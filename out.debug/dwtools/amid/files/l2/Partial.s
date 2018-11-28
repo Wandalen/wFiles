@@ -792,6 +792,10 @@ having.writing = 0;
 having.reading = 1;
 having.driving = 1;
 
+var operates = pathResolveHardLinkAct.operates = Object.create( null );
+
+operates.filePath = { read : 1 }
+
 //
 
 function _pathResolveHardLink_body( o )
@@ -4911,7 +4915,7 @@ function _link_functor( gen )
   _.routineOptions( _link_functor,gen );
 
   let nameOfMethodAct = gen.nameOfMethodAct;
-  let nameOfMethodEntry = _.strRemoveEnd( gen.nameOfMethodAct,'Act' );
+  let nameOfMethodEntry = _.strRemoveEnd( gen.nameOfMethodAct, 'Act' );
   let expectingAbsolutePaths = gen.expectingAbsolutePaths;
   let onBeforeRaname = gen.onBeforeRaname;
   let onAfterRaname = gen.onAfterRaname;
@@ -6445,11 +6449,6 @@ let Proto =
   providerForPath : providerForPath,
   providerRegisterTo : providerRegisterTo,
 
-  // claimBeginAct : claimBeginAct,
-  // claimBegin : claimBegin,
-  // claimEndAct : claimEndAct,
-  // claimEnd : claimEnd,
-
   // path
 
   localFromGlobal : localFromGlobal,
@@ -6531,10 +6530,10 @@ let Proto =
 
   isTerminalAct : isTerminalAct,
   isTerminal : isTerminal,
-  terminalsAre : _vectorize( isTerminal ),
-  terminalsAllAre : _vectorizeAll( isTerminal ),
-  terminalsAllAre : _vectorizeAny( isTerminal ),
-  terminalsAllAre : _vectorizeNone( isTerminal ),
+  areTerminals : _vectorize( isTerminal ),
+  allAreTerminals : _vectorizeAll( isTerminal ),
+  anyAreTerminals : _vectorizeAny( isTerminal ),
+  noneAreTerminals : _vectorizeNone( isTerminal ),
   resolvedIsTerminal : resolvedIsTerminal,
   resolvedAreTerminals : _vectorize( resolvedIsTerminal ),
   resolvedAllAreTerminals : _vectorizeAll( resolvedIsTerminal ),
@@ -6543,10 +6542,10 @@ let Proto =
 
   isDirAct : isDirAct,
   isDir : isDir,
-  dirsAre : _vectorize( isDir ),
-  dirsAllAre : _vectorizeAll( isDir ),
-  dirsAllAre : _vectorizeAny( isDir ),
-  dirsAllAre : _vectorizeNone( isDir ),
+  areDirs : _vectorize( isDir ),
+  allAreDirs : _vectorizeAll( isDir ),
+  anyAreDirs : _vectorizeAny( isDir ),
+  noneAreDirs : _vectorizeNone( isDir ),
   resolvedIsDir : resolvedIsDir,
   resolvedAreDirs : _vectorize( resolvedIsDir ),
   resolvedAllAreDirs : _vectorizeAll( resolvedIsDir ),

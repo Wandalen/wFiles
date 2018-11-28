@@ -2,31 +2,10 @@
 
 'use strict';
 
-var isBrowser = true;
-
 if( typeof module !== 'undefined' )
 {
 
-  isBrowser = false;
-
-  if( typeof _global_ === 'undefined' || !_global_.wBase )
-  {
-    let toolsPath = '../../../dwtools/Base.s';
-    let toolsExternal = 0;
-    try
-    {
-      toolsPath = require.resolve( toolsPath );
-    }
-    catch( err )
-    {
-      toolsExternal = 1;
-      require( 'wTools' );
-    }
-    if( !toolsExternal )
-    require( toolsPath );
-  }
-
-  var _ = _global_.wTools;
+  let _ = require( '../../Tools.s' );
 
   if( !_global_.wTools.FileProvider )
   require( '../files/UseTop.s' );
@@ -36,8 +15,6 @@ if( typeof module !== 'undefined' )
   _.include( 'wTesting' );
 
   var waitSync = require( 'wait-sync' );
-
-  // _.assert( HardDrive === _.FileProvider.HardDrive,'overwritten' );
 
 }
 
@@ -87,7 +64,7 @@ function symlinkIsAllowed()
 {
   var self = this;
 
-  if( !isBrowser && typeof process !== undefined )
+  if( Config.platform === 'nodejs' && typeof process !== undefined )
   if( process.platform === 'win32' )
   {
     var allowed = false;
@@ -2690,7 +2667,7 @@ function fileReadJson( test )
   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
   var bufferData1;
 
-  if( isBrowser || self.providerIsInstanceOf( _.FileProvider.Extract ))
+  if( Config.platform === 'browser' || self.providerIsInstanceOf( _.FileProvider.Extract ))
   bufferData1 = new ArrayBuffer( 4 );
   else
   bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] );
@@ -22214,7 +22191,7 @@ function nativize( t )
     return;
   }
 
-  if( !isBrowser && process.platform === 'win32' )
+  if( Config.platform === 'nodejs' && process.platform === 'win32' )
   {
     t.description = 'path in win32 style ';
 
@@ -22666,7 +22643,7 @@ function filesAreHardLinked( test )
     return;
   }
 
-  if( isBrowser || test.context.providerIsInstanceOf( _.FileProvider.Extract ) )
+  if( Config.platform === 'browser' || test.context.providerIsInstanceOf( _.FileProvider.Extract ) )
   var bufferData = new ArrayBuffer( 4 );
   else
   var bufferData = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] );
@@ -22765,7 +22742,7 @@ function filesAreSame( test )
   var bufferData1;
   var bufferData2;
 
-  if( isBrowser || test.context.providerIsInstanceOf( _.FileProvider.Extract ) )
+  if( Config.platform === 'browser' || test.context.providerIsInstanceOf( _.FileProvider.Extract ) )
   {
     bufferData1 = new ArrayBuffer( 4 );
     bufferData2 = new ArrayBuffer( 5 );
@@ -22959,7 +22936,7 @@ function filesSize( test )
   var bufferData1;
   var bufferData2;
 
-  if( isBrowser || test.context.providerIsInstanceOf( _.FileProvider.Extract ) )
+  if( Config.platform === 'browser' || test.context.providerIsInstanceOf( _.FileProvider.Extract ) )
   {
     bufferData1 = new ArrayBuffer( 4 );
     bufferData2 = new ArrayBuffer( 5 );
@@ -23073,7 +23050,7 @@ function fileSize( test )
   var bufferData1;
   var bufferData2;
 
-  if( isBrowser || test.context.providerIsInstanceOf( _.FileProvider.Extract ) )
+  if( Config.platform === 'browser' || test.context.providerIsInstanceOf( _.FileProvider.Extract ) )
   {
     bufferData1 = new ArrayBuffer( 4 );
     bufferData2 = new ArrayBuffer( 5 );

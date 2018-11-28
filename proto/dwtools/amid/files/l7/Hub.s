@@ -812,6 +812,7 @@ function routinesGenerate()
     paths : null,
     having : null,
     encoders : null,
+    operates : null,
   }
 
   for( let r in Parent.prototype ) (function()
@@ -828,7 +829,7 @@ function routinesGenerate()
     return;
 
     _.assert( !!original );
-    _.assertMapHasOnly( original,KnownRoutineFields );
+    _.assertMapHasOnly( original, KnownRoutineFields );
 
     if( having.hubRedirecting === 0 || having.hubRedirecting === false )
     return;

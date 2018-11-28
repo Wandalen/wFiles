@@ -5,7 +5,7 @@
 if( typeof module !== 'undefined' )
 {
 
-  let _ = require( '../../Tools.s' );
+  var _ = require( '../../Tools.s' );
 
   _.include( 'wTesting' );
 
@@ -23,7 +23,7 @@ var Parent = wTester;
 
 function onSuiteBegin()
 {
-  this.isBrowser = typeof module === 'undefined';
+  // this.isBrowser = typeof module === 'undefined';
 
   /* qqq : make dirTempOpen working in browser */
   // if( !this.isBrowser )
@@ -53,7 +53,7 @@ function makeStandardExtract( o )
 {
   _.assert( arguments.length === 0 || arguments.length === 1 );
 
-  let extract = _.FileProvider.Extract
+  var extract = _.FileProvider.Extract
   ({
     filesTree :
     {
@@ -267,7 +267,7 @@ function symlinkIsAllowed()
 {
   var self = this;
 
-  if( !self.isBrowser && typeof process !== undefined )
+  if( Config.platform === 'nodejs' && typeof process !== undefined )
   if( process.platform === 'win32' )
   {
     var allow = false;
@@ -300,7 +300,7 @@ function symlinkIsAllowed()
 !!! implement and cover _.routineExtend( null, routine );
 */
 
-let select = _.routineFromPreAndBody( _.select.pre, _.select.body );
+var select = _.routineFromPreAndBody( _.select.pre, _.select.body );
 var defaults = select.defaults;
 defaults.upToken = [ '/', '.' ];
 
@@ -491,22 +491,22 @@ function recordFilterInherit( test )
     },
   });
 
-  let f1 = extract1.recordFilter();
+  var f1 = extract1.recordFilter();
 
   f1.prefixPath = '/commonDir/filter1'
   f1.basePath = './proto';
   f1.inFilePath = { 'f' : true, 'd' : true, 'ex' : false, 'f1' : true, 'd1' : true, 'ex1' : false }
 
-  let f2 = extract1.recordFilter();
+  var f2 = extract1.recordFilter();
 
   f2.prefixPath = '/commonDir/filter2'
   f2.basePath = './proto';
   f2.inFilePath = { 'f' : true, 'd' : true, 'ex' : false, 'f2' : true, 'd2' : true, 'ex2' : false }
 
-  let f3 = extract1.recordFilter();
+  var f3 = extract1.recordFilter();
   f3.pathsInherit( f1 ).pathsInherit( f2 );
 
-  let expectedBasePath =
+  var expectedBasePath =
   {
     '/commonDir/filter1/f' : '/commonDir/filter1/proto',
     '/commonDir/filter1/d' : '/commonDir/filter1/proto',
@@ -524,6 +524,120 @@ function recordFilterInherit( test )
 
   test.identical( f3.prefixPath, null );
   test.identical( f3.basePath, expectedBasePath );
+
+}
+
+//
+
+function recordFilter( test )
+{
+
+  var extract1 = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      src :
+      {
+        f1: '1',
+        d : { f2 : '2', f3 : '3' },
+      },
+      dst :
+      {
+        f1: 'dst',
+        d : 'dst',
+      }
+    },
+  });
+
+  /* */
+
+  var files = extract1.filesReflect
+  ({
+    reflectMap : { 'src' : 'dst' },
+    srcFilter : { prefixPath : '/' },
+    dstFilter : { prefixPath : '/' },
+  });
+
+  var expSrc = [ '/src', '/src/f1', '/src/d', '/src/d/f2', '/src/d/f3' ];
+  var gotSrc = _.select( files, '*/src/absolute' );
+  var expDst = [ '/src', '/src/f1', '/src/d', '/src/d/f2', '/src/d/f3' ];
+  var gotDst = _.select( files, '*/src/absolute' );
+
+  test.identical( gotSrc, expSrc );
+  test.identical( gotDst, expDst );
+
+  /* */
+
+  var files = extract1.filesReflect
+  ({
+    reflectMap : { 'src' : '/dst' },
+    srcFilter : { prefixPath : '/' },
+    // dstFilter : { prefixPath : '/' },
+  });
+
+  var expSrc = [ '/src', '/src/f1', '/src/d', '/src/d/f2', '/src/d/f3' ];
+  var gotSrc = _.select( files, '*/src/absolute' );
+  var expDst = [ '/src', '/src/f1', '/src/d', '/src/d/f2', '/src/d/f3' ];
+  var gotDst = _.select( files, '*/src/absolute' );
+
+  test.identical( gotSrc, expSrc );
+  test.identical( gotDst, expDst );
+
+  /* */
+
+  var files = extract1.filesReflect
+  ({
+    reflectMap : { '/src' : 'dst' },
+    // srcFilter : { prefixPath : '/' },
+    dstFilter : { prefixPath : '/' },
+  });
+
+  var expSrc = [ '/src', '/src/f1', '/src/d', '/src/d/f2', '/src/d/f3' ];
+  var gotSrc = _.select( files, '*/src/absolute' );
+  var expDst = [ '/src', '/src/f1', '/src/d', '/src/d/f2', '/src/d/f3' ];
+  var gotDst = _.select( files, '*/src/absolute' );
+
+  test.identical( gotSrc, expSrc );
+  test.identical( gotDst, expDst );
+
+  /* */
+
+  if( !Config.debug )
+  return;
+
+  /* */
+
+  test.description = 'cant deduce base path';
+
+  test.shouldThrowError( () =>
+  {
+    extract1.filesReflect
+    ({
+      reflectMap : { 'src' : 'dst' },
+      // srcFilter : { prefixPath : '/' },
+      // dstFilter : { prefixPath : '/' },
+    });
+  });
+
+  test.shouldThrowError( () =>
+  {
+    extract1.filesReflect
+    ({
+      reflectMap : { 'src' : 'dst' },
+      srcFilter : { prefixPath : '/' },
+      // dstFilter : { prefixPath : '/' },
+    });
+  });
+
+  test.shouldThrowError( () =>
+  {
+    extract1.filesReflect
+    ({
+      reflectMap : { 'src' : 'dst' },
+      // srcFilter : { prefixPath : '/' },
+      dstFilter : { prefixPath : '/' },
+    });
+  });
 
 }
 
@@ -738,9 +852,9 @@ function filesFindTrivial( t )
 
 function filesFindMaskTerminal( test )
 {
-  let context = this;
-  let testDir = _.path.join( context.testRootDirectory, test.name );
-  let filePath = _.path.join( testDir, 'package.json' );
+  var context = this;
+  var testDir = _.path.join( context.testRootDirectory, test.name );
+  var filePath = _.path.join( testDir, 'package.json' );
 
   _.fileProvider.filesDelete( testDir );
   _.fileProvider.fileWrite( filePath, filePath );
@@ -911,7 +1025,7 @@ function filesFindPreset( test )
 
 function filesFind( test )
 {
-  let context = this;
+  var context = this;
   var testDir = _.path.join( context.testRootDirectory, test.name );
 
   var fixedOptions =
@@ -1807,9 +1921,9 @@ filesFind2.timeOut = 15000;
 
 function filesFindRecursive( test )
 {
-  let self = this;
+  var self = this;
 
-  let provider = _.FileProvider.Extract
+  var provider = _.FileProvider.Extract
   ({
     filesTree :
     {
@@ -5175,7 +5289,7 @@ ctrlctrl :
 
 function filesGlob( test )
 {
-  let context = this;
+  var context = this;
   var filesTree =
   {
     'a' :
@@ -6207,7 +6321,7 @@ function filesReflectTrivial( t )
     linking : 'nop'
   }
 
-  t.shouldThrowError( () =>  provider.filesReflect( o ) );
+  t.shouldThrowError( () => provider.filesReflect( o ) );
   t.identical( provider.filesTree, tree );
 
   //
@@ -6484,8 +6598,8 @@ function filesReflectRecursive( t )
 
 function filesReflectMutuallyExcluding( t )
 {
-  let context = this;
-  let precise = true;
+  var context = this;
+  var precise = true;
 
   /* */
 
@@ -7735,7 +7849,7 @@ function _filesReflect( t, o )
 
   function optionsMake()
   {
-    let options =
+    var options =
     {
       reflectMap : { '/src' : '/dst' },
       srcFilter : { effectiveFileProvider : p.src },
@@ -9669,7 +9783,7 @@ function filesReflector( t )
 
 function filesReflectWithHub( test )
 {
-  let context = this;
+  var context = this;
   var filesTree =
   {
     src : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
@@ -9793,8 +9907,8 @@ function filesReflectWithPrefix( t )
 
 function filesReflectDstPreserving( test )
 {
-  let context = this;
-  let filesTree =
+  var context = this;
+  var filesTree =
   {
     src :
     {
@@ -10180,7 +10294,7 @@ function filesReflectDstPreserving( test )
 
 function filesReflectDstDeletingDirs( test )
 {
-  let self = this;
+  var self = this;
 
   /* */
 
@@ -10619,11 +10733,11 @@ function filesReflectDstDeletingDirs( test )
 
 function filesReflectLinked( test )
 {
-  let self = this;
+  var self = this;
 
-  let testDir = _.path.join( self.testRootDirectory, test.name );
-  let srcDir = _.path.join( testDir, 'src' );
-  let dstDir = _.path.join( testDir, 'dst' );
+  var testDir = _.path.join( self.testRootDirectory, test.name );
+  var srcDir = _.path.join( testDir, 'src' );
+  var dstDir = _.path.join( testDir, 'dst' );
 
   logger.log( 'testDir', testDir );
 
@@ -13542,8 +13656,8 @@ experiment.experimental = 1;
 // function filesFindExperiment( test )
 // {
 //
-//   let testDir = _.path.join( context.testRootDirectory, test.name );
-//   let filePath = _.path.join( testDir, 'package.json' );
+//   var testDir = _.path.join( context.testRootDirectory, test.name );
+//   var filePath = _.path.join( testDir, 'package.json' );
 //
 //   _.fileProvider.filesDelete( testDir );
 //
@@ -13595,7 +13709,7 @@ var Self =
   context :
   {
 
-    isBrowser : null,
+    // isBrowser : null,
     testRootDirectory : null,
 
     makeStandardExtract : makeStandardExtract,
@@ -13613,6 +13727,7 @@ var Self =
 
     recordFilterPrefixesApply : recordFilterPrefixesApply,
     recordFilterInherit : recordFilterInherit,
+    recordFilter : recordFilter,
 
     filesFindTrivial : filesFindTrivial,
     filesFindMaskTerminal : filesFindMaskTerminal,

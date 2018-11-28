@@ -2799,12 +2799,26 @@ function filesReflect_body( o )
 
     o2.srcPath = srcPath;
     o2.srcFilter.inFilePath = srcPath;
-    o2.srcFilter.form();
+    try
+    {
+      o2.srcFilter.form();
+    }
+    catch( err )
+    {
+      throw _.err( 'Failed to form source filter\n', err );
+    }
     o2.srcPath = o2.srcFilter.stemPath;
 
     o2.dstPath = dstPath;
     o2.dstFilter.inFilePath = dstPath;
-    o2.dstFilter.form();
+    try
+    {
+      o2.dstFilter.form();
+    }
+    catch( err )
+    {
+      throw _.err( 'Failed to form destination filter\n', err );
+    }
     o2.dstPath = o2.dstFilter.stemPath;
 
     let src = o2.srcFilter.effectiveFileProvider;

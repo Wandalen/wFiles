@@ -2843,9 +2843,20 @@ function filesReflect_body( o )
 
     if( o.verbosity >= 1 )
     {
-      let dsts = _.mapVals( o.reflectMap ).filter( ( p ) => _.strIs( p ) || _.arrayIs( p ) );
-      dsts = _.arrayRemoveDuplicates( dsts );
-      dsts = path.s.normalize( path.s.join( o.dstFilter.prefixPath || '.', o.dstFilter.basePath || '.', dsts ) );
+      let dsts = _.mapVals( o.reflectMap );
+      dsts = _.arrayFlattenOnce( null, dsts );
+      dsts = _.filter( dsts, ( p ) =>
+      {
+        if( _.strIs( p ) )
+        return p;
+        if( p === true )
+        return o.srcFilter.prefixPath;
+        if( o === false )
+        return;
+        return p;
+      });
+      dsts = path.s.normalize( path.s.join( o.dstFilter.prefixPath || '.', dsts ) );
+      debugger;
       self.logger.log( _.timeSpent( ' + Reflect ' + o.result.length + ' files to ' + path.commonReport( dsts ) + ' in ', time ) );
     }
 

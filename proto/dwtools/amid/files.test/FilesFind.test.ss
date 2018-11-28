@@ -398,12 +398,30 @@ function recordFilterPrefixesApply( test )
   test.case = 'trivial';
 
   var f1 = extract1.recordFilter();
-  var expectedBasePath = { '/commonDir/filter1/proto/f' : '/commonDir/filter1/proto', '/commonDir/filter1/proto/d' : '/commonDir/filter1/proto', '/commonDir/filter1/proto/ex' : '/commonDir/filter1/proto' }
-  var expectedFilePath = { '/commonDir/filter1/proto/f' : true, '/commonDir/filter1/proto/d' : true, '/commonDir/filter1/proto/ex' : false }
+  var expectedBasePath = { '/commonDir/filter1/f' : '/commonDir/filter1/proto', '/commonDir/filter1/d' : '/commonDir/filter1/proto', '/commonDir/filter1/ex' : '/commonDir/filter1/proto' }
+  var expectedFilePath = { '/commonDir/filter1/f' : true, '/commonDir/filter1/d' : true, '/commonDir/filter1/ex' : false }
 
   f1.inFilePath = { 'f' : true, 'd' : true, 'ex' : false }
   f1.prefixPath = '/commonDir/filter1'
   f1.basePath = './proto';
+
+  f1.prefixesApply();
+
+  test.identical( f1.prefixPath, null );
+  test.identical( f1.basePath, expectedBasePath );
+  test.identical( f1.inFilePath, expectedFilePath );
+
+  /* */
+
+  test.case = 'trivial';
+
+  var f1 = extract1.recordFilter();
+  var expectedBasePath = { '/commonDir/filter1/f' : '/commonDir/filter1', '/commonDir/filter1/d' : '/commonDir/filter1', '/commonDir/filter1/ex' : '/commonDir/filter1' }
+  var expectedFilePath = { '/commonDir/filter1/f' : true, '/commonDir/filter1/d' : true, '/commonDir/filter1/ex' : false }
+
+  f1.inFilePath = { 'f' : true, 'd' : true, 'ex' : false }
+  f1.prefixPath = '/commonDir/filter1'
+  f1.basePath = '.';
 
   f1.prefixesApply();
 
@@ -418,11 +436,11 @@ function recordFilterPrefixesApply( test )
   var f1 = extract1.recordFilter();
   var expectedBasePath =
   {
-    '/commonDir/filter1/proto/f' : '/commonDir/filter1/proto',
+    '/commonDir/filter1/f' : '/commonDir/filter1/proto',
     '/commonDir/filter1/d' : '/commonDir/filter1/proto',
     '/commonDir/ex' : '/commonDir/filter1/proto',
   }
-  var expectedFilePath = { '/commonDir/filter1/proto/f' : true, '/commonDir/filter1/d' : true, '/commonDir/ex' : false }
+  var expectedFilePath = { '/commonDir/filter1/f' : true, '/commonDir/filter1/d' : true, '/commonDir/ex' : false }
 
   f1.inFilePath = { 'f' : true, '/commonDir/filter1/d' : true, '/commonDir/ex' : false }
   f1.prefixPath = '/commonDir/filter1'
@@ -443,10 +461,10 @@ function recordFilterPrefixesApply( test )
   {
     '/commonDir/filter1/d' : '/proto',
     '/commonDir/ex' : '/proto',
-    '/proto/f' : '/proto',
+    '/commonDir/filter1/f' : '/proto',
   }
 
-  var expectedFilePath = { '/proto/f' : true, '/commonDir/filter1/d' : true, '/commonDir/ex' : false }
+  var expectedFilePath = { '/commonDir/filter1/f' : true, '/commonDir/filter1/d' : true, '/commonDir/ex' : false }
 
   f1.inFilePath = { 'f' : true, '/commonDir/filter1/d' : true, '/commonDir/ex' : false }
   f1.prefixPath = '/commonDir/filter1'
@@ -490,18 +508,18 @@ function recordFilterInherit( test )
 
   let expectedBasePath =
   {
-    '/commonDir/filter1/proto/f' : '/commonDir/filter1/proto',
-    '/commonDir/filter1/proto/d' : '/commonDir/filter1/proto',
-    '/commonDir/filter1/proto/ex' : '/commonDir/filter1/proto',
-    '/commonDir/filter1/proto/f1' : '/commonDir/filter1/proto',
-    '/commonDir/filter1/proto/d1' : '/commonDir/filter1/proto',
-    '/commonDir/filter1/proto/ex1' : '/commonDir/filter1/proto',
-    '/commonDir/filter2/proto/f' : '/commonDir/filter2/proto',
-    '/commonDir/filter2/proto/d' : '/commonDir/filter2/proto',
-    '/commonDir/filter2/proto/ex' : '/commonDir/filter2/proto',
-    '/commonDir/filter2/proto/f2' : '/commonDir/filter2/proto',
-    '/commonDir/filter2/proto/d2' : '/commonDir/filter2/proto',
-    '/commonDir/filter2/proto/ex2' : '/commonDir/filter2/proto',
+    '/commonDir/filter1/f' : '/commonDir/filter1/proto',
+    '/commonDir/filter1/d' : '/commonDir/filter1/proto',
+    '/commonDir/filter1/ex' : '/commonDir/filter1/proto',
+    '/commonDir/filter1/f1' : '/commonDir/filter1/proto',
+    '/commonDir/filter1/d1' : '/commonDir/filter1/proto',
+    '/commonDir/filter1/ex1' : '/commonDir/filter1/proto',
+    '/commonDir/filter2/f' : '/commonDir/filter2/proto',
+    '/commonDir/filter2/d' : '/commonDir/filter2/proto',
+    '/commonDir/filter2/ex' : '/commonDir/filter2/proto',
+    '/commonDir/filter2/f2' : '/commonDir/filter2/proto',
+    '/commonDir/filter2/d2' : '/commonDir/filter2/proto',
+    '/commonDir/filter2/ex2' : '/commonDir/filter2/proto',
   }
 
   test.identical( f3.prefixPath, null );
@@ -3781,6 +3799,7 @@ function filesFindGlob( test )
 
   clean();
   var expectedAbsolutes = [];
+  debugger;
   var records = globTerminals({ filePath : 'src1/**', filter : { prefixPath : '/src2', basePath : '/src2' } });
   var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
@@ -3792,6 +3811,8 @@ function filesFindGlob( test )
   var records = globAll({ filePath : 'src1/**', filter : { prefixPath : '/src2', basePath : '/src2' } });
   var gotAbsolutes = context.select( records, '*.absolute' );
   test.identical( gotAbsolutes, expectedAbsolutes );
+
+  // debugger; return; xxx
 
   /* */
 
@@ -4584,7 +4605,9 @@ function filesFindGlob( test )
   clean();
   var expectedAbsolutes = [ '/doubledir/d1/a', '/doubledir/d1/d11/b', '/doubledir/d1/d11/c' ];
   var expectedRelatives = [ '../a', './b', './c' ];
+  debugger;
   var records = globTerminals({ filter : { prefixPath : '/doubledir/d1/**', basePath : '/doubledir/d1/d11' } });
+  debugger;
   var gotAbsolutes = context.select( records, '*.absolute' );
   var gotRelatives = context.select( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
@@ -4613,6 +4636,8 @@ function filesFindGlob( test )
   var gotRelatives = context.select( records, '*.relative' );
   test.identical( gotAbsolutes, expectedAbsolutes );
   test.identical( gotRelatives, expectedRelatives );
+
+  // debugger; return; xxx
 
   test.case = 'globAll prefixPath : /doubledir/d1/**, basePath:/doubledir/d1/d11, filePath:b';
 
@@ -5436,7 +5461,7 @@ function filesReflectTrivial( t )
   {
     reflectMap :
     {
-      '/src' : '/dst'
+      '/src' : '/dst',
     },
     filter :
     {
@@ -9594,6 +9619,8 @@ function filesReflector( t )
   });
   reflect( '/alt/a' );
   t.identical( dst.filesTree, { alt : { a : '/alt/a' } } );
+
+  // debugger; return; xxx
 
   //
 

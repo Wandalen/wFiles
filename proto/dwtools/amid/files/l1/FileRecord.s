@@ -305,6 +305,7 @@ function _statAnalyze()
   let c = record.context;
   let fileProvider = c.effectiveFileProvider;
   let path = record.path;
+  let logger = fileProvider.logger || _global.logger;
 
   _.assert( c instanceof _.FileRecordFactory,'_record expects instance of ( FileRecordFactory )' );
   _.assert( fileProvider instanceof _.FileProvider.Abstract,'Expects file provider instance of FileProvider' );
@@ -320,11 +321,12 @@ function _statAnalyze()
 
   /* */
 
-  if( fileProvider.verbosity > 2 )
-  if( !record.stat )
-  {
-    logger.log( '!','Cant access file :',record.absolute );
-  }
+  // if( fileProvider.verbosity > 2 )
+  // if( !record.stat )
+  // {
+  //   debugger;
+  //   logger.log( '!','Cant access file :', record.absolute );
+  // }
 
   /* */
 

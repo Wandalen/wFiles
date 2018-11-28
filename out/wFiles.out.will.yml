@@ -300,8 +300,8 @@ reflector:
       ./dwtools/amid/files.test/Provider.Url.test.ss: true
       ./dwtools/amid/files.test/Record.test.s: true
     srcFilter:
-      basePath: ./proto
-      prefixPath: .
+      basePath: .
+      prefixPath: proto
     dstFilter:
       basePath: .
       prefixPath: .

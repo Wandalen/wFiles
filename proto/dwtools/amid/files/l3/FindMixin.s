@@ -192,6 +192,9 @@ function _filesFilterForm( o )
       '{- o.filePath -} and {- o.filter.inFilePath -} should be exactly same or null'
     );
 
+    // if( o.filter.basePath === '/dst' )
+    // debugger;
+
     o.filter.inFilePath = o.filePath;
     o.filter.form();
     o.filePath = o.filter.stemPath;
@@ -1593,6 +1596,7 @@ function filesReflectEvaluate_body( o )
       let dstOptions2 = _.mapExtend( null, dstOptions );
       dstOptions2.filePath = record.dst.absolute;
       dstOptions2.filter = filter2;
+      dstOptions2.filter.stemPath = null;
       dstOptions2.includingBase = 0;
       dstOptions2.onUp = [ _.routineJoin( undefined, handleDstUp, [ srcRecord.context, 'dstRewriting', filter2 ] ) ];
 
@@ -1656,6 +1660,7 @@ function filesReflectEvaluate_body( o )
         let dstOptions2 = _.mapExtend( null, dstOptions );
         dstOptions2.filePath = dst.path.join( record.dst.context.basePath, dstRecords[ f ].absolute );
         dstOptions2.filter = dstOptions2.filter.clone();
+        dstOptions2.filter.stemPath = null;
         dstOptions2.filter.inFilePath = null;
         dstOptions2.filter.basePath = record.dst.context.basePath;
         dstOptions2.onUp = [ _.routineJoin( null, handleDstUp, [ record.src.context, 'dstDeleting', null ] ) ];

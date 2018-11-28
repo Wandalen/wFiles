@@ -609,91 +609,12 @@ function _formBasePath()
   _.assert( _.objectIs( filter ) );
   _.assert( filter.globMap === null );
   _.assert( filter.formed === 2 );
-  // _.assert( filter.prefixPath === null || _.strIs( filter.prefixPath ) );
-  // _.assert( filter.postfixPath === null || _.strIs( filter.postfixPath ) );
-  // _.assert( filter.basePath === null || _.strIs( filter.basePath ) );
-  // _.assert( _.strIs( filter.inFilePath ) || _.arrayIs( filter.inFilePath ) || _.mapIs( filter.inFilePath ), 'inFilePath of file record filter is not defined' );
+  _.assert( filter.stemPath === null );
 
+  // debugger;
+  filter.prefixesApply();
+  // debugger;
   filter.globMap = filter.pathsNormalize();
-
-  // filter.inFilePath = path.s.normalize( filter.inFilePath );
-  // filter.globMap = path.s.normalize( path.s.join( filter.prefixPath || '.', filter.inFilePath || '.', filter.postfixPath || '.' ) );
-  // filter.globMap = path.globMapExtend( null, filter.globMap );
-  //
-  // /* */
-  //
-  // for( let g in filter.globMap )
-  // {
-  //   let g2 = usePath( g );
-  //   if( g === g2 )
-  //   continue;
-  //   _.assert( _.strIs( g2 ) );
-  //   filter.globMap[ g2 ] = filter.globMap[ g ];
-  //   delete filter.globMap[ g ];
-  // }
-  //
-  // /* */
-  //
-  // if( filter.basePath === null )
-  // {
-  //   filter.basePath = _.mapKeys( filter.globMap ).filter( ( g ) => path.isAbsolute( g ) /*|| path.isGlobal( g )*/ );
-  //   filter.basePath = filter.basePath.map( ( g ) => path.fromGlob( g ) );
-  //   _.sure( filter.basePath.length > 0 || ( _.arrayIs( filter.inFilePath ) && filter.inFilePath.length === 0 ), 'Cant deduce basePath' );
-  //   let basePath = Object.create( null );
-  //   for( let b in filter.basePath )
-  //   basePath[ filter.basePath[ b ] ] = path.normalize( filter.basePath[ b ] );
-  //   filter.basePath = basePath;
-  // }
-  // else
-  // {
-  //
-  //   _.assert( _.strIs( filter.basePath ) );
-  //   filter.basePath = path.normalize( path.join( filter.prefixPath || '.', filter.basePath, filter.postfixPath || '.' ) );
-  //   filter.basePath = usePath( filter.basePath );
-  //   filter.basePath = path.normalize( filter.basePath );
-  //   let basePath = Object.create( null );
-  //   let stemPath = _.mapKeys( filter.globMap ).filter( ( g ) => path.isAbsolute( g ) );
-  //   stemPath = stemPath.map( ( g ) => path.fromGlob( g ) );
-  //   for( let b in stemPath )
-  //   basePath[ stemPath[ b ] ] = filter.basePath;
-  //   filter.basePath = basePath;
-  //
-  // }
-  //
-  // /* */
-  //
-  // filter.formed = 3;
-  //
-  // if( _.none( path.s.areGlob( filter.globMap ) ) && _.all( _.mapVals( filter.globMap ) ) )
-  // {
-  //   filter.stemPath = _.mapKeys( filter.globMap );
-  //   if( filter.stemPath.length === 1 )
-  //   filter.stemPath = filter.stemPath[ 0 ];
-  //   filter.globMap = null;
-  // }
-  //
-  // _.assert
-  // (
-  //      ( _.arrayIs( filter.stemPath ) && filter.stemPath.length === 0 )
-  //   || ( _.mapIs( filter.basePath ) && _.mapKeys( filter.basePath ).length > 0 )
-  //   , 'Cant deduce base path'
-  // )
-  //
-  // if( !_.mapKeys( filter.basePath ).length && !filter.effectiveFileProvider )
-  // filter.effectiveFileProvider = filter.hubFileProvider;
-  //
-  // /* */
-  //
-  // function usePath( path )
-  // {
-  //   if( filter.effectiveFileProvider && !_.path.isGlobal( path ) )
-  //   return path;
-  //   let effectiveProvider2 = fileProvider.providerForPath( path );
-  //   filter.effectiveFileProvider = filter.effectiveFileProvider || effectiveProvider2;
-  //   _.assert( effectiveProvider2 === null || filter.effectiveFileProvider === effectiveProvider2, 'Record filter should have paths of single file provider' );
-  //   let result = filter.hubFileProvider.localFromGlobal( path );
-  //   return result;
-  // }
 
 }
 
@@ -752,6 +673,7 @@ function _formMasks()
   if( filter.globMap )
   {
 
+    // debugger;
     for( let g in filter.globMap )
     {
 
@@ -795,6 +717,7 @@ function _formMasks()
       _.assert( subfilter.maskAll !== filter.maskAll );
     }
 
+    // debugger;
   }
 
   /* */
@@ -1019,18 +942,19 @@ function pathsNormalize()
   _.assert( arguments.length === 0 );
   _.assert( filter.formed === 2 );
 
-  _.assert( filter.prefixPath === null || _.strIs( filter.prefixPath ) );
-  _.assert( filter.postfixPath === null || _.strIs( filter.postfixPath ) );
+  _.assert( filter.prefixPath === null, 'Fixes should be applied so far' );
+  _.assert( filter.postfixPath === null, 'Fixes should be applied so far' );
 
   // _.assert( filter.prefixPath === null || _.strIs( filter.prefixPath ) );
   // _.assert( filter.postfixPath === null || _.strIs( filter.postfixPath ) );
 
-  _.assert( filter.basePath === null || _.strIs( filter.basePath ) );
+  _.assert( filter.basePath === null || _.strIs( filter.basePath ) || _.mapIs( filter.basePath ) );
   _.assert( _.strIs( filter.inFilePath ) || _.arrayIs( filter.inFilePath ) || _.mapIs( filter.inFilePath ), 'inFilePath of file record filter is not defined' );
 
   filter.inFilePath = path.s.normalize( filter.inFilePath );
-  let inFilePath = path.s.normalize( path.s.join( filter.prefixPath || '.', filter.inFilePath || '.', filter.postfixPath || '.' ) );
-  inFilePath = path.globMapExtend( null, inFilePath );
+  let inFilePath = path.globMapExtend( null, filter.inFilePath );
+  // let inFilePath = path.s.normalize( path.s.join( filter.prefixPath || '.', filter.inFilePath || '.', filter.postfixPath || '.' ) );
+  // inFilePath = path.globMapExtend( null, inFilePath );
 
   /* */
 
@@ -1056,11 +980,11 @@ function pathsNormalize()
     basePath[ filter.basePath[ b ] ] = path.normalize( filter.basePath[ b ] );
     filter.basePath = basePath;
   }
-  else
+  else if( _.strIs( filter.basePath ) )
   {
 
     _.assert( _.strIs( filter.basePath ) );
-    filter.basePath = path.normalize( path.join( filter.prefixPath || '.', filter.basePath, filter.postfixPath || '.' ) );
+    // filter.basePath = path.normalize( path.join( filter.prefixPath || '.', filter.basePath, filter.postfixPath || '.' ) );
     filter.basePath = usePath( filter.basePath );
     filter.basePath = path.normalize( filter.basePath );
     let basePath = Object.create( null );
@@ -1069,6 +993,33 @@ function pathsNormalize()
     for( let b in stemPath )
     basePath[ stemPath[ b ] ] = filter.basePath;
     filter.basePath = basePath;
+
+  }
+  else if( _.mapIs( filter.basePath ) )
+  {
+
+    _.assert( _.mapIs( filter.basePath ) );
+    // filter.basePath = path.normalize( path.join( filter.prefixPath || '.', filter.basePath, filter.postfixPath || '.' ) );
+
+    filter.basePath = path.filter( filter.basePath, ( p ) => usePath( p ) );
+    filter.basePath = path.filter( filter.basePath, ( p ) => path.normalize( p ) );
+
+    // filter.basePath = usePath( filter.basePath );
+    // filter.basePath = path.normalize( filter.basePath );
+
+    // let basePath = Object.create( null );
+    let stemPath = _.mapKeys( inFilePath ).filter( ( g ) => path.isAbsolute( g ) );
+    // stemPath = stemPath.map( ( g ) => path.fromGlob( g ) );
+    // for( let b in stemPath )
+    // basePath[ stemPath[ b ] ] = filter.basePath;
+    // filter.basePath = basePath;
+
+    if( Config.debug )
+    {
+      // debugger;
+      let diff = _.arraySetDiff( _.mapKeys( filter.basePath ), path.s.fromGlob( stemPath ) );
+      _.assert( diff.length === 0, () => 'Some file paths do not have base paths or opposite : ' + _.strQuote( diff ) );
+    }
 
   }
 
@@ -1098,14 +1049,14 @@ function pathsNormalize()
 
   /* */
 
-  function usePath( path )
+  function usePath( filePath )
   {
-    if( filter.effectiveFileProvider && !_.path.isGlobal( path ) )
-    return path;
-    let effectiveProvider2 = fileProvider.providerForPath( path );
+    if( filter.effectiveFileProvider && !path.isGlobal( filePath ) )
+    return filePath;
+    let effectiveProvider2 = fileProvider.providerForPath( filePath );
     filter.effectiveFileProvider = filter.effectiveFileProvider || effectiveProvider2;
     _.assert( effectiveProvider2 === null || filter.effectiveFileProvider === effectiveProvider2, 'Record filter should have paths of single file provider' );
-    let result = filter.hubFileProvider.localFromGlobal( path );
+    let result = filter.hubFileProvider.localFromGlobal( filePath );
     return result;
   }
 
@@ -1118,20 +1069,24 @@ function prefixesApply( o )
   let filter = this;
   let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider;
   let path = fileProvider.path;
+  let prefixPath;
 
   o = _.routineOptions( prefixesApply, arguments );
   _.assert( filter.postfixPath === null, 'not implemented' );
 
   if( filter.prefixPath !== null )
   {
+    prefixPath = path.fromGlob( filter.prefixPath );
 
     let o2 = { basePath : 0, fixes : 0, onEach : filePathEach }
     filter.allPaths( o2 );
 
     let o3 = { filePath : 0, stemPath : 0, fixes : 0, onEach : basePathEach }
     filter.allPaths( o3 );
-
   }
+
+  // if( filter.basePath === '/dst' )
+  // debugger;
 
   if( _.strIs( filter.basePath ) && filter.stemPath !== null )
   {
@@ -1145,51 +1100,26 @@ function prefixesApply( o )
   filter.prefixPath = null;
   filter.postfixPath = null;
 
+  if( Config.debug && filter.basePath && filter.stemPath )
+  assertBasePath( filter.stemPath );
+
+  if( Config.debug && filter.basePath && filter.inFilePath )
+  assertBasePath( filter.inFilePath );
+
   return filter;
-
-  /* */
-
-  function basePathNorm( originalStemPath )
-  {
-    let basePath = Object.create( null );
-    let stemPath = originalStemPath;
-    if( _.mapIs( stemPath ) )
-    stemPath = _.mapKeys( stemPath );
-    else if( !_.arrayIs( stemPath ) )
-    stemPath = [ stemPath ];
-
-    for( let s = 0 ; s < stemPath.length ; s++ )
-    {
-      _.assert( _.strIs( stemPath[ s ] ) || _.boolIs( stemPath[ s ] ) );
-      if( _.boolIs( stemPath[ s ] ) )
-      {
-        _.assert( _.strIs( filter.prefixPath ) );
-        basePath[ filter.prefixPath ] = filter.basePath;
-      }
-      else
-      {
-        basePath[ stemPath[ s ] ] = filter.basePath;
-      }
-    }
-
-    filter.basePath = basePath;
-  }
 
   /* */
 
   function filePathEach( it )
   {
     if( _.strIs( filter.prefixPath ) )
-    if( _.strIs( it.value ) && path.isRelative( it.value ) )
+    if( _.strIs( it.value ) )
     {
       let basePath = filter.basePathFor( it.value );
       basePath = basePath || '.';
-      it.value = path.join( filter.prefixPath, basePath, it.value );
+      it.value = path.join( filter.prefixPath, it.value );
+      // it.value = path.join( filter.prefixPath, basePath, it.value );
     }
-    // else if( it.value === true )
-    // {
-    //   it.value = filter.prefixPath;
-    // }
     return true;
   }
 
@@ -1198,7 +1128,7 @@ function prefixesApply( o )
   function basePathEach( it )
   {
     // debugger;
-    if( _.strIs( it.value ) && path.isRelative( it.value ) )
+    if( _.strIs( it.value ) )
     {
       it.value = path.join( filter.prefixPath, it.value );
     }
@@ -1206,6 +1136,59 @@ function prefixesApply( o )
     {
     }
     return true;
+  }
+
+  /* */
+
+  function basePathNorm( originalStemPath )
+  {
+    let basePath = Object.create( null );
+    let stemPaths = originalStemPath;
+
+    if( _.mapIs( stemPaths ) )
+    stemPaths = _.mapKeys( stemPaths );
+    else if( !_.arrayIs( stemPaths ) )
+    stemPaths = [ stemPaths ];
+
+    for( let s = 0 ; s < stemPaths.length ; s++ )
+    {
+      let stemPath = stemPaths[ s ];
+
+      _.assert( _.strIs( stemPath ) || _.boolIs( stemPath ) );
+
+      if( _.strIs( stemPath ) && path.isGlob( stemPath ) )
+      stemPath = path.fromGlob( stemPath );
+
+      if( _.boolIs( stemPath ) )
+      {
+        _.assert( _.strIs( prefixPath ) && !path.isGlob( prefixPath ) );
+        basePath[ prefixPath ] = filter.basePath;
+      }
+      else
+      {
+        _.assert( !path.isGlob( stemPath ) );
+        if( path.isAbsolute( stemPath ) )
+        basePath[ stemPath ] = filter.basePath;
+      }
+
+    }
+
+    filter.basePath = basePath;
+  }
+
+  /* */
+
+  function assertBasePath( stemPath )
+  {
+    if( _.mapIs( stemPath ) )
+    stemPath = _.mapKeys( stemPath );
+    else if( _.strIs( stemPath ) )
+    stemPath = [ stemPath ];
+
+    stemPath = stemPath.filter( ( g ) => _.strIs( g ) && path.isAbsolute( g ) );
+
+    let diff = _.arraySetDiff( _.mapKeys( filter.basePath ), path.s.fromGlob( stemPath ) );
+    _.assert( diff.length === 0, () => 'Some file paths do not have base paths or opposite : ' + _.strQuote( diff ) );
   }
 
 }

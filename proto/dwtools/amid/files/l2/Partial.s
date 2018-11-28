@@ -730,6 +730,10 @@ having.writing = 0;
 having.reading = 1;
 having.driving = 1;
 
+var operates = pathResolveSoftLinkAct.operates  = Object.create( null );
+
+operates.filePath = { pathToRead : 1 };
+
 //
 
 function _pathResolveSoftLink_body( o )
@@ -794,7 +798,7 @@ having.driving = 1;
 
 var operates = pathResolveHardLinkAct.operates = Object.create( null );
 
-operates.filePath = { read : 1 }
+operates.filePath = { pathToRead : 1 }
 
 //
 
@@ -1484,6 +1488,10 @@ having.writing = 0;
 having.reading = 1;
 having.driving = 1;
 
+var operates = fileReadAct.operates = Object.create( null );
+
+operates.filePath = { pathToRead : 1 };
+
 //
 
 let streamReadAct = Object.create( null );
@@ -1502,6 +1510,10 @@ var having = streamReadAct.having = Object.create( null );
 having.writing = 0;
 having.reading = 1;
 having.driving = 1;
+
+var operates = streamReadAct.operates = Object.create( null );
+
+operates.filePath = { pathToRead : 1 }
 
 //
 
@@ -1524,6 +1536,10 @@ having.writing = 0;
 having.reading = 1;
 having.driving = 1;
 
+var operates = statReadAct.operates = Object.create( null );
+
+operates.filePath = { pathToRead : 1 }
+
 //
 
 let _fileExistsAct = Object.create( null );
@@ -1542,6 +1558,10 @@ var having = _fileExistsAct.having = Object.create( null );
 having.writing = 0;
 having.reading = 1;
 having.driving = 1;
+
+var operates = _fileExistsAct.operates = Object.create( null );
+
+operates.filePath = { pathToRead : 1 }
 
 //
 
@@ -1579,6 +1599,10 @@ having.writing = 0;
 having.reading = 1;
 having.driving = 1;
 
+var operates = fileHashAct.operates = Object.create( null );
+
+operates.filePath = { pathToRead : 1 }
+
 //
 
 let dirReadAct = Object.create( null );
@@ -1598,6 +1622,10 @@ var having = dirReadAct.having = Object.create( null );
 having.writing = 0;
 having.reading = 1;
 having.driving = 1;
+
+var operates = dirReadAct.operates = Object.create( null );
+
+operates.filePath = { pathToRead : 1 }
 
 // --
 // read content
@@ -3124,6 +3152,10 @@ having.writing = 0;
 having.reading = 1;
 having.driving = 1;
 
+var operates = isTerminalAct.operates = Object.create( null );
+
+operates.filePath = { pathToRead : 1 }
+
 //
 
 function isTerminal_body( o )
@@ -3245,6 +3277,10 @@ var having = isDirAct.having = Object.create( null );
 having.writing = 0;
 having.reading = 1;
 having.driving = 1;
+
+var operates = isDirAct.operates = Object.create( null );
+
+operates.filePath = { pathToRead : 1 }
 
 //
 
@@ -3428,6 +3464,10 @@ having.writing = 1;
 having.reading = 0;
 having.driving = 1;
 
+var operates = streamWriteAct.operates = Object.create( null );
+
+operates.filePath = { pathToWrite : 1 }
+
 //
 
 function _streamWrite_body( o )
@@ -3473,6 +3513,10 @@ var having = fileWriteAct.having = Object.create( null );
 having.writing = 1;
 having.reading = 0;
 having.driving = 1;
+
+var operates = fileWriteAct.operates = Object.create( null );
+
+operates.filePath = { pathToWrite : 1 }
 
 //
 
@@ -3920,6 +3964,10 @@ having.writing = 1;
 having.reading = 0;
 having.driving = 1;
 
+var operates = fileTimeSetAct.operates = Object.create( null );
+
+operates.filePath = { pathToWrite : 1 }
+
 //
 
 function _fileTimeSet_pre( routine,args )
@@ -3999,6 +4047,10 @@ var having = fileDeleteAct.having = Object.create( null );
 having.writing = 1;
 having.reading = 0;
 having.driving = 1;
+
+var operates = fileDeleteAct.operates = Object.create( null );
+
+operates.filePath = { pathToWrite : 1 }
 
 //
 
@@ -4207,6 +4259,10 @@ having.writing = 1;
 having.reading = 0;
 having.driving = 1;
 
+var operates = dirMakeAct.operates = Object.create( null );
+
+operates.filePath = { pathToWrite : 1 }
+
 //
 
 function _dirMake_body( o )
@@ -4378,6 +4434,11 @@ having.writing = 1;
 having.reading = 0;
 having.driving = 1;
 
+var operates = fileRenameAct.operates = Object.create( null );
+
+operates.srcPath = { pathToRead : 1 }
+operates.dstPath = { pathToWrite : 1 }
+
 //
 
 let fileCopyAct = Object.create( null );
@@ -4404,6 +4465,11 @@ having.writing = 1;
 having.reading = 0;
 having.driving = 1;
 
+var operates = fileCopyAct.operates = Object.create( null );
+
+operates.srcPath = { pathToRead : 1 }
+operates.dstPath = { pathToWrite : 1 }
+
 //
 
 let linkSoftAct = Object.create( null );
@@ -4427,6 +4493,11 @@ var having = linkSoftAct.having = Object.create( null );
 having.writing = 1;
 having.reading = 0;
 having.driving = 1;
+
+var operates = linkSoftAct.operates = Object.create( null );
+
+operates.srcPath = { pathToRead : 1 }
+operates.dstPath = { pathToWrite : 1 }
 
 //
 
@@ -4470,6 +4541,11 @@ having.reading = 0;
 having.driving = 1;
 having.hardLinking = 1;
 
+var operates = linkHardAct.operates = Object.create( null );
+
+operates.srcPath = { pathToRead : 1 }
+operates.dstPath = { pathToWrite : 1 }
+
 //
 
 /**
@@ -4507,6 +4583,10 @@ var having = fileIsSoftLinkAct.having = Object.create( null );
 having.writing = 0;
 having.reading = 1;
 having.driving = 0;
+
+var operates = fileIsSoftLinkAct.operates = Object.create( null );
+
+operates.filePath = { pathToRead : 1 }
 
 /**
  * Return True if `filePath` is a symbolic link.
@@ -4571,6 +4651,10 @@ having.writing = 0;
 having.reading = 1;
 having.driving = 0;
 
+var operates = fileIsHardLinkAct.operates = Object.create( null );
+
+operates.filePath = { pathToRead : 1 }
+
 //
 
 /**
@@ -4621,6 +4705,10 @@ var having = fileIsTextLinkAct.having = Object.create( null );
 having.writing = 0;
 having.reading = 1;
 having.driving = 0;
+
+var operates = fileIsTextLinkAct.operates = Object.create( null );
+
+operates.filePath = { pathToRead : 1 }
 
 //
 
@@ -5936,6 +6024,10 @@ having.writing = 1;
 having.reading = 0;
 having.driving = 1;
 
+var operates = hardLinkBreakAct.operates = Object.create( null );
+
+operates.filePath = { pathToRead : 1, pathToWrite : 1 }
+
 //
 
 function _hardLinkBreak_body( o )
@@ -5991,6 +6083,10 @@ having.writing = 1;
 having.reading = 0;
 having.driving = 1;
 
+var operates = softLinkBreakAct.operates = Object.create( null );
+
+operates.filePath = { pathToRead : 1, pathToWrite : 1 }
+
 //
 
 function _softLinkBreak_body( o )
@@ -6035,6 +6131,11 @@ var having = filesAreHardLinkedAct.having = Object.create( null );
 having.writing = 0;
 having.reading = 1;
 having.driving = 1;
+
+var operates = softLinkBreakAct.operates = Object.create( null );
+
+operates.srcPath = { pathToRead : 1 }
+operates.dstPath = { pathToRead : 1 }
 
 //
 

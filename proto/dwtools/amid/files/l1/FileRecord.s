@@ -445,9 +445,6 @@ function _isDirGet()
 
   _.assert( _.routineIs( record.stat.isDirectory ) );
 
-  if( !record.stat.isDirectory )
-  return false;
-
   return record.stat.isDirectory();
 }
 
@@ -460,12 +457,9 @@ function _isTerminalGet()
   if( !record.stat )
   return false;
 
-  _.assert( _.routineIs( record.stat.isDirectory ) );
+  _.assert( _.routineIs( record.stat.isFile ) );
 
-  if( !record.stat.isDirectory )
-  return false;
-
-  return !record.stat.isDirectory();
+  return record.stat.isFile();
 }
 
 //

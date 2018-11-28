@@ -798,7 +798,7 @@ operates.filePath = { read : 1 }
 
 //
 
-function _pathResolveHardLink_body( o )
+function pathResolveHardLink_body( o )
 {
   let self = this;
 
@@ -816,9 +816,9 @@ function _pathResolveHardLink_body( o )
   return self.path.normalize( result );
 }
 
-var defaults = _pathResolveHardLink_body.defaults = Object.create( pathResolveHardLinkAct.defaults );
-var paths = _pathResolveHardLink_body.paths = Object.create( pathResolveHardLinkAct.paths );
-var having = _pathResolveHardLink_body.having = Object.create( pathResolveHardLinkAct.having );
+var defaults = pathResolveHardLink_body.defaults = Object.create( pathResolveHardLinkAct.defaults );
+var paths = pathResolveHardLink_body.paths = Object.create( pathResolveHardLinkAct.paths );
+var having = pathResolveHardLink_body.having = Object.create( pathResolveHardLinkAct.having );
 
 having.driving = 0;
 having.aspect = 'body';
@@ -834,13 +834,13 @@ having.aspect = 'body';
 // }
 //
 // pathResolveHardLink.pre = _preSinglePath;
-// pathResolveHardLink.body = _pathResolveHardLink_body;
+// pathResolveHardLink.body = pathResolveHardLink_body;
 //
-// var defaults = pathResolveHardLink.defaults = Object.create( _pathResolveHardLink_body.defaults );
-// var paths = pathResolveHardLink.paths = Object.create( _pathResolveHardLink_body.paths );
-// var having = pathResolveHardLink.having = Object.create( _pathResolveHardLink_body.having );
+// var defaults = pathResolveHardLink.defaults = Object.create( pathResolveHardLink_body.defaults );
+// var paths = pathResolveHardLink.paths = Object.create( pathResolveHardLink_body.paths );
+// var having = pathResolveHardLink.having = Object.create( pathResolveHardLink_body.having );
 
-let pathResolveHardLink = _.routineFromPreAndBody( _preSinglePath, _pathResolveHardLink_body );
+let pathResolveHardLink = _.routineFromPreAndBody( _preSinglePath, pathResolveHardLink_body );
 
 pathResolveHardLink.having.aspect = 'entry';
 

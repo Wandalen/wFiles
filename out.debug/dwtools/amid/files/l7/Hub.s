@@ -429,7 +429,7 @@ let pathResolveSoftLink = _.routineFromPreAndBody( Parent.prototype.pathResolveS
 
 //
 
-function _pathResolveHardLink_body( o )
+function pathResolveHardLink_body( o )
 {
   let self = this;
 
@@ -449,9 +449,9 @@ function _pathResolveHardLink_body( o )
   return result;
 }
 
-_.routineExtend( _pathResolveHardLink_body, Parent.prototype.pathResolveHardLink );
+_.routineExtend( pathResolveHardLink_body, Parent.prototype.pathResolveHardLink );
 
-let pathResolveHardLink = _.routineFromPreAndBody( Parent.prototype.pathResolveHardLink.pre, _pathResolveHardLink_body );
+let pathResolveHardLink = _.routineFromPreAndBody( Parent.prototype.pathResolveHardLink.pre, pathResolveHardLink_body );
 
 //
 

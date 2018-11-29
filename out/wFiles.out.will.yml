@@ -100,6 +100,7 @@ path:
       - ./dwtools/amid/files/l7
       - ./dwtools/amid/files/l7/Hub.s
       - ./dwtools/amid/files/l8_filter
+      - ./dwtools/amid/files/l8_filter/Image.s
       - ./dwtools/amid/files/l8_filter/Reroot.s
       - ./dwtools/amid/files/l9
       - ./dwtools/amid/files.test
@@ -154,6 +155,7 @@ path:
       - ./dwtools/amid/files/l5_provider/RemoteServlet.ss
       - ./dwtools/amid/files/l5_provider/Svn.ss
       - ./dwtools/amid/files/l7/Hub.s
+      - ./dwtools/amid/files/l8_filter/Image.s
       - ./dwtools/amid/files/l8_filter/Reroot.s
       - ./dwtools/amid/files.test/aFileProvider.test.s
       - ./dwtools/amid/files.test/Files.copy.test.s
@@ -284,6 +286,7 @@ reflector:
       ./dwtools/amid/files/l5_provider/RemoteServlet.ss: true
       ./dwtools/amid/files/l5_provider/Svn.ss: true
       ./dwtools/amid/files/l7/Hub.s: true
+      ./dwtools/amid/files/l8_filter/Image.s: true
       ./dwtools/amid/files/l8_filter/Reroot.s: true
       ./dwtools/amid/files.test/aFileProvider.test.s: true
       ./dwtools/amid/files.test/Files.copy.test.s: true
@@ -447,6 +450,7 @@ exported:
         - ./dwtools/amid/files/l5_provider/RemoteServlet.ss
         - ./dwtools/amid/files/l5_provider/Svn.ss
         - ./dwtools/amid/files/l7/Hub.s
+        - ./dwtools/amid/files/l8_filter/Image.s
         - ./dwtools/amid/files/l8_filter/Reroot.s
         - ./dwtools/amid/files.test/aFileProvider.test.s
         - ./dwtools/amid/files.test/Files.copy.test.s

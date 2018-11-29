@@ -165,7 +165,7 @@ function _routineFunctor( routine, routineName )
 
       if( pre )
       {
-        debugger;
+        debugger; xxx
         args = pre.call( this.original, resultRoutine, args );
         if( !_.unrollIs( args ) )
         args = _.unrollFrom([ args ]);
@@ -179,9 +179,8 @@ function _routineFunctor( routine, routineName )
 
       _.assert( !_.argumentsArrayIs( args ), 'Does not expect arguments array' );
 
-      debugger;
-
-      result = body.apply( this.original, args );
+      result = this.onCall( this.original, body, args );
+      // result = body.apply( this.original, args );
 
       if( this.onCallEnd )
       result = this.onCallEnd( result, op );
@@ -197,6 +196,13 @@ function _routineFunctor( routine, routineName )
   return resultRoutine;
 }
 
+//
+
+function onCall( original, body, args )
+{
+  return body.apply( original, args );
+}
+
 // --
 // relationship
 // --
@@ -208,6 +214,7 @@ let Composes =
 let Aggregates =
 {
   onCallBegin : null,
+  onCall : null,
   onCallEnd : null,
 }
 

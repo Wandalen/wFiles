@@ -65,6 +65,7 @@ path:
       - .
       - ./dwtools
       - ./dwtools/Tools.s
+      - ./dwtools/abase
       - ./dwtools/amid
       - ./dwtools/amid/files
       - ./dwtools/amid/files/UseBase.s
@@ -101,6 +102,7 @@ path:
       - ./dwtools/amid/files/l8_filter
       - ./dwtools/amid/files/l8_filter/Image.s
       - ./dwtools/amid/files/l8_filter/Reroot.s
+      - ./dwtools/amid/files/l9
       - ./dwtools/amid/files.test
       - ./dwtools/amid/files.test/aFileProvider.test.s
       - ./dwtools/amid/files.test/Files.copy.test.s
@@ -116,6 +118,7 @@ path:
       - ./dwtools/amid/files.test/Provider.Hub.HardDrive.test.ss
       - ./dwtools/amid/files.test/Provider.Url.test.ss
       - ./dwtools/amid/files.test/Record.test.s
+      - ./dwtools/atop
     criterion:
       default: 1
       debug: 1

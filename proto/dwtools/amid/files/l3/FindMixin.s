@@ -2855,7 +2855,7 @@ function filesReflect_body( o )
       throw _.err( 'No file moved\n', _.toStr( o.reflectMap, { levels : 2, multiline : 1, wrap : 0 } ) );
     }
 
-    if( o.verbosity >= 1 && 0 )
+    if( o.verbosity >= 1 )
     {
       let dsts = _.mapVals( o.reflectMap );
       dsts = _.arrayFlattenOnce( null, dsts );

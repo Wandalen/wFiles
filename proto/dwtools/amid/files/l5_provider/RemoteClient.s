@@ -249,7 +249,7 @@ streamReadAct.defaults.__proto__ = Parent.prototype.streamReadAct.defaults;
 
 //
 
-function fileStatAct( o )
+function statReadAct( o )
 {
 
   if( _.strIs( o ) )
@@ -258,7 +258,7 @@ function fileStatAct( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.strIs( o.filePath ) );
 
-  let o = _.routineOptions( fileStatAct,o );
+  let o = _.routineOptions( statReadAct,o );
   let result = null;
 
   /* */
@@ -306,8 +306,8 @@ function fileStatAct( o )
 
 }
 
-fileStatAct.defaults = {};
-fileStatAct.defaults.__proto__ = Parent.prototype.fileStatAct.defaults;
+statReadAct.defaults = {};
+statReadAct.defaults.__proto__ = Parent.prototype.statReadAct.defaults;
 
 //
 
@@ -392,7 +392,7 @@ fileHashAct.defaults.__proto__ = Parent.prototype.fileHashAct.defaults;
 
 //
 
-function directoryReadAct( o )
+function dirReadAct( o )
 {
   let self = this;
 
@@ -403,7 +403,7 @@ function directoryReadAct( o )
   }
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.routineOptions( directoryReadAct,o );
+  _.routineOptions( dirReadAct,o );
 
   let result = null;
 
@@ -502,8 +502,8 @@ function directoryReadAct( o )
 
 }
 
-directoryReadAct.defaults = {};
-directoryReadAct.defaults.__proto__ = Parent.prototype.directoryReadAct.defaults;
+dirReadAct.defaults = {};
+dirReadAct.defaults.__proto__ = Parent.prototype.dirReadAct.defaults;
 
 // --
 // write
@@ -697,7 +697,7 @@ function fileDeleteAct( o )
   let self = this;
   let stat;
 
-  let stat = self.fileStatAct( o.filePath );
+  let stat = self.statReadAct( o.filePath );
   if( stat && stat.isSymbolicLink() )
   {
     debugger;
@@ -937,7 +937,7 @@ fileTimeSetAct.defaults.__proto__ = Parent.prototype.fileTimeSetAct.defaults;
 
 //
 
-function directoryMakeAct( o )
+function dirMakeAct( o )
 {
 
   if( _.strIs( o ) )
@@ -950,7 +950,7 @@ function directoryMakeAct( o )
     _.assert( arguments.length === 1, 'Expects single argument' );
   }
 
-  _.routineOptions( directoryMakeAct,o );
+  _.routineOptions( dirMakeAct,o );
 
   let stat;
 
@@ -971,14 +971,14 @@ function directoryMakeAct( o )
 
 }
 
-directoryMakeAct.defaults = {};
-directoryMakeAct.defaults.__proto__ = Parent.prototype.directoryMakeAct.defaults;
+dirMakeAct.defaults = {};
+dirMakeAct.defaults.__proto__ = Parent.prototype.dirMakeAct.defaults;
 
 //
 
 /**
- * directoryMake options
- * @typedef { object } wTools~directoryMakeOptions
+ * dirMake options
+ * @typedef { object } wTools~dirMakeOptions
  * @property { string } [ o.filePath=null ] - Path to new directory.
  * @property { boolean } [ o.rewriting=false ] - Deletes files that prevents folder creation if they exists.
  * @property { boolean } [ o.force=true ] - Makes parent directories to complete path( o.filePath ) if they needed.
@@ -994,22 +994,22 @@ directoryMakeAct.defaults.__proto__ = Parent.prototype.directoryMakeAct.defaults
  *  - First by passing only destination directory path and use default options;
  *  - Second by passing options object( o ).
  *
- * @param { wTools~directoryMakeOptions } o - options { @link wTools~directoryMakeOptions }.
+ * @param { wTools~dirMakeOptions } o - options { @link wTools~dirMakeOptions }.
  *
  * @example
  * let fileProvider = _.FileProvider.Default();
- * fileProvider.directoryMake( 'directory' );
- * let stat = fileProvider.fileStatAct( 'directory' );
+ * fileProvider.dirMake( 'directory' );
+ * let stat = fileProvider.statReadAct( 'directory' );
  * console.log( stat.isDirectory() ); // returns true
  *
- * @method directoryMake
+ * @method dirMake
  * @throws { exception } If no argument provided.
  * @throws { exception } If ( o.rewriting ) is false and any file prevents making dir.
  * @throws { exception } If ( o.force ) is false and one dir is not enough to complete folders structure or folder already exists.
  * @memberof wTools
  */
 
-function directoryMake( o )
+function dirMake( o )
 {
   let self = this;
 
@@ -1023,7 +1023,7 @@ function directoryMake( o )
     _.assert( arguments.length === 1, 'Expects single argument' );
   }
 
-  _.routineOptions( directoryMake,o );
+  _.routineOptions( dirMake,o );
   o.filePath = self.path.nativize( o.filePath );
 
   if( o.rewritingTerminal )
@@ -1064,7 +1064,7 @@ function directoryMake( o )
 
 }
 
-directoryMake.defaults = Parent.prototype.directoryMake.defaults;
+dirMake.defaults = Parent.prototype.dirMake.defaults;
 
 //
 
@@ -1296,10 +1296,10 @@ let Proto =
 
   fileReadAct : fileReadAct,
   streamReadAct : streamReadAct,
-  fileStatAct : fileStatAct,
+  statReadAct : statReadAct,
   fileHashAct : fileHashAct,
 
-  directoryReadAct : directoryReadAct,
+  dirReadAct : dirReadAct,
 
 
   // write
@@ -1316,8 +1316,8 @@ let Proto =
 
   fileTimeSetAct : fileTimeSetAct,
 
-  directoryMakeAct : directoryMakeAct,
-  directoryMake : directoryMake,
+  dirMakeAct : dirMakeAct,
+  dirMake : dirMake,
 
   linkSoftAct : linkSoftAct,
   linkHardAct : linkHardAct,

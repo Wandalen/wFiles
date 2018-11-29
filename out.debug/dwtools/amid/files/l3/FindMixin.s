@@ -2082,7 +2082,7 @@ function filesReflectEvaluate_body( o )
       for( let m in touchMap )
       if( _.strBegins( m, absolutePath ) && touchMap[ m ] !== 'destructive' )
       {
-        debugger;
+        // debugger;
         touchMap[ m ] = 'destructive';
       }
     }

@@ -1623,7 +1623,7 @@ function _testMasks( record )
   // debugger;
   // if( record.absolute === '/dst/file2' )
   // debugger;
-  // if( _.strHas( record.absolute, 'layer1' ) )
+  // if( _.strHas( record.absolute, '.scenario.' ) )
   // debugger;
   // if( _.strEnds( record.absolute, 'layer1' ) )
   // debugger;

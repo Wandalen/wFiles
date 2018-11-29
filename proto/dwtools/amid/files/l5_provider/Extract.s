@@ -407,8 +407,10 @@ function dirReadAct( o )
 
 }
 
-var defaults = dirReadAct.defaults = Object.create( Parent.prototype.dirReadAct.defaults );
-var having = dirReadAct.having = Object.create( Parent.prototype.dirReadAct.having );
+_.routineExtend( dirReadAct, Parent.prototype.dirReadAct );
+
+// var defaults = dirReadAct.defaults = Object.create( Parent.prototype.dirReadAct.defaults );
+// var having = dirReadAct.having = Object.create( Parent.prototype.dirReadAct.having );
 
 // --
 // read stat
@@ -507,8 +509,10 @@ function statReadAct( o )
 
 }
 
-statReadAct.defaults = Object.create( Parent.prototype.statReadAct.defaults );
-statReadAct.having = Object.create( Parent.prototype.statReadAct.having );
+_.routineExtend( statReadAct, Parent.prototype.statReadAct );
+
+// statReadAct.defaults = Object.create( Parent.prototype.statReadAct.defaults );
+// statReadAct.having = Object.create( Parent.prototype.statReadAct.having );
 
 //
 
@@ -800,8 +804,10 @@ function fileWriteAct( o )
 
 }
 
-var defaults = fileWriteAct.defaults = Object.create( Parent.prototype.fileWriteAct.defaults );
-var having = fileWriteAct.having = Object.create( Parent.prototype.fileWriteAct.having );
+_.routineExtend( fileWriteAct, Parent.prototype.fileWriteAct );
+
+// var defaults = fileWriteAct.defaults = Object.create( Parent.prototype.fileWriteAct.defaults );
+// var having = fileWriteAct.having = Object.create( Parent.prototype.fileWriteAct.having );
 
 //
 
@@ -820,8 +826,10 @@ function fileTimeSetAct( o )
 
 }
 
-var defaults = fileTimeSetAct.defaults = Object.create( Parent.prototype.fileTimeSetAct.defaults );
-var having = fileTimeSetAct.having = Object.create( Parent.prototype.fileTimeSetAct.having );
+_.routineExtend( fileTimeSetAct, Parent.prototype.fileTimeSetAct );
+
+// var defaults = fileTimeSetAct.defaults = Object.create( Parent.prototype.fileTimeSetAct.defaults );
+// var having = fileTimeSetAct.having = Object.create( Parent.prototype.fileTimeSetAct.having );
 
 //
 
@@ -883,8 +891,10 @@ function fileDeleteAct( o )
 
 }
 
-var defaults = fileDeleteAct.defaults = Object.create( Parent.prototype.fileDeleteAct.defaults );
-var having = fileDeleteAct.having = Object.create( Parent.prototype.fileDeleteAct.having );
+_.routineExtend( fileDeleteAct, Parent.prototype.fileDeleteAct );
+
+// var defaults = fileDeleteAct.defaults = Object.create( Parent.prototype.fileDeleteAct.defaults );
+// var having = fileDeleteAct.having = Object.create( Parent.prototype.fileDeleteAct.having );
 
 //
 
@@ -922,8 +932,10 @@ function dirMakeAct( o )
 
 }
 
-var defaults = dirMakeAct.defaults = Object.create( Parent.prototype.dirMakeAct.defaults );
-var having = dirMakeAct.having = Object.create( Parent.prototype.dirMakeAct.having );
+_.routineExtend( dirMakeAct, Parent.prototype.dirMakeAct );
+
+// var defaults = dirMakeAct.defaults = Object.create( Parent.prototype.dirMakeAct.defaults );
+// var having = dirMakeAct.having = Object.create( Parent.prototype.dirMakeAct.having );
 
 //
 
@@ -990,11 +1002,13 @@ function fileRenameAct( o )
 
 }
 
-var defaults = fileRenameAct.defaults = Object.create( Parent.prototype.fileRenameAct.defaults );
+_.routineExtend( fileRenameAct, Parent.prototype.fileRenameAct );
 
-defaults.sync = 1;
+// var defaults = fileRenameAct.defaults = Object.create( Parent.prototype.fileRenameAct.defaults );
 
-var having = fileRenameAct.having = Object.create( Parent.prototype.fileRenameAct.having );
+fileRenameAct.defaults.sync = 1;
+
+// var having = fileRenameAct.having = Object.create( Parent.prototype.fileRenameAct.having );
 
 //
 
@@ -1068,11 +1082,13 @@ function fileCopyAct( o )
   }
 }
 
-var defaults = fileCopyAct.defaults = Object.create( Parent.prototype.fileCopyAct.defaults );
+_.routineExtend( fileCopyAct, Parent.prototype.fileCopyAct );
 
-defaults.sync = 0;
+// var defaults = fileCopyAct.defaults = Object.create( Parent.prototype.fileCopyAct.defaults );
 
-var having = fileCopyAct.having = Object.create( Parent.prototype.fileCopyAct.having );
+fileCopyAct.defaults.sync = 0;
+
+// var having = fileCopyAct.having = Object.create( Parent.prototype.fileCopyAct.having );
 
 //
 
@@ -1124,8 +1140,10 @@ function linkSoftAct( o )
   }
 }
 
-var defaults = linkSoftAct.defaults = Object.create( Parent.prototype.linkSoftAct.defaults );
-var having = linkSoftAct.having = Object.create( Parent.prototype.linkSoftAct.having );
+_.routineExtend( linkSoftAct, Parent.prototype.linkSoftAct );
+
+// var defaults = linkSoftAct.defaults = Object.create( Parent.prototype.linkSoftAct.defaults );
+// var having = linkSoftAct.having = Object.create( Parent.prototype.linkSoftAct.having );
 
 //
 
@@ -1196,8 +1214,10 @@ function linkHardAct( o )
   }
 }
 
-var defaults = linkHardAct.defaults = Object.create( Parent.prototype.linkHardAct.defaults );
-var having = linkHardAct.having = Object.create( Parent.prototype.linkHardAct.having );
+_.routineExtend( linkHardAct, Parent.prototype.linkHardAct );
+
+// var defaults = linkHardAct.defaults = Object.create( Parent.prototype.linkHardAct.defaults );
+// var having = linkHardAct.having = Object.create( Parent.prototype.linkHardAct.having );
 
 //
 
@@ -1231,7 +1251,9 @@ function hardLinkBreakAct( o )
   return new _.Consequence().give( null );
 }
 
-var defaults = hardLinkBreakAct.defaults = Object.create( Parent.prototype.hardLinkBreakAct.defaults );
+_.routineExtend( hardLinkBreakAct, Parent.prototype.hardLinkBreakAct );
+
+// var defaults = hardLinkBreakAct.defaults = Object.create( Parent.prototype.hardLinkBreakAct.defaults );
 
 // --
 // etc
@@ -1575,8 +1597,10 @@ function rewriteFromProvider( o )
   return self;
 }
 
-rewriteFromProvider.defaults = Object.create( filesTreeRead.defaults );
-rewriteFromProvider.having = Object.create( filesTreeRead.having );
+_.routineExtend( rewriteFromProvider, filesTreeRead );
+
+// rewriteFromProvider.defaults = Object.create( filesTreeRead.defaults );
+// rewriteFromProvider.having = Object.create( filesTreeRead.having );
 
 //
 
@@ -1863,8 +1887,8 @@ function _descriptorReadResolved( o )
 
   return result;
 }
-
-_descriptorReadResolved.defaults = Object.create( _descriptorRead.defaults );
+_.routineExtend( _descriptorReadResolved, _descriptorRead );
+// _descriptorReadResolved.defaults = Object.create( _descriptorRead.defaults );
 
 //
 

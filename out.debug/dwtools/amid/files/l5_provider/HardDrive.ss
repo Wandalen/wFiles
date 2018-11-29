@@ -1665,7 +1665,7 @@ let Statics =
 // declare
 // --
 
-let Proto =
+let Extend =
 {
 
   // inter
@@ -1729,7 +1729,7 @@ _.classDeclare
 ({
   cls : Self,
   parent : Parent,
-  extend : Proto,
+  extend : Extend,
 });
 
 _.FileProvider.Find.mixin( Self );
@@ -1754,9 +1754,9 @@ if( !_.FileProvider.Default )
 
 _.FileProvider[ Self.shortName ] = Self;
 
-if( typeof module !== 'undefined' )
-if( _global_.WTOOLS_PRIVATE )
-{ /* delete require.cache[ module.id ]; */ }
+// if( typeof module !== 'undefined' )
+// if( _global_.WTOOLS_PRIVATE )
+// { /* delete require.cache[ module.id ]; */ }
 
 if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = Self;

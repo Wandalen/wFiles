@@ -2305,7 +2305,7 @@ having.driving = 0;
 
 //
 
-function _dirRead_pre( routine,args )
+function dirRead_pre( routine,args )
 {
   let self = this;
 
@@ -2327,12 +2327,13 @@ function _dirRead_pre( routine,args )
 
 //
 
-function _dirRead_body( o )
+function dirRead_body( o )
 {
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.arrayHas( [ 'record', 'absolute', 'relative' ], o.outputFormat ) )
+  _.assertRoutineOptions( dirRead_body, arguments );
 
   let o2 = _.mapExtend( null, o );
   delete o2.outputFormat;
@@ -2400,14 +2401,14 @@ function _dirRead_body( o )
 
 }
 
-var defaults = _dirRead_body.defaults = Object.create( dirReadAct.defaults );
+var defaults = dirRead_body.defaults = Object.create( dirReadAct.defaults );
 
 defaults.outputFormat = 'relative';
 defaults.basePath = null;
 defaults.throwing = 0;
 
-var paths = _dirRead_body.paths = Object.create( dirReadAct.paths );
-var having = _dirRead_body.having = Object.create( dirReadAct.having );
+var paths = dirRead_body.paths = Object.create( dirReadAct.paths );
+var having = dirRead_body.having = Object.create( dirReadAct.having );
 
 having.driving = 0;
 having.aspect = 'body';
@@ -2460,7 +2461,7 @@ having.aspect = 'body';
  * @memberof wFileProviderPartial
  */
 
-let dirRead = _.routineFromPreAndBody( _dirRead_pre, _dirRead_body );
+let dirRead = _.routineFromPreAndBody( dirRead_pre, dirRead_body );
 
 dirRead.having.aspect = 'entry';
 

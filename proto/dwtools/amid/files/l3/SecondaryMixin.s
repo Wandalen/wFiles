@@ -242,7 +242,9 @@ filesRead.defaults =
   preset : null,
 }
 
-_.routineExtend( filesRead, fileRead );
+// _.routineExtend( filesRead, fileRead );
+
+filesRead.defaults.__proto__ = fileRead.defaults;
 
 filesRead.presets = Object.create( null );
 

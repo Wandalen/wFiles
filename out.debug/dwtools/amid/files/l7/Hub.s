@@ -1024,9 +1024,9 @@ let Composes =
 {
 
   defaultProtocol : null,
-
   providersWithProtocolMap : _.define.own({}),
-  // providersWithOriginMap : _.define.own({}),
+
+  safe : 0,
 
 }
 

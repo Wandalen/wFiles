@@ -149,7 +149,13 @@ function init( o )
   {
     if( o.logger )
     self.logger = o.logger;
+    else
+    self.logger = new _.Logger({ output : logger });
     self.copy( o );
+  }
+  else
+  {
+    self.logger = new _.Logger({ output : logger });
   }
 
   if( self.path === null )

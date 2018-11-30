@@ -867,6 +867,7 @@ pathResolveHardLink.having.aspect = 'entry';
 
 /*
   qqq : option preservingRelative:1 to preserve relative in path of soft link if happened to be so
+  !!! qqq : no duplicates
 */
 
 function _pathResolveLinkChain_body( o )
@@ -946,8 +947,8 @@ function _pathResolveLinkChain_body( o )
     if( filePath !== o.filePath || self.fileIsSoftLink( filePath ) )
     {
 
-      if( path.isGlobal( filePath ) )
-      debugger;
+      // if( path.isGlobal( filePath ) )
+      // debugger;
 
       /* if( o.preservingRelative && !_.uri.isAbsolute( filePath ) )
       {

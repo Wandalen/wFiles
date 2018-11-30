@@ -238,34 +238,79 @@ function _providerDefaults( o )
 
 //
 
-function _preSinglePathWithoutProviderOptions( routine, args )
+function _preFilePathScalarWithoutProviderDefaults( routine, args )
 {
   let self = this;
+  let path = self.path;
 
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
   _.assert( args && args.length === 1 );
 
   let o = args[ 0 ];
 
-  if( self.path.like( o ) )
-  o = { filePath : self.path.from( o ) };
+  if( path.like( o ) )
+  o = { filePath : path.from( o ) };
 
   _.routineOptions( routine, o );
 
-  o.filePath = self.path.normalize( o.filePath );
+  o.filePath = path.normalize( o.filePath );
 
-  _.assert( self.path.isAbsolute( o.filePath ), 'Expects absolute path {-o.filePath-}, but got', o.filePath );
+  _.assert( path.isAbsolute( o.filePath ), () => 'Expects absolute path {-o.filePath-}, but got ' + _.strQuote( o.filePath ) );
 
   return o;
 }
 
 //
 
-function _preSinglePath( routine, args )
+function _preFilePathScalarWithProviderDefaults( routine, args )
 {
   let self = this;
 
-  let o = self._preSinglePathWithoutProviderOptions.apply( self, arguments );
+  let o = self._preFilePathScalarWithoutProviderDefaults.apply( self, arguments );
+
+  if( o.verbosity === null )
+  o.verbosity = _.numberClamp( self.verbosity - 4, 0, 9 );
+
+  self._providerDefaults( o );
+
+  return o;
+}
+
+//
+
+function _preFilePathVectorWithoutProviderDefaults( routine, args )
+{
+  let self = this;
+  let path = self.path.s;
+
+  _.assert( arguments.length === 2, 'Expects exactly two arguments' );
+  _.assert( args && args.length === 1 );
+
+  let o = args[ 0 ];
+
+  if( path.like( o ) )
+  o = { filePath : path.from( o ) };
+
+  _.routineOptions( routine, o );
+
+  o.filePath = path.normalize( o.filePath );
+
+  _.assert( path.allAreAbsolute( o.filePath ), () => 'Expects absolute path {-o.filePath-}, but got ' + _.strQuote( o.filePath ) );
+
+  return o;
+}
+
+//
+
+function _preFilePathVectorWithProviderDefaults( routine, args )
+{
+  let self = this;
+
+  let o = self._preFilePathVectorWithoutProviderDefaults.apply( self, arguments );
+
+  if( o.verbosity === null )
+  o.verbosity = _.numberClamp( self.verbosity - 4, 0, 9 );
+
   self._providerDefaults( o );
 
   return o;
@@ -775,7 +820,7 @@ function pathResolveSoftLink( path )
   return result;
 }
 
-pathResolveSoftLink.pre = _preSinglePath;
+pathResolveSoftLink.pre = _preFilePathScalarWithProviderDefaults;
 pathResolveSoftLink.body = _pathResolveSoftLink_body;
 
 var defaults = pathResolveSoftLink.defaults = Object.create( _pathResolveSoftLink_body.defaults );
@@ -843,14 +888,14 @@ having.aspect = 'body';
 //   return result;
 // }
 //
-// pathResolveHardLink.pre = _preSinglePath;
+// pathResolveHardLink.pre = _preFilePathScalarWithProviderDefaults;
 // pathResolveHardLink.body = pathResolveHardLink_body;
 //
 // var defaults = pathResolveHardLink.defaults = Object.create( pathResolveHardLink_body.defaults );
 // var paths = pathResolveHardLink.paths = Object.create( pathResolveHardLink_body.paths );
 // var having = pathResolveHardLink.having = Object.create( pathResolveHardLink_body.having );
 
-let pathResolveHardLink = _.routineFromPreAndBody( _preSinglePath, pathResolveHardLink_body );
+let pathResolveHardLink = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, pathResolveHardLink_body );
 
 pathResolveHardLink.having.aspect = 'entry';
 
@@ -1021,7 +1066,7 @@ having.hubRedirecting = 0;
 
 //
 
-let resolveLinkChain = _.routineFromPreAndBody( _preSinglePath, _pathResolveLinkChain_body );
+let resolveLinkChain = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, _pathResolveLinkChain_body );
 
 resolveLinkChain.having.aspect = 'entry';
 
@@ -1065,7 +1110,7 @@ having.hubRedirecting = 0;
 
 //
 
-let pathResolveLink = _.routineFromPreAndBody( _preSinglePath, _pathResolveLink_body );
+let pathResolveLink = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, _pathResolveLink_body );
 
 pathResolveLink.having.aspect = 'entry';
 
@@ -1676,7 +1721,7 @@ var having = _streamRead_body.having = Object.create( streamReadAct.having );
 having.driving = 0;
 having.aspect = 'body';
 
-let streamRead = _.routineFromPreAndBody( _preSinglePath, _streamRead_body );
+let streamRead = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, _streamRead_body );
 
 streamRead.having.aspect = 'entry';
 
@@ -1685,10 +1730,11 @@ streamRead.having.aspect = 'entry';
 function _fileRead_pre( routine, args )
 {
   let self = this;
-  let o = self._preSinglePathWithoutProviderOptions.apply( self, arguments );
-  if( o.verbosity === null )
-  o.verbosity = self.verbosity - 4;
-  self._providerDefaults( o );
+  let o = self._preFilePathScalarWithProviderDefaults.apply( self, arguments );
+  // let o = self._preFilePathScalarWithoutProviderDefaults.apply( self, arguments );
+  // if( o.verbosity === null )
+  // o.verbosity = _.numberClamp( self.verbosity - 4, 0, 9 );
+  // self._providerDefaults( o );
   return o;
 }
 
@@ -2270,7 +2316,7 @@ having.aspect = 'body';
  * @memberof wFileProviderPartial
  */
 
-let fileHash = _.routineFromPreAndBody( _preSinglePath, _fileHash_body );
+let fileHash = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, _fileHash_body );
 
 fileHash.having.aspect = 'entry';
 
@@ -2638,7 +2684,7 @@ statRead_body.having.aspect = 'body';
  * @memberof wFileProviderPartial
  */
 
-let statRead = _.routineFromPreAndBody( _preSinglePath, statRead_body );
+let statRead = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, statRead_body );
 
 statRead.having.aspect = 'entry';
 statRead.having.hubRedirecting = 0;
@@ -2648,7 +2694,7 @@ statRead.defaults.resolvingTextLink = 0;
 
 //
 
-let statResolvedRead = _.routineFromPreAndBody( _preSinglePath, statRead_body );
+let statResolvedRead = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, statRead_body );
 
 statResolvedRead.having.aspect = 'entry';
 statResolvedRead.having.hubRedirecting = 0;
@@ -2747,7 +2793,7 @@ having.aspect = 'body';
 
 //
 
-let fileExists = _.routineFromPreAndBody( _preSinglePath, fileExists_body );
+let fileExists = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, fileExists_body );
 
 fileExists.having.aspect = 'entry';
 
@@ -3044,7 +3090,7 @@ having.hubRedirecting = 0;
  * @memberof wFileProviderPartial
  */
 
-let fileSize = _.routineFromPreAndBody( _preSinglePath, _fileSize_body );
+let fileSize = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, _fileSize_body );
 
 fileSize.having.aspect = 'entry';
 
@@ -3106,7 +3152,7 @@ _.assert( fileSize.having.hubRedirecting === 0 );
 //  * @memberof wFileProviderPartial
 //  */
 //
-// let isTerminal = _.routineFromPreAndBody( _preSinglePath, isTerminal_body );
+// let isTerminal = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isTerminal_body );
 //
 // isTerminal.having.aspect = 'entry';
 //
@@ -3123,7 +3169,7 @@ _.assert( fileSize.having.hubRedirecting === 0 );
 //  * @memberof wFileProviderPartial
 //  */
 //
-// let terminalResolvedIs = _.routineFromPreAndBody( _preSinglePath, isTerminal_body );
+// let terminalResolvedIs = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isTerminal_body );
 //
 // terminalResolvedIs.defaults.resolvingSoftLink = 1;
 // terminalResolvedIs.defaults.resolvingTextLink = 1;
@@ -3233,7 +3279,7 @@ having.hubResolving = 1;
  * @memberof wFileProviderPartial
  */
 
-let isTerminal = _.routineFromPreAndBody( _preSinglePath, isTerminal_body );
+let isTerminal = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isTerminal_body );
 
 isTerminal.having.aspect = 'entry';
 
@@ -3249,7 +3295,7 @@ isTerminal.having.aspect = 'entry';
  * @memberof wFileProviderPartial
  */
 
-let resolvedIsTerminal = _.routineFromPreAndBody( _preSinglePath, isTerminal_body );
+let resolvedIsTerminal = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isTerminal_body );
 
 resolvedIsTerminal.defaults.resolvingSoftLink = null;
 resolvedIsTerminal.defaults.resolvingTextLink = null;
@@ -3397,7 +3443,7 @@ _.routineExtend( isDir_body, isTerminal_body );
  * @memberof wFileProviderPartial
  */
 
-let isDir = _.routineFromPreAndBody( _preSinglePath, isDir_body );
+let isDir = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isDir_body );
 
 isDir.having.aspect = 'entry';
 
@@ -3414,7 +3460,7 @@ isDir.having.aspect = 'entry';
  * @memberof wFileProviderPartial
  */
 
-let resolvedIsDir = _.routineFromPreAndBody( _preSinglePath, isDir_body );
+let resolvedIsDir = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isDir_body );
 
 resolvedIsDir.defaults.resolvingSoftLink = null;
 resolvedIsDir.defaults.resolvingTextLink = null;
@@ -3496,7 +3542,7 @@ var having = _streamWrite_body.having = Object.create( streamWriteAct.having );
 having.driving = 0;
 having.aspect = 'body';
 
-let streamWrite = _.routineFromPreAndBody( _preSinglePath, _streamWrite_body );
+let streamWrite = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, _streamWrite_body );
 
 streamWrite.having.aspect = 'entry';
 
@@ -4237,11 +4283,11 @@ having.aspect = 'body';
  * @memberof wFileProviderPartial
  */
 
-let fileDelete = _.routineFromPreAndBody( _preSinglePath, fileDelete_body );
+let fileDelete = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, fileDelete_body );
 
 fileDelete.having.aspect = 'entry';
 
-let fileResolvedDelete = _.routineFromPreAndBody( _preSinglePath, fileDelete_body, 'fileResolvedDelete' );
+let fileResolvedDelete = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, fileDelete_body, 'fileResolvedDelete' );
 
 fileResolvedDelete.having.aspect = 'entry';
 fileResolvedDelete.defaults.resolvingSoftLink = null;
@@ -4384,7 +4430,7 @@ var having = _dirMake_body.having = Object.create( dirMakeAct.having );
 having.driving = 0;
 having.aspect = 'body';
 
-let dirMake = _.routineFromPreAndBody( _preSinglePath, _dirMake_body );
+let dirMake = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, _dirMake_body );
 
 dirMake.having.aspect = 'entry';
 
@@ -4411,7 +4457,7 @@ var having = _dirMakeForFile_body.having = Object.create( dirMake.having );
 having.driving = 0;
 having.aspect = 'body';
 
-let dirMakeForFile = _.routineFromPreAndBody( _preSinglePath, _dirMakeForFile_body );
+let dirMakeForFile = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, _dirMakeForFile_body );
 
 dirMakeForFile.having.aspect = 'entry';
 
@@ -4784,11 +4830,11 @@ having.reading = 1;
 having.aspect = 'body';
 having.driving = 0;
 
-let fileIsLink = _.routineFromPreAndBody( _preSinglePath, fileIsLink_body );
+let fileIsLink = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, fileIsLink_body );
 
 fileIsLink.having.aspect = 'entry';
 
-let fileResolvedIsLink = _.routineFromPreAndBody( _preSinglePath, fileIsLink_body );
+let fileResolvedIsLink = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, fileIsLink_body );
 
 fileResolvedIsLink.defaults.resolvingSoftLink = null;
 fileResolvedIsLink.defaults.resolvingTextLink = null;
@@ -6068,7 +6114,7 @@ var having = _hardLinkBreak_body.having = Object.create( hardLinkBreakAct.having
 having.driving = 0;
 having.aspect = 'body';
 
-let hardLinkBreak = _.routineFromPreAndBody( _preSinglePath, _hardLinkBreak_body );
+let hardLinkBreak = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, _hardLinkBreak_body );
 
 hardLinkBreak.having.aspect = 'entry';
 
@@ -6127,7 +6173,7 @@ var having = _softLinkBreak_body.having = Object.create( softLinkBreakAct.having
 having.driving = 0;
 having.aspect = 'body';
 
-let softLinkBreak = _.routineFromPreAndBody( _preSinglePath, _softLinkBreak_body );
+let softLinkBreak = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, _softLinkBreak_body );
 
 softLinkBreak.having.aspect = 'entry';
 
@@ -6550,8 +6596,10 @@ let Proto =
 
   _fileOptionsGet : _fileOptionsGet,
   _providerDefaults : _providerDefaults,
-  _preSinglePath : _preSinglePath,
-  _preSinglePathWithoutProviderOptions : _preSinglePathWithoutProviderOptions,
+  _preFilePathScalarWithProviderDefaults : _preFilePathScalarWithProviderDefaults,
+  _preFilePathScalarWithoutProviderDefaults : _preFilePathScalarWithoutProviderDefaults,
+  _preFilePathVectorWithProviderDefaults : _preFilePathVectorWithProviderDefaults,
+  _preFilePathVectorWithoutProviderDefaults : _preFilePathVectorWithoutProviderDefaults,
 
   protocolsForOrigins : protocolsForOrigins,
   originsForProtocols : originsForProtocols,

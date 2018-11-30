@@ -36,23 +36,6 @@ let Self = function wFileProviderSecondary( o )
 
 Self.shortName = 'Secondary';
 
-// function onMixin( mixinDescriptor, dstClass )
-// {
-//
-//   let dstPrototype = dstClass.prototype;
-//
-//   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
-//   _.assert( _.routineIs( dstClass ) );
-//
-//   _.mixinApply( this, dstPrototype );
-//   // _.mixinApply
-//   // ({
-//   //   dstPrototype : dstPrototype,
-//   //   descriptor : Self,
-//   // });
-//
-// }
-
 // --
 // files read
 // --
@@ -114,6 +97,47 @@ function filesRead( o )
 
   let result = Object.create( null );
   result.options = o;
+
+  /* */
+
+  o._filesReadEnd = _filesReadEnd;
+  o._optionsForFileRead = _optionsForFileRead;
+
+  /* begin */
+
+  _filesReadBegin();
+
+  if( o.sync )
+  {
+    return self._filesReadSync( o );
+  }
+  else
+  {
+    return self._filesReadAsync( o );
+  }
+
+  /* - */
+
+  function _optionsForFileRead( src )
+  {
+    let readOptions = _.mapOnly( o, self.fileRead.defaults );
+    readOptions.onEnd = o.onEach;
+
+    if( _.objectIs( src ) )
+    {
+      if( _.FileRecord && src instanceof _.FileRecord )
+      readOptions.filePath = src.absolute;
+      else
+      _.mapExtend( readOptions,src );
+    }
+    else
+    readOptions.filePath = src;
+
+    // if( o.sync )
+    // readOptions.returnRead = true;
+
+    return readOptions;
+  }
 
   /* */
 
@@ -207,45 +231,6 @@ function filesRead( o )
     return result;
   }
 
-  /* */
-
-  function _optionsForFileRead( src )
-  {
-    let readOptions = _.mapOnly( o, self.fileRead.defaults );
-    readOptions.onEnd = o.onEach;
-
-    if( _.objectIs( src ) )
-    {
-      if( _.FileRecord && src instanceof _.FileRecord )
-      readOptions.filePath = src.absolute;
-      else
-      _.mapExtend( readOptions,src );
-    }
-    else
-    readOptions.filePath = src;
-
-    // if( o.sync )
-    // readOptions.returnRead = true;
-
-    return readOptions;
-  }
-
-  o._filesReadEnd = _filesReadEnd;
-  o._optionsForFileRead = _optionsForFileRead;
-
-  /* begin */
-
-  _filesReadBegin();
-
-  if( o.sync )
-  {
-    return self._filesReadSync( o );
-  }
-  else
-  {
-    return self._filesReadAsync( o );
-  }
-
 }
 
 filesRead.defaults =
@@ -257,7 +242,7 @@ filesRead.defaults =
   preset : null,
 }
 
-filesRead.defaults.__proto__ = fileRead.defaults;
+_.routineExtend( filesRead, fileRead );
 
 filesRead.presets = Object.create( null );
 
@@ -274,12 +259,6 @@ filesRead.presets.js =
     o.data = o.data[ 0 ];
   }
 }
-
-var having = filesRead.having = Object.create( null );
-
-having.writing = 0;
-having.reading = 1;
-having.driving = 0;
 
 //
 
@@ -403,11 +382,30 @@ function filesAreUpToDate( dst,src )
 
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
 
-  // if( src.indexOf( 'Private.cpp' ) !== -1 )
-  // console.log( 'src :',src );
-  //
-  // if( src.indexOf( 'Private.cpp' ) !== -1 )
-  // debugger;
+  /* */
+
+  dst = from( dst );
+  src = from( src );
+
+  // logger.log( 'dst',dst[ 0 ] );
+  // logger.log( 'src',src[ 0 ] );
+
+  let dstMax = _.entityMax( dst, function( e ){ return e.stat ? e.stat.mtime : Infinity; } );
+  let srcMax = _.entityMax( src, function( e ){ return e.stat ? e.stat.mtime : Infinity; } );
+
+  // logger.log( 'dstMax.element.stat.mtime',dstMax.element.stat.mtime );
+  // logger.log( 'srcMax.element.stat.mtime',srcMax.element.stat.mtime );
+
+  if( !dstMax.element.stat )
+  return false;
+
+  if( !srcMax.element.stat )
+  return false;
+
+  if( dstMax.element.stat.mtime >= srcMax.element.stat.mtime )
+  return true;
+  else
+  return false;
 
   /* */
 
@@ -434,31 +432,6 @@ function filesAreUpToDate( dst,src )
     }
     return [ _from( file ) ];
   }
-
-  /* */
-
-  dst = from( dst );
-  src = from( src );
-
-  // logger.log( 'dst',dst[ 0 ] );
-  // logger.log( 'src',src[ 0 ] );
-
-  let dstMax = _.entityMax( dst, function( e ){ return e.stat ? e.stat.mtime : Infinity; } );
-  let srcMax = _.entityMax( src, function( e ){ return e.stat ? e.stat.mtime : Infinity; } );
-
-  // logger.log( 'dstMax.element.stat.mtime',dstMax.element.stat.mtime );
-  // logger.log( 'srcMax.element.stat.mtime',srcMax.element.stat.mtime );
-
-  if( !dstMax.element.stat )
-  return false;
-
-  if( !srcMax.element.stat )
-  return false;
-
-  if( dstMax.element.stat.mtime >= srcMax.element.stat.mtime )
-  return true;
-  else
-  return false;
 
 }
 
@@ -631,11 +604,6 @@ function filesSearchText( o )
 
   let o2 = _.mapOnly( o, self.filesFind.defaults );
 
-  // delete o2.ins;
-  // delete o2.stringWithRegexp;
-  // delete o2.toleratingSpaces;
-  // delete o2.determiningLineNumber;
-
   o2.onUp = _.arrayAppendElement( o2.onUp, handleUp );
 
   let records = self.filesFind( o2 );
@@ -667,21 +635,26 @@ function filesSearchText( o )
 
 }
 
-var defaults = filesSearchText.defaults = Object.create( Find.prototype.filesFind.defaults );
+_.routineExtend( filesSearchText, Find.prototype.filesFind );
+
+// var defaults = filesSearchText.defaults = Object.create( Find.prototype.filesFind.defaults );
+
+var defaults = filesSearchText.defaults;
 
 _.mapSupplement( defaults, _.mapBut( _.strSearch.defaults, { src : null } ) );
 
 defaults.determiningLineNumber = 1;
+
 // defaults.ins = null;
 // defaults.stringWithRegexp = 0;
 // defaults.toleratingSpaces = 0;
 // defaults.determiningLineNumber = 1;
 
-var having = filesSearchText.having = Object.create( Find.prototype.filesFind.having );
-
-having.writing = 0;
-having.reading = 1;
-having.driving = 0;
+// var having = filesSearchText.having = Object.create( Find.prototype.filesFind.having );
+//
+// having.writing = 0;
+// having.reading = 1;
+// having.driving = 0;
 
 // --
 // read
@@ -800,7 +773,7 @@ _fileConfigRead2.defaults = fileConfigRead2.defaults;
 
 //
 
-function _fileConfigPathGet_body( o )
+function fileConfigPathGet_body( o )
 {
   let self = this;
   let result = null;
@@ -839,55 +812,48 @@ function _fileConfigPathGet_body( o )
   return null;
 }
 
-// _.routineExtend( _fileConfigRead_body, fileRead );
-
-var defaults = _fileConfigPathGet_body.defaults = Object.create( null );
+var defaults = fileConfigPathGet_body.defaults = Object.create( null );
 
 defaults.filePath = null;
-// defaults.verbosity = null;
-// defaults.encoding = null;
-// defaults.throwing = null;
 
-var fileConfigPathGet = _.routineFromPreAndBody( fileRead.pre, _fileConfigPathGet_body );
+var fileConfigPathGet = _.routineFromPreAndBody( Partial.prototype._preFilePathVectorWithProviderDefaults, fileConfigPathGet_body );
 
 //
 
-function _fileConfigRead_body( o )
+// function _fileRead_pre( routine, args )
+// {
+//   let self = this;
+//
+//   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
+//   _.assert( args && args.length === 1 );
+//
+//   let o = args[ 0 ];
+//
+//   if( self.path.like( o ) )
+//   o = { filePath : self.path.from( o ) };
+//
+//   _.routineOptions( routine, o );
+//
+//   o.filePath = self.path.normalize( o.filePath );
+//
+//   _.assert( self.path.isAbsolute( o.filePath ), 'Expects absolute path {-o.filePath-}, but got', o.filePath );
+//
+//   if( o.verbosity === null )
+//   o.verbosity = _.numberClamp( self.verbosity - 4, 0, 9 );
+//
+//   self._providerDefaults( o );
+//
+//   return o;
+// }
+
+//
+
+function fileConfigRead_body( o )
 {
   let self = this;
   let result = null;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-
-  // let exts = Object.create( null );
-  // for( let e in fileRead.encoders )
-  // {
-  //   let encoder = fileRead.encoders[ e ];
-  //   if( encoder.exts )
-  //   for( let s = 0 ; s < encoder.exts.length ; s++ )
-  //   exts[ encoder.exts[ s ] ] = e;
-  // }
-  //
-  // _.assert( !!o.filePath );
-  //
-  // // self.fieldSet({ throwing : 0 });
-  //
-  // /* */
-  //
-  // for( let ext in exts )
-  // {
-  //   let o2 = _.mapExtend( null,o );
-  //   o2.filePath = o.filePath + '.' + ext;
-  //   o2.encoding = exts[ ext ];
-  //   o2.throwing = 1;
-  //
-  //   if( !self.fileExists( o2.filePath ) )
-  //   continue;
-  //
-  //   result = self.fileRead( o2 );
-  //
-  //   _.sure( result !== undefined && result !== null, () => 'Read ' + result + ' from ' + o2.filePath );
-  // }
 
   let found = self.fileConfigPathGet({ filePath : o.filePath });
 
@@ -915,22 +881,20 @@ function _fileConfigRead_body( o )
   return result;
 }
 
-_.routineExtend( _fileConfigRead_body, fileRead );
+_.routineExtend( fileConfigRead_body, fileRead );
 
-var defaults = _fileConfigRead_body.defaults;
+var defaults = fileConfigRead_body.defaults;
 
 defaults.encoding = null;
-// defaults.throwing = null;
 
 //
 
-var fileConfigRead = _.routineFromPreAndBody( fileRead.pre, _fileConfigRead_body );
+var fileConfigRead = _.routineFromPreAndBody( Partial.prototype._preFilePathVectorWithProviderDefaults, fileConfigRead_body );
 
 fileConfigRead.having.aspect = 'entry';
 
 //
 
-let TemplateTreeResolver;
 function _fileCodeRead_body( o )
 {
   let self = this;
@@ -1057,27 +1021,13 @@ _.classDeclare
 _.FileProvider = _.FileProvider || Object.create( null );
 _.FileProvider[ Self.shortName ] = Self;
 
-//
-//
-// let Self =
-// {
-//
-//   supplement : Supplement,
-//
-//   name : 'wFilePorviderSecondaryMixin',
-//   shortName : 'Secondary',
-//   onMixin : onMixin,
-//
-// }
-// _.FileProvider[ Self.shortName ] = _.mixinDelcare( Self );
-
 // --
 // export
 // --
 
-if( typeof module !== 'undefined' )
-if( _global_.WTOOLS_PRIVATE )
-{ /* delete require.cache[ module.id ]; */ }
+// if( typeof module !== 'undefined' )
+// if( _global_.WTOOLS_PRIVATE )
+// { /* delete require.cache[ module.id ]; */ }
 
 if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = Self;

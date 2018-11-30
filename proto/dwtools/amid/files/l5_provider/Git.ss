@@ -454,7 +454,8 @@ function filesReflectSingle_body( o )
   let result = _.Consequence().give( null );
   let shell = _.sheller
   ({
-    verbosity : o.verbosity >= 3 ? 1 : 0,
+    // verbosity : o.verbosity >= 3 ? 1 : 0,
+    verbosity : 1,
     con : result,
     currentPath : dstPath,
   });

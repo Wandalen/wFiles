@@ -454,8 +454,8 @@ function filesReflectSingle_body( o )
   let result = _.Consequence().give( null );
   let shell = _.sheller
   ({
-    // verbosity : o.verbosity >= 3 ? 1 : 0,
-    verbosity : 1,
+    verbosity : o.verbosity >= 3 ? 1 : 0,
+    // verbosity : 1,
     con : result,
     currentPath : dstPath,
   });
@@ -556,6 +556,8 @@ function isUpToDate( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( !!self.hub );
 
+  // console.log( 'isUpToDate:begin' );
+
   let srcCurrentPath;
   let dstFileProvider = self.hub.providerForPath( o.localPath );
   let paths = self.pathParse( o.remotePath );
@@ -563,12 +565,15 @@ function isUpToDate( o )
   let shell = _.sheller
   ({
     verbosity : 0,
+    // verbosity : 1,
     con : result,
     currentPath : o.localPath,
   });
+
   let shellAll = _.sheller
   ({
     verbosity : 0,
+    // verbosity : 1,
     con : result,
     currentPath : o.localPath,
     throwingExitCode : 0,
@@ -603,19 +608,27 @@ function isUpToDate( o )
 
   shell( 'git fetch origin' );
 
+  result.then( ( err, arg ) =>
+  {
+    // console.log( 'isUpToDate:1' );
+    if( err )
+    throw _.err( err );
+    return null;
+  });
+
   shellAll
   ([
     'git diff origin/master --quiet --exit-code',
     'git diff --quiet --exit-code',
     'git branch -v',
     'git status',
-    'git diff',
   ]);
 
   result
   .ifNoErrorThen( function( arg )
   {
-    _.assert( arg.length === 6 );
+    // console.log( 'isUpToDate:2' );
+    _.assert( arg.length === 5 );
     let diffRemote = arg[ 0 ].exitCode !== 0;
     let diffLocal = arg[ 1 ].exitCode !== 0;
     let commitsRemote = _.strHas( arg[ 2 ].output, '[ahead' );
@@ -631,6 +644,7 @@ function isUpToDate( o )
   result
   .doThen( function( err, arg )
   {
+    // console.log( 'isUpToDate:end' );
     if( err )
     throw _.err( err );
     return arg;
@@ -655,6 +669,8 @@ function isDownloaded( o )
   _.routineOptions( isUpToDate, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( !!self.hub );
+
+  // logger.log( 'isDownloaded:begin' );
 
   let srcCurrentPath;
   let dstFileProvider = self.hub.providerForPath( o.localPath );
@@ -690,6 +706,7 @@ function isDownloaded( o )
   result
   .doThen( function( err, arg )
   {
+    // logger.log( 'isDownloaded:end' );
     if( err )
     throw _.err( err );
     return arg;
@@ -798,9 +815,9 @@ _.FileProvider[ Self.shortName ] = Self;
 // export
 // --
 
-if( typeof module !== 'undefined' )
-if( _global_.WTOOLS_PRIVATE )
-{ /* delete require.cache[ module.id ]; */ }
+// if( typeof module !== 'undefined' )
+// if( _global_.WTOOLS_PRIVATE )
+// { /* delete require.cache[ module.id ]; */ }
 
 if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = Self;

@@ -150,12 +150,12 @@ function init( o )
     if( o.logger )
     self.logger = o.logger;
     else
-    self.logger = new _.Logger({ output : logger });
+    self.logger = new _.Logger({ output : console });
     self.copy( o );
   }
   else
   {
-    self.logger = new _.Logger({ output : logger });
+    self.logger = new _.Logger({ output : console });
   }
 
   if( self.path === null )
@@ -6469,7 +6469,7 @@ let Composes =
   verbosity : 0,
   sync : 1,
   throwing : 1,
-  safe : 2,
+  safe : 1,
   stating : 1,
 }
 

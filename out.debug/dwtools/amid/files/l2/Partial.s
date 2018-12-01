@@ -243,7 +243,7 @@ function _preFilePathScalarWithoutProviderDefaults( routine, args )
   let self = this;
   let path = self.path;
 
-  _.assert( arguments.length === 2, 'Expects exactly two arguments' );
+  _.assert( args && args.length === 1, 'Routine ' + routine.name + ' expects exactly two arguments' );
   _.assert( args && args.length === 1 );
 
   let o = args[ 0 ];
@@ -281,21 +281,23 @@ function _preFilePathScalarWithProviderDefaults( routine, args )
 function _preFilePathVectorWithoutProviderDefaults( routine, args )
 {
   let self = this;
-  let path = self.path.s;
+  let path = self.path;
 
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
-  _.assert( args && args.length === 1 );
+  _.assert( args && args.length === 1, 'Routine ' + routine.name + ' expects exactly two arguments' );
 
   let o = args[ 0 ];
 
   if( path.like( o ) )
   o = { filePath : path.from( o ) };
+  else if( _.arrayIs( o ) )
+  o = { filePath : o };
 
   _.routineOptions( routine, o );
 
-  o.filePath = path.normalize( o.filePath );
+  _.assert( path.s.allAreAbsolute( o.filePath ), () => 'Expects absolute path {-o.filePath-}, but got ' + _.strQuote( o.filePath ) );
 
-  _.assert( path.allAreAbsolute( o.filePath ), () => 'Expects absolute path {-o.filePath-}, but got ' + _.strQuote( o.filePath ) );
+  o.filePath = path.s.normalize( o.filePath );
 
   return o;
 }
@@ -2187,7 +2189,7 @@ fileInterpret.having.aspect = 'entry';
 
 let _fileHash_body = ( function()
 {
-  let crypto;
+  let Crypto;
 
   return function fileHash( o )
   {
@@ -2198,9 +2200,9 @@ let _fileHash_body = ( function()
     if( o.verbosity >= 3 )
     self.logger.log( ' . fileHash :',o.filePath );
 
-    if( crypto === undefined )
-    crypto = require( 'crypto' );
-    let md5sum = crypto.createHash( 'md5' );
+    if( Crypto === undefined )
+    Crypto = require( 'crypto' );
+    let md5sum = Crypto.createHash( 'md5' );
 
     /* */
 

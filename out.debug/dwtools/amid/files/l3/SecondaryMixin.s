@@ -778,7 +778,7 @@ _fileConfigRead2.defaults = fileConfigRead2.defaults;
 function fileConfigPathGet_body( o )
 {
   let self = this;
-  let result = null;
+  let result = [];
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
@@ -796,22 +796,27 @@ function fileConfigPathGet_body( o )
 
   _.assert( !!o.filePath );
 
-  // self.fieldSet({ throwing : 0 });
-
   /* */
 
-  for( let ext in exts )
+  debugger;
+  _.each( exts, ( encoderName, ext ) =>
   {
-    let filePath = o.filePath + '.' + ext;
-    if( self.fileExists( filePath ) )
-    return { filePath : filePath, encoding : exts[ ext ], ext : ext };
-  }
+    _.each( o.filePath, ( filePath ) =>
+    {
+      _.assert( _.strIs( ext ) );
+      _.assert( _.strIs( filePath ) );
+      filePath = filePath + '.' + ext;
+      if( self.fileExists( filePath ) )
+      debugger;
+      if( self.fileExists( filePath ) )
+      result.push({ filePath : filePath, encoding : exts[ ext ], ext : ext });
+    });
+  });
+  debugger;
 
   /* */
 
-  // self.fieldReset({ throwing : 0 });
-
-  return null;
+  return result;
 }
 
 var defaults = fileConfigPathGet_body.defaults = Object.create( null );
@@ -859,17 +864,29 @@ function fileConfigRead_body( o )
 
   let found = self.fileConfigPathGet({ filePath : o.filePath });
 
-  if( found )
+  debugger;
+  if( found && found.length )
   {
 
-    let o2 = _.mapExtend( null,o );
-    o2.filePath = found.filePath;
-    o2.encoding = found.encoding;
+    for( let f = 0 ; f < found.length ; f++ )
+    {
+      let file = found[ f ];
 
-    result = self.fileRead( o2 );
+      let o2 = _.mapExtend( null,o );
+      o2.filePath = file.filePath;
+      o2.encoding = file.encoding;
 
-    if( o.throwing )
-    _.sure( result !== undefined && result !== null, () => 'Read ' + result + ' from ' + o2.filePath );
+      let read = self.fileRead( o2 );
+
+      // if( o.throwing )
+      _.sure( _.mapIs( read ), () => 'Read ' + result + ' from ' + o2.filePath );
+
+      if( result === null )
+      result = read;
+      else
+      result = _.mapExtendRecursive( result, read );
+
+    }
 
   }
 

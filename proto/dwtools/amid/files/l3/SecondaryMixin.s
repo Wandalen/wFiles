@@ -778,9 +778,10 @@ _fileConfigRead2.defaults = fileConfigRead2.defaults;
 function fileConfigPathGet_body( o )
 {
   let self = this;
-  let result = [];
+  let result = o.outputFormat === 'array' ? [] : Object.create( null );
 
   _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( _.arrayHas( [ 'array', 'map' ], o.outputFormat ) );
 
   let exts = Object.create( null );
   for( let e in fileRead.encoders )
@@ -798,21 +799,30 @@ function fileConfigPathGet_body( o )
 
   /* */
 
-  debugger;
+  // debugger;
   _.each( exts, ( encoderName, ext ) =>
   {
     _.each( o.filePath, ( filePath ) =>
     {
       _.assert( _.strIs( ext ) );
       _.assert( _.strIs( filePath ) );
-      filePath = filePath + '.' + ext;
-      if( self.fileExists( filePath ) )
-      debugger;
-      if( self.fileExists( filePath ) )
-      result.push({ filePath : filePath, encoding : exts[ ext ], ext : ext });
+      let filePath2 = filePath + '.' + ext;
+      // logger.log( 'check', filePath2, self.fileExists( filePath2 ) );
+      // if( self.fileExists( filePath2 ) )
+      // debugger;
+      if( self.fileExists( filePath2 ) )
+      if( o.outputFormat === 'array' )
+      {
+        result.push({ particularPath : filePath2, abstractPath : filePath, encoding : exts[ ext ], ext : ext });
+      }
+      else
+      {
+        _.sure( result[ filePath ] === undefined, () => 'Several configs exists for ' + _.strQuote( filePath ) );
+        result[ filePath ] = { particularPath : filePath2, abstractPath : filePath, encoding : exts[ ext ], ext : ext };
+      }
     });
   });
-  debugger;
+  // debugger;
 
   /* */
 
@@ -822,8 +832,9 @@ function fileConfigPathGet_body( o )
 var defaults = fileConfigPathGet_body.defaults = Object.create( null );
 
 defaults.filePath = null;
+defaults.outputFormat = 'array';
 
-var fileConfigPathGet = _.routineFromPreAndBody( Partial.prototype._preFilePathVectorWithProviderDefaults, fileConfigPathGet_body );
+let fileConfigPathGet = _.routineFromPreAndBody( Partial.prototype._preFilePathVectorWithProviderDefaults, fileConfigPathGet_body );
 
 //
 
@@ -861,10 +872,21 @@ function fileConfigRead_body( o )
   let result = null;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( _.arrayHas( [ 'all', 'any' ], o.many ) );
 
   let found = self.fileConfigPathGet({ filePath : o.filePath });
 
-  debugger;
+  if( o.many === 'all' )
+  {
+    let abstractPath1 = _.arrayAs( o.filePath );
+    let abstractPath2 = found.map( ( f ) => f.abstractPath );
+    if( _.arraySetBut( abstractPath1.slice(), abstractPath2 ).length )
+    throw _.err( 'Such configs were not found\n', _.strQuote( _.arraySetBut( abstractPath1.slice(), abstractPath2 ) ) );
+    if( abstractPath1.length !== abstractPath2.length )
+    throw _.err( 'Some configs were loaded several times' );
+  }
+
+  // debugger;
   if( found && found.length )
   {
 
@@ -873,13 +895,18 @@ function fileConfigRead_body( o )
       let file = found[ f ];
 
       let o2 = _.mapExtend( null,o );
-      o2.filePath = file.filePath;
+      o2.filePath = file.particularPath;
       o2.encoding = file.encoding;
+      if( o2.verbosity >= 2 )
+      o2.verbosity = 5;
+      delete o2.many;
 
+      // debugger;
       let read = self.fileRead( o2 );
+      // debugger;
 
       // if( o.throwing )
-      _.sure( _.mapIs( read ), () => 'Read ' + result + ' from ' + o2.filePath );
+      _.sure( _.mapIs( read ), () => 'Expects map, but read ' + _.toStrShort( result ) + ' from ' + o2.filePath );
 
       if( result === null )
       result = read;
@@ -905,6 +932,7 @@ _.routineExtend( fileConfigRead_body, fileRead );
 var defaults = fileConfigRead_body.defaults;
 
 defaults.encoding = null;
+defaults.many = 'all';
 
 //
 

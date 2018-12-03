@@ -24071,8 +24071,8 @@ function pathResolveLinkChain( test )
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
   var got = self.provider.pathResolveLinkChain( o );
   var expected = [ linkPath ]
-  if( _.routineIs( self.provider.pathResolveHardLinkAct ) )
-  expected = [ linkPath,filePath ];
+  // if( _.routineIs( self.provider.pathResolveHardLinkAct ) )
+  // expected = [ linkPath,filePath ];
   test.identical( got, expected );
 
   test.case = 'softlink';

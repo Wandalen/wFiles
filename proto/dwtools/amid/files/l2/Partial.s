@@ -3289,7 +3289,11 @@ function isTerminal_body( o )
     filePath : o.filePath,
     resolvingSoftLink : o.resolvingSoftLink,
     resolvingTextLink : o.resolvingTextLink,
+    throwing : 0
   });
+
+  if( o.filePath === null )
+  return false;
 
   // if( self.isDir( o.filePath ) )
   // return false;

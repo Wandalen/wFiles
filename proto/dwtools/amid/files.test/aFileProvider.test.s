@@ -25822,8 +25822,8 @@ function pathResolveLinkChain( test )
   self.provider.softLink( linkPath, '../file' );
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   self.provider.pathResolveLinkChain( o );
-  var expectedResult = [ linkPath, '../file', filePath ]
-  var expectedFound = [ linkPath, filePath ]
+  var expectedFound = [ linkPath, '../file', filePath ]
+  var expectedResult = [ linkPath, filePath ]
   test.identical( o.result, expectedResult );
   test.identical( o.found, expectedFound );
 
@@ -25935,14 +25935,14 @@ function pathResolveLinkChain( test )
   });
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0, preservingRelative : 1 } );
   var got = self.provider.pathResolveLinkChain( o );
-  var expectedResult =
+  var expectedFound =
   [
     linkPath,
     '../file',
     filePath,
     null
   ]
-  var expectedFound =
+  var expectedResult =
   [
     linkPath,
     filePath,
@@ -26081,7 +26081,7 @@ function pathResolveLinkChain( test )
   self.provider.softLink( linkPath, '../link2' );
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   self.provider.pathResolveLinkChain( o );
-  var expectedResult =
+  var expectedFound =
   [
     linkPath,
     '../link2',
@@ -26090,7 +26090,7 @@ function pathResolveLinkChain( test )
     linkPath3,
     filePath
   ]
-  var expectedFound =
+  var expectedResult =
   [
     linkPath,
     linkPath2,
@@ -26148,13 +26148,13 @@ function pathResolveLinkChain( test )
   self.provider.pathResolveLinkChain( o );
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   {
-    test.identical( o.result, [ linkPath, '../link2', linkPath2, filePath ] )
-    test.identical( o.found, [ linkPath, linkPath2, filePath ] )
+    test.identical( o.found, [ linkPath, '../link2', linkPath2, filePath ] )
+    test.identical( o.result, [ linkPath, linkPath2, filePath ]  )
   }
   else
   {
-    test.identical( o.result, [ linkPath, '../link2', linkPath2, linkPath3, filePath ] )
-    test.identical( o.found, [ linkPath, linkPath2, linkPath3, filePath ] )
+    test.identical( o.found, [ linkPath, '../link2', linkPath2, linkPath3, filePath ] )
+    test.identical( o.result, [ linkPath, linkPath2, linkPath3, filePath ] )
   }
 
 
@@ -26165,7 +26165,7 @@ function pathResolveLinkChain( test )
   self.provider.softLink( linkPath2, '../file' );
   var o = _.mapExtend( null, o1, { filePath : path.join( dir, 'link/link2' ) , preservingRelative : 1, resolvingIntermediateDirectories : 1 } );
   var got = self.provider.pathResolveLinkChain( o );
-  var expectedResult =
+  var expectedFound =
   [
     path.join( dir, 'link/link2' ),
     path.join( dir, 'link' ),
@@ -26175,7 +26175,7 @@ function pathResolveLinkChain( test )
     '../file',
     filePath,
   ]
-  var expectedFound =
+  var expectedResult =
   [
     path.join( dir, 'link/link2' ),
     path.join( dir, 'link' ),
@@ -26253,8 +26253,8 @@ function pathResolveLinkChain( test )
   var testPath = _.path.join( dirPath, 'linkToDir1/linkToDir2/linkToFile' )
   var o = _.mapExtend( null, o1, { filePath : testPath , preservingRelative : 1, resolvingIntermediateDirectories : 1 } );
   var got = self.provider.pathResolveLinkChain( o );
-  test.identical( o.result, [ testPath, linkInDir, '../dir1', dirPath1, linkInDir1, '../../dir2', dirPath2, linkInDir2, '../../file', pathToFile ] )
-  test.identical( o.found, [ testPath, linkInDir, dirPath1, linkInDir1, dirPath2, linkInDir2, pathToFile ] )
+  test.identical( o.found, [ testPath, linkInDir, '../dir1', dirPath1, linkInDir1, '../../dir2', dirPath2, linkInDir2, '../../file', pathToFile ] )
+  test.identical( o.result, [ testPath, linkInDir, dirPath1, linkInDir1, dirPath2, linkInDir2, pathToFile ] )
 
   test.close( 'chain' );
 

@@ -979,20 +979,20 @@ function pathResolveLinkChain_body( o )
     if( o.throwing )
     throw _.err( 'Links cycle at', _.strQuote( o.filePath ) );
     else
-    return o.found;
+    return o.result;
   }
 
   o.result.push( o.filePath );
   o.found.push( o.filePath );
 
-  if( o.found.length > 1 )
+  if( o.result.length > 1 )
   {
     let stat = self.statRead({ filePath : o.filePath, resolvingSoftLink : 0, resolvingTextLink : 0, throwing : o.throwing });
     if( !stat )
     {
       o.found.push( stat );
       o.result.push( stat );
-      return o.found;
+      return o.result;
     }
   }
 
@@ -1013,7 +1013,7 @@ function pathResolveLinkChain_body( o )
       self.pathResolveLinkChain.body.call( self, o );
     }
 
-    return o.found;
+    return o.result;
   }
 
   /* */
@@ -1061,7 +1061,7 @@ function pathResolveLinkChain_body( o )
       } */
 
       if( o.preservingRelative && !path.isAbsolute( filePath ) )
-      o.result.push( filePath );
+      o.found.push( filePath );
 
       // o.filePath = _.uri.normalize( filePath );
       o.filePath = path.join( o.filePath, filePath )
@@ -1083,7 +1083,7 @@ function pathResolveLinkChain_body( o )
     }
   }
 
-  return o.found;
+  return o.result;
 }
 
 pathResolveLinkChain_body.defaults =
@@ -1129,7 +1129,7 @@ function _pathResolveLink_body( o )
   o2.result = [];
   self.pathResolveLinkChain.body.call( self, o2 );
 
-  return o2.found[ o2.found.length-1 ];
+  return o2.result[ o2.result.length-1 ];
 }
 
 _pathResolveLink_body.defaults =

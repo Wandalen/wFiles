@@ -93,32 +93,32 @@ function pathResolveSoftLinkAct( o )
 
 _.routineExtend( pathResolveSoftLinkAct, Parent.prototype.pathResolveSoftLinkAct )
 
+// //
+//
+// function pathResolveHardLinkAct( o )
+// {
+//   let self = this;
+//
+//   _.assert( arguments.length === 1, 'Expects single argument' );
+//   _.assert( self.path.isAbsolute( o.filePath ) );
+//
+//   if( /*!self.resolvingHardLink ||*/ !self.fileIsHardLink( o.filePath ) )
+//   return o.filePath;
+//
+//   let descriptor = self._descriptorRead( o.filePath );
+//   let resolved = self._descriptorResolveHardLinkPath( descriptor );
+//
+//   if( !self._descriptorRead( resolved ) )
+//   return o.filePath;
+//
+//   _.assert( _.strIs( resolved ) )
+//
+//   return resolved;
+// }
+
 //
 
-function pathResolveHardLinkAct( o )
-{
-  let self = this;
-
-  _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( self.path.isAbsolute( o.filePath ) );
-
-  if( /*!self.resolvingHardLink ||*/ !self.fileIsHardLink( o.filePath ) )
-  return o.filePath;
-
-  let descriptor = self._descriptorRead( o.filePath );
-  let resolved = self._descriptorResolveHardLinkPath( descriptor );
-
-  if( !self._descriptorRead( resolved ) )
-  return o.filePath;
-
-  _.assert( _.strIs( resolved ) )
-
-  return resolved;
-}
-
-//
-
-// function linkSoftReadAct( o )
+// function softLinkReadAct( o )
 // {
 //   let self = this;
 
@@ -136,7 +136,7 @@ function pathResolveHardLinkAct( o )
 //   return result;
 // }
 
-// _.routineExtend( linkSoftReadAct, Parent.prototype.linkSoftReadAct );
+// _.routineExtend( softLinkReadAct, Parent.prototype.softLinkReadAct );
 
 // --
 // read
@@ -446,7 +446,7 @@ function statReadAct( o )
     // if( filePath === '/out/icons' )
     // debugger;
 
-    let o2 = { filePath : filePath, resolvingSoftLink : o.resolvingSoftLink };
+    let o2 = { filePath : filePath, resolvingSoftLink : o.resolvingSoftLink, resolvingTextLink : 0 };
     try
     {
       filePath = self.pathResolveLink( o2 );
@@ -478,33 +478,56 @@ function statReadAct( o )
       result[ k ] = new Date( timeStats[ k ] );
     }
 
-    result.isFile = function() { return false; };
-    result.isDirectory = function() { return false; };
-    result.isSymbolicLink = function() { return false; };
+    result.isTerminal = returnFalse;
+    result.isDir = returnFalse;
+    result.isTextLink = returnFalse; /* qqq : implement and add coverage, please */
+    result.isSoftLink = returnFalse;
+    result.isHardLink = returnFalse; /* qqq : implement and add coverage, please */
+    result.isFile = returnFalse;
+    result.isDirectory = returnFalse;
+    result.isSymbolicLink = returnFalse;
 
     if( self._descriptorIsDir( file ) )
     {
-      result.isDirectory = function() { return true; };
+      result.isDirectory = returnTrue;
+      result.isDir = returnTrue;
     }
     else if( self._descriptorIsTerminal( file ) )
     {
-      result.isFile = function() { return true; };
+      result.isTerminal = returnTrue;
+      result.isFile = returnTrue;
       if( _.strIs( file ) )
       result.size = file.length;
       else
       result.size = file.byteLength;
+      _.assert( result.size >= 0 );
     }
     else if( self._descriptorIsSoftLink( file ) )
     {
-
-      result.isSymbolicLink = function() { return true; };
-
+      result.isSymbolicLink = returnTrue;
+      result.isSoftLink = returnTrue;
     }
     else if( self._descriptorIsScript( file ) )
     {
+      result.isTerminal = returnTrue;
+      result.isFile = returnTrue;
     }
 
     return result;
+  }
+
+  /* */
+
+  function returnFalse()
+  {
+    return false;
+  }
+
+  /* */
+
+  function returnTrue()
+  {
+    return true;
   }
 
 }
@@ -560,58 +583,58 @@ _.routineExtend( fileExistsAct, Parent.prototype.fileExistsAct );
 // var having = isTerminalAct.having = Object.create( Parent.prototype.isTerminalAct.having );
 
 //
-
-/**
- * Return True if file at `filePath` is a hard link.
- * @param filePath
- * @returns {boolean}
- * @method fileIsHardLink
- * @memberof wFileProviderExtract
- */
-
-function fileIsHardLink( filePath )
-{
-  let self = this;
-
-  _.assert( arguments.length === 1, 'Expects single argument' );
-
-  let descriptor = self._descriptorRead( filePath )
-
-  return self._descriptorIsHardLink( descriptor );
-}
-
-var having = fileIsHardLink.having = Object.create( null );
-
-having.writing = 0;
-having.reading = 1;
-having.driving = 0;
-
 //
-
-/**
- * Return True if file at `filePath` is a soft link.
- * @param filePath
- * @returns {boolean}
- * @method fileIsSoftLink
- * @memberof wFileProviderExtract
- */
-
-function fileIsSoftLink( filePath )
-{
-  let self = this;
-
-  _.assert( arguments.length === 1, 'Expects single argument' );
-
-  let descriptor = self._descriptorRead( filePath );
-
-  return self._descriptorIsSoftLink( descriptor );
-}
-
-var having = fileIsSoftLink.having = Object.create( null );
-
-having.writing = 0;
-having.reading = 1;
-having.driving = 0;
+// /**
+//  * Return True if file at `filePath` is a hard link.
+//  * @param filePath
+//  * @returns {boolean}
+//  * @method fileIsHardLink
+//  * @memberof wFileProviderExtract
+//  */
+//
+// function fileIsHardLink( filePath )
+// {
+//   let self = this;
+//
+//   _.assert( arguments.length === 1, 'Expects single argument' );
+//
+//   let descriptor = self._descriptorRead( filePath )
+//
+//   return self._descriptorIsHardLink( descriptor );
+// }
+//
+// var having = fileIsHardLink.having = Object.create( null );
+//
+// having.writing = 0;
+// having.reading = 1;
+// having.driving = 0;
+//
+// //
+//
+// /**
+//  * Return True if file at `filePath` is a soft link.
+//  * @param filePath
+//  * @returns {boolean}
+//  * @method fileIsSoftLink
+//  * @memberof wFileProviderExtract
+//  */
+//
+// function fileIsSoftLink( filePath )
+// {
+//   let self = this;
+//
+//   _.assert( arguments.length === 1, 'Expects single argument' );
+//
+//   let descriptor = self._descriptorRead( filePath );
+//
+//   return self._descriptorIsSoftLink( descriptor );
+// }
+//
+// var having = fileIsSoftLink.having = Object.create( null );
+//
+// having.writing = 0;
+// having.reading = 1;
+// having.driving = 0;
 
 //
 
@@ -1049,11 +1072,11 @@ function fileCopyAct( o )
     if( o.breakingDstHardLink && self.fileIsHardLink( o.dstPath ) )
     self.hardLinkBreak({ filePath : o.dstPath, sync : 1 });
 
-    if( self.fileIsSoftLinkAct( o.srcPath ) )
+    if( self.fileIsSoftLink( o.srcPath ) )
     {
       if( self.fileExistsAct({ filePath : o.dstPath }) )
       self.fileDeleteAct({ filePath : o.dstPath, sync : 1 })
-      return self.linkSoftAct
+      return self.softLinkAct
       ({
         originalDstPath : o.originalDstPath,
         originalSrcPath : o.originalSrcPath,
@@ -1069,13 +1092,13 @@ function fileCopyAct( o )
   else
   {
     return _.timeOut( 0, () => _copyPre() )
-    .ifNoErrorThen( ( arg/*aaa*/ ) =>
+    .ifNoErrorThen( ( arg ) =>
     {
       if( o.breakingDstHardLink && self.fileIsHardLink( o.dstPath ) )
       return self.hardLinkBreak({ filePath : o.dstPath, sync : 0 });
       return arg;
     })
-    .ifNoErrorThen( ( arg/*aaa*/ ) =>
+    .ifNoErrorThen( ( arg ) =>
     {
       return self.fileWrite({ filePath : o.dstPath, data : srcFile, sync : 0 });
     })
@@ -1092,12 +1115,12 @@ fileCopyAct.defaults.sync = 0;
 
 //
 
-function linkSoftAct( o )
+function softLinkAct( o )
 {
   let self = this;
 
   // debugger
-  _.assertRoutineOptions( linkSoftAct,arguments );
+  _.assertRoutineOptions( softLinkAct,arguments );
 
   _.assert( self.path.is( o.srcPath ) );
   _.assert( self.path.isAbsolute( o.dstPath ) );
@@ -1113,7 +1136,7 @@ function linkSoftAct( o )
     // return true;
 
     if( self.statRead( o.dstPath ) )
-    throw _.err( 'linkSoftAct',o.dstPath,'already exists' );
+    throw _.err( 'softLinkAct',o.dstPath,'already exists' );
 
     self._descriptorWrite( o.dstPath, self._descriptorSoftLinkMake( o.srcPath ) );
 
@@ -1131,7 +1154,7 @@ function linkSoftAct( o )
       throw _.err( err );
 
       if( stat )
-      throw _.err( 'linkSoftAct',o.dstPath,'already exists' );
+      throw _.err( 'softLinkAct',o.dstPath,'already exists' );
 
       self._descriptorWrite( o.dstPath, self._descriptorSoftLinkMake( o.srcPath ) );
 
@@ -1140,41 +1163,41 @@ function linkSoftAct( o )
   }
 }
 
-_.routineExtend( linkSoftAct, Parent.prototype.linkSoftAct );
+_.routineExtend( softLinkAct, Parent.prototype.softLinkAct );
 
-// var defaults = linkSoftAct.defaults = Object.create( Parent.prototype.linkSoftAct.defaults );
-// var having = linkSoftAct.having = Object.create( Parent.prototype.linkSoftAct.having );
+// var defaults = softLinkAct.defaults = Object.create( Parent.prototype.softLinkAct.defaults );
+// var having = softLinkAct.having = Object.create( Parent.prototype.softLinkAct.having );
 
 //
 
-function linkHardAct( o )
+function hardLinkAct( o )
 {
   let self = this;
 
-  _.assertRoutineOptions( linkHardAct, arguments );
+  _.assertRoutineOptions( hardLinkAct, arguments );
   _.assert( self.path.isNormalized( o.srcPath ) );
   _.assert( self.path.isNormalized( o.dstPath ) );
 
   if( o.sync )
   {
     if( self.statResolvedRead( o.dstPath ) )
-    throw _.err( 'linkHardAct', o.dstPath, 'already exists' );
+    throw _.err( 'hardLinkAct', o.dstPath, 'already exists' );
 
     let file = self._descriptorRead( o.srcPath );
 
     if( !file )
-    throw _.err( 'linkHardAct', o.srcPath, 'does not exist' );
+    throw _.err( 'hardLinkAct', o.srcPath, 'does not exist' );
 
     if( o.dstPath === o.srcPath )
     return true;
 
     // if( !self._descriptorIsLink( file ) )
     if( !self.isTerminal( o.srcPath ) )
-    throw _.err( 'linkHardAct', o.srcPath,' is not a terminal file' );
+    throw _.err( 'hardLinkAct', o.srcPath,' is not a terminal file' );
 
     let dstDir = self._descriptorRead( self.path.dir( o.dstPath ) );
     if( !dstDir )
-    throw _.err( 'linkHardAct: Directory for', o.dstPath, 'does not exist' );
+    throw _.err( 'hardLinkAct: Directory for', o.dstPath, 'does not exist' );
 
     self._descriptorWrite( o.dstPath, self._descriptorHardLinkMake( o.srcPath ) );
 
@@ -1192,20 +1215,20 @@ function linkHardAct( o )
       throw _.err( err );
 
       if( stat )
-      throw _.err( 'linkHardAct',o.dstPath,'already exists' );
+      throw _.err( 'hardLinkAct',o.dstPath,'already exists' );
 
       let file = self._descriptorRead( o.srcPath );
 
       if( !file )
-      throw _.err( 'linkHardAct',o.srcPath,'does not exist' );
+      throw _.err( 'hardLinkAct',o.srcPath,'does not exist' );
 
       // if( !self._descriptorIsLink( file ) )
       if( !self.isTerminal( o.srcPath ) )
-      throw _.err( 'linkHardAct',o.srcPath,' is not a terminal file' );
+      throw _.err( 'hardLinkAct',o.srcPath,' is not a terminal file' );
 
       let dstDir = self._descriptorRead( self.path.dir( o.dstPath ) );
       if( !dstDir )
-      throw _.err( 'linkHardAct: dirs structure before', o.dstPath, ' does not exist' );
+      throw _.err( 'hardLinkAct: dirs structure before', o.dstPath, ' does not exist' );
 
       self._descriptorWrite( o.dstPath, self._descriptorHardLinkMake( o.srcPath ) );
 
@@ -1214,10 +1237,10 @@ function linkHardAct( o )
   }
 }
 
-_.routineExtend( linkHardAct, Parent.prototype.linkHardAct );
+_.routineExtend( hardLinkAct, Parent.prototype.hardLinkAct );
 
-// var defaults = linkHardAct.defaults = Object.create( Parent.prototype.linkHardAct.defaults );
-// var having = linkHardAct.having = Object.create( Parent.prototype.linkHardAct.having );
+// var defaults = hardLinkAct.defaults = Object.create( Parent.prototype.hardLinkAct.defaults );
+// var having = hardLinkAct.having = Object.create( Parent.prototype.hardLinkAct.having );
 
 //
 
@@ -1693,7 +1716,7 @@ function readToProvider( o )
         if( srcStat )
         type = srcStat.isDirectory() ? 'dir' : 'file';
 
-        o.dstProvider.linkSoft
+        o.dstProvider.softLink
         ({
           dstPath : dstPath,
           srcPath : contentPath,
@@ -1735,7 +1758,7 @@ function readToProvider( o )
       if( terminating )
       o.dstProvider.fileCopy( dstPath,contentPath );
       else
-      o.dstProvider.linkHard( dstPath,contentPath );
+      o.dstProvider.hardLink( dstPath,contentPath );
     }
 
     handleWritten( dstPath );
@@ -2506,8 +2529,8 @@ let Proto =
 
   pathCurrentAct : pathCurrentAct,
   pathResolveSoftLinkAct : pathResolveSoftLinkAct,
-  pathResolveHardLinkAct : pathResolveHardLinkAct,
-  // linkSoftReadAct : linkSoftReadAct,
+  // pathResolveHardLinkAct : pathResolveHardLinkAct,
+  // softLinkReadAct : softLinkReadAct,
 
   // read
 
@@ -2522,8 +2545,9 @@ let Proto =
 
   // isTerminalAct : isTerminalAct,
 
-  fileIsHardLink : fileIsHardLink,
-  fileIsSoftLink : fileIsSoftLink,
+  // !!! should not walk around act
+  // fileIsHardLink : fileIsHardLink,
+  // fileIsSoftLink : fileIsSoftLink,
 
   filesAreHardLinkedAct : filesAreHardLinkedAct,
 
@@ -2540,8 +2564,8 @@ let Proto =
 
   fileRenameAct : fileRenameAct,
   fileCopyAct : fileCopyAct,
-  linkSoftAct : linkSoftAct,
-  linkHardAct : linkHardAct,
+  softLinkAct : softLinkAct,
+  hardLinkAct : hardLinkAct,
 
   hardLinkBreakAct : hardLinkBreakAct,
 
@@ -2612,9 +2636,9 @@ _.FileProvider.Secondary.mixin( Self );
 
 _.FileProvider[ Self.shortName ] = Self;
 
-if( typeof module !== 'undefined' )
-if( _global_.WTOOLS_PRIVATE )
-{ /* delete require.cache[ module.id ]; */ }
+// if( typeof module !== 'undefined' )
+// if( _global_.WTOOLS_PRIVATE )
+// { /* delete require.cache[ module.id ]; */ }
 
 if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = Self;

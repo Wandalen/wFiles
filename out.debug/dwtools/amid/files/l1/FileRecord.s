@@ -271,11 +271,9 @@ function _statRead()
   {
 
     let provider = _.path.isGlobal( record.real ) ? c.fileProvider : c.effectiveFileProvider;
-    record.stat = provider.statResolvedRead
+    record.stat = provider.statRead
     ({
       filePath : record.real,
-      resolvingSoftLink : 0,
-      resolvingTextLink : 0,
       throwing : 0,
       sync : 1,
     });

@@ -158,34 +158,39 @@ function _routineFunctor( routine, routineName )
 
   let r =
   {
-    [ routineName ] : function( o )
+    [ routineName ] : function()
     {
-      let args = _.unrollFrom( arguments );
-      let result;
+      let op2 = _.mapExtend( null, op );
+      op2.originalFileProvider = this.original;
+      op2.originalBody = body;
+      op2.args = _.unrollFrom( arguments );
+      op2.result = undefined;
+      // op2.methodDescriptor = op;
+
+      debugger;
 
       if( pre )
       {
         debugger; xxx
-        args = pre.call( this.original, resultRoutine, args );
-        if( !_.unrollIs( args ) )
-        args = _.unrollFrom([ args ]);
+        op2.args = pre.call( this.original, resultRoutine, op2.args );
+        if( !_.unrollIs( op2.args ) )
+        op2.args = _.unrollFrom([ op2.args ]);
       }
 
       if( this.onCallBegin )
-      args = this.onCallBegin( args, op );
+      op2.args = this.onCallBegin( op2 );
 
-      if( !_.unrollIs( args ) )
-      args = _.unrollFrom([ args ]);
+      if( !_.unrollIs( op2.args ) )
+      op2.args = _.unrollFrom([ op2.args ]);
 
-      _.assert( !_.argumentsArrayIs( args ), 'Does not expect arguments array' );
+      _.assert( !_.argumentsArrayIs( op2.args ), 'Does not expect arguments array' );
 
-      result = this.onCall( this.original, body, args );
-      // result = body.apply( this.original, args );
+      op2.result = this.onCall( op2 );
 
       if( this.onCallEnd )
-      result = this.onCallEnd( result, op );
+      op2.result = this.onCallEnd( op2.result, op );
 
-      return result;
+      return op2.result;
     }
   }
 
@@ -198,9 +203,10 @@ function _routineFunctor( routine, routineName )
 
 //
 
-function onCall( original, body, args )
+function onCall( op )
 {
-  return body.apply( original, args );
+  _.assert( arguments.length === 1 );
+  return op.originalBody.apply( op.originalFileProvider, op.args );
 }
 
 // --
@@ -214,7 +220,7 @@ let Composes =
 let Aggregates =
 {
   onCallBegin : null,
-  onCall : null,
+  onCall : onCall,
   onCallEnd : null,
 }
 

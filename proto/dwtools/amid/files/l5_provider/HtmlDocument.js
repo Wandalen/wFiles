@@ -372,7 +372,7 @@ let Proto =
   pathCurrentAct : pathCurrentAct,
   // pathResolveSoftLinkAct : pathResolveSoftLinkAct,
   // pathResolveHardLinkAct : pathResolveHardLinkAct,
-  // linkSoftReadAct : linkSoftReadAct,
+  // softLinkReadAct : softLinkReadAct,
 
   // read
 
@@ -403,8 +403,8 @@ let Proto =
 
   // fileRenameAct : fileRenameAct,
   // fileCopyAct : fileCopyAct,
-  // linkSoftAct : linkSoftAct,
-  // linkHardAct : linkHardAct,
+  // softLinkAct : softLinkAct,
+  // hardLinkAct : hardLinkAct,
   // hardLinkBreakAct : hardLinkBreakAct,
 
   //

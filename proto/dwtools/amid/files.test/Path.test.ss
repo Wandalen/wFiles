@@ -110,7 +110,7 @@ function createTestSymLink( path, target, type, data )
 
   if( _.fileProvider.statResolvedRead( path ) )
   _.fileProvider.filesDelete( path );
-  _.fileProvider.linkSoft( path, origin );
+  _.fileProvider.softLink( path, origin );
 }
 
 //

@@ -188,14 +188,21 @@ let Associates =
 let Restricts =
 {
 
-  _checkModeProperty : null,
+  isDir : null,
+  isTerminal : null,
+  isTextLink : null,
+  isSoftLink : null,
+  isHardLink : null,
+
   isDirectory : null,
   isFile : null,
+  isSymbolicLink : null,
   isBlockDevice : null,
   isCharacterDevice : null,
-  isSymbolicLink : null,
   isFIFO : null,
   isSocket : null,
+
+  _checkModeProperty : null,
 
 }
 
@@ -205,15 +212,14 @@ let Statics =
 
 let Globals =
 {
-  statIs : statIs,
-  statsHaveDifferentContent : statsHaveDifferentContent,
-  statsCouldBeLinked : statsCouldBeLinked,
-  statHash2Get : statHash2Get,
+  statIs,
+  statsHaveDifferentContent,
+  statsCouldBeLinked,
+  statHash2Get,
 }
 
 let Forbids =
 {
-  isDir : 'isDir',
 }
 
 // --
@@ -225,7 +231,12 @@ let Extend =
 
   init : init,
 
-  _checkModeProperty : null,
+  isDir : null,
+  isTerminal : null,
+  isTextLink : null,
+  isSoftLink : null,
+  isHardLink : null,
+
   isDirectory : null,
   isFile : null,
   isBlockDevice : null,
@@ -234,14 +245,16 @@ let Extend =
   isFIFO : null,
   isSocket : null,
 
+  _checkModeProperty : null,
+
   //
 
-  Composes : Composes,
-  Aggregates : Aggregates,
-  Associates : Associates,
-  Restricts : Restricts,
-  Statics : Statics,
-  Forbids : Forbids,
+  Composes,
+  Aggregates,
+  Associates,
+  Restricts,
+  Statics,
+  Forbids,
 
 }
 

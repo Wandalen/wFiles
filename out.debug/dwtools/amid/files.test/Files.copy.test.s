@@ -103,7 +103,7 @@ function prepareFile( path, type, link, level )
 
   if( link === 'soft' )
   {
-    _.fileProvider.linkSoft( _path, path );
+    _.fileProvider.softLink( _path, path );
   }
 
   if( link === 'text' )

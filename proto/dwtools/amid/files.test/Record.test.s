@@ -389,7 +389,7 @@ function record( test )
   // var src = _.path.join( testRootDirectory, 'src' );
   // var dst = _.path.join( testRootDirectory, 'dst' );
   // _.fileProvider.fileWrite( src, 'src' );
-  // _.fileProvider.linkSoft( dst, src );
+  // _.fileProvider.softLink( dst, src );
   // var got = _.fileProvider.recordFactory().record( dst );
   // test.identical( got.absolute, dst );
   // test.identical( got.real, src );
@@ -401,7 +401,7 @@ function record( test )
   var src = _.path.join( testRootDirectory, 'src' );
   var dst = _.path.join( testRootDirectory, 'dst' );
   _.fileProvider.fileWrite( src, 'src' );
-  _.fileProvider.linkSoft( dst, src );
+  _.fileProvider.softLink( dst, src );
   var got = _.fileProvider.recordFactory().record( dst );
   test.identical( got.absolute, dst );
   test.identical( got.real, dst );
@@ -703,12 +703,12 @@ function recordForLink( test )
   _.fileProvider.filesDelete( dir );
   _.fileProvider.fileWrite( pathTerminal, pathTerminal );
   _.fileProvider.dirMake( pathToDir );
-  _.fileProvider.linkSoft( pathLinkToTerminal, pathTerminal );
-  _.fileProvider.linkSoft( pathLinkToDir, pathToDir );
-  _.fileProvider.linkSoft( pathLinkToLinkToTerminal, pathLinkToTerminal );
-  _.fileProvider.linkSoft( pathLinkToLinkToDir, pathLinkToDir );
-  _.fileProvider.linkSoft({ dstPath : pathLinkToMissing, srcPath : pathToMissing, allowingMissing : 1 });
-  _.fileProvider.linkSoft({ dstPath : pathLinkToLinkToMissing, srcPath : pathLinkToMissing, allowingMissing : 1 });
+  _.fileProvider.softLink( pathLinkToTerminal, pathTerminal );
+  _.fileProvider.softLink( pathLinkToDir, pathToDir );
+  _.fileProvider.softLink( pathLinkToLinkToTerminal, pathLinkToTerminal );
+  _.fileProvider.softLink( pathLinkToLinkToDir, pathLinkToDir );
+  _.fileProvider.softLink({ dstPath : pathLinkToMissing, srcPath : pathToMissing, allowingMissing : 1 });
+  _.fileProvider.softLink({ dstPath : pathLinkToLinkToMissing, srcPath : pathLinkToMissing, allowingMissing : 1 });
 
   test.case = 'link to missing';
 
@@ -838,7 +838,7 @@ function recordForLink( test )
   test.case = 'self cycled';
 
   var pathSelfCycled = _.path.join( dir, 'pathSelfCycled' );
-  _.fileProvider.linkSoft({ dstPath : pathSelfCycled, srcPath : pathSelfCycled, allowingMissing : 1 });
+  _.fileProvider.softLink({ dstPath : pathSelfCycled, srcPath : pathSelfCycled, allowingMissing : 1 });
 
   var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 0, allowingMissing : 0 }).form();
   var record = recordContext.record( pathSelfCycled );
@@ -868,8 +868,8 @@ function recordForLink( test )
 
   var pathA = _.path.join( dir, 'pathA' );
   var pathB = _.path.join( dir, 'pathB' );
-  _.fileProvider.linkSoft({ dstPath : pathA, srcPath : pathB, allowingMissing : 1 });
-  _.fileProvider.linkSoft({ dstPath : pathB, srcPath : pathA, allowingMissing : 1 });
+  _.fileProvider.softLink({ dstPath : pathA, srcPath : pathB, allowingMissing : 1 });
+  _.fileProvider.softLink({ dstPath : pathB, srcPath : pathA, allowingMissing : 1 });
 
   var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 0, allowingMissing : 0 }).form();
   var record = recordContext.record( pathA );
@@ -924,12 +924,12 @@ function recordForRelativeLink( test )
   _.fileProvider.filesDelete( dir );
   _.fileProvider.fileWrite( pathTerminal, pathTerminal );
   _.fileProvider.dirMake( pathToDir );
-  _.fileProvider.linkSoft( pathLinkToTerminal, _.path.relative( pathLinkToTerminal, pathTerminal ) );
-  _.fileProvider.linkSoft( pathLinkToDir, _.path.relative( pathLinkToDir, pathToDir ) );
-  _.fileProvider.linkSoft( pathLinkToLinkToTerminal, _.path.relative( pathLinkToLinkToTerminal, pathLinkToTerminal ) );
-  _.fileProvider.linkSoft( pathLinkToLinkToDir, _.path.relative( pathLinkToLinkToDir, pathLinkToDir ) );
-  _.fileProvider.linkSoft({ dstPath : pathLinkToMissing, srcPath : _.path.relative( pathLinkToMissing, pathToMissing ), allowingMissing : 1 });
-  _.fileProvider.linkSoft({ dstPath : pathLinkToLinkToMissing, srcPath : _.path.relative( pathLinkToLinkToMissing, pathLinkToMissing ), allowingMissing : 1 });
+  _.fileProvider.softLink( pathLinkToTerminal, _.path.relative( pathLinkToTerminal, pathTerminal ) );
+  _.fileProvider.softLink( pathLinkToDir, _.path.relative( pathLinkToDir, pathToDir ) );
+  _.fileProvider.softLink( pathLinkToLinkToTerminal, _.path.relative( pathLinkToLinkToTerminal, pathLinkToTerminal ) );
+  _.fileProvider.softLink( pathLinkToLinkToDir, _.path.relative( pathLinkToLinkToDir, pathLinkToDir ) );
+  _.fileProvider.softLink({ dstPath : pathLinkToMissing, srcPath : _.path.relative( pathLinkToMissing, pathToMissing ), allowingMissing : 1 });
+  _.fileProvider.softLink({ dstPath : pathLinkToLinkToMissing, srcPath : _.path.relative( pathLinkToLinkToMissing, pathLinkToMissing ), allowingMissing : 1 });
 
   test.case = 'link to missing';
 
@@ -1059,8 +1059,8 @@ function recordForRelativeLink( test )
 
   var pathLinkAbsolute = _.path.join( dir, 'pathLinkAbsolute' );
   var pathLinkRelative = _.path.join( dir, 'pathLinkRelative' );
-  _.fileProvider.linkSoft({ dstPath : pathLinkRelative, srcPath : _.path.resolve( pathLinkRelative, pathToMissing ), allowingMissing : 1 });
-  _.fileProvider.linkSoft( pathLinkAbsolute, pathLinkRelative );
+  _.fileProvider.softLink({ dstPath : pathLinkRelative, srcPath : _.path.resolve( pathLinkRelative, pathToMissing ), allowingMissing : 1 });
+  _.fileProvider.softLink( pathLinkAbsolute, pathLinkRelative );
 
   var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 0, allowingMissing : 0 }).form();
   var record = recordContext.record( pathLinkAbsolute );
@@ -1092,8 +1092,8 @@ function recordForRelativeLink( test )
 
   var pathLinkAbsolute = _.path.join( dir, 'pathLinkAbsolute' );
   var pathLinkRelative = _.path.join( dir, 'pathLinkRelative' );
-  _.fileProvider.linkSoft( pathLinkRelative, _.path.resolve( pathLinkRelative, pathTerminal ) );
-  _.fileProvider.linkSoft( pathLinkAbsolute, pathLinkRelative );
+  _.fileProvider.softLink( pathLinkRelative, _.path.resolve( pathLinkRelative, pathTerminal ) );
+  _.fileProvider.softLink( pathLinkAbsolute, pathLinkRelative );
 
   var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 0 }).form();
   var record = recordContext.record( pathLinkAbsolute );
@@ -1115,8 +1115,8 @@ function recordForRelativeLink( test )
 
   var pathLinkAbsolute = _.path.join( dir, 'pathLinkAbsolute' );
   var pathLinkRelative = _.path.join( dir, 'pathLinkRelative' );
-  _.fileProvider.linkSoft( pathLinkRelative, _.path.resolve( pathLinkRelative, pathToDir ) );
-  _.fileProvider.linkSoft( pathLinkAbsolute, pathLinkRelative );
+  _.fileProvider.softLink( pathLinkRelative, _.path.resolve( pathLinkRelative, pathToDir ) );
+  _.fileProvider.softLink( pathLinkAbsolute, pathLinkRelative );
 
   var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 0 }).form();
   var record = recordContext.record( pathLinkAbsolute );
@@ -1138,8 +1138,8 @@ function recordForRelativeLink( test )
 
   var pathLinkAbsolute = _.path.join( dir, 'pathLinkAbsolute' );
   var pathLinkRelative = _.path.join( dir, 'pathLinkRelative' );
-  _.fileProvider.linkSoft({ dstPath : pathLinkAbsolute, srcPath : pathToMissing, allowingMissing : 1 });
-  _.fileProvider.linkSoft( pathLinkRelative, _.path.relative( pathLinkRelative, pathLinkAbsolute ) );
+  _.fileProvider.softLink({ dstPath : pathLinkAbsolute, srcPath : pathToMissing, allowingMissing : 1 });
+  _.fileProvider.softLink( pathLinkRelative, _.path.relative( pathLinkRelative, pathLinkAbsolute ) );
 
   var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 0, allowingMissing : 0 }).form();
   var record = recordContext.record( pathLinkAbsolute );
@@ -1171,8 +1171,8 @@ function recordForRelativeLink( test )
 
   var pathLinkAbsolute = _.path.join( dir, 'pathLinkAbsolute' );
   var pathLinkRelative = _.path.join( dir, 'pathLinkRelative' );
-  _.fileProvider.linkSoft( pathLinkAbsolute, pathTerminal );
-  _.fileProvider.linkSoft( pathLinkRelative, _.path.relative( pathLinkRelative, pathLinkAbsolute ) );
+  _.fileProvider.softLink( pathLinkAbsolute, pathTerminal );
+  _.fileProvider.softLink( pathLinkRelative, _.path.relative( pathLinkRelative, pathLinkAbsolute ) );
 
   var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 0 }).form();
   var record = recordContext.record( pathLinkAbsolute );
@@ -1194,8 +1194,8 @@ function recordForRelativeLink( test )
 
   var pathLinkAbsolute = _.path.join( dir, 'pathLinkAbsolute' );
   var pathLinkRelative = _.path.join( dir, 'pathLinkRelative' );
-  _.fileProvider.linkSoft( pathLinkAbsolute, pathToDir );
-  _.fileProvider.linkSoft( pathLinkRelative, _.path.relative( pathLinkRelative, pathLinkAbsolute ) );
+  _.fileProvider.softLink( pathLinkAbsolute, pathToDir );
+  _.fileProvider.softLink( pathLinkRelative, _.path.relative( pathLinkRelative, pathLinkAbsolute ) );
 
   var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 0 }).form();
   var record = recordContext.record( pathLinkAbsolute );
@@ -1216,7 +1216,7 @@ function recordForRelativeLink( test )
   test.case = 'self cycled';
 
   var pathSelfCycled = _.path.join( dir, 'pathSelfCycled' );
-  _.fileProvider.linkSoft({ dstPath : pathSelfCycled, srcPath : '../pathSelfCycled', allowingMissing : 1 });
+  _.fileProvider.softLink({ dstPath : pathSelfCycled, srcPath : '../pathSelfCycled', allowingMissing : 1 });
 
   var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 0, allowingMissing : 0 }).form();
   var record = recordContext.record( pathSelfCycled );
@@ -1246,8 +1246,8 @@ function recordForRelativeLink( test )
 
   var pathA = _.path.join( dir, 'pathA' );
   var pathB = _.path.join( dir, 'pathB' );
-  _.fileProvider.linkSoft({ dstPath : pathA, srcPath : _.path.relative( pathA, pathB ), allowingMissing : 1 });
-  _.fileProvider.linkSoft({ dstPath : pathB, srcPath : _.path.relative( pathB, pathA ), allowingMissing : 1 });
+  _.fileProvider.softLink({ dstPath : pathA, srcPath : _.path.relative( pathA, pathB ), allowingMissing : 1 });
+  _.fileProvider.softLink({ dstPath : pathB, srcPath : _.path.relative( pathB, pathA ), allowingMissing : 1 });
 
   var recordContext = _.FileRecordFactory( o, { resolvingSoftLink : 0, allowingMissing : 0 }).form();
   var record = recordContext.record( pathA );

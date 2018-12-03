@@ -429,29 +429,29 @@ let pathResolveSoftLink = _.routineFromPreAndBody( Parent.prototype.pathResolveS
 
 //
 
-function pathResolveHardLink_body( o )
-{
-  let self = this;
-
-  _.assert( arguments.length === 1, 'Expects single argument' );
-
-  let r = self._localFromGlobal( o.filePath );
-
-  o.filePath = r.filePath;
-
-  let result = r.provider.pathResolveHardLink.body.call( r.provider,o );
-
-  _.assert( !!result );
-
-  if( result === o.filePath )
-  return r.originalPath;
-
-  return result;
-}
-
-_.routineExtend( pathResolveHardLink_body, Parent.prototype.pathResolveHardLink );
-
-let pathResolveHardLink = _.routineFromPreAndBody( Parent.prototype.pathResolveHardLink.pre, pathResolveHardLink_body );
+// function pathResolveHardLink_body( o )
+// {
+//   let self = this;
+//
+//   _.assert( arguments.length === 1, 'Expects single argument' );
+//
+//   let r = self._localFromGlobal( o.filePath );
+//
+//   o.filePath = r.filePath;
+//
+//   let result = r.provider.pathResolveHardLink.body.call( r.provider,o );
+//
+//   _.assert( !!result );
+//
+//   if( result === o.filePath )
+//   return r.originalPath;
+//
+//   return result;
+// }
+//
+// _.routineExtend( pathResolveHardLink_body, Parent.prototype.pathResolveHardLink );
+//
+// let pathResolveHardLink = _.routineFromPreAndBody( Parent.prototype.pathResolveHardLink.pre, pathResolveHardLink_body );
 
 //
 
@@ -632,7 +632,7 @@ _link_functor.defaults =
 
 //
 
-let linkHardAct = _link_functor({ routine : Parent.prototype.linkHardAct });
+let hardLinkAct = _link_functor({ routine : Parent.prototype.hardLinkAct });
 let fileRenameAct = _link_functor({ routine : Parent.prototype.fileRenameAct });
 
 //
@@ -648,7 +648,7 @@ function _fileCopyActDifferent( o,dst,src,routine )
   if( src.provider.fileIsSoftLink( src.filePath ) )
   {
     let resolvedPath = src.provider.pathResolveSoftLink( src.filePath );
-    return dst.provider.linkSoft
+    return dst.provider.softLink
     ({
       dstPath : dst.filePath,
       srcPath : path.join( src.parsedPath.origin,resolvedPath ),
@@ -970,24 +970,22 @@ let FilteredRoutines =
   // path
 
   pathResolveSoftLinkAct : Routines.pathResolveSoftLinkAct,
-  pathResolveHardLinkAct : Routines.pathResolveHardLinkAct,
+  // pathResolveHardLinkAct : Routines.pathResolveHardLinkAct,
 
-  // read act
+  // read
 
   fileReadAct : Routines.fileReadAct,
   streamReadAct : Routines.streamReadAct,
   fileHashAct : Routines.fileHashAct,
 
-  isTerminalAct : Routines.isTerminalAct,
-  isDirAct : Routines.isDirAct,
+  // isTerminalAct : Routines.isTerminalAct,
+  // isDirAct : Routines.isDirAct,
+
   dirReadAct : Routines.dirReadAct,
-
-  // read stat
-
   statReadAct : Routines.statReadAct,
   fileExistsAct : Routines.fileExistsAct,
 
-  // write act
+  // write
 
   fileWriteAct : Routines.fileWriteAct,
   streamWriteAct : Routines.streamWriteAct,
@@ -996,7 +994,7 @@ let FilteredRoutines =
 
   dirMakeAct : Routines.dirMakeAct,
 
-  linkSoftAct : Routines.linkSoftAct,
+  softLinkAct : Routines.softLinkAct,
 
   hardLinkBreakAct : Routines.hardLinkBreakAct,
   softLinkBreakAct : Routines.softLinkBreakAct,
@@ -1102,7 +1100,7 @@ let Proto =
 
   pathResolveLink : pathResolveLink,
   pathResolveSoftLink : pathResolveSoftLink,
-  pathResolveHardLink : pathResolveHardLink,
+  // pathResolveHardLink : pathResolveHardLink,
 
   pathCurrentAct : pathCurrentAct,
 
@@ -1114,7 +1112,7 @@ let Proto =
   //
 
   filesAreHardLinkedAct : filesAreHardLinkedAct,
-  linkHardAct : linkHardAct,
+  hardLinkAct : hardLinkAct,
   fileRenameAct : fileRenameAct,
   fileCopyAct : fileCopyAct,
 

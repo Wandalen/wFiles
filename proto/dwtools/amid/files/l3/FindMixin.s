@@ -2599,7 +2599,7 @@ function filesReflectSingle_body( o )
       /* qqq : should not change time of file if it is already linked */
       // debugger;
 
-      dst.linkHard
+      dst.hardLink
       ({
         dstPath : record.dst.absolute,
         srcPath : record.src.absolute,
@@ -2614,7 +2614,7 @@ function filesReflectSingle_body( o )
     {
       /* qqq : should not change time of file if it is already linked */
 
-      hub.linkSoft
+      hub.softLink
       ({
         dstPath : record.dst.hubAbsolute,
         srcPath : record.src.hubAbsolute,
@@ -3589,7 +3589,7 @@ function softLinksRebase( o )
     let resolvedPath = self.pathResolveSoftLink( record.hubAbsolute );
     let rebasedPath = self.path.rebase( resolvedPath, o.oldPath, o.newPath );
     self.fileDelete({ filePath : record.hubAbsolute, verbosity : 0 });
-    self.linkSoft
+    self.softLink
     ({
       dstPath : record.hubAbsolute,
       srcPath : rebasedPath,

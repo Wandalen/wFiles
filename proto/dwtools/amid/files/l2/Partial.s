@@ -773,7 +773,7 @@ function pathResolveTextLink_pre( routine, args )
   let path = self.path;
 
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
-  _.assert( args.length === 1, 'Expects exactly two arguments' );
+  _.assert( args.length === 1, 'Expects single argument for', routine.name );
   _.routineOptions( routine, args );
 
   return args[ 0 ];
@@ -3289,7 +3289,11 @@ function isTerminal_body( o )
     filePath : o.filePath,
     resolvingSoftLink : o.resolvingSoftLink,
     resolvingTextLink : o.resolvingTextLink,
+    throwing : 0
   });
+
+  if( o.filePath === null )
+  return false;
 
   // if( self.isDir( o.filePath ) )
   // return false;

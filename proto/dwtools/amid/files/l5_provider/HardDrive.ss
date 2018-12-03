@@ -184,7 +184,7 @@ function _pathResolveTextLinkAct( o )
 
     let cpath = _.fileProvider.path.nativize( prefix + parts.slice( 0, p+1 ).join( '/' ) );
 
-    let stat = _.fileProvider.statResolvedRead({ filePath : cpath, resolvingTextLink : 0 }); /* qqq */
+    let stat = _.fileProvider.statResolvedRead({ filePath : cpath, resolvingTextLink : 0, resolvingSoftLink : 0 }); /* qqq */
     if( !stat )
     {
       if( o.allowingMissing )

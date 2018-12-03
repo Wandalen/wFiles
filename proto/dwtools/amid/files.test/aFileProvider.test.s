@@ -24945,37 +24945,35 @@ function pathResolveLinkChain( test )
   test.case = 'not existing file';
   self.provider.filesDelete( _.path.dir( filePath ) );
   var o = _.mapExtend( null, o1, { filePath : filePath } );
-  var got = self.provider.pathResolveLinkChain( o );
-  var expected = [ filePath ];
-  test.identical( got, expected );
+  self.provider.pathResolveLinkChain( o );
+  test.identical( o.result, [ filePath ] )
+  test.identical( o.found, [ filePath ] )
 
   test.case = 'existing file';
   self.provider.filesDelete( _.path.dir( filePath ) );
   self.provider.fileWrite( filePath, filePath );
   var o = _.mapExtend( null, o1, { filePath : filePath } );
-  var got = self.provider.pathResolveLinkChain( o );
-  var expected = [ filePath ];
-  test.identical( got, expected );
+  self.provider.pathResolveLinkChain( o );
+  test.identical( o.result, [ filePath ] )
+  test.identical( o.found, [ filePath ] )
 
   test.case = 'hardlink';
   self.provider.filesDelete( _.path.dir( filePath ) );
   self.provider.fileWrite( filePath, filePath );
   self.provider.hardLink( linkPath, filePath );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  var got = self.provider.pathResolveLinkChain( o );
-  var expected = [ linkPath ]
-  // if( _.routineIs( self.provider.pathResolveHardLinkAct ) )
-  // expected = [ linkPath,filePath ];
-  test.identical( got, expected );
+  self.provider.pathResolveLinkChain( o );
+  test.identical( o.result, [ linkPath ] )
+  test.identical( o.found, [ linkPath ] )
 
   test.case = 'softlink';
   self.provider.filesDelete( _.path.dir( filePath ) );
   self.provider.fileWrite( filePath, filePath );
   self.provider.softLink( linkPath, filePath );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  var got = self.provider.pathResolveLinkChain( o );
-  var expected = [ linkPath,filePath ]
-  test.identical( got, expected );
+  self.provider.pathResolveLinkChain( o );
+  test.identical( o.result, [ linkPath,filePath ] )
+  test.identical( o.found, [ linkPath,filePath ] )
 
   test.case = 'relative softlink';
   self.provider.filesDelete( _.path.dir( filePath ) );
@@ -24983,8 +24981,8 @@ function pathResolveLinkChain( test )
   self.provider.softLink( linkPath, '../file' );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
   var got = self.provider.pathResolveLinkChain( o );
-  var expected = [ linkPath,filePath ]
-  test.identical( got, expected );
+  test.identical( o.result, [ linkPath, filePath ] )
+  test.identical( o.found, [ linkPath,filePath ] )
 
   test.case = 'relative softlink, preservingRelative : 1';
   self.provider.filesDelete( _.path.dir( filePath ) );
@@ -25003,8 +25001,8 @@ function pathResolveLinkChain( test )
   self.provider.fileWrite( linkPath, 'link ' + filePath );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
   var got = self.provider.pathResolveLinkChain( o );
-  var expected = [ linkPath,filePath ]
-  test.identical( got, expected );
+  test.identical( o.result, [ linkPath, filePath ] )
+  test.identical( o.found, [ linkPath, filePath ] )
 
   //
 
@@ -25162,9 +25160,9 @@ function pathResolveLinkChain( test )
   self.provider.softLink( linkPath2, filePath );
   self.provider.softLink( linkPath, linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  var got = self.provider.pathResolveLinkChain( o );
-  var expected = [ linkPath,linkPath2,filePath ];
-  test.identical( got, expected );
+  self.provider.pathResolveLinkChain( o );
+  test.identical( o.result, [ linkPath,linkPath2,filePath ] );
+  test.identical( o.found, [ linkPath,linkPath2,filePath ] );
 
   test.case = 'soft-soft-file, preservingRelative';
   self.provider.filesDelete( _.path.dir( filePath ) );
@@ -25172,9 +25170,9 @@ function pathResolveLinkChain( test )
   self.provider.softLink( linkPath2, filePath );
   self.provider.softLink( linkPath, linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
-  var got = self.provider.pathResolveLinkChain( o );
-  var expected = [ linkPath,linkPath2,filePath ];
-  test.identical( got, expected );
+  self.provider.pathResolveLinkChain( o );
+  test.identical( o.result, [ linkPath,linkPath2,filePath ] );
+  test.identical( o.found, [ linkPath,linkPath2,filePath ] );
 
   // debugger; return; xxx
 
@@ -25184,9 +25182,9 @@ function pathResolveLinkChain( test )
   self.provider.fileWrite( linkPath2, 'link ' + filePath );
   self.provider.fileWrite( linkPath, 'link ' + linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  var got = self.provider.pathResolveLinkChain( o );
-  var expected = [ linkPath,filePath ];
-  test.identical( got, expected );
+  self.provider.pathResolveLinkChain( o );
+  test.identical( o.result, [ linkPath,filePath ] );
+  test.identical( o.found, [ linkPath,filePath ] );
 
   test.case = 'text-text-file, preservingRelative';
   self.provider.filesDelete( _.path.dir( filePath ) );
@@ -25194,9 +25192,9 @@ function pathResolveLinkChain( test )
   self.provider.fileWrite( linkPath2, 'link ' + filePath );
   self.provider.fileWrite( linkPath, 'link ' + linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
-  var got = self.provider.pathResolveLinkChain( o );
-  var expected = [ linkPath,filePath ];
-  test.identical( got, expected );
+  self.provider.pathResolveLinkChain( o );
+  test.identical( o.result, [ linkPath,filePath ] );
+  test.identical( o.found, [ linkPath,filePath ] );
 
   test.case = 'soft-text-soft-file';
   self.provider.filesDelete( _.path.dir( filePath ) );
@@ -25205,9 +25203,9 @@ function pathResolveLinkChain( test )
   self.provider.fileWrite( linkPath2, 'link ' + linkPath3 );
   self.provider.softLink( linkPath, linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  var got = self.provider.pathResolveLinkChain( o );
-  var expected = [ linkPath,linkPath2,linkPath3,filePath ];
-  test.identical( got, expected );
+  self.provider.pathResolveLinkChain( o );
+  test.identical( o.result, [ linkPath,linkPath2,linkPath3,filePath ] );
+  test.identical( o.found, [ linkPath,linkPath2,linkPath3,filePath ] );
 
   test.case = 'soft-text-soft-file, preservingRelative';
   self.provider.filesDelete( _.path.dir( filePath ) );
@@ -25216,9 +25214,9 @@ function pathResolveLinkChain( test )
   self.provider.fileWrite( linkPath2, 'link ' + linkPath3 );
   self.provider.softLink( linkPath, linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
-  var got = self.provider.pathResolveLinkChain( o );
-  var expected = [ linkPath,linkPath2,linkPath3,filePath ];
-  test.identical( got, expected );
+  self.provider.pathResolveLinkChain( o );
+  test.identical( o.result, [ linkPath,linkPath2,linkPath3,filePath ] );
+  test.identical( o.found, [ linkPath,linkPath2,linkPath3,filePath ] );
 
   test.case = 'text-soft-text-file';
   self.provider.filesDelete( _.path.dir( filePath ) );
@@ -25227,9 +25225,9 @@ function pathResolveLinkChain( test )
   self.provider.softLink( linkPath2, linkPath3 );
   self.provider.fileWrite( linkPath, 'link ' + linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  var got = self.provider.pathResolveLinkChain( o );
-  var expected = [ linkPath,filePath ];
-  test.identical( got, expected );
+  self.provider.pathResolveLinkChain( o );
+  test.identical( o.result, [ linkPath, linkPath2, linkPath3, filePath ] );
+  test.identical( o.found, [ linkPath, linkPath2, linkPath3, filePath ] );
 
   test.case = 'text-soft-text-file, preservingRelative';
   self.provider.filesDelete( _.path.dir( filePath ) );
@@ -25238,9 +25236,9 @@ function pathResolveLinkChain( test )
   self.provider.softLink( linkPath2, linkPath3 );
   self.provider.fileWrite( linkPath, 'link ' + linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
-  var got = self.provider.pathResolveLinkChain( o );
-  var expected = [ linkPath,filePath ];
-  test.identical( got, expected );
+  self.provider.pathResolveLinkChain( o );
+  test.identical( o.result, [ linkPath, linkPath2, linkPath3, filePath ] );
+  test.identical( o.found, [ linkPath, linkPath2, linkPath3, filePath ] );
 
   test.case = 'relative soft-relative soft-soft-file, preservingRelative : 1';
   self.provider.filesDelete( _.path.dir( filePath ) );

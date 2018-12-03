@@ -155,6 +155,24 @@ function statHash2Get( stat )
   return result;
 }
 
+//
+
+function isLink()
+{
+  let stat = this;
+  let result = false;
+
+  _.assert( arguments.length === 0 );
+
+  if( !result )
+  result = stat.isSoftLink();
+
+  if( !result )
+  result = stat.isTextLink();
+
+  return result;
+}
+
 // --
 //
 // --
@@ -236,6 +254,7 @@ let Extend =
   isTextLink : null,
   isSoftLink : null,
   isHardLink : null,
+  isLink,
 
   isDirectory : null,
   isFile : null,

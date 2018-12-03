@@ -25163,6 +25163,7 @@ function pathResolveLinkChain( test )
   self.provider.pathResolveLinkChain( o );
   test.identical( o.result, [ linkPath,linkPath2,filePath ] );
   test.identical( o.found, [ linkPath,linkPath2,filePath ] );
+  debugger;
 
   test.case = 'soft-soft-file, preservingRelative';
   self.provider.filesDelete( _.path.dir( filePath ) );

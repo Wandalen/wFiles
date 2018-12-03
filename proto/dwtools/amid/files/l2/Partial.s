@@ -987,6 +987,8 @@ function pathResolveLinkChain_body( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.boolLike( o.resolvingSoftLink ) );
   _.assert( _.boolLike( o.resolvingTextLink ) );
+  _.assert( _.boolLike( o.allowingMissing ) );
+  _.assert( _.boolLike( o.throwing ) );
   _.assert( _.arrayIs( o.found ) );
   _.assert( _.arrayIs( o.result ) );
 
@@ -1034,7 +1036,10 @@ function pathResolveLinkChain_body( o )
     o.result.push( stat );
 
     if( o.throwing && !o.allowingMissing )
-    throw _.err( 'Does not exist file', _.strQuote( o.filePath ) );
+    {
+      debugger;
+      throw _.err( 'Does not exist file', _.strQuote( o.filePath ) );
+    }
 
     return o.result;
   }
@@ -1317,6 +1322,7 @@ function _pathResolveLink_body( o )
   let o2 = _.mapExtend( null, o );
   o2.found = [];
   o2.result = [];
+  o2.resolvingIntermediateDirectories = 0;
   self.pathResolveLinkChain.body.call( self, o2 );
 
   return o2.result[ o2.result.length-1 ];
@@ -1328,9 +1334,10 @@ _pathResolveLink_body.defaults =
   filePath : null,
   resolvingSoftLink : null,
   resolvingTextLink : null,
+  throwing : 1,
+  allowingMissing : 1,
   preservingRelative : 1,
-  resolvingIntermediateDirectories : 0,
-  throwing : 1
+  // resolvingIntermediateDirectories : 0, /* qqq : why was it here? */
 }
 
 var paths = _pathResolveLink_body.paths = Object.create( null );

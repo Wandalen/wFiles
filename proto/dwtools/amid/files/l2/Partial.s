@@ -740,14 +740,14 @@ function _pathResolveTextLink( o )
 
   let result = self._pathResolveTextLinkAct
   ({
-    filePath : filePath,
+    filePath : o.filePath,
     visited : [],
     hasLink : false,
     allowingMissing : o.allowingMissing,
   });
 
   if( !result )
-  return { resolved : false, originalFilePath : filePath, resolvedFilePath : null };
+  return { resolved : false, originalFilePath : o.filePath, resolvedFilePath : null };
 
   _.assert( arguments.length === 1 || arguments.length === 2  );
 
@@ -756,7 +756,7 @@ function _pathResolveTextLink( o )
 
   self.logger.log( 'pathResolveTextLink :', o.filePath, '->', result );
 
-  return { resolved : true, originalFilePath : filePath, resolvedFilePath : result };
+  return { resolved : true, originalFilePath : o.filePath, resolvedFilePath : result };
 }
 
 _pathResolveTextLink.defaults =

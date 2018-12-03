@@ -22555,7 +22555,7 @@ function isTerminal( test )
 
 //
 
-function fileSymbolicLinkIs( test )
+function isSoftLink( test )
 {
   var self = this;
 
@@ -22626,6 +22626,114 @@ function fileSymbolicLinkIs( test )
   var got = self.provider.fileIsSoftLink( symlink );
   test.identical( got, true );
   self.provider.fieldReset( 'resolvingSoftLink', 1 );
+};
+
+//
+
+//
+
+function isTextLink( test )
+{
+  let self = this;
+  let dirPath = test.context.makePath( 'written/isTextLink' );
+  let filePath = test.context.makePath( 'written/isTextLink/file' );
+  let linkPath = test.context.makePath( 'written/isTextLink/link' );
+
+  /**/
+
+  self.provider.fieldPush( 'usingTextLink', 0 )
+
+  test.case = 'to missing'
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite( linkPath, 'link ' + filePath );
+  test.is( !self.provider.fileIsTextLink( linkPath ) );
+
+  test.case = 'to terminal'
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.fileWrite( linkPath, 'link ' + filePath );
+  test.is( !self.provider.fileIsTextLink( linkPath ) );
+
+  test.case = 'to directory'
+  self.provider.filesDelete( filePath );
+  self.provider.dirMake( filePath );
+  self.provider.fileWrite( linkPath, 'link ' + filePath );
+  test.is( !self.provider.fileIsTextLink( linkPath ) );
+
+  test.case = 'to text link'
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite( filePath, 'link ' + dirPath );
+  self.provider.fileWrite( linkPath, 'link ' + filePath );
+  test.is( !self.provider.fileIsTextLink( linkPath ) );
+
+  test.case = 'self cycled'
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite( linkPath, 'link ' + linkPath );
+  test.mustNotThrowError( () => self.provider.fileIsTextLink( linkPath ) );
+
+  test.case = 'cycled'
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite( filePath, 'link ' + linkPath );
+  self.provider.fileWrite( linkPath, 'link ' + filePath );
+  test.mustNotThrowError( () => self.provider.fileIsTextLink( linkPath ) );
+
+  test.case = 'to cycled soft link'
+  self.provider.filesDelete( filePath );
+  self.provider.softLink({ dstPath : filePath, srcPath : filePath, allowingMissing : 1 });
+  self.provider.fileWrite( linkPath, 'link ' + filePath );
+  self.provider.fieldPush( 'resolvingSoftLink', 1 )
+  test.is( !self.provider.fileIsTextLink( linkPath ) );
+  self.provider.fieldPop( 'resolvingSoftLink', 1 );
+
+  self.provider.fieldPop( 'usingTextLink', 0 )
+
+  /**/
+
+  self.provider.fieldPush( 'usingTextLink', 1 )
+
+  test.case = 'to missing'
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite( linkPath, 'link ' + filePath );
+  test.is( self.provider.fileIsTextLink( linkPath ) );
+
+  test.case = 'to terminal'
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.fileWrite( linkPath, 'link ' + filePath );
+  test.is( self.provider.fileIsTextLink( linkPath ) );
+
+  test.case = 'to directory'
+  self.provider.filesDelete( filePath );
+  self.provider.dirMake( filePath );
+  self.provider.fileWrite( linkPath, 'link ' + filePath );
+  test.is( self.provider.fileIsTextLink( linkPath ) );
+
+  test.case = 'to text link'
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite( filePath, 'link ' + dirPath );
+  self.provider.fileWrite( linkPath, 'link ' + filePath );
+  test.is( self.provider.fileIsTextLink( linkPath ) );
+
+  test.case = 'self cycled'
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite( linkPath, 'link ' + linkPath );
+  test.is( self.provider.fileIsTextLink( linkPath ) );
+
+  test.case = 'cycled'
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite( filePath, 'link ' + linkPath );
+  self.provider.fileWrite( linkPath, 'link ' + filePath );
+  test.is( self.provider.fileIsTextLink( linkPath ) );
+
+  test.case = 'to cycled soft link'
+  self.provider.filesDelete( filePath );
+  self.provider.softLink({ dstPath : filePath, srcPath : filePath, allowingMissing : 1 });
+  self.provider.fileWrite( linkPath, 'link ' + filePath );
+  self.provider.fieldPush( 'resolvingSoftLink', 1 )
+  test.is( self.provider.fileIsTextLink( linkPath ) );
+  self.provider.fieldPop( 'resolvingSoftLink', 1 );
+
+  self.provider.fieldPop( 'usingTextLink', 1 )
 };
 
 //
@@ -24226,7 +24334,8 @@ var Self =
     dirIsEmpty : dirIsEmpty,
 
     isTerminal : isTerminal,
-    fileSymbolicLinkIs : fileSymbolicLinkIs,
+    isSoftLink : isSoftLink,
+    isTextLink : isTextLink,
 
     filesAreHardLinked : filesAreHardLinked,
     filesAreSame : filesAreSame,

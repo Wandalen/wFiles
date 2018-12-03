@@ -22637,6 +22637,7 @@ function isTextLink( test )
   let self = this;
   let dirPath = test.context.makePath( 'written/isTextLink' );
   let filePath = test.context.makePath( 'written/isTextLink/file' );
+  let filePath2 = test.context.makePath( 'written/isTextLink/file2' );
   let linkPath = test.context.makePath( 'written/isTextLink/link' );
 
   /**/
@@ -22685,14 +22686,49 @@ function isTextLink( test )
   test.is( !self.provider.fileIsTextLink( linkPath ) );
   self.provider.fieldPop( 'resolvingSoftLink', 1 );
 
+  test.case = 'terminal'
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite( filePath, filePath );
+  test.is( !self.provider.fileIsTextLink( filePath ) );
+
+  test.case = 'softlink'
+  self.provider.filesDelete( filePath );
+  self.provider.softLink({ dstPath : filePath, srcPath : filePath, makingDirectory : 1, allowingMissing : 1 });
+  test.is( !self.provider.fileIsTextLink( filePath ) );
+
+  test.case = 'softlink to softlink to missing'
+  self.provider.filesDelete( filePath );
+  self.provider.softLink({ dstPath : filePath, srcPath : filePath, makingDirectory : 1, allowingMissing : 1 });
+  self.provider.softLink({ dstPath : linkPath, srcPath : filePath, allowingMissing : 1 });
+  test.is( !self.provider.fileIsTextLink( linkPath ) );
+
+  test.case = 'softlink to softlink to terminal'
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite( filePath2, filePath2 );
+  self.provider.softLink({ dstPath : filePath, srcPath : filePath2 });
+  self.provider.softLink({ dstPath : linkPath, srcPath : filePath });
+  test.is( !self.provider.fileIsTextLink( linkPath ) );
+
+  test.case = 'softlink to softlink to dir'
+  self.provider.filesDelete( filePath );
+  self.provider.softLink({ dstPath : filePath, srcPath : _.path.dir( filePath ), makingDirectory : 1 });
+  self.provider.softLink({ dstPath : linkPath, srcPath : filePath, makingDirectory : 1 });
+  test.is( !self.provider.fileIsTextLink( linkPath ) );
+
+  test.case = 'hardlink'
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.hardLink({ dstPath : linkPath, srcPath : filePath, makingDirectory : 1 });
+  test.is( !self.provider.fileIsTextLink( linkPath ) );
+
   self.provider.fieldPop( 'usingTextLink', 0 )
 
   /**/
 
   self.provider.fieldPush( 'usingTextLink', 1 )
+  self.provider.filesDelete( dirPath );
 
   test.case = 'to missing'
-  self.provider.filesDelete( filePath );
   self.provider.fileWrite( linkPath, 'link ' + filePath );
   test.is( self.provider.fileIsTextLink( linkPath ) );
 
@@ -22732,6 +22768,41 @@ function isTextLink( test )
   self.provider.fieldPush( 'resolvingSoftLink', 1 )
   test.is( self.provider.fileIsTextLink( linkPath ) );
   self.provider.fieldPop( 'resolvingSoftLink', 1 );
+
+  test.case = 'terminal'
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite( filePath, filePath );
+  test.is( !self.provider.fileIsTextLink( filePath ) );
+
+  test.case = 'softlink'
+  self.provider.filesDelete( filePath );
+  self.provider.softLink({ dstPath : filePath, srcPath : filePath, makingDirectory : 1, allowingMissing : 1 });
+  test.is( !self.provider.fileIsTextLink( filePath ) );
+
+  test.case = 'softlink to softlink to missing'
+  self.provider.filesDelete( filePath );
+  self.provider.softLink({ dstPath : filePath, srcPath : filePath, makingDirectory : 1, allowingMissing : 1 });
+  self.provider.softLink({ dstPath : linkPath, srcPath : filePath, allowingMissing : 1 });
+  test.is( !self.provider.fileIsTextLink( linkPath ) );
+
+  test.case = 'softlink to softlink to terminal'
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite( filePath2, filePath2 );
+  self.provider.softLink({ dstPath : filePath, srcPath : filePath2 });
+  self.provider.softLink({ dstPath : linkPath, srcPath : filePath });
+  test.is( !self.provider.fileIsTextLink( linkPath ) );
+
+  test.case = 'softlink to softlink to dir'
+  self.provider.filesDelete( filePath );
+  self.provider.softLink({ dstPath : filePath, srcPath : _.path.dir( filePath ), makingDirectory : 1 });
+  self.provider.softLink({ dstPath : linkPath, srcPath : filePath, makingDirectory : 1 });
+  test.is( !self.provider.fileIsTextLink( linkPath ) );
+
+  test.case = 'hardlink'
+  self.provider.filesDelete( filePath );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.hardLink({ dstPath : linkPath, srcPath : filePath, makingDirectory : 1 });
+  test.is( !self.provider.fileIsTextLink( linkPath ) );
 
   self.provider.fieldPop( 'usingTextLink', 1 )
 };

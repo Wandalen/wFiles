@@ -220,7 +220,7 @@ let Restricts =
   isFIFO : null,
   isSocket : null,
 
-  _checkModeProperty : null,
+  // _checkModeProperty : null,
 
 }
 
@@ -264,7 +264,7 @@ let Extend =
   isFIFO : null,
   isSocket : null,
 
-  _checkModeProperty : null,
+  // _checkModeProperty : null,
 
   //
 

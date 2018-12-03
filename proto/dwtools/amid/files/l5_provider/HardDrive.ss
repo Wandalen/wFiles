@@ -729,7 +729,6 @@ function statReadAct( o )
 
   function isTerminal()
   {
-    debugger;
     return this.isFile();
   }
 
@@ -737,7 +736,6 @@ function statReadAct( o )
 
   function isDir()
   {
-    debugger;
     return this.isDirectory();
   }
 
@@ -746,7 +744,6 @@ function statReadAct( o )
   let _isTextLink;
   function isTextLink()
   {
-    debugger;
     if( this._isTextLink !== undefined )
     return _isTextLink;
     this._isTextLink = self._isTextLink( o.filePath );
@@ -757,7 +754,6 @@ function statReadAct( o )
 
   function isSoftLink()
   {
-    debugger;
     return this.isSymbolicLink();
   }
 
@@ -798,7 +794,6 @@ function statReadAct( o )
       isHardLink,
       isLink : _.FileStat.prototype.isLink,
     }
-    debugger;
     _.mapExtend( stat, extend );
     return stat;
   }

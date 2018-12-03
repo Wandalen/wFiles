@@ -184,7 +184,7 @@ function _pathResolveTextLinkAct( o )
 
     let cpath = _.fileProvider.path.nativize( prefix + parts.slice( 0, p+1 ).join( '/' ) );
 
-    let stat = _.fileProvider.statResolvedRead({ filePath : cpath, resolvingTextLink : 0 }); /* qqq */
+    let stat = _.fileProvider.statResolvedRead({ filePath : cpath, resolvingTextLink : 0, resolvingSoftLink : 0 }); /* qqq */
     if( !stat )
     {
       if( o.allowingMissing )
@@ -699,7 +699,6 @@ function statReadAct( o )
       result = StandardFile.statSync.apply( StandardFile, args );
       else
       result = StandardFile.lstatSync.apply( StandardFile, args );
-      debugger; // xxx
     }
     catch( err )
     {
@@ -797,6 +796,7 @@ function statReadAct( o )
       isTextLink,
       isSoftLink,
       isHardLink,
+      isLink : _.FileStat.prototype.isLink,
     }
     debugger;
     _.mapExtend( stat, extend );
@@ -805,6 +805,7 @@ function statReadAct( o )
 
 }
 
+_.assert( _.routineIs( _.FileStat.prototype.isLink ) );
 _.routineExtend( statReadAct, Parent.prototype.statReadAct );
 
 //

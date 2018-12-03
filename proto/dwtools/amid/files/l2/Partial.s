@@ -5137,18 +5137,31 @@ function isLink_body( o )
   if( o.resolvingSoftLink && o.resolvingTextLink )
   return result;
 
-  // let stat = self.fileStat( o.filePath ); //qqq
+  let stat = self.statRead
+  ({
+    filePath : o.filePath,
+    resolvingSoftLink : o.resolvingSoftLink,
+    resolvingTextLink : o.resolvingTextLink,
+  });
 
-  if( !o.resolvingSoftLink  )
-  {
-    result = self.isSoftLink( o.filePath );
-  }
+  result = stat.isLink();
 
-  if( o.usingTextLink && !o.resolvingTextLink )
-  {
-    if( !result )
-    result = self.isTextLink( o.filePath );
-  }
+  // if( !o.resolvingSoftLink && !result )
+  // result = stat.isSoftLink();
+  //
+  // if( !o.resolvingTextLink && !result && o.usingTextLink )
+  // result = stat.isTextLink();
+
+  // if( !o.resolvingSoftLink  )
+  // {
+  //   result = self.isSoftLink( o.filePath );
+  // }
+  //
+  // if( o.usingTextLink && !o.resolvingTextLink )
+  // {
+  //   if( !result )
+  //   result = self.isTextLink( o.filePath );
+  // }
 
   return result;
 }

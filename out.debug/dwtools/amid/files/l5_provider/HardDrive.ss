@@ -102,14 +102,37 @@ function _fileIsTextLink( filePath )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  debugger; xxx
+  // debugger; xxx
 
   if( !self.usingTextLink )
   return false;
 
-  let result = self._pathResolveTextLink( filePath );
+  // let result = self._pathResolveTextLink({ filePath : filePath, allowingMissing : true });
 
-  return !!result.resolved;
+  let stat = self.statReadAct
+  ({
+    filePath : filePath,
+    throwing : 0,
+    sync : 1,
+    resolvingSoftLink : 0,
+  });
+
+  if( stat && stat.isFile() )
+  {
+    let read = self.fileReadAct
+    ({
+      filePath : filePath,
+      sync : 1,
+      encoding : 'utf8',
+      advanced : null,
+      resolvingSoftLink : 0
+    })
+    let regexp = /link ([^\n]+)\n?$/;
+    return regexp.test( read );
+  }
+
+  // return !!result.resolved;
+  return false;
 }
 
 var having = _fileIsTextLink.having = Object.create( null );
@@ -724,11 +747,11 @@ function statReadAct( o )
   let _isTextLink;
   function isTextLink()
   {
-    debugger; xxx
-    if( _isTextLink !== undefined )
+    debugger;
+    if( this._isTextLink !== undefined )
     return _isTextLink;
-    _isTextLink = self._fileIsTextLink( o.filePath );
-    return _isTextLink;
+    this._isTextLink = self._fileIsTextLink( o.filePath );
+    return this._isTextLink;
   }
 
   /* */

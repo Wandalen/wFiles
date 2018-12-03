@@ -5144,6 +5144,9 @@ function isLink_body( o )
     resolvingTextLink : o.resolvingTextLink,
   });
 
+  if( !stat )
+  return result;
+
   result = stat.isLink();
 
   // if( !o.resolvingSoftLink && !result )

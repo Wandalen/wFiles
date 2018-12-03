@@ -13,7 +13,8 @@ if( typeof module !== 'undefined' )
   if( !_.FileProvider )
   require( '../UseMid.s' );
 
-  File = require( 'fs-extra' );
+  // File = require( 'fs-extra' );
+  File = require( 'fs' );
   StandardFile = require( 'fs' );
   Os = require( 'os' );
 
@@ -1776,54 +1777,54 @@ let Extend =
 
   // inter
 
-  init : init,
+  init,
 
   // path
 
-  pathNativizeAct : pathNativizeAct,
-  pathCurrentAct : pathCurrentAct,
+  pathNativizeAct,
+  pathCurrentAct,
 
-  _isTextLink : _isTextLink,
-  _pathResolveTextLinkAct : _pathResolveTextLinkAct,
-  pathResolveSoftLinkAct : pathResolveSoftLinkAct,
+  _isTextLink,
+  _pathResolveTextLinkAct,
+  pathResolveSoftLinkAct,
 
-  pathDirTempAct : pathDirTempAct,
-  pathDirUserHomeAct : pathDirUserHomeAct,
+  pathDirTempAct,
+  pathDirUserHomeAct,
 
   // read
 
-  fileReadAct : fileReadAct,
-  streamReadAct : streamReadAct,
-  dirReadAct : dirReadAct,
-  statReadAct : statReadAct,
-  fileExistsAct : fileExistsAct,
+  fileReadAct,
+  streamReadAct,
+  dirReadAct,
+  statReadAct,
+  fileExistsAct,
 
   // write
 
-  fileWriteAct : fileWriteAct,
-  streamWriteAct : streamWriteAct,
-  fileTimeSetAct : fileTimeSetAct,
-  fileDeleteAct : fileDeleteAct,
-  dirMakeAct : dirMakeAct,
+  fileWriteAct,
+  streamWriteAct,
+  fileTimeSetAct,
+  fileDeleteAct,
+  dirMakeAct,
 
-  // link act
+  // link
 
-  fileRenameAct : fileRenameAct,
-  fileCopyAct : fileCopyAct,
-  softLinkAct : softLinkAct,
-  hardLinkAct : hardLinkAct,
+  fileRenameAct,
+  fileCopyAct,
+  softLinkAct,
+  hardLinkAct,
 
   // etc
 
-  _encodingFor : _encodingFor,
+  _encodingFor,
 
   //
 
-  Composes : Composes,
-  Aggregates : Aggregates,
-  Associates : Associates,
-  Restricts : Restricts,
-  Statics : Statics,
+  Composes,
+  Aggregates,
+  Associates,
+  Restricts,
+  Statics,
 
 }
 

@@ -146,6 +146,7 @@ function _routineFunctor( routine, routineName )
   op.routineName = routineName;
   op.reads = [];
   op.writes = [];
+  op.image = self;
 
   for( let k in routine.operates )
   {
@@ -167,7 +168,8 @@ function _routineFunctor( routine, routineName )
       op2.result = undefined;
       // op2.methodDescriptor = op;
 
-      // debugger;
+      if( op.routineName === 'statReadAct' )
+      debugger;
 
       if( pre )
       {
@@ -178,17 +180,24 @@ function _routineFunctor( routine, routineName )
       }
 
       if( this.onCallBegin )
-      op2.args = this.onCallBegin( op2 );
+      {
+        let r = this.onCallBegin( op2 );
+        _.assert( r === undefined );
+      }
 
       if( !_.unrollIs( op2.args ) )
       op2.args = _.unrollFrom([ op2.args ]);
 
       _.assert( !_.argumentsArrayIs( op2.args ), 'Does not expect arguments array' );
 
-      op2.result = this.onCall( op2 );
+      let r = this.onCall( op2 );
+      _.assert( r === undefined );
 
       if( this.onCallEnd )
-      op2.result = this.onCallEnd( op2.result, op );
+      {
+        let r = this.onCallEnd( op2.result, op );
+        _.assert( r === undefined );
+      }
 
       return op2.result;
     }
@@ -206,7 +215,7 @@ function _routineFunctor( routine, routineName )
 function onCall( op )
 {
   _.assert( arguments.length === 1 );
-  return op.originalBody.apply( op.originalFileProvider, op.args );
+  op.result = op.originalBody.apply( op.originalFileProvider, op.args );
 }
 
 // --

@@ -592,16 +592,16 @@ _.routineExtend( fileExistsAct, Parent.prototype.fileExistsAct );
 //  * @memberof wFileProviderExtract
 //  */
 //
-// function fileIsHardLink( filePath )
-// {
-//   let self = this;
-//
-//   _.assert( arguments.length === 1, 'Expects single argument' );
-//
-//   let descriptor = self._descriptorRead( filePath )
-//
-//   return self._descriptorIsHardLink( descriptor );
-// }
+function fileIsHardLink( filePath )
+{
+  let self = this;
+
+  _.assert( arguments.length === 1, 'Expects single argument' );
+
+  let descriptor = self._descriptorRead( filePath )
+
+  return self._descriptorIsHardLink( descriptor );
+}
 //
 // var having = fileIsHardLink.having = Object.create( null );
 //

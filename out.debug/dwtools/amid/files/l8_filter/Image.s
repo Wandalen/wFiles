@@ -167,7 +167,7 @@ function _routineFunctor( routine, routineName )
       op2.result = undefined;
       // op2.methodDescriptor = op;
 
-      debugger;
+      // debugger;
 
       if( pre )
       {

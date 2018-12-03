@@ -7,13 +7,12 @@ if( typeof module !== 'undefined' )
 
   let _ = require( '../../Tools.s' );
 
-  if( !_global_.wTools.FileProvider )
+  _.include( 'wTesting' );
+
+  // if( !_global_.wTools.FileProvider )
   require( '../files/UseTop.s' );
 
   var crypto = require( 'crypto' );
-
-  _.include( 'wTesting' );
-
   var waitSync = require( 'wait-sync' );
 
 }
@@ -23592,7 +23591,7 @@ function uriResolve( test )
 
 //
 
-function resolveLinkChain( test )
+function pathResolveLinkChain( test )
 {
   let self = this;
 
@@ -23611,11 +23610,11 @@ function resolveLinkChain( test )
     preservingRelative : 0
   }
 
-  let dir = test.context.makePath( 'written/resolveLinkChain' );
-  let filePath = test.context.makePath( 'written/resolveLinkChain/file' );
-  let linkPath = test.context.makePath( 'written/resolveLinkChain/link' );
-  let linkPath2 = test.context.makePath( 'written/resolveLinkChain/link2' );
-  let linkPath3 = test.context.makePath( 'written/resolveLinkChain/link3' );
+  let dir = test.context.makePath( 'written/pathResolveLinkChain' );
+  let filePath = test.context.makePath( 'written/pathResolveLinkChain/file' );
+  let linkPath = test.context.makePath( 'written/pathResolveLinkChain/link' );
+  let linkPath2 = test.context.makePath( 'written/pathResolveLinkChain/link2' );
+  let linkPath3 = test.context.makePath( 'written/pathResolveLinkChain/link3' );
   let path = self.provider.path;
 
   self.provider.fieldPush( 'usingTextLink', true );
@@ -23627,7 +23626,7 @@ function resolveLinkChain( test )
   test.case = 'not existing file';
   self.provider.filesDelete( _.path.dir( filePath ) );
   var o = _.mapExtend( null, o1, { filePath : filePath } );
-  var got = self.provider.resolveLinkChain( o );
+  var got = self.provider.pathResolveLinkChain( o );
   var expected = [ filePath ];
   test.identical( got, expected );
 
@@ -23635,7 +23634,7 @@ function resolveLinkChain( test )
   self.provider.filesDelete( _.path.dir( filePath ) );
   self.provider.fileWrite( filePath, filePath );
   var o = _.mapExtend( null, o1, { filePath : filePath } );
-  var got = self.provider.resolveLinkChain( o );
+  var got = self.provider.pathResolveLinkChain( o );
   var expected = [ filePath ];
   test.identical( got, expected );
 
@@ -23644,7 +23643,7 @@ function resolveLinkChain( test )
   self.provider.fileWrite( filePath, filePath );
   self.provider.hardLink( linkPath, filePath );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  var got = self.provider.resolveLinkChain( o );
+  var got = self.provider.pathResolveLinkChain( o );
   var expected = [ linkPath ]
   if( _.routineIs( self.provider.pathResolveHardLinkAct ) )
   expected = [ linkPath,filePath ];
@@ -23655,7 +23654,7 @@ function resolveLinkChain( test )
   self.provider.fileWrite( filePath, filePath );
   self.provider.softLink( linkPath, filePath );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  var got = self.provider.resolveLinkChain( o );
+  var got = self.provider.pathResolveLinkChain( o );
   var expected = [ linkPath,filePath ]
   test.identical( got, expected );
 
@@ -23664,7 +23663,7 @@ function resolveLinkChain( test )
   self.provider.fileWrite( filePath, filePath );
   self.provider.softLink( linkPath, '../file' );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  var got = self.provider.resolveLinkChain( o );
+  var got = self.provider.pathResolveLinkChain( o );
   var expected = [ linkPath,filePath ]
   test.identical( got, expected );
 
@@ -23673,7 +23672,7 @@ function resolveLinkChain( test )
   self.provider.fileWrite( filePath, filePath );
   self.provider.softLink( linkPath, '../file' );
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
-  self.provider.resolveLinkChain( o );
+  self.provider.pathResolveLinkChain( o );
   var expectedResult = [ linkPath, '../file', filePath ]
   var expectedFound = [ linkPath, filePath ]
   test.identical( o.result, expectedResult );
@@ -23684,7 +23683,7 @@ function resolveLinkChain( test )
   self.provider.fileWrite( filePath, filePath );
   self.provider.fileWrite( linkPath, 'link ' + filePath );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  var got = self.provider.resolveLinkChain( o );
+  var got = self.provider.pathResolveLinkChain( o );
   var expected = [ linkPath,filePath ]
   test.identical( got, expected );
 
@@ -23700,7 +23699,7 @@ function resolveLinkChain( test )
     allowingMissing : 1
   });
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0 } );
-  var got = self.provider.resolveLinkChain( o );
+  var got = self.provider.pathResolveLinkChain( o );
   var expectedResult =
   [
     linkPath,
@@ -23728,7 +23727,7 @@ function resolveLinkChain( test )
     allowingMissing : 1
   });
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0, preservingRelative : 1 } );
-  var got = self.provider.resolveLinkChain( o );
+  var got = self.provider.pathResolveLinkChain( o );
   var expectedResult =
   [
     linkPath,
@@ -23757,7 +23756,7 @@ function resolveLinkChain( test )
     allowingMissing : 1
   });
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0 } );
-  var got = self.provider.resolveLinkChain( o );
+  var got = self.provider.pathResolveLinkChain( o );
   var expectedResult =
   [
     linkPath,
@@ -23786,7 +23785,7 @@ function resolveLinkChain( test )
     allowingMissing : 1
   });
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0, preservingRelative : 1 } );
-  var got = self.provider.resolveLinkChain( o );
+  var got = self.provider.pathResolveLinkChain( o );
   var expectedResult =
   [
     linkPath,
@@ -23815,7 +23814,7 @@ function resolveLinkChain( test )
     allowingMissing : 1
   });
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1 } );
-  test.shouldThrowError( () => self.provider.resolveLinkChain( o ) );
+  test.shouldThrowError( () => self.provider.pathResolveLinkChain( o ) );
 
   //
 
@@ -23830,7 +23829,7 @@ function resolveLinkChain( test )
     allowingMissing : 1
   });
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1  } );
-  test.shouldThrowError( () => self.provider.resolveLinkChain( o ) );
+  test.shouldThrowError( () => self.provider.pathResolveLinkChain( o ) );
 
   test.close( 'simple' );
 
@@ -23844,7 +23843,7 @@ function resolveLinkChain( test )
   self.provider.softLink( linkPath2, filePath );
   self.provider.softLink( linkPath, linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  var got = self.provider.resolveLinkChain( o );
+  var got = self.provider.pathResolveLinkChain( o );
   var expected = [ linkPath,linkPath2,filePath ];
   test.identical( got, expected );
 
@@ -23854,9 +23853,11 @@ function resolveLinkChain( test )
   self.provider.softLink( linkPath2, filePath );
   self.provider.softLink( linkPath, linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
-  var got = self.provider.resolveLinkChain( o );
+  var got = self.provider.pathResolveLinkChain( o );
   var expected = [ linkPath,linkPath2,filePath ];
   test.identical( got, expected );
+
+  // debugger; return; xxx
 
   test.case = 'text-text-file';
   self.provider.filesDelete( _.path.dir( filePath ) );
@@ -23864,7 +23865,7 @@ function resolveLinkChain( test )
   self.provider.fileWrite( linkPath2, 'link ' + filePath );
   self.provider.fileWrite( linkPath, 'link ' + linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  var got = self.provider.resolveLinkChain( o );
+  var got = self.provider.pathResolveLinkChain( o );
   var expected = [ linkPath,filePath ];
   test.identical( got, expected );
 
@@ -23874,7 +23875,7 @@ function resolveLinkChain( test )
   self.provider.fileWrite( linkPath2, 'link ' + filePath );
   self.provider.fileWrite( linkPath, 'link ' + linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
-  var got = self.provider.resolveLinkChain( o );
+  var got = self.provider.pathResolveLinkChain( o );
   var expected = [ linkPath,filePath ];
   test.identical( got, expected );
 
@@ -23885,7 +23886,7 @@ function resolveLinkChain( test )
   self.provider.fileWrite( linkPath2, 'link ' + linkPath3 );
   self.provider.softLink( linkPath, linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  var got = self.provider.resolveLinkChain( o );
+  var got = self.provider.pathResolveLinkChain( o );
   var expected = [ linkPath,linkPath2,linkPath3,filePath ];
   test.identical( got, expected );
 
@@ -23896,7 +23897,7 @@ function resolveLinkChain( test )
   self.provider.fileWrite( linkPath2, 'link ' + linkPath3 );
   self.provider.softLink( linkPath, linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
-  var got = self.provider.resolveLinkChain( o );
+  var got = self.provider.pathResolveLinkChain( o );
   var expected = [ linkPath,linkPath2,linkPath3,filePath ];
   test.identical( got, expected );
 
@@ -23907,7 +23908,7 @@ function resolveLinkChain( test )
   self.provider.softLink( linkPath2, linkPath3 );
   self.provider.fileWrite( linkPath, 'link ' + linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  var got = self.provider.resolveLinkChain( o );
+  var got = self.provider.pathResolveLinkChain( o );
   var expected = [ linkPath,filePath ];
   test.identical( got, expected );
 
@@ -23918,7 +23919,7 @@ function resolveLinkChain( test )
   self.provider.softLink( linkPath2, linkPath3 );
   self.provider.fileWrite( linkPath, 'link ' + linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
-  var got = self.provider.resolveLinkChain( o );
+  var got = self.provider.pathResolveLinkChain( o );
   var expected = [ linkPath,filePath ];
   test.identical( got, expected );
 
@@ -23929,7 +23930,7 @@ function resolveLinkChain( test )
   self.provider.softLink( linkPath2, '../link3' );
   self.provider.softLink( linkPath, '../link2' );
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
-  self.provider.resolveLinkChain( o );
+  self.provider.pathResolveLinkChain( o );
   var expectedResult =
   [
     linkPath,
@@ -23956,7 +23957,7 @@ function resolveLinkChain( test )
   self.provider.hardLink( linkPath2, linkPath3 );
   self.provider.softLink( linkPath, linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  self.provider.resolveLinkChain( o );
+  self.provider.pathResolveLinkChain( o );
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   {
     test.identical( o.result, [ linkPath, linkPath2, filePath ] )
@@ -23975,7 +23976,7 @@ function resolveLinkChain( test )
   self.provider.hardLink( linkPath2, linkPath3 );
   self.provider.softLink( linkPath, self.provider.path.relative( linkPath, linkPath2 ) );
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 0 } );
-  self.provider.resolveLinkChain( o );
+  self.provider.pathResolveLinkChain( o );
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   {
     test.identical( o.result, [ linkPath, linkPath2, filePath ] )
@@ -23994,7 +23995,7 @@ function resolveLinkChain( test )
   self.provider.hardLink( linkPath2, linkPath3 );
   self.provider.softLink( linkPath, self.provider.path.relative( linkPath, linkPath2 ) );
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
-  self.provider.resolveLinkChain( o );
+  self.provider.pathResolveLinkChain( o );
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   {
     test.identical( o.result, [ linkPath, '../link2', linkPath2, filePath ] )
@@ -24013,7 +24014,7 @@ function resolveLinkChain( test )
   self.provider.softLink( linkPath, '..' );
   self.provider.softLink( linkPath2, '../file' );
   var o = _.mapExtend( null, o1, { filePath : path.join( dir, 'link/link2' ) , preservingRelative : 1, resolvingIntermediateDirectories : 1 } );
-  var got = self.provider.resolveLinkChain( o );
+  var got = self.provider.pathResolveLinkChain( o );
   var expectedResult =
   [
     path.join( dir, 'link/link2' ),
@@ -24066,7 +24067,7 @@ function resolveLinkChain( test )
 
   var testPath = _.path.join( dirPath, 'linkToDir1/linkToDir2/linkToFile' )
   var o = _.mapExtend( null, o1, { filePath : testPath , preservingRelative : 1, resolvingIntermediateDirectories : 1 } );
-  var got = self.provider.resolveLinkChain( o );
+  var got = self.provider.pathResolveLinkChain( o );
   test.identical( o.result, [ testPath, linkInDir, dirPath1, linkInDir1, dirPath2, linkInDir2, pathToFile ] )
   test.identical( o.found, [ testPath, linkInDir, dirPath1, linkInDir1, dirPath2, linkInDir2, pathToFile ] )
 
@@ -24101,7 +24102,7 @@ function resolveLinkChain( test )
 
   var testPath = _.path.join( dirPath, 'linkToDir1/linkToDir2/linkToFile' )
   var o = _.mapExtend( null, o1, { filePath : testPath , preservingRelative : 1, resolvingIntermediateDirectories : 1 } );
-  var got = self.provider.resolveLinkChain( o );
+  var got = self.provider.pathResolveLinkChain( o );
   test.identical( o.result, [ testPath, linkInDir, '../dir1', dirPath1, linkInDir1, '../../dir2', dirPath2, linkInDir2, '../../file', pathToFile ] )
   test.identical( o.found, [ testPath, linkInDir, dirPath1, linkInDir1, dirPath2, linkInDir2, pathToFile ] )
 
@@ -24239,7 +24240,7 @@ var Self =
     pathResolve : pathResolve,
     uriResolve : uriResolve,
 
-    resolveLinkChain : resolveLinkChain,
+    pathResolveLinkChain : pathResolveLinkChain,
 
   },
 

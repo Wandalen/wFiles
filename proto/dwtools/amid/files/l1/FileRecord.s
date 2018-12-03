@@ -496,8 +496,8 @@ function _isTextLinkGet()
 
   // debugger; xxx
 
-  // return c.fileProvider.fileIsTextLink( c.real );
-  return c.fileProvider.fileIsTextLink( record.real );
+  // return c.fileProvider.isTextLink( c.real );
+  return c.fileProvider.isTextLink( record.real );
 }
 
 //

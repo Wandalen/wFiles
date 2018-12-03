@@ -387,8 +387,8 @@ let Proto =
 
   // isTerminalAct : isTerminalAct,
 
-  // fileIsHardLink : fileIsHardLink,
-  // fileIsSoftLink : fileIsSoftLink,
+  // isHardLink : isHardLink,
+  // isSoftLink : isSoftLink,
   // filesAreHardLinkedAct : filesAreHardLinkedAct,
 
   // write

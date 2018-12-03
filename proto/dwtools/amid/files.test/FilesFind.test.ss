@@ -281,7 +281,7 @@ function symlinkIsAllowed()
     try
     {
       _.fileProvider.softLink({ dstPath : dstPath, srcPath : srcPath, throwing : 1, sync : 1 });
-      allow = _.fileProvider.fileIsSoftLink( dstPath );
+      allow = _.fileProvider.isSoftLink( dstPath );
     }
     catch( err )
     {
@@ -2497,7 +2497,7 @@ function filesFindLinked( test )
   _.fileProvider.fileWrite( terminal, terminal )
   _.fileProvider.softLink( dstPath, srcPath );
 
-  test.is( _.fileProvider.fileIsSoftLink( dstPath ) );
+  test.is( _.fileProvider.isSoftLink( dstPath ) );
 
   var got = _.fileProvider.filesFind
   ({
@@ -2589,7 +2589,7 @@ function filesFindLinked( test )
   _.fileProvider.fileWrite( terminal, terminal )
   _.fileProvider.softLink( dstPath, srcPath );
 
-  test.is( _.fileProvider.fileIsSoftLink( dstPath ) );
+  test.is( _.fileProvider.isSoftLink( dstPath ) );
 
   var got = _.fileProvider.filesFind
   ({
@@ -10781,7 +10781,7 @@ function filesReflectLinked( test )
     seems File.copyFileSync works if resolvingDstSoftLink is always 1
   */
 
-  test.is( !_.fileProvider.fileIsSoftLink( _.path.join( dstDir, 'link' ) ) );
+  test.is( !_.fileProvider.isSoftLink( _.path.join( dstDir, 'link' ) ) );
   test.identical( _.fileProvider.fileRead( _.path.join( dstDir, 'link' ) ), 'file' );
 
   /**/
@@ -10847,19 +10847,19 @@ function filesReflectLinked( test )
     allowingMissing : 1,
   })
 
-  test.is( _.fileProvider.fileIsSoftLink( _.path.join( dstDir, 'link' ) ) );
+  test.is( _.fileProvider.isSoftLink( _.path.join( dstDir, 'link' ) ) );
   var dstLink1 = _.fileProvider.pathResolveSoftLink({ filePath : _.path.join( dstDir, 'link' )/*, readLink : 1*/ });
   test.identical( dstLink1, _.path.join( dstDir, 'fileNotExists' ) );
 
-  test.is( _.fileProvider.fileIsSoftLink( _.path.join( dstDir, 'link2' ) ) );
+  test.is( _.fileProvider.isSoftLink( _.path.join( dstDir, 'link2' ) ) );
   var dstLink2 = _.fileProvider.pathResolveSoftLink({ filePath : _.path.join( dstDir, 'link2' )/*, readLink : 1*/ });
   test.identical( dstLink2, _.path.join( dstDir, 'file' ) );
 
-  test.is( !_.fileProvider.fileIsSoftLink( _.path.join( dstDir, 'link3' ) ) );
+  test.is( !_.fileProvider.isSoftLink( _.path.join( dstDir, 'link3' ) ) );
   var read = _.fileProvider.fileRead({ filePath : _.path.join( dstDir, 'link3' ) });
   test.identical( read, 'file' );
 
-  test.is( _.fileProvider.fileIsSoftLink( _.path.join( dstDir, 'link4' ) ) );
+  test.is( _.fileProvider.isSoftLink( _.path.join( dstDir, 'link4' ) ) );
   var dstLink4 = _.fileProvider.pathResolveSoftLink({ filePath : _.path.join( dstDir, 'link4' )/*, readLink : 1*/ });
   test.identical( dstLink4, _.path.join( dstDir, 'fileNotExists' ) );
 

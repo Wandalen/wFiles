@@ -645,7 +645,7 @@ function _fileCopyActDifferent( o,dst,src,routine )
   /* qqq : implement async */
   _.assert( o.sync, 'not implemented' );
 
-  if( src.provider.fileIsSoftLink( src.filePath ) )
+  if( src.provider.isSoftLink( src.filePath ) )
   {
     let resolvedPath = src.provider.pathResolveSoftLink( src.filePath );
     return dst.provider.softLink

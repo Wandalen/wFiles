@@ -96,7 +96,7 @@ function pathCurrentAct()
 
 //
 
-function _fileIsTextLink( filePath )
+function _isTextLink( filePath )
 {
   let self = this;
 
@@ -135,13 +135,13 @@ function _fileIsTextLink( filePath )
   return false;
 }
 
-var having = _fileIsTextLink.having = Object.create( null );
+var having = _isTextLink.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
 having.driving = 0;
 
-var operates = _fileIsTextLink.operates = Object.create( null );
+var operates = _isTextLink.operates = Object.create( null );
 
 operates.filePath = { pathToRead : 1 }
 
@@ -279,7 +279,7 @@ function pathResolveSoftLinkAct( o )
   _.assert( self.path.isAbsolute( o.filePath ) );
 
   /* using self.resolvingSoftLink causes recursion problem in pathResolveLink */
-  if( !self.fileIsSoftLink( o.filePath ) )
+  if( !self.isSoftLink( o.filePath ) )
   return o.filePath;
 
   try
@@ -421,7 +421,7 @@ function fileReadAct( o )
   // if( _.strHas( o.filePath, 'icons.woff2' ) )
   // debugger;
 
-  if( !o.resolvingSoftLink && self.fileIsSoftLink( o.filePath ) )
+  if( !o.resolvingSoftLink && self.isSoftLink( o.filePath ) )
   {
     let err = _.err( 'fileReadAct: Reading from soft link is not allowed when "resolvingSoftLink" is disabled' );
     return handleError( err );
@@ -750,7 +750,7 @@ function statReadAct( o )
     debugger;
     if( this._isTextLink !== undefined )
     return _isTextLink;
-    this._isTextLink = self._fileIsTextLink( o.filePath );
+    this._isTextLink = self._isTextLink( o.filePath );
     return this._isTextLink;
   }
 
@@ -1243,10 +1243,10 @@ function fileCopyAct( o )
     return new _.Consequence().error( err );
   }
 
-  if( o.breakingDstHardLink && self.fileIsHardLink( o.dstPath ) )
+  if( o.breakingDstHardLink && self.isHardLink( o.dstPath ) )
   self.hardLinkBreak({ filePath : o.dstPath, sync : 1 });
 
-  if( self.fileIsSoftLink( o.srcPath ) )
+  if( self.isSoftLink( o.srcPath ) )
   {
     if( self.fileExistsAct({ filePath : o.dstPath }) )
     self.fileDeleteAct({ filePath : o.dstPath, sync : 1 })
@@ -1787,7 +1787,7 @@ let Extend =
   pathNativizeAct : pathNativizeAct,
   pathCurrentAct : pathCurrentAct,
 
-  _fileIsTextLink : _fileIsTextLink,
+  _isTextLink : _isTextLink,
   _pathResolveTextLinkAct : _pathResolveTextLinkAct,
   pathResolveSoftLinkAct : pathResolveSoftLinkAct,
 

@@ -838,7 +838,7 @@ function _pathResolveSoftLink_body( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( !!o.filePath );
 
-  if( !self.fileIsSoftLink( o.filePath ) )
+  if( !self.isSoftLink( o.filePath ) )
   return o.filePath;
 
   let result = self.pathResolveSoftLinkAct( o );
@@ -906,7 +906,7 @@ having.aspect = 'entry';
 //   if( !_.routineIs( self.pathResolveHardLinkAct ) )
 //   return o.filePath;
 //
-//   if( !self.fileIsHardLink( o.filePath ) )
+//   if( !self.isHardLink( o.filePath ) )
 //   return o.filePath;
 //
 //   let result = self.pathResolveHardLinkAct( o );
@@ -1006,7 +1006,7 @@ function pathResolveLinkChain_body( o )
     for( let i = 1; i < parts.length; i++ )
     {
       o.filePath = path.join( o.filePath, parts[ i ] );
-      if( self.fileIsLink( o.filePath ) )
+      if( self.isLink( o.filePath ) )
       self.pathResolveLinkChain.body.call( self, o );
       else if( i === parts.length - 1 )
       self.pathResolveLinkChain.body.call( self, o );
@@ -1032,7 +1032,7 @@ function pathResolveLinkChain_body( o )
   if( o.resolvingSoftLink )
   {
     let filePath = self.pathResolveSoftLink({ filePath : o.filePath });
-    if( filePath !== o.filePath || self.fileIsSoftLink( filePath ) )
+    if( filePath !== o.filePath || self.isSoftLink( filePath ) )
     {
 
       // if( path.isGlobal( filePath ) )
@@ -1050,7 +1050,7 @@ function pathResolveLinkChain_body( o )
         // o.result.push( o.last ); // qqq ??? o.O
         // filePath = _.uri.dir( o.filePath );
         filePath = path.dir( o.filePath ); // qqq ???
-        if( !self.fileIsLink( filePath ) ) // qqq ???
+        if( !self.isLink( filePath ) ) // qqq ???
         filePath = o.last; // qqq ???
       }
       else
@@ -3093,7 +3093,7 @@ function _fileSize_body( o )
   if( o.filePath === '/out/icons' )
   debugger;
 
-  // if( self.fileIsSoftLink( o.filePath ) )
+  // if( self.isSoftLink( o.filePath ) )
   // {
   //   throw _.err( 'not tested' );
   //   return false;
@@ -3279,8 +3279,9 @@ function isTerminal_body( o )
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.mapIs( o ) );
+  _.assert( _.assertRoutineOptions( isTerminal_body, arguments ) );
   _.assert( _.boolLike( o.resolvingSoftLink ) );
+  _.assert( _.boolLike( o.resolvingTextLink ) );
 
   o.filePath = self.pathResolveLink
   ({
@@ -3292,16 +3293,16 @@ function isTerminal_body( o )
   // if( self.isDir( o.filePath ) )
   // return false;
 
-  /* !!! qqq : doublecheck that fileIsSoftLink is not required and add stand-alone test routine */
+  /* !!! qqq : doublecheck that isSoftLink is not required and add stand-alone test routine */
 
   // // if( o.resolvingSoftLink )
   // if( self.usingSoftLink )
-  // if( self.fileIsSoftLink( o.filePath ) )
+  // if( self.isSoftLink( o.filePath ) )
   // return false;
   //
   // // if( self.usingTextLink && o.resolvingTextLink )
   // if( self.usingTextLink )
-  // if( self.fileIsTextLink( o.filePath ) )
+  // if( self.isTextLink( o.filePath ) )
   // return false;
 
   // if( _.routineIs( self.isTerminalAct ) )
@@ -3428,8 +3429,9 @@ function isDir_body( o )
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.mapIs( o ) );
+  _.assert( _.assertRoutineOptions( isDir_body, arguments ) );
   _.assert( _.boolLike( o.resolvingSoftLink ) );
+  _.assert( _.boolLike( o.resolvingTextLink ) );
 
   o.filePath = self.pathResolveLink
   ({
@@ -3443,12 +3445,12 @@ function isDir_body( o )
   //
   // // if( o.resolvingSoftLink )
   // if( self.usingSoftLink )
-  // if( self.fileIsSoftLink( o.filePath ) )
+  // if( self.isSoftLink( o.filePath ) )
   // return false;
   //
   // // if( self.usingTextLink && o.resolvingTextLink )
   // if( self.usingTextLink )
-  // if( self.fileIsTextLink( o.filePath ) )
+  // if( self.isTextLink( o.filePath ) )
   // return false;
 
   // if( _.routineIs( self.isDirAct ) )
@@ -3740,7 +3742,7 @@ function fileWrite_body( o )
     self.dirMakeForFile( o.filePath );
   }
 
-  let terminateLink = !self.resolvingSoftLink && self.fileIsSoftLink( o.filePath );
+  let terminateLink = !self.resolvingSoftLink && self.isSoftLink( o.filePath );
 
   if( terminateLink && o.writeMode !== 'rewrite' )
   {
@@ -4707,7 +4709,7 @@ operates.dstPath = { pathToWrite : 1 }
 
 // //
 //
-// function fileIsTextLinkAct( filePath )
+// function isTextLinkAct( filePath )
 // {
 //   let self = this;
 //
@@ -4721,30 +4723,41 @@ operates.dstPath = { pathToWrite : 1 }
 //   return !!result.resolved;
 // }
 //
-// var having = fileIsTextLinkAct.having = Object.create( null );
+// var having = isTextLinkAct.having = Object.create( null );
 //
 // having.writing = 0;
 // having.reading = 1;
 // having.driving = 0;
 //
-// var operates = fileIsTextLinkAct.operates = Object.create( null );
+// var operates = isTextLinkAct.operates = Object.create( null );
 //
 // operates.filePath = { pathToRead : 1 }
 
 //
 
-function fileIsTextLink( filePath )
+function isTextLink_body( o )
 {
   let self = this;
-  let path = self.path;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( _.assertRoutineOptions( isTextLink_body, arguments ) );
+  _.assert( _.boolLike( o.resolvingSoftLink ) );
+  // _.assert( _.boolLike( o.resolvingTextLink ) );
 
-  // filePath = path.normalize( filePath );
-  // let result = self.fileIsTextLinkAct( filePath );
-  // return result;
+  o.filePath = self.pathResolveLink
+  ({
+    filePath : o.filePath,
+    resolvingSoftLink : o.resolvingSoftLink,
+    resolvingTextLink : 0,
+    // resolvingTextLink : o.resolvingTextLink,
+  });
 
-  let stat = self.statRead( filePath );
+  let stat = self.statRead
+  ({
+    filePath : o.filePath,
+    resolvingSoftLink : 0,
+    resolvingTextLink : 0,
+  });
 
   if( !stat )
   return false;
@@ -4752,11 +4765,69 @@ function fileIsTextLink( filePath )
   return stat.isTextLink();
 }
 
-var having = fileIsTextLink.having = Object.create( null );
+var defaults = isTextLink_body.defaults = Object.create( null );
+
+defaults.filePath = null;
+defaults.resolvingSoftLink = 0;
+defaults.resolvingTextLink = 0;
+
+var paths = isTextLink_body.paths = Object.create( null );
+
+paths.filePath = null;
+
+var having = isTextLink_body.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
 having.driving = 0;
+having.hubResolving = 1;
+
+var operates = isTextLink_body.operates = Object.create( null );
+
+operates.filePath = { pathToRead : 1 }
+
+//
+
+let isTextLink = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isTextLink_body );
+
+isTextLink.defaults.resolvingSoftLink = 0;
+// isTextLink.defaults.resolvingTextLink = 0;
+
+isTextLink.having.aspect = 'entry';
+
+//
+
+let resolvedIsTextLink = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isTextLink_body );
+
+resolvedIsTextLink.defaults.resolvingSoftLink = null;
+// resolvedIsTextLink.defaults.resolvingTextLink = null;
+
+resolvedIsTextLink.having.aspect = 'entry';
+
+// function isTextLink_body( filePath )
+// {
+//   let self = this;
+//   let path = self.path;
+//
+//   _.assert( arguments.length === 1, 'Expects single argument' );
+//
+//   // filePath = path.normalize( filePath );
+//   // let result = self.isTextLinkAct( filePath );
+//   // return result;
+//
+//   let stat = self.statRead( filePath );
+//
+//   if( !stat )
+//   return false;
+//
+//   return stat.isTextLink();
+// }
+//
+// var having = isTextLink.having = Object.create( null );
+//
+// having.writing = 0;
+// having.reading = 1;
+// having.driving = 0;
 
 // //
 //
@@ -4764,11 +4835,11 @@ having.driving = 0;
 //  * Return True if `filePath` is a symbolic link.
 //  * @param filePath
 //  * @returns {boolean}
-//  * @method fileIsSoftLinkAct
+//  * @method isSoftLinkAct
 //  * @memberof wFileProviderPartial
 //  */
 //
-// function fileIsSoftLinkAct( filePath )
+// function isSoftLinkAct( filePath )
 // {
 //   let self = this;
 //
@@ -4790,13 +4861,13 @@ having.driving = 0;
 //   return stat.isSymbolicLink();
 // }
 //
-// var having = fileIsSoftLinkAct.having = Object.create( null );
+// var having = isSoftLinkAct.having = Object.create( null );
 //
 // having.writing = 0;
 // having.reading = 1;
 // having.driving = 0;
 //
-// var operates = fileIsSoftLinkAct.operates = Object.create( null );
+// var operates = isSoftLinkAct.operates = Object.create( null );
 //
 // operates.filePath = { pathToRead : 1 }
 
@@ -4806,35 +4877,104 @@ having.driving = 0;
  * Return True if `filePath` is a symbolic link.
  * @param filePath
  * @returns {boolean}
- * @method fileIsSoftLink
+ * @method isSoftLink
  * @memberof wFileProviderPartial
  */
 
-//
-
-function fileIsSoftLink( filePath )
+function isSoftLink_body( o )
 {
   let self = this;
-  let path = self.path;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( _.assertRoutineOptions( isSoftLink_body, arguments ) );
+  // _.assert( _.boolLike( o.resolvingSoftLink ) );
+  _.assert( _.boolLike( o.resolvingTextLink ) );
 
-  // filePath = path.normalize( filePath );
-  // let result = self.fileIsSoftLinkAct( filePath );
-  // return result;
-  // debugger;
+  o.filePath = self.pathResolveLink
+  ({
+    filePath : o.filePath,
+    resolvingSoftLink : 0,
+    // resolvingSoftLink : o.resolvingSoftLink,
+    resolvingTextLink : o.resolvingTextLink,
+  });
 
-  let stat = self.statRead( filePath );
+  let stat = self.statRead
+  ({
+    filePath : o.filePath,
+    resolvingSoftLink : 0,
+    resolvingTextLink : 0,
+  });
+
   if( !stat )
   return false;
+
   return stat.isSoftLink();
 }
 
-var having = fileIsSoftLink.having = Object.create( null );
+var defaults = isSoftLink_body.defaults = Object.create( null );
+
+defaults.filePath = null;
+// defaults.resolvingSoftLink = 0;
+defaults.resolvingTextLink = 0;
+
+var paths = isSoftLink_body.paths = Object.create( null );
+
+paths.filePath = null;
+
+var having = isSoftLink_body.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
 having.driving = 0;
+having.hubResolving = 1;
+
+var operates = isSoftLink_body.operates = Object.create( null );
+
+operates.filePath = { pathToRead : 1 }
+
+//
+
+let isSoftLink = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isSoftLink_body );
+
+// isSoftLink.defaults.resolvingSoftLink = 0;
+isSoftLink.defaults.resolvingTextLink = 0;
+
+isSoftLink.having.aspect = 'entry';
+
+//
+
+let resolvedIsSoftLink = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isSoftLink_body );
+
+// resolvedIsSoftLink.defaults.resolvingSoftLink = null;
+resolvedIsSoftLink.defaults.resolvingTextLink = null;
+
+resolvedIsSoftLink.having.aspect = 'entry';
+
+// //
+//
+// function isSoftLink( filePath )
+// {
+//   let self = this;
+//   let path = self.path;
+//
+//   _.assert( arguments.length === 1, 'Expects single argument' );
+//
+//   // filePath = path.normalize( filePath );
+//   // let result = self.isSoftLinkAct( filePath );
+//   // return result;
+//   // debugger;
+//
+//   let stat = self.statRead( filePath );
+//   if( !stat )
+//   return false;
+//   return stat.isSoftLink();
+// }
+//
+// var having = isSoftLink.having = Object.create( null );
+//
+// having.writing = 0;
+// having.reading = 1;
+// having.driving = 0;
 
 // //
 //
@@ -4842,11 +4982,11 @@ having.driving = 0;
 //  * Return True if file at `filePath` is a hard link.
 //  * @param filePath
 //  * @returns {boolean}
-//  * @method fileIsHardLinkAct
+//  * @method isHardLinkAct
 //  * @memberof wFileProviderPartial
 //  */
 //
-// function fileIsHardLinkAct( filePath )
+// function isHardLinkAct( filePath )
 // {
 //   let self = this;
 //
@@ -4865,13 +5005,13 @@ having.driving = 0;
 //   return stat.nlink >= 2;
 // }
 //
-// var having = fileIsHardLinkAct.having = Object.create( null );
+// var having = isHardLinkAct.having = Object.create( null );
 //
 // having.writing = 0;
 // having.reading = 1;
 // having.driving = 0;
 //
-// var operates = fileIsHardLinkAct.operates = Object.create( null );
+// var operates = isHardLinkAct.operates = Object.create( null );
 //
 // operates.filePath = { pathToRead : 1 }
 
@@ -4881,39 +5021,107 @@ having.driving = 0;
  * Return True if file at `filePath` is a hard link.
  * @param filePath
  * @returns {boolean}
- * @method fileIsHardLink
+ * @method isHardLink
  * @memberof wFileProviderPartial
  */
 
-function fileIsHardLink( filePath )
+function isHardLink_body( o )
 {
   let self = this;
-  let path = self.path;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( _.assertRoutineOptions( isHardLink_body, arguments ) );
+  _.assert( _.boolLike( o.resolvingSoftLink ) );
+  _.assert( _.boolLike( o.resolvingTextLink ) );
 
-  // filePath = path.normalize( filePath );
-  // let result = self.fileIsHardLinkAct( filePath );
-  // return result;
+  o.filePath = self.pathResolveLink
+  ({
+    filePath : o.filePath,
+    resolvingSoftLink : o.resolvingSoftLink,
+    resolvingTextLink : o.resolvingTextLink,
+  });
 
-  debugger;
-  let stat = self.statRead( filePath );
+  let stat = self.statRead
+  ({
+    filePath : o.filePath,
+    resolvingSoftLink : 0,
+    resolvingTextLink : 0,
+  });
 
   if( !stat )
   return false;
 
-  return stat.isTextLink();
+  return stat.isHardLink();
 }
 
-var having = fileIsHardLink.having = Object.create( null );
+var defaults = isHardLink_body.defaults = Object.create( null );
+
+defaults.filePath = null;
+defaults.resolvingSoftLink = 0;
+defaults.resolvingTextLink = 0;
+
+var paths = isHardLink_body.paths = Object.create( null );
+
+paths.filePath = null;
+
+var having = isHardLink_body.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
 having.driving = 0;
+having.hubResolving = 1;
+
+var operates = isHardLink_body.operates = Object.create( null );
+
+operates.filePath = { pathToRead : 1 }
 
 //
 
-function fileIsLink_body( o )
+let isHardLink = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isHardLink_body );
+
+isHardLink.defaults.resolvingSoftLink = 0;
+isHardLink.defaults.resolvingTextLink = 0;
+
+isHardLink.having.aspect = 'entry';
+
+//
+
+let resolvedIsHardLink = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isHardLink_body );
+
+resolvedIsHardLink.defaults.resolvingSoftLink = null;
+resolvedIsHardLink.defaults.resolvingTextLink = null;
+
+resolvedIsHardLink.having.aspect = 'entry';
+
+// function isHardLink( filePath )
+// {
+//   let self = this;
+//   let path = self.path;
+//
+//   _.assert( arguments.length === 1, 'Expects single argument' );
+//
+//   // filePath = path.normalize( filePath );
+//   // let result = self.isHardLinkAct( filePath );
+//   // return result;
+//
+//   debugger;
+//   let stat = self.statRead( filePath );
+//
+//   if( !stat )
+//   return false;
+//
+//   return stat.isTextLink();
+// }
+//
+// var having = isHardLink.having = Object.create( null );
+//
+// having.writing = 0;
+// having.reading = 1;
+// having.driving = 0;
+
+//
+
+function isLink_body( o )
 {
   let self = this;
 
@@ -4924,48 +5132,50 @@ function fileIsLink_body( o )
   if( o.resolvingSoftLink && o.resolvingTextLink )
   return result;
 
+  let stat = self.fileStat( o.filePath );
+
   if( !o.resolvingSoftLink  )
   {
-    result = self.fileIsSoftLink( o.filePath );
+    result = self.isSoftLink( o.filePath );
   }
 
   if( o.usingTextLink && !o.resolvingTextLink )
   {
     if( !result )
-    result = self.fileIsTextLink( o.filePath );
+    result = self.isTextLink( o.filePath );
   }
 
   return result;
 }
 
-var defaults = fileIsLink_body.defaults = Object.create( null );
+var defaults = isLink_body.defaults = Object.create( null );
 
 defaults.filePath = null;
 defaults.resolvingSoftLink = 0;
 defaults.resolvingTextLink = 0;
 defaults.usingTextLink = 0;
 
-var paths = fileIsLink_body.paths = Object.create( null );
+var paths = isLink_body.paths = Object.create( null );
 
 paths.filePath = null;
 
-var having = fileIsLink_body.having = Object.create( null );
+var having = isLink_body.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
 having.aspect = 'body';
 having.driving = 0;
 
-let fileIsLink = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, fileIsLink_body );
+let isLink = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isLink_body );
 
-fileIsLink.having.aspect = 'entry';
+isLink.having.aspect = 'entry';
 
-let fileResolvedIsLink = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, fileIsLink_body );
+let resolvedIsLink = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isLink_body );
 
-fileResolvedIsLink.defaults.resolvingSoftLink = null;
-fileResolvedIsLink.defaults.resolvingTextLink = null;
+resolvedIsLink.defaults.resolvingSoftLink = null;
+resolvedIsLink.defaults.resolvingTextLink = null;
 
-fileResolvedIsLink.having.aspect = 'entry';
+resolvedIsLink.having.aspect = 'entry';
 
 // --
 // link
@@ -5346,12 +5556,12 @@ function _link_functor( gen )
 
           // else if( _.definedIs( o.breakingDstSoftLink ) )
           // {
-          //   if( o.breakingDstSoftLink && self.fileIsSoftLink( o.dstPath ) )
+          //   if( o.breakingDstSoftLink && self.isSoftLink( o.dstPath ) )
           //   self.softLinkBreak({ filePath : o.dstPath, sync : 1 });
           // }
 
           let skipRenaming = false;
-          if( renamingSkipingHardLinks && self.fileIsHardLink( o.dstPath ) )
+          if( renamingSkipingHardLinks && self.isHardLink( o.dstPath ) )
           skipRenaming = true;
 
           if( renamingAllowed && !skipRenaming )
@@ -5465,7 +5675,7 @@ function _link_functor( gen )
         if( !dstExists || !renamingAllowed )
         return null;
 
-        if( renamingSkipingHardLinks && self.fileIsHardLink( o.dstPath ) )
+        if( renamingSkipingHardLinks && self.isHardLink( o.dstPath ) )
         return null;
 
         temp = tempNameMake();
@@ -6334,7 +6544,7 @@ function filesAreSoftLinked_body( files )
   if( files[ 0 ] === files[ 1 ] )
   return false;
 
-  if( !self.fileIsSoftLink( files[ 0 ] ) )
+  if( !self.isSoftLink( files[ 0 ] ) )
   return false;
 
   let resolved;
@@ -6702,9 +6912,9 @@ let Forbids =
 
   isTerminalAct : 'isTerminalAct',
   isDirAct : 'isDirAct',
-  fileIsTextLinkAct : 'fileIsTextLinkAct',
-  fileIsSoftLinkAct : 'fileIsSoftLinkAct',
-  fileIsHardLinkAct : 'fileIsHardLinkAct',
+  isTextLinkAct : 'isTextLinkAct',
+  isSoftLinkAct : 'isSoftLinkAct',
+  isHardLinkAct : 'isHardLinkAct',
 
 }
 
@@ -6913,43 +7123,57 @@ let Proto =
   filesAreHardLinkedAct : filesAreHardLinkedAct,
   filesAreHardLinked : filesAreHardLinked,
 
-  // fileIsTextLinkAct : fileIsTextLinkAct,
-  fileIsTextLink : fileIsTextLink,
-  filesAreTextLinks : _vectorize( fileIsTextLink ),
-  filesAllAreTextLinks : _vectorizeAll( fileIsTextLink ),
-  filesAnyAreTextLinks : _vectorizeAny( fileIsTextLink ),
-  filesNoneAreTextLinks : _vectorizeNone( fileIsTextLink ),
+  // isTextLinkAct : isTextLinkAct,
+  isTextLink,
+  filesAreTextLinks : _vectorize( isTextLink ),
+  allAreTextLinks : _vectorizeAll( isTextLink ),
+  anyAreTextLinks : _vectorizeAny( isTextLink ),
+  noneAreTextLinks : _vectorizeNone( isTextLink ),
+  resolvedIsTextLink,
+  resolvedAreTextLinks : _vectorize( resolvedIsTextLink ),
+  resolvedAllAreTextLinks : _vectorizeAll( resolvedIsTextLink ),
+  resolvedAnyAreTextLinks : _vectorizeAny( resolvedIsTextLink ),
+  resolvedNoneAreTextLinks : _vectorizeNone( resolvedIsTextLink ),
 
-  // fileIsSoftLinkAct : fileIsSoftLinkAct,
-  fileIsSoftLink : fileIsSoftLink,
-  filesAreSoftLinks : _vectorize( fileIsSoftLink ),
-  filesAllAreSoftLinks : _vectorizeAll( fileIsSoftLink ),
-  filesAnyAreSoftLinks : _vectorizeAny( fileIsSoftLink ),
-  filesNoneAreSoftLinks : _vectorizeNone( fileIsSoftLink ),
+  // isSoftLinkAct : isSoftLinkAct,
+  isSoftLink,
+  filesAreSoftLinks : _vectorize( isSoftLink ),
+  allAreSoftLinks : _vectorizeAll( isSoftLink ),
+  anyAreSoftLinks : _vectorizeAny( isSoftLink ),
+  noneAreSoftLinks : _vectorizeNone( isSoftLink ),
+  resolvedIsSoftLink,
+  resolvedAreSoftLinks : _vectorize( resolvedIsSoftLink ),
+  resolvedAllAreSoftLinks : _vectorizeAll( resolvedIsSoftLink ),
+  resolvedAnyAreSoftLinks : _vectorizeAny( resolvedIsSoftLink ),
+  resolvedNoneAreSoftLinks : _vectorizeNone( resolvedIsSoftLink ),
 
-  // fileIsHardLinkAct : fileIsHardLinkAct,
-  fileIsHardLink : fileIsHardLink,
-  filesAreHardLinks : _vectorize( fileIsHardLink ),
-  filesAllAreHardLinks : _vectorizeAll( fileIsHardLink ),
-  filesAnyAreHardLinks : _vectorizeAny( fileIsHardLink ),
-  filesNoneAreHardLinks : _vectorizeNone( fileIsHardLink ),
+  // isHardLinkAct : isHardLinkAct,
+  isHardLink,
+  areHardLinks : _vectorize( isHardLink ),
+  allAreHardLinks : _vectorizeAll( isHardLink ),
+  anyAreHardLinks : _vectorizeAny( isHardLink ),
+  noneAreHardLinks : _vectorizeNone( isHardLink ),
+  resolvedIsHardLink,
+  resolvedAreHardLinks : _vectorize( resolvedIsHardLink ),
+  resolvedAllAreHardLinks : _vectorizeAll( resolvedIsHardLink ),
+  resolvedAnyAreHardLinks : _vectorizeAny( resolvedIsHardLink ),
+  resolvedNoneAreHardLinks : _vectorizeNone( resolvedIsHardLink ),
 
-  fileIsLink : fileIsLink,
-  filesAreLinks : _vectorize( fileIsLink ),
-  filesAllAreLinks : _vectorizeAll( fileIsLink ),
-  filesAnyAreLinks : _vectorizeAny( fileIsLink ),
-  filesNoneAreLinks : _vectorizeNone( fileIsLink ),
+  isLink,
+  areLinks : _vectorize( isLink ),
+  allAreLinks : _vectorizeAll( isLink ),
+  anyAreLinks : _vectorizeAny( isLink ),
+  noneAreLinks : _vectorizeNone( isLink ),
+  resolvedIsLink,
+  filesResolvedAreLinks : _vectorize( resolvedIsLink ),
+  filesResolvedAllAreLinks : _vectorizeAll( resolvedIsLink ),
+  filesResolvedAnyAreLinks : _vectorizeAny( resolvedIsLink ),
+  filesResolvedNoneAreLinks : _vectorizeNone( resolvedIsLink ),
 
-  fileResolvedIsLink : fileResolvedIsLink,
-  filesResolvedAreLinks : _vectorize( fileResolvedIsLink ),
-  filesResolvedAllAreLinks : _vectorizeAll( fileResolvedIsLink ),
-  filesResolvedAnyAreLinks : _vectorizeAny( fileResolvedIsLink ),
-  filesResolvedNoneAreLinks : _vectorizeNone( fileResolvedIsLink ),
-
-  // filesAreSoftLinks : _.routineVectorize_functor( fileIsSoftLink ),
-  // filesAreHardLinks : _.routineVectorize_functor( fileIsHardLink ),
-  // filesAreTextLinks : _.routineVectorize_functor( fileIsTextLink ),
-  // filesAreLinks : _.routineVectorize_functor( fileIsLink ),
+  // filesAreSoftLinks : _.routineVectorize_functor( isSoftLink ),
+  // areHardLinks : _.routineVectorize_functor( isHardLink ),
+  // filesAreTextLinks : _.routineVectorize_functor( isTextLink ),
+  // areLinks : _.routineVectorize_functor( isLink ),
 
   // accessor
 

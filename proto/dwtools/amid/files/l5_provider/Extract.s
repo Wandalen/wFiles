@@ -80,7 +80,7 @@ function pathResolveSoftLinkAct( o )
   _.assert( self.path.isAbsolute( o.filePath ) );
 
   /* using self.resolvingSoftLink causes recursion problem in pathResolveLink */
-  if( !self.fileIsSoftLink( o.filePath ) )
+  if( !self.isSoftLink( o.filePath ) )
   return o.filePath;
 
   let descriptor = self._descriptorRead( o.filePath );
@@ -102,7 +102,7 @@ _.routineExtend( pathResolveSoftLinkAct, Parent.prototype.pathResolveSoftLinkAct
 //   _.assert( arguments.length === 1, 'Expects single argument' );
 //   _.assert( self.path.isAbsolute( o.filePath ) );
 //
-//   if( /*!self.resolvingHardLink ||*/ !self.fileIsHardLink( o.filePath ) )
+//   if( /*!self.resolvingHardLink ||*/ !self.isHardLink( o.filePath ) )
 //   return o.filePath;
 //
 //   let descriptor = self._descriptorRead( o.filePath );
@@ -125,7 +125,7 @@ _.routineExtend( pathResolveSoftLinkAct, Parent.prototype.pathResolveSoftLinkAct
 //   _.assert( arguments.length === 1, 'Expects single argument' );
 //   _.assert( self.path.isAbsolute( o.filePath ) );
 
-//   if( !self.fileIsSoftLink( o.filePath ) )
+//   if( !self.isSoftLink( o.filePath ) )
 //   return o.filePath;
 
 //   let descriptor = self._descriptorRead( o.filePath );
@@ -588,11 +588,11 @@ _.routineExtend( fileExistsAct, Parent.prototype.fileExistsAct );
 //  * Return True if file at `filePath` is a hard link.
 //  * @param filePath
 //  * @returns {boolean}
-//  * @method fileIsHardLink
+//  * @method isHardLink
 //  * @memberof wFileProviderExtract
 //  */
 //
-function fileIsHardLink( filePath )
+function isHardLink( filePath )
 {
   let self = this;
 
@@ -603,7 +603,7 @@ function fileIsHardLink( filePath )
   return self._descriptorIsHardLink( descriptor );
 }
 //
-// var having = fileIsHardLink.having = Object.create( null );
+// var having = isHardLink.having = Object.create( null );
 //
 // having.writing = 0;
 // having.reading = 1;
@@ -615,11 +615,11 @@ function fileIsHardLink( filePath )
 //  * Return True if file at `filePath` is a soft link.
 //  * @param filePath
 //  * @returns {boolean}
-//  * @method fileIsSoftLink
+//  * @method isSoftLink
 //  * @memberof wFileProviderExtract
 //  */
 //
-// function fileIsSoftLink( filePath )
+// function isSoftLink( filePath )
 // {
 //   let self = this;
 //
@@ -630,7 +630,7 @@ function fileIsHardLink( filePath )
 //   return self._descriptorIsSoftLink( descriptor );
 // }
 //
-// var having = fileIsSoftLink.having = Object.create( null );
+// var having = isSoftLink.having = Object.create( null );
 //
 // having.writing = 0;
 // having.reading = 1;
@@ -1069,10 +1069,10 @@ function fileCopyAct( o )
   {
     _copyPre();
 
-    if( o.breakingDstHardLink && self.fileIsHardLink( o.dstPath ) )
+    if( o.breakingDstHardLink && self.isHardLink( o.dstPath ) )
     self.hardLinkBreak({ filePath : o.dstPath, sync : 1 });
 
-    if( self.fileIsSoftLink( o.srcPath ) )
+    if( self.isSoftLink( o.srcPath ) )
     {
       if( self.fileExistsAct({ filePath : o.dstPath }) )
       self.fileDeleteAct({ filePath : o.dstPath, sync : 1 })
@@ -1094,7 +1094,7 @@ function fileCopyAct( o )
     return _.timeOut( 0, () => _copyPre() )
     .ifNoErrorThen( ( arg ) =>
     {
-      if( o.breakingDstHardLink && self.fileIsHardLink( o.dstPath ) )
+      if( o.breakingDstHardLink && self.isHardLink( o.dstPath ) )
       return self.hardLinkBreak({ filePath : o.dstPath, sync : 0 });
       return arg;
     })
@@ -1459,7 +1459,7 @@ function filesTreeRead( o )
       }
       else if( o.readingTerminals )
       {
-        // if( o.srcProvider.fileIsSoftLink
+        // if( o.srcProvider.isSoftLink
         // ({
         //   filePath : record.absolute,
         //   resolvingSoftLink : o.resolvingSoftLink,
@@ -2546,8 +2546,8 @@ let Proto =
   // isTerminalAct : isTerminalAct,
 
   // !!! should not walk around act
-  // fileIsHardLink : fileIsHardLink,
-  // fileIsSoftLink : fileIsSoftLink,
+  // isHardLink : isHardLink,
+  // isSoftLink : isSoftLink,
 
   filesAreHardLinkedAct : filesAreHardLinkedAct,
 

@@ -328,6 +328,8 @@ function _preSrcDstPathWithoutProviderDefaults( routine, args )
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
   _.assert( args.length === 1 || args.length === 2, 'Routine ' + routine.name + ' expects one or two arguments' );
 
+  let o = args[ 0 ];
+
   if( path.like( args[ 0 ] ) || path.like( args[ 1 ] ) )
   o = { dstPath : args[ 0 ], srcPath : args[ 1 ] }
 
@@ -6516,6 +6518,8 @@ having.aspect = 'entry';
 
 function textLink_body( o )
 {
+  let self = this;
+  let path = self.path;
 
   _.assertRoutineOptions( textLink_body, arguments );
   _.assert( path.is( o.srcPath ) );

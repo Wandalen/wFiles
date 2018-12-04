@@ -747,7 +747,7 @@ function statReadAct( o )
   function isTextLink()
   {
     if( this._isTextLink !== undefined )
-    return _isTextLink;
+    return this._isTextLink;
     this._isTextLink = self._isTextLink( o.filePath );
     return this._isTextLink;
   }

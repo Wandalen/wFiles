@@ -215,7 +215,7 @@ function _pathResolveTextLinkAct( o )
 
       }
       while( m && readSize < size );
-      File.close( f );
+      File.closeSync( f );
 
       if( m )
       o.hasLink = true;
@@ -291,14 +291,12 @@ function pathResolveSoftLinkAct( o )
       let result = File.readlinkSync( self.path.nativize( o.filePath ) );
 
       /* qqq : why? add experiment please? */
-      /* aaa : moved to pathResolveSoftLink_body */
-      // if( !o.relativeToDir )
-      // if( !self.path.isAbsolute( self.path.normalize( result ) ) )
-      // {
-      //   if( _.strBegins( result, '.\\' ) )
-      //   result = _.strIsolateBeginOrNone( result, '.\\' )[ 2 ];
-      //   result = '..\\' + result;
-      // }
+      if( !self.path.isAbsolute( self.path.normalize( result ) ) )
+      {
+        if( _.strBegins( result, '.\\' ) )
+        result = _.strIsolateBeginOrNone( result, '.\\' )[ 2 ];
+        result = '..\\' + result;
+      }
 
       return result;
     }

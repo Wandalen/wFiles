@@ -849,13 +849,6 @@ function pathResolveSoftLink_body( o )
 
   result = self.path.normalize( result );
 
-  if( !self.path.isAbsolute( result ) )
-  {
-    if( _.strBegins( result, './' ) )
-    result = _.strIsolateBeginOrNone( result, './' )[ 2 ];
-    result = '../' + result;
-  }
-
   if( !o.allowingMissing )
   {
     let resolvedPath = self.path.join( o.filePath, result );
@@ -1110,7 +1103,7 @@ function pathResolveLinkChain_body( o )
 
   if( o.resolvingSoftLink && stat.isSoftLink() )
   {
-    let filePath = self.pathResolveSoftLink({ filePath : o.filePath /*, allowingMissing : o.allowingMissing */ }); /* qqq : implement allowingMissing */
+    let filePath = self.pathResolveSoftLink({ filePath : o.filePath , allowingMissing : o.allowingMissing }); /* qqq : implement allowingMissing */
     _.assert( filePath !== o.filePath );
     if( filePath !== o.filePath )
     {

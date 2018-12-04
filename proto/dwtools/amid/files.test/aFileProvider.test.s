@@ -26161,8 +26161,8 @@ function pathResolveLinkChain( test )
   self.provider.filesDelete( _.path.dir( filePath ) );
   var o = _.mapExtend( null, o1, { filePath : filePath } );
   self.provider.pathResolveLinkChain( o );
-  test.identical( o.result, [ filePath ] )
-  test.identical( o.found, [ filePath ] )
+  test.identical( o.result, [ filePath, null ] )
+  test.identical( o.found, [ filePath, null ] )
 
   test.case = 'existing file';
   self.provider.filesDelete( _.path.dir( filePath ) );
@@ -26336,7 +26336,7 @@ function pathResolveLinkChain( test )
 
   //
 
-  test.case = 'absolute softlink to missing'
+  test.case = 'absolute softlink to missing, allowingMissing : 0'
   self.provider.filesDelete( _.path.dir( filePath ) );
   self.provider.softLink
   ({
@@ -26345,7 +26345,50 @@ function pathResolveLinkChain( test )
     makingDirectory : 1,
     allowingMissing : 1
   });
-  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1 } );
+  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissing : 0 } );
+  test.shouldThrowError( () => self.provider.pathResolveLinkChain( o ) );
+
+  //
+
+  test.case = 'absolute softlink to missing, allowingMissing : 1'
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.softLink
+  ({
+    dstPath : linkPath,
+    srcPath : filePath,
+    makingDirectory : 1,
+    allowingMissing : 1
+  });
+  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissing : 1 } );
+  var got = self.provider.pathResolveLinkChain( o );
+  var expectedFound =
+  [
+    linkPath,
+    filePath,
+    null
+  ]
+  var expectedResult =
+  [
+    linkPath,
+    filePath,
+    null
+  ]
+  test.identical( o.result, expectedResult );
+  test.identical( o.found, expectedFound );
+
+  //
+
+  test.case = 'relative softlink to missing'
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  var filePathRelative = self.provider.path.relative( linkPath,filePath );
+  self.provider.softLink
+  ({
+    dstPath : linkPath,
+    srcPath : filePathRelative,
+    makingDirectory : 1,
+    allowingMissing : 1
+  });
+  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissing : 0  } );
   test.shouldThrowError( () => self.provider.pathResolveLinkChain( o ) );
 
   //
@@ -26360,8 +26403,22 @@ function pathResolveLinkChain( test )
     makingDirectory : 1,
     allowingMissing : 1
   });
-  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1  } );
-  test.shouldThrowError( () => self.provider.pathResolveLinkChain( o ) );
+  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissing : 1  } );
+  var got = self.provider.pathResolveLinkChain( o );
+  var expectedFound =
+  [
+    linkPath,
+    filePath,
+    null
+  ]
+  var expectedResult =
+  [
+    linkPath,
+    filePath,
+    null
+  ]
+  test.identical( o.result, expectedResult );
+  test.identical( o.found, expectedFound );
 
   test.close( 'simple' );
 

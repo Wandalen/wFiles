@@ -813,7 +813,6 @@ var defaults = pathResolveSoftLinkAct.defaults = Object.create( null );
 
 defaults.filePath = null;
 // defaults.readLink = 0;
-// defaults.relativeToDir = 0; /* !!! qqq : what is it? aaa : moved to pathResolveSoftLink*/
 
 var paths = pathResolveSoftLinkAct.paths = Object.create( null );
 

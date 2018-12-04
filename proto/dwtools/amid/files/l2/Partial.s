@@ -813,7 +813,6 @@ var defaults = pathResolveSoftLinkAct.defaults = Object.create( null );
 
 defaults.filePath = null;
 // defaults.readLink = 0;
-defaults.relativeToDir = 0; /* !!! qqq : what is it? */
 
 var paths = pathResolveSoftLinkAct.paths = Object.create( null );
 
@@ -847,10 +846,27 @@ function pathResolveSoftLink_body( o )
 
   let result = self.pathResolveSoftLinkAct( o );
 
-  return self.path.normalize( result );
+  result = self.path.normalize( result );
+
+  if( !o.allowingMissing )
+  {
+    let resolvedPath = self.path.join( o.filePath, result );
+    let stat = self.statRead
+    ({
+      filePath : resolvedPath,
+      resolvingSoftLink : 0,
+      resolvingTextLink : 0
+    })
+    if( !stat )
+    throw _.err( 'Error resolving softlink:', o.filePath, '\nFile does not exist:', resolvedPath );
+  }
+
+  return result;
 }
 
 _.routineExtend( pathResolveSoftLink_body, pathResolveSoftLinkAct );
+
+pathResolveSoftLink_body.defaults.allowingMissing = 1;
 
 // var defaults = pathResolveSoftLink_body.defaults = Object.create( pathResolveSoftLinkAct.defaults );
 // var paths = pathResolveSoftLink_body.paths = Object.create( pathResolveSoftLinkAct.paths );
@@ -1001,7 +1017,7 @@ function pathResolveLinkChain_body( o )
 
   if( _.arrayHas( o.found, o.filePath ) )
   {
-    o.err = { cycleInLinks : true }; /* xxx */
+    o.err = { cycleInLinks : true }; /* xxx */ // used by Extract.statReadAct to get kind of error
     debugger;
     if( o.throwing )
     {
@@ -1086,7 +1102,7 @@ function pathResolveLinkChain_body( o )
 
   if( o.resolvingSoftLink && stat.isSoftLink() )
   {
-    let filePath = self.pathResolveSoftLink({ filePath : o.filePath /*, allowingMissing : o.allowingMissing */ }); /* qqq : implement allowingMissing */
+    let filePath = self.pathResolveSoftLink({ filePath : o.filePath , allowingMissing : o.allowingMissing }); /* qqq : implement allowingMissing */
     _.assert( filePath !== o.filePath );
     if( filePath !== o.filePath )
     {

@@ -7852,62 +7852,62 @@ function _filesReflect( t, o )
 
   /* */
 
-  // var p = o.prepare();
-  // var o1 = optionsMake();
-  // var o2 =
-  // {
-  //   linking : 'fileCopy',
-  //   srcDeleting : 0,
-  //   dstDeleting : 0,
-  //   writing : 1,
-  //   dstRewriting : 1,
-  //   dstRewritingByDistinct : 1,
-  //   preservingTime : 0,
-  // }
-  //
-  // t.case = 'complex move\n' + _.toStr( o2 );
-  //
-  // var records = p.hub.filesReflect( _.mapExtend( null, o1, o2 ) );
-  //
-  // var expected = _.FileProvider.Extract
-  // ({
-  //   filesTree :
-  //   {
-  //     src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-  //     dst : { a2 : '2', a1 : '1', b : '1', c : '1', dir : { a2 : '2', a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir4 : {}, dir5 : {}, srcFile : '1', dstFile : { f : '1' } },
-  //   },
-  // });
-  //
-  // t.identical( p.src.filesTree.src, expected.filesTree.src );
-  // t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
-  //
-  // var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
-  // var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
-  // var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
-  // var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy' ];
-  // var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
-  // var expectedPreserve = [ true, false, false, false, false, true, false, false, false, false, false, false, false, true, false, true, false, false, false ];
-  //
-  // var dstAbsolute = context.select( records, '*.dst.absolute' );
-  // var srcAbsolute = context.select( records, '*.src.absolute' );
-  // var effAbsolute = context.select( records, '*.effective.absolute' );
-  // var action = context.select( records, '*.action' );
-  // var allow = context.select( records, '*.allow' );
-  // var preserve = context.select( records, '*.preserve' );
-  //
-  // t.identical( dstAbsolute, expectedDstAbsolute );
-  // t.identical( srcAbsolute, expectedSrcAbsolute );
-  // t.identical( effAbsolute, expectedEffAbsolute );
-  // t.identical( action, expectedAction );
-  // t.identical( allow, expectedAllow );
-  // t.identical( preserve, expectedPreserve );
-  //
-  // t.identical( p.hub.filesAreHardLinked([ p.src.globalFromLocal( '/src/a1' ), p.dst.globalFromLocal( '/dst/a1' ) ]), false );
-  // t.identical( p.hub.filesAreHardLinked([ p.src.globalFromLocal( '/src/a2' ), p.dst.globalFromLocal( '/dst/a2' ) ]), false );
-  // t.identical( p.hub.filesAreHardLinked([ p.src.globalFromLocal( '/src/b' ), p.dst.globalFromLocal( '/dst/b' ) ]), false );
-  // t.identical( p.hub.filesAreHardLinked([ p.src.globalFromLocal( '/src/dir/a1' ), p.dst.globalFromLocal( '/dst/dir/a1' ) ]), false );
-  // t.identical( p.hub.filesAreHardLinked([ p.src.globalFromLocal( '/src/dir/a2' ), p.dst.globalFromLocal( '/dst/dir/a2' ) ]), false );
-  // t.identical( p.hub.filesAreHardLinked([ p.src.globalFromLocal( '/src/dir/b' ), p.dst.globalFromLocal( '/dst/dir/b' ) ]), false );
+  var p = o.prepare();
+  var o1 = optionsMake();
+  var o2 =
+  {
+    linking : 'fileCopy',
+    srcDeleting : 0,
+    dstDeleting : 0,
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 1,
+    preservingTime : 0,
+  }
+
+  t.case = 'complex move\n' + _.toStr( o2 );
+
+  var records = p.hub.filesReflect( _.mapExtend( null, o1, o2 ) );
+
+  var expected = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+      dst : { a2 : '2', a1 : '1', b : '1', c : '1', dir : { a2 : '2', a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir4 : {}, dir5 : {}, srcFile : '1', dstFile : { f : '1' } },
+    },
+  });
+
+  t.identical( p.src.filesTree.src, expected.filesTree.src );
+  t.identical( p.dst.filesTree.dst, expected.filesTree.dst );
+
+  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
+  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
+  var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
+  var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy' ];
+  var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
+  var expectedPreserve = [ true, false, false, false, false, true, false, false, false, false, false, false, false, true, false, true, false, false, false ];
+
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
+  var preserve = context.select( records, '*.preserve' );
+
+  t.identical( dstAbsolute, expectedDstAbsolute );
+  t.identical( srcAbsolute, expectedSrcAbsolute );
+  t.identical( effAbsolute, expectedEffAbsolute );
+  t.identical( action, expectedAction );
+  t.identical( allow, expectedAllow );
+  t.identical( preserve, expectedPreserve );
+
+  t.identical( p.hub.filesAreHardLinked([ p.src.globalFromLocal( '/src/a1' ), p.dst.globalFromLocal( '/dst/a1' ) ]), false );
+  t.identical( p.hub.filesAreHardLinked([ p.src.globalFromLocal( '/src/a2' ), p.dst.globalFromLocal( '/dst/a2' ) ]), false );
+  t.identical( p.hub.filesAreHardLinked([ p.src.globalFromLocal( '/src/b' ), p.dst.globalFromLocal( '/dst/b' ) ]), false );
+  t.identical( p.hub.filesAreHardLinked([ p.src.globalFromLocal( '/src/dir/a1' ), p.dst.globalFromLocal( '/dst/dir/a1' ) ]), false );
+  t.identical( p.hub.filesAreHardLinked([ p.src.globalFromLocal( '/src/dir/a2' ), p.dst.globalFromLocal( '/dst/dir/a2' ) ]), false );
+  t.identical( p.hub.filesAreHardLinked([ p.src.globalFromLocal( '/src/dir/b' ), p.dst.globalFromLocal( '/dst/dir/b' ) ]), false );
 
   /* */
 
@@ -7961,9 +7961,7 @@ function _filesReflect( t, o )
     t.identical( action, expectedAction );
     t.identical( allow, expectedAllow );
 
-    debugger;
     t.identical( p.hub.filesAreHardLinked([ p.src.globalFromLocal( '/src/a1' ), p.dst.globalFromLocal( '/dst/a1' ) ]), p.src === p.dst );
-    debugger;
     t.identical( p.hub.filesAreHardLinked([ p.src.globalFromLocal( '/src/a2' ), p.dst.globalFromLocal( '/dst/a2' ) ]), false );
     t.identical( p.hub.filesAreHardLinked([ p.src.globalFromLocal( '/src/b' ), p.dst.globalFromLocal( '/dst/b' ) ]), p.src === p.dst );
     t.identical( p.hub.filesAreHardLinked([ p.src.globalFromLocal( '/src/dir/a1' ), p.dst.globalFromLocal( '/dst/dir/a1' ) ]), p.src === p.dst );
@@ -7981,7 +7979,7 @@ function _filesReflect( t, o )
 
   }
 
-  debugger; return; xxx
+  // debugger; return; xxx
 
   /* */
 

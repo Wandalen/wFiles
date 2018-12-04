@@ -1327,9 +1327,16 @@ function _pathResolveLink_body( o )
   o2.found = [];
   o2.result = [];
   o2.resolvingIntermediateDirectories = 0;
-  self.pathResolveLinkChain.body.call( self, o2 );
+  let result = self.pathResolveLinkChain.body.call( self, o2 );
 
-  return o2.result[ o2.result.length-1 ];
+  if( result[ result.length-1 ] === null )
+  result = result[ result.length-2 ];
+  else
+  result = result[ result.length-1 ];
+
+  _.assert( result === null || _.strIs( result ) );
+
+  return result;
 }
 
 _pathResolveLink_body.defaults =

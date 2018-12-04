@@ -7508,7 +7508,6 @@ let Proto =
   fileCopy,
   softLink,
   hardLink,
-
   textLink,
   /* qqq : implement routine textLink */
 

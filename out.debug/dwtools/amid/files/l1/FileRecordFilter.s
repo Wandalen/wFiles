@@ -612,7 +612,7 @@ function _formMasks()
     filter.filterMap = Object.create( null );
     let _processed = path.globMapToRegexps( filter.stemPath/*globMap*/, filter.basePath  );
 
-    _.assert( filter.stemPath === null );
+    // _.assert( filter.stemPath === null );
     filter.stemPath = _.mapKeys( _processed.regexpMap );
     for( let p in _processed.regexpMap )
     {
@@ -670,8 +670,8 @@ function _formFinal()
 
   _.assert( arguments.length === 0 );
   _.assert( filter.formed === 4 );
-  // _.assert( _.strIs( filter.stemPath ) || _.arrayIs( filter.stemPath ) );
-  _.assert( _.strIs( filter.stemPath ) || _.mapIs( filter.stemPath ) );
+  _.assert( _.strIs( filter.stemPath ) || _.arrayIs( filter.stemPath ) || _.mapIs( filter.stemPath ) );
+  // _.assert( _.strIs( filter.stemPath ) || _.mapIs( filter.stemPath ) );
   _.assert( path.s.noneAreGlob( filter.stemPath ) );
   _.assert( path.s.allAreAbsolute( filter.stemPath ) || path.s.allAreGlobal( filter.stemPath ) );
   _.assert( _.objectIs( filter.basePath ) );

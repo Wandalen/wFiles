@@ -1038,6 +1038,7 @@ function pathResolveLinkChain_body( o )
     o.found.push( stat );
     o.result.push( stat );
 
+    if( o.result.length > 2 )
     if( o.throwing && !o.allowingMissing )
     {
       debugger;

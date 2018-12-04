@@ -239,20 +239,18 @@ function _statRead()
 
   /* resolve link */
 
-  // if( _.strEnds( record.real, 'filesReflectLinks/src/link' ) )
-  // debugger;
-
   record.real = c.effectiveFileProvider.pathResolveLink
   ({
     filePath : record.real,
     resolvingSoftLink : c.resolvingSoftLink,
     resolvingTextLink : c.resolvingTextLink,
     hub : c.fileProvider,
-    throwing : !c.allowingMissing,
+    allowingMissing : c.allowingMissing,
+    throwing : 1,
   });
 
-  // if( !record.real )
-  // debugger;
+  if( !record.real )
+  debugger;
 
   record.realAbsolute = record.real;
 
@@ -541,7 +539,6 @@ function _realUriGet()
   let c = record.context;
   let fileProvider = c.effectiveFileProvider;
   return fileProvider.globalFromLocal( record.real );
-  // return c.originPath + record.real;
 }
 
 //

@@ -658,7 +658,7 @@ function _filesFindTrivial( t, provider )
 
   t.case = 'setup trivial';
 
-  wasTree1.readToProvider( provider,context.testRootDirectory );
+  wasTree1.readToProvider( provider, context.testRootDirectory );
   var gotTree = _.FileProvider.Extract().rewriteFromProvider( provider, context.testRootDirectory );
   t.identical( gotTree.filesTree, wasTree1.filesTree );
 
@@ -670,7 +670,7 @@ function _filesFindTrivial( t, provider )
   var o2 = { recursive : '2', includingBase : 1, includingTransient : 1, includingTerminals : 1, includingDirs : 1 }
   t.case = 'find single terminal file . includingTransient : 1';
 
-  var got = provider.filesFind( _.mapExtend( null,o1,o2 ) );
+  var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [ '.' ];
   t.identical( got, expected );
 
@@ -680,7 +680,7 @@ function _filesFindTrivial( t, provider )
   var o2 = { recursive : '2', includingBase : 1, includingTransient : 0, includingTerminals : 1 }
   t.case = 'find single terminal file . includingTransient : 0';
 
-  var got = provider.filesFind( _.mapExtend( null,o1,o2 ) );
+  var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [];
   t.identical( got, expected );
 
@@ -690,7 +690,7 @@ function _filesFindTrivial( t, provider )
   var o2 = { recursive : '2', includingBase : 0, includingTransient : 1, includingTerminals : 1 }
   t.case = 'find single terminal file . includingBase : 0';
 
-  var got = provider.filesFind( _.mapExtend( null,o1,o2 ) );
+  var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [];
   t.identical( got, expected );
 
@@ -706,39 +706,39 @@ function _filesFindTrivial( t, provider )
 
   t.case = 'setup trivial';
 
-  wasTree1.readToProvider( provider,context.testRootDirectory );
-  var gotTree = _.FileProvider.Extract().rewriteFromProvider( provider,context.testRootDirectory );
+  wasTree1.readToProvider( provider, context.testRootDirectory );
+  var gotTree = _.FileProvider.Extract().rewriteFromProvider( provider, context.testRootDirectory );
   t.identical( gotTree.filesTree, wasTree1.filesTree );
 
-  wasTree1.readToProvider( provider,context.testRootDirectory );
+  wasTree1.readToProvider( provider, context.testRootDirectory );
 
   /* */
 
-  var o1 = { filePath : _.path.join( context.testRootDirectory,'f' ), outputFormat : 'relative' }
+  var o1 = { filePath : _.path.join( context.testRootDirectory, 'f' ), outputFormat : 'relative' }
   var o2 = { recursive : '2', includingBase : 1, includingTransient : 1, includingTerminals : 1 }
   t.case = 'find single terminal file . includingTerminals : 1';
 
-  var got = provider.filesFind( _.mapExtend( null,o1,o2 ) );
+  var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [ '.' ];
   t.identical( got, expected );
 
   /* */
 
-  var o1 = { filePath : _.path.join( context.testRootDirectory,'f' ), outputFormat : 'relative' }
+  var o1 = { filePath : _.path.join( context.testRootDirectory, 'f' ), outputFormat : 'relative' }
   var o2 = { recursive : '2', includingBase : 1, includingTransient : 1, includingTerminals : 0 }
   t.case = 'find single terminal file . includingTerminals : 0';
 
-  var got = provider.filesFind( _.mapExtend( null,o1,o2 ) );
+  var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [];
   t.identical( got, expected );
 
   /* */
 
-  var o1 = { filePath : _.path.join( context.testRootDirectory,'f' ), outputFormat : 'relative' }
+  var o1 = { filePath : _.path.join( context.testRootDirectory, 'f' ), outputFormat : 'relative' }
   var o2 = { recursive : '2', includingBase : 0, includingTransient : 1, includingTerminals : 1 }
   t.case = 'find single terminal file . includingBase : 0';
 
-  var got = provider.filesFind( _.mapExtend( null,o1,o2 ) );
+  var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [];
   t.identical( got, expected );
 
@@ -768,7 +768,7 @@ function _filesFindTrivial( t, provider )
   var o2 = { recursive : '2', includingBase : 1, includingTransient : 1, includingTerminals : 1, includingDirs : 1 }
   t.case = 'find includingBase : 1';
 
-  var got = provider.filesFind( _.mapExtend( null,o1,o2 ) );
+  var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [ '.', './d', './dir1', './dir1/a', './dir1/b', './dir1/dir11', './dir2', './dir2/c' ];
   t.identical( got, expected );
 
@@ -778,7 +778,7 @@ function _filesFindTrivial( t, provider )
   var o2 = { recursive : '2', includingBase : 0, includingTransient : 1, includingTerminals : 1, includingDirs : 1 }
   t.case = 'find includingBase:0';
 
-  var got = provider.filesFind( _.mapExtend( null,o1,o2 ) );
+  var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [ './d', './dir1', './dir1/a', './dir1/b', './dir1/dir11', './dir2', './dir2/c' ];
   t.identical( got, expected );
 
@@ -788,7 +788,7 @@ function _filesFindTrivial( t, provider )
   var o2 = { recursive : '2', includingBase : 1, includingTransient : 1, includingTerminals : 1, includingDirs : 0 }
   t.case = 'find includingTransient:0';
 
-  var got = provider.filesFind( _.mapExtend( null,o1,o2 ) );
+  var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [ './d', './dir1/a', './dir1/b', './dir2/c' ];
   t.identical( got, expected );
 
@@ -798,7 +798,7 @@ function _filesFindTrivial( t, provider )
   var o2 = { recursive : '2', includingBase : 1, includingTransient : 1, includingTerminals : 0, includingDirs : 1 }
   t.case = 'find includingTerminals:0';
 
-  var got = provider.filesFind( _.mapExtend( null,o1,o2 ) );
+  var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [ '.', './dir1', './dir1/dir11', './dir2' ];
   t.identical( got, expected );
 
@@ -817,10 +817,10 @@ function _filesFindTrivial( t, provider )
   // t.case = 'setup trivial';
   //
   // wasTree1.readToProvider({ dstProvider : provider, dstPath : context.testRootDirectory, allowDelete : 1 });
-  // var gotTree = _.FileProvider.Extract().rewriteFromProvider( provider,context.testRootDirectory );
+  // var gotTree = _.FileProvider.Extract().rewriteFromProvider( provider, context.testRootDirectory );
   // t.identical( gotTree.filesTree, wasTree1.filesTree );
   //
-  // logger.log( 'context.testRootDirectory',_.fileProvider.path.nativize( context.testRootDirectory ) );
+  // logger.log( 'context.testRootDirectory', _.fileProvider.path.nativize( context.testRootDirectory ) );
 
   // /* */
   //
@@ -828,7 +828,7 @@ function _filesFindTrivial( t, provider )
   // // var o2 = { recursive : '2', includingBase : 1, includingTransient : 1, includingTerminals : 1 }
   // // t.case = 'find includingTerminals:0';
   // //
-  // // var got = provider.filesFind( _.mapExtend( null,o1,o2 ) );
+  // // var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   // // var expected = [ '.', './dir1', './dir1/dir11', './dir2' ];
   // // t.identical( got, expected );
   //
@@ -841,10 +841,10 @@ function filesFindTrivial( t )
   var context = this;
 
   var provider = _.FileProvider.Extract();
-  context._filesFindTrivial( t,provider );
+  context._filesFindTrivial( t, provider );
 
   var provider = _.FileProvider.HardDrive();
-  context._filesFindTrivial( t,provider );
+  context._filesFindTrivial( t, provider );
 
 }
 
@@ -1121,7 +1121,7 @@ function filesFind( test )
     'a.*',
     'a.j?',
     '[!ab].s',
-    // '{x.*,a.*}' // not supported
+    // '{x.*, a.*}' // not supported
   ];
 
   /* */
@@ -1211,7 +1211,7 @@ function filesFind( test )
         if( options.outputFormat === 'absolute' || options.outputFormat === 'relative' )
         {
           logger.log( 'Files:', _.toStr( files.sort() ) )
-          logger.log( 'Expected:',_.toStr( expected.sort() ) )
+          logger.log( 'Expected:', _.toStr( expected.sort() ) )
           checks.push( test.identical( files.sort(), expected.sort() ) );
         }
       }
@@ -1230,9 +1230,9 @@ function filesFind( test )
   [
     '**/a/a.?',
     '**/b/a.??',
-    // '**/c/{x.*,c.*}', // not supported
-    // 'a/**/c/{x.*,c.*}',// not supported
-    // '**/b/{x,c}/*',// not supported
+    // '**/c/{x.*, c.*}', // not supported
+    // 'a/**/c/{x.*, c.*}', // not supported
+    // '**/b/{x, c}/*', // not supported
     '**/[!ab]/*.?s',
     'b/[a-c]/**/a/*',
     '[ab]/**/[!ac]/*',
@@ -1304,7 +1304,7 @@ function filesFind( test )
     var o =
     {
       data : t,
-      head : [ '#', 'level', 'outputFormat', 'recursive','i.terminals','i.dirs', 'glob', 'passed' ],
+      head : [ '#', 'level', 'outputFormat', 'recursive', 'i.terminals', 'i.dirs', 'glob', 'passed' ],
       colWidths :
       {
         0 : 4,
@@ -1421,8 +1421,8 @@ function filesFind( test )
 
         filesNames.forEach( ( name ) =>
         {
-          // var filePath = _.path.join( path,l + '-' + name );
-          var filePath = _.path.join( path,name );
+          // var filePath = _.path.join( path, l + '-' + name );
+          var filePath = _.path.join( path, name );
           var passed = true;
           var relative = _.path.dot( _.path.relative( o.basePath || testDir, filePath ) );
 
@@ -1513,7 +1513,7 @@ function filesFind( test )
         }
       })
     }
-    makePaths( tree ,testDir );
+    makePaths( tree , testDir );
     paths.sort();
     paths.forEach( ( p ) => _.fileProvider.fileWrite( p, '' ) )
     return paths;
@@ -1530,7 +1530,7 @@ function filesFind2( t )
   var context = this;
   var dir = _.path.join( context.testRootDirectory, t.name );
   var provider = _.FileProvider.HardDrive();
-  var filePath,got,expected;
+  var filePath, got, expected;
 
   var filesTree =
   {
@@ -1576,7 +1576,7 @@ function filesFind2( t )
       for( var j = 0; j < src.length; j++ )
       {
         if( _.RegexpObject.test( orderingExclusion[ i ], src[ j ]  ) )
-        if( _.arrayRightIndex( result,src[ j ] ) >= 0 )
+        if( _.arrayRightIndex( result, src[ j ] ) >= 0 )
         continue;
         else
         result.push( src[ j ] );
@@ -1593,14 +1593,14 @@ function filesFind2( t )
 
   got = provider.filesFind( dir );
   expected = provider.dirRead( dir );
-  t.identical( check( got,expected ), true );
+  t.identical( check( got, expected ), true );
 
   /*filePath - terminal file*/
 
   filePath = _.path.join( dir, __filename );
   got = provider.filesFind( filePath );
   expected = provider.dirRead( filePath );
-  t.identical( check( got,expected ), true );
+  t.identical( check( got, expected ), true );
 
   /*filePath - empty dir*/
 
@@ -1636,7 +1636,7 @@ function filesFind2( t )
   var expected = [];
   t.identical( got, expected );
 
-  /*filePath - some paths don't exist,allowingMissing off*/
+  /*filePath - some paths don't exist, allowingMissing off*/
 
   debugger;
   got = provider.filesFind
@@ -1649,7 +1649,7 @@ function filesFind2( t )
   t.identical( check( got, expected ), true )
   debugger;
 
-  /*filePath - some paths not exist,allowingMissing on*/
+  /*filePath - some paths not exist, allowingMissing on*/
 
   got = provider.filesFind
   ({
@@ -1662,52 +1662,52 @@ function filesFind2( t )
 
   /* */
 
-  t.description = 'includingTerminals,includingTransient options';
+  t.description = 'includingTerminals, includingTransient options';
 
-  /*filePath - empty dir, includingTerminals,includingTransient on*/
+  /*filePath - empty dir, includingTerminals, includingTransient on*/
 
   provider.dirMake( _.path.join( context.testRootDirectory, 'empty' ) )
   got = provider.filesFind({ filePath : _.path.join( dir, 'empty' ), includingTerminals : 1, includingTransient : 1 });
   t.identical( got, [] );
 
-   /*filePath - empty dir, includingTerminals,includingTransient on, includingBase off*/
+   /*filePath - empty dir, includingTerminals, includingTransient on, includingBase off*/
 
    provider.dirMake( _.path.join( context.testRootDirectory, 'empty' ) )
    got = provider.filesFind({ filePath : _.path.join( dir, 'empty' ), includingTerminals : 1, includingTransient : 1, includingBase : 0 });
    t.identical( got, [] );
 
-  /*filePath - empty dir, includingTerminals,includingTransient off*/
+  /*filePath - empty dir, includingTerminals, includingTransient off*/
 
   provider.dirMake( _.path.join( context.testRootDirectory, 'empty' ) )
   got = provider.filesFind({ filePath : _.path.join( dir, 'empty' ), includingTerminals : 0, includingTransient : 0 });
   t.identical( got, [] );
 
-  /*filePath - directory, includingTerminals,includingTransient on*/
+  /*filePath - directory, includingTerminals, includingTransient on*/
 
   got = provider.filesFind({ filePath : dir, includingTerminals : 1, includingTransient : 1, includingBase : 0 });
   expected = provider.dirRead( dir );
-  t.identical( check( got,expected ), true );
+  t.identical( check( got, expected ), true );
 
-  /*filePath - directory, includingTerminals,includingTransient off*/
+  /*filePath - directory, includingTerminals, includingTransient off*/
 
   got = provider.filesFind({ filePath : dir, includingTerminals : 0, includingTransient : 0 });
   expected = provider.dirRead( dir );
   t.identical( got, [] );
 
-  /*filePath - directory, includingTerminals off,includingTransient on*/
+  /*filePath - directory, includingTerminals off, includingTransient on*/
 
   got = provider.filesFind({ filePath : dir, includingTerminals : 0, includingTransient : 1, includingBase : 0 });
   expected = provider.dirRead( dir );
-  t.identical( check( got,expected ), true  );
+  t.identical( check( got, expected ), true  );
 
-  /*filePath - terminal file, includingTerminals,includingTransient off*/
+  /*filePath - terminal file, includingTerminals, includingTransient off*/
 
   filePath = _.path.join( dir, __filename );
   got = provider.filesFind({ filePath : filePath, includingTerminals : 0, includingTransient : 0 });
   expected = provider.dirRead( dir );
   t.identical( got, [] );
 
-  /*filePath - terminal file, includingTerminals off,includingTransient on*/
+  /*filePath - terminal file, includingTerminals off, includingTransient on*/
 
   filePath = _.path.join( dir, __filename );
   got = provider.filesFind({ filePath : filePath, includingTerminals : 0, includingTransient : 1 });
@@ -1717,20 +1717,20 @@ function filesFind2( t )
 
   t.description = 'outputFormat option';
 
-  /*filePath - directory,outputFormat absolute */
+  /*filePath - directory, outputFormat absolute */
 
   got = provider.filesFind({ filePath : dir, outputFormat : 'record' });
   function recordIs( element ){ return element.constructor.name === 'wFileRecord' };
   expected = provider.dirRead( dir );
   t.identical( check( got, recordIs ), true );
 
-  /*filePath - directory,outputFormat absolute */
+  /*filePath - directory, outputFormat absolute */
 
   got = provider.filesFind({ filePath : dir, outputFormat : 'absolute' });
   expected = provider.dirRead( dir );
   t.identical( check( got, _.path.isAbsolute ), true );
 
-  /*filePath - directory,outputFormat relative */
+  /*filePath - directory, outputFormat relative */
 
   got = provider.filesFind({ filePath : dir, outputFormat : 'relative' });
   expected = provider.dirRead( dir );
@@ -1738,12 +1738,12 @@ function filesFind2( t )
   expected[ i ] = _.path.join( './', expected[ i ] );
   t.identical( check( got, expected ), true );
 
-  /*filePath - directory,outputFormat nothing */
+  /*filePath - directory, outputFormat nothing */
 
   got = provider.filesFind({ filePath : dir, outputFormat : 'nothing' });
   t.identical( got, [] );
 
-  /*filePath - directory,outputFormat unexpected */
+  /*filePath - directory, outputFormat unexpected */
 
   t.shouldThrowErrorSync( function()
   {
@@ -1840,9 +1840,9 @@ function filesFind2( t )
   });
   t.identical( got, [] );
 
-  /*filePath - directory, orderingExclusion mask,maskTerminal null,expected order Caching->Files*/
+  /*filePath - directory, orderingExclusion mask, maskTerminal null, expected order Caching->Files*/
 
-  var orderingExclusion = [ 'src','dir3' ];
+  var orderingExclusion = [ 'src', 'dir3' ];
   got = provider.filesFind
   ({
     filePath : dir,
@@ -1956,7 +1956,7 @@ function filesFindRecursive( test )
     outputFormat : 'relative',
     recursive : '1',
   })
-  var expected = [ '.', './src','./src2' ]
+  var expected = [ '.', './src', './src2' ]
   test.identical( got, expected );
 
   var got = provider.filesFind
@@ -2480,8 +2480,8 @@ function filesFindLinked( test )
     recursive : '2',
     includingBase : 1,
   })
-  test.identical( _.select( got, '*/absolute' ), [ '/toDir','/toDir/terminal'  ] );
-  test.identical( _.select( got, '*/real' ), [ '/directory','/directory/terminal'  ] );
+  test.identical( _.select( got, '*/absolute' ), [ '/toDir', '/toDir/terminal'  ] );
+  test.identical( _.select( got, '*/real' ), [ '/directory', '/directory/terminal'  ] );
 
   test.close( 'link to directory, extract' );
 
@@ -2687,9 +2687,9 @@ function filesFindResolving( test )
 
   /*
 
-    resolvingSoftLink : 0,1
-    resolvingTextLink : 0,1
-    provider : usingTextLink : 0,1
+    resolvingSoftLink : 0, 1
+    resolvingTextLink : 0, 1
+    provider : usingTextLink : 0, 1
 
   */
 
@@ -3668,7 +3668,7 @@ function filesFindPerformance( t )
       provider.fileWrite({ filePath : path, data : 'abc', writeMode : 'rewrite' } );
     }
 
-    logger.log( _.timeSpent( 'Spent to make ' + filesNumber +' files tree',t1 ) );
+    logger.log( _.timeSpent( 'Spent to make ' + filesNumber +' files tree', t1 ) );
   }
 
   var times = 10;
@@ -3685,7 +3685,7 @@ function filesFindPerformance( t )
     });
   }
 
-  logger.log( _.timeSpent( 'Spent to make  provider.filesFind x' + times + ' times in dir with ' + filesNumber +' files tree',t2 ) );
+  logger.log( _.timeSpent( 'Spent to make  provider.filesFind x' + times + ' times in dir with ' + filesNumber +' files tree', t2 ) );
 
   t.identical( files.length, filesNumber );
 
@@ -3702,7 +3702,7 @@ function filesFindPerformance( t )
   //     recursive : '2'
   //   });
   // }
-  // logger.log( _.timeSpent( 'Spent to make CachingStats.filesFind x' + times + ' times in dir with ' + filesNumber +' files tree',t2 ) );
+  // logger.log( _.timeSpent( 'Spent to make CachingStats.filesFind x' + times + ' times in dir with ' + filesNumber +' files tree', t2 ) );
 
   /*stats, dirRead filters filesFind*/
 
@@ -3717,7 +3717,7 @@ function filesFindPerformance( t )
   //   });
   // }
 
-  // logger.log( _.timeSpent( 'Spent to make filesFind with three filters x' + times + ' times in dir with ' + filesNumber +' files tree',t2 ) );
+  // logger.log( _.timeSpent( 'Spent to make filesFind with three filters x' + times + ' times in dir with ' + filesNumber +' files tree', t2 ) );
 
   // t.identical( files.length, filesNumber );
 }
@@ -5493,7 +5493,7 @@ function filesGlob( test )
 
   /* {} are not supported, yet zzz */
 
-  // var  glob = 'a/{x.*,a.*}';
+  // var  glob = 'a/{x.*, a.*}';
   // var options = completeOptions( glob );
   // var got = _.fileProvider.filesGlob( options );
   // var expected =
@@ -5505,7 +5505,7 @@ function filesGlob( test )
   // ]
   // test.identical( got, expected );
   //
-  // var  glob = '**/c/{x.*,c.*}';
+  // var  glob = '**/c/{x.*, c.*}';
   // var options = completeOptions( glob );
   // var got = _.fileProvider.filesGlob( options );
   // var expected =
@@ -5517,7 +5517,7 @@ function filesGlob( test )
   // ]
   // test.identical( got, expected );
   //
-  // var  glob = 'b/*/{x,c}/a/*';
+  // var  glob = 'b/*/{x, c}/a/*';
   // var options = completeOptions( glob );
   // var got = _.fileProvider.filesGlob( options );
   // var expected =
@@ -6318,7 +6318,7 @@ function filesReflectTrivial( t )
 
   //
 
-  t.case = 'linking : nop,dst files will be deleted for rewriting after onWriteDstUp call'
+  t.case = 'linking : nop, dst files will be deleted for rewriting after onWriteDstUp call'
   var tree =
   {
     'src' :
@@ -7346,7 +7346,7 @@ function filesReflectWithFilter( t )
     prepare : prepareSingle,
   }
 
-  context._filesReflectWithFilter( t,o );
+  context._filesReflectWithFilter( t, o );
 
   /* */
 
@@ -7355,7 +7355,7 @@ function filesReflectWithFilter( t )
     prepare : prepareTwo,
   }
 
-  context._filesReflectWithFilter( t,o );
+  context._filesReflectWithFilter( t, o );
 
 }
 
@@ -7818,7 +7818,7 @@ function filesReflect( t )
     prepare : prepareSingle,
   }
 
-  context._filesReflect( t,o );
+  context._filesReflect( t, o );
 
   /* */
 
@@ -7827,7 +7827,7 @@ function filesReflect( t )
     prepare : prepareTwo,
   }
 
-  context._filesReflect( t,o );
+  context._filesReflect( t, o );
 
 }
 
@@ -7867,7 +7867,7 @@ function _filesReflect( t, o )
   //
   // t.case = 'complex move\n' + _.toStr( o2 );
   //
-  // var records = p.hub.filesReflect( _.mapExtend( null,o1,o2 ) );
+  // var records = p.hub.filesReflect( _.mapExtend( null, o1, o2 ) );
   //
   // var expected = _.FileProvider.Extract
   // ({
@@ -7929,7 +7929,7 @@ function _filesReflect( t, o )
   if( p.src === p.dst )
   {
 
-    var records = p.hub.filesReflect( _.mapExtend( null,o1,o2 ) );
+    var records = p.hub.filesReflect( _.mapExtend( null, o1, o2 ) );
 
     var expected = _.FileProvider.Extract
     ({
@@ -7949,26 +7949,26 @@ function _filesReflect( t, o )
     var expectedAction = [ 'dirMake', 'hardlink', 'hardlink', 'hardlink', 'hardlink', 'dirMake', 'hardlink', 'hardlink', 'hardlink', 'dirMake', 'hardlink', 'hardlink', 'hardlink', 'dirMake', 'dirMake', 'dirMake', 'hardlink', 'dirMake', 'hardlink' ];
     var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
 
-    var dstAbsolute = context.select( records,'*.dst.absolute' );
-    var srcAbsolute = context.select( records,'*.src.absolute' );
-    var effAbsolute = context.select( records,'*.effective.absolute' );
+    var dstAbsolute = context.select( records, '*.dst.absolute' );
+    var srcAbsolute = context.select( records, '*.src.absolute' );
+    var effAbsolute = context.select( records, '*.effective.absolute' );
     var action = context.select( records, '*.action' );
     var allow = context.select( records, '*.allow' );
 
-    // t.identical( dstAbsolute, expectedDstAbsolute );
-    // t.identical( srcAbsolute, expectedSrcAbsolute );
-    // t.identical( effAbsolute, expectedEffAbsolute );
-    // t.identical( action, expectedAction );
-    // t.identical( allow, expectedAllow );
+    t.identical( dstAbsolute, expectedDstAbsolute );
+    t.identical( srcAbsolute, expectedSrcAbsolute );
+    t.identical( effAbsolute, expectedEffAbsolute );
+    t.identical( action, expectedAction );
+    t.identical( allow, expectedAllow );
 
     debugger;
-    t.identical( p.hub.filesAreHardLinked([ p.src.globalFromLocal( '/src/a1' ),p.dst.globalFromLocal( '/dst/a1' ) ]), p.src === p.dst );
+    t.identical( p.hub.filesAreHardLinked([ p.src.globalFromLocal( '/src/a1' ), p.dst.globalFromLocal( '/dst/a1' ) ]), p.src === p.dst );
     debugger;
-    t.identical( p.hub.filesAreHardLinked([ p.src.globalFromLocal( '/src/a2' ),p.dst.globalFromLocal( '/dst/a2' ) ]), false );
-    t.identical( p.hub.filesAreHardLinked([ p.src.globalFromLocal( '/src/b' ),p.dst.globalFromLocal( '/dst/b' ) ]), p.src === p.dst );
-    t.identical( p.hub.filesAreHardLinked([ p.src.globalFromLocal( '/src/dir/a1' ),p.dst.globalFromLocal( '/dst/dir/a1' ) ]), p.src === p.dst );
-    t.identical( p.hub.filesAreHardLinked([ p.src.globalFromLocal( '/src/dir/a2' ),p.dst.globalFromLocal( '/dst/dir/a2' ) ]), false );
-    t.identical( p.hub.filesAreHardLinked([ p.src.globalFromLocal( '/src/dir/b' ),p.dst.globalFromLocal( '/dst/dir/b' ) ]), p.src === p.dst );
+    t.identical( p.hub.filesAreHardLinked([ p.src.globalFromLocal( '/src/a2' ), p.dst.globalFromLocal( '/dst/a2' ) ]), false );
+    t.identical( p.hub.filesAreHardLinked([ p.src.globalFromLocal( '/src/b' ), p.dst.globalFromLocal( '/dst/b' ) ]), p.src === p.dst );
+    t.identical( p.hub.filesAreHardLinked([ p.src.globalFromLocal( '/src/dir/a1' ), p.dst.globalFromLocal( '/dst/dir/a1' ) ]), p.src === p.dst );
+    t.identical( p.hub.filesAreHardLinked([ p.src.globalFromLocal( '/src/dir/a2' ), p.dst.globalFromLocal( '/dst/dir/a2' ) ]), false );
+    t.identical( p.hub.filesAreHardLinked([ p.src.globalFromLocal( '/src/dir/b' ), p.dst.globalFromLocal( '/dst/dir/b' ) ]), p.src === p.dst );
 
   }
   else
@@ -7976,7 +7976,7 @@ function _filesReflect( t, o )
 
     t.shouldThrowErrorSync( function()
     {
-      var records = p.hub.filesReflect( _.mapExtend( null,o1,o2 ) );
+      var records = p.hub.filesReflect( _.mapExtend( null, o1, o2 ) );
     });
 
   }
@@ -8001,7 +8001,7 @@ function _filesReflect( t, o )
 
   t.case = 'complex move with dstRewriting:0, includingNonAllowed:0\n' + _.toStr( o2 );
 
-  var records = p.hub.filesReflect( _.mapExtend( null,o1,o2 ) );
+  var records = p.hub.filesReflect( _.mapExtend( null, o1, o2 ) );
 
   var expected = _.FileProvider.Extract
   ({
@@ -8051,7 +8051,7 @@ function _filesReflect( t, o )
 
   t.case = 'complex move with dstRewriting:0, includingNonAllowed:1\n' + _.toStr( o2 );
 
-  var records = p.hub.filesReflect( _.mapExtend( null,o1,o2 ) );
+  var records = p.hub.filesReflect( _.mapExtend( null, o1, o2 ) );
 
   var expected = _.FileProvider.Extract
   ({
@@ -8101,7 +8101,7 @@ function _filesReflect( t, o )
 
   t.case = 'complex move with writing : 0\n' + _.toStr( o2 );
 
-  var records = p.hub.filesReflect( _.mapExtend( null,o1,o2 ) );
+  var records = p.hub.filesReflect( _.mapExtend( null, o1, o2 ) );
 
   var expected = _.FileProvider.Extract
   ({
@@ -8121,11 +8121,11 @@ function _filesReflect( t, o )
   var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy' ];
   var expectedAllow = [ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false ];
 
-  var dstAbsolute = context.select( records,'*.dst.absolute' );
-  var srcAbsolute = context.select( records,'*.src.absolute' );
-  var effAbsolute = context.select( records,'*.effective.absolute' );
-  var action = context.select( records,'*.action' );
-  var allow = context.select( records,'*.allow' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
+  var allow = context.select( records, '*.allow' );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -8151,7 +8151,7 @@ function _filesReflect( t, o )
 
   t.case = 'complex move with writing : 1, linking : nop\n' + _.toStr( o2 );
 
-  var records = p.hub.filesReflect( _.mapExtend( null,o1,o2 ) );
+  var records = p.hub.filesReflect( _.mapExtend( null, o1, o2 ) );
 
   var expected = _.FileProvider.Extract
   ({
@@ -8171,14 +8171,14 @@ function _filesReflect( t, o )
   var expectedAction = [ 'dirMake', 'nop', 'nop', 'nop', 'nop', 'dirMake', 'nop', 'nop', 'nop', 'dirMake', 'nop', 'nop', 'nop', 'dirMake', 'dirMake', 'dirMake', 'nop', 'dirMake', 'nop' ];
   var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
 
-  var dstAbsolute = context.select( records,'*.dst.absolute' );
-  var srcAbsolute = context.select( records,'*.src.absolute' );
-  var effAbsolute = context.select( records,'*.effective.absolute' );
-  var action = context.select( records,'*.action' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
   var allow = context.select( records, '*.allow' );
 
-  logger.log( 'expectedEffAbsolute',expectedEffAbsolute );
-  logger.log( 'action',action );
+  logger.log( 'expectedEffAbsolute', expectedEffAbsolute );
+  logger.log( 'action', action );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -8204,7 +8204,7 @@ function _filesReflect( t, o )
 
   t.case = 'complex move with writing : 1, dstRewriting : 0, includingNonAllowed : 0, linking : nop\n' + _.toStr( o2 );
 
-  var records = p.hub.filesReflect( _.mapExtend( null,o1,o2 ) );
+  var records = p.hub.filesReflect( _.mapExtend( null, o1, o2 ) );
 
   var expected = _.FileProvider.Extract
   ({
@@ -8224,14 +8224,14 @@ function _filesReflect( t, o )
   var expectedAction = [ 'dirMake', 'nop', 'dirMake', 'nop', 'dirMake', 'nop', 'nop', 'nop', 'dirMake', 'dirMake', 'dirMake' ];
   var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true ];
 
-  var dstAbsolute = context.select( records,'*.dst.absolute' );
-  var srcAbsolute = context.select( records,'*.src.absolute' );
-  var effAbsolute = context.select( records,'*.effective.absolute' );
-  var action = context.select( records,'*.action' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
   var allow = context.select( records, '*.allow' );
 
-  logger.log( 'expectedEffAbsolute',expectedEffAbsolute );
-  logger.log( 'action',action );
+  logger.log( 'expectedEffAbsolute', expectedEffAbsolute );
+  logger.log( 'action', action );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -8257,7 +8257,7 @@ function _filesReflect( t, o )
 
   t.case = 'complex move with writing : 1, dstRewriting : 0, includingNonAllowed : 1, linking : nop\n' + _.toStr( o2 );
 
-  var records = p.hub.filesReflect( _.mapExtend( null,o1,o2 ) );
+  var records = p.hub.filesReflect( _.mapExtend( null, o1, o2 ) );
 
   var expected = _.FileProvider.Extract
   ({
@@ -8277,14 +8277,14 @@ function _filesReflect( t, o )
   var expectedAction = [ 'dirMake', 'nop', 'nop', 'nop', 'nop', 'dirMake', 'nop', 'nop', 'nop', 'dirMake', 'nop', 'nop', 'nop', 'dirMake', 'dirMake', 'dirMake', 'nop', 'dirMake' ];
   var expectedAllow = [ true, true, false, false, false, true, true, false, false, true, true, true, true, true, true, true, false, false ];
 
-  var dstAbsolute = context.select( records,'*.dst.absolute' );
-  var srcAbsolute = context.select( records,'*.src.absolute' );
-  var effAbsolute = context.select( records,'*.effective.absolute' );
-  var action = context.select( records,'*.action' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
+  var action = context.select( records, '*.action' );
   var allow = context.select( records, '*.allow' );
 
-  logger.log( 'expectedEffAbsolute',expectedEffAbsolute );
-  logger.log( 'action',action );
+  logger.log( 'expectedEffAbsolute', expectedEffAbsolute );
+  logger.log( 'action', action );
 
   t.identical( dstAbsolute, expectedDstAbsolute );
   t.identical( srcAbsolute, expectedSrcAbsolute );
@@ -8310,7 +8310,7 @@ function _filesReflect( t, o )
 
   t.case = 'complex move with preservingSame : 1, linking : fileCopy\n' + _.toStr( o2 );
 
-  var records = p.hub.filesReflect( _.mapExtend( null,o1,o2 ) );
+  var records = p.hub.filesReflect( _.mapExtend( null, o1, o2 ) );
 
   var expected = _.FileProvider.Extract
   ({
@@ -8362,7 +8362,7 @@ function _filesReflect( t, o )
 
   t.case = 'complex move with srcDeleting : 1\n' + _.toStr( o2 );
 
-  var records = p.hub.filesReflect( _.mapExtend( null,o1,o2 ) );
+  var records = p.hub.filesReflect( _.mapExtend( null, o1, o2 ) );
 
   var expected = _.FileProvider.Extract
   ({
@@ -8383,9 +8383,9 @@ function _filesReflect( t, o )
   var expectedSrcActions = [ 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete' ];
   var expectedSrcAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
 
-  var dstAbsolute = context.select( records,'*.dst.absolute' );
-  var srcAbsolute = context.select( records,'*.src.absolute' );
-  var effAbsolute = context.select( records,'*.effective.absolute' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
   var action = context.select( records, '*.action' );
   var allow = context.select( records, '*.allow' );
   var srcActions = context.select( records, '*.srcAction' );
@@ -8416,7 +8416,7 @@ function _filesReflect( t, o )
 
   t.case = 'complex move with srcDeleting : 1, dstRewriting : 0\n' + _.toStr( o2 );
 
-  var records = p.hub.filesReflect( _.mapExtend( null,o1,o2 ) );
+  var records = p.hub.filesReflect( _.mapExtend( null, o1, o2 ) );
 
   var expected = _.FileProvider.Extract
   ({
@@ -8438,9 +8438,9 @@ function _filesReflect( t, o )
   var expectedSrcActions = [ 'fileDelete', 'fileDelete', null, null, null, 'fileDelete', 'fileDelete', null, null, 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', null, null ];
   var expectedSrcAllow = [ false, true, true, true, true, false, true, true, true, true, true, true, true, true, true, false, true, true ];
 
-  var dstAbsolute = context.select( records,'*.dst.absolute' );
-  var srcAbsolute = context.select( records,'*.src.absolute' );
-  var effAbsolute = context.select( records,'*.effective.absolute' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
   var action = context.select( records, '*.action' );
   var allow = context.select( records, '*.allow' );
   var srcActions = context.select( records, '*.srcAction' );
@@ -8473,7 +8473,7 @@ function _filesReflect( t, o )
   t.case = 'complex move with srcDeleting : 1, dstRewriting : 0, includingNonAllowed : 0\n' + _.toStr( o2 );
 
   debugger;
-  var records = p.hub.filesReflect( _.mapExtend( null,o1,o2 ) );
+  var records = p.hub.filesReflect( _.mapExtend( null, o1, o2 ) );
 
   var expected = _.FileProvider.Extract
   ({
@@ -8495,9 +8495,9 @@ function _filesReflect( t, o )
   var expectedSrcActions = [ 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete' ];
   var expectedSrcAllow = [ false, true, false, true, true, true, true, true, true, true, false ];
 
-  var dstAbsolute = context.select( records,'*.dst.absolute' );
-  var srcAbsolute = context.select( records,'*.src.absolute' );
-  var effAbsolute = context.select( records,'*.effective.absolute' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
   var action = context.select( records, '*.action' );
   var allow = context.select( records, '*.allow' );
   var srcActions = context.select( records, '*.srcAction' );
@@ -8581,7 +8581,7 @@ function _filesReflect( t, o )
 
   t.case = 'complex move with dstDeleting : 1, dstRewriting : 0, srcDeleting : 1, includingNonAllowed : 0\n' + _.toStr( o2 );
 
-  var records = p.hub.filesReflect( _.mapExtend( null,o1,o2 ) );
+  var records = p.hub.filesReflect( _.mapExtend( null, o1, o2 ) );
 
   var expected = _.FileProvider.Extract
   ({
@@ -8610,9 +8610,9 @@ function _filesReflect( t, o )
   var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
   var expectedPreserve = [ true, false, true, false, false, false, false, false, false, true, false, true, false, false, false, false, false, false ];
 
-  var dstAbsolute = context.select( records,'*.dst.absolute' );
-  var srcAbsolute = context.select( records,'*.src.absolute' );
-  var effAbsolute = context.select( records,'*.effective.absolute' );
+  var dstAbsolute = context.select( records, '*.dst.absolute' );
+  var srcAbsolute = context.select( records, '*.src.absolute' );
+  var effAbsolute = context.select( records, '*.effective.absolute' );
   var action = context.select( records, '*.action' );
   var allow = context.select( records, '*.allow' );
   var preserve = context.select( records, '*.preserve' );
@@ -9799,7 +9799,7 @@ function filesReflectWithHub( test )
   //   dstRewriting : 1
   // }
   //
-  // var records = hub.filesReflect( _.mapExtend( null,o1,o2 ) );
+  // var records = hub.filesReflect( _.mapExtend( null, o1, o2 ) );
   // test.is( records.length >= 0 );
   //
   // var got = _.FileProvider.Extract.filesTreeRead({ srcPath : dstPath, srcProvider : dstProvider });
@@ -9822,7 +9822,7 @@ function filesReflectWithHub( test )
   }
 
   // debugger;
-  var records = hub.filesReflect( _.mapExtend( null,o1,o2 ) );
+  var records = hub.filesReflect( _.mapExtend( null, o1, o2 ) );
   test.is( records.length >= 0 );
 
   var got = _.FileProvider.Extract.filesTreeRead({ srcPath : dstPath, srcProvider : dstProvider });
@@ -10434,7 +10434,7 @@ function filesReflectDstDeletingDirs( test )
 
   //
 
-  test.case = 'dst/dir cleaned,not actual,dstDeletingCleanedDirs : 0';
+  test.case = 'dst/dir cleaned, not actual, dstDeletingCleanedDirs : 0';
   var filesTree =
   {
     src : {},
@@ -11400,11 +11400,11 @@ function filesFindDifference( test )
       },
       expected :
       [
-        { src : { relative : '.' }, /*same : undefined, del : undefined,*/ newer :null, older : null },
-        { src : { relative : './a.a' }, /*same : undefined, del : undefined,*/ newer :  { side : 'src' }, older : null },
+        { src : { relative : '.' }, /*same : undefined, del : undefined, */ newer :null, older : null },
+        { src : { relative : './a.a' }, /*same : undefined, del : undefined, */ newer :  { side : 'src' }, older : null },
         { src : { relative : './b1.b' }, same : true, /* del : undefined, */ newer : null, older : null   },
-        { src : { relative : './b2.b' }, same : false,/*  del : undefined, */ newer : null, older : null   },
-        { src : { relative : './c' }, /*same : undefined, del : undefined,*/ newer : null, older : null   },
+        { src : { relative : './b2.b' }, same : false, /*  del : undefined, */ newer : null, older : null   },
+        { src : { relative : './c' }, /*same : undefined, del : undefined, */ newer : null, older : null   },
         { src : { relative : './c/d1.d' }, /* same : undefined, */ del : true, newer : { side : 'dst' }, older : null },
         { src : { relative : './c/b3.b' }, same : false, /* del : undefined, */ newer : null, older : null   },
       ],
@@ -11737,30 +11737,30 @@ function filesFindDifference( test )
       expected :
       [
 
-        { relative : '.', /*same : undefined, del : undefined,*/ older : null, newer : null  },
+        { relative : '.', /*same : undefined, del : undefined, */ older : null, newer : null  },
 
-        { relative : './a.a', same : true,/*  del : undefined, */ older : null, newer : null  },
+        { relative : './a.a', same : true, /*  del : undefined, */ older : null, newer : null  },
         { relative : './b1.b', same : true, /* del : undefined, */ older : null, newer : null  },
         { relative : './b2.b', same : false, /* del : undefined, */ older : null, newer : null  },
 
-        { relative : './c', /*same : undefined, del : undefined,*/ older : null, newer : null  },
+        { relative : './c', /*same : undefined, del : undefined, */ older : null, newer : null  },
 
         { relative : './c/dstfile.d', /* same : undefined,  */del : true, older : null, newer : { side : 'dst' } },
         { relative : './c/dstdir', /* same : undefined, */ del : true, older : null, newer : { side : 'dst' }  },
         { relative : './c/srcfile-dstdir/srcfile-dstdir-file', /* same : undefined, */ del : true, older : null, newer : { side : 'dst' } },
 
-        { relative : './c/b3.b', same : false,/*  del : undefined, */ older : null, newer : null  },
+        { relative : './c/b3.b', same : false, /*  del : undefined, */ older : null, newer : null  },
 
-        { relative : './c/srcfile', /*same : undefined, del : undefined,*/ older : null, newer : { side : 'src' } },
+        { relative : './c/srcfile', /*same : undefined, del : undefined, */ older : null, newer : { side : 'src' } },
         { relative : './c/srcfile-dstdir', same : false, /* del : undefined, */ older : null , newer : null },
 
-        { relative : './c/e', /*same : undefined, del : undefined,*/ older : null , newer : null },
+        { relative : './c/e', /*same : undefined, del : undefined, */ older : null , newer : null },
         { relative : './c/e/d2.d', same : false, /* del : undefined, */ older : null, newer : null  },
         { relative : './c/e/e1.e', same : true, /* del : undefined, */ older : null, newer : null  },
 
-        { relative : './c/srcdir', /*same : undefined, del : undefined,*/ older : null, newer : { side : 'src' } },
+        { relative : './c/srcdir', /*same : undefined, del : undefined, */ older : null, newer : { side : 'src' } },
         { relative : './c/srcdir-dstfile', same : false, /* del : undefined, */ older : null , newer : null },
-        { relative : './c/srcdir-dstfile/srcdir-dstfile-file', /*same : undefined, del : undefined,*/ older : null, newer : { side : 'src' } },
+        { relative : './c/srcdir-dstfile/srcdir-dstfile-file', /*same : undefined, del : undefined, */ older : null, newer : { side : 'src' } },
 
       ],
 
@@ -11783,7 +11783,7 @@ function filesFindDifference( test )
         { relative : '.', /*same : undefined, del : undefined*/ },
 
         { relative : './c', /* same : undefined, */ del : true },
-        { relative : './c/c1',/*  same : undefined, */ del : true },
+        { relative : './c/c1', /*  same : undefined, */ del : true },
         { relative : './c/c2', /* same : undefined, */ del : true },
         { relative : './c/c2/c22', /* same : undefined, */ del : true },
 
@@ -11878,35 +11878,35 @@ function filesFindDifference( test )
       includingTerminals : 1,
       includingDirs : 1,
       recursive : '2',
-      onDown : function( record ){ test.identical( _.objectIs( record ),true ); },
-      onUp : function( record ){ test.identical( _.objectIs( record ),true ); },
+      onDown : function( record ){ test.identical( _.objectIs( record ), true ); },
+      onUp : function( record ){ test.identical( _.objectIs( record ), true ); },
       srcFilter : { ends : sample.ends }
     }
 
-    _.mapExtend( o,sample.options || {} );
+    _.mapExtend( o, sample.options || {} );
 
     var files = _.FileProvider.HardDrive();
 
     var got = files.filesFindDifference( o );
 
     var passed = true;
-    passed = passed && test.contains( got,sample.expected );
-    passed = passed && test.identical( got.length,sample.expected.length );
+    passed = passed && test.contains( got, sample.expected );
+    passed = passed && test.identical( got.length, sample.expected.length );
 
     if( !passed )
     {
 
-      // logger.log( 'got :\n' + _.toStr( got,{ levels : 3 } ) );
-      // logger.log( 'expected :\n' + _.toStr( sample.expected,{ levels : 3 } ) );
+      // logger.log( 'got :\n' + _.toStr( got, { levels : 3 } ) );
+      // logger.log( 'expected :\n' + _.toStr( sample.expected, { levels : 3 } ) );
 
-      // logger.log( 'got :\n' + _.toStr( got,{ levels : 2 } ) );
+      // logger.log( 'got :\n' + _.toStr( got, { levels : 2 } ) );
 
-      logger.log( 'relative :\n' + _.toStr( context.select( got,'*.src.relative' ),{ levels : 2 } ) );
-      logger.log( 'same :\n' + _.toStr( context.select( got,'*.same' ),{ levels : 2 } ) );
-      logger.log( 'del :\n' + _.toStr( context.select( got,'*.del' ),{ levels : 2 } ) );
+      logger.log( 'relative :\n' + _.toStr( context.select( got, '*.src.relative' ), { levels : 2 } ) );
+      logger.log( 'same :\n' + _.toStr( context.select( got, '*.same' ), { levels : 2 } ) );
+      logger.log( 'del :\n' + _.toStr( context.select( got, '*.del' ), { levels : 2 } ) );
 
-      logger.log( 'newer :\n' + _.toStr( context.select( got,'*.newer.side' ),{ levels : 1 } ) );
-      logger.log( 'older :\n' + _.toStr( context.select( got,'*.older' ),{ levels : 1 } ) );
+      logger.log( 'newer :\n' + _.toStr( context.select( got, '*.newer.side' ), { levels : 1 } ) );
+      logger.log( 'older :\n' + _.toStr( context.select( got, '*.older' ), { levels : 1 } ) );
 
     }
 
@@ -12429,7 +12429,7 @@ function filesCopyWithAdapter( test )
             {
               'b3.b' : 'b3x',
               'd1.d' : 'd1',
-              'e': { 'd2.d' : 'd2','e1.e' : 'd1' },
+              'e': { 'd2.d' : 'd2', 'e1.e' : 'd1' },
               'f' : {},
               'g': {}
             },
@@ -13518,7 +13518,7 @@ function filesCopyWithAdapter( test )
       filePath : dir,
       read : 0,
     });
-    logger.log( 'treeWriten :',_.toStr( treeWriten,{ levels : 99 } ) );
+    logger.log( 'treeWriten :', _.toStr( treeWriten, { levels : 99 } ) );
 */
 
     var copyOptions =
@@ -13535,7 +13535,7 @@ function filesCopyWithAdapter( test )
       allowDelete : 0,
     }
 
-    _.mapExtend( copyOptions,sample.options || {} );
+    _.mapExtend( copyOptions, sample.options || {} );
 
     var got = _.fileProvider.filesCopyWithAdapter( copyOptions );
 
@@ -13545,23 +13545,23 @@ function filesCopyWithAdapter( test )
     var passed = true;
     if( sample.expected )
     {
-      passed = passed && test.contains( got,sample.expected );
-      passed = passed && test.identical( got.length,sample.expected.length );
+      passed = passed && test.contains( got, sample.expected );
+      passed = passed && test.identical( got.length, sample.expected.length );
     }
-    passed = passed && test.contains( treeGot.initial,sample.filesTree.got );
+    passed = passed && test.contains( treeGot.initial, sample.filesTree.got );
 
     if( !passed )
     {
-      logger.log( 'return :\n' + _.toStr( got,{ levels : 2 } ) );
-      // logger.log( 'got :\n' + _.toStr( treeGot.initial,{ levels : 99 } ) );
-      // logger.log( 'expected :\n' + _.toStr( sample.filesTree.got,{ levels : 99 } ) );
+      logger.log( 'return :\n' + _.toStr( got, { levels : 2 } ) );
+      // logger.log( 'got :\n' + _.toStr( treeGot.initial, { levels : 99 } ) );
+      // logger.log( 'expected :\n' + _.toStr( sample.filesTree.got, { levels : 99 } ) );
 
-      logger.log( 'relative :\n' + _.toStr( context.select( got,'*.relative' ),{ levels : 2 } ) );
-      logger.log( 'action :\n' + _.toStr( context.select( got,'*.action' ),{ levels : 2 } ) );
+      logger.log( 'relative :\n' + _.toStr( context.select( got, '*.relative' ), { levels : 2 } ) );
+      logger.log( 'action :\n' + _.toStr( context.select( got, '*.action' ), { levels : 2 } ) );
       // logger.log( 'length :\n' + got.length + ' / ' + sample.expected.length );
 
-      //logger.log( 'same :\n' + _.toStr( context.select( got,'*.same' ),{ levels : 2 } ) );
-      //logger.log( 'del :\n' + _.toStr( context.select( got,'*.del' ),{ levels : 2 } ) );
+      //logger.log( 'same :\n' + _.toStr( context.select( got, '*.same' ), { levels : 2 } ) );
+      //logger.log( 'del :\n' + _.toStr( context.select( got, '*.del' ), { levels : 2 } ) );
 
     }
 

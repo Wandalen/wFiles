@@ -1718,7 +1718,9 @@ function filesReflectEvaluate_body( o )
       if( record.reason === 'dstDeleting' && !record.dst.isActual )
       {}
       else if( record.reason === 'srcLooking' && record.dst.isActual && record.dst.isDir && !record.src.isActual && record.src.stat )
-      record.include = false;
+      {
+        record.include = false;
+      }
       else if( ( !record.dst.stat && !record.src.isDir ) || ( record.dst.isTerminal && !record.dst.isActual ) )
       {
         debugger;

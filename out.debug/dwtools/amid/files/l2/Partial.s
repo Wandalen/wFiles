@@ -839,8 +839,11 @@ function pathResolveSoftLink_body( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( !!o.filePath );
 
-  if( !self.isSoftLink( o.filePath ) )
-  return o.filePath;
+  /* should not have redundant conditions */
+  /* qqq : check does it cause problems */
+
+  // if( !self.isSoftLink( o.filePath ) )
+  // return o.filePath;
 
   let result = self.pathResolveSoftLinkAct( o );
 
@@ -6902,7 +6905,11 @@ function filesAreHardLinked_body( files )
     return false;
   }
 
-  return true;
+  /*
+    should return "not sure" ( null ), not true if result is not precise
+  */
+
+  return null;
 }
 
 var defaults = filesAreHardLinked_body.defaults = null;

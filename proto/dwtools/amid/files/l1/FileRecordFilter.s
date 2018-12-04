@@ -910,8 +910,8 @@ function pathsNormalize()
 
     if( Config.debug )
     {
-      let stemPath = _.mapKeys( stemPath ).filter( ( g ) => path.isAbsolute( g ) );
-      let diff = _.arraySetDiff( _.mapKeys( filter.basePath ), path.s.fromGlob( stemPath ) );
+      let stemPath2 = _.mapKeys( stemPath ).filter( ( g ) => path.isAbsolute( g ) );
+      let diff = _.arraySetDiff( _.mapKeys( filter.basePath ), path.s.fromGlob( stemPath2 ) );
       _.assert( diff.length === 0, () => 'Some file paths do not have base paths or opposite : ' + _.strQuote( diff ) );
     }
 

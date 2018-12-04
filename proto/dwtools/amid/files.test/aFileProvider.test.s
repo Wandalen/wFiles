@@ -26957,6 +26957,72 @@ function pathResolveLinkChain( test )
 
   test.close( 'chain' );
 
+  /**/
+
+  test.open( 'cycle' );
+
+  test.case = 'self cycle softlink, throwing on'
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.softLink({ dstPath : linkPath, srcPath : '../link', allowingMissing : 1, makingDirectory : 1 });
+  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1 } );
+  test.shouldThrowError( () => self.provider.pathResolveLinkChain( o ) );
+
+  test.case = 'self cycle softlink, throwing off'
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.softLink({ dstPath : linkPath, srcPath : '../link', allowingMissing : 1, makingDirectory : 1 });
+  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0 } );
+  self.provider.pathResolveLinkChain( o );
+  test.identical( o.result, [ linkPath,linkPath ] );
+  test.identical( o.found, [ linkPath,linkPath ] );
+
+  test.case = 'self cycle text, throwing on '
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.fileWrite( linkPath, 'link ' + linkPath );
+  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1 } );
+  test.shouldThrowError( () => self.provider.pathResolveLinkChain( o ) );
+
+  test.case = 'self cycle text, throwing off'
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.fileWrite( linkPath, 'link ' + linkPath );
+  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0 } );
+  self.provider.pathResolveLinkChain( o );
+  test.identical( o.result, [ linkPath,linkPath ] );
+  test.identical( o.found, [ linkPath,linkPath ] );
+
+  test.case = 'cycle softlink, throwing on'
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.softLink({ dstPath : linkPath2, srcPath : linkPath, allowingMissing : 1, makingDirectory : 1 });
+  self.provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissing : 1, makingDirectory : 1 });
+  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1 } );
+  test.shouldThrowError( () => self.provider.pathResolveLinkChain( o ) );
+
+  test.case = 'cycle softlink, throwing off'
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.softLink({ dstPath : linkPath2, srcPath : linkPath, allowingMissing : 1, makingDirectory : 1 });
+  self.provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissing : 1, makingDirectory : 1 });
+  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0 } );
+  self.provider.pathResolveLinkChain( o );
+  test.identical( o.result, [ linkPath,linkPath2,linkPath ] );
+  test.identical( o.found, [ linkPath,linkPath2,linkPath ] );
+
+  test.case = 'cycle text link, throwing on'
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.fileWrite( linkPath2, 'link ' + linkPath );
+  self.provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1 } );
+  test.shouldThrowError( () => self.provider.pathResolveLinkChain( o ) );
+
+  test.case = 'cycle text link, throwing off'
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.fileWrite( linkPath2, 'link ' + linkPath );
+  self.provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0 } );
+  self.provider.pathResolveLinkChain( o );
+  test.identical( o.result, [ linkPath,linkPath2,linkPath ] );
+  test.identical( o.found, [ linkPath,linkPath2,linkPath ] );
+
+  test.close( 'cycle' );
+
   self.provider.fieldPop( 'usingTextLink', true );
 }
 

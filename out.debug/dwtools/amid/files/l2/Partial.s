@@ -6784,63 +6784,70 @@ softLinkBreak.having.aspect = 'entry';
 function filesAreSoftLinked_pre( routine, args )
 {
   let self = this;
-  _.assert( arguments.length === 2, 'Expects exactly two arguments' );
-  if( args.length !== 1 || ( !_.arrayIs( args[ 0 ] ) && !_.argumentsArrayIs( args[ 0 ] ) ) )
-  return _.longSlice( args );
-  else
-  {
-    _.assert( args.length === 1 );
-    return args[ 0 ];
-  }
+  let o = self._preFilePathVectorWithProviderDefaults.apply( self, arguments );
+
+  // _.assert( arguments.length === 2, 'Expects exactly two arguments' );
+  // if( args.length !== 1 || ( !_.arrayIs( args[ 0 ] ) && !_.argumentsArrayIs( args[ 0 ] ) ) )
+  // return _.longSlice( args );
+  // else
+  // {
+  //   _.assert( args.length === 1 );
+  //   return args[ 0 ];
+  // }
+
+  return o;
 }
 
 //
 
-function filesAreSoftLinked_body( files )
+function filesAreSoftLinked_body( o )
 {
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( files.length === 2 );
+  _.assert( o.filePath.length === 2 );
 
-  files = self.path.s.normalize( files );
+  debugger;
 
-  _.assert( self.path.s.allAreAbsolute( files ) );
+  o.filePath = self.path.s.normalize( o.filePath );
 
-  if( files[ 0 ] === files[ 1 ] )
+  _.assert( self.path.s.allAreAbsolute( o.filePath ) );
+
+  if( o.filePath[ 0 ] === o.filePath[ 1 ] )
   return false;
 
-  if( !self.isSoftLink( files[ 0 ] ) )
-  return false;
+  // if( !self.isSoftLink( files[ 0 ] ) )
+  // return false;
 
-  let resolved;
+  let resolved = [];
 
-  try
-  {
-    resolved = self.pathResolveLink
-    ({
-      filePath : files[ 0 ],
-      resolvingSoftLink : true
-    });
-  }
-  catch( err )
-  {
-    throw _.err( err );
-    // qqq ?
-    // resolved = self.pathResolveSoftLink
-    // ({
-    //   filePath : files[ 0 ],
-    //   // readLink : 1
-    // });
-  }
+  resolved[ 0 ] = self.pathResolveLink
+  ({
+    filePath : o.filePath[ 0 ],
+    resolvingSoftLink : true,
+    resolvingTextLink : o.resolvingTextLink,
+  });
 
-  _.assert( self.path.is( resolved ) );
+  resolved[ 1 ] = self.pathResolveLink
+  ({
+    filePath : o.filePath[ 1 ],
+    resolvingSoftLink : true,
+    resolvingTextLink : o.resolvingTextLink,
+  });
 
-  return files[ 1 ] === resolved;
+  _.assert( self.path.is( resolved[ 0 ] ) );
+  _.assert( self.path.is( resolved[ 1 ] ) );
+
+  return resolved[ 0 ] === resolved[ 1 ];
 }
 
-var defaults = filesAreSoftLinked_body.defaults = null;
+var defaults = filesAreSoftLinked_body.defaults = Object.create( null );
+
+defaults.filePath = null;
+defaults.resolvingTextLink = null;
+
 var having = filesAreSoftLinked_body.having = Object.create( null );
+
 having.writing = 0;
 having.reading = 1;
 having.driving = 0;

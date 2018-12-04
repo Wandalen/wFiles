@@ -650,6 +650,9 @@ function filesAreHardLinkedAct( ins1Path, ins2Path )
   // if( self.fileExists( ins1Path ) && self.fileExists( ins2Path ) )
   // debugger;
 
+  if( ins1Path === ins2Path )
+  return true;
+
   let descriptor1 = self._descriptorRead( ins1Path );
   let descriptor2 = self._descriptorRead( ins2Path );
 

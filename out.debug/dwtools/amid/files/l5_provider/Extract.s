@@ -187,10 +187,9 @@ function fileReadAct( o )
   //   return handleError( _.err( 'Cant resolve :', result ) );
   // }
 
-  xxx
   if( self._descriptorIsHardLink( result ) )
   {
-    xxx
+    debugger; xxx
     let resolved = self._descriptorResolve({ descriptor : result });
     if( resolved === undefined )
     return handleError( _.err( 'Cant resolve :', result ) );
@@ -498,7 +497,9 @@ function statReadAct( o )
     {
       result.isTerminal = returnTrue;
       result.isFile = returnTrue;
-      if( _.strIs( file ) )
+      if( _.numberIs( file ) )
+      result.size = String( file ).length;
+      else if( _.strIs( file ) )
       result.size = file.length;
       else
       result.size = file.byteLength;
@@ -2138,15 +2139,16 @@ function _descriptorIsDir( file )
 
 function _descriptorIsTerminal( file )
 {
-  return _.strIs( file ) || _.bufferRawIs( file ) || _.bufferTypedIs( file );
+  return _.strIs( file ) || _.numberIs( file ) || _.bufferRawIs( file ) || _.bufferTypedIs( file );
 }
 
 //
 
 function _descriptorIsLink( file )
 {
-  if( !file )
+  if( !_.arrayIs( file ) )
   return false;
+
   // if( _.arrayIs( file ) )
   {
     _.assert( file.length === 1 );
@@ -2160,8 +2162,9 @@ function _descriptorIsLink( file )
 
 function _descriptorIsSoftLink( file )
 {
-  if( !file )
+  if( !_.arrayIs( file ) )
   return false;
+
   // if( _.arrayIs( file ) )
   {
     _.assert( file.length === 1 );
@@ -2175,7 +2178,7 @@ function _descriptorIsSoftLink( file )
 
 function _descriptorIsHardLink( file )
 {
-  if( !file )
+  if( !_.arrayIs( file ) )
   return false;
 
   // if( _.arrayIs( file ) )
@@ -2194,8 +2197,9 @@ function _descriptorIsHardLink( file )
 
 function _descriptorIsScript( file )
 {
-  if( !file )
+  if( !_.arrayIs( file ) )
   return false;
+
   // if( _.arrayIs( file ) )
   {
     _.assert( file.length === 1 );

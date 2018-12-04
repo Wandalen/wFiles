@@ -291,6 +291,7 @@ function pathResolveSoftLinkAct( o )
       let result = File.readlinkSync( self.path.nativize( o.filePath ) );
 
       /* qqq : why? add experiment please? */
+      /* aaa : makes path relative to link instead of directory where link is located */
       if( !self.path.isAbsolute( self.path.normalize( result ) ) )
       {
         if( _.strBegins( result, '.\\' ) )

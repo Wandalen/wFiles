@@ -26642,6 +26642,121 @@ function pathResolveLinkChain( test )
   self.provider.fieldPop( 'usingTextLink', true );
 }
 
+//
+
+function pathResolveSoftLink( test )
+{
+  let self = this;
+
+  let filePath = test.context.makePath( 'written/pathResolveSoftLink/file' );
+  let linkPath = test.context.makePath( 'written/pathResolveSoftLink/link' );
+
+  var o1 =
+  {
+    allowingMissing : 1
+  }
+
+  test.case = 'not existing file';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  var o = _.mapExtend( null, o1, { filePath : filePath } );
+  var got = self.provider.pathResolveSoftLink( o );
+  test.identical( got, filePath )
+
+  test.case = 'existing file';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.fileWrite( filePath, filePath );
+  var o = _.mapExtend( null, o1, { filePath : filePath } );
+  var got = self.provider.pathResolveSoftLink( o );
+  test.identical( got, filePath )
+
+  test.case = 'hardlink';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.hardLink( linkPath, filePath );
+  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var got = self.provider.pathResolveSoftLink( o );
+  test.identical( got, linkPath )
+
+  test.case = 'softlink';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.softLink( linkPath, filePath );
+  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var got = self.provider.pathResolveSoftLink( o );
+  test.identical( got, filePath )
+
+  test.case = 'relative softlink';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.softLink( linkPath, '../file' );
+  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var got = self.provider.pathResolveSoftLink( o );
+  test.identical( got, '../file' );
+
+  test.case = 'textlink';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.fileWrite( linkPath, 'link ' + filePath );
+  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var got = self.provider.pathResolveSoftLink( o );
+  test.identical( got, linkPath );
+
+  //
+
+  test.case = 'absolute softlink to missing'
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.softLink
+  ({
+    dstPath : linkPath,
+    srcPath : filePath,
+    makingDirectory : 1,
+    allowingMissing : 1
+  });
+  var o = _.mapExtend( null, o1, { filePath : linkPath, allowingMissing : 1 } );
+  var got = self.provider.pathResolveSoftLink( o );
+  test.identical( got, filePath );
+
+  test.case = 'absolute softlink to missing'
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.softLink
+  ({
+    dstPath : linkPath,
+    srcPath : filePath,
+    makingDirectory : 1,
+    allowingMissing : 1
+  });
+  var o = _.mapExtend( null, o1, { filePath : linkPath, allowingMissing : 0 } );
+  test.shouldThrowError( () => self.provider.pathResolveSoftLink( o ) );
+
+  test.case = 'relative softlink to missing'
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  var filePathRelative = self.provider.path.relative( linkPath,filePath );
+  self.provider.softLink
+  ({
+    dstPath : linkPath,
+    srcPath : filePathRelative,
+    makingDirectory : 1,
+    allowingMissing : 1
+  });
+  var o = _.mapExtend( null, o1, { filePath : linkPath, allowingMissing : 1 } );
+  var got = self.provider.pathResolveSoftLink( o );
+  test.identical( got, filePathRelative );
+
+  test.case = 'relative softlink to missing'
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  var filePathRelative = self.provider.path.relative( linkPath,filePath );
+  self.provider.softLink
+  ({
+    dstPath : linkPath,
+    srcPath : filePathRelative,
+    makingDirectory : 1,
+    allowingMissing : 1
+  });
+  var o = _.mapExtend( null, o1, { filePath : linkPath, allowingMissing : 0 } );
+  test.shouldThrowError( () => self.provider.pathResolveSoftLink( o ) );
+
+}
+
 // --
 // declare
 // --
@@ -26775,6 +26890,7 @@ var Self =
     uriResolve : uriResolve,
 
     pathResolveLinkChain : pathResolveLinkChain,
+    pathResolveSoftLink : pathResolveSoftLink,
 
   },
 

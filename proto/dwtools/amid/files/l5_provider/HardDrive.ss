@@ -291,13 +291,14 @@ function pathResolveSoftLinkAct( o )
       let result = File.readlinkSync( self.path.nativize( o.filePath ) );
 
       /* qqq : why? add experiment please? */
-      if( !o.relativeToDir )
-      if( !self.path.isAbsolute( self.path.normalize( result ) ) )
-      {
-        if( _.strBegins( result, '.\\' ) )
-        result = _.strIsolateBeginOrNone( result, '.\\' )[ 2 ];
-        result = '..\\' + result;
-      }
+      /* aaa : moved to pathResolveSoftLink_body */
+      // if( !o.relativeToDir )
+      // if( !self.path.isAbsolute( self.path.normalize( result ) ) )
+      // {
+      //   if( _.strBegins( result, '.\\' ) )
+      //   result = _.strIsolateBeginOrNone( result, '.\\' )[ 2 ];
+      //   result = '..\\' + result;
+      // }
 
       return result;
     }

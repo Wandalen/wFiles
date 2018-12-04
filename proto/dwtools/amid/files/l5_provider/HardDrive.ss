@@ -703,7 +703,7 @@ function statReadAct( o )
     }
     catch( err )
     {
-      debugger;
+      // debugger;
       if( o.throwing )
       throw _.err( 'Error getting stat of', o.filePath, '\n', err );
     }

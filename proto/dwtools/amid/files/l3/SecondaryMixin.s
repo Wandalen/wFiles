@@ -942,7 +942,7 @@ fileConfigRead.having.aspect = 'entry';
 
 //
 
-function _fileCodeRead_body( o )
+function fileCodeRead_body( o )
 {
   let self = this;
   _.assert( arguments.length === 1, 'Expects single argument' );
@@ -976,7 +976,7 @@ function _fileCodeRead_body( o )
   return result;
 }
 
-var defaults = _fileCodeRead_body.defaults = Object.create( fileRead.defaults );
+var defaults = fileCodeRead_body.defaults = Object.create( fileRead.defaults );
 
 defaults.encoding = 'utf8';
 defaults.wrapping = 1;
@@ -985,12 +985,14 @@ defaults.name = null;
 defaults.prefix = '// ======================================\n( function {{name}}() {\n';
 defaults.postfix = '\n})();\n';
 
-var paths = _fileCodeRead_body.paths = Object.create( fileRead.paths );
-var having = _fileCodeRead_body.having = Object.create( fileRead.having );
+// var paths = fileCodeRead_body.paths = Object.create( fileRead.paths );
+// var having = fileCodeRead_body.having = Object.create( fileRead.having );
+
+_.routineExtend( fileCodeRead_body, fileRead );
 
 //
 
-var fileCodeRead = _.routineFromPreAndBody( fileRead.pre, _fileCodeRead_body );
+var fileCodeRead = _.routineFromPreAndBody( fileRead.pre, fileCodeRead_body );
 
 fileCodeRead.having.aspect = 'entry';
 

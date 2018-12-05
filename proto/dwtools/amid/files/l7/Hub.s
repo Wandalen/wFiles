@@ -584,11 +584,12 @@ function _link_functor( fop )
 
   _.assert( _.strDefined( name ) );
   _.assert( _.objectIs( routine.defaults ) );
-  _.assert( _.objectIs( routine.paths ) );
+  // _.assert( _.objectIs( routine.paths ) );
+  _.assert( routine.paths === undefined );
   _.assert( _.objectIs( routine.having ) );
 
   let defaults = hubLink.defaults = Object.create( routine.defaults );
-  let paths = hubLink.paths = Object.create( routine.paths );
+  // let paths = hubLink.paths = Object.create( routine.paths );
   let having = hubLink.having = Object.create( routine.having );
 
   _.assert( defaults.srcPath !== undefined );
@@ -809,7 +810,7 @@ function routinesGenerate()
     pre : null,
     body : null,
     defaults : null,
-    paths : null,
+    // paths : null,
     having : null,
     encoders : null,
     operates : null,
@@ -850,14 +851,14 @@ function routinesGenerate()
     return;
 
     if(  original.defaults )
-    _.assert( _.objectIs( original.paths ) );
-    if(  original.paths )
+    _.assert( _.objectIs( original.operates ) );
+    if(  original.operates )
     _.assert( _.objectIs( original.defaults ) );
 
     let hubResolving = having.hubResolving;
     let havingBare = having.driving;
-    var paths = original.paths;
-    let pathsLength = paths ? _.mapKeys( paths ).length : 0;
+    var operates = original.operates;
+    let operatesLength = operates ? _.mapKeys( operates ).length : 0;
     let pre = original.pre;
     let body = original.body;
 
@@ -871,7 +872,7 @@ function routinesGenerate()
       for( let p in paths )
       if( o[ p ] )
       {
-        if( pathsLength === 1 )
+        if( operatesLength === 1 )
         {
           let r;
 
@@ -939,22 +940,24 @@ function routinesGenerate()
       }
     }
 
-    wrap.having = Object.create( original.having );
+    _.routineExtend( wrap, original );
 
-    if( original.defaults )
-    {
-      wrap.defaults = Object.create( original.defaults );
-      wrap.paths = Object.create( original.paths );
-    }
-
-    if( original.encoders )
-    wrap.encoders = Object.create( original.encoders );
-
-    if( original.pre )
-    wrap.pre = original.pre;
-
-    if( original.body )
-    wrap.body = original.body;
+    // wrap.having = Object.create( original.having );
+    //
+    // if( original.defaults )
+    // {
+    //   wrap.defaults = Object.create( original.defaults );
+    //   wrap.paths = Object.create( original.paths );
+    // }
+    //
+    // if( original.encoders )
+    // wrap.encoders = Object.create( original.encoders );
+    //
+    // if( original.pre )
+    // wrap.pre = original.pre;
+    //
+    // if( original.body )
+    // wrap.body = original.body;
 
   })();
 

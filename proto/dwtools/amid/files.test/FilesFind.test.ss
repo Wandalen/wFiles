@@ -10845,7 +10845,9 @@ function filesReflectLinked( test )
     allowingMissing : 1,
   })
 
+  debugger;
   test.is( _.fileProvider.isSoftLink( _.path.join( dstDir, 'link' ) ) );
+  debugger;
   var dstLink1 = _.fileProvider.pathResolveSoftLink({ filePath : _.path.join( dstDir, 'link' )/*, readLink : 1*/ });
   test.identical( dstLink1, _.path.join( dstDir, 'fileNotExists' ) );
 
@@ -10860,6 +10862,8 @@ function filesReflectLinked( test )
   test.is( _.fileProvider.isSoftLink( _.path.join( dstDir, 'link4' ) ) );
   var dstLink4 = _.fileProvider.pathResolveSoftLink({ filePath : _.path.join( dstDir, 'link4' )/*, readLink : 1*/ });
   test.identical( dstLink4, _.path.join( dstDir, 'fileNotExists' ) );
+
+  xxx
 
 }
 

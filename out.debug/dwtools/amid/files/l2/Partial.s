@@ -770,7 +770,7 @@ having.aspect = 'body';
 //
 // firstAvailable.having.aspect = 'entry';
 
-//
+
 
 let _pathResolveTextLinkAct = null;
 
@@ -7400,7 +7400,7 @@ let Proto =
   pathCurrentAct,
   pathDirTempAct : null,
 
-  _pathResolveTextLinkAct,
+  _pathResolveTextLinkAct : null,
   _pathResolveTextLink,
   pathResolveTextLink,
 

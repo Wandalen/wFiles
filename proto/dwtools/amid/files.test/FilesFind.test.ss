@@ -10978,6 +10978,8 @@ function filesReflectLinked( test )
   // test.identical( dstLink4, _.path.join( dstDir, 'fileNotExists' ) );
 
 
+  xxx
+
 }
 
 //

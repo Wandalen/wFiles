@@ -2643,14 +2643,28 @@ function filesReflectSingle_body( o )
         resolvingDstTextLink : o.resolvingDstTextLink,
       });
     }
+    else if( record.action === 'textLink' )
+    {
+      hub.textLink
+      ({
+        dstPath : record.dst.hubAbsolute,
+        srcPath : record.src.hubAbsolute,
+        makingDirectory : 1,
+        allowingMissing : 1,
+        resolvingSrcSoftLink : o.resolvingSrcSoftLink,
+        resolvingSrcTextLink : o.resolvingSrcTextLink,
+        resolvingDstSoftLink : o.resolvingDstSoftLink,
+        resolvingDstTextLink : o.resolvingDstTextLink,
+      });
+    }
     else if( record.action === 'fileCopy' )
     {
-      // debugger;
       hub.fileCopy
       ({
         dstPath : record.dst.hubAbsolute,
         srcPath : record.src.hubAbsolute,
         makingDirectory : 1,
+        allowingMissing : 1,
         resolvingSrcSoftLink : o.resolvingSrcSoftLink,
         resolvingSrcTextLink : o.resolvingSrcTextLink,
         resolvingDstSoftLink : o.resolvingDstSoftLink,

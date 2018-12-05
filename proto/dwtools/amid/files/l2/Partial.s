@@ -3929,25 +3929,52 @@ function isTextLink_body( o )
   _.assert( _.boolLike( o.resolvingSoftLink ) );
   // _.assert( _.boolLike( o.resolvingTextLink ) );
 
-  o.filePath = self.pathResolveLink
+  let stat = self.statReadAct
   ({
+    filePath : o.filePath,
+    throwing : 0,
+    sync : 1,
+    resolvingSoftLink : 0,
+  });
+
+  let o2 =
+  {
     filePath : o.filePath,
     resolvingSoftLink : o.resolvingSoftLink,
     resolvingTextLink : 0,
-    // resolvingTextLink : o.resolvingTextLink,
-  });
+    stat : stat,
+    throwing : 0
+  }
 
-  let stat = self.statRead
-  ({
-    filePath : o.filePath,
-    resolvingSoftLink : 0,
-    resolvingTextLink : 0,
-  });
+  o.filePath = self.pathResolveLink( o2 );
 
-  if( !stat )
+  if( o.filePath === null )
   return false;
 
-  return stat.isTextLink();
+  if( o2.stat === null )
+  return false;
+
+  return o2.stat.isTextLink();
+
+  // o.filePath = self.pathResolveLink
+  // ({
+  //   filePath : o.filePath,
+  //   resolvingSoftLink : o.resolvingSoftLink,
+  //   resolvingTextLink : 0,
+  //   // resolvingTextLink : o.resolvingTextLink,
+  // });
+
+  // let stat = self.statRead
+  // ({
+  //   filePath : o.filePath,
+  //   resolvingSoftLink : 0,
+  //   resolvingTextLink : 0,
+  // });
+
+  // if( !stat )
+  // return false;
+
+  // return stat.isTextLink();
 }
 
 var defaults = isTextLink_body.defaults = Object.create( null );

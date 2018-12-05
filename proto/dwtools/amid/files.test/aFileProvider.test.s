@@ -24237,7 +24237,7 @@ function isSoftLink( test )
 
   test.case = 'text self cycled'
   self.provider.filesDelete( dirPath );
-  self.provider.fileWrite( linkPath, 'link ' + linkPath );
+  self.provider.fileWrite( linkPath, 'link ../link' );
   var o = { filePath : linkPath, resolvingTextLink : 0 };
   var got = self.provider.isSoftLink( o );
   test.identical( got, false )
@@ -24508,18 +24508,22 @@ function isSoftLink( test )
 
   test.case = 'text self cycled'
   self.provider.filesDelete( dirPath );
-  self.provider.fileWrite( linkPath, 'link ' + linkPath );
+  self.provider.fileWrite( linkPath, 'link ../link' );
   var o = { filePath : linkPath, resolvingTextLink : 1 };
-  test.shouldThrowError( () => self.provider.isSoftLink( _.mapExtend( null, o ) ) );
-  test.shouldThrowError( () => self.provider.statRead( _.mapExtend( null, o ) ) );
+  var got = self.provider.isSoftLink( _.mapExtend( null, o ) );
+  test.identical( got, false );
+  var got = self.provider.statRead( _.mapExtend( null, o ) )
+  test.identical( got, null );
 
   test.case = 'text cycled'
   self.provider.filesDelete( dirPath );
   self.provider.fileWrite( linkPath2, 'link ' + linkPath );
   self.provider.fileWrite( linkPath, 'link ' + linkPath2 );
   var o = { filePath : linkPath, resolvingTextLink : 1 };
-  test.shouldThrowError( () => self.provider.isSoftLink( _.mapExtend( null, o ) ) );
-  test.shouldThrowError( () => self.provider.statRead( _.mapExtend( null, o ) ) );
+  var got = self.provider.isSoftLink( _.mapExtend( null, o ) );
+  test.identical( got, false );
+  var got = self.provider.statRead( _.mapExtend( null, o ) )
+  test.identical( got, null );
 
   self.provider.fieldPop( 'usingTextLink', 1 );
 

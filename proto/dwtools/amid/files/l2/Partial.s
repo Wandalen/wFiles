@@ -4282,24 +4282,51 @@ function isHardLink_body( o )
   _.assert( _.boolLike( o.resolvingSoftLink ) );
   _.assert( _.boolLike( o.resolvingTextLink ) );
 
-  o.filePath = self.pathResolveLink
+  let stat = self.statReadAct
   ({
+    filePath : o.filePath,
+    throwing : 0,
+    sync : 1,
+    resolvingSoftLink : 0,
+  });
+
+  let o2 =
+  {
     filePath : o.filePath,
     resolvingSoftLink : o.resolvingSoftLink,
     resolvingTextLink : o.resolvingTextLink,
-  });
+    stat : stat,
+    throwing : 0
+  }
 
-  let stat = self.statRead
-  ({
-    filePath : o.filePath,
-    resolvingSoftLink : 0,
-    resolvingTextLink : 0,
-  });
+  o.filePath = self.pathResolveLink( o2 );
 
-  if( !stat )
+  if( o.filePath === null )
   return false;
 
-  return stat.isHardLink();
+  if( o2.stat === null )
+  return false;
+
+  return o2.stat.isHardLink();
+
+  // o.filePath = self.pathResolveLink
+  // ({
+  //   filePath : o.filePath,
+  //   resolvingSoftLink : o.resolvingSoftLink,
+  //   resolvingTextLink : o.resolvingTextLink,
+  // });
+
+  // let stat = self.statRead
+  // ({
+  //   filePath : o.filePath,
+  //   resolvingSoftLink : 0,
+  //   resolvingTextLink : 0,
+  // });
+
+  // if( !stat )
+  // return false;
+
+  // return stat.isHardLink();
 }
 
 var defaults = isHardLink_body.defaults = Object.create( null );
@@ -4380,7 +4407,7 @@ function isLink_body( o )
   if( o.resolvingSoftLink && o.resolvingTextLink )
   return result;
 
-  let stat = self.statRead
+  /* let stat = self.statRead
   ({
     filePath : o.filePath,
     resolvingSoftLink : o.resolvingSoftLink,
@@ -4390,7 +4417,34 @@ function isLink_body( o )
   if( !stat )
   return result;
 
-  result = stat.isLink();
+  result = stat.isLink(); */
+
+  let stat = self.statReadAct
+  ({
+    filePath : o.filePath,
+    throwing : 0,
+    sync : 1,
+    resolvingSoftLink : 0,
+  });
+
+  let o2 =
+  {
+    filePath : o.filePath,
+    resolvingSoftLink : o.resolvingSoftLink,
+    resolvingTextLink : o.resolvingTextLink,
+    stat : stat,
+    throwing : 0
+  }
+
+  o.filePath = self.pathResolveLink( o2 );
+
+  if( o.filePath === null )
+  return result;
+
+  if( o2.stat === null )
+  return result;
+
+  result = o2.stat.isLink();
 
   // if( !o.resolvingSoftLink && !result )
   // result = stat.isSoftLink();

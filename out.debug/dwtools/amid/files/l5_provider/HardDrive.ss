@@ -150,124 +150,166 @@ operates.filePath = { pathToRead : 1 }
 
 let buffer;
 // function _pathResolveTextLinkAct( filePath, visited, hasLink, allowingMissing )
+// function _pathResolveTextLinkAct( o )
+// {
+//   let self = this;
+
+//   _.assertRoutineOptions( _pathResolveTextLinkAct, arguments );
+//   _.assert( arguments.length === 1 );
+//   _.assert( _.arrayIs( o.visited ) );
+
+//   if( !buffer )
+//   buffer = Buffer.alloc( 512 );
+
+//   if( o.visited.indexOf( o.filePath ) !== -1 )
+//   throw _.err( 'Cyclic text link :', o.filePath );
+//   o.visited.push( o.filePath );
+
+//   o.filePath = self.path.normalize( o.filePath );
+//   let exists = _.fileProvider.fileExists({ filePath : o.filePath /*, resolvingTextLink : 0*/ }); /*qqq*/
+
+//   let prefix, parts;
+//   if( o.filePath[ 0 ] === '/' )
+//   {
+//     prefix = '/';
+//     parts = o.filePath.substr( 1 ).split( '/' );
+//   }
+//   else
+//   {
+//     prefix = '';
+//     parts = o.filePath.split( '/' );
+//   }
+
+//   for( var p = exists ? p = parts.length-1 : 0 ; p < parts.length ; p++ )
+//   {
+
+//     let cpath = _.fileProvider.path.nativize( prefix + parts.slice( 0, p+1 ).join( '/' ) );
+
+//     let stat = _.fileProvider.statResolvedRead({ filePath : cpath, resolvingTextLink : 0, resolvingSoftLink : 0 }); /* qqq */
+//     if( !stat )
+//     {
+//       if( o.allowingMissing )
+//       return o.filePath;
+//       else
+//       return false;
+//     }
+
+//     if( stat.isFile() )
+//     {
+
+//       let regexp = /link ([^\n]+)\n?$/;
+//       let size = Number( stat.size );
+//       let readSize = _.bigIntIs( size ) ? BigInt( 256 ) : 256;
+//       let f = File.openSync( cpath, 'r' );
+//       let m;
+//       do
+//       {
+
+//         readSize *= _.bigIntIs( size ) ? BigInt( 2 ) : 2;
+//         readSize = readSize < size ? readSize : size;
+//         if( buffer.length < readSize )
+//         buffer = Buffer.alloc( readSize );
+//         File.readSync( f, buffer, 0, readSize, 0 );
+//         let read = buffer.toString( 'utf8', 0, readSize );
+//         m = read.match( regexp );
+
+//       }
+//       while( m && readSize < size );
+//       File.closeSync( f );
+
+//       if( m )
+//       o.hasLink = true;
+
+//       if( !m )
+//       if( p !== parts.length-1 )
+//       return false;
+//       else
+//       return o.hasLink ? o.filePath : false;
+
+//       /* */
+
+//       let o2 = _.mapExtend( null, o );
+//       o2.filePath = self.path.join( m[ 1 ], parts.slice( p+1 ).join( '/' ) );
+
+//       if( o2.filePath[ 0 ] === '.' )
+//       o2.filePath = self.path.reroot( cpath , '..' , o2.filePath );
+
+//       let result = self._pathResolveTextLinkAct( o2 );
+//       if( o2.hasLink )
+//       {
+//         if( !result )
+//         {
+//           debugger;
+//           throw _.err
+//           (
+//             'Cant resolve : ' + o.visited[ 0 ] +
+//             '\nnot found : ' + ( m ? m[ 1 ] : o.filePath ) +
+//             '\nlooked at :\n' + ( o.visited.join( '\n' ) )
+//           );
+//         }
+//         else
+//         return result;
+//       }
+//       else
+//       {
+//         throw _.err( 'not expected' );
+//         return result;
+//       }
+//     }
+
+//   }
+
+//   return o.hasLink ? o.filePath : false;
+// }
+
+// _pathResolveTextLinkAct.defaults =
+// {
+//   filePath : null,
+//   visited : null,
+//   hasLink : null,
+//   allowingMissing : true,
+// }
+
 function _pathResolveTextLinkAct( o )
 {
   let self = this;
 
   _.assertRoutineOptions( _pathResolveTextLinkAct, arguments );
   _.assert( arguments.length === 1 );
-  _.assert( _.arrayIs( o.visited ) );
 
   if( !buffer )
   buffer = Buffer.alloc( 512 );
 
-  if( o.visited.indexOf( o.filePath ) !== -1 )
-  throw _.err( 'Cyclic text link :', o.filePath );
-  o.visited.push( o.filePath );
+  let stat = self.statResolvedRead({ filePath : o.filePath, resolvingTextLink : 0, resolvingSoftLink : 0 }); /* qqq */
+  if( !stat )
+  return false;
 
-  o.filePath = self.path.normalize( o.filePath );
-  let exists = _.fileProvider.fileExists({ filePath : o.filePath /*, resolvingTextLink : 0*/ }); /*qqq*/
+  if( !stat.isFile() )
+  return false;
 
-  let prefix, parts;
-  if( o.filePath[ 0 ] === '/' )
-  {
-    prefix = '/';
-    parts = o.filePath.substr( 1 ).split( '/' );
-  }
+  let filePath = self.path.nativize( o.filePath );
+  let regexp = /link ([^\n]+)\n?$/;
+  let size = Number( stat.size );
+  let readSize = _.bigIntIs( size ) ? BigInt( 256 ) : 256;
+  let f = File.openSync( filePath, 'r' );
+  readSize *= _.bigIntIs( size ) ? BigInt( 2 ) : 2;
+  readSize = readSize < size ? readSize : size;
+  if( buffer.length < readSize )
+  buffer = Buffer.alloc( readSize );
+  File.readSync( f, buffer, 0, readSize, 0 );
+  File.closeSync( f );
+  let read = buffer.toString( 'utf8', 0, readSize );
+  let m = read.match( regexp );
+
+  if( m )
+  return m[ 1 ];
   else
-  {
-    prefix = '';
-    parts = o.filePath.split( '/' );
-  }
-
-  for( var p = exists ? p = parts.length-1 : 0 ; p < parts.length ; p++ )
-  {
-
-    let cpath = _.fileProvider.path.nativize( prefix + parts.slice( 0, p+1 ).join( '/' ) );
-
-    let stat = _.fileProvider.statResolvedRead({ filePath : cpath, resolvingTextLink : 0, resolvingSoftLink : 0 }); /* qqq */
-    if( !stat )
-    {
-      if( o.allowingMissing )
-      return o.filePath;
-      else
-      return false;
-    }
-
-    if( stat.isFile() )
-    {
-
-      let regexp = /link ([^\n]+)\n?$/;
-      let size = Number( stat.size );
-      let readSize = _.bigIntIs( size ) ? BigInt( 256 ) : 256;
-      let f = File.openSync( cpath, 'r' );
-      let m;
-      do
-      {
-
-        readSize *= _.bigIntIs( size ) ? BigInt( 2 ) : 2;
-        readSize = readSize < size ? readSize : size;
-        if( buffer.length < readSize )
-        buffer = Buffer.alloc( readSize );
-        File.readSync( f, buffer, 0, readSize, 0 );
-        let read = buffer.toString( 'utf8', 0, readSize );
-        m = read.match( regexp );
-
-      }
-      while( m && readSize < size );
-      File.closeSync( f );
-
-      if( m )
-      o.hasLink = true;
-
-      if( !m )
-      if( p !== parts.length-1 )
-      return false;
-      else
-      return o.hasLink ? o.filePath : false;
-
-      /* */
-
-      let o2 = _.mapExtend( null, o );
-      o2.filePath = self.path.join( m[ 1 ], parts.slice( p+1 ).join( '/' ) );
-
-      if( o2.filePath[ 0 ] === '.' )
-      o2.filePath = self.path.reroot( cpath , '..' , o2.filePath );
-
-      let result = self._pathResolveTextLinkAct( o2 );
-      if( o2.hasLink )
-      {
-        if( !result )
-        {
-          debugger;
-          throw _.err
-          (
-            'Cant resolve : ' + o.visited[ 0 ] +
-            '\nnot found : ' + ( m ? m[ 1 ] : o.filePath ) +
-            '\nlooked at :\n' + ( o.visited.join( '\n' ) )
-          );
-        }
-        else
-        return result;
-      }
-      else
-      {
-        throw _.err( 'not expected' );
-        return result;
-      }
-    }
-
-  }
-
-  return o.hasLink ? o.filePath : false;
+  return false;
 }
 
 _pathResolveTextLinkAct.defaults =
 {
-  filePath : null,
-  visited : null,
-  hasLink : null,
-  allowingMissing : true,
+  filePath : null
 }
 
 //
@@ -747,7 +789,7 @@ function statReadAct( o )
   function isTextLink()
   {
     if( this._isTextLink !== undefined )
-    return _isTextLink;
+    return this._isTextLink;
     this._isTextLink = self._isTextLink( o.filePath );
     return this._isTextLink;
   }

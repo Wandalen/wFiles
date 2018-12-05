@@ -10782,61 +10782,23 @@ function filesReflectLinked( test )
   test.is( !_.fileProvider.isSoftLink( _.path.join( dstDir, 'link' ) ) );
   test.identical( _.fileProvider.fileRead( _.path.join( dstDir, 'link' ) ), 'file' );
 
-  /**/
+  /* */
 
+  test.case = 'src - link to missing, dst - link to missing'
   _.fileProvider.filesDelete( testDir );
-
-  _.fileProvider.dirMake( srcDir );
-  _.fileProvider.dirMake( dstDir );
-
-  _.fileProvider.fileWrite( _.path.join( srcDir, 'file' ), 'file' );
-  _.fileProvider.fileWrite( _.path.join( dstDir, 'file' ), 'file' );
-
   _.fileProvider.softLink
   ({
     srcPath : _.path.join( srcDir, 'fileNotExists' ),
     dstPath : _.path.join( srcDir, 'link' ),
-    allowingMissing : 1
+    allowingMissing : 1,
+    makingDirectory : 1
   })
-
-  _.fileProvider.softLink
-  ({
-    srcPath : _.path.join( srcDir, 'fileNotExists' ),
-    dstPath : _.path.join( srcDir, 'link2' ),
-    allowingMissing : 1
-  })
-
-  _.fileProvider.softLink
-  ({
-    srcPath : _.path.join( srcDir, 'file' ),
-    dstPath : _.path.join( srcDir, 'link3' ),
-  })
-
   _.fileProvider.softLink
   ({
     srcPath : _.path.join( dstDir, 'fileNotExists' ),
     dstPath : _.path.join( dstDir, 'link' ),
-    allowingMissing : 1
-  })
-
-  _.fileProvider.softLink
-  ({
-    srcPath : _.path.join( dstDir, 'file' ),
-    dstPath : _.path.join( dstDir, 'link2' ),
-  })
-
-  _.fileProvider.softLink
-  ({
-    srcPath : _.path.join( dstDir, 'fileNotExists' ),
-    dstPath : _.path.join( dstDir, 'link3' ),
-    allowingMissing : 1
-  })
-
-  _.fileProvider.softLink
-  ({
-    srcPath : _.path.join( dstDir, 'fileNotExists' ),
-    dstPath : _.path.join( dstDir, 'link4' ),
-    allowingMissing : 1
+    allowingMissing : 1,
+    makingDirectory : 1
   })
 
   _.fileProvider.filesReflect
@@ -10845,23 +10807,176 @@ function filesReflectLinked( test )
     allowingMissing : 1,
   })
 
-  debugger;
+  test.will = 'dstDir/link should not be rewritten by srcDir/link'
   test.is( _.fileProvider.isSoftLink( _.path.join( dstDir, 'link' ) ) );
-  debugger;
   var dstLink1 = _.fileProvider.pathResolveSoftLink({ filePath : _.path.join( dstDir, 'link' )/*, readLink : 1*/ });
   test.identical( dstLink1, _.path.join( dstDir, 'fileNotExists' ) );
 
-  test.is( _.fileProvider.isSoftLink( _.path.join( dstDir, 'link2' ) ) );
-  var dstLink2 = _.fileProvider.pathResolveSoftLink({ filePath : _.path.join( dstDir, 'link2' )/*, readLink : 1*/ });
-  test.identical( dstLink2, _.path.join( dstDir, 'file' ) );
+  /* */
 
-  test.is( !_.fileProvider.isSoftLink( _.path.join( dstDir, 'link3' ) ) );
-  var read = _.fileProvider.fileRead({ filePath : _.path.join( dstDir, 'link3' ) });
+  test.case = 'src - link to missing, dst - link to terminal'
+  _.fileProvider.filesDelete( testDir );
+  _.fileProvider.softLink
+  ({
+    srcPath : _.path.join( srcDir, 'fileNotExists' ),
+    dstPath : _.path.join( srcDir, 'link' ),
+    allowingMissing : 1,
+    makingDirectory : 1
+  })
+  _.fileProvider.fileWrite( _.path.join( dstDir, 'file' ), 'file' );
+  _.fileProvider.softLink
+  ({
+    srcPath : _.path.join( dstDir, 'file' ),
+    dstPath : _.path.join( dstDir, 'link' ),
+    makingDirectory : 1
+  })
+
+  _.fileProvider.filesReflect
+  ({
+    reflectMap : { [ srcDir ] : dstDir },
+    allowingMissing : 1,
+  })
+
+  test.will = 'dstDir/link should not be rewritten by srcDir/link'
+  test.is( _.fileProvider.isSoftLink( _.path.join( dstDir, 'link' ) ) );
+  var dstLink1 = _.fileProvider.pathResolveSoftLink({ filePath : _.path.join( dstDir, 'link' )/*, readLink : 1*/ });
+  test.identical( dstLink1, _.path.join( dstDir, 'file' ) );
+
+  /* */
+
+  test.case = 'src - link to terminal, dst - link to missing'
+  _.fileProvider.filesDelete( testDir );
+  _.fileProvider.fileWrite( _.path.join( srcDir, 'file' ), 'file' );
+  _.fileProvider.softLink
+  ({
+    srcPath : _.path.join( srcDir, 'file' ),
+    dstPath : _.path.join( srcDir, 'link' ),
+    makingDirectory : 1
+  })
+  _.fileProvider.softLink
+  ({
+    srcPath : _.path.join( dstDir, 'fileNotExists' ),
+    dstPath : _.path.join( dstDir, 'link' ),
+    allowingMissing : 1,
+    makingDirectory : 1
+  })
+
+  _.fileProvider.filesReflect
+  ({
+    reflectMap : { [ srcDir ] : dstDir },
+    allowingMissing : 1,
+  })
+
+  test.will = 'dstDir/link should be rewritten by srcDir/link'
+  test.is( !_.fileProvider.isSoftLink( _.path.join( dstDir, 'link' ) ) );
+  test.is( _.fileProvider.isTerminal( _.path.join( dstDir, 'link' ) ) );
+  var read = _.fileProvider.fileRead({ filePath : _.path.join( dstDir, 'link' ) });
   test.identical( read, 'file' );
 
-  test.is( _.fileProvider.isSoftLink( _.path.join( dstDir, 'link4' ) ) );
-  var dstLink4 = _.fileProvider.pathResolveSoftLink({ filePath : _.path.join( dstDir, 'link4' )/*, readLink : 1*/ });
+  /* */
+
+  test.case = 'src - no files, dst - link to missing'
+  _.fileProvider.filesDelete( testDir );
+  _.fileProvider.softLink
+  ({
+    srcPath : _.path.join( dstDir, 'fileNotExists' ),
+    dstPath : _.path.join( dstDir, 'link' ),
+    allowingMissing : 1,
+    makingDirectory : 1
+  })
+
+  _.fileProvider.filesReflect
+  ({
+    reflectMap : { [ srcDir ] : dstDir },
+    allowingMissing : 1,
+  })
+
+  test.will = 'dstDir/link should not be rewritten by srcDir/link'
+  test.is( _.fileProvider.isSoftLink( _.path.join( dstDir, 'link' ) ) );
+  var dstLink4 = _.fileProvider.pathResolveSoftLink({ filePath : _.path.join( dstDir, 'link' )/*, readLink : 1*/ });
   test.identical( dstLink4, _.path.join( dstDir, 'fileNotExists' ) );
+
+  //
+
+  // /* old test case */
+
+  // _.fileProvider.filesDelete( testDir );
+
+  // _.fileProvider.dirMake( srcDir );
+  // _.fileProvider.dirMake( dstDir );
+
+  // _.fileProvider.fileWrite( _.path.join( srcDir, 'file' ), 'file' );
+  // _.fileProvider.fileWrite( _.path.join( dstDir, 'file' ), 'file' );
+
+  // _.fileProvider.softLink
+  // ({
+  //   srcPath : _.path.join( srcDir, 'fileNotExists' ),
+  //   dstPath : _.path.join( srcDir, 'link' ),
+  //   allowingMissing : 1
+  // })
+
+  // _.fileProvider.softLink
+  // ({
+  //   srcPath : _.path.join( srcDir, 'fileNotExists' ),
+  //   dstPath : _.path.join( srcDir, 'link2' ),
+  //   allowingMissing : 1
+  // })
+
+  // _.fileProvider.softLink
+  // ({
+  //   srcPath : _.path.join( srcDir, 'file' ),
+  //   dstPath : _.path.join( srcDir, 'link3' ),
+  // })
+
+  // _.fileProvider.softLink
+  // ({
+  //   srcPath : _.path.join( dstDir, 'fileNotExists' ),
+  //   dstPath : _.path.join( dstDir, 'link' ),
+  //   allowingMissing : 1
+  // })
+
+  // _.fileProvider.softLink
+  // ({
+  //   srcPath : _.path.join( dstDir, 'file' ),
+  //   dstPath : _.path.join( dstDir, 'link2' ),
+  // })
+
+  // _.fileProvider.softLink
+  // ({
+  //   srcPath : _.path.join( dstDir, 'fileNotExists' ),
+  //   dstPath : _.path.join( dstDir, 'link3' ),
+  //   allowingMissing : 1
+  // })
+
+  // _.fileProvider.softLink
+  // ({
+  //   srcPath : _.path.join( dstDir, 'fileNotExists' ),
+  //   dstPath : _.path.join( dstDir, 'link4' ),
+  //   allowingMissing : 1
+  // })
+
+  // _.fileProvider.filesReflect
+  // ({
+  //   reflectMap : { [ srcDir ] : dstDir },
+  //   allowingMissing : 1,
+  // })
+
+  // test.is( _.fileProvider.isSoftLink( _.path.join( dstDir, 'link' ) ) );
+  // var dstLink1 = _.fileProvider.pathResolveSoftLink({ filePath : _.path.join( dstDir, 'link' )/*, readLink : 1*/ });
+  // test.identical( dstLink1, _.path.join( dstDir, 'fileNotExists' ) );
+
+  // test.is( _.fileProvider.isSoftLink( _.path.join( dstDir, 'link2' ) ) );
+  // var dstLink2 = _.fileProvider.pathResolveSoftLink({ filePath : _.path.join( dstDir, 'link2' )/*, readLink : 1*/ });
+  // test.identical( dstLink2, _.path.join( dstDir, 'file' ) );
+
+  // test.is( !_.fileProvider.isSoftLink( _.path.join( dstDir, 'link3' ) ) );
+  // var read = _.fileProvider.fileRead({ filePath : _.path.join( dstDir, 'link3' ) });
+  // test.identical( read, 'file' );
+
+  // test.is( _.fileProvider.isSoftLink( _.path.join( dstDir, 'link4' ) ) );
+  // var dstLink4 = _.fileProvider.pathResolveSoftLink({ filePath : _.path.join( dstDir, 'link4' )/*, readLink : 1*/ });
+  // test.identical( dstLink4, _.path.join( dstDir, 'fileNotExists' ) );
+
 
   xxx
 

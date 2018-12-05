@@ -5600,7 +5600,7 @@ function _link_pre( routine, args )
 {
   let self = this;
   let o = self._preSrcDstPathWithProviderDefaults.apply( self, arguments );
-
+  _.mapSupplementNulls( o, routine.defaults );
   return o;
 
   // let self = this;
@@ -5710,7 +5710,10 @@ function _linkMultiple( o, link )
   {
     let read = self.fileRead({ filePath : newestRecord.absolute, encoding : 'original.type' });
     self.fileWrite( mostLinkedRecord.absolute, read );
-    /* qqq : should be fileCopyAct here */
+    /*
+      fileCopy cant be used here
+      because hardlinks of most linked file with other files should be preserved
+    */
   }
 
   /* */
@@ -5840,15 +5843,16 @@ function _link_functor( gen )
     let result;
     let tempPath;
 
-    // if( entryMethodName === 'fileCopy' )
-    // debugger;
-    // logger.log( entryMethodName, o.dstPath, '<-', o.srcPath );
-
     verify( arguments );
 
     if( _.longIs( o.dstPath ) && linkAct.having.hardLinking ) /* qqq : should work not only for hardlinks */
     return _linkMultiple.call( self, o, _link_body );
     _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
+
+    // if( entryMethodName === 'fileCopy' )
+    // debugger;
+    // self.logger.log( ' +', entryMethodName, ':', path.moveReport( o.dstPath, o.srcPath ) );
+    // debugger;
 
     pathResolve();
     pathResolveLinks();
@@ -5925,12 +5929,12 @@ function _link_functor( gen )
       _.assert( _.routineIs( linkAct ), 'method', actMethodName, 'is not implemented' );
       _.assert( _.objectIs( linkAct.defaults ), 'method', actMethodName, 'does not have defaults, but should' );
       _.assertRoutineOptions( _link_body, args );
-      _.assert( o.breakingSrcHardLink !== null );
-      _.assert( o.resolvingSrcSoftLink !== null );
-      _.assert( o.resolvingSrcTextLink !== null );
-      _.assert( o.breakingDstHardLink !== null );
-      _.assert( o.resolvingDstSoftLink !== null );
-      _.assert( o.resolvingDstTextLink !== null );
+      _.assert( _.boolLike( o.breakingSrcHardLink ) );
+      _.assert( _.boolLike( o.resolvingSrcSoftLink ) );
+      _.assert( _.boolLike( o.resolvingSrcTextLink ) );
+      _.assert( _.boolLike( o.breakingDstHardLink ) );
+      _.assert( _.boolLike( o.resolvingDstSoftLink ) );
+      _.assert( _.boolLike( o.resolvingDstTextLink ) );
     }
 
     /* - */
@@ -6099,7 +6103,7 @@ function _link_functor( gen )
       if( !renamingAllowed )
       return false;
 
-      if( !renamingHardLinks && self.isHardLink( o.dstPath ) )
+      if( !renamingHardLinks && dstStat.isHardLink() )
       return false;
 
       return true;
@@ -6255,7 +6259,7 @@ _link_functor.defaults =
   // expectingAbsolutePaths : true,
 
   renamingAllowed : true,
-  renamingHardLinks : false,
+  renamingHardLinks : true,
 
   skippingSamePath : true,
   skippingHardLinked : false,
@@ -6500,7 +6504,7 @@ function fileCopy_functor()
     actMethodName : 'fileCopyAct',
     onBeforeRaname : _onBeforeRaname,
     renamingAllowed : true,
-    renamingHardLinks : true,
+    renamingHardLinks : false,
     skippingSamePath : true,
     skippingMissing : true,
   });

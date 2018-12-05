@@ -28744,8 +28744,8 @@ function pathResolveLinkChain( test )
   self.provider.fileWrite( linkPath, 'link ' + linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
   self.provider.pathResolveLinkChain( o );
-  test.identical( o.result, [ linkPath,filePath ] );
-  test.identical( o.found, [ linkPath,filePath ] );
+  test.identical( o.result, [ linkPath, linkPath2, filePath ] );
+  test.identical( o.found, [ linkPath, linkPath2, filePath ] );
 
   test.case = 'text-text-file, preservingRelative';
   self.provider.filesDelete( _.path.dir( filePath ) );
@@ -28754,8 +28754,8 @@ function pathResolveLinkChain( test )
   self.provider.fileWrite( linkPath, 'link ' + linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   self.provider.pathResolveLinkChain( o );
-  test.identical( o.result, [ linkPath,filePath ] );
-  test.identical( o.found, [ linkPath,filePath ] );
+  test.identical( o.result, [ linkPath, linkPath2, filePath ] );
+  test.identical( o.found, [ linkPath, linkPath2, filePath ] );
 
   test.case = 'soft-text-soft-file';
   self.provider.filesDelete( _.path.dir( filePath ) );
@@ -29007,19 +29007,17 @@ function pathResolveLinkChain( test )
 
   test.case = 'self cycle text, throwing on '
   self.provider.filesDelete( _.path.dir( filePath ) );
-  self.provider.fileWrite( linkPath, 'link ' + linkPath );
+  self.provider.fileWrite( linkPath, 'link ' + '../link' );
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1 } );
   test.shouldThrowError( () => self.provider.pathResolveLinkChain( o ) );
 
   test.case = 'self cycle text, throwing off'
   self.provider.filesDelete( _.path.dir( filePath ) );
-  self.provider.fileWrite( linkPath, 'link ' + linkPath );
+  self.provider.fileWrite( linkPath, 'link ' + '../link' );
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0 } );
   self.provider.pathResolveLinkChain( o );
   test.identical( o.result, [ linkPath,linkPath ] );
   test.identical( o.found, [ linkPath,linkPath ] );
-
-  // debugger; return; xxx
 
   test.case = 'cycle softlink, throwing on'
   self.provider.filesDelete( _.path.dir( filePath ) );

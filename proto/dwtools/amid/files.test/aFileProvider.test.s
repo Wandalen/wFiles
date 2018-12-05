@@ -27435,13 +27435,47 @@ function isLink( test )
   test.identical( got.isDirectory(), true );
   test.identical( got.isLink(), false );
 
+  test.case = 'text self cycled'
+  self.provider.filesDelete( dirPath );
+  self.provider.fileWrite( linkPath, 'link ../link' );
+  var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
+  var got = self.provider.isLink( _.mapExtend( null, o ) );
+  test.identical( got, false );
+  var got = self.provider.statRead( _.mapExtend( null, o ) );
+  test.identical( got,null );
+
+  test.case = 'text self cycled'
+  self.provider.filesDelete( dirPath );
+  self.provider.fileWrite( linkPath, 'link ../link' );
+  var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
+  var got = self.provider.isLink( _.mapExtend( null, o ) );
+  test.identical( got, true );
+  var got = self.provider.statRead( _.mapExtend( null, o ) );
+  test.identical( got.isTerminal(), true );
+  test.identical( got.isHardLink(), false );
+  test.identical( got.isSoftLink(), false );
+  test.identical( got.isTextLink(), true );
+  test.identical( got.isDirectory(), false );
+  test.identical( got.isLink(), true );
+
+  test.case = 'text self cycled'
+  self.provider.filesDelete( dirPath );
+  self.provider.fileWrite( linkPath, 'link ../link' );
+  var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
+  var got = self.provider.isLink( _.mapExtend( null, o ) );
+  test.identical( got, false );
+  var got = self.provider.statRead( _.mapExtend( null, o ) );
+  test.identical( got,null );
+
   test.case = 'text cycled'
   self.provider.filesDelete( dirPath );
   self.provider.fileWrite( linkPath2, 'link ' + linkPath );
   self.provider.fileWrite( linkPath, 'link ' + linkPath2 );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  test.shouldThrowError( () => self.provider.isLink( _.mapExtend( null, o ) ) );
-  test.shouldThrowError( () => self.provider.statRead( _.mapExtend( null, o ) ) );
+  var got = self.provider.isLink( _.mapExtend( null, o ) );
+  test.identical( got, false );
+  var got = self.provider.statRead( _.mapExtend( null, o ) );
+  test.identical( got,null );
 
   test.case = 'text cycled'
   self.provider.filesDelete( dirPath );
@@ -27463,8 +27497,10 @@ function isLink( test )
   self.provider.fileWrite( linkPath2, 'link ' + linkPath );
   self.provider.fileWrite( linkPath, 'link ' + linkPath2 );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  test.shouldThrowError( () => self.provider.isLink( _.mapExtend( null, o ) ) );
-  test.shouldThrowError( () => self.provider.statRead( _.mapExtend( null, o ) ) );
+  var got = self.provider.isLink( _.mapExtend( null, o ) );
+  test.identical( got, false );
+  var got = self.provider.statRead( _.mapExtend( null, o ) );
+  test.identical( got,null );
 
   self.provider.fieldPop( 'usingTextLink', 1 );
 }

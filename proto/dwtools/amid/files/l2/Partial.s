@@ -4398,7 +4398,7 @@ function isLink_body( o )
   if( o.resolvingSoftLink && o.resolvingTextLink )
   return result;
 
-  let stat = self.statRead
+  /* let stat = self.statRead
   ({
     filePath : o.filePath,
     resolvingSoftLink : o.resolvingSoftLink,
@@ -4408,7 +4408,34 @@ function isLink_body( o )
   if( !stat )
   return result;
 
-  result = stat.isLink();
+  result = stat.isLink(); */
+
+  let stat = self.statReadAct
+  ({
+    filePath : o.filePath,
+    throwing : 0,
+    sync : 1,
+    resolvingSoftLink : 0,
+  });
+
+  let o2 =
+  {
+    filePath : o.filePath,
+    resolvingSoftLink : o.resolvingSoftLink,
+    resolvingTextLink : o.resolvingTextLink,
+    stat : stat,
+    throwing : 0
+  }
+
+  o.filePath = self.pathResolveLink( o2 );
+
+  if( o.filePath === null )
+  return result;
+
+  if( o2.stat === null )
+  return result;
+
+  result = o2.stat.isLink();
 
   // if( !o.resolvingSoftLink && !result )
   // result = stat.isSoftLink();

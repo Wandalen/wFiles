@@ -696,7 +696,7 @@ _pathForCopy_body.defaults =
   path : null,
 }
 
-var paths = _pathForCopy_body.paths = Object.create( null );
+// var paths = _pathForCopy_body.paths = Object.create( null );
 var having = _pathForCopy_body.having = Object.create( null );
 
 having.driving = 0;
@@ -875,9 +875,9 @@ var defaults = pathResolveSoftLinkAct.defaults = Object.create( null );
 defaults.filePath = null;
 // defaults.readLink = 0;
 
-var paths = pathResolveSoftLinkAct.paths = Object.create( null );
-
-paths.filePath = null;
+// var paths = pathResolveSoftLinkAct.paths = Object.create( null );
+//
+// paths.filePath = null;
 
 var having = pathResolveSoftLinkAct.having = Object.create( null );
 
@@ -952,7 +952,7 @@ pathResolveSoftLink.pre = _preFilePathScalarWithProviderDefaults;
 pathResolveSoftLink.body = pathResolveSoftLink_body;
 
 var defaults = pathResolveSoftLink.defaults = Object.create( pathResolveSoftLink_body.defaults );
-var paths = pathResolveSoftLink.paths = Object.create( pathResolveSoftLink_body.paths );
+// var paths = pathResolveSoftLink.paths = Object.create( pathResolveSoftLink_body.paths );
 var having = pathResolveSoftLink.having = Object.create( pathResolveSoftLink_body.having );
 
 having.aspect = 'entry';
@@ -1231,9 +1231,9 @@ pathResolveLinkChain_body.defaults =
   stat : null,
 }
 
-var paths = pathResolveLinkChain_body.paths = Object.create( null );
-
-paths.filePath = null;
+// var paths = pathResolveLinkChain_body.paths = Object.create( null );
+//
+// paths.filePath = null;
 
 var having = pathResolveLinkChain_body.having = Object.create( null );
 
@@ -1440,9 +1440,9 @@ pathResolveLink_body.defaults =
   // resolvingIntermediateDirectories : 0, /* qqq : why was it here? */
 }
 
-var paths = pathResolveLink_body.paths = Object.create( null );
-
-paths.filePath = null;
+// var paths = pathResolveLink_body.paths = Object.create( null );
+//
+// paths.filePath = null;
 
 var having = pathResolveLink_body.having = Object.create( null );
 
@@ -1871,9 +1871,9 @@ defaults.sync = null;
 defaults.throwing = 0;
 defaults.resolvingSoftLink = null;
 
-var paths = statReadAct.paths = Object.create( null );
-
-paths.filePath = null;
+// var paths = statReadAct.paths = Object.create( null );
+//
+// paths.filePath = null;
 
 var having = statReadAct.having = Object.create( null );
 
@@ -2149,9 +2149,9 @@ var defaults = _fileExistsAct.defaults = Object.create( null );
 defaults.filePath = null;
 defaults.sync = null;
 
-var paths = _fileExistsAct.paths = Object.create( null );
-
-paths.filePath = null;
+// var paths = _fileExistsAct.paths = Object.create( null );
+//
+// paths.filePath = null;
 
 var having = _fileExistsAct.having = Object.create( null );
 
@@ -2292,9 +2292,9 @@ var defaults = streamReadAct.defaults = Object.create( null );
 defaults.filePath = null;
 defaults.encoding = null;
 
-var paths = streamReadAct.paths = Object.create( null );
-
-paths.filePath = null;
+// var paths = streamReadAct.paths = Object.create( null );
+//
+// paths.filePath = null;
 
 var having = streamReadAct.having = Object.create( null );
 
@@ -2340,7 +2340,7 @@ var defaults = streamRead_body.defaults = Object.create( streamReadAct.defaults 
 
 defaults.throwing = null;
 
-var paths = streamRead_body.paths = Object.create( streamReadAct.paths );
+// var paths = streamRead_body.paths = Object.create( streamReadAct.paths );
 var having = streamRead_body.having = Object.create( streamReadAct.having );
 
 having.driving = 0;
@@ -2375,9 +2375,9 @@ defaults.encoding = null;
 defaults.advanced = null;
 defaults.resolvingSoftLink = null;
 
-var paths = fileReadAct.paths = Object.create( null );
-
-paths.filePath = null;
+// var paths = fileReadAct.paths = Object.create( null );
+//
+// paths.filePath = null;
 
 var having = fileReadAct.having = Object.create( null );
 
@@ -2545,7 +2545,7 @@ defaults.onError = null;
 defaults.resolvingTextLink = null;
 defaults.verbosity = null;
 
-var paths = fileRead_body.paths = Object.create( fileReadAct.paths );
+// var paths = fileRead_body.paths = Object.create( fileReadAct.paths );
 var having = fileRead_body.having = Object.create( fileReadAct.having );
 
 having.driving = 0;
@@ -2714,7 +2714,7 @@ var defaults = fileReadJson_body.defaults = Object.create( fileRead.defaults );
 defaults.sync = 1;
 defaults.encoding = 'json';
 
-var paths = fileReadJson_body.paths = Object.create( fileRead.paths );
+// var paths = fileReadJson_body.paths = Object.create( fileRead.paths );
 var having = fileReadJson_body.having = Object.create( fileRead.having );
 
 having.driving = 0;
@@ -2757,7 +2757,7 @@ var defaults = fileReadJs_body.defaults = Object.create( fileRead.defaults );
 defaults.sync = 1;
 defaults.encoding = 'js.structure';
 
-var paths = fileReadJs_body.paths = Object.create( fileRead.paths );
+// var paths = fileReadJs_body.paths = Object.create( fileRead.paths );
 var having = fileReadJs_body.having = Object.create( fileRead.having );
 
 having.driving = 0;
@@ -2844,9 +2844,9 @@ defaults.filePath = null;
 defaults.sync = null;
 defaults.throwing = null;
 
-var paths = fileHashAct.paths = Object.create( null );
-
-paths.filePath = null;
+// var paths = fileHashAct.paths = Object.create( null );
+//
+// paths.filePath = null;
 
 var having = fileHashAct.having = Object.create( null );
 
@@ -3037,9 +3037,9 @@ defaults.filePath = null;
 defaults.sync = null;
 defaults.throwing = null;
 
-var paths = dirReadAct.paths = Object.create( null );
-
-paths.filePath = null;
+// var paths = dirReadAct.paths = Object.create( null );
+//
+// paths.filePath = null;
 
 var having = dirReadAct.having = Object.create( null );
 
@@ -3133,7 +3133,7 @@ defaults.outputFormat = 'relative';
 defaults.basePath = null;
 defaults.throwing = 0;
 
-var paths = dirRead_body.paths = Object.create( dirReadAct.paths );
+// var paths = dirRead_body.paths = Object.create( dirReadAct.paths );
 var having = dirRead_body.having = Object.create( dirReadAct.having );
 
 having.driving = 0;
@@ -3212,7 +3212,7 @@ function dirReadDirs_body( o )
 }
 
 var defaults = dirReadDirs_body.defaults = Object.create( dirRead.defaults );
-var paths = dirReadDirs_body.paths = Object.create( dirRead.defaults );
+// var paths = dirReadDirs_body.paths = Object.create( dirRead.defaults );
 var having = dirReadDirs_body.having = Object.create( dirRead.defaults );
 
 having.driving = 0;
@@ -3244,7 +3244,7 @@ function dirReadTerminals_body( o )
 }
 
 var defaults = dirReadTerminals_body.defaults = Object.create( dirRead.defaults );
-var paths = dirReadTerminals_body.paths = Object.create( dirRead.defaults );
+// var paths = dirReadTerminals_body.paths = Object.create( dirRead.defaults );
 var having = dirReadTerminals_body.having = Object.create( dirRead.defaults );
 
 having.driving = 0;
@@ -3436,7 +3436,7 @@ defaults.ins1 = null;
 defaults.ins2 = null;
 defaults.default = NaN;
 
-var paths = filesAreSame_body.paths = Object.create( null );
+// var paths = filesAreSame_body.paths = Object.create( null );
 
 var having = filesAreSame_body.having = Object.create( null );
 
@@ -3680,9 +3680,9 @@ defaults.filePath = null;
 defaults.resolvingSoftLink = 0;
 defaults.resolvingTextLink = 0;
 
-var paths = isTerminal_body.paths = Object.create( null );
-
-paths.filePath = null;
+// var paths = isTerminal_body.paths = Object.create( null );
+//
+// paths.filePath = null;
 
 var having = isTerminal_body.having = Object.create( null );
 
@@ -3828,9 +3828,9 @@ defaults.filePath = null;
 defaults.resolvingSoftLink = 0;
 defaults.resolvingTextLink = 0;
 
-var paths = isDir_body.paths = Object.create( null );
-
-paths.filePath = null;
+// var paths = isDir_body.paths = Object.create( null );
+//
+// paths.filePath = null;
 
 var having = isDir_body.having = Object.create( null );
 
@@ -3992,9 +3992,9 @@ defaults.filePath = null;
 defaults.resolvingSoftLink = 0;
 // defaults.resolvingTextLink = 0;
 
-var paths = isTextLink_body.paths = Object.create( null );
-
-paths.filePath = null;
+// var paths = isTextLink_body.paths = Object.create( null );
+//
+// paths.filePath = null;
 
 var having = isTextLink_body.having = Object.create( null );
 
@@ -4165,9 +4165,9 @@ defaults.filePath = null;
 // defaults.resolvingSoftLink = 0;
 defaults.resolvingTextLink = 0;
 
-var paths = isSoftLink_body.paths = Object.create( null );
-
-paths.filePath = null;
+// var paths = isSoftLink_body.paths = Object.create( null );
+//
+// paths.filePath = null;
 
 var having = isSoftLink_body.having = Object.create( null );
 
@@ -4335,9 +4335,9 @@ defaults.filePath = null;
 defaults.resolvingSoftLink = 0;
 defaults.resolvingTextLink = 0;
 
-var paths = isHardLink_body.paths = Object.create( null );
-
-paths.filePath = null;
+// var paths = isHardLink_body.paths = Object.create( null );
+//
+// paths.filePath = null;
 
 var having = isHardLink_body.having = Object.create( null );
 
@@ -4473,9 +4473,9 @@ defaults.resolvingSoftLink = 0;
 defaults.resolvingTextLink = 0;
 defaults.usingTextLink = 0;
 
-var paths = isLink_body.paths = Object.create( null );
-
-paths.filePath = null;
+// var paths = isLink_body.paths = Object.create( null );
+//
+// paths.filePath = null;
 
 var having = isLink_body.having = Object.create( null );
 
@@ -4582,9 +4582,9 @@ var defaults = streamWriteAct.defaults = Object.create( null );
 
 defaults.filePath = null;
 
-var paths = streamWriteAct.paths = Object.create( null );
-
-paths.filePath = null;
+// var paths = streamWriteAct.paths = Object.create( null );
+//
+// paths.filePath = null;
 
 var having = streamWriteAct.having = Object.create( null );
 
@@ -4610,7 +4610,7 @@ function _streamWrite_body( o )
 }
 
 var defaults = _streamWrite_body.defaults = Object.create( streamWriteAct.defaults );
-var paths = _streamWrite_body.paths = Object.create( streamWriteAct.paths );
+// var paths = _streamWrite_body.paths = Object.create( streamWriteAct.paths );
 var having = _streamWrite_body.having = Object.create( streamWriteAct.having );
 
 having.driving = 0;
@@ -4632,9 +4632,9 @@ defaults.data = '';
 defaults.encoding = 'original.type';
 defaults.writeMode = 'rewrite';
 
-var paths = fileWriteAct.paths = Object.create( null );
-
-paths.filePath = null;
+// var paths = fileWriteAct.paths = Object.create( null );
+//
+// paths.filePath = null;
 
 var having = fileWriteAct.having = Object.create( null );
 
@@ -4776,7 +4776,7 @@ defaults.verbosity = null;
 defaults.makingDirectory = 1;
 defaults.purging = 0;
 
-var paths = fileWrite_body.paths = Object.create( fileWriteAct.paths );
+// var paths = fileWrite_body.paths = Object.create( fileWriteAct.paths );
 var having = fileWrite_body.having = Object.create( fileWriteAct.having );
 
 having.driving = 0;
@@ -4852,7 +4852,7 @@ var defaults = _fileAppend_body.defaults = Object.create( fileWrite.defaults );
 
 defaults.writeMode = 'append';
 
-var paths = _fileAppend_body.paths = Object.create( fileWrite.paths );
+// var paths = _fileAppend_body.paths = Object.create( fileWrite.paths );
 var having = _fileAppend_body.having = Object.create( fileWrite.having );
 
 having.driving = 0;
@@ -4930,7 +4930,7 @@ defaults.pretty = 1;
 defaults.sync = null;
 defaults.cloning = _.toJson.cloning;
 
-var paths = _fileWriteJson_body.paths = Object.create( fileWrite.paths );
+// var paths = _fileWriteJson_body.paths = Object.create( fileWrite.paths );
 var having = _fileWriteJson_body.having = Object.create( fileWrite.having );
 
 having.driving = 0;
@@ -5060,7 +5060,7 @@ var defaults = fileTouch_body.defaults = Object.create( fileWrite.defaults );
 
 defaults.data = null;
 
-var paths = fileTouch_body.paths = Object.create( fileWrite.paths );
+// var paths = fileTouch_body.paths = Object.create( fileWrite.paths );
 var having = fileTouch_body.having = Object.create( fileWrite.having );
 
 having.driving = 0;
@@ -5082,9 +5082,9 @@ defaults.filePath = null;
 defaults.atime = null;
 defaults.mtime = null;
 
-var paths = fileTimeSetAct.paths = Object.create( null );
-
-paths.filePath = null;
+// var paths = fileTimeSetAct.paths = Object.create( null );
+//
+// paths.filePath = null;
 
 var having = fileTimeSetAct.having = Object.create( null );
 
@@ -5145,7 +5145,7 @@ function _fileTimeSet_body( o )
 }
 
 var defaults = _fileTimeSet_body.defaults = Object.create( fileTimeSetAct.defaults );
-var paths = _fileTimeSet_body.paths = Object.create( fileTimeSetAct.paths );
+// var paths = _fileTimeSet_body.paths = Object.create( fileTimeSetAct.paths );
 var having = _fileTimeSet_body.having = Object.create( fileTimeSetAct.having );
 
 having.driving = 0;
@@ -5166,9 +5166,9 @@ var defaults = fileDeleteAct.defaults = Object.create( null );
 defaults.filePath = null;
 defaults.sync = null;
 
-var paths = fileDeleteAct.paths = Object.create( null );
-
-paths.filePath = null;
+// var paths = fileDeleteAct.paths = Object.create( null );
+//
+// paths.filePath = null;
 
 var having = fileDeleteAct.having = Object.create( null );
 
@@ -5317,7 +5317,7 @@ defaults.safe = null;
 defaults.resolvingSoftLink = 0;
 defaults.resolvingTextLink = 0;
 
-var paths = fileDelete_body.paths = Object.create( fileDeleteAct.paths );
+// var paths = fileDelete_body.paths = Object.create( fileDeleteAct.paths );
 var having = fileDelete_body.having = Object.create( fileDeleteAct.having );
 
 having.driving = 0;
@@ -5380,9 +5380,9 @@ dirMakeAct.defaults =
   sync : null,
 }
 
-var paths = dirMakeAct.paths = Object.create( null );
-
-paths.filePath = null;
+// var paths = dirMakeAct.paths = Object.create( null );
+//
+// paths.filePath = null;
 
 var having = dirMakeAct.having = Object.create( null );
 
@@ -5501,7 +5501,7 @@ var defaults = _dirMake_body.defaults = Object.create( dirMakeAct.defaults );
 defaults.recursive = 1;
 defaults.rewritingTerminal = 1;
 
-var paths = _dirMake_body.paths = Object.create( dirMakeAct.paths );
+// var paths = _dirMake_body.paths = Object.create( dirMakeAct.paths );
 var having = _dirMake_body.having = Object.create( dirMakeAct.having );
 
 having.driving = 0;
@@ -5528,7 +5528,7 @@ var defaults = _dirMakeForFile_body.defaults = Object.create( dirMake.defaults )
 
 defaults.recursive = 1;
 
-var paths = _dirMakeForFile_body.paths = Object.create( dirMake.paths );
+// var paths = _dirMakeForFile_body.paths = Object.create( dirMake.paths );
 var having = _dirMakeForFile_body.having = Object.create( dirMake.having );
 
 having.driving = 0;
@@ -5537,114 +5537,6 @@ having.aspect = 'body';
 let dirMakeForFile = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, _dirMakeForFile_body );
 
 dirMakeForFile.having.aspect = 'entry';
-
-// --
-// link act
-// --
-
-let fileRenameAct = Object.create( null );
-
-fileRenameAct.name = 'fileRenameAct';
-
-var defaults = fileRenameAct.defaults = Object.create( null );
-
-defaults.dstPath = null;
-defaults.srcPath = null;
-defaults.originalDstPath = null;
-defaults.originalSrcPath = null;
-defaults.sync = null;
-
-var paths = fileRenameAct.paths = Object.create( null );
-
-paths.dstPath = null;
-paths.srcPath = null;
-
-var having = fileRenameAct.having = Object.create( null );
-
-having.writing = 1;
-having.reading = 0;
-having.driving = 1;
-
-var operates = fileRenameAct.operates = Object.create( null );
-
-operates.srcPath = { pathToRead : 1 }
-operates.dstPath = { pathToWrite : 1 }
-
-//
-
-let softLinkAct = Object.create( null );
-
-var defaults = softLinkAct.defaults = Object.create( null );
-
-defaults.dstPath = null;
-defaults.srcPath = null;
-defaults.originalDstPath = null;
-defaults.originalSrcPath = null;
-defaults.sync = null;
-defaults.type = null;
-
-var paths = softLinkAct.paths = Object.create( null );
-
-paths.dstPath = null;
-// paths.srcPath = null;
-
-var having = softLinkAct.having = Object.create( null );
-
-having.writing = 1;
-having.reading = 0;
-having.driving = 1;
-
-var operates = softLinkAct.operates = Object.create( null );
-
-operates.srcPath = { pathToRead : 1 }
-operates.dstPath = { pathToWrite : 1 }
-
-//
-
-/**
- * Creates hard link( new name ) to existing source( o.srcPath ) named as ( o.dstPath ).
- *
- * Accepts only ready options.
- * Expects normalized absolute paths for source( o.srcPath ) and destination( o.dstPath ), routine makes nativization by itself.
- * Source ( o.srcPath ) must be an existing terminal file.
- * Destination ( o.dstPath ) must not exist in filesystem.
- * Folders structure before destination( o.dstPath ) must exist in filesystem.
- * If source( o.srcPath ) and destination( o.dstPath ) paths are equal, operiation is considered as successful.
- *
- * @method hardLinkAct
- * @memberof wFileProviderPartial
- */
-
-let hardLinkAct = Object.create( null );
-
-hardLinkAct.name = 'hardLinkAct';
-
-var defaults = hardLinkAct.defaults = Object.create( null );
-
-defaults.dstPath = null;
-defaults.srcPath = null;
-defaults.originalDstPath = null;
-defaults.originalSrcPath = null;
-defaults.breakingSrcHardLink = 0;
-defaults.breakingDstHardLink = 1;
-defaults.sync = null;
-
-var paths = hardLinkAct.paths = Object.create( null );
-
-// paths.dstPath = null;
-// paths.srcPath = null;
-
-var having = hardLinkAct.having = Object.create( null );
-
-having.writing = 1;
-having.reading = 0;
-having.driving = 1;
-having.hardLinking = 1;
-
-var operates = hardLinkAct.operates = Object.create( null );
-
-operates.srcPath = { pathToRead : 1 }
-operates.dstPath = { pathToWrite : 1 }
 
 // --
 // link
@@ -5873,18 +5765,22 @@ function _link_functor( gen )
   let actMethodName = gen.actMethodName;
   let entryMethodName = _.strRemoveEnd( gen.actMethodName, 'Act' );
   // let expectingAbsolutePaths = gen.expectingAbsolutePaths;
-  let onBeforeRaname = gen.onBeforeRaname;
+  let onVerify = gen.onVerify;
+  let onSkip = gen.onSkip;
+  let onRanameBegin = gen.onRanameBegin;
   // let onAfterRaname = gen.onAfterRaname;
-  let renamingAllowed = gen.renamingAllowed;
-  let renamingHardLinks = gen.renamingHardLinks;
+  let renaming = gen.renaming;
+  // let renamingHardLinks = gen.renamingHardLinks;
   let skippingSamePath = gen.skippingSamePath;
-  let skippingHardLinked = gen.skippingHardLinked;
-  let skippingSoftLinked = gen.skippingSoftLinked;
+  // let skippingHardLinked = gen.skippingHardLinked;
+  // let skippingSoftLinked = gen.skippingSoftLinked;
   let skippingMissing = gen.skippingMissing;
 
   _.assert( _.objectIs( actMethod ) || _.routineIs( actMethod ) );
   _.assert( _.objectIs( actMethod.defaults ) );
-  _.assert( !onBeforeRaname || _.routineIs( onBeforeRaname ) );
+  _.assert( !onVerify || _.routineIs( onVerify ) );
+  _.assert( !onSkip || _.routineIs( onSkip ) );
+  _.assert( !onRanameBegin || _.routineIs( onRanameBegin ) );
   // _.assert( !onAfterRaname || _.routineIs( onAfterRaname ) );
 
   /* - */
@@ -5893,31 +5789,35 @@ function _link_functor( gen )
   {
     let self = this;
     let path = self.path;
-    let linkAct = self[ actMethodName ];
-    let result;
-    let tempPath;
+    let c = Object.create( null );
+    c.linkAct = self[ actMethodName ];
+    c.result = undefined;
+    c.tempPath = undefined;
+    c.dstStat = undefined;
+    c.srcStat = undefined;
+    c.options = o;
 
     verify( arguments );
 
-    if( _.longIs( o.dstPath ) && linkAct.having.hardLinking ) /* qqq : should work not only for hardlinks */
+    if( _.longIs( o.dstPath ) && c.linkAct.having.hardLinking ) /* qqq : should work not only for hardlinks */
     return _linkMultiple.call( self, o, _link_body );
     _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
 
     // if( entryMethodName === 'fileCopy' )
     // debugger;
-    // self.logger.log( ' +', entryMethodName, ':', path.moveReport( o.dstPath, o.srcPath ) );
+    self.logger.log( ' +', entryMethodName, ':', path.moveReport( o.dstPath, o.srcPath ) );
     // debugger;
 
     pathResolve();
     pathResolveLinks();
 
-    let dstStat;
-    let srcStat = self.statRead({ filePath : o.srcPath, resolvingSoftLink : 0, resolvingTextLink : 0 });
+    // let dstStat;
+    c.srcStat = self.statRead({ filePath : o.srcPath });
 
     if( skip() )
     return end();
 
-    let o2 = _.mapOnly( o, linkAct.defaults );
+    let o2 = c.options2 = _.mapOnly( o, c.linkAct.defaults );
 
     /* */
 
@@ -5927,8 +5827,8 @@ function _link_functor( gen )
       try
       {
 
-        if( onBeforeRaname )
-        onBeforeRaname.call( self, o2 );
+        if( onRanameBegin )
+        onRanameBegin.call( self, c );
 
         if( self.fileExists( o2.dstPath ) )
         {
@@ -5944,13 +5844,13 @@ function _link_functor( gen )
         // if( onAfterRaname )
         // onAfterRaname.call( self, o2 );
 
-        linkAct.call( self, o2 );
+        c.linkAct.call( self, o2 );
         log();
 
-        if( tempPath )
+        if( c.tempPath )
         {
-          self.filesDelete({ filePath : tempPath, verbosity : 0 });
-          tempPath = null;
+          self.filesDelete({ filePath : c.tempPath, verbosity : 0 });
+          c.tempPath = null;
         }
 
         validateSize();
@@ -5980,15 +5880,18 @@ function _link_functor( gen )
     function verify( args )
     {
       _.assert( args.length === 1, 'Expects single argument' );
-      _.assert( _.routineIs( linkAct ), 'method', actMethodName, 'is not implemented' );
-      _.assert( _.objectIs( linkAct.defaults ), 'method', actMethodName, 'does not have defaults, but should' );
+      _.assert( _.routineIs( c.linkAct ), 'method', actMethodName, 'is not implemented' );
+      _.assert( _.objectIs( c.linkAct.defaults ), 'method', actMethodName, 'does not have defaults, but should' );
       _.assertRoutineOptions( _link_body, args );
-      _.assert( _.boolLike( o.breakingSrcHardLink ) );
+      // debugger;
+      // _.assert( _.boolLike( o.breakingSrcHardLink ) );
       _.assert( _.boolLike( o.resolvingSrcSoftLink ) );
       _.assert( _.boolLike( o.resolvingSrcTextLink ) );
-      _.assert( _.boolLike( o.breakingDstHardLink ) );
+      // _.assert( _.boolLike( o.breakingDstHardLink ) );
       _.assert( _.boolLike( o.resolvingDstSoftLink ) );
       _.assert( _.boolLike( o.resolvingDstTextLink ) );
+      if( onVerify )
+      onVerify.call( self, c );
     }
 
     /* - */
@@ -5998,7 +5901,7 @@ function _link_functor( gen )
 
       /* allowingMissing */
 
-      if( !srcStat )
+      if( !c.srcStat )
       {
         if( !o.allowingMissing )
         {
@@ -6036,18 +5939,25 @@ function _link_functor( gen )
 
       /* skipping */
 
-      let skipping = false;
-
-      if( skippingHardLinked )
-      skipping = skipping || self.filesAreHardLinked([ o.dstPath, o.srcPath ]);
-      if( skippingSoftLinked )
-      skipping = skipping || self.filesAreSoftLinked([ o.dstPath, o.srcPath ]);
-
-      if( skipping )
+      if( onSkip )
+      if( onSkip.call( self, c ) )
       {
         end( true );
         return true;
       }
+
+      // let skipping = false;
+      //
+      // if( skippingHardLinked )
+      // skipping = skipping || self.filesAreHardLinked([ o.dstPath, o.srcPath ]);
+      // if( skippingSoftLinked )
+      // skipping = skipping || self.filesAreSoftLinked([ o.dstPath, o.srcPath ]);
+      //
+      // if( skipping )
+      // {
+      //   end( true );
+      //   return true;
+      // }
 
       return false;
     }
@@ -6060,7 +5970,7 @@ function _link_functor( gen )
       if( !o.rewriting )
       throw _.err( 'Destination file ' + _.strQuote( o2.dstPath ) + ' exist and rewriting is off.' );
 
-      dstStat = self.statRead
+      c.dstStat = self.statRead
       ({
         filePath : o2.dstPath,
         resolvingSoftLink : 0,
@@ -6068,7 +5978,7 @@ function _link_functor( gen )
         sync : 1,
       });
 
-      if( dstStat.isDirectory() && !o.rewritingDirs )
+      if( c.dstStat.isDirectory() && !o.rewritingDirs )
       throw _.err( 'Destination file ' + _.strQuote( o2.dstPath ) + ' is a directory and rewritingDirs is off.' );
 
     }
@@ -6152,12 +6062,15 @@ function _link_functor( gen )
     function tempRenameCan()
     {
 
-      _.assert( _.fileStatIs( dstStat ) );
+      _.assert( _.fileStatIs( c.dstStat ) );
 
-      if( !renamingAllowed )
+      if( !renaming )
       return false;
 
-      if( !renamingHardLinks && dstStat.isHardLink() )
+      /* qqq : if breakingSrcHardLink is on then src file should be broken */
+
+      if( !o.breakingDstHardLink && c.dstStat.isHardLink() )
+      // if( !renamingHardLinks && c.dstStat.isHardLink() )
       return false;
 
       return true;
@@ -6168,12 +6081,12 @@ function _link_functor( gen )
     function tempRename()
     {
 
-      tempPath = tempNameMake( o2.dstPath );
-      if( self.statRead({ filePath : tempPath }) )
-      self.filesDelete( tempPath );
+      c.tempPath = tempNameMake( o2.dstPath );
+      if( self.statRead({ filePath : c.tempPath }) )
+      self.filesDelete( c.tempPath );
       self.fileRenameAct
       ({
-        dstPath : tempPath,
+        dstPath : c.tempPath,
         srcPath : o.dstPath,
         originalDstPath : o.originalDstPath,
         originalSrcPath : o.originalSrcPath,
@@ -6190,13 +6103,13 @@ function _link_functor( gen )
     function tempRenameBack()
     {
 
-      if( tempPath ) try
+      if( c.tempPath ) try
       {
         debugger;
         self.fileRenameAct
         ({
           dstPath : o.dstPath,
-          srcPath : tempPath,
+          srcPath : c.tempPath,
           originalDstPath : o.originalDstPath,
           originalSrcPath : o.originalSrcPath,
           sync : 1,
@@ -6225,15 +6138,15 @@ function _link_functor( gen )
       /* qqq : fix please */
       // if( !Config.debug )
       // return;
-      // let srcStat = self.statResolvedRead({ filePath : o.srcPath, resolvingSoftLink : 1, resolvingTextLink : 1 });
-      // if( !srcStat )
+      // let c.srcStat = self.statResolvedRead({ filePath : o.srcPath, resolvingSoftLink : 1, resolvingTextLink : 1 });
+      // if( !c.srcStat )
       // return;
-      // let dstStat = self.statResolvedRead({ filePath : o.dstPath, resolvingSoftLink : 1, resolvingTextLink : 1 });
-      // if( !dstStat )
+      // let c.dstStat = self.statResolvedRead({ filePath : o.dstPath, resolvingSoftLink : 1, resolvingTextLink : 1 });
+      // if( !c.dstStat )
       // return;
-      // _.assert( !!dstStat );
-      // if( !( srcStat.size == dstStat.size ) )
-      // self.logger.warn( `Warning: ${o.srcPath} (${srcStat.size}) and ${o.dstPath} (${dstStat.size}) should have same size!` )
+      // _.assert( !!c.dstStat );
+      // if( !( c.srcStat.size == c.dstStat.size ) )
+      // self.logger.warn( `Warning: ${o.srcPath} (${c.srcStat.size}) and ${o.dstPath} (${c.dstStat.size}) should have same size!` )
     }
 
     /* - */
@@ -6244,8 +6157,8 @@ function _link_functor( gen )
       {
         if( o.sync )
         throw err;
-        result = new _.Consequence().error( err );
-        return result;
+        c.result = new _.Consequence().error( err );
+        return c.result;
       }
       else
       {
@@ -6262,12 +6175,12 @@ function _link_functor( gen )
     {
       if( r !== undefined )
       if( o.sync )
-      result = r;
+      c.result = r;
       else
-      result = _.Consequence().give( r );
-      _.assert( !!o.sync || _.consequenceIs( result ) );
-      _.assert( result !== undefined );
-      return result;
+      c.result = _.Consequence().give( r );
+      _.assert( !!o.sync || _.consequenceIs( c.result ) );
+      _.assert( c.result !== undefined );
+      return c.result;
     }
 
   }
@@ -6308,19 +6221,45 @@ _link_functor.defaults =
   actMethod : null,
   actMethodName : null,
 
-  onBeforeRaname : null,
-  // onAfterRaname : null,
-  // expectingAbsolutePaths : true,
+  onVerify : null,
+  onSkip : null,
+  onRanameBegin : null,
 
-  renamingAllowed : true,
-  renamingHardLinks : true,
-
+  renaming : true,
   skippingSamePath : true,
-  skippingHardLinked : false,
-  skippingSoftLinked : false,
   skippingMissing : false,
 
 }
+
+//
+
+let fileRenameAct = Object.create( null );
+
+fileRenameAct.name = 'fileRenameAct';
+
+var defaults = fileRenameAct.defaults = Object.create( null );
+
+defaults.dstPath = null;
+defaults.srcPath = null;
+defaults.originalDstPath = null;
+defaults.originalSrcPath = null;
+defaults.sync = null;
+
+// var paths = fileRenameAct.paths = Object.create( null );
+//
+// paths.dstPath = null;
+// paths.srcPath = null;
+
+var having = fileRenameAct.having = Object.create( null );
+
+having.writing = 1;
+having.reading = 0;
+having.driving = 1;
+
+var operates = fileRenameAct.operates = Object.create( null );
+
+operates.srcPath = { pathToRead : 1 }
+operates.dstPath = { pathToWrite : 1 }
 
 //
 
@@ -6471,10 +6410,10 @@ defaults.originalSrcPath = null;
 defaults.breakingDstHardLink = 0;
 defaults.sync = null;
 
-var paths = fileCopyAct.paths = Object.create( null );
-
-paths.dstPath = null;
-paths.srcPath = null;
+// var paths = fileCopyAct.paths = Object.create( null );
+//
+// paths.dstPath = null;
+// paths.srcPath = null;
 
 var having = fileCopyAct.having = Object.create( null );
 
@@ -6534,39 +6473,33 @@ operates.dstPath = { pathToWrite : 1 }
  * @memberof wFileProviderPartial
  */
 
-function fileCopy_functor()
+function _fileCopyRenameBegin( c )
 {
+  let self = this;
+  let o = c.options;
 
-  function _onBeforeRaname( o )
+  _.assert( _.strIs( o.srcPath ) );
+  _.assert( _.fileStatIs( c.srcStat ) );
+
+  let isDir = c.srcStat.isDir();
+  if( isDir )
   {
-    let self = this;
-
-    _.assert( _.strIs( o.srcPath ) );
-
-    let isDir = self.isDir({ filePath : o.srcPath, resolvingSoftLink : 0, resolvingTextLink : 0 })
-    if( isDir )
-    {
-      debugger;
-      throw _.err( 'Cant copy directory ' + _.strQuote( o.srcPath ) + ', consider method filesCopy'  );
-    }
-
+    debugger;
+    throw _.err( 'Cant copy directory ' + _.strQuote( o.srcPath ) + ', consider method filesCopy'  );
   }
 
-  let fileCopy = _link_functor
-  ({
-    actMethod : fileCopyAct,
-    actMethodName : 'fileCopyAct',
-    onBeforeRaname : _onBeforeRaname,
-    renamingAllowed : true,
-    renamingHardLinks : false,
-    skippingSamePath : true,
-    skippingMissing : true,
-  });
-
-  return fileCopy;
 }
 
-let fileCopy = fileCopy_functor();
+let fileCopy = _link_functor
+({
+  actMethod : fileCopyAct,
+  actMethodName : 'fileCopyAct',
+  onRanameBegin : _fileCopyRenameBegin,
+  // renaming : true,
+  // renamingHardLinks : false,
+  skippingSamePath : true,
+  skippingMissing : true,
+});
 
 // var defaults = fileCopy.body.defaults = Object.create( fileCopyAct.defaults );
 
@@ -6579,8 +6512,10 @@ defaults.allowingMissing = 0;
 defaults.throwing = null;
 defaults.verbosity = null;
 
+defaults.breakingSrcHardLink = 0;
 defaults.resolvingSrcSoftLink = 1;
 defaults.resolvingSrcTextLink = 0;
+
 defaults.breakingDstHardLink = 0;
 defaults.resolvingDstSoftLink = 0;
 defaults.resolvingDstTextLink = 0;
@@ -6597,6 +6532,35 @@ defaults.resolvingDstTextLink = 0;
 // var having = fileCopy.having = Object.create( fileCopy.body.having );
 //
 // having.aspect = 'entry';
+
+//
+
+let softLinkAct = Object.create( null );
+
+var defaults = softLinkAct.defaults = Object.create( null );
+
+defaults.dstPath = null;
+defaults.srcPath = null;
+defaults.originalDstPath = null;
+defaults.originalSrcPath = null;
+defaults.sync = null;
+defaults.type = null;
+
+// var paths = softLinkAct.paths = Object.create( null );
+//
+// paths.dstPath = null;
+// paths.srcPath = null;
+
+var having = softLinkAct.having = Object.create( null );
+
+having.writing = 1;
+having.reading = 0;
+having.driving = 1;
+
+var operates = softLinkAct.operates = Object.create( null );
+
+operates.srcPath = { pathToRead : 1 }
+operates.dstPath = { pathToWrite : 1 }
 
 //
 
@@ -6625,13 +6589,23 @@ defaults.resolvingDstTextLink = 0;
  * @memberof wFileProviderPartial
  */
 
+function _softLinkSkip( c )
+{
+  let self = this;
+  let o = c.options;
+  if( o.dstPath !== o.srcPath && self.filesAreSoftLinked([ o.dstPath, o.srcPath ]) )
+  return true;
+}
+
 let softLink = _link_functor
 ({
   actMethod : softLinkAct,
   actMethodName : 'softLinkAct',
   //expectingAbsolutePaths : false,
   skippingSamePath : false,
-  // skippingSoftLinked : true xxx
+  skippingMissing : false,
+  // skippingSoftLinked : true,
+  onSkip : _softLinkSkip,
 });
 
 // var defaults = softLink.body.defaults = Object.create( softLinkAct.defaults );
@@ -6644,6 +6618,7 @@ defaults.makingDirectory = 0;
 defaults.throwing = null;
 defaults.verbosity = null;
 defaults.allowingMissing = 0;
+
 defaults.resolvingSrcSoftLink = 0;
 defaults.resolvingSrcTextLink = 0;
 defaults.resolvingDstSoftLink = 0;
@@ -6667,6 +6642,53 @@ defaults.resolvingDstTextLink = 0;
 
 /**
  * Creates hard link( new name ) to existing source( o.srcPath ) named as ( o.dstPath ).
+ *
+ * Accepts only ready options.
+ * Expects normalized absolute paths for source( o.srcPath ) and destination( o.dstPath ), routine makes nativization by itself.
+ * Source ( o.srcPath ) must be an existing terminal file.
+ * Destination ( o.dstPath ) must not exist in filesystem.
+ * Folders structure before destination( o.dstPath ) must exist in filesystem.
+ * If source( o.srcPath ) and destination( o.dstPath ) paths are equal, operiation is considered as successful.
+ *
+ * @method hardLinkAct
+ * @memberof wFileProviderPartial
+ */
+
+let hardLinkAct = Object.create( null );
+
+hardLinkAct.name = 'hardLinkAct';
+
+var defaults = hardLinkAct.defaults = Object.create( null );
+
+defaults.dstPath = null;
+defaults.srcPath = null;
+defaults.originalDstPath = null;
+defaults.originalSrcPath = null;
+defaults.breakingSrcHardLink = 0;
+defaults.breakingDstHardLink = 1;
+defaults.sync = null;
+
+// var paths = hardLinkAct.paths = Object.create( null );
+//
+// // paths.dstPath = null;
+// // paths.srcPath = null;
+
+var having = hardLinkAct.having = Object.create( null );
+
+having.writing = 1;
+having.reading = 0;
+having.driving = 1;
+having.hardLinking = 1;
+
+var operates = hardLinkAct.operates = Object.create( null );
+
+operates.srcPath = { pathToRead : 1 }
+operates.dstPath = { pathToWrite : 1 }
+
+//
+
+/**
+ * Creates hard link( new name ) to existing source( o.srcPath ) named as ( o.dstPath ).
  * Rewrites target( o.dstPath ) by default if it exist. Logging of working process is controled by option( o.verbosity ).
  * Returns true if link is successfully created. If some error occurs during execution method uses option( o.throwing ) to
  * determine what to do - throw error or return false.
@@ -6679,12 +6701,34 @@ defaults.resolvingDstTextLink = 0;
  * @memberof wFileProviderPartial
  */
 
+function _hardLinkSkip( с )
+{
+  let self = this;
+  let o = c.options;
+  if( self.filesAreHardLinked([ o.dstPath, o.srcPath ]) )
+  return true;
+}
+
+function _hardLinkVerify( c )
+{
+  _.assert( _.boolLike( o.breakingSrcHardLink ) );
+  _.assert( _.boolLike( o.breakingDstHardLink ) );
+  _.assert
+  (
+    !!c.options.breakingSrcHardLink || !!c.options.breakingDstHardLink,
+    'Both source and destination hardlinks could not be preserved, please set breakingSrcHardLink or breakingDstHardLink to true'
+  );
+}
+
 let hardLink = _link_functor
 ({
   actMethod : hardLinkAct,
   actMethodName : 'hardLinkAct',
   skippingSamePath : true,
-  skippingHardLinked : true,
+  skippingMissing : false,
+  // skippingHardLinked : true,
+  onVerify : _hardLinkVerify,
+  onSkip : _hardLinkSkip,
 });
 
 // var defaults = hardLink.body.defaults = Object.create( hardLinkAct.defaults );
@@ -6698,6 +6742,7 @@ defaults.throwing = null;
 defaults.verbosity = null;
 defaults.allowDiffContent = 0;
 defaults.sourceMode = 'modified>hardlinks>';
+
 defaults.breakingSrcHardLink = 0;
 defaults.resolvingSrcSoftLink = 1;
 defaults.resolvingSrcTextLink = 0;
@@ -6728,33 +6773,111 @@ defaults.resolvingDstTextLink = 0;
 
 //
 
-function textLink_body( o )
+function textLinkAct( o )
 {
   let self = this;
   let path = self.path;
 
-  _.assertRoutineOptions( textLink_body, arguments );
+  _.assertRoutineOptions( textLinkAct, arguments );
   _.assert( path.is( o.srcPath ) );
   _.assert( path.isAbsolute( o.dstPath ) );
 
   return self.fileWrite( o.dstPath, 'link ' + o.srcPath );
 }
 
-var defaults = textLink_body.defaults = Object.create( null );
+var defaults = textLinkAct.defaults = Object.create( null );
 
-defaults.srcPath = null;
 defaults.dstPath = null;
+defaults.srcPath = null;
 
-var having = textLink_body.having = Object.create( null );
+var having = textLinkAct.having = Object.create( null );
 
 having.writing = 1;
-having.reading = 1;
-having.driving = 0;
-having.aspect = 'body';
+having.reading = 0;
+having.driving = 1;
 
-let textLink = _.routineFromPreAndBody( _preSrcDstPathWithProviderDefaults, textLink_body );
+var operates = textLinkAct.operates = Object.create( null );
 
-textLink.having.aspect = 'entry';
+operates.srcPath = { pathToRead : 1 }
+operates.dstPath = { pathToWrite : 1 }
+
+//
+
+/**
+ * Creates text link to existing source( o.srcPath ) named as ( o.dstPath ).
+ * Rewrites target( o.dstPath ) by default if it exist. Logging of working process is controled by option( o.verbosity ).
+ * Returns true if link is successfully created. If some error occurs during execution method uses option( o.throwing ) to
+ * determine what to do - throw error or return false.
+ *
+ * @param { wTools~linkOptions } o - options { @link wTools~linkOptions  }
+ *
+ * @method textLink
+ * @throws { exception } If( o.srcPath ) doesn`t exist.
+ * @throws { exception } If cant link ( o.srcPath ) with ( o.dstPath ).
+ * @memberof wFileProviderPartial
+ */
+
+function _textLinkSkip( с )
+{
+  let self = this;
+  let o = c.options;
+  debugger; xxx // qqq : implement filesAreTextLinked
+  if( o.dstPath !== o.srcPath && self.filesAreTextLinked([ o.dstPath, o.srcPath ]) )
+  return true;
+}
+
+let textLink = _link_functor
+({
+  actMethod : textLinkAct,
+  actMethodName : 'textLinkAct',
+  skippingSamePath : false,
+  skippingMissing : false,
+  onSkip : _textLinkSkip,
+});
+
+var defaults = textLink.body.defaults;
+
+defaults.rewriting = 1;
+defaults.rewritingDirs = 0;
+defaults.makingDirectory = 0;
+defaults.throwing = null;
+defaults.verbosity = null;
+defaults.allowingMissing = 0;
+
+defaults.resolvingSrcSoftLink = 0;
+defaults.resolvingSrcTextLink = 0;
+defaults.resolvingDstSoftLink = 0;
+defaults.resolvingDstTextLink = 0;
+
+//
+
+// function textLink_body( o )
+// {
+//   let self = this;
+//   let path = self.path;
+//
+//   _.assertRoutineOptions( textLink_body, arguments );
+//   _.assert( path.is( o.srcPath ) );
+//   _.assert( path.isAbsolute( o.dstPath ) );
+//
+//   return self.fileWrite( o.dstPath, 'link ' + o.srcPath );
+// }
+//
+// var defaults = textLink_body.defaults = Object.create( null );
+//
+// defaults.srcPath = null;
+// defaults.dstPath = null;
+//
+// var having = textLink_body.having = Object.create( null );
+//
+// having.writing = 1;
+// having.reading = 1;
+// having.driving = 0;
+// having.aspect = 'body';
+//
+// let textLink = _.routineFromPreAndBody( _preSrcDstPathWithProviderDefaults, textLink_body );
+//
+// textLink.having.aspect = 'entry';
 
 //
 
@@ -6897,7 +7020,7 @@ defaults.allowingMissing = 1;
 defaults.throwing = null;
 defaults.verbosity = null;
 
-var paths = fileExchange_body.paths = Object.create( null );
+// var paths = fileExchange_body.paths = Object.create( null );
 
 var having = fileExchange_body.having = Object.create( null );
 
@@ -6965,9 +7088,9 @@ var defaults = hardLinkBreakAct.defaults = Object.create( null );
 defaults.filePath = null;
 defaults.sync = null;
 
-var paths = hardLinkBreakAct.paths = Object.create( null );
-
-paths.filePath = null;
+// var paths = hardLinkBreakAct.paths = Object.create( null );
+//
+// paths.filePath = null;
 
 var having = hardLinkBreakAct.having = Object.create( null );
 
@@ -7005,7 +7128,7 @@ function hardLinkBreak_body( o )
 }
 
 var defaults = hardLinkBreak_body.defaults = Object.create( hardLinkBreakAct.defaults );
-var paths = hardLinkBreak_body.paths = Object.create( hardLinkBreakAct.paths );
+// var paths = hardLinkBreak_body.paths = Object.create( hardLinkBreakAct.paths );
 var having = hardLinkBreak_body.having = Object.create( hardLinkBreakAct.having );
 
 having.driving = 0;
@@ -7024,9 +7147,9 @@ var defaults = softLinkBreakAct.defaults = Object.create( null );
 defaults.filePath = null;
 defaults.sync = null;
 
-var paths = softLinkBreakAct.paths = Object.create( null );
-
-paths.filePath = null;
+// var paths = softLinkBreakAct.paths = Object.create( null );
+//
+// paths.filePath = null;
 
 var having = softLinkBreakAct.having = Object.create( null );
 
@@ -7064,7 +7187,7 @@ function _softLinkBreak_body( o )
 }
 
 var defaults = _softLinkBreak_body.defaults = Object.create( softLinkBreakAct.defaults );
-var paths = _softLinkBreak_body.paths = Object.create( softLinkBreakAct.paths );
+// var paths = _softLinkBreak_body.paths = Object.create( softLinkBreakAct.paths );
 var having = _softLinkBreak_body.having = Object.create( softLinkBreakAct.having );
 
 having.driving = 0;
@@ -7727,8 +7850,10 @@ let Proto =
   hardLinkAct,
   hardLink,
 
+  textLinkAct,
   textLink,
-  /* qqq : implement routine textLink */
+
+  /* qqq : cover routine textLink */
 
   fileExchange,
 

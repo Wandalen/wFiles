@@ -5429,37 +5429,6 @@ operates.dstPath = { pathToWrite : 1 }
 
 //
 
-let fileCopyAct = Object.create( null );
-
-fileCopyAct.name = 'fileCopyAct';
-
-var defaults = fileCopyAct.defaults = Object.create( null );
-
-defaults.dstPath = null;
-defaults.srcPath = null;
-defaults.originalDstPath = null;
-defaults.originalSrcPath = null;
-defaults.breakingDstHardLink = 0;
-defaults.sync = null;
-
-var paths = fileCopyAct.paths = Object.create( null );
-
-paths.dstPath = null;
-paths.srcPath = null;
-
-var having = fileCopyAct.having = Object.create( null );
-
-having.writing = 1;
-having.reading = 0;
-having.driving = 1;
-
-var operates = fileCopyAct.operates = Object.create( null );
-
-operates.srcPath = { pathToRead : 1 }
-operates.dstPath = { pathToWrite : 1 }
-
-//
-
 let softLinkAct = Object.create( null );
 
 var defaults = softLinkAct.defaults = Object.create( null );
@@ -5754,17 +5723,18 @@ function _link_functor( gen )
   let entryMethodName = _.strRemoveEnd( gen.actMethodName, 'Act' );
   // let expectingAbsolutePaths = gen.expectingAbsolutePaths;
   let onBeforeRaname = gen.onBeforeRaname;
-  let onAfterRaname = gen.onAfterRaname;
+  // let onAfterRaname = gen.onAfterRaname;
   let renamingAllowed = gen.renamingAllowed;
   let renamingHardLinks = gen.renamingHardLinks;
   let skippingSamePath = gen.skippingSamePath;
   let skippingHardLinked = gen.skippingHardLinked;
   let skippingSoftLinked = gen.skippingSoftLinked;
+  let skippingMissing = gen.skippingMissing;
 
   _.assert( _.objectIs( actMethod ) || _.routineIs( actMethod ) );
   _.assert( _.objectIs( actMethod.defaults ) );
   _.assert( !onBeforeRaname || _.routineIs( onBeforeRaname ) );
-  _.assert( !onAfterRaname || _.routineIs( onAfterRaname ) );
+  // _.assert( !onAfterRaname || _.routineIs( onAfterRaname ) );
 
   /* - */
 
@@ -5775,6 +5745,10 @@ function _link_functor( gen )
     let linkAct = self[ actMethodName ];
     let result;
     let tempPath;
+
+    // if( entryMethodName === 'fileCopy' )
+    // debugger;
+    // logger.log( entryMethodName, o.dstPath, '<-', o.srcPath );
 
     verify( arguments );
 
@@ -5788,7 +5762,7 @@ function _link_functor( gen )
     let dstStat;
     let srcStat = self.statRead({ filePath : o.srcPath, resolvingSoftLink : 0, resolvingTextLink : 0 });
 
-    if( !verifyFiles() )
+    if( skip() )
     return end();
 
     let o2 = _.mapOnly( o, linkAct.defaults );
@@ -5815,8 +5789,8 @@ function _link_functor( gen )
           self.dirMakeForFile( o2.dstPath );
         }
 
-        if( onAfterRaname && o.rewriting )
-        onAfterRaname.call( self, o2 );
+        // if( onAfterRaname )
+        // onAfterRaname.call( self, o2 );
 
         linkAct.call( self, o2 );
         log();
@@ -5867,18 +5841,25 @@ function _link_functor( gen )
 
     /* - */
 
-    function verifyFiles()
+    function skip()
     {
 
       /* allowingMissing */
 
-      if( !o.allowingMissing )
       if( !srcStat )
       {
-        debugger;
-        let err = _.err( 'Source file', _.strQuote( o.srcPath ), 'does not exist' );
-        error( err );
-        return false;
+        if( !o.allowingMissing )
+        {
+          debugger;
+          let err = _.err( 'Source file', _.strQuote( o.srcPath ), 'does not exist' );
+          error( err );
+          return true;
+        }
+        if( skippingMissing )
+        {
+          end( false );
+          return true;
+        }
       }
 
       /* equal paths */
@@ -5886,24 +5867,17 @@ function _link_functor( gen )
       if( o.dstPath === o.srcPath )
       {
 
-        // if( !o.allowingMissing )
-        // if( !srcStat )
-        // {
-        //   let err = _.err( 'Src file', o.srcPath, 'does not exist' );
-        //   return error( err );
-        // }
-
         if( skippingSamePath )
         {
           end( true );
-          return false;
+          return true;
         }
 
         if( !o.allowingMissing )
         {
           let err = _.err( 'Making link on itself is not allowed. Please enable options {-o.allowingMissing-} if that was your goal.' );
           error( err );
-          return false;
+          return true;
         }
 
       }
@@ -5920,10 +5894,10 @@ function _link_functor( gen )
       if( skipping )
       {
         end( true );
-        return false;
+        return true;
       }
 
-      return true;
+      return false;
     }
 
     /* - */
@@ -5945,13 +5919,6 @@ function _link_functor( gen )
       if( dstStat.isDirectory() && !o.rewritingDirs )
       throw _.err( 'Destination file ' + _.strQuote( o2.dstPath ) + ' is a directory and rewritingDirs is off.' );
 
-      // let skipRenaming = false;
-      // if( !renamingHardLinks && self.isHardLink( o.dstPath ) )
-      // skipRenaming = true;
-      //
-      // if( renamingAllowed && !skipRenaming )
-      // tempRename();
-
     }
 
     /* - */
@@ -5959,7 +5926,9 @@ function _link_functor( gen )
     function pathResolve()
     {
 
+      if( !o.originalSrcPath )
       o.originalSrcPath = o.srcPath;
+      if( !o.originalDstPath )
       o.originalDstPath = o.dstPath;
 
       if( !path.isAbsolute( o.dstPath ) )
@@ -5973,6 +5942,9 @@ function _link_functor( gen )
         _.assert( path.isAbsolute( o.dstPath ), () => 'Expects absolute path {-o.dstPath-}, but got', _.strQuote( o.dstPath ) );
         o.srcPath = path.resolve( o.dstPath, o.srcPath );
       }
+
+      _.assert( path.isAbsolute( o.originalSrcPath ) );
+      _.assert( path.isAbsolute( o.originalDstPath ) );
 
     }
 
@@ -6182,7 +6154,7 @@ _link_functor.defaults =
   actMethodName : null,
 
   onBeforeRaname : null,
-  onAfterRaname : null,
+  // onAfterRaname : null,
   // expectingAbsolutePaths : true,
 
   renamingAllowed : true,
@@ -6190,7 +6162,9 @@ _link_functor.defaults =
 
   skippingSamePath : true,
   skippingHardLinked : false,
-  skippingSoftLinked : false
+  skippingSoftLinked : false,
+  skippingMissing : false,
+
 }
 
 //
@@ -6296,6 +6270,7 @@ let fileRename = _link_functor
   actMethodName : 'fileRenameAct',
   actMethod : fileRenameAct,
   skippingSamePath : true,
+  skippingMissing : true,
 });
 
 // var defaults = fileRename.body.defaults = Object.create( fileRenameAct.defaults );
@@ -6305,6 +6280,7 @@ var defaults = fileRename.body.defaults;
 defaults.rewriting = 0;
 defaults.rewritingDirs = 0;
 defaults.makingDirectory = 0;
+defaults.allowingMissing = 0;
 defaults.throwing = null;
 defaults.verbosity = null;
 defaults.resolvingSrcSoftLink = 1;
@@ -6324,6 +6300,37 @@ defaults.resolvingDstTextLink = 0;
 // var having = fileRename.having = Object.create( fileRename.body.having );
 //
 // having.aspect = 'entry';
+
+//
+
+let fileCopyAct = Object.create( null );
+
+fileCopyAct.name = 'fileCopyAct';
+
+var defaults = fileCopyAct.defaults = Object.create( null );
+
+defaults.dstPath = null;
+defaults.srcPath = null;
+defaults.originalDstPath = null;
+defaults.originalSrcPath = null;
+defaults.breakingDstHardLink = 0;
+defaults.sync = null;
+
+var paths = fileCopyAct.paths = Object.create( null );
+
+paths.dstPath = null;
+paths.srcPath = null;
+
+var having = fileCopyAct.having = Object.create( null );
+
+having.writing = 1;
+having.reading = 0;
+having.driving = 1;
+
+var operates = fileCopyAct.operates = Object.create( null );
+
+operates.srcPath = { pathToRead : 1 }
+operates.dstPath = { pathToWrite : 1 }
 
 //
 
@@ -6385,36 +6392,20 @@ function fileCopy_functor()
     if( isDir )
     {
       debugger;
-      // let isDir = self.fileIsDirectory({ filePath : o.srcPath, resolvingSoftLink : 0, resolvingTextLink : 0 })
       throw _.err( 'Cant copy directory ' + _.strQuote( o.srcPath ) + ', consider method filesCopy'  );
     }
 
-    return o;
   }
-
-  // function _fileCopyOnRewriting( o )
-  // {
-  //   let self = this;
-
-  //   _.assert( _.objectIs( o ) );
-
-  //   let dirPath = self.path.dir( o.dstPath );
-  //   if( self.isDir({ filePath : dirPath, resolvingSoftLink : 0, resolvingTextLink : 0 }) )
-  //   return;
-
-  //   if( o.rewriting )
-  //   return self.dirMakeForFile({ filePath : o.dstPath, rewritingTerminal : 1, recursive : 1, sync : o.sync });
-  // }
 
   let fileCopy = _link_functor
   ({
     actMethod : fileCopyAct,
     actMethodName : 'fileCopyAct',
-    // onAfterRaname : _fileCopyOnRewriting,
     onBeforeRaname : _onBeforeRaname,
     renamingAllowed : true,
     renamingHardLinks : true,
     skippingSamePath : true,
+    skippingMissing : true,
   });
 
   return fileCopy;
@@ -6429,6 +6420,7 @@ var defaults = fileCopy.body.defaults;
 defaults.rewriting = 1;
 defaults.rewritingDirs = 0;
 defaults.makingDirectory = 0;
+defaults.allowingMissing = 0;
 defaults.throwing = null;
 defaults.verbosity = null;
 
@@ -6484,7 +6476,7 @@ let softLink = _link_functor
   actMethodName : 'softLinkAct',
   //expectingAbsolutePaths : false,
   skippingSamePath : false,
-  // skippingSoftLinked : true
+  // skippingSoftLinked : true xxx
 });
 
 // var defaults = softLink.body.defaults = Object.create( softLinkAct.defaults );
@@ -7564,19 +7556,22 @@ let Proto =
 
   // link
 
-  fileRenameAct,
-  fileCopyAct,
-  softLinkAct,
-  hardLinkAct,
-
   _link_pre,
   _linkMultiple,
   _link_functor,
 
+  fileRenameAct,
   fileRename,
+
+  fileCopyAct,
   fileCopy,
+
+  softLinkAct,
   softLink,
+
+  hardLinkAct,
   hardLink,
+
   textLink,
   /* qqq : implement routine textLink */
 

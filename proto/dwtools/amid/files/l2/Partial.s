@@ -5751,7 +5751,7 @@ function _link_functor( gen )
 
     // if( entryMethodName === 'fileCopy' )
     // debugger;
-    self.logger.log( ' +', entryMethodName, ':', path.moveReport( o.dstPath, o.srcPath ) );
+    // self.logger.log( ' +', entryMethodName, ':', path.moveReport( o.dstPath, o.srcPath ) );
     // debugger;
 
     pathResolve();
@@ -6649,7 +6649,7 @@ operates.dstPath = { pathToWrite : 1 }
  * @memberof wFileProviderPartial
  */
 
-function _hardLinkSkip( с )
+function _hardLinkSkip( c )
 {
   let self = this;
   let o = c.options;
@@ -6659,6 +6659,8 @@ function _hardLinkSkip( с )
 
 function _hardLinkVerify( c )
 {
+  let self = this;
+  let o = c.options;
   _.assert( _.boolLike( o.breakingSrcHardLink ) );
   _.assert( _.boolLike( o.breakingDstHardLink ) );
   _.assert

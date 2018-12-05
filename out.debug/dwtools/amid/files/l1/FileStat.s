@@ -52,7 +52,7 @@ function init( filePath, o )
 //
 // --
 
-function statIs( src )
+function fileStatIs( src )
 {
   if( File )
   if( src instanceof File.Stats )
@@ -87,8 +87,8 @@ function statsHaveDifferentContent( stat1, stat2 )
 function statsCouldBeLinked( stat1,stat2 )
 {
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
-  _.assert( _.statIs( stat1 ) );
-  _.assert( _.statIs( stat2 ) );
+  _.assert( _.fileStatIs( stat1 ) );
+  _.assert( _.fileStatIs( stat2 ) );
   _.assert( !!stat1.mtime );
 
   /*
@@ -230,7 +230,7 @@ let Statics =
 
 let Globals =
 {
-  statIs,
+  fileStatIs,
   statsHaveDifferentContent,
   statsCouldBeLinked,
   statHash2Get,

@@ -5591,7 +5591,8 @@ function filesReflectTrivial( t )
 
   /* */
 
-  t.case = 'deleting enabled, no filter'
+  t.case = 'deleting enabled, no filter';
+
   var tree =
   {
     src : { file : 'file', file2 : 'file2' },
@@ -5606,8 +5607,11 @@ function filesReflectTrivial( t )
     srcDeleting : 1,
     dstDeleting : 1,
   }
+
   var provider = new _.FileProvider.Extract({ filesTree : tree });
+  // debugger;
   t.mustNotThrowError( () => provider.filesReflect( o ) );
+  // debugger;
 
   var expectedTree =
   {

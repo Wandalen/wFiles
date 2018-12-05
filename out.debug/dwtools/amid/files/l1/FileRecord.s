@@ -237,17 +237,46 @@ function _statRead()
 
   _.assert( arguments.length === 0 );
 
+  // if( record.absolute === '/dst/dir' )
+  // debugger;
+
   /* resolve link */
 
-  record.real = c.effectiveFileProvider.pathResolveLink
+  // record.real = c.effectiveFileProvider.pathResolveLink
+  // ({
+  //   filePath : record.real,
+  //   resolvingSoftLink : c.resolvingSoftLink,
+  //   resolvingTextLink : c.resolvingTextLink,
+  //   hub : c.fileProvider,
+  //   allowingMissing : c.allowingMissing,
+  //   throwing : 1,
+  // });
+
+  /* should be here because pathResolveLink does not guarantee reading stat */
+
+  let stat = c.effectiveFileProvider.statReadAct
   ({
+    filePath : record.real,
+    throwing : 0,
+    resolvingSoftLink : 0,
+    sync : 1,
+    // resolvingTextLink : 0,
+  });
+
+  let o2 =
+  {
+    stat : stat,
     filePath : record.real,
     resolvingSoftLink : c.resolvingSoftLink,
     resolvingTextLink : c.resolvingTextLink,
     hub : c.fileProvider,
     allowingMissing : c.allowingMissing,
     throwing : 1,
-  });
+  }
+
+  record.real = c.effectiveFileProvider.pathResolveLink( o2 );
+
+  _.assert( o2.stat === null || _.fileStatIs( o2.stat ) );
 
   if( !record.real )
   debugger;
@@ -262,19 +291,22 @@ function _statRead()
   if( !c.stating )
   {
     //record.isTransient = false;
-    record.isActual = false
+    record.isActual = false; // xxx
   }
 
   if( c.stating && record.real )
   {
 
-    let provider = _.path.isGlobal( record.real ) ? c.fileProvider : c.effectiveFileProvider;
-    record.stat = provider.statRead
-    ({
-      filePath : record.real,
-      throwing : 0,
-      sync : 1,
-    });
+    record.stat = o2.stat;
+
+    // let provider = _.path.isGlobal( record.real ) ? c.fileProvider : c.effectiveFileProvider;
+    //
+    // record.stat = provider.statRead
+    // ({
+    //   filePath : record.real,
+    //   throwing : 0,
+    //   sync : 1,
+    // });
 
     if( !record.stat && !c.allowingMissing )
     if( record.real !== record.absolute )
@@ -287,7 +319,7 @@ function _statRead()
 
   /* analyze stat */
 
-  _.assert( record.stat === null || _.statIs( record.stat ) );
+  _.assert( record.stat === null || _.fileStatIs( record.stat ) );
   record._statAnalyze();
 
   return record;

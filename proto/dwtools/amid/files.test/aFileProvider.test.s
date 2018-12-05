@@ -3693,7 +3693,7 @@ function fileCopySync( test )
       throwing : 0,
     });
   });
-  test.identical( got, false );
+  test.identical( got, null );
 
   /**/
 
@@ -3722,7 +3722,7 @@ function fileCopySync( test )
       throwing : 0,
     });
   });
-  test.identical( got, false );
+  test.identical( got, null );
 
   //
 

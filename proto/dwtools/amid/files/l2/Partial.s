@@ -6483,6 +6483,8 @@ defaults.resolvingDstTextLink = 0;
 
 let softLinkAct = Object.create( null );
 
+softLinkAct.name = 'softLinkAct';
+
 var defaults = softLinkAct.defaults = Object.create( null );
 
 defaults.dstPath = null;

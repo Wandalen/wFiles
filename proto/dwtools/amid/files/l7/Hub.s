@@ -578,19 +578,17 @@ function filesAreHardLinkedAct( dstPath, srcPath )
 function _link_functor( fop )
 {
   fop = _.routineOptions( _link_functor, arguments );
-  let routine = fop.routine;
-  let name = routine.name;
-  let onDifferentProviders = fop.onDifferentProviders;
 
-  _.assert( _.strDefined( name ) );
+  let routine = fop.routine;
+  let routineName = routine.name;
+  let onDifferentProviders = fop.onDifferentProviders;
+  let allowDifferentProviders = fop.allowDifferentProviders;
+
+  debugger;
+  _.assert( _.strDefined( routineName ) );
   _.assert( _.objectIs( routine.defaults ) );
-  // _.assert( _.objectIs( routine.paths ) );
   _.assert( routine.paths === undefined );
   _.assert( _.objectIs( routine.having ) );
-
-  // let defaults = hubLink.defaults = Object.create( routine.defaults );
-  // // let paths = hubLink.paths = Object.create( routine.paths );
-  // let having = hubLink.having = Object.create( routine.having );
 
   _.routineExtend( hubLink, routine );
 
@@ -616,15 +614,26 @@ function _link_functor( fop )
     _.assert( !!src.provider, 'no provider for path', o.srcPath );
 
     if( dst.provider !== src.provider )
-    if( onDifferentProviders )
-    return onDifferentProviders.call( self, o, dst, src, routine );
+    {
+      if( allowDifferentProviders )
+      {
+      }
+      else
+      {
+        if( onDifferentProviders )
+        return onDifferentProviders.call( self, o, dst, src, routine );
+        else
+        throw _.err( 'Cant ' + routineName + ' files of different file providers :\n' + o.dstPath + '\n' + o.srcPath );
+      }
+    }
     else
-    throw _.err( 'Cant ' + name + ' files of different file providers :\n' + o.dstPath + '\n' + o.srcPath );
+    {
+      o.srcPath = src.filePath;
+    }
 
     o.dstPath = dst.filePath;
-    o.srcPath = src.filePath;
 
-    return dst.provider[ name ]( o );
+    return dst.provider[ routineName ]( o );
   }
 
 }
@@ -633,12 +642,16 @@ _link_functor.defaults =
 {
   routine : null,
   onDifferentProviders : null,
+  allowDifferentProviders : 0,
 }
 
 //
 
 let hardLinkAct = _link_functor({ routine : Parent.prototype.hardLinkAct });
 let fileRenameAct = _link_functor({ routine : Parent.prototype.fileRenameAct });
+
+let softLinkAct = _link_functor({ routine : Parent.prototype.softLinkAct, allowDifferentProviders : 1 });
+let textLinkAct = _link_functor({ routine : Parent.prototype.textLinkAct, allowDifferentProviders : 1 });
 
 //
 
@@ -661,42 +674,20 @@ function _fileCopyActDifferent( o, dst, src, routine )
     });
   }
 
-  // let srcEncoding = src.provider._bufferEncodingGet();
-  // let dstEncoding = dst.provider._bufferEncodingGet();
-  // let srcEncoding = 'buffer.bytes';
-  // let dstEncoding = 'buffer.bytes';
-
-  // if( _.strEnds( src.filePath, 'icons' ) )
-  // debugger;
-
-  // debugger;
-
   let read = src.provider.fileRead
   ({
     filePath : src.filePath,
     resolvingTextLink : 0,
     resolvingSoftLink : 0,
     encoding : 'original.type',
-    // encoding : 'buffer.bytes',
     sync : 1,
   });
-
-  // if( srcEncoding !== dstEncoding )
-  // {
-  //   if( dstEncoding === 'buffer.node' )
-  //   read = _.bufferNodeFrom( read );
-  //   else if( dstEncoding === 'buffer.raw' )
-  //   read = _.bufferRawFrom( read );
-  //   else
-  //   _.assert( 0, 'Not implemented conversion from', srcEncoding, 'to', dstEncoding );
-  // }
 
   let result = dst.provider.fileWrite
   ({
     filePath : dst.filePath,
     data : read,
     encoding : 'original.type',
-    // encoding : 'buffer.bytes',
   });
 
   return result;
@@ -1001,8 +992,8 @@ let FilteredRoutines =
 
   dirMakeAct : Routines.dirMakeAct,
 
-  softLinkAct : Routines.softLinkAct,
-  textLinkAct : Routines.textLinkAct,
+  // softLinkAct : Routines.softLinkAct,
+  // textLinkAct : Routines.textLinkAct,
 
   hardLinkBreakAct : Routines.hardLinkBreakAct,
   softLinkBreakAct : Routines.softLinkBreakAct,
@@ -1122,6 +1113,10 @@ let Proto =
 
   hardLinkAct,
   fileRenameAct,
+
+  softLinkAct,
+  textLinkAct,
+
   fileCopyAct,
 
   // accessor

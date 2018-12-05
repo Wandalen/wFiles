@@ -1093,6 +1093,30 @@ function pathResolveLinkChain_body( o )
   if( !o.resolvingIntermediateDirectories && !o.resolvingSoftLink && !o.resolvingTextLink )
   return o.result;
 
+  /* */
+
+  if( o.resolvingIntermediateDirectories )
+  {
+    o.resolvingIntermediateDirectories = 0;
+
+    let parts = path.split( o.filePath );
+    let o2 = _.mapExtend( null, o );
+    o2.filePath = '/';
+
+    for( let i = 1; i < parts.length; i++ )
+    {
+      o2.filePath = path.join( o2.filePath, parts[ i ] );
+      if( self.isLink( o2.filePath ) )
+      self.pathResolveLinkChain.body.call( self, o2 );
+      else if( i === parts.length - 1 )
+      self.pathResolveLinkChain.body.call( self, o2 );
+    }
+
+    return o2.result;
+  }
+
+  /* */
+
   let stat = self.statRead
   ({
     filePath : o.filePath,
@@ -1127,28 +1151,6 @@ function pathResolveLinkChain_body( o )
   //     return o.result;
   //   }
   // }
-
-  /* */
-
-  if( o.resolvingIntermediateDirectories )
-  {
-    o.resolvingIntermediateDirectories = 0;
-
-    let parts = path.split( o.filePath );
-    let o2 = _.mapExtend( null, o );
-    o2.filePath = '/';
-
-    for( let i = 1; i < parts.length; i++ )
-    {
-      o2.filePath = path.join( o2.filePath, parts[ i ] );
-      if( self.isLink( o2.filePath ) )
-      self.pathResolveLinkChain.body.call( self, o2 );
-      else if( i === parts.length - 1 )
-      self.pathResolveLinkChain.body.call( self, o2 );
-    }
-
-    return o2.result;
-  }
 
   /* */
 

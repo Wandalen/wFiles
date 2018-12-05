@@ -28432,7 +28432,8 @@ function pathResolveLinkChain( test )
     resolvingSoftLink : 1,
     resolvingTextLink : 1,
     preservingRelative : 0,
-    allowingMissing : 1
+    allowingMissing : 1,
+    throwing : 1
   }
 
   let dir = test.context.makePath( 'written/pathResolveLinkChain' );
@@ -28444,9 +28445,15 @@ function pathResolveLinkChain( test )
 
   self.provider.fieldPush( 'usingTextLink', true );
 
-  /* */
+  /*
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    preservingRelative : [ 0,1 ],
+    allowingMissing : [ 0,1 ],
+    throwing : 1
+  */
 
-  test.open( 'simple' );
+  /* basic */
 
   test.case = 'not existing file';
   self.provider.filesDelete( _.path.dir( filePath ) );
@@ -28711,11 +28718,7 @@ function pathResolveLinkChain( test )
   test.identical( o.result, expectedResult );
   test.identical( o.found, expectedFound );
 
-  test.close( 'simple' );
-
-  /* */
-
-  test.open( 'chain' );
+  /* chain */
 
   test.case = 'soft-soft-file';
   self.provider.filesDelete( _.path.dir( filePath ) );
@@ -28886,6 +28889,30 @@ function pathResolveLinkChain( test )
     test.identical( o.result, [ linkPath, linkPath2, linkPath3, filePath ] )
   }
 
+  /* chain, resolvingIntermediateDirectories : [ 0, 1 ] */
+
+  test.case = 'two soft links in path';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.softLink( linkPath, '..' );
+  self.provider.softLink( linkPath2, '../file' );
+  var o = _.mapExtend( null, o1, { filePath : path.join( dir, 'link/link2' ) , preservingRelative : 1, resolvingIntermediateDirectories : 0 } );
+  var got = self.provider.pathResolveLinkChain( o );
+  var expectedFound =
+  [
+    path.join( dir, 'link/link2' ),
+    '../file',
+    path.join( dir, 'link/file' ),
+  ]
+  var expectedResult =
+  [
+    path.join( dir, 'link/link2' ),
+    path.join( dir, 'link/file' ),
+  ]
+  test.identical( o.result, expectedResult );
+  test.identical( o.found, expectedFound );
+
+  //
 
   test.case = 'two soft links in path';
   self.provider.filesDelete( _.path.dir( filePath ) );
@@ -28914,6 +28941,45 @@ function pathResolveLinkChain( test )
   ]
   test.identical( o.result, expectedResult );
   test.identical( o.found, expectedFound );
+
+  //
+
+  test.case = 'several absolute soft links in path';
+  var dirPath = _.path.dir( filePath );
+  var dirPath1 = _.path.join( dirPath, 'dir1' );
+  var dirPath2 = _.path.join( dirPath, 'dir2' );
+  var pathToFile = _.path.join( dirPath, 'file' );
+  var linkInDir = _.path.join( dirPath, 'linkToDir1' );
+  var linkInDir1 = _.path.join( dirPath1, 'linkToDir2' );
+  var linkInDir2 = _.path.join( dirPath2, 'linkToFile' );
+  self.provider.filesDelete( dirPath );
+  self.provider.dirMake( dirPath );
+  self.provider.dirMake( dirPath1 );
+  self.provider.dirMake( dirPath2 );
+  self.provider.fileWrite( pathToFile,pathToFile );
+  self.provider.softLink( linkInDir, dirPath1 );
+  self.provider.softLink( linkInDir1, dirPath2 );
+  self.provider.softLink( linkInDir2, pathToFile );
+
+  /*
+    dir :
+      dir1 :
+        linkToDir2
+      dir2 :
+        linkToFile
+      linkToDir1
+      file
+
+    path : 'dir/linkToDir1/linkToDir2/linkToFile' -> 'dir/file'
+  */
+
+  var testPath = _.path.join( dirPath, 'linkToDir1/linkToDir2/linkToFile' )
+  var o = _.mapExtend( null, o1, { filePath : testPath , preservingRelative : 1, resolvingIntermediateDirectories : 0 } );
+  var got = self.provider.pathResolveLinkChain( o );
+  test.identical( o.result, [ testPath, pathToFile ] )
+  test.identical( o.found, [ testPath, pathToFile ] )
+
+  //
 
   test.case = 'several absolute soft links in path';
   var dirPath = _.path.dir( filePath );
@@ -28950,6 +29016,45 @@ function pathResolveLinkChain( test )
   test.identical( o.result, [ testPath, linkInDir, dirPath1, linkInDir1, dirPath2, linkInDir2, pathToFile ] )
   test.identical( o.found, [ testPath, linkInDir, dirPath1, linkInDir1, dirPath2, linkInDir2, pathToFile ] )
 
+  //
+
+  test.case = 'several relative soft links in path';
+  var dirPath = _.path.dir( filePath );
+  var dirPath1 = _.path.join( dirPath, 'dir1' );
+  var dirPath2 = _.path.join( dirPath, 'dir2' );
+  var pathToFile = _.path.join( dirPath, 'file' );
+  var linkInDir = _.path.join( dirPath, 'linkToDir1' );
+  var linkInDir1 = _.path.join( dirPath1, 'linkToDir2' );
+  var linkInDir2 = _.path.join( dirPath2, 'linkToFile' );
+  self.provider.filesDelete( dirPath );
+  self.provider.dirMake( dirPath );
+  self.provider.dirMake( dirPath1 );
+  self.provider.dirMake( dirPath2 );
+  self.provider.fileWrite( pathToFile,pathToFile );
+  self.provider.softLink( linkInDir, self.provider.path.relative( linkInDir, dirPath1 ) );
+  self.provider.softLink( linkInDir1, self.provider.path.relative( linkInDir1, dirPath2 ) );
+  self.provider.softLink( linkInDir2, self.provider.path.relative( linkInDir2, pathToFile ) );
+
+  /*
+    dir :
+      dir1 :
+        linkToDir2
+      dir2 :
+        linkToFile
+      linkToDir1
+      file
+
+    path : 'dir/linkToDir1/linkToDir2/linkToFile' -> 'dir/file'
+  */
+
+  var testPath = _.path.join( dirPath, 'linkToDir1/linkToDir2/linkToFile' )
+  var o = _.mapExtend( null, o1, { filePath : testPath , preservingRelative : 1, resolvingIntermediateDirectories : 0 } );
+  var got = self.provider.pathResolveLinkChain( o );
+  test.identical( o.found, [ testPath, '../../file', _.path.join( dirPath, 'linkToDir1/file'), null ] )
+  test.identical( o.result, [ testPath, _.path.join( dirPath, 'linkToDir1/file'), null ] )
+
+  //
+
   test.case = 'several relative soft links in path';
   var dirPath = _.path.dir( filePath );
   var dirPath1 = _.path.join( dirPath, 'dir1' );
@@ -28985,11 +29090,81 @@ function pathResolveLinkChain( test )
   test.identical( o.found, [ testPath, linkInDir, '../dir1', dirPath1, linkInDir1, '../../dir2', dirPath2, linkInDir2, '../../file', pathToFile ] )
   test.identical( o.result, [ testPath, linkInDir, dirPath1, linkInDir1, dirPath2, linkInDir2, pathToFile ] )
 
-  test.close( 'chain' );
+  //
 
-  /**/
+  test.case = 'several absolute text links in path';
+  var dirPath = _.path.dir( filePath );
+  var dirPath1 = _.path.join( dirPath, 'dir1' );
+  var dirPath2 = _.path.join( dirPath, 'dir2' );
+  var pathToFile = _.path.join( dirPath, 'file' );
+  var linkInDir = _.path.join( dirPath, 'linkToDir1' );
+  var linkInDir1 = _.path.join( dirPath1, 'linkToDir2' );
+  var linkInDir2 = _.path.join( dirPath2, 'linkToFile' );
+  self.provider.filesDelete( dirPath );
+  self.provider.dirMake( dirPath );
+  self.provider.dirMake( dirPath1 );
+  self.provider.dirMake( dirPath2 );
+  self.provider.fileWrite( pathToFile,pathToFile );
+  self.provider.textLink( linkInDir, dirPath1 );
+  self.provider.textLink( linkInDir1, dirPath2 );
+  self.provider.textLink( linkInDir2, pathToFile );
 
-  test.open( 'cycle' );
+  /*
+    dir :
+      dir1 :
+        linkToDir2
+      dir2 :
+        linkToFile
+      linkToDir1
+      file
+
+    path : 'dir/linkToDir1/linkToDir2/linkToFile' -> 'dir/file'
+  */
+
+  var testPath = _.path.join( dirPath, 'linkToDir1/linkToDir2/linkToFile' )
+  var o = _.mapExtend( null, o1, { filePath : testPath , preservingRelative : 1, resolvingIntermediateDirectories : 1 } );
+  var got = self.provider.pathResolveLinkChain( o );
+  test.identical( o.result, [ testPath, linkInDir, dirPath1, linkInDir1, dirPath2, linkInDir2, pathToFile ] )
+  test.identical( o.found, [ testPath, linkInDir, dirPath1, linkInDir1, dirPath2, linkInDir2, pathToFile ] )
+
+  //
+
+  test.case = 'several absolute text links in path';
+  var dirPath = _.path.dir( filePath );
+  var dirPath1 = _.path.join( dirPath, 'dir1' );
+  var dirPath2 = _.path.join( dirPath, 'dir2' );
+  var pathToFile = _.path.join( dirPath, 'file' );
+  var linkInDir = _.path.join( dirPath, 'linkToDir1' );
+  var linkInDir1 = _.path.join( dirPath1, 'linkToDir2' );
+  var linkInDir2 = _.path.join( dirPath2, 'linkToFile' );
+  self.provider.filesDelete( dirPath );
+  self.provider.dirMake( dirPath );
+  self.provider.dirMake( dirPath1 );
+  self.provider.dirMake( dirPath2 );
+  self.provider.fileWrite( pathToFile,pathToFile );
+  self.provider.textLink( linkInDir, dirPath1 );
+  self.provider.textLink( linkInDir1, dirPath2 );
+  self.provider.textLink( linkInDir2, pathToFile );
+
+  /*
+    dir :
+      dir1 :
+        linkToDir2
+      dir2 :
+        linkToFile
+      linkToDir1
+      file
+
+    path : 'dir/linkToDir1/linkToDir2/linkToFile' -> 'dir/file'
+  */
+
+  var testPath = _.path.join( dirPath, 'linkToDir1/linkToDir2/linkToFile' )
+  var o = _.mapExtend( null, o1, { filePath : testPath , preservingRelative : 1, resolvingIntermediateDirectories : 0 } );
+  var got = self.provider.pathResolveLinkChain( o );
+  test.identical( o.result, [ testPath, null ] )
+  test.identical( o.found, [ testPath, null ] )
+
+  /* cycle, throwing : [ 0,1 ] */
 
   test.case = 'self cycle softlink, throwing on'
   self.provider.filesDelete( _.path.dir( filePath ) );
@@ -29051,11 +29226,23 @@ function pathResolveLinkChain( test )
   test.identical( o.result, [ linkPath,linkPath2,linkPath ] );
   test.identical( o.found, [ linkPath,linkPath2,linkPath ] );
 
-  test.close( 'cycle' );
+  test.case = 'cycle soft text, throwing off'
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.fileWrite( linkPath2, 'link ' + linkPath );
+  self.provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissing : 1, makingDirectory : 1 });
+  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0 } );
+  self.provider.pathResolveLinkChain( o );
+  test.identical( o.result, [ linkPath,linkPath2,linkPath ] );
+  test.identical( o.found, [ linkPath,linkPath2,linkPath ] );
 
-  /**/
+  test.case = 'cycle soft text, throwing on'
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.fileWrite( linkPath2, 'link ' + linkPath );
+  self.provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissing : 1, makingDirectory : 1 });
+  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1 } );
+  test.shouldThrowError( () => self.provider.pathResolveLinkChain( o ) );
 
-  test.open( 'allowingMissing 0, throwing 1' );
+  /* allowingMissing : 0 throwing : 1, preservingRelative : [ 0, 1 ] */
 
   o1.allowingMissing = 0;
   o1.throwing = 1;
@@ -29129,6 +29316,14 @@ function pathResolveLinkChain( test )
   test.identical( o.result, [ linkPath,filePath, null ] )
   test.identical( o.found, [ linkPath,filePath, null ] )
 
+  test.case = 'relative softlink to missing';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.softLink({ dstPath : linkPath, srcPath : '../file', allowingMissing : 1, makingDirectory : 1 });
+  var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
+  test.shouldThrowError( () => self.provider.pathResolveLinkChain( o ) );
+  test.identical( o.result, [ linkPath,filePath, null ] )
+  test.identical( o.found, [ linkPath, '../file', filePath, null ] )
+
   test.case = 'textlink to missing';
   self.provider.filesDelete( _.path.dir( filePath ) );
   self.provider.textLink({ dstPath : linkPath, srcPath : filePath });
@@ -29136,6 +29331,14 @@ function pathResolveLinkChain( test )
   test.shouldThrowError( () => self.provider.pathResolveLinkChain( o ) );
   test.identical( o.result, [ linkPath,filePath, null ] )
   test.identical( o.found, [ linkPath,filePath, null ] )
+
+  test.case = 'textlink to missing';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.textLink({ dstPath : linkPath, srcPath : '../file' });
+  var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
+  test.shouldThrowError( () => self.provider.pathResolveLinkChain( o ) );
+  test.identical( o.result, [ linkPath,filePath, null ] )
+  test.identical( o.found, [ linkPath,'../file',filePath, null ] )
 
   test.case = 'double textlink to missing';
   self.provider.filesDelete( _.path.dir( filePath ) );
@@ -29173,7 +29376,139 @@ function pathResolveLinkChain( test )
   test.identical( o.result, [ linkPath,linkPath2, filePath, null ] )
   test.identical( o.found, [ linkPath,linkPath2, filePath, null ] )
 
-  test.close( 'allowingMissing 0, throwing 1' );
+  /* allowingMissing : 0 throwing : 0, preservingRelative : [ 0, 1 ] */
+
+  o1.allowingMissing = 0;
+  o1.throwing = 0;
+
+  //
+
+  test.case = 'not existing file';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  var o = _.mapExtend( null, o1, { filePath : filePath } );
+  self.provider.pathResolveLinkChain( o );
+  test.identical( o.result, [ filePath, null ] )
+  test.identical( o.found, [ filePath, null ] )
+
+  test.case = 'existing file';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.fileWrite( filePath, filePath );
+  var o = _.mapExtend( null, o1, { filePath : filePath } );
+  self.provider.pathResolveLinkChain( o );
+  test.identical( o.result, [ filePath ] )
+  test.identical( o.found, [ filePath ] )
+
+  test.case = 'hardlink';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.hardLink( linkPath, filePath );
+  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  self.provider.pathResolveLinkChain( o );
+  test.identical( o.result, [ linkPath ] )
+  test.identical( o.found, [ linkPath ] )
+
+  test.case = 'softlink';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.softLink( linkPath, filePath );
+  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  self.provider.pathResolveLinkChain( o );
+  test.identical( o.result, [ linkPath,filePath ] )
+  test.identical( o.found, [ linkPath,filePath ] )
+
+  test.case = 'relative softlink';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.softLink( linkPath, '../file' );
+  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var got = self.provider.pathResolveLinkChain( o );
+  test.identical( o.result, [ linkPath, filePath ] )
+  test.identical( o.found, [ linkPath,filePath ] )
+
+  test.case = 'textlink';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.fileWrite( linkPath, 'link ' + filePath );
+  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  var got = self.provider.pathResolveLinkChain( o );
+  test.identical( o.result, [ linkPath, filePath ] )
+  test.identical( o.found, [ linkPath, filePath ] )
+
+  test.case = 'softlink to missing';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.softLink({ dstPath : linkPath, srcPath : filePath, allowingMissing : 1, makingDirectory : 1 });
+  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  test.mustNotThrowError( () => self.provider.pathResolveLinkChain( o ) );
+  test.identical( o.result, [ linkPath,filePath, null ] )
+  test.identical( o.found, [ linkPath,filePath, null ] )
+
+  test.case = 'relative softlink to missing';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.softLink({ dstPath : linkPath, srcPath : '../file', allowingMissing : 1, makingDirectory : 1 });
+  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  test.mustNotThrowError( () => self.provider.pathResolveLinkChain( o ) );
+  test.identical( o.result, [ linkPath,filePath, null ] )
+  test.identical( o.found, [ linkPath,filePath, null ] )
+
+  test.case = 'relative softlink to missing';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.softLink({ dstPath : linkPath, srcPath : '../file', allowingMissing : 1, makingDirectory : 1 });
+  var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
+  test.mustNotThrowError( () => self.provider.pathResolveLinkChain( o ) );
+  test.identical( o.result, [ linkPath,filePath, null ] )
+  test.identical( o.found, [ linkPath, '../file', filePath, null ] )
+
+  test.case = 'textlink to missing';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.textLink({ dstPath : linkPath, srcPath : filePath });
+  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  test.mustNotThrowError( () => self.provider.pathResolveLinkChain( o ) );
+  test.identical( o.result, [ linkPath,filePath, null ] )
+  test.identical( o.found, [ linkPath,filePath, null ] )
+
+  test.case = 'textlink to missing';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.textLink({ dstPath : linkPath, srcPath : '../file' });
+  var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
+  test.mustNotThrowError( () => self.provider.pathResolveLinkChain( o ) );
+  test.identical( o.result, [ linkPath,filePath, null ] )
+  test.identical( o.found, [ linkPath,'../file',filePath, null ] )
+
+  test.case = 'double textlink to missing';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.textLink({ dstPath : linkPath2, srcPath : filePath });
+  self.provider.textLink({ dstPath : linkPath, srcPath : linkPath2 });
+  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  test.mustNotThrowError( () => self.provider.pathResolveLinkChain( o ) );
+  test.identical( o.result, [ linkPath,linkPath2, filePath, null ] )
+  test.identical( o.found, [ linkPath,linkPath2, filePath, null ] )
+
+  test.case = 'double softlink to missing';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissing : 1, makingDirectory : 1 });
+  self.provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissing : 1, makingDirectory : 1 });
+  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  test.mustNotThrowError( () => self.provider.pathResolveLinkChain( o ) );
+  test.identical( o.result, [ linkPath,linkPath2, filePath, null ] )
+  test.identical( o.found, [ linkPath,linkPath2, filePath, null ] )
+
+  test.case = 'soft to text to missing';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.textLink({ dstPath : linkPath2, srcPath : filePath });
+  self.provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissing : 1, makingDirectory : 1 });
+  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  test.mustNotThrowError( () => self.provider.pathResolveLinkChain( o ) );
+  test.identical( o.result, [ linkPath,linkPath2, filePath, null ] )
+  test.identical( o.found, [ linkPath,linkPath2, filePath, null ] )
+
+  test.case = 'text to soft to missing';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissing : 1, makingDirectory : 1 });
+  self.provider.textLink({ dstPath : linkPath, srcPath : linkPath2 });
+  var o = _.mapExtend( null, o1, { filePath : linkPath } );
+  test.mustNotThrowError( () => self.provider.pathResolveLinkChain( o ) );
+  test.identical( o.result, [ linkPath,linkPath2, filePath, null ] )
+  test.identical( o.found, [ linkPath,linkPath2, filePath, null ] )
 
   self.provider.fieldPop( 'usingTextLink', true );
 }

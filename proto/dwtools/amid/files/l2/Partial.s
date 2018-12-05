@@ -3884,7 +3884,7 @@ var defaults = isTextLink_body.defaults = Object.create( null );
 
 defaults.filePath = null;
 defaults.resolvingSoftLink = 0;
-defaults.resolvingTextLink = 0;
+// defaults.resolvingTextLink = 0;
 
 var paths = isTextLink_body.paths = Object.create( null );
 

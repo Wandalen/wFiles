@@ -413,7 +413,7 @@ function filesAreUpToDate( dst,src )
 
   function _from( file )
   {
-    if( _.statIs( file ) )
+    if( _.fileStatIs( file ) )
     return  { stat : file };
     else if( _.strIs( file ) )
     return { stat : self.statResolvedRead( file ) };

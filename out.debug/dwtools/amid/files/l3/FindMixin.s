@@ -25,6 +25,8 @@ let Self = function wFileProviderFind( o )
 
 Self.shortName = 'Find';
 
+// let debugPath = '/dst/dir';
+
 // --
 // etc
 // --
@@ -85,7 +87,7 @@ function _filesFilterMasksSupplement( dst,src )
 // files find
 // --
 
-function _filesFindLikePre_pre( args )
+function filesFindLikePre_pre( args )
 {
   let o;
 
@@ -130,11 +132,11 @@ function _filesFindLikePre_pre( args )
 
 //
 
-function __filesFind_pre( routine, args )
+function filesFind_pre( routine, args )
 {
   let self = this;
   let path = self.path;
-  let o = self._filesFindLikePre_pre( args );
+  let o = self.filesFindLikePre_pre( args );
 
   _.routineOptions( routine, o );
 
@@ -216,17 +218,17 @@ _filesFilterForm.defaults = Object.create( _.FileRecordFilter.prototype.Composes
 
 //
 
-function _filesFindSingle_pre( routine, args )
+function filesFindSingle_pre( routine, args )
 {
   let self = this;
   let path = self.path;
-  let o = self.__filesFind_pre( routine, args );
+  let o = self.filesFind_pre( routine, args );
   return o;
 }
 
 //
 
-function _filesFindSingle_body( o )
+function filesFindSingle_body( o )
 {
   let self = this;
   let path = self.path;
@@ -235,7 +237,7 @@ function _filesFindSingle_body( o )
 
   _.assert( _.objectIs( o.filter.effectiveFileProvider ) );
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertRoutineOptions( _filesFindSingle_body, o );
+  _.assertRoutineOptions( filesFindSingle_body, o );
   _.assert( _.routineIs( o.onUp ) || _.arrayIs( o.onUp ) );
   _.assert( _.routineIs( o.onDown ) || _.arrayIs( o.onDown ) );
   _.assert( path.isNormalized( o.filePath ) );
@@ -284,6 +286,9 @@ function _filesFindSingle_body( o )
 
   _.assert( recordFactory.basePath === o.filter.basePath[ o.filePath ] );
 
+  // if( o.filePath === '/dst/dir' )
+  // debugger;
+
   let record = recordFactory.record( o.filePath );
 
   _.assert( recordFactory.dirPath === null );
@@ -293,6 +298,7 @@ function _filesFindSingle_body( o )
 
   forFile( record, o );
 
+  // debugger;
   return result;
 
   /* */
@@ -506,7 +512,7 @@ function _filesFindSingle_body( o )
 
 }
 
-_filesFindSingle_body.defaults =
+filesFindSingle_body.defaults =
 {
 
   filePath : null,
@@ -534,31 +540,31 @@ _filesFindSingle_body.defaults =
 
 }
 
-_filesFindSingle_body.paths =
+filesFindSingle_body.paths =
 {
   filePath : null,
 }
 
-var having = _filesFindSingle_body.having = Object.create( null );
+var having = filesFindSingle_body.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
 having.driving = 0;
 
-let filesFindSingle = _.routineFromPreAndBody( _filesFindSingle_pre, _filesFindSingle_body );
+let filesFindSingle = _.routineFromPreAndBody( filesFindSingle_pre, filesFindSingle_body );
 
 // //
 //
-// function _filesFind_pre( routine, args )
+// function filesFind_pre( routine, args )
 // {
 //   let self = this;
 //   let path = self.path;
-//   return self.__filesFind_pre( routine, args )
+//   return self.filesFind_pre( routine, args )
 // }
 
 //
 
-function _filesFind_body( o )
+function filesFind_body( o )
 {
   let self = this;
   let path = self.path;
@@ -671,9 +677,9 @@ function _filesFind_body( o )
 
 }
 
-_.routineExtend( _filesFind_body, filesFindSingle.body );
+_.routineExtend( filesFind_body, filesFindSingle.body );
 
-var defaults = _filesFind_body.defaults;
+var defaults = filesFind_body.defaults;
 
 // defaults.prefixPath = null;
 // defaults.postfixPath = null;
@@ -688,7 +694,7 @@ defaults.mandatory = 0;
 _.assert( defaults.maskAll === undefined );
 _.assert( defaults.glob === undefined );
 
-let filesFind = _.routineFromPreAndBody( __filesFind_pre, _filesFind_body );
+let filesFind = _.routineFromPreAndBody( filesFind_pre, filesFind_body );
 
 filesFind.having.aspect = 'entry';
 
@@ -777,7 +783,7 @@ function filesFinder_functor( routine )
   function finder()
   {
     let self = this;
-    let op0 = self._filesFindLikePre_pre( arguments );
+    let op0 = self.filesFindLikePre_pre( arguments );
     // let op0 = self.filesFind.pre.call( self, self.filesFind, arguments );
     _.assertMapHasOnly( op0, finder.defaults );
     return er;
@@ -1007,7 +1013,7 @@ filesCopyWithAdapter.defaults =
   onDown : [],
 }
 
-// filesCopyWithAdapter.defaults.__proto__ = _filesFindMasksAdjust.defaults
+// filesCopyWithAdapter.defaults.__proto__ = filesFindMasksAdjust.defaults
 
 var paths = filesCopyWithAdapter.paths = Object.create( null );
 
@@ -1400,7 +1406,7 @@ function filesReflectEvaluate_body( o )
     // if( _.strEnds( record.dst.absolute, debugPath ) )
     // debugger;
 
-    _.sure( !_.strBegins( record.dst.absolute, '/../' ), 'Dst path:', record.dst.absolute, 'leads out of file system.' );
+    _.sure( !_.strBegins( record.dst.absolute, '/../' ), () => 'Destination path ' + _.strQuote( record.dst.absolute ) + ' leads out of file system.' );
 
     if( !record.src.isActual && !record.dst.isActual )
     {
@@ -1532,6 +1538,9 @@ function filesReflectEvaluate_body( o )
     let record = recordMake( dstRecord, srcRecord, dstRecord );
     record.reason = reason;
 
+    // if( _.strEnds( record.dst.absolute, debugPath ) )
+    // debugger;
+
     if( handleUp( record, op ) === false )
     record.include = false;
 
@@ -1542,6 +1551,9 @@ function filesReflectEvaluate_body( o )
 
   function handleDstDown( record, op )
   {
+    // if( _.strEnds( record.dst.absolute, debugPath ) )
+    // debugger;
+
     handleDown( record, op );
     return record;
   }
@@ -1557,6 +1569,9 @@ function filesReflectEvaluate_body( o )
     let dstRecord = dstRecordFactory.record( relative );
     let record = recordMake( dstRecord, srcRecord, srcRecord );
     record.reason = 'srcLooking';
+
+    // if( _.strEnds( record.dst.absolute, debugPath ) )
+    // debugger;
 
     if( o.filesGraph )
     {
@@ -2913,7 +2928,7 @@ function filesReflector_functor( routine )
   function reflector()
   {
     let self = this;
-    let op0 = self._filesFindLikePre_pre( arguments );
+    let op0 = self.filesFindLikePre_pre( arguments );
     _.assertMapHasOnly( op0, reflector.defaults );
     return er;
 
@@ -2970,7 +2985,7 @@ let filesReflector = filesReflector_functor( filesReflect );
 
 //
 
-function _filesFindSame_body( o )
+function filesFindSame_body( o )
 {
   let self = this;
   let logger = self.logger;
@@ -3249,9 +3264,9 @@ function _filesFindSame_body( o )
 
 }
 
-_.routineExtend( _filesFindSame_body, filesFindRecursive );
+_.routineExtend( filesFindSame_body, filesFindRecursive );
 
-var defaults = _filesFindSame_body.defaults;
+var defaults = filesFindSame_body.defaults;
 
 defaults.maxSize = 1 << 22;
 // defaults.lattersFileSizeLimit = 1048576;
@@ -3270,7 +3285,7 @@ defaults.relativePaths = 0;
 
 defaults.result = null;
 
-let filesFindSame = _.routineFromPreAndBody( filesFind.pre, _filesFindSame_body );
+let filesFindSame = _.routineFromPreAndBody( filesFind.pre, filesFindSame_body );
 
 filesFindSame.having.aspect = 'entry';
 
@@ -3282,7 +3297,7 @@ function filesDelete_pre( routine,args )
 {
   let self = this;
   args = _.longSlice( args );
-  let o = self.__filesFind_pre( routine, args );
+  let o = self.filesFind_pre( routine, args );
   return o;
 }
 
@@ -3329,6 +3344,9 @@ function filesDelete_body( o )
   let o2 = _.mapOnly( o, self.filesFind.defaults );
   o2.verbosity = 0;
   delete o2.safe;
+
+  // if( o2.filePath && ( o2.filePath === '/dst/dir' || o2.filePath[ 0 ] === '/dst/dir' ) )
+  // debugger;
 
   self.fieldSet( 'resolvingSoftLink', 0 );
   files = self.filesFind.body.call( self, o2 );
@@ -3400,7 +3418,7 @@ function filesDeleteForce( o )
 {
   let self = this;
 
-  o = self._filesFindLikePre_pre( arguments );
+  o = self.filesFindLikePre_pre( arguments );
 
   _.routineOptions( filesDeleteForce, o );
 
@@ -3417,7 +3435,7 @@ function filesDeleteFiles( o )
 {
   let self = this;
 
-  o = self._filesFindLikePre_pre( arguments );
+  o = self.filesFindLikePre_pre( arguments );
 
   _.routineOptions( filesDeleteFiles, o );
 
@@ -3448,7 +3466,7 @@ function filesDeleteEmptyDirs()
   let self = this;
 
   // _.assert( arguments.length === 1 || arguments.length === 3 );
-  // let o = self._filesFindLikePre_pre( arguments,1 );
+  // let o = self.filesFindLikePre_pre( arguments,1 );
 
   debugger;
   let o = filesDeleteEmptyDirs.pre.call( self,filesDeleteEmptyDirs, arguments );
@@ -3724,8 +3742,8 @@ let Supplement =
 
   // find
 
-  _filesFindLikePre_pre : _filesFindLikePre_pre,
-  __filesFind_pre : __filesFind_pre,
+  filesFindLikePre_pre : filesFindLikePre_pre,
+  filesFind_pre : filesFind_pre,
   _filesFilterForm : _filesFilterForm,
 
   filesFindSingle : filesFindSingle,

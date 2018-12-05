@@ -341,11 +341,17 @@ function _preSrcDstPathWithoutProviderDefaults( routine, args )
 
   _.routineOptions( routine, o );
 
-  o.dstPath = path.s.from( o.dstPath );
-  o.srcPath = path.s.from( o.srcPath );
+  if( o.dstPath !== null )
+  {
+    o.dstPath = path.s.from( o.dstPath );
+    o.dstPath = path.s.normalize( o.dstPath );
+  }
 
-  o.dstPath = path.s.normalize( o.dstPath );
-  o.srcPath = path.s.normalize( o.srcPath );
+  if( o.srcPath !== null )
+  {
+    o.srcPath = path.s.from( o.srcPath );
+    o.srcPath = path.s.normalize( o.srcPath );
+  }
 
   return o;
 }

@@ -3694,8 +3694,7 @@ function fileCopySync( test )
       throwing : 0,
     });
   });
-  debugger;
-  test.identical( got, false );
+  test.identical( got, null );
 
   /**/
 
@@ -3724,7 +3723,7 @@ function fileCopySync( test )
       throwing : 0,
     });
   });
-  test.identical( got, false );
+  test.identical( got, null );
 
   //
 
@@ -22864,7 +22863,7 @@ function isTerminal( test )
 
   test.case = 'soft self cycled'
   self.provider.filesDelete( dirPath );
-  self.provider.softLink({ dstPath : linkPath, srcPath : linkPath, allowingMissing : 1, makingDirectory : 1 });
+  self.provider.softLink({ dstPath : linkPath, srcPath : '../link', allowingMissing : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = self.provider.isTerminal( o );
   test.identical( got, false )
@@ -23017,7 +23016,7 @@ function isTerminal( test )
 
   test.case = 'text self cycled'
   self.provider.filesDelete( dirPath );
-  self.provider.fileWrite( linkPath, 'link ' + linkPath );
+  self.provider.fileWrite( linkPath, 'link ../link' );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = self.provider.isTerminal( o );
   test.identical( got, true )
@@ -24085,7 +24084,7 @@ function isSoftLink( test )
 
   test.case = 'soft self cycled'
   self.provider.filesDelete( dirPath );
-  self.provider.softLink({ dstPath : linkPath, srcPath : linkPath, allowingMissing : 1, makingDirectory : 1 });
+  self.provider.softLink({ dstPath : linkPath, srcPath : '../link', allowingMissing : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0 };
   var got = self.provider.isSoftLink( o );
   test.identical( got, true )
@@ -24410,7 +24409,7 @@ function isSoftLink( test )
 
   test.case = 'soft self cycled'
   self.provider.filesDelete( dirPath );
-  self.provider.softLink({ dstPath : linkPath, srcPath : linkPath, allowingMissing : 1, makingDirectory : 1 });
+  self.provider.softLink({ dstPath : linkPath, srcPath : '../link', allowingMissing : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1 };
   var got = self.provider.isSoftLink( _.mapExtend( null, o ) );
   test.identical( got, true )
@@ -25021,7 +25020,7 @@ function isHardLink( test )
 
   test.case = 'soft self cycled'
   self.provider.filesDelete( dirPath );
-  self.provider.softLink({ dstPath : linkPath, srcPath : linkPath, allowingMissing : 1, makingDirectory : 1 });
+  self.provider.softLink({ dstPath : linkPath, srcPath : '../link', allowingMissing : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = self.provider.isHardLink( o );
   test.identical( got, false )
@@ -25619,7 +25618,7 @@ function isHardLink( test )
 
   test.case = 'soft self cycled'
   self.provider.filesDelete( dirPath );
-  self.provider.softLink({ dstPath : linkPath, srcPath : linkPath, allowingMissing : 1, makingDirectory : 1 });
+  self.provider.softLink({ dstPath : linkPath, srcPath : '../link', allowingMissing : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
   var got = self.provider.isHardLink( _.mapExtend( null, o ) );
   test.identical( got, false )
@@ -25629,7 +25628,7 @@ function isHardLink( test )
 
   test.case = 'soft self cycled'
   self.provider.filesDelete( dirPath );
-  self.provider.softLink({ dstPath : linkPath, srcPath : linkPath, allowingMissing : 1, makingDirectory : 1 });
+  self.provider.softLink({ dstPath : linkPath, srcPath : '../link', allowingMissing : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
   var got = self.provider.isHardLink( _.mapExtend( null, o ) );
   test.identical( got, false )
@@ -25638,7 +25637,7 @@ function isHardLink( test )
 
   test.case = 'soft self cycled'
   self.provider.filesDelete( dirPath );
-  self.provider.softLink({ dstPath : linkPath, srcPath : linkPath, allowingMissing : 1, makingDirectory : 1 });
+  self.provider.softLink({ dstPath : linkPath, srcPath : '../link', allowingMissing : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
   var got = self.provider.isHardLink( _.mapExtend( null, o ) );
   test.identical( got, false )
@@ -25661,7 +25660,8 @@ function isHardLink( test )
   self.provider.softLink({ dstPath : linkPath2, srcPath : linkPath, allowingMissing : 1, makingDirectory : 1 });
   self.provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissing : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
-  test.shouldThrowError( () => self.provider.isHardLink( _.mapExtend( null, o ) ) );
+  var got = self.provider.isHardLink( _.mapExtend( null, o ) );
+  test.identical( got, false )
   var got = self.provider.statRead( _.mapExtend( null, o ) );
   test.identical( got, null );
 
@@ -25670,7 +25670,8 @@ function isHardLink( test )
   self.provider.softLink({ dstPath : linkPath2, srcPath : linkPath, allowingMissing : 1, makingDirectory : 1 });
   self.provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissing : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  test.shouldThrowError( () => self.provider.isHardLink( _.mapExtend( null, o ) ) );
+  var got = self.provider.isHardLink( _.mapExtend( null, o ) );
+  test.identical( got, false )
   var got = self.provider.statRead( _.mapExtend( null, o ) );
   test.identical( got, null );
 
@@ -25988,14 +25989,17 @@ function isHardLink( test )
 
   test.case = 'text self cycled'
   self.provider.filesDelete( dirPath );
-  self.provider.fileWrite( linkPath, 'link ' + linkPath );
+  self.provider.fileWrite( linkPath, 'link ../link' );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  test.shouldThrowError( () => self.provider.isHardLink( _.mapExtend( null, o ) ) );
-  test.shouldThrowError( () => self.provider.statRead( _.mapExtend( null, o ) ) );
+  var got = self.provider.isHardLink( _.mapExtend( null, o ) );
+  test.identical( got, false );
+  var got = self.provider.statRead( _.mapExtend( null, o ) );
+  test.identical( got, null );
+
 
   test.case = 'text self cycled'
   self.provider.filesDelete( dirPath );
-  self.provider.fileWrite( linkPath, 'link ' + linkPath );
+  self.provider.fileWrite( linkPath, 'link ../link' );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
   var got = self.provider.isHardLink( _.mapExtend( null, o ) );
   test.identical( got, false )
@@ -26007,18 +26011,22 @@ function isHardLink( test )
 
   test.case = 'text self cycled'
   self.provider.filesDelete( dirPath );
-  self.provider.fileWrite( linkPath, 'link ' + linkPath );
+  self.provider.fileWrite( linkPath, 'link ../link' );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  test.shouldThrowError( () => self.provider.isHardLink( _.mapExtend( null, o ) ) );
-  test.shouldThrowError( () => self.provider.statRead( _.mapExtend( null, o ) ) );
+  var got = self.provider.isHardLink( _.mapExtend( null, o ) );
+  test.identical( got, false );
+  var got = self.provider.statRead( _.mapExtend( null, o ) );
+  test.identical( got, null );
 
   test.case = 'text cycled'
   self.provider.filesDelete( dirPath );
   self.provider.fileWrite( linkPath2, 'link ' + linkPath );
   self.provider.fileWrite( linkPath, 'link ' + linkPath2 );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  test.shouldThrowError( () => self.provider.isHardLink( _.mapExtend( null, o ) ) );
-  test.shouldThrowError( () => self.provider.statRead( _.mapExtend( null, o ) ) );
+  var got = self.provider.isHardLink( _.mapExtend( null, o ) );
+  test.identical( got, false );
+  var got = self.provider.statRead( _.mapExtend( null, o ) );
+  test.identical( got, null );
 
   test.case = 'text cycled'
   self.provider.filesDelete( dirPath );
@@ -26038,8 +26046,10 @@ function isHardLink( test )
   self.provider.fileWrite( linkPath2, 'link ' + linkPath );
   self.provider.fileWrite( linkPath, 'link ' + linkPath2 );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
-  test.shouldThrowError( () => self.provider.isHardLink( _.mapExtend( null, o ) ) );
-  test.shouldThrowError( () => self.provider.statRead( _.mapExtend( null, o ) ) );
+  var got = self.provider.isHardLink( _.mapExtend( null, o ) );
+  test.identical( got, false );
+  var got = self.provider.statRead( _.mapExtend( null, o ) );
+  test.identical( got, null );
 
   self.provider.fieldPop( 'usingTextLink', 1 );
 }
@@ -26224,7 +26234,7 @@ function isLink( test )
 
   test.case = 'soft self cycled'
   self.provider.filesDelete( dirPath );
-  self.provider.softLink({ dstPath : linkPath, srcPath : linkPath, allowingMissing : 1, makingDirectory : 1 });
+  self.provider.softLink({ dstPath : linkPath, srcPath : '../link', allowingMissing : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = self.provider.isLink( _.mapExtend( null, o ) );
   test.identical( got, true )
@@ -26399,7 +26409,7 @@ function isLink( test )
 
   test.case = 'text self cycled'
   self.provider.filesDelete( dirPath );
-  self.provider.fileWrite( linkPath, 'link ' + linkPath );
+  self.provider.fileWrite( linkPath, 'link ../link' );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = self.provider.isLink( _.mapExtend( null, o ) );
   test.identical( got, true )
@@ -26898,7 +26908,7 @@ function isLink( test )
 
   test.case = 'soft self cycled'
   self.provider.filesDelete( dirPath );
-  self.provider.softLink({ dstPath : linkPath, srcPath : linkPath, allowingMissing : 1, makingDirectory : 1 });
+  self.provider.softLink({ dstPath : linkPath, srcPath : '../link', allowingMissing : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
   var got = self.provider.isLink( _.mapExtend( null, o ) );
   test.identical( got, true )
@@ -26911,7 +26921,7 @@ function isLink( test )
 
   test.case = 'soft self cycled'
   self.provider.filesDelete( dirPath );
-  self.provider.softLink({ dstPath : linkPath, srcPath : linkPath, allowingMissing : 1, makingDirectory : 1 });
+  self.provider.softLink({ dstPath : linkPath, srcPath : '../link', allowingMissing : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
   var got = self.provider.isLink( _.mapExtend( null, o ) );
   test.identical( got, false )
@@ -26920,7 +26930,7 @@ function isLink( test )
 
    test.case = 'soft self cycled'
   self.provider.filesDelete( dirPath );
-  self.provider.softLink({ dstPath : linkPath, srcPath : linkPath, allowingMissing : 1, makingDirectory : 1 });
+  self.provider.softLink({ dstPath : linkPath, srcPath : '../link', allowingMissing : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
   var got = self.provider.isLink( _.mapExtend( null, o ) );
   test.identical( got, false )
@@ -27426,13 +27436,47 @@ function isLink( test )
   test.identical( got.isDirectory(), true );
   test.identical( got.isLink(), false );
 
+  test.case = 'text self cycled'
+  self.provider.filesDelete( dirPath );
+  self.provider.fileWrite( linkPath, 'link ../link' );
+  var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
+  var got = self.provider.isLink( _.mapExtend( null, o ) );
+  test.identical( got, false );
+  var got = self.provider.statRead( _.mapExtend( null, o ) );
+  test.identical( got,null );
+
+  test.case = 'text self cycled'
+  self.provider.filesDelete( dirPath );
+  self.provider.fileWrite( linkPath, 'link ../link' );
+  var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
+  var got = self.provider.isLink( _.mapExtend( null, o ) );
+  test.identical( got, true );
+  var got = self.provider.statRead( _.mapExtend( null, o ) );
+  test.identical( got.isTerminal(), true );
+  test.identical( got.isHardLink(), false );
+  test.identical( got.isSoftLink(), false );
+  test.identical( got.isTextLink(), true );
+  test.identical( got.isDirectory(), false );
+  test.identical( got.isLink(), true );
+
+  test.case = 'text self cycled'
+  self.provider.filesDelete( dirPath );
+  self.provider.fileWrite( linkPath, 'link ../link' );
+  var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
+  var got = self.provider.isLink( _.mapExtend( null, o ) );
+  test.identical( got, false );
+  var got = self.provider.statRead( _.mapExtend( null, o ) );
+  test.identical( got,null );
+
   test.case = 'text cycled'
   self.provider.filesDelete( dirPath );
   self.provider.fileWrite( linkPath2, 'link ' + linkPath );
   self.provider.fileWrite( linkPath, 'link ' + linkPath2 );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  test.shouldThrowError( () => self.provider.isLink( _.mapExtend( null, o ) ) );
-  test.shouldThrowError( () => self.provider.statRead( _.mapExtend( null, o ) ) );
+  var got = self.provider.isLink( _.mapExtend( null, o ) );
+  test.identical( got, false );
+  var got = self.provider.statRead( _.mapExtend( null, o ) );
+  test.identical( got,null );
 
   test.case = 'text cycled'
   self.provider.filesDelete( dirPath );
@@ -27454,8 +27498,10 @@ function isLink( test )
   self.provider.fileWrite( linkPath2, 'link ' + linkPath );
   self.provider.fileWrite( linkPath, 'link ' + linkPath2 );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
-  test.shouldThrowError( () => self.provider.isLink( _.mapExtend( null, o ) ) );
-  test.shouldThrowError( () => self.provider.statRead( _.mapExtend( null, o ) ) );
+  var got = self.provider.isLink( _.mapExtend( null, o ) );
+  test.identical( got, false );
+  var got = self.provider.statRead( _.mapExtend( null, o ) );
+  test.identical( got,null );
 
   self.provider.fieldPop( 'usingTextLink', 1 );
 }

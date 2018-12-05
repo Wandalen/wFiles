@@ -36,7 +36,7 @@ _.assert( _.routineIs( _.uri.isNormalized ) );
 function init( o )
 {
   let self = this;
-  Parent.prototype.init.call( self,o );
+  Parent.prototype.init.call( self, o );
 
   _.assert( arguments.length === 0 || arguments.length === 1 );
 
@@ -106,7 +106,7 @@ function providersRegister( src )
   else if( _.arrayIs( src ) )
   for( let p = 0 ; p < src.length ; p++ )
   self.providerRegister( src[ p ] );
-  else _.assert( 0,'Unknown kind of argument',src );
+  else _.assert( 0, 'Unknown kind of argument', src );
 
   return self;
 }
@@ -122,7 +122,7 @@ function providerRegister( fileProvider )
   _.assert( _.arrayIs( fileProvider.protocols ) );
   _.assert( _.strDefined( fileProvider.protocol ), 'Cant register file provider without {-protocol-} defined', _.strQuote( fileProvider.nickName ) );
   _.assert( _.strDefined( fileProvider.originPath ) );
-  _.assert( fileProvider.protocols && fileProvider.protocols.length, 'Cant register file provider without protocols',_.strQuote( fileProvider.nickName ) );
+  _.assert( fileProvider.protocols && fileProvider.protocols.length, 'Cant register file provider without protocols', _.strQuote( fileProvider.nickName ) );
 
   {
     let protocolMap = self.providersWithProtocolMap;
@@ -336,7 +336,7 @@ function _localFromGlobal( filePath, provider )
     r.provider = self.providerForPath( r.parsedPath );
   }
 
-  _.assert( _.objectIs( r.provider ),'no provider for path',filePath );
+  _.assert( _.objectIs( r.provider ), 'no provider for path', filePath );
 
   r.filePath = r.provider.localFromGlobal( r.parsedPath );
 
@@ -361,7 +361,7 @@ function pathNativizeAct( filePath )
   let r = self._localFromGlobal.apply( self, arguments );
   r.filePath = r.provider.path.nativize( r.filePath );
   xxx
-  _.assert( _.objectIs( r.provider ),'no provider for path',filePath );
+  _.assert( _.objectIs( r.provider ), 'no provider for path', filePath );
   _.assert( arguments.length === 1 );
   return r;
 }
@@ -381,7 +381,7 @@ function _pathResolveLink_body( o )
   let r = self._localFromGlobal( o.filePath );
   o.filePath = r.filePath;
 
-  let result = r.provider.pathResolveLink.body.call( r.provider,o );
+  let result = r.provider.pathResolveLink.body.call( r.provider, o );
 
   _.assert( !!result );
 
@@ -413,7 +413,7 @@ function _pathResolveSoftLink_body( o )
 
   o.filePath = r.filePath;
 
-  let result = r.provider.pathResolveSoftLink.body.call( r.provider,o );
+  let result = r.provider.pathResolveSoftLink.body.call( r.provider, o );
 
   _.assert( !!result );
 
@@ -439,7 +439,7 @@ let pathResolveSoftLink = _.routineFromPreAndBody( Parent.prototype.pathResolveS
 //
 //   o.filePath = r.filePath;
 //
-//   let result = r.provider.pathResolveHardLink.body.call( r.provider,o );
+//   let result = r.provider.pathResolveHardLink.body.call( r.provider, o );
 //
 //   _.assert( !!result );
 //
@@ -469,34 +469,34 @@ function pathCurrentAct()
 //
 // --
 
-function statResolvedRead_body( o )
-{
-  let self = this;
-
-  // debugger;
-
-  _.assert( arguments.length === 1 );
-
-  o.filePath = self.pathResolveLink
-  ({
-    filePath : o.filePath,
-    resolvingSoftLink : o.resolvingSoftLink,
-    resolvingTextLink : o.resolvingTextLink,
-  });
-
-  let r = self._localFromGlobal( o.filePath );
-  let o2 = _.mapOnly( o, self.statReadAct.defaults );
-
-  o2.resolvingSoftLink = 0;
-  o2.filePath = r.filePath;
-  let result = r.provider.statReadAct.call( r.provider, o2 );
-
-  return result;
-}
-
-_.routineExtend( statResolvedRead_body, Parent.prototype.statResolvedRead );
-
-let statResolvedRead = _.routineFromPreAndBody( Parent.prototype.statResolvedRead.pre, statResolvedRead_body );
+// function statResolvedRead_body( o )
+// {
+//   let self = this;
+//
+//   // debugger;
+//
+//   _.assert( arguments.length === 1 );
+//
+//   o.filePath = self.pathResolveLink
+//   ({
+//     filePath : o.filePath,
+//     resolvingSoftLink : o.resolvingSoftLink,
+//     resolvingTextLink : o.resolvingTextLink,
+//   });
+//
+//   let r = self._localFromGlobal( o.filePath );
+//   let o2 = _.mapOnly( o, self.statReadAct.defaults );
+//
+//   o2.resolvingSoftLink = 0;
+//   o2.filePath = r.filePath;
+//   let result = r.provider.statReadAct.call( r.provider, o2 );
+//
+//   return result;
+// }
+//
+// _.routineExtend( statResolvedRead_body, Parent.prototype.statResolvedRead );
+//
+// let statResolvedRead = _.routineFromPreAndBody( Parent.prototype.statResolvedRead.pre, statResolvedRead_body );
 
 //
 
@@ -561,8 +561,8 @@ function filesAreHardLinkedAct( dstPath, srcPath )
   let dst = self._localFromGlobal( dstPath );
   let src = self._localFromGlobal( srcPath );
 
-  _.assert( !!dst.provider,'no provider for path',dstPath );
-  _.assert( !!src.provider,'no provider for path',srcPath );
+  _.assert( !!dst.provider, 'no provider for path', dstPath );
+  _.assert( !!src.provider, 'no provider for path', srcPath );
 
   if( dst.provider !== src.provider )
   return false;
@@ -577,7 +577,7 @@ function filesAreHardLinkedAct( dstPath, srcPath )
 
 function _link_functor( fop )
 {
-  fop = _.routineOptions( _link_functor,arguments );
+  fop = _.routineOptions( _link_functor, arguments );
   let routine = fop.routine;
   let name = routine.name;
   let onDifferentProviders = fop.onDifferentProviders;
@@ -588,9 +588,13 @@ function _link_functor( fop )
   _.assert( routine.paths === undefined );
   _.assert( _.objectIs( routine.having ) );
 
-  let defaults = hubLink.defaults = Object.create( routine.defaults );
-  // let paths = hubLink.paths = Object.create( routine.paths );
-  let having = hubLink.having = Object.create( routine.having );
+  // let defaults = hubLink.defaults = Object.create( routine.defaults );
+  // // let paths = hubLink.paths = Object.create( routine.paths );
+  // let having = hubLink.having = Object.create( routine.having );
+
+  _.routineExtend( hubLink, routine );
+
+  let defaults = hubLink.defaults;
 
   _.assert( defaults.srcPath !== undefined );
   _.assert( defaults.dstPath !== undefined );
@@ -608,12 +612,12 @@ function _link_functor( fop )
     let dst = self._localFromGlobal( o.dstPath );
     let src = self._localFromGlobal( o.srcPath );
 
-    _.assert( !!dst.provider, 'no provider for path',o.dstPath );
-    _.assert( !!src.provider, 'no provider for path',o.srcPath );
+    _.assert( !!dst.provider, 'no provider for path', o.dstPath );
+    _.assert( !!src.provider, 'no provider for path', o.srcPath );
 
     if( dst.provider !== src.provider )
     if( onDifferentProviders )
-    return onDifferentProviders.call( self,o,dst,src,routine );
+    return onDifferentProviders.call( self, o, dst, src, routine );
     else
     throw _.err( 'Cant ' + name + ' files of different file providers :\n' + o.dstPath + '\n' + o.srcPath );
 
@@ -638,7 +642,7 @@ let fileRenameAct = _link_functor({ routine : Parent.prototype.fileRenameAct });
 
 //
 
-function _fileCopyActDifferent( o,dst,src,routine )
+function _fileCopyActDifferent( o, dst, src, routine )
 {
   let self = this;
   let path = self.path;
@@ -652,7 +656,7 @@ function _fileCopyActDifferent( o,dst,src,routine )
     return dst.provider.softLink
     ({
       dstPath : dst.filePath,
-      srcPath : path.join( src.parsedPath.origin,resolvedPath ),
+      srcPath : path.join( src.parsedPath.origin, resolvedPath ),
       allowingMissing : 1,
     });
   }
@@ -763,7 +767,7 @@ function _defaultOriginSet( src )
   {
     _.assert( _.strIs( src ) );
     _.assert( path.isGlobal( src ) );
-    let protocol = _.strRemoveEnd( src,'://' );
+    let protocol = _.strRemoveEnd( src, '://' );
     _.assert( !path.isGlobal( protocol ) );
     self[ defaultProtocolSymbol ] = protocol;
     self[ defaultOriginSymbol ] = src;
@@ -869,7 +873,7 @@ function routinesGenerate()
       let self = this;
       let provider = self;
 
-      for( let p in paths )
+      for( let p in operates )
       if( o[ p ] )
       {
         if( operatesLength === 1 )
@@ -920,23 +924,23 @@ function routinesGenerate()
       }
 
       if( pre )
-      o = pre.call( this,wrap,arguments );
+      o = pre.call( this, wrap, arguments );
       else if( wrap.defaults )
-      _.routineOptions( wrap,o );
+      _.routineOptions( wrap, o );
 
       let provider = self;
 
-      provider = resolve.call( self,o );
+      provider = resolve.call( self, o );
 
       if( provider === self )
       {
-        _.assert( _.routineIs( original ),'no original method for',name );
-        return original.call( provider,o );
+        _.assert( _.routineIs( original ), 'No original method for', name );
+        return original.call( provider, o );
       }
       else
       {
         _.assert( _.routineIs( provider[ name ] ) );
-        return provider[ name ].call( provider,o );
+        return provider[ name ].call( provider, o );
       }
     }
 
@@ -998,6 +1002,7 @@ let FilteredRoutines =
   dirMakeAct : Routines.dirMakeAct,
 
   softLinkAct : Routines.softLinkAct,
+  textLinkAct : Routines.textLinkAct,
 
   hardLinkBreakAct : Routines.hardLinkBreakAct,
   softLinkBreakAct : Routines.softLinkBreakAct,
@@ -1075,67 +1080,66 @@ let Forbids =
 let Proto =
 {
 
-  init : init,
+  init,
 
   // provider
 
-  providerDefaultSet : providerDefaultSet,
-  providerRegister : providerRegister,
-  providerUnregister : providerUnregister,
-  providersRegister : providersRegister,
-  providerForPath : providerForPath,
+  providerDefaultSet,
+  providerRegister,
+  providerUnregister,
+  providersRegister,
+  providerForPath,
 
   // adapter
 
-  _recordFactoryFormEnd : _recordFactoryFormEnd,
-  _recordFormBegin : _recordFormBegin,
-  _recordPathForm : _recordPathForm,
-  _recordFormEnd : _recordFormEnd,
+  _recordFactoryFormEnd,
+  _recordFormBegin,
+  _recordPathForm,
+  _recordFormEnd,
 
-  fieldSet : fieldSet,
-  fieldReset : fieldReset,
+  fieldSet,
+  fieldReset,
 
   // path
 
-  localFromGlobal : localFromGlobal,
-  _localFromGlobal : _localFromGlobal,
-  localsFromGlobals : localsFromGlobals,
+  localFromGlobal,
+  _localFromGlobal,
+  localsFromGlobals,
 
-  pathResolveLink : pathResolveLink,
-  pathResolveSoftLink : pathResolveSoftLink,
-  // pathResolveHardLink : pathResolveHardLink,
+  pathResolveLink,
+  pathResolveSoftLink,
 
-  pathCurrentAct : pathCurrentAct,
-
-  //
-
-  statResolvedRead : statResolvedRead,
-  fileRead : fileRead,
+  pathCurrentAct,
 
   //
 
-  filesAreHardLinkedAct : filesAreHardLinkedAct,
-  hardLinkAct : hardLinkAct,
-  fileRenameAct : fileRenameAct,
-  fileCopyAct : fileCopyAct,
+  // statResolvedRead,
+  fileRead,
+
+  //
+
+  filesAreHardLinkedAct,
+
+  hardLinkAct,
+  fileRenameAct,
+  fileCopyAct,
 
   // accessor
 
-  _defaultProviderSet : _defaultProviderSet,
-  _defaultProtocolSet : _defaultProtocolSet,
-  _defaultOriginSet : _defaultOriginSet,
-  // _verbosityChange : _verbosityChange,
+  _defaultProviderSet,
+  _defaultProtocolSet,
+  _defaultOriginSet,
 
   //
 
-  Composes : Composes,
-  Aggregates : Aggregates,
-  Associates : Associates,
-  Restricts : Restricts,
-  Medials : Medials,
-  Accessors : Accessors,
-  Statics : Statics,
-  Forbids : Forbids,
+  Composes,
+  Aggregates,
+  Associates,
+  Restricts,
+  Medials,
+  Accessors,
+  Statics,
+  Forbids,
 
 }
 
@@ -1159,11 +1163,11 @@ let missingMap = Object.create( null );
 for( let r in Routines )
 {
   _.assert( !!Self.prototype[ r ], 'routine', r, 'does not exist in prototype' );
-  if( !_.mapOwnKey( Self.prototype,r ) && Routines[ r ] !== Self.prototype[ r ] )
+  if( !_.mapOwnKey( Self.prototype, r ) && Routines[ r ] !== Self.prototype[ r ] )
   missingMap[ r ] = 'Routines.' + r;
 }
 
-_.assert( !_.mapKeys( missingMap ).length, 'routine(s) were not written into Proto explicitly','\n',_.toStr( missingMap,{ stringWrapper : '' } ) );
+_.assert( !_.mapKeys( missingMap ).length, 'routine(s) were not written into Proto explicitly', '\n', _.toStr( missingMap, { stringWrapper : '' } ) );
 _.assert( !FilteredRoutines.pathResolveLink );
 _.assert( !( 'pathResolveLink' in FilteredRoutines ) );
 _.assertMapHasNoUndefine( FilteredRoutines );

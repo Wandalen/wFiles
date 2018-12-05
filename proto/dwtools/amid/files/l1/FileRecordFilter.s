@@ -598,7 +598,7 @@ function _formMasks()
       for( let b in filter.basePath )
       {
         let glob = path.join( filter.basePath[ b ], g );
-        debugger;
+        // debugger;
         if( glob !== g )
         {
           delete filter.stemPath/*globMap*/[ g ];

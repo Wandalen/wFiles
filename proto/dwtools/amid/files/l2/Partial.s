@@ -5829,11 +5829,11 @@ function _link_functor( gen )
       _.assert( _.routineIs( c.linkAct ), 'method', actMethodName, 'is not implemented' );
       _.assert( _.objectIs( c.linkAct.defaults ), 'method', actMethodName, 'does not have defaults, but should' );
       _.assertRoutineOptions( _link_body, args );
-      debugger;
+      // debugger;
       // _.assert( _.boolLike( o.breakingSrcHardLink ) );
       _.assert( _.boolLike( o.resolvingSrcSoftLink ) );
       _.assert( _.boolLike( o.resolvingSrcTextLink ) );
-      _.assert( _.boolLike( o.breakingDstHardLink ) );
+      // _.assert( _.boolLike( o.breakingDstHardLink ) );
       _.assert( _.boolLike( o.resolvingDstSoftLink ) );
       _.assert( _.boolLike( o.resolvingDstTextLink ) );
       if( onVerify )
@@ -6535,7 +6535,7 @@ operates.dstPath = { pathToWrite : 1 }
  * @memberof wFileProviderPartial
  */
 
-function _softLinkSkip( с )
+function _softLinkSkip( c )
 {
   let self = this;
   let o = c.options;
@@ -6564,6 +6564,7 @@ defaults.makingDirectory = 0;
 defaults.throwing = null;
 defaults.verbosity = null;
 defaults.allowingMissing = 0;
+
 defaults.resolvingSrcSoftLink = 0;
 defaults.resolvingSrcTextLink = 0;
 defaults.resolvingDstSoftLink = 0;
@@ -6718,33 +6719,111 @@ defaults.resolvingDstTextLink = 0;
 
 //
 
-function textLink_body( o )
+function textLinkAct( o )
 {
   let self = this;
   let path = self.path;
 
-  _.assertRoutineOptions( textLink_body, arguments );
+  _.assertRoutineOptions( textLinkAct, arguments );
   _.assert( path.is( o.srcPath ) );
   _.assert( path.isAbsolute( o.dstPath ) );
 
   return self.fileWrite( o.dstPath, 'link ' + o.srcPath );
 }
 
-var defaults = textLink_body.defaults = Object.create( null );
+var defaults = textLinkAct.defaults = Object.create( null );
 
-defaults.srcPath = null;
 defaults.dstPath = null;
+defaults.srcPath = null;
 
-var having = textLink_body.having = Object.create( null );
+var having = textLinkAct.having = Object.create( null );
 
 having.writing = 1;
-having.reading = 1;
-having.driving = 0;
-having.aspect = 'body';
+having.reading = 0;
+having.driving = 1;
 
-let textLink = _.routineFromPreAndBody( _preSrcDstPathWithProviderDefaults, textLink_body );
+var operates = textLinkAct.operates = Object.create( null );
 
-textLink.having.aspect = 'entry';
+operates.srcPath = { pathToRead : 1 }
+operates.dstPath = { pathToWrite : 1 }
+
+//
+
+/**
+ * Creates text link to existing source( o.srcPath ) named as ( o.dstPath ).
+ * Rewrites target( o.dstPath ) by default if it exist. Logging of working process is controled by option( o.verbosity ).
+ * Returns true if link is successfully created. If some error occurs during execution method uses option( o.throwing ) to
+ * determine what to do - throw error or return false.
+ *
+ * @param { wTools~linkOptions } o - options { @link wTools~linkOptions  }
+ *
+ * @method textLink
+ * @throws { exception } If( o.srcPath ) doesn`t exist.
+ * @throws { exception } If cant link ( o.srcPath ) with ( o.dstPath ).
+ * @memberof wFileProviderPartial
+ */
+
+function _textLinkSkip( с )
+{
+  let self = this;
+  let o = c.options;
+  debugger; xxx // qqq : implement filesAreTextLinked
+  if( o.dstPath !== o.srcPath && self.filesAreTextLinked([ o.dstPath, o.srcPath ]) )
+  return true;
+}
+
+let textLink = _link_functor
+({
+  actMethod : textLinkAct,
+  actMethodName : 'textLinkAct',
+  skippingSamePath : false,
+  skippingMissing : false,
+  onSkip : _textLinkSkip,
+});
+
+var defaults = textLink.body.defaults;
+
+defaults.rewriting = 1;
+defaults.rewritingDirs = 0;
+defaults.makingDirectory = 0;
+defaults.throwing = null;
+defaults.verbosity = null;
+defaults.allowingMissing = 0;
+
+defaults.resolvingSrcSoftLink = 0;
+defaults.resolvingSrcTextLink = 0;
+defaults.resolvingDstSoftLink = 0;
+defaults.resolvingDstTextLink = 0;
+
+//
+
+// function textLink_body( o )
+// {
+//   let self = this;
+//   let path = self.path;
+//
+//   _.assertRoutineOptions( textLink_body, arguments );
+//   _.assert( path.is( o.srcPath ) );
+//   _.assert( path.isAbsolute( o.dstPath ) );
+//
+//   return self.fileWrite( o.dstPath, 'link ' + o.srcPath );
+// }
+//
+// var defaults = textLink_body.defaults = Object.create( null );
+//
+// defaults.srcPath = null;
+// defaults.dstPath = null;
+//
+// var having = textLink_body.having = Object.create( null );
+//
+// having.writing = 1;
+// having.reading = 1;
+// having.driving = 0;
+// having.aspect = 'body';
+//
+// let textLink = _.routineFromPreAndBody( _preSrcDstPathWithProviderDefaults, textLink_body );
+//
+// textLink.having.aspect = 'entry';
 
 //
 
@@ -7717,8 +7796,10 @@ let Proto =
   hardLinkAct,
   hardLink,
 
+  textLinkAct,
   textLink,
-  /* qqq : implement routine textLink */
+
+  /* qqq : cover routine textLink */
 
   fileExchange,
 

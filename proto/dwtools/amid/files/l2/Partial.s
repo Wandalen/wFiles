@@ -6424,7 +6424,7 @@ function _fileCopyRenameBegin( c )
   let self = this;
   let o = c.options;
 
-  _.assert( _.statIs( o.srcPath ) );
+  _.assert( _.strIs( o.srcPath ) );
   _.assert( _.fileStatIs( c.srcStat ) );
 
   let isDir = c.srcStat.isDir();

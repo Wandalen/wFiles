@@ -29513,6 +29513,8 @@ function pathResolveLinkChain( test )
   self.provider.fieldPop( 'usingTextLink', true );
 }
 
+pathResolveLinkChain.timeOut = 30000;
+
 //
 
 function pathResolveSoftLink( test )

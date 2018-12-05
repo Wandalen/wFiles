@@ -5938,6 +5938,9 @@ function _link_functor( gen )
     function pathResolve()
     {
 
+      _.assert( o.originalSrcPath === null, 'not tested' );
+      _.assert( o.originalDstPath === null, 'not tested' );
+
       if( !o.originalSrcPath )
       o.originalSrcPath = o.srcPath;
       if( !o.originalDstPath )
@@ -5955,8 +5958,8 @@ function _link_functor( gen )
         o.srcPath = path.resolve( o.dstPath, o.srcPath );
       }
 
-      _.assert( path.isAbsolute( o.originalSrcPath ) );
-      _.assert( path.isAbsolute( o.originalDstPath ) );
+      _.assert( path.isAbsolute( o.srcPath ) );
+      _.assert( path.isAbsolute( o.dstPath ) );
 
     }
 

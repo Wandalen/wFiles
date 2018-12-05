@@ -341,8 +341,17 @@ function _preSrcDstPathWithoutProviderDefaults( routine, args )
 
   _.routineOptions( routine, o );
 
-  o.dstPath = path.s.normalize( o.dstPath );
-  o.srcPath = path.s.normalize( o.srcPath );
+  if( o.dstPath !== null )
+  {
+    o.dstPath = path.s.from( o.dstPath );
+    o.dstPath = path.s.normalize( o.dstPath );
+  }
+
+  if( o.srcPath !== null )
+  {
+    o.srcPath = path.s.from( o.srcPath );
+    o.srcPath = path.s.normalize( o.srcPath );
+  }
 
   return o;
 }
@@ -5644,54 +5653,59 @@ operates.dstPath = { pathToWrite : 1 }
 function _link_pre( routine, args )
 {
   let self = this;
-  let o;
-
-  if( args.length === 2 )
-  {
-    o =
-    {
-      dstPath : args[ 0 ],
-      srcPath : args[ 1 ],
-    }
-    _.assert( args.length === 2 );
-  }
-  else
-  {
-    o = args[ 0 ];
-    _.assert( args.length === 1 );
-  }
-
-  _.routineOptions( routine, o );
-
-  if( o.verbosity === null )
-  o.verbosity = _.numberClamp( self.verbosity - 3, 0, 9 );
-
-  self._providerDefaults( o );
+  let o = self._preSrcDstPathWithProviderDefaults.apply( self, arguments );
   _.mapSupplementNulls( o, routine.defaults );
-
-  _.assert( o.filePaths === undefined );
-
-  if( _.longIs( o.dstPath ) )
-  {
-    o.dstPath = o.dstPath.map( ( dstPath ) => self.path.from( dstPath ) );
-    o.dstPath = self.path.s.normalize( o.dstPath );
-  }
-  else
-  {
-    o.dstPath = self.path.from( o.dstPath );
-    o.dstPath = self.path.normalize( o.dstPath );
-  }
-
-  if( o.srcPath )
-  {
-    o.srcPath = self.path.from( o.srcPath );
-    o.srcPath = self.path.normalize( o.srcPath );
-  }
-
-  // if( o.verbosity )
-  // self.logger.log( routine.name, ':', o.dstPath + ' <- ' + o.srcPath );
-
   return o;
+
+  // let self = this;
+  // let o;
+  //
+  // if( args.length === 2 )
+  // {
+  //   o =
+  //   {
+  //     dstPath : args[ 0 ],
+  //     srcPath : args[ 1 ],
+  //   }
+  //   _.assert( args.length === 2 );
+  // }
+  // else
+  // {
+  //   o = args[ 0 ];
+  //   _.assert( args.length === 1 );
+  // }
+  //
+  // _.routineOptions( routine, o );
+  //
+  // if( o.verbosity === null )
+  // o.verbosity = _.numberClamp( self.verbosity - 3, 0, 9 );
+  //
+  // self._providerDefaults( o );
+  // _.mapSupplementNulls( o, routine.defaults );
+  //
+  // _.assert( o.filePaths === undefined );
+  //
+  // if( _.longIs( o.dstPath ) )
+  // {
+  //   o.dstPath = o.dstPath.map( ( dstPath ) => self.path.from( dstPath ) );
+  //   o.dstPath = self.path.s.normalize( o.dstPath );
+  // }
+  // else
+  // {
+  //   o.dstPath = self.path.from( o.dstPath );
+  //   o.dstPath = self.path.normalize( o.dstPath );
+  // }
+  //
+  // if( o.srcPath )
+  // {
+  //   o.srcPath = self.path.from( o.srcPath );
+  //   o.srcPath = self.path.normalize( o.srcPath );
+  // }
+  //
+  // // if( o.verbosity )
+  // // self.logger.log( routine.name, ':', o.dstPath + ' <- ' + o.srcPath );
+  //
+  // return o;
 }
 
 //
@@ -5750,7 +5764,10 @@ function _linkMultiple( o, link )
   {
     let read = self.fileRead({ filePath : newestRecord.absolute, encoding : 'original.type' });
     self.fileWrite( mostLinkedRecord.absolute, read );
-    /* qqq : should be fileCopyAct here */
+    /*
+      fileCopy cant be used here
+      because hardlinks of most linked file with other files should be preserved
+    */
   }
 
   /* */
@@ -5880,15 +5897,16 @@ function _link_functor( gen )
     let result;
     let tempPath;
 
-    // if( entryMethodName === 'fileCopy' )
-    // debugger;
-    // logger.log( entryMethodName, o.dstPath, '<-', o.srcPath );
-
     verify( arguments );
 
     if( _.longIs( o.dstPath ) && linkAct.having.hardLinking ) /* qqq : should work not only for hardlinks */
     return _linkMultiple.call( self, o, _link_body );
     _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
+
+    // if( entryMethodName === 'fileCopy' )
+    // debugger;
+    // self.logger.log( ' +', entryMethodName, ':', path.moveReport( o.dstPath, o.srcPath ) );
+    // debugger;
 
     pathResolve();
     pathResolveLinks();
@@ -5965,12 +5983,12 @@ function _link_functor( gen )
       _.assert( _.routineIs( linkAct ), 'method', actMethodName, 'is not implemented' );
       _.assert( _.objectIs( linkAct.defaults ), 'method', actMethodName, 'does not have defaults, but should' );
       _.assertRoutineOptions( _link_body, args );
-      _.assert( o.breakingSrcHardLink !== null );
-      _.assert( o.resolvingSrcSoftLink !== null );
-      _.assert( o.resolvingSrcTextLink !== null );
-      _.assert( o.breakingDstHardLink !== null );
-      _.assert( o.resolvingDstSoftLink !== null );
-      _.assert( o.resolvingDstTextLink !== null );
+      _.assert( _.boolLike( o.breakingSrcHardLink ) );
+      _.assert( _.boolLike( o.resolvingSrcSoftLink ) );
+      _.assert( _.boolLike( o.resolvingSrcTextLink ) );
+      _.assert( _.boolLike( o.breakingDstHardLink ) );
+      _.assert( _.boolLike( o.resolvingDstSoftLink ) );
+      _.assert( _.boolLike( o.resolvingDstTextLink ) );
     }
 
     /* - */
@@ -6139,7 +6157,7 @@ function _link_functor( gen )
       if( !renamingAllowed )
       return false;
 
-      if( !renamingHardLinks && self.isHardLink( o.dstPath ) )
+      if( !renamingHardLinks && dstStat.isHardLink() )
       return false;
 
       return true;
@@ -6295,7 +6313,7 @@ _link_functor.defaults =
   // expectingAbsolutePaths : true,
 
   renamingAllowed : true,
-  renamingHardLinks : false,
+  renamingHardLinks : true,
 
   skippingSamePath : true,
   skippingHardLinked : false,
@@ -6540,7 +6558,7 @@ function fileCopy_functor()
     actMethodName : 'fileCopyAct',
     onBeforeRaname : _onBeforeRaname,
     renamingAllowed : true,
-    renamingHardLinks : true,
+    renamingHardLinks : false,
     skippingSamePath : true,
     skippingMissing : true,
   });
@@ -7501,12 +7519,12 @@ let Proto =
 
   _fileOptionsGet,
   _providerDefaults,
-  _preFilePathScalarWithProviderDefaults,
   _preFilePathScalarWithoutProviderDefaults,
-  _preFilePathVectorWithProviderDefaults,
+  _preFilePathScalarWithProviderDefaults,
   _preFilePathVectorWithoutProviderDefaults,
-  _preSrcDstPathWithProviderDefaults,
+  _preFilePathVectorWithProviderDefaults,
   _preSrcDstPathWithoutProviderDefaults,
+  _preSrcDstPathWithProviderDefaults,
 
   protocolsForOrigins,
   originsForProtocols,

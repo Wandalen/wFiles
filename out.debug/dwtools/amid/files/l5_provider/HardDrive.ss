@@ -805,7 +805,6 @@ function statReadAct( o )
 
   function isHardLink()
   {
-    debugger;
     return this.nlink >= 2;
   }
 

@@ -341,6 +341,9 @@ function _preSrcDstPathWithoutProviderDefaults( routine, args )
 
   _.routineOptions( routine, o );
 
+  o.dstPath = path.s.from( o.dstPath );
+  o.srcPath = path.s.from( o.srcPath );
+
   o.dstPath = path.s.normalize( o.dstPath );
   o.srcPath = path.s.normalize( o.srcPath );
 
@@ -5522,54 +5525,59 @@ operates.dstPath = { pathToWrite : 1 }
 function _link_pre( routine, args )
 {
   let self = this;
-  let o;
-
-  if( args.length === 2 )
-  {
-    o =
-    {
-      dstPath : args[ 0 ],
-      srcPath : args[ 1 ],
-    }
-    _.assert( args.length === 2 );
-  }
-  else
-  {
-    o = args[ 0 ];
-    _.assert( args.length === 1 );
-  }
-
-  _.routineOptions( routine, o );
-
-  if( o.verbosity === null )
-  o.verbosity = _.numberClamp( self.verbosity - 3, 0, 9 );
-
-  self._providerDefaults( o );
-  _.mapSupplementNulls( o, routine.defaults );
-
-  _.assert( o.filePaths === undefined );
-
-  if( _.longIs( o.dstPath ) )
-  {
-    o.dstPath = o.dstPath.map( ( dstPath ) => self.path.from( dstPath ) );
-    o.dstPath = self.path.s.normalize( o.dstPath );
-  }
-  else
-  {
-    o.dstPath = self.path.from( o.dstPath );
-    o.dstPath = self.path.normalize( o.dstPath );
-  }
-
-  if( o.srcPath )
-  {
-    o.srcPath = self.path.from( o.srcPath );
-    o.srcPath = self.path.normalize( o.srcPath );
-  }
-
-  // if( o.verbosity )
-  // self.logger.log( routine.name, ':', o.dstPath + ' <- ' + o.srcPath );
+  let o = self._preSrcDstPathWithProviderDefaults.apply( self, arguments );
 
   return o;
+
+  // let self = this;
+  // let o;
+  //
+  // if( args.length === 2 )
+  // {
+  //   o =
+  //   {
+  //     dstPath : args[ 0 ],
+  //     srcPath : args[ 1 ],
+  //   }
+  //   _.assert( args.length === 2 );
+  // }
+  // else
+  // {
+  //   o = args[ 0 ];
+  //   _.assert( args.length === 1 );
+  // }
+  //
+  // _.routineOptions( routine, o );
+  //
+  // if( o.verbosity === null )
+  // o.verbosity = _.numberClamp( self.verbosity - 3, 0, 9 );
+  //
+  // self._providerDefaults( o );
+  // _.mapSupplementNulls( o, routine.defaults );
+  //
+  // _.assert( o.filePaths === undefined );
+  //
+  // if( _.longIs( o.dstPath ) )
+  // {
+  //   o.dstPath = o.dstPath.map( ( dstPath ) => self.path.from( dstPath ) );
+  //   o.dstPath = self.path.s.normalize( o.dstPath );
+  // }
+  // else
+  // {
+  //   o.dstPath = self.path.from( o.dstPath );
+  //   o.dstPath = self.path.normalize( o.dstPath );
+  // }
+  //
+  // if( o.srcPath )
+  // {
+  //   o.srcPath = self.path.from( o.srcPath );
+  //   o.srcPath = self.path.normalize( o.srcPath );
+  // }
+  //
+  // // if( o.verbosity )
+  // // self.logger.log( routine.name, ':', o.dstPath + ' <- ' + o.srcPath );
+  //
+  // return o;
 }
 
 //
@@ -7379,12 +7387,12 @@ let Proto =
 
   _fileOptionsGet,
   _providerDefaults,
-  _preFilePathScalarWithProviderDefaults,
   _preFilePathScalarWithoutProviderDefaults,
-  _preFilePathVectorWithProviderDefaults,
+  _preFilePathScalarWithProviderDefaults,
   _preFilePathVectorWithoutProviderDefaults,
-  _preSrcDstPathWithProviderDefaults,
+  _preFilePathVectorWithProviderDefaults,
   _preSrcDstPathWithoutProviderDefaults,
+  _preSrcDstPathWithProviderDefaults,
 
   protocolsForOrigins,
   originsForProtocols,

@@ -29702,7 +29702,7 @@ function pathResolveTextLink( test )
   test.identical( got, filePath );
 
   /*
-  
+
     Add test cases :
 
     absolute textlink to file that does not exist
@@ -29726,15 +29726,14 @@ function pathResolveTextLink( test )
   var got = self.provider.pathResolveTextLink( o );
   test.identical( got, linkPath );
 
-  /* Throws an error
   test.case = 'relative textlink to regular file';
   self.provider.filesDelete( workDir );
   self.provider.fileWrite( filePath, testData );
   self.provider.textLink({ dstPath : linkPath, srcPath : filePath });
   var o = { filePath : linkPath };
   var got = self.provider.pathResolveTextLink( o );
-  test.identical( got, linkPath );
-  */
+  test.identical( got, linkPath );  // Throws an error
+
 
   test.case = 'absolute softlink to file that does not exist';
   self.provider.filesDelete( workDir );  // remove temp files created by previous test case

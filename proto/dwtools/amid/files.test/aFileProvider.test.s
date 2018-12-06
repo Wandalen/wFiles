@@ -29734,7 +29734,7 @@ function pathResolveTextLink( test )
   self.provider.textLink({ dstPath : linkPath, srcPath : '../file' });
   var o = { filePath : linkPath };
   var got = self.provider.pathResolveTextLink( o );
-  test.identical( got, '../file' );  // Throws an error
+  test.identical( got, '../file' );
 
   test.case = 'absolute softlink to file that does not exist';
   self.provider.filesDelete( workDir );  // remove temp files created by previous test case
@@ -29773,7 +29773,84 @@ function pathResolveTextLink( test )
     Please duplicate here tests above and adjust expected results.
   */
 
+  test.case = 'regular file';
+  self.provider.filesDelete( workDir );
+  self.provider.fileWrite( filePath, testData );
+  var o = { filePath : filePath };
+  var got = self.provider.pathResolveTextLink( o );
+  test.identical( got, filePath )
+
+  test.case = 'hardlink to regular file';
+  self.provider.filesDelete( workDir );
+  self.provider.fileWrite( filePath, testData );
+  self.provider.hardLink({ dstPath : linkPath, srcPath : filePath });
+  var o = { filePath : linkPath };
+  var got = self.provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
+
+  test.case = 'absolute softlink to regular file';
+  self.provider.filesDelete( workDir );
+  self.provider.fileWrite( filePath, testData );
+  self.provider.softLink({ dstPath : linkPath, srcPath : filePath });
+  var o = { filePath : linkPath };
+  var got = self.provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
+
+  test.case = 'absolute textlink to regular file';
+  self.provider.filesDelete( workDir );
+  self.provider.fileWrite( filePath, testData );
+  self.provider.textLink({ dstPath : linkPath, srcPath : filePath });
+  var o = { filePath : linkPath };
+  var got = self.provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
+
+  test.case = 'absolute textlink to file that does not exist';
+  self.provider.filesDelete( workDir );
+  self.provider.textLink({ dstPath : linkPath, srcPath : filePath, allowingMissing : 1, makingDirectory : 1  });
+  var o = { filePath : linkPath };
+  var got = self.provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
+
+  test.case = 'relative textlink to file that does not exist';
+  self.provider.filesDelete( workDir );
+  self.provider.textLink({ dstPath : linkPath, srcPath : '../file', allowingMissing : 1, makingDirectory : 1 });
+  var o = { filePath : linkPath };
+  var got = self.provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
+
+  test.case = 'relative textlink to regular file';
+  self.provider.filesDelete( workDir );
+  self.provider.fileWrite( filePath, testData );
+  self.provider.textLink({ dstPath : linkPath, srcPath : '../file' });
+  var o = { filePath : linkPath };
+  var got = self.provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
+
+  test.case = 'absolute softlink to file that does not exist';
+  self.provider.filesDelete( workDir );
+  self.provider.softLink({ dstPath : linkPath, srcPath : filePath, allowingMissing : 1, makingDirectory : 1 }); // prepare link for test case
+  var o = { filePath : linkPath };
+  var got = self.provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
+
+  test.case = 'relative softlink to file that does not exist';
+  self.provider.filesDelete( workDir );
+  self.provider.softLink({ dstPath : linkPath, srcPath : '../file', allowingMissing : 1, makingDirectory : 1 });
+  var o = { filePath : linkPath };
+  var got = self.provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
+
+  test.case = 'relative softlink to regular file';
+  self.provider.filesDelete( workDir );
+  self.provider.fileWrite( filePath, testData );
+  self.provider.softLink({ dstPath : linkPath, srcPath : '../file' });
+  var o = { filePath : linkPath };
+  var got = self.provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
+
   self.provider.fieldPop( 'usingTextLink', 0 );
+
+
 }
 
 // --
@@ -29785,7 +29862,7 @@ var Self =
 
   name : 'Tools/mid/files/fileProvider/Abstract',
   abstract : 1,
-  silencing : 1,
+  silencing : 0,
   // verbosity : 7,
 
   onSuiteBegin : onSuiteBegin,

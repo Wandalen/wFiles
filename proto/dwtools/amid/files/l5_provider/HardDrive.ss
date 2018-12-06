@@ -1289,11 +1289,13 @@ function fileCopyAct( o )
   {
     if( self.fileExistsAct({ filePath : o.dstPath }) )
     self.fileDeleteAct({ filePath : o.dstPath, sync : 1 })
+    let srcPathResolved = self.pathResolveSoftLink( o.srcPath );
+    let srcPath = self.path.join( o.srcPath, srcPathResolved );
     return self.softLinkAct
     ({
       originalDstPath : o.originalDstPath,
-      originalSrcPath : o.originalSrcPath,
-      srcPath : self.pathResolveSoftLink( o.srcPath ),
+      originalSrcPath : srcPathResolved,
+      srcPath : srcPath,
       dstPath : o.dstPath,
       sync : o.sync,
       type : null

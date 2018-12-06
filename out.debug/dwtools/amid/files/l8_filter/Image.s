@@ -166,14 +166,11 @@ function _routineFunctor( routine, routineName )
       op2.originalBody = body;
       op2.args = _.unrollFrom( arguments );
       op2.result = undefined;
-      // op2.methodDescriptor = op;
-
-      // if( op.routineName === 'statReadAct' )
-      // debugger;
 
       if( pre )
       {
-        debugger; xxx
+        debugger;
+        _.assert( 0, 'not tested' );
         op2.args = pre.call( this.original, resultRoutine, op2.args );
         if( !_.unrollIs( op2.args ) )
         op2.args = _.unrollFrom([ op2.args ]);
@@ -189,13 +186,12 @@ function _routineFunctor( routine, routineName )
       op2.args = _.unrollFrom([ op2.args ]);
 
       _.assert( !_.argumentsArrayIs( op2.args ), 'Does not expect arguments array' );
-
       let r = this.onCall( op2 );
       _.assert( r === undefined );
 
       if( this.onCallEnd )
       {
-        let r = this.onCallEnd( op2.result, op );
+        let r = this.onCallEnd( op2 );
         _.assert( r === undefined );
       }
 

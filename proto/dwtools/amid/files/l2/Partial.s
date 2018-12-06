@@ -797,7 +797,6 @@ function _pathResolveTextLink( o )
     filePath : o.filePath,
     // visited : [],
     // hasLink : false,
-    // allowingMissing : o.allowingMissing,
   });
 
   if( !result )
@@ -810,20 +809,12 @@ function _pathResolveTextLink( o )
 
   self.logger.log( 'pathResolveTextLink :', o.filePath, '->', result );
 
-  if( !o.allowingMissing )
-  {
-    let resolvedPath = self.path.join( o.filePath, result );
-    if( !self.fileExists( resolvedPath ) )
-    throw _.err( 'Error resolving textlink:', o.filePath, '\nFile does not exist:', resolvedPath );
-  }
-
   return { resolved : true, originalFilePath : o.filePath, resolvedFilePath : result };
 }
 
 _pathResolveTextLink.defaults =
 {
-  filePath : null,
-  allowingMissing : null,
+  filePath : null
 }
 
 //
@@ -860,8 +851,7 @@ function pathResolveTextLink_body( o )
 
 pathResolveTextLink_body.defaults =
 {
-  filePath : null,
-  allowingMissing : null,
+  filePath : null
 }
 
 let pathResolveTextLink = _.routineFromPreAndBody( pathResolveTextLink_pre, pathResolveTextLink_body );
@@ -909,25 +899,10 @@ function pathResolveSoftLink_body( o )
 
   result = self.path.normalize( result );
 
-  if( !o.allowingMissing )
-  {
-    let resolvedPath = self.path.join( o.filePath, result );
-    let stat = self.statRead
-    ({
-      filePath : resolvedPath,
-      resolvingSoftLink : 0,
-      resolvingTextLink : 0
-    })
-    if( !stat )
-    throw _.err( 'Error resolving softlink:', o.filePath, '\nFile does not exist:', resolvedPath );
-  }
-
   return result;
 }
 
 _.routineExtend( pathResolveSoftLink_body, pathResolveSoftLinkAct );
-
-pathResolveSoftLink_body.defaults.allowingMissing = 1;
 
 // var defaults = pathResolveSoftLink_body.defaults = Object.create( pathResolveSoftLinkAct.defaults );
 // var paths = pathResolveSoftLink_body.paths = Object.create( pathResolveSoftLinkAct.paths );
@@ -1169,7 +1144,7 @@ function pathResolveLinkChain_body( o )
 
   if( o.resolvingSoftLink && o.stat.isSoftLink() )
   {
-    let filePath = self.pathResolveSoftLink({ filePath : o.filePath , allowingMissing : true }); /* qqq : implement allowingMissing */
+    let filePath = self.pathResolveSoftLink({ filePath : o.filePath }); /* qqq : implement allowingMissing */
     // _.assert( filePath !== o.filePath );
     if( filePath !== o.filePath )
     {
@@ -1187,7 +1162,7 @@ function pathResolveLinkChain_body( o )
   if( self.usingTextLink )
   if( o.resolvingTextLink && o.stat.isTextLink() )
   {
-    let filePath = self.pathResolveTextLink({ filePath : o.filePath, allowingMissing : true });
+    let filePath = self.pathResolveTextLink({ filePath : o.filePath });
     // _.assert( filePath !== o.filePath );
     if( filePath !== o.filePath )
     {

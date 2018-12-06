@@ -29668,6 +29668,7 @@ function pathResolveTextLink( test )
   let workDir = test.context.makePath( 'written/pathResolveSoftLink' );
   let filePath = test.context.makePath( 'written/pathResolveSoftLink/file' );
   let linkPath = test.context.makePath( 'written/pathResolveSoftLink/link' );
+  let linkPath2 = test.context.makePath( 'written/pathResolveSoftLink/link2' );
   let testData = 'pathResolveSoftLink';
 
   self.provider.fieldPush( 'usingTextLink', 1 )
@@ -29765,6 +29766,7 @@ function pathResolveTextLink( test )
   var o = { filePath : linkPath };
   var got = self.provider.pathResolveTextLink( o );
   test.identical( got, filePath );
+  self.provider.textLink({ dstPath : linkPath2, srcPath : linkPath });
   o = { filePath : got };
   var got1 = self.provider.pathResolveTextLink( o );
   test.identical( got1, filePath );

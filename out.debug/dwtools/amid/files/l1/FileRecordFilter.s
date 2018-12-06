@@ -118,7 +118,7 @@ function and( src )
   _.assert( !src.formed || src.formed <= 1 );
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( src.stemPath/*globMap*/ === null || src.stemPath/*globMap*/ === undefined );
-  _.assert( filter.stemPath/*globMap*/ === null );
+  // _.assert( filter.stemPath/*globMap*/ === null );
   _.assert( filter.filterMap === null );
   _.assert( filter.test === null );
 
@@ -238,7 +238,7 @@ function pathsJoin( src )
   _.assert( !filter.formed || filter.formed <= 1 );
   _.assert( !src.formed || src.formed <= 1 );
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( filter.stemPath/*globMap*/ === null );
+  // _.assert( filter.stemPath/*globMap*/ === null );
   _.assert( filter.filterMap === null );
   _.assert( filter.test === null );
   _.assert( filter.inFilePath === null );
@@ -410,7 +410,7 @@ function pathsExtend( src )
   _.assert( !filter.formed || filter.formed <= 1 );
   _.assert( !src.formed || src.formed <= 1 );
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( filter.stemPath/*globMap*/ === null );
+  // _.assert( filter.stemPath/*globMap*/ === null );
   _.assert( filter.filterMap === null );
   _.assert( filter.test === null );
   _.assert( filter.inFilePath === null );

@@ -59,29 +59,6 @@ function init( o )
     c.form();
   }
 
-  // if( c === undefined )
-  // {
-  //   debugger;
-  //   c = new _.FileRecordFactory();
-  // }
-  // else if( _.mapIs( c ) )
-  // {
-  //   if( !c.basePath && !c.dirPath && !c.stemPath )
-  //   {
-  //     c.basePath = _.uri.dir( filePath );
-  //     c.stemPath = c.basePath;
-  //   }
-  //   c = new _.FileRecordFactory( c );
-  // }
-  //
-  // record.context = c;
-  //
-  // Object.freeze( record.context );
-  //
-  // record.input = filePath;
-  //
-  // _.assert( record.isActual === null );
-
   record.form();
 
   return record;
@@ -95,14 +72,10 @@ function form()
 
   _.assert( Object.isFrozen( record.context ) );
   _.assert( !!record.context.formed, 'Record context is not formed' );
-  // _.assert( record.fileProvider );
   _.assert( record.context.fileProvider instanceof _.FileProvider.Abstract );
   _.assert( record.context.effectiveFileProvider instanceof _.FileProvider.Abstract );
-  // _.assert( record.input );
-
   _.assert( _.strIs( record.input ),'{ record.input } must be a string' );
   _.assert( record.context instanceof _.FileRecordFactory,'Expects instance of { FileRecordFactory }' );
-  // _.assert( record.fileProvider instanceof _.FileProvider.Abstract,'Expects file provider instance of FileProvider' );
 
   record._pathsForm();
   record._statRead();
@@ -214,8 +187,6 @@ function _pathsForm()
 
   c.fileProvider._recordFormBegin( record );
 
-  // _.assert( _.strIs( c.originPath ) );
-
   record.hubAbsolute = record.absolute;
 
   record.real = record.absolute;
@@ -234,79 +205,57 @@ function _statRead()
 {
   let record = this;
   let c = record.context;
+  let stat;
 
   _.assert( arguments.length === 0 );
 
-  // if( record.absolute === '/dst/dir' )
-  // debugger;
+  if( record.real === '/self' )
+  debugger;
 
-  /* resolve link */
-
-  // record.real = c.effectiveFileProvider.pathResolveLink
-  // ({
-  //   filePath : record.real,
-  //   resolvingSoftLink : c.resolvingSoftLink,
-  //   resolvingTextLink : c.resolvingTextLink,
-  //   hub : c.fileProvider,
-  //   allowingMissing : c.allowingMissing,
-  //   throwing : 1,
-  // });
-
-  /* should be here because pathResolveLink does not guarantee reading stat */
-
-  let stat = c.effectiveFileProvider.statReadAct
-  ({
-    filePath : record.real,
-    throwing : 0,
-    resolvingSoftLink : 0,
-    sync : 1,
-    // resolvingTextLink : 0,
-  });
-
-  let o2 =
+  if( c.stating || c.resolvingSoftLink || c.resolvingTextLink )
   {
-    stat : stat,
-    filePath : record.real,
-    resolvingSoftLink : c.resolvingSoftLink,
-    resolvingTextLink : c.resolvingTextLink,
-    hub : c.fileProvider,
-    allowingMissing : c.allowingMissing,
-    throwing : 1,
+
+    /*
+      statRead should be before pathResolveLink
+      because it does not guarantee reading stat
+    */
+    stat = c.effectiveFileProvider.statReadAct
+    ({
+      filePath : record.real,
+      throwing : 0,
+      resolvingSoftLink : 0,
+      sync : 1,
+      // resolvingTextLink : 0,
+    });
+
+    let o2 =
+    {
+      stat : stat,
+      filePath : record.real,
+      resolvingSoftLink : c.resolvingSoftLink,
+      resolvingTextLink : c.resolvingTextLink,
+      hub : c.fileProvider,
+      allowingMissing : c.allowingMissing,
+      throwing : 1,
+    }
+
+    record.real = c.effectiveFileProvider.pathResolveLink( o2 );
+
+    _.assert( o2.stat === null || _.fileStatIs( o2.stat ) );
+
+    stat = o2.stat;
+
   }
-
-  record.real = c.effectiveFileProvider.pathResolveLink( o2 );
-
-  _.assert( o2.stat === null || _.fileStatIs( o2.stat ) );
 
   if( !record.real )
   debugger;
 
   record.realAbsolute = record.real;
 
-  // if( c.effectiveFileProvider.verbosity >= 8 )
-  // logger.log( 'Record', record.absolute,'->', record.real );
-
-  /* get stat */
-
-  if( !c.stating )
-  {
-    //record.isTransient = false;
-    record.isActual = false; // xxx
-  }
-
   if( c.stating && record.real )
   {
 
-    record.stat = o2.stat;
-
-    // let provider = _.path.isGlobal( record.real ) ? c.fileProvider : c.effectiveFileProvider;
-    //
-    // record.stat = provider.statRead
-    // ({
-    //   filePath : record.real,
-    //   throwing : 0,
-    //   sync : 1,
-    // });
+    record.stat = stat;
 
     if( !record.stat && !c.allowingMissing )
     if( record.real !== record.absolute )
@@ -319,7 +268,6 @@ function _statRead()
 
   /* analyze stat */
 
-  _.assert( record.stat === null || _.fileStatIs( record.stat ) );
   record._statAnalyze();
 
   return record;
@@ -335,26 +283,10 @@ function _statAnalyze()
   let path = record.path;
   let logger = fileProvider.logger || _global.logger;
 
+  _.assert( record.stat === null || _.fileStatIs( record.stat ) );
   _.assert( c instanceof _.FileRecordFactory,'_record expects instance of ( FileRecordFactory )' );
   _.assert( fileProvider instanceof _.FileProvider.Abstract,'Expects file provider instance of FileProvider' );
   _.assert( arguments.length === 0 );
-
-  /* */
-
-  // if( !record.stat )
-  // {
-  //   record.isTransient = false;
-  //   record.isActual = false;
-  // }
-
-  /* */
-
-  // if( fileProvider.verbosity > 2 )
-  // if( !record.stat )
-  // {
-  //   debugger;
-  //   logger.log( '!','Cant access file :', record.absolute );
-  // }
 
   /* */
 
@@ -373,20 +305,11 @@ function _statAnalyze()
 
   if( c.safe )
   {
-    // if( record.isActual )
     if( record.stat )
     if( !path.isSafe( record.absolute, c.safe ) )
     {
-
-      // debugger;
-      // let err1 = _.ErrorLooking( 'Experiment1' );
-      // debugger;
-      // let err2 = path.ErrorNotSafe( 'Making record', record.absolute, c.safe );
-      // debugger;
-
       debugger;
       throw path.ErrorNotSafe( 'Making record', record.absolute, c.safe );
-      // throw _.err( 'Unsafe record :', record.absolute, '\nUse options {- safe:0 -} if intention was to access system files.' );
     }
     if( record.stat && !record.stat.isFile() && !record.stat.isDirectory() && !record.stat.isSymbolicLink() )
     throw _.err( 'Unsafe record, unknown kind of file :',record.absolute );
@@ -459,7 +382,6 @@ function _isStemGet()
   let record = this;
   let c = record.context;
   return c.stemPath === record.absolute;
-  // return c.stemPath === record.hubAbsolute;
 }
 
 //
@@ -471,9 +393,9 @@ function _isDirGet()
   if( !record.stat )
   return false;
 
-  _.assert( _.routineIs( record.stat.isDirectory ) );
+  _.assert( _.routineIs( record.stat.isDir ) );
 
-  return record.stat.isDirectory();
+  return record.stat.isDir();
 }
 
 //
@@ -485,9 +407,22 @@ function _isTerminalGet()
   if( !record.stat )
   return false;
 
-  _.assert( _.routineIs( record.stat.isFile ) );
+  _.assert( _.routineIs( record.stat.isTerminal ) );
 
-  return record.stat.isFile();
+  return record.stat.isTerminal();
+}
+
+//
+
+function _isHardLinkGet()
+{
+  let record = this;
+  let c = record.context;
+
+  if( !record.stat )
+  return false;
+
+  return record.stat.isHardLink();
 }
 
 //
@@ -503,7 +438,7 @@ function _isSoftLinkGet()
   if( !record.stat )
   return false;
 
-  return record.stat.isSymbolicLink();
+  return record.stat.isSoftLink();
 }
 
 //
@@ -524,10 +459,7 @@ function _isTextLinkGet()
   if( !record.stat )
   return false;
 
-  // debugger; xxx
-
-  // return c.fileProvider.isTextLink( c.real );
-  return c.fileProvider.isTextLink( record.real );
+  return record.stat.isTextLink();
 }
 
 //
@@ -750,12 +682,10 @@ let Accessors =
   fullName : { readOnly : 1 },
   path : { readOnly : 1 },
 
-  // isDir : { readOnly : 1 },
-  // isTerminal : { readOnly : 1 },
-
   isStem : { readOnly : 1 },
   isDir : { readOnly : 1 },
   isTerminal : { readOnly : 1 },
+  isHardLink : { readOnly : 1 },
   isSoftLink : { readOnly : 1 },
   isTextLink : { readOnly : 1 },
   isLink : { readOnly : 1 },
@@ -769,49 +699,50 @@ let Accessors =
 let Proto =
 {
 
-  init : init,
-  form : form,
-  clone : clone,
-  From : From,
-  FromMany : FromMany,
-  toAbsolute : toAbsolute,
+  init,
+  form,
+  clone,
+  From,
+  FromMany,
+  toAbsolute,
 
-  _pathsForm : _pathsForm,
-  _statRead : _statRead,
-  _statAnalyze : _statAnalyze,
+  _pathsForm,
+  _statRead,
+  _statAnalyze,
 
-  reval : reval,
-  changeExt : changeExt,
-  hashGet : hashGet,
+  reval,
+  changeExt,
+  hashGet,
 
-  _isStemGet : _isStemGet,
-  _isDirGet : _isDirGet,
-  _isTerminalGet : _isTerminalGet,
-  _isSoftLinkGet : _isSoftLinkGet,
-  _isTextLinkGet : _isTextLinkGet,
-  _isLinkGet : _isLinkGet,
+  _isStemGet,
+  _isDirGet,
+  _isTerminalGet,
+  _isHardLinkGet,
+  _isSoftLinkGet,
+  _isTextLinkGet,
+  _isLinkGet,
 
-  _pathGet : _pathGet,
-  _absoluteUriGet : _absoluteUriGet,
-  _realUriGet : _realUriGet,
-  _dirGet : _dirGet,
-  _extsGet : _extsGet,
-  _extGet : _extGet,
-  _extWithDotGet : _extWithDotGet,
-  _nickNameGet : _nickNameGet,
-  _nameGet : _nameGet,
-  _fullNameGet : _fullNameGet,
+  _pathGet,
+  _absoluteUriGet,
+  _realUriGet,
+  _dirGet,
+  _extsGet,
+  _extGet,
+  _extWithDotGet,
+  _nickNameGet,
+  _nameGet,
+  _fullNameGet,
 
   //
 
-  Composes : Composes,
-  Aggregates : Aggregates,
-  Associates : Associates,
-  Restricts : Restricts,
-  Statics : Statics,
-  Copiers : Copiers,
-  Forbids : Forbids,
-  Accessors : Accessors,
+  Composes,
+  Aggregates,
+  Associates,
+  Restricts,
+  Statics,
+  Copiers,
+  Forbids,
+  Accessors,
 
 }
 
@@ -839,9 +770,9 @@ require( './FileRecordFactory.s' );
 
 _[ Self.shortName ] = Self;
 
-if( typeof module !== 'undefined' )
-if( _global_.WTOOLS_PRIVATE )
-{ /* delete require.cache[ module.id ]; */ }
+// if( typeof module !== 'undefined' )
+// if( _global_.WTOOLS_PRIVATE )
+// { /* delete require.cache[ module.id ]; */ }
 
 if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = Self;

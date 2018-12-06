@@ -342,12 +342,12 @@ function pathsInherit( src )
   _.assert( !filter.formed || filter.formed <= 1 );
   _.assert( !src.formed || src.formed <= 1 );
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( filter.stemPath/*globMap*/ === null );
+  // _.assert( filter.stemPath/*globMap*/ === null );
   _.assert( filter.filterMap === null );
   _.assert( filter.test === null );
   _.assert( !filter.hubFileProvider || !src.hubFileProvider || filter.hubFileProvider === src.hubFileProvider );
   _.assert( src !== filter );
-  _.assert( src.stemPath/*globMap*/ === null || src.stemPath/*globMap*/ === undefined );
+  // _.assert( src.stemPath/*globMap*/ === null || src.stemPath/*globMap*/ === undefined );
 
   let fileProvider = filter.effectiveFileProvider || filter.hubFileProvider || src.effectiveFileProvider || src.hubFileProvider;
   let path = fileProvider.path;
@@ -377,11 +377,14 @@ function pathsInherit( src )
 
   /* */
 
-  if( src.inFilePath )
-  filter.inFilePath = path.globMapExtend( filter.inFilePath, src.inFilePath, true );
+  if( src.filePath )
+  filter.filePath = path.globMapExtend( filter.filePath, src.filePath, true );
 
-  if( src.stemPath )
-  filter.stemPath = path.globMapExtend( filter.stemPath, src.stemPath, true );
+  // if( src.inFilePath )
+  // filter.inFilePath = path.globMapExtend( filter.inFilePath, src.inFilePath, true );
+  //
+  // if( src.stemPath )
+  // filter.stemPath = path.globMapExtend( filter.stemPath, src.stemPath, true );
 
   return filter;
 }
@@ -451,6 +454,9 @@ function form()
   _.assert( filter.formed <= 3 );
   _.assert( filter.hubFileProvider instanceof _.FileProvider.Abstract );
 
+  // if( filter.filePath === null )
+  // debugger;
+
   filter._formFinal();
 
   _.assert( filter.formed === 5 );
@@ -490,7 +496,7 @@ function _formFixes()
   let path = fileProvider.path;
 
   _.assert( arguments.length === 0 );
-  _.assert( filter.stemPath/*globMap*/ === null );
+  // _.assert( filter.stemPath/*globMap*/ === null );
   _.assert( filter.formed === 1 );
   _.assert( filter.prefixPath === null || _.strIs( filter.prefixPath ) || _.arrayIs( filter.prefixPath ) );
   _.assert( filter.postfixPath === null || _.strIs( filter.postfixPath ) || _.arrayIs( filter.postfixPath ) );
@@ -520,9 +526,12 @@ function _formBasePath()
 
   _.assert( arguments.length === 0 );
   _.assert( _.objectIs( filter ) );
-  _.assert( filter.stemPath/*globMap*/ === null );
+  // _.assert( filter.stemPath/*globMap*/ === null );
   _.assert( filter.formed === 2 );
-  _.assert( filter.stemPath === null );
+  // _.assert( filter.stemPath === null );
+
+  // if( filter.filePath === null )
+  // debugger;
 
   // debugger;
   filter.prefixesApply();
@@ -1643,7 +1652,7 @@ function _testFull( record )
 }
 
 // --
-// accessors
+// path
 // --
 
 function basePathFor( filePath )
@@ -1684,6 +1693,24 @@ function basePathsGet()
   return [ filter.basePath ];
   else
   return [];
+}
+
+//
+
+function filePathGet()
+{
+  let filter = this;
+  return filter.filePath;
+}
+
+//
+
+function filePathSet( src )
+{
+  let filter = this;
+  _.assert( src === null || _.strIs( src ) || _.arrayIs( src ) || _.mapIs( src ) );
+  filter.filePath = src;
+  return src;
 }
 
 // --
@@ -1728,8 +1755,9 @@ let Composes =
 let Aggregates =
 {
 
-  inFilePath : null,
-  stemPath : null,
+  filePath : null,
+  // inFilePath : null,
+  // stemPath : null,
 
 }
 
@@ -1769,7 +1797,6 @@ let Forbids =
   options : 'options',
   glob : 'glob',
   recipe : 'recipe',
-  filePath : 'filePath',
   globOut : 'globOut',
   inPrefixPath : 'inPrefixPath',
   inPostfixPath : 'inPostfixPath',
@@ -1777,7 +1804,6 @@ let Forbids =
   fileProvider : 'fileProvider',
   fileProviderEffective : 'fileProviderEffective',
   isEmpty : 'isEmpty',
-
   globMap : 'globMap',
   _processed : '_processed',
 
@@ -1785,7 +1811,11 @@ let Forbids =
 
 let Accessors =
 {
+
   basePaths : { getter : basePathsGet, readOnly : 1 },
+  inFilePath : { getter : filePathGet, setter : filePathSet },
+  stemPath : { getter : filePathGet, setter : filePathSet },
+
 }
 
 // --
@@ -1833,10 +1863,12 @@ let Proto =
   _testTime,
   _testFull,
 
-  // basePath
+  // path
 
   basePathFor,
   basePathsGet,
+  filePathGet,
+  filePathSet,
 
   //
 

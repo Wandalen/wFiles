@@ -3684,7 +3684,6 @@ function fileCopySync( test )
 
   test.mustNotThrowError( function()
   {
-    debugger;
     got = self.provider.fileCopy
     ({
       srcPath : test.context.makePath( 'not_existing_path' ),

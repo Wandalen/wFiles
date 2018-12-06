@@ -197,6 +197,7 @@ function _filesFilterForm( o )
     // if( o.filter.basePath === '/dst' )
     // debugger;
 
+    if( o.filePath !== null )
     o.filter.inFilePath = o.filePath;
     o.filter.form();
     o.filePath = o.filter.stemPath;

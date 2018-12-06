@@ -584,7 +584,6 @@ function _link_functor( fop )
   let onDifferentProviders = fop.onDifferentProviders;
   let allowDifferentProviders = fop.allowDifferentProviders;
 
-  debugger;
   _.assert( _.strDefined( routineName ) );
   _.assert( _.objectIs( routine.defaults ) );
   _.assert( routine.paths === undefined );

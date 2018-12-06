@@ -29758,6 +29758,17 @@ function pathResolveTextLink( test )
   var got = self.provider.pathResolveTextLink( o );
   test.identical( got, linkPath );
 
+  test.case = 'Chain with two absolute text links';
+  self.provider.filesDelete( workDir );
+  self.provider.fileWrite( filePath, testData );
+  self.provider.textLink({ dstPath : linkPath, srcPath : filePath });
+  var o = { filePath : linkPath };
+  var got = self.provider.pathResolveTextLink( o );
+  test.identical( got, filePath );
+  o = { filePath : got };
+  var got1 = self.provider.pathResolveTextLink( o );
+  test.identical( got1, filePath );
+
   self.provider.fieldPop( 'usingTextLink', 1 )
 
   /**/

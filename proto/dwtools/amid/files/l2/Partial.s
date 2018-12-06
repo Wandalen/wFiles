@@ -5870,6 +5870,7 @@ function _link_functor( gen )
         {
           return self.dirMakeForFile({ filePath : o2.dstPath, sync : 0 });
         }
+        return dstExists;
       });
 
       con.ifNoErrorThen( _.routineSeal( self, c.linkAct, [ o2 ] ) );
@@ -6892,13 +6893,23 @@ function textLinkAct( o )
   _.assert( path.is( o.srcPath ) );
   _.assert( path.isAbsolute( o.dstPath ) );
 
-  return self.fileWrite( o.dstPath, 'link ' + o.srcPath );
+  let srcPath = o.srcPath;
+  if( !self.path.isAbsolute( o.originalSrcPath ) )
+  srcPath = o.originalSrcPath;
+
+  let result = self.fileWrite({ filePath : o.dstPath, data : 'link ' + srcPath, sync : o.sync });
+
+  if( o.sync )
+  return true;
+  else
+  return result;
 }
 
 var defaults = textLinkAct.defaults = Object.create( null );
 
 defaults.dstPath = null;
 defaults.srcPath = null;
+defaults.sync = null;
 defaults.originalDstPath = null;
 defaults.originalSrcPath = null;
 

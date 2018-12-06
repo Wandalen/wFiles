@@ -29702,7 +29702,7 @@ function pathResolveTextLink( test )
   test.identical( got, filePath );
 
   /*
-
+  
     Add test cases :
 
     absolute textlink to file that does not exist
@@ -29710,6 +29710,30 @@ function pathResolveTextLink( test )
     relative textlink to regular file
 
     use allowingMissing : 1 option to create link for missing file
+  */
+
+  test.case = 'absolute textlink to file that does not exist';
+  self.provider.filesDelete( workDir );  // remove temp files created by previous test case
+  self.provider.textLink({ dstPath : linkPath, srcPath : filePath, allowingMissing : 1, makingDirectory : 1  });
+  var o = { filePath : linkPath }; // create options map for current test case
+  var got = self.provider.pathResolveTextLink( o ); // call routine and save result
+  test.identical( got, linkPath ); // check result
+
+  test.case = 'relative textlink to file that does not exist';
+  self.provider.filesDelete( workDir );
+  self.provider.textLink({ dstPath : linkPath, srcPath : '../file', allowingMissing : 1, makingDirectory : 1 });
+  var o = { filePath : linkPath };
+  var got = self.provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
+
+  /* Throws an error
+  test.case = 'relative textlink to regular file';
+  self.provider.filesDelete( workDir );
+  self.provider.fileWrite( filePath, testData );
+  self.provider.textLink({ dstPath : linkPath, srcPath : filePath });
+  var o = { filePath : linkPath };
+  var got = self.provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
   */
 
   test.case = 'absolute softlink to file that does not exist';

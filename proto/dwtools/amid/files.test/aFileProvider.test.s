@@ -29732,7 +29732,7 @@ function pathResolveTextLink( test )
   self.provider.textLink({ dstPath : linkPath, srcPath : filePath });
   var o = { filePath : linkPath };
   var got = self.provider.pathResolveTextLink( o );
-  test.identical( got, linkPath );  // Throws an error
+  test.identical( got, linkPath ); // Throws an error
 
 
   test.case = 'absolute softlink to file that does not exist';

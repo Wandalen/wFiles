@@ -29670,6 +29670,8 @@ function pathResolveTextLink( test )
   let linkPath = test.context.makePath( 'written/pathResolveSoftLink/link' );
   let testData = 'pathResolveSoftLink';
 
+  self.provider.fieldPush( 'usingTextLink', 1 )
+
   test.case = 'regular file';
   self.provider.filesDelete( workDir );
   self.provider.fileWrite( filePath, testData );
@@ -29717,23 +29719,22 @@ function pathResolveTextLink( test )
   self.provider.textLink({ dstPath : linkPath, srcPath : filePath, allowingMissing : 1, makingDirectory : 1  });
   var o = { filePath : linkPath }; // create options map for current test case
   var got = self.provider.pathResolveTextLink( o ); // call routine and save result
-  test.identical( got, linkPath ); // check result
+  test.identical( got, filePath ); // check result
 
   test.case = 'relative textlink to file that does not exist';
   self.provider.filesDelete( workDir );
   self.provider.textLink({ dstPath : linkPath, srcPath : '../file', allowingMissing : 1, makingDirectory : 1 });
   var o = { filePath : linkPath };
   var got = self.provider.pathResolveTextLink( o );
-  test.identical( got, linkPath );
+  test.identical( got, '../file' );
 
   test.case = 'relative textlink to regular file';
   self.provider.filesDelete( workDir );
   self.provider.fileWrite( filePath, testData );
-  self.provider.textLink({ dstPath : linkPath, srcPath : filePath });
+  self.provider.textLink({ dstPath : linkPath, srcPath : '../file' });
   var o = { filePath : linkPath };
   var got = self.provider.pathResolveTextLink( o );
-  test.identical( got, linkPath );  // Throws an error
-
+  test.identical( got, '../file' );  // Throws an error
 
   test.case = 'absolute softlink to file that does not exist';
   self.provider.filesDelete( workDir );  // remove temp files created by previous test case
@@ -29756,6 +29757,23 @@ function pathResolveTextLink( test )
   var o = { filePath : linkPath };
   var got = self.provider.pathResolveTextLink( o );
   test.identical( got, linkPath );
+
+  self.provider.fieldPop( 'usingTextLink', 1 )
+
+  /**/
+
+  self.provider.fieldPush( 'usingTextLink', 0 );
+
+  /*
+    pathResolveTextLink only resolves text link and returns result without any additional checks
+
+    usingTextLink - 1, enables resolving of text link, routine returns resolved path
+    usingTextLink - 0, disables resolving of text link, routine always returns original path - o.filePath
+
+    Please duplicate here tests above and adjust expected results.
+  */
+
+  self.provider.fieldPop( 'usingTextLink', 0 );
 }
 
 // --

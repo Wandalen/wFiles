@@ -29862,7 +29862,7 @@ var Self =
 
   name : 'Tools/mid/files/fileProvider/Abstract',
   abstract : 1,
-  silencing : 0,
+  silencing : 1,
   // verbosity : 7,
 
   onSuiteBegin : onSuiteBegin,

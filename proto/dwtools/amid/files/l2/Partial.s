@@ -1947,11 +1947,17 @@ function statRead_body( o )
 
   // let o2 = _.mapOnly( o, self.statReadAct.defaults );
   // let result = self.statReadAct( o2 );
-  let result = o2.stat;
+  // let result = o2.stat;
 
-  if( _.consequenceIs( result ) )
-  return result.ifNoErrorThen( end );
-  return end( result );
+  if( o.sync )
+  {
+    return end( o2.stat );
+  }
+  else
+  {
+    let result = new _.Consequence().give( o2.stat );
+    return result.ifNoErrorThen( end );
+  }
 
   /* - */
 
@@ -5871,8 +5877,54 @@ function _link_functor( gen )
     else /* async */
     {
 
-      _.assert( 0, 'synchronize with sync version' );
+      // _.assert( 0, 'synchronize with sync version' );
 
+      let con = new _.Consequence().give( null )
+
+      if( onRanameBegin )
+      con.ifNoErrorThen( _.routineSeal( self,onRanameBegin, [ c ] ) );
+
+      con.ifNoErrorThen( _.routineSeal( self,self.fileExists, [ o2.dstPath ] ) );
+      con.ifNoErrorThen( ( dstExists ) =>
+      {
+        if( dstExists )
+        {
+          return verifyDstAsync().ifNoErrorThen( () => tempRenameAsync() )
+        }
+        else if( o.makingDirectory )
+        {
+          return self.dirMakeForFile({ filePath : o2.dstPath, sync : 0 });
+        }
+      });
+
+      con.ifNoErrorThen( _.routineSeal( self, c.linkAct, [ o2 ] ) );
+
+      con.ifNoErrorThen( ( got ) =>
+      {
+        log();
+        if( c.tempPath )
+        return self.filesDelete({ filePath : c.tempPath, verbosity : 0 });
+        return got;
+      });
+      con.ifNoErrorThen( () =>
+      {
+        c.tempPath = null;
+        validateSize();
+        return true;
+      });
+
+      con.ifErrorThen( ( err ) =>
+      {
+        return tempRenameBackAsync()
+        .doThen( () =>
+        {
+          if( o.throwing )
+          throw _.err( 'Cant', entryMethodName, o.dstPath, '<-', o.srcPath, '\n', err )
+          return false;
+        })
+      })
+
+      return con;
     }
 
     /* - */
@@ -5981,6 +6033,30 @@ function _link_functor( gen )
       if( c.dstStat.isDirectory() && !o.rewritingDirs )
       throw _.err( 'Destination file ' + _.strQuote( o2.dstPath ) + ' is a directory and rewritingDirs is off.' );
 
+    }
+
+    /* - */
+
+    function verifyDstAsync()
+    {
+
+      if( !o.rewriting )
+      throw _.err( 'Destination file ' + _.strQuote( o2.dstPath ) + ' exist and rewriting is off.' );
+
+      return self.statRead
+      ({
+        filePath : o2.dstPath,
+        resolvingSoftLink : 0,
+        resolvingTextLink : 0,
+        sync : 0,
+      })
+      .ifNoErrorThen( ( stat ) =>
+      {
+        c.dstStat = stat;
+        if( c.dstStat.isDirectory() && !o.rewritingDirs )
+        throw _.err( 'Destination file ' + _.strQuote( o2.dstPath ) + ' is a directory and rewritingDirs is off.' );
+        return stat;
+      })
     }
 
     /* - */
@@ -6098,6 +6174,39 @@ function _link_functor( gen )
 
     }
 
+    function tempRenameAsync()
+    {
+      if( !tempRenameCan() )
+      return false;
+
+      c.tempPath = tempNameMake( o2.dstPath );
+      return self.statRead
+      ({
+        filePath : c.tempPath,
+        sync : 0
+      })
+      .ifNoErrorThen( ( tempStat ) =>
+      {
+        if( tempStat )
+        return self.filesDelete( c.tempPath );
+        return tempStat;
+      })
+      .ifNoErrorThen( () =>
+      {
+        return self.fileRenameAct
+        ({
+          dstPath : c.tempPath,
+          srcPath : o.dstPath,
+          originalDstPath : o.originalDstPath,
+          originalSrcPath : o.originalSrcPath,
+          sync : 0,
+          // resolvingSrcSoftLink : 0,
+          // resolvingSrcTextLink : 0,
+          // verbosity : 0,
+        });
+      })
+    }
+
     /* - */
 
     function tempRenameBack()
@@ -6122,6 +6231,27 @@ function _link_functor( gen )
         // console.error( err.toString() + '\n' + err.stack );
       }
 
+    }
+
+    function tempRenameBackAsync()
+    {
+      if( !c.tempPath )
+      return new _.Consequence().give( null );
+
+      return self.fileRenameAct
+      ({
+        dstPath : o.dstPath,
+        srcPath : c.tempPath,
+        originalDstPath : o.originalDstPath,
+        originalSrcPath : o.originalSrcPath,
+        sync : 0,
+      })
+      .doThen( ( err2, got ) )
+      {
+        if( err2 )
+        console.error( err2 );
+        return got;
+      }
     }
 
     /* - */
@@ -6488,6 +6618,7 @@ function _fileCopyRenameBegin( c )
     throw _.err( 'Cant copy directory ' + _.strQuote( o.srcPath ) + ', consider method filesCopy'  );
   }
 
+  return c;
 }
 
 let fileCopy = _link_functor

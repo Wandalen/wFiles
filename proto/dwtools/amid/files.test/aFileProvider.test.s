@@ -6052,7 +6052,7 @@ function fileCopyAsync( test )
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function( got )
     {
-      test.identical( got, false );
+      test.identical( got, null );
       return got;
     });
   })
@@ -6087,7 +6087,7 @@ function fileCopyAsync( test )
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function( got )
     {
-      test.identical( got, false );
+      test.identical( got, null );
       return got;
     });
   })
@@ -6556,7 +6556,7 @@ function fileCopyLinksAsync( test )
 
   /* hardlink */
 
-  .doThen( () =>
+  .ifNoErrorThen( () =>
   {
     test.case = 'dst is a hard link, breaking disabled';
     self.provider.filesDelete( dir );
@@ -6568,7 +6568,7 @@ function fileCopyLinksAsync( test )
       dstPath : dstPath,
       srcPath : otherPath,
       sync : 0,
-      breakingDstSoftLink : 0,
+      // breakingDstSoftLink : 0,
       breakingDstHardLink : 0
     })
     .ifNoErrorThen( ( arg/*aaa*/ ) =>
@@ -6590,7 +6590,7 @@ function fileCopyLinksAsync( test )
 
   //
 
-  .doThen( () =>
+  .ifNoErrorThen( () =>
   {
     test.case = 'dst is a hard link, breakingDstSoftLink : 1 ,breakingDstHardLink : 0';
     self.provider.filesDelete( dir );
@@ -6602,7 +6602,7 @@ function fileCopyLinksAsync( test )
       dstPath : dstPath,
       srcPath : otherPath,
       sync : 0,
-      breakingDstSoftLink : 1,
+      // breakingDstSoftLink : 1,
       breakingDstHardLink : 0
     })
     .ifNoErrorThen( ( arg/*aaa*/ ) =>
@@ -6624,7 +6624,7 @@ function fileCopyLinksAsync( test )
 
   //
 
-  .doThen( () =>
+  .ifNoErrorThen( () =>
   {
     test.case = 'dst is a hard link, breakingDstHardLink : 1';
     self.provider.filesDelete( dir );
@@ -6636,7 +6636,7 @@ function fileCopyLinksAsync( test )
       dstPath : dstPath,
       srcPath : otherPath,
       sync : 0,
-      breakingDstSoftLink : 0,
+      // breakingDstSoftLink : 0,
       breakingDstHardLink : 1
     })
     .ifNoErrorThen( ( arg/*aaa*/ ) =>
@@ -6658,7 +6658,7 @@ function fileCopyLinksAsync( test )
 
   //
 
-  .doThen( () =>
+  .ifNoErrorThen( () =>
   {
     test.case = 'dst is a hard link, breakingDstSoftLink : 1, breakingDstHardLink : 1';
     self.provider.filesDelete( dir );

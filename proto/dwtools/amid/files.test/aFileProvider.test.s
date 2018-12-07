@@ -29767,9 +29767,9 @@ function pathResolveTextLink( test )
   var got = self.provider.pathResolveTextLink( o );
   test.identical( got, filePath );
   self.provider.textLink({ dstPath : linkPath2, srcPath : linkPath });
-  o = { filePath : got };
+  o = { filePath : linkPath2 };
   var got1 = self.provider.pathResolveTextLink( o );
-  test.identical( got1, filePath );
+  test.identical( got1, linkPath );
 
   test.case = 'Chain with relative and absolute text links';
   self.provider.filesDelete( workDir );
@@ -29783,7 +29783,7 @@ function pathResolveTextLink( test )
   var got1 = self.provider.pathResolveTextLink( o );
   test.identical( got1, '../file' );
 
-  test.case = 'Chain with relative text links';
+  test.case = 'Chain with two relative text links that don´t exist';
   self.provider.filesDelete( workDir );
   self.provider.fileWrite( filePath, testData );
   self.provider.textLink({ dstPath : linkPath, srcPath : '../file0', allowingMissing : 1, makingDirectory : 1  });
@@ -29791,6 +29791,42 @@ function pathResolveTextLink( test )
   var got = self.provider.pathResolveTextLink( o );
   test.identical( got, '../file0' );
   self.provider.textLink({ dstPath : linkPath, srcPath : '../file1', allowingMissing : 1, makingDirectory : 1  });
+  o = { filePath : linkPath2 };
+  var got1 = self.provider.pathResolveTextLink( o );
+  test.identical( got1, linkPath2 );
+
+  test.case = 'Chain with two absolute soft links';
+  self.provider.filesDelete( workDir );
+  self.provider.fileWrite( filePath, testData );
+  self.provider.softLink({ dstPath : linkPath, srcPath : filePath });
+  var o = { filePath : linkPath };
+  var got = self.provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
+  self.provider.softLink({ dstPath : linkPath2, srcPath : linkPath });
+  o = { filePath : linkPath2 };
+  var got1 = self.provider.pathResolveTextLink( o );
+  test.identical( got1, linkPath2 );
+
+  test.case = 'Chain with relative and absolute soft links';
+  self.provider.filesDelete( workDir );
+  self.provider.fileWrite( filePath, testData );
+  self.provider.softLink({ dstPath : linkPath, srcPath : '../file' });
+  var o = { filePath : linkPath };
+  var got = self.provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
+  self.provider.softLink({ dstPath : linkPath2, srcPath : got });
+  o = { filePath : linkPath2 };
+  var got1 = self.provider.pathResolveTextLink( o );
+  test.identical( got1, linkPath2 );
+
+  test.case = 'Chain with two relative soft links that don´t exist';
+  self.provider.filesDelete( workDir );
+  self.provider.fileWrite( filePath, testData );
+  self.provider.softLink({ dstPath : linkPath, srcPath : '../file0', allowingMissing : 1, makingDirectory : 1  });
+  var o = { filePath : linkPath };
+  var got = self.provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
+  self.provider.softLink({ dstPath : linkPath, srcPath : '../file1', allowingMissing : 1, makingDirectory : 1  });
   o = { filePath : linkPath2 };
   var got1 = self.provider.pathResolveTextLink( o );
   test.identical( got1, linkPath2 );
@@ -29885,6 +29921,78 @@ function pathResolveTextLink( test )
   var o = { filePath : linkPath };
   var got = self.provider.pathResolveTextLink( o );
   test.identical( got, linkPath );
+
+  test.case = 'Chain with two absolute text links';
+  self.provider.filesDelete( workDir );
+  self.provider.fileWrite( filePath, testData );
+  self.provider.textLink({ dstPath : linkPath, srcPath : filePath });
+  var o = { filePath : linkPath };
+  var got = self.provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
+  self.provider.textLink({ dstPath : linkPath2, srcPath : linkPath });
+  o = { filePath : linkPath2 };
+  var got1 = self.provider.pathResolveTextLink( o );
+  test.identical( got1, linkPath2 );
+
+  test.case = 'Chain with relative and absolute text links';
+  self.provider.filesDelete( workDir );
+  self.provider.fileWrite( filePath, testData );
+  self.provider.textLink({ dstPath : linkPath, srcPath : '../file' });
+  var o = { filePath : linkPath };
+  var got = self.provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
+  self.provider.textLink({ dstPath : linkPath2, srcPath : got });
+  o = { filePath : linkPath2 };
+  var got1 = self.provider.pathResolveTextLink( o );
+  test.identical( got1, linkPath2 );
+
+  test.case = 'Chain with two relative text links that don´t exist';
+  self.provider.filesDelete( workDir );
+  self.provider.fileWrite( filePath, testData );
+  self.provider.textLink({ dstPath : linkPath, srcPath : '../file0', allowingMissing : 1, makingDirectory : 1  });
+  var o = { filePath : linkPath };
+  var got = self.provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
+  self.provider.textLink({ dstPath : linkPath, srcPath : '../file1', allowingMissing : 1, makingDirectory : 1  });
+  o = { filePath : linkPath2 };
+  var got1 = self.provider.pathResolveTextLink( o );
+  test.identical( got1, linkPath2 );
+
+  test.case = 'Chain with two absolute soft links';
+  self.provider.filesDelete( workDir );
+  self.provider.fileWrite( filePath, testData );
+  self.provider.softLink({ dstPath : linkPath, srcPath : filePath });
+  var o = { filePath : linkPath };
+  var got = self.provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
+  self.provider.softLink({ dstPath : linkPath2, srcPath : linkPath });
+  o = { filePath : linkPath2 };
+  var got1 = self.provider.pathResolveTextLink( o );
+  test.identical( got1, linkPath2 );
+
+  test.case = 'Chain with relative and absolute soft links';
+  self.provider.filesDelete( workDir );
+  self.provider.fileWrite( filePath, testData );
+  self.provider.softLink({ dstPath : linkPath, srcPath : '../file' });
+  var o = { filePath : linkPath };
+  var got = self.provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
+  self.provider.softLink({ dstPath : linkPath2, srcPath : got });
+  o = { filePath : linkPath2 };
+  var got1 = self.provider.pathResolveTextLink( o );
+  test.identical( got1, linkPath2 );
+
+  test.case = 'Chain with two relative soft links that don´t exist';
+  self.provider.filesDelete( workDir );
+  self.provider.fileWrite( filePath, testData );
+  self.provider.softLink({ dstPath : linkPath, srcPath : '../file0', allowingMissing : 1, makingDirectory : 1  });
+  var o = { filePath : linkPath };
+  var got = self.provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
+  self.provider.softLink({ dstPath : linkPath, srcPath : '../file1', allowingMissing : 1, makingDirectory : 1  });
+  o = { filePath : linkPath2 };
+  var got1 = self.provider.pathResolveTextLink( o );
+  test.identical( got1, linkPath2 );
 
   self.provider.fieldPop( 'usingTextLink', 0 );
 

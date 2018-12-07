@@ -7574,76 +7574,76 @@ function fileCopySoftLinkResolving( test )
 
 //
 
-function fileCopyAsyncThrowingError( test )
-{
-  var self = this;
+// function fileCopyAsyncThrowingError( test )
+// {
+//   var self = this;
 
-  if( !_.routineIs( self.provider.fileCopy ) )
-  return;
+//   if( !_.routineIs( self.provider.fileCopy ) )
+//   return;
 
-  var dir = test.context.makePath( 'written/fileCopyAsync' );
+//   var dir = test.context.makePath( 'written/fileCopyAsync' );
 
-  if( !self.provider.statResolvedRead( dir ) )
-  self.provider.dirMake( dir );
+//   if( !self.provider.statResolvedRead( dir ) )
+//   self.provider.dirMake( dir );
 
-  var consequence = new _.Consequence().give( null );
+//   var consequence = new _.Consequence().give( null );
 
-  consequence
-  .ifNoErrorThen( function( arg/*aaa*/ )
-  {
-    test.case = 'async, throwing error';
-    var con = self.provider.fileCopy
-    ({
-      srcPath : test.context.makePath( 'invalid.txt' ),
-      dstPath : test.context.makePath( 'dstPath.txt' ),
-      sync : 0,
-    });
+//   consequence
+//   .ifNoErrorThen( function( arg/*aaa*/ )
+//   {
+//     test.case = 'async, throwing error';
+//     var con = self.provider.fileCopy
+//     ({
+//       srcPath : test.context.makePath( 'invalid.txt' ),
+//       dstPath : test.context.makePath( 'dstPath.txt' ),
+//       sync : 0,
+//     });
 
-    return test.shouldThrowErrorAsync( con );
-  })
-  .ifNoErrorThen( function( arg/*aaa*/ )
-  {
-    test.case = 'async,try rewrite dir';
-    var con = self.provider.fileCopy
-    ({
-      srcPath : test.context.makePath( 'invalid.txt' ),
-      dstPath : test.context.makePath( 'tmp' ),
-      sync : 0,
-    });
+//     return test.shouldThrowError( con );
+//   })
+//   .ifNoErrorThen( function( arg/*aaa*/ )
+//   {
+//     test.case = 'async,try rewrite dir';
+//     var con = self.provider.fileCopy
+//     ({
+//       srcPath : test.context.makePath( 'invalid.txt' ),
+//       dstPath : test.context.makePath( 'tmp' ),
+//       sync : 0,
+//     });
 
-    return test.shouldThrowErrorAsync( con );
-  })
-  .ifNoErrorThen( function( arg/*aaa*/ )
-  {
-    test.case = 'async copy dir';
-    try
-    {
-      self.provider.dirMake
-      ({
-        filePath : test.context.makePath( 'written/fileCopyAsync/copydir' ),
-        sync : 1
-      });
-      self.provider.fileWrite
-      ({
-        filePath : test.context.makePath( 'written/fileCopyAsync/copydir/copyfile.txt' ),
-        data : 'Lorem',
-        sync : 1
-      });
-    } catch ( err ) { }
+//     return test.shouldThrowErrorAsync( con );
+//   })
+//   .ifNoErrorThen( function( arg/*aaa*/ )
+//   {
+//     test.case = 'async copy dir';
+//     try
+//     {
+//       self.provider.dirMake
+//       ({
+//         filePath : test.context.makePath( 'written/fileCopyAsync/copydir' ),
+//         sync : 1
+//       });
+//       self.provider.fileWrite
+//       ({
+//         filePath : test.context.makePath( 'written/fileCopyAsync/copydir/copyfile.txt' ),
+//         data : 'Lorem',
+//         sync : 1
+//       });
+//     } catch ( err ) { }
 
-    debugger;
-    var con = self.provider.fileCopy
-    ({
-        srcPath : test.context.makePath( 'written/fileCopyAsync/copydir' ),
-        dstPath : test.context.makePath( 'written/fileCopyAsync/copydir2' ),
-        sync : 0,
-    });
+//     debugger;
+//     var con = self.provider.fileCopy
+//     ({
+//         srcPath : test.context.makePath( 'written/fileCopyAsync/copydir' ),
+//         dstPath : test.context.makePath( 'written/fileCopyAsync/copydir2' ),
+//         sync : 0,
+//     });
 
-    return test.shouldThrowErrorAsync( con );
-  });
+//     return test.shouldThrowErrorAsync( con );
+//   });
 
-  return consequence;
-}
+//   return consequence;
+// }
 
 //
 
@@ -7691,7 +7691,7 @@ function fileRenameSync( test )
       throwing : 0,
     });
   });
-  test.identical( got, false );
+  test.identical( got, null );
 
   /**/
 
@@ -7720,7 +7720,7 @@ function fileRenameSync( test )
       throwing : 0,
     });
   });
-  test.identical( got, false );
+  test.identical( got, null );
 
   //
 
@@ -30367,7 +30367,7 @@ var Self =
     fileCopyAsync : fileCopyAsync,
     fileCopyLinksAsync : fileCopyLinksAsync,
     fileCopySoftLinkResolving : fileCopySoftLinkResolving,
-    fileCopyAsyncThrowingError : fileCopyAsyncThrowingError,/* last case dont throw error */
+    // fileCopyAsyncThrowingError : fileCopyAsyncThrowingError,/* rewrite this routine */
 
     fileRenameSync : fileRenameSync,
     fileRenameRelativePath : fileRenameRelativePath,

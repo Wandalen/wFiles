@@ -16751,7 +16751,16 @@ function softLinkRelativePath( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   // if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   // {
-    test.shouldThrowError( () =>  self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 }) );
+    test.shouldThrowError( () =>
+    {
+      self.provider.pathResolveLink
+      ({
+        filePath : dstPath,
+        resolvingSoftLink : 1,
+        allowingMissing : 0,
+        throwing : 1
+      })
+    });
     self.provider.fileWrite( pathToFile, pathToFile );
     var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
     test.identical( got, pathToFile );
@@ -16780,7 +16789,16 @@ function softLinkRelativePath( test )
   test.is( self.provider.isSoftLink( dstPath ) );
  // if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   // {
-    test.shouldThrowError( () =>  self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 }) );
+    test.shouldThrowError( () =>
+    {
+      self.provider.pathResolveLink
+      ({
+        filePath : dstPath,
+        resolvingSoftLink : 1,
+        allowingMissing : 0,
+        throwing : 1
+      })
+    });
     self.provider.fileWrite( pathToFile, pathToFile );
     var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
     test.identical( got, pathToFile );
@@ -16809,7 +16827,16 @@ function softLinkRelativePath( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   // if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   // {
-    test.shouldThrowError( () =>  self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 }) );
+    test.shouldThrowError( () =>
+    {
+      self.provider.pathResolveLink
+      ({
+        filePath : dstPath,
+        resolvingSoftLink : 1,
+        allowingMissing : 0,
+        throwing : 1
+      })
+    });
     self.provider.fileWrite( pathToFile, pathToFile );
     var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
     test.identical( got, pathToFile );
@@ -16838,7 +16865,16 @@ function softLinkRelativePath( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   // if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   // {
-    test.shouldThrowError( () =>  self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 }) );
+    test.shouldThrowError( () =>
+    {
+      self.provider.pathResolveLink
+      ({
+        filePath : dstPath,
+        resolvingSoftLink : 1,
+        allowingMissing : 0,
+        throwing : 1
+      })
+    });
     self.provider.fileWrite( pathToFile, pathToFile );
     var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
     test.identical( got, pathToFile );
@@ -16871,7 +16907,16 @@ function softLinkRelativePath( test )
     allowingMissing : 1
   });
   test.is( self.provider.isSoftLink( dstPath ) );
-  test.shouldThrowError( () =>  self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 }) );
+  test.shouldThrowError( () =>
+  {
+    self.provider.pathResolveLink
+    ({
+      filePath : dstPath,
+      resolvingSoftLink : 1,
+      allowingMissing : 0,
+      throwing : 1
+    })
+  });
   var got = self.provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, srcPath );
 
@@ -16891,7 +16936,16 @@ function softLinkRelativePath( test )
     allowingMissing : 1
   });
   test.is( self.provider.isSoftLink( dstPathResolved ) );
-  test.shouldThrowError( () =>  self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 }) );
+  test.shouldThrowError( () =>
+  {
+    self.provider.pathResolveLink
+    ({
+      filePath : dstPath,
+      resolvingSoftLink : 1,
+      allowingMissing : 0,
+      throwing : 1
+    })
+  });
   var got = self.provider.pathResolveSoftLink({ filePath : dstPathResolved/*, readLink : 1*/ });
   test.identical( got, srcPath );
 

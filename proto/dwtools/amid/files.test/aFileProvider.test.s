@@ -19017,7 +19017,7 @@ function hardLinkSync( test )
     sync : 1,
   });
   test.identical( got, true );
-  test.is( self.provider.filesAreHardLinked([ srcPath, dstPath ]) )
+  test.identical( self.provider.filesAreHardLinked([ srcPath, dstPath ]), null )
 
   /**/
 
@@ -19198,7 +19198,7 @@ function hardLinkSync( test )
     rewriting : 1,
     throwing : 1
   })
-  test.is( self.provider.filesAreHardLinked( paths ) );
+  test.identical( self.provider.filesAreHardLinked( paths ), null );
 
   /**/
 
@@ -19214,7 +19214,7 @@ function hardLinkSync( test )
     rewriting : 1,
     throwing : 1
   })
-  test.is( self.provider.filesAreHardLinked( paths ) );
+  test.identical( self.provider.filesAreHardLinked( paths ), null );
 
   /**/
 
@@ -19236,7 +19236,7 @@ function hardLinkSync( test )
     rewriting : 1,
     throwing : 1
   })
-  test.is( self.provider.filesAreHardLinked( paths ) );
+  test.identical( self.provider.filesAreHardLinked( paths ), null );
 
   /**/
 
@@ -19281,7 +19281,7 @@ function hardLinkSync( test )
     rewriting : 1,
     throwing : 1
   })
-  test.is( self.provider.filesAreHardLinked( paths ) );
+  test.identical( self.provider.filesAreHardLinked( paths ), null );
 
   /**/
 
@@ -19296,7 +19296,7 @@ function hardLinkSync( test )
     rewriting : 1,
     throwing : 1
   })
-  test.is( self.provider.filesAreHardLinked( paths ) );
+  test.identical( self.provider.filesAreHardLinked( paths ), null );
 
   /**/
 
@@ -19311,7 +19311,7 @@ function hardLinkSync( test )
     rewriting : 1,
     throwing : 1
   })
-  test.is( self.provider.filesAreHardLinked( paths ) );
+  test.identical( self.provider.filesAreHardLinked( paths ), null );
 
   /**/
 
@@ -19326,7 +19326,7 @@ function hardLinkSync( test )
     rewriting : 1,
     throwing : 1
   })
-  test.is( self.provider.filesAreHardLinked( paths ) );
+  test.identical( self.provider.filesAreHardLinked( paths ), null );
 
   /**/
 
@@ -19336,14 +19336,17 @@ function hardLinkSync( test )
   makeFiles( fileNames.slice( 0, 1 ), currentTestDir );
   var paths = fileNames.map( ( n )  => self.makePath( _.path.join( currentTestDir, n ) ) );
   paths = self.provider.path.s.normalize( paths );
-  self.provider.hardLink
-  ({
-    sync : 1,
-    dstPath : paths,
-    rewriting : 1,
-    throwing : 1
+  test.mustNotThrowError( () =>
+  {
+    self.provider.hardLink
+    ({
+      sync : 1,
+      dstPath : paths,
+      rewriting : 1,
+      throwing : 1
+    })
   })
-  test.is( self.provider.filesAreHardLinked( paths ) );
+  test.identical( self.provider.filesAreHardLinked( paths ), null );
   self.provider.fileWrite( paths[ paths.length - 1 ], fileNames[ fileNames.length - 1 ] );
   test.identical( self.provider.fileRead( paths[ 0 ] ), self.provider.fileRead( paths[ paths.length - 1 ] ) );
 
@@ -19397,7 +19400,7 @@ function hardLinkSync( test )
   files[ files.length - 1 ].stat.mtime = files[ 0 ].stat.mtime;
   files[ files.length - 1 ].stat.birthtime = files[ 0 ].stat.birthtime;
   self.provider.hardLink({ dstPath : files, allowDiffContent : 1 });
-  test.is( self.provider.filesAreHardLinked( paths ) ); */
+  test.identical( self.provider.filesAreHardLinked( paths ), null ); */
 
   /**/
 
@@ -19406,7 +19409,7 @@ function hardLinkSync( test )
   paths = self.provider.path.s.normalize( paths );
   var srcPath = paths.pop();
   self.provider.hardLink({ srcPath : srcPath, dstPath : paths });
-  test.is( self.provider.filesAreHardLinked( paths ) );
+  test.identical( self.provider.filesAreHardLinked( paths ), null );
   var src = self.provider.fileRead( srcPath );
   var dst = self.provider.fileRead( paths[ paths.length - 1 ] );
   test.identical( src, dst )
@@ -19428,7 +19431,7 @@ function hardLinkSync( test )
     dstPath : paths,
     sourceMode : 'modified>hardlinks<'
   });
-  test.is( self.provider.filesAreHardLinked( paths ) );
+  test.identical( self.provider.filesAreHardLinked( paths ), null );
   var srcPath = paths[ 2 ];
   test.identical( selectedFile.absolute, srcPath );
   var src = self.provider.fileRead( srcPath );
@@ -19450,7 +19453,7 @@ function hardLinkSync( test )
     dstPath : paths,
     sourceMode : 'modified>hardlinks>'
   });
-  test.is( self.provider.filesAreHardLinked( paths ) );
+  test.identical( self.provider.filesAreHardLinked( paths ), null );
   var srcPath = paths[ paths.length - 1 ];
   test.identical( selectedFile.absolute, srcPath );
   var src = self.provider.fileRead( srcPath );
@@ -19472,7 +19475,7 @@ function hardLinkSync( test )
     dstPath : paths,
     sourceMode : 'modified<hardlinks>'
   });
-  test.is( self.provider.filesAreHardLinked( paths ) );
+  test.identical( self.provider.filesAreHardLinked( paths ), null );
   var srcPath = paths[ 0 ];
   test.identical( selectedFile.absolute, srcPath );
   var src = self.provider.fileRead( srcPath );
@@ -19492,7 +19495,7 @@ function hardLinkSync( test )
     dstPath : paths,
     sourceMode : 'modified<hardlinks<'
   });
-  test.is( self.provider.filesAreHardLinked( paths ) );
+  test.identical( self.provider.filesAreHardLinked( paths ), null );
   var srcPath = paths[ 0 ];
   test.identical( selectedFile.absolute, srcPath );
   var src = self.provider.fileRead( srcPath );
@@ -19517,7 +19520,7 @@ function hardLinkSync( test )
     dstPath : paths,
     sourceMode : 'modified>hardlinks>'
   });
-  test.is( self.provider.filesAreHardLinked( paths ) );
+  test.identical( self.provider.filesAreHardLinked( paths ), null );
   var srcPath = paths[ 2 ];
   test.identical( selectedFile.absolute, srcPath );
   var src = self.provider.fileRead( srcPath );
@@ -19542,7 +19545,7 @@ function hardLinkSync( test )
     dstPath : paths,
     sourceMode : 'modified>hardlinks<'
   });
-  test.is( self.provider.filesAreHardLinked( paths ) );
+  test.identical( self.provider.filesAreHardLinked( paths ), null );
   var srcPath = paths[ 0 ];
   test.identical( selectedFile.absolute, srcPath );
   var src = self.provider.fileRead( srcPath );
@@ -19577,7 +19580,7 @@ function hardLinkRelativePath( test )
   var dstPath = test.context.makePath( 'written/hardLinkRelativePath/dstFile' );
   self.provider.filesDelete( dstPath );
   self.provider.hardLink( dstPath, srcPath );
-  test.is( self.provider.filesAreHardLinked( [ pathToFile, dstPath ] ) );
+  test.identical( self.provider.filesAreHardLinked( [ pathToFile, dstPath ] ), null );
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got,pathToFile );
 
@@ -19585,7 +19588,7 @@ function hardLinkRelativePath( test )
   var dstPath = test.context.makePath( 'written/hardLinkRelativePath/dstFile' );
   self.provider.filesDelete( dstPath );
   self.provider.hardLink( dstPath, srcPath );
-  test.is( self.provider.filesAreHardLinked( [ pathToFile, dstPath ] ) );
+  test.identical( self.provider.filesAreHardLinked( [ pathToFile, dstPath ] ), null );
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got,pathToFile );
 
@@ -19594,7 +19597,7 @@ function hardLinkRelativePath( test )
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.hardLink( dstPath, srcPath );
-  test.is( self.provider.filesAreHardLinked( [ pathToFile, dstPath ] ) );
+  test.identical( self.provider.filesAreHardLinked( [ pathToFile, dstPath ] ), null );
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got,pathToFile );
 
@@ -19603,7 +19606,7 @@ function hardLinkRelativePath( test )
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.hardLink( dstPath, srcPath );
-  test.is( self.provider.filesAreHardLinked( [ pathToFile, dstPath ] ) );
+  test.identical( self.provider.filesAreHardLinked( [ pathToFile, dstPath ] ), null );
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got,pathToFile );
 
@@ -19614,7 +19617,7 @@ function hardLinkRelativePath( test )
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.hardLink( dstPath, srcPath );
-  test.is( self.provider.filesAreHardLinked( [ pathToFile2, dstPath ] ) );
+  test.identical( self.provider.filesAreHardLinked( [ pathToFile2, dstPath ] ), null );
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got,pathToFile2 );
 
@@ -19625,7 +19628,7 @@ function hardLinkRelativePath( test )
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.hardLink( dstPath, srcPath );
-  test.is( self.provider.filesAreHardLinked( [ pathToFile2, dstPath ] ) );
+  test.identical( self.provider.filesAreHardLinked( [ pathToFile2, dstPath ] ), null );
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got,pathToFile2 );
 
@@ -19657,7 +19660,7 @@ function hardLinkRelativePath( test )
   var dstPathResolved = _.path.resolve( srcPath, dstPath );
   self.provider.filesDelete( dstPathResolved );
   self.provider.hardLink( dstPath, srcPath );
-  test.is( self.provider.filesAreHardLinked( [ pathToFile, dstPathResolved ] ) );
+  test.identical( self.provider.filesAreHardLinked( [ pathToFile, dstPathResolved ] ), null );
   var got = self.provider.fileRead({ filePath : dstPathResolved, resolvingSoftLink : 1 });
   test.identical( got,pathToFile );
 
@@ -19666,7 +19669,7 @@ function hardLinkRelativePath( test )
   var dstPathResolved = _.path.resolve( srcPath, dstPath );
   self.provider.filesDelete( dstPathResolved );
   self.provider.hardLink( dstPath, srcPath );
-  test.is( self.provider.filesAreHardLinked( [ pathToFile, dstPathResolved ] ) );
+  test.identical( self.provider.filesAreHardLinked( [ pathToFile, dstPathResolved ] ), null );
   var got = self.provider.fileRead({ filePath : dstPathResolved, resolvingSoftLink : 1 });
   test.identical( got,pathToFile );
 
@@ -19676,7 +19679,7 @@ function hardLinkRelativePath( test )
   var dstPathResolved = _.path.resolve( srcPath, dstPath );
   self.provider.filesDelete( dstPathResolved );
   self.provider.hardLink( dstPath, srcPath );
-  test.is( self.provider.filesAreHardLinked( [ pathToFile, dstPathResolved ] ) );
+  test.identical( self.provider.filesAreHardLinked( [ pathToFile, dstPathResolved ] ), null );
   var got = self.provider.fileRead({ filePath : dstPathResolved, resolvingSoftLink : 1 });
   test.identical( got,pathToFile );
 
@@ -19685,7 +19688,7 @@ function hardLinkRelativePath( test )
   var dstPathResolved = _.path.resolve( srcPath, dstPath );
   self.provider.filesDelete( dstPathResolved );
   self.provider.hardLink( dstPath, srcPath );
-  test.is( self.provider.filesAreHardLinked( [ pathToFile, dstPathResolved ] ) );
+  test.identical( self.provider.filesAreHardLinked( [ pathToFile, dstPathResolved ] ), null );
   var got = self.provider.fileRead({ filePath : dstPathResolved, resolvingSoftLink : 1 });
   test.identical( got,pathToFile );
 
@@ -19695,7 +19698,7 @@ function hardLinkRelativePath( test )
   self.provider.dirMakeForFile( dstPathResolved );
   self.provider.filesDelete( dstPathResolved );
   self.provider.hardLink( dstPath, srcPath );
-  test.is( self.provider.filesAreHardLinked( [ pathToFile, dstPathResolved ] ) );
+  test.identical( self.provider.filesAreHardLinked( [ pathToFile, dstPathResolved ] ), null );
   var got = self.provider.fileRead({ filePath : dstPathResolved, resolvingSoftLink : 1 });
   test.identical( got,pathToFile );
 
@@ -19705,7 +19708,7 @@ function hardLinkRelativePath( test )
   self.provider.dirMakeForFile( dstPathResolved );
   self.provider.filesDelete( dstPathResolved );
   self.provider.hardLink( dstPath, srcPath );
-  test.is( self.provider.filesAreHardLinked( [ pathToFile, dstPathResolved ] ) );
+  test.identical( self.provider.filesAreHardLinked( [ pathToFile, dstPathResolved ] ), null );
   var got = self.provider.fileRead({ filePath : dstPathResolved, resolvingSoftLink : 1 });
   test.identical( got,pathToFile );
 
@@ -19820,7 +19823,7 @@ function hardLinkExperiment( test )
     dstPath : paths,
     sourceMode : 'modified<hardlinks>'
   });
-  test.is( self.provider.filesAreHardLinked( paths ) );
+  test.identical( self.provider.filesAreHardLinked( paths ), null );
   var srcPath = paths[ 0 ];
   test.identical( selectedFile.absolute, srcPath );
   test.identical( selectedFile.stat.nlink, 4 );
@@ -20810,7 +20813,7 @@ function hardLinkAsync( test )
       rewriting : 1,
       throwing : 1
     })
-    .doThen( () => test.is( self.provider.filesAreHardLinked( paths ) ) );
+    .doThen( () => test.identical( self.provider.filesAreHardLinked( paths ), null ) );
   })
 
   /**/
@@ -20827,7 +20830,7 @@ function hardLinkAsync( test )
       rewriting : 1,
       throwing : 1
     })
-    .doThen( () => test.is( self.provider.filesAreHardLinked( paths ) ) );
+    .doThen( () => test.identical( self.provider.filesAreHardLinked( paths ), null ) );
   })
 
   /**/
@@ -20851,7 +20854,7 @@ function hardLinkAsync( test )
       rewriting : 1,
       throwing : 1
     })
-    .doThen( () => test.is( self.provider.filesAreHardLinked( paths ) ) );
+    .doThen( () => test.identical( self.provider.filesAreHardLinked( paths ), null ) );
   })
 
   /**/
@@ -20906,7 +20909,7 @@ function hardLinkAsync( test )
       rewriting : 1,
       throwing : 1
     })
-    .doThen( () => test.is( self.provider.filesAreHardLinked( paths ) ) );
+    .doThen( () => test.identical( self.provider.filesAreHardLinked( paths ), null ) );
   })
 
   /**/
@@ -20923,7 +20926,7 @@ function hardLinkAsync( test )
       rewriting : 1,
       throwing : 1
     })
-    .doThen( () => test.is( self.provider.filesAreHardLinked( paths ) ) );
+    .doThen( () => test.identical( self.provider.filesAreHardLinked( paths ), null ) );
   })
 
   .ifNoErrorThen( function( arg/*aaa*/ )
@@ -20938,7 +20941,7 @@ function hardLinkAsync( test )
       rewriting : 1,
       throwing : 1
     })
-    .doThen( () => test.is( self.provider.filesAreHardLinked( paths ) ) );
+    .doThen( () => test.identical( self.provider.filesAreHardLinked( paths ), null ) );
   })
 
   /**/
@@ -20955,7 +20958,7 @@ function hardLinkAsync( test )
       rewriting : 1,
       throwing : 1
     })
-    .doThen( () => test.is( self.provider.filesAreHardLinked( paths ) ) );
+    .doThen( () => test.identical( self.provider.filesAreHardLinked( paths ), null ) );
   })
 
   /**/
@@ -20976,7 +20979,7 @@ function hardLinkAsync( test )
     })
     .doThen( () =>
     {
-      test.is( self.provider.filesAreHardLinked( paths ) );
+      test.identical( self.provider.filesAreHardLinked( paths ), null );
       self.provider.fileWrite( paths[ paths.length - 1 ], fileNames[ fileNames.length - 1 ] );
       test.identical( self.provider.fileRead( paths[ 0 ] ), self.provider.fileRead( paths[ paths.length - 1 ] ) );
       return null;
@@ -21057,7 +21060,7 @@ function hardLinkAsync( test )
     })
     .doThen( () =>
     {
-      test.is( self.provider.filesAreHardLinked( paths ) );
+      test.identical( self.provider.filesAreHardLinked( paths ), null );
     });
   }) */
 
@@ -21081,7 +21084,7 @@ function hardLinkAsync( test )
     })
     .ifNoErrorThen( ( arg/*aaa*/ ) =>
     {
-      test.is( self.provider.filesAreHardLinked( paths ) );
+      test.identical( self.provider.filesAreHardLinked( paths ), null );
       var srcPath = paths[ paths.length - 1 ];
       test.identical( selectedFile.absolute, srcPath );
       var src = self.provider.fileRead( srcPath );
@@ -21115,7 +21118,7 @@ function hardLinkAsync( test )
     })
     .ifNoErrorThen( ( arg/*aaa*/ ) =>
     {
-      test.is( self.provider.filesAreHardLinked( paths ) );
+      test.identical( self.provider.filesAreHardLinked( paths ), null );
       var srcPath = paths[ 0 ];
       test.identical( selectedFile.absolute, srcPath );
       var dstPath = paths[ 1 ];

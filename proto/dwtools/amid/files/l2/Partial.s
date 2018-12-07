@@ -5595,7 +5595,7 @@ function _linkMultiple( o, link )
   _.assert( _.strIs( o.sourceMode ) || _.longIs( o.sourceMode ) );
 
   let needed = 0;
-  let records = self.recordFactory().records( o.dstPath );
+  let records = self.recordFactory({ allowingMissing : 1 }).records( o.dstPath ); //qqq : should allow missing files?
   let newestRecord;
   let mostLinkedRecord;
 
@@ -6822,7 +6822,8 @@ function _hardLinkSkip( c )
 {
   let self = this;
   let o = c.options;
-  if( self.filesAreHardLinked([ o.dstPath, o.srcPath ]) )
+  let linked = self.filesAreHardLinked([ o.dstPath, o.srcPath ]);
+  if( linked || linked === null ) //qqq : should skip if linked is null?
   return true;
 }
 

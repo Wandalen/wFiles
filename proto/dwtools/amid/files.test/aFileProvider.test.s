@@ -21185,6 +21185,7 @@ function hardLinkActAsync( test )
       got = _.mapOwnKeys( o );
       test.identical( got, expected );
       self.provider.filesDelete( dir );
+      return null;
     })
   })
 
@@ -21214,6 +21215,7 @@ function hardLinkActAsync( test )
       got = _.mapOwnKeys( o );
       test.identical( got, expected );
       self.provider.filesDelete( dir );
+      return null;
     })
   })
 
@@ -21244,6 +21246,7 @@ function hardLinkActAsync( test )
       got = _.mapOwnKeys( o );
       test.identical( got, expected );
       self.provider.filesDelete( dir );
+      return null;
     })
   })
 
@@ -21276,6 +21279,7 @@ function hardLinkActAsync( test )
       got = _.mapOwnKeys( o );
       test.identical( got, expected );
       self.provider.filesDelete( dir );
+      return null;
     })
   })
 
@@ -21307,6 +21311,7 @@ function hardLinkActAsync( test )
       got = _.mapOwnKeys( o );
       test.identical( got, expected );
       self.provider.filesDelete( dir );
+      return null;
     })
   })
 
@@ -21335,6 +21340,7 @@ function hardLinkActAsync( test )
       test.is( !self.provider.isHardLink( dstPath ) );
       got = _.mapOwnKeys( o );
       test.identical( got, expected );
+      return null;
     })
   })
 

@@ -779,9 +779,11 @@ function statReadAct( o )
         else
         con.give( null );
       }
-      debugger;
-      handleEnd( stat );
-      con.give( stat );
+      else
+      {
+        handleEnd( stat );
+        con.give( stat );
+      }
     }
   }
 

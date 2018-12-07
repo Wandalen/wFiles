@@ -20024,7 +20024,7 @@ function hardLinkActSync( test )
     var srcPath = _.path.join( dir,'src' );
     self.provider.fileWrite( filePath, filePath );
     self.provider.hardLink({ srcPath : filePath, dstPath : srcPath, sync : 1 });
-    test.is( self.provider.filesAreHardLinked( [ srcPath, filePath ] ) );
+    test.identical( self.provider.filesAreHardLinked( [ srcPath, filePath ] ), null );
     var dstPath = _.path.join( dir,'dst' );
     var o =
     {
@@ -20037,7 +20037,7 @@ function hardLinkActSync( test )
       sync : 1
     }
     self.provider.hardLinkAct( o );
-    test.is( self.provider.filesAreHardLinked( [ filePath, srcPath, dstPath ] ) );
+    test.identical( self.provider.filesAreHardLinked( [ filePath, srcPath, dstPath ] ), null );
     self.provider.fileWrite( dstPath, dstPath );
     var srcFile = self.provider.fileRead( srcPath );
     test.identical( srcFile, dstPath );

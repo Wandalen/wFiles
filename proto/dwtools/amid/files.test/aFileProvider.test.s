@@ -13554,7 +13554,7 @@ function fileWriteLinksSync( test )
   });
   test.identical( got, data );
   test.is( self.provider.isHardLink( dstPath ) );
-  test.is( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+  test.identical( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ), null );
 
   //
 
@@ -13605,7 +13605,7 @@ function fileWriteLinksSync( test )
   });
   test.identical( got, data + data + data );
   test.is( self.provider.isHardLink( dstPath ) );
-  test.is( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+  test.identical( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ), null );
 
   //
 
@@ -13656,7 +13656,7 @@ function fileWriteLinksSync( test )
   });
   test.identical( got, data + data + data );
   test.is( self.provider.isHardLink( dstPath ) );
-  test.is( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+  test.identical( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ), null );
 
   if( !test.context.symlinkIsAllowed() )
   return;
@@ -14559,7 +14559,7 @@ function fileWriteLinksAsync( test )
       });
       test.identical( got, data );
       test.is( self.provider.isHardLink( dstPath ) );
-      test.is( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+      test.identical( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ), null );
       return null;
     })
   })
@@ -14699,7 +14699,7 @@ function fileWriteLinksAsync( test )
       });
       test.identical( got, data + data + data );
       test.is( self.provider.isHardLink( dstPath ) );
-      test.is( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+      test.identical( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ), null );
       return null;
 
     })
@@ -14841,7 +14841,7 @@ function fileWriteLinksAsync( test )
       });
       test.identical( got, data + data + data );
       test.is( self.provider.isHardLink( dstPath ) );
-      test.is( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+      test.identical( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ), null );
       return null;
 
     })
@@ -17508,7 +17508,7 @@ function softLinkActSync( test )
     self.provider.softLinkAct( o )
   });
   test.is( !self.provider.isSoftLink( dstPath ) );
-  test.is( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+  test.identical( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ), null );
   var dstFile = self.provider.fileRead( dstPath );
   test.identical( dstFile, srcPath );
   self.provider.filesDelete( dir );
@@ -19909,7 +19909,7 @@ function hardLinkActSync( test )
   }
   var expected = _.mapOwnKeys( o );
   self.provider.hardLinkAct( o );
-  test.is( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+  test.identical( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ), null );
   var got = _.mapOwnKeys( o );
   test.identical( got, expected );
   self.provider.filesDelete( dir );
@@ -19977,7 +19977,7 @@ function hardLinkActSync( test )
     sync : 1
   }
   self.provider.hardLinkAct( o );
-  test.is( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+  test.identical( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ), null );
   self.provider.fileWrite( dstPath, dstPath );
   var srcFile = self.provider.fileRead( srcPath );
   test.identical( srcFile, dstPath );
@@ -20001,7 +20001,7 @@ function hardLinkActSync( test )
   }
   var expected = _.mapOwnKeys( o );
   self.provider.hardLinkAct( o );
-  test.is( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+  test.identical( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ), null );
   var got = _.mapOwnKeys( o );
   test.identical( got, expected );
   self.provider.filesDelete( dir );
@@ -20115,7 +20115,7 @@ function hardLinkActSync( test )
   {
     self.provider.hardLinkAct( o )
   });
-  test.is( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+  test.identical( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ), null );
   var dstFile = self.provider.fileRead( dstPath );
   test.identical( dstFile, srcPath );
   self.provider.filesDelete( dir );
@@ -20229,7 +20229,7 @@ function hardLinkActSync( test )
   expected.dstPath = self.provider.path.nativize( o.dstPath );
 
   self.provider.hardLinkAct( o );
-  test.is( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+  test.identical( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ), null );
   test.identical( o, expected );
   self.provider.filesDelete( dir );
 
@@ -20251,7 +20251,7 @@ function hardLinkActSync( test )
   }
   var expected = _.mapOwnKeys( o );
   self.provider.hardLinkAct( o );
-  test.is( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+  test.identical( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ), null );
   var got = _.mapOwnKeys( o );
   test.identical( got, expected );
   self.provider.filesDelete( dir );
@@ -20597,7 +20597,7 @@ function hardLinkAsync( test )
     .doThen( ( err, got ) =>
     {
       test.identical( got, true );
-      test.is( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+      test.identical( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ), null );
       return null;
     })
   })
@@ -21173,7 +21173,7 @@ function hardLinkActAsync( test )
     .doThen( ( err, got ) =>
     {
       test.identical( got, true );
-      test.is( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+      test.identical( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ), null );
       got = _.mapOwnKeys( o );
       test.identical( got, expected );
       self.provider.filesDelete( dir );
@@ -21355,7 +21355,7 @@ function hardLinkActAsync( test )
     .doThen( ( err, got ) =>
     {
       test.identical( got, true );
-      test.is( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
+      test.identical( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ), null );
       got = _.mapOwnKeys( o );
       test.identical( got, expected );
       self.provider.filesDelete( dir );

@@ -5793,6 +5793,7 @@ function _link_functor( gen )
     pathResolveLinks();
 
     // let dstStat;
+    if( c.srcStat === undefined )
     c.srcStat = self.statRead({ filePath : o.srcPath });
 
     if( skip() )
@@ -6090,14 +6091,21 @@ function _link_functor( gen )
 
       // if( self.path.isAbsolute( o.originalSrcPath ) )
       if( o.resolvingSrcSoftLink || o.resolvingSrcTextLink )
-      o.srcPath = self.pathResolveLink
-      ({
-        filePath : o.srcPath,
-        resolvingSoftLink : o.resolvingSrcSoftLink,
-        resolvingTextLink : o.resolvingSrcTextLink,
-        // resolvingHardLink : 0,
-      });
-
+      {
+        let o2 =
+        {
+          filePath : o.srcPath,
+          resolvingSoftLink : o.resolvingSrcSoftLink,
+          resolvingTextLink : o.resolvingSrcTextLink,
+          allowingMissing : o.allowingMissing,
+          throwing : o.throwing
+          // resolvingHardLink : 0,
+        }
+        c.srcPathResolved = self.pathResolveLink( o2 );
+        c.srcStat = o2.stat;
+        if( c.srcPathResolved )
+        o.srcPath = c.srcPathResolved;
+      }
     }
 
     /* - */

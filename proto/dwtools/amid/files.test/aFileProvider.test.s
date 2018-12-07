@@ -29831,6 +29831,19 @@ function pathResolveTextLink( test )
   var got1 = self.provider.pathResolveTextLink( o );
   test.identical( got1, linkPath2 );
 
+  test.case = 'Chain with absolute soft and text links';
+  self.provider.filesDelete( workDir );
+  self.provider.fileWrite( filePath, testData );
+  self.provider.softLink({ dstPath : linkPath, srcPath : filePath });
+  var o = { filePath : linkPath };
+  var got = self.provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
+  self.provider.textLink({ dstPath : linkPath2, srcPath : got });
+  o = { filePath : linkPath2 };
+  var got1 = self.provider.pathResolveTextLink( o );
+  test.identical( got1, linkPath );
+
+
 
   self.provider.fieldPop( 'usingTextLink', 1 )
 
@@ -29990,6 +30003,18 @@ function pathResolveTextLink( test )
   var got = self.provider.pathResolveTextLink( o );
   test.identical( got, linkPath );
   self.provider.softLink({ dstPath : linkPath, srcPath : '../file1', allowingMissing : 1, makingDirectory : 1  });
+  o = { filePath : linkPath2 };
+  var got1 = self.provider.pathResolveTextLink( o );
+  test.identical( got1, linkPath2 );
+
+  test.case = 'Chain with absolute soft and text links';
+  self.provider.filesDelete( workDir );
+  self.provider.fileWrite( filePath, testData );
+  self.provider.softLink({ dstPath : linkPath, srcPath : filePath });
+  var o = { filePath : linkPath };
+  var got = self.provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
+  self.provider.textLink({ dstPath : linkPath2, srcPath : got });
   o = { filePath : linkPath2 };
   var got1 = self.provider.pathResolveTextLink( o );
   test.identical( got1, linkPath2 );

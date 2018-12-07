@@ -17294,7 +17294,8 @@ function softLinkChain( test )
   test.identical( got, expected );
 
   var expected = path.join( dir, 'x' );
-  var got = provider.pathResolveLink({ filePath : path.join( dir, 'a/b/c' ), resolvingIntermediateDirectories : 1 });
+  var got = provider.pathResolveLinkChain({ filePath : path.join( dir, 'a/b/c' ), resolvingIntermediateDirectories : 1 });
+  got = got[ got.length - 1 ];
   var stat = provider.statResolvedRead( got );
   test.is( !!stat );
   test.identical( got, expected );

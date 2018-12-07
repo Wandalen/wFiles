@@ -15189,7 +15189,7 @@ function softLinkSync( test )
 
   self.provider.softLink
   ({
-    srcPath : srcPath,
+    srcPath : '../link_test',
     dstPath : srcPath,
     rewriting : 1,
     rewritingDirs : 1,
@@ -15210,9 +15210,48 @@ function softLinkSync( test )
   //   var got = self.provider.pathResolveLink({ filePath : srcPath, resolvingSoftLink : 1 });
   //   test.identical( got, srcPath )
   // }
+  test.mustNotThrowError(() =>
+  {
+    self.provider.pathResolveLink
+    ({
+      filePath : srcPath,
+      resolvingSoftLink : 1,
+      allowingMissing : 1,
+      throwing : 1
+    });
+  })
+
+  test.mustNotThrowError(() =>
+  {
+    self.provider.pathResolveLink
+    ({
+      filePath : srcPath,
+      resolvingSoftLink : 1,
+      allowingMissing : 1,
+      throwing : 0
+    });
+  })
+
+  test.mustNotThrowError(() =>
+  {
+    self.provider.pathResolveLink
+    ({
+      filePath : srcPath,
+      resolvingSoftLink : 1,
+      allowingMissing : 0,
+      throwing : 0
+    });
+  })
+
   test.shouldThrowError(() =>
   {
-    self.provider.pathResolveLink({ filePath : srcPath, resolvingSoftLink : 1 });
+    self.provider.pathResolveLink
+    ({
+      filePath : srcPath,
+      resolvingSoftLink : 1,
+      allowingMissing : 0,
+      throwing : 1
+    });
   })
 
   //
@@ -15232,7 +15271,17 @@ function softLinkSync( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   // if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   // {
-    test.shouldThrowError( () =>  self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 }) );
+    test.shouldThrowError( () =>
+    {
+      self.provider.pathResolveLink
+      ({
+        filePath : dstPath,
+        resolvingSoftLink : 1,
+        allowingMissing : 0,
+        throwing : 1
+      });
+    })
+
     self.provider.fileWrite( notExistingPath, notExistingPath );
     var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
     test.identical( got, notExistingPath );
@@ -15261,7 +15310,16 @@ function softLinkSync( test )
   test.is( self.provider.isSoftLink( dstPath ) );
  // if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   // {
-    test.shouldThrowError( () =>  self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 }) );
+    test.shouldThrowError( () =>
+    {
+      self.provider.pathResolveLink
+      ({
+        filePath : dstPath,
+        resolvingSoftLink : 1,
+        allowingMissing : 0,
+        throwing : 1
+      });
+    })
     self.provider.fileWrite( notExistingPath, notExistingPath );
     var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
     test.identical( got, notExistingPath );
@@ -15289,7 +15347,16 @@ function softLinkSync( test )
   test.is( self.provider.isSoftLink( dstPath ) );
  // if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   // {
-    test.shouldThrowError( () =>  self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 }) );
+    test.shouldThrowError( () =>
+    {
+      self.provider.pathResolveLink
+      ({
+        filePath : dstPath,
+        resolvingSoftLink : 1,
+        allowingMissing : 0,
+        throwing : 1
+      });
+    })
     self.provider.fileWrite( notExistingPath, notExistingPath );
     var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
     test.identical( got, notExistingPath );
@@ -15317,7 +15384,16 @@ function softLinkSync( test )
   test.is( self.provider.isSoftLink( dstPath ) );
 // if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   // {
-    test.shouldThrowError( () =>  self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 }) );
+    test.shouldThrowError( () =>
+    {
+      self.provider.pathResolveLink
+      ({
+        filePath : dstPath,
+        resolvingSoftLink : 1,
+        allowingMissing : 0,
+        throwing : 1
+      });
+    })
     self.provider.fileWrite( notExistingPath, notExistingPath );
     var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
     test.identical( got, notExistingPath );

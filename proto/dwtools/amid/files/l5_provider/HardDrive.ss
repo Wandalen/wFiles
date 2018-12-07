@@ -767,6 +767,22 @@ function statReadAct( o )
     StandardFile.lstat.apply( StandardFile, args );
 
     return con;
+
+    /* */
+
+    function handleAsyncEnd( err, stat )
+    {
+      if( err )
+      {
+        if( o.throwing )
+        con.error( _.err( err ) );
+        else
+        con.give( null );
+      }
+      debugger;
+      handleEnd( stat );
+      con.give( stat );
+    }
   }
 
   /* */
@@ -806,22 +822,6 @@ function statReadAct( o )
   function isHardLink()
   {
     return this.nlink >= 2;
-  }
-
-  /* */
-
-  function handleAsyncEnd( err, stat )
-  {
-    if( err )
-    {
-      if( o.throwing )
-      con.error( _.err( err ) );
-      else
-      con.give( null );
-    }
-    debugger;
-    handleEnd( stat );
-    con.give( stat );
   }
 
   /* */

@@ -8990,7 +8990,7 @@ function fileRenameAsync( test )
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function( got )
     {
-      test.identical( got, false );
+      test.identical( got, null );
       return got;
     });
   })
@@ -9028,7 +9028,7 @@ function fileRenameAsync( test )
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function( got )
     {
-      test.identical( got, false );
+      test.identical( got, null );
       return got;
     });
   })

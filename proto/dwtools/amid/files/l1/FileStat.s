@@ -35,7 +35,7 @@ Self.shortName = 'FileStat';
 //
 // --
 
-function init( filePath, o )
+function init( o )
 {
   let self = this;
 

@@ -209,8 +209,8 @@ function _statRead()
 
   _.assert( arguments.length === 0 );
 
-  if( record.real === '/self' )
-  debugger;
+  // if( record.real === '/dst/d' )
+  // debugger;
 
   if( c.stating || c.resolvingSoftLink || c.resolvingTextLink )
   {

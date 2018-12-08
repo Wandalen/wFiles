@@ -287,9 +287,6 @@ function filesFindSingle_body( o )
 
   _.assert( recordFactory.basePath === o.filter.basePath[ o.filePath ] );
 
-  // if( o.filePath === '/dst/dir' )
-  // debugger;
-
   let record = recordFactory.record( o.filePath );
 
   _.assert( recordFactory.dirPath === null );
@@ -297,9 +294,14 @@ function filesFindSingle_body( o )
   _.assert( recordFactory.effectiveFileProvider === o.filter.effectiveFileProvider );
   _.assert( recordFactory.fileProvider === o.filter.hubFileProvider );
 
+  // if( o.filePath === '/src' )
+  // debugger;
+
   forFile( record, o );
 
+  // if( o.filePath === '/src' )
   // debugger;
+
   return result;
 
   /* */
@@ -1567,6 +1569,9 @@ function filesReflectEvaluate_body( o )
     if( o.onDstName )
     relative = o.onDstName.call( self, relative, dstRecordFactory, op, o, srcRecord );
 
+    // if( srcRecord.absolute === '/src/d' )
+    // debugger;
+
     let dstRecord = dstRecordFactory.record( relative );
     let record = recordMake( dstRecord, srcRecord, srcRecord );
     record.reason = 'srcLooking';
@@ -1590,6 +1595,9 @@ function filesReflectEvaluate_body( o )
         record.upToDate = true;
       }
     }
+
+    // if( record.src.absolute === '/src/d' )
+    // debugger;
 
     /* */
 

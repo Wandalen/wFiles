@@ -44,7 +44,7 @@ var Proto =
   enabled : 1,
   verbosity : 4,
 
-  // routine : 'readWriteSync',
+  // routine : 'pathResolveTextLink',
 
   onSuiteBegin : onSuiteBegin,
   onSuiteEnd : onSuiteEnd,

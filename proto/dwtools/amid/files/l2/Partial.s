@@ -4296,9 +4296,12 @@ function _linkMultiple( o, link )
   _.assert( !!o );
   _.assert( _.strIs( o.srcPath ) || o.srcPath === null );
   _.assert( _.strIs( o.sourceMode ) || _.longIs( o.sourceMode ) );
+  _.assert( _.boolLike( o.allowingMissing ) );
+
+  debugger; xxx
 
   let needed = 0;
-  let records = self.recordFactory({ allowingMissing : 1 }).records( o.dstPath ); //qqq : should allow missing files?
+  let records = self.recordFactory({ allowingMissing : o.allowingMissing }).records( o.dstPath ); // Vova : should allow missing files?
   let newestRecord;
   let mostLinkedRecord;
 
@@ -4448,16 +4451,11 @@ function _link_functor( gen )
   let actMethod = gen.actMethod;
   let actMethodName = gen.actMethodName;
   let entryMethodName = _.strRemoveEnd( gen.actMethodName, 'Act' );
-  // let expectingAbsolutePaths = gen.expectingAbsolutePaths;
   let onVerify = gen.onVerify;
   let onSkip = gen.onSkip;
   let onRanameBegin = gen.onRanameBegin;
-  // let onAfterRaname = gen.onAfterRaname;
   let renaming = gen.renaming;
-  // let renamingHardLinks = gen.renamingHardLinks;
   let skippingSamePath = gen.skippingSamePath;
-  // let skippingHardLinked = gen.skippingHardLinked;
-  // let skippingSoftLinked = gen.skippingSoftLinked;
   let skippingMissing = gen.skippingMissing;
 
   _.assert( _.objectIs( actMethod ) || _.routineIs( actMethod ) );
@@ -4465,7 +4463,6 @@ function _link_functor( gen )
   _.assert( !onVerify || _.routineIs( onVerify ) );
   _.assert( !onSkip || _.routineIs( onSkip ) );
   _.assert( !onRanameBegin || _.routineIs( onRanameBegin ) );
-  // _.assert( !onAfterRaname || _.routineIs( onAfterRaname ) );
 
   /* - */
 
@@ -4473,6 +4470,7 @@ function _link_functor( gen )
   {
     let self = this;
     let path = self.path;
+
     let c = Object.create( null );
     c.linkAct = self[ actMethodName ];
     c.result = undefined;
@@ -4483,21 +4481,12 @@ function _link_functor( gen )
 
     verify( arguments );
 
-    if( _.longIs( o.dstPath ) && c.linkAct.having.hardLinking ) /* qqq : should work not only for hardlinks */
+    if( _.longIs( o.dstPath ) && c.linkAct.having.hardLinking ) /* qqq : _linkMultiple should work not only for hardlinks */
     return _linkMultiple.call( self, o, _link_body );
     _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
 
-    // if( entryMethodName === 'fileCopy' )
-    // debugger;
-    // self.logger.log( ' +', entryMethodName, ':', path.moveReport( o.dstPath, o.srcPath ) );
-    // debugger;
-
     pathResolve();
     pathResolveLinks();
-
-    // let dstStat;
-    if( c.srcStat === undefined )
-    c.srcStat = self.statRead({ filePath : o.srcPath });
 
     if( skip() )
     return end();
@@ -4526,9 +4515,6 @@ function _link_functor( gen )
           self.dirMakeForFile( o2.dstPath );
         }
 
-        // if( onAfterRaname )
-        // onAfterRaname.call( self, o2 );
-
         c.linkAct.call( self, o2 );
         log();
 
@@ -4555,9 +4541,6 @@ function _link_functor( gen )
     }
     else /* async */
     {
-
-      // _.assert( 0, 'synchronize with sync version' );
-
       let con = new _.Consequence().give( null )
 
       if( onRanameBegin )
@@ -4600,7 +4583,7 @@ function _link_functor( gen )
         {
           if( o.throwing )
           throw _.err( 'Cant', entryMethodName, o.dstPath, '<-', o.srcPath, '\n', err )
-          return false;
+          return false; /* qqq : linking routine should return null if error and throwing : 0 */
         })
       })
 
@@ -4615,11 +4598,8 @@ function _link_functor( gen )
       _.assert( _.routineIs( c.linkAct ), 'method', actMethodName, 'is not implemented' );
       _.assert( _.objectIs( c.linkAct.defaults ), 'method', actMethodName, 'does not have defaults, but should' );
       _.assertRoutineOptions( _link_body, args );
-      // debugger;
-      // _.assert( _.boolLike( o.breakingSrcHardLink ) );
       _.assert( _.boolLike( o.resolvingSrcSoftLink ) );
       _.assert( _.boolLike( o.resolvingSrcTextLink ) );
-      // _.assert( _.boolLike( o.breakingDstHardLink ) );
       _.assert( _.boolLike( o.resolvingDstSoftLink ) );
       _.assert( _.boolLike( o.resolvingDstTextLink ) );
       if( onVerify )
@@ -4678,19 +4658,6 @@ function _link_functor( gen )
         return true;
       }
 
-      // let skipping = false;
-      //
-      // if( skippingHardLinked )
-      // skipping = skipping || self.filesAreHardLinked([ o.dstPath, o.srcPath ]);
-      // if( skippingSoftLinked )
-      // skipping = skipping || self.filesAreSoftLinked([ o.dstPath, o.srcPath ]);
-      //
-      // if( skipping )
-      // {
-      //   end( true );
-      //   return true;
-      // }
-
       return false;
     }
 
@@ -4702,11 +4669,10 @@ function _link_functor( gen )
       if( !o.rewriting )
       throw _.err( 'Destination file ' + _.strQuote( o2.dstPath ) + ' exist and rewriting is off.' );
 
+      if( c.dstStat === undefined )
       c.dstStat = self.statRead
       ({
         filePath : o2.dstPath,
-        resolvingSoftLink : 0,
-        resolvingTextLink : 0,
         sync : 1,
       });
 
@@ -4726,12 +4692,11 @@ function _link_functor( gen )
       return self.statRead
       ({
         filePath : o2.dstPath,
-        resolvingSoftLink : 0,
-        resolvingTextLink : 0,
         sync : 0,
       })
       .ifNoErrorThen( ( stat ) =>
       {
+        _.assert( c.dstStat === undefined );
         c.dstStat = stat;
         if( c.dstStat.isDirectory() && !o.rewritingDirs )
         throw _.err( 'Destination file ' + _.strQuote( o2.dstPath ) + ' is a directory and rewritingDirs is off.' );
@@ -4777,22 +4742,31 @@ function _link_functor( gen )
       _.assert( path.isAbsolute( o.srcPath ) );
       _.assert( path.isAbsolute( o.dstPath ) );
 
-      /* "if" required because relative path should be preserved */
+      /*
+        temp fix : "if" required because relative path should be preserved
+      */
+
       if( o.resolvingDstSoftLink || o.resolvingDstTextLink )
-      o.dstPath = self.pathResolveLink
-      ({
-        filePath : o.dstPath,
-        resolvingSoftLink : o.resolvingDstSoftLink,
-        resolvingTextLink : o.resolvingDstTextLink,
-        // resolvingHardLink : 0,
-      });
+      {
+        let o2 =
+        {
+          filePath : o.dstPath,
+          resolvingSoftLink : o.resolvingDstSoftLink,
+          resolvingTextLink : o.resolvingDstTextLink,
+        }
+        c.dstPath = self.pathResolveLink( o2 );
+        c.dstStat = o2.stat;
+      }
+
+      // o.dstPath = self.pathResolveLink
+      // ({
+      //   filePath : o.dstPath,
+      //   resolvingSoftLink : o.resolvingDstSoftLink,
+      //   resolvingTextLink : o.resolvingDstTextLink,
+      // });
 
       /* */
 
-      /* qqq : pathResolveLink expects absolute path */
-      /* temp fix : "if" required because relative path should be preserved */
-
-      // if( self.path.isAbsolute( o.originalSrcPath ) )
       if( o.resolvingSrcSoftLink || o.resolvingSrcTextLink )
       {
         let o2 =
@@ -4802,13 +4776,17 @@ function _link_functor( gen )
           resolvingTextLink : o.resolvingSrcTextLink,
           allowingMissing : o.allowingMissing,
           throwing : o.throwing
-          // resolvingHardLink : 0,
         }
-        c.srcPathResolved = self.pathResolveLink( o2 );
+        c.srcResolvedPath = self.pathResolveLink( o2 );
         c.srcStat = o2.stat;
-        if( c.srcPathResolved )
-        o.srcPath = c.srcPathResolved;
+        if( c.srcResolvedPath )
+        o.srcPath = c.srcResolvedPath; /* qqq : what is srcResolvedPath for? */
       }
+      else
+      {
+        c.srcStat = self.statRead({ filePath : o.srcPath });
+      }
+
     }
 
     /* - */
@@ -5165,12 +5143,14 @@ let fileRename = _link_functor
 });
 
 var defaults = fileRename.body.defaults;
+
 defaults.rewriting = 0;
 defaults.rewritingDirs = 0;
 defaults.makingDirectory = 0;
 defaults.allowingMissing = 0;
 defaults.throwing = null;
 defaults.verbosity = null;
+
 defaults.resolvingSrcSoftLink = 1;
 defaults.resolvingSrcTextLink = 0;
 defaults.resolvingDstSoftLink = 0;
@@ -5268,8 +5248,6 @@ let fileCopy = _link_functor
   actMethod : fileCopyAct,
   actMethodName : 'fileCopyAct',
   onRanameBegin : _fileCopyRenameBegin,
-  // renaming : true,
-  // renamingHardLinks : false,
   skippingSamePath : true,
   skippingMissing : true,
 });
@@ -5440,7 +5418,9 @@ function _hardLinkSkip( c )
   let self = this;
   let o = c.options;
   let linked = self.filesAreHardLinked([ o.dstPath, o.srcPath ]);
-  if( linked || linked === null ) //qqq : should skip if linked is null?
+  // Vova : should skip if linked is null( not sure )?
+  // Kos : maybe
+  if( linked || linked === null )
   return true;
 }
 
@@ -5959,8 +5939,10 @@ function filesAreHardLinked_body( o )
   {
     for( let i = 1 ; i < o.filePath.length ; i++ )
     {
-      if( !self.filesAreHardLinkedAct( o.filePath[ 0 ], o.filePath[ i ] ) )
-      return false;
+      let r = self.filesAreHardLinkedAct( o.filePath[ 0 ], o.filePath[ i ] );
+      _.assert( _.boolIs( r ) );
+      if( !r )
+      return r;
     }
     return true;
   }
@@ -5992,8 +5974,9 @@ having.aspect = 'body';
 
 let filesAreHardLinked = _.routineFromPreAndBody( filesAreLinked_pre, filesAreHardLinked_body );
 
-filesAreHardLinked.having.driving = 0;
-filesAreHardLinked.having.aspect = 'entry';
+var having = filesAreHardLinked.having;
+having.driving = 0;
+having.aspect = 'entry';
 
 //
 

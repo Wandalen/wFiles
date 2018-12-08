@@ -1853,12 +1853,16 @@ let Extend =
   fileDeleteAct,
   dirMakeAct,
 
-  // link
+  // linking
 
   fileRenameAct,
   fileCopyAct,
   softLinkAct,
   hardLinkAct,
+
+  // link
+
+  // qqq : implement filesAreHardLinkedAct
 
   // etc
 

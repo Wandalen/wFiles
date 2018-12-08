@@ -239,6 +239,7 @@ function _statRead()
       throwing : 1,
     }
 
+    if( stat )
     record.real = c.effectiveFileProvider.pathResolveLink( o2 );
 
     _.assert( o2.stat === null || _.fileStatIs( o2.stat ) );

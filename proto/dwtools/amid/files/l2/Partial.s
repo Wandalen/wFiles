@@ -850,14 +850,14 @@ function pathResolveLinkChain_body( o )
   {
     o.err = { cycleInLinks : true }; /* xxx */ // used by Extract.statReadAct to get kind of error
     debugger;
-    if( o.throwing )
+    if( o.throwing && !o.allowingMissing )
     {
       throw _.err( 'Links cycle at', _.strQuote( o.filePath ) );
     }
     else
     {
-      o.result.push( o.filePath );
-      o.found.push( o.filePath );
+      o.result.push( o.filePath, o.stat );
+      o.found.push( o.filePath, o.stat );
       return o.result;
     }
   }
@@ -912,7 +912,7 @@ function pathResolveLinkChain_body( o )
     o.found.push( o.stat );
     o.result.push( o.stat );
 
-    if( o.result.length > 2 )
+    // if( o.result.length > 2 ) // should throw error if any part of chain does not exist
     if( o.throwing && !o.allowingMissing )
     {
       debugger;
@@ -1026,7 +1026,7 @@ function pathResolveLink_body( o )
   let r = self.pathResolveLinkChain.body.call( self, o2 );
   o.stat = o2.stat;
 
-  if( r[ r.length-1 ] === null )
+  if( r[ r.length-1 ] === null && o.allowingMissing )
   r = r[ r.length-2 ];
   else
   r = r[ r.length-1 ];
@@ -4298,7 +4298,7 @@ function _linkMultiple( o, link )
   _.assert( _.strIs( o.sourceMode ) || _.longIs( o.sourceMode ) );
 
   let needed = 0;
-  let records = self.recordFactory().records( o.dstPath );
+  let records = self.recordFactory({ allowingMissing : 1 }).records( o.dstPath ); //qqq : should allow missing files?
   let newestRecord;
   let mostLinkedRecord;
 
@@ -4496,6 +4496,7 @@ function _link_functor( gen )
     pathResolveLinks();
 
     // let dstStat;
+    if( c.srcStat === undefined )
     c.srcStat = self.statRead({ filePath : o.srcPath });
 
     if( skip() )
@@ -4573,6 +4574,7 @@ function _link_functor( gen )
         {
           return self.dirMakeForFile({ filePath : o2.dstPath, sync : 0 });
         }
+        return dstExists;
       });
 
       con.ifNoErrorThen( _.routineSeal( self, c.linkAct, [ o2 ] ) );
@@ -4792,14 +4794,21 @@ function _link_functor( gen )
 
       // if( self.path.isAbsolute( o.originalSrcPath ) )
       if( o.resolvingSrcSoftLink || o.resolvingSrcTextLink )
-      o.srcPath = self.pathResolveLink
-      ({
-        filePath : o.srcPath,
-        resolvingSoftLink : o.resolvingSrcSoftLink,
-        resolvingTextLink : o.resolvingSrcTextLink,
-        // resolvingHardLink : 0,
-      });
-
+      {
+        let o2 =
+        {
+          filePath : o.srcPath,
+          resolvingSoftLink : o.resolvingSrcSoftLink,
+          resolvingTextLink : o.resolvingSrcTextLink,
+          allowingMissing : o.allowingMissing,
+          throwing : o.throwing
+          // resolvingHardLink : 0,
+        }
+        c.srcPathResolved = self.pathResolveLink( o2 );
+        c.srcStat = o2.stat;
+        if( c.srcPathResolved )
+        o.srcPath = c.srcPathResolved;
+      }
     }
 
     /* - */
@@ -5430,7 +5439,8 @@ function _hardLinkSkip( c )
 {
   let self = this;
   let o = c.options;
-  if( self.filesAreHardLinked([ o.dstPath, o.srcPath ]) )
+  let linked = self.filesAreHardLinked([ o.dstPath, o.srcPath ]);
+  if( linked || linked === null ) //qqq : should skip if linked is null?
   return true;
 }
 
@@ -5486,12 +5496,22 @@ function textLinkAct( o )
   _.assert( path.is( o.srcPath ) );
   _.assert( path.isAbsolute( o.dstPath ) );
 
-  return self.fileWrite( o.dstPath, 'link ' + o.srcPath );
+  let srcPath = o.srcPath;
+  if( !self.path.isAbsolute( o.originalSrcPath ) )
+  srcPath = o.originalSrcPath;
+
+  let result = self.fileWrite({ filePath : o.dstPath, data : 'link ' + srcPath, sync : o.sync });
+
+  if( o.sync )
+  return true;
+  else
+  return result;
 }
 
 var defaults = textLinkAct.defaults = Object.create( null );
 defaults.dstPath = null;
 defaults.srcPath = null;
+defaults.sync = null;
 defaults.originalDstPath = null;
 defaults.originalSrcPath = null;
 

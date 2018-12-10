@@ -30721,39 +30721,26 @@ function pathResolveTextLink( test )
   );
 
   test.case = 'No arguments';
-  self.provider.filesDelete( workDir );
   test.shouldThrowError( () =>
     self.provider.pathResolveTextLink( )
   );
 
   test.case = 'Too many arguments';
-  self.provider.filesDelete( workDir );
-  self.provider.fileWrite( filePath, testData );
-  self.provider.textLink({ dstPath : linkPath, srcPath : filePath });
   test.shouldThrowError( () =>
     self.provider.pathResolveTextLink(  { filePath : linkPath },  { filePath : linkPath }   )
   );
 
   test.case = 'No filePath option';
-  self.provider.filesDelete( workDir );
-  self.provider.fileWrite( filePath, testData );
-  self.provider.textLink({ dstPath : linkPath, srcPath : filePath });
   test.shouldThrowError( () =>
     self.provider.pathResolveTextLink(  { otherPath : linkPath }   )
   );
 
   test.case = 'Two filePath options';
-  self.provider.filesDelete( workDir );
-  self.provider.fileWrite( filePath, testData );
-  self.provider.textLink({ dstPath : linkPath, srcPath : filePath });
   test.shouldThrowError( () =>
-    self.provider.pathResolveTextLink(  { filePath : linkPath, filePath : filePath }   )
+    self.provider.pathResolveTextLink(  { filePath : linkPath, filePath : linkPath2 }   )
   );
 
   test.case = 'Two allowingMissing options';
-  self.provider.filesDelete( workDir );
-  self.provider.fileWrite( filePath, testData );
-  self.provider.textLink({ dstPath : linkPath, srcPath : filePath });
   test.shouldThrowError( () =>
     self.provider.pathResolveTextLink(  { filePath : linkPath, allowingMissing : 1, allowingMissing : 1 }   )
   );
@@ -30762,19 +30749,15 @@ function pathResolveTextLink( test )
   test.shouldThrowError( () => self.provider.pathResolveTextLink( { filePath : undefined } ) );
 
   test.case = 'Wrong filePath options - number';
-  self.provider.filesDelete( workDir );
   test.shouldThrowError( () => self.provider.pathResolveTextLink( { filePath : 3.14159 } ) );
 
   test.case = 'Wrong filePath options - array';
-  self.provider.filesDelete( workDir );
   test.shouldThrowError( () => self.provider.pathResolveTextLink( { filePath : [ 0, 'a' ] } ) );
 
   test.case = 'Wrong filePath options - null';
-  self.provider.filesDelete( workDir );
   test.shouldThrowError( () => self.provider.pathResolveTextLink( { filePath : null } ) );
 
   test.case = 'Wrong filePath options - NaN';
-  self.provider.filesDelete( workDir );
   test.shouldThrowError( () => self.provider.pathResolveTextLink( { filePath : NaN } ) );
 
 }

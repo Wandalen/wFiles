@@ -348,9 +348,24 @@ function filesFindSingle_body( o )
     {
       let files = o.filter.effectiveFileProvider.dirRead({ filePath : or.absolute, outputFormat : 'absolute' });
 
-      if( o.allowingMissing )
+      // if( o.allowingMissing )
+      // if( files === null )
+      // files = [];
+
       if( files === null )
-      files = [];
+      {
+        if( o.allowingMissing )
+        {
+          files = [];
+        }
+        else
+        {
+          debugger;
+          files = o.filter.effectiveFileProvider.dirRead({ filePath : or.absolute, outputFormat : 'absolute' });
+          debugger;
+          throw _.err( 'Failed to read directory', _.strQuote( or.absolute ) );
+        }
+      }
 
       files = or.factory.records( files );
 

@@ -7941,6 +7941,8 @@ function _filesReflect( t, o )
   t.identical( p.hub.filesAreHardLinked([ p.src.globalFromLocal( '/src/a1' ), p.dst.globalFromLocal( '/dst/a1' ) ]), false );
   t.identical( p.hub.filesAreHardLinked([ p.src.globalFromLocal( '/src/a1' ), p.src.globalFromLocal( '/src/a1' ) ]), true );
 
+  debugger; return; xxx
+
   /* */
 
   var p = o.prepare();
@@ -13879,7 +13881,7 @@ var Self =
     filesReflectTrivial : filesReflectTrivial,
     filesReflectMutuallyExcluding : filesReflectMutuallyExcluding,
     filesReflectWithFilter : filesReflectWithFilter,
-    // filesReflect : filesReflect, // xxx
+    filesReflect : filesReflect, // xxx
     filesReflectRecursive : filesReflectRecursive,
     filesReflectGrab : filesReflectGrab,
     filesReflector : filesReflector,

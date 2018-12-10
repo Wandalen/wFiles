@@ -1,4 +1,4 @@
-( function _FileProvider_HardDrive_FilesFind_test_ss_( ) {
+( function _FilesFind_HardDrive_test_ss_( ) {
 
 'use strict';
 
@@ -38,7 +38,7 @@ function onSuiteEnd()
 var Proto =
 {
 
-  name : 'Tools/mid/files/fileProvider/HardDrive/FilesFind',
+  name : 'Tools/mid/files/FilesFind/HardDrive',
   abstract : 0,
   silencing : 1,
   enabled : 1,

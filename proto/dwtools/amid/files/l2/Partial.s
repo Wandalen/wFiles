@@ -4998,7 +4998,7 @@ function _link_functor( gen )
           resolvingSoftLink : o.resolvingDstSoftLink,
           resolvingTextLink : o.resolvingDstTextLink,
         }
-        c.dstPath = self.pathResolveLinkFull( o2 );
+        o.dstPath = self.pathResolveLinkFull( o2 );
         c.dstStat = o2.stat;
       }
 

@@ -30764,7 +30764,7 @@ function pathResolveLinkExperiments( test )
 
   /**/
 
-  test.case = 'not existing file';
+  test.case = 'not existing file, allowingMissing : 0';
   self.provider.filesDelete( _.path.dir( filePath ) );
 
   // works after change in pathResolveLinkHeadDirect
@@ -30779,6 +30779,36 @@ function pathResolveLinkExperiments( test )
      throwing : 0,
   });
   test.identical( got, null );
+
+  test.case = 'not existing file, allowingMissing : 1';
+
+  var got = self.provider.pathResolveLinkFull
+  ({
+     filePath : filePath,
+     allowingMissing : 1,
+     resolvingHeadDirect : 1,
+     resolvingHeadReverse : 1,
+     resolvingSoftLink : 1,
+     resolvingTextLink : 1,
+     throwing : 0,
+  });
+  test.identical( got, filePath );
+
+  test.case = 'not existing file, allowingMissing : 0, resolvingHeadDirect : 0, resolvingHeadReverse : 0';
+
+  var got = self.provider.pathResolveLinkFull
+  ({
+     filePath : filePath,
+     allowingMissing : 0,
+     resolvingHeadDirect : 0,
+     resolvingHeadReverse : 0,
+     resolvingSoftLink : 1,
+     resolvingTextLink : 1,
+     throwing : 0,
+  });
+  test.identical( got, null );
+
+  debugger; return; xxx
 
   //
 

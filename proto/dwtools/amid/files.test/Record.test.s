@@ -132,7 +132,7 @@ function record( test )
   var recordContext = _.FileRecordFactory( o, { dirPath : _.path.dir( dir ) } ).form();
   var got = recordContext.record({ input : filePath, context : recordContext });
   check( got, filePath,recordContext );
-  test.identical( got.stat.isDirectory(), true )
+  test.identical( got.stat.isDir(), true )
   test.identical( got.isDir, true );
 
   /*relative path without dir/relative options*/
@@ -165,7 +165,7 @@ function record( test )
   var got = recordContext.record({ input : filePath, context : recordContext });
   // test.identical( got.relative, './file.test/Record.test.s' );
   test.identical( got.relative, './' + _.path.relative( _.path.join( __filename, '../..' ) ,__filename ) );
-  test.identical( got.stat.isFile(), true );
+  test.identical( got.stat.isTerminal(), true );
 
   /*relative option can be any absolute path*/
 
@@ -174,7 +174,7 @@ function record( test )
   var got = recordContext.record({ input : filePath, context : recordContext });
   test.identical( got.relative, '..' + filePath );
   test.identical( got.absolute, filePath );
-  test.identical( got.stat.isFile(), true );
+  test.identical( got.stat.isTerminal(), true );
 
   /*dir option can be any absolute path*/
 
@@ -183,7 +183,7 @@ function record( test )
   var got = recordContext.record({ input : filePath, context : recordContext });
   test.identical( got.relative, '..' + filePath );
   test.identical( got.absolute, filePath );
-  test.identical( got.stat.isFile(), true );
+  test.identical( got.stat.isTerminal(), true );
 
   /*relative option is path to dir on other drive*/
 
@@ -192,7 +192,7 @@ function record( test )
   var got = recordContext.record({ input : filePath, context : recordContext });
   test.identical( got.relative, '../..' + filePath );
   test.identical( got.absolute, filePath );
-  test.identical( got.stat.isFile(), true );
+  test.identical( got.stat.isTerminal(), true );
 
   /*dir option is path to dir on other drive*/
 
@@ -201,7 +201,7 @@ function record( test )
   var got = recordContext.record({ input : filePath, context : recordContext });
   test.identical( got.relative, '../..' + filePath );
   test.identical( got.absolute, filePath );
-  test.identical( got.stat.isFile(), true );
+  test.identical( got.stat.isTerminal(), true );
 
 
   /*dir path must be absolute*/

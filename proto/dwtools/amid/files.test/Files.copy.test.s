@@ -589,7 +589,7 @@ function filesCopyWithAdapter2( test )
     var files = _.fileProvider.filesFind
     ({
       filePath : filePath,
-      includingBase : 0,
+      includingStem : 0,
       includingTransient : 1,
       includingDirs : 1,
       includingTerminals : 1,
@@ -603,9 +603,9 @@ function filesCopyWithAdapter2( test )
 
       var r = files[ i ];
 
-      if( r.stat.isFile() )
+      if( r.stat.isTerminal() )
       set = _.fileProvider.fileRead( r.absolute );
-      if( r.stat.isDirectory() )
+      if( r.stat.isDir() )
       set = {};
 
       _.selectSet

@@ -235,20 +235,20 @@ function filesFindSingle_body( o )
   let path = self.path;
 
   o.filter.effectiveFileProvider._providerDefaults( o ); /* !!! */
+  // o.filter.effectiveFileProvider.assertProviderDefaults( o );
 
-  _.assert( _.objectIs( o.filter.effectiveFileProvider ) );
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assertRoutineOptions( filesFindSingle_body, o );
   _.assert( _.routineIs( o.onUp ) || _.arrayIs( o.onUp ) );
   _.assert( _.routineIs( o.onDown ) || _.arrayIs( o.onDown ) );
-  _.assert( path.isNormalized( o.filePath ) );
+  _.assert( path.isNormalized( o.filePath ), 'Expects normalized path {-o.filePath-}' );
   _.assert( path.isAbsolute( o.filePath ), 'Expects absolute path {-o.filePath-}' );
-  _.assert( !!o.filter.formed, 'Expects formed filter' );
-  _.assert( _.mapIs( o.filter.basePath ), 'Expects absolute path {-o.filter.basePath-}' );
 
+  _.assert( o.filter.formed === 5, 'Expects formed filter' );
+  _.assert( _.objectIs( o.filter.effectiveFileProvider ) );
+  _.assert( _.mapIs( o.filter.basePath ), 'Expects absolute path {-o.filter.basePath-}' );
   _.assert( o.filter.effectiveFileProvider instanceof _.FileProvider.Abstract );
   _.assert( o.filter.hubFileProvider === o.filter.effectiveFileProvider || o.filter.hubFileProvider instanceof _.FileProvider.Hub );
-  _.assert( o.filter.formed === 5 );
 
   /* handler */
 
@@ -267,13 +267,8 @@ function filesFindSingle_body( o )
   /* */
 
   let recordAdd = recordAdd_functor( o );
-  let result = o.result = o.result || [];
-
+  o.result = o.result || [];
   Object.freeze( o );
-
-  if( o.allowingMissing )
-  if( !o.filter.effectiveFileProvider.fileExists( o.filePath ) )
-  return result;
 
   let o2 =
   {
@@ -284,111 +279,37 @@ function filesFindSingle_body( o )
   _.assert( _.strDefined( o2.basePath ), 'No base path for', o.filePath );
 
   let recordFactory = _.FileRecordFactory.TollerantMake( o, o2 ).form();
+  let stemRecord = recordFactory.record( o.filePath );
 
   _.assert( recordFactory.basePath === o.filter.basePath[ o.filePath ] );
-
-  // if( o.filePath === '/dst/dir' )
-  // debugger;
-
-  let record = recordFactory.record( o.filePath );
-
   _.assert( recordFactory.dirPath === null );
-  _.assert( record.isStem === true );
+  _.assert( stemRecord.isStem === true );
   _.assert( recordFactory.effectiveFileProvider === o.filter.effectiveFileProvider );
   _.assert( recordFactory.fileProvider === o.filter.hubFileProvider );
 
-  forFile( record, o );
-
-  // debugger;
-  return result;
-
-  /* */
-
-  function handleUp( record, op )
+  if( !stemRecord.stat )
   {
-    _.assert( arguments.length === 2 );
-
-    record = op.onUp.call( self, record, op );
-
-    return record;
+    if( o.allowingMissing )
+    {
+      // recordAdd( stemRecord );
+      return o.result;
+    }
+    debugger;
+    throw _.err( 'Stem file does not exist', _.strQuote( stemRecord.absolute ) );
   }
 
-  /* */
+  forStem( stemRecord, o );
 
-  function handleDown( record, op )
-  {
-    _.assert( arguments.length === 2 );
-
-    record = op.onDown.call( self, record, op );
-
-    return record;
-  }
-
-  /* add result */
-
-  function recordAdd_functor( o )
-  {
-    let recordAdd;
-
-    if( o.outputFormat === 'absolute' )
-    recordAdd = function( record )
-    {
-      _.assert( arguments.length === 1, 'Expects single argument' );
-      o.result.push( record.absolute );
-    }
-    else if( o.outputFormat === 'relative' )
-    recordAdd = function( record )
-    {
-      _.assert( arguments.length === 1, 'Expects single argument' );
-      o.result.push( record.relative );
-    }
-    else if( o.outputFormat === 'record' )
-    recordAdd = function( record )
-    {
-      _.assert( arguments.length === 1, 'Expects single argument' );
-      o.result.push( record );
-    }
-    else if( o.outputFormat === 'nothing' )
-    recordAdd = function( record )
-    {
-    }
-    else _.assert( 0,'unexpected output format :',o.outputFormat );
-
-    return recordAdd;
-  }
+  return o.result;
 
   /* */
 
-  // function forPath( filePath, o )
-  // {
-  //
-  //   let o2 =
-  //   {
-  //     fileProvider : self,
-  //     effectiveFileProvider : o.filter.effectiveFileProvider,
-  //     stemPath : filePath,
-  //     basePath : o.filter.basePath[ filePath ],
-  //   };
-  //
-  //   _.assert( _.strDefined( o2.basePath ), 'No base path for', filePath );
-  //
-  //   let recordFactory = _.FileRecordFactory.TollerantMake( o, o2 ).form();
-  //   let record = recordFactory.record( filePath );
-  //
-  //   _.assert( recordFactory.dirPath === null );
-  //   _.assert( record.isStem === true );
-  //
-  //   forFile( record, o );
-  // }
-
-  /* */
-
-  function forFile( record, o )
+  function forStem( record, o )
   {
-    if( record.isDir )
+    // debugger;
     forDirectory( record, o )
-    else
     forTerminal( record, o )
+    // debugger;
   }
 
   /* */
@@ -405,25 +326,18 @@ function filesFindSingle_body( o )
     let isTransient = r.isTransient;
     let includingTransient = ( o.includingTransient && r.isTransient && o.includingDirs );
     let includingActual = ( o.includingActual && r.isActual && o.includingDirs );
-    let including = !!r.stat;
+    // let including = !!r.stat;
+    let including = true;
     including = including && ( includingTransient || includingActual );
-    including = including && ( o.includingBase || !r.isStem );
-
-    // console.log( 'forDirectory', r.absolute );
-    // debugger;
+    including = including && ( o.includingStem || !r.isStem );
 
     /* up */
 
     if( including )
     {
       r = handleUp( r, o );
-
-      _.assert( r === false || r === _.dont || _.objectIs( r ) );
-      // _.assert( r === false || _.objectIs( r ) );
-
       if( r === false || r === _.dont )
       return false;
-
       recordAdd( r );
     }
 
@@ -432,14 +346,13 @@ function filesFindSingle_body( o )
     if( isTransient && o.recursive )
     if( o.recursive === '2' || or.isStem )
     {
-
       let files = o.filter.effectiveFileProvider.dirRead({ filePath : or.absolute, outputFormat : 'absolute' });
 
       if( o.allowingMissing )
       if( files === null )
       files = [];
 
-      files = or.context.records( files );
+      files = or.factory.records( files );
 
       if( Config.debug )
       for( let f = 0 ; f < files.length ; f++ )
@@ -492,23 +405,73 @@ function filesFindSingle_body( o )
     let or = r;
     let includingTransient = ( o.includingTransient && r.isTransient && o.includingTerminals );
     let includingActual = ( o.includingActual && r.isActual && o.includingTerminals );
-    let including = !!r.stat;
+    // let including = !!r.stat;
+    let including = true;
     including = including && ( includingTransient || includingActual );
-    including = including && ( o.includingBase || !or.isStem );
+    including = including && ( o.includingStem || !or.isStem );
 
     if( !including )
     return;
 
     r = handleUp( r, o );
-
-    _.assert( r === false || r === _.dont || _.objectIs( r ) );
-
     if( r === false || r === _.dont )
     return false;
-
     recordAdd( r );
 
     handleDown( r, o );
+  }
+
+  /* - */
+
+  function handleUp( record, op )
+  {
+    _.assert( arguments.length === 2 );
+    let result = op.onUp.call( self, record, op );
+    _.assert( result === false || result === _.dont || result === record, 'onUp should return original record or _.dont, but got', _.toStrShort( result ) );
+    return result;
+  }
+
+  /* - */
+
+  function handleDown( record, op )
+  {
+    _.assert( arguments.length === 2 );
+    let result = op.onDown.call( self, record, op );
+    // _.assert( result === undefined || result === record, 'onDown should return original record or undefined, but got', _.toStrShort( result ) ); // xxx
+    return result;
+  }
+
+  /* - */
+
+  function recordAdd_functor( o )
+  {
+    let recordAdd;
+
+    if( o.outputFormat === 'absolute' )
+    recordAdd = function( record )
+    {
+      _.assert( arguments.length === 1, 'Expects single argument' );
+      o.result.push( record.absolute );
+    }
+    else if( o.outputFormat === 'relative' )
+    recordAdd = function( record )
+    {
+      _.assert( arguments.length === 1, 'Expects single argument' );
+      o.result.push( record.relative );
+    }
+    else if( o.outputFormat === 'record' )
+    recordAdd = function( record )
+    {
+      _.assert( arguments.length === 1, 'Expects single argument' );
+      o.result.push( record );
+    }
+    else if( o.outputFormat === 'nothing' )
+    recordAdd = function( record )
+    {
+    }
+    else _.assert( 0,'unexpected output format :',o.outputFormat );
+
+    return recordAdd;
   }
 
 }
@@ -517,27 +480,26 @@ filesFindSingle_body.defaults =
 {
 
   filePath : null,
-
-  allowingMissing : 0,
-  maskPreset : 'default.exclude',
+  filter : null,
 
   includingTerminals : 1,
   includingDirs : 0,
   includingActual : 1,
   includingTransient : 0,
-  includingBase : 1,
+  includingStem : 1,
 
+  allowingMissing : 0,
   recursive : '1',
+
+  resolving : 1,
   resolvingSoftLink : 1,
   resolvingTextLink : 0,
 
+  maskPreset : 'default.exclude',
   outputFormat : 'record',
   result : [],
-
   onUp : [],
   onDown : [],
-
-  filter : null,
 
 }
 
@@ -1206,7 +1168,7 @@ function filesReflectEvaluate_body( o )
     _.assert( o.srcPath === o.srcFilter.stemPath );
 
     let srcOptions = _.mapOnly( o, self.filesFindSingle.defaults );
-    srcOptions.includingBase = 1;
+    srcOptions.includingStem = 1;
     srcOptions.includingTransient = 1;
     srcOptions.verbosity = 0;
     srcOptions.filter = o.srcFilter;
@@ -1244,7 +1206,7 @@ function filesReflectEvaluate_body( o )
     let dstOptions = _.mapExtend( null, srcOptions );
     dstOptions.filter = o.dstFilter;
     dstOptions.filePath = o.dstPath;
-    dstOptions.includingBase = 1;
+    dstOptions.includingStem = 1;
     dstOptions.recursive = '2';
     dstOptions.verbosity = 0;
     dstOptions.result = null;
@@ -1396,6 +1358,10 @@ function filesReflectEvaluate_body( o )
     record.deleteFirst = false;
     record.touch = false;
     record.include = true;
+
+    dstRecord.associated = record;
+    srcRecord.associated = record;
+
     return record;
   }
 
@@ -1424,7 +1390,6 @@ function filesReflectEvaluate_body( o )
     if( !o.includingTerminals && !record.effective.isDir )
     return end( record );
 
-    // _.assert( _.arrayIs( o.onUp ) );
     _.assert( _.routineIs( o.onUp ) );
     _.assert( arguments.length === 2 );
 
@@ -1434,15 +1399,6 @@ function filesReflectEvaluate_body( o )
     let r = o.onUp.call( self, record, o );
     if( r === _.dont )
     return end( false );
-
-    // for( let i = 0 ; i < o.onUp.length ; i++ )
-    // {
-    //   let routine = o.onUp[ i ];
-    //   result = routine.call( self, record, o ) && result;
-    //   _.assert( result !== undefined );
-    //   if( r === false || r === _.dont )
-    //   return end( false );
-    // }
 
     return end( record );
 
@@ -1462,248 +1418,13 @@ function filesReflectEvaluate_body( o )
 
   /* */
 
-  function handleDown( record, op )
-  {
-
-    // if( _.strEnds( record.dst.absolute, debugPath ) )
-    // debugger;
-
-    if( touchMap[ record.dst.absolute ] )
-    touch( record, touchMap[ record.dst.absolute ] );
-    _.assert( touchMap[ record.dst.absolute ] === record.touch || !record.touch );
-
-    let srcExists = !!record.src.stat;
-    let dstExists = !!record.dst.stat;
-
-    // _.assert( _.arrayIs( o.onDown ) );
-    _.assert( !!record.dst && !!record.src );
-    _.assert( arguments.length === 2 );
-
-    if( !record.include )
-    return end( false );
-
-    if( !o.includingDst && record.effective === record.dst )
-    return end( record );
-
-    if( !o.includingDirs && record.effective.isDir )
-    return end( record );
-
-    if( !o.includingTerminals && !record.effective.isDir )
-    return end( record );
-
-    handleDown2.call( self, record, o );
-    // _.routinesCall( self, o.onDown, [ record,o ] );
-    let r = o.onDown.call( self, record, o );
-    _.assert( r !== _.dont );
-    // if( r === _.dont )
-    // return end( false );
-
-    _.assert( record.include === true );
-    _.assert( record.action !== 'exclude' || record.touch === false )
-
-    if( touchMap[ record.dst.absolute ] )
-    touch( record, touchMap[ record.dst.absolute ] );
-    _.assert( touchMap[ record.dst.absolute ] === record.touch || !record.touch );
-
-    if( !srcExists && record.reason === 'srcLooking' )
-    return end( false );
-
-    if( !record.src.isActual && !record.dst.isActual && !record.touch )
-    return end( false );
-
-    if( !o.includingNonAllowed && !record.allow )
-    return end( false );
-
-    return end( record.touch );
-
-    function end( result )
-    {
-      if( result === false )
-      {
-        if( record.include )
-        recordRemove( record );
-        record.include = false;
-      }
-      return result;
-    }
-  }
-
-  /* */
-
-  function handleDstUp( srcContext, reason, dstFilter, dstRecord, op )
-  {
-
-    _.assert( arguments.length === 5 );
-    _.assert( _.strIs( reason ) );
-    let srcRecord = srcContext.record( dstRecord.relative );
-    let record = recordMake( dstRecord, srcRecord, dstRecord );
-    record.reason = reason;
-
-    // if( _.strEnds( record.dst.absolute, debugPath ) )
-    // debugger;
-
-    if( handleUp( record, op ) === false )
-    record.include = false;
-
-    return record;
-  }
-
-  /* */
-
-  function handleDstDown( record, op )
-  {
-    // if( _.strEnds( record.dst.absolute, debugPath ) )
-    // debugger;
-
-    handleDown( record, op );
-    return record;
-  }
-
-  /* */
-
-  function handleSrcUp( srcRecord, op )
-  {
-    let relative = srcRecord.relative;
-    if( o.onDstName )
-    relative = o.onDstName.call( self, relative, dstRecordFactory, op, o, srcRecord );
-
-    let dstRecord = dstRecordFactory.record( relative );
-    let record = recordMake( dstRecord, srcRecord, srcRecord );
-    record.reason = 'srcLooking';
-
-    // if( _.strEnds( record.dst.absolute, debugPath ) )
-    // debugger;
-
-    if( o.filesGraph )
-    {
-      if( record.dst.absolute === o.dstPath )
-      {
-        o.filesGraph.dstPath = o.dstPath;
-        o.filesGraph.srcPath = o.srcPath;
-        o.filesGraph.actionBegin( o.dstPath + ' <- ' + o.srcPath );
-      }
-      if( !record.src.isDir )
-      {
-        o.filesGraph.filesUpdate( record.dst );
-        o.filesGraph.filesUpdate( record.src );
-        if( o.filesGraph.fileIsUpToDate( record.dst ) )
-        record.upToDate = true;
-      }
-    }
-
-    /* */
-
-    handleUp( record, op );
-
-    if( o.includingDst && record.include && record.src.isActual && record.src.stat )
-    if( record.dst.isDir && !record.src.isDir )
-    {
-      /* src is terminal, dst is dir */
-
-      _.assert( _.strIs( record.dst.context.basePath ) );
-      let filter2 = self.recordFilter
-      ({
-        effectiveFileProvider : dstOptions.filter.effectiveFileProvider,
-        hubFileProvider : dstOptions.filter.hubFileProvider,
-      });
-      filter2.inFilePath = null;
-      filter2.basePath = record.dst.context.basePath;
-
-      let dstOptions2 = _.mapExtend( null, dstOptions );
-      dstOptions2.filePath = record.dst.absolute;
-      dstOptions2.filter = filter2;
-      dstOptions2.filter.stemPath = null;
-      dstOptions2.includingBase = 0;
-      dstOptions2.onUp = [ _.routineJoin( undefined, handleDstUp, [ srcRecord.context, 'dstRewriting', filter2 ] ) ];
-
-      let found = self.filesFind( dstOptions2 );
-
-    }
-
-    /* */
-
-    if( record.include && record.goingUp )
-    return record;
-    else
-    return _.dont;
-  }
-
-  /* */
-
-  function handleSrcDown( record, op )
-  {
-
-    if( o.filesGraph && !record.src.isDir && !record.upToDate )
-    {
-      record.dst.reval();
-      o.filesGraph.dependencyAdd( record.dst, record.src );
-    }
-
-    // if( _.strEnds( record.dst.absolute, debugPath ) )
-    // debugger;
-
-    if( o.includingDst )
-    if( record.dst.isDir && record.src.isDir )
-    {
-      _.assert( _.strIs( record.dst.context.basePath ) );
-      _.assert( _.strIs( record.src.context.basePath ) );
-
-      let dstFiles = record.dst.context.effectiveFileProvider.dirRead({ filePath : record.dst.absolute, outputFormat : 'absolute' });
-      let dstRecords = record.dst.context.records( dstFiles );
-      let srcFiles = record.src.context.effectiveFileProvider.dirRead({ filePath : record.src.absolute, outputFormat : 'absolute' });
-      let srcRecords = record.src.context.records( srcFiles );
-
-      for( let f = dstRecords.length-1 ; f >= 0 ; f-- )
-      {
-        let dstRecord = dstRecords[ f ];
-
-        // if( _.strEnds( dstRecord.absolute, debugPath ) )
-        // debugger;
-
-        let srcRecord = _.arrayLeft( srcRecords, dstRecord, ( r ) => r.relative ).element;
-        if( !srcRecord )
-        continue;
-        if( /*dstRecord.isActual &&*/ dstRecord.isDir && !srcRecord.isActual )
-        continue;
-        dstRecords.splice( f, 1 );
-      }
-
-      for( let f = 0 ; f < dstRecords.length ; f++ )
-      {
-        // if( _.strEnds( dstRecords[ f ].absolute, debugPath ) )
-        // debugger;
-
-        let dstOptions2 = _.mapExtend( null, dstOptions );
-        dstOptions2.filePath = dst.path.join( record.dst.context.basePath, dstRecords[ f ].absolute );
-        dstOptions2.filter = dstOptions2.filter.clone();
-        dstOptions2.filter.stemPath = null;
-        dstOptions2.filter.inFilePath = null;
-        dstOptions2.filter.basePath = record.dst.context.basePath;
-        dstOptions2.onUp = [ _.routineJoin( null, handleDstUp, [ record.src.context, 'dstDeleting', null ] ) ];
-        let found = self.filesFind( dstOptions2 );
-      }
-    }
-
-    handleDown( record, op );
-
-    if( o.filesGraph )
-    {
-      if( record.dst.absolute === o.dstPath )
-      o.filesGraph.actionEnd();
-    }
-
-    return record;
-  }
-
-  /* */
-
   function handleUp2( record, op )
   {
 
     let a = actionMap[ record.dst.absolute ];
     let t = touchMap[ record.dst.absolute ];
 
-    // if( _.strHas( record.dst.hubAbsolute, 'fmap' ) )
+    // if( _.strHas( record.dst.absoluteGlobalOrLocal, 'fmap' ) )
     // debugger
 
     if( !o.writing )
@@ -1712,7 +1433,7 @@ function filesReflectEvaluate_body( o )
     /* workaround : ignore link to file that does not exist */
 
     // if( record.src.isLink )
-    // if( !record.src.context.effectiveFileProvider.statResolvedRead( record.src.real ) )
+    // if( !record.src.factory.effectiveFileProvider.statResolvedRead( record.src.real ) )
     // record.allow = false;
 
     if( record.reason !== 'srcLooking' && a )
@@ -1850,6 +1571,74 @@ function filesReflectEvaluate_body( o )
     }
 
     return record;
+  }
+
+  /* */
+
+  function handleDown( record, op )
+  {
+
+    // if( _.strEnds( record.dst.absolute, debugPath ) )
+    // debugger;
+
+    if( touchMap[ record.dst.absolute ] )
+    touch( record, touchMap[ record.dst.absolute ] );
+    _.assert( touchMap[ record.dst.absolute ] === record.touch || !record.touch );
+
+    let srcExists = !!record.src.stat;
+    let dstExists = !!record.dst.stat;
+
+    // _.assert( _.arrayIs( o.onDown ) );
+    _.assert( !!record.dst && !!record.src );
+    _.assert( arguments.length === 2 );
+
+    if( !record.include )
+    return end( false );
+
+    if( !o.includingDst && record.effective === record.dst )
+    return end( record );
+
+    if( !o.includingDirs && record.effective.isDir )
+    return end( record );
+
+    if( !o.includingTerminals && !record.effective.isDir )
+    return end( record );
+
+    handleDown2.call( self, record, o );
+    // _.routinesCall( self, o.onDown, [ record,o ] );
+    let r = o.onDown.call( self, record, o );
+    _.assert( r !== _.dont );
+    // if( r === _.dont )
+    // return end( false );
+
+    _.assert( record.include === true );
+    _.assert( record.action !== 'exclude' || record.touch === false )
+
+    if( touchMap[ record.dst.absolute ] )
+    touch( record, touchMap[ record.dst.absolute ] );
+    _.assert( touchMap[ record.dst.absolute ] === record.touch || !record.touch );
+
+    if( !srcExists && record.reason === 'srcLooking' )
+    return end( false );
+
+    if( !record.src.isActual && !record.dst.isActual && !record.touch )
+    return end( false );
+
+    if( !o.includingNonAllowed && !record.allow )
+    return end( false );
+
+    return end( record.touch );
+
+    function end( result )
+    {
+      if( result === false )
+      {
+        if( record.include )
+        recordRemove( record );
+        record.include = false;
+      }
+      return result;
+    }
   }
 
   /* */
@@ -1997,7 +1786,7 @@ function filesReflectEvaluate_body( o )
         }
         else if( o.dstRewritingPreserving )
         {
-          if( self.filesHasTerminal( record.dst.hubAbsolute ) )
+          if( self.filesHasTerminal( record.dst.absoluteGlobalOrLocal ) )
           throw _.err( 'Can\'t rewrite directory ' + _.strQuote( record.dst.absolute ) + ' by terminal ' + _.strQuote( record.src.absolute ) + ', directory has terminal(s)' );
         }
 
@@ -2051,6 +1840,182 @@ function filesReflectEvaluate_body( o )
     _.assert( _.strIs( record.action ), () => 'Action for record ' + _.strQuote( record.src.relative ) + ' was not defined' );
 
     srcDeleteMaybe( record );
+
+    return record;
+  }
+
+  /* */
+
+  function handleDstUp( srcContext, reason, dstFilter, dstRecord, op )
+  {
+
+    _.assert( arguments.length === 5 );
+    _.assert( _.strIs( reason ) );
+    let srcRecord = srcContext.record( dstRecord.relative );
+    let record = recordMake( dstRecord, srcRecord, dstRecord );
+    record.reason = reason;
+
+    // if( _.strEnds( record.dst.absolute, debugPath ) )
+    // debugger;
+
+    if( handleUp( record, op ) === false )
+    record.include = false;
+
+    // return record;
+    return dstRecord;
+  }
+
+  /* */
+
+  function handleDstDown( dstRecord, op )
+  {
+    // if( _.strEnds( record.dst.absolute, debugPath ) )
+    // debugger;
+    let record = dstRecord.associated;
+    handleDown( record, op );
+    return record;
+  }
+
+  /* */
+
+  function handleSrcUp( srcRecord, op )
+  {
+    let relative = srcRecord.relative;
+    if( o.onDstName )
+    relative = o.onDstName.call( self, relative, dstRecordFactory, op, o, srcRecord );
+
+    // if( srcRecord.absolute === '/src/d' )
+    // debugger;
+
+    let dstRecord = dstRecordFactory.record( relative );
+    let record = recordMake( dstRecord, srcRecord, srcRecord );
+    record.reason = 'srcLooking';
+
+    // if( _.strEnds( record.dst.absolute, debugPath ) )
+    // debugger;
+
+    if( o.filesGraph )
+    {
+      if( record.dst.absolute === o.dstPath )
+      {
+        o.filesGraph.dstPath = o.dstPath;
+        o.filesGraph.srcPath = o.srcPath;
+        o.filesGraph.actionBegin( o.dstPath + ' <- ' + o.srcPath );
+      }
+      if( !record.src.isDir )
+      {
+        o.filesGraph.filesUpdate( record.dst );
+        o.filesGraph.filesUpdate( record.src );
+        if( o.filesGraph.fileIsUpToDate( record.dst ) )
+        record.upToDate = true;
+      }
+    }
+
+    // if( record.src.absolute === '/src/d' )
+    // debugger;
+
+    /* */
+
+    handleUp( record, op );
+
+    if( o.includingDst && record.include && record.src.isActual && record.src.stat )
+    if( record.dst.isDir && !record.src.isDir )
+    {
+      /* src is terminal, dst is dir */
+
+      _.assert( _.strIs( record.dst.factory.basePath ) );
+      let filter2 = self.recordFilter
+      ({
+        effectiveFileProvider : dstOptions.filter.effectiveFileProvider,
+        hubFileProvider : dstOptions.filter.hubFileProvider,
+      });
+      filter2.inFilePath = null;
+      filter2.basePath = record.dst.factory.basePath;
+
+      let dstOptions2 = _.mapExtend( null, dstOptions );
+      dstOptions2.filePath = record.dst.absolute;
+      dstOptions2.filter = filter2;
+      dstOptions2.filter.stemPath = null;
+      dstOptions2.includingStem = 0;
+      dstOptions2.onUp = [ _.routineJoin( undefined, handleDstUp, [ srcRecord.factory, 'dstRewriting', filter2 ] ) ];
+
+      let found = self.filesFind( dstOptions2 );
+
+    }
+
+    /* */
+
+    if( record.include && record.goingUp )
+    // return record;
+    return srcRecord;
+    else
+    return _.dont;
+  }
+
+  /* */
+
+  function handleSrcDown( srcRecord, op )
+  {
+    let record = srcRecord.associated;
+
+    if( o.filesGraph && !record.src.isDir && !record.upToDate )
+    {
+      record.dst.reval();
+      o.filesGraph.dependencyAdd( record.dst, record.src );
+    }
+
+    // if( _.strEnds( record.dst.absolute, debugPath ) )
+    // debugger;
+
+    if( o.includingDst )
+    if( record.dst.isDir && record.src.isDir )
+    {
+      _.assert( _.strIs( record.dst.factory.basePath ) );
+      _.assert( _.strIs( record.src.factory.basePath ) );
+
+      let dstFiles = record.dst.factory.effectiveFileProvider.dirRead({ filePath : record.dst.absolute, outputFormat : 'absolute' });
+      let dstRecords = record.dst.factory.records( dstFiles );
+      let srcFiles = record.src.factory.effectiveFileProvider.dirRead({ filePath : record.src.absolute, outputFormat : 'absolute' });
+      let srcRecords = record.src.factory.records( srcFiles );
+
+      for( let f = dstRecords.length-1 ; f >= 0 ; f-- )
+      {
+        let dstRecord = dstRecords[ f ];
+
+        // if( _.strEnds( dstRecord.absolute, debugPath ) )
+        // debugger;
+
+        let srcRecord = _.arrayLeft( srcRecords, dstRecord, ( r ) => r.relative ).element;
+        if( !srcRecord )
+        continue;
+        if( /*dstRecord.isActual &&*/ dstRecord.isDir && !srcRecord.isActual )
+        continue;
+        dstRecords.splice( f, 1 );
+      }
+
+      for( let f = 0 ; f < dstRecords.length ; f++ )
+      {
+        // if( _.strEnds( dstRecords[ f ].absolute, debugPath ) )
+        // debugger;
+
+        let dstOptions2 = _.mapExtend( null, dstOptions );
+        dstOptions2.filePath = dst.path.join( record.dst.factory.basePath, dstRecords[ f ].absolute );
+        dstOptions2.filter = dstOptions2.filter.clone();
+        dstOptions2.filter.stemPath = null;
+        dstOptions2.filter.inFilePath = null;
+        dstOptions2.filter.basePath = record.dst.factory.basePath;
+        dstOptions2.onUp = [ _.routineJoin( null, handleDstUp, [ record.src.factory, 'dstDeleting', null ] ) ];
+        let found = self.filesFind( dstOptions2 );
+      }
+    }
+
+    handleDown( record, op );
+
+    if( o.filesGraph )
+    {
+      if( record.dst.absolute === o.dstPath )
+      o.filesGraph.actionEnd();
+    }
 
     return record;
   }
@@ -2144,7 +2109,7 @@ function filesReflectEvaluate_body( o )
     return false;
     if( touchMap[ record.dst.absolute ] === 'constructive' )
     return true;
-    let files = record.dst.context.effectiveFileProvider.dirRead({ filePath : record.dst.absolute, outputFormat : 'absolute' });
+    let files = record.dst.factory.effectiveFileProvider.dirRead({ filePath : record.dst.absolute, outputFormat : 'absolute' });
     files = files.filter( ( file ) => actionMap[ file ] !== 'fileDelete' );
     return !!files.length;
   }
@@ -2362,7 +2327,7 @@ defaults.includingTerminals = 1;
 defaults.includingDirs = 1;
 defaults.includingNonAllowed = 1;
 // defaults.includingTransient = 1;
-// defaults.includingBase = 1;
+// defaults.includingStem = 1;
 defaults.includingDst = null;
 
 defaults.recursive = '2';
@@ -2580,7 +2545,7 @@ function filesReflectSingle_body( o )
     _.assert( !!record.touch );
     _.assert( !!record.action );
 
-    record.dst.context.effectiveFileProvider.dirMake
+    record.dst.factory.effectiveFileProvider.dirMake
     ({
       recursive : 1,
       rewritingTerminal : 0,
@@ -2597,7 +2562,7 @@ function filesReflectSingle_body( o )
     return;
     if( record.dst.absolute === record.src.absolute )
     return;
-    record.dst.context.effectiveFileProvider.filesDelete( record.dst.absolute );
+    record.dst.factory.effectiveFileProvider.filesDelete( record.dst.absolute );
   }
 
   /* */
@@ -2634,8 +2599,8 @@ function filesReflectSingle_body( o )
 
       hub.softLink
       ({
-        dstPath : record.dst.hubAbsolute,
-        srcPath : record.src.hubAbsolute,
+        dstPath : record.dst.absoluteGlobalOrLocal,
+        srcPath : record.src.absoluteGlobalOrLocal,
         makingDirectory : 1,
         allowingMissing : 1,
         resolvingSrcSoftLink : o.resolvingSrcSoftLink,
@@ -2648,8 +2613,8 @@ function filesReflectSingle_body( o )
     {
       hub.textLink
       ({
-        dstPath : record.dst.hubAbsolute,
-        srcPath : record.src.hubAbsolute,
+        dstPath : record.dst.absoluteGlobalOrLocal,
+        srcPath : record.src.absoluteGlobalOrLocal,
         makingDirectory : 1,
         allowingMissing : 1,
         resolvingSrcSoftLink : o.resolvingSrcSoftLink,
@@ -2662,8 +2627,8 @@ function filesReflectSingle_body( o )
     {
       hub.fileCopy
       ({
-        dstPath : record.dst.hubAbsolute,
-        srcPath : record.src.hubAbsolute,
+        dstPath : record.dst.absoluteGlobalOrLocal,
+        srcPath : record.src.absoluteGlobalOrLocal,
         makingDirectory : 1,
         allowingMissing : 1,
         resolvingSrcSoftLink : o.resolvingSrcSoftLink,
@@ -2718,9 +2683,9 @@ function filesReflectSingle_body( o )
     else if( record.src.isDir )
     {
       _.assert( record.action === 'dirMake' || record.action === 'fileDelete' );
-      if( !record.src.context.effectiveFileProvider.dirRead( record.src.absolute ).length )
+      if( !record.src.factory.effectiveFileProvider.dirRead( record.src.absolute ).length )
       {
-        record.src.context.effectiveFileProvider.fileDelete( record.src.absolute );
+        record.src.factory.effectiveFileProvider.fileDelete( record.src.absolute );
       }
       else
       {
@@ -2730,7 +2695,7 @@ function filesReflectSingle_body( o )
     else
     {
       _.assert( record.action === 'fileCopy' || record.action === 'hardlink' || record.action === 'softlink' || record.action === 'nop' );
-      record.src.context.effectiveFileProvider.fileDelete( record.src.absolute );
+      record.src.factory.effectiveFileProvider.fileDelete( record.src.absolute );
     }
 
   }
@@ -3372,7 +3337,7 @@ function filesDelete_body( o )
   for( let f = files.length-1 ; f >= 0 ; f-- )
   {
     let file = files[ f ];
-    file.context.effectiveFileProvider.fileDelete
+    file.factory.effectiveFileProvider.fileDelete
     ({
       filePath : file.absolute,
       sync : 1,
@@ -3621,16 +3586,16 @@ function softLinksRebase( o )
     return;
 
     record.isSoftLink;
-    let resolvedPath = self.pathResolveSoftLink( record.hubAbsolute );
+    let resolvedPath = self.pathResolveSoftLink( record.absoluteGlobalOrLocal );
     let rebasedPath = self.path.rebase( resolvedPath, o.oldPath, o.newPath );
-    self.fileDelete({ filePath : record.hubAbsolute, verbosity : 0 });
+    self.fileDelete({ filePath : record.absoluteGlobalOrLocal, verbosity : 0 });
     self.softLink
     ({
-      dstPath : record.hubAbsolute,
+      dstPath : record.absoluteGlobalOrLocal,
       srcPath : rebasedPath,
       allowingMissing : 1,
     });
-    _.assert( !!self.statResolvedRead({ filePath : record.hubAbsolute, resolvingSoftLink : 0 }) );
+    _.assert( !!self.statResolvedRead({ filePath : record.absoluteGlobalOrLocal, resolvingSoftLink : 0 }) );
   });
 
   let files = self.filesFind.body.call( self,optionsFind );
@@ -3660,7 +3625,7 @@ function filesHasTerminal( filePath )
   self.filesFind
   ({
     filePath : filePath,
-    includingBase : 1,
+    includingStem : 1,
     includingDirs : 1,
     includingTerminals : 1,
     onUp : onUp,

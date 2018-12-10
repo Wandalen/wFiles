@@ -50,7 +50,7 @@ function init( o )
       if( self[ k ] !== undefined )
       result = self[ k ];
       else
-      result = self.original[ k ];
+      result = self.originalFileProvider[ k ];
       if( self._routineDrivingAndChanging( result ) )
       return self._routineFunctor( result, k );
       return result;
@@ -59,8 +59,8 @@ function init( o )
     {
       if( self[ k ] !== undefined )
       self[ k ] = val;
-      else if( self.original[ k ] !== undefined )
-      self.original[ k ] = val;
+      else if( self.originalFileProvider[ k ] !== undefined )
+      self.originalFileProvider[ k ] = val;
       else
       self[ k ] = val;
       return true;
@@ -69,26 +69,17 @@ function init( o )
 
   let proxy = new Proxy( self, accessors );
 
-  if( !self.original )
-  self.original = _.fileProvider;
+  self.proxy = proxy;
+  self.imageFilter = self;
+  if( !self.originalFileProvider )
+  self.originalFileProvider = _.fileProvider;
 
-  if( !self.fileProvider )
-  {
-    self.fileProvider = self.original;
-    while( self.fileProvider.original )
-    self.fileProvider = self.fileProvider.original;
-  }
+  self.realFileProvider = self.originalFileProvider;
+  while( self.realFileProvider.originalFileProvider )
+  self.realFileProvider = self.realFileProvider.originalFileProvider;
 
-  _.assert( self.original instanceof _.FileProvider.Partial );
-  _.assert( self.fileProvider instanceof _.FileProvider.Partial );
-
-  // if( !self.archive )
-  // self.archive = new _.FilesImage({ fileProvider : proxy });
-  // debugger;
-  // let proxy = _.proxyMap( self, self.original );
-  //
-  // if( !proxy.archive )
-  // proxy.archive = new wFilesImage({ fileProvider : proxy });
+  _.assert( self.originalFileProvider instanceof _.FileProvider.Partial );
+  _.assert( self.realFileProvider instanceof _.FileProvider.Partial );
 
   return proxy;
 }
@@ -146,7 +137,7 @@ function _routineFunctor( routine, routineName )
   op.routineName = routineName;
   op.reads = [];
   op.writes = [];
-  op.image = self;
+  op.image = self.proxy;
 
   for( let k in routine.operates )
   {
@@ -162,7 +153,7 @@ function _routineFunctor( routine, routineName )
     [ routineName ] : function()
     {
       let op2 = _.mapExtend( null, op );
-      op2.originalFileProvider = this.original;
+      op2.originalFileProvider = this.originalFileProvider;
       op2.originalBody = body;
       op2.args = _.unrollFrom( arguments );
       op2.result = undefined;
@@ -171,14 +162,14 @@ function _routineFunctor( routine, routineName )
       {
         debugger;
         _.assert( 0, 'not tested' );
-        op2.args = pre.call( this.original, resultRoutine, op2.args );
+        op2.args = pre.call( this.originalFileProvider, resultRoutine, op2.args );
         if( !_.unrollIs( op2.args ) )
         op2.args = _.unrollFrom([ op2.args ]);
       }
 
       if( this.onCallBegin )
       {
-        let r = this.onCallBegin( op2 );
+        let r = this.imageFilter.onCallBegin( op2 );
         _.assert( r === undefined );
       }
 
@@ -186,12 +177,12 @@ function _routineFunctor( routine, routineName )
       op2.args = _.unrollFrom([ op2.args ]);
 
       _.assert( !_.argumentsArrayIs( op2.args ), 'Does not expect arguments array' );
-      let r = this.onCall( op2 );
+      let r = this.imageFilter.onCall( op2 );
       _.assert( r === undefined );
 
       if( this.onCallEnd )
       {
-        let r = this.onCallEnd( op2 );
+        let r = this.imageFilter.onCallEnd( op2 );
         _.assert( r === undefined );
       }
 
@@ -231,18 +222,27 @@ let Aggregates =
 
 let Associates =
 {
-  // archive : null,
-  original : null,
-  fileProvider : null,
+  originalFileProvider : null,
+  realFileProvider : null,
+  // original : null,
+  // fileProvider : null,
 }
 
 let Restricts =
 {
   routines : _.define.own({}),
+  proxy : null,
+  imageFilter : null,
 }
 
 let Events =
 {
+}
+
+let Frobids =
+{
+  original : 'original',
+  fileProvider : 'fileProvider',
 }
 
 // --
@@ -264,6 +264,7 @@ let Extend =
   Associates,
   Restricts,
   Events,
+  Frobids,
 
 }
 

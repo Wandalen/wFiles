@@ -207,7 +207,7 @@ function record( o )
 
   if( o instanceof _.FileRecord )
   {
-    _.assert( o.context === self );
+    _.assert( o.factory === self );
     return o;
   }
 
@@ -221,9 +221,9 @@ function record( o )
   _.assert( arguments.length === 1 );
   _.assert( _.objectIs( o ) );
   _.assert( _.strIs( o.input ), () => 'Expects string {-o.input-}, but got ' + _.strType( o.input ) );
-  _.assert( o.context === undefined || o.context === self );
+  _.assert( o.factory === undefined || o.factory === self );
 
-  o.context = self;
+  o.factory = self;
 
   return _.FileRecord( o );
 }
@@ -276,6 +276,9 @@ function _resolvingSoftLinkGet()
 {
   let self = this;
 
+  if( !self.resolving )
+  return false;
+
   if( self[ resolvingSoftLinkSymbol ] !== null )
   return self[ resolvingSoftLinkSymbol ];
 
@@ -292,6 +295,9 @@ function _resolvingSoftLinkGet()
 function _usingTextLinkGet()
 {
   let self = this;
+
+  if( !self.resolving )
+  return false;
 
   if( self[ usingTextLinkSymbol ] !== null )
   return self[ usingTextLinkSymbol ];
@@ -381,6 +387,7 @@ let Composes =
   resolvingTextLink : null,
   usingTextLink : null,
   stating : null,
+  resolving : 0,
   safe : null,
 
 }
@@ -452,34 +459,34 @@ let Forbids =
 let Proto =
 {
 
-  init : init,
-  TollerantMake : TollerantMake,
+  init,
+  TollerantMake,
 
-  form : form,
+  form,
 
-  record : record,
+  record,
   records : _.routineVectorize_functor( record ),
-  recordsFiltered : recordsFiltered,
+  recordsFiltered,
 
-  _usingSoftLinkGet : _usingSoftLinkGet,
-  _resolvingSoftLinkSet : _resolvingSoftLinkSet,
-  _resolvingSoftLinkGet : _resolvingSoftLinkGet,
+  _usingSoftLinkGet,
+  _resolvingSoftLinkSet,
+  _resolvingSoftLinkGet,
 
-  _usingTextLinkGet : _usingTextLinkGet,
-  _resolvingTextLinkGet : _resolvingTextLinkGet,
+  _usingTextLinkGet,
+  _resolvingTextLinkGet,
 
-  _statingGet : _statingGet,
-  _safeGet : _safeGet,
+  _statingGet,
+  _safeGet,
 
   /* */
 
-  Composes : Composes,
-  Aggregates : Aggregates,
-  Associates : Associates,
-  Restricts : Restricts,
-  Statics : Statics,
-  Forbids : Forbids,
-  Accessors : Accessors,
+  Composes,
+  Aggregates,
+  Associates,
+  Restricts,
+  Statics,
+  Forbids,
+  Accessors,
 
 }
 

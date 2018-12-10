@@ -667,7 +667,7 @@ function _filesFindTrivial( t, provider )
   /* */
 
   var o1 = { filePath : _.path.join( context.testRootDirectory ), outputFormat : 'relative' }
-  var o2 = { recursive : '2', includingBase : 1, includingTransient : 1, includingTerminals : 1, includingDirs : 1 }
+  var o2 = { recursive : '2', includingStem : 1, includingTransient : 1, includingTerminals : 1, includingDirs : 1 }
   t.case = 'find single terminal file . includingTransient : 1';
 
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
@@ -677,7 +677,7 @@ function _filesFindTrivial( t, provider )
   /* */
 
   var o1 = { filePath : _.path.join( context.testRootDirectory ), outputFormat : 'relative' }
-  var o2 = { recursive : '2', includingBase : 1, includingTransient : 0, includingTerminals : 1 }
+  var o2 = { recursive : '2', includingStem : 1, includingTransient : 0, includingTerminals : 1 }
   t.case = 'find single terminal file . includingTransient : 0';
 
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
@@ -687,8 +687,8 @@ function _filesFindTrivial( t, provider )
   /* */
 
   var o1 = { filePath : _.path.join( context.testRootDirectory ), outputFormat : 'relative' }
-  var o2 = { recursive : '2', includingBase : 0, includingTransient : 1, includingTerminals : 1 }
-  t.case = 'find single terminal file . includingBase : 0';
+  var o2 = { recursive : '2', includingStem : 0, includingTransient : 1, includingTerminals : 1 }
+  t.case = 'find single terminal file . includingStem : 0';
 
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [];
@@ -715,7 +715,7 @@ function _filesFindTrivial( t, provider )
   /* */
 
   var o1 = { filePath : _.path.join( context.testRootDirectory, 'f' ), outputFormat : 'relative' }
-  var o2 = { recursive : '2', includingBase : 1, includingTransient : 1, includingTerminals : 1 }
+  var o2 = { recursive : '2', includingStem : 1, includingTransient : 1, includingTerminals : 1 }
   t.case = 'find single terminal file . includingTerminals : 1';
 
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
@@ -725,7 +725,7 @@ function _filesFindTrivial( t, provider )
   /* */
 
   var o1 = { filePath : _.path.join( context.testRootDirectory, 'f' ), outputFormat : 'relative' }
-  var o2 = { recursive : '2', includingBase : 1, includingTransient : 1, includingTerminals : 0 }
+  var o2 = { recursive : '2', includingStem : 1, includingTransient : 1, includingTerminals : 0 }
   t.case = 'find single terminal file . includingTerminals : 0';
 
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
@@ -735,8 +735,8 @@ function _filesFindTrivial( t, provider )
   /* */
 
   var o1 = { filePath : _.path.join( context.testRootDirectory, 'f' ), outputFormat : 'relative' }
-  var o2 = { recursive : '2', includingBase : 0, includingTransient : 1, includingTerminals : 1 }
-  t.case = 'find single terminal file . includingBase : 0';
+  var o2 = { recursive : '2', includingStem : 0, includingTransient : 1, includingTerminals : 1 }
+  t.case = 'find single terminal file . includingStem : 0';
 
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [];
@@ -765,8 +765,8 @@ function _filesFindTrivial( t, provider )
   /* */
 
   var o1 = { filePath : _.path.join( context.testRootDirectory ), outputFormat : 'relative' }
-  var o2 = { recursive : '2', includingBase : 1, includingTransient : 1, includingTerminals : 1, includingDirs : 1 }
-  t.case = 'find includingBase : 1';
+  var o2 = { recursive : '2', includingStem : 1, includingTransient : 1, includingTerminals : 1, includingDirs : 1 }
+  t.case = 'find includingStem : 1';
 
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [ '.', './d', './dir1', './dir1/a', './dir1/b', './dir1/dir11', './dir2', './dir2/c' ];
@@ -775,8 +775,8 @@ function _filesFindTrivial( t, provider )
   /* */
 
   var o1 = { filePath : _.path.join( context.testRootDirectory ), outputFormat : 'relative' }
-  var o2 = { recursive : '2', includingBase : 0, includingTransient : 1, includingTerminals : 1, includingDirs : 1 }
-  t.case = 'find includingBase:0';
+  var o2 = { recursive : '2', includingStem : 0, includingTransient : 1, includingTerminals : 1, includingDirs : 1 }
+  t.case = 'find includingStem:0';
 
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [ './d', './dir1', './dir1/a', './dir1/b', './dir1/dir11', './dir2', './dir2/c' ];
@@ -785,7 +785,7 @@ function _filesFindTrivial( t, provider )
   /* */
 
   var o1 = { filePath : _.path.join( context.testRootDirectory ), outputFormat : 'relative' }
-  var o2 = { recursive : '2', includingBase : 1, includingTransient : 1, includingTerminals : 1, includingDirs : 0 }
+  var o2 = { recursive : '2', includingStem : 1, includingTransient : 1, includingTerminals : 1, includingDirs : 0 }
   t.case = 'find includingTransient:0';
 
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
@@ -795,7 +795,7 @@ function _filesFindTrivial( t, provider )
   /* */
 
   var o1 = { filePath : _.path.join( context.testRootDirectory ), outputFormat : 'relative' }
-  var o2 = { recursive : '2', includingBase : 1, includingTransient : 1, includingTerminals : 0, includingDirs : 1 }
+  var o2 = { recursive : '2', includingStem : 1, includingTransient : 1, includingTerminals : 0, includingDirs : 1 }
   t.case = 'find includingTerminals:0';
 
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
@@ -825,7 +825,7 @@ function _filesFindTrivial( t, provider )
   // /* */
   //
   // // var o1 = { filePath : _.path.join( context.testRootDirectory ), outputFormat : 'relative' }
-  // // var o2 = { recursive : '2', includingBase : 1, includingTransient : 1, includingTerminals : 1 }
+  // // var o2 = { recursive : '2', includingStem : 1, includingTransient : 1, includingTerminals : 1 }
   // // t.case = 'find includingTerminals:0';
   // //
   // // var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
@@ -1033,7 +1033,7 @@ function filesFind( test )
     // filePath : testDir,
     // strict : 1,
     allowingMissing : 1,
-    includingBase : 1,
+    includingStem : 1,
     result : [],
     orderingExclusion : [],
     sortingWithArray : null,
@@ -1346,7 +1346,7 @@ function filesFind( test )
 
     var isDir = _.fileProvider.isDir( o.filePath );
 
-    if( isDir && o._includingDirs && o.includingBase )
+    if( isDir && o._includingDirs && o.includingStem )
     {
       if( o.outputFormat === 'absolute' ||  o.outputFormat === 'record' )
       _.arrayPrependOnce( expected, o.filePath );
@@ -1624,36 +1624,51 @@ function filesFind2( t )
     });
   })
 
-  /*filePath - not exist*/
+  t.case = 'filePath - not exist';
 
   got = provider.filesFind
   ({
     filePath : nonexistentPath,
-    allowingMissing : 0
+    allowingMissing : 1,
   });
   // var expected = [ provider.recordFactory({ basePath : '/invalid path', filter : got[ 0 ].context.filter }).record( '/invalid path' ) ];
   var expected = [];
   t.identical( got, expected );
 
-  /*filePath - some paths don't exist, allowingMissing off*/
+  t.shouldThrowErrorSync( function()
+  {
+    got = provider.filesFind
+    ({
+      filePath : nonexistentPath,
+      allowingMissing : 0,
+    });
+  })
 
-  debugger;
+  t.case = 'filePath - some paths dont exist';
+
   got = provider.filesFind
   ({
     filePath : [ nonexistentPath, filePath ],
-    allowingMissing : 0
+    allowingMissing : 1,
   });
   expected = provider.dirRead( filePath );
-  debugger;
   t.identical( check( got, expected ), true )
-  debugger;
+
+  t.shouldThrowErrorSync( function()
+  {
+    got = provider.filesFind
+    ({
+      filePath : [ nonexistentPath, filePath ],
+      allowingMissing : 0,
+    });
+  });
 
   /*filePath - some paths not exist, allowingMissing on*/
 
   got = provider.filesFind
   ({
     filePath : [ nonexistentPath, filePath ],
-    allowingMissing : 1
+    allowingMissing : 1,
   });
   t.identical( got.length, 1 );
   t.is( got[ 0 ] instanceof _.FileRecord );
@@ -1666,24 +1681,24 @@ function filesFind2( t )
   /*filePath - empty dir, includingTerminals, includingTransient on*/
 
   provider.dirMake( _.path.join( context.testRootDirectory, 'empty' ) )
-  got = provider.filesFind({ filePath : _.path.join( dir, 'empty' ), includingTerminals : 1, includingTransient : 1 });
+  got = provider.filesFind({ filePath : _.path.join( dir, 'empty' ), includingTerminals : 1, includingTransient : 1, allowingMissing : 1 });
   t.identical( got, [] );
 
-   /*filePath - empty dir, includingTerminals, includingTransient on, includingBase off*/
+  /*filePath - empty dir, includingTerminals, includingTransient on, includingStem off*/
 
-   provider.dirMake( _.path.join( context.testRootDirectory, 'empty' ) )
-   got = provider.filesFind({ filePath : _.path.join( dir, 'empty' ), includingTerminals : 1, includingTransient : 1, includingBase : 0 });
-   t.identical( got, [] );
+  provider.dirMake( _.path.join( context.testRootDirectory, 'empty' ) )
+  got = provider.filesFind({ filePath : _.path.join( dir, 'empty' ), includingTerminals : 1, includingTransient : 1, includingStem : 0, allowingMissing : 1 });
+  t.identical( got, [] );
 
   /*filePath - empty dir, includingTerminals, includingTransient off*/
 
   provider.dirMake( _.path.join( context.testRootDirectory, 'empty' ) )
-  got = provider.filesFind({ filePath : _.path.join( dir, 'empty' ), includingTerminals : 0, includingTransient : 0 });
+  got = provider.filesFind({ filePath : _.path.join( dir, 'empty' ), includingTerminals : 0, includingTransient : 0, allowingMissing : 1 });
   t.identical( got, [] );
 
   /*filePath - directory, includingTerminals, includingTransient on*/
 
-  got = provider.filesFind({ filePath : dir, includingTerminals : 1, includingTransient : 1, includingBase : 0 });
+  got = provider.filesFind({ filePath : dir, includingTerminals : 1, includingTransient : 1, includingStem : 0 });
   expected = provider.dirRead( dir );
   t.identical( check( got, expected ), true );
 
@@ -1695,7 +1710,7 @@ function filesFind2( t )
 
   /*filePath - directory, includingTerminals off, includingTransient on*/
 
-  got = provider.filesFind({ filePath : dir, includingTerminals : 0, includingTransient : 1, includingBase : 0 });
+  got = provider.filesFind({ filePath : dir, includingTerminals : 0, includingTransient : 1, includingStem : 0 });
   expected = provider.dirRead( dir );
   t.identical( check( got, expected ), true  );
 
@@ -1813,7 +1828,7 @@ function filesFind2( t )
       maskDirectory : 'dir',
     },
     outputFormat : 'relative',
-    includingBase : 1,
+    includingStem : 1,
     includingTerminals : 1,
     includingDirs : 1,
     recursive : '2'
@@ -2108,165 +2123,167 @@ function filesFindLinked( test )
 
   //
 
-  // test.open( 'normal' );
-  //
-  // var tree =
-  // {
-  //   terminal : 'terminal',
-  //   normal : [{ softLink : '/terminal' }],
-  // }
-  // var provider = new _.FileProvider.Extract({ filesTree : tree });
-  //
-  // var got = provider.filesFind
-  // ({
-  //   filePath : '/',
-  //   resolvingSoftLink : 0,
-  //   outputFormat : 'record',
-  //   includingTransient : 1,
-  //   includingTerminals : 1,
-  //   includingDirs : 1,
-  //   recursive : '2',
-  //   includingBase : 1,
-  // })
-  // test.identical( _.select( got, '*/absolute' ), [ '/', '/normal', '/terminal' ] );
-  // test.identical( _.select( got, '*/real' ), [ '/', '/normal', '/terminal' ] );
-  //
-  // var got = provider.filesFind
-  // ({
-  //   filePath : '/',
-  //   resolvingSoftLink : 1,
-  //   outputFormat : 'record',
-  //   includingTransient : 1,
-  //   includingTerminals : 1,
-  //   includingDirs : 1,
-  //   recursive : '2',
-  //   includingBase : 1,
-  // })
-  // test.identical( _.select( got, '*/absolute' ), [ '/', '/normal', '/terminal' ] );
-  // test.identical( _.select( got, '*/real' ), [ '/', '/terminal', '/terminal' ] );
-  //
-  // test.close( 'normal' );
-  //
-  // /* */
-  //
-  // test.open( 'double' );
-  //
-  // var tree =
-  // {
-  //   terminal : 'terminal',
-  //   normal : [{ softLink : '/terminal' }],
-  //   double : [{ softLink : '/normal' }],
-  // }
-  // var provider = new _.FileProvider.Extract({ filesTree : tree });
-  //
-  // var got = provider.filesFind
-  // ({
-  //   filePath : '/',
-  //   resolvingSoftLink : 0,
-  //   outputFormat : 'record',
-  //   includingTransient : 1,
-  //   includingTerminals : 1,
-  //   includingDirs : 1,
-  //   recursive : '2',
-  //   includingBase : 1,
-  // })
-  // test.identical( _.select( got, '*/absolute' ), [ '/', '/double', '/normal', '/terminal' ] );
-  // test.identical( _.select( got, '*/real' ), [ '/', '/double', '/normal', '/terminal' ] );
-  //
-  // var got = provider.filesFind
-  // ({
-  //   filePath : '/',
-  //   resolvingSoftLink : 1,
-  //   outputFormat : 'record',
-  //   includingTransient : 1,
-  //   includingTerminals : 1,
-  //   includingDirs : 1,
-  //   recursive : '2',
-  //   includingBase : 1,
-  // })
-  // test.identical( _.select( got, '*/absolute' ), [ '/', '/double', '/normal', '/terminal' ] );
-  // test.identical( _.select( got, '*/real' ), [ '/', '/terminal', '/terminal', '/terminal' ] );
-  //
-  // test.close( 'double' );
-  //
-  // /* */
-  //
-  // test.open( 'broken' );
-  //
-  // var tree =
-  // {
-  //   terminal : 'terminal',
-  //   normal : [{ softLink : '/terminal' }],
-  //   broken : [{ softLink : '/missing' }],
-  // }
-  // var provider = new _.FileProvider.Extract({ filesTree : tree });
-  //
-  // var got = provider.filesFind
-  // ({
-  //   filePath : '/',
-  //   resolvingSoftLink : 0,
-  //   outputFormat : 'record',
-  //   includingTransient : 1,
-  //   includingTerminals : 1,
-  //   allowingMissing : 0,
-  //   includingDirs : 1,
-  //   recursive : '2',
-  //   includingBase : 1,
-  // })
-  // test.identical( _.select( got, '*/absolute' ), [ '/', '/broken', '/normal', '/terminal' ] );
-  // test.identical( _.select( got, '*/real' ), [ '/', '/broken', '/normal', '/terminal' ] );
-  //
-  // var got = provider.filesFind
-  // ({
-  //   filePath : '/',
-  //   resolvingSoftLink : 0,
-  //   outputFormat : 'record',
-  //   includingTransient : 1,
-  //   includingTerminals : 1,
-  //   allowingMissing : 1,
-  //   includingDirs : 1,
-  //   recursive : '2',
-  //   includingBase : 1,
-  // })
-  // test.identical( _.select( got, '*/absolute' ), [ '/', '/broken', '/normal', '/terminal' ] );
-  // test.identical( _.select( got, '*/real' ), [ '/', '/broken', '/normal', '/terminal' ] );
-  //
-  // test.shouldThrowError( () =>
-  // {
-  //   provider.filesFind
-  //   ({
-  //     filePath : '/',
-  //     resolvingSoftLink : 1,
-  //     outputFormat : 'record',
-  //     includingTransient : 1,
-  //     includingTerminals : 1,
-  //     allowingMissing : 0,
-  //     includingDirs : 1,
-  //     recursive : '2',
-  //     includingBase : 1,
-  //   })
-  // })
-  //
-  // var got = provider.filesFind
-  // ({
-  //   filePath : '/',
-  //   resolvingSoftLink : 1,
-  //   outputFormat : 'record',
-  //   includingTransient : 1,
-  //   includingTerminals : 1,
-  //   allowingMissing : 1,
-  //   includingDirs : 1,
-  //   recursive : '2',
-  //   includingBase : 1,
-  // })
-  // test.identical( _.select( got, '*/absolute' ), [ '/', '/normal', '/terminal' ] );
-  // test.identical( _.select( got, '*/real' ), [ '/', '/terminal', '/terminal' ] );
-  //
-  // test.close( 'broken' );
+  test.open( 'normal' );
+
+  var tree =
+  {
+    terminal : 'terminal',
+    normal : [{ softLink : '/terminal' }],
+  }
+  var provider = new _.FileProvider.Extract({ filesTree : tree });
+
+  var got = provider.filesFind
+  ({
+    filePath : '/',
+    resolvingSoftLink : 0,
+    outputFormat : 'record',
+    includingTransient : 1,
+    includingTerminals : 1,
+    includingDirs : 1,
+    recursive : '2',
+    includingStem : 1,
+  })
+  test.identical( _.select( got, '*/absolute' ), [ '/', '/normal', '/terminal' ] );
+  test.identical( _.select( got, '*/real' ), [ '/', '/normal', '/terminal' ] );
+
+  var got = provider.filesFind
+  ({
+    filePath : '/',
+    resolvingSoftLink : 1,
+    outputFormat : 'record',
+    includingTransient : 1,
+    includingTerminals : 1,
+    includingDirs : 1,
+    recursive : '2',
+    includingStem : 1,
+  })
+  test.identical( _.select( got, '*/absolute' ), [ '/', '/normal', '/terminal' ] );
+  test.identical( _.select( got, '*/real' ), [ '/', '/terminal', '/terminal' ] );
+
+  test.close( 'normal' );
 
   /* */
 
-  // test.open( 'self cycled' );
+  test.open( 'double' );
+
+  var tree =
+  {
+    terminal : 'terminal',
+    normal : [{ softLink : '/terminal' }],
+    double : [{ softLink : '/normal' }],
+  }
+  var provider = new _.FileProvider.Extract({ filesTree : tree });
+
+  var got = provider.filesFind
+  ({
+    filePath : '/',
+    resolvingSoftLink : 0,
+    outputFormat : 'record',
+    includingTransient : 1,
+    includingTerminals : 1,
+    includingDirs : 1,
+    recursive : '2',
+    includingStem : 1,
+  })
+  test.identical( _.select( got, '*/absolute' ), [ '/', '/double', '/normal', '/terminal' ] );
+  test.identical( _.select( got, '*/real' ), [ '/', '/double', '/normal', '/terminal' ] );
+
+  var got = provider.filesFind
+  ({
+    filePath : '/',
+    resolvingSoftLink : 1,
+    outputFormat : 'record',
+    includingTransient : 1,
+    includingTerminals : 1,
+    includingDirs : 1,
+    recursive : '2',
+    includingStem : 1,
+  })
+  test.identical( _.select( got, '*/absolute' ), [ '/', '/double', '/normal', '/terminal' ] );
+  test.identical( _.select( got, '*/real' ), [ '/', '/terminal', '/terminal', '/terminal' ] );
+
+  test.close( 'double' );
+
+  /* */
+
+  test.open( 'broken' );
+
+  var tree =
+  {
+    terminal : 'terminal',
+    normal : [{ softLink : '/terminal' }],
+    broken : [{ softLink : '/missing' }],
+  }
+  var provider = new _.FileProvider.Extract({ filesTree : tree });
+
+  var got = provider.filesFind
+  ({
+    filePath : '/',
+    resolvingSoftLink : 0,
+    outputFormat : 'record',
+    includingTransient : 1,
+    includingTerminals : 1,
+    allowingMissing : 0,
+    includingDirs : 1,
+    recursive : '2',
+    includingStem : 1,
+  })
+  test.identical( _.select( got, '*/absolute' ), [ '/', '/broken', '/normal', '/terminal' ] );
+  test.identical( _.select( got, '*/real' ), [ '/', '/broken', '/normal', '/terminal' ] );
+
+  var got = provider.filesFind
+  ({
+    filePath : '/',
+    resolvingSoftLink : 0,
+    outputFormat : 'record',
+    includingTransient : 1,
+    includingTerminals : 1,
+    allowingMissing : 1,
+    includingDirs : 1,
+    recursive : '2',
+    includingStem : 1,
+  })
+  test.identical( _.select( got, '*/absolute' ), [ '/', '/broken', '/normal', '/terminal' ] );
+  test.identical( _.select( got, '*/real' ), [ '/', '/broken', '/normal', '/terminal' ] );
+
+  test.shouldThrowError( () =>
+  {
+    provider.filesFind
+    ({
+      filePath : '/',
+      resolvingSoftLink : 1,
+      outputFormat : 'record',
+      includingTransient : 1,
+      includingTerminals : 1,
+      allowingMissing : 0,
+      includingDirs : 1,
+      recursive : '2',
+      includingStem : 1,
+    })
+  })
+
+  var got = provider.filesFind
+  ({
+    filePath : '/',
+    resolvingSoftLink : 1,
+    outputFormat : 'record',
+    includingTransient : 1,
+    includingTerminals : 1,
+    allowingMissing : 1,
+    includingDirs : 1,
+    recursive : '2',
+    includingStem : 1,
+  })
+
+  test.identical( _.select( got, '*/absolute' ), [ '/', '/broken', '/normal', '/terminal' ] );
+  test.identical( _.select( got, '*/real' ), [ '/', '/missing', '/terminal', '/terminal' ] );
+  test.identical( _.select( got, '*/stat' ).map( ( e ) => !!e ), [ true, false, true, true ] );
+
+  test.close( 'broken' );
+
+  /* */
+
+  test.open( 'self cycled' );
 
   var tree =
   {
@@ -2274,41 +2291,41 @@ function filesFindLinked( test )
     normal : [{ softLink : '/terminal' }],
     self : [{ softLink : '/self' }],
   }
+
   var provider = new _.FileProvider.Extract({ filesTree : tree });
 
-  // var got = provider.filesFind
-  // ({
-  //   filePath : '/',
-  //   resolvingSoftLink : 0,
-  //   outputFormat : 'record',
-  //   includingTransient : 1,
-  //   includingTerminals : 1,
-  //   allowingMissing : 0,
-  //   includingDirs : 1,
-  //   recursive : '2',
-  //   includingBase : 1,
-  // })
-  // test.identical( _.select( got, '*/absolute' ), [ '/',  '/normal', '/self', '/terminal' ] );
-  // test.identical( _.select( got, '*/real' ), [ '/', '/normal', '/self', '/terminal' ] );
-  //
-  // var got = provider.filesFind
-  // ({
-  //   filePath : '/',
-  //   resolvingSoftLink : 0,
-  //   outputFormat : 'record',
-  //   includingTransient : 1,
-  //   includingTerminals : 1,
-  //   allowingMissing : 1,
-  //   includingDirs : 1,
-  //   recursive : '2',
-  //   includingBase : 1,
-  // })
-  // test.identical( _.select( got, '*/absolute' ), [ '/', '/normal', '/self', '/terminal'] );
-  // test.identical( _.select( got, '*/real' ), [ '/', '/normal', '/self', '/terminal' ] );
+  var got = provider.filesFind
+  ({
+    filePath : '/',
+    resolvingSoftLink : 0,
+    outputFormat : 'record',
+    includingTransient : 1,
+    includingTerminals : 1,
+    allowingMissing : 0,
+    includingDirs : 1,
+    recursive : '2',
+    includingStem : 1,
+  })
+  test.identical( _.select( got, '*/absolute' ), [ '/',  '/normal', '/self', '/terminal' ] );
+  test.identical( _.select( got, '*/real' ), [ '/', '/normal', '/self', '/terminal' ] );
+
+  var got = provider.filesFind
+  ({
+    filePath : '/',
+    resolvingSoftLink : 0,
+    outputFormat : 'record',
+    includingTransient : 1,
+    includingTerminals : 1,
+    allowingMissing : 1,
+    includingDirs : 1,
+    recursive : '2',
+    includingStem : 1,
+  })
+  test.identical( _.select( got, '*/absolute' ), [ '/', '/normal', '/self', '/terminal'] );
+  test.identical( _.select( got, '*/real' ), [ '/', '/normal', '/self', '/terminal' ] );
 
   test.shouldThrowErrorSync( () =>
   {
-    debugger;
     let found = provider.filesFind
     ({
       filePath : '/',
@@ -2319,12 +2336,9 @@ function filesFindLinked( test )
       allowingMissing : 0,
       includingDirs : 1,
       recursive : '2',
-      includingBase : 1,
+      includingStem : 1,
     });
-    debugger;
   });
-
-  return;
 
   provider.filesFind
   ({
@@ -2336,7 +2350,7 @@ function filesFindLinked( test )
     allowingMissing : 1,
     includingDirs : 1,
     recursive : '2',
-    includingBase : 1,
+    includingStem : 1,
   })
 
   test.close( 'self cycled' );
@@ -2363,7 +2377,7 @@ function filesFindLinked( test )
     allowingMissing : 0,
     includingDirs : 1,
     recursive : '2',
-    includingBase : 1,
+    includingStem : 1,
   })
   test.identical( _.select( got, '*/absolute' ), [ '/', '/one', '/terminal', '/two' ] );
   test.identical( _.select( got, '*/real' ), [ '/', '/one', '/terminal', '/two' ] );
@@ -2380,7 +2394,7 @@ function filesFindLinked( test )
       allowingMissing : 0,
       includingDirs : 1,
       recursive : '2',
-      includingBase : 1,
+      includingStem : 1,
     })
   })
 
@@ -2394,7 +2408,7 @@ function filesFindLinked( test )
     allowingMissing : 1,
     includingDirs : 1,
     recursive : '2',
-    includingBase : 1,
+    includingStem : 1,
   })
   test.identical( _.select( got, '*/absolute' ), [ '/', '/one', '/terminal', '/two' ] );
   test.identical( _.select( got, '*/real' ), [ '/', '/one', '/terminal', '/two' ] );
@@ -2422,7 +2436,7 @@ function filesFindLinked( test )
     includingTerminals : 1,
     includingDirs : 1,
     recursive : '2',
-    includingBase : 1,
+    includingStem : 1,
   })
   test.identical( _.select( got, '*/absolute' ), [ '/', '/normala', '/normalb', '/terminal' ] );
   test.identical( _.select( got, '*/real' ), [ '/', '/normala', '/normalb', '/terminal' ] );
@@ -2436,7 +2450,7 @@ function filesFindLinked( test )
     includingTerminals : 1,
     includingDirs : 1,
     recursive : '2',
-    includingBase : 1,
+    includingStem : 1,
   })
   test.identical( _.select( got, '*/absolute' ), [ '/', '/normala', '/normalb', '/terminal' ] );
   test.identical( _.select( got, '*/real' ), [ '/', '/terminal', '/terminal', '/terminal' ] );
@@ -2451,11 +2465,12 @@ function filesFindLinked( test )
   {
     directory :
     {
-      terminal : 'terminal'
+      terminal : 'terminal',
     },
-    toDir : [{ softLink : '/directory'}]
+    toDir : [{ softLink : '/directory' }],
   }
   var provider = new _.FileProvider.Extract({ filesTree : tree });
+
   var got = provider.filesFind
   ({
     filePath : '/toDir',
@@ -2465,23 +2480,25 @@ function filesFindLinked( test )
     includingTerminals : 1,
     includingDirs : 1,
     recursive : '2',
-    includingBase : 1,
+    includingStem : 1,
   })
 
   test.identical( _.select( got, '*/absolute' ), [ '/toDir'  ] );
   test.identical( _.select( got, '*/real' ), [ '/toDir' ] );
 
+  // debugger;
   var got = provider.filesFind
   ({
     filePath : '/toDir',
-    resolvingSoftLink : 1,
     outputFormat : 'record',
+    resolvingSoftLink : 1,
     includingTransient : 1,
     includingTerminals : 1,
     includingDirs : 1,
+    includingStem : 1,
     recursive : '2',
-    includingBase : 1,
   })
+
   test.identical( _.select( got, '*/absolute' ), [ '/toDir', '/toDir/terminal'  ] );
   test.identical( _.select( got, '*/real' ), [ '/directory', '/directory/terminal'  ] );
 
@@ -2498,7 +2515,6 @@ function filesFindLinked( test )
   _.fileProvider.filesDelete( dir );
   _.fileProvider.fileWrite( terminal, terminal )
   _.fileProvider.softLink( dstPath, srcPath );
-
   test.is( _.fileProvider.isSoftLink( dstPath ) );
 
   var got = _.fileProvider.filesFind
@@ -2510,8 +2526,9 @@ function filesFindLinked( test )
     includingTerminals : 1,
     includingDirs : 1,
     recursive : '2',
-    includingBase : 1,
+    includingStem : 1,
   })
+
   var expectedAbsolutes = _.path.s.resolve( dir, [ 'toDir'  ] );
   var expectedReal = _.path.s.resolve( dir, [ 'toDir' ] );
   test.identical( _.select( got, '*/absolute' ), expectedAbsolutes );
@@ -2526,8 +2543,9 @@ function filesFindLinked( test )
     includingTerminals : 1,
     includingDirs : 1,
     recursive : '2',
-    includingBase : 1,
-  })
+    includingStem : 1,
+  });
+
   var expectedAbsolutes = _.path.s.resolve( dir, [ 'toDir', 'toDir/terminal' ] );
   var expectedReal = _.path.s.resolve( dir, [ 'directory', 'directory/terminal' ] );
   test.identical( _.select( got, '*/absolute' ), expectedAbsolutes );
@@ -2557,7 +2575,7 @@ function filesFindLinked( test )
     includingTerminals : 1,
     includingDirs : 1,
     recursive : '2',
-    includingBase : 1,
+    includingStem : 1,
   })
 
   test.identical( _.select( got, '*/absolute' ), [ '/', '/toDir', '/directory', '/directory/terminal'  ] );
@@ -2572,7 +2590,7 @@ function filesFindLinked( test )
     includingTerminals : 1,
     includingDirs : 1,
     recursive : '2',
-    includingBase : 1,
+    includingStem : 1,
   })
   test.identical( _.select( got, '*/absolute' ), [ '/', '/directory', '/directory/terminal', '/toDir', '/toDir/terminal'  ] );
   test.identical( _.select( got, '*/real' ), [ '/', '/directory', '/directory/terminal', '/directory', '/directory/terminal'  ] );
@@ -2602,7 +2620,7 @@ function filesFindLinked( test )
     includingTerminals : 1,
     includingDirs : 1,
     recursive : '2',
-    includingBase : 1,
+    includingStem : 1,
   })
   var expectedAbsolutes = _.path.s.resolve( dir, [ '.', 'toDir', 'directory', 'directory/terminal',  ] );
   var expectedReal = _.path.s.resolve( dir, [ '.', 'toDir', 'directory', 'directory/terminal' ] );
@@ -2618,7 +2636,7 @@ function filesFindLinked( test )
     includingTerminals : 1,
     includingDirs : 1,
     recursive : '2',
-    includingBase : 1,
+    includingStem : 1,
   })
   var expectedAbsolutes = _.path.s.resolve( dir, [ '.', 'directory', 'directory/terminal', 'toDir', 'toDir/terminal' ] );
   var expectedReal = _.path.s.resolve( dir, [ '.', 'directory', 'directory/terminal', 'directory', 'directory/terminal' ] );
@@ -2643,7 +2661,7 @@ function filesFindResolving( test )
     orderingExclusion : [],
     sortingWithArray : null,
     outputFormat : 'record',
-    includingBase : 1,
+    includingStem : 1,
     includingTerminals : 1,
     includingTransient : 1,
     recursive : '2'
@@ -3224,7 +3242,7 @@ function filesFindResolving( test )
     filePath : testDir,
     resolvingSoftLink : 1,
     resolvingTextLink : 0,
-    includingBase : 0
+    includingStem : 0
   }
   var options = _.mapExtend( o, fixedOptions );
   _.fileProvider.softLink( softLink, srcDirPath );
@@ -3782,6 +3800,7 @@ function filesFindGlob( test )
     includingTerminals : 1,
     includingDirs : 0,
     includingTransient : 0,
+    allowingMissing : 1,
     recursive : '2',
   });
 
@@ -3792,6 +3811,7 @@ function filesFindGlob( test )
     includingTerminals : 1,
     includingDirs : 1,
     includingTransient : 1,
+    allowingMissing : 1,
     recursive : '2',
   });
 
@@ -3896,11 +3916,19 @@ function filesFindGlob( test )
   test.case = 'globTerminals /src1/**, prefixPath : /src2';
 
   clean();
-  var expectedAbsolutes = [];
-  debugger;
+  var expAbsolutes = [];
+  var expIsActual = [];
+  var expIsTransient = [];
+  var expStat = [];
   var records = globTerminals({ filePath : 'src1/**', filter : { prefixPath : '/src2', basePath : '/src2' } });
   var gotAbsolutes = context.select( records, '*.absolute' );
-  test.identical( gotAbsolutes, expectedAbsolutes );
+  var gotIsActual = context.select( records, '*.isActual' );
+  var gotIsTransient = context.select( records, '*.isTransient' );
+  var gotStat = context.select( records, '*.stat' ).map( ( e ) => !!e );
+  test.identical( gotAbsolutes, expAbsolutes );
+  test.identical( gotIsActual, expIsActual );
+  test.identical( gotIsTransient, expIsTransient );
+  test.identical( gotStat, expStat );
 
   test.case = 'globAll /src1/**, prefixPath : /src2';
 
@@ -6342,7 +6370,7 @@ function filesReflectTrivial( t )
   function onWriteDstUp1( record )
   {
     if( !record.dst.isDir )
-    record.dst.context.fileProvider.fileWrite( record.dst.absolute, 'onWriteDstUp' );
+    record.dst.factory.fileProvider.fileWrite( record.dst.absolute, 'onWriteDstUp' );
     return record;
   }
 
@@ -6395,7 +6423,7 @@ function filesReflectTrivial( t )
   function onWriteDstUp2( record )
   {
     if( !record.dst.isDir )
-    record.dst.context.fileProvider.fileWrite( record.dst.absolute, 'onWriteDstUp' );
+    record.dst.factory.fileProvider.fileWrite( record.dst.absolute, 'onWriteDstUp' );
     return _.dont;
   }
 
@@ -10979,7 +11007,6 @@ function filesReflectLinked( test )
   // var dstLink4 = _.fileProvider.pathResolveSoftLink({ filePath : _.path.join( dstDir, 'link4' )/*, readLink : 1*/ });
   // test.identical( dstLink4, _.path.join( dstDir, 'fileNotExists' ) );
 
-
   xxx
 
 }
@@ -11985,7 +12012,7 @@ function filesFindDifference( test )
       sameTime : 1,
     });
 
-    // var files = _.fileProvider.filesFind({ filePath : dir, includingBase : 1, recursive : '2', includingTransient : 1 } );
+    // var files = _.fileProvider.filesFind({ filePath : dir, includingStem : 1, recursive : '2', includingTransient : 1 } );
 
     // logger.log( context.select( files, '*.relative' ) )
     // logger.log( context.select( files, '*.stat.mtime' ).map( ( t ) => t.getTime() ) )
@@ -13850,7 +13877,7 @@ var Self =
     filesReflectTrivial : filesReflectTrivial,
     filesReflectMutuallyExcluding : filesReflectMutuallyExcluding,
     filesReflectWithFilter : filesReflectWithFilter,
-    filesReflect : filesReflect,
+    // filesReflect : filesReflect, // xxx
     filesReflectRecursive : filesReflectRecursive,
     filesReflectGrab : filesReflectGrab,
     filesReflector : filesReflector,

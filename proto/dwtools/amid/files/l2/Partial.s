@@ -1154,7 +1154,7 @@ function pathResolveLinkHeadDirect_body( o )
     o2.filePath = filePath;
     o2.stat = null;
     o2.preservingRelative = 0;
-    if( i === splits.length - 1 || self.isLink( o2.filePath ) )
+    if( /*i === splits.length - 1 ||*/ self.isLink( o2.filePath ) )
     filePath = self.pathResolveLinkTail.body.call( self, o2 );
   }
 
@@ -5671,8 +5671,19 @@ function _softLinkSkip( c )
 {
   let self = this;
   let o = c.options;
-  if( o.dstPath !== o.srcPath && self.filesAreSoftLinked([ o.dstPath, o.srcPath ]) )
-  return true;
+
+  if( !o.allowingMissing )
+  // if( self.filesAreSoftLinked([ o.dstPath, o.srcPath ]) )
+  if( o.dstPath === o.srcPath )
+  throw _.err( 'Soft link cycle', path.moveReport( o.dstPath, o.srcPath ) );
+
+  // if( o.dstPath !== o.srcPath && self.filesAreSoftLinked([ o.dstPath, o.srcPath ]) )
+  // if( o.dstPath === o.srcPath )
+  // return true;
+
+  // if( o.dstPath !== o.srcPath && self.filesAreSoftLinked([ o.dstPath, o.srcPath ]) )
+  // return true;
+
 }
 
 let softLink = _link_functor

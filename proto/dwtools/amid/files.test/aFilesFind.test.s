@@ -97,30 +97,11 @@ function filesFindLinked( test )
   let self = this;
   let workDir = test.context.pathFor( test.name );
   let provider = self.provider;
+  let path = self.provider.path;
 
   /*
     link : [ normal, double, broken, self cycled, cycled, dst and src resolving to the same file ]
   */
-
-  var tree =
-  {
-    terminal : 'terminal',
-    normal : [{ softLink : '/terminal' }],
-    double : [{ softLink : '/normal' }],
-    broken : [{ softLink : '/missing' }],
-    brokenChain : [{ softLink : '/broken' }],
-    selfCycled : [{ softLink : '/selfCycled' }],
-    cycled :
-    {
-      one : [{ softLink : '/cycled/two' }],
-      two : [{ softLink : '/cycled/one' }],
-    },
-    toSameFile :
-    {
-      one : [{ softLink : '/terminal' }],
-      two : [{ softLink : '/terminal' }],
-    }
-  }
 
   //
 
@@ -134,18 +115,18 @@ function filesFindLinked( test )
 
   //
 
-  let terminalPath = self.provider.path.join( workDir, 'terminal' );
-  let normalPath = self.provider.path.join( workDir, 'normal' );
-  let doublePath = self.provider.path.join( workDir, 'double' );
-  let brokenPath = self.provider.path.join( workDir, 'broken' );
-  let missingPath = self.provider.path.join( workDir, 'missing' );
-  let selfPath = self.provider.path.join( workDir, 'self' );
-  let onePath = self.provider.path.join( workDir, 'one' );
-  let twoPath = self.provider.path.join( workDir, 'two' );
-  let normalaPath = self.provider.path.join( workDir, 'normala' );
-  let normalbPath = self.provider.path.join( workDir, 'normalb' );
-  let dirPath = self.provider.path.join( workDir, 'directory' );
-  let toDirPath = self.provider.path.join( workDir, 'toDir' );
+  let terminalPath = path.join( workDir, 'terminal' );
+  let normalPath = path.join( workDir, 'normal' );
+  let doublePath = path.join( workDir, 'double' );
+  let brokenPath = path.join( workDir, 'broken' );
+  let missingPath = path.join( workDir, 'missing' );
+  let selfPath = path.join( workDir, 'self' );
+  let onePath = path.join( workDir, 'one' );
+  let twoPath = path.join( workDir, 'two' );
+  let normalaPath = path.join( workDir, 'normala' );
+  let normalbPath = path.join( workDir, 'normalb' );
+  let dirPath = path.join( workDir, 'directory' );
+  let toDirPath = path.join( workDir, 'toDir' );
 
   //
 
@@ -161,7 +142,7 @@ function filesFindLinked( test )
   self.provider.fileWrite( terminalPath, terminalPath );
   self.provider.softLink( normalPath, terminalPath );
 
-  var got = provider.filesFind
+  var got = self.provider.filesFind
   ({
     filePath : workDir,
     resolvingSoftLink : 0,
@@ -175,7 +156,7 @@ function filesFindLinked( test )
   test.identical( select( got, '*/absolute' ), [ '/', '/normal', '/terminal' ] );
   test.identical( select( got, '*/real' ), [ '/', '/normal', '/terminal' ] );
 
-  var got = provider.filesFind
+  var got = self.provider.filesFind
   ({
     filePath : workDir,
     resolvingSoftLink : 1,
@@ -207,7 +188,7 @@ function filesFindLinked( test )
   self.provider.softLink( normalPath, terminalPath );
   self.provider.softLink( doublePath, normalPath );
 
-  var got = provider.filesFind
+  var got = self.provider.filesFind
   ({
     filePath : workDir,
     resolvingSoftLink : 0,
@@ -221,7 +202,7 @@ function filesFindLinked( test )
   test.identical( select( got, '*/absolute' ), [ '/', '/double', '/normal', '/terminal' ] );
   test.identical( select( got, '*/real' ), [ '/', '/double', '/normal', '/terminal' ] );
 
-  var got = provider.filesFind
+  var got = self.provider.filesFind
   ({
     filePath : workDir,
     resolvingSoftLink : 1,
@@ -253,7 +234,7 @@ function filesFindLinked( test )
   self.provider.softLink( normalPath, terminalPath );
   self.provider.softLink({ dstPath : brokenPath, srcPath : missingPath, allowingMissing : 1 });
 
-  var got = provider.filesFind
+  var got = self.provider.filesFind
   ({
     filePath : workDir,
     resolvingSoftLink : 0,
@@ -268,7 +249,7 @@ function filesFindLinked( test )
   test.identical( select( got, '*/absolute' ), [ '/', '/broken', '/normal', '/terminal' ] );
   test.identical( select( got, '*/real' ), [ '/', '/broken', '/normal', '/terminal' ] );
 
-  var got = provider.filesFind
+  var got = self.provider.filesFind
   ({
     filePath : workDir,
     resolvingSoftLink : 0,
@@ -299,7 +280,7 @@ function filesFindLinked( test )
     })
   })
 
-  var got = provider.filesFind
+  var got = self.provider.filesFind
   ({
     filePath : workDir,
     resolvingSoftLink : 1,
@@ -334,7 +315,7 @@ function filesFindLinked( test )
   self.provider.softLink( normalPath, terminalPath );
   self.provider.softLink({ dstPath : selfPath, srcPath : '../self', allowingMissing : 1 });
 
-  var got = provider.filesFind
+  var got = self.provider.filesFind
   ({
     filePath : workDir,
     resolvingSoftLink : 0,
@@ -349,7 +330,7 @@ function filesFindLinked( test )
   test.identical( select( got, '*/absolute' ), [ '/',  '/normal', '/self', '/terminal' ] );
   test.identical( select( got, '*/real' ), [ '/', '/normal', '/self', '/terminal' ] );
 
-  var got = provider.filesFind
+  var got = self.provider.filesFind
   ({
     filePath : workDir,
     resolvingSoftLink : 0,
@@ -411,7 +392,7 @@ function filesFindLinked( test )
   self.provider.softLink({ dstPath : twoPath, srcPath : onePath, allowingMissing : 1 });
   self.provider.softLink({ dstPath : onePath, srcPath : twoPath, allowingMissing : 1 });
 
-  var got = provider.filesFind
+  var got = self.provider.filesFind
   ({
     filePath : workDir,
     resolvingSoftLink : 0,
@@ -442,7 +423,7 @@ function filesFindLinked( test )
     })
   })
 
-  var got = provider.filesFind
+  var got = self.provider.filesFind
   ({
     filePath : workDir,
     resolvingSoftLink : 0,
@@ -475,7 +456,7 @@ function filesFindLinked( test )
   self.provider.softLink( normalaPath,terminalPath );
   self.provider.softLink( normalbPath,terminalPath );
 
-  var got = provider.filesFind
+  var got = self.provider.filesFind
   ({
     filePath : workDir,
     resolvingSoftLink : 0,
@@ -489,7 +470,7 @@ function filesFindLinked( test )
   test.identical( select( got, '*/absolute' ), [ '/', '/normala', '/normalb', '/terminal' ] );
   test.identical( select( got, '*/real' ), [ '/', '/normala', '/normalb', '/terminal' ] );
 
-  var got = provider.filesFind
+  var got = self.provider.filesFind
   ({
     filePath : workDir,
     resolvingSoftLink : 1,
@@ -524,7 +505,7 @@ function filesFindLinked( test )
   self.provider.fileWrite( terminalInDirPath, terminalInDirPath );
   self.provider.softLink( toDirPath,dirPath );
 
-  var got = provider.filesFind
+  var got = self.provider.filesFind
   ({
     filePath : toDirPath,
     resolvingSoftLink : 0,
@@ -540,7 +521,7 @@ function filesFindLinked( test )
   test.identical( select( got, '*/real' ), [ '/toDir' ] );
 
   // debugger;
-  var got = provider.filesFind
+  var got = self.provider.filesFind
   ({
     filePath : toDirPath,
     outputFormat : 'record',
@@ -576,7 +557,7 @@ function filesFindLinked( test )
   self.provider.fileWrite( terminalInDirPath, terminalInDirPath );
   self.provider.softLink( toDirPath,dirPath );
 
-  var got = provider.filesFind
+  var got = self.provider.filesFind
   ({
     filePath : workDir,
     resolvingSoftLink : 0,
@@ -591,7 +572,7 @@ function filesFindLinked( test )
   test.identical( select( got, '*/absolute' ), [ '/', '/toDir', '/directory', '/directory/terminal'  ] );
   test.identical( select( got, '*/real' ), [ '/', '/toDir', '/directory', '/directory/terminal'  ] );
 
-  var got = provider.filesFind
+  var got = self.provider.filesFind
   ({
     filePath : workDir,
     resolvingSoftLink : 1,

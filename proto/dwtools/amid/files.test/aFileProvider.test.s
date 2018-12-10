@@ -6957,8 +6957,8 @@ function fileCopySoftLinkResolving( test )
   test.is( self.provider.isSoftLink( srcPath2 ) );
   test.is( self.provider.isSoftLink( dstPath ) );
   test.is( self.provider.isSoftLink( dstPath2 ) );
-  test.identical( self.provider.pathResolveLink( srcPath ), srcPathTerminal );
-  test.identical( self.provider.pathResolveLink( dstPath ), srcPathTerminal );
+  test.identical( self.provider.pathResolveLinkFull( srcPath ), srcPathTerminal );
+  test.identical( self.provider.pathResolveLinkFull( dstPath ), srcPathTerminal );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), srcPath2 );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), srcPath2 );
 
@@ -6977,8 +6977,8 @@ function fileCopySoftLinkResolving( test )
   test.is( self.provider.isSoftLink( srcPath2 ) );
   test.is( self.provider.isTerminal( dstPath ) );
   test.is( self.provider.isSoftLink( dstPath2 ) );
-  test.identical( self.provider.pathResolveLink( srcPath ), srcPathTerminal );
-  test.identical( self.provider.pathResolveLink( dstPath2 ), dstPathTerminal );
+  test.identical( self.provider.pathResolveLinkFull( srcPath ), srcPathTerminal );
+  test.identical( self.provider.pathResolveLinkFull( dstPath2 ), dstPathTerminal );
   test.identical( self.provider.fileRead( srcPath ), srcPathTerminal );
   test.identical( self.provider.fileRead( dstPath ), srcPathTerminal );
 
@@ -6998,8 +6998,8 @@ function fileCopySoftLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.is( self.provider.isSoftLink( dstPath2 ) );
   test.is( self.provider.isSoftLink( dstPathTerminal ) );
-  test.identical( self.provider.pathResolveLink( srcPath ), srcPathTerminal );
-  test.identical( self.provider.pathResolveLink( dstPath ), srcPathTerminal );
+  test.identical( self.provider.pathResolveLinkFull( srcPath ), srcPathTerminal );
+  test.identical( self.provider.pathResolveLinkFull( dstPath ), srcPathTerminal );
   test.identical( self.provider.fileRead( srcPath ), srcPathTerminal );
   test.identical( self.provider.fileRead( dstPath ), srcPathTerminal );
 
@@ -7020,8 +7020,8 @@ function fileCopySoftLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath2 ) );
   test.is( self.provider.isTerminal( srcPathTerminal ) );
   test.is( self.provider.isTerminal( dstPathTerminal ) );
-  test.identical( self.provider.pathResolveLink( srcPath ), srcPathTerminal );
-  test.identical( self.provider.pathResolveLink( dstPath ), dstPathTerminal );
+  test.identical( self.provider.pathResolveLinkFull( srcPath ), srcPathTerminal );
+  test.identical( self.provider.pathResolveLinkFull( dstPath ), dstPathTerminal );
   test.identical( self.provider.fileRead( srcPath ), srcPathTerminal );
   test.identical( self.provider.fileRead( dstPath ), srcPathTerminal );
 
@@ -10297,9 +10297,9 @@ function fileRenameSoftLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.is( self.provider.isSoftLink( dstPath2 ) );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), srcPath2 );
-  test.identical( self.provider.pathResolveLink( srcPath2 ), srcPathTerminal );
-  test.identical( self.provider.pathResolveLink( dstPath ), srcPathTerminal );
-  test.identical( self.provider.pathResolveLink( dstPath2 ), dstPathTerminal );
+  test.identical( self.provider.pathResolveLinkFull( srcPath2 ), srcPathTerminal );
+  test.identical( self.provider.pathResolveLinkFull( dstPath ), srcPathTerminal );
+  test.identical( self.provider.pathResolveLinkFull( dstPath2 ), dstPathTerminal );
   test.identical( self.provider.fileRead( srcPath2 ), srcPathTerminal );
   test.identical( self.provider.fileRead( dstPath ), srcPathTerminal );
   test.identical( self.provider.fileRead( dstPath2 ), dstPathTerminal );
@@ -10345,9 +10345,9 @@ function fileRenameSoftLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.is( self.provider.isSoftLink( dstPath2 ) );
   test.is( self.provider.isSoftLink( dstPathTerminal ) );
-  test.identical( self.provider.pathResolveLink( srcPath2 ), srcPathTerminal );
-  test.identical( self.provider.pathResolveLink( dstPath ), srcPathTerminal );
-  test.identical( self.provider.pathResolveLink( dstPath2 ), srcPathTerminal );
+  test.identical( self.provider.pathResolveLinkFull( srcPath2 ), srcPathTerminal );
+  test.identical( self.provider.pathResolveLinkFull( dstPath ), srcPathTerminal );
+  test.identical( self.provider.pathResolveLinkFull( dstPath2 ), srcPathTerminal );
   test.identical( self.provider.fileRead( dstPath ), srcPathTerminal );
   test.identical( self.provider.fileRead( dstPath2 ), srcPathTerminal );
 
@@ -10501,7 +10501,7 @@ function fileRenameSoftLinkResolving( test )
   test.identical( self.provider.pathResolveSoftLink( srcPath2 ), srcPath );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), srcPath2 );
   test.identical( self.provider.pathResolveSoftLink( dstPath2 ), dstPath );
-  test.identical( self.provider.pathResolveLink( dstPath ), srcPath );
+  test.identical( self.provider.pathResolveLinkFull( dstPath ), srcPath );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -10541,7 +10541,7 @@ function fileRenameSoftLinkResolving( test )
   test.identical( self.provider.pathResolveSoftLink( dstPath ), srcPath2 );
   test.identical( self.provider.pathResolveSoftLink( srcPath2 ), srcPath );
   test.identical( self.provider.pathResolveSoftLink( dstPath2 ), dstPath );
-  test.identical( self.provider.pathResolveLink( dstPath2 ), srcPath );
+  test.identical( self.provider.pathResolveLinkFull( dstPath2 ), srcPath );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -15202,17 +15202,17 @@ function softLinkSync( test )
   // {
   //   test.shouldThrowError(() =>
   //   {
-  //     self.provider.pathResolveLink({ filePath : srcPath, resolvingSoftLink : 1 });
+  //     self.provider.pathResolveLinkFull({ filePath : srcPath, resolvingSoftLink : 1 });
   //   })
   // }
   // else
   // {
-  //   var got = self.provider.pathResolveLink({ filePath : srcPath, resolvingSoftLink : 1 });
+  //   var got = self.provider.pathResolveLinkFull({ filePath : srcPath, resolvingSoftLink : 1 });
   //   test.identical( got, srcPath )
   // }
   test.mustNotThrowError(() =>
   {
-    self.provider.pathResolveLink
+    self.provider.pathResolveLinkFull
     ({
       filePath : srcPath,
       resolvingSoftLink : 1,
@@ -15223,7 +15223,7 @@ function softLinkSync( test )
 
   test.mustNotThrowError(() =>
   {
-    self.provider.pathResolveLink
+    self.provider.pathResolveLinkFull
     ({
       filePath : srcPath,
       resolvingSoftLink : 1,
@@ -15234,7 +15234,7 @@ function softLinkSync( test )
 
   test.mustNotThrowError(() =>
   {
-    self.provider.pathResolveLink
+    self.provider.pathResolveLinkFull
     ({
       filePath : srcPath,
       resolvingSoftLink : 1,
@@ -15245,7 +15245,7 @@ function softLinkSync( test )
 
   test.shouldThrowError(() =>
   {
-    self.provider.pathResolveLink
+    self.provider.pathResolveLinkFull
     ({
       filePath : srcPath,
       resolvingSoftLink : 1,
@@ -15273,7 +15273,7 @@ function softLinkSync( test )
   // {
     test.shouldThrowError( () =>
     {
-      self.provider.pathResolveLink
+      self.provider.pathResolveLinkFull
       ({
         filePath : dstPath,
         resolvingSoftLink : 1,
@@ -15283,12 +15283,12 @@ function softLinkSync( test )
     })
 
     self.provider.fileWrite( notExistingPath, notExistingPath );
-    var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+    var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
     test.identical( got, notExistingPath );
   // }
   // else
   // {
-  //   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  //   var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
   //   test.identical( got, notExistingPath );
   // }
 
@@ -15312,7 +15312,7 @@ function softLinkSync( test )
   // {
     test.shouldThrowError( () =>
     {
-      self.provider.pathResolveLink
+      self.provider.pathResolveLinkFull
       ({
         filePath : dstPath,
         resolvingSoftLink : 1,
@@ -15321,12 +15321,12 @@ function softLinkSync( test )
       });
     })
     self.provider.fileWrite( notExistingPath, notExistingPath );
-    var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+    var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
     test.identical( got, notExistingPath );
   // }
   // else
   // {
-  //   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  //   var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
   //   test.identical( got, notExistingPath );
   // }
 
@@ -15349,7 +15349,7 @@ function softLinkSync( test )
   // {
     test.shouldThrowError( () =>
     {
-      self.provider.pathResolveLink
+      self.provider.pathResolveLinkFull
       ({
         filePath : dstPath,
         resolvingSoftLink : 1,
@@ -15358,12 +15358,12 @@ function softLinkSync( test )
       });
     })
     self.provider.fileWrite( notExistingPath, notExistingPath );
-    var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+    var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
     test.identical( got, notExistingPath );
   // }
   // else
   // {
-  //   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  //   var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
   //   test.identical( got, notExistingPath );
   // }
 
@@ -15386,7 +15386,7 @@ function softLinkSync( test )
   // {
     test.shouldThrowError( () =>
     {
-      self.provider.pathResolveLink
+      self.provider.pathResolveLinkFull
       ({
         filePath : dstPath,
         resolvingSoftLink : 1,
@@ -15395,12 +15395,12 @@ function softLinkSync( test )
       });
     })
     self.provider.fileWrite( notExistingPath, notExistingPath );
-    var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+    var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
     test.identical( got, notExistingPath );
   // }
   // else
   // {
-  //   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  //   var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
   //   test.identical( got, notExistingPath );
   // }
 
@@ -15997,7 +15997,7 @@ function softLinkAsync( test )
     })
     .doThen( () =>
     {
-      var got = self.provider.pathResolveLink({ filePath : srcPath, resolvingSoftLink : 1 });
+      var got = self.provider.pathResolveLinkFull({ filePath : srcPath, resolvingSoftLink : 1 });
       test.identical( got, srcPath )
       return null;
     })
@@ -16120,7 +16120,7 @@ function softLinkRelativePath( test )
   var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
   self.provider.filesDelete( dstPath );
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile );
   test.is( self.provider.isSoftLink( dstPath ) );
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
@@ -16132,7 +16132,7 @@ function softLinkRelativePath( test )
   var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
   self.provider.filesDelete( dstPath );
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile );
   test.is( self.provider.isSoftLink( dstPath ) );
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
@@ -16145,7 +16145,7 @@ function softLinkRelativePath( test )
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile );
   test.is( self.provider.isSoftLink( dstPath ) );
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
@@ -16158,7 +16158,7 @@ function softLinkRelativePath( test )
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile );
   test.is( self.provider.isSoftLink( dstPath ) );
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
@@ -16173,7 +16173,7 @@ function softLinkRelativePath( test )
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile2 );
   test.is( self.provider.isSoftLink( dstPath ) );
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
@@ -16188,7 +16188,7 @@ function softLinkRelativePath( test )
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile2 );
   test.is( self.provider.isSoftLink( dstPath ) );
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
@@ -16204,7 +16204,7 @@ function softLinkRelativePath( test )
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile2 );
   test.is( self.provider.isSoftLink( dstPath ) );
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
@@ -16220,7 +16220,7 @@ function softLinkRelativePath( test )
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile2 );
   test.is( self.provider.isSoftLink( dstPath ) );
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
@@ -16236,7 +16236,7 @@ function softLinkRelativePath( test )
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile2 );
   test.is( self.provider.isSoftLink( dstPath ) );
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
@@ -16252,7 +16252,7 @@ function softLinkRelativePath( test )
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile2 );
   test.is( self.provider.isSoftLink( dstPath ) );
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
@@ -16268,7 +16268,7 @@ function softLinkRelativePath( test )
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile2 );
   test.is( self.provider.isSoftLink( dstPath ) );
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
@@ -16284,7 +16284,7 @@ function softLinkRelativePath( test )
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile2 );
   test.is( self.provider.isSoftLink( dstPath ) );
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
@@ -16300,7 +16300,7 @@ function softLinkRelativePath( test )
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile2 );
   test.is( self.provider.isSoftLink( dstPath ) );
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
@@ -16316,7 +16316,7 @@ function softLinkRelativePath( test )
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToFile2 );
   test.is( self.provider.isSoftLink( dstPath ) );
   var got = self.provider.fileRead({ filePath : dstPath, resolvingSoftLink : 1 });
@@ -16347,7 +16347,7 @@ function softLinkRelativePath( test )
   var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstDir' );
   self.provider.filesDelete( dstPath );
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToDir );
   test.is( self.provider.isSoftLink( dstPath ) );
   var got = self.provider.dirRead({ filePath : dstPath });
@@ -16359,7 +16359,7 @@ function softLinkRelativePath( test )
   var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstDir' );
   self.provider.filesDelete( dstPath );
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToDir );
   test.is( self.provider.isSoftLink( dstPath ) );
   var got = self.provider.dirRead({ filePath : dstPath });
@@ -16372,7 +16372,7 @@ function softLinkRelativePath( test )
   self.provider.filesDelete( _.path.dir( dstPath ) );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToDir );
   test.is( self.provider.isSoftLink( dstPath ) );
   var got = self.provider.dirRead({ filePath : dstPath });
@@ -16385,7 +16385,7 @@ function softLinkRelativePath( test )
   self.provider.filesDelete( _.path.dir( dstPath ) );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToDir );
   test.is( self.provider.isSoftLink( dstPath ) );
   var got = self.provider.dirRead({ filePath : dstPath });
@@ -16402,7 +16402,7 @@ function softLinkRelativePath( test )
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToDir2 );
   test.is( self.provider.isSoftLink( dstPath ) );
   var got = self.provider.dirRead({ filePath : dstPath });
@@ -16419,7 +16419,7 @@ function softLinkRelativePath( test )
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToDir2 );
   test.is( self.provider.isSoftLink( dstPath ) );
   var got = self.provider.dirRead({ filePath : dstPath });
@@ -16438,7 +16438,7 @@ function softLinkRelativePath( test )
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToDir2 );
   test.is( self.provider.isSoftLink( dstPath ) );
   var got = self.provider.dirRead({ filePath : dstPath });
@@ -16455,7 +16455,7 @@ function softLinkRelativePath( test )
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToDir2 );
   test.is( self.provider.isSoftLink( dstPath ) );
   var got = self.provider.dirRead({ filePath : dstPath });
@@ -16472,7 +16472,7 @@ function softLinkRelativePath( test )
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToDir2 );
   test.is( self.provider.isSoftLink( dstPath ) );
   var got = self.provider.dirRead({ filePath : dstPath });
@@ -16489,7 +16489,7 @@ function softLinkRelativePath( test )
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToDir2 );
   test.is( self.provider.isSoftLink( dstPath ) );
   var got = self.provider.dirRead({ filePath : dstPath });
@@ -16507,7 +16507,7 @@ function softLinkRelativePath( test )
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToDir2 );
   test.is( self.provider.isSoftLink( dstPath ) );
   var got = self.provider.dirRead({ filePath : dstPath });
@@ -16524,7 +16524,7 @@ function softLinkRelativePath( test )
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToDir2 );
   test.is( self.provider.isSoftLink( dstPath ) );
   var got = self.provider.dirRead({ filePath : dstPath });
@@ -16542,7 +16542,7 @@ function softLinkRelativePath( test )
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToDir2 );
   test.is( self.provider.isSoftLink( dstPath ) );
   var got = self.provider.dirRead({ filePath : dstPath });
@@ -16560,7 +16560,7 @@ function softLinkRelativePath( test )
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
   test.identical( got, pathToDir2 );
   test.is( self.provider.isSoftLink( dstPath ) );
   var got = self.provider.dirRead({ filePath : dstPath });
@@ -16589,7 +16589,7 @@ function softLinkRelativePath( test )
   var dstPathResolved = _.path.resolve( srcPath, dstPath );
   self.provider.filesDelete( dstPathResolved );
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPathResolved, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPathResolved, resolvingSoftLink : 1 });
   test.identical( got, pathToFile );
   test.is( self.provider.isSoftLink( dstPathResolved ) );
   var got = self.provider.fileRead({ filePath : dstPathResolved, resolvingSoftLink : 1 });
@@ -16600,7 +16600,7 @@ function softLinkRelativePath( test )
   var dstPathResolved = _.path.resolve( srcPath, dstPath );
   self.provider.filesDelete( dstPathResolved );
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPathResolved, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPathResolved, resolvingSoftLink : 1 });
   test.identical( got, pathToFile );
   test.is( self.provider.isSoftLink( dstPathResolved ) );
   var got = self.provider.fileRead({ filePath : dstPathResolved, resolvingSoftLink : 1 });
@@ -16611,7 +16611,7 @@ function softLinkRelativePath( test )
   var dstPathResolved = _.path.resolve( srcPath, dstPath );
   self.provider.filesDelete( dstPathResolved );
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPathResolved, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPathResolved, resolvingSoftLink : 1 });
   test.identical( got, pathToFile );
   test.is( self.provider.isSoftLink( dstPathResolved ) );
   var got = self.provider.fileRead({ filePath : dstPathResolved, resolvingSoftLink : 1 });
@@ -16622,7 +16622,7 @@ function softLinkRelativePath( test )
   var dstPathResolved = _.path.resolve( srcPath, dstPath );
   self.provider.filesDelete( dstPathResolved );
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPathResolved, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPathResolved, resolvingSoftLink : 1 });
   test.identical( got, pathToFile );
   test.is( self.provider.isSoftLink( dstPathResolved ) );
   var got = self.provider.fileRead({ filePath : dstPathResolved, resolvingSoftLink : 1 });
@@ -16634,7 +16634,7 @@ function softLinkRelativePath( test )
   self.provider.dirMakeForFile( dstPathResolved );
   self.provider.filesDelete( dstPathResolved );
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPathResolved, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPathResolved, resolvingSoftLink : 1 });
   test.identical( got, pathToFile );
   test.is( self.provider.isSoftLink( dstPathResolved ) );
   var got = self.provider.fileRead({ filePath : dstPathResolved, resolvingSoftLink : 1 });
@@ -16646,7 +16646,7 @@ function softLinkRelativePath( test )
   self.provider.dirMakeForFile( dstPathResolved );
   self.provider.filesDelete( dstPathResolved );
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPathResolved, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPathResolved, resolvingSoftLink : 1 });
   test.identical( got, pathToFile );
   test.is( self.provider.isSoftLink( dstPathResolved ) );
   var got = self.provider.fileRead({ filePath : dstPathResolved, resolvingSoftLink : 1 });
@@ -16667,7 +16667,7 @@ function softLinkRelativePath( test )
   var dstPathResolved = _.path.resolve( srcPath, dstPath );
   self.provider.filesDelete( dstPathResolved );
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPathResolved, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPathResolved, resolvingSoftLink : 1 });
   test.identical( got, pathToDir );
   test.is( self.provider.isSoftLink( dstPathResolved ) );
   var got = self.provider.dirRead({ filePath : dstPathResolved });
@@ -16678,7 +16678,7 @@ function softLinkRelativePath( test )
   var dstPathResolved = _.path.resolve( srcPath, dstPath );
   self.provider.filesDelete( dstPathResolved );
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPathResolved, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPathResolved, resolvingSoftLink : 1 });
   test.identical( got, pathToDir );
   test.is( self.provider.isSoftLink( dstPathResolved ) );
   var got = self.provider.dirRead({ filePath : dstPathResolved });
@@ -16689,7 +16689,7 @@ function softLinkRelativePath( test )
   var dstPathResolved = _.path.resolve( srcPath, dstPath );
   self.provider.filesDelete( dstPathResolved );
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPathResolved, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPathResolved, resolvingSoftLink : 1 });
   test.identical( got, pathToDir );
   test.is( self.provider.isSoftLink( dstPathResolved ) );
   var got = self.provider.dirRead({ filePath : dstPathResolved });
@@ -16700,7 +16700,7 @@ function softLinkRelativePath( test )
   var dstPathResolved = _.path.resolve( srcPath, dstPath );
   self.provider.filesDelete( dstPathResolved );
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPathResolved, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPathResolved, resolvingSoftLink : 1 });
   test.identical( got, pathToDir );
   test.is( self.provider.isSoftLink( dstPathResolved ) );
   var got = self.provider.dirRead({ filePath : dstPathResolved });
@@ -16712,7 +16712,7 @@ function softLinkRelativePath( test )
   self.provider.filesDelete( dstPathResolved );
   self.provider.dirMakeForFile( dstPathResolved );
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPathResolved, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPathResolved, resolvingSoftLink : 1 });
   test.identical( got, pathToDir );
   test.is( self.provider.isSoftLink( dstPathResolved ) );
   var got = self.provider.dirRead({ filePath : dstPathResolved });
@@ -16724,7 +16724,7 @@ function softLinkRelativePath( test )
   self.provider.filesDelete( dstPathResolved );
   self.provider.dirMakeForFile( dstPathResolved );
   self.provider.softLink( dstPath, srcPath );
-  var got = self.provider.pathResolveLink({ filePath : dstPathResolved, resolvingSoftLink : 1 });
+  var got = self.provider.pathResolveLinkFull({ filePath : dstPathResolved, resolvingSoftLink : 1 });
   test.identical( got, pathToDir );
   test.is( self.provider.isSoftLink( dstPathResolved ) );
   var got = self.provider.dirRead({ filePath : dstPathResolved });
@@ -16753,7 +16753,7 @@ function softLinkRelativePath( test )
   // {
     test.shouldThrowError( () =>
     {
-      self.provider.pathResolveLink
+      self.provider.pathResolveLinkFull
       ({
         filePath : dstPath,
         resolvingSoftLink : 1,
@@ -16762,13 +16762,13 @@ function softLinkRelativePath( test )
       })
     });
     self.provider.fileWrite( pathToFile, pathToFile );
-    var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+    var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
     test.identical( got, pathToFile );
 
   // }
   // else
   // {
-  //   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  //   var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
   //   test.identical( got, pathToFile );
   // }
   var got = self.provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
@@ -16791,7 +16791,7 @@ function softLinkRelativePath( test )
   // {
     test.shouldThrowError( () =>
     {
-      self.provider.pathResolveLink
+      self.provider.pathResolveLinkFull
       ({
         filePath : dstPath,
         resolvingSoftLink : 1,
@@ -16800,13 +16800,13 @@ function softLinkRelativePath( test )
       })
     });
     self.provider.fileWrite( pathToFile, pathToFile );
-    var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+    var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
     test.identical( got, pathToFile );
 
   // }
   // else
   // {
-  //   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  //   var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
   //   test.identical( got, pathToFile );
   // }
   var got = self.provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
@@ -16829,7 +16829,7 @@ function softLinkRelativePath( test )
   // {
     test.shouldThrowError( () =>
     {
-      self.provider.pathResolveLink
+      self.provider.pathResolveLinkFull
       ({
         filePath : dstPath,
         resolvingSoftLink : 1,
@@ -16838,13 +16838,13 @@ function softLinkRelativePath( test )
       })
     });
     self.provider.fileWrite( pathToFile, pathToFile );
-    var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+    var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
     test.identical( got, pathToFile );
 
   // }
   // else
   // {
-  //   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  //   var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
   //   test.identical( got, pathToFile );
   // }
   var got = self.provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
@@ -16867,7 +16867,7 @@ function softLinkRelativePath( test )
   // {
     test.shouldThrowError( () =>
     {
-      self.provider.pathResolveLink
+      self.provider.pathResolveLinkFull
       ({
         filePath : dstPath,
         resolvingSoftLink : 1,
@@ -16876,13 +16876,13 @@ function softLinkRelativePath( test )
       })
     });
     self.provider.fileWrite( pathToFile, pathToFile );
-    var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+    var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
     test.identical( got, pathToFile );
 
   // }
   // else
   // {
-  //   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
+  //   var got = self.provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
   //   test.identical( got, pathToFile );
   // }
   var got = self.provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
@@ -16909,7 +16909,7 @@ function softLinkRelativePath( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.shouldThrowError( () =>
   {
-    self.provider.pathResolveLink
+    self.provider.pathResolveLinkFull
     ({
       filePath : dstPath,
       resolvingSoftLink : 1,
@@ -16938,7 +16938,7 @@ function softLinkRelativePath( test )
   test.is( self.provider.isSoftLink( dstPathResolved ) );
   test.shouldThrowError( () =>
   {
-    self.provider.pathResolveLink
+    self.provider.pathResolveLinkFull
     ({
       filePath : dstPath,
       resolvingSoftLink : 1,
@@ -17282,13 +17282,13 @@ function softLinkChain( test )
   test.description = 'resolve path';
 
   var expected = path.join( dir, 'a' );
-  var got = provider.pathResolveLink( path.join( dir, 'a/b' ) );
+  var got = provider.pathResolveLinkFull( path.join( dir, 'a/b' ) );
   var stat = provider.statResolvedRead( got );
   test.is( !!stat );
   test.identical( got, expected );
 
   var expected = path.join( dir, 'x' );
-  var got = provider.pathResolveLink( path.join( dir, 'a/c' ) );
+  var got = provider.pathResolveLinkFull( path.join( dir, 'a/c' ) );
   var stat = provider.statResolvedRead( got );
   test.is( !!stat );
   test.identical( got, expected );
@@ -18132,7 +18132,7 @@ function softLinkSoftLinkResolving( test )
   test.identical( self.provider.pathResolveSoftLink( srcPath2 ), srcPath );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), srcPath );
   test.identical( self.provider.pathResolveSoftLink( dstPath2 ), dstPath );
-  test.identical( self.provider.pathResolveLink( dstPath ), srcPath )
+  test.identical( self.provider.pathResolveLinkFull( dstPath ), srcPath )
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -18659,7 +18659,7 @@ function softLinkRelativeLinkResolving( test )
   test.identical( self.provider.pathResolveSoftLink( srcPath2 ), '../src' );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), srcPath );
   test.identical( self.provider.pathResolveSoftLink( dstPath2 ), '../dst' );
-  test.identical( self.provider.pathResolveLink( dstPath ), srcPath );
+  test.identical( self.provider.pathResolveLinkFull( dstPath ), srcPath );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -22445,7 +22445,7 @@ function hardLinkSoftLinkResolving( test )
   test.identical( self.provider.pathResolveSoftLink( srcPath2 ), srcPath );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPath2 );
   test.identical( self.provider.pathResolveSoftLink( dstPath2 ), dstPath );
-  test.identical( self.provider.pathResolveLink( dstPath ), dstPath );
+  test.identical( self.provider.pathResolveLinkFull( dstPath ), dstPath );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -30095,7 +30095,7 @@ pathResolveLinkTailChain.timeOut = 30000;
 
 //
 
-function pathResolveLink( test )
+function pathResolveLinkFull( test )
 {
   let self = this;
 
@@ -30119,7 +30119,7 @@ function pathResolveLink( test )
   test.case = 'not existing file';
   self.provider.filesDelete( _.path.dir( filePath ) );
 
-  var got = self.provider.pathResolveLink
+  var got = self.provider.pathResolveLinkFull
   ({
      filePath : filePath,
      allowingMissing : 0,
@@ -30127,7 +30127,7 @@ function pathResolveLink( test )
   });
   test.identical( got, null );
 
-  var got = self.provider.pathResolveLink
+  var got = self.provider.pathResolveLinkFull
   ({
      filePath : filePath,
      allowingMissing : 1,
@@ -30137,7 +30137,7 @@ function pathResolveLink( test )
 
   test.shouldThrowError( () =>
   {
-    self.provider.pathResolveLink
+    self.provider.pathResolveLinkFull
     ({
        filePath : filePath,
        allowingMissing : 0,
@@ -30145,7 +30145,7 @@ function pathResolveLink( test )
     });
   })
 
-  var got = self.provider.pathResolveLink
+  var got = self.provider.pathResolveLinkFull
   ({
      filePath : filePath,
      allowingMissing : 1,
@@ -30165,7 +30165,7 @@ function pathResolveLink( test )
     allowingMissing : 1
   });
 
-  var got = self.provider.pathResolveLink
+  var got = self.provider.pathResolveLinkFull
   ({
      filePath : linkPath,
      allowingMissing : 0,
@@ -30173,7 +30173,7 @@ function pathResolveLink( test )
   });
   test.identical( got, null );
 
-  var got = self.provider.pathResolveLink
+  var got = self.provider.pathResolveLinkFull
   ({
      filePath : linkPath,
      allowingMissing : 1,
@@ -30183,7 +30183,7 @@ function pathResolveLink( test )
 
   test.shouldThrowError( () =>
   {
-    self.provider.pathResolveLink
+    self.provider.pathResolveLinkFull
     ({
       filePath : linkPath,
       allowingMissing : 0,
@@ -30191,7 +30191,7 @@ function pathResolveLink( test )
     });
   })
 
-  var got = self.provider.pathResolveLink
+  var got = self.provider.pathResolveLinkFull
   ({
      filePath : linkPath,
      allowingMissing : 1,
@@ -30205,7 +30205,7 @@ function pathResolveLink( test )
   self.provider.filesDelete( _.path.dir( filePath ) );
   self.provider.softLink({ dstPath : linkPath, srcPath : '../link', allowingMissing : 1, makingDirectory : 1 });
 
-  var got = self.provider.pathResolveLink
+  var got = self.provider.pathResolveLinkFull
   ({
      filePath : linkPath,
      allowingMissing : 0,
@@ -30213,7 +30213,7 @@ function pathResolveLink( test )
   });
   test.identical( got, null );
 
-  var got = self.provider.pathResolveLink
+  var got = self.provider.pathResolveLinkFull
   ({
      filePath : linkPath,
      allowingMissing : 1,
@@ -30223,7 +30223,7 @@ function pathResolveLink( test )
 
   test.shouldThrowError( () =>
   {
-    self.provider.pathResolveLink
+    self.provider.pathResolveLinkFull
     ({
       filePath : linkPath,
       allowingMissing : 0,
@@ -30232,7 +30232,7 @@ function pathResolveLink( test )
   })
   test.identical( got, linkPath );
 
-  var got = self.provider.pathResolveLink
+  var got = self.provider.pathResolveLinkFull
   ({
      filePath : linkPath,
      allowingMissing : 1,
@@ -30247,7 +30247,7 @@ function pathResolveLink( test )
   self.provider.softLink({ dstPath : linkPath2, srcPath : linkPath, allowingMissing : 1, makingDirectory : 1 });
   self.provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissing : 1, makingDirectory : 1 });
 
-  var got = self.provider.pathResolveLink
+  var got = self.provider.pathResolveLinkFull
   ({
      filePath : linkPath,
      allowingMissing : 0,
@@ -30255,7 +30255,7 @@ function pathResolveLink( test )
   });
   test.identical( got, null );
 
-  var got = self.provider.pathResolveLink
+  var got = self.provider.pathResolveLinkFull
   ({
      filePath : linkPath,
      allowingMissing : 1,
@@ -30265,7 +30265,7 @@ function pathResolveLink( test )
 
   test.shouldThrowError( () =>
   {
-    self.provider.pathResolveLink
+    self.provider.pathResolveLinkFull
     ({
       filePath : linkPath,
       allowingMissing : 0,
@@ -30274,7 +30274,7 @@ function pathResolveLink( test )
   })
   test.identical( got, linkPath );
 
-  var got = self.provider.pathResolveLink
+  var got = self.provider.pathResolveLinkFull
   ({
      filePath : linkPath,
      allowingMissing : 1,
@@ -30285,7 +30285,7 @@ function pathResolveLink( test )
   self.provider.fieldPop( 'usingTextLink', true );
 }
 
-pathResolveLink.timeOut = 30000;
+pathResolveLinkFull.timeOut = 30000;
 
 //
 
@@ -30625,7 +30625,7 @@ var Self =
     uriResolve : uriResolve,
 
     pathResolveLinkTailChain : pathResolveLinkTailChain,
-    pathResolveLink : pathResolveLink,
+    pathResolveLinkFull : pathResolveLinkFull,
     pathResolveSoftLink : pathResolveSoftLink,
     pathResolveTextLink : pathResolveTextLink,
 

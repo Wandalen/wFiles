@@ -106,8 +106,11 @@ path:
       - ./dwtools/amid/files/l9
       - ./dwtools/amid/files.test
       - ./dwtools/amid/files.test/aFileProvider.test.s
+      - ./dwtools/amid/files.test/aFilesFind.test.s
       - ./dwtools/amid/files.test/Files.copy.test.s
       - ./dwtools/amid/files.test/Files.etc.test.ss
+      - ./dwtools/amid/files.test/FilesFind.Extract.test.s
+      - ./dwtools/amid/files.test/FilesFind.HardDrive.test.ss
       - ./dwtools/amid/files.test/FilesFind.test.ss
       - ./dwtools/amid/files.test/FilesRead.test.s
       - ./dwtools/amid/files.test/Hub.copy.test.ss
@@ -160,8 +163,11 @@ path:
       - ./dwtools/amid/files/l8_filter/Image.s
       - ./dwtools/amid/files/l8_filter/Reroot.s
       - ./dwtools/amid/files.test/aFileProvider.test.s
+      - ./dwtools/amid/files.test/aFilesFind.test.s
       - ./dwtools/amid/files.test/Files.copy.test.s
       - ./dwtools/amid/files.test/Files.etc.test.ss
+      - ./dwtools/amid/files.test/FilesFind.Extract.test.s
+      - ./dwtools/amid/files.test/FilesFind.HardDrive.test.ss
       - ./dwtools/amid/files.test/FilesFind.test.ss
       - ./dwtools/amid/files.test/FilesRead.test.s
       - ./dwtools/amid/files.test/Hub.copy.test.ss
@@ -285,8 +291,11 @@ reflector:
       ./dwtools/amid/files/l8_filter/Image.s: true
       ./dwtools/amid/files/l8_filter/Reroot.s: true
       ./dwtools/amid/files.test/aFileProvider.test.s: true
+      ./dwtools/amid/files.test/aFilesFind.test.s: true
       ./dwtools/amid/files.test/Files.copy.test.s: true
       ./dwtools/amid/files.test/Files.etc.test.ss: true
+      ./dwtools/amid/files.test/FilesFind.Extract.test.s: true
+      ./dwtools/amid/files.test/FilesFind.HardDrive.test.ss: true
       ./dwtools/amid/files.test/FilesFind.test.ss: true
       ./dwtools/amid/files.test/FilesRead.test.s: true
       ./dwtools/amid/files.test/Hub.copy.test.ss: true
@@ -451,8 +460,11 @@ exported:
         - ./dwtools/amid/files/l8_filter/Image.s
         - ./dwtools/amid/files/l8_filter/Reroot.s
         - ./dwtools/amid/files.test/aFileProvider.test.s
+        - ./dwtools/amid/files.test/aFilesFind.test.s
         - ./dwtools/amid/files.test/Files.copy.test.s
         - ./dwtools/amid/files.test/Files.etc.test.ss
+        - ./dwtools/amid/files.test/FilesFind.Extract.test.s
+        - ./dwtools/amid/files.test/FilesFind.HardDrive.test.ss
         - ./dwtools/amid/files.test/FilesFind.test.ss
         - ./dwtools/amid/files.test/FilesRead.test.s
         - ./dwtools/amid/files.test/Hub.copy.test.ss

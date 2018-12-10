@@ -30902,6 +30902,20 @@ function pathResolveLinkExperiments( test )
 
   /**/
 
+  var got = self.provider.pathResolveLinkFull
+  ({
+     filePath : filePath,
+     allowingMissing : 0,
+     resolvingHeadDirect : 1,
+     resolvingHeadReverse : 0,
+     resolvingSoftLink : 1,
+     resolvingTextLink : 1,
+     throwing : 0,
+  });
+  test.identical( got, null );
+
+  /**/
+
   // test.case = 'not existing file, allowingMissing : 0';
   // self.provider.filesDelete( _.path.dir( filePath ) );
   //

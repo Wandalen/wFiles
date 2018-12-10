@@ -839,8 +839,7 @@ function pathResolveLinkFull_body( o )
     // o.stat = o2.stat;
 
   }
-
-  if( o.stat )
+  else
   {
 
     let o2 =
@@ -1154,7 +1153,7 @@ function pathResolveLinkHeadDirect_body( o )
     o2.filePath = filePath;
     o2.stat = null;
     o2.preservingRelative = 0;
-    if( /*i === splits.length - 1 ||*/ self.isLink( o2.filePath ) )
+    if( i === splits.length - 1 || self.isLink( o2.filePath ) )
     filePath = self.pathResolveLinkTail.body.call( self, o2 );
   }
 

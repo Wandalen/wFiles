@@ -2927,7 +2927,7 @@ function filesAreSame_body( o )
   /* hard linked */
 
   if( _.bigIntIs( o.ins1.stat.ino ) && _.bigIntIs( o.ins2.stat.ino ) )
-  if( o.ins1.context.effectiveFileProvider === o.ins2.context.effectiveFileProvider )
+  if( o.ins1.factory.effectiveFileProvider === o.ins2.factory.effectiveFileProvider )
   if( o.ins1.stat.ino > 0 )
   if( o.ins1.stat.ino === o.ins2.stat.ino )
   return true;

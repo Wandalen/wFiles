@@ -30153,6 +30153,144 @@ function pathResolveLinkFull( test )
   });
   test.identical( got, filePath );
 
+  var got = self.provider.pathResolveLinkFull
+  ({
+     filePath : filePath,
+     allowingMissing : 0,
+     resolvingHeadDirect : 0,
+     resolvingHeadReverse : 0,
+     resolvingSoftLink : 1,
+     resolvingTextLink : 1,
+     throwing : 0,
+  });
+  test.identical( got, null );
+
+  var got = self.provider.pathResolveLinkFull
+  ({
+     filePath : filePath,
+     allowingMissing : 0,
+     resolvingHeadDirect : 1,
+     resolvingHeadReverse : 1,
+     resolvingSoftLink : 1,
+     resolvingTextLink : 1,
+     throwing : 0,
+  });
+  test.identical( got, null );
+
+  var got = self.provider.pathResolveLinkFull
+  ({
+     filePath : filePath,
+     allowingMissing : 0,
+     resolvingHeadDirect : 1,
+     resolvingHeadReverse : 0,
+     resolvingSoftLink : 1,
+     resolvingTextLink : 1,
+     throwing : 0,
+  });
+  test.identical( got, null );
+
+  var got = self.provider.pathResolveLinkFull
+  ({
+     filePath : filePath,
+     allowingMissing : 0,
+     resolvingHeadDirect : 0,
+     resolvingHeadReverse : 1,
+     resolvingSoftLink : 1,
+     resolvingTextLink : 1,
+     throwing : 0,
+  });
+  test.identical( got, null );
+
+  var got = self.provider.pathResolveLinkFull
+  ({
+     filePath : filePath,
+     allowingMissing : 1,
+     resolvingHeadDirect : 1,
+     resolvingHeadReverse : 1,
+     resolvingSoftLink : 1,
+     resolvingTextLink : 1,
+     throwing : 0,
+  });
+  test.identical( got, filePath );
+
+  var got = self.provider.pathResolveLinkFull
+  ({
+     filePath : filePath,
+     allowingMissing : 1,
+     resolvingHeadDirect : 0,
+     resolvingHeadReverse : 1,
+     resolvingSoftLink : 1,
+     resolvingTextLink : 1,
+     throwing : 0,
+  });
+  test.identical( got, filePath );
+
+  var got = self.provider.pathResolveLinkFull
+  ({
+     filePath : filePath,
+     allowingMissing : 1,
+     resolvingHeadDirect : 1,
+     resolvingHeadReverse : 0,
+     resolvingSoftLink : 1,
+     resolvingTextLink : 1,
+     throwing : 0,
+  });
+  test.identical( got, filePath );
+
+  var got = self.provider.pathResolveLinkFull
+  ({
+     filePath : filePath,
+     allowingMissing : 1,
+     resolvingHeadDirect : 0,
+     resolvingHeadReverse : 0,
+     resolvingSoftLink : 1,
+     resolvingTextLink : 1,
+     throwing : 0,
+  });
+  test.identical( got, filePath );
+
+  test.shouldThrowError( () =>
+  {
+    self.provider.pathResolveLinkFull
+    ({
+       filePath : filePath,
+       allowingMissing : 0,
+       resolvingHeadDirect : 0,
+       resolvingHeadReverse : 0,
+       resolvingSoftLink : 1,
+       resolvingTextLink : 1,
+       throwing : 1,
+    });
+  })
+
+  test.shouldThrowError( () =>
+  {
+    self.provider.pathResolveLinkFull
+    ({
+       filePath : filePath,
+       allowingMissing : 0,
+       resolvingHeadDirect : 1,
+       resolvingHeadReverse : 0,
+       resolvingSoftLink : 1,
+       resolvingTextLink : 1,
+       throwing : 1,
+    });
+  })
+
+  test.shouldThrowError( () =>
+  {
+    self.provider.pathResolveLinkFull
+    ({
+       filePath : filePath,
+       allowingMissing : 0,
+       resolvingHeadDirect : 0,
+       resolvingHeadReverse : 1,
+       resolvingSoftLink : 1,
+       resolvingTextLink : 1,
+       throwing : 1,
+    });
+  })
+
   //
 
   test.case = 'absolute softlink to missing'
@@ -30880,6 +31018,55 @@ function pathResolveLinkExperiments( test )
 
 }
 
+//
+
+function fileCopyExperiment( test )
+{
+  let self = this;
+
+  let workDir = test.context.pathFor( 'written/fileCopySoftLinkResolving' );
+  let srcPath = self.provider.path.join( workDir, 'src' );
+  let dstPath = self.provider.path.join( workDir, 'dst' );
+
+  /*
+    src,dst - both are self soft links
+
+    1. dstPath fails to resolve, dstStat is null, dstPath is not changed because allowingMissing is 1 by default
+    2. verifyDst is called because fileExists check gives true
+       verifyDst throws an error because does not expect to see dstStat as null in this case
+
+
+    Expected behaviour :
+
+    dstStat is created in verifyDst, stat from pathResolveLinkFull is not be used
+    dstPath is be rewritten by soft link from srcPath
+
+  */
+
+  self.provider.filesDelete( workDir );
+  self.provider.dirMake( workDir );
+  self.provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissing : 1 });
+  self.provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissing : 1 });
+  var got = self.provider.fileCopy
+  ({
+      srcPath : srcPath,
+      dstPath : dstPath,
+      sync : 1,
+      rewriting : 1,
+      resolvingSrcSoftLink : 0,
+      resolvingDstSoftLink : 1,
+      allowingMissing : 0,
+      throwing : 0
+  });
+  test.identical( got, true );
+  test.identical( o.srcPath, srcPath );
+  test.identical( o.dstPath, dstPath );
+  test.is( self.provider.isSoftLink( srcPath ) );
+  test.is( self.provider.isSoftLink( dstPath ) );
+  test.identical( self.provider.pathResolveSoftLink( srcPath ), '../src' );
+  test.identical( self.provider.pathResolveSoftLink( dstPath ), '../src' );
+}
+
 // --
 // declare
 // --
@@ -31018,6 +31205,7 @@ var Self =
     pathResolveTextLink : pathResolveTextLink,
 
     pathResolveLinkExperiments : pathResolveLinkExperiments,
+    fileCopyExperiment : fileCopyExperiment,
   },
 
 };

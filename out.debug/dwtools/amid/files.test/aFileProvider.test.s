@@ -30900,90 +30900,90 @@ function pathResolveLinkExperiments( test )
   let linkPath2 = test.context.pathFor( 'written/pathResolveLinkExperiments/link2' );
   let path = self.provider.path;
 
-  /**/
+  /* */
 
-  // test.case = 'not existing file, allowingMissing : 0';
-  // self.provider.filesDelete( _.path.dir( filePath ) );
+  test.case = 'not existing file, allowingMissing : 0';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+
+  // works after change in pathResolveLinkHeadDirect
+  var got = self.provider.pathResolveLinkFull
+  ({
+     filePath : filePath,
+     allowingMissing : 0,
+     resolvingHeadDirect : 1,
+     resolvingHeadReverse : 1,
+     resolvingSoftLink : 1,
+     resolvingTextLink : 1,
+     throwing : 0,
+  });
+  test.identical( got, null );
+
+  test.case = 'not existing file, allowingMissing : 1';
+
+  var got = self.provider.pathResolveLinkFull
+  ({
+     filePath : filePath,
+     allowingMissing : 1,
+     resolvingHeadDirect : 1,
+     resolvingHeadReverse : 1,
+     resolvingSoftLink : 1,
+     resolvingTextLink : 1,
+     throwing : 0,
+  });
+  test.identical( got, filePath );
+
+  test.case = 'not existing file, allowingMissing : 0, resolvingHeadDirect : 0, resolvingHeadReverse : 0';
+
+  var got = self.provider.pathResolveLinkFull
+  ({
+     filePath : filePath,
+     allowingMissing : 0,
+     resolvingHeadDirect : 0,
+     resolvingHeadReverse : 0,
+     resolvingSoftLink : 1,
+     resolvingTextLink : 1,
+     throwing : 0,
+  });
+  test.identical( got, null );
+
   //
-  // // works after change in pathResolveLinkHeadDirect
-  // var got = self.provider.pathResolveLinkFull
-  // ({
-  //    filePath : filePath,
-  //    allowingMissing : 0,
-  //    resolvingHeadDirect : 1,
-  //    resolvingHeadReverse : 1,
-  //    resolvingSoftLink : 1,
-  //    resolvingTextLink : 1,
-  //    throwing : 0,
-  // });
-  // test.identical( got, null );
-  //
-  // test.case = 'not existing file, allowingMissing : 1';
-  //
-  // var got = self.provider.pathResolveLinkFull
-  // ({
-  //    filePath : filePath,
-  //    allowingMissing : 1,
-  //    resolvingHeadDirect : 1,
-  //    resolvingHeadReverse : 1,
-  //    resolvingSoftLink : 1,
-  //    resolvingTextLink : 1,
-  //    throwing : 0,
-  // });
-  // test.identical( got, filePath );
-  //
-  // test.case = 'not existing file, allowingMissing : 0, resolvingHeadDirect : 0, resolvingHeadReverse : 0';
-  //
-  // var got = self.provider.pathResolveLinkFull
-  // ({
-  //    filePath : filePath,
-  //    allowingMissing : 0,
-  //    resolvingHeadDirect : 0,
-  //    resolvingHeadReverse : 0,
-  //    resolvingSoftLink : 1,
-  //    resolvingTextLink : 1,
-  //    throwing : 0,
-  // });
-  // test.identical( got, null );
-  //
-  // //
-  //
-  // test.case = 'not existing file';
-  // self.provider.filesDelete( _.path.dir( filePath ) );
-  //
-  // //should return same even if resolvingHead is off
-  // var got = self.provider.pathResolveLinkFull
-  // ({
-  //    filePath : filePath,
-  //    allowingMissing : 0,
-  //    resolvingHeadDirect : 0,
-  //    resolvingHeadReverse : 0,
-  //    resolvingSoftLink : 1,
-  //    resolvingTextLink : 1,
-  //    throwing : 0,
-  // });
-  // test.identical( got, null );
+
+  test.case = 'not existing file';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+
+  //should return same even if resolvingHead is off
+  var got = self.provider.pathResolveLinkFull
+  ({
+     filePath : filePath,
+     allowingMissing : 0,
+     resolvingHeadDirect : 0,
+     resolvingHeadReverse : 0,
+     resolvingSoftLink : 1,
+     resolvingTextLink : 1,
+     throwing : 0,
+  });
+  test.identical( got, null );
 
   /* */
 
-  // // works after change in pathResolveLinkHeadDirect
-  // test.case = 'two soft links in path';
-  // self.provider.filesDelete( path.dir( filePath ) );
-  // self.provider.fileWrite( filePath, filePath );
-  // self.provider.softLink( linkPath, '..' );
-  // self.provider.softLink( linkPath2, '../file' );
-  // var o =
-  // {
-  //   filePath : path.join( dir, 'link/link2' ),
-  //   preservingRelative : 1,
-  //   resolvingHeadDirect : 1,
-  //   resolvingHeadReverse : 0,
-  //   allowingMissing : 0,
-  //   throwing : 1
-  // };
-  // var got = self.provider.pathResolveLinkFull( o );
-  // var expectedResult = path.join( dir, 'link/file' )
-  // test.identical( got, expectedResult );
+  // works after change in pathResolveLinkHeadDirect
+  test.case = 'two soft links in path';
+  self.provider.filesDelete( path.dir( filePath ) );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.softLink( linkPath, '..' );
+  self.provider.softLink( linkPath2, '../file' );
+  var o =
+  {
+    filePath : path.join( dir, 'link/link2' ),
+    preservingRelative : 1,
+    resolvingHeadDirect : 1,
+    resolvingHeadReverse : 0,
+    allowingMissing : 0,
+    throwing : 1
+  };
+  var got = self.provider.pathResolveLinkFull( o );
+  var expectedResult = path.join( dir, 'link/file' )
+  test.identical( got, expectedResult );
 
   /* */
 

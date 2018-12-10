@@ -839,7 +839,9 @@ function pathResolveLinkFull_body( o )
     // o.stat = o2.stat;
 
   }
-  else
+  // else
+
+  if( o.stat )
   {
 
     let o2 =
@@ -860,6 +862,13 @@ function pathResolveLinkFull_body( o )
     o.stat = o2.stat;
     _.assert( o.stat !== undefined );
 
+  }
+  else
+  {
+    if( !o.allowingMissing )
+    {
+      result = null;
+    }
   }
 
   if( o.stat && o.resolvingHeadReverse )
@@ -1153,7 +1162,7 @@ function pathResolveLinkHeadDirect_body( o )
     o2.filePath = filePath;
     o2.stat = null;
     o2.preservingRelative = 0;
-    if( i === splits.length - 1 || self.isLink( o2.filePath ) )
+    if( /*i === splits.length - 1 ||*/ self.isLink( o2.filePath ) )
     filePath = self.pathResolveLinkTail.body.call( self, o2 );
   }
 

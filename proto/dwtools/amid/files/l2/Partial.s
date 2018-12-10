@@ -1221,6 +1221,7 @@ function pathResolveLinkHeadReverse_body( o )
 }
 
 
+
 _.routineExtend( pathResolveLinkHeadReverse_body, _pathResolveLink );
 
 //

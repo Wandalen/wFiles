@@ -46,7 +46,7 @@ var filesTree =
 
 //
 
-function makePath( filePath )
+function pathFor( filePath )
 {
   return '/' + filePath;
 }
@@ -67,7 +67,7 @@ var Proto =
   {
     filesTree : filesTree,
     provider : _.FileProvider.Extract( { filesTree : filesTree, usingTime : 1 } ),
-    makePath : makePath,
+    pathFor : pathFor,
     testFile : '/file1'
   },
 

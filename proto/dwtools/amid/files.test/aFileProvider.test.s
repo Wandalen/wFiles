@@ -30153,6 +30153,144 @@ function pathResolveLinkFull( test )
   });
   test.identical( got, filePath );
 
+  var got = self.provider.pathResolveLinkFull
+  ({
+     filePath : filePath,
+     allowingMissing : 0,
+     resolvingHeadDirect : 0,
+     resolvingHeadReverse : 0,
+     resolvingSoftLink : 1,
+     resolvingTextLink : 1,
+     throwing : 0,
+  });
+  test.identical( got, null );
+
+  var got = self.provider.pathResolveLinkFull
+  ({
+     filePath : filePath,
+     allowingMissing : 0,
+     resolvingHeadDirect : 1,
+     resolvingHeadReverse : 1,
+     resolvingSoftLink : 1,
+     resolvingTextLink : 1,
+     throwing : 0,
+  });
+  test.identical( got, null );
+
+  var got = self.provider.pathResolveLinkFull
+  ({
+     filePath : filePath,
+     allowingMissing : 0,
+     resolvingHeadDirect : 1,
+     resolvingHeadReverse : 0,
+     resolvingSoftLink : 1,
+     resolvingTextLink : 1,
+     throwing : 0,
+  });
+  test.identical( got, null );
+
+  var got = self.provider.pathResolveLinkFull
+  ({
+     filePath : filePath,
+     allowingMissing : 0,
+     resolvingHeadDirect : 0,
+     resolvingHeadReverse : 1,
+     resolvingSoftLink : 1,
+     resolvingTextLink : 1,
+     throwing : 0,
+  });
+  test.identical( got, null );
+
+  var got = self.provider.pathResolveLinkFull
+  ({
+     filePath : filePath,
+     allowingMissing : 1,
+     resolvingHeadDirect : 1,
+     resolvingHeadReverse : 1,
+     resolvingSoftLink : 1,
+     resolvingTextLink : 1,
+     throwing : 0,
+  });
+  test.identical( got, filePath );
+
+  var got = self.provider.pathResolveLinkFull
+  ({
+     filePath : filePath,
+     allowingMissing : 1,
+     resolvingHeadDirect : 0,
+     resolvingHeadReverse : 1,
+     resolvingSoftLink : 1,
+     resolvingTextLink : 1,
+     throwing : 0,
+  });
+  test.identical( got, filePath );
+
+  var got = self.provider.pathResolveLinkFull
+  ({
+     filePath : filePath,
+     allowingMissing : 1,
+     resolvingHeadDirect : 1,
+     resolvingHeadReverse : 0,
+     resolvingSoftLink : 1,
+     resolvingTextLink : 1,
+     throwing : 0,
+  });
+  test.identical( got, filePath );
+
+  var got = self.provider.pathResolveLinkFull
+  ({
+     filePath : filePath,
+     allowingMissing : 1,
+     resolvingHeadDirect : 0,
+     resolvingHeadReverse : 0,
+     resolvingSoftLink : 1,
+     resolvingTextLink : 1,
+     throwing : 0,
+  });
+  test.identical( got, filePath );
+
+  test.shouldThrowError( () =>
+  {
+    self.provider.pathResolveLinkFull
+    ({
+       filePath : filePath,
+       allowingMissing : 0,
+       resolvingHeadDirect : 0,
+       resolvingHeadReverse : 0,
+       resolvingSoftLink : 1,
+       resolvingTextLink : 1,
+       throwing : 1,
+    });
+  })
+
+  test.shouldThrowError( () =>
+  {
+    self.provider.pathResolveLinkFull
+    ({
+       filePath : filePath,
+       allowingMissing : 0,
+       resolvingHeadDirect : 1,
+       resolvingHeadReverse : 0,
+       resolvingSoftLink : 1,
+       resolvingTextLink : 1,
+       throwing : 1,
+    });
+  })
+
+  test.shouldThrowError( () =>
+  {
+    self.provider.pathResolveLinkFull
+    ({
+       filePath : filePath,
+       allowingMissing : 0,
+       resolvingHeadDirect : 0,
+       resolvingHeadReverse : 1,
+       resolvingSoftLink : 1,
+       resolvingTextLink : 1,
+       throwing : 1,
+    });
+  })
+
   //
 
   test.case = 'absolute softlink to missing'

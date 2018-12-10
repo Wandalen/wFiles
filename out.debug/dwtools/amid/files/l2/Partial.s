@@ -1220,6 +1220,7 @@ function pathResolveLinkHeadReverse_body( o )
   return result;
 }
 
+
 _.routineExtend( pathResolveLinkHeadReverse_body, _pathResolveLink );
 
 //

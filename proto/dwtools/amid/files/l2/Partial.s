@@ -1154,7 +1154,7 @@ function pathResolveLinkHeadDirect_body( o )
     o2.filePath = filePath;
     o2.stat = null;
     o2.preservingRelative = 0;
-    if( self.isLink( o2.filePath ) || i === splits.length - 1 )
+    if( i === splits.length - 1 || self.isLink( o2.filePath ) )
     filePath = self.pathResolveLinkTail.body.call( self, o2 );
   }
 

@@ -336,11 +336,8 @@ function filesFindSingle_body( o )
     if( including )
     {
       r = handleUp( r, o );
-
-      _.assert( r === false || r === _.dont || r === or );
       if( r === false || r === _.dont )
       return false;
-
       recordAdd( r );
     }
 
@@ -417,12 +414,8 @@ function filesFindSingle_body( o )
     return;
 
     r = handleUp( r, o );
-
-    _.assert( r === false || r === _.dont || r === or );
-
     if( r === false || r === _.dont )
     return false;
-
     recordAdd( r );
 
     handleDown( r, o );
@@ -433,8 +426,9 @@ function filesFindSingle_body( o )
   function handleUp( record, op )
   {
     _.assert( arguments.length === 2 );
-    record = op.onUp.call( self, record, op );
-    return record;
+    let result = op.onUp.call( self, record, op );
+    _.assert( result === false || result === _.dont || result === record, 'onUp should return original record or _.dont, but got', _.toStrShort( result ) );
+    return result;
   }
 
   /* - */
@@ -442,8 +436,9 @@ function filesFindSingle_body( o )
   function handleDown( record, op )
   {
     _.assert( arguments.length === 2 );
-    record = op.onDown.call( self, record, op );
-    return record;
+    let result = op.onDown.call( self, record, op );
+    // _.assert( result === undefined || result === record, 'onDown should return original record or undefined, but got', _.toStrShort( result ) ); // xxx
+    return result;
   }
 
   /* - */

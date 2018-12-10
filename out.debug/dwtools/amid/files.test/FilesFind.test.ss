@@ -11024,7 +11024,9 @@ function filesDelete( test )
   test.case = 'delete terminal file';
   _.fileProvider.fileWrite( filePath, ' ');
   _.fileProvider.filesDelete( filePath );
+  debugger;
   var stat = _.fileProvider.statResolvedRead( filePath );
+  debugger;
   test.identical( stat, null );
 
   test.case = 'delete empty dir';

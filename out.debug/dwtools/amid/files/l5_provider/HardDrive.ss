@@ -321,7 +321,7 @@ function pathResolveSoftLinkAct( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( self.path.isAbsolute( o.filePath ) );
 
-  /* using self.resolvingSoftLink causes recursion problem in pathResolveLink */
+  /* using self.resolvingSoftLink causes recursion problem in pathResolveLinkFull */
   if( !self.isSoftLink( o.filePath ) )
   return o.filePath;
 
@@ -621,7 +621,7 @@ function dirReadAct( o )
   // /* xxx : temp fix of windows link chain problem */
   // if( process.platform === 'win32' )
   // {
-  //   o.filePath = self.pathResolveLink({ filePath : o.filePath, resolvingSoftLink : 1, resolvingTextLink : 0 });
+  //   o.filePath = self.pathResolveLinkFull({ filePath : o.filePath, resolvingSoftLink : 1, resolvingTextLink : 0 });
   // }
 
   let fileNativePath = self.path.nativize( o.filePath );

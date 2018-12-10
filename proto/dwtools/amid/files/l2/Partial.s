@@ -1517,7 +1517,7 @@ function statRead_body( o )
     }
   }
 
-  // o.filePath = self.pathResolveLink( o2 );
+  // o.filePath = self.pathResolveLinkFull( o2 );
   //
   // if( o.filePath === null )
   // {
@@ -3124,7 +3124,7 @@ function isDir_body( o )
   _.assert( _.boolLike( o.resolvingSoftLink ) );
   _.assert( _.boolLike( o.resolvingTextLink ) );
 
-  // o.filePath = self.pathResolveLink
+  // o.filePath = self.pathResolveLinkFull
   // ({
   //   filePath : o.filePath,
   //   resolvingSoftLink : o.resolvingSoftLink,
@@ -3243,7 +3243,7 @@ function isHardLink_body( o )
   //   throwing : 0
   // }
   //
-  // o.filePath = self.pathResolveLink( o2 );
+  // o.filePath = self.pathResolveLinkFull( o2 );
 
   let o2 =
   {
@@ -3335,7 +3335,7 @@ function isSoftLink_body( o )
   //   throwing : 0
   // }
   //
-  // o.filePath = self.pathResolveLink( o2 );
+  // o.filePath = self.pathResolveLinkFull( o2 );
 
   let o2 =
   {
@@ -3412,7 +3412,7 @@ function isTextLink_body( o )
   //   throwing : 0
   // }
   //
-  // o.filePath = self.pathResolveLink( o2 );
+  // o.filePath = self.pathResolveLinkFull( o2 );
 
   let o2 =
   {
@@ -3493,7 +3493,7 @@ function isLink_body( o )
   //   throwing : 0
   // }
   //
-  // o.filePath = self.pathResolveLink( o2 );
+  // o.filePath = self.pathResolveLinkFull( o2 );
 
   let o2 =
   {

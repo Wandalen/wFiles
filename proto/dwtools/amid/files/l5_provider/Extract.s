@@ -80,7 +80,7 @@ function pathResolveSoftLinkAct( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( self.path.isAbsolute( o.filePath ) );
 
-  // /* using self.resolvingSoftLink causes recursion problem in pathResolveLink */
+  // /* using self.resolvingSoftLink causes recursion problem in pathResolveLinkFull */
   // debugger;
   // if( !self.isSoftLink( o.filePath ) )
   // return o.filePath;

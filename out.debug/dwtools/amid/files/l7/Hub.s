@@ -482,7 +482,7 @@ function fileRead_body( o )
 
   _.assert( arguments.length === 1 );
 
-  o.filePath = self.pathResolveLink
+  o.filePath = self.pathResolveLinkFull
   ({
     filePath : o.filePath,
     resolvingSoftLink : o.resolvingSoftLink,
@@ -836,7 +836,7 @@ function routinesGenerate()
           // xxx
 
           if( hubResolving )
-          o[ p ] = self.pathResolveLink
+          o[ p ] = self.pathResolveLinkFull
           ({
             filePath : o[ p ],
             resolvingSoftLink : o.resolvingSoftLink || false,
@@ -1116,8 +1116,8 @@ for( let r in Routines )
 }
 
 _.assert( !_.mapKeys( missingMap ).length, 'routine(s) were not written into Proto explicitly', '\n', _.toStr( missingMap, { stringWrapper : '' } ) );
-_.assert( !FilteredRoutines.pathResolveLink );
-_.assert( !( 'pathResolveLink' in FilteredRoutines ) );
+_.assert( !FilteredRoutines.pathResolveLinkFull );
+_.assert( !( 'pathResolveLinkFull' in FilteredRoutines ) );
 _.assertMapHasNoUndefine( FilteredRoutines );
 _.assertMapHasNoUndefine( Proto );
 _.assertMapHasNoUndefine( Self );

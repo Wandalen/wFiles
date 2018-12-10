@@ -29724,10 +29724,10 @@ function pathResolveTextLink( test )
 
   test.case = 'relative textlink to file that does not exist';
   self.provider.filesDelete( workDir );
-  self.provider.textLink({ dstPath : linkPath, srcPath : '../file', allowingMissing : 1, makingDirectory : 1 });
+  self.provider.textLink({ dstPath : linkPath, srcPath : '../file2', allowingMissing : 1, makingDirectory : 1 });
   var o = { filePath : linkPath };
   var got = self.provider.pathResolveTextLink( o );
-  test.identical( got, '../file' );
+  test.identical( got, '../file2' );
 
   test.case = 'relative textlink to regular file';
   self.provider.filesDelete( workDir );
@@ -29746,7 +29746,7 @@ function pathResolveTextLink( test )
 
   test.case = 'relative softlink to file that does not exist';
   self.provider.filesDelete( workDir );
-  self.provider.softLink({ dstPath : linkPath, srcPath : '../file', allowingMissing : 1, makingDirectory : 1 });
+  self.provider.softLink({ dstPath : linkPath, srcPath : '../file2', allowingMissing : 1, makingDirectory : 1 });
   var o = { filePath : linkPath };
   var got = self.provider.pathResolveTextLink( o );
   test.identical( got, linkPath );
@@ -29890,7 +29890,7 @@ function pathResolveTextLink( test )
 
   test.case = 'relative textlink to file that does not exist';
   self.provider.filesDelete( workDir );
-  self.provider.textLink({ dstPath : linkPath, srcPath : '../file', allowingMissing : 1, makingDirectory : 1 });
+  self.provider.textLink({ dstPath : linkPath, srcPath : '../file2', allowingMissing : 1, makingDirectory : 1 });
   var o = { filePath : linkPath };
   var got = self.provider.pathResolveTextLink( o );
   test.identical( got, linkPath );
@@ -29912,7 +29912,7 @@ function pathResolveTextLink( test )
 
   test.case = 'relative softlink to file that does not exist';
   self.provider.filesDelete( workDir );
-  self.provider.softLink({ dstPath : linkPath, srcPath : '../file', allowingMissing : 1, makingDirectory : 1 });
+  self.provider.softLink({ dstPath : linkPath, srcPath : '../file2', allowingMissing : 1, makingDirectory : 1 });
   var o = { filePath : linkPath };
   var got = self.provider.pathResolveTextLink( o );
   test.identical( got, linkPath );
@@ -30028,19 +30028,36 @@ function pathResolveTextLink( test )
   if( !Config.debug )
   return;
 
-  test.case = 'File doesn´t exist';
-  self.provider.filesDelete( workDir );
-  self.provider.fileWrite( filePath, testData );
-  test.mustNotThrowError( () =>
-    self.provider.softLink({ dstPath : linkPath, srcPath : '../file2' })
-  );
-
   test.case = 'Expects object input';
   self.provider.filesDelete( workDir );
   self.provider.fileWrite( filePath, testData );
-  self.provider.softLink({ dstPath : linkPath, srcPath : filePath });
+  self.provider.textLink({ dstPath : linkPath, srcPath : filePath });
   test.mustNotThrowError( () =>
     self.provider.pathResolveTextLink( linkPath )
+  );
+
+  test.case = 'No arguments';
+  self.provider.filesDelete( workDir );
+  self.provider.fileWrite( filePath, testData );
+  self.provider.textLink({ dstPath : linkPath, srcPath : filePath });
+  test.shouldThrowErrorSync( () =>
+    self.provider.pathResolveTextLink( )
+  );
+
+  test.case = 'Too many arguments';
+  self.provider.filesDelete( workDir );
+  self.provider.fileWrite( filePath, testData );
+  self.provider.textLink({ dstPath : linkPath, srcPath : filePath });
+  test.shouldThrowErrorSync( () =>
+    self.provider.pathResolveTextLink(  { filePath : linkPath },  { filePath : linkPath }   )
+  );
+
+  test.case = 'No filePath option';
+  self.provider.filesDelete( workDir );
+  self.provider.fileWrite( filePath, testData );
+  self.provider.textLink({ dstPath : linkPath, srcPath : filePath });
+  test.shouldThrowErrorSync( () =>
+    self.provider.pathResolveTextLink(  { otherPath : linkPath }   )
   );
 
 }

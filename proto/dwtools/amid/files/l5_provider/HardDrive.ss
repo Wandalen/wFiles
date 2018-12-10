@@ -118,7 +118,7 @@ function _isTextLink( filePath )
     resolvingSoftLink : 0,
   });
 
-  if( stat && stat.isFile() )
+  if( stat && stat.isTerminal() )
   {
     let read = self.fileReadAct
     ({
@@ -149,12 +149,12 @@ operates.filePath = { pathToRead : 1 }
 //
 
 let buffer;
-// function _pathResolveTextLinkAct( filePath, visited, hasLink, allowingMissing )
-// function _pathResolveTextLinkAct( o )
+// function pathResolveTextLinkAct( filePath, visited, hasLink, allowingMissing )
+// function pathResolveTextLinkAct( o )
 // {
 //   let self = this;
 
-//   _.assertRoutineOptions( _pathResolveTextLinkAct, arguments );
+//   _.assertRoutineOptions( pathResolveTextLinkAct, arguments );
 //   _.assert( arguments.length === 1 );
 //   _.assert( _.arrayIs( o.visited ) );
 
@@ -194,7 +194,7 @@ let buffer;
 //       return false;
 //     }
 
-//     if( stat.isFile() )
+//     if( stat.isTerminal() )
 //     {
 
 //       let regexp = /link ([^\n]+)\n?$/;
@@ -234,7 +234,7 @@ let buffer;
 //       if( o2.filePath[ 0 ] === '.' )
 //       o2.filePath = self.path.reroot( cpath , '..' , o2.filePath );
 
-//       let result = self._pathResolveTextLinkAct( o2 );
+//       let result = self.pathResolveTextLinkAct( o2 );
 //       if( o2.hasLink )
 //       {
 //         if( !result )
@@ -262,7 +262,7 @@ let buffer;
 //   return o.hasLink ? o.filePath : false;
 // }
 
-// _pathResolveTextLinkAct.defaults =
+// pathResolveTextLinkAct.defaults =
 // {
 //   filePath : null,
 //   visited : null,
@@ -270,11 +270,11 @@ let buffer;
 //   allowingMissing : true,
 // }
 
-function _pathResolveTextLinkAct( o )
+function pathResolveTextLinkAct( o )
 {
   let self = this;
 
-  _.assertRoutineOptions( _pathResolveTextLinkAct, arguments );
+  _.assertRoutineOptions( pathResolveTextLinkAct, arguments );
   _.assert( arguments.length === 1 );
 
   if( !buffer )
@@ -284,7 +284,7 @@ function _pathResolveTextLinkAct( o )
   if( !stat )
   return false;
 
-  if( !stat.isFile() )
+  if( !stat.isTerminal() )
   return false;
 
   let filePath = self.path.nativize( o.filePath );
@@ -307,7 +307,7 @@ function _pathResolveTextLinkAct( o )
   return false;
 }
 
-_pathResolveTextLinkAct.defaults =
+pathResolveTextLinkAct.defaults =
 {
   filePath : null
 }
@@ -639,7 +639,7 @@ function dirReadAct( o )
         sync : 1,
         resolvingSoftLink : 1,
       });
-      if( stat.isDirectory() )
+      if( stat.isDir() )
       {
         result = File.readdirSync( fileNativePath );
         return result
@@ -678,7 +678,7 @@ function dirReadAct( o )
         else
         con.give( result );
       }
-      else if( stat.isDirectory() )
+      else if( stat.isDir() )
       {
         File.readdir( fileNativePath, function( err, files )
         {
@@ -1142,7 +1142,7 @@ function fileDeleteAct( o )
       throwing : 0,
     });
 
-    if( stat && stat.isDirectory() )
+    if( stat && stat.isDir() )
     File.rmdirSync( o.filePath  );
     else
     File.unlinkSync( o.filePath  );
@@ -1162,7 +1162,7 @@ function fileDeleteAct( o )
       if( err )
       return con.error( err );
 
-      if( stat && stat.isDirectory() )
+      if( stat && stat.isDir() )
       File.rmdir( o.filePath, handleResult );
       else
       File.unlink( o.filePath, handleResult );
@@ -1593,7 +1593,7 @@ function hardLinkAct( o )
 
     if( !stat )
     throw _.err( '{o.srcPath} does not exist in file system:', srcPath );
-    if( !stat.isFile() )
+    if( !stat.isTerminal() )
     throw _.err( '{o.srcPath} is not a terminal file:', srcPath );
 
     try
@@ -1627,7 +1627,7 @@ function hardLinkAct( o )
       return con.error( err );
       if( !stat )
       return con.error( _.err( '{o.srcPath} does not exist in file system:', srcPath ) );
-      if( !stat.isFile() )
+      if( !stat.isTerminal() )
       return con.error( _.err( '{o.srcPath} is not a terminal file:', srcPath ) );
 
       File.link( o.srcPath, o.dstPath, function( err )
@@ -1831,7 +1831,7 @@ let Extend =
   pathCurrentAct,
 
   _isTextLink,
-  _pathResolveTextLinkAct,
+  pathResolveTextLinkAct,
   pathResolveSoftLinkAct,
 
   pathDirTempAct,

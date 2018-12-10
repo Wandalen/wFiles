@@ -31,7 +31,7 @@ function onSuiteBegin( test )
 
 //
 
-function makePath( filePath )
+function pathFor( filePath )
 {
   filePath =  _.path.join( this.testRootDirectory, filePath );
   return _.path.normalize( filePath );
@@ -48,7 +48,7 @@ function providerIsInstanceOf( src )
 
   if( _.FileProvider.Hub && self.provider instanceof _.FileProvider.Hub )
   {
-    var testPath = self.makePath( 'testPath' );
+    var testPath = self.pathFor( 'testPath' );
     var provider = self.provider.providerForPath( testPath );
     if( provider instanceof src )
     return true;
@@ -67,9 +67,9 @@ function symlinkIsAllowed()
   if( process.platform === 'win32' )
   {
     var allowed = false;
-    var dir = self.makePath( 'symlinkIsAllowed' );
-    var srcPath = self.makePath( 'symlinkIsAllowed/src' );
-    var dstPath = self.makePath( 'symlinkIsAllowed/dst' );
+    var dir = self.pathFor( 'symlinkIsAllowed' );
+    var srcPath = self.pathFor( 'symlinkIsAllowed/src' );
+    var dstPath = self.pathFor( 'symlinkIsAllowed/dst' );
 
     self.provider.filesDelete( dir );
     self.provider.fileWrite( srcPath, srcPath );
@@ -97,7 +97,7 @@ function symlinkIsAllowed()
 //   var self = this;
 //
 //   test.case = 'shouldWriteOnlyOnce test';
-//   var files = self.provider.dirRead( self.makePath( filePath ) );
+//   var files = self.provider.dirRead( self.pathFor( filePath ) );
 //   test.identical( files, expected );
 // }
 
@@ -180,7 +180,7 @@ function readWriteSync( test )
 
   debugger
 
-  var dir = _.path.normalize( test.context.makePath( 'written/readWriteSync' ) );
+  var dir = _.path.normalize( test.context.pathFor( 'written/readWriteSync' ) );
 
   var got, filePath, readOptions, writeOptions;
   var testData = 'Lorem ipsum dolor sit amet';
@@ -210,7 +210,7 @@ function readWriteSync( test )
   {
     var got = self.provider.fileRead
     ({
-      filePath : test.context.makePath( 'invalid path' ),
+      filePath : test.context.pathFor( 'invalid path' ),
       sync : 1,
       throwing : 0,
     });
@@ -220,7 +220,7 @@ function readWriteSync( test )
   //
 
   test.case = 'fileRead, path ways to not a terminal file';
-  filePath = test.context.makePath( 'written/readWriteSync/dir' );
+  filePath = test.context.pathFor( 'written/readWriteSync/dir' );
   self.provider.dirMake( filePath );
 
   /**/
@@ -252,7 +252,7 @@ function readWriteSync( test )
 
   test.case = 'fileRead,simple file read ';
   self.provider.filesDelete( dir );
-  filePath = test.context.makePath( 'written/readWriteSync/file' );
+  filePath = test.context.pathFor( 'written/readWriteSync/file' );
   self.provider.fileWrite( filePath, testData );
   var files = self.provider.dirRead( dir );
   test.identical( files, [ 'file' ] );
@@ -315,7 +315,7 @@ function readWriteSync( test )
 
   test.case = 'fileRead,file read with common encodings';
   self.provider.filesDelete( dir );
-  filePath = test.context.makePath( 'written/readWriteSync/file' );
+  filePath = test.context.pathFor( 'written/readWriteSync/file' );
 
   /**/
 
@@ -434,7 +434,7 @@ function readWriteSync( test )
   {
     test.case = 'other encodings';
     self.provider.filesDelete( dir );
-    filePath = test.context.makePath( 'written/readWriteSync/file' );
+    filePath = test.context.pathFor( 'written/readWriteSync/file' );
     testData = 'abc';
 
     self.provider.fileWrite( filePath, testData );
@@ -462,7 +462,7 @@ function readWriteSync( test )
 
   test.case = 'fileRead,onBegin,onEnd,onError';
   self.provider.filesDelete( dir );
-  filePath = test.context.makePath( 'written/readWriteSync/file' );
+  filePath = test.context.pathFor( 'written/readWriteSync/file' );
   testData = 'Lorem ipsum dolor sit amet';
   function onBegin( err, o )
   {
@@ -552,7 +552,7 @@ function readWriteSync( test )
       sync : 1,
       returningRead : 0,
       throwing : 1,
-      filePath : test.context.makePath( 'invalid path' ),
+      filePath : test.context.pathFor( 'invalid path' ),
       encoding : 'utf8',
       onBegin : null,
       onEnd : null,
@@ -572,7 +572,7 @@ function readWriteSync( test )
       sync : 1,
       returningRead : 1,
       throwing : 1,
-      filePath : test.context.makePath( 'invalid path' ),
+      filePath : test.context.pathFor( 'invalid path' ),
       encoding : 'utf8',
       onBegin : null,
       onEnd : null,
@@ -590,7 +590,7 @@ function readWriteSync( test )
       sync : 1,
       returningRead : 0,
       throwing : 0,
-      filePath : test.context.makePath( 'invalid path' ),
+      filePath : test.context.pathFor( 'invalid path' ),
       encoding : 'utf8',
       onBegin : null,
       onEnd : null,
@@ -608,7 +608,7 @@ function readWriteSync( test )
       sync : 1,
       returningRead : 0,
       throwing : 1,
-      filePath : test.context.makePath( 'invalid path' ),
+      filePath : test.context.pathFor( 'invalid path' ),
       encoding : 'utf8',
       onBegin : null,
       onEnd : null,
@@ -622,7 +622,7 @@ function readWriteSync( test )
   //
 
   test.case = 'fileWrite, path not exist,default settings';
-  filePath = test.context.makePath( 'written/readWriteSync/file' );
+  filePath = test.context.pathFor( 'written/readWriteSync/file' );
   testData = 'Lorem ipsum dolor sit amet';
 
   /**/
@@ -641,7 +641,7 @@ function readWriteSync( test )
   /* path includes not existing directory */
 
   self.provider.filesDelete( dir );
-  filePath = test.context.makePath( 'written/readWriteSync/files/file' );
+  filePath = test.context.pathFor( 'written/readWriteSync/files/file' );
   self.provider.fileWrite( filePath, testData );
   var files = self.provider.dirRead( _.path.dir( filePath ) );
   test.identical( files, [ 'file' ] );
@@ -655,7 +655,7 @@ function readWriteSync( test )
   //
 
   test.case = 'fileWrite, path already exist,default settings';
-  filePath = test.context.makePath( 'written/readWriteSync/file' );
+  filePath = test.context.pathFor( 'written/readWriteSync/file' );
   testData = 'Lorem ipsum dolor sit amet';
   self.provider.fileWrite( filePath, testData );
 
@@ -682,7 +682,7 @@ function readWriteSync( test )
 
   test.case = 'fileWrite, path already exist';
   self.provider.filesDelete( dir );
-  filePath = test.context.makePath( 'written/readWriteSync/file' );
+  filePath = test.context.pathFor( 'written/readWriteSync/file' );
   testData = 'Lorem ipsum dolor sit amet';
   self.provider.fileWrite( filePath, testData );
 
@@ -748,7 +748,7 @@ function readWriteSync( test )
   test.case = 'fileWrite, path not exist';
   self.provider.filesDelete( dir );
   testData = 'Lorem ipsum dolor sit amet';
-  filePath = test.context.makePath( 'written/readWriteSync/file' );
+  filePath = test.context.pathFor( 'written/readWriteSync/file' );
 
 
   /*path includes not existing directory*/
@@ -821,7 +821,7 @@ function readWriteSync( test )
   test.case = 'fileWrite, different write modes';
   self.provider.filesDelete( dir );
   testData = 'Lorem ipsum dolor sit amet';
-  filePath = test.context.makePath( 'written/readWriteSync/file' );
+  filePath = test.context.pathFor( 'written/readWriteSync/file' );
 
   /*rewrite*/
 
@@ -885,7 +885,7 @@ function readWriteSync( test )
   test.case = 'fileWrite, any writeMode should create file it not exist';
   self.provider.filesDelete( dir );
   testData = 'Lorem ipsum dolor sit amet';
-  filePath = test.context.makePath( 'written/readWriteSync/file' );
+  filePath = test.context.pathFor( 'written/readWriteSync/file' );
 
   /*rewrite*/
 
@@ -957,7 +957,7 @@ function readWriteSync( test )
     var data = 'data';
     self.provider.fieldSet( 'resolvingSoftLink', 1 );
     self.provider.fileWrite( filePath, data );
-    var linkPath = test.context.makePath( 'written/readWriteSync/link' );
+    var linkPath = test.context.pathFor( 'written/readWriteSync/link' );
     self.provider.softLink( linkPath, filePath );
     var got = self.provider.fileRead( linkPath );
     test.identical( got, data);
@@ -967,7 +967,7 @@ function readWriteSync( test )
     var data = 'data';
     self.provider.fieldSet( 'resolvingSoftLink', 0 );
     self.provider.fileWrite( filePath, data );
-    var linkPath = test.context.makePath( 'written/readWriteSync/link' );
+    var linkPath = test.context.pathFor( 'written/readWriteSync/link' );
     self.provider.softLink( linkPath, filePath );
     test.shouldThrowError( () =>
     {
@@ -979,7 +979,7 @@ function readWriteSync( test )
     var data = 'data';
     self.provider.fieldSet( 'resolvingSoftLink', 1 );
     self.provider.fileWrite( filePath, data );
-    var linkPath = test.context.makePath( 'written/readWriteSync/link' );
+    var linkPath = test.context.pathFor( 'written/readWriteSync/link' );
     self.provider.softLink( linkPath, filePath );
     self.provider.fileWrite( linkPath, data + data );
     var got = self.provider.fileRead( filePath );
@@ -992,7 +992,7 @@ function readWriteSync( test )
     var data = 'data';
     self.provider.fieldSet( 'resolvingSoftLink', 0 );
     self.provider.fileWrite( filePath, data );
-    var linkPath = test.context.makePath( 'written/readWriteSync/link' );
+    var linkPath = test.context.pathFor( 'written/readWriteSync/link' );
     self.provider.softLink( linkPath, filePath );
     self.provider.fileWrite( linkPath, data + data );
     var got = self.provider.fileRead( filePath );
@@ -1005,7 +1005,7 @@ function readWriteSync( test )
     var data = 'data';
     self.provider.fieldSet( 'resolvingSoftLink', 0 );
     self.provider.fileWrite( filePath, data );
-    var linkPath = test.context.makePath( 'written/readWriteSync/link' );
+    var linkPath = test.context.pathFor( 'written/readWriteSync/link' );
     self.provider.softLink( linkPath, filePath );
     self.provider.fileWrite
     ({
@@ -1023,7 +1023,7 @@ function readWriteSync( test )
     var data = 'data';
     self.provider.fieldSet( 'resolvingSoftLink', 0 );
     self.provider.fileWrite( filePath, data );
-    var linkPath = test.context.makePath( 'written/readWriteSync/link' );
+    var linkPath = test.context.pathFor( 'written/readWriteSync/link' );
     self.provider.softLink( linkPath, filePath );
     self.provider.fileWrite
     ({
@@ -1047,7 +1047,7 @@ function readWriteSync( test )
       encoding : 'original.type',
       data : data
     });
-    var linkPath = test.context.makePath( 'written/readWriteSync/link' );
+    var linkPath = test.context.pathFor( 'written/readWriteSync/link' );
     self.provider.softLink( linkPath, filePath );
     var appendData = 'abc';
     self.provider.fileWrite
@@ -1068,7 +1068,7 @@ function readWriteSync( test )
     var data = 'data';
     self.provider.fieldSet( 'resolvingSoftLink', 0 );
     self.provider.fileWrite( filePath, data );
-    var linkPath = test.context.makePath( 'written/readWriteSync/link' );
+    var linkPath = test.context.pathFor( 'written/readWriteSync/link' );
     self.provider.softLink( linkPath, filePath );
     self.provider.fileWrite
     ({
@@ -1086,7 +1086,7 @@ function readWriteSync( test )
     var data = 'data';
     self.provider.fieldSet( 'resolvingSoftLink', 0 );
     self.provider.fileWrite( filePath, data );
-    var linkPath = test.context.makePath( 'written/readWriteSync/link' );
+    var linkPath = test.context.pathFor( 'written/readWriteSync/link' );
     self.provider.softLink( linkPath, filePath );
     self.provider.fileWrite
     ({
@@ -1110,7 +1110,7 @@ function readWriteSync( test )
       encoding : 'original.type',
       data : data
     });
-    var linkPath = test.context.makePath( 'written/readWriteSync/link' );
+    var linkPath = test.context.pathFor( 'written/readWriteSync/link' );
     self.provider.softLink( linkPath, filePath );
     var appendData = 'abc';
     self.provider.fileWrite
@@ -1137,7 +1137,7 @@ function readWriteSync( test )
     self.provider.filesDelete( dir );
     testData = 'Lorem ipsum dolor sit amet';
     var buffer = _.bufferRawFrom( Buffer.from( testData ) );
-    filePath = test.context.makePath( 'written/readWriteSync/file' );
+    filePath = test.context.pathFor( 'written/readWriteSync/file' );
 
     /**/
 
@@ -1179,7 +1179,7 @@ function readWriteSync( test )
         var data = 'data';
         self.provider.fieldSet( 'resolvingSoftLink', 0 );
         self.provider.fileWrite( filePath, data );
-        var linkPath = test.context.makePath( 'written/readWriteSync/link' );
+        var linkPath = test.context.pathFor( 'written/readWriteSync/link' );
         self.provider.softLink( linkPath, filePath );
         self.provider.fileWrite
         ({
@@ -1197,7 +1197,7 @@ function readWriteSync( test )
         var data = 'data';
         self.provider.fieldSet( 'resolvingSoftLink', 0 );
         self.provider.fileWrite( filePath, data );
-        var linkPath = test.context.makePath( 'written/readWriteSync/link' );
+        var linkPath = test.context.pathFor( 'written/readWriteSync/link' );
         self.provider.softLink( linkPath, filePath );
         self.provider.fileWrite
         ({
@@ -1351,19 +1351,19 @@ function readWriteSync( test )
   // var data1 = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit';
   // self.provider.fileWrite
   // ({
-  //   filePath : test.context.makePath( 'written/readWriteSync/test.txt' ),
+  //   filePath : test.context.pathFor( 'written/readWriteSync/test.txt' ),
   //   data : data1,
   //   sync : 1,
   // });
   //
   // test.case = 'single file is written';
-  // var files = self.provider.dirRead( test.context.makePath( 'written/readWriteSync/' ) );
+  // var files = self.provider.dirRead( test.context.pathFor( 'written/readWriteSync/' ) );
   // test.identical( files, [ 'test.txt' ] );
   //
   // test.case = 'synchronous, writeMode : rewrite';
   // var got = self.provider.fileRead
   // ({
-  //   filePath : test.context.makePath( 'written/readWriteSync/test.txt' ),
+  //   filePath : test.context.pathFor( 'written/readWriteSync/test.txt' ),
   //   sync : 1
   // });
   // var expected = data1;
@@ -1372,20 +1372,20 @@ function readWriteSync( test )
   // var data2 = 'LOREM';
   // self.provider.fileWrite
   // ({
-  //   filePath : test.context.makePath( 'written/readWriteSync/test.txt' ),
+  //   filePath : test.context.pathFor( 'written/readWriteSync/test.txt' ),
   //   data : data2,
   //   sync : 1,
   //   writeMode : 'append'
   // });
   //
   // test.case = 'single file is written';
-  // var files = self.provider.dirRead( test.context.makePath( 'written/readWriteSync/' ) );
+  // var files = self.provider.dirRead( test.context.pathFor( 'written/readWriteSync/' ) );
   // test.identical( files, [ 'test.txt' ] );
   //
   // test.case = 'synchronous, writeMode : append';
   // var got = self.provider.fileRead
   // ({
-  //   filePath : test.context.makePath( 'written/readWriteSync/test.txt' ),
+  //   filePath : test.context.pathFor( 'written/readWriteSync/test.txt' ),
   //   sync : 1
   // });
   // var expected = data1 + data2;
@@ -1394,20 +1394,20 @@ function readWriteSync( test )
   // var data2 = 'LOREM';
   // self.provider.fileWrite
   // ({
-  //   filePath : test.context.makePath( 'written/readWriteSync/test.txt' ),
+  //   filePath : test.context.pathFor( 'written/readWriteSync/test.txt' ),
   //   data : data2,
   //   sync : 1,
   //   writeMode : 'prepend'
   // });
   //
   // test.case = 'single file is written';
-  // var files = self.provider.dirRead( test.context.makePath( 'written/readWriteSync/' ) );
+  // var files = self.provider.dirRead( test.context.pathFor( 'written/readWriteSync/' ) );
   // test.identical( files, [ 'test.txt' ] );
   //
   // test.case = 'synchronous, writeMode : prepend';
   // var got = self.provider.fileRead
   // ({
-  //   filePath : test.context.makePath( 'written/readWriteSync/test.txt' ),
+  //   filePath : test.context.pathFor( 'written/readWriteSync/test.txt' ),
   //   sync : 1
   // });
   // var expected = data2 + data1 + data2;
@@ -1420,7 +1420,7 @@ function readWriteSync( test )
   //   {
   //     self.provider.fileRead
   //     ({
-  //       filePath : test.context.makePath( 'unknown' ),
+  //       filePath : test.context.pathFor( 'unknown' ),
   //       sync : 1
   //     });
   //   });
@@ -1430,7 +1430,7 @@ function readWriteSync( test )
   //   {
   //     self.provider.fileRead
   //     ({
-  //       filePath : test.context.makePath( '/' ),
+  //       filePath : test.context.pathFor( '/' ),
   //       sync : 1
   //     });
   //   });
@@ -1450,7 +1450,7 @@ function readWriteAsync( test )
   }
 
   var symlinkIsAllowed = test.context.symlinkIsAllowed();
-  var dir = test.context.makePath( 'written/readWriteAsync' );
+  var dir = test.context.pathFor( 'written/readWriteAsync' );
   var got, filePath, readOptions, writeOptions,onBegin,onEnd,onError,buffer;
   var testData = 'Lorem ipsum dolor sit amet';
 
@@ -1497,7 +1497,7 @@ function readWriteAsync( test )
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
     test.case = 'fileRead, path ways to not a terminal file';
-    filePath = test.context.makePath( 'written/readWriteAsync/dir' );
+    filePath = test.context.pathFor( 'written/readWriteAsync/dir' );
     self.provider.dirMake( filePath );
     return null;
   })
@@ -1539,7 +1539,7 @@ function readWriteAsync( test )
   {
     test.case = 'fileRead,simple file read ';
     self.provider.filesDelete( dir );
-    filePath = test.context.makePath( 'written/readWriteAsync/file' );
+    filePath = test.context.pathFor( 'written/readWriteAsync/file' );
     self.provider.fileWrite( filePath, testData );
     var files = self.provider.dirRead( dir );
     test.identical( files, [ 'file' ] );
@@ -1599,7 +1599,7 @@ function readWriteAsync( test )
   {
     test.case = 'fileRead,file read with common encodings';
     self.provider.filesDelete( dir );
-    filePath = test.context.makePath( 'written/readWriteAsync/file' );
+    filePath = test.context.pathFor( 'written/readWriteAsync/file' );
     return null;
   })
 
@@ -1699,7 +1699,7 @@ function readWriteAsync( test )
   {
     test.case = 'fileRead,onBegin,onEnd,onError';
     self.provider.filesDelete( dir );
-    filePath = test.context.makePath( 'written/readWriteAsync/file' );
+    filePath = test.context.pathFor( 'written/readWriteAsync/file' );
     testData = 'Lorem ipsum dolor sit amet';
     onBegin = function onBegin( err, o )
     {
@@ -1904,7 +1904,7 @@ function readWriteAsync( test )
   {
     test.case = 'fileWrite, path not exist,default settings';
     self.provider.filesDelete( dir );
-    filePath = test.context.makePath( 'written/readWriteAsync/file' );
+    filePath = test.context.pathFor( 'written/readWriteAsync/file' );
     testData = 'Lorem ipsum dolor sit amet';
     return null;
   })
@@ -1938,7 +1938,7 @@ function readWriteAsync( test )
 
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
-    filePath = test.context.makePath( 'written/readWriteAsync/files/file.txt' );
+    filePath = test.context.pathFor( 'written/readWriteAsync/files/file.txt' );
     return self.provider.fileWrite
     ({
        sync : 0,
@@ -1948,7 +1948,7 @@ function readWriteAsync( test )
   })
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
-    var files = self.provider.dirRead( test.context.makePath( 'written/readWriteAsync/files' ) );
+    var files = self.provider.dirRead( test.context.pathFor( 'written/readWriteAsync/files' ) );
     test.identical( files, [ 'file.txt' ] );
     got = self.provider.fileRead
     ({
@@ -1963,7 +1963,7 @@ function readWriteAsync( test )
   {
     test.case = 'fileWrite, path already exist,default settings';
     self.provider.filesDelete( dir );
-    filePath = test.context.makePath( 'written/readWriteAsync/file' );
+    filePath = test.context.pathFor( 'written/readWriteAsync/file' );
     testData = 'Lorem ipsum dolor sit amet';
     self.provider.fileWrite( filePath, testData );
     return null;
@@ -2012,7 +2012,7 @@ function readWriteAsync( test )
   {
     test.case = 'fileWrite, path already exist';
     self.provider.filesDelete( dir );
-    filePath = test.context.makePath( 'written/readWriteAsync/file' );
+    filePath = test.context.pathFor( 'written/readWriteAsync/file' );
     testData = 'Lorem ipsum dolor sit amet';
     self.provider.fileWrite( filePath, testData );
     return null;
@@ -2104,7 +2104,7 @@ function readWriteAsync( test )
     test.case = 'fileWrite, path not exist';
     self.provider.filesDelete( dir );
     testData = 'Lorem ipsum dolor sit amet';
-    filePath = test.context.makePath( 'written/readWriteAsync/file' );
+    filePath = test.context.pathFor( 'written/readWriteAsync/file' );
     return null;
   })
 
@@ -2192,7 +2192,7 @@ function readWriteAsync( test )
     test.case = 'fileWrite, different write modes';
     self.provider.filesDelete( dir );
     testData = 'Lorem ipsum dolor sit amet';
-    filePath = test.context.makePath( 'written/readWriteAsync/file' );
+    filePath = test.context.pathFor( 'written/readWriteAsync/file' );
     return null;
   })
 
@@ -2282,7 +2282,7 @@ function readWriteAsync( test )
     test.case = 'fileWrite, any writeMode should create file it not exist';
     self.provider.filesDelete( dir );
     testData = 'Lorem ipsum dolor sit amet';
-    filePath = test.context.makePath( 'written/readWriteAsync/file' );
+    filePath = test.context.pathFor( 'written/readWriteAsync/file' );
     return null;
   })
 
@@ -2377,7 +2377,7 @@ function readWriteAsync( test )
     return self.provider.fileWrite({ filePath : filePath, data : data, sync : 0 })
     .doThen( () =>
     {
-      var linkPath = test.context.makePath( 'written/readWriteAsync/link' );
+      var linkPath = test.context.pathFor( 'written/readWriteAsync/link' );
       self.provider.softLink( linkPath, filePath );
       return self.provider.fileRead({ filePath : linkPath, sync : 0 })
       .doThen( ( err, got ) =>
@@ -2401,7 +2401,7 @@ function readWriteAsync( test )
     return self.provider.fileWrite({ filePath : filePath, data : data, sync : 0 })
     .doThen( () =>
     {
-      var linkPath = test.context.makePath( 'written/readWriteAsync/link' );
+      var linkPath = test.context.pathFor( 'written/readWriteAsync/link' );
       self.provider.softLink( linkPath, filePath );
       var con = self.provider.fileRead({ filePath : linkPath, sync : 0 });
       return test.shouldThrowError( con )
@@ -2425,7 +2425,7 @@ function readWriteAsync( test )
     return self.provider.fileWrite({ filePath : filePath, data : data, sync : 0 })
     .doThen( () =>
     {
-      var linkPath = test.context.makePath( 'written/readWriteAsync/link' );
+      var linkPath = test.context.pathFor( 'written/readWriteAsync/link' );
       self.provider.softLink( linkPath, filePath );
       return self.provider.fileWrite({ filePath : filePath, data : data + data, sync : 0 })
     })
@@ -2446,7 +2446,7 @@ function readWriteAsync( test )
     test.case = 'write using link, resolvingSoftLink off';
     var data = 'data';
     self.provider.fieldSet( 'resolvingSoftLink', 0 );
-    var linkPath = test.context.makePath( 'written/readWriteAsync/link' );
+    var linkPath = test.context.pathFor( 'written/readWriteAsync/link' );
     return self.provider.fileWrite({ filePath : filePath, data : data, sync : 0 })
     .doThen( () =>
     {
@@ -2482,7 +2482,7 @@ function readWriteAsync( test )
     test.case = 'write using link, resolvingSoftLink off';
     var data = 'data';
     self.provider.fieldSet( 'resolvingSoftLink', 0 );
-    var linkPath = test.context.makePath( 'written/readWriteAsync/link' );
+    var linkPath = test.context.pathFor( 'written/readWriteAsync/link' );
     return self.provider.fileWrite({ filePath : filePath, data : data, sync : 0 })
     .doThen( () =>
     {
@@ -2524,7 +2524,7 @@ function readWriteAsync( test )
     test.case = 'write using link, resolvingSoftLink off';
     var data = 'data';
     self.provider.fieldSet( 'resolvingSoftLink', 0 );
-    var linkPath = test.context.makePath( 'written/readWriteAsync/link' );
+    var linkPath = test.context.pathFor( 'written/readWriteAsync/link' );
     return self.provider.fileWrite({ filePath : filePath, data : data, sync : 0 })
     .doThen( () =>
     {
@@ -2575,7 +2575,7 @@ function readWriteAsync( test )
       self.provider.filesDelete( dir );
       testData = 'Lorem ipsum dolor sit amet';
       buffer = _.bufferRawFrom( Buffer.from( testData ) );
-      filePath = test.context.makePath( 'written/readWriteAsync/file' );
+      filePath = test.context.pathFor( 'written/readWriteAsync/file' );
       return null;
     })
 
@@ -2624,7 +2624,7 @@ function readWriteAsync( test )
     {
       test.case = 'other encodings';
       self.provider.filesDelete( dir );
-      filePath = test.context.makePath( 'written/readWriteSync/file' );
+      filePath = test.context.pathFor( 'written/readWriteSync/file' );
       testData = 'abc';
       return null;
     })
@@ -2740,7 +2740,7 @@ function fileReadJson( test )
       content : void 0
     };
 
-    var path = test.context.makePath( testCheck.path );
+    var path = test.context.pathFor( testCheck.path );
 
     if( self.provider.statResolvedRead( path ) )
     self.provider.fileDelete( path );
@@ -2790,7 +2790,7 @@ function fileReadJson( test )
 function fileReadWithEncoding( test )
 {
   let self = this;
-  let filePath = test.context.makePath( 'written/fileReadWithEncoding/dstFile' );
+  let filePath = test.context.pathFor( 'written/fileReadWithEncoding/dstFile' );
   let isHd = self.providerIsInstanceOf( _.FileProvider.HardDrive );
 
   test.open( 'buffer.*' );
@@ -2920,7 +2920,7 @@ function fileReadWithEncoding( test )
   //
 
   var data = '{a : b}';
-  var filePath2 = test.context.makePath( 'written/fileReadWithEncoding/dstFile2' );
+  var filePath2 = test.context.pathFor( 'written/fileReadWithEncoding/dstFile2' );
   self.provider.filesDelete( filePath2 );
   self.provider.fileWrite({ filePath : filePath2, data : data });
   test.shouldThrowError( () =>
@@ -2944,7 +2944,7 @@ function fileReadWithEncoding( test )
     //
 
     var data = 'module.exports = { data : 1 '
-    var filePath3 = test.context.makePath( 'written/fileReadWithEncoding/dstFile3' );
+    var filePath3 = test.context.pathFor( 'written/fileReadWithEncoding/dstFile3' );
     self.provider.filesDelete( filePath3 );
     self.provider.fileWrite({ filePath : filePath3, data : data });
     test.shouldThrowError( () =>
@@ -2959,7 +2959,7 @@ function fileReadWithEncoding( test )
 function fileWriteWithEncoding( test )
 {
   let self = this;
-  let filePath = test.context.makePath( 'written/fileWriteWithEncoding/dstFile' );
+  let filePath = test.context.pathFor( 'written/fileWriteWithEncoding/dstFile' );
   let isHd = self.providerIsInstanceOf( _.FileProvider.HardDrive );
 
   /* js */
@@ -3232,7 +3232,7 @@ function fileWriteJson( test )
       exist : null
     }
 
-    var path = test.context.makePath( testCheck.path );
+    var path = test.context.pathFor( testCheck.path );
 
     // clear
 
@@ -3298,14 +3298,14 @@ function fileTouch( test )
 
   var got;
 
-  var dir = test.context.makePath( 'written/fileTouch' );
+  var dir = test.context.pathFor( 'written/fileTouch' );
 
   self.provider.filesDelete( dir );
 
   if( !self.provider.statResolvedRead( dir ) )
   self.provider.dirMake( dir );
 
-  var srcPath = _.path.normalize( test.context.makePath( 'written/fileTouch/src.txt' ) );
+  var srcPath = _.path.normalize( test.context.pathFor( 'written/fileTouch/src.txt' ) );
   var testData = 'test';
 
   //
@@ -3405,8 +3405,8 @@ function fileTimeSet( test )
     return;
   }
 
-  let testDir = test.context.makePath( 'written/fileTimeSet' );
-  let filePath = test.context.makePath( 'written/fileTimeSet/file' );
+  let testDir = test.context.pathFor( 'written/fileTimeSet' );
+  let filePath = test.context.pathFor( 'written/fileTimeSet/file' );
 
   let maxDiff = self.provider.systemBitrateTimeGet();
 
@@ -3429,7 +3429,7 @@ function fileTimeSet( test )
   var time = new Date();
   self.provider.fileTimeSet( filePath, time, time );
   var stat  = self.provider.statResolvedRead( filePath );
-  test.is( stat.isFile() );
+  test.is( stat.isTerminal() );
   var adiff = time.getTime() - stat.atime.getTime();
   testDiff( adiff );
   var mdiff = time.getTime() - stat.mtime.getTime();
@@ -3441,7 +3441,7 @@ function fileTimeSet( test )
   var time = new Date();
   self.provider.fileTimeSet( testDir, time, time );
   var stat  = self.provider.statResolvedRead( testDir );
-  test.is( stat.isDirectory() );
+  test.is( stat.isDir() );
   var adiff = time.getTime() - stat.atime.getTime();
   testDiff( adiff );
   var mdiff = time.getTime() - stat.mtime.getTime();
@@ -3453,7 +3453,7 @@ function fileTimeSet( test )
   var time = new Date();
   self.provider.fileTimeSet({ filePath : filePath, atime : time, mtime : time });
   var stat  = self.provider.statResolvedRead( filePath );
-  test.is( stat.isFile() );
+  test.is( stat.isTerminal() );
   var adiff = time.getTime() - stat.atime.getTime();
   testDiff( adiff );
   var mdiff = time.getTime() - stat.mtime.getTime();
@@ -3465,7 +3465,7 @@ function fileTimeSet( test )
   var time = new Date();
   self.provider.fileTimeSet({ filePath : testDir, atime : time, mtime : time });
   var stat  = self.provider.statResolvedRead( testDir );
-  test.is( stat.isDirectory() );
+  test.is( stat.isDir() );
   var adiff = time.getTime() - stat.atime.getTime();
   testDiff( adiff );
   var mdiff = time.getTime() - stat.mtime.getTime();
@@ -3474,13 +3474,13 @@ function fileTimeSet( test )
   test.case = 'two args, file';
   self.provider.filesDelete( testDir );
   self.provider.fileWrite( filePath, filePath );
-  var filePath2 = test.context.makePath( 'written/fileTimeSet/file2' );
+  var filePath2 = test.context.pathFor( 'written/fileTimeSet/file2' );
   self.provider.fileWrite( filePath2, filePath2 );
   var time = new Date();
   self.provider.fileTimeSet( filePath2, time, time );
   self.provider.fileTimeSet( filePath, filePath2 );
   var stat  = self.provider.statResolvedRead( filePath );
-  test.is( stat.isFile() );
+  test.is( stat.isTerminal() );
   var adiff = time.getTime() - stat.atime.getTime();
   testDiff( adiff );
   var mdiff = time.getTime() - stat.mtime.getTime();
@@ -3489,13 +3489,13 @@ function fileTimeSet( test )
   test.case = 'two args, dir';
   self.provider.filesDelete( testDir );
   self.provider.fileWrite( filePath, filePath );
-  var filePath2 = test.context.makePath( 'written/fileTimeSet/dir' );
+  var filePath2 = test.context.pathFor( 'written/fileTimeSet/dir' );
   self.provider.dirMake( filePath2 );
   var time = new Date();
   self.provider.fileTimeSet( filePath2, time, time );
   self.provider.fileTimeSet( testDir, filePath2 );
   var stat  = self.provider.statResolvedRead( testDir );
-  test.is( stat.isDirectory() );
+  test.is( stat.isDir() );
   var adiff = time.getTime() - stat.atime.getTime();
   testDiff( adiff );
   var mdiff = time.getTime() - stat.mtime.getTime();
@@ -3540,7 +3540,7 @@ function fileTimeSet( test )
     var time = new Date().getTime();
     self.provider.fileTimeSet( filePath, time, time );
     var stat  = self.provider.statResolvedRead( filePath );
-    test.is( stat.isFile() );
+    test.is( stat.isTerminal() );
     var adiff = time - stat.atime.getTime();
     testDiff( adiff );
     var mdiff = time - stat.mtime.getTime();
@@ -3553,7 +3553,7 @@ function fileTimeSet( test )
   var time = new Date().getTime();
   self.provider.fileTimeSet( filePath, time / 1000, time / 1000 );
   var stat  = self.provider.statResolvedRead( filePath );
-  test.is( stat.isFile() );
+  test.is( stat.isTerminal() );
   var adiff = time - stat.atime.getTime();
   testDiff( adiff );
   var mdiff = time - stat.mtime.getTime();
@@ -3572,7 +3572,7 @@ function fileTimeSet( test )
   test.case = 'two args, second file does not exist';
   self.provider.filesDelete( testDir );
   self.provider.fileWrite( filePath, filePath );
-  var filePath2 = test.context.makePath( 'written/fileTimeSet/dir' );
+  var filePath2 = test.context.pathFor( 'written/fileTimeSet/dir' );
   var time = new Date();
   var statb  = self.provider.statResolvedRead( filePath );
   test.shouldThrowError( () => self.provider.fileTimeSet( filePath, filePath2 ) );
@@ -3626,7 +3626,7 @@ function writeAsyncThrowingError( test )
 
     test.case = 'async, try to rewrite dir';
 
-    var path = test.context.makePath( 'dir' );
+    var path = test.context.pathFor( 'dir' );
     self.provider.dirMake( path );
     test.identical( self.provider.isDir( path ), true )
     var data1 = 'data1';
@@ -3657,7 +3657,7 @@ function fileCopySync( test )
 
   var got;
 
-  var dir = test.context.makePath( 'written/fileCopy' );
+  var dir = test.context.pathFor( 'written/fileCopy' );
 
   if( !self.provider.statResolvedRead( dir ) )
   self.provider.dirMake( dir );
@@ -3672,7 +3672,7 @@ function fileCopySync( test )
   {
     self.provider.fileCopy
     ({
-      srcPath : test.context.makePath( 'not_existing_path' ),
+      srcPath : test.context.pathFor( 'not_existing_path' ),
       dstPath : ' ',
       sync : 1,
       rewriting : 1,
@@ -3686,7 +3686,7 @@ function fileCopySync( test )
   {
     got = self.provider.fileCopy
     ({
-      srcPath : test.context.makePath( 'not_existing_path' ),
+      srcPath : test.context.pathFor( 'not_existing_path' ),
       dstPath : ' ',
       sync : 1,
       rewriting : 1,
@@ -3701,7 +3701,7 @@ function fileCopySync( test )
   {
     self.provider.fileCopy
     ({
-      srcPath : test.context.makePath( 'not_existing_path' ),
+      srcPath : test.context.pathFor( 'not_existing_path' ),
       dstPath : ' ',
       sync : 1,
       rewriting : 0,
@@ -3715,7 +3715,7 @@ function fileCopySync( test )
   {
     got = self.provider.fileCopy
     ({
-      srcPath : test.context.makePath( 'not_existing_path' ),
+      srcPath : test.context.pathFor( 'not_existing_path' ),
       dstPath : ' ',
       sync : 1,
       rewriting : 0,
@@ -3727,8 +3727,8 @@ function fileCopySync( test )
   //
 
   test.case = 'dst path not exist';
-  var srcPath = test.context.makePath( 'written/fileCopy/src.txt' );
-  var dstPath = test.context.makePath( 'written/fileCopy/dst.txt' );
+  var srcPath = test.context.pathFor( 'written/fileCopy/src.txt' );
+  var dstPath = test.context.pathFor( 'written/fileCopy/dst.txt' );
   self.provider.fileWrite( srcPath, ' ' );
 
   /**/
@@ -4142,7 +4142,7 @@ function fileCopySync( test )
   /* relative paths */
 
   test.case = 'relative path, dst path not exist';
-  var dir = test.context.makePath( 'written/fileCopy' );
+  var dir = test.context.pathFor( 'written/fileCopy' );
   var srcPath = _.path.join( dir,'src' );
   var dstPath = _.path.join( dir,'dst' );
 
@@ -4263,7 +4263,7 @@ function fileCopyActSync( test )
 
   var got;
 
-  var dir = test.context.makePath( 'written/fileCopy' );
+  var dir = test.context.pathFor( 'written/fileCopy' );
   var srcPath = _.path.join( dir,'src' );
   var dstPath = _.path.join( dir,'dst' );
 
@@ -4893,7 +4893,7 @@ function fileCopyActSync( test )
 
   //
 
-  var dir = test.context.makePath( 'written/' + test.name );
+  var dir = test.context.pathFor( 'written/' + test.name );
   var srcPath = _.path.join( dir, 'src' );
   var dstPath = _.path.join( dir, 'dst' );
   var otherPath = _.path.join( dir, 'other' );
@@ -5298,9 +5298,9 @@ function fileCopyRelativePath( test )
     return;
   }
 
-  let testDir = test.context.makePath( 'written/fileCopyRelativePath' );
-  let pathToDir = test.context.makePath( 'written/fileCopyRelativePath/dir' );
-  let pathToFile = test.context.makePath( 'written/fileCopyRelativePath/file' );
+  let testDir = test.context.pathFor( 'written/fileCopyRelativePath' );
+  let pathToDir = test.context.pathFor( 'written/fileCopyRelativePath/dir' );
+  let pathToFile = test.context.pathFor( 'written/fileCopyRelativePath/file' );
 
   test.open( 'src - relative path to a file' );
 
@@ -5308,19 +5308,19 @@ function fileCopyRelativePath( test )
   self.provider.fileWrite( pathToFile, pathToFile );
 
   var srcPath = '../file';
-  var dstPath = test.context.makePath( 'written/fileCopyRelativePath/dstFile' );
+  var dstPath = test.context.pathFor( 'written/fileCopyRelativePath/dstFile' );
   self.provider.filesDelete( dstPath );
   self.provider.fileCopy( dstPath, srcPath );
   test.is( self.provider.filesAreSame( pathToFile, dstPath ) );
 
   var srcPath = './../file';
-  var dstPath = test.context.makePath( 'written/fileCopyRelativePath/dstFile' );
+  var dstPath = test.context.pathFor( 'written/fileCopyRelativePath/dstFile' );
   self.provider.filesDelete( dstPath );
   self.provider.fileCopy( dstPath, srcPath );
   test.is( self.provider.filesAreSame( pathToFile, dstPath ) );
 
   var srcPath = '../../file';
-  var dstPath = test.context.makePath( 'written/fileCopyRelativePath/dstDir/dstFile' );
+  var dstPath = test.context.pathFor( 'written/fileCopyRelativePath/dstDir/dstFile' );
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.fileCopy( dstPath, srcPath );
@@ -5328,7 +5328,7 @@ function fileCopyRelativePath( test )
 
 
   var srcPath = './../../file';
-  var dstPath = test.context.makePath( 'written/fileCopyRelativePath/dstDir/dstFile' );
+  var dstPath = test.context.pathFor( 'written/fileCopyRelativePath/dstDir/dstFile' );
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.fileCopy( dstPath, srcPath );
@@ -5336,18 +5336,18 @@ function fileCopyRelativePath( test )
 
 
   var srcPath = './../../../file';
-  var pathToFile2 = test.context.makePath( 'written/fileCopyRelativePath/a/file' );
+  var pathToFile2 = test.context.pathFor( 'written/fileCopyRelativePath/a/file' );
   self.provider.fileWrite( pathToFile2, pathToFile2 );
-  var dstPath = test.context.makePath( 'written/fileCopyRelativePath/a/b/c/dstFile' );
+  var dstPath = test.context.pathFor( 'written/fileCopyRelativePath/a/b/c/dstFile' );
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.fileCopy( dstPath, srcPath );
   test.is( self.provider.filesAreSame( pathToFile2, dstPath ) );
 
   var srcPath = '../../../file';
-  var pathToFile2 = test.context.makePath( 'written/fileCopyRelativePath/a/file' );
+  var pathToFile2 = test.context.pathFor( 'written/fileCopyRelativePath/a/file' );
   self.provider.fileWrite( pathToFile2, pathToFile2 );
-  var dstPath = test.context.makePath( 'written/fileCopyRelativePath/a/b/c/dstFile' );
+  var dstPath = test.context.pathFor( 'written/fileCopyRelativePath/a/b/c/dstFile' );
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.fileCopy( dstPath, srcPath );
@@ -5409,7 +5409,7 @@ function fileCopyRelativePath( test )
   self.provider.dirMake( pathToDir );
 
   var srcPath = '../dir';
-  var dstPath = test.context.makePath( 'written/fileCopyRelativePath/dstDir' );
+  var dstPath = test.context.pathFor( 'written/fileCopyRelativePath/dstDir' );
   self.provider.filesDelete( dstPath );
   test.shouldThrowError( () => self.provider.fileCopy( dstPath, srcPath ) );
   test.is( !self.provider.fileExists( dstPath ) );
@@ -5469,7 +5469,7 @@ function fileCopyLinksSync( test )
     return;
   }
 
-  var dir = test.context.makePath( 'written/' + test.name );
+  var dir = test.context.pathFor( 'written/' + test.name );
 
   if( !self.provider.statResolvedRead( dir ) )
   self.provider.dirMake( dir );
@@ -6002,13 +6002,13 @@ function fileCopyAsync( test )
     return;
   }
 
-  var dir = test.context.makePath( 'written/fileCopyAsync' );
+  var dir = test.context.pathFor( 'written/fileCopyAsync' );
 
   if( !self.provider.statResolvedRead( dir ) )
   self.provider.dirMake( dir );
 
-  var srcPath = test.context.makePath( 'written/fileCopyAsync/src.txt' );
-  var dstPath = test.context.makePath( 'written/fileCopyAsync/dst.txt' );
+  var srcPath = test.context.pathFor( 'written/fileCopyAsync/src.txt' );
+  var dstPath = test.context.pathFor( 'written/fileCopyAsync/dst.txt' );
 
   var consequence = new _.Consequence().give( null );
 
@@ -6027,7 +6027,7 @@ function fileCopyAsync( test )
   {
     var con = self.provider.fileCopy
     ({
-      srcPath : test.context.makePath( 'not_existing_path' ),
+      srcPath : test.context.pathFor( 'not_existing_path' ),
       dstPath : ' ',
       sync : 0,
       rewriting : 1,
@@ -6042,7 +6042,7 @@ function fileCopyAsync( test )
   {
     var con = self.provider.fileCopy
     ({
-      srcPath : test.context.makePath( 'not_existing_path' ),
+      srcPath : test.context.pathFor( 'not_existing_path' ),
       dstPath : ' ',
       sync : 0,
       rewriting : 1,
@@ -6062,7 +6062,7 @@ function fileCopyAsync( test )
   {
     var con = self.provider.fileCopy
     ({
-      srcPath : test.context.makePath( 'not_existing_path' ),
+      srcPath : test.context.pathFor( 'not_existing_path' ),
       dstPath : ' ',
       sync : 0,
       rewriting : 0,
@@ -6077,7 +6077,7 @@ function fileCopyAsync( test )
   {
     var con = self.provider.fileCopy
     ({
-      srcPath : test.context.makePath( 'not_existing_path' ),
+      srcPath : test.context.pathFor( 'not_existing_path' ),
       dstPath : ' ',
       sync : 0,
       rewriting : 0,
@@ -6540,7 +6540,7 @@ function fileCopyLinksAsync( test )
     return;
   }
 
-  var dir = test.context.makePath( 'written/' + test.name );
+  var dir = test.context.pathFor( 'written/' + test.name );
 
   if( !self.provider.statResolvedRead( dir ) )
   self.provider.dirMake( dir );
@@ -6860,7 +6860,7 @@ function fileCopySoftLinkResolving( test )
     return self.provider.fileCopy( o );
   }
 
-  let workDir = test.context.makePath( 'written/fileCopySoftLinkResolving' );
+  let workDir = test.context.pathFor( 'written/fileCopySoftLinkResolving' );
   let srcPath = self.provider.path.join( workDir, 'src' );
   let srcPath2 = self.provider.path.join( workDir, 'src2' );
   let dstPath = self.provider.path.join( workDir, 'dst' );
@@ -7581,7 +7581,7 @@ function fileCopySoftLinkResolving( test )
 //   if( !_.routineIs( self.provider.fileCopy ) )
 //   return;
 
-//   var dir = test.context.makePath( 'written/fileCopyAsync' );
+//   var dir = test.context.pathFor( 'written/fileCopyAsync' );
 
 //   if( !self.provider.statResolvedRead( dir ) )
 //   self.provider.dirMake( dir );
@@ -7594,8 +7594,8 @@ function fileCopySoftLinkResolving( test )
 //     test.case = 'async, throwing error';
 //     var con = self.provider.fileCopy
 //     ({
-//       srcPath : test.context.makePath( 'invalid.txt' ),
-//       dstPath : test.context.makePath( 'dstPath.txt' ),
+//       srcPath : test.context.pathFor( 'invalid.txt' ),
+//       dstPath : test.context.pathFor( 'dstPath.txt' ),
 //       sync : 0,
 //     });
 
@@ -7606,8 +7606,8 @@ function fileCopySoftLinkResolving( test )
 //     test.case = 'async,try rewrite dir';
 //     var con = self.provider.fileCopy
 //     ({
-//       srcPath : test.context.makePath( 'invalid.txt' ),
-//       dstPath : test.context.makePath( 'tmp' ),
+//       srcPath : test.context.pathFor( 'invalid.txt' ),
+//       dstPath : test.context.pathFor( 'tmp' ),
 //       sync : 0,
 //     });
 
@@ -7620,12 +7620,12 @@ function fileCopySoftLinkResolving( test )
 //     {
 //       self.provider.dirMake
 //       ({
-//         filePath : test.context.makePath( 'written/fileCopyAsync/copydir' ),
+//         filePath : test.context.pathFor( 'written/fileCopyAsync/copydir' ),
 //         sync : 1
 //       });
 //       self.provider.fileWrite
 //       ({
-//         filePath : test.context.makePath( 'written/fileCopyAsync/copydir/copyfile.txt' ),
+//         filePath : test.context.pathFor( 'written/fileCopyAsync/copydir/copyfile.txt' ),
 //         data : 'Lorem',
 //         sync : 1
 //       });
@@ -7634,8 +7634,8 @@ function fileCopySoftLinkResolving( test )
 //     debugger;
 //     var con = self.provider.fileCopy
 //     ({
-//         srcPath : test.context.makePath( 'written/fileCopyAsync/copydir' ),
-//         dstPath : test.context.makePath( 'written/fileCopyAsync/copydir2' ),
+//         srcPath : test.context.pathFor( 'written/fileCopyAsync/copydir' ),
+//         dstPath : test.context.pathFor( 'written/fileCopyAsync/copydir2' ),
 //         sync : 0,
 //     });
 
@@ -7658,8 +7658,8 @@ function fileRenameSync( test )
   }
 
   var got;
-  var srcPath = test.context.makePath( 'written/fileRename/src' );
-  var dstPath = test.context.makePath( 'written/fileRename/dst' );
+  var srcPath = test.context.pathFor( 'written/fileRename/src' );
+  var dstPath = test.context.pathFor( 'written/fileRename/dst' );
   var dir  = _.path.dir( srcPath );
 
   //
@@ -7670,7 +7670,7 @@ function fileRenameSync( test )
   {
     self.provider.fileRename
     ({
-      srcPath : test.context.makePath( 'not_existing_path' ),
+      srcPath : test.context.pathFor( 'not_existing_path' ),
       dstPath : ' ',
       sync : 1,
       rewriting : 1,
@@ -7684,7 +7684,7 @@ function fileRenameSync( test )
   {
     got = self.provider.fileRename
     ({
-      srcPath : test.context.makePath( 'not_existing_path' ),
+      srcPath : test.context.pathFor( 'not_existing_path' ),
       dstPath : ' ',
       sync : 1,
       rewriting : 1,
@@ -7699,7 +7699,7 @@ function fileRenameSync( test )
   {
     self.provider.fileRename
     ({
-      srcPath : test.context.makePath( 'not_existing_path' ),
+      srcPath : test.context.pathFor( 'not_existing_path' ),
       dstPath : ' ',
       sync : 1,
       rewriting : 0,
@@ -7713,7 +7713,7 @@ function fileRenameSync( test )
   {
     got = self.provider.fileRename
     ({
-      srcPath : test.context.makePath( 'not_existing_path' ),
+      srcPath : test.context.pathFor( 'not_existing_path' ),
       dstPath : ' ',
       sync : 1,
       rewriting : 0,
@@ -7929,7 +7929,7 @@ function fileRenameSync( test )
 
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath,' ' );
-  dstPath = test.context.makePath( 'written/fileRename/dir/dst' );
+  dstPath = test.context.pathFor( 'written/fileRename/dir/dst' );
   self.provider.dirMake( _.path.dir( dstPath ) );
   got = self.provider.fileRename
   ({
@@ -7947,7 +7947,7 @@ function fileRenameSync( test )
 
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath,' ' );
-  dstPath = test.context.makePath( 'written/fileRename/dir/dst' );
+  dstPath = test.context.pathFor( 'written/fileRename/dir/dst' );
   self.provider.dirMake( _.path.dir( dstPath ) );
   got = self.provider.fileRename
   ({
@@ -7965,7 +7965,7 @@ function fileRenameSync( test )
 
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath,' ' );
-  dstPath = test.context.makePath( 'written/fileRename/dir/dst' );
+  dstPath = test.context.pathFor( 'written/fileRename/dir/dst' );
   self.provider.dirMake( _.path.dir( dstPath ) );
   got = self.provider.fileRename
   ({
@@ -7983,7 +7983,7 @@ function fileRenameSync( test )
 
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath,' ' );
-  dstPath = test.context.makePath( 'written/fileRename/dir/dst' );
+  dstPath = test.context.pathFor( 'written/fileRename/dir/dst' );
   self.provider.dirMake( _.path.dir( dstPath ) );
   got = self.provider.fileRename
   ({
@@ -8005,7 +8005,7 @@ function fileRenameSync( test )
 
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath,' ' );
-  dstPath = test.context.makePath( 'written/fileRename/dir/dst' );
+  dstPath = test.context.pathFor( 'written/fileRename/dir/dst' );
   test.shouldThrowErrorSync( function()
   {
     self.provider.fileRename
@@ -8079,7 +8079,7 @@ function fileRenameSync( test )
   debugger
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath,' ' );
-  dstPath = test.context.makePath( 'written/fileRename/dir/dst' );
+  dstPath = test.context.pathFor( 'written/fileRename/dir/dst' );
   self.provider.fileWrite( dstPath,' ' );
   got = self.provider.fileRename
   ({
@@ -8098,7 +8098,7 @@ function fileRenameSync( test )
 
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath,' ' );
-  dstPath = test.context.makePath( 'written/fileRename/dir/dst' );
+  dstPath = test.context.pathFor( 'written/fileRename/dir/dst' );
   self.provider.fileWrite( dstPath,' ' );
   got = self.provider.fileRename
   ({
@@ -8117,7 +8117,7 @@ function fileRenameSync( test )
 
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath,' ' );
-  dstPath = test.context.makePath( 'written/fileRename/dir/dst' );
+  dstPath = test.context.pathFor( 'written/fileRename/dir/dst' );
   self.provider.fileWrite( dstPath,' ' );
   test.shouldThrowErrorSync( function()
   {
@@ -8135,7 +8135,7 @@ function fileRenameSync( test )
 
   self.provider.filesDelete( dir );
   self.provider.fileWrite( srcPath,' ' );
-  dstPath = test.context.makePath( 'written/fileRename/dir/dst' );
+  dstPath = test.context.pathFor( 'written/fileRename/dir/dst' );
   self.provider.fileWrite( dstPath,' ' );
   test.mustNotThrowError( function()
   {
@@ -8242,8 +8242,8 @@ function fileRenameSync2( test )
   }
 
   var got;
-  var srcPath = test.context.makePath( 'written/fileRename/src' );
-  var dstPath = test.context.makePath( 'written/fileRename/dst' );
+  var srcPath = test.context.pathFor( 'written/fileRename/src' );
+  var dstPath = test.context.pathFor( 'written/fileRename/dst' );
   var dir  = _.path.dir( srcPath );
 
   test.open( 'rewriting terminal' );
@@ -8565,14 +8565,14 @@ function fileRenameRelativePath( test )
     return;
   }
 
-  let testDir = test.context.makePath( 'written/fileRenameRelativePath' );
-  let pathToDir = test.context.makePath( 'written/fileRenameRelativePath/dir' );
-  let pathToFile = test.context.makePath( 'written/fileRenameRelativePath/file' );
+  let testDir = test.context.pathFor( 'written/fileRenameRelativePath' );
+  let pathToDir = test.context.pathFor( 'written/fileRenameRelativePath/dir' );
+  let pathToFile = test.context.pathFor( 'written/fileRenameRelativePath/file' );
 
   test.open( 'src - relative path to a file' );
 
   var srcPath = '../file';
-  var dstPath = test.context.makePath( 'written/fileRenameRelativePath/dstFile' );
+  var dstPath = test.context.pathFor( 'written/fileRenameRelativePath/dstFile' );
   self.provider.filesDelete( testDir );
   self.provider.fileWrite( pathToFile, pathToFile );
   self.provider.fileRename( dstPath, srcPath );
@@ -8582,7 +8582,7 @@ function fileRenameRelativePath( test )
   test.identical( got, pathToFile );
 
   var srcPath = './../file';
-  var dstPath = test.context.makePath( 'written/fileRenameRelativePath/dstFile' );
+  var dstPath = test.context.pathFor( 'written/fileRenameRelativePath/dstFile' );
   self.provider.filesDelete( testDir );
   self.provider.fileWrite( pathToFile, pathToFile );
   self.provider.fileRename( dstPath, srcPath );
@@ -8593,7 +8593,7 @@ function fileRenameRelativePath( test )
 
 
   var srcPath = '../../file';
-  var dstPath = test.context.makePath( 'written/fileRenameRelativePath/dstDir/dstFile' );
+  var dstPath = test.context.pathFor( 'written/fileRenameRelativePath/dstDir/dstFile' );
   self.provider.filesDelete( testDir );
   self.provider.fileWrite( pathToFile, pathToFile );
   self.provider.dirMakeForFile( dstPath );
@@ -8604,7 +8604,7 @@ function fileRenameRelativePath( test )
   test.identical( got, pathToFile );
 
   var srcPath = './../../file';
-  var dstPath = test.context.makePath( 'written/fileRenameRelativePath/dstDir/dstFile' );
+  var dstPath = test.context.pathFor( 'written/fileRenameRelativePath/dstDir/dstFile' );
   self.provider.filesDelete( testDir );
   self.provider.fileWrite( pathToFile, pathToFile );
   self.provider.dirMakeForFile( dstPath );
@@ -8615,10 +8615,10 @@ function fileRenameRelativePath( test )
   test.identical( got, pathToFile );
 
   var srcPath = './../../../file';
-  var pathToFile2 = test.context.makePath( 'written/fileRenameRelativePath/a/file' );
+  var pathToFile2 = test.context.pathFor( 'written/fileRenameRelativePath/a/file' );
   self.provider.filesDelete( testDir );
   self.provider.fileWrite( pathToFile2, pathToFile2 );
-  var dstPath = test.context.makePath( 'written/fileRenameRelativePath/a/b/c/dstFile' );
+  var dstPath = test.context.pathFor( 'written/fileRenameRelativePath/a/b/c/dstFile' );
   self.provider.dirMakeForFile( dstPath )
   self.provider.fileRename( dstPath, srcPath );
   test.is( !self.provider.fileExists( pathToFile2 ) )
@@ -8627,10 +8627,10 @@ function fileRenameRelativePath( test )
   test.identical( got, pathToFile2 );
 
   var srcPath = '../../../file';
-  var pathToFile2 = test.context.makePath( 'written/fileRenameRelativePath/a/file' );
+  var pathToFile2 = test.context.pathFor( 'written/fileRenameRelativePath/a/file' );
   self.provider.filesDelete( testDir );
   self.provider.fileWrite( pathToFile2, pathToFile2 );
-  var dstPath = test.context.makePath( 'written/fileRenameRelativePath/a/b/c/dstFile' );
+  var dstPath = test.context.pathFor( 'written/fileRenameRelativePath/a/b/c/dstFile' );
   self.provider.dirMakeForFile( dstPath )
   self.provider.fileRename( dstPath, srcPath );
   test.is( !self.provider.fileExists( pathToFile2 ) )
@@ -8644,7 +8644,7 @@ function fileRenameRelativePath( test )
 
   test.open( 'dst - relative path to a file' );
 
-  pathToFile = test.context.makePath( 'written/fileRenameRelativePath/a/b/c/file' );
+  pathToFile = test.context.pathFor( 'written/fileRenameRelativePath/a/b/c/file' );
 
   var srcPath = pathToFile;
   var dstPath = '../dstFile';
@@ -8725,7 +8725,7 @@ function fileRenameRelativePath( test )
   test.open( 'src - relative path to a dir' );
 
   var srcPath = '../dir';
-  var dstPath = test.context.makePath( 'written/fileRenameRelativePath/dstDir' );
+  var dstPath = test.context.pathFor( 'written/fileRenameRelativePath/dstDir' );
   var fileInDirPath = self.provider.path.join( testDir, 'dir', 'fileInDir' );
   self.provider.filesDelete( testDir );
   self.provider.fileWrite( fileInDirPath, fileInDirPath );
@@ -8736,7 +8736,7 @@ function fileRenameRelativePath( test )
   test.identical( got, [ 'fileInDir' ] );
 
   var srcPath = './../dir';
-  var dstPath = test.context.makePath( 'written/fileRenameRelativePath/dstDir' );
+  var dstPath = test.context.pathFor( 'written/fileRenameRelativePath/dstDir' );
   var fileInDirPath = self.provider.path.join( testDir, 'dir', 'fileInDir' );
   self.provider.filesDelete( testDir );
   self.provider.fileWrite( fileInDirPath, fileInDirPath );
@@ -8747,7 +8747,7 @@ function fileRenameRelativePath( test )
   test.identical( got, [ 'fileInDir' ] );
 
   var srcPath = '../../dir';
-  var dstPath = test.context.makePath( 'written/fileRenameRelativePath/dst/dstDir' );
+  var dstPath = test.context.pathFor( 'written/fileRenameRelativePath/dst/dstDir' );
   var fileInDirPath = self.provider.path.join( testDir, 'dir', 'fileInDir' );
   self.provider.filesDelete( testDir );
   self.provider.fileWrite( fileInDirPath, fileInDirPath );
@@ -8759,7 +8759,7 @@ function fileRenameRelativePath( test )
   test.identical( got, [ 'fileInDir' ] );
 
   var srcPath = './../../dir';
-  var dstPath = test.context.makePath( 'written/fileRenameRelativePath/dst/dstDir' );
+  var dstPath = test.context.pathFor( 'written/fileRenameRelativePath/dst/dstDir' );
   var fileInDirPath = self.provider.path.join( testDir, 'dir', 'fileInDir' );
   self.provider.filesDelete( testDir );
   self.provider.fileWrite( fileInDirPath, fileInDirPath );
@@ -8771,7 +8771,7 @@ function fileRenameRelativePath( test )
   test.identical( got, [ 'fileInDir' ] );
 
   var srcPath = '../../../dir';
-  var dstPath = test.context.makePath( 'written/fileRenameRelativePath/a/b/dstDir' );
+  var dstPath = test.context.pathFor( 'written/fileRenameRelativePath/a/b/dstDir' );
   var fileInDirPath = self.provider.path.join( testDir, 'dir', 'fileInDir' );
   self.provider.filesDelete( testDir );
   self.provider.fileWrite( fileInDirPath, fileInDirPath );
@@ -8783,7 +8783,7 @@ function fileRenameRelativePath( test )
   test.identical( got, [ 'fileInDir' ] );
 
   var srcPath = './../../../dir';
-  var dstPath = test.context.makePath( 'written/fileRenameRelativePath/a/b/dstDir' );
+  var dstPath = test.context.pathFor( 'written/fileRenameRelativePath/a/b/dstDir' );
   var fileInDirPath = self.provider.path.join( testDir, 'dir', 'fileInDir' );
   self.provider.filesDelete( testDir );
   self.provider.fileWrite( fileInDirPath, fileInDirPath );
@@ -8800,7 +8800,7 @@ function fileRenameRelativePath( test )
 
   test.open( 'dst - relative path to a dir' );
 
-  pathToDir = test.context.makePath( 'written/fileRenameRelativePath/1/2/3/dir' )
+  pathToDir = test.context.pathFor( 'written/fileRenameRelativePath/1/2/3/dir' )
 
   var srcPath = pathToDir;
   var dstPath = '../dstDir';
@@ -8904,7 +8904,7 @@ function fileRenameRelativePath( test )
 
   test.open( 'same paths' );
 
-  pathToFile =  test.context.makePath( 'written/fileRenameRelativePath/file' )
+  pathToFile =  test.context.pathFor( 'written/fileRenameRelativePath/file' )
 
   var srcPath = pathToFile;
   var dstPath = '../file';
@@ -8943,8 +8943,8 @@ function fileRenameAsync( test )
   }
 
   var got;
-  var srcPath = test.context.makePath( 'written/fileRenameAsync/src' );
-  var dstPath = test.context.makePath( 'written/fileRenameAsync/dst' );
+  var srcPath = test.context.pathFor( 'written/fileRenameAsync/src' );
+  var dstPath = test.context.pathFor( 'written/fileRenameAsync/dst' );
   var dir  = _.path.dir( srcPath );
 
 
@@ -8963,7 +8963,7 @@ function fileRenameAsync( test )
   {
     var con = self.provider.fileRename
     ({
-      srcPath : test.context.makePath( 'not_existing_path' ),
+      srcPath : test.context.pathFor( 'not_existing_path' ),
       dstPath : ' ',
       sync : 0,
       rewriting : 1,
@@ -8980,7 +8980,7 @@ function fileRenameAsync( test )
   {
     var con = self.provider.fileRename
     ({
-      srcPath : test.context.makePath( 'not_existing_path' ),
+      srcPath : test.context.pathFor( 'not_existing_path' ),
       dstPath : ' ',
       sync : 0,
       rewriting : 1,
@@ -9002,7 +9002,7 @@ function fileRenameAsync( test )
   {
     var con = self.provider.fileRename
     ({
-      srcPath : test.context.makePath( 'not_existing_path' ),
+      srcPath : test.context.pathFor( 'not_existing_path' ),
       dstPath : ' ',
       sync : 0,
       rewriting : 0,
@@ -9018,7 +9018,7 @@ function fileRenameAsync( test )
   {
     var con = self.provider.fileRename
     ({
-      srcPath : test.context.makePath( 'not_existing_path' ),
+      srcPath : test.context.pathFor( 'not_existing_path' ),
       dstPath : ' ',
       sync : 0,
       rewriting : 0,
@@ -9350,7 +9350,7 @@ function fileRenameAsync( test )
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
     test.case = 'rename moving to other existing dir';
-    dstPath = test.context.makePath( 'written/fileRenameAsync/dir/dst' );
+    dstPath = test.context.pathFor( 'written/fileRenameAsync/dir/dst' );
     return null;
   })
 
@@ -9463,7 +9463,7 @@ function fileRenameAsync( test )
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
     test.case = 'rename moving to not existing dir';
-    dstPath = test.context.makePath( 'written/fileRename/dir/dst' );
+    dstPath = test.context.pathFor( 'written/fileRename/dir/dst' );
     return null;
   })
 
@@ -9570,7 +9570,7 @@ function fileRenameAsync( test )
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
     test.case = 'dst is not empty dir';
-    dstPath = test.context.makePath( 'written/fileRenameAsync/dir/dst' );
+    dstPath = test.context.pathFor( 'written/fileRenameAsync/dir/dst' );
     return null;
   })
 
@@ -9769,7 +9769,7 @@ function fileRenameActSync( test )
 
   var got;
 
-  var dir = test.context.makePath( 'written/fileCopy' );
+  var dir = test.context.pathFor( 'written/fileCopy' );
   var srcPath = _.path.join( dir,'src' );
   var dstPath = _.path.join( dir,'dst' );
 
@@ -9985,7 +9985,7 @@ function fileRenameActSync( test )
 
   //
 
-  var dir = test.context.makePath( 'written/' + test.name );
+  var dir = test.context.pathFor( 'written/' + test.name );
   var srcPath = _.path.join( dir, 'src' );
   var dstPath = _.path.join( dir, 'dst' );
   var otherPath = _.path.join( dir, 'other' );
@@ -10194,7 +10194,7 @@ function fileRenameSoftLinkResolving( test )
     return self.provider.fileRename( o );
   }
 
-  let workDir = test.context.makePath( 'written/fileRenameSoftLinkResolving' );
+  let workDir = test.context.pathFor( 'written/fileRenameSoftLinkResolving' );
   let srcPath = self.provider.path.join( workDir, 'src' );
   let srcPath2 = self.provider.path.join( workDir, 'src2' );
   let dstPath = self.provider.path.join( workDir, 'dst' );
@@ -10646,7 +10646,7 @@ function fileDeleteSync( test )
   if( self.providerIsInstanceOf( _.FileProvider.Extract ) )
   isExtract = true;
 
-  var dir = test.context.makePath( 'written/fileDelete' );
+  var dir = test.context.pathFor( 'written/fileDelete' );
 
   if( !self.provider.statResolvedRead( dir ) )
   self.provider.dirMake( dir );
@@ -10661,7 +10661,7 @@ function fileDeleteSync( test )
   {
     self.provider.fileDelete
     ({
-      filePath : test.context.makePath( 'not_existing_path' ),
+      filePath : test.context.pathFor( 'not_existing_path' ),
       sync : 1,
       throwing : 1
     })
@@ -10673,7 +10673,7 @@ function fileDeleteSync( test )
   {
     var got = self.provider.fileDelete
     ({
-      filePath : test.context.makePath( 'not_existing_path' ),
+      filePath : test.context.pathFor( 'not_existing_path' ),
       sync : 1,
       throwing : 0
     });
@@ -10683,7 +10683,7 @@ function fileDeleteSync( test )
   //
 
   test.case = 'removing existing file';
-  var filePath = test.context.makePath( 'written/fileDelete/file.txt');
+  var filePath = test.context.pathFor( 'written/fileDelete/file.txt');
 
   /**/
 
@@ -10712,7 +10712,7 @@ function fileDeleteSync( test )
   //
 
   test.case = 'removing empty folder';
-  var filePath = test.context.makePath( 'written/fileDelete/folder');
+  var filePath = test.context.pathFor( 'written/fileDelete/folder');
 
   /**/
 
@@ -10741,7 +10741,7 @@ function fileDeleteSync( test )
   //
 
   test.case = 'try removing folder with file';
-  var filePath = test.context.makePath( 'written/fileDelete/folder/file.txt');
+  var filePath = test.context.pathFor( 'written/fileDelete/folder/file.txt');
   var folder = _.path.dir( filePath );
 
   /**/
@@ -10910,7 +10910,7 @@ function fileDeleteActSync( test )
     return;
   }
 
-  var mp = _.routineJoin( test.context, test.context.makePath );
+  var mp = _.routineJoin( test.context, test.context.pathFor );
   var dir = mp( 'fileDeleteActSync' );
 
   //
@@ -11131,7 +11131,7 @@ function fileDeleteAsync( test )
 
   var filePath,folder;
 
-  var dir = test.context.makePath( 'written/fileDeleteAsync' );
+  var dir = test.context.pathFor( 'written/fileDeleteAsync' );
 
   if( !self.provider.statResolvedRead( dir ) )
   self.provider.dirMake( dir );
@@ -11151,7 +11151,7 @@ function fileDeleteAsync( test )
   {
     var con = self.provider.fileDelete
     ({
-      filePath : test.context.makePath( 'not_existing_path' ),
+      filePath : test.context.pathFor( 'not_existing_path' ),
       sync : 0,
       throwing : 1
     });
@@ -11165,7 +11165,7 @@ function fileDeleteAsync( test )
   {
     var con = self.provider.fileDelete
     ({
-      filePath : test.context.makePath( 'not_existing_path' ),
+      filePath : test.context.pathFor( 'not_existing_path' ),
       sync : 0,
       throwing : 0
     });
@@ -11180,7 +11180,7 @@ function fileDeleteAsync( test )
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
     test.case = 'removing file';
-    filePath = test.context.makePath( 'written/fileDeleteAsync/file.txt');
+    filePath = test.context.pathFor( 'written/fileDeleteAsync/file.txt');
     return null;
   })
 
@@ -11231,7 +11231,7 @@ function fileDeleteAsync( test )
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
     test.case = 'removing existing empty folder';
-    filePath = test.context.makePath( 'written/fileDeleteAsync/folder');
+    filePath = test.context.pathFor( 'written/fileDeleteAsync/folder');
     return null;
   })
 
@@ -11280,7 +11280,7 @@ function fileDeleteAsync( test )
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
     test.case = 'removing existing folder with file';
-    filePath = test.context.makePath( 'written/fileDeleteAsync/folder/file.txt');
+    filePath = test.context.pathFor( 'written/fileDeleteAsync/folder/file.txt');
     return null;
 
   })
@@ -11503,7 +11503,7 @@ function statResolvedReadSync( test )
     return;
   }
 
-  var dir = test.context.makePath( 'read/statResolvedRead' );
+  var dir = test.context.pathFor( 'read/statResolvedRead' );
   var filePath,expected;
 
   if( !self.provider.statResolvedRead( dir ) )
@@ -11511,7 +11511,7 @@ function statResolvedReadSync( test )
 
   //
 
-  filePath = test.context.makePath( 'read/statResolvedRead/src.txt' );
+  filePath = test.context.pathFor( 'read/statResolvedRead/src.txt' );
   self.provider.fileWrite( filePath, 'Excepteur sint occaecat cupidatat non proident' );
   test.case = 'synchronous file stat default options';
   expected = 46;
@@ -11538,7 +11538,7 @@ function statResolvedReadSync( test )
   //
 
   test.case = 'invalid path';
-  filePath = test.context.makePath( '///bad path///test.txt' );
+  filePath = test.context.pathFor( '///bad path///test.txt' );
 
   /**/
 
@@ -11577,7 +11577,7 @@ function statReadActSync( test )
     return;
   }
 
-  var mp = _.routineJoin( test.context, test.context.makePath );
+  var mp = _.routineJoin( test.context, test.context.pathFor );
   var dir = mp( 'statReadActSync' );
 
   //
@@ -11893,7 +11893,7 @@ function statResolvedReadAsync( test )
     return;
   }
 
-  var dir = test.context.makePath( 'read/statResolvedReadAsync' );
+  var dir = test.context.pathFor( 'read/statResolvedReadAsync' );
   var filePath,expected;
 
   if( !self.provider.statResolvedRead( dir ) )
@@ -11906,7 +11906,7 @@ function statResolvedReadAsync( test )
   consequence
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
-    filePath = test.context.makePath( 'read/statResolvedReadAsync/src.txt' );
+    filePath = test.context.pathFor( 'read/statResolvedReadAsync/src.txt' );
     self.provider.fileWrite( filePath, 'Excepteur sint occaecat cupidatat non proident' );
     test.case = 'synchronous file stat default options';
     expected = 46;
@@ -11956,7 +11956,7 @@ function statResolvedReadAsync( test )
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
     test.case = 'invalid path';
-    filePath = test.context.makePath( '///bad path///test.txt' );
+    filePath = test.context.pathFor( '///bad path///test.txt' );
     return null;
   })
 
@@ -12011,7 +12011,7 @@ function dirMakeSync( test )
   if( self.provider.filesTree )
   self.provider.filesTree = {};
 
-  var dir = test.context.makePath( 'written/dirMake' );
+  var dir = test.context.pathFor( 'written/dirMake' );
   var filePath;
 
   if( !self.provider.statResolvedRead( dir ) )
@@ -12020,7 +12020,7 @@ function dirMakeSync( test )
   //
 
   test.case = 'synchronous mkdir';
-  filePath = test.context.makePath( 'written/dirMake/make_dir' );
+  filePath = test.context.pathFor( 'written/dirMake/make_dir' );
 
   /**/
 
@@ -12032,7 +12032,7 @@ function dirMakeSync( test )
 
   test.case = 'synchronous mkdir force';
   self.provider.filesDelete( filePath );
-  filePath = test.context.makePath( 'written/dirMake/make_dir/dir1/' );
+  filePath = test.context.pathFor( 'written/dirMake/make_dir/dir1/' );
 
   /**/
 
@@ -12061,7 +12061,7 @@ function dirMakeSync( test )
   //
 
   test.case = 'try to rewrite terminal file';
-  filePath = test.context.makePath( 'written/dirMake/terminal.txt' );
+  filePath = test.context.pathFor( 'written/dirMake/terminal.txt' );
   self.provider.fileWrite( filePath, ' ' );
 
   /**/
@@ -12095,7 +12095,7 @@ function dirMakeSync( test )
   //
 
   test.case = 'try to rewrite empty dir';
-  filePath = test.context.makePath( 'written/dirMake/empty' );
+  filePath = test.context.pathFor( 'written/dirMake/empty' );
 
   /**/
 
@@ -12175,7 +12175,7 @@ function dirMakeSync( test )
   //
 
   test.case = 'dir exists, no rewritingTerminal, no force';
-  filePath = test.context.makePath( 'written/dirMake/make_dir/' );
+  filePath = test.context.pathFor( 'written/dirMake/make_dir/' );
 
   /**/
 
@@ -12195,7 +12195,7 @@ function dirMakeSync( test )
   //
 
   test.case = 'try to rewrite folder with files';
-  filePath = test.context.makePath( 'written/dirMake/make_dir/file' );
+  filePath = test.context.pathFor( 'written/dirMake/make_dir/file' );
   self.provider.filesDelete( dir );
 
   /**/
@@ -12245,7 +12245,7 @@ function dirMakeSync( test )
 
   test.case = 'folders structure not exist';
   self.provider.filesDelete( dir );
-  filePath = test.context.makePath( 'written/dirMake/dir' );
+  filePath = test.context.pathFor( 'written/dirMake/dir' );
 
   /**/
 
@@ -12315,7 +12315,7 @@ function dirMakeAsync( test )
   if( self.provider.filesTree )
   self.provider.filesTree = {};
 
-  var dir = test.context.makePath( 'written/dirMakeAsync' );
+  var dir = test.context.pathFor( 'written/dirMakeAsync' );
   var filePath;
 
   if( !self.provider.statResolvedRead( dir ) )
@@ -12329,7 +12329,7 @@ function dirMakeAsync( test )
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
     test.case = 'synchronous mkdir';
-    filePath = test.context.makePath( 'written/dirMakeAsync/make_dir' );
+    filePath = test.context.pathFor( 'written/dirMakeAsync/make_dir' );
     return null;
   })
 
@@ -12359,7 +12359,7 @@ function dirMakeAsync( test )
     test.case = 'synchronous mkdir force';
     self.provider.filesDelete( filePath );
     filePath = tes
-    t.context.makePath( 'written/dirMakeAsync/make_dir/dir1/' );
+    t.context.pathFor( 'written/dirMakeAsync/make_dir/dir1/' );
     return null;
   })
 
@@ -12402,7 +12402,7 @@ function dirMakeAsync( test )
   .doThen( function()
   {
     test.case = 'try to rewrite terminal file';
-    filePath = test.context.makePath( 'written/dirMakeAsync/terminal.txt' );
+    filePath = test.context.pathFor( 'written/dirMakeAsync/terminal.txt' );
     self.provider.fileWrite( filePath, ' ' );
     return null;
   })
@@ -12447,7 +12447,7 @@ function dirMakeAsync( test )
   .doThen( function()
   {
     test.case = 'try to rewrite empty dir';
-    filePath = test.context.makePath( 'written/dirMakeAsync/empty' );
+    filePath = test.context.pathFor( 'written/dirMakeAsync/empty' );
     return null;
   })
 
@@ -12530,7 +12530,7 @@ function dirMakeAsync( test )
   .doThen( function()
   {
     test.case = 'dir exists, no rewritingTerminal, no force';
-    filePath = test.context.makePath( 'written/dirMakeAsync/make_dir/' );
+    filePath = test.context.pathFor( 'written/dirMakeAsync/make_dir/' );
     return null;
   })
 
@@ -12555,7 +12555,7 @@ function dirMakeAsync( test )
   .doThen( function()
   {
     test.case = 'try to rewrite folder with files';
-    filePath = test.context.makePath( 'written/dirMakeAsync/make_dir/file' );
+    filePath = test.context.pathFor( 'written/dirMakeAsync/make_dir/file' );
     self.provider.filesDelete( dir );
     return null;
   })
@@ -12616,7 +12616,7 @@ function dirMakeAsync( test )
   {
     test.case = 'folders structure not exist';
     self.provider.filesDelete( dir );
-    filePath = test.context.makePath( 'written/dirMakeAsync/dir' );
+    filePath = test.context.pathFor( 'written/dirMakeAsync/dir' );
     return null;
   })
 
@@ -12705,7 +12705,7 @@ function fileHashSync( test )
   if( Config.platform === 'browser' )
   return;
 
-  var dir = test.context.makePath( 'read/fileHash' );
+  var dir = test.context.pathFor( 'read/fileHash' );
   var got,filePath,data;
 
   if( !self.provider.statResolvedRead( dir ) )
@@ -12715,7 +12715,7 @@ function fileHashSync( test )
 
   test.case = 'synchronous filehash';
   data = 'Excepteur sint occaecat cupidatat non proident';
-  filePath = test.context.makePath( 'read/fileHash/src.txt' );
+  filePath = test.context.pathFor( 'read/fileHash/src.txt' );
 
   /**/
 
@@ -12729,7 +12729,7 @@ function fileHashSync( test )
   //
 
   test.case = 'invalid path';
-  filePath = test.context.makePath( 'invalid.txt' );
+  filePath = test.context.pathFor( 'invalid.txt' );
 
   /**/
 
@@ -12773,7 +12773,7 @@ function fileHashSync( test )
   {
     self.provider.fileHash
     ({
-      filePath : test.context.makePath( '/' ),
+      filePath : test.context.pathFor( '/' ),
       sync : 1,
       throwing : 1
     });
@@ -12785,7 +12785,7 @@ function fileHashSync( test )
   {
     got = self.provider.fileHash
     ({
-      filePath : test.context.makePath( '/' ),
+      filePath : test.context.pathFor( '/' ),
       sync : 1,
       throwing : 0
     });
@@ -12807,7 +12807,7 @@ function fileHashAsync( test )
     return;
   }
 
-  var dir = test.context.makePath( 'read/fileHashAsync' );
+  var dir = test.context.pathFor( 'read/fileHashAsync' );
   var got,filePath,data;
 
   if( !self.provider.statResolvedRead( dir ) )
@@ -12826,7 +12826,7 @@ function fileHashAsync( test )
   {
     test.case = 'async filehash';
     data = 'Excepteur sint occaecat cupidatat non proident';
-    filePath = test.context.makePath( 'read/fileHashAsync/src.txt' );
+    filePath = test.context.pathFor( 'read/fileHashAsync/src.txt' );
   })
 
   /**/
@@ -12854,7 +12854,7 @@ function fileHashAsync( test )
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
     test.case = 'invalid path';
-    filePath = test.context.makePath( 'invalid.txt' );
+    filePath = test.context.pathFor( 'invalid.txt' );
   })
 
   /**/
@@ -12911,7 +12911,7 @@ function fileHashAsync( test )
   {
     var con = self.provider.fileHash
     ({
-      filePath : test.context.makePath( '/' ),
+      filePath : test.context.pathFor( '/' ),
       sync : 0,
       throwing : 1
     });
@@ -12923,7 +12923,7 @@ function fileHashAsync( test )
   {
     var con = self.provider.fileHash
     ({
-      filePath : test.context.makePath( '/' ),
+      filePath : test.context.pathFor( '/' ),
       sync : 0,
       throwing : 0
     });
@@ -12952,7 +12952,7 @@ function dirReadSync( test )
     return;
   }
 
-  var dir = test.context.makePath( 'read/dirReadAct' );
+  var dir = test.context.pathFor( 'read/dirReadAct' );
   var got,filePath;
 
   if( !self.provider.statResolvedRead( dir ) )
@@ -12961,7 +12961,7 @@ function dirReadSync( test )
   //
 
   test.case = 'synchronous read';
-  filePath = test.context.makePath( 'read/dirRead/1.txt' ),
+  filePath = test.context.pathFor( 'read/dirRead/1.txt' ),
 
   /**/
 
@@ -12985,7 +12985,7 @@ function dirReadSync( test )
   //
 
   test.case = 'synchronous, filePath points to file';
-  filePath = test.context.makePath( 'read/dirRead/1.txt' );
+  filePath = test.context.pathFor( 'read/dirRead/1.txt' );
 
   /**/
 
@@ -13009,7 +13009,7 @@ function dirReadSync( test )
   //
 
   test.case = 'path not exist';
-  filePath = test.context.makePath( 'non_existing_folder' );
+  filePath = test.context.pathFor( 'non_existing_folder' );
 
   /**/
 
@@ -13042,7 +13042,7 @@ function dirReadAsync( test )
     return;
   }
 
-  var dir = test.context.makePath( 'read/dirReadAsync' );
+  var dir = test.context.pathFor( 'read/dirReadAsync' );
   var got,filePath;
 
   if( !self.provider.statResolvedRead( dir ) )
@@ -13057,7 +13057,7 @@ function dirReadAsync( test )
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
     test.case = 'synchronous read';
-    filePath = test.context.makePath( 'read/dirReadAsync/1.txt' );
+    filePath = test.context.pathFor( 'read/dirReadAsync/1.txt' );
     return null;
   })
 
@@ -13104,7 +13104,7 @@ function dirReadAsync( test )
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
     test.case = 'synchronous, filePath points to file';
-    filePath = test.context.makePath( 'read/dirReadAsync/1.txt' );
+    filePath = test.context.pathFor( 'read/dirReadAsync/1.txt' );
     return null;
   })
 
@@ -13153,7 +13153,7 @@ function dirReadAsync( test )
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
     test.case = 'path not exist';
-    filePath = test.context.makePath( 'non_existing_folder' );
+    filePath = test.context.pathFor( 'non_existing_folder' );
     return null;
   })
 
@@ -13207,7 +13207,7 @@ function fileWriteSync( test )
   {
     self.provider.dirMake
     ({
-      filePath : test.context.makePath( 'write_test' ),
+      filePath : test.context.pathFor( 'write_test' ),
       sync : 1
     })
   }
@@ -13218,13 +13218,13 @@ function fileWriteSync( test )
   test.case ='rewrite, file not exist ';
   self.provider.fileWrite
   ({
-    filePath : test.context.makePath( 'write_test/dst.txt' ),
+    filePath : test.context.pathFor( 'write_test/dst.txt' ),
     data : data,
     sync : 1
   });
   var got = self.provider.fileRead
   ({
-    filePath : test.context.makePath( 'write_test/dst.txt' ),
+    filePath : test.context.pathFor( 'write_test/dst.txt' ),
     sync : 1
   });
   var expected = data;
@@ -13234,13 +13234,13 @@ function fileWriteSync( test )
   data = "LOREM LOREM";
   self.provider.fileWrite
   ({
-    filePath : test.context.makePath( 'write_test/dst.txt' ),
+    filePath : test.context.pathFor( 'write_test/dst.txt' ),
     data : data,
     sync : 1
   });
   var got = self.provider.fileRead
   ({
-    filePath : test.context.makePath( 'write_test/dst.txt' ),
+    filePath : test.context.pathFor( 'write_test/dst.txt' ),
     sync : 1
   });
   var expected = data;
@@ -13250,14 +13250,14 @@ function fileWriteSync( test )
   data = "LOREM LOREM";
   self.provider.fileWrite
   ({
-    filePath : test.context.makePath( 'write_test/dst.txt' ),
+    filePath : test.context.pathFor( 'write_test/dst.txt' ),
     data : data,
     sync : 1,
     encoding : 'original.type'
   });
   var got = self.provider.fileRead
   ({
-    filePath : test.context.makePath( 'write_test/dst.txt' ),
+    filePath : test.context.pathFor( 'write_test/dst.txt' ),
     encoding : 'original.type',
     sync : 1
   });
@@ -13270,14 +13270,14 @@ function fileWriteSync( test )
   data = new Uint8Array( [ 97,98,99 ] );
   self.provider.fileWrite
   ({
-    filePath : test.context.makePath( 'write_test/dst.txt' ),
+    filePath : test.context.pathFor( 'write_test/dst.txt' ),
     data : data,
     sync : 1,
     encoding : 'original.type'
   });
   var got = self.provider.fileRead
   ({
-    filePath : test.context.makePath( 'write_test/dst.txt' ),
+    filePath : test.context.pathFor( 'write_test/dst.txt' ),
     encoding : 'original.type',
     sync : 1
   });
@@ -13290,14 +13290,14 @@ function fileWriteSync( test )
   data = new Uint8Array( [ 97,98,99 ] ).buffer;
   self.provider.fileWrite
   ({
-    filePath : test.context.makePath( 'write_test/dst.txt' ),
+    filePath : test.context.pathFor( 'write_test/dst.txt' ),
     data : data,
     sync : 1,
     encoding : 'original.type'
   });
   var got = self.provider.fileRead
   ({
-    filePath : test.context.makePath( 'write_test/dst.txt' ),
+    filePath : test.context.pathFor( 'write_test/dst.txt' ),
     encoding : 'original.type',
     sync : 1
   });
@@ -13312,14 +13312,14 @@ function fileWriteSync( test )
     data = Buffer.from( [ 97,98,99 ] );
     self.provider.fileWrite
     ({
-      filePath : test.context.makePath( 'write_test/dst.txt' ),
+      filePath : test.context.pathFor( 'write_test/dst.txt' ),
       data : data,
       sync : 1,
       encoding : 'original.type'
     });
     var got = self.provider.fileRead
     ({
-      filePath : test.context.makePath( 'write_test/dst.txt' ),
+      filePath : test.context.pathFor( 'write_test/dst.txt' ),
       encoding : 'original.type',
       sync : 1
     });
@@ -13336,7 +13336,7 @@ function fileWriteSync( test )
     {
       self.provider.fileWrite
       ({
-        filePath : test.context.makePath( 'unknown/dst.txt' ),
+        filePath : test.context.pathFor( 'unknown/dst.txt' ),
         data : data,
         sync : 1,
         makingDirectory : 0,
@@ -13348,7 +13348,7 @@ function fileWriteSync( test )
     {
       self.provider.fileWrite
       ({
-        filePath : test.context.makePath( 'write_test' ),
+        filePath : test.context.pathFor( 'write_test' ),
         data : data,
         sync : 1
       });
@@ -13357,19 +13357,19 @@ function fileWriteSync( test )
 
   /*writeMode append*/
 
-  self.provider.filesDelete( test.context.makePath( 'write_test/append.txt' ) );
+  self.provider.filesDelete( test.context.pathFor( 'write_test/append.txt' ) );
   var data = 'APPEND';
   test.case ='append, file not exist ';
   self.provider.fileWrite
   ({
-    filePath : test.context.makePath( 'write_test/append.txt' ),
+    filePath : test.context.pathFor( 'write_test/append.txt' ),
     data : data,
     writeMode : 'append',
     sync : 1
   });
   var got = self.provider.fileRead
   ({
-    filePath : test.context.makePath( 'write_test/append.txt' ),
+    filePath : test.context.pathFor( 'write_test/append.txt' ),
     sync : 1
   });
   var expected = data;
@@ -13378,14 +13378,14 @@ function fileWriteSync( test )
   test.case ='append, to file ';
   self.provider.fileWrite
   ({
-    filePath : test.context.makePath( 'write_test/append.txt' ),
+    filePath : test.context.pathFor( 'write_test/append.txt' ),
     data : data,
     writeMode : 'append',
     sync : 1
   });
   var got = self.provider.fileRead
   ({
-    filePath : test.context.makePath( 'write_test/append.txt' ),
+    filePath : test.context.pathFor( 'write_test/append.txt' ),
     sync : 1
   });
   var expected = 'APPENDAPPEND';
@@ -13400,7 +13400,7 @@ function fileWriteSync( test )
     {
       self.provider.fileWrite
       ({
-        filePath : test.context.makePath( 'unknown/dst.txt' ),
+        filePath : test.context.pathFor( 'unknown/dst.txt' ),
         data : data,
         writeMode : 'append',
         sync : 1,
@@ -13413,7 +13413,7 @@ function fileWriteSync( test )
     {
       self.provider.fileWrite
       ({
-        filePath : test.context.makePath( 'write_test' ),
+        filePath : test.context.pathFor( 'write_test' ),
         data : data,
         writeMode : 'append',
         sync : 1
@@ -13422,19 +13422,19 @@ function fileWriteSync( test )
   }
   /*writeMode prepend*/
 
-  self.provider.filesDelete( test.context.makePath( 'write_test/prepend.txt' ) )
+  self.provider.filesDelete( test.context.pathFor( 'write_test/prepend.txt' ) )
   var data = 'Lorem';
   test.case ='prepend, file not exist ';
   self.provider.fileWrite
   ({
-    filePath : test.context.makePath( 'write_test/prepend.txt' ),
+    filePath : test.context.pathFor( 'write_test/prepend.txt' ),
     data : data,
     writeMode : 'prepend',
     sync : 1
   });
   var got = self.provider.fileRead
   ({
-    filePath : test.context.makePath( 'write_test/prepend.txt' ),
+    filePath : test.context.pathFor( 'write_test/prepend.txt' ),
     sync : 1
   });
   var expected = data;
@@ -13444,14 +13444,14 @@ function fileWriteSync( test )
   test.case ='prepend to file ';
   self.provider.fileWrite
   ({
-    filePath : test.context.makePath( 'write_test/prepend.txt' ),
+    filePath : test.context.pathFor( 'write_test/prepend.txt' ),
     data : data,
     writeMode : 'prepend',
     sync : 1
   });
   var got = self.provider.fileRead
   ({
-    filePath : test.context.makePath( 'write_test/prepend.txt' ),
+    filePath : test.context.pathFor( 'write_test/prepend.txt' ),
     sync : 1
   });
   var expected = 'new textLorem';
@@ -13466,7 +13466,7 @@ function fileWriteSync( test )
     {
       self.provider.fileWrite
       ({
-        filePath : test.context.makePath( 'unknown/dst.txt' ),
+        filePath : test.context.pathFor( 'unknown/dst.txt' ),
         data : data,
         writeMode : 'prepend',
         sync : 1,
@@ -13479,7 +13479,7 @@ function fileWriteSync( test )
     {
       self.provider.fileWrite
       ({
-        filePath : test.context.makePath( 'write_test' ),
+        filePath : test.context.pathFor( 'write_test' ),
         data : data,
         writeMode : 'prepend',
         sync : 1
@@ -13497,7 +13497,7 @@ function fileWriteLinksSync( test )
   if( !_.routineIs( self.provider.fileWrite ) )
   return;
 
-  var mp = _.routineJoin( test.context, test.context.makePath );
+  var mp = _.routineJoin( test.context, test.context.pathFor );
 
   var dirPath = mp( 'write_test' );
   var srcPath = mp( 'write_test/src.txt' );
@@ -13981,8 +13981,8 @@ function fileWriteAsync( test )
 
   .doThen( () =>
   {
-    self.provider.filesDelete( test.context.makePath( 'write_test' ) )
-    return self.provider.dirMake( test.context.makePath( 'write_test' ) )
+    self.provider.filesDelete( test.context.pathFor( 'write_test' ) )
+    return self.provider.dirMake( test.context.pathFor( 'write_test' ) )
   })
 
   /*writeMode rewrite*/
@@ -13993,7 +13993,7 @@ function fileWriteAsync( test )
     test.case ='rewrite, file not exist ';
     var con = self.provider.fileWrite
     ({
-      filePath : test.context.makePath( 'write_test/dst.txt' ),
+      filePath : test.context.pathFor( 'write_test/dst.txt' ),
       data : data,
       sync : 0
     });
@@ -14004,7 +14004,7 @@ function fileWriteAsync( test )
   {
     var got = self.provider.fileRead
     ({
-      filePath : test.context.makePath( 'write_test/dst.txt' ),
+      filePath : test.context.pathFor( 'write_test/dst.txt' ),
       sync : 1
     });
     var expected = data;
@@ -14017,7 +14017,7 @@ function fileWriteAsync( test )
     data = "LOREM LOREM";
     var con = self.provider.fileWrite
     ({
-      filePath : test.context.makePath( 'write_test/dst.txt' ),
+      filePath : test.context.pathFor( 'write_test/dst.txt' ),
       data : data,
       sync : 0
     });
@@ -14028,7 +14028,7 @@ function fileWriteAsync( test )
   {
     var got = self.provider.fileRead
     ({
-      filePath : test.context.makePath( 'write_test/dst.txt' ),
+      filePath : test.context.pathFor( 'write_test/dst.txt' ),
       sync : 1
     });
     var expected = data;
@@ -14040,7 +14040,7 @@ function fileWriteAsync( test )
     test.case ='try to rewrite folder';
     var con = self.provider.fileWrite
     ({
-      filePath : test.context.makePath( 'write_test' ),
+      filePath : test.context.pathFor( 'write_test' ),
       data : data,
       sync : 0,
       makingDirectory : 0
@@ -14051,7 +14051,7 @@ function fileWriteAsync( test )
   /*writeMode append*/
   .doThen( function()
   {
-    return self.provider.filesDelete( test.context.makePath( 'write_test/append.txt' ) );
+    return self.provider.filesDelete( test.context.pathFor( 'write_test/append.txt' ) );
   })
   .doThen( function()
   {
@@ -14059,7 +14059,7 @@ function fileWriteAsync( test )
     test.case ='append, file not exist ';
     var con = self.provider.fileWrite
     ({
-      filePath : test.context.makePath( 'write_test/append.txt' ),
+      filePath : test.context.pathFor( 'write_test/append.txt' ),
       data : data,
       writeMode : 'append',
       sync : 0
@@ -14071,7 +14071,7 @@ function fileWriteAsync( test )
   {
     var got = self.provider.fileRead
     ({
-      filePath : test.context.makePath( 'write_test/append.txt' ),
+      filePath : test.context.pathFor( 'write_test/append.txt' ),
       sync : 1
     });
     var expected = data;
@@ -14083,7 +14083,7 @@ function fileWriteAsync( test )
     test.case ='append, to file ';
     var con = self.provider.fileWrite
     ({
-      filePath : test.context.makePath( 'write_test/append.txt' ),
+      filePath : test.context.pathFor( 'write_test/append.txt' ),
       data : data,
       writeMode : 'append',
       sync : 0
@@ -14095,7 +14095,7 @@ function fileWriteAsync( test )
   {
     var got = self.provider.fileRead
     ({
-      filePath : test.context.makePath( 'write_test/append.txt' ),
+      filePath : test.context.pathFor( 'write_test/append.txt' ),
       sync : 1
     });
     var expected = 'APPENDAPPEND';
@@ -14107,7 +14107,7 @@ function fileWriteAsync( test )
     test.case ='try to append to folder';
     var con = self.provider.fileWrite
     ({
-      filePath : test.context.makePath( 'write_test' ),
+      filePath : test.context.pathFor( 'write_test' ),
       data : data,
       writeMode : 'append',
       sync : 0
@@ -14119,7 +14119,7 @@ function fileWriteAsync( test )
   /*writeMode prepend*/
   .doThen( function()
   {
-    return self.provider.filesDelete( test.context.makePath( 'write_test/prepend.txt' ) );
+    return self.provider.filesDelete( test.context.pathFor( 'write_test/prepend.txt' ) );
   })
   .doThen( function()
   {
@@ -14127,7 +14127,7 @@ function fileWriteAsync( test )
     test.case ='prepend, file not exist ';
     var con = self.provider.fileWrite
     ({
-      filePath : test.context.makePath( 'write_test/prepend.txt' ),
+      filePath : test.context.pathFor( 'write_test/prepend.txt' ),
       data : data,
       writeMode : 'prepend',
       sync : 0
@@ -14139,7 +14139,7 @@ function fileWriteAsync( test )
   {
     var got = self.provider.fileRead
     ({
-      filePath : test.context.makePath( 'write_test/prepend.txt' ),
+      filePath : test.context.pathFor( 'write_test/prepend.txt' ),
       sync : 1
     });
     var expected = data;
@@ -14152,7 +14152,7 @@ function fileWriteAsync( test )
     test.case ='prepend to file ';
     var con = self.provider.fileWrite
     ({
-      filePath : test.context.makePath( 'write_test/prepend.txt' ),
+      filePath : test.context.pathFor( 'write_test/prepend.txt' ),
       data : data,
       writeMode : 'prepend',
       sync : 0
@@ -14164,7 +14164,7 @@ function fileWriteAsync( test )
   {
     var got = self.provider.fileRead
     ({
-      filePath : test.context.makePath( 'write_test/prepend.txt' ),
+      filePath : test.context.pathFor( 'write_test/prepend.txt' ),
       sync : 1
     });
     var expected = 'new textLorem';
@@ -14176,7 +14176,7 @@ function fileWriteAsync( test )
     test.case ='try prepend to folder';
     var con = self.provider.fileWrite
     ({
-      filePath : test.context.makePath( 'write_test' ),
+      filePath : test.context.pathFor( 'write_test' ),
       data : data,
       writeMode : 'prepend',
       sync : 0
@@ -14199,7 +14199,7 @@ function fileWriteLinksAsync( test )
   if( !_.routineIs( self.provider.fileWrite ) )
   return;
 
-  var mp = _.routineJoin( test.context, test.context.makePath );
+  var mp = _.routineJoin( test.context, test.context.pathFor );
 
   var dirPath = mp( 'write_test' );
   var srcPath = mp( 'write_test/src.txt' );
@@ -14874,7 +14874,7 @@ function softLinkSync( test )
     return;
   }
 
-  var dir = test.context.makePath( 'written/softLink' );
+  var dir = test.context.pathFor( 'written/softLink' );
   var srcPath,dstPath;
 
   if( !self.provider.statResolvedRead( dir ) )
@@ -14883,8 +14883,8 @@ function softLinkSync( test )
   //
 
   test.case = 'make link sync';
-  srcPath  = test.context.makePath( 'written/softLink/link_test.txt' );
-  dstPath = test.context.makePath( 'written/softLink/link.txt' );
+  srcPath  = test.context.pathFor( 'written/softLink/link_test.txt' );
+  dstPath = test.context.pathFor( 'written/softLink/link.txt' );
   self.provider.fileWrite( srcPath, '000' );
 
   /**/
@@ -14914,8 +14914,8 @@ function softLinkSync( test )
 
   test.case = 'make for file that not exist';
   self.provider.filesDelete( dir );
-  srcPath  = test.context.makePath( 'written/softLink/no_file.txt' );
-  dstPath = test.context.makePath( 'written/softLink/link2.txt' );
+  srcPath  = test.context.pathFor( 'written/softLink/no_file.txt' );
+  dstPath = test.context.pathFor( 'written/softLink/link2.txt' );
 
   /**/
 
@@ -14950,8 +14950,8 @@ function softLinkSync( test )
   //
 
   test.case = 'link already exists';
-  srcPath = test.context.makePath( 'written/softLink/link_test.txt' );
-  dstPath = test.context.makePath( 'written/softLink/link.txt' );
+  srcPath = test.context.pathFor( 'written/softLink/link_test.txt' );
+  dstPath = test.context.pathFor( 'written/softLink/link.txt' );
   self.provider.fileWrite( srcPath, 'abc' );
   self.provider.softLink
   ({
@@ -15026,7 +15026,7 @@ function softLinkSync( test )
 
   test.case = 'src is equal to dst';
   self.provider.filesDelete( dir );
-  srcPath = test.context.makePath( 'written/softLink/link_test.txt' );
+  srcPath = test.context.pathFor( 'written/softLink/link_test.txt' );
   self.provider.fileWrite( srcPath, ' ' );
 
   /**/
@@ -15138,8 +15138,8 @@ function softLinkSync( test )
 
   test.case = 'try make softlink to folder';
   self.provider.filesDelete( dir );
-  srcPath = test.context.makePath( 'written/softLink/link_test' );
-  dstPath = test.context.makePath( 'written/softLink/link' );
+  srcPath = test.context.pathFor( 'written/softLink/link_test' );
+  dstPath = test.context.pathFor( 'written/softLink/link' );
   self.provider.dirMake( srcPath );
 
   /**/
@@ -15256,7 +15256,7 @@ function softLinkSync( test )
 
   //
 
-  var notExistingPath = test.context.makePath( 'written/softLink/notExisting' );
+  var notExistingPath = test.context.pathFor( 'written/softLink/notExisting' );
   self.provider.filesDelete( notExistingPath );
   self.provider.filesDelete( dstPath );
   self.provider.softLink
@@ -15295,7 +15295,7 @@ function softLinkSync( test )
 
   //
 
-  var notExistingPath = test.context.makePath( 'written/softLink/notExisting' );
+  var notExistingPath = test.context.pathFor( 'written/softLink/notExisting' );
   self.provider.filesDelete( notExistingPath );
   self.provider.filesDelete( dstPath );
   self.provider.softLink
@@ -15332,7 +15332,7 @@ function softLinkSync( test )
 
   //
 
-  var notExistingPath = test.context.makePath( 'written/softLink/notExisting' );
+  var notExistingPath = test.context.pathFor( 'written/softLink/notExisting' );
   self.provider.filesDelete( notExistingPath );
   self.provider.filesDelete( dstPath );
   self.provider.softLink
@@ -15369,7 +15369,7 @@ function softLinkSync( test )
 
   //
 
-  var notExistingPath = test.context.makePath( 'written/softLink/notExisting' );
+  var notExistingPath = test.context.pathFor( 'written/softLink/notExisting' );
   self.provider.filesDelete( notExistingPath );
   self.provider.filesDelete( dstPath );
   self.provider.softLink
@@ -15406,7 +15406,7 @@ function softLinkSync( test )
 
   //
 
-  var notExistingPath = test.context.makePath( 'written/softLink/notExisting' );
+  var notExistingPath = test.context.pathFor( 'written/softLink/notExisting' );
   self.provider.filesDelete( notExistingPath );
   self.provider.filesDelete( dstPath );
   test.mustNotThrowError( () =>
@@ -15426,7 +15426,7 @@ function softLinkSync( test )
 
   //
 
-  var notExistingPath = test.context.makePath( 'written/softLink/notExisting' );
+  var notExistingPath = test.context.pathFor( 'written/softLink/notExisting' );
   self.provider.filesDelete( notExistingPath );
   self.provider.filesDelete( dstPath );
   test.shouldThrowError( () =>
@@ -15446,7 +15446,7 @@ function softLinkSync( test )
 
   //
 
-  var notExistingPath = test.context.makePath( 'written/softLink/notExisting' );
+  var notExistingPath = test.context.pathFor( 'written/softLink/notExisting' );
   self.provider.filesDelete( notExistingPath );
   self.provider.filesDelete( dstPath );
   test.mustNotThrowError( () =>
@@ -15466,7 +15466,7 @@ function softLinkSync( test )
 
   //
 
-  var notExistingPath = test.context.makePath( 'written/softLink/notExisting' );
+  var notExistingPath = test.context.pathFor( 'written/softLink/notExisting' );
   self.provider.filesDelete( notExistingPath );
   self.provider.filesDelete( dstPath );
   test.shouldThrowError( () =>
@@ -15581,7 +15581,7 @@ function softLinkAsync( test )
     return;
   }
 
-  var dir = test.context.makePath( 'written/softLinkAsync' );
+  var dir = test.context.pathFor( 'written/softLinkAsync' );
   var srcPath,dstPath;
 
   if( !self.provider.statResolvedRead( dir ) )
@@ -15595,8 +15595,8 @@ function softLinkAsync( test )
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
     test.case = 'make link async';
-    srcPath  = test.context.makePath( 'written/softLinkAsync/link_test.txt' );
-    dstPath = test.context.makePath( 'written/softLinkAsync/link.txt' );
+    srcPath  = test.context.pathFor( 'written/softLinkAsync/link_test.txt' );
+    dstPath = test.context.pathFor( 'written/softLinkAsync/link.txt' );
     self.provider.fileWrite( srcPath, '000' );
     return null;
   })
@@ -15637,8 +15637,8 @@ function softLinkAsync( test )
   {
     test.case = 'make for file that not exist';
     self.provider.filesDelete( dir );
-    srcPath  = test.context.makePath( 'written/softLinkAsync/no_file.txt' );
-    dstPath = test.context.makePath( 'written/softLinkAsync/link2.txt' );
+    srcPath  = test.context.pathFor( 'written/softLinkAsync/no_file.txt' );
+    dstPath = test.context.pathFor( 'written/softLinkAsync/link2.txt' );
     return null;
   })
 
@@ -15683,8 +15683,8 @@ function softLinkAsync( test )
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
     test.case = 'link already exists';
-    srcPath = test.context.makePath( 'written/softLinkAsync/link_test.txt' );
-    dstPath = test.context.makePath( 'written/softLinkAsync/link.txt' );
+    srcPath = test.context.pathFor( 'written/softLinkAsync/link_test.txt' );
+    dstPath = test.context.pathFor( 'written/softLinkAsync/link.txt' );
     self.provider.fileWrite( srcPath, 'abc' );
     return self.provider.softLink
     ({
@@ -15773,7 +15773,7 @@ function softLinkAsync( test )
   {
     test.case = 'src is equal to dst';
     self.provider.filesDelete( dir );
-    srcPath = test.context.makePath( 'written/softLinkAsync/link_test.txt' );
+    srcPath = test.context.pathFor( 'written/softLinkAsync/link_test.txt' );
     self.provider.fileWrite( srcPath, ' ' );
     return null;
   })
@@ -15912,8 +15912,8 @@ function softLinkAsync( test )
   {
     test.case = 'try make hardlink for folder';
     self.provider.filesDelete( dir );
-    srcPath = test.context.makePath( 'written/softLinkAsync/link_test' );
-    dstPath = test.context.makePath( 'written/softLinkAsync/link' );
+    srcPath = test.context.pathFor( 'written/softLinkAsync/link_test' );
+    dstPath = test.context.pathFor( 'written/softLinkAsync/link' );
     self.provider.dirMake( srcPath );
     return null;
   })
@@ -16107,9 +16107,9 @@ function softLinkRelativePath( test )
     return;
   }
 
-  let testDir = test.context.makePath( 'written/softLinkRelativePath' );
-  let pathToDir = test.context.makePath( 'written/softLinkRelativePath/dir' );
-  let pathToFile = test.context.makePath( 'written/softLinkRelativePath/file' );
+  let testDir = test.context.pathFor( 'written/softLinkRelativePath' );
+  let pathToDir = test.context.pathFor( 'written/softLinkRelativePath/dir' );
+  let pathToFile = test.context.pathFor( 'written/softLinkRelativePath/file' );
 
   test.open( 'src - relative path to a file' );
 
@@ -16117,7 +16117,7 @@ function softLinkRelativePath( test )
   self.provider.fileWrite( pathToFile, pathToFile );
 
   var srcPath = '../file';
-  var dstPath = test.context.makePath( 'written/softLinkRelativePath/dstFile' );
+  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
   self.provider.filesDelete( dstPath );
   self.provider.softLink( dstPath, srcPath );
   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
@@ -16129,7 +16129,7 @@ function softLinkRelativePath( test )
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = './../file';
-  var dstPath = test.context.makePath( 'written/softLinkRelativePath/dstFile' );
+  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
   self.provider.filesDelete( dstPath );
   self.provider.softLink( dstPath, srcPath );
   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
@@ -16141,7 +16141,7 @@ function softLinkRelativePath( test )
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = '../../file';
-  var dstPath = test.context.makePath( 'written/softLinkRelativePath/dstDir/dstFile' );
+  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstDir/dstFile' );
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
@@ -16154,7 +16154,7 @@ function softLinkRelativePath( test )
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = './../../file';
-  var dstPath = test.context.makePath( 'written/softLinkRelativePath/dstDir/dstFile' );
+  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstDir/dstFile' );
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
@@ -16167,9 +16167,9 @@ function softLinkRelativePath( test )
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = './../../../file';
-  var pathToFile2 = test.context.makePath( 'written/softLinkRelativePath/a/file' );
+  var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/a/file' );
   self.provider.fileWrite( pathToFile2, pathToFile2 );
-  var dstPath = test.context.makePath( 'written/softLinkRelativePath/a/b/c/dstFile' );
+  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/a/b/c/dstFile' );
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
@@ -16182,9 +16182,9 @@ function softLinkRelativePath( test )
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = '../../../file';
-  var pathToFile2 = test.context.makePath( 'written/softLinkRelativePath/a/file' );
+  var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/a/file' );
   self.provider.fileWrite( pathToFile2, pathToFile2 );
-  var dstPath = test.context.makePath( 'written/softLinkRelativePath/a/b/c/dstFile' );
+  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/a/b/c/dstFile' );
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
@@ -16197,10 +16197,10 @@ function softLinkRelativePath( test )
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = './.././a/b/c';
-  var pathToFile2 = test.context.makePath( 'written/softLinkRelativePath/a/b/c' );
+  var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/a/b/c' );
   self.provider.filesDelete( pathToFile2 );
   self.provider.fileWrite( pathToFile2, pathToFile2 );
-  var dstPath = test.context.makePath( 'written/softLinkRelativePath/dstFile' );
+  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
@@ -16213,10 +16213,10 @@ function softLinkRelativePath( test )
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = '.././a/b/c';
-  var pathToFile2 = test.context.makePath( 'written/softLinkRelativePath/a/b/c' );
+  var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/a/b/c' );
   self.provider.filesDelete( pathToFile2 );
   self.provider.fileWrite( pathToFile2, pathToFile2 );
-  var dstPath = test.context.makePath( 'written/softLinkRelativePath/dstFile' );
+  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
@@ -16229,10 +16229,10 @@ function softLinkRelativePath( test )
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = '.\\..\\.\\a\\b\\c';
-  var pathToFile2 = test.context.makePath( 'written/softLinkRelativePath/a/b/c' );
+  var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/a/b/c' );
   self.provider.filesDelete( pathToFile2 );
   self.provider.fileWrite( pathToFile2, pathToFile2 );
-  var dstPath = test.context.makePath( 'written/softLinkRelativePath/dstFile' );
+  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
@@ -16245,10 +16245,10 @@ function softLinkRelativePath( test )
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = '..\\.\\a\\b\\c';
-  var pathToFile2 = test.context.makePath( 'written/softLinkRelativePath/a/b/c' );
+  var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/a/b/c' );
   self.provider.filesDelete( pathToFile2 );
   self.provider.fileWrite( pathToFile2, pathToFile2 );
-  var dstPath = test.context.makePath( 'written/softLinkRelativePath/dstFile' );
+  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
@@ -16261,10 +16261,10 @@ function softLinkRelativePath( test )
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = './../a/b/c/../..';
-  var pathToFile2 = test.context.makePath( 'written/softLinkRelativePath/a' );
+  var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/a' );
   self.provider.filesDelete( pathToFile2 );
   self.provider.fileWrite( pathToFile2, pathToFile2 );
-  var dstPath = test.context.makePath( 'written/softLinkRelativePath/dstFile' );
+  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
@@ -16277,10 +16277,10 @@ function softLinkRelativePath( test )
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = '../a/b/c/../..';
-  var pathToFile2 = test.context.makePath( 'written/softLinkRelativePath/a' );
+  var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/a' );
   self.provider.filesDelete( pathToFile2 );
   self.provider.fileWrite( pathToFile2, pathToFile2 );
-  var dstPath = test.context.makePath( 'written/softLinkRelativePath/dstFile' );
+  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
@@ -16293,10 +16293,10 @@ function softLinkRelativePath( test )
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = '.\\..\\a\\b\\c\\..\\..';
-  var pathToFile2 = test.context.makePath( 'written/softLinkRelativePath/a' );
+  var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/a' );
   self.provider.filesDelete( pathToFile2 );
   self.provider.fileWrite( pathToFile2, pathToFile2 );
-  var dstPath = test.context.makePath( 'written/softLinkRelativePath/dstFile' );
+  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
@@ -16309,10 +16309,10 @@ function softLinkRelativePath( test )
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = '..\\a\\b\\c\\..\\..';
-  var pathToFile2 = test.context.makePath( 'written/softLinkRelativePath/a' );
+  var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/a' );
   self.provider.filesDelete( pathToFile2 );
   self.provider.fileWrite( pathToFile2, pathToFile2 );
-  var dstPath = test.context.makePath( 'written/softLinkRelativePath/dstFile' );
+  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
@@ -16325,9 +16325,9 @@ function softLinkRelativePath( test )
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = '..\\a\\b\\c\\..\\..';
-  var pathToFile2 = test.context.makePath( 'written/softLinkRelativePath/a' );
+  var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/a' );
   self.provider.filesDelete( pathToFile2 );
-  var dstPath = test.context.makePath( 'written/softLinkRelativePath/dstFile' );
+  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   test.shouldThrowError( () => self.provider.softLink( dstPath, srcPath ) );
@@ -16344,7 +16344,7 @@ function softLinkRelativePath( test )
   self.provider.dirMake( pathToDir );
 
   var srcPath = '../dir';
-  var dstPath = test.context.makePath( 'written/softLinkRelativePath/dstDir' );
+  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstDir' );
   self.provider.filesDelete( dstPath );
   self.provider.softLink( dstPath, srcPath );
   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
@@ -16356,7 +16356,7 @@ function softLinkRelativePath( test )
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = './../dir';
-  var dstPath = test.context.makePath( 'written/softLinkRelativePath/dstDir' );
+  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstDir' );
   self.provider.filesDelete( dstPath );
   self.provider.softLink( dstPath, srcPath );
   var got = self.provider.pathResolveLink({ filePath : dstPath, resolvingSoftLink : 1 });
@@ -16368,7 +16368,7 @@ function softLinkRelativePath( test )
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = '../../dir';
-  var dstPath = test.context.makePath( 'written/softLinkRelativePath/dstDir/dstDirLink' );
+  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstDir/dstDirLink' );
   self.provider.filesDelete( _.path.dir( dstPath ) );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
@@ -16381,7 +16381,7 @@ function softLinkRelativePath( test )
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = './../../dir';
-  var dstPath = test.context.makePath( 'written/softLinkRelativePath/dstDir/dstDirLink' );
+  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstDir/dstDirLink' );
   self.provider.filesDelete( _.path.dir( dstPath ) );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
@@ -16394,11 +16394,11 @@ function softLinkRelativePath( test )
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = '../../../dir';
-  var pathToDir2 = test.context.makePath( 'written/softLinkRelativePath/a/dir' );
+  var pathToDir2 = test.context.pathFor( 'written/softLinkRelativePath/a/dir' );
   self.provider.filesDelete( _.path.dir( pathToDir2 ) );
   self.provider.dirMake( pathToDir2 );
   self.provider.fileWrite( _.path.join( pathToDir2, 'fileInDir' ) , 'fileInDir' );
-  var dstPath = test.context.makePath( 'written/softLinkRelativePath/a/b/c/dstDir' );
+  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/a/b/c/dstDir' );
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
@@ -16411,11 +16411,11 @@ function softLinkRelativePath( test )
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = './../../../dir';
-  var pathToDir2 = test.context.makePath( 'written/softLinkRelativePath/a/dir' );
+  var pathToDir2 = test.context.pathFor( 'written/softLinkRelativePath/a/dir' );
   self.provider.filesDelete( _.path.dir( pathToDir2 ) );
   self.provider.dirMake( pathToDir2 );
   self.provider.fileWrite( _.path.join( pathToDir2, 'fileInDir' ) , 'fileInDir' );
-  var dstPath = test.context.makePath( 'written/softLinkRelativePath/a/b/c/dstDir' );
+  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/a/b/c/dstDir' );
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
@@ -16430,11 +16430,11 @@ function softLinkRelativePath( test )
   //
 
   var srcPath = './.././a/b/c';
-  var pathToDir2 = test.context.makePath( 'written/softLinkRelativePath/a/b/c' );
+  var pathToDir2 = test.context.pathFor( 'written/softLinkRelativePath/a/b/c' );
   self.provider.filesDelete( _.path.dir( pathToDir2 ) );
   self.provider.dirMake( pathToDir2 );
   self.provider.fileWrite( _.path.join( pathToDir2, 'fileInDir' ) , 'fileInDir' );
-  var dstPath = test.context.makePath( 'written/softLinkRelativePath/dstDir' );
+  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstDir' );
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
@@ -16447,11 +16447,11 @@ function softLinkRelativePath( test )
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = '.././a/b/c';
-  var pathToDir2 = test.context.makePath( 'written/softLinkRelativePath/a/b/c' );
+  var pathToDir2 = test.context.pathFor( 'written/softLinkRelativePath/a/b/c' );
   self.provider.filesDelete( _.path.dir( pathToDir2 ) );
   self.provider.dirMake( pathToDir2 );
   self.provider.fileWrite( _.path.join( pathToDir2, 'fileInDir' ) , 'fileInDir' );
-  var dstPath = test.context.makePath( 'written/softLinkRelativePath/dstDir' );
+  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstDir' );
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
@@ -16464,11 +16464,11 @@ function softLinkRelativePath( test )
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = '.\\..\\.\\a\\b\\c';
-  var pathToDir2 = test.context.makePath( 'written/softLinkRelativePath/a/b/c' );
+  var pathToDir2 = test.context.pathFor( 'written/softLinkRelativePath/a/b/c' );
   self.provider.filesDelete( _.path.dir( pathToDir2 ) );
   self.provider.dirMake( pathToDir2 );
   self.provider.fileWrite( _.path.join( pathToDir2, 'fileInDir' ) , 'fileInDir' );
-  var dstPath = test.context.makePath( 'written/softLinkRelativePath/dstDir' );
+  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstDir' );
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
@@ -16481,11 +16481,11 @@ function softLinkRelativePath( test )
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = '..\\.\\a\\b\\c';
-  var pathToDir2 = test.context.makePath( 'written/softLinkRelativePath/a/b/c' );
+  var pathToDir2 = test.context.pathFor( 'written/softLinkRelativePath/a/b/c' );
   self.provider.filesDelete( _.path.dir( pathToDir2 ) );
   self.provider.dirMake( pathToDir2 );
   self.provider.fileWrite( _.path.join( pathToDir2, 'fileInDir' ) , 'fileInDir' );
-  var dstPath = test.context.makePath( 'written/softLinkRelativePath/dstDir' );
+  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstDir' );
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
@@ -16499,11 +16499,11 @@ function softLinkRelativePath( test )
 
 
   var srcPath = './../a/b/c/../..';
-  var pathToDir2 = test.context.makePath( 'written/softLinkRelativePath/a' );
+  var pathToDir2 = test.context.pathFor( 'written/softLinkRelativePath/a' );
   self.provider.filesDelete( _.path.dir( pathToDir2 ) );
   self.provider.dirMake( pathToDir2 );
   self.provider.fileWrite( _.path.join( pathToDir2, 'fileInDir' ) , 'fileInDir' );
-  var dstPath = test.context.makePath( 'written/softLinkRelativePath/dstDir' );
+  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstDir' );
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
@@ -16516,11 +16516,11 @@ function softLinkRelativePath( test )
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = '../a/b/c/../..';
-  var pathToDir2 = test.context.makePath( 'written/softLinkRelativePath/a' );
+  var pathToDir2 = test.context.pathFor( 'written/softLinkRelativePath/a' );
   self.provider.filesDelete( _.path.dir( pathToDir2 ) );
   self.provider.dirMake( pathToDir2 );
   self.provider.fileWrite( _.path.join( pathToDir2, 'fileInDir' ) , 'fileInDir' );
-  var dstPath = test.context.makePath( 'written/softLinkRelativePath/dstDir' );
+  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstDir' );
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
@@ -16534,11 +16534,11 @@ function softLinkRelativePath( test )
 
 
   var srcPath = '.\\..\\a\\b\\c\\..\\..';
-  var pathToDir2 = test.context.makePath( 'written/softLinkRelativePath/a' );
+  var pathToDir2 = test.context.pathFor( 'written/softLinkRelativePath/a' );
   self.provider.filesDelete( _.path.dir( pathToDir2 ) );
   self.provider.dirMake( pathToDir2 );
   self.provider.fileWrite( _.path.join( pathToDir2, 'fileInDir' ) , 'fileInDir' );
-  var dstPath = test.context.makePath( 'written/softLinkRelativePath/dstDir' );
+  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstDir' );
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
@@ -16552,11 +16552,11 @@ function softLinkRelativePath( test )
 
 
   var srcPath = '..\\a\\b\\c\\..\\..';
-  var pathToDir2 = test.context.makePath( 'written/softLinkRelativePath/a' );
+  var pathToDir2 = test.context.pathFor( 'written/softLinkRelativePath/a' );
   self.provider.filesDelete( _.path.dir( pathToDir2 ) );
   self.provider.dirMake( pathToDir2 );
   self.provider.fileWrite( _.path.join( pathToDir2, 'fileInDir' ) , 'fileInDir' );
-  var dstPath = test.context.makePath( 'written/softLinkRelativePath/dstDir' );
+  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstDir' );
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.softLink( dstPath, srcPath );
@@ -16569,9 +16569,9 @@ function softLinkRelativePath( test )
   test.identical( got, _.path.normalize( srcPath ) );
 
   var srcPath = '..\\a\\b\\c\\..\\..';
-  var pathToFile2 = test.context.makePath( 'written/softLinkRelativePath/a' );
+  var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/a' );
   self.provider.filesDelete( pathToFile2 );
-  var dstPath = test.context.makePath( 'written/softLinkRelativePath/dstFile' );
+  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath );
   test.shouldThrowError( () => self.provider.softLink( dstPath, srcPath ) );
@@ -16737,7 +16737,7 @@ function softLinkRelativePath( test )
   test.open( 'allowingMissing on, relative path to src' );
 
   var srcPath = '../file';
-  var dstPath = test.context.makePath( 'written/softLinkRelativePath/dstFile' );
+  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
   self.provider.filesDelete( testDir );
   self.provider.dirMakeForFile( dstPath );
   self.provider.softLink
@@ -16775,7 +16775,7 @@ function softLinkRelativePath( test )
   test.identical( got, srcPath );
 
   var srcPath = '../file';
-  var dstPath = test.context.makePath( 'written/softLinkRelativePath/dstFile' );
+  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
   self.provider.filesDelete( testDir );
   self.provider.dirMakeForFile( dstPath );
   self.provider.softLink
@@ -16813,7 +16813,7 @@ function softLinkRelativePath( test )
   test.identical( got, srcPath );
 
   var srcPath = '../file';
-  var dstPath = test.context.makePath( 'written/softLinkRelativePath/dstFile' );
+  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
   self.provider.filesDelete( testDir );
   self.provider.dirMakeForFile( dstPath );
   self.provider.softLink
@@ -16851,7 +16851,7 @@ function softLinkRelativePath( test )
   test.identical( got, srcPath );
 
   var srcPath = '../file';
-  var dstPath = test.context.makePath( 'written/softLinkRelativePath/dstFile' );
+  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
   self.provider.filesDelete( testDir );
   self.provider.dirMakeForFile( dstPath );
   self.provider.softLink
@@ -16956,7 +16956,7 @@ function softLinkRelativePath( test )
   test.open( 'allowingMissing off, relative path to src' );
 
   var srcPath = '../file';
-  var dstPath = test.context.makePath( 'written/softLinkRelativePath/dstFile' );
+  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
   self.provider.filesDelete( testDir );
   test.shouldThrowError( () =>
   {
@@ -16972,7 +16972,7 @@ function softLinkRelativePath( test )
   test.is( !self.provider.isSoftLink( dstPath ) );
 
   var srcPath = '../file';
-  var dstPath = test.context.makePath( 'written/softLinkRelativePath/dstFile' );
+  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
   self.provider.filesDelete( testDir );
   test.mustNotThrowError( () =>
   {
@@ -16988,7 +16988,7 @@ function softLinkRelativePath( test )
   test.is( !self.provider.isSoftLink( dstPath ) );
 
   var srcPath = '../file';
-  var dstPath = test.context.makePath( 'written/softLinkRelativePath/dstFile' );
+  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
   self.provider.filesDelete( testDir );
   test.mustNotThrowError( () =>
   {
@@ -17004,7 +17004,7 @@ function softLinkRelativePath( test )
   test.is( !self.provider.isSoftLink( dstPath ) );
 
   var srcPath = '../file';
-  var dstPath = test.context.makePath( 'written/softLinkRelativePath/dstFile' );
+  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
   self.provider.filesDelete( testDir );
   test.shouldThrowError( () =>
   {
@@ -17099,7 +17099,7 @@ function fileReadAsync( test )
 
   var src = 'Excepteur sint occaecat cupidatat non proident';
 
-  self.testFile = test.context.makePath( 'written/fileReadAsync/file' );
+  self.testFile = test.context.pathFor( 'written/fileReadAsync/file' );
   self.provider.fileWrite( self.testFile, src );
 
   consequence
@@ -17269,7 +17269,7 @@ function softLinkChain( test )
   var provider = self.provider;
   var path = provider.path;
   // var dir = path.dirTempOpen();
-  var dir = test.context.makePath( 'written/softLinkChain' );
+  var dir = test.context.pathFor( 'written/softLinkChain' );
   // var dir = path.dirTempOpen( path.join( __dirname, 'softLinkChain' ) ); // xxx
 
   debugger;
@@ -17294,7 +17294,7 @@ function softLinkChain( test )
   test.identical( got, expected );
 
   var expected = path.join( dir, 'x' );
-  var got = provider.pathResolveLinkChain({ filePath : path.join( dir, 'a/b/c' ), resolvingIntermediateDirectories : 1 });
+  var got = provider.pathResolveLinkTailChain({ filePath : path.join( dir, 'a/b/c' ), resolvingHeadDirectories : 1 });
   got = got[ got.length - 1 ];
   var stat = provider.statResolvedRead( got );
   test.is( !!stat );
@@ -17326,7 +17326,7 @@ function softLinkActSync( test )
     return;
   }
 
-  var mp = _.routineJoin( test.context, test.context.makePath );
+  var mp = _.routineJoin( test.context, test.context.pathFor );
   var dir = mp( 'hardLinkActSync' );
 
   var symlinkIsAllowed = test.context.symlinkIsAllowed();
@@ -17777,7 +17777,7 @@ function softLinkSoftLinkResolving( test )
     return self.provider.softLink( o );
   }
 
-  let workDir = test.context.makePath( 'written/fileRenameSoftLinkResolving' );
+  let workDir = test.context.pathFor( 'written/fileRenameSoftLinkResolving' );
   let srcPath = self.provider.path.join( workDir, 'src' );
   let srcPath2 = self.provider.path.join( workDir, 'src2' );
   let dstPath = self.provider.path.join( workDir, 'dst' );
@@ -18299,7 +18299,7 @@ function softLinkRelativeLinkResolving( test )
     return self.provider.softLink( o );
   }
 
-  let workDir = test.context.makePath( 'written/softLinkRelativeLinkResolving' );
+  let workDir = test.context.pathFor( 'written/softLinkRelativeLinkResolving' );
   let srcPath = self.provider.path.join( workDir, 'src' );
   let srcPath2 = self.provider.path.join( workDir, 'src2' );
   let srcPathRelative2 = self.provider.path.relative( srcPath, srcPath2 );
@@ -18822,7 +18822,7 @@ function hardLinkSync( test )
   {
     var paths = names.map( ( name, i ) =>
     {
-      var filePath = self.makePath( _.path.join( dirPath, name ) );
+      var filePath = self.pathFor( _.path.join( dirPath, name ) );
       self.provider.fileWrite({ filePath : filePath, data : filePath, purging : 1 });
 
       if( sameTime )
@@ -18874,7 +18874,7 @@ function hardLinkSync( test )
     return true;
   }
 
-  var dir = test.context.makePath( 'written/hardLink' );
+  var dir = test.context.pathFor( 'written/hardLink' );
   self.provider.filesDelete( dir )
   var srcPath,dstPath;
 
@@ -18884,8 +18884,8 @@ function hardLinkSync( test )
   //
 
   test.case = 'make link async';
-  srcPath  = test.context.makePath( 'written/hardLink/link_test.txt' );
-  dstPath = test.context.makePath( 'written/hardLink/link.txt' );
+  srcPath  = test.context.pathFor( 'written/hardLink/link_test.txt' );
+  dstPath = test.context.pathFor( 'written/hardLink/link.txt' );
   self.provider.fileWrite( srcPath, '000' );
 
   /**/
@@ -18914,8 +18914,8 @@ function hardLinkSync( test )
 
   test.case = 'make for file that not exist';
   self.provider.filesDelete( dir );
-  srcPath  = test.context.makePath( 'written/hardLink/no_file.txt' );
-  dstPath = test.context.makePath( 'written/hardLink/link2.txt' );
+  srcPath  = test.context.pathFor( 'written/hardLink/no_file.txt' );
+  dstPath = test.context.pathFor( 'written/hardLink/link2.txt' );
 
   /**/
 
@@ -18950,8 +18950,8 @@ function hardLinkSync( test )
   //
 
   test.case = 'link already exists';
-  srcPath = test.context.makePath( 'written/hardLink/link_test.txt' );
-  dstPath = test.context.makePath( 'written/hardLink/link.txt' );
+  srcPath = test.context.pathFor( 'written/hardLink/link_test.txt' );
+  dstPath = test.context.pathFor( 'written/hardLink/link.txt' );
   self.provider.fileWrite( srcPath, 'abc' );
   self.provider.hardLink
   ({
@@ -19037,7 +19037,7 @@ function hardLinkSync( test )
 
   test.case = 'src is equal to dst';
   self.provider.filesDelete( dir );
-  srcPath = test.context.makePath( 'written/hardLink/link_test.txt' );
+  srcPath = test.context.pathFor( 'written/hardLink/link_test.txt' );
   self.provider.fileWrite( srcPath, ' ' );
 
   /**/
@@ -19112,8 +19112,8 @@ function hardLinkSync( test )
 
   test.case = 'try make hardlink for folder';
   self.provider.filesDelete( dir );
-  srcPath = test.context.makePath( 'written/hardLink/link_test' );
-  dstPath = test.context.makePath( 'written/hardLink/link' );
+  srcPath = test.context.pathFor( 'written/hardLink/link_test' );
+  dstPath = test.context.pathFor( 'written/hardLink/link' );
   self.provider.dirMake( srcPath );
 
   /**/
@@ -19266,7 +19266,7 @@ function hardLinkSync( test )
 
   test.case = 'dstPath option, groups of linked files ';
   var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
-  self.provider.filesDelete( test.context.makePath( currentTestDir ) );
+  self.provider.filesDelete( test.context.pathFor( currentTestDir ) );
 
   /**/
 
@@ -19332,9 +19332,9 @@ function hardLinkSync( test )
 
   test.case = 'dstPath option, only first path exists';
   var fileNames = [ 'a1', 'a2', 'a3' ];
-  self.provider.filesDelete( test.context.makePath( currentTestDir ) );
+  self.provider.filesDelete( test.context.pathFor( currentTestDir ) );
   makeFiles( fileNames.slice( 0, 1 ), currentTestDir );
-  var paths = fileNames.map( ( n )  => self.makePath( _.path.join( currentTestDir, n ) ) );
+  var paths = fileNames.map( ( n )  => self.pathFor( _.path.join( currentTestDir, n ) ) );
   paths = self.provider.path.s.normalize( paths );
   test.mustNotThrowError( () =>
   {
@@ -19353,8 +19353,8 @@ function hardLinkSync( test )
   /**/
 
   test.case = 'dstPath option, all paths not exist';
-  self.provider.filesDelete( test.context.makePath( currentTestDir ) );
-  var paths = fileNames.map( ( n )  => self.makePath( _.path.join( currentTestDir, n ) ) );
+  self.provider.filesDelete( test.context.pathFor( currentTestDir ) );
+  var paths = fileNames.map( ( n )  => self.pathFor( _.path.join( currentTestDir, n ) ) );
   paths = self.provider.path.s.normalize( paths );
   test.shouldThrowError( () =>
   {
@@ -19567,9 +19567,9 @@ function hardLinkRelativePath( test )
     return;
   }
 
-  let testDir = test.context.makePath( 'written/hardLinkRelativePath' );
-  let pathToDir = test.context.makePath( 'written/hardLinkRelativePath/dir' );
-  let pathToFile = test.context.makePath( 'written/hardLinkRelativePath/file' );
+  let testDir = test.context.pathFor( 'written/hardLinkRelativePath' );
+  let pathToDir = test.context.pathFor( 'written/hardLinkRelativePath/dir' );
+  let pathToFile = test.context.pathFor( 'written/hardLinkRelativePath/file' );
 
   test.open( 'src - relative path to a file' );
 
@@ -19577,7 +19577,7 @@ function hardLinkRelativePath( test )
   self.provider.fileWrite( pathToFile, pathToFile );
 
   var srcPath = '../file';
-  var dstPath = test.context.makePath( 'written/hardLinkRelativePath/dstFile' );
+  var dstPath = test.context.pathFor( 'written/hardLinkRelativePath/dstFile' );
   self.provider.filesDelete( dstPath );
   self.provider.hardLink( dstPath, srcPath );
   test.identical( self.provider.filesAreHardLinked( [ pathToFile, dstPath ] ), null );
@@ -19585,7 +19585,7 @@ function hardLinkRelativePath( test )
   test.identical( got,pathToFile );
 
   var srcPath = './../file';
-  var dstPath = test.context.makePath( 'written/hardLinkRelativePath/dstFile' );
+  var dstPath = test.context.pathFor( 'written/hardLinkRelativePath/dstFile' );
   self.provider.filesDelete( dstPath );
   self.provider.hardLink( dstPath, srcPath );
   test.identical( self.provider.filesAreHardLinked( [ pathToFile, dstPath ] ), null );
@@ -19593,7 +19593,7 @@ function hardLinkRelativePath( test )
   test.identical( got,pathToFile );
 
   var srcPath = '../../file';
-  var dstPath = test.context.makePath( 'written/hardLinkRelativePath/dstDir/dstFile' );
+  var dstPath = test.context.pathFor( 'written/hardLinkRelativePath/dstDir/dstFile' );
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.hardLink( dstPath, srcPath );
@@ -19602,7 +19602,7 @@ function hardLinkRelativePath( test )
   test.identical( got,pathToFile );
 
   var srcPath = './../../file';
-  var dstPath = test.context.makePath( 'written/hardLinkRelativePath/dstDir/dstFile' );
+  var dstPath = test.context.pathFor( 'written/hardLinkRelativePath/dstDir/dstFile' );
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.hardLink( dstPath, srcPath );
@@ -19611,9 +19611,9 @@ function hardLinkRelativePath( test )
   test.identical( got,pathToFile );
 
   var srcPath = './../../../file';
-  var pathToFile2 = test.context.makePath( 'written/hardLinkRelativePath/a/file' );
+  var pathToFile2 = test.context.pathFor( 'written/hardLinkRelativePath/a/file' );
   self.provider.fileWrite( pathToFile2, pathToFile2 );
-  var dstPath = test.context.makePath( 'written/hardLinkRelativePath/a/b/c/dstFile' );
+  var dstPath = test.context.pathFor( 'written/hardLinkRelativePath/a/b/c/dstFile' );
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.hardLink( dstPath, srcPath );
@@ -19622,9 +19622,9 @@ function hardLinkRelativePath( test )
   test.identical( got,pathToFile2 );
 
   var srcPath = '../../../file';
-  var pathToFile2 = test.context.makePath( 'written/hardLinkRelativePath/a/file' );
+  var pathToFile2 = test.context.pathFor( 'written/hardLinkRelativePath/a/file' );
   self.provider.fileWrite( pathToFile2, pathToFile2 );
-  var dstPath = test.context.makePath( 'written/hardLinkRelativePath/a/b/c/dstFile' );
+  var dstPath = test.context.pathFor( 'written/hardLinkRelativePath/a/b/c/dstFile' );
   self.provider.filesDelete( dstPath );
   self.provider.dirMakeForFile( dstPath )
   self.provider.hardLink( dstPath, srcPath );
@@ -19643,7 +19643,7 @@ function hardLinkRelativePath( test )
   self.provider.dirMake( pathToDir );
 
   var srcPath = '../dir';
-  var dstPath = test.context.makePath( 'written/hardLinkRelativePath/dstDir' );
+  var dstPath = test.context.pathFor( 'written/hardLinkRelativePath/dstDir' );
   self.provider.filesDelete( dstPath );
   test.shouldThrowError( () => self.provider.hardLink( dstPath, srcPath ) )
   test.is( !self.provider.filesAreHardLinked( [ pathToDir, dstPath ] ) );
@@ -19771,7 +19771,7 @@ function hardLinkExperiment( test )
   {
     var paths = names.map( ( name, i ) =>
     {
-      var filePath = self.makePath( _.path.join( dirPath, name ) );
+      var filePath = self.pathFor( _.path.join( dirPath, name ) );
       self.provider.fileWrite({ filePath : filePath, data : filePath, purging : 1 });
 
       if( sameTime )
@@ -19800,7 +19800,7 @@ function hardLinkExperiment( test )
   }
 
 
-  var dir = test.context.makePath( 'written/hardLink' );
+  var dir = test.context.pathFor( 'written/hardLink' );
   var srcPath,dstPath;
 
   var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
@@ -19854,7 +19854,7 @@ function hardLinkSoftlinked( test )
     return;
   }
 
-  var mp = _.routineJoin( test.context, test.context.makePath );
+  var mp = _.routineJoin( test.context, test.context.pathFor );
 
   test.case = 'files are already linked, must not throw an error'
   var dir = mp( 'hardLinkActSync/dir' );
@@ -19894,7 +19894,7 @@ function hardLinkActSync( test )
     return;
   }
 
-  var mp = _.routineJoin( test.context, test.context.makePath );
+  var mp = _.routineJoin( test.context, test.context.pathFor );
   var dir = mp( 'hardLinkActSync' );
 
   var symlinkIsAllowed = test.context.symlinkIsAllowed();
@@ -20403,7 +20403,7 @@ function hardLinkAsync( test )
   {
     var paths = names.map( ( name, i ) =>
     {
-      var filePath = self.makePath( _.path.join( dirPath, name ) );
+      var filePath = self.pathFor( _.path.join( dirPath, name ) );
       self.provider.fileWrite({ filePath : filePath, data : filePath, purging : 1 });
 
       if( sameTime )
@@ -20431,7 +20431,7 @@ function hardLinkAsync( test )
     self.provider.hardLink( _.path.join( dir, 'file' + i ), filePath );
   }
 
-  var dir = test.context.makePath( 'written/hardLinkAsync' );
+  var dir = test.context.pathFor( 'written/hardLinkAsync' );
   self.provider.filesDelete( dir );
   var srcPath,dstPath;
 
@@ -20452,8 +20452,8 @@ function hardLinkAsync( test )
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
     test.case = 'make link async';
-    srcPath  = test.context.makePath( 'written/hardLinkAsync/link_test.txt' );
-    dstPath = test.context.makePath( 'written/hardLinkAsync/link.txt' );
+    srcPath  = test.context.pathFor( 'written/hardLinkAsync/link_test.txt' );
+    dstPath = test.context.pathFor( 'written/hardLinkAsync/link.txt' );
     self.provider.fileWrite( srcPath, '000' );
     return null;
   })
@@ -20492,8 +20492,8 @@ function hardLinkAsync( test )
   {
     test.case = 'make for file that not exist';
     self.provider.filesDelete( dir );
-    srcPath  = test.context.makePath( 'written/hardLinkAsync/no_file.txt' );
-    dstPath = test.context.makePath( 'written/hardLinkAsync/link2.txt' );
+    srcPath  = test.context.pathFor( 'written/hardLinkAsync/no_file.txt' );
+    dstPath = test.context.pathFor( 'written/hardLinkAsync/link2.txt' );
     return null;
   })
 
@@ -20537,8 +20537,8 @@ function hardLinkAsync( test )
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
     test.case = 'link already exists';
-    srcPath = test.context.makePath( 'written/hardLinkAsync/link_test.txt' );
-    dstPath = test.context.makePath( 'written/hardLinkAsync/link.txt' );
+    srcPath = test.context.pathFor( 'written/hardLinkAsync/link_test.txt' );
+    dstPath = test.context.pathFor( 'written/hardLinkAsync/link.txt' );
     self.provider.fileWrite( srcPath, 'abc' );
     return self.provider.hardLink
     ({
@@ -20631,7 +20631,7 @@ function hardLinkAsync( test )
   {
     test.case = 'src is equal to dst';
     self.provider.filesDelete( dir );
-    srcPath = test.context.makePath( 'written/hardLinkAsync/link_test.txt' );
+    srcPath = test.context.pathFor( 'written/hardLinkAsync/link_test.txt' );
     self.provider.fileWrite( srcPath, ' ' );
     return null;
   })
@@ -20726,8 +20726,8 @@ function hardLinkAsync( test )
   {
     test.case = 'try make hardlink for folder';
     self.provider.filesDelete( dir );
-    srcPath = test.context.makePath( 'written/hardLinkAsync/link_test' );
-    dstPath = test.context.makePath( 'written/hardLinkAsync/link' );
+    srcPath = test.context.pathFor( 'written/hardLinkAsync/link_test' );
+    dstPath = test.context.pathFor( 'written/hardLinkAsync/link' );
     self.provider.dirMake( srcPath );
     return null;
   })
@@ -20891,7 +20891,7 @@ function hardLinkAsync( test )
   {
     test.case = 'dstPath option, groups of linked files ';
     fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
-    self.provider.filesDelete( test.context.makePath( currentTestDir ) );
+    self.provider.filesDelete( test.context.pathFor( currentTestDir ) );
     return null;
   })
 
@@ -20967,9 +20967,9 @@ function hardLinkAsync( test )
   {
     test.case = 'dstPath option, only first path exists';
     var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
-    self.provider.filesDelete( test.context.makePath( currentTestDir ) );
+    self.provider.filesDelete( test.context.pathFor( currentTestDir ) );
     makeFiles( fileNames.slice( 0, 1 ), currentTestDir );
-    var paths = fileNames.map( ( n )  => self.makePath( _.path.join( currentTestDir, n ) ) );
+    var paths = fileNames.map( ( n )  => self.pathFor( _.path.join( currentTestDir, n ) ) );
     return self.provider.hardLink
     ({
       sync : 0,
@@ -20992,8 +20992,8 @@ function hardLinkAsync( test )
   {
     test.case = 'dstPath option, all paths not exist';
     var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
-    self.provider.filesDelete( test.context.makePath( currentTestDir ) );
-    var paths = fileNames.map( ( n )  => self.makePath( _.path.join( currentTestDir, n ) ) );
+    self.provider.filesDelete( test.context.pathFor( currentTestDir ) );
+    var paths = fileNames.map( ( n )  => self.pathFor( _.path.join( currentTestDir, n ) ) );
     debugger
     var con = self.provider.hardLink
     ({
@@ -21100,7 +21100,7 @@ function hardLinkAsync( test )
   {
     test.case = 'sourceMode: source must be a file with max amount of links';
     var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
-    self.provider.filesDelete( test.context.makePath( currentTestDir ) );
+    self.provider.filesDelete( test.context.pathFor( currentTestDir ) );
     var paths = makeFiles( fileNames, currentTestDir );
     waitSync( delay );
     self.provider.fileWrite( paths[ 0 ], 'max links file' );
@@ -21152,7 +21152,7 @@ function hardLinkActAsync( test )
     return;
   }
 
-  let mp = _.routineJoin( test.context, test.context.makePath );
+  let mp = _.routineJoin( test.context, test.context.pathFor );
   var dir = mp( 'hardLinkActSync' );
 
   let symlinkIsAllowed = test.context.symlinkIsAllowed();
@@ -21394,7 +21394,7 @@ function fileExchangeSync( test )
     return;
   }
 
-  var dir = test.context.makePath( 'written/fileExchange' );
+  var dir = test.context.pathFor( 'written/fileExchange' );
   var srcPath,dstPath,src,dst,got;
 
   if( !self.provider.statResolvedRead( dir ) )
@@ -21403,8 +21403,8 @@ function fileExchangeSync( test )
   //
 
   test.case = 'swap two files content';
-  srcPath = test.context.makePath( 'written/fileExchange/src' );
-  dstPath = test.context.makePath( 'written/fileExchange/dst' );
+  srcPath = test.context.pathFor( 'written/fileExchange/src' );
+  dstPath = test.context.pathFor( 'written/fileExchange/dst' );
 
 
   /*default setting*/
@@ -21438,8 +21438,8 @@ function fileExchangeSync( test )
   //
 
   test.case = 'swap two dirs content';
-  srcPath = test.context.makePath( 'written/fileExchange/src/src.txt' );
-  dstPath = test.context.makePath( 'written/fileExchange/dst/dst.txt' );
+  srcPath = test.context.pathFor( 'written/fileExchange/src/src.txt' );
+  dstPath = test.context.pathFor( 'written/fileExchange/dst/dst.txt' );
 
   /*throwing on*/
 
@@ -21482,8 +21482,8 @@ function fileExchangeSync( test )
   //
 
   test.case = 'path not exist';
-  srcPath = test.context.makePath( 'written/fileExchange/src' );
-  dstPath = test.context.makePath( 'written/fileExchange/dst' );
+  srcPath = test.context.pathFor( 'written/fileExchange/src' );
+  dstPath = test.context.pathFor( 'written/fileExchange/dst' );
 
   /*src not exist, throwing on*/
 
@@ -21688,7 +21688,7 @@ function fileExchangeAsync( test )
     return;
   }
 
-  var dir = test.context.makePath( 'written/fileExchangeAsync' );
+  var dir = test.context.pathFor( 'written/fileExchangeAsync' );
   var srcPath,dstPath,src,dst,got;
 
   if( !self.provider.statResolvedRead( dir ) )
@@ -21703,8 +21703,8 @@ function fileExchangeAsync( test )
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
     test.case = 'swap two files content';
-    srcPath = test.context.makePath( 'written/fileExchangeAsync/src' );
-    dstPath = test.context.makePath( 'written/fileExchangeAsync/dst' );
+    srcPath = test.context.pathFor( 'written/fileExchangeAsync/src' );
+    dstPath = test.context.pathFor( 'written/fileExchangeAsync/dst' );
     return null;
   })
 
@@ -21763,8 +21763,8 @@ function fileExchangeAsync( test )
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
     test.case = 'swap two dirs content';
-    srcPath = test.context.makePath( 'written/fileExchangeAsync/src/src.txt' );
-    dstPath = test.context.makePath( 'written/fileExchangeAsync/dst/dst.txt' );
+    srcPath = test.context.pathFor( 'written/fileExchangeAsync/src/src.txt' );
+    dstPath = test.context.pathFor( 'written/fileExchangeAsync/dst/dst.txt' );
     return null;
   })
 
@@ -21827,8 +21827,8 @@ function fileExchangeAsync( test )
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
     test.case = 'path not exist';
-    srcPath = test.context.makePath( 'written/fileExchangeAsync/src' );
-    dstPath = test.context.makePath( 'written/fileExchangeAsync/dst' );
+    srcPath = test.context.pathFor( 'written/fileExchangeAsync/src' );
+    dstPath = test.context.pathFor( 'written/fileExchangeAsync/dst' );
     return null;
   })
 
@@ -22106,7 +22106,7 @@ function hardLinkSoftLinkResolving( test )
     return self.provider.hardLink( o );
   }
 
-  let workDir = test.context.makePath( 'written/fileRenameSoftLinkResolving' );
+  let workDir = test.context.pathFor( 'written/fileRenameSoftLinkResolving' );
   let srcPath = self.provider.path.join( workDir, 'src' );
   let srcPath2 = self.provider.path.join( workDir, 'src2' );
   let dstPath = self.provider.path.join( workDir, 'dst' );
@@ -22750,11 +22750,11 @@ hardLinkAsyncRunner.timeOut = 60000 * 50;
 function isDir( test )
 {
   let self = this;
-  let dirPath = test.context.makePath( 'written/isDir' );
-  let filePath = test.context.makePath( 'written/isDir/file' );
-  let linkPath = test.context.makePath( 'written/isDir/link' );
-  let linkPath2 = test.context.makePath( 'written/isDir/link2' );
-  let linkPath3 = test.context.makePath( 'written/isDir/link3' );
+  let dirPath = test.context.pathFor( 'written/isDir' );
+  let filePath = test.context.pathFor( 'written/isDir/file' );
+  let linkPath = test.context.pathFor( 'written/isDir/link' );
+  let linkPath2 = test.context.pathFor( 'written/isDir/link2' );
+  let linkPath3 = test.context.pathFor( 'written/isDir/link3' );
 
   /* resolving off */
 
@@ -23059,7 +23059,7 @@ function dirIsEmpty( test )
 {
   var self = this;
 
-  var filePath = test.context.makePath( 'written/dirIsEmpty' );
+  var filePath = test.context.pathFor( 'written/dirIsEmpty' );
   self.provider.filesDelete( filePath );
 
   //
@@ -23078,7 +23078,7 @@ function dirIsEmpty( test )
 
   test.case = 'path with dot';
   self.provider.filesDelete( filePath );
-  var path = test.context.makePath( 'written/.dirIsEmpty' );
+  var path = test.context.pathFor( 'written/.dirIsEmpty' );
   self.provider.dirMake( path )
   test.identical( self.provider.dirIsEmpty( path ), true );
 
@@ -23126,11 +23126,11 @@ function dirIsEmpty( test )
 function isTerminal( test )
 {
   let self = this;
-  let dirPath = test.context.makePath( 'written/isTerminal' );
-  let filePath = test.context.makePath( 'written/isTerminal/file' );
-  let linkPath = test.context.makePath( 'written/isTerminal/link' );
-  let linkPath2 = test.context.makePath( 'written/isTerminal/link2' );
-  let linkPath3 = test.context.makePath( 'written/isTerminal/link3' );
+  let dirPath = test.context.pathFor( 'written/isTerminal' );
+  let filePath = test.context.pathFor( 'written/isTerminal/file' );
+  let linkPath = test.context.pathFor( 'written/isTerminal/link' );
+  let linkPath2 = test.context.pathFor( 'written/isTerminal/link2' );
+  let linkPath3 = test.context.pathFor( 'written/isTerminal/link3' );
 
   /* resolving off */
 
@@ -24345,11 +24345,11 @@ function isTerminal( test )
 function isSoftLink( test )
 {
   let self = this;
-  let dirPath = test.context.makePath( 'written/isSoftLink' );
-  let filePath = test.context.makePath( 'written/isSoftLink/file' );
-  let linkPath = test.context.makePath( 'written/isSoftLink/link' );
-  let linkPath2 = test.context.makePath( 'written/isSoftLink/link2' );
-  let linkPath3 = test.context.makePath( 'written/isSoftLink/link3' );
+  let dirPath = test.context.pathFor( 'written/isSoftLink' );
+  let filePath = test.context.pathFor( 'written/isSoftLink/file' );
+  let linkPath = test.context.pathFor( 'written/isSoftLink/link' );
+  let linkPath2 = test.context.pathFor( 'written/isSoftLink/link2' );
+  let linkPath3 = test.context.pathFor( 'written/isSoftLink/link3' );
 
   /* resolving off */
 
@@ -24941,10 +24941,10 @@ function isSoftLink( test )
 function isTextLink( test )
 {
   let self = this;
-  let dirPath = test.context.makePath( 'written/isTextLink' );
-  let filePath = test.context.makePath( 'written/isTextLink/file' );
-  let filePath2 = test.context.makePath( 'written/isTextLink/file2' );
-  let linkPath = test.context.makePath( 'written/isTextLink/link' );
+  let dirPath = test.context.pathFor( 'written/isTextLink' );
+  let filePath = test.context.pathFor( 'written/isTextLink/file' );
+  let filePath2 = test.context.pathFor( 'written/isTextLink/file2' );
+  let linkPath = test.context.pathFor( 'written/isTextLink/link' );
 
   /**/
 
@@ -25272,11 +25272,11 @@ function isTextLink( test )
 function isHardLink( test )
 {
   let self = this;
-  let dirPath = test.context.makePath( 'written/isHardLink' );
-  let filePath = test.context.makePath( 'written/isHardLink/file' );
-  let linkPath = test.context.makePath( 'written/isHardLink/link' );
-  let linkPath2 = test.context.makePath( 'written/isHardLink/link2' );
-  let linkPath3 = test.context.makePath( 'written/isHardLink/link3' );
+  let dirPath = test.context.pathFor( 'written/isHardLink' );
+  let filePath = test.context.pathFor( 'written/isHardLink/file' );
+  let linkPath = test.context.pathFor( 'written/isHardLink/link' );
+  let linkPath2 = test.context.pathFor( 'written/isHardLink/link2' );
+  let linkPath3 = test.context.pathFor( 'written/isHardLink/link3' );
 
   /* resolving off */
 
@@ -26463,11 +26463,11 @@ function isHardLink( test )
 function isLink( test )
 {
   let self = this;
-  let dirPath = test.context.makePath( 'written/isLink' );
-  let filePath = test.context.makePath( 'written/isLink/file' );
-  let linkPath = test.context.makePath( 'written/isLink/link' );
-  let linkPath2 = test.context.makePath( 'written/isLink/link2' );
-  let linkPath3 = test.context.makePath( 'written/isLink/link3' );
+  let dirPath = test.context.pathFor( 'written/isLink' );
+  let filePath = test.context.pathFor( 'written/isLink/file' );
+  let linkPath = test.context.pathFor( 'written/isLink/link' );
+  let linkPath2 = test.context.pathFor( 'written/isLink/link2' );
+  let linkPath3 = test.context.pathFor( 'written/isLink/link3' );
 
   /* resolving off */
 
@@ -27933,7 +27933,7 @@ function filesAreHardLinked( test )
   //
 
   test.case = 'same text file';
-  var filePath = test.context.makePath( 'written/filesAreHardLinked/file' );
+  var filePath = test.context.pathFor( 'written/filesAreHardLinked/file' );
   self.provider.fileWrite( filePath, textData );
   var got = self.provider.filesAreHardLinked([ filePath, filePath ]);
   test.identical( got, true );
@@ -27941,9 +27941,9 @@ function filesAreHardLinked( test )
   //
 
   test.case = 'softlink to a file';
-  self.provider.filesDelete( test.context.makePath( 'written/filesAreHardLinked' ) );
-  var filePath = test.context.makePath( 'written/filesAreHardLinked/file' );
-  var linkPath = test.context.makePath( 'written/filesAreHardLinked/link' );
+  self.provider.filesDelete( test.context.pathFor( 'written/filesAreHardLinked' ) );
+  var filePath = test.context.pathFor( 'written/filesAreHardLinked/file' );
+  var linkPath = test.context.pathFor( 'written/filesAreHardLinked/link' );
   self.provider.fileWrite( filePath, textData );
   self.provider.softLink( linkPath, filePath );
   /* resolvingSoftLink off */
@@ -27960,9 +27960,9 @@ function filesAreHardLinked( test )
   //
 
   test.case = 'different files with identical binary content';
-  var filePath = test.context.makePath( 'written/filesAreHardLinked/file' );
-  var filePath2 = test.context.makePath( 'written/filesAreHardLinked/file2' );
-  self.provider.filesDelete( test.context.makePath( 'written/filesAreHardLinked' ) );
+  var filePath = test.context.pathFor( 'written/filesAreHardLinked/file' );
+  var filePath2 = test.context.pathFor( 'written/filesAreHardLinked/file2' );
+  self.provider.filesDelete( test.context.pathFor( 'written/filesAreHardLinked' ) );
   self.provider.fileWrite( filePath, bufferData );
   self.provider.fileWrite( filePath2, bufferData );
   var got = self.provider.filesAreHardLinked([ filePath, filePath2 ]);
@@ -27971,9 +27971,9 @@ function filesAreHardLinked( test )
   //
 
   test.case = 'symlink to file with  binary content';
-  self.provider.filesDelete( test.context.makePath( 'written/filesAreHardLinked' ) );
-  var filePath = test.context.makePath( 'written/filesAreHardLinked/file' );
-  var linkPath = test.context.makePath( 'written/filesAreHardLinked/link' );
+  self.provider.filesDelete( test.context.pathFor( 'written/filesAreHardLinked' ) );
+  var filePath = test.context.pathFor( 'written/filesAreHardLinked/file' );
+  var linkPath = test.context.pathFor( 'written/filesAreHardLinked/link' );
   self.provider.fileWrite( filePath, bufferData );
   self.provider.softLink( linkPath, filePath );
   /* resolvingSoftLink off */
@@ -27990,9 +27990,9 @@ function filesAreHardLinked( test )
   //
 
   test.case = 'hardLink to file with  binary content';
-  self.provider.filesDelete( test.context.makePath( 'written/filesAreHardLinked' ) );
-  var filePath = test.context.makePath( 'written/filesAreHardLinked/file' );
-  var linkPath = test.context.makePath( 'written/filesAreHardLinked/link' );
+  self.provider.filesDelete( test.context.pathFor( 'written/filesAreHardLinked' ) );
+  var filePath = test.context.pathFor( 'written/filesAreHardLinked/file' );
+  var linkPath = test.context.pathFor( 'written/filesAreHardLinked/link' );
   self.provider.fileWrite( filePath, bufferData );
   self.provider.hardLink( linkPath, filePath );
   var got = self.provider.filesAreHardLinked([ linkPath, filePath ]);
@@ -28001,9 +28001,9 @@ function filesAreHardLinked( test )
   //
 
   test.case = 'hardlink to file with  text content : file record';
-  self.provider.filesDelete( test.context.makePath( 'written/filesAreHardLinked' ) );
-  var filePath = test.context.makePath( 'written/filesAreHardLinked/file' );
-  var linkPath = test.context.makePath( 'written/filesAreHardLinked/link' );
+  self.provider.filesDelete( test.context.pathFor( 'written/filesAreHardLinked' ) );
+  var filePath = test.context.pathFor( 'written/filesAreHardLinked/file' );
+  var linkPath = test.context.pathFor( 'written/filesAreHardLinked/link' );
   self.provider.fileWrite( filePath, textData );
   self.provider.hardLink( linkPath, filePath );
   var fileRecord = self.provider.recordFactory().record( filePath );
@@ -28039,7 +28039,7 @@ function filesAreSame( test )
   //
 
   test.case = 'same file with empty content';
-  var filePath = test.context.makePath( 'written/filesAreSame/file' );
+  var filePath = test.context.pathFor( 'written/filesAreSame/file' );
   self.provider.fileWrite( filePath, '' );
   var got = self.provider.filesAreSame( filePath, filePath );
   if( self.provider.UsingBigIntForStat )
@@ -28050,8 +28050,8 @@ function filesAreSame( test )
   //
 
   test.case = 'two different files with empty content';
-  var filePath = test.context.makePath( 'written/filesAreSame/file' );
-  var filePath2 = test.context.makePath( 'written/filesAreSame/file2' );
+  var filePath = test.context.pathFor( 'written/filesAreSame/file' );
+  var filePath2 = test.context.pathFor( 'written/filesAreSame/file2' );
   self.provider.fileWrite( filePath, '' );
   self.provider.fileWrite( filePath2, '' );
   var got = self.provider.filesAreSame( filePath, filePath2 );
@@ -28060,8 +28060,8 @@ function filesAreSame( test )
   //
 
   test.case = 'files with identical binary content';
-  var filePath = test.context.makePath( 'written/filesAreSame/file' );
-  var filePath2 = test.context.makePath( 'written/filesAreSame/file2' );
+  var filePath = test.context.pathFor( 'written/filesAreSame/file' );
+  var filePath2 = test.context.pathFor( 'written/filesAreSame/file2' );
   self.provider.fileWrite( filePath, bufferData1 );
   self.provider.fileWrite( filePath2, bufferData1 );
   var got = self.provider.filesAreSame( filePath, filePath2 );
@@ -28070,8 +28070,8 @@ function filesAreSame( test )
   //
 
   test.case = 'files with non identical text content';
-  var filePath = test.context.makePath( 'written/filesAreSame/file' );
-  var filePath2 = test.context.makePath( 'written/filesAreSame/file2' );
+  var filePath = test.context.pathFor( 'written/filesAreSame/file' );
+  var filePath2 = test.context.pathFor( 'written/filesAreSame/file2' );
   self.provider.fileWrite( filePath, textData1 );
   self.provider.fileWrite( filePath2, textData2 );
   var got = self.provider.filesAreSame( filePath, filePath2 );
@@ -28080,8 +28080,8 @@ function filesAreSame( test )
   //
 
   test.case = 'files with non identical binart content';
-  var filePath = test.context.makePath( 'written/filesAreSame/file' );
-  var filePath2 = test.context.makePath( 'written/filesAreSame/file2' );
+  var filePath = test.context.pathFor( 'written/filesAreSame/file' );
+  var filePath2 = test.context.pathFor( 'written/filesAreSame/file2' );
   self.provider.fileWrite( filePath, bufferData1 );
   self.provider.fileWrite( filePath2, bufferData2 );
   var got = self.provider.filesAreSame( filePath, filePath2 );
@@ -28090,8 +28090,8 @@ function filesAreSame( test )
   //
 
   test.case = 'file and symlink to file';
-  var filePath = test.context.makePath( 'written/filesAreSame/file' );
-  var filePath2 = test.context.makePath( 'written/filesAreSame/file2' );
+  var filePath = test.context.pathFor( 'written/filesAreSame/file' );
+  var filePath2 = test.context.pathFor( 'written/filesAreSame/file2' );
   self.provider.fileWrite( filePath, textData1 );
   self.provider.softLink( filePath2, filePath );
   /* resolvingSoftLink off */
@@ -28108,8 +28108,8 @@ function filesAreSame( test )
   //
 
   test.case = 'not existing path';
-  var filePath = test.context.makePath( 'written/filesAreSame/file' );
-  var filePath2 = test.context.makePath( 'written/filesAreSame/file2' );
+  var filePath = test.context.pathFor( 'written/filesAreSame/file' );
+  var filePath2 = test.context.pathFor( 'written/filesAreSame/file2' );
   self.provider.fileWrite( filePath, bufferData1 );
   self.provider.filesDelete( filePath );
   test.shouldThrowError( () =>
@@ -28120,8 +28120,8 @@ function filesAreSame( test )
   //
 
   test.case = 'two file records asociated with two regular files';
-  var filePath = test.context.makePath( 'written/filesAreSame/file' );
-  var filePath2 = test.context.makePath( 'written/filesAreSame/file2' );
+  var filePath = test.context.pathFor( 'written/filesAreSame/file' );
+  var filePath2 = test.context.pathFor( 'written/filesAreSame/file2' );
   self.provider.fileWrite( filePath, textData1 );
   self.provider.fileWrite( filePath, textData1 );
   var got = self.provider.filesAreSame( self.provider.recordFactory().record( filePath ), self.provider.recordFactory().record( filePath2 ) );
@@ -28130,8 +28130,8 @@ function filesAreSame( test )
   //
 
   test.case = 'two file records asociated with two regular files, same content';
-  var filePath = test.context.makePath( 'written/filesAreSame/file' );
-  var filePath2 = test.context.makePath( 'written/filesAreSame/file2' );
+  var filePath = test.context.pathFor( 'written/filesAreSame/file' );
+  var filePath2 = test.context.pathFor( 'written/filesAreSame/file2' );
   self.provider.fileWrite( filePath, textData1 );
   self.provider.fileWrite( filePath2, textData1 );
   var got = self.provider.filesAreSame( self.provider.recordFactory().record( filePath ), self.provider.recordFactory().record( filePath2 ) );
@@ -28140,8 +28140,8 @@ function filesAreSame( test )
   //
 
   test.case = 'two file records asociated with two regular files, diff content';
-  var filePath = test.context.makePath( 'written/filesAreSame/file' );
-  var filePath2 = test.context.makePath( 'written/filesAreSame/file2' );
+  var filePath = test.context.pathFor( 'written/filesAreSame/file' );
+  var filePath2 = test.context.pathFor( 'written/filesAreSame/file2' );
   self.provider.fileWrite( filePath, textData1 );
   self.provider.filesDelete( filePath2 );
   self.provider.fileWrite( filePath2, textData2 );
@@ -28151,13 +28151,13 @@ function filesAreSame( test )
   //
 
   test.case = 'two file records asociated with two symlinks, same content';
-  var filePath = test.context.makePath( 'written/filesAreSame/file' );
-  var filePath2 = test.context.makePath( 'written/filesAreSame/file2' );
+  var filePath = test.context.pathFor( 'written/filesAreSame/file' );
+  var filePath2 = test.context.pathFor( 'written/filesAreSame/file2' );
   self.provider.fileWrite( filePath, textData1 );
   self.provider.filesDelete( filePath2 );
   self.provider.fileWrite( filePath2, textData1 );
-  var linkPath = test.context.makePath( 'written/filesAreSame/link1' );
-  var linkPath2 = test.context.makePath( 'written/filesAreSame/link2' );
+  var linkPath = test.context.pathFor( 'written/filesAreSame/link1' );
+  var linkPath2 = test.context.pathFor( 'written/filesAreSame/link2' );
   self.provider.softLink( linkPath, filePath );
   self.provider.softLink( linkPath2, filePath2 );
   /* resolvingSoftLink off */
@@ -28174,13 +28174,13 @@ function filesAreSame( test )
   //
 
   test.case = 'two file records asociated with two symlinks, diff content';
-  var filePath = test.context.makePath( 'written/filesAreSame/file' );
-  var filePath2 = test.context.makePath( 'written/filesAreSame/file2' );
+  var filePath = test.context.pathFor( 'written/filesAreSame/file' );
+  var filePath2 = test.context.pathFor( 'written/filesAreSame/file2' );
   self.provider.fileWrite( filePath, textData1 );
   self.provider.filesDelete( filePath2 );
   self.provider.fileWrite( filePath2, textData2 );
-  var linkPath = test.context.makePath( 'written/filesAreSame/link1' );
-  var linkPath2 = test.context.makePath( 'written/filesAreSame/link2' );
+  var linkPath = test.context.pathFor( 'written/filesAreSame/link1' );
+  var linkPath2 = test.context.pathFor( 'written/filesAreSame/link2' );
   self.provider.softLink( linkPath, filePath );
   self.provider.softLink( linkPath2, filePath2 );
   /* resolvingSoftLink off */
@@ -28267,7 +28267,7 @@ function filesSize( test )
   {
     // join several test aspects together
 
-    var path = test.context.makePath( testCheck.path );
+    var path = test.context.pathFor( testCheck.path );
     var got;
 
     test.case = testCheck.name;
@@ -28289,7 +28289,7 @@ function filesSize( test )
     test.identical( got, expected );
   }
 
-  var paths = testChecks.map( c => test.context.makePath( c.path ) );
+  var paths = testChecks.map( c => test.context.pathFor( c.path ) );
   var expected = testChecks.reduce( ( pc, cc ) => { return pc + cc.expected; }, 0 );
 
   test.case = 'all paths together';
@@ -28300,7 +28300,7 @@ function filesSize( test )
 
   test.case = 'single path that exists';
   var path = testChecks[ testChecks.length - 1 ].path
-  var got = self.provider.filesSize( test.context.makePath( path ) );
+  var got = self.provider.filesSize( test.context.pathFor( path ) );
   var expected = testChecks[ testChecks.length - 1 ].expected;
   if( _.bigIntIs( got ) )
   expected = BigInt( expected );
@@ -28310,11 +28310,11 @@ function filesSize( test )
   return;
 
   test.case = 'single path that not exists';
-  var path = test.context.makePath( 'filesSize/filesSize/notExistingPath' );
+  var path = test.context.pathFor( 'filesSize/filesSize/notExistingPath' );
   test.shouldThrowError( () => self.provider.filesSize( path ) );
 
   test.case = 'not existing path in array';
-  var path = test.context.makePath( 'filesSize/filesSize/notExistingPath' );
+  var path = test.context.pathFor( 'filesSize/filesSize/notExistingPath' );
   var path2 = testChecks[ testChecks.length - 1 ].path;
   var paths = [ path2, path ];
   test.shouldThrowError( () => self.provider.filesSize( paths ) );
@@ -28380,7 +28380,7 @@ function fileSize( test )
   {
     // join several test aspects together
 
-    var path = test.context.makePath( testCheck.path )
+    var path = test.context.pathFor( testCheck.path )
     var got;
 
     test.case = testCheck.name;
@@ -28413,7 +28413,7 @@ function fileSize( test )
   test.case = 'extra arguments';
   test.shouldThrowErrorSync( function( )
   {
-    self.provider.fileSize( test.context.makePath( 'tmp.tmp/fileSize/data2' ), test.context.makePath( 'tmp.tmp/fileSize/data3' ) );
+    self.provider.fileSize( test.context.pathFor( 'tmp.tmp/fileSize/data2' ), test.context.pathFor( 'tmp.tmp/fileSize/data3' ) );
   });
 
   test.case = 'path is not string';
@@ -28425,7 +28425,7 @@ function fileSize( test )
   test.case = 'passed unexpected property';
   test.shouldThrowErrorSync( function( )
   {
-    self.provider.fileSize( { filePath : test.context.makePath( 'tmp.tmp/fileSize/data2' ), dir : test.context.makePath( 'tmp.tmp/fileSize/data3' ) } );
+    self.provider.fileSize( { filePath : test.context.pathFor( 'tmp.tmp/fileSize/data2' ), dir : test.context.pathFor( 'tmp.tmp/fileSize/data3' ) } );
   });
 
 };
@@ -28436,9 +28436,9 @@ function fileExists( test )
 {
   let self = this;
 
-  let testDirPath = test.context.makePath( 'written/fileExists' );
-  let srcPath = test.context.makePath( 'written/fileExists/src' );
-  let dstPath = test.context.makePath( 'written/fileExists/dst' );
+  let testDirPath = test.context.pathFor( 'written/fileExists' );
+  let srcPath = test.context.pathFor( 'written/fileExists/src' );
+  let dstPath = test.context.pathFor( 'written/fileExists/dst' );
 
   self.provider.filesDelete( testDirPath );
 
@@ -28874,15 +28874,15 @@ function uriResolve( test )
 
 //
 
-function pathResolveLinkChain( test )
+function pathResolveLinkTailChain( test )
 {
   let self = this;
 
-  if( !self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  {
-    test.identical( 1,1 );
-    return;
-  }
+  // if( !self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  // {
+  //   test.identical( 1,1 );
+  //   return;
+  // }
 
   let o1 =
   {
@@ -28895,14 +28895,46 @@ function pathResolveLinkChain( test )
     throwing : 1
   }
 
-  let dir = test.context.makePath( 'written/pathResolveLinkChain' );
-  let filePath = test.context.makePath( 'written/pathResolveLinkChain/file' );
-  let linkPath = test.context.makePath( 'written/pathResolveLinkChain/link' );
-  let linkPath2 = test.context.makePath( 'written/pathResolveLinkChain/link2' );
-  let linkPath3 = test.context.makePath( 'written/pathResolveLinkChain/link3' );
   let path = self.provider.path;
+  let dir = test.context.pathFor( 'written/pathResolveLinkTailChain' );
+  let filePath = test.context.pathFor( 'written/pathResolveLinkTailChain/file' );
+  let linkPath = test.context.pathFor( 'written/pathResolveLinkTailChain/link' );
+  let linkPath2 = test.context.pathFor( 'written/pathResolveLinkTailChain/link2' );
+  let linkPath3 = test.context.pathFor( 'written/pathResolveLinkTailChain/link3' );
 
   self.provider.fieldPush( 'usingTextLink', true );
+
+  /* trivial */
+
+  // var tree =
+  // {
+  //   directory :
+  //   {
+  //     terminal : 'terminal'
+  //   },
+  //   toDir : [{ softLink : '/directory' }]
+  // }
+
+  self.provider.fileWrite( path.join( dir, 'directory/terminal' ), 'terminal' );
+  self.provider.dirMake( path.join( dir, 'toDir' ) );
+  self.provider.softLink( path.join( dir, 'toDir/softlink' ), path.join( dir, 'directory/terminal' ) );
+
+  var o =
+  {
+    filePath : path.join( dir, 'toDir/softlink' ),
+    // resolvingHeadDirectories : 1,
+    allowingMissing : 1,
+    throwing : 1,
+  }
+  debugger;
+  var got = self.provider.pathResolveLinkTailChain( o );
+  debugger;
+
+  test.is( got === o.result );
+  test.identical( o.result, [ path.join( dir, 'toDir/softlink' ), path.join( dir, 'directory/terminal' ) ] );
+  test.identical( o.found, [ path.join( dir, 'toDir/softlink' ), path.join( dir, 'directory/terminal' ) ] );
+
+  // debugger; return; xxx
 
   /*
     resolvingSoftLink : 1,
@@ -28917,7 +28949,7 @@ function pathResolveLinkChain( test )
   test.case = 'not existing file';
   self.provider.filesDelete( _.path.dir( filePath ) );
   var o = _.mapExtend( null, o1, { filePath : filePath } );
-  self.provider.pathResolveLinkChain( o );
+  self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ filePath, null ] )
   test.identical( o.found, [ filePath, null ] )
 
@@ -28925,7 +28957,7 @@ function pathResolveLinkChain( test )
   self.provider.filesDelete( _.path.dir( filePath ) );
   self.provider.fileWrite( filePath, filePath );
   var o = _.mapExtend( null, o1, { filePath : filePath } );
-  self.provider.pathResolveLinkChain( o );
+  self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ filePath ] )
   test.identical( o.found, [ filePath ] )
 
@@ -28934,7 +28966,7 @@ function pathResolveLinkChain( test )
   self.provider.fileWrite( filePath, filePath );
   self.provider.hardLink( linkPath, filePath );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  self.provider.pathResolveLinkChain( o );
+  self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath ] )
   test.identical( o.found, [ linkPath ] )
 
@@ -28943,7 +28975,7 @@ function pathResolveLinkChain( test )
   self.provider.fileWrite( filePath, filePath );
   self.provider.softLink( linkPath, filePath );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  self.provider.pathResolveLinkChain( o );
+  self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath,filePath ] )
   test.identical( o.found, [ linkPath,filePath ] )
 
@@ -28952,7 +28984,7 @@ function pathResolveLinkChain( test )
   self.provider.fileWrite( filePath, filePath );
   self.provider.softLink( linkPath, '../file' );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  var got = self.provider.pathResolveLinkChain( o );
+  var got = self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, filePath ] )
   test.identical( o.found, [ linkPath,filePath ] )
 
@@ -28961,7 +28993,7 @@ function pathResolveLinkChain( test )
   self.provider.fileWrite( filePath, filePath );
   self.provider.softLink( linkPath, '../file' );
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
-  self.provider.pathResolveLinkChain( o );
+  self.provider.pathResolveLinkTailChain( o );
   var expectedFound = [ linkPath, '../file', filePath ]
   var expectedResult = [ linkPath, filePath ]
   test.identical( o.result, expectedResult );
@@ -28972,7 +29004,7 @@ function pathResolveLinkChain( test )
   self.provider.fileWrite( filePath, filePath );
   self.provider.fileWrite( linkPath, 'link ' + filePath );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  var got = self.provider.pathResolveLinkChain( o );
+  var got = self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, filePath ] )
   test.identical( o.found, [ linkPath, filePath ] )
 
@@ -28988,7 +29020,7 @@ function pathResolveLinkChain( test )
     allowingMissing : 1
   });
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0 } );
-  var got = self.provider.pathResolveLinkChain( o );
+  var got = self.provider.pathResolveLinkTailChain( o );
   var expectedResult =
   [
     linkPath,
@@ -29016,7 +29048,7 @@ function pathResolveLinkChain( test )
     allowingMissing : 1
   });
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0, preservingRelative : 1 } );
-  var got = self.provider.pathResolveLinkChain( o );
+  var got = self.provider.pathResolveLinkTailChain( o );
   var expectedResult =
   [
     linkPath,
@@ -29045,7 +29077,7 @@ function pathResolveLinkChain( test )
     allowingMissing : 1
   });
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0 } );
-  var got = self.provider.pathResolveLinkChain( o );
+  var got = self.provider.pathResolveLinkTailChain( o );
   var expectedResult =
   [
     linkPath,
@@ -29074,7 +29106,7 @@ function pathResolveLinkChain( test )
     allowingMissing : 1
   });
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0, preservingRelative : 1 } );
-  var got = self.provider.pathResolveLinkChain( o );
+  var got = self.provider.pathResolveLinkTailChain( o );
   var expectedFound =
   [
     linkPath,
@@ -29103,7 +29135,7 @@ function pathResolveLinkChain( test )
     allowingMissing : 1
   });
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissing : 0 } );
-  test.shouldThrowError( () => self.provider.pathResolveLinkChain( o ) );
+  test.shouldThrowError( () => self.provider.pathResolveLinkTailChain( o ) );
 
   //
 
@@ -29117,7 +29149,7 @@ function pathResolveLinkChain( test )
     allowingMissing : 1
   });
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissing : 1 } );
-  var got = self.provider.pathResolveLinkChain( o );
+  var got = self.provider.pathResolveLinkTailChain( o );
   var expectedFound =
   [
     linkPath,
@@ -29146,7 +29178,7 @@ function pathResolveLinkChain( test )
     allowingMissing : 1
   });
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissing : 0  } );
-  test.shouldThrowError( () => self.provider.pathResolveLinkChain( o ) );
+  test.shouldThrowError( () => self.provider.pathResolveLinkTailChain( o ) );
 
   //
 
@@ -29161,7 +29193,7 @@ function pathResolveLinkChain( test )
     allowingMissing : 1
   });
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissing : 1  } );
-  var got = self.provider.pathResolveLinkChain( o );
+  var got = self.provider.pathResolveLinkTailChain( o );
   var expectedFound =
   [
     linkPath,
@@ -29185,7 +29217,7 @@ function pathResolveLinkChain( test )
   self.provider.softLink( linkPath2, filePath );
   self.provider.softLink( linkPath, linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  self.provider.pathResolveLinkChain( o );
+  self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath,linkPath2,filePath ] );
   test.identical( o.found, [ linkPath,linkPath2,filePath ] );
 
@@ -29195,7 +29227,7 @@ function pathResolveLinkChain( test )
   self.provider.softLink( linkPath2, filePath );
   self.provider.softLink( linkPath, linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
-  self.provider.pathResolveLinkChain( o );
+  self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath,linkPath2,filePath ] );
   test.identical( o.found, [ linkPath,linkPath2,filePath ] );
 
@@ -29205,7 +29237,7 @@ function pathResolveLinkChain( test )
   self.provider.fileWrite( linkPath2, 'link ' + filePath );
   self.provider.fileWrite( linkPath, 'link ' + linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  self.provider.pathResolveLinkChain( o );
+  self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, linkPath2, filePath ] );
   test.identical( o.found, [ linkPath, linkPath2, filePath ] );
 
@@ -29215,7 +29247,7 @@ function pathResolveLinkChain( test )
   self.provider.fileWrite( linkPath2, 'link ' + filePath );
   self.provider.fileWrite( linkPath, 'link ' + linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
-  self.provider.pathResolveLinkChain( o );
+  self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, linkPath2, filePath ] );
   test.identical( o.found, [ linkPath, linkPath2, filePath ] );
 
@@ -29226,7 +29258,7 @@ function pathResolveLinkChain( test )
   self.provider.fileWrite( linkPath2, 'link ' + linkPath3 );
   self.provider.softLink( linkPath, linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  self.provider.pathResolveLinkChain( o );
+  self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath,linkPath2,linkPath3,filePath ] );
   test.identical( o.found, [ linkPath,linkPath2,linkPath3,filePath ] );
 
@@ -29237,7 +29269,7 @@ function pathResolveLinkChain( test )
   self.provider.fileWrite( linkPath2, 'link ' + linkPath3 );
   self.provider.softLink( linkPath, linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
-  self.provider.pathResolveLinkChain( o );
+  self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath,linkPath2,linkPath3,filePath ] );
   test.identical( o.found, [ linkPath,linkPath2,linkPath3,filePath ] );
 
@@ -29248,7 +29280,7 @@ function pathResolveLinkChain( test )
   self.provider.softLink( linkPath2, linkPath3 );
   self.provider.fileWrite( linkPath, 'link ' + linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  self.provider.pathResolveLinkChain( o );
+  self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, linkPath2, linkPath3, filePath ] );
   test.identical( o.found, [ linkPath, linkPath2, linkPath3, filePath ] );
 
@@ -29259,7 +29291,7 @@ function pathResolveLinkChain( test )
   self.provider.softLink( linkPath2, linkPath3 );
   self.provider.fileWrite( linkPath, 'link ' + linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
-  self.provider.pathResolveLinkChain( o );
+  self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, linkPath2, linkPath3, filePath ] );
   test.identical( o.found, [ linkPath, linkPath2, linkPath3, filePath ] );
 
@@ -29270,7 +29302,7 @@ function pathResolveLinkChain( test )
   self.provider.softLink( linkPath2, '../link3' );
   self.provider.softLink( linkPath, '../link2' );
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
-  self.provider.pathResolveLinkChain( o );
+  self.provider.pathResolveLinkTailChain( o );
   var expectedFound =
   [
     linkPath,
@@ -29298,7 +29330,7 @@ function pathResolveLinkChain( test )
   self.provider.hardLink( linkPath2, linkPath3 );
   self.provider.softLink( linkPath, linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  self.provider.pathResolveLinkChain( o );
+  self.provider.pathResolveLinkTailChain( o );
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   {
     test.identical( o.result, [ linkPath, linkPath2, filePath ] )
@@ -29317,7 +29349,7 @@ function pathResolveLinkChain( test )
   self.provider.hardLink( linkPath2, linkPath3 );
   self.provider.softLink( linkPath, self.provider.path.relative( linkPath, linkPath2 ) );
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 0 } );
-  self.provider.pathResolveLinkChain( o );
+  self.provider.pathResolveLinkTailChain( o );
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   {
     test.identical( o.result, [ linkPath, linkPath2, filePath ] )
@@ -29336,7 +29368,7 @@ function pathResolveLinkChain( test )
   self.provider.hardLink( linkPath2, linkPath3 );
   self.provider.softLink( linkPath, self.provider.path.relative( linkPath, linkPath2 ) );
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
-  self.provider.pathResolveLinkChain( o );
+  self.provider.pathResolveLinkTailChain( o );
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   {
     test.identical( o.found, [ linkPath, '../link2', linkPath2, filePath ] )
@@ -29348,15 +29380,15 @@ function pathResolveLinkChain( test )
     test.identical( o.result, [ linkPath, linkPath2, linkPath3, filePath ] )
   }
 
-  /* chain, resolvingIntermediateDirectories : [ 0, 1 ] */
+  /* chain, resolvingHeadDirectories : [ 0, 1 ] */
 
   test.case = 'two soft links in path';
   self.provider.filesDelete( _.path.dir( filePath ) );
   self.provider.fileWrite( filePath, filePath );
   self.provider.softLink( linkPath, '..' );
   self.provider.softLink( linkPath2, '../file' );
-  var o = _.mapExtend( null, o1, { filePath : path.join( dir, 'link/link2' ) , preservingRelative : 1, resolvingIntermediateDirectories : 0 } );
-  var got = self.provider.pathResolveLinkChain( o );
+  var o = _.mapExtend( null, o1, { filePath : path.join( dir, 'link/link2' ) , preservingRelative : 1, resolvingHeadDirectories : 0 } );
+  var got = self.provider.pathResolveLinkTailChain( o );
   var expectedFound =
   [
     path.join( dir, 'link/link2' ),
@@ -29378,8 +29410,8 @@ function pathResolveLinkChain( test )
   self.provider.fileWrite( filePath, filePath );
   self.provider.softLink( linkPath, '..' );
   self.provider.softLink( linkPath2, '../file' );
-  var o = _.mapExtend( null, o1, { filePath : path.join( dir, 'link/link2' ) , preservingRelative : 1, resolvingIntermediateDirectories : 1 } );
-  var got = self.provider.pathResolveLinkChain( o );
+  var o = _.mapExtend( null, o1, { filePath : path.join( dir, 'link/link2' ) , preservingRelative : 1, resolvingHeadDirectories : 1 } );
+  var got = self.provider.pathResolveLinkTailChain( o );
   var expectedFound =
   [
     path.join( dir, 'link/link2' ),
@@ -29433,8 +29465,8 @@ function pathResolveLinkChain( test )
   */
 
   var testPath = _.path.join( dirPath, 'linkToDir1/linkToDir2/linkToFile' )
-  var o = _.mapExtend( null, o1, { filePath : testPath , preservingRelative : 1, resolvingIntermediateDirectories : 0 } );
-  var got = self.provider.pathResolveLinkChain( o );
+  var o = _.mapExtend( null, o1, { filePath : testPath , preservingRelative : 1, resolvingHeadDirectories : 0 } );
+  var got = self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ testPath, pathToFile ] )
   test.identical( o.found, [ testPath, pathToFile ] )
 
@@ -29470,8 +29502,8 @@ function pathResolveLinkChain( test )
   */
 
   var testPath = _.path.join( dirPath, 'linkToDir1/linkToDir2/linkToFile' )
-  var o = _.mapExtend( null, o1, { filePath : testPath , preservingRelative : 1, resolvingIntermediateDirectories : 1 } );
-  var got = self.provider.pathResolveLinkChain( o );
+  var o = _.mapExtend( null, o1, { filePath : testPath , preservingRelative : 1, resolvingHeadDirectories : 1 } );
+  var got = self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ testPath, linkInDir, dirPath1, linkInDir1, dirPath2, linkInDir2, pathToFile ] )
   test.identical( o.found, [ testPath, linkInDir, dirPath1, linkInDir1, dirPath2, linkInDir2, pathToFile ] )
 
@@ -29507,8 +29539,8 @@ function pathResolveLinkChain( test )
   */
 
   var testPath = _.path.join( dirPath, 'linkToDir1/linkToDir2/linkToFile' )
-  var o = _.mapExtend( null, o1, { filePath : testPath , preservingRelative : 1, resolvingIntermediateDirectories : 0 } );
-  var got = self.provider.pathResolveLinkChain( o );
+  var o = _.mapExtend( null, o1, { filePath : testPath , preservingRelative : 1, resolvingHeadDirectories : 0 } );
+  var got = self.provider.pathResolveLinkTailChain( o );
   test.identical( o.found, [ testPath, '../../file', _.path.join( dirPath, 'linkToDir1/file'), null ] )
   test.identical( o.result, [ testPath, _.path.join( dirPath, 'linkToDir1/file'), null ] )
 
@@ -29544,8 +29576,8 @@ function pathResolveLinkChain( test )
   */
 
   var testPath = _.path.join( dirPath, 'linkToDir1/linkToDir2/linkToFile' )
-  var o = _.mapExtend( null, o1, { filePath : testPath , preservingRelative : 1, resolvingIntermediateDirectories : 1 } );
-  var got = self.provider.pathResolveLinkChain( o );
+  var o = _.mapExtend( null, o1, { filePath : testPath , preservingRelative : 1, resolvingHeadDirectories : 1 } );
+  var got = self.provider.pathResolveLinkTailChain( o );
   test.identical( o.found, [ testPath, linkInDir, '../dir1', dirPath1, linkInDir1, '../../dir2', dirPath2, linkInDir2, '../../file', pathToFile ] )
   test.identical( o.result, [ testPath, linkInDir, dirPath1, linkInDir1, dirPath2, linkInDir2, pathToFile ] )
 
@@ -29581,8 +29613,8 @@ function pathResolveLinkChain( test )
   */
 
   var testPath = _.path.join( dirPath, 'linkToDir1/linkToDir2/linkToFile' )
-  var o = _.mapExtend( null, o1, { filePath : testPath , preservingRelative : 1, resolvingIntermediateDirectories : 1 } );
-  var got = self.provider.pathResolveLinkChain( o );
+  var o = _.mapExtend( null, o1, { filePath : testPath , preservingRelative : 1, resolvingHeadDirectories : 1 } );
+  var got = self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ testPath, linkInDir, dirPath1, linkInDir1, dirPath2, linkInDir2, pathToFile ] )
   test.identical( o.found, [ testPath, linkInDir, dirPath1, linkInDir1, dirPath2, linkInDir2, pathToFile ] )
 
@@ -29618,8 +29650,8 @@ function pathResolveLinkChain( test )
   */
 
   var testPath = _.path.join( dirPath, 'linkToDir1/linkToDir2/linkToFile' )
-  var o = _.mapExtend( null, o1, { filePath : testPath , preservingRelative : 1, resolvingIntermediateDirectories : 0 } );
-  var got = self.provider.pathResolveLinkChain( o );
+  var o = _.mapExtend( null, o1, { filePath : testPath , preservingRelative : 1, resolvingHeadDirectories : 0 } );
+  var got = self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ testPath, null ] )
   test.identical( o.found, [ testPath, null ] )
 
@@ -29629,7 +29661,7 @@ function pathResolveLinkChain( test )
   self.provider.filesDelete( _.path.dir( filePath ) );
   self.provider.softLink({ dstPath : linkPath, srcPath : '../link', allowingMissing : 1, makingDirectory : 1 });
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissing : 1 } );
-  self.provider.pathResolveLinkChain( o );
+  self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath,linkPath, null ] );
   test.identical( o.found, [ linkPath,linkPath, null ] );
 
@@ -29637,13 +29669,13 @@ function pathResolveLinkChain( test )
   self.provider.filesDelete( _.path.dir( filePath ) );
   self.provider.softLink({ dstPath : linkPath, srcPath : '../link', allowingMissing : 1, makingDirectory : 1 });
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissing : 0 } );
-  test.shouldThrowError( () => self.provider.pathResolveLinkChain( o ) );
+  test.shouldThrowError( () => self.provider.pathResolveLinkTailChain( o ) );
 
   test.case = 'self cycle softlink, throwing off'
   self.provider.filesDelete( _.path.dir( filePath ) );
   self.provider.softLink({ dstPath : linkPath, srcPath : '../link', allowingMissing : 1, makingDirectory : 1 });
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0, allowingMissing : 1 } );
-  self.provider.pathResolveLinkChain( o );
+  self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath,linkPath, null ] );
   test.identical( o.found, [ linkPath,linkPath, null ] );
 
@@ -29651,7 +29683,7 @@ function pathResolveLinkChain( test )
   self.provider.filesDelete( _.path.dir( filePath ) );
   self.provider.softLink({ dstPath : linkPath, srcPath : '../link', allowingMissing : 1, makingDirectory : 1 });
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0, allowingMissing : 0 } );
-  self.provider.pathResolveLinkChain( o );
+  self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath,linkPath, null ] );
   test.identical( o.found, [ linkPath,linkPath, null ] );
 
@@ -29659,7 +29691,7 @@ function pathResolveLinkChain( test )
   self.provider.filesDelete( _.path.dir( filePath ) );
   self.provider.fileWrite( linkPath, 'link ' + '../link' );
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissing : 1 } );
-  self.provider.pathResolveLinkChain( o );
+  self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath,linkPath, null ] );
   test.identical( o.found, [ linkPath,linkPath, null ] );
 
@@ -29667,13 +29699,13 @@ function pathResolveLinkChain( test )
   self.provider.filesDelete( _.path.dir( filePath ) );
   self.provider.fileWrite( linkPath, 'link ' + '../link' );
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissing : 0 } );
-  test.shouldThrowError( () => self.provider.pathResolveLinkChain( o ) );
+  test.shouldThrowError( () => self.provider.pathResolveLinkTailChain( o ) );
 
   test.case = 'self cycle text, throwing off'
   self.provider.filesDelete( _.path.dir( filePath ) );
   self.provider.fileWrite( linkPath, 'link ' + '../link' );
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0, allowingMissing : 1 } );
-  self.provider.pathResolveLinkChain( o );
+  self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath,linkPath, null ] );
   test.identical( o.found, [ linkPath,linkPath, null ] );
 
@@ -29681,7 +29713,7 @@ function pathResolveLinkChain( test )
   self.provider.filesDelete( _.path.dir( filePath ) );
   self.provider.fileWrite( linkPath, 'link ' + '../link' );
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0, allowingMissing : 0 } );
-  self.provider.pathResolveLinkChain( o );
+  self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath,linkPath, null ] );
   test.identical( o.found, [ linkPath,linkPath, null ] );
 
@@ -29690,7 +29722,7 @@ function pathResolveLinkChain( test )
   self.provider.softLink({ dstPath : linkPath2, srcPath : linkPath, allowingMissing : 1, makingDirectory : 1 });
   self.provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissing : 1, makingDirectory : 1 });
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissing : 1 } );
-  self.provider.pathResolveLinkChain( o );
+  self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath,linkPath2,linkPath, null ] );
   test.identical( o.found, [ linkPath,linkPath2,linkPath, null ] );
 
@@ -29699,14 +29731,14 @@ function pathResolveLinkChain( test )
   self.provider.softLink({ dstPath : linkPath2, srcPath : linkPath, allowingMissing : 1, makingDirectory : 1 });
   self.provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissing : 1, makingDirectory : 1 });
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissing : 0 } );
-  test.shouldThrowError( () => self.provider.pathResolveLinkChain( o ) );
+  test.shouldThrowError( () => self.provider.pathResolveLinkTailChain( o ) );
 
   test.case = 'cycle softlink, throwing off'
   self.provider.filesDelete( _.path.dir( filePath ) );
   self.provider.softLink({ dstPath : linkPath2, srcPath : linkPath, allowingMissing : 1, makingDirectory : 1 });
   self.provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissing : 1, makingDirectory : 1 });
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0, allowingMissing : 1 } );
-  self.provider.pathResolveLinkChain( o );
+  self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath,linkPath2,linkPath, null ] );
   test.identical( o.found, [ linkPath,linkPath2,linkPath, null ] );
 
@@ -29715,7 +29747,7 @@ function pathResolveLinkChain( test )
   self.provider.softLink({ dstPath : linkPath2, srcPath : linkPath, allowingMissing : 1, makingDirectory : 1 });
   self.provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissing : 1, makingDirectory : 1 });
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0, allowingMissing : 0 } );
-  self.provider.pathResolveLinkChain( o );
+  self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath,linkPath2,linkPath, null ] );
   test.identical( o.found, [ linkPath,linkPath2,linkPath, null ] );
 
@@ -29724,7 +29756,7 @@ function pathResolveLinkChain( test )
   self.provider.fileWrite( linkPath2, 'link ' + linkPath );
   self.provider.fileWrite( linkPath, 'link ' + linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissing : 1 } );
-  self.provider.pathResolveLinkChain( o );
+  self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath,linkPath2,linkPath, null ] );
   test.identical( o.found, [ linkPath,linkPath2,linkPath, null ] );
 
@@ -29733,14 +29765,14 @@ function pathResolveLinkChain( test )
   self.provider.fileWrite( linkPath2, 'link ' + linkPath );
   self.provider.fileWrite( linkPath, 'link ' + linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissing : 0 } );
-  test.shouldThrowError( () => self.provider.pathResolveLinkChain( o ) );
+  test.shouldThrowError( () => self.provider.pathResolveLinkTailChain( o ) );
 
   test.case = 'cycle text link, throwing off'
   self.provider.filesDelete( _.path.dir( filePath ) );
   self.provider.fileWrite( linkPath2, 'link ' + linkPath );
   self.provider.fileWrite( linkPath, 'link ' + linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0, allowingMissing : 1 } );
-  self.provider.pathResolveLinkChain( o );
+  self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath,linkPath2,linkPath, null ] );
   test.identical( o.found, [ linkPath,linkPath2,linkPath, null ] );
 
@@ -29749,7 +29781,7 @@ function pathResolveLinkChain( test )
   self.provider.fileWrite( linkPath2, 'link ' + linkPath );
   self.provider.fileWrite( linkPath, 'link ' + linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0, allowingMissing : 1 } );
-  self.provider.pathResolveLinkChain( o );
+  self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath,linkPath2,linkPath, null ] );
   test.identical( o.found, [ linkPath,linkPath2,linkPath, null ] );
 
@@ -29758,7 +29790,7 @@ function pathResolveLinkChain( test )
   self.provider.fileWrite( linkPath2, 'link ' + linkPath );
   self.provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissing : 1, makingDirectory : 1 });
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissing : 1 } );
-  self.provider.pathResolveLinkChain( o );
+  self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath,linkPath2,linkPath, null ] );
   test.identical( o.found, [ linkPath,linkPath2,linkPath, null ] );
 
@@ -29767,14 +29799,14 @@ function pathResolveLinkChain( test )
   self.provider.fileWrite( linkPath2, 'link ' + linkPath );
   self.provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissing : 1, makingDirectory : 1 });
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissing : 0 } );
-  test.shouldThrowError( () => self.provider.pathResolveLinkChain( o ) );
+  test.shouldThrowError( () => self.provider.pathResolveLinkTailChain( o ) );
 
   test.case = 'cycle soft text, throwing off'
   self.provider.filesDelete( _.path.dir( filePath ) );
   self.provider.fileWrite( linkPath2, 'link ' + linkPath );
   self.provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissing : 1, makingDirectory : 1 });
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0, allowingMissing : 1 } );
-  self.provider.pathResolveLinkChain( o );
+  self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath,linkPath2,linkPath, null ] );
   test.identical( o.found, [ linkPath,linkPath2,linkPath, null ] );
 
@@ -29783,7 +29815,7 @@ function pathResolveLinkChain( test )
   self.provider.fileWrite( linkPath2, 'link ' + linkPath );
   self.provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissing : 1, makingDirectory : 1 });
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0, allowingMissing : 0 } );
-  self.provider.pathResolveLinkChain( o );
+  self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath,linkPath2,linkPath, null ] );
   test.identical( o.found, [ linkPath,linkPath2,linkPath, null ] );
 
@@ -29798,7 +29830,7 @@ function pathResolveLinkChain( test )
   test.case = 'not existing file';
   self.provider.filesDelete( _.path.dir( filePath ) );
   var o = _.mapExtend( null, o1, { filePath : filePath } );
-  test.shouldThrowError( () => self.provider.pathResolveLinkChain( o ) );
+  test.shouldThrowError( () => self.provider.pathResolveLinkTailChain( o ) );
   test.identical( o.result, [ filePath, null ] )
   test.identical( o.found, [ filePath, null ] )
 
@@ -29806,7 +29838,7 @@ function pathResolveLinkChain( test )
   self.provider.filesDelete( _.path.dir( filePath ) );
   self.provider.fileWrite( filePath, filePath );
   var o = _.mapExtend( null, o1, { filePath : filePath } );
-  self.provider.pathResolveLinkChain( o );
+  self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ filePath ] )
   test.identical( o.found, [ filePath ] )
 
@@ -29815,7 +29847,7 @@ function pathResolveLinkChain( test )
   self.provider.fileWrite( filePath, filePath );
   self.provider.hardLink( linkPath, filePath );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  self.provider.pathResolveLinkChain( o );
+  self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath ] )
   test.identical( o.found, [ linkPath ] )
 
@@ -29824,7 +29856,7 @@ function pathResolveLinkChain( test )
   self.provider.fileWrite( filePath, filePath );
   self.provider.softLink( linkPath, filePath );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  self.provider.pathResolveLinkChain( o );
+  self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath,filePath ] )
   test.identical( o.found, [ linkPath,filePath ] )
 
@@ -29833,7 +29865,7 @@ function pathResolveLinkChain( test )
   self.provider.fileWrite( filePath, filePath );
   self.provider.softLink( linkPath, '../file' );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  var got = self.provider.pathResolveLinkChain( o );
+  var got = self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, filePath ] )
   test.identical( o.found, [ linkPath,filePath ] )
 
@@ -29842,7 +29874,7 @@ function pathResolveLinkChain( test )
   self.provider.fileWrite( filePath, filePath );
   self.provider.fileWrite( linkPath, 'link ' + filePath );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  var got = self.provider.pathResolveLinkChain( o );
+  var got = self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, filePath ] )
   test.identical( o.found, [ linkPath, filePath ] )
 
@@ -29850,7 +29882,7 @@ function pathResolveLinkChain( test )
   self.provider.filesDelete( _.path.dir( filePath ) );
   self.provider.softLink({ dstPath : linkPath, srcPath : filePath, allowingMissing : 1, makingDirectory : 1 });
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  test.shouldThrowError( () => self.provider.pathResolveLinkChain( o ) );
+  test.shouldThrowError( () => self.provider.pathResolveLinkTailChain( o ) );
   test.identical( o.result, [ linkPath,filePath, null ] )
   test.identical( o.found, [ linkPath,filePath, null ] )
 
@@ -29858,7 +29890,7 @@ function pathResolveLinkChain( test )
   self.provider.filesDelete( _.path.dir( filePath ) );
   self.provider.softLink({ dstPath : linkPath, srcPath : '../file', allowingMissing : 1, makingDirectory : 1 });
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  test.shouldThrowError( () => self.provider.pathResolveLinkChain( o ) );
+  test.shouldThrowError( () => self.provider.pathResolveLinkTailChain( o ) );
   test.identical( o.result, [ linkPath,filePath, null ] )
   test.identical( o.found, [ linkPath,filePath, null ] )
 
@@ -29866,7 +29898,7 @@ function pathResolveLinkChain( test )
   self.provider.filesDelete( _.path.dir( filePath ) );
   self.provider.softLink({ dstPath : linkPath, srcPath : '../file', allowingMissing : 1, makingDirectory : 1 });
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
-  test.shouldThrowError( () => self.provider.pathResolveLinkChain( o ) );
+  test.shouldThrowError( () => self.provider.pathResolveLinkTailChain( o ) );
   test.identical( o.result, [ linkPath,filePath, null ] )
   test.identical( o.found, [ linkPath, '../file', filePath, null ] )
 
@@ -29874,7 +29906,7 @@ function pathResolveLinkChain( test )
   self.provider.filesDelete( _.path.dir( filePath ) );
   self.provider.textLink({ dstPath : linkPath, srcPath : filePath, allowingMissing : 1, makingDirectory : 1 });
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  test.shouldThrowError( () => self.provider.pathResolveLinkChain( o ) );
+  test.shouldThrowError( () => self.provider.pathResolveLinkTailChain( o ) );
   test.identical( o.result, [ linkPath,filePath, null ] )
   test.identical( o.found, [ linkPath,filePath, null ] )
 
@@ -29882,7 +29914,7 @@ function pathResolveLinkChain( test )
   self.provider.filesDelete( _.path.dir( filePath ) );
   self.provider.textLink({ dstPath : linkPath, srcPath : '../file', allowingMissing : 1, makingDirectory : 1 });
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
-  test.shouldThrowError( () => self.provider.pathResolveLinkChain( o ) );
+  test.shouldThrowError( () => self.provider.pathResolveLinkTailChain( o ) );
   test.identical( o.result, [ linkPath,filePath, null ] )
   test.identical( o.found, [ linkPath,'../file',filePath, null ] )
 
@@ -29891,7 +29923,7 @@ function pathResolveLinkChain( test )
   self.provider.textLink({ dstPath : linkPath2, srcPath : filePath, allowingMissing : 1, makingDirectory : 1 });
   self.provider.textLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  test.shouldThrowError( () => self.provider.pathResolveLinkChain( o ) );
+  test.shouldThrowError( () => self.provider.pathResolveLinkTailChain( o ) );
   test.identical( o.result, [ linkPath,linkPath2, filePath, null ] )
   test.identical( o.found, [ linkPath,linkPath2, filePath, null ] )
 
@@ -29900,7 +29932,7 @@ function pathResolveLinkChain( test )
   self.provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissing : 1, makingDirectory : 1 });
   self.provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissing : 1, makingDirectory : 1 });
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  test.shouldThrowError( () => self.provider.pathResolveLinkChain( o ) );
+  test.shouldThrowError( () => self.provider.pathResolveLinkTailChain( o ) );
   test.identical( o.result, [ linkPath,linkPath2, filePath, null ] )
   test.identical( o.found, [ linkPath,linkPath2, filePath, null ] )
 
@@ -29909,7 +29941,7 @@ function pathResolveLinkChain( test )
   self.provider.textLink({ dstPath : linkPath2, srcPath : filePath, allowingMissing : 1, makingDirectory : 1 });
   self.provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  test.shouldThrowError( () => self.provider.pathResolveLinkChain( o ) );
+  test.shouldThrowError( () => self.provider.pathResolveLinkTailChain( o ) );
   test.identical( o.result, [ linkPath,linkPath2, filePath, null ] )
   test.identical( o.found, [ linkPath,linkPath2, filePath, null ] )
 
@@ -29918,7 +29950,7 @@ function pathResolveLinkChain( test )
   self.provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissing : 1, makingDirectory : 1 });
   self.provider.textLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  test.shouldThrowError( () => self.provider.pathResolveLinkChain( o ) );
+  test.shouldThrowError( () => self.provider.pathResolveLinkTailChain( o ) );
   test.identical( o.result, [ linkPath,linkPath2, filePath, null ] )
   test.identical( o.found, [ linkPath,linkPath2, filePath, null ] )
 
@@ -29932,7 +29964,7 @@ function pathResolveLinkChain( test )
   test.case = 'not existing file';
   self.provider.filesDelete( _.path.dir( filePath ) );
   var o = _.mapExtend( null, o1, { filePath : filePath } );
-  self.provider.pathResolveLinkChain( o );
+  self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ filePath, null ] )
   test.identical( o.found, [ filePath, null ] )
 
@@ -29940,7 +29972,7 @@ function pathResolveLinkChain( test )
   self.provider.filesDelete( _.path.dir( filePath ) );
   self.provider.fileWrite( filePath, filePath );
   var o = _.mapExtend( null, o1, { filePath : filePath } );
-  self.provider.pathResolveLinkChain( o );
+  self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ filePath ] )
   test.identical( o.found, [ filePath ] )
 
@@ -29949,7 +29981,7 @@ function pathResolveLinkChain( test )
   self.provider.fileWrite( filePath, filePath );
   self.provider.hardLink( linkPath, filePath );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  self.provider.pathResolveLinkChain( o );
+  self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath ] )
   test.identical( o.found, [ linkPath ] )
 
@@ -29958,7 +29990,7 @@ function pathResolveLinkChain( test )
   self.provider.fileWrite( filePath, filePath );
   self.provider.softLink( linkPath, filePath );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  self.provider.pathResolveLinkChain( o );
+  self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath,filePath ] )
   test.identical( o.found, [ linkPath,filePath ] )
 
@@ -29967,7 +29999,7 @@ function pathResolveLinkChain( test )
   self.provider.fileWrite( filePath, filePath );
   self.provider.softLink( linkPath, '../file' );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  var got = self.provider.pathResolveLinkChain( o );
+  var got = self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, filePath ] )
   test.identical( o.found, [ linkPath,filePath ] )
 
@@ -29976,7 +30008,7 @@ function pathResolveLinkChain( test )
   self.provider.fileWrite( filePath, filePath );
   self.provider.fileWrite( linkPath, 'link ' + filePath );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  var got = self.provider.pathResolveLinkChain( o );
+  var got = self.provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, filePath ] )
   test.identical( o.found, [ linkPath, filePath ] )
 
@@ -29984,7 +30016,7 @@ function pathResolveLinkChain( test )
   self.provider.filesDelete( _.path.dir( filePath ) );
   self.provider.softLink({ dstPath : linkPath, srcPath : filePath, allowingMissing : 1, makingDirectory : 1 });
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  test.mustNotThrowError( () => self.provider.pathResolveLinkChain( o ) );
+  test.mustNotThrowError( () => self.provider.pathResolveLinkTailChain( o ) );
   test.identical( o.result, [ linkPath,filePath, null ] )
   test.identical( o.found, [ linkPath,filePath, null ] )
 
@@ -29992,7 +30024,7 @@ function pathResolveLinkChain( test )
   self.provider.filesDelete( _.path.dir( filePath ) );
   self.provider.softLink({ dstPath : linkPath, srcPath : '../file', allowingMissing : 1, makingDirectory : 1 });
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  test.mustNotThrowError( () => self.provider.pathResolveLinkChain( o ) );
+  test.mustNotThrowError( () => self.provider.pathResolveLinkTailChain( o ) );
   test.identical( o.result, [ linkPath,filePath, null ] )
   test.identical( o.found, [ linkPath,filePath, null ] )
 
@@ -30000,7 +30032,7 @@ function pathResolveLinkChain( test )
   self.provider.filesDelete( _.path.dir( filePath ) );
   self.provider.softLink({ dstPath : linkPath, srcPath : '../file', allowingMissing : 1, makingDirectory : 1 });
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
-  test.mustNotThrowError( () => self.provider.pathResolveLinkChain( o ) );
+  test.mustNotThrowError( () => self.provider.pathResolveLinkTailChain( o ) );
   test.identical( o.result, [ linkPath,filePath, null ] )
   test.identical( o.found, [ linkPath, '../file', filePath, null ] )
 
@@ -30008,7 +30040,7 @@ function pathResolveLinkChain( test )
   self.provider.filesDelete( _.path.dir( filePath ) );
   self.provider.textLink({ dstPath : linkPath, srcPath : filePath, allowingMissing : 1, makingDirectory : 1 });
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  test.mustNotThrowError( () => self.provider.pathResolveLinkChain( o ) );
+  test.mustNotThrowError( () => self.provider.pathResolveLinkTailChain( o ) );
   test.identical( o.result, [ linkPath,filePath, null ] )
   test.identical( o.found, [ linkPath,filePath, null ] )
 
@@ -30016,7 +30048,7 @@ function pathResolveLinkChain( test )
   self.provider.filesDelete( _.path.dir( filePath ) );
   self.provider.textLink({ dstPath : linkPath, srcPath : '../file', allowingMissing : 1, makingDirectory : 1 });
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
-  test.mustNotThrowError( () => self.provider.pathResolveLinkChain( o ) );
+  test.mustNotThrowError( () => self.provider.pathResolveLinkTailChain( o ) );
   test.identical( o.result, [ linkPath,filePath, null ] )
   test.identical( o.found, [ linkPath,'../file',filePath, null ] )
 
@@ -30025,7 +30057,7 @@ function pathResolveLinkChain( test )
   self.provider.textLink({ dstPath : linkPath2, srcPath : filePath, allowingMissing : 1, makingDirectory : 1 });
   self.provider.textLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  test.mustNotThrowError( () => self.provider.pathResolveLinkChain( o ) );
+  test.mustNotThrowError( () => self.provider.pathResolveLinkTailChain( o ) );
   test.identical( o.result, [ linkPath,linkPath2, filePath, null ] )
   test.identical( o.found, [ linkPath,linkPath2, filePath, null ] )
 
@@ -30034,7 +30066,7 @@ function pathResolveLinkChain( test )
   self.provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissing : 1, makingDirectory : 1 });
   self.provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissing : 1, makingDirectory : 1 });
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  test.mustNotThrowError( () => self.provider.pathResolveLinkChain( o ) );
+  test.mustNotThrowError( () => self.provider.pathResolveLinkTailChain( o ) );
   test.identical( o.result, [ linkPath,linkPath2, filePath, null ] )
   test.identical( o.found, [ linkPath,linkPath2, filePath, null ] )
 
@@ -30043,7 +30075,7 @@ function pathResolveLinkChain( test )
   self.provider.textLink({ dstPath : linkPath2, srcPath : filePath, allowingMissing : 1, makingDirectory : 1 });
   self.provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  test.mustNotThrowError( () => self.provider.pathResolveLinkChain( o ) );
+  test.mustNotThrowError( () => self.provider.pathResolveLinkTailChain( o ) );
   test.identical( o.result, [ linkPath,linkPath2, filePath, null ] )
   test.identical( o.found, [ linkPath,linkPath2, filePath, null ] )
 
@@ -30052,14 +30084,14 @@ function pathResolveLinkChain( test )
   self.provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissing : 1, makingDirectory : 1 });
   self.provider.textLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  test.mustNotThrowError( () => self.provider.pathResolveLinkChain( o ) );
+  test.mustNotThrowError( () => self.provider.pathResolveLinkTailChain( o ) );
   test.identical( o.result, [ linkPath,linkPath2, filePath, null ] )
   test.identical( o.found, [ linkPath,linkPath2, filePath, null ] )
 
   self.provider.fieldPop( 'usingTextLink', true );
 }
 
-pathResolveLinkChain.timeOut = 30000;
+pathResolveLinkTailChain.timeOut = 30000;
 
 //
 
@@ -30073,11 +30105,11 @@ function pathResolveLink( test )
     return;
   }
 
-  let dir = test.context.makePath( 'written/pathResolveLinkChain' );
-  let filePath = test.context.makePath( 'written/pathResolveLinkChain/file' );
-  let linkPath = test.context.makePath( 'written/pathResolveLinkChain/link' );
-  let linkPath2 = test.context.makePath( 'written/pathResolveLinkChain/link2' );
-  let linkPath3 = test.context.makePath( 'written/pathResolveLinkChain/link3' );
+  let dir = test.context.pathFor( 'written/pathResolveLinkTailChain' );
+  let filePath = test.context.pathFor( 'written/pathResolveLinkTailChain/file' );
+  let linkPath = test.context.pathFor( 'written/pathResolveLinkTailChain/link' );
+  let linkPath2 = test.context.pathFor( 'written/pathResolveLinkTailChain/link2' );
+  let linkPath3 = test.context.pathFor( 'written/pathResolveLinkTailChain/link3' );
   let path = self.provider.path;
 
   self.provider.fieldPush( 'usingTextLink', true );
@@ -30261,8 +30293,8 @@ function pathResolveSoftLink( test )
 {
   let self = this;
 
-  let filePath = test.context.makePath( 'written/pathResolveSoftLink/file' );
-  let linkPath = test.context.makePath( 'written/pathResolveSoftLink/link' );
+  let filePath = test.context.pathFor( 'written/pathResolveSoftLink/file' );
+  let linkPath = test.context.pathFor( 'written/pathResolveSoftLink/link' );
 
   var o1 =
   {
@@ -30349,9 +30381,9 @@ function pathResolveTextLink( test )
 {
   let self = this;
 
-  let workDir = test.context.makePath( 'written/pathResolveSoftLink' );
-  let filePath = test.context.makePath( 'written/pathResolveSoftLink/file' );
-  let linkPath = test.context.makePath( 'written/pathResolveSoftLink/link' );
+  let workDir = test.context.pathFor( 'written/pathResolveSoftLink' );
+  let filePath = test.context.pathFor( 'written/pathResolveSoftLink/file' );
+  let linkPath = test.context.pathFor( 'written/pathResolveSoftLink/link' );
   let testData = 'pathResolveSoftLink';
 
   self.provider.fieldPush( 'usingTextLink', 1 )
@@ -30476,7 +30508,7 @@ var Self =
 
   context :
   {
-    makePath : makePath,
+    pathFor : pathFor,
     providerIsInstanceOf : providerIsInstanceOf,
     symlinkIsAllowed : symlinkIsAllowed,
     testRootDirectory : null,
@@ -30592,7 +30624,7 @@ var Self =
     pathResolve : pathResolve,
     uriResolve : uriResolve,
 
-    pathResolveLinkChain : pathResolveLinkChain,
+    pathResolveLinkTailChain : pathResolveLinkTailChain,
     pathResolveLink : pathResolveLink,
     pathResolveSoftLink : pathResolveSoftLink,
     pathResolveTextLink : pathResolveTextLink,

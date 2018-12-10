@@ -616,7 +616,7 @@ function filesSearchText( o )
 
   function handleUp( record )
   {
-    let read = record.context.effectiveFileProvider.fileRead( record.absolute );
+    let read = record.factory.effectiveFileProvider.fileRead( record.absolute );
 
     let o2 = _.mapOnly( o, _.strSearch.defaults );
     o2.src = read;

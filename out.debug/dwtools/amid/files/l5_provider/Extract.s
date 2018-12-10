@@ -75,20 +75,24 @@ function pathCurrentAct()
 function pathResolveSoftLinkAct( o )
 {
   let self = this;
+  let filePath = o.filePath;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( self.path.isAbsolute( o.filePath ) );
 
-  /* using self.resolvingSoftLink causes recursion problem in pathResolveLink */
-  if( !self.isSoftLink( o.filePath ) )
-  return o.filePath;
+  // /* using self.resolvingSoftLink causes recursion problem in pathResolveLink */
+  // debugger;
+  // if( !self.isSoftLink( o.filePath ) )
+  // return o.filePath;
 
-  let descriptor = self._descriptorRead( o.filePath );
-  let resolved = self._descriptorResolveSoftLinkPath( descriptor );
+  let descriptor = self._descriptorRead( filePath );
 
-  _.assert( _.strIs( resolved ) )
+  if( self._descriptorIsSoftLink( descriptor ) )
+  filePath = self._descriptorResolveSoftLinkPath( descriptor );
 
-  return resolved;
+  _.assert( _.strIs( filePath ) )
+
+  return filePath;
 }
 
 _.routineExtend( pathResolveSoftLinkAct, Parent.prototype.pathResolveSoftLinkAct )
@@ -165,7 +169,7 @@ function fileReadAct( o )
   // if( _.strHas( o.filePath, 'icons.woff2' ) )
   // debugger;
 
-  o.filePath = self.pathResolveLink
+  o.filePath = self.pathResolveLinkFull
   ({
     filePath : o.filePath,
     resolvingSoftLink : o.resolvingSoftLink,
@@ -379,7 +383,7 @@ function dirReadAct( o )
 
   function readDir()
   {
-    o.filePath = self.pathResolveLink({ filePath : o.filePath, resolvingSoftLink : 1 });
+    o.filePath = self.pathResolveLinkFull({ filePath : o.filePath, resolvingSoftLink : 1 });
 
     let file = self._descriptorRead( o.filePath );
 
@@ -447,17 +451,30 @@ function statReadAct( o )
     // if( filePath === '/out/icons' )
     // debugger;
 
-    let o2 = { filePath : filePath, resolvingSoftLink : o.resolvingSoftLink, resolvingTextLink : 0 };
-    try
+    if( o.resolvingSoftLink || ( o.resolvingTextLink && self.usingTextLink ) )
     {
-      filePath = self.pathResolveLink( o2 );
-    }
-    catch( err )
-    {
-      if( !o.throwing && o2.err && o2.err.cycleInLinks )
-      return result;
 
-      throw err;
+      let o2 =
+      {
+        filePath : filePath,
+        resolvingSoftLink : o.resolvingSoftLink,
+        resolvingTextLink : o.resolvingTextLink,
+      };
+
+      // try
+      // {
+        filePath = self.pathResolveLinkFull( o2 );
+      // }
+      // catch( err )
+      // {
+      //   if( !o.throwing && o2.err && o2.err.cycleInLinks )
+      //   return result;
+      //   throw err;
+      // }
+
+      _.assert( o2.stat !== undefined );
+
+      return o2.stat;
     }
 
     let file = self._descriptorRead( filePath );
@@ -622,7 +639,8 @@ function fileWriteAct( o )
 
     if( self._descriptorIsLink( descriptor ) )
     {
-      let resolvedPath = self.pathResolveLink( filePath );
+      let resolvedPath = self.pathResolveLinkFull( filePath );
+
       descriptor = self._descriptorRead( resolvedPath );
 
       if( !self._descriptorIsLink( descriptor ) )
@@ -860,6 +878,17 @@ function fileRenameAct( o )
   _.assert( self.path.isNormalized( o.srcPath ) );
   _.assert( self.path.isNormalized( o.dstPath ) );
 
+  if( o.sync )
+  {
+    return rename();
+  }
+  else
+  {
+    return _.timeOut( 0, () => rename() );
+  }
+
+  /* - */
+
   /* rename */
 
   function rename( )
@@ -872,44 +901,25 @@ function fileRenameAct( o )
     let srcDir = self._descriptorRead( srcDirPath );
     if( !srcDir || !srcDir[ srcName ] )
     throw _.err( 'Source path', _.strQuote( o.srcPath ), 'doesn`t exist!' );
-
     let dstDir = self._descriptorRead( dstDirPath );
     if( !dstDir )
     throw _.err( 'Destination folders structure : ' + dstDirPath + ' doesn`t exist' );
     if( dstDir[ dstName ] )
     throw _.err( 'Destination path', _.strQuote( o.dstPath ), 'already exist!' );
 
-    if( dstDir === srcDir )
-    {
-      dstDir[ dstName ] = srcDir[ srcName ];
-      delete dstDir[ srcName ];
-    }
-    else
-    {
-      dstDir[ dstName ] = srcDir[ srcName ];
-      delete srcDir[ srcName ];
+    dstDir[ dstName ] = srcDir[ srcName ];
+    delete dstDir[ srcName ];
 
-      // self._descriptorWrite( srcDirPath, srcDir );
+    if( dstDir !== srcDir )
+    {
       self._descriptorTimeUpdate( srcDirPath );
-
     }
 
     for( let k in self.timeStats[ o.srcPath ] )
     self.timeStats[ o.srcPath ][ k ] = null;
-
-    // self._descriptorWrite( dstDirPath, dstDir );
     self._descriptorTimeUpdate( dstDirPath );
 
     return true;
-  }
-
-  if( o.sync )
-  {
-    rename( );
-  }
-  else
-  {
-    return _.timeOut( 0, () => rename() );
   }
 
 }
@@ -927,8 +937,6 @@ function fileCopyAct( o )
   _.assertRoutineOptions( fileCopyAct, arguments );
   _.assert( self.path.isNormalized( o.srcPath ) );
   _.assert( self.path.isNormalized( o.dstPath ) );
-
-  debugger;
 
   if( o.sync  )
   {
@@ -1360,7 +1368,7 @@ function filesTreeRead( o )
 
     let element;
     _.assert( !!record.stat, 'file does not exists', record.absolute );
-    let isDir = record.stat.isDirectory();
+    let isDir = record.stat.isDir();
 
     /* */
 

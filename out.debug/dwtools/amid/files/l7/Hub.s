@@ -246,8 +246,8 @@ function _recordPathForm( record )
   _.assert( record instanceof _.FileRecord );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  record.hubAbsolute = record.absoluteUri;
-  record.realAbsolute = record.realUri;
+  record.absoluteGlobalOrLocal = record.absoluteGlobal;
+  record.realGlobalOrLocal = record.realGlobal;
 
   return record;
 }
@@ -260,7 +260,7 @@ function _recordFormEnd( record )
   _.assert( record instanceof _.FileRecord );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  record.realAbsolute = record.realUri;
+  record.realGlobalOrLocal = record.realGlobal;
 
   return record;
 }
@@ -368,20 +368,31 @@ function pathNativizeAct( filePath )
 
 //
 
-function _pathResolveLink_body( o )
+function pathCurrentAct()
+{
+  let self = this;
+
+  if( self.defaultProvider )
+  return self.defaultProvider.path.current.apply( self.defaultProvider.path, arguments );
+
+  _.assert( 0, 'Default provider is not set for the Hub', self.nickName );
+}
+
+//
+
+function pathResolveLinkFull_body( o )
 {
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  /* needed to return local path for softlink src */
-  if( !o.resolvingSoftLink && !o.resolvingTextLink )
-  return o.filePath;
+  // if( !o.resolvingSoftLink && !o.resolvingTextLink )
+  // return o.filePath;
 
   let r = self._localFromGlobal( o.filePath );
   o.filePath = r.filePath;
 
-  let result = r.provider.pathResolveLink.body.call( r.provider, o );
+  let result = r.provider.pathResolveLinkFull.body.call( r.provider, o );
 
   _.assert( !!result );
 
@@ -397,13 +408,47 @@ function _pathResolveLink_body( o )
   return result;
 }
 
-_.routineExtend( _pathResolveLink_body, Parent.prototype.pathResolveLink );
+_.routineExtend( pathResolveLinkFull_body, Parent.prototype.pathResolveLinkFull );
 
-let pathResolveLink = _.routineFromPreAndBody( Parent.prototype.pathResolveLink.pre, _pathResolveLink_body );
+let pathResolveLinkFull = _.routineFromPreAndBody( Parent.prototype.pathResolveLinkFull.pre, pathResolveLinkFull_body );
 
 //
 
-function _pathResolveSoftLink_body( o )
+function pathResolveLinkTail_body( o )
+{
+  let self = this;
+
+  _.assert( arguments.length === 1, 'Expects single argument' );
+
+  // if( !o.resolvingSoftLink && !o.resolvingTextLink )
+  // return o.filePath;
+
+  let r = self._localFromGlobal( o.filePath );
+  o.filePath = r.filePath;
+
+  let result = r.provider.pathResolveLinkTail.body.call( r.provider, o );
+
+  _.assert( !!result );
+
+  result = self.path.join( r.provider.originPath, result );
+
+  if( result === o.filePath )
+  {
+    debugger;
+    _.assert( 0, 'not implemented' );
+    return r.originalPath;
+  }
+
+  return result;
+}
+
+_.routineExtend( pathResolveLinkTail_body, Parent.prototype.pathResolveLinkTail );
+
+let pathResolveLinkTail = _.routineFromPreAndBody( Parent.prototype.pathResolveLinkTail.pre, pathResolveLinkTail_body );
+
+//
+
+function pathResolveSoftLink_body( o )
 {
   let self = this;
 
@@ -423,80 +468,9 @@ function _pathResolveSoftLink_body( o )
   return result;
 }
 
-_.routineExtend( _pathResolveSoftLink_body, Parent.prototype.pathResolveSoftLink );
+_.routineExtend( pathResolveSoftLink_body, Parent.prototype.pathResolveSoftLink );
 
-let pathResolveSoftLink = _.routineFromPreAndBody( Parent.prototype.pathResolveSoftLink.pre, _pathResolveSoftLink_body );
-
-//
-
-// function pathResolveHardLink_body( o )
-// {
-//   let self = this;
-//
-//   _.assert( arguments.length === 1, 'Expects single argument' );
-//
-//   let r = self._localFromGlobal( o.filePath );
-//
-//   o.filePath = r.filePath;
-//
-//   let result = r.provider.pathResolveHardLink.body.call( r.provider, o );
-//
-//   _.assert( !!result );
-//
-//   if( result === o.filePath )
-//   return r.originalPath;
-//
-//   return result;
-// }
-//
-// _.routineExtend( pathResolveHardLink_body, Parent.prototype.pathResolveHardLink );
-//
-// let pathResolveHardLink = _.routineFromPreAndBody( Parent.prototype.pathResolveHardLink.pre, pathResolveHardLink_body );
-
-//
-
-function pathCurrentAct()
-{
-  let self = this;
-
-  if( self.defaultProvider )
-  return self.defaultProvider.path.current.apply( self.defaultProvider.path, arguments );
-
-  _.assert( 0, 'Default provider is not set for the Hub', self.nickName );
-}
-
-// --
-//
-// --
-
-// function statResolvedRead_body( o )
-// {
-//   let self = this;
-//
-//   // debugger;
-//
-//   _.assert( arguments.length === 1 );
-//
-//   o.filePath = self.pathResolveLink
-//   ({
-//     filePath : o.filePath,
-//     resolvingSoftLink : o.resolvingSoftLink,
-//     resolvingTextLink : o.resolvingTextLink,
-//   });
-//
-//   let r = self._localFromGlobal( o.filePath );
-//   let o2 = _.mapOnly( o, self.statReadAct.defaults );
-//
-//   o2.resolvingSoftLink = 0;
-//   o2.filePath = r.filePath;
-//   let result = r.provider.statReadAct.call( r.provider, o2 );
-//
-//   return result;
-// }
-//
-// _.routineExtend( statResolvedRead_body, Parent.prototype.statResolvedRead );
-//
-// let statResolvedRead = _.routineFromPreAndBody( Parent.prototype.statResolvedRead.pre, statResolvedRead_body );
+let pathResolveSoftLink = _.routineFromPreAndBody( Parent.prototype.pathResolveSoftLink.pre, pathResolveSoftLink_body );
 
 //
 
@@ -530,50 +504,9 @@ _.routineExtend( fileRead_body, Parent.prototype.fileRead );
 
 let fileRead = _.routineFromPreAndBody( Parent.prototype.fileRead.pre, fileRead_body );
 
-//
-
-// function _filesReflect_body( o )
-// {
-//   let self = this;
-//   let path = self.path;
-//
-//   if(  )
-//
-//   return o.result;
-// }
-//
-// _.routineExtend( _filesReflect_body, _.FileProvider.Find.prototype.filesReflect );
-//
-// var defaults = _filesReflect_body.defaults;
-//
-// let filesReflect = _.routineFromPreAndBody( _.FileProvider.Find.prototype.filesReflect.pre, _filesReflect_body );
-
 // --
-//
+// linker
 // --
-
-function filesAreHardLinkedAct( dstPath, srcPath )
-{
-  let self = this;
-
-  _.assert( arguments.length === 2, 'Expects exactly two arguments' );
-
-  let dst = self._localFromGlobal( dstPath );
-  let src = self._localFromGlobal( srcPath );
-
-  _.assert( !!dst.provider, 'no provider for path', dstPath );
-  _.assert( !!src.provider, 'no provider for path', srcPath );
-
-  if( dst.provider !== src.provider )
-  return false;
-
-  // debugger;
-  // _.assert( 0, 'not tested' );
-
-  return dst.provider.filesAreHardLinkedAct( dst.filePath, src.filePath );
-}
-
-//
 
 function _link_functor( fop )
 {
@@ -693,6 +626,31 @@ function _fileCopyActDifferent( o, dst, src, routine )
 }
 
 let fileCopyAct = _link_functor({ routine : Parent.prototype.fileCopyAct, onDifferentProviders : _fileCopyActDifferent });
+
+// --
+// link
+// --
+
+function filesAreHardLinkedAct( dstPath, srcPath )
+{
+  let self = this;
+
+  _.assert( arguments.length === 2, 'Expects exactly two arguments' );
+
+  let dst = self._localFromGlobal( dstPath );
+  let src = self._localFromGlobal( srcPath );
+
+  _.assert( !!dst.provider, 'no provider for path', dstPath );
+  _.assert( !!src.provider, 'no provider for path', srcPath );
+
+  if( dst.provider !== src.provider )
+  return false;
+
+  // debugger;
+  // _.assert( 0, 'not tested' );
+
+  return dst.provider.filesAreHardLinkedAct( dst.filePath, src.filePath );
+}
 
 // --
 //
@@ -967,17 +925,13 @@ let FilteredRoutines =
   // path
 
   pathResolveSoftLinkAct : Routines.pathResolveSoftLinkAct,
-  // pathResolveHardLinkAct : Routines.pathResolveHardLinkAct,
+  pathResolveTextLinkAct : Routines.pathResolveTextLinkAct,
 
   // read
 
   fileReadAct : Routines.fileReadAct,
   streamReadAct : Routines.streamReadAct,
   fileHashAct : Routines.fileHashAct,
-
-  // isTerminalAct : Routines.isTerminalAct,
-  // isDirAct : Routines.isDirAct,
-
   dirReadAct : Routines.dirReadAct,
   statReadAct : Routines.statReadAct,
   fileExistsAct : Routines.fileExistsAct,
@@ -988,11 +942,9 @@ let FilteredRoutines =
   streamWriteAct : Routines.streamWriteAct,
   fileTimeSetAct : Routines.fileTimeSetAct,
   fileDeleteAct : Routines.fileDeleteAct,
-
   dirMakeAct : Routines.dirMakeAct,
 
-  // softLinkAct : Routines.softLinkAct,
-  // textLinkAct : Routines.textLinkAct,
+  // link
 
   hardLinkBreakAct : Routines.hardLinkBreakAct,
   softLinkBreakAct : Routines.softLinkBreakAct,
@@ -1005,8 +957,6 @@ let FilteredRoutines =
 
 let Path = _.uri.CloneExtending({ fileProvider : Self });
 _.assert( _.prototypeHas( Path, _.uri ) );
-
-// Path.pathNativizeAct = pathNativizeAct;
 
 // --
 // relationship
@@ -1096,19 +1046,19 @@ let Proto =
   _localFromGlobal,
   localsFromGlobals,
 
-  pathResolveLink,
-  pathResolveSoftLink,
-
   pathCurrentAct,
 
+  pathResolveLinkFull,
+  pathResolveLinkTail,
+  pathResolveSoftLink,
+
   //
 
-  // statResolvedRead,
   fileRead,
 
-  //
+  // linker
 
-  filesAreHardLinkedAct,
+  _link_functor,
 
   hardLinkAct,
   fileRenameAct,
@@ -1117,6 +1067,10 @@ let Proto =
   textLinkAct,
 
   fileCopyAct,
+
+  // link
+
+  filesAreHardLinkedAct,
 
   // accessor
 

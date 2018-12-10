@@ -14,7 +14,7 @@ if( typeof module !== 'undefined' )
 let _global = _global_;
 let _ = _global_.wTools;
 let Parent = null;
-let Self = function wFileRecordFilter( c )
+let Self = function wFileRecordFilter( o )
 {
   return _.instanceConstructor( Self, this, arguments );
 }
@@ -120,7 +120,7 @@ function and( src )
   _.assert( src.stemPath/*globMap*/ === null || src.stemPath/*globMap*/ === undefined );
   // _.assert( filter.stemPath/*globMap*/ === null );
   _.assert( filter.filterMap === null );
-  _.assert( filter.test === null );
+  _.assert( filter.applyTo === null );
 
   // _.assert( src.inFilePath === null || src.inFilePath === undefined );
   // _.assert( src.basePath === null || src.basePath === undefined );
@@ -240,7 +240,7 @@ function pathsJoin( src )
   _.assert( arguments.length === 1, 'Expects single argument' );
   // _.assert( filter.stemPath/*globMap*/ === null );
   _.assert( filter.filterMap === null );
-  _.assert( filter.test === null );
+  _.assert( filter.applyTo === null );
   _.assert( filter.inFilePath === null );
   _.assert( !filter.hubFileProvider || !src.hubFileProvider || filter.hubFileProvider === src.hubFileProvider );
   _.assert( src !== filter );
@@ -344,7 +344,7 @@ function pathsInherit( src )
   _.assert( arguments.length === 1, 'Expects single argument' );
   // _.assert( filter.stemPath/*globMap*/ === null );
   _.assert( filter.filterMap === null );
-  _.assert( filter.test === null );
+  _.assert( filter.applyTo === null );
   _.assert( !filter.hubFileProvider || !src.hubFileProvider || filter.hubFileProvider === src.hubFileProvider );
   _.assert( src !== filter );
   // _.assert( src.stemPath/*globMap*/ === null || src.stemPath/*globMap*/ === undefined );
@@ -412,7 +412,7 @@ function pathsExtend( src )
   _.assert( arguments.length === 1, 'Expects single argument' );
   // _.assert( filter.stemPath/*globMap*/ === null );
   _.assert( filter.filterMap === null );
-  _.assert( filter.test === null );
+  _.assert( filter.applyTo === null );
   _.assert( filter.inFilePath === null );
   _.assert( !filter.hubFileProvider || !src.hubFileProvider || filter.hubFileProvider === src.hubFileProvider );
   _.assert( src !== filter );
@@ -703,12 +703,12 @@ function _formFinal()
     );
   }
 
-  filter.test = filter._testNothing;
+  filter.applyTo = filter._applyToRecordNothing;
 
   if( filter.notOlder || filter.notNewer || filter.notOlderAge || filter.notNewerAge )
-  filter.test = filter._testFull;
+  filter.applyTo = filter._applyToRecordFull;
   else if( filter.hasMask() )
-  filter.test = filter._testMasks;
+  filter.applyTo = filter._applyToRecordMasks;
 
   filter.formed = 5;
 }
@@ -1506,7 +1506,7 @@ function toStr()
 
 //
 
-function _testNothing( record )
+function _applyToRecordNothing( record )
 {
   let filter = this;
   return record.isActual;
@@ -1514,26 +1514,17 @@ function _testNothing( record )
 
 //
 
-function _testMasks( record )
+function _applyToRecordMasks( record )
 {
   let filter = this;
   let relative = record.relative;
-  let c = record.context;
+  let f = record.factory;
   let path = record.path;
-  filter = filter.filterMap ? filter.filterMap[ c.stemPath ] : filter;
-  // let filter = filter.filterMap ? filter.filterMap[ path.relative( c.basePath, c.stemPath ) ] : filter;
+  filter = filter.filterMap ? filter.filterMap[ f.stemPath ] : filter;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( !!filter, 'Cant resolve filter for start path', () => _.strQuote( c.stemPath ) );
-  _.assert( c.formed, 'Record context was not formed!' );
-
-  // debugger;
-  // if( record.absolute === '/dst/file2' )
-  // debugger;
-  // if( _.strHas( record.absolute, '.scenario.' ) )
-  // debugger;
-  // if( _.strEnds( record.absolute, 'layer1' ) )
-  // debugger;
+  _.assert( !!filter, 'Cant resolve filter for start path', () => _.strQuote( f.stemPath ) );
+  _.assert( !!f.formed, 'Record factor was not formed!' );
 
   /* */
 
@@ -1568,7 +1559,7 @@ function _testMasks( record )
 
   /* */
 
-  // logger.log( '_testMasks', record.absolute, record.isTransient, record.isActual );
+  // logger.log( '_applyToRecordMasks', record.absolute, record.isTransient, record.isActual );
   // if( record.absolute === '/common.external' )
   // debugger;
   // if( _.strHas( record.absolute, '/dstExt/d1a/d1b/b.js' ) )
@@ -1583,7 +1574,7 @@ function _testMasks( record )
 
 //
 
-function _testTime( record )
+function _applyToRecordTime( record )
 {
   let filter = this;
 
@@ -1636,7 +1627,7 @@ function _testTime( record )
 
 //
 
-function _testFull( record )
+function _applyToRecordFull( record )
 {
   let filter = this;
 
@@ -1645,8 +1636,8 @@ function _testFull( record )
   if( record.isActual === false )
   return record.isActual;
 
-  filter._testMasks( record );
-  filter._testTime( record );
+  filter._applyToRecordMasks( record );
+  filter._applyToRecordTime( record );
 
   return record.isActual;
 }
@@ -1771,7 +1762,7 @@ let Restricts =
 {
 
   filterMap : null,
-  test : null,
+  applyTo : null,
   formed : 0,
   globFound : null,
 
@@ -1806,6 +1797,7 @@ let Forbids =
   isEmpty : 'isEmpty',
   globMap : 'globMap',
   _processed : '_processed',
+  test : 'test',
 
 }
 
@@ -1858,10 +1850,10 @@ let Proto =
   compactField,
   toStr,
 
-  _testNothing,
-  _testMasks,
-  _testTime,
-  _testFull,
+  _applyToRecordNothing,
+  _applyToRecordMasks,
+  _applyToRecordTime,
+  _applyToRecordFull,
 
   // path
 
@@ -1893,7 +1885,6 @@ _.classDeclare
 
 _.mapExtend( _,Globals );
 
-if( _global_.wCopyable )
 _.Copyable.mixin( Self );
 
 // --

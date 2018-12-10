@@ -1170,6 +1170,7 @@ function filesReflectEvaluate_body( o )
     let srcOptions = _.mapOnly( o, self.filesFindSingle.defaults );
     srcOptions.includingStem = 1;
     srcOptions.includingTransient = 1;
+    srcOptions.allowingMissing = 1;
     srcOptions.verbosity = 0;
     srcOptions.filter = o.srcFilter;
     srcOptions.filePath = o.srcPath;

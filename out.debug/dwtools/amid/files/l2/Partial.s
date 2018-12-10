@@ -836,7 +836,7 @@ function pathResolveLinkFull_body( o )
     }
 
     result = self.pathResolveLinkHeadDirect.body.call( self, o2 );
-    o.stat = o2.stat;
+    // o.stat = o2.stat;
 
   }
 

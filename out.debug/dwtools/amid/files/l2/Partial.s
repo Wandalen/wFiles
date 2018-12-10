@@ -1154,7 +1154,7 @@ function pathResolveLinkHeadDirect_body( o )
     o2.filePath = filePath;
     o2.stat = null;
     o2.preservingRelative = 0;
-    if( self.isLink( o2.filePath ) )
+    if( i === splits.length - 1 || self.isLink( o2.filePath ) )
     filePath = self.pathResolveLinkTail.body.call( self, o2 );
   }
 
@@ -2930,7 +2930,7 @@ function filesAreSame_body( o )
   /* hard linked */
 
   if( _.bigIntIs( o.ins1.stat.ino ) && _.bigIntIs( o.ins2.stat.ino ) )
-  if( o.ins1.context.effectiveFileProvider === o.ins2.context.effectiveFileProvider )
+  if( o.ins1.factory.effectiveFileProvider === o.ins2.factory.effectiveFileProvider )
   if( o.ins1.stat.ino > 0 )
   if( o.ins1.stat.ino === o.ins2.stat.ino )
   return true;

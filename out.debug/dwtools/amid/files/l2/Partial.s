@@ -5671,8 +5671,19 @@ function _softLinkSkip( c )
 {
   let self = this;
   let o = c.options;
-  if( o.dstPath !== o.srcPath && self.filesAreSoftLinked([ o.dstPath, o.srcPath ]) )
-  return true;
+
+  if( !o.allowingMissing )
+  // if( self.filesAreSoftLinked([ o.dstPath, o.srcPath ]) )
+  if( o.dstPath === o.srcPath )
+  throw _.err( 'Soft link cycle', path.moveReport( o.dstPath, o.srcPath ) );
+
+  // if( o.dstPath !== o.srcPath && self.filesAreSoftLinked([ o.dstPath, o.srcPath ]) )
+  // if( o.dstPath === o.srcPath )
+  // return true;
+
+  // if( o.dstPath !== o.srcPath && self.filesAreSoftLinked([ o.dstPath, o.srcPath ]) )
+  // return true;
+
 }
 
 let softLink = _link_functor

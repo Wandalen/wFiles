@@ -839,6 +839,7 @@ function pathResolveLinkFull_body( o )
     // o.stat = o2.stat;
 
   }
+  // else
 
   if( o.stat )
   {
@@ -861,6 +862,13 @@ function pathResolveLinkFull_body( o )
     o.stat = o2.stat;
     _.assert( o.stat !== undefined );
 
+  }
+  else
+  {
+    if( !o.allowingMissing )
+    {
+      result = null;
+    }
   }
 
   if( o.stat && o.resolvingHeadReverse )
@@ -4998,7 +5006,7 @@ function _link_functor( gen )
           resolvingSoftLink : o.resolvingDstSoftLink,
           resolvingTextLink : o.resolvingDstTextLink,
         }
-        c.dstPath = self.pathResolveLinkFull( o2 );
+        o.dstPath = self.pathResolveLinkFull( o2 );
         c.dstStat = o2.stat;
       }
 

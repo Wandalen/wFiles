@@ -30648,10 +30648,6 @@ function pathResolveTextLink( test )
   self.provider.textLink({ dstPath : linkPath, srcPath : linkPath2 });
   var got = self.provider.pathResolveTextLink( { filePath : linkPath } );
   test.identical( got, linkPath );
-  var got1 = self.provider.pathResolveTextLink( { filePath : got } );
-  test.identical( got1, linkPath );
-  var got2 = self.provider.pathResolveTextLink( { filePath : got1 } );
-  test.identical( got2, linkPath );
 
   test.case = 'Chain with relative and absolute text links';
   self.provider.filesDelete( workDir );
@@ -30660,10 +30656,6 @@ function pathResolveTextLink( test )
   self.provider.textLink({ dstPath : linkPath, srcPath : linkPath2 });
   var got = self.provider.pathResolveTextLink( { filePath : linkPath } );
   test.identical( got, linkPath );
-  var got1 = self.provider.pathResolveTextLink( { filePath : got } );
-  test.identical( got1, linkPath );
-  var got2 = self.provider.pathResolveTextLink( { filePath : got1 } );
-  test.identical( got2, linkPath );
 
   test.case = 'Chain with absolute and relative text link that doesn´t exist';
   self.provider.filesDelete( workDir );
@@ -30672,10 +30664,6 @@ function pathResolveTextLink( test )
   self.provider.textLink({ dstPath : linkPath, srcPath : linkPath2  });
   var got = self.provider.pathResolveTextLink( { filePath : linkPath } );
   test.identical( got, linkPath );
-  var got1 = self.provider.pathResolveTextLink( { filePath : got } );
-  test.identical( got1, linkPath );
-  var got2 = self.provider.pathResolveTextLink( { filePath : got1 } );
-  test.identical( got2, linkPath );
 
   test.case = 'Chain with two absolute soft links';
   self.provider.filesDelete( workDir );
@@ -30684,10 +30672,6 @@ function pathResolveTextLink( test )
   self.provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
   var got = self.provider.pathResolveTextLink( { filePath : linkPath } );
   test.identical( got, linkPath );
-  var got1 = self.provider.pathResolveTextLink( { filePath : got } );
-  test.identical( got1, linkPath );
-  var got2 = self.provider.pathResolveTextLink( { filePath : got1 } );
-  test.identical( got2, linkPath );
 
   test.case = 'Chain with relative and absolute soft links';
   self.provider.filesDelete( workDir );
@@ -30696,10 +30680,6 @@ function pathResolveTextLink( test )
   self.provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
   var got = self.provider.pathResolveTextLink( { filePath : linkPath } );
   test.identical( got, linkPath );
-  var got1 = self.provider.pathResolveTextLink( { filePath : got } );
-  test.identical( got1, linkPath );
-  var got2 = self.provider.pathResolveTextLink( { filePath : got1 } );
-  test.identical( got2, linkPath );
 
   test.case = 'Chain with absolute and relative soft link that doesn´t exist';
   self.provider.filesDelete( workDir );
@@ -30708,10 +30688,6 @@ function pathResolveTextLink( test )
   self.provider.softLink({ dstPath : linkPath, srcPath : linkPath2  });
   var got = self.provider.pathResolveTextLink( { filePath : linkPath } );
   test.identical( got, linkPath );
-  var got1 = self.provider.pathResolveTextLink( { filePath : got } );
-  test.identical( got1, linkPath );
-  var got2 = self.provider.pathResolveTextLink( { filePath : got1 } );
-  test.identical( got2, linkPath );
 
   test.case = 'Chain with absolute soft and text links';
   self.provider.filesDelete( workDir );
@@ -30720,10 +30696,6 @@ function pathResolveTextLink( test )
   self.provider.textLink({ dstPath : linkPath2, srcPath : linkPath });
   var got = self.provider.pathResolveTextLink( { filePath : linkPath2 } );
   test.identical( got, linkPath2 );
-  var got1 = self.provider.pathResolveTextLink( { filePath : got } );
-  test.identical( got1, linkPath2 );
-  var got2 = self.provider.pathResolveTextLink( { filePath : got1 } );
-  test.identical( got2, linkPath2 );
 
   test.case = 'Chain with relative soft and text links';
   self.provider.filesDelete( workDir );
@@ -30732,10 +30704,6 @@ function pathResolveTextLink( test )
   self.provider.textLink({ dstPath : linkPath2, srcPath : linkPath });
   var got = self.provider.pathResolveTextLink( { filePath : linkPath2 } );
   test.identical( got, linkPath2 );
-  var got1 = self.provider.pathResolveTextLink( { filePath : got } );
-  test.identical( got1, linkPath2 );
-  var got2 = self.provider.pathResolveTextLink( { filePath : got1 } );
-  test.identical( got2, linkPath2 );
 
   self.provider.fieldPop( 'usingTextLink', 0 );
 
@@ -30754,7 +30722,7 @@ function pathResolveTextLink( test )
 
   test.case = 'No arguments';
   self.provider.filesDelete( workDir );
-  test.shouldThrowErrorSync( () =>
+  test.shouldThrowError( () =>
     self.provider.pathResolveTextLink( )
   );
 
@@ -30762,7 +30730,7 @@ function pathResolveTextLink( test )
   self.provider.filesDelete( workDir );
   self.provider.fileWrite( filePath, testData );
   self.provider.textLink({ dstPath : linkPath, srcPath : filePath });
-  test.shouldThrowErrorSync( () =>
+  test.shouldThrowError( () =>
     self.provider.pathResolveTextLink(  { filePath : linkPath },  { filePath : linkPath }   )
   );
 
@@ -30770,7 +30738,7 @@ function pathResolveTextLink( test )
   self.provider.filesDelete( workDir );
   self.provider.fileWrite( filePath, testData );
   self.provider.textLink({ dstPath : linkPath, srcPath : filePath });
-  test.shouldThrowErrorSync( () =>
+  test.shouldThrowError( () =>
     self.provider.pathResolveTextLink(  { otherPath : linkPath }   )
   );
 
@@ -30778,7 +30746,7 @@ function pathResolveTextLink( test )
   self.provider.filesDelete( workDir );
   self.provider.fileWrite( filePath, testData );
   self.provider.textLink({ dstPath : linkPath, srcPath : filePath });
-  test.shouldThrowErrorSync( () =>
+  test.shouldThrowError( () =>
     self.provider.pathResolveTextLink(  { filePath : linkPath, filePath : filePath }   )
   );
 
@@ -30786,39 +30754,28 @@ function pathResolveTextLink( test )
   self.provider.filesDelete( workDir );
   self.provider.fileWrite( filePath, testData );
   self.provider.textLink({ dstPath : linkPath, srcPath : filePath });
-  test.shouldThrowErrorSync( () =>
+  test.shouldThrowError( () =>
     self.provider.pathResolveTextLink(  { filePath : linkPath, allowingMissing : 1, allowingMissing : 1 }   )
   );
 
   test.case = 'Wrong filePath options - undefined';
-  self.provider.filesDelete( workDir );
-  test.shouldThrowErrorSync( () =>
-    self.provider.pathResolveTextLink(  { filePath : undefined }   )
-  );
+  test.shouldThrowError( () => self.provider.pathResolveTextLink( { filePath : undefined } ) );
 
   test.case = 'Wrong filePath options - number';
   self.provider.filesDelete( workDir );
-  test.shouldThrowErrorSync( () =>
-    self.provider.pathResolveTextLink(  { filePath : 3.14159 }   )
-  );
+  test.shouldThrowError( () => self.provider.pathResolveTextLink( { filePath : 3.14159 } ) );
 
   test.case = 'Wrong filePath options - array';
   self.provider.filesDelete( workDir );
-  test.shouldThrowErrorSync( () =>
-    self.provider.pathResolveTextLink(  { filePath : [ 0, 'a' ] }   )
-  );
+  test.shouldThrowError( () => self.provider.pathResolveTextLink( { filePath : [ 0, 'a' ] } ) );
 
   test.case = 'Wrong filePath options - null';
   self.provider.filesDelete( workDir );
-  test.shouldThrowErrorSync( () =>
-    self.provider.pathResolveTextLink(  { filePath : null }   )
-  );
+  test.shouldThrowError( () => self.provider.pathResolveTextLink( { filePath : null } ) );
 
   test.case = 'Wrong filePath options - NaN';
   self.provider.filesDelete( workDir );
-  test.shouldThrowErrorSync( () =>
-    self.provider.pathResolveTextLink(  { filePath : NaN }   )
-  );
+  test.shouldThrowError( () => self.provider.pathResolveTextLink( { filePath : NaN } ) );
 
 }
 

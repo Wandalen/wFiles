@@ -941,11 +941,9 @@ function pathResolveLinkTail_body( o )
   if( r[ r.length-1 ] === null )
   {
     let cycle = false;
-
-    if( !o.allowingCycling )
+    if( r.length > 2 )
     cycle = _.arrayRightIndex( r, r[ r.length-2 ], r.length-3 ) !== -1;
-
-    if( !cycle && o.allowingMissing )
+    if( cycle && o.allowingCycling || !cycle && o.allowingMissing )
     result = r[ r.length-2 ];
   }
 
@@ -1017,8 +1015,8 @@ function pathResolveLinkTailChain_body( o )
     }
     else
     {
-      o.result.push( o.filePath );
-      o.found.push( o.filePath );
+      o.result.push( o.filePath, null );
+      o.found.push( o.filePath, null );
 
       if( o.allowingCycling )
       {
@@ -1029,11 +1027,6 @@ function pathResolveLinkTailChain_body( o )
           resolvingSoftLink : 0,
           sync : 1,
         });
-      }
-      else
-      {
-        o.result.push( null );
-        o.found.push( null );
       }
 
       return o.result;

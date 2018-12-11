@@ -940,8 +940,12 @@ function pathResolveLinkTail_body( o )
 
   if( r[ r.length-1 ] === null )
   {
-    let cycle = _.arrayRightIndex( r, r[ r.length-2 ], r.length-3 ) !== -1;
-    if( cycle && o.allowingCycling || !cycle && o.allowingMissing )
+    let cycle = false;
+
+    if( !o.allowingCycling )
+    cycle = _.arrayRightIndex( r, r[ r.length-2 ], r.length-3 ) !== -1;
+
+    if( !cycle && o.allowingMissing )
     result = r[ r.length-2 ];
   }
 
@@ -1013,8 +1017,25 @@ function pathResolveLinkTailChain_body( o )
     }
     else
     {
-      o.result.push( o.filePath, null );
-      o.found.push( o.filePath, null );
+      o.result.push( o.filePath );
+      o.found.push( o.filePath );
+
+      if( o.allowingCycling )
+      {
+        o.stat = self.statReadAct
+        ({
+          filePath : o.filePath,
+          throwing : 0,
+          resolvingSoftLink : 0,
+          sync : 1,
+        });
+      }
+      else
+      {
+        o.result.push( null );
+        o.found.push( null );
+      }
+
       return o.result;
     }
   }
@@ -5029,7 +5050,7 @@ function _link_functor( gen )
           resolvingTextLink : o.resolvingDstTextLink,
         }
         o.dstPath = self.pathResolveLinkFull( o2 );
-        // c.dstStat = o2.stat;
+        c.dstStat = o2.stat;
       }
 
       // o.dstPath = self.pathResolveLinkFull

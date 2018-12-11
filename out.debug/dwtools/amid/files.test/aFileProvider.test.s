@@ -31454,6 +31454,28 @@ function fileCopyExperiment( test )
 
 }
 
+//
+
+function statReadExperiment( test )
+{
+  let self = this;
+
+  let workDir = test.context.pathFor( 'written/statReadExperiment' );
+  let srcPath = self.provider.path.join( workDir, 'src' );
+
+  test.shouldThrowError( () =>
+  {
+    debugger
+    self.provider.statRead({ filePath : srcPath, throwing : 1 });
+  })
+
+  //
+
+  var got = self.provider.statRead({ filePath : srcPath, throwing : 0 });
+  test.identical( got, null )
+}
+
+
 // --
 // declare
 // --
@@ -31593,6 +31615,9 @@ var Self =
     pathResolveTextLink : pathResolveTextLink,
 
     fileCopyExperiment : fileCopyExperiment,
+
+    statReadExperiment : statReadExperiment,
+
   },
 
 };

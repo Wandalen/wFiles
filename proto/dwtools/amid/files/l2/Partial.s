@@ -1512,32 +1512,18 @@ function statRead_body( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.routineIs( self.statReadAct ) );
 
-  // if( o.resolvingTextLink )
-  // o.filePath = self.path.pathResolveTextLink( o.filePath, true );
-  //
-  // let stat = self.statReadAct
-  // ({
-  //   filePath : o.filePath,
-  //   throwing : 0,
-  //   sync : 1,
-  //   resolvingSoftLink : 0,
-  // });
-
   let o2 =
   {
-    // stat : stat,
     filePath : o.filePath,
     resolvingTextLink : o.resolvingTextLink,
     resolvingSoftLink : o.resolvingSoftLink,
-    // resolvingSoftLink : 0, // qqq
-    throwing : o.throwing
+    throwing : o.throwing,
+  	allowingMissing : 0,
+  	allowingCycling : 0,
   }
 
-  // debugger;
-  let resolvedPath = self.pathResolveLinkFull( o2 );
-  // debugger;
+  let resolvedPath = self.pathResolveLinkFull( o2 ); /* xxx qqq : add option sync */
 
-  // if( o2.result[ o2.result.length - 1 ] === null )
   if( resolvedPath === null )
   {
     if( o.throwing )
@@ -1556,19 +1542,6 @@ function statRead_body( o )
       return new _.Consequence().give( null );
     }
   }
-
-  // o.filePath = self.pathResolveLinkFull( o2 );
-  //
-  // if( o.filePath === null )
-  // {
-  //   if( o.sync )
-  //   return null;
-  //   return new _.Consequence().give( null );
-  // }
-
-  // let o2 = _.mapOnly( o, self.statReadAct.defaults );
-  // let result = self.statReadAct( o2 );
-  // let result = o2.stat;
 
   if( o.sync )
   {

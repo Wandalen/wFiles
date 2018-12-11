@@ -31467,12 +31467,14 @@ function statReadExperiment( test )
   {
     debugger
     self.provider.statRead({ filePath : srcPath, throwing : 1 });
+    debugger;
   })
 
   //
 
-  var got = self.provider.statRead({ filePath : srcPath, throwing : 0 });
-  test.identical( got, null )
+  // var got = self.provider.statRead({ filePath : srcPath, throwing : 0 });
+  // test.identical( got, null );
+
 }
 
 
@@ -31615,7 +31617,6 @@ var Self =
     pathResolveTextLink : pathResolveTextLink,
 
     fileCopyExperiment : fileCopyExperiment,
-
     statReadExperiment : statReadExperiment,
 
   },

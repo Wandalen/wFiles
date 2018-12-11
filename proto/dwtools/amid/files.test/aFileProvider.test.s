@@ -18862,7 +18862,7 @@ function softLinkMakeAndResolve( test )
   test.identical( stat, null );
 
   var resolved = self.provider.pathResolveSoftLink( pathToResolve );
-  var expected = self.provider.path.join( dirPath, 'file' );
+  var expected = pathToResolve;
   test.identical( resolved, expected );
 }
 

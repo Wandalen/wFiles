@@ -23107,18 +23107,87 @@ function dirIsEmpty( test )
 
   //
 
+  test.case = 'textlink to file';
+  self.provider.filesDelete( filePath );
+  var src = filePath + '_';
+  self.provider.fileWrite( src, '' );
+  self.provider.textLink( filePath, src );
+  test.identical( self.provider.dirIsEmpty( filePath ), false );
+
+  //
+
   test.case = 'softLink empty dir';
   self.provider.filesDelete( filePath );
   var src = filePath + '_';
   self.provider.dirMake( src );
   self.provider.softLink( filePath, src );
-  self.provider.fieldSet( 'resolvingSoftLink', 0 );
   test.identical( self.provider.dirIsEmpty( filePath ), false );
-  self.provider.fieldReset( 'resolvingSoftLink', 0 );
-  self.provider.fieldSet( 'resolvingSoftLink', 1 );
-  debugger
-  test.identical( self.provider.dirIsEmpty( filePath ), true );
-  self.provider.fieldReset( 'resolvingSoftLink', 1 );
+
+  //
+
+  test.case = 'textlink to empty dir';
+  self.provider.filesDelete( filePath );
+  var src = filePath + '_';
+  self.provider.dirMake( src );
+  self.provider.textLink( filePath, src );
+  test.identical( self.provider.dirIsEmpty( filePath ), false );
+
+  test.case = 'softLink empty dir';
+  self.provider.filesDelete( filePath );
+  var src = filePath + '_';
+  self.provider.dirMake( src );
+  self.provider.softLink( filePath, src );
+
+  self.provider.fieldPush( 'resolvingSoftLink', 0 );
+  test.identical( self.provider.resolvedDirIsEmpty( filePath ), false );
+  self.provider.fieldPop( 'resolvingSoftLink', 0 );
+
+  self.provider.fieldPush( 'resolvingSoftLink', 1 );
+  test.identical( self.provider.resolvedDirIsEmpty( filePath ), true );
+  self.provider.fieldPop( 'resolvingSoftLink', 1 );
+
+  //
+
+  test.case = 'textlink empty dir';
+  self.provider.filesDelete( filePath );
+  var src = filePath + '_';
+  self.provider.dirMake( src );
+  self.provider.textLink( filePath, src );
+
+  self.provider.fieldPush( 'usingTextLink', 0 );
+
+  self.provider.fieldPush( 'resolvingTextLink', 0 );
+  test.identical( self.provider.resolvedDirIsEmpty( filePath ), false );
+  self.provider.fieldPop( 'resolvingTextLink', 0 );
+
+  self.provider.fieldPush( 'resolvingTextLink', 1 );
+  test.identical( self.provider.resolvedDirIsEmpty( filePath ), false );
+  self.provider.fieldPop( 'resolvingTextLink', 1 );
+
+  self.provider.fieldPop( 'usingTextLink', 0 );
+
+  //
+
+  test.case = 'textlink empty dir';
+  self.provider.filesDelete( filePath );
+  var src = filePath + '_';
+  self.provider.dirMake( src );
+  self.provider.textLink( filePath, src );
+
+  self.provider.fieldPush( 'usingTextLink', 1 );
+
+  self.provider.fieldPush( 'resolvingTextLink', 0 );
+  test.identical( self.provider.resolvedDirIsEmpty( filePath ), false );
+  self.provider.fieldPop( 'resolvingTextLink', 0 );
+
+  self.provider.fieldPush( 'resolvingTextLink', 1 );
+  test.identical( self.provider.resolvedDirIsEmpty( filePath ), true );
+  self.provider.fieldPop( 'resolvingTextLink', 1 );
+
+  self.provider.fieldPop( 'usingTextLink', 1 );
+
+
+
 };
 
 //

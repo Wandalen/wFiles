@@ -3593,8 +3593,10 @@ function resolvedDirIsEmpty( filePath )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  if( self.resolvedIsDir( filePath ) )
-  return !self.dirRead( filePath ).length;
+  let o = { filePath : filePath };
+
+  if( self.resolvedIsDir( o ) )
+  return !self.dirRead( o.filePath ).length;
 
   return false;
 }

@@ -30669,256 +30669,257 @@ function pathResolveLinkFull( test )
 
   self.provider.fieldPop( 'usingTextLink', true );
 
-  // /* chain, resolvingHeadDirect : [ 0, 1 ] */
+  /* chain, resolvingHeadDirect : [ 0, 1 ], resolvingHeadReverse : 0 */
 
-  // var o1 =
-  // {
-  //   resolvingSoftLink : 1,
-  //   resolvingTextLink : 1,
-  //   allowingMissing : 1,
-  //   resolvingHeadDirect : 0,
-  //   resolvingHeadReverse : 0,
-  //   throwing : 1
-  // }
+  var o1 =
+  {
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    allowingMissing : 1,
+    resolvingHeadDirect : 0,
+    resolvingHeadReverse : 0,
+    throwing : 1
+  }
 
-  // test.case = 'two soft links in path';
-  // self.provider.filesDelete( _.path.dir( filePath ) );
-  // self.provider.fileWrite( filePath, filePath );
-  // self.provider.softLink( linkPath, '..' );
-  // self.provider.softLink( linkPath2, '../file' );
-  // var o = _.mapExtend( null, o1, { filePath : path.join( dir, 'link/link2' ) , preservingRelative : 1, resolvingHeadDirect : 0 } );
-  // var got = self.provider.pathResolveLinkFull( o );
-  // var expected = path.join( dir, 'link/file' );
-  // test.identical( got,expected )
+  test.case = 'two soft links in path';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.softLink( linkPath, '..' );
+  self.provider.softLink( linkPath2, '../file' );
+  var o = _.mapExtend( null, o1, { filePath : path.join( dir, 'link/link2' ) , preservingRelative : 1, resolvingHeadDirect : 0, resolvingHeadReverse : 0 } );
+  var got = self.provider.pathResolveLinkFull( o );
+  var expected = path.join( dir, 'link/file' );
+  test.identical( got,expected )
 
-  // //
+  //
 
-  // test.case = 'two soft links in path';
-  // self.provider.filesDelete( _.path.dir( filePath ) );
-  // self.provider.fileWrite( filePath, filePath );
-  // self.provider.softLink( linkPath, '..' );
-  // self.provider.softLink( linkPath2, '../file' );
-  // var o = _.mapExtend( null, o1, { filePath : path.join( dir, 'link/link2' ) , preservingRelative : 1, resolvingHeadDirect : 1 } );
-  // debugger
-  // var got = self.provider.pathResolveLinkFull( o );
-  // test.identical( got,filePath )
+  test.case = 'two soft links in path';
+  self.provider.filesDelete( _.path.dir( filePath ) );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.softLink( linkPath, '..' );
+  self.provider.softLink( linkPath2, '../file' );
+  var o = _.mapExtend( null, o1, { filePath : path.join( dir, 'link/link2' ) , preservingRelative : 1, resolvingHeadDirect : 0, resolvingHeadReverse : 1 } );
+  var got = self.provider.pathResolveLinkFull( o );
+  var expected = filePath;
+  test.identical( got,expected );
 
-  // //
+  //
 
-  // test.case = 'several absolute soft links in path';
-  // var dirPath = _.path.dir( filePath );
-  // var dirPath1 = _.path.join( dirPath, 'dir1' );
-  // var dirPath2 = _.path.join( dirPath, 'dir2' );
-  // var pathToFile = _.path.join( dirPath, 'file' );
-  // var linkInDir = _.path.join( dirPath, 'linkToDir1' );
-  // var linkInDir1 = _.path.join( dirPath1, 'linkToDir2' );
-  // var linkInDir2 = _.path.join( dirPath2, 'linkToFile' );
-  // self.provider.filesDelete( dirPath );
-  // self.provider.dirMake( dirPath );
-  // self.provider.dirMake( dirPath1 );
-  // self.provider.dirMake( dirPath2 );
-  // self.provider.fileWrite( pathToFile,pathToFile );
-  // self.provider.softLink( linkInDir, dirPath1 );
-  // self.provider.softLink( linkInDir1, dirPath2 );
-  // self.provider.softLink( linkInDir2, pathToFile );
+  test.case = 'several absolute soft links in path';
+  var dirPath = _.path.dir( filePath );
+  var dirPath1 = _.path.join( dirPath, 'dir1' );
+  var dirPath2 = _.path.join( dirPath, 'dir2' );
+  var pathToFile = _.path.join( dirPath, 'file' );
+  var linkInDir = _.path.join( dirPath, 'linkToDir1' );
+  var linkInDir1 = _.path.join( dirPath1, 'linkToDir2' );
+  var linkInDir2 = _.path.join( dirPath2, 'linkToFile' );
+  self.provider.filesDelete( dirPath );
+  self.provider.dirMake( dirPath );
+  self.provider.dirMake( dirPath1 );
+  self.provider.dirMake( dirPath2 );
+  self.provider.fileWrite( pathToFile,pathToFile );
+  self.provider.softLink( linkInDir, dirPath1 );
+  self.provider.softLink( linkInDir1, dirPath2 );
+  self.provider.softLink( linkInDir2, pathToFile );
 
-  // /*
-  //   dir :
-  //     dir1 :
-  //       linkToDir2
-  //     dir2 :
-  //       linkToFile
-  //     linkToDir1
-  //     file
+  /*
+    dir :
+      dir1 :
+        linkToDir2
+      dir2 :
+        linkToFile
+      linkToDir1
+      file
 
-  //   path : 'dir/linkToDir1/linkToDir2/linkToFile' -> 'dir/file'
-  // */
+    path : 'dir/linkToDir1/linkToDir2/linkToFile' -> 'dir/file'
+  */
 
-  // var testPath = _.path.join( dirPath, 'linkToDir1/linkToDir2/linkToFile' )
-  // var o = _.mapExtend( null, o1, { filePath : testPath , preservingRelative : 1, resolvingHeadDirect : 0 } );
-  // var got = self.provider.pathResolveLinkFull( o );
-  // test.identical( got,pathToFile )
+  var testPath = _.path.join( dirPath, 'linkToDir1/linkToDir2/linkToFile' )
+  var o = _.mapExtend( null, o1, { filePath : testPath , preservingRelative : 1, resolvingHeadDirect : 0, resolvingHeadReverse : 0 } );
+  var got = self.provider.pathResolveLinkFull( o );
+  test.identical( got,_.path.join( dirPath, pathToFile ) );
 
-  // //
+  //
 
-  // test.case = 'several absolute soft links in path';
-  // var dirPath = _.path.dir( filePath );
-  // var dirPath1 = _.path.join( dirPath, 'dir1' );
-  // var dirPath2 = _.path.join( dirPath, 'dir2' );
-  // var pathToFile = _.path.join( dirPath, 'file' );
-  // var linkInDir = _.path.join( dirPath, 'linkToDir1' );
-  // var linkInDir1 = _.path.join( dirPath1, 'linkToDir2' );
-  // var linkInDir2 = _.path.join( dirPath2, 'linkToFile' );
-  // self.provider.filesDelete( dirPath );
-  // self.provider.dirMake( dirPath );
-  // self.provider.dirMake( dirPath1 );
-  // self.provider.dirMake( dirPath2 );
-  // self.provider.fileWrite( pathToFile,pathToFile );
-  // self.provider.softLink( linkInDir, dirPath1 );
-  // self.provider.softLink( linkInDir1, dirPath2 );
-  // self.provider.softLink( linkInDir2, pathToFile );
+  test.case = 'several absolute soft links in path';
+  var dirPath = _.path.dir( filePath );
+  var dirPath1 = _.path.join( dirPath, 'dir1' );
+  var dirPath2 = _.path.join( dirPath, 'dir2' );
+  var pathToFile = _.path.join( dirPath, 'file' );
+  var linkInDir = _.path.join( dirPath, 'linkToDir1' );
+  var linkInDir1 = _.path.join( dirPath1, 'linkToDir2' );
+  var linkInDir2 = _.path.join( dirPath2, 'linkToFile' );
+  self.provider.filesDelete( dirPath );
+  self.provider.dirMake( dirPath );
+  self.provider.dirMake( dirPath1 );
+  self.provider.dirMake( dirPath2 );
+  self.provider.fileWrite( pathToFile,pathToFile );
+  self.provider.softLink( linkInDir, dirPath1 );
+  self.provider.softLink( linkInDir1, dirPath2 );
+  self.provider.softLink( linkInDir2, pathToFile );
 
-  // /*
-  //   dir :
-  //     dir1 :
-  //       linkToDir2
-  //     dir2 :
-  //       linkToFile
-  //     linkToDir1
-  //     file
+  /*
+    dir :
+      dir1 :
+        linkToDir2
+      dir2 :
+        linkToFile
+      linkToDir1
+      file
 
-  //   path : 'dir/linkToDir1/linkToDir2/linkToFile' -> 'dir/file'
-  // */
+    path : 'dir/linkToDir1/linkToDir2/linkToFile' -> 'dir/file'
+  */
 
-  // var testPath = _.path.join( dirPath, 'linkToDir1/linkToDir2/linkToFile' )
-  // var o = _.mapExtend( null, o1, { filePath : testPath , preservingRelative : 1, resolvingHeadDirect : 1 } );
-  // var got = self.provider.pathResolveLinkFull( o );
-  // test.identical( got,pathToFile );
+  var testPath = _.path.join( dirPath, 'linkToDir1/linkToDir2/linkToFile' )
+  var o = _.mapExtend( null, o1, { filePath : testPath , preservingRelative : 1, resolvingHeadDirect : 0, resolvingHeadReverse : 1 } );
+  var got = self.provider.pathResolveLinkFull( o );
+  test.identical( got,pathToFile );
 
-  // //
+  //
 
-  // test.case = 'several relative soft links in path';
-  // var dirPath = _.path.dir( filePath );
-  // var dirPath1 = _.path.join( dirPath, 'dir1' );
-  // var dirPath2 = _.path.join( dirPath, 'dir2' );
-  // var pathToFile = _.path.join( dirPath, 'file' );
-  // var linkInDir = _.path.join( dirPath, 'linkToDir1' );
-  // var linkInDir1 = _.path.join( dirPath1, 'linkToDir2' );
-  // var linkInDir2 = _.path.join( dirPath2, 'linkToFile' );
-  // self.provider.filesDelete( dirPath );
-  // self.provider.dirMake( dirPath );
-  // self.provider.dirMake( dirPath1 );
-  // self.provider.dirMake( dirPath2 );
-  // self.provider.fileWrite( pathToFile,pathToFile );
-  // self.provider.softLink( linkInDir, self.provider.path.relative( linkInDir, dirPath1 ) );
-  // self.provider.softLink( linkInDir1, self.provider.path.relative( linkInDir1, dirPath2 ) );
-  // self.provider.softLink( linkInDir2, self.provider.path.relative( linkInDir2, pathToFile ) );
+  test.case = 'several relative soft links in path';
+  var dirPath = _.path.dir( filePath );
+  var dirPath1 = _.path.join( dirPath, 'dir1' );
+  var dirPath2 = _.path.join( dirPath, 'dir2' );
+  var pathToFile = _.path.join( dirPath, 'file' );
+  var linkInDir = _.path.join( dirPath, 'linkToDir1' );
+  var linkInDir1 = _.path.join( dirPath1, 'linkToDir2' );
+  var linkInDir2 = _.path.join( dirPath2, 'linkToFile' );
+  self.provider.filesDelete( dirPath );
+  self.provider.dirMake( dirPath );
+  self.provider.dirMake( dirPath1 );
+  self.provider.dirMake( dirPath2 );
+  self.provider.fileWrite( pathToFile,pathToFile );
+  self.provider.softLink( linkInDir, self.provider.path.relative( linkInDir, dirPath1 ) );
+  self.provider.softLink( linkInDir1, self.provider.path.relative( linkInDir1, dirPath2 ) );
+  self.provider.softLink( linkInDir2, self.provider.path.relative( linkInDir2, pathToFile ) );
 
-  // /*
-  //   dir :
-  //     dir1 :
-  //       linkToDir2
-  //     dir2 :
-  //       linkToFile
-  //     linkToDir1
-  //     file
+  /*
+    dir :
+      dir1 :
+        linkToDir2
+      dir2 :
+        linkToFile
+      linkToDir1
+      file
 
-  //   path : 'dir/linkToDir1/linkToDir2/linkToFile' -> 'dir/file'
-  // */
+    path : 'dir/linkToDir1/linkToDir2/linkToFile' -> 'dir/file'
+  */
 
-  // var testPath = _.path.join( dirPath, 'linkToDir1/linkToDir2/linkToFile' )
-  // var o = _.mapExtend( null, o1, { filePath : testPath , preservingRelative : 1, resolvingHeadDirect : 0 } );
-  // var got = self.provider.pathResolveLinkFull( o );
-  // test.identical( got,null );
+  var testPath = _.path.join( dirPath, 'linkToDir1/linkToDir2/linkToFile' )
+  var o = _.mapExtend( null, o1, { filePath : testPath , preservingRelative : 1, resolvingHeadDirect : 0, resolvingHeadReverse : 0 } );
+  var got = self.provider.pathResolveLinkFull( o );
+  var expected = _.path.join( dirPath, 'linkToDir1/file' );
+  test.identical( got,expected );
 
 
-  // //
+  //
 
-  // test.case = 'several relative soft links in path';
-  // var dirPath = _.path.dir( filePath );
-  // var dirPath1 = _.path.join( dirPath, 'dir1' );
-  // var dirPath2 = _.path.join( dirPath, 'dir2' );
-  // var pathToFile = _.path.join( dirPath, 'file' );
-  // var linkInDir = _.path.join( dirPath, 'linkToDir1' );
-  // var linkInDir1 = _.path.join( dirPath1, 'linkToDir2' );
-  // var linkInDir2 = _.path.join( dirPath2, 'linkToFile' );
-  // self.provider.filesDelete( dirPath );
-  // self.provider.dirMake( dirPath );
-  // self.provider.dirMake( dirPath1 );
-  // self.provider.dirMake( dirPath2 );
-  // self.provider.fileWrite( pathToFile,pathToFile );
-  // self.provider.softLink( linkInDir, self.provider.path.relative( linkInDir, dirPath1 ) );
-  // self.provider.softLink( linkInDir1, self.provider.path.relative( linkInDir1, dirPath2 ) );
-  // self.provider.softLink( linkInDir2, self.provider.path.relative( linkInDir2, pathToFile ) );
+  test.case = 'several relative soft links in path';
+  var dirPath = _.path.dir( filePath );
+  var dirPath1 = _.path.join( dirPath, 'dir1' );
+  var dirPath2 = _.path.join( dirPath, 'dir2' );
+  var pathToFile = _.path.join( dirPath, 'file' );
+  var linkInDir = _.path.join( dirPath, 'linkToDir1' );
+  var linkInDir1 = _.path.join( dirPath1, 'linkToDir2' );
+  var linkInDir2 = _.path.join( dirPath2, 'linkToFile' );
+  self.provider.filesDelete( dirPath );
+  self.provider.dirMake( dirPath );
+  self.provider.dirMake( dirPath1 );
+  self.provider.dirMake( dirPath2 );
+  self.provider.fileWrite( pathToFile,pathToFile );
+  self.provider.softLink( linkInDir, self.provider.path.relative( linkInDir, dirPath1 ) );
+  self.provider.softLink( linkInDir1, self.provider.path.relative( linkInDir1, dirPath2 ) );
+  self.provider.softLink( linkInDir2, self.provider.path.relative( linkInDir2, pathToFile ) );
 
-  // /*
-  //   dir :
-  //     dir1 :
-  //       linkToDir2
-  //     dir2 :
-  //       linkToFile
-  //     linkToDir1
-  //     file
+  /*
+    dir :
+      dir1 :
+        linkToDir2
+      dir2 :
+        linkToFile
+      linkToDir1
+      file
 
-  //   path : 'dir/linkToDir1/linkToDir2/linkToFile' -> 'dir/file'
-  // */
+    path : 'dir/linkToDir1/linkToDir2/linkToFile' -> 'dir/file'
+  */
 
-  // var testPath = _.path.join( dirPath, 'linkToDir1/linkToDir2/linkToFile' )
-  // var o = _.mapExtend( null, o1, { filePath : testPath , preservingRelative : 1, resolvingHeadDirect : 1 } );
-  // var got = self.provider.pathResolveLinkFull( o );
-  // test.identical( got,pathToFile );
+  var testPath = _.path.join( dirPath, 'linkToDir1/linkToDir2/linkToFile' )
+  var o = _.mapExtend( null, o1, { filePath : testPath , preservingRelative : 1, resolvingHeadDirect : 1, resolvingHeadReverse : 1 } );
+  var got = self.provider.pathResolveLinkFull( o );
+  test.identical( got,pathToFile );
 
-  // //
+  //
 
-  // test.case = 'several absolute text links in path';
-  // var dirPath = _.path.dir( filePath );
-  // var dirPath1 = _.path.join( dirPath, 'dir1' );
-  // var dirPath2 = _.path.join( dirPath, 'dir2' );
-  // var pathToFile = _.path.join( dirPath, 'file' );
-  // var linkInDir = _.path.join( dirPath, 'linkToDir1' );
-  // var linkInDir1 = _.path.join( dirPath1, 'linkToDir2' );
-  // var linkInDir2 = _.path.join( dirPath2, 'linkToFile' );
-  // self.provider.filesDelete( dirPath );
-  // self.provider.dirMake( dirPath );
-  // self.provider.dirMake( dirPath1 );
-  // self.provider.dirMake( dirPath2 );
-  // self.provider.fileWrite( pathToFile,pathToFile );
-  // self.provider.textLink( linkInDir, dirPath1 );
-  // self.provider.textLink( linkInDir1, dirPath2 );
-  // self.provider.textLink( linkInDir2, pathToFile );
+  test.case = 'several absolute text links in path';
+  var dirPath = _.path.dir( filePath );
+  var dirPath1 = _.path.join( dirPath, 'dir1' );
+  var dirPath2 = _.path.join( dirPath, 'dir2' );
+  var pathToFile = _.path.join( dirPath, 'file' );
+  var linkInDir = _.path.join( dirPath, 'linkToDir1' );
+  var linkInDir1 = _.path.join( dirPath1, 'linkToDir2' );
+  var linkInDir2 = _.path.join( dirPath2, 'linkToFile' );
+  self.provider.filesDelete( dirPath );
+  self.provider.dirMake( dirPath );
+  self.provider.dirMake( dirPath1 );
+  self.provider.dirMake( dirPath2 );
+  self.provider.fileWrite( pathToFile,pathToFile );
+  self.provider.textLink( linkInDir, dirPath1 );
+  self.provider.textLink( linkInDir1, dirPath2 );
+  self.provider.textLink( linkInDir2, pathToFile );
 
-  // /*
-  //   dir :
-  //     dir1 :
-  //       linkToDir2
-  //     dir2 :
-  //       linkToFile
-  //     linkToDir1
-  //     file
+  /*
+    dir :
+      dir1 :
+        linkToDir2
+      dir2 :
+        linkToFile
+      linkToDir1
+      file
 
-  //   path : 'dir/linkToDir1/linkToDir2/linkToFile' -> 'dir/file'
-  // */
+    path : 'dir/linkToDir1/linkToDir2/linkToFile' -> 'dir/file'
+  */
 
-  // var testPath = _.path.join( dirPath, 'linkToDir1/linkToDir2/linkToFile' )
-  // var o = _.mapExtend( null, o1, { filePath : testPath , preservingRelative : 1, resolvingHeadDirect : 1 } );
-  // var got = self.provider.pathResolveLinkFull( o );
-  // test.identical( got,pathToFile );
+  var testPath = _.path.join( dirPath, 'linkToDir1/linkToDir2/linkToFile' )
+  var o = _.mapExtend( null, o1, { filePath : testPath , preservingRelative : 1, resolvingHeadDirect : 1, resolvingHeadReverse : 0 } );
+  var got = self.provider.pathResolveLinkFull( o );
+  test.identical( got,testPath );
 
-  // //
+  //
 
-  // test.case = 'several absolute text links in path';
-  // var dirPath = _.path.dir( filePath );
-  // var dirPath1 = _.path.join( dirPath, 'dir1' );
-  // var dirPath2 = _.path.join( dirPath, 'dir2' );
-  // var pathToFile = _.path.join( dirPath, 'file' );
-  // var linkInDir = _.path.join( dirPath, 'linkToDir1' );
-  // var linkInDir1 = _.path.join( dirPath1, 'linkToDir2' );
-  // var linkInDir2 = _.path.join( dirPath2, 'linkToFile' );
-  // self.provider.filesDelete( dirPath );
-  // self.provider.dirMake( dirPath );
-  // self.provider.dirMake( dirPath1 );
-  // self.provider.dirMake( dirPath2 );
-  // self.provider.fileWrite( pathToFile,pathToFile );
-  // self.provider.textLink( linkInDir, dirPath1 );
-  // self.provider.textLink( linkInDir1, dirPath2 );
-  // self.provider.textLink( linkInDir2, pathToFile );
+  test.case = 'several absolute text links in path';
+  var dirPath = _.path.dir( filePath );
+  var dirPath1 = _.path.join( dirPath, 'dir1' );
+  var dirPath2 = _.path.join( dirPath, 'dir2' );
+  var pathToFile = _.path.join( dirPath, 'file' );
+  var linkInDir = _.path.join( dirPath, 'linkToDir1' );
+  var linkInDir1 = _.path.join( dirPath1, 'linkToDir2' );
+  var linkInDir2 = _.path.join( dirPath2, 'linkToFile' );
+  self.provider.filesDelete( dirPath );
+  self.provider.dirMake( dirPath );
+  self.provider.dirMake( dirPath1 );
+  self.provider.dirMake( dirPath2 );
+  self.provider.fileWrite( pathToFile,pathToFile );
+  self.provider.textLink( linkInDir, dirPath1 );
+  self.provider.textLink( linkInDir1, dirPath2 );
+  self.provider.textLink( linkInDir2, pathToFile );
 
-  // /*
-  //   dir :
-  //     dir1 :
-  //       linkToDir2
-  //     dir2 :
-  //       linkToFile
-  //     linkToDir1
-  //     file
+  /*
+    dir :
+      dir1 :
+        linkToDir2
+      dir2 :
+        linkToFile
+      linkToDir1
+      file
 
-  //   path : 'dir/linkToDir1/linkToDir2/linkToFile' -> 'dir/file'
-  // */
+    path : 'dir/linkToDir1/linkToDir2/linkToFile' -> 'dir/file'
+  */
 
-  // var testPath = _.path.join( dirPath, 'linkToDir1/linkToDir2/linkToFile' )
-  // var o = _.mapExtend( null, o1, { filePath : testPath , preservingRelative : 1, resolvingHeadDirect : 0 } );
-  // var got = self.provider.pathResolveLinkFull( o );
-  // test.identical( got,null );
+  var testPath = _.path.join( dirPath, 'linkToDir1/linkToDir2/linkToFile' )
+  var o = _.mapExtend( null, o1, { filePath : testPath , preservingRelative : 1, resolvingHeadDirect : 0, resolvingHeadReverse : 1 } );
+  var got = self.provider.pathResolveLinkFull( o );
+  test.identical( got,pathToFile );
 
 }
 

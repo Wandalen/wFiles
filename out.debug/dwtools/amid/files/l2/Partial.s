@@ -805,17 +805,27 @@ function pathResolveLinkFull_body( o )
     because resolving does not guarantee reading stat
   */
 
-  if( !o.stat )
-  o.stat = self.statReadAct
-  ({
-    filePath : result,
-    throwing : 0,
-    resolvingSoftLink : 0,
-    sync : 1,
-  });
+  // if( !o.stat )
+  // o.stat = self.statReadAct
+  // ({
+  //   filePath : result,
+  //   throwing : 0,
+  //   resolvingSoftLink : 0,
+  //   sync : 1,
+  // });
 
   if( !o.resolvingSoftLink && ( !o.resolvingTextLink || !self.usingTextLink ) )
   {
+
+    if( !o.stat )
+    o.stat = self.statReadAct
+    ({
+      filePath : result,
+      throwing : 0,
+      resolvingSoftLink : 0,
+      sync : 1,
+    });
+
     if( o.stat )
     return result;
 
@@ -832,8 +842,8 @@ function pathResolveLinkFull_body( o )
     return result;
   }
 
-
-  if( !o.stat && o.resolvingHeadDirect )
+  // if( !o.stat && o.resolvingHeadDirect )
+  if( o.resolvingHeadDirect )
   {
 
     let o2 =
@@ -845,13 +855,24 @@ function pathResolveLinkFull_body( o )
       allowingMissing : o.allowingMissing,
       allowingCycling: o.allowingCycling,
       throwing : o.throwing,
+      // stat : o.stat,
     }
 
     result = self.pathResolveLinkHeadDirect.body.call( self, o2 );
+    // o.stat = o2.stat;
 
   }
 
-  if( _.strEnds( o.filePath, 'experiment/linkToDir1/linkToDir2/linkToFile' ) )
+  // if( !o.stat )
+  o.stat = self.statReadAct
+  ({
+    filePath : result,
+    throwing : 0,
+    resolvingSoftLink : 0,
+    sync : 1,
+  });
+
+  if( _.strEnds( o.filePath, 'experiment/linkToDir1/linkToTerminal' ) )
   debugger;
 
   if( result )
@@ -1181,6 +1202,9 @@ function pathResolveLinkHeadDirect_body( o )
 }
 
 _.routineExtend( pathResolveLinkHeadDirect_body, _pathResolveLink );
+
+var defaults = pathResolveLinkHeadDirect_body.defaults;
+// defaults.stat = null;
 
 //
 

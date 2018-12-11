@@ -1211,6 +1211,9 @@ function pathResolveLinkHeadReverse_body( o )
 
   // console.log( 'pathResolveLinkHeadReverse', o.filePath );
 
+  if( o.filePath === 'extract+src:///src/a1' )
+  debugger;
+
   while( !path.isRoot( prefixPath ) )
   {
     let o2 = _.mapExtend( null, o );
@@ -1219,8 +1222,11 @@ function pathResolveLinkHeadReverse_body( o )
     prefixPath = self.pathResolveLinkTail( o2 );
     postfixPath = path.join( path.fullName( prefixPath ), postfixPath );
     prefixPath = path.dir( prefixPath );
-  _.assert( !_.strBegins( prefixPath, '/..' ) && !_.strHas( prefixPath, '///..' ) )
+    _.assert( !_.strBegins( prefixPath, '/..' ) && !_.strHas( prefixPath, '///..' ) )
   }
+
+  if( o.filePath === 'extract+src:///src/a1' )
+  debugger;
 
   let result = '/' + postfixPath;
 

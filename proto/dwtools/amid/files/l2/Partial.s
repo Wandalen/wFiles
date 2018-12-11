@@ -5050,7 +5050,7 @@ function _link_functor( gen )
           resolvingTextLink : o.resolvingDstTextLink,
         }
         o.dstPath = self.pathResolveLinkFull( o2 );
-        c.dstStat = o2.stat;
+        c.dstStat = o2.stat; /* it's ok */
       }
 
       // o.dstPath = self.pathResolveLinkFull

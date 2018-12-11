@@ -17272,7 +17272,6 @@ function softLinkChain( test )
   var path = provider.path;
   // var dir = path.dirTempOpen();
   var dir = test.context.pathFor( 'written/softLinkChain' );
-  // var dir = path.dirTempOpen( path.join( __dirname, 'softLinkChain' ) ); // xxx
 
   debugger;
 
@@ -30365,9 +30364,7 @@ function pathResolveLinkFull( test )
   /* - */
 
   test.case = 'not existing file';
-  debugger;
   self.provider.filesDelete( path.dir( filePath ) );
-  debugger;
 
   var got = self.provider.pathResolveLinkFull
   ({
@@ -31408,7 +31405,7 @@ function fileCopyExperiment( test )
 {
   let self = this;
 
-  let workDir = test.context.pathFor( 'written/fileCopySoftLinkResolving' );
+  let workDir = test.context.pathFor( 'written/fileCopyExperiment' );
   let srcPath = self.provider.path.join( workDir, 'src' );
   let dstPath = self.provider.path.join( workDir, 'dst' );
 
@@ -31442,13 +31439,15 @@ function fileCopyExperiment( test )
       allowingMissing : 0,
       throwing : 0
   });
+  debugger;
   test.identical( got, true );
-  test.identical( o.srcPath, srcPath );
-  test.identical( o.dstPath, dstPath );
+  test.identical( srcPath, srcPath );
+  test.identical( dstPath, dstPath );
   test.is( self.provider.isSoftLink( srcPath ) );
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), '../src' );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), '../src' );
+
 }
 
 // --

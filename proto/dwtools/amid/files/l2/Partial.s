@@ -349,12 +349,6 @@ function _preSrcDstPathWithoutProviderDefaults( routine, args )
   if( path.like( args[ 0 ] ) || path.like( args[ 1 ] ) )
   o = { dstPath : args[ 0 ], srcPath : args[ 1 ] }
 
-  // let o = args[ 0 ];
-  // if( path.like( o ) )
-  // o = { filePath : path.from( o ) };
-  // else if( _.arrayIs( o ) )
-  // o = { filePath : o };
-
   _.routineOptions( routine, o );
 
   if( o.dstPath !== null )

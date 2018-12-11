@@ -18900,69 +18900,6 @@ function softLinkMakeAndResolve( test )
   var resolved = self.provider.pathResolveSoftLink( pathToResolve );
   var expected = pathToResolve;
   test.identical( resolved, expected );
-
-  //
-
-  test.case = 'path contains relative link to dir with terminal'
-  self.provider.filesDelete( workDir );
-  var dirPath = self.pathFor( 'written/softLinkMakeAndResolve/dir' );
-  var fileInDir = self.pathFor( 'written/softLinkMakeAndResolve/dir/file' );
-  self.provider.fileWrite( fileInDir, fileInDir );
-  self.provider.softLink({ dstPath : linkPath, srcPath : '../dir', allowingMissing : 1 });
-  var pathToResolve = self.provider.path.join( workDir, 'link/file' );
-
-  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  test.is( self.provider.fileExists( pathToResolve ) );
-  else
-  test.is( !self.provider.fileExists( pathToResolve ) );
-
-  var stat = self.provider.statRead( pathToResolve );
-  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  test.is( stat.isFile() )
-  else
-  test.identical( stat, null );
-
-  var resolved = self.provider.pathResolveSoftLink( pathToResolve );
-  var expected = pathToResolve;
-  test.identical( resolved, expected );
-
-  //
-
-  test.case = 'several absolute soft links in path';
-  self.provider.filesDelete( workDir );
-  var dirPath1 = _.path.join( dirPath, 'dir1' );
-  var dirPath2 = _.path.join( dirPath, 'dir2' );
-  var pathToFile = _.path.join( dirPath, 'file' );
-  var linkInDir = _.path.join( dirPath, 'linkToDir1' );
-  var linkInDir1 = _.path.join( dirPath1, 'linkToDir2' );
-  var linkInDir2 = _.path.join( dirPath2, 'linkToFile' );
-  self.provider.filesDelete( dirPath );
-  self.provider.dirMake( dirPath );
-  self.provider.dirMake( dirPath1 );
-  self.provider.dirMake( dirPath2 );
-  self.provider.fileWrite( pathToFile,pathToFile );
-  self.provider.softLink( linkInDir, dirPath1 );
-  self.provider.softLink( linkInDir1, dirPath2 );
-  self.provider.softLink( linkInDir2, pathToFile );
-
-  /*
-    dir :
-      dir1 :
-        linkToDir2
-      dir2 :
-        linkToFile
-      linkToDir1
-      file
-
-    path : 'dir/linkToDir1/linkToDir2/linkToFile' -> 'dir/file'
-  */
-
-  var testPath = _.path.join( dirPath, 'linkToDir1/linkToDir2/linkToFile' );
-  var got = self.provider.pathResolveSoftLink({ filePath : testPath });
-  var expected = filePath;
-  test.identical( got, expected );
-
-
 }
 
 //
@@ -28258,9 +28195,6 @@ function filesAreHardLinked( test )
   var fileRecord = self.provider.recordFactory().record( filePath );
   var linkRecord = self.provider.recordFactory().record( linkPath );
   var got = self.provider.filesAreHardLinked([ fileRecord, linkRecord ]);
-  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  test.identical( got, null );
-  else
   test.identical( got, true );
 
 };
@@ -31863,6 +31797,13 @@ experiment/linkToDir2
   debugger;
   test.identical( got, terminalPath );
 
+/*
+
+xxx : o = { filePath : path.s.from( o.filePath ) }
+
+
+*/
+
   /* - */
 
   // test.case = 'works only for hd, but not';
@@ -31886,84 +31827,6 @@ experiment/linkToDir2
   // var got = self.provider.pathResolveLinkFull( o );
   // test.identical( got, terminalPath );
 
-}
-
-//
-
-function experiment2( test )
-{
-  let self = this;
-
-  let path = self.provider.path;
-  let dirPath = test.context.pathFor( 'experiment' );
-
-  test.case = 'several absolute soft links in path';
-  self.provider.filesDelete( dirPath );
-  var dirPath1 = path.join( dirPath, 'dir1' );
-  var dirPath2 = path.join( dirPath, 'dir2' );
-  var pathToFile = path.join( dirPath, 'file' );
-  var linkInDir = path.join( dirPath, 'linkToDir1' );
-  var linkInDir1 = path.join( dirPath1, 'linkToDir2' );
-  var linkInDir2 = path.join( dirPath2, 'linkToFile' );
-  self.provider.dirMake( dirPath );
-  self.provider.dirMake( dirPath1 );
-  self.provider.dirMake( dirPath2 );
-  self.provider.fileWrite( pathToFile,pathToFile );
-  self.provider.softLink( linkInDir, dirPath1 );
-  self.provider.softLink( linkInDir1, dirPath2 );
-  self.provider.softLink( linkInDir2, pathToFile );
-
-  /*
-    dir :
-      dir1 :
-        linkToDir2
-      dir2 :
-        linkToFile
-      linkToDir1
-      file
-
-    path : 'dir/linkToDir1/linkToDir2/linkToFile' -> 'dir/file'
-  */
-
-  var testPath = path.join( dirPath, 'linkToDir1/linkToDir2/linkToFile' );
-  debugger
-  var got = self.provider.pathResolveSoftLink({ filePath : testPath });
-  test.identical( got, pathToFile );
-
-  //
-
-  test.case = 'several relative soft links in path';
-  self.provider.filesDelete( dirPath );
-  var dirPath1 = _.path.join( dirPath, 'dir1' );
-  var dirPath2 = _.path.join( dirPath, 'dir2' );
-  var pathToFile = _.path.join( dirPath, 'file' );
-  var linkInDir = _.path.join( dirPath, 'linkToDir1' );
-  var linkInDir1 = _.path.join( dirPath1, 'linkToDir2' );
-  var linkInDir2 = _.path.join( dirPath2, 'linkToFile' );
-  self.provider.dirMake( dirPath );
-  self.provider.dirMake( dirPath1 );
-  self.provider.dirMake( dirPath2 );
-  self.provider.fileWrite( pathToFile,pathToFile );
-  self.provider.softLink( linkInDir, self.provider.path.relative( linkInDir, dirPath1 ) );
-  self.provider.softLink( linkInDir1, self.provider.path.relative( linkInDir1, dirPath2 ) );
-  self.provider.softLink( linkInDir2, self.provider.path.relative( linkInDir2, pathToFile ) );
-
-  /*
-    dir :
-      dir1 :
-        linkToDir2
-      dir2 :
-        linkToFile
-      linkToDir1
-      file
-
-    path : 'dir/linkToDir1/linkToDir2/linkToFile' -> 'dir/file'
-  */
-
-  var testPath = _.path.join( dirPath, 'linkToDir1/linkToDir2/linkToFile' )
-  debugger
-  var got = self.provider.pathResolveSoftLink({ filePath : testPath });
-  test.identical( got, pathToFile );
 }
 
 // --
@@ -32106,7 +31969,6 @@ var Self =
     fileCopyExperiment : fileCopyExperiment,
     statReadExperiment : statReadExperiment,
     experiment : experiment,
-    experiment2 : experiment2
 
   },
 

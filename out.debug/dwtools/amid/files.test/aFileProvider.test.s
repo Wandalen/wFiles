@@ -31797,6 +31797,13 @@ experiment/linkToDir2
   debugger;
   test.identical( got, terminalPath );
 
+/*
+
+xxx : o = { filePath : path.s.from( o.filePath ) }
+
+
+*/
+
   /* - */
 
   // test.case = 'works only for hd, but not';

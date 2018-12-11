@@ -20,15 +20,17 @@ _.assert( !!Parent );
 
 function onSuiteBegin( test )
 {
-  this.testRootDirectory = _.path.dirTempOpen( _.path.join( __dirname, '../..'  ), 'Provider/HardDrive' );
+  let path = this.provider.path;
+  this.testRootDirectory = path.dirTempOpen( path.join( __dirname, '../..'  ), 'Provider/HardDrive' );
 }
 
 //
 
 function onSuiteEnd()
 {
+  let path = this.provider.path;
   _.assert( _.strEnds( this.testRootDirectory, 'Provider/HardDrive' ) );
-  _.path.dirTempClose( this.testRootDirectory );
+  path.dirTempClose( this.testRootDirectory );
 }
 
 // --

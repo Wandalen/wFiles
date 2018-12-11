@@ -988,7 +988,7 @@ function prefixesApply( o )
     let o2 = { basePath : 0, fixes : 0, onEach : filePathEach }
     filter.allPaths( o2 );
 
-    let o3 = { filePath : 0, stemPath : 0, fixes : 0, onEach : basePathEach }
+    let o3 = { filePath : 0, /*stemPath : 0,*/ fixes : 0, onEach : basePathEach }
     filter.allPaths( o3 );
   }
 
@@ -1131,12 +1131,16 @@ function allPaths( o )
   if( !each( filter.basePath, 'basePath' ) )
   return false;
 
-  if( o.stemPath )
-  if( !each( filter.stemPath, 'stemPath' ) )
-  return false;
+  // if( o.stemPath )
+  // if( !each( filter.stemPath, 'stemPath' ) )
+  // return false;
+  //
+  // if( o.filePath )
+  // if( !each( filter.inFilePath, 'inFilePath' ) )
+  // return false;
 
   if( o.filePath )
-  if( !each( filter.inFilePath, 'inFilePath' ) )
+  if( !each( filter.filePath, 'inFilePath' ) )
   return false;
 
   return true;
@@ -1223,7 +1227,7 @@ allPaths.defaults =
   onEach : null,
   fixes : 1,
   basePath : 1,
-  stemPath : 1,
+  // stemPath : 1,
   filePath : 1,
 }
 
@@ -1262,7 +1266,7 @@ isRelative.defaults =
 {
   fixes : 1,
   basePath : 1,
-  stemPath : 1,
+  // stemPath : 1,
   filePath : 1,
 }
 
@@ -1301,7 +1305,7 @@ sureRelative.defaults =
 {
   fixes : 1,
   basePath : 1,
-  stemPath : 1,
+  // stemPath : 1,
   filePath : 1,
 }
 
@@ -1344,7 +1348,7 @@ sureRelative.defaults =
 {
   fixes : 1,
   basePath : 1,
-  stemPath : 1,
+  // stemPath : 1,
   filePath : 1,
 }
 

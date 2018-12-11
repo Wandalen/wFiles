@@ -308,6 +308,8 @@ function _preFilePathVectorWithoutProviderDefaults( routine, args )
   o = { filePath : path.from( o ) };
   else if( _.arrayIs( o ) )
   o = { filePath : o };
+  else if( _.arrayIs( o.filePath ) )
+  o = { filePath : path.s.from( o.filePath ) }
 
   _.routineOptions( routine, o );
 

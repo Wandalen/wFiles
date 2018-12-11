@@ -821,7 +821,23 @@ function pathResolveLinkFull_body( o )
   });
 
   if( !o.resolvingSoftLink && ( !o.resolvingTextLink || !self.usingTextLink ) )
-  return result;
+  {
+    if( o.stat )
+    return result;
+
+    if( !o.allowingMissing )
+    {
+      result = null;
+      if( o.throwing )
+      {
+        debugger;
+        throw _.err( 'File does not exist', _.strQuote( o.filePath ) );
+      }
+    }
+
+    return result;
+  }
+
 
   if( _.strEnds( o.filePath, 'experiment/linkToDir1/linkToDir2/linkToFile' ) )
   debugger;

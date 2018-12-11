@@ -30533,6 +30533,45 @@ function pathResolveLinkFull( test )
     });
   })
 
+  test.shouldThrowError( () =>
+  {
+    self.provider.pathResolveLinkFull
+    ({
+       filePath : filePath,
+       allowingMissing : 0,
+       resolvingHeadDirect : 0,
+       resolvingHeadReverse : 0,
+       resolvingSoftLink : 0,
+       resolvingTextLink : 0,
+       throwing : 1,
+    });
+
+  })
+
+  var got = self.provider.pathResolveLinkFull
+  ({
+      filePath : filePath,
+      allowingMissing : 1,
+      resolvingHeadDirect : 0,
+      resolvingHeadReverse : 0,
+      resolvingSoftLink : 0,
+      resolvingTextLink : 0,
+      throwing : 1,
+  });
+  test.identical( got, filePath )
+
+  var got = self.provider.pathResolveLinkFull
+  ({
+      filePath : filePath,
+      allowingMissing : 0,
+      resolvingHeadDirect : 0,
+      resolvingHeadReverse : 0,
+      resolvingSoftLink : 0,
+      resolvingTextLink : 0,
+      throwing : 0,
+  });
+  test.identical( got, null );
+
   //
 
   test.case = 'absolute softlink to missing'

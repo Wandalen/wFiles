@@ -18805,36 +18805,69 @@ function softLinkMakeAndResolve( test )
   let linkPath = self.pathFor( 'written/softLinkMakeAndResolve/link' );
   let linkPath2 = self.pathFor( 'written/softLinkMakeAndResolve/link' );
 
+  test.case = 'absolute to missing'
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
   self.provider.softLink({ dstPath : linkPath, srcPath : filePath, allowingMissing : 1 });
   var resolved = self.provider.pathResolveSoftLink( linkPath );
   test.identical( resolved, filePath );
 
+  test.case = 'absolute to terminal'
   self.provider.filesDelete( workDir );
   self.provider.fileWrite( filePath,filePath );
   self.provider.softLink({ dstPath : linkPath, srcPath : filePath, allowingMissing : 1 });
   var resolved = self.provider.pathResolveSoftLink( linkPath );
   test.identical( resolved, filePath );
 
+  test.case = 'absolute to absolute to terminal'
+  self.provider.filesDelete( workDir );
+  self.provider.fileWrite( filePath,filePath );
+  self.provider.softLink({ dstPath : linkPath2, srcPath : filePath, allowingMissing : 1 });
+  self.provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissing : 1 });
+  var resolved = self.provider.pathResolveSoftLink( linkPath );
+  test.identical( resolved, linkPath2 );
+
+  test.case = 'absolute to dir'
+  self.provider.filesDelete( workDir );
+  self.provider.dirMake( workDir );
+  var dirPath = self.pathFor( 'written/softLinkMakeAndResolve/dir' );
+  self.provider.dirMake( dirPath );
+  self.provider.softLink({ dstPath : linkPath, srcPath : dirPath, allowingMissing : 1 });
+  var resolved = self.provider.pathResolveSoftLink( linkPath );
+  test.identical( resolved, dirPath );
+
+  test.case = 'relative to missing'
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
   self.provider.softLink({ dstPath : linkPath, srcPath : '../file', allowingMissing : 1 });
   var resolved = self.provider.pathResolveSoftLink( linkPath );
   test.identical( resolved, '../file' );
 
+  test.case = 'self link'
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
   self.provider.softLink({ dstPath : linkPath, srcPath : '../link', allowingMissing : 1 });
   var resolved = self.provider.pathResolveSoftLink( linkPath );
   test.identical( resolved, '../link' );
 
+  test.case = 'two relative links in chain'
+  self.provider.filesDelete( workDir );
+  self.provider.fileWrite( filePath,filePath );
+  self.provider.softLink({ dstPath : linkPath2, srcPath : '../file', allowingMissing : 1 });
+  self.provider.softLink({ dstPath : linkPath, srcPath : '../link2', allowingMissing : 1 });
+  var resolved = self.provider.pathResolveSoftLink( linkPath );
+  test.identical( resolved, '../link2' );
+
+  test.case = 'relative to dir'
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
-  self.provider.softLink({ dstPath : linkPath, srcPath : '../../file', allowingMissing : 1 });
+  var dirPath = self.pathFor( 'written/softLinkMakeAndResolve/dir' );
+  self.provider.dirMake( dirPath );
+  self.provider.softLink({ dstPath : linkPath, srcPath : '../dir', allowingMissing : 1 });
   var resolved = self.provider.pathResolveSoftLink( linkPath );
-  test.identical( resolved, '../../file' );
+  test.identical( resolved, '../dir' );
 
+  test.case = 'path contains link to empty dir'
   self.provider.filesDelete( workDir );
   var dirPath = self.pathFor( 'written/softLinkMakeAndResolve/dir' );
   self.provider.dirMake( dirPath );
@@ -18845,6 +18878,7 @@ function softLinkMakeAndResolve( test )
   var expected = self.provider.path.join( dirPath, 'file' );
   test.identical( resolved, pathToResolve );
 
+  test.case = 'path contains link to dir with terminal'
   self.provider.filesDelete( workDir );
   var dirPath = self.pathFor( 'written/softLinkMakeAndResolve/dir' );
   var fileInDir = self.pathFor( 'written/softLinkMakeAndResolve/dir/file' );
@@ -18854,6 +18888,8 @@ function softLinkMakeAndResolve( test )
 
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   test.is( self.provider.fileExists( pathToResolve ) );
+  else
+  test.is( !self.provider.fileExists( pathToResolve ) );
 
   var stat = self.provider.statRead( pathToResolve );
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )

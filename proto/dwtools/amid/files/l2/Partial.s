@@ -4548,7 +4548,7 @@ function _linkMultiple( o, link )
   _.assert( _.strIs( o.sourceMode ) || _.longIs( o.sourceMode ) );
   _.assert( _.boolLike( o.allowingMissing ) );
 
-  debugger; xxx
+  debugger; //xxx
 
   let needed = 0;
   let records = self.recordFactory({ allowingMissing : o.allowingMissing }).records( o.dstPath );
@@ -4738,7 +4738,15 @@ function _link_functor( gen )
     _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
 
     pathResolve();
-    pathResolveLinks();
+
+    try
+    {
+      pathResolveLinks();
+    }
+    catch( err )
+    {
+      return error( err );
+    }
 
     if( skip() )
     return end();
@@ -5597,6 +5605,8 @@ function _hardLinkVerify( c )
     !!c.options.breakingSrcHardLink || !!c.options.breakingDstHardLink,
     'Both source and destination hardlinks could not be preserved, please set breakingSrcHardLink or breakingDstHardLink to true'
   );
+  _.assert( o.allowingMissing === 0 || _.longIs( o.dstPath ), 'o.allowingMissing could be disabled when linking two files' );
+
 }
 
 let hardLink = _link_functor
@@ -5617,6 +5627,7 @@ defaults.makingDirectory = 0;
 defaults.throwing = null;
 defaults.verbosity = null;
 defaults.allowDiffContent = 0;
+defaults.allowingMissing = 0;
 defaults.sourceMode = 'modified>hardlinks>';
 
 defaults.breakingSrcHardLink = 0;

@@ -770,6 +770,7 @@ defaults.resolvingSoftLink = null;
 defaults.resolvingTextLink = null;
 defaults.throwing = 1;
 defaults.allowingMissing = 1;
+defaults.allowingCycling = 1;
 
 var having = _pathResolveLink.having = Object.create( null );
 having.driving = 0;
@@ -832,6 +833,7 @@ function pathResolveLinkFull_body( o )
       resolvingSoftLink : o.resolvingSoftLink,
       resolvingTextLink : o.resolvingTextLink,
       allowingMissing : o.allowingMissing,
+      allowingCycling: o.allowingCycling,
       throwing : o.throwing,
     }
 
@@ -853,6 +855,7 @@ function pathResolveLinkFull_body( o )
       resolvingTextLink : o.resolvingTextLink,
       preservingRelative : o.preservingRelative,
       allowingMissing : o.allowingMissing,
+      allowingCycling: o.allowingCycling,
       throwing : o.throwing,
     }
 
@@ -883,6 +886,7 @@ function pathResolveLinkFull_body( o )
       resolvingSoftLink : o.resolvingSoftLink,
       resolvingTextLink : o.resolvingTextLink,
       allowingMissing : o.allowingMissing,
+      allowingCycling: o.allowingCycling,
       throwing : o.throwing,
     }
 
@@ -932,14 +936,18 @@ function pathResolveLinkTail_body( o )
   let r = self.pathResolveLinkTailChain.body.call( self, o2 );
   o.stat = o2.stat;
 
-  if( r[ r.length-1 ] === null && o.allowingMissing )
-  r = r[ r.length-2 ];
-  else
-  r = r[ r.length-1 ];
+  let result = r[ r.length-1 ];
 
-  _.assert( r === null || _.strIs( r ) );
+  if( r[ r.length-1 ] === null )
+  {
+    let cycle = _.arrayRightIndex( r, r[ r.length-2 ], r.length-3 ) !== -1;
+    if( cycle && o.allowingCycling || !cycle && o.allowingMissing )
+    result = r[ r.length-2 ];
+  }
 
-  return r;
+  _.assert( result === null || _.strIs( result ) );
+
+  return result;
 }
 
 _.routineExtend( pathResolveLinkTail_body, _pathResolveLink );
@@ -999,7 +1007,7 @@ function pathResolveLinkTailChain_body( o )
   {
     o.err = { cycleInLinks : true }; /* xxx */ // used by Extract.statReadAct to get kind of error
     debugger;
-    if( o.throwing && !o.allowingMissing )
+    if( o.throwing && !o.allowingCycling )
     {
       throw _.err( 'Links cycle at', _.strQuote( o.filePath ) );
     }
@@ -1146,6 +1154,7 @@ function pathResolveLinkHeadDirect_body( o )
   _.assert( _.boolLike( o.resolvingSoftLink ) );
   _.assert( _.boolLike( o.resolvingTextLink ) );
   _.assert( _.boolLike( o.allowingMissing ) );
+  _.assert( _.boolLike( o.allowingCycling ) );
   _.assert( _.boolLike( o.throwing ) );
   _.assert( path.isAbsolute( o.filePath ) );
   _.assertRoutineOptions( pathResolveLinkHeadDirect_body, arguments );
@@ -1198,6 +1207,7 @@ function pathResolveLinkHeadReverse_body( o )
   _.assert( _.boolLike( o.resolvingSoftLink ) );
   _.assert( _.boolLike( o.resolvingTextLink ) );
   _.assert( _.boolLike( o.allowingMissing ) );
+  _.assert( _.boolLike( o.allowingCycling ) );
   _.assert( _.boolLike( o.throwing ) );
   _.assert( path.isAbsolute( o.filePath ) );
   _.assertRoutineOptions( pathResolveLinkHeadReverse_body, arguments );
@@ -5019,7 +5029,7 @@ function _link_functor( gen )
           resolvingTextLink : o.resolvingDstTextLink,
         }
         o.dstPath = self.pathResolveLinkFull( o2 );
-        c.dstStat = o2.stat;
+        // c.dstStat = o2.stat;
       }
 
       // o.dstPath = self.pathResolveLinkFull
@@ -5038,6 +5048,7 @@ function _link_functor( gen )
           filePath : o.srcPath,
           resolvingSoftLink : o.resolvingSrcSoftLink,
           resolvingTextLink : o.resolvingSrcTextLink,
+          allowingCycling : o.allowingMissing,
           allowingMissing : o.allowingMissing,
           throwing : o.throwing
         }
@@ -5074,7 +5085,7 @@ function _link_functor( gen )
 
       /* qqq : if breakingSrcHardLink is on then src file should be broken */
 
-      if( _.boolIs( o.breakingDstHardLink ) )
+      if( _.boolLike( o.breakingDstHardLink ) )
       if( !o.breakingDstHardLink && c.dstStat.isHardLink() )
       // if( !renamingHardLinks && c.dstStat.isHardLink() )
       return false;

@@ -29884,7 +29884,7 @@ function pathResolveLinkTailChain( test )
   test.case = 'self cycle softlink, throwing on'
   self.provider.filesDelete( _.path.dir( filePath ) );
   self.provider.softLink({ dstPath : linkPath, srcPath : '../link', allowingMissing : 1, makingDirectory : 1 });
-  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissing : 0 } );
+  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissing : 0, allowingCycling : 0 } );
   test.shouldThrowError( () => self.provider.pathResolveLinkTailChain( o ) );
 
   test.case = 'self cycle softlink, throwing off'
@@ -29914,7 +29914,7 @@ function pathResolveLinkTailChain( test )
   test.case = 'self cycle text, throwing on '
   self.provider.filesDelete( _.path.dir( filePath ) );
   self.provider.fileWrite( linkPath, 'link ' + '../link' );
-  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissing : 0 } );
+  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissing : 0, allowingCycling : 0 } );
   test.shouldThrowError( () => self.provider.pathResolveLinkTailChain( o ) );
 
   test.case = 'self cycle text, throwing off'
@@ -29946,7 +29946,7 @@ function pathResolveLinkTailChain( test )
   self.provider.filesDelete( _.path.dir( filePath ) );
   self.provider.softLink({ dstPath : linkPath2, srcPath : linkPath, allowingMissing : 1, makingDirectory : 1 });
   self.provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissing : 1, makingDirectory : 1 });
-  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissing : 0 } );
+  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissing : 0, allowingCycling : 0 } );
   test.shouldThrowError( () => self.provider.pathResolveLinkTailChain( o ) );
 
   test.case = 'cycle softlink, throwing off'
@@ -29980,7 +29980,7 @@ function pathResolveLinkTailChain( test )
   self.provider.filesDelete( _.path.dir( filePath ) );
   self.provider.fileWrite( linkPath2, 'link ' + linkPath );
   self.provider.fileWrite( linkPath, 'link ' + linkPath2 );
-  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissing : 0 } );
+  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissing : 0, allowingCycling : 0 } );
   test.shouldThrowError( () => self.provider.pathResolveLinkTailChain( o ) );
 
   test.case = 'cycle text link, throwing off'
@@ -30014,7 +30014,7 @@ function pathResolveLinkTailChain( test )
   self.provider.filesDelete( _.path.dir( filePath ) );
   self.provider.fileWrite( linkPath2, 'link ' + linkPath );
   self.provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissing : 1, makingDirectory : 1 });
-  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissing : 0 } );
+  var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissing : 0, allowingCycling : 0 } );
   test.shouldThrowError( () => self.provider.pathResolveLinkTailChain( o ) );
 
   test.case = 'cycle soft text, throwing off'
@@ -30562,7 +30562,7 @@ function pathResolveLinkFull( test )
   var got = self.provider.pathResolveLinkFull
   ({
      filePath : linkPath,
-     allowingMissing : 0,
+     allowingCycling : 0,
      throwing : 0,
   });
   test.identical( got, null );
@@ -30570,7 +30570,7 @@ function pathResolveLinkFull( test )
   var got = self.provider.pathResolveLinkFull
   ({
      filePath : linkPath,
-     allowingMissing : 1,
+     allowingCycling : 1,
      throwing : 0,
   });
   test.identical( got, linkPath );
@@ -30580,7 +30580,7 @@ function pathResolveLinkFull( test )
     self.provider.pathResolveLinkFull
     ({
       filePath : linkPath,
-      allowingMissing : 0,
+      allowingCycling : 0,
       throwing : 1,
     });
   })
@@ -30589,7 +30589,7 @@ function pathResolveLinkFull( test )
   var got = self.provider.pathResolveLinkFull
   ({
      filePath : linkPath,
-     allowingMissing : 1,
+     allowingCycling : 1,
      throwing : 1,
   });
   test.identical( got, linkPath );
@@ -30604,7 +30604,7 @@ function pathResolveLinkFull( test )
   var got = self.provider.pathResolveLinkFull
   ({
      filePath : linkPath,
-     allowingMissing : 0,
+     allowingCycling : 0,
      throwing : 0,
   });
   test.identical( got, null );
@@ -30612,7 +30612,7 @@ function pathResolveLinkFull( test )
   var got = self.provider.pathResolveLinkFull
   ({
      filePath : linkPath,
-     allowingMissing : 1,
+     allowingCycling : 1,
      throwing : 0,
   });
   test.identical( got, linkPath );
@@ -30622,7 +30622,7 @@ function pathResolveLinkFull( test )
     self.provider.pathResolveLinkFull
     ({
       filePath : linkPath,
-      allowingMissing : 0,
+      allowingCycling : 0,
       throwing : 1,
     });
   })
@@ -30631,7 +30631,7 @@ function pathResolveLinkFull( test )
   var got = self.provider.pathResolveLinkFull
   ({
      filePath : linkPath,
-     allowingMissing : 1,
+     allowingCycling : 1,
      throwing : 1,
   });
   test.identical( got, linkPath );

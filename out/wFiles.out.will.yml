@@ -107,21 +107,20 @@ path:
       - ./dwtools/amid/files.test
       - ./dwtools/amid/files.test/aFileProvider.test.s
       - ./dwtools/amid/files.test/aFilesFind.test.s
+      - ./dwtools/amid/files.test/Extract.html
+      - ./dwtools/amid/files.test/Extract.test.s
       - ./dwtools/amid/files.test/Files.copy.test.s
       - ./dwtools/amid/files.test/Files.etc.test.ss
       - ./dwtools/amid/files.test/FilesFind.Extract.test.s
       - ./dwtools/amid/files.test/FilesFind.HardDrive.test.ss
-      - ./dwtools/amid/files.test/FilesFind.test.ss
       - ./dwtools/amid/files.test/FilesRead.test.s
+      - ./dwtools/amid/files.test/HardDrive.test.ss
       - ./dwtools/amid/files.test/Hub.copy.test.ss
+      - ./dwtools/amid/files.test/Hub.Extract.test.s
+      - ./dwtools/amid/files.test/Hub.HardDrive.test.ss
       - ./dwtools/amid/files.test/Path.test.ss
-      - ./dwtools/amid/files.test/Provider.Extract.html
-      - ./dwtools/amid/files.test/Provider.Extract.test.s
-      - ./dwtools/amid/files.test/Provider.HardDrive.test.ss
-      - ./dwtools/amid/files.test/Provider.Hub.Extract.test.s
-      - ./dwtools/amid/files.test/Provider.Hub.HardDrive.test.ss
-      - ./dwtools/amid/files.test/Provider.Url.test.ss
       - ./dwtools/amid/files.test/Record.test.s
+      - ./dwtools/amid/files.test/Uri.test.ss
       - ./dwtools/atop
     criterion:
       default: 1
@@ -164,21 +163,20 @@ path:
       - ./dwtools/amid/files/l8_filter/Reroot.s
       - ./dwtools/amid/files.test/aFileProvider.test.s
       - ./dwtools/amid/files.test/aFilesFind.test.s
+      - ./dwtools/amid/files.test/Extract.html
+      - ./dwtools/amid/files.test/Extract.test.s
       - ./dwtools/amid/files.test/Files.copy.test.s
       - ./dwtools/amid/files.test/Files.etc.test.ss
       - ./dwtools/amid/files.test/FilesFind.Extract.test.s
       - ./dwtools/amid/files.test/FilesFind.HardDrive.test.ss
-      - ./dwtools/amid/files.test/FilesFind.test.ss
       - ./dwtools/amid/files.test/FilesRead.test.s
+      - ./dwtools/amid/files.test/HardDrive.test.ss
       - ./dwtools/amid/files.test/Hub.copy.test.ss
+      - ./dwtools/amid/files.test/Hub.Extract.test.s
+      - ./dwtools/amid/files.test/Hub.HardDrive.test.ss
       - ./dwtools/amid/files.test/Path.test.ss
-      - ./dwtools/amid/files.test/Provider.Extract.html
-      - ./dwtools/amid/files.test/Provider.Extract.test.s
-      - ./dwtools/amid/files.test/Provider.HardDrive.test.ss
-      - ./dwtools/amid/files.test/Provider.Hub.Extract.test.s
-      - ./dwtools/amid/files.test/Provider.Hub.HardDrive.test.ss
-      - ./dwtools/amid/files.test/Provider.Url.test.ss
       - ./dwtools/amid/files.test/Record.test.s
+      - ./dwtools/amid/files.test/Uri.test.ss
     criterion:
       default: 1
       debug: 1
@@ -292,21 +290,20 @@ reflector:
       ./dwtools/amid/files/l8_filter/Reroot.s: true
       ./dwtools/amid/files.test/aFileProvider.test.s: true
       ./dwtools/amid/files.test/aFilesFind.test.s: true
+      ./dwtools/amid/files.test/Extract.html: true
+      ./dwtools/amid/files.test/Extract.test.s: true
       ./dwtools/amid/files.test/Files.copy.test.s: true
       ./dwtools/amid/files.test/Files.etc.test.ss: true
       ./dwtools/amid/files.test/FilesFind.Extract.test.s: true
       ./dwtools/amid/files.test/FilesFind.HardDrive.test.ss: true
-      ./dwtools/amid/files.test/FilesFind.test.ss: true
       ./dwtools/amid/files.test/FilesRead.test.s: true
+      ./dwtools/amid/files.test/HardDrive.test.ss: true
       ./dwtools/amid/files.test/Hub.copy.test.ss: true
+      ./dwtools/amid/files.test/Hub.Extract.test.s: true
+      ./dwtools/amid/files.test/Hub.HardDrive.test.ss: true
       ./dwtools/amid/files.test/Path.test.ss: true
-      ./dwtools/amid/files.test/Provider.Extract.html: true
-      ./dwtools/amid/files.test/Provider.Extract.test.s: true
-      ./dwtools/amid/files.test/Provider.HardDrive.test.ss: true
-      ./dwtools/amid/files.test/Provider.Hub.Extract.test.s: true
-      ./dwtools/amid/files.test/Provider.Hub.HardDrive.test.ss: true
-      ./dwtools/amid/files.test/Provider.Url.test.ss: true
       ./dwtools/amid/files.test/Record.test.s: true
+      ./dwtools/amid/files.test/Uri.test.ss: true
     srcFilter:
       basePath: .
       prefixPath: proto
@@ -461,21 +458,20 @@ exported:
         - ./dwtools/amid/files/l8_filter/Reroot.s
         - ./dwtools/amid/files.test/aFileProvider.test.s
         - ./dwtools/amid/files.test/aFilesFind.test.s
+        - ./dwtools/amid/files.test/Extract.html
+        - ./dwtools/amid/files.test/Extract.test.s
         - ./dwtools/amid/files.test/Files.copy.test.s
         - ./dwtools/amid/files.test/Files.etc.test.ss
         - ./dwtools/amid/files.test/FilesFind.Extract.test.s
         - ./dwtools/amid/files.test/FilesFind.HardDrive.test.ss
-        - ./dwtools/amid/files.test/FilesFind.test.ss
         - ./dwtools/amid/files.test/FilesRead.test.s
+        - ./dwtools/amid/files.test/HardDrive.test.ss
         - ./dwtools/amid/files.test/Hub.copy.test.ss
+        - ./dwtools/amid/files.test/Hub.Extract.test.s
+        - ./dwtools/amid/files.test/Hub.HardDrive.test.ss
         - ./dwtools/amid/files.test/Path.test.ss
-        - ./dwtools/amid/files.test/Provider.Extract.html
-        - ./dwtools/amid/files.test/Provider.Extract.test.s
-        - ./dwtools/amid/files.test/Provider.HardDrive.test.ss
-        - ./dwtools/amid/files.test/Provider.Hub.Extract.test.s
-        - ./dwtools/amid/files.test/Provider.Hub.HardDrive.test.ss
-        - ./dwtools/amid/files.test/Provider.Url.test.ss
         - ./dwtools/amid/files.test/Record.test.s
+        - ./dwtools/amid/files.test/Uri.test.ss
       criterion:
         default: 1
         debug: 1

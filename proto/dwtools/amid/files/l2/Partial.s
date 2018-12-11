@@ -868,6 +868,8 @@ function pathResolveLinkFull_body( o )
     if( !o.allowingMissing )
     {
       result = null;
+      if( o.throwing )
+      throw _.err( 'File does not exist', _.strQuote( o.filePath ) );
     }
   }
 

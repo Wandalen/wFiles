@@ -28258,6 +28258,9 @@ function filesAreHardLinked( test )
   var fileRecord = self.provider.recordFactory().record( filePath );
   var linkRecord = self.provider.recordFactory().record( linkPath );
   var got = self.provider.filesAreHardLinked([ fileRecord, linkRecord ]);
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  test.identical( got, null );
+  else
   test.identical( got, true );
 
 };

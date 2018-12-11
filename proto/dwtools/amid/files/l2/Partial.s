@@ -5951,33 +5951,38 @@ function fileExchange_body( o )
 
   o.dstPath = tempPath;
 
+  var o2 = _.mapExtend( null, o );
+
+  o2.originalSrcPath = null;
+  o2.originalDstPath = null;
+
   if( o.sync )
   {
-    self.fileRename( o );
-    o.dstPath = o.srcPath;
-    o.srcPath = dstPath;
-    self.fileRename( o );
-    o.dstPath = dstPath;
-    o.srcPath = tempPath;
-    return self.fileRename( o );
+    self.fileRename( _.mapExtend( null, o2 ) );
+    o2.dstPath = o2.srcPath;
+    o2.srcPath = dstPath;
+    self.fileRename( _.mapExtend( null, o2 ) );
+    o2.dstPath = dstPath;
+    o2.srcPath = tempPath;
+    return self.fileRename( _.mapExtend( null, o2 ) );
   }
   else
   {
     let con = new _.Consequence().give( null );
 
-    con.ifNoErrorThen( _.routineSeal( self, self.fileRename, [ o ] ) )
+    con.ifNoErrorThen( _.routineSeal( self, self.fileRename, [ _.mapExtend( null, o2 ) ] ) )
     .ifNoErrorThen( function( arg/*aaa*/ )
     {
-      o.dstPath = o.srcPath;
-      o.srcPath = dstPath;
+      o2.dstPath = o2.srcPath;
+      o2.srcPath = dstPath;
     })
-    .ifNoErrorThen( _.routineSeal( self, self.fileRename, [ o ] ) )
+    .ifNoErrorThen( _.routineSeal( self, self.fileRename, [ _.mapExtend( null, o2 ) ] ) )
     .ifNoErrorThen( function( arg/*aaa*/ )
     {
-      o.dstPath = dstPath;
-      o.srcPath = tempPath;
+      o2.dstPath = dstPath;
+      o2.srcPath = tempPath;
     })
-    .ifNoErrorThen( _.routineSeal( self, self.fileRename, [ o ] ) );
+    .ifNoErrorThen( _.routineSeal( self, self.fileRename, [ _.mapExtend( null, o2 ) ] ) );
 
     return con;
   }

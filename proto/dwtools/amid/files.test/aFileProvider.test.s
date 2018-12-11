@@ -7045,8 +7045,8 @@ function fileCopySoftLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), srcPathTerminal );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), srcPathTerminal );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -7060,8 +7060,8 @@ function fileCopySoftLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), srcPathTerminal );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPathTerminal );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -7076,8 +7076,8 @@ function fileCopySoftLinkResolving( test )
   test.identical( self.provider.pathResolveSoftLink( srcPath ), srcPathTerminal );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPathTerminal );
   test.identical( self.provider.pathResolveSoftLink( dstPathTerminal ), srcPathTerminal );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -7091,8 +7091,8 @@ function fileCopySoftLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), srcPathTerminal );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPathTerminal );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   test.close( 'broken' );
 
@@ -7114,8 +7114,8 @@ function fileCopySoftLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), '../src' );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), '../src' );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -7127,33 +7127,37 @@ function fileCopySoftLinkResolving( test )
   test.is( self.provider.isSoftLink( srcPath ) );
   test.is( !self.provider.fileExists( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
   self.provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissing : 1 });
   var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 0, allowingMissing : 1, throwing : 0 };
   var got = fileCopy( o );
-  test.identical( got, false );
+  test.identical( got, true );
   test.identical( o.srcPath, srcPath );
   test.identical( o.dstPath, dstPath );
   test.is( self.provider.isSoftLink( srcPath ) );
-  test.is( !self.provider.fileExists( dstPath ) );
+  test.is( self.provider.isSoftLink( dstPath ) );
+  // test.is( !self.provider.fileExists( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
+  test.identical( self.provider.pathResolveSoftLink( dstPath ), '../src' );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
   self.provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissing : 1 });
   var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 0, allowingMissing : 1, throwing : 1 };
   var got = fileCopy( o );
-  test.identical( got, false );
+  test.identical( got, true );
   test.identical( o.srcPath, srcPath );
   test.identical( o.dstPath, dstPath );
   test.is( self.provider.isSoftLink( srcPath ) );
-  test.is( !self.provider.fileExists( dstPath ) );
+  test.is( self.provider.isSoftLink( dstPath ) );
+  // test.is( !self.provider.fileExists( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
+  test.identical( self.provider.pathResolveSoftLink( dstPath ), '../src' );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
 
   /* both are self links */
 
@@ -7170,8 +7174,8 @@ function fileCopySoftLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), '../src' );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), '../src' );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -7186,8 +7190,8 @@ function fileCopySoftLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), '../src' );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), '../src' );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -7202,8 +7206,8 @@ function fileCopySoftLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), '../src' );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), '../src' );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -7218,8 +7222,8 @@ function fileCopySoftLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), '../src' );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), '../src' );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   //
 
@@ -7236,8 +7240,8 @@ function fileCopySoftLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), '../src' );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), '../dst' );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -7245,15 +7249,15 @@ function fileCopySoftLinkResolving( test )
   self.provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissing : 1 });
   var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 0, allowingMissing : 1, throwing : 0 };
   var got = fileCopy( o );
-  test.identical( got, false );
+  test.identical( got, true );
   test.identical( o.srcPath, srcPath );
   test.identical( o.dstPath, dstPath );
   test.is( self.provider.isSoftLink( srcPath ) );
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( self.provider.pathResolveSoftLink( dstPath ), '../dst' );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  test.identical( self.provider.pathResolveSoftLink( dstPath ), '../src' );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -7267,8 +7271,8 @@ function fileCopySoftLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), '../src' );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), '../dst' );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -7276,15 +7280,15 @@ function fileCopySoftLinkResolving( test )
   self.provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissing : 1 });
   var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 0, allowingMissing : 1, throwing : 1 };
   var got = fileCopy( o );
-  test.identical( got, false );
+  test.identical( got, true );
   test.identical( o.srcPath, srcPath );
   test.identical( o.dstPath, dstPath );
   test.is( self.provider.isSoftLink( srcPath ) );
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( self.provider.pathResolveSoftLink( dstPath ), '../dst' );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  test.identical( self.provider.pathResolveSoftLink( dstPath ), '../src' );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   //
 
@@ -7301,8 +7305,8 @@ function fileCopySoftLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), '../src' );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), '../src' );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -7317,8 +7321,8 @@ function fileCopySoftLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), '../src' );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), '../src' );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -7333,8 +7337,8 @@ function fileCopySoftLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), '../src' );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), '../src' );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -7349,8 +7353,8 @@ function fileCopySoftLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), '../src' );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), '../src' );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   //
 
@@ -7367,8 +7371,8 @@ function fileCopySoftLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), '../src' );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), '../dst' );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -7376,15 +7380,15 @@ function fileCopySoftLinkResolving( test )
   self.provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissing : 1 });
   var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 1, allowingMissing : 1, throwing : 0 };
   var got = fileCopy( o );
-  test.identical( got, false );
+  test.identical( got, true );
   test.identical( o.srcPath, srcPath );
   test.identical( o.dstPath, dstPath );
   test.is( self.provider.isSoftLink( srcPath ) );
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( self.provider.pathResolveSoftLink( dstPath ), '../dst' );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  test.identical( self.provider.pathResolveSoftLink( dstPath ), '../src' );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -7398,8 +7402,8 @@ function fileCopySoftLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), '../src' );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), '../dst' );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -7407,15 +7411,15 @@ function fileCopySoftLinkResolving( test )
   self.provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissing : 1 });
   var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 1, allowingMissing : 1, throwing : 1 };
   var got = fileCopy( o );
-  test.identical( got, false );
+  test.identical( got, true );
   test.identical( o.srcPath, srcPath );
   test.identical( o.dstPath, dstPath );
   test.is( self.provider.isSoftLink( srcPath ) );
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( self.provider.pathResolveSoftLink( dstPath ), '../dst' );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  test.identical( self.provider.pathResolveSoftLink( dstPath ), '../src' );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   test.close( 'self cycled' );
 
@@ -7441,8 +7445,8 @@ function fileCopySoftLinkResolving( test )
   test.identical( self.provider.pathResolveSoftLink( dstPath ), srcPath2 );
   test.identical( self.provider.pathResolveSoftLink( srcPath2 ), srcPath );
   test.identical( self.provider.pathResolveSoftLink( dstPath2 ), dstPath );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -7462,8 +7466,8 @@ function fileCopySoftLinkResolving( test )
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPath2 );
   test.identical( self.provider.pathResolveSoftLink( srcPath2 ), srcPath );
   test.identical( self.provider.pathResolveSoftLink( dstPath2 ), dstPath );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -7483,8 +7487,8 @@ function fileCopySoftLinkResolving( test )
   test.identical( self.provider.pathResolveSoftLink( dstPath ), srcPath2 );
   test.identical( self.provider.pathResolveSoftLink( srcPath2 ), srcPath );
   test.identical( self.provider.pathResolveSoftLink( dstPath2 ), dstPath );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -7504,8 +7508,8 @@ function fileCopySoftLinkResolving( test )
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPath2 );
   test.identical( self.provider.pathResolveSoftLink( srcPath2 ), srcPath );
   test.identical( self.provider.pathResolveSoftLink( dstPath2 ), dstPath );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   test.close( 'cycled' );
 
@@ -10370,8 +10374,8 @@ function fileRenameSoftLinkResolving( test )
   test.is( !self.provider.fileExists( srcPath ) );
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), srcPathTerminal );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -10385,8 +10389,8 @@ function fileRenameSoftLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), srcPathTerminal );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPathTerminal );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -10400,8 +10404,8 @@ function fileRenameSoftLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPathTerminal );
   test.identical( self.provider.pathResolveSoftLink( dstPathTerminal ), srcPathTerminal );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -10415,8 +10419,8 @@ function fileRenameSoftLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), srcPathTerminal );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPathTerminal );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   test.close( 'broken' );
 
@@ -10435,7 +10439,7 @@ function fileRenameSoftLinkResolving( test )
   test.is( !self.provider.fileExists( srcPath ) );
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), '../src' );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -10449,8 +10453,8 @@ function fileRenameSoftLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), '../src' );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), '../dst' );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -10463,7 +10467,7 @@ function fileRenameSoftLinkResolving( test )
   test.is( !self.provider.fileExists( srcPath ) );
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), '../src' );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -10477,8 +10481,8 @@ function fileRenameSoftLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), '../src' );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), '../dst' );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   test.close( 'self cycled' );
 
@@ -10523,8 +10527,8 @@ function fileRenameSoftLinkResolving( test )
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPath2 );
   test.identical( self.provider.pathResolveSoftLink( srcPath2 ), srcPath );
   test.identical( self.provider.pathResolveSoftLink( dstPath2 ), dstPath );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -10563,8 +10567,8 @@ function fileRenameSoftLinkResolving( test )
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPath2 );
   test.identical( self.provider.pathResolveSoftLink( srcPath2 ), srcPath );
   test.identical( self.provider.pathResolveSoftLink( dstPath2 ), dstPath );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   test.close( 'cycled' );
 
@@ -10597,7 +10601,7 @@ function fileRenameSoftLinkResolving( test )
   test.is( self.provider.isSoftLink( srcPath ) );
   test.is( self.provider.isTerminal( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), srcPathTerminal );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
   test.identical( self.provider.fileRead( dstPath ), srcPathTerminal );
 
   self.provider.filesDelete( workDir );
@@ -15218,7 +15222,7 @@ function softLinkSync( test )
     ({
       filePath : srcPath,
       resolvingSoftLink : 1,
-      allowingMissing : 1,
+      allowingCycling : 1,
       throwing : 1
     });
   })
@@ -15229,7 +15233,7 @@ function softLinkSync( test )
     ({
       filePath : srcPath,
       resolvingSoftLink : 1,
-      allowingMissing : 1,
+      allowingCycling : 1,
       throwing : 0
     });
   })
@@ -15240,7 +15244,7 @@ function softLinkSync( test )
     ({
       filePath : srcPath,
       resolvingSoftLink : 1,
-      allowingMissing : 0,
+      allowingCycling : 0,
       throwing : 0
     });
   })
@@ -15251,7 +15255,7 @@ function softLinkSync( test )
     ({
       filePath : srcPath,
       resolvingSoftLink : 1,
-      allowingMissing : 0,
+      allowingCycling : 0,
       throwing : 1
     });
   })
@@ -16915,7 +16919,7 @@ function softLinkRelativePath( test )
     ({
       filePath : dstPath,
       resolvingSoftLink : 1,
-      allowingMissing : 0,
+      allowingCycling : 0,
       throwing : 1
     })
   });
@@ -16944,7 +16948,7 @@ function softLinkRelativePath( test )
     ({
       filePath : dstPath,
       resolvingSoftLink : 1,
-      allowingMissing : 0,
+      allowingCycling : 0,
       throwing : 1
     })
   });
@@ -17295,8 +17299,7 @@ function softLinkChain( test )
   test.identical( got, expected );
 
   var expected = path.join( dir, 'x' );
-  var got = provider.pathResolveLinkTailChain({ filePath : path.join( dir, 'a/b/c' ), resolvingHeadDirectories : 1 });
-  got = got[ got.length - 1 ];
+  var got = provider.pathResolveLinkFull({ filePath : path.join( dir, 'a/b/c' ) });
   var stat = provider.statResolvedRead( got );
   test.is( !!stat );
   test.identical( got, expected );
@@ -17995,8 +17998,8 @@ function softLinkSoftLinkResolving( test )
   test.is( self.provider.isSoftLink( srcPath ) );
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), srcPath );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -18010,8 +18013,8 @@ function softLinkSoftLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), srcPathTerminal );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPathTerminal );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -18026,8 +18029,8 @@ function softLinkSoftLinkResolving( test )
   test.identical( self.provider.pathResolveSoftLink( srcPath ), srcPathTerminal );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPathTerminal );
   test.identical( self.provider.pathResolveSoftLink( dstPathTerminal ), srcPath );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -18041,8 +18044,8 @@ function softLinkSoftLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), srcPathTerminal );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPathTerminal );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   test.close( 'broken' );
 
@@ -18062,8 +18065,8 @@ function softLinkSoftLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), '../src' );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), srcPath );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -18077,8 +18080,8 @@ function softLinkSoftLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), '../src' );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), '../dst' );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -18092,8 +18095,8 @@ function softLinkSoftLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), '../src' );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), srcPath );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -18107,8 +18110,8 @@ function softLinkSoftLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), '../src' );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), '../dst' );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   test.close( 'self cycled' );
 
@@ -18153,8 +18156,8 @@ function softLinkSoftLinkResolving( test )
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPath2 );
   test.identical( self.provider.pathResolveSoftLink( srcPath2 ), srcPath );
   test.identical( self.provider.pathResolveSoftLink( dstPath2 ), dstPath );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -18174,8 +18177,8 @@ function softLinkSoftLinkResolving( test )
   test.identical( self.provider.pathResolveSoftLink( dstPath ), srcPath );
   test.identical( self.provider.pathResolveSoftLink( srcPath2 ), srcPath );
   test.identical( self.provider.pathResolveSoftLink( dstPath2 ), dstPath );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -18195,8 +18198,8 @@ function softLinkSoftLinkResolving( test )
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPath2 );
   test.identical( self.provider.pathResolveSoftLink( srcPath2 ), srcPath );
   test.identical( self.provider.pathResolveSoftLink( dstPath2 ), dstPath );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   test.close( 'cycled' );
 
@@ -18521,8 +18524,8 @@ function softLinkRelativeLinkResolving( test )
   test.is( self.provider.isSoftLink( srcPath ) );
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), srcPath );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -18536,8 +18539,8 @@ function softLinkRelativeLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), srcPathRelativeTerminal );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPathRelativeTerminal );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -18553,8 +18556,8 @@ function softLinkRelativeLinkResolving( test )
   test.identical( self.provider.pathResolveSoftLink( srcPath ), srcPathRelativeTerminal );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPathRelativeTerminal );
   test.identical( self.provider.pathResolveSoftLink( dstPathTerminal ), srcPath );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -18568,8 +18571,8 @@ function softLinkRelativeLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), srcPathRelativeTerminal );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPathRelativeTerminal );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   test.close( 'broken' );
 
@@ -18589,8 +18592,8 @@ function softLinkRelativeLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), '../src' );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), srcPath );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -18604,8 +18607,8 @@ function softLinkRelativeLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), '../src' );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), '../dst' );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -18619,8 +18622,8 @@ function softLinkRelativeLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), '../src' );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), srcPath );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -18634,8 +18637,8 @@ function softLinkRelativeLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), '../src' );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), '../dst' );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   test.close( 'self cycled' );
 
@@ -18680,8 +18683,8 @@ function softLinkRelativeLinkResolving( test )
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPathRelative2 );
   test.identical( self.provider.pathResolveSoftLink( srcPath2 ), '../src' );
   test.identical( self.provider.pathResolveSoftLink( dstPath2 ), '../dst' );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -18701,8 +18704,8 @@ function softLinkRelativeLinkResolving( test )
   test.identical( self.provider.pathResolveSoftLink( dstPath ), srcPath );
   test.identical( self.provider.pathResolveSoftLink( srcPath2 ), '../src' );
   test.identical( self.provider.pathResolveSoftLink( dstPath2 ), '../dst' );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -18722,8 +18725,8 @@ function softLinkRelativeLinkResolving( test )
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPathRelative2 );
   test.identical( self.provider.pathResolveSoftLink( srcPath2 ), '../src' );
   test.identical( self.provider.pathResolveSoftLink( dstPath2 ), '../dst' );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   test.close( 'cycled' );
 
@@ -22309,8 +22312,8 @@ function hardLinkSoftLinkResolving( test )
   test.is( self.provider.isSoftLink( srcPath ) );
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPathTerminal );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -22318,14 +22321,14 @@ function hardLinkSoftLinkResolving( test )
   self.provider.softLink({ dstPath : dstPath, srcPath : dstPathTerminal, allowingMissing : 1 });
   var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 0 };
   test.shouldThrowError( () => hardLink( o ) );
-  test.identical( o.srcPath, srcPathTerminal );
+  test.identical( o.srcPath, srcPath );
   test.identical( o.dstPath, dstPath );
   test.is( self.provider.isSoftLink( srcPath ) );
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), srcPathTerminal );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPathTerminal );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -22339,8 +22342,8 @@ function hardLinkSoftLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), srcPathTerminal );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPathTerminal );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -22348,14 +22351,14 @@ function hardLinkSoftLinkResolving( test )
   self.provider.softLink({ dstPath : dstPath, srcPath : dstPathTerminal, allowingMissing : 1 });
   var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 1 };
   test.shouldThrowError( () => hardLink( o ) );
-  test.identical( o.srcPath, srcPathTerminal );
+  test.identical( o.srcPath, srcPath );
   test.identical( o.dstPath, dstPathTerminal );
   test.is( self.provider.isSoftLink( srcPath ) );
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), srcPathTerminal );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPathTerminal );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   test.close( 'broken' );
 
@@ -22375,8 +22378,8 @@ function hardLinkSoftLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), '../src' );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), '../dst' );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -22390,8 +22393,8 @@ function hardLinkSoftLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), '../src' );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), '../dst' );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -22405,8 +22408,8 @@ function hardLinkSoftLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), '../src' );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), '../dst' );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -22420,8 +22423,8 @@ function hardLinkSoftLinkResolving( test )
   test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), '../src' );
   test.identical( self.provider.pathResolveSoftLink( dstPath ), '../dst' );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   test.close( 'self cycled' );
 
@@ -22466,8 +22469,8 @@ function hardLinkSoftLinkResolving( test )
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPath2 );
   test.identical( self.provider.pathResolveSoftLink( srcPath2 ), srcPath );
   test.identical( self.provider.pathResolveSoftLink( dstPath2 ), dstPath );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -22487,8 +22490,8 @@ function hardLinkSoftLinkResolving( test )
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPath2 );
   test.identical( self.provider.pathResolveSoftLink( srcPath2 ), srcPath );
   test.identical( self.provider.pathResolveSoftLink( dstPath2 ), dstPath );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
@@ -22508,8 +22511,8 @@ function hardLinkSoftLinkResolving( test )
   test.identical( self.provider.pathResolveSoftLink( dstPath ), dstPath2 );
   test.identical( self.provider.pathResolveSoftLink( srcPath2 ), srcPath );
   test.identical( self.provider.pathResolveSoftLink( dstPath2 ), dstPath );
-  test.identical( self.provider.statResolvedRead( srcPath ), null );
-  test.identical( self.provider.statResolvedRead( dstPath ), null );
+  //test.identical( self.provider.statResolvedRead( srcPath ), null );
+  //test.identical( self.provider.statResolvedRead( dstPath ), null );
 
   test.close( 'cycled' );
 
@@ -23939,7 +23942,7 @@ function isTerminal( test )
   var got = self.provider.isTerminal( _.mapExtend( null, o ) );
   test.identical( got, false )
   var got = self.provider.statRead( _.mapExtend( null, o ) );
-  test.identical( got, null );
+  test.identical( got.isTerminal(), false );
 
   test.case = 'soft self cycled'
   self.provider.filesDelete( dirPath );
@@ -23948,7 +23951,7 @@ function isTerminal( test )
   var got = self.provider.isTerminal( _.mapExtend( null, o ) );
   test.identical( got, false )
   var got = self.provider.statRead( _.mapExtend( null, o ) );
-  test.identical( got, null );
+  test.identical( got.isTerminal(), false );
 
   test.case = 'soft cycled'
   self.provider.filesDelete( dirPath );
@@ -23969,7 +23972,7 @@ function isTerminal( test )
   var got = self.provider.isTerminal( _.mapExtend( null, o ) );
   test.identical( got, false )
   var got = self.provider.statRead( _.mapExtend( null, o ) );
-  test.identical( got, null );
+  test.identical( got.isTerminal(), false );
 
   test.case = 'soft cycled'
   self.provider.filesDelete( dirPath );
@@ -23979,7 +23982,7 @@ function isTerminal( test )
   var got = self.provider.isTerminal( _.mapExtend( null, o ) );
   test.identical( got, false )
   var got = self.provider.statRead( _.mapExtend( null, o ) );
-  test.identical( got, null );
+  test.identical( got.isTerminal(), false );
 
   test.case = 'hardlink'
   self.provider.filesDelete( dirPath );
@@ -24369,7 +24372,7 @@ function isTerminal( test )
   self.provider.fileWrite( linkPath, 'link ../link' );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
   var got = self.provider.isTerminal( _.mapExtend( null, o ) );
-  test.identical( got, false )
+  test.identical( got, true )
   var got = self.provider.statRead( _.mapExtend( null, o ) );
   test.identical( got, null );
 

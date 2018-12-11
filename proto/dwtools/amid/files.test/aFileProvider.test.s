@@ -31270,14 +31270,9 @@ function pathResolveTextLink( test )
     self.provider.pathResolveTextLink(  { otherPath : linkPath }   )
   );
 
-  test.case = 'Two filePath options';
+  test.case = 'Only one allowingMissing option';
   test.shouldThrowError( () =>
-    self.provider.pathResolveTextLink(  { filePath : linkPath, filePath : linkPath2 }   )
-  );
-
-  test.case = 'Two allowingMissing options';
-  test.shouldThrowError( () =>
-    self.provider.pathResolveTextLink(  { filePath : linkPath, allowingMissing : 1, allowingMissing : 1 }   )
+    self.provider.pathResolveTextLink(  { filePath : linkPath, allowingMissing : 1 }   )
   );
 
   test.case = 'Wrong filePath options - undefined';

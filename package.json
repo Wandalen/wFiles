@@ -52,12 +52,10 @@
     "wRegexpObject": "",
     "wselector": "",
     "wverbal": "",
-    "wLogger": "",
-    "fs-extra": ""
+    "wLogger": ""
   },
   "devDependencies": {
     "wTesting": "",
-    "typedarray-to-buffer": "",
     "cli-table2": "",
     "wFiles": ".",
     "wait-sync": ""

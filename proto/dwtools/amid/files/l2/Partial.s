@@ -823,6 +823,9 @@ function pathResolveLinkFull_body( o )
   if( !o.resolvingSoftLink && ( !o.resolvingTextLink || !self.usingTextLink ) )
   return result;
 
+  if( _.strEnds( o.filePath, 'experiment/linkToDir1/linkToDir2/linkToFile' ) )
+  debugger;
+
   if( !o.stat && o.resolvingHeadDirect )
   {
 

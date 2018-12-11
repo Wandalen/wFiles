@@ -22690,15 +22690,6 @@ function nativize( t )
 
 //
 
-function experiment( test )
-{
-  var self = this;
-
-  test.identical( 1,1 );
-}
-
-//
-
 function hardLinkSyncRunner( test )
 {
   var self = this;
@@ -29541,6 +29532,7 @@ function pathResolveLinkTailChain( test )
   ]
   test.identical( o.result, expectedResult );
   test.identical( o.found, expectedFound);
+
   debugger;
 
   test.case = 'soft-hard-text-file';
@@ -31443,7 +31435,7 @@ function fileCopyExperiment( test )
       allowingMissing : 0,
       throwing : 0
   });
-  debugger;
+
   test.identical( got, true );
   test.identical( srcPath, srcPath );
   test.identical( dstPath, dstPath );
@@ -31477,6 +31469,66 @@ function statReadExperiment( test )
 
 }
 
+//
+
+function experiment( test )
+{
+  let self = this;
+
+  let path = self.provider.path;
+  let dir = test.context.pathFor( 'experiment' );
+  let filePath = test.context.pathFor( 'experiment/file' );
+  let linkPath = test.context.pathFor( 'experiment/link' );
+  let linkPath2 = test.context.pathFor( 'experiment/link2' );
+  let linkPath3 = test.context.pathFor( 'experiment/link3' );
+
+  var o1 =
+  {
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    allowingMissing : 1,
+    resolvingHeadDirect : 0,
+    resolvingHeadReverse : 0,
+    throwing : 1
+  }
+
+  test.case = 'several relative soft links in path';
+  var dirPath = _.path.dir( filePath );
+  var dirPath1 = _.path.join( dirPath, 'dir1' );
+  var dirPath2 = _.path.join( dirPath, 'dir2' );
+  var pathToFile = _.path.join( dirPath, 'file' );
+  var linkInDir = _.path.join( dirPath, 'linkToDir1' );
+  var linkInDir1 = _.path.join( dirPath1, 'linkToDir2' );
+  var linkInDir2 = _.path.join( dirPath2, 'linkToFile' );
+  self.provider.filesDelete( dirPath );
+  self.provider.dirMake( dirPath );
+  self.provider.dirMake( dirPath1 );
+  self.provider.dirMake( dirPath2 );
+  self.provider.fileWrite( pathToFile,pathToFile );
+  self.provider.softLink( linkInDir, self.provider.path.relative( linkInDir, dirPath1 ) );
+  self.provider.softLink( linkInDir1, self.provider.path.relative( linkInDir1, dirPath2 ) );
+  self.provider.softLink( linkInDir2, self.provider.path.relative( linkInDir2, pathToFile ) );
+
+  /*
+    dir :
+      dir1 :
+        linkToDir2
+      dir2 :
+        linkToFile
+      linkToDir1
+      file
+
+    path : 'dir/linkToDir1/linkToDir2/linkToFile' -> 'dir/file'
+  */
+
+  var testPath = _.path.join( dirPath, 'linkToDir1/linkToDir2/linkToFile' )
+  var o = _.mapExtend( null, o1, { filePath : testPath, preservingRelative : 1, resolvingHeadDirect : 1, resolvingHeadReverse : 1 } );
+  debugger;
+  var got = self.provider.pathResolveLinkFull( o );
+  debugger;
+  test.identical( got, pathToFile );
+
+}
 
 // --
 // declare
@@ -31585,8 +31637,6 @@ var Self =
 
     nativize : nativize,
 
-    // experiment : experiment,
-
     // hardLinkSyncRunner : hardLinkSyncRunner,
     // hardLinkAsyncRunner : hardLinkAsyncRunner,
 
@@ -31618,6 +31668,7 @@ var Self =
 
     fileCopyExperiment : fileCopyExperiment,
     statReadExperiment : statReadExperiment,
+    experiment : experiment,
 
   },
 

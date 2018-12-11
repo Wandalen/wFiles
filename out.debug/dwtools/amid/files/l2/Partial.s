@@ -770,6 +770,7 @@ defaults.resolvingSoftLink = null;
 defaults.resolvingTextLink = null;
 defaults.throwing = 1;
 defaults.allowingMissing = 1;
+defaults.allowingCycling = 1;
 
 var having = _pathResolveLink.having = Object.create( null );
 having.driving = 0;
@@ -832,6 +833,7 @@ function pathResolveLinkFull_body( o )
       resolvingSoftLink : o.resolvingSoftLink,
       resolvingTextLink : o.resolvingTextLink,
       allowingMissing : o.allowingMissing,
+      allowingCycling: o.allowingCycling,
       throwing : o.throwing,
     }
 
@@ -852,6 +854,7 @@ function pathResolveLinkFull_body( o )
       resolvingTextLink : o.resolvingTextLink,
       preservingRelative : o.preservingRelative,
       allowingMissing : o.allowingMissing,
+      allowingCycling: o.allowingCycling,
       throwing : o.throwing,
     }
 
@@ -883,6 +886,7 @@ function pathResolveLinkFull_body( o )
       resolvingSoftLink : o.resolvingSoftLink,
       resolvingTextLink : o.resolvingTextLink,
       allowingMissing : o.allowingMissing,
+      allowingCycling: o.allowingCycling,
       throwing : o.throwing,
     }
 
@@ -932,14 +936,20 @@ function pathResolveLinkTail_body( o )
   let r = self.pathResolveLinkTailChain.body.call( self, o2 );
   o.stat = o2.stat;
 
-  if( r[ r.length-1 ] === null && o.allowingMissing )
-  r = r[ r.length-2 ];
-  else
-  r = r[ r.length-1 ];
+  let result = r[ r.length-1 ];
 
-  _.assert( r === null || _.strIs( r ) );
+  if( r[ r.length-1 ] === null )
+  {
+    let cycle = false;
+    if( r.length > 2 )
+    cycle = _.arrayRightIndex( r, r[ r.length-2 ], r.length-3 ) !== -1;
+    if( cycle && o.allowingCycling || !cycle && o.allowingMissing )
+    result = r[ r.length-2 ];
+  }
 
-  return r;
+  _.assert( result === null || _.strIs( result ) );
+
+  return result;
 }
 
 _.routineExtend( pathResolveLinkTail_body, _pathResolveLink );
@@ -999,7 +1009,7 @@ function pathResolveLinkTailChain_body( o )
   {
     o.err = { cycleInLinks : true }; /* xxx */ // used by Extract.statReadAct to get kind of error
     debugger;
-    if( o.throwing && !o.allowingMissing )
+    if( o.throwing && !o.allowingCycling )
     {
       throw _.err( 'Links cycle at', _.strQuote( o.filePath ) );
     }
@@ -1007,6 +1017,18 @@ function pathResolveLinkTailChain_body( o )
     {
       o.result.push( o.filePath, null );
       o.found.push( o.filePath, null );
+
+      if( o.allowingCycling )
+      {
+        o.stat = self.statReadAct
+        ({
+          filePath : o.filePath,
+          throwing : 0,
+          resolvingSoftLink : 0,
+          sync : 1,
+        });
+      }
+
       return o.result;
     }
   }
@@ -1146,6 +1168,7 @@ function pathResolveLinkHeadDirect_body( o )
   _.assert( _.boolLike( o.resolvingSoftLink ) );
   _.assert( _.boolLike( o.resolvingTextLink ) );
   _.assert( _.boolLike( o.allowingMissing ) );
+  _.assert( _.boolLike( o.allowingCycling ) );
   _.assert( _.boolLike( o.throwing ) );
   _.assert( path.isAbsolute( o.filePath ) );
   _.assertRoutineOptions( pathResolveLinkHeadDirect_body, arguments );
@@ -1198,6 +1221,7 @@ function pathResolveLinkHeadReverse_body( o )
   _.assert( _.boolLike( o.resolvingSoftLink ) );
   _.assert( _.boolLike( o.resolvingTextLink ) );
   _.assert( _.boolLike( o.allowingMissing ) );
+  _.assert( _.boolLike( o.allowingCycling ) );
   _.assert( _.boolLike( o.throwing ) );
   _.assert( path.isAbsolute( o.filePath ) );
   _.assertRoutineOptions( pathResolveLinkHeadReverse_body, arguments );
@@ -3601,8 +3625,10 @@ function resolvedDirIsEmpty( filePath )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  if( self.resolvedIsDir( filePath ) )
-  return !self.dirRead( filePath ).length;
+  let o = { filePath : filePath };
+
+  if( self.resolvedIsDir( o ) )
+  return !self.dirRead( o.filePath ).length;
 
   return false;
 }
@@ -5042,6 +5068,7 @@ function _link_functor( gen )
           filePath : o.srcPath,
           resolvingSoftLink : o.resolvingSrcSoftLink,
           resolvingTextLink : o.resolvingSrcTextLink,
+          allowingCycling : o.allowingMissing,
           allowingMissing : o.allowingMissing,
           throwing : o.throwing
         }
@@ -5078,6 +5105,7 @@ function _link_functor( gen )
 
       /* qqq : if breakingSrcHardLink is on then src file should be broken */
 
+      if( _.boolLike( o.breakingDstHardLink ) )
       if( !o.breakingDstHardLink && c.dstStat.isHardLink() )
       // if( !renamingHardLinks && c.dstStat.isHardLink() )
       return false;
@@ -5923,33 +5951,38 @@ function fileExchange_body( o )
 
   o.dstPath = tempPath;
 
+  var o2 = _.mapExtend( null, o );
+
+  o2.originalSrcPath = null;
+  o2.originalDstPath = null;
+
   if( o.sync )
   {
-    self.fileRename( o );
-    o.dstPath = o.srcPath;
-    o.srcPath = dstPath;
-    self.fileRename( o );
-    o.dstPath = dstPath;
-    o.srcPath = tempPath;
-    return self.fileRename( o );
+    self.fileRename( _.mapExtend( null, o2 ) );
+    o2.dstPath = o2.srcPath;
+    o2.srcPath = dstPath;
+    self.fileRename( _.mapExtend( null, o2 ) );
+    o2.dstPath = dstPath;
+    o2.srcPath = tempPath;
+    return self.fileRename( _.mapExtend( null, o2 ) );
   }
   else
   {
     let con = new _.Consequence().give( null );
 
-    con.ifNoErrorThen( _.routineSeal( self, self.fileRename, [ o ] ) )
+    con.ifNoErrorThen( _.routineSeal( self, self.fileRename, [ _.mapExtend( null, o2 ) ] ) )
     .ifNoErrorThen( function( arg/*aaa*/ )
     {
-      o.dstPath = o.srcPath;
-      o.srcPath = dstPath;
+      o2.dstPath = o2.srcPath;
+      o2.srcPath = dstPath;
     })
-    .ifNoErrorThen( _.routineSeal( self, self.fileRename, [ o ] ) )
+    .ifNoErrorThen( _.routineSeal( self, self.fileRename, [ _.mapExtend( null, o2 ) ] ) )
     .ifNoErrorThen( function( arg/*aaa*/ )
     {
-      o.dstPath = dstPath;
-      o.srcPath = tempPath;
+      o2.dstPath = dstPath;
+      o2.srcPath = tempPath;
     })
-    .ifNoErrorThen( _.routineSeal( self, self.fileRename, [ o ] ) );
+    .ifNoErrorThen( _.routineSeal( self, self.fileRename, [ _.mapExtend( null, o2 ) ] ) );
 
     return con;
   }

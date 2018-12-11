@@ -807,26 +807,26 @@ function pathResolveLinkFull_body( o )
     because resolving does not guarantee reading stat
   */
 
-  // if( !o.stat )
-  // o.stat = self.statReadAct
-  // ({
-  //   filePath : result,
-  //   throwing : 0,
-  //   resolvingSoftLink : 0,
-  //   sync : 1,
-  // });
+  if( !o.stat )
+  o.stat = self.statReadAct
+  ({
+    filePath : result,
+    throwing : 0,
+    resolvingSoftLink : 0,
+    sync : 1,
+  });
 
   if( !o.resolvingSoftLink && ( !o.resolvingTextLink || !self.usingTextLink ) )
   {
 
-    if( !o.stat )
-    o.stat = self.statReadAct
-    ({
-      filePath : result,
-      throwing : 0,
-      resolvingSoftLink : 0,
-      sync : 1,
-    });
+    // if( !o.stat )
+    // o.stat = self.statReadAct
+    // ({
+    //   filePath : result,
+    //   throwing : 0,
+    //   resolvingSoftLink : 0,
+    //   sync : 1,
+    // });
 
     if( o.stat )
     return result;
@@ -848,6 +848,7 @@ function pathResolveLinkFull_body( o )
   if( o.resolvingHeadDirect )
   {
 
+    let filePath = result;
     let o2 =
     {
       hub : hub,
@@ -861,11 +862,18 @@ function pathResolveLinkFull_body( o )
     }
 
     result = self.pathResolveLinkHeadDirect.body.call( self, o2 );
+
+    if( result !== filePath )
+    {
+      debugger;
+      o.stat = null;
+    }
+
     // o.stat = o2.stat;
 
   }
 
-  // if( !o.stat )
+  if( !o.stat )
   o.stat = self.statReadAct
   ({
     filePath : result,

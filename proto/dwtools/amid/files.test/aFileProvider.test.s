@@ -25310,6 +25310,7 @@ function isTextLink( test )
 
   test.case = 'softlink to softlink to dir'
   self.provider.filesDelete( filePath );
+  self.provider.filesDelete( linkPath );
   self.provider.softLink({ dstPath : filePath, srcPath : _.path.dir( filePath ), makingDirectory : 1 });
   self.provider.softLink({ dstPath : linkPath, srcPath : filePath, makingDirectory : 1 });
   test.is( !self.provider.isTextLink({ filePath : linkPath, resolvingSoftLink : 1 }) );
@@ -25323,6 +25324,7 @@ function isTextLink( test )
 
   test.case = 'hardlink'
   self.provider.filesDelete( filePath );
+  self.provider.filesDelete( linkPath );
   self.provider.fileWrite( filePath, filePath );
   self.provider.hardLink({ dstPath : linkPath, srcPath : filePath, makingDirectory : 1 });
   test.is( !self.provider.isTextLink({ filePath : linkPath, resolvingSoftLink : 1 }) );

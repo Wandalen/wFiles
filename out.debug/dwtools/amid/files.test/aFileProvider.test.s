@@ -31651,7 +31651,49 @@ function experiment( test )
     throwing : 1
   }
 
-  test.case = 'several relative soft links in path';
+  /* - */
+
+  // test.case = 'several relative soft links in path, simpliefied';
+  // var dirPath = _.path.dir( filePath );
+  // // var dirPath1 = _.path.join( dirPath, 'dir1' );
+  // var dirPath2 = _.path.join( dirPath, 'dir2' );
+  // var pathToFile = _.path.join( dirPath, 'file' );
+  // var linkInDir = _.path.join( dirPath, 'linkToDir1' );
+  // // var linkInDir1 = _.path.join( dirPath1, 'linkToDir2' );
+  // var linkInDir2 = _.path.join( dirPath2, 'linkToFile' );
+  // self.provider.filesDelete( dirPath );
+  // self.provider.dirMake( dirPath );
+  // // self.provider.dirMake( dirPath1 );
+  // self.provider.dirMake( dirPath2 );
+  // self.provider.fileWrite( pathToFile,pathToFile );
+  // self.provider.softLink( linkInDir, self.provider.path.relative( linkInDir, dirPath2 ) );
+  // // self.provider.softLink( linkInDir1, self.provider.path.relative( linkInDir1, dirPath2 ) );
+  // self.provider.softLink( linkInDir2, self.provider.path.relative( linkInDir2, pathToFile ) );
+  //
+  // /*
+  //   dir :
+  //     // dir1 :
+  //     //   linkToDir2
+  //     dir2 :
+  //       linkToFile
+  //     linkToDir2
+  //     file
+  //
+  //   path : 'dir/linkToDir1/linkToDir2/linkToFile' -> 'dir/file'
+  // */
+  //
+  // var testPath = _.path.join( dirPath, 'linkToDir1/linkToFile' )
+  // var o = _.mapExtend( null, o1, { filePath : testPath, preservingRelative : 1, resolvingHeadDirect : 1, resolvingHeadReverse : 1 } );
+  // debugger;
+  // var got = self.provider.pathResolveLinkFull( o );
+  // debugger;
+  // test.identical( got, pathToFile );
+
+  // debugger; return; xxx
+
+  /* - */
+
+  test.case = 'several relative soft links in path, complicated';
   var dirPath = _.path.dir( filePath );
   var dirPath1 = _.path.join( dirPath, 'dir1' );
   var dirPath2 = _.path.join( dirPath, 'dir2' );
@@ -31663,7 +31705,7 @@ function experiment( test )
   self.provider.dirMake( dirPath );
   self.provider.dirMake( dirPath1 );
   self.provider.dirMake( dirPath2 );
-  self.provider.fileWrite( pathToFile,pathToFile );
+  self.provider.fileWrite( pathToFile, pathToFile );
   self.provider.softLink( linkInDir, self.provider.path.relative( linkInDir, dirPath1 ) );
   self.provider.softLink( linkInDir1, self.provider.path.relative( linkInDir1, dirPath2 ) );
   self.provider.softLink( linkInDir2, self.provider.path.relative( linkInDir2, pathToFile ) );
@@ -31680,12 +31722,63 @@ function experiment( test )
     path : 'dir/linkToDir1/linkToDir2/linkToFile' -> 'dir/file'
   */
 
+/*
+
+/experiment/linkToDir1/linkToDir2/linkToFile
+lrwxrwxrwx 1 kos 197121 9 Dec 11 16:22 /experiment/linkToDir1/linkToDir2/linkToFile -> ./../file
+
+/experiment/linkToDir1/linkToDir2
+lrwxrwxrwx 1 kos 197121 9 Dec 11 16:22 /experiment/linkToDir1/linkToDir2 -> ./../dir2
+
+/experiment/linkToDir1
+lrwxrwxrwx 1 kos 197121 6 Dec 11 16:22 /experiment/linkToDir1 -> ./dir1
+
+/experiment
+total 1
+drwxr-xr-x 1 kos 197121   0 Dec 11 16:22 .
+drwxr-xr-x 1 kos 197121   0 Dec 11 16:22 ..
+drwxr-xr-x 1 kos 197121   0 Dec 11 16:22 dir1
+drwxr-xr-x 1 kos 197121   0 Dec 11 16:22 dir2
+-rw-r--r-- 1 kos 197121 129 Dec 11 16:22 file
+lrwxrwxrwx 1 kos 197121   6 Dec 11 16:22 linkToDir1 -> ./dir1
+
+/experiment/dir1
+total 0
+drwxr-xr-x 1 kos 197121 0 Dec 11 16:22 .
+drwxr-xr-x 1 kos 197121 0 Dec 11 16:22 ..
+lrwxrwxrwx 1 kos 197121 9 Dec 11 16:22 linkToDir2 -> ./../dir2
+
+/experiment/dir2
+total 0
+drwxr-xr-x 1 kos 197121 0 Dec 11 16:22 .
+drwxr-xr-x 1 kos 197121 0 Dec 11 16:22 ..
+lrwxrwxrwx 1 kos 197121 9 Dec 11 16:22 linkToFile -> ./../file
+
+/experiment/linkToDir1/file
+No such file or directory
+
+/experiment/linkToDir1
+experiment/linkToDir1 -> ./dir1
+
+/experiment/linkToDir1
+experiment/linkToDir2
+
+*/
+
   var testPath = _.path.join( dirPath, 'linkToDir1/linkToDir2/linkToFile' )
   var o = _.mapExtend( null, o1, { filePath : testPath, preservingRelative : 1, resolvingHeadDirect : 1, resolvingHeadReverse : 1 } );
   debugger;
   var got = self.provider.pathResolveLinkFull( o );
   debugger;
   test.identical( got, pathToFile );
+
+/*
+﻿
+o2.found
+"/C/pro/web/Dave/git/trunk/builder/include/dwtools/tmp.tmp/Provider/HardDrive/48f50c26-a71b-1826-a228-64597bd2208f/experiment/linkToDir1/linkToDir2/linkToFile"
+"../../file"
+"/C/pro/web/Dave/git/trunk/builder/include/dwtools/tmp.tmp/Provider/HardDrive/48f50c26-a71b-1826-a228-64597bd2208f/experiment/linkToDir1/file"
+*/
 
 }
 

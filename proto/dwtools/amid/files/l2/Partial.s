@@ -839,9 +839,6 @@ function pathResolveLinkFull_body( o )
   }
 
 
-  if( _.strEnds( o.filePath, 'experiment/linkToDir1/linkToDir2/linkToFile' ) )
-  debugger;
-
   if( !o.stat && o.resolvingHeadDirect )
   {
 
@@ -859,6 +856,9 @@ function pathResolveLinkFull_body( o )
     result = self.pathResolveLinkHeadDirect.body.call( self, o2 );
 
   }
+
+  if( _.strEnds( o.filePath, 'experiment/linkToDir1/linkToDir2/linkToFile' ) )
+  debugger;
 
   if( result )
   // if( o.stat )
@@ -1024,6 +1024,9 @@ function pathResolveLinkTailChain_body( o )
   if( hub && hub !== self && path.isGlobal( o.filePath ) )
   return hub.pathResolveLinkTailChain.body.call( hub, o );
 
+  // if( _.strEnds( o.filePath, '/experiment/linkToDir1/file' ) )
+  // debugger;
+
   if( _.arrayHas( o.found, o.filePath ) )
   {
     o.err = { cycleInLinks : true }; /* xxx */ // used by Extract.statReadAct to get kind of error
@@ -1052,7 +1055,7 @@ function pathResolveLinkTailChain_body( o )
     }
   }
 
-  o.result.push( o.filePath );
+  // o.result.push( o.filePath );
   o.found.push( o.filePath );
 
   /*
@@ -1061,32 +1064,10 @@ function pathResolveLinkTailChain_body( o )
   */
 
   if( !o.resolvingSoftLink && ( !o.resolvingTextLink || !self.usingTextLink ) )
-  return o.result;
-
-  /* */
-
-  // if( o.resolvingHeadDirectories )
-  // {
-  //   o.resolvingHeadDirectories = 0;
-  //
-  //   _.assert( path.isAbsolute( o.filePath ) );
-  //
-  //   let splits = path.split( o.filePath );
-  //   let o2 = _.mapExtend( null, o );
-  //   o2.filePath = '/';
-  //
-  //   for( let i = 1; i < splits.length; i++ )
-  //   {
-  //     o2.filePath = path.join( o2.filePath, splits[ i ] );
-  //     o2.stat = null;
-  //     if( self.isLink( o2.filePath ) )
-  //     self.pathResolveLinkTailChain.body.call( self, o2 );
-  //     else if( i === splits.length - 1 )
-  //     self.pathResolveLinkTailChain.body.call( self, o2 );
-  //   }
-  //
-  //   return o2.result;
-  // }
+  {
+    o.result.push( o.filePath );
+    return o.result;
+  }
 
   /* */
 
@@ -1101,8 +1082,9 @@ function pathResolveLinkTailChain_body( o )
 
   if( !o.stat )
   {
-    o.found.push( o.stat );
+    o.result.push( o.filePath );
     o.result.push( o.stat );
+    o.found.push( o.stat );
 
     // if( o.result.length > 2 ) // should throw error if any part of chain does not exist
     if( o.throwing && !o.allowingMissing )
@@ -1118,17 +1100,13 @@ function pathResolveLinkTailChain_body( o )
 
   if( o.resolvingSoftLink && o.stat.isSoftLink() )
   {
+    debugger;
     let filePath = self.pathResolveSoftLink({ filePath : o.filePath }); /* qqq : implement allowingMissing */
-    // _.assert( filePath !== o.filePath );
-    // if( filePath !== o.filePath )
-    {
-      if( o.preservingRelative && !path.isAbsolute( filePath ) )
-      o.found.push( filePath );
-
-      o.filePath = path.join( o.filePath, filePath )
-      o.stat = null;
-      return self.pathResolveLinkTailChain.body.call( self, o );
-    }
+    if( o.preservingRelative && !path.isAbsolute( filePath ) )
+    o.result.push( filePath );
+    o.filePath = path.join( o.filePath, filePath )
+    o.stat = null;
+    return self.pathResolveLinkTailChain.body.call( self, o );
   }
 
   /* */
@@ -1137,18 +1115,14 @@ function pathResolveLinkTailChain_body( o )
   if( o.resolvingTextLink && o.stat.isTextLink() )
   {
     let filePath = self.pathResolveTextLink({ filePath : o.filePath });
-    // _.assert( filePath !== o.filePath );
-    // if( filePath !== o.filePath )
-    {
-      if( o.preservingRelative && !path.isAbsolute( filePath ) )
-      o.found.push( filePath );
-
-      o.filePath = path.join( o.filePath, filePath )
-      o.stat = null;
-      return self.pathResolveLinkTailChain.body.call( self, o );
-    }
+    if( o.preservingRelative && !path.isAbsolute( filePath ) )
+    o.result.push( filePath );
+    o.filePath = path.join( o.filePath, filePath )
+    o.stat = null;
+    return self.pathResolveLinkTailChain.body.call( self, o );
   }
 
+  o.result.push( o.filePath );
   return o.result;
 }
 
@@ -1254,8 +1228,8 @@ function pathResolveLinkHeadReverse_body( o )
 
   // console.log( 'pathResolveLinkHeadReverse', o.filePath );
 
-  if( o.filePath === 'extract+src:///src/a1' )
-  debugger;
+  // if( o.filePath === 'extract+src:///src/a1' )
+  // debugger;
 
   while( !path.isRoot( prefixPath ) )
   {
@@ -1268,8 +1242,8 @@ function pathResolveLinkHeadReverse_body( o )
     _.assert( !_.strBegins( prefixPath, '/..' ) && !_.strHas( prefixPath, '///..' ) )
   }
 
-  if( o.filePath === 'extract+src:///src/a1' )
-  debugger;
+  // if( o.filePath === 'extract+src:///src/a1' )
+  // debugger;
 
   let result = '/' + postfixPath;
 

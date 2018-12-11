@@ -31693,29 +31693,29 @@ function experiment( test )
 
   /* - */
 
-  // test.case = 'several relative soft links in path, complicated';
-  // var dirPath = _.path.dir( filePath );
-  // var dir1Path = _.path.join( dirPath, 'dir1' );
-  // var dirPath2 = _.path.join( dirPath, 'dir2' );
-  // var pathToFile = _.path.join( dirPath, 'file' );
-  // var linkToDir1Path = _.path.join( dirPath, 'linkToDir1' );
-  // var linkToTerminalPath = _.path.join( dir1Path, 'linkToDir2' );
-  // var linkInDir2 = _.path.join( dirPath2, 'linkToTerminal' );
-  // self.provider.filesDelete( dirPath );
-  // self.provider.dirMake( dirPath );
-  // self.provider.dirMake( dir1Path );
-  // self.provider.dirMake( dirPath2 );
-  // self.provider.fileWrite( pathToFile, pathToFile );
-  // self.provider.softLink( linkToDir1Path, self.provider.path.relative( linkToDir1Path, dir1Path ) );
-  // self.provider.softLink( linkToTerminalPath, self.provider.path.relative( linkToTerminalPath, dirPath2 ) );
-  // self.provider.softLink( linkInDir2, self.provider.path.relative( linkInDir2, pathToFile ) );
-  //
-  // var testPath = _.path.join( dirPath, 'linkToDir1/linkToDir2/linkToTerminal' )
-  // var o = _.mapExtend( null, o1, { filePath : testPath, preservingRelative : 1, resolvingHeadDirect : 1, resolvingHeadReverse : 1 } );
-  // debugger;
-  // var got = self.provider.pathResolveLinkFull( o );
-  // debugger;
-  // test.identical( got, pathToFile );
+  test.case = 'several relative soft links in path, complicated';
+  var dirPath = _.path.dir( filePath );
+  var dir1Path = _.path.join( dirPath, 'dir1' );
+  var dirPath2 = _.path.join( dirPath, 'dir2' );
+  var pathToFile = _.path.join( dirPath, 'file' );
+  var linkToDir1Path = _.path.join( dirPath, 'linkToDir1' );
+  var linkToTerminalPath = _.path.join( dir1Path, 'linkToDir2' );
+  var linkInDir2 = _.path.join( dirPath2, 'linkToTerminal' );
+  self.provider.filesDelete( dirPath );
+  self.provider.dirMake( dirPath );
+  self.provider.dirMake( dir1Path );
+  self.provider.dirMake( dirPath2 );
+  self.provider.fileWrite( pathToFile, pathToFile );
+  self.provider.softLink( linkToDir1Path, self.provider.path.relative( linkToDir1Path, dir1Path ) );
+  self.provider.softLink( linkToTerminalPath, self.provider.path.relative( linkToTerminalPath, dirPath2 ) );
+  self.provider.softLink( linkInDir2, self.provider.path.relative( linkInDir2, pathToFile ) );
+
+  var testPath = _.path.join( dirPath, 'linkToDir1/linkToDir2/linkToTerminal' )
+  var o = _.mapExtend( null, o1, { filePath : testPath, preservingRelative : 1, resolvingHeadDirect : 1, resolvingHeadReverse : 1 } );
+  debugger;
+  var got = self.provider.pathResolveLinkFull( o );
+  debugger;
+  test.identical( got, pathToFile );
 
   /*
     dir :
@@ -31792,9 +31792,7 @@ experiment/linkToDir2
 
   var testPath = _.path.join( basePath, 'linkToDir1/linkToTerminal' )
   var o = _.mapExtend( null, o1, { filePath : testPath, preservingRelative : 1, resolvingHeadDirect : 1, resolvingHeadReverse : 1 } );
-  debugger;
   var got = self.provider.pathResolveLinkFull( o );
-  debugger;
   test.identical( got, terminalPath );
 
 /*

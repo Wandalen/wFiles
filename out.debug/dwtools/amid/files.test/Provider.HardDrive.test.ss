@@ -29,7 +29,7 @@ function onSuiteBegin( test )
 function onSuiteEnd()
 {
   let path = this.provider.path;
-  _.assert( _.strEnds( this.testRootDirectory, 'Provider/HardDrive' ) );
+  _.assert( _.strEnds( this.testRootDirectory, 'Provider/HardDrive' ) ); // qqq : error here
   path.dirTempClose( this.testRootDirectory );
 }
 

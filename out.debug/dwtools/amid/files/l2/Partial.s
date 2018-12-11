@@ -960,6 +960,9 @@ function pathResolveLinkTail_body( o )
     result = r[ r.length-2 ];
   }
 
+  if( o.filePath !== result )
+  logger.log( 'pathResolveLinkTail', o.filePath, '->', result );
+
   _.assert( result === null || _.strIs( result ) );
 
   return result;
@@ -1137,10 +1140,6 @@ function pathResolveLinkHeadDirect_pre()
 {
   let self = this;
   let o = self._preFilePathScalarWithProviderDefaults.apply( self, arguments );
-
-  // if( o.found === null )
-  // o.found = [];
-
   return o;
 }
 
@@ -1174,7 +1173,7 @@ function pathResolveLinkHeadDirect_body( o )
     o2.filePath = filePath;
     o2.stat = null;
     o2.preservingRelative = 0;
-    if( /*i === splits.length - 1 ||*/ self.isLink( o2.filePath ) )
+    if( self.isLink( o2.filePath ) )
     filePath = self.pathResolveLinkTail.body.call( self, o2 );
   }
 

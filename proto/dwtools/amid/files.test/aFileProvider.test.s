@@ -31472,8 +31472,8 @@ function statReadExperiment( test )
 
   //
 
-  // var got = self.provider.statRead({ filePath : srcPath, throwing : 0 });
-  // test.identical( got, null );
+  var got = self.provider.statRead({ filePath : srcPath, throwing : 0 });
+  test.identical( got, null );
 
 }
 

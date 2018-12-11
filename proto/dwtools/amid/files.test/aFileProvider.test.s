@@ -29078,7 +29078,7 @@ function linkingCriticalCases( test )
   {
     filePath : linkPath,
     preservingRelative : 1,
-    allowingMissing : 1,
+    allowingCycling : 1,
     throwing : 1
   };
   self.provider.pathResolveLinkTailChain( o );

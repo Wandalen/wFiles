@@ -807,7 +807,7 @@ function pathResolveLinkFull_body( o )
 
   /*
     statRead should be before resolving
-    because it does not guarantee reading stat
+    because resolving does not guarantee reading stat
   */
 
   if( !o.stat )
@@ -836,12 +836,11 @@ function pathResolveLinkFull_body( o )
     }
 
     result = self.pathResolveLinkHeadDirect.body.call( self, o2 );
-    // o.stat = o2.stat;
 
   }
-  // else
 
-  if( o.stat )
+  if( result )
+  // if( o.stat )
   {
 
     let o2 =
@@ -856,9 +855,7 @@ function pathResolveLinkFull_body( o )
       throwing : o.throwing,
     }
 
-    // debugger;
     result = self.pathResolveLinkTail.body.call( self, o2 );
-    // debugger;
     o.stat = o2.stat;
     _.assert( o.stat !== undefined );
 
@@ -869,7 +866,10 @@ function pathResolveLinkFull_body( o )
     {
       result = null;
       if( o.throwing )
-      throw _.err( 'File does not exist', _.strQuote( o.filePath ) );
+      {
+        debugger;
+        throw _.err( 'File does not exist', _.strQuote( o.filePath ) );
+      }
     }
   }
 

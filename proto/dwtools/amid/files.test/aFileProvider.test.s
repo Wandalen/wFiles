@@ -30243,6 +30243,7 @@ pathResolveLinkTailChain.timeOut = 30000;
 function pathResolveLinkFull( test )
 {
   let self = this;
+  let path = self.provider.path;
 
   // if( !self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   // {
@@ -30250,19 +30251,50 @@ function pathResolveLinkFull( test )
   //   return;
   // }
 
-  let dir = test.context.pathFor( 'written/pathResolveLinkTailChain' );
-  let filePath = test.context.pathFor( 'written/pathResolveLinkTailChain/file' );
-  let linkPath = test.context.pathFor( 'written/pathResolveLinkTailChain/link' );
-  let linkPath2 = test.context.pathFor( 'written/pathResolveLinkTailChain/link2' );
-  let linkPath3 = test.context.pathFor( 'written/pathResolveLinkTailChain/link3' );
-  let path = self.provider.path;
+  let dir = test.context.pathFor( 'written/pathResolveLinkFull' );
+  let filePath = test.context.pathFor( 'written/pathResolveLinkFull/file' );
+  let linkPath = test.context.pathFor( 'written/pathResolveLinkFull/link' );
+  let linkPath2 = test.context.pathFor( 'written/pathResolveLinkFull/link2' );
+  let linkPath3 = test.context.pathFor( 'written/pathResolveLinkFull/link3' );
+  let terminalInDirPath = self.provider.path.join( dir, 'terminal' );
+  let toDirPath = path.join( dir, 'toDir' );
 
   self.provider.fieldPush( 'usingTextLink', true );
 
-  //
+  /* - */
+
+  test.open( 'critical' );
+
+  var tree =
+  {
+    directory :
+    {
+      terminal : 'terminal',
+    },
+    toDir : [{ softLink : '/directory' }],
+  }
+
+  self.provider.filesDelete( dir );
+  self.provider.fileWrite( terminalInDirPath, terminalInDirPath );
+  self.provider.softLink( toDirPath, dir );
+
+  var o2 =
+  {
+     filePath : path.join( toDirPath, 'terminal' ),
+     allowingMissing : 0,
+     throwing : 0,
+  }
+  var got = self.provider.pathResolveLinkFull( o2 );
+  test.identical( got, terminalInDirPath );
+
+  test.close( 'critical' );
+
+  /* - */
 
   test.case = 'not existing file';
-  self.provider.filesDelete( _.path.dir( filePath ) );
+  debugger;
+  self.provider.filesDelete( path.dir( filePath ) );
+  debugger;
 
   var got = self.provider.pathResolveLinkFull
   ({

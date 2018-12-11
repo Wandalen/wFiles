@@ -44,7 +44,7 @@ var Proto =
   enabled : 1,
   verbosity : 4,
 
-  // routine : 'pathResolveTextLink',
+  // routine : 'pathResolveSoftLink2',
 
   onSuiteBegin : onSuiteBegin,
   onSuiteEnd : onSuiteEnd,

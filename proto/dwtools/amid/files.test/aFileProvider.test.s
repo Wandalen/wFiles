@@ -31805,25 +31805,26 @@ xxx : o = { filePath : path.s.from( o.filePath ) }
   /* - */
 
   // test.case = 'works only for hd, but not';
-  // var basePath = _.path.dir( filePath );
-  // var dir1Path = _.path.join( basePath, 'dir1a/dir1b' );
-  // var terminalPath = _.path.join( basePath, 'terminal' );
-  // var linkToDir1Path = _.path.join( basePath, 'linkToDir1' );
-  // var linkToTerminalPath = _.path.join( dir1Path, 'linkToTerminal' );
-  //
-  // console.log( 'basePath', basePath );
-  //
-  // self.provider.filesDelete( basePath );
-  // self.provider.dirMake( basePath );
-  // self.provider.dirMake( dir1Path );
-  // self.provider.fileWrite( terminalPath, terminalPath );
-  // self.provider.softLink( linkToDir1Path, self.provider.path.relative( linkToDir1Path, dir1Path ) );
-  // self.provider.softLink({ dstPath : linkToTerminalPath, srcPath : self.provider.path.relative( basePath, terminalPath ), allowingMissing : 1 });
-  //
-  // var testPath = _.path.join( basePath, 'linkToDir1/linkToTerminal' )
-  // var o = _.mapExtend( null, o1, { filePath : testPath, preservingRelative : 1, resolvingHeadDirect : 1, resolvingHeadReverse : 1 } );
-  // var got = self.provider.pathResolveLinkFull( o );
-  // test.identical( got, terminalPath );
+  test.case = 'works only for both';
+  var basePath = _.path.dir( filePath );
+  var dir1Path = _.path.join( basePath, 'dir1a/dir1b' );
+  var terminalPath = _.path.join( basePath, 'terminal' );
+  var linkToDir1Path = _.path.join( basePath, 'linkToDir1' );
+  var linkToTerminalPath = _.path.join( dir1Path, 'linkToTerminal' );
+
+  console.log( 'basePath', basePath );
+
+  self.provider.filesDelete( basePath );
+  self.provider.dirMake( basePath );
+  self.provider.dirMake( dir1Path );
+  self.provider.fileWrite( terminalPath, terminalPath );
+  self.provider.softLink( linkToDir1Path, self.provider.path.relative( linkToDir1Path, dir1Path ) );
+  self.provider.softLink({ dstPath : linkToTerminalPath, srcPath : self.provider.path.relative( /* basePath */linkToTerminalPath, terminalPath ), allowingMissing : 1 });
+
+  var testPath = _.path.join( basePath, 'linkToDir1/linkToTerminal' )
+  var o = _.mapExtend( null, o1, { filePath : testPath, preservingRelative : 1, resolvingHeadDirect : 1, resolvingHeadReverse : 1 } );
+  var got = self.provider.pathResolveLinkFull( o );
+  test.identical( got, terminalPath );
 
 }
 

@@ -28538,7 +28538,7 @@ function fileExists( test )
   self.provider.fileWrite( srcPath, srcPath );
   self.provider.hardLink( dstPath, srcPath );
   var got = self.provider.fileExists( dstPath );
-  test.is( self.provider.filesAreHardLinked([ dstPath, srcPath ]) );
+  test.identical( self.provider.filesAreHardLinked([ dstPath, srcPath ]), null );
   test.identical( got, true );
 
   if( !test.context.symlinkIsAllowed() )

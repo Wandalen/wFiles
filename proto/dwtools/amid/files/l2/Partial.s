@@ -5074,6 +5074,7 @@ function _link_functor( gen )
 
       /* qqq : if breakingSrcHardLink is on then src file should be broken */
 
+      if( _.boolIs( o.breakingDstHardLink ) )
       if( !o.breakingDstHardLink && c.dstStat.isHardLink() )
       // if( !renamingHardLinks && c.dstStat.isHardLink() )
       return false;

@@ -1218,7 +1218,7 @@ function pathResolveLinkHeadDirect_body( o )
     if( !o2.stat )
     {
       debugger;
-      filePath = path.join.apply( path, _.arrayAppendArrays( [], [ filePath, splits[ i ] ] ) );
+      filePath = path.join.apply( path, _.arrayAppendArrays( [], [ filePath, splits.slice( i+1 ) ] ) );
       o.stat = null;
       break;
     }

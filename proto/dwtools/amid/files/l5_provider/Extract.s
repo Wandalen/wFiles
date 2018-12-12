@@ -996,7 +996,7 @@ function fileCopyAct( o )
 
     let dstPath = self._descriptorRead( o.dstPath );
     if( self._descriptorIsDir( dstPath ) )
-    throw _.err( 'Can`t rewrite dir with file : ' + o.dstPath );
+    throw _.err( 'Can`t rewrite directory by terminal file : ' + o.dstPath );
 
     return true;
   }

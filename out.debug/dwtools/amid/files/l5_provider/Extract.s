@@ -294,12 +294,12 @@ _.routineExtend( fileReadAct, Parent.prototype.fileReadAct );
 
 //
 
-// let fileHashAct = ( function()
+// let hashReadAct = ( function()
 // {
 
 //   let crypto;
 
-//   return function fileHashAct( o )
+//   return function hashReadAct( o )
 //   {
 //     let result=NaN;
 //     let self = this;
@@ -307,7 +307,7 @@ _.routineExtend( fileReadAct, Parent.prototype.fileReadAct );
 //     if( _.strIs( o ) )
 //     o = { filePath : o };
 
-//     _.assertRoutineOptions( fileHashAct, o );
+//     _.assertRoutineOptions( hashReadAct, o );
 //     _.assert( _.strIs( o.filePath ) );
 //     _.assert( arguments.length === 1, 'Expects single argument' );
 
@@ -351,8 +351,8 @@ _.routineExtend( fileReadAct, Parent.prototype.fileReadAct );
 //   }
 // })();
 
-// fileHashAct.defaults = {};
-// fileHashAct.defaults.__proto__ = Parent.prototype.fileHashAct.defaults;
+// hashReadAct.defaults = {};
+// hashReadAct.defaults.__proto__ = Parent.prototype.hashReadAct.defaults;
 
 //
 
@@ -427,6 +427,9 @@ function statReadAct( o )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assertRoutineOptions( statReadAct, o );
+
+  // if( o.filePath === '/dst' )
+  // debugger;
 
   /* */
 

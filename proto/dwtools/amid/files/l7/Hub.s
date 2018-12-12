@@ -937,7 +937,7 @@ let FilteredRoutines =
 
   fileReadAct : Routines.fileReadAct,
   streamReadAct : Routines.streamReadAct,
-  fileHashAct : Routines.fileHashAct,
+  hashReadAct : Routines.hashReadAct,
   dirReadAct : Routines.dirReadAct,
   statReadAct : Routines.statReadAct,
   fileExistsAct : Routines.fileExistsAct,

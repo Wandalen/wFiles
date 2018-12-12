@@ -530,12 +530,12 @@ _.routineExtend( streamReadAct, Parent.prototype.streamReadAct );
 
 //
 
-// let fileHashAct = ( function()
+// let hashReadAct = ( function()
 // {
 
 //   let crypto;
 
-//   return function fileHashAct( o )
+//   return function hashReadAct( o )
 //   {
 //     let result = NaN;
 //     let self = this;
@@ -543,7 +543,7 @@ _.routineExtend( streamReadAct, Parent.prototype.streamReadAct );
 //     if( _.strIs( o ) )
 //     o = { filePath : o };
 
-//     _.assertRoutineOptions( fileHashAct, o );
+//     _.assertRoutineOptions( hashReadAct, o );
 //     _.assert( _.strIs( o.filePath ) );
 //     _.assert( arguments.length === 1, 'Expects single argument' );
 
@@ -606,8 +606,8 @@ _.routineExtend( streamReadAct, Parent.prototype.streamReadAct );
 
 // })();
 
-// fileHashAct.defaults = {};
-// fileHashAct.defaults.__proto__ = Parent.prototype.fileHashAct.defaults;
+// hashReadAct.defaults = {};
+// hashReadAct.defaults.__proto__ = Parent.prototype.hashReadAct.defaults;
 
 //
 

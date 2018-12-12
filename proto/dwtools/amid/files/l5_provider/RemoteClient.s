@@ -311,12 +311,12 @@ statReadAct.defaults.__proto__ = Parent.prototype.statReadAct.defaults;
 
 //
 
-let fileHashAct = ( function()
+let hashReadAct = ( function()
 {
 
   let crypto;
 
-  return function fileHashAct( o )
+  return function hashReadAct( o )
   {
     let result = NaN;
     let self = this;
@@ -324,7 +324,7 @@ let fileHashAct = ( function()
     if( _.strIs( o ) )
     o = { filePath : o };
 
-    _.routineOptions( fileHashAct,o );
+    _.routineOptions( hashReadAct,o );
     _.assert( _.strIs( o.filePath ) );
     _.assert( arguments.length === 1, 'Expects single argument' );
 
@@ -387,8 +387,8 @@ let fileHashAct = ( function()
 
 })();
 
-fileHashAct.defaults = {};
-fileHashAct.defaults.__proto__ = Parent.prototype.fileHashAct.defaults;
+hashReadAct.defaults = {};
+hashReadAct.defaults.__proto__ = Parent.prototype.hashReadAct.defaults;
 
 //
 
@@ -1297,7 +1297,7 @@ let Proto =
   fileReadAct : fileReadAct,
   streamReadAct : streamReadAct,
   statReadAct : statReadAct,
-  fileHashAct : fileHashAct,
+  hashReadAct : hashReadAct,
 
   dirReadAct : dirReadAct,
 

@@ -5,7 +5,7 @@
 if( typeof module !== 'undefined' )
 {
 
-  let _ = _global_.wTools;
+  let _ = require( '../../../Tools.s' );
   if( !_.FileProvider )
   require( '../UseMid.s' );
 

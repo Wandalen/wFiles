@@ -4,12 +4,9 @@
 
 if( typeof module !== 'undefined' )
 {
-  let _global = _global_;
-  let _ = _global_.wTools;
-
+  let _ = require( '../../../Tools.s' );
   if( !_.FileProvider )
   require( '../UseMid.s' );
-
 }
 
 let _global = _global_;

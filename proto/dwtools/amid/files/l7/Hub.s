@@ -394,15 +394,18 @@ function pathResolveLinkFull_body( o )
 
   let result = r.provider.pathResolveLinkFull.body.call( r.provider, o );
 
-  _.assert( !!result );
+  // _.assert( !!result );
+
+  if( result === null )
+  return null;
 
   result = self.path.join( r.provider.originPath, result );
 
   if( result === o.filePath )
   {
     debugger;
-    _.assert( 0, 'not implemented' );
-    return r.originalPath;
+    _.assert( 0, 'not tested' );
+    // return r.originalPath;
   }
 
   return result;
@@ -428,15 +431,18 @@ function pathResolveLinkTail_body( o )
 
   let result = r.provider.pathResolveLinkTail.body.call( r.provider, o );
 
-  _.assert( !!result );
+  if( result === null )
+  return null;
+
+  // _.assert( !!result );
 
   result = self.path.join( r.provider.originPath, result );
 
   if( result === o.filePath )
   {
     debugger;
-    _.assert( 0, 'not implemented' );
-    return r.originalPath;
+    _.assert( 0, 'not tested' );
+    // return r.originalPath;
   }
 
   return result;

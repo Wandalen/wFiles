@@ -26,15 +26,17 @@ var Parent = wTester;
 
 function onSuiteBegin( test )
 {
-  this.testRootDirectory = _.path.dirTempOpen( _.path.join( __dirname, '../..'  ), 'FileProvider/Abstract' );
+  let path = this.provider.path;
+  this.testRootDirectory = path.dirTempOpen( path.join( __dirname, '../..'  ), 'FilesFind/Abstract' );
 }
 
 //
 
 function pathFor( filePath )
 {
-  filePath =  _.path.join( this.testRootDirectory, filePath );
-  return _.path.normalize( filePath );
+  let path = this.provider.path;
+  filePath =  path.join( this.testRootDirectory, filePath );
+  return path.normalize( filePath );
 }
 
 //

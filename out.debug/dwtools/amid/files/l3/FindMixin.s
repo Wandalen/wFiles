@@ -3733,65 +3733,65 @@ let Supplement =
 
   // etc
 
-  recordsOrder : recordsOrder,
-  _filesFilterMasksSupplement : _filesFilterMasksSupplement,
+  recordsOrder,
+  _filesFilterMasksSupplement,
 
   // find
 
-  filesFindLikePre_pre : filesFindLikePre_pre,
-  filesFind_pre : filesFind_pre,
-  _filesFilterForm : _filesFilterForm,
+  filesFindLikePre_pre,
+  filesFind_pre,
+  _filesFilterForm,
 
-  filesFindSingle : filesFindSingle,
-  filesFind : filesFind,
-  filesFindRecursive : filesFindRecursive,
-  filesGlob : filesGlob,
+  filesFindSingle,
+  filesFind,
+  filesFindRecursive,
+  filesGlob,
 
-  filesFinder_functor : filesFinder_functor,
-  filesFinder : filesFinder,
-  filesGlober : filesGlober,
+  filesFinder_functor,
+  filesFinder,
+  filesGlober,
 
   // reflect
 
-  filesCopyWithAdapter : filesCopyWithAdapter,
+  filesCopyWithAdapter,
 
-  _filesPrepareFilters : _filesPrepareFilters,
+  _filesPrepareFilters,
 
-  filesReflectEvaluate : filesReflectEvaluate,
-  filesReflectSingle : filesReflectSingle,
-  filesReflect : filesReflect,
+  filesReflectEvaluate,
+  filesReflectSingle,
+  filesReflect,
 
-  filesReflector_functor : filesReflector_functor,
-  filesReflector : filesReflector,
+  filesReflector_functor,
+  filesReflector,
 
   // same
 
-  filesFindSame : filesFindSame,
+  filesFindSame,
 
   // delete
 
-  filesDelete : filesDelete,
+  filesDelete,
 
-  filesDeleteForce : filesDeleteForce,
-  filesDeleteFiles : filesDeleteFiles,
-  filesDeleteEmptyDirs : filesDeleteEmptyDirs,
+  filesDeleteForce,
+  filesDeleteFiles,
+  filesDeleteEmptyDirs,
 
   // other find
 
-  softLinksBreak : softLinksBreak,
-  softLinksRebase : softLinksRebase,
-  filesHasTerminal : filesHasTerminal,
+  softLinksBreak,
+  softLinksRebase,
+  filesHasTerminal,
 
   // resolver
 
-  filesResolve : filesResolve,
+  filesResolve,
 
   //
 
-  Composes : Composes,
-  Aggregates : Aggregates,
-  Associates : Associates,
-  Restricts : Restricts,
+  Composes,
+  Aggregates,
+  Associates,
+  Restricts,
 
 }
 

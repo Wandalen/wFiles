@@ -858,18 +858,18 @@ function pathResolveLinkFull_body( o )
       allowingMissing : o.allowingMissing,
       allowingCycling: o.allowingCycling,
       throwing : o.throwing,
-      // stat : o.stat,
+      stat : o.stat,
     }
 
     result = self.pathResolveLinkHeadDirect.body.call( self, o2 );
 
-    if( result !== filePath )
-    {
-      debugger;
-      o.stat = null;
-    }
+    // if( result !== filePath )
+    // {
+    //   debugger;
+    //   o.stat = null;
+    // }
 
-    // o.stat = o2.stat;
+    o.stat = o2.stat;
 
   }
 
@@ -882,8 +882,8 @@ function pathResolveLinkFull_body( o )
     sync : 1,
   });
 
-  if( _.strEnds( o.filePath, 'experiment/linkToDir1/linkToTerminal' ) )
-  debugger;
+  // if( _.strEnds( o.filePath, 'experiment/linkToDir1/linkToTerminal' ) )
+  // debugger;
 
   if( result )
   // if( o.stat )
@@ -991,8 +991,8 @@ function pathResolveLinkTail_body( o )
     result = r[ r.length-2 ];
   }
 
-  if( o.filePath !== result )
-  logger.log( 'pathResolveLinkTail', o.filePath, '->', result );
+  // if( o.filePath !== result )
+  // logger.log( 'pathResolveLinkTail', o.filePath, '->', result );
 
   _.assert( result === null || _.strIs( result ) );
 
@@ -1057,7 +1057,7 @@ function pathResolveLinkTailChain_body( o )
 
   if( _.arrayHas( o.found, o.filePath ) )
   {
-    o.err = { cycleInLinks : true }; /* xxx */ // used by Extract.statReadAct to get kind of error
+    // o.err = { cycleInLinks : true }; /* xxx */ // used by Extract.statReadAct to get kind of error
     debugger;
     if( o.throwing && !o.allowingCycling )
     {
@@ -1069,15 +1069,13 @@ function pathResolveLinkTailChain_body( o )
       o.found.push( o.filePath, null );
 
       if( o.allowingCycling )
-      {
-        o.stat = self.statReadAct
-        ({
-          filePath : o.filePath,
-          throwing : 0,
-          resolvingSoftLink : 0,
-          sync : 1,
-        });
-      }
+      o.stat = self.statReadAct
+      ({
+        filePath : o.filePath,
+        throwing : 0,
+        resolvingSoftLink : 0,
+        sync : 1,
+      });
 
       return o.result;
     }
@@ -1111,8 +1109,8 @@ function pathResolveLinkTailChain_body( o )
   if( !o.stat )
   {
     o.result.push( o.filePath );
-    o.result.push( o.stat );
-    o.found.push( o.stat );
+    o.result.push( null );
+    o.found.push( null );
 
     // if( o.result.length > 2 ) // should throw error if any part of chain does not exist
     if( o.throwing && !o.allowingMissing )
@@ -1128,7 +1126,6 @@ function pathResolveLinkTailChain_body( o )
 
   if( o.resolvingSoftLink && o.stat.isSoftLink() )
   {
-    debugger;
     let filePath = self.pathResolveSoftLink({ filePath : o.filePath }); /* qqq : implement allowingMissing */
     if( o.preservingRelative && !path.isAbsolute( filePath ) )
     o.result.push( filePath );
@@ -1204,8 +1201,12 @@ function pathResolveLinkHeadDirect_body( o )
     o2.filePath = filePath;
     o2.stat = null;
     o2.preservingRelative = 0;
+    if( i === splits.length-1 )
+    o2.stat = o.stat;
     if( self.isLink( o2.filePath ) )
     filePath = self.pathResolveLinkTail.body.call( self, o2 );
+    if( i === splits.length-1 )
+    o.stat = o2.stat;
   }
 
   return filePath;
@@ -1214,7 +1215,7 @@ function pathResolveLinkHeadDirect_body( o )
 _.routineExtend( pathResolveLinkHeadDirect_body, _pathResolveLink );
 
 var defaults = pathResolveLinkHeadDirect_body.defaults;
-// defaults.stat = null;
+defaults.stat = null;
 
 //
 

@@ -448,9 +448,6 @@ function statReadAct( o )
   {
     let result = null;
 
-    // if( filePath === '/out/icons' )
-    // debugger;
-
     if( o.resolvingSoftLink || ( o.resolvingTextLink && self.usingTextLink ) )
     {
 
@@ -461,27 +458,16 @@ function statReadAct( o )
         resolvingTextLink : o.resolvingTextLink,
       };
 
-      // try
-      // {
-        filePath = self.pathResolveLinkFull( o2 );
-      // }
-      // catch( err )
-      // {
-      //   if( !o.throwing && o2.err && o2.err.cycleInLinks )
-      //   return result;
-      //   throw err;
-      // }
-
+      filePath = self.pathResolveLinkFull( o2 );
       _.assert( o2.stat !== undefined );
 
       return o2.stat;
     }
 
-    let file = self._descriptorRead( filePath );
+    let d = self._descriptorRead( filePath );
 
-    if( !_.definedIs( file ) )
+    if( !_.definedIs( d ) )
     {
-      // _.assert( !file );
       if( o.throwing )
       throw _.err( 'Path', _.strQuote( filePath ), 'doesn`t exist!' );
       return result;
@@ -505,29 +491,29 @@ function statReadAct( o )
     result.isDirectory = returnFalse;
     result.isSymbolicLink = returnFalse;
 
-    if( self._descriptorIsDir( file ) )
+    if( self._descriptorIsDir( d ) )
     {
       result.isDirectory = returnTrue;
       result.isDir = returnTrue;
     }
-    else if( self._descriptorIsTerminal( file ) )
+    else if( self._descriptorIsTerminal( d ) )
     {
       result.isTerminal = returnTrue;
       result.isFile = returnTrue;
-      if( _.numberIs( file ) )
-      result.size = String( file ).length;
-      else if( _.strIs( file ) )
-      result.size = file.length;
+      if( _.numberIs( d ) )
+      result.size = String( d ).length;
+      else if( _.strIs( d ) )
+      result.size = d.length;
       else
-      result.size = file.byteLength;
+      result.size = d.byteLength;
       _.assert( result.size >= 0 );
     }
-    else if( self._descriptorIsSoftLink( file ) )
+    else if( self._descriptorIsSoftLink( d ) )
     {
       result.isSymbolicLink = returnTrue;
       result.isSoftLink = returnTrue;
     }
-    else if( self._descriptorIsScript( file ) )
+    else if( self._descriptorIsScript( d ) )
     {
       result.isTerminal = returnTrue;
       result.isFile = returnTrue;
@@ -769,7 +755,7 @@ function fileDeleteAct( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.strIs( o.filePath ) );
 
-  logger.log( 'Extract.fileDeleteAct', o.filePath );
+  // logger.log( 'Extract.fileDeleteAct', o.filePath );
   // debugger;
 
   if( o.sync )
@@ -1795,6 +1781,7 @@ having.driving = 0;
 function _descriptorRead( o )
 {
   let self = this;
+  let path = self.path;
 
   if( _.strIs( arguments[ 0 ] ) )
   o = { filePath : arguments[ 0 ] };
@@ -1806,6 +1793,7 @@ function _descriptorRead( o )
 
   _.routineOptions( _descriptorRead, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( !path.isGlobal( o.filePath ), 'Expects local path, but got', o.filePath );
 
   let optionsSelect = Object.create( null );
 

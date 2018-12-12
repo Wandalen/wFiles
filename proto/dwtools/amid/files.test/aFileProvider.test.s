@@ -31712,10 +31712,10 @@ function experiment( test )
 
   var testPath = _.path.join( dirPath, 'linkToDir1/linkToDir2/linkToTerminal' )
   var o = _.mapExtend( null, o1, { filePath : testPath, preservingRelative : 1, resolvingHeadDirect : 1, resolvingHeadReverse : 1 } );
-  debugger;
   var got = self.provider.pathResolveLinkFull( o );
-  debugger;
   test.identical( got, pathToFile );
+
+  debugger; return; xxx
 
   /*
     dir :

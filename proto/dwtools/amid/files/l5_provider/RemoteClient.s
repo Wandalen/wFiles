@@ -1068,17 +1068,17 @@ dirMake.defaults = Parent.prototype.dirMake.defaults;
 
 //
 
-function linkSoftAct( o )
+function softLinkAct( o )
 {
   let self = this;
-  o = self._linkPre( linkSoftAct,arguments );
+  o = self._linkPre( softLinkAct,arguments );
 
   /* */
 
   if( o.sync )
   {
     if( self.fileStat( o.dstPath ) )
-    throw _.err( 'linkSoftAct',o.dstPath,'already exists' );
+    throw _.err( 'softLinkAct',o.dstPath,'already exists' );
 
     File.symlinkSync( o.srcPath,o.dstPath );
   }
@@ -1094,7 +1094,7 @@ function linkSoftAct( o )
     .got( function( err, stat )
     {
       if( stat )
-      return con.error ( _.err( 'linkSoftAct',o.dstPath,'already exists' ) );
+      return con.error ( _.err( 'softLinkAct',o.dstPath,'already exists' ) );
       File.symlink( o.srcPath, o.dstPath, function( err )
       {
         return con.give( err, null )
@@ -1105,16 +1105,16 @@ function linkSoftAct( o )
 
 }
 
-linkSoftAct.defaults = {};
-linkSoftAct.defaults.__proto__ = Parent.prototype.linkSoftAct.defaults;
+softLinkAct.defaults = {};
+softLinkAct.defaults.__proto__ = Parent.prototype.softLinkAct.defaults;
 
 //
 
-function linkHardAct( o )
+function hardLinkAct( o )
 {
   let self = this;
 
-  o = self._linkPre( linkHardAct,arguments );
+  o = self._linkPre( hardLinkAct,arguments );
 
   /* */
 
@@ -1134,7 +1134,7 @@ function linkHardAct( o )
       });
 
       if( self.fileStat( o.dstPath ) )
-      throw _.err( 'linkHardAct',o.dstPath,'already exists' );
+      throw _.err( 'hardLinkAct',o.dstPath,'already exists' );
 
       File.linkSync( o.srcPath,o.dstPath );
       return true;
@@ -1173,7 +1173,7 @@ function linkHardAct( o )
       return con.error( err );
 
       if( stat )
-      return con.error( _.err( 'linkHardAct',o.dstPath,'already exists' ) );
+      return con.error( _.err( 'hardLinkAct',o.dstPath,'already exists' ) );
 
       File.link( o.srcPath,o.dstPath, function( err )
       {
@@ -1185,8 +1185,8 @@ function linkHardAct( o )
   }
 }
 
-linkHardAct.defaults = {};
-linkHardAct.defaults.__proto__ = Parent.prototype.linkHardAct.defaults;
+hardLinkAct.defaults = {};
+hardLinkAct.defaults.__proto__ = Parent.prototype.hardLinkAct.defaults;
 
 // --
 // encoders
@@ -1319,8 +1319,8 @@ let Proto =
   dirMakeAct : dirMakeAct,
   dirMake : dirMake,
 
-  linkSoftAct : linkSoftAct,
-  linkHardAct : linkHardAct,
+  softLinkAct : softLinkAct,
+  hardLinkAct : hardLinkAct,
 
 
   //

@@ -128,7 +128,7 @@ function filesRead( o )
       if( _.FileRecord && src instanceof _.FileRecord )
       readOptions.filePath = src.absolute;
       else
-      _.mapExtend( readOptions,src );
+      _.mapExtend( readOptions, _.mapOnly( src, self.fileRead.defaults ) );
     }
     else
     readOptions.filePath = src;

@@ -1170,53 +1170,6 @@ function allPaths( o )
       return path.iterateAll({ iteration : it, filePath : thePath, onEach : o.onEach });
     }
 
-    // if( thePath === null || _.strIs( thePath ) )
-    // {
-    //   if( o.onEach( it ) === false )
-    //   return false;
-    //   if( filter[ name ] !== it.value )
-    //   filter[ name ] = it.value;
-    // }
-    // else if( _.arrayIs( thePath ) )
-    // {
-    //   for( let p = 0 ; p < thePath.length ; p++ )
-    //   {
-    //     if( o.onEach( it ) === false )
-    //     return false;
-    //     thePath[ p ] = it.value;
-    //   }
-    // }
-    // else if( _.mapIs( thePath ) )
-    // for( let src in thePath )
-    // {
-    //   let dst = thePath[ src ];
-    //
-    //   it.name = 'destination of ' + name;
-    //   it.value = dst;
-    //   if( o.onEach( it ) === false )
-    //   return false;
-    //
-    //   if( it.value !== dst )
-    //   {
-    //     thePath[ src ] = it.value;
-    //     dst = it.value;
-    //   }
-    //
-    //   it.name = 'source of ' + name;
-    //   it.value = src;
-    //   if( o.onEach( it ) === false )
-    //   return false;
-    //
-    //   if( it.value !== src )
-    //   if( thePath[ it.value ] === undefined || !!thePath[ it.value ] )
-    //   {
-    //     delete thePath[ src ];
-    //     thePath[ it.value ] = dst;
-    //   }
-    //
-    // }
-    // else _.assert( 0 );
-
     return true;
   }
 

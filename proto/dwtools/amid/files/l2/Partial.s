@@ -6264,13 +6264,13 @@ function filesAreHardLinked_body( o )
     return true;
   }
 
-  let statFirst = self.statResolvedRead( o.filePath[ 0 ] );
+  let statFirst = self.statRead( o.filePath[ 0 ] );
   if( !statFirst )
   return false;
 
   for( let i = 1 ; i < o.filePath.length ; i++ )
   {
-    let statCurrent = self.statResolvedRead( self.path.from( o.filePath[ i ] ) );
+    let statCurrent = self.statRead( self.path.from( o.filePath[ i ] ) );
     if( !statCurrent || !_.statsCouldBeLinked( statFirst, statCurrent ) )
     return false;
   }

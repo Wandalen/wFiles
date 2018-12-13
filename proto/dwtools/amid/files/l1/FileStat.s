@@ -84,7 +84,55 @@ function statsHaveDifferentContent( stat1, stat2 )
 
 //
 
-function statsCouldBeLinked( stat1,stat2 )
+function statsAreLinked( stat1, stat2 )
+{
+  _.assert( arguments.length === 2, 'Expects exactly two arguments' );
+  _.assert( _.fileStatIs( stat1 ) );
+  _.assert( _.fileStatIs( stat2 ) );
+  _.assert( !!stat1.mtime );
+
+  /*
+  ino comparison is not reliable test on nodejs below 10.5
+  it's reliable only if ino is BigNumber
+  */
+
+  if( stat1.ino !== stat2.ino )
+  return false;
+
+  if( _.bigIntIs( stat1.ino ) )
+  debugger;
+
+  if( _.bigIntIs( stat1.ino ) )
+  return stat1.ino === stat2.ino;
+
+  /*
+  try to make a good guess if ino comprison is not possible
+  */
+
+  if( stat1.nlink !== stat2.nlink )
+  return false;
+
+  if( stat1.mode !== stat2.mode )
+  return false;
+
+  if( stat1.size !== stat2.size )
+  return false;
+
+  if( stat1.mtime.getTime() !== stat2.mtime.getTime() )
+  return false;
+
+  if( stat1.ctime.getTime() !== stat2.ctime.getTime() )
+  return false;
+
+  if( stat1.birthtime.getTime() !== stat2.birthtime.getTime() )
+  return false;
+
+  return null;
+}
+
+//
+
+function statsCouldBeLinked( stat1, stat2 )
 {
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
   _.assert( _.fileStatIs( stat1 ) );
@@ -232,6 +280,7 @@ let Globals =
 {
   fileStatIs,
   statsHaveDifferentContent,
+  statsAreLinked,
   statsCouldBeLinked,
   statHash2Get,
 }

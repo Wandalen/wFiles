@@ -2,13 +2,10 @@
 
 'use strict';
 
-let isBrowser = true;
-
 if( typeof module !== 'undefined' )
 {
-  isBrowser = false;
 
-  let _ = _global_.wTools;
+  let _ = require( '../../../Tools.s' );
   if( !_.FileProvider )
   require( '../UseMid.s' );
 

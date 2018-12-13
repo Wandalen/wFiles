@@ -8,7 +8,7 @@
 //   let _global = _global_;
 //   let _ = _global_.wTools;
 //
-//   // require( '../UseFilesArchive.s' );
+//   // require( '../IncludeArchive.s' );
 //
 // }
 
@@ -138,6 +138,13 @@ function _routineFunctor( routine, routineName )
   op.reads = [];
   op.writes = [];
   op.image = self.proxy;
+  op.originalCall = function originalCall()
+  {
+    let op2 = this;
+    _.assert( arguments.length === 0 );
+    _.assert( _.arrayLike( op2.args ) );
+    op2.result = op2.originalBody.apply( op2.image, op2.args );
+  }
 
   for( let k in routine.operates )
   {

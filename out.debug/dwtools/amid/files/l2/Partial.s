@@ -1191,6 +1191,9 @@ function pathResolveLinkHeadDirect_body( o )
   if( hub && hub !== self && path.isGlobal( o.filePath ) )
   return hub.pathResolveLinkHeadDirect.body.call( hub, o );
 
+  if( !o.resolvingSoftLink && ( !o.resolvingTextLink || !self.usingTextLink ) )
+  return o.filePath;
+
   let splits = path.split( o.filePath );
   let filePath = '/';
   let o2 = _.mapExtend( null, o );
@@ -1203,7 +1206,23 @@ function pathResolveLinkHeadDirect_body( o )
     o2.preservingRelative = 0;
     if( i === splits.length-1 )
     o2.stat = o.stat;
-    if( self.isLink( o2.filePath ) )
+    if( !o2.stat )
+    o2.stat = self.statReadAct
+    ({
+      filePath : filePath,
+      throwing : 0,
+      sync : 1,
+      resolvingSoftLink : 0,
+    });
+    // if( self.isLink( o2.filePath ) )
+    if( !o2.stat )
+    {
+      debugger;
+      filePath = path.join.apply( path, _.arrayAppendArrays( [], [ filePath, splits.slice( i+1 ) ] ) );
+      o.stat = null;
+      break;
+    }
+    if( ( o2.stat.isSoftLink() && o2.resolvingSoftLink ) || ( o2.stat.isTextLink() && o2.resolvingTextLink && self.usingTextLink ) )
     filePath = self.pathResolveLinkTail.body.call( self, o2 );
     if( i === splits.length-1 )
     o.stat = o2.stat;
@@ -2414,39 +2433,39 @@ fileInterpret.having.aspect = 'entry';
 
 //
 
-let fileHashAct = Object.create( null );
-fileHashAct.name = 'fileHashAct';
+let hashReadAct = Object.create( null );
+hashReadAct.name = 'hashReadAct';
 
-var defaults = fileHashAct.defaults = Object.create( null );
+var defaults = hashReadAct.defaults = Object.create( null );
 
 defaults.filePath = null;
 defaults.sync = null;
 defaults.throwing = null;
 
-var having = fileHashAct.having = Object.create( null );
+var having = hashReadAct.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
 having.driving = 1;
 
-var operates = fileHashAct.operates = Object.create( null );
+var operates = hashReadAct.operates = Object.create( null );
 
 operates.filePath = { pathToRead : 1 }
 
 //
 
-let fileHash_body = ( function()
+let hashRead_body = ( function()
 {
   let Crypto;
 
-  return function fileHash( o )
+  return function hashRead( o )
   {
     let self = this;
 
     _.assert( arguments.length === 1, 'Expects single argument' );
 
     if( o.verbosity >= 3 )
-    self.logger.log( ' . fileHash :', o.filePath );
+    self.logger.log( ' . hashRead :', o.filePath );
 
     if( Crypto === undefined )
     Crypto = require( 'crypto' );
@@ -2517,14 +2536,14 @@ let fileHash_body = ( function()
 qqq : use routineExtend where possible please
 */
 
-_.routineExtend( fileHash_body, fileHashAct );
+_.routineExtend( hashRead_body, hashReadAct );
 
-var defaults = fileHash_body.defaults;
+var defaults = hashRead_body.defaults;
 
 defaults.throwing = null;
 defaults.verbosity = null;
 
-var having = fileHash_body.having;
+var having = hashRead_body.having;
 
 having.driving = 0;
 having.aspect = 'body';
@@ -2543,15 +2562,15 @@ having.aspect = 'body';
  * If ( o.filePath ) path exists - returns hash as String, otherwise returns null.
  * If ( o.sync ) mode is disabled - returns Consequence instance @see{@link wConsequence }.
  * @example
- * wTools.fileProvider.fileHash( './existingDir/test.txt' );
+ * wTools.fileProvider.hashRead( './existingDir/test.txt' );
  * // returns 'fd8b30903ac80418777799a8200c4ff5'
  *
  * @example
- * wTools.fileProvider.fileHash( './notExistingFile.txt' );
+ * wTools.fileProvider.hashRead( './notExistingFile.txt' );
  * // returns NaN
  *
  * @example
- * let consequence = wTools.fileProvider.fileHash
+ * let consequence = wTools.fileProvider.hashRead
  * ({
  *  filePath : './existingDir/test.txt',
  *  sync : 0
@@ -2564,16 +2583,16 @@ having.aspect = 'body';
  *    console.log( hash );
  * })
  *
- * @method fileHash
+ * @method hashRead
  * @throws { Exception } If no arguments provided.
  * @throws { Exception } If ( o.filePath ) is not a String or instance of wFileRecord.
  * @throws { Exception } If ( o.filePath ) path to a file doesn't exist or file is a directory.
  * @memberof wFileProviderPartial
  */
 
-let fileHash = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, fileHash_body );
+let hashRead = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, hashRead_body );
 
-fileHash.having.aspect = 'entry';
+hashRead.having.aspect = 'entry';
 
 //
 
@@ -2839,7 +2858,7 @@ function filesFingerprints( files )
     continue;
 
     fingerprint.size = record.stat.size;
-    fingerprint.hash = record.hashGet();
+    fingerprint.hash = record.hashRead();
 
     result[ record.relative ] = fingerprint;
   }
@@ -2980,8 +2999,8 @@ function filesAreSame_body( o )
 
   try
   {
-    let h1 = o.ins1.hashGet();
-    let h2 = o.ins2.hashGet();
+    let h1 = o.ins1.hashRead();
+    let h2 = o.ins2.hashRead();
 
     _.assert( _.strIs( h1 ) && _.strIs( h2 ) );
 
@@ -6245,13 +6264,13 @@ function filesAreHardLinked_body( o )
     return true;
   }
 
-  let statFirst = self.statResolvedRead( o.filePath[ 0 ] );
+  let statFirst = self.statRead( o.filePath[ 0 ] );
   if( !statFirst )
   return false;
 
   for( let i = 1 ; i < o.filePath.length ; i++ )
   {
-    let statCurrent = self.statResolvedRead( self.path.from( o.filePath[ i ] ) );
+    let statCurrent = self.statRead( self.path.from( o.filePath[ i ] ) );
     if( !statCurrent || !_.statsCouldBeLinked( statFirst, statCurrent ) )
     return false;
   }
@@ -6786,8 +6805,8 @@ let Proto =
   fileReadJs,
   fileInterpret,
 
-  fileHashAct,
-  fileHash,
+  hashReadAct,
+  hashRead,
 
   dirReadAct,
   dirRead,

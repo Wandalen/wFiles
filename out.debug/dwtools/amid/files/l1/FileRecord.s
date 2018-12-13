@@ -342,7 +342,7 @@ function changeExt( ext )
 
 //
 
-function hashGet()
+function hashRead()
 {
   let record = this;
   let f = record.factory;
@@ -352,7 +352,7 @@ function hashGet()
   if( record.hash !== null )
   return record.hash;
 
-  record.hash = f.effectiveFileProvider.fileHash
+  record.hash = f.effectiveFileProvider.hashRead
   ({
     filePath : record.absolute,
     verbosity : 0,
@@ -704,7 +704,7 @@ let Proto =
 
   reval,
   changeExt,
-  hashGet,
+  hashRead,
 
   _isStemGet,
   _isDirGet,

@@ -12698,7 +12698,7 @@ function dirMakeAsync( test )
 
 
 
-function fileHashSync( test )
+function hashReadSync( test )
 {
   var self = this;
 
@@ -12711,7 +12711,7 @@ function fileHashSync( test )
   if( Config.platform === 'browser' )
   return;
 
-  var dir = test.context.pathFor( 'read/fileHash' );
+  var dir = test.context.pathFor( 'read/hashRead' );
   var got,filePath,data;
 
   if( !self.provider.statResolvedRead( dir ) )
@@ -12721,12 +12721,12 @@ function fileHashSync( test )
 
   test.case = 'synchronous filehash';
   data = 'Excepteur sint occaecat cupidatat non proident';
-  filePath = test.context.pathFor( 'read/fileHash/src.txt' );
+  filePath = test.context.pathFor( 'read/hashRead/src.txt' );
 
   /**/
 
   self.provider.fileWrite( filePath, data );
-  got = self.provider.fileHash( filePath );
+  got = self.provider.hashRead( filePath );
   var md5sum = crypto.createHash( 'md5' );
   md5sum.update( data );
   var expected = md5sum.digest( 'hex' );
@@ -12739,7 +12739,7 @@ function fileHashSync( test )
 
   /**/
 
-  got = self.provider.fileHash
+  got = self.provider.hashRead
   ({
      filePath : filePath,
      throwing : 0
@@ -12751,7 +12751,7 @@ function fileHashSync( test )
 
   test.shouldThrowErrorSync( function( )
   {
-    self.provider.fileHash
+    self.provider.hashRead
     ({
       filePath : filePath,
       sync : 1,
@@ -12763,7 +12763,7 @@ function fileHashSync( test )
 
   test.mustNotThrowError( function( )
   {
-    got = self.provider.fileHash
+    got = self.provider.hashRead
     ({
       filePath : filePath,
       sync : 1,
@@ -12777,7 +12777,7 @@ function fileHashSync( test )
 
   test.shouldThrowErrorSync( function( )
   {
-    self.provider.fileHash
+    self.provider.hashRead
     ({
       filePath : test.context.pathFor( '/' ),
       sync : 1,
@@ -12789,7 +12789,7 @@ function fileHashSync( test )
 
   test.mustNotThrowError( function( )
   {
-    got = self.provider.fileHash
+    got = self.provider.hashRead
     ({
       filePath : test.context.pathFor( '/' ),
       sync : 1,
@@ -12803,7 +12803,7 @@ function fileHashSync( test )
 
 //
 
-function fileHashAsync( test )
+function hashReadAsync( test )
 {
   var self = this;
 
@@ -12813,7 +12813,7 @@ function fileHashAsync( test )
     return;
   }
 
-  var dir = test.context.pathFor( 'read/fileHashAsync' );
+  var dir = test.context.pathFor( 'read/hashReadAsync' );
   var got,filePath,data;
 
   if( !self.provider.statResolvedRead( dir ) )
@@ -12832,7 +12832,7 @@ function fileHashAsync( test )
   {
     test.case = 'async filehash';
     data = 'Excepteur sint occaecat cupidatat non proident';
-    filePath = test.context.pathFor( 'read/fileHashAsync/src.txt' );
+    filePath = test.context.pathFor( 'read/hashReadAsync/src.txt' );
   })
 
   /**/
@@ -12840,7 +12840,7 @@ function fileHashAsync( test )
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
     self.provider.fileWrite( filePath, data );
-    return self.provider.fileHash
+    return self.provider.hashRead
     ({
       filePath : filePath,
       sync : 0,
@@ -12867,7 +12867,7 @@ function fileHashAsync( test )
 
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
-    return self.provider.fileHash
+    return self.provider.hashRead
     ({
       filePath : filePath,
       sync : 0,
@@ -12884,7 +12884,7 @@ function fileHashAsync( test )
 
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
-    var con = self.provider.fileHash
+    var con = self.provider.hashRead
     ({
       filePath : filePath,
       sync : 0,
@@ -12897,7 +12897,7 @@ function fileHashAsync( test )
 
   .doThen( function()
   {
-    var con = self.provider.fileHash
+    var con = self.provider.hashRead
     ({
       filePath : filePath,
       sync : 0,
@@ -12915,7 +12915,7 @@ function fileHashAsync( test )
 
   .ifNoErrorThen( function( arg/*aaa*/ )
   {
-    var con = self.provider.fileHash
+    var con = self.provider.hashRead
     ({
       filePath : test.context.pathFor( '/' ),
       sync : 0,
@@ -12927,7 +12927,7 @@ function fileHashAsync( test )
   /*is not terminal file, throwing disabled*/
   .doThen( function()
   {
-    var con = self.provider.fileHash
+    var con = self.provider.hashRead
     ({
       filePath : test.context.pathFor( '/' ),
       sync : 0,
@@ -31805,25 +31805,26 @@ xxx : o = { filePath : path.s.from( o.filePath ) }
   /* - */
 
   // test.case = 'works only for hd, but not';
-  // var basePath = _.path.dir( filePath );
-  // var dir1Path = _.path.join( basePath, 'dir1a/dir1b' );
-  // var terminalPath = _.path.join( basePath, 'terminal' );
-  // var linkToDir1Path = _.path.join( basePath, 'linkToDir1' );
-  // var linkToTerminalPath = _.path.join( dir1Path, 'linkToTerminal' );
-  //
-  // console.log( 'basePath', basePath );
-  //
-  // self.provider.filesDelete( basePath );
-  // self.provider.dirMake( basePath );
-  // self.provider.dirMake( dir1Path );
-  // self.provider.fileWrite( terminalPath, terminalPath );
-  // self.provider.softLink( linkToDir1Path, self.provider.path.relative( linkToDir1Path, dir1Path ) );
-  // self.provider.softLink({ dstPath : linkToTerminalPath, srcPath : self.provider.path.relative( basePath, terminalPath ), allowingMissing : 1 });
-  //
-  // var testPath = _.path.join( basePath, 'linkToDir1/linkToTerminal' )
-  // var o = _.mapExtend( null, o1, { filePath : testPath, preservingRelative : 1, resolvingHeadDirect : 1, resolvingHeadReverse : 1 } );
-  // var got = self.provider.pathResolveLinkFull( o );
-  // test.identical( got, terminalPath );
+  test.case = 'works only for both';
+  var basePath = _.path.dir( filePath );
+  var dir1Path = _.path.join( basePath, 'dir1a/dir1b' );
+  var terminalPath = _.path.join( basePath, 'terminal' );
+  var linkToDir1Path = _.path.join( basePath, 'linkToDir1' );
+  var linkToTerminalPath = _.path.join( dir1Path, 'linkToTerminal' );
+
+  console.log( 'basePath', basePath );
+
+  self.provider.filesDelete( basePath );
+  self.provider.dirMake( basePath );
+  self.provider.dirMake( dir1Path );
+  self.provider.fileWrite( terminalPath, terminalPath );
+  self.provider.softLink( linkToDir1Path, self.provider.path.relative( linkToDir1Path, dir1Path ) );
+  self.provider.softLink({ dstPath : linkToTerminalPath, srcPath : self.provider.path.relative( /* basePath */linkToTerminalPath, terminalPath ), allowingMissing : 1 });
+
+  var testPath = _.path.join( basePath, 'linkToDir1/linkToTerminal' )
+  var o = _.mapExtend( null, o1, { filePath : testPath, preservingRelative : 1, resolvingHeadDirect : 1, resolvingHeadReverse : 1 } );
+  var got = self.provider.pathResolveLinkFull( o );
+  test.identical( got, terminalPath );
 
 }
 
@@ -31897,8 +31898,8 @@ var Self =
     dirMakeSync : dirMakeSync,
     dirMakeAsync : dirMakeAsync,
 
-    fileHashSync : fileHashSync,
-    fileHashAsync : fileHashAsync,
+    hashReadSync : hashReadSync,
+    hashReadAsync : hashReadAsync,
 
     dirReadSync : dirReadSync,
     dirReadAsync : dirReadAsync,

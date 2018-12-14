@@ -50,106 +50,6 @@ function init( o )
 
 }
 
-// //
-//
-// function claimEndAct( o )
-// {
-//   let self = this;
-//
-//   if( _.strIs( o ) )
-//   o = { filePath : o }
-//
-//   _.assert( arguments.length === 1 );
-//   _.assert( _.strIs( o.filePath ) );
-//   _.assert( !!self.claimMap[ o.filePath ] );
-//
-//   let claim = self.claimMap[ o.filePath ];
-//   if( claim.tempOpened )
-//   self.claimProvider.path.dirTempClose( claim.tempPath )
-//   delete self.claimMap[ o.filePath ];
-//
-// }
-//
-// //
-//
-// function claimBeginAct( o )
-// {
-//   let self = this;
-//   let path = self.path;
-//
-//   if( _.strIs( o ) )
-//   o = { filePath : o }
-//
-//   _.assert( arguments.length === 1 );
-//   _.assert( _.strIs( o.filePath ) );
-//   _.sure( ( !o.login && !o.password ) || ( _.strIs( o.login ) && _.strIs( o.password ) ) );
-//   _.assert( !self.claimMap[ o.filePath ] );
-//
-//   if( !o.tempPath )
-//   {
-//     let dir = self.claimProvider.path.resolve( 'module' );
-//     o.tempPath = self.claimProvider.path.dirTempOpen( dir, 'git-' + _.idWithGuid( o.filePath ) );
-//     o.tempOpened = 1;
-//     _.assert( self.claimProvider.dirIsEmpty( o.tempPath ) );
-//   }
-//
-// /*
-//   git+https:///github.com/user/name.git/staging
-// */
-//
-//   let prefix = '';
-//   if( o.login && o.password )
-//   prefix = o.login + ':' + o.password + '@';
-//
-//   let filePath = path.join( prefix, o.filePath );
-//   filePath = filePath.replace( /^git\+/, '' )
-//
-//   try
-//   {
-//
-//     self.claimProvider.dirMake( o.tempPath );
-//     debugger;
-//     let promise = Git( self.claimProvider.path.nativize( o.tempPath ) ).silent( true ).clone( filePath );
-//     _.assert( _.promiseLike( promise ) );
-//     o.con = _.Consequence.From( promise );
-//     o.ready = 0;
-//     o.times = 1;
-//
-//     self.claimMap[ o.filePath ] = o;
-//
-//     // o.con.sleep();
-//
-//     return o.con.doThen( ( err, arg ) =>
-//     {
-//       debugger;
-//       o.ready = 1;
-//       if( err )
-//       errorHandle( err );
-//     });
-//
-//   }
-//   catch( err )
-//   {
-//     errorHandle( err );
-//   }
-//
-//   function errorHandle( err )
-//   {
-//     delete self.claimMap[ o.filePath ];
-//     throw _.err( err );
-//   }
-//
-// }
-//
-// claimBeginAct.defaults =
-// {
-//   filePath : null,
-//   tempPath : null,
-//   login : null,
-//   password : null,
-//   repository : null,
-// }
-
 // --
 // path
 // --
@@ -160,169 +60,6 @@ function localFromGlobal( uri )
   let path = self.path;
   return path.str( uri );
 }
-
-// // --
-// // link
-// // --
-//
-// function pathResolveSoftLinkAct( o )
-// {
-//   let self = this;
-//   let claim = self.claimBegin({ filePath : o.filePath, sync : 1 });
-//
-//   debugger; xxx
-//
-//   _.sure( _.strIs( claim.tempPath ), 'Cant claim', o.filePath );
-//
-//   self.claimProvider.pathResolveSoftLinkAct( claim.tempPath );
-//
-//   return resolved;
-// }
-//
-// _.routineExtend( pathResolveSoftLinkAct, Parent.prototype.pathResolveSoftLinkAct )
-//
-// // --
-// // read
-// // --
-//
-// function fileReadAct( o )
-// {
-//   let self = this;
-//   let con = new _.Consequence();
-//
-//   _.assertRoutineOptions( fileReadAct, arguments );
-//   _.assert( arguments.length === 1, 'Expects single argument' );
-//   _.assert( _.strIs( o.filePath ),'fileReadAct :','Expects {-o.filePath-}' );
-//   _.assert( _.strIs( o.encoding ),'fileReadAct :','Expects {-o.encoding-}' );
-//   _.assert( !o.sync,'sync version is not implemented' );
-//
-//   o.encoding = o.encoding.toLowerCase();
-//   let encoder = fileReadAct.encoders[ o.encoding ];
-//
-//   debugger; xxx
-//
-//   logger.log( 'fileReadAct',o );
-//
-//   /* */
-//
-//   let result = null;;
-//   let totalSize = null;
-//   let dstOffset = 0;
-//
-//   if( encoder && encoder.onBegin )
-//   _.sure( encoder.onBegin.call( self, { operation : o, encoder : encoder }) === undefined );
-//
-//   self.streamReadAct({ filePath :  o.filePath })
-//   .got( function( err, response )
-//   {
-//     debugger;
-//
-//     if( err )
-//     return handleError( err );
-//
-//     _.assert( _.strIs( o.encoding ) || o.encoding === null );
-//
-//     if( o.encoding === null )
-//     {
-//       totalSize = response.headers[ 'content-length' ];
-//       result = new ArrayBuffer( totalSize );
-//     }
-//     else
-//     {
-//       response.setEncoding( o.encoding );
-//       result = '';
-//     }
-//
-//     response.on( 'data', onData );
-//     response.on( 'end', onEnd );
-//     response.on( 'error', handleError );
-//     debugger;
-//
-//   });
-//
-//   return con;
-//
-//   /* */
-//
-//   function onEnd()
-//   {
-//     if( o.encoding === null )
-//     _.assert( _.bufferRawIs( result ) );
-//     else
-//     _.assert( _.strIs( result ) );
-//
-//     let context = { data : result, operation : o, encoder : encoder };
-//     if( encoder && encoder.onEnd )
-//     _.sure( encoder.onEnd.call( self,context ) === undefined );
-//     result = context.data
-//
-//     con.give( result );
-//   }
-//
-//   /* on encoding : arraybuffer or encoding : buffer should return buffer( in consequence ) */
-//
-//   function handleError( err )
-//   {
-//
-//     if( encoder && encoder.onError )
-//     try
-//     {
-//       err = _._err
-//       ({
-//         args : [ stack,'\nfileReadAct( ',o.filePath,' )\n',err ],
-//         usingSourceCode : 0,
-//         level : 0,
-//       });
-//       err = encoder.onError.call( self,{ error : err, operation : o, encoder : encoder })
-//     }
-//     catch( err2 )
-//     {
-//       console.error( err2 );
-//       console.error( err.toString() + '\n' + err.stack );
-//     }
-//
-//     if( o.sync )
-//     {
-//       throw err;
-//     }
-//     else
-//     {
-//       con.error( err );
-//     }
-//   }
-//
-//   /* */
-//
-//   function onData( data )
-//   {
-//
-//     if( o.encoding === null )
-//     {
-//       _.bufferMove
-//       ({
-//         dst : result,
-//         src : data,
-//         dstOffset : dstOffset
-//       });
-//
-//       dstOffset += data.length;
-//     }
-//     else
-//     {
-//       result += data;
-//     }
-//
-//   }
-//
-// }
-//
-// _.routineExtend( fileReadAct, Parent.prototype.fileReadAct );
-//
-// fileReadAct.advanced =
-// {
-//   user : null,
-//   password : null,
-// }
 
 //
 
@@ -450,11 +187,11 @@ function filesReflectSingle_body( o )
 
   // console.log( 'filesReflectSingle', o.verbosity );
 
+  debugger;
   let result = _.Consequence().give( null );
   let shell = _.sheller
   ({
-    verbosity : o.verbosity >= 3 ? 1 : 0,
-    // verbosity : 1,
+    verbosity : o.verbosity - 2,
     con : result,
     currentPath : dstPath,
   });
@@ -503,11 +240,13 @@ function filesReflectSingle_body( o )
 
   if( paths.hash )
   {
+    _.assert( _.strDefined( paths.hash ) );
     if( gitConfigExists )
     shell( 'git stash' );
-    _.assert( _.strDefined( paths.hash ) );
+    shell( 'git fetch' );
     shell( 'git checkout ' + paths.hash );
-    shell( 'git pull' );
+    if( paths.hash.length < 7 || !_.strIsHex( paths.hash ) ) /* qqq : probably does not work in all cases */
+    shell( 'git merge' );
     shell({ path : 'git stash pop', throwingExitCode : 0 });
   }
 
@@ -561,17 +300,19 @@ function isUpToDate( o )
   let dstFileProvider = self.hub.providerForPath( o.localPath );
   let paths = self.pathParse( o.remotePath );
   let result = _.Consequence().give( null );
+  debugger;
   let shell = _.sheller
   ({
-    verbosity : 0,
-    // verbosity : 1,
+    // verbosity : 0,
+    verbosity : o.verbosity - 2,
     con : result,
     currentPath : o.localPath,
   });
 
   let shellAll = _.sheller
   ({
-    verbosity : 0,
+    verbosity : o.verbosity - 2,
+    // verbosity : 0,
     // verbosity : 1,
     con : result,
     currentPath : o.localPath,
@@ -746,8 +487,6 @@ let Associates =
 
 let Restricts =
 {
-  // claimMap : _.define.own({}),
-  // claimProvider : null,
 }
 
 let Statics =
@@ -768,29 +507,29 @@ let Forbids =
 let Proto =
 {
 
-  finit : finit,
-  init : init,
+  finit,
+  init,
 
   // path
 
-  localFromGlobal : localFromGlobal,
-  pathIsolateGlobalAndLocal : pathIsolateGlobalAndLocal,
-  pathParse : pathParse,
+  localFromGlobal,
+  pathIsolateGlobalAndLocal,
+  pathParse,
 
   // etc
 
-  filesReflectSingle : filesReflectSingle,
-  isUpToDate : isUpToDate,
-  isDownloaded : isDownloaded,
+  filesReflectSingle,
+  isUpToDate,
+  isDownloaded,
 
   //
 
-  Composes : Composes,
-  Aggregates : Aggregates,
-  Associates : Associates,
-  Restricts : Restricts,
-  Statics : Statics,
-  Forbids : Forbids,
+  Composes,
+  Aggregates,
+  Associates,
+  Restricts,
+  Statics,
+  Forbids,
 
 }
 

@@ -2161,12 +2161,9 @@ function filesReflectEvaluate_body( o )
     if( dirHaveFiles( record ) )
     {
       /* preserve dir if it has filtered out files */
-      // touch( record, 'constructive' );
       if( preserveAction === 'dirMake' )
       {
         dirMake( record );
-        // action( record, preserveAction );
-        // preserve( record );
         _.assert( record.preserve === true );
       }
       else
@@ -2210,18 +2207,14 @@ function filesReflectEvaluate_body( o )
       return;
     }
 
-    // debugger;
     let linking = o.linking;
     if( _.strHas( linking, 'Maybe' ) )
     {
-      // debugger; xxx
       if( src === dst )
       linking = _.strRemoveEnd( linking, 'Maybe' );
       else
       linking = 'fileCopy';
     }
-
-    // console.log( 'link', record.dst.absolute, '<-', record.src.absolute )
 
     action( record, linking );
     touch( record, 'constructive' );
@@ -2510,9 +2503,7 @@ function filesReflectSingle_body( o )
   function writeSrcUp( record )
   {
 
-    // console.log( 'writeSrcUp', record.dst.absolute );
     // if( _.strEnds( record.dst.absolute, debugPath ) )
-    // debugger;
     // debugger;
 
     let onr = o.onWriteDstUp.call( self, record, o );
@@ -2532,9 +2523,7 @@ function filesReflectSingle_body( o )
 
   function writeSrcDown( record )
   {
-    // console.log( 'writeSrcDown', record.dst.absolute );
     // if( _.strEnds( record.dst.absolute, debugPath ) )
-    // debugger;
     // debugger;
 
     srcDeleteMaybe( record );
@@ -2858,9 +2847,6 @@ function filesReflect_body( o )
 
   function end()
   {
-    // debugger;
-    // console.log( cons );
-
     if( o.mandatory )
     if( !o.result.length )
     {
@@ -3369,7 +3355,7 @@ function filesDelete_body( o )
 
   function end()
   {
-    if( o.verbosity >= 2 )
+    if( o.verbosity >= 1 )
     self.logger.log( _.timeSpent( ' - filesDelete ' + o.result.length + ' files at ' + path.commonReport( o.filePath ) + ' in ', time ) );
     return files;
   }
@@ -3513,7 +3499,7 @@ function filesDeleteEmptyDirs()
 
       if( !sub.length )
       {
-        if( self.verbosity >= 2 )
+        if( self.verbosity >= 1 )
         self.logger.log( '- deleted :',record.absolute );
         self.fileDelete({ filePath : record.absolute, throwing : o.throwing });
       }

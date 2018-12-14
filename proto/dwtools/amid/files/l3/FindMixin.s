@@ -2354,6 +2354,7 @@ defaults.dstRewritingPreserving = 0;
 defaults.preservingTime = 0;
 defaults.preservingSame = 0;
 
+defaults.extra = null;
 defaults.onUp = null;
 defaults.onDown = null;
 defaults.onDstName = null;

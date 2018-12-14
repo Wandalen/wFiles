@@ -97,51 +97,6 @@ function pathResolveSoftLinkAct( o )
 
 _.routineExtend( pathResolveSoftLinkAct, Parent.prototype.pathResolveSoftLinkAct )
 
-// //
-//
-// function pathResolveHardLinkAct( o )
-// {
-//   let self = this;
-//
-//   _.assert( arguments.length === 1, 'Expects single argument' );
-//   _.assert( self.path.isAbsolute( o.filePath ) );
-//
-//   if( /*!self.resolvingHardLink ||*/ !self.isHardLink( o.filePath ) )
-//   return o.filePath;
-//
-//   let descriptor = self._descriptorRead( o.filePath );
-//   let resolved = self._descriptorResolveHardLinkPath( descriptor );
-//
-//   if( !self._descriptorRead( resolved ) )
-//   return o.filePath;
-//
-//   _.assert( _.strIs( resolved ) )
-//
-//   return resolved;
-// }
-
-//
-
-// function softLinkReadAct( o )
-// {
-//   let self = this;
-
-//   _.assert( arguments.length === 1, 'Expects single argument' );
-//   _.assert( self.path.isAbsolute( o.filePath ) );
-
-//   if( !self.isSoftLink( o.filePath ) )
-//   return o.filePath;
-
-//   let descriptor = self._descriptorRead( o.filePath );
-//   let result = self._descriptorResolveSoftLinkPath( descriptor );
-
-//   _.assert( _.strIs( result ) );
-
-//   return result;
-// }
-
-// _.routineExtend( softLinkReadAct, Parent.prototype.softLinkReadAct );
-
 // --
 // read
 // --

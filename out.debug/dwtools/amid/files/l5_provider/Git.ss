@@ -128,6 +128,10 @@ function filesReflectSingle_body( o )
 {
   let self = this;
   let path = self.path;
+  let con2 = new _.Consequence();
+
+  o.extra = o.extra || Object.create( null );
+  _.routineOptions( filesReflectSingle_body, o.extra, filesReflectSingle_body.extra );
 
   _.assertRoutineOptions( filesReflectSingle_body, o );
   _.assert( o.mandatory === undefined )
@@ -169,6 +173,7 @@ function filesReflectSingle_body( o )
 
   _.sure( _.strDefined( paths.stripped ) );
   _.sure( _.strDefined( paths.compact ) );
+  _.sure( _.strDefined( paths.hash ) );
   _.sure( _.strIs( dstPath ) );
   _.sure( dstFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
   _.sure( !o.srcFilter || !o.srcFilter.hasFiltering(), 'Does not support filtering, but {o.srcFilter} is not empty' );
@@ -194,6 +199,15 @@ function filesReflectSingle_body( o )
     verbosity : o.verbosity - 2,
     con : result,
     currentPath : dstPath,
+  });
+
+  let shellAll = _.sheller
+  ({
+    verbosity : o.verbosity - 2,
+    con : result,
+    currentPath : dstPath,
+    throwingExitCode : 0,
+    outputCollecting : 1,
   });
 
   if( !dstFileProvider.fileExists( dstPath ) )
@@ -235,24 +249,55 @@ function filesReflectSingle_body( o )
     if( !dstFileProvider.fileExists( path.join( dstPath, '.git' ) ) )
     shell( 'git clone ' + paths.compact + ' ' + '.' );
   }
+  else
+  {
+    if( o.extra.fetching )
+    shell( 'git fetch origin' );
+  }
+
+  let localChanges = false;
+  if( gitConfigExists )
+  {
+    shellAll
+    ([
+      'git status',
+    ]);
+    result
+    .ifNoErrorThen( function( arg )
+    {
+      _.assert( arg.length === 2 );
+      localChanges = _.strHas( arg[ 0 ].output, 'Changes to be committed' );
+      return localChanges;
+    })
+  }
 
   /* stash changes and checkout branch/commit */
 
-  if( paths.hash )
+  // result.ifErrorThen( con2 ); // qqq !!!
+  result.ifErrorThen( ( err ) =>
   {
-    _.assert( _.strDefined( paths.hash ) );
-    if( gitConfigExists )
+    con2.error( err );
+  });
+
+  result.ifNoErrorThen( ( arg ) =>
+  {
+
+    if( localChanges )
     shell( 'git stash' );
-    shell( 'git fetch' );
     shell( 'git checkout ' + paths.hash );
-    if( paths.hash.length < 7 || !_.strIsHex( paths.hash ) ) /* qqq : probably does not work in all cases */
+    if( paths.hash.length < 7 || !_.strIsHex( paths.hash ) ) /* qqq : probably does not work for all cases */
     shell( 'git merge' );
+    if( localChanges )
     shell({ path : 'git stash pop', throwingExitCode : 0 });
-  }
+
+    result.then( con2 );
+
+    return arg;
+  });
 
   /* handle error if any */
 
-  result
+  con2
   .doThen( function( err, arg )
   {
     if( err )
@@ -260,7 +305,7 @@ function filesReflectSingle_body( o )
     return recordsMake();
   });
 
-  return result.split();
+  return con2;
 
   /* */
 
@@ -278,6 +323,10 @@ function filesReflectSingle_body( o )
 }
 
 _.routineExtend( filesReflectSingle_body, _.FileProvider.Find.prototype.filesReflectSingle );
+
+var extra = filesReflectSingle_body.extra = Object.create( null );
+
+extra.fetching = 1;
 
 var defaults = filesReflectSingle_body.defaults;
 
@@ -303,8 +352,8 @@ function isUpToDate( o )
   debugger;
   let shell = _.sheller
   ({
-    // verbosity : 0,
     verbosity : o.verbosity - 2,
+    // verbosity : 2,
     con : result,
     currentPath : o.localPath,
   });
@@ -312,8 +361,7 @@ function isUpToDate( o )
   let shellAll = _.sheller
   ({
     verbosity : o.verbosity - 2,
-    // verbosity : 0,
-    // verbosity : 1,
+    // verbosity : 2,
     con : result,
     currentPath : o.localPath,
     throwingExitCode : 0,
@@ -358,28 +406,42 @@ function isUpToDate( o )
 
   shellAll
   ([
-    'git diff origin/master --quiet --exit-code',
-    'git diff --quiet --exit-code',
-    'git branch -v',
+    // 'git diff origin/master --quiet --exit-code',
+    // 'git diff --quiet --exit-code',
+    // 'git branch -v',
     'git status',
   ]);
 
   result
   .ifNoErrorThen( function( arg )
   {
-    // console.log( 'isUpToDate:2' );
-    _.assert( arg.length === 5 );
-    let diffRemote = arg[ 0 ].exitCode !== 0;
-    let diffLocal = arg[ 1 ].exitCode !== 0;
-    let commitsRemote = _.strHas( arg[ 2 ].output, '[ahead' );
-    let commitsLocal = _.strHas( arg[ 3 ].output, 'Changes to be committed' );
-    let result = !diffRemote && !commitsRemote;
+    _.assert( arg.length === 2 );
+
+    // self.logger.log( o.remotePath, arg[ 0 ].output );
+
+    let result = !_.strHas( arg[ 0 ].output, 'Your branch is behind' );
 
     if( o.verbosity )
     self.logger.log( o.remotePath, result ? 'is up to date' : 'is not up to date' );
 
     return result;
-  });
+  })
+  // .ifNoErrorThen( function( arg )
+  // {
+  //   // console.log( 'isUpToDate:2' );
+  //   _.assert( arg.length === 5 );
+  //   let diffRemote = arg[ 0 ].exitCode !== 0;
+  //   let diffLocal = arg[ 1 ].exitCode !== 0;
+  //   let commitsRemote = _.strHas( arg[ 2 ].output, '[ahead' );
+  //   let commitsLocal = _.strHas( arg[ 3 ].output, 'Changes to be committed' );
+  //   let result = !diffRemote && !commitsRemote;
+  //
+  //   if( o.verbosity )
+  //   self.logger.log( o.remotePath, result ? 'is up to date' : 'is not up to date' );
+  //
+  //   return result;
+  // })
+  ;
 
   result
   .doThen( function( err, arg )

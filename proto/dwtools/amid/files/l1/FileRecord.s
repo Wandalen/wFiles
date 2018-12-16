@@ -81,6 +81,8 @@ function form()
   _.assert( record.factory instanceof _.FileRecordFactory, 'Expects instance of { FileRecordFactory }' );
 
   record._pathsForm();
+  record._filterApply();
+
   // record._statRead();
   // record._statAnalyze();
 
@@ -204,6 +206,55 @@ function _pathsForm()
 
 //
 
+function _filterApply()
+{
+  let record = this;
+  let f = record.factory;
+
+  _.assert( arguments.length === 0 );
+
+  if( record.isTransient === null )
+  record.isTransient = true;
+  if( record.isActual === null )
+  record.isActual = true;
+
+  if( f.filter )
+  {
+    _.assert( f.filter.formed === 5, 'Expects formed filter' );
+    f.filter.applyTo( record );
+  }
+
+}
+
+//
+
+function _isSafe()
+{
+  let record = this;
+  let f = record.factory;
+
+  _.assert( arguments.length === 0 );
+
+  if( f.safe )
+  {
+    if( record.stat )
+    if( !path.isSafe( record.absolute, f.safe ) )
+    {
+      debugger;
+      throw path.ErrorNotSafe( 'Making record', record.absolute, f.safe );
+    }
+    if( record.stat && !record.stat.isTerminal() && !record.stat.isDir() && !record.stat.isSymbolicLink() )
+    {
+      debugger;
+      throw path.ErrorNotSafe( 'Making record. Unknown kind of file', record.absolute, f.safe );
+    }
+  }
+
+  return true;
+}
+
+//
+
 function _statRead()
 {
   let record = this;
@@ -211,12 +262,6 @@ function _statRead()
   let stat;
 
   _.assert( arguments.length === 0 );
-
-  console.log( '_statRead', record.absolute );
-
-  // debugger;
-  if( record.absolute === '/filesFindLinked/normal' )
-  debugger;
 
   record[ realSymbol ] = record.absolute;
 
@@ -235,15 +280,11 @@ function _statRead()
       throwing : 1,
     }
 
-    // logger.log( 'pathResolveLinkFull', record.absolute );
-
     record[ realSymbol ] = f.effectiveFileProvider.pathResolveLinkFull( o2 );
 
     stat = o2.stat;
 
   }
-
-  // record.realGlobalMaybe = record.real;
 
   /* read and set stat */
 
@@ -265,8 +306,6 @@ function _statRead()
 
   /* analyze stat */
 
-  // record._statAnalyze();
-
   return record;
 }
 
@@ -287,33 +326,35 @@ function _statAnalyze()
 
   /* */
 
-  if( record.isTransient === null )
-  record.isTransient = true;
-  if( record.isActual === null )
-  record.isActual = true;
-
-  if( f.filter )
-  {
-    _.assert( f.filter.formed === 5, 'Expects formed filter' );
-    f.filter.applyTo( record );
-  }
+  // if( record.isTransient === null )
+  // record.isTransient = true;
+  // if( record.isActual === null )
+  // record.isActual = true;
+  //
+  // if( f.filter )
+  // {
+  //   _.assert( f.filter.formed === 5, 'Expects formed filter' );
+  //   f.filter.applyTo( record );
+  // }
 
   /* */
 
-  if( f.safe )
-  {
-    if( record.stat )
-    if( !path.isSafe( record.absolute, f.safe ) )
-    {
-      debugger;
-      throw path.ErrorNotSafe( 'Making record', record.absolute, f.safe );
-    }
-    if( record.stat && !record.stat.isTerminal() && !record.stat.isDir() && !record.stat.isSymbolicLink() )
-    {
-      debugger;
-      throw path.ErrorNotSafe( 'Making record. Unknown kind of file', record.absolute, f.safe );
-    }
-  }
+  // if( f.safe )
+  // {
+  //   if( record.stat )
+  //   if( !path.isSafe( record.absolute, f.safe ) )
+  //   {
+  //     debugger;
+  //     throw path.ErrorNotSafe( 'Making record', record.absolute, f.safe );
+  //   }
+  //   if( record.stat && !record.stat.isTerminal() && !record.stat.isDir() && !record.stat.isSymbolicLink() )
+  //   {
+  //     debugger;
+  //     throw path.ErrorNotSafe( 'Making record. Unknown kind of file', record.absolute, f.safe );
+  //   }
+  // }
+
+  record._isSafe();
 
   /* */
 
@@ -337,8 +378,8 @@ function reval()
 
   _.assert( arguments.length === 0 );
 
-  record.isActual = null;
-  record.isTransient = null;
+  // record.isActual = null;
+  // record.isTransient = null;
 
   record[ statSymbol ] = 0;
   record[ realSymbol ] = 0;
@@ -775,6 +816,8 @@ let Proto =
   toAbsolute,
 
   _pathsForm,
+  _filterApply,
+  _isSafe,
   _statRead,
   _statAnalyze,
 

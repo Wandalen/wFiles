@@ -25,7 +25,7 @@ let Self = function wFileProviderFind( o )
 
 Self.shortName = 'Find';
 
-// let debugPath = '/dst/dir';
+let debugPath = '/file.b';
 
 // --
 // etc
@@ -1378,8 +1378,8 @@ function filesReflectEvaluate_body( o )
   function handleUp( record, op )
   {
 
-    // if( _.strEnds( record.dst.absolute, debugPath ) )
-    // debugger;
+    if( _.strEnds( record.dst.absolute, debugPath ) )
+    debugger;
 
     _.sure( !_.strBegins( record.dst.absolute, '/../' ), () => 'Destination path ' + _.strQuote( record.dst.absolute ) + ' leads out of file system.' );
 
@@ -1432,17 +1432,8 @@ function filesReflectEvaluate_body( o )
     let a = actionMap[ record.dst.absolute ];
     let t = touchMap[ record.dst.absolute ];
 
-    // if( _.strHas( record.dst.absoluteGlobalMaybe, 'fmap' ) )
-    // debugger
-
     if( !o.writing )
     record.allow = false;
-
-    /* workaround : ignore link to file that does not exist */
-
-    // if( record.src.isLink )
-    // if( !record.src.factory.effectiveFileProvider.statResolvedRead( record.src.real ) )
-    // record.allow = false;
 
     if( record.reason !== 'srcLooking' && a )
     {
@@ -1450,8 +1441,8 @@ function filesReflectEvaluate_body( o )
       return record
     }
 
-    // if( _.strEnds( record.dst.absolute, debugPath ) )
-    // debugger;
+    if( _.strEnds( record.dst.absolute, debugPath ) )
+    debugger;
 
     _.assert( arguments.length === 2 );
     _.assert( t === undefined || _.strIs( a ) );
@@ -1586,8 +1577,8 @@ function filesReflectEvaluate_body( o )
   function handleDown( record, op )
   {
 
-    // if( _.strEnds( record.dst.absolute, debugPath ) )
-    // debugger;
+    if( _.strEnds( record.dst.absolute, debugPath ) )
+    debugger;
 
     if( touchMap[ record.dst.absolute ] )
     touch( record, touchMap[ record.dst.absolute ] );
@@ -1596,7 +1587,6 @@ function filesReflectEvaluate_body( o )
     let srcExists = !!record.src.stat;
     let dstExists = !!record.dst.stat;
 
-    // _.assert( _.arrayIs( o.onDown ) );
     _.assert( !!record.dst && !!record.src );
     _.assert( arguments.length === 2 );
 
@@ -1613,11 +1603,8 @@ function filesReflectEvaluate_body( o )
     return end( record );
 
     handleDown2.call( self, record, o );
-    // _.routinesCall( self, o.onDown, [ record,o ] );
     let r = o.onDown.call( self, record, o );
     _.assert( r !== _.dont );
-    // if( r === _.dont )
-    // return end( false );
 
     _.assert( record.include === true );
     _.assert( record.action !== 'exclude' || record.touch === false )

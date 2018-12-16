@@ -84,12 +84,14 @@ function statsHaveDifferentContent( stat1, stat2 )
 
 //
 
-function statsAreLinked( stat1, stat2 )
+function statsAreHardLinked( stat1, stat2 )
 {
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
   _.assert( _.fileStatIs( stat1 ) );
   _.assert( _.fileStatIs( stat2 ) );
-  _.assert( !!stat1.mtime );
+
+  if( !stat1.mtime )
+  return null;
 
   /*
   ino comparison is not reliable test on nodejs below 10.5
@@ -280,7 +282,7 @@ let Globals =
 {
   fileStatIs,
   statsHaveDifferentContent,
-  statsAreLinked,
+  statsAreHardLinked,
   statsCouldBeLinked,
   statHash2Get,
 }

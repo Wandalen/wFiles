@@ -122,7 +122,7 @@ function fileReadAct( o )
     }
     else
     {
-      return con.give( context.data );
+      return con.take( context.data );
     }
 
   }

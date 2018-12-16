@@ -67,7 +67,7 @@ function streamReadAct( o )
       }
       else
       {
-        con.give( response );
+        con.take( response );
       }
     });
   }
@@ -212,7 +212,7 @@ function fileReadAct( o )
     _.sure( encoder.onEnd.call( self,context ) === undefined );
     result = context.data
 
-    con.give( result );
+    con.take( result );
   }
 
 }
@@ -276,7 +276,7 @@ function fileCopyToHardDriveAct( o )
   {
     writeStream.close( function( )
     {
-      con.give( o.filePath );
+      con.take( o.filePath );
     })
   });
 

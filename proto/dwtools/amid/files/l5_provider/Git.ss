@@ -143,7 +143,7 @@ function filesReflectSingle_body( o )
   _.assert( _.routineIs( o.onWriteSrcUp ) && o.onWriteSrcUp.composed && o.onWriteSrcUp.composed.elements.length === 0, 'Not supported options' );
   _.assert( _.routineIs( o.onWriteSrcDown ) && o.onWriteSrcDown.composed && o.onWriteSrcDown.composed.elements.length === 0, 'Not supported options' );
   _.assert( o.outputFormat === 'record' || o.outputFormat === 'nothing', 'Not supported options' );
-  _.assert( o.linking === 'fileCopy' || o.linking === 'hardlinkMaybe' || o.linking === 'softlinkMaybe', 'Not supported options' );
+  _.assert( o.linking === 'fileCopy' || o.linking === 'hardLinkMaybe' || o.linking === 'softLinkMaybe', 'Not supported options' );
   _.assert( !o.srcFilter.hasFiltering(), 'Not supported options' );
   _.assert( !o.dstFilter.hasFiltering(), 'Not supported options' );
   _.assert( o.srcFilter.formed === 5 );
@@ -192,8 +192,7 @@ function filesReflectSingle_body( o )
 
   // console.log( 'filesReflectSingle', o.verbosity );
 
-  debugger;
-  let result = _.Consequence().give( null );
+  let result = _.Consequence().take( null );
   let shell = _.sheller
   ({
     verbosity : o.verbosity - 2,
@@ -273,8 +272,8 @@ function filesReflectSingle_body( o )
 
   /* stash changes and checkout branch/commit */
 
-  // result.ifErrorThen( con2 ); // qqq !!!
-  result.ifErrorThen( ( err ) =>
+  // result.except( con2 ); // xxx qqq !!!
+  result.except( ( err ) =>
   {
     con2.error( err );
   });
@@ -290,7 +289,7 @@ function filesReflectSingle_body( o )
     if( localChanges )
     shell({ path : 'git stash pop', throwingExitCode : 0 });
 
-    result.then( con2 );
+    result.finally( con2 );
 
     return arg;
   });
@@ -298,7 +297,7 @@ function filesReflectSingle_body( o )
   /* handle error if any */
 
   con2
-  .doThen( function( err, arg )
+  .finally( function( err, arg )
   {
     if( err )
     throw _.err( err );
@@ -348,8 +347,8 @@ function isUpToDate( o )
   let srcCurrentPath;
   let dstFileProvider = self.hub.providerForPath( o.localPath );
   let paths = self.pathParse( o.remotePath );
-  let result = _.Consequence().give( null );
-  debugger;
+  let result = _.Consequence().take( null );
+
   let shell = _.sheller
   ({
     verbosity : o.verbosity - 2,
@@ -396,7 +395,7 @@ function isUpToDate( o )
 
   shell( 'git fetch origin' );
 
-  result.then( ( err, arg ) =>
+  result.finally( ( err, arg ) =>
   {
     // console.log( 'isUpToDate:1' );
     if( err )
@@ -444,7 +443,7 @@ function isUpToDate( o )
   ;
 
   result
-  .doThen( function( err, arg )
+  .finally( function( err, arg )
   {
     // console.log( 'isUpToDate:end' );
     if( err )
@@ -477,7 +476,7 @@ function isDownloaded( o )
   let srcCurrentPath;
   let dstFileProvider = self.hub.providerForPath( o.localPath );
   let paths = self.pathParse( o.remotePath );
-  let result = _.Consequence().give( null );
+  let result = _.Consequence().take( null );
 
   _.assert( dstFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
 
@@ -506,7 +505,7 @@ function isDownloaded( o )
   });
 
   result
-  .doThen( function( err, arg )
+  .finally( function( err, arg )
   {
     // logger.log( 'isDownloaded:end' );
     if( err )

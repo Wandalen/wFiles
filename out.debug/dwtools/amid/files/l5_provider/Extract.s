@@ -200,7 +200,7 @@ function fileReadAct( o )
     }
     else
     {
-      return con.give( data );
+      return con.take( data );
     }
 
   }
@@ -244,71 +244,6 @@ function fileReadAct( o )
 
 _.routineExtend( fileReadAct, Parent.prototype.fileReadAct );
 
-// var defaults = fileReadAct.defaults = Object.create( Parent.prototype.fileReadAct.defaults );
-// var having = fileReadAct.having = Object.create( Parent.prototype.fileReadAct.having );
-
-//
-
-// let hashReadAct = ( function()
-// {
-
-//   let crypto;
-
-//   return function hashReadAct( o )
-//   {
-//     let result=NaN;
-//     let self = this;
-
-//     if( _.strIs( o ) )
-//     o = { filePath : o };
-
-//     _.assertRoutineOptions( hashReadAct, o );
-//     _.assert( _.strIs( o.filePath ) );
-//     _.assert( arguments.length === 1, 'Expects single argument' );
-
-//     /* */
-
-//     if( !crypto )
-//     crypto = require( 'crypto' );
-//     let md5sum = crypto.createHash( 'md5' );
-
-//     /* */
-//     function makeHash()
-//     {
-//       try
-//       {
-//         let read = self.fileReadAct( { filePath : o.filePath, sync : 1 } );
-//         md5sum.update( read );
-//         result = md5sum.digest( 'hex' );
-//       }
-//       catch( err )
-//       {
-//         if( o.throwing )
-//         {
-//           throw _.err( err );
-//         }
-//       }
-//     }
-
-//    if( o.sync )
-//    {
-//      makeHash( );
-//      return result;
-//    }
-//    else
-//    {
-//      return _.timeOut( 0, function()
-//      {
-//        makeHash();
-//        return result;
-//      })
-//    }
-//   }
-// })();
-
-// hashReadAct.defaults = {};
-// hashReadAct.defaults.__proto__ = Parent.prototype.hashReadAct.defaults;
-
 //
 
 function dirReadAct( o )
@@ -342,15 +277,11 @@ function dirReadAct( o )
 
     let file = self._descriptorRead( o.filePath );
 
-    // if( self._descriptorIsLink( file ) )
-    // file = self._descriptorResolve({ descriptor : result, resolvingSoftLink : 1 });
-
     if( file !== undefined )
     {
       if( _.objectIs( file ) )
       {
         result = Object.keys( file );
-        _.assert( _.arrayIs( result ), 'readdirSync returned not array' );
       }
       else
       {
@@ -359,18 +290,15 @@ function dirReadAct( o )
     }
     else
     {
-      if( o.throwing )
-      throw _.err( 'File ', _.strQuote( o.filePath ), 'doesn`t exist!' );;
       result = null;
+      // if( o.throwing )
+      throw _.err( 'File ', _.strQuote( o.filePath ), 'doesn`t exist!' );;
     }
   }
 
 }
 
 _.routineExtend( dirReadAct, Parent.prototype.dirReadAct );
-
-// var defaults = dirReadAct.defaults = Object.create( Parent.prototype.dirReadAct.defaults );
-// var having = dirReadAct.having = Object.create( Parent.prototype.dirReadAct.having );
 
 // --
 // read stat
@@ -992,10 +920,10 @@ function softLinkAct( o )
   else
   {
     // if( o.dstPath === o.srcPath )
-    // return new _.Consequence().give( true );
+    // return new _.Consequence().take( true );
 
     return self.statRead({ filePath : o.dstPath, sync : 0 })
-    .doThen( ( err, stat ) =>
+    .finally( ( err, stat ) =>
     {
       if( err )
       throw _.err( err );
@@ -1060,12 +988,12 @@ function hardLinkAct( o )
   else
   {
     if( o.dstPath === o.srcPath )
-    return new _.Consequence().give( true );
+    return new _.Consequence().take( true );
 
     xxx /* qqq : synchronize wtih sync version, please */
 
     return self.statRead({ filePath : o.dstPath, sync : 0 })
-    .doThen( ( err, stat ) =>
+    .finally( ( err, stat ) =>
     {
       if( err )
       throw _.err( err );
@@ -1116,7 +1044,7 @@ function hardLinkBreakAct( o )
   self._descriptorWrite( o.filePath, descriptor.data );
 
   if( !o.sync )
-  return new _.Consequence().give( null );
+  return new _.Consequence().take( null );
 }
 
 _.routineExtend( hardLinkBreakAct, Parent.prototype.hardLinkBreakAct );
@@ -1423,9 +1351,9 @@ function filesTreeRead( o )
 
   /* */
 
-  o.srcProvider.fieldSet( 'resolvingSoftLink', 1 );
+  o.srcProvider.fieldPush( 'resolvingSoftLink', 1 );
   let found = o.srcProvider.filesGlob( _.mapOnly( o, o.srcProvider.filesGlob.defaults ) );
-  o.srcProvider.fieldReset( 'resolvingSoftLink', 1 );
+  o.srcProvider.fieldPop( 'resolvingSoftLink', 1 );
 
   return result;
 }

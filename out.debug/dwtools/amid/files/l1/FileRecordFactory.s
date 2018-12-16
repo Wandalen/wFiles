@@ -379,7 +379,7 @@ let Composes =
   basePath : null,
   stemPath : null,
 
-  onRecord : null,
+  // onRecord : null,
   strict : 1,
 
   allowingMissing : 0,
@@ -387,7 +387,7 @@ let Composes =
   resolvingTextLink : null,
   usingTextLink : null,
   stating : null,
-  resolving : 0,
+  resolving : 1,
   safe : null,
 
 }
@@ -417,20 +417,6 @@ let Statics =
   TollerantMake : TollerantMake,
 }
 
-let Accessors =
-{
-
-  resolvingSoftLink : 'resolvingSoftLink',
-  usingSoftLink : 'usingSoftLink',
-
-  resolvingTextLink : 'resolvingTextLink',
-  usingTextLink : 'usingTextLink',
-
-  stating : 'stating',
-  safe : 'safe',
-
-}
-
 let Forbids =
 {
 
@@ -449,6 +435,21 @@ let Forbids =
   notNewerAge : 'notNewerAge',
   originPath : 'originPath',
   fileProviderEffective : 'fileProviderEffective',
+  onRecord : 'onRecord',
+
+}
+
+let Accessors =
+{
+
+  resolvingSoftLink : 'resolvingSoftLink',
+  usingSoftLink : 'usingSoftLink',
+
+  resolvingTextLink : 'resolvingTextLink',
+  usingTextLink : 'usingTextLink',
+
+  stating : 'stating',
+  safe : 'safe',
 
 }
 

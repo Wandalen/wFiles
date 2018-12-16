@@ -1311,12 +1311,12 @@ pathResolveLinkHeadReverse.having.aspect = 'entry';
 // record
 // --
 
-function _recordFactoryFormEnd( recordContext )
+function _recordFactoryFormEnd( recordFactory )
 {
   let self = this;
-  _.assert( recordContext instanceof _.FileRecordFactory );
+  _.assert( recordFactory instanceof _.FileRecordFactory );
   _.assert( arguments.length === 1, 'Expects single argument' );
-  return recordContext;
+  return recordFactory;
 }
 
 //
@@ -1341,6 +1341,26 @@ function _recordFormEnd( record )
 {
   let self = this;
   return record;
+}
+
+//
+
+function _recordAbsoluteGlobalMaybeGet( record )
+{
+  let self = this;
+  _.assert( record instanceof _.FileRecord );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  return record.absolute;
+}
+
+//
+
+function _recordRealGlobalMaybeGet( record )
+{
+  let self = this;
+  _.assert( record instanceof _.FileRecord );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  return record.real;
 }
 
 //
@@ -1579,7 +1599,7 @@ function statRead_body( o )
     {
       if( o.sync )
       return null;
-      return new _.Consequence().give( null );
+      return new _.Consequence().take( null );
     }
   }
 
@@ -1589,7 +1609,7 @@ function statRead_body( o )
   }
   else
   {
-    let result = new _.Consequence().give( o2.stat );
+    let result = new _.Consequence().take( o2.stat );
     return result.ifNoErrorThen( end );
   }
 
@@ -2035,7 +2055,7 @@ function fileRead_body( o )
 
     result
     .ifNoErrorThen( handleEnd )
-    .ifErrorThen( handleError )
+    .except( handleError )
     ;
 
     return result;
@@ -2059,7 +2079,7 @@ function fileRead_body( o )
     let r = o
 
     debugger;
-    _.Consequence.give( o.onBegin, r );
+    _.Consequence.take( o.onBegin, r );
   }
 
   /* end */
@@ -2095,7 +2115,7 @@ function fileRead_body( o )
     if( o.onEnd )
     debugger;
     if( o.onEnd )
-    _.Consequence.give( o.onEnd, o );
+    _.Consequence.take( o.onEnd, o );
 
     return r;
   }
@@ -2515,7 +2535,7 @@ let hashRead_body = ( function()
       stream.on( 'end', function()
       {
         let hash = md5sum.digest( 'hex' );
-        con.give( hash );
+        con.take( hash );
       });
 
       stream.on( 'error', function( err )
@@ -2523,7 +2543,7 @@ let hashRead_body = ( function()
         if( o.throwing )
         con.error( _.err( err ) );
         else
-        con.give( NaN );
+        con.take( NaN );
       });
 
       return con;
@@ -2596,35 +2616,13 @@ hashRead.having.aspect = 'entry';
 
 //
 
-function dirRead_pre( routine, args )
-{
-  let self = this;
-
-  _.assert( arguments.length === 2, 'Expects exactly two arguments' );
-  _.assert( args.length === 0 || args.length === 1 );
-
-  let o = args[ 0 ] || Object.create( null );
-
-  if( self.path.like( o ) )
-  o = { filePath : self.path.from( o ) };
-
-  _.routineOptions( routine, o );
-  self._providerDefaults( o );
-
-  _.assert( self.path.isAbsolute( o.filePath ) );
-
-  return o;
-}
-
-//
-
 let dirReadAct = Object.create( null );
 dirReadAct.name = 'dirReadAct';
 
 var defaults = dirReadAct.defaults = Object.create( null );
 defaults.filePath = null;
 defaults.sync = null;
-defaults.throwing = null;
+// defaults.throwing = null;
 
 var having = dirReadAct.having = Object.create( null );
 having.writing = 0;
@@ -2636,9 +2634,33 @@ operates.filePath = { pathToRead : 1 }
 
 //
 
+function dirRead_pre( routine, args )
+{
+  let self = this;
+  let o = self._preFilePathScalarWithProviderDefaults.apply( self, arguments );
+  return o;
+  // _.assert( arguments.length === 2, 'Expects exactly two arguments' );
+  // _.assert( args.length === 0 || args.length === 1 );
+  //
+  // let o = args[ 0 ] || Object.create( null );
+  //
+  // if( self.path.like( o ) )
+  // o = { filePath : self.path.from( o ) };
+  //
+  // _.routineOptions( routine, o );
+  // self._providerDefaults( o );
+  //
+  // _.assert( self.path.isAbsolute( o.filePath ) );
+  //
+  // return o;
+}
+
+//
+
 function dirRead_body( o )
 {
   let self = this;
+  let result;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.arrayHas( [ 'record', 'absolute', 'relative' ], o.outputFormat ) )
@@ -2647,9 +2669,24 @@ function dirRead_body( o )
   let o2 = _.mapExtend( null, o );
   delete o2.outputFormat;
   delete o2.basePath;
+  delete o2.throwing;
   o2.filePath = self.path.normalize( o2.filePath );
 
-  let result = self.dirReadAct( o2 );
+  /* */
+
+  try
+  {
+    result = self.dirReadAct( o2 );
+  }
+  catch( err )
+  {
+    if( o.throwing )
+    throw _.err( err );
+    else
+    return null;
+  }
+
+  /* */
 
   if( o2.sync )
   {
@@ -2658,8 +2695,13 @@ function dirRead_body( o )
   }
   else
   {
-    result.ifNoErrorThen( function( list )
+    result.finally( function( err, list )
     {
+      if( err )
+      if( o.throwing )
+      throw _.err( err );
+      else
+      return null;
       if( list )
       return adjust( list );
       return list;
@@ -2689,10 +2731,7 @@ function dirRead_body( o )
     if( o.outputFormat === 'absolute' )
     result = result.map( function( relative )
     {
-      // if( isDir )
       return self.path.join( o.filePath, relative );
-      // else
-      // return o.filePath;
     });
     else if( o.outputFormat === 'record' )
     result = result.map( function( relative )
@@ -3781,9 +3820,9 @@ function fileWrite_body( o )
 
   if( terminateLink && o.writeMode !== 'rewrite' )
   {
-    self.fieldSet( 'resolvingSoftLink', 1 );
+    self.fieldPush( 'resolvingSoftLink', 1 );
     let readData = self.fileRead({ filePath :  o.filePath, encoding : 'original.type' });
-    self.fieldReset( 'resolvingSoftLink', 1 );
+    self.fieldPop( 'resolvingSoftLink', 1 );
 
     let writeData = o.data;
 
@@ -4247,7 +4286,7 @@ function fileDelete_body( o )
     }
     else
     {
-      let con = new _.Consequence().give( null );
+      let con = new _.Consequence().take( null );
       let cons = [];
       for( let f = 0 ; f < o.filePath.length ; f++ )
       {
@@ -4255,7 +4294,7 @@ function fileDelete_body( o )
         o2.filePath = o.filePath[ f ];
         cons[ f ] = fileDelete_body.call( self, o2 );
       }
-      con.andThen( cons );
+      con.andKeep( cons );
       return con;
     }
   }
@@ -4321,7 +4360,7 @@ function fileDelete_body( o )
       log( 1 );
     }
     else
-    result.doThen( function( err, arg )
+    result.finally( function( err, arg )
     {
       log( !err );
       if( err )
@@ -4454,7 +4493,7 @@ function dirMake_body( o )
       if( !o.recursive  )
       return handleError( _.err( 'File already exists:', _.strQuote( o.filePath ) ) );
       else
-      return o.sync ? undefined : new _.Consequence().give( null );
+      return o.sync ? undefined : new _.Consequence().take( null );
     }
 
   }
@@ -4497,7 +4536,7 @@ function dirMake_body( o )
   }
   else
   {
-    let con = new _.Consequence().give( null );
+    let con = new _.Consequence().take( null );
     for( let i = 0; i < splits.length; i++ )
     con.ifNoErrorThen( _.routineSeal( self, onPart, [ splits[ i ] ] ) );
 
@@ -4588,7 +4627,7 @@ function _linkMultiple( o, link )
   let self = this;
 
   if( o.dstPath.length < 2 )
-  return o.sync ? true : new _.Consequence().give( true );
+  return o.sync ? true : new _.Consequence().take( true );
 
   _.assert( !!o );
   _.assert( _.strIs( o.srcPath ) || o.srcPath === null );
@@ -4634,7 +4673,7 @@ function _linkMultiple( o, link )
   }
 
   if( !needed )
-  return o.sync ? true : new _.Consequence().give( true );
+  return o.sync ? true : new _.Consequence().take( true );
 
   /* */
 
@@ -4677,10 +4716,10 @@ function _linkMultiple( o, link )
     for( let p = 0 ; p < records.length ; p++ )
     cons.push( onRecord( records[ p ] ).tap( handler ) );
 
-    let con = new _.Consequence().give( null );
+    let con = new _.Consequence().take( null );
 
-    con.andThen( cons )
-    .doThen( () =>
+    con.andKeep( cons )
+    .finally( () =>
     {
       if( result.err )
       {
@@ -4710,7 +4749,7 @@ function _linkMultiple( o, link )
   function onRecord( record )
   {
     if( record === mostLinkedRecord )
-    return o.sync ? true : new _.Consequence().give( true );
+    return o.sync ? true : new _.Consequence().take( true );
 
     if( !o.allowDiffContent )
     if( record.stat && newestRecord.stat.mtime.getTime() === record.stat.mtime.getTime() && newestRecord.stat.birthtime.getTime() === record.stat.birthtime.getTime() )
@@ -4734,7 +4773,7 @@ function _linkMultiple( o, link )
       return link.call( self, linkOptions );
     }
 
-    return o.sync ? true : new _.Consequence().give( true );
+    return o.sync ? true : new _.Consequence().take( true );
   }
 
 }
@@ -4848,7 +4887,7 @@ function _link_functor( gen )
     }
     else /* async */
     {
-      let con = new _.Consequence().give( null )
+      let con = new _.Consequence().take( null )
 
       if( onRanameBegin )
       con.ifNoErrorThen( _.routineSeal( self,onRanameBegin, [ c ] ) );
@@ -4883,10 +4922,10 @@ function _link_functor( gen )
         return true;
       });
 
-      con.ifErrorThen( ( err ) =>
+      con.except( ( err ) =>
       {
         return tempRenameBackAsync()
-        .doThen( () =>
+        .finally( () =>
         {
           if( o.throwing )
           throw _.err( 'Cant', entryMethodName, o.dstPath, '<-', o.srcPath, '\n', err )
@@ -5210,7 +5249,7 @@ function _link_functor( gen )
     function tempRenameBackAsync()
     {
       if( !c.tempPath )
-      return new _.Consequence().give( null );
+      return new _.Consequence().take( null );
 
       return self.fileRenameAct
       ({
@@ -5220,7 +5259,7 @@ function _link_functor( gen )
         originalSrcPath : o.originalSrcPath,
         sync : 0,
       })
-      .doThen( ( err2, got ) )
+      .finally( ( err2, got ) )
       {
         if( err2 )
         console.error( err2 );
@@ -5268,7 +5307,7 @@ function _link_functor( gen )
       {
         // if( o.sync )
         // return false;
-        // return new _.Consequence().give( false );
+        // return new _.Consequence().take( false );
         return end( null ); /* qqq : should return null, if error. not false. cover it, please */
       }
     }
@@ -5281,7 +5320,7 @@ function _link_functor( gen )
       if( o.sync )
       c.result = r;
       else
-      c.result = _.Consequence().give( r );
+      c.result = _.Consequence().take( r );
       _.assert( !!o.sync || _.consequenceIs( c.result ) );
       _.assert( c.result !== undefined );
       return c.result;
@@ -5917,7 +5956,7 @@ function fileExchange_body( o )
     if( o.sync )
     return null;
     else
-    return new _.Consequence().give( null );
+    return new _.Consequence().take( null );
   }
 
   if( !src || !dst )
@@ -5981,7 +6020,7 @@ function fileExchange_body( o )
   }
   else
   {
-    let con = new _.Consequence().give( null );
+    let con = new _.Consequence().take( null );
 
     con.ifNoErrorThen( _.routineSeal( self, self.fileRename, [ _.mapExtend( null, o2 ) ] ) )
     .ifNoErrorThen( function( arg/*aaa*/ )
@@ -6692,6 +6731,9 @@ let Proto =
   _recordFormBegin,
   _recordPathForm,
   _recordFormEnd,
+
+  _recordAbsoluteGlobalMaybeGet,
+  _recordRealGlobalMaybeGet,
 
   record,
   _recordsSort,

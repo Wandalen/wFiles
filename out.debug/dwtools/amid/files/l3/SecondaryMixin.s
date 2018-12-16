@@ -336,7 +336,7 @@ function _filesReadAsync( o )
   for( let p = 0 ; p < o.paths.length ; p++ ) ( function( p )
   {
 
-    con.choke();
+    con.done( 1 );
 
     let readOptions = _optionsForFileRead( o.paths[ p ] );
 
@@ -353,7 +353,7 @@ function _filesReadAsync( o )
         read[ p ] = arg;
       }
 
-      con.give( null );
+      con.take( null );
 
     });
 
@@ -361,10 +361,10 @@ function _filesReadAsync( o )
 
   /* end */
 
-  con.give( null ).got( function filesReadEnd()
+  con.take( null ).got( function filesReadEnd()
   {
     let result = _filesReadEnd( errs, read );
-    con.give( o.throwing ? err : undefined , result );
+    con.take( o.throwing ? err : undefined , result );
   });
 
   /* */

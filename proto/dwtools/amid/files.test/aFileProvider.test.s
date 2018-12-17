@@ -3320,7 +3320,7 @@ function fileTouch( test )
 
   test.case = 'filePath doesnt exist, filePath as record';
   self.provider.filesDelete( srcPath );
-  var record = self.provider.recordFactory().record( srcPath );
+  var record = self.provider.recordFactory({ allowingMissing : 1 }).record( srcPath );
   test.identical( record.stat, null );
   self.provider.fileTouch( record );
   var stat = self.provider.statResolvedRead( srcPath );

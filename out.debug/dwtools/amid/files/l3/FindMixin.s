@@ -652,17 +652,11 @@ function filesFind_body( o )
 _.routineExtend( filesFind_body, filesFindSingle.body );
 
 var defaults = filesFind_body.defaults;
-
-// defaults.prefixPath = null;
-// defaults.postfixPath = null;
-
 defaults.orderingExclusion = [];
 defaults.sortingWithArray = null;
 defaults.verbosity = null;
 defaults.mandatory = 0;
 
-// _.mapExtend( defaults, _filesFilterForm.defaults );
-// _.assert( defaults.maskAll !== undefined );
 _.assert( defaults.maskAll === undefined );
 _.assert( defaults.glob === undefined );
 
@@ -691,7 +685,6 @@ function filesFindRecursive( o )
 _.routineExtend( filesFindRecursive, filesFind );
 
 var defaults = filesFindRecursive.defaults;
-
 defaults.filePath = null;
 defaults.recursive = '2';
 defaults.includingTransient = 0;
@@ -735,7 +728,6 @@ function filesGlob( o )
 _.routineExtend( filesGlob, filesFind );
 
 var defaults = filesGlob.defaults;
-
 defaults.outputFormat = 'absolute';
 defaults.recursive = '2';
 defaults.includingTerminals = 1;
@@ -986,14 +978,11 @@ filesCopyWithAdapter.defaults =
 }
 
 // filesCopyWithAdapter.defaults.__proto__ = filesFindMasksAdjust.defaults
-
-var paths = filesCopyWithAdapter.paths = Object.create( null );
-
-paths.src = null;
-paths.dst = null;
+// var paths = filesCopyWithAdapter.paths = Object.create( null );
+// paths.src = null;
+// paths.dst = null;
 
 var having = filesCopyWithAdapter.having = Object.create( null );
-
 having.writing = 0;
 having.reading = 1;
 having.driving = 0;
@@ -2339,17 +2328,14 @@ defaults.onDown = null;
 defaults.onDstName = null;
 
 var defaults = filesReflectEvaluate_body.defaults = Object.create( filesReflectSingleDefaults );
-
 defaults.srcPath = null;
 defaults.dstPath = null;
 
-var paths = filesReflectEvaluate_body.paths = Object.create( null );
-
-paths.srcPath = null;
-paths.dstPath = null;
+// var paths = filesReflectEvaluate_body.paths = Object.create( null );
+// paths.srcPath = null;
+// paths.dstPath = null;
 
 var having = filesReflectEvaluate_body.having = Object.create( null );
-
 having.writing = 0;
 having.reading = 1;
 having.driving = 0;
@@ -2704,13 +2690,11 @@ defaults.breakingDstHardLink = null;
 defaults.resolvingDstSoftLink = null;
 defaults.resolvingDstTextLink = null;
 
-var paths = filesReflectSingle_body.paths = Object.create( null );
-
-paths.srcPath = null;
-paths.dstPath = null;
+// var paths = filesReflectSingle_body.paths = Object.create( null );
+// paths.srcPath = null;
+// paths.dstPath = null;
 
 var having = filesReflectSingle_body.having = Object.create( null );
-
 having.writing = 0;
 having.reading = 1;
 having.driving = 0;
@@ -3229,7 +3213,6 @@ function filesFindSame_body( o )
 _.routineExtend( filesFindSame_body, filesFindRecursive );
 
 var defaults = filesFindSame_body.defaults;
-
 defaults.maxSize = 1 << 22;
 // defaults.lattersFileSizeLimit = 1048576;
 defaults.similarityLimit = 0.95;
@@ -3367,11 +3350,11 @@ let filesDelete = _.routineFromPreAndBody( filesDelete_pre, filesDelete_body );
 filesDelete.having.aspect = 'entry';
 
 var defaults = filesDelete.defaults;
-var paths = filesDelete.paths;
+// var paths = filesDelete.paths;
 var having = filesDelete.having;
 
 _.assert( !!defaults );
-_.assert( !!paths );
+// _.assert( !!paths );
 _.assert( !!having );
 
 //
@@ -3498,7 +3481,6 @@ function filesDeleteEmptyDirs()
 _.routineExtend( filesDeleteEmptyDirs, filesDelete );
 
 var defaults = filesDeleteEmptyDirs.defaults;
-
 defaults.throwing = false;
 defaults.verbosity = null;
 defaults.outputFormat = 'absolute';
@@ -3543,7 +3525,6 @@ function softLinksBreak( o )
 _.routineExtend( softLinksBreak, filesFind );
 
 var defaults = softLinksBreak.defaults;
-
 defaults.outputFormat = 'record';
 defaults.breakingSoftLink = 1;
 defaults.breakingTextLink = 0;
@@ -3659,15 +3640,13 @@ function filesResolve( o )
 _.routineExtend( filesResolve, filesGlob );
 
 var defaults = filesResolve.defaults;
-
 defaults.recursive = '2';
 defaults.globPath = null;
 defaults.translator = null;
 defaults.outputFormat = 'record';
 
-var paths = filesResolve.paths;
-
-paths.globPath = null;
+// var paths = filesResolve.paths;
+// paths.globPath = null;
 
 // --
 // relationship

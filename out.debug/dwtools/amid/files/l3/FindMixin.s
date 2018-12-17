@@ -25,7 +25,7 @@ let Self = function wFileProviderFind( o )
 
 Self.shortName = 'Find';
 
-let debugPath = '/file.b';
+let debugPath = '/dst/link';
 
 // --
 // etc
@@ -1868,15 +1868,13 @@ function filesReflectEvaluate_body( o )
     if( o.onDstName )
     relative = o.onDstName.call( self, relative, dstRecordFactory, op, o, srcRecord );
 
-    // if( srcRecord.absolute === '/src/d' )
-    // debugger;
-
     let dstRecord = dstRecordFactory.record( relative );
     let record = recordMake( dstRecord, srcRecord, srcRecord );
     record.reason = 'srcLooking';
 
-    // if( _.strEnds( record.dst.absolute, debugPath ) )
-    // debugger;
+    if( _.strEnds( record.dst.absolute, debugPath ) )
+    debugger;
+    let isSoftLink = record.dst.isSoftLink;
 
     if( o.filesGraph )
     {

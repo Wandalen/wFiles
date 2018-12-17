@@ -311,8 +311,8 @@ function statReadAct( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assertRoutineOptions( statReadAct, o );
 
-  // if( o.filePath === '/dst' )
-  // debugger;
+  if( _.strEnds( o.filePath, '/dst/link' ) )
+  debugger;
 
   /* */
 

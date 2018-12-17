@@ -31085,94 +31085,6 @@ function pathResolveSoftLink( test )
 {
   let self = this;
 
-  let filePath = test.context.pathFor( 'written/pathResolveSoftLink/file' );
-  let linkPath = test.context.pathFor( 'written/pathResolveSoftLink/link' );
-
-  var o1 =
-  {
-  }
-
-  test.case = 'not existing file';
-  self.provider.filesDelete( _.path.dir( filePath ) );
-  var o = _.mapExtend( null, o1, { filePath : filePath } );
-  var got = self.provider.pathResolveSoftLink( o );
-  test.identical( got, filePath )
-
-  test.case = 'existing file';
-  self.provider.filesDelete( _.path.dir( filePath ) );
-  self.provider.fileWrite( filePath, filePath );
-  var o = _.mapExtend( null, o1, { filePath : filePath } );
-  var got = self.provider.pathResolveSoftLink( o );
-  test.identical( got, filePath )
-
-  test.case = 'hardLink';
-  self.provider.filesDelete( _.path.dir( filePath ) );
-  self.provider.fileWrite( filePath, filePath );
-  self.provider.hardLink( linkPath, filePath );
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  var got = self.provider.pathResolveSoftLink( o );
-  test.identical( got, linkPath )
-
-  test.case = 'softLink';
-  self.provider.filesDelete( _.path.dir( filePath ) );
-  self.provider.fileWrite( filePath, filePath );
-  self.provider.softLink( linkPath, filePath );
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  var got = self.provider.pathResolveSoftLink( o );
-  test.identical( got, filePath )
-
-  test.case = 'relative softLink';
-  self.provider.filesDelete( _.path.dir( filePath ) );
-  self.provider.fileWrite( filePath, filePath );
-  self.provider.softLink( linkPath, '../file' );
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  var got = self.provider.pathResolveSoftLink( o );
-  test.identical( got, '../file' );
-
-  test.case = 'textLink';
-  self.provider.filesDelete( _.path.dir( filePath ) );
-  self.provider.fileWrite( filePath, filePath );
-  self.provider.fileWrite( linkPath, 'link ' + filePath );
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  var got = self.provider.pathResolveSoftLink( o );
-  test.identical( got, linkPath );
-
-  //
-
-  test.case = 'absolute softLink to missing'
-  self.provider.filesDelete( _.path.dir( filePath ) );
-  self.provider.softLink
-  ({
-    dstPath : linkPath,
-    srcPath : filePath,
-    makingDirectory : 1,
-    allowingMissing : 1
-  });
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  var got = self.provider.pathResolveSoftLink( o );
-  test.identical( got, filePath );
-
-  test.case = 'relative softLink to missing'
-  self.provider.filesDelete( _.path.dir( filePath ) );
-  var filePathRelative = self.provider.path.relative( linkPath,filePath );
-  self.provider.softLink
-  ({
-    dstPath : linkPath,
-    srcPath : filePathRelative,
-    makingDirectory : 1,
-    allowingMissing : 1
-  });
-  var o = _.mapExtend( null, o1, { filePath : linkPath } );
-  var got = self.provider.pathResolveSoftLink( o );
-  test.identical( got, filePathRelative );
-}
-
-//
-
-function pathResolveSoftLink2( test )
-{
-  let self = this;
-
   let workDir = test.context.pathFor( 'written/pathResolveSoftLink' );
   let filePath = test.context.pathFor( 'written/pathResolveSoftLink/file' );
   let linkPath = test.context.pathFor( 'written/pathResolveSoftLink/link' );
@@ -31367,30 +31279,20 @@ function pathResolveSoftLink2( test )
   test.case = 'No object input';
   self.provider.filesDelete( workDir );
   self.provider.fileWrite( filePath, testData );
-  self.provider.softLink({ dstPath : linkPath, srcPath : filePath });
-  test.mustNotThrowError( () =>
-    self.provider.pathResolveSoftLink( linkPath )
-  );
+  self.provider.softLink({ dstPath : linkPath, srcPath : filePath } );
+  test.mustNotThrowError( () => self.provider.pathResolveSoftLink( linkPath ) );
 
   test.case = 'No arguments';
-  test.shouldThrowError( () =>
-    self.provider.pathResolveSoftLink( )
-  );
+  test.shouldThrowError( () => self.provider.pathResolveSoftLink( ) );
 
   test.case = 'Too many arguments';
-  test.shouldThrowError( () =>
-    self.provider.pathResolveSoftLink(  { filePath : linkPath },  { filePath : linkPath }   )
-  );
+  test.shouldThrowError( () => self.provider.pathResolveSoftLink( { filePath : linkPath }, { filePath : linkPath } ) );
 
   test.case = 'No filePath option';
-  test.shouldThrowError( () =>
-    self.provider.pathResolveSoftLink(  { otherPath : linkPath }   )
-  );
+  test.shouldThrowError( () => self.provider.pathResolveSoftLink( { otherPath : linkPath } ) );
 
-  test.case = 'Only one allowingMissing option';
-  test.shouldThrowError( () =>
-    self.provider.pathResolveSoftLink(  { filePath : linkPath, allowingMissing : 1 }   )
-  );
+  test.case = 'Redundant option';
+  test.shouldThrowError( () => self.provider.pathResolveSoftLink( { filePath : linkPath, allowingMissing : 1 } ) );
 
   test.case = 'Wrong filePath options - undefined';
   test.shouldThrowError( () => self.provider.pathResolveSoftLink( { filePath : undefined } ) );
@@ -31746,24 +31648,16 @@ function pathResolveTextLink( test )
   );
 
   test.case = 'No arguments';
-  test.shouldThrowError( () =>
-    self.provider.pathResolveTextLink( )
-  );
+  test.shouldThrowError( () => self.provider.pathResolveTextLink( ) );
 
   test.case = 'Too many arguments';
-  test.shouldThrowError( () =>
-    self.provider.pathResolveTextLink(  { filePath : linkPath },  { filePath : linkPath }   )
-  );
+  test.shouldThrowError( () => self.provider.pathResolveTextLink( { filePath : linkPath },  { filePath : linkPath } ) );
 
   test.case = 'No filePath option';
-  test.shouldThrowError( () =>
-    self.provider.pathResolveTextLink(  { otherPath : linkPath }   )
-  );
+  test.shouldThrowError( () => self.provider.pathResolveTextLink( { otherPath : linkPath } ) );
 
   test.case = 'Only one allowingMissing option';
-  test.shouldThrowError( () =>
-    self.provider.pathResolveTextLink(  { filePath : linkPath, allowingMissing : 1 }   )
-  );
+  test.shouldThrowError( () => self.provider.pathResolveTextLink( { filePath : linkPath, allowingMissing : 1 } ) );
 
   test.case = 'Wrong filePath options - undefined';
   test.shouldThrowError( () => self.provider.pathResolveTextLink( { filePath : undefined } ) );
@@ -32191,7 +32085,6 @@ var Self =
     pathResolveLinkTailChain : pathResolveLinkTailChain,
     pathResolveLinkFull : pathResolveLinkFull,
     pathResolveSoftLink : pathResolveSoftLink,
-    pathResolveSoftLink2 : pathResolveSoftLink2,
     pathResolveTextLink : pathResolveTextLink,
 
     fileCopyExperiment : fileCopyExperiment,

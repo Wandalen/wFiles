@@ -231,6 +231,7 @@ function _filterApply()
 function _isSafe()
 {
   let record = this;
+  let path = record.path;
   let f = record.factory;
 
   _.assert( arguments.length === 0 );

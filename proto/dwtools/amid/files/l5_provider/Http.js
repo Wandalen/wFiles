@@ -101,7 +101,7 @@ function statReadAct( o )
         let size = parseInt( request.getResponseHeader( 'Content-Length' ) );
         result.size = size;
         if( con )
-        con.give( result );
+        con.take( result );
       }
     }
     request.send();
@@ -232,7 +232,7 @@ function fileReadAct( o )
 
       o.ended = 1;
 
-      con.give( result );
+      con.take( result );
     }
     catch( err )
     {
@@ -249,7 +249,7 @@ function fileReadAct( o )
     // not implemented well
     if( e.lengthComputable )
     if( o.onProgress )
-    _.Consequence.give( o.onProgress,
+    _.Consequence.take( o.onProgress,
     {
       progress : e.loaded / e.total,
       options : o,

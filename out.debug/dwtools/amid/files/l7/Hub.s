@@ -203,27 +203,27 @@ function providerForPath( url )
 // adapter
 // --
 
-function _recordFactoryFormEnd( recordContext )
+function _recordFactoryFormEnd( recordFactory )
 {
   let self = this;
 
-  _.assert( recordContext instanceof _.FileRecordFactory );
+  _.assert( recordFactory instanceof _.FileRecordFactory );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  if( !recordContext.effectiveFileProvider )
+  if( !recordFactory.effectiveFileProvider )
   debugger;
 
-  if( !recordContext.effectiveFileProvider )
-  recordContext.effectiveFileProvider = recordContext.fileProvider.providerForPath( recordContext.basePath );
+  if( !recordFactory.effectiveFileProvider )
+  recordFactory.effectiveFileProvider = recordFactory.fileProvider.providerForPath( recordFactory.basePath );
 
-  _.assert( _.objectIs( recordContext.effectiveFileProvider ), 'No provider for path', recordContext.basePath );
+  _.assert( recordFactory.effectiveFileProvider instanceof _.FileProvider.Abstract, 'No provider for base path', recordFactory.basePath, 'found' );
 
-  recordContext.basePath = recordContext.effectiveFileProvider.localFromGlobal( recordContext.basePath );
+  recordFactory.basePath = recordFactory.effectiveFileProvider.localFromGlobal( recordFactory.basePath );
 
-  if( recordContext.stemPath !== null )
-  recordContext.stemPath = recordContext.effectiveFileProvider.localFromGlobal( recordContext.stemPath );
+  if( recordFactory.stemPath !== null )
+  recordFactory.stemPath = recordFactory.effectiveFileProvider.localFromGlobal( recordFactory.stemPath );
 
-  return recordContext;
+  return recordFactory;
 }
 
 //
@@ -246,8 +246,8 @@ function _recordPathForm( record )
   _.assert( record instanceof _.FileRecord );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  record.absoluteGlobalOrLocal = record.absoluteGlobal;
-  record.realGlobalOrLocal = record.realGlobal;
+  // record.absoluteGlobalMaybe = record.absoluteGlobal;
+  // record.realGlobalMaybe = record.realGlobal;
 
   return record;
 }
@@ -260,41 +260,61 @@ function _recordFormEnd( record )
   _.assert( record instanceof _.FileRecord );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  record.realGlobalOrLocal = record.realGlobal;
+  // record.realGlobalMaybe = record.realGlobal;
 
   return record;
 }
 
 //
 
-function fieldSet()
+function _recordAbsoluteGlobalMaybeGet( record )
+{
+  let self = this;
+  _.assert( record instanceof _.FileRecord );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  return record.absoluteGlobal;
+}
+
+//
+
+function _recordRealGlobalMaybeGet( record )
+{
+  let self = this;
+  _.assert( record instanceof _.FileRecord );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  return record.realGlobal;
+}
+
+//
+
+function fieldPush()
 {
   let self = this;
 
-  Parent.prototype.fieldSet.apply( self, arguments );
+  Parent.prototype.fieldPush.apply( self, arguments );
 
   if( self.providersWithProtocolMap )
   for( let or in self.providersWithProtocolMap )
   {
     let provider = self.providersWithProtocolMap[ or ];
-    provider.fieldSet.apply( provider, arguments )
+    provider.fieldPush.apply( provider, arguments )
   }
 
 }
 
 //
 
-function fieldReset()
+function fieldPop()
 {
   let self = this;
 
-  Parent.prototype.fieldReset.apply( self, arguments );
+  Parent.prototype.fieldPop.apply( self, arguments );
 
   if( self.providersWithProtocolMap )
   for( let or in self.providersWithProtocolMap )
   {
     let provider = self.providersWithProtocolMap[ or ];
-    provider.fieldReset.apply( provider, arguments );
+    provider.fieldPop.apply( provider, arguments );
   }
 
 }
@@ -1043,8 +1063,11 @@ let Proto =
   _recordPathForm,
   _recordFormEnd,
 
-  fieldSet,
-  fieldReset,
+  _recordAbsoluteGlobalMaybeGet,
+  _recordRealGlobalMaybeGet,
+
+  fieldPush,
+  fieldPop,
 
   // path
 

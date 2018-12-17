@@ -347,7 +347,7 @@ function pathResolveSoftLinkAct( o )
   catch( err )
   {
     debugger;
-    throw _.err( 'Error resolving softlink', o.filePath, '\n', err );
+    throw _.err( 'Error resolving softLink', o.filePath, '\n', err );
   }
 
 }
@@ -423,7 +423,7 @@ function fileReadAct( o )
     if( o.sync )
     return data;
     else
-    return con.give( data );
+    return con.take( data );
 
   }
 
@@ -528,87 +528,6 @@ _.routineExtend( streamReadAct, Parent.prototype.streamReadAct );
 
 //
 
-// let hashReadAct = ( function()
-// {
-
-//   let crypto;
-
-//   return function hashReadAct( o )
-//   {
-//     let result = NaN;
-//     let self = this;
-
-//     if( _.strIs( o ) )
-//     o = { filePath : o };
-
-//     _.assertRoutineOptions( hashReadAct, o );
-//     _.assert( _.strIs( o.filePath ) );
-//     _.assert( arguments.length === 1, 'Expects single argument' );
-
-//     /* */
-
-//     if( !crypto )
-//     crypto = require( 'crypto' );
-//     let md5sum = crypto.createHash( 'md5' );
-
-//     /* */
-
-//     if( o.sync )
-//     {
-
-//       try
-//       {
-//         let read = File.readFileSync( o.filePath );
-//         md5sum.update( read );
-//         result = md5sum.digest( 'hex' );
-//       }
-//       catch( err )
-//       {
-//         if( o.throwing )
-//         throw err;
-//         result = NaN;
-//       }
-
-//       return result;
-
-//     }
-//     else
-//     {
-
-//       let con = new _.Consequence();
-//       let stream = File.ReadStream( o.filePath );
-
-//       stream.on( 'data', function( d )
-//       {
-//         md5sum.update( d );
-//       });
-
-//       stream.on( 'end', function()
-//       {
-//         let hash = md5sum.digest( 'hex' );
-//         con.give( hash );
-//       });
-
-//       stream.on( 'error', function( err )
-//       {
-//         if( o.throwing )
-//         con.error( _.err( err ) );
-//         else
-//         con.give( NaN );
-//       });
-
-//       return con;
-//     }
-
-//   }
-
-// })();
-
-// hashReadAct.defaults = {};
-// hashReadAct.defaults.__proto__ = Parent.prototype.hashReadAct.defaults;
-
-//
-
 function dirReadAct( o )
 {
   let self = this;
@@ -649,7 +568,7 @@ function dirReadAct( o )
     }
     catch ( err )
     {
-      if( o.throwing )
+      // if( o.throwing )
       throw _.err( err );
       result = null;
     }
@@ -671,10 +590,10 @@ function dirReadAct( o )
     {
       if( err )
       {
-        if( o.throwing )
+        // if( o.throwing )
         con.error( _.err( err ) );
-        else
-        con.give( result );
+        // else
+        // con.take( result );
       }
       else if( stat.isDir() )
       {
@@ -682,21 +601,21 @@ function dirReadAct( o )
         {
           if( err )
           {
-            if( o.throwing )
+            // if( o.throwing )
             con.error( _.err( err ) );
-            else
-            con.give( result );
+            // else
+            // con.take( result );
           }
           else
           {
-            con.give( files || null );
+            con.take( files || null );
           }
         });
       }
       else
       {
         result = [ self.path.name({ path : o.filePath, withExtension : 1 }) ];
-        con.give( result );
+        con.take( result );
       }
     });
 
@@ -775,12 +694,12 @@ function statReadAct( o )
         if( o.throwing )
         con.error( _.err( err ) );
         else
-        con.give( null );
+        con.take( null );
       }
       else
       {
         handleEnd( stat );
-        con.give( stat );
+        con.take( stat );
       }
     }
   }
@@ -989,7 +908,7 @@ function fileWriteAct( o )
     {
       if( err )
       return con.error(  _.err( err ) );
-      return con.give( o );
+      return con.take( o );
     }
 
     if( o.writeMode === 'rewrite' )
@@ -1173,7 +1092,7 @@ function fileDeleteAct( o )
       if( err )
       con.error( err );
       else
-      con.give( true );
+      con.take( true );
     }
 
     return con;
@@ -1216,7 +1135,7 @@ function dirMakeAct( o )
       if( err )
       con.error( err );
       else
-      con.give( true );
+      con.take( true );
     });
 
     return con;
@@ -1254,7 +1173,7 @@ function fileRenameAct( o )
       if( err )
       con.error( err );
       else
-      con.give( true );
+      con.take( true );
     });
     return con;
   }
@@ -1318,11 +1237,11 @@ function fileCopyAct( o )
   }
   else
   {
-    let con = new _.Consequence().give( null );
+    let con = new _.Consequence().take( null );
     let readCon = new _.Consequence();
     let writeCon = new _.Consequence();
 
-    con.andThen( [ readCon, writeCon ] );
+    con.andKeep( [ readCon, writeCon ] );
 
     con.ifNoErrorThen( ( got ) =>
     {
@@ -1336,31 +1255,31 @@ function fileCopyAct( o )
 
     // File.copyFile( o.srcPath, o.dstPath, function( err, data )
     // {
-    //   con.give( err, data );
+    //   con.take( err, data );
     // });
 
     let readStream = self.streamReadAct({ filePath : o.srcPath, encoding : self.encoding });
 
     readStream.on( 'error', ( err ) =>
     {
-      readCon.give( _.err( err ) );
+      readCon.take( _.err( err ) );
     })
 
     readStream.on( 'end', () =>
     {
-      readCon.give( null );
+      readCon.take( null );
     })
 
     let writeStream = self.streamWriteAct({ filePath : o.dstPath });
 
     writeStream.on( 'error', ( err ) =>
     {
-      writeCon.give( _.err( err ) );
+      writeCon.take( _.err( err ) );
     })
 
     writeStream.on( 'finish', () =>
     {
-      writeCon.give( null );
+      writeCon.take( null );
     })
 
     readStream.pipe( writeStream );
@@ -1488,7 +1407,7 @@ gotPath : builder -> ../../../app/builder : /C/pro/web/app/builder
 
       function onSymlink( err )
       {
-        con.give( err, undefined )
+        con.take( err, undefined )
       }
 
       if( process.platform === 'win32' )
@@ -1502,7 +1421,7 @@ gotPath : builder -> ../../../app/builder : /C/pro/web/app/builder
       if( err )
       con.error( err );
       else
-      con.give( true );
+      con.take( true );
     }
 
     if( process.platform === 'win32' )
@@ -1610,7 +1529,7 @@ function hardLinkAct( o )
     let con = new _.Consequence();
 
     if( o.dstPath === o.srcPath )
-    return con.give( true );
+    return con.take( true );
 
     self.statReadAct
     ({
@@ -1630,7 +1549,7 @@ function hardLinkAct( o )
 
       File.link( o.srcPath, o.dstPath, function( err )
       {
-        return err ? con.error( err ) : con.give( true );
+        return err ? con.error( err ) : con.take( true );
       });
     })
 

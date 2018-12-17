@@ -320,7 +320,7 @@ _forCopy_body.defaults =
   filePath : null,
 }
 
-var paths = _forCopy_body.paths = Object.create( null );
+// var paths = _forCopy_body.paths = Object.create( null );
 var having = _forCopy_body.having = Object.create( null );
 
 having.driving = 0;
@@ -422,7 +422,7 @@ _firstAvailable_body.defaults =
   onPath : null,
 }
 
-var paths = _firstAvailable_body.paths = Object.create( null );
+// var paths = _firstAvailable_body.paths = Object.create( null );
 var having = _firstAvailable_body.having = Object.create( null );
 
 having.driving = 0;

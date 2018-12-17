@@ -1483,6 +1483,9 @@ function _applyToRecordMasks( record )
   _.assert( !!filter, 'Cant resolve filter for start path', () => _.strQuote( f.stemPath ) );
   _.assert( !!f.formed, 'Record factor was not formed!' );
 
+  // if( _.strHas( record.absolute, '/file.b' ) )
+  // debugger;
+
   /* */
 
   if( record.isDir )

@@ -82,7 +82,7 @@ function filesReflectSingle_body( o )
   _.assert( _.routineIs( o.onWriteSrcUp ) && o.onWriteSrcUp.composed && o.onWriteSrcUp.composed.elements.length === 0, 'Not supported options' );
   _.assert( _.routineIs( o.onWriteSrcDown ) && o.onWriteSrcDown.composed && o.onWriteSrcDown.composed.elements.length === 0, 'Not supported options' );
   _.assert( o.outputFormat === 'record' || o.outputFormat === 'nothing', 'Not supported options' );
-  _.assert( o.linking === 'fileCopy' || o.linking === 'hardlinkMaybe' || o.linking === 'softlinkMaybe', 'Not supported options' );
+  _.assert( o.linking === 'fileCopy' || o.linking === 'hardLinkMaybe' || o.linking === 'softLinkMaybe', 'Not supported options' );
   _.assert( !o.srcFilter.hasFiltering(), 'Not supported options' );
   _.assert( !o.dstFilter.hasFiltering(), 'Not supported options' );
   _.assert( o.srcFilter.formed === 5 );
@@ -193,7 +193,7 @@ function filesReflectSingle_body( o )
     /* handle error if any */
 
     result
-    .doThen( function( err, arg )
+    .finally( function( err, arg )
     {
       if( err )
       throw _.err( err );

@@ -50,106 +50,6 @@ function init( o )
 
 }
 
-// //
-//
-// function claimEndAct( o )
-// {
-//   let self = this;
-//
-//   if( _.strIs( o ) )
-//   o = { filePath : o }
-//
-//   _.assert( arguments.length === 1 );
-//   _.assert( _.strIs( o.filePath ) );
-//   _.assert( !!self.claimMap[ o.filePath ] );
-//
-//   let claim = self.claimMap[ o.filePath ];
-//   if( claim.tempOpened )
-//   self.claimProvider.path.dirTempClose( claim.tempPath )
-//   delete self.claimMap[ o.filePath ];
-//
-// }
-//
-// //
-//
-// function claimBeginAct( o )
-// {
-//   let self = this;
-//   let path = self.path;
-//
-//   if( _.strIs( o ) )
-//   o = { filePath : o }
-//
-//   _.assert( arguments.length === 1 );
-//   _.assert( _.strIs( o.filePath ) );
-//   _.sure( ( !o.login && !o.password ) || ( _.strIs( o.login ) && _.strIs( o.password ) ) );
-//   _.assert( !self.claimMap[ o.filePath ] );
-//
-//   if( !o.tempPath )
-//   {
-//     let dir = self.claimProvider.path.resolve( 'module' );
-//     o.tempPath = self.claimProvider.path.dirTempOpen( dir, 'git-' + _.idWithGuid( o.filePath ) );
-//     o.tempOpened = 1;
-//     _.assert( self.claimProvider.dirIsEmpty( o.tempPath ) );
-//   }
-//
-// /*
-//   git+https:///github.com/user/name.git/staging
-// */
-//
-//   let prefix = '';
-//   if( o.login && o.password )
-//   prefix = o.login + ':' + o.password + '@';
-//
-//   let filePath = path.join( prefix, o.filePath );
-//   filePath = filePath.replace( /^git\+/, '' )
-//
-//   try
-//   {
-//
-//     self.claimProvider.dirMake( o.tempPath );
-//     debugger;
-//     let promise = Git( self.claimProvider.path.nativize( o.tempPath ) ).silent( true ).clone( filePath );
-//     _.assert( _.promiseLike( promise ) );
-//     o.con = _.Consequence.From( promise );
-//     o.ready = 0;
-//     o.times = 1;
-//
-//     self.claimMap[ o.filePath ] = o;
-//
-//     // o.con.sleep();
-//
-//     return o.con.doThen( ( err, arg ) =>
-//     {
-//       debugger;
-//       o.ready = 1;
-//       if( err )
-//       errorHandle( err );
-//     });
-//
-//   }
-//   catch( err )
-//   {
-//     errorHandle( err );
-//   }
-//
-//   function errorHandle( err )
-//   {
-//     delete self.claimMap[ o.filePath ];
-//     throw _.err( err );
-//   }
-//
-// }
-//
-// claimBeginAct.defaults =
-// {
-//   filePath : null,
-//   tempPath : null,
-//   login : null,
-//   password : null,
-//   repository : null,
-// }
-
 // --
 // path
 // --
@@ -160,169 +60,6 @@ function localFromGlobal( uri )
   let path = self.path;
   return path.str( uri );
 }
-
-// // --
-// // link
-// // --
-//
-// function pathResolveSoftLinkAct( o )
-// {
-//   let self = this;
-//   let claim = self.claimBegin({ filePath : o.filePath, sync : 1 });
-//
-//   debugger; xxx
-//
-//   _.sure( _.strIs( claim.tempPath ), 'Cant claim', o.filePath );
-//
-//   self.claimProvider.pathResolveSoftLinkAct( claim.tempPath );
-//
-//   return resolved;
-// }
-//
-// _.routineExtend( pathResolveSoftLinkAct, Parent.prototype.pathResolveSoftLinkAct )
-//
-// // --
-// // read
-// // --
-//
-// function fileReadAct( o )
-// {
-//   let self = this;
-//   let con = new _.Consequence();
-//
-//   _.assertRoutineOptions( fileReadAct, arguments );
-//   _.assert( arguments.length === 1, 'Expects single argument' );
-//   _.assert( _.strIs( o.filePath ),'fileReadAct :','Expects {-o.filePath-}' );
-//   _.assert( _.strIs( o.encoding ),'fileReadAct :','Expects {-o.encoding-}' );
-//   _.assert( !o.sync,'sync version is not implemented' );
-//
-//   o.encoding = o.encoding.toLowerCase();
-//   let encoder = fileReadAct.encoders[ o.encoding ];
-//
-//   debugger; xxx
-//
-//   logger.log( 'fileReadAct',o );
-//
-//   /* */
-//
-//   let result = null;;
-//   let totalSize = null;
-//   let dstOffset = 0;
-//
-//   if( encoder && encoder.onBegin )
-//   _.sure( encoder.onBegin.call( self, { operation : o, encoder : encoder }) === undefined );
-//
-//   self.streamReadAct({ filePath :  o.filePath })
-//   .got( function( err, response )
-//   {
-//     debugger;
-//
-//     if( err )
-//     return handleError( err );
-//
-//     _.assert( _.strIs( o.encoding ) || o.encoding === null );
-//
-//     if( o.encoding === null )
-//     {
-//       totalSize = response.headers[ 'content-length' ];
-//       result = new ArrayBuffer( totalSize );
-//     }
-//     else
-//     {
-//       response.setEncoding( o.encoding );
-//       result = '';
-//     }
-//
-//     response.on( 'data', onData );
-//     response.on( 'end', onEnd );
-//     response.on( 'error', handleError );
-//     debugger;
-//
-//   });
-//
-//   return con;
-//
-//   /* */
-//
-//   function onEnd()
-//   {
-//     if( o.encoding === null )
-//     _.assert( _.bufferRawIs( result ) );
-//     else
-//     _.assert( _.strIs( result ) );
-//
-//     let context = { data : result, operation : o, encoder : encoder };
-//     if( encoder && encoder.onEnd )
-//     _.sure( encoder.onEnd.call( self,context ) === undefined );
-//     result = context.data
-//
-//     con.give( result );
-//   }
-//
-//   /* on encoding : arraybuffer or encoding : buffer should return buffer( in consequence ) */
-//
-//   function handleError( err )
-//   {
-//
-//     if( encoder && encoder.onError )
-//     try
-//     {
-//       err = _._err
-//       ({
-//         args : [ stack,'\nfileReadAct( ',o.filePath,' )\n',err ],
-//         usingSourceCode : 0,
-//         level : 0,
-//       });
-//       err = encoder.onError.call( self,{ error : err, operation : o, encoder : encoder })
-//     }
-//     catch( err2 )
-//     {
-//       console.error( err2 );
-//       console.error( err.toString() + '\n' + err.stack );
-//     }
-//
-//     if( o.sync )
-//     {
-//       throw err;
-//     }
-//     else
-//     {
-//       con.error( err );
-//     }
-//   }
-//
-//   /* */
-//
-//   function onData( data )
-//   {
-//
-//     if( o.encoding === null )
-//     {
-//       _.bufferMove
-//       ({
-//         dst : result,
-//         src : data,
-//         dstOffset : dstOffset
-//       });
-//
-//       dstOffset += data.length;
-//     }
-//     else
-//     {
-//       result += data;
-//     }
-//
-//   }
-//
-// }
-//
-// _.routineExtend( fileReadAct, Parent.prototype.fileReadAct );
-//
-// fileReadAct.advanced =
-// {
-//   user : null,
-//   password : null,
-// }
 
 //
 
@@ -391,6 +128,10 @@ function filesReflectSingle_body( o )
 {
   let self = this;
   let path = self.path;
+  let con2 = new _.Consequence();
+
+  o.extra = o.extra || Object.create( null );
+  _.routineOptions( filesReflectSingle_body, o.extra, filesReflectSingle_body.extra );
 
   _.assertRoutineOptions( filesReflectSingle_body, o );
   _.assert( o.mandatory === undefined )
@@ -402,7 +143,7 @@ function filesReflectSingle_body( o )
   _.assert( _.routineIs( o.onWriteSrcUp ) && o.onWriteSrcUp.composed && o.onWriteSrcUp.composed.elements.length === 0, 'Not supported options' );
   _.assert( _.routineIs( o.onWriteSrcDown ) && o.onWriteSrcDown.composed && o.onWriteSrcDown.composed.elements.length === 0, 'Not supported options' );
   _.assert( o.outputFormat === 'record' || o.outputFormat === 'nothing', 'Not supported options' );
-  _.assert( o.linking === 'fileCopy' || o.linking === 'hardlinkMaybe' || o.linking === 'softlinkMaybe', 'Not supported options' );
+  _.assert( o.linking === 'fileCopy' || o.linking === 'hardLinkMaybe' || o.linking === 'softLinkMaybe', 'Not supported options' );
   _.assert( !o.srcFilter.hasFiltering(), 'Not supported options' );
   _.assert( !o.dstFilter.hasFiltering(), 'Not supported options' );
   _.assert( o.srcFilter.formed === 5 );
@@ -432,6 +173,7 @@ function filesReflectSingle_body( o )
 
   _.sure( _.strDefined( paths.stripped ) );
   _.sure( _.strDefined( paths.compact ) );
+  _.sure( _.strDefined( paths.hash ) );
   _.sure( _.strIs( dstPath ) );
   _.sure( dstFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
   _.sure( !o.srcFilter || !o.srcFilter.hasFiltering(), 'Does not support filtering, but {o.srcFilter} is not empty' );
@@ -450,13 +192,21 @@ function filesReflectSingle_body( o )
 
   // console.log( 'filesReflectSingle', o.verbosity );
 
-  let result = _.Consequence().give( null );
+  let result = _.Consequence().take( null );
   let shell = _.sheller
   ({
-    verbosity : o.verbosity >= 3 ? 1 : 0,
-    // verbosity : 1,
+    verbosity : o.verbosity - 2,
     con : result,
     currentPath : dstPath,
+  });
+
+  let shellAll = _.sheller
+  ({
+    verbosity : o.verbosity - 2,
+    con : result,
+    currentPath : dstPath,
+    throwingExitCode : 0,
+    outputCollecting : 1,
   });
 
   if( !dstFileProvider.fileExists( dstPath ) )
@@ -498,30 +248,63 @@ function filesReflectSingle_body( o )
     if( !dstFileProvider.fileExists( path.join( dstPath, '.git' ) ) )
     shell( 'git clone ' + paths.compact + ' ' + '.' );
   }
+  else
+  {
+    if( o.extra.fetching )
+    shell( 'git fetch origin' );
+  }
+
+  let localChanges = false;
+  if( gitConfigExists )
+  {
+    shellAll
+    ([
+      'git status',
+    ]);
+    result
+    .ifNoErrorThen( function( arg )
+    {
+      _.assert( arg.length === 2 );
+      localChanges = _.strHas( arg[ 0 ].output, 'Changes to be committed' );
+      return localChanges;
+    })
+  }
 
   /* stash changes and checkout branch/commit */
 
-  if( paths.hash )
+  // result.except( con2 ); // xxx qqq !!!
+  result.except( ( err ) =>
   {
-    if( gitConfigExists )
+    con2.error( err );
+  });
+
+  result.ifNoErrorThen( ( arg ) =>
+  {
+
+    if( localChanges )
     shell( 'git stash' );
-    _.assert( _.strDefined( paths.hash ) );
     shell( 'git checkout ' + paths.hash );
-    shell( 'git pull' );
+    if( paths.hash.length < 7 || !_.strIsHex( paths.hash ) ) /* qqq : probably does not work for all cases */
+    shell( 'git merge' );
+    if( localChanges )
     shell({ path : 'git stash pop', throwingExitCode : 0 });
-  }
+
+    result.finally( con2 );
+
+    return arg;
+  });
 
   /* handle error if any */
 
-  result
-  .doThen( function( err, arg )
+  con2
+  .finally( function( err, arg )
   {
     if( err )
     throw _.err( err );
     return recordsMake();
   });
 
-  return result.split();
+  return con2;
 
   /* */
 
@@ -539,6 +322,10 @@ function filesReflectSingle_body( o )
 }
 
 _.routineExtend( filesReflectSingle_body, _.FileProvider.Find.prototype.filesReflectSingle );
+
+var extra = filesReflectSingle_body.extra = Object.create( null );
+
+extra.fetching = 1;
 
 var defaults = filesReflectSingle_body.defaults;
 
@@ -560,19 +347,20 @@ function isUpToDate( o )
   let srcCurrentPath;
   let dstFileProvider = self.hub.providerForPath( o.localPath );
   let paths = self.pathParse( o.remotePath );
-  let result = _.Consequence().give( null );
+  let result = _.Consequence().take( null );
+
   let shell = _.sheller
   ({
-    verbosity : 0,
-    // verbosity : 1,
+    verbosity : o.verbosity - 2,
+    // verbosity : 2,
     con : result,
     currentPath : o.localPath,
   });
 
   let shellAll = _.sheller
   ({
-    verbosity : 0,
-    // verbosity : 1,
+    verbosity : o.verbosity - 2,
+    // verbosity : 2,
     con : result,
     currentPath : o.localPath,
     throwingExitCode : 0,
@@ -607,7 +395,7 @@ function isUpToDate( o )
 
   shell( 'git fetch origin' );
 
-  result.then( ( err, arg ) =>
+  result.finally( ( err, arg ) =>
   {
     // console.log( 'isUpToDate:1' );
     if( err )
@@ -617,31 +405,45 @@ function isUpToDate( o )
 
   shellAll
   ([
-    'git diff origin/master --quiet --exit-code',
-    'git diff --quiet --exit-code',
-    'git branch -v',
+    // 'git diff origin/master --quiet --exit-code',
+    // 'git diff --quiet --exit-code',
+    // 'git branch -v',
     'git status',
   ]);
 
   result
   .ifNoErrorThen( function( arg )
   {
-    // console.log( 'isUpToDate:2' );
-    _.assert( arg.length === 5 );
-    let diffRemote = arg[ 0 ].exitCode !== 0;
-    let diffLocal = arg[ 1 ].exitCode !== 0;
-    let commitsRemote = _.strHas( arg[ 2 ].output, '[ahead' );
-    let commitsLocal = _.strHas( arg[ 3 ].output, 'Changes to be committed' );
-    let result = !diffRemote && !commitsRemote;
+    _.assert( arg.length === 2 );
+
+    // self.logger.log( o.remotePath, arg[ 0 ].output );
+
+    let result = !_.strHas( arg[ 0 ].output, 'Your branch is behind' );
 
     if( o.verbosity )
     self.logger.log( o.remotePath, result ? 'is up to date' : 'is not up to date' );
 
     return result;
-  });
+  })
+  // .ifNoErrorThen( function( arg )
+  // {
+  //   // console.log( 'isUpToDate:2' );
+  //   _.assert( arg.length === 5 );
+  //   let diffRemote = arg[ 0 ].exitCode !== 0;
+  //   let diffLocal = arg[ 1 ].exitCode !== 0;
+  //   let commitsRemote = _.strHas( arg[ 2 ].output, '[ahead' );
+  //   let commitsLocal = _.strHas( arg[ 3 ].output, 'Changes to be committed' );
+  //   let result = !diffRemote && !commitsRemote;
+  //
+  //   if( o.verbosity )
+  //   self.logger.log( o.remotePath, result ? 'is up to date' : 'is not up to date' );
+  //
+  //   return result;
+  // })
+  ;
 
   result
-  .doThen( function( err, arg )
+  .finally( function( err, arg )
   {
     // console.log( 'isUpToDate:end' );
     if( err )
@@ -674,7 +476,7 @@ function isDownloaded( o )
   let srcCurrentPath;
   let dstFileProvider = self.hub.providerForPath( o.localPath );
   let paths = self.pathParse( o.remotePath );
-  let result = _.Consequence().give( null );
+  let result = _.Consequence().take( null );
 
   _.assert( dstFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
 
@@ -703,7 +505,7 @@ function isDownloaded( o )
   });
 
   result
-  .doThen( function( err, arg )
+  .finally( function( err, arg )
   {
     // logger.log( 'isDownloaded:end' );
     if( err )
@@ -746,8 +548,6 @@ let Associates =
 
 let Restricts =
 {
-  // claimMap : _.define.own({}),
-  // claimProvider : null,
 }
 
 let Statics =
@@ -768,29 +568,29 @@ let Forbids =
 let Proto =
 {
 
-  finit : finit,
-  init : init,
+  finit,
+  init,
 
   // path
 
-  localFromGlobal : localFromGlobal,
-  pathIsolateGlobalAndLocal : pathIsolateGlobalAndLocal,
-  pathParse : pathParse,
+  localFromGlobal,
+  pathIsolateGlobalAndLocal,
+  pathParse,
 
   // etc
 
-  filesReflectSingle : filesReflectSingle,
-  isUpToDate : isUpToDate,
-  isDownloaded : isDownloaded,
+  filesReflectSingle,
+  isUpToDate,
+  isDownloaded,
 
   //
 
-  Composes : Composes,
-  Aggregates : Aggregates,
-  Associates : Associates,
-  Restricts : Restricts,
-  Statics : Statics,
-  Forbids : Forbids,
+  Composes,
+  Aggregates,
+  Associates,
+  Restricts,
+  Statics,
+  Forbids,
 
 }
 

@@ -38,9 +38,9 @@ function onSuiteEnd()
 
 function fileRead( test )
 {
-  var con = new _.Consequence().give( null )
+  var con = new _.Consequence().take( null )
 
-  .doThen( () =>
+  .finally( () =>
   {
     test.case = 'unavailbe path';
 
@@ -49,26 +49,26 @@ function fileRead( test )
     return test.shouldThrowError( got );
   })
 
-  .doThen( () =>
+  .finally( () =>
   {
     test.case = 'get a avaible path';
 
     var o = { filePath : this.testFile, sync : 0 };
     return this.provider.fileRead( o )
-    .doThen( ( err, got ) =>
+    .finally( ( err, got ) =>
     {
       test.is( _.strHas( got, '# wTools' ) )
     })
   })
 
-  .doThen( () =>
+  .finally( () =>
   {
     test.case = 'get a avaible path';
 
     var url = 'https://www.npmjs.com/search?q=wTools'
     var o = { filePath : url, sync : 0 };
     return this.provider.fileRead( o )
-    .doThen( ( err, got ) =>
+    .finally( ( err, got ) =>
     {
       test.is( _.strBegins( got, '<!DOCTYPE' ) )
     })
@@ -82,11 +82,11 @@ function fileRead( test )
 function fileCopyToHardDrive( test )
 {
   var filePath = _.path.join( this.testRootDirectory, test.name, _.path.name( this.testFile ) );
-  var con = new _.Consequence().give( null )
+  var con = new _.Consequence().take( null )
 
   //
 
-  .doThen( () =>
+  .finally( () =>
   {
     test.case = 'unavailable url';
     var o =
@@ -100,7 +100,7 @@ function fileCopyToHardDrive( test )
 
   //
 
-  .doThen( () =>
+  .finally( () =>
   {
     test.case = 'save file from the url to a hard drive';
     var o =
@@ -109,7 +109,7 @@ function fileCopyToHardDrive( test )
       filePath : filePath,
     }
     return this.provider.fileCopyToHardDrive( o )
-    .doThen( ( err, got ) =>
+    .finally( ( err, got ) =>
     {
       var file = HardDrive.fileRead( got );
 
@@ -120,7 +120,7 @@ function fileCopyToHardDrive( test )
       }
 
       return this.provider.fileRead( o )
-      .doThen( ( err, got ) => test.identical( got, file ) )
+      .finally( ( err, got ) => test.identical( got, file ) )
     })
   })
 

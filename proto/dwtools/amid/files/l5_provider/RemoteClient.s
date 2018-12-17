@@ -69,7 +69,7 @@
 //
 //   return self;
 //
-//   self.fileRead({ filePath : './builder/Clean', sync : 0 }).doThen( function( err,arg )
+//   self.fileRead({ filePath : './builder/Clean', sync : 0 }).finally( function( err,arg )
 //   {
 //     if( err )
 //     throw _.errLogOnce( err );
@@ -149,7 +149,7 @@
 //     if( o.sync )
 //     return data;
 //     else
-//     return con.give( data );
+//     return con.take( data );
 //
 //   }
 //
@@ -218,7 +218,7 @@
 //     try
 //     {
 //       stream = File.createReadStream( o.filePath );
-//       con.give( stream );
+//       con.take( stream );
 //     }
 //     catch( err )
 //     {
@@ -275,10 +275,10 @@
 //         if( o.throwing )
 //         con.error( err );
 //         else
-//         con.give( result );
+//         con.take( result );
 //       }
 //       else
-//       con.give( stats );
+//       con.take( stats );
 //     }
 //
 //     if( o.resolvingSoftLink )
@@ -354,7 +354,7 @@
 //       stream.on( 'end', function()
 //       {
 //         let hash = md5sum.digest( 'hex' );
-//         con.give( hash );
+//         con.take( hash );
 //       });
 //
 //       stream.on( 'error', function( err )
@@ -362,7 +362,7 @@
 //         if( o.throwing )
 //         con.error( _.err( err ) );
 //         else
-//         con.give( NaN );
+//         con.take( NaN );
 //       });
 //
 //       return con;
@@ -455,7 +455,7 @@
 //         if( o.throwing )
 //         con.error( _.err( err ) );
 //         else
-//         con.give( result );
+//         con.take( result );
 //       }
 //       else if( stat.isDirectory() )
 //       {
@@ -466,19 +466,19 @@
 //             if( o.throwing )
 //             con.error( _.err( err ) );
 //             else
-//             con.give( result );
+//             con.take( result );
 //           }
 //           else
 //           {
 //             handleEnd( files );
-//             con.give( files || null );
+//             con.take( files || null );
 //           }
 //         });
 //       }
 //       else
 //       {
 //         result = [ self.path.name({ path : self.path.refine( o.filePath ), withExtension : 1 }) ];
-//         con.give( result );
+//         con.take( result );
 //       }
 //     });
 //
@@ -523,7 +523,7 @@
 //     try
 //     {
 //       stream = File.createWriteStream( o.filePath );
-//       con.give( stream );
+//       con.take( stream );
 //     }
 //     catch( err )
 //     {
@@ -598,7 +598,7 @@
 //       //if( err && !o.silentError )
 //       if( err )
 //       return con.error(  _.err( err ) );
-//       return con.give();
+//       return con.take();
 //     }
 //
 //     if( o.writeMode === 'rewrite' )
@@ -704,9 +704,9 @@
 //     let con = new _.Consequence();
 //
 //     if( stat && stat.isDirectory() )
-//     File.rmdir( o.filePath,function( err,data ){ con.give( err,data ) } );
+//     File.rmdir( o.filePath,function( err,data ){ con.take( err,data ) } );
 //     else
-//     File.unlink( o.filePath,function( err,data ){ con.give( err,data ) } );
+//     File.unlink( o.filePath,function( err,data ){ con.take( err,data ) } );
 //
 //     return con;
 //   }
@@ -771,7 +771,7 @@
 //   o.filePath = self.path.nativize( o.filePath );
 //
 //   // if( _.files.usingReadOnly )
-//   // return o.sync ? undefined : con.give();
+//   // return o.sync ? undefined : con.take();
 //
 //   let stat;
 //   if( o.sync )
@@ -793,11 +793,11 @@
 //
 //     if( !o.force )
 //     {
-//       self.fileDeleteAct( optionsAct ).doThen( con );
+//       self.fileDeleteAct( optionsAct ).finally( con );
 //     }
 //     else
 //     {
-//       File.remove( o.filePath,function( err ){ con.give( err,null ) } );
+//       File.remove( o.filePath,function( err ){ con.take( err,null ) } );
 //     }
 //
 //     return con;
@@ -847,7 +847,7 @@
 //     let con = new _.Consequence();
 //     File.copy( o.srcPath, o.dstPath, function( err, data )
 //     {
-//       con.give( err, data );
+//       con.take( err, data );
 //     });
 //     return con;
 //   }
@@ -884,7 +884,7 @@
 //     let con = new _.Consequence();
 //     File.rename( o.srcPath, o.dstPath, function( err,data )
 //     {
-//       con.give( err,data );
+//       con.take( err,data );
 //     });
 //     return con;
 //   }
@@ -949,7 +949,7 @@
 //   {
 //     let con = new _.Consequence();
 //
-//     File.mkdir( o.filePath, function( err, data ){ con.give( err, data ); } );
+//     File.mkdir( o.filePath, function( err, data ){ con.take( err, data ); } );
 //
 //     return con;
 //   }
@@ -1036,12 +1036,12 @@
 //     if( o.force )
 //     File.mkdirs( o.filePath, function( err, data )
 //     {
-//       con.give( err, data )
+//       con.take( err, data )
 //     });
 //     else
 //     File.mkdir( o.filePath, function( err, data )
 //     {
-//       con.give( err, data );
+//       con.take( err, data );
 //     });
 //
 //     return con;
@@ -1082,7 +1082,7 @@
 //       return con.error ( _.err( 'softLinkAct',o.dstPath,'already exists' ) );
 //       File.symlink( o.srcPath, o.dstPath, function( err )
 //       {
-//         return con.give( err, null )
+//         return con.take( err, null )
 //       });
 //     });
 //     return con;
@@ -1135,7 +1135,7 @@
 //     let con = new _.Consequence();
 //
 //     if( o.dstPath === o.srcPath )
-//     return con.give( true );
+//     return con.take( true );
 //
 //     self.fileStat
 //     ({
@@ -1162,7 +1162,7 @@
 //
 //       File.link( o.srcPath,o.dstPath, function( err )
 //       {
-//         return con.give( err,null );
+//         return con.take( err,null );
 //       });
 //     })
 //

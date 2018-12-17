@@ -311,8 +311,10 @@ function statReadAct( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assertRoutineOptions( statReadAct, o );
 
-  if( _.strEnds( o.filePath, '/dst/link' ) )
-  debugger;
+  // if( _.strEnds( o.filePath, '/dst/link' ) )
+  // debugger;
+  // if( _.strEnds( o.filePath, '/dst/file' ) )
+  // debugger;
 
   /* */
 
@@ -368,6 +370,7 @@ function statReadAct( o )
       result[ k ] = new Date( timeStats[ k ] );
     }
 
+    result.filePath = filePath;
     result.isTerminal = returnFalse;
     result.isDir = returnFalse;
     result.isTextLink = returnFalse; /* qqq : implement and add coverage, please */

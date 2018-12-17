@@ -974,6 +974,9 @@ function pathResolveLinkTail_body( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assertRoutineOptions( pathResolveLinkTail_body, arguments );
 
+  if( o.filePath === '/filesReflectLinked/dst/link' )
+  debugger;
+
   let o2 = _.mapExtend( null, o );
   o2.found = [];
   o2.result = [];
@@ -1624,6 +1627,7 @@ function statRead_body( o )
       _.assert( _.routineIs( stat.isTextLink ), 'Stat should have routine isTextLink' );
       _.assert( _.routineIs( stat.isSoftLink ), 'Stat should have routine isSoftLink' );
       _.assert( _.routineIs( stat.isHardLink ), 'Stat should have routine isHardLink' );
+      _.assert( _.strIs( stat.filePath ), 'Stat should have file path' );
     }
     return stat;
   }

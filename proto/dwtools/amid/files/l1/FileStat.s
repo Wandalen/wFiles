@@ -251,6 +251,8 @@ let Aggregates =
 
 let Associates =
 {
+  associated : null,
+  filePath : null,
 }
 
 let Restricts =
@@ -298,7 +300,7 @@ let Forbids =
 let Extend =
 {
 
-  init : init,
+  init,
 
   isDir : null,
   isTerminal : null,

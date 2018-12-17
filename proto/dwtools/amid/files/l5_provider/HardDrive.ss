@@ -749,6 +749,7 @@ function statReadAct( o )
   {
     let extend =
     {
+      filePath : o.filePath,
       isTerminal,
       isDir,
       isTextLink,

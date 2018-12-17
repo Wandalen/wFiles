@@ -1367,8 +1367,8 @@ function filesReflectEvaluate_body( o )
   function handleUp( record, op )
   {
 
-    if( _.strEnds( record.dst.absolute, debugPath ) )
-    debugger;
+    // if( _.strEnds( record.dst.absolute, debugPath ) )
+    // debugger;
 
     _.sure( !_.strBegins( record.dst.absolute, '/../' ), () => 'Destination path ' + _.strQuote( record.dst.absolute ) + ' leads out of file system.' );
 
@@ -1430,8 +1430,8 @@ function filesReflectEvaluate_body( o )
       return record
     }
 
-    if( _.strEnds( record.dst.absolute, debugPath ) )
-    debugger;
+    // if( _.strEnds( record.dst.absolute, debugPath ) )
+    // debugger;
 
     _.assert( arguments.length === 2 );
     _.assert( t === undefined || _.strIs( a ) );
@@ -1566,8 +1566,8 @@ function filesReflectEvaluate_body( o )
   function handleDown( record, op )
   {
 
-    if( _.strEnds( record.dst.absolute, debugPath ) )
-    debugger;
+    // if( _.strEnds( record.dst.absolute, debugPath ) )
+    // debugger;
 
     if( touchMap[ record.dst.absolute ] )
     touch( record, touchMap[ record.dst.absolute ] );
@@ -1872,8 +1872,8 @@ function filesReflectEvaluate_body( o )
     let record = recordMake( dstRecord, srcRecord, srcRecord );
     record.reason = 'srcLooking';
 
-    if( _.strEnds( record.dst.absolute, debugPath ) )
-    debugger;
+    // if( _.strEnds( record.dst.absolute, debugPath ) )
+    // debugger;
     let isSoftLink = record.dst.isSoftLink;
 
     if( o.filesGraph )

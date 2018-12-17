@@ -2083,7 +2083,7 @@ function fileRead_body( o )
     let r = o
 
     debugger;
-    _.Consequence.take( o.onBegin, r );
+    _.Consequence.Take( o.onBegin, r );
   }
 
   /* end */
@@ -2119,7 +2119,7 @@ function fileRead_body( o )
     if( o.onEnd )
     debugger;
     if( o.onEnd )
-    _.Consequence.take( o.onEnd, o );
+    _.Consequence.Take( o.onEnd, o );
 
     return r;
   }
@@ -2148,7 +2148,7 @@ function fileRead_body( o )
     }
 
     if( o.onError )
-    wConsequence.error( o.onError, err );
+    _.Consequence.Error( o.onError, err );
 
     if( o.throwing )
     throw _.err( err );

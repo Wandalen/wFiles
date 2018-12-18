@@ -32020,6 +32020,31 @@ xxx : o = { filePath : path.s.from( o.filePath ) }
 
 }
 
+//
+
+function experiment2( test )
+{
+  let self = this;
+
+  let path = self.provider.path;
+  let dir = test.context.pathFor( 'written/pathResolveLinkTailChain' );
+  let filePath = test.context.pathFor( 'written/pathResolveLinkTailChain/file' );
+  let linkPath = test.context.pathFor( 'written/pathResolveLinkTailChain/link' );
+
+  self.provider.filesDelete( dir );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.softLink( linkPath, filePath );
+
+  var o =
+  {
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+  }
+  self.provider.pathResolveLinkTailChain( o );
+  test.identical( o.result, [ linkPath, filePath ] );
+  test.identical( o.found, [ linkPath, filePath ] );
+}
+
 // --
 // declare
 // --
@@ -32160,6 +32185,7 @@ var Self =
     fileCopyExperiment : fileCopyExperiment,
     statReadExperiment : statReadExperiment,
     experiment : experiment,
+    experiment2 : experiment2,
 
   },
 

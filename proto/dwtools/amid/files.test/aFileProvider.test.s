@@ -31713,9 +31713,7 @@ function pathResolveTextLink( test )
   self.provider.filesDelete( workDir );
   self.provider.fileWrite( filePath, testData );
   self.provider.textLink({ dstPath : linkPath, srcPath : filePath });
-  test.mustNotThrowError( () =>
-    self.provider.pathResolveTextLink( linkPath )
-  );
+  test.mustNotThrowError( () => self.provider.pathResolveTextLink( linkPath ) );
 
   test.case = 'No arguments';
   test.shouldThrowError( () => self.provider.pathResolveTextLink( ) );

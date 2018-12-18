@@ -723,11 +723,17 @@ function pathResolveTextLink_pre( routine, args )
   let self = this;
   let path = self.path;
 
+  let o = args[ 0 ];
+
+  if( !_.mapIs( o ) )
+  o = { filePath : o };
+
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
   _.assert( args.length === 1, 'Expects single argument for', routine.name );
-  _.routineOptions( routine, args );
+  _.routineOptions( routine, o );
+  _.assert( _.strIs( o.filePath ), 'Expects string' );
 
-  return args[ 0 ];
+  return o;
 }
 
 //

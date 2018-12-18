@@ -799,7 +799,9 @@ function pathResolveLinkFull_body( o )
   let result = o.filePath;
 
   _.assert( _.routineIs( self.pathResolveLinkTailChain.body ) );
-  _.assert( path.isAbsolute( o.filePath ) )
+  _.assert( path.isAbsolute( o.filePath ) );
+  _.assert( !!o.resolvingHeadDirect );
+  _.assert( !!o.resolvingHeadReverse );
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assertRoutineOptions( pathResolveLinkFull_body, arguments );
 
@@ -849,6 +851,9 @@ function pathResolveLinkFull_body( o )
       return result;
     }
 
+    if( o.resolvingSoftLink )
+    debugger;
+
     if( o.resolvingHeadDirect )
     {
 
@@ -870,6 +875,9 @@ function pathResolveLinkFull_body( o )
       o.stat = o2.stat;
 
     }
+
+    if( o.resolvingSoftLink )
+    debugger;
 
     if( result )
     {
@@ -905,13 +913,16 @@ function pathResolveLinkFull_body( o )
       }
     }
 
+    // if( !o.resolvingHeadDirect || o.stat )
+    // if( o.resolvingHeadReverse )
     if( o.stat && o.resolvingHeadReverse )
     {
 
+      let absolutePath = _.mapIs( result ) ? result.absolutePath : result;
       let o2 =
       {
         hub : hub,
-        filePath : result,
+        filePath : absolutePath,
         resolvingSoftLink : o.resolvingSoftLink,
         resolvingTextLink : o.resolvingTextLink,
         allowingMissed : o.allowingMissed,
@@ -919,11 +930,14 @@ function pathResolveLinkFull_body( o )
         throwing : o.throwing,
       }
 
-      result = self.pathResolveLinkHeadReverse.body.call( self, o2 );
+      let r = self.pathResolveLinkHeadReverse.body.call( self, o2 );
+      if( r === absolutePath )
+      r = _.mapIs( result ) ? result.filePath : result;
+      result = r;
 
     }
 
-    return result;
+    return _.mapIs( result ) ? result.filePath : result;
   }
 
   /**/
@@ -979,21 +993,32 @@ function pathResolveLinkTail_body( o )
   let r = self.pathResolveLinkTailChain.body.call( self, o2 );
   o.stat = o2.stat;
 
-  let result = r[ r.length-1 ];
+  let result = Object.create( null );
 
-  if( result === null )
+  // result.relative = r[ r.length-1 ];
+
+  result.filePath = o2.result[ o2.result.length-1 ];
+  result.absolutePath = o2.found[ o2.found.length-1 ];
+
+  // let result = r[ r.length-1 ];
+
+  if( result.filePath === null )
   {
     let cycle = false;
     if( o2.found.length > 2 )
     cycle = _.arrayRightIndex( o2.found, o2.found[ o2.found.length-2 ], o2.found.length-3 ) !== -1;
     if( cycle && o.allowingCycled || !cycle && o.allowingMissed )
-    result = o2.found[ o2.found.length-2 ];
+    {
+      result.filePath = o2.result[ o2.result.length-2 ];
+      result.absolutePath = o2.found[ o2.found.length-2 ];
+    }
   }
 
   // if( o.filePath !== result )
   // logger.log( 'pathResolveLinkTail', o.filePath, '->', result );
 
-  _.assert( result === null || _.strIs( result ) );
+  _.assert( result.filePath === null || _.strIs( result.filePath ) );
+  _.assert( result.absolutePath === null || _.strIs( result.absolutePath ) );
 
   return result;
 }
@@ -1225,14 +1250,22 @@ function pathResolveLinkHeadDirect_body( o )
   let filePath = '/';
   let o2 = _.mapExtend( null, o );
 
-  for( let i = 1; i < splits.length; i++ )
+  for( let i = 1 ; i < splits.length ; i++ )
   {
+
+    if( i === splits.length-1 )
+    {
+      filePath = path.join( filePath, splits[ i ] );
+      break;
+    }
+
     filePath = path.join( filePath, splits[ i ] );
     o2.filePath = filePath;
     o2.stat = null;
     o2.preservingRelative = 0;
     if( i === splits.length-1 )
     o2.stat = o.stat;
+
     if( !o2.stat )
     o2.stat = self.statReadAct
     ({
@@ -1241,6 +1274,7 @@ function pathResolveLinkHeadDirect_body( o )
       sync : 1,
       resolvingSoftLink : 0,
     });
+
     // if( self.isLink( o2.filePath ) )
     if( !o2.stat )
     {
@@ -1249,8 +1283,9 @@ function pathResolveLinkHeadDirect_body( o )
       o.stat = null;
       break;
     }
+
     if( ( o2.stat.isSoftLink() && o2.resolvingSoftLink ) || ( o2.stat.isTextLink() && o2.resolvingTextLink && self.usingTextLink ) )
-    filePath = self.pathResolveLinkTail.body.call( self, o2 );
+    filePath = self.pathResolveLinkTail.body.call( self, o2 ).absolutePath;
     if( i === splits.length-1 )
     o.stat = o2.stat;
   }
@@ -1310,7 +1345,7 @@ function pathResolveLinkHeadReverse_body( o )
     let o2 = _.mapExtend( null, o );
     o2.filePath = prefixPath;
     o2.preservingRelative = 0;
-    prefixPath = self.pathResolveLinkTail( o2 );
+    prefixPath = self.pathResolveLinkTail( o2 ).absolutePath;
     postfixPath = path.join( path.fullName( prefixPath ), postfixPath );
     prefixPath = path.dir( prefixPath );
     _.assert( !_.strBegins( prefixPath, '/..' ) && !_.strHas( prefixPath, '///..' ) )
@@ -4952,9 +4987,7 @@ function _link_functor( gen )
       {
 
         tempRenameBackSync();
-        if( o.throwing )
-        throw _.err( 'Cant', entryMethodName, o.dstPath, '<-', o.srcPath, '\n', err )
-        return false;
+        return error( _.err( 'Cant', entryMethodName, o.dstPath, '<-', o.srcPath, '\n', err ) );
 
       }
 
@@ -5002,9 +5035,8 @@ function _link_functor( gen )
         return tempRenameBackAsync()
         .finally( () =>
         {
-          if( o.throwing )
-          throw _.err( 'Cant', entryMethodName, o.dstPath, '<-', o.srcPath, '\n', err )
-          return false; /* qqq : linking routine should return null if error and throwing : 0 */
+          return error( _.err( 'Cant', entryMethodName, o.dstPath, '<-', o.srcPath, '\n', err ) );
+          /* qqq : linking routine should return null if error and throwing : 0 */
         })
       })
 
@@ -5708,27 +5740,42 @@ function _fileCopyAct( c )
 
   if( c.srcStat.isSoftLink() )
   {
-    let srcPathResolved = self.pathResolveSoftLink( o.srcPath );
+
+    debugger;
+    /* should not throw error for missed neither for cycled */
+    let srcResolvedPath = self.pathResolveSoftLink
+    ({
+      filePath : o.srcPath,
+      // allowingMissed : o.allowingMissed,
+      // allowingCycled : o.allowingCycled,
+    });
+    debugger;
+
     self.softLinkAct
     ({
       dstPath : o.dstPath,
-      srcPath : srcPathResolved,
+      srcPath : srcResolvedPath,
       originalDstPath : o.originalDstPath,
-      originalSrcPath : srcPathResolved,
+      originalSrcPath : o.originalSrcPath,
       sync : o.sync,
       type : null,
     });
+
   }
   else
-  self.fileCopyAct
-  ({
-    dstPath : o.dstPath,
-    srcPath : o.srcPath,
-    originalDstPath : o.originalDstPath,
-    originalSrcPath : o.originalSrcPath,
-    breakingDstHardLink : o.breakingDstHardLink,
-    sync : o.sync,
-  });
+  {
+
+    self.fileCopyAct
+    ({
+      dstPath : o.dstPath,
+      srcPath : o.srcPath,
+      originalDstPath : o.originalDstPath,
+      originalSrcPath : o.originalSrcPath,
+      breakingDstHardLink : o.breakingDstHardLink,
+      sync : o.sync,
+    });
+
+  }
 
   return c;
 }
@@ -6048,7 +6095,9 @@ function _textLinkVerify2( c )
 {
   let self = this;
   let o = c.options;
-  debugger; // qqq : implement filesAreTextLinked
+  // qqq : test filesAreTextLinked
+  if( o.dstPath !== o.srcPath && self.filesAreTextLinked([ o.dstPath, o.srcPath ]) )
+  debugger;
   if( o.dstPath !== o.srcPath && self.filesAreTextLinked([ o.dstPath, o.srcPath ]) )
   c.end( true );
   // return true;
@@ -6556,7 +6605,7 @@ function filesAreSoftLinked_body( o )
 
 var defaults = filesAreSoftLinked_body.defaults = Object.create( null );
 defaults.filePath = null;
-defaults.resolvingTextLink = null;
+defaults.resolvingTextLink = 0;
 
 var operates = filesAreSoftLinked_body.operates = Object.create( null );
 operates.filePath = { pathToRead : 1 }
@@ -6616,7 +6665,7 @@ function filesAreTextLinked_body( o )
 
 var defaults = filesAreTextLinked_body.defaults = Object.create( null );
 defaults.filePath = null;
-defaults.resolvingSoftLink = null;
+defaults.resolvingSoftLink = 0;
 
 var operates = filesAreTextLinked_body.operates = Object.create( null );
 operates.filePath = { pathToRead : 1 }

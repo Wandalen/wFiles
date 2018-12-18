@@ -29621,8 +29621,8 @@ function pathResolveLinkTailChain( test )
   self.provider.softLink( linkPath, '../file' );
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   self.provider.pathResolveLinkTailChain( o );
-  var expectedFound = [ linkPath, '../file', filePath ]
-  var expectedResult = [ linkPath, filePath ]
+  var expectedFound = [ linkPath, filePath ]
+  var expectedResult = [ linkPath, '../file' ]
   test.identical( o.result, expectedResult );
   test.identical( o.found, expectedFound );
 
@@ -29737,14 +29737,13 @@ function pathResolveLinkTailChain( test )
   var expectedFound =
   [
     linkPath,
-    '../file',
     filePath,
     null
   ]
   var expectedResult =
   [
     linkPath,
-    filePath,
+    '../file',
     null
   ]
   test.identical( o.result, expectedResult );
@@ -29933,17 +29932,15 @@ function pathResolveLinkTailChain( test )
   var expectedFound =
   [
     linkPath,
-    '../link2',
     linkPath2,
-    '../link3',
     linkPath3,
     filePath
   ]
   var expectedResult =
   [
     linkPath,
-    linkPath2,
-    linkPath3,
+    '../link2',
+    '../link3',
     filePath
   ]
   test.identical( o.result, expectedResult );
@@ -29999,13 +29996,13 @@ function pathResolveLinkTailChain( test )
   self.provider.pathResolveLinkTailChain( o );
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   {
-    test.identical( o.found, [ linkPath, '../link2', linkPath2, filePath ] )
-    test.identical( o.result, [ linkPath, linkPath2, filePath ]  )
+    test.identical( o.found, [ linkPath, linkPath2, filePath ] )
+    test.identical( o.result, [ linkPath, '../link2', filePath ]  )
   }
   else
   {
-    test.identical( o.found, [ linkPath, '../link2', linkPath2, linkPath3, filePath ] )
-    test.identical( o.result, [ linkPath, linkPath2, linkPath3, filePath ] )
+    test.identical( o.found, [ linkPath, linkPath2, linkPath3, filePath ] )
+    test.identical( o.result, [ linkPath, '../link2', linkPath3, filePath ] )
   }
 
   // /* chain, resolvingHeadDirectories : [ 0, 1 ] */
@@ -30527,8 +30524,8 @@ function pathResolveLinkTailChain( test )
   self.provider.softLink({ dstPath : linkPath, srcPath : '../file', allowingMissing : 1, makingDirectory : 1 });
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   test.shouldThrowError( () => self.provider.pathResolveLinkTailChain( o ) );
-  test.identical( o.result, [ linkPath,filePath, null ] )
-  test.identical( o.found, [ linkPath, '../file', filePath, null ] )
+  test.identical( o.result, [ linkPath,'../file', null ] )
+  test.identical( o.found, [ linkPath, filePath, null ] )
 
   test.case = 'textLink to missing';
   self.provider.filesDelete( _.path.dir( filePath ) );
@@ -30543,8 +30540,8 @@ function pathResolveLinkTailChain( test )
   self.provider.textLink({ dstPath : linkPath, srcPath : '../file', allowingMissing : 1, makingDirectory : 1 });
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   test.shouldThrowError( () => self.provider.pathResolveLinkTailChain( o ) );
-  test.identical( o.result, [ linkPath,filePath, null ] )
-  test.identical( o.found, [ linkPath,'../file',filePath, null ] )
+  test.identical( o.result, [ linkPath,'../file', null ] )
+  test.identical( o.found, [ linkPath,filePath, null ] )
 
   test.case = 'double textLink to missing';
   self.provider.filesDelete( _.path.dir( filePath ) );
@@ -30661,8 +30658,8 @@ function pathResolveLinkTailChain( test )
   self.provider.softLink({ dstPath : linkPath, srcPath : '../file', allowingMissing : 1, makingDirectory : 1 });
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   test.mustNotThrowError( () => self.provider.pathResolveLinkTailChain( o ) );
-  test.identical( o.result, [ linkPath,filePath, null ] )
-  test.identical( o.found, [ linkPath, '../file', filePath, null ] )
+  test.identical( o.result, [ linkPath,'../file', null ] )
+  test.identical( o.found, [ linkPath, filePath, null ] )
 
   test.case = 'textLink to missing';
   self.provider.filesDelete( _.path.dir( filePath ) );
@@ -30677,8 +30674,8 @@ function pathResolveLinkTailChain( test )
   self.provider.textLink({ dstPath : linkPath, srcPath : '../file', allowingMissing : 1, makingDirectory : 1 });
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   test.mustNotThrowError( () => self.provider.pathResolveLinkTailChain( o ) );
-  test.identical( o.result, [ linkPath,filePath, null ] )
-  test.identical( o.found, [ linkPath,'../file',filePath, null ] )
+  test.identical( o.result, [ linkPath, '../file', null ] )
+  test.identical( o.found, [ linkPath, filePath, null ] )
 
   test.case = 'double textLink to missing';
   self.provider.filesDelete( _.path.dir( filePath ) );

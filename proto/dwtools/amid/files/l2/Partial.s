@@ -1067,6 +1067,7 @@ function pathResolveLinkTailChain_pre()
 /*
  - both o.found and o.result have no duplicates
  - o.found has only absolute paths, always
+ - o.result has corresponding element before the iteration starts, the iteration check o.found and put new element ot o.found
 */
 
 /*

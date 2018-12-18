@@ -1005,7 +1005,7 @@ function pathResolveLinkTail_body( o )
 
   let o2 = _.mapExtend( null, o );
   o2.found = [];
-  o2.result = [ o.filePath ]; 
+  o2.result = [ o.filePath ];
   let r = self.pathResolveLinkTailChain.body.call( self, o2 );
   o.stat = o2.stat;
 
@@ -1063,6 +1063,7 @@ function pathResolveLinkTailChain_pre()
 /*
  - both o.found and o.result have no duplicates
  - o.found has only absolute paths, always
+ - o.result has corresponding element before the iteration starts, the iteration check o.found and put new element ot o.found
 */
 
 /*

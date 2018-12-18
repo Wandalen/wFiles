@@ -2546,6 +2546,8 @@ function filesReflectSingle_body( o )
     if( !record.allow || record.preserve )
     return;
 
+    debugger;
+
     if( record.action === 'hardLink' )
     {
       /* qqq : should not change time of file if it is already linked */

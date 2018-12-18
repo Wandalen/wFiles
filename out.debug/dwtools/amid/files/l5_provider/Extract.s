@@ -813,11 +813,31 @@ function fileCopyAct( o )
   _.assert( self.path.isNormalized( o.srcPath ) );
   _.assert( self.path.isNormalized( o.dstPath ) );
 
-  if( o.sync  )
+  debugger;
+
+  if( o.sync  ) // qqq : synchronize async version
   {
     _copyPre();
 
-    if( o.breakingDstHardLink && self.isHardLink( o.dstPath ) )
+    let dstStat = self.statReadAct
+    ({
+      filePath : o.dstPath,
+      resolvingSoftLink : 0,
+      sync : 1,
+      throwing : 0,
+    });
+
+    let srcStat = self.statReadAct
+    ({
+      filePath : o.dstPath,
+      resolvingSoftLink : 0,
+      sync : 1,
+      throwing : 0,
+    });
+
+    _.assert( srcStat.isTerinal() );
+
+    if( o.breakingDstHardLink && dstStat.isHardLink() )
     self.hardLinkBreak({ filePath : o.dstPath, sync : 1 });
 
     /* qqq : ? */

@@ -29209,11 +29209,7 @@ function pathResolveLinkTailChain( test )
 {
   let self = this;
 
-  // if( !self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  // {
-  //   test.identical( 1,1 );
-  //   return;
-  // }
+  /* - */
 
   let o1 =
   {
@@ -29234,6 +29230,21 @@ function pathResolveLinkTailChain( test )
   let linkPath3 = test.context.pathFor( 'written/pathResolveLinkTailChain/link3' );
 
   self.provider.fieldPush( 'usingTextLink', true );
+
+  /* - */
+
+  self.provider.filesDelete( dir );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.softLink( linkPath, filePath );
+
+  var o =
+  {
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+  }
+  self.provider.pathResolveLinkTailChain( o );
+  test.identical( o.result, [ linkPath, filePath ] );
+  test.identical( o.found, [ linkPath, filePath ] );
 
   /* trivial */
 

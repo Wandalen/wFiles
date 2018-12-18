@@ -264,8 +264,8 @@ function _statRead()
 
   _.assert( arguments.length === 0 );
 
-  if( _.strEnds( record.absolute, '/dst/link' ) )
-  debugger;
+  // if( _.strEnds( record.absolute, '/dst/link' ) )
+  // debugger;
 
   record[ realSymbol ] = record.absolute;
 

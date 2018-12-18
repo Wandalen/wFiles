@@ -1297,14 +1297,12 @@ _.routineExtend( fileCopyAct, Parent.prototype.fileCopyAct );
 function softLinkAct( o )
 {
   let self = this;
+  let srcIsAbsolute = self.path.isAbsolute( o.originalSrcPath );
 
   _.assertRoutineOptions( softLinkAct, arguments );
-  // _.assertMapHasAll( o, softLinkAct.defaults );
   _.assert( self.path.isAbsolute( o.dstPath ) );
   _.assert( self.path.isNormalized( o.srcPath ) );
   _.assert( self.path.isNormalized( o.dstPath ) );
-
-  let srcIsAbsolute = self.path.isAbsolute( o.originalSrcPath );
 
   if( !srcIsAbsolute )
   {
@@ -1316,25 +1314,19 @@ function softLinkAct( o )
   }
 
   let srcPath = o.srcPath;
-  // let dstPath = o.dstPath;
 
   _.assert( !!o.dstPath );
   _.assert( !!o.srcPath );
   _.assert( o.type === null || o.type === 'dir' ||  o.type === 'file' );
 
-  // debugger;
-
   if( process.platform === 'win32' )
   {
-    // let srcStat = self.statReadAct({ filePath : o.srcPath });
 
     if( o.type === null )
     {
       /* not dir */
       if( !srcIsAbsolute )
       srcPath = self.path.resolve( self.path.dir( o.dstPath ), srcPath );
-      // if( !self.path.isAbsolute( srcPath ) )
-      // srcPath = self.path.resolve( dstPath, srcPath );
 
       let srcStat = self.statReadAct
       ({
@@ -1349,73 +1341,29 @@ function softLinkAct( o )
 
     }
 
-    // debugger;
-    // if( o.type === null )
-    // o.type = 'dir';
-
-    // if( _.strBegins( o.srcPath, '.\\' ) )
-    // o.srcPath = _.strIsolateBeginOrNone( o.srcPath, '.\\' )[ 2 ];
-    // if( _.strBegins( o.srcPath, '..' ) )
-    // o.srcPath = '.' + _.strIsolateBeginOrNone( o.srcPath, '..' )[ 2 ];
-
-/*
-dstPath : /C/pro/web/Port/package/xxx/builder
-srcPath : ./../../../app/builder
-
-absolutePath : /C/pro/web/Port/app/builder
-resolvedPath : /C/pro/web/Port/app/builder
-gotPath : builder -> ../../../app/builder : /C/pro/web/app/builder
-*/
-
   }
 
-  o.dstPath = self.path.nativize( o.dstPath );
-  o.srcPath = self.path.nativize( o.srcPath );
+  let dstNativePath = self.path.nativize( o.dstPath );
+  let srcNativePath = self.path.nativize( o.srcPath );
 
   /* */
 
   if( o.sync )
   {
 
-    // if( self.statReadAct({ filePath : dstPath, sync : 1, throwing : 0, resolvingSoftLink : 0 }) ) /* qqq */
-    // throw _.err( 'softLinkAct', dstPath, 'already exists' );
-
     if( process.platform === 'win32' )
     {
-      File.symlinkSync( o.srcPath, o.dstPath, o.type );
+      File.symlinkSync( srcNativePath, dstNativePath, o.type );
     }
     else
     {
-      File.symlinkSync( o.srcPath, o.dstPath );
+      File.symlinkSync( srcNativePath, dstNativePath );
     }
 
   }
   else
   {
-    // throw _.err( 'not tested' );
     let con = new _.Consequence();
-    /* self.statReadAct
-    ({
-      filePath : dstPath,
-      throwing : 0,
-      resolvingSoftLink : 0,
-      sync : 0
-    })
-    .got( function( err, stat )
-    {
-      if( stat )
-      return con.error ( _.err( 'softLinkAct', dstPath, 'already exists' ) );
-
-      function onSymlink( err )
-      {
-        con.take( err, undefined )
-      }
-
-      if( process.platform === 'win32' )
-      File.symlink( o.srcPath, o.dstPath, o.type, onSymlink );
-      else
-      File.symlink( o.srcPath, o.dstPath, onSymlink );
-    }) */
 
     function onSymlink( err )
     {
@@ -1426,9 +1374,9 @@ gotPath : builder -> ../../../app/builder : /C/pro/web/app/builder
     }
 
     if( process.platform === 'win32' )
-    File.symlink( o.srcPath, o.dstPath, o.type, onSymlink );
+    File.symlink( srcNativePath, dstNativePath, o.type, onSymlink );
     else
-    File.symlink( o.srcPath, o.dstPath, onSymlink );
+    File.symlink( srcNativePath, dstNativePath, onSymlink );
 
     return con;
   }

@@ -6162,12 +6162,14 @@ function fileExchange_body( o )
     {
       o2.dstPath = o2.srcPath;
       o2.srcPath = dstPath;
+      return true;
     })
     .ifNoErrorThen( _.routineSeal( self, self.fileRename, [ _.mapExtend( null, o2 ) ] ) )
     .ifNoErrorThen( function( arg/*aaa*/ )
     {
       o2.dstPath = dstPath;
       o2.srcPath = tempPath;
+      return true;
     })
     .ifNoErrorThen( _.routineSeal( self, self.fileRename, [ _.mapExtend( null, o2 ) ] ) );
 

@@ -723,11 +723,17 @@ function pathResolveTextLink_pre( routine, args )
   let self = this;
   let path = self.path;
 
+  let o = args[ 0 ];
+
+  if( !_.mapIs( o ) )
+  o = { filePath : o };
+
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
   _.assert( args.length === 1, 'Expects single argument for', routine.name );
-  _.routineOptions( routine, args );
+  _.routineOptions( routine, o );
+  _.assert( _.strIs( o.filePath ), 'Expects string' );
 
-  return args[ 0 ];
+  return o;
 }
 
 //
@@ -802,22 +808,85 @@ function pathResolveLinkFull_body( o )
   if( hub && hub !== self && path.isGlobal( o.filePath ) )
   return hub.pathResolveLinkFull.body.call( hub, o );
 
-  /*
-    statRead should be before resolving
-    because resolving does not guarantee reading stat
-  */
+  if( o.sync )
+  return _pathResolveLinkFullSync();
+  else
+  return _pathResolveLinkFullAsync();
 
-  if( !o.stat )
-  o.stat = self.statReadAct
-  ({
-    filePath : result,
-    throwing : 0,
-    resolvingSoftLink : 0,
-    sync : 1,
-  });
+  /**/
 
-  if( !o.resolvingSoftLink && ( !o.resolvingTextLink || !self.usingTextLink ) )
+  function _pathResolveLinkFullSync()
   {
+    /*
+      statRead should be before resolving
+      because resolving does not guarantee reading stat
+    */
+
+    if( !o.stat )
+    o.stat = self.statReadAct
+    ({
+      filePath : result,
+      throwing : 0,
+      resolvingSoftLink : 0,
+      sync : 1,
+    });
+
+    if( !o.resolvingSoftLink && ( !o.resolvingTextLink || !self.usingTextLink ) )
+    {
+
+      // if( !o.stat )
+      // o.stat = self.statReadAct
+      // ({
+      //   filePath : result,
+      //   throwing : 0,
+      //   resolvingSoftLink : 0,
+      //   sync : 1,
+      // });
+
+      if( o.stat )
+      return result;
+
+      if( !o.allowingMissing )
+      {
+        result = null;
+        if( o.throwing )
+        {
+          debugger;
+          throw _.err( 'File does not exist', _.strQuote( o.filePath ) );
+        }
+      }
+
+      return result;
+    }
+
+    // if( !o.stat && o.resolvingHeadDirect )
+    if( o.resolvingHeadDirect )
+    {
+
+      let filePath = result;
+      let o2 =
+      {
+        hub : hub,
+        filePath : result,
+        resolvingSoftLink : o.resolvingSoftLink,
+        resolvingTextLink : o.resolvingTextLink,
+        allowingMissing : o.allowingMissing,
+        allowingCycling: o.allowingCycling,
+        throwing : o.throwing,
+        stat : o.stat,
+      }
+
+      result = self.pathResolveLinkHeadDirect.body.call( self, o2 );
+
+      // if( result !== filePath )
+      // {
+      //   debugger;
+      //   o.stat = null;
+      // }
+
+      o.stat = o2.stat;
+
+    }
 
     // if( !o.stat )
     // o.stat = self.statReadAct
@@ -828,123 +897,80 @@ function pathResolveLinkFull_body( o )
     //   sync : 1,
     // });
 
-    if( o.stat )
-    return result;
+    // if( _.strEnds( o.filePath, 'experiment/linkToDir1/linkToTerminal' ) )
+    // debugger;
 
-    if( !o.allowingMissing )
+    if( result )
+    // if( o.stat )
     {
-      result = null;
-      if( o.throwing )
+
+      let o2 =
       {
-        debugger;
-        throw _.err( 'File does not exist', _.strQuote( o.filePath ) );
+        stat : o.stat,
+        hub : hub,
+        filePath : result,
+        resolvingSoftLink : o.resolvingSoftLink,
+        resolvingTextLink : o.resolvingTextLink,
+        preservingRelative : o.preservingRelative,
+        allowingMissing : o.allowingMissing,
+        allowingCycling: o.allowingCycling,
+        throwing : o.throwing,
+      }
+
+      result = self.pathResolveLinkTail.body.call( self, o2 );
+      o.stat = o2.stat;
+      _.assert( o.stat !== undefined );
+
+    }
+    else
+    {
+      if( !o.allowingMissing )
+      {
+        result = null;
+        if( o.throwing )
+        {
+          debugger;
+          throw _.err( 'File does not exist', _.strQuote( o.filePath ) );
+        }
       }
     }
 
+    if( o.stat && o.resolvingHeadReverse )
+    {
+
+      let o2 =
+      {
+        hub : hub,
+        filePath : result,
+        resolvingSoftLink : o.resolvingSoftLink,
+        resolvingTextLink : o.resolvingTextLink,
+        allowingMissing : o.allowingMissing,
+        allowingCycling: o.allowingCycling,
+        throwing : o.throwing,
+      }
+
+      result = self.pathResolveLinkHeadReverse.body.call( self, o2 );
+
+    }
+
     return result;
   }
 
-  // if( !o.stat && o.resolvingHeadDirect )
-  if( o.resolvingHeadDirect )
+  /**/
+
+  function _pathResolveLinkFullAsync()
   {
-
-    let filePath = result;
-    let o2 =
-    {
-      hub : hub,
-      filePath : result,
-      resolvingSoftLink : o.resolvingSoftLink,
-      resolvingTextLink : o.resolvingTextLink,
-      allowingMissing : o.allowingMissing,
-      allowingCycling: o.allowingCycling,
-      throwing : o.throwing,
-      stat : o.stat,
-    }
-
-    result = self.pathResolveLinkHeadDirect.body.call( self, o2 );
-
-    // if( result !== filePath )
-    // {
-    //   debugger;
-    //   o.stat = null;
-    // }
-
-    o.stat = o2.stat;
-
+    let con = new _.Consequence().take( null );
+    con.thenKeep( () => _pathResolveLinkFullSync() );
+    return con;
   }
-
-  if( !o.stat )
-  o.stat = self.statReadAct
-  ({
-    filePath : result,
-    throwing : 0,
-    resolvingSoftLink : 0,
-    sync : 1,
-  });
-
-  // if( _.strEnds( o.filePath, 'experiment/linkToDir1/linkToTerminal' ) )
-  // debugger;
-
-  if( result )
-  // if( o.stat )
-  {
-
-    let o2 =
-    {
-      stat : o.stat,
-      hub : hub,
-      filePath : result,
-      resolvingSoftLink : o.resolvingSoftLink,
-      resolvingTextLink : o.resolvingTextLink,
-      preservingRelative : o.preservingRelative,
-      allowingMissing : o.allowingMissing,
-      allowingCycling: o.allowingCycling,
-      throwing : o.throwing,
-    }
-
-    result = self.pathResolveLinkTail.body.call( self, o2 );
-    o.stat = o2.stat;
-    _.assert( o.stat !== undefined );
-
-  }
-  else
-  {
-    if( !o.allowingMissing )
-    {
-      result = null;
-      if( o.throwing )
-      {
-        debugger;
-        throw _.err( 'File does not exist', _.strQuote( o.filePath ) );
-      }
-    }
-  }
-
-  if( o.stat && o.resolvingHeadReverse )
-  {
-
-    let o2 =
-    {
-      hub : hub,
-      filePath : result,
-      resolvingSoftLink : o.resolvingSoftLink,
-      resolvingTextLink : o.resolvingTextLink,
-      allowingMissing : o.allowingMissing,
-      allowingCycling: o.allowingCycling,
-      throwing : o.throwing,
-    }
-
-    result = self.pathResolveLinkHeadReverse.body.call( self, o2 );
-
-  }
-
-  return result;
 }
 
 _.routineExtend( pathResolveLinkFull_body, _pathResolveLink );
 
 var defaults = pathResolveLinkFull_body.defaults;
 defaults.stat = null;
+defaults.sync = null;
 defaults.resolvingHeadDirect = 1;
 defaults.resolvingHeadReverse = 1;
 defaults.preservingRelative = 1;
@@ -1606,46 +1632,56 @@ function statRead_body( o )
     filePath : o.filePath,
     resolvingTextLink : o.resolvingTextLink,
     resolvingSoftLink : o.resolvingSoftLink,
+    sync : o.sync,
     throwing : o.throwing,
   	allowingMissing : 0,
   	allowingCycling : 0,
   }
 
-  let resolvedPath = self.pathResolveLinkFull( o2 ); /* xxx qqq : add option sync */
+  let result = self.pathResolveLinkFull( o2 ); /* xxx qqq : add option sync */
 
-  if( resolvedPath === null )
-  {
-    if( o.throwing )
-    {
-      debugger;
-      _.assert( 0, 'not tested' );
-      let err = _.err( 'Failed to resolve' );
-      if( o.sync )
-      throw err;
-      return new _.Consequence().error( err );
-    }
-    else
-    {
-      if( o.sync )
-      return null;
-      return new _.Consequence().take( null );
-    }
-  }
+  // if( resolvedPath === null )
+  // {
+  //   if( o.throwing )
+  //   {
+  //     debugger;
+  //     _.assert( 0, 'not tested' );
+  //     let err = _.err( 'Failed to resolve' );
+  //     if( o.sync )
+  //     throw err;
+  //     return new _.Consequence().error( err );
+  //   }
+  //   else
+  //   {
+  //     if( o.sync )
+  //     return null;
+  //     return new _.Consequence().take( null );
+  //   }
+  // }
 
   if( o.sync )
   {
-    return end( o2.stat );
+    return end( result );
   }
   else
   {
-    let result = new _.Consequence().take( o2.stat );
-    return result.ifNoErrorThen( end );
+    // let result = new _.Consequence().take( o2.stat );
+    return result.thenKeep( end );
   }
 
   /* - */
 
-  function end( stat )
+  function end( result )
   {
+    if( result === null )
+    {
+      if( o.throwing )
+      throw _.err( 'Failed to resolve' );
+      else
+      return result;
+    }
+
+    let stat = o2.stat;
     if( stat )
     {
       _.assert( _.routineIs( stat.isTerminal ), 'Stat should have routine isTerminal' );
@@ -2109,7 +2145,7 @@ function fileRead_body( o )
     let r = o
 
     debugger;
-    _.Consequence.take( o.onBegin, r );
+    _.Consequence.Take( o.onBegin, r );
   }
 
   /* end */
@@ -2145,7 +2181,7 @@ function fileRead_body( o )
     if( o.onEnd )
     debugger;
     if( o.onEnd )
-    _.Consequence.take( o.onEnd, o );
+    _.Consequence.Take( o.onEnd, o );
 
     return r;
   }
@@ -2174,7 +2210,7 @@ function fileRead_body( o )
     }
 
     if( o.onError )
-    wConsequence.error( o.onError, err );
+    _.Consequence.Error( o.onError, err );
 
     if( o.throwing )
     throw _.err( err );
@@ -4798,6 +4834,7 @@ function _linkMultiple( o, link )
     if( !record.stat || !_.statsCouldBeLinked( mostLinkedRecord.stat , record.stat ) )
     {
       let linkOptions = _.mapExtend( null, o );
+      linkOptions.allowingMissing = 0; // Vova : hardLink does not allow missing srcPath
       linkOptions.dstPath = record.absolute;
       linkOptions.srcPath = mostLinkedRecord.absolute;
       return link.call( self, linkOptions );

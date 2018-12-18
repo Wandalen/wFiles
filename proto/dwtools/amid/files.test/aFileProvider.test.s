@@ -32337,6 +32337,8 @@ function pathResolveLinkFullSpecial( test )
   let terminalInDirPath = self.provider.path.join( dir, 'terminal' );
   let toDirPath = path.join( dir, 'toDir' );
 
+  self.provider.fieldPush( 'usingTextLink', 1 );
+
   var o1 =
   {
     resolvingSoftLink : 1,
@@ -32430,7 +32432,9 @@ function pathResolveLinkFullSpecial( test )
     resolvingHeadReverse : 1,
   }
   var o = _.mapExtend( null, o1, o2 );
+  debugger;
   var got = self.provider.pathResolveLinkFull( o );
+  debugger;
   test.identical( got, pathToFile );
 
   /* - */
@@ -32473,8 +32477,10 @@ function pathResolveLinkFullSpecial( test )
   }
   var o = _.mapExtend( null, o1, o2 );
   var got = self.provider.pathResolveLinkFull( o );
+  test.is( !!self.provider.usingTextLink );
   test.identical( got, pathToFile );
 
+  self.provider.fieldPop( 'usingTextLink', 1 );
 }
 
 //

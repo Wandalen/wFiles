@@ -876,6 +876,9 @@ function pathResolveLinkFull_body( o )
 
     }
 
+    if( o.resolvingSoftLink )
+    debugger;
+
     if( result )
     {
 
@@ -6092,7 +6095,9 @@ function _textLinkVerify2( c )
 {
   let self = this;
   let o = c.options;
-  debugger; // qqq : implement filesAreTextLinked
+  // qqq : test filesAreTextLinked
+  if( o.dstPath !== o.srcPath && self.filesAreTextLinked([ o.dstPath, o.srcPath ]) )
+  debugger;
   if( o.dstPath !== o.srcPath && self.filesAreTextLinked([ o.dstPath, o.srcPath ]) )
   c.end( true );
   // return true;
@@ -6600,7 +6605,7 @@ function filesAreSoftLinked_body( o )
 
 var defaults = filesAreSoftLinked_body.defaults = Object.create( null );
 defaults.filePath = null;
-defaults.resolvingTextLink = null;
+defaults.resolvingTextLink = 0;
 
 var operates = filesAreSoftLinked_body.operates = Object.create( null );
 operates.filePath = { pathToRead : 1 }
@@ -6660,7 +6665,7 @@ function filesAreTextLinked_body( o )
 
 var defaults = filesAreTextLinked_body.defaults = Object.create( null );
 defaults.filePath = null;
-defaults.resolvingSoftLink = null;
+defaults.resolvingSoftLink = 0;
 
 var operates = filesAreTextLinked_body.operates = Object.create( null );
 operates.filePath = { pathToRead : 1 }

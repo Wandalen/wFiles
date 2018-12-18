@@ -382,7 +382,8 @@ let Composes =
   // onRecord : null,
   strict : 1,
 
-  allowingMissing : 0,
+  allowingMissed : 0,
+  allowingCycled : 0,
   resolvingSoftLink : null,
   resolvingTextLink : null,
   usingTextLink : null,

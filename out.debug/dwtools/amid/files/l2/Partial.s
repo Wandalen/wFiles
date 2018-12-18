@@ -684,7 +684,6 @@ operates.filePath = { pathToRead : 1 };
 qqq : ?
 */
 
-// function _pathResolveTextLink( path, allowingMissing )
 function _pathResolveTextLink( o )
 {
   let self = this;
@@ -771,8 +770,8 @@ defaults.filePath = null;
 defaults.resolvingSoftLink = null;
 defaults.resolvingTextLink = null;
 defaults.throwing = 1;
-defaults.allowingMissing = 1;
-defaults.allowingCycling = 1;
+defaults.allowingMissed = 1;
+defaults.allowingCycled = 1;
 
 var having = _pathResolveLink.having = Object.create( null );
 having.driving = 0;
@@ -834,19 +833,10 @@ function pathResolveLinkFull_body( o )
     if( !o.resolvingSoftLink && ( !o.resolvingTextLink || !self.usingTextLink ) )
     {
 
-      // if( !o.stat )
-      // o.stat = self.statReadAct
-      // ({
-      //   filePath : result,
-      //   throwing : 0,
-      //   resolvingSoftLink : 0,
-      //   sync : 1,
-      // });
-
       if( o.stat )
       return result;
 
-      if( !o.allowingMissing )
+      if( !o.allowingMissed )
       {
         result = null;
         if( o.throwing )
@@ -859,7 +849,6 @@ function pathResolveLinkFull_body( o )
       return result;
     }
 
-    // if( !o.stat && o.resolvingHeadDirect )
     if( o.resolvingHeadDirect )
     {
 
@@ -870,38 +859,19 @@ function pathResolveLinkFull_body( o )
         filePath : result,
         resolvingSoftLink : o.resolvingSoftLink,
         resolvingTextLink : o.resolvingTextLink,
-        allowingMissing : o.allowingMissing,
-        allowingCycling: o.allowingCycling,
+        allowingMissed : o.allowingMissed,
+        allowingCycled: o.allowingCycled,
         throwing : o.throwing,
         stat : o.stat,
       }
 
       result = self.pathResolveLinkHeadDirect.body.call( self, o2 );
 
-      // if( result !== filePath )
-      // {
-      //   debugger;
-      //   o.stat = null;
-      // }
-
       o.stat = o2.stat;
 
     }
 
-    // if( !o.stat )
-    // o.stat = self.statReadAct
-    // ({
-    //   filePath : result,
-    //   throwing : 0,
-    //   resolvingSoftLink : 0,
-    //   sync : 1,
-    // });
-
-    // if( _.strEnds( o.filePath, 'experiment/linkToDir1/linkToTerminal' ) )
-    // debugger;
-
     if( result )
-    // if( o.stat )
     {
 
       let o2 =
@@ -912,8 +882,8 @@ function pathResolveLinkFull_body( o )
         resolvingSoftLink : o.resolvingSoftLink,
         resolvingTextLink : o.resolvingTextLink,
         preservingRelative : o.preservingRelative,
-        allowingMissing : o.allowingMissing,
-        allowingCycling: o.allowingCycling,
+        allowingMissed : o.allowingMissed,
+        allowingCycled : o.allowingCycled,
         throwing : o.throwing,
       }
 
@@ -924,7 +894,7 @@ function pathResolveLinkFull_body( o )
     }
     else
     {
-      if( !o.allowingMissing )
+      if( !o.allowingMissed )
       {
         result = null;
         if( o.throwing )
@@ -944,8 +914,8 @@ function pathResolveLinkFull_body( o )
         filePath : result,
         resolvingSoftLink : o.resolvingSoftLink,
         resolvingTextLink : o.resolvingTextLink,
-        allowingMissing : o.allowingMissing,
-        allowingCycling: o.allowingCycling,
+        allowingMissed : o.allowingMissed,
+        allowingCycled: o.allowingCycled,
         throwing : o.throwing,
       }
 
@@ -1000,7 +970,7 @@ function pathResolveLinkTail_body( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assertRoutineOptions( pathResolveLinkTail_body, arguments );
 
-  if( _.strEnds( o.filePath, 'pathResolveLinkTailChain/file' ) )
+  if( _.strEnds( o.filePath, '/self' ) )
   debugger;
 
   let o2 = _.mapExtend( null, o );
@@ -1016,12 +986,12 @@ function pathResolveLinkTail_body( o )
   //   let cycle = false;
   //   if( o2.found.length > 2 )
   //   cycle = _.arrayRightIndex( r, r[ r.length-2 ], r.length-3 ) !== -1;
-  //   if( cycle && o.allowingCycling || !cycle && o.allowingMissing )
+  //   if( cycle && o.allowingCycled || !cycle && o.allowingMissed )
   //   result = r[ r.length-2 ];
   // }
 
   if( result === null )
-  if( o.stat && o.allowingCycling || !o.stat && o.allowingMissing )
+  if( o.stat && o.allowingCycled || !o.stat && o.allowingMissed )
   result = o2.found[ o2.found.length-2 ];
 
   // if( o.filePath !== result )
@@ -1083,7 +1053,8 @@ function pathResolveLinkTailChain_body( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.boolLike( o.resolvingSoftLink ) );
   _.assert( _.boolLike( o.resolvingTextLink ) );
-  _.assert( _.boolLike( o.allowingMissing ) );
+  _.assert( _.boolLike( o.allowingMissed ) );
+  _.assert( _.boolLike( o.allowingCycled ) );
   _.assert( _.boolLike( o.throwing ) );
   _.assert( _.arrayIs( o.found ) );
   _.assert( _.arrayIs( o.result ) );
@@ -1101,7 +1072,7 @@ function pathResolveLinkTailChain_body( o )
   {
     // o.err = { cycleInLinks : true }; /* xxx */ // used by Extract.statReadAct to get kind of error
     debugger;
-    if( o.throwing && !o.allowingCycling )
+    if( o.throwing && !o.allowingCycled )
     {
       throw _.err( 'Links cycle at', _.strQuote( o.filePath ) );
     }
@@ -1112,7 +1083,7 @@ function pathResolveLinkTailChain_body( o )
       o.result.push( null );
       // o.found.push( null );
 
-      if( o.allowingCycling )
+      if( o.allowingCycled )
       o.stat = self.statReadAct
       ({
         filePath : o.filePath,
@@ -1157,7 +1128,7 @@ function pathResolveLinkTailChain_body( o )
     o.found.push( null );
 
     // if( o.result.length > 2 ) // should throw error if any part of chain does not exist
-    if( o.throwing && !o.allowingMissing )
+    if( o.throwing && !o.allowingMissed )
     {
       debugger;
       throw _.err( 'Does not exist file', _.strQuote( o.filePath ) );
@@ -1170,7 +1141,7 @@ function pathResolveLinkTailChain_body( o )
 
   if( o.resolvingSoftLink && o.stat.isSoftLink() )
   {
-    let filePath = self.pathResolveSoftLink({ filePath : o.filePath }); /* qqq : implement allowingMissing */
+    let filePath = self.pathResolveSoftLink({ filePath : o.filePath }); /* qqq : implement extended options */
     if( o.preservingRelative && !path.isAbsolute( filePath ) )
     {
       o.result.push( filePath );
@@ -1191,7 +1162,7 @@ function pathResolveLinkTailChain_body( o )
   if( self.usingTextLink )
   if( o.resolvingTextLink && o.stat.isTextLink() )
   {
-    let filePath = self.pathResolveTextLink({ filePath : o.filePath });
+    let filePath = self.pathResolveTextLink({ filePath : o.filePath }); /* qqq : implement extended options */
     if( o.preservingRelative && !path.isAbsolute( filePath ) )
     {
       o.result.push( filePath );
@@ -1241,8 +1212,8 @@ function pathResolveLinkHeadDirect_body( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.boolLike( o.resolvingSoftLink ) );
   _.assert( _.boolLike( o.resolvingTextLink ) );
-  _.assert( _.boolLike( o.allowingMissing ) );
-  _.assert( _.boolLike( o.allowingCycling ) );
+  _.assert( _.boolLike( o.allowingMissed ) );
+  _.assert( _.boolLike( o.allowingCycled ) );
   _.assert( _.boolLike( o.throwing ) );
   _.assert( path.isAbsolute( o.filePath ) );
   _.assertRoutineOptions( pathResolveLinkHeadDirect_body, arguments );
@@ -1320,8 +1291,8 @@ function pathResolveLinkHeadReverse_body( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.boolLike( o.resolvingSoftLink ) );
   _.assert( _.boolLike( o.resolvingTextLink ) );
-  _.assert( _.boolLike( o.allowingMissing ) );
-  _.assert( _.boolLike( o.allowingCycling ) );
+  _.assert( _.boolLike( o.allowingMissed ) );
+  _.assert( _.boolLike( o.allowingCycled ) );
   _.assert( _.boolLike( o.throwing ) );
   _.assert( path.isAbsolute( o.filePath ) );
   _.assertRoutineOptions( pathResolveLinkHeadReverse_body, arguments );
@@ -1639,30 +1610,14 @@ function statRead_body( o )
     resolvingSoftLink : o.resolvingSoftLink,
     sync : o.sync,
     throwing : o.throwing,
-  	allowingMissing : 0,
-  	allowingCycling : 0,
+  	allowingMissed : 0,
+  	allowingCycled : 0,
   }
 
-  let result = self.pathResolveLinkFull( o2 ); /* xxx qqq : add option sync */
+  // debugger;
+  // logger.log( 'statRead', o2.filePath );
 
-  // if( resolvedPath === null )
-  // {
-  //   if( o.throwing )
-  //   {
-  //     debugger;
-  //     _.assert( 0, 'not tested' );
-  //     let err = _.err( 'Failed to resolve' );
-  //     if( o.sync )
-  //     throw err;
-  //     return new _.Consequence().error( err );
-  //   }
-  //   else
-  //   {
-  //     if( o.sync )
-  //     return null;
-  //     return new _.Consequence().take( null );
-  //   }
-  // }
+  let result = self.pathResolveLinkFull( o2 ); /* xxx qqq : add option sync */
 
   if( o.sync )
   {
@@ -4703,12 +4658,14 @@ function _linkMultiple( o, link )
   _.assert( !!o );
   _.assert( _.strIs( o.srcPath ) || o.srcPath === null );
   _.assert( _.strIs( o.sourceMode ) || _.longIs( o.sourceMode ) );
-  _.assert( _.boolLike( o.allowingMissing ) );
+  _.assert( _.boolLike( o.allowingMissed ) );
+  _.assert( _.boolLike( o.allowingCycled ) );
 
   debugger; //xxx
 
   let needed = 0;
-  let records = self.recordFactory({ allowingMissing : o.allowingMissing }).records( o.dstPath );
+  let factory = self.recordFactory({ allowingMissed : o.allowingMissed, allowingCycled : o.allowingCycled });
+  let records = factory.records( o.dstPath );
   // Vova : should allow missing files?
   // Kos : need to investigate
   let newestRecord;
@@ -4838,8 +4795,9 @@ function _linkMultiple( o, link )
 
     if( !record.stat || !_.statsCouldBeLinked( mostLinkedRecord.stat , record.stat ) )
     {
+      debugger;
       let linkOptions = _.mapExtend( null, o );
-      linkOptions.allowingMissing = 0; // Vova : hardLink does not allow missing srcPath
+      linkOptions.allowingMissed = 0; // Vova : hardLink does not allow missing srcPath
       linkOptions.dstPath = record.absolute;
       linkOptions.srcPath = mostLinkedRecord.absolute;
       return link.call( self, linkOptions );
@@ -5019,6 +4977,8 @@ function _link_functor( gen )
       _.assert( _.boolLike( o.resolvingSrcTextLink ) );
       _.assert( _.boolLike( o.resolvingDstSoftLink ) );
       _.assert( _.boolLike( o.resolvingDstTextLink ) );
+      _.assert( _.boolLike( o.allowingMissed ) );
+      _.assert( _.boolLike( o.allowingCycled ) );
       if( onSkip1 )
       if( onSkip1.call( self, c ) )
       return true;
@@ -5029,11 +4989,11 @@ function _link_functor( gen )
     function skip2()
     {
 
-      /* allowingMissing */
+      /* allowingMissed */
 
       if( !c.srcStat )
       {
-        if( !o.allowingMissing )
+        if( !o.allowingMissed )
         {
           debugger;
           let err = _.err( 'Source file', _.strQuote( o.srcPath ), 'does not exist' );
@@ -5058,9 +5018,9 @@ function _link_functor( gen )
           return true;
         }
 
-        if( !o.allowingMissing )
+        if( !o.allowingMissed )
         {
-          let err = _.err( 'Making link on itself is not allowed. Please enable options {-o.allowingMissing-} if that was your goal.' );
+          let err = _.err( 'Making link on itself is not allowed. Please enable options {-o.allowingMissed-} if that was your goal.' );
           error( err );
           return true;
         }
@@ -5170,6 +5130,8 @@ function _link_functor( gen )
             filePath : o.dstPath,
             resolvingSoftLink : o.resolvingDstSoftLink,
             resolvingTextLink : o.resolvingDstTextLink,
+            allowingCycled : 1,
+            allowingMissed : 1,
           }
           o.dstPath = self.pathResolveLinkFull( o2 );
           c.dstStat = o2.stat; /* it's ok */
@@ -5184,8 +5146,8 @@ function _link_functor( gen )
             filePath : o.srcPath,
             resolvingSoftLink : o.resolvingSrcSoftLink,
             resolvingTextLink : o.resolvingSrcTextLink,
-            allowingCycling : o.allowingMissing,
-            allowingMissing : o.allowingMissing,
+            allowingCycled : o.allowingCycled,
+            allowingMissed : o.allowingMissed,
             throwing : o.throwing
           }
           c.srcResolvedPath = self.pathResolveLinkFull( o2 );
@@ -5572,7 +5534,8 @@ var defaults = fileRename.body.defaults;
 defaults.rewriting = 0;
 defaults.rewritingDirs = 0;
 defaults.makingDirectory = 0;
-defaults.allowingMissing = 0;
+defaults.allowingMissed = 0;
+defaults.allowingCycled = 0;
 defaults.throwing = null;
 defaults.verbosity = null;
 
@@ -5716,7 +5679,8 @@ var defaults = fileCopy.body.defaults;
 defaults.rewriting = 1;
 defaults.rewritingDirs = 0;
 defaults.makingDirectory = 0;
-defaults.allowingMissing = 0;
+defaults.allowingMissed = 0;
+defaults.allowingCycled = 0;
 defaults.throwing = null;
 defaults.verbosity = null;
 
@@ -5801,7 +5765,7 @@ function _hardLinkSkip1( c )
     !!c.options.breakingSrcHardLink || !!c.options.breakingDstHardLink,
     'Both source and destination hardlinks could not be preserved, please set breakingSrcHardLink or breakingDstHardLink to true'
   );
-  _.assert( o.allowingMissing === 0 || _.longIs( o.dstPath ), 'o.allowingMissing could be disabled when linking two files' );
+  _.assert( o.allowingMissed === 0 || _.longIs( o.dstPath ), 'o.allowingMissed could be disabled when linking two files' );
 
 }
 
@@ -5835,7 +5799,8 @@ defaults.makingDirectory = 0;
 defaults.throwing = null;
 defaults.verbosity = null;
 defaults.allowDiffContent = 0;
-defaults.allowingMissing = 0;
+defaults.allowingMissed = 0;
+defaults.allowingCycled = 0;
 defaults.sourceMode = 'modified>hardlinks>';
 
 defaults.breakingSrcHardLink = 0;
@@ -5907,7 +5872,7 @@ function _softLinkSkip2( c )
   let self = this;
   let o = c.options;
 
-  if( !o.allowingMissing )
+  if( !o.allowingMissed )
   // if( self.filesAreSoftLinked([ o.dstPath, o.srcPath ]) )
   if( o.dstPath === o.srcPath )
   throw _.err( 'Soft link cycle', path.moveReport( o.dstPath, o.srcPath ) );
@@ -5937,7 +5902,8 @@ defaults.rewritingDirs = 0;
 defaults.makingDirectory = 0;
 defaults.throwing = null;
 defaults.verbosity = null;
-defaults.allowingMissing = 0;
+defaults.allowingMissed = 0;
+defaults.allowingCycled = 0;
 
 defaults.resolvingSrcSoftLink = 0;
 defaults.resolvingSrcTextLink = 0;
@@ -6032,7 +5998,8 @@ defaults.rewritingDirs = 0;
 defaults.makingDirectory = 0;
 defaults.throwing = null;
 defaults.verbosity = null;
-defaults.allowingMissing = 0;
+defaults.allowingMissed = 0;
+defaults.allowingCycled = 0;
 
 defaults.resolvingSrcSoftLink = 0;
 defaults.resolvingSrcTextLink = 0;
@@ -6081,8 +6048,10 @@ function fileExchange_body( o )
   let dstPath = o.dstPath;
   let srcPath = o.srcPath;
 
-  let allowingMissing = o.allowingMissing;
-  delete o.allowingMissing;
+  throw _.err( 'not tested after introducing of allowingCycled' );
+
+  let allowingMissed = o.allowingMissed;
+  // delete o.allowingMissed;
 
   let src = self.statResolvedRead({ filePath : o.srcPath, throwing : 0 });
   let dst = self.statResolvedRead({ filePath : o.dstPath, throwing : 0 });
@@ -6097,7 +6066,7 @@ function fileExchange_body( o )
 
   if( !src || !dst )
   {
-    if( allowingMissing )
+    if( allowingMissed )
     {
       if( !src && dst )
       {
@@ -6180,7 +6149,8 @@ var defaults = fileExchange_body.defaults = Object.create( null );
 defaults.srcPath = null;
 defaults.dstPath = null;
 defaults.sync = null;
-defaults.allowingMissing = 1;
+defaults.allowingMissed = 1;
+defaults.allowingCycled = 1;
 defaults.throwing = null;
 defaults.verbosity = null;
 
@@ -6202,7 +6172,7 @@ having.aspect = 'body';
  * @param {Boolean} [ o.sync=true ] - Determines execution mode: true - synchronously, false - asynchronously.
  * In asynchronous mode returns wConsequence @see{@link wConsequence }.
  * @param {Boolean} [ o.throwing=true ] - Controls error throwing. Returns false if error occurred and ( o.throwing ) is disabled.
- * @param {Boolean} [ o.allowingMissing=true ] - Allows missing of the file( s ). If source ( o.srcPath ) is missing - ( o.srcPath ) becomes destination and ( o.dstPath ) becomes the source. Routine returns null if both paths are missing.
+ * @param {Boolean} [ o.allowingMissed=true ] - Allows missing of the file( s ). If source ( o.srcPath ) is missing - ( o.srcPath ) becomes destination and ( o.dstPath ) becomes the source. Routine returns null if both paths are missing.
  * @returns {Boolean|wConsequence} Returns true after successful exchange, otherwise false is returned. Also returns false if an error occurs and ( o.throwing ) is disabled.
  * In async mode returns Consequence instance @see{@link wConsequence } with same result.
  *

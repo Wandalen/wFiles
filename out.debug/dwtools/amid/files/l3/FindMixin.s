@@ -289,7 +289,7 @@ function filesFindSingle_body( o )
 
   if( !stemRecord.stat )
   {
-    if( o.allowingMissing )
+    if( o.allowingMissed )
     {
       // recordAdd( stemRecord );
       return o.result;
@@ -350,7 +350,7 @@ function filesFindSingle_body( o )
 
       if( files === null )
       {
-        if( o.allowingMissing )
+        if( o.allowingMissed )
         {
           files = [];
         }
@@ -497,7 +497,8 @@ filesFindSingle_body.defaults =
   includingTransient : 0,
   includingStem : 1,
 
-  allowingMissing : 0,
+  allowingMissed : 0,
+  allowingCycled : 0,
   recursive : '1',
 
   // resolving : 1,
@@ -512,13 +513,12 @@ filesFindSingle_body.defaults =
 
 }
 
-filesFindSingle_body.paths =
-{
-  filePath : null,
-}
+// filesFindSingle_body.paths =
+// {
+//   filePath : null,
+// }
 
 var having = filesFindSingle_body.having = Object.create( null );
-
 having.writing = 0;
 having.reading = 1;
 having.driving = 0;
@@ -1168,7 +1168,8 @@ function filesReflectEvaluate_body( o )
     let srcOptions = _.mapOnly( o, self.filesFindSingle.defaults );
     srcOptions.includingStem = 1;
     srcOptions.includingTransient = 1;
-    srcOptions.allowingMissing = 1;
+    srcOptions.allowingMissed = 1;
+    srcOptions.allowingCycled = 1;
     srcOptions.verbosity = 0;
     srcOptions.filter = o.srcFilter;
     srcOptions.filePath = o.srcPath;
@@ -1226,7 +1227,7 @@ function filesReflectEvaluate_body( o )
       basePath : o.dstFilter.basePath[ o.dstPath ],
       stemPath : o.dstPath,
       filter : o.dstFilter,
-      allowingMissing : 1,
+      allowingMissed : 1,
       allowingCycled : 1,
     }
 
@@ -2297,7 +2298,8 @@ defaults.verbosity = 0;
 
 // defaults.mandatory = 0;
 
-defaults.allowingMissing = 0;
+defaults.allowingMissed = 0;
+defaults.allowingCycled = 0;
 defaults.includingTerminals = 1;
 defaults.includingDirs = 1;
 defaults.includingNonAllowed = 1;
@@ -2573,7 +2575,8 @@ function filesReflectSingle_body( o )
         dstPath : record.dst.absoluteGlobalMaybe,
         srcPath : record.src.absoluteGlobalMaybe,
         makingDirectory : 1,
-        allowingMissing : 1,
+        allowingMissed : 1,
+        allowingCycled : 1,
         resolvingSrcSoftLink : o.resolvingSrcSoftLink,
         resolvingSrcTextLink : o.resolvingSrcTextLink,
         resolvingDstSoftLink : o.resolvingDstSoftLink,
@@ -2587,7 +2590,8 @@ function filesReflectSingle_body( o )
         dstPath : record.dst.absoluteGlobalMaybe,
         srcPath : record.src.absoluteGlobalMaybe,
         makingDirectory : 1,
-        allowingMissing : 1,
+        allowingMissed : 1,
+        allowingCycled : 1,
         resolvingSrcSoftLink : o.resolvingSrcSoftLink,
         resolvingSrcTextLink : o.resolvingSrcTextLink,
         resolvingDstSoftLink : o.resolvingDstSoftLink,
@@ -2601,7 +2605,7 @@ function filesReflectSingle_body( o )
         dstPath : record.dst.absoluteGlobalMaybe,
         srcPath : record.src.absoluteGlobalMaybe,
         makingDirectory : 1,
-        allowingMissing : 1,
+        allowingMissed : 1,
         resolvingSrcSoftLink : o.resolvingSrcSoftLink,
         resolvingSrcTextLink : o.resolvingSrcTextLink,
         resolvingDstSoftLink : o.resolvingDstSoftLink,
@@ -3336,7 +3340,8 @@ defaults.includingDirs = 1;
 defaults.includingTerminals = 1;
 defaults.resolvingSoftLink = 0;
 defaults.resolvingTextLink = 0;
-defaults.allowingMissing = 1;
+defaults.allowingMissed = 1;
+defaults.allowingCycled = 1;
 defaults.verbosity = null;
 defaults.maskPreset = 0;
 defaults.throwing = null;
@@ -3545,6 +3550,7 @@ function softLinksRebase( o )
   let optionsFind = _.mapOnly( o, filesFind.defaults );
   optionsFind.onDown = _.arrayAppendElement( _.arrayAs( optionsFind.onDown ), function( record )
   {
+
     if( !record.isSoftLink )
     return;
 
@@ -3556,9 +3562,12 @@ function softLinksRebase( o )
     ({
       dstPath : record.absoluteGlobalMaybe,
       srcPath : rebasedPath,
-      allowingMissing : 1,
+      allowingMissed : 1,
+      allowingCycled : 1,
     });
+
     _.assert( !!self.statResolvedRead({ filePath : record.absoluteGlobalMaybe, resolvingSoftLink : 0 }) );
+
   });
 
   let files = self.filesFind.body.call( self,optionsFind );

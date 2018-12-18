@@ -827,15 +827,15 @@ function fileCopyAct( o )
       throwing : 0,
     });
 
-    let srcStat = self.statReadAct
-    ({
-      filePath : o.dstPath,
-      resolvingSoftLink : 0,
-      sync : 1,
-      throwing : 0,
-    });
+    // let srcStat = self.statReadAct
+    // ({
+    //   filePath : o.srcPath,
+    //   resolvingSoftLink : 0,
+    //   sync : 1,
+    //   throwing : 0,
+    // });
 
-    _.assert( srcStat.isTerinal() );
+    _.assert( self.isTerminal( o.srcPath ), () => _.strQuote( o.srcPath ), 'is not terminal' );
 
     if( o.breakingDstHardLink && dstStat.isHardLink() )
     self.hardLinkBreak({ filePath : o.dstPath, sync : 1 });
@@ -1391,7 +1391,7 @@ let defaults2 =
   basePath : null,
 
   recursive : '2',
-  allowingMissing : 0,
+  allowingMissed : 0,
   includingTerminals : 1,
   includingDirs : 1,
   includingTransient : 1,
@@ -1548,7 +1548,7 @@ function readToProvider( o )
         ({
           dstPath : dstPath,
           srcPath : contentPath,
-          allowingMissing : 1,
+          allowingMissed : 1,
           type : type
         });
       }

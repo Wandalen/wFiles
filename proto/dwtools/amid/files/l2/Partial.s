@@ -986,7 +986,7 @@ function pathResolveLinkTail_body( o )
     let cycle = false;
     if( o2.found.length > 2 )
     cycle = _.arrayRightIndex( o2.found, o2.found[ o2.found.length-2 ], o2.found.length-3 ) !== -1;
-    if( cycle && o.allowingCycling || !cycle && o.allowingMissing )
+    if( cycle && o.allowingCycled || !cycle && o.allowingMissed )
     result = o2.found[ o2.found.length-2 ];
   }
 

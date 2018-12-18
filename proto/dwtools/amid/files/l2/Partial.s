@@ -5707,15 +5707,18 @@ function _fileCopyAct( c )
   debugger;
 
   if( c.srcStat.isSoftLink() )
-  self.softLinkAct
-  ({
-    dstPath : o.dstPath,
-    srcPath : self.pathResolveSoftLink( o.srcPath ),
-    originalDstPath : o.originalDstPath,
-    originalSrcPath : o.originalSrcPath,
-    sync : o.sync,
-    type : null,
-  });
+  {
+    let srcPathResolved = self.pathResolveSoftLink( o.srcPath );
+    self.softLinkAct
+    ({
+      dstPath : o.dstPath,
+      srcPath : srcPathResolved,
+      originalDstPath : o.originalDstPath,
+      originalSrcPath : srcPathResolved,
+      sync : o.sync,
+      type : null,
+    });
+  }
   else
   self.fileCopyAct
   ({

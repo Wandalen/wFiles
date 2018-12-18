@@ -3982,7 +3982,7 @@ function fileCopySync( test )
     rewriting : 1,
     throwing : 0
   });
-  test.identical( got, false );
+  test.identical( got, null );
   var srcStat = self.provider.statResolvedRead( srcPath );
   var dstNow = self.provider.fileRead( dstPath );
   test.is( srcStat.isDirectory() );
@@ -4010,7 +4010,7 @@ function fileCopySync( test )
     rewriting : 0,
     throwing : 0
   });
-  test.identical( got, false );
+  test.identical( got, null );
   var srcStat = self.provider.statResolvedRead( srcPath );
   var dstNow = self.provider.fileRead( dstPath );
   test.is( srcStat.isDirectory() );
@@ -7137,7 +7137,7 @@ function fileCopySoftLinkResolving( test )
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
   self.provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
-  var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 0, allowingMissed : 1, throwing : 0 };
+  var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 0, allowingMissed : 1, allowingCycled : 1, throwing : 0 };
   var got = fileCopy( o );
   test.identical( got, true );
   test.identical( o.srcPath, srcPath );
@@ -7152,7 +7152,7 @@ function fileCopySoftLinkResolving( test )
   self.provider.filesDelete( workDir );
   self.provider.dirMake( workDir );
   self.provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
-  var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 0, allowingMissed : 1, throwing : 1 };
+  var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 0, allowingMissed : 1, allowingCycled : 1, throwing : 1 };
   var got = fileCopy( o );
   test.identical( got, true );
   test.identical( o.srcPath, srcPath );
@@ -7236,10 +7236,10 @@ function fileCopySoftLinkResolving( test )
   self.provider.dirMake( workDir );
   self.provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
   self.provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
-  var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 0, allowingMissed : 0, throwing : 0 };
+  var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 0, allowingMissed : 0,  throwing : 0 };
   var got = fileCopy( o );
   test.identical( got, null );
-  test.identical( o.srcPath, srcPath );
+  test.identical( o.srcPath, null );
   test.identical( o.dstPath, dstPath );
   test.is( self.provider.isSoftLink( srcPath ) );
   test.is( self.provider.isSoftLink( dstPath ) );
@@ -7252,7 +7252,7 @@ function fileCopySoftLinkResolving( test )
   self.provider.dirMake( workDir );
   self.provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
   self.provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
-  var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 0, allowingMissed : 1, throwing : 0 };
+  var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 0, allowingMissed : 1, allowingCycled : 1, throwing : 0 };
   var got = fileCopy( o );
   test.identical( got, true );
   test.identical( o.srcPath, srcPath );
@@ -7283,7 +7283,7 @@ function fileCopySoftLinkResolving( test )
   self.provider.dirMake( workDir );
   self.provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
   self.provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
-  var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 0, allowingMissed : 1, throwing : 1 };
+  var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 0, allowingMissed : 1, allowingCycled : 1, throwing : 1 };
   var got = fileCopy( o );
   test.identical( got, true );
   test.identical( o.srcPath, srcPath );
@@ -7370,7 +7370,7 @@ function fileCopySoftLinkResolving( test )
   var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 1, allowingMissed : 0, throwing : 0 };
   var got = fileCopy( o );
   test.identical( got, null );
-  test.identical( o.srcPath, srcPath );
+  test.identical( o.srcPath, null );
   test.identical( o.dstPath, dstPath );
   test.is( self.provider.isSoftLink( srcPath ) );
   test.is( self.provider.isSoftLink( dstPath ) );
@@ -7383,7 +7383,7 @@ function fileCopySoftLinkResolving( test )
   self.provider.dirMake( workDir );
   self.provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
   self.provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
-  var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 1, allowingMissed : 1, throwing : 0 };
+  var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 1, allowingMissed : 1, allowingCycled : 1, throwing : 0 };
   var got = fileCopy( o );
   test.identical( got, true );
   test.identical( o.srcPath, srcPath );
@@ -7414,7 +7414,7 @@ function fileCopySoftLinkResolving( test )
   self.provider.dirMake( workDir );
   self.provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
   self.provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
-  var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 1, allowingMissed : 1, throwing : 1 };
+  var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 1, allowingMissed : 1, allowingCycled : 1, throwing : 1 };
   var got = fileCopy( o );
   test.identical( got, true );
   test.identical( o.srcPath, srcPath );

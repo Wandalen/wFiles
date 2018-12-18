@@ -280,7 +280,8 @@ function _statRead()
       resolvingTextLink : f.resolvingTextLink,
       resolvingHeadDirect : 1,
       resolvingHeadReverse : 1,
-      allowingMissing : f.allowingMissing,
+      allowingMissed : f.allowingMissed,
+      allowingCycled : f.allowingCycled,
       throwing : 1,
     }
 

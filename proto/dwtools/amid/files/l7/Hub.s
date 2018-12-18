@@ -628,7 +628,7 @@ function _fileCopyActDifferent( o, dst, src, routine )
     ({
       dstPath : dst.filePath,
       srcPath : path.join( src.parsedPath.origin, resolvedPath ),
-      allowingMissing : 1,
+      allowingMissed : 1,
     });
   }
 

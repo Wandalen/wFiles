@@ -106,7 +106,7 @@ function _isTextLink( filePath )
   if( !self.usingTextLink )
   return false;
 
-  // let result = self._pathResolveTextLink({ filePath : filePath, allowingMissing : true });
+  // let result = self._pathResolveTextLink({ filePath : filePath, allowingMissed : true });
 
   let stat = self.statReadAct
   ({
@@ -147,7 +147,7 @@ operates.filePath = { pathToRead : 1 }
 //
 
 let buffer;
-// function pathResolveTextLinkAct( filePath, visited, hasLink, allowingMissing )
+// function pathResolveTextLinkAct( filePath, visited, hasLink, allowingMissed )
 // function pathResolveTextLinkAct( o )
 // {
 //   let self = this;
@@ -186,7 +186,7 @@ let buffer;
 //     let stat = _.fileProvider.statResolvedRead({ filePath : cpath, resolvingTextLink : 0, resolvingSoftLink : 0 }); /* qqq */
 //     if( !stat )
 //     {
-//       if( o.allowingMissing )
+//       if( o.allowingMissed )
 //       return o.filePath;
 //       else
 //       return false;
@@ -265,7 +265,7 @@ let buffer;
 //   filePath : null,
 //   visited : null,
 //   hasLink : null,
-//   allowingMissing : true,
+//   allowingMissed : true,
 // }
 
 function pathResolveTextLinkAct( o )

@@ -29,7 +29,9 @@ function onSuiteBegin( test )
 function onSuiteEnd()
 {
   let path = this.provider.path;
-  _.assert( _.strEnds( this.testRootDirectory, 'Provider/HardDrive' ) ); // qqq : error here
+  // qqq : error here
+  // aaa : format of temp path was changed and has unique id at the end
+  _.assert( _.strHas( this.testRootDirectory, 'Provider/HardDrive' ) );
   path.dirTempClose( this.testRootDirectory );
 }
 

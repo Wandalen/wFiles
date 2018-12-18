@@ -307,9 +307,9 @@ function _preFilePathVectorWithoutProviderDefaults( routine, args )
   if( path.like( o ) )
   o = { filePath : path.from( o ) };
   else if( _.arrayIs( o ) )
-  o = { filePath : o };
-  // else if( _.arrayIs( o.filePath ) )
-  // o = { filePath : path.s.from( o.filePath ) } /* no, please have a look _preSrcDstPathWithProviderDefaults */
+  o = { filePath : path.s.from( o ) };
+  else if( _.arrayIs( o.filePath ) )
+  o = { filePath : path.s.from( o.filePath ) }
 
   _.routineOptions( routine, o );
 
@@ -6132,12 +6132,14 @@ function fileExchange_body( o )
     {
       o2.dstPath = o2.srcPath;
       o2.srcPath = dstPath;
+      return true;
     })
     .ifNoErrorThen( _.routineSeal( self, self.fileRename, [ _.mapExtend( null, o2 ) ] ) )
     .ifNoErrorThen( function( arg/*aaa*/ )
     {
       o2.dstPath = dstPath;
       o2.srcPath = tempPath;
+      return true;
     })
     .ifNoErrorThen( _.routineSeal( self, self.fileRename, [ _.mapExtend( null, o2 ) ] ) );
 

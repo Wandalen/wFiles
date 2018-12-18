@@ -4819,8 +4819,8 @@ function _link_functor( gen )
   let onAct = gen.onAct;
   let actMethodName = gen.actMethodName;
   let entryMethodName = _.strRemoveEnd( gen.actMethodName, 'Act' );
-  let onSkip1 = gen.onSkip1;
-  let onSkip2 = gen.onSkip2;
+  let onVerify1 = gen.onVerify1;
+  let onVerify2 = gen.onVerify2;
   // let onRanameBegin = gen.onRanameBegin;
   let renaming = gen.renaming;
   let skippingSamePath = gen.skippingSamePath;
@@ -4830,8 +4830,8 @@ function _link_functor( gen )
   // _.assert( _.objectIs( onAct.defaults ) );
   _.assert( _.routineIs( onAct ) );
   _.assert( _.objectIs( onAct.defaults ) );
-  _.assert( !onSkip1 || _.routineIs( onSkip1 ) );
-  _.assert( !onSkip2 || _.routineIs( onSkip2 ) );
+  _.assert( !onVerify1 || _.routineIs( onVerify1 ) );
+  _.assert( !onVerify2 || _.routineIs( onVerify2 ) );
   // _.assert( !onRanameBegin || _.routineIs( onRanameBegin ) );
 
   /* - */
@@ -4843,28 +4843,78 @@ function _link_functor( gen )
 
     let c = Object.create( null );
     // c.linkAct = self[ actMethodName ];
+
+    c.ended = false;
     c.linkAct = onAct;
     c.result = undefined;
     c.tempPath = undefined;
     c.dstStat = undefined;
     c.srcStat = undefined;
     c.options = o;
+    c.options2 = undefined;
 
-    if( skip1( arguments ) )
-    return end();
+    c.verify1 = verify1;
+    c.verify2 = verify2;
+    c.verifyDst = o.sync ? verifyDstSync : verifyDstAsync;
+    c.pathResolve = pathResolve;
+    c.linksResolve = linksResolve;
+    c.log = log;
+    c.tempRenameCan = tempRenameCan;
+    c.tempRename = o.sync ? tempRenameSync : tempRenameAsync;
+    c.tempRenameBack = o.sync ? tempRenameBackSync : tempRenameBackAsync;
+    c.tempNameMake = tempNameMake;
+    c.validateSize = validateSize;
+    c.error = error;
+    c.end = end;
+
+    Object.preventExtensions( c );
+
+    /* - */
+
+/*
+    function verify1( args )
+    function verify2()
+    function verifyDst()
+    function verifyDstAsync()
+    function pathResolve()
+    function linksResolve()
+    function log()
+    function tempRenameCan()
+    function tempRenameSync()
+    function tempRenameAsync()
+    function tempRenameBackSync()
+    function tempRenameBackAsync()
+    function tempNameMake( filePath )
+    function validateSize()
+    function error( err )
+    function end( r )
+*/
+
+    c.verify1( arguments );
+    if( c.ended )
+    return c.end();
 
     if( _.longIs( o.dstPath ) && c.linkAct.having.hardLinking ) /* qqq : _linkMultiple should work not only for hardlinks */
     return _linkMultiple.call( self, o, _link_body );
     _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
 
-    pathResolve();
+    var r = c.pathResolve();
+    _.assert( r === undefined );
+    if( c.ended )
+    return c.end();
 
-    let r = pathResolveLinks();
-    if( r !== undefined )
-    return r;
+    var r = c.linksResolve();
+    _.assert( r === undefined );
+    // if( r !== undefined )
+    // return r;
+    if( c.ended )
+    return c.end();
 
-    if( skip2() )
-    return end();
+    c.verify2();
+    // if( verify2() )
+    // return end();
+    if( c.ended )
+    return c.end();
 
     let o2 = c.options2 = _.mapOnly( o, c.linkAct.defaults );
 
@@ -4881,9 +4931,9 @@ function _link_functor( gen )
 
         if( self.fileExists( o2.dstPath ) )
         {
-          verifyDst()
+          c.verifyDst()
           if( tempRenameCan() )
-          tempRename();
+          tempRenameSync();
         }
         else if( o.makingDirectory )
         {
@@ -4905,7 +4955,7 @@ function _link_functor( gen )
       catch( err )
       {
 
-        tempRenameBack();
+        tempRenameBackSync();
         if( o.throwing )
         throw _.err( 'Cant', entryMethodName, o.dstPath, '<-', o.srcPath, '\n', err )
         return false;
@@ -4926,7 +4976,7 @@ function _link_functor( gen )
       {
         if( dstExists )
         {
-          return verifyDstAsync().ifNoErrorThen( () => tempRenameAsync() )
+          return c.verifyDst().ifNoErrorThen( () => tempRenameAsync() )
         }
         else if( o.makingDirectory )
         {
@@ -4967,7 +5017,7 @@ function _link_functor( gen )
 
     /* - */
 
-    function skip1( args )
+    function verify1( args )
     {
       _.assert( args.length === 1, 'Expects single argument' );
       _.assert( _.routineIs( c.linkAct ), 'method', actMethodName, 'is not implemented' );
@@ -4979,14 +5029,20 @@ function _link_functor( gen )
       _.assert( _.boolLike( o.resolvingDstTextLink ) );
       _.assert( _.boolLike( o.allowingMissed ) );
       _.assert( _.boolLike( o.allowingCycled ) );
-      if( onSkip1 )
-      if( onSkip1.call( self, c ) )
-      return true;
+
+      if( onVerify1 )
+      {
+        let r = onVerify1.call( self, c );
+        _.assert( r === undefined );
+      }
+      // if( onVerify1.call( self, c ) )
+      // return true;
+
     }
 
     /* - */
 
-    function skip2()
+    function verify2()
     {
 
       /* allowingMissed */
@@ -5029,19 +5085,24 @@ function _link_functor( gen )
 
       /* skipping */
 
-      if( onSkip2 )
-      if( onSkip2.call( self, c ) )
+      if( onVerify2 )
       {
-        end( true );
-        return true;
+        let r = onVerify2.call( self, c );
+        _.assert( r === undefined );
       }
+
+      // if( onVerify2.call( self, c ) )
+      // {
+      //   end( true );
+      //   return true;
+      // }
 
       return false;
     }
 
     /* - */
 
-    function verifyDst()
+    function verifyDstSync()
     {
 
       if( !o.rewriting )
@@ -5114,7 +5175,7 @@ function _link_functor( gen )
 
     /* - */
 
-    function pathResolveLinks()
+    function linksResolve()
     {
 
       try
@@ -5150,10 +5211,12 @@ function _link_functor( gen )
             allowingMissed : o.allowingMissed,
             throwing : o.throwing
           }
-          c.srcResolvedPath = self.pathResolveLinkFull( o2 );
+          o.srcPath = self.pathResolveLinkFull( o2 );
           c.srcStat = o2.stat;
-          if( c.srcResolvedPath )
-          o.srcPath = c.srcResolvedPath; /* qqq : what is srcResolvedPath for? */
+          // c.srcResolvedPath = self.pathResolveLinkFull( o2 );
+          // c.srcStat = o2.stat;
+          // if( c.srcResolvedPath )
+          // o.srcPath = c.srcResolvedPath; /* qqq : what is srcResolvedPath for? */
         }
         else
         {
@@ -5163,7 +5226,8 @@ function _link_functor( gen )
       }
       catch( err )
       {
-        return error( err );
+        debugger;
+        c.error( err );
       }
 
     }
@@ -5199,7 +5263,7 @@ function _link_functor( gen )
 
     /* - */
 
-    function tempRename()
+    function tempRenameSync()
     {
 
       c.tempPath = tempNameMake( o2.dstPath );
@@ -5254,7 +5318,7 @@ function _link_functor( gen )
 
     /* - */
 
-    function tempRenameBack()
+    function tempRenameBackSync()
     {
 
       if( c.tempPath ) try
@@ -5328,12 +5392,13 @@ function _link_functor( gen )
 
     function error( err )
     {
+      _.assert( arguments.length === 1 );
       if( o.throwing )
       {
         if( o.sync )
         throw err;
         c.result = new _.Consequence().error( err );
-        return c.result;
+        return end( c.result );
       }
       else
       {
@@ -5348,8 +5413,13 @@ function _link_functor( gen )
 
     function end( r )
     {
+      _.assert( arguments.length === 0 || arguments.length === 1 );
+      _.assert( arguments.length === 0 || r !== undefined );
+      c.ended = true;
       if( r !== undefined )
       if( o.sync )
+      c.result = r;
+      else if( _.consequenceIs( r ) )
       c.result = r;
       else
       c.result = _.Consequence().take( r );
@@ -5384,8 +5454,8 @@ _link_functor.defaults =
 
   actMethodName : null,
   onAct : null,
-  onSkip1 : null,
-  onSkip2 : null,
+  onVerify1 : null,
+  onVerify2 : null,
   // onRanameBegin : null,
 
   renaming : true,
@@ -5613,7 +5683,7 @@ operates.dstPath = { pathToWrite : 1 }
  * @memberof wFileProviderPartial
  */
 
-function _fileCopySkip2( c )
+function _fileCopyVerify2( c )
 {
   let self = this;
   let o = c.options;
@@ -5621,11 +5691,12 @@ function _fileCopySkip2( c )
   _.assert( _.strIs( o.srcPath ) );
   _.assert( _.fileStatIs( c.srcStat ) );
 
-  let isDir = c.srcStat.isDir();
-  if( isDir )
+  // let isDir = c.srcStat.isDir();
+  // if( c.srcStat.isDir() && self.dirRead( o.srcPath ).length > 0 )
+  if( c.srcStat.isDir() )
   {
     debugger;
-    throw _.err( 'Cant copy directory ' + _.strQuote( o.srcPath ) + ', consider method filesCopy'  );
+    c.error( _.err( 'Cant copy directory ' + _.strQuote( o.srcPath ) + ', consider method filesCopy'  ) );
   }
 
 }
@@ -5669,7 +5740,7 @@ let fileCopy = _link_functor
 ({
   actMethodName : 'fileCopyAct',
   onAct : _fileCopyAct,
-  onSkip2 : _fileCopySkip2,
+  onVerify2 : _fileCopyVerify2,
   skippingSamePath : true,
   skippingMissing : true,
 });
@@ -5754,7 +5825,7 @@ function _hardLinkAct( c )
 
 _.routineExtend( _hardLinkAct, hardLinkAct );
 
-function _hardLinkSkip1( c )
+function _hardLinkVerify1( c )
 {
   let self = this;
   let o = c.options;
@@ -5769,7 +5840,7 @@ function _hardLinkSkip1( c )
 
 }
 
-function _hardLinkSkip2( c )
+function _hardLinkVerify2( c )
 {
   let self = this;
   let o = c.options;
@@ -5778,15 +5849,16 @@ function _hardLinkSkip2( c )
   // Vova : should skip if linked is null( not sure )?
   // Kos : maybe
   if( linked || linked === null )
-  return true;
+  c.end( true );
+  // return true;
 }
 
 let hardLink = _link_functor
 ({
   actMethodName : 'hardLinkAct',
   onAct : _hardLinkAct,
-  onSkip1 : _hardLinkSkip1,
-  onSkip2 : _hardLinkSkip2,
+  onVerify1 : _hardLinkVerify1,
+  onVerify2 : _hardLinkVerify2,
   skippingSamePath : true,
   skippingMissing : false,
 });
@@ -5867,7 +5939,7 @@ function _softLinkAct( c )
 
 _.routineExtend( _softLinkAct, softLinkAct );
 
-function _softLinkSkip2( c )
+function _softLinkVerify2( c )
 {
   let self = this;
   let o = c.options;
@@ -5875,7 +5947,7 @@ function _softLinkSkip2( c )
   if( !o.allowingMissed )
   // if( self.filesAreSoftLinked([ o.dstPath, o.srcPath ]) )
   if( o.dstPath === o.srcPath )
-  throw _.err( 'Soft link cycle', path.moveReport( o.dstPath, o.srcPath ) );
+  c.error( _.err( 'Soft link cycle', path.moveReport( o.dstPath, o.srcPath ) ) );
 
   // if( o.dstPath !== o.srcPath && self.filesAreSoftLinked([ o.dstPath, o.srcPath ]) )
   // if( o.dstPath === o.srcPath )
@@ -5890,7 +5962,7 @@ let softLink = _link_functor
 ({
   actMethodName : 'softLinkAct',
   onAct : _softLinkAct,
-  onSkip2 : _softLinkSkip2,
+  onVerify2 : _softLinkVerify2,
   skippingSamePath : false,
   skippingMissing : false,
 });
@@ -5973,20 +6045,21 @@ function _textLinkAct( c )
 
 _.routineExtend( _textLinkAct, textLinkAct );
 
-function _textLinkSkip2( c )
+function _textLinkVerify2( c )
 {
   let self = this;
   let o = c.options;
   debugger; // qqq : implement filesAreTextLinked
   if( o.dstPath !== o.srcPath && self.filesAreTextLinked([ o.dstPath, o.srcPath ]) )
-  return true;
+  c.end( true );
+  // return true;
 }
 
 let textLink = _link_functor
 ({
   actMethodName : 'textLinkAct',
   onAct : _textLinkAct,
-  onSkip2 : _textLinkSkip2,
+  onVerify2 : _textLinkVerify2,
   skippingSamePath : false,
   skippingMissing : false,
 });

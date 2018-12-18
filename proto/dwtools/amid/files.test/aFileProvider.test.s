@@ -3965,6 +3965,9 @@ function fileCopySync( test )
 
   /* rewritin on & throwing off */
 
+  var srcPath = test.context.pathFor( 'written/fileCopy/src.txt' );
+  var dstPath = test.context.pathFor( 'written/fileCopy/dst.txt' );
+
   self.provider.filesDelete( dir );
   self.provider.dirMake( srcPath );
   self.provider.fileWrite( dstPath, ' ' );
@@ -3988,6 +3991,8 @@ function fileCopySync( test )
   test.identical( dstNow, dstBefore );
   var dirAfter = self.provider.dirRead( dir );
   test.identical( dirAfter, dirBefore );
+
+  // debugger; return; xxx
 
   /* rewritin & throwing off */
 

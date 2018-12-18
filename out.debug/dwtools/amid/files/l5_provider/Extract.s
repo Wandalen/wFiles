@@ -148,11 +148,13 @@ function fileReadAct( o )
 
   if( self._descriptorIsHardLink( result ) )
   {
-    debugger; xxx
-    let resolved = self._descriptorResolve({ descriptor : result });
-    if( resolved === undefined )
-    return handleError( _.err( 'Cant resolve :', result ) );
-    result = resolved;
+    result = result[ 0 ].data;
+    _.assert( result !== undefined );
+    // debugger; xxx
+    // let resolved = self._descriptorResolve({ descriptor : result });
+    // if( resolved === undefined )
+    // return handleError( _.err( 'Cant resolve :', result ) );
+    // result = resolved;
   }
 
   if( result === undefined || result === null )

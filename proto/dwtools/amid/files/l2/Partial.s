@@ -1011,18 +1011,14 @@ function pathResolveLinkTail_body( o )
 
   let result = r[ r.length-1 ];
 
-  // if( r[ r.length-1 ] === null )
-  // {
-  //   let cycle = false;
-  //   if( o2.found.length > 2 )
-  //   cycle = _.arrayRightIndex( r, r[ r.length-2 ], r.length-3 ) !== -1;
-  //   if( cycle && o.allowingCycling || !cycle && o.allowingMissing )
-  //   result = r[ r.length-2 ];
-  // }
-
   if( result === null )
-  if( o.stat && o.allowingCycling || !o.stat && o.allowingMissing )
-  result = o2.found[ o2.found.length-2 ];
+  {
+    let cycle = false;
+    if( o2.found.length > 2 )
+    cycle = _.arrayRightIndex( o2.found, o2.found[ o2.found.length-2 ], o2.found.length-3 ) !== -1;
+    if( cycle && o.allowingCycling || !cycle && o.allowingMissing )
+    result = o2.found[ o2.found.length-2 ];
+  }
 
   // if( o.filePath !== result )
   // logger.log( 'pathResolveLinkTail', o.filePath, '->', result );

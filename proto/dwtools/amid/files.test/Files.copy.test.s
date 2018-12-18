@@ -57,7 +57,7 @@ function onSuiteEnd()
 
 var statResolvedReads = ( path ) =>
 {
-  path = _.fileProvider.pathResolveTextLink( path, true );
+  path = _.fileProvider.pathResolveTextLink( path );
   return _.fileProvider.statResolvedRead( path );
 }
 

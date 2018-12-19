@@ -3850,7 +3850,7 @@ function fileCopySync( test )
       throwing : 0
     });
   });
-  test.identical( got, false );
+  test.identical( got, null );
   var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dst.txt', 'src.txt' ] );
 
@@ -6310,7 +6310,7 @@ function fileCopyAsync( test )
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function( got )
     {
-      test.identical( got, false );
+      test.identical( got, null );
       var files = self.provider.dirRead( dir );
       test.identical( files, [ 'dst.txt', 'src.txt' ] );
       return null;
@@ -6482,7 +6482,7 @@ function fileCopyAsync( test )
     })
     .finally( ( err, got ) =>
     {
-      test.identical( got, false );
+      test.identical( got, null );
       var srcStat = self.provider.statResolvedRead( srcPath );
       var dstNow = self.provider.fileRead( dstPath );
       test.is( srcStat.isDirectory() );
@@ -6516,7 +6516,7 @@ function fileCopyAsync( test )
     })
     .finally( ( err, got ) =>
     {
-      test.identical( got, false );
+      test.identical( got, null );
       var srcStat = self.provider.statResolvedRead( srcPath );
       var dstNow = self.provider.fileRead( dstPath );
       test.is( srcStat.isDirectory() );
@@ -8058,11 +8058,31 @@ function fileCopyError( test )
     throwing : 1,
     allowingMissed : 0,
   }
-  test.shouldThrowError( () => self.provider.fileCopy( o ) );
+  test.mustNotThrowError( () => self.provider.fileCopy( o ) );
   test.is( self.provider.isSoftLink( srcPath ) );
-  test.is( self.provider.isTerminal( dstPath ) );
+  test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), missingPath );
-  test.identical( self.provider.fileRead( dstPath ), dstPath );
+  test.identical( self.provider.pathResolveSoftLink( dstPath ), missingPath );
+
+  //
+
+  test.case = 'error on resolve src';
+  self.provider.filesDelete( workDir );
+  self.provider.fileWrite( dstPath, dstPath );
+  self.provider.softLink({ dstPath : srcPath, srcPath : missingPath, allowingMissed : 1 });
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    resolvingSrcSoftLink : 0,
+    throwing : 0,
+    allowingMissed : 0,
+  }
+  test.mustNotThrowError( () => self.provider.fileCopy( o ) );
+  test.is( self.provider.isSoftLink( srcPath ) );
+  test.is( self.provider.isSoftLink( dstPath ) );
+  test.identical( self.provider.pathResolveSoftLink( srcPath ), missingPath );
+  test.identical( self.provider.pathResolveSoftLink( dstPath ), missingPath );
 
   //
 
@@ -8426,7 +8446,7 @@ function fileRenameSync( test )
       throwing : 0
     });
   });
-  test.identical( got, false );
+  test.identical( got, null );
 
   //
 
@@ -8624,7 +8644,7 @@ function fileRenameSync( test )
       throwing : 0
     });
   });
-  test.identical( got, false )
+  test.identical( got, null )
   var files = self.provider.dirRead( dir );
   test.identical( files, [ 'src' ] );
 
@@ -8641,7 +8661,7 @@ function fileRenameSync( test )
       throwing : 0
     });
   });
-  test.identical( got, false )
+  test.identical( got, null )
   var files = self.provider.dirRead( dir );
   test.identical( files, [ 'src' ] );
 
@@ -8723,7 +8743,7 @@ function fileRenameSync( test )
       throwing : 0
     });
   });
-  test.identical( got, false );
+  test.identical( got, null );
   var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dir','src' ] );
 
@@ -9807,7 +9827,7 @@ function fileRenameAsync( test )
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function( got )
     {
-      test.identical( got, false );
+      test.identical( got, null );
       return got;
     });
   })
@@ -10108,7 +10128,7 @@ function fileRenameAsync( test )
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function( got )
     {
-      test.identical( got, false )
+      test.identical( got, null )
       var files = self.provider.dirRead( dir );
       test.identical( files, [ 'src' ] );
       return got;
@@ -10133,7 +10153,7 @@ function fileRenameAsync( test )
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function( got )
     {
-      test.identical( got, false )
+      test.identical( got, null )
       var files = self.provider.dirRead( dir );
       test.identical( files, [ 'src' ] );
       return got;
@@ -10241,7 +10261,7 @@ function fileRenameAsync( test )
     return test.mustNotThrowError( con )
     .finally( function( err,got )
     {
-      test.identical( got, false );
+      test.identical( got, null );
       var files = self.provider.dirRead( dir );
       test.identical( files, [ 'dir','src' ] );
       return got;

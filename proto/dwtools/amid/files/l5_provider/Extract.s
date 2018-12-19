@@ -611,8 +611,15 @@ function fileWriteAct( o )
 
     if( descriptor === undefined || self._descriptorIsLink( descriptor ) )
     {
-      read = '';
-      writeMode = 'rewrite';
+      if( self._descriptorIsHardLink( descriptor ) )
+      {
+        read = descriptor[ 0 ].data;
+      }
+      else
+      {
+        read = '';
+        writeMode = 'rewrite';
+      }
     }
     else
     {
@@ -1126,16 +1133,19 @@ function hardLinkBreakAct( o )
   let self = this;
   let descriptor = self._descriptorRead( o.filePath );
 
-  xxx
-
   _.assert( self._descriptorIsHardLink( descriptor ) );
 
   // let read = self._descriptorResolve({ descriptor : descriptor });
   // _.assert( self._descriptorIsTerminal( read ) );
 
-  _.arrayRemoveOnce( descriptor.filePath, o.filePath );
+  _.arrayRemoveOnce( descriptor[ 0 ].hardLinks, o.filePath );
 
-  self._descriptorWrite( o.filePath, descriptor.data );
+  self._descriptorWrite
+  ({
+    filePath : o.filePath,
+    data : descriptor.data,
+    breakingHardLink : true
+  });
 
   if( !o.sync )
   return new _.Consequence().take( null );
@@ -2020,7 +2030,7 @@ function _descriptorIsLink( file )
     file = file[ 0 ];
   }
   _.assert( !!file );
-  return !!( file.hardLink || file.softLink );
+  return !!( file.hardLinks || file.softLink );
 }
 
 //
@@ -2114,7 +2124,25 @@ function _descriptorWrite( o )
 
   let result;
 
-  if( self._descriptorIsHardLink( file ) )
+  if( self._descriptorIsSoftLink( file ) )
+  {
+    let filePath = o.filePath;
+    o.filePath = self.pathResolveLinkFull
+    ({
+      filePath : o.filePath,
+      allowingMissed : 1,
+      allowingCycled : 0,
+      resolvingSoftLink : 1,
+      resolvingTextLink : 0,
+      preservingRelative : 0,
+      throwing : 1
+    })
+
+    if( o.filePath !== filePath )
+    file = self._descriptorRead( filePath );
+  }
+
+  if( !o.breakingHardLink && self._descriptorIsHardLink( file ) )
   {
     result = file[ 0 ].data = o.data;
   }
@@ -2158,7 +2186,8 @@ _descriptorWrite.defaults =
   filePath : null,
   filesTree : null,
   data : null,
-  upToken : [ './', '/' ]
+  upToken : [ './', '/' ],
+  breakingHardLink : false
 }
 
 //

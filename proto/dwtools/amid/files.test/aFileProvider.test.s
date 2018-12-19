@@ -28861,6 +28861,52 @@ function filesAreHardLinked( test )
 
 //
 
+function filesAreTextLinked( test )
+{
+  let self = this;
+
+  let workDir = self.pathFor( 'written/filesAreTextLinked' )
+  let filePath1 = self.pathFor( 'written/filesAreTextLinked/file1' );
+  let filePath2 = self.pathFor( 'written/filesAreTextLinked/file2' );
+  let linkPath1 = self.pathFor( 'written/filesAreTextLinked/link1' );
+  let linkPath2 = self.pathFor( 'written/filesAreTextLinked/link2' );
+
+  /*
+    resolvingTextLink is always on
+
+    options :
+    filePath - array with paths
+    resolvingSoftLink : 0/1
+
+    kind of file : missing, terminal, dir, link( soft, hard, text ), chain of links
+    combine this kinds of file to create test cases
+  */
+
+  test.case = 'missing,missing';
+  self.provider.filesDelete( workDir );
+  var got = self.provider.filesAreTextLinked({ filePath : [ filePath1, filePath2 ], resolvingSoftLink : 0 });
+  test.identical( got, false );
+
+  test.case = 'missing,missing';
+  self.provider.filesDelete( workDir );
+  var got = self.provider.filesAreTextLinked({ filePath : [ filePath1, filePath2 ], resolvingSoftLink : 1 });
+  test.identical( got, false );
+
+  test.case = 'missing,terminal';
+  self.provider.filesDelete( workDir );
+  self.provider.fileWrite( filePath2, filePath2 );
+  var got = self.provider.filesAreTextLinked({ filePath : [ filePath1, filePath2 ], resolvingSoftLink : 0 });
+  test.identical( got, false );
+
+  test.case = 'missing,terminal';
+  self.provider.filesDelete( workDir );
+  self.provider.fileWrite( filePath2, filePath2 );
+  var got = self.provider.filesAreTextLinked({ filePath : [ filePath1, filePath2 ], resolvingSoftLink : 1 });
+  test.identical( got, false );
+}
+
+//
+
 function filesAreSame( test )
 {
   var self = this;
@@ -32924,6 +32970,7 @@ var Self =
     isLink : isLink,
 
     filesAreHardLinked : filesAreHardLinked,
+    filesAreTextLinked : filesAreTextLinked,
     filesAreSame : filesAreSame,
 
     filesSize : filesSize,

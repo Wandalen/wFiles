@@ -851,8 +851,8 @@ function pathResolveLinkFull_body( o )
       return result;
     }
 
-    if( o.resolvingSoftLink )
-    debugger;
+    // if( o.resolvingSoftLink )
+    // debugger;
 
     if( o.resolvingHeadDirect )
     {
@@ -876,8 +876,8 @@ function pathResolveLinkFull_body( o )
 
     }
 
-    if( o.resolvingSoftLink )
-    debugger;
+    // if( o.resolvingSoftLink )
+    // debugger;
 
     if( result )
     {
@@ -957,7 +957,7 @@ defaults.stat = null;
 defaults.sync = null;
 defaults.resolvingHeadDirect = 1;
 defaults.resolvingHeadReverse = 1;
-defaults.preservingRelative = 1;
+defaults.preservingRelative = 0;
 
 //
 
@@ -1027,7 +1027,7 @@ _.routineExtend( pathResolveLinkTail_body, _pathResolveLink );
 
 var defaults = pathResolveLinkTail_body.defaults;
 defaults.stat = null;
-defaults.preservingRelative = 1;
+defaults.preservingRelative = 0;
 
 //
 

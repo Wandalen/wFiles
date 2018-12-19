@@ -32494,7 +32494,8 @@ function fileCopyExperiment( test )
   let dstPath = self.provider.path.join( workDir, 'dst' );
 
   /*
-    src,dst - both are self soft links
+
+    src, dst - both are self soft links
 
     1. dstPath fails to resolve, dstStat is null, dstPath is not changed because allowingMissed is 1 by default
     2. verifyDst is called because fileExists check gives true

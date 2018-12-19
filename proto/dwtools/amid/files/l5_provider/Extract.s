@@ -97,6 +97,41 @@ function pathResolveSoftLinkAct( o )
 
 _.routineExtend( pathResolveSoftLinkAct, Parent.prototype.pathResolveSoftLinkAct )
 
+//
+
+function pathResolveTextLinkAct( o )
+{
+  let self = this;
+  let filePath = o.filePath;
+
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( self.path.isAbsolute( o.filePath ) );
+
+  let file = self._descriptorRead( o.filePath );
+
+  if( !_.definedIs( file ) )
+  return false;
+  if( !self._descriptorIsTerminal( file ) )
+  return false;
+  if( _.numberIs( file ) )
+  return false;
+
+  if( _.bufferRawIs( file ) || _.bufferTypedIs( file ) )
+  file = _.bufferToStr( file );
+
+  _.assert( _.strIs( file ) );
+
+  let regexp = /link ([^\n]+)\n?$/;
+  let m = file.match( regexp );
+
+  if( m )
+  return m[ 1 ];
+  else
+  return false;
+}
+
+_.routineExtend( pathResolveTextLinkAct, Parent.prototype.pathResolveTextLinkAct )
+
 // --
 // read
 // --
@@ -398,11 +433,18 @@ function statReadAct( o )
       else
       result.size = d.byteLength;
       _.assert( result.size >= 0 );
+
+      if( self._descriptorIsTextLink( d ) )
+      result.isTextLink = returnTrue;
     }
     else if( self._descriptorIsSoftLink( d ) )
     {
       result.isSymbolicLink = returnTrue;
       result.isSoftLink = returnTrue;
+    }
+    else if( self._descriptorIsHardLink( d ) )
+    {
+      result.isHardLink = returnTrue;
     }
     else if( self._descriptorIsScript( d ) )
     {
@@ -1991,6 +2033,18 @@ function _descriptorIsHardLink( file )
 
 //
 
+function _descriptorIsTextLink( file )
+{
+  let regexp = /link ([^\n]+)\n?$/;
+
+  if( _.strIs( file ) )
+  return file.match( regexp );
+  else if( _.bufferRawIs( file ) || _.bufferTypedIs( file ) )
+  return _.bufferToStr( file ).match( regexp );
+}
+
+//
+
 function _descriptorIsScript( file )
 {
   if( !_.arrayIs( file ) )
@@ -2365,6 +2419,7 @@ let Statics =
   _descriptorIsLink,
   _descriptorIsSoftLink,
   _descriptorIsHardLink,
+  _descriptorIsTextLink,
 
   _descriptorScriptMake,
   _descriptorSoftLinkMake,
@@ -2387,6 +2442,7 @@ let Proto =
 
   pathCurrentAct,
   pathResolveSoftLinkAct,
+  pathResolveTextLinkAct,
 
   // read
 

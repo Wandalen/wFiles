@@ -860,7 +860,7 @@ function fileRenameAct( o )
     throw _.err( 'Destination path', _.strQuote( o.dstPath ), 'already exist!' );
 
     dstDir[ dstName ] = srcDir[ srcName ];
-    delete dstDir[ srcName ];
+    delete srcDir[ srcName ];
 
     if( dstDir !== srcDir )
     {

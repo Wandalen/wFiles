@@ -907,6 +907,7 @@ function fileCopyAct( o )
 
     _.assert( self.isTerminal( o.srcPath ), () => _.strQuote( o.srcPath ), 'is not terminal' );
 
+    if( dstStat )
     if( o.breakingDstHardLink && dstStat.isHardLink() )
     self.hardLinkBreak({ filePath : o.dstPath, sync : 1 });
 
@@ -2107,19 +2108,29 @@ function _descriptorWrite( o )
   _.routineOptions( _descriptorWrite, o );
   _.assert( arguments.length === 1 || arguments.length === 2 );
 
-  let willBeCreated = self._descriptorRead( o.filePath ) === undefined;
-
-  let optionsSelect = Object.create( null );
-
-  optionsSelect.setting = 1;
-  optionsSelect.set = o.data;
-  optionsSelect.query = o.filePath;
-  optionsSelect.container = o.filesTree;
-  optionsSelect.upToken = o.upToken;
-  optionsSelect.usingIndexedAccessToMap = 0;
-
+  let file = self._descriptorRead( o.filePath );
+  let willBeCreated = file === undefined;
   let time = _.timeNow();
-  let result = _.select( optionsSelect );
+
+  let result;
+
+  if( self._descriptorIsHardLink( file ) )
+  {
+    result = file[ 0 ].data = o.data;
+  }
+  else
+  {
+    let optionsSelect = Object.create( null );
+
+    optionsSelect.setting = 1;
+    optionsSelect.set = o.data;
+    optionsSelect.query = o.filePath;
+    optionsSelect.container = o.filesTree;
+    optionsSelect.upToken = o.upToken;
+    optionsSelect.usingIndexedAccessToMap = 0;
+
+    result = _.select( optionsSelect );
+  }
 
   o.filePath = self.path.join( '/', o.filePath );
 

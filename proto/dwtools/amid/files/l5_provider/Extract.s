@@ -611,8 +611,15 @@ function fileWriteAct( o )
 
     if( descriptor === undefined || self._descriptorIsLink( descriptor ) )
     {
-      read = '';
-      writeMode = 'rewrite';
+      if( self._descriptorIsHardLink( descriptor ) )
+      {
+        read = descriptor[ 0 ].data;
+      }
+      else
+      {
+        read = '';
+        writeMode = 'rewrite';
+      }
     }
     else
     {
@@ -853,7 +860,7 @@ function fileRenameAct( o )
     throw _.err( 'Destination path', _.strQuote( o.dstPath ), 'already exist!' );
 
     dstDir[ dstName ] = srcDir[ srcName ];
-    delete dstDir[ srcName ];
+    delete srcDir[ srcName ];
 
     if( dstDir !== srcDir )
     {
@@ -907,6 +914,7 @@ function fileCopyAct( o )
 
     _.assert( self.isTerminal( o.srcPath ), () => _.strQuote( o.srcPath ), 'is not terminal' );
 
+    if( dstStat )
     if( o.breakingDstHardLink && dstStat.isHardLink() )
     self.hardLinkBreak({ filePath : o.dstPath, sync : 1 });
 
@@ -1125,16 +1133,19 @@ function hardLinkBreakAct( o )
   let self = this;
   let descriptor = self._descriptorRead( o.filePath );
 
-  xxx
-
   _.assert( self._descriptorIsHardLink( descriptor ) );
 
   // let read = self._descriptorResolve({ descriptor : descriptor });
   // _.assert( self._descriptorIsTerminal( read ) );
 
-  _.arrayRemoveOnce( descriptor.filePath, o.filePath );
+  _.arrayRemoveOnce( descriptor[ 0 ].hardLinks, o.filePath );
 
-  self._descriptorWrite( o.filePath, descriptor.data );
+  self._descriptorWrite
+  ({
+    filePath : o.filePath,
+    data : descriptor.data,
+    breakingHardLink : true
+  });
 
   if( !o.sync )
   return new _.Consequence().take( null );
@@ -2019,7 +2030,7 @@ function _descriptorIsLink( file )
     file = file[ 0 ];
   }
   _.assert( !!file );
-  return !!( file.hardLink || file.softLink );
+  return !!( file.hardLinks || file.softLink );
 }
 
 //
@@ -2107,19 +2118,47 @@ function _descriptorWrite( o )
   _.routineOptions( _descriptorWrite, o );
   _.assert( arguments.length === 1 || arguments.length === 2 );
 
-  let willBeCreated = self._descriptorRead( o.filePath ) === undefined;
-
-  let optionsSelect = Object.create( null );
-
-  optionsSelect.setting = 1;
-  optionsSelect.set = o.data;
-  optionsSelect.query = o.filePath;
-  optionsSelect.container = o.filesTree;
-  optionsSelect.upToken = o.upToken;
-  optionsSelect.usingIndexedAccessToMap = 0;
-
+  let file = self._descriptorRead( o.filePath );
+  let willBeCreated = file === undefined;
   let time = _.timeNow();
-  let result = _.select( optionsSelect );
+
+  let result;
+
+  if( self._descriptorIsSoftLink( file ) )
+  {
+    let filePath = o.filePath;
+    o.filePath = self.pathResolveLinkFull
+    ({
+      filePath : o.filePath,
+      allowingMissed : 1,
+      allowingCycled : 0,
+      resolvingSoftLink : 1,
+      resolvingTextLink : 0,
+      preservingRelative : 0,
+      throwing : 1
+    })
+
+    if( o.filePath !== filePath )
+    file = self._descriptorRead( filePath );
+  }
+
+  if( !o.breakingHardLink && self._descriptorIsHardLink( file ) )
+  {
+    result = file[ 0 ].data = o.data;
+  }
+  else
+  {
+    let optionsSelect = Object.create( null );
+
+    optionsSelect.setting = 1;
+    optionsSelect.set = o.data;
+    optionsSelect.query = o.filePath;
+    optionsSelect.container = o.filesTree;
+    optionsSelect.upToken = o.upToken;
+    optionsSelect.usingIndexedAccessToMap = 0;
+
+    result = _.select( optionsSelect );
+  }
 
   o.filePath = self.path.join( '/', o.filePath );
 
@@ -2147,7 +2186,8 @@ _descriptorWrite.defaults =
   filePath : null,
   filesTree : null,
   data : null,
-  upToken : [ './', '/' ]
+  upToken : [ './', '/' ],
+  breakingHardLink : false
 }
 
 //

@@ -8058,11 +8058,31 @@ function fileCopyError( test )
     throwing : 1,
     allowingMissed : 0,
   }
-  test.shouldThrowError( () => self.provider.fileCopy( o ) );
+  test.mustNotThrowError( () => self.provider.fileCopy( o ) );
   test.is( self.provider.isSoftLink( srcPath ) );
-  test.is( self.provider.isTerminal( dstPath ) );
+  test.is( self.provider.isSoftLink( dstPath ) );
   test.identical( self.provider.pathResolveSoftLink( srcPath ), missingPath );
-  test.identical( self.provider.fileRead( dstPath ), dstPath );
+  test.identical( self.provider.pathResolveSoftLink( dstPath ), missingPath );
+
+  //
+
+  test.case = 'error on resolve src';
+  self.provider.filesDelete( workDir );
+  self.provider.fileWrite( dstPath, dstPath );
+  self.provider.softLink({ dstPath : srcPath, srcPath : missingPath, allowingMissed : 1 });
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    resolvingSrcSoftLink : 0,
+    throwing : 0,
+    allowingMissed : 0,
+  }
+  test.mustNotThrowError( () => self.provider.fileCopy( o ) );
+  test.is( self.provider.isSoftLink( srcPath ) );
+  test.is( self.provider.isSoftLink( dstPath ) );
+  test.identical( self.provider.pathResolveSoftLink( srcPath ), missingPath );
+  test.identical( self.provider.pathResolveSoftLink( dstPath ), missingPath );
 
   //
 

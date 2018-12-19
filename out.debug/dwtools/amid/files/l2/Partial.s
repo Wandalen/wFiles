@@ -6095,12 +6095,11 @@ function _textLinkVerify2( c )
 {
   let self = this;
   let o = c.options;
-  // qqq : test filesAreTextLinked
+  // qqq : cover filesAreTextLinked
   if( o.dstPath !== o.srcPath && self.filesAreTextLinked([ o.dstPath, o.srcPath ]) )
   debugger;
   if( o.dstPath !== o.srcPath && self.filesAreTextLinked([ o.dstPath, o.srcPath ]) )
   c.end( true );
-  // return true;
 }
 
 let textLink = _link_functor

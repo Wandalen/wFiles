@@ -18181,8 +18181,6 @@ function softLinkActSync( test )
   }
 
   var expected = _.mapExtend( null, o );
-  expected.srcPath = self.provider.path.nativize( o.srcPath );
-  expected.dstPath = self.provider.path.nativize( o.dstPath );
   if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   if( process.platform === 'win32' )
   expected.type = 'file'

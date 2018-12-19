@@ -9827,7 +9827,7 @@ function fileRenameAsync( test )
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function( got )
     {
-      test.identical( got, false );
+      test.identical( got, null );
       return got;
     });
   })
@@ -10128,7 +10128,7 @@ function fileRenameAsync( test )
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function( got )
     {
-      test.identical( got, false )
+      test.identical( got, null )
       var files = self.provider.dirRead( dir );
       test.identical( files, [ 'src' ] );
       return got;
@@ -10153,7 +10153,7 @@ function fileRenameAsync( test )
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function( got )
     {
-      test.identical( got, false )
+      test.identical( got, null )
       var files = self.provider.dirRead( dir );
       test.identical( files, [ 'src' ] );
       return got;
@@ -10261,7 +10261,7 @@ function fileRenameAsync( test )
     return test.mustNotThrowError( con )
     .finally( function( err,got )
     {
-      test.identical( got, false );
+      test.identical( got, null );
       var files = self.provider.dirRead( dir );
       test.identical( files, [ 'dir','src' ] );
       return got;

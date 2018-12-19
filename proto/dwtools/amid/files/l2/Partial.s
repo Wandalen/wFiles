@@ -5014,7 +5014,7 @@ function _link_functor( gen )
         return dstExists;
       });
 
-      con.ifNoErrorThen( _.routineSeal( self, c.linkAct, [ o2 ] ) );
+      con.ifNoErrorThen( _.routineSeal( self, c.linkAct, [ c ] ) );
 
       con.ifNoErrorThen( ( got ) =>
       {

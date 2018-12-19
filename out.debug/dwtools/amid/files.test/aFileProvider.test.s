@@ -12176,6 +12176,8 @@ function statReadActSync( test )
   var mp = _.routineJoin( test.context, test.context.pathFor );
   var dir = mp( 'statReadActSync' );
 
+  self.provider.fieldPush( 'usingTextLink', 1 );
+
   /* - */
 
   test.case = 'regular terminal';
@@ -12206,6 +12208,13 @@ function statReadActSync( test )
   test.is( !stat.isCharacterDevice() );
   test.is( !stat.isFIFO() );
   test.is( !stat.isSocket() );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.nlink, BigInt( 1 ) )
+  else
+  test.identical( stat.nlink, 1 );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.size, BigInt( 5 ) );
+  else
   test.identical( stat.size, 5 );
 
   test.description = 'file2';
@@ -12230,6 +12239,13 @@ function statReadActSync( test )
   test.is( !stat.isCharacterDevice() );
   test.is( !stat.isFIFO() );
   test.is( !stat.isSocket() );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.nlink, BigInt( 1 ) )
+  else
+  test.identical( stat.nlink, 1 );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.size, BigInt( 0 ) );
+  else
   test.identical( stat.size, 0 );
 
   self.provider.filesDelete( dir );
@@ -12264,6 +12280,13 @@ function statReadActSync( test )
   test.is( !stat.isCharacterDevice() );
   test.is( !stat.isFIFO() );
   test.is( !stat.isSocket() );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.nlink, BigInt( 2 ) )
+  else
+  test.identical( stat.nlink, 2 );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.size, BigInt( 5 ) );
+  else
   test.identical( stat.size, 5 );
 
   test.description = 'file2';
@@ -12288,6 +12311,13 @@ function statReadActSync( test )
   test.is( !stat.isCharacterDevice() );
   test.is( !stat.isFIFO() );
   test.is( !stat.isSocket() );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.nlink, BigInt( 2 ) )
+  else
+  test.identical( stat.nlink, 2 );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.size, BigInt( 5 ) );
+  else
   test.identical( stat.size, 5 );
 
   self.provider.filesDelete( dir );
@@ -12322,6 +12352,13 @@ function statReadActSync( test )
   test.is( !stat.isCharacterDevice() );
   test.is( !stat.isFIFO() );
   test.is( !stat.isSocket() );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.nlink, BigInt( 1 ) )
+  else
+  test.identical( stat.nlink, 1 );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.size, BigInt( 5 ) );
+  else
   test.identical( stat.size, 5 );
 
   test.description = 'file2';
@@ -12346,6 +12383,10 @@ function statReadActSync( test )
   test.is( !stat.isCharacterDevice() );
   test.is( !stat.isFIFO() );
   test.is( !stat.isSocket() );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.nlink, BigInt( 1 ) )
+  else
+  test.identical( stat.nlink, 1 );
   // test.identical( stat.size, null );
 
   test.description = 'file2, resolving';
@@ -12370,6 +12411,9 @@ function statReadActSync( test )
   test.is( !stat.isCharacterDevice() );
   test.is( !stat.isFIFO() );
   test.is( !stat.isSocket() );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.size, BigInt( 5 ) );
+  else
   test.identical( stat.size, 5 );
 
   self.provider.filesDelete( dir );
@@ -12404,6 +12448,13 @@ function statReadActSync( test )
   test.is( !stat.isCharacterDevice() );
   test.is( !stat.isFIFO() );
   test.is( !stat.isSocket() );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.nlink, BigInt( 1 ) )
+  else
+  test.identical( stat.nlink, 1 );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.size, BigInt( 5 ) );
+  else
   test.identical( stat.size, 5 );
 
   test.description = 'file2';
@@ -12428,7 +12479,84 @@ function statReadActSync( test )
   test.is( !stat.isCharacterDevice() );
   test.is( !stat.isFIFO() );
   test.is( !stat.isSocket() );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.nlink, BigInt( 1 ) )
+  else
+  test.identical( stat.nlink, 1 );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.size, BigInt( 119 ) );
+  else
   test.identical( stat.size, 27 );
+
+  //
+
+  self.provider.fieldPush( 'usingTextLink', 0 );
+
+  test.description = 'file2, usingTextLink off';
+  var o =
+  {
+    filePath : file2Path,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 0,
+  }
+  var o2 = _.mapExtend( null, o );
+  var stat = self.provider.statReadAct( o );
+  test.identical( o, o2 );
+  test.is( !!stat );
+  test.is( !stat.isDir() );
+  test.is( stat.isTerminal() );
+  test.is( !stat.isTextLink() );
+  test.is( !stat.isSoftLink() );
+  test.is( !stat.isHardLink() );
+  test.is( !stat.isLink() );
+  test.is( !stat.isBlockDevice() );
+  test.is( !stat.isCharacterDevice() );
+  test.is( !stat.isFIFO() );
+  test.is( !stat.isSocket() );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.nlink, BigInt( 1 ) )
+  else
+  test.identical( stat.nlink, 1 );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.size, BigInt( 119 ) );
+  else
+  test.identical( stat.size, 27 );
+
+  test.description = 'file2, resolving, , usingTextLink off';
+  var o =
+  {
+    filePath : file2Path,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 1,
+  }
+  var o2 = _.mapExtend( null, o );
+  var stat = self.provider.statReadAct( o );
+  test.identical( o, o2 );
+  test.is( !!stat );
+  test.is( !stat.isDir() );
+  test.is( stat.isTerminal() );
+  test.is( !stat.isTextLink() );
+  test.is( !stat.isSoftLink() );
+  test.is( !stat.isHardLink() );
+  test.is( !stat.isLink() );
+  test.is( !stat.isBlockDevice() );
+  test.is( !stat.isCharacterDevice() );
+  test.is( !stat.isFIFO() );
+  test.is( !stat.isSocket() );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.nlink, BigInt( 1 ) )
+  else
+  test.identical( stat.nlink, 1 );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.size, BigInt( 119 ) );
+  else
+  test.identical( stat.size, 27 );
+
+  self.provider.fieldPop( 'usingTextLink', 0 );
+
+  //
 
   test.description = 'file2, resolving';
   var o =
@@ -12452,6 +12580,13 @@ function statReadActSync( test )
   test.is( !stat.isCharacterDevice() );
   test.is( !stat.isFIFO() );
   test.is( !stat.isSocket() );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.nlink, BigInt( 1 ) )
+  else
+  test.identical( stat.nlink, 1 );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.size, BigInt( 119 ) );
+  else
   test.identical( stat.size, 27 );
 
   self.provider.filesDelete( dir );
@@ -12486,6 +12621,13 @@ function statReadActSync( test )
   test.is( !stat.isCharacterDevice() );
   test.is( !stat.isFIFO() );
   test.is( !stat.isSocket() );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.nlink, BigInt( 1 ) )
+  else
+  test.identical( stat.nlink, 1 );
+  if( self.provider.UsingBigIntForStat )
+  test.is( stat.size === BigInt( 0 ) || stat.size === null );
+  else
   test.is( stat.size === 0 || stat.size === null );
 
   test.description = 'file2';
@@ -12510,6 +12652,13 @@ function statReadActSync( test )
   test.is( !stat.isCharacterDevice() );
   test.is( !stat.isFIFO() );
   test.is( !stat.isSocket() );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.nlink, BigInt( 1 ) )
+  else
+  test.identical( stat.nlink, 1 );
+  if( self.provider.UsingBigIntForStat )
+  test.is( stat.size === BigInt( 0 ) || stat.size === null );
+  else
   test.is( stat.size === 0 || stat.size === null );
 
   /* - */
@@ -12809,6 +12958,10 @@ function statReadActSync( test )
     self.provider.statReadAct( o );
   })
   test.identical( o.filePath, expected.filePath );
+
+  /*  */
+
+  self.provider.fieldPop( 'usingTextLink', 1 );
 }
 
 //

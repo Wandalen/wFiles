@@ -111,13 +111,16 @@ function pathResolveTextLinkAct( o )
 
   if( !_.definedIs( file ) )
   return false;
-  if( !self._descriptorIsTerminal( file ) )
+  if( self._descriptorIsSoftLink( file ) )
   return false;
   if( _.numberIs( file ) )
   return false;
 
   if( _.bufferRawIs( file ) || _.bufferTypedIs( file ) )
   file = _.bufferToStr( file );
+
+  if( _.arrayIs( file ) )
+  file = file[ 0 ].data;
 
   _.assert( _.strIs( file ) );
 
@@ -584,16 +587,28 @@ function fileWriteAct( o )
 
     if( self._descriptorIsLink( descriptor ) )
     {
-      let resolvedPath = self.pathResolveLinkFull( filePath );
-
+      let resolvedPath = self.pathResolveLinkFull
+      ({
+        filePath : filePath,
+        allowingMissed : 1,
+        allowingCycled : 0,
+        resolvingSoftLink : 1,
+        resolvingTextLink : 0,
+        preservingRelative : 0,
+        throwing : 1
+      })
       descriptor = self._descriptorRead( resolvedPath );
+      filePath = resolvedPath;
 
-      if( !self._descriptorIsLink( descriptor ) )
-      {
-        filePath = resolvedPath;
-        if( descriptor === undefined )
-        throw _.err( 'Link refers to file ->', filePath, 'that doesn`t exist' );
-      }
+      //descriptor should be missing/text/hard/terminal
+      _.assert( descriptor === undefined || self._descriptorIsTerminal( descriptor ) || self._descriptorIsHardLink( descriptor )  );
+
+      // if( !self._descriptorIsLink( descriptor ) )
+      // {
+      //   filePath = resolvedPath;
+      //   if( descriptor === undefined )
+      //   throw _.err( 'Link refers to file ->', filePath, 'that doesn`t exist' );
+      // }
     }
 
     // let dstName = self.path.name({ path : filePath, withExtension : 1 });
@@ -937,6 +952,22 @@ function fileCopyAct( o )
 
     let data = self.fileRead({ filePath : o.srcPath, encoding : 'original.type', sync : 1, resolvingTextLink : 0 });
     _.assert( data !== null && data !== undefined );
+
+    if( dstStat )
+    if( dstStat.isSoftLink() )
+    {
+      o.dstPath = self.pathResolveLinkFull
+      ({
+        filePath : o.dstPath,
+        allowingMissed : 1,
+        allowingCycled : 0,
+        resolvingSoftLink : 1,
+        resolvingTextLink : 0,
+        preservingRelative : 0,
+        throwing : 1
+      })
+    }
+
     self._descriptorWrite( o.dstPath, data );
 
   }
@@ -1088,37 +1119,66 @@ function hardLinkAct( o )
   }
   else
   {
+    let con = new _.Consequence().take( true );
+
     if( o.dstPath === o.srcPath )
-    return new _.Consequence().take( true );
+    return con;
 
-    xxx /* qqq : synchronize wtih sync version, please */
+    /* qqq : synchronize wtih sync version, please */
 
-    return self.statRead({ filePath : o.dstPath, sync : 0 })
-    .finally( ( err, stat ) =>
+    let dstExists = self.fileExists( o.dstPath );
+
+    con.thenKeep( () => self.statRead({ filePath : o.srcPath, sync : 0 }) );
+    con.thenKeep( ( srcStat ) =>
     {
-      if( err )
-      throw _.err( err );
+      if( !srcStat.isTerminal() )
+      throw _.err( o.srcPath, 'is not a terminal file' );
 
-      if( stat )
+      if( dstExists )
       throw _.err( o.dstPath, 'already exists' );
 
-      let file = self._descriptorRead( o.srcPath );
-
-      if( !file )
-      throw _.err( o.srcPath, 'does not exist' );
-
-      // if( !self._descriptorIsLink( file ) )
-      if( !self.isTerminal( o.srcPath ) )
-      throw _.err( o.srcPath, ' is not a terminal file' );
-
-      let dstDir = self._descriptorRead( self.path.dir( o.dstPath ) );
+      let dstDir = self.isDir( self.path.dir( o.dstPath ) );
       if( !dstDir )
-      throw _.err( 'hardLinkAct: dirs structure before', o.dstPath, ' does not exist' );
+      throw _.err( 'Directory for', o.dstPath, 'does not exist' );
 
-      self._descriptorWrite( o.dstPath, self._descriptorHardLinkMake( o.srcPath ) );
+      let srcDescriptor = self._descriptorRead( o.srcPath );
+      let descriptor = self._descriptorHardLinkMake( [ o.dstPath, o.srcPath ], srcDescriptor );
+      if( srcDescriptor !== descriptor )
+      self._descriptorWrite( o.srcPath, descriptor );
+      self._descriptorWrite( o.dstPath, descriptor );
 
       return true;
     })
+
+    return con;
+
+
+    // return self.statRead({ filePath : o.dstPath, sync : 0 })
+    // .finally( ( err, stat ) =>
+    // {
+    //   if( err )
+    //   throw _.err( err );
+
+    //   if( stat )
+    //   throw _.err( o.dstPath, 'already exists' );
+
+    //   let file = self._descriptorRead( o.srcPath );
+
+    //   if( !file )
+    //   throw _.err( o.srcPath, 'does not exist' );
+
+    //   // if( !self._descriptorIsLink( file ) )
+    //   if( !self.isTerminal( o.srcPath ) )
+    //   throw _.err( o.srcPath, ' is not a terminal file' );
+
+    //   let dstDir = self._descriptorRead( self.path.dir( o.dstPath ) );
+    //   if( !dstDir )
+    //   throw _.err( 'hardLinkAct: dirs structure before', o.dstPath, ' does not exist' );
+
+    //   self._descriptorWrite( o.dstPath, self._descriptorHardLinkMake( o.srcPath ) );
+
+    //   return true;
+    // })
   }
 }
 
@@ -1177,7 +1237,7 @@ function filesAreHardLinkedAct( ins1Path, ins2Path )
 
   _.assert
   (
-    !_.arrayHas( descriptor1.hardLinks, ins2Path ),
+    !_.arrayHas( descriptor1[ 0 ].hardLinks, ins2Path ),
     'Hardlinked files are desynchronized, two hardlinked files should share the same descriptor, but those do not :',
     '\n', ins1Path,
     '\n', ins2Path
@@ -2123,24 +2183,6 @@ function _descriptorWrite( o )
   let time = _.timeNow();
 
   let result;
-
-  if( self._descriptorIsSoftLink( file ) )
-  {
-    let filePath = o.filePath;
-    o.filePath = self.pathResolveLinkFull
-    ({
-      filePath : o.filePath,
-      allowingMissed : 1,
-      allowingCycled : 0,
-      resolvingSoftLink : 1,
-      resolvingTextLink : 0,
-      preservingRelative : 0,
-      throwing : 1
-    })
-
-    if( o.filePath !== filePath )
-    file = self._descriptorRead( filePath );
-  }
 
   if( !o.breakingHardLink && self._descriptorIsHardLink( file ) )
   {

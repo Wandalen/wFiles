@@ -3850,7 +3850,7 @@ function fileCopySync( test )
       throwing : 0
     });
   });
-  test.identical( got, false );
+  test.identical( got, null );
   var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dst.txt', 'src.txt' ] );
 
@@ -6310,7 +6310,7 @@ function fileCopyAsync( test )
     return test.mustNotThrowError( con )
     .ifNoErrorThen( function( got )
     {
-      test.identical( got, false );
+      test.identical( got, null );
       var files = self.provider.dirRead( dir );
       test.identical( files, [ 'dst.txt', 'src.txt' ] );
       return null;
@@ -6482,7 +6482,7 @@ function fileCopyAsync( test )
     })
     .finally( ( err, got ) =>
     {
-      test.identical( got, false );
+      test.identical( got, null );
       var srcStat = self.provider.statResolvedRead( srcPath );
       var dstNow = self.provider.fileRead( dstPath );
       test.is( srcStat.isDirectory() );
@@ -6516,7 +6516,7 @@ function fileCopyAsync( test )
     })
     .finally( ( err, got ) =>
     {
-      test.identical( got, false );
+      test.identical( got, null );
       var srcStat = self.provider.statResolvedRead( srcPath );
       var dstNow = self.provider.fileRead( dstPath );
       test.is( srcStat.isDirectory() );

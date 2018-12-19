@@ -5751,7 +5751,7 @@ function _fileCopyAct( c )
     });
     debugger;
 
-    self.softLinkAct
+    return self.softLinkAct
     ({
       dstPath : o.dstPath,
       srcPath : srcResolvedPath,
@@ -5765,7 +5765,7 @@ function _fileCopyAct( c )
   else
   {
 
-    self.fileCopyAct
+    return self.fileCopyAct
     ({
       dstPath : o.dstPath,
       srcPath : o.srcPath,
@@ -5777,7 +5777,7 @@ function _fileCopyAct( c )
 
   }
 
-  return c;
+  // return c;
 }
 
 _.routineExtend( _fileCopyAct, fileCopyAct );

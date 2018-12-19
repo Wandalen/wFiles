@@ -22218,9 +22218,10 @@ function hardLinkAsync( test )
     return test.shouldThrowError( con )
     .finally( () =>
     {
-      test.identical( self.provider.filesAreHardLinked( paths ), null );
-      test.is( !self.provider.fileExists( path[ 1 ] ) );
-      test.is( !self.provider.fileExists( path[ 2 ] ) );
+      test.identical( self.provider.filesAreHardLinked( paths ), false );
+      test.is( self.provider.fileExists( paths[ 0 ] ) );
+      test.is( !self.provider.fileExists( paths[ 1 ] ) );
+      test.is( !self.provider.fileExists( paths[ 2 ] ) );
       return null;
     })
   })
@@ -22233,7 +22234,6 @@ function hardLinkAsync( test )
     var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
     self.provider.filesDelete( test.context.pathFor( currentTestDir ) );
     var paths = fileNames.map( ( n )  => self.pathFor( _.path.join( currentTestDir, n ) ) );
-    debugger
     var con = self.provider.hardLink
     ({
       sync : 0,

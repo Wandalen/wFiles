@@ -4865,11 +4865,11 @@ function _link_functor( gen )
     c.options = o;
     c.options2 = undefined;
 
-    c.verify1 = verify1;
-    c.verify2 = verify2;
+    c.verify1 = o.sync ? verify1 : verify1Async;
+    c.verify2 = o.sync ? verify2 : verify2Async;
     c.verifyDst = o.sync ? verifyDstSync : verifyDstAsync;
-    c.pathResolve = pathResolve;
-    c.linksResolve = linksResolve;
+    c.pathResolve = o.sync ? pathResolve : pathResolveAsync;
+    c.linksResolve = o.sync ? linksResolve : linksResolveAsync;
     c.log = log;
     c.tempRenameCan = tempRenameCan;
     c.tempRename = o.sync ? tempRenameSync : tempRenameAsync;
@@ -4879,36 +4879,42 @@ function _link_functor( gen )
     c.error = error;
     c.end = end;
 
+    if( !o.sync )
+    {
+      c.con1 = new _.Consequence().take( null );
+      c.con2 = new _.Consequence();
+    }
+
     Object.preventExtensions( c );
 
-    /* - */
-
-    c.verify1( arguments );
-    if( c.ended )
-    return c.end();
-
-    if( _.longIs( o.dstPath ) && c.linkAct.having.hardLinking ) /* qqq : _linkMultiple should work not only for hardlinks */
-    return _linkMultiple.call( self, o, _link_body );
-    _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
-
-    var r = c.pathResolve();
-    if( c.ended )
-    return c.end();
-
-    var r = c.linksResolve();
-    if( c.ended )
-    return c.end();
-
-    c.verify2();
-    if( c.ended )
-    return c.end();
-
-    let o2 = c.options2 = _.mapOnly( o, c.linkAct.defaults );
+    let o2;
 
     /* */
 
     if( o.sync )
     {
+
+      c.verify1( arguments );
+      if( c.ended )
+      return c.end();
+
+      if( _.longIs( o.dstPath ) && c.linkAct.having.hardLinking ) /* qqq : _linkMultiple should work not only for hardlinks */
+      return _linkMultiple.call( self, o, _link_body );
+      _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
+
+      var r = c.pathResolve();
+      if( c.ended )
+      return c.end();
+
+      var r = c.linksResolve();
+      if( c.ended )
+      return c.end();
+
+      c.verify2();
+      if( c.ended )
+      return c.end();
+
+      o2 = c.options2 = _.mapOnly( o, c.linkAct.defaults );
 
       try
       {
@@ -4948,13 +4954,11 @@ function _link_functor( gen )
     }
     else /* async */
     {
-      let con = new _.Consequence().take( null )
 
-      // if( onRanameBegin )
-      // con.ifNoErrorThen( _.routineSeal( self,onRanameBegin, [ c ] ) );
+      /* main part */
 
-      con.ifNoErrorThen( _.routineSeal( self,self.fileExists, [ o2.dstPath ] ) );
-      con.ifNoErrorThen( ( dstExists ) =>
+      c.con2.ifNoErrorThen( () => self.fileExists( o2.dstPath ) );
+      c.con2.ifNoErrorThen( ( dstExists ) =>
       {
         if( dstExists )
         {
@@ -4967,23 +4971,23 @@ function _link_functor( gen )
         return dstExists;
       });
 
-      con.ifNoErrorThen( _.routineSeal( self, c.linkAct, [ c ] ) );
+      c.con2.ifNoErrorThen( _.routineSeal( self, c.linkAct, [ c ] ) );
 
-      con.ifNoErrorThen( ( got ) =>
+      c.con2.ifNoErrorThen( ( got ) =>
       {
         log();
         if( c.tempPath )
         return self.filesDelete({ filePath : c.tempPath, verbosity : 0 });
         return got;
       });
-      con.ifNoErrorThen( () =>
+      c.con2.ifNoErrorThen( () =>
       {
         c.tempPath = null;
         validateSize();
         return true;
       });
 
-      con.except( ( err ) =>
+      c.con2.except( ( err ) =>
       {
         return tempRenameBackAsync()
         .finally( () =>
@@ -4993,7 +4997,37 @@ function _link_functor( gen )
         })
       })
 
-      return con;
+      /* launcher */
+
+      c.verify1( arguments );
+
+      c.con1.thenKeep( () =>
+      {
+        if( _.longIs( o.dstPath ) && c.linkAct.having.hardLinking ) /* qqq : _linkMultiple should work not only for hardlinks */
+        {
+          c.result = _linkMultiple.call( self, o, _link_body );
+          return true;
+        }
+        _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
+
+        c.pathResolve();
+        c.linksResolve();
+        c.verify2();
+
+        return true;
+      })
+
+      c.con1.thenKeep( () =>
+      {
+        if( c.result ) //return result if ended early
+        return c.result;
+        //prepare options map and launch main part
+        o2 = c.options2 = _.mapOnly( o, c.linkAct.defaults );
+        c.con2.take( null );
+        return c.con2;
+      })
+
+      return c.con1;
     }
 
     /* - */
@@ -5019,6 +5053,15 @@ function _link_functor( gen )
       // if( onVerify1.call( self, c ) )
       // return true;
 
+    }
+
+    function verify1Async( args )
+    {
+      c.con1.thenKeep( () =>
+      {
+        verify1( args );
+        return true;
+      })
     }
 
     /* - */
@@ -5080,6 +5123,15 @@ function _link_functor( gen )
 
       return false;
     }
+
+    function verify2Async()
+    {
+      c.con1.thenKeep( () =>
+      {
+        return verify2()
+      });
+    }
+
 
     /* - */
 
@@ -5154,6 +5206,15 @@ function _link_functor( gen )
 
     }
 
+    function pathResolveAsync()
+    {
+      c.con1.thenKeep( () =>
+      {
+        pathResolve();
+        return true;
+      })
+    }
+
     /* - */
 
     function linksResolve()
@@ -5211,6 +5272,72 @@ function _link_functor( gen )
         c.error( err );
       }
 
+    }
+
+    function linksResolveAsync()
+    {
+
+      c.con1.thenKeep( () =>
+      {
+        _.assert( path.isAbsolute( o.srcPath ) );
+        _.assert( path.isAbsolute( o.dstPath ) );
+
+        if( o.resolvingDstSoftLink || ( o.resolvingDstTextLink && self.usingTextLink ) )
+        {
+          let o2 =
+          {
+            filePath : o.dstPath,
+            resolvingSoftLink : o.resolvingDstSoftLink,
+            resolvingTextLink : o.resolvingDstTextLink,
+            sync : 0,
+            allowingCycled : 1,
+            allowingMissed : 1,
+          }
+          return self.pathResolveLinkFull( o2 ).thenKeep( ( dstPath ) =>
+          {
+            o.dstPath = dstPath;
+            c.dstStat = o2.stat;
+            return true;
+          })
+        }
+
+        return true;
+      })
+
+      /* */
+
+      c.con1.thenKeep( () =>
+      {
+        if( o.resolvingSrcSoftLink || ( o.resolvingSrcTextLink && self.usingTextLink ) )
+        {
+          let o2 =
+          {
+            filePath : o.srcPath,
+            resolvingSoftLink : o.resolvingSrcSoftLink,
+            resolvingTextLink : o.resolvingSrcTextLink,
+            allowingCycled : o.allowingCycled,
+            allowingMissed : o.allowingMissed,
+            sync : 0,
+            throwing : o.throwing
+          }
+          return self.pathResolveLinkFull( o2 )
+          .thenKeep( ( srcPath ) =>
+          {
+            o.srcPath = srcPath;
+            c.srcStat = o2.stat;
+            return true;
+          })
+        }
+        else
+        {
+          return self.statRead({ filePath : o.srcPath, sync : 0 })
+          .thenKeep( ( srcStat ) =>
+          {
+            c.srcStat = srcStat;
+            return true;
+          })
+        }
+      })
     }
 
     /* - */

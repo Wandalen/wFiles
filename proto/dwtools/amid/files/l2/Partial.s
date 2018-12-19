@@ -5019,7 +5019,7 @@ function _link_functor( gen )
 
       c.con1.thenKeep( () =>
       {
-        if( c.result ) //return result if ended early
+        if( c.result !== undefined ) //return result if ended early
         return c.result;
         //prepare options map and launch main part
         o2 = c.options2 = _.mapOnly( o, c.linkAct.defaults );

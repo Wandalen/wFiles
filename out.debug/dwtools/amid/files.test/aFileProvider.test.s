@@ -12176,7 +12176,343 @@ function statReadActSync( test )
   var mp = _.routineJoin( test.context, test.context.pathFor );
   var dir = mp( 'statReadActSync' );
 
-  //
+  /* - */
+
+  test.case = 'regular terminal';
+  var file1Path = _.path.join( dir, 'file1' );
+  var file2Path = _.path.join( dir, 'file2' );
+  self.provider.fileWrite( file1Path, 'file1' );
+  self.provider.fileWrite( file2Path, '' );
+
+  test.description = 'file1';
+  var o =
+  {
+    filePath : file1Path,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 0,
+  }
+  var o2 = _.mapExtend( null, o );
+  var stat = self.provider.statReadAct( o );
+  test.identical( o, o2 );
+  test.is( !!stat );
+  test.is( !stat.isDir() );
+  test.is( stat.isTerminal() );
+  test.is( !stat.isTextLink() );
+  test.is( !stat.isSoftLink() );
+  test.is( !stat.isHardLink() );
+  test.is( !stat.isLink() );
+  test.is( !stat.isBlockDevice() );
+  test.is( !stat.isCharacterDevice() );
+  test.is( !stat.isFIFO() );
+  test.is( !stat.isSocket() );
+  test.identical( stat.size, 5 );
+
+  test.description = 'file2';
+  var o =
+  {
+    filePath : file2Path,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 0,
+  }
+  var o2 = _.mapExtend( null, o );
+  var stat = self.provider.statReadAct( o );
+  test.identical( o, o2 );
+  test.is( !!stat );
+  test.is( !stat.isDir() );
+  test.is( stat.isTerminal() );
+  test.is( !stat.isTextLink() );
+  test.is( !stat.isSoftLink() );
+  test.is( !stat.isHardLink() );
+  test.is( !stat.isLink() );
+  test.is( !stat.isBlockDevice() );
+  test.is( !stat.isCharacterDevice() );
+  test.is( !stat.isFIFO() );
+  test.is( !stat.isSocket() );
+  test.identical( stat.size, 0 );
+
+  self.provider.filesDelete( dir );
+
+  /* - */
+
+  test.case = 'hard link';
+  var file1Path = _.path.join( dir, 'file1' );
+  var file2Path = _.path.join( dir, 'file2' );
+  self.provider.fileWrite( file1Path, 'file1' );
+  self.provider.hardLink( file2Path, file1Path );
+
+  test.description = 'file1';
+  var o =
+  {
+    filePath : file1Path,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 0,
+  }
+  var o2 = _.mapExtend( null, o );
+  var stat = self.provider.statReadAct( o );
+  test.identical( o, o2 );
+  test.is( !!stat );
+  test.is( !stat.isDir() );
+  test.is( stat.isTerminal() );
+  test.is( !stat.isTextLink() );
+  test.is( !stat.isSoftLink() );
+  test.is( stat.isHardLink() );
+  test.is( !stat.isLink() );
+  test.is( !stat.isBlockDevice() );
+  test.is( !stat.isCharacterDevice() );
+  test.is( !stat.isFIFO() );
+  test.is( !stat.isSocket() );
+  test.identical( stat.size, 5 );
+
+  test.description = 'file2';
+  var o =
+  {
+    filePath : file2Path,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 0,
+  }
+  var o2 = _.mapExtend( null, o );
+  var stat = self.provider.statReadAct( o );
+  test.identical( o, o2 );
+  test.is( !!stat );
+  test.is( !stat.isDir() );
+  test.is( stat.isTerminal() );
+  test.is( !stat.isTextLink() );
+  test.is( !stat.isSoftLink() );
+  test.is( stat.isHardLink() );
+  test.is( !stat.isLink() );
+  test.is( !stat.isBlockDevice() );
+  test.is( !stat.isCharacterDevice() );
+  test.is( !stat.isFIFO() );
+  test.is( !stat.isSocket() );
+  test.identical( stat.size, 5 );
+
+  self.provider.filesDelete( dir );
+
+  /* - */
+
+  test.case = 'soft link';
+  var file1Path = _.path.join( dir, 'file1' );
+  var file2Path = _.path.join( dir, 'file2' );
+  self.provider.fileWrite( file1Path, 'file1' );
+  self.provider.softLink( file2Path, file1Path );
+
+  test.description = 'file1';
+  var o =
+  {
+    filePath : file1Path,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 0,
+  }
+  var o2 = _.mapExtend( null, o );
+  var stat = self.provider.statReadAct( o );
+  test.identical( o, o2 );
+  test.is( !!stat );
+  test.is( !stat.isDir() );
+  test.is( stat.isTerminal() );
+  test.is( !stat.isTextLink() );
+  test.is( !stat.isSoftLink() );
+  test.is( !stat.isHardLink() );
+  test.is( !stat.isLink() );
+  test.is( !stat.isBlockDevice() );
+  test.is( !stat.isCharacterDevice() );
+  test.is( !stat.isFIFO() );
+  test.is( !stat.isSocket() );
+  test.identical( stat.size, 5 );
+
+  test.description = 'file2';
+  var o =
+  {
+    filePath : file2Path,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 0,
+  }
+  var o2 = _.mapExtend( null, o );
+  var stat = self.provider.statReadAct( o );
+  test.identical( o, o2 );
+  test.is( !!stat );
+  test.is( !stat.isDir() );
+  test.is( !stat.isTerminal() );
+  test.is( !stat.isTextLink() );
+  test.is( stat.isSoftLink() );
+  test.is( !stat.isHardLink() );
+  test.is( stat.isLink() );
+  test.is( !stat.isBlockDevice() );
+  test.is( !stat.isCharacterDevice() );
+  test.is( !stat.isFIFO() );
+  test.is( !stat.isSocket() );
+  // test.identical( stat.size, null );
+
+  test.description = 'file2, resolving';
+  var o =
+  {
+    filePath : file2Path,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 1,
+  }
+  var o2 = _.mapExtend( null, o );
+  var stat = self.provider.statReadAct( o );
+  test.identical( o, o2 );
+  test.is( !!stat );
+  test.is( !stat.isDir() );
+  test.is( stat.isTerminal() );
+  test.is( !stat.isTextLink() );
+  test.is( !stat.isSoftLink() );
+  test.is( !stat.isHardLink() );
+  test.is( !stat.isLink() );
+  test.is( !stat.isBlockDevice() );
+  test.is( !stat.isCharacterDevice() );
+  test.is( !stat.isFIFO() );
+  test.is( !stat.isSocket() );
+  test.identical( stat.size, 5 );
+
+  self.provider.filesDelete( dir );
+
+  // /* - */
+
+  test.case = 'text link';
+  var file1Path = _.path.join( dir, 'file1' );
+  var file2Path = _.path.join( dir, 'file2' );
+  self.provider.fileWrite( file1Path, 'file1' );
+  self.provider.textLink( file2Path, file1Path );
+
+  test.description = 'file1';
+  var o =
+  {
+    filePath : file1Path,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 0,
+  }
+  var o2 = _.mapExtend( null, o );
+  var stat = self.provider.statReadAct( o );
+  test.identical( o, o2 );
+  test.is( !!stat );
+  test.is( !stat.isDir() );
+  test.is( stat.isTerminal() );
+  test.is( !stat.isTextLink() );
+  test.is( !stat.isSoftLink() );
+  test.is( !stat.isHardLink() );
+  test.is( !stat.isLink() );
+  test.is( !stat.isBlockDevice() );
+  test.is( !stat.isCharacterDevice() );
+  test.is( !stat.isFIFO() );
+  test.is( !stat.isSocket() );
+  test.identical( stat.size, 5 );
+
+  test.description = 'file2';
+  var o =
+  {
+    filePath : file2Path,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 0,
+  }
+  var o2 = _.mapExtend( null, o );
+  var stat = self.provider.statReadAct( o );
+  test.identical( o, o2 );
+  test.is( !!stat );
+  test.is( !stat.isDir() );
+  test.is( stat.isTerminal() );
+  test.is( stat.isTextLink() );
+  test.is( !stat.isSoftLink() );
+  test.is( !stat.isHardLink() );
+  test.is( stat.isLink() );
+  test.is( !stat.isBlockDevice() );
+  test.is( !stat.isCharacterDevice() );
+  test.is( !stat.isFIFO() );
+  test.is( !stat.isSocket() );
+  test.identical( stat.size, 27 );
+
+  test.description = 'file2, resolving';
+  var o =
+  {
+    filePath : file2Path,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 1,
+  }
+  var o2 = _.mapExtend( null, o );
+  var stat = self.provider.statReadAct( o );
+  test.identical( o, o2 );
+  test.is( !!stat );
+  test.is( !stat.isDir() );
+  test.is( stat.isTerminal() );
+  test.is( stat.isTextLink() );
+  test.is( !stat.isSoftLink() );
+  test.is( !stat.isHardLink() );
+  test.is( stat.isLink() );
+  test.is( !stat.isBlockDevice() );
+  test.is( !stat.isCharacterDevice() );
+  test.is( !stat.isFIFO() );
+  test.is( !stat.isSocket() );
+  test.identical( stat.size, 27 );
+
+  self.provider.filesDelete( dir );
+
+  /* - */
+
+  test.case = 'directory';
+  var file1Path = _.path.join( dir, 'file1' );
+  var file2Path = _.path.join( dir, 'file2' );
+  self.provider.dirMake( file1Path );
+  self.provider.dirMake( file2Path );
+
+  test.description = 'file1';
+  var o =
+  {
+    filePath : file1Path,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 0,
+  }
+  var o2 = _.mapExtend( null, o );
+  var stat = self.provider.statReadAct( o );
+  test.identical( o, o2 );
+  test.is( !!stat );
+  test.is( stat.isDir() );
+  test.is( !stat.isTerminal() );
+  test.is( !stat.isTextLink() );
+  test.is( !stat.isSoftLink() );
+  test.is( !stat.isHardLink() );
+  test.is( !stat.isLink() );
+  test.is( !stat.isBlockDevice() );
+  test.is( !stat.isCharacterDevice() );
+  test.is( !stat.isFIFO() );
+  test.is( !stat.isSocket() );
+  test.is( stat.size === 0 || stat.size === null );
+
+  test.description = 'file2';
+  var o =
+  {
+    filePath : file2Path,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 0,
+  }
+  var o2 = _.mapExtend( null, o );
+  var stat = self.provider.statReadAct( o );
+  test.identical( o, o2 );
+  test.is( !!stat );
+  test.is( stat.isDir() );
+  test.is( !stat.isTerminal() );
+  test.is( !stat.isTextLink() );
+  test.is( !stat.isSoftLink() );
+  test.is( !stat.isHardLink() );
+  test.is( !stat.isLink() );
+  test.is( !stat.isBlockDevice() );
+  test.is( !stat.isCharacterDevice() );
+  test.is( !stat.isFIFO() );
+  test.is( !stat.isSocket() );
+  test.is( stat.size === 0 || stat.size === null );
+
+  /* - */
 
   test.case = 'basic usage, should path nativize all paths in options map if needed by its own means';
   var srcPath = _.path.join( dir,'src' );
@@ -12186,7 +12522,7 @@ function statReadActSync( test )
     filePath : srcPath,
     sync : 1,
     throwing : 0,
-    resolvingSoftLink : 1
+    resolvingSoftLink : 1,
   }
   var expected = _.mapExtend( null, o );
   // expected.filePath = self.provider.path.nativize( o.filePath );
@@ -12207,7 +12543,6 @@ function statReadActSync( test )
     resolvingSoftLink : 1
   }
   var expected = _.mapExtend( null, o );
-  // expected.filePath = self.provider.path.nativize( o.filePath );
   var stat = self.provider.statReadAct( o );
   test.identical( o, expected );
   test.is( !stat );
@@ -12225,8 +12560,7 @@ function statReadActSync( test )
     resolvingSoftLink : 1
   }
   var expected = _.mapExtend( null, o );
-  // expected.filePath = self.provider.path.nativize( o.filePath );
-  test.shouldThrowError( () => self.provider.statReadAct( o ) )
+  test.shouldThrowError( () => self.provider.statReadAct( o ) );
   test.identical( o, expected );
   self.provider.filesDelete( dir );
 

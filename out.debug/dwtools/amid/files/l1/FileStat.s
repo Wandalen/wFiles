@@ -223,6 +223,13 @@ function isLink()
   return result;
 }
 
+//
+
+function returnFalse()
+{
+  return false;
+}
+
 // --
 //
 // --
@@ -264,13 +271,14 @@ let Restricts =
   isSoftLink : null,
   isHardLink : null,
 
-  isDirectory : null,
-  isFile : null,
-  isSymbolicLink : null,
-  isBlockDevice : null,
-  isCharacterDevice : null,
-  isFIFO : null,
-  isSocket : null,
+  isDirectory : null, /* alias */
+  isFile : null, /* alias */
+  isSymbolicLink : null, /* alias */
+
+  isBlockDevice : returnFalse,
+  isCharacterDevice : returnFalse,
+  isFIFO : returnFalse,
+  isSocket : returnFalse,
 
   // _checkModeProperty : null,
 
@@ -309,13 +317,14 @@ let Extend =
   isHardLink : null,
   isLink,
 
-  isDirectory : null,
-  isFile : null,
-  isBlockDevice : null,
-  isCharacterDevice : null,
-  isSymbolicLink : null,
-  isFIFO : null,
-  isSocket : null,
+  isDirectory : null, /* alias */
+  isFile : null, /* alias */
+  isSymbolicLink : null, /* alias */
+
+  isBlockDevice : returnFalse,
+  isCharacterDevice : returnFalse,
+  isFIFO : returnFalse,
+  isSocket : returnFalse,
 
   // _checkModeProperty : null,
 

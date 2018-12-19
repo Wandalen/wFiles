@@ -818,10 +818,14 @@ function pathResolveLinkFull_body( o )
 
   function _pathResolveLinkFullSync()
   {
+
     /*
       statRead should be before resolving
       because resolving does not guarantee reading stat
     */
+
+    // if( _.strEnds( o.filePath, '/statReadActSync/src' ) )
+    // debugger;
 
     if( !o.stat )
     o.stat = self.statReadAct
@@ -867,12 +871,12 @@ function pathResolveLinkFull_body( o )
         allowingMissed : o.allowingMissed,
         allowingCycled: o.allowingCycled,
         throwing : o.throwing,
-        stat : o.stat,
+        stat : null,
+        // stat : o.stat,
       }
 
       result = self.pathResolveLinkHeadDirect.body.call( self, o2 );
-
-      o.stat = o2.stat;
+      // o.stat = o2.stat;
 
     }
 

@@ -352,6 +352,7 @@ function statReadAct( o )
   // debugger;
   // if( _.strEnds( o.filePath, '/dst/file' ) )
   // debugger;
+  // logger.log( 'statReadAct', o.filePath, o.resolvingSoftLink );
 
   /* */
 
@@ -373,28 +374,34 @@ function statReadAct( o )
   {
     let result = null;
 
-    if( o.resolvingSoftLink || ( o.resolvingTextLink && self.usingTextLink ) )
+    if( o.resolvingSoftLink )
     {
+      // debugger;
 
       let o2 =
       {
         filePath : filePath,
         resolvingSoftLink : o.resolvingSoftLink,
-        resolvingTextLink : o.resolvingTextLink,
+        resolvingTextLink : 0,
       };
 
       filePath = self.pathResolveLinkFull( o2 );
       _.assert( o2.stat !== undefined );
+
+      if( !o2.stat && o.throwing )
+      throw _.err( 'File', _.strQuote( filePath ), 'doesn`t exist!' );
 
       return o2.stat;
     }
 
     let d = self._descriptorRead( filePath );
 
+    // debugger;
+
     if( !_.definedIs( d ) )
     {
       if( o.throwing )
-      throw _.err( 'Path', _.strQuote( filePath ), 'doesn`t exist!' );
+      throw _.err( 'File', _.strQuote( filePath ), 'doesn`t exist!' );
       return result;
     }
 
@@ -422,20 +429,31 @@ function statReadAct( o )
       result.isDirectory = returnTrue;
       result.isDir = returnTrue;
     }
-    else if( self._descriptorIsTerminal( d ) )
+    else if( self._descriptorIsTerminal( d ) || self._descriptorIsHardLink( d ) )
     {
+      if( self._descriptorIsHardLink( d ) )
+      {
+        d = d[ 0 ].data;
+        result.isHardLink = returnTrue;
+      }
+
       result.isTerminal = returnTrue;
       result.isFile = returnTrue;
+
       if( _.numberIs( d ) )
       result.size = String( d ).length;
       else if( _.strIs( d ) )
       result.size = d.length;
       else
       result.size = d.byteLength;
+
       _.assert( result.size >= 0 );
 
-      if( self._descriptorIsTextLink( d ) )
-      result.isTextLink = returnTrue;
+      result.isTextLink = function isTextLink()
+      {
+        debugger;
+        return self._descriptorIsTextLink( d );
+      }
     }
     else if( self._descriptorIsSoftLink( d ) )
     {
@@ -444,7 +462,8 @@ function statReadAct( o )
     }
     else if( self._descriptorIsHardLink( d ) )
     {
-      result.isHardLink = returnTrue;
+      _.assert( 0 );
+      // result.isHardLink = returnTrue;
     }
     else if( self._descriptorIsScript( d ) )
     {
@@ -2036,11 +2055,10 @@ function _descriptorIsHardLink( file )
 function _descriptorIsTextLink( file )
 {
   let regexp = /link ([^\n]+)\n?$/;
-
-  if( _.strIs( file ) )
-  return file.match( regexp );
-  else if( _.bufferRawIs( file ) || _.bufferTypedIs( file ) )
-  return _.bufferToStr( file ).match( regexp );
+  if( _.bufferRawIs( file ) || _.bufferTypedIs( file ) )
+  file = _.bufferToStr( file )
+  _.assert( _.strIs( file ) );
+  return regexp.test( file );
 }
 
 //

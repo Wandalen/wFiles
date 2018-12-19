@@ -43,6 +43,8 @@ function init( o )
 
   _.instanceInit( record );
 
+  record[ isTransientSymbol ] = null;
+  record[ isActualSymbol ] = null;
   record[ statSymbol ] = 0;
   record[ realSymbol ] = 0;
 
@@ -81,8 +83,7 @@ function form()
   _.assert( record.factory instanceof _.FileRecordFactory, 'Expects instance of { FileRecordFactory }' );
 
   record._pathsForm();
-  record._filterApply();
-
+  // record._filterApply();
   // record._statRead();
   // record._statAnalyze();
 
@@ -213,10 +214,10 @@ function _filterApply()
 
   _.assert( arguments.length === 0 );
 
-  if( record.isTransient === null )
-  record.isTransient = true;
-  if( record.isActual === null )
-  record.isActual = true;
+  if( record[ isTransientSymbol ] === null )
+  record[ isTransientSymbol ] = true;
+  if( record[ isActualSymbol ] === null )
+  record[ isActualSymbol ] = true;
 
   if( f.filter )
   {
@@ -329,49 +330,9 @@ function _statAnalyze()
   _.assert( fileProvider instanceof _.FileProvider.Abstract, 'Expects file provider instance of FileProvider' );
   _.assert( arguments.length === 0 );
 
-  /* */
-
-  // if( record.isTransient === null )
-  // record.isTransient = true;
-  // if( record.isActual === null )
-  // record.isActual = true;
-  //
-  // if( f.filter )
-  // {
-  //   _.assert( f.filter.formed === 5, 'Expects formed filter' );
-  //   f.filter.applyTo( record );
-  // }
-
-  /* */
-
-  // if( f.safe )
-  // {
-  //   if( record.stat )
-  //   if( !path.isSafe( record.absolute, f.safe ) )
-  //   {
-  //     debugger;
-  //     throw path.ErrorNotSafe( 'Making record', record.absolute, f.safe );
-  //   }
-  //   if( record.stat && !record.stat.isTerminal() && !record.stat.isDir() && !record.stat.isSymbolicLink() )
-  //   {
-  //     debugger;
-  //     throw path.ErrorNotSafe( 'Making record. Unknown kind of file', record.absolute, f.safe );
-  //   }
-  // }
-
   record._isSafe();
 
-  /* */
-
   record.factory.fileProvider._recordFormEnd( record );
-
-  // if( f.onRecord )
-  // {
-  //   if( f.onRecord.length )
-  //   debugger;
-  //   _.assert( fileProvider );
-  //   _.routinesCall( f, f.onRecord, [ record ] );
-  // }
 
 }
 
@@ -383,8 +344,8 @@ function reval()
 
   _.assert( arguments.length === 0 );
 
-  // record.isActual = null;
-  // record.isTransient = null;
+  record[ Symbo.for( 'isActual' ) ] = null;
+  record[ Symbo.for( 'isTransient' ) ] = null;
 
   record[ statSymbol ] = 0;
   record[ realSymbol ] = 0;
@@ -424,6 +385,34 @@ function hashRead()
   });
 
   return record.hash;
+}
+
+//
+
+function _isTransientGet()
+{
+  let record = this;
+  let result = record[ isTransientSymbol ];
+  if( result === null )
+  {
+    record._filterApply();
+    result = record[ isTransientSymbol ];
+  }
+  return result;
+}
+
+//
+
+function _isActualGet()
+{
+  let record = this;
+  let result = record[ isActualSymbol ];
+  if( result === null )
+  {
+    record._filterApply();
+    result = record[ isActualSymbol ];
+  }
+  return result;
 }
 
 //
@@ -695,6 +684,8 @@ function statCopier( it )
 
 let statSymbol = Symbol.for( 'stat' );
 let realSymbol = Symbol.for( 'real' );
+let isTransientSymbol = Symbol.for( 'isTransient' );
+let isActualSymbol = Symbol.for( 'isActual' );
 
 let Composes =
 {
@@ -709,8 +700,8 @@ let Composes =
 
   /* */
 
-  isTransient : null,
-  isActual : null,
+  // isTransient : null,
+  // isActual : null,
   hash : null,
 
 }
@@ -796,6 +787,8 @@ let Accessors =
   name : { readOnly : 1 },
   fullName : { readOnly : 1 },
 
+  isTransient : { readOnly : 1 },
+  isActual : { readOnly : 1 },
   isStem : { readOnly : 1 },
   isDir : { readOnly : 1 },
   isTerminal : { readOnly : 1 },
@@ -830,6 +823,8 @@ let Proto =
   changeExt,
   hashRead,
 
+  _isTransientGet,
+  _isActualGet,
   _isStemGet,
   _isDirGet,
   _isTerminalGet,

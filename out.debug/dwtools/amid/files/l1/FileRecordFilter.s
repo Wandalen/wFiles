@@ -1492,28 +1492,28 @@ function _applyToRecordMasks( record )
   {
 
     if( record.isTransient && filter.maskTransientAll )
-    record.isTransient = filter.maskTransientAll.test( relative );
+    record[ isTransientSymbol ] = filter.maskTransientAll.test( relative );
     if( record.isTransient && filter.maskTransientDirectory )
-    record.isTransient = filter.maskTransientDirectory.test( relative );
+    record[ isTransientSymbol ] = filter.maskTransientDirectory.test( relative );
 
     if( record.isActual && filter.maskAll )
-    record.isActual = filter.maskAll.test( relative );
+    record[ isActualSymbol ] = filter.maskAll.test( relative );
     if( record.isActual && filter.maskDirectory )
-    record.isActual = filter.maskDirectory.test( relative );
+    record[ isActualSymbol ] = filter.maskDirectory.test( relative );
 
   }
   else
   {
 
     if( record.isActual && filter.maskAll )
-    record.isActual = filter.maskAll.test( relative );
+    record[ isActualSymbol ] = filter.maskAll.test( relative );
     if( record.isActual && filter.maskTerminal )
-    record.isActual = filter.maskTerminal.test( relative );
+    record[ isActualSymbol ] = filter.maskTerminal.test( relative );
 
     if( record.isTransient && filter.maskTransientAll )
-    record.isTransient = filter.maskTransientAll.test( relative );
+    record[ isTransientSymbol ] = filter.maskTransientAll.test( relative );
     if( record.isTransient && filter.maskTransientTerminal )
-    record.isTransient = filter.maskTransientTerminal.test( relative );
+    record[ isTransientSymbol ] = filter.maskTransientTerminal.test( relative );
 
   }
 
@@ -1557,28 +1557,28 @@ function _applyToRecordTime( record )
     if( filter.notOlder !== null )
     {
       debugger;
-      record.isActual = time >= filter.notOlder;
+      record[ isActualSymbol ] = time >= filter.notOlder;
     }
 
     if( record.isActual === true )
     if( filter.notNewer !== null )
     {
       debugger;
-      record.isActual = time <= filter.notNewer;
+      record[ isActualSymbol ] = time <= filter.notNewer;
     }
 
     if( record.isActual === true )
     if( filter.notOlderAge !== null )
     {
       debugger;
-      record.isActual = _.timeNow() - filter.notOlderAge - time <= 0;
+      record[ isActualSymbol ] = _.timeNow() - filter.notOlderAge - time <= 0;
     }
 
     if( record.isActual === true )
     if( filter.notNewerAge !== null )
     {
       debugger;
-      record.isActual = _.timeNow() - filter.notNewerAge - time >= 0;
+      record[ isActualSymbol ] = _.timeNow() - filter.notNewerAge - time >= 0;
     }
   }
 
@@ -1667,6 +1667,9 @@ function filePathSet( src )
 // --
 // relations
 // --
+
+let isTransientSymbol = Symbol.for( 'isTransient' );
+let isActualSymbol = Symbol.for( 'isActual' );
 
 let MaskNames =
 [

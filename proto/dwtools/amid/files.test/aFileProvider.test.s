@@ -12207,6 +12207,10 @@ function statReadActSync( test )
   test.is( !stat.isFIFO() );
   test.is( !stat.isSocket() );
   if( self.provider.UsingBigIntForStat )
+  test.identical( stat.nlink, BigInt( 1 ) )
+  else
+  test.identical( stat.nlink, 1 );
+  if( self.provider.UsingBigIntForStat )
   test.identical( stat.size, BigInt( 5 ) );
   else
   test.identical( stat.size, 5 );
@@ -12233,6 +12237,10 @@ function statReadActSync( test )
   test.is( !stat.isCharacterDevice() );
   test.is( !stat.isFIFO() );
   test.is( !stat.isSocket() );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.nlink, BigInt( 1 ) )
+  else
+  test.identical( stat.nlink, 1 );
   if( self.provider.UsingBigIntForStat )
   test.identical( stat.size, BigInt( 0 ) );
   else
@@ -12271,6 +12279,10 @@ function statReadActSync( test )
   test.is( !stat.isFIFO() );
   test.is( !stat.isSocket() );
   if( self.provider.UsingBigIntForStat )
+  test.identical( stat.nlink, BigInt( 2 ) )
+  else
+  test.identical( stat.nlink, 2 );
+  if( self.provider.UsingBigIntForStat )
   test.identical( stat.size, BigInt( 5 ) );
   else
   test.identical( stat.size, 5 );
@@ -12297,6 +12309,10 @@ function statReadActSync( test )
   test.is( !stat.isCharacterDevice() );
   test.is( !stat.isFIFO() );
   test.is( !stat.isSocket() );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.nlink, BigInt( 2 ) )
+  else
+  test.identical( stat.nlink, 2 );
   if( self.provider.UsingBigIntForStat )
   test.identical( stat.size, BigInt( 5 ) );
   else
@@ -12335,6 +12351,10 @@ function statReadActSync( test )
   test.is( !stat.isFIFO() );
   test.is( !stat.isSocket() );
   if( self.provider.UsingBigIntForStat )
+  test.identical( stat.nlink, BigInt( 1 ) )
+  else
+  test.identical( stat.nlink, 1 );
+  if( self.provider.UsingBigIntForStat )
   test.identical( stat.size, BigInt( 5 ) );
   else
   test.identical( stat.size, 5 );
@@ -12361,6 +12381,10 @@ function statReadActSync( test )
   test.is( !stat.isCharacterDevice() );
   test.is( !stat.isFIFO() );
   test.is( !stat.isSocket() );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.nlink, BigInt( 1 ) )
+  else
+  test.identical( stat.nlink, 1 );
   // test.identical( stat.size, null );
 
   test.description = 'file2, resolving';
@@ -12423,6 +12447,10 @@ function statReadActSync( test )
   test.is( !stat.isFIFO() );
   test.is( !stat.isSocket() );
   if( self.provider.UsingBigIntForStat )
+  test.identical( stat.nlink, BigInt( 1 ) )
+  else
+  test.identical( stat.nlink, 1 );
+  if( self.provider.UsingBigIntForStat )
   test.identical( stat.size, BigInt( 5 ) );
   else
   test.identical( stat.size, 5 );
@@ -12450,6 +12478,10 @@ function statReadActSync( test )
   test.is( !stat.isFIFO() );
   test.is( !stat.isSocket() );
   if( self.provider.UsingBigIntForStat )
+  test.identical( stat.nlink, BigInt( 1 ) )
+  else
+  test.identical( stat.nlink, 1 );
+  if( self.provider.UsingBigIntForStat )
   test.identical( stat.size, BigInt( 27 ) );
   else
   test.identical( stat.size, 27 );
@@ -12476,6 +12508,10 @@ function statReadActSync( test )
   test.is( !stat.isCharacterDevice() );
   test.is( !stat.isFIFO() );
   test.is( !stat.isSocket() );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.nlink, BigInt( 1 ) )
+  else
+  test.identical( stat.nlink, 1 );
   if( self.provider.UsingBigIntForStat )
   test.identical( stat.size, BigInt( 27 ) );
   else
@@ -12514,6 +12550,10 @@ function statReadActSync( test )
   test.is( !stat.isFIFO() );
   test.is( !stat.isSocket() );
   if( self.provider.UsingBigIntForStat )
+  test.identical( stat.nlink, BigInt( 1 ) )
+  else
+  test.identical( stat.nlink, 1 );
+  if( self.provider.UsingBigIntForStat )
   test.is( stat.size === BigInt( 0 ) || stat.size === null );
   else
   test.is( stat.size === 0 || stat.size === null );
@@ -12540,6 +12580,10 @@ function statReadActSync( test )
   test.is( !stat.isCharacterDevice() );
   test.is( !stat.isFIFO() );
   test.is( !stat.isSocket() );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.nlink, BigInt( 1 ) )
+  else
+  test.identical( stat.nlink, 1 );
   if( self.provider.UsingBigIntForStat )
   test.is( stat.size === BigInt( 0 ) || stat.size === null );
   else

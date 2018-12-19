@@ -5014,7 +5014,7 @@ function _link_functor( gen )
         return dstExists;
       });
 
-      con.ifNoErrorThen( _.routineSeal( self, c.linkAct, [ o2 ] ) );
+      con.ifNoErrorThen( _.routineSeal( self, c.linkAct, [ c ] ) );
 
       con.ifNoErrorThen( ( got ) =>
       {
@@ -5751,12 +5751,12 @@ function _fileCopyAct( c )
     });
     debugger;
 
-    self.softLinkAct
+    return self.softLinkAct
     ({
       dstPath : o.dstPath,
       srcPath : srcResolvedPath,
       originalDstPath : o.originalDstPath,
-      originalSrcPath : o.originalSrcPath,
+      originalSrcPath : srcResolvedPath,
       sync : o.sync,
       type : null,
     });
@@ -5765,7 +5765,7 @@ function _fileCopyAct( c )
   else
   {
 
-    self.fileCopyAct
+    return self.fileCopyAct
     ({
       dstPath : o.dstPath,
       srcPath : o.srcPath,
@@ -5777,7 +5777,7 @@ function _fileCopyAct( c )
 
   }
 
-  return c;
+  // return c;
 }
 
 _.routineExtend( _fileCopyAct, fileCopyAct );

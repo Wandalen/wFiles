@@ -423,6 +423,7 @@ function statReadAct( o )
     result.isFile = returnFalse;
     result.isDirectory = returnFalse;
     result.isSymbolicLink = returnFalse;
+    result.nlink = 1;
 
     if( self._descriptorIsDir( d ) )
     {
@@ -433,6 +434,9 @@ function statReadAct( o )
     {
       if( self._descriptorIsHardLink( d ) )
       {
+        if( _.arrayIs( d[ 0 ].hardLinks ) )
+        result.nlink = d[ 0 ].hardLinks.length;
+
         d = d[ 0 ].data;
         result.isHardLink = returnTrue;
       }
@@ -449,9 +453,12 @@ function statReadAct( o )
 
       _.assert( result.size >= 0 );
 
+
       result.isTextLink = function isTextLink()
       {
         debugger;
+        if( !self.usingTextLink )
+        return false;
         return self._descriptorIsTextLink( d );
       }
     }

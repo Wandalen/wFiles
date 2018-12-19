@@ -5756,7 +5756,7 @@ function _fileCopyAct( c )
       dstPath : o.dstPath,
       srcPath : srcResolvedPath,
       originalDstPath : o.originalDstPath,
-      originalSrcPath : o.originalSrcPath,
+      originalSrcPath : srcResolvedPath,
       sync : o.sync,
       type : null,
     });

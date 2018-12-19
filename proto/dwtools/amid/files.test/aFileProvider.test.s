@@ -12176,6 +12176,8 @@ function statReadActSync( test )
   var mp = _.routineJoin( test.context, test.context.pathFor );
   var dir = mp( 'statReadActSync' );
 
+  self.provider.fieldPush( 'usingTextLink', 1 );
+
   /* - */
 
   test.case = 'regular terminal';
@@ -12482,9 +12484,79 @@ function statReadActSync( test )
   else
   test.identical( stat.nlink, 1 );
   if( self.provider.UsingBigIntForStat )
-  test.identical( stat.size, BigInt( 27 ) );
+  test.identical( stat.size, BigInt( 119 ) );
   else
   test.identical( stat.size, 27 );
+
+  //
+
+  self.provider.fieldPush( 'usingTextLink', 0 );
+
+  test.description = 'file2, usingTextLink off';
+  var o =
+  {
+    filePath : file2Path,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 0,
+  }
+  var o2 = _.mapExtend( null, o );
+  var stat = self.provider.statReadAct( o );
+  test.identical( o, o2 );
+  test.is( !!stat );
+  test.is( !stat.isDir() );
+  test.is( stat.isTerminal() );
+  test.is( !stat.isTextLink() );
+  test.is( !stat.isSoftLink() );
+  test.is( !stat.isHardLink() );
+  test.is( !stat.isLink() );
+  test.is( !stat.isBlockDevice() );
+  test.is( !stat.isCharacterDevice() );
+  test.is( !stat.isFIFO() );
+  test.is( !stat.isSocket() );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.nlink, BigInt( 1 ) )
+  else
+  test.identical( stat.nlink, 1 );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.size, BigInt( 119 ) );
+  else
+  test.identical( stat.size, 27 );
+
+  test.description = 'file2, resolving, , usingTextLink off';
+  var o =
+  {
+    filePath : file2Path,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 1,
+  }
+  var o2 = _.mapExtend( null, o );
+  var stat = self.provider.statReadAct( o );
+  test.identical( o, o2 );
+  test.is( !!stat );
+  test.is( !stat.isDir() );
+  test.is( stat.isTerminal() );
+  test.is( !stat.isTextLink() );
+  test.is( !stat.isSoftLink() );
+  test.is( !stat.isHardLink() );
+  test.is( !stat.isLink() );
+  test.is( !stat.isBlockDevice() );
+  test.is( !stat.isCharacterDevice() );
+  test.is( !stat.isFIFO() );
+  test.is( !stat.isSocket() );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.nlink, BigInt( 1 ) )
+  else
+  test.identical( stat.nlink, 1 );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.size, BigInt( 119 ) );
+  else
+  test.identical( stat.size, 27 );
+
+  self.provider.fieldPop( 'usingTextLink', 0 );
+
+  //
 
   test.description = 'file2, resolving';
   var o =
@@ -12513,7 +12585,7 @@ function statReadActSync( test )
   else
   test.identical( stat.nlink, 1 );
   if( self.provider.UsingBigIntForStat )
-  test.identical( stat.size, BigInt( 27 ) );
+  test.identical( stat.size, BigInt( 119 ) );
   else
   test.identical( stat.size, 27 );
 
@@ -12886,6 +12958,10 @@ function statReadActSync( test )
     self.provider.statReadAct( o );
   })
   test.identical( o.filePath, expected.filePath );
+
+  /*  */
+
+  self.provider.fieldPop( 'usingTextLink', 1 );
 }
 
 //

@@ -1288,7 +1288,7 @@ function pathResolveLinkHeadDirect_body( o )
       break;
     }
 
-    if( ( o2.stat.isSoftLink() && o2.resolvingSoftLink ) || ( o2.stat.isTextLink() && o2.resolvingTextLink && self.usingTextLink ) )
+    if( ( o2.resolvingSoftLink && o2.stat.isSoftLink() ) || ( o2.resolvingTextLink && self.usingTextLink && o2.stat.isTextLink() ) )
     filePath = self.pathResolveLinkTail.body.call( self, o2 ).absolutePath;
     if( i === splits.length-1 )
     o.stat = o2.stat;
@@ -3069,6 +3069,7 @@ function filesAreSame_body( o )
 
   /* text link */
 
+  if( self.usingTextLink )
   if( o.ins1.isTextLink )
   {
     debugger;
@@ -3546,42 +3547,18 @@ function isTextLink_body( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.assertRoutineOptions( isTextLink_body, arguments ) );
   _.assert( _.boolLike( o.resolvingSoftLink ) );
-  // _.assert( _.boolLike( o.resolvingTextLink ) );
-
-  // let stat = self.statReadAct
-  // ({
-  //   filePath : o.filePath,
-  //   throwing : 0,
-  //   sync : 1,
-  //   resolvingSoftLink : 0,
-  // });
-  //
-  // let o2 =
-  // {
-  //   filePath : o.filePath,
-  //   resolvingSoftLink : o.resolvingSoftLink,
-  //   resolvingTextLink : 0,
-  //   stat : stat,
-  //   throwing : 0
-  // }
-  //
-  // o.filePath = self.pathResolveLinkFull( o2 );
 
   let o2 =
   {
     filePath : o.filePath,
     resolvingSoftLink : o.resolvingSoftLink,
     resolvingTextLink : 0,
-    // stat : stat,
     throwing : 0
   }
 
   o.filePath = self.pathResolveLinkFull( o2 );
 
   _.assert( o2.stat !== undefined );
-
-  // if( o.filePath === null )
-  // return false;
 
   if( o2.stat === null )
   return false;

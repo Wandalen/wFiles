@@ -8446,7 +8446,7 @@ function fileRenameSync( test )
       throwing : 0
     });
   });
-  test.identical( got, false );
+  test.identical( got, null );
 
   //
 
@@ -8644,7 +8644,7 @@ function fileRenameSync( test )
       throwing : 0
     });
   });
-  test.identical( got, false )
+  test.identical( got, null )
   var files = self.provider.dirRead( dir );
   test.identical( files, [ 'src' ] );
 
@@ -8661,7 +8661,7 @@ function fileRenameSync( test )
       throwing : 0
     });
   });
-  test.identical( got, false )
+  test.identical( got, null )
   var files = self.provider.dirRead( dir );
   test.identical( files, [ 'src' ] );
 
@@ -8743,7 +8743,7 @@ function fileRenameSync( test )
       throwing : 0
     });
   });
-  test.identical( got, false );
+  test.identical( got, null );
   var files = self.provider.dirRead( dir );
   test.identical( files, [ 'dir','src' ] );
 

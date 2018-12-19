@@ -15652,7 +15652,10 @@ function fileWriteLinksAsync( test )
       });
       test.identical( got, data );
       test.is( self.provider.isHardLink( dstPath ) );
+      if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
       test.identical( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ), null );
+      else
+      test.identical( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ), true );
       return null;
     })
   })
@@ -15792,7 +15795,10 @@ function fileWriteLinksAsync( test )
       });
       test.identical( got, data + data + data );
       test.is( self.provider.isHardLink( dstPath ) );
+      if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
       test.identical( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ), null );
+      else
+      test.identical( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ), true );
       return null;
 
     })
@@ -15934,7 +15940,10 @@ function fileWriteLinksAsync( test )
       });
       test.identical( got, data + data + data );
       test.is( self.provider.isHardLink( dstPath ) );
+      if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
       test.identical( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ), null );
+      else
+      test.identical( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ), true );
       return null;
 
     })

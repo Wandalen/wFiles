@@ -449,21 +449,28 @@ function pathResolveLinkTail_body( o )
   let r = self._localFromGlobal( o.filePath );
   o.filePath = r.filePath;
 
+  // if( o.filePath === '/src/a1' )
+  // debugger;
+
   let result = r.provider.pathResolveLinkTail.body.call( r.provider, o );
 
   if( result === null )
   return null;
 
+  if( result.filePath === null )
+  return null;
+
   // _.assert( !!result );
 
-  result = self.path.join( r.provider.originPath, result );
+  result.filePath = self.path.join( r.provider.originPath, result.filePath );
+  result.absolutePath = self.path.join( r.provider.originPath, result.absolutePath );
 
-  if( result === o.filePath )
-  {
-    debugger;
-    _.assert( 0, 'not tested' );
-    // return r.originalPath;
-  }
+  // if( result === o.filePath )
+  // {
+  //   debugger;
+  //   _.assert( 0, 'not tested' );
+  //   // return r.originalPath;
+  // }
 
   return result;
 }

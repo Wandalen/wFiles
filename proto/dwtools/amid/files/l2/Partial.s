@@ -1278,7 +1278,7 @@ function pathResolveLinkHeadDirect_body( o )
     // if( self.isLink( o2.filePath ) )
     if( !o2.stat )
     {
-      debugger;
+      // debugger;
       filePath = path.join.apply( path, _.arrayAppendArrays( [], [ filePath, splits.slice( i+1 ) ] ) );
       o.stat = null;
       break;
@@ -4902,25 +4902,6 @@ function _link_functor( gen )
 
     /* - */
 
-/*
-    function verify1( args )
-    function verify2()
-    function verifyDst()
-    function verifyDstAsync()
-    function pathResolve()
-    function linksResolve()
-    function log()
-    function tempRenameCan()
-    function tempRenameSync()
-    function tempRenameAsync()
-    function tempRenameBackSync()
-    function tempRenameBackAsync()
-    function tempNameMake( filePath )
-    function validateSize()
-    function error( err )
-    function end( r )
-*/
-
     c.verify1( arguments );
     if( c.ended )
     return c.end();
@@ -4930,20 +4911,14 @@ function _link_functor( gen )
     _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
 
     var r = c.pathResolve();
-    _.assert( r === undefined );
     if( c.ended )
     return c.end();
 
     var r = c.linksResolve();
-    _.assert( r === undefined );
-    // if( r !== undefined )
-    // return r;
     if( c.ended )
     return c.end();
 
     c.verify2();
-    // if( verify2() )
-    // return end();
     if( c.ended )
     return c.end();
 
@@ -4956,9 +4931,6 @@ function _link_functor( gen )
 
       try
       {
-
-        // if( onRanameBegin )
-        // onRanameBegin.call( self, c );
 
         if( self.fileExists( o2.dstPath ) )
         {

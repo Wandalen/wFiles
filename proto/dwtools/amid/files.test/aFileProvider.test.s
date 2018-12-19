@@ -12206,6 +12206,9 @@ function statReadActSync( test )
   test.is( !stat.isCharacterDevice() );
   test.is( !stat.isFIFO() );
   test.is( !stat.isSocket() );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.size, BigInt( 5 ) );
+  else
   test.identical( stat.size, 5 );
 
   test.description = 'file2';
@@ -12230,6 +12233,9 @@ function statReadActSync( test )
   test.is( !stat.isCharacterDevice() );
   test.is( !stat.isFIFO() );
   test.is( !stat.isSocket() );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.size, BigInt( 0 ) );
+  else
   test.identical( stat.size, 0 );
 
   self.provider.filesDelete( dir );
@@ -12264,6 +12270,9 @@ function statReadActSync( test )
   test.is( !stat.isCharacterDevice() );
   test.is( !stat.isFIFO() );
   test.is( !stat.isSocket() );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.size, BigInt( 5 ) );
+  else
   test.identical( stat.size, 5 );
 
   test.description = 'file2';
@@ -12288,6 +12297,9 @@ function statReadActSync( test )
   test.is( !stat.isCharacterDevice() );
   test.is( !stat.isFIFO() );
   test.is( !stat.isSocket() );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.size, BigInt( 5 ) );
+  else
   test.identical( stat.size, 5 );
 
   self.provider.filesDelete( dir );
@@ -12322,6 +12334,9 @@ function statReadActSync( test )
   test.is( !stat.isCharacterDevice() );
   test.is( !stat.isFIFO() );
   test.is( !stat.isSocket() );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.size, BigInt( 5 ) );
+  else
   test.identical( stat.size, 5 );
 
   test.description = 'file2';
@@ -12370,6 +12385,9 @@ function statReadActSync( test )
   test.is( !stat.isCharacterDevice() );
   test.is( !stat.isFIFO() );
   test.is( !stat.isSocket() );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.size, BigInt( 5 ) );
+  else
   test.identical( stat.size, 5 );
 
   self.provider.filesDelete( dir );
@@ -12404,6 +12422,9 @@ function statReadActSync( test )
   test.is( !stat.isCharacterDevice() );
   test.is( !stat.isFIFO() );
   test.is( !stat.isSocket() );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.size, BigInt( 5 ) );
+  else
   test.identical( stat.size, 5 );
 
   test.description = 'file2';
@@ -12428,6 +12449,9 @@ function statReadActSync( test )
   test.is( !stat.isCharacterDevice() );
   test.is( !stat.isFIFO() );
   test.is( !stat.isSocket() );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.size, BigInt( 27 ) );
+  else
   test.identical( stat.size, 27 );
 
   test.description = 'file2, resolving';
@@ -12452,6 +12476,9 @@ function statReadActSync( test )
   test.is( !stat.isCharacterDevice() );
   test.is( !stat.isFIFO() );
   test.is( !stat.isSocket() );
+  if( self.provider.UsingBigIntForStat )
+  test.identical( stat.size, BigInt( 27 ) );
+  else
   test.identical( stat.size, 27 );
 
   self.provider.filesDelete( dir );
@@ -12486,6 +12513,9 @@ function statReadActSync( test )
   test.is( !stat.isCharacterDevice() );
   test.is( !stat.isFIFO() );
   test.is( !stat.isSocket() );
+  if( self.provider.UsingBigIntForStat )
+  test.is( stat.size === BigInt( 0 ) || stat.size === null );
+  else
   test.is( stat.size === 0 || stat.size === null );
 
   test.description = 'file2';
@@ -12510,6 +12540,9 @@ function statReadActSync( test )
   test.is( !stat.isCharacterDevice() );
   test.is( !stat.isFIFO() );
   test.is( !stat.isSocket() );
+  if( self.provider.UsingBigIntForStat )
+  test.is( stat.size === BigInt( 0 ) || stat.size === null );
+  else
   test.is( stat.size === 0 || stat.size === null );
 
   /* - */

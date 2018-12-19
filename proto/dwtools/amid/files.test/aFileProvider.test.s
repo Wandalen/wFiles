@@ -33229,7 +33229,8 @@ function experiment( test )
   var testPath = _.path.join( dirPath, 'linkToDir1/linkToDir2/linkToTerminal' )
   var o = _.mapExtend( null, o1, { filePath : testPath, preservingRelative : 1, resolvingHeadDirect : 1, resolvingHeadReverse : 1 } );
   var got = self.provider.pathResolveLinkFull( o );
-  test.identical( got, pathToFile );
+  var expected = self.provider.path.relative( linkInDir2, pathToFile );
+  test.identical( got, expected );
 
   debugger; return; xxx
 

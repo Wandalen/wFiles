@@ -5970,13 +5970,21 @@ function _hardLinkVerify2( c )
 {
   let self = this;
   let o = c.options;
-  let linked = self.filesAreHardLinked([ o.dstPath, o.srcPath ]);
-  // xxx : does it take into acccount breakingSrcHardLink and breakingDstHardLink
-  // Vova : should skip if linked is null( not sure )?
-  // Kos : maybe
-  if( linked || linked === null )
-  c.end( true );
-  // return true;
+
+  if( !c.srcStat.isTerminal() )
+  {
+    c.error( _.err( 'Source file should be a terminal.' ) );
+  }
+  else
+  {
+    let linked = self.filesAreHardLinked([ o.dstPath, o.srcPath ]);
+    // xxx : does it take into acccount breakingSrcHardLink and breakingDstHardLink
+    // Vova : should skip if linked is null( not sure )?
+    // Kos : maybe
+    if( linked || linked === null )
+    c.end( true );
+    // return true;
+  }
 }
 
 let hardLink = _link_functor

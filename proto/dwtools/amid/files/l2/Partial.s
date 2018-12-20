@@ -685,36 +685,36 @@ operates.filePath = { pathToRead : 1 };
 qqq : ?
 */
 
-function _pathResolveTextLink( o )
-{
-  let self = this;
+// function _pathResolveTextLink( o )
+// {
+//   let self = this;
 
-  _.assertRoutineOptions( _pathResolveTextLink, arguments );
+//   _.assertRoutineOptions( _pathResolveTextLink, arguments );
 
-  let result = self.pathResolveTextLinkAct
-  ({
-    filePath : o.filePath,
-    // visited : [],
-    // hasLink : false,
-  });
+//   let result = self.pathResolveTextLinkAct
+//   ({
+//     filePath : o.filePath,
+//     // visited : [],
+//     // hasLink : false,
+//   });
 
-  if( !result )
-  return { resolved : false, originalFilePath : o.filePath, resolvedFilePath : null };
+//   if( !result )
+//   return { resolved : false, originalFilePath : o.filePath, resolvedFilePath : null };
 
-  _.assert( arguments.length === 1 || arguments.length === 2  );
+//   _.assert( arguments.length === 1 || arguments.length === 2  );
 
-  if( result && o.filePath[ 0 ] === '.' && !self.path.isAbsolute( result ) )
-  result = './' + result;
+//   if( result && o.filePath[ 0 ] === '.' && !self.path.isAbsolute( result ) )
+//   result = './' + result;
 
-  self.logger.log( 'pathResolveTextLink :', o.filePath, '->', result );
+//   self.logger.log( 'pathResolveTextLink :', o.filePath, '->', result );
 
-  return { resolved : true, originalFilePath : o.filePath, resolvedFilePath : result };
-}
+//   return { resolved : true, originalFilePath : o.filePath, resolvedFilePath : result };
+// }
 
-_pathResolveTextLink.defaults =
-{
-  filePath : null
-}
+// _pathResolveTextLink.defaults =
+// {
+//   filePath : null
+// }
 
 //
 
@@ -749,15 +749,18 @@ function pathResolveTextLink_body( o )
   _.assert( _.strIs( o.filePath ), 'Expects string' );
   _.assert( arguments.length === 1, 'Expects exactly one argument' );
 
-  let result = self._pathResolveTextLink( o );
+  let result = self.pathResolveTextLinkAct({ filePath : o.filePath });
 
-  return result.resolvedFilePath || result.originalFilePath;
+  if( !result )
+  return o.filePath;
+
+  self.logger.log( 'pathResolveTextLink :', o.filePath, '->', result );
+
+  return result;
 }
 
-pathResolveTextLink_body.defaults =
-{
-  filePath : null
-}
+var defaults = pathResolveTextLink_body.defaults = Object.create( null );
+defaults.filePath = null;
 
 let pathResolveTextLink = _.routineFromPreAndBody( pathResolveTextLink_pre, pathResolveTextLink_body );
 
@@ -4869,6 +4872,7 @@ function _link_functor( gen )
     c.linkAct = onAct;
     c.result = undefined;
     c.tempPath = undefined;
+    c.tempPathSrc = undefined;
     c.dstStat = undefined;
     c.srcStat = undefined;
     c.options = o;
@@ -4931,6 +4935,14 @@ function _link_functor( gen )
 
       try
       {
+
+        if( self.fileExists( o2.srcPath ) )
+        {
+          debugger
+          _.assert( !!c.srcStat )
+          if( o.breakingSrcHardLink && c.srcStat.isHardLink() )
+          srcBreakHardLinkSync();
+        }
 
         if( self.fileExists( o2.dstPath ) )
         {
@@ -5461,6 +5473,26 @@ function _link_functor( gen )
         // console.error( err.toString() + '\n' + err.stack );
       }
 
+      if( c.tempPathSrc ) try
+      {
+        debugger;
+        self.filesDelete( o.srcPath );
+        self.fileRenameAct
+        ({
+          dstPath : o.srcPath,
+          srcPath : c.tempPathSrc,
+          originalDstPath : o.originalDstPath,
+          originalSrcPath : o.originalSrcPath,
+          sync : 1,
+        });
+      }
+      catch( err2 )
+      {
+        debugger;
+        console.error( err2 );
+        // console.error( err.toString() + '\n' + err.stack );
+      }
+
     }
 
     function tempRenameBackAsync()
@@ -5507,6 +5539,32 @@ function _link_functor( gen )
       // _.assert( !!c.dstStat );
       // if( !( c.srcStat.size == c.dstStat.size ) )
       // self.logger.warn( `Warning: ${o.srcPath} (${c.srcStat.size}) and ${o.dstPath} (${c.dstStat.size}) should have same size!` )
+    }
+
+    /* - */
+
+    function srcBreakHardLinkSync()
+    {
+      c.tempPathSrc = tempNameMake( o2.srcPath );
+      if( self.fileExists( c.tempPathSrc ) )
+      self.filesDelete( c.tempPathSrc )
+      self.fileRenameAct
+      ({
+        dstPath : c.tempPathSrc,
+        srcPath : o2.srcPath,
+        originalDstPath : o.originalDstPath,
+        originalSrcPath : o.originalSrcPath,
+        sync : 1,
+      });
+      self.fileCopyAct
+      ({
+        srcPath : c.tempPathSrc,
+        dstPath : o2.srcPath,
+        originalDstPath : o.originalDstPath,
+        originalSrcPath : o.originalSrcPath,
+        sync : 1,
+        breakingDstHardLink : 0
+      })
     }
 
     /* - */
@@ -7077,7 +7135,7 @@ let Proto =
   pathResolveSoftLink,
 
   pathResolveTextLinkAct,
-  _pathResolveTextLink,
+  // _pathResolveTextLink,
   pathResolveTextLink,
 
   pathResolveLinkFull,

@@ -890,7 +890,7 @@ function relative( test )
   var got = _.path.relative( from, to );
   test.identical( got, expected );
 
-  _.fileProvider.fieldSet( 'safe', 0 );
+  _.fileProvider.fieldPush( 'safe', 0 );
 
   var from = _.fileProvider.recordFactory().record( '/a/b/c');
   var to = _.fileProvider.recordFactory().record( '/a' );
@@ -932,7 +932,7 @@ function relative( test )
   // var got = _.path.s.relative( o );
   // test.identical( got, expected );
 
-  _.fileProvider.fieldReset( 'safe', 0 );
+  _.fileProvider.fieldPop( 'safe', 0 );
 }
 
 //

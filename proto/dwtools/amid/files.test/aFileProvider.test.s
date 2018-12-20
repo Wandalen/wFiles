@@ -21113,9 +21113,14 @@ function hardLinkSoftlinked( test )
 {
   var self = this;
 
-  if( !_.routineIs( self.provider.hardLinkAct ) )
+  if( !test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   {
-    test.case = 'hardLinkAct is not implemented'
+    /*
+      qqq : statReadAct of Extract and HD handle links in head of path differently
+      HD always resolve them
+      add test routine statReadActLinkedHead
+    */
+    test.case = 'Not implemented for Extract';
     test.identical( 1, 1 )
     return;
   }

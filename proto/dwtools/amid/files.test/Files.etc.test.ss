@@ -110,7 +110,7 @@ function createTestSymLink( path, target, type, data )
   if( _.fileProvider.statResolvedRead( path ) )
   _.fileProvider.fileDelete( path );
   // File.symlinkSync( origin, path, typeOrigin );
-  _.fileProvider.linkSoft( path, origin );
+  _.fileProvider.softLink( path, origin );
 }
 
 //
@@ -1540,7 +1540,7 @@ function _fileOptionsGet( test ) {
 //
 //   var file1 = _.fileProvider.fileRecordContext().fileRecord( path1 );
 //   // File.symlinkSync( path2, link, 'file' );
-//   _.fileProvider.linkSoft( link, path2 );
+//   _.fileProvider.softLink( link, path2 );
 //   try
 //   {
 //     got = _.fileProvider.filesSame( { ins1 : file1, ins2 : link } );
@@ -1559,8 +1559,8 @@ function _fileOptionsGet( test ) {
 //
 //     createTestFile( file1 );
 //     con = _.timeOut( 50);
-//     con.doThen( ( ) => createTestFile( file2 ) );
-//     con.doThen( ( ) =>
+//     con.finally( ( ) => createTestFile( file2 ) );
+//     con.finally( ( ) =>
 //     {
 //       try
 //       {
@@ -1831,7 +1831,7 @@ function _fileOptionsGet( test ) {
 //   test.identical( got, file2 );
 //
 //   var con = _.timeOut( 50 );
-//   con.doThen( ( ) =>
+//   con.finally( ( ) =>
 //   {
 //     createTestFile( file3, 'test3' );
 //     file3 = mergePath( file3 );
@@ -1880,7 +1880,7 @@ function _fileOptionsGet( test ) {
 //   test.identical( got, file1 );
 //
 //   var con = _.timeOut( 50 );
-//   con.doThen( ( ) =>
+//   con.finally( ( ) =>
 //   {
 //     createTestFile( file3, 'test3' );
 //     file3 = mergePath( file3 );
@@ -2445,7 +2445,7 @@ function filesNewer( test )
   test.identical( got, file2 );
 
   var con = _.timeOut( 50 );
-  con.doThen( ( ) =>
+  con.finally( ( ) =>
   {
     createTestFile( file3, 'test3' );
     file3 = mergePath( file3 );
@@ -2498,7 +2498,7 @@ function filesOlder( test )
   test.identical( got, file1 );
 
   var con = _.timeOut( 50 );
-  con.doThen( ( ) =>
+  con.finally( ( ) =>
   {
     createTestFile( file3, 'test3' );
     file3 = mergePath( file3 );
@@ -3202,18 +3202,18 @@ function filesAreUpToDate2( test )
     {
       createTestResources( fileLists );
       console.log( '--> files created second' );
-      con.give( );
+      con.take( );
     }, delay );
     return con;
   }
 */
 
-  var con = new _.Consequence( ).give( null );
+  var con = new _.Consequence( ).take( null );
   for( let tc of testChecks )
   {
     ( function( tc )
     {
-      con.doThen( () =>
+      con.finally( () =>
       {
         console.log( 'tc : ' + tc.name );
         createTestResources( tc.createFirst );
@@ -3221,9 +3221,9 @@ function filesAreUpToDate2( test )
         return null;
       })
 
-      con.doThen( _.routineSeal( _,_.timeOut,[ 1000 ] ) );
-      con.doThen( _.routineSeal( null,createTestResources,[ tc.createSecond ] ) );
-      con.doThen( _.routineSeal( console,console.log,[ '--> files created second' ] ) );
+      con.finally( _.routineSeal( _,_.timeOut,[ 1000 ] ) );
+      con.finally( _.routineSeal( null,createTestResources,[ tc.createSecond ] ) );
+      con.finally( _.routineSeal( console,console.log,[ '--> files created second' ] ) );
 
 /*
       try
@@ -3236,7 +3236,7 @@ function filesAreUpToDate2( test )
       }
 */
 
-      con.doThen( ( ) =>
+      con.finally( ( ) =>
       {
         test.description = tc.name;
         try
@@ -3272,13 +3272,13 @@ function testDelaySample( test )
 
   test.identical( 1,1 );
 
-  con.doThen( function( ){ logger.log( '1000ms delay' ) } );
+  con.finally( function( ){ logger.log( '1000ms delay' ) } );
 
-  con.doThen( _.routineSeal( _,_.timeOut,[ 1000 ] ) );
+  con.finally( _.routineSeal( _,_.timeOut,[ 1000 ] ) );
 
-  con.doThen( function( ){ logger.log( '2000ms delay' ) } );
+  con.finally( function( ){ logger.log( '2000ms delay' ) } );
 
-  con.doThen( function( ){ test.identical( 1,1 ); } );
+  con.finally( function( ){ test.identical( 1,1 ); } );
 
   return con;
 }

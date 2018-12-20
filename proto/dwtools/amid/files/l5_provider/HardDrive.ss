@@ -324,31 +324,71 @@ function pathResolveSoftLinkAct( o )
   if( !self.isSoftLink( o.filePath ) )
   return o.filePath;
 
+  let result;
+
   try
   {
+    if( o.resolvingIntermediateDirectories )
+    return resolveIntermediateDirectories();
 
-    // if( o.readLink )
+    result = File.readlinkSync( self.path.nativize( o.filePath ) );
+
+    /* qqq : why? add experiment please? */
+    /* aaa : makes path relative to link instead of directory where link is located */
+    if( !self.path.isAbsolute( self.path.normalize( result ) ) )
     {
-      let result = File.readlinkSync( self.path.nativize( o.filePath ) );
-
-      /* qqq : why? add experiment please? */
-      /* aaa : makes path relative to link instead of directory where link is located */
-      if( !self.path.isAbsolute( self.path.normalize( result ) ) )
-      {
-        if( _.strBegins( result, '.\\' ) )
-        result = _.strIsolateBeginOrNone( result, '.\\' )[ 2 ];
-        result = '..\\' + result;
-      }
-
-      return result;
+      if( _.strBegins( result, '.\\' ) )
+      result = _.strIsolateBeginOrNone( result, '.\\' )[ 2 ];
+      result = '..\\' + result;
     }
 
-    // return File.realpathSync( self.path.nativize( o.filePath ) );
+    if( o.resolvingMultiple )
+    return resolvingMultiple();
+
+    return result;
   }
   catch( err )
   {
     debugger;
     throw _.err( 'Error resolving softLink', o.filePath, '\n', err );
+  }
+
+  /**/
+
+  function resolveIntermediateDirectories()
+  {
+    if( o.resolvingMultiple )
+    return File.realpathSync( self.path.nativize( o.filePath ) );
+
+    let splits = self.path.split( o.filePath );
+    let o2 = _.mapExtend( null, o );
+
+    o2.resolvingIntermediateDirectories = 0;
+    o2.filePath = '/';
+
+    for( let i = 1 ; i < splits.length ; i++ )
+    {
+      o2.filePath = self.path.join( o2.filePath, splits[ i ] );
+
+      if( self.isSoftLink( o2.filePath ) )
+      {
+        result = self.pathResolveSoftLinkAct( o2 )
+        o2.filePath = self.path.join( o2.filePath, result );
+      }
+    }
+    return o2.filePath;
+  }
+
+  /**/
+
+  function resolvingMultiple()
+  {
+    result = self.path.join( o.filePath, self.path.normalize( result ) );
+    if( !self.isSoftLink( result ) )
+    return result;
+    let o2 = _.mapExtend( null, o );
+    o2.filePath = result;
+    return self.pathResolveSoftLinkAct( o2 );
   }
 
 }

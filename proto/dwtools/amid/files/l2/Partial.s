@@ -617,6 +617,8 @@ pathResolveSoftLinkAct.name = 'pathResolveSoftLinkAct';
 
 var defaults = pathResolveSoftLinkAct.defaults = Object.create( null );
 defaults.filePath = null;
+defaults.resolvingMultiple = 0;
+defaults.resolvingIntermediateDirectories = 0;
 
 var having = pathResolveSoftLinkAct.having = Object.create( null );
 having.writing = 0;

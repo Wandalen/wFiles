@@ -6253,52 +6253,50 @@ function fileExchange_body( o )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  let dstPath = o.dstPath;
-  let srcPath = o.srcPath;
+  // throw _.err( 'not tested after introducing of allowingCycled' );
 
-  throw _.err( 'not tested after introducing of allowingCycled' );
+  // let src = self.statResolvedRead({ filePath : o.srcPath, throwing : 0 });
+  // let dst = self.statResolvedRead({ filePath : o.dstPath, throwing : 0 });
 
-  let allowingMissed = o.allowingMissed;
-  // delete o.allowingMissed;
+  let src = _statResolvedRead( o.srcPath );
+  let dst = _statResolvedRead( o.dstPath );
 
-  let src = self.statResolvedRead({ filePath : o.srcPath, throwing : 0 });
-  let dst = self.statResolvedRead({ filePath : o.dstPath, throwing : 0 });
-
-  function _returnNull()
+  let optionsForRename =
   {
-    if( o.sync )
-    return null;
-    else
-    return new _.Consequence().take( null );
+    resolvingSrcTextLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 0,
+    resolvingDstSoftLink : 0,
+    allowingMissed : 0
   }
 
-  if( !src || !dst )
+  if( !src.stat || !dst.stat )
   {
-    if( allowingMissed )
+    if( o.allowingMissed )
     {
-      if( !src && dst )
+      if( !src.stat && dst.stat )
       {
-        o.srcPath = o.dstPath;
-        o.dstPath = srcPath;
+        o.srcPath = dst.filePath;
+        o.dstPath = src.filePath;
       }
-      if( !src && !dst )
+      if( !src.stat && !dst.stat )
       return _returnNull();
 
-      return self.fileRename( o );
+      return self.fileRename( _.mapExtend( null, o, optionsForRename ) );
     }
     else if( o.throwing )
     {
       let err;
 
-      if( !src && !dst )
+      if( !src.stat && !dst.stat )
       {
         err = _.err( 'srcPath and dstPath not exist! srcPath: ', o.srcPath, ' dstPath: ', o.dstPath )
       }
-      else if( !src )
+      else if( !src.stat )
       {
         err = _.err( 'srcPath not exist! srcPath: ', o.srcPath );
       }
-      else
+      else if( !dst.stat )
       {
         err = _.err( 'dstPath not exist! dstPath: ', o.dstPath );
       }
@@ -6312,11 +6310,11 @@ function fileExchange_body( o )
     return _returnNull();
   }
 
-  let tempPath = o.srcPath + '-' + _.idWithGuid() + '.tmp';
+  let tempPath = src.filePath + '-' + _.idWithGuid() + '.tmp';
 
   o.dstPath = tempPath;
 
-  var o2 = _.mapExtend( null, o );
+  var o2 = _.mapExtend( null, o, optionsForRename );
 
   o2.originalSrcPath = null;
   o2.originalDstPath = null;
@@ -6324,35 +6322,69 @@ function fileExchange_body( o )
   if( o.sync )
   {
     self.fileRename( _.mapExtend( null, o2 ) );
-    o2.dstPath = o2.srcPath;
-    o2.srcPath = dstPath;
+    o2.dstPath = src.filePath;
+    o2.srcPath = dst.filePath;
     self.fileRename( _.mapExtend( null, o2 ) );
-    o2.dstPath = dstPath;
+    o2.dstPath = dst.filePath;
     o2.srcPath = tempPath;
     return self.fileRename( _.mapExtend( null, o2 ) );
   }
   else
   {
-    let con = new _.Consequence().take( null );
+    let con = self.fileRename( _.mapExtend( null, o2 ) );
 
-    con.ifNoErrorThen( _.routineSeal( self, self.fileRename, [ _.mapExtend( null, o2 ) ] ) )
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    con.thenKeep( () =>
     {
-      o2.dstPath = o2.srcPath;
-      o2.srcPath = dstPath;
-      return true;
-    })
-    .ifNoErrorThen( _.routineSeal( self, self.fileRename, [ _.mapExtend( null, o2 ) ] ) )
-    .ifNoErrorThen( function( arg/*aaa*/ )
+      o2.dstPath = src.filePath;
+      o2.srcPath = dst.filePath;
+      return self.fileRename( _.mapExtend( null, o2 ) );
+    });
+
+    con.thenKeep( () =>
     {
-      o2.dstPath = dstPath;
+      o2.dstPath = dst.filePath;
       o2.srcPath = tempPath;
-      return true;
-    })
-    .ifNoErrorThen( _.routineSeal( self, self.fileRename, [ _.mapExtend( null, o2 ) ] ) );
+      return self.fileRename( _.mapExtend( null, o2 ) );
+    });
+
+    con.except( ( err ) =>
+    {
+      if( !o.throwing )
+      return null;
+      throw err;
+    });
 
     return con;
   }
+
+  /* - */
+
+  function _statResolvedRead( filePath )
+  {
+    let o2 =
+    {
+      filePath : filePath,
+      resolvingTextLink : self.resolvingTextLink,
+      resolvingSoftLink : self.resolvingSoftLink,
+      sync : 1,
+      throwing : o.throwing,
+      allowingMissed : o.allowingMissed,
+      allowingCycled : o.allowingCycled,
+    }
+    filePath = self.pathResolveLinkFull( o2 );
+    return { filePath : filePath, stat : o2.stat };
+  }
+
+  /* - */
+
+  function _returnNull()
+  {
+    if( o.sync )
+    return null;
+    else
+    return new _.Consequence().take( null );
+  }
+
 }
 
 var defaults = fileExchange_body.defaults = Object.create( null );

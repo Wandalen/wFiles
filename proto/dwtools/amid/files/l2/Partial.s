@@ -1612,6 +1612,7 @@ having.kind = 'record';
   qqq : statReadAct of Extract and HD handle links in head of path differently
   HD always resolve them
   add test routine statReadActLinkedHead
+  Vova : low priority
 */
 
 let statReadAct = Object.create( null );
@@ -2791,7 +2792,11 @@ function dirRead_body( o )
       return 0;
     });
 
-    // let isDir = self.resolvedIsDir( o.filePath ); /* qqq : add test case for this line */
+    /*
+    qqq : add test case for this line
+    Vova : low priority
+    */
+    // let isDir = self.resolvedIsDir( o.filePath );
 
     if( o.outputFormat === 'absolute' )
     result = result.map( function( relative )
@@ -4902,7 +4907,11 @@ function _link_functor( gen )
       if( c.ended )
       return c.end();
 
-      if( _.longIs( o.dstPath ) && c.linkAct.having.hardLinking ) /* qqq : _linkMultiple should work not only for hardlinks */
+      /*
+      qqq : _linkMultiple should work not only for hardlinks
+      Vova : low priority
+      */
+      if( _.longIs( o.dstPath ) && c.linkAct.having.hardLinking )
       return _linkMultiple.call( self, o, _link_body );
       _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
 
@@ -5007,7 +5016,7 @@ function _link_functor( gen )
 
       c.con1.thenKeep( () =>
       {
-        if( _.longIs( o.dstPath ) && c.linkAct.having.hardLinking ) /* qqq : _linkMultiple should work not only for hardlinks */
+        if( _.longIs( o.dstPath ) && c.linkAct.having.hardLinking )
         {
           c.result = _linkMultiple.call( self, o, _link_body );
           return true;

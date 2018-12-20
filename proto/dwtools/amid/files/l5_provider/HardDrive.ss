@@ -278,7 +278,8 @@ function pathResolveTextLinkAct( o )
   if( !buffer )
   buffer = Buffer.alloc( 512 );
 
-  let stat = self.statResolvedRead({ filePath : o.filePath, resolvingTextLink : 0, resolvingSoftLink : 0 }); /* qqq */
+  /* qqq use statReadAct Vova : low priority*/
+  let stat = self.statResolvedRead({ filePath : o.filePath, resolvingTextLink : 0, resolvingSoftLink : 0 });
   if( !stat )
   return false;
 

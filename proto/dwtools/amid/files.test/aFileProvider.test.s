@@ -32830,6 +32830,35 @@ function pathResolveSoftLink( test )
   var got = self.provider.pathResolveSoftLink( { filePath : linkPath2 } );
   test.identical( got, linkPath );
 
+  /* resolvingMultiple */
+
+  test.case = 'single soft link';
+  self.provider.filesDelete( workDir );
+  self.provider.fileWrite( filePath, testData );
+  self.provider.softLink( linkPath, filePath );
+  var o = _.mapExtend( null, o1, { filePath : linkPath, resolvingMultiple : 1 } );
+  var got = self.provider.pathResolveSoftLink( o );
+  test.identical( got, filePath );
+
+  test.case = 'double soft link';
+  self.provider.filesDelete( workDir );
+  self.provider.fileWrite( filePath, testData );
+  self.provider.softLink( linkPath2, filePath );
+  self.provider.softLink( linkPath, linkPath2 );
+  var o = _.mapExtend( null, o1, { filePath : linkPath, resolvingMultiple : 1 } );
+  var got = self.provider.pathResolveSoftLink( o );
+  test.identical( got, filePath );
+
+  test.case = 'two soft links in path';
+  self.provider.filesDelete( workDir );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.softLink( linkPath, '..' );
+  self.provider.softLink( linkPath2, '../file' );
+  var pathToResolve = self.provider.path.join( workDir, 'link/link2' )
+  var o = _.mapExtend( null, o1, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 0 } );
+  var got = self.provider.pathResolveSoftLink( o );
+  test.identical( got, filePath );
+
   /* */
 
   if( !Config.debug )

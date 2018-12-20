@@ -638,6 +638,7 @@ function pathResolveSoftLink_body( o )
 
   /* should not have redundant conditions */
   /* qqq : check does it cause problems */
+  /* aaa : no, Act version already has this check */
 
   // if( !self.isSoftLink( o.filePath ) )
   // return o.filePath;
@@ -1068,6 +1069,7 @@ function pathResolveLinkTailChain_pre()
 /*
   qqq : option preservingRelative:1 to preserve relative in path of soft link if happened to be so
   !!! qqq : no duplicates
+  aaa : both implemented, test cases exists too
 */
 
 function pathResolveLinkTailChain_body( o )
@@ -1652,7 +1654,9 @@ function statRead_body( o )
   // debugger;
   // logger.log( 'statRead', o2.filePath );
 
-  let result = self.pathResolveLinkFull( o2 ); /* xxx qqq : add option sync */
+  /* xxx qqq : add option sync */
+  /* xxx aaa : implemented basic wrapper for sync, needs improvement */
+  let result = self.pathResolveLinkFull( o2 );
 
   if( o.sync )
   {
@@ -4236,7 +4240,7 @@ function fileTimeSet_pre( routine, args )
     atime : args[ 1 ],
     mtime : args[ 2 ],
   }
-  else if( args.length === 2 ) /* qqq : tests required */
+  else if( args.length === 2 ) /* qqq : tests required */ /* aaa : case exists */
   {
     let stat = args[ 1 ];
     if( _.strIs( stat ) )
@@ -5258,7 +5262,7 @@ function _link_functor( gen )
           // c.srcResolvedPath = self.pathResolveLinkFull( o2 );
           // c.srcStat = o2.stat;
           // if( c.srcResolvedPath )
-          // o.srcPath = c.srcResolvedPath; /* qqq : what is srcResolvedPath for? */
+          // o.srcPath = c.srcResolvedPath; /* qqq : what is srcResolvedPath for? */ /* aaa: not needed anymore */
         }
         else
         {

@@ -30974,16 +30974,8 @@ function pathResolveLinkTailChain( test )
   self.provider.softLink( linkPath, linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
   self.provider.pathResolveLinkTailChain( o );
-  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  {
-    test.identical( o.result, [ linkPath, linkPath2, filePath ] )
-    test.identical( o.found, [ linkPath, linkPath2, filePath ] )
-  }
-  else
-  {
-    test.identical( o.result, [ linkPath, linkPath2, linkPath3, filePath ] )
-    test.identical( o.found, [ linkPath, linkPath2, linkPath3, filePath ] )
-  }
+  test.identical( o.result, [ linkPath, linkPath2, filePath ] )
+  test.identical( o.found, [ linkPath, linkPath2, filePath ] )
 
   test.case = 'relative soft-hard-text-file';
   self.provider.filesDelete( _.path.dir( filePath ) );
@@ -30993,16 +30985,8 @@ function pathResolveLinkTailChain( test )
   self.provider.softLink( linkPath, self.provider.path.relative( linkPath, linkPath2 ) );
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 0 } );
   self.provider.pathResolveLinkTailChain( o );
-  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  {
-    test.identical( o.result, [ linkPath, linkPath2, filePath ] )
-    test.identical( o.found, [ linkPath, linkPath2, filePath ] )
-  }
-  else
-  {
-    test.identical( o.result, [ linkPath, linkPath2, linkPath3, filePath ] )
-    test.identical( o.found, [ linkPath, linkPath2, linkPath3, filePath ] )
-  }
+  test.identical( o.result, [ linkPath, linkPath2, filePath ] )
+  test.identical( o.found, [ linkPath, linkPath2, filePath ] )
 
   test.case = 'relative soft-hard-text-file';
   self.provider.filesDelete( _.path.dir( filePath ) );
@@ -31012,16 +30996,8 @@ function pathResolveLinkTailChain( test )
   self.provider.softLink( linkPath, self.provider.path.relative( linkPath, linkPath2 ) );
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   self.provider.pathResolveLinkTailChain( o );
-  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  {
-    test.identical( o.found, [ linkPath, linkPath2, filePath ] )
+  test.identical( o.found, [ linkPath, linkPath2, filePath ] )
     test.identical( o.result, [ linkPath, '../link2', filePath ]  )
-  }
-  else
-  {
-    test.identical( o.found, [ linkPath, linkPath2, linkPath3, filePath ] )
-    test.identical( o.result, [ linkPath, '../link2', linkPath3, filePath ] )
-  }
 
   // /* chain, resolvingHeadDirectories : [ 0, 1 ] */
 

@@ -41,7 +41,7 @@ var Parent = wTester;
 // var suitFileLocation = _.diagnosticLocation().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
 
 var FileRecord = _.FileRecord;
-var testRootDirectory = _.fileProvider.path.nativize( _.path.resolve( __dirname + '/../../../../tmp.tmp/sample/FilesIndividualTest' ) );
+var testRootDirectory = _.fileProvider.path.nativize( _.path.dirTempOpen( _.path.join( __dirname, '../..'  ), 'FilesIndividualTest' ) );
 
 //
 
@@ -141,7 +141,7 @@ function createTestHardLink( path, target, data )
   if( _.fileProvider.statResolvedRead( path ) )
   _.fileProvider.fileDelete( path );
   // File.linkSync( origin, path );
-  _.fileProvider.linkHard( path, origin )
+  _.fileProvider.hardLink( path, origin )
 }
 
 //
@@ -1667,7 +1667,7 @@ function _fileOptionsGet( test ) {
 //   //   test.case = 'missed arguments';
 //   //   test.shouldThrowErrorSync( function( )
 //   //   {
-//   //     _.fileProvider.linkHarded( );
+//   //     _.fileProvider.hardLinked( );
 //   //   } );
 //   // }
 // };
@@ -1758,7 +1758,7 @@ function _fileOptionsGet( test ) {
 //
 //     try
 //     {
-//       got.result = _.fileProvider.linkHard({ dstPath :  link, srcPath : file, sync : 1 });
+//       got.result = _.fileProvider.hardLink({ dstPath :  link, srcPath : file, sync : 1 });
 //       // got.isExists = File.existsSync(  _.path.resolve( link ) );
 //       got.isExists = !!_.fileProvider.statResolvedRead(  _.path.resolve( link ) );
 //       got.ishard = checkHardLink( link, file );
@@ -1783,25 +1783,25 @@ function _fileOptionsGet( test ) {
 //     test.case = 'missed arguments';
 //     test.shouldThrowErrorSync( function( )
 //     {
-//       _.fileProvider.linkHard( );
+//       _.fileProvider.hardLink( );
 //     } );
 //
 //     test.case = 'extra arguments';
 //     test.shouldThrowErrorSync( function( )
 //     {
-//       _.fileProvider.linkHard( 'tmp.tmp/filesLink/identical1', 'tmp.tmp/filesLink/same_text.txt', 'tmp.tmp/filesLink/same_text.txt' );
+//       _.fileProvider.hardLink( 'tmp.tmp/filesLink/identical1', 'tmp.tmp/filesLink/same_text.txt', 'tmp.tmp/filesLink/same_text.txt' );
 //     } );
 //
 //     test.case = 'argumetns is not string';
 //     test.shouldThrowErrorSync( function( )
 //     {
-//       _.fileProvider.linkHard( 34, {} );
+//       _.fileProvider.hardLink( 34, {} );
 //     } );
 //
 //     test.case = 'passed unexpected property';
 //     test.shouldThrowErrorSync( function( )
 //     {
-//       _.fileProvider.linkHard( {
+//       _.fileProvider.hardLink( {
 //         dstPath : 'tmp.tmp/fileHardlink/src1',
 //         srcPath : 'tmp.tmp/fileHardlink/hard_text.txt',
 //         dir : 'tmp.tmp/fileHardlink'
@@ -2369,7 +2369,7 @@ function filesLink( test )
 
     try
     {
-      got.result = _.fileProvider.linkHard({ dstPath :  link, srcPath : file, sync : 1 });
+      got.result = _.fileProvider.hardLink({ dstPath :  link, srcPath : file, sync : 1 });
       // got.isExists = File.existsSync(  _.path.resolve( link ) );
       got.isExists = !!_.fileProvider.statResolvedRead(  _.path.resolve( link ) );
       got.ishard = checkHardLink( link, file );
@@ -2394,25 +2394,25 @@ function filesLink( test )
     test.description = 'missed arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileProvider.linkHard( );
+      _.fileProvider.hardLink( );
     } );
 
     test.description = 'extra arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileProvider.linkHard( 'tmp.tmp/filesLink/identical1', 'tmp.tmp/filesLink/same_text.txt', 'tmp.tmp/filesLink/same_text.txt' );
+      _.fileProvider.hardLink( 'tmp.tmp/filesLink/identical1', 'tmp.tmp/filesLink/same_text.txt', 'tmp.tmp/filesLink/same_text.txt' );
     } );
 
     test.description = 'argumetns is not string';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileProvider.linkHard( 34, {} );
+      _.fileProvider.hardLink( 34, {} );
     } );
 
     test.description = 'passed unexpected property';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileProvider.linkHard( {
+      _.fileProvider.hardLink( {
         dstPath : 'tmp.tmp/fileHardlink/src1',
         srcPath : 'tmp.tmp/fileHardlink/hard_text.txt',
         dir : 'tmp.tmp/fileHardlink'

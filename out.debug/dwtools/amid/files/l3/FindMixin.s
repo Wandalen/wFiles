@@ -877,7 +877,10 @@ function filesCopyWithAdapter( o )
   options.preservingSame = o.tryingPreserve; // check it
   options.includingDst = o.investigateDestination;
 
-  /* qqq : wrong! resolving*Link and resolvingSoftLink are not related, as well as resolvingTextLink */
+  /*
+  qqq : wrong! resolving*Link and resolvingSoftLink are not related, as well as resolvingTextLink
+  Vova : low priority
+  */
   options.resolvingSrcSoftLink = o.resolvingSoftLink;
   options.resolvingDstSoftLink = o.resolvingSoftLink;
   options.resolvingSrcTextLink = o.resolvingTextLink;

@@ -1079,7 +1079,7 @@ function filesFind( test )
     // basePath : null,
     // filePath : testDir,
     // strict : 1,
-    allowingMissing : 1,
+    allowingMissed : 1,
     includingStem : 1,
     result : [],
     orderingExclusion : [],
@@ -1657,7 +1657,7 @@ function filesFind2( t )
 
   /* - */
 
-  t.description = 'allowingMissing option';
+  t.description = 'allowingMissed option';
   filePath = _.path.join( dir, __filename );
   var nonexistentPath = _.path.join( dir, 'nonexistent' );
 
@@ -1676,7 +1676,7 @@ function filesFind2( t )
   got = provider.filesFind
   ({
     filePath : nonexistentPath,
-    allowingMissing : 1,
+    allowingMissed : 1,
   });
   // var expected = [ provider.recordFactory({ basePath : '/invalid path', filter : got[ 0 ].context.filter }).record( '/invalid path' ) ];
   var expected = [];
@@ -1687,7 +1687,7 @@ function filesFind2( t )
     got = provider.filesFind
     ({
       filePath : nonexistentPath,
-      allowingMissing : 0,
+      allowingMissed : 0,
     });
   })
 
@@ -1696,7 +1696,7 @@ function filesFind2( t )
   got = provider.filesFind
   ({
     filePath : [ nonexistentPath, filePath ],
-    allowingMissing : 1,
+    allowingMissed : 1,
   });
   expected = provider.dirRead( filePath );
   t.identical( check( got, expected ), true )
@@ -1706,16 +1706,16 @@ function filesFind2( t )
     got = provider.filesFind
     ({
       filePath : [ nonexistentPath, filePath ],
-      allowingMissing : 0,
+      allowingMissed : 0,
     });
   });
 
-  /*filePath - some paths not exist, allowingMissing on*/
+  /*filePath - some paths not exist, allowingMissed on*/
 
   got = provider.filesFind
   ({
     filePath : [ nonexistentPath, filePath ],
-    allowingMissing : 1,
+    allowingMissed : 1,
   });
   t.identical( got.length, 1 );
   t.is( got[ 0 ] instanceof _.FileRecord );
@@ -1728,19 +1728,19 @@ function filesFind2( t )
   /*filePath - empty dir, includingTerminals, includingTransient on*/
 
   provider.dirMake( _.path.join( context.testRootDirectory, 'empty' ) )
-  got = provider.filesFind({ filePath : _.path.join( dir, 'empty' ), includingTerminals : 1, includingTransient : 1, allowingMissing : 1 });
+  got = provider.filesFind({ filePath : _.path.join( dir, 'empty' ), includingTerminals : 1, includingTransient : 1, allowingMissed : 1 });
   t.identical( got, [] );
 
   /*filePath - empty dir, includingTerminals, includingTransient on, includingStem off*/
 
   provider.dirMake( _.path.join( context.testRootDirectory, 'empty' ) )
-  got = provider.filesFind({ filePath : _.path.join( dir, 'empty' ), includingTerminals : 1, includingTransient : 1, includingStem : 0, allowingMissing : 1 });
+  got = provider.filesFind({ filePath : _.path.join( dir, 'empty' ), includingTerminals : 1, includingTransient : 1, includingStem : 0, allowingMissed : 1 });
   t.identical( got, [] );
 
   /*filePath - empty dir, includingTerminals, includingTransient off*/
 
   provider.dirMake( _.path.join( context.testRootDirectory, 'empty' ) )
-  got = provider.filesFind({ filePath : _.path.join( dir, 'empty' ), includingTerminals : 0, includingTransient : 0, allowingMissing : 1 });
+  got = provider.filesFind({ filePath : _.path.join( dir, 'empty' ), includingTerminals : 0, includingTransient : 0, allowingMissed : 1 });
   t.identical( got, [] );
 
   /*filePath - directory, includingTerminals, includingTransient on*/
@@ -2282,7 +2282,7 @@ function filesFindLinked( test )
   self.provider.filesDelete( workDir );
   self.provider.fileWrite( terminalPath, terminalPath );
   self.provider.softLink( normalPath, terminalPath );
-  self.provider.softLink({ dstPath : brokenPath, srcPath : missingPath, allowingMissing : 1 });
+  self.provider.softLink({ dstPath : brokenPath, srcPath : missingPath, allowingMissed : 1 });
 
   var got = self.provider.filesFind
   ({
@@ -2291,7 +2291,7 @@ function filesFindLinked( test )
     outputFormat : 'record',
     includingTransient : 1,
     includingTerminals : 1,
-    allowingMissing : 0,
+    allowingMissed : 0,
     includingDirs : 1,
     recursive : '2',
     includingStem : 1,
@@ -2306,7 +2306,7 @@ function filesFindLinked( test )
     outputFormat : 'record',
     includingTransient : 1,
     includingTerminals : 1,
-    allowingMissing : 1,
+    allowingMissed : 1,
     includingDirs : 1,
     recursive : '2',
     includingStem : 1,
@@ -2323,7 +2323,7 @@ function filesFindLinked( test )
       outputFormat : 'record',
       includingTransient : 1,
       includingTerminals : 1,
-      allowingMissing : 0,
+      allowingMissed : 0,
       includingDirs : 1,
       recursive : '2',
       includingStem : 1,
@@ -2337,7 +2337,7 @@ function filesFindLinked( test )
     outputFormat : 'record',
     includingTransient : 1,
     includingTerminals : 1,
-    allowingMissing : 1,
+    allowingMissed : 1,
     includingDirs : 1,
     recursive : '2',
     includingStem : 1,
@@ -2363,7 +2363,7 @@ function filesFindLinked( test )
   self.provider.filesDelete( workDir );
   self.provider.fileWrite( terminalPath, terminalPath );
   self.provider.softLink( normalPath, terminalPath );
-  self.provider.softLink({ dstPath : selfPath, srcPath : '../self', allowingMissing : 1 });
+  self.provider.softLink({ dstPath : selfPath, srcPath : '../self', allowingMissed : 1 });
 
   var got = self.provider.filesFind
   ({
@@ -2372,7 +2372,8 @@ function filesFindLinked( test )
     outputFormat : 'record',
     includingTransient : 1,
     includingTerminals : 1,
-    allowingMissing : 0,
+    allowingMissed : 0,
+    allowingCycled : 1,
     includingDirs : 1,
     recursive : '2',
     includingStem : 1,
@@ -2387,7 +2388,8 @@ function filesFindLinked( test )
     outputFormat : 'record',
     includingTransient : 1,
     includingTerminals : 1,
-    allowingMissing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
     includingDirs : 1,
     recursive : '2',
     includingStem : 1,
@@ -2404,7 +2406,7 @@ function filesFindLinked( test )
       outputFormat : 'record',
       includingTransient : 1,
       includingTerminals : 1,
-      allowingMissing : 0,
+      allowingMissed : 0,
       includingDirs : 1,
       recursive : '2',
       includingStem : 1,
@@ -2418,7 +2420,8 @@ function filesFindLinked( test )
     outputFormat : 'record',
     includingTransient : 1,
     includingTerminals : 1,
-    allowingMissing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
     includingDirs : 1,
     recursive : '2',
     includingStem : 1,
@@ -2439,8 +2442,8 @@ function filesFindLinked( test )
 
   self.provider.filesDelete( workDir );
   self.provider.fileWrite( terminalPath, terminalPath );
-  self.provider.softLink({ dstPath : twoPath, srcPath : onePath, allowingMissing : 1 });
-  self.provider.softLink({ dstPath : onePath, srcPath : twoPath, allowingMissing : 1 });
+  self.provider.softLink({ dstPath : twoPath, srcPath : onePath, allowingMissed : 1 });
+  self.provider.softLink({ dstPath : onePath, srcPath : twoPath, allowingMissed : 1 });
 
   var got = self.provider.filesFind
   ({
@@ -2449,7 +2452,7 @@ function filesFindLinked( test )
     outputFormat : 'record',
     includingTransient : 1,
     includingTerminals : 1,
-    allowingMissing : 0,
+    allowingMissed : 0,
     includingDirs : 1,
     recursive : '2',
     includingStem : 1,
@@ -2466,7 +2469,7 @@ function filesFindLinked( test )
       outputFormat : 'record',
       includingTransient : 1,
       includingTerminals : 1,
-      allowingMissing : 0,
+      allowingMissed : 0,
       includingDirs : 1,
       recursive : '2',
       includingStem : 1,
@@ -2480,7 +2483,7 @@ function filesFindLinked( test )
     outputFormat : 'record',
     includingTransient : 1,
     includingTerminals : 1,
-    allowingMissing : 1,
+    allowingMissed : 1,
     includingDirs : 1,
     recursive : '2',
     includingStem : 1,
@@ -2650,7 +2653,7 @@ function filesFindResolving( test )
   var fixedOptions =
   {
     // basePath : null,
-    allowingMissing : 1,
+    allowingMissed : 1,
     orderingExclusion : [],
     sortingWithArray : null,
     outputFormat : 'record',
@@ -2716,7 +2719,7 @@ function filesFindResolving( test )
     resolvingTextLink : 0,
   }
   var options = _.mapExtend( o, fixedOptions );
-  _.fileProvider.fieldSet( 'usingTextLink', 0 );
+  _.fileProvider.fieldPush( 'usingTextLink', 0 );
   var files = _.fileProvider.filesFind( options );
   var filtered = files.map( recordSimplify );
   var expected =
@@ -2734,7 +2737,7 @@ function filesFindResolving( test )
   ]
 
   test.identical( filtered, expected )
-  _.fileProvider.fieldReset( 'usingTextLink', 0 );
+  _.fileProvider.fieldPop( 'usingTextLink', 0 );
 
   //
 
@@ -2746,7 +2749,7 @@ function filesFindResolving( test )
     resolvingTextLink : 0,
   }
   var options = _.mapExtend( o, fixedOptions );
-  _.fileProvider.fieldSet( 'usingTextLink', 0 );
+  _.fileProvider.fieldPush( 'usingTextLink', 0 );
   var files = _.fileProvider.filesFind( options );
   var filtered = files.map( recordSimplify );
   var expected =
@@ -2764,7 +2767,7 @@ function filesFindResolving( test )
   ]
 
   test.identical( filtered, expected )
-  _.fileProvider.fieldReset( 'usingTextLink', 0 );
+  _.fileProvider.fieldPop( 'usingTextLink', 0 );
 
   //
 
@@ -2776,7 +2779,7 @@ function filesFindResolving( test )
     resolvingTextLink : 1,
   }
   var options = _.mapExtend( o, fixedOptions );
-  _.fileProvider.fieldSet( 'usingTextLink', 0 );
+  _.fileProvider.fieldPush( 'usingTextLink', 0 );
   var files = _.fileProvider.filesFind( options );
   var filtered = files.map( recordSimplify );
   var expected =
@@ -2794,7 +2797,7 @@ function filesFindResolving( test )
   ]
 
   test.identical( filtered, expected )
-  _.fileProvider.fieldReset( 'usingTextLink', 0 );
+  _.fileProvider.fieldPop( 'usingTextLink', 0 );
 
   //
 
@@ -2806,7 +2809,7 @@ function filesFindResolving( test )
     resolvingTextLink : 1,
   }
   var options = _.mapExtend( o, fixedOptions );
-  _.fileProvider.fieldSet( 'usingTextLink', 1 );
+  _.fileProvider.fieldPush( 'usingTextLink', 1 );
   var files = _.fileProvider.filesFind( options );
   var filtered = files.map( recordSimplify );
   var expected =
@@ -2824,7 +2827,7 @@ function filesFindResolving( test )
   ]
 
   test.identical( filtered, expected )
-  _.fileProvider.fieldReset( 'usingTextLink', 1 );
+  _.fileProvider.fieldPop( 'usingTextLink', 1 );
 
   //
 
@@ -2832,7 +2835,7 @@ function filesFindResolving( test )
   makeCleanTree( testDir );
   var srcFilePath = filePaths[ 0 ];
   var textLinkPath = _.path.join( testDir, 'textLink' );
-  _.fileProvider.fieldSet( 'usingTextLink', 0 );
+  _.fileProvider.fieldPush( 'usingTextLink', 0 );
   var o =
   {
     filePath : testDir,
@@ -2867,7 +2870,7 @@ function filesFindResolving( test )
   var srcFileStat = _.fileProvider.statResolvedRead( srcFilePath );
   var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
   test.is( srcFileStat.ino !== textLinkStat.ino );
-  _.fileProvider.fieldReset( 'usingTextLink', 0 );
+  _.fileProvider.fieldPop( 'usingTextLink', 0 );
 
 
   //
@@ -2876,7 +2879,7 @@ function filesFindResolving( test )
   makeCleanTree( testDir );
   var srcFilePath = filePaths[ 0 ];
   var textLinkPath = _.path.join( testDir, 'textLink' );
-  _.fileProvider.fieldSet( 'usingTextLink', 0 );
+  _.fileProvider.fieldPush( 'usingTextLink', 0 );
   var o =
   {
     filePath : testDir,
@@ -2911,7 +2914,7 @@ function filesFindResolving( test )
   var srcFileStat = _.fileProvider.statResolvedRead( srcFilePath );
   var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
   test.is( srcFileStat.ino !== textLinkStat.ino );
-  _.fileProvider.fieldReset( 'usingTextLink', 0 );
+  _.fileProvider.fieldPop( 'usingTextLink', 0 );
 
   //
 
@@ -2919,7 +2922,7 @@ function filesFindResolving( test )
   makeCleanTree( testDir );
   var srcFilePath = filePaths[ 0 ];
   var textLinkPath = _.path.join( testDir, 'textLink' );
-  _.fileProvider.fieldSet( 'usingTextLink', 1 );
+  _.fileProvider.fieldPush( 'usingTextLink', 1 );
   var o =
   {
     filePath : testDir,
@@ -2954,7 +2957,7 @@ function filesFindResolving( test )
   var srcFileStat = _.fileProvider.statResolvedRead( srcFilePath );
   var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
   test.identical( srcFileStat.ino, textLinkStat.ino );
-  _.fileProvider.fieldReset( 'usingTextLink', 1 );
+  _.fileProvider.fieldPop( 'usingTextLink', 1 );
 
   //
 
@@ -2962,7 +2965,7 @@ function filesFindResolving( test )
   makeCleanTree( testDir );
   var srcFilePath = filePaths[ 0 ];
   var textLinkPath = _.path.join( testDir, 'textLink' );
-  _.fileProvider.fieldSet( 'usingTextLink', 1 );
+  _.fileProvider.fieldPush( 'usingTextLink', 1 );
   var o =
   {
     filePath : testDir,
@@ -2997,7 +3000,7 @@ function filesFindResolving( test )
   var srcFileStat = _.fileProvider.statResolvedRead( srcFilePath );
   var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
   test.identical( srcFileStat.ino, textLinkStat.ino );
-  _.fileProvider.fieldReset( 'usingTextLink', 1 );
+  _.fileProvider.fieldPop( 'usingTextLink', 1 );
 
    //
 
@@ -3005,7 +3008,7 @@ function filesFindResolving( test )
   makeCleanTree( testDir );
   var srcFilePath = filePaths[ 0 ];
   var textLinkPath = _.path.join( testDir, 'textLink' );
-  _.fileProvider.fieldSet( 'usingTextLink', 1 );
+  _.fileProvider.fieldPush( 'usingTextLink', 1 );
   var o =
   {
     filePath : testDir,
@@ -3040,7 +3043,7 @@ function filesFindResolving( test )
   var srcFileStat = _.fileProvider.statResolvedRead( srcFilePath );
   var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
   test.identical( srcFileStat.ino, textLinkStat.ino );
-  _.fileProvider.fieldReset( 'usingTextLink', 1 );
+  _.fileProvider.fieldPop( 'usingTextLink', 1 );
 
   //
 
@@ -3049,7 +3052,7 @@ function filesFindResolving( test )
   var srcFilePath = filePaths[ 0 ];
   var textLinkPath = _.path.join( testDir, 'textLink' );
   var textLink2Path = _.path.join( testDir, 'textLink2' );
-  _.fileProvider.fieldSet( 'usingTextLink', 1 );
+  _.fileProvider.fieldPush( 'usingTextLink', 1 );
   var o =
   {
     filePath : testDir,
@@ -3092,7 +3095,7 @@ function filesFindResolving( test )
   var textLink2Stat = findRecord( files, 'absolute', textLink2Path ).stat;
   test.identical( srcFileStat.ino, textLinkStat.ino );
   test.identical( srcFileStat.ino, textLink2Stat.ino );
-  _.fileProvider.fieldReset( 'usingTextLink', 1 );
+  _.fileProvider.fieldPop( 'usingTextLink', 1 );
 
   if( !symlinkIsAllowed )
   return;
@@ -3108,7 +3111,7 @@ function filesFindResolving( test )
     resolvingTextLink : 0,
   }
   var options = _.mapExtend( o, fixedOptions );
-  _.fileProvider.fieldSet( 'usingTextLink', 0 );
+  _.fileProvider.fieldPush( 'usingTextLink', 0 );
   var softLink = _.path.join( testDir, 'link' );
   var srcPath = filePaths[ 0 ];
   _.fileProvider.softLink( softLink, srcPath );
@@ -3136,7 +3139,7 @@ function filesFindResolving( test )
   var srcFileStat = _.fileProvider.statResolvedRead( filePaths[ 0 ] );
   var softLinkStat = findRecord( files, 'absolute', softLink ).stat;
   test.is( srcFileStat.ino !== softLinkStat.ino );
-  _.fileProvider.fieldReset( 'usingTextLink', 0 );
+  _.fileProvider.fieldPop( 'usingTextLink', 0 );
 
   //
 
@@ -3149,7 +3152,7 @@ function filesFindResolving( test )
     resolvingTextLink : 0,
   }
   var options = _.mapExtend( o, fixedOptions );
-  _.fileProvider.fieldSet( 'usingTextLink', 0 );
+  _.fileProvider.fieldPush( 'usingTextLink', 0 );
   var softLink = _.path.join( testDir, 'link' );
   var srcPath = filePaths[ 0 ];
   _.fileProvider.softLink( softLink, srcPath );
@@ -3177,7 +3180,7 @@ function filesFindResolving( test )
   var srcFileStat = _.fileProvider.statResolvedRead( filePaths[ 0 ] );
   var softLinkStat = findRecord( files, 'absolute', softLink ).stat;
   test.identical( srcFileStat.ino, softLinkStat.ino );
-  _.fileProvider.fieldReset( 'usingTextLink', 0 );
+  _.fileProvider.fieldPop( 'usingTextLink', 0 );
 
   //
 
@@ -3191,7 +3194,7 @@ function filesFindResolving( test )
   }
 
   var options = _.mapExtend( o, fixedOptions );
-  _.fileProvider.fieldSet( 'usingTextLink', 1 );
+  _.fileProvider.fieldPush( 'usingTextLink', 1 );
   var softLink = _.path.join( testDir, 'link' );
   var srcPath = filePaths[ 0 ];
   _.fileProvider.softLink( softLink, srcPath );
@@ -3220,14 +3223,14 @@ function filesFindResolving( test )
   var srcFileStat = _.fileProvider.statResolvedRead( filePaths[ 0 ] );
   var softLinkStat = findRecord( files, 'absolute', softLink ).stat;
   test.identical( srcFileStat.ino, softLinkStat.ino );
-  _.fileProvider.fieldReset( 'usingTextLink', 1 );
+  _.fileProvider.fieldPop( 'usingTextLink', 1 );
 
   //
 
   test.case = 'soft link to a dir, resolvingSoftLink : 1, resolvingTextLink : 0';
   var srcDirPath = _.path.join( testDir, 'dir' );
   var softLink = _.path.join( testDir, 'linkToDir' );
-  _.fileProvider.fieldSet( 'usingTextLink', 0 );
+  _.fileProvider.fieldPush( 'usingTextLink', 0 );
   _.fileProvider.filesDelete( testDir );
   makeCleanTree( srcDirPath );
   var o =
@@ -3275,14 +3278,14 @@ function filesFindResolving( test )
   var srcDirStat = _.fileProvider.statResolvedRead( srcDirPath );
   var softLinkStat = findRecord( files, 'absolute', softLink ).stat;
   test.identical( srcDirStat.ino, softLinkStat.ino );
-  _.fileProvider.fieldReset( 'usingTextLink', 0 );
+  _.fileProvider.fieldPop( 'usingTextLink', 0 );
 
   //
 
   test.case = 'soft link to a dir, resolvingSoftLink : 1, resolvingTextLink : 1';
   var srcDirPath = _.path.join( testDir, 'dir' );
   var softLink = _.path.join( testDir, 'linkToDir' );
-  _.fileProvider.fieldSet( 'usingTextLink', 1 );
+  _.fileProvider.fieldPush( 'usingTextLink', 1 );
   _.fileProvider.filesDelete( testDir );
   makeCleanTree( srcDirPath );
   var o =
@@ -3331,7 +3334,7 @@ function filesFindResolving( test )
   var srcDirStat = _.fileProvider.statResolvedRead( srcDirPath );
   var softLinkStat = findRecord( files, 'absolute', softLink ).stat;
   test.identical( srcDirStat.ino, softLinkStat.ino );
-  _.fileProvider.fieldReset( 'usingTextLink', 1 );
+  _.fileProvider.fieldPop( 'usingTextLink', 1 );
 
   //
 
@@ -3345,7 +3348,7 @@ function filesFindResolving( test )
   }
 
   var options = _.mapExtend( o, fixedOptions );
-  _.fileProvider.fieldSet( 'usingTextLink', 0 );
+  _.fileProvider.fieldPush( 'usingTextLink', 0 );
   var softLink = _.path.join( testDir, 'link' );
   var softLink2 = _.path.join( testDir, 'link2' );
   var srcPath = filePaths[ 0 ];
@@ -3383,7 +3386,7 @@ function filesFindResolving( test )
   var softLink2Stat = findRecord( files, 'absolute', softLink2 ).stat;
   test.identical( srcFileStat.ino, softLinkStat.ino );
   test.identical( srcFileStat.ino, softLink2Stat.ino );
-  _.fileProvider.fieldReset( 'usingTextLink', 0 );
+  _.fileProvider.fieldPop( 'usingTextLink', 0 );
 
   //
 
@@ -3397,7 +3400,7 @@ function filesFindResolving( test )
   }
 
   var options = _.mapExtend( o, fixedOptions );
-  _.fileProvider.fieldSet( 'usingTextLink', 1 );
+  _.fileProvider.fieldPush( 'usingTextLink', 1 );
   var softLink = _.path.join( testDir, 'link' );
   var softLink2 = _.path.join( testDir, 'link2' );
   var srcPath = filePaths[ 0 ];
@@ -3435,7 +3438,7 @@ function filesFindResolving( test )
   var softLink2Stat = findRecord( files, 'absolute', softLink2 ).stat;
   test.identical( srcFileStat.ino, softLinkStat.ino );
   test.identical( srcFileStat.ino, softLink2Stat.ino );
-  _.fileProvider.fieldReset( 'usingTextLink', 1 );
+  _.fileProvider.fieldPop( 'usingTextLink', 1 );
 
   //
 
@@ -3449,7 +3452,7 @@ function filesFindResolving( test )
   }
 
   var options = _.mapExtend( o, fixedOptions );
-  _.fileProvider.fieldSet( 'usingTextLink', 0 );
+  _.fileProvider.fieldPush( 'usingTextLink', 0 );
   var softLink = _.path.join( testDir, 'link' );
   var softLink2 = _.path.join( testDir, 'link2' );
   var srcPath = filePaths[ 0 ];
@@ -3487,7 +3490,7 @@ function filesFindResolving( test )
   var softLink2Stat = findRecord( files, 'absolute', softLink2 ).stat;
   test.identical( srcFileStat.ino, softLinkStat.ino );
   test.identical( srcFileStat.ino, softLink2Stat.ino );
-  _.fileProvider.fieldReset( 'usingTextLink', 0 );
+  _.fileProvider.fieldPop( 'usingTextLink', 0 );
 
   //
 
@@ -3501,7 +3504,7 @@ function filesFindResolving( test )
   }
 
   var options = _.mapExtend( o, fixedOptions );
-  _.fileProvider.fieldSet( 'usingTextLink', 1 );
+  _.fileProvider.fieldPush( 'usingTextLink', 1 );
   var softLink = _.path.join( testDir, 'link' );
   var softLink2 = _.path.join( testDir, 'link2' );
   var srcPath = filePaths[ 0 ];
@@ -3539,7 +3542,7 @@ function filesFindResolving( test )
   var softLink2Stat = findRecord( files, 'absolute', softLink2 ).stat;
   test.identical( srcFileStat.ino, softLinkStat.ino );
   test.identical( srcFileStat.ino, softLink2Stat.ino );
-  _.fileProvider.fieldReset( 'usingTextLink', 1 );
+  _.fileProvider.fieldPop( 'usingTextLink', 1 );
 
   //
 
@@ -3548,7 +3551,7 @@ function filesFindResolving( test )
   var srcFilePath = filePaths[ 0 ];
   var textLinkPath = _.path.join( testDir, 'textLink' );
   var softLinkPath = _.path.join( testDir, 'softLinkPath' );
-  _.fileProvider.fieldSet( 'usingTextLink', 1 );
+  _.fileProvider.fieldPush( 'usingTextLink', 1 );
   var o =
   {
     filePath : testDir,
@@ -3591,7 +3594,7 @@ function filesFindResolving( test )
   var softLinkStat = findRecord( files, 'absolute', softLinkPath ).stat;
   test.identical( srcFileStat.ino, textLinkStat.ino );
   test.identical( srcFileStat.ino, softLinkStat.ino );
-  _.fileProvider.fieldReset( 'usingTextLink', 1 );
+  _.fileProvider.fieldPop( 'usingTextLink', 1 );
 
   //
 
@@ -3601,7 +3604,7 @@ function filesFindResolving( test )
   makeCleanTree( srcDirPath );
   var textLinkPath = _.path.join( testDir, 'textLink' );
   var softLinkPath = _.path.join( testDir, 'softLinkPath' );
-  _.fileProvider.fieldSet( 'usingTextLink', 1 );
+  _.fileProvider.fieldPush( 'usingTextLink', 1 );
   var o =
   {
     filePath : testDir,
@@ -3652,7 +3655,7 @@ function filesFindResolving( test )
   test.identical( srcDirStat.ino, softLinkStat.ino );
   test.is( srcFileStat.ino !== textLinkStat.ino )
   test.is( srcFileStat.ino !== softLinkStat.ino )
-  _.fileProvider.fieldReset( 'usingTextLink', 1 );
+  _.fileProvider.fieldPop( 'usingTextLink', 1 );
 
 }
 
@@ -3793,7 +3796,7 @@ function filesFindGlob( test )
     includingTerminals : 1,
     includingDirs : 0,
     includingTransient : 0,
-    allowingMissing : 1,
+    allowingMissed : 1,
     recursive : '2',
   });
 
@@ -3804,7 +3807,7 @@ function filesFindGlob( test )
     includingTerminals : 1,
     includingDirs : 1,
     includingTransient : 1,
-    allowingMissing : 1,
+    allowingMissed : 1,
     recursive : '2',
   });
 
@@ -9781,7 +9784,7 @@ function filesReflector( t )
   ({
     srcFilter : { prefixPath : 'src:///', basePath : 'src:///' },
     dstFilter : { prefixPath : 'dst:///', basePath : 'dst:///' },
-    linking : 'softlink',
+    linking : 'softLink',
     mandatory : 1,
   });
   reflect( 'alt/a' )
@@ -10764,13 +10767,13 @@ function filesReflectLinked( test )
   ({
     srcPath : path.join( srcDir, 'fileNotExists' ),
     dstPath : path.join( srcDir, 'link' ),
-    allowingMissing : 1,
+    allowingMissed : 1,
   })
 
   provider.filesReflect
   ({
     reflectMap : { [ srcDir ] : dstDir },
-    allowingMissing : 1,
+    allowingMissed : 1,
   });
 
   test.is( provider.fileExists( path.join( dstDir, 'file' ) ) )
@@ -10789,13 +10792,13 @@ function filesReflectLinked( test )
   ({
     srcPath : path.join( dstDir, 'fileNotExists' ),
     dstPath : path.join( dstDir, 'link' ),
-    allowingMissing : 1
+    allowingMissed : 1
   });
 
   provider.filesReflect
   ({
     reflectMap : { [ srcDir ] : dstDir },
-    allowingMissing : 1,
+    allowingMissed : 1,
   });
 
   /*
@@ -10817,21 +10820,21 @@ function filesReflectLinked( test )
   ({
     srcPath : path.join( srcDir, 'fileNotExists' ),
     dstPath : path.join( srcDir, 'link' ),
-    allowingMissing : 1,
+    allowingMissed : 1,
     makingDirectory : 1
   })
   provider.softLink
   ({
     srcPath : path.join( dstDir, 'fileNotExists' ),
     dstPath : path.join( dstDir, 'link' ),
-    allowingMissing : 1,
+    allowingMissed : 1,
     makingDirectory : 1
   })
 
   provider.filesReflect
   ({
     reflectMap : { [ srcDir ] : dstDir },
-    allowingMissing : 1,
+    allowingMissed : 1,
   })
 
   test.will = 'dstDir/link should not be rewritten by srcDir/link'
@@ -10847,7 +10850,7 @@ function filesReflectLinked( test )
   ({
     srcPath : path.join( srcDir, 'fileNotExists' ),
     dstPath : path.join( srcDir, 'link' ),
-    allowingMissing : 1,
+    allowingMissed : 1,
     makingDirectory : 1
   })
   provider.fileWrite( path.join( dstDir, 'file' ), 'file' );
@@ -10861,7 +10864,7 @@ function filesReflectLinked( test )
   provider.filesReflect
   ({
     reflectMap : { [ srcDir ] : dstDir },
-    allowingMissing : 1,
+    allowingMissed : 1,
   })
 
   test.will = 'dstDir/link should not be rewritten by srcDir/link'
@@ -10884,14 +10887,14 @@ function filesReflectLinked( test )
   ({
     srcPath : path.join( dstDir, 'fileNotExists' ),
     dstPath : path.join( dstDir, 'link' ),
-    allowingMissing : 1,
+    allowingMissed : 1,
     makingDirectory : 1
   })
 
   provider.filesReflect
   ({
     reflectMap : { [ srcDir ] : dstDir },
-    allowingMissing : 1,
+    allowingMissed : 1,
   })
 
   test.will = 'dstDir/link should be rewritten by srcDir/link'
@@ -10908,14 +10911,14 @@ function filesReflectLinked( test )
   ({
     srcPath : path.join( dstDir, 'fileNotExists' ),
     dstPath : path.join( dstDir, 'link' ),
-    allowingMissing : 1,
+    allowingMissed : 1,
     makingDirectory : 1
   })
 
   provider.filesReflect
   ({
     reflectMap : { [ srcDir ] : dstDir },
-    allowingMissing : 1,
+    allowingMissed : 1,
   })
 
   test.will = 'dstDir/link should not be rewritten by srcDir/link'
@@ -10939,14 +10942,14 @@ function filesReflectLinked( test )
   // ({
   //   srcPath : path.join( srcDir, 'fileNotExists' ),
   //   dstPath : path.join( srcDir, 'link' ),
-  //   allowingMissing : 1
+  //   allowingMissed : 1
   // })
 
   // provider.softLink
   // ({
   //   srcPath : path.join( srcDir, 'fileNotExists' ),
   //   dstPath : path.join( srcDir, 'link2' ),
-  //   allowingMissing : 1
+  //   allowingMissed : 1
   // })
 
   // provider.softLink
@@ -10959,7 +10962,7 @@ function filesReflectLinked( test )
   // ({
   //   srcPath : path.join( dstDir, 'fileNotExists' ),
   //   dstPath : path.join( dstDir, 'link' ),
-  //   allowingMissing : 1
+  //   allowingMissed : 1
   // })
 
   // provider.softLink
@@ -10972,20 +10975,20 @@ function filesReflectLinked( test )
   // ({
   //   srcPath : path.join( dstDir, 'fileNotExists' ),
   //   dstPath : path.join( dstDir, 'link3' ),
-  //   allowingMissing : 1
+  //   allowingMissed : 1
   // })
 
   // provider.softLink
   // ({
   //   srcPath : path.join( dstDir, 'fileNotExists' ),
   //   dstPath : path.join( dstDir, 'link4' ),
-  //   allowingMissing : 1
+  //   allowingMissed : 1
   // })
 
   // provider.filesReflect
   // ({
   //   reflectMap : { [ srcDir ] : dstDir },
-  //   allowingMissing : 1,
+  //   allowingMissed : 1,
   // })
 
   // test.is( provider.isSoftLink( path.join( dstDir, 'link' ) ) );
@@ -11085,7 +11088,7 @@ function filesDelete( test )
   return;
 
   test.case = 'delete soft link, resolvingSoftLink 1';
-  _.fileProvider.fieldSet( 'resolvingSoftLink', 1 );
+  _.fileProvider.fieldPush( 'resolvingSoftLink', 1 );
   var dst = _.path.join( testDir, 'link' );
   _.fileProvider.fileWrite( filePath, ' ');
   _.fileProvider.softLink( dst, filePath );
@@ -11094,11 +11097,11 @@ function filesDelete( test )
   test.identical( stat, null );
   var stat = _.fileProvider.statResolvedRead( filePath );
   test.is( !!stat );
-  _.fileProvider.fieldReset( 'resolvingSoftLink', 1 );
+  _.fileProvider.fieldPop( 'resolvingSoftLink', 1 );
 
   test.case = 'delete soft link, resolvingSoftLink 0';
   _.fileProvider.filesDelete( testDir );
-  _.fileProvider.fieldSet( 'resolvingSoftLink', 0 );
+  _.fileProvider.fieldPush( 'resolvingSoftLink', 0 );
   var dst = _.path.join( testDir, 'link' );
   _.fileProvider.fileWrite( filePath, ' ');
   _.fileProvider.softLink( dst, filePath );
@@ -11107,7 +11110,7 @@ function filesDelete( test )
   test.identical( stat, null );
   var stat = _.fileProvider.statResolvedRead( filePath );
   test.is( !!stat );
-  _.fileProvider.fieldReset( 'resolvingSoftLink', 0 );
+  _.fileProvider.fieldPop( 'resolvingSoftLink', 0 );
 }
 
 //

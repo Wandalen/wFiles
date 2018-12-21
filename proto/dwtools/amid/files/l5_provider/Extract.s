@@ -75,7 +75,7 @@ function pathCurrentAct()
 function pathResolveSoftLinkAct( o )
 {
   let self = this;
-  let filePath = o.filePath;
+  // let filePath = o.filePath;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( self.path.isAbsolute( o.filePath ) );
@@ -85,14 +85,62 @@ function pathResolveSoftLinkAct( o )
   // if( !self.isSoftLink( o.filePath ) )
   // return o.filePath;
 
-  let descriptor = self._descriptorRead( filePath );
+  let result;
 
-  if( self._descriptorIsSoftLink( descriptor ) )
-  filePath = self._descriptorResolveSoftLinkPath( descriptor );
+  if( o.resolvingIntermediateDirectories )
+  return resolveIntermediateDirectories();
 
-  _.assert( _.strIs( filePath ) )
+  let descriptor = self._descriptorRead( o.filePath );
 
-  return filePath;
+  if( !self._descriptorIsSoftLink( descriptor ) )
+  return o.filePath;
+
+  result = self._descriptorResolveSoftLinkPath( descriptor );
+
+  _.assert( _.strIs( result ) )
+
+  if( o.resolvingMultiple )
+  return resolvingMultiple();
+
+  return result;
+
+  /*  */
+
+  function resolveIntermediateDirectories()
+  {
+    let splits = self.path.split( o.filePath );
+    let o2 = _.mapExtend( null, o );
+
+    o2.resolvingIntermediateDirectories = 0;
+    o2.filePath = '/';
+
+    for( let i = 1 ; i < splits.length ; i++ )
+    {
+      o2.filePath = self.path.join( o2.filePath, splits[ i ] );
+
+      let descriptor = self._descriptorRead( o2.filePath );
+
+      if( self._descriptorIsSoftLink( descriptor ) )
+      {
+        result = self.pathResolveSoftLinkAct( o2 )
+        o2.filePath = self.path.join( o2.filePath, result );
+      }
+    }
+    return o2.filePath;
+  }
+
+  /**/
+
+  function resolvingMultiple()
+  {
+    result = self.path.join( o.filePath, self.path.normalize( result ) );
+    let descriptor = self._descriptorRead( result );
+    if( !self._descriptorIsSoftLink( descriptor ) )
+    return result;
+    let o2 = _.mapExtend( null, o );
+    o2.filePath = result;
+    return self.pathResolveSoftLinkAct( o2 );
+  }
 }
 
 _.routineExtend( pathResolveSoftLinkAct, Parent.prototype.pathResolveSoftLinkAct )

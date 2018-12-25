@@ -742,7 +742,7 @@ function fileWriteAct( o )
     /* what for is that needed ??? */
     /*self._descriptorRead({ query : dstDir, set : structure });*/
 
-    return true;
+    return true; 
   }
 
 }

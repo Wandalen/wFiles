@@ -4527,36 +4527,40 @@ function dirMake_body( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( path.isNormalized( o.filePath ) );
 
+  let o2 = { filePath : o.filePath }
+  let filePath = self.pathResolveLinkFull( o2 );
+
   /* qqq : use fileExists instead of statRead where possible */
-  if( self.fileExists( o.filePath ) )
+  if( self.fileExists( filePath ) )
   {
 
     // debugger;
-    let stat = self.statResolvedRead( o.filePath );
+    // let stat = self.statResolvedRead( filePath );
+    let stat = o2.stat;
     _.assert( !!stat );
     if( stat.isTerminal() )
     if( o.rewritingTerminal )
-    self.fileDelete( o.filePath );
+    self.fileDelete( filePath );
     else
-    return handleError( _.err( 'Cant rewrite terminal file', _.strQuote( o.filePath ), 'by directory file.' ) );
+    return handleError( _.err( 'Cant rewrite terminal file', _.strQuote( filePath ), 'by directory file.' ) );
 
     if( stat.isDir() )
     {
       if( !o.recursive  )
-      return handleError( _.err( 'File already exists:', _.strQuote( o.filePath ) ) );
+      return handleError( _.err( 'File already exists:', _.strQuote( filePath ) ) );
       else
       return o.sync ? undefined : new _.Consequence().take( null );
     }
 
   }
 
-  let exists = self.fileExists( path.dir( o.filePath ) );
+  let exists = self.fileExists( path.dir( filePath ) );
 
   if( !o.recursive && !exists )
-  return handleError( _.err( 'Directory', _.strQuote( o.filePath ), ' doesn\'t exist!. Use {-o.recursive-} option to create it.' ) );
+  return handleError( _.err( 'Directory', _.strQuote( filePath ), ' doesn\'t exist!. Use {-o.recursive-} option to create it.' ) );
 
-  let splits = [ o.filePath ];
-  let dir = o.filePath;
+  let splits = [ filePath ];
+  let dir = filePath;
 
   if( !exists )
   while( !exists )

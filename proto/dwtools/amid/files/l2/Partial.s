@@ -4532,7 +4532,7 @@ function dirMake_body( o )
   {
 
     // debugger;
-    let stat = self.statRead( o.filePath );
+    let stat = self.statResolvedRead( o.filePath );
     _.assert( !!stat );
     if( stat.isTerminal() )
     if( o.rewritingTerminal )

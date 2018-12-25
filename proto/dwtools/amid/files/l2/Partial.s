@@ -4893,8 +4893,9 @@ function _link_functor( gen )
     c.tempRenameCan = tempRenameCan;
     c.tempRename = o.sync ? tempRenameSync : tempRenameAsync;
     c.tempRenameBack = o.sync ? tempRenameBackSync : tempRenameBackAsync;
-    c.tempNameMake = tempNameMake;
+    c.tempNameMake = tempNameMake
     c.validateSize = validateSize;
+    c.srcBreakHardLink = srcBreakHardLinkSync;
     c.error = error;
     c.end = end;
 
@@ -4942,13 +4943,15 @@ function _link_functor( gen )
       try
       {
 
-        if( self.fileExists( o2.srcPath ) )
-        {
-          debugger
-          _.assert( !!c.srcStat )
-          if( o.breakingSrcHardLink && c.srcStat.isHardLink() )
-          srcBreakHardLinkSync();
-        }
+        // qqq : bad
+        // // if( self.fileExists( o2.srcPath ) )
+        // if( c.srcStat )
+        // {
+        //   debugger
+        //   _.assert( !!c.srcStat )
+        //   if( o.breakingSrcHardLink && c.srcStat.isHardLink() )
+        //   c.srcBreakHardLink();
+        // }
 
         if( self.fileExists( o2.dstPath ) )
         {
@@ -5893,12 +5896,12 @@ function _fileCopyAct( c )
 
   _.assert( _.fileStatIs( c.srcStat ) );
 
-  debugger;
+  // debugger;
 
   if( c.srcStat.isSoftLink() )
   {
 
-    debugger;
+    // debugger;
     /* should not throw error for missed neither for cycled */
     let srcResolvedPath = self.pathResolveSoftLink
     ({
@@ -5906,7 +5909,7 @@ function _fileCopyAct( c )
       // allowingMissed : o.allowingMissed,
       // allowingCycled : o.allowingCycled,
     });
-    debugger;
+    // debugger;
 
     return self.softLinkAct
     ({

@@ -4895,7 +4895,7 @@ function _link_functor( gen )
     c.tempRenameBack = o.sync ? tempRenameBackSync : tempRenameBackAsync;
     c.tempNameMake = tempNameMake
     c.validateSize = validateSize;
-    c.srcBreakHardLink = srcBreakHardLinkSync;
+    // c.srcBreakHardLink = srcBreakHardLinkSync;
     c.error = error;
     c.end = end;
 
@@ -5552,29 +5552,29 @@ function _link_functor( gen )
 
     /* - */
 
-    function srcBreakHardLinkSync()
-    {
-      c.tempPathSrc = tempNameMake( o2.srcPath );
-      if( self.fileExists( c.tempPathSrc ) )
-      self.filesDelete( c.tempPathSrc )
-      self.fileRenameAct
-      ({
-        dstPath : c.tempPathSrc,
-        srcPath : o2.srcPath,
-        originalDstPath : o.originalDstPath,
-        originalSrcPath : o.originalSrcPath,
-        sync : 1,
-      });
-      self.fileCopyAct
-      ({
-        srcPath : c.tempPathSrc,
-        dstPath : o2.srcPath,
-        originalDstPath : o.originalDstPath,
-        originalSrcPath : o.originalSrcPath,
-        sync : 1,
-        breakingDstHardLink : 0
-      })
-    }
+    // function srcBreakHardLinkSync()
+    // {
+    //   c.tempPathSrc = tempNameMake( o2.srcPath );
+    //   if( self.fileExists( c.tempPathSrc ) )
+    //   self.filesDelete( c.tempPathSrc )
+    //   self.fileRenameAct
+    //   ({
+    //     dstPath : c.tempPathSrc,
+    //     srcPath : o2.srcPath,
+    //     originalDstPath : o.originalDstPath,
+    //     originalSrcPath : o.originalSrcPath,
+    //     sync : 1,
+    //   });
+    //   self.fileCopyAct
+    //   ({
+    //     srcPath : c.tempPathSrc,
+    //     dstPath : o2.srcPath,
+    //     originalDstPath : o.originalDstPath,
+    //     originalSrcPath : o.originalSrcPath,
+    //     sync : 1,
+    //     breakingDstHardLink : 0
+    //   })
+    // }
 
     /* - */
 
@@ -6026,6 +6026,11 @@ operates.dstPath = { pathToWrite : 1 }
 function _hardLinkAct( c )
 {
   let self = this;
+
+  if( !self.fileExists( c.options2.dstPath ) )
+  if( c.options.breakingSrcHardLink && c.srcStat.isHardLink() )
+  self.hardLinkBreak( c.options2.srcPath );
+
   return self.hardLinkAct( c.options2 );
 }
 

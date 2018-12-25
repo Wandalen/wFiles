@@ -12484,7 +12484,7 @@ function statReadActSync( test )
   else
   test.identical( stat.nlink, 1 );
   if( self.provider.UsingBigIntForStat )
-  test.identical( stat.size, BigInt( 119 ) );
+  test.ge( stat.size , BigInt( 119 ) );
   else
   test.identical( stat.size, 27 );
 
@@ -12519,7 +12519,7 @@ function statReadActSync( test )
   else
   test.identical( stat.nlink, 1 );
   if( self.provider.UsingBigIntForStat )
-  test.identical( stat.size, BigInt( 119 ) );
+  test.ge( stat.size , BigInt( 119 ) );
   else
   test.identical( stat.size, 27 );
 
@@ -12550,7 +12550,7 @@ function statReadActSync( test )
   else
   test.identical( stat.nlink, 1 );
   if( self.provider.UsingBigIntForStat )
-  test.identical( stat.size, BigInt( 119 ) );
+  test.ge( stat.size , BigInt( 119 ) );
   else
   test.identical( stat.size, 27 );
 
@@ -12585,7 +12585,7 @@ function statReadActSync( test )
   else
   test.identical( stat.nlink, 1 );
   if( self.provider.UsingBigIntForStat )
-  test.identical( stat.size, BigInt( 119 ) );
+  test.ge( stat.size , BigInt( 119 ) );
   else
   test.identical( stat.size, 27 );
 

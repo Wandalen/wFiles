@@ -13385,6 +13385,169 @@ function dirMakeSync( test )
 
 //
 
+function dirMakeSyncLinks( test )
+{
+  let self = this;
+
+  let workDir = self.pathFor( 'written/dirMakeSyncLinks' );
+  let dirPath = self.pathFor( 'written/dirMakeSyncLinks/dir' );
+  let filePath = self.pathFor( 'written/dirMakeSyncLinks/file' );
+  let fileInDir = self.pathFor( 'written/dirMakeSyncLinks/dir/file' );
+  let linkToDir = self.pathFor( 'written/dirMakeSyncLinks/link' );
+
+  test.case = 'link to missing';
+  self.provider.filesDelete( workDir );
+  self.provider.softLink({ dstPath : linkToDir, srcPath : dirPath, allowingMissed : 1, makingDirectory : 1 });
+  self.provider.dirMake({ filePath : linkToDir, recursive : 1 });
+  test.is( self.provider.isDir( dirPath ) );
+
+  test.case = 'link to missing';
+  self.provider.filesDelete( workDir );
+  self.provider.softLink({ dstPath : linkToDir, srcPath : dirPath, allowingMissed : 1, makingDirectory : 1 });
+  self.provider.dirMake({ filePath : linkToDir, recursive : 0 });
+  test.is( self.provider.isDir( dirPath ) );
+
+  test.case = 'link to terminal';
+  self.provider.filesDelete( workDir );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.softLink({ dstPath : linkToDir, srcPath : filePath });
+  self.provider.dirMake({ filePath : linkToDir, recursive : 1, rewritingTerminal : 1 });
+  test.is( self.provider.isDir( filePath ) );
+
+  test.case = 'link to terminal';
+  self.provider.filesDelete( workDir );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.softLink({ dstPath : linkToDir, srcPath : filePath });
+  test.shouldThrowErrorSync( () =>
+  {
+    self.provider.dirMake
+    ({
+      filePath : linkToDir,
+      recursive : 1,
+      rewritingTerminal : 0
+    });
+  })
+  test.is( self.provider.isTerminal( filePath ) );
+
+  test.case = 'link to terminal';
+  self.provider.filesDelete( workDir );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.softLink({ dstPath : linkToDir, srcPath : filePath });
+  self.provider.dirMake({ filePath : linkToDir, recursive : 0, rewritingTerminal : 1 });
+  test.is( self.provider.isDir( filePath ) );
+
+  test.case = 'link to terminal';
+  self.provider.filesDelete( workDir );
+  self.provider.fileWrite( filePath, filePath );
+  self.provider.softLink({ dstPath : linkToDir, srcPath : filePath });
+  test.shouldThrowErrorSync( () =>
+  {
+    self.provider.dirMake
+    ({
+      filePath : linkToDir,
+      recursive : 0,
+      rewritingTerminal : 0
+    });
+  })
+  test.is( self.provider.isTerminal( filePath ) );
+
+  test.case = 'link to empty dir';
+  self.provider.filesDelete( workDir );
+  self.provider.dirMake( dirPath );
+  self.provider.softLink({ dstPath : linkToDir, srcPath : dirPath });
+  self.provider.dirMake({ filePath : linkToDir, recursive : 1 });
+  test.is( self.provider.isDir( dirPath ) );
+  test.is( self.provider.isSoftLink( linkToDir ) );
+  test.identical( self.provider.dirRead( dirPath ), [] )
+
+  test.case = 'link to empty dir';
+  self.provider.filesDelete( workDir );
+  self.provider.dirMake( dirPath );
+  self.provider.softLink({ dstPath : linkToDir, srcPath : dirPath });
+  test.shouldThrowErrorSync( () =>
+  {
+    self.provider.dirMake
+    ({
+      filePath : linkToDir,
+      recursive : 0,
+    });
+  })
+  test.is( self.provider.isDir( dirPath ) );
+  test.is( self.provider.isSoftLink( linkToDir ) );
+  test.identical( self.provider.dirRead( dirPath ), [] )
+
+  test.case = 'link to dir';
+  self.provider.filesDelete( workDir );
+  self.provider.fileWrite( fileInDir,fileInDir );
+  self.provider.softLink({ dstPath : linkToDir, srcPath : dirPath });
+  self.provider.dirMake({ filePath : linkToDir, recursive : 1 });
+  test.is( self.provider.isDir( dirPath ) );
+  test.is( self.provider.isSoftLink( linkToDir ) );
+  test.identical( self.provider.dirRead( dirPath ), [ 'file' ] )
+
+  test.case = 'link to dir';
+  self.provider.filesDelete( workDir );
+  self.provider.fileWrite( fileInDir,fileInDir );
+  self.provider.softLink({ dstPath : linkToDir, srcPath : dirPath });
+  test.shouldThrowErrorSync( () =>
+  {
+    self.provider.dirMake
+    ({
+      filePath : linkToDir,
+      recursive : 0,
+    });
+  })
+  test.is( self.provider.isDir( dirPath ) );
+  test.is( self.provider.isSoftLink( linkToDir ) );
+  test.identical( self.provider.dirRead( dirPath ), [ 'file' ] )
+
+  test.case = 'intermediate link, one dir to create';
+  self.provider.filesDelete( workDir );
+  self.provider.dirMake( dirPath );
+  self.provider.softLink({ dstPath : linkToDir, srcPath : dirPath });
+  var path = self.provider.path.join( linkToDir, 'dir' );
+  self.provider.dirMake({ filePath : path, recursive : 1 })
+  test.is( self.provider.isDir( path ) );
+  test.is( self.provider.isSoftLink( linkToDir ) );
+
+  test.case = 'intermediate link, one dir to create';
+  self.provider.filesDelete( workDir );
+  self.provider.dirMake( dirPath );
+  self.provider.softLink({ dstPath : linkToDir, srcPath : dirPath });
+  var path = self.provider.path.join( linkToDir, 'dir' );
+  self.provider.dirMake({ filePath : path, recursive : 0 })
+  test.is( self.provider.isDir( path ) );
+  test.is( self.provider.isSoftLink( linkToDir ) );
+
+  test.case = 'intermediate link, severals dirs to create';
+  self.provider.filesDelete( workDir );
+  self.provider.dirMake( dirPath );
+  self.provider.softLink({ dstPath : linkToDir, srcPath : dirPath });
+  var path = self.provider.path.join( linkToDir, 'dir/dir2/dir3' );
+  self.provider.dirMake({ filePath : path, recursive : 1 })
+  test.is( self.provider.isDir( path ) );
+  test.is( self.provider.isSoftLink( linkToDir ) );
+
+  test.case = 'intermediate link, severals dirs to create';
+  self.provider.filesDelete( workDir );
+  self.provider.dirMake( dirPath );
+  self.provider.softLink({ dstPath : linkToDir, srcPath : dirPath });
+  var path = self.provider.path.join( linkToDir, 'dir/dir2/dir3' );
+  test.shouldThrowErrorSync( () =>
+  {
+    self.provider.dirMake
+    ({
+      filePath : path,
+      recursive : 0,
+    });
+  })
+  test.is( !self.provider.fileExists( path ) );
+  test.is( self.provider.isSoftLink( linkToDir ) );
+
+}
+
+//
+
 function dirMakeAsync( test )
 {
   var self = this;
@@ -33792,6 +33955,7 @@ var Self =
     statResolvedReadAsync : statResolvedReadAsync,
 
     dirMakeSync : dirMakeSync,
+    dirMakeSyncLinks : dirMakeSyncLinks,
     dirMakeAsync : dirMakeAsync,
 
     hashReadSync : hashReadSync,

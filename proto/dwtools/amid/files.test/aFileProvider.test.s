@@ -24157,7 +24157,7 @@ function hardLinkHardLinkBreaking( test )
   let dstPathTerminal = self.provider.path.join( workDir, 'dstTerminal' );
 
 
-  /*  */
+  // /*  */
 
   test.case = 'src - terminal, dst - hardlink';
 
@@ -24167,8 +24167,15 @@ function hardLinkHardLinkBreaking( test )
   self.provider.hardLink( dstPath, dstPathTerminal );
   var o = { breakingSrcHardLink : 0, breakingDstHardLink : 0 };
   test.shouldThrowErrorSync( () => hardLink( o ) );
-  test.is( self.provider.isTerminal( srcPath) );
-  test.is( self.provider.isHardLink( dstPath) );
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  {
+    test.identical( self.provider.filesAreHardLinked([ dstPath, dstPathTerminal ]), null );
+  }
+  else
+  {
+    test.identical( self.provider.filesAreHardLinked([ dstPath, dstPathTerminal ]), true );
+  }
+  test.identical( self.provider.filesAreHardLinked([ srcPath, dstPath ]), false );
 
   self.provider.filesDelete( workDir );
   self.provider.fileWrite( srcPath, srcPath );
@@ -24176,8 +24183,15 @@ function hardLinkHardLinkBreaking( test )
   self.provider.hardLink( dstPath, dstPathTerminal );
   var o = { breakingSrcHardLink : 1, breakingDstHardLink : 0 };
   test.shouldThrowErrorSync( () => hardLink( o ) );
-  test.is( self.provider.isTerminal( srcPath) );
-  test.is( self.provider.isHardLink( dstPath) );
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  {
+    test.identical( self.provider.filesAreHardLinked([ dstPath, dstPathTerminal ]), null );
+  }
+  else
+  {
+    test.identical( self.provider.filesAreHardLinked([ dstPath, dstPathTerminal ]), true );
+  }
+  test.identical( self.provider.filesAreHardLinked([ srcPath, dstPath ]), false );
 
   self.provider.filesDelete( workDir );
   self.provider.fileWrite( srcPath, srcPath );
@@ -24185,9 +24199,15 @@ function hardLinkHardLinkBreaking( test )
   self.provider.hardLink( dstPath, dstPathTerminal );
   var o = { breakingSrcHardLink : 0, breakingDstHardLink : 1 };
   hardLink( o );
-  test.is( self.provider.isTerminal( srcPath) );
-  test.is( self.provider.isHardLink( dstPath) );
-  test.identical( self.provider.fileRead( dstPath ), srcPath );
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  {
+    test.identical( self.provider.filesAreHardLinked([ srcPath, dstPath ]), null );
+  }
+  else
+  {
+    test.identical( self.provider.filesAreHardLinked([ srcPath, dstPath ]), true );
+  }
+  test.identical( self.provider.filesAreHardLinked([ dstPath, dstPathTerminal ]), false );
 
   self.provider.filesDelete( workDir );
   self.provider.fileWrite( srcPath, srcPath );
@@ -24195,9 +24215,15 @@ function hardLinkHardLinkBreaking( test )
   self.provider.hardLink( dstPath, dstPathTerminal );
   var o = { breakingSrcHardLink : 1, breakingDstHardLink : 1 };
   hardLink( o );
-  test.is( self.provider.isTerminal( srcPath) );
-  test.is( self.provider.isHardLink( dstPath) );
-  test.identical( self.provider.fileRead( dstPath ), srcPath );
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  {
+    test.identical( self.provider.filesAreHardLinked([ srcPath, dstPath ]), null );
+  }
+  else
+  {
+    test.identical( self.provider.filesAreHardLinked([ srcPath, dstPath ]), true );
+  }
+  test.identical( self.provider.filesAreHardLinked([ dstPath, dstPathTerminal ]), false );
 
   self.provider.filesDelete( workDir );
   self.provider.fileWrite( srcPath, srcPath );
@@ -24205,9 +24231,15 @@ function hardLinkHardLinkBreaking( test )
   self.provider.hardLink( dstPath, dstPathTerminal );
   var o = { breakingSrcHardLink : 1, breakingDstHardLink : 1, rewriting : 0 };
   test.shouldThrowErrorSync( () => hardLink( o ) );
-  test.is( self.provider.isTerminal( srcPath) );
-  test.is( self.provider.isHardLink( dstPath) );
-  test.identical( self.provider.fileRead( dstPath ), dstPathTerminal );
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  {
+    test.identical( self.provider.filesAreHardLinked([ dstPath, dstPathTerminal ]), null );
+  }
+  else
+  {
+    test.identical( self.provider.filesAreHardLinked([ dstPath, dstPathTerminal ]), true );
+  }
+  test.identical( self.provider.filesAreHardLinked([ srcPath, dstPath ]), false );
 
   test.case = 'src - hardlink, dst - terminal';
 
@@ -24217,9 +24249,15 @@ function hardLinkHardLinkBreaking( test )
   self.provider.hardLink( srcPath, srcPathTerminal );
   var o = { breakingSrcHardLink : 0, breakingDstHardLink : 0 };
   test.shouldThrowError( () => hardLink( o ) );
-  test.is( self.provider.isHardLink( srcPath ) );
-  test.is( self.provider.isTerminal( dstPath ) );
-  test.identical( self.provider.fileRead( dstPath ), dstPath );
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  {
+    test.identical( self.provider.filesAreHardLinked([ srcPath, srcPathTerminal ]), null );
+  }
+  else
+  {
+    test.identical( self.provider.filesAreHardLinked([ srcPath, srcPathTerminal ]), true );
+  }
+  test.identical( self.provider.filesAreHardLinked([ srcPath, dstPath ]), false );
 
   self.provider.filesDelete( workDir );
   self.provider.fileWrite( srcPathTerminal, srcPathTerminal );
@@ -24227,9 +24265,18 @@ function hardLinkHardLinkBreaking( test )
   self.provider.hardLink( srcPath, srcPathTerminal );
   var o = { breakingSrcHardLink : 0, breakingDstHardLink : 1 };
   hardLink( o );
-  test.is( self.provider.isHardLink( srcPath ) );
-  test.is( self.provider.isHardLink( dstPath ) );
-  test.identical( self.provider.fileRead( dstPath ), srcPathTerminal );
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  {
+    test.identical( self.provider.filesAreHardLinked([ srcPath, srcPathTerminal ]), null );
+    test.identical( self.provider.filesAreHardLinked([ dstPath, srcPathTerminal ]), null );
+    test.identical( self.provider.filesAreHardLinked([ srcPath, dstPath ]), null );
+  }
+  else
+  {
+    test.identical( self.provider.filesAreHardLinked([ srcPath, srcPathTerminal ]), true );
+    test.identical( self.provider.filesAreHardLinked([ dstPath, srcPathTerminal ]), true );
+    test.identical( self.provider.filesAreHardLinked([ srcPath, dstPath ]), true );
+  }
 
   self.provider.filesDelete( workDir );
   self.provider.fileWrite( srcPathTerminal, srcPathTerminal );
@@ -24237,13 +24284,17 @@ function hardLinkHardLinkBreaking( test )
   self.provider.hardLink( srcPath, srcPathTerminal );
   var o = { breakingSrcHardLink : 1, breakingDstHardLink : 0 };
   hardLink( o );
-  test.is( self.provider.isTerminal( srcPath) );
-  test.is( self.provider.isHardLink( srcPath ) );
-  test.is( self.provider.isHardLink( dstPath ) );
-  test.identical( self.provider.fileRead( dstPath ), srcPathTerminal );
-  self.provider.fileWrite( srcPath, 'something' );
-  test.identical( self.provider.fileRead( srcPathTerminal ), srcPathTerminal );
-  test.identical( self.provider.fileRead( dstPath ), 'something' );
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  {
+    test.identical( self.provider.filesAreHardLinked([ srcPath, dstPath ]), null );
+  }
+  else
+  {
+    test.identical( self.provider.filesAreHardLinked([ srcPath, dstPath ]), true );
+  }
+  test.identical( self.provider.filesAreHardLinked([ srcPath, srcPathTerminal ]), false );
+  test.identical( self.provider.filesAreHardLinked([ dstPath, srcPathTerminal ]), false );
+
 
   self.provider.filesDelete( workDir );
   self.provider.fileWrite( srcPathTerminal, srcPathTerminal );
@@ -24251,13 +24302,16 @@ function hardLinkHardLinkBreaking( test )
   self.provider.hardLink( srcPath, srcPathTerminal );
   var o = { breakingSrcHardLink : 1, breakingDstHardLink : 1 };
   hardLink( o );
-  test.is( self.provider.isTerminal( srcPath) );
-  test.is( self.provider.isHardLink( srcPath ) );
-  test.is( self.provider.isHardLink( dstPath ) );
-  test.identical( self.provider.fileRead( dstPath ), srcPathTerminal );
-  self.provider.fileWrite( srcPath, 'something' );
-  test.identical( self.provider.fileRead( srcPathTerminal ), srcPathTerminal );
-  test.identical( self.provider.fileRead( dstPath ), 'something' );
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  {
+    test.identical( self.provider.filesAreHardLinked([ srcPath, dstPath ]), null );
+  }
+  else
+  {
+    test.identical( self.provider.filesAreHardLinked([ srcPath, dstPath ]), true );
+  }
+  test.identical( self.provider.filesAreHardLinked([ srcPath, srcPathTerminal ]), false );
+  test.identical( self.provider.filesAreHardLinked([ dstPath, srcPathTerminal ]), false );
 
   test.case = 'src - hardlink, dst - missing';
 
@@ -24266,43 +24320,66 @@ function hardLinkHardLinkBreaking( test )
   self.provider.hardLink( srcPath, srcPathTerminal );
   var o = { breakingSrcHardLink : 0, breakingDstHardLink : 0 };
   test.shouldThrowError( () => hardLink( o ) );
-  test.is( self.provider.isHardLink( srcPath ) );
-  test.is( !self.provider.fileExists( dstPath ) );
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  {
+    test.identical( self.provider.filesAreHardLinked([ srcPath, srcPathTerminal ]), null );
+  }
+  else
+  {
+    test.identical( self.provider.filesAreHardLinked([ srcPath, srcPathTerminal ]), true );
+  }
+  test.identical( self.provider.filesAreHardLinked([ srcPath, dstPath ]), false );
 
   self.provider.filesDelete( workDir );
   self.provider.fileWrite( srcPathTerminal, srcPathTerminal );
   self.provider.hardLink( srcPath, srcPathTerminal );
   var o = { breakingSrcHardLink : 0, breakingDstHardLink : 1 };
   hardLink( o );
-  test.is( self.provider.isHardLink( srcPath ) );
-  test.is( self.provider.isHardLink( dstPath ) );
-  test.identical( self.provider.fileRead( dstPath ), srcPathTerminal );
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  {
+    test.identical( self.provider.filesAreHardLinked([ srcPath, srcPathTerminal ]), null );
+    test.identical( self.provider.filesAreHardLinked([ dstPath, srcPathTerminal ]), null );
+    test.identical( self.provider.filesAreHardLinked([ srcPath, dstPath ]), null );
+  }
+  else
+  {
+    test.identical( self.provider.filesAreHardLinked([ srcPath, srcPathTerminal ]), true );
+    test.identical( self.provider.filesAreHardLinked([ dstPath, srcPathTerminal ]), true );
+    test.identical( self.provider.filesAreHardLinked([ srcPath, dstPath ]), true );
+  }
 
   self.provider.filesDelete( workDir );
   self.provider.fileWrite( srcPathTerminal, srcPathTerminal );
   self.provider.hardLink( srcPath, srcPathTerminal );
   var o = { breakingSrcHardLink : 1, breakingDstHardLink : 0 };
   hardLink( o );
-  test.is( self.provider.isTerminal( srcPath) );
-  test.is( self.provider.isHardLink( srcPath ) );
-  test.is( self.provider.isHardLink( dstPath ) );
-  test.identical( self.provider.fileRead( dstPath ), srcPathTerminal );
-  self.provider.fileWrite( srcPath, 'something' );
-  test.identical( self.provider.fileRead( srcPathTerminal ), srcPathTerminal );
-  test.identical( self.provider.fileRead( dstPath ), 'something' );
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  {
+    test.identical( self.provider.filesAreHardLinked([ srcPath, dstPath ]), null );
+  }
+  else
+  {
+    test.identical( self.provider.filesAreHardLinked([ srcPath, dstPath ]), true );
+  }
+  test.identical( self.provider.filesAreHardLinked([ srcPath, srcPathTerminal ]), false );
+  test.identical( self.provider.filesAreHardLinked([ dstPath, srcPathTerminal ]), false );
+
 
   self.provider.filesDelete( workDir );
   self.provider.fileWrite( srcPathTerminal, srcPathTerminal );
   self.provider.hardLink( srcPath, srcPathTerminal );
   var o = { breakingSrcHardLink : 1, breakingDstHardLink : 1 };
   hardLink( o );
-  test.is( self.provider.isTerminal( srcPath) );
-  test.is( self.provider.isHardLink( srcPath ) );
-  test.is( self.provider.isHardLink( dstPath ) );
-  test.identical( self.provider.fileRead( dstPath ), srcPathTerminal );
-  self.provider.fileWrite( srcPath, 'something' );
-  test.identical( self.provider.fileRead( srcPathTerminal ), srcPathTerminal );
-  test.identical( self.provider.fileRead( dstPath ), 'something' );
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  {
+    test.identical( self.provider.filesAreHardLinked([ srcPath, dstPath ]), null );
+  }
+  else
+  {
+    test.identical( self.provider.filesAreHardLinked([ srcPath, dstPath ]), true );
+  }
+  test.identical( self.provider.filesAreHardLinked([ srcPath, srcPathTerminal ]), false );
+  test.identical( self.provider.filesAreHardLinked([ dstPath, srcPathTerminal ]), false );
 
   test.case = 'src - hardlink, dst - hardlink';
 
@@ -24313,10 +24390,17 @@ function hardLinkHardLinkBreaking( test )
   self.provider.hardLink( dstPath, dstPathTerminal );
   var o = { breakingSrcHardLink : 0, breakingDstHardLink : 0 };
   test.shouldThrowError( () => hardLink( o ) );
-  test.is( self.provider.isHardLink( srcPath ) );
-  test.is( self.provider.isHardLink( dstPath ) );
-  test.identical( self.provider.fileRead( srcPath ), srcPathTerminal );
-  test.identical( self.provider.fileRead( dstPath ), dstPathTerminal );
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  {
+    test.identical( self.provider.filesAreHardLinked([ srcPath, srcPathTerminal ]), null );
+    test.identical( self.provider.filesAreHardLinked([ dstPath, dstPathTerminal ]), null );
+  }
+  else
+  {
+    test.identical( self.provider.filesAreHardLinked([ srcPath, srcPathTerminal ]), true );
+    test.identical( self.provider.filesAreHardLinked([ dstPath, dstPathTerminal ]), true );
+  }
+  test.identical( self.provider.filesAreHardLinked([ srcPath, dstPath ]), false );
 
   self.provider.filesDelete( workDir );
   self.provider.fileWrite( srcPathTerminal, srcPathTerminal );
@@ -24325,10 +24409,38 @@ function hardLinkHardLinkBreaking( test )
   self.provider.hardLink( dstPath, dstPathTerminal );
   var o = { breakingSrcHardLink : 1, breakingDstHardLink : 0 };
   test.shouldThrowError( () => hardLink( o ) );
-  test.is( self.provider.isHardLink( srcPath ) );
-  test.is( self.provider.isHardLink( dstPath ) );
-  test.identical( self.provider.fileRead( srcPath ), srcPathTerminal );
-  test.identical( self.provider.fileRead( dstPath ), dstPathTerminal );
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  {
+    test.identical( self.provider.filesAreHardLinked([ srcPath, srcPathTerminal ]), null );
+    test.identical( self.provider.filesAreHardLinked([ dstPath, dstPathTerminal ]), null );
+  }
+  else
+  {
+    test.identical( self.provider.filesAreHardLinked([ srcPath, srcPathTerminal ]), true );
+    test.identical( self.provider.filesAreHardLinked([ dstPath, dstPathTerminal ]), true );
+  }
+  test.identical( self.provider.filesAreHardLinked([ srcPath, dstPath ]), false );
+
+  self.provider.filesDelete( workDir );
+  self.provider.fileWrite( srcPathTerminal, srcPathTerminal );
+  self.provider.fileWrite( dstPathTerminal, dstPathTerminal );
+  self.provider.hardLink( srcPath, srcPathTerminal );
+  self.provider.hardLink( dstPath, dstPathTerminal );
+  var o = { breakingSrcHardLink : 0, breakingDstHardLink : 1 };
+  hardLink( o );
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  {
+    test.identical( self.provider.filesAreHardLinked([ srcPath, srcPathTerminal ]), null );
+    test.identical( self.provider.filesAreHardLinked([ srcPath, dstPath ]), null );
+    test.identical( self.provider.filesAreHardLinked([ srcPathTerminal, dstPath ]), null );
+  }
+  else
+  {
+    test.identical( self.provider.filesAreHardLinked([ srcPath, dstPath ]), true );
+    test.identical( self.provider.filesAreHardLinked([ srcPath, srcPathTerminal ]), true );
+    test.identical( self.provider.filesAreHardLinked([ srcPathTerminal, dstPath ]), true );
+  }
+  test.identical( self.provider.filesAreHardLinked([ dstPath, dstPathTerminal ]), false );
 
   self.provider.filesDelete( workDir );
   self.provider.fileWrite( srcPathTerminal, srcPathTerminal );
@@ -24337,13 +24449,12 @@ function hardLinkHardLinkBreaking( test )
   self.provider.hardLink( dstPath, dstPathTerminal );
   var o = { breakingSrcHardLink : 1, breakingDstHardLink : 1 };
   hardLink( o )
-  test.is( self.provider.isHardLink( srcPath ) );
-  test.is( self.provider.isHardLink( dstPath ) );
-  test.identical( self.provider.fileRead( srcPath ), srcPathTerminal );
-  test.identical( self.provider.fileRead( dstPath ), srcPathTerminal );
-  self.provider.fileWrite( srcPath, 'something' );
-  test.identical( self.provider.fileRead( srcPathTerminal ), srcPathTerminal );
-  test.identical( self.provider.fileRead( dstPath ), 'something' );
+  test.identical( self.provider.filesAreHardLinked([ srcPath, srcPathTerminal ]), false );
+  test.identical( self.provider.filesAreHardLinked([ dstPath, dstPathTerminal ]), false );
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  test.identical( self.provider.filesAreHardLinked([ srcPath, dstPath ]), null );
+  else
+  test.identical( self.provider.filesAreHardLinked([ srcPath, dstPath ]), true );
 
 }
 

@@ -20,8 +20,11 @@ _.assert( !!Parent );
 
 function onSuiteBegin( test )
 {
-  let path = this.provider.path;
-  this.testRootDirectory = path.dirTempOpen( path.join( __dirname, '../..'  ), 'Provider/HardDrive' );
+  let context = this;
+  let path = context.provider.path;
+  context.testRootDirectory = path.dirTempOpen( 'FilesFind' );
+  // let path = this.provider.path;
+  // this.testRootDirectory = path.dirTempOpen( path.join( __dirname, '../..'  ), 'Provider/HardDrive' );
 }
 
 //

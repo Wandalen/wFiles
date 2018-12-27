@@ -3267,7 +3267,7 @@ function filesDelete_body( o )
   let files = [];
 
   let time;
-  if( o.verbosity >= 2 )
+  if( o.verbosity >= 1 )
   time = _.timeNow();
 
   _.assert( !o.includingTransient, 'Transient files should not be included' );
@@ -3355,7 +3355,7 @@ function filesDelete_body( o )
   function end()
   {
     if( o.verbosity >= 1 )
-    self.logger.log( _.timeSpent( ' - filesDelete ' + o.result.length + ' files at ' + path.commonReport( o.filePath ) + ' in ', time ) );
+    self.logger.log( ' - filesDelete ' + o.result.length + ' files at ' + path.commonReport( o.filePath ) + ' in ' + _.timeSpent( time ) );
     return files;
   }
 

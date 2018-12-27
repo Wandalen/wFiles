@@ -3404,10 +3404,7 @@ var having = filesDelete.having;
 
 _.assert( !!defaults );
 _.assert( !!having );
-
-debugger;
 _.assert( !!filesDelete.defaults.includingDirs );
-debugger;
 
 // //
 //

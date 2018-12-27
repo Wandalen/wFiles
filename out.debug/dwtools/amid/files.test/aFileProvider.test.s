@@ -18602,15 +18602,11 @@ function softLinkActSync( test )
 
   var softLinkIsSupported = test.context.softLinkIsSupported();
 
-<<<<<<< HEAD
-  if( !softLinkIsSupported )
-=======
   let hardLinked = true;
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) && !self.provider.UsingBigIntForStat )
   hardLinked = null;
 
-  if( !symlinkIsAllowed )
->>>>>>> 42a213b2cd155e823e5fd2ec4c8fb5b201e80a87
+  if( !softLinkIsSupported )
   {
     test.case = 'symlinks are not allowed'
     test.identical( 1, 1 )
@@ -21362,15 +21358,11 @@ function hardLinkActSync( test )
   var mp = _.routineJoin( test.context, test.context.pathFor );
   var dir = mp( 'hardLinkActSync' );
 
-<<<<<<< HEAD
-  var softLinkIsSupported = test.context.softLinkIsSupported();
-=======
   let hardLinked = true;
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) && !self.provider.UsingBigIntForStat )
   hardLinked = null;
 
-  var symlinkIsAllowed = test.context.symlinkIsAllowed();
->>>>>>> 42a213b2cd155e823e5fd2ec4c8fb5b201e80a87
+  var softLinkIsSupported = test.context.softLinkIsSupported();
 
   //
 
@@ -22706,15 +22698,11 @@ function hardLinkActAsync( test )
   let mp = _.routineJoin( test.context, test.context.pathFor );
   var dir = mp( 'hardLinkActSync' );
 
-<<<<<<< HEAD
-  let softLinkIsSupported = test.context.softLinkIsSupported();
-=======
   let hardLinked = true;
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) && !self.provider.UsingBigIntForStat )
   hardLinked = null;
 
-  let symlinkIsAllowed = test.context.symlinkIsAllowed();
->>>>>>> 42a213b2cd155e823e5fd2ec4c8fb5b201e80a87
+  let softLinkIsSupported = test.context.softLinkIsSupported();
   let con = new _.Consequence().take( null )
 
   //
@@ -24204,16 +24192,11 @@ function hardLinkHardLinkBreaking( test )
   let srcPathTerminal = self.provider.path.join( workDir, 'srcTerminal' );
   let dstPathTerminal = self.provider.path.join( workDir, 'dstTerminal' );
 
-<<<<<<< HEAD
-  /*  */
-=======
   let hardLinked = true;
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) && !self.provider.UsingBigIntForStat )
   hardLinked = null;
 
-
   // /*  */
->>>>>>> 42a213b2cd155e823e5fd2ec4c8fb5b201e80a87
 
   test.case = 'src - terminal, dst - hardlink';
 

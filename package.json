@@ -56,7 +56,6 @@
   },
   "devDependencies": {
     "wTesting": "",
-    "cli-table2": "",
     "wFiles": ".",
     "wait-sync": ""
   },

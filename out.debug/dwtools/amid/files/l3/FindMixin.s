@@ -3253,6 +3253,13 @@ function filesDelete_pre( routine,args )
 
 //
 
+/*
+qqq :
+- add extended test routine
+- cover option deletingEmptyDirs
+- cover returned result, record of non-exitent files should not be in the result
+*/
+
 function filesDelete_body( o )
 {
   let self = this;
@@ -3295,27 +3302,51 @@ function filesDelete_body( o )
   o2.verbosity = 0;
   delete o2.safe;
 
-  // if( o2.filePath && ( o2.filePath === '/dst/dir' || o2.filePath[ 0 ] === '/dst/dir' ) )
-  // debugger;
-
-  self.fieldPush( 'resolvingSoftLink', 0 );
+  // self.fieldPush( 'resolvingSoftLink', 0 );
   files = self.filesFind.body.call( self, o2 );
-  self.fieldPop( 'resolvingSoftLink', 0 );
+  // self.fieldPop( 'resolvingSoftLink', 0 );
 
   /* */
 
+  if( o.writing )
   for( let f = files.length-1 ; f >= 0 ; f-- )
   {
     let file = files[ f ];
-    file.factory.effectiveFileProvider.fileDelete
-    ({
-      filePath : file.absolute,
-      sync : 1,
-      throwing : o.throwing,
-      verbosity : o.verbosity-1,
-      safe : o.safe,
-    });
+    fileDelete( file );
   }
+
+  /* */
+
+  if( o.deletingEmptyDirs && files.length )
+  {
+    let dirMap = Object.create( null );
+    let factory = files[ 0 ].factory;
+
+    debugger;
+    let dirsPath = path.chainToRoot( files[ 0 ].dir );
+    _.mapSet( dirMap, dirsPath, 1 );
+
+    for( let f = files.length-1 ; f >= 0 ; f-- )
+    {
+      let file = files[ f ];
+      debugger; xxx
+      dirMap[ file.dir ] = 1;
+      delete dirMap[ file.absolute ];
+    }
+
+    for( let f in dirMap )
+    {
+      let file = factory.record( f );
+      files.push( file );
+      if( o.wirting )
+      xxx;
+      if( o.wirting )
+      fileDelete( file );
+    }
+
+  }
+
+  /* */
 
   return end();
 
@@ -3326,6 +3357,20 @@ function filesDelete_body( o )
     if( o.verbosity >= 1 )
     self.logger.log( _.timeSpent( ' - filesDelete ' + o.result.length + ' files at ' + path.commonReport( o.filePath ) + ' in ', time ) );
     return files;
+  }
+
+  /* - */
+
+  function fileDelete( file )
+  {
+    file.factory.effectiveFileProvider.fileDelete
+    ({
+      filePath : file.absolute,
+      sync : 1,
+      throwing : o.throwing,
+      verbosity : o.verbosity-1,
+      safe : o.safe,
+    });
   }
 
 }
@@ -3346,49 +3391,47 @@ defaults.allowingCycled = 1;
 defaults.verbosity = null;
 defaults.maskPreset = 0;
 defaults.throwing = null;
-
 defaults.safe = null;
+defaults.writing = 1;
+defaults.deletingEmptyDirs = 0;
 
 //
 
 let filesDelete = _.routineFromPreAndBody( filesDelete_pre, filesDelete_body );
-
 filesDelete.having.aspect = 'entry';
 
 var defaults = filesDelete.defaults;
-// var paths = filesDelete.paths;
 var having = filesDelete.having;
 
 _.assert( !!defaults );
-// _.assert( !!paths );
 _.assert( !!having );
 
+// //
+//
+// function filesDeleteForce( o )
+// {
+//   let self = this;
+//
+//   o = self.filesFindLikePre_pre( arguments );
+//
+//   _.routineOptions( filesDeleteForce, o );
+//
+//   return self.filesDelete( o );
+// }
+//
+// _.routineExtend( filesDeleteForce, filesDelete );
+//
+// var defaults = filesDeleteForce.defaults;
+
 //
 
-function filesDeleteForce( o )
+function filesDeleteTerminals( o )
 {
   let self = this;
 
   o = self.filesFindLikePre_pre( arguments );
 
-  _.routineOptions( filesDeleteForce, o );
-
-  return self.filesDelete( o );
-}
-
-_.routineExtend( filesDeleteForce, filesDelete );
-
-var defaults = filesDeleteForce.defaults;
-
-//
-
-function filesDeleteFiles( o )
-{
-  let self = this;
-
-  o = self.filesFindLikePre_pre( arguments );
-
-  _.routineOptions( filesDeleteFiles, o );
+  _.routineOptions( filesDeleteTerminals, o );
 
   _.assert( o.includingTerminals );
   _.assert( !o.includingDirs );
@@ -3399,7 +3442,7 @@ function filesDeleteFiles( o )
   return self.filesDelete( o );
 }
 
-_.routineExtend( filesDeleteFiles, filesDelete );
+_.routineExtend( filesDeleteTerminals, filesDelete );
 
 defaults.recursive = '2';
 defaults.includingTerminals = 1;
@@ -3726,8 +3769,7 @@ let Supplement =
 
   filesDelete,
 
-  filesDeleteForce,
-  filesDeleteFiles,
+  filesDeleteTerminals,
   filesDeleteEmptyDirs,
 
   // other find

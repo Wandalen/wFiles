@@ -2,11 +2,8 @@
 
 'use strict';
 
-var isBrowser = true;
-
 if( typeof module !== 'undefined' )
 {
-  isBrowser = false;
   require( './aFilesFind.test.s' );
 }
 
@@ -66,7 +63,7 @@ var Proto =
   context :
   {
     filesTree : filesTree,
-    provider : _.FileProvider.Extract( { filesTree : filesTree, usingTime : 1 } ),
+    provider : _.FileProvider.Extract({ filesTree : filesTree, usingTime : 1, protocol : 'current' }),
     pathFor : pathFor,
     testFile : '/file1'
   },

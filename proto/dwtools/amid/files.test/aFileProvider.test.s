@@ -61,7 +61,7 @@ function providerIsInstanceOf( src )
 
 //
 
-function symlinkIsAllowed()
+function softLinkIsSupported()
 {
   var self = this;
 
@@ -69,9 +69,9 @@ function symlinkIsAllowed()
   if( process.platform === 'win32' )
   {
     var allowed = false;
-    var dir = self.pathFor( 'symlinkIsAllowed' );
-    var srcPath = self.pathFor( 'symlinkIsAllowed/src' );
-    var dstPath = self.pathFor( 'symlinkIsAllowed/dst' );
+    var dir = self.pathFor( 'softLinkIsSupported' );
+    var srcPath = self.pathFor( 'softLinkIsSupported/src' );
+    var dstPath = self.pathFor( 'softLinkIsSupported/dst' );
 
     self.provider.filesDelete( dir );
     self.provider.fileWrite( srcPath, srcPath );
@@ -947,11 +947,11 @@ function readWriteSync( test )
 
   //
 
-  var symlinkIsAllowed = test.context.symlinkIsAllowed();
+  var softLinkIsSupported = test.context.softLinkIsSupported();
 
   //
 
-  if( symlinkIsAllowed )
+  if( softLinkIsSupported )
   {
     /* resolvingSoftLink */
 
@@ -1175,7 +1175,7 @@ function readWriteSync( test )
       });
       test.identical( got, testData );
 
-      if( symlinkIsAllowed )
+      if( softLinkIsSupported )
       {
         test.case = 'write using link, resolvingSoftLink off';
         var data = 'data';
@@ -1451,7 +1451,7 @@ function readWriteAsync( test )
     return;
   }
 
-  var symlinkIsAllowed = test.context.symlinkIsAllowed();
+  var softLinkIsSupported = test.context.softLinkIsSupported();
   var dir = test.context.pathFor( 'written/readWriteAsync' );
   var got, filePath, readOptions, writeOptions,onBegin,onEnd,onError,buffer;
   var testData = 'Lorem ipsum dolor sit amet';
@@ -2370,7 +2370,7 @@ function readWriteAsync( test )
   .ifNoErrorThen( ( arg/*aaa*/ ) =>
   {
 
-    if( !symlinkIsAllowed )
+    if( !softLinkIsSupported )
     return null;
 
     test.case = 'read from soft link, resolvingSoftLink on';
@@ -2394,7 +2394,7 @@ function readWriteAsync( test )
 
   .ifNoErrorThen( ( arg/*aaa*/ ) =>
   {
-    if( !symlinkIsAllowed )
+    if( !softLinkIsSupported )
     return null;
 
     test.case = 'read from soft link, resolvingSoftLink on';
@@ -2418,7 +2418,7 @@ function readWriteAsync( test )
 
   .ifNoErrorThen( ( arg/*aaa*/ ) =>
   {
-    if( !symlinkIsAllowed )
+    if( !softLinkIsSupported )
     return null;
 
     test.case = 'write using link, resolvingSoftLink on';
@@ -2442,7 +2442,7 @@ function readWriteAsync( test )
 
   .ifNoErrorThen( ( arg/*aaa*/ ) =>
   {
-    if( !symlinkIsAllowed )
+    if( !softLinkIsSupported )
     return null;
 
     test.case = 'write using link, resolvingSoftLink off';
@@ -2478,7 +2478,7 @@ function readWriteAsync( test )
 
   .ifNoErrorThen( ( arg/*aaa*/ ) =>
   {
-    if( !symlinkIsAllowed )
+    if( !softLinkIsSupported )
     return null;
 
     test.case = 'write using link, resolvingSoftLink off';
@@ -2520,7 +2520,7 @@ function readWriteAsync( test )
 
   .ifNoErrorThen( ( arg/*aaa*/ ) =>
   {
-    if( !symlinkIsAllowed )
+    if( !softLinkIsSupported )
     return null;
 
     test.case = 'write using link, resolvingSoftLink off';
@@ -5024,7 +5024,7 @@ function fileCopyActSync( test )
 
   /* links */
 
-  if( !test.context.symlinkIsAllowed() )
+  if( !test.context.softLinkIsSupported() )
   return;
 
   test.case = 'dst is a soft link';
@@ -5742,7 +5742,7 @@ function fileCopyLinksSync( test )
 
   //
 
-  if( !test.context.symlinkIsAllowed() )
+  if( !test.context.softLinkIsSupported() )
   return;
 
   test.case = 'dst is a soft link, breaking disabled';
@@ -6698,7 +6698,7 @@ function fileCopyLinksAsync( test )
 
   //
 
-  if( !test.context.symlinkIsAllowed() )
+  if( !test.context.softLinkIsSupported() )
   return con;
 
   /* soft links */
@@ -11464,7 +11464,7 @@ function fileDeleteSync( test )
 
   //
 
-  if( !test.context.symlinkIsAllowed() )
+  if( !test.context.softLinkIsSupported() )
   return;
 
   test.case = 'delete soft link, resolvingSoftLink 1';
@@ -12030,7 +12030,7 @@ function fileDeleteAsync( test )
   //   })
   // });
 
-  if( !test.context.symlinkIsAllowed() )
+  if( !test.context.softLinkIsSupported() )
   return consequence;
 
   consequence.ifNoErrorThen( ( arg/*aaa*/ ) =>
@@ -12735,7 +12735,7 @@ function statReadActSync( test )
 
   //
 
-  if( test.context.symlinkIsAllowed() )
+  if( test.context.softLinkIsSupported() )
   {
     test.case = 'src is a soft link';
     var srcPath = _.path.join( dir,'src' );
@@ -14914,7 +14914,7 @@ function fileWriteLinksSync( test )
   else
   test.identical( self.provider.filesAreHardLinked( [ srcPath, dstPath ] ), true );
 
-  if( !test.context.symlinkIsAllowed() )
+  if( !test.context.softLinkIsSupported() )
   return;
 
   /* soft link */
@@ -15462,7 +15462,7 @@ function fileWriteLinksAsync( test )
   var dstPath = mp( 'write_test/dst.txt' );
   var data;
 
-  var symlinkIsAllowed = test.context.symlinkIsAllowed();
+  var softLinkIsSupported = test.context.softLinkIsSupported();
 
   var con = new _.Consequence().take( null )
 
@@ -15470,7 +15470,7 @@ function fileWriteLinksAsync( test )
 
   .finally( function()
   {
-    if( !symlinkIsAllowed )
+    if( !softLinkIsSupported )
     return null;
 
     self.provider.filesDelete( dirPath )
@@ -15539,7 +15539,7 @@ function fileWriteLinksAsync( test )
 
   .finally( function()
   {
-    if( !symlinkIsAllowed )
+    if( !softLinkIsSupported )
     return null;
 
     self.provider.filesDelete( dirPath )
@@ -15611,7 +15611,7 @@ function fileWriteLinksAsync( test )
 
   .finally( function()
   {
-    if( !symlinkIsAllowed )
+    if( !softLinkIsSupported )
     return null;
 
     self.provider.filesDelete( dirPath )
@@ -15684,7 +15684,7 @@ function fileWriteLinksAsync( test )
 
   .finally( function()
   {
-    if( !symlinkIsAllowed )
+    if( !softLinkIsSupported )
     return null;
 
     self.provider.filesDelete( dirPath )
@@ -15827,7 +15827,7 @@ function fileWriteLinksAsync( test )
 
   .finally( function()
   {
-    if( !symlinkIsAllowed )
+    if( !softLinkIsSupported )
     return null;
 
     self.provider.filesDelete( dirPath );
@@ -15972,7 +15972,7 @@ function fileWriteLinksAsync( test )
 
   .finally( function()
   {
-    if( !symlinkIsAllowed )
+    if( !softLinkIsSupported )
     return null;
 
     self.provider.filesDelete( dirPath );
@@ -16132,7 +16132,7 @@ function softLinkSync( test )
     return;
   }
 
-  if( !test.context.symlinkIsAllowed() )
+  if( !test.context.softLinkIsSupported() )
   {
     test.case = 'System does not allow to create soft links.';
     test.identical( 1, 1 )
@@ -16839,7 +16839,7 @@ function softLinkAsync( test )
     return;
   }
 
-  if( !test.context.symlinkIsAllowed() )
+  if( !test.context.softLinkIsSupported() )
   {
     test.case = 'System does not allow to create soft links.';
     test.identical( 1, 1 )
@@ -18592,9 +18592,9 @@ function softLinkActSync( test )
   var mp = _.routineJoin( test.context, test.context.pathFor );
   var dir = mp( 'hardLinkActSync' );
 
-  var symlinkIsAllowed = test.context.symlinkIsAllowed();
+  var softLinkIsSupported = test.context.softLinkIsSupported();
 
-  if( !symlinkIsAllowed )
+  if( !softLinkIsSupported )
   {
     test.case = 'symlinks are not allowed'
     test.identical( 1, 1 )
@@ -21288,7 +21288,7 @@ function hardLinkSoftlinked( test )
     return;
   }
 
-  if( !test.context.symlinkIsAllowed() )
+  if( !test.context.softLinkIsSupported() )
   {
     test.case = 'System does not allow to create soft links.';
     test.identical( 1, 1 )
@@ -21338,7 +21338,7 @@ function hardLinkActSync( test )
   var mp = _.routineJoin( test.context, test.context.pathFor );
   var dir = mp( 'hardLinkActSync' );
 
-  var symlinkIsAllowed = test.context.symlinkIsAllowed();
+  var softLinkIsSupported = test.context.softLinkIsSupported();
 
   //
 
@@ -21504,7 +21504,7 @@ function hardLinkActSync( test )
 
   //
 
-  if( symlinkIsAllowed )
+  if( softLinkIsSupported )
   {
     test.case = 'src is a soft link, check link';
     self.provider.filesDelete( dir );
@@ -21589,7 +21589,7 @@ function hardLinkActSync( test )
 
   //
 
-  if( symlinkIsAllowed )
+  if( softLinkIsSupported )
   {
     test.case = 'dst is a soft link';
     self.provider.filesDelete( dir );
@@ -22670,7 +22670,7 @@ function hardLinkActAsync( test )
   let mp = _.routineJoin( test.context, test.context.pathFor );
   var dir = mp( 'hardLinkActSync' );
 
-  let symlinkIsAllowed = test.context.symlinkIsAllowed();
+  let softLinkIsSupported = test.context.softLinkIsSupported();
   let con = new _.Consequence().take( null )
 
   //
@@ -24155,7 +24155,6 @@ function hardLinkHardLinkBreaking( test )
   let dstPath2 = self.provider.path.join( workDir, 'dst2' );
   let srcPathTerminal = self.provider.path.join( workDir, 'srcTerminal' );
   let dstPathTerminal = self.provider.path.join( workDir, 'dstTerminal' );
-
 
   /*  */
 
@@ -30359,7 +30358,7 @@ function fileExists( test )
   test.identical( self.provider.filesAreHardLinked([ dstPath, srcPath ]), true );
   test.identical( got, true );
 
-  if( !test.context.symlinkIsAllowed() )
+  if( !test.context.softLinkIsSupported() )
   return;
 
   test.case = 'soft link to file';
@@ -33903,7 +33902,7 @@ var Self =
   {
     pathFor : pathFor,
     providerIsInstanceOf : providerIsInstanceOf,
-    symlinkIsAllowed : symlinkIsAllowed,
+    softLinkIsSupported : softLinkIsSupported,
     testRootDirectory : null,
     // shouldWriteOnlyOnce : shouldWriteOnlyOnce
   },

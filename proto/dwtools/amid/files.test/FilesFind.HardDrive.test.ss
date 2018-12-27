@@ -53,7 +53,7 @@ var Proto =
 
   context :
   {
-    provider : _.FileProvider.HardDrive(),
+    provider : _.FileProvider.HardDrive({ protocol : 'current' }),
     onSuiteBegin : onSuiteBegin,
     testRootDirectory : null,
   },

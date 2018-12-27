@@ -3378,7 +3378,6 @@ function filesDelete_body( o )
 _.routineExtend( filesDelete_body, filesFind );
 
 var defaults = filesDelete_body.defaults;
-
 defaults.outputFormat = 'record';
 defaults.recursive = '2';
 defaults.includingTransient = 0;
@@ -3405,6 +3404,10 @@ var having = filesDelete.having;
 
 _.assert( !!defaults );
 _.assert( !!having );
+
+debugger;
+_.assert( !!filesDelete.defaults.includingDirs );
+debugger;
 
 // //
 //
@@ -3444,6 +3447,7 @@ function filesDeleteTerminals( o )
 
 _.routineExtend( filesDeleteTerminals, filesDelete );
 
+var defaults = filesDeleteTerminals.defaults;
 defaults.recursive = '2';
 defaults.includingTerminals = 1;
 defaults.includingDirs = 0;
@@ -3803,6 +3807,8 @@ _.classDeclare
 
 _.FileProvider = _.FileProvider || Object.create( null );
 _.FileProvider[ Self.shortName ] = Self;
+
+_.assert( !!_.FileProvider.Find.prototype.filesDelete.defaults.includingDirs );
 
 // --
 // export

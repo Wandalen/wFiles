@@ -55,9 +55,8 @@
     "wLogger": ""
   },
   "devDependencies": {
-    "wTesting": "",
-    "wFiles": ".",
-    "wait-sync": ""
+    "wait-sync": "",
+    "wTesting": ""
   },
   "keywords": [
     "wTools",

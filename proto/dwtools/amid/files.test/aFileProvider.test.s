@@ -30370,12 +30370,12 @@ function record( test )
   let self = this;
   let join = _.routineJoin( self.provider.path, self.provider.path.join );
   let provider = self.provider;
-  let hub = self.provider;
+  let hub = self.hub;
 
   // let term1Path = self.pathFor( 'record/term1' );
   // self.provider.fileWrite( term1Path, term1Path );
 
-  test.is( probider.hub === hub );
+  test.is( provider.hub === hub );
   test.identical( _.mapKeys( hub.providersWithProtocolMap ), [ 'current' ] );
 
   var record = provider.record( '/some/file/terminal' );

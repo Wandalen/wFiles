@@ -1388,15 +1388,15 @@ function filesFind( test )
     if( _.fileProvider.statResolvedRead( testDir ) )
     _.fileProvider.filesDelete( testDir );
 
-    var filePath = testDir;
+    var dirForFile = testDir;
     for( var i = 0; i <= level; i++ )
     {
       if( i >= 1 )
-      filePath = path.join( filePath, '' + i );
+      dirForFile = path.join( dirForFile, '' + i );
 
       for( var j = 0; j < filesNames.length; j++ )
       {
-        filePath = path.join( filePath, filesNames[ j ] );
+        let filePath = path.join( dirForFile, filesNames[ j ] );
         _.fileProvider.fileWrite( filePath, '' );
       }
 
@@ -1409,7 +1409,7 @@ function filesFind( test )
   function makeExpected( level, o )
   {
     var expected = [];
-    var filePath = testDir;
+    var dirPath = testDir;
 
     var isDir = _.fileProvider.isDir( o.filePath );
 
@@ -1461,10 +1461,10 @@ function filesFind( test )
 
       if( l > 0 )
       {
-        filePath = path.join( filePath, '' + l );
+        dirPath = path.join( dirPath, '' + l );
         if( o.includingDirs && o.includingTransient )
         {
-          var relative = path.dot( filePath.relative( o.basePath || testDir, filePath ) );
+          var relative = path.dot( path.relative( o.basePath || testDir, dirPath ) );
 
           if( o.glob )
           passed = path.globRegexpsForDirectory( o.glob, o.filePath, o.basePath ).test( relative );
@@ -1472,7 +1472,7 @@ function filesFind( test )
           if( passed )
           {
             if( o.outputFormat === 'absolute' || o.outputFormat === 'record' )
-            expected.push( filePath );
+            expected.push( dirPath );
             if( o.outputFormat === 'relative' )
             expected.push( relative );
           }
@@ -1488,7 +1488,7 @@ function filesFind( test )
         filesNames.forEach( ( name ) =>
         {
           // var filePath = path.join( path, l + '-' + name );
-          filePath = path.join( filePath, name );
+          var filePath = path.join( dirPath, name );
           var passed = true;
           var relative = path.dot( path.relative( o.basePath || testDir, filePath ) );
 

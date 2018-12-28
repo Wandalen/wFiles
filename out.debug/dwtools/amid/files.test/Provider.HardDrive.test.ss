@@ -16,23 +16,38 @@ var Parent = wTests[ 'Tools/mid/files/fileProvider/Abstract' ];
 
 _.assert( !!Parent );
 
+// //
+//
+// function onSuiteBegin( test )
+// {
+//   let path = this.provider.path;
+//   this.testSuitePath = path.dirTempOpen( path.join( __dirname, '../..'  ), 'Provider/HardDrive' );
+// }
+//
+// //
+//
+// function onSuiteEnd()
+// {
+//   let path = this.provider.path;
+//   // qqq : error here
+//   // aaa : format of temp path was changed and has unique id at the end
+//   _.assert( _.strHas( this.testSuitePath, 'Provider/HardDrive' ) );
+//   path.dirTempClose( this.testSuitePath );
+// }
+
 //
 
 function onSuiteBegin( test )
 {
-  let path = this.provider.path;
-  this.testRootDirectory = path.dirTempOpen( path.join( __dirname, '../..'  ), 'Provider/HardDrive' );
-}
+  let context = this;
 
-//
+  context.provider = _.FileProvider.HardDrive({ protocol : 'current' });
+  context.hub = _.FileProvider.Hub({ providers : [ context.provider ] });
 
-function onSuiteEnd()
-{
-  let path = this.provider.path;
-  // qqq : error here
-  // aaa : format of temp path was changed and has unique id at the end
-  _.assert( _.strHas( this.testRootDirectory, 'Provider/HardDrive' ) );
-  path.dirTempClose( this.testRootDirectory );
+  let path = context.provider.path;
+  context.testSuitePath = path.dirTempOpen( 'FilesFind' );
+  // let path = this.provider.path;
+  // this.testSuitePath = path.dirTempOpen( path.join( __dirname, '../..'  ), 'Provider/HardDrive' );
 }
 
 // --
@@ -50,14 +65,13 @@ var Proto =
 
   // routine : 'pathResolveSoftLink',
 
-  onSuiteBegin : onSuiteBegin,
-  onSuiteEnd : onSuiteEnd,
+  onSuiteBegin,
 
   context :
   {
     provider : _.FileProvider.HardDrive(),
-    onSuiteBegin : onSuiteBegin,
-    testRootDirectory : null,
+    // onSuiteBegin : onSuiteBegin,
+    testSuitePath : null,
   },
 
   tests :

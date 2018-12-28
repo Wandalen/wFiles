@@ -403,6 +403,16 @@ function _isTransientGet()
 
 //
 
+function _isTransientSet( src )
+{
+  let record = this;
+  src = !!src;
+  record[ isTransientSymbol ] = src;
+  return src;
+}
+
+//
+
 function _isActualGet()
 {
   let record = this;
@@ -413,6 +423,16 @@ function _isActualGet()
     result = record[ isActualSymbol ];
   }
   return result;
+}
+
+//
+
+function _isActualSet( src )
+{
+  let record = this;
+  src = !!src;
+  record[ isActualSymbol ] = src;
+  return src;
 }
 
 //
@@ -787,8 +807,8 @@ let Accessors =
   name : { readOnly : 1 },
   fullName : { readOnly : 1 },
 
-  isTransient : { readOnly : 1 },
-  isActual : { readOnly : 1 },
+  isTransient : { readOnly : 0 },
+  isActual : { readOnly : 0 },
   isStem : { readOnly : 1 },
   isDir : { readOnly : 1 },
   isTerminal : { readOnly : 1 },
@@ -824,7 +844,9 @@ let Proto =
   hashRead,
 
   _isTransientGet,
+  _isTransientSet,
   _isActualGet,
+  _isActualSet,
   _isStemGet,
   _isDirGet,
   _isTerminalGet,

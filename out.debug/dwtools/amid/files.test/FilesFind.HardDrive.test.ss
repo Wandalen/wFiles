@@ -21,20 +21,25 @@ _.assert( !!Parent );
 function onSuiteBegin( test )
 {
   let context = this;
+
+  context.provider = _.FileProvider.HardDrive({ protocol : 'current' });
+  context.hub = _.FileProvider.Hub({ providers : [ context.provider ] });
+
   let path = context.provider.path;
-  context.testRootDirectory = path.dirTempOpen( 'FilesFind' );
+  context.testSuitePath = path.dirTempOpen( 'FilesFind' );
   // let path = this.provider.path;
-  // this.testRootDirectory = path.dirTempOpen( path.join( __dirname, '../..'  ), 'Provider/HardDrive' );
+  // this.testSuitePath = path.dirTempOpen( path.join( __dirname, '../..'  ), 'Provider/HardDrive' );
 }
 
 //
-
-function onSuiteEnd()
-{
-  let path = this.provider.path;
-  _.assert( _.strHas( this.testRootDirectory, 'Provider/HardDrive' ) );
-  path.dirTempClose( this.testRootDirectory );
-}
+// //
+//
+// function onSuiteEnd()
+// {
+//   let path = this.provider.path;
+//   _.assert( _.strHas( this.testSuitePath, 'Provider/HardDrive' ) );
+//   path.dirTempClose( this.testSuitePath );
+// }
 
 // --
 // declare
@@ -51,14 +56,14 @@ var Proto =
 
   // routine : 'pathResolveTextLink',
 
-  onSuiteBegin : onSuiteBegin,
-  onSuiteEnd : onSuiteEnd,
+  onSuiteBegin,
+  // onSuiteEnd,
 
   context :
   {
-    provider : _.FileProvider.HardDrive({ protocol : 'current' }),
-    onSuiteBegin : onSuiteBegin,
-    testRootDirectory : null,
+    // provider : null,
+    // onSuiteBegin : onSuiteBegin,
+    testSuitePath : null,
   },
 
   tests :

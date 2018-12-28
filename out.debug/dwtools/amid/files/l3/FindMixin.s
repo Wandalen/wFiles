@@ -3273,18 +3273,24 @@ function filesDelete_body( o )
   _.assert( !o.includingTransient, 'Transient files should not be included' );
   _.assert( o.resolvingTextLink === 0 || o.resolvingTextLink === false );
   _.assert( o.resolvingSoftLink === 0 || o.resolvingSoftLink === false );
-  _.assert( o.outputFormat === 'record' );
+  // _.assert( o.outputFormat === 'record' );
   _.assert( _.numberIs( o.safe ) );
   _.assert( arguments.length === 1 );
 
   /* */
 
-  if( _.strIs( o.filePath ) )
+  if( _.strIs( o.filePath ) && !o.deletingEmptyDirs )
   {
     if( !self.fileExists( o.filePath ) )
     return end();
     if( self.isTerminal( o.filePath ) )
     {
+      // debugger;
+      let file = self.record( o.filePath );
+      file.isActual = true;
+      file.isTransient = true;
+      o.result.push( file );
+      if( o.writing )
       self.fileDelete
       ({
         filePath : o.filePath,
@@ -3300,11 +3306,10 @@ function filesDelete_body( o )
 
   let o2 = _.mapOnly( o, self.filesFind.defaults );
   o2.verbosity = 0;
+  o2.outputFormat = 'record';
   delete o2.safe;
 
-  // self.fieldPush( 'resolvingSoftLink', 0 );
   files = self.filesFind.body.call( self, o2 );
-  // self.fieldPop( 'resolvingSoftLink', 0 );
 
   /* */
 
@@ -3312,6 +3317,7 @@ function filesDelete_body( o )
   for( let f = files.length-1 ; f >= 0 ; f-- )
   {
     let file = files[ f ];
+    if( file.isActual )
     fileDelete( file );
   }
 
@@ -3319,28 +3325,44 @@ function filesDelete_body( o )
 
   if( o.deletingEmptyDirs && files.length )
   {
+    let delMap = Object.create( null );
     let dirMap = Object.create( null );
     let factory = files[ 0 ].factory;
-
-    debugger;
-    let dirsPath = path.chainToRoot( files[ 0 ].dir );
-    _.mapSet( dirMap, dirsPath, 1 );
 
     for( let f = files.length-1 ; f >= 0 ; f-- )
     {
       let file = files[ f ];
-      debugger; xxx
       dirMap[ file.dir ] = 1;
-      delete dirMap[ file.absolute ];
+      delMap[ file.absolute ] = 1;
     }
 
-    for( let f in dirMap )
+    let dirsFile = [];
+    let dirsPath = path.chainToRoot( files[ 0 ].dir );
+    debugger;
+    for( let d = dirsPath.length-1 ; d >= 0 ; d-- )
     {
-      let file = factory.record( f );
-      files.push( file );
-      if( o.wirting )
-      xxx;
-      if( o.wirting )
+      let dirPath = dirsPath[ d ];
+      let files = self.dirRead({ filePath : dirPath, outputFormat : 'absolute' });
+      if( files.length > 1 )
+      break;
+      if( files.length === 1 && !delMap[ files[ 0 ] ] )
+      break;
+      dirMap[ dirPath ] = 1;
+      delMap[ dirPath ] = 1;
+
+      let file = factory.record( dirPath );
+      file.isActual = true;
+      file.isTransient = true;
+      dirsFile.unshift( file );
+
+    }
+
+    _.arrayPrependArray( o.result, dirsFile );
+
+    for( let d = dirsFile.length-1 ; d >= 0 ; d-- )
+    {
+      let file = dirsFile[ d ];
+      if( o.writing )
       fileDelete( file );
     }
 
@@ -3356,6 +3378,13 @@ function filesDelete_body( o )
   {
     if( o.verbosity >= 1 )
     self.logger.log( ' - filesDelete ' + o.result.length + ' files at ' + path.commonReport( o.filePath ) + ' in ' + _.timeSpent( time ) );
+
+    if( o.outputFormat === 'absolute' )
+    files = _.select( files, '*/absolute' );
+    else if( o.outputFormat === 'relative' )
+    files = _.select( files, '*/relative' );
+    else _.assert( o.outputFormat === 'record' );
+
     return files;
   }
 

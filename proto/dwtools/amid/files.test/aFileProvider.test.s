@@ -22,12 +22,33 @@ if( typeof module !== 'undefined' )
 var _ = _global_.wTools;
 var Parent = wTester;
 
+// //
+//
+// function onSuiteBegin( test )
+// {
+//   let path = this.provider.path;
+//   this.testSuitePath = path.dirTempOpen( path.join( __dirname, '../..'  ), 'FileProvider/Abstract' );
+// }
+
 //
 
 function onSuiteBegin( test )
 {
+  let context = this;
+  let path = context.provider.path;
+  // context.testSuitePath = path.dirTempOpen( 'FilesFind' );
+  // context.testSuitePath = context.provider.dirTempOpen( path.join( __dirname, '../..'  ), 'FileProvider/Abstract' );
+}
+
+//
+
+function onSuiteEnd()
+{
   let path = this.provider.path;
-  this.testRootDirectory = path.dirTempOpen( path.join( __dirname, '../..'  ), 'FileProvider/Abstract' );
+  _.assert( _.strHas( this.testSuitePath, 'tst.tst' ) );
+  path.dirTempClose( this.testSuitePath );
+  this.provide.finit();
+  this.hub.finit();
 }
 
 //
@@ -35,7 +56,7 @@ function onSuiteBegin( test )
 function pathFor( filePath )
 {
   let path = this.provider.path;
-  filePath =  path.join( this.testRootDirectory, filePath );
+  filePath =  path.join( this.testSuitePath, filePath );
   return path.normalize( filePath );
 }
 
@@ -24418,111 +24439,6 @@ function hardLinkHardLinkBreaking( test )
 
 //
 
-function nativize( t )
-{
-  var self = this;
-
-  if( !_.routineIs( self.provider.path.nativize ) )
-  return;
-
-  if( !( self.provider instanceof _.FileProvider.HardDrive ) )
-  {
-    t.description = 'nativize returns src'
-    t.identical( 1, 1 )
-    return;
-  }
-
-  if( Config.platform === 'nodejs' && process.platform === 'win32' )
-  {
-    t.description = 'path in win32 style ';
-
-    /**/
-
-    debugger
-    var path = '/A/abc/';
-    var got = self.provider.path.nativize( path );
-    var expected = 'A:\\abc\\';
-    t.identical( got, expected );
-
-    /**/
-
-    var path = '/A/';
-    var got = self.provider.path.nativize( path );
-    var expected = 'A:\\';
-    t.identical( got, expected );
-
-    /**/
-
-    var path = '/A';
-    var got = self.provider.path.nativize( path );
-    // var expected = 'A:\\';
-    var expected = 'A:';
-    t.identical( got, expected );
-
-    /**/
-
-    var path = '/A/a';
-    var got = self.provider.path.nativize( path );
-    var expected = 'A:\\a';
-    t.identical( got, expected );
-
-    /**/
-
-    var path = 'A:/a';
-    var got = self.provider.path.nativize( path );
-    var expected = 'A:\\a';
-    t.identical( got, expected );
-
-    /**/
-
-    var path = '\\A\\a';
-    var got = self.provider.path.nativize( path );
-    var expected = 'A:\\a';
-    t.identical( got, expected );
-
-    /**/
-
-    var path = 'A';
-    var got = self.provider.path.nativize( path );
-    var expected = 'A';
-    t.identical( got, expected );
-
-    /**/
-
-    var path = '/c/a';
-    var got = self.provider.path.nativize( path );
-    var expected = 'c:\\a';
-    t.identical( got, expected );
-
-    /**/
-
-    var path = '/A/1.txt';
-    var got = self.provider.path.nativize( path );
-    var expected = 'A:\\1.txt';
-    t.identical( got, expected );
-
-    /**/
-
-    var path = 'A:/a\\b/c\\d';
-    var got = self.provider.path.nativize( path );
-    var expected = 'A:\\a\\b\\c\\d';
-    t.identical( got, expected );
-  }
-
-  //
-
-  if( Config.debug )
-  {
-    t.description = 'path is not a string ';
-    t.shouldThrowErrorSync( function()
-    {
-      self.provider.path.nativize( 1 );
-    })
-  }
-}
-
-//
-
 function hardLinkSyncRunner( test )
 {
   var self = this;
@@ -30445,7 +30361,32 @@ function fileExists( test )
   test.identical( got, true );
 }
 
-//
+// --
+// record
+// --
+
+function record( test )
+{
+  let self = this;
+  let join = _.routineJoin( self.provider.path, self.provider.path.join );
+  let provider = self.provider;
+  let hub = self.provider;
+
+  // let term1Path = self.pathFor( 'record/term1' );
+  // self.provider.fileWrite( term1Path, term1Path );
+
+  test.is( probider.hub === hub );
+  test.identical( _.mapKeys( hub.providersWithProtocolMap ), [ 'current' ] );
+
+  var record = provider.record( '/some/file/terminal' );
+
+  test.identical( record.absolute, '/some/file/terminal' );
+
+}
+
+// --
+// path
+// --
 
 function pathResolve( test )
 {
@@ -33493,6 +33434,8 @@ function pathResolveTextLink( test )
 
 }
 
+//
+
 function pathResolveLinkFullSpecial( test )
 {
   let self = this;
@@ -33653,6 +33596,113 @@ function pathResolveLinkFullSpecial( test )
 }
 
 //
+
+function pathNativize( t )
+{
+  var self = this;
+
+  if( !_.routineIs( self.provider.path.nativize ) )
+  return;
+
+  if( !( self.provider instanceof _.FileProvider.HardDrive ) )
+  {
+    t.description = 'nativize returns src'
+    t.identical( 1, 1 )
+    return;
+  }
+
+  if( Config.platform === 'nodejs' && process.platform === 'win32' )
+  {
+    t.description = 'path in win32 style ';
+
+    /**/
+
+    debugger
+    var path = '/A/abc/';
+    var got = self.provider.path.nativize( path );
+    var expected = 'A:\\abc\\';
+    t.identical( got, expected );
+
+    /**/
+
+    var path = '/A/';
+    var got = self.provider.path.nativize( path );
+    var expected = 'A:\\';
+    t.identical( got, expected );
+
+    /**/
+
+    var path = '/A';
+    var got = self.provider.path.nativize( path );
+    // var expected = 'A:\\';
+    var expected = 'A:';
+    t.identical( got, expected );
+
+    /**/
+
+    var path = '/A/a';
+    var got = self.provider.path.nativize( path );
+    var expected = 'A:\\a';
+    t.identical( got, expected );
+
+    /**/
+
+    var path = 'A:/a';
+    var got = self.provider.path.nativize( path );
+    var expected = 'A:\\a';
+    t.identical( got, expected );
+
+    /**/
+
+    var path = '\\A\\a';
+    var got = self.provider.path.nativize( path );
+    var expected = 'A:\\a';
+    t.identical( got, expected );
+
+    /**/
+
+    var path = 'A';
+    var got = self.provider.path.nativize( path );
+    var expected = 'A';
+    t.identical( got, expected );
+
+    /**/
+
+    var path = '/c/a';
+    var got = self.provider.path.nativize( path );
+    var expected = 'c:\\a';
+    t.identical( got, expected );
+
+    /**/
+
+    var path = '/A/1.txt';
+    var got = self.provider.path.nativize( path );
+    var expected = 'A:\\1.txt';
+    t.identical( got, expected );
+
+    /**/
+
+    var path = 'A:/a\\b/c\\d';
+    var got = self.provider.path.nativize( path );
+    var expected = 'A:\\a\\b\\c\\d';
+    t.identical( got, expected );
+  }
+
+  //
+
+  if( Config.debug )
+  {
+    t.description = 'path is not a string ';
+    t.shouldThrowErrorSync( function()
+    {
+      self.provider.path.nativize( 1 );
+    })
+  }
+}
+
+// --
+// experiment
+// --
 
 function fileCopyExperiment( test )
 {
@@ -33972,7 +34022,7 @@ var Self =
     pathFor : pathFor,
     providerIsInstanceOf : providerIsInstanceOf,
     softLinkIsSupported : softLinkIsSupported,
-    testRootDirectory : null,
+    testSuitePath : null,
     // shouldWriteOnlyOnce : shouldWriteOnlyOnce
   },
 
@@ -34063,8 +34113,6 @@ var Self =
 
     //etc
 
-    nativize : nativize,
-
     // hardLinkSyncRunner : hardLinkSyncRunner,
     // hardLinkAsyncRunner : hardLinkAsyncRunner,
 
@@ -34086,6 +34134,12 @@ var Self =
 
     fileExists : fileExists,
 
+    // record
+
+    record : record,
+
+    // path
+
     pathResolve : pathResolve,
     uriResolve : uriResolve,
 
@@ -34095,6 +34149,10 @@ var Self =
     pathResolveSoftLink : pathResolveSoftLink,
     pathResolveTextLink : pathResolveTextLink,
     pathResolveLinkFullSpecial : pathResolveLinkFullSpecial,
+
+    pathNativize : pathNativize,
+
+    // experiment
 
     fileCopyExperiment : fileCopyExperiment,
     statReadExperiment : statReadExperiment,

@@ -26,9 +26,9 @@ function onSuiteBegin()
   this.isBrowser = typeof module === 'undefined';
 
   if( !this.isBrowser )
-  this.testRootDirectory = _.path.dirTempOpen( _.path.join( __dirname, '../..' ), 'FilesRead' );
+  this.testSuitePath = _.path.dirTempOpen( _.path.join( __dirname, '../..' ), 'FilesRead' );
   else
-  this.testRootDirectory = _.path.current();
+  this.testSuitePath = _.path.current();
 }
 
 //
@@ -37,8 +37,8 @@ function onSuiteEnd()
 {
   if( !this.isBrowser )
   {
-    _.assert( _.strEnds( this.testRootDirectory, 'FilesRead' ) );
-    _.path.dirTempClose(  this.testRootDirectory );
+    _.assert( _.strEnds( this.testSuitePath, 'FilesRead' ) );
+    _.path.dirTempClose(  this.testSuitePath );
   }
 }
 
@@ -62,7 +62,7 @@ function filesRead( test )
   //
 
   var provider = _.fileProvider;
-  var testDir = _.path.join( test.context.testRootDirectory, test.name );
+  var testDir = _.path.join( test.context.testSuitePath, test.name );
   var fileNames = [ 'a', 'b', 'c' ];
 
   test.case = 'sync reading of files, all files are present';
@@ -132,7 +132,7 @@ function filesRead( test )
 
 function filesTreeRead( test )
 {
-  var currentTestDir = _.path.join( test.context.testRootDirectory, test.name );
+  var currentTestDir = _.path.join( test.context.testSuitePath, test.name );
   var provider = _.fileProvider;
   provider.safe = 1;
   var filesTreeReadFixedOptions =
@@ -346,7 +346,7 @@ function filesTreeWrite( test )
 {
   test.case = 'filesTreeWrite';
 
-  var currentTestDir = _.path.join( test.context.testRootDirectory, test.name );
+  var currentTestDir = _.path.join( test.context.testSuitePath, test.name );
   var provider = _.fileProvider;
 
   var fixedOptions =
@@ -536,7 +536,7 @@ var Self =
 
   context :
   {
-    testRootDirectory : null,
+    testSuitePath : null,
     isBrowser : null
   },
 

@@ -20,16 +20,16 @@ if( typeof module !== 'undefined' )
 
 var _ = _global_.wTools;
 var Parent = wTester;
-var testRootDirectory;
+var testSuitePath;
 
 //
 
 function onSuiteBegin()
 {
   if( Config.platform === 'nodejs' )
-  testRootDirectory = _.path.dirTempOpen( _.path.join( __dirname, '../..' ), 'FileRecord' );
+  testSuitePath = _.path.dirTempOpen( _.path.join( __dirname, '../..' ), 'FileRecord' );
   else
-  testRootDirectory = _.path.current();
+  testSuitePath = _.path.current();
 }
 
 //
@@ -38,8 +38,8 @@ function onSuiteEnd()
 {
   if( Config.platform === 'nodejs' )
   {
-    _.assert( _.strEnds( testRootDirectory, 'FileRecord' ) );
-    _.path.dirTempClose( testRootDirectory );
+    _.assert( _.strEnds( testSuitePath, 'FileRecord' ) );
+    _.path.dirTempClose( testSuitePath );
   }
 }
 
@@ -386,8 +386,8 @@ function record( test )
   /* softlink, resolvingSoftLink  1 */
 
   // _.fileProvider.fieldSet( 'resolvingSoftLink', 1 );
-  // var src = _.path.join( testRootDirectory, 'src' );
-  // var dst = _.path.join( testRootDirectory, 'dst' );
+  // var src = _.path.join( testSuitePath, 'src' );
+  // var dst = _.path.join( testSuitePath, 'dst' );
   // _.fileProvider.fileWrite( src, 'src' );
   // _.fileProvider.softLink( dst, src );
   // var got = _.fileProvider.recordFactory().record( dst );
@@ -398,8 +398,8 @@ function record( test )
   /* softlink, resolvingSoftLink  0 */
 
   _.fileProvider.fieldSet( 'resolvingSoftLink', 0 );
-  var src = _.path.join( testRootDirectory, 'src' );
-  var dst = _.path.join( testRootDirectory, 'dst' );
+  var src = _.path.join( testSuitePath, 'src' );
+  var dst = _.path.join( testSuitePath, 'dst' );
   _.fileProvider.fileWrite( src, 'src' );
   _.fileProvider.softLink( dst, src );
   var got = _.fileProvider.recordFactory().record( dst );
@@ -684,7 +684,7 @@ function recordForLink( test )
 {
   let self = this;
 
-  let dir = _.path.join( testRootDirectory, test.name );
+  let dir = _.path.join( testSuitePath, test.name );
   let o =
   {
     fileProvider : _.fileProvider,
@@ -903,7 +903,7 @@ function recordForRelativeLink( test )
 {
   let self = this;
 
-  let dir = _.path.join( testRootDirectory, test.name );
+  let dir = _.path.join( testSuitePath, test.name );
   let o =
   {
     fileProvider : _.fileProvider,

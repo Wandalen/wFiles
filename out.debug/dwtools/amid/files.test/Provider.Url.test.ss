@@ -22,7 +22,7 @@ _.assert( !!Parent );
 function onSuiteBegin( test )
 {
   var self = this;
-  self.testRootDirectory = _.path.dirTempOpen( _.path.join( __dirname, '../..'  ), 'Provider/Url' );
+  self.testSuitePath = _.path.dirTempOpen( _.path.join( __dirname, '../..'  ), 'Provider/Url' );
 }
 
 //
@@ -30,8 +30,8 @@ function onSuiteBegin( test )
 function onSuiteEnd()
 {
   var self = this;
-  _.assert( _.strEnds( self.testRootDirectory, 'Provider/Url' ) );
-  _.path.dirTempClose( this.testRootDirectory );
+  _.assert( _.strEnds( self.testSuitePath, 'Provider/Url' ) );
+  _.path.dirTempClose( this.testSuitePath );
 }
 
 //
@@ -81,7 +81,7 @@ function fileRead( test )
 
 function fileCopyToHardDrive( test )
 {
-  var filePath = _.path.join( this.testRootDirectory, test.name, _.path.name( this.testFile ) );
+  var filePath = _.path.join( this.testSuitePath, test.name, _.path.name( this.testFile ) );
   var con = new _.Consequence().take( null )
 
   //

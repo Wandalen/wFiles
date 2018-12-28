@@ -48,6 +48,21 @@ function pathFor( filePath )
   return '/' + filePath;
 }
 
+//
+
+function onSuiteBegin( test )
+{
+  let context = this;
+
+  context.provider = _.FileProvider.Extract({ filesTree : filesTree, usingTime : 1, protocol : 'current' });
+  context.hub = _.FileProvider.Hub({ providers : [ context.provider ] });
+
+  let path = context.provider.path;
+  context.testSuitePath = path.dirTempOpen( 'FilesFind' );
+  // let path = this.provider.path;
+  // this.testSuitePath = path.dirTempOpen( path.join( __dirname, '../..'  ), 'Provider/HardDrive' );
+}
+
 // --
 // declare
 // --
@@ -60,12 +75,14 @@ var Proto =
   abstract : 0,
   enabled : 1,
 
+  onSuiteBegin,
+
   context :
   {
     filesTree : filesTree,
-    provider : _.FileProvider.Extract({ filesTree : filesTree, usingTime : 1, protocol : 'current' }),
+    // provider : _.FileProvider.Extract({ filesTree : filesTree, usingTime : 1, protocol : 'current' }),
     pathFor : pathFor,
-    testFile : '/file1'
+    testFile : '/file1',
   },
 
   tests :

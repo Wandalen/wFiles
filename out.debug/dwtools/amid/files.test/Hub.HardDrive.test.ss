@@ -24,7 +24,7 @@ function makePath( filePath )
 {
   var self = this;
 
-  filePath =  _.path.join( self.testRootDirectory,  filePath );
+  filePath =  _.path.join( self.testSuitePath,  filePath );
 
   return self.providerEffective.originPath + _.path.normalize( filePath );
 }
@@ -35,7 +35,7 @@ function onSuiteBegin()
 {
   var self = this;
 
-  self.testRootDirectory = _.path.dirTempOpen( _.path.join( __dirname, '../..'  ), 'Hub/HardDrive' );
+  self.testSuitePath = _.path.dirTempOpen( _.path.join( __dirname, '../..'  ), 'Hub/HardDrive' );
 
   self.provider.providerRegister( self.providerEffective );
   self.provider.defaultProvider = self.providerEffective;
@@ -46,9 +46,9 @@ function onSuiteBegin()
 
 function onSuiteEnd()
 {
-  _.assert( _.strEnds( this.testRootDirectory, 'Hub/HardDrive' ) );
-  // this.providerEffective.filesDelete({ filePath : this.testRootDirectory });
-  _.path.dirTempClose( this.testRootDirectory );
+  _.assert( _.strEnds( this.testSuitePath, 'Hub/HardDrive' ) );
+  // this.providerEffective.filesDelete({ filePath : this.testSuitePath });
+  _.path.dirTempClose( this.testSuitePath );
 }
 
 // --
@@ -70,11 +70,11 @@ var Proto =
   {
     provider : _.FileProvider.Hub({ empty : 1 }),
     providerEffective : _.FileProvider.HardDrive(),
-    testRootDirectory : null,
+    testSuitePath : null,
 
     makePath : makePath,
     // testFile : null,
-    // testRootDirectory : __dirname + '/../../../../tmp.tmp/hard-drive',
+    // testSuitePath : __dirname + '/../../../../tmp.tmp/hard-drive',
     // testFile : __dirname + '/../../../../tmp.tmp/hard-drive/test.txt',
   },
 

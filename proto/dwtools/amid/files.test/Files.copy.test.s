@@ -29,12 +29,12 @@ function onSuiteBegin()
   this.isBrowser = typeof module === 'undefined';
 
   if( !this.isBrowser )
-  this.testRootDirectory = _.path.dirTempOpen( _.path.join( __dirname, '../..'  ), 'FilesCopy' );
+  this.testSuitePath = _.path.dirTempOpen( _.path.join( __dirname, '../..'  ), 'FilesCopy' );
   else
-  this.testRootDirectory = _.path.current();
+  this.testSuitePath = _.path.current();
 
-  this.dstPath = _.path.join( this.testRootDirectory, 'dst' );
-  this.srcPath = _.path.join( this.testRootDirectory, 'src' );
+  this.dstPath = _.path.join( this.testSuitePath, 'dst' );
+  this.srcPath = _.path.join( this.testSuitePath, 'src' );
 
   this.filePathSrc = _.path.join( this.srcPath, 'file.src' );
   this.filePathDst = _.path.join( this.dstPath, 'file.dst' );
@@ -48,8 +48,8 @@ function onSuiteEnd()
 {
   if( !this.isBrowser )
   {
-    _.assert( _.strEnds( this.testRootDirectory, 'FilesCopy' ) );
-    _.path.dirTempClose( this.testRootDirectory );
+    _.assert( _.strEnds( this.testSuitePath, 'FilesCopy' ) );
+    _.path.dirTempClose( this.testSuitePath );
   }
 }
 
@@ -219,7 +219,7 @@ function filesCopyWithAdapter( test )
 
   // combinations.forEach( ( src ) =>
   // {
-  //   _.fileProvider.filesDelete( test.context.testRootDirectory );
+  //   _.fileProvider.filesDelete( test.context.testSuitePath );
 
   //   var info =
   //   {
@@ -295,7 +295,7 @@ function filesCopyWithAdapter( test )
       // if( n !== 29 )
       // return;
 
-      _.fileProvider.filesDelete( test.context.testRootDirectory );
+      _.fileProvider.filesDelete( test.context.testSuitePath );
 
       if( src.level !== dst.level )
       return;
@@ -408,7 +408,7 @@ function filesCopyWithAdapter( test )
 
   // combinations.forEach( ( dst ) =>
   // {
-  //   _.fileProvider.filesDelete( test.context.testRootDirectory );
+  //   _.fileProvider.filesDelete( test.context.testSuitePath );
 
   //   var info =
   //   {
@@ -479,7 +479,7 @@ function filesCopyWithAdapter( test )
   //     checks : []
   //   };
 
-  //   _.fileProvider.filesDelete( test.context.testRootDirectory );
+  //   _.fileProvider.filesDelete( test.context.testSuitePath );
 
   //   o.src = srcPath;
   //   o.dst = dstPath;
@@ -680,7 +680,7 @@ var Self =
   context :
   {
     isBrowser : null,
-    testRootDirectory : null,
+    testSuitePath : null,
     dstPath : null,
     srcPath : null,
     filePathSrc : null,

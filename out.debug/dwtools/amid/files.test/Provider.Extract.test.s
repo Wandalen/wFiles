@@ -2,11 +2,8 @@
 
 'use strict';
 
-var isBrowser = true;
-
 if( typeof module !== 'undefined' )
 {
-  isBrowser = false;
   require( './aFileProvider.test.s' );
 }
 
@@ -44,6 +41,20 @@ var filesTree =
   'softLinkToDir' : [{ softLink : '/test_dir' }],
 }
 
+//
+
+function onSuiteBegin( test )
+{
+  let context = this;
+
+  context.provider = _.FileProvider.Extract({ filesTree : filesTree, usingTime : 1, protocol : 'current' });
+  context.hub = _.FileProvider.Hub({ providers : [ context.provider ] });
+
+  let path = context.provider.path;
+  context.testSuitePath = path.dirTempOpen( 'FilesFind' );
+  // let path = this.provider.path;
+  // this.testSuitePath = path.dirTempOpen( path.join( __dirname, '../..'  ), 'Provider/HardDrive' );
+}
 //
 
 function pathFor( filePath )
@@ -122,6 +133,8 @@ var Proto =
   silencing : 1,
   abstract : 0,
   enabled : 1,
+
+  onSuiteBegin,
 
   context :
   {

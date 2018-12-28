@@ -210,18 +210,21 @@ function _recordFactoryFormEnd( recordFactory )
   _.assert( recordFactory instanceof _.FileRecordFactory );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  if( !recordFactory.effectiveFileProvider )
-  debugger;
+  // if( !recordFactory.effectiveFileProvider )
+  // debugger;
 
-  if( !recordFactory.effectiveFileProvider )
-  recordFactory.effectiveFileProvider = recordFactory.fileProvider.providerForPath( recordFactory.basePath );
+  // if( !recordFactory.effectiveFileProvider )
+  // recordFactory.effectiveFileProvider = recordFactory.fileProvider.providerForPath( recordFactory.basePath );
 
   _.assert( recordFactory.effectiveFileProvider instanceof _.FileProvider.Abstract, 'No provider for base path', recordFactory.basePath, 'found' );
 
-  recordFactory.basePath = recordFactory.effectiveFileProvider.localFromGlobal( recordFactory.basePath );
+  // recordFactory.basePath = recordFactory.effectiveFileProvider.localFromGlobal( recordFactory.basePath );
+  //
+  // if( recordFactory.stemPath !== null )
+  // recordFactory.stemPath = recordFactory.effectiveFileProvider.localFromGlobal( recordFactory.stemPath );
 
-  if( recordFactory.stemPath !== null )
-  recordFactory.stemPath = recordFactory.effectiveFileProvider.localFromGlobal( recordFactory.stemPath );
+  _.assert( !_.path.isGlobal( recordFactory.basePath ) );
+  _.assert( recordFactory.stemPath === null || !_.path.isGlobal( recordFactory.stemPath ) );
 
   return recordFactory;
 }

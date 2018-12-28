@@ -98,6 +98,7 @@ function form()
     self.effectiveFileProvider = self.effectiveFileProvider || self.filter.effectiveFileProvider;
   }
 
+  let effectiveFileProvider = self.effectiveFileProvider || self.fileProvider;
   if( self.fileProvider && self.fileProvider.hub )
   self.fileProvider = self.fileProvider.hub;
 
@@ -162,10 +163,10 @@ function form()
 
   /* */
 
-  self.fileProvider._recordFactoryFormEnd( self );
-
   if( !self.effectiveFileProvider )
-  self.effectiveFileProvider = self.fileProvider;
+  self.effectiveFileProvider = effectiveFileProvider;
+
+  self.fileProvider._recordFactoryFormEnd( self );
 
   /* */
 

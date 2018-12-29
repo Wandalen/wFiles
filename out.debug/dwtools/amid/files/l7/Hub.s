@@ -214,7 +214,7 @@ function _recordFactoryFormEnd( recordFactory )
   // debugger;
 
   // if( !recordFactory.effectiveFileProvider )
-  // recordFactory.effectiveFileProvider = recordFactory.fileProvider.providerForPath( recordFactory.basePath );
+  // recordFactory.effectiveFileProvider = recordFactory.hubFileProvider.providerForPath( recordFactory.basePath );
 
   _.assert( recordFactory.effectiveFileProvider instanceof _.FileProvider.Abstract, 'No provider for base path', recordFactory.basePath, 'found' );
 
@@ -359,7 +359,7 @@ function _localFromGlobal( filePath, provider )
     r.provider = self.providerForPath( r.parsedPath );
   }
 
-  _.assert( _.objectIs( r.provider ), 'no provider for path', filePath );
+  _.assert( _.objectIs( r.provider ), 'No provider for path', filePath );
 
   r.filePath = r.provider.localFromGlobal( r.parsedPath );
 
@@ -384,7 +384,7 @@ function pathNativizeAct( filePath )
   let r = self._localFromGlobal.apply( self, arguments );
   r.filePath = r.provider.path.nativize( r.filePath );
   xxx
-  _.assert( _.objectIs( r.provider ), 'no provider for path', filePath );
+  _.assert( _.objectIs( r.provider ), 'No provider for path', filePath );
   _.assert( arguments.length === 1 );
   return r;
 }
@@ -496,10 +496,19 @@ function pathResolveSoftLink_body( o )
 
   let result = r.provider.pathResolveSoftLink.body.call( r.provider, o );
 
+  if( result === null )
+  return result;
+
   _.assert( !!result );
 
+  result = self.path.join( r.provider.originPath, result );
+
   if( result === o.filePath )
-  return r.originalPath;
+  {
+    debugger;
+    _.assert( 0, 'not tested' );
+    return r.originalPath;
+  }
 
   return result;
 }
@@ -574,6 +583,38 @@ function _link_functor( fop )
     let self = this;
 
     _.assert( arguments.length === 1, 'Expects single argument' );
+
+    {
+
+      let dst = self._localFromGlobal( o.originalDstPath );
+      let src = self._localFromGlobal( o.originalSrcPath );
+
+      _.assert( !!dst.provider, 'no provider for path', o.originalDstPath );
+      _.assert( !!src.provider, 'no provider for path', o.originalSrcPath );
+
+      if( dst.provider !== src.provider )
+      {
+        if( allowDifferentProviders )
+        {
+        }
+        else
+        {
+          if( onDifferentProviders )
+          return onDifferentProviders.call( self, o, dst, src, routine );
+          else
+          throw _.err( 'Cant ' + routineName + ' files of different file providers :\n' + o.originalDstPath + '\n' + o.originalSrcPath );
+        }
+      }
+      else
+      {
+        o.originalSrcPath = src.filePath;
+      }
+
+      o.originalDstPath = dst.filePath;
+
+    }
+
+    /* */
 
     let dst = self._localFromGlobal( o.dstPath );
     let src = self._localFromGlobal( o.srcPath );

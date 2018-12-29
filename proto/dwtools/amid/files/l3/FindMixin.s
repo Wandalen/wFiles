@@ -87,7 +87,7 @@ function _filesFilterMasksSupplement( dst,src )
 // files find
 // --
 
-function filesFindLikePre_pre( args )
+function filesFindLike_pre( args )
 {
   let o;
 
@@ -119,13 +119,13 @@ function filesFindLikePre_pre( args )
 
   }
 
-  if( o.maskPreset )
-  {
-    _.assert( o.maskPreset === 'default.exclude', 'Not supported preset', o.maskPreset );
-    o.filter = o.filter || Object.create( null );
-    if( Object.keys( o.filter ).length === 0 )
-    o.filter.maskAll = _.files.regexpMakeSafe();
-  }
+  // if( o.maskPreset )
+  // {
+  //   _.assert( o.maskPreset === 'default.exclude', 'Not supported preset', o.maskPreset );
+  //   o.filter = o.filter || Object.create( null );
+  //   if( Object.keys( o.filter ).length === 0 )
+  //   o.filter.maskAll = _.files.regexpMakeSafe();
+  // }
 
   return o;
 }
@@ -136,9 +136,19 @@ function filesFind_pre( routine, args )
 {
   let self = this;
   let path = self.path;
-  let o = self.filesFindLikePre_pre( args );
+  let o = self.filesFindLike_pre( args );
 
   _.routineOptions( routine, o );
+
+  if( o.maskPreset )
+  {
+    _.assert( o.maskPreset === 'default.exclude', 'Not supported preset', o.maskPreset );
+    o.filter = o.filter || Object.create( null );
+    if( o.filter.formed == 5 )
+    debugger;
+    if( !o.filter.formed || o.filter.formed < 5 )
+    o.filter.maskAll = _.files.regexpMakeSafe( o.filter.maskAll || null );
+  }
 
   if( Config.debug )
   {
@@ -248,7 +258,9 @@ function filesFindSingle_body( o )
   _.assert( _.objectIs( o.filter.effectiveFileProvider ) );
   _.assert( _.mapIs( o.filter.basePath ), 'Expects absolute path {-o.filter.basePath-}' );
   _.assert( o.filter.effectiveFileProvider instanceof _.FileProvider.Abstract );
-  _.assert( o.filter.hubFileProvider === o.filter.effectiveFileProvider || o.filter.hubFileProvider instanceof _.FileProvider.Hub );
+  // _.assert( o.filter.hubFileProvider === o.filter.effectiveFileProvider || o.filter.hubFileProvider instanceof _.FileProvider.Hub );
+  // _.assert( o.filter.hubFileProvider === null || o.filter.hubFileProvider instanceof _.FileProvider.Hub );
+  _.assert( o.filter.defaultFileProvider instanceof _.FileProvider.Abstract );
 
   /* handler */
 
@@ -278,14 +290,15 @@ function filesFindSingle_body( o )
 
   _.assert( _.strDefined( o2.basePath ), 'No base path for', o.filePath );
 
-  let recordFactory = _.FileRecordFactory.TollerantMake( o, o2 ).form();
+  let recordFactory = _.FileRecordFactory.TollerantFrom( o, o2 ).form();
   let stemRecord = recordFactory.record( o.filePath );
 
   _.assert( recordFactory.basePath === o.filter.basePath[ o.filePath ] );
   _.assert( recordFactory.dirPath === null );
   _.assert( stemRecord.isStem === true );
   _.assert( recordFactory.effectiveFileProvider === o.filter.effectiveFileProvider );
-  _.assert( recordFactory.fileProvider === o.filter.hubFileProvider );
+  _.assert( recordFactory.hubFileProvider === o.filter.hubFileProvider || o.filter.hubFileProvider === null );
+  _.assert( recordFactory.defaultFileProvider === o.filter.defaultFileProvider );
 
   if( !stemRecord.stat )
   {
@@ -747,7 +760,7 @@ function filesFinder_functor( routine )
   function finder()
   {
     let self = this;
-    let op0 = self.filesFindLikePre_pre( arguments );
+    let op0 = self.filesFindLike_pre( arguments );
     // let op0 = self.filesFind.pre.call( self, self.filesFind, arguments );
     _.assertMapHasOnly( op0, finder.defaults );
     return er;
@@ -838,7 +851,6 @@ function filesCopyWithAdapter( o )
 
   /* safe */
 
-  // xxx
   // if( self.safe )
   // if( o.removingSource && ( !o.allowWrite || !o.allowRewrite ) )
   // throw _.err( 'not safe removingSource:1 with allowWrite:0 or allowRewrite:0' );
@@ -1018,14 +1030,17 @@ defaults.preservingTime = 1;
 function _filesPrepareFilters( routine, o )
 {
   let self = this;
-  let hub = self.hub || self;
+  // let hub = self.hub || self;
 
   _.assert( arguments.length === 2 );
 
   /* */
 
-  o.srcFilter = hub.recordFilter( o.srcFilter );
-  o.dstFilter = hub.recordFilter( o.dstFilter );
+  // o.srcFilter = hub.recordFilter( o.srcFilter );
+  // o.dstFilter = hub.recordFilter( o.dstFilter );
+
+  o.srcFilter = self.recordFilter( o.srcFilter );
+  o.dstFilter = self.recordFilter( o.dstFilter );
 
   if( o.filter )
   {
@@ -1038,11 +1053,11 @@ function _filesPrepareFilters( routine, o )
   _.assert( _.objectIs( o.srcFilter ) );
   _.assert( _.objectIs( o.dstFilter ) );
 
-  _.assert( !o.srcFilter.formed );
-  _.assert( !o.dstFilter.formed );
+  _.assert( o.srcFilter.formed <= 1 );
+  _.assert( o.dstFilter.formed <= 1 );
 
-  _.assert( _.objectIs( o.srcFilter.hubFileProvider ) );
-  _.assert( _.objectIs( o.dstFilter.hubFileProvider ) );
+  _.assert( _.objectIs( o.srcFilter.defaultFileProvider ) );
+  _.assert( _.objectIs( o.dstFilter.defaultFileProvider ) );
 
   _.assert( !( o.srcFilter.effectiveFileProvider instanceof _.FileProvider.Hub ) );
   _.assert( !( o.dstFilter.effectiveFileProvider instanceof _.FileProvider.Hub ) );
@@ -1126,15 +1141,20 @@ function filesReflectEvaluate_body( o )
   let src = o.srcFilter.effectiveFileProvider;
 
   _.assert( o.dstFilter.effectiveFileProvider === dstRecordFactory.effectiveFileProvider );
-  _.assert( o.dstFilter.hubFileProvider === dstRecordFactory.fileProvider );
+  _.assert( o.dstFilter.defaultFileProvider === dstRecordFactory.defaultFileProvider );
+  _.assert( o.dstFilter.hubFileProvider === dstRecordFactory.hubFileProvider || o.dstFilter.hubFileProvider === null );
   _.assert( !!o.dstFilter.effectiveFileProvider );
-  _.assert( !!o.dstFilter.hubFileProvider );
+  // _.assert( !!o.dstFilter.hubFileProvider );
+  _.assert( !!o.dstFilter.defaultFileProvider );
   _.assert( !!o.srcFilter.effectiveFileProvider );
-  _.assert( !!o.srcFilter.hubFileProvider );
+  // _.assert( !!o.srcFilter.hubFileProvider );
+  _.assert( !!o.srcFilter.defaultFileProvider );
   _.assert( o.dstFilter.effectiveFileProvider instanceof _.FileProvider.Abstract );
-  _.assert( o.dstFilter.hubFileProvider === o.dstFilter.effectiveFileProvider || o.dstFilter.hubFileProvider instanceof _.FileProvider.Hub );
+  // _.assert( o.dstFilter.hubFileProvider === o.dstFilter.effectiveFileProvider || o.dstFilter.hubFileProvider instanceof _.FileProvider.Hub );
+  // _.assert( o.dstFilter.hubFileProvider === null || o.dstFilter.hubFileProvider instanceof _.FileProvider.Hub );
   _.assert( o.srcFilter.effectiveFileProvider instanceof _.FileProvider.Abstract );
-  _.assert( o.srcFilter.hubFileProvider === o.srcFilter.effectiveFileProvider || o.srcFilter.hubFileProvider instanceof _.FileProvider.Hub );
+  // _.assert( o.srcFilter.hubFileProvider === o.srcFilter.effectiveFileProvider || o.srcFilter.hubFileProvider instanceof _.FileProvider.Hub );
+  // _.assert( o.srcFilter.hubFileProvider === null || o.srcFilter.hubFileProvider instanceof _.FileProvider.Hub );
   _.assert( src.path.s.allAreNormalized( o.srcPath ) );
   _.assert( dst.path.isNormalized( o.dstPath ) );
 
@@ -1174,6 +1194,7 @@ function filesReflectEvaluate_body( o )
     srcOptions.allowingMissed = 1;
     srcOptions.allowingCycled = 1;
     srcOptions.verbosity = 0;
+    srcOptions.maskPreset = 0;
     srcOptions.filter = o.srcFilter;
     srcOptions.filePath = o.srcPath;
     srcOptions.result = null;
@@ -1204,13 +1225,14 @@ function filesReflectEvaluate_body( o )
     _.assert( _.objectIs( o.dstFilter.basePath ) );
     _.assert( o.dstFilter.stemPath === o.dstPath );
     _.assert( !!o.dstFilter.effectiveFileProvider );
-    _.assert( !!o.dstFilter.hubFileProvider );
+    _.assert( !!o.dstFilter.defaultFileProvider );
 
     let dstOptions = _.mapExtend( null, srcOptions );
     dstOptions.filter = o.dstFilter;
     dstOptions.filePath = o.dstPath;
     dstOptions.includingStem = 1;
     dstOptions.recursive = '2';
+    dstOptions.maskPreset = 0;
     dstOptions.verbosity = 0;
     dstOptions.result = null;
     dstOptions.onUp = [];
@@ -1234,7 +1256,7 @@ function filesReflectEvaluate_body( o )
       allowingCycled : 1,
     }
 
-    let dstRecordFactory = _.FileRecordFactory.TollerantMake( o, dstOp ).form();
+    let dstRecordFactory = _.FileRecordFactory.TollerantFrom( o, dstOp ).form();
 
     _.assert( _.strIs( dstOp.basePath ) );
     _.assert( dstRecordFactory.basePath === _.uri.parse( o.dstFilter.basePath[ o.dstPath ] ).localPath );
@@ -1717,7 +1739,7 @@ function filesReflectEvaluate_body( o )
           }
           else
           {
-            // if( !o.dstDeleting ) // xxx
+            // if( !o.dstDeleting )
             // record.allow = false;
             dirDeleteOrPreserve( record );
           }
@@ -1800,7 +1822,7 @@ function filesReflectEvaluate_body( o )
             if( !record.dst.isActual && record.touch !== 'destructive' )
             record.allow = false;
             dirDeleteOrPreserve( record );
-            // if( record.dst.isActual ) // xxx
+            // if( record.dst.isActual )
             // fileDelete( record );
           }
         }
@@ -2748,8 +2770,8 @@ function filesReflect_body( o )
   o.reflectMap = path.globMapExtend( null, o.reflectMap );
 
   _.assert( _.all( o.reflectMap, ( e, k ) => k === false || path.is( k ) ) );
-  _.assert( !o.srcFilter.formed );
-  _.assert( !o.dstFilter.formed );
+  _.assert( o.srcFilter.formed <= 1 );
+  _.assert( o.dstFilter.formed <= 1 );
 
   if( o.verbosity >= 1 )
   time = _.timeNow();
@@ -2770,6 +2792,11 @@ function filesReflect_body( o )
 
     o2.srcPath = srcPath;
     o2.srcFilter.inFilePath = srcPath;
+
+    // if( !( self instanceof _.FileProvider.Hub ) && !o2.srcFilter.effectiveFileProvider )
+    // o2.srcFilter.effectiveFileProvider = self;
+    // debugger;
+
     try
     {
       o2.srcFilter.form();
@@ -2782,6 +2809,10 @@ function filesReflect_body( o )
 
     o2.dstPath = dstPath;
     o2.dstFilter.inFilePath = dstPath;
+
+    // if( !( self instanceof _.FileProvider.Hub ) && !o2.dstFilter.effectiveFileProvider )
+    // o2.dstFilter.effectiveFileProvider = self;
+
     try
     {
       o2.dstFilter.form();
@@ -2879,7 +2910,7 @@ function filesReflector_functor( routine )
   function reflector()
   {
     let self = this;
-    let op0 = self.filesFindLikePre_pre( arguments );
+    let op0 = self.filesFindLike_pre( arguments );
     _.assertMapHasOnly( op0, reflector.defaults );
     return er;
 
@@ -3263,6 +3294,7 @@ qqq :
 function filesDelete_body( o )
 {
   let self = this;
+  let provider = o.filter.effectiveFileProvider;
   let path = self.path;
   let files = [];
 
@@ -3281,17 +3313,17 @@ function filesDelete_body( o )
 
   if( _.strIs( o.filePath ) && !o.deletingEmptyDirs )
   {
-    if( !self.fileExists( o.filePath ) )
+    if( !provider.fileExists( o.filePath ) )
     return end();
-    if( self.isTerminal( o.filePath ) )
+    if( provider.isTerminal( o.filePath ) )
     {
       // debugger;
-      let file = self.record( o.filePath );
+      let file = provider.record( o.filePath );
       file.isActual = true;
       file.isTransient = true;
       o.result.push( file );
       if( o.writing )
-      self.fileDelete
+      provider.fileDelete
       ({
         filePath : o.filePath,
         throwing :  o.throwing,
@@ -3304,12 +3336,12 @@ function filesDelete_body( o )
 
   /* */
 
-  let o2 = _.mapOnly( o, self.filesFind.defaults );
+  let o2 = _.mapOnly( o, provider.filesFind.defaults );
   o2.verbosity = 0;
   o2.outputFormat = 'record';
   delete o2.safe;
 
-  files = self.filesFind.body.call( self, o2 );
+  files = provider.filesFind.body.call( provider, o2 );
 
   /* */
 
@@ -3342,7 +3374,7 @@ function filesDelete_body( o )
     for( let d = dirsPath.length-1 ; d >= 0 ; d-- )
     {
       let dirPath = dirsPath[ d ];
-      let files = self.dirRead({ filePath : dirPath, outputFormat : 'absolute' });
+      let files = provider.dirRead({ filePath : dirPath, outputFormat : 'absolute' });
       if( files.length > 1 )
       break;
       if( files.length === 1 && !delMap[ files[ 0 ] ] )
@@ -3377,7 +3409,7 @@ function filesDelete_body( o )
   function end()
   {
     if( o.verbosity >= 1 )
-    self.logger.log( ' - filesDelete ' + o.result.length + ' files at ' + path.commonReport( o.filePath ) + ' in ' + _.timeSpent( time ) );
+    provider.logger.log( ' - filesDelete ' + o.result.length + ' files at ' + path.commonReport( o.filePath ) + ' in ' + _.timeSpent( time ) );
 
     if( o.outputFormat === 'absolute' )
     files = _.select( files, '*/absolute' );
@@ -3441,7 +3473,7 @@ _.assert( !!filesDelete.defaults.includingDirs );
 // {
 //   let self = this;
 //
-//   o = self.filesFindLikePre_pre( arguments );
+//   o = self.filesFindLike_pre( arguments );
 //
 //   _.routineOptions( filesDeleteForce, o );
 //
@@ -3458,7 +3490,7 @@ function filesDeleteTerminals( o )
 {
   let self = this;
 
-  o = self.filesFindLikePre_pre( arguments );
+  o = self.filesFindLike_pre( arguments );
 
   _.routineOptions( filesDeleteTerminals, o );
 
@@ -3485,33 +3517,17 @@ defaults.includingTransient = 0;
 qqq : add test coverage, extract pre and body, please
 */
 
-function filesDeleteEmptyDirs()
+function filesDeleteEmptyDirs_body( o )
 {
   let self = this;
 
-  // _.assert( arguments.length === 1 || arguments.length === 3 );
-  // let o = self.filesFindLikePre_pre( arguments,1 );
-
-  debugger;
-  let o = filesDeleteEmptyDirs.pre.call( self,filesDeleteEmptyDirs, arguments );
-  debugger;
-
   /* */
 
-  // _.assert( 0, 'not tested' ); // qqq
-
-  //o.outputFormat = 'absolute'; // qqq
-  // o.includingTerminals = 0;
-  // o.includingTransient = 1;
-
+  _.assertRoutineOptions( filesDeleteEmptyDirs_body, arguments );
   _.assert( !o.includingTerminals );
   _.assert( o.includingDirs );
   _.assert( !o.includingTransient );
-
-  if( o.recursive === undefined )
-  o.recursive = '2';
-
-  // _.routineOptions( filesDeleteEmptyDirs, o );
+  _.assert( o.recursive !== undefined && o.recursive !== null );
 
   /* */
 
@@ -3519,11 +3535,7 @@ function filesDeleteEmptyDirs()
 
   o2.onDown = _.arrayAppendElement( _.arrayAs( o.onDown ), handleDown );
 
-  debugger;
   let files = self.filesFind.body.call( self, o2 );
-  debugger;
-
-  // return new _.Consequence().take( null );
 
   return files;
 
@@ -3541,14 +3553,14 @@ function filesDeleteEmptyDirs()
 
       if( !sub.length )
       {
-        if( self.verbosity >= 1 )
-        self.logger.log( '- deleted :',record.absolute );
-        self.fileDelete({ filePath : record.absolute, throwing : o.throwing });
+        // if( self.verbosity >= 1 )
+        // self.logger.log( ' - deleted :', record.absolute );
+        self.fileDelete({ filePath : record.absolute, throwing : o.throwing, verbosity : o.verbosity });
       }
     }
     catch( err )
     {
-      if( !o.throwing )
+      if( o.throwing )
       throw _.err( err );
     }
 
@@ -3557,9 +3569,9 @@ function filesDeleteEmptyDirs()
 
 }
 
-_.routineExtend( filesDeleteEmptyDirs, filesDelete );
+_.routineExtend( filesDeleteEmptyDirs_body, filesFind.body );
 
-var defaults = filesDeleteEmptyDirs.defaults;
+var defaults = filesDeleteEmptyDirs_body.defaults;
 defaults.throwing = false;
 defaults.verbosity = null;
 defaults.outputFormat = 'absolute';
@@ -3567,6 +3579,8 @@ defaults.includingTerminals = 0;
 defaults.includingDirs = 1;
 defaults.includingTransient = 0;
 defaults.recursive = '2';
+
+let filesDeleteEmptyDirs = _.routineFromPreAndBody( filesFind.pre, filesDeleteEmptyDirs_body );
 
 // --
 // other find
@@ -3765,7 +3779,7 @@ let Supplement =
 
   // find
 
-  filesFindLikePre_pre,
+  filesFindLike_pre,
   filesFind_pre,
   _filesFilterForm,
 

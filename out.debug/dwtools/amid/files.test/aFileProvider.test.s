@@ -45,7 +45,7 @@ function onSuiteBegin( test )
 function onSuiteEnd()
 {
   let path = this.provider.path;
-  _.assert( _.strHas( this.testSuitePath, 'tst.tst' ) );
+  _.assert( _.strHas( this.testSuitePath, 'tmp.tmp' ) );
   path.dirTempClose( this.testSuitePath );
   this.provide.finit();
   this.hub.finit();

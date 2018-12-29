@@ -39,36 +39,39 @@ _.assert( !_.FileRecordFactory );
 
 function init( o )
 {
-  let self = this;
+  let factory = this;
 
-  self[ usingSoftLinkSymbol ] = null;
-  self[ resolvingSoftLinkSymbol ] = null;
-  self[ usingTextLinkSymbol ] = null;
-  self[ resolvingTextLinkSymbol ] = null;
-  self[ statingSymbol ] = null;
-  self[ safeSymbol ] = null;
+  factory[ usingSoftLinkSymbol ] = null;
+  factory[ resolvingSoftLinkSymbol ] = null;
+  factory[ usingTextLinkSymbol ] = null;
+  factory[ resolvingTextLinkSymbol ] = null;
+  factory[ statingSymbol ] = null;
+  factory[ safeSymbol ] = null;
 
-  _.instanceInit( self );
-  Object.preventExtensions( self );
+  _.assert( arguments.length === 0 || arguments.length === 1 );
+
+  _.instanceInit( factory );
+  Object.preventExtensions( factory );
 
   /* */
 
-  // if( arguments.length !== 1 || arguments[ 0 ] !== undefined )
-  // if( arguments.length > 0 )
   for( let a = 0 ; a < arguments.length ; a++ )
   {
     let src = arguments[ a ];
     if( _.mapIs( src ) )
-    Object.assign( self, src );
+    Object.assign( factory, src );
     else
-    Object.assign( self, _.mapOnly( src, Self.prototype.fieldsOfCopyableGroups ) );
+    Object.assign( factory, _.mapOnly( src, Self.prototype.fieldsOfCopyableGroups ) );
   }
 
+  // factory._formAssociations();
+
+  return factory;
 }
 
 //
 
-function TollerantMake( o )
+function TollerantFrom( o )
 {
   _.assert( arguments.length >= 1, 'Expects at least one argument' );
   _.assert( _.objectIs( Self.prototype.Composes ) );
@@ -78,137 +81,226 @@ function TollerantMake( o )
 
 //
 
+function _formAssociations()
+{
+  let factory = this;
+
+  _.assert( factory.formed === 0 ); debugger;
+
+  /* */
+
+  if( factory.filter )
+  {
+    factory.hubFileProvider = factory.hubFileProvider || factory.filter.hubFileProvider;
+    factory.effectiveFileProvider = factory.effectiveFileProvider || factory.filter.effectiveFileProvider;
+    factory.defaultFileProvider = factory.defaultFileProvider || factory.filter.defaultFileProvider;
+  }
+
+  /* */
+
+  if( factory.hubFileProvider )
+  {
+    if( factory.hubFileProvider.hub && factory.hubFileProvider.hub !== factory.hubFileProvider )
+    {
+      _.assert( factory.effectiveFileProvider === null || factory.effectiveFileProvider === factory.hubFileProvider );
+      factory.effectiveFileProvider = factory.hubFileProvider;
+      factory.hubFileProvider = factory.hubFileProvider.hub;
+    }
+  }
+
+  // if( factory.defaultFileProvider )
+  // {
+  //   if( factory.defaultFileProvider instanceof _.FileProvider.Hub )
+  //   {
+  //     _.assert( factory.hubFileProvider === null || factory.hubFileProvider === factory.defaultFileProvider );
+  //     factory.hubFileProvider = factory.defaultFileProvider;
+  //     factory.defaultFileProvider = null;
+  //   }
+  // }
+  // 
+  // if( factory.defaultFileProvider && factory.defaultFileProvider.hub )
+  // {
+  //   _.assert( factory.hubFileProvider === null || factory.hubFileProvider === factory.defaultFileProvider.hub );
+  //   factory.hubFileProvider = factory.defaultFileProvider.hub;
+  // }
+
+  if( factory.effectiveFileProvider )
+  {
+    if( factory.effectiveFileProvider instanceof _.FileProvider.Hub )
+    {
+      _.assert( factory.hubFileProvider === null || factory.hubFileProvider === factory.effectiveFileProvider );
+      factory.hubFileProvider = factory.effectiveFileProvider;
+      factory.effectiveFileProvider = null;
+    }
+  }
+
+  if( factory.effectiveFileProvider && factory.effectiveFileProvider.hub )
+  {
+    _.assert( factory.hubFileProvider === null || factory.hubFileProvider === factory.effectiveFileProvider.hub );
+    factory.hubFileProvider = factory.effectiveFileProvider.hub;
+  }
+
+  if( !factory.defaultFileProvider )
+  {
+    factory.defaultFileProvider = factory.defaultFileProvider || factory.effectiveFileProvider || factory.hubFileProvider;
+  }
+
+  /* */
+
+  _.assert( !factory.hubFileProvider || factory.hubFileProvider instanceof _.FileProvider.Abstract, 'Expects {- factory.hubFileProvider -}' );
+  _.assert( factory.defaultFileProvider instanceof _.FileProvider.Abstract );
+  _.assert( !factory.effectiveFileProvider || !( factory.effectiveFileProvider instanceof _.FileProvider.Hub ) );
+
+}
+
+//
+
 function form()
 {
-  let self = this;
+  let factory = this;
 
-  // if( self.stemPath === 'tmp:///' )
+  // if( factory.stemPath === 'tmp:///' )
   // debugger;
 
   _.assert( arguments.length === 0 );
-  _.assert( !self.formed );
+  _.assert( !factory.formed );
 
-  self.formed = 1;
-
-  /* */
-
-  if( self.filter )
-  {
-    self.fileProvider = self.fileProvider || self.filter.hubFileProvider;
-    self.effectiveFileProvider = self.effectiveFileProvider || self.filter.effectiveFileProvider;
-  }
-
-  let effectiveFileProvider = self.effectiveFileProvider || self.fileProvider;
-  if( self.fileProvider && self.fileProvider.hub )
-  self.fileProvider = self.fileProvider.hub;
-
-  let fileProvider = self.fileProvider || self.effectiveFileProvider;
-  let path = fileProvider.path;
+  if( factory.basePath === '/dst' )
+  debugger;
+  factory._formAssociations();
 
   /* */
 
-  if( self.basePath )
+  // if( factory.filter )
+  // {
+  //   factory.hubFileProvider = factory.hubFileProvider || factory.filter.hubFileProvider;
+  //   factory.effectiveFileProvider = factory.effectiveFileProvider || factory.filter.effectiveFileProvider;
+  //   factory.defaultFileProvider = factory.defaultFileProvider || factory.filter.defaultFileProvider;
+  // }
+  //
+  // let effectiveFileProvider = factory.effectiveFileProvider || factory.hubFileProvider;
+  // if( factory.hubFileProvider && factory.hubFileProvider.hub )
+  // factory.hubFileProvider = factory.hubFileProvider.hub;
+
+  factory._formAssociations();
+
+  let hubFileProvider = factory.hubFileProvider || factory.effectiveFileProvider || factory.defaultFileProvider;
+  let path = hubFileProvider.path;
+
+  /* */
+
+  if( factory.basePath )
   {
 
     _.assert( !!path );
 
-    self.basePath = path.from( self.basePath );
-    self.basePath = path.normalize( self.basePath );
+    factory.basePath = path.from( factory.basePath );
+    factory.basePath = path.normalize( factory.basePath );
 
-    if( !self.effectiveFileProvider )
-    self.effectiveFileProvider = self.fileProvider.providerForPath( self.basePath );
+    if( !factory.effectiveFileProvider )
+    factory.effectiveFileProvider = hubFileProvider.providerForPath( factory.basePath );
 
     if( Config.debug )
-    if( _.path.isGlobal( self.basePath ) )
+    if( _.path.isGlobal( factory.basePath ) )
     {
-      let url = _.uri.parse( self.basePath );
+      let url = _.uri.parse( factory.basePath );
     }
 
   }
 
   /* */
 
-  if( self.dirPath )
+  if( factory.dirPath )
   {
-    self.dirPath = path.from( self.dirPath );
-    self.dirPath = path.normalize( self.dirPath );
+    factory.dirPath = path.from( factory.dirPath );
+    factory.dirPath = path.normalize( factory.dirPath );
 
-    if( self.basePath )
-    self.dirPath = path.join( self.basePath, self.dirPath );
+    if( factory.basePath )
+    factory.dirPath = path.join( factory.basePath, factory.dirPath );
 
     if( Config.debug )
-    if( _.path.isGlobal( self.dirPath ) )
+    if( _.path.isGlobal( factory.dirPath ) )
     {
-      let url = _.uri.parse( self.dirPath );
+      let url = _.uri.parse( factory.dirPath );
     }
   }
 
-  if( !self.stemPath )
+  if( !factory.stemPath )
   {
-    self.stemPath = path.normalize( path.join( self.basePath, self.dirPath || '' ) );
+    factory.stemPath = path.normalize( path.join( factory.basePath, factory.dirPath || '' ) );
   }
-  else if( self.stemPath )
+  else if( factory.stemPath )
   {
-    self.stemPath = path.normalize( path.join( self.basePath, self.dirPath || '', self.stemPath ) );
-  }
-
-  if( !self.basePath )
-  if( self.dirPath )
-  {
-    self.basePath = self.dirPath;
+    factory.stemPath = path.normalize( path.join( factory.basePath, factory.dirPath || '', factory.stemPath ) );
   }
 
-  if( !self.basePath && self.filter && self.stemPath )
-  self.basePath = self.filter.basePath[ self.stemPath ];
+  if( !factory.basePath )
+  if( factory.dirPath )
+  {
+    factory.basePath = factory.dirPath;
+  }
+
+  if( !factory.basePath && factory.filter && factory.stemPath )
+  factory.basePath = factory.filter.basePath[ factory.stemPath ];
 
   /* */
 
-  if( !self.effectiveFileProvider )
-  self.effectiveFileProvider = effectiveFileProvider;
+  // if( !factory.effectiveFileProvider )
+  // factory.effectiveFileProvider = effectiveFileProvider;
 
-  self.fileProvider._recordFactoryFormEnd( self );
+  if( !factory.hubFileProvider )
+  factory.hubFileProvider = factory.defaultFileProvider;
+
+  if( !factory.effectiveFileProvider )
+  factory.effectiveFileProvider = factory.defaultFileProvider;
+
+  _.assert( !!factory.hubFileProvider );
+
+  factory.hubFileProvider._recordFactoryFormEnd( factory );
 
   /* */
 
   if( Config.debug )
   {
 
-    _.assert( self.fileProvider instanceof _.FileProvider.Abstract );
-    _.assert( path.isAbsolute( self.basePath ) );
-    _.assert( self.dirPath === null || path.is( self.dirPath ) );
-    _.assert( path.isAbsolute( self.stemPath ) );
+    _.assert( factory.hubFileProvider instanceof _.FileProvider.Abstract );
+    _.assert( path.isAbsolute( factory.basePath ) );
+    _.assert( factory.dirPath === null || path.is( factory.dirPath ) );
+    _.assert( path.isAbsolute( factory.stemPath ) );
 
-    if( self.dirPath )
-    _.assert( _.path.isGlobal( self.dirPath ) || path.isAbsolute( self.dirPath ), () => '{-o.dirPath-} should be absolute path' + _.strQuote( self.dirPath ) );
+    if( factory.dirPath )
+    _.assert( _.path.isGlobal( factory.dirPath ) || path.isAbsolute( factory.dirPath ), () => '{-o.dirPath-} should be absolute path' + _.strQuote( factory.dirPath ) );
 
-    _.assert( _.strDefined( self.basePath ) );
-    _.assert( _.path.isGlobal( self.basePath ) || path.isAbsolute( self.basePath ), () => '{-o.basePath-} should be absolute path' + _.strQuote( self.basePath ) );
+    _.assert( _.strDefined( factory.basePath ) );
+    _.assert( _.path.isGlobal( factory.basePath ) || path.isAbsolute( factory.basePath ), () => '{-o.basePath-} should be absolute path' + _.strQuote( factory.basePath ) );
 
-    _.assert( self.filter === null || self.filter instanceof _.FileRecordFilter );
+    _.assert( factory.filter === null || factory.filter instanceof _.FileRecordFilter );
 
-    if( self.filter )
+    if( factory.filter )
     {
-      _.assert( !!self.filter.formed );
-      _.assert( self.filter.basePath[ self.stemPath ] === self.basePath );
-      _.assert( self.filter.effectiveFileProvider === self.effectiveFileProvider );
-      _.assert( self.filter.hubFileProvider === self.fileProvider );
+      _.assert( !!factory.filter.formed );
+      _.assert( factory.filter.basePath[ factory.stemPath ] === factory.basePath );
+      _.assert( factory.filter.effectiveFileProvider === factory.effectiveFileProvider );
+      _.assert( factory.filter.hubFileProvider === factory.hubFileProvider || factory.filter.hubFileProvider === null );
+      _.assert( factory.filter.defaultFileProvider === factory.defaultFileProvider );
     }
 
   }
 
-  Object.freeze( self );
-  return self;
+  factory.formed = 1;
+  Object.freeze( factory );
+  return factory;
 }
 
 //
 
 function record( o )
 {
-  let self = this;
+  let factory = this;
 
   if( o instanceof _.FileRecord )
   {
-    _.assert( o.factory === self );
+    _.assert( o.factory === factory );
     return o;
   }
 
@@ -222,9 +314,9 @@ function record( o )
   _.assert( arguments.length === 1 );
   _.assert( _.objectIs( o ) );
   _.assert( _.strIs( o.input ), () => 'Expects string {-o.input-}, but got ' + _.strType( o.input ) );
-  _.assert( o.factory === undefined || o.factory === self );
+  _.assert( o.factory === undefined || o.factory === factory );
 
-  o.factory = self;
+  o.factory = factory;
 
   return _.FileRecord( o );
 }
@@ -233,11 +325,11 @@ function record( o )
 
 function recordsFiltered( filePaths,fileContext )
 {
-  var self = this;
+  var factory = this;
 
   _.assert( arguments.length === 1 );
 
-  var result = self.records( filePaths );
+  var result = factory.records( filePaths );
 
   for( var r = result.length-1 ; r >= 0 ; r-- )
   if( !result[ r ].stat )
@@ -250,116 +342,116 @@ function recordsFiltered( filePaths,fileContext )
 
 function _usingSoftLinkGet()
 {
-  let self = this;
+  let factory = this;
 
-  if( self[ usingSoftLinkSymbol ] !== null )
-  return self[ usingSoftLinkSymbol ];
+  if( factory[ usingSoftLinkSymbol ] !== null )
+  return factory[ usingSoftLinkSymbol ];
 
-  if( self.effectiveFileProvider )
-  return self.effectiveFileProvider.usingSoftLink;
-  else if( self.fileProvider )
-  return self.fileProvider.usingSoftLink;
+  if( factory.effectiveFileProvider )
+  return factory.effectiveFileProvider.usingSoftLink;
+  else if( factory.hubFileProvider )
+  return factory.hubFileProvider.usingSoftLink;
 
-  return self[ usingSoftLinkSymbol ];
+  return factory[ usingSoftLinkSymbol ];
 }
 
 //
 
 function _resolvingSoftLinkSet( src )
 {
-  let self = this;
-  self[ resolvingSoftLinkSymbol ] = src;
+  let factory = this;
+  factory[ resolvingSoftLinkSymbol ] = src;
 }
 
 //
 
 function _resolvingSoftLinkGet()
 {
-  let self = this;
+  let factory = this;
 
-  if( !self.resolving )
+  if( !factory.resolving )
   return false;
 
-  if( self[ resolvingSoftLinkSymbol ] !== null )
-  return self[ resolvingSoftLinkSymbol ];
+  if( factory[ resolvingSoftLinkSymbol ] !== null )
+  return factory[ resolvingSoftLinkSymbol ];
 
-  if( self.effectiveFileProvider )
-  return self.effectiveFileProvider.resolvingSoftLink;
-  else if( self.fileProvider )
-  return self.fileProvider.resolvingSoftLink;
+  if( factory.effectiveFileProvider )
+  return factory.effectiveFileProvider.resolvingSoftLink;
+  else if( factory.hubFileProvider )
+  return factory.hubFileProvider.resolvingSoftLink;
 
-  return self[ resolvingSoftLinkSymbol ];
+  return factory[ resolvingSoftLinkSymbol ];
 }
 
 //
 
 function _usingTextLinkGet()
 {
-  let self = this;
+  let factory = this;
 
-  if( !self.resolving )
+  if( !factory.resolving )
   return false;
 
-  if( self[ usingTextLinkSymbol ] !== null )
-  return self[ usingTextLinkSymbol ];
+  if( factory[ usingTextLinkSymbol ] !== null )
+  return factory[ usingTextLinkSymbol ];
 
-  if( self.effectiveFileProvider )
-  return self.effectiveFileProvider.usingTextLink;
-  else if( self.fileProvider )
-  return self.fileProvider.usingTextLink;
+  if( factory.effectiveFileProvider )
+  return factory.effectiveFileProvider.usingTextLink;
+  else if( factory.hubFileProvider )
+  return factory.hubFileProvider.usingTextLink;
 
-  return self[ usingTextLinkSymbol ];
+  return factory[ usingTextLinkSymbol ];
 }
 
 //
 
 function _resolvingTextLinkGet()
 {
-  let self = this;
+  let factory = this;
 
-  if( self[ resolvingTextLinkSymbol ] !== null )
-  return self[ resolvingTextLinkSymbol ];
+  if( factory[ resolvingTextLinkSymbol ] !== null )
+  return factory[ resolvingTextLinkSymbol ];
 
-  if( self.effectiveFileProvider )
-  return self.effectiveFileProvider.resolvingTextLink;
-  else if( self.fileProvider )
-  return self.fileProvider.resolvingTextLink;
+  if( factory.effectiveFileProvider )
+  return factory.effectiveFileProvider.resolvingTextLink;
+  else if( factory.hubFileProvider )
+  return factory.hubFileProvider.resolvingTextLink;
 
-  return self[ resolvingTextLinkSymbol ];
+  return factory[ resolvingTextLinkSymbol ];
 }
 
 //
 
 function _statingGet()
 {
-  let self = this;
+  let factory = this;
 
-  if( self[ statingSymbol ] !== null )
-  return self[ statingSymbol ];
+  if( factory[ statingSymbol ] !== null )
+  return factory[ statingSymbol ];
 
-  if( self.effectiveFileProvider )
-  return self.effectiveFileProvider.stating;
-  else if( self.fileProvider )
-  return self.fileProvider.stating;
+  if( factory.effectiveFileProvider )
+  return factory.effectiveFileProvider.stating;
+  else if( factory.hubFileProvider )
+  return factory.hubFileProvider.stating;
 
-  return self[ statingSymbol ];
+  return factory[ statingSymbol ];
 }
 
 //
 
 function _safeGet()
 {
-  let self = this;
+  let factory = this;
 
-  if( self[ safeSymbol ] !== null )
-  return self[ safeSymbol ];
+  if( factory[ safeSymbol ] !== null )
+  return factory[ safeSymbol ];
 
-  if( self.effectiveFileProvider )
-  return self.effectiveFileProvider.safe;
-  else if( self.fileProvider )
-  return self.fileProvider.safe;
+  if( factory.effectiveFileProvider )
+  return factory.effectiveFileProvider.safe;
+  else if( factory.hubFileProvider )
+  return factory.hubFileProvider.safe;
 
-  return self[ safeSymbol ];
+  return factory[ safeSymbol ];
 }
 
 // --
@@ -400,8 +492,9 @@ let Aggregates =
 
 let Associates =
 {
-  fileProvider : null,
+  hubFileProvider : null,
   effectiveFileProvider : null,
+  defaultFileProvider : null,
   filter : null,
 }
 
@@ -416,7 +509,7 @@ let Restricts =
 
 let Statics =
 {
-  TollerantMake : TollerantMake,
+  TollerantFrom : TollerantFrom,
 }
 
 let Forbids =
@@ -436,8 +529,9 @@ let Forbids =
   notOlderAge : 'notOlderAge',
   notNewerAge : 'notNewerAge',
   originPath : 'originPath',
-  fileProviderEffective : 'fileProviderEffective',
   onRecord : 'onRecord',
+  fileProviderEffective : 'fileProviderEffective',
+  fileProvider : 'fileProvider',
 
 }
 
@@ -463,8 +557,9 @@ let Proto =
 {
 
   init,
-  TollerantMake,
+  TollerantFrom,
 
+  _formAssociations,
   form,
 
   record,

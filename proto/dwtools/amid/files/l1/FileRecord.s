@@ -77,7 +77,7 @@ function form()
 
   _.assert( Object.isFrozen( record.factory ) );
   _.assert( !!record.factory.formed, 'Record factory is not formed' );
-  _.assert( record.factory.fileProvider instanceof _.FileProvider.Abstract );
+  _.assert( record.factory.hubFileProvider instanceof _.FileProvider.Abstract );
   _.assert( record.factory.effectiveFileProvider instanceof _.FileProvider.Abstract );
   _.assert( _.strIs( record.input ), '{ record.input } must be a string' );
   _.assert( record.factory instanceof _.FileRecordFactory, 'Expects instance of { FileRecordFactory }' );
@@ -192,7 +192,7 @@ function _pathsForm()
 
   record.absolute = path.normalize( record.absolute );
 
-  f.fileProvider._recordFormBegin( record );
+  f.hubFileProvider._recordFormBegin( record );
 
   // record.absoluteGlobalMaybe = record.absolute;
   // record.real = record.absolute;
@@ -200,7 +200,7 @@ function _pathsForm()
 
   /* */
 
-  record.factory.fileProvider._recordPathForm( record );
+  record.factory.hubFileProvider._recordPathForm( record );
 
   return record;
 }
@@ -275,7 +275,7 @@ function _statRead()
 
     let o2 =
     {
-      hub : f.fileProvider,
+      hub : f.hubFileProvider,
       filePath : record.absolute,
       resolvingSoftLink : f.resolvingSoftLink,
       resolvingTextLink : f.resolvingTextLink,
@@ -332,7 +332,7 @@ function _statAnalyze()
 
   record._isSafe();
 
-  record.factory.fileProvider._recordFormEnd( record );
+  record.factory.hubFileProvider._recordFormEnd( record );
 
 }
 
@@ -543,7 +543,7 @@ function _pathGet()
   let record = this;
   let f = record.factory;
   _.assert( !!f );
-  let fileProvider = f.fileProvider;
+  let fileProvider = f.hubFileProvider;
   return fileProvider.path;
 }
 
@@ -599,7 +599,7 @@ function _absoluteGlobalMaybeGet()
 {
   let record = this;
   let f = record.factory;
-  let fileProvider = f.fileProvider;
+  let fileProvider = f.hubFileProvider;
   return fileProvider._recordAbsoluteGlobalMaybeGet( record );
 }
 
@@ -609,7 +609,7 @@ function _realGlobalMaybeGet()
 {
   let record = this;
   let f = record.factory;
-  let fileProvider = f.fileProvider;
+  let fileProvider = f.hubFileProvider;
   return fileProvider._recordRealGlobalMaybeGet( record );
 }
 

@@ -1546,31 +1546,50 @@ _recordsSort.defaults =
 
 //
 
-function recordFactory( context )
+function recordFactory( factory )
 {
   let self = this;
 
-  context = context || Object.create( null );
+  factory = factory || Object.create( null );
 
-  if( context instanceof _.FileRecordFactory )
+  if( factory instanceof _.FileRecordFactory )
   {
-    // if( !context.formed )
-    // context.form();
-    return context
+
+    if( !factory.hubFileProvider && self.hub )
+    factory.hubFileProvider = self.hub;
+
+    if( !factory.defaultFileProvider )
+    factory.defaultFileProvider = self;
+
+    return factory
   }
 
   _.assert( arguments.length === 0 || arguments.length === 1 );
 
-  if( !context.fileProvider )
-  context.fileProvider = self;
+  if( !factory.defaultFileProvider )
+  factory.defaultFileProvider = self;
 
-  _.assert( context.fileProvider === self );
-
-  return _.FileRecordFactory( context )/*.form()*/;
+  return _.FileRecordFactory( factory );
 }
 
-var having = recordFactory.having = Object.create( null );
+// {
+//   let self = this;
+//
+//   factory = factory || Object.create( null );
+//
+//   if( factory instanceof _.FileRecordFactory )
+//   return factory
+//
+//   _.assert( arguments.length === 0 || arguments.length === 1 );
+//
+//   if( !factory.hubFileProvider )
+//   factory.hubFileProvider = self;
+//   _.assert( factory.hubFileProvider === self );
+// xxx
+//   return _.FileRecordFactory( factory );
+// }
 
+var having = recordFactory.having = Object.create( null );
 having.writing = 0;
 having.reading = 0;
 having.driving = 0;
@@ -1586,24 +1605,25 @@ function recordFilter( filter )
 
   if( filter instanceof _.FileRecordFilter )
   {
-    if( !filter.hubFileProvider )
-    filter.hubFileProvider = self.hub || self;
+
+    if( !filter.hubFileProvider && self.hub )
+    filter.hubFileProvider = self.hub;
+
+    if( !filter.defaultFileProvider )
+    filter.defaultFileProvider = self;
+
     return filter
   }
 
   _.assert( arguments.length === 0 || arguments.length === 1 );
 
-  if( !filter.hubFileProvider )
-  filter.hubFileProvider = self.hub || self;
-
-  if( !filter.effectiveFileProvider && !( self instanceof _.FileProvider.Hub ) )
-  filter.effectiveFileProvider = self;
+  if( !filter.defaultFileProvider )
+  filter.defaultFileProvider = self;
 
   return _.FileRecordFilter( filter );
 }
 
 var having = recordFilter.having = Object.create( null );
-
 having.writing = 0;
 having.reading = 0;
 having.driving = 0;
@@ -5896,12 +5916,10 @@ function _fileCopyAct( c )
 
   _.assert( _.fileStatIs( c.srcStat ) );
 
-  // debugger;
-
   if( c.srcStat.isSoftLink() )
   {
+    debugger;
 
-    // debugger;
     /* should not throw error for missed neither for cycled */
     let srcResolvedPath = self.pathResolveSoftLink
     ({
@@ -5909,7 +5927,6 @@ function _fileCopyAct( c )
       // allowingMissed : o.allowingMissed,
       // allowingCycled : o.allowingCycled,
     });
-    // debugger;
 
     return self.softLinkAct
     ({

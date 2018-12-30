@@ -1178,6 +1178,8 @@ function filesReflectEvaluate_body( o )
 
       o.srcFilter.inFilePath = o.srcPath;
       o.srcFilter.hubFileProvider = o.srcFilter.hubFileProvider || self;
+
+      o.srcFilter._formAssociations();
       o.srcFilter._formBasePath();
 
       o.srcFilter.inFilePath = o.srcPath;

@@ -61,13 +61,9 @@ function form()
 {
   let filter = this;
   _.assert( filter.formed <= 3 );
-  // _.assert( filter.hubFileProvider instanceof _.FileProvider.Abstract );
 
-  // if( filter.filePath === null )
-  // debugger;
-
+  filter._formAssociations();
   filter._formFinal();
-
 
   _.assert( filter.formed === 5 );
   Object.freeze( filter );
@@ -1001,7 +997,7 @@ function pathsNormalize()
     return filePath;
     let effectiveProvider2 = fileProvider.providerForPath( filePath );
     _.assert( filter.effectiveFileProvider === null || effectiveProvider2 === null || filter.effectiveFileProvider === effectiveProvider2, 'Record filter should have paths of single file provider' );
-    filter.effectiveFileProvider = filter.effectiveFileProvider || effectiveProvider2; 
+    filter.effectiveFileProvider = filter.effectiveFileProvider || effectiveProvider2;
     if( !filter.hubFileProvider )
     filter.hubFileProvider = filter.effectiveFileProvider.hub;
     _.assert( filter.effectiveFileProvider.hub === filter.hubFileProvider );

@@ -1000,9 +1000,8 @@ function pathsNormalize()
     if( filter.effectiveFileProvider && !path.isGlobal( filePath ) )
     return filePath;
     let effectiveProvider2 = fileProvider.providerForPath( filePath );
-    debugger;
     _.assert( filter.effectiveFileProvider === null || effectiveProvider2 === null || filter.effectiveFileProvider === effectiveProvider2, 'Record filter should have paths of single file provider' );
-    filter.effectiveFileProvider = filter.effectiveFileProvider || effectiveProvider2;
+    filter.effectiveFileProvider = filter.effectiveFileProvider || effectiveProvider2; 
     if( !filter.hubFileProvider )
     filter.hubFileProvider = filter.effectiveFileProvider.hub;
     _.assert( filter.effectiveFileProvider.hub === filter.hubFileProvider );

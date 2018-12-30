@@ -201,10 +201,7 @@ function readWriteSync( test )
     return;
   }
 
-  debugger
-
   var dir = _.path.normalize( test.context.pathFor( 'written/readWriteSync' ) );
-
   var got, filePath, readOptions, writeOptions;
   var testData = 'Lorem ipsum dolor sit amet';
 
@@ -212,79 +209,92 @@ function readWriteSync( test )
   self.provider.dirMake( dir );
 
   //
-
-  test.case = 'fileRead, invalid path';
-
-  /**/
-
-  test.shouldThrowErrorSync( function()
-  {
-    self.provider.fileRead
-    ({
-      filePath : 'invalid path',
-      sync : 1,
-      throwing : 1,
-    })
-  });
-
-  /**/
-
-  test.mustNotThrowError( function()
-  {
-    var got = self.provider.fileRead
-    ({
-      filePath : test.context.pathFor( 'invalid path' ),
-      sync : 1,
-      throwing : 0,
-    });
-    test.identical( got, null );
-  })
-
   //
-
-  test.case = 'fileRead, path ways to not a terminal file';
-  filePath = test.context.pathFor( 'written/readWriteSync/dir' );
-  self.provider.dirMake( filePath );
-
-  /**/
-
-  test.shouldThrowErrorSync( function()
-  {
-    self.provider.fileRead
-    ({
-      filePath : filePath,
-      sync : 1,
-      throwing : 1,
-    })
-  });
-
-  /**/
-
-  test.mustNotThrowError( function()
-  {
-    var got = self.provider.fileRead
-    ({
-      filePath : filePath,
-      sync : 1,
-      throwing : 0,
-    });
-    test.identical( got, null );
-  });
-
+  // test.case = 'fileRead, invalid path';
   //
-
-  test.case = 'fileRead,simple file read ';
-  self.provider.filesDelete( dir );
-  filePath = test.context.pathFor( 'written/readWriteSync/file' );
-  self.provider.fileWrite( filePath, testData );
-  var files = self.provider.dirRead( dir );
-  test.identical( files, [ 'file' ] );
-
-  /**/
-
+  // /**/
+  //
   // test.shouldThrowErrorSync( function()
   // {
   //   self.provider.fileRead
+  //   ({
+  //     filePath : 'invalid path',
+  //     sync : 1,
+  //     throwing : 1,
+  //   })
+  // });
+  //
+  // /**/
+  //
+  // test.mustNotThrowError( function()
+  // {
+  //   var got = self.provider.fileRead
+  //   ({
+  //     filePath : test.context.pathFor( 'invalid path' ),
+  //     sync : 1,
+  //     throwing : 0,
+  //   });
+  //   test.identical( got, null );
+  // })
+  //
+  // //
+  //
+  // test.case = 'fileRead, path ways to not a terminal file';
+  // filePath = test.context.pathFor( 'written/readWriteSync/dir' );
+  // self.provider.dirMake( filePath );
+  //
+  // /**/
+  //
+  // test.shouldThrowErrorSync( function()
+  // {
+  //   self.provider.fileRead
+  //   ({
+  //     filePath : filePath,
+  //     sync : 1,
+  //     throwing : 1,
+  //   })
+  // });
+  //
+  // /**/
+  //
+  // test.mustNotThrowError( function()
+  // {
+  //   var got = self.provider.fileRead
+  //   ({
+  //     filePath : filePath,
+  //     sync : 1,
+  //     throwing : 0,
+  //   });
+  //   test.identical( got, null );
+  // });
+  //
+  // //
+  //
+  // test.case = 'fileRead,simple file read ';
+  // self.provider.filesDelete( dir );
+  // filePath = test.context.pathFor( 'written/readWriteSync/file' );
+  // self.provider.fileWrite( filePath, testData );
+  // var files = self.provider.dirRead( dir );
+  // test.identical( files, [ 'file' ] );
+  //
+  // /**/
+  //
+  // // test.shouldThrowErrorSync( function()
+  // // {
+  // //   self.provider.fileRead
+  // //   ({
+  // //     filePath : filePath,
+  // //     sync : 1,
+  // //     encoding : 'utf8',
+  // //     throwing : 1,
+  // //   })
+  // // });
+  //
+  // /**/
+  //
+  // test.mustNotThrowError( function()
+  // {
+  //   got = self.provider.fileRead
   //   ({
   //     filePath : filePath,
   //     sync : 1,
@@ -292,196 +302,185 @@ function readWriteSync( test )
   //     throwing : 1,
   //   })
   // });
-
-  /**/
-
-  test.mustNotThrowError( function()
-  {
-    got = self.provider.fileRead
-    ({
-      filePath : filePath,
-      sync : 1,
-      encoding : 'utf8',
-      throwing : 1,
-    })
-  });
-  test.identical( got, testData );
-
-  /**/
-
-  test.shouldThrowErrorSync( function()
-  {
-    self.provider.fileRead
-    ({
-      filePath : filePath,
-      sync : 1,
-      encoding : 'unknown',
-      throwing : 1,
-    })
-  });
-
-  /**/
-
-  test.mustNotThrowError( function()
-  {
-    var got = self.provider.fileRead
-    ({
-      filePath : filePath,
-      sync : 1,
-      encoding : 'unknown',
-      throwing : 0,
-    });
-    test.identical( got, null );
-  });
+  // test.identical( got, testData );
+  //
+  // /**/
+  //
+  // test.shouldThrowErrorSync( function()
+  // {
+  //   self.provider.fileRead
+  //   ({
+  //     filePath : filePath,
+  //     sync : 1,
+  //     encoding : 'unknown',
+  //     throwing : 1,
+  //   })
+  // });
+  //
+  // /**/
+  //
+  // test.mustNotThrowError( function()
+  // {
+  //   var got = self.provider.fileRead
+  //   ({
+  //     filePath : filePath,
+  //     sync : 1,
+  //     encoding : 'unknown',
+  //     throwing : 0,
+  //   });
+  //   test.identical( got, null );
+  // });
+  //
+  // //
+  //
+  // test.case = 'fileRead,file read with common encodings';
+  // self.provider.filesDelete( dir );
+  // filePath = test.context.pathFor( 'written/readWriteSync/file' );
+  //
+  // /**/
+  //
+  // testData = { a : 'abc' };
+  // self.provider.fileWrite( filePath, JSON.stringify( testData ) );
+  // got = self.provider.fileRead
+  // ({
+  //   filePath : filePath,
+  //   sync : 1,
+  //   encoding : 'json',
+  //   throwing : 1,
+  // });
+  // test.identical( got , testData );
+  //
+  // /**/
+  //
+  // var isHd = self.providerIsInstanceOf( _.FileProvider.HardDrive );
+  //
+  // if( isHd )
+  // testData = 'module.exports = { a : 1 }';
+  // else
+  // testData = '1 + 2';
+  //
+  // self.provider.fileWrite( filePath, testData );
+  // got = self.provider.fileRead
+  // ({
+  //   filePath : filePath,
+  //   sync : 1,
+  //   encoding : isHd ? 'js.node' : 'js.structure',
+  //   throwing : 1,
+  // });
+  //
+  // if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  // {
+  //   test.identical( got, { a : 1 } );
+  // }
+  // else
+  // {
+  //   var expected = _.exec
+  //   ({
+  //     code : testData,
+  //     filePath :filePath,
+  //     prependingReturn : 1,
+  //   });
+  //   test.identical( got , expected );
+  // }
+  //
+  // /**/
+  //
+  // testData = filePath;
+  // self.provider.fileWrite( filePath, testData );
+  // got = self.provider.fileRead
+  // ({
+  //   filePath : filePath,
+  //   sync : 1,
+  //   encoding : 'original.type',
+  //   throwing : 1,
+  // });
+  // if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  // {
+  //   test.is( _.bufferBytesIs( got ) )
+  //   test.identical( got, _.bufferBytesFrom( Buffer.from( testData ) ) );
+  // }
+  // else
+  // {
+  //   test.identical( got , testData );
+  // }
+  //
+  // /**/
+  //
+  // test.shouldThrowError( () =>
+  // {
+  //   self.provider.fileRead
+  //   ({
+  //     filePath : filePath,
+  //     sync : 1,
+  //     encoding : 'abcde',
+  //     throwing : 1,
+  //   });
+  // })
+  //
+  // /**/
+  //
+  // test.mustNotThrowError( () =>
+  // {
+  //   var got = self.provider.fileRead
+  //   ({
+  //     filePath : filePath,
+  //     sync : 1,
+  //     encoding : 'abcde',
+  //     throwing : 0,
+  //   });
+  //   test.identical( got, null );
+  // })
+  //
+  // /**/
+  //
+  // test.case = 'encoder not finded';
+  // var encoding = 'unknown';
+  // test.identical( self.provider.fileRead.encoders[ encoding ], undefined );
+  // // test.identical( self.provider.fileReadAct.encoders[ encoding ], undefined );
+  // test.shouldThrowError( () =>
+  // {
+  //   self.provider.fileRead
+  //   ({
+  //     filePath : filePath,
+  //     sync : 1,
+  //     throwing : 1,
+  //     encoding : encoding
+  //   });
+  // });
+  //
+  // //
+  //
+  // if( Config.platform === 'nodejs' )
+  // {
+  //   test.case = 'other encodings';
+  //   self.provider.filesDelete( dir );
+  //   filePath = test.context.pathFor( 'written/readWriteSync/file' );
+  //   testData = 'abc';
+  //
+  //   self.provider.fileWrite( filePath, testData );
+  //   got = self.provider.fileRead
+  //   ({
+  //     filePath : filePath,
+  //     sync : 1,
+  //     encoding : 'buffer.node',
+  //     throwing : 1,
+  //   });
+  //   test.is( _.bufferNodeIs( got ) );
+  //
+  //   self.provider.fileWrite( filePath, testData );
+  //   got = self.provider.fileRead
+  //   ({
+  //     filePath : filePath,
+  //     sync : 1,
+  //     encoding : 'buffer.raw',
+  //     throwing : 1,
+  //   });
+  //   test.is( _.bufferRawIs( got ) );
+  // }
 
   //
 
-  test.case = 'fileRead,file read with common encodings';
-  self.provider.filesDelete( dir );
-  filePath = test.context.pathFor( 'written/readWriteSync/file' );
-
-  /**/
-
-  testData = { a : 'abc' };
-  self.provider.fileWrite( filePath, JSON.stringify( testData ) );
-  got = self.provider.fileRead
-  ({
-    filePath : filePath,
-    sync : 1,
-    encoding : 'json',
-    throwing : 1,
-  });
-  test.identical( got , testData );
-
-  /**/
-
-  var isHd = self.providerIsInstanceOf( _.FileProvider.HardDrive );
-
-  if( isHd )
-  testData = 'module.exports = { a : 1 }';
-  else
-  testData = '1 + 2';
-
-  self.provider.fileWrite( filePath, testData );
-  got = self.provider.fileRead
-  ({
-    filePath : filePath,
-    sync : 1,
-    encoding : isHd ? 'js.node' : 'js.structure',
-    throwing : 1,
-  });
-
-  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  {
-    test.identical( got, { a : 1 } );
-  }
-  else
-  {
-    var expected = _.exec
-    ({
-      code : testData,
-      filePath :filePath,
-      prependingReturn : 1,
-    });
-    test.identical( got , expected );
-  }
-
-  /**/
-
-  testData = filePath;
-  self.provider.fileWrite( filePath, testData );
-  got = self.provider.fileRead
-  ({
-    filePath : filePath,
-    sync : 1,
-    encoding : 'original.type',
-    throwing : 1,
-  });
-  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  {
-    test.is( _.bufferBytesIs( got ) )
-    test.identical( got, _.bufferBytesFrom( Buffer.from( testData ) ) );
-  }
-  else
-  {
-    test.identical( got , testData );
-  }
-
-  /**/
-
-  test.shouldThrowError( () =>
-  {
-    self.provider.fileRead
-    ({
-      filePath : filePath,
-      sync : 1,
-      encoding : 'abcde',
-      throwing : 1,
-    });
-  })
-
-  /**/
-
-  test.mustNotThrowError( () =>
-  {
-    var got = self.provider.fileRead
-    ({
-      filePath : filePath,
-      sync : 1,
-      encoding : 'abcde',
-      throwing : 0,
-    });
-    test.identical( got, null );
-  })
-
-  /**/
-
-  test.case = 'encoder not finded';
-  var encoding = 'unknown';
-  test.identical( self.provider.fileRead.encoders[ encoding ], undefined );
-  // test.identical( self.provider.fileReadAct.encoders[ encoding ], undefined );
-  test.shouldThrowError( () =>
-  {
-    self.provider.fileRead
-    ({
-      filePath : filePath,
-      sync : 1,
-      throwing : 1,
-      encoding : encoding
-    });
-  });
-
-  //
-
-  if( Config.platform === 'nodejs' )
-  {
-    test.case = 'other encodings';
-    self.provider.filesDelete( dir );
-    filePath = test.context.pathFor( 'written/readWriteSync/file' );
-    testData = 'abc';
-
-    self.provider.fileWrite( filePath, testData );
-    got = self.provider.fileRead
-    ({
-      filePath : filePath,
-      sync : 1,
-      encoding : 'buffer.node',
-      throwing : 1,
-    });
-    test.is( _.bufferNodeIs( got ) );
-
-    self.provider.fileWrite( filePath, testData );
-    got = self.provider.fileRead
-    ({
-      filePath : filePath,
-      sync : 1,
-      encoding : 'buffer.raw',
-      throwing : 1,
-    });
-    test.is( _.bufferRawIs( got ) );
-  }
-
-  //
+  debugger;
 
   test.case = 'fileRead,onBegin,onEnd,onError';
   self.provider.filesDelete( dir );
@@ -504,6 +503,7 @@ function readWriteSync( test )
 
   /*onBegin returningRead 0*/
 
+  debugger;
   got = self.provider.fileRead
   ({
     sync : 1,
@@ -515,7 +515,10 @@ function readWriteSync( test )
     onEnd : null,
     onError : null,
   });
+  debugger;
   test.identical( got.result, testData );
+
+  debugger; return; xxx
 
   /*onBegin returningRead 1*/
 
@@ -29724,6 +29727,8 @@ function isLink( test )
 
   self.provider.fieldPop( 'usingTextLink', 1 );
 }
+
+isLink.timeOut = 30000;
 
 //
 

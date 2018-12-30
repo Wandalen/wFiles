@@ -85,7 +85,7 @@ function _formAssociations()
 {
   let factory = this;
 
-  _.assert( factory.formed === 0 ); debugger;
+  _.assert( factory.formed === 0 );
 
   /* */
 
@@ -117,7 +117,7 @@ function _formAssociations()
   //     factory.defaultFileProvider = null;
   //   }
   // }
-  // 
+  //
   // if( factory.defaultFileProvider && factory.defaultFileProvider.hub )
   // {
   //   _.assert( factory.hubFileProvider === null || factory.hubFileProvider === factory.defaultFileProvider.hub );
@@ -165,8 +165,8 @@ function form()
   _.assert( arguments.length === 0 );
   _.assert( !factory.formed );
 
-  if( factory.basePath === '/dst' )
-  debugger;
+  // if( factory.basePath === '/dst' )
+  // debugger;
   factory._formAssociations();
 
   /* */

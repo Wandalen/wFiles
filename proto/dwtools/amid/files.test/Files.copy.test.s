@@ -186,7 +186,7 @@ function filesCopyWithAdapter( test )
     allowWrite : 1,
     allowRewrite : 1,
     allowRewriteFileByDir : 1,
-    recursive : '2',
+    recursive : 2,
     resolvingSoftLink : 1,
     resolvingTextLink : 1
   }
@@ -543,7 +543,7 @@ function filesCopyWithAdapter2( test )
     allowWrite : 1,
     allowRewrite : 1,
     allowRewriteFileByDir : 1,
-    recursive : '2',
+    recursive : 2,
   }
 
   function makeTree( path, tree, stat )
@@ -593,7 +593,7 @@ function filesCopyWithAdapter2( test )
       includingTransient : 1,
       includingDirs : 1,
       includingTerminals : 1,
-      recursive : '2'
+      recursive : 2
     });
 
     var tree = {};

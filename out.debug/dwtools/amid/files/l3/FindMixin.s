@@ -158,7 +158,7 @@ function filesFind_pre( routine, args )
     _.assert( o.basePath === undefined );
     _.assert( o.prefixPath === undefined );
     _.assert( o.postfixPath === undefined );
-    _.assert( o.recursive === 0 || o.recursive === '1' || o.recursive === '2', 'Incorrect value of recursive option:', o.recursive )
+    _.assert( o.recursive === 0 || o.recursive === 1 || o.recursive === 2, () => 'Incorrect value of recursive option', _.strQuote( o.recursive ), ', should be 0, 1 or 2' );
 
   }
 
@@ -357,7 +357,7 @@ function filesFindSingle_body( o )
     /* read */
 
     if( isTransient && o.recursive )
-    if( o.recursive === '2' || or.isStem )
+    if( o.recursive === 2 || or.isStem )
     {
       let files = o.filter.effectiveFileProvider.dirRead({ filePath : or.absolute, outputFormat : 'absolute' });
 
@@ -512,7 +512,7 @@ filesFindSingle_body.defaults =
 
   allowingMissed : 0,
   allowingCycled : 0,
-  recursive : '1',
+  recursive : 1,
 
   // resolving : 1,
   resolvingSoftLink : 0,
@@ -699,7 +699,7 @@ _.routineExtend( filesFindRecursive, filesFind );
 
 var defaults = filesFindRecursive.defaults;
 defaults.filePath = null;
-defaults.recursive = '2';
+defaults.recursive = 2;
 defaults.includingTransient = 0;
 defaults.includingDirs = 1;
 defaults.includingTerminals = 1;
@@ -714,7 +714,7 @@ function filesGlob( o )
   o = { filePath : o }
 
   if( o.recursive === undefined )
-  o.recursive = '2';
+  o.recursive = 2;
 
   o.filter = o.filter || Object.create( null );
 
@@ -726,7 +726,7 @@ function filesGlob( o )
   }
   else
   {
-    o.filePath = o.recursive ? '**' : '*';
+    o.filePath = o.recursive === 2 ? '**' : '*';
   }
 
   _.assert( arguments.length === 1, 'Expects single argument' );
@@ -742,7 +742,7 @@ _.routineExtend( filesGlob, filesFind );
 
 var defaults = filesGlob.defaults;
 defaults.outputFormat = 'absolute';
-defaults.recursive = '2';
+defaults.recursive = 2;
 defaults.includingTerminals = 1;
 defaults.includingDirs = 1;
 defaults.includingTransient = 0;
@@ -813,7 +813,7 @@ let filesGlober = filesFinder_functor( filesGlob );
 // defaults.removingSource = 0;
 // defaults.removingSourceTerminals = 0;
 //
-// defaults.recursive = '2';
+// defaults.recursive = 2;
 // defaults.allowDelete = 0;
 // defaults.allowWrite = 0;
 // defaults.allowRewrite = 1;
@@ -1014,7 +1014,7 @@ defaults.resolvingTextLink = 0;
 defaults.removingSource = 0;
 defaults.removingSourceTerminals = 0;
 
-defaults.recursive = '2';
+defaults.recursive = 2;
 defaults.allowDelete = 0;
 defaults.allowWrite = 0;
 defaults.allowRewrite = 1;
@@ -1233,7 +1233,7 @@ function filesReflectEvaluate_body( o )
     dstOptions.filter = o.dstFilter;
     dstOptions.filePath = o.dstPath;
     dstOptions.includingStem = 1;
-    dstOptions.recursive = '2';
+    dstOptions.recursive = 2;
     dstOptions.maskPreset = 0;
     dstOptions.verbosity = 0;
     dstOptions.result = null;
@@ -2334,7 +2334,7 @@ defaults.includingNonAllowed = 1;
 // defaults.includingStem = 1;
 defaults.includingDst = null;
 
-defaults.recursive = '2';
+defaults.recursive = 2;
 // defaults.resolvingSoftLink = 0;
 // defaults.resolvingTextLink = 0;
 
@@ -3442,7 +3442,7 @@ _.routineExtend( filesDelete_body, filesFind );
 
 var defaults = filesDelete_body.defaults;
 defaults.outputFormat = 'record';
-defaults.recursive = '2';
+defaults.recursive = 2;
 defaults.includingTransient = 0;
 defaults.includingDirs = 1;
 defaults.includingTerminals = 1;
@@ -3508,7 +3508,7 @@ function filesDeleteTerminals( o )
 _.routineExtend( filesDeleteTerminals, filesDelete );
 
 var defaults = filesDeleteTerminals.defaults;
-defaults.recursive = '2';
+defaults.recursive = 2;
 defaults.includingTerminals = 1;
 defaults.includingDirs = 0;
 defaults.includingTransient = 0;
@@ -3580,7 +3580,7 @@ defaults.outputFormat = 'absolute';
 defaults.includingTerminals = 0;
 defaults.includingDirs = 1;
 defaults.includingTransient = 0;
-defaults.recursive = '2';
+defaults.recursive = 2;
 
 let filesDeleteEmptyDirs = _.routineFromPreAndBody( filesFind.pre, filesDeleteEmptyDirs_body );
 
@@ -3623,7 +3623,7 @@ var defaults = softLinksBreak.defaults;
 defaults.outputFormat = 'record';
 defaults.breakingSoftLink = 1;
 defaults.breakingTextLink = 0;
-defaults.recursive = '2';
+defaults.recursive = 2;
 
 //
 
@@ -3671,7 +3671,7 @@ var defaults = softLinksRebase.defaults;
 defaults.outputFormat = 'record';
 defaults.oldPath = null;
 defaults.newPath = null;
-defaults.recursive = '2';
+defaults.recursive = 2;
 defaults.resolvingSoftLink = 0;
 
 //
@@ -3692,7 +3692,7 @@ function filesHasTerminal( filePath )
     onUp : onUp,
     resolvingSoftLink : 0,
     resolvingTextLink : 0,
-    recursive : '2'
+    recursive : 2
   })
 
   return terminal;
@@ -3739,7 +3739,7 @@ function filesResolve( o )
 _.routineExtend( filesResolve, filesGlob );
 
 var defaults = filesResolve.defaults;
-defaults.recursive = '2';
+defaults.recursive = 2;
 defaults.globPath = null;
 defaults.translator = null;
 defaults.outputFormat = 'record';

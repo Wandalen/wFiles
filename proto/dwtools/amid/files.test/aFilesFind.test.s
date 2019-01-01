@@ -1312,8 +1312,6 @@ function filesFind( test )
     })
   }
 
-  // debugger; return; xxx
-
   var allFiles =  prepareTree( 1 );
 
   /**/

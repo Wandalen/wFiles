@@ -196,14 +196,14 @@ function filesReflectSingle_body( o )
   let shell = _.sheller
   ({
     verbosity : o.verbosity - 2,
-    con : result,
+    ready : result,
     currentPath : dstPath,
   });
 
   let shellAll = _.sheller
   ({
     verbosity : o.verbosity - 2,
-    con : result,
+    ready : result,
     currentPath : dstPath,
     throwingExitCode : 0,
     outputCollecting : 1,
@@ -353,7 +353,7 @@ function isUpToDate( o )
   ({
     verbosity : o.verbosity - 2,
     // verbosity : 2,
-    con : result,
+    ready : result,
     currentPath : o.localPath,
   });
 
@@ -361,7 +361,7 @@ function isUpToDate( o )
   ({
     verbosity : o.verbosity - 2,
     // verbosity : 2,
-    con : result,
+    ready : result,
     currentPath : o.localPath,
     throwingExitCode : 0,
     outputCollecting : 1,

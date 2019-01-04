@@ -1000,7 +1000,8 @@ function pathsNormalize()
     filter.effectiveFileProvider = filter.effectiveFileProvider || effectiveProvider2;
     if( !filter.hubFileProvider )
     filter.hubFileProvider = filter.effectiveFileProvider.hub;
-    _.assert( filter.effectiveFileProvider.hub === filter.hubFileProvider );
+    _.assert( filter.effectiveFileProvider.hub === null || filter.hubFileProvider === filter.effectiveFileProvider.hub );
+    _.assert( filter.effectiveFileProvider.hub === null || filter.hubFileProvider instanceof _.FileProvider.Hub );
     // debugger;
     if( !path.isGlobal( filePath ) )
     {
@@ -1591,28 +1592,24 @@ function _applyToRecordTime( record )
     if( record.isActual === true )
     if( filter.notOlder !== null )
     {
-      debugger;
       record[ isActualSymbol ] = time >= filter.notOlder;
     }
 
     if( record.isActual === true )
     if( filter.notNewer !== null )
     {
-      debugger;
       record[ isActualSymbol ] = time <= filter.notNewer;
     }
 
     if( record.isActual === true )
     if( filter.notOlderAge !== null )
     {
-      debugger;
       record[ isActualSymbol ] = _.timeNow() - filter.notOlderAge - time <= 0;
     }
 
     if( record.isActual === true )
     if( filter.notNewerAge !== null )
     {
-      debugger;
       record[ isActualSymbol ] = _.timeNow() - filter.notNewerAge - time >= 0;
     }
   }
@@ -1683,6 +1680,91 @@ function basePathsGet()
 
 //
 
+function dstPathCommon()
+{
+  let filter = this;
+  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let path = fileProvider.path;
+  let filePath = filter.filePath;
+
+  if( _.strIs( filePath ) )
+  filePath = [ filePath ];
+
+  _.assert( _.arrayIs( filePath ) );
+  _.assert( arguments.length === 0 );
+
+  // filePath = _.mapVals( filePath );
+  filePath = _.arrayAppendArrayOnce( [], filePath );
+  filePath = _.filter( filePath, ( p ) =>
+  {
+    if( _.strIs( p ) )
+    return p;
+    if( p === true )
+    return filter.prefixPath || undefined;
+    if( p === false )
+    return;
+    return p;
+  });
+  filePath = path.s.join( filter.prefixPath || '.', filePath );
+
+  // debugger; xxx
+
+  return path.common.apply( path, filePath );
+}
+
+//
+
+function srcPathCommon()
+{
+  let filter = this;
+  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let path = fileProvider.path;
+  let filePath = filter.filePath;
+
+  if( _.strIs( filePath ) )
+  filePath = [ filePath ];
+
+  _.assert( _.arrayIs( filePath ) );
+  _.assert( arguments.length === 0 );
+
+  // filePath = _.mapVals( filePath );
+  filePath = _.arrayAppendArrayOnce( [], filePath );
+  filePath = _.filter( filePath, ( p ) =>
+  {
+    if( _.strIs( p ) )
+    return p;
+    if( p === true )
+    return filter.prefixPath || undefined;
+    if( p === false )
+    return;
+    return p;
+  });
+  filePath = path.s.join( filter.prefixPath || '.', filePath );
+
+  // _.assert( _.mapIs( filter.filePath ) );
+  // _.assert( arguments.length === 0 );
+  //
+  // let filePath = _.mapVals( filter.filePath );
+  // filePath = _.arrayAppendArrayOnce( null, filePath );
+  // filePath = _.filter( filePath, ( p ) =>
+  // {
+  //   if( _.strIs( p ) )
+  //   return p;
+  //   if( p === true )
+  //   return filter.prefixPath || undefined;
+  //   if( p === false )
+  //   return;
+  //   return p;
+  // });
+  // filePath = path.s.join( filter.prefixPath || '.', filePath );
+
+  // debugger; xxx
+
+  return path.common.apply( path, filePath );
+}
+
+//
+
 function filePathGet()
 {
   let filter = this;
@@ -1719,6 +1801,8 @@ let MaskNames =
 let Composes =
 {
 
+  filePath : null,
+
   hasExtension : null,
   begins : null,
   ends : null,
@@ -1743,11 +1827,7 @@ let Composes =
 
 let Aggregates =
 {
-
-  filePath : null,
-  // inFilePath : null,
-  // stemPath : null,
-
+  // filePath : null,
 }
 
 let Associates =
@@ -1865,6 +1945,8 @@ let Extend =
 
   basePathFor,
   basePathsGet,
+  dstPathCommon,
+  srcPathCommon,
   filePathGet,
   filePathSet,
 

@@ -708,26 +708,26 @@ let fileCopyAct = _link_functor({ routine : Parent.prototype.fileCopyAct, onDiff
 // link
 // --
 
-function filesAreHardLinkedAct( dstPath, srcPath )
+function filesAreHardLinkedAct( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 2, 'Expects exactly two arguments' );
+  _.assertRoutineOptions( filesAreHardLinkedAct, arguments );
+  _.assert( o.filePath.length === 2, 'Expects exactly two arguments' );
 
-  let dst = self._localFromGlobal( dstPath );
-  let src = self._localFromGlobal( srcPath );
+  let dst = self._localFromGlobal( o.filePath[ 0 ] );
+  let src = self._localFromGlobal( o.filePath[ 1 ] );
 
-  _.assert( !!dst.provider, 'no provider for path', dstPath );
-  _.assert( !!src.provider, 'no provider for path', srcPath );
+  _.assert( !!dst.provider, 'No provider for path', o.filePath[ 0 ] );
+  _.assert( !!src.provider, 'No provider for path', o.filePath[ 1 ] );
 
   if( dst.provider !== src.provider )
   return false;
 
-  // debugger;
-  // _.assert( 0, 'not tested' );
-
-  return dst.provider.filesAreHardLinkedAct( dst.filePath, src.filePath );
+  return dst.provider.filesAreHardLinkedAct({ filePath : [ dst.filePath, src.filePath ] });
 }
+
+_.routineExtend( filesAreHardLinkedAct, Parent.prototype.filesAreHardLinkedAct );
 
 // --
 //

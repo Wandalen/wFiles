@@ -276,6 +276,7 @@ function filesReflectSingle_body( o )
   result.except( ( err ) =>
   {
     con2.error( err );
+    throw err;
   });
 
   result.ifNoErrorThen( ( arg ) =>

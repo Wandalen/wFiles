@@ -1841,7 +1841,12 @@ function filesReflectEvaluate_body( o )
           debugger;
           let same = self.filesAreSame( record.src, record.dst, true );
           debugger;
-          throw _.err( 'Can\'t rewrite terminal file ' + _.strQuote( record.dst.absolute ) + ' by terminal file ' + _.strQuote( record.src.absolute ) + ', terminals have different content' );
+          throw _.err
+          (
+            'Can\'t rewrite' + ' ' + 'terminal file ' + _.strQuote( record.dst.absolute ) + '\n' +
+            'by terminal file ' + _.strQuote( record.src.absolute ) + '\n' +
+            'files have different content'
+          );
         }
       }
 
@@ -2750,6 +2755,13 @@ function filesReflect_pre( routine, args )
   if( _.strIs( o.reflectMap ) )
   o.reflectMap = { [ o.reflectMap ] : true }
 
+  if( o.srcFilter.filePath !== null && o.reflectMap === null )
+  o.reflectMap = o.srcFilter.filePath;
+
+  _.assert( o.dstFilter.filePath === null );
+  _.assert( o.srcFilter.filePath === null || o.srcFilter.filePath === o.reflectMap );
+  _.assert( o.filter === null || o.filter.filePath === null || o.filter.filePath === undefined );
+
   _.assert( _.mapIs( o.reflectMap ), 'Expects reflect map' );
   _.assert( o.dstPath === undefined );
   _.assert( o.srcPath === undefined );
@@ -2768,8 +2780,15 @@ function filesReflect_body( o )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assertRoutineOptions( filesReflect_body, o );
+  _.assert( o.dstFilter.filePath === null );
+  _.assert( o.srcFilter.filePath === null || o.srcFilter.filePath === o.reflectMap );
+  _.assert( o.filter === null || o.filter.filePath === null || o.filter.filePath === undefined );
 
   o.reflectMap = path.globMapExtend( null, o.reflectMap );
+  o.srcFilter.filePath = _.mapKeys( o.reflectMap );
+  o.dstFilter.filePath = _.mapVals( o.reflectMap ).filter( ( e ) => _.strIs( e ) ? e : false );
+  if( o.dstFilter.filePath.length === 0 )
+  o.dstFilter.filePath = _.entityShallowClone( o.dstFilter.prefixPath );
 
   _.assert( _.all( o.reflectMap, ( e, k ) => k === false || path.is( k ) ) );
   _.assert( o.srcFilter.formed <= 1 );
@@ -2858,21 +2877,11 @@ function filesReflect_body( o )
 
     if( o.verbosity >= 1 )
     {
-      let dsts = _.mapVals( o.reflectMap );
-      dsts = _.arrayFlattenOnce( null, dsts );
-      dsts = _.filter( dsts, ( p ) =>
-      {
-        if( _.strIs( p ) )
-        return p;
-        if( p === true )
-        return o.srcFilter.prefixPath;
-        if( o === false )
-        return;
-        return p;
-      });
-      dsts = path.s.normalize( path.s.join( o.dstFilter.prefixPath || '.', dsts ) );
-      debugger;
-      self.logger.log( _.timeSpent( ' + Reflect ' + o.result.length + ' files to ' + path.commonReport( dsts ) + ' in ', time ) );
+      let srcFilter = o.srcFilter.clone().form();
+      let dstFilter = o.dstFilter.clone().form();
+      let src = srcFilter.srcPathCommon();
+      let dst = dstFilter.dstPathCommon();
+      self.logger.log( ' + Reflect ' + o.result.length + ' files ' + path.moveReport( dst, src ) + ' in ' + _.timeSpent( time ) );
     }
 
     return o.result;

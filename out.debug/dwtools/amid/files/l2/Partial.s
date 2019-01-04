@@ -4890,9 +4890,8 @@ function _link_functor( gen )
   {
     let self = this;
     let path = self.path;
-
+    let o2;
     let c = Object.create( null );
-    // c.linkAct = self[ actMethodName ];
 
     c.ended = false;
     c.linkAct = onAct;
@@ -4915,7 +4914,6 @@ function _link_functor( gen )
     c.tempRenameBack = o.sync ? tempRenameBackSync : tempRenameBackAsync;
     c.tempNameMake = tempNameMake
     c.validateSize = validateSize;
-    // c.srcBreakHardLink = srcBreakHardLinkSync;
     c.error = error;
     c.end = end;
 
@@ -4925,9 +4923,7 @@ function _link_functor( gen )
       c.con2 = new _.Consequence();
     }
 
-    Object.preventExtensions( c );
-
-    let o2;
+    Object.preventExtensions( c ); debugger;
 
     /* */
 
@@ -6673,7 +6669,7 @@ having.reading = 1;
 having.driving = 1;
 
 var operates = filesAreHardLinkedAct.operates = Object.create( null );
-operates.filePath = { pathToRead : 1 }
+operates.filePath = { pathToRead : 1, vector : [ 2, 2 ] }
 
 //
 
@@ -6745,7 +6741,7 @@ function filesAreHardLinked_body( o )
   {
     for( let i = 1 ; i < o.filePath.length ; i++ )
     {
-      let r = self.filesAreHardLinkedAct( o.filePath[ 0 ], o.filePath[ i ] );
+      let r = self.filesAreHardLinkedAct({ filePath : [ o.filePath[ 0 ], o.filePath[ i ] ] });
       _.assert( _.boolIs( r ) );
       if( !r )
       return r;

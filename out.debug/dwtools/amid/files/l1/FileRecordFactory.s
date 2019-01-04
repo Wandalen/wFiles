@@ -48,7 +48,7 @@ function init( o )
   factory[ statingSymbol ] = null;
   factory[ safeSymbol ] = null;
 
-  _.assert( arguments.length === 0 || arguments.length === 1 );
+  _.assert( arguments.length === 0 || arguments.length === 1, 'Expects single argument' );
 
   _.instanceInit( factory );
   Object.preventExtensions( factory );

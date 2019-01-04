@@ -742,7 +742,7 @@ function fileWriteAct( o )
     /* what for is that needed ??? */
     /*self._descriptorRead({ query : dstDir, set : structure });*/
 
-    return true; 
+    return true;
   }
 
 }
@@ -1263,17 +1263,18 @@ _.routineExtend( hardLinkBreakAct, Parent.prototype.hardLinkBreakAct );
 
 //
 
-function filesAreHardLinkedAct( ins1Path, ins2Path )
+function filesAreHardLinkedAct( o )
 {
   let self = this;
 
-  _.assert( arguments.length === 2, 'Expects exactly two arguments' );
+  _.assertRoutineOptions( filesAreHardLinkedAct, arguments );
+  _.assert( o.filePath.length === 2, 'Expects exactly two arguments' );
 
-  if( ins1Path === ins2Path )
+  if( o.filePath[ 0 ] === o.filePath[ 1 ] )
   return true;
 
-  let descriptor1 = self._descriptorRead( ins1Path );
-  let descriptor2 = self._descriptorRead( ins2Path );
+  let descriptor1 = self._descriptorRead( o.filePath[ 0 ] );
+  let descriptor2 = self._descriptorRead( o.filePath[ 1 ] );
 
   if( !self._descriptorIsHardLink( descriptor1 ) )
   return false;
@@ -1285,14 +1286,16 @@ function filesAreHardLinkedAct( ins1Path, ins2Path )
 
   _.assert
   (
-    !_.arrayHas( descriptor1[ 0 ].hardLinks, ins2Path ),
+    !_.arrayHas( descriptor1[ 0 ].hardLinks, o.filePath[ 1 ] ),
     'Hardlinked files are desynchronized, two hardlinked files should share the same descriptor, but those do not :',
-    '\n', ins1Path,
-    '\n', ins2Path
+    '\n', o.filePath[ 0 ],
+    '\n', o.filePath[ 1 ]
   );
 
   return false;
 }
+
+_.routineExtend( filesAreHardLinkedAct, Parent.prototype.filesAreHardLinkedAct );
 
 // --
 // etc

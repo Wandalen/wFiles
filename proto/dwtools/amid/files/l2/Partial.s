@@ -2557,9 +2557,8 @@ let hashReadAct = ( function hashReadAct()
 
     _.assert( arguments.length === 1, 'Expects single argument' );
 
-    debugger;
-    if( o.verbosity >= 3 )
-    self.logger.log( ' . hashRead :', o.filePath );
+    // if( o.verbosity >= 3 )
+    // self.logger.log( ' . hashRead :', o.filePath );
 
     if( Crypto === undefined )
     Crypto = require( 'crypto' );
@@ -2766,6 +2765,9 @@ function hashRead_body( o )
 {
   let self = this;
   let result;
+
+  if( o.verbosity >= 1 )
+  self.logger.log( ' . hashRead :', o.filePath );
 
   try
   {
@@ -3120,7 +3122,7 @@ having.driving = 0;
  * @example
  * let path1 = 'tmp/sample/file1',
      path2 = 'tmp/sample/file2',
-     usingTime = true,
+     usingExtraStat = true,
      buffer = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] );
 
    wTools.fileWrite( { filePath : path1, data : buffer } );
@@ -3130,11 +3132,11 @@ having.driving = 0;
 
      let sameWithoutTime = wTools.filesAreSame( path1, path2 ); // true
 
-     let sameWithTime = wTools.filesAreSame( path1, path2, usingTime ); // false
+     let sameWithTime = wTools.filesAreSame( path1, path2, usingExtraStat ); // false
    }, 100);
  * @param {string|wFileRecord} ins1 first file to compare
  * @param {string|wFileRecord} ins2 second file to compare
- * @param {boolean} usingTime if this argument sets to true method will additionally check modified time of files, and
+ * @param {boolean} usingExtraStat if this argument sets to true method will additionally check modified time of files, and
     if they are different, method returns false.
  * @returns {boolean}
  * @method filesAreSame

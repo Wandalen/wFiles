@@ -257,7 +257,7 @@ function fileReadAct( o )
   else if( !self._descriptorIsTerminal( result ) )
   return handleError( _.err( 'Can`t read file : ' + _.strQuote( o.filePath ), result ) );
 
-  if( self.usingTime )
+  if( self.usingExtraStat )
   self._fileTimeSetAct({ filePath : o.filePath, atime : _.timeNow() });
 
   return handleEnd( result );
@@ -399,12 +399,6 @@ function statReadAct( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assertRoutineOptions( statReadAct, o );
 
-  // if( _.strEnds( o.filePath, '/dst/link' ) )
-  // debugger;
-  // if( _.strEnds( o.filePath, '/dst/file' ) )
-  // debugger;
-  // logger.log( 'statReadAct', o.filePath, o.resolvingSoftLink );
-
   /* */
 
   if( o.sync )
@@ -447,8 +441,6 @@ function statReadAct( o )
 
     let d = self._descriptorRead( filePath );
 
-    // debugger;
-
     if( !_.definedIs( d ) )
     {
       if( o.throwing )
@@ -458,11 +450,17 @@ function statReadAct( o )
 
     result = new _.FileStat();
 
-    if( self.timeStats && self.timeStats[ filePath ] )
+    if( self.extraStats && self.extraStats[ filePath ] )
     {
-      let timeStats = self.timeStats[ filePath ];
-      for( let k in timeStats )
-      result[ k ] = new Date( timeStats[ k ] );
+      let extraStat = self.extraStats[ filePath ];
+      // for( let k in extraStats )
+      // result[ k ] = new Date( extraStats[ k ] );
+      debugger;
+      result.atime = new Date( extraStat.atime );
+      result.mtime = new Date( extraStat.mtime );
+      result.ctime = new Date( extraStat.ctime );
+      result.birthtime = new Date( extraStat.birthtime );
+      result.ino = extraStat.ino || null;
     }
 
     result.filePath = filePath;
@@ -475,6 +473,7 @@ function statReadAct( o )
     result.isDirectory = returnFalse;
     result.isSymbolicLink = returnFalse;
     result.nlink = 1;
+    // result.ino = d.ino || null;
 
     if( self._descriptorIsDir( d ) )
     {
@@ -577,27 +576,7 @@ function fileWriteAct( o )
 
   let encoder = fileWriteAct.encoders[ o.encoding ];
 
-  /* o.data */
-
-  // if( _.bufferTypedIs( o.data ) )
-  // {
-  //   o.data = _.bufferNodeFrom( o.data );
-  // }
-
   _.assert( self._descriptorIsTerminal( o.data ), 'Expects string or Buffer, but got', _.strType( o.data ) );
-
-  // if( _.bufferRawIs( o.data ) )
-  // o.data = _.bufferToStr( o.data );
-
-  /* write */
-
-  function handleError( err )
-  {
-    err = _.err( err );
-    if( o.sync )
-    throw err;
-    return new _.Consequence().error( err );
-  }
 
   /* */
 
@@ -608,6 +587,16 @@ function fileWriteAct( o )
   else
   {
     return _.timeOut( 0, () => write() );
+  }
+
+  /* */
+
+  function handleError( err )
+  {
+    err = _.err( err );
+    if( o.sync )
+    throw err;
+    return new _.Consequence().error( err );
   }
 
   /* begin */
@@ -624,7 +613,7 @@ function fileWriteAct( o )
     return context.data;
   }
 
-  /*  */
+  /* */
 
   function write()
   {
@@ -657,6 +646,7 @@ function fileWriteAct( o )
       //   if( descriptor === undefined )
       //   throw _.err( 'Link refers to file ->', filePath, 'that doesn`t exist' );
       // }
+
     }
 
     // let dstName = self.path.name({ path : filePath, withExtension : 1 });
@@ -749,9 +739,6 @@ function fileWriteAct( o )
 
 _.routineExtend( fileWriteAct, Parent.prototype.fileWriteAct );
 
-// var defaults = fileWriteAct.defaults = Object.create( Parent.prototype.fileWriteAct.defaults );
-// var having = fileWriteAct.having = Object.create( Parent.prototype.fileWriteAct.having );
-
 //
 
 function fileTimeSetAct( o )
@@ -771,8 +758,77 @@ function fileTimeSetAct( o )
 
 _.routineExtend( fileTimeSetAct, Parent.prototype.fileTimeSetAct );
 
-// var defaults = fileTimeSetAct.defaults = Object.create( Parent.prototype.fileTimeSetAct.defaults );
-// var having = fileTimeSetAct.having = Object.create( Parent.prototype.fileTimeSetAct.having );
+//
+
+function _fileTimeSetAct( o )
+{
+  let self = this;
+
+  if( !self.usingExtraStat )
+  return;
+
+  if( _.strIs( arguments[ 0 ] ) )
+  o = { filePath : arguments[ 0 ] };
+
+  _.assert( self.path.isAbsolute( o.filePath ), o.filePath );
+  _.assert( o.atime === undefined || o.atime === null || _.numberIs( o.atime ) );
+  _.assert( o.mtime === undefined || o.mtime === null || _.numberIs( o.mtime ) );
+  _.assert( o.ctime === undefined || o.ctime === null || _.numberIs( o.ctime ) );
+  _.assert( o.birthtime === undefined || o.birthtime === null || _.numberIs( o.birthtime ) );
+
+  let extra = self.extraStats[ o.filePath ];
+
+  if( !extra )
+  {
+    extra = self.extraStats[ o.filePath ] = Object.create( null );
+    extra.atime = null;
+    extra.mtime = null;
+    extra.ctime = null;
+    extra.birthtime = null;
+    extra.ino = ++Self.InoCounter;
+    Object.preventExtensions( extra );
+  }
+
+  if( o.atime )
+  extra.atime = o.atime;
+
+  if( o.mtime )
+  extra.mtime = o.mtime;
+
+  if( o.ctime )
+  extra.ctime = o.ctime;
+
+  if( o.birthtime )
+  extra.birthtime = o.birthtime;
+
+  if( o.updatingDir )
+  {
+    let dirPath = self.path.dir( o.filePath );
+    if( dirPath === '/' )
+    return;
+
+    extra.birthtime = null;
+
+    _.assert( o.atime && o.mtime && o.ctime );
+    _.assert( o.atime === o.mtime && o.mtime === o.ctime );
+
+    o.filePath = dirPath;
+
+    self._fileTimeSetAct( o );
+  }
+
+  return extra;
+}
+
+_fileTimeSetAct.defaults =
+{
+  filePath : null,
+  atime : null,
+  mtime : null,
+  ctime : null,
+  birthtime : null,
+  updatingDir : false
+}
 
 //
 
@@ -829,8 +885,10 @@ function fileDeleteAct( o )
     let fileName = self.path.name({ path : o.filePath, withExtension : 1 });
     delete dir[ fileName ];
 
-    for( let k in self.timeStats[ o.filePath ] )
-    self.timeStats[ o.filePath ][ k ] = null;
+    // for( let k in self.extraStats[ o.filePath ] )
+    // self.extraStats[ o.filePath ][ k ] = null;
+    delete self.extraStats[ o.filePath ];
+    self._descriptorTimeUpdate( dirPath, 0 );
 
     return true;
   }
@@ -916,6 +974,7 @@ function fileRenameAct( o )
     let srcDir = self._descriptorRead( srcDirPath );
     if( !srcDir || !srcDir[ srcName ] )
     throw _.err( 'Source path', _.strQuote( o.srcPath ), 'doesn`t exist!' );
+
     let dstDir = self._descriptorRead( dstDirPath );
     if( !dstDir )
     throw _.err( 'Destination folders structure : ' + dstDirPath + ' doesn`t exist' );
@@ -925,14 +984,14 @@ function fileRenameAct( o )
     dstDir[ dstName ] = srcDir[ srcName ];
     delete srcDir[ srcName ];
 
+    self.extraStats[ o.dstPath ] = self.extraStats[ o.srcPath ];
+    delete self.extraStats[ o.srcPath ];
+
     if( dstDir !== srcDir )
     {
-      self._descriptorTimeUpdate( srcDirPath );
+      self._descriptorTimeUpdate( srcDirPath, 0 );
+      self._descriptorTimeUpdate( dstDirPath, 0 );
     }
-
-    for( let k in self.timeStats[ o.srcPath ] )
-    self.timeStats[ o.srcPath ][ k ] = null;
-    self._descriptorTimeUpdate( dstDirPath );
 
     return true;
   }
@@ -1340,72 +1399,6 @@ linksRebase.defaults =
   filePath : '/',
   oldPath : '',
   newPath : '',
-}
-
-//
-
-function _fileTimeSetAct( o )
-{
-  let self = this;
-
-  if( !self.usingTime )
-  return;
-
-  if( _.strIs( arguments[ 0 ] ) )
-  o = { filePath : arguments[ 0 ] };
-
-  _.assert( self.path.isAbsolute( o.filePath ), o.filePath );
-
-  let timeStats = self.timeStats[ o.filePath ];
-
-  if( !timeStats )
-  {
-    timeStats = self.timeStats[ o.filePath ] = Object.create( null );
-    timeStats.atime = null;
-    timeStats.mtime = null;
-    timeStats.ctime = null;
-    timeStats.birthtime = null;
-  }
-
-  if( o.atime )
-  timeStats.atime = o.atime;
-
-  if( o.mtime )
-  timeStats.mtime = o.mtime;
-
-  if( o.ctime )
-  timeStats.ctime = o.ctime;
-
-  if( o.birthtime )
-  timeStats.birthtime = o.birthtime;
-
-  if( o.updateParent )
-  {
-    let parentPath = self.path.dir( o.filePath );
-    if( parentPath === '/' )
-    return;
-
-    timeStats.birthtime = null;
-
-    _.assert( o.atime && o.mtime && o.ctime );
-    _.assert( o.atime === o.mtime && o.mtime === o.ctime );
-
-    o.filePath = parentPath;
-
-    self._fileTimeSetAct( o );
-  }
-
-  return timeStats;
-}
-
-_fileTimeSetAct.defaults =
-{
-  filePath : null,
-  atime : null,
-  mtime : null,
-  ctime : null,
-  birthtime : null,
-  updateParent : false
 }
 
 //
@@ -2239,16 +2232,16 @@ function _descriptorWrite( o )
   }
   else
   {
-    let optionsSelect = Object.create( null );
+    let o2 = Object.create( null );
 
-    optionsSelect.setting = 1;
-    optionsSelect.set = o.data;
-    optionsSelect.query = o.filePath;
-    optionsSelect.container = o.filesTree;
-    optionsSelect.upToken = o.upToken;
-    optionsSelect.usingIndexedAccessToMap = 0;
+    o2.setting = 1;
+    o2.set = o.data;
+    o2.query = o.filePath;
+    o2.container = o.filesTree;
+    o2.upToken = o.upToken;
+    o2.usingIndexedAccessToMap = 0;
 
-    result = _.select( optionsSelect );
+    result = _.select( o2 );
   }
 
   o.filePath = self.path.join( '/', o.filePath );
@@ -2264,9 +2257,10 @@ function _descriptorWrite( o )
   {
     timeOptions.atime = time;
     timeOptions.birthtime = time;
-    timeOptions.updateParent = 1;
+    timeOptions.updatingDir = 1;
   }
 
+  if( self.usingExtraStat )
   self._fileTimeSetAct( timeOptions );
 
   return result;
@@ -2283,27 +2277,31 @@ _descriptorWrite.defaults =
 
 //
 
-function _descriptorTimeUpdate( filePath, wasCreated )
+function _descriptorTimeUpdate( filePath, created )
 {
   let self = this;
-
   let time = _.timeNow();
 
-  let timeOptions =
+  _.assert( arguments.length === 2 );
+
+  if( !self.usingExtraStat )
+  return;
+
+  let o2 =
   {
     filePath : filePath,
     ctime : time,
     mtime : time
   }
 
-  if( wasCreated )
+  if( created )
   {
-    timeOptions.atime = time;
-    timeOptions.birthtime = time;
-    timeOptions.updateParent = 1;
+    o2.atime = time;
+    o2.birthtime = time;
+    o2.updatingDir = 1; xxx
   }
 
-  self._fileTimeSetAct( timeOptions );
+  self._fileTimeSetAct( o2 );
 }
 
 //
@@ -2328,6 +2326,7 @@ function _descriptorScriptMake( filePath, data )
   let d = Object.create( null );
   d.filePath = filePath;
   d.code = data;
+  // d.ino = ++Self.InoCounter;
   return [ d ];
 }
 
@@ -2338,6 +2337,7 @@ function _descriptorSoftLinkMake( filePath )
   _.assert( arguments.length === 1, 'Expects single argument' );
   let d = Object.create( null );
   d.softLink = filePath;
+  // d.ino = ++Self.InoCounter;
   return [ d ];
 }
 
@@ -2357,6 +2357,7 @@ function _descriptorHardLinkMake( filePath, data )
   let d = Object.create( null );
   d.hardLinks = filePath;
   d.data = data;
+  // d.ino = ++Self.InoCounter;
 
   return [ d ];
 }
@@ -2543,7 +2544,7 @@ writeEncoders[ 'original.type' ] =
 
 let Composes =
 {
-  usingTime : null,
+  usingExtraStat : null,
   protocols : _.define.own( [] ),
   _currentPath : '/',
   safe : 0,
@@ -2560,7 +2561,7 @@ let Associates =
 
 let Restricts =
 {
-  timeStats : _.define.own( {} ),
+  extraStats : _.define.own( {} ),
 }
 
 let Statics =
@@ -2582,6 +2583,7 @@ let Statics =
   _descriptorHardLinkMake,
 
   Path : _.uri.CloneExtending({ fileProvider : Self }),
+  InoCounter : 0,
 
 }
 
@@ -2613,6 +2615,7 @@ let Proto =
 
   fileWriteAct,
   fileTimeSetAct,
+  _fileTimeSetAct,
   fileDeleteAct,
   dirMakeAct,
   streamWriteAct : null,
@@ -2632,8 +2635,6 @@ let Proto =
   // etc
 
   linksRebase,
-  _fileTimeSetAct,
-
   filesTreeRead,
   rewriteFromProvider,
   readToProvider,

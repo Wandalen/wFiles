@@ -100,6 +100,7 @@ function statsAreHardLinked( stat1, stat2 )
 
   // if( _.bigIntIs( stat1.ino ) )
   // debugger;
+
   if( _.bigIntIs( stat1.ino ) )
   return stat1.ino === stat2.ino;
 
@@ -109,6 +110,12 @@ function statsAreHardLinked( stat1, stat2 )
   /*
   try to make a good guess if ino comprison is not possible
   */
+
+  if( stat1.nlink < 2 )
+  return false;
+
+  if( stat2.nlink < 2 )
+  return false;
 
   if( stat1.nlink !== stat2.nlink )
   return false;

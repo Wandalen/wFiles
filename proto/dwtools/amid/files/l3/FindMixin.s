@@ -876,7 +876,7 @@ function filesCopyWithAdapter( o )
     'tryingPreserve',
     'ext?',
     'maxSize?',
-    'usingTime?',
+    'usingExtraStat?',
   */
 
   options.linking = options.linking ? 'hardLink' : 'fileCopy';
@@ -974,7 +974,7 @@ filesCopyWithAdapter.defaults =
   investigateDestination : 1,
 
   maxSize : 1 << 21,
-  usingTime : 1,
+  usingExtraStat : 1,
   recursive : 0,
 
   includingTerminals : 1,

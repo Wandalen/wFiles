@@ -47,7 +47,7 @@ function onSuiteBegin( test )
 {
   let context = this;
 
-  context.provider = _.FileProvider.Extract({ filesTree : filesTree, usingTime : 1, protocol : 'current' });
+  context.provider = _.FileProvider.Extract({ filesTree : filesTree, usingExtraStat : 1, protocol : 'current' });
   context.hub = _.FileProvider.Hub({ providers : [ context.provider ] });
 
   let path = context.provider.path;
@@ -139,7 +139,7 @@ var Proto =
   context :
   {
     filesTree : filesTree,
-    provider : _.FileProvider.Extract( { filesTree : filesTree, usingTime : 1 } ),
+    provider : _.FileProvider.Extract( { filesTree : filesTree, usingExtraStat : 1 } ),
     pathFor : pathFor,
     testFile : '/file1'
   },

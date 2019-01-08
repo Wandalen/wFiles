@@ -808,18 +808,18 @@ function fileDeleteAct( o )
       throwing : 0,
     });
 
-    // if( stat && stat.isSymbolicLink && stat.isSymbolicLink() )
-    // {
-    //   // debugger;
-    //   // throw _.err( 'not tested' );
-    // }
-
     if( !stat )
-    throw _.err( 'Path', _.strQuote( o.filePath ), 'doesn`t exist!' );
+    {
+      debugger;
+      throw _.err( 'Path', _.strQuote( o.filePath ), 'doesn`t exist!' );
+    }
 
     let file = self._descriptorRead( o.filePath );
     if( self._descriptorIsDir( file ) && Object.keys( file ).length )
-    throw _.err( 'Directory is not empty : ' + _.strQuote( o.filePath ) );
+    {
+      debugger;
+      throw _.err( 'Directory is not empty : ' + _.strQuote( o.filePath ) );
+    }
 
     let dirPath = self.path.dir( o.filePath );
     let dir = self._descriptorRead( dirPath );
@@ -952,8 +952,6 @@ function fileCopyAct( o )
   _.assertRoutineOptions( fileCopyAct, arguments );
   _.assert( self.path.isNormalized( o.srcPath ) );
   _.assert( self.path.isNormalized( o.dstPath ) );
-
-  debugger;
 
   if( o.sync  ) // qqq : synchronize async version
   {

@@ -90,22 +90,21 @@ function statsAreHardLinked( stat1, stat2 )
   _.assert( _.fileStatIs( stat1 ) );
   _.assert( _.fileStatIs( stat2 ) );
 
-  if( !stat1.mtime )
-  return null;
+  // if( !stat1.mtime ) /* ? */
+  // return null;
 
   /*
   ino comparison is not reliable test on nodejs below 10.5
   it's reliable only if ino is BigNumber
   */
 
-  if( stat1.ino !== stat2.ino )
-  return false;
-
-  if( _.bigIntIs( stat1.ino ) )
-  debugger;
-
+  // if( _.bigIntIs( stat1.ino ) )
+  // debugger;
   if( _.bigIntIs( stat1.ino ) )
   return stat1.ino === stat2.ino;
+
+  if( stat1.ino !== stat2.ino )
+  return false;
 
   /*
   try to make a good guess if ino comprison is not possible
@@ -120,65 +119,68 @@ function statsAreHardLinked( stat1, stat2 )
   if( stat1.size !== stat2.size )
   return false;
 
+  if( stat1.mtime && stat2.mtime )
   if( stat1.mtime.getTime() !== stat2.mtime.getTime() )
   return false;
 
+  if( stat1.ctime && stat2.ctime )
   if( stat1.ctime.getTime() !== stat2.ctime.getTime() )
   return false;
 
+  if( stat1.birthtime && stat2.birthtime )
   if( stat1.birthtime.getTime() !== stat2.birthtime.getTime() )
   return false;
 
-  return null;
+  return _.maybe;
 }
 
+// //
 //
-
-function statsCouldBeLinked( stat1, stat2 )
-{
-  _.assert( arguments.length === 2, 'Expects exactly two arguments' );
-  _.assert( _.fileStatIs( stat1 ) );
-  _.assert( _.fileStatIs( stat2 ) );
-  _.assert( !!stat1.mtime );
-
-  /*
-  ino comparison is not reliable test on nodejs below 10.5
-  it's reliable only if ino is BigNumber
-  */
-
-  if( stat1.ino !== stat2.ino )
-  return false;
-
-  if( _.bigIntIs( stat1.ino ) )
-  debugger;
-
-  if( _.bigIntIs( stat1.ino ) )
-  return stat1.ino === stat2.ino;
-
-  /*
-  try to make a good guess if ino comprison is not possible
-  */
-
-  if( stat1.nlink !== stat2.nlink )
-  return false;
-
-  if( stat1.mode !== stat2.mode )
-  return false;
-
-  if( stat1.size !== stat2.size )
-  return false;
-
-  if( stat1.mtime.getTime() !== stat2.mtime.getTime() )
-  return false;
-
-  if( stat1.ctime.getTime() !== stat2.ctime.getTime() )
-  return false;
-
-  if( stat1.birthtime.getTime() !== stat2.birthtime.getTime() )
-  return false;
-
-  return true;
-}
+// function /*statsCouldBeLinked*/statsAreHardLinked( stat1, stat2 )
+// {
+//   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
+//   _.assert( _.fileStatIs( stat1 ) );
+//   _.assert( _.fileStatIs( stat2 ) );
+//   _.assert( !!stat1.mtime );
+//
+//   /*
+//   ino comparison is not reliable test on nodejs below 10.5
+//   it's reliable only if ino is BigNumber
+//   */
+//
+//   if( stat1.ino !== stat2.ino )
+//   return false;
+//
+//   if( _.bigIntIs( stat1.ino ) )
+//   debugger;
+//
+//   if( _.bigIntIs( stat1.ino ) )
+//   return stat1.ino === stat2.ino;
+//
+//   /*
+//   try to make a good guess if ino comprison is not possible
+//   */
+//
+//   if( stat1.nlink !== stat2.nlink )
+//   return false;
+//
+//   if( stat1.mode !== stat2.mode )
+//   return false;
+//
+//   if( stat1.size !== stat2.size )
+//   return false;
+//
+//   if( stat1.mtime.getTime() !== stat2.mtime.getTime() )
+//   return false;
+//
+//   if( stat1.ctime.getTime() !== stat2.ctime.getTime() )
+//   return false;
+//
+//   if( stat1.birthtime.getTime() !== stat2.birthtime.getTime() )
+//   return false;
+//
+//   return true;
+// }
 
 //
 
@@ -293,7 +295,7 @@ let Globals =
   fileStatIs,
   statsHaveDifferentContent,
   statsAreHardLinked,
-  statsCouldBeLinked,
+  // /*statsCouldBeLinked*/statsAreHardLinked,
   statHash2Get,
 }
 

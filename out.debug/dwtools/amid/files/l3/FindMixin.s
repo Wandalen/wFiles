@@ -1548,7 +1548,6 @@ function filesReflectEvaluate_body( o )
         }
         else if( record.src.isActual )
         {
-          // touch( record, 'destructive' );
           record.deleteFirst = true;
         }
 
@@ -1566,8 +1565,8 @@ function filesReflectEvaluate_body( o )
           if( !o.writing || !o.dstRewriting )
           record.allow = false;
 
-          if( !record.preserve )
-          record.deleteFirst = true;
+          // if( !record.preserve ) // xxx
+          // record.deleteFirst = true;
 
           link( record );
 
@@ -1741,16 +1740,12 @@ function filesReflectEvaluate_body( o )
           }
           else
           {
-            // if( !o.dstDeleting )
-            // record.allow = false;
             dirDeleteOrPreserve( record );
           }
         }
         else
         {
           dirMake( record );
-          // action( record, 'dirMake' );
-          // preserve( record );
         }
 
       }
@@ -1767,8 +1762,6 @@ function filesReflectEvaluate_body( o )
         {
           record.deleteFirst = true;
           dirMake( record );
-          // action( record, 'dirMake' );
-          // touch( record, 'constructive' );
         }
         else
         {
@@ -1804,7 +1797,6 @@ function filesReflectEvaluate_body( o )
 
         if( record.touch === 'constructive' )
         {
-          // action( record, 'dirMake' );
           record.preserve = true;
           dirMake( record );
         }
@@ -1817,15 +1809,12 @@ function filesReflectEvaluate_body( o )
           }
           else
           {
-            // record.deleteFirst = false;
             _.assert( record.deleteFirst === false );
             if( !o.dstDeleting )
             record.allow = false;
             if( !record.dst.isActual && record.touch !== 'destructive' )
             record.allow = false;
             dirDeleteOrPreserve( record );
-            // if( record.dst.isActual )
-            // fileDelete( record );
           }
         }
 
@@ -2012,7 +2001,6 @@ function filesReflectEvaluate_body( o )
       {
         // if( _.strEnds( dstRecords[ f ].absolute, debugPath ) )
         // debugger;
-
         let dstOptions2 = _.mapExtend( null, dstOptions );
         dstOptions2.filePath = dst.path.join( record.dst.factory.basePath, dstRecords[ f ].absolute );
         dstOptions2.filter = dstOptions2.filter.clone();
@@ -2022,6 +2010,7 @@ function filesReflectEvaluate_body( o )
         dstOptions2.onUp = [ _.routineJoin( null, handleDstUp, [ record.src.factory, 'dstDeleting', null ] ) ];
         let found = self.filesFind( dstOptions2 );
       }
+
     }
 
     handleDown( record, op );
@@ -3058,11 +3047,8 @@ function filesFindSame_body( o )
       let minSize = Math.min( file1.stat.size, file2.stat.size );
       let maxSize = Math.max( file1.stat.size, file2.stat.size );
 
-      if( _.statsCouldBeLinked( file1.stat, file2.stat ) )
+      if( _./*statsCouldBeLinked*/statsAreHardLinked( file1.stat, file2.stat ) )
       {
-        // console.log( 'linked :', file1.absolute, file2.absolute );
-        // if( _.strHas( file1.absolute, 'fonts/icons' ) )
-        // debugger;
         linkAdd();
         continue;
       }

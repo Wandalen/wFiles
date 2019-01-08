@@ -2145,7 +2145,7 @@ function fileRead_body( o )
   {
 
     result
-    .ifNoErrorThen( handleEnd )
+    .thenKeep( handleEnd )
     .except( handleError )
     ;
 
@@ -2544,37 +2544,20 @@ fileInterpret.having.aspect = 'entry';
 
 //
 
-let hashReadAct = Object.create( null );
-hashReadAct.name = 'hashReadAct';
+// let hashReadAct = Object.create( null );
+// hashReadAct.name = 'hashReadAct';
 
-var defaults = hashReadAct.defaults = Object.create( null );
-
-defaults.filePath = null;
-defaults.sync = null;
-defaults.throwing = null;
-
-var having = hashReadAct.having = Object.create( null );
-
-having.writing = 0;
-having.reading = 1;
-having.driving = 1;
-
-var operates = hashReadAct.operates = Object.create( null );
-
-operates.filePath = { pathToRead : 1 }
-
-//
-
-let hashRead_body = ( function()
+let hashReadAct = ( function hashReadAct()
 {
   let Crypto;
 
-  return function hashRead( o )
+  return function hashReadAct( o )
   {
     let self = this;
 
     _.assert( arguments.length === 1, 'Expects single argument' );
 
+    debugger;
     if( o.verbosity >= 3 )
     self.logger.log( ' . hashRead :', o.filePath );
 
@@ -2599,9 +2582,9 @@ let hashRead_body = ( function()
       }
       catch( err )
       {
-        if( o.throwing )
+        // if( o.throwing )
         throw err;
-        result = NaN;
+        // result = NaN;
       }
 
       return result;
@@ -2631,10 +2614,10 @@ let hashRead_body = ( function()
 
       stream.on( 'error', function( err )
       {
-        if( o.throwing )
+        // if( o.throwing )
         con.error( _.err( err ) );
-        else
-        con.take( NaN );
+        // else
+        // con.take( NaN );
       });
 
       return con;
@@ -2643,21 +2626,99 @@ let hashRead_body = ( function()
 
 })();
 
-/*
-qqq : use routineExtend where possible please
-*/
+var defaults = hashReadAct.defaults = Object.create( null );
+defaults.filePath = null;
+defaults.sync = null;
+// defaults.throwing = null;
 
-_.routineExtend( hashRead_body, hashReadAct );
+var having = hashReadAct.having = Object.create( null );
+having.writing = 0;
+having.reading = 1;
+having.driving = 1;
 
-var defaults = hashRead_body.defaults;
+var operates = hashReadAct.operates = Object.create( null );
+operates.filePath = { pathToRead : 1 }
 
-defaults.throwing = null;
-defaults.verbosity = null;
-
-var having = hashRead_body.having;
-
-having.driving = 0;
-having.aspect = 'body';
+//
+//
+// let hashRead_body = ( function()
+// {
+//   let Crypto;
+//
+//   return function hashRead( o )
+//   {
+//     let self = this;
+//
+//     _.assert( arguments.length === 1, 'Expects single argument' );
+//
+//     debugger;
+//     if( o.verbosity >= 3 )
+//     self.logger.log( ' . hashRead :', o.filePath );
+//
+//     if( Crypto === undefined )
+//     Crypto = require( 'crypto' );
+//     let md5sum = Crypto.createHash( 'md5' );
+//
+//     /* */
+//
+//     if( o.sync && _.boolLike( o.sync ) )
+//     {
+//       let result;
+//       try
+//       {
+//         let stat = self.statResolvedRead({ filePath : o.filePath, sync : 1, throwing : 0 });
+//         _.sure( !!stat, 'Cant get stats of file ' + _.strQuote( o.filePath ) );
+//         if( stat.size > self.hashFileSizeLimit )
+//         throw _.err( 'File is too big ' + _.strQuote( o.filePath ) + ' ' + stat.size + ' > ' + self.hashFileSizeLimit );
+//         let read = self.fileReadSync( o.filePath );
+//         md5sum.update( read );
+//         result = md5sum.digest( 'hex' );
+//       }
+//       catch( err )
+//       {
+//         if( o.throwing )
+//         throw err;
+//         result = NaN;
+//       }
+//
+//       return result;
+//
+//     }
+//     else if( o.sync === 'worker' )
+//     {
+//
+//       debugger; throw _.err( 'not implemented' );
+//
+//     }
+//     else
+//     {
+//       let con = new _.Consequence();
+//       let stream = self.streamRead( o.filePath );
+//
+//       stream.on( 'data', function( d )
+//       {
+//         md5sum.update( d );
+//       });
+//
+//       stream.on( 'end', function()
+//       {
+//         let hash = md5sum.digest( 'hex' );
+//         con.take( hash );
+//       });
+//
+//       stream.on( 'error', function( err )
+//       {
+//         if( o.throwing )
+//         con.error( _.err( err ) );
+//         else
+//         con.take( NaN );
+//       });
+//
+//       return con;
+//     }
+//   }
+//
+// })();
 
 //
 
@@ -2701,9 +2762,55 @@ having.aspect = 'body';
  * @memberof wFileProviderPartial
  */
 
-let hashRead = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, hashRead_body );
+function hashRead_body( o )
+{
+  let self = this;
+  let result;
 
+  try
+  {
+    result = self.hashReadAct( o );
+  }
+  catch( err )
+  {
+    if( o.throwing )
+    throw _.err( 'Cant read hash of', o.filePath, '\n', err );
+    else
+    return NaN;
+  }
+
+  if( _.consequenceIs( result ) )
+  result.finally( ( err, arg ) =>
+  {
+    if( err )
+    if( o.throwing )
+    throw _.err( 'Cant read hash of', o.filePath, '\n', err );
+    else
+    return NaN;
+    return arg;
+  });
+
+  return result;
+}
+
+_.routineExtend( hashRead_body, hashReadAct );
+
+var defaults = hashRead_body.defaults;
+defaults.throwing = null;
+defaults.verbosity = null;
+
+var having = hashRead_body.having;
+having.driving = 0;
+having.aspect = 'body';
+
+let hashRead = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, hashRead_body );
 hashRead.having.aspect = 'entry';
+
+//
+
+// let hashRead = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, hashRead_body );
+//
+// hashRead.having.aspect = 'entry';
 
 //
 
@@ -3066,8 +3173,12 @@ function filesAreSame_body( o )
 {
   let self = this;
 
-  o.ins1 = self.record( o.ins1 );
-  o.ins2 = self.record( o.ins2 );
+  debugger;
+  let f = self.recordFactory({ resolvingSoftLink : 0, resolvingTextLink : 0 });
+  debugger;
+
+  o.ins1 = f.record( o.ins1 );
+  o.ins2 = f.record( o.ins2 );
 
   /* no stat */
 
@@ -3076,6 +3187,13 @@ function filesAreSame_body( o )
   if( !o.ins2.stat )
   return false;
 
+  if( o.ins1.factory.effectiveFileProvider === o.ins2.factory.effectiveFileProvider && o.ins1.stat.ino > 0 )
+  {
+    let could = _.statsAreHardLinked( o.ins1.stat, o.ins2.stat );
+    if( could === true || could === _.maybe )
+    return true;
+  }
+
   /* dir */
 
   if( o.ins1.stat.isDir() )
@@ -3083,12 +3201,21 @@ function filesAreSame_body( o )
     if( !o.ins2.stat.isDir() )
     return false;
     debugger;
-    if( o.ins1.ino > 0 )
-    if( o.ins1.ino === o.ins2.ino )
-    return true;
-    if( o.ins1.size !== o.ins2.size )
+
+    if( o.ins1.factory.effectiveFileProvider === o.ins2.factory.effectiveFileProvider && o.ins1.stat.ino > 0 )
+    if( self.UsingBigIntForStat )
+    return o.ins1.ino === o.ins2.ino;
+    else
+    return o.ins1.ino === o.ins2.ino ? null : false;
+
+    // if( o.ins1.ino > 0 )
+    // if( o.ins1.ino === o.ins2.ino )
+    // return true;
+    // if( o.ins1.size !== o.ins2.size )
+    // return false;
+    // return o.ins1.real === o.ins2.real;
+
     return false;
-    return o.ins1.real === o.ins2.real;
   }
 
   /* soft link */
@@ -3114,9 +3241,8 @@ function filesAreSame_body( o )
 
   /* hard linked */
 
-  if( _.bigIntIs( o.ins1.stat.ino ) && _.bigIntIs( o.ins2.stat.ino ) )
-  if( o.ins1.factory.effectiveFileProvider === o.ins2.factory.effectiveFileProvider )
-  if( o.ins1.stat.ino > 0 )
+  if( o.ins1.factory.effectiveFileProvider === o.ins2.factory.effectiveFileProvider && o.ins1.stat.ino > 0 )
+  if( self.UsingBigIntForStat )
   if( o.ins1.stat.ino === o.ins2.stat.ino )
   return true;
 
@@ -4614,7 +4740,7 @@ function dirMake_body( o )
   {
     let con = new _.Consequence().take( null );
     for( let i = 0; i < splits.length; i++ )
-    con.ifNoErrorThen( _.routineSeal( self, onPart, [ splits[ i ] ] ) );
+    con.thenKeep( _.routineSeal( self, onPart, [ splits[ i ] ] ) );
 
     return con;
   }
@@ -4743,7 +4869,7 @@ function _linkMultiple( o, link )
   for( let p = 0 ; p < records.length ; p++ )
   {
     let record = records[ p ];
-    if( !record.stat || !_.statsCouldBeLinked( newestRecord.stat, record.stat ) )
+    if( !record.stat || !_./*statsCouldBeLinked*/statsAreHardLinked( newestRecord.stat, record.stat ) )
     {
       needed = 1;
       break;
@@ -4843,7 +4969,7 @@ function _linkMultiple( o, link )
       }
     }
 
-    if( !record.stat || !_.statsCouldBeLinked( mostLinkedRecord.stat , record.stat ) )
+    if( !record.stat || !_./*statsCouldBeLinked*/statsAreHardLinked( mostLinkedRecord.stat , record.stat ) )
     {
       debugger;
       let linkOptions = _.mapExtend( null, o );
@@ -4871,18 +4997,14 @@ function _link_functor( gen )
   let entryMethodName = _.strRemoveEnd( gen.actMethodName, 'Act' );
   let onVerify1 = gen.onVerify1;
   let onVerify2 = gen.onVerify2;
-  // let onRanameBegin = gen.onRanameBegin;
   let renaming = gen.renaming;
   let skippingSamePath = gen.skippingSamePath;
-  let skippingMissing = gen.skippingMissing;
+  let skippingMissed = gen.skippingMissed;
 
-  // _.assert( _.objectIs( onAct ) || _.routineIs( onAct ) );
-  // _.assert( _.objectIs( onAct.defaults ) );
   _.assert( _.routineIs( onAct ) );
   _.assert( _.objectIs( onAct.defaults ) );
-  _.assert( !onVerify1 || _.routineIs( onVerify1 ) );
-  _.assert( !onVerify2 || _.routineIs( onVerify2 ) );
-  // _.assert( !onRanameBegin || _.routineIs( onRanameBegin ) );
+  _.assert( onVerify1 === null || _.routineIs( onVerify1 ) );
+  _.assert( onVerify2 === null || _.routineIs( onVerify2 ) );
 
   /* - */
 
@@ -4911,7 +5033,8 @@ function _link_functor( gen )
     c.log = log;
     c.tempRenameCan = tempRenameCan;
     c.tempRename = o.sync ? tempRenameSync : tempRenameAsync;
-    c.tempRenameBack = o.sync ? tempRenameBackSync : tempRenameBackAsync;
+    c.tempRenameRevert = o.sync ? tempRenameRevertSync : tempRenameRevertAsync;
+    c.tempDelete = tempDelete;
     c.tempNameMake = tempNameMake
     c.validateSize = validateSize;
     c.error = error;
@@ -4921,9 +5044,10 @@ function _link_functor( gen )
     {
       c.con1 = new _.Consequence().take( null );
       c.con2 = new _.Consequence();
+      // qqq : why two?
     }
 
-    Object.preventExtensions( c ); debugger;
+    Object.preventExtensions( c );
 
     /* */
 
@@ -4938,15 +5062,16 @@ function _link_functor( gen )
       qqq : _linkMultiple should work not only for hardlinks
       Vova : low priority
       */
+
       if( _.longIs( o.dstPath ) && c.linkAct.having.hardLinking )
       return _linkMultiple.call( self, o, _link_body );
       _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
 
-      var r = c.pathResolve();
+      c.pathResolve();
       if( c.ended )
       return c.end();
 
-      var r = c.linksResolve();
+      c.linksResolve();
       if( c.ended )
       return c.end();
 
@@ -4983,19 +5108,14 @@ function _link_functor( gen )
         c.linkAct.call( self, c );
         log();
 
-        if( c.tempPath )
-        {
-          self.filesDelete({ filePath : c.tempPath, verbosity : 0 });
-          c.tempPath = null;
-        }
-
-        validateSize();
+        c.validateSize();
+        c.tempDelete();
 
       }
       catch( err )
       {
 
-        tempRenameBackSync();
+        c.tempRenameRevert();
         return error( _.err( 'Cant', entryMethodName, o.dstPath, '<-', o.srcPath, '\n', err ) );
 
       }
@@ -5007,12 +5127,12 @@ function _link_functor( gen )
 
       /* main part */
 
-      c.con2.ifNoErrorThen( () => self.fileExists( o2.dstPath ) );
-      c.con2.ifNoErrorThen( ( dstExists ) =>
+      c.con2.thenKeep( () => self.fileExists( o2.dstPath ) );
+      c.con2.thenKeep( ( dstExists ) =>
       {
         if( dstExists )
         {
-          return c.verifyDst().ifNoErrorThen( () => tempRenameAsync() )
+          return c.verifyDst().thenKeep( () => tempRenameAsync() )
         }
         else if( o.makingDirectory )
         {
@@ -5021,16 +5141,16 @@ function _link_functor( gen )
         return dstExists;
       });
 
-      c.con2.ifNoErrorThen( _.routineSeal( self, c.linkAct, [ c ] ) );
+      c.con2.thenKeep( _.routineSeal( self, c.linkAct, [ c ] ) );
 
-      c.con2.ifNoErrorThen( ( got ) =>
+      c.con2.thenKeep( ( got ) =>
       {
         log();
-        if( c.tempPath )
-        return self.filesDelete({ filePath : c.tempPath, verbosity : 0 });
-        return got;
+        // if( c.tempPath )
+        // return self.filesDelete({ filePath : c.tempPath, verbosity : 0 });
+        return c.tempDelete();
       });
-      c.con2.ifNoErrorThen( () =>
+      c.con2.thenKeep( () =>
       {
         c.tempPath = null;
         validateSize();
@@ -5039,7 +5159,7 @@ function _link_functor( gen )
 
       c.con2.except( ( err ) =>
       {
-        return tempRenameBackAsync()
+        return c.tempRenameRevert()
         .finally( () =>
         {
           return error( _.err( 'Cant', entryMethodName, o.dstPath, '<-', o.srcPath, '\n', err ) );
@@ -5130,7 +5250,7 @@ function _link_functor( gen )
           error( err );
           return true;
         }
-        if( skippingMissing )
+        if( skippingMissed )
         {
           end( false );
           return true;
@@ -5216,7 +5336,7 @@ function _link_functor( gen )
         filePath : o2.dstPath,
         sync : 0,
       })
-      .ifNoErrorThen( ( stat ) =>
+      .thenKeep( ( stat ) =>
       {
         _.assert( c.dstStat === undefined );
         c.dstStat = stat;
@@ -5424,15 +5544,15 @@ function _link_functor( gen )
     function tempRenameSync()
     {
 
-      c.tempPath = tempNameMake( o2.dstPath );
+      c.tempPath = c.tempNameMake( o2.dstPath );
       if( self.statRead({ filePath : c.tempPath }) )
       self.filesDelete( c.tempPath );
       self.fileRenameAct
       ({
         dstPath : c.tempPath,
         srcPath : o.dstPath,
-        originalDstPath : o.originalDstPath,
-        originalSrcPath : o.originalSrcPath,
+        originalDstPath : c.tempPath,
+        originalSrcPath : o.dstPath,
         sync : 1,
         // resolvingSrcSoftLink : 0,
         // resolvingSrcTextLink : 0,
@@ -5446,26 +5566,26 @@ function _link_functor( gen )
       if( !tempRenameCan() )
       return false;
 
-      c.tempPath = tempNameMake( o2.dstPath );
+      c.tempPath = c.tempNameMake( o2.dstPath );
       return self.statRead
       ({
         filePath : c.tempPath,
         sync : 0
       })
-      .ifNoErrorThen( ( tempStat ) =>
+      .thenKeep( ( tempStat ) =>
       {
         if( tempStat )
         return self.filesDelete( c.tempPath );
         return tempStat;
       })
-      .ifNoErrorThen( () =>
+      .thenKeep( () =>
       {
         return self.fileRenameAct
         ({
           dstPath : c.tempPath,
           srcPath : o.dstPath,
-          originalDstPath : o.originalDstPath,
-          originalSrcPath : o.originalSrcPath,
+          originalDstPath : c.tempPath,
+          originalSrcPath : o.dstPath,
           sync : 0,
           // resolvingSrcSoftLink : 0,
           // resolvingSrcTextLink : 0,
@@ -5476,7 +5596,7 @@ function _link_functor( gen )
 
     /* - */
 
-    function tempRenameBackSync()
+    function tempRenameRevertSync()
     {
 
       if( c.tempPath ) try
@@ -5486,8 +5606,8 @@ function _link_functor( gen )
         ({
           dstPath : o.dstPath,
           srcPath : c.tempPath,
-          originalDstPath : o.originalDstPath,
-          originalSrcPath : o.originalSrcPath,
+          originalDstPath : o.dstPath,
+          originalSrcPath : c.tempPath,
           sync : 1,
         });
       }
@@ -5498,29 +5618,30 @@ function _link_functor( gen )
         // console.error( err.toString() + '\n' + err.stack );
       }
 
-      if( c.tempPathSrc ) try
-      {
-        debugger;
-        self.filesDelete( o.srcPath );
-        self.fileRenameAct
-        ({
-          dstPath : o.srcPath,
-          srcPath : c.tempPathSrc,
-          originalDstPath : o.originalDstPath,
-          originalSrcPath : o.originalSrcPath,
-          sync : 1,
-        });
-      }
-      catch( err2 )
-      {
-        debugger;
-        console.error( err2 );
-        // console.error( err.toString() + '\n' + err.stack );
-      }
+      // qqq : ???
+      // if( c.tempPathSrc ) try
+      // {
+      //   debugger;
+      //   self.filesDelete( o.srcPath );
+      //   self.fileRenameAct
+      //   ({
+      //     dstPath : o.srcPath,
+      //     srcPath : c.tempPathSrc,
+      //     originalDstPath : o.srcPath,
+      //     originalSrcPath : c.tempPathSrc,
+      //     sync : 1,
+      //   });
+      // }
+      // catch( err2 )
+      // {
+      //   debugger;
+      //   console.error( err2 );
+      //   // console.error( err.toString() + '\n' + err.stack );
+      // }
 
     }
 
-    function tempRenameBackAsync()
+    function tempRenameRevertAsync()
     {
       if( !c.tempPath )
       return new _.Consequence().take( null );
@@ -5529,8 +5650,8 @@ function _link_functor( gen )
       ({
         dstPath : o.dstPath,
         srcPath : c.tempPath,
-        originalDstPath : o.originalDstPath,
-        originalSrcPath : o.originalSrcPath,
+        originalDstPath : o.dstPath,
+        originalSrcPath : c.tempPath,
         sync : 0,
       })
       .finally( ( err2, got ) )
@@ -5539,6 +5660,26 @@ function _link_functor( gen )
         console.error( err2 );
         return got;
       }
+    }
+
+    /* - */
+
+    function tempDelete()
+    {
+
+      if( c.tempPath )
+      {
+        let tempPath = c.tempPath;
+        c.tempPath = null;
+        return self.filesDelete
+        ({
+          filePath : tempPath,
+          verbosity : 0,
+          // sync : o.sync, /* qqq : implement o.sync */
+        });
+      }
+
+      return null;
     }
 
     /* - */
@@ -5664,7 +5805,7 @@ _link_functor.defaults =
 
   renaming : true,
   skippingSamePath : true,
-  skippingMissing : false,
+  skippingMissed : false,
 
 }
 
@@ -5800,7 +5941,8 @@ let fileRename = _link_functor
   actMethodName : 'fileRenameAct',
   onAct : _fileRenameAct,
   skippingSamePath : true,
-  skippingMissing : true,
+  skippingMissed : false,
+  // skippingMissed : true,
 });
 
 var defaults = fileRename.body.defaults;
@@ -5893,10 +6035,11 @@ function _fileCopyVerify2( c )
   let o = c.options;
 
   _.assert( _.strIs( o.srcPath ) );
-  _.assert( _.fileStatIs( c.srcStat ) );
+  _.assert( _.fileStatIs( c.srcStat ) || c.srcStat === null );
 
-  // let isDir = c.srcStat.isDir();
-  // if( c.srcStat.isDir() && self.dirRead( o.srcPath ).length > 0 )
+  if( c.srcStat === null )
+  return;
+
   if( c.srcStat.isDir() )
   {
     debugger;
@@ -5910,9 +6053,13 @@ function _fileCopyAct( c )
   let self = this;
   let o = c.options2;
 
-  _.assert( _.fileStatIs( c.srcStat ) );
+  _.assert( _.fileStatIs( c.srcStat ) || c.srcStat === null );
 
-  if( c.srcStat.isSoftLink() )
+  if( c.srcStat === null )
+  {
+    // return self.fileDeleteAct({ filePath : o.dstPath, sync : o.sync });
+  }
+  else if( c.srcStat.isSoftLink() )
   {
     debugger;
 
@@ -5950,7 +6097,6 @@ function _fileCopyAct( c )
 
   }
 
-  // return c;
 }
 
 _.routineExtend( _fileCopyAct, fileCopyAct );
@@ -5961,7 +6107,8 @@ let fileCopy = _link_functor
   onAct : _fileCopyAct,
   onVerify2 : _fileCopyVerify2,
   skippingSamePath : true,
-  skippingMissing : true,
+  skippingMissed : false,
+  // skippingMissed : true,
 });
 
 var defaults = fileCopy.body.defaults;
@@ -5974,7 +6121,7 @@ defaults.allowingCycled = 0;
 defaults.throwing = null;
 defaults.verbosity = null;
 
-defaults.breakingSrcHardLink = 0;
+// defaults.breakingSrcHardLink = 0;
 defaults.resolvingSrcSoftLink = 1;
 defaults.resolvingSrcTextLink = 0;
 
@@ -6092,7 +6239,7 @@ let hardLink = _link_functor
   onVerify1 : _hardLinkVerify1,
   onVerify2 : _hardLinkVerify2,
   skippingSamePath : true,
-  skippingMissing : false,
+  skippingMissed : false,
 });
 
 var defaults = hardLink.body.defaults;
@@ -6196,7 +6343,7 @@ let softLink = _link_functor
   onAct : _softLinkAct,
   onVerify2 : _softLinkVerify2,
   skippingSamePath : false,
-  skippingMissing : false,
+  skippingMissed : false,
 });
 
 var defaults = softLink.body.defaults;
@@ -6294,7 +6441,7 @@ let textLink = _link_functor
   onAct : _textLinkAct,
   onVerify2 : _textLinkVerify2,
   skippingSamePath : false,
-  skippingMissing : false,
+  skippingMissed : false,
 });
 
 var defaults = textLink.body.defaults;
@@ -6352,7 +6499,6 @@ function fileExchange_body( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
 
   // throw _.err( 'not tested after introducing of allowingCycled' );
-
   // let src = self.statResolvedRead({ filePath : o.srcPath, throwing : 0 });
   // let dst = self.statResolvedRead({ filePath : o.dstPath, throwing : 0 });
 
@@ -6756,7 +6902,7 @@ function filesAreHardLinked_body( o )
   for( let i = 1 ; i < o.filePath.length ; i++ )
   {
     let statCurrent = self.statRead( self.path.from( o.filePath[ i ] ) );
-    if( !statCurrent || !_.statsCouldBeLinked( statFirst, statCurrent ) )
+    if( !statCurrent || !_./*statsCouldBeLinked*/statsAreHardLinked( statFirst, statCurrent ) )
     return false;
   }
 

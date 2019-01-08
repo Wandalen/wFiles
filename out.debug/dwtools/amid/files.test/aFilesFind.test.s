@@ -917,16 +917,16 @@ function filesFindMaskTerminal( test )
 {
   let context = this;
   let path = context.provider.path;
-  var testDir = path.join( context.testSuitePath, test.name );
-  var filePath = path.join( testDir, 'package.json' );
+  var testPath = path.join( context.testSuitePath, test.name );
+  var filePath = path.join( testPath, 'package.json' );
 
-  _.fileProvider.filesDelete( testDir );
+  _.fileProvider.filesDelete( testPath );
   _.fileProvider.fileWrite( filePath, filePath );
 
   test.case = 'relative to current dir';
 
   var filter =  { maskTerminal : './package.json' }
-  var got = _.fileProvider.filesFind({ filePath : testDir, filter : filter, recursive : 1 });
+  var got = _.fileProvider.filesFind({ filePath : testPath, filter : filter, recursive : 1 });
   test.identical( got.length, 1 );
 
   /* */
@@ -934,7 +934,7 @@ function filesFindMaskTerminal( test )
   test.case = 'relative to parent dir';
 
   var filter =  { maskTerminal : './filesFindMaskTerminal/package.json' }
-  var got = _.fileProvider.filesFind({ filePath : testDir, filter : filter });
+  var got = _.fileProvider.filesFind({ filePath : testPath, filter : filter });
   test.identical( got.length, 0 );
   // test.identical( got[ 0 ].absolute, filePath );
   // test.identical( got[ 0 ].relative, './package.json' );
@@ -1116,12 +1116,12 @@ function filesFind( test )
 {
   let context = this;
   let path = context.provider.path;
-  var testDir = path.join( context.testSuitePath, test.name );
+  var testPath = path.join( context.testSuitePath, test.name );
 
   var fixedOptions =
   {
     // basePath : null,
-    // filePath : testDir,
+    // filePath : testPath,
     // strict : 1,
     allowingMissed : 1,
     includingStem : 1,
@@ -1198,7 +1198,7 @@ function filesFind( test )
   var recursive = [ 0, 1, 2 ];
   var includingTerminals = [ 0, 1 ];
   var includingTransient = [ 0, 1 ];
-  var filePaths = [ testDir ];
+  var filePaths = [ testPath ];
 
   var globs =
   [
@@ -1336,11 +1336,11 @@ function filesFind( test )
       recursive : 2,
       includingTerminals : 1,
       includingTransient : 0,
-      filePath : path.join( testDir, glob ),
+      filePath : path.join( testPath, glob ),
       filter :
       {
-        basePath : testDir,
-        prefixPath : testDir
+        basePath : testPath,
+        prefixPath : testPath
       }
     };
 
@@ -1351,11 +1351,11 @@ function filesFind( test )
     info.number = ++n;
     test.case = _.toStr( info, { levels : 3 } )
     var files = _.fileProvider.filesFind( _.cloneJust( o ) );
-    var tester = path.globRegexpsForTerminal( glob, testDir, info.filter.basePath );
+    var tester = path.globRegexpsForTerminal( glob, testPath, info.filter.basePath );
     var expected = allFiles.slice();
     expected = expected.filter( ( p ) =>
     {
-      return tester.test( './' + path.relative( testDir, p ) )
+      return tester.test( './' + path.relative( testPath, p ) )
     });
     logger.log( 'Got: ', _.toStr( files ) );
     logger.log( 'Expected: ', _.toStr( expected ) );
@@ -1411,10 +1411,10 @@ function filesFind( test )
 
   function prepareFiles( level )
   {
-    if( _.fileProvider.statResolvedRead( testDir ) )
-    _.fileProvider.filesDelete( testDir );
+    if( _.fileProvider.statResolvedRead( testPath ) )
+    _.fileProvider.filesDelete( testPath );
 
-    var dirForFile = testDir;
+    var dirForFile = testPath;
     for( var i = 0; i <= level; i++ )
     {
       if( i >= 1 )
@@ -1435,7 +1435,7 @@ function filesFind( test )
   function makeExpected( level, o )
   {
     var expected = [];
-    var dirPath = testDir;
+    var dirPath = testPath;
     var isDir = _.fileProvider.isDir( o.filePath );
 
     if( isDir && o._includingDirs && o.includingStem )
@@ -1491,7 +1491,7 @@ function filesFind( test )
         dirPath = path.join( dirPath, '' + l );
         if( o.includingDirs && o.includingTransient )
         {
-          var relative = path.dot( path.relative( o.basePath || testDir, dirPath ) );
+          var relative = path.dot( path.relative( o.basePath || testPath, dirPath ) );
 
           if( o.glob )
           passed = path.globRegexpsForDirectory( o.glob, o.filePath, o.basePath ).test( relative );
@@ -1517,10 +1517,10 @@ function filesFind( test )
           // var filePath = path.join( path, l + '-' + name );
           var filePath = path.join( dirPath, name );
           var passed = true;
-          var relative = path.dot( path.relative( o.basePath || testDir, filePath ) );
+          var relative = path.dot( path.relative( o.basePath || testPath, filePath ) );
 
           if( o.glob )
-          passed = path.globRegexpsForTerminal( o.glob, o.filePath, o.basePath || testDir ).test( relative );
+          passed = path.globRegexpsForTerminal( o.glob, o.filePath, o.basePath || testPath ).test( relative );
 
           if( passed )
           {
@@ -1574,7 +1574,7 @@ function filesFind( test )
       }
     }
 
-    _.fileProvider.filesDelete( testDir );
+    _.fileProvider.filesDelete( testPath );
 
     for( var i = 0; i < numberOfDuplicates; i++ )
     {
@@ -1605,7 +1605,7 @@ function filesFind( test )
         }
       })
     }
-    makePaths( tree , testDir );
+    makePaths( tree , testPath );
     paths.sort();
     paths.forEach( ( p ) => _.fileProvider.fileWrite( p, '' ) )
     return paths;
@@ -2218,7 +2218,7 @@ filesFindRecursive.timeOut = 15000;
 function filesFindLinked( test )
 {
   let context = this;
-  let workDir = test.context.pathFor( test.name );
+  let testPath = test.context.pathFor( test.name );
   let provider = context.provider;
   let path = context.provider.path;
 
@@ -2232,24 +2232,24 @@ function filesFindLinked( test )
   {
     let result = _.select( container, path );
     if( _.strIs( result[ 0 ] ) )
-    result = result.map( ( e ) => _.strPrependOnce( _.strRemoveBegin( e, workDir ), '/' ) );
+    result = result.map( ( e ) => _.strPrependOnce( _.strRemoveBegin( e, testPath ), '/' ) );
     return result;
   }
 
   //
 
-  let terminalPath = path.join( workDir, 'terminal' );
-  let normalPath = path.join( workDir, 'normal' );
-  let doublePath = path.join( workDir, 'double' );
-  let brokenPath = path.join( workDir, 'broken' );
-  let missingPath = path.join( workDir, 'missing' );
-  let autoPath = path.join( workDir, 'auto' );
-  let onePath = path.join( workDir, 'one' );
-  let twoPath = path.join( workDir, 'two' );
-  let normalaPath = path.join( workDir, 'normala' );
-  let normalbPath = path.join( workDir, 'normalb' );
-  let dirPath = path.join( workDir, 'directory' );
-  let toDirPath = path.join( workDir, 'toDir' );
+  let terminalPath = path.join( testPath, 'terminal' );
+  let normalPath = path.join( testPath, 'normal' );
+  let doublePath = path.join( testPath, 'double' );
+  let brokenPath = path.join( testPath, 'broken' );
+  let missingPath = path.join( testPath, 'missing' );
+  let autoPath = path.join( testPath, 'auto' );
+  let onePath = path.join( testPath, 'one' );
+  let twoPath = path.join( testPath, 'two' );
+  let normalaPath = path.join( testPath, 'normala' );
+  let normalbPath = path.join( testPath, 'normalb' );
+  let dirPath = path.join( testPath, 'directory' );
+  let toDirPath = path.join( testPath, 'toDir' );
 
   //
 
@@ -2263,13 +2263,13 @@ function filesFindLinked( test )
 
   debugger;
 
-  context.provider.filesDelete( workDir );
+  context.provider.filesDelete( testPath );
   context.provider.fileWrite( terminalPath, terminalPath );
   context.provider.softLink( normalPath, terminalPath );
 
   var got = context.provider.filesFind
   ({
-    filePath : workDir,
+    filePath : testPath,
     resolvingSoftLink : 0,
     outputFormat : 'record',
     includingTransient : 1,
@@ -2283,7 +2283,7 @@ function filesFindLinked( test )
 
   var got = context.provider.filesFind
   ({
-    filePath : workDir,
+    filePath : testPath,
     resolvingSoftLink : 1,
     outputFormat : 'record',
     includingTransient : 1,
@@ -2310,14 +2310,14 @@ function filesFindLinked( test )
     double : [{ softLink : '/normal' }],
   }
 
-  context.provider.filesDelete( workDir );
+  context.provider.filesDelete( testPath );
   context.provider.fileWrite( terminalPath, terminalPath );
   context.provider.softLink( normalPath, terminalPath );
   context.provider.softLink( doublePath, normalPath );
 
   var got = context.provider.filesFind
   ({
-    filePath : workDir,
+    filePath : testPath,
     resolvingSoftLink : 0,
     outputFormat : 'record',
     includingTransient : 1,
@@ -2331,7 +2331,7 @@ function filesFindLinked( test )
 
   var got = context.provider.filesFind
   ({
-    filePath : workDir,
+    filePath : testPath,
     resolvingSoftLink : 1,
     outputFormat : 'record',
     includingTransient : 1,
@@ -2356,7 +2356,7 @@ function filesFindLinked( test )
     broken : [{ softLink : '/missing' }],
   }
 
-  context.provider.filesDelete( workDir );
+  context.provider.filesDelete( testPath );
   context.provider.fileWrite( terminalPath, terminalPath );
   context.provider.softLink( normalPath, terminalPath );
   context.provider.softLink({ dstPath : brokenPath, srcPath : missingPath, allowingMissed : 1 });
@@ -2365,7 +2365,7 @@ function filesFindLinked( test )
 
   var got = context.provider.filesFind
   ({
-    filePath : workDir,
+    filePath : testPath,
     outputFormat : 'record',
     includingTransient : 1,
     includingTerminals : 1,
@@ -2384,7 +2384,7 @@ function filesFindLinked( test )
 
   var got = context.provider.filesFind
   ({
-    filePath : workDir,
+    filePath : testPath,
     outputFormat : 'record',
     includingTransient : 1,
     includingTerminals : 1,
@@ -2405,7 +2405,7 @@ function filesFindLinked( test )
   {
     var got = context.provider.filesFind
     ({
-      filePath : workDir,
+      filePath : testPath,
       outputFormat : 'record',
       includingTransient : 1,
       includingTerminals : 1,
@@ -2431,7 +2431,7 @@ function filesFindLinked( test )
     auto : [{ softLink : '/auto' }],
   }
 
-  context.provider.filesDelete( workDir );
+  context.provider.filesDelete( testPath );
   context.provider.fileWrite( terminalPath, terminalPath );
   context.provider.softLink( normalPath, terminalPath );
   context.provider.softLink({ dstPath : autoPath, srcPath : '../auto', allowingMissed : 1 });
@@ -2442,7 +2442,7 @@ function filesFindLinked( test )
 
   var got = context.provider.filesFind
   ({
-    filePath : workDir,
+    filePath : testPath,
     outputFormat : 'record',
     includingTransient : 1,
     includingTerminals : 1,
@@ -2463,7 +2463,7 @@ function filesFindLinked( test )
 
   var got = context.provider.filesFind
   ({
-    filePath : workDir,
+    filePath : testPath,
     outputFormat : 'record',
     includingTransient : 1,
     includingTerminals : 1,
@@ -2486,7 +2486,7 @@ function filesFindLinked( test )
   {
     var got = context.provider.filesFind
     ({
-      filePath : workDir,
+      filePath : testPath,
       outputFormat : 'record',
       includingTransient : 1,
       includingTerminals : 1,
@@ -2512,14 +2512,14 @@ function filesFindLinked( test )
     two : [{ softLink : '/one' }],
   }
 
-  context.provider.filesDelete( workDir );
+  context.provider.filesDelete( testPath );
   context.provider.fileWrite( terminalPath, terminalPath );
   context.provider.softLink({ dstPath : twoPath, srcPath : onePath, allowingMissed : 1 });
   context.provider.softLink({ dstPath : onePath, srcPath : twoPath, allowingMissed : 1 });
 
   var got = context.provider.filesFind
   ({
-    filePath : workDir,
+    filePath : testPath,
     resolvingSoftLink : 0,
     outputFormat : 'record',
     includingTransient : 1,
@@ -2536,7 +2536,7 @@ function filesFindLinked( test )
   {
     provider.filesFind
     ({
-      filePath : workDir,
+      filePath : testPath,
       resolvingSoftLink : 1,
       outputFormat : 'record',
       includingTransient : 1,
@@ -2550,7 +2550,7 @@ function filesFindLinked( test )
 
   var got = context.provider.filesFind
   ({
-    filePath : workDir,
+    filePath : testPath,
     resolvingSoftLink : 0,
     outputFormat : 'record',
     includingTransient : 1,
@@ -2576,14 +2576,14 @@ function filesFindLinked( test )
     normalb : [{ softLink : '/terminal' }],
   }
 
-  context.provider.filesDelete( workDir );
+  context.provider.filesDelete( testPath );
   context.provider.fileWrite( terminalPath, terminalPath );
   context.provider.softLink( normalaPath,terminalPath );
   context.provider.softLink( normalbPath,terminalPath );
 
   var got = context.provider.filesFind
   ({
-    filePath : workDir,
+    filePath : testPath,
     resolvingSoftLink : 0,
     outputFormat : 'record',
     includingTransient : 1,
@@ -2597,7 +2597,7 @@ function filesFindLinked( test )
 
   var got = context.provider.filesFind
   ({
-    filePath : workDir,
+    filePath : testPath,
     resolvingSoftLink : 1,
     outputFormat : 'record',
     includingTransient : 1,
@@ -2626,7 +2626,7 @@ function filesFindLinked( test )
 
   var terminalInDirPath = context.provider.path.join( dirPath, 'terminal' );
 
-  context.provider.filesDelete( workDir );
+  context.provider.filesDelete( testPath );
   context.provider.fileWrite( terminalInDirPath, terminalInDirPath );
   context.provider.softLink( toDirPath,dirPath );
 
@@ -2677,13 +2677,13 @@ function filesFindLinked( test )
 
   var terminalInDirPath = context.provider.path.join( dirPath, 'terminal' );
 
-  context.provider.filesDelete( workDir );
+  context.provider.filesDelete( testPath );
   context.provider.fileWrite( terminalInDirPath, terminalInDirPath );
   context.provider.softLink( toDirPath,dirPath );
 
   var got = context.provider.filesFind
   ({
-    filePath : workDir,
+    filePath : testPath,
     resolvingSoftLink : 0,
     outputFormat : 'record',
     includingTransient : 1,
@@ -2698,7 +2698,7 @@ function filesFindLinked( test )
 
   var got = context.provider.filesFind
   ({
-    filePath : workDir,
+    filePath : testPath,
     resolvingSoftLink : 1,
     outputFormat : 'record',
     includingTransient : 1,
@@ -2719,7 +2719,7 @@ function filesFindResolving( test )
 {
   let context = this;
   let path = context.provider.path;
-  var testDir = path.join( context.testSuitePath, test.name );
+  var testPath = path.join( context.testSuitePath, test.name );
 
   var softLinkIsSupported = context.softLinkIsSupported();
 
@@ -2784,10 +2784,10 @@ function filesFindResolving( test )
 
   //
 
-  makeCleanTree( testDir );
+  makeCleanTree( testPath );
   var o =
   {
-    filePath : testDir,
+    filePath : testPath,
     resolvingSoftLink : 0,
     resolvingTextLink : 0,
   }
@@ -2798,8 +2798,8 @@ function filesFindResolving( test )
   var expected =
   [
     {
-      absolute : testDir,
-      real : testDir,
+      absolute : testPath,
+      real : testPath,
       isDir : true
     },
     {
@@ -2814,10 +2814,10 @@ function filesFindResolving( test )
 
   //
 
-  makeCleanTree( testDir );
+  makeCleanTree( testPath );
   var o =
   {
-    filePath : testDir,
+    filePath : testPath,
     resolvingSoftLink : 1,
     resolvingTextLink : 0,
   }
@@ -2828,8 +2828,8 @@ function filesFindResolving( test )
   var expected =
   [
     {
-      absolute : testDir,
-      real : testDir,
+      absolute : testPath,
+      real : testPath,
       isDir : true
     },
     {
@@ -2844,10 +2844,10 @@ function filesFindResolving( test )
 
   //
 
-  makeCleanTree( testDir );
+  makeCleanTree( testPath );
   var o =
   {
-    filePath : testDir,
+    filePath : testPath,
     resolvingSoftLink : 1,
     resolvingTextLink : 1,
   }
@@ -2858,8 +2858,8 @@ function filesFindResolving( test )
   var expected =
   [
     {
-      absolute : testDir,
-      real : testDir,
+      absolute : testPath,
+      real : testPath,
       isDir : true
     },
     {
@@ -2874,10 +2874,10 @@ function filesFindResolving( test )
 
   //
 
-  makeCleanTree( testDir );
+  makeCleanTree( testPath );
   var o =
   {
-    filePath : testDir,
+    filePath : testPath,
     resolvingSoftLink : 1,
     resolvingTextLink : 1,
   }
@@ -2888,8 +2888,8 @@ function filesFindResolving( test )
   var expected =
   [
     {
-      absolute : testDir,
-      real : testDir,
+      absolute : testPath,
+      real : testPath,
       isDir : true
     },
     {
@@ -2905,13 +2905,13 @@ function filesFindResolving( test )
   //
 
   test.case = 'text link to a file, resolvingSoftLink : 0, resolvingTextLink : 0';
-  makeCleanTree( testDir );
+  makeCleanTree( testPath );
   var srcFilePath = filePaths[ 0 ];
-  var textLinkPath = path.join( testDir, 'textLink' );
+  var textLinkPath = path.join( testPath, 'textLink' );
   _.fileProvider.fieldPush( 'usingTextLink', 0 );
   var o =
   {
-    filePath : testDir,
+    filePath : testPath,
     resolvingSoftLink : 0,
     resolvingTextLink : 0,
   }
@@ -2923,8 +2923,8 @@ function filesFindResolving( test )
   var expected =
   [
     {
-      absolute : testDir,
-      real : testDir,
+      absolute : testPath,
+      real : testPath,
       isDir : true
     },
     {
@@ -2949,13 +2949,13 @@ function filesFindResolving( test )
   //
 
   test.case = 'text link to a file, resolvingSoftLink : 0, resolvingTextLink : 1, usingTextLink : 0';
-  makeCleanTree( testDir );
+  makeCleanTree( testPath );
   var srcFilePath = filePaths[ 0 ];
-  var textLinkPath = path.join( testDir, 'textLink' );
+  var textLinkPath = path.join( testPath, 'textLink' );
   _.fileProvider.fieldPush( 'usingTextLink', 0 );
   var o =
   {
-    filePath : testDir,
+    filePath : testPath,
     resolvingSoftLink : 0,
     resolvingTextLink : 1,
   }
@@ -2967,8 +2967,8 @@ function filesFindResolving( test )
   var expected =
   [
     {
-      absolute : testDir,
-      real : testDir,
+      absolute : testPath,
+      real : testPath,
       isDir : true
     },
     {
@@ -2992,13 +2992,13 @@ function filesFindResolving( test )
   //
 
   test.case = 'text link to a file, resolvingSoftLink : 0, resolvingTextLink : 1, usingTextLink : 1';
-  makeCleanTree( testDir );
+  makeCleanTree( testPath );
   var srcFilePath = filePaths[ 0 ];
-  var textLinkPath = path.join( testDir, 'textLink' );
+  var textLinkPath = path.join( testPath, 'textLink' );
   _.fileProvider.fieldPush( 'usingTextLink', 1 );
   var o =
   {
-    filePath : testDir,
+    filePath : testPath,
     resolvingSoftLink : 0,
     resolvingTextLink : 1,
   }
@@ -3010,8 +3010,8 @@ function filesFindResolving( test )
   var expected =
   [
     {
-      absolute : testDir,
-      real : testDir,
+      absolute : testPath,
+      real : testPath,
       isDir : true
     },
     {
@@ -3035,13 +3035,13 @@ function filesFindResolving( test )
   //
 
   test.case = 'text link to a file, resolvingSoftLink : 1, resolvingTextLink : 1, usingTextLink : 1';
-  makeCleanTree( testDir );
+  makeCleanTree( testPath );
   var srcFilePath = filePaths[ 0 ];
-  var textLinkPath = path.join( testDir, 'textLink' );
+  var textLinkPath = path.join( testPath, 'textLink' );
   _.fileProvider.fieldPush( 'usingTextLink', 1 );
   var o =
   {
-    filePath : testDir,
+    filePath : testPath,
     resolvingSoftLink : 1,
     resolvingTextLink : 1,
   }
@@ -3053,8 +3053,8 @@ function filesFindResolving( test )
   var expected =
   [
     {
-      absolute : testDir,
-      real : testDir,
+      absolute : testPath,
+      real : testPath,
       isDir : true
     },
     {
@@ -3078,13 +3078,13 @@ function filesFindResolving( test )
    //
 
   test.case = 'text link to a file, resolvingSoftLink : 1, resolvingTextLink : 1, usingTextLink : 1';
-  makeCleanTree( testDir );
+  makeCleanTree( testPath );
   var srcFilePath = filePaths[ 0 ];
-  var textLinkPath = path.join( testDir, 'textLink' );
+  var textLinkPath = path.join( testPath, 'textLink' );
   _.fileProvider.fieldPush( 'usingTextLink', 1 );
   var o =
   {
-    filePath : testDir,
+    filePath : testPath,
     resolvingSoftLink : 1,
     resolvingTextLink : 1,
   }
@@ -3096,8 +3096,8 @@ function filesFindResolving( test )
   var expected =
   [
     {
-      absolute : testDir,
-      real : testDir,
+      absolute : testPath,
+      real : testPath,
       isDir : true
     },
     {
@@ -3121,14 +3121,14 @@ function filesFindResolving( test )
   //
 
   test.case = 'text->text->file, resolvingSoftLink : 1, resolvingTextLink : 1, usingTextLink : 1';
-  makeCleanTree( testDir );
+  makeCleanTree( testPath );
   var srcFilePath = filePaths[ 0 ];
-  var textLinkPath = path.join( testDir, 'textLink' );
-  var textLink2Path = path.join( testDir, 'textLink2' );
+  var textLinkPath = path.join( testPath, 'textLink' );
+  var textLink2Path = path.join( testPath, 'textLink2' );
   _.fileProvider.fieldPush( 'usingTextLink', 1 );
   var o =
   {
-    filePath : testDir,
+    filePath : testPath,
     resolvingSoftLink : 1,
     resolvingTextLink : 1,
   }
@@ -3141,8 +3141,8 @@ function filesFindResolving( test )
   var expected =
   [
     {
-      absolute : testDir,
-      real : testDir,
+      absolute : testPath,
+      real : testPath,
       isDir : true
     },
     {
@@ -3176,16 +3176,16 @@ function filesFindResolving( test )
   /* soft link */
 
   test.case = 'soft link to a file, resolvingSoftLink : 0, resolvingTextLink : 0'
-  makeCleanTree( testDir );
+  makeCleanTree( testPath );
   var o =
   {
-    filePath : testDir,
+    filePath : testPath,
     resolvingSoftLink : 0,
     resolvingTextLink : 0,
   }
   var options = _.mapExtend( o, fixedOptions );
   _.fileProvider.fieldPush( 'usingTextLink', 0 );
-  var softLink = path.join( testDir, 'link' );
+  var softLink = path.join( testPath, 'link' );
   var srcPath = filePaths[ 0 ];
   _.fileProvider.softLink( softLink, srcPath );
   var files = _.fileProvider.filesFind( options );
@@ -3193,8 +3193,8 @@ function filesFindResolving( test )
   var expected =
   [
     {
-      absolute : testDir,
-      real : testDir,
+      absolute : testPath,
+      real : testPath,
       isDir : true
     },
     {
@@ -3217,16 +3217,16 @@ function filesFindResolving( test )
   //
 
   test.case = 'soft link to a file, resolvingSoftLink : 1, resolvingTextLink : 0'
-  makeCleanTree( testDir );
+  makeCleanTree( testPath );
   var o =
   {
-    filePath : testDir,
+    filePath : testPath,
     resolvingSoftLink : 1,
     resolvingTextLink : 0,
   }
   var options = _.mapExtend( o, fixedOptions );
   _.fileProvider.fieldPush( 'usingTextLink', 0 );
-  var softLink = path.join( testDir, 'link' );
+  var softLink = path.join( testPath, 'link' );
   var srcPath = filePaths[ 0 ];
   _.fileProvider.softLink( softLink, srcPath );
   var files = _.fileProvider.filesFind( options );
@@ -3234,8 +3234,8 @@ function filesFindResolving( test )
   var expected =
   [
     {
-      absolute : testDir,
-      real : testDir,
+      absolute : testPath,
+      real : testPath,
       isDir : true
     },
     {
@@ -3258,17 +3258,17 @@ function filesFindResolving( test )
   //
 
   test.case = 'soft link to a file, resolvingSoftLink : 1, resolvingTextLink : 1'
-  makeCleanTree( testDir );
+  makeCleanTree( testPath );
   var o =
   {
-    filePath : testDir,
+    filePath : testPath,
     resolvingSoftLink : 1,
     resolvingTextLink : 0,
   }
 
   var options = _.mapExtend( o, fixedOptions );
   _.fileProvider.fieldPush( 'usingTextLink', 1 );
-  var softLink = path.join( testDir, 'link' );
+  var softLink = path.join( testPath, 'link' );
   var srcPath = filePaths[ 0 ];
   _.fileProvider.softLink( softLink, srcPath );
   var files = _.fileProvider.filesFind( options );
@@ -3276,8 +3276,8 @@ function filesFindResolving( test )
   var expected =
   [
     {
-      absolute : testDir,
-      real : testDir,
+      absolute : testPath,
+      real : testPath,
       isDir : true
     },
     {
@@ -3301,14 +3301,14 @@ function filesFindResolving( test )
   //
 
   test.case = 'soft link to a dir, resolvingSoftLink : 1, resolvingTextLink : 0';
-  var srcDirPath = path.join( testDir, 'dir' );
-  var softLink = path.join( testDir, 'linkToDir' );
+  var srcDirPath = path.join( testPath, 'dir' );
+  var softLink = path.join( testPath, 'linkToDir' );
   _.fileProvider.fieldPush( 'usingTextLink', 0 );
-  _.fileProvider.filesDelete( testDir );
+  _.fileProvider.filesDelete( testPath );
   makeCleanTree( srcDirPath );
   var o =
   {
-    filePath : testDir,
+    filePath : testPath,
     resolvingSoftLink : 1,
     resolvingTextLink : 0,
     includingStem : 0
@@ -3321,8 +3321,8 @@ function filesFindResolving( test )
   var expected =
   [
     {
-      absolute : testDir,
-      real : testDir,
+      absolute : testPath,
+      real : testPath,
       isDir : true
     },
     {
@@ -3356,14 +3356,14 @@ function filesFindResolving( test )
   //
 
   test.case = 'soft link to a dir, resolvingSoftLink : 1, resolvingTextLink : 1';
-  var srcDirPath = path.join( testDir, 'dir' );
-  var softLink = path.join( testDir, 'linkToDir' );
+  var srcDirPath = path.join( testPath, 'dir' );
+  var softLink = path.join( testPath, 'linkToDir' );
   _.fileProvider.fieldPush( 'usingTextLink', 1 );
-  _.fileProvider.filesDelete( testDir );
+  _.fileProvider.filesDelete( testPath );
   makeCleanTree( srcDirPath );
   var o =
   {
-    filePath : testDir,
+    filePath : testPath,
     resolvingSoftLink : 1,
     resolvingTextLink : 1,
   }
@@ -3375,8 +3375,8 @@ function filesFindResolving( test )
   var expected =
   [
     {
-      absolute : testDir,
-      real : testDir,
+      absolute : testPath,
+      real : testPath,
       isDir : true
     },
     {
@@ -3412,18 +3412,18 @@ function filesFindResolving( test )
   //
 
   test.case = 'multiple soft links in chain, resolvingSoftLink : 1, resolvingTextLink : 0'
-  makeCleanTree( testDir );
+  makeCleanTree( testPath );
   var o =
   {
-    filePath : testDir,
+    filePath : testPath,
     resolvingSoftLink : 1,
     resolvingTextLink : 0,
   }
 
   var options = _.mapExtend( o, fixedOptions );
   _.fileProvider.fieldPush( 'usingTextLink', 0 );
-  var softLink = path.join( testDir, 'link' );
-  var softLink2 = path.join( testDir, 'link2' );
+  var softLink = path.join( testPath, 'link' );
+  var softLink2 = path.join( testPath, 'link2' );
   var srcPath = filePaths[ 0 ];
   _.fileProvider.softLink( softLink, srcPath );
   _.fileProvider.softLink( softLink2, softLink );
@@ -3432,8 +3432,8 @@ function filesFindResolving( test )
   var expected =
   [
     {
-      absolute : testDir,
-      real : testDir,
+      absolute : testPath,
+      real : testPath,
       isDir : true
     },
     {
@@ -3464,18 +3464,18 @@ function filesFindResolving( test )
   //
 
   test.case = 'multiple soft links in chain, resolvingSoftLink : 1, resolvingTextLink : 1'
-  makeCleanTree( testDir );
+  makeCleanTree( testPath );
   var o =
   {
-    filePath : testDir,
+    filePath : testPath,
     resolvingSoftLink : 1,
     resolvingTextLink : 1,
   }
 
   var options = _.mapExtend( o, fixedOptions );
   _.fileProvider.fieldPush( 'usingTextLink', 1 );
-  var softLink = path.join( testDir, 'link' );
-  var softLink2 = path.join( testDir, 'link2' );
+  var softLink = path.join( testPath, 'link' );
+  var softLink2 = path.join( testPath, 'link2' );
   var srcPath = filePaths[ 0 ];
   _.fileProvider.softLink( softLink, srcPath );
   _.fileProvider.softLink( softLink2, softLink );
@@ -3484,8 +3484,8 @@ function filesFindResolving( test )
   var expected =
   [
     {
-      absolute : testDir,
-      real : testDir,
+      absolute : testPath,
+      real : testPath,
       isDir : true
     },
     {
@@ -3516,18 +3516,18 @@ function filesFindResolving( test )
   //
 
   test.case = 'multiple soft links to single file, resolvingSoftLink : 1, resolvingTextLink : 0'
-  makeCleanTree( testDir );
+  makeCleanTree( testPath );
   var o =
   {
-    filePath : testDir,
+    filePath : testPath,
     resolvingSoftLink : 1,
     resolvingTextLink : 0,
   }
 
   var options = _.mapExtend( o, fixedOptions );
   _.fileProvider.fieldPush( 'usingTextLink', 0 );
-  var softLink = path.join( testDir, 'link' );
-  var softLink2 = path.join( testDir, 'link2' );
+  var softLink = path.join( testPath, 'link' );
+  var softLink2 = path.join( testPath, 'link2' );
   var srcPath = filePaths[ 0 ];
   _.fileProvider.softLink( softLink, srcPath );
   _.fileProvider.softLink( softLink2, srcPath );
@@ -3536,8 +3536,8 @@ function filesFindResolving( test )
   var expected =
   [
     {
-      absolute : testDir,
-      real : testDir,
+      absolute : testPath,
+      real : testPath,
       isDir : true
     },
     {
@@ -3568,18 +3568,18 @@ function filesFindResolving( test )
   //
 
   test.case = 'multiple soft links to single file, resolvingSoftLink : 1, resolvingTextLink : 1'
-  makeCleanTree( testDir );
+  makeCleanTree( testPath );
   var o =
   {
-    filePath : testDir,
+    filePath : testPath,
     resolvingSoftLink : 1,
     resolvingTextLink : 1,
   }
 
   var options = _.mapExtend( o, fixedOptions );
   _.fileProvider.fieldPush( 'usingTextLink', 1 );
-  var softLink = path.join( testDir, 'link' );
-  var softLink2 = path.join( testDir, 'link2' );
+  var softLink = path.join( testPath, 'link' );
+  var softLink2 = path.join( testPath, 'link2' );
   var srcPath = filePaths[ 0 ];
   _.fileProvider.softLink( softLink, srcPath );
   _.fileProvider.softLink( softLink2, srcPath );
@@ -3588,8 +3588,8 @@ function filesFindResolving( test )
   var expected =
   [
     {
-      absolute : testDir,
-      real : testDir,
+      absolute : testPath,
+      real : testPath,
       isDir : true
     },
     {
@@ -3620,14 +3620,14 @@ function filesFindResolving( test )
   //
 
   test.case = 'soft->text->file, resolvingSoftLink : 1, resolvingTextLink : 1, usingTextLink : 1';
-  makeCleanTree( testDir );
+  makeCleanTree( testPath );
   var srcFilePath = filePaths[ 0 ];
-  var textLinkPath = path.join( testDir, 'textLink' );
-  var softLinkPath = path.join( testDir, 'softLinkPath' );
+  var textLinkPath = path.join( testPath, 'textLink' );
+  var softLinkPath = path.join( testPath, 'softLinkPath' );
   _.fileProvider.fieldPush( 'usingTextLink', 1 );
   var o =
   {
-    filePath : testDir,
+    filePath : testPath,
     resolvingSoftLink : 1,
     resolvingTextLink : 1,
   }
@@ -3640,8 +3640,8 @@ function filesFindResolving( test )
   var expected =
   [
     {
-      absolute : testDir,
-      real : testDir,
+      absolute : testPath,
+      real : testPath,
       isDir : true
     },
     {
@@ -3672,15 +3672,15 @@ function filesFindResolving( test )
   //
 
   test.case = 'soft->text->file, resolvingSoftLink : 1, resolvingTextLink : 1, usingTextLink : 1';
-  _.fileProvider.filesDelete( testDir );
-  var srcDirPath = path.join( testDir, 'dir' );
+  _.fileProvider.filesDelete( testPath );
+  var srcDirPath = path.join( testPath, 'dir' );
   makeCleanTree( srcDirPath );
-  var textLinkPath = path.join( testDir, 'textLink' );
-  var softLinkPath = path.join( testDir, 'softLinkPath' );
+  var textLinkPath = path.join( testPath, 'textLink' );
+  var softLinkPath = path.join( testPath, 'softLinkPath' );
   _.fileProvider.fieldPush( 'usingTextLink', 1 );
   var o =
   {
-    filePath : testDir,
+    filePath : testPath,
     resolvingSoftLink : 1,
     resolvingTextLink : 1,
   }
@@ -3693,8 +3693,8 @@ function filesFindResolving( test )
   var expected =
   [
     {
-      absolute : testDir,
-      real : testDir,
+      absolute : testPath,
+      real : testPath,
       isDir : true
     },
     {
@@ -5424,13 +5424,13 @@ function filesGlob( test )
     'a.txt' : '',
   }
 
-  var testDir = path.join( context.testSuitePath, test.name );
+  var testPath = path.join( context.testSuitePath, test.name );
 
   _.fileProvider.safe = 0;
   _.FileProvider.Extract.readToProvider
   ({
     dstProvider : _.fileProvider,
-    dstPath : testDir,
+    dstPath : testPath,
     filesTree : filesTree,
     allowWrite : 1,
     allowDelete : 1,
@@ -5444,7 +5444,7 @@ function filesGlob( test )
   function completeOptions( glob )
   {
     var options = _.mapExtend( null, commonOptions );
-    options.filePath = path.join( testDir, glob );
+    options.filePath = path.join( testPath, glob );
     return options
   }
 
@@ -5581,9 +5581,9 @@ function filesGlob( test )
   var glob = '**/*.s';
   var options =
   {
-    filePath : path.join( testDir, 'a/c', glob ),
+    filePath : path.join( testPath, 'a/c', glob ),
     outputFormat : 'relative',
-    filter: { basePath : testDir }
+    filter: { basePath : testPath }
   }
   var got = _.fileProvider.filesGlob( options );
   var expected =
@@ -6469,10 +6469,12 @@ function filesReflectTrivial( t )
     },
     'dst' :
     {
+      a : 'onWriteDstUp',
+      a1 : 'onWriteDstUp',
     }
   }
 
-  t.identical( provider.filesTree, expectedTree );
+  t.identical( provider.filesTree, expectedTree ); debugger;
 
   //
 
@@ -6903,11 +6905,11 @@ function filesReflectMutuallyExcluding( t )
   {
     src :
     {
-      srcDirM : {}, srcDir : {}, bothDirM : {}, bothDir : {},
+      srcDirM : {}, srcPath : {}, bothDirM : {}, bothDir : {},
     },
     dst :
     {
-      dstDirM : {}, dstDir : {}, bothDirM : {}, bothDir : {},
+      dstDirM : {}, dstPath : {}, bothDirM : {}, bothDir : {},
     }
   }
 
@@ -6939,18 +6941,19 @@ function filesReflectMutuallyExcluding( t )
     },
     dst :
     {
-      dstDir : {}, bothDir : {}, srcDir : {},
+      dstPath : {}, bothDir : {}, srcPath : {},
     },
   }
   t.identical( provider.filesTree.src, expectedTree.src );
   t.identical( provider.filesTree.dst, expectedTree.dst );
 
-  var expectedDstAbsolute = [ '/dst', '/dst/bothDir', '/dst/srcDir', '/dst/bothDirM', '/dst/dstDir', '/dst/dstDirM' ];
-  var expectedSrcAbsolute = [ '/src', '/src/bothDir', '/src/srcDir', '/src/bothDirM', '/src/dstDir', '/src/dstDirM' ];
-  var expectedEffAbsolute = [ '/src', '/src/bothDir', '/src/srcDir', '/dst/bothDirM', '/dst/dstDir', '/dst/dstDirM' ];
-  var expectedAction = [ 'dirMake', 'dirMake', 'dirMake', 'fileDelete', 'ignore', 'fileDelete' ];
-  var expectedAllow = [ true, true, true, true, false, true ];
-  var expectedPreserve = [ true, true, false, false, true, false ];
+  var expectedDstAbsolute = [ '/dst', '/dst/bothDir', '/dst/srcPath', '/dst/bothDirM', '/dst/dstDirM', '/dst/dstPath' ];
+  var expectedSrcAbsolute = [ '/src', '/src/bothDir', '/src/srcPath', '/src/bothDirM', '/src/dstDirM', '/src/dstPath' ];
+  var expectedEffAbsolute = [ '/src', '/src/bothDir', '/src/srcPath', '/dst/bothDirM', '/dst/dstDirM', '/dst/dstPath' ];
+  var expectedAction = [ 'dirMake', 'dirMake', 'dirMake', 'fileDelete', 'fileDelete', 'ignore' ];
+  var expectedReason = [ 'srcLooking', 'srcLooking', 'srcLooking', 'dstDeleting', 'dstDeleting', 'dstDeleting' ];
+  var expectedAllow = [ true, true, true, true, true, false ];
+  var expectedPreserve = [ true, true, false, false, false, true ];
   var expectedSrcAction = [ 'fileDelete', 'fileDelete', 'fileDelete', null, null, null ];
   var expectedSrcAllow = [ false, true, true, true, true, true ];
 
@@ -6958,6 +6961,7 @@ function filesReflectMutuallyExcluding( t )
   var srcAbsolute = context.select( records, '*.src.absolute' );
   var effAbsolute = context.select( records, '*.effective.absolute' );
   var action = context.select( records, '*.action' );
+  var reason = context.select( records, '*.reason' );
   var allow = context.select( records, '*.allow' );
   var preserve = context.select( records, '*.preserve' );
   var srcAction = context.select( records, '*.srcAction' );
@@ -6969,6 +6973,7 @@ function filesReflectMutuallyExcluding( t )
     t.identical( srcAbsolute, expectedSrcAbsolute );
     t.identical( effAbsolute, expectedEffAbsolute );
     t.identical( action, expectedAction );
+    t.identical( reason, expectedReason );
     t.identical( allow, expectedAllow );
     t.identical( preserve, expectedPreserve );
     t.identical( srcAction, expectedSrcAction );
@@ -8244,7 +8249,20 @@ function _filesReflect( t, o )
     filesTree :
     {
       src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-      dst : { a2 : '2', dir : { a2 : '2' }, dirSame : {}, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dir1 : {}, dir4 : {}, dstFile : {} },
+      dst :
+      {
+        a2 : '2',
+        b : '1',
+        c : '2',
+        dir : { a2 : '2', b : '1', c : '2' },
+        dirSame : { d : '1' },
+        dir2 : { a2 : '2', b : '1', c : '2' },
+        dir3 : {},
+        dir5 : {},
+        dir1 : {},
+        dir4 : {},
+        dstFile : {},
+      },
     },
   });
 
@@ -9929,15 +9947,15 @@ function filesReflectWithPrefix( t )
 
   var tree =
   {
-    src : { srcDir : { a : 'dst/a', b : 'dst/b' }, c : 'src/c', d : 'src/d',  },
-    dst : { dstDir : { a : 'dst/a', b : 'dst/b' } },
+    src : { srcPath : { a : 'dst/a', b : 'dst/b' }, c : 'src/c', d : 'src/d',  },
+    dst : { dstPath : { a : 'dst/a', b : 'dst/b' } },
   }
 
   var o =
   {
     reflectMap :
     {
-      '/src/srcDir' : '.',
+      '/src/srcPath' : '.',
     },
     srcFilter :
     {
@@ -9956,16 +9974,16 @@ function filesReflectWithPrefix( t )
 
   var expectedTree =
   {
-    src : { srcDir : { a : 'dst/a', b : 'dst/b' }, c : 'src/c', d : 'src/d',  },
-    dst : { dstDir : { a : 'dst/a', b : 'dst/b' }, dstDir2 : { a : 'dst/a', b : 'dst/b' } },
+    src : { srcPath : { a : 'dst/a', b : 'dst/b' }, c : 'src/c', d : 'src/d',  },
+    dst : { dstPath : { a : 'dst/a', b : 'dst/b' }, dstDir2 : { a : 'dst/a', b : 'dst/b' } },
   }
   t.identical( provider.filesTree, expectedTree );
 
   debugger;
 
   var expectedDstAbsolute = [ '/dst/dstDir2', '/dst/dstDir2/a', '/dst/dstDir2/b' ];
-  var expectedSrcAbsolute = [ '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b' ];
-  var expectedEffAbsolute = [ '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b' ];
+  var expectedSrcAbsolute = [ '/src/srcPath', '/src/srcPath/a', '/src/srcPath/b' ];
+  var expectedEffAbsolute = [ '/src/srcPath', '/src/srcPath/a', '/src/srcPath/b' ];
 
   var dstAbsolute = c.select( records, '*.dst.absolute' );
   var srcAbsolute = c.select( records, '*.src.absolute' );
@@ -10809,220 +10827,252 @@ function filesReflectDstDeletingDirs( test )
 function filesReflectLinked( test )
 {
   let context = this;
-  let workDir = test.context.pathFor( test.name );
+  let testPath = test.context.pathFor( test.name );
   let provider = context.provider;
   let path = context.provider.path;
-  var srcDir = path.join( workDir, 'src' );
-  var dstDir = path.join( workDir, 'dst' );
+  var srcPath = path.join( testPath, 'src' );
+  var dstPath = path.join( testPath, 'dst' );
+  var dstLinkPath = path.join( dstPath, 'link' );
+  var srcLinkPath = path.join( srcPath, 'link' );
 
   /* - */
 
   test.case = 'first';
 
-  logger.log( 'workDir', workDir );
+  logger.log( 'testPath', testPath );
 
-  provider.filesDelete( workDir );
+  provider.filesDelete( testPath );
 
-  provider.dirMake( srcDir );
+  provider.dirMake( srcPath );
 
-  provider.fileWrite( path.join( srcDir, 'file' ), 'file' );
+  provider.fileWrite( path.join( srcPath, 'file' ), 'file' );
 
   provider.softLink
   ({
-    srcPath : path.join( srcDir, 'fileNotExists' ),
-    dstPath : path.join( srcDir, 'link' ),
+    srcPath : path.join( srcPath, 'fileNotExists' ),
+    dstPath : srcLinkPath,
     allowingMissed : 1,
   })
 
   provider.filesReflect
   ({
-    reflectMap : { [ srcDir ] : dstDir },
+    reflectMap : { [ srcPath ] : dstPath },
     allowingMissed : 1,
   });
 
-  test.is( provider.fileExists( path.join( dstDir, 'file' ) ) )
-  test.is( !provider.fileExists( path.join( dstDir, 'link' ) ) )
+  test.is( provider.fileExists( path.join( dstPath, 'file' ) ) )
+  test.is( !provider.fileExists( dstLinkPath ) )
 
   /**/
 
-  provider.filesDelete( workDir );
+  provider.filesDelete( testPath );
 
-  provider.dirMake( srcDir );
-  provider.dirMake( dstDir );
+  provider.dirMake( srcPath );
+  provider.dirMake( dstPath );
 
-  provider.fileWrite( path.join( srcDir, 'link' ), 'file' );
+  provider.fileWrite( srcLinkPath, 'file' );
 
   provider.softLink
   ({
-    srcPath : path.join( dstDir, 'fileNotExists' ),
-    dstPath : path.join( dstDir, 'link' ),
+    srcPath : path.join( dstPath, 'fileNotExists' ),
+    dstPath : dstLinkPath,
     allowingMissed : 1
   });
 
   provider.filesReflect
   ({
-    reflectMap : { [ srcDir ] : dstDir },
+    reflectMap : { [ srcPath ] : dstPath },
     allowingMissed : 1,
   });
 
   /*
-    !!! qqq : dstDir/link should be link and dstDir/fileNotExists should exists if resolvingDstSoftLink : 1
+    !!! qqq : dstPath/link should be link and dstPath/fileNotExists should exists if resolvingDstSoftLink : 1
     but resolvingDstSoftLink is 0 by default
     so resolvingDstSoftLink option is NOT COVERED by tests at all!
 
     seems File.copyFileSync works if resolvingDstSoftLink is always 1
   */
 
-  test.is( !provider.isSoftLink( path.join( dstDir, 'link' ) ) );
-  test.identical( provider.fileRead( path.join( dstDir, 'link' ) ), 'file' );
+  test.is( !provider.isSoftLink( dstLinkPath ) );
+  test.identical( provider.fileRead( dstLinkPath ), 'file' );
 
   /* */
 
-  test.case = 'src - link to missing, dst - link to missing'
-  provider.filesDelete( workDir );
+  test.case = 'src - link to missing, dst - link to missing';
+  provider.filesDelete( testPath );
   provider.softLink
   ({
-    srcPath : path.join( srcDir, 'fileNotExists' ),
-    dstPath : path.join( srcDir, 'link' ),
+    srcPath : path.join( srcPath, 'fileNotExists' ),
+    dstPath : srcLinkPath,
     allowingMissed : 1,
-    makingDirectory : 1
+    makingDirectory : 1,
   })
   provider.softLink
   ({
-    srcPath : path.join( dstDir, 'fileNotExists' ),
-    dstPath : path.join( dstDir, 'link' ),
+    srcPath : path.join( dstPath, 'fileNotExists' ),
+    dstPath : dstLinkPath,
     allowingMissed : 1,
-    makingDirectory : 1
+    makingDirectory : 1,
   })
+
+  test.is( provider.isSoftLink( dstLinkPath ) );
 
   provider.filesReflect
   ({
-    reflectMap : { [ srcDir ] : dstDir },
-    allowingMissed : 1,
-  })
-
-  test.will = 'dstDir/link should not be rewritten by srcDir/link'
-  test.is( provider.isSoftLink( path.join( dstDir, 'link' ) ) );
-  var dstLink1 = provider.pathResolveSoftLink({ filePath : path.join( dstDir, 'link' ) });
-  test.identical( dstLink1, path.join( dstDir, 'fileNotExists' ) );
-
-  /* */
-
-  test.case = 'src link is broken, src resolving is on'
-  provider.filesDelete( workDir );
-  provider.softLink
-  ({
-    srcPath : path.join( srcDir, 'fileNotExists' ),
-    dstPath : path.join( srcDir, 'link' ),
-    allowingMissed : 1,
-    makingDirectory : 1
-  })
-  provider.fileWrite( path.join( dstDir, 'file' ), 'file' );
-  provider.softLink
-  ({
-    srcPath : path.join( dstDir, 'file' ),
-    dstPath : path.join( dstDir, 'link' ),
-    makingDirectory : 1
-  })
-
-  var records = provider.filesReflect
-  ({
-    reflectMap : { [ srcDir ] : dstDir },
+    reflectMap : { [ srcPath ] : dstPath },
     allowingMissed : 1,
     resolvingSrcSoftLink : 1,
-  });
+  })
 
-  test.will = 'should delete dst link file';
-  test.is( !provider.fileExists( path.join( dstDir, 'link' ) ) );
-  // test.is( provider.isSoftLink( path.join( dstDir, 'link' ) ) );
-  // var dstLink1 = provider.pathResolveSoftLink({ filePath : path.join( dstDir, 'link' ) });
-  // test.identical( dstLink1, path.join( dstDir, 'file' ) );
+  test.will = 'dstPath/link should not be rewritten by srcPath/link';
+  test.is( !provider.fileExists( dstLinkPath ) );
+  // var dstLink1 = provider.pathResolveSoftLink( dstLinkPath );
+  // test.identical( dstLink1, path.join( dstPath, 'fileNotExists' ) );
 
   /* */
 
-  test.case = 'should replace dst link by broken link'
-  provider.filesDelete( workDir );
+  test.case = 'src - link to missing, dst - link to missing';
+  provider.filesDelete( testPath );
   provider.softLink
   ({
-    srcPath : path.join( srcDir, 'fileNotExists' ),
-    dstPath : path.join( srcDir, 'link' ),
+    srcPath : path.join( srcPath, 'fileNotExists' ),
+    dstPath : srcLinkPath,
     allowingMissed : 1,
-    makingDirectory : 1
+    makingDirectory : 1,
   })
-  provider.fileWrite( path.join( dstDir, 'file' ), 'file' );
   provider.softLink
   ({
-    srcPath : path.join( dstDir, 'file' ),
-    dstPath : path.join( dstDir, 'link' ),
-    makingDirectory : 1
+    srcPath : path.join( dstPath, 'fileNotExists' ),
+    dstPath : dstLinkPath,
+    allowingMissed : 1,
+    makingDirectory : 1,
   })
-
-  var records = provider.filesReflect
+  provider.filesReflect
   ({
-    reflectMap : { [ srcDir ] : dstDir },
+    reflectMap : { [ srcPath ] : dstPath },
     allowingMissed : 1,
     resolvingSrcSoftLink : 0,
   })
 
-  test.will = 'dstDir/link should not be rewritten by srcDir/link';
-  test.is( provider.fileExists( path.join( dstDir, 'link' ) ) );
-  test.is( provider.isSoftLink( path.join( dstDir, 'link' ) ) );
-  var dstLink1 = provider.pathResolveSoftLink({ filePath : path.join( dstDir, 'link' ) });
-  test.identical( dstLink1, path.join( srcDir, 'fileNotExists' ) );
+  test.will = 'dstPath/link should not be rewritten by srcPath/link';
+  test.is( provider.isSoftLink( dstLinkPath ) );
+  var dstLink1 = provider.pathResolveSoftLink( dstLinkPath );
+  test.identical( dstLink1, path.join( srcPath, 'fileNotExists' ) );
+
+  /* */
+
+  test.case = 'src link is broken, src resolving is on'
+  provider.filesDelete( testPath );
+  provider.softLink
+  ({
+    srcPath : path.join( srcPath, 'fileNotExists' ),
+    dstPath : srcLinkPath,
+    allowingMissed : 1,
+    makingDirectory : 1
+  })
+  provider.fileWrite( path.join( dstPath, 'file' ), 'file' );
+  provider.softLink
+  ({
+    srcPath : path.join( dstPath, 'file' ),
+    dstPath : dstLinkPath,
+    makingDirectory : 1
+  })
+
+  var records = provider.filesReflect
+  ({
+    reflectMap : { [ srcPath ] : dstPath },
+    allowingMissed : 1,
+    resolvingSrcSoftLink : 1,
+  });
+
+  test.will = 'delete dst link file';
+  test.is( !provider.fileExists( dstLinkPath ) );
+
+  /* */
+
+  test.case = 'replace dst link by broken link'
+  provider.filesDelete( testPath );
+  provider.softLink
+  ({
+    srcPath : path.join( srcPath, 'fileNotExists' ),
+    dstPath : srcLinkPath,
+    allowingMissed : 1,
+    makingDirectory : 1
+  })
+  provider.fileWrite( path.join( dstPath, 'file' ), 'file' );
+  provider.softLink
+  ({
+    srcPath : path.join( dstPath, 'file' ),
+    dstPath : dstLinkPath,
+    makingDirectory : 1
+  })
+
+  var records = provider.filesReflect
+  ({
+    reflectMap : { [ srcPath ] : dstPath },
+    allowingMissed : 1,
+    resolvingSrcSoftLink : 0,
+  })
+
+  test.will = 'dstPath/link should not be rewritten by srcPath/link';
+  test.is( provider.fileExists( dstLinkPath ) );
+  test.is( provider.isSoftLink( dstLinkPath ) );
+  var dstLink1 = provider.pathResolveSoftLink({ filePath : dstLinkPath });
+  test.identical( dstLink1, path.join( srcPath, 'fileNotExists' ) );
 
   /* */
 
   test.case = 'src - link to terminal, dst - link to missing'
-  provider.filesDelete( workDir );
-  provider.fileWrite( path.join( srcDir, 'file' ), 'file' );
+  provider.filesDelete( testPath );
+  provider.fileWrite( path.join( srcPath, 'file' ), 'file' );
   provider.softLink
   ({
-    srcPath : path.join( srcDir, 'file' ),
-    dstPath : path.join( srcDir, 'link' ),
+    srcPath : path.join( srcPath, 'file' ),
+    dstPath : srcLinkPath,
     makingDirectory : 1
   })
   provider.softLink
   ({
-    srcPath : path.join( dstDir, 'fileNotExists' ),
-    dstPath : path.join( dstDir, 'link' ),
+    srcPath : path.join( dstPath, 'fileNotExists' ),
+    dstPath : dstLinkPath,
     allowingMissed : 1,
     makingDirectory : 1
   })
 
   provider.filesReflect
   ({
-    reflectMap : { [ srcDir ] : dstDir },
+    reflectMap : { [ srcPath ] : dstPath },
     allowingMissed : 1,
   })
 
-  test.will = 'dstDir/link should be rewritten by srcDir/link'
-  test.is( !provider.isSoftLink( path.join( dstDir, 'link' ) ) );
-  test.is( provider.isTerminal( path.join( dstDir, 'link' ) ) );
-  var read = provider.fileRead({ filePath : path.join( dstDir, 'link' ) });
+  test.will = 'dstPath/link should be rewritten by srcPath/link'
+  test.is( !provider.isSoftLink( dstLinkPath ) );
+  test.is( provider.isTerminal( dstLinkPath ) );
+  var read = provider.fileRead({ filePath : dstLinkPath });
   test.identical( read, 'file' );
 
   /* */
 
   test.case = 'src - no files, dst - link to missing'
-  provider.filesDelete( workDir );
+  provider.filesDelete( testPath );
   provider.softLink
   ({
-    srcPath : path.join( dstDir, 'fileNotExists' ),
-    dstPath : path.join( dstDir, 'link' ),
+    srcPath : path.join( dstPath, 'fileNotExists' ),
+    dstPath : dstLinkPath,
     allowingMissed : 1,
     makingDirectory : 1
   })
 
   provider.filesReflect
   ({
-    reflectMap : { [ srcDir ] : dstDir },
+    reflectMap : { [ srcPath ] : dstPath },
     allowingMissed : 1,
   })
 
-  test.will = 'dstDir/link should not be rewritten by srcDir/link'
-  test.is( provider.isSoftLink( path.join( dstDir, 'link' ) ) );
-  var dstLink4 = provider.pathResolveSoftLink({ filePath : path.join( dstDir, 'link' ) });
-  test.identical( dstLink4, path.join( dstDir, 'fileNotExists' ) );
+  test.will = 'dstPath/link should not be rewritten by srcPath/link'
+  test.is( provider.isSoftLink( dstLinkPath ) );
+  var dstLink4 = provider.pathResolveSoftLink({ filePath : dstLinkPath });
+  test.identical( dstLink4, path.join( dstPath, 'fileNotExists' ) );
 
 }
 
@@ -11036,9 +11086,9 @@ function filesDelete( test )
   let hub = context.hub;
 
   var softLinkIsSupported = context.softLinkIsSupported();
-  var testDir = path.join( context.testSuitePath, test.name );
-  var filePath = path.join( testDir, 'file' );
-  var dirPath = path.join( testDir, 'dir' );
+  var testPath = path.join( context.testSuitePath, test.name );
+  var filePath = path.join( testPath, 'file' );
+  var dirPath = path.join( testPath, 'dir' );
 
   /* */
 
@@ -11059,8 +11109,8 @@ function filesDelete( test )
   /* */
 
   test.case = 'delete hard link';
-  provider.filesDelete( testDir );
-  var dst = path.join( testDir, 'link' );
+  provider.filesDelete( testPath );
+  var dst = path.join( testPath, 'link' );
   provider.fileWrite( filePath, 'a');
   provider.hardLink( dst, filePath );
   provider.filesDelete( dst );
@@ -11099,11 +11149,11 @@ function filesDelete( test )
 
   test.identical( provider.protocol, 'current' );
   extract.providerRegisterTo( hub );
-  provider.filesDelete( testDir );
-  hub.filesReflect({ reflectMap : { 'src:///' : 'current://' + testDir } });
-  test.identical( provider.dirRead( testDir ), [ 'src' ] );
-  provider.filesDelete( testDir );
-  var stat = provider.statResolvedRead( testDir );
+  provider.filesDelete( testPath );
+  hub.filesReflect({ reflectMap : { 'src:///' : 'current://' + testPath } });
+  test.identical( provider.dirRead( testPath ), [ 'src' ] );
+  provider.filesDelete( testPath );
+  var stat = provider.statResolvedRead( testPath );
   test.identical( stat, null );
   extract.finit();
   test.identical( _.mapKeys( hub.providersWithProtocolMap ), [ 'current' ] );
@@ -11135,20 +11185,20 @@ function filesDelete( test )
 
   test.identical( provider.protocol, 'current' );
   extract.providerRegisterTo( hub );
-  provider.filesDelete( testDir );
-  hub.filesReflect({ reflectMap : { 'src:///' : 'current://' + testDir } });
+  provider.filesDelete( testPath );
+  hub.filesReflect({ reflectMap : { 'src:///' : 'current://' + testPath } });
 
   var deleted = provider.filesDelete
   ({
-    filePath : path.join( testDir, 'd1/d2a/d3/d4' ),
+    filePath : path.join( testPath, 'd1/d2a/d3/d4' ),
     deletingEmptyDirs : 1,
   });
 
   var expected = [ '../..', '..', '.', './t' ];
   test.identical( _.select( deleted, '*/relative' ), expected );
-  var stat = provider.statResolvedRead( path.join( testDir, 'd1/d2a' ) );
+  var stat = provider.statResolvedRead( path.join( testPath, 'd1/d2a' ) );
   test.identical( stat, null );
-  var stat = provider.statResolvedRead( path.join( testDir, 'd1/d2b' ) );
+  var stat = provider.statResolvedRead( path.join( testPath, 'd1/d2b' ) );
   test.is( !!stat );
 
   extract.finit();
@@ -11163,7 +11213,7 @@ function filesDelete( test )
 
   test.case = 'delete soft link, resolvingSoftLink 1';
   provider.fieldPush( 'resolvingSoftLink', 1 );
-  var dst = path.join( testDir, 'link' );
+  var dst = path.join( testPath, 'link' );
   provider.fileWrite( filePath, ' ');
   provider.softLink( dst, filePath );
   provider.filesDelete( dst )
@@ -11176,9 +11226,9 @@ function filesDelete( test )
   /* */
 
   test.case = 'delete soft link, resolvingSoftLink 0';
-  provider.filesDelete( testDir );
+  provider.filesDelete( testPath );
   provider.fieldPush( 'resolvingSoftLink', 0 );
-  var dst = path.join( testDir, 'link' );
+  var dst = path.join( testPath, 'link' );
   provider.fileWrite( filePath, ' ');
   provider.softLink( dst, filePath );
   provider.filesDelete( dst )
@@ -11386,8 +11436,8 @@ function filesDeleteEmptyDirs( test )
 
   test.case = 'resolvingSoftLink : 1'
   var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
-  provider.softLink( '/dstDir', '/dir' )
-  provider.filesDeleteEmptyDirs({ filePath : '/dstDir', resolvingSoftLink : 1  });
+  provider.softLink( '/dstPath', '/dir' )
+  provider.filesDeleteEmptyDirs({ filePath : '/dstPath', resolvingSoftLink : 1  });
   var expected =
   {
     file : 'file',
@@ -11402,14 +11452,14 @@ function filesDeleteEmptyDirs( test )
         empty3 : {},
       }
     },
-    dstDir : [{ softLink : '/dir'}]
+    dstPath : [{ softLink : '/dir'}]
   }
   test.identical( provider.filesTree, expected );
 
   test.case = 'resolvingSoftLink : 0'
   var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
-  provider.softLink( '/dstDir', '/dir' )
-  provider.filesDeleteEmptyDirs({ filePath : '/dstDir', resolvingSoftLink : 0  });
+  provider.softLink( '/dstPath', '/dir' )
+  provider.filesDeleteEmptyDirs({ filePath : '/dstPath', resolvingSoftLink : 0  });
   var expected =
   {
     file : 'file',
@@ -11424,7 +11474,7 @@ function filesDeleteEmptyDirs( test )
         empty3 : {},
       }
     },
-    dstDir : [{ softLink : '/dir'}]
+    dstPath : [{ softLink : '/dir'}]
   }
   test.identical( provider.filesTree, expected );
 
@@ -11449,14 +11499,14 @@ function filesDeleteAndAsyncWrite( test )
 
   test.case = 'try to delete dir before async write will be completed';
 
-  var testDir = path.join( context.testSuitePath, test.name );
+  var testPath = path.join( context.testSuitePath, test.name );
 
 
   var cons = [];
 
   for( var i = 0; i < 10; i++ )
   {
-    var filePath = path.join( testDir, 'file' + i );
+    var filePath = path.join( testPath, 'file' + i );
     var con = _.fileProvider.fileWrite({ filePath : filePath, data : filePath, sync : 0 });
     cons.push( con );
   }
@@ -11465,7 +11515,7 @@ function filesDeleteAndAsyncWrite( test )
   {
     test.shouldThrowError( () =>
     {
-      _.fileProvider.filesDelete( testDir );
+      _.fileProvider.filesDelete( testPath );
     });
   });
 
@@ -11475,10 +11525,10 @@ function filesDeleteAndAsyncWrite( test )
   {
     test.mustNotThrowError( () =>
     {
-      _.fileProvider.filesDelete( testDir );
+      _.fileProvider.filesDelete( testPath );
     });
 
-    var files = _.fileProvider.dirRead( testDir );
+    var files = _.fileProvider.dirRead( testPath );
     test.identical( files, null );
   })
   return mainCon;
@@ -13813,9 +13863,9 @@ function experiment( test )
   let context = this;
   let path = context.provider.path;
 
-  var testDir = path.join( context.testSuitePath, test.name );
-  var src = path.join( testDir, 'src' );
-  var dst = path.join( testDir, 'dst' );
+  var testPath = path.join( context.testSuitePath, test.name );
+  var src = path.join( testPath, 'src' );
+  var dst = path.join( testPath, 'dst' );
   _.fileProvider.fileWrite( src, 'data' );
   _.fileProvider.softLink( dst, src );
   _.fileProvider.resolvingSoftLink = 1;
@@ -13875,10 +13925,10 @@ experiment.experimental = 1;
 // function filesFindExperiment( test )
 // {
 //
-//   var testDir = path.join( context.testSuitePath, test.name );
-//   var filePath = path.join( testDir, 'package.json' );
+//   var testPath = path.join( context.testSuitePath, test.name );
+//   var filePath = path.join( testPath, 'package.json' );
 //
-//   _.fileProvider.filesDelete( testDir );
+//   _.fileProvider.filesDelete( testPath );
 //
 //   _.fileProvider.fileWrite( filePath, filePath );
 //
@@ -13889,7 +13939,7 @@ experiment.experimental = 1;
 //
 //   var filter =  { maskTerminal : maskTerminal }
 //
-//   var got = _.fileProvider.filesFind({ filePath : testDir, filter : filter });
+//   var got = _.fileProvider.filesFind({ filePath : testPath, filter : filter });
 //
 //   test.identical( got.length, 1 );
 //
@@ -13902,7 +13952,7 @@ experiment.experimental = 1;
 //
 //   var filter =  { maskTerminal : maskTerminal }
 //
-//   var got = _.fileProvider.filesFind({ filePath : testDir, filter : filter });
+//   var got = _.fileProvider.filesFind({ filePath : testPath, filter : filter });
 //
 //   test.identical( got.length, 1 );
 //

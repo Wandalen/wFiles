@@ -300,7 +300,7 @@ function record( o )
 
   if( o instanceof _.FileRecord )
   {
-    _.assert( o.factory === factory );
+    _.assert( o.factory === factory || !!o.factory );
     return o;
   }
 

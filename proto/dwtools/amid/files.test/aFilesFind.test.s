@@ -947,6 +947,20 @@ function filesFindMaskTerminal( test )
 
 function filesFindCriticalCases( test )
 {
+  let self = this;
+  let provider = self.provider;
+  let hub = self.hub;
+
+  /* */
+
+  test.case = 'filePath : filter';
+
+  var extract = _.FileProvider.Extract
+  ({
+    filesTree : { dir1 : { a : 1, b : 2 }, dir2 : { c : 3 }, dir3 : { d : 4 }, e : 5 },
+  });
+
+  /* */
 
   test.case = 'extract : empty file path array';
 

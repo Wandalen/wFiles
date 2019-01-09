@@ -67,10 +67,10 @@ function init( o )
     },
   };
 
-  let proxy = new Proxy( self, accessors );
+  let proxyImage = new Proxy( self, accessors );
 
-  self.proxy = proxy;
-  self.imageFilter = self;
+  self.proxyImage = proxyImage;
+  self.image = self;
   if( !self.originalFileProvider )
   self.originalFileProvider = _.fileProvider;
 
@@ -81,7 +81,7 @@ function init( o )
   _.assert( self.originalFileProvider instanceof _.FileProvider.Partial );
   _.assert( self.realFileProvider instanceof _.FileProvider.Partial );
 
-  return proxy;
+  return proxyImage;
 }
 
 //
@@ -137,7 +137,7 @@ function _routineFunctor( routine, routineName )
   op.routineName = routineName;
   op.reads = [];
   op.writes = [];
-  op.image = self.proxy;
+  op.image = self.proxyImage;
   op.originalCall = function originalCall()
   {
     let op2 = this;
@@ -176,7 +176,7 @@ function _routineFunctor( routine, routineName )
 
       if( this.onCallBegin )
       {
-        let r = this.imageFilter.onCallBegin( op2 );
+        let r = this.image.onCallBegin( op2 );
         _.assert( r === undefined );
       }
 
@@ -184,12 +184,12 @@ function _routineFunctor( routine, routineName )
       op2.args = _.unrollFrom([ op2.args ]);
 
       _.assert( !_.argumentsArrayIs( op2.args ), 'Does not expect arguments array' );
-      let r = this.imageFilter.onCall( op2 );
+      let r = this.image.onCall( op2 );
       _.assert( r === undefined );
 
       if( this.onCallEnd )
       {
-        let r = this.imageFilter.onCallEnd( op2 );
+        let r = this.image.onCallEnd( op2 );
         _.assert( r === undefined );
       }
 
@@ -231,15 +231,14 @@ let Associates =
 {
   originalFileProvider : null,
   realFileProvider : null,
-  // original : null,
-  // fileProvider : null,
+  archive : null,
 }
 
 let Restricts =
 {
   routines : _.define.own({}),
-  proxy : null,
-  imageFilter : null,
+  proxyImage : null,
+  image : null,
 }
 
 let Events =
@@ -250,6 +249,8 @@ let Frobids =
 {
   original : 'original',
   fileProvider : 'fileProvider',
+  proxy : 'proxy',
+  imageFilter : 'imageFilter',
 }
 
 // --

@@ -3175,9 +3175,9 @@ function filesAreSame_body( o )
 {
   let self = this;
 
-  debugger;
+  // debugger;
   let f = self.recordFactory({ resolvingSoftLink : 0, resolvingTextLink : 0 });
-  debugger;
+  // debugger;
 
   o.ins1 = f.record( o.ins1 );
   o.ins2 = f.record( o.ins2 );

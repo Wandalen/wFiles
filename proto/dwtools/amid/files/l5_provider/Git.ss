@@ -368,7 +368,7 @@ function isUpToDate( o )
     outputCollecting : 1,
   });
 
-  _.assert( dstFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
+  _.assert( dstFileProvider instanceof _.FileProvider.HardDrive || dstFileProvider.originalFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
 
   if( !dstFileProvider.fileExists( o.localPath ) )
   return false;
@@ -479,7 +479,7 @@ function isDownloaded( o )
   let paths = self.pathParse( o.remotePath );
   let result = _.Consequence().take( null );
 
-  _.assert( dstFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
+  _.assert( dstFileProvider instanceof _.FileProvider.HardDrive || dstFileProvider.originalFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
 
   if( !dstFileProvider.fileExists( o.localPath ) )
   return false;

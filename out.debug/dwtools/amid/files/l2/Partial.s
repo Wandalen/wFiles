@@ -6909,13 +6909,13 @@ function filesAreHardLinked_body( o )
   }
 
   /*
-    should return "not sure" ( null ), not true if result is not precise
+    should return _.maybe, not true if result is not precise
   */
 
   if( self.UsingBigIntForStat )
   return true;
 
-  return null;
+  return _.maybe;
 }
 
 _.routineExtend( filesAreHardLinked_body, filesAreHardLinkedAct );

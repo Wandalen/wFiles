@@ -947,9 +947,10 @@ function filesFindMaskTerminal( test )
 
 function filesFindCriticalCases( test )
 {
-  let context = this;
+  let context = this
   let testPath = test.context.pathFor( test.name );
   let provider = context.provider;
+  let hub = context.hub;
   let path = context.provider.path;
 
   /* */
@@ -958,11 +959,22 @@ function filesFindCriticalCases( test )
 
   var extract = _.FileProvider.Extract
   ({
-    filesTree : { dir1 : { a : 1, b : 2 }, dir2 : { c : 3 }, dir3 : { d : 4 }, e : 5 },
+    filesTree : { dir1 : { a : 1, b : 2 }, e : 5 },
   });
 
-  extract.
-xxx
+  extract.protocol = 'src';
+  extract.providerRegisterTo( hub );
+  extract.filesReflect({ reflectMap : { 'src:///' : 'hd://' + testPath } });
+
+  var filter = provider.filter({ filePath : testPath + '/dir1' });
+  var got = provider.filesFind({ filePath : filter });
+  var relative = _.select( got, '*/relative' );
+  var expectedRelative = [];
+
+  test.identical( relative, expectedRelative );
+
+  debugger; return; xxx
+
   /* */
 
   test.case = 'extract : empty file path array';
@@ -980,11 +992,11 @@ xxx
 
   test.case = 'hub : empty file path array';
 
-  var hub = _.FileProvider.Hub({ providers : [] });
-  _.FileProvider.Extract({ protocol : 'ext1' }).providerRegisterTo( hub );
-  _.FileProvider.Extract({ protocol : 'ext2' }).providerRegisterTo( hub );
+  var hub2 = _.FileProvider.Hub({ providers : [] });
+  _.FileProvider.Extract({ protocol : 'ext1' }).providerRegisterTo( hub2 );
+  _.FileProvider.Extract({ protocol : 'ext2' }).providerRegisterTo( hub2 );
 
-  var got = hub.filesFind([]);
+  var got = hub2.filesFind([]);
   var expected = [];
   test.identical( got, expected );
 

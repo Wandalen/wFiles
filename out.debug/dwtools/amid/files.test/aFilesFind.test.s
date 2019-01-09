@@ -947,9 +947,10 @@ function filesFindMaskTerminal( test )
 
 function filesFindCriticalCases( test )
 {
-  let self = this;
-  let provider = self.provider;
-  let hub = self.hub;
+  let context = this;
+  let testPath = test.context.pathFor( test.name );
+  let provider = context.provider;
+  let path = context.provider.path;
 
   /* */
 
@@ -960,6 +961,8 @@ function filesFindCriticalCases( test )
     filesTree : { dir1 : { a : 1, b : 2 }, dir2 : { c : 3 }, dir3 : { d : 4 }, e : 5 },
   });
 
+  extract.
+xxx
   /* */
 
   test.case = 'extract : empty file path array';

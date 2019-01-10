@@ -721,7 +721,7 @@ function pathsExtend( src )
   _.assert( filter.inFilePath === null );
   _.assert( !filter.hubFileProvider || !src.hubFileProvider || filter.hubFileProvider === src.hubFileProvider );
   _.assert( src !== filter );
-  _.assert( src.inFilePath === null || src.inFilePath === undefined );
+  _.assert( src.inFilePath === null || src.inFilePath === undefined || filter.inFilePath === null );
 
   let fileProvider = filter.effectiveFileProvider || filter.hubFileProvider || filter.defaultFileProvider || src.effectiveFileProvider || src.hubFileProvider || src.defaultFileProvider;
   let path = fileProvider.path;
@@ -998,20 +998,30 @@ function pathsNormalize()
     let effectiveProvider2 = fileProvider.providerForPath( filePath );
     _.assert( filter.effectiveFileProvider === null || effectiveProvider2 === null || filter.effectiveFileProvider === effectiveProvider2, 'Record filter should have paths of single file provider' );
     filter.effectiveFileProvider = filter.effectiveFileProvider || effectiveProvider2;
-    if( !filter.hubFileProvider )
-    filter.hubFileProvider = filter.effectiveFileProvider.hub;
-    _.assert( filter.effectiveFileProvider.hub === null || filter.hubFileProvider === filter.effectiveFileProvider.hub );
-    _.assert( filter.effectiveFileProvider.hub === null || filter.hubFileProvider instanceof _.FileProvider.Hub );
-    // debugger;
+
+    if( filter.effectiveFileProvider )
+    {
+
+      _.assert( !!filter.effectiveFileProvider );
+
+      if( !filter.hubFileProvider )
+      filter.hubFileProvider = filter.effectiveFileProvider.hub;
+
+      _.assert( filter.effectiveFileProvider.hub === null || filter.hubFileProvider === filter.effectiveFileProvider.hub );
+      _.assert( filter.effectiveFileProvider.hub === null || filter.hubFileProvider instanceof _.FileProvider.Hub );
+
+    }
+
     if( !path.isGlobal( filePath ) )
     {
-      // if( !filter.effectiveFileProvider )
-      // filter.effectiveFileProvider = filter.defaultFileProvider;
       return filePath;
     }
-    // debugger;
-    _.assert( !!filter.hubFileProvider );
-    let result = filter.hubFileProvider.localFromGlobal( filePath );
+
+    // _.assert( !!filter.hubFileProvider );
+
+    let provider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+
+    let result = provider.localFromGlobal( filePath );
     return result;
   }
 

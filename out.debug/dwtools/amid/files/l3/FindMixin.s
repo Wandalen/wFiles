@@ -179,19 +179,20 @@ function _filesFilterForm( o )
   _.assert( !o.filter || !o.filter.formed <= 3, 'Filter is already formed, but should not be!' )
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  // debugger;
-  // if( o.filePath )
-  // o.filePath = path.s.normalize( o.filePath );
-
   o.filter = self.recordFilter( o.filter || {} );
+
+  if( o.filePath instanceof _.FileRecordFilter )
+  {
+    debugger;
+    // _.assert( o.filter.isEmpty(), 'Filter should be empty if it passed via {- o.filePath -} option' );
+    o.filter.pathsExtend( o.filePath ).and( o.filePath );
+    o.filePath = null;
+  }
 
   if( o.maskPreset && !o.filter.formed ) // !!!
   {
     _.assert( o.maskPreset === 'default.exclude', 'Not supported preset', o.maskPreset );
     let filter2 = { maskAll : _.files.regexpMakeSafe() };
-    // o.filter = o.filter || Object.create( null );
-    // if( Object.keys( o.filter ).length === 0 )
-    // o.filter.maskAll = _.files.regexpMakeSafe();
     o.filter.and( filter2 );
   }
 
@@ -204,17 +205,12 @@ function _filesFilterForm( o )
       '{- o.filePath -} and {- o.filter.inFilePath -} should be exactly same or null'
     );
 
-    // if( o.filter.basePath === '/dst' )
-    // debugger;
-
     if( o.filePath !== null )
     o.filter.inFilePath = o.filePath;
     o.filter.form();
     o.filePath = o.filter.stemPath;
 
   }
-
-  // debugger; // xxx
 
   _.assert( o.filePath === o.filter.stemPath );
   _.assert( !self.hub || o.filter.hubFileProvider === self.hub );

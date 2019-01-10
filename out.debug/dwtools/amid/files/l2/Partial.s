@@ -455,7 +455,7 @@ function providerForPath( path )
 {
   let self = this;
   _.assert( _.strIs( path ), 'Expects string' );
-  _.assert( !_.path.isGlobal( path ) );
+  _.assert( !self.path.isGlobal( path ), () => 'Path for the file provider should be local, but is ' + _.strQuote( path ) );
   return self;
 }
 

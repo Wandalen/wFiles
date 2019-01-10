@@ -359,7 +359,7 @@ function _localFromGlobal( filePath, provider )
     r.provider = self.providerForPath( r.parsedPath );
   }
 
-  _.assert( _.objectIs( r.provider ), 'No provider for path', filePath );
+  _.assert( _.objectIs( r.provider ), () => 'No provider for path ' + _.strQuote( filePath ) );
 
   r.filePath = r.provider.localFromGlobal( r.parsedPath );
 

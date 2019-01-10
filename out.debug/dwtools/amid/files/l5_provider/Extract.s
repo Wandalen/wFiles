@@ -455,7 +455,7 @@ function statReadAct( o )
       let extraStat = self.extraStats[ filePath ];
       // for( let k in extraStats )
       // result[ k ] = new Date( extraStats[ k ] );
-      debugger;
+      // debugger;
       result.atime = new Date( extraStat.atime );
       result.mtime = new Date( extraStat.mtime );
       result.ctime = new Date( extraStat.ctime );

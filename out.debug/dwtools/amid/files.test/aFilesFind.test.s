@@ -964,7 +964,9 @@ function filesFindCriticalCases( test )
 
   extract.protocol = 'src';
   extract.providerRegisterTo( hub );
+  debugger;
   extract.filesReflect({ reflectMap : { 'src:///' : 'hd://' + testPath } });
+  extract.finit();
 
   var filter = provider.filter({ filePath : testPath + '/dir1' });
   var got = provider.filesFind({ filePath : filter });

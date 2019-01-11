@@ -5480,7 +5480,7 @@ function filesGlob( test )
 
   test.case = 'simple glob';
 
-  var glob = '*'
+  var glob = '*';
   var got = _.fileProvider.filesGlob( completeOptions( glob ) );
   var expected =
   [

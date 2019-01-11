@@ -502,9 +502,9 @@ filesFindSingle_body.defaults =
 
   includingTerminals : 1,
   includingDirs : 0,
+  includingStem : 1,
   includingActual : 1,
   includingTransient : 0,
-  includingStem : 1,
 
   allowingMissed : 0,
   allowingCycled : 0,
@@ -3289,7 +3289,7 @@ function filesDelete_body( o )
   let self = this;
   let provider = o.filter.effectiveFileProvider;
   let path = self.path;
-  let files = [];
+  // let files = [];
 
   let time;
   if( o.verbosity >= 1 )
@@ -3298,7 +3298,6 @@ function filesDelete_body( o )
   _.assert( !o.includingTransient, 'Transient files should not be included' );
   _.assert( o.resolvingTextLink === 0 || o.resolvingTextLink === false );
   _.assert( o.resolvingSoftLink === 0 || o.resolvingSoftLink === false );
-  // _.assert( o.outputFormat === 'record' );
   _.assert( _.numberIs( o.safe ) );
   _.assert( arguments.length === 1 );
 
@@ -3308,21 +3307,23 @@ function filesDelete_body( o )
   {
     if( !provider.fileExists( o.filePath ) )
     return end();
+    /*
+      reminder : masks are not applicable to stem file
+    */
     if( provider.isTerminal( o.filePath ) )
     {
-      // debugger;
       let file = provider.record( o.filePath );
       file.isActual = true;
       file.isTransient = true;
       o.result.push( file );
       if( o.writing )
-      provider.fileDelete
-      ({
-        filePath : o.filePath,
-        throwing :  o.throwing,
-        verbosity : o.verbosity,
-        sync : 1, /* qqq : implement and cover sync option for filesFind and filesDelete */
-      });
+      provider.fileDelete( file );
+      // ({
+      //   filePath : o.filePath,
+      //   throwing :  o.throwing,
+      //   verbosity : o.verbosity,
+      //   sync : 1, /* qqq : implement and cover sync option for filesFind and filesDelete */
+      // });
       return end();
     }
   }
@@ -3332,37 +3333,66 @@ function filesDelete_body( o )
   let o2 = _.mapOnly( o, provider.filesFind.defaults );
   o2.verbosity = 0;
   o2.outputFormat = 'record';
-  delete o2.safe;
+  o2.includingTransient = 1;
+  _.assert( !!o.includingDirs );
+  _.assert( !!o.includingActual );
+  _.assert( !o.includingTransient );
+  _.assert( o.result === o2.result );
+  // delete o2.safe;
 
-  files = provider.filesFind.body.call( provider, o2 );
+  provider.filesFind.body.call( provider, o2 );
 
   /* */
 
-  if( o.writing )
-  for( let f = files.length-1 ; f >= 0 ; f-- )
+  for( let f1 = 0 ; f1 < o.result.length ; f1++ )
   {
-    let file = files[ f ];
-    if( file.isActual )
-    fileDelete( file );
+    let file1 = o.result[ f1 ];
+    if( file1.isActual )
+    continue;
+    debugger;
+    o.result.splice( f1, 1 );
+    f1 -= 1;
+    for( let f2 = f1-1 ; f2 >= 0 ; f2-- )
+    {
+      let file2 = o.result[ f2 ];
+      if( _.strBegins( file1.absolute, file2.absolute ) )
+      {
+        debugger;
+        o.result.splice( f2, 1 );
+        f1 -=1 ; 
+      }
+    }
   }
 
   /* */
 
-  if( o.deletingEmptyDirs && files.length )
+  debugger;
+  if( o.writing )
+  for( let f = o.result.length-1 ; f >= 0 ; f-- )
+  {
+    let file = o.result[ f ];
+    if( file.isActual )
+    fileDelete( file );
+  }
+  debugger;
+
+  /* */
+
+  if( o.deletingEmptyDirs && o.result.length )
   {
     let delMap = Object.create( null );
     let dirMap = Object.create( null );
-    let factory = files[ 0 ].factory;
+    let factory = o.result[ 0 ].factory;
 
-    for( let f = files.length-1 ; f >= 0 ; f-- )
+    for( let f = o.result.length-1 ; f >= 0 ; f-- )
     {
-      let file = files[ f ];
+      let file = o.result[ f ];
       dirMap[ file.dir ] = 1;
       delMap[ file.absolute ] = 1;
     }
 
     let dirsFile = [];
-    let dirsPath = path.chainToRoot( files[ 0 ].dir );
+    let dirsPath = path.chainToRoot( o.result[ 0 ].dir );
     debugger;
     for( let d = dirsPath.length-1 ; d >= 0 ; d-- )
     {
@@ -3405,25 +3435,26 @@ function filesDelete_body( o )
     provider.logger.log( ' - filesDelete ' + o.result.length + ' files at ' + path.commonReport( o.filePath ) + ' in ' + _.timeSpent( time ) );
 
     if( o.outputFormat === 'absolute' )
-    files = _.select( files, '*/absolute' );
+    o.result = _.select( o.result, '*/absolute' );
     else if( o.outputFormat === 'relative' )
-    files = _.select( files, '*/relative' );
+    o.result = _.select( o.result, '*/relative' );
     else _.assert( o.outputFormat === 'record' );
 
-    return files;
+    return o.result;
   }
 
   /* - */
 
   function fileDelete( file )
   {
+    debugger;
     file.factory.effectiveFileProvider.fileDelete
     ({
       filePath : file.absolute,
-      sync : 1,
       throwing : o.throwing,
       verbosity : o.verbosity-1,
       safe : o.safe,
+      sync : 1, /* qqq : implement and cover sync option for filesFind and filesDelete */
     });
   }
 

@@ -71,7 +71,7 @@ var Proto =
 {
 
   name : 'Tools/mid/files/FilesFind/Extract',
-  silencing : 1,
+  silencing : 0,
   abstract : 0,
   enabled : 1,
 

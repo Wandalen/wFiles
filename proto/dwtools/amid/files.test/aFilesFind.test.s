@@ -1294,11 +1294,11 @@ function filesFind( test )
 
       if( options.glob !== undefined )
       {
-        options.terminalPath = path.join( options.terminalPath, options.glob );
+        options.filePath = path.join( options.filePath, options.glob );
         delete options.glob;
       }
 
-      if( options.terminalPath === null )
+      if( options.filePath === null )
       return test.shouldThrowError( () => _.fileProvider.filesFind( options ) );
 
       var files = _.fileProvider.filesFind( options );
@@ -5472,7 +5472,7 @@ function filesGlob( test )
   function completeOptions( glob )
   {
     var options = _.mapExtend( null, commonOptions );
-    options.terminalPath = path.join( testPath, glob );
+    options.filePath = path.join( testPath, glob );
     return options
   }
 

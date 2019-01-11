@@ -1308,7 +1308,7 @@ function hardLinkBreakAct( o )
   self._descriptorWrite
   ({
     filePath : o.filePath,
-    data : descriptor.data,
+    data : descriptor[ 0 ].data,
     breakingHardLink : true
   });
 

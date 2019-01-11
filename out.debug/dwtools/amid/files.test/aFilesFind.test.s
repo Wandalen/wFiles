@@ -1464,34 +1464,34 @@ function filesFind( test )
   {
     var expected = [];
     var dirPath = testPath;
-    var isDir = _.fileProvider.isDir( o.terminalPath );
+    var isDir = _.fileProvider.isDir( o.filePath );
 
     if( isDir && o._includingDirs && o.includingStem )
     {
       debugger;
 
       if( o.outputFormat === 'absolute' ||  o.outputFormat === 'record' )
-      _.arrayPrependOnce( expected, o.terminalPath );
+      _.arrayPrependOnce( expected, o.filePath );
 
       if( o.outputFormat === 'relative' )
-      _.arrayPrependOnce( expected, path.relative( o.terminalPath, o.terminalPath ) );
+      _.arrayPrependOnce( expected, path.relative( o.filePath, o.filePath ) );
     }
 
     if( !isDir )
     {
       if( o.includingTerminals )
       {
-        var relative = path.dot( path.relative( o.basePath || o.terminalPath, o.terminalPath ) );
+        var relative = path.dot( path.relative( o.basePath || o.filePath, o.filePath ) );
         var passed = true;
 
         if( o.glob )
         {
           if( relative === '.' )
-          var toTest = path.dot( path.name({ path : o.terminalPath, withExtension : 1 }) );
+          var toTest = path.dot( path.name({ path : o.filePath, withExtension : 1 }) );
           else
           var toTest = relative;
 
-          var passed = path.globRegexpsForTerminal( o.glob, o.terminalPath, o.basePath ).test( toTest );
+          var passed = path.globRegexpsForTerminal( o.glob, o.filePath, o.basePath ).test( toTest );
         }
 
         if( !passed )
@@ -1499,7 +1499,7 @@ function filesFind( test )
 
         if( o.outputFormat === 'absolute' ||  o.outputFormat === 'record' )
         {
-          expected.push( o.terminalPath );
+          expected.push( o.filePath );
         }
         if( o.outputFormat === 'relative' )
         {
@@ -1522,7 +1522,7 @@ function filesFind( test )
           var relative = path.dot( path.relative( o.basePath || testPath, dirPath ) );
 
           if( o.glob )
-          passed = path.globRegexpsForDirectory( o.glob, o.terminalPath, o.basePath ).test( relative );
+          passed = path.globRegexpsForDirectory( o.glob, o.filePath, o.basePath ).test( relative );
 
           if( passed )
           {
@@ -1542,13 +1542,12 @@ function filesFind( test )
 
         filesNames.forEach( ( name ) =>
         {
-          // var terminalPath = path.join( path, l + '-' + name );
           var terminalPath = path.join( dirPath, name );
           var passed = true;
           var relative = path.dot( path.relative( o.basePath || testPath, terminalPath ) );
 
           if( o.glob )
-          passed = path.globRegexpsForTerminal( o.glob, o.terminalPath, o.basePath || testPath ).test( relative );
+          passed = path.globRegexpsForTerminal( o.glob, o.filePath, o.basePath || testPath ).test( relative );
 
           if( passed )
           {

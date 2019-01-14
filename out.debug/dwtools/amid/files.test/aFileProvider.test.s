@@ -20387,79 +20387,9 @@ function hardLinkSync( test )
     return;
   }
 
-  function linkGroups( paths, groups )
-  {
-    groups.forEach( ( g ) =>
-    {
-      var filePathes = g.map( ( i ) => paths[ i ] );
-      provider.hardLink({ dstPath : filePathes });
-    })
-  }
-
   let hardLinked = true;
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) && !provider.UsingBigIntForStat )
   hardLinked = null;
-
-  var delay = 0.01;
-
-  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  delay = provider.systemBitrateTimeGet() / 1000;
-
-  function makeFiles( names, dirPath, sameTime )
-  {
-    var paths = names.map( ( name, i ) =>
-    {
-      var filePath = self.pathFor( /*_.path*/path.join( dirPath, name ) );
-      provider.fileWrite({ filePath : filePath, data : filePath, purging : 1 });
-
-      if( sameTime )
-      {
-        var time = delay * 1000;
-        provider.fileTimeSet( filePath, time, time );
-      }
-      else if( i > 0 )
-      {
-        waitSync( delay );
-        provider.fileWrite({ filePath : filePath, data : /*_.path*/path.name( filePath ) });
-      }
-
-      return filePath;
-    });
-
-    return paths;
-  }
-
-  function makeHardLinksToPath( filePath, amount )
-  {
-    _.assert( _.strHas( filePath, 'tmp.tmp' ) );
-    var /*dir*/testPath = /*_.path*/path.dirTempOpen( self.provider.path.dir( filePath ), /*_.path*/path.name( filePath ) );
-    for( var i = 0; i < amount; i++ )
-    provider.hardLink( /*_.path*/path.join( /*dir*/testPath, 'file' + i ), filePath );
-  }
-
-  function filesHaveSameTime( paths )
-  {
-    _.assert( paths.length > 1 );
-    var srcStat = provider.statResolvedRead( paths[ 0 ] );
-
-    for( var i = 1; i < paths.length; i++ )
-    {
-      var stat = provider.statResolvedRead( paths[ i ] );
-      if( srcStat.atime.getTime() !== stat.atime.getTime() )
-      {
-        logger.log( srcStat.atime.getTime(), stat.atime.getTime() );
-        return false;
-      }
-
-      if( srcStat.mtime.getTime() !== stat.mtime.getTime() )
-      {
-        logger.log( srcStat.mtime.getTime(), stat.mtime.getTime() )
-        return false;
-      }
-    }
-
-    return true;
-  }
 
   var /*dir*/testPath = test.context.pathFor( 'written/hardLink' );
   provider.filesDelete( /*dir*/testPath )
@@ -20762,6 +20692,105 @@ function hardLinkSync( test )
       sync : 1,
     });
   })
+}
+
+hardLinkSync.timeOut = 60000;
+
+//
+
+function hardLinkMultipleSync( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let path = provider.path;
+
+  if( !_.routineIs( provider.hardLinkAct ) )
+  {
+    test.case = 'hardLinkAct is not implemented'
+    test.identical( 1, 1 )
+    return;
+  }
+
+  function linkGroups( paths, groups )
+  {
+    groups.forEach( ( g ) =>
+    {
+      var filePathes = g.map( ( i ) => paths[ i ] );
+      provider.hardLink({ dstPath : filePathes });
+    })
+  }
+
+  let hardLinked = true;
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) && !provider.UsingBigIntForStat )
+  hardLinked = null;
+
+  var delay = 0.01;
+
+  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  delay = provider.systemBitrateTimeGet() / 1000;
+
+  function makeFiles( names, dirPath, sameTime )
+  {
+    var paths = names.map( ( name, i ) =>
+    {
+      var filePath = self.pathFor( /*_.path*/path.join( dirPath, name ) );
+      provider.fileWrite({ filePath : filePath, data : filePath, purging : 1 });
+
+      if( sameTime )
+      {
+        var time = delay * 1000;
+        provider.fileTimeSet( filePath, time, time );
+      }
+      else if( i > 0 )
+      {
+        waitSync( delay );
+        provider.fileWrite({ filePath : filePath, data : /*_.path*/path.name( filePath ) });
+      }
+
+      return filePath;
+    });
+
+    return paths;
+  }
+
+  function makeHardLinksToPath( filePath, amount )
+  {
+    _.assert( _.strHas( filePath, 'tmp.tmp' ) );
+    var /*dir*/testPath = /*_.path*/path.dirTempOpen( self.provider.path.dir( filePath ), /*_.path*/path.name( filePath ) );
+    for( var i = 0; i < amount; i++ )
+    provider.hardLink( /*_.path*/path.join( /*dir*/testPath, 'file' + i ), filePath );
+  }
+
+  function filesHaveSameTime( paths )
+  {
+    _.assert( paths.length > 1 );
+    var srcStat = provider.statResolvedRead( paths[ 0 ] );
+
+    for( var i = 1; i < paths.length; i++ )
+    {
+      var stat = provider.statResolvedRead( paths[ i ] );
+      if( srcStat.atime.getTime() !== stat.atime.getTime() )
+      {
+        logger.log( srcStat.atime.getTime(), stat.atime.getTime() );
+        return false;
+      }
+
+      if( srcStat.mtime.getTime() !== stat.mtime.getTime() )
+      {
+        logger.log( srcStat.mtime.getTime(), stat.mtime.getTime() )
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  var /*dir*/testPath = test.context.pathFor( 'written/hardLink' );
+  provider.filesDelete( /*dir*/testPath )
+  var srcPath,dstPath;
+
+  if( !provider.statResolvedRead( /*dir*/testPath ) )
+  provider.dirMake( /*dir*/testPath );
 
   //
 
@@ -21168,7 +21197,7 @@ function hardLinkSync( test )
   var ok = test.identical( src, dst );
 }
 
-hardLinkSync.timeOut = 60000;
+hardLinkMultipleSync.timeOut = 60000;
 
 //
 
@@ -34344,6 +34373,7 @@ var Self =
     softLinkMakeAndResolve,
 
     hardLinkSync,
+    hardLinkMultipleSync,
     hardLinkRelativePath,
     // hardLinkExperiment,
     hardLinkSoftlinked,

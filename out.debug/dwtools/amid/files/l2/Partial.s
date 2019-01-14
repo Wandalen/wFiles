@@ -260,7 +260,7 @@ function _preFilePathScalarWithoutProviderDefaults( routine, args )
   let path = self.path;
 
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
-  _.assert( _.objectIs( args[ 0 ] ) || path.is( args[ 0 ] ), 'Expects options map or path' ); 
+  _.assert( _.objectIs( args[ 0 ] ) || path.is( args[ 0 ] ), 'Expects options map or path' );
   _.assert( args && args.length === 1, 'Routine ' + routine.name + ' expects exactly one arguments' );
 
   let o = args[ 0 ];
@@ -2077,7 +2077,14 @@ streamRead.having.aspect = 'entry';
 function fileRead_pre( routine, args )
 {
   let self = this;
-  let o = self._preFilePathScalarWithProviderDefaults.apply( self, arguments );
+
+  let o = self._preFilePathScalarWithoutProviderDefaults.apply( self, arguments );
+
+  if( o.verbosity === null )
+  o.verbosity = _.numberClamp( self.verbosity - 5, 0, 9 );
+
+  self._providerDefaults( o );
+
   return o;
 }
 
@@ -2193,7 +2200,7 @@ function fileRead_body( o )
       return null;
     }
 
-    if( o.verbosity >= 4 )
+    if( o.verbosity >= 1 )
     self.logger.log( ' . Read :', o.filePath );
 
     o.result = data;
@@ -4840,7 +4847,7 @@ function _linkMultiple( o, link )
   _.assert( _.boolLike( o.allowingMissed ) );
   _.assert( _.boolLike( o.allowingCycled ) );
 
-  debugger; //xxx
+  // debugger; //xxx
 
   let needed = 0;
   let factory = self.recordFactory({ allowingMissed : o.allowingMissed, allowingCycled : o.allowingCycled });
@@ -4974,11 +4981,11 @@ function _linkMultiple( o, link )
 
     if( !record.stat || !_./*statsCouldBeLinked*/statsAreHardLinked( mostLinkedRecord.stat , record.stat ) )
     {
-      debugger;
       let linkOptions = _.mapExtend( null, o );
       linkOptions.allowingMissed = 0; // Vova : hardLink does not allow missing srcPath
       linkOptions.dstPath = record.absolute;
       linkOptions.srcPath = mostLinkedRecord.absolute;
+      debugger;
       return link.call( self, linkOptions );
     }
 
@@ -5066,6 +5073,8 @@ function _link_functor( gen )
       Vova : low priority
       */
 
+      // if( _.longIs( o.dstPath ) && c.linkAct.having.hardLinking && o.dstPath[ 0 ] === "/C/pro/web/Port/package/wStarter/builder/package.json" )
+      // debugger;
       if( _.longIs( o.dstPath ) && c.linkAct.having.hardLinking )
       return _linkMultiple.call( self, o, _link_body );
       _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
@@ -5077,6 +5086,9 @@ function _link_functor( gen )
       c.linksResolve();
       if( c.ended )
       return c.end();
+
+      // if( o.dstPath === '/C/pro/web/Port/app/builder/package.json' )
+      // debugger;
 
       c.verify2();
       if( c.ended )
@@ -5096,6 +5108,9 @@ function _link_functor( gen )
         //   if( o.breakingSrcHardLink && c.srcStat.isHardLink() )
         //   c.srcBreakHardLink();
         // }
+
+        // if( o2.dstPath === '/C/pro/web/Port/app/builder/package.json' )
+        // debugger;
 
         if( self.fileExists( o2.dstPath ) )
         {
@@ -5118,6 +5133,7 @@ function _link_functor( gen )
       catch( err )
       {
 
+        debugger;
         c.tempRenameRevert();
         return error( _.err( 'Cant', entryMethodName, o.dstPath, '<-', o.srcPath, '\n', err ) );
 
@@ -5305,7 +5321,6 @@ function _link_functor( gen )
       });
     }
 
-
     /* - */
 
     function verifyDstSync()
@@ -5378,6 +5393,8 @@ function _link_functor( gen )
       _.assert( path.isAbsolute( o.dstPath ) );
 
     }
+
+    /* */
 
     function pathResolveAsync()
     {
@@ -5536,7 +5553,6 @@ function _link_functor( gen )
 
       if( _.boolLike( o.breakingDstHardLink ) )
       if( !o.breakingDstHardLink && c.dstStat.isHardLink() )
-      // if( !renamingHardLinks && c.dstStat.isHardLink() )
       return false;
 
       return true;
@@ -6219,6 +6235,9 @@ function _hardLinkVerify2( c )
   let self = this;
   let o = c.options;
 
+  // if( o.dstPath === '/C/pro/web/Port/app/builder/package.json' )
+  // debugger;
+
   if( !c.srcStat.isTerminal() )
   {
     c.error( _.err( 'Source file should be a terminal.' ) );
@@ -6226,12 +6245,9 @@ function _hardLinkVerify2( c )
   else
   {
     let linked = self.filesAreHardLinked([ o.dstPath, o.srcPath ]);
-    // xxx : does it take into acccount breakingSrcHardLink and breakingDstHardLink
-    // Vova : should skip if linked is null( not sure )?
-    // Kos : maybe
-    if( linked || linked === null )
+    if( linked || linked === _.maybe ) // qqq : this is fix
+    // if( linked || linked === null )
     c.end( true );
-    // return true;
   }
 }
 
@@ -6901,6 +6917,9 @@ function filesAreHardLinked_body( o )
   let statFirst = self.statRead( o.filePath[ 0 ] );
   if( !statFirst )
   return false;
+
+  // if( o.filePath[ 0 ] === '/C/pro/web/Port/app/builder/package.json' )
+  // debugger;
 
   for( let i = 1 ; i < o.filePath.length ; i++ )
   {

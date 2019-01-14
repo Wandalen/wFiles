@@ -1472,11 +1472,14 @@ function hardLinkAct( o )
 
   _.assertRoutineOptions( hardLinkAct, arguments );
 
-  let dstPath = o.dstPath;
-  let srcPath = o.srcPath;
+  // let dstPath = o.dstPath;
+  // let srcPath = o.srcPath;
 
-  o.dstPath = self.path.nativize( o.dstPath );
-  o.srcPath = self.path.nativize( o.srcPath );
+  let dstPath = self.path.nativize( o.dstPath );
+  let srcPath = self.path.nativize( o.srcPath );
+
+  // o.dstPath = self.path.nativize( o.dstPath );
+  // o.srcPath = self.path.nativize( o.srcPath );
 
   _.assert( !!o.dstPath );
   _.assert( !!o.srcPath );
@@ -1489,23 +1492,26 @@ function hardLinkAct( o )
     if( o.dstPath === o.srcPath )
     return true;
 
+    if( srcPath === 'c:\\pro\\web\\Dave\\git\\trunk\\builder\\package.json' )
+    debugger;
+
     /* qqq : is needed */
     let stat = self.statReadAct
     ({
-      filePath : srcPath,
+      filePath : o.srcPath,
       throwing : 1,
       sync : 1,
       resolvingSoftLink : 0,
     });
 
     if( !stat )
-    throw _.err( '{o.srcPath} does not exist in file system:', srcPath );
+    throw _.err( '{o.srcPath} does not exist on hard drive:', o.srcPath );
     if( !stat.isTerminal() )
-    throw _.err( '{o.srcPath} is not a terminal file:', srcPath );
+    throw _.err( '{o.srcPath} is not a terminal file:', o.srcPath );
 
     try
     {
-      File.linkSync( o.srcPath, o.dstPath );
+      File.linkSync( srcPath, dstPath );
       return true;
     }
     catch ( err )
@@ -1523,7 +1529,7 @@ function hardLinkAct( o )
 
     self.statReadAct
     ({
-      filePath : srcPath,
+      filePath : o.srcPath,
       sync : 0,
       throwing : 0,
       resolvingSoftLink : 0,
@@ -1533,11 +1539,11 @@ function hardLinkAct( o )
       if( err )
       return con.error( err );
       if( !stat )
-      return con.error( _.err( '{o.srcPath} does not exist in file system:', srcPath ) );
+      return con.error( _.err( '{o.srcPath} does not exist on hard drive:', o.srcPath ) );
       if( !stat.isTerminal() )
-      return con.error( _.err( '{o.srcPath} is not a terminal file:', srcPath ) );
+      return con.error( _.err( '{o.srcPath} is not a terminal file:', o.srcPath ) );
 
-      File.link( o.srcPath, o.dstPath, function( err )
+      File.link( srcPath, dstPath, function( err )
       {
         return err ? con.error( err ) : con.take( true );
       });

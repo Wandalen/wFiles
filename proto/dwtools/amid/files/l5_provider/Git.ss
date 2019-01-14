@@ -175,7 +175,7 @@ function filesReflectSingle_body( o )
   _.sure( _.strDefined( paths.compact ) );
   _.sure( _.strDefined( paths.hash ) );
   _.sure( _.strIs( dstPath ) );
-  _.sure( dstFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
+  _.assert( dstFileProvider instanceof _.FileProvider.HardDrive || dstFileProvider.originalFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
   _.sure( !o.srcFilter || !o.srcFilter.hasFiltering(), 'Does not support filtering, but {o.srcFilter} is not empty' );
   _.sure( !o.dstFilter || !o.dstFilter.hasFiltering(), 'Does not support filtering, but {o.dstFilter} is not empty' );
   _.sure( !o.filter || !o.filter.hasFiltering(), 'Does not support filtering, but {o.filter} is not empty' );
@@ -195,14 +195,14 @@ function filesReflectSingle_body( o )
   let result = _.Consequence().take( null );
   let shell = _.sheller
   ({
-    verbosity : o.verbosity - 2,
+    verbosity : o.verbosity - 1,
     ready : result,
     currentPath : dstPath,
   });
 
   let shellAll = _.sheller
   ({
-    verbosity : o.verbosity - 2,
+    verbosity : o.verbosity - 1,
     ready : result,
     currentPath : dstPath,
     throwingExitCode : 0,
@@ -352,7 +352,7 @@ function isUpToDate( o )
 
   let shell = _.sheller
   ({
-    verbosity : o.verbosity - 2,
+    verbosity : o.verbosity - 1,
     // verbosity : 2,
     ready : result,
     currentPath : o.localPath,
@@ -360,7 +360,7 @@ function isUpToDate( o )
 
   let shellAll = _.sheller
   ({
-    verbosity : o.verbosity - 2,
+    verbosity : o.verbosity - 1,
     // verbosity : 2,
     ready : result,
     currentPath : o.localPath,

@@ -111,11 +111,17 @@ function statsAreHardLinked( stat1, stat2 )
   try to make a good guess if ino comprison is not possible
   */
 
-  if( stat1.nlink < 2 )
-  return false;
+  /*
+    should return true for comparing file with itself
+    so nlink could be 1
+  */
 
-  if( stat2.nlink < 2 )
-  return false;
+  // qqq
+  // if( stat1.nlink < 2 )
+  // return false;
+  //
+  // if( stat2.nlink < 2 )
+  // return false;
 
   if( stat1.nlink !== stat2.nlink )
   return false;

@@ -876,6 +876,8 @@ function fileConfigRead_body( o )
 
   let found = self.fileConfigPathGet({ filePath : o.filePath });
 
+  /* */
+
   if( o.many === 'all' )
   {
     let abstractPath1 = _.arrayAs( o.filePath );
@@ -886,7 +888,8 @@ function fileConfigRead_body( o )
     throw _.err( 'Some configs were loaded several times' );
   }
 
-  // debugger;
+  /* */
+
   if( found && found.length )
   {
 
@@ -897,15 +900,12 @@ function fileConfigRead_body( o )
       let o2 = _.mapExtend( null,o );
       o2.filePath = file.particularPath;
       o2.encoding = file.encoding;
-      if( o2.verbosity >= 2 )
-      o2.verbosity = 5;
+      // if( o2.verbosity >= 2 )
+      // o2.verbosity = 5;
       delete o2.many;
 
-      // debugger;
       let read = self.fileRead( o2 );
-      // debugger;
 
-      // if( o.throwing )
       _.sure( _.mapIs( read ), () => 'Expects map, but read ' + _.toStrShort( result ) + ' from ' + o2.filePath );
 
       if( result === null )
@@ -917,12 +917,17 @@ function fileConfigRead_body( o )
 
   }
 
+  /* */
+
   if( result === null || result === undefined )
   {
     debugger;
     if( o.throwing )
     throw _.err( 'Found no config at', () => o.filePath + '.*' );
+    result = null;
   }
+
+  /* */
 
   return result;
 }
@@ -1025,35 +1030,35 @@ let Supplement =
 
   // files read
 
-  filesRead : filesRead,
-  _filesReadAsync : _filesReadAsync,
-  _filesReadSync : _filesReadSync,
+  filesRead,
+  _filesReadAsync,
+  _filesReadSync,
 
   // etc
 
-  filesAreUpToDate : filesAreUpToDate,
-  filesAreUpToDate2 : filesAreUpToDate2,
+  filesAreUpToDate,
+  filesAreUpToDate2,
 
-  filesSearchText : filesSearchText,
+  filesSearchText,
 
-  systemBitrateTimeGet : systemBitrateTimeGet,
+  systemBitrateTimeGet,
 
   // read
 
-  fileConfigRead2 : fileConfigRead2,
-  _fileConfigRead2 : _fileConfigRead2,
+  fileConfigRead2,
+  _fileConfigRead2,
 
-  fileConfigPathGet : fileConfigPathGet,
-  fileConfigRead : fileConfigRead,
+  fileConfigPathGet,
+  fileConfigRead,
 
-  fileCodeRead : fileCodeRead,
+  fileCodeRead,
 
   //
 
-  Composes : Composes,
-  Aggregates : Aggregates,
-  Associates : Associates,
-  Restricts : Restricts,
+  Composes,
+  Aggregates,
+  Associates,
+  Restricts,
 
 }
 

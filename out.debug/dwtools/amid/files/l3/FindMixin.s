@@ -3340,7 +3340,7 @@ function filesDelete_body( o )
   _.assert( o.result === o2.result );
   // delete o2.safe;
 
-  provider.filesFind.body.call( provider, o2 );
+  provider.filesFind.body.call( provider, o2 ); debugger;
 
   /* */
 
@@ -3349,17 +3349,19 @@ function filesDelete_body( o )
     let file1 = o.result[ f1 ];
     if( file1.isActual )
     continue;
-    debugger;
+
     o.result.splice( f1, 1 );
     f1 -= 1;
-    for( let f2 = f1-1 ; f2 >= 0 ; f2-- )
+    for( let f2 = f1 ; f2 >= 0 ; f2-- )
     {
       let file2 = o.result[ f2 ];
+      if( file2.relative === '.' )
+      debugger;
       if( _.strBegins( file1.absolute, file2.absolute ) )
       {
         debugger;
         o.result.splice( f2, 1 );
-        f1 -=1 ; 
+        f1 -=1 ;
       }
     }
   }

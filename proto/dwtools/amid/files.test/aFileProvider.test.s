@@ -14929,7 +14929,7 @@ function fileWriteLinksSync( test )
 
   let hardLinked = true;
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) && !provider.UsingBigIntForStat )
-  hardLinked = null;
+  hardLinked = _.maybe;
 
   /*writeMode rewrite*/
 
@@ -15650,7 +15650,7 @@ function fileWriteLinksAsync( test )
 
   let hardLinked = true;
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) && !provider.UsingBigIntForStat )
-  hardLinked = null;
+  hardLinked = _.maybe;
 
   var con = new _.Consequence().take( null )
 
@@ -18794,7 +18794,7 @@ function softLinkActSync( test )
 
   let hardLinked = true;
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) && !provider.UsingBigIntForStat )
-  hardLinked = null;
+  hardLinked = _.maybe;
 
   if( !softLinkIsSupported )
   {
@@ -20389,7 +20389,7 @@ function hardLinkSync( test )
 
   let hardLinked = true;
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) && !provider.UsingBigIntForStat )
-  hardLinked = null;
+  hardLinked = _.maybe;
 
   var /*dir*/testPath = test.context.pathFor( 'written/hardLink' );
   provider.filesDelete( /*dir*/testPath )
@@ -20692,6 +20692,92 @@ function hardLinkSync( test )
       sync : 1,
     });
   })
+
+  /**/
+
+  test.case = 'try to link same file, srcPath has intermediate soft link to same dir';
+  self.provider.filesDelete( testPath );
+  var dirPath = path.join( testPath, 'dir' );
+  var terminalPath = path.join( dirPath, 'terminal' );
+  var linkToDirPath = path.join( testPath, 'linkToDir' );
+  self.provider.fileWrite( terminalPath, terminalPath );
+  self.provider.softLink( linkToDirPath, dirPath );
+  var srcPath2 = path.join( linkToDirPath, 'terminal' );
+  var terminalStatBefore = self.provider.statRead( terminalPath );
+  var got = self.provider.hardLink
+  ({
+    dstPath : terminalPath,
+    srcPath : srcPath2,
+    throwing : 1,
+    resolvingSrcSoftLink : 0,
+    resolvingDstSoftLink : 0,
+  });
+  test.identical( got, true );
+  var terminalStatAfter = self.provider.statRead( terminalPath );
+  test.identical( terminalStatBefore.mtime.getTime(), terminalStatAfter.mtime.getTime() );
+
+  test.case = 'try to link same file, srcPath has intermediate soft link to same dir';
+  self.provider.filesDelete( testPath );
+  var dirPath = path.join( testPath, 'dir' );
+  var terminalPath = path.join( dirPath, 'terminal' );
+  var linkToDirPath = path.join( testPath, 'linkToDir' );
+  self.provider.fileWrite( terminalPath, terminalPath );
+  self.provider.softLink( linkToDirPath, dirPath );
+  var srcPath2 = path.join( linkToDirPath, 'terminal' );
+  var terminalStatBefore = self.provider.statRead( terminalPath );
+  var got = self.provider.hardLink
+  ({
+    dstPath : terminalPath,
+    srcPath : srcPath2,
+    throwing : 1,
+    resolvingSrcSoftLink : 1,
+    resolvingDstSoftLink : 0,
+  });
+  test.identical( got, true );
+  var terminalStatAfter = self.provider.statRead( terminalPath );
+  test.identical( terminalStatBefore.mtime.getTime(), terminalStatAfter.mtime.getTime() );
+
+  test.case = 'try to link same file, dstPath has intermediate soft link to same dir';
+  self.provider.filesDelete( testPath );
+  var dirPath = path.join( testPath, 'dir' );
+  var terminalPath = path.join( dirPath, 'terminal' );
+  var linkToDirPath = path.join( testPath, 'linkToDir' );
+  self.provider.fileWrite( terminalPath, terminalPath );
+  self.provider.softLink( linkToDirPath, dirPath );
+  var srcPath2 = path.join( linkToDirPath, 'terminal' );
+  var terminalStatBefore = self.provider.statRead( terminalPath );
+  var got = self.provider.hardLink
+  ({
+    dstPath : srcPath2,
+    srcPath : terminalPath,
+    throwing : 1,
+    resolvingSrcSoftLink : 0,
+    resolvingDstSoftLink : 1,
+  });
+  test.identical( got, true );
+  var terminalStatAfter = self.provider.statRead( terminalPath );
+  test.identical( terminalStatBefore.mtime.getTime(), terminalStatAfter.mtime.getTime() );
+
+  test.case = 'try to link same file, srcPath and dstPath have intermediate soft link to same dir';
+  self.provider.filesDelete( testPath );
+  var dirPath = path.join( testPath, 'dir' );
+  var terminalPath = path.join( dirPath, 'terminal' );
+  var linkToDirPath = path.join( testPath, 'linkToDir' );
+  self.provider.fileWrite( terminalPath, terminalPath );
+  self.provider.softLink( linkToDirPath, dirPath );
+  var srcPath2 = path.join( linkToDirPath, 'terminal' );
+  var terminalStatBefore = self.provider.statRead( terminalPath );
+  var got = self.provider.hardLink
+  ({
+    dstPath : srcPath2,
+    srcPath : srcPath2,
+    throwing : 1,
+    resolvingSrcSoftLink : 1,
+    resolvingDstSoftLink : 1,
+  });
+  test.identical( got, true );
+  var terminalStatAfter = self.provider.statRead( terminalPath );
+  test.identical( terminalStatBefore.mtime.getTime(), terminalStatAfter.mtime.getTime() );
 }
 
 hardLinkSync.timeOut = 60000;
@@ -20722,7 +20808,7 @@ function hardLinkMultipleSync( test )
 
   let hardLinked = true;
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) && !provider.UsingBigIntForStat )
-  hardLinked = null;
+  hardLinked = _.maybe;
 
   var delay = 0.01;
 
@@ -21219,7 +21305,7 @@ function hardLinkRelativePath( test )
 
   let hardLinked = true;
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) && !provider.UsingBigIntForStat )
-  hardLinked = null;
+  hardLinked = _.maybe;
 
   test.open( 'src - relative path to a file' );
 
@@ -21596,7 +21682,7 @@ function hardLinkActSync( test )
 
   let hardLinked = true;
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) && !provider.UsingBigIntForStat )
-  hardLinked = null;
+  hardLinked = _.maybe;
 
   var softLinkIsSupported = test.context.softLinkIsSupported();
 
@@ -22123,7 +22209,7 @@ function hardLinkAsync( test )
 
   let hardLinked = true;
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) && !provider.UsingBigIntForStat )
-  hardLinked = null;
+  hardLinked = _.maybe;
 
   var delay = 0.01;
 
@@ -22940,7 +23026,7 @@ function hardLinkActAsync( test )
 
   let hardLinked = true;
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) && !provider.UsingBigIntForStat )
-  hardLinked = null;
+  hardLinked = _.maybe;
 
   let softLinkIsSupported = test.context.softLinkIsSupported();
   let con = new _.Consequence().take( null )
@@ -23915,7 +24001,7 @@ function hardLinkSoftLinkResolving( test )
 
   let hardLinked = true;
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) && !provider.UsingBigIntForStat )
-  hardLinked = null;
+  hardLinked = _.maybe;
 
   /**/
 
@@ -24442,7 +24528,7 @@ function hardLinkHardLinkBreaking( test )
 
   let hardLinked = true;
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) && !provider.UsingBigIntForStat )
-  hardLinked = null;
+  hardLinked = _.maybe;
 
   // /*  */
 
@@ -30001,7 +30087,7 @@ function filesAreHardLinked( test )
 
   let hardLinked = true;
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) && !provider.UsingBigIntForStat )
-  hardLinked = null;
+  hardLinked = _.maybe;
 
   //
 
@@ -30572,7 +30658,7 @@ function fileExists( test )
 
   let hardLinked = true;
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) && !provider.UsingBigIntForStat )
-  hardLinked = null;
+  hardLinked = _.maybe;
 
   provider.filesDelete( testDirPath );
 

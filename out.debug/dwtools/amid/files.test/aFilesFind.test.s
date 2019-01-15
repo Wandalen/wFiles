@@ -11272,7 +11272,7 @@ function filesDelete( test )
 
   /* */
 
-  test.case = 'delete tree with filter';
+  test.case = 'delete tree with filter, exclude all';
   var extract = _.FileProvider.Extract
   ({
 
@@ -11318,6 +11318,71 @@ function filesDelete( test )
     './src/a.a',
     './src/b1.b',
     './src/b2.b',
+    './src/c',
+    './src/c/b3.b',
+    './src/c/srcfile',
+    './src/c/srcfile-dstdir',
+    './src/c/e',
+    './src/c/e/d2.d',
+    './src/c/e/e1.e',
+    './src/c/srcdir',
+    './src/c/srcdir-dstfile',
+    './src/c/srcdir-dstfile/srcdir-dstfile-file'
+  ];
+  var files = provider.filesFindRecursive({ filePath : testPath, outputFormat : 'relative' });
+  test.identical( files, expectedFiles );
+  extract.finit();
+  test.identical( _.mapKeys( hub.providersWithProtocolMap ), [ 'current' ] );
+
+  /* */
+
+  test.case = 'delete tree with transient filter';
+  var extract = _.FileProvider.Extract
+  ({
+
+    protocol : 'src',
+    filesTree :
+    {
+      'src' :
+      {
+        'a.a' : 'a',
+        'b1.b' : 'b1',
+        'b2.b' : 'b2x',
+        'c' :
+        {
+          'b3.b' : 'b3x',
+          'e' : { 'd2.d' : 'd2x', 'e1.e' : 'd1' },
+          'srcfile' : 'srcfile',
+          'srcdir' : {},
+          'srcdir-dstfile' : { 'srcdir-dstfile-file' : 'srcdir-dstfile-file' },
+          'srcfile-dstdir' : 'x',
+        }
+      }
+    }
+
+  });
+
+  test.identical( provider.protocol, 'current' );
+  extract.providerRegisterTo( hub );
+  provider.filesDelete( testPath );
+  hub.filesReflect({ reflectMap : { 'src:///' : 'current://' + testPath } });
+  test.identical( provider.dirRead( testPath ), [ 'src' ] );
+  var deleted = provider.filesDelete({ filter : { filePath : testPath, maskTransientDirectory : { excludeAny : '/c' } } });
+  var expectedDeleted =
+  [
+    './src/a.a',
+    './src/b1.b',
+    './src/b2.b',
+  ]
+  ;
+  test.identical( _.select( deleted, '*/relative' ), expectedDeleted );
+  test.identical( provider.dirRead( testPath ), [ 'src' ] );
+  var stat = provider.statResolvedRead( testPath );
+  test.is( !!stat );
+  var expectedFiles =
+  [
+    '.',
+    './src',
     './src/c',
     './src/c/b3.b',
     './src/c/srcfile',
@@ -11417,6 +11482,8 @@ function filesDelete( test )
   /* */
 
 }
+
+filesDelete.timeOut = 20000;
 
 //
 

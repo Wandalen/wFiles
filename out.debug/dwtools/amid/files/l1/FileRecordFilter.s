@@ -76,9 +76,6 @@ function _formAssociations()
 {
   let filter = this;
 
-  // _.assert( filter.formed === 0 ); debugger;
-  // debugger;
-
   /* */
 
   if( filter.hubFileProvider )
@@ -90,22 +87,6 @@ function _formAssociations()
       filter.hubFileProvider = filter.hubFileProvider.hub;
     }
   }
-
-  // if( filter.defaultFileProvider )
-  // {
-  //   if( filter.defaultFileProvider instanceof _.FileProvider.Hub )
-  //   {
-  //     _.assert( filter.hubFileProvider === null || filter.hubFileProvider === filter.defaultFileProvider );
-  //     filter.hubFileProvider = filter.defaultFileProvider;
-  //     // filter.defaultFileProvider = null;
-  //   }
-  // }
-
-  // if( filter.defaultFileProvider && filter.defaultFileProvider.hub )
-  // {
-  //   _.assert( filter.hubFileProvider === null || filter.hubFileProvider === filter.defaultFileProvider.hub );
-  //   filter.hubFileProvider = filter.defaultFileProvider.hub;
-  // }
 
   if( filter.effectiveFileProvider )
   {
@@ -128,8 +109,6 @@ function _formAssociations()
     filter.defaultFileProvider = filter.defaultFileProvider || filter.effectiveFileProvider || filter.hubFileProvider;
   }
 
-  // debugger;
-
   /* */
 
   _.assert( !filter.hubFileProvider || filter.hubFileProvider instanceof _.FileProvider.Abstract, 'Expects {- filter.hubFileProvider -}' );
@@ -141,18 +120,9 @@ function _formAssociations()
   filter.maskAll = _.RegexpObject( filter.maskAll );
   filter.maskTerminal = _.RegexpObject( filter.maskTerminal );
   filter.maskDirectory = _.RegexpObject( filter.maskDirectory );
-
   filter.maskTransientAll = _.RegexpObject( filter.maskTransientAll );
   filter.maskTransientTerminal = _.RegexpObject( filter.maskTransientTerminal );
   filter.maskTransientDirectory = _.RegexpObject( filter.maskTransientDirectory );
-
-  // filter.maskAll = _.RegexpObject( filter.maskAll || Object.create( null ), 'includeAny' );
-  // filter.maskTerminal = _.RegexpObject( filter.maskTerminal || Object.create( null ), 'includeAny' );
-  // filter.maskDirectory = _.RegexpObject( filter.maskDirectory || Object.create( null ), 'includeAny' );
-  //
-  // filter.maskTransientAll = _.RegexpObject( filter.maskTransientAll || Object.create( null ), 'includeAny' );
-  // filter.maskTransientTerminal = _.RegexpObject( filter.maskTransientTerminal || Object.create( null ), 'includeAny' );
-  // filter.maskTransientDirectory = _.RegexpObject( filter.maskTransientDirectory || Object.create( null ), 'includeAny' );
 
   /* */
 
@@ -295,7 +265,7 @@ function _formMasks()
       subfilter.maskTerminal = filter.maskTerminal.clone();
       subfilter.maskDirectory = filter.maskDirectory.clone();
       subfilter.maskTransientAll = filter.maskTransientAll.clone();
-      subfilter.maskTransientTerminal = _.RegexpObject.And( filter.maskTransientTerminal.clone(), { includeAny : /$_^/ } );
+      subfilter.maskTransientTerminal = _.RegexpObject.And( filter.maskTransientTerminal.clone(), { includeAny : /$_^/ } ); // xxx
       subfilter.maskTransientDirectory = _.RegexpObject.And( filter.maskTransientDirectory.clone(), { includeAny : regexps.transient } );
       _.assert( subfilter.maskAll !== filter.maskAll );
     }
@@ -515,7 +485,6 @@ function and( src )
   filter.maskAll = _.RegexpObject.And( filter.maskAll, src.maskAll || null );
   filter.maskTerminal = _.RegexpObject.And( filter.maskTerminal, src.maskTerminal || null );
   filter.maskDirectory = _.RegexpObject.And( filter.maskDirectory, src.maskDirectory || null );
-
   filter.maskTransientAll = _.RegexpObject.And( filter.maskTransientAll, src.maskTransientAll || null );
   filter.maskTransientTerminal = _.RegexpObject.And( filter.maskTransientTerminal, src.maskTransientTerminal || null );
   filter.maskTransientDirectory = _.RegexpObject.And( filter.maskTransientDirectory, src.maskTransientDirectory || null );
@@ -1529,7 +1498,7 @@ function _applyToRecordMasks( record )
   _.assert( !!filter, 'Cant resolve filter for start path', () => _.strQuote( f.stemPath ) );
   _.assert( !!f.formed, 'Record factor was not formed!' );
 
-  // if( _.strHas( record.absolute, 'terminal' ) )
+  // if( _.strHas( record.absolute, '/src/c' ) )
   // debugger;
 
   /* */
@@ -1703,7 +1672,6 @@ function dstPathCommon()
   _.assert( _.arrayIs( filePath ) );
   _.assert( arguments.length === 0 );
 
-  // filePath = _.mapVals( filePath );
   filePath = _.arrayAppendArrayOnce( [], filePath );
   filePath = _.filter( filePath, ( p ) =>
   {
@@ -1716,8 +1684,6 @@ function dstPathCommon()
     return p;
   });
   filePath = path.s.join( filter.prefixPath || '.', filePath );
-
-  // debugger; xxx
 
   return path.common.apply( path, filePath );
 }
@@ -1737,7 +1703,6 @@ function srcPathCommon()
   _.assert( _.arrayIs( filePath ) );
   _.assert( arguments.length === 0 );
 
-  // filePath = _.mapVals( filePath );
   filePath = _.arrayAppendArrayOnce( [], filePath );
   filePath = _.filter( filePath, ( p ) =>
   {
@@ -1750,25 +1715,6 @@ function srcPathCommon()
     return p;
   });
   filePath = path.s.join( filter.prefixPath || '.', filePath );
-
-  // _.assert( _.mapIs( filter.filePath ) );
-  // _.assert( arguments.length === 0 );
-  //
-  // let filePath = _.mapVals( filter.filePath );
-  // filePath = _.arrayAppendArrayOnce( null, filePath );
-  // filePath = _.filter( filePath, ( p ) =>
-  // {
-  //   if( _.strIs( p ) )
-  //   return p;
-  //   if( p === true )
-  //   return filter.prefixPath || undefined;
-  //   if( p === false )
-  //   return;
-  //   return p;
-  // });
-  // filePath = path.s.join( filter.prefixPath || '.', filePath );
-
-  // debugger; xxx
 
   return path.common.apply( path, filePath );
 }
@@ -1837,7 +1783,6 @@ let Composes =
 
 let Aggregates =
 {
-  // filePath : null,
 }
 
 let Associates =
@@ -1854,9 +1799,6 @@ let Restricts =
   applyTo : null,
   formed : 0,
   globFound : null,
-
-  // globMap : null,
-  // _processed : null,
 
 }
 

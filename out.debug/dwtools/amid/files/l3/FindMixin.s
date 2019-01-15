@@ -3318,12 +3318,6 @@ function filesDelete_body( o )
       o.result.push( file );
       if( o.writing )
       provider.fileDelete( file );
-      // ({
-      //   filePath : o.filePath,
-      //   throwing :  o.throwing,
-      //   verbosity : o.verbosity,
-      //   sync : 1, /* qqq : implement and cover sync option for filesFind and filesDelete */
-      // });
       return end();
     }
   }
@@ -3338,16 +3332,17 @@ function filesDelete_body( o )
   _.assert( !!o.includingActual );
   _.assert( !o.includingTransient );
   _.assert( o.result === o2.result );
-  // delete o2.safe;
 
-  provider.filesFind.body.call( provider, o2 ); debugger;
+  // debugger;
+  provider.filesFind.body.call( provider, o2 );
+  // debugger;
 
   /* */
 
   for( let f1 = 0 ; f1 < o.result.length ; f1++ )
   {
     let file1 = o.result[ f1 ];
-    if( file1.isActual )
+    if( file1.isActual && ( file1.isTransient || file1.isTerminal ) )
     continue;
 
     o.result.splice( f1, 1 );
@@ -3368,7 +3363,7 @@ function filesDelete_body( o )
 
   /* */
 
-  debugger;
+  // debugger;
   if( o.writing )
   for( let f = o.result.length-1 ; f >= 0 ; f-- )
   {
@@ -3376,7 +3371,7 @@ function filesDelete_body( o )
     if( file.isActual )
     fileDelete( file );
   }
-  debugger;
+  // debugger;
 
   /* */
 
@@ -3449,7 +3444,6 @@ function filesDelete_body( o )
 
   function fileDelete( file )
   {
-    debugger;
     file.factory.effectiveFileProvider.fileDelete
     ({
       filePath : file.absolute,

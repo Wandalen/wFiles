@@ -1492,9 +1492,6 @@ function hardLinkAct( o )
     if( o.dstPath === o.srcPath )
     return true;
 
-    if( srcPath === 'c:\\pro\\web\\Dave\\git\\trunk\\builder\\package.json' )
-    debugger;
-
     /* qqq : is needed */
     let stat = self.statReadAct
     ({

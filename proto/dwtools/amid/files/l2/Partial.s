@@ -1573,23 +1573,6 @@ function recordFactory( factory )
   return _.FileRecordFactory( factory );
 }
 
-// {
-//   let self = this;
-//
-//   factory = factory || Object.create( null );
-//
-//   if( factory instanceof _.FileRecordFactory )
-//   return factory
-//
-//   _.assert( arguments.length === 0 || arguments.length === 1 );
-//
-//   if( !factory.hubFileProvider )
-//   factory.hubFileProvider = self;
-//   _.assert( factory.hubFileProvider === self );
-// xxx
-//   return _.FileRecordFactory( factory );
-// }
-
 var having = recordFactory.having = Object.create( null );
 having.writing = 0;
 having.reading = 0;

@@ -22042,8 +22042,6 @@ function hardLinkActSync( test )
   }
 
   var expected = _.mapExtend( null, o );
-  expected.srcPath = provider.path.nativize( o.srcPath );
-  expected.dstPath = provider.path.nativize( o.dstPath );
 
   provider.hardLinkAct( o );
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )

@@ -959,7 +959,7 @@ function filesFindCriticalCases( test )
 
   var extract = _.FileProvider.Extract
   ({
-    filesTree : { dir1 : { a : 1, b : 2 }, e : 5 },
+    filesTree : { dir1 : { a : '1', b : '2' }, e : '5' },
   });
 
   extract.protocol = 'src';

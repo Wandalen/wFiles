@@ -12640,10 +12640,11 @@ function statReadActSync( test )
   test.identical( stat.nlink, BigInt( 1 ) )
   else
   test.identical( stat.nlink, 1 );
+  var read = self.provider.fileRead( file2Path );
   if( provider.UsingBigIntForStat )
-  test.ge( stat.size , BigInt( 119 ) );
+  test.ge( stat.size , BigInt( read.length ) );
   else
-  test.identical( stat.size, 27 );
+  test.identical( stat.size, read.length );
 
   //
 
@@ -12675,10 +12676,11 @@ function statReadActSync( test )
   test.identical( stat.nlink, BigInt( 1 ) )
   else
   test.identical( stat.nlink, 1 );
+  var read = self.provider.fileRead( file2Path );
   if( provider.UsingBigIntForStat )
-  test.ge( stat.size , BigInt( 119 ) );
+  test.ge( stat.size , BigInt( read.length ) );
   else
-  test.identical( stat.size, 27 );
+  test.identical( stat.size, read.length );
 
   test.description = 'file2, resolving, , usingTextLink off';
   var o =
@@ -12706,10 +12708,11 @@ function statReadActSync( test )
   test.identical( stat.nlink, BigInt( 1 ) )
   else
   test.identical( stat.nlink, 1 );
+  var read = self.provider.fileRead( file2Path );
   if( provider.UsingBigIntForStat )
-  test.ge( stat.size , BigInt( 119 ) );
+  test.ge( stat.size , BigInt( read.length ) );
   else
-  test.identical( stat.size, 27 );
+  test.identical( stat.size, read.length );
 
   provider.fieldPop( 'usingTextLink', 0 );
 
@@ -12741,10 +12744,11 @@ function statReadActSync( test )
   test.identical( stat.nlink, BigInt( 1 ) )
   else
   test.identical( stat.nlink, 1 );
+  var read = self.provider.fileRead( file2Path );
   if( provider.UsingBigIntForStat )
-  test.ge( stat.size , BigInt( 119 ) );
+  test.ge( stat.size , BigInt( read.length ) );
   else
-  test.identical( stat.size, 27 );
+  test.identical( stat.size, read.length );
 
   provider.filesDelete( /*dir*/testPath );
 

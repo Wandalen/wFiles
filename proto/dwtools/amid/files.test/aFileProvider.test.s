@@ -13689,7 +13689,7 @@ function dirMakeLinksSync( test )
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( dirPath );
   provider.softLink({ dstPath : linkToDir, srcPath : dirPath });
-  var path = provider.path.join( linkToDir, '/dir/dir2/dir3' );
+  var path = provider.path.join( linkToDir, 'dir/dir2/dir3' );
   provider.dirMake({ filePath : path, recursive : 1 })
   test.is( provider.isDir( path ) );
   test.is( provider.isSoftLink( linkToDir ) );
@@ -13698,7 +13698,7 @@ function dirMakeLinksSync( test )
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( dirPath );
   provider.softLink({ dstPath : linkToDir, srcPath : dirPath });
-  var path = provider.path.join( linkToDir, '/dir/dir2/dir3' );
+  var path = provider.path.join( linkToDir, 'dir/dir2/dir3' );
   test.shouldThrowErrorSync( () =>
   {
     provider.dirMake

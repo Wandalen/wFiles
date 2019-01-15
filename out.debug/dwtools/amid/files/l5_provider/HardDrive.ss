@@ -1472,14 +1472,8 @@ function hardLinkAct( o )
 
   _.assertRoutineOptions( hardLinkAct, arguments );
 
-  // let dstPath = o.dstPath;
-  // let srcPath = o.srcPath;
-
   let dstPath = self.path.nativize( o.dstPath );
   let srcPath = self.path.nativize( o.srcPath );
-
-  // o.dstPath = self.path.nativize( o.dstPath );
-  // o.srcPath = self.path.nativize( o.srcPath );
 
   _.assert( !!o.dstPath );
   _.assert( !!o.srcPath );

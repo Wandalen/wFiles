@@ -21643,7 +21643,7 @@ function hardLinkSoftlinked( test )
 
   test.case = 'files are already linked, must not throw an error'
   var /*dir*/testPath = mp( 'hardLinkActSync/dir' );
-  var fileInDir = mp( 'hardLinkActSync/testPath/src' );
+  var fileInDir = mp( 'hardLinkActSync/dir/src' );
   var linkToDir = mp( 'hardLinkActSync/linkToDir' );
   var fileInLinkedDir = mp( 'hardLinkActSync/linkToDir/src' );
   provider.fileWrite( fileInDir, fileInDir );

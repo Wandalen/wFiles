@@ -265,8 +265,8 @@ function _formMasks()
       subfilter.maskTerminal = filter.maskTerminal.clone();
       subfilter.maskDirectory = filter.maskDirectory.clone();
       subfilter.maskTransientAll = filter.maskTransientAll.clone();
-      subfilter.maskTransientTerminal = _.RegexpObject.And( filter.maskTransientTerminal.clone(), { includeAny : /$_^/ } ); // xxx
-      // subfilter.maskTransientTerminal = filter.maskTransientTerminal.clone();
+      subfilter.maskTransientTerminal = _.RegexpObject.And( filter.maskTransientTerminal.clone(), { includeAny : /$_^/ } );
+      // subfilter.maskTransientTerminal = filter.maskTransientTerminal.clone(); // xxx
       subfilter.maskTransientDirectory = _.RegexpObject.And( filter.maskTransientDirectory.clone(), { includeAny : regexps.transient } );
       _.assert( subfilter.maskAll !== filter.maskAll );
     }

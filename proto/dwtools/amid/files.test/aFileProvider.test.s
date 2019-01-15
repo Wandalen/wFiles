@@ -12640,10 +12640,11 @@ function statReadActSync( test )
   test.identical( stat.nlink, BigInt( 1 ) )
   else
   test.identical( stat.nlink, 1 );
+  var read = self.provider.fileRead( file2Path );
   if( provider.UsingBigIntForStat )
-  test.ge( stat.size , BigInt( 119 ) );
+  test.ge( stat.size , BigInt( read.length ) );
   else
-  test.identical( stat.size, 27 );
+  test.identical( stat.size, read.length );
 
   //
 
@@ -12675,10 +12676,11 @@ function statReadActSync( test )
   test.identical( stat.nlink, BigInt( 1 ) )
   else
   test.identical( stat.nlink, 1 );
+  var read = self.provider.fileRead( file2Path );
   if( provider.UsingBigIntForStat )
-  test.ge( stat.size , BigInt( 119 ) );
+  test.ge( stat.size , BigInt( read.length ) );
   else
-  test.identical( stat.size, 27 );
+  test.identical( stat.size, read.length );
 
   test.description = 'file2, resolving, , usingTextLink off';
   var o =
@@ -12706,10 +12708,11 @@ function statReadActSync( test )
   test.identical( stat.nlink, BigInt( 1 ) )
   else
   test.identical( stat.nlink, 1 );
+  var read = self.provider.fileRead( file2Path );
   if( provider.UsingBigIntForStat )
-  test.ge( stat.size , BigInt( 119 ) );
+  test.ge( stat.size , BigInt( read.length ) );
   else
-  test.identical( stat.size, 27 );
+  test.identical( stat.size, read.length );
 
   provider.fieldPop( 'usingTextLink', 0 );
 
@@ -12741,10 +12744,11 @@ function statReadActSync( test )
   test.identical( stat.nlink, BigInt( 1 ) )
   else
   test.identical( stat.nlink, 1 );
+  var read = self.provider.fileRead( file2Path );
   if( provider.UsingBigIntForStat )
-  test.ge( stat.size , BigInt( 119 ) );
+  test.ge( stat.size , BigInt( read.length ) );
   else
-  test.identical( stat.size, 27 );
+  test.identical( stat.size, read.length );
 
   provider.filesDelete( /*dir*/testPath );
 
@@ -13685,7 +13689,7 @@ function dirMakeLinksSync( test )
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( dirPath );
   provider.softLink({ dstPath : linkToDir, srcPath : dirPath });
-  var path = provider.path.join( linkToDir, '/dir/dir2/dir3' );
+  var path = provider.path.join( linkToDir, 'dir/dir2/dir3' );
   provider.dirMake({ filePath : path, recursive : 1 })
   test.is( provider.isDir( path ) );
   test.is( provider.isSoftLink( linkToDir ) );
@@ -13694,7 +13698,7 @@ function dirMakeLinksSync( test )
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( dirPath );
   provider.softLink({ dstPath : linkToDir, srcPath : dirPath });
-  var path = provider.path.join( linkToDir, '/dir/dir2/dir3' );
+  var path = provider.path.join( linkToDir, 'dir/dir2/dir3' );
   test.shouldThrowErrorSync( () =>
   {
     provider.dirMake
@@ -20882,7 +20886,8 @@ function hardLinkMultipleSync( test )
 
   if( self.providerIsInstanceOf( _.FileProvider.Extract ) )
   {
-    // next section needs time stats from Extract.statResolvedRead, not implemented yet
+    //Vova: next section needs time stats from Extract.statResolvedRead, not implemented yet
+    test.identical( 1,1 );
     return;
   }
 
@@ -21639,7 +21644,7 @@ function hardLinkSoftlinked( test )
 
   test.case = 'files are already linked, must not throw an error'
   var /*dir*/testPath = mp( 'hardLinkActSync/dir' );
-  var fileInDir = mp( 'hardLinkActSync/testPath/src' );
+  var fileInDir = mp( 'hardLinkActSync/dir/src' );
   var linkToDir = mp( 'hardLinkActSync/linkToDir' );
   var fileInLinkedDir = mp( 'hardLinkActSync/linkToDir/src' );
   provider.fileWrite( fileInDir, fileInDir );
@@ -22038,8 +22043,6 @@ function hardLinkActSync( test )
   }
 
   var expected = _.mapExtend( null, o );
-  expected.srcPath = provider.path.nativize( o.srcPath );
-  expected.dstPath = provider.path.nativize( o.dstPath );
 
   provider.hardLinkAct( o );
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )

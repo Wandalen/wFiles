@@ -237,7 +237,7 @@ function _isSafe()
 
   _.assert( arguments.length === 0 );
 
-  if( f.safe )
+  if( f.safe && f.stating )
   {
     if( record.stat )
     if( !path.isSafe( record.absolute, f.safe ) )
@@ -325,12 +325,15 @@ function _statAnalyze()
   let path = record.path;
   let logger = fileProvider.logger || _global.logger;
 
-  _.assert( record.stat === null || _.fileStatIs( record.stat ) );
   _.assert( f instanceof _.FileRecordFactory, '_record expects instance of ( FileRecordFactory )' );
   _.assert( fileProvider instanceof _.FileProvider.Abstract, 'Expects file provider instance of FileProvider' );
   _.assert( arguments.length === 0 );
 
-  record._isSafe();
+  if( f.stating )
+  {
+    _.assert( record.stat === null || _.fileStatIs( record.stat ) );
+    record._isSafe();
+  }
 
   record.factory.hubFileProvider._recordFormEnd( record );
 

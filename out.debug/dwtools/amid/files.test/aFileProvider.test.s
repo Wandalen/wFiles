@@ -30255,10 +30255,7 @@ function filesAreSame( test )
   var filePath = test.context.pathFor( 'written/filesAreSame/file' );
   provider.fileWrite( filePath, '' );
   var got = provider.filesAreSame( filePath, filePath );
-  if( provider.UsingBigIntForStat )
   test.identical( got, true );
-  else
-  test.identical( got, false );
 
   //
 
@@ -30316,7 +30313,7 @@ function filesAreSame( test )
   provider.fieldPush( 'resolvingSoftLink', 1 );
   var got = provider.filesAreSame( filePath, filePath2 );
   provider.fieldPop( 'resolvingSoftLink', 1 );
-  test.identical( got, true );
+  test.identical( got, false );
 
   //
 
@@ -30325,10 +30322,9 @@ function filesAreSame( test )
   var filePath2 = test.context.pathFor( 'written/filesAreSame/file2' );
   provider.fileWrite( filePath, bufferData1 );
   provider.filesDelete( filePath );
-  test.shouldThrowError( () =>
-  {
-    provider.filesAreSame( filePath, filePath2 );
-  })
+  var got = provider.filesAreSame( filePath, filePath2 );
+  test.identical( got, false )
+
 
   //
 

@@ -4830,8 +4830,6 @@ function _linkMultiple( o, link )
   _.assert( _.boolLike( o.allowingMissed ) );
   _.assert( _.boolLike( o.allowingCycled ) );
 
-  // debugger; //xxx
-
   let needed = 0;
   let factory = self.recordFactory({ allowingMissed : o.allowingMissed, allowingCycled : o.allowingCycled });
   let records = factory.records( o.dstPath );
@@ -5004,7 +5002,7 @@ function _link_functor( gen )
   function _link_body( o )
   {
     let self = this;
-    let path = self.path;
+    let path = self.hub ? self.hub.path : self.path;
     let o2;
     let c = Object.create( null );
 
@@ -5044,6 +5042,8 @@ function _link_functor( gen )
 
     /* */
 
+    debugger;
+
     if( o.sync )
     {
 
@@ -5056,8 +5056,9 @@ function _link_functor( gen )
       Vova : low priority
       */
 
-      // if( _.longIs( o.dstPath ) && c.linkAct.having.hardLinking && o.dstPath[ 0 ] === "/C/pro/web/Port/package/wStarter/builder/package.json" )
-      // debugger;
+      if( _.strHas( o.dstPath, '/filesReflectorExperiment/dstDir/link' ) )
+      debugger;
+
       if( _.longIs( o.dstPath ) && c.linkAct.having.hardLinking )
       return _linkMultiple.call( self, o, _link_body );
       _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
@@ -5070,9 +5071,6 @@ function _link_functor( gen )
       if( c.ended )
       return c.end();
 
-      // if( o.dstPath === '/C/pro/web/Port/app/builder/package.json' )
-      // debugger;
-
       c.verify2();
       if( c.ended )
       return c.end();
@@ -5081,19 +5079,6 @@ function _link_functor( gen )
 
       try
       {
-
-        // qqq : bad
-        // // if( self.fileExists( o2.srcPath ) )
-        // if( c.srcStat )
-        // {
-        //   debugger
-        //   _.assert( !!c.srcStat )
-        //   if( o.breakingSrcHardLink && c.srcStat.isHardLink() )
-        //   c.srcBreakHardLink();
-        // }
-
-        // if( o2.dstPath === '/C/pro/web/Port/app/builder/package.json' )
-        // debugger;
 
         if( self.fileExists( o2.dstPath ) )
         {
@@ -5243,19 +5228,24 @@ function _link_functor( gen )
 
       /* allowingMissed */
 
-      if( !c.srcStat )
+      if( !o.allowingMissed || skippingMissed )
       {
-        if( !o.allowingMissed )
+        if( c.srcStat === undefined )
+        c.srcStat = self.statRead({ filePath : o.srcPath, sync : 1 });
+        if( !c.srcStat )
         {
-          debugger;
-          let err = _.err( 'Source file', _.strQuote( o.srcPath ), 'does not exist' );
-          error( err );
-          return true;
-        }
-        if( skippingMissed )
-        {
-          end( false );
-          return true;
+          if( !o.allowingMissed )
+          {
+            debugger;
+            let err = _.err( 'Source file', _.strQuote( o.srcPath ), 'does not exist' );
+            error( err );
+            return true;
+          }
+          if( skippingMissed )
+          {
+            end( false );
+            return true;
+          }
         }
       }
 
@@ -5393,6 +5383,8 @@ function _link_functor( gen )
     function linksResolve()
     {
 
+      debugger;
+
       try
       {
 
@@ -5428,14 +5420,11 @@ function _link_functor( gen )
           }
           o.srcPath = self.pathResolveLinkFull( o2 );
           c.srcStat = o2.stat;
-          // c.srcResolvedPath = self.pathResolveLinkFull( o2 );
-          // c.srcStat = o2.stat;
-          // if( c.srcResolvedPath )
-          // o.srcPath = c.srcResolvedPath; /* qqq : what is srcResolvedPath for? */ /* aaa: not needed anymore */
         }
         else
         {
-          c.srcStat = self.statRead({ filePath : o.srcPath });
+          /* do not read stat if possible */
+          c.srcStat = self.statRead({ filePath : o.srcPath, sync : 1 });
         }
 
       }
@@ -5503,12 +5492,13 @@ function _link_functor( gen )
         }
         else
         {
+          /* do not read stat if possible */
           return self.statRead({ filePath : o.srcPath, sync : 0 })
           .thenKeep( ( srcStat ) =>
           {
             c.srcStat = srcStat;
             return true;
-          })
+          });
         }
       })
     }
@@ -5803,7 +5793,6 @@ _link_functor.defaults =
   onAct : null,
   onVerify1 : null,
   onVerify2 : null,
-  // onRanameBegin : null,
 
   renaming : true,
   skippingSamePath : true,
@@ -5944,7 +5933,6 @@ let fileRename = _link_functor
   onAct : _fileRenameAct,
   skippingSamePath : true,
   skippingMissed : false,
-  // skippingMissed : true,
 });
 
 var defaults = fileRename.body.defaults;
@@ -6039,6 +6027,9 @@ function _fileCopyVerify2( c )
   _.assert( _.strIs( o.srcPath ) );
   _.assert( _.fileStatIs( c.srcStat ) || c.srcStat === null );
 
+  if( c.srcStat === undefined )
+  c.srcStat = self.statRead({ filePath : o.srcPath, sync : 1 });
+
   if( c.srcStat === null )
   return;
 
@@ -6110,7 +6101,6 @@ let fileCopy = _link_functor
   onVerify2 : _fileCopyVerify2,
   skippingSamePath : true,
   skippingMissed : false,
-  // skippingMissed : true,
 });
 
 var defaults = fileCopy.body.defaults;
@@ -6185,19 +6175,6 @@ operates.dstPath = { pathToWrite : 1 }
  * @memberof wFileProviderPartial
  */
 
-function _hardLinkAct( c )
-{
-  let self = this;
-
-  if( !self.fileExists( c.options2.dstPath ) )
-  if( c.options.breakingSrcHardLink && c.srcStat.isHardLink() )
-  self.hardLinkBreak( c.options2.srcPath );
-
-  return self.hardLinkAct( c.options2 );
-}
-
-_.routineExtend( _hardLinkAct, hardLinkAct );
-
 function _hardLinkVerify1( c )
 {
   let self = this;
@@ -6218,8 +6195,9 @@ function _hardLinkVerify2( c )
   let self = this;
   let o = c.options;
 
-  // if( o.dstPath === '/C/pro/web/Port/app/builder/package.json' )
-  // debugger;
+  if( c.srcStat === undefined )
+  c.srcStat = self.statRead({ filePath : o.srcPath, sync : 1 });
+  _.assert( _.fileStatIs( c.srcStat ) );
 
   if( !c.srcStat.isTerminal() )
   {
@@ -6228,11 +6206,24 @@ function _hardLinkVerify2( c )
   else
   {
     let linked = self.filesAreHardLinked([ o.dstPath, o.srcPath ]);
-    if( linked || linked === _.maybe ) // qqq : this is fix
-    // if( linked || linked === null )
+    if( linked || linked === _.maybe )
     c.end( true );
   }
 }
+
+function _hardLinkAct( c )
+{
+  let self = this;
+
+  if( c.options.breakingSrcHardLink )
+  if( c.srcStat.isHardLink() )
+  if( !self.fileExists( c.options2.dstPath ) )
+  self.hardLinkBreak( c.options2.srcPath );
+
+  return self.hardLinkAct( c.options2 );
+}
+
+_.routineExtend( _hardLinkAct, hardLinkAct );
 
 let hardLink = _link_functor
 ({
@@ -6901,9 +6892,6 @@ function filesAreHardLinked_body( o )
   if( !statFirst )
   return false;
 
-  // if( o.filePath[ 0 ] === '/C/pro/web/Port/app/builder/package.json' )
-  // debugger;
-
   for( let i = 1 ; i < o.filePath.length ; i++ )
   {
     let statCurrent = self.statRead( self.path.from( o.filePath[ i ] ) );
@@ -7080,7 +7068,6 @@ function _protocolsSet( protocols )
   protocols = protocols.map( ( p ) => p.toLowerCase() );
 
   let protocol = protocols[ 0 ];
-  // let protocol = protocols.join( '+' );
 
   self[ protocolsSymbol ] = protocols;
   self[ protocolSymbol ] = protocol;
@@ -7090,12 +7077,9 @@ function _protocolsSet( protocols )
   else
   self[ originPathSymbol ] = null;
 
-  // self[ originPathSymbol ] = protocols.map( ( protocol ) => protocol + '://' );
-
 }
 
 var having = _protocolsSet.having = Object.create( null );
-
 having.writing = 0;
 having.reading = 0;
 having.driving = 0;
@@ -7114,7 +7098,6 @@ function _protocolSet( protocol )
 }
 
 var having = _protocolSet.having = Object.create( null );
-
 having.writing = 0;
 having.reading = 0;
 having.driving = 0;
@@ -7125,22 +7108,10 @@ having.kind = 'inter';
 function _originPathSet( origins )
 {
   let self = this;
-
   self.protocols = self.protocolsForOrigins( origins );
-
-  // _.assert( arguments.length === 1, 'Expects single argument' );
-  // _.assert( _.strIs( origins ) );
-  // _.assert( _.strEnds( origins, '://' ) );
-  //
-  // origins = _.strRemoveEnd( origins, '://' );
-  //
-  // _.assert( !_.strHas( origins, '://' ) );
-
-  // self._protocolsSet( origins.split( '+' ) );
 }
 
 var having = _originPathSet.having = Object.create( null );
-
 having.writing = 0;
 having.reading = 0;
 having.driving = 0;

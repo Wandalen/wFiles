@@ -51,7 +51,7 @@ var Statics =
 {
   Record : FileRecord,
   RecordFilter : FileRecordFilter,
-  RecordContext : FileRecordFactory,
+  RecordFactory : FileRecordFactory,
 }
 
 // --
@@ -61,16 +61,15 @@ var Statics =
 var Proto =
 {
 
-  init : init,
+  init,
 
   // relations
 
-
-  Composes : Composes,
-  Aggregates : Aggregates,
-  Associates : Associates,
-  Restricts : Restricts,
-  Statics : Statics,
+  Composes,
+  Aggregates,
+  Associates,
+  Restricts,
+  Statics,
 
 }
 

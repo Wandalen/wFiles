@@ -9899,12 +9899,53 @@ function filesReflector( t )
 
 //
 
-function filesReflectorExperiment( t )
+function filesReflectorExperiment( test )
 {
   let context = this;
-  let testPath = _.path.join( context.testSuitePath, t.name );
+  let testPath = _.path.join( context.testSuitePath, test.name );
 
-  /**/
+  /* */
+
+  // var filesTree =
+  // {
+  //   'terminal' : 'terminal',
+  //   'link' : [{ softLink : '/terminal' }]
+  // }
+  //
+  // var src = new _.FileProvider.Extract({ protocol : 'src', filesTree : filesTree });
+  // var dst = new _.FileProvider.Extract({ protocol : 'dst', filesTree : {} });
+  // var hub = new _.FileProvider.Hub({ providers : [ src, dst ] });
+  // var dstPath = _.path.join( '/', 'dstDir' );
+  //
+  // var reflect = hub.filesReflector
+  // ({
+  //   dstFilter :
+  //   {
+  //     prefixPath : _.uri.join( 'dst://', dstPath ),
+  //   },
+  //   srcFilter :
+  //   {
+  //     prefixPath : _.uri.join( 'src://', '/' ),
+  //   },
+  //   mandatory : 1,
+  // });
+  //
+  // debugger;
+  // reflect( '.' );
+  // debugger;
+  //
+  // var got = dst.dirRead( dstPath );
+  // var expected = [ 'link', 'terminal' ];
+  // test.identical( got, expected );
+  // test.is( dst.isTerminal( _.path.join( dstPath, 'terminal' ) ) );
+  // test.is( dst.isSoftLink( _.path.join( dstPath, 'link' ) ) );
+  // var got = dst.fileRead( _.path.join( dstPath, 'link' ) );
+  // var expected = 'terminal';
+  // test.identical( got, expected );
+  //
+  // debugger; return; xxx
+
+  /* */
 
   var filesTree =
   {
@@ -9917,7 +9958,7 @@ function filesReflectorExperiment( t )
   var hub = new _.FileProvider.Hub({ providers : [ src,dst ] });
   var dstPath = _.path.join( testPath, 'dstDir' );
 
-  let move = hub.filesReflector
+  var reflect = hub.filesReflector
   ({
     dstFilter :
     {
@@ -9930,16 +9971,19 @@ function filesReflectorExperiment( t )
     mandatory : 1,
   });
 
-  move( '.' );
+  debugger;
+  reflect( '.' );
+  debugger;
 
   var got = dst.dirRead( dstPath );
-  var expected = [ 'terminal', 'link' ];
+  var expected = [ 'link', 'terminal' ];
   test.identical( got, expected );
   test.is( dst.isTerminal( _.path.join( dstPath, 'terminal' ) ) );
   test.is( dst.isSoftLink( _.path.join( dstPath, 'link' ) ) );
   var got = dst.fileRead( _.path.join( dstPath, 'link' ) );
   var expected = 'terminal';
-  test.identical( read, expected );
+  test.identical( got, expected );
+
 }
 
 //

@@ -118,7 +118,7 @@ function providerRegister( fileProvider )
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( fileProvider instanceof _.FileProvider.Abstract );
+  _.assert( fileProvider instanceof _.FileProvider.Abstract, () => 'Expects file providers, but got ' + _.strTypeOf( fileProvider ) );
   _.assert( _.arrayIs( fileProvider.protocols ) );
   _.assert( _.strDefined( fileProvider.protocol ), 'Cant register file provider without {-protocol-} defined', _.strQuote( fileProvider.nickName ) );
   _.assert( _.strDefined( fileProvider.originPath ) );
@@ -126,7 +126,6 @@ function providerRegister( fileProvider )
 
   {
     let protocolMap = self.providersWithProtocolMap;
-    // let originMap = self.providersWithOriginMap;
     for( let p = 0 ; p < fileProvider.protocols.length ; p++ )
     {
       let protocol = fileProvider.protocols[ p ];
@@ -137,7 +136,6 @@ function providerRegister( fileProvider )
         () => _.strQuote( fileProvider.nickName ) + ' is trying to reserve protocol, reserved by ' + _.strQuote( protocolMap[ protocol ].nickName )
       );
       protocolMap[ protocol ] = fileProvider;
-      // originMap[ self.originsForProtocols( protocol ) ] = fileProvider;
     }
   }
 
@@ -156,11 +154,9 @@ function providerUnregister( fileProvider )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( fileProvider instanceof _.FileProvider.Abstract );
   _.assert( self.providersWithProtocolMap[ fileProvider.protocol ] === fileProvider );
-  // _.assert( self.providersWithOriginMap[ fileProvider.originPath ] === fileProvider );
   _.assert( fileProvider.hub === self );
 
   delete self.providersWithProtocolMap[ fileProvider.protocol ];
-  // delete self.providersWithOriginMap[ fileProvider.originPath ];
   fileProvider.hub = null;
 
   return self;
@@ -209,20 +205,7 @@ function _recordFactoryFormEnd( recordFactory )
 
   _.assert( recordFactory instanceof _.FileRecordFactory );
   _.assert( arguments.length === 1, 'Expects single argument' );
-
-  // if( !recordFactory.effectiveFileProvider )
-  // debugger;
-
-  // if( !recordFactory.effectiveFileProvider )
-  // recordFactory.effectiveFileProvider = recordFactory.hubFileProvider.providerForPath( recordFactory.basePath );
-
   _.assert( recordFactory.effectiveFileProvider instanceof _.FileProvider.Abstract, 'No provider for base path', recordFactory.basePath, 'found' );
-
-  // recordFactory.basePath = recordFactory.effectiveFileProvider.localFromGlobal( recordFactory.basePath );
-  //
-  // if( recordFactory.stemPath !== null )
-  // recordFactory.stemPath = recordFactory.effectiveFileProvider.localFromGlobal( recordFactory.stemPath );
-
   _.assert( !_.path.isGlobal( recordFactory.basePath ) );
   _.assert( recordFactory.stemPath === null || !_.path.isGlobal( recordFactory.stemPath ) );
 
@@ -249,9 +232,6 @@ function _recordPathForm( record )
   _.assert( record instanceof _.FileRecord );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  // record.absoluteGlobalMaybe = record.absoluteGlobal;
-  // record.realGlobalMaybe = record.realGlobal;
-
   return record;
 }
 
@@ -262,8 +242,6 @@ function _recordFormEnd( record )
   let self = this;
   _.assert( record instanceof _.FileRecord );
   _.assert( arguments.length === 1, 'Expects single argument' );
-
-  // record.realGlobalMaybe = record.realGlobal;
 
   return record;
 }
@@ -344,9 +322,6 @@ function _localFromGlobal( filePath, provider )
   _.assert( _.strIs( filePath ), 'Expects string' );
   _.assert( arguments.length === 1 || arguments.length === 2 );
 
-  // if( _.strHas( filePath, 'git+' ) )
-  // debugger;
-
   r.originalPath = filePath;
 
   r.parsedPath = r.originalPath;
@@ -409,15 +384,10 @@ function pathResolveLinkFull_body( o )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  // if( !o.resolvingSoftLink && !o.resolvingTextLink )
-  // return o.filePath;
-
   let r = self._localFromGlobal( o.filePath );
   o.filePath = r.filePath;
 
   let result = r.provider.pathResolveLinkFull.body.call( r.provider, o );
-
-  // _.assert( !!result );
 
   if( result === null )
   return null;
@@ -446,14 +416,8 @@ function pathResolveLinkTail_body( o )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  // if( !o.resolvingSoftLink && !o.resolvingTextLink )
-  // return o.filePath;
-
   let r = self._localFromGlobal( o.filePath );
   o.filePath = r.filePath;
-
-  // if( o.filePath === '/src/a1' )
-  // debugger;
 
   let result = r.provider.pathResolveLinkTail.body.call( r.provider, o );
 
@@ -463,17 +427,8 @@ function pathResolveLinkTail_body( o )
   if( result.filePath === null )
   return null;
 
-  // _.assert( !!result );
-
   result.filePath = self.path.join( r.provider.originPath, result.filePath );
   result.absolutePath = self.path.join( r.provider.originPath, result.absolutePath );
-
-  // if( result === o.filePath )
-  // {
-  //   debugger;
-  //   _.assert( 0, 'not tested' );
-  //   // return r.originalPath;
-  // }
 
   return result;
 }
@@ -535,7 +490,6 @@ function fileRead_body( o )
   });
 
   let r = self._localFromGlobal( o.filePath );
-  // let o2 = _.mapOnly( o, self.statReadAct.defaults );
   let o2 = _.mapExtend( null, o );
 
   o2.resolvingSoftLink = 0;
@@ -560,14 +514,21 @@ function _link_functor( fop )
   let routine = fop.routine;
   let routineName = routine.name;
   let onDifferentProviders = fop.onDifferentProviders;
-  let allowDifferentProviders = fop.allowDifferentProviders;
+  // let allowDifferentProviders = fop.allowDifferentProviders;
 
+  _.assert( _.routineIs( fop.onDifferentProviders ) || _.boolIs( fop.onDifferentProviders ) );
   _.assert( _.strDefined( routineName ) );
   _.assert( _.objectIs( routine.defaults ) );
   _.assert( routine.paths === undefined );
   _.assert( _.objectIs( routine.having ) );
+  // _.assert( _.routineIs( onDifferentProviders ) );
 
   _.routineExtend( hubLink, routine );
+
+  if( fop.onDifferentProviders === true )
+  fop.onDifferentProviders = function handleDifferentProviders( op )
+  {
+  }
 
   let defaults = hubLink.defaults;
 
@@ -581,68 +542,66 @@ function _link_functor( fop )
   function hubLink( o )
   {
     let self = this;
-
-    _.assert( arguments.length === 1, 'Expects single argument' );
-
+    let op = Object.create( null );
+    op.continue = true;
+    op.options = o;
+    op.routineName = routineName;
+    op.end = function end()
     {
+      op.continue = false;
+      return op.result;
+    }
 
-      let dst = self._localFromGlobal( o.originalDstPath );
-      let src = self._localFromGlobal( o.originalSrcPath );
+    _.assert( arguments.length === 1, 'Expects single argument' ); debugger;
 
-      _.assert( !!dst.provider, 'no provider for path', o.originalDstPath );
-      _.assert( !!src.provider, 'no provider for path', o.originalSrcPath );
+    /* */
 
-      if( dst.provider !== src.provider )
-      {
-        if( allowDifferentProviders )
-        {
-        }
-        else
-        {
-          if( onDifferentProviders )
-          return onDifferentProviders.call( self, o, dst, src, routine );
-          else
-          throw _.err( 'Cant ' + routineName + ' files of different file providers :\n' + o.originalDstPath + '\n' + o.originalSrcPath );
-        }
-      }
-      else
-      {
-        o.originalSrcPath = src.filePath;
-      }
+    op.originalDst = self._localFromGlobal( o.originalDstPath );
+    op.originalSrc = self._localFromGlobal( o.originalSrcPath );
 
-      o.originalDstPath = dst.filePath;
+    _.assert( !!op.originalDst.provider, 'no provider for path', o.originalDstPath );
+    _.assert( !!op.originalSrc.provider, 'no provider for path', o.originalSrcPath );
 
+    o.originalDstPath = op.originalDst.filePath;
+
+    if( op.originalDst.provider !== op.originalSrc.provider )
+    {
+    }
+    else
+    {
+      o.originalSrcPath = op.originalSrc.filePath;
     }
 
     /* */
 
-    let dst = self._localFromGlobal( o.dstPath );
-    let src = self._localFromGlobal( o.srcPath );
+    op.dst = self._localFromGlobal( o.dstPath );
+    op.src = self._localFromGlobal( o.srcPath );
 
-    _.assert( !!dst.provider, 'no provider for path', o.dstPath );
-    _.assert( !!src.provider, 'no provider for path', o.srcPath );
+    _.assert( !!op.dst.provider, 'no provider for path', o.dstPath );
+    _.assert( !!op.src.provider, 'no provider for path', o.srcPath );
 
-    if( dst.provider !== src.provider )
+    o.dstPath = op.dst.filePath;
+
+    if( op.dst.provider !== op.src.provider )
     {
-      if( allowDifferentProviders )
+      if( onDifferentProviders )
       {
+        onDifferentProviders.call( self, op );
+        if( !op.continue )
+        return op.result;
       }
       else
       {
-        if( onDifferentProviders )
-        return onDifferentProviders.call( self, o, dst, src, routine );
-        else
         throw _.err( 'Cant ' + routineName + ' files of different file providers :\n' + o.dstPath + '\n' + o.srcPath );
       }
     }
     else
     {
-      o.srcPath = src.filePath;
+      o.srcPath = op.src.filePath;
     }
 
-    o.dstPath = dst.filePath;
-
-    return dst.provider[ routineName ]( o );
+    op.result = op.dst.provider[ routineName ]( o );
+    return op.end();
   }
 
 }
@@ -650,8 +609,8 @@ function _link_functor( fop )
 _link_functor.defaults =
 {
   routine : null,
-  onDifferentProviders : null,
-  allowDifferentProviders : 0,
+  onDifferentProviders : false,
+  // allowDifferentProviders : 0,
 }
 
 //
@@ -659,50 +618,57 @@ _link_functor.defaults =
 let hardLinkAct = _link_functor({ routine : Parent.prototype.hardLinkAct });
 let fileRenameAct = _link_functor({ routine : Parent.prototype.fileRenameAct });
 
-let softLinkAct = _link_functor({ routine : Parent.prototype.softLinkAct, allowDifferentProviders : 1 });
-let textLinkAct = _link_functor({ routine : Parent.prototype.textLinkAct, allowDifferentProviders : 1 });
+let softLinkAct = _link_functor({ routine : Parent.prototype.softLinkAct, onDifferentProviders : true });
+let textLinkAct = _link_functor({ routine : Parent.prototype.textLinkAct, onDifferentProviders : true });
 
 //
 
-function _fileCopyActDifferent( o, dst, src, routine )
+// function _fileCopyActDifferent( o, dst, src, routine )
+function _fileCopyActDifferent( op )
 {
   let self = this;
   let path = self.path;
+  let o = op.options;
 
   /* qqq : implement async */
   _.assert( o.sync, 'not implemented' );
 
-  if( src.provider.isSoftLink( src.filePath ) )
+  if( op.src.provider.isSoftLink( op.src.filePath ) )
   {
-    let resolvedPath = src.provider.pathResolveSoftLink( src.filePath );
-    return dst.provider.softLink
+    let resolvedPath = op.src.provider.pathResolveSoftLink( op.src.filePath );
+    c.result = op.dst.provider.softLink
     ({
-      dstPath : dst.filePath,
-      srcPath : path.join( src.parsedPath.origin, resolvedPath ),
+      dstPath : op.dst.filePath,
+      srcPath : path.join( op.src.parsedPath.origin, resolvedPath ),
       allowingMissed : 1,
     });
+    return op.end();
   }
 
-  let read = src.provider.fileRead
+  let read = op.src.provider.fileRead
   ({
-    filePath : src.filePath,
+    filePath : op.src.filePath,
     resolvingTextLink : 0,
     resolvingSoftLink : 0,
     encoding : 'original.type',
     sync : 1,
   });
 
-  let result = dst.provider.fileWrite
+  op.result = op.dst.provider.fileWrite
   ({
-    filePath : dst.filePath,
+    filePath : op.dst.filePath,
     data : read,
     encoding : 'original.type',
   });
 
-  return result;
+  return op.end();
 }
 
-let fileCopyAct = _link_functor({ routine : Parent.prototype.fileCopyAct, onDifferentProviders : _fileCopyActDifferent });
+let fileCopyAct = _link_functor
+({
+  routine : Parent.prototype.fileCopyAct,
+  onDifferentProviders : _fileCopyActDifferent,
+});
 
 // --
 // link
@@ -905,13 +871,6 @@ function routinesGenerate()
         {
           let r;
 
-          // if( havingBare )
-          // debugger;
-          //
-          // _.assert( o.resolvingSoftLink !== undefined );
-          // _.assert( o.resolvingTextLink !== undefined );
-          // xxx
-
           if( hubResolving )
           o[ p ] = self.pathResolveLinkFull
           ({
@@ -970,23 +929,6 @@ function routinesGenerate()
     }
 
     _.routineExtend( wrap, original );
-
-    // wrap.having = Object.create( original.having );
-    //
-    // if( original.defaults )
-    // {
-    //   wrap.defaults = Object.create( original.defaults );
-    //   wrap.paths = Object.create( original.paths );
-    // }
-    //
-    // if( original.encoders )
-    // wrap.encoders = Object.create( original.encoders );
-    //
-    // if( original.pre )
-    // wrap.pre = original.pre;
-    //
-    // if( original.body )
-    // wrap.body = original.body;
 
   })();
 

@@ -9956,7 +9956,9 @@ function filesReflectorExperiment( test )
   var src = new _.FileProvider.Extract({ protocol : 'src', filesTree : filesTree });
   var dst = new _.FileProvider.HardDrive({ protocol : 'dst' });
   var hub = new _.FileProvider.Hub({ providers : [ src,dst ] });
-  var dstPath = _.path.join( testPath, 'dstDir' );
+  var dstPath = _.path.join( testPath, '.' );
+
+  dst.filesDelete( testPath );
 
   var reflect = hub.filesReflector
   ({

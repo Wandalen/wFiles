@@ -308,7 +308,7 @@ function localFromGlobal( filePath )
 {
   let self = this;
   _.assert( arguments.length === 1, 'Expects single argument' );
-  return self._localFromGlobal( filePath ).filePath;
+  return self._localFromGlobal( filePath ).localPath;
 }
 
 //
@@ -317,12 +317,12 @@ function _localFromGlobal( filePath, provider )
 {
   let self = this;
   let path = self.path;
-  let r = { filePath : filePath, provider : provider };
+  let r = Object.create( null );
+  r.originalPath = filePath;
+  r.provider = provider;
 
   _.assert( _.strIs( filePath ), 'Expects string' );
   _.assert( arguments.length === 1 || arguments.length === 2 );
-
-  r.originalPath = filePath;
 
   r.parsedPath = r.originalPath;
   if( _.strIs( filePath ) )
@@ -336,9 +336,9 @@ function _localFromGlobal( filePath, provider )
 
   _.assert( _.objectIs( r.provider ), () => 'No provider for path ' + _.strQuote( filePath ) );
 
-  r.filePath = r.provider.localFromGlobal( r.parsedPath );
+  r.localPath = r.provider.localFromGlobal( r.parsedPath );
 
-  _.assert( _.strIs( r.filePath ) );
+  _.assert( _.strIs( r.localPath ) );
 
   return r;
 }
@@ -357,11 +357,10 @@ function pathNativizeAct( filePath )
 {
   let self = this;
   let r = self._localFromGlobal.apply( self, arguments );
-  r.filePath = r.provider.path.nativize( r.filePath );
-  xxx
+  r.localPath = r.provider.path.nativize( r.localPath );
+  _.assert( 0, 'not implemented' ); xxx
   _.assert( _.objectIs( r.provider ), 'No provider for path', filePath );
   _.assert( arguments.length === 1 );
-  return r;
 }
 
 //
@@ -385,7 +384,7 @@ function pathResolveLinkFull_body( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
 
   let r = self._localFromGlobal( o.filePath );
-  o.filePath = r.filePath;
+  o.filePath = r.localPath;
 
   let result = r.provider.pathResolveLinkFull.body.call( r.provider, o );
 
@@ -417,7 +416,7 @@ function pathResolveLinkTail_body( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
 
   let r = self._localFromGlobal( o.filePath );
-  o.filePath = r.filePath;
+  o.filePath = r.localPath;
 
   let result = r.provider.pathResolveLinkTail.body.call( r.provider, o );
 
@@ -447,7 +446,7 @@ function pathResolveSoftLink_body( o )
 
   let r = self._localFromGlobal( o.filePath );
 
-  o.filePath = r.filePath;
+  o.filePath = r.localPath;
 
   let result = r.provider.pathResolveSoftLink.body.call( r.provider, o );
 
@@ -493,7 +492,7 @@ function fileRead_body( o )
   let o2 = _.mapExtend( null, o );
 
   o2.resolvingSoftLink = 0;
-  o2.filePath = r.filePath;
+  o2.filePath = r.localPath;
   let result = r.provider.fileRead.body.call( r.provider, o2 );
 
   return result;
@@ -559,17 +558,17 @@ function _link_functor( fop )
     op.originalDst = self._localFromGlobal( o.originalDstPath );
     op.originalSrc = self._localFromGlobal( o.originalSrcPath );
 
-    _.assert( !!op.originalDst.provider, 'no provider for path', o.originalDstPath );
-    _.assert( !!op.originalSrc.provider, 'no provider for path', o.originalSrcPath );
+    _.assert( !!op.originalDst.provider, 'No provider for path', o.originalDstPath );
+    _.assert( !!op.originalSrc.provider, 'No provider for path', o.originalSrcPath );
 
-    o.originalDstPath = op.originalDst.filePath;
+    o.originalDstPath = op.originalDst.localPath;
 
     if( op.originalDst.provider !== op.originalSrc.provider )
     {
     }
     else
     {
-      o.originalSrcPath = op.originalSrc.filePath;
+      o.originalSrcPath = op.originalSrc.localPath;
     }
 
     /* */
@@ -577,10 +576,10 @@ function _link_functor( fop )
     op.dst = self._localFromGlobal( o.dstPath );
     op.src = self._localFromGlobal( o.srcPath );
 
-    _.assert( !!op.dst.provider, 'no provider for path', o.dstPath );
-    _.assert( !!op.src.provider, 'no provider for path', o.srcPath );
+    _.assert( !!op.dst.provider, 'No provider for path', o.dstPath );
+    _.assert( !!op.src.provider, 'No provider for path', o.srcPath );
 
-    o.dstPath = op.dst.filePath;
+    o.dstPath = op.dst.localPath;
 
     if( op.dst.provider !== op.src.provider )
     {
@@ -597,7 +596,7 @@ function _link_functor( fop )
     }
     else
     {
-      o.srcPath = op.src.filePath;
+      o.srcPath = op.src.localPath;
     }
 
     op.result = op.dst.provider[ routineName ]( o );
@@ -633,12 +632,13 @@ function _fileCopyActDifferent( op )
   /* qqq : implement async */
   _.assert( o.sync, 'not implemented' );
 
-  if( op.src.provider.isSoftLink( op.src.filePath ) )
+  if( op.src.provider.isSoftLink( op.src.localPath ) )
   {
-    let resolvedPath = op.src.provider.pathResolveSoftLink( op.src.filePath );
+    let resolvedPath = op.src.provider.pathResolveSoftLink( op.src.localPath );
+    debugger;
     c.result = op.dst.provider.softLink
     ({
-      dstPath : op.dst.filePath,
+      dstPath : op.dst.localPath,
       srcPath : path.join( op.src.parsedPath.origin, resolvedPath ),
       allowingMissed : 1,
     });
@@ -647,7 +647,7 @@ function _fileCopyActDifferent( op )
 
   let read = op.src.provider.fileRead
   ({
-    filePath : op.src.filePath,
+    filePath : op.src.localPath,
     resolvingTextLink : 0,
     resolvingSoftLink : 0,
     encoding : 'original.type',
@@ -656,7 +656,7 @@ function _fileCopyActDifferent( op )
 
   op.result = op.dst.provider.fileWrite
   ({
-    filePath : op.dst.filePath,
+    filePath : op.dst.localPath,
     data : read,
     encoding : 'original.type',
   });
@@ -690,7 +690,7 @@ function filesAreHardLinkedAct( o )
   if( dst.provider !== src.provider )
   return false;
 
-  return dst.provider.filesAreHardLinkedAct({ filePath : [ dst.filePath, src.filePath ] });
+  return dst.provider.filesAreHardLinkedAct({ filePath : [ dst.localPath, src.localPath ] });
 }
 
 _.routineExtend( filesAreHardLinkedAct, Parent.prototype.filesAreHardLinkedAct );
@@ -880,7 +880,7 @@ function routinesGenerate()
           });
 
           r = self._localFromGlobal( o[ p ] );
-          o[ p ] = r.filePath;
+          o[ p ] = r.localPath;
           provider = r.provider;
 
           _.assert( _.objectIs( provider ), 'No provider for path', o[ p ] );

@@ -5042,8 +5042,6 @@ function _link_functor( gen )
 
     /* */
 
-    debugger;
-
     if( o.sync )
     {
 
@@ -5133,8 +5131,6 @@ function _link_functor( gen )
       c.con2.thenKeep( ( got ) =>
       {
         log();
-        // if( c.tempPath )
-        // return self.filesDelete({ filePath : c.tempPath, verbosity : 0 });
         return c.tempDelete();
       });
       c.con2.thenKeep( () =>
@@ -5207,8 +5203,6 @@ function _link_functor( gen )
         let r = onVerify1.call( self, c );
         _.assert( r === undefined );
       }
-      // if( onVerify1.call( self, c ) )
-      // return true;
 
     }
 
@@ -5276,12 +5270,6 @@ function _link_functor( gen )
         let r = onVerify2.call( self, c );
         _.assert( r === undefined );
       }
-
-      // if( onVerify2.call( self, c ) )
-      // {
-      //   end( true );
-      //   return true;
-      // }
 
       return false;
     }

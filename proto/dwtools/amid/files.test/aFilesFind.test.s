@@ -9906,47 +9906,6 @@ function filesReflectorExperiment( test )
 
   /* */
 
-  // var filesTree =
-  // {
-  //   'terminal' : 'terminal',
-  //   'link' : [{ softLink : '/terminal' }]
-  // }
-  //
-  // var src = new _.FileProvider.Extract({ protocol : 'src', filesTree : filesTree });
-  // var dst = new _.FileProvider.Extract({ protocol : 'dst', filesTree : {} });
-  // var hub = new _.FileProvider.Hub({ providers : [ src, dst ] });
-  // var dstPath = _.path.join( '/', 'dstDir' );
-  //
-  // var reflect = hub.filesReflector
-  // ({
-  //   dstFilter :
-  //   {
-  //     prefixPath : _.uri.join( 'dst://', dstPath ),
-  //   },
-  //   srcFilter :
-  //   {
-  //     prefixPath : _.uri.join( 'src://', '/' ),
-  //   },
-  //   mandatory : 1,
-  // });
-  //
-  // debugger;
-  // reflect( '.' );
-  // debugger;
-  //
-  // var got = dst.dirRead( dstPath );
-  // var expected = [ 'link', 'terminal' ];
-  // test.identical( got, expected );
-  // test.is( dst.isTerminal( _.path.join( dstPath, 'terminal' ) ) );
-  // test.is( dst.isSoftLink( _.path.join( dstPath, 'link' ) ) );
-  // var got = dst.fileRead( _.path.join( dstPath, 'link' ) );
-  // var expected = 'terminal';
-  // test.identical( got, expected );
-  //
-  // debugger; return; xxx
-
-  /* */
-
   var filesTree =
   {
     'terminal' : 'terminal',
@@ -9954,11 +9913,9 @@ function filesReflectorExperiment( test )
   }
 
   var src = new _.FileProvider.Extract({ protocol : 'src', filesTree : filesTree });
-  var dst = new _.FileProvider.HardDrive({ protocol : 'dst' });
-  var hub = new _.FileProvider.Hub({ providers : [ src,dst ] });
-  var dstPath = _.path.join( testPath, '.' );
-
-  dst.filesDelete( testPath );
+  var dst = new _.FileProvider.Extract({ protocol : 'dst', filesTree : {} });
+  var hub = new _.FileProvider.Hub({ providers : [ src, dst ] });
+  var dstPath = _.path.join( '/', 'dstDir' );
 
   var reflect = hub.filesReflector
   ({
@@ -9968,7 +9925,7 @@ function filesReflectorExperiment( test )
     },
     srcFilter :
     {
-      prefixPath : _.uri.join( 'src://','/' ),
+      prefixPath : _.uri.join( 'src://', '/' ),
     },
     mandatory : 1,
   });
@@ -9985,6 +9942,49 @@ function filesReflectorExperiment( test )
   var got = dst.fileRead( _.path.join( dstPath, 'link' ) );
   var expected = 'terminal';
   test.identical( got, expected );
+
+  debugger; return; xxx
+
+  // /* */
+  //
+  // var filesTree =
+  // {
+  //   'terminal' : 'terminal',
+  //   'link' : [{ softLink : '/terminal' }]
+  // }
+  //
+  // var src = new _.FileProvider.Extract({ protocol : 'src', filesTree : filesTree });
+  // var dst = new _.FileProvider.HardDrive({ protocol : 'dst' });
+  // var hub = new _.FileProvider.Hub({ providers : [ src,dst ] });
+  // var dstPath = _.path.join( testPath, '.' );
+  //
+  // dst.filesDelete( testPath );
+  //
+  // var reflect = hub.filesReflector
+  // ({
+  //   dstFilter :
+  //   {
+  //     prefixPath : _.uri.join( 'dst://', dstPath ),
+  //   },
+  //   srcFilter :
+  //   {
+  //     prefixPath : _.uri.join( 'src://','/' ),
+  //   },
+  //   mandatory : 1,
+  // });
+  //
+  // debugger;
+  // reflect( '.' );
+  // debugger;
+  //
+  // var got = dst.dirRead( dstPath );
+  // var expected = [ 'link', 'terminal' ];
+  // test.identical( got, expected );
+  // test.is( dst.isTerminal( _.path.join( dstPath, 'terminal' ) ) );
+  // test.is( dst.isSoftLink( _.path.join( dstPath, 'link' ) ) );
+  // var got = dst.fileRead( _.path.join( dstPath, 'link' ) );
+  // var expected = 'terminal';
+  // test.identical( got, expected );
 
 }
 

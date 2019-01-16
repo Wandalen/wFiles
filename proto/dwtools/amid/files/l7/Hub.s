@@ -513,7 +513,6 @@ function _link_functor( fop )
 
   let routine = fop.routine;
   let routineName = routine.name;
-  let onDifferentProviders = fop.onDifferentProviders;
   // let allowDifferentProviders = fop.allowDifferentProviders;
 
   _.assert( _.routineIs( fop.onDifferentProviders ) || _.boolIs( fop.onDifferentProviders ) );
@@ -530,6 +529,7 @@ function _link_functor( fop )
   {
   }
 
+  let onDifferentProviders = fop.onDifferentProviders;
   let defaults = hubLink.defaults;
 
   _.assert( defaults.srcPath !== undefined );

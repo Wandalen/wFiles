@@ -1360,6 +1360,39 @@ function recordFilterClone( test )
 
 }
 
+//
+
+function recordStating( test )
+{
+  test.case = 'get stat with stating off';
+  var o =
+  {
+    defaultFileProvider : _.fileProvider,
+    filter : null,
+    basePath : _.path.normalize( __dirname ),
+    stating : false
+  };
+  var filePath = _.path.normalize( __filename );
+  var factory = _.FileRecordFactory.TollerantFrom( o ).form();
+  var got = factory.record({ input : filePath, factory : factory });
+  var stat = got.stat;
+  test.identical( stat, 0 );
+
+  test.case = 'get stat with stating on';
+  var o =
+  {
+    defaultFileProvider : _.fileProvider,
+    filter : null,
+    basePath : _.path.normalize( __dirname ),
+    stating : true
+  };
+  var filePath = _.path.normalize( __filename );
+  var factory = _.FileRecordFactory.TollerantFrom( o ).form();
+  var got = factory.record({ input : filePath, factory : factory });
+  var stat = got.stat;
+  test.is( _.fileStatIs( stat ) );
+}
+
 // --
 // proto
 // --
@@ -1383,6 +1416,8 @@ var Self =
     recordForRelativeLink,
 
     recordFilterClone,
+
+    recordStating
 
   },
 

@@ -959,7 +959,7 @@ function filesFindCriticalCases( test )
 
   var extract = _.FileProvider.Extract
   ({
-    filesTree : { dir1 : { a : 1, b : 2 }, e : 5 },
+    filesTree : { dir1 : { a : '1', b : '2' }, e : '5' },
   });
 
   extract.protocol = 'src';
@@ -2747,7 +2747,6 @@ function filesFindResolving( test )
   let context = this;
   let path = context.provider.path;
   var testPath = path.join( context.testSuitePath, test.name );
-
   var softLinkIsSupported = context.softLinkIsSupported();
 
   var fixedOptions =
@@ -9900,6 +9899,51 @@ function filesReflector( t )
 
 //
 
+function filesReflectorExperiment( t )
+{
+  let context = this;
+  let testPath = _.path.join( context.testSuitePath, t.name );
+
+  /**/
+
+  var filesTree =
+  {
+    'terminal' : 'terminal',
+    'link' : [{ softLink : '/terminal' }]
+  }
+
+  var src = new _.FileProvider.Extract({ protocol : 'src', filesTree : filesTree });
+  var dst = new _.FileProvider.HardDrive({ protocol : 'dst' });
+  var hub = new _.FileProvider.Hub({ providers : [ src,dst ] });
+  var dstPath = _.path.join( testPath, 'dstDir' );
+
+  let move = hub.filesReflector
+  ({
+    dstFilter :
+    {
+      prefixPath : _.uri.join( 'dst://', dstPath ),
+    },
+    srcFilter :
+    {
+      prefixPath : _.uri.join( 'src://','/' ),
+    },
+    mandatory : 1,
+  });
+
+  move( '.' );
+
+  var got = dst.dirRead( dstPath );
+  var expected = [ 'terminal', 'link' ];
+  test.identical( got, expected );
+  test.is( dst.isTerminal( _.path.join( dstPath, 'terminal' ) ) );
+  test.is( dst.isSoftLink( _.path.join( dstPath, 'link' ) ) );
+  var got = dst.fileRead( _.path.join( dstPath, 'link' ) );
+  var expected = 'terminal';
+  test.identical( read, expected );
+}
+
+//
+
 function filesReflectWithHub( test )
 {
   let context = this;
@@ -14252,7 +14296,7 @@ var Self =
     filesFindRecursive,
     filesFindLinked,
 
-    // filesFindResolving,
+    filesFindResolving,
     filesFindPerformance,
 
     filesFindGlob,
@@ -14265,6 +14309,7 @@ var Self =
     filesReflectRecursive,
     filesReflectGrab,
     filesReflector,
+    filesReflectorExperiment,
     filesReflectWithHub,
     filesReflectWithPrefix,
     filesReflectDstPreserving,

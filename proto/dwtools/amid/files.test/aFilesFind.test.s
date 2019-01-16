@@ -2747,7 +2747,6 @@ function filesFindResolving( test )
   let context = this;
   let path = context.provider.path;
   var testPath = path.join( context.testSuitePath, test.name );
-
   var softLinkIsSupported = context.softLinkIsSupported();
 
   var fixedOptions =
@@ -14297,7 +14296,7 @@ var Self =
     filesFindRecursive,
     filesFindLinked,
 
-    // filesFindResolving,
+    filesFindResolving,
     filesFindPerformance,
 
     filesFindGlob,

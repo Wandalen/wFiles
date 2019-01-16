@@ -3333,9 +3333,7 @@ function filesDelete_body( o )
   _.assert( !o.includingTransient );
   _.assert( o.result === o2.result );
 
-  // debugger;
   provider.filesFind.body.call( provider, o2 );
-  // debugger;
 
   /* */
 

@@ -2745,8 +2745,10 @@ function filesFindLinked( test )
 function filesFindResolving( test )
 {
   let context = this;
+  let provider = context.provider;
   let path = context.provider.path;
   var testPath = path.join( context.testSuitePath, test.name );
+  var terminalPath = path.join( testPath, 'file' );
   var softLinkIsSupported = context.softLinkIsSupported();
 
   var fixedOptions =
@@ -2759,20 +2761,8 @@ function filesFindResolving( test )
     includingStem : 1,
     includingTerminals : 1,
     includingTransient : 1,
+    includingDirs : 1,
     recursive : 2
-  }
-
-  var terminalPaths;
-
-  function makeCleanTree( dir )
-  {
-    _.fileProvider.filesDelete( dir );
-    terminalPaths = [ 'file' ].map( ( name ) =>
-    {
-      terminalPath = path.join( dir, name )
-      _.fileProvider.fileWrite( terminalPath, path );
-      return terminalPath;
-    });
   }
 
   function recordSimplify( record )
@@ -2810,7 +2800,8 @@ function filesFindResolving( test )
 
   //
 
-  makeCleanTree( testPath );
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalPath, terminalPath );
   var o =
   {
     filePath : testPath,
@@ -2818,8 +2809,9 @@ function filesFindResolving( test )
     resolvingTextLink : 0,
   }
   var options = _.mapExtend( o, fixedOptions );
-  _.fileProvider.fieldPush( 'usingTextLink', 0 );
-  var files = _.fileProvider.filesFind( options );
+  provider.fieldPush( 'usingTextLink', 0 );
+  debugger
+  var files = provider.filesFind( options );
   var filtered = files.map( recordSimplify );
   var expected =
   [
@@ -2829,18 +2821,19 @@ function filesFindResolving( test )
       isDir : true
     },
     {
-      absolute : terminalPaths[ 0 ],
-      real : terminalPaths[ 0 ],
+      absolute : terminalPath,
+      real : terminalPath,
       isDir : false
     },
   ]
 
   test.identical( filtered, expected )
-  _.fileProvider.fieldPop( 'usingTextLink', 0 );
+  provider.fieldPop( 'usingTextLink', 0 );
 
   //
 
-  makeCleanTree( testPath );
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalPath, terminalPath );
   var o =
   {
     filePath : testPath,
@@ -2848,8 +2841,8 @@ function filesFindResolving( test )
     resolvingTextLink : 0,
   }
   var options = _.mapExtend( o, fixedOptions );
-  _.fileProvider.fieldPush( 'usingTextLink', 0 );
-  var files = _.fileProvider.filesFind( options );
+  provider.fieldPush( 'usingTextLink', 0 );
+  var files = provider.filesFind( options );
   var filtered = files.map( recordSimplify );
   var expected =
   [
@@ -2859,18 +2852,19 @@ function filesFindResolving( test )
       isDir : true
     },
     {
-      absolute : terminalPaths[ 0 ],
-      real : terminalPaths[ 0 ],
+      absolute : terminalPath,
+      real : terminalPath,
       isDir : false
     },
   ]
 
   test.identical( filtered, expected )
-  _.fileProvider.fieldPop( 'usingTextLink', 0 );
+  provider.fieldPop( 'usingTextLink', 0 );
 
   //
 
-  makeCleanTree( testPath );
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalPath, terminalPath );
   var o =
   {
     filePath : testPath,
@@ -2878,8 +2872,8 @@ function filesFindResolving( test )
     resolvingTextLink : 1,
   }
   var options = _.mapExtend( o, fixedOptions );
-  _.fileProvider.fieldPush( 'usingTextLink', 0 );
-  var files = _.fileProvider.filesFind( options );
+  provider.fieldPush( 'usingTextLink', 0 );
+  var files = provider.filesFind( options );
   var filtered = files.map( recordSimplify );
   var expected =
   [
@@ -2889,18 +2883,19 @@ function filesFindResolving( test )
       isDir : true
     },
     {
-      absolute : terminalPaths[ 0 ],
-      real : terminalPaths[ 0 ],
+      absolute : terminalPath,
+      real : terminalPath,
       isDir : false
     },
   ]
 
   test.identical( filtered, expected )
-  _.fileProvider.fieldPop( 'usingTextLink', 0 );
+  provider.fieldPop( 'usingTextLink', 0 );
 
   //
 
-  makeCleanTree( testPath );
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalPath, terminalPath );
   var o =
   {
     filePath : testPath,
@@ -2908,8 +2903,8 @@ function filesFindResolving( test )
     resolvingTextLink : 1,
   }
   var options = _.mapExtend( o, fixedOptions );
-  _.fileProvider.fieldPush( 'usingTextLink', 1 );
-  var files = _.fileProvider.filesFind( options );
+  provider.fieldPush( 'usingTextLink', 1 );
+  var files = provider.filesFind( options );
   var filtered = files.map( recordSimplify );
   var expected =
   [
@@ -2919,22 +2914,23 @@ function filesFindResolving( test )
       isDir : true
     },
     {
-      absolute : terminalPaths[ 0 ],
-      real : terminalPaths[ 0 ],
+      absolute : terminalPath,
+      real : terminalPath,
       isDir : false
     },
   ]
 
   test.identical( filtered, expected )
-  _.fileProvider.fieldPop( 'usingTextLink', 1 );
+  provider.fieldPop( 'usingTextLink', 1 );
 
   //
 
   test.case = 'text link to a file, resolvingSoftLink : 0, resolvingTextLink : 0';
-  makeCleanTree( testPath );
-  var srcFilePath = terminalPaths[ 0 ];
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalPath, terminalPath );
+  var srcFilePath = terminalPath;
   var textLinkPath = path.join( testPath, 'textLink' );
-  _.fileProvider.fieldPush( 'usingTextLink', 0 );
+  provider.fieldPush( 'usingTextLink', 0 );
   var o =
   {
     filePath : testPath,
@@ -2942,9 +2938,9 @@ function filesFindResolving( test )
     resolvingTextLink : 0,
   }
   var options = _.mapExtend( o, fixedOptions );
-  _.fileProvider.fileWrite( textLinkPath, 'link ' + srcFilePath );
+  provider.fileWrite( textLinkPath, 'link ' + srcFilePath );
 
-  var files = _.fileProvider.filesFind( options );
+  var files = provider.filesFind( options );
   var filtered = files.map( recordSimplify );
   var expected =
   [
@@ -2966,19 +2962,20 @@ function filesFindResolving( test )
   ]
 
   test.identical( filtered, expected )
-  var srcFileStat = _.fileProvider.statResolvedRead( srcFilePath );
+  var srcFileStat = provider.statResolvedRead( srcFilePath );
   var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
   test.is( srcFileStat.ino !== textLinkStat.ino );
-  _.fileProvider.fieldPop( 'usingTextLink', 0 );
+  provider.fieldPop( 'usingTextLink', 0 );
 
 
   //
 
   test.case = 'text link to a file, resolvingSoftLink : 0, resolvingTextLink : 1, usingTextLink : 0';
-  makeCleanTree( testPath );
-  var srcFilePath = terminalPaths[ 0 ];
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalPath, terminalPath );
+  var srcFilePath = terminalPath;
   var textLinkPath = path.join( testPath, 'textLink' );
-  _.fileProvider.fieldPush( 'usingTextLink', 0 );
+  provider.fieldPush( 'usingTextLink', 0 );
   var o =
   {
     filePath : testPath,
@@ -2986,9 +2983,9 @@ function filesFindResolving( test )
     resolvingTextLink : 1,
   }
   var options = _.mapExtend( o, fixedOptions );
-  _.fileProvider.fileWrite( textLinkPath, 'link ' + srcFilePath );
+  provider.fileWrite( textLinkPath, 'link ' + srcFilePath );
 
-  var files = _.fileProvider.filesFind( options );
+  var files = provider.filesFind( options );
   var filtered = files.map( recordSimplify );
   var expected =
   [
@@ -3010,18 +3007,19 @@ function filesFindResolving( test )
   ]
 
   test.identical( filtered, expected )
-  var srcFileStat = _.fileProvider.statResolvedRead( srcFilePath );
+  var srcFileStat = provider.statResolvedRead( srcFilePath );
   var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
   test.is( srcFileStat.ino !== textLinkStat.ino );
-  _.fileProvider.fieldPop( 'usingTextLink', 0 );
+  provider.fieldPop( 'usingTextLink', 0 );
 
   //
 
   test.case = 'text link to a file, resolvingSoftLink : 0, resolvingTextLink : 1, usingTextLink : 1';
-  makeCleanTree( testPath );
-  var srcFilePath = terminalPaths[ 0 ];
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalPath, terminalPath );
+  var srcFilePath = terminalPath;
   var textLinkPath = path.join( testPath, 'textLink' );
-  _.fileProvider.fieldPush( 'usingTextLink', 1 );
+  provider.fieldPush( 'usingTextLink', 1 );
   var o =
   {
     filePath : testPath,
@@ -3029,9 +3027,9 @@ function filesFindResolving( test )
     resolvingTextLink : 1,
   }
   var options = _.mapExtend( o, fixedOptions );
-  _.fileProvider.fileWrite( textLinkPath, 'link ' + srcFilePath );
+  provider.fileWrite( textLinkPath, 'link ' + srcFilePath );
 
-  var files = _.fileProvider.filesFind( options );
+  var files = provider.filesFind( options );
   var filtered = files.map( recordSimplify );
   var expected =
   [
@@ -3053,18 +3051,19 @@ function filesFindResolving( test )
   ]
 
   test.identical( filtered, expected )
-  var srcFileStat = _.fileProvider.statResolvedRead( srcFilePath );
+  var srcFileStat = provider.statResolvedRead( srcFilePath );
   var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
   test.identical( srcFileStat.ino, textLinkStat.ino );
-  _.fileProvider.fieldPop( 'usingTextLink', 1 );
+  provider.fieldPop( 'usingTextLink', 1 );
 
   //
 
   test.case = 'text link to a file, resolvingSoftLink : 1, resolvingTextLink : 1, usingTextLink : 1';
-  makeCleanTree( testPath );
-  var srcFilePath = terminalPaths[ 0 ];
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalPath, terminalPath );
+  var srcFilePath = terminalPath;
   var textLinkPath = path.join( testPath, 'textLink' );
-  _.fileProvider.fieldPush( 'usingTextLink', 1 );
+  provider.fieldPush( 'usingTextLink', 1 );
   var o =
   {
     filePath : testPath,
@@ -3072,9 +3071,9 @@ function filesFindResolving( test )
     resolvingTextLink : 1,
   }
   var options = _.mapExtend( o, fixedOptions );
-  _.fileProvider.fileWrite( textLinkPath, 'link ' + srcFilePath );
+  provider.fileWrite( textLinkPath, 'link ' + srcFilePath );
 
-  var files = _.fileProvider.filesFind( options );
+  var files = provider.filesFind( options );
   var filtered = files.map( recordSimplify );
   var expected =
   [
@@ -3096,18 +3095,19 @@ function filesFindResolving( test )
   ]
 
   test.identical( filtered, expected )
-  var srcFileStat = _.fileProvider.statResolvedRead( srcFilePath );
+  var srcFileStat = provider.statResolvedRead( srcFilePath );
   var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
   test.identical( srcFileStat.ino, textLinkStat.ino );
-  _.fileProvider.fieldPop( 'usingTextLink', 1 );
+  provider.fieldPop( 'usingTextLink', 1 );
 
    //
 
   test.case = 'text link to a file, resolvingSoftLink : 1, resolvingTextLink : 1, usingTextLink : 1';
-  makeCleanTree( testPath );
-  var srcFilePath = terminalPaths[ 0 ];
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalPath, terminalPath );
+  var srcFilePath = terminalPath;
   var textLinkPath = path.join( testPath, 'textLink' );
-  _.fileProvider.fieldPush( 'usingTextLink', 1 );
+  provider.fieldPush( 'usingTextLink', 1 );
   var o =
   {
     filePath : testPath,
@@ -3115,9 +3115,9 @@ function filesFindResolving( test )
     resolvingTextLink : 1,
   }
   var options = _.mapExtend( o, fixedOptions );
-  _.fileProvider.fileWrite( textLinkPath, 'link ' + srcFilePath );
+  provider.fileWrite( textLinkPath, 'link ' + srcFilePath );
 
-  var files = _.fileProvider.filesFind( options );
+  var files = provider.filesFind( options );
   var filtered = files.map( recordSimplify );
   var expected =
   [
@@ -3139,19 +3139,20 @@ function filesFindResolving( test )
   ]
 
   test.identical( filtered, expected )
-  var srcFileStat = _.fileProvider.statResolvedRead( srcFilePath );
+  var srcFileStat = provider.statResolvedRead( srcFilePath );
   var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
   test.identical( srcFileStat.ino, textLinkStat.ino );
-  _.fileProvider.fieldPop( 'usingTextLink', 1 );
+  provider.fieldPop( 'usingTextLink', 1 );
 
   //
 
   test.case = 'text->text->file, resolvingSoftLink : 1, resolvingTextLink : 1, usingTextLink : 1';
-  makeCleanTree( testPath );
-  var srcFilePath = terminalPaths[ 0 ];
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalPath, terminalPath );
+  var srcFilePath = terminalPath;
   var textLinkPath = path.join( testPath, 'textLink' );
   var textLink2Path = path.join( testPath, 'textLink2' );
-  _.fileProvider.fieldPush( 'usingTextLink', 1 );
+  provider.fieldPush( 'usingTextLink', 1 );
   var o =
   {
     filePath : testPath,
@@ -3159,10 +3160,10 @@ function filesFindResolving( test )
     resolvingTextLink : 1,
   }
   var options = _.mapExtend( o, fixedOptions );
-  _.fileProvider.fileWrite( textLinkPath, 'link ' + srcFilePath );
-  _.fileProvider.fileWrite( textLink2Path, 'link ' + srcFilePath );
+  provider.fileWrite( textLinkPath, 'link ' + srcFilePath );
+  provider.fileWrite( textLink2Path, 'link ' + srcFilePath );
 
-  var files = _.fileProvider.filesFind( options );
+  var files = provider.filesFind( options );
   var filtered = files.map( recordSimplify );
   var expected =
   [
@@ -3189,12 +3190,12 @@ function filesFindResolving( test )
   ]
 
   test.identical( filtered, expected )
-  var srcFileStat = _.fileProvider.statResolvedRead( srcFilePath );
+  var srcFileStat = provider.statResolvedRead( srcFilePath );
   var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
   var textLink2Stat = findRecord( files, 'absolute', textLink2Path ).stat;
   test.identical( srcFileStat.ino, textLinkStat.ino );
   test.identical( srcFileStat.ino, textLink2Stat.ino );
-  _.fileProvider.fieldPop( 'usingTextLink', 1 );
+  provider.fieldPop( 'usingTextLink', 1 );
 
   if( !softLinkIsSupported )
   return;
@@ -3202,7 +3203,8 @@ function filesFindResolving( test )
   /* soft link */
 
   test.case = 'soft link to a file, resolvingSoftLink : 0, resolvingTextLink : 0'
-  makeCleanTree( testPath );
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalPath, terminalPath );
   var o =
   {
     filePath : testPath,
@@ -3210,11 +3212,11 @@ function filesFindResolving( test )
     resolvingTextLink : 0,
   }
   var options = _.mapExtend( o, fixedOptions );
-  _.fileProvider.fieldPush( 'usingTextLink', 0 );
+  provider.fieldPush( 'usingTextLink', 0 );
   var softLink = path.join( testPath, 'link' );
-  var srcPath = terminalPaths[ 0 ];
-  _.fileProvider.softLink( softLink, srcPath );
-  var files = _.fileProvider.filesFind( options );
+  var srcPath = terminalPath;
+  provider.softLink( softLink, srcPath );
+  var files = provider.filesFind( options );
   var filtered = files.map( recordSimplify );
   var expected =
   [
@@ -3224,8 +3226,8 @@ function filesFindResolving( test )
       isDir : true
     },
     {
-      absolute : terminalPaths[ 0 ],
-      real : terminalPaths[ 0 ],
+      absolute : terminalPath,
+      real : terminalPath,
       isDir : false
     },
     {
@@ -3235,15 +3237,16 @@ function filesFindResolving( test )
     },
   ]
   test.identical( filtered, expected )
-  var srcFileStat = _.fileProvider.statResolvedRead( terminalPaths[ 0 ] );
+  var srcFileStat = provider.statResolvedRead( terminalPath );
   var softLinkStat = findRecord( files, 'absolute', softLink ).stat;
   test.is( srcFileStat.ino !== softLinkStat.ino );
-  _.fileProvider.fieldPop( 'usingTextLink', 0 );
+  provider.fieldPop( 'usingTextLink', 0 );
 
   //
 
   test.case = 'soft link to a file, resolvingSoftLink : 1, resolvingTextLink : 0'
-  makeCleanTree( testPath );
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalPath, terminalPath );
   var o =
   {
     filePath : testPath,
@@ -3251,11 +3254,11 @@ function filesFindResolving( test )
     resolvingTextLink : 0,
   }
   var options = _.mapExtend( o, fixedOptions );
-  _.fileProvider.fieldPush( 'usingTextLink', 0 );
+  provider.fieldPush( 'usingTextLink', 0 );
   var softLink = path.join( testPath, 'link' );
-  var srcPath = terminalPaths[ 0 ];
-  _.fileProvider.softLink( softLink, srcPath );
-  var files = _.fileProvider.filesFind( options );
+  var srcPath = terminalPath;
+  provider.softLink( softLink, srcPath );
+  var files = provider.filesFind( options );
   var filtered = files.map( recordSimplify );
   var expected =
   [
@@ -3265,26 +3268,27 @@ function filesFindResolving( test )
       isDir : true
     },
     {
-      absolute : terminalPaths[ 0 ],
-      real : terminalPaths[ 0 ],
+      absolute : terminalPath,
+      real : terminalPath,
       isDir : false
     },
     {
       absolute : softLink,
-      real : terminalPaths[ 0 ],
+      real : terminalPath,
       isDir : false
     },
   ]
   test.identical( filtered, expected )
-  var srcFileStat = _.fileProvider.statResolvedRead( terminalPaths[ 0 ] );
+  var srcFileStat = provider.statResolvedRead( terminalPath );
   var softLinkStat = findRecord( files, 'absolute', softLink ).stat;
   test.identical( srcFileStat.ino, softLinkStat.ino );
-  _.fileProvider.fieldPop( 'usingTextLink', 0 );
+  provider.fieldPop( 'usingTextLink', 0 );
 
   //
 
   test.case = 'soft link to a file, resolvingSoftLink : 1, resolvingTextLink : 1'
-  makeCleanTree( testPath );
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalPath, terminalPath );
   var o =
   {
     filePath : testPath,
@@ -3293,11 +3297,11 @@ function filesFindResolving( test )
   }
 
   var options = _.mapExtend( o, fixedOptions );
-  _.fileProvider.fieldPush( 'usingTextLink', 1 );
+  provider.fieldPush( 'usingTextLink', 1 );
   var softLink = path.join( testPath, 'link' );
-  var srcPath = terminalPaths[ 0 ];
-  _.fileProvider.softLink( softLink, srcPath );
-  var files = _.fileProvider.filesFind( options );
+  var srcPath = terminalPath;
+  provider.softLink( softLink, srcPath );
+  var files = provider.filesFind( options );
   var filtered = files.map( recordSimplify );
   var expected =
   [
@@ -3307,31 +3311,32 @@ function filesFindResolving( test )
       isDir : true
     },
     {
-      absolute : terminalPaths[ 0 ],
-      real : terminalPaths[ 0 ],
+      absolute : terminalPath,
+      real : terminalPath,
       isDir : false
     },
     {
       absolute : softLink,
-      real : terminalPaths[ 0 ],
+      real : terminalPath,
       isDir : false
     },
   ]
 
   test.identical( filtered, expected )
-  var srcFileStat = _.fileProvider.statResolvedRead( terminalPaths[ 0 ] );
+  var srcFileStat = provider.statResolvedRead( terminalPath );
   var softLinkStat = findRecord( files, 'absolute', softLink ).stat;
   test.identical( srcFileStat.ino, softLinkStat.ino );
-  _.fileProvider.fieldPop( 'usingTextLink', 1 );
+  provider.fieldPop( 'usingTextLink', 1 );
 
   //
 
   test.case = 'soft link to a dir, resolvingSoftLink : 1, resolvingTextLink : 0';
   var srcDirPath = path.join( testPath, 'dir' );
   var softLink = path.join( testPath, 'linkToDir' );
-  _.fileProvider.fieldPush( 'usingTextLink', 0 );
-  _.fileProvider.filesDelete( testPath );
-  makeCleanTree( srcDirPath );
+  provider.fieldPush( 'usingTextLink', 0 );
+  provider.filesDelete( testPath );
+  terminalPath = path.join( srcDirPath, 'file' );
+  provider.fileWrite( terminalPath, terminalPath );
   var o =
   {
     filePath : testPath,
@@ -3340,9 +3345,9 @@ function filesFindResolving( test )
     includingStem : 0
   }
   var options = _.mapExtend( o, fixedOptions );
-  _.fileProvider.softLink( softLink, srcDirPath );
+  provider.softLink( softLink, srcDirPath );
 
-  var files = _.fileProvider.filesFind(options );
+  var files = provider.filesFind(options );
   var filtered = files.map( recordSimplify );
   var expected =
   [
@@ -3357,8 +3362,8 @@ function filesFindResolving( test )
       isDir : true
     },
     {
-      absolute : terminalPaths[ 0 ],
-      real : terminalPaths[ 0 ],
+      absolute : terminalPath,
+      real : terminalPath,
       isDir : false
     },
     {
@@ -3367,26 +3372,27 @@ function filesFindResolving( test )
       isDir : true
     },
     {
-      absolute : path.join( softLink, path.name({ path : terminalPaths[ 0 ], withExtension : 1 }) ),
-      real : path.join( softLink, path.name({ path : terminalPaths[ 0 ], withExtension : 1 }) ),
+      absolute : path.join( softLink, path.name({ path : terminalPath, withExtension : 1 }) ),
+      real : path.join( srcDirPath, path.name({ path : terminalPath, withExtension : 1 }) ),
       isDir : false
     }
   ]
 
   test.identical( filtered, expected )
-  var srcDirStat = _.fileProvider.statResolvedRead( srcDirPath );
+  var srcDirStat = provider.statResolvedRead( srcDirPath );
   var softLinkStat = findRecord( files, 'absolute', softLink ).stat;
   test.identical( srcDirStat.ino, softLinkStat.ino );
-  _.fileProvider.fieldPop( 'usingTextLink', 0 );
+  provider.fieldPop( 'usingTextLink', 0 );
 
   //
 
   test.case = 'soft link to a dir, resolvingSoftLink : 1, resolvingTextLink : 1';
   var srcDirPath = path.join( testPath, 'dir' );
   var softLink = path.join( testPath, 'linkToDir' );
-  _.fileProvider.fieldPush( 'usingTextLink', 1 );
-  _.fileProvider.filesDelete( testPath );
-  makeCleanTree( srcDirPath );
+  provider.fieldPush( 'usingTextLink', 1 );
+  provider.filesDelete( testPath );
+  terminalPath = path.join( srcDirPath, 'file' );
+  provider.fileWrite( terminalPath, terminalPath );
   var o =
   {
     filePath : testPath,
@@ -3394,9 +3400,9 @@ function filesFindResolving( test )
     resolvingTextLink : 1,
   }
   var options = _.mapExtend( o, fixedOptions );
-  _.fileProvider.softLink( softLink, srcDirPath );
+  provider.softLink( softLink, srcDirPath );
 
-  var files = _.fileProvider.filesFind( options );
+  var files = provider.filesFind( options );
   var filtered = files.map( recordSimplify );
   var expected =
   [
@@ -3411,8 +3417,8 @@ function filesFindResolving( test )
       isDir : true
     },
     {
-      absolute : terminalPaths[ 0 ],
-      real : terminalPaths[ 0 ],
+      absolute : terminalPath,
+      real : terminalPath,
       isDir : false
     },
     {
@@ -3421,8 +3427,8 @@ function filesFindResolving( test )
       isDir : true
     },
     {
-      absolute : path.join( softLink, path.name({ path : terminalPaths[ 0 ], withExtension : 1 }) ),
-      real : path.join( softLink, path.name({ path : terminalPaths[ 0 ], withExtension : 1 }) ),
+      absolute : path.join( softLink, path.name({ path : terminalPath, withExtension : 1 }) ),
+      real : path.join( srcDirPath, path.name({ path : terminalPath, withExtension : 1 }) ),
       isDir : false
     }
   ]
@@ -3430,15 +3436,17 @@ function filesFindResolving( test )
   logger.log( _.toStr( files, { levels : 99 } )   )
 
   test.identical( filtered, expected )
-  var srcDirStat = _.fileProvider.statResolvedRead( srcDirPath );
+  var srcDirStat = provider.statResolvedRead( srcDirPath );
   var softLinkStat = findRecord( files, 'absolute', softLink ).stat;
   test.identical( srcDirStat.ino, softLinkStat.ino );
-  _.fileProvider.fieldPop( 'usingTextLink', 1 );
+  provider.fieldPop( 'usingTextLink', 1 );
 
   //
 
   test.case = 'multiple soft links in chain, resolvingSoftLink : 1, resolvingTextLink : 0'
-  makeCleanTree( testPath );
+  provider.filesDelete( testPath );
+  terminalPath = path.join( testPath, 'file' );
+  provider.fileWrite( terminalPath, terminalPath );
   var o =
   {
     filePath : testPath,
@@ -3447,13 +3455,13 @@ function filesFindResolving( test )
   }
 
   var options = _.mapExtend( o, fixedOptions );
-  _.fileProvider.fieldPush( 'usingTextLink', 0 );
+  provider.fieldPush( 'usingTextLink', 0 );
   var softLink = path.join( testPath, 'link' );
   var softLink2 = path.join( testPath, 'link2' );
-  var srcPath = terminalPaths[ 0 ];
-  _.fileProvider.softLink( softLink, srcPath );
-  _.fileProvider.softLink( softLink2, softLink );
-  var files = _.fileProvider.filesFind( options );
+  var srcPath = terminalPath;
+  provider.softLink( softLink, srcPath );
+  provider.softLink( softLink2, softLink );
+  var files = provider.filesFind( options );
   var filtered = files.map( recordSimplify );
   var expected =
   [
@@ -3463,34 +3471,36 @@ function filesFindResolving( test )
       isDir : true
     },
     {
-      absolute : terminalPaths[ 0 ],
-      real : terminalPaths[ 0 ],
+      absolute : terminalPath,
+      real : terminalPath,
       isDir : false
     },
     {
       absolute : softLink,
-      real : terminalPaths[ 0 ],
+      real : terminalPath,
       isDir : false
     },
     {
       absolute : softLink2,
-      real : terminalPaths[ 0 ],
+      real : terminalPath,
       isDir : false
     },
   ]
 
   test.identical( filtered, expected )
-  var srcFileStat = _.fileProvider.statResolvedRead( terminalPaths[ 0 ] );
+  var srcFileStat = provider.statResolvedRead( terminalPath );
   var softLinkStat = findRecord( files, 'absolute', softLink ).stat;
   var softLink2Stat = findRecord( files, 'absolute', softLink2 ).stat;
   test.identical( srcFileStat.ino, softLinkStat.ino );
   test.identical( srcFileStat.ino, softLink2Stat.ino );
-  _.fileProvider.fieldPop( 'usingTextLink', 0 );
+  provider.fieldPop( 'usingTextLink', 0 );
 
   //
 
   test.case = 'multiple soft links in chain, resolvingSoftLink : 1, resolvingTextLink : 1'
-  makeCleanTree( testPath );
+  provider.filesDelete( testPath );
+  terminalPath = path.join( testPath, 'file' );
+  provider.fileWrite( terminalPath, terminalPath );
   var o =
   {
     filePath : testPath,
@@ -3499,13 +3509,13 @@ function filesFindResolving( test )
   }
 
   var options = _.mapExtend( o, fixedOptions );
-  _.fileProvider.fieldPush( 'usingTextLink', 1 );
+  provider.fieldPush( 'usingTextLink', 1 );
   var softLink = path.join( testPath, 'link' );
   var softLink2 = path.join( testPath, 'link2' );
-  var srcPath = terminalPaths[ 0 ];
-  _.fileProvider.softLink( softLink, srcPath );
-  _.fileProvider.softLink( softLink2, softLink );
-  var files = _.fileProvider.filesFind( options );
+  var srcPath = terminalPath;
+  provider.softLink( softLink, srcPath );
+  provider.softLink( softLink2, softLink );
+  var files = provider.filesFind( options );
   var filtered = files.map( recordSimplify );
   var expected =
   [
@@ -3515,34 +3525,36 @@ function filesFindResolving( test )
       isDir : true
     },
     {
-      absolute : terminalPaths[ 0 ],
-      real : terminalPaths[ 0 ],
+      absolute : terminalPath,
+      real : terminalPath,
       isDir : false
     },
     {
       absolute : softLink,
-      real : terminalPaths[ 0 ],
+      real : terminalPath,
       isDir : false
     },
     {
       absolute : softLink2,
-      real : terminalPaths[ 0 ],
+      real : terminalPath,
       isDir : false
     },
   ]
 
   test.identical( filtered, expected )
-  var srcFileStat = _.fileProvider.statResolvedRead( terminalPaths[ 0 ] );
+  var srcFileStat = provider.statResolvedRead( terminalPath );
   var softLinkStat = findRecord( files, 'absolute', softLink ).stat;
   var softLink2Stat = findRecord( files, 'absolute', softLink2 ).stat;
   test.identical( srcFileStat.ino, softLinkStat.ino );
   test.identical( srcFileStat.ino, softLink2Stat.ino );
-  _.fileProvider.fieldPop( 'usingTextLink', 1 );
+  provider.fieldPop( 'usingTextLink', 1 );
 
   //
 
   test.case = 'multiple soft links to single file, resolvingSoftLink : 1, resolvingTextLink : 0'
-  makeCleanTree( testPath );
+  provider.filesDelete( testPath );
+  terminalPath = path.join( testPath, 'file' );
+  provider.fileWrite( terminalPath, terminalPath );
   var o =
   {
     filePath : testPath,
@@ -3551,13 +3563,13 @@ function filesFindResolving( test )
   }
 
   var options = _.mapExtend( o, fixedOptions );
-  _.fileProvider.fieldPush( 'usingTextLink', 0 );
+  provider.fieldPush( 'usingTextLink', 0 );
   var softLink = path.join( testPath, 'link' );
   var softLink2 = path.join( testPath, 'link2' );
-  var srcPath = terminalPaths[ 0 ];
-  _.fileProvider.softLink( softLink, srcPath );
-  _.fileProvider.softLink( softLink2, srcPath );
-  var files = _.fileProvider.filesFind( options );
+  var srcPath = terminalPath;
+  provider.softLink( softLink, srcPath );
+  provider.softLink( softLink2, srcPath );
+  var files = provider.filesFind( options );
   var filtered = files.map( recordSimplify );
   var expected =
   [
@@ -3567,34 +3579,36 @@ function filesFindResolving( test )
       isDir : true
     },
     {
-      absolute : terminalPaths[ 0 ],
-      real : terminalPaths[ 0 ],
+      absolute : terminalPath,
+      real : terminalPath,
       isDir : false
     },
     {
       absolute : softLink,
-      real : terminalPaths[ 0 ],
+      real : terminalPath,
       isDir : false
     },
     {
       absolute : softLink2,
-      real : terminalPaths[ 0 ],
+      real : terminalPath,
       isDir : false
     },
   ]
 
   test.identical( filtered, expected )
-  var srcFileStat = _.fileProvider.statResolvedRead( terminalPaths[ 0 ] );
+  var srcFileStat = provider.statResolvedRead( terminalPath );
   var softLinkStat = findRecord( files, 'absolute', softLink ).stat;
   var softLink2Stat = findRecord( files, 'absolute', softLink2 ).stat;
   test.identical( srcFileStat.ino, softLinkStat.ino );
   test.identical( srcFileStat.ino, softLink2Stat.ino );
-  _.fileProvider.fieldPop( 'usingTextLink', 0 );
+  provider.fieldPop( 'usingTextLink', 0 );
 
   //
 
   test.case = 'multiple soft links to single file, resolvingSoftLink : 1, resolvingTextLink : 1'
-  makeCleanTree( testPath );
+  provider.filesDelete( testPath );
+  terminalPath = path.join( testPath, 'file' );
+  provider.fileWrite( terminalPath, terminalPath );
   var o =
   {
     filePath : testPath,
@@ -3603,13 +3617,13 @@ function filesFindResolving( test )
   }
 
   var options = _.mapExtend( o, fixedOptions );
-  _.fileProvider.fieldPush( 'usingTextLink', 1 );
+  provider.fieldPush( 'usingTextLink', 1 );
   var softLink = path.join( testPath, 'link' );
   var softLink2 = path.join( testPath, 'link2' );
-  var srcPath = terminalPaths[ 0 ];
-  _.fileProvider.softLink( softLink, srcPath );
-  _.fileProvider.softLink( softLink2, srcPath );
-  var files = _.fileProvider.filesFind( options );
+  var srcPath = terminalPath;
+  provider.softLink( softLink, srcPath );
+  provider.softLink( softLink2, srcPath );
+  var files = provider.filesFind( options );
   var filtered = files.map( recordSimplify );
   var expected =
   [
@@ -3619,38 +3633,40 @@ function filesFindResolving( test )
       isDir : true
     },
     {
-      absolute : terminalPaths[ 0 ],
-      real : terminalPaths[ 0 ],
+      absolute : terminalPath,
+      real : terminalPath,
       isDir : false
     },
     {
       absolute : softLink,
-      real : terminalPaths[ 0 ],
+      real : terminalPath,
       isDir : false
     },
     {
       absolute : softLink2,
-      real : terminalPaths[ 0 ],
+      real : terminalPath,
       isDir : false
     },
   ]
 
   test.identical( filtered, expected )
-  var srcFileStat = _.fileProvider.statResolvedRead( terminalPaths[ 0 ] );
+  var srcFileStat = provider.statResolvedRead( terminalPath );
   var softLinkStat = findRecord( files, 'absolute', softLink ).stat;
   var softLink2Stat = findRecord( files, 'absolute', softLink2 ).stat;
   test.identical( srcFileStat.ino, softLinkStat.ino );
   test.identical( srcFileStat.ino, softLink2Stat.ino );
-  _.fileProvider.fieldPop( 'usingTextLink', 1 );
+  provider.fieldPop( 'usingTextLink', 1 );
 
   //
 
   test.case = 'soft->text->file, resolvingSoftLink : 1, resolvingTextLink : 1, usingTextLink : 1';
-  makeCleanTree( testPath );
-  var srcFilePath = terminalPaths[ 0 ];
+  provider.filesDelete( testPath );
+  terminalPath = path.join( testPath, 'file' );
+  provider.fileWrite( terminalPath, terminalPath );
+  var srcFilePath = terminalPath;
   var textLinkPath = path.join( testPath, 'textLink' );
   var softLinkPath = path.join( testPath, 'softLinkPath' );
-  _.fileProvider.fieldPush( 'usingTextLink', 1 );
+  provider.fieldPush( 'usingTextLink', 1 );
   var o =
   {
     filePath : testPath,
@@ -3658,10 +3674,10 @@ function filesFindResolving( test )
     resolvingTextLink : 1,
   }
   var options = _.mapExtend( o, fixedOptions );
-  _.fileProvider.fileWrite( textLinkPath, 'link ' + srcFilePath );
-  _.fileProvider.softLink( softLinkPath, textLinkPath );
+  provider.fileWrite( textLinkPath, 'link ' + srcFilePath );
+  provider.softLink( softLinkPath, textLinkPath );
 
-  var files = _.fileProvider.filesFind( options );
+  var files = provider.filesFind( options );
   var filtered = files.map( recordSimplify );
   var expected =
   [
@@ -3688,22 +3704,23 @@ function filesFindResolving( test )
   ]
 
   test.identical( filtered, expected )
-  var srcFileStat = _.fileProvider.statResolvedRead( srcFilePath );
+  var srcFileStat = provider.statResolvedRead( srcFilePath );
   var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
   var softLinkStat = findRecord( files, 'absolute', softLinkPath ).stat;
   test.identical( srcFileStat.ino, textLinkStat.ino );
   test.identical( srcFileStat.ino, softLinkStat.ino );
-  _.fileProvider.fieldPop( 'usingTextLink', 1 );
+  provider.fieldPop( 'usingTextLink', 1 );
 
   //
 
   test.case = 'soft->text->file, resolvingSoftLink : 1, resolvingTextLink : 1, usingTextLink : 1';
-  _.fileProvider.filesDelete( testPath );
   var srcDirPath = path.join( testPath, 'dir' );
-  makeCleanTree( srcDirPath );
+  terminalPath = path.join( srcDirPath, 'file' );
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalPath, terminalPath );
   var textLinkPath = path.join( testPath, 'textLink' );
-  var softLinkPath = path.join( testPath, 'softLinkPath' );
-  _.fileProvider.fieldPush( 'usingTextLink', 1 );
+  var softLinkPath = path.join( testPath, 'softLink' );
+  provider.fieldPush( 'usingTextLink', 1 );
   var o =
   {
     filePath : testPath,
@@ -3711,10 +3728,10 @@ function filesFindResolving( test )
     resolvingTextLink : 1,
   }
   var options = _.mapExtend( o, fixedOptions );
-  _.fileProvider.fileWrite( textLinkPath, 'link ' + srcDirPath );
-  _.fileProvider.softLink( softLinkPath, textLinkPath );
+  provider.fileWrite( textLinkPath, 'link ' + srcDirPath );
+  provider.softLink( softLinkPath, textLinkPath );
 
-  var files = _.fileProvider.filesFind( options );
+  var files = provider.filesFind( options );
   var filtered = files.map( recordSimplify );
   var expected =
   [
@@ -3729,8 +3746,8 @@ function filesFindResolving( test )
       isDir : true
     },
     {
-      absolute : terminalPaths[ 0 ],
-      real : terminalPaths[ 0 ],
+      absolute : terminalPath,
+      real : terminalPath,
       isDir : false
     },
     {
@@ -3739,22 +3756,34 @@ function filesFindResolving( test )
       isDir : true
     },
     {
+      absolute : path.join( softLinkPath, 'file' ),
+      real : terminalPath,
+      isDir : false
+    },
+    {
       absolute : textLinkPath,
       real : srcDirPath,
       isDir : true
     },
+
+    {
+      absolute : path.join( textLinkPath, 'file' ),
+      real : terminalPath,
+      isDir : false
+    },
   ]
 
   test.identical( filtered, expected )
-  var srcDirStat = _.fileProvider.statResolvedRead( srcDirPath );
-  var srcFileStat = findRecord( files, 'absolute', terminalPaths[ 0 ] ).stat;
+  console.log( _.toStr( filtered, { levels : 99 }))
+  var srcDirStat = provider.statResolvedRead( srcDirPath );
+  var srcFileStat = findRecord( files, 'absolute', terminalPath ).stat;
   var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
   var softLinkStat = findRecord( files, 'absolute', softLinkPath ).stat;
   test.identical( srcDirStat.ino, textLinkStat.ino );
   test.identical( srcDirStat.ino, softLinkStat.ino );
   test.is( srcFileStat.ino !== textLinkStat.ino )
   test.is( srcFileStat.ino !== softLinkStat.ino )
-  _.fileProvider.fieldPop( 'usingTextLink', 1 );
+  provider.fieldPop( 'usingTextLink', 1 );
 
 }
 

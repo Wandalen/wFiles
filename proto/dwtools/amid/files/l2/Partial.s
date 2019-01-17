@@ -5054,8 +5054,8 @@ function _link_functor( gen )
       Vova : low priority
       */
 
-      if( _.strHas( o.dstPath, '/filesReflectorExperiment/dstDir/link' ) )
-      debugger;
+      // if( _.strHas( o.dstPath, '/filesReflectorExperiment/dstDir/link' ) )
+      // debugger;
 
       if( _.longIs( o.dstPath ) && c.linkAct.having.hardLinking )
       return _linkMultiple.call( self, o, _link_body );

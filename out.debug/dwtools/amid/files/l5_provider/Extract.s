@@ -438,6 +438,18 @@ function statReadAct( o )
 
       return o2.stat;
     }
+    else if( _.strCount( filePath, self.path._upStr ) > 1 )
+    {
+      // resolve intermediate dir(s) except terminal
+      let fileName = self.path.name({ path : filePath, withExtension : 1 });
+      filePath = self.pathResolveSoftLinkAct
+      ({
+        filePath : self.path.dir( filePath ),
+        resolvingIntermediateDirectories : 1,
+        resolvingMultiple : 1
+      });
+      filePath = self.path.join( filePath, fileName );
+    }
 
     let d = self._descriptorRead( filePath );
 
@@ -554,8 +566,25 @@ _.routineExtend( statReadAct, Parent.prototype.statReadAct );
 function fileExistsAct( o )
 {
   let self = this;
+
   _.assert( arguments.length === 1 );
-  let file = self._descriptorRead( o.filePath );
+  _.assert( self.path.isNormalized( o.filePath ) );
+
+  let filePath = o.filePath;
+
+  if( _.strCount( filePath, self.path._upStr ) > 1 )
+  {
+    let fileName = self.path.name({ path : filePath, withExtension : 1 });
+    filePath = self.pathResolveSoftLinkAct
+    ({
+      filePath : self.path.dir( filePath ),
+      resolvingIntermediateDirectories : 1,
+      resolvingMultiple : 1
+    });
+    filePath = self.path.join( filePath, fileName );
+  }
+
+  let file = self._descriptorRead( filePath );
   return !!file;
 }
 

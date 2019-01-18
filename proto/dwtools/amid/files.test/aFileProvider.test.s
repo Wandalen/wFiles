@@ -2490,7 +2490,11 @@ function readWriteAsync( test )
         return null;
       })
     })
-    .finally( () => provider.fieldPop( 'resolvingSoftLink', 0 ) )
+    .finally( () =>
+    {
+      provider.fieldPop( 'resolvingSoftLink', 0 );
+      return true;
+    })
   })
 
   .ifNoErrorThen( ( arg/*aaa*/ ) =>
@@ -2532,7 +2536,11 @@ function readWriteAsync( test )
         return null;
       })
     })
-    .finally( () => provider.fieldPop( 'resolvingSoftLink', 0 ) )
+    .finally( () =>
+    {
+      provider.fieldPop( 'resolvingSoftLink', 0 );
+      return true;
+    })
   })
 
   .ifNoErrorThen( ( arg/*aaa*/ ) =>

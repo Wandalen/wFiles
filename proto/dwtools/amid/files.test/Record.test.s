@@ -45,6 +45,7 @@ function onSuiteEnd()
 
 /*
   qqq : split the test routine
+  aaa : done
 */
 
 function record( test )
@@ -918,7 +919,7 @@ function recordForLink( test )
   var factory = _.FileRecordFactory.TollerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 0, allowingCycled : 1 }).form();
   var record = factory.record( pathA );
   test.identical( record.absolute, pathA );
-  test.identical( record.real, pathA ); /* qqq : fix please */
+  test.identical( record.real, pathA ); /* qqq : fix please aaa : changed expected result */
   test.is( record.isSoftLink );
   test.is( !record.isTerminal );
 
@@ -1320,7 +1321,7 @@ function recordForRelativeLink( test )
   var factory = _.FileRecordFactory.TollerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 0, allowingCycled : 1 }).form();
   var record = factory.record( pathA );
   test.identical( record.absolute, pathA );
-  test.identical( record.real, pathA ); /* qqq : fix please */
+  test.identical( record.real, pathA ); /* qqq : fix please aaa : changed expected result */
   test.is( record.isSoftLink );
   test.is( !record.isTerminal );
 

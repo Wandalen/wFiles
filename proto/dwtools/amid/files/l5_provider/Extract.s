@@ -1049,7 +1049,7 @@ function fileCopyAct( o )
     if( o.breakingDstHardLink && dstStat.isHardLink() )
     self.hardLinkBreak({ filePath : o.dstPath, sync : 1 });
 
-    /* qqq : ? */
+    /* qqq : ? aaa : redundant, just copy the descriptor instead of this */
     // if( self.isSoftLink( o.srcPath ) )
     // {
     //   if( self.fileExistsAct({ filePath : o.dstPath }) )

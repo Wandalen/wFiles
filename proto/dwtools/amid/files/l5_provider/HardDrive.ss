@@ -930,7 +930,8 @@ function fileWriteAct( o )
         }
         catch( err ){ }
         if( data )
-        o.data = o.data.concat( data ) */
+        o.data = o.data.concat( data )
+        */
 
         if( self.fileExistsAct({ filePath : o.filePath, sync : 1 }) )
         {
@@ -1152,7 +1153,7 @@ function dirMakeAct( o )
   let fileNativePath = self.path.nativize( o.filePath );
 
   _.assertRoutineOptions( dirMakeAct, arguments );
-  // _.assert( self.statReadAct( self.path.dir( o.filePath ) ), 'Directory for directory does not exist :\n' + _.strQuote( o.filePath ) ); /* qqq */
+  // _.assert( self.statReadAct( self.path.dir( o.filePath ) ), 'Directory for directory does not exist :\n' + _.strQuote( o.filePath ) ); /* qqq aaa : fs handles this */
 
   if( o.sync )
   {
@@ -1486,7 +1487,7 @@ function hardLinkAct( o )
     if( o.dstPath === o.srcPath )
     return true;
 
-    /* qqq : is needed */
+    /* qqq : is needed aaa : with this info error is more clear */
     let stat = self.statReadAct
     ({
       filePath : o.srcPath,

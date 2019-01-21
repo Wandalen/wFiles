@@ -686,6 +686,7 @@ operates.filePath = { pathToRead : 1 };
 
 /*
 qqq : ?
+aaa : old code
 */
 
 // function _pathResolveTextLink( o )
@@ -1075,7 +1076,7 @@ function pathResolveLinkTailChain_pre()
 /*
   qqq : option preservingRelative:1 to preserve relative in path of soft link if happened to be so
   !!! qqq : no duplicates
-  aaa : both implemented, test cases exists too
+  aaa : both implemented, test cases exist too
 */
 
 function pathResolveLinkTailChain_body( o )
@@ -1174,7 +1175,7 @@ function pathResolveLinkTailChain_body( o )
 
   if( o.resolvingSoftLink && o.stat.isSoftLink() )
   {
-    let filePath = self.pathResolveSoftLink({ filePath : o.filePath }); /* qqq : implement extended options vova : done for hd */
+    let filePath = self.pathResolveSoftLink({ filePath : o.filePath }); /* qqq : implement extended options vova : done for hd,extract */
     if( o.preservingRelative && !path.isAbsolute( filePath ) )
     {
       o.result.push( filePath );
@@ -1621,7 +1622,7 @@ having.kind = 'record';
   qqq : statReadAct of Extract and HD handle links in head of path differently
   HD always resolve them
   add test routine statReadActLinkedHead
-  Vova : low priority
+  Vova : statReadActLinkedHead added, soft links are handled, text links need tests and implementation, low priority
 */
 
 let statReadAct = Object.create( null );
@@ -5599,6 +5600,7 @@ function _link_functor( gen )
       }
 
       // qqq : ???
+      // aaa : redundant code
       // if( c.tempPathSrc ) try
       // {
       //   debugger;
@@ -5686,32 +5688,6 @@ function _link_functor( gen )
       // if( !( c.srcStat.size == c.dstStat.size ) )
       // self.logger.warn( `Warning: ${o.srcPath} (${c.srcStat.size}) and ${o.dstPath} (${c.dstStat.size}) should have same size!` )
     }
-
-    /* - */
-
-    // function srcBreakHardLinkSync()
-    // {
-    //   c.tempPathSrc = tempNameMake( o2.srcPath );
-    //   if( self.fileExists( c.tempPathSrc ) )
-    //   self.filesDelete( c.tempPathSrc )
-    //   self.fileRenameAct
-    //   ({
-    //     dstPath : c.tempPathSrc,
-    //     srcPath : o2.srcPath,
-    //     originalDstPath : o.originalDstPath,
-    //     originalSrcPath : o.originalSrcPath,
-    //     sync : 1,
-    //   });
-    //   self.fileCopyAct
-    //   ({
-    //     srcPath : c.tempPathSrc,
-    //     dstPath : o2.srcPath,
-    //     originalDstPath : o.originalDstPath,
-    //     originalSrcPath : o.originalSrcPath,
-    //     sync : 1,
-    //     breakingDstHardLink : 0
-    //   })
-    // }
 
     /* - */
 

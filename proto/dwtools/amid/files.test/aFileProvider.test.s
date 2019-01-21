@@ -31691,6 +31691,7 @@ function linkingCriticalCases( test )
   /*
     qqq : cases with preservingRelative : 0 or resolvingHeadDirect : 0 are disabled,
     pathResolveLinkFull does not allow to disable these option for now
+    Vova : low priority
   */
 
   let /*dir*/testPath = test.context.pathFor( 'written/linkingCriticalCases' );
@@ -33041,6 +33042,7 @@ function pathResolveLinkFull( test )
   /*
     qqq : cases with preservingRelative : 0 or resolvingHeadDirect : 0 are disabled,
     pathResolveLinkFull does not allow to disable these option for now
+    Vova : low priority
   */
 
   let /*dir*/testPath = test.context.pathFor( 'written/pathResolveLinkFull' );
@@ -34968,7 +34970,7 @@ var Self =
     fileCopyAsync,
     fileCopyLinksAsync,
     fileCopySoftLinkResolving,
-    // fileCopyAsyncThrowingError, /* qqq : rewrite this routine */
+    // fileCopyAsyncThrowingError, /* Vova : rewrite this routine, low priority */
     fileCopyLinks,
     fileCopyError,
 

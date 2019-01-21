@@ -438,17 +438,9 @@ function statReadAct( o )
 
       return o2.stat;
     }
-    else if( _.strCount( filePath, self.path._upStr ) > 1 )
+    else
     {
-      // resolve intermediate dir(s) except terminal
-      let fileName = self.path.name({ path : filePath, withExtension : 1 });
-      filePath = self.pathResolveSoftLinkAct
-      ({
-        filePath : self.path.dir( filePath ),
-        resolvingIntermediateDirectories : 1,
-        resolvingMultiple : 1
-      });
-      filePath = self.path.join( filePath, fileName );
+      filePath = self._pathResolveIntermediateDirs( filePath );
     }
 
     let d = self._descriptorRead( filePath );
@@ -572,17 +564,7 @@ function fileExistsAct( o )
 
   let filePath = o.filePath;
 
-  if( _.strCount( filePath, self.path._upStr ) > 1 )
-  {
-    let fileName = self.path.name({ path : filePath, withExtension : 1 });
-    filePath = self.pathResolveSoftLinkAct
-    ({
-      filePath : self.path.dir( filePath ),
-      resolvingIntermediateDirectories : 1,
-      resolvingMultiple : 1
-    });
-    filePath = self.path.join( filePath, fileName );
-  }
+  filePath = self._pathResolveIntermediateDirs( filePath );
 
   let file = self._descriptorRead( filePath );
   return !!file;
@@ -1359,8 +1341,14 @@ function filesAreHardLinkedAct( o )
   if( o.filePath[ 0 ] === o.filePath[ 1 ] )
   return true;
 
-  let descriptor1 = self._descriptorRead( o.filePath[ 0 ] );
-  let descriptor2 = self._descriptorRead( o.filePath[ 1 ] );
+  let filePath1 = self._pathResolveIntermediateDirs( o.filePath[ 0 ] );
+  let filePath2 = self._pathResolveIntermediateDirs( o.filePath[ 1 ] );
+
+  if( filePath1 === filePath2 )
+  return true;
+
+  let descriptor1 = self._descriptorRead( filePath1 );
+  let descriptor2 = self._descriptorRead( filePath2 );
 
   if( !self._descriptorIsHardLink( descriptor1 ) )
   return false;
@@ -1894,6 +1882,35 @@ var having = readToProvider.having = Object.create( null );
 having.writing = 1;
 having.reading = 0;
 having.driving = 0;
+
+//
+//
+//
+
+function _pathResolveIntermediateDirs( filePath )
+{
+  let self = this;
+
+  // resolves intermediate dir(s) except terminal
+
+  _.assert( self.path.isAbsolute( filePath ) );
+  _.assert( self.path.isNormalized( filePath ) );
+
+  if( _.strCount( filePath, self.path._upStr ) > 1 )
+  {
+    let fileName = self.path.name({ path : filePath, withExtension : 1 });
+    filePath = self.pathResolveSoftLinkAct
+    ({
+      filePath : self.path.dir( filePath ),
+      resolvingIntermediateDirectories : 1,
+      resolvingMultiple : 1
+    });
+    filePath = self.path.join( filePath, fileName );
+  }
+
+  return filePath;
+
+}
 
 // --
 // descriptor read
@@ -2667,6 +2684,10 @@ let Proto =
   filesTreeRead,
   rewriteFromProvider,
   readToProvider,
+
+  //
+
+  _pathResolveIntermediateDirs,
 
   // descriptor read
 

@@ -1237,16 +1237,27 @@ function hardLinkAct( o )
   {
     let con = new _.Consequence().take( true );
 
-    if( o.dstPath === o.srcPath )
-    return con;
-
     /* qqq : synchronize wtih sync version, please */
 
-    let dstExists = self.fileExists( o.dstPath );
+    let dstExists;
 
-    con.thenKeep( () => self.statRead({ filePath : o.srcPath, sync : 0 }) );
+    con.thenKeep( () => self.fileExists( o.dstPath ) );
+    con.thenKeep( ( got ) =>
+    {
+      dstExists = got;
+      return self.statRead({ filePath : o.srcPath, sync : 0 })
+    });
     con.thenKeep( ( srcStat ) =>
     {
+      if( !srcStat )
+      {
+        debugger;
+        throw _.err( o.srcPath, 'does not exist' );
+      }
+
+      if( o.dstPath === o.srcPath )
+      return true;
+
       if( !srcStat.isTerminal() )
       throw _.err( o.srcPath, 'is not a terminal file' );
 

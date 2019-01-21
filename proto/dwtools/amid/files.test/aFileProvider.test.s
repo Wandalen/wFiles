@@ -13252,6 +13252,455 @@ function statResolvedReadAsync( test )
 
 //
 
+function statReadActLinkedHead( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let path = provider.path;
+
+  var testPath = test.context.pathFor( 'written', test.name );
+  var dirPath = path.join( testPath, 'dir' );
+  var dirPath2 = path.join( testPath, 'dir2' );
+  var terminalPath = path.join( dirPath, 'terminal' );
+  var terminalLinkPath = path.join( dirPath, 'terminalLink' );
+  var linkPath = path.join( testPath, 'link' );
+  var linkPath2 = path.join( dirPath2, 'link2' );
+
+  /**/
+
+  test.case = 'intermediate soft link to directory with terminal';
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalPath, terminalPath );
+  provider.softLink( linkPath, dirPath );
+  var pathToRead = path.join( testPath, 'link/terminal' );
+  var o =
+  {
+    filePath : pathToRead,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 0,
+  }
+  var got = provider.statReadAct( o );
+  test.is( _.fileStatIs( got ) );
+  test.is( got.isTerminal() );
+
+  /**/
+
+  test.case = 'intermediate soft link to directory with terminal';
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalPath, terminalPath );
+  provider.softLink( linkPath, dirPath );
+  var pathToRead = path.join( testPath, 'link/terminal' );
+  var o =
+  {
+    filePath : pathToRead,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 1,
+  }
+  var got = provider.statReadAct( o );
+  test.is( _.fileStatIs( got ) );
+  test.is( got.isTerminal() );
+
+  /**/
+
+  test.case = 'intermediate soft link to directory with soft link';
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalPath, terminalPath );
+  provider.softLink( terminalLinkPath, terminalPath );
+  provider.softLink( linkPath, dirPath );
+  var pathToRead = path.join( testPath, 'link/terminalLink' );
+  var o =
+  {
+    filePath : pathToRead,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 0,
+  }
+  var got = provider.statReadAct( o );
+  test.is( _.fileStatIs( got ) );
+  test.is( got.isSoftLink() );
+
+  /**/
+
+  test.case = 'intermediate soft link to directory with soft link';
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalPath, terminalPath );
+  provider.softLink( terminalLinkPath, terminalPath );
+  provider.softLink( linkPath, dirPath );
+  var pathToRead = path.join( testPath, 'link/terminalLink' );
+  var o =
+  {
+    filePath : pathToRead,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 1,
+  }
+  var got = provider.statReadAct( o );
+  test.is( _.fileStatIs( got ) );
+  test.is( got.isTerminal() );
+
+  /**/
+
+  test.case = 'intermediate soft link to directory with missing file';
+  provider.filesDelete( testPath );
+  provider.dirMake( dirPath );
+  provider.softLink( linkPath, dirPath );
+  var pathToRead = path.join( testPath, 'link/missing' );
+  var o =
+  {
+    filePath : pathToRead,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 0,
+  }
+  var got = provider.statReadAct( o );
+  test.identical( got, null );
+
+  /**/
+
+  test.case = 'intermediate soft link to directory with missing file';
+  provider.filesDelete( testPath );
+  provider.dirMake( dirPath );
+  provider.softLink( linkPath, dirPath );
+  var pathToRead = path.join( testPath, 'link/missing' );
+  var o =
+  {
+    filePath : pathToRead,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 1,
+  }
+  var got = provider.statReadAct( o );
+  test.identical( got, null );
+
+  /**/
+
+  test.case = 'intermediate soft link to terminal';
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalPath, terminalPath );
+  provider.softLink( linkPath, terminalPath );
+  var pathToRead = path.join( testPath, 'link/terminal' );
+  var o =
+  {
+    filePath : pathToRead,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 0,
+  }
+  var got = provider.statReadAct( o );
+  test.identical( got, null );
+
+  /**/
+
+  test.case = 'intermediate soft link to terminal';
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalPath, terminalPath );
+  provider.softLink( linkPath, terminalPath );
+  var pathToRead = path.join( testPath, 'link/terminal' );
+  var o =
+  {
+    filePath : pathToRead,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 1,
+  }
+  var got = provider.statReadAct( o );
+  test.identical( got, null );
+
+  /**/
+
+  test.case = 'soft->soft->dir/terminal';
+  var linkPath2 = path.join( testPath, 'link2' );
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalPath, terminalPath );
+  provider.softLink( linkPath2, dirPath );
+  provider.softLink( linkPath, linkPath2 );
+  var pathToRead = path.join( testPath, 'link/terminal' );
+  var o =
+  {
+    filePath : pathToRead,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 0,
+  }
+  var got = provider.statReadAct( o );
+  test.is( _.fileStatIs( got ) );
+  test.is( got.isTerminal() );
+
+  /**/
+
+  test.case = 'soft->soft->dir/terminal';
+  var linkPath2 = path.join( testPath, 'link2' );
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalPath, terminalPath );
+  provider.softLink( linkPath2, dirPath );
+  provider.softLink( linkPath, linkPath2 );
+  var pathToRead = path.join( testPath, 'link/terminal' );
+  var o =
+  {
+    filePath : pathToRead,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 1,
+  }
+  var got = provider.statReadAct( o );
+  test.is( _.fileStatIs( got ) );
+  test.is( got.isTerminal() );
+
+  /**/
+
+  test.case = 'soft->soft->dir/soft->terminal';
+  var linkPath2 = path.join( testPath, 'link2' );
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalPath, terminalPath );
+  provider.softLink( terminalLinkPath, terminalPath );
+  provider.softLink( linkPath2, dirPath );
+  provider.softLink( linkPath, linkPath2 );
+  var pathToRead = path.join( testPath, 'link/terminalLink' );
+  var o =
+  {
+    filePath : pathToRead,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 0,
+  }
+  var got = provider.statReadAct( o );
+  test.is( _.fileStatIs( got ) );
+  test.is( got.isSoftLink() );
+
+  /**/
+
+  test.case = 'soft->soft->dir/soft->terminal';
+  var linkPath2 = path.join( testPath, 'link2' );
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalPath, terminalPath );
+  provider.softLink( terminalLinkPath, terminalPath );
+  provider.softLink( linkPath2, dirPath );
+  provider.softLink( linkPath, linkPath2 );
+  var pathToRead = path.join( testPath, 'link/terminalLink' );
+  var o =
+  {
+    filePath : pathToRead,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 1,
+  }
+  var got = provider.statReadAct( o );
+  test.is( _.fileStatIs( got ) );
+  test.is( got.isTerminal() );
+
+  /**/
+
+  test.case = 'soft->soft->dir/missing';
+  var linkPath2 = path.join( testPath, 'link2' );
+  provider.filesDelete( testPath );
+  provider.dirMake( dirPath );
+  provider.softLink( linkPath2, dirPath );
+  provider.softLink( linkPath, linkPath2 );
+  var pathToRead = path.join( testPath, 'link/missing' );
+  var o =
+  {
+    filePath : pathToRead,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 0,
+  }
+  var got = provider.statReadAct( o );
+  test.identical( got, null );
+
+  /**/
+
+  test.case = 'soft->soft->dir/missing';
+  var linkPath2 = path.join( testPath, 'link2' );
+  provider.filesDelete( testPath );
+  provider.dirMake( dirPath );
+  provider.softLink( linkPath2, dirPath );
+  provider.softLink( linkPath, linkPath2 );
+  var pathToRead = path.join( testPath, 'link/missing' );
+  var o =
+  {
+    filePath : pathToRead,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 1,
+  }
+  var got = provider.statReadAct( o );
+  test.identical( got, null );
+
+  /**/
+
+  test.case = 'two intermediate links in path, soft/soft/terminal';
+  var linkPath2 = path.join( dirPath2, 'link2' );
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalPath, terminalPath );
+  provider.dirMake( dirPath2 );
+  provider.softLink( linkPath2, dirPath );
+  provider.softLink( linkPath, dirPath2 );
+  var pathToRead = path.join( testPath, 'link/link2/terminal' );
+  var o =
+  {
+    filePath : pathToRead,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 0,
+  }
+  var got = provider.statReadAct( o );
+  test.is( _.fileStatIs( got ) );
+  test.is( got.isTerminal() );
+
+  /**/
+
+  test.case = 'two intermediate links in path, soft/soft/terminal';
+  var linkPath2 = path.join( dirPath2, 'link2' );
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalPath, terminalPath );
+  provider.dirMake( dirPath2 );
+  provider.softLink( linkPath2, dirPath );
+  provider.softLink( linkPath, dirPath2 );
+  var pathToRead = path.join( testPath, 'link/link2/terminal' );
+  var o =
+  {
+    filePath : pathToRead,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 1,
+  }
+  var got = provider.statReadAct( o );
+  test.is( _.fileStatIs( got ) );
+  test.is( got.isTerminal() );
+
+  /**/
+
+  test.case = 'two intermediate links in path, soft/soft/missing';
+  var linkPath2 = path.join( dirPath2, 'link2' );
+  provider.filesDelete( testPath );
+  provider.dirMake( dirPath );
+  provider.dirMake( dirPath2 );
+  provider.softLink( linkPath2, dirPath );
+  provider.softLink( linkPath, dirPath2 );
+  var pathToRead = path.join( testPath, 'link/link2/missing' );
+  var o =
+  {
+    filePath : pathToRead,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 0,
+  }
+  var got = provider.statReadAct( o );
+  test.identical( got, null );
+
+  /**/
+
+  test.case = 'two intermediate links in path, soft/soft/missing';
+  var linkPath2 = path.join( dirPath2, 'link2' );
+  provider.filesDelete( testPath );
+  provider.dirMake( dirPath );
+  provider.dirMake( dirPath2 );
+  provider.softLink( linkPath2, dirPath );
+  provider.softLink( linkPath, dirPath2 );
+  var pathToRead = path.join( testPath, 'link/link2/missing' );
+  var o =
+  {
+    filePath : pathToRead,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 1,
+  }
+  var got = provider.statReadAct( o );
+  test.identical( got, null );
+
+  /**/
+
+  test.case = 'two intermediate links in path, soft/soft/soft->terminal';
+  var linkPath2 = path.join( dirPath2, 'link2' );
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalPath, terminalPath );
+  provider.softLink( terminalLinkPath, terminalPath );
+  provider.dirMake( dirPath2 );
+  provider.softLink( linkPath2, dirPath );
+  provider.softLink( linkPath, dirPath2 );
+  var pathToRead = path.join( testPath, 'link/link2/terminalLink' );
+  var o =
+  {
+    filePath : pathToRead,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 0,
+  }
+  var got = provider.statReadAct( o );
+  test.is( _.fileStatIs( got ) );
+  test.is( got.isSoftLink() );
+
+  /**/
+
+  test.case = 'two intermediate links in path, soft/soft/soft->terminal';
+  var linkPath2 = path.join( dirPath2, 'link2' );
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalPath, terminalPath );
+  provider.softLink( terminalLinkPath, terminalPath );
+  provider.dirMake( dirPath2 );
+  provider.softLink( linkPath2, dirPath );
+  provider.softLink( linkPath, dirPath2 );
+  var pathToRead = path.join( testPath, 'link/link2/terminalLink' );
+  var o =
+  {
+    filePath : pathToRead,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 1,
+  }
+  var got = provider.statReadAct( o );
+  test.is( _.fileStatIs( got ) );
+  test.is( got.isTerminal() );
+
+  /**/
+
+  test.case = 'two intermediate links in path, soft/soft/soft->missing';
+  var linkPath2 = path.join( dirPath2, 'link2' );
+  provider.filesDelete( testPath );
+  provider.dirMake( dirPath );
+  provider.dirMake( dirPath2 );
+  provider.softLink({ dstPath : terminalLinkPath, srcPath : terminalPath, allowingMissed : 1 });
+  provider.softLink( linkPath2, dirPath );
+  provider.softLink( linkPath, dirPath2 );
+  var pathToRead = path.join( testPath, 'link/link2/terminalLink' );
+  var o =
+  {
+    filePath : pathToRead,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 0,
+  }
+  var got = provider.statReadAct( o );
+  test.is( _.fileStatIs( got ) );
+  test.is( got.isSoftLink() );
+
+  /**/
+
+  test.case = 'two intermediate links in path, soft/soft/soft->missing';
+  var linkPath2 = path.join( dirPath2, 'link2' );
+  provider.filesDelete( testPath );
+  provider.dirMake( dirPath );
+  provider.dirMake( dirPath2 );
+  provider.softLink({ dstPath : terminalLinkPath, srcPath : terminalPath, allowingMissed : 1 });
+  provider.softLink( linkPath2, dirPath );
+  provider.softLink( linkPath, dirPath2 );
+  var pathToRead = path.join( testPath, 'link/link2/terminalLink' );
+  var o =
+  {
+    filePath : pathToRead,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 1,
+  }
+  var got = provider.statReadAct( o );
+  test.identical( got, null );
+
+}
+
+//
+
 function dirMakeSync( test )
 {
   let self = this;
@@ -21629,10 +22078,11 @@ function hardLinkSoftlinked( test )
       qqq : statReadAct of Extract and HD handle links in head of path differently
       HD always resolve them
       add test routine statReadActLinkedHead
+      aaa : done
     */
-    test.case = 'Not implemented for Extract';
-    test.identical( 1, 1 )
-    return;
+    // test.case = 'Not implemented for Extract';
+    // test.identical( 1, 1 )
+    // return;
   }
 
   if( !test.context.softLinkIsSupported() )
@@ -21658,8 +22108,8 @@ function hardLinkSoftlinked( test )
   test.is( !!statResolvedReadAfter );
   if( statResolvedReadAfter )
   {
-    if( !self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-    return;
+    // if( !self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+    // return;
 
     test.identical( statResolvedReadBefore.atime.getTime(), statResolvedReadAfter.atime.getTime() );
     test.identical( statResolvedReadBefore.ctime.getTime(), statResolvedReadAfter.ctime.getTime() );
@@ -34536,6 +34986,7 @@ var Self =
     statResolvedReadSync,
     statReadActSync,
     statResolvedReadAsync,
+    statReadActLinkedHead,
 
     dirMakeSync,
     dirMakeLinksSync,

@@ -282,7 +282,7 @@ function pathResolveTextLinkAct( o )
   let stat = self.statReadAct
   ({
     filePath : o.filePath,
-    throwing : 1,
+    throwing : 0,
     sync : 1,
     resolvingSoftLink : 0,
   });

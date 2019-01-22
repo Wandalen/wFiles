@@ -4451,7 +4451,7 @@ function fileTouch_body( o )
 
   if( self.fileExists( o.filePath ) )
   {
-    let stat = self.statRead( o.filePath );
+    // let stat = self.statRead( o.filePath );
     if( !self.resolvedIsTerminal( o.filePath ) )
     {
       throw _.err( o.filePath, 'is not terminal' );

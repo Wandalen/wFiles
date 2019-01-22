@@ -1089,24 +1089,74 @@ function fileCopyAct( o )
   }
   else
   {
-    return _.timeOut( 0, () => _copyPre() )
-    .ifNoErrorThen( ( arg ) =>
+    let con = new _.Consequence().take( null );
+    let dstStat;
+    let data;
+
+    con.thenKeep( () =>
     {
-      if( o.breakingDstHardLink && self.isHardLink( o.dstPath ) )
+      _copyPre();
+      return self.statReadAct
+      ({
+        filePath : o.dstPath,
+        resolvingSoftLink : 0,
+        sync : 0,
+        throwing : 0,
+      })
+    })
+    .thenKeep( ( got ) =>
+    {
+      dstStat = got;
+
+      if( dstStat )
+      if( o.breakingDstHardLink && dstStat.isHardLink() )
       return self.hardLinkBreak({ filePath : o.dstPath, sync : 0 });
-      return arg;
+      return true;
     })
-    .ifNoErrorThen( ( arg ) =>
+    .thenKeep( () =>
     {
-      return self.fileRead({ filePath : o.srcPath, encoding : 'original.type', sync : 0 });
+      return self.fileRead
+      ({
+        filePath : o.srcPath,
+        encoding : 'original.type',
+        sync : 0,
+        resolvingTextLink : 0
+      })
     })
-    .ifNoErrorThen( ( data ) =>
+    .thenKeep( ( got ) =>
     {
+      data = got;
+
       _.assert( data !== null && data !== undefined );
+
+      if( dstStat )
+      if( dstStat.isSoftLink() )
+      return self.pathResolveLinkFull
+      ({
+        filePath : o.dstPath,
+        allowingMissed : 1,
+        allowingCycled : 0,
+        resolvingSoftLink : 1,
+        resolvingTextLink : 0,
+        preservingRelative : 0,
+        sync : 0,
+        throwing : 1
+      })
+      .thenKeep( ( dstPath ) =>
+      {
+        o.dstPath = dstPath;
+        return true;
+      })
+
+      return true;
+    })
+    .thenKeep( () =>
+    {
       self._descriptorWrite( o.dstPath, data );
       return true;
     })
 
+    return con;
   }
 
   /* - */

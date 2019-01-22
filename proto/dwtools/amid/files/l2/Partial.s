@@ -5762,12 +5762,12 @@ function _link_functor( gen )
         originalSrcPath : c.tempPath,
         sync : 0,
       })
-      .finally( ( err2, got ) )
+      .finally( ( err2, got ) =>
       {
         if( err2 )
         console.error( err2 );
         return got;
-      }
+      })
     }
 
     /* - */

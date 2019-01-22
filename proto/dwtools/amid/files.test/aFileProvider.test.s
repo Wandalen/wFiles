@@ -8311,6 +8311,538 @@ function fileCopyError( test )
 
 //
 
+function fileCopyAsyncThrowingError( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let path = provider.path;
+
+  let testPath = test.context.pathFor( 'written/fileCopyError' );
+  let srcPath = test.context.pathFor( 'written/fileCopyError/src' );
+  let dstPath = test.context.pathFor( 'written/fileCopyError/dst' );
+  let missingPath = test.context.pathFor( 'written/fileCopyError/missing' );
+
+  let con = new _.Consequence().take( null )
+
+  /**/
+
+  .thenKeep( () =>
+  {
+    test.case = 'missing';
+    provider.filesDelete( testPath );
+    var o =
+    {
+      srcPath : srcPath,
+      dstPath : dstPath,
+      sync : 0,
+      allowingMissed : 0,
+      throwing : 1
+    }
+    return test.shouldThrowError( provider.fileCopy( o ) )
+    .thenKeep( () =>
+    {
+      test.is( !provider.fileExists( srcPath ) );
+      test.is( !provider.fileExists( dstPath ) );
+      return true;
+    })
+  })
+
+  //
+
+  .thenKeep( () =>
+  {
+    test.case = 'missing';
+    provider.filesDelete( testPath );
+    var o =
+    {
+      srcPath : srcPath,
+      dstPath : dstPath,
+      sync : 0,
+      allowingMissed : 0,
+      throwing : 0
+    }
+    return provider.fileCopy( o )
+    .thenKeep( ( got ) =>
+    {
+      test.identical( got, null );
+      test.is( !provider.fileExists( srcPath ) );
+      test.is( !provider.fileExists( dstPath ) );
+      return true;
+    })
+  })
+
+  //
+
+  .thenKeep( () =>
+  {
+    test.case = 'try to copy dir';
+    provider.filesDelete( /*workDir*/testPath );
+    provider.dirMake( srcPath );
+    var o =
+    {
+      srcPath : srcPath,
+      dstPath : dstPath,
+      sync : 0,
+      throwing : 1
+    }
+    return test.shouldThrowError( provider.fileCopy( o ) )
+    .thenKeep( () =>
+    {
+      test.is( provider.fileExists( srcPath ) );
+      test.is( provider.isDir( srcPath ) );
+      test.is( !provider.fileExists( dstPath ) );
+      return true;
+    })
+
+  })
+
+  //
+
+  .thenKeep( () =>
+  {
+    test.case = 'try to copy dir';
+    provider.filesDelete( /*workDir*/testPath );
+    provider.dirMake( srcPath );
+    var o =
+    {
+      srcPath : srcPath,
+      dstPath : dstPath,
+      sync : 0,
+      throwing : 0
+    }
+    return provider.fileCopy( o )
+    .thenKeep( ( got ) =>
+    {
+      test.identical( got, null );
+      test.is( provider.fileExists( srcPath ) );
+      test.is( provider.isDir( srcPath ) );
+      test.is( !provider.fileExists( dstPath ) );
+      return true;
+    })
+
+  })
+
+  //
+
+  .thenKeep( () =>
+  {
+    test.case = 'try to copy soft link to dir';
+    provider.filesDelete( /*workDir*/testPath );
+    provider.dirMake( /*dir*/testPath );
+    provider.softLink( srcPath, /*dir*/testPath );
+    var o =
+    {
+      srcPath : srcPath,
+      dstPath : dstPath,
+      resolvingSrcSoftLink : 0,
+      sync : 0,
+      throwing : 1
+    }
+    return provider.fileCopy( o )
+    .thenKeep( ( got ) =>
+    {
+      test.identical( got, true );
+      test.is( provider.fileExists( srcPath ) );
+      test.is( provider.isSoftLink( srcPath ) );
+      test.is( provider.isSoftLink( dstPath ) );
+      test.identical( provider.pathResolveSoftLink( dstPath ), /*dir*/testPath );
+      return true;
+    })
+  })
+
+  //
+
+  .thenKeep( () =>
+  {
+    test.case = 'try to copy soft link to dir';
+    provider.filesDelete( /*workDir*/testPath );
+    provider.dirMake( /*dir*/testPath );
+    provider.softLink( srcPath, /*dir*/testPath );
+    var o =
+    {
+      srcPath : srcPath,
+      dstPath : dstPath,
+      resolvingSrcSoftLink : 1,
+      sync : 0,
+      throwing : 1
+    }
+    return test.shouldThrowError( provider.fileCopy( o ) )
+    .thenKeep( () =>
+    {
+      test.is( provider.isSoftLink( srcPath ) );
+      test.is( !provider.fileExists( dstPath ) );
+      return true;
+    })
+  })
+
+  //
+
+  .thenKeep( () =>
+  {
+    test.case = 'try to copy soft link to dir';
+    provider.filesDelete( /*workDir*/testPath );
+    provider.dirMake( /*dir*/testPath );
+    provider.softLink( srcPath, /*dir*/testPath );
+    var o =
+    {
+      srcPath : srcPath,
+      dstPath : dstPath,
+      resolvingSrcSoftLink : 1,
+      sync : 0,
+      throwing : 0
+    }
+    return provider.fileCopy( o )
+    .thenKeep( ( got ) =>
+    {
+      test.identical( got, null );
+      test.is( provider.isSoftLink( srcPath ) );
+      test.is( !provider.fileExists( dstPath ) );
+      return true;
+    })
+  })
+
+  //
+
+  .thenKeep( () =>
+  {
+    test.case = 'rewriting terminal';
+    provider.filesDelete( /*workDir*/testPath );
+    provider.fileWrite( srcPath, srcPath );
+    provider.fileWrite( dstPath, dstPath );
+    var o =
+    {
+      srcPath : srcPath,
+      dstPath : dstPath,
+      sync : 0,
+      rewriting : 0,
+      throwing : 1
+    }
+    return test.shouldThrowError( provider.fileCopy( o ) )
+    .thenKeep( () =>
+    {
+      test.is( provider.isTerminal( srcPath ) );
+      test.is( provider.isTerminal( dstPath ) );
+      test.identical( provider.fileRead( srcPath ), srcPath );
+      test.identical( provider.fileRead( dstPath ), dstPath );
+      return true;
+    })
+  })
+
+  //
+
+  .thenKeep( () =>
+  {
+    test.case = 'rewriting terminal';
+    provider.filesDelete( /*workDir*/testPath );
+    provider.fileWrite( srcPath, srcPath );
+    provider.fileWrite( dstPath, dstPath );
+    var o =
+    {
+      srcPath : srcPath,
+      dstPath : dstPath,
+      sync : 0,
+      rewriting : 0,
+      throwing : 0
+    }
+    return provider.fileCopy( o )
+    .thenKeep( ( got ) =>
+    {
+      test.identical( got, null );
+      test.is( provider.isTerminal( srcPath ) );
+      test.is( provider.isTerminal( dstPath ) );
+      test.identical( provider.fileRead( srcPath ), srcPath );
+      test.identical( provider.fileRead( dstPath ), dstPath );
+      return true;
+    })
+
+  })
+
+  //
+
+  .thenKeep( () =>
+  {
+    test.case = 'rewriting /*dir*/testPath by terminal';
+    provider.filesDelete( /*workDir*/testPath );
+    provider.fileWrite( srcPath, srcPath );
+    provider.dirMake( dstPath );
+    var o =
+    {
+      srcPath : srcPath,
+      dstPath : dstPath,
+      rewriting : 1,
+      rewritingDirs : 0,
+      sync : 0,
+      throwing : 1
+    }
+    return test.shouldThrowError( provider.fileCopy( o ) )
+    .thenKeep( () =>
+    {
+      test.is( provider.isTerminal( srcPath ) );
+      test.is( provider.isDir( dstPath ) );
+      test.identical( provider.fileRead( srcPath ), srcPath );
+      test.identical( provider.dirRead( dstPath ), [] );
+      return true;
+    })
+
+  })
+
+  //
+
+  .thenKeep( () =>
+  {
+    test.case = 'rewriting /*dir*/testPath by terminal';
+    provider.filesDelete( /*workDir*/testPath );
+    provider.fileWrite( srcPath, srcPath );
+    provider.dirMake( dstPath );
+    var o =
+    {
+      srcPath : srcPath,
+      dstPath : dstPath,
+      rewriting : 1,
+      rewritingDirs : 0,
+      sync : 0,
+      throwing : 0
+    }
+    return provider.fileCopy( o )
+    .thenKeep( ( got ) =>
+    {
+      test.identical( got, null );
+      test.is( provider.isTerminal( srcPath ) );
+      test.is( provider.isDir( dstPath ) );
+      test.identical( provider.fileRead( srcPath ), srcPath );
+      test.identical( provider.dirRead( dstPath ), [] );
+      return true;
+    })
+  })
+
+  //
+
+  .thenKeep( () =>
+  {
+    test.case = 'error on resolve src';
+    provider.filesDelete( /*workDir*/testPath );
+    provider.fileWrite( dstPath, dstPath );
+    var o =
+    {
+      srcPath : srcPath,
+      dstPath : dstPath,
+      allowingMissed : 0,
+      sync : 0,
+      throwing : 1
+    }
+    return test.shouldThrowError( provider.fileCopy( o ) )
+    .thenKeep( () =>
+    {
+      test.is( !provider.fileExists( srcPath ) );
+      test.is( provider.isTerminal( dstPath ) );
+      test.identical( provider.fileRead( dstPath ), dstPath );
+      return true;
+    })
+  })
+
+  //
+
+  .thenKeep( () =>
+  {
+    test.case = 'error on resolve src';
+    provider.filesDelete( /*workDir*/testPath );
+    provider.fileWrite( dstPath, dstPath );
+    var o =
+    {
+      srcPath : srcPath,
+      dstPath : dstPath,
+      allowingMissed : 0,
+      sync : 0,
+      throwing : 0
+    }
+    return provider.fileCopy( o )
+    .thenKeep( ( got ) =>
+    {
+      test.identical( got, null );
+      test.is( !provider.fileExists( srcPath ) );
+      test.is( provider.isTerminal( dstPath ) );
+      test.identical( provider.fileRead( dstPath ), dstPath );
+      return true;
+    })
+
+  })
+
+  //
+
+  .thenKeep( () =>
+  {
+    test.case = 'error on resolve src';
+    provider.filesDelete( /*workDir*/testPath );
+    provider.fileWrite( dstPath, dstPath );
+    provider.softLink({ dstPath : srcPath, srcPath : missingPath, allowingMissed : 1 });
+    var o =
+    {
+      srcPath : srcPath,
+      dstPath : dstPath,
+      resolvingSrcSoftLink : 0,
+      throwing : 1,
+      sync : 0,
+      allowingMissed : 0,
+    }
+    return test.mustNotThrowError( provider.fileCopy( o ) )
+    .thenKeep( () =>
+    {
+      test.is( provider.isSoftLink( srcPath ) );
+      test.is( provider.isSoftLink( dstPath ) );
+      test.identical( provider.pathResolveSoftLink( srcPath ), missingPath );
+      test.identical( provider.pathResolveSoftLink( dstPath ), missingPath );
+      return true;
+    })
+  })
+
+  //
+
+  .thenKeep( () =>
+  {
+    test.case = 'error on resolve src';
+    provider.filesDelete( /*workDir*/testPath );
+    provider.fileWrite( dstPath, dstPath );
+    provider.softLink({ dstPath : srcPath, srcPath : missingPath, allowingMissed : 1 });
+    var o =
+    {
+      srcPath : srcPath,
+      dstPath : dstPath,
+      resolvingSrcSoftLink : 0,
+      throwing : 0,
+      sync : 0,
+      allowingMissed : 0,
+    }
+    return test.mustNotThrowError( provider.fileCopy( o ) )
+    .thenKeep( () =>
+    {
+      test.is( provider.isSoftLink( srcPath ) );
+      test.is( provider.isSoftLink( dstPath ) );
+      test.identical( provider.pathResolveSoftLink( srcPath ), missingPath );
+      test.identical( provider.pathResolveSoftLink( dstPath ), missingPath );
+      return true;
+    })
+  })
+
+  //
+
+  .thenKeep( () =>
+  {
+    test.case = 'error on fileCopy missed link should not be throwen';
+    provider.filesDelete( /*workDir*/testPath );
+    provider.fileWrite( dstPath, dstPath );
+    provider.softLink({ dstPath : srcPath, srcPath : missingPath, allowingMissed : 1 });
+    var o =
+    {
+      srcPath : srcPath,
+      dstPath : dstPath,
+      resolvingSrcSoftLink : 0,
+      throwing : 1,
+      sync : 0,
+      allowingMissed : 0,
+    }
+    return provider.fileCopy( o )
+    .thenKeep( ( got ) =>
+    {
+      test.is( got );
+      test.is( provider.isSoftLink( srcPath ) );
+      test.is( provider.isSoftLink( dstPath ) );
+      test.identical( provider.pathResolveSoftLink( srcPath ), missingPath );
+      return true;
+    })
+
+  })
+
+  //
+
+  .thenKeep( () =>
+  {
+    test.case = 'error on fileCopy missed link should not be throwen';
+    provider.filesDelete( /*workDir*/testPath );
+    provider.fileWrite( dstPath, dstPath );
+    provider.softLink({ dstPath : srcPath, srcPath : missingPath, allowingMissed : 1 });
+    var o =
+    {
+      srcPath : srcPath,
+      dstPath : dstPath,
+      resolvingSrcSoftLink : 0,
+      sync : 0,
+      throwing : 0,
+      allowingMissed : 0,
+    }
+    return provider.fileCopy( o )
+    .thenKeep( ( got ) =>
+    {
+      test.is( got );
+      test.is( provider.isSoftLink( srcPath ) );
+      test.is( provider.isSoftLink( dstPath ) );
+      test.identical( provider.pathResolveSoftLink( srcPath ), missingPath );
+      return true;
+    })
+  })
+
+  //
+
+  .thenKeep( () =>
+  {
+    test.case = 'error on resolve src';
+    provider.filesDelete( /*workDir*/testPath );
+    provider.fileWrite( dstPath, dstPath );
+    provider.softLink({ dstPath : srcPath, srcPath : missingPath, allowingMissed : 1 });
+    var o =
+    {
+      srcPath : srcPath,
+      dstPath : dstPath,
+      allowingMissed : 0,
+      sync : 0,
+      resolvingSrcSoftLink : 1,
+      throwing : 1
+    }
+    return test.shouldThrowError( provider.fileCopy( o ) )
+    .thenKeep( () =>
+    {
+      test.is( provider.isSoftLink( srcPath ) );
+      test.is( provider.isTerminal( dstPath ) );
+      test.identical( provider.pathResolveSoftLink( srcPath ), missingPath );
+      test.identical( provider.fileRead( dstPath ), dstPath );
+      return true;
+    })
+  })
+
+  //
+
+  .thenKeep( () =>
+  {
+    test.case = 'error on resolve src';
+    provider.filesDelete( /*workDir*/testPath );
+    provider.fileWrite( dstPath, dstPath );
+    provider.softLink({ dstPath : srcPath, srcPath : missingPath, allowingMissed : 1 });
+    var o =
+    {
+      srcPath : srcPath,
+      dstPath : dstPath,
+      allowingMissed : 0,
+      sync : 0,
+      resolvingSrcSoftLink : 1,
+      throwing : 0
+    }
+    return provider.fileCopy( o )
+    .thenKeep( ( got ) =>
+    {
+      test.identical( got, null );
+      test.is( provider.isSoftLink( srcPath ) );
+      test.is( provider.isTerminal( dstPath ) );
+      test.identical( provider.pathResolveSoftLink( srcPath ), missingPath );
+      test.identical( provider.fileRead( dstPath ), dstPath );
+      return true;
+    })
+
+  })
+
+  return con;
+}
+
+//
+
 // function fileCopyAsyncThrowingError( test )
 // {
 //   let self = this;
@@ -34970,7 +35502,7 @@ var Self =
     fileCopyAsync,
     fileCopyLinksAsync,
     fileCopySoftLinkResolving,
-    // fileCopyAsyncThrowingError, /* Vova : rewrite this routine, low priority */
+    fileCopyAsyncThrowingError, /* Vova : rewrite this routine, low priority */
     fileCopyLinks,
     fileCopyError,
 

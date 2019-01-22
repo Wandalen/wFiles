@@ -1203,6 +1203,9 @@ function hardLinkAct( o )
 
   if( o.sync )
   {
+    if( o.dstPath === o.srcPath )
+    return true;
+
     let dstExists = self.fileExists( o.dstPath );
     let srcStat = self.statRead( o.srcPath );
 
@@ -1211,9 +1214,6 @@ function hardLinkAct( o )
       debugger;
       throw _.err( o.srcPath, 'does not exist' );
     }
-
-    if( o.dstPath === o.srcPath )
-    return true;
 
     if( !srcStat.isTerminal( o.srcPath ) )
     throw _.err( o.srcPath, 'is not a terminal file' );
@@ -1239,6 +1239,9 @@ function hardLinkAct( o )
 
     /* qqq : synchronize wtih sync version, please */
 
+    if( o.dstPath === o.srcPath )
+    return con;
+
     let dstExists;
 
     con.thenKeep( () => self.fileExists( o.dstPath ) );
@@ -1254,9 +1257,6 @@ function hardLinkAct( o )
         debugger;
         throw _.err( o.srcPath, 'does not exist' );
       }
-
-      if( o.dstPath === o.srcPath )
-      return true;
 
       if( !srcStat.isTerminal() )
       throw _.err( o.srcPath, 'is not a terminal file' );

@@ -957,7 +957,124 @@ function pathResolveLinkFull_body( o )
   function _pathResolveLinkFullAsync()
   {
     let con = new _.Consequence().take( null );
-    con.thenKeep( () => _pathResolveLinkFullSync() );
+
+    if( !o.stat )
+    con.thenKeep( () =>
+    {
+      return self.statReadAct
+      ({
+        filePath : result,
+        throwing : 0,
+        resolvingSoftLink : 0,
+        sync : 0
+      })
+    })
+
+    con.thenKeep( ( stat ) =>
+    {
+      o.stat = stat;
+
+      if( !o.resolvingSoftLink && ( !o.resolvingTextLink || !self.usingTextLink ) )
+      {
+
+        if( o.stat )
+        return result;
+
+        if( !o.allowingMissed )
+        {
+          result = null;
+          if( o.throwing )
+          {
+            debugger;
+            throw _.err( 'File does not exist', _.strQuote( o.filePath ) );
+          }
+        }
+
+        return result;
+      }
+
+      if( o.resolvingHeadDirect )
+      {
+
+        let filePath = result;
+        let o2 =
+        {
+          hub : hub,
+          filePath : result,
+          resolvingSoftLink : o.resolvingSoftLink,
+          resolvingTextLink : o.resolvingTextLink,
+          allowingMissed : o.allowingMissed,
+          allowingCycled: o.allowingCycled,
+          throwing : o.throwing,
+          stat : null,
+          // stat : o.stat,
+        }
+
+        result = self.pathResolveLinkHeadDirect.body.call( self, o2 );
+        // o.stat = o2.stat;
+
+      }
+
+      if( result )
+      {
+
+        let o2 =
+        {
+          stat : o.stat,
+          hub : hub,
+          filePath : result,
+          resolvingSoftLink : o.resolvingSoftLink,
+          resolvingTextLink : o.resolvingTextLink,
+          preservingRelative : o.preservingRelative,
+          allowingMissed : o.allowingMissed,
+          allowingCycled : o.allowingCycled,
+          throwing : o.throwing,
+        }
+
+        result = self.pathResolveLinkTail.body.call( self, o2 );
+        o.stat = o2.stat;
+        _.assert( o.stat !== undefined );
+
+      }
+      else
+      {
+        if( !o.allowingMissed )
+        {
+          result = null;
+          if( o.throwing )
+          {
+            debugger;
+            throw _.err( 'File does not exist', _.strQuote( o.filePath ) );
+          }
+        }
+      }
+
+      if( o.stat && o.resolvingHeadReverse )
+      {
+
+        let absolutePath = _.mapIs( result ) ? result.absolutePath : result;
+        let o2 =
+        {
+          hub : hub,
+          filePath : absolutePath,
+          resolvingSoftLink : o.resolvingSoftLink,
+          resolvingTextLink : o.resolvingTextLink,
+          allowingMissed : o.allowingMissed,
+          allowingCycled: o.allowingCycled,
+          throwing : o.throwing,
+        }
+
+        let r = self.pathResolveLinkHeadReverse.body.call( self, o2 );
+        if( r === absolutePath )
+        r = _.mapIs( result ) ? result.filePath : result;
+        result = r;
+
+      }
+
+      return _.mapIs( result ) ? result.filePath : result;
+
+    })
+
     return con;
   }
 }

@@ -4610,8 +4610,6 @@ function fileCopyActSync( test )
   }
 
   var expected = _.mapExtend( null, o );
-  expected.srcPath = provider.path.nativize( o.srcPath );
-  expected.dstPath = provider.path.nativize( o.dstPath );
 
   provider.fileCopyAct( o );
   var files = provider.dirRead( /*dir*/testPath );
@@ -11332,8 +11330,6 @@ function fileRenameActSync( test )
   }
 
   var expected = _.mapExtend( null, o );
-  expected.srcPath = provider.path.nativize( o.srcPath );
-  expected.dstPath = provider.path.nativize( o.dstPath );
 
   provider.fileRenameAct( o );
   var files = provider.dirRead( /*dir*/testPath );

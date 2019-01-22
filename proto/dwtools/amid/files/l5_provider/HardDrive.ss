@@ -551,12 +551,11 @@ function streamReadAct( o )
 
   _.assertRoutineOptions( streamReadAct, arguments );
 
-  let filePath = o.filePath;
-  o.filePath = self.path.nativize( o.filePath );
+  let filePath = self.path.nativize( o.filePath );
 
   try
   {
-    return File.createReadStream( o.filePath, { encoding : o.encoding } );
+    return File.createReadStream( filePath, { encoding : o.encoding } );
   }
   catch( err )
   {
@@ -988,13 +987,11 @@ function streamWriteAct( o )
 
   _.assertRoutineOptions( streamWriteAct, arguments );
 
-  let filePath = o.filePath;
-
-  o.filePath = self.path.nativize( o.filePath );
+  let filePath = self.path.nativize( o.filePath );
 
   try
   {
-    return File.createWriteStream( o.filePath );
+    return File.createWriteStream( filePath );
   }
   catch( err )
   {
@@ -1193,20 +1190,20 @@ function fileRenameAct( o )
   _.assert( self.path.isNormalized( o.srcPath ) );
   _.assert( self.path.isNormalized( o.dstPath ) );
 
-  o.dstPath = self.path.nativize( o.dstPath );
-  o.srcPath = self.path.nativize( o.srcPath );
+  let dstPath = self.path.nativize( o.dstPath );
+  let srcPath = self.path.nativize( o.srcPath );
 
-  _.assert( !!o.dstPath );
-  _.assert( !!o.srcPath );
+  _.assert( !!dstPath );
+  _.assert( !!srcPath );
 
   if( o.sync )
   {
-    File.renameSync( o.srcPath, o.dstPath );
+    File.renameSync( srcPath, dstPath );
   }
   else
   {
     let con = new _.Consequence();
-    File.rename( o.srcPath, o.dstPath, function( err )
+    File.rename( srcPath, dstPath, function( err )
     {
       if( err )
       con.error( err );
@@ -1260,18 +1257,18 @@ function fileCopyAct( o )
   }
 
 
-  o.dstPath = self.path.nativize( o.dstPath );
-  o.srcPath = self.path.nativize( o.srcPath );
+  let dstPath = self.path.nativize( o.dstPath );
+  let srcPath = self.path.nativize( o.srcPath );
 
-  _.assert( !!o.dstPath );
-  _.assert( !!o.srcPath );
+  _.assert( !!dstPath );
+  _.assert( !!srcPath );
 
   /* */
 
   if( o.sync )
   {
     // File.copySync( o.srcPath, o.dstPath );
-    File.copyFileSync( o.srcPath, o.dstPath );
+    File.copyFileSync( srcPath, dstPath );
   }
   else
   {
@@ -1296,7 +1293,7 @@ function fileCopyAct( o )
     //   con.take( err, data );
     // });
 
-    let readStream = self.streamReadAct({ filePath : o.srcPath, encoding : self.encoding });
+    let readStream = self.streamReadAct({ filePath : srcPath, encoding : self.encoding });
 
     readStream.on( 'error', ( err ) =>
     {
@@ -1308,7 +1305,7 @@ function fileCopyAct( o )
       readCon.take( null );
     })
 
-    let writeStream = self.streamWriteAct({ filePath : o.dstPath });
+    let writeStream = self.streamWriteAct({ filePath : dstPath });
 
     writeStream.on( 'error', ( err ) =>
     {

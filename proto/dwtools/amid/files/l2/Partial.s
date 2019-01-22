@@ -1965,6 +1965,7 @@ var having = filesSize.having = Object.create( null );
 having.writing = 0;
 having.reading = 1;
 having.driving = 0;
+var operates = filesSize.operates = Object.create( null );
 
 //
 
@@ -3394,6 +3395,9 @@ having.writing = 0;
 having.reading = 1;
 having.driving = 0;
 having.aspect = 'body';
+var operates = filesAreSame_body.operates = Object.create( null );
+operates.ins1 = { pathToRead : 1 };
+operates.ins2 = { pathToRead : 1 };
 
 /*
 qqq : add operate to methods which miss it
@@ -3931,6 +3935,8 @@ having.writing = 0;
 having.reading = 1;
 having.aspect = 'body';
 having.driving = 0;
+var operates = isLink_body.operates = Object.create( null );
+operates.filePath = { pathToRead : 1 };
 
 //
 

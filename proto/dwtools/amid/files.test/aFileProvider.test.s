@@ -15435,6 +15435,149 @@ function dirReadSync( test )
 
 //
 
+function dirReadSyncOutputFormats( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let path = provider.path;
+
+  if( !_.routineIs( provider.dirReadAct ) || !_.routineIs( provider.statReadAct ) )
+  {
+    test.identical( 1,1 );
+    return;
+  }
+
+  var testPath = test.context.pathFor( 'read/dirReadSyncOutputFormats' );
+  var filePath = path.join( testPath, 'file' );
+
+  /* absolute */
+
+  test.case = 'missing path';
+  var got = provider.dirRead
+  ({
+    filePath : filePath,
+    outputFormat : 'absolute'
+  })
+  test.identical( got, null );
+
+  test.case = 'terminal';
+  provider.fileWrite( filePath, filePath );
+  var got = provider.dirRead
+  ({
+    filePath : filePath,
+    outputFormat : 'absolute'
+  })
+  test.identical( got, [ filePath ] );
+
+  test.case = 'directory';
+  provider.fileWrite( filePath, filePath );
+  var got = provider.dirRead
+  ({
+    filePath : testPath,
+    outputFormat : 'absolute'
+  })
+  test.identical( got, [ filePath ] );
+
+  /* record */
+
+  test.case = 'missing path';
+  provider.filesDelete( testPath );
+  var got = provider.dirRead
+  ({
+    filePath : filePath,
+    outputFormat : 'record'
+  })
+  test.identical( got, null);
+
+  test.case = 'terminal';
+  provider.fileWrite( filePath, filePath );
+  var got = provider.dirRead
+  ({
+    filePath : filePath,
+    outputFormat : 'record'
+  })
+  test.identical( got.length, 1 );
+  test.is( got[ 0 ] instanceof _.FileRecord );
+  test.identical( got[ 0 ].absolute, filePath );
+
+  test.case = 'directory';
+  provider.fileWrite( filePath, filePath );
+  var got = provider.dirRead
+  ({
+    filePath : testPath,
+    outputFormat : 'record'
+  })
+  test.identical( got.length, 1 );
+  test.is( got[ 0 ] instanceof _.FileRecord );
+  test.identical( got[ 0 ].absolute, filePath );
+
+  /* relative */
+
+  test.case = 'missing path';
+  provider.filesDelete( testPath );
+  var got = provider.dirRead
+  ({
+    filePath : filePath,
+    outputFormat : 'relative'
+  })
+  test.identical( got, null );
+
+  test.case = 'terminal';
+  provider.fileWrite( filePath, filePath );
+  var got = provider.dirRead
+  ({
+    filePath : filePath,
+    outputFormat : 'relative'
+  })
+  test.identical( got, [ 'file' ] );
+
+  test.case = 'directory';
+  provider.fileWrite( filePath, filePath );
+  var got = provider.dirRead
+  ({
+    filePath : testPath,
+    outputFormat : 'relative'
+  })
+  test.identical( got, [ 'file' ] );
+
+  /* relative, diff basePath */
+
+  var basePath = path.join( testPath, 'baseDir' );
+
+  test.case = 'missing path';
+  provider.filesDelete( testPath );
+  var got = provider.dirRead
+  ({
+    filePath : filePath,
+    outputFormat : 'relative',
+    basePath : basePath
+  })
+  test.identical( got, null );
+
+  test.case = 'terminal';
+  provider.fileWrite( filePath, filePath );
+  var got = provider.dirRead
+  ({
+    filePath : filePath,
+    outputFormat : 'relative',
+    basePath : basePath
+  })
+  test.identical( got, [ '../file' ] );
+
+  test.case = 'directory';
+  provider.fileWrite( filePath, filePath );
+  var got = provider.dirRead
+  ({
+    filePath : testPath,
+    outputFormat : 'relative',
+    basePath : basePath
+  })
+  test.identical( got, [ '../file' ] );
+
+}
+
+//
+
 function dirReadAsync( test )
 {
   let self = this;
@@ -35523,6 +35666,7 @@ var Self =
     hashReadAsync,
 
     dirReadSync,
+    dirReadSyncOutputFormats,
     dirReadAsync,
 
     fileWriteSync,

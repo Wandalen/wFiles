@@ -12211,7 +12211,6 @@ function fileDeleteActSync( test )
     sync : 1
   }
   var expected = _.mapExtend( null, o );
-  expected.filePath = provider.path.nativize( o.filePath );
   provider.fileDeleteAct( o );
   test.identical( o, expected );
   var stat = provider.statResolvedRead( srcPath );
@@ -12280,7 +12279,6 @@ function fileDeleteActSync( test )
     sync : 1
   }
   var expected = _.mapExtend( null, o );
-  expected.filePath = provider.path.nativize( o.filePath );
   provider.fileDeleteAct( o );
   test.identical( o, expected );
   var stat = provider.statResolvedRead( srcPath );
@@ -12298,7 +12296,6 @@ function fileDeleteActSync( test )
     sync : 1
   }
   var expected = _.mapOwnKeys( o );
-  expected.filePath = provider.path.nativize( o.filePath );
   provider.fileDeleteAct( o );
   var got = _.mapOwnKeys( o );
   test.identical( got, expected );

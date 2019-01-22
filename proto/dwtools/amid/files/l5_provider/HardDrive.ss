@@ -902,7 +902,7 @@ function fileWriteAct( o )
   if( _.bufferTypedIs( o.data ) && !_.bufferBytesIs( o.data ) || _.bufferRawIs( o.data ) )
   o.data = _.bufferNodeFrom( o.data );
 
-  /* qqq : is it possible to do it without conversion from raw buffer? */
+  // /* qqq : is it possible to do it without conversion from raw buffer? */
 
   _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ) || _.bufferBytesIs( o.data ), 'Expects string or node buffer, but got', _.strType( o.data ) );
 
@@ -1085,34 +1085,29 @@ function fileDeleteAct( o )
   _.assert( self.path.isAbsolute( o.filePath ) );
   _.assert( self.path.isNormalized( o.filePath ) );
 
-  let filePath = o.filePath;
-
-  o.filePath = self.path.nativize( o.filePath );
-
-  /* qqq : sync is not accounted */
-  /* qqq : is it needed */
+  let filePath = self.path.nativize( o.filePath );
 
   if( o.sync )
   {
     let stat = self.statReadAct
     ({
-      filePath : filePath,
+      filePath : o.filePath,
       resolvingSoftLink : 0,
       sync : 1,
       throwing : 0,
     });
 
     if( stat && stat.isDir() )
-    File.rmdirSync( o.filePath  );
+    File.rmdirSync( filePath );
     else
-    File.unlinkSync( o.filePath  );
+    File.unlinkSync( filePath );
 
   }
   else
   {
     let con = self.statReadAct
     ({
-      filePath : filePath,
+      filePath : o.filePath,
       resolvingSoftLink : 0,
       sync : 0,
       throwing : 0,
@@ -1123,9 +1118,9 @@ function fileDeleteAct( o )
       return con.error( err );
 
       if( stat && stat.isDir() )
-      File.rmdir( o.filePath, handleResult );
+      File.rmdir( filePath, handleResult );
       else
-      File.unlink( o.filePath, handleResult );
+      File.unlink( filePath, handleResult );
     })
 
     /**/

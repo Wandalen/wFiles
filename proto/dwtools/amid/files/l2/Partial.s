@@ -6253,13 +6253,24 @@ operates.dstPath = { pathToWrite : 1 }
 
 /**
  * Creates hard link( new name ) to existing source( o.srcPath ) named as ( o.dstPath ).
- * Rewrites target( o.dstPath ) by default if it exist. Logging of working process is controled by option( o.verbosity ).
+ * Rewrites target( o.dstPath ) by default if it exists. Logging of working process is controled by option( o.verbosity ).
  * Returns true if link is successfully created. If some error occurs during execution method uses option( o.throwing ) to
  * determine what to do - throw error or return false.
  *
- * @param { wTools~linkOptions } o - options { @link wTools~linkOptions  }
  *
- * @method softLink
+ * @param { wTools~linkOptions } o - options { @link wTools~linkOptions  }
+ * @property { boolean } [ o.breakingSrcHardLink=false ] - Breaks all hardlinks to source( o.srcPath ) file before creating a new hardlink.
+ * @property { boolean } [ o.breakingDstHardLink=true ] - Breaks all hardlinks to destination( o.dstPath ) file before creating a new hardlink.
+ *
+ *
+ * This is how routine links two existing hardlinks( = ) depending on combination of breakingSrcHardLink and breakingDstHardLink:
+ * f1 = src - dst = f2
+ * breakingSrcHardLink:1 breakingDstHardLink:1 - breaks hardlinks: f1 = src and dst = f2
+ * breakingSrcHardLink:1 breakingDstHardLink:0 - breaks hardlink f1 = src
+ * breakingSrcHardLink:0 breakingDstHardLink:1 - breaks hardlink dst = f2
+ * breakingSrcHardLink:0 breakingDstHardLink:0 - preserves both hardlinks, is forbidden because its impossible to implement on FileProvider.HardDrive
+ *
+ * @method hardLink
  * @throws { exception } If( o.srcPath ) doesn`t exist.
  * @throws { exception } If cant link ( o.srcPath ) with ( o.dstPath ).
  * @memberof wFileProviderPartial
@@ -6392,6 +6403,8 @@ operates.dstPath = { pathToWrite : 1 }
  * @property { boolean } [ rewriting=true ] - Rewrites target( o.dstPath ).
  * @property { boolean } [ verbosity=true ] - Logs working process.
  * @property { boolean } [ throwing=true ] - Enables error throwing. Otherwise returns true/false.
+ * @property { boolean } [ o.breakingSrcHardLink= ] - Breaks all hardlinks to source( o.srcPath ) file before link operation.
+ * @property { boolean } [ o.breakingDstHardLink= ] - Breaks all hardlinks to destination( o.dstPath ) file before link operation.
  */
 
 /**

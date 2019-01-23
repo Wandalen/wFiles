@@ -6317,9 +6317,9 @@ function _hardLinkAct( c )
   let self = this;
 
   if( c.options.breakingSrcHardLink )
-  if( c.srcStat.isHardLink() )
   if( !self.fileExists( c.options2.dstPath ) )
   {
+    if( c.srcStat.isHardLink() )
     self.hardLinkBreak( c.options2.srcPath );
   }
   else

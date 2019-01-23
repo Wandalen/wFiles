@@ -25678,12 +25678,11 @@ function hardLinkHardLinkBreaking( test )
   provider.fileWrite( dstPathTerminal, dstPathTerminal );
   provider.hardLink( dstPath, dstPathTerminal );
   var o = { breakingSrcHardLink : 1, breakingDstHardLink : 0 };
-  test.shouldThrowError( () => hardLink( o ) );
-  test.identical( provider.filesAreHardLinked([ dstPath, dstPathTerminal ]), hardLinked );
-  test.identical( provider.filesAreHardLinked([ srcPath, dstPath ]), false );
+  hardLink( o );
+  test.identical( provider.filesAreHardLinked([ srcPath, dstPath, dstPathTerminal ]), hardLinked );
   test.identical( provider.fileRead( srcPath ), srcPath );
-  test.identical( provider.fileRead( dstPath ), dstPathTerminal );
-  test.identical( provider.fileRead( dstPathTerminal ), dstPathTerminal );
+  test.identical( provider.fileRead( dstPath ), srcPath );
+  test.identical( provider.fileRead( dstPathTerminal ), srcPath );
 
   provider.filesDelete( /*workDir*/testPath );
   provider.fileWrite( srcPath, srcPath );

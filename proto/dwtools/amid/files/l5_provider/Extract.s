@@ -1287,7 +1287,7 @@ function hardLinkAct( o )
   {
     let con = new _.Consequence().take( true );
 
-    /* qqq : synchronize wtih sync version, please */
+    /* qqq : synchronize wtih sync version, please aaa : done */
 
     if( o.dstPath === o.srcPath )
     return con;

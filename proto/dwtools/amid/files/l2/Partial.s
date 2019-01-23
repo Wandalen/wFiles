@@ -6308,7 +6308,22 @@ function _hardLinkAct( c )
   if( c.options.breakingSrcHardLink )
   if( c.srcStat.isHardLink() )
   if( !self.fileExists( c.options2.dstPath ) )
-  self.hardLinkBreak( c.options2.srcPath );
+  {
+    self.hardLinkBreak( c.options2.srcPath );
+  }
+  else
+  {
+    if( !c.options.breakingDstHardLink )
+    if( c.dstStat.isHardLink() )
+    {
+      let srcData = self.fileRead( c.options2.srcPath );
+      self.fileWrite( c.options2.dstPath, srcData );
+      self.fileDelete( c.options2.srcPath );
+      let dstPath = c.options2.dstPath;
+      c.options2.dstPath = c.options2.srcPath;
+      c.options2.srcPath = dstPath;
+    }
+  }
 
   return self.hardLinkAct( c.options2 );
 }

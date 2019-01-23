@@ -570,60 +570,70 @@ function filesFind_body( o )
 
   forPaths( o.filePath,_.mapExtend( null,o ) );
 
-  /* order */
+  return end();
 
-  o.result = self.recordsOrder( o.result, o.orderingExclusion );
+  /* */
 
-  // let orderingExclusion = _.RegexpObject.order( o.orderingExclusion || [] );
-  // if( !orderingExclusion.length )
-  // {
-  //   forPaths( o.filePath,_.mapExtend( null,o ) );
-  // }
-  // else
-  // {
-  //   let maskTerminal = o.maskTerminal;
-  //   for( let e = 0 ; e < orderingExclusion.length ; e++ )
-  //   {
-  //     o.maskTerminal = _.RegexpObject.And( Object.create( null ),maskTerminal,orderingExclusion[ e ] );
-  //     forPaths( o.filePath,_.mapExtend( null,o ) );
-  //   }
-  // }
-
-  /* sort */
-
-  if( o.sortingWithArray )
+  function end()
   {
+    /* order */
 
-    _.assert( _.arrayIs( o.sortingWithArray ) );
+    o.result = self.recordsOrder( o.result, o.orderingExclusion );
 
-    if( o.outputFormat === 'record' )
-    o.result.sort( function( a,b )
+    // let orderingExclusion = _.RegexpObject.order( o.orderingExclusion || [] );
+    // if( !orderingExclusion.length )
+    // {
+    //   forPaths( o.filePath,_.mapExtend( null,o ) );
+    // }
+    // else
+    // {
+    //   let maskTerminal = o.maskTerminal;
+    //   for( let e = 0 ; e < orderingExclusion.length ; e++ )
+    //   {
+    //     o.maskTerminal = _.RegexpObject.And( Object.create( null ),maskTerminal,orderingExclusion[ e ] );
+    //     forPaths( o.filePath,_.mapExtend( null,o ) );
+    //   }
+    // }
+
+    /* sort */
+
+    if( o.sortingWithArray )
     {
-      return _.regexpArrayIndex( o.sortingWithArray,a.relative ) - _.regexpArrayIndex( o.sortingWithArray,b.relative );
-    })
-    else
-    o.result.sort( function( a,b )
+
+      _.assert( _.arrayIs( o.sortingWithArray ) );
+
+      if( o.outputFormat === 'record' )
+      o.result.sort( function( a,b )
+      {
+        return _.regexpArrayIndex( o.sortingWithArray,a.relative ) - _.regexpArrayIndex( o.sortingWithArray,b.relative );
+      })
+      else
+      o.result.sort( function( a,b )
+      {
+        return _.regexpArrayIndex( o.sortingWithArray,a ) - _.regexpArrayIndex( o.sortingWithArray,b );
+      });
+
+    }
+
+    /* mandatory */
+
+    if( o.mandatory )
+    if( !o.result.length )
     {
-      return _.regexpArrayIndex( o.sortingWithArray,a ) - _.regexpArrayIndex( o.sortingWithArray,b );
-    });
+      debugger;
+      throw _.err( 'No file found at ' + path.commonReport( o.filter.inFilePath || o.filePath ) );
+    }
 
+    /* timing */
+
+    if( o.verbosity >= 1 )
+    self.logger.log( ' . Found ' + o.result.length + ' files at ' + o.filePath + ' in ', _.timeSpent( time ) );
+
+    if( !o.sync )
+    return new _.Consequence().take( o.result );
+
+    return o.result;
   }
-
-  /* mandatory */
-
-  if( o.mandatory )
-  if( !o.result.length )
-  {
-    debugger;
-    throw _.err( 'No file found at ' + path.commonReport( o.filter.inFilePath || o.filePath ) );
-  }
-
-  /* timing */
-
-  if( o.verbosity >= 1 )
-  self.logger.log( ' . Found ' + o.result.length + ' files at ' + o.filePath + ' in ', _.timeSpent( time ) );
-
-  return o.result;
 
   /* find for several paths */
 
@@ -647,6 +657,7 @@ function filesFind_body( o )
       delete options.orderingExclusion;
       delete options.sortingWithArray;
       delete options.verbosity;
+      delete options.sync;
       options.filePath = filePath;
 
       // debugger;
@@ -661,6 +672,7 @@ function filesFind_body( o )
 _.routineExtend( filesFind_body, filesFindSingle.body );
 
 var defaults = filesFind_body.defaults;
+defaults.sync = 1;
 defaults.orderingExclusion = [];
 defaults.sortingWithArray = null;
 defaults.verbosity = null;

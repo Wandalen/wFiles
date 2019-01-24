@@ -310,7 +310,7 @@ function _preFilePathVectorWithoutProviderDefaults( routine, args )
   else if( _.arrayIs( o ) )
   o = { filePath : path.s.from( o ) };
   else if( _.arrayIs( o.filePath ) )
-  o = { filePath : path.s.from( o.filePath ) }
+  o.filePath = path.s.from( o.filePath );
 
   _.routineOptions( routine, o );
 
@@ -7165,7 +7165,7 @@ function filesAreTextLinked_body( o )
       resolvingSoftLink : o.resolvingSoftLink,
       resolvingTextLink : true,
     });
-    _.assert( path.is( resolved[ 0 ] ) );
+    _.assert( path.is( resolved[ i ] ) );
   }
 
   for( let i = 1 ; i < resolved.length ; i++ )

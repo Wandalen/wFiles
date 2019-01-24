@@ -31309,6 +31309,8 @@ function filesAreTextLinked( test )
   let linkPath1 = self.pathFor( 'written/filesAreTextLinked/link1' );
   let linkPath2 = self.pathFor( 'written/filesAreTextLinked/link2' );
 
+  provider.fieldPush( 'usingTextLink', 1 );
+
   /*
     resolvingTextLink is always on
 
@@ -31341,6 +31343,113 @@ function filesAreTextLinked( test )
   provider.fileWrite( filePath2, filePath2 );
   var got = provider.filesAreTextLinked({ filePath : [ filePath1, filePath2 ], resolvingSoftLink : 1 });
   test.identical( got, false );
+
+  test.case = 'terminal,terminal';
+  provider.filesDelete( /*workDir*/testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  provider.fileWrite( filePath2, filePath2 );
+  var got = provider.filesAreTextLinked({ filePath : [ filePath1, filePath2 ], resolvingSoftLink : 1 });
+  test.identical( got, false );
+
+  test.case = 'terminal,terminal';
+  provider.filesDelete( /*workDir*/testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  provider.fileWrite( filePath2, filePath2 );
+  var got = provider.filesAreTextLinked({ filePath : [ filePath1, filePath2 ], resolvingSoftLink : 0 });
+  test.identical( got, false );
+
+  test.case = 'terminal,text link to other file';
+  provider.filesDelete( /*workDir*/testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  provider.fileWrite( filePath2, filePath2 );
+  provider.textLink( linkPath1, filePath2 );
+  var got = provider.filesAreTextLinked({ filePath : [ filePath1, linkPath1 ], resolvingSoftLink : 1 });
+  test.identical( got, false );
+
+  test.case = 'terminal,text link to other file';
+  provider.filesDelete( /*workDir*/testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  provider.fileWrite( filePath2, filePath2 );
+  provider.textLink( linkPath1, filePath2 );
+  var got = provider.filesAreTextLinked({ filePath : [ filePath1, linkPath1 ], resolvingSoftLink : 0 });
+  test.identical( got, false );
+
+  test.case = 'terminal,text link to same file';
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  provider.textLink( linkPath1, filePath1 );
+  var got = provider.filesAreTextLinked({ filePath : [ filePath1, linkPath1 ], resolvingSoftLink : 0 });
+  test.identical( got, true );
+
+  test.case = 'terminal,text link to same file';
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  provider.textLink( linkPath1, filePath1 );
+  var got = provider.filesAreTextLinked({ filePath : [ filePath1, linkPath1 ], resolvingSoftLink : 1 });
+  test.identical( got, true );
+
+  test.case = 'terminal,soft link to other';
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  provider.fileWrite( filePath2, filePath2 );
+  provider.softLink( linkPath1, filePath2 );
+  var got = provider.filesAreTextLinked({ filePath : [ filePath1, linkPath1 ], resolvingSoftLink : 1 });
+  test.identical( got, false );
+
+  test.case = 'terminal,soft link to other';
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  provider.fileWrite( filePath2, filePath2 );
+  provider.softLink( linkPath1, filePath2 );
+  var got = provider.filesAreTextLinked({ filePath : [ filePath1, linkPath1 ], resolvingSoftLink : 0 });
+  test.identical( got, false );
+
+  test.case = 'terminal,soft link to same';
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  provider.softLink( linkPath1, filePath1 );
+  var got = provider.filesAreTextLinked({ filePath : [ filePath1, linkPath1 ], resolvingSoftLink : 1 });
+  test.identical( got, true );
+
+  test.case = 'terminal,soft link to same';
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  provider.softLink( linkPath1, filePath1 );
+  var got = provider.filesAreTextLinked({ filePath : [ filePath1, linkPath1 ], resolvingSoftLink : 0 });
+  test.identical( got, false );
+
+  test.case = 'terminal,hardlink to same';
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  provider.hardLink( linkPath1, filePath1 );
+  var got = provider.filesAreTextLinked({ filePath : [ filePath1, linkPath1 ], resolvingSoftLink : 0 });
+  test.identical( got, false );
+
+  test.case = 'terminal,hardlink to same';
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  provider.hardLink( linkPath1, filePath1 );
+  var got = provider.filesAreTextLinked({ filePath : [ filePath1, linkPath1 ], resolvingSoftLink : 1 });
+  test.identical( got, false );
+
+  test.case = 'terminal,soft to text to same';
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  provider.textLink( linkPath2, filePath1 );
+  provider.softLink( linkPath1, linkPath2 );
+  var got = provider.filesAreTextLinked({ filePath : [ filePath1, linkPath1 ], resolvingSoftLink : 1 });
+  test.identical( got, true );
+
+  test.case = 'terminal,soft to text to same';
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  provider.textLink( linkPath2, filePath1 );
+  provider.softLink( linkPath1, linkPath2 );
+  var got = provider.filesAreTextLinked({ filePath : [ filePath1, linkPath1 ], resolvingSoftLink : 0 });
+  test.identical( got, false );
+
+  provider.fieldPop( 'usingTextLink', 1 );
+
 }
 
 //

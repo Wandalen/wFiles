@@ -5177,7 +5177,7 @@ function _link_functor( gen )
       return c.end();
 
       /*
-      qqq : _linkMultiple should work not only for hardlinks
+      zzz : _linkMultiple should work not only for hardlinks
       Vova : low priority
       */
 
@@ -5801,18 +5801,55 @@ function _link_functor( gen )
 
     function validateSize()
     {
-      /* qqq : fix please */
-      // if( !Config.debug )
-      // return;
-      // let c.srcStat = self.statResolvedRead({ filePath : o.srcPath, resolvingSoftLink : 1, resolvingTextLink : 1 });
-      // if( !c.srcStat )
-      // return;
-      // let c.dstStat = self.statResolvedRead({ filePath : o.dstPath, resolvingSoftLink : 1, resolvingTextLink : 1 });
-      // if( !c.dstStat )
-      // return;
-      // _.assert( !!c.dstStat );
-      // if( !( c.srcStat.size == c.dstStat.size ) )
-      // self.logger.warn( `Warning: ${o.srcPath} (${c.srcStat.size}) and ${o.dstPath} (${c.dstStat.size}) should have same size!` )
+      if( !Config.debug )
+      return;
+      if( !c.srcStat )
+      return;
+      if( o.srcPath === o.dstPath )
+      return;
+
+      let srcPath = o.srcPath;
+      let dstPath = o.dstPath;
+
+      if( actMethodName === 'fileCopyAct' )
+      {
+        if( c.srcStat.isSoftLink() )
+        {
+          let srcPathResolved = self.pathResolveSoftLink( srcPath );
+          srcPath = self.path.join( srcPath, srcPathResolved );
+          let srcStat = self.statReadAct({ filePath : srcPath, throwing : 0, resolvingSoftLink : 0, sync : 1 });
+          if( srcStat )
+          {
+            c.srcStat = srcStat;
+            let dstPathResolved = self.pathResolveSoftLink( dstPath );
+            dstPath = self.path.join( dstPath, dstPathResolved );
+          }
+        }
+      }
+      else if( actMethodName === 'softLinkAct' )
+      {
+        let dstPathResolved = self.pathResolveSoftLink( o.dstPath );
+        dstPath = self.path.join( dstPath, dstPathResolved );
+      }
+      else if( actMethodName === 'textLinkAct' )
+      {
+        self.fieldPush( 'usingTextLink', 1 );
+        let dstPathResolved = self.pathResolveTextLink( o.dstPath );
+        self.fieldPop( 'usingTextLink', 1 );
+        dstPath = self.path.join( dstPath, dstPathResolved );
+      }
+
+      c.dstStat = self.statReadAct({ filePath : dstPath, throwing : 1, resolvingSoftLink : 0, sync : 1 });
+
+      _.assert( !!c.srcStat );
+      _.assert( !!c.dstStat );
+
+      if( !( c.srcStat.size == c.dstStat.size ) )
+      {
+        let msg = `Warning: ${o.srcPath} (${c.srcStat.size}) and ${o.dstPath} (${c.dstStat.size}) should have same size!`;
+        self.logger.warn( msg )
+      }
+
     }
 
     /* - */

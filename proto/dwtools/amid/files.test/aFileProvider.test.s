@@ -21497,6 +21497,281 @@ function softLinkMakeAndResolve( test )
 
 //
 
+function textLinkSync( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let path = provider.path;
+
+  let testPath = self.pathFor( 'written/textLinkSync' )
+  let filePath1 = self.pathFor( 'written/textLinkSync/file1' );
+  let filePath2 = self.pathFor( 'written/textLinkSync/file2' );
+  let linkPath1 = self.pathFor( 'written/textLinkSync/link1' );
+  let linkPath2 = self.pathFor( 'written/textLinkSync/link2' );
+
+  self.provider.fieldPush( 'usingTextLink', 1 );
+
+  //
+
+  test.case = 'textlink to missing';
+  provider.filesDelete( testPath );
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.textLink
+    ({
+      dstPath : linkPath1,
+      srcPath : filePath1,
+      allowingMissed : 0
+    });
+  });
+  test.is( !provider.fileExists( filePath1 ) );
+  test.is( !provider.fileExists( linkPath1 ) );
+
+  test.case = 'textlink to missing';
+  provider.filesDelete( testPath );
+  provider.textLink
+  ({
+    dstPath : linkPath1,
+    srcPath : filePath1,
+    allowingMissed : 1
+  });
+  test.is( provider.isTextLink( linkPath1 ) );
+  test.is( !provider.fileExists( filePath1 ) );
+  var got = provider.pathResolveTextLink( linkPath1 );
+  test.identical( got, filePath1 );
+
+  test.case = 'textlink to terminal';
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  provider.textLink
+  ({
+    dstPath : linkPath1,
+    srcPath : filePath1,
+  });
+  test.is( provider.isTextLink( linkPath1 ) );
+  test.is( provider.isTerminal( linkPath1 ) );
+  test.is( provider.isTerminal( filePath1 ) );
+  var got = provider.pathResolveTextLink( linkPath1 );
+  test.identical( got, filePath1 );
+
+  test.case = 'textlink to directory';
+  provider.filesDelete( testPath );
+  provider.dirMake( filePath1 );
+  provider.textLink
+  ({
+    dstPath : linkPath1,
+    srcPath : filePath1,
+  });
+  test.is( provider.isTextLink( linkPath1 ) );
+  test.is( provider.isTerminal( linkPath1 ) );
+  test.is( provider.isDir( filePath1 ) );
+  var got = provider.pathResolveTextLink( linkPath1 );
+  test.identical( got, filePath1 );
+
+  test.case = 'textlink to textlink';
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1,filePath1 );
+  provider.textLink
+  ({
+    dstPath : linkPath1,
+    srcPath : filePath1,
+  });
+  provider.textLink
+  ({
+    dstPath : linkPath2,
+    srcPath : linkPath1,
+  });
+  test.is( provider.isTextLink( linkPath2 ) );
+  test.is( provider.isTextLink( linkPath1 ) );
+  test.is( provider.isTerminal( filePath1 ) );
+  var got = provider.pathResolveTextLink( linkPath2 );
+  test.identical( got, linkPath1 );
+
+  /**/
+
+  test.case = 'try to rewrite existing terminal'
+  provider.filesDelete( testPath );
+  provider.fileWrite( linkPath1,linkPath1 );
+  provider.fileWrite( filePath1,filePath1 );
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.textLink
+    ({
+      dstPath : linkPath1,
+      srcPath : filePath1,
+      rewriting : 0
+    });
+  })
+  test.is( provider.isTerminal( linkPath1 ) );
+  test.is( provider.isTerminal( filePath1 ) );
+  test.is( !provider.isTextLink( linkPath1 ) );
+
+  test.case = 'try to rewrite existing terminal'
+  provider.filesDelete( testPath );
+  provider.fileWrite( linkPath1,linkPath1 );
+  provider.fileWrite( filePath1,filePath1 );
+  provider.textLink
+  ({
+    dstPath : linkPath1,
+    srcPath : filePath1,
+    rewriting : 1
+  });
+  test.is( provider.isTextLink( linkPath1 ) );
+  test.is( provider.isTerminal( filePath1 ) );
+  var got = provider.pathResolveTextLink( linkPath1 );
+  test.identical( got, filePath1 );
+
+  test.case = 'try to rewrite existing dir'
+  provider.filesDelete( testPath );
+  provider.dirMake( linkPath1 );
+  provider.fileWrite( filePath1,filePath1 );
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.textLink
+    ({
+      dstPath : linkPath1,
+      srcPath : filePath1,
+      rewriting : 1,
+      rewritingDirs : 0
+    });
+  })
+  test.is( provider.isDir( linkPath1 ) );
+  test.is( provider.isTerminal( filePath1 ) );
+
+  test.case = 'try to rewrite existing dir'
+  provider.filesDelete( testPath );
+  provider.dirMake( linkPath1 );
+  provider.fileWrite( filePath1,filePath1 );
+  provider.textLink
+  ({
+    dstPath : linkPath1,
+    srcPath : filePath1,
+    rewriting : 1,
+    rewritingDirs : 1
+  });
+  test.is( provider.isTextLink( linkPath1 ) );
+  test.is( provider.isTerminal( filePath1 ) );
+  var got = provider.pathResolveTextLink( linkPath1 );
+  test.identical( got, filePath1 );
+
+  /**/
+
+  test.case = 'equal path';
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1,filePath1 );
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.textLink
+    ({
+      dstPath : filePath1,
+      srcPath : filePath1,
+      allowingMissed : 0
+    });
+  })
+  test.is(!provider.isTextLink( filePath1 ) );
+  test.is( provider.isTerminal( filePath1 ) );
+
+  test.case = 'equal path';
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1,filePath1 );
+  provider.textLink
+  ({
+    dstPath : filePath1,
+    srcPath : filePath1,
+    allowingMissed : 1
+  });
+  test.is( provider.isTextLink( filePath1 ) );
+  var got = provider.pathResolveTextLink( filePath1 );
+  test.identical( got, filePath1 );
+
+  test.case = 'textlinked';
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1,filePath1 );
+  provider.textLink( linkPath1,filePath1 );
+  var statBefore = provider.statRead( linkPath1 );
+  provider.textLink
+  ({
+    dstPath : linkPath1,
+    srcPath : filePath1,
+  });
+  var statAfter = provider.statRead( linkPath1 );
+  test.is( provider.isTextLink( linkPath1 ) );
+  test.is( provider.isTerminal( filePath1 ) );
+  var got = provider.pathResolveTextLink( linkPath1 );
+  test.identical( got, filePath1 );
+  test.identical( statAfter.mtime.getTime(), statBefore.mtime.getTime() );
+
+  /*  */
+
+  test.case = 'relative text link to missing';
+  provider.filesDelete( testPath );
+  provider.textLink
+  ({
+    dstPath : linkPath1,
+    srcPath : '../file1',
+    allowingMissed : 1
+  });
+  test.is( provider.isTextLink( linkPath1 ) );
+  test.is( !provider.fileExists( filePath1 ) );
+  var got = provider.pathResolveTextLink( linkPath1 );
+  test.identical( got, '../file1' );
+
+  test.case = 'relative text link to terminal';
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1,filePath1 );
+  provider.textLink
+  ({
+    dstPath : linkPath1,
+    srcPath : '../file1',
+    allowingMissed : 1
+  });
+  test.is( provider.isTextLink( linkPath1 ) );
+  test.is( provider.isTerminal( filePath1 ) );
+  var got = provider.pathResolveTextLink( linkPath1 );
+  test.identical( got, '../file1' );
+
+  /* throwing */
+
+  test.case = 'relative text link to missing';
+  provider.filesDelete( testPath );
+  test.mustNotThrowError( () =>
+  {
+    provider.textLink
+    ({
+      dstPath : linkPath1,
+      srcPath : '../file1',
+      allowingMissed : 0,
+      throwing : 0
+    });
+  })
+  test.is( !provider.isTextLink( linkPath1 ) );
+  test.is( !provider.fileExists( filePath1 ) );
+
+  test.case = 'rewrite existing';
+  provider.filesDelete( testPath );
+  provider.fileWrite( linkPath1,linkPath1 );
+  provider.fileWrite( filePath1,filePath1 );
+  test.mustNotThrowError( () =>
+  {
+    provider.textLink
+    ({
+      dstPath : linkPath1,
+      srcPath : filePath1,
+      rewriting : 0,
+      throwing : 0
+    });
+  })
+  test.is( !provider.isTextLink( linkPath1 ) );
+  test.is( provider.isTerminal( filePath1 ) );
+  test.is( provider.isTerminal( linkPath1 ) );
+
+  /*  */
+
+  self.provider.fieldPop( 'usingTextLink', 1 );
+}
+
+//
+
 function hardLinkSync( test )
 {
   let self = this;
@@ -35946,6 +36221,8 @@ var Self =
     softLinkSoftLinkResolving,
     softLinkRelativeLinkResolving,
     softLinkMakeAndResolve,
+
+    textLinkSync,
 
     hardLinkSync,
     hardLinkMultipleSync,

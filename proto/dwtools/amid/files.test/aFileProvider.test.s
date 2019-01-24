@@ -31646,6 +31646,160 @@ function filesAreSame( test )
 
 //
 
+function statsAreHardLinked( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let path = provider.path;
+
+  let testPath = self.pathFor( 'written/statsAreHardLinked' )
+  let filePath1 = self.pathFor( 'written/statsAreHardLinked/file1' );
+  let filePath2 = self.pathFor( 'written/statsAreHardLinked/file2' );
+  let linkPath1 = self.pathFor( 'written/statsAreHardLinked/link1' );
+  let linkPath2 = self.pathFor( 'written/statsAreHardLinked/link2' );
+
+  if( !_.routineIs( _.statsAreHardLinked ) )
+  {
+    test.identical( 1,1 )
+    return;
+  }
+
+  test.case = 'comparing same file';
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  var stat = provider.statRead( filePath1 );
+  var got = _.statsAreHardLinked( stat,stat );
+  if( provider.UsingBigIntForStat )
+  test.identical( got, true );
+  else
+  test.identical( got, _.maybe );
+
+  test.case = 'comparing with different terminal';
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  provider.fileWrite( filePath2, filePath2 );
+  var stat1 = provider.statRead( filePath1 );
+  var stat2 = provider.statRead( filePath2 );
+  var got = _.statsAreHardLinked( stat1,stat2 );
+  test.identical( got, false );
+
+  test.case = 'comparing with terminal of same content';
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  provider.fileWrite( filePath2, filePath1 );
+  var stat1 = provider.statRead( filePath1 );
+  var stat2 = provider.statRead( filePath2 );
+  var got = _.statsAreHardLinked( stat1,stat2 );
+  test.identical( got, false );
+
+  test.case = 'imitate problem with same ino, on lower nodejs versions, compare similar files';
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1, 'diff' );
+  provider.fileWrite( filePath2, 'fidd' );
+  var stat1 = provider.statRead( filePath1 );
+  var stat2 = provider.statRead( filePath2 );
+  stat1.ino = stat2.ino = Number( stat1.ino );
+  stat1.mtime = stat2.mtime;
+  stat1.birthtime = stat2.birthtime;
+  stat1.ctime = stat2.ctime;
+  var got = _.statsAreHardLinked( stat1,stat2 );
+  test.identical( got, _.maybe );
+
+
+  test.case = 'comparing with hardlink';
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  provider.hardLink( filePath2, filePath1 );
+  var stat1 = provider.statRead( filePath1 );
+  var stat2 = provider.statRead( filePath2 );
+  var got = _.statsAreHardLinked( stat1,stat2 );
+  if( provider.UsingBigIntForStat )
+  test.identical( got, true );
+  else
+  test.identical( got, _.maybe );
+
+  test.case = 'comparing with softlink';
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  provider.softLink( filePath2, filePath1 );
+  var stat1 = provider.statRead( filePath1 );
+  var stat2 = provider.statRead( filePath2 );
+  var got = _.statsAreHardLinked( stat1,stat2 );
+  test.identical( got, false );
+
+  test.case = 'comparing with textlink';
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  provider.textLink( filePath2, filePath1 );
+  var stat1 = provider.statRead( filePath1 );
+  var stat2 = provider.statRead( filePath2 );
+  var got = _.statsAreHardLinked( stat1,stat2 );
+  test.identical( got, false );
+
+  test.case = 'comparing two diff hardlinks';
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  provider.fileWrite( filePath2, filePath2 );
+  provider.hardLink( linkPath1, filePath1 );
+  provider.hardLink( linkPath2, filePath2 );
+  var stat1 = provider.statRead( linkPath1 );
+  var stat2 = provider.statRead( linkPath2 );
+  var got = _.statsAreHardLinked( stat1,stat2 );
+  test.identical( got, false );
+
+  test.case = 'comparing two hardlinks to same file';
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  provider.hardLink( linkPath1, filePath1 );
+  provider.hardLink( linkPath2, filePath1 );
+  var stat1 = provider.statRead( linkPath1 );
+  var stat2 = provider.statRead( linkPath2 );
+  var got = _.statsAreHardLinked( stat1,stat2 );
+  if( provider.UsingBigIntForStat )
+  test.identical( got, true );
+  else
+  test.identical( got, _.maybe );
+
+  test.case = 'same ino different size';
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  provider.fileWrite( filePath2, filePath2 );
+  var stat1 = provider.statRead( filePath1 );
+  var stat2 = provider.statRead( filePath2 );
+  stat1.ino = stat2.ino = 1;
+  stat1.size = 1;
+  stat2.size = 2;
+  var got = _.statsAreHardLinked( stat1,stat2 );
+  test.identical( got, false );
+
+  test.case = 'same ino different nlink';
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  provider.fileWrite( filePath2, filePath2 );
+  var stat1 = provider.statRead( filePath1 );
+  var stat2 = provider.statRead( filePath2 );
+  stat1.ino = stat2.ino = 1;
+  stat1.nlink = 1;
+  stat2.nlink = 2;
+  var got = _.statsAreHardLinked( stat1,stat2 );
+  test.identical( got, false );
+
+  test.case = 'same ino, size, but different date';
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  provider.fileWrite( filePath2, filePath2 );
+  var stat1 = provider.statRead( filePath1 );
+  var stat2 = provider.statRead( filePath2 );
+  stat1.ino = stat2.ino = 1;
+  stat1.size = stat2.size = 1;
+  stat1.mtime = new Date();
+  var got = _.statsAreHardLinked( stat1,stat2 );
+  test.identical( got, false );
+
+}
+
+//
+
 function filesSize( test )
 {
   let self = this;
@@ -35824,6 +35978,8 @@ var Self =
     filesAreHardLinked,
     filesAreTextLinked,
     filesAreSame,
+
+    statsAreHardLinked,
 
     filesSize,
     fileSize,

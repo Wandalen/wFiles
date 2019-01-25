@@ -21,14 +21,10 @@ _.assert( !!Parent );
 function onSuiteBegin( test )
 {
   let context = this;
-
   context.provider = _.FileProvider.HardDrive({ protocol : 'current' });
   context.hub = _.FileProvider.Hub({ providers : [ context.provider ] });
-
   let path = context.provider.path;
-  context.testSuitePath = path.dirTempOpen( 'FilesFind' );
-  // let path = this.provider.path;
-  // this.testSuitePath = path.dirTempOpen( path.join( __dirname, '../..'  ), 'Provider/HardDrive' );
+  context.testSuitePath = path.dirTempOpen( 'suite-' + 'FilesFind' );
 }
 
 //

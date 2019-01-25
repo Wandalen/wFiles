@@ -3291,22 +3291,23 @@ function filesFindResolving( test )
     {
       absolute : testPath,
       real : testPath,
-      isDir : true
+      isDir : true,
     },
     {
       absolute : terminalPath,
       real : terminalPath,
-      isDir : false
+      isDir : false,
     },
     {
       absolute : softLink,
       real : softLink,
-      isDir : false
+      isDir : false,
     },
   ]
   test.identical( filtered, expected );
   var srcFileStat = provider.statResolvedRead( terminalPath );
   var softLinkStat = findRecord( files, 'absolute', softLink ).stat;
+  debugger;
   test.is( srcFileStat.ino !== softLinkStat.ino );
   provider.fieldPop( 'usingTextLink', 0 );
 

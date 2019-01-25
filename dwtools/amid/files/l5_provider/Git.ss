@@ -46,13 +46,7 @@ function init( o )
   if( !GitConfig )
   GitConfig = require( 'gitconfiglocal' );
 
-  debugger;
-
   Parent.prototype.init.call( self,o );
-
-  // debugger;
-  // self.protocols = [ 'git', 'git+http', 'git+https', 'git+ssh' ];
-  // debugger;
 
 }
 

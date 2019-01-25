@@ -50,6 +50,10 @@ function init( o )
 
   Parent.prototype.init.call( self,o );
 
+  // debugger;
+  // self.protocols = [ 'git', 'git+http', 'git+https', 'git+ssh' ];
+  // debugger;
+
 }
 
 // --

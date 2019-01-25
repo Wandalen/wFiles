@@ -140,10 +140,15 @@ function init( o )
 
   Parent.prototype.init.call( self );
 
-  self[ protocolsSymbol ] = [];
-  self[ protocolSymbol ] = null;
+  // self[ protocolsSymbol ] = [];
+  // self[ protocolSymbol ] = null;
 
   _.instanceInit( self );
+
+  debugger;
+  _.assert( _.arrayIs( self.protocols ) );
+  _.assert( self.protocol !== undefined );
+  debugger;
 
   if( self.Self === Self )
   Object.preventExtensions( self );
@@ -7067,6 +7072,8 @@ function _protocolsSet( protocols )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
+  debugger;
+
   if( protocols === null )
   {
     self[ protocolsSymbol ] = [];
@@ -7082,7 +7089,9 @@ function _protocolsSet( protocols )
 
   protocols = protocols.map( ( p ) => p.toLowerCase() );
 
-  let protocol = protocols[ 0 ];
+  let protocol = protocols[ 0 ] || null;
+
+  _.assert( _.strIs( protocol ) || protocol === null );
 
   self[ protocolsSymbol ] = protocols;
   self[ protocolSymbol ] = protocol;
@@ -7105,6 +7114,8 @@ having.kind = 'inter';
 function _protocolSet( protocol )
 {
   let self = this;
+
+  debugger;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( protocol === null || _.strIs( protocol ) );

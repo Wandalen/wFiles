@@ -13667,20 +13667,20 @@ function dirMakeLinksSync( test )
   test.is( provider.isSoftLink( linkToDir ) );
   test.identical( provider.dirRead( dirPath ), [ 'file' ] )
 
-  test.case = 'intermediate link, one /*dir*/testPath to create';
+  test.case = 'intermediate link, one dir to create';
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( dirPath );
   provider.softLink({ dstPath : linkToDir, srcPath : dirPath });
-  var path = provider.path.join( linkToDir, 'dir' );
+  var path = provider.path.join( linkToDir, 'directory' );
   provider.dirMake({ filePath : path, recursive : 1 })
   test.is( provider.isDir( path ) );
   test.is( provider.isSoftLink( linkToDir ) );
 
-  test.case = 'intermediate link, one /*dir*/testPath to create';
+  test.case = 'intermediate link, one dir to create';
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( dirPath );
   provider.softLink({ dstPath : linkToDir, srcPath : dirPath });
-  var path = provider.path.join( linkToDir, 'dir' );
+  var path = provider.path.join( linkToDir, 'directory' );
   provider.dirMake({ filePath : path, recursive : 0 })
   test.is( provider.isDir( path ) );
   test.is( provider.isSoftLink( linkToDir ) );
@@ -13689,7 +13689,7 @@ function dirMakeLinksSync( test )
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( dirPath );
   provider.softLink({ dstPath : linkToDir, srcPath : dirPath });
-  var path = provider.path.join( linkToDir, 'dir/dir2/dir3' );
+  var path = provider.path.join( linkToDir, 'directory/directory2/directory3' );
   provider.dirMake({ filePath : path, recursive : 1 })
   test.is( provider.isDir( path ) );
   test.is( provider.isSoftLink( linkToDir ) );
@@ -13698,7 +13698,7 @@ function dirMakeLinksSync( test )
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( dirPath );
   provider.softLink({ dstPath : linkToDir, srcPath : dirPath });
-  var path = provider.path.join( linkToDir, 'dir/dir2/dir3' );
+  var path = provider.path.join( linkToDir, 'directory/directory2/directory3' );
   test.shouldThrowErrorSync( () =>
   {
     provider.dirMake
@@ -20360,16 +20360,10 @@ function softLinkMakeAndResolve( test )
   provider.softLink({ dstPath : linkPath, srcPath : dirPath, allowingMissed : 1 });
   var pathToResolve = provider.path.join( /*workDir*/testPath, 'link/file' );
 
-  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   test.is( provider.fileExists( pathToResolve ) );
-  else
-  test.is( !provider.fileExists( pathToResolve ) );
 
   var stat = provider.statRead( pathToResolve );
-  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   test.is( stat.isFile() )
-  else
-  test.identical( stat, null );
 
   var resolved = provider.pathResolveSoftLink( pathToResolve );
   var expected = pathToResolve;
@@ -20708,7 +20702,7 @@ function hardLinkSync( test )
   self.provider.softLink( linkToDirPath, dirPath );
   var srcPath2 = path.join( linkToDirPath, 'terminal' );
   var terminalStatBefore = self.provider.statRead( terminalPath );
-  var got = self.provider.hardLink
+  var got = self.provider.hardLink ///Vova : Extract.filesAreHardLinkedAct doesn't resolve intermediate directories
   ({
     dstPath : terminalPath,
     srcPath : srcPath2,
@@ -30710,6 +30704,110 @@ function fileExists( test )
   test.identical( got, true );
 }
 
+//
+
+function fileExistsCompliantBehavior( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let path = provider.path;
+
+  let testPath = test.context.pathFor( 'written/fileExistsCompliantBehavior' );
+  let srcPath = test.context.pathFor( 'written/fileExistsCompliantBehavior/src' );
+  let dstPath = test.context.pathFor( 'written/fileExistsCompliantBehavior/dst' );
+  let dstPath2 = test.context.pathFor( 'written/fileExistsCompliantBehavior/dst2' );
+
+  /*
+    checks that fileExists has same behavior for hd & extract providers:
+    resolves intermediate directories, but does not resolve terminal
+  */
+
+  test.case = 'soft link to missing, not intermediate links';
+  provider.filesDelete( testPath );
+  provider.softLink
+  ({
+    dstPath : dstPath,
+    srcPath : srcPath,
+    allowingMissed : 1,
+    makingDirectory : 1
+  });
+  test.is( !provider.fileExists( srcPath ) );
+  test.is( provider.fileExists( dstPath ) );
+
+  //
+
+  test.case = 'soft link chain to missing, not intermediate links';
+  provider.filesDelete( testPath );
+  provider.softLink
+  ({
+    dstPath : dstPath2,
+    srcPath : srcPath,
+    allowingMissed : 1,
+    makingDirectory : 1
+  });
+  provider.softLink
+  ({
+    dstPath : dstPath,
+    srcPath : dstPath2,
+    allowingMissed : 1,
+  });
+  test.is( !provider.fileExists( srcPath ) );
+  test.is( provider.fileExists( dstPath ) );
+  test.is( provider.fileExists( dstPath2 ) );
+
+  //
+
+  test.case = 'path to missing, intermediate link to testDir';
+  provider.filesDelete( testPath );
+  provider.softLink
+  ({
+    dstPath : dstPath,
+    srcPath : testPath,
+    allowingMissed : 1,
+    makingDirectory : 1
+  });
+  var pathToCheck = path.join( dstPath, 'src' );
+  test.is( !provider.fileExists( pathToCheck ) );
+  test.is( provider.fileExists( dstPath ) );
+
+  //
+
+  test.case = 'path to terminal, intermediate link to testDir';
+  provider.filesDelete( testPath );
+  provider.fileWrite( srcPath, srcPath );
+  provider.softLink
+  ({
+    dstPath : dstPath,
+    srcPath : testPath,
+  });
+  var pathToCheck = path.join( dstPath, 'src' );
+  test.is( provider.fileExists( pathToCheck ) );
+  test.is( provider.fileExists( srcPath ) );
+  test.is( provider.fileExists( dstPath ) );
+
+  //
+
+  test.case = 'path to terminal, intermediate link to soft link in same directory';
+  provider.filesDelete( testPath );
+  provider.fileWrite( dstPath2, dstPath2 );
+  provider.softLink
+  ({
+    dstPath : srcPath,
+    srcPath : testPath,
+  });
+  provider.softLink
+  ({
+    dstPath : dstPath,
+    srcPath : srcPath,
+  });
+  /* dst -> src -> testPath */
+  var pathToCheck = path.join( testPath, 'dst/dst2' );
+  test.is( provider.fileExists( pathToCheck ) );
+  test.is( provider.fileExists( srcPath ) );
+  test.is( provider.fileExists( dstPath ) );
+
+}
+
 // --
 // record
 // --
@@ -34493,6 +34591,7 @@ var Self =
     fileSize,
 
     fileExists,
+    fileExistsCompliantBehavior,
 
     // record
 

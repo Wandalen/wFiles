@@ -438,6 +438,10 @@ function statReadAct( o )
 
       return o2.stat;
     }
+    else
+    {
+      filePath = self._pathResolveIntermediateDirs( filePath );
+    }
 
     let d = self._descriptorRead( filePath );
 
@@ -554,8 +558,15 @@ _.routineExtend( statReadAct, Parent.prototype.statReadAct );
 function fileExistsAct( o )
 {
   let self = this;
+
   _.assert( arguments.length === 1 );
-  let file = self._descriptorRead( o.filePath );
+  _.assert( self.path.isNormalized( o.filePath ) );
+
+  let filePath = o.filePath;
+
+  filePath = self._pathResolveIntermediateDirs( filePath );
+
+  let file = self._descriptorRead( filePath );
   return !!file;
 }
 
@@ -1012,7 +1023,7 @@ function fileCopyAct( o )
   _.assert( self.path.isNormalized( o.srcPath ) );
   _.assert( self.path.isNormalized( o.dstPath ) );
 
-  if( o.sync  ) // qqq : synchronize async version
+  if( o.sync  ) // qqq : synchronize async version aaa : done
   {
     _copyPre();
 
@@ -1038,7 +1049,7 @@ function fileCopyAct( o )
     if( o.breakingDstHardLink && dstStat.isHardLink() )
     self.hardLinkBreak({ filePath : o.dstPath, sync : 1 });
 
-    /* qqq : ? */
+    /* qqq : ? aaa : redundant, just copy the descriptor instead of this */
     // if( self.isSoftLink( o.srcPath ) )
     // {
     //   if( self.fileExistsAct({ filePath : o.dstPath }) )
@@ -1078,24 +1089,74 @@ function fileCopyAct( o )
   }
   else
   {
-    return _.timeOut( 0, () => _copyPre() )
-    .ifNoErrorThen( ( arg ) =>
+    let con = new _.Consequence().take( null );
+    let dstStat;
+    let data;
+
+    con.thenKeep( () =>
     {
-      if( o.breakingDstHardLink && self.isHardLink( o.dstPath ) )
+      _copyPre();
+      return self.statReadAct
+      ({
+        filePath : o.dstPath,
+        resolvingSoftLink : 0,
+        sync : 0,
+        throwing : 0,
+      })
+    })
+    .thenKeep( ( got ) =>
+    {
+      dstStat = got;
+
+      if( dstStat )
+      if( o.breakingDstHardLink && dstStat.isHardLink() )
       return self.hardLinkBreak({ filePath : o.dstPath, sync : 0 });
-      return arg;
+      return true;
     })
-    .ifNoErrorThen( ( arg ) =>
+    .thenKeep( () =>
     {
-      return self.fileRead({ filePath : o.srcPath, encoding : 'original.type', sync : 0 });
+      return self.fileRead
+      ({
+        filePath : o.srcPath,
+        encoding : 'original.type',
+        sync : 0,
+        resolvingTextLink : 0
+      })
     })
-    .ifNoErrorThen( ( data ) =>
+    .thenKeep( ( got ) =>
     {
+      data = got;
+
       _.assert( data !== null && data !== undefined );
+
+      if( dstStat )
+      if( dstStat.isSoftLink() )
+      return self.pathResolveLinkFull
+      ({
+        filePath : o.dstPath,
+        allowingMissed : 1,
+        allowingCycled : 0,
+        resolvingSoftLink : 1,
+        resolvingTextLink : 0,
+        preservingRelative : 0,
+        sync : 0,
+        throwing : 1
+      })
+      .thenKeep( ( dstPath ) =>
+      {
+        o.dstPath = dstPath;
+        return true;
+      })
+
+      return true;
+    })
+    .thenKeep( () =>
+    {
       self._descriptorWrite( o.dstPath, data );
       return true;
     })
 
+    return con;
   }
 
   /* - */
@@ -1192,6 +1253,9 @@ function hardLinkAct( o )
 
   if( o.sync )
   {
+    if( o.dstPath === o.srcPath )
+    return true;
+
     let dstExists = self.fileExists( o.dstPath );
     let srcStat = self.statRead( o.srcPath );
 
@@ -1200,9 +1264,6 @@ function hardLinkAct( o )
       debugger;
       throw _.err( o.srcPath, 'does not exist' );
     }
-
-    if( o.dstPath === o.srcPath )
-    return true;
 
     if( !srcStat.isTerminal( o.srcPath ) )
     throw _.err( o.srcPath, 'is not a terminal file' );
@@ -1226,16 +1287,27 @@ function hardLinkAct( o )
   {
     let con = new _.Consequence().take( true );
 
+    /* qqq : synchronize wtih sync version, please aaa : done */
+
     if( o.dstPath === o.srcPath )
     return con;
 
-    /* qqq : synchronize wtih sync version, please */
+    let dstExists;
 
-    let dstExists = self.fileExists( o.dstPath );
-
-    con.thenKeep( () => self.statRead({ filePath : o.srcPath, sync : 0 }) );
+    con.thenKeep( () => self.fileExists( o.dstPath ) );
+    con.thenKeep( ( got ) =>
+    {
+      dstExists = got;
+      return self.statRead({ filePath : o.srcPath, sync : 0 })
+    });
     con.thenKeep( ( srcStat ) =>
     {
+      if( !srcStat )
+      {
+        debugger;
+        throw _.err( o.srcPath, 'does not exist' );
+      }
+
       if( !srcStat.isTerminal() )
       throw _.err( o.srcPath, 'is not a terminal file' );
 
@@ -1330,8 +1402,14 @@ function filesAreHardLinkedAct( o )
   if( o.filePath[ 0 ] === o.filePath[ 1 ] )
   return true;
 
-  let descriptor1 = self._descriptorRead( o.filePath[ 0 ] );
-  let descriptor2 = self._descriptorRead( o.filePath[ 1 ] );
+  let filePath1 = self._pathResolveIntermediateDirs( o.filePath[ 0 ] );
+  let filePath2 = self._pathResolveIntermediateDirs( o.filePath[ 1 ] );
+
+  if( filePath1 === filePath2 )
+  return true;
+
+  let descriptor1 = self._descriptorRead( filePath1 );
+  let descriptor2 = self._descriptorRead( filePath2 );
 
   if( !self._descriptorIsHardLink( descriptor1 ) )
   return false;
@@ -1865,6 +1943,35 @@ var having = readToProvider.having = Object.create( null );
 having.writing = 1;
 having.reading = 0;
 having.driving = 0;
+
+//
+//
+//
+
+function _pathResolveIntermediateDirs( filePath )
+{
+  let self = this;
+
+  // resolves intermediate dir(s) except terminal
+
+  _.assert( self.path.isAbsolute( filePath ) );
+  _.assert( self.path.isNormalized( filePath ) );
+
+  if( _.strCount( filePath, self.path._upStr ) > 1 )
+  {
+    let fileName = self.path.name({ path : filePath, withExtension : 1 });
+    filePath = self.pathResolveSoftLinkAct
+    ({
+      filePath : self.path.dir( filePath ),
+      resolvingIntermediateDirectories : 1,
+      resolvingMultiple : 1
+    });
+    filePath = self.path.join( filePath, fileName );
+  }
+
+  return filePath;
+
+}
 
 // --
 // descriptor read
@@ -2637,6 +2744,10 @@ let Proto =
   filesTreeRead,
   rewriteFromProvider,
   readToProvider,
+
+  //
+
+  _pathResolveIntermediateDirs,
 
   // descriptor read
 

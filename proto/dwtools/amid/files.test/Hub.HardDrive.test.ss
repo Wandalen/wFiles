@@ -2,8 +2,6 @@
 
 'use strict';
 
-// !!! disabled because Provider.Hub is in implementation phase
-
 if( typeof module !== 'undefined' )
 {
 
@@ -20,7 +18,7 @@ _.assert( !!Parent );
 
 //
 
-function makePath( filePath )
+function pathFor( filePath )
 {
   var self = this;
 
@@ -39,8 +37,8 @@ function onSuiteBegin()
 
   self.provider.providerRegister( self.providerEffective );
   self.provider.defaultProvider = self.providerEffective;
-  self.provider.defaultOrigin = self.providerEffective.originPath;
-  self.provider.defaultProtocol = self.providerEffective.protocol;
+  // self.provider.defaultOrigin = self.providerEffective.originPath;
+  // self.provider.defaultProtocol = self.providerEffective.protocol;
 
 }
 
@@ -61,7 +59,7 @@ var Proto =
   name : 'Tools/mid/files/fileProvider/Hub/withHardDrive',
   abstract : 0,
   silencing : 1,
-  enabled : 0,
+  enabled : 1,
 
   onSuiteBegin : onSuiteBegin,
   onSuiteEnd : onSuiteEnd,
@@ -72,7 +70,7 @@ var Proto =
     providerEffective : _.FileProvider.HardDrive(),
     testSuitePath : null,
 
-    makePath : makePath,
+    pathFor : pathFor,
     // testFile : null,
     // testSuitePath : __dirname + '/../../../../tmp.tmp/hard-drive',
     // testFile : __dirname + '/../../../../tmp.tmp/hard-drive/test.txt',

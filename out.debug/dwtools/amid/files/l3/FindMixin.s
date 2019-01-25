@@ -568,60 +568,70 @@ function filesFind_body( o )
 
   forPaths( o.filePath,_.mapExtend( null,o ) );
 
-  /* order */
+  return end();
 
-  o.result = self.recordsOrder( o.result, o.orderingExclusion );
+  /* */
 
-  // let orderingExclusion = _.RegexpObject.order( o.orderingExclusion || [] );
-  // if( !orderingExclusion.length )
-  // {
-  //   forPaths( o.filePath,_.mapExtend( null,o ) );
-  // }
-  // else
-  // {
-  //   let maskTerminal = o.maskTerminal;
-  //   for( let e = 0 ; e < orderingExclusion.length ; e++ )
-  //   {
-  //     o.maskTerminal = _.RegexpObject.And( Object.create( null ),maskTerminal,orderingExclusion[ e ] );
-  //     forPaths( o.filePath,_.mapExtend( null,o ) );
-  //   }
-  // }
-
-  /* sort */
-
-  if( o.sortingWithArray )
+  function end()
   {
+    /* order */
 
-    _.assert( _.arrayIs( o.sortingWithArray ) );
+    o.result = self.recordsOrder( o.result, o.orderingExclusion );
 
-    if( o.outputFormat === 'record' )
-    o.result.sort( function( a,b )
+    // let orderingExclusion = _.RegexpObject.order( o.orderingExclusion || [] );
+    // if( !orderingExclusion.length )
+    // {
+    //   forPaths( o.filePath,_.mapExtend( null,o ) );
+    // }
+    // else
+    // {
+    //   let maskTerminal = o.maskTerminal;
+    //   for( let e = 0 ; e < orderingExclusion.length ; e++ )
+    //   {
+    //     o.maskTerminal = _.RegexpObject.And( Object.create( null ),maskTerminal,orderingExclusion[ e ] );
+    //     forPaths( o.filePath,_.mapExtend( null,o ) );
+    //   }
+    // }
+
+    /* sort */
+
+    if( o.sortingWithArray )
     {
-      return _.regexpArrayIndex( o.sortingWithArray,a.relative ) - _.regexpArrayIndex( o.sortingWithArray,b.relative );
-    })
-    else
-    o.result.sort( function( a,b )
+
+      _.assert( _.arrayIs( o.sortingWithArray ) );
+
+      if( o.outputFormat === 'record' )
+      o.result.sort( function( a,b )
+      {
+        return _.regexpArrayIndex( o.sortingWithArray,a.relative ) - _.regexpArrayIndex( o.sortingWithArray,b.relative );
+      })
+      else
+      o.result.sort( function( a,b )
+      {
+        return _.regexpArrayIndex( o.sortingWithArray,a ) - _.regexpArrayIndex( o.sortingWithArray,b );
+      });
+
+    }
+
+    /* mandatory */
+
+    if( o.mandatory )
+    if( !o.result.length )
     {
-      return _.regexpArrayIndex( o.sortingWithArray,a ) - _.regexpArrayIndex( o.sortingWithArray,b );
-    });
+      debugger;
+      throw _.err( 'No file found at ' + path.commonReport( o.filter.inFilePath || o.filePath ) );
+    }
 
+    /* timing */
+
+    if( o.verbosity >= 1 )
+    self.logger.log( ' . Found ' + o.result.length + ' files at ' + o.filePath + ' in ', _.timeSpent( time ) );
+
+    if( !o.sync )
+    return new _.Consequence().take( o.result );
+
+    return o.result;
   }
-
-  /* mandatory */
-
-  if( o.mandatory )
-  if( !o.result.length )
-  {
-    debugger;
-    throw _.err( 'No file found at ' + path.commonReport( o.filter.inFilePath || o.filePath ) );
-  }
-
-  /* timing */
-
-  if( o.verbosity >= 1 )
-  self.logger.log( ' . Found ' + o.result.length + ' files at ' + o.filePath + ' in ', _.timeSpent( time ) );
-
-  return o.result;
 
   /* find for several paths */
 
@@ -645,6 +655,7 @@ function filesFind_body( o )
       delete options.orderingExclusion;
       delete options.sortingWithArray;
       delete options.verbosity;
+      delete options.sync;
       options.filePath = filePath;
 
       // debugger;
@@ -659,6 +670,7 @@ function filesFind_body( o )
 _.routineExtend( filesFind_body, filesFindSingle.body );
 
 var defaults = filesFind_body.defaults;
+defaults.sync = 1;
 defaults.orderingExclusion = [];
 defaults.sortingWithArray = null;
 defaults.verbosity = null;
@@ -3616,6 +3628,11 @@ function filesDelete_body( o )
   if( o.verbosity >= 1 )
   time = _.timeNow();
 
+  let con;
+
+  if( !o.sync )
+  con = new _.Consequence().take( null );
+
   _.assert( !o.includingTransient, 'Transient files should not be included' );
   _.assert( o.resolvingTextLink === 0 || o.resolvingTextLink === false );
   _.assert( o.resolvingSoftLink === 0 || o.resolvingSoftLink === false );
@@ -3638,7 +3655,12 @@ function filesDelete_body( o )
       file.isTransient = true;
       o.result.push( file );
       if( o.writing )
-      provider.fileDelete( file );
+      {
+        if( o.sync )
+        fileDelete( file );
+        else
+        con.thenKeep( () => fileDelete( file ) );
+      }
       return end();
     }
   }
@@ -3654,30 +3676,15 @@ function filesDelete_body( o )
   _.assert( !o.includingTransient );
   _.assert( o.result === o2.result );
 
-  provider.filesFind.body.call( provider, o2 );
-
-  /* */
-
-  for( let f1 = 0 ; f1 < o.result.length ; f1++ )
+  if( o.sync )
   {
-    let file1 = o.result[ f1 ];
-    if( file1.isActual && ( file1.isTransient || file1.isTerminal ) )
-    continue;
-
-    o.result.splice( f1, 1 );
-    f1 -= 1;
-    for( let f2 = f1 ; f2 >= 0 ; f2-- )
-    {
-      let file2 = o.result[ f2 ];
-      if( file2.relative === '.' )
-      debugger;
-      if( _.strBegins( file1.absolute, file2.absolute ) )
-      {
-        debugger;
-        o.result.splice( f2, 1 );
-        f1 -=1 ;
-      }
-    }
+    provider.filesFind.body.call( provider, o2 );
+    handleResult();
+  }
+  else
+  {
+    con.thenKeep( () => provider.filesFind.body.call( provider, o2 ) );
+    con.thenKeep( () => handleResult() );
   }
 
   /* */
@@ -3686,13 +3693,101 @@ function filesDelete_body( o )
   for( let f = o.result.length-1 ; f >= 0 ; f-- )
   {
     let file = o.result[ f ];
+
     if( file.isActual && file.absolute !== '/' )
+    if( o.sync )
     fileDelete( file );
+    else
+    con.thenKeep( () => fileDelete( file ) );
   }
 
   /* */
 
   if( o.deletingEmptyDirs && o.result.length )
+  {
+    if( o.sync )
+    deletingEmptyDirs();
+    else
+    con.thenKeep( () => deletingEmptyDirs() );
+  }
+
+  /* */
+
+  return end();
+
+  /* - */
+
+  function handleResult()
+  {
+    for( let f1 = 0 ; f1 < o.result.length ; f1++ )
+    {
+      let file1 = o.result[ f1 ];
+      if( file1.isActual && ( file1.isTransient || file1.isTerminal ) )
+      continue;
+
+      o.result.splice( f1, 1 );
+      f1 -= 1;
+      for( let f2 = f1 ; f2 >= 0 ; f2-- )
+      {
+        let file2 = o.result[ f2 ];
+        if( file2.relative === '.' )
+        debugger;
+        if( _.strBegins( file1.absolute, file2.absolute ) )
+        {
+          debugger;
+          o.result.splice( f2, 1 );
+          f1 -=1 ;
+        }
+      }
+    }
+
+    return true;
+  }
+
+  /* - */
+
+  function end()
+  {
+    if( o.sync )
+    return endSync();
+    else
+    return con.thenKeep( () => endSync() );
+  }
+
+  /* - */
+
+  function endSync()
+  {
+    if( o.verbosity >= 1 )
+    provider.logger.log( ' - filesDelete ' + o.result.length + ' files at ' + path.commonReport( o.filePath ) + ' in ' + _.timeSpent( time ) );
+
+    if( o.outputFormat === 'absolute' )
+    o.result = _.select( o.result, '*/absolute' );
+    else if( o.outputFormat === 'relative' )
+    o.result = _.select( o.result, '*/relative' );
+    else _.assert( o.outputFormat === 'record' );
+
+    return o.result;
+  }
+
+  /* - */
+
+  function fileDelete( file )
+  {
+    let optionsForDelete =
+    {
+      filePath : file.absolute,
+      throwing : o.throwing,
+      verbosity : o.verbosity-1,
+      safe : o.safe,
+      sync : o.sync, /* qqq : implement and cover sync option for filesFind and filesDelete aaa : done*/
+    }
+    return file.factory.effectiveFileProvider.fileDelete( optionsForDelete );
+  }
+
+  /* - */
+
+  function deletingEmptyDirs()
   {
     let delMap = Object.create( null );
     let dirMap = Object.create( null );
@@ -3728,47 +3823,22 @@ function filesDelete_body( o )
 
     _.arrayPrependArray( o.result, dirsFile );
 
+    let con;
+
+    if( !o.sync )
+    con = new _.Consequence().take( null );
+
+    if( o.writing )
     for( let d = dirsFile.length-1 ; d >= 0 ; d-- )
     {
       let file = dirsFile[ d ];
-      if( o.writing )
+      if( o.sync )
       fileDelete( file );
+      else
+      con.thenKeep( () => fileDelete( file ) );
     }
 
-  }
-
-  /* */
-
-  return end();
-
-  /* - */
-
-  function end()
-  {
-    if( o.verbosity >= 1 )
-    provider.logger.log( ' - filesDelete ' + o.result.length + ' files at ' + path.commonReport( o.filePath ) + ' in ' + _.timeSpent( time ) );
-
-    if( o.outputFormat === 'absolute' )
-    o.result = _.select( o.result, '*/absolute' );
-    else if( o.outputFormat === 'relative' )
-    o.result = _.select( o.result, '*/relative' );
-    else _.assert( o.outputFormat === 'record' );
-
-    return o.result;
-  }
-
-  /* - */
-
-  function fileDelete( file )
-  {
-    file.factory.effectiveFileProvider.fileDelete
-    ({
-      filePath : file.absolute,
-      throwing : o.throwing,
-      verbosity : o.verbosity-1,
-      safe : o.safe,
-      sync : 1, /* qqq : implement and cover sync option for filesFind and filesDelete */
-    });
+    return con;
   }
 
 }
@@ -3777,6 +3847,7 @@ _.routineExtend( filesDelete_body, filesFind );
 
 var defaults = filesDelete_body.defaults;
 defaults.outputFormat = 'record';
+defaults.sync = 1;
 defaults.recursive = 2;
 defaults.includingTransient = 0;
 defaults.includingDirs = 1;

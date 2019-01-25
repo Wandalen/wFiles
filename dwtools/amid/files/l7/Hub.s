@@ -662,8 +662,8 @@ function _fileCopyActDifferent( op )
   let path = self.path;
   let o = op.options;
 
-  /* qqq : implement async */
-  _.assert( o.sync, 'not implemented' );
+  /* qqq : implement async, aaa : done */
+  // _.assert( o.sync, 'not implemented' );
 
   if( op.src.provider.isSoftLink( op.src.localPath ) )
   {
@@ -673,6 +673,7 @@ function _fileCopyActDifferent( op )
     ({
       dstPath : op.dst.localPath,
       srcPath : path.join( op.src.parsedPath.origin, resolvedPath ),
+      sync : o.sync,
       allowingMissed : 1,
     });
     return op.end();
@@ -684,14 +685,26 @@ function _fileCopyActDifferent( op )
     resolvingTextLink : 0,
     resolvingSoftLink : 0,
     encoding : 'original.type',
-    sync : 1,
+    sync : o.sync,
   });
 
+  if( o.sync )
   op.result = op.dst.provider.fileWrite
   ({
     filePath : op.dst.localPath,
     data : read,
     encoding : 'original.type',
+  });
+  else
+  op.result = read.thenKeep( ( read ) =>
+  {
+    return op.dst.provider.fileWrite
+    ({
+      filePath : op.dst.localPath,
+      data : read,
+      sync : 0,
+      encoding : 'original.type',
+    });
   });
 
   return op.end();

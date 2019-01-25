@@ -12483,6 +12483,386 @@ filesDelete.timeOut = 20000;
 
 //
 
+function filesDeleteAsync( test )
+{
+  let context = this;
+  let path = context.provider.path;
+  let provider = context.provider;
+  let hub = context.hub;
+
+  var softLinkIsSupported = context.softLinkIsSupported();
+  var testPath = path.join( context.testSuitePath, test.name );
+  var terminalPath = path.join( testPath, 'terminal' );
+  var dirPath = path.join( testPath, 'dir' );
+  var con = new _.Consequence().take( null )
+
+  /* */
+
+  .finally( () =>
+  {
+    test.case = 'delete terminal file';
+    provider.fileWrite( terminalPath, 'a' );
+    return provider.filesDelete({ filePath : terminalPath, sync : 0 })
+    .thenKeep( ( deleted ) =>
+    {
+      test.identical( _.select( deleted, '*/relative' ), [ './terminal' ] );
+      var stat = provider.statResolvedRead( terminalPath );
+      test.identical( stat, null );
+      return true;
+    })
+  })
+
+  //
+
+  .finally( () =>
+  {
+    test.case = 'delete empty dir';
+    provider.dirMake( dirPath );
+    return provider.filesDelete({ filePath : dirPath, sync : 0 })
+    .thenKeep( ( deleted ) =>
+    {
+      var stat = provider.statResolvedRead( dirPath );
+      test.identical( stat, null );
+      return true;
+    })
+  })
+
+  //
+
+  .finally( () =>
+  {
+    test.case = 'delete hard link';
+    provider.filesDelete( testPath );
+    var dst = path.join( testPath, 'link' );
+    provider.fileWrite( terminalPath, 'a');
+    provider.hardLink( dst, terminalPath );
+    return provider.filesDelete({ filePath : dst, sync : 0 })
+    .thenKeep( ( deleted ) =>
+    {
+      var stat = provider.statResolvedRead( dst );
+      test.identical( stat, null );
+      var stat = provider.statResolvedRead( terminalPath );
+      test.is( !!stat );
+      return true;
+    })
+  })
+
+  //
+
+  .finally( () =>
+  {
+    test.case = 'delete tree';
+    var extract = _.FileProvider.Extract
+    ({
+
+      protocol : 'src',
+      filesTree :
+      {
+        'src' :
+        {
+          'a.a' : 'a',
+          'b1.b' : 'b1',
+          'b2.b' : 'b2x',
+          'c' :
+          {
+            'b3.b' : 'b3x',
+            'e' : { 'd2.d' : 'd2x', 'e1.e' : 'd1' },
+            'srcfile' : 'srcfile',
+            'srcdir' : {},
+            'srcdir-dstfile' : { 'srcdir-dstfile-file' : 'srcdir-dstfile-file' },
+            'srcfile-dstdir' : 'x',
+          }
+        }
+      }
+
+    });
+    test.identical( provider.protocol, 'current' );
+    extract.providerRegisterTo( hub );
+    provider.filesDelete( testPath );
+    hub.filesReflect({ reflectMap : { 'src:///' : 'current://' + testPath } });
+    test.identical( provider.dirRead( testPath ), [ 'src' ] );
+    return provider.filesDelete({ filePath : testPath, sync : 0 })
+    .thenKeep( ( deleted ) =>
+    {
+      var expectedDeleted =
+      [
+        '.',
+        './src',
+        './src/a.a',
+        './src/b1.b',
+        './src/b2.b',
+        './src/c',
+        './src/c/b3.b',
+        './src/c/srcfile',
+        './src/c/srcfile-dstdir',
+        './src/c/e',
+        './src/c/e/d2.d',
+        './src/c/e/e1.e',
+        './src/c/srcdir',
+        './src/c/srcdir-dstfile',
+        './src/c/srcdir-dstfile/srcdir-dstfile-file'
+      ];
+      test.identical( _.select( deleted, '*/relative' ), expectedDeleted );
+      test.identical( provider.dirRead( testPath ), null );
+      var stat = provider.statResolvedRead( testPath );
+      test.identical( stat, null );
+      extract.finit();
+      test.identical( _.mapKeys( hub.providersWithProtocolMap ), [ 'current' ] );
+      return true;
+    })
+  })
+
+  //
+
+  .finally( () =>
+  {
+    test.case = 'delete tree with filter';
+    var extract = _.FileProvider.Extract
+    ({
+
+      protocol : 'src',
+      filesTree :
+      {
+        'src' :
+        {
+          'a.a' : 'a',
+          'b1.b' : 'b1',
+          'b2.b' : 'b2x',
+          'c' :
+          {
+            'b3.b' : 'b3x',
+            'e' : { 'd2.d' : 'd2x', 'e1.e' : 'd1' },
+            'srcfile' : 'srcfile',
+            'srcdir' : {},
+            'srcdir-dstfile' : { 'srcdir-dstfile-file' : 'srcdir-dstfile-file' },
+            'srcfile-dstdir' : 'x',
+          }
+        }
+      }
+
+    });
+
+    test.identical( provider.protocol, 'current' );
+    extract.providerRegisterTo( hub );
+    provider.filesDelete( testPath );
+    hub.filesReflect({ reflectMap : { 'src:///' : 'current://' + testPath } });
+    test.identical( provider.dirRead( testPath ), [ 'src' ] );
+    return provider.filesDelete({ filter : { filePath : testPath, maskAll : { excludeAny : '/c' } }, sync : 0 })
+    .thenKeep( ( deleted ) =>
+    {
+      var expectedDeleted =
+      [
+        './src/a.a',
+        './src/b1.b',
+        './src/b2.b',
+      ];
+      test.identical( _.select( deleted, '*/relative' ), expectedDeleted );
+      test.identical( provider.dirRead( testPath ), [ 'src' ] );
+      var stat = provider.statResolvedRead( testPath );
+      test.is( !!stat );
+      var expectedFiles =
+      [
+        '.',
+        './src',
+        './src/c',
+        './src/c/b3.b',
+        './src/c/srcfile',
+        './src/c/srcfile-dstdir',
+        './src/c/e',
+        './src/c/e/d2.d',
+        './src/c/e/e1.e',
+        './src/c/srcdir',
+        './src/c/srcdir-dstfile',
+        './src/c/srcdir-dstfile/srcdir-dstfile-file',
+      ];
+      var files = provider.filesFindRecursive({ filePath : testPath, outputFormat : 'relative' });
+      test.identical( files, expectedFiles );
+      extract.finit();
+      test.identical( _.mapKeys( hub.providersWithProtocolMap ), [ 'current' ] );
+      return true;
+    })
+
+  })
+
+  //
+
+  .finally( () =>
+  {
+
+    test.case = 'delete tree with filter, exclude all';
+    var extract = _.FileProvider.Extract
+    ({
+
+      protocol : 'src',
+      filesTree :
+      {
+        'src' :
+        {
+          'a.a' : 'a',
+          'b1.b' : 'b1',
+          'b2.b' : 'b2x',
+          'c' :
+          {
+            'b3.b' : 'b3x',
+            'e' : { 'd2.d' : 'd2x', 'e1.e' : 'd1' },
+            'srcfile' : 'srcfile',
+            'srcdir' : {},
+            'srcdir-dstfile' : { 'srcdir-dstfile-file' : 'srcdir-dstfile-file' },
+            'srcfile-dstdir' : 'x',
+          }
+        }
+      }
+
+    });
+
+    test.identical( provider.protocol, 'current' );
+    extract.providerRegisterTo( hub );
+    provider.filesDelete( testPath );
+    hub.filesReflect({ reflectMap : { 'src:///' : 'current://' + testPath } });
+    test.identical( provider.dirRead( testPath ), [ 'src' ] );
+    return provider.filesDelete({ filter : { filePath : testPath, maskAll : { excludeAny : '/src' } }, sync : 0 })
+    .thenKeep( ( deleted ) =>
+    {
+      var expectedDeleted =
+      [
+      ];
+      test.identical( _.select( deleted, '*/relative' ), expectedDeleted );
+      test.identical( provider.dirRead( testPath ), [ 'src' ] );
+      var stat = provider.statResolvedRead( testPath );
+      test.is( !!stat );
+      var expectedFiles =
+      [
+        '.',
+        './src',
+        './src/a.a',
+        './src/b1.b',
+        './src/b2.b',
+        './src/c',
+        './src/c/b3.b',
+        './src/c/srcfile',
+        './src/c/srcfile-dstdir',
+        './src/c/e',
+        './src/c/e/d2.d',
+        './src/c/e/e1.e',
+        './src/c/srcdir',
+        './src/c/srcdir-dstfile',
+        './src/c/srcdir-dstfile/srcdir-dstfile-file'
+      ];
+      var files = provider.filesFindRecursive({ filePath : testPath, outputFormat : 'relative' });
+      test.identical( files, expectedFiles );
+      extract.finit();
+      test.identical( _.mapKeys( hub.providersWithProtocolMap ), [ 'current' ] );
+      return true;
+    })
+
+  })
+
+  //
+
+
+  .finally( () =>
+  {
+    test.case = 'deletingEmptyDirs : 1';
+    var extract = _.FileProvider.Extract
+    ({
+      protocol : 'src',
+      filesTree :
+      {
+        'd1' :
+        {
+          'd2a' :
+          {
+            'd3' :
+            {
+              'd4' : { 't' : 't' },
+            },
+          },
+          'd2b' :
+          {
+            't' : 't'
+          },
+        },
+      },
+    });
+
+    test.identical( provider.protocol, 'current' );
+    extract.providerRegisterTo( hub );
+    provider.filesDelete( testPath );
+    hub.filesReflect({ reflectMap : { 'src:///' : 'current://' + testPath } });
+
+    return provider.filesDelete
+    ({
+      filePath : path.join( testPath, 'd1/d2a/d3/d4' ),
+      deletingEmptyDirs : 1,
+      sync : 0
+    })
+    .thenKeep( ( deleted ) =>
+    {
+      var expected = [ '../..', '..', '.', './t' ];
+      test.identical( _.select( deleted, '*/relative' ), expected );
+      var stat = provider.statResolvedRead( path.join( testPath, 'd1/d2a' ) );
+      test.identical( stat, null );
+      var stat = provider.statResolvedRead( path.join( testPath, 'd1/d2b' ) );
+      test.is( !!stat );
+
+      extract.finit();
+      test.identical( _.mapKeys( hub.providersWithProtocolMap ), [ 'current' ] );
+      return true;
+    })
+  })
+
+  //
+
+  if( !softLinkIsSupported )
+  return con;
+
+  con.finally( () =>
+  {
+    test.case = 'delete soft link, resolvingSoftLink 1';
+    provider.fieldPush( 'resolvingSoftLink', 1 );
+    var dst = path.join( testPath, 'link' );
+    provider.fileWrite( terminalPath, ' ');
+    provider.softLink( dst, terminalPath );
+    return provider.filesDelete({ filePath : dst, sync : 0 })
+    .thenKeep( ( deleted ) =>
+    {
+      var stat = provider.statResolvedRead( dst );
+      test.identical( stat, null );
+      var stat = provider.statResolvedRead( terminalPath );
+      test.is( !!stat );
+      provider.fieldPop( 'resolvingSoftLink', 1 );
+      return true;
+    })
+  })
+
+  .finally( () =>
+  {
+    test.case = 'delete soft link, resolvingSoftLink 0';
+    provider.fieldPush( 'resolvingSoftLink', 0 );
+    var dst = path.join( testPath, 'link' );
+    provider.fileWrite( terminalPath, ' ');
+    provider.softLink( dst, terminalPath );
+    return provider.filesDelete({ filePath : dst, sync : 0 })
+    .thenKeep( ( deleted ) =>
+    {
+      var stat = provider.statResolvedRead( dst );
+      test.identical( stat, null );
+      var stat = provider.statResolvedRead( terminalPath );
+      test.is( !!stat );
+      provider.fieldPop( 'resolvingSoftLink', 0 );
+      return true;
+    })
+  })
+
+  /* */
+
+  return con;
+}
+
+filesDeleteAsync.timeOut = 20000;
+
+//
+
 function filesDeleteEmptyDirs( test )
 {
   var tree =
@@ -15281,6 +15661,7 @@ var Self =
     filesReflectTo,
 
     filesDelete,
+    filesDeleteAsync,
     filesDeleteEmptyDirs,
     // filesDeleteAndAsyncWrite,
 

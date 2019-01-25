@@ -279,7 +279,14 @@ function pathResolveTextLinkAct( o )
   buffer = Buffer.alloc( 512 );
 
   /* qqq use statReadAct Vova : low priority*/
-  let stat = self.statResolvedRead({ filePath : o.filePath, resolvingTextLink : 0, resolvingSoftLink : 0 });
+  let stat = self.statReadAct
+  ({
+    filePath : o.filePath,
+    throwing : 0,
+    sync : 1,
+    resolvingSoftLink : 0,
+  });
+
   if( !stat )
   return false;
 
@@ -553,12 +560,11 @@ function streamReadAct( o )
 
   _.assertRoutineOptions( streamReadAct, arguments );
 
-  let filePath = o.filePath;
-  o.filePath = self.path.nativize( o.filePath );
+  let filePath = self.path.nativize( o.filePath );
 
   try
   {
-    return File.createReadStream( o.filePath, { encoding : o.encoding } );
+    return File.createReadStream( filePath, { encoding : o.encoding } );
   }
   catch( err )
   {
@@ -904,7 +910,7 @@ function fileWriteAct( o )
   if( _.bufferTypedIs( o.data ) && !_.bufferBytesIs( o.data ) || _.bufferRawIs( o.data ) )
   o.data = _.bufferNodeFrom( o.data );
 
-  /* qqq : is it possible to do it without conversion from raw buffer? */
+  // /* qqq : is it possible to do it without conversion from raw buffer? */
 
   _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ) || _.bufferBytesIs( o.data ), 'Expects string or node buffer, but got', _.strType( o.data ) );
 
@@ -932,7 +938,8 @@ function fileWriteAct( o )
         }
         catch( err ){ }
         if( data )
-        o.data = o.data.concat( data ) */
+        o.data = o.data.concat( data )
+        */
 
         if( self.fileExistsAct({ filePath : o.filePath, sync : 1 }) )
         {
@@ -989,13 +996,11 @@ function streamWriteAct( o )
 
   _.assertRoutineOptions( streamWriteAct, arguments );
 
-  let filePath = o.filePath;
-
-  o.filePath = self.path.nativize( o.filePath );
+  let filePath = self.path.nativize( o.filePath );
 
   try
   {
-    return File.createWriteStream( o.filePath );
+    return File.createWriteStream( filePath );
   }
   catch( err )
   {
@@ -1086,34 +1091,29 @@ function fileDeleteAct( o )
   _.assert( self.path.isAbsolute( o.filePath ) );
   _.assert( self.path.isNormalized( o.filePath ) );
 
-  let filePath = o.filePath;
-
-  o.filePath = self.path.nativize( o.filePath );
-
-  /* qqq : sync is not accounted */
-  /* qqq : is it needed */
+  let filePath = self.path.nativize( o.filePath );
 
   if( o.sync )
   {
     let stat = self.statReadAct
     ({
-      filePath : filePath,
+      filePath : o.filePath,
       resolvingSoftLink : 0,
       sync : 1,
       throwing : 0,
     });
 
     if( stat && stat.isDir() )
-    File.rmdirSync( o.filePath  );
+    File.rmdirSync( filePath );
     else
-    File.unlinkSync( o.filePath  );
+    File.unlinkSync( filePath );
 
   }
   else
   {
     let con = self.statReadAct
     ({
-      filePath : filePath,
+      filePath : o.filePath,
       resolvingSoftLink : 0,
       sync : 0,
       throwing : 0,
@@ -1124,9 +1124,9 @@ function fileDeleteAct( o )
       return con.error( err );
 
       if( stat && stat.isDir() )
-      File.rmdir( o.filePath, handleResult );
+      File.rmdir( filePath, handleResult );
       else
-      File.unlink( o.filePath, handleResult );
+      File.unlink( filePath, handleResult );
     })
 
     /**/
@@ -1154,7 +1154,7 @@ function dirMakeAct( o )
   let fileNativePath = self.path.nativize( o.filePath );
 
   _.assertRoutineOptions( dirMakeAct, arguments );
-  // _.assert( self.statReadAct( self.path.dir( o.filePath ) ), 'Directory for directory does not exist :\n' + _.strQuote( o.filePath ) ); /* qqq */
+  // _.assert( self.statReadAct( self.path.dir( o.filePath ) ), 'Directory for directory does not exist :\n' + _.strQuote( o.filePath ) ); /* qqq aaa : fs handles this */
 
   if( o.sync )
   {
@@ -1199,20 +1199,20 @@ function fileRenameAct( o )
   _.assert( self.path.isNormalized( o.srcPath ) );
   _.assert( self.path.isNormalized( o.dstPath ) );
 
-  o.dstPath = self.path.nativize( o.dstPath );
-  o.srcPath = self.path.nativize( o.srcPath );
+  let dstPath = self.path.nativize( o.dstPath );
+  let srcPath = self.path.nativize( o.srcPath );
 
-  _.assert( !!o.dstPath );
-  _.assert( !!o.srcPath );
+  _.assert( !!dstPath );
+  _.assert( !!srcPath );
 
   if( o.sync )
   {
-    File.renameSync( o.srcPath, o.dstPath );
+    File.renameSync( srcPath, dstPath );
   }
   else
   {
     let con = new _.Consequence();
-    File.rename( o.srcPath, o.dstPath, function( err )
+    File.rename( srcPath, dstPath, function( err )
     {
       if( err )
       con.error( err );
@@ -1266,18 +1266,18 @@ function fileCopyAct( o )
   }
 
 
-  o.dstPath = self.path.nativize( o.dstPath );
-  o.srcPath = self.path.nativize( o.srcPath );
+  let dstPath = self.path.nativize( o.dstPath );
+  let srcPath = self.path.nativize( o.srcPath );
 
-  _.assert( !!o.dstPath );
-  _.assert( !!o.srcPath );
+  _.assert( !!dstPath );
+  _.assert( !!srcPath );
 
   /* */
 
   if( o.sync )
   {
     // File.copySync( o.srcPath, o.dstPath );
-    File.copyFileSync( o.srcPath, o.dstPath );
+    File.copyFileSync( srcPath, dstPath );
   }
   else
   {
@@ -1302,7 +1302,7 @@ function fileCopyAct( o )
     //   con.take( err, data );
     // });
 
-    let readStream = self.streamReadAct({ filePath : o.srcPath, encoding : self.encoding });
+    let readStream = self.streamReadAct({ filePath : srcPath, encoding : self.encoding });
 
     readStream.on( 'error', ( err ) =>
     {
@@ -1314,7 +1314,7 @@ function fileCopyAct( o )
       readCon.take( null );
     })
 
-    let writeStream = self.streamWriteAct({ filePath : o.dstPath });
+    let writeStream = self.streamWriteAct({ filePath : dstPath });
 
     writeStream.on( 'error', ( err ) =>
     {
@@ -1488,7 +1488,7 @@ function hardLinkAct( o )
     if( o.dstPath === o.srcPath )
     return true;
 
-    /* qqq : is needed */
+    /* qqq : is needed aaa : with this info error is more clear */
     let stat = self.statReadAct
     ({
       filePath : o.srcPath,

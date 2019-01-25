@@ -2812,14 +2812,10 @@ function filesFindResolving( test )
 {
   let context = this;
   let provider = context.provider;
-
   let hub = context.hub;
   let path = context.provider.path;
   let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
-
-  // let path = context.provider.path;
-  // var testPath = path.join( context.testSuitePath, test.name );
-  // var terminalPath = path.join( testPath, 'file' );
+  let terminalPath = path.join( testPath, 'terminal' );
 
   var softLinkIsSupported = context.softLinkIsSupported();
 
@@ -2870,407 +2866,407 @@ function filesFindResolving( test )
 
   */
 
+  // //
   //
-
-  provider.filesDelete( testPath );
-  provider.fileWrite( terminalPath, terminalPath );
-  var o =
-  {
-    filePath : testPath,
-    resolvingSoftLink : 0,
-    resolvingTextLink : 0,
-  }
-  var options = _.mapExtend( o, fixedOptions );
-  provider.fieldPush( 'usingTextLink', 0 );
-  debugger
-  var files = provider.filesFind( options );
-  var filtered = files.map( recordSimplify );
-  var expected =
-  [
-    {
-      absolute : testPath,
-      real : testPath,
-      isDir : true
-    },
-    {
-      absolute : terminalPath,
-      real : terminalPath,
-      isDir : false
-    },
-  ]
-
-  test.identical( filtered, expected )
-  provider.fieldPop( 'usingTextLink', 0 );
-
+  // provider.filesDelete( testPath );
+  // provider.fileWrite( terminalPath, terminalPath );
+  // var o =
+  // {
+  //   filePath : testPath,
+  //   resolvingSoftLink : 0,
+  //   resolvingTextLink : 0,
+  // }
+  // var options = _.mapExtend( o, fixedOptions );
+  // provider.fieldPush( 'usingTextLink', 0 );
+  // debugger
+  // var files = provider.filesFind( options );
+  // var filtered = files.map( recordSimplify );
+  // var expected =
+  // [
+  //   {
+  //     absolute : testPath,
+  //     real : testPath,
+  //     isDir : true
+  //   },
+  //   {
+  //     absolute : terminalPath,
+  //     real : terminalPath,
+  //     isDir : false
+  //   },
+  // ]
   //
-
-  provider.filesDelete( testPath );
-  provider.fileWrite( terminalPath, terminalPath );
-  var o =
-  {
-    filePath : testPath,
-    resolvingSoftLink : 1,
-    resolvingTextLink : 0,
-  }
-  var options = _.mapExtend( o, fixedOptions );
-  provider.fieldPush( 'usingTextLink', 0 );
-  var files = provider.filesFind( options );
-  var filtered = files.map( recordSimplify );
-  var expected =
-  [
-    {
-      absolute : testPath,
-      real : testPath,
-      isDir : true
-    },
-    {
-      absolute : terminalPath,
-      real : terminalPath,
-      isDir : false
-    },
-  ]
-
-  test.identical( filtered, expected )
-  provider.fieldPop( 'usingTextLink', 0 );
-
+  // test.identical( filtered, expected )
+  // provider.fieldPop( 'usingTextLink', 0 );
   //
-
-  provider.filesDelete( testPath );
-  provider.fileWrite( terminalPath, terminalPath );
-  var o =
-  {
-    filePath : testPath,
-    resolvingSoftLink : 1,
-    resolvingTextLink : 1,
-  }
-  var options = _.mapExtend( o, fixedOptions );
-  provider.fieldPush( 'usingTextLink', 0 );
-  var files = provider.filesFind( options );
-  var filtered = files.map( recordSimplify );
-  var expected =
-  [
-    {
-      absolute : testPath,
-      real : testPath,
-      isDir : true
-    },
-    {
-      absolute : terminalPath,
-      real : terminalPath,
-      isDir : false
-    },
-  ]
-
-  test.identical( filtered, expected )
-  provider.fieldPop( 'usingTextLink', 0 );
-
+  // //
   //
-
-  provider.filesDelete( testPath );
-  provider.fileWrite( terminalPath, terminalPath );
-  var o =
-  {
-    filePath : testPath,
-    resolvingSoftLink : 1,
-    resolvingTextLink : 1,
-  }
-  var options = _.mapExtend( o, fixedOptions );
-  provider.fieldPush( 'usingTextLink', 1 );
-  var files = provider.filesFind( options );
-  var filtered = files.map( recordSimplify );
-  var expected =
-  [
-    {
-      absolute : testPath,
-      real : testPath,
-      isDir : true
-    },
-    {
-      absolute : terminalPath,
-      real : terminalPath,
-      isDir : false
-    },
-  ]
-
-  test.identical( filtered, expected )
-  provider.fieldPop( 'usingTextLink', 1 );
-
+  // provider.filesDelete( testPath );
+  // provider.fileWrite( terminalPath, terminalPath );
+  // var o =
+  // {
+  //   filePath : testPath,
+  //   resolvingSoftLink : 1,
+  //   resolvingTextLink : 0,
+  // }
+  // var options = _.mapExtend( o, fixedOptions );
+  // provider.fieldPush( 'usingTextLink', 0 );
+  // var files = provider.filesFind( options );
+  // var filtered = files.map( recordSimplify );
+  // var expected =
+  // [
+  //   {
+  //     absolute : testPath,
+  //     real : testPath,
+  //     isDir : true
+  //   },
+  //   {
+  //     absolute : terminalPath,
+  //     real : terminalPath,
+  //     isDir : false
+  //   },
+  // ]
   //
-
-  test.case = 'text link to a file, resolvingSoftLink : 0, resolvingTextLink : 0';
-  provider.filesDelete( testPath );
-  provider.fileWrite( terminalPath, terminalPath );
-  var srcFilePath = terminalPath;
-  var textLinkPath = path.join( testPath, 'textLink' );
-  provider.fieldPush( 'usingTextLink', 0 );
-  var o =
-  {
-    filePath : testPath,
-    resolvingSoftLink : 0,
-    resolvingTextLink : 0,
-  }
-  var options = _.mapExtend( o, fixedOptions );
-  provider.fileWrite( textLinkPath, 'link ' + srcFilePath );
-
-  var files = provider.filesFind( options );
-  var filtered = files.map( recordSimplify );
-  var expected =
-  [
-    {
-      absolute : testPath,
-      real : testPath,
-      isDir : true
-    },
-    {
-      absolute : srcFilePath,
-      real : srcFilePath,
-      isDir : false
-    },
-    {
-      absolute : textLinkPath,
-      real : textLinkPath,
-      isDir : false
-    },
-  ]
-
-  test.identical( filtered, expected )
-  var srcFileStat = provider.statResolvedRead( srcFilePath );
-  var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
-  test.is( srcFileStat.ino !== textLinkStat.ino );
-  provider.fieldPop( 'usingTextLink', 0 );
-
-
+  // test.identical( filtered, expected )
+  // provider.fieldPop( 'usingTextLink', 0 );
   //
-
-  test.case = 'text link to a file, resolvingSoftLink : 0, resolvingTextLink : 1, usingTextLink : 0';
-  provider.filesDelete( testPath );
-  provider.fileWrite( terminalPath, terminalPath );
-  var srcFilePath = terminalPath;
-  var textLinkPath = path.join( testPath, 'textLink' );
-  provider.fieldPush( 'usingTextLink', 0 );
-  var o =
-  {
-    filePath : testPath,
-    resolvingSoftLink : 0,
-    resolvingTextLink : 1,
-  }
-  var options = _.mapExtend( o, fixedOptions );
-  provider.fileWrite( textLinkPath, 'link ' + srcFilePath );
-
-  var files = provider.filesFind( options );
-  var filtered = files.map( recordSimplify );
-  var expected =
-  [
-    {
-      absolute : testPath,
-      real : testPath,
-      isDir : true
-    },
-    {
-      absolute : srcFilePath,
-      real : srcFilePath,
-      isDir : false
-    },
-    {
-      absolute : textLinkPath,
-      real : textLinkPath,
-      isDir : false
-    },
-  ]
-
-  test.identical( filtered, expected )
-  var srcFileStat = provider.statResolvedRead( srcFilePath );
-  var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
-  test.is( srcFileStat.ino !== textLinkStat.ino );
-  provider.fieldPop( 'usingTextLink', 0 );
-
+  // //
   //
-
-  test.case = 'text link to a file, resolvingSoftLink : 0, resolvingTextLink : 1, usingTextLink : 1';
-  provider.filesDelete( testPath );
-  provider.fileWrite( terminalPath, terminalPath );
-  var srcFilePath = terminalPath;
-  var textLinkPath = path.join( testPath, 'textLink' );
-  provider.fieldPush( 'usingTextLink', 1 );
-  var o =
-  {
-    filePath : testPath,
-    resolvingSoftLink : 0,
-    resolvingTextLink : 1,
-  }
-  var options = _.mapExtend( o, fixedOptions );
-  provider.fileWrite( textLinkPath, 'link ' + srcFilePath );
-
-  var files = provider.filesFind( options );
-  var filtered = files.map( recordSimplify );
-  var expected =
-  [
-    {
-      absolute : testPath,
-      real : testPath,
-      isDir : true
-    },
-    {
-      absolute : srcFilePath,
-      real : srcFilePath,
-      isDir : false
-    },
-    {
-      absolute : textLinkPath,
-      real : srcFilePath,
-      isDir : false
-    },
-  ]
-
-  test.identical( filtered, expected )
-  var srcFileStat = provider.statResolvedRead( srcFilePath );
-  var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
-  test.identical( srcFileStat.ino, textLinkStat.ino );
-  provider.fieldPop( 'usingTextLink', 1 );
-
+  // provider.filesDelete( testPath );
+  // provider.fileWrite( terminalPath, terminalPath );
+  // var o =
+  // {
+  //   filePath : testPath,
+  //   resolvingSoftLink : 1,
+  //   resolvingTextLink : 1,
+  // }
+  // var options = _.mapExtend( o, fixedOptions );
+  // provider.fieldPush( 'usingTextLink', 0 );
+  // var files = provider.filesFind( options );
+  // var filtered = files.map( recordSimplify );
+  // var expected =
+  // [
+  //   {
+  //     absolute : testPath,
+  //     real : testPath,
+  //     isDir : true
+  //   },
+  //   {
+  //     absolute : terminalPath,
+  //     real : terminalPath,
+  //     isDir : false
+  //   },
+  // ]
   //
-
-  test.case = 'text link to a file, resolvingSoftLink : 1, resolvingTextLink : 1, usingTextLink : 1';
-  provider.filesDelete( testPath );
-  provider.fileWrite( terminalPath, terminalPath );
-  var srcFilePath = terminalPath;
-  var textLinkPath = path.join( testPath, 'textLink' );
-  provider.fieldPush( 'usingTextLink', 1 );
-  var o =
-  {
-    filePath : testPath,
-    resolvingSoftLink : 1,
-    resolvingTextLink : 1,
-  }
-  var options = _.mapExtend( o, fixedOptions );
-  provider.fileWrite( textLinkPath, 'link ' + srcFilePath );
-
-  var files = provider.filesFind( options );
-  var filtered = files.map( recordSimplify );
-  var expected =
-  [
-    {
-      absolute : testPath,
-      real : testPath,
-      isDir : true
-    },
-    {
-      absolute : srcFilePath,
-      real : srcFilePath,
-      isDir : false
-    },
-    {
-      absolute : textLinkPath,
-      real : srcFilePath,
-      isDir : false
-    },
-  ]
-
-  test.identical( filtered, expected )
-  var srcFileStat = provider.statResolvedRead( srcFilePath );
-  var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
-  test.identical( srcFileStat.ino, textLinkStat.ino );
-  provider.fieldPop( 'usingTextLink', 1 );
-
-   //
-
-  test.case = 'text link to a file, resolvingSoftLink : 1, resolvingTextLink : 1, usingTextLink : 1';
-  provider.filesDelete( testPath );
-  provider.fileWrite( terminalPath, terminalPath );
-  var srcFilePath = terminalPath;
-  var textLinkPath = path.join( testPath, 'textLink' );
-  provider.fieldPush( 'usingTextLink', 1 );
-  var o =
-  {
-    filePath : testPath,
-    resolvingSoftLink : 1,
-    resolvingTextLink : 1,
-  }
-  var options = _.mapExtend( o, fixedOptions );
-  provider.fileWrite( textLinkPath, 'link ' + srcFilePath );
-
-  var files = provider.filesFind( options );
-  var filtered = files.map( recordSimplify );
-  var expected =
-  [
-    {
-      absolute : testPath,
-      real : testPath,
-      isDir : true
-    },
-    {
-      absolute : srcFilePath,
-      real : srcFilePath,
-      isDir : false
-    },
-    {
-      absolute : textLinkPath,
-      real : srcFilePath,
-      isDir : false
-    },
-  ]
-
-  test.identical( filtered, expected )
-  var srcFileStat = provider.statResolvedRead( srcFilePath );
-  var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
-  test.identical( srcFileStat.ino, textLinkStat.ino );
-  provider.fieldPop( 'usingTextLink', 1 );
-
+  // test.identical( filtered, expected )
+  // provider.fieldPop( 'usingTextLink', 0 );
   //
-
-  test.case = 'text->text->file, resolvingSoftLink : 1, resolvingTextLink : 1, usingTextLink : 1';
-  provider.filesDelete( testPath );
-  provider.fileWrite( terminalPath, terminalPath );
-  var srcFilePath = terminalPath;
-  var textLinkPath = path.join( testPath, 'textLink' );
-  var textLink2Path = path.join( testPath, 'textLink2' );
-  provider.fieldPush( 'usingTextLink', 1 );
-  var o =
-  {
-    filePath : testPath,
-    resolvingSoftLink : 1,
-    resolvingTextLink : 1,
-  }
-  var options = _.mapExtend( o, fixedOptions );
-  provider.fileWrite( textLinkPath, 'link ' + srcFilePath );
-  provider.fileWrite( textLink2Path, 'link ' + srcFilePath );
-
-  var files = provider.filesFind( options );
-  var filtered = files.map( recordSimplify );
-  var expected =
-  [
-    {
-      absolute : testPath,
-      real : testPath,
-      isDir : true
-    },
-    {
-      absolute : srcFilePath,
-      real : srcFilePath,
-      isDir : false
-    },
-    {
-      absolute : textLinkPath,
-      real : srcFilePath,
-      isDir : false
-    },
-    {
-      absolute : textLink2Path,
-      real : srcFilePath,
-      isDir : false
-    },
-  ]
-
-  test.identical( filtered, expected )
-  var srcFileStat = provider.statResolvedRead( srcFilePath );
-  var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
-  var textLink2Stat = findRecord( files, 'absolute', textLink2Path ).stat;
-  test.identical( srcFileStat.ino, textLinkStat.ino );
-  test.identical( srcFileStat.ino, textLink2Stat.ino );
-  provider.fieldPop( 'usingTextLink', 1 );
-
-  if( !softLinkIsSupported )
-  return;
+  // //
+  //
+  // provider.filesDelete( testPath );
+  // provider.fileWrite( terminalPath, terminalPath );
+  // var o =
+  // {
+  //   filePath : testPath,
+  //   resolvingSoftLink : 1,
+  //   resolvingTextLink : 1,
+  // }
+  // var options = _.mapExtend( o, fixedOptions );
+  // provider.fieldPush( 'usingTextLink', 1 );
+  // var files = provider.filesFind( options );
+  // var filtered = files.map( recordSimplify );
+  // var expected =
+  // [
+  //   {
+  //     absolute : testPath,
+  //     real : testPath,
+  //     isDir : true
+  //   },
+  //   {
+  //     absolute : terminalPath,
+  //     real : terminalPath,
+  //     isDir : false
+  //   },
+  // ]
+  //
+  // test.identical( filtered, expected )
+  // provider.fieldPop( 'usingTextLink', 1 );
+  //
+  // //
+  //
+  // test.case = 'text link to a file, resolvingSoftLink : 0, resolvingTextLink : 0';
+  // provider.filesDelete( testPath );
+  // provider.fileWrite( terminalPath, terminalPath );
+  // var srcFilePath = terminalPath;
+  // var textLinkPath = path.join( testPath, 'textLink' );
+  // provider.fieldPush( 'usingTextLink', 0 );
+  // var o =
+  // {
+  //   filePath : testPath,
+  //   resolvingSoftLink : 0,
+  //   resolvingTextLink : 0,
+  // }
+  // var options = _.mapExtend( o, fixedOptions );
+  // provider.fileWrite( textLinkPath, 'link ' + srcFilePath );
+  //
+  // var files = provider.filesFind( options );
+  // var filtered = files.map( recordSimplify );
+  // var expected =
+  // [
+  //   {
+  //     absolute : testPath,
+  //     real : testPath,
+  //     isDir : true
+  //   },
+  //   {
+  //     absolute : srcFilePath,
+  //     real : srcFilePath,
+  //     isDir : false
+  //   },
+  //   {
+  //     absolute : textLinkPath,
+  //     real : textLinkPath,
+  //     isDir : false
+  //   },
+  // ]
+  //
+  // test.identical( filtered, expected )
+  // var srcFileStat = provider.statResolvedRead( srcFilePath );
+  // var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
+  // test.is( srcFileStat.ino !== textLinkStat.ino );
+  // provider.fieldPop( 'usingTextLink', 0 );
+  //
+  //
+  // //
+  //
+  // test.case = 'text link to a file, resolvingSoftLink : 0, resolvingTextLink : 1, usingTextLink : 0';
+  // provider.filesDelete( testPath );
+  // provider.fileWrite( terminalPath, terminalPath );
+  // var srcFilePath = terminalPath;
+  // var textLinkPath = path.join( testPath, 'textLink' );
+  // provider.fieldPush( 'usingTextLink', 0 );
+  // var o =
+  // {
+  //   filePath : testPath,
+  //   resolvingSoftLink : 0,
+  //   resolvingTextLink : 1,
+  // }
+  // var options = _.mapExtend( o, fixedOptions );
+  // provider.fileWrite( textLinkPath, 'link ' + srcFilePath );
+  //
+  // var files = provider.filesFind( options );
+  // var filtered = files.map( recordSimplify );
+  // var expected =
+  // [
+  //   {
+  //     absolute : testPath,
+  //     real : testPath,
+  //     isDir : true
+  //   },
+  //   {
+  //     absolute : srcFilePath,
+  //     real : srcFilePath,
+  //     isDir : false
+  //   },
+  //   {
+  //     absolute : textLinkPath,
+  //     real : textLinkPath,
+  //     isDir : false
+  //   },
+  // ]
+  //
+  // test.identical( filtered, expected )
+  // var srcFileStat = provider.statResolvedRead( srcFilePath );
+  // var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
+  // test.is( srcFileStat.ino !== textLinkStat.ino );
+  // provider.fieldPop( 'usingTextLink', 0 );
+  //
+  // //
+  //
+  // test.case = 'text link to a file, resolvingSoftLink : 0, resolvingTextLink : 1, usingTextLink : 1';
+  // provider.filesDelete( testPath );
+  // provider.fileWrite( terminalPath, terminalPath );
+  // var srcFilePath = terminalPath;
+  // var textLinkPath = path.join( testPath, 'textLink' );
+  // provider.fieldPush( 'usingTextLink', 1 );
+  // var o =
+  // {
+  //   filePath : testPath,
+  //   resolvingSoftLink : 0,
+  //   resolvingTextLink : 1,
+  // }
+  // var options = _.mapExtend( o, fixedOptions );
+  // provider.fileWrite( textLinkPath, 'link ' + srcFilePath );
+  //
+  // var files = provider.filesFind( options );
+  // var filtered = files.map( recordSimplify );
+  // var expected =
+  // [
+  //   {
+  //     absolute : testPath,
+  //     real : testPath,
+  //     isDir : true
+  //   },
+  //   {
+  //     absolute : srcFilePath,
+  //     real : srcFilePath,
+  //     isDir : false
+  //   },
+  //   {
+  //     absolute : textLinkPath,
+  //     real : srcFilePath,
+  //     isDir : false
+  //   },
+  // ]
+  //
+  // test.identical( filtered, expected )
+  // var srcFileStat = provider.statResolvedRead( srcFilePath );
+  // var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
+  // test.identical( srcFileStat.ino, textLinkStat.ino );
+  // provider.fieldPop( 'usingTextLink', 1 );
+  //
+  // //
+  //
+  // test.case = 'text link to a file, resolvingSoftLink : 1, resolvingTextLink : 1, usingTextLink : 1';
+  // provider.filesDelete( testPath );
+  // provider.fileWrite( terminalPath, terminalPath );
+  // var srcFilePath = terminalPath;
+  // var textLinkPath = path.join( testPath, 'textLink' );
+  // provider.fieldPush( 'usingTextLink', 1 );
+  // var o =
+  // {
+  //   filePath : testPath,
+  //   resolvingSoftLink : 1,
+  //   resolvingTextLink : 1,
+  // }
+  // var options = _.mapExtend( o, fixedOptions );
+  // provider.fileWrite( textLinkPath, 'link ' + srcFilePath );
+  //
+  // var files = provider.filesFind( options );
+  // var filtered = files.map( recordSimplify );
+  // var expected =
+  // [
+  //   {
+  //     absolute : testPath,
+  //     real : testPath,
+  //     isDir : true
+  //   },
+  //   {
+  //     absolute : srcFilePath,
+  //     real : srcFilePath,
+  //     isDir : false
+  //   },
+  //   {
+  //     absolute : textLinkPath,
+  //     real : srcFilePath,
+  //     isDir : false
+  //   },
+  // ]
+  //
+  // test.identical( filtered, expected )
+  // var srcFileStat = provider.statResolvedRead( srcFilePath );
+  // var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
+  // test.identical( srcFileStat.ino, textLinkStat.ino );
+  // provider.fieldPop( 'usingTextLink', 1 );
+  //
+  //  //
+  //
+  // test.case = 'text link to a file, resolvingSoftLink : 1, resolvingTextLink : 1, usingTextLink : 1';
+  // provider.filesDelete( testPath );
+  // provider.fileWrite( terminalPath, terminalPath );
+  // var srcFilePath = terminalPath;
+  // var textLinkPath = path.join( testPath, 'textLink' );
+  // provider.fieldPush( 'usingTextLink', 1 );
+  // var o =
+  // {
+  //   filePath : testPath,
+  //   resolvingSoftLink : 1,
+  //   resolvingTextLink : 1,
+  // }
+  // var options = _.mapExtend( o, fixedOptions );
+  // provider.fileWrite( textLinkPath, 'link ' + srcFilePath );
+  //
+  // var files = provider.filesFind( options );
+  // var filtered = files.map( recordSimplify );
+  // var expected =
+  // [
+  //   {
+  //     absolute : testPath,
+  //     real : testPath,
+  //     isDir : true
+  //   },
+  //   {
+  //     absolute : srcFilePath,
+  //     real : srcFilePath,
+  //     isDir : false
+  //   },
+  //   {
+  //     absolute : textLinkPath,
+  //     real : srcFilePath,
+  //     isDir : false
+  //   },
+  // ]
+  //
+  // test.identical( filtered, expected )
+  // var srcFileStat = provider.statResolvedRead( srcFilePath );
+  // var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
+  // test.identical( srcFileStat.ino, textLinkStat.ino );
+  // provider.fieldPop( 'usingTextLink', 1 );
+  //
+  // //
+  //
+  // test.case = 'text->text->file, resolvingSoftLink : 1, resolvingTextLink : 1, usingTextLink : 1';
+  // provider.filesDelete( testPath );
+  // provider.fileWrite( terminalPath, terminalPath );
+  // var srcFilePath = terminalPath;
+  // var textLinkPath = path.join( testPath, 'textLink' );
+  // var textLink2Path = path.join( testPath, 'textLink2' );
+  // provider.fieldPush( 'usingTextLink', 1 );
+  // var o =
+  // {
+  //   filePath : testPath,
+  //   resolvingSoftLink : 1,
+  //   resolvingTextLink : 1,
+  // }
+  // var options = _.mapExtend( o, fixedOptions );
+  // provider.fileWrite( textLinkPath, 'link ' + srcFilePath );
+  // provider.fileWrite( textLink2Path, 'link ' + srcFilePath );
+  //
+  // var files = provider.filesFind( options );
+  // var filtered = files.map( recordSimplify );
+  // var expected =
+  // [
+  //   {
+  //     absolute : testPath,
+  //     real : testPath,
+  //     isDir : true
+  //   },
+  //   {
+  //     absolute : srcFilePath,
+  //     real : srcFilePath,
+  //     isDir : false
+  //   },
+  //   {
+  //     absolute : textLinkPath,
+  //     real : srcFilePath,
+  //     isDir : false
+  //   },
+  //   {
+  //     absolute : textLink2Path,
+  //     real : srcFilePath,
+  //     isDir : false
+  //   },
+  // ]
+  //
+  // test.identical( filtered, expected )
+  // var srcFileStat = provider.statResolvedRead( srcFilePath );
+  // var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
+  // var textLink2Stat = findRecord( files, 'absolute', textLink2Path ).stat;
+  // test.identical( srcFileStat.ino, textLinkStat.ino );
+  // test.identical( srcFileStat.ino, textLink2Stat.ino );
+  // provider.fieldPop( 'usingTextLink', 1 );
+  //
+  // if( !softLinkIsSupported )
+  // return;
 
   /* soft link */
 
@@ -3283,12 +3279,12 @@ function filesFindResolving( test )
     resolvingSoftLink : 0,
     resolvingTextLink : 0,
   }
-  var options = _.mapExtend( o, fixedOptions );
+  var o2 = _.mapExtend( o, fixedOptions );
   provider.fieldPush( 'usingTextLink', 0 );
   var softLink = path.join( testPath, 'link' );
   var srcPath = terminalPath;
   provider.softLink( softLink, srcPath );
-  var files = provider.filesFind( options );
+  var files = provider.filesFind( o2 );
   var filtered = files.map( recordSimplify );
   var expected =
   [
@@ -3308,11 +3304,13 @@ function filesFindResolving( test )
       isDir : false
     },
   ]
-  test.identical( filtered, expected )
+  test.identical( filtered, expected );
   var srcFileStat = provider.statResolvedRead( terminalPath );
   var softLinkStat = findRecord( files, 'absolute', softLink ).stat;
   test.is( srcFileStat.ino !== softLinkStat.ino );
   provider.fieldPop( 'usingTextLink', 0 );
+
+  debugger; return; xxx
 
   //
 

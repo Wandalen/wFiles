@@ -46,6 +46,8 @@ function init( o )
   if( !GitConfig )
   GitConfig = require( 'gitconfiglocal' );
 
+  debugger;
+
   Parent.prototype.init.call( self,o );
 
 }
@@ -155,7 +157,7 @@ function filesReflectSingle_body( o )
 
   /* */
 
-  let dstFileProvider = o.dstFilter.determineEffectiveFileProvider();
+  let dstFileProvider = o.dstFilter.pathProvider();
   let srcPath = o.srcPath;
   let dstPath = o.dstPath;
   let srcCurrentPath;

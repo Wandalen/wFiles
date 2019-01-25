@@ -195,6 +195,39 @@ function providerForPath( url )
   return self.defaultProvider;
 }
 
+//
+
+function protocolNameGenerate( skip )
+{
+  let self = this;
+  let number = 1;
+  let name;
+
+  _.assert( arguments.length === 0 || arguments.length === 1 );
+  skip = skip || 0;
+  skip += 1;
+
+  do
+  {
+    name = 'pro' + number;
+    number += 1;
+    if( !self.providersWithProtocolMap[ name ] )
+    skip -= 1;
+  }
+  while( skip > 0 )
+
+  return name;
+}
+
+//
+
+function hasProvider( provider )
+{
+  let self = this;
+  _.assert( arguments.length === 1 );
+  return !!self.providersWithProtocolMap[ provider.protocol ];
+}
+
 // --
 // adapter
 // --
@@ -551,7 +584,7 @@ function _link_functor( fop )
       return op.result;
     }
 
-    _.assert( arguments.length === 1, 'Expects single argument' ); debugger;
+    _.assert( arguments.length === 1, 'Expects single argument' );
 
     /* */
 
@@ -1061,6 +1094,8 @@ let Proto =
   providerUnregister,
   providersRegister,
   providerForPath,
+  protocolNameGenerate,
+  hasProvider,
 
   // adapter
 

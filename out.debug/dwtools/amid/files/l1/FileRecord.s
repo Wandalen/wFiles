@@ -164,14 +164,16 @@ function _pathsForm()
 
   _.assert( arguments.length === 0 );
   _.assert( _.strIs( f.basePath ) );
+  _.assert( _.strIs( f.stemPath ) );
+  _.assert( path.isAbsolute( f.stemPath ) );
 
   /* path */
 
   if( !isAbsolute )
   if( f.dirPath )
-  filePath = path.join( f.basePath, f.dirPath, filePath );
+  filePath = path.join( f.basePath, f.dirPath, f.stemPath, filePath );
   else if( f.basePath )
-  filePath = path.join( f.basePath, filePath );
+  filePath = path.join( f.basePath, f.stemPath, filePath );
   else if( !path.isAbsolute( filePath ) )
   _.assert( 0, 'FileRecordFactory expects defined fields {-dirPath-} or {-basePath-} or absolute path' );
 

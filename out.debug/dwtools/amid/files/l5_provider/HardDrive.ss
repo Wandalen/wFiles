@@ -399,7 +399,9 @@ _.routineExtend( pathResolveSoftLinkAct, Parent.prototype.pathResolveSoftLinkAct
 
 function pathDirTempAct()
 {
-  return Os.tmpdir();
+  let self = this;
+  let path = self.path;
+  return path.normalize( Os.tmpdir() );
 }
 
 //

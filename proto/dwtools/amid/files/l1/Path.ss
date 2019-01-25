@@ -39,7 +39,7 @@ let _pathRealMainFile;
 function realMainFile()
 {
   if( _pathRealMainFile ) return _pathRealMainFile;
-  _pathRealMainFile = _.path.normalize( require.main.filename );
+  _pathRealMainFile = this.normalize( require.main.filename );
   return _pathRealMainFile;
 }
 
@@ -59,7 +59,7 @@ function realMainDir()
   return _pathRealMainDir;
 
   if( require.main )
-  _pathRealMainDir = _.path.normalize( _.path.dir( require.main.filename ) );
+  _pathRealMainDir = this.normalize( this.dir( require.main.filename ) );
   else
   return this.effectiveMainFile();
 
@@ -90,18 +90,18 @@ let effectiveMainFile = ( function effectiveMainFile()
 
     if( process.argv[ 0 ] || process.argv[ 1 ] )
     {
-      result = _.path.join( _.path.currentAtBegin,process.argv[ 1 ] || process.argv[ 0 ] );
-      result = _.path.resolve( result );
+      result = this.join( this.currentAtBegin, process.argv[ 1 ] || process.argv[ 0 ] );
+      result = this.resolve( result );
     }
 
     if( !this.fileProvider.statResolvedRead( result ) )
     {
       debugger;
-      console.error( 'process.argv :', process.argv.join( ',' ) );
-      console.error( 'currentAtBegin :', _.path.currentAtBegin );
-      console.error( 'effectiveMainFile.raw :', _.path.join( _.path.currentAtBegin, process.argv[ 1 ] || process.argv[ 0 ] ) );
+      console.error( 'process.argv :', process.argv.join( ', ' ) );
+      console.error( 'currentAtBegin :', this.currentAtBegin );
+      console.error( 'effectiveMainFile.raw :', this.join( this.currentAtBegin, process.argv[ 1 ] || process.argv[ 0 ] ) );
       console.error( 'effectiveMainFile :', result );
-      result = _.path.realMainFile();
+      result = this.realMainFile();
     }
 
     return result;
@@ -123,7 +123,7 @@ function effectiveMainDir()
 {
   _.assert( arguments.length === 0 );
 
-  let result = _.path.dir( this.effectiveMainFile() );
+  let result = this.dir( this.effectiveMainFile() );
 
   return result;
 }
@@ -133,7 +133,7 @@ function effectiveMainDir()
 function resolveTextLink( path )
 {
   _.assert( !!this.fileProvider );
-  return this.fileProvider.pathResolveTextLink.apply( this.fileProvider,arguments );
+  return this.fileProvider.pathResolveTextLink.apply( this.fileProvider, arguments );
 }
 
 //
@@ -141,7 +141,7 @@ function resolveTextLink( path )
 function _resolveTextLink( path )
 {
   _.assert( !!this.fileProvider );
-  return this.fileProvider._pathResolveTextLink.apply( this.fileProvider,arguments );
+  return this.fileProvider._pathResolveTextLink.apply( this.fileProvider, arguments );
 }
 
 //
@@ -168,7 +168,7 @@ function dirUserHome()
 function dirTemp()
 {
   _.assert( arguments.length === 0 );
-  _.assert( _.routineIs( this.fileProvider.pathDirTempAct ) );
+  _.assert( _.routineIs( this.fileProvider.pathDirTempAct ), () => 'Provider ' + this.fileProvider.nickName + ' does not support temp files' );
   if( this.tempPath )
   return this.tempPath;
   return this.fileProvider.pathDirTempAct();
@@ -178,38 +178,42 @@ function dirTemp()
 
 function dirTempFor( o )
 {
+
   _.assert( arguments.length <= 2 );
 
-  if( arguments.length === 1 )
+  if( _.mapIs( o ) )
   {
-    if( arguments[ 0 ] !== undefined && arguments[ 0 ] !== null )
-    o = { packageName : arguments[ 0 ] }
+    o = arguments[ 0 ];
   }
   else
   {
+    if( arguments[ 1 ] !== undefined )
     o =
     {
       packagePath : arguments[ 0 ],
-      packageName : arguments[ 1 ]
+      packageName : arguments[ 1 ],
+    }
+    else
+    o =
+    {
+      packageName : arguments[ 0 ],
     }
   }
 
-  o = _.routineOptions( dirTempFor,o );
+  o = _.routineOptions( dirTempFor, o );
 
-  if( !o.packageName)
+  if( !o.packageName )
   o.packageName = _.idWithGuid();
   else
-  o.packageName = _.path.join( o.packageName, _.idWithGuid() );
-
-  // if( !o.packagePath )
-  // o.packagePath = Os ? Os.tmpdir() : '/';
+  o.packageName = o.packageName + '-' + _.idWithTime();
 
   if( !o.packagePath )
-  o.packagePath = _.path.dirTemp();
+  o.packagePath = this.dirTemp();
 
-  _.assert( !_.path.isAbsolute( o.packageName ), 'dirTempFor: {o.packageName} must not contain an absolute path:', o.packageName );
+  _.assert( this.isAbsolute( o.packagePath ) );
+  _.assert( !this.isAbsolute( o.packageName ), () => 'Option {- o.packageName -} should be relative path, but is ' + o.packageName );
 
-  o.fullPath = _.path.normalize( _.path.join( o.packagePath, 'tmp.tmp', o.packageName ) );
+  o.fullPath = this.join( o.packagePath, 'tmp.tmp', o.packageName );
 
   return o.fullPath;
 }
@@ -225,7 +229,7 @@ dirTempFor.defaults =
 function dirTempOpen( packagePath, packageName )
 {
   _.assert( !!this.fileProvider );
-  packagePath = _.path.dirTempFor.apply( _, arguments );
+  packagePath = this.dirTempFor.apply( this, arguments );
   this.fileProvider.filesDelete({ filePath : packagePath, throwing : 0 });
   this.fileProvider.dirMake( packagePath );
   return packagePath;
@@ -237,16 +241,15 @@ function dirTempClose( filePath )
 {
   _.assert( arguments.length === 1 );
   _.assert( !!this.fileProvider );
-  _.assert( _.path.isAbsolute( filePath ) );
-  _.assert( _.strHas( _.path.normalize( filePath ), '/tmp.tmp/' ), 'dirTempClose: provided path does not contain temporary directory:', filePath );
+  _.assert( this.isAbsolute( filePath ) );
+  _.sure( _.strHas( this.normalize( filePath ), '/tmp.tmp/' ), 'Path does not contain temporary directory:', filePath );
   this.fileProvider.filesDelete({ filePath : filePath, throwing : 0 });
 }
 
 //
 
-function _forCopy_pre( routine,args )
+function forCopy_pre( routine, args )
 {
-  // let self = this;
 
   _.assert( args.length === 1 );
 
@@ -255,8 +258,7 @@ function _forCopy_pre( routine,args )
   if( !_.mapIs( o ) )
   o = { filePath : o };
 
-  _.routineOptions( routine,o );
-  // _.assert( self instanceof _.FileProvider.Abstract );
+  _.routineOptions( routine, o );
   _.assert( _.strIs( o.filePath ) );
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
 
@@ -265,7 +267,7 @@ function _forCopy_pre( routine,args )
 
 //
 
-function _forCopy_body( o )
+function forCopy_body( o )
 {
   let path = this;
   let fileProvider = this.fileProvider;
@@ -278,15 +280,15 @@ function _forCopy_body( o )
 
   let parts = _.strSplitFast({ src : name, delimeter : '-', preservingEmpty : 0, preservingDelimeters : 0 });
   if( parts[ parts.length-1 ] === o.postfix )
-  name = parts.slice( 0,parts.length-1 ).join( '-' );
+  name = parts.slice( 0, parts.length-1 ).join( '-' );
 
   // !!! this condition (first if below) is not necessary, because if it fulfilled then previous fulfiled too, and has the
   // same effect as previous
 
   if( parts.length > 1 && parts[ parts.length-1 ] === o.postfix )
-  name = parts.slice( 0,parts.length-1 ).join( '-' );
+  name = parts.slice( 0, parts.length-1 ).join( '-' );
   else if( parts.length > 2 && parts[ parts.length-2 ] === o.postfix )
-  name = parts.slice( 0,parts.length-2 ).join( '-' );
+  name = parts.slice( 0, parts.length-2 ).join( '-' );
 
   /*file.absolute =  file.dir + '/' + file.name + file.extWithDot;*/
 
@@ -313,16 +315,14 @@ function _forCopy_body( o )
   throw _.err( 'Cant make copy path for : ' + file.absolute );
 }
 
-_forCopy_body.defaults =
+forCopy_body.defaults =
 {
   delimeter : '-',
   postfix : 'copy',
   filePath : null,
 }
 
-// var paths = _forCopy_body.paths = Object.create( null );
-var having = _forCopy_body.having = Object.create( null );
-
+var having = forCopy_body.having = Object.create( null );
 having.driving = 0;
 having.aspect = 'body';
 
@@ -345,43 +345,12 @@ having.aspect = 'body';
  * @memberof wTools.path
  */
 
-let forCopy = _.routineFromPreAndBody( _forCopy_pre, _forCopy_body );
+let forCopy = _.routineFromPreAndBody( forCopy_pre, forCopy_body );
 
 forCopy.having.aspect = 'entry';
 
-// /**
-//  * Generate path string for copy of existing file passed into `o.path`. If file with generated path is exists now,
-//  * method try to generate new path by adding numeric index into tail of path, before extension.
-//  * @example
-//  * let str = 'foo/bar/baz.txt',
-//    let path = wTools.forCopy( {path : str } ); // 'foo/bar/baz-copy.txt'
-//  * @param {Object} o options argument
-//  * @param {string} o.path Path to file for create name for copy.
-//  * @param {string} [o.postfix='copy'] postfix for mark file copy.
-//  * @returns {string} path for copy.
-//  * @throws {Error} If missed argument, or passed more then one.
-//  * @throws {Error} If passed object has unexpected property.
-//  * @throws {Error} If file for `o.path` is not exist.
-//  * @method forCopy
-//  * @memberof wTools.path
-//  */
-//
-// function forCopy( o )
-// {
-//   // _.assert( !!this.fileProvider );
-//   // return this.fileProvider.forCopy.apply( this.fileProvider, arguments );
-// }
-//
-// forCopy.defaults =
-// {
-//   delimeter : '-',
-//   postfix : 'copy',
-//   path : null,
-// }
-
-function _firstAvailable_pre( routine,args )
+function _firstAvailable_pre( routine, args )
 {
-  // let self = this;
 
   _.assert( args.length === 1 );
 
@@ -390,7 +359,7 @@ function _firstAvailable_pre( routine,args )
   if( !_.mapIs( o ) )
   o = { paths : o }
 
-  _.routineOptions( routine,o );
+  _.routineOptions( routine, o );
   _.assert( _.arrayIs( o.paths ) );
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
 
@@ -409,7 +378,7 @@ function _firstAvailable_body( o )
   for( let p = 0 ; p < o.paths.length ; p++ )
   {
     let path = o.paths[ p ];
-    if( fileProvdier.fileExists( o.onPath ? o.onPath.call( o,path,p ) : path ) )
+    if( fileProvdier.fileExists( o.onPath ? o.onPath.call( o, path, p ) : path ) )
     return path;
   }
 
@@ -422,14 +391,11 @@ _firstAvailable_body.defaults =
   onPath : null,
 }
 
-// var paths = _firstAvailable_body.paths = Object.create( null );
 var having = _firstAvailable_body.having = Object.create( null );
-
 having.driving = 0;
 having.aspect = 'body';
 
 let firstAvailable = _.routineFromPreAndBody( _firstAvailable_pre, _firstAvailable_body );
-
 firstAvailable.having.aspect = 'entry';
 
 // --
@@ -439,22 +405,23 @@ firstAvailable.having.aspect = 'entry';
 let Proto =
 {
 
-  realMainFile : realMainFile,
-  realMainDir : realMainDir,
+  realMainFile,
+  realMainDir,
 
-  effectiveMainFile : effectiveMainFile,
-  effectiveMainDir : effectiveMainDir,
+  effectiveMainFile,
+  effectiveMainDir,
 
-  resolveTextLink : resolveTextLink,
-  _resolveTextLink : _resolveTextLink,
+  resolveTextLink,
+  _resolveTextLink,
 
-  dirUserHome : dirUserHome,
-  dirTemp : dirTemp,
-  dirTempFor : dirTempFor,
-  dirTempOpen : dirTempOpen,
-  dirTempClose : dirTempClose,
-  forCopy : forCopy,
-  firstAvailable : firstAvailable,
+  dirUserHome,
+  dirTemp,
+  dirTempFor,
+  dirTempOpen,
+  dirTempClose,
+
+  forCopy,
+  firstAvailable,
 
 }
 
@@ -464,9 +431,9 @@ _.mapExtend( Self, Proto );
 // export
 // --
 
-if( typeof module !== 'undefined' )
-if( _global_.WTOOLS_PRIVATE )
-{ /* delete require.cache[ module.id ]; */ }
+// if( typeof module !== 'undefined' )
+// if( _global_.WTOOLS_PRIVATE )
+// { /* delete require.cache[ module.id ]; */ }
 
 if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = Self;

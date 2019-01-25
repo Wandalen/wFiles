@@ -140,6 +140,9 @@ function init( o )
 
   Parent.prototype.init.call( self );
 
+  self[ protocolsSymbol ] = [];
+  self[ protocolSymbol ] = null;
+
   _.instanceInit( self );
 
   if( self.Self === Self )
@@ -469,6 +472,26 @@ function providerRegisterTo( hub )
   return self;
 }
 
+//
+
+function providerUnregister()
+{
+  let self = this;
+  _.assert( arguments.length === 0 );
+  if( self.hub )
+  self.hub.providerUnregister( self );
+  return self;
+}
+
+//
+
+function hasProvider( provider )
+{
+  let self = this;
+  _.assert( arguments.length === 1 );
+  return self === provider;
+}
+
 // --
 // path
 // --
@@ -519,7 +542,6 @@ function pathNativizeAct( filePath )
 }
 
 var having = pathNativizeAct.having = Object.create( null );
-
 having.writing = 0;
 having.reading = 0;
 having.driving = 1;
@@ -531,7 +553,16 @@ let pathCurrentAct = null;
 
 //
 
-function _pathForCopy_pre( routine, args )
+function pathDirTempAct()
+{
+  let self = this;
+  let path = self.path;
+  return '/temp';
+}
+
+//
+
+function pathForCopy_pre( routine, args )
 {
   let self = this;
 
@@ -552,7 +583,7 @@ function _pathForCopy_pre( routine, args )
 
 //
 
-function _pathForCopy_body( o )
+function pathForCopy_body( o )
 {
   let fileProvider = this;
 
@@ -599,15 +630,14 @@ function _pathForCopy_body( o )
   throw _.err( 'Cant make copy path for : ' + file.absolute );
 }
 
-_pathForCopy_body.defaults =
+pathForCopy_body.defaults =
 {
   delimeter : '-',
   postfix : 'copy',
   path : null,
 }
 
-var having = _pathForCopy_body.having = Object.create( null );
-
+var having = pathForCopy_body.having = Object.create( null );
 having.driving = 0;
 having.aspect = 'body';
 
@@ -5054,9 +5084,6 @@ function _link_functor( gen )
       Vova : low priority
       */
 
-      if( _.strHas( o.dstPath, '/filesReflectorExperiment/dstDir/link' ) )
-      debugger;
-
       if( _.longIs( o.dstPath ) && c.linkAct.having.hardLinking )
       return _linkMultiple.call( self, o, _link_body );
       _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
@@ -5371,7 +5398,7 @@ function _link_functor( gen )
     function linksResolve()
     {
 
-      debugger;
+      // debugger; // xxx
 
       try
       {
@@ -7080,7 +7107,7 @@ function _protocolSet( protocol )
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.strIs( protocol ) );
+  _.assert( protocol === null || _.strIs( protocol ) );
 
   self._protocolsSet( protocol );
 }
@@ -7252,10 +7279,14 @@ let Proto =
   _preSrcDstPathWithoutProviderDefaults,
   _preSrcDstPathWithProviderDefaults,
 
+  // hub
+
   protocolsForOrigins,
   originsForProtocols,
   providerForPath,
   providerRegisterTo,
+  providerUnregister,
+  hasProvider,
 
   // path
 
@@ -7266,8 +7297,8 @@ let Proto =
   globalsFromLocals : _vectorize( globalFromLocal ),
 
   pathNativizeAct,
-  pathCurrentAct,
-  pathDirTempAct : null,
+  pathCurrentAct : null,
+  pathDirTempAct,
 
   // resolve
 

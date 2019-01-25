@@ -2636,7 +2636,6 @@ let Proto =
   fileReadAct,
   dirReadAct,
   streamReadAct : null,
-
   statReadAct,
   fileExistsAct,
 

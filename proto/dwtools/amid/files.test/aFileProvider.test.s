@@ -31729,6 +31729,152 @@ function filesAreTextLinked( test )
 
 //
 
+function filesAreSoftLinked( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let path = provider.path;
+
+  let /*workDir*/testPath = self.pathFor( 'written/filesAreSoftLinked' )
+  let filePath1 = self.pathFor( 'written/filesAreSoftLinked/file1' );
+  let filePath2 = self.pathFor( 'written/filesAreSoftLinked/file2' );
+  let linkPath1 = self.pathFor( 'written/filesAreSoftLinked/link1' );
+  let linkPath2 = self.pathFor( 'written/filesAreSoftLinked/link2' );
+
+  provider.fieldPush( 'usingTextLink', 1 );
+
+  test.case = 'missing,missing';
+  provider.filesDelete( /*workDir*/testPath );
+  var got = provider.filesAreSoftLinked({ filePath : [ filePath1, filePath2 ], resolvingTextLink : 0 });
+  test.identical( got, false );
+
+  test.case = 'missing,missing';
+  provider.filesDelete( /*workDir*/testPath );
+  var got = provider.filesAreSoftLinked({ filePath : [ filePath1, filePath2 ], resolvingTextLink : 1 });
+  test.identical( got, false );
+
+  test.case = 'missing,terminal';
+  provider.filesDelete( /*workDir*/testPath );
+  provider.fileWrite( filePath2, filePath2 );
+  var got = provider.filesAreSoftLinked({ filePath : [ filePath1, filePath2 ], resolvingTextLink : 0 });
+  test.identical( got, false );
+
+  test.case = 'missing,terminal';
+  provider.filesDelete( /*workDir*/testPath );
+  provider.fileWrite( filePath2, filePath2 );
+  var got = provider.filesAreSoftLinked({ filePath : [ filePath1, filePath2 ], resolvingTextLink : 1 });
+  test.identical( got, false );
+
+  test.case = 'terminal,terminal';
+  provider.filesDelete( /*workDir*/testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  provider.fileWrite( filePath2, filePath2 );
+  var got = provider.filesAreSoftLinked({ filePath : [ filePath1, filePath2 ], resolvingTextLink : 1 });
+  test.identical( got, false );
+
+  test.case = 'terminal,terminal';
+  provider.filesDelete( /*workDir*/testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  provider.fileWrite( filePath2, filePath2 );
+  var got = provider.filesAreSoftLinked({ filePath : [ filePath1, filePath2 ], resolvingTextLink : 0 });
+  test.identical( got, false );
+
+  test.case = 'terminal,text link to other file';
+  provider.filesDelete( /*workDir*/testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  provider.fileWrite( filePath2, filePath2 );
+  provider.textLink( linkPath1, filePath2 );
+  var got = provider.filesAreSoftLinked({ filePath : [ filePath1, linkPath1 ], resolvingTextLink : 1 });
+  test.identical( got, false );
+
+  test.case = 'terminal,text link to other file';
+  provider.filesDelete( /*workDir*/testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  provider.fileWrite( filePath2, filePath2 );
+  provider.textLink( linkPath1, filePath2 );
+  var got = provider.filesAreSoftLinked({ filePath : [ filePath1, linkPath1 ], resolvingTextLink : 0 });
+  test.identical( got, false );
+
+  test.case = 'terminal,text link to same file';
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  provider.textLink( linkPath1, filePath1 );
+  var got = provider.filesAreSoftLinked({ filePath : [ filePath1, linkPath1 ], resolvingTextLink : 0 });
+  test.identical( got, false );
+
+  test.case = 'terminal,text link to same file';
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  provider.textLink( linkPath1, filePath1 );
+  var got = provider.filesAreSoftLinked({ filePath : [ filePath1, linkPath1 ], resolvingTextLink : 1 });
+  test.identical( got, true );
+
+  test.case = 'terminal,soft link to other';
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  provider.fileWrite( filePath2, filePath2 );
+  provider.softLink( linkPath1, filePath2 );
+  var got = provider.filesAreSoftLinked({ filePath : [ filePath1, linkPath1 ], resolvingTextLink : 1 });
+  test.identical( got, false );
+
+  test.case = 'terminal,soft link to other';
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  provider.fileWrite( filePath2, filePath2 );
+  provider.softLink( linkPath1, filePath2 );
+  var got = provider.filesAreSoftLinked({ filePath : [ filePath1, linkPath1 ], resolvingTextLink : 0 });
+  test.identical( got, false );
+
+  test.case = 'terminal,soft link to same';
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  provider.softLink( linkPath1, filePath1 );
+  var got = provider.filesAreSoftLinked({ filePath : [ filePath1, linkPath1 ], resolvingTextLink : 1 });
+  test.identical( got, true );
+
+  test.case = 'terminal,soft link to same';
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  provider.softLink( linkPath1, filePath1 );
+  var got = provider.filesAreSoftLinked({ filePath : [ filePath1, linkPath1 ], resolvingTextLink : 0 });
+  test.identical( got, true );
+
+  test.case = 'terminal,hardlink to same';
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  provider.hardLink( linkPath1, filePath1 );
+  var got = provider.filesAreSoftLinked({ filePath : [ filePath1, linkPath1 ], resolvingTextLink : 0 });
+  test.identical( got, false );
+
+  test.case = 'terminal,hardlink to same';
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  provider.hardLink( linkPath1, filePath1 );
+  var got = provider.filesAreSoftLinked({ filePath : [ filePath1, linkPath1 ], resolvingTextLink : 1 });
+  test.identical( got, false );
+
+  test.case = 'terminal,soft to text to same';
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  provider.textLink( linkPath2, filePath1 );
+  provider.softLink( linkPath1, linkPath2 );
+  var got = provider.filesAreSoftLinked({ filePath : [ filePath1, linkPath1 ], resolvingTextLink : 1 });
+  test.identical( got, true );
+
+  test.case = 'terminal,soft to text to same';
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1, filePath1 );
+  provider.textLink( linkPath2, filePath1 );
+  provider.softLink( linkPath1, linkPath2 );
+  var got = provider.filesAreSoftLinked({ filePath : [ filePath1, linkPath1 ], resolvingTextLink : 0 });
+  test.identical( got, false );
+
+  provider.fieldPop( 'usingTextLink', 1 );
+
+}
+
+//
+
 function filesAreSame( test )
 {
   let self = this;
@@ -36175,7 +36321,7 @@ var Self =
     fileCopyAsync,
     fileCopyLinksAsync,
     fileCopySoftLinkResolving,
-    fileCopyAsyncThrowingError, /* Vova : rewrite this routine, low priority */
+    fileCopyAsyncThrowingError,
     fileCopyLinks,
     fileCopyError,
 
@@ -36254,6 +36400,7 @@ var Self =
 
     filesAreHardLinked,
     filesAreTextLinked,
+    filesAreSoftLinked,
     filesAreSame,
 
     statsAreHardLinked,

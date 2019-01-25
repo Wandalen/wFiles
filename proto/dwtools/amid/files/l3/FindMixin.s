@@ -3460,7 +3460,7 @@ function filesDelete_body( o )
       throwing : o.throwing,
       verbosity : o.verbosity-1,
       safe : o.safe,
-      sync : o.sync, /* qqq : implement and cover sync option for filesFind and filesDelete */
+      sync : o.sync, /* qqq : implement and cover sync option for filesFind and filesDelete aaa : done*/
     }
     return file.factory.effectiveFileProvider.fileDelete( optionsForDelete );
   }

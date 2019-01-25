@@ -3403,6 +3403,7 @@ operates.ins2 = { pathToRead : 1 };
 
 /*
 qqq : add operate to methods which miss it
+aaa : done
 */
 
 //
@@ -4796,7 +4797,9 @@ function dirMake_body( o )
   let o2 = { filePath : o.filePath }
   let filePath = self.pathResolveLinkFull( o2 );
 
-  /* qqq : use fileExists instead of statRead where possible */
+  /* qqq : use fileExists instead of statRead where possible
+     aaa : done
+  */
   if( self.fileExists( filePath ) )
   {
 
@@ -5273,7 +5276,10 @@ function _link_functor( gen )
         .finally( () =>
         {
           return error( _.err( 'Cant', entryMethodName, o.dstPath, '<-', o.srcPath, '\n', err ) );
-          /* qqq : linking routine should return null if error and throwing : 0 */
+          /*
+          qqq : linking routine should return null if error and throwing : 0
+          aaa : works as expected
+          */
         })
       })
 
@@ -5637,7 +5643,10 @@ function _link_functor( gen )
       if( !renaming )
       return false;
 
-      /* qqq : if breakingSrcHardLink is on then src file should be broken */
+      /*
+      qqq : if breakingSrcHardLink is on then src file should be broken
+      aaa : fixed
+      */
 
       if( _.boolLike( o.breakingDstHardLink ) )
       if( !o.breakingDstHardLink && c.dstStat.isHardLink() )
@@ -6576,7 +6585,7 @@ function _textLinkVerify2( c )
 {
   let self = this;
   let o = c.options;
-  // qqq : cover filesAreTextLinked
+  // qqq : cover filesAreTextLinked aaa : done
   if( o.dstPath !== o.srcPath && self.filesAreTextLinked([ o.dstPath, o.srcPath ]) )
   debugger;
   if( o.dstPath !== o.srcPath && self.filesAreTextLinked([ o.dstPath, o.srcPath ]) )

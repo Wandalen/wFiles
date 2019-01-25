@@ -629,7 +629,7 @@ function _fileCopyActDifferent( op )
   let path = self.path;
   let o = op.options;
 
-  /* qqq : implement async */
+  /* qqq : implement async, aaa : done */
   // _.assert( o.sync, 'not implemented' );
 
   if( op.src.provider.isSoftLink( op.src.localPath ) )

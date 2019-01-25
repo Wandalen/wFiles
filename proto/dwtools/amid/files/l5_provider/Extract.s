@@ -1023,7 +1023,7 @@ function fileCopyAct( o )
   _.assert( self.path.isNormalized( o.srcPath ) );
   _.assert( self.path.isNormalized( o.dstPath ) );
 
-  if( o.sync  ) // qqq : synchronize async version
+  if( o.sync  ) // qqq : synchronize async version aaa : done
   {
     _copyPre();
 

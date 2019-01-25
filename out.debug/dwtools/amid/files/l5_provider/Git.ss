@@ -46,6 +46,8 @@ function init( o )
   if( !GitConfig )
   GitConfig = require( 'gitconfiglocal' );
 
+  debugger;
+
   Parent.prototype.init.call( self,o );
 
 }

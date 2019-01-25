@@ -7107,7 +7107,7 @@ function _protocolSet( protocol )
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.strIs( protocol ) );
+  _.assert( protocol === null || _.strIs( protocol ) );
 
   self._protocolsSet( protocol );
 }

@@ -235,7 +235,7 @@ function _formMasks()
     _.assert( filter.filterMap === null );
     filter.filterMap = Object.create( null );
 
-    let _processed = path.globMapToRegexps( filter.stemPath, filter.basePath  );
+    let _processed = path.fileMapToRegexps( filter.stemPath, filter.basePath  );
 
     filter.basePath = _processed.unglobedBasePath;
     filter.stemPath = _.mapKeys( _processed.regexpMap );
@@ -715,7 +715,7 @@ function pathsInherit( src )
   /* */
 
   if( src.filePath )
-  filter.filePath = path.globMapExtend( filter.filePath, src.filePath, true );
+  filter.filePath = path.fileMapExtend( filter.filePath, src.filePath, true );
 
   return filter;
 }
@@ -895,7 +895,7 @@ function pathsNormalize()
   /* */
 
   filter.inFilePath = path.s.normalize( filter.inFilePath );
-  let stemPath = path.globMapExtend( null, filter.inFilePath );
+  let stemPath = path.fileMapExtend( null, filter.inFilePath );
   for( let g in stemPath )
   {
     let g2 = filter.pathNormalize( g );
@@ -1163,7 +1163,7 @@ function filePathPrependBasePath( filePath, basePath )
       delete basePath[ g ];
       basePath[ joinedPath ] = b;
       delete filePath[ g ];
-      path.globMapExtend( filePath, joinedPath, value );
+      path.fileMapExtend( filePath, joinedPath, value );
       // basePath
     }
 
@@ -1173,7 +1173,7 @@ function filePathPrependBasePath( filePath, basePath )
     //   if( glob !== g )
     //   {
     //     delete filePath[ g ];
-    //     path.globMapExtend( filePath, glob, value );
+    //     path.fileMapExtend( filePath, glob, value );
     //     // basePath
     //   }
     // }
@@ -1865,6 +1865,22 @@ function srcPathCommon()
 
 //
 
+function globalsFromLocals()
+{
+  let filter = this;
+
+  debugger;
+
+  if( filter.basePath )
+  filter.basePath = filter.effectiveFileProvider.globalsFromLocals( filter.basePath );
+
+  if( filter.filePath )
+  filter.filePath = filter.effectiveFileProvider.globalsFromLocals( filter.filePath );
+
+}
+
+//
+
 function filePathGet()
 {
   let filter = this;
@@ -2053,6 +2069,7 @@ let Extend =
   basePathsGet,
   dstPathCommon,
   srcPathCommon,
+  globalsFromLocals,
   filePathGet,
   filePathSet,
 

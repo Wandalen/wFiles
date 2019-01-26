@@ -49,6 +49,59 @@ Self.shortName = 'Partial';
 // shortcuts
 // --
 
+function _vectorizeKeysAndVals( routine, select )
+{
+  select = select || 1;
+
+  let routineName = routine.name;
+
+  _.assert( _.routineIs( routine ) );
+  _.assert( _.strDefined( routineName ) );
+  _.assert( arguments.length === 1 || arguments.length === 2 );
+
+  // let routine2 = _.routineVectorize_functor // qqq : uncomment it, please
+  // ({
+  //   routine : [ routineName ],
+  //   vectorizingArray : 1,
+  //   vectorizingMap : 1,
+  //   vectorizingKeys : 1,
+  //   select : select,
+  // });
+
+  function routine2( srcs )
+  {
+    _.assert( arguments.length === 1 ); debugger;
+    if( _.mapIs( srcs ) )
+    {
+      let result = Object.create( null );
+      for( let s in srcs )
+      {
+        let val = routine.call( this, srcs[ s ] );
+        let key = routine.call( this, s );
+        result[ key ] = val;
+      }
+      return result;
+    }
+    else if( _.arrayIs( srcs ) )
+    {
+      let result = [];
+      for( let s = 0 ; s < srcs.length ; s++ )
+      result[ s ] = routine.call( this, srcs[ s ] );
+      return result;
+    }
+    else
+    {
+      return routine.call( this, srcs );
+    }
+  }
+
+  _.routineExtend( routine2, routine );
+
+  return routine2;
+}
+
+//
+
 function _vectorize( routine, select )
 {
   select = select || 1;
@@ -499,23 +552,26 @@ function hasProvider( provider )
 // path
 // --
 
-function localFromGlobal( uri )
+function localFromGlobal( globalPath )
 {
   let self = this;
 
-  if( _.strIs( uri ) )
+  if( _.boolLike( globalPath ) )
+  return globalPath;
+
+  if( _.strIs( globalPath ) )
   {
-    if( !_.path.isGlobal( uri ) )
-    return uri;
-    uri = _.uri.parse( uri );
+    if( !_.path.isGlobal( globalPath ) )
+    return globalPath;
+    globalPath = _.uri.parse( globalPath );
   }
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.mapIs( uri ) ) ;
-  _.assert( _.strIs( uri.localPath ) );
-  _.assert( !self.protocols || !uri.protocol || _.arrayHas( self.protocols, uri.protocol ) );
+  _.assert( _.mapIs( globalPath ) ) ;
+  _.assert( _.strIs( globalPath.localPath ) );
+  _.assert( !self.protocols || !globalPath.protocol || _.arrayHas( self.protocols, globalPath.protocol ) );
 
-  return uri.localPath;
+  return globalPath.localPath;
 }
 
 //
@@ -524,6 +580,9 @@ function globalFromLocal( localPath )
 {
   let self = this;
   let path = self.path.parse ? self.path : _.uri;
+
+  if( _.boolLike( localPath ) )
+  return localPath;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.strIs( localPath ) )
@@ -7472,10 +7531,10 @@ let Proto =
   // path
 
   localFromGlobal,
-  localsFromGlobals : _vectorize( localFromGlobal ),
+  localsFromGlobals : _vectorizeKeysAndVals( localFromGlobal ),
 
   globalFromLocal,
-  globalsFromLocals : _vectorize( globalFromLocal ),
+  globalsFromLocals : _vectorizeKeysAndVals( globalFromLocal ),
 
   pathNativizeAct,
   pathCurrentAct : null,

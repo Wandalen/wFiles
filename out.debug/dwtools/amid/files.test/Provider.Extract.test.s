@@ -46,15 +46,22 @@ var filesTree =
 function onSuiteBegin( test )
 {
   let context = this;
-
   context.provider = _.FileProvider.Extract({ filesTree : filesTree, usingExtraStat : 1, protocol : 'current' });
   context.hub = _.FileProvider.Hub({ providers : [ context.provider ] });
-
   let path = context.provider.path;
   context.testSuitePath = path.dirTempOpen( 'FilesFind' );
-  // let path = this.provider.path;
-  // this.testSuitePath = path.dirTempOpen( path.join( __dirname, '../..'  ), 'Provider/HardDrive' );
 }
+
+//
+
+function onSuiteEnd()
+{
+  let context = this;
+  let path = this.provider.path;
+  // _.assert( _.mapKeys( context.provider.filesTree ).length === 1 ); // qqq : uncomment it, please
+  return Parent.onSuiteEnd.apply( this, arguments );
+}
+
 //
 
 function pathFor( filePath )
@@ -135,6 +142,7 @@ var Proto =
   enabled : 1,
 
   onSuiteBegin,
+  onSuiteEnd,
 
   context :
   {

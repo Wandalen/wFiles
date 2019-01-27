@@ -1841,7 +1841,10 @@ function filesReflectEvaluate_body( o )
 
         if( o.dstRewritingPreserving )
         if( o.writing && o.dstRewriting && o.dstRewritingByDistinct )
-        throw _.err( 'Can\'t rewrite terminal file ' + record.dst.absolute + ' by directory ' + record.src.absolute + ', dstRewritingPreserving is enabled' );
+        {
+          debugger;
+          throw _.err( 'Can\'t rewrite terminal file ' + record.dst.absolute + ' by directory ' + record.src.absolute + ', dstRewritingPreserving is enabled' );
+        }
 
         if( !record.src.isActual && record.dst.isActual )
         if( record.touch === 'constructive' )
@@ -2910,8 +2913,24 @@ function filesReflect_pre( routine, args )
 
   /* */
 
+  if( o.reflectMap === null && _.mapIs( o.srcFilter.filePath ) )
+  {
+    o.reflectMap = o.srcFilter.filePath;
+    o.srcFilter.filePath = null;
+  }
+
+  debugger;
   if( o.reflectMap === null )
   {
+    debugger;
+
+    if( o.srcFilter.filePath === null )
+    o.srcFilter.filePath = o.srcFilter.prefixPath;
+    if( o.dstFilter.filePath === null )
+    o.dstFilter.filePath = o.dstFilter.prefixPath;
+
+    _.assert( _.strIs( o.srcFilter.filePath ) || _.arrayIs( o.srcFilter.filePath ) );
+    _.assert( _.strIs( o.dstFilter.filePath ) || _.arrayIs( o.dstFilter.filePath ) );
 
     o.srcFilter._formBasePath();
     o.dstFilter._formBasePath();
@@ -2919,27 +2938,14 @@ function filesReflect_pre( routine, args )
     _.assert( _.strIs( o.srcFilter.filePath ) || _.arrayIs( o.srcFilter.filePath ) );
     _.assert( _.strIs( o.dstFilter.filePath ) || _.arrayIs( o.dstFilter.filePath ) );
 
-    debugger;
-
     if( self instanceof _.FileProvider.Hub )
     {
       o.srcFilter.globalsFromLocals();
-      // o.srcFilter.basePath = o.srcFilter.effectiveFileProvider.globalsFromLocals( o.srcFilter.basePath );
-      // o.dstFilter.basePath = o.dstFilter.effectiveFileProvider.globalsFromLocals( o.srcFilter.basePath );
-      // o.reflectMap = path.fileMapExtend( null, o.srcFilter.effectiveFileProvider.globalsFromLocals( o.srcFilter.filePath ), o.dstFilter.effectiveFileProvider.globalsFromLocals( o.dstFilter.filePath ) );
-      o.reflectMap = path.fileMapExtend( null, o.srcFilter.filePath, o.dstFilter.filePath );
-    }
-    else
-    {
-      o.reflectMap = path.fileMapExtend( null, o.srcFilter.filePath, o.dstFilter.filePath );
+      o.dstFilter.globalsFromLocals();
     }
 
-    // if( self instanceof _.FileProvider.Hub )
-    // o.reflectMap = { [ o.srcFilter.effectiveFileProvider.globalFromLocal( o.srcFilter.filePath ) ] : o.dstFilter.effectiveFileProvider.globalFromLocal( o.dstFilter.filePath ) }
-    // else
-    // o.reflectMap = { [ o.srcFilter.filePath ] : o.dstFilter.filePath }
+    o.reflectMap = path.fileMapExtend( null, o.srcFilter.filePath, o.dstFilter.filePath );
 
-    debugger;
   }
   else
   {
@@ -3019,9 +3025,11 @@ function filesReflect_body( o )
     try
     {
       o2.dstFilter = o2.dstFilter.clone();
+      if( _.mapIs( o2.dstFilter.basePath ) )
       for( let dstPath2 in groupedGlobMap )
       if( dstPath !== dstPath2 )
       {
+        _.assert( !!o2.dstFilter.basePath );
         _.assert( _.strIs( o2.dstFilter.basePath[ dstPath2 ] ), () => 'No base path for ' + dstPath2 );
         delete o2.dstFilter.basePath[ dstPath2 ];
       }

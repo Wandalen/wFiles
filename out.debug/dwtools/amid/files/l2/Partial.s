@@ -70,7 +70,7 @@ function _vectorizeKeysAndVals( routine, select )
 
   function routine2( srcs )
   {
-    _.assert( arguments.length === 1 ); debugger;
+    _.assert( arguments.length === 1 );
     if( _.mapIs( srcs ) )
     {
       let result = Object.create( null );

@@ -168,8 +168,12 @@ function _formBasePath()
   _.assert( _.objectIs( filter ) );
   _.assert( filter.formed === 2 );
 
+  debugger;
+
   filter.prefixesApply();
   filter.stemPath = filter.pathsNormalize();
+
+  debugger;
 
   filter.formed = 3;
 }
@@ -1868,8 +1872,6 @@ function srcPathCommon()
 function globalsFromLocals()
 {
   let filter = this;
-
-  debugger;
 
   if( filter.basePath )
   filter.basePath = filter.effectiveFileProvider.globalsFromLocals( filter.basePath );

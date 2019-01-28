@@ -5892,7 +5892,7 @@ function _link_functor( gen )
         ({
           filePath : tempPath,
           verbosity : 0,
-          // sync : o.sync, /* qqq : implement o.sync */
+          sync : o.sync, /* qqq : implement o.sync, aaa : done */
         });
       }
 

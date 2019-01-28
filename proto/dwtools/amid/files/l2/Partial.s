@@ -5948,6 +5948,7 @@ function _link_functor( gen )
       if( !c.dstStat && self.providersWithProtocolMap )
       if( self.isLink( o.dstPath ) )
       {
+        //Vova: temporary allow broken dst link for linking operation through Hub
         let methodName = _.strReplaceAll( actMethodName, 'Act', '' );
         self.logger.warn( 'Warning: Hub.' + methodName + '.validateSize failed to get stat for broken dst link:', dstPath );
         return;

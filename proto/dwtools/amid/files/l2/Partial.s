@@ -3069,6 +3069,7 @@ function dirRead_body( o )
   _.assert( _.arrayHas( [ 'record', 'absolute', 'relative' ], o.outputFormat ) )
   _.assertRoutineOptions( dirRead_body, arguments );
 
+  let filePath = o.filePath;
   let o2 = _.mapExtend( null, o );
   delete o2.outputFormat;
   delete o2.basePath;
@@ -3117,6 +3118,11 @@ function dirRead_body( o )
 
   function adjust( result )
   {
+    if( _.strIs( result ) )
+    {
+      filePath = self.path.dir( filePath );
+      result = [ result ];
+    }
 
     _.assert( _.arrayIs( result ) );
 
@@ -3138,17 +3144,17 @@ function dirRead_body( o )
     if( o.outputFormat === 'absolute' )
     result = result.map( function( relative )
     {
-      return self.path.join( o.filePath, relative );
+      return self.path.join( filePath, relative );
     });
     else if( o.outputFormat === 'record' )
     result = result.map( function( relative )
     {
-      return self.recordFactory({ dirPath : o.filePath, basePath : o.basePath }).record( relative );
+      return self.recordFactory({ dirPath : filePath, basePath : o.basePath }).record( relative );
     });
     else if( o.basePath )
     result = result.map( function( relative )
     {
-      return self.path.relative( o.basePath, self.path.join( o.filePath, relative ) );
+      return self.path.relative( o.basePath, self.path.join( filePath, relative ) );
     });
 
     return result;

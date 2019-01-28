@@ -2819,7 +2819,7 @@ function filesFindResolving( test )
 
   // let path = context.provider.path;
   // var testPath = path.join( context.testSuitePath, test.name );
-  // var terminalPath = path.join( testPath, 'file' );
+  var terminalPath = path.join( testPath, 'terminal' );
 
   var softLinkIsSupported = context.softLinkIsSupported();
 
@@ -13170,8 +13170,6 @@ function filesFindDifference( test )
      probably problem is in method used by HardDrive.fileTimeSetAct
   */
 
-  var testRoutineDir = path.join( context.testSuitePath, test.name );
-
   var samples =
   [
 
@@ -13755,7 +13753,7 @@ function filesFindDifference( test )
   {
 
     var sample = samples[ s ];
-    var dir = path.join( testRoutineDir, './tmp/sample/' + sample.name );
+    var dir = path.join( testPath, './tmp/sample/' + sample.name );
     test.case = sample.name;
 
     // if( sample.name !== 'exclude-2' )
@@ -13830,10 +13828,6 @@ function filesCopyWithAdapter( test )
   let hub = context.hub;
   let path = context.provider.path;
   let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
-
-  let context = this;
-  let path = context.provider.path;
-  var testRoutineDir = path.join( context.testSuitePath, test.name );
 
   var samples =
   [
@@ -14107,7 +14101,7 @@ function filesCopyWithAdapter( test )
         {
           srcAction : null,
           srcAllow : true,
-          reason : 'dstDeleting',
+          reason : 'srcLooking',
           action : 'directory preserved',
           allow : true,
           relative : './c'
@@ -14115,10 +14109,18 @@ function filesCopyWithAdapter( test )
         {
           srcAction : 'fileDelete',
           srcAllow : true,
-          reason : 'dstDeleting',
+          reason : 'srcLooking',
           action : 'copied',
           allow : true,
           relative : './c/b3.b'
+        },
+        {
+          srcAction : null,
+          srcAllow : true,
+          reason : 'dstDeleting',
+          action : 'fileDelete',
+          allow : false,
+          relative : './c/dstdir'
         },
         {
           srcAction : null,
@@ -14140,26 +14142,18 @@ function filesCopyWithAdapter( test )
           srcAction : null,
           srcAllow : true,
           reason : 'dstDeleting',
-          action : 'fileDelete',
-          allow : false,
-          relative : './c/dstdir'
-        },
-        {
-          srcAction : null,
-          srcAllow : true,
-          reason : 'dstDeleting',
           action : 'directory preserved',
-          allow : true,
-          relative : './c/e'
-        },
-        {
-          srcAction : null,
-          srcAllow : true,
-          reason : 'dstDeleting',
-          action : 'fileDelete',
           allow : false,
           relative : './c/srcfile-dstdir'
         },
+        // {
+        //   srcAction : null,
+        //   srcAllow : true,
+        //   reason : 'dstDeleting',
+        //   action : 'directory preserved',
+        //   allow : true,
+        //   relative : './c/e' //exists on both sides, is excluded by filter
+        // },
         {
           srcAction : null,
           srcAllow : true,
@@ -15411,7 +15405,7 @@ function filesCopyWithAdapter( test )
     var sample = samples[ s ];
     if( !sample ) break;
 
-    var dir = path.join( testRoutineDir, './tmp/sample/' + sample.name );
+    var dir = path.join( testPath, './tmp/sample/' + sample.name );
     test.case = sample.name;
 
     _.FileProvider.Extract.readToProvider

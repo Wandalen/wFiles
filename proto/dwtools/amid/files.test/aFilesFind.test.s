@@ -2896,7 +2896,7 @@ function filesFindResolving( test )
       absolute : terminalPath,
       real : terminalPath,
       isDir : false
-    },
+    }
   ]
 
   test.identical( filtered, expected )
@@ -2927,7 +2927,7 @@ function filesFindResolving( test )
       absolute : terminalPath,
       real : terminalPath,
       isDir : false
-    },
+    }
   ]
 
   test.identical( filtered, expected )
@@ -2958,7 +2958,7 @@ function filesFindResolving( test )
       absolute : terminalPath,
       real : terminalPath,
       isDir : false
-    },
+    }
   ]
 
   test.identical( filtered, expected )
@@ -2989,7 +2989,7 @@ function filesFindResolving( test )
       absolute : terminalPath,
       real : terminalPath,
       isDir : false
-    },
+    }
   ]
 
   test.identical( filtered, expected )
@@ -3030,7 +3030,7 @@ function filesFindResolving( test )
       absolute : textLinkPath,
       real : textLinkPath,
       isDir : false
-    },
+    }
   ]
 
   test.identical( filtered, expected )
@@ -3075,7 +3075,7 @@ function filesFindResolving( test )
       absolute : textLinkPath,
       real : textLinkPath,
       isDir : false
-    },
+    }
   ]
 
   test.identical( filtered, expected )
@@ -3119,7 +3119,7 @@ function filesFindResolving( test )
       absolute : textLinkPath,
       real : srcFilePath,
       isDir : false
-    },
+    }
   ]
 
   test.identical( filtered, expected )
@@ -3163,7 +3163,7 @@ function filesFindResolving( test )
       absolute : textLinkPath,
       real : srcFilePath,
       isDir : false
-    },
+    }
   ]
 
   test.identical( filtered, expected )
@@ -3207,7 +3207,7 @@ function filesFindResolving( test )
       absolute : textLinkPath,
       real : srcFilePath,
       isDir : false
-    },
+    }
   ]
 
   test.identical( filtered, expected )
@@ -3258,7 +3258,7 @@ function filesFindResolving( test )
       absolute : textLink2Path,
       real : srcFilePath,
       isDir : false
-    },
+    }
   ]
 
   test.identical( filtered, expected )
@@ -3297,16 +3297,17 @@ function filesFindResolving( test )
       real : testPath,
       isDir : true
     },
-    {
-      absolute : terminalPath,
-      real : terminalPath,
-      isDir : false
-    },
+
     {
       absolute : softLink,
       real : softLink,
       isDir : false
     },
+    {
+      absolute : terminalPath,
+      real : terminalPath,
+      isDir : false
+    }
   ]
   test.identical( filtered, expected )
   var srcFileStat = provider.statResolvedRead( terminalPath );
@@ -3340,15 +3341,16 @@ function filesFindResolving( test )
       isDir : true
     },
     {
-      absolute : terminalPath,
-      real : terminalPath,
-      isDir : false
-    },
-    {
       absolute : softLink,
       real : terminalPath,
       isDir : false
     },
+    {
+      absolute : terminalPath,
+      real : terminalPath,
+      isDir : false
+    }
+
   ]
   test.identical( filtered, expected )
   var srcFileStat = provider.statResolvedRead( terminalPath );
@@ -3383,15 +3385,15 @@ function filesFindResolving( test )
       isDir : true
     },
     {
-      absolute : terminalPath,
-      real : terminalPath,
-      isDir : false
-    },
-    {
       absolute : softLink,
       real : terminalPath,
       isDir : false
     },
+    {
+      absolute : terminalPath,
+      real : terminalPath,
+      isDir : false
+    }
   ]
 
   test.identical( filtered, expected )

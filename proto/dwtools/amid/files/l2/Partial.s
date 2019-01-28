@@ -5943,7 +5943,15 @@ function _link_functor( gen )
         dstPath = self.path.join( dstPath, dstPathResolved );
       }
 
-      c.dstStat = self.statReadAct({ filePath : dstPath, throwing : 1, resolvingSoftLink : 0, sync : 1 });
+      c.dstStat = self.statReadAct({ filePath : dstPath, throwing : 0, resolvingSoftLink : 0, sync : 1 });
+
+      if( !c.dstStat && self.providersWithProtocolMap )
+      if( self.isLink( o.dstPath ) )
+      {
+        let methodName = _.strReplaceAll( actMethodName, 'Act', '' );
+        self.logger.warn( 'Warning: Hub.' + methodName + '.validateSize failed to get stat for broken dst link:', dstPath );
+        return;
+      }
 
       _.assert( !!c.srcStat );
       _.assert( !!c.dstStat );

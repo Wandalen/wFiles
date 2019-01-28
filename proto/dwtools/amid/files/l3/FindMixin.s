@@ -1841,7 +1841,10 @@ function filesReflectEvaluate_body( o )
 
         if( o.dstRewritingPreserving )
         if( o.writing && o.dstRewriting && o.dstRewritingByDistinct )
-        throw _.err( 'Can\'t rewrite terminal file ' + record.dst.absolute + ' by directory ' + record.src.absolute + ', dstRewritingPreserving is enabled' );
+        {
+          debugger;
+          throw _.err( 'Can\'t rewrite terminal file ' + record.dst.absolute + ' by directory ' + record.src.absolute + ', dstRewritingPreserving is enabled' );
+        }
 
         if( !record.src.isActual && record.dst.isActual )
         if( record.touch === 'constructive' )
@@ -2910,26 +2913,43 @@ function filesReflect_pre( routine, args )
 
   /* */
 
+  if( o.reflectMap === null && _.mapIs( o.srcFilter.filePath ) )
+  {
+    o.reflectMap = o.srcFilter.filePath;
+    o.srcFilter.filePath = null;
+  }
+
+  debugger;
   if( o.reflectMap === null )
   {
     debugger;
 
+    if( o.srcFilter.filePath === null )
+    o.srcFilter.filePath = o.srcFilter.prefixPath;
+    if( o.dstFilter.filePath === null )
+    o.dstFilter.filePath = o.dstFilter.prefixPath;
+
+    _.assert( _.strIs( o.srcFilter.filePath ) || _.arrayIs( o.srcFilter.filePath ) );
+    _.assert( _.strIs( o.dstFilter.filePath ) || _.arrayIs( o.dstFilter.filePath ) );
+
     o.srcFilter._formBasePath();
     o.dstFilter._formBasePath();
 
-    _.assert( _.strIs( o.srcFilter.filePath ) );
-    _.assert( _.strIs( o.dstFilter.filePath ) );
+    _.assert( _.strIs( o.srcFilter.filePath ) || _.arrayIs( o.srcFilter.filePath ) );
+    _.assert( _.strIs( o.dstFilter.filePath ) || _.arrayIs( o.dstFilter.filePath ) );
 
     if( self instanceof _.FileProvider.Hub )
-    o.reflectMap = { [ o.srcFilter.effectiveFileProvider.globalFromLocal( o.srcFilter.filePath ) ] : o.dstFilter.effectiveFileProvider.globalFromLocal( o.dstFilter.filePath ) }
-    else
-    o.reflectMap = { [ o.srcFilter.filePath ] : o.dstFilter.filePath }
+    {
+      o.srcFilter.globalsFromLocals();
+      o.dstFilter.globalsFromLocals();
+    }
 
-    debugger;
+    o.reflectMap = path.fileMapExtend( null, o.srcFilter.filePath, o.dstFilter.filePath );
+
   }
   else
   {
-    o.reflectMap = path.globMapExtend( null, o.reflectMap );
+    o.reflectMap = path.fileMapExtend( null, o.reflectMap );
     o.srcFilter.filePath = _.mapKeys( o.reflectMap );
     o.dstFilter.filePath = _.arrayFlattenOnce( _.mapVals( o.reflectMap ) ).filter( ( e ) => _.strIs( e ) ? e : false );
   }
@@ -2975,51 +2995,54 @@ function filesReflect_body( o )
 
   /* */
 
-  let groupedGlobMap = path.globMapGroupByDst( o.reflectMap );
+  let groupedGlobMap = path.fileMapGroupByDst( o.reflectMap );
   for( let dstPath in groupedGlobMap )
   {
 
     let srcPath = groupedGlobMap[ dstPath ];
     let o2 = _.mapOnly( o, self.filesReflectSingle.body.defaults );
 
-    o2.srcFilter = o2.srcFilter.clone();
-    o2.dstFilter = o2.dstFilter.clone();
     o2.result = [];
+
     _.assert( _.arrayIs( o2.result ) );
 
-    o2.srcPath = srcPath;
-    o2.srcFilter.inFilePath = srcPath;
-
-    // if( !( self instanceof _.FileProvider.Hub ) && !o2.srcFilter.effectiveFileProvider )
-    // o2.srcFilter.effectiveFileProvider = self;
-    // debugger;
+    /* */
 
     try
     {
-      // debugger;
+      o2.srcFilter = o2.srcFilter.clone();
+      o2.srcFilter.inFilePath = srcPath;
       o2.srcFilter.form();
+      o2.srcPath = o2.srcFilter.stemPath;
     }
     catch( err )
     {
       throw _.err( 'Failed to form source filter\n', err );
     }
-    o2.srcPath = o2.srcFilter.stemPath;
 
-    o2.dstPath = dstPath;
-    o2.dstFilter.inFilePath = dstPath;
-
-    // if( !( self instanceof _.FileProvider.Hub ) && !o2.dstFilter.effectiveFileProvider )
-    // o2.dstFilter.effectiveFileProvider = self;
+    /* */
 
     try
     {
+      o2.dstFilter = o2.dstFilter.clone();
+      if( _.mapIs( o2.dstFilter.basePath ) )
+      for( let dstPath2 in groupedGlobMap )
+      if( dstPath !== dstPath2 )
+      {
+        _.assert( !!o2.dstFilter.basePath );
+        _.assert( _.strIs( o2.dstFilter.basePath[ dstPath2 ] ), () => 'No base path for ' + dstPath2 );
+        delete o2.dstFilter.basePath[ dstPath2 ];
+      }
+      o2.dstFilter.inFilePath = dstPath;
       o2.dstFilter.form();
+      o2.dstPath = o2.dstFilter.stemPath;
     }
     catch( err )
     {
       throw _.err( 'Failed to form destination filter\n', err );
     }
-    o2.dstPath = o2.dstFilter.stemPath;
+
+    /* */
 
     let src = o2.srcFilter.effectiveFileProvider;
     let r = src.filesReflectSingle.body.call( src, o2 );
@@ -3730,11 +3753,9 @@ function filesDelete_body( o )
       for( let f2 = f1 ; f2 >= 0 ; f2-- )
       {
         let file2 = o.result[ f2 ];
-        if( file2.relative === '.' )
-        debugger;
+        // if( file2.relative === '.' ) /* ? */
         if( _.strBegins( file1.absolute, file2.absolute ) )
         {
-          debugger;
           o.result.splice( f2, 1 );
           f1 -=1 ;
         }

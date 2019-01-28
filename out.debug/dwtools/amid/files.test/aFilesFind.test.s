@@ -2029,7 +2029,7 @@ function filesFind2( test )
   });
   test.identical( got, [] );
 
-  /*terminalPath - directory, orderingExclusion mask, maskTerminal null, expected order Caching->terminals*/
+  /*terminalPath - directory, orderingExclusion mask, maskTerminal null, expected order Caching->Files*/
 
   var orderingExclusion = [ 'src', 'dir3' ];
   got = provider.filesFind
@@ -2812,10 +2812,14 @@ function filesFindResolving( test )
 {
   let context = this;
   let provider = context.provider;
+
   let hub = context.hub;
   let path = context.provider.path;
   let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
-  let terminalPath = path.join( testPath, 'terminal' );
+
+  // let path = context.provider.path;
+  // var testPath = path.join( context.testSuitePath, test.name );
+  // var terminalPath = path.join( testPath, 'file' );
 
   var softLinkIsSupported = context.softLinkIsSupported();
 
@@ -3214,7 +3218,7 @@ function filesFindResolving( test )
 
   //
 
-  test.case = 'text->text->terminal, resolvingSoftLink : 1, resolvingTextLink : 1, usingTextLink : 1';
+  test.case = 'text->text->file, resolvingSoftLink : 1, resolvingTextLink : 1, usingTextLink : 1';
   provider.filesDelete( testPath );
   provider.fileWrite( terminalPath, terminalPath );
   var srcFilePath = terminalPath;
@@ -3279,32 +3283,32 @@ function filesFindResolving( test )
     resolvingSoftLink : 0,
     resolvingTextLink : 0,
   }
-  var o2 = _.mapExtend( o, fixedOptions );
+  var options = _.mapExtend( o, fixedOptions );
   provider.fieldPush( 'usingTextLink', 0 );
   var softLink = path.join( testPath, 'link' );
   var srcPath = terminalPath;
   provider.softLink( softLink, srcPath );
-  var files = provider.filesFind( o2 );
+  var files = provider.filesFind( options );
   var filtered = files.map( recordSimplify );
   var expected =
   [
     {
       absolute : testPath,
       real : testPath,
-      isDir : true,
-    },
-    {
-      absolute : softLink,
-      real : softLink,
-      isDir : false,
+      isDir : true
     },
     {
       absolute : terminalPath,
       real : terminalPath,
-      isDir : false,
-    }
+      isDir : false
+    },
+    {
+      absolute : softLink,
+      real : softLink,
+      isDir : false
+    },
   ]
-  test.identical( filtered, expected );
+  test.identical( filtered, expected )
   var srcFileStat = provider.statResolvedRead( terminalPath );
   var softLinkStat = findRecord( files, 'absolute', softLink ).stat;
   test.is( srcFileStat.ino !== softLinkStat.ino );
@@ -3336,17 +3340,17 @@ function filesFindResolving( test )
       isDir : true
     },
     {
-      absolute : softLink,
-      real : terminalPath,
-      isDir : false
-    },
-    {
       absolute : terminalPath,
       real : terminalPath,
       isDir : false
     },
+    {
+      absolute : softLink,
+      real : terminalPath,
+      isDir : false
+    },
   ]
-  test.identical( filtered, expected );
+  test.identical( filtered, expected )
   var srcFileStat = provider.statResolvedRead( terminalPath );
   var softLinkStat = findRecord( files, 'absolute', softLink ).stat;
   test.identical( srcFileStat.ino, softLinkStat.ino );
@@ -3379,12 +3383,12 @@ function filesFindResolving( test )
       isDir : true
     },
     {
-      absolute : softLink,
+      absolute : terminalPath,
       real : terminalPath,
       isDir : false
     },
     {
-      absolute : terminalPath,
+      absolute : softLink,
       real : terminalPath,
       isDir : false
     },
@@ -3403,7 +3407,7 @@ function filesFindResolving( test )
   var softLink = path.join( testPath, 'linkToDir' );
   provider.fieldPush( 'usingTextLink', 0 );
   provider.filesDelete( testPath );
-  terminalPath = path.join( srcDirPath, 'terminal' );
+  terminalPath = path.join( srcDirPath, 'file' );
   provider.fileWrite( terminalPath, terminalPath );
   var o =
   {
@@ -3459,7 +3463,7 @@ function filesFindResolving( test )
   var softLink = path.join( testPath, 'linkToDir' );
   provider.fieldPush( 'usingTextLink', 1 );
   provider.filesDelete( testPath );
-  terminalPath = path.join( srcDirPath, 'terminal' );
+  terminalPath = path.join( srcDirPath, 'file' );
   provider.fileWrite( terminalPath, terminalPath );
   var o =
   {
@@ -3727,7 +3731,7 @@ function filesFindResolving( test )
 
   //
 
-  test.case = 'soft->text->terminal, resolvingSoftLink : 1, resolvingTextLink : 1, usingTextLink : 1';
+  test.case = 'soft->text->file, resolvingSoftLink : 1, resolvingTextLink : 1, usingTextLink : 1';
   provider.filesDelete( testPath );
   terminalPath = path.join( testPath, 'file' );
   provider.fileWrite( terminalPath, terminalPath );
@@ -3781,10 +3785,9 @@ function filesFindResolving( test )
 
   //
 
-  test.case = 'soft->text->terminal, resolvingSoftLink : 1, resolvingTextLink : 1, usingTextLink : 1';
+  test.case = 'soft->text->file, resolvingSoftLink : 1, resolvingTextLink : 1, usingTextLink : 1';
   var srcDirPath = path.join( testPath, 'dir' );
-  terminalPath = path.join( srcDirPath, 'terminal' );
-  // terminalPath = path.join( srcDirPath, 'file' ); /* qqq : should be terminal. it confuses */
+  terminalPath = path.join( srcDirPath, 'file' );
   provider.filesDelete( testPath );
   provider.fileWrite( terminalPath, terminalPath );
   var textLinkPath = path.join( testPath, 'textLink' );
@@ -3825,7 +3828,7 @@ function filesFindResolving( test )
       isDir : true
     },
     {
-      absolute : path.join( softLinkPath, 'terminal' ),
+      absolute : path.join( softLinkPath, 'file' ),
       real : terminalPath,
       isDir : false
     },
@@ -3834,8 +3837,9 @@ function filesFindResolving( test )
       real : srcDirPath,
       isDir : true
     },
+
     {
-      absolute : path.join( textLinkPath, 'terminal' ),
+      absolute : path.join( textLinkPath, 'file' ),
       real : terminalPath,
       isDir : false
     },
@@ -10527,7 +10531,7 @@ function filesReflector( test )
   var reflect = hub.filesReflector
   ({
     srcFilter : { prefixPath : 'src:///', basePath : 'src:///' },
-    dstFilter : { prefixPath : 'current://' + testPath, basePath : 'current://' + testPath + '/a/b' },
+    dstFilter : { prefixPath : 'current://' + testPath, basePath : 'current://' + testPath + '/a/b' }, // xxx
   });
   reflect( '/alt/a' )
   var extract = provider.filesExtract( testPath );
@@ -10826,73 +10830,23 @@ function filesReflectLinkWithHub( test )
 
 //
 
-function filesReflectDeducing( test )
+function filesReflectWithPrefix( test )
 {
   var c = this;
-
-  /* */
-
-  test.case = 'both prefixes defined, relative dst and src';
-
-  var tree =
-  {
-    src : { srcDir : { a : 'src/a', b : 'src/b' }, c : 'src/c', d : 'src/d' },
-    dst : { dstDir : { a : 'dst/a', c : 'dst/c' } },
-  }
-
-  var o =
-  {
-    reflectMap :
-    {
-      '.' : '.',
-    },
-    srcFilter :
-    {
-      prefixPath : '/src/srcDir',
-    },
-    dstFilter :
-    {
-      prefixPath : '/dst/dstDir2',
-    },
-  }
-
-  var provider = new _.FileProvider.Extract({ filesTree : tree });
-  var records = provider.filesReflect( o );
-
-  var expectedTree =
-  {
-    src : { srcDir : { a : 'src/a', b : 'src/b' }, c : 'src/c', d : 'src/d',  },
-    dst : { dstDir : { a : 'dst/a', c : 'dst/c' }, dstDir2 : { a : 'src/a', b : 'src/b' } },
-  }
-  test.identical( provider.filesTree, expectedTree );
-
-  var expectedDstAbsolute = [ '/dst/dstDir2', '/dst/dstDir2/a', '/dst/dstDir2/b' ];
-  var expectedSrcAbsolute = [ '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b' ];
-  var expectedEffAbsolute = [ '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b' ];
-
-  var dstAbsolute = _.select( records, '*/dst/absolute' );
-  var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
-
-  test.identical( dstAbsolute, expectedDstAbsolute );
-  test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
-
-  /* */
 
   test.case = 'both prefixes defined, relative dst';
 
   var tree =
   {
-    src : { srcDir : { a : 'src/a', b : 'src/b' }, c : 'src/c', d : 'src/d',  },
-    dst : { dstDir : { a : 'dst/a', c : 'dst/c' } },
+    src : { srcPath : { a : 'dst/a', b : 'dst/b' }, c : 'src/c', d : 'src/d',  },
+    dst : { dstPath : { a : 'dst/a', b : 'dst/b' } },
   }
 
   var o =
   {
     reflectMap :
     {
-      '/src/srcDir' : '.',
+      '/src/srcPath' : '.',
     },
     srcFilter :
     {
@@ -10905,209 +10859,32 @@ function filesReflectDeducing( test )
   }
 
   var provider = new _.FileProvider.Extract({ filesTree : tree });
+  debugger;
   var records = provider.filesReflect( o );
+  debugger;
 
   var expectedTree =
   {
-    src : { srcDir : { a : 'src/a', b : 'src/b' }, c : 'src/c', d : 'src/d',  },
-    dst : { dstDir : { a : 'dst/a', c : 'dst/c' }, dstDir2 : { a : 'src/a', b : 'src/b' } },
+    src : { srcPath : { a : 'dst/a', b : 'dst/b' }, c : 'src/c', d : 'src/d',  },
+    dst : { dstPath : { a : 'dst/a', b : 'dst/b' }, dstDir2 : { a : 'dst/a', b : 'dst/b' } },
   }
   test.identical( provider.filesTree, expectedTree );
+
+  debugger;
 
   var expectedDstAbsolute = [ '/dst/dstDir2', '/dst/dstDir2/a', '/dst/dstDir2/b' ];
-  var expectedSrcAbsolute = [ '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b' ];
-  var expectedEffAbsolute = [ '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b' ];
+  var expectedSrcAbsolute = [ '/src/srcPath', '/src/srcPath/a', '/src/srcPath/b' ];
+  var expectedEffAbsolute = [ '/src/srcPath', '/src/srcPath/a', '/src/srcPath/b' ];
 
-  var dstAbsolute = _.select( records, '*/dst/absolute' );
-  var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
-
-  test.identical( dstAbsolute, expectedDstAbsolute );
-  test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
-
-  /* */
-
-  test.case = 'no reflect map, single path';
-
-  var tree =
-  {
-    src : { srcDir : { a : 'src/a', b : 'src/b' }, c : 'src/c', d : 'src/d',  },
-    dst : { dstDir : { a : 'dst/a', c : 'dst/c' } },
-  }
-
-  var o =
-  {
-    reflectMap : null,
-    srcFilter :
-    {
-      filePath : '/src/srcDir',
-    },
-    dstFilter :
-    {
-      filePath : '/dst/dstDir2',
-    },
-  }
-
-  var provider = new _.FileProvider.Extract({ filesTree : tree });
-  var records = provider.filesReflect( o );
-
-  var expectedTree =
-  {
-    src : { srcDir : { a : 'src/a', b : 'src/b' }, c : 'src/c', d : 'src/d',  },
-    dst : { dstDir : { a : 'dst/a', c : 'dst/c' }, dstDir2 : { a : 'src/a', b : 'src/b' } },
-  }
-  test.identical( provider.filesTree, expectedTree );
-
-  var expectedDstAbsolute = [ '/dst/dstDir2', '/dst/dstDir2/a', '/dst/dstDir2/b' ];
-  var expectedSrcAbsolute = [ '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b' ];
-  var expectedEffAbsolute = [ '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b' ];
-
-  var dstAbsolute = _.select( records, '*/dst/absolute' );
-  var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  var dstAbsolute = c.select( records, '*.dst.absolute' );
+  var srcAbsolute = c.select( records, '*.src.absolute' );
+  var effAbsolute = c.select( records, '*.effective.absolute' );
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
   test.identical( effAbsolute, expectedEffAbsolute );
 
-  /* */
-
-  test.case = 'no reflect map, single path';
-
-  var tree =
-  {
-    src : { srcDir : { a : 'src/a', b : 'src/b' }, c : 'src/c', d : 'src/d',  },
-    dst : { dstDir : { a : 'dst/a', c : 'dst/c' } },
-  }
-
-  var o =
-  {
-    reflectMap : null,
-    srcFilter :
-    {
-      prefixPath : '/src',
-      filePath : { 'srcDir' : 'dstDir2' },
-    },
-    dstFilter :
-    {
-      prefixPath : '/dst',
-    },
-  }
-
-  var provider = new _.FileProvider.Extract({ filesTree : tree });
-  var records = provider.filesReflect( o );
-
-  var expectedTree =
-  {
-    src : { srcDir : { a : 'src/a', b : 'src/b' }, c : 'src/c', d : 'src/d',  },
-    dst : { dstDir : { a : 'dst/a', c : 'dst/c' }, dstDir2 : { a : 'src/a', b : 'src/b' } },
-  }
-  test.identical( provider.filesTree, expectedTree );
-
-  var expectedDstAbsolute = [ '/dst/dstDir2', '/dst/dstDir2/a', '/dst/dstDir2/b' ];
-  var expectedSrcAbsolute = [ '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b' ];
-  var expectedEffAbsolute = [ '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b' ];
-
-  var dstAbsolute = _.select( records, '*/dst/absolute' );
-  var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
-
-  test.identical( dstAbsolute, expectedDstAbsolute );
-  test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
-
-  /* */
-
-  test.case = 'no reflect map, multiple paths';
-
-  var tree =
-  {
-    src : { srcDir : { a : 'src/a', b : 'src/b' }, srcDir2 : { e : 'src/e' }, c : 'src/c', d : 'src/d',  },
-    dst : { dstDir : { a : 'dst/a', c : 'dst/c' } },
-  }
-
-  var o =
-  {
-    reflectMap : null,
-    srcFilter :
-    {
-      filePath : [ '/src/srcDir', '/src/srcDir2' ],
-    },
-    dstFilter :
-    {
-      filePath : [ '/dst/dstDir', '/dst/dstDir2' ]
-    },
-  }
-
-  var provider = new _.FileProvider.Extract({ filesTree : tree });
-  var records = provider.filesReflect( o );
-
-  var expectedTree =
-  {
-    src : { srcDir : { a : 'src/a', b : 'src/b' }, srcDir2 : { e : 'src/e' }, c : 'src/c', d : 'src/d',  },
-    dst : { dstDir : { a : 'src/a', b : 'src/b', c : 'dst/c', e : 'src/e' }, dstDir2 : { a : 'src/a', b : 'src/b', e : 'src/e' } },
-  }
-  test.identical( provider.filesTree, expectedTree );
-
-  var expectedDstAbsolute = [ '/dst/dstDir', '/dst/dstDir/a', '/dst/dstDir/b', '/dst/dstDir', '/dst/dstDir/e', '/dst/dstDir2', '/dst/dstDir2/a', '/dst/dstDir2/b', '/dst/dstDir2', '/dst/dstDir2/e' ];
-  var expectedSrcAbsolute = [ '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b', '/src/srcDir2', '/src/srcDir2/e', '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b', '/src/srcDir2', '/src/srcDir2/e' ];
-  var expectedEffAbsolute = [ '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b', '/src/srcDir2', '/src/srcDir2/e', '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b', '/src/srcDir2', '/src/srcDir2/e' ];
-
-  var dstAbsolute = _.select( records, '*/dst/absolute' );
-  var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
-
-  test.identical( dstAbsolute, expectedDstAbsolute );
-  test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
-
-  /* */
-
-  test.case = 'no reflect map, multiple paths, hub';
-
-  var tree =
-  {
-    src : { srcDir : { a : 'src/a', b : 'src/b' }, srcDir2 : { e : 'src/e' }, c : 'src/c', d : 'src/d',  },
-    dst : { dstDir : { a : 'dst/a', c : 'dst/c' } },
-  }
-
-  var o =
-  {
-    reflectMap : null,
-    srcFilter :
-    {
-      filePath : [ 'extract:///src/srcDir', 'extract:///src/srcDir2' ],
-    },
-    dstFilter :
-    {
-      filePath : [ 'extract:///dst/dstDir', 'extract:///dst/dstDir2' ]
-    },
-  }
-
-  var provider = new _.FileProvider.Extract({ filesTree : tree, protocol : 'extract' });
-  var hub = new _.FileProvider.Hub({ providers : [ provider ] });
-  var records = hub.filesReflect( o );
-
-  var expectedTree =
-  {
-    src : { srcDir : { a : 'src/a', b : 'src/b' }, srcDir2 : { e : 'src/e' }, c : 'src/c', d : 'src/d',  },
-    dst : { dstDir : { a : 'src/a', b : 'src/b', c : 'dst/c', e : 'src/e' }, dstDir2 : { a : 'src/a', b : 'src/b', e : 'src/e' } },
-  }
-
-  test.identical( provider.filesTree, expectedTree );
-
-  var expectedDstAbsolute = [ '/dst/dstDir', '/dst/dstDir/a', '/dst/dstDir/b', '/dst/dstDir', '/dst/dstDir/e', '/dst/dstDir2', '/dst/dstDir2/a', '/dst/dstDir2/b', '/dst/dstDir2', '/dst/dstDir2/e' ];
-  var expectedSrcAbsolute = [ '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b', '/src/srcDir2', '/src/srcDir2/e', '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b', '/src/srcDir2', '/src/srcDir2/e' ];
-  var expectedEffAbsolute = [ '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b', '/src/srcDir2', '/src/srcDir2/e', '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b', '/src/srcDir2', '/src/srcDir2/e' ];
-
-  var dstAbsolute = _.select( records, '*/dst/absolute' );
-  var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
-
-  test.identical( dstAbsolute, expectedDstAbsolute );
-  test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  debugger;
 
 }
 
@@ -15877,7 +15654,7 @@ var Self =
     filesReflector,
     filesReflectWithHub,
     filesReflectLinkWithHub,
-    filesReflectDeducing,
+    filesReflectWithPrefix,
     filesReflectDstPreserving,
     filesReflectDstDeletingDirs,
     filesReflectLinked,

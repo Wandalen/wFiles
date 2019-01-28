@@ -12319,113 +12319,113 @@ function filesDelete( test )
   var terminalPath = path.join( testPath, 'terminal' );
   var dirPath = path.join( testPath, 'dir' );
 
-  // /* */
-  //
-  // test.case = 'delete all files of extract';
-  //
-  // var extract1 = _.FileProvider.Extract
-  // ({
-  //   filesTree :
-  //   {
-  //     f : 'f',
-  //     dir : { df : 'df' },
-  //   },
-  // });
-  //
-  // extract1.filesDelete( '/' );
-  //
-  // test.identical( extract1.filesTree, {} );
-  //
-  // /* */
-  //
-  // test.case = 'delete terminal file';
-  // provider.fileWrite( terminalPath, 'a' );
-  // var deleted = provider.filesDelete( terminalPath );
-  // test.identical( _.select( deleted, '*/relative' ), [ './terminal' ] );
-  // var stat = provider.statResolvedRead( terminalPath );
-  // test.identical( stat, null );
-  //
-  // /* */
-  //
-  // test.case = 'delete empty dir';
-  // provider.dirMake( dirPath );
-  // provider.filesDelete( dirPath );
-  // var stat = provider.statResolvedRead( dirPath );
-  // test.identical( stat, null );
-  //
-  // /* */
-  //
-  // test.case = 'delete hard link';
-  // provider.filesDelete( testPath );
-  // var dst = path.join( testPath, 'link' );
-  // provider.fileWrite( terminalPath, 'a');
-  // provider.hardLink( dst, terminalPath );
-  // provider.filesDelete( dst );
-  // var stat = provider.statResolvedRead( dst );
-  // test.identical( stat, null );
-  // var stat = provider.statResolvedRead( terminalPath );
-  // test.is( !!stat );
-  //
-  // /* */
-  //
-  // test.case = 'delete tree';
-  // var extract = _.FileProvider.Extract
-  // ({
-  //
-  //   protocol : 'src',
-  //   filesTree :
-  //   {
-  //     'src' :
-  //     {
-  //       'a.a' : 'a',
-  //       'b1.b' : 'b1',
-  //       'b2.b' : 'b2x',
-  //       'c' :
-  //       {
-  //         'b3.b' : 'b3x',
-  //         'e' : { 'd2.d' : 'd2x', 'e1.e' : 'd1' },
-  //         'srcfile' : 'srcfile',
-  //         'srcdir' : {},
-  //         'srcdir-dstfile' : { 'srcdir-dstfile-file' : 'srcdir-dstfile-file' },
-  //         'srcfile-dstdir' : 'x',
-  //       }
-  //     }
-  //   }
-  //
-  // });
-  //
-  // test.identical( provider.protocol, 'current' );
-  // extract.providerRegisterTo( hub );
-  // provider.filesDelete( testPath );
-  // hub.filesReflect({ reflectMap : { 'src:///' : 'current://' + testPath } });
-  // test.identical( provider.dirRead( testPath ), [ 'src' ] );
-  // var deleted = provider.filesDelete( testPath );
-  // var expectedDeleted =
-  // [
-  //   '.',
-  //   './src',
-  //   './src/a.a',
-  //   './src/b1.b',
-  //   './src/b2.b',
-  //   './src/c',
-  //   './src/c/b3.b',
-  //   './src/c/srcfile',
-  //   './src/c/srcfile-dstdir',
-  //   './src/c/e',
-  //   './src/c/e/d2.d',
-  //   './src/c/e/e1.e',
-  //   './src/c/srcdir',
-  //   './src/c/srcdir-dstfile',
-  //   './src/c/srcdir-dstfile/srcdir-dstfile-file'
-  // ];
-  // test.identical( _.select( deleted, '*/relative' ), expectedDeleted );
-  // test.identical( provider.dirRead( testPath ), null );
-  // var stat = provider.statResolvedRead( testPath );
-  // test.identical( stat, null );
-  // extract.finit();
-  // test.identical( _.mapKeys( hub.providersWithProtocolMap ), [ 'current' ] );
-  //
-  // /* */
+  /* */
+
+  test.case = 'delete all files of extract';
+
+  var extract1 = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      f : 'f',
+      dir : { df : 'df' },
+    },
+  });
+
+  extract1.filesDelete( '/' );
+
+  test.identical( extract1.filesTree, {} );
+
+  /* */
+
+  test.case = 'delete terminal file';
+  provider.fileWrite( terminalPath, 'a' );
+  var deleted = provider.filesDelete( terminalPath );
+  test.identical( _.select( deleted, '*/relative' ), [ './terminal' ] );
+  var stat = provider.statResolvedRead( terminalPath );
+  test.identical( stat, null );
+
+  /* */
+
+  test.case = 'delete empty dir';
+  provider.dirMake( dirPath );
+  provider.filesDelete( dirPath );
+  var stat = provider.statResolvedRead( dirPath );
+  test.identical( stat, null );
+
+  /* */
+
+  test.case = 'delete hard link';
+  provider.filesDelete( testPath );
+  var dst = path.join( testPath, 'link' );
+  provider.fileWrite( terminalPath, 'a');
+  provider.hardLink( dst, terminalPath );
+  provider.filesDelete( dst );
+  var stat = provider.statResolvedRead( dst );
+  test.identical( stat, null );
+  var stat = provider.statResolvedRead( terminalPath );
+  test.is( !!stat );
+
+  /* */
+
+  test.case = 'delete tree';
+  var extract = _.FileProvider.Extract
+  ({
+
+    protocol : 'src',
+    filesTree :
+    {
+      'src' :
+      {
+        'a.a' : 'a',
+        'b1.b' : 'b1',
+        'b2.b' : 'b2x',
+        'c' :
+        {
+          'b3.b' : 'b3x',
+          'e' : { 'd2.d' : 'd2x', 'e1.e' : 'd1' },
+          'srcfile' : 'srcfile',
+          'srcdir' : {},
+          'srcdir-dstfile' : { 'srcdir-dstfile-file' : 'srcdir-dstfile-file' },
+          'srcfile-dstdir' : 'x',
+        }
+      }
+    }
+
+  });
+
+  test.identical( provider.protocol, 'current' );
+  extract.providerRegisterTo( hub );
+  provider.filesDelete( testPath );
+  hub.filesReflect({ reflectMap : { 'src:///' : 'current://' + testPath } });
+  test.identical( provider.dirRead( testPath ), [ 'src' ] );
+  var deleted = provider.filesDelete( testPath );
+  var expectedDeleted =
+  [
+    '.',
+    './src',
+    './src/a.a',
+    './src/b1.b',
+    './src/b2.b',
+    './src/c',
+    './src/c/b3.b',
+    './src/c/srcfile',
+    './src/c/srcfile-dstdir',
+    './src/c/e',
+    './src/c/e/d2.d',
+    './src/c/e/e1.e',
+    './src/c/srcdir',
+    './src/c/srcdir-dstfile',
+    './src/c/srcdir-dstfile/srcdir-dstfile-file'
+  ];
+  test.identical( _.select( deleted, '*/relative' ), expectedDeleted );
+  test.identical( provider.dirRead( testPath ), null );
+  var stat = provider.statResolvedRead( testPath );
+  test.identical( stat, null );
+  extract.finit();
+  test.identical( _.mapKeys( hub.providersWithProtocolMap ), [ 'current' ] );
+
+  /* */
 
   test.case = 'delete tree with filter';
   var extract = _.FileProvider.Extract
@@ -12458,9 +12458,7 @@ function filesDelete( test )
   provider.filesDelete( testPath );
   hub.filesReflect({ reflectMap : { 'src:///' : 'current://' + testPath } });
   test.identical( provider.dirRead( testPath ), [ 'src' ] );
-  debugger;
   var deleted = provider.filesDelete({ filter : { filePath : testPath, maskAll : { excludeAny : '/c' } } });
-  debugger;
   var expectedDeleted =
   [
     './src/a.a',
@@ -12490,8 +12488,6 @@ function filesDelete( test )
   test.identical( files, expectedFiles );
   extract.finit();
   test.identical( _.mapKeys( hub.providersWithProtocolMap ), [ 'current' ] );
-
-  debugger; return; xxx
 
   /* */
 

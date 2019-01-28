@@ -3753,7 +3753,7 @@ function filesDelete_body( o )
       for( let f2 = f1 ; f2 >= 0 ; f2-- )
       {
         let file2 = o.result[ f2 ];
-        if( file2.relative === '.' )
+        // if( file2.relative === '.' ) /* ? */
         if( _.strBegins( file1.absolute, file2.absolute ) )
         {
           o.result.splice( f2, 1 );

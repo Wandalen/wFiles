@@ -1875,7 +1875,7 @@ function statRead_body( o )
   // logger.log( 'statRead', o2.filePath );
 
   /* xxx qqq : add option sync */
-  /* xxx aaa : implemented basic wrapper for sync, needs improvement */
+  /* xxx aaa : done */
   let result = self.pathResolveLinkFull( o2 );
 
   if( o.sync )
@@ -5264,6 +5264,11 @@ function _link_functor( gen )
       c.con1 = new _.Consequence().take( null );
       c.con2 = new _.Consequence();
       // qqq : why two?
+      /* aaa : to split execution into veryfication and linking:
+      linking stage needs own exception handler,
+      linking stage will not be launched if error was thrown on veryfication or stage ended early
+      */
+
     }
 
     Object.preventExtensions( c );

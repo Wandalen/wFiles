@@ -168,12 +168,8 @@ function _formBasePath()
   _.assert( _.objectIs( filter ) );
   _.assert( filter.formed === 2 );
 
-  debugger;
-
   filter.prefixesApply();
   filter.stemPath = filter.pathsNormalize();
-
-  debugger;
 
   filter.formed = 3;
 }
@@ -703,6 +699,8 @@ function pathsInherit( src )
   if( !( src instanceof Self ) )
   src = fileProvider.recordFilter( src );
 
+  // debugger;
+
   src.prefixesApply();
   filter.prefixesApply();
 
@@ -1228,16 +1226,32 @@ function filePathMultiplyRelatives( filePath, basePath )
 
 //
 
+function filePathFromFixes()
+{
+  let filter = this;
+  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let path = fileProvider.path;
+
+  _.assert( arguments.length === 0 );
+
+  if( !filter.filePath )
+  {
+    // adjustingFilePath = false;
+    filter.filePath = path.s.join( filter.prefixPath || '.', filter.postfixPath || '.' );
+    _.assert( path.s.allAreAbsolute( filter.filePath ), 'Can deduce file path' );
+  }
+
+  return filter.filePath;
+}
+
+//
+
 function prefixesApply( o )
 {
   let filter = this;
   let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
   let path = fileProvider.path;
   let adjustingFilePath = true;
-
-  // if( filter.prefixPath === null )
-  // if( _.strIs( filter.basePath ) && path.isAbsolute( filter.basePath ) )
-  // filter.prefixPath = filter.basePath;
 
   if( filter.prefixPath === null && filter.postfixPath === null )
   return filter;
@@ -1247,13 +1261,19 @@ function prefixesApply( o )
   _.assert( filter.postfixPath === null || _.strIs( filter.postfixPath ) );
   _.assert( filter.postfixPath === null, 'not implemented' );
 
-  /* */
+  /* yyy */
+
+  // if( !filter.filePath )
+  // {
+  //   adjustingFilePath = false;
+  //   filter.filePath = path.s.join( filter.prefixPath || '.', filter.postfixPath || '.' );
+  //   _.assert( path.s.allAreAbsolute( filter.filePath ), 'Can deduce file path' );
+  // }
 
   if( !filter.filePath )
   {
     adjustingFilePath = false;
-    filter.filePath = path.s.join( filter.prefixPath || '.', filter.postfixPath || '.' );
-    _.assert( path.s.allAreAbsolute( filter.filePath ), 'Can deduce file path' );
+    filter.filePathFromFixes();
   }
 
   /* */
@@ -1265,27 +1285,18 @@ function prefixesApply( o )
 
   /* */
 
+  _.assert( filter.postfixPath === null || !path.s.AllAreGlob( filter.postfixPath ) );
+
+  if( adjustingFilePath )
   {
-
-    _.assert( filter.postfixPath === null || !path.s.AllAreGlob( filter.postfixPath ) );
-
-    if( adjustingFilePath )
-    {
-      let o2 = { basePath : 0, fixes : 0, filePath : 1, onEach : filePathEach }
-      filter.allPaths( o2 );
-    }
-
-    let o3 = { basePath : 1, fixes : 0, filePath : 0, onEach : basePathEach }
-    filter.allPaths( o3 );
-
+    let o2 = { basePath : 0, fixes : 0, filePath : 1, onEach : filePathEach }
+    filter.allPaths( o2 );
   }
 
-  /* */
+  let o3 = { basePath : 1, fixes : 0, filePath : 0, onEach : basePathEach }
+  filter.allPaths( o3 );
 
-  // if( _.strIs( filter.basePath ) )
-  // {
-  //   filter.basePath = filter.basePathNormalize( filter.filePath ); // xxx
-  // }
+  /* */
 
   filter.prefixPath = null;
   filter.postfixPath = null;
@@ -2046,6 +2057,7 @@ let Extend =
   basePathNormalize,
   filePathPrependBasePath,
   filePathMultiplyRelatives,
+  filePathFromFixes,
   prefixesApply,
 
   allPaths,

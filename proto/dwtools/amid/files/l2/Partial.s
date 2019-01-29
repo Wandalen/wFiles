@@ -1875,7 +1875,7 @@ function statRead_body( o )
   // logger.log( 'statRead', o2.filePath );
 
   /* xxx qqq : add option sync */
-  /* xxx aaa : implemented basic wrapper for sync, needs improvement */
+  /* xxx aaa : done */
   let result = self.pathResolveLinkFull( o2 );
 
   if( o.sync )
@@ -3069,6 +3069,7 @@ function dirRead_body( o )
   _.assert( _.arrayHas( [ 'record', 'absolute', 'relative' ], o.outputFormat ) )
   _.assertRoutineOptions( dirRead_body, arguments );
 
+  let filePath = o.filePath;
   let o2 = _.mapExtend( null, o );
   delete o2.outputFormat;
   delete o2.basePath;
@@ -3117,6 +3118,11 @@ function dirRead_body( o )
 
   function adjust( result )
   {
+    if( _.strIs( result ) )
+    {
+      filePath = self.path.dir( filePath );
+      result = [ result ];
+    }
 
     _.assert( _.arrayIs( result ) );
 
@@ -3138,17 +3144,17 @@ function dirRead_body( o )
     if( o.outputFormat === 'absolute' )
     result = result.map( function( relative )
     {
-      return self.path.join( o.filePath, relative );
+      return self.path.join( filePath, relative );
     });
     else if( o.outputFormat === 'record' )
     result = result.map( function( relative )
     {
-      return self.recordFactory({ dirPath : o.filePath, basePath : o.basePath }).record( relative );
+      return self.recordFactory({ dirPath : filePath, basePath : o.basePath }).record( relative );
     });
     else if( o.basePath )
     result = result.map( function( relative )
     {
-      return self.path.relative( o.basePath, self.path.join( o.filePath, relative ) );
+      return self.path.relative( o.basePath, self.path.join( filePath, relative ) );
     });
 
     return result;
@@ -5258,6 +5264,11 @@ function _link_functor( gen )
       c.con1 = new _.Consequence().take( null );
       c.con2 = new _.Consequence();
       // qqq : why two?
+      /* aaa : to split execution into veryfication and linking:
+      linking stage needs own exception handler,
+      linking stage will not be launched if error was thrown on veryfication or stage ended early
+      */
+
     }
 
     Object.preventExtensions( c );
@@ -5881,7 +5892,7 @@ function _link_functor( gen )
         ({
           filePath : tempPath,
           verbosity : 0,
-          // sync : o.sync, /* qqq : implement o.sync */
+          sync : o.sync, /* qqq : implement o.sync, aaa : done */
         });
       }
 
@@ -5937,7 +5948,16 @@ function _link_functor( gen )
         dstPath = self.path.join( dstPath, dstPathResolved );
       }
 
-      c.dstStat = self.statReadAct({ filePath : dstPath, throwing : 1, resolvingSoftLink : 0, sync : 1 });
+      c.dstStat = self.statReadAct({ filePath : dstPath, throwing : 0, resolvingSoftLink : 0, sync : 1 });
+
+      if( !c.dstStat && self.providersWithProtocolMap )
+      if( self.isLink( o.dstPath ) )
+      {
+        //Vova: temporary allow broken dst link for linking operation through Hub
+        let methodName = _.strReplaceAll( actMethodName, 'Act', '' );
+        self.logger.warn( 'Warning: Hub.' + methodName + '.validateSize failed to get stat for broken dst link:', dstPath );
+        return;
+      }
 
       _.assert( !!c.srcStat );
       _.assert( !!c.dstStat );

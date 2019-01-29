@@ -188,7 +188,7 @@ let FileWriteEncoders =
 
   'json' : writeJsonMin,
   'json.min' : writeJsonMin,
-  'json.raw' : writeJsonRaw,
+  'json.fine' : writeJsonRaw,
   'js.structure' : writeJsStrcuture,
 
 }

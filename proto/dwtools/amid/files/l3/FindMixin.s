@@ -2926,7 +2926,6 @@ function filesReflect_pre( routine, args )
     o.srcFilter.filePath = null;
   }
 
-  debugger;
   if( o.reflectMap === null )
   {
     debugger;

@@ -732,11 +732,6 @@ function pathResolveSoftLink_body( o )
   _.assert( !!o.filePath );
 
   /* should not have redundant conditions */
-  /* qqq : check does it cause problems */
-  /* aaa : no, Act version already has this check */
-
-  // if( !self.isSoftLink( o.filePath ) )
-  // return o.filePath;
 
   let result = self.pathResolveSoftLinkAct( o );
 
@@ -773,44 +768,6 @@ having.driving = 1;
 
 var operates = pathResolveTextLinkAct.operates  = Object.create( null );
 operates.filePath = { pathToRead : 1 };
-
-//
-
-/*
-qqq : ?
-aaa : old code
-*/
-
-// function _pathResolveTextLink( o )
-// {
-//   let self = this;
-
-//   _.assertRoutineOptions( _pathResolveTextLink, arguments );
-
-//   let result = self.pathResolveTextLinkAct
-//   ({
-//     filePath : o.filePath,
-//     // visited : [],
-//     // hasLink : false,
-//   });
-
-//   if( !result )
-//   return { resolved : false, originalFilePath : o.filePath, resolvedFilePath : null };
-
-//   _.assert( arguments.length === 1 || arguments.length === 2  );
-
-//   if( result && o.filePath[ 0 ] === '.' && !self.path.isAbsolute( result ) )
-//   result = './' + result;
-
-//   self.logger.log( 'pathResolveTextLink :', o.filePath, '->', result );
-
-//   return { resolved : true, originalFilePath : o.filePath, resolvedFilePath : result };
-// }
-
-// _pathResolveTextLink.defaults =
-// {
-//   filePath : null
-// }
 
 //
 
@@ -1282,12 +1239,6 @@ function pathResolveLinkTailChain_pre()
  - o.result has corresponding element before the iteration starts, the iteration check o.found and put new element ot o.found
 */
 
-/*
-  qqq : option preservingRelative:1 to preserve relative in path of soft link if happened to be so
-  !!! qqq : no duplicates
-  aaa : both implemented, test cases exist too
-*/
-
 function pathResolveLinkTailChain_body( o )
 {
   let self = this;
@@ -1308,23 +1259,16 @@ function pathResolveLinkTailChain_body( o )
   if( hub && hub !== self && path.isGlobal( o.filePath ) )
   return hub.pathResolveLinkTailChain.body.call( hub, o );
 
-  // if( _.strEnds( o.filePath, '/experiment/linkToDir1/file' ) )
-  // debugger;
-
   if( _.arrayHas( o.found, o.filePath ) )
   {
-    // o.err = { cycleInLinks : true }; /* xxx */ // used by Extract.statReadAct to get kind of error
-    debugger;
     if( o.throwing && !o.allowingCycled )
     {
       throw _.err( 'Links cycle at', _.strQuote( o.filePath ) );
     }
     else
     {
-      // o.result.push( o.filePath, null );
       o.found.push( o.filePath, null );
       o.result.push( null );
-      // o.found.push( null );
 
       if( o.allowingCycled )
       o.stat = self.statReadAct
@@ -1339,7 +1283,6 @@ function pathResolveLinkTailChain_body( o )
     }
   }
 
-  // // o.result.push( o.filePath );
   o.found.push( o.filePath );
 
   /*
@@ -1349,7 +1292,6 @@ function pathResolveLinkTailChain_body( o )
 
   if( !o.resolvingSoftLink && ( !o.resolvingTextLink || !self.usingTextLink ) )
   {
-    // o.result.push( o.filePath );
     return o.result;
   }
 
@@ -1366,11 +1308,10 @@ function pathResolveLinkTailChain_body( o )
 
   if( !o.stat )
   {
-    // o.result.push( o.filePath );
     o.result.push( null );
     o.found.push( null );
 
-    // if( o.result.length > 2 ) // should throw error if any part of chain does not exist
+    // should throw error if any part of chain does not exist
     if( o.throwing && !o.allowingMissed )
     {
       debugger;
@@ -1384,7 +1325,9 @@ function pathResolveLinkTailChain_body( o )
 
   if( o.resolvingSoftLink && o.stat.isSoftLink() )
   {
-    let filePath = self.pathResolveSoftLink({ filePath : o.filePath }); /* qqq : implement extended options vova : done for hd,extract */
+    let filePath = self.pathResolveSoftLink({ filePath : o.filePath });
+    /* qqq : implement extended options vova : done for hd,extract */
+    /* qqq : add test coverage, please */
     if( o.preservingRelative && !path.isAbsolute( filePath ) )
     {
       o.result.push( filePath );
@@ -1395,7 +1338,6 @@ function pathResolveLinkTailChain_body( o )
       o.filePath = path.join( o.filePath, filePath )
       o.result.push( o.filePath );
     }
-    // o.found.push( o.filePath );
     o.stat = null;
     return self.pathResolveLinkTailChain.body.call( self, o );
   }
@@ -1405,7 +1347,8 @@ function pathResolveLinkTailChain_body( o )
   if( self.usingTextLink )
   if( o.resolvingTextLink && o.stat.isTextLink() )
   {
-    let filePath = self.pathResolveTextLink({ filePath : o.filePath }); /* qqq : implement extended options */
+    let filePath = self.pathResolveTextLink({ filePath : o.filePath });
+    /* qqq : implement extended options */
     if( o.preservingRelative && !path.isAbsolute( filePath ) )
     {
       o.result.push( filePath );
@@ -1416,12 +1359,10 @@ function pathResolveLinkTailChain_body( o )
       o.filePath = path.join( o.filePath, filePath )
       o.result.push( o.filePath );
     }
-    // o.found.push( o.filePath );
     o.stat = null;
     return self.pathResolveLinkTailChain.body.call( self, o );
   }
 
-  // o.result.push( o.filePath );
   return o.result;
 }
 
@@ -1497,10 +1438,8 @@ function pathResolveLinkHeadDirect_body( o )
       resolvingSoftLink : 0,
     });
 
-    // if( self.isLink( o2.filePath ) )
     if( !o2.stat )
     {
-      // debugger;
       filePath = path.join.apply( path, _.arrayAppendArrays( [], [ filePath, splits.slice( i+1 ) ] ) );
       o.stat = null;
       break;
@@ -1875,7 +1814,7 @@ function statRead_body( o )
   // logger.log( 'statRead', o2.filePath );
 
   /* xxx qqq : add option sync */
-  /* xxx aaa : implemented basic wrapper for sync, needs improvement */
+  /* xxx aaa : done */
   let result = self.pathResolveLinkFull( o2 );
 
   if( o.sync )
@@ -3069,6 +3008,7 @@ function dirRead_body( o )
   _.assert( _.arrayHas( [ 'record', 'absolute', 'relative' ], o.outputFormat ) )
   _.assertRoutineOptions( dirRead_body, arguments );
 
+  let filePath = o.filePath;
   let o2 = _.mapExtend( null, o );
   delete o2.outputFormat;
   delete o2.basePath;
@@ -3117,6 +3057,11 @@ function dirRead_body( o )
 
   function adjust( result )
   {
+    if( _.strIs( result ) )
+    {
+      filePath = self.path.dir( filePath );
+      result = [ result ];
+    }
 
     _.assert( _.arrayIs( result ) );
 
@@ -3138,17 +3083,17 @@ function dirRead_body( o )
     if( o.outputFormat === 'absolute' )
     result = result.map( function( relative )
     {
-      return self.path.join( o.filePath, relative );
+      return self.path.join( filePath, relative );
     });
     else if( o.outputFormat === 'record' )
     result = result.map( function( relative )
     {
-      return self.recordFactory({ dirPath : o.filePath, basePath : o.basePath }).record( relative );
+      return self.recordFactory({ dirPath : filePath, basePath : o.basePath }).record( relative );
     });
     else if( o.basePath )
     result = result.map( function( relative )
     {
-      return self.path.relative( o.basePath, self.path.join( o.filePath, relative ) );
+      return self.path.relative( o.basePath, self.path.join( filePath, relative ) );
     });
 
     return result;
@@ -5258,6 +5203,11 @@ function _link_functor( gen )
       c.con1 = new _.Consequence().take( null );
       c.con2 = new _.Consequence();
       // qqq : why two?
+      /* aaa : to split execution into veryfication and linking:
+      linking stage needs own exception handler,
+      linking stage will not be launched if error was thrown on veryfication or stage ended early
+      */
+
     }
 
     Object.preventExtensions( c );
@@ -5881,7 +5831,7 @@ function _link_functor( gen )
         ({
           filePath : tempPath,
           verbosity : 0,
-          // sync : o.sync, /* qqq : implement o.sync */
+          sync : o.sync, /* qqq : implement o.sync, aaa : done */
         });
       }
 
@@ -5937,7 +5887,16 @@ function _link_functor( gen )
         dstPath = self.path.join( dstPath, dstPathResolved );
       }
 
-      c.dstStat = self.statReadAct({ filePath : dstPath, throwing : 1, resolvingSoftLink : 0, sync : 1 });
+      c.dstStat = self.statReadAct({ filePath : dstPath, throwing : 0, resolvingSoftLink : 0, sync : 1 });
+
+      if( !c.dstStat && self.providersWithProtocolMap )
+      if( self.isLink( o.dstPath ) )
+      {
+        //Vova: temporary allow broken dst link for linking operation through Hub
+        let methodName = _.strReplaceAll( actMethodName, 'Act', '' );
+        self.logger.warn( 'Warning: Hub.' + methodName + '.validateSize failed to get stat for broken dst link:', dstPath );
+        return;
+      }
 
       _.assert( !!c.srcStat );
       _.assert( !!c.dstStat );

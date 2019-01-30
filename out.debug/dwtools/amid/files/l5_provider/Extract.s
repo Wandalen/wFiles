@@ -373,7 +373,8 @@ function dirReadAct( o )
       }
       else
       {
-        result = [ self.path.name({ path : o.filePath, withExtension : 1 }) ];
+        // result = [ self.path.name({ path : o.filePath, withExtension : 1 }) ];
+        result = self.path.name({ path : o.filePath, withExtension : 1 });
       }
     }
     else

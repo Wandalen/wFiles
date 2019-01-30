@@ -149,7 +149,7 @@ let writeJsonMin =
   }
 }
 
-let writeJsonRaw =
+let writeJsonFine =
 {
   onBegin : function( e )
   {
@@ -188,7 +188,7 @@ let FileWriteEncoders =
 
   'json' : writeJsonMin,
   'json.min' : writeJsonMin,
-  'json.raw' : writeJsonRaw,
+  'json.fine' : writeJsonFine,
   'js.structure' : writeJsStrcuture,
 
 }

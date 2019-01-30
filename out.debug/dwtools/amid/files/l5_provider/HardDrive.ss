@@ -612,7 +612,8 @@ function dirReadAct( o )
       }
       else
       {
-        result = [ self.path.name({ path : o.filePath, withExtension : 1 }) ];
+        // result = [ self.path.name({ path : o.filePath, withExtension : 1 }) ];
+        result = self.path.name({ path : o.filePath, withExtension : 1 });
       }
     }
     catch ( err )
@@ -663,7 +664,8 @@ function dirReadAct( o )
       }
       else
       {
-        result = [ self.path.name({ path : o.filePath, withExtension : 1 }) ];
+        // result = [ self.path.name({ path : o.filePath, withExtension : 1 }) ];
+        result = self.path.name({ path : o.filePath, withExtension : 1 });
         con.take( result );
       }
     });

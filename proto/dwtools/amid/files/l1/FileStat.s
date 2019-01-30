@@ -90,16 +90,10 @@ function statsAreHardLinked( stat1, stat2 )
   _.assert( _.fileStatIs( stat1 ) );
   _.assert( _.fileStatIs( stat2 ) );
 
-  // if( !stat1.mtime ) /* ? */
-  // return null;
-
   /*
   ino comparison is not reliable test on nodejs below 10.5
   it's reliable only if ino is BigNumber
   */
-
-  // if( _.bigIntIs( stat1.ino ) )
-  // debugger;
 
   if( _.bigIntIs( stat1.ino ) )
   return stat1.ino === stat2.ino;
@@ -111,17 +105,10 @@ function statsAreHardLinked( stat1, stat2 )
   try to make a good guess if ino comprison is not possible
   */
 
-  /*
+  /* notes :
     should return true for comparing file with itself
     so nlink could be 1
   */
-
-  // qqq
-  // if( stat1.nlink < 2 )
-  // return false;
-  //
-  // if( stat2.nlink < 2 )
-  // return false;
 
   if( stat1.nlink !== stat2.nlink )
   return false;
@@ -146,54 +133,6 @@ function statsAreHardLinked( stat1, stat2 )
 
   return _.maybe;
 }
-
-// //
-//
-// function /*statsCouldBeLinked*/statsAreHardLinked( stat1, stat2 )
-// {
-//   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
-//   _.assert( _.fileStatIs( stat1 ) );
-//   _.assert( _.fileStatIs( stat2 ) );
-//   _.assert( !!stat1.mtime );
-//
-//   /*
-//   ino comparison is not reliable test on nodejs below 10.5
-//   it's reliable only if ino is BigNumber
-//   */
-//
-//   if( stat1.ino !== stat2.ino )
-//   return false;
-//
-//   if( _.bigIntIs( stat1.ino ) )
-//   debugger;
-//
-//   if( _.bigIntIs( stat1.ino ) )
-//   return stat1.ino === stat2.ino;
-//
-//   /*
-//   try to make a good guess if ino comprison is not possible
-//   */
-//
-//   if( stat1.nlink !== stat2.nlink )
-//   return false;
-//
-//   if( stat1.mode !== stat2.mode )
-//   return false;
-//
-//   if( stat1.size !== stat2.size )
-//   return false;
-//
-//   if( stat1.mtime.getTime() !== stat2.mtime.getTime() )
-//   return false;
-//
-//   if( stat1.ctime.getTime() !== stat2.ctime.getTime() )
-//   return false;
-//
-//   if( stat1.birthtime.getTime() !== stat2.birthtime.getTime() )
-//   return false;
-//
-//   return true;
-// }
 
 //
 

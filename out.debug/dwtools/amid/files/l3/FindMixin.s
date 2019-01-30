@@ -353,7 +353,12 @@ function filesFindSingle_body( o )
     if( isTransient && o.recursive )
     if( o.recursive === 2 || or.isStem )
     {
-      let files = o.filter.effectiveFileProvider.dirRead({ filePath : or.absolute, outputFormat : 'absolute' });
+      /* Vova : real path should be used for soft/text link to a dir for two reasons:
+      - files from linked directory should be taken into account
+      - usage of or.absolute path for a link will lead to recursion on next forDirectory( file, o ), because dirRead will return same path( or.absolute )
+      outputFormat : relative is used because absolute path should contain path to a link in head
+      */
+      let files = o.filter.effectiveFileProvider.dirRead({ filePath : /* or.absolute */or.real, outputFormat : /* 'absolute' */'relative' });
 
       if( files === null )
       {
@@ -367,6 +372,8 @@ function filesFindSingle_body( o )
           throw _.err( 'Failed to read directory', _.strQuote( or.absolute ) );
         }
       }
+
+      files = self.path.s.join( or.absolute, files );
 
       files = or.factory.records( files );
 

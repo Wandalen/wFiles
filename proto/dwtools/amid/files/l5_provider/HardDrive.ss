@@ -328,8 +328,8 @@ function pathResolveSoftLinkAct( o )
   _.assert( self.path.isAbsolute( o.filePath ) );
 
   /* using self.resolvingSoftLink causes recursion problem in pathResolveLinkFull */
-  if( !self.isSoftLink( o.filePath ) )
-  return o.filePath;
+  // if( !self.isSoftLink( o.filePath ) )
+  // return o.filePath;
 
   let result;
 
@@ -337,6 +337,9 @@ function pathResolveSoftLinkAct( o )
   {
     if( o.resolvingIntermediateDirectories )
     return resolveIntermediateDirectories();
+
+    if( !self.isSoftLink( o.filePath ) )
+    return o.filePath;
 
     result = File.readlinkSync( self.path.nativize( o.filePath ) );
 

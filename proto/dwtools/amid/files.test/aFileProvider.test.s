@@ -35243,6 +35243,9 @@ function pathResolveSoftLink( test )
   let filePath = test.context.pathFor( 'written/pathResolveSoftLink/file' );
   let linkPath = test.context.pathFor( 'written/pathResolveSoftLink/link' );
   let linkPath2 = test.context.pathFor( 'written/pathResolveSoftLink/link2' );
+  let linkPath3 = test.context.pathFor( 'written/pathResolveSoftLink/link3' );
+  let dirPath = test.context.pathFor( 'written/pathResolveSoftLink/dir' );
+  let terminalInDirPath = test.context.pathFor( 'written/pathResolveSoftLink/dir/terminal' );
   let testData = 'pathResolveSoftLink';
 
   var o1 =
@@ -35444,6 +35447,45 @@ function pathResolveSoftLink( test )
   var got = provider.pathResolveSoftLink( o );
   test.identical( got, filePath );
 
+  test.case = 'Chain with two softlink and text link to missing file';
+  provider.filesDelete( /*workDir*/testPath );
+  provider.textLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1 });
+  provider.softLink({ dstPath : linkPath2, srcPath : linkPath });
+  provider.softLink({ dstPath : linkPath3, srcPath : linkPath2 });
+  var got = provider.pathResolveSoftLink( { filePath : linkPath3, resolvingMultiple : 1 } );
+  test.identical( got, linkPath );
+
+  test.case = 'Chain with two softlink, last link is broken';
+  provider.filesDelete( /*workDir*/testPath );
+  provider.softLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
+  provider.softLink({ dstPath : linkPath2, srcPath : linkPath });
+  var got = provider.pathResolveSoftLink( { filePath : linkPath2, resolvingMultiple : 1 } );
+  test.identical( got, filePath );
+
+  test.case = 'Chain with two textlinks';
+  provider.filesDelete( /*workDir*/testPath );
+  provider.textLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
+  provider.textLink({ dstPath : linkPath2, srcPath : linkPath });
+  var got = provider.pathResolveSoftLink( { filePath : linkPath2, resolvingMultiple : 1 } );
+  test.identical( got, linkPath2 );
+
+  test.case = 'Chain with two relative softLinks';
+  provider.filesDelete( /*workDir*/testPath );
+  provider.softLink({ dstPath : linkPath, srcPath : '../file', allowingMissed : 1, makingDirectory : 1 });
+  provider.softLink({ dstPath : linkPath2, srcPath : '../link' });
+  var got = provider.pathResolveSoftLink( { filePath : linkPath2, resolvingMultiple : 1 } );
+  test.identical( got, filePath );
+
+  test.case = 'Chain with relative and absolute softLinks';
+  provider.filesDelete( /*workDir*/testPath );
+  provider.softLink({ dstPath : linkPath, srcPath : '../file', allowingMissed : 1, makingDirectory : 1 });
+  provider.softLink({ dstPath : linkPath2, srcPath : linkPath });
+  provider.softLink({ dstPath : linkPath3, srcPath : '../link2' });
+  var got = provider.pathResolveSoftLink( { filePath : linkPath3, resolvingMultiple : 1 } );
+  test.identical( got, filePath );
+
+  /* resolvingIntermediateDirectories */
+
   test.case = 'two soft links in path';
   provider.filesDelete( /*workDir*/testPath );
   provider.fileWrite( filePath, filePath );
@@ -35453,6 +35495,66 @@ function pathResolveSoftLink( test )
   var o = _.mapExtend( null, o1, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 0 } );
   var got = provider.pathResolveSoftLink( o );
   test.identical( got, filePath );
+
+  test.case = 'intermediate absolute soft link to other directory';
+  provider.filesDelete( /*workDir*/testPath );
+  provider.fileWrite( terminalInDirPath, terminalInDirPath );
+  provider.softLink( linkPath, dirPath );
+  var pathToResolve = provider.path.join( linkPath, 'terminal' );
+  var o = _.mapExtend( null, o1, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 0 } );
+  var got = provider.pathResolveSoftLink( o );
+  test.identical( got, terminalInDirPath );
+
+  test.case = 'intermediate absolute soft link to other directory';
+  provider.filesDelete( /*workDir*/testPath );
+  provider.fileWrite( terminalInDirPath, terminalInDirPath );
+  provider.softLink( linkPath, dirPath );
+  var pathToResolve = provider.path.join( linkPath, 'terminal' );
+  var o = _.mapExtend( null, o1, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 1 } );
+  var got = provider.pathResolveSoftLink( o );
+  test.identical( got, terminalInDirPath );
+
+  test.case = 'intermediate chain of soft links to other directory, resolvingMultiple off';
+  provider.filesDelete( /*workDir*/testPath );
+  provider.fileWrite( terminalInDirPath, terminalInDirPath );
+  provider.softLink( linkPath2, dirPath );
+  provider.softLink( linkPath, linkPath2 );
+  var pathToResolve = provider.path.join( linkPath, 'terminal' );
+  var o = _.mapExtend( null, o1, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 0 } );
+  var got = provider.pathResolveSoftLink( o );
+  var expected = provider.path.join( linkPath2, 'terminal' );
+  test.identical( got, expected );
+
+  test.case = 'intermediate chain of soft links to other directory, resolvingMultiple on';
+  provider.filesDelete( /*workDir*/testPath );
+  provider.fileWrite( terminalInDirPath, terminalInDirPath );
+  provider.softLink( linkPath2, dirPath );
+  provider.softLink( linkPath, linkPath2 );
+  var pathToResolve = provider.path.join( linkPath, 'terminal' );
+  var o = _.mapExtend( null, o1, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 1 } );
+  var got = provider.pathResolveSoftLink( o );
+  test.identical( got, terminalInDirPath );
+
+  test.case = 'intermediate chain of relative soft links to other directory, resolvingMultiple on';
+  provider.filesDelete( /*workDir*/testPath );
+  provider.fileWrite( terminalInDirPath, terminalInDirPath );
+  provider.softLink( linkPath2, '../dir' );
+  provider.softLink( linkPath, '../link2' );
+  var pathToResolve = provider.path.join( linkPath, 'terminal' );
+  var o = _.mapExtend( null, o1, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 0 } );
+  var got = provider.pathResolveSoftLink( o );
+  var expected = provider.path.join( linkPath2, 'terminal' );
+  test.identical( got, expected );
+
+  test.case = 'intermediate chain of relative soft links to other directory, resolvingMultiple on';
+  provider.filesDelete( /*workDir*/testPath );
+  provider.fileWrite( terminalInDirPath, terminalInDirPath );
+  provider.softLink( linkPath2, '../dir' );
+  provider.softLink( linkPath, '../link2' );
+  var pathToResolve = provider.path.join( linkPath, 'terminal' );
+  var o = _.mapExtend( null, o1, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 1 } );
+  var got = provider.pathResolveSoftLink( o );
+  test.identical( got, terminalInDirPath );
 
   /* */
 

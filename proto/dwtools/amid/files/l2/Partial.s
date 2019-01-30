@@ -732,11 +732,6 @@ function pathResolveSoftLink_body( o )
   _.assert( !!o.filePath );
 
   /* should not have redundant conditions */
-  /* qqq : check does it cause problems */
-  /* aaa : no, Act version already has this check */
-
-  // if( !self.isSoftLink( o.filePath ) )
-  // return o.filePath;
 
   let result = self.pathResolveSoftLinkAct( o );
 
@@ -773,44 +768,6 @@ having.driving = 1;
 
 var operates = pathResolveTextLinkAct.operates  = Object.create( null );
 operates.filePath = { pathToRead : 1 };
-
-//
-
-/*
-qqq : ?
-aaa : old code
-*/
-
-// function _pathResolveTextLink( o )
-// {
-//   let self = this;
-
-//   _.assertRoutineOptions( _pathResolveTextLink, arguments );
-
-//   let result = self.pathResolveTextLinkAct
-//   ({
-//     filePath : o.filePath,
-//     // visited : [],
-//     // hasLink : false,
-//   });
-
-//   if( !result )
-//   return { resolved : false, originalFilePath : o.filePath, resolvedFilePath : null };
-
-//   _.assert( arguments.length === 1 || arguments.length === 2  );
-
-//   if( result && o.filePath[ 0 ] === '.' && !self.path.isAbsolute( result ) )
-//   result = './' + result;
-
-//   self.logger.log( 'pathResolveTextLink :', o.filePath, '->', result );
-
-//   return { resolved : true, originalFilePath : o.filePath, resolvedFilePath : result };
-// }
-
-// _pathResolveTextLink.defaults =
-// {
-//   filePath : null
-// }
 
 //
 

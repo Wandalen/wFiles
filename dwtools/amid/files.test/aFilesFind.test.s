@@ -3861,6 +3861,41 @@ function filesFindResolving( test )
 
 }
 
+function filesFindResolvingExperiment( test )
+{
+  let context = this;
+  let provider = context.provider;
+  let path = context.provider.path;
+  let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
+
+  test.case = 'textLink->dir, resolvingTextLink : 1, usingTextLink : 1';
+  let srcDirPath = path.join( testPath, 'dir' );
+  let terminalPath = path.join( srcDirPath, 'terminal' );
+  let textLinkPath = path.join( testPath, 'textLink' );
+
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalPath, terminalPath );
+  provider.fieldPush( 'usingTextLink', 1 );
+  provider.textLink( textLinkPath, srcDirPath );
+
+  var o =
+  {
+    filePath : textLinkPath,
+    resolvingTextLink : 1,
+    includingStem : 1,
+    includingTerminals : 1,
+    includingTransient : 1,
+    includingDirs : 1,
+    recursive : 2
+  }
+
+  var files = provider.filesFind( o );
+
+  provider.fieldPop( 'usingTextLink', 1 );
+
+
+}
+
 //
 
 function filesFindPerformance( test )
@@ -15795,6 +15830,7 @@ var Self =
     filesFindLinked,
 
     filesFindResolving,
+    filesFindResolvingExperiment,
     filesFindPerformance,
 
     filesFindGlob,

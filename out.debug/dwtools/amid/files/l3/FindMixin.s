@@ -358,6 +358,7 @@ function filesFindSingle_body( o )
       - usage of or.absolute path for a link will lead to recursion on next forDirectory( file, o ), because dirRead will return same path( or.absolute )
       outputFormat : relative is used because absolute path should contain path to a link in head
       */
+      // let files = o.filter.effectiveFileProvider.dirRead({ filePath : or.absolute, outputFormat : 'absolute' });
       let files = o.filter.effectiveFileProvider.dirRead({ filePath : /* or.absolute */or.real, outputFormat : /* 'absolute' */'relative' });
 
       if( files === null )

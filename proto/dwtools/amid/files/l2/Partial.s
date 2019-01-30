@@ -59,41 +59,41 @@ function _vectorizeKeysAndVals( routine, select )
   _.assert( _.strDefined( routineName ) );
   _.assert( arguments.length === 1 || arguments.length === 2 );
 
-  // let routine2 = _.routineVectorize_functor // qqq : uncomment it, please
-  // ({
-  //   routine : [ routineName ],
-  //   vectorizingArray : 1,
-  //   vectorizingMap : 1,
-  //   vectorizingKeys : 1,
-  //   select : select,
-  // });
+  let routine2 = _.routineVectorize_functor // qqq : uncomment it, please
+  ({
+    routine : [ routineName ],
+    vectorizingArray : 1,
+    vectorizingMap : 1,
+    vectorizingKeys : 1,
+    select : select,
+  });
 
-  function routine2( srcs )
-  {
-    _.assert( arguments.length === 1 );
-    if( _.mapIs( srcs ) )
-    {
-      let result = Object.create( null );
-      for( let s in srcs )
-      {
-        let val = routine.call( this, srcs[ s ] );
-        let key = routine.call( this, s );
-        result[ key ] = val;
-      }
-      return result;
-    }
-    else if( _.arrayIs( srcs ) )
-    {
-      let result = [];
-      for( let s = 0 ; s < srcs.length ; s++ )
-      result[ s ] = routine.call( this, srcs[ s ] );
-      return result;
-    }
-    else
-    {
-      return routine.call( this, srcs );
-    }
-  }
+  // function routine2( srcs )
+  // {
+  //   _.assert( arguments.length === 1 );
+  //   if( _.mapIs( srcs ) )
+  //   {
+  //     let result = Object.create( null );
+  //     for( let s in srcs )
+  //     {
+  //       let val = routine.call( this, srcs[ s ] );
+  //       let key = routine.call( this, s );
+  //       result[ key ] = val;
+  //     }
+  //     return result;
+  //   }
+  //   else if( _.arrayIs( srcs ) )
+  //   {
+  //     let result = [];
+  //     for( let s = 0 ; s < srcs.length ; s++ )
+  //     result[ s ] = routine.call( this, srcs[ s ] );
+  //     return result;
+  //   }
+  //   else
+  //   {
+  //     return routine.call( this, srcs );
+  //   }
+  // }
 
   _.routineExtend( routine2, routine );
 

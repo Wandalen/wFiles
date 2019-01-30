@@ -3868,7 +3868,7 @@ function filesFindResolvingExperiment( test )
   let path = context.provider.path;
   let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
 
-  test.case = 'soft->dir, resolvingTextLink : 1, usingTextLink : 1';
+  test.case = 'textLink->dir, resolvingTextLink : 1, usingTextLink : 1';
   let srcDirPath = path.join( testPath, 'dir' );
   let terminalPath = path.join( srcDirPath, 'terminal' );
   let textLinkPath = path.join( testPath, 'textLink' );

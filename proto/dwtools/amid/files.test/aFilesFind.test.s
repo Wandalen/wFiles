@@ -3865,22 +3865,23 @@ function filesFindResolvingExperiment( test )
 {
   let context = this;
   let provider = context.provider;
-
-  let hub = context.hub;
   let path = context.provider.path;
   let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
 
-  // let path = context.provider.path;
-  // var testPath = path.join( context.testSuitePath, test.name );
-  var terminalPath = path.join( testPath, 'terminal' );
+  test.case = 'soft->dir, resolvingTextLink : 1, usingTextLink : 1';
+  let srcDirPath = path.join( testPath, 'dir' );
+  let terminalPath = path.join( srcDirPath, 'terminal' );
+  let textLinkPath = path.join( testPath, 'textLink' );
 
-  var fixedOptions =
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalPath, terminalPath );
+  provider.fieldPush( 'usingTextLink', 1 );
+  provider.textLink( textLinkPath, srcDirPath );
+
+  var o =
   {
-    // basePath : null,
-    allowingMissed : 1,
-    orderingExclusion : [],
-    sortingWithArray : null,
-    outputFormat : 'record',
+    filePath : textLinkPath,
+    resolvingTextLink : 1,
     includingStem : 1,
     includingTerminals : 1,
     includingTransient : 1,
@@ -3888,101 +3889,8 @@ function filesFindResolvingExperiment( test )
     recursive : 2
   }
 
-  function recordSimplify( record )
-  {
-    var result =
-    {
-      absolute : record.absolute,
-      real : record.real,
-      isDir : record.isDir
-    }
+  var files = provider.filesFind( o );
 
-    return result;
-  }
-
-  function findRecord( records, field, value )
-  {
-    var result = records.filter( ( r ) =>
-    {
-      if( r[ field ] === value )
-      return r;
-    });
-
-    _.assert( result.length === 1 );
-
-    return result[ 0 ];
-  }
-
-  test.case = 'soft->text->dir, resolvingSoftLink : 1, resolvingTextLink : 1, usingTextLink : 1';
-  var srcDirPath = path.join( testPath, 'dir' );
-  terminalPath = path.join( srcDirPath, 'file' );
-  provider.filesDelete( testPath );
-  provider.fileWrite( terminalPath, terminalPath );
-  var textLinkPath = path.join( testPath, 'textLink' );
-  var softLinkPath = path.join( testPath, 'softLink' );
-  provider.fieldPush( 'usingTextLink', 1 );
-  var o =
-  {
-    filePath : testPath,
-    resolvingSoftLink : 1,
-    resolvingTextLink : 1,
-  }
-  var options = _.mapExtend( o, fixedOptions );
-  provider.textLink( textLinkPath, srcDirPath );
-  provider.softLink( softLinkPath, textLinkPath );
-
-  var files = provider.filesFind( options );
-  // var filtered = files.map( recordSimplify );
-  // var expected =
-  // [
-  //   {
-  //     absolute : testPath,
-  //     real : testPath,
-  //     isDir : true
-  //   },
-  //   {
-  //     absolute : srcDirPath,
-  //     real : srcDirPath,
-  //     isDir : true
-  //   },
-  //   {
-  //     absolute : terminalPath,
-  //     real : terminalPath,
-  //     isDir : false
-  //   },
-  //   {
-  //     absolute : softLinkPath,
-  //     real : srcDirPath,
-  //     isDir : true
-  //   },
-  //   {
-  //     absolute : path.join( softLinkPath, 'file' ),
-  //     real : terminalPath,
-  //     isDir : false
-  //   },
-  //   {
-  //     absolute : textLinkPath,
-  //     real : srcDirPath,
-  //     isDir : true
-  //   },
-
-  //   {
-  //     absolute : path.join( textLinkPath, 'file' ),
-  //     real : terminalPath,
-  //     isDir : false
-  //   },
-  // ]
-
-  // test.identical( filtered, expected )
-  // console.log( _.toStr( filtered, { levels : 99 }))
-  // var srcDirStat = provider.statResolvedRead( srcDirPath );
-  // var srcFileStat = findRecord( files, 'absolute', terminalPath ).stat;
-  // var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
-  // var softLinkStat = findRecord( files, 'absolute', softLinkPath ).stat;
-  // test.identical( srcDirStat.ino, textLinkStat.ino );
-  // test.identical( srcDirStat.ino, softLinkStat.ino );
-  // test.is( srcFileStat.ino !== textLinkStat.ino )
-  // test.is( srcFileStat.ino !== softLinkStat.ino )
   provider.fieldPop( 'usingTextLink', 1 );
 
 

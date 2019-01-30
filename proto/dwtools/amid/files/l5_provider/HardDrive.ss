@@ -275,8 +275,13 @@ function pathResolveTextLinkAct( o )
   _.assertRoutineOptions( pathResolveTextLinkAct, arguments );
   _.assert( arguments.length === 1 );
 
+  let result;
+
   if( !buffer )
   buffer = Buffer.alloc( 512 );
+
+  if( o.resolvingIntermediateDirectories )
+  return resolveIntermediateDirectories();
 
   /* qqq use statReadAct Vova : low priority*/
   let stat = self.statReadAct
@@ -307,16 +312,54 @@ function pathResolveTextLinkAct( o )
   let read = buffer.toString( 'utf8', 0, readSize );
   let m = read.match( regexp );
 
-  if( m )
-  return m[ 1 ];
-  else
+  if( !m )
   return false;
+
+  result = m[ 1 ];
+
+  if( o.resolvingMultiple )
+  return resolvingMultiple();
+
+  return result;
+
+  /**/
+
+  function resolveIntermediateDirectories()
+  {
+    let splits = self.path.split( o.filePath );
+    let o2 = _.mapExtend( null, o );
+
+    o2.resolvingIntermediateDirectories = 0;
+    o2.filePath = '/';
+
+    for( let i = 1 ; i < splits.length ; i++ )
+    {
+      o2.filePath = self.path.join( o2.filePath, splits[ i ] );
+
+      if( self.isTextLink( o2.filePath ) )
+      {
+        result = self.pathResolveTextLinkAct( o2 )
+        o2.filePath = self.path.join( o2.filePath, result );
+      }
+    }
+    return o2.filePath;
+  }
+
+  /**/
+
+  function resolvingMultiple()
+  {
+    result = self.path.join( o.filePath, self.path.normalize( result ) );
+    if( !self.isTextLink( result ) )
+    return result;
+    let o2 = _.mapExtend( null, o );
+    o2.filePath = result;
+    return self.pathResolveTextLinkAct( o2 );
+  }
 }
 
-pathResolveTextLinkAct.defaults =
-{
-  filePath : null
-}
+_.routineExtend( pathResolveTextLinkAct, Parent.prototype.pathResolveTextLinkAct )
+
 
 //
 

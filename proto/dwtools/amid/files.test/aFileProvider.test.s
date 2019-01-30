@@ -35608,7 +35608,10 @@ function pathResolveTextLink( test )
   let filePath = test.context.pathFor( 'written/pathResolveSoftLink/file' );
   let linkPath = test.context.pathFor( 'written/pathResolveSoftLink/link' );
   let linkPath2 = test.context.pathFor( 'written/pathResolveSoftLink/link2' );
-  let testData = 'pathResolveSoftLink';
+  let linkPath3 = test.context.pathFor( 'written/pathResolveSoftLink/link3' );
+  let dirPath = test.context.pathFor( 'written/pathResolveSoftLink/dir' );
+  let terminalInDirPath = test.context.pathFor( 'written/pathResolveSoftLink/dir/terminal' );
+  let testData = 'pathResolveTextLink';
 
   provider.fieldPush( 'usingTextLink', 1 );
 
@@ -35920,6 +35923,138 @@ function pathResolveTextLink( test )
   test.identical( got, linkPath2 );
 
   provider.fieldPop( 'usingTextLink', 0 );
+
+
+  provider.fieldPush( 'usingTextLink', 1 );
+
+  /* resolvingMultiple */
+
+  test.case = 'single text link';
+  provider.filesDelete( /*workDir*/testPath );
+  provider.fileWrite( filePath, testData );
+  provider.textLink( linkPath, filePath );
+  var got = provider.pathResolveTextLink({ filePath : linkPath, resolvingMultiple : 1 });
+  test.identical( got, filePath );
+
+  test.case = 'double text link';
+  provider.filesDelete( /*workDir*/testPath );
+  provider.fileWrite( filePath, testData );
+  provider.textLink( linkPath2, filePath );
+  provider.textLink( linkPath, linkPath2 );
+  var got = provider.pathResolveTextLink({ filePath : linkPath, resolvingMultiple : 1 });
+  test.identical( got, filePath );
+
+  test.case = 'Chain with two textlinks and soft link to missing file';
+  provider.filesDelete( /*workDir*/testPath );
+  provider.softLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
+  provider.textLink({ dstPath : linkPath2, srcPath : linkPath });
+  provider.textLink({ dstPath : linkPath3, srcPath : linkPath2 });
+  var got = provider.pathResolveTextLink( { filePath : linkPath3, resolvingMultiple : 1 } );
+  test.identical( got, linkPath );
+
+  test.case = 'Chain with two textlinks, last link is broken';
+  provider.filesDelete( /*workDir*/testPath );
+  provider.textLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
+  provider.textLink({ dstPath : linkPath2, srcPath : linkPath });
+  var got = provider.pathResolveTextLink( { filePath : linkPath2, resolvingMultiple : 1 } );
+  test.identical( got, filePath );
+
+  test.case = 'Chain with two softlinks';
+  provider.filesDelete( /*workDir*/testPath );
+  provider.softLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
+  provider.softLink({ dstPath : linkPath2, srcPath : linkPath });
+  var got = provider.pathResolveTextLink( { filePath : linkPath2, resolvingMultiple : 1 } );
+  test.identical( got, linkPath2 );
+
+  test.case = 'Chain with two relative textlinks';
+  provider.filesDelete( /*workDir*/testPath );
+  provider.textLink({ dstPath : linkPath, srcPath : '../file', allowingMissed : 1, makingDirectory : 1 });
+  provider.textLink({ dstPath : linkPath2, srcPath : '../link' });
+  var got = provider.pathResolveTextLink( { filePath : linkPath2, resolvingMultiple : 1 } );
+  test.identical( got, filePath );
+
+  test.case = 'Chain with relative and absolute textlinks';
+  provider.filesDelete( /*workDir*/testPath );
+  provider.textLink({ dstPath : linkPath, srcPath : '../file', allowingMissed : 1, makingDirectory : 1 });
+  provider.textLink({ dstPath : linkPath2, srcPath : linkPath });
+  provider.textLink({ dstPath : linkPath3, srcPath : '../link2' });
+  var got = provider.pathResolveTextLink( { filePath : linkPath3, resolvingMultiple : 1 } );
+  test.identical( got, filePath );
+
+  /* resolvingIntermediateDirectories */
+
+  test.case = 'two text links in path';
+  provider.filesDelete( /*workDir*/testPath );
+  provider.fileWrite( filePath, filePath );
+  provider.textLink( linkPath, '..' );
+  provider.textLink( linkPath2, '../file' );
+  var pathToResolve = provider.path.join( /*workDir*/testPath, 'link/link2' )
+  var o = _.mapExtend( null, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 0 } );
+  debugger
+  var got = provider.pathResolveTextLink( o );
+  test.identical( got, filePath );
+
+  test.case = 'intermediate absolute text link to other directory';
+  provider.filesDelete( /*workDir*/testPath );
+  provider.fileWrite( terminalInDirPath, terminalInDirPath );
+  provider.textLink( linkPath, dirPath );
+  var pathToResolve = provider.path.join( linkPath, 'terminal' );
+  var o = _.mapExtend( null, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 0 } );
+  var got = provider.pathResolveTextLink( o );
+  test.identical( got, terminalInDirPath );
+
+  test.case = 'intermediate absolute soft link to other directory';
+  provider.filesDelete( /*workDir*/testPath );
+  provider.fileWrite( terminalInDirPath, terminalInDirPath );
+  provider.softLink( linkPath, dirPath );
+  var pathToResolve = provider.path.join( linkPath, 'terminal' );
+  var o = _.mapExtend( null, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 1 } );
+  var got = provider.pathResolveTextLink( o );
+  test.identical( got, pathToResolve );
+
+  test.case = 'intermediate chain of text links to other directory, resolvingMultiple off';
+  provider.filesDelete( /*workDir*/testPath );
+  provider.fileWrite( terminalInDirPath, terminalInDirPath );
+  provider.textLink( linkPath2, dirPath );
+  provider.textLink( linkPath, linkPath2 );
+  var pathToResolve = provider.path.join( linkPath, 'terminal' );
+  var o = _.mapExtend( null, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 0 } );
+  var got = provider.pathResolveTextLink( o );
+  var expected = provider.path.join( linkPath2, 'terminal' );
+  test.identical( got, expected );
+
+  test.case = 'intermediate chain of text links to other directory, resolvingMultiple on';
+  provider.filesDelete( /*workDir*/testPath );
+  provider.fileWrite( terminalInDirPath, terminalInDirPath );
+  provider.textLink( linkPath2, dirPath );
+  provider.textLink( linkPath, linkPath2 );
+  var pathToResolve = provider.path.join( linkPath, 'terminal' );
+  var o = _.mapExtend( null, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 1 } );
+  var got = provider.pathResolveTextLink( o );
+  test.identical( got, terminalInDirPath );
+
+  test.case = 'intermediate chain of relative text links to other directory, resolvingMultiple on';
+  provider.filesDelete( /*workDir*/testPath );
+  provider.fileWrite( terminalInDirPath, terminalInDirPath );
+  provider.textLink( linkPath2, '../dir' );
+  provider.textLink( linkPath, '../link2' );
+  var pathToResolve = provider.path.join( linkPath, 'terminal' );
+  var o = _.mapExtend( null, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 0 } );
+  var got = provider.pathResolveTextLink( o );
+  var expected = provider.path.join( linkPath2, 'terminal' );
+  test.identical( got, expected );
+
+  test.case = 'intermediate chain of relative text links to other directory, resolvingMultiple on';
+  provider.filesDelete( /*workDir*/testPath );
+  provider.fileWrite( terminalInDirPath, terminalInDirPath );
+  provider.textLink( linkPath2, '../dir' );
+  provider.textLink( linkPath, '../link2' );
+  var pathToResolve = provider.path.join( linkPath, 'terminal' );
+  var o = _.mapExtend( null, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 1 } );
+  var got = provider.pathResolveTextLink( o );
+  test.identical( got, terminalInDirPath );
+
+  provider.fieldPop( 'usingTextLink', 1 );
 
   /* */
 

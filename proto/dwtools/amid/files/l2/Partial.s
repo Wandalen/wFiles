@@ -760,6 +760,8 @@ pathResolveTextLinkAct.name = 'pathResolveTextLinkAct';
 
 var defaults = pathResolveTextLinkAct.defaults = Object.create( null );
 defaults.filePath = null;
+defaults.resolvingMultiple = 0;
+defaults.resolvingIntermediateDirectories = 0;
 
 var having = pathResolveTextLinkAct.having = Object.create( null );
 having.writing = 0;
@@ -802,7 +804,7 @@ function pathResolveTextLink_body( o )
   _.assert( _.strIs( o.filePath ), 'Expects string' );
   _.assert( arguments.length === 1, 'Expects exactly one argument' );
 
-  let result = self.pathResolveTextLinkAct({ filePath : o.filePath });
+  let result = self.pathResolveTextLinkAct( o );
 
   if( !result )
   return o.filePath;
@@ -812,8 +814,11 @@ function pathResolveTextLink_body( o )
   return result;
 }
 
-var defaults = pathResolveTextLink_body.defaults = Object.create( null );
-defaults.filePath = null;
+_.routineExtend( pathResolveTextLink_body, pathResolveTextLinkAct );
+
+var having = pathResolveTextLink_body.having;
+having.driving = 0;
+having.aspect = 'body';
 
 let pathResolveTextLink = _.routineFromPreAndBody( pathResolveTextLink_pre, pathResolveTextLink_body );
 

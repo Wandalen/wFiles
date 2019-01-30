@@ -32645,6 +32645,163 @@ function record( test )
 // path
 // --
 
+function localsFromGlobals( test )
+{
+  let self = this;
+  let provider = new self.provider.constructor({ protocol : 'global' });
+
+  test.open( 'string' );
+
+  test.case = 'local';
+  var got = provider.localsFromGlobals( '/a' );
+  test.identical( got, '/a' );
+
+  test.case = 'relative';
+  var got = provider.localsFromGlobals( 'a' );
+  test.identical( got, 'a' );
+
+  test.case = 'single global string';
+  var got = provider.localsFromGlobals( 'global:///a' );
+  test.identical( got, '/a' )
+
+  test.close( 'string' );
+
+  test.open( 'array' );
+
+  test.case = 'single global in array';
+  var got = provider.localsFromGlobals( [ 'global:///a' ] );
+  test.identical( got, [ '/a' ] )
+
+  test.case = 'globals in array';
+  var got = provider.localsFromGlobals( [ 'global:///a', 'global:///a/b' ] );
+  test.identical( got, [ '/a', '/a/b' ] )
+
+  test.close( 'array' );
+
+  test.open( 'map' );
+
+  var got = provider.localsFromGlobals( { 'global:///a' : 'global:///a' } );
+  test.identical( got, { '/a' : '/a'} )
+
+  var got = provider.localsFromGlobals( { '/a' : 'global:///a' } );
+  test.identical( got, { '/a' : '/a'} )
+
+  var got = provider.localsFromGlobals( { 'global:///a' : '/a' } );
+  test.identical( got, { '/a' : '/a'} )
+
+  var got = provider.localsFromGlobals( { 'global:///a' : 1 } );
+  test.identical( got, { '/a' : 1 } )
+
+  var got = provider.localsFromGlobals( { 1 : 'global:///a' } );
+  test.identical( got, { 1 : '/a' } )
+
+  var got = provider.localsFromGlobals( { 1 : 1 } );
+  test.identical( got, { 1 : 1 } )
+
+  test.close( 'map' );
+
+  if( !Config.debug )
+  return;
+
+  test.shouldThrowErrorSync( () => provider.localsFromGlobals( '/a', '/b' ) );
+  test.shouldThrowErrorSync( () => provider.localsFromGlobals( 'b:///a' ) );
+  test.shouldThrowErrorSync( () => provider.localsFromGlobals( [ 'b:///a' ] ) );
+  test.shouldThrowErrorSync( () => provider.localsFromGlobals( { 'b:///a' : '/a' } ) );
+  test.shouldThrowErrorSync( () => provider.localsFromGlobals( { '/a' : 'b:///a' } ) );
+  test.shouldThrowErrorSync( () => provider.localsFromGlobals( { '/a' : [] } ) );
+  test.shouldThrowErrorSync( () => provider.localsFromGlobals( { '/a' : {} } ) );
+
+  provider.finit();
+
+}
+
+//
+
+function globalsFromLocals( test )
+{
+  let self = this;
+  let provider = new self.provider.constructor({ protocol : 'global' });
+
+  test.open( 'string' );
+
+  test.case = 'local';
+  var got = provider.globalsFromLocals( '/a' );
+  test.identical( got, 'global:///a' );
+
+  test.case = 'relative';
+  var got = provider.globalsFromLocals( 'a' );
+  test.identical( got, 'global://a' );
+
+  test.case = 'global string';
+  var got = provider.globalsFromLocals( 'global:///a' );
+  test.identical( got, 'global:///a' )
+
+  test.case = 'global string';
+  var got = provider.globalsFromLocals( 'other:///a' );
+  test.identical( got, 'other:///a' )
+
+  test.close( 'string' );
+
+  test.open( 'array' );
+
+  test.case = 'single global in array';
+  var got = provider.globalsFromLocals( [ 'global:///a' ] );
+  test.identical( got, [ 'global:///a' ] )
+
+  test.case = 'single global in array';
+  var got = provider.globalsFromLocals( [ 'other:///a' ] );
+  test.identical( got, [ 'other:///a' ] )
+
+  test.case = 'globals in array';
+  var got = provider.globalsFromLocals( [ 'global:///a', '/a/b', 'other:///a' ] );
+  test.identical( got, [ 'global:///a', 'global:///a/b', 'other:///a' ] )
+
+  test.close( 'array' );
+
+  test.open( 'map' );
+
+  var got = provider.globalsFromLocals( { 'global:///a' : 'other:///a' } );
+  test.identical( got, { 'global:///a' : 'other:///a' } )
+
+  var got = provider.globalsFromLocals( { 'other:///a' : 'global:///a' } );
+  test.identical( got, { 'other:///a' : 'global:///a' } )
+
+  var got = provider.globalsFromLocals( { '/a' : 'global:///a' } );
+  test.identical( got, { 'global:///a' : 'global:///a' } )
+
+  var got = provider.globalsFromLocals( { '/a' : '/a' } );
+  test.identical( got, { 'global:///a' : 'global:///a' } )
+
+  var got = provider.globalsFromLocals( { 'global:///a' : '/a' } );
+  test.identical( got, { 'global:///a' : 'global:///a' } )
+
+  var got = provider.globalsFromLocals( { 'global:///a' : 1 } );
+  test.identical( got, { 'global:///a' : 1 } )
+
+  var got = provider.globalsFromLocals( { 1 : '/a' } );
+  test.identical( got, { 'global://1' : 'global:///a' } )
+
+  var got = provider.globalsFromLocals( { 1 : 'global:///a' } );
+  test.identical( got, { 'global://1' : 'global:///a' } )
+
+  var got = provider.globalsFromLocals( { 1 : 1 } );
+  test.identical( got, { 'global://1' : 1 } )
+
+  test.close( 'map' );
+
+  if( !Config.debug )
+  return;
+
+  test.shouldThrowErrorSync( () => provider.globalsFromLocals( '/a', '/b' ) );
+  test.shouldThrowErrorSync( () => provider.globalsFromLocals( { '/a' : [] } ) );
+  test.shouldThrowErrorSync( () => provider.globalsFromLocals( { '/a' : {} } ) );
+
+  provider.finit();
+
+}
+
+//
+
 function pathResolve( test )
 {
   let self = this;
@@ -36416,6 +36573,9 @@ var Self =
     record,
 
     // path
+
+    localsFromGlobals,
+    globalsFromLocals,
 
     pathResolve,
     uriResolve,

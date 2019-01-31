@@ -59,41 +59,41 @@ function _vectorizeKeysAndVals( routine, select )
   _.assert( _.strDefined( routineName ) );
   _.assert( arguments.length === 1 || arguments.length === 2 );
 
-  // let routine2 = _.routineVectorize_functor // qqq : uncomment it, please
-  // ({
-  //   routine : [ routineName ],
-  //   vectorizingArray : 1,
-  //   vectorizingMap : 1,
-  //   vectorizingKeys : 1,
-  //   select : select,
-  // });
+  let routine2 = _.routineVectorize_functor // qqq : uncomment it, please
+  ({
+    routine : [ routineName ],
+    vectorizingArray : 1,
+    vectorizingMap : 1,
+    vectorizingKeys : 1,
+    select : select,
+  });
 
-  function routine2( srcs )
-  {
-    _.assert( arguments.length === 1 );
-    if( _.mapIs( srcs ) )
-    {
-      let result = Object.create( null );
-      for( let s in srcs )
-      {
-        let val = routine.call( this, srcs[ s ] );
-        let key = routine.call( this, s );
-        result[ key ] = val;
-      }
-      return result;
-    }
-    else if( _.arrayIs( srcs ) )
-    {
-      let result = [];
-      for( let s = 0 ; s < srcs.length ; s++ )
-      result[ s ] = routine.call( this, srcs[ s ] );
-      return result;
-    }
-    else
-    {
-      return routine.call( this, srcs );
-    }
-  }
+  // function routine2( srcs )
+  // {
+  //   _.assert( arguments.length === 1 );
+  //   if( _.mapIs( srcs ) )
+  //   {
+  //     let result = Object.create( null );
+  //     for( let s in srcs )
+  //     {
+  //       let val = routine.call( this, srcs[ s ] );
+  //       let key = routine.call( this, s );
+  //       result[ key ] = val;
+  //     }
+  //     return result;
+  //   }
+  //   else if( _.arrayIs( srcs ) )
+  //   {
+  //     let result = [];
+  //     for( let s = 0 ; s < srcs.length ; s++ )
+  //     result[ s ] = routine.call( this, srcs[ s ] );
+  //     return result;
+  //   }
+  //   else
+  //   {
+  //     return routine.call( this, srcs );
+  //   }
+  // }
 
   _.routineExtend( routine2, routine );
 
@@ -760,6 +760,8 @@ pathResolveTextLinkAct.name = 'pathResolveTextLinkAct';
 
 var defaults = pathResolveTextLinkAct.defaults = Object.create( null );
 defaults.filePath = null;
+defaults.resolvingMultiple = 0;
+defaults.resolvingIntermediateDirectories = 0;
 
 var having = pathResolveTextLinkAct.having = Object.create( null );
 having.writing = 0;
@@ -802,7 +804,7 @@ function pathResolveTextLink_body( o )
   _.assert( _.strIs( o.filePath ), 'Expects string' );
   _.assert( arguments.length === 1, 'Expects exactly one argument' );
 
-  let result = self.pathResolveTextLinkAct({ filePath : o.filePath });
+  let result = self.pathResolveTextLinkAct( o );
 
   if( !result )
   return o.filePath;
@@ -812,8 +814,11 @@ function pathResolveTextLink_body( o )
   return result;
 }
 
-var defaults = pathResolveTextLink_body.defaults = Object.create( null );
-defaults.filePath = null;
+_.routineExtend( pathResolveTextLink_body, pathResolveTextLinkAct );
+
+var having = pathResolveTextLink_body.having;
+having.driving = 0;
+having.aspect = 'body';
 
 let pathResolveTextLink = _.routineFromPreAndBody( pathResolveTextLink_pre, pathResolveTextLink_body );
 

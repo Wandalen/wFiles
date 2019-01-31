@@ -151,14 +151,16 @@ function pathResolveTextLinkAct( o )
 {
   let self = this;
   let filePath = o.filePath;
+  let result;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( self.path.isAbsolute( o.filePath ) );
 
+  if( o.resolvingIntermediateDirectories )
+  return resolveIntermediateDirectories();
+
   let file = self._descriptorRead( o.filePath );
 
-  if( !_.definedIs( file ) )
-  return false;
   if( self._descriptorIsSoftLink( file ) )
   return false;
   if( _.numberIs( file ) )
@@ -175,10 +177,53 @@ function pathResolveTextLinkAct( o )
   let regexp = /link ([^\n]+)\n?$/;
   let m = file.match( regexp );
 
-  if( m )
-  return m[ 1 ];
-  else
+  if( !m )
   return false;
+
+  result = m[ 1 ];
+
+  if( o.resolvingMultiple )
+  return resolvingMultiple();
+
+  return result;
+
+  /*  */
+
+  function resolveIntermediateDirectories()
+  {
+    let splits = self.path.split( o.filePath );
+    let o2 = _.mapExtend( null, o );
+
+    o2.resolvingIntermediateDirectories = 0;
+    o2.filePath = '/';
+
+    for( let i = 1 ; i < splits.length ; i++ )
+    {
+      o2.filePath = self.path.join( o2.filePath, splits[ i ] );
+
+      let descriptor = self._descriptorRead( o2.filePath );
+
+      if( self._descriptorIsTextLink( descriptor ) )
+      {
+        result = self.pathResolveTextLinkAct( o2 )
+        o2.filePath = self.path.join( o2.filePath, result );
+      }
+    }
+    return o2.filePath;
+  }
+
+  /**/
+
+  function resolvingMultiple()
+  {
+    result = self.path.join( o.filePath, self.path.normalize( result ) );
+    let descriptor = self._descriptorRead( result );
+    if( !self._descriptorIsTextLink( descriptor ) )
+    return result;
+    let o2 = _.mapExtend( null, o );
+    o2.filePath = result;
+    return self.pathResolveTextLinkAct( o2 );
+  }
 }
 
 _.routineExtend( pathResolveTextLinkAct, Parent.prototype.pathResolveTextLinkAct )
@@ -2282,6 +2327,13 @@ function _descriptorIsHardLink( file )
 
 function _descriptorIsTextLink( file )
 {
+  if( !_.definedIs( file ) )
+  return false;
+  if( _.arrayIs( file ) )
+  return false;
+  if( _.objectIs( file ) )
+  return false;
+
   let regexp = /link ([^\n]+)\n?$/;
   if( _.bufferRawIs( file ) || _.bufferTypedIs( file ) )
   file = _.bufferToStr( file )

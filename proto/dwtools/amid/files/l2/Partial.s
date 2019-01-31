@@ -2665,7 +2665,7 @@ function _fileInterpret_body( o )
       let encoder = fileInterpret.encoders[ e ];
       if( !encoder.exts )
       continue;
-      if( encoder.forInterpreter !== undefined && !encoder.forInterpreter )
+      if( encoder.forConfig !== undefined && !encoder.forConfig )
       continue;
       if( _.arrayHas( encoder.exts, ext ) )
       {

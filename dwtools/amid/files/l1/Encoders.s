@@ -17,7 +17,7 @@ let readJson =
 {
 
   exts : [ 'json' ],
-  forInterpreter : 1,
+  forConfig : 1,
 
   onBegin : function( e )
   {
@@ -40,7 +40,7 @@ let readJsStructure =
 {
 
   exts : [ 'js','s','ss','jstruct' ],
-  forInterpreter : 0,
+  forConfig : 0,
 
   onBegin : function( e )
   {
@@ -62,7 +62,7 @@ let readJsSmart =
 {
 
   exts : [ 'js','s','ss','jstruct','jslike' ],
-  forInterpreter : 1,
+  forConfig : 1,
 
   onBegin : function( e )
   {
@@ -102,7 +102,7 @@ let readJsNode =
 {
 
   exts : [ 'js','s','ss','jstruct' ],
-  forInterpreter : 0,
+  forConfig : 0,
 
   onBegin : function( e )
   {

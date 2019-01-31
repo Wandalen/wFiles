@@ -780,7 +780,7 @@ function pathsExtend( src )
 //
 // --
 
-function filteringEmpty()
+function filteringClear()
 {
   let filter = this;
 
@@ -2045,7 +2045,7 @@ let Extend =
 
   //
 
-  filteringEmpty,
+  filteringClear,
   hasMask,
   hasFiltering,
   hasData,

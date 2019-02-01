@@ -6,6 +6,8 @@ let _global = _global_;
 let _ = _global_.wTools;
 let Self = _global_.wTools;
 
+_.include( 'wGdfStrategy' );
+
 // --
 // encoders
 // --
@@ -13,48 +15,48 @@ let Self = _global_.wTools;
 // let ReadEncoders = fileRead.encoders;
 // let WriteEncoders = fileWrite.encoders;
 
-let readJson =
-{
+// let readJson =
+// {
 
-  exts : [ 'json' ],
-  forConfig : 1,
+//   exts : [ 'json' ],
+//   forConfig : 1,
 
-  onBegin : function( e )
-  {
-    _.assert( e.operation.encoding === 'json' );
-    e.operation.encoding = 'utf8';
-  },
+//   onBegin : function( e )
+//   {
+//     _.assert( e.operation.encoding === 'json' );
+//     e.operation.encoding = 'utf8';
+//   },
 
-  onEnd : function( e )
-  {
-    if( !_.strIs( e.data ) )
-    throw _.err( '( fileRead.encoders.json.onEnd ) expects string' );
-    e.data = _.jsonParse( e.data );
-  },
+//   onEnd : function( e )
+//   {
+//     if( !_.strIs( e.data ) )
+//     throw _.err( '( fileRead.encoders.json.onEnd ) expects string' );
+//     e.data = _.jsonParse( e.data );
+//   },
 
-}
+// }
 
-//
+// //
 
-let readJsStructure =
-{
+// let readJsStructure =
+// {
 
-  exts : [ 'js','s','ss','jstruct' ],
-  forConfig : 0,
+//   exts : [ 'js','s','ss','jstruct' ],
+//   forConfig : 0,
 
-  onBegin : function( e )
-  {
-    e.operation.encoding = 'utf8';
-  },
+//   onBegin : function( e )
+//   {
+//     e.operation.encoding = 'utf8';
+//   },
 
-  onEnd : function( e )
-  {
-    if( !_.strIs( e.data ) )
-    throw _.err( '( fileRead.encoders.js.structure.onEnd ) expects string' );
-    e.data = _.exec({ code : e.data, filePath : e.operation.filePath, prependingReturn : 1 });
-  },
+//   onEnd : function( e )
+//   {
+//     if( !_.strIs( e.data ) )
+//     throw _.err( '( fileRead.encoders.js.structure.onEnd ) expects string' );
+//     e.data = _.exec({ code : e.data, filePath : e.operation.filePath, prependingReturn : 1 });
+//   },
 
-}
+// }
 
 //
 
@@ -140,33 +142,33 @@ let readBufferBytes =
 //
 // --
 
-let writeJsonMin =
-{
-  onBegin : function( e )
-  {
-    e.operation.data = JSON.stringify( e.operation.data );
-    e.operation.encoding = 'utf8';
-  }
-}
+// let writeJsonMin =
+// {
+//   onBegin : function( e )
+//   {
+//     e.operation.data = JSON.stringify( e.operation.data );
+//     e.operation.encoding = 'utf8';
+//   }
+// }
 
-let writeJsonFine =
-{
-  onBegin : function( e )
-  {
-    e.operation.data = _.cloneData({ src : e.operation.data });
-    e.operation.data = _.toJson( e.operation.data, { cloning : 0 } );
-    e.operation.encoding = 'utf8';
-  }
-}
+// let writeJsonFine =
+// {
+//   onBegin : function( e )
+//   {
+//     e.operation.data = _.cloneData({ src : e.operation.data });
+//     e.operation.data = _.toJson( e.operation.data, { cloning : 0 } );
+//     e.operation.encoding = 'utf8';
+//   }
+// }
 
-let writeJsStrcuture =
-{
-  onBegin : function( e )
-  {
-    e.operation.data = _.toJs( e.data );
-    e.operation.encoding = 'utf8';
-  }
-}
+// let writeJsStrcuture =
+// {
+//   onBegin : function( e )
+//   {
+//     e.operation.data = _.toJs( e.data );
+//     e.operation.encoding = 'utf8';
+//   }
+// }
 
 // --
 // declare
@@ -175,8 +177,8 @@ let writeJsStrcuture =
 let FileReadEncoders =
 {
 
-  'json' : readJson,
-  'js.structure' : readJsStructure,
+  // 'json' : readJson,
+  // 'js.structure' : readJsStructure,
   'js.smart' : readJsSmart,
   'js.node' : readJsNode,
   'buffer.bytes' : readBufferBytes,
@@ -186,10 +188,10 @@ let FileReadEncoders =
 let FileWriteEncoders =
 {
 
-  'json' : writeJsonMin,
-  'json.min' : writeJsonMin,
-  'json.fine' : writeJsonFine,
-  'js.structure' : writeJsStrcuture,
+  // 'json' : writeJsonMin,
+  // 'json.min' : writeJsonMin,
+  // 'json.fine' : writeJsonFine,
+  // 'js.structure' : writeJsStrcuture,
 
 }
 

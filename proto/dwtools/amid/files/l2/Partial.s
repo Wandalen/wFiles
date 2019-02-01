@@ -446,6 +446,111 @@ function _preSrcDstPathWithProviderDefaults( routine, args )
 
 //
 
+function encodersGenerate()
+{
+  _.assert( _.Gdf, 'GdfStrategy is required to generate encoders!' );
+  _.assert( _.mapIs( _.Gdf.InMap ) );
+  _.assert( _.mapIs( _.Gdf.OutMap ) );
+
+  let writeConverters = _.Gdf.InMap[ 'structure' ];
+  let readConverters = _.Gdf.OutMap[ 'structure' ];
+
+  let WriteEndoders = Object.create( null );
+  let ReadEncoders = Object.create( null );
+
+  /**/
+
+  writeConverters.forEach( ( converter ) =>
+  {
+    let encoder = Object.create( null );
+
+    encoder.converter = converter;
+    encoder.exts = converter.ext.slice();
+
+    encoder.onBegin = function( e )
+    {
+      let encoded = converter.encode({ data : e.operation.data, envMap : e.operation });
+      e.operation.data = encoded.data;
+      if( encoded.format === 'string' )
+      e.operation.encoding = 'utf8';
+      else
+      e.operation.encoding = encoded.format;
+    }
+
+    if( converter.shortName )
+    {
+      WriteEndoders[ converter.shortName ] = encoder;
+    }
+    else
+    {
+      _.assert( converter.ext.length );
+      WriteEndoders[ converter.ext[ 0 ] ] = encoder;
+    }
+  })
+
+  /**/
+
+  readConverters.forEach( ( converter ) =>
+  {
+    let encoder = Object.create( null );
+
+    encoder.converter = converter;
+    encoder.exts = converter.ext.slice();
+    encoder.forConfig = converter.forConfig;
+
+    encoder.onBegin = function( e )
+    {
+      if( converter.in[ 0 ] === 'string' )
+      e.operation.encoding = 'utf8';
+      else
+      e.operation.encoding = converter.in[ 0 ];
+    }
+    encoder.onEnd = function( e )
+    {
+      let decoded = converter.encode({ data : e.data, envMap : e.operation });
+      e.data = decoded.data;
+    }
+
+    if( converter.shortName )
+    {
+      ReadEncoders[ converter.shortName ] = encoder;
+    }
+    else
+    {
+      _.assert( converter.ext.length );
+      ReadEncoders[ converter.ext[ 0 ] ] = encoder;
+    }
+  })
+
+  /* */
+
+  for( let k in _.FileReadEncoders )
+  {
+    let converter = _.FileReadEncoders[ k ].converter;
+    if( converter )
+    if( !_.arrayHas( readConverters, converter ) )
+    delete _.FileReadEncoders[ k ]
+  }
+
+  for( let k in _.FileWriteEncoders )
+  {
+    let converter = _.FileWriteEncoders[ k ].converter;
+    if( converter )
+    if( !_.arrayHas( writeConverters, converter ) )
+    delete _.FileWriteEncoders[ k ];
+  }
+
+  /* */
+
+  _.assert( _.mapIs( _.FileReadEncoders ) );
+  _.assert( _.mapIs( _.FileWriteEncoders ) );
+
+  Object.assign( _.FileReadEncoders, ReadEncoders );
+  Object.assign( _.FileWriteEncoders, WriteEndoders );
+}
+
+//
+
 /**
  * Return options for file read/write. If `filePath is an object, method returns it. Method validate result option
     properties by default parameters from invocation context.
@@ -7348,7 +7453,8 @@ let Statics =
   MakeDefault : MakeDefault,
   Path : _.path.CloneExtending({ fileProvider : Self }),
   WriteMode : WriteMode,
-  ProviderDefaults : ProviderDefaults
+  ProviderDefaults : ProviderDefaults,
+  EncodersGenerate : encodersGenerate
 }
 
 let Forbids =
@@ -7418,6 +7524,7 @@ let Proto =
   _preFilePathVectorWithProviderDefaults,
   _preSrcDstPathWithoutProviderDefaults,
   _preSrcDstPathWithProviderDefaults,
+  encodersGenerate,
 
   // hub
 
@@ -7680,6 +7787,8 @@ _.Verbal.mixin( Self );
 
 _.assert( _.routineIs( Self.prototype.statsResolvedRead ) );
 _.assert( _.objectIs( Self.prototype.statsResolvedRead.defaults ) );
+
+Self.EncodersGenerate();
 
 // --
 // export

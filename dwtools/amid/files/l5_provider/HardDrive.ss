@@ -164,7 +164,7 @@ let buffer;
 //   o.visited.push( o.filePath );
 
 //   o.filePath = self.path.normalize( o.filePath );
-//   let exists = _.fileProvider.fileExists({ filePath : o.filePath /*, resolvingTextLink : 0*/ }); /*qqq*/
+//   let exists = _.fileProvider.fileExists({ filePath : o.filePath /*, resolvingTextLink : 0*/ });
 
 //   let prefix, parts;
 //   if( o.filePath[ 0 ] === '/' )
@@ -183,7 +183,7 @@ let buffer;
 
 //     let cpath = _.fileProvider.path.nativize( prefix + parts.slice( 0, p+1 ).join( '/' ) );
 
-//     let stat = _.fileProvider.statResolvedRead({ filePath : cpath, resolvingTextLink : 0, resolvingSoftLink : 0 }); /* qqq */
+//     let stat = _.fileProvider.statResolvedRead({ filePath : cpath, resolvingTextLink : 0, resolvingSoftLink : 0 });
 //     if( !stat )
 //     {
 //       if( o.allowingMissed )
@@ -283,7 +283,6 @@ function pathResolveTextLinkAct( o )
   if( o.resolvingIntermediateDirectories )
   return resolveIntermediateDirectories();
 
-  /* qqq use statReadAct Vova : low priority*/
   let stat = self.statReadAct
   ({
     filePath : o.filePath,
@@ -370,10 +369,6 @@ function pathResolveSoftLinkAct( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( self.path.isAbsolute( o.filePath ) );
 
-  /* using self.resolvingSoftLink causes recursion problem in pathResolveLinkFull */
-  // if( !self.isSoftLink( o.filePath ) )
-  // return o.filePath;
-
   let result;
 
   try
@@ -386,6 +381,7 @@ function pathResolveSoftLinkAct( o )
 
     result = File.readlinkSync( self.path.nativize( o.filePath ) );
 
+    debugger;
     /* qqq : why? add experiment please? */
     /* aaa : makes path relative to link instead of directory where link is located */
     if( !self.path.isAbsolute( self.path.normalize( result ) ) )
@@ -969,25 +965,12 @@ function fileWriteAct( o )
   if( o.sync )
   {
 
-      // if( _.strHas( o.filePath, 'icons.woff2' ) )
-      // debugger;
-
       if( o.writeMode === 'rewrite' )
       File.writeFileSync( fileNativePath, o.data, { encoding : self._encodingFor( o.encoding ) } );
       else if( o.writeMode === 'append' )
       File.appendFileSync( fileNativePath, o.data, { encoding : self._encodingFor( o.encoding ) } );
       else if( o.writeMode === 'prepend' )
       {
-        /* let data;
-        // qqq : this is not right. reasons of exception could be variuos.
-        try
-        {
-          data = File.readFileSync( fileNativePath, { encoding : self._encodingFor( o.encoding ) } )
-        }
-        catch( err ){ }
-        if( data )
-        o.data = o.data.concat( data )
-        */
 
         if( self.fileExistsAct({ filePath : o.filePath, sync : 1 }) )
         {
@@ -1202,7 +1185,6 @@ function dirMakeAct( o )
   let fileNativePath = self.path.nativize( o.filePath );
 
   _.assertRoutineOptions( dirMakeAct, arguments );
-  // _.assert( self.statReadAct( self.path.dir( o.filePath ) ), 'Directory for directory does not exist :\n' + _.strQuote( o.filePath ) ); /* qqq aaa : fs handles this */
 
   if( o.sync )
   {
@@ -1536,7 +1518,8 @@ function hardLinkAct( o )
     if( o.dstPath === o.srcPath )
     return true;
 
-    /* qqq : is needed aaa : with this info error is more clear */
+    /* this makse info about error more clear */
+
     let stat = self.statReadAct
     ({
       filePath : o.srcPath,

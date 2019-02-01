@@ -912,7 +912,7 @@ function filesCopyWithAdapter( o )
   options.includingDst = o.investigateDestination;
 
   /*
-  qqq : wrong! resolving*Link and resolvingSoftLink are not related, as well as resolvingTextLink
+  zzz : wrong! resolving*Link and resolvingSoftLink are not related, as well as resolvingTextLink
   Vova : low priority
   */
   options.resolvingSrcSoftLink = o.resolvingSoftLink;
@@ -2749,8 +2749,7 @@ function filesReflectSingle_body( o )
 
     if( record.action === 'hardLink' )
     {
-      /* qqq : should not change time of file if it is already linked */
-      // debugger;
+      /* zzz : should not change time of file if it is already linked */
 
       dst.hardLink
       ({
@@ -2765,7 +2764,7 @@ function filesReflectSingle_body( o )
     }
     else if( record.action === 'softLink' )
     {
-      /* qqq : should not change time of file if it is already linked */
+      /* zzz : should not change time of file if it is already linked */
 
       hub.softLink
       ({
@@ -3808,7 +3807,7 @@ function filesDelete_body( o )
       throwing : o.throwing,
       verbosity : o.verbosity-1,
       safe : o.safe,
-      sync : o.sync, /* qqq : implement and cover sync option for filesFind and filesDelete aaa : done*/
+      sync : o.sync,
     }
     return file.factory.effectiveFileProvider.fileDelete( optionsForDelete );
   }

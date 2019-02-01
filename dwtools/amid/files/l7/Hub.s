@@ -655,15 +655,11 @@ let textLinkAct = _link_functor({ routine : Parent.prototype.textLinkAct, onDiff
 
 //
 
-// function _fileCopyActDifferent( o, dst, src, routine )
 function _fileCopyActDifferent( op )
 {
   let self = this;
   let path = self.path;
   let o = op.options;
-
-  /* qqq : implement async, aaa : done */
-  // _.assert( o.sync, 'not implemented' );
 
   if( op.src.provider.isSoftLink( op.src.localPath ) )
   {

@@ -288,7 +288,6 @@ encoders[ 'buffer.raw' ] =
   onEnd : function( e )
   {
     // _.assert( _.strIs( data ) );
-    // qqq : use _.?someRoutine? please
     // let nodeBuffer = Buffer.from( data )
     // let result = _.bufferRawFrom( nodeBuffer );
 

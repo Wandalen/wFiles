@@ -59,7 +59,7 @@ function _vectorizeKeysAndVals( routine, select )
   _.assert( _.strDefined( routineName ) );
   _.assert( arguments.length === 1 || arguments.length === 2 );
 
-  let routine2 = _.routineVectorize_functor // qqq : uncomment it, please
+  let routine2 = _.routineVectorize_functor
   ({
     routine : [ routineName ],
     vectorizingArray : 1,
@@ -1331,8 +1331,6 @@ function pathResolveLinkTailChain_body( o )
   if( o.resolvingSoftLink && o.stat.isSoftLink() )
   {
     let filePath = self.pathResolveSoftLink({ filePath : o.filePath });
-    /* qqq : implement extended options vova : done for hd,extract */
-    /* qqq : add test coverage, please */
     if( o.preservingRelative && !path.isAbsolute( filePath ) )
     {
       o.result.push( filePath );
@@ -1353,7 +1351,6 @@ function pathResolveLinkTailChain_body( o )
   if( o.resolvingTextLink && o.stat.isTextLink() )
   {
     let filePath = self.pathResolveTextLink({ filePath : o.filePath });
-    /* qqq : implement extended options */
     if( o.preservingRelative && !path.isAbsolute( filePath ) )
     {
       o.result.push( filePath );
@@ -1772,7 +1769,7 @@ having.kind = 'record';
 // --
 
 /*
-  qqq : statReadAct of Extract and HD handle links in head of path differently
+  zzz : statReadAct of Extract and HD handle links in head of path differently
   HD always resolve them
   add test routine statReadActLinkedHead
   Vova : statReadActLinkedHead added, soft links are handled, text links need tests and implementation, low priority
@@ -1815,11 +1812,6 @@ function statRead_body( o )
   	allowingCycled : 0,
   }
 
-  // debugger;
-  // logger.log( 'statRead', o2.filePath );
-
-  /* xxx qqq : add option sync */
-  /* xxx aaa : done */
   let result = self.pathResolveLinkFull( o2 );
 
   if( o.sync )
@@ -1828,7 +1820,6 @@ function statRead_body( o )
   }
   else
   {
-    // let result = new _.Consequence().take( o2.stat );
     return result.thenKeep( end );
   }
 
@@ -3079,12 +3070,6 @@ function dirRead_body( o )
       return 0;
     });
 
-    /*
-    qqq : add test case for this line
-    Vova : low priority
-    */
-    // let isDir = self.resolvedIsDir( o.filePath );
-
     if( o.outputFormat === 'absolute' )
     result = result.map( function( relative )
     {
@@ -3442,11 +3427,6 @@ having.aspect = 'body';
 var operates = filesAreSame_body.operates = Object.create( null );
 operates.ins1 = { pathToRead : 1 };
 operates.ins2 = { pathToRead : 1 };
-
-/*
-qqq : add operate to methods which miss it
-aaa : done
-*/
 
 //
 
@@ -4559,12 +4539,11 @@ function fileTimeSet_pre( routine, args )
     atime : args[ 1 ],
     mtime : args[ 2 ],
   }
-  else if( args.length === 2 ) /* qqq : tests required */ /* aaa : case exists */
+  else if( args.length === 2 )
   {
     let stat = args[ 1 ];
     if( _.strIs( stat ) )
     stat = self.statResolvedRead({ filePath : stat, sync : 1, throwing : 1 })
-    // _.assert( _.fileStatIs( stat ) );
     o =
     {
       filePath : args[ 0 ],
@@ -4839,14 +4818,9 @@ function dirMake_body( o )
   let o2 = { filePath : o.filePath }
   let filePath = self.pathResolveLinkFull( o2 );
 
-  /* qqq : use fileExists instead of statRead where possible
-     aaa : done
-  */
   if( self.fileExists( filePath ) )
   {
 
-    // debugger;
-    // let stat = self.statResolvedRead( filePath );
     let stat = o2.stat;
     _.assert( !!stat );
     if( stat.isTerminal() )
@@ -5207,7 +5181,7 @@ function _link_functor( gen )
     {
       c.con1 = new _.Consequence().take( null );
       c.con2 = new _.Consequence();
-      // qqq : why two?
+      // zzz : why two?
       /* aaa : to split execution into veryfication and linking:
       linking stage needs own exception handler,
       linking stage will not be launched if error was thrown on veryfication or stage ended early
@@ -5320,10 +5294,6 @@ function _link_functor( gen )
         .finally( () =>
         {
           return error( _.err( 'Cant', entryMethodName, o.dstPath, '<-', o.srcPath, '\n', err ) );
-          /*
-          qqq : linking routine should return null if error and throwing : 0
-          aaa : works as expected
-          */
         })
       })
 
@@ -5687,11 +5657,6 @@ function _link_functor( gen )
       if( !renaming )
       return false;
 
-      /*
-      qqq : if breakingSrcHardLink is on then src file should be broken
-      aaa : fixed
-      */
-
       if( _.boolLike( o.breakingDstHardLink ) )
       if( !o.breakingDstHardLink && c.dstStat.isHardLink() )
       return false;
@@ -5775,30 +5740,7 @@ function _link_functor( gen )
       {
         debugger;
         console.error( err2 );
-        // console.error( err.toString() + '\n' + err.stack );
       }
-
-      // qqq : ???
-      // aaa : redundant code
-      // if( c.tempPathSrc ) try
-      // {
-      //   debugger;
-      //   self.filesDelete( o.srcPath );
-      //   self.fileRenameAct
-      //   ({
-      //     dstPath : o.srcPath,
-      //     srcPath : c.tempPathSrc,
-      //     originalDstPath : o.srcPath,
-      //     originalSrcPath : c.tempPathSrc,
-      //     sync : 1,
-      //   });
-      // }
-      // catch( err2 )
-      // {
-      //   debugger;
-      //   console.error( err2 );
-      //   // console.error( err.toString() + '\n' + err.stack );
-      // }
 
     }
 
@@ -5836,7 +5778,7 @@ function _link_functor( gen )
         ({
           filePath : tempPath,
           verbosity : 0,
-          sync : o.sync, /* qqq : implement o.sync, aaa : done */
+          sync : o.sync,
         });
       }
 
@@ -5928,10 +5870,7 @@ function _link_functor( gen )
       }
       else
       {
-        // if( o.sync )
-        // return false;
-        // return new _.Consequence().take( false );
-        return end( null ); /* qqq : should return null, if error. not false. cover it, please */
+        return end( null );
       }
     }
 
@@ -5969,8 +5908,6 @@ function _link_functor( gen )
   var having = linkEntry.having;
 
   having.aspect = 'entry';
-
-  /* qqq : at the end, all files should has the same size */
 
   return linkEntry;
 }
@@ -6638,9 +6575,8 @@ function _textLinkVerify2( c )
 {
   let self = this;
   let o = c.options;
-  // qqq : cover filesAreTextLinked aaa : done
-  if( o.dstPath !== o.srcPath && self.filesAreTextLinked([ o.dstPath, o.srcPath ]) )
-  debugger;
+  // if( o.dstPath !== o.srcPath && self.filesAreTextLinked([ o.dstPath, o.srcPath ]) )
+  // debugger;
   if( o.dstPath !== o.srcPath && self.filesAreTextLinked([ o.dstPath, o.srcPath ]) )
   c.end( true );
 }
@@ -7083,7 +7019,7 @@ function filesAreLinked_pre( routine, args )
 
 //
 
-function filesAreHardLinked_body( o )
+function filesAreHardLinked_body( o ) /* qqq : refactor. probably move some code to filesAreHardLinkedAct */
 {
   let self = this;
 
@@ -7695,8 +7631,6 @@ let Proto =
 
   textLinkAct,
   textLink,
-
-  /* qqq : cover routine textLink */
 
   fileExchange,
 

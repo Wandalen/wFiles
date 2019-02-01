@@ -272,7 +272,7 @@ function filesReflectSingle_body( o )
 
   /* stash changes and checkout branch/commit */
 
-  // result.except( con2 ); // xxx qqq !!!
+  // result.except( con2 ); // xxx !!!
   result.except( ( err ) =>
   {
     con2.error( err );

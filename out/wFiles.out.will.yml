@@ -368,7 +368,7 @@ step:
       reflector: 'reflector::reflect.proto.*=1'
     inherit:
       - predefined.reflect
-  reflect.submodules.debug:
+  reflect.submodules.:
     criterion:
       debug: 1
       raw: 0
@@ -376,7 +376,7 @@ step:
       reflector: 'reflector::reflect.submodules*=1'
     inherit:
       - predefined.reflect
-  reflect.submodules.debug.raw:
+  reflect.submodules.raw:
     criterion:
       debug: 1
       raw: 1

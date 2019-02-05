@@ -9,6 +9,7 @@ if( typeof module !== 'undefined' )
 
   _.include( 'wSelector' );
   _.include( 'wExternalFundamentals' );
+  _.include( 'wRoutineFundamentals' );
   _.include( 'wProto' );
 
   _.include( 'wPathFundamentals' );

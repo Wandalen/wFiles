@@ -193,7 +193,7 @@ function _formMasks()
 
   if( filter.hasExtension )
   {
-    _.assert( _.strIs( filter.hasExtension ) || _.strsAre( filter.hasExtension ) );
+    _.assert( _.strIs( filter.hasExtension ) || _.strsAreAll( filter.hasExtension ) );
 
     filter.hasExtension = _.arrayAs( filter.hasExtension );
     filter.hasExtension = new RegExp( '^.*\\.(' + _.regexpsEscape( filter.hasExtension ).join( '|' ) + ')(\\.|$)(?!.*\/.+)', 'i' );
@@ -204,7 +204,7 @@ function _formMasks()
 
   if( filter.begins )
   {
-    _.assert( _.strIs( filter.begins ) || _.strsAre( filter.begins ) );
+    _.assert( _.strIs( filter.begins ) || _.strsAreAll( filter.begins ) );
 
     filter.begins = _.arrayAs( filter.begins );
     filter.begins = new RegExp( '^(\\.\\/)?(' + _.regexpsEscape( filter.begins ).join( '|' ) + ')' );
@@ -215,7 +215,7 @@ function _formMasks()
 
   if( filter.ends )
   {
-    _.assert( _.strIs( filter.ends ) || _.strsAre( filter.ends ) );
+    _.assert( _.strIs( filter.ends ) || _.strsAreAll( filter.ends ) );
 
     filter.ends = _.arrayAs( filter.ends );
     filter.ends = new RegExp( '(' + '^\.|' + _.regexpsEscape( filter.ends ).join( '|' ) + ')$' );
@@ -441,8 +441,8 @@ function and( src )
   {
     if( src[ a ] === null || src[ a ] === undefined )
     continue;
-    _.assert( _.strIs( src[ a ] ) || _.strsAre( src[ a ] ) );
-    _.assert( filter[ a ] === null || _.strIs( filter[ a ] ) || _.strsAre( filter[ a ] ) );
+    _.assert( _.strIs( src[ a ] ) || _.strsAreAll( src[ a ] ) );
+    _.assert( filter[ a ] === null || _.strIs( filter[ a ] ) || _.strsAreAll( filter[ a ] ) );
     if( filter[ a ] === null )
     {
       filter[ a ] = src[ a ];
@@ -568,8 +568,8 @@ function _pathsJoin_body( o )
     if( o.src[ a ] === null || o.src[ a ] === undefined )
     continue;
 
-    _.assert( _.strIs( o.src[ a ] ) || _.strsAre( o.src[ a ] ) );
-    _.assert( filter[ a ] === null || _.strIs( filter[ a ] ) || _.strsAre( filter[ a ] ) );
+    _.assert( _.strIs( o.src[ a ] ) || _.strsAreAll( o.src[ a ] ) );
+    _.assert( filter[ a ] === null || _.strIs( filter[ a ] ) || _.strsAreAll( filter[ a ] ) );
 
     if( filter[ a ] === null )
     {

@@ -778,12 +778,14 @@ _fileConfigRead2.defaults = fileConfigRead2.defaults;
 function fileConfigPathGet_body( o )
 {
   let self = this;
+  let path = self.path;
   let result = o.outputFormat === 'array' ? [] : Object.create( null );
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.arrayHas( [ 'array', 'map' ], o.outputFormat ) );
 
   let exts = Object.create( null );
+
   for( let e in fileRead.encoders )
   {
     let encoder = fileRead.encoders[ e ];
@@ -795,21 +797,27 @@ function fileConfigPathGet_body( o )
     exts[ encoder.exts[ s ] ] = e;
   }
 
-  _.assert( !!o.filePath );
+  // debugger;
+  // _.each( o.filePath, ( filePath ) =>
+  // {
+  //   let ext = path.ext( filePath );
+  //   debugger;
+  // });
+  // debugger;
+
+  o.filePath = _.arrayAs( o.filePath );
+  _.assert( _.strsAreAll( o.filePath ) );
 
   /* */
 
-  // debugger;
   _.each( exts, ( encoderName, ext ) =>
   {
     _.each( o.filePath, ( filePath ) =>
     {
       _.assert( _.strIs( ext ) );
       _.assert( _.strIs( filePath ) );
-      let filePath2 = filePath + '.' + ext;
-      // logger.log( 'check', filePath2, self.fileExists( filePath2 ) );
-      // if( self.fileExists( filePath2 ) )
-      // debugger;
+      // let filePath2 = filePath + '.' + ext;
+      let filePath2 = _.strAppendOnce( filePath, '.' + ext );
       if( self.fileExists( filePath2 ) )
       if( o.outputFormat === 'array' )
       {
@@ -822,7 +830,6 @@ function fileConfigPathGet_body( o )
       }
     });
   });
-  // debugger;
 
   /* */
 
@@ -866,6 +873,14 @@ let fileConfigPathGet = _.routineFromPreAndBody( Partial.prototype._preFilePathV
 
 //
 
+/*
+qqq : add test
+take into account case when filePath have extension and case when does not
+filePath : fullPath.json
+filePath : fullPath
+both should work fine
+*/
+
 function fileConfigRead_body( o )
 {
   let self = this;
@@ -883,9 +898,15 @@ function fileConfigRead_body( o )
     let abstractPath1 = _.arrayAs( o.filePath );
     let abstractPath2 = found.map( ( f ) => f.abstractPath );
     if( _.arraySetBut( abstractPath1.slice(), abstractPath2 ).length )
-    throw _.err( 'Such configs were not found\n', _.strQuote( _.arraySetBut( abstractPath1.slice(), abstractPath2 ) ) );
+    {
+      debugger;
+      throw _.err( 'None config was found\n', _.strQuote( _.arraySetBut( abstractPath1.slice(), abstractPath2 ) ) );
+    }
     if( abstractPath1.length !== abstractPath2.length )
-    throw _.err( 'Some configs were loaded several times' );
+    {
+      debugger;
+      throw _.err( 'Some configs were loaded several times' );
+    }
   }
 
   /* */

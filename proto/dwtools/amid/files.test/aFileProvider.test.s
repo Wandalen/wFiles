@@ -12775,6 +12775,71 @@ function fileDeleteAsync( test )
 
 //
 
+function fileDeleteLocked( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let path = provider.path;
+
+  if( !self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  {
+    test.identical( 1,1 );
+    return;
+  }
+
+  //
+
+  let fs = require( 'fs' );
+  let testPath = self.pathFor( 'write/fileDeleteLocked' );
+  let terminalPath = path.join( testPath, 'terminal' );
+
+  test.case = 'try to delete opened file, using fs.openSync';
+  provider.fileWrite( terminalPath, terminalPath );
+  var fd = fs.openSync( provider.path.nativize( terminalPath ), 'r' );
+  var got = provider.fileDelete({ filePath : terminalPath, sync : 1, throwing : 1 });
+  test.will = 'no errors from fs module';
+  test.identical( got, undefined );
+  test.will = 'test dir can`t be deleted because is not empty';
+  test.shouldThrowErrorSync( () => provider.fileDelete({ filePath : testPath, sync : 1, throwing : 1 }) )
+  test.will = 'terminal still exists';
+  test.is( provider.fileExists( terminalPath ) );
+  test.will = 'can`t be read';
+  test.shouldThrowErrorSync( () => provider.fileRead( terminalPath ) );
+  test.will = 'can`t be written';
+  test.shouldThrowErrorSync( () => provider.fileWrite( terminalPath, terminalPath ) );
+  fs.closeSync( fd );
+  test.will = 'terminal is closed and removed';
+  test.is( !provider.fileExists( terminalPath ) );
+
+  //
+
+  test.case = 'try to delete opened file using fs.createReadStream';
+  provider.fileWrite( terminalPath, terminalPath );
+  var stream = provider.streamRead( terminalPath );
+  var got = provider.fileDelete({ filePath : terminalPath, sync : 1, throwing : 1 });
+  test.will = 'no errors from fs module';
+  test.identical( got, undefined );
+  test.will = 'test dir can`t be deleted because is not empty';
+  test.shouldThrowErrorSync( () => provider.fileDelete({ filePath : testPath, sync : 1, throwing : 1 }) )
+  test.will = 'terminal still exists';
+  test.is( provider.fileExists( terminalPath ) );
+  test.will = 'can`t be read';
+  test.shouldThrowErrorSync( () => provider.fileRead( terminalPath ) );
+  test.will = 'can`t be written';
+  test.shouldThrowErrorSync( () => provider.fileWrite( terminalPath, terminalPath ) );
+  stream.close();
+  return _.timeOut( 1000, () =>
+  {
+    test.will = 'terminal is closed and removed';
+    test.is( stream.closed );
+    test.is( !provider.fileExists( terminalPath ) );
+  })
+
+
+}
+
+//
+
 function statResolvedReadSync( test )
 {
   let self = this;
@@ -37044,6 +37109,7 @@ var Self =
     fileDeleteSync,
     fileDeleteActSync,
     fileDeleteAsync,
+    fileDeleteLocked,
 
     statResolvedReadSync,
     statReadActSync,

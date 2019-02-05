@@ -6748,10 +6748,19 @@ function fileExchange_body( o )
 
   // throw _.err( 'not tested after introducing of allowingCycled' );
   // let src = self.statResolvedRead({ filePath : o.srcPath, throwing : 0 });
-  // let dst = self.statResolvedRead({ filePath : o.dstPath, throwing : 0 });
+  // let dst = self.statResolvedRead({ filePath : o.dstPath, throwing : 0 });]
 
-  let src = _statResolvedRead( o.srcPath );
-  let dst = _statResolvedRead( o.dstPath );
+  let src, dst;
+
+  try
+  {
+    src = _statResolvedRead( o.srcPath );
+    dst = _statResolvedRead( o.dstPath );
+  }
+  catch( err )
+  {
+    return new _.Consequence().error( err );
+  }
 
   let optionsForRename =
   {
@@ -6804,10 +6813,10 @@ function fileExchange_body( o )
 
   let tempPath = src.filePath + '-' + _.idWithGuid() + '.tmp';
 
-  o.dstPath = tempPath;
-
   var o2 = _.mapExtend( null, o, optionsForRename );
 
+  o2.srcPath = src.filePath;
+  o2.dstPath = tempPath;
   o2.originalSrcPath = null;
   o2.originalDstPath = null;
 

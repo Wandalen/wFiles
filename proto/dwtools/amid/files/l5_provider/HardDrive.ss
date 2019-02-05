@@ -1122,6 +1122,8 @@ function fileDeleteAct( o )
   _.assert( self.path.isAbsolute( o.filePath ) );
   _.assert( self.path.isNormalized( o.filePath ) );
 
+  // console.log( 'fileDeleteAct', o.filePath );
+
   let filePath = self.path.nativize( o.filePath );
 
   if( o.sync )

@@ -3088,7 +3088,7 @@ function fileWriteWithEncoding( test )
     map : { string : 'string', number : 1, array : [ 'string', 1 ] }
   }
   provider.filesDelete( filePath );
-  provider.fileWrite({ filePath : filePath, data : src, encoding : 'json' })
+  provider.fileWrite({ filePath : filePath, data : src, encoding : 'json.min' })
   var got = provider.fileRead({ filePath : filePath, encoding : 'json' });
   test.identical( got, expected );
 

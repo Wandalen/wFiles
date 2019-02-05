@@ -477,15 +477,14 @@ function encodersGenerate()
       e.operation.encoding = encoded.format;
     }
 
-    if( converter.shortName )
+    _.assert( converter.ext.length );
+
+    _.each( converter.ext, ( ext ) =>
     {
-      WriteEndoders[ converter.shortName ] = encoder;
-    }
-    else
-    {
-      _.assert( converter.ext.length );
-      WriteEndoders[ converter.ext[ 0 ] ] = encoder;
-    }
+      if( !WriteEndoders[ ext ] || converter.default )
+      WriteEndoders[ ext ] = encoder;
+    })
+
   })
 
   /**/
@@ -511,15 +510,13 @@ function encodersGenerate()
       e.data = decoded.data;
     }
 
-    if( converter.shortName )
+    _.assert( converter.ext.length );
+
+    _.each( converter.ext, ( ext ) =>
     {
-      ReadEncoders[ converter.shortName ] = encoder;
-    }
-    else
-    {
-      _.assert( converter.ext.length );
-      ReadEncoders[ converter.ext[ 0 ] ] = encoder;
-    }
+      if( !ReadEncoders[ ext ] || converter.default )
+      ReadEncoders[ ext ] = encoder;
+    })
   })
 
   /* */

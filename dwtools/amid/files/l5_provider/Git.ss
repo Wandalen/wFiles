@@ -245,6 +245,7 @@ function filesReflectSingle_body( o )
 
   if( !gitConfigExists )
   {
+    debugger;
     if( !dstFileProvider.fileExists( path.join( dstPath, '.git' ) ) )
     shell( 'git clone ' + paths.compact + ' ' + '.' );
   }

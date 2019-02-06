@@ -3651,13 +3651,11 @@ function filesDelete_body( o )
   let self = this;
   let provider = o.filter.effectiveFileProvider;
   let path = self.path;
-  // let files = [];
-
+  let con;
   let time;
+
   if( o.verbosity >= 1 )
   time = _.timeNow();
-
-  let con;
 
   if( !o.sync )
   con = new _.Consequence().take( null );
@@ -3742,6 +3740,15 @@ function filesDelete_body( o )
 
   /* */
 
+  /*
+  workaround to fix phantom issue on windows+nodejs
+  program exits before actually deleting several dir files
+  */
+
+  _.timeBegin( 5 );
+
+  /* */
+
   return end();
 
   /* - */
@@ -3801,7 +3808,7 @@ function filesDelete_body( o )
 
   function fileDelete( file )
   {
-    let optionsForDelete =
+    let o2 =
     {
       filePath : file.absolute,
       throwing : o.throwing,
@@ -3809,7 +3816,9 @@ function filesDelete_body( o )
       safe : o.safe,
       sync : o.sync,
     }
-    return file.factory.effectiveFileProvider.fileDelete( optionsForDelete );
+    let r = file.factory.effectiveFileProvider.fileDelete( o2 );
+    if( r === null )
+    provider.logger.log( ' ! Cant delete ' + file.absolute );
   }
 
   /* - */

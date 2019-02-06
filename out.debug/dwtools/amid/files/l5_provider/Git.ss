@@ -245,6 +245,8 @@ function filesReflectSingle_body( o )
 
   if( !gitConfigExists )
   {
+    // debugger;
+    /* !!! delete dst dir maybe */
     if( !dstFileProvider.fileExists( path.join( dstPath, '.git' ) ) )
     shell( 'git clone ' + paths.compact + ' ' + '.' );
   }

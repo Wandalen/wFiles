@@ -482,7 +482,11 @@ function encodersGenerate()
     _.each( converter.ext, ( ext ) =>
     {
       if( !WriteEndoders[ ext ] || converter.default )
-      WriteEndoders[ ext ] = encoder;
+      {
+        if( WriteEndoders[ ext ] )
+        _.assert( !WriteEndoders[ ext ].converter.default, `Two default write converters for ${ext} encoder:`, WriteEndoders[ ext ].converter.name, ',', converter.name  );
+        WriteEndoders[ ext ] = encoder;
+      }
     })
 
   })
@@ -515,7 +519,11 @@ function encodersGenerate()
     _.each( converter.ext, ( ext ) =>
     {
       if( !ReadEncoders[ ext ] || converter.default )
-      ReadEncoders[ ext ] = encoder;
+      {
+        if( ReadEncoders[ ext ] )
+        _.assert( !ReadEncoders[ ext ].converter.default, `Two default read converters for ${ext} encoder:`, ReadEncoders[ ext ].converter.name, ',', converter.name  );
+        ReadEncoders[ ext ] = encoder;
+      }
     })
   })
 

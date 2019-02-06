@@ -452,6 +452,16 @@ function encodersGenerate()
   _.assert( _.mapIs( _.Gdf.InMap ) );
   _.assert( _.mapIs( _.Gdf.OutMap ) );
 
+  for( let k in _.Gdf.InOutMap )
+  {
+    if( !_.strHas( k, 'structure' ) )
+    continue;
+    var defaults = _.select( _.Gdf.InOutMap[ k ], '*/default' );
+    defaults = _.arrayCountElement( defaults, 1 );
+    if( defaults > 1 )
+    throw _.err( 'Several default converters for in-out combination:', k  );
+  }
+
   let writeConverters = _.Gdf.InMap[ 'structure' ];
   let readConverters = _.Gdf.OutMap[ 'structure' ];
 
@@ -482,11 +492,7 @@ function encodersGenerate()
     _.each( converter.ext, ( ext ) =>
     {
       if( !WriteEndoders[ ext ] || converter.default )
-      {
-        if( WriteEndoders[ ext ] )
-        _.assert( !WriteEndoders[ ext ].converter.default, `Two default write converters for ${ext} encoder:`, WriteEndoders[ ext ].converter.name, ',', converter.name  );
-        WriteEndoders[ ext ] = encoder;
-      }
+      WriteEndoders[ ext ] = encoder;
     })
 
   })
@@ -519,11 +525,7 @@ function encodersGenerate()
     _.each( converter.ext, ( ext ) =>
     {
       if( !ReadEncoders[ ext ] || converter.default )
-      {
-        if( ReadEncoders[ ext ] )
-        _.assert( !ReadEncoders[ ext ].converter.default, `Two default read converters for ${ext} encoder:`, ReadEncoders[ ext ].converter.name, ',', converter.name  );
-        ReadEncoders[ ext ] = encoder;
-      }
+      ReadEncoders[ ext ] = encoder;
     })
   })
 

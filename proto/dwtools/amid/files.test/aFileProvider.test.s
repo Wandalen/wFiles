@@ -37378,7 +37378,7 @@ function EncodersGenerate( test )
 
   test.will = 'update encoders, encoder should exist';
   provider.EncodersGenerate();
-  let encoder = _.FileWriteEncoders[ 'testEncoder' ];
+  var encoder = _.FileWriteEncoders[ 'testEncoder' ];
   test.is( _.mapIs( encoder ) );
   test.identical( encoder.exts, converter.ext );
   test.identical( encoder.converter, converter );
@@ -37389,6 +37389,23 @@ function EncodersGenerate( test )
   provider.EncodersGenerate();
   test.will = 'update encoders, encoder should not exist';
   test.is( !_.FileWriteEncoders[ 'testEncoder' ] );
+
+  //
+
+  test.case = 'adjust converter exts'
+  var converter = readConverters[ 0 ];
+  var originalExt = converter.ext.slice();
+  var ext = 'testExt';
+  converter.ext = [ ext ];
+  test.is( !_.mapIs( _.FileReadEncoders[ ext ] ) );
+  provider.EncodersGenerate();
+  var encoder = _.FileReadEncoders[ ext ];
+  test.is( _.mapIs( encoder ) );
+  test.identical( encoder.exts, converter.ext );
+  test.identical( encoder.converter, converter );
+  converter.ext = originalExt.slice();
+  provider.EncodersGenerate();
+  test.is( !_.mapIs( _.FileReadEncoders[ ext ] ) );
 
   /* - */
 

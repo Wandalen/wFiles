@@ -534,7 +534,7 @@ function EncodersGenerate()
   {
     let converter = _.FileReadEncoders[ k ].converter;
     if( converter )
-    if( !_.arrayHas( readConverters, converter ) )
+    if( !_.arrayHas( readConverters, converter ) || !_.arrayHas( converter.ext, k ) )
     delete _.FileReadEncoders[ k ]
   }
 
@@ -542,7 +542,7 @@ function EncodersGenerate()
   {
     let converter = _.FileWriteEncoders[ k ].converter;
     if( converter )
-    if( !_.arrayHas( writeConverters, converter ) )
+    if( !_.arrayHas( writeConverters, converter ) || !_.arrayHas( converter.ext, k ) )
     delete _.FileWriteEncoders[ k ];
   }
 

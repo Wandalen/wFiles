@@ -37333,6 +37333,126 @@ function experiment2( test )
   test.identical( o.found, [ linkPath, filePath ] );
 }
 
+//
+
+function EncodersGenerate( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let writeConverters = _.Gdf.InMap[ 'structure' ];
+  let readConverters = _.Gdf.OutMap[ 'structure' ];
+
+  //
+
+  test.case = 'check if all write encoders are generated';
+  _checkEncoders( _.FileWriteEncoders, writeConverters );
+
+  //
+
+  test.case = 'check if all read encoders are generated';
+  _checkEncoders( _.FileReadEncoders, readConverters );
+
+  //
+
+  test.case = 'add and remove write converter';
+
+  test.will = 'encoder and converter should not exist';
+  test.is( !_.FileWriteEncoders[ 'testEncoder' ] );
+  test.is( !_.Gdf.ExtMap[ 'testEncoder' ] );
+  var testConverter =
+  {
+    ext : [ 'testEncoder' ],
+    in : [ 'structure' ],
+    out : [ 'string' ],
+
+    onEncode : function( op )
+    {
+      op.out.data = _.toStr( op.out.data, { levels : 99 } );
+      op.out.format = 'string';
+    }
+  }
+  var converter = _.Gdf([ testConverter ])[ 0 ];
+
+  test.will = 'encoder should not exist';
+  test.is( !_.FileWriteEncoders[ 'testEncoder' ] );
+
+  test.will = 'update encoders, encoder should exist';
+  provider.EncodersGenerate();
+  var encoder = _.FileWriteEncoders[ 'testEncoder' ];
+  test.is( _.mapIs( encoder ) );
+  test.identical( encoder.exts, converter.ext );
+  test.identical( encoder.converter, converter );
+
+  test.will = 'finit converter, encoder should exist';
+  converter.finit();
+  test.is( _.mapIs( _.FileWriteEncoders[ 'testEncoder' ] ) );
+  provider.EncodersGenerate();
+  test.will = 'update encoders, encoder should not exist';
+  test.is( !_.FileWriteEncoders[ 'testEncoder' ] );
+
+  //
+
+  test.case = 'adjust converter exts'
+  var converter = readConverters[ 0 ];
+  var originalExt = converter.ext.slice();
+  var ext = 'testExt';
+  converter.ext = [ ext ];
+  test.is( !_.mapIs( _.FileReadEncoders[ ext ] ) );
+  provider.EncodersGenerate();
+  var encoder = _.FileReadEncoders[ ext ];
+  test.is( _.mapIs( encoder ) );
+  test.identical( encoder.exts, converter.ext );
+  test.identical( encoder.converter, converter );
+  converter.ext = originalExt.slice();
+  provider.EncodersGenerate();
+  test.is( !_.mapIs( _.FileReadEncoders[ ext ] ) );
+
+  /* - */
+
+  function _checkEncoders( encoders, converters )
+  {
+    _.each( converters, ( converter ) =>
+    {
+      _.each( converter.ext, ( ext ) =>
+      {
+        if( encoders[ ext ].converter.default )
+        {
+          test.will = 'expects only one default converter for encoder: ' + ext;
+          let defaultConverter = _.Gdf.ExtMap[ ext ].filter( ( c ) => !!c.default )
+          test.identical( defaultConverter.length, 1 );
+
+          test.will = ext + ' encoder should exist';
+          test.is( _.mapIs( encoders[ ext ] ) );
+          test.will = ext + ' encoder should use default converter: ' + defaultConverter[ 0 ].name;
+          test.is( encoders[ ext ].converter === defaultConverter[ 0 ] );
+        }
+        else
+        {
+          test.will = ext + ' encoder should exist';
+          test.is( _.mapIs( encoders[ ext ] ) );
+          test.will = ext + ' encoder should exist and use converter: ' + converter.name;
+          test.is( encoders[ ext ].converter === converter );
+        }
+
+        test.will = ext + ' encoder should have onBegin/onEnd or both';
+
+        if( _.FileWriteEncoders[ ext ] )
+        {
+          test.is( _.routineIs( encoders[ ext ].onBegin ) );
+        }
+        else
+        {
+          test.is( _.routineIs( encoders[ ext ].onBegin ) );
+          test.is( _.routineIs( encoders[ ext ].onEnd ) );
+        }
+
+        test.will = ext + ' encoder should have exts arrays';
+        test.is( _.arrayIs( encoders[ ext ].exts ) )
+      })
+    })
+  }
+}
+
 // --
 // declare
 // --
@@ -37501,6 +37621,10 @@ var Self =
     statReadExperiment,
     experiment,
     experiment2,
+
+    //static
+
+    EncodersGenerate,
 
   },
 

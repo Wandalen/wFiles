@@ -446,7 +446,7 @@ function _preSrcDstPathWithProviderDefaults( routine, args )
 
 //
 
-function encodersGenerate()
+function EncodersGenerate()
 {
   _.assert( _.Gdf, 'GdfStrategy is required to generate encoders!' );
   _.assert( _.mapIs( _.Gdf.InMap ) );
@@ -534,7 +534,7 @@ function encodersGenerate()
   {
     let converter = _.FileReadEncoders[ k ].converter;
     if( converter )
-    if( !_.arrayHas( readConverters, converter ) )
+    if( !_.arrayHas( readConverters, converter ) || !_.arrayHas( converter.ext, k ) )
     delete _.FileReadEncoders[ k ]
   }
 
@@ -542,7 +542,7 @@ function encodersGenerate()
   {
     let converter = _.FileWriteEncoders[ k ].converter;
     if( converter )
-    if( !_.arrayHas( writeConverters, converter ) )
+    if( !_.arrayHas( writeConverters, converter ) || !_.arrayHas( converter.ext, k ) )
     delete _.FileWriteEncoders[ k ];
   }
 
@@ -7478,7 +7478,7 @@ let Statics =
   Path : _.path.CloneExtending({ fileProvider : Self }),
   WriteMode : WriteMode,
   ProviderDefaults : ProviderDefaults,
-  EncodersGenerate : encodersGenerate
+  EncodersGenerate : EncodersGenerate
 }
 
 let Forbids =
@@ -7548,7 +7548,7 @@ let Proto =
   _preFilePathVectorWithProviderDefaults,
   _preSrcDstPathWithoutProviderDefaults,
   _preSrcDstPathWithProviderDefaults,
-  encodersGenerate,
+  EncodersGenerate,
 
   // hub
 

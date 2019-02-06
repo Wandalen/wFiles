@@ -24738,8 +24738,10 @@ function fileExchangeSync( test )
     return;
   }
 
-  var /*dir*/testPath = test.context.pathFor( 'written/fileExchange' );
+  var testPath = test.context.pathFor( 'written/fileExchange' );
   var srcPath,dstPath,src,dst,got;
+  var srcPathTerminal = provider.path.join( testPath, 'srcTerminal' );
+  var dstPathTerminal = provider.path.join( testPath, 'dstTerminal' );
 
   if( !provider.statResolvedRead( /*dir*/testPath ) )
   provider.dirMake( /*dir*/testPath );
@@ -25020,9 +25022,6 @@ function fileExchangeSync( test )
 
   //
 
-  var srcPathTerminal = provider.path.join( testPath, 'srcTerminal' );
-  var dstPathTerminal = provider.path.join( testPath, 'dstTerminal' );
-
   test.case = 'two soft links to terminals';
   provider.filesDelete( testPath );
   provider.fileWrite( srcPathTerminal, srcPathTerminal );
@@ -25154,6 +25153,126 @@ function fileExchangeSync( test )
   test.identical( provider.fileRead( dstPathTerminal ), srcPathTerminal );
   test.identical( provider.fileRead( dstPath ), srcPathTerminal );
 
+  // cycled links
+
+  srcPath = path.join( testPath, 'src' );
+  dstPath = path.join( testPath, 'dst' );
+
+  test.case = 'two self cycled soft links, cycled allowed';
+  provider.filesDelete( testPath );
+  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1, makingDirectory : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  provider.fileExchange
+  ({
+    srcPath : srcPath,
+    dstPath : dstPath,
+    sync : 1,
+    allowingMissed : 0,
+    allowingCycled : 1,
+    throwing : 1
+  });
+  test.is( provider.isSoftLink( srcPath ) );
+  test.is( provider.isSoftLink( dstPath ) );
+  test.identical( provider.pathResolveSoftLink( srcPath ), '../dst' );
+  test.identical( provider.pathResolveSoftLink( dstPath ), '../src' );
+
+  test.case = 'two self cycled soft links, cycled not allowed';
+  provider.filesDelete( testPath );
+  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1, makingDirectory : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.fileExchange
+    ({
+      srcPath : srcPath,
+      dstPath : dstPath,
+      sync : 1,
+      allowingMissed : 0,
+      allowingCycled : 0,
+      throwing : 1
+    });
+  })
+  test.is( provider.isSoftLink( srcPath ) );
+  test.is( provider.isSoftLink( dstPath ) );
+  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
+  test.identical( provider.pathResolveSoftLink( dstPath ), '../dst' );
+
+  test.case = 'two self cycled soft links, cycled not allowed, throwing off';
+  provider.filesDelete( testPath );
+  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1, makingDirectory : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  got = provider.fileExchange
+  ({
+    srcPath : srcPath,
+    dstPath : dstPath,
+    sync : 1,
+    allowingMissed : 0,
+    allowingCycled : 0,
+    throwing : 0
+  });
+  test.identical( got, null );
+  test.is( provider.isSoftLink( srcPath ) );
+  test.is( provider.isSoftLink( dstPath ) );
+  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
+  test.identical( provider.pathResolveSoftLink( dstPath ), '../dst' );
+
+  test.case = 'self cycled and terminal, cycled allowed';
+  provider.filesDelete( testPath );
+  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1, makingDirectory : 1 });
+  provider.fileWrite( dstPathTerminal, dstPathTerminal )
+  provider.fileExchange
+  ({
+    srcPath : srcPath,
+    dstPath : dstPathTerminal,
+    sync : 1,
+    allowingMissed : 0,
+    allowingCycled : 1,
+    throwing : 1
+  });
+  test.is( provider.isTerminal( srcPath ) );
+  test.is( provider.isSoftLink( dstPathTerminal ) );
+  test.identical( provider.fileRead( srcPath ), dstPathTerminal );
+  test.identical( provider.pathResolveSoftLink( dstPathTerminal ), '../src' );
+
+  test.case = 'self cycled and terminal, cycled not allowed';
+  provider.filesDelete( testPath );
+  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1, makingDirectory : 1 });
+  provider.fileWrite( dstPathTerminal, dstPathTerminal )
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.fileExchange
+    ({
+      srcPath : srcPath,
+      dstPath : dstPathTerminal,
+      sync : 1,
+      allowingMissed : 0,
+      allowingCycled : 0,
+      throwing : 1
+    });
+  })
+  test.is( provider.isTerminal( dstPathTerminal ) );
+  test.is( provider.isSoftLink( srcPath ) );
+  test.identical( provider.fileRead( dstPathTerminal ), dstPathTerminal );
+  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
+
+  test.case = 'self cycled and terminal, cycled not allowed, throwing off';
+  provider.filesDelete( testPath );
+  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1, makingDirectory : 1 });
+  provider.fileWrite( dstPathTerminal, dstPathTerminal )
+  got = provider.fileExchange
+  ({
+    srcPath : srcPath,
+    dstPath : dstPathTerminal,
+    sync : 1,
+    allowingMissed : 0,
+    allowingCycled : 0,
+    throwing : 0
+  });
+  test.identical( got, null );
+  test.is( provider.isTerminal( dstPathTerminal ) );
+  test.is( provider.isSoftLink( srcPath ) );
+  test.identical( provider.fileRead( dstPathTerminal ), dstPathTerminal );
+  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
 
 }
 
@@ -25733,7 +25852,176 @@ function fileExchangeAsync( test )
     })
   })
 
+  //cycled links
+
+  .thenKeep( () =>
+  {
+    test.case = 'two self cycled soft links, cycled allowed';
+    provider.filesDelete( testPath );
+    provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1, makingDirectory : 1 });
+    provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+    return provider.fileExchange
+    ({
+      srcPath : srcPath,
+      dstPath : dstPath,
+      sync : 0,
+      allowingMissed : 0,
+      allowingCycled : 1,
+      throwing : 1
+    })
+    .thenKeep( ( got ) =>
+    {
+      test.is( provider.isSoftLink( srcPath ) );
+      test.is( provider.isSoftLink( dstPath ) );
+      test.identical( provider.pathResolveSoftLink( srcPath ), '../dst' );
+      test.identical( provider.pathResolveSoftLink( dstPath ), '../src' );
+      return got;
+    })
+  })
+
+  //
+
+  .thenKeep( () =>
+  {
+    test.case = 'two self cycled soft links, cycled not allowed';
+    provider.filesDelete( testPath );
+    provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1, makingDirectory : 1 });
+    provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+    let con = provider.fileExchange
+    ({
+      srcPath : srcPath,
+      dstPath : dstPath,
+      sync : 0,
+      allowingMissed : 0,
+      allowingCycled : 0,
+      throwing : 1
+    });
+    return test.shouldThrowErrorAsync( con )
+    .thenKeep( () =>
+    {
+      test.is( provider.isSoftLink( srcPath ) );
+      test.is( provider.isSoftLink( dstPath ) );
+      test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
+      test.identical( provider.pathResolveSoftLink( dstPath ), '../dst' );
+      return null;
+    })
+
+  })
+
+  //
+
+  .thenKeep( () =>
+  {
+    test.case = 'two self cycled soft links, cycled not allowed, throwing off';
+    provider.filesDelete( testPath );
+    provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1, makingDirectory : 1 });
+    provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+    return provider.fileExchange
+    ({
+      srcPath : srcPath,
+      dstPath : dstPath,
+      sync : 0,
+      allowingMissed : 0,
+      allowingCycled : 0,
+      throwing : 0
+    })
+    .thenKeep( ( got ) =>
+    {
+      test.identical( got, null );
+      test.is( provider.isSoftLink( srcPath ) );
+      test.is( provider.isSoftLink( dstPath ) );
+      test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
+      test.identical( provider.pathResolveSoftLink( dstPath ), '../dst' );
+      return null;
+    })
+  })
+
+  //
+
+  .thenKeep( () =>
+  {
+    test.case = 'self cycled and terminal, cycled allowed';
+    provider.filesDelete( testPath );
+    provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1, makingDirectory : 1 });
+    provider.fileWrite( dstPathTerminal, dstPathTerminal )
+    return provider.fileExchange
+    ({
+      srcPath : srcPath,
+      dstPath : dstPathTerminal,
+      sync : 0,
+      allowingMissed : 0,
+      allowingCycled : 1,
+      throwing : 1
+    })
+    .thenKeep( ( got ) =>
+    {
+      test.is( provider.isTerminal( srcPath ) );
+      test.is( provider.isSoftLink( dstPathTerminal ) );
+      test.identical( provider.fileRead( srcPath ), dstPathTerminal );
+      test.identical( provider.pathResolveSoftLink( dstPathTerminal ), '../src' );
+      return got;
+    })
+
+  })
+
+  //
+
+  .thenKeep( () =>
+  {
+    test.case = 'self cycled and terminal, cycled not allowed';
+    provider.filesDelete( testPath );
+    provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1, makingDirectory : 1 });
+    provider.fileWrite( dstPathTerminal, dstPathTerminal )
+    let con = provider.fileExchange
+    ({
+      srcPath : srcPath,
+      dstPath : dstPathTerminal,
+      sync : 0,
+      allowingMissed : 0,
+      allowingCycled : 0,
+      throwing : 1
+    });
+    return test.shouldThrowErrorAsync( con )
+    .thenKeep( () =>
+    {
+      test.is( provider.isTerminal( dstPathTerminal ) );
+      test.is( provider.isSoftLink( srcPath ) );
+      test.identical( provider.fileRead( dstPathTerminal ), dstPathTerminal );
+      test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
+      return null;
+    })
+  })
+
+  //
+
+  .thenKeep( () =>
+  {
+    test.case = 'self cycled and terminal, cycled not allowed, throwing off';
+    provider.filesDelete( testPath );
+    provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1, makingDirectory : 1 });
+    provider.fileWrite( dstPathTerminal, dstPathTerminal )
+    return provider.fileExchange
+    ({
+      srcPath : srcPath,
+      dstPath : dstPathTerminal,
+      sync : 0,
+      allowingMissed : 0,
+      allowingCycled : 0,
+      throwing : 0
+    })
+    .thenKeep( ( got ) =>
+    {
+      test.identical( got, null );
+      test.is( provider.isTerminal( dstPathTerminal ) );
+      test.is( provider.isSoftLink( srcPath ) );
+      test.identical( provider.fileRead( dstPathTerminal ), dstPathTerminal );
+      test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
+      return null;
+    })
+  })
+
   return consequence;
+
 }
 
 //

@@ -4527,7 +4527,7 @@ _.assert( _.boolLike( _.toJson.defaults.cloning ) );
  * @throws {Error} If options has unexpected property.
  * @method fileWriteJson
  * @memberof wFileProviderPartial
- */
+*/
 
 let fileWriteJson = _.routineFromPreAndBody( fileWrite_pre, fileWriteJson_body );
 fileWriteJson.having.aspect = 'entry';
@@ -6768,7 +6768,7 @@ function fileExchange_body( o )
   }
   catch( err )
   {
-    return new _.Consequence().error( err );
+    return handleError( err );
   }
 
   let optionsForRename =
@@ -6790,7 +6790,7 @@ function fileExchange_body( o )
         o.dstPath = src.filePath;
       }
       if( !src.stat && !dst.stat )
-      return _returnNull();
+      return returnNull();
 
       return self.fileRename( _.mapExtend( null, o, optionsForRename ) );
     }
@@ -6811,13 +6811,10 @@ function fileExchange_body( o )
         err = _.err( 'dstPath not exist! dstPath: ', o.dstPath );
       }
 
-      if( o.sync )
-      throw err;
-      else
-      return new _.Consequence().error( err );
+      return handleError( err );
     }
     else
-    return _returnNull();
+    return returnNull();
   }
 
   let tempPath = src.filePath + '-' + _.idWithGuid() + '.tmp';
@@ -6887,12 +6884,24 @@ function fileExchange_body( o )
 
   /* - */
 
-  function _returnNull()
+  function returnNull()
   {
     if( o.sync )
     return null;
     else
     return new _.Consequence().take( null );
+  }
+
+  /* - */
+
+  function handleError( err )
+  {
+    if( !o.throwing )
+    return returnNull();
+
+    if( o.sync )
+    throw _.err( err );
+    return new _.Consequence().error( err );
   }
 
 }

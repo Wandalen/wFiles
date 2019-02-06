@@ -3819,6 +3819,7 @@ function filesDelete_body( o )
     let r = file.factory.effectiveFileProvider.fileDelete( o2 );
     if( r === null )
     provider.logger.log( ' ! Cant delete ' + file.absolute );
+    return r;
   }
 
   /* - */

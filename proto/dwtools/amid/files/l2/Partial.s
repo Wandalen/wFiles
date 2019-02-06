@@ -446,6 +446,117 @@ function _preSrcDstPathWithProviderDefaults( routine, args )
 
 //
 
+function encodersGenerate()
+{
+  _.assert( _.Gdf, 'GdfStrategy is required to generate encoders!' );
+  _.assert( _.mapIs( _.Gdf.InMap ) );
+  _.assert( _.mapIs( _.Gdf.OutMap ) );
+
+  for( let k in _.Gdf.InOutMap )
+  {
+    if( !_.strHas( k, 'structure' ) )
+    continue;
+    var defaults = _.entityFilter( _.Gdf.InOutMap[ k ], ( c ) => c.default ? c : undefined );
+    if( defaults.length > 1 )
+    throw _.err( `Several default converters for '${k}' in-out combination:`, _.select( defaults, '*/name' )  );
+  }
+
+  let writeConverters = _.Gdf.InMap[ 'structure' ];
+  let readConverters = _.Gdf.OutMap[ 'structure' ];
+
+  let WriteEndoders = Object.create( null );
+  let ReadEncoders = Object.create( null );
+
+  /**/
+
+  writeConverters.forEach( ( converter ) =>
+  {
+    let encoder = Object.create( null );
+
+    encoder.converter = converter;
+    encoder.exts = converter.ext.slice();
+
+    encoder.onBegin = function( e )
+    {
+      let encoded = converter.encode({ data : e.operation.data, envMap : e.operation });
+      e.operation.data = encoded.data;
+      if( encoded.format === 'string' )
+      e.operation.encoding = 'utf8';
+      else
+      e.operation.encoding = encoded.format;
+    }
+
+    _.assert( converter.ext.length );
+
+    _.each( converter.ext, ( ext ) =>
+    {
+      if( !WriteEndoders[ ext ] || converter.default )
+      WriteEndoders[ ext ] = encoder;
+    })
+
+  })
+
+  /**/
+
+  readConverters.forEach( ( converter ) =>
+  {
+    let encoder = Object.create( null );
+
+    encoder.converter = converter;
+    encoder.exts = converter.ext.slice();
+    encoder.forConfig = converter.forConfig;
+
+    encoder.onBegin = function( e )
+    {
+      if( converter.in[ 0 ] === 'string' )
+      e.operation.encoding = 'utf8';
+      else
+      e.operation.encoding = converter.in[ 0 ];
+    }
+    encoder.onEnd = function( e )
+    {
+      let decoded = converter.encode({ data : e.data, envMap : e.operation });
+      e.data = decoded.data;
+    }
+
+    _.assert( converter.ext.length );
+
+    _.each( converter.ext, ( ext ) =>
+    {
+      if( !ReadEncoders[ ext ] || converter.default )
+      ReadEncoders[ ext ] = encoder;
+    })
+  })
+
+  /* */
+
+  for( let k in _.FileReadEncoders )
+  {
+    let converter = _.FileReadEncoders[ k ].converter;
+    if( converter )
+    if( !_.arrayHas( readConverters, converter ) )
+    delete _.FileReadEncoders[ k ]
+  }
+
+  for( let k in _.FileWriteEncoders )
+  {
+    let converter = _.FileWriteEncoders[ k ].converter;
+    if( converter )
+    if( !_.arrayHas( writeConverters, converter ) )
+    delete _.FileWriteEncoders[ k ];
+  }
+
+  /* */
+
+  _.assert( _.mapIs( _.FileReadEncoders ) );
+  _.assert( _.mapIs( _.FileWriteEncoders ) );
+
+  Object.assign( _.FileReadEncoders, ReadEncoders );
+  Object.assign( _.FileWriteEncoders, WriteEndoders );
+}
+
+//
+
 /**
  * Return options for file read/write. If `filePath is an object, method returns it. Method validate result option
     properties by default parameters from invocation context.
@@ -4416,7 +4527,7 @@ _.assert( _.boolLike( _.toJson.defaults.cloning ) );
  * @throws {Error} If options has unexpected property.
  * @method fileWriteJson
  * @memberof wFileProviderPartial
- */
+*/
 
 let fileWriteJson = _.routineFromPreAndBody( fileWrite_pre, fileWriteJson_body );
 fileWriteJson.having.aspect = 'entry';
@@ -6646,10 +6757,19 @@ function fileExchange_body( o )
 
   // throw _.err( 'not tested after introducing of allowingCycled' );
   // let src = self.statResolvedRead({ filePath : o.srcPath, throwing : 0 });
-  // let dst = self.statResolvedRead({ filePath : o.dstPath, throwing : 0 });
+  // let dst = self.statResolvedRead({ filePath : o.dstPath, throwing : 0 });]
 
-  let src = _statResolvedRead( o.srcPath );
-  let dst = _statResolvedRead( o.dstPath );
+  let src, dst;
+
+  try
+  {
+    src = _statResolvedRead( o.srcPath );
+    dst = _statResolvedRead( o.dstPath );
+  }
+  catch( err )
+  {
+    return handleError( err );
+  }
 
   let optionsForRename =
   {
@@ -6670,7 +6790,7 @@ function fileExchange_body( o )
         o.dstPath = src.filePath;
       }
       if( !src.stat && !dst.stat )
-      return _returnNull();
+      return returnNull();
 
       return self.fileRename( _.mapExtend( null, o, optionsForRename ) );
     }
@@ -6691,21 +6811,18 @@ function fileExchange_body( o )
         err = _.err( 'dstPath not exist! dstPath: ', o.dstPath );
       }
 
-      if( o.sync )
-      throw err;
-      else
-      return new _.Consequence().error( err );
+      return handleError( err );
     }
     else
-    return _returnNull();
+    return returnNull();
   }
 
   let tempPath = src.filePath + '-' + _.idWithGuid() + '.tmp';
 
-  o.dstPath = tempPath;
-
   var o2 = _.mapExtend( null, o, optionsForRename );
 
+  o2.srcPath = src.filePath;
+  o2.dstPath = tempPath;
   o2.originalSrcPath = null;
   o2.originalDstPath = null;
 
@@ -6767,12 +6884,24 @@ function fileExchange_body( o )
 
   /* - */
 
-  function _returnNull()
+  function returnNull()
   {
     if( o.sync )
     return null;
     else
     return new _.Consequence().take( null );
+  }
+
+  /* - */
+
+  function handleError( err )
+  {
+    if( !o.throwing )
+    return returnNull();
+
+    if( o.sync )
+    throw _.err( err );
+    return new _.Consequence().error( err );
   }
 
 }
@@ -7348,7 +7477,8 @@ let Statics =
   MakeDefault : MakeDefault,
   Path : _.path.CloneExtending({ fileProvider : Self }),
   WriteMode : WriteMode,
-  ProviderDefaults : ProviderDefaults
+  ProviderDefaults : ProviderDefaults,
+  EncodersGenerate : encodersGenerate
 }
 
 let Forbids =
@@ -7418,6 +7548,7 @@ let Proto =
   _preFilePathVectorWithProviderDefaults,
   _preSrcDstPathWithoutProviderDefaults,
   _preSrcDstPathWithProviderDefaults,
+  encodersGenerate,
 
   // hub
 
@@ -7680,6 +7811,8 @@ _.Verbal.mixin( Self );
 
 _.assert( _.routineIs( Self.prototype.statsResolvedRead ) );
 _.assert( _.objectIs( Self.prototype.statsResolvedRead.defaults ) );
+
+Self.EncodersGenerate();
 
 // --
 // export

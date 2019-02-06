@@ -520,6 +520,189 @@ function readToProvider( test )
 
 }
 
+//
+
+function fileConfigRead( test )
+{
+  let context = this;
+  let provider = context.provider || _.fileProvider;
+  let path = provider.path;
+  let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let terminalPath = path.join( testPath, 'terminal' );
+
+  //
+
+  test.case = 'no config'
+  provider.filesDelete( testPath );
+  test.shouldThrowErrorSync( () => provider.fileConfigRead({ filePath : terminalPath, many : 'all' }) );
+  test.shouldThrowErrorSync( () => provider.fileConfigRead({ filePath : terminalPath, many : 'any', throwing : 1 }) );
+  test.mustNotThrowError( () => provider.fileConfigRead({ filePath : terminalPath, many : 'any', throwing : 0 }) );
+
+  //
+
+  let src =
+  {
+
+    null : null,
+    number : 13,
+    string : 'something',
+    map : { a : '1', dir : { b : 2 }, c : [ 1,2,3 ] },
+    array : [ { a : '1', dir : { b : 2 }, c : [ 1,2,3 ] } ],
+  }
+
+  //
+
+  test.case = 'json, no ext';
+  provider.filesDelete( testPath );
+  var filePath = path.changeExt( terminalPath, 'json' );
+  provider.fileWrite({ filePath : filePath, data : src, encoding : 'json.fine' });
+  var got = provider.fileConfigRead({ filePath : terminalPath });
+  test.identical( got, src );
+
+  test.case = 'json, with ext';
+  provider.filesDelete( testPath );
+  var filePath = path.changeExt( terminalPath, 'json' );
+  provider.fileWrite({ filePath : filePath, data : src, encoding : 'json.fine' });
+  var got = provider.fileConfigRead({ filePath : filePath });
+  test.identical( got, src )
+
+  test.case = 'bson, no ext';
+  provider.filesDelete( testPath );
+  var filePath = path.changeExt( terminalPath, 'bson' );
+  provider.fileWrite({ filePath : filePath, data : src, encoding : 'bson' });
+  var got = provider.fileConfigRead({ filePath : terminalPath });
+  test.identical( got, src );
+
+  test.case = 'bson, with ext';
+  provider.filesDelete( testPath );
+  var filePath = path.changeExt( terminalPath, 'bson' );
+  provider.fileWrite({ filePath : filePath, data : src, encoding : 'bson' });
+  var got = provider.fileConfigRead({ filePath : filePath });
+  test.identical( got, src )
+
+  test.case = 'cson, no ext';
+  provider.filesDelete( testPath );
+  var filePath = path.changeExt( terminalPath, 'coffee' );
+  provider.fileWrite({ filePath : filePath, data : src, encoding : 'coffee' });
+  var got = provider.fileConfigRead({ filePath : terminalPath });
+  test.identical( got, src );
+
+  test.case = 'cson, with ext';
+  provider.filesDelete( testPath );
+  var filePath = path.changeExt( terminalPath, 'coffee' );
+  provider.fileWrite({ filePath : filePath, data : src, encoding : 'coffee' });
+  var got = provider.fileConfigRead({ filePath : filePath });
+  test.identical( got, src )
+
+  //
+
+  test.case = 'several configs';
+
+  var src1 =
+  {
+
+    null : null,
+    number : 13,
+    string : 'something',
+  }
+  var src2 =
+  {
+    map : { a : '1', dir : { b : 2 }, c : [ 1,2,3 ] },
+    array : [ { a : '1', dir : { b : 2 }, c : [ 1,2,3 ] } ],
+  }
+  provider.filesDelete( testPath );
+  var filePath = path.changeExt( terminalPath, 'json' );
+  provider.fileWrite({ filePath : filePath, data : src1, encoding : 'json.fine' });
+  var filePath = path.changeExt( terminalPath, 'bson' );
+  provider.fileWrite({ filePath : filePath, data : src2, encoding : 'bson' });
+  var filePath = path.s.changeExt( terminalPath, [ 'json', 'bson' ] );
+  var got = provider.fileConfigRead({ filePath : filePath });
+  test.identical( got, src );
+
+  //
+
+  test.case = 'several configs, no ext';
+
+  var src1 =
+  {
+
+    null : null,
+    number : 13,
+    string : 'something',
+  }
+  var src2 =
+  {
+    map : { a : '1', dir : { b : 2 }, c : [ 1,2,3 ] },
+    array : [ { a : '1', dir : { b : 2 }, c : [ 1,2,3 ] } ],
+  }
+  provider.filesDelete( testPath );
+  var filePath = path.changeExt( terminalPath, 'json' );
+  provider.fileWrite({ filePath : filePath, data : src1, encoding : 'json.fine' });
+  var filePath = path.changeExt( terminalPath, 'bson' );
+  provider.fileWrite({ filePath : filePath, data : src2, encoding : 'bson' });
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.fileConfigRead({ filePath : [ terminalPath, terminalPath ] });
+  })
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.fileConfigRead({ filePath : terminalPath });
+  })
+
+  //
+
+  test.case = 'second config rewrites some properties of first';
+  var src1 =
+  {
+
+    null : null,
+    number : 13,
+    string : 'something',
+  }
+  var src2 =
+  {
+    null : 1,
+    number : 10,
+  }
+  provider.filesDelete( testPath );
+  var filePath = path.changeExt( terminalPath, 'json' );
+  provider.fileWrite({ filePath : filePath, data : src1, encoding : 'json.fine' });
+  var filePath = path.changeExt( terminalPath, 'bson' );
+  provider.fileWrite({ filePath : filePath, data : src2, encoding : 'bson' });
+  var filePath = path.s.changeExt( terminalPath, [ 'json', 'bson' ] );
+  var got = provider.fileConfigRead({ filePath : filePath });
+  var expected =
+  {
+    null : 1,
+    number : 10,
+    string : 'something',
+  }
+  test.identical( got, expected );
+
+  //
+
+  test.case = 'second config is empty';
+  var src1 =
+  {
+
+    null : null,
+    number : 13,
+    string : 'something',
+  }
+  var src2 =
+  {
+  }
+  provider.filesDelete( testPath );
+  var filePath = path.changeExt( terminalPath, 'json' );
+  provider.fileWrite({ filePath : filePath, data : src1, encoding : 'json.fine' });
+  var filePath = path.changeExt( terminalPath, 'bson' );
+  provider.fileWrite({ filePath : filePath, data : src2, encoding : 'bson' });
+  var filePath = path.s.changeExt( terminalPath, [ 'json', 'bson' ] );
+  var got = provider.fileConfigRead({ filePath : filePath });
+  test.identical( got, src1 );
+
+}
+
 // --
 // declare
 // --
@@ -547,6 +730,8 @@ var Self =
     filesTreeRead : filesTreeRead,
     filesTreeWrite : filesTreeWrite,
     // readToProvider : readToProvider,
+
+    fileConfigRead : fileConfigRead
 
   },
 

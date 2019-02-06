@@ -456,10 +456,9 @@ function encodersGenerate()
   {
     if( !_.strHas( k, 'structure' ) )
     continue;
-    var defaults = _.select( _.Gdf.InOutMap[ k ], '*/default' );
-    defaults = _.arrayCountElement( defaults, 1 );
-    if( defaults > 1 )
-    throw _.err( 'Several default converters for in-out combination:', k  );
+    var defaults = _.entityFilter( _.Gdf.InOutMap[ k ], ( c ) => c.default ? c : undefined );
+    if( defaults.length > 1 )
+    throw _.err( `Several default converters for '${k}' in-out combination:`, _.select( defaults, '*/name' )  );
   }
 
   let writeConverters = _.Gdf.InMap[ 'structure' ];

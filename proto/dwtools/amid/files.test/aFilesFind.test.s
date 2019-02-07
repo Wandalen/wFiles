@@ -13125,247 +13125,361 @@ filesDeleteAsync.timeOut = 20000;
 
 function filesDeleteEmptyDirs( test )
 {
-  var tree =
-  {
-    file : 'file',
-    empty1 : {},
-    dir :
+  let context = this;
+  let path = context.provider.path;
+  let provider = context.provider;
+
+  var testPath = path.join( context.testSuitePath, test.name );
+
+  var tree = _.FileProvider.Extract
+  ({
+    filesTree :
     {
       file : 'file',
-      empty2 : {},
-      dir :
+      empty1 : {},
+      dir1 :
       {
         file : 'file',
-        empty3 : {},
+        empty2 : {},
+        dir2 :
+        {
+          file : 'file',
+          empty3 : {},
+        }
       }
     }
-  }
+  })
 
   //
 
   test.case = 'defaults'
-  var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
-  provider.filesDeleteEmptyDirs( '/' );
+  provider.filesDelete( testPath );
+  tree.readToProvider( provider, testPath );
+  provider.filesDeleteEmptyDirs( testPath );
   var expected =
-  {
-    file : 'file',
-    dir :
-    {
-      file : 'file',
-      dir :
-      {
-        file : 'file',
-      }
-    }
-  }
-  test.identical( provider.filesTree, expected );
+  [
+    './file',
+    './dir1',
+    './dir1/file',
+    './dir1/dir2',
+    './dir1/dir2/file'
+  ]
+  var got = provider.filesFindRecursive({ filePath : testPath, outputFormat : 'relative', includingStem : 0 });
+  test.identical( expected, got );
 
   //
 
   test.case = 'not recursive'
-  var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
-  provider.filesDeleteEmptyDirs({ filePath : '/', recursive : 1 });
-  var expected =
+  provider.filesDelete( testPath );
+  tree.readToProvider( provider, testPath );
+  provider.filesDeleteEmptyDirs({ filePath : testPath, recursive : 1 });
+  /*
   {
     file : 'file',
-    dir :
+    dir1 :
     {
       file : 'file',
       empty2 : {},
-      dir :
+      dir2 :
       {
         file : 'file',
         empty3 : {},
       }
     }
-  }
-  test.identical( provider.filesTree, expected );
+  } */
+  var expected =
+  [
+    './file',
+    './dir1',
+    './dir1/file',
+    './dir1/dir2',
+    './dir1/dir2/file',
+    './dir1/dir2/empty3',
+    './dir1/empty2'
+  ]
+  var got = provider.filesFindRecursive({ filePath : testPath, outputFormat : 'relative', includingStem : 0 });
+  test.identical( got, expected );
 
   //
 
   test.case = 'filter'
-  var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
+  provider.filesDelete( testPath );
+  tree.readToProvider( provider, testPath );
   var filter = { maskDirectory : /empty2$/ };
-  provider.filesDeleteEmptyDirs({ filePath : '/', filter : filter });
-  var expected =
+  provider.filesDeleteEmptyDirs({ filePath : testPath, filter : filter  });
+  /*
   {
     file : 'file',
     empty1 : {},
     dir :
     {
       file : 'file',
-      dir :
+      dir2 :
       {
         file : 'file',
         empty3 : {},
       }
     }
-  }
-  test.identical( provider.filesTree, expected );
+  } */
+  var expected =
+  [
+    './file',
+    './dir1',
+    './dir1/file',
+    './dir1/dir2',
+    './dir1/dir2/file',
+    './dir1/dir2/empty3',
+    './empty1'
+  ]
+  var got = provider.filesFindRecursive({ filePath : testPath, outputFormat : 'relative', includingStem : 0 });
+  test.identical( got, expected );
 
   //
 
   test.case = 'filter for not existing dir'
-  var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
+  provider.filesDelete( testPath );
+  tree.readToProvider( provider, testPath );
   var filter = { maskDirectory : 'emptyDir' };
-  provider.filesDeleteEmptyDirs({ filePath : '/', filter : filter });
-  var expected =
+  provider.filesDeleteEmptyDirs({ filePath : testPath, filter : filter });
+  /*
   {
     file : 'file',
     empty1 : {},
-    dir :
+    dir1 :
     {
       file : 'file',
       empty2 : {},
-      dir :
+      dir2 :
       {
         file : 'file',
         empty3 : {},
       }
     }
-  }
-  test.identical( provider.filesTree, expected );
+  } */
+  var expected =
+  [
+    './file',
+    './dir1',
+    './dir1/file',
+    './dir1/dir2',
+    './dir1/dir2/file',
+    './dir1/dir2/empty3',
+    './dir1/empty2',
+    './empty1'
+  ]
+  var got = provider.filesFindRecursive({ filePath : testPath, outputFormat : 'relative', includingStem : 0 });
+  test.identical( got, expected );
 
   //
 
   test.case = 'filter for terminals'
-  var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
+  provider.filesDelete( testPath );
+  tree.readToProvider( provider, testPath );
   var filter = { maskTerminal : 'file' };
-  provider.filesDeleteEmptyDirs({ filePath : '/', filter : filter });
-  var expected =
+  provider.filesDeleteEmptyDirs({ filePath : testPath, filter : filter });
+  /*
   {
     file : 'file',
-    dir :
+    dir1 :
     {
       file : 'file',
-      dir :
+      dir2 :
       {
         file : 'file',
       }
     }
-  }
-  test.identical( provider.filesTree, expected );
+  } */
+  var expected =
+  [
+    './file',
+    './dir1',
+    './dir1/file',
+    './dir1/dir2',
+    './dir1/dir2/file'
+  ]
+  var got = provider.filesFindRecursive({ filePath : testPath, outputFormat : 'relative', includingStem : 0 });
+  test.identical( got, expected );
 
   //
 
   test.case = 'glob for dir'
-  var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
-  provider.filesDeleteEmptyDirs({ filePath : '/**/empty3' });
-  var expected =
+  provider.filesDelete( testPath );
+  tree.readToProvider( provider, testPath );
+  provider.filesDeleteEmptyDirs( path.join( testPath,'**/empty3' ) );
+  /*
   {
     file : 'file',
     empty1 : {},
-    dir :
+    dir1 :
     {
       file : 'file',
       empty2 : {},
-      dir :
+      dir2 :
       {
         file : 'file',
       }
     }
-  }
-  test.identical( provider.filesTree, expected );
+  } */
+  var expected =
+  [
+    './file',
+    './dir1',
+    './dir1/file',
+    './dir1/dir2',
+    './dir1/dir2/file',
+    './dir1/empty2',
+    './empty1'
+  ]
+  var got = provider.filesFindRecursive({ filePath : testPath, outputFormat : 'relative', includingStem : 0 });
+  test.identical( got, expected );
 
   //
 
   test.case = 'glob for terminals'
-  var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
-  provider.filesDeleteEmptyDirs({ filePath : '/**/file' });
-  var expected =
-  {
+  provider.filesDelete( testPath );
+  tree.readToProvider( provider, testPath );
+  provider.filesDeleteEmptyDirs( path.join( testPath,'**/file') );
+  /* {
     file : 'file',
     empty1 : {},
-    dir :
+    dir1 :
     {
       file : 'file',
       empty2 : {},
-      dir :
+      dir2 :
       {
         file : 'file',
         empty3 : {},
       }
     }
-  }
-  test.identical( provider.filesTree, expected );
+  } */
+  var expected =
+  [
+    './file',
+    './dir1',
+    './dir1/file',
+    './dir1/dir2',
+    './dir1/dir2/file',
+    './dir1/dir2/empty3',
+    './dir1/empty2',
+    './empty1'
+  ]
+  var got = provider.filesFindRecursive({ filePath : testPath, outputFormat : 'relative', includingStem : 0 });
+  test.identical( got, expected );
 
   //
 
   test.case = 'glob not existing file'
-  var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
-  provider.filesDeleteEmptyDirs({ filePath : '/**/emptyDir' });
-  var expected =
-  {
+  provider.filesDelete( testPath );
+  tree.readToProvider( provider, testPath );
+  provider.filesDeleteEmptyDirs( path.join( testPath,'**/emptyDir' ) );
+  /* {
     file : 'file',
     empty1 : {},
-    dir :
+    dir1 :
     {
       file : 'file',
       empty2 : {},
-      dir :
+      dir2 :
       {
         file : 'file',
         empty3 : {},
       }
     }
-  }
-  test.identical( provider.filesTree, expected );
+  } */
+  var expected =
+  [
+    './file',
+    './dir1',
+    './dir1/file',
+    './dir1/dir2',
+    './dir1/dir2/file',
+    './dir1/dir2/empty3',
+    './dir1/empty2',
+    './empty1'
+  ]
+  var got = provider.filesFindRecursive({ filePath : testPath, outputFormat : 'relative', includingStem : 0 });
+  test.identical( got, expected );
 
   //
 
   test.case = 'resolvingSoftLink : 1'
-  var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
-  provider.softLink( '/dstPath', '/dir' )
-  provider.filesDeleteEmptyDirs({ filePath : '/dstPath', resolvingSoftLink : 1  });
+  provider.filesDelete( testPath );
+  tree.readToProvider( provider, testPath );
+  provider.softLink( path.join( testPath, 'dstPath' ), path.join( testPath, 'dir1' ) )
+  provider.filesDeleteEmptyDirs({ filePath : path.join( testPath, 'dstPath' ), resolvingSoftLink : 1  });
+  // {
+  //   file : 'file',
+  //   empty1 : {},
+  //   dir1 :
+  //   {
+  //     file : 'file',
+  //     empty2 : {},
+  //     dir2 :
+  //     {
+  //       file : 'file',
+  //       empty3 : {},
+  //     }
+  //   },
+  //   dstPath : [{ softLink : '/dir1'}]
+  // }
   var expected =
-  {
-    file : 'file',
-    empty1 : {},
-    dir :
-    {
-      file : 'file',
-      empty2 : {},
-      dir :
-      {
-        file : 'file',
-        empty3 : {},
-      }
-    },
-    dstPath : [{ softLink : '/dir'}]
-  }
-  test.identical( provider.filesTree, expected );
+  [
+    './dstPath',
+    './file',
+    './dir1',
+    './dir1/file',
+    './dir1/dir2',
+    './dir1/dir2/file',
+    './empty1'
+  ]
+  var got = provider.filesFindRecursive({ filePath : testPath, outputFormat : 'relative', includingStem : 0 });
+  test.identical( got, expected );
 
   test.case = 'resolvingSoftLink : 0'
-  var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
-  provider.softLink( '/dstPath', '/dir' )
-  provider.filesDeleteEmptyDirs({ filePath : '/dstPath', resolvingSoftLink : 0  });
-  var expected =
-  {
+  provider.filesDelete( testPath );
+  tree.readToProvider( provider, testPath );
+  provider.softLink( path.join( testPath, 'dstPath' ), path.join( testPath, 'dir1' ) )
+  provider.filesDeleteEmptyDirs({ filePath : path.join( testPath, 'dstPath' ), resolvingSoftLink : 0  });
+  /* {
     file : 'file',
     empty1 : {},
-    dir :
+    dir1 :
     {
       file : 'file',
       empty2 : {},
-      dir :
+      dir2 :
       {
         file : 'file',
         empty3 : {},
       }
     },
     dstPath : [{ softLink : '/dir'}]
-  }
-  test.identical( provider.filesTree, expected );
+  } */
+  var expected =
+  [
+    './dstPath',
+    './file',
+    './dir1',
+    './dir1/file',
+    './dir1/dir2',
+    './dir1/dir2/file',
+    './dir1/dir2/empty3',
+    './dir1/empty2',
+    './empty1'
+  ]
+  var got = provider.filesFindRecursive({ filePath : testPath, outputFormat : 'relative', includingStem : 0 });
+  test.identical( got, expected );
 
   //
 
   if( !Config.debug )
   {
     test.case = 'including of terminals is not allow';
-    test.shouldThrowError( () => provider.filesDeleteEmptyDirs({ filePath : '/', includingTerminals : 1 }) )
+    test.shouldThrowError( () => provider.filesDeleteEmptyDirs({ filePath : testPath, includingTerminals : 1 }) )
 
     test.case = 'including of transients is not allow';
-    test.shouldThrowError( () => provider.filesDeleteEmptyDirs({ filePath : '/', includingTransient : 1 }) )
+    test.shouldThrowError( () => provider.filesDeleteEmptyDirs({ filePath : testPath, includingTransient : 1 }) )
   }
 }
 

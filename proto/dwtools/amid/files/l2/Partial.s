@@ -7158,37 +7158,17 @@ function filesAreHardLinked_body( o ) /* qqq : refactor. probably move some code
   if( !o.filePath.length )
   return true;
 
-  if( _.routineIs( self.filesAreHardLinkedAct ) )
-  {
-    for( let i = 1 ; i < o.filePath.length ; i++ )
-    {
-      let r = self.filesAreHardLinkedAct({ filePath : [ o.filePath[ 0 ], o.filePath[ i ] ] });
-      _.assert( _.boolIs( r ) );
-      if( !r )
-      return r;
-    }
-    return true;
-  }
-
-  let statFirst = self.statRead( o.filePath[ 0 ] );
-  if( !statFirst )
-  return false;
+  let result;
 
   for( let i = 1 ; i < o.filePath.length ; i++ )
   {
-    let statCurrent = self.statRead( self.path.from( o.filePath[ i ] ) );
-    if( !statCurrent || !_./*statsCouldBeLinked*/statsAreHardLinked( statFirst, statCurrent ) )
-    return false;
+    result = self.filesAreHardLinkedAct({ filePath : [ o.filePath[ 0 ], o.filePath[ i ] ] });
+    _.assert( _.boolIs( result ) || result === _.maybe );
+    if( !result )
+    break;
   }
 
-  /*
-    should return _.maybe, not true if result is not precise
-  */
-
-  if( self.UsingBigIntForStat )
-  return true;
-
-  return _.maybe;
+  return result;
 }
 
 _.routineExtend( filesAreHardLinked_body, filesAreHardLinkedAct );

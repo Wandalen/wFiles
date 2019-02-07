@@ -13485,6 +13485,250 @@ function filesDeleteEmptyDirs( test )
 
 //
 
+function filesDeleteTerminals( test )
+{
+  let context = this;
+  let path = context.provider.path;
+  let provider = context.provider;
+
+  let testPath = path.join( context.testSuitePath, test.name );
+
+  var tree = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      terminal0 : 'terminal0',
+      emptyDir0 : {},
+      dir1 :
+      {
+        terminal1 : 'terminal1',
+        emptyDir1 : {},
+        dir2 :
+        {
+          terminal2 : 'terminal2',
+          emptyDir2 : {},
+        }
+      }
+    }
+  })
+
+  //
+
+  test.case = 'defaults'
+  provider.filesDelete( testPath );
+  tree.readToProvider( provider, testPath );
+  provider.filesDeleteTerminals( testPath );
+  var expected =
+  [
+    './dir1',
+    './dir1/dir2',
+    './dir1/dir2/emptyDir2',
+    './dir1/emptyDir1',
+    './emptyDir0'
+  ]
+  var got = provider.filesFindRecursive({ filePath : testPath, outputFormat : 'relative', includingStem : 0 });
+  test.identical( got, expected );
+
+  //
+
+  test.case = 'recursion off'
+  provider.filesDelete( testPath );
+  tree.readToProvider( provider, testPath );
+  provider.filesDeleteTerminals({ filePath : testPath, recursive : 0 });
+  var expected =
+  [
+    './terminal0',
+    './dir1',
+    './dir1/terminal1',
+    './dir1/dir2',
+    './dir1/dir2/terminal2',
+    './dir1/dir2/emptyDir2',
+    './dir1/emptyDir1',
+    './emptyDir0'
+  ]
+  var got = provider.filesFindRecursive({ filePath : testPath, outputFormat : 'relative', includingStem : 0 });
+  test.identical( got, expected );
+
+  test.case = 'recursion only first level'
+  provider.filesDelete( testPath );
+  tree.readToProvider( provider, testPath );
+  provider.filesDeleteTerminals({ filePath : testPath, recursive : 1 });
+  var expected =
+  [
+    './dir1',
+    './dir1/terminal1',
+    './dir1/dir2',
+    './dir1/dir2/terminal2',
+    './dir1/dir2/emptyDir2',
+    './dir1/emptyDir1',
+    './emptyDir0'
+  ]
+  var got = provider.filesFindRecursive({ filePath : testPath, outputFormat : 'relative', includingStem : 0 });
+  test.identical( got, expected );
+
+  test.case = 'mask terminals'
+  provider.filesDelete( testPath );
+  tree.readToProvider( provider, testPath );
+  var filter = { maskTerminal : /terminal[01]$/ }
+  provider.filesDeleteTerminals({ filePath : testPath, filter : filter });
+  var expected =
+  [
+    './dir1',
+    './dir1/dir2',
+    './dir1/dir2/terminal2',
+    './dir1/dir2/emptyDir2',
+    './dir1/emptyDir1',
+    './emptyDir0'
+  ]
+  var got = provider.filesFindRecursive({ filePath : testPath, outputFormat : 'relative', includingStem : 0 });
+  test.identical( got, expected );
+
+  test.case = 'mask dirs'
+  provider.filesDelete( testPath );
+  tree.readToProvider( provider, testPath );
+  var filter = { maskDirectory : /dir2/ }
+  provider.filesDeleteTerminals({ filePath : testPath, filter : filter });
+  var expected =
+  [
+    './dir1',
+    './dir1/dir2',
+    './dir1/dir2/emptyDir2',
+    './dir1/emptyDir1',
+    './emptyDir0'
+  ]
+  var got = provider.filesFindRecursive({ filePath : testPath, outputFormat : 'relative', includingStem : 0 });
+  test.identical( got, expected );
+
+  test.case = 'mask not existing terminal'
+  provider.filesDelete( testPath );
+  tree.readToProvider( provider, testPath );
+  var filter = { maskTerminal : /missing/ }
+  provider.filesDeleteTerminals({ filePath : testPath, filter : filter });
+  var expected =
+  [
+    './terminal0',
+    './dir1',
+    './dir1/terminal1',
+    './dir1/dir2',
+    './dir1/dir2/terminal2',
+    './dir1/dir2/emptyDir2',
+    './dir1/emptyDir1',
+    './emptyDir0'
+  ]
+  var got = provider.filesFindRecursive({ filePath : testPath, outputFormat : 'relative', includingStem : 0 });
+  test.identical( got, expected );
+
+  test.case = 'glob for terminals'
+  provider.filesDelete( testPath );
+  tree.readToProvider( provider, testPath );
+  provider.filesDeleteTerminals({ filePath : path.join( testPath, '**/terminal*' ) });
+  var expected =
+  [
+    './dir1',
+    './dir1/dir2',
+    './dir1/dir2/emptyDir2',
+    './dir1/emptyDir1',
+    './emptyDir0'
+  ]
+  var got = provider.filesFindRecursive({ filePath : testPath, outputFormat : 'relative', includingStem : 0 });
+  test.identical( got, expected );
+
+  //
+
+  test.case = 'soft link to directory';
+  provider.filesDelete( testPath );
+  tree.readToProvider( provider, testPath );
+  var linkPath = path.join( testPath, 'linkToDir' );
+  var dirPath = path.join( testPath, 'dir1' );
+  provider.softLink( linkPath, dirPath );
+  test.is( provider.isSoftLink( linkPath ) )
+  provider.filesDeleteTerminals({ filePath : testPath });
+  var expected =
+  [
+    './dir1',
+    './dir1/dir2',
+    './dir1/dir2/emptyDir2',
+    './dir1/emptyDir1',
+    './emptyDir0'
+  ]
+  var got = provider.filesFindRecursive({ filePath : testPath, outputFormat : 'relative', includingStem : 0 });
+  test.identical( got, expected );
+
+  //
+
+  test.case = 'deleting empty dirs';
+  provider.filesDelete( testPath );
+  tree.readToProvider( provider, testPath );
+  provider.filesDeleteTerminals({ filePath : testPath, deletingEmptyDirs : 1 });
+  var expected =
+  [
+    './dir1',
+    './dir1/dir2',
+    './dir1/dir2/emptyDir2',
+    './dir1/emptyDir1',
+    './emptyDir0'
+  ]
+  var got = provider.filesFindRecursive({ filePath : testPath, outputFormat : 'relative', includingStem : 0 });
+  test.identical( got, expected );
+
+  //
+
+  test.case = 'writing controls delete';
+  provider.filesDelete( testPath );
+  tree.readToProvider( provider, testPath );
+  provider.filesDeleteTerminals({ filePath : testPath, writing : 0 });
+  var expected =
+  [
+    './terminal0',
+    './dir1',
+    './dir1/terminal1',
+    './dir1/dir2',
+    './dir1/dir2/terminal2',
+    './dir1/dir2/emptyDir2',
+    './dir1/emptyDir1',
+    './emptyDir0'
+  ]
+  var got = provider.filesFindRecursive({ filePath : testPath, outputFormat : 'relative', includingStem : 0 });
+  test.identical( got, expected );
+
+  //
+
+  test.case = 'broken soft link';
+  provider.filesDelete( testPath );
+  tree.readToProvider( provider, testPath );
+  var linkPath = path.join( testPath, 'linkToDir' );
+  provider.softLink({ dstPath : linkPath, srcPath :dirPath, allowingMissed : 1 });
+  test.is( provider.isSoftLink( linkPath ) )
+  var expected =
+  [
+    './dir1',
+    './dir1/dir2',
+    './dir1/dir2/emptyDir2',
+    './dir1/emptyDir1',
+    './emptyDir0'
+  ]
+  provider.filesDeleteTerminals({ filePath : testPath, allowingMissed : 1 });
+  var got = provider.filesFindRecursive({ filePath : testPath, outputFormat : 'relative', includingStem : 0 });
+  test.identical( got, expected );
+  provider.filesDeleteTerminals({ filePath : testPath, allowingMissed : 0 });
+  var got = provider.filesFindRecursive({ filePath : testPath, outputFormat : 'relative', includingStem : 0 });
+  test.identical( got, expected );
+
+  //
+
+  if( Config.debug )
+  {
+    test.shouldThrowErrorSync( () => provider.filesDeleteTerminals({ filePath : testPath, includingDirs : 1 }) )
+    test.shouldThrowErrorSync( () => provider.filesDeleteTerminals({ filePath : testPath, includingTransient : 1 }) )
+    test.shouldThrowErrorSync( () => provider.filesDeleteTerminals({ filePath : testPath, includingTerminals : 0 }) )
+    test.shouldThrowErrorSync( () => provider.filesDeleteTerminals({ filePath : testPath, resolvingSoftLink : 1 }) )
+    test.shouldThrowErrorSync( () => provider.filesDeleteTerminals({ filePath : testPath, resolvingTextLink : 1 }) )
+  }
+
+}
+
+//
+
 function filesDeleteAndAsyncWrite( test )
 {
   let context = this;
@@ -16037,6 +16281,7 @@ var Self =
     filesDelete,
     filesDeleteAsync,
     filesDeleteEmptyDirs,
+    filesDeleteTerminals,
     // filesDeleteAndAsyncWrite,
 
     // filesFindDifference,

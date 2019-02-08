@@ -13123,6 +13123,185 @@ filesDeleteAsync.timeOut = 20000;
 
 //
 
+function filesDeleteDeletingEmptyDirs( test )
+{
+  let context = this;
+  let path = context.provider.path;
+  let provider = context.provider;
+  let hub = context.hub;
+
+  var testPath = path.join( context.testSuitePath, test.name );
+
+  var tree = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      file : 'file',
+      empty1 : {},
+      dir1 :
+      {
+        file : 'file',
+        empty2 : {},
+        dir2 :
+        {
+          file : 'file',
+          empty3 : {},
+        }
+      }
+    }
+  })
+
+  //
+
+  test.case = 'mask dir, deletingEmptyDirs off'
+  provider.filesDelete( testPath );
+  tree.readToProvider( provider, testPath );
+  var filter = { maskDirectory : /dir.$/g }
+  var got = provider.filesDelete({ filePath : testPath, filter : filter, deletingEmptyDirs : 0 });
+  var deleted = _.select( got, '*/relative');
+  var expected =
+  [
+    './file',
+    './dir1/file',
+    './dir1/dir2/file',
+  ]
+  test.will = 'filtered empty dirs should not be deleted';
+  test.identical( deleted, expected );
+
+  test.case = 'mask dir, deletingEmptyDirs on'
+  provider.filesDelete( testPath );
+  tree.readToProvider( provider, testPath );
+  var filter = { maskDirectory : /dir.$/g }
+  var got = provider.filesDelete({ filePath : testPath, filter : filter, deletingEmptyDirs : 1 });
+  var deleted = _.select( got, '*/relative');
+  var expected =
+  [
+    '.',
+    './file',
+    './dir1/file',
+    './dir1/dir2/file',
+    './dir1/dir2/empty3',
+    './dir1/empty1',
+    './empty1'
+  ]
+  test.will = 'filtered empty dirs should be deleted';
+  test.identical( deleted, expected );
+
+  test.case = 'everything is actual, deletingEmptyDirs off'
+  provider.filesDelete( testPath );
+  tree.readToProvider( provider, testPath );
+  var got = provider.filesDelete({ filePath : testPath, deletingEmptyDirs : 0 });
+  var deleted = _.select( got, '*/relative');
+  var expected =
+  [
+    '.',
+    './file',
+    './dir1/file',
+    './dir1/dir2/file',
+    './dir1/dir2/empty3',
+    './dir1/empty1',
+    './empty1'
+  ]
+  test.will = 'all files should be deleted';
+  test.identical( deleted, expected );
+
+  test.case = 'everything is actual, deletingEmptyDirs on'
+  provider.filesDelete( testPath );
+  tree.readToProvider( provider, testPath );
+  var got = provider.filesDelete({ filePath : testPath, deletingEmptyDirs : 1 });
+  var deleted = _.select( got, '*/relative');
+  var expected =
+  [
+    '.',
+    './file',
+    './dir1/file',
+    './dir1/dir2/file',
+    './dir1/dir2/empty3',
+    './dir1/empty1',
+    './empty1'
+  ]
+  test.will = 'all files should be deleted';
+  test.identical( deleted, expected );
+
+  test.case = 'exclude empty dirs,deletingEmptyDirs off'
+  provider.filesDelete( testPath );
+  tree.readToProvider( provider, testPath );
+  var filter = { maskDirectory : { excludeAny : 'empty'} }
+  var got = provider.filesDelete({ filePath : testPath, filter : filter, deletingEmptyDirs : 0 });
+  var deleted = _.select( got, '*/relative');
+  var expected =
+  [
+    './file',
+    './dir1/file',
+    './dir1/dir2/file',
+  ]
+  test.will = 'empty dirs should be preserved';
+  test.identical( deleted, expected );
+
+  test.case = 'exclude empty dirs,deletingEmptyDirs on'
+  provider.filesDelete( testPath );
+  tree.readToProvider( provider, testPath );
+  var filter = { maskDirectory : { excludeAny : 'empty'} }
+  var got = provider.filesDelete({ filePath : testPath, filter : filter, deletingEmptyDirs : 1 });
+  var deleted = _.select( got, '*/relative');
+  var expected =
+  [
+    '.',
+    './file',
+    './dir1/file',
+    './dir1/dir2/file',
+    './dir1/dir2/empty3',
+    './dir1/empty1',
+    './empty1'
+  ]
+  test.will = 'all files should be deleted';
+  test.identical( deleted, expected );
+
+  test.case = 'exclude dirs,deletingEmptyDirs off'
+  provider.filesDelete( testPath );
+  tree.readToProvider( provider, testPath );
+  var filter = { maskDirectory : { excludeAny : /dir.$/g } }
+  var got = provider.filesDelete({ filePath : testPath, filter : filter, deletingEmptyDirs : 1 });
+  var deleted = _.select( got, '*/relative');
+  var expected =
+  [
+    '.',
+    './file',
+    './dir1',
+    './dir1/file',
+    './dir1/dir2',
+    './dir1/dir2/file',
+    './dir1/dir2/empty3',
+    './dir1/empty2',
+    './empty1'
+  ]
+  test.will = 'all files should be deleted';
+  test.identical( deleted, expected );
+
+  test.case = 'exclude dirs,deletingEmptyDirs on'
+  provider.filesDelete( testPath );
+  tree.readToProvider( provider, testPath );
+  var filter = { maskDirectory : { excludeAny : /dir.$/g } }
+  var got = provider.filesDelete({ filePath : testPath, filter : filter, deletingEmptyDirs : 0 });
+  var deleted = _.select( got, '*/relative');
+  var expected =
+  [
+    './file',
+    './dir1/file',
+    './dir1/dir2/file',
+    './dir1/dir2/empty3',
+    './dir1/empty2',
+    './empty1'
+  ]
+  test.will = 'only terminals and empty* dirs should be deleted';
+  test.identical( deleted, expected );
+
+}
+
+filesDeleteDeletingEmptyDirs.timeOut = 20000;
+
+//
+
 function filesDeleteEmptyDirs( test )
 {
   let context = this;
@@ -16270,6 +16449,7 @@ var Self =
 
     filesDelete,
     filesDeleteAsync,
+    filesDeleteDeletingEmptyDirs,
     filesDeleteEmptyDirs,
     filesDeleteTerminals,
     // filesDeleteAndAsyncWrite,

@@ -36407,7 +36407,7 @@ function pathResolveSoftLink( test )
 
   test.case = 'Chain with two softlink and text link to missing file';
   provider.filesDelete( /*workDir*/testPath );
-  provider.textLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1 });
+  provider.textLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath2, srcPath : linkPath });
   provider.softLink({ dstPath : linkPath3, srcPath : linkPath2 });
   var got = provider.pathResolveSoftLink( { filePath : linkPath3, resolvingMultiple : 1 } );

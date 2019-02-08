@@ -14449,8 +14449,6 @@ function filesCopyWithAdapter( test )
   let path = context.provider.path;
   let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
 
-  let context = this;
-  let path = context.provider.path;
   var testRoutineDir = path.join( context.testSuitePath, test.name );
 
   var samples =
@@ -14725,7 +14723,7 @@ function filesCopyWithAdapter( test )
         {
           srcAction : null,
           srcAllow : true,
-          reason : 'dstDeleting',
+          reason : 'srcLooking',
           action : 'directory preserved',
           allow : true,
           relative : './c'
@@ -14733,10 +14731,18 @@ function filesCopyWithAdapter( test )
         {
           srcAction : 'fileDelete',
           srcAllow : true,
-          reason : 'dstDeleting',
+          reason : 'srcLooking',
           action : 'copied',
           allow : true,
           relative : './c/b3.b'
+        },
+        {
+          srcAction : null,
+          srcAllow : true,
+          reason : 'dstDeleting',
+          action : 'fileDelete',
+          allow : false,
+          relative : './c/dstdir'
         },
         {
           srcAction : null,
@@ -14758,23 +14764,7 @@ function filesCopyWithAdapter( test )
           srcAction : null,
           srcAllow : true,
           reason : 'dstDeleting',
-          action : 'fileDelete',
-          allow : false,
-          relative : './c/dstdir'
-        },
-        {
-          srcAction : null,
-          srcAllow : true,
-          reason : 'dstDeleting',
           action : 'directory preserved',
-          allow : true,
-          relative : './c/e'
-        },
-        {
-          srcAction : null,
-          srcAllow : true,
-          reason : 'dstDeleting',
-          action : 'fileDelete',
           allow : false,
           relative : './c/srcfile-dstdir'
         },

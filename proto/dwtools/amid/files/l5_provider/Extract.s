@@ -1559,7 +1559,7 @@ function filesTreeRead( o )
 
   _.routineOptions( filesTreeRead, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.strIs( o.glob ) || _.strsAre( o.glob ) || _.strIs( o.srcPath ) );
+  _.assert( _.strIs( o.glob ) || _.strsAreAll( o.glob ) || _.strIs( o.srcPath ) );
   _.assert( _.objectIs( o.srcProvider ) );
   _.assert( o.filePath === undefined );
 

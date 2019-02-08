@@ -1332,8 +1332,8 @@ function hardLinkAct( o )
     self._descriptorWrite( o.srcPath, descriptor );
     self._descriptorWrite( o.dstPath, descriptor );
 
-    if( self.usingExtraStat )
-    self.extraStats[ o.dstPath ] = self.extraStats[ o.srcPath ];///Vova : check which stats hardlinked files should have in common
+    // if( self.usingExtraStat )
+    // self.extraStats[ o.dstPath ] = self.extraStats[ o.srcPath ];///Vova : check which stats hardlinked files should have in common
 
     return true;
   }

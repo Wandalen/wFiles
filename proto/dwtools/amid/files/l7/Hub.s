@@ -576,7 +576,7 @@ function _link_functor( fop )
     let self = this;
     let op = Object.create( null );
     op.continue = true;
-    op.options = o;
+    op.options = _.mapExtend( null, o );
     op.routineName = routineName;
     op.end = function end()
     {
@@ -588,31 +588,31 @@ function _link_functor( fop )
 
     /* */
 
-    op.originalDst = self._localFromGlobal( o.originalDstPath );
-    op.originalSrc = self._localFromGlobal( o.originalSrcPath );
+    op.originalDst = self._localFromGlobal( op.options.originalDstPath );
+    op.originalSrc = self._localFromGlobal( op.options.originalSrcPath );
 
-    _.assert( !!op.originalDst.provider, 'No provider for path', o.originalDstPath );
-    _.assert( !!op.originalSrc.provider, 'No provider for path', o.originalSrcPath );
+    _.assert( !!op.originalDst.provider, 'No provider for path', op.options.originalDstPath );
+    _.assert( !!op.originalSrc.provider, 'No provider for path', op.options.originalSrcPath );
 
-    o.originalDstPath = op.originalDst.localPath;
+    op.options.originalDstPath = op.originalDst.localPath;
 
     if( op.originalDst.provider !== op.originalSrc.provider )
     {
     }
     else
     {
-      o.originalSrcPath = op.originalSrc.localPath;
+      op.options.originalSrcPath = op.originalSrc.localPath;
     }
 
     /* */
 
-    op.dst = self._localFromGlobal( o.dstPath );
-    op.src = self._localFromGlobal( o.srcPath );
+    op.dst = self._localFromGlobal( op.options.dstPath );
+    op.src = self._localFromGlobal( op.options.srcPath );
 
-    _.assert( !!op.dst.provider, 'No provider for path', o.dstPath );
-    _.assert( !!op.src.provider, 'No provider for path', o.srcPath );
+    _.assert( !!op.dst.provider, 'No provider for path', op.options.dstPath );
+    _.assert( !!op.src.provider, 'No provider for path', op.options.srcPath );
 
-    o.dstPath = op.dst.localPath;
+    op.options.dstPath = op.dst.localPath;
 
     if( op.dst.provider !== op.src.provider )
     {
@@ -624,15 +624,15 @@ function _link_functor( fop )
       }
       else
       {
-        throw _.err( 'Cant ' + routineName + ' files of different file providers :\n' + o.dstPath + '\n' + o.srcPath );
+        throw _.err( 'Cant ' + routineName + ' files of different file providers :\n' + op.options.dstPath + '\n' + op.options.srcPath );
       }
     }
     else
     {
-      o.srcPath = op.src.localPath;
+      op.options.srcPath = op.src.localPath;
     }
 
-    op.result = op.dst.provider[ routineName ]( o );
+    op.result = op.dst.provider[ routineName ]( op.options );
     return op.end();
   }
 

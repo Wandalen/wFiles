@@ -37625,6 +37625,29 @@ function experiment2( test )
 
 //
 
+function hardLinkExperiment( test )
+{
+  let self = this;
+  let provider = self.provider;
+
+  let testPath = test.context.pathFor( 'written/hardLinkExperiment' );
+  let terminalPath = test.context.pathFor( 'written/hardLinkExperiment/terminal' );
+  let linkPath = test.context.pathFor( 'written/hardLinkExperiment/hardLink' );
+
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalPath, terminalPath );
+  provider.hardLink( linkPath, terminalPath );
+  var statTerminal = provider.statRead( terminalPath );
+  var statLink = provider.statRead( linkPath );
+  test.identical( statTerminal.ino, statLink.ino );
+  var got = _.statsAreHardLinked( statTerminal,statLink );
+  test.identical( got, _.maybe );
+  var got = provider.filesAreHardLinked([ linkPath,terminalPath ]);
+  test.identical( got, true );
+}
+
+//
+
 function EncodersGenerate( test )
 {
   let self = this;
@@ -37911,6 +37934,7 @@ var Self =
     statReadExperiment,
     experiment,
     experiment2,
+    hardLinkExperiment,
 
     //static
 

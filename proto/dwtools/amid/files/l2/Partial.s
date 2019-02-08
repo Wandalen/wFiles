@@ -6634,7 +6634,13 @@ function textLinkAct( o )
   if( !self.path.isAbsolute( o.originalSrcPath ) )
   srcPath = o.originalSrcPath;
 
-  let result = self.fileWrite({ filePath : o.dstPath, data : 'link ' + srcPath, sync : o.sync });
+  let result = self.fileWrite
+  ({
+    filePath : o.dstPath,
+    data : 'link ' + srcPath,
+    sync : o.sync,
+    makingDirectory : 0
+  });
 
   if( o.sync )
   return true;

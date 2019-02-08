@@ -21574,6 +21574,8 @@ function textLinkSync( test )
   let linkPath1 = self.pathFor( 'written/textLinkSync/link1' );
   let linkPath2 = self.pathFor( 'written/textLinkSync/link2' );
 
+  var got;
+
   self.provider.fieldPush( 'usingTextLink', 1 );
 
   //
@@ -21598,7 +21600,8 @@ function textLinkSync( test )
   ({
     dstPath : linkPath1,
     srcPath : filePath1,
-    allowingMissed : 1
+    allowingMissed : 1,
+    makingDirectory : 1
   });
   test.is( provider.isTextLink( linkPath1 ) );
   test.is( !provider.fileExists( filePath1 ) );
@@ -21774,7 +21777,8 @@ function textLinkSync( test )
   ({
     dstPath : linkPath1,
     srcPath : '../file1',
-    allowingMissed : 1
+    allowingMissed : 1,
+    makingDirectory : 1
   });
   test.is( provider.isTextLink( linkPath1 ) );
   test.is( !provider.fileExists( filePath1 ) );
@@ -21795,13 +21799,13 @@ function textLinkSync( test )
   var got = provider.pathResolveTextLink( linkPath1 );
   test.identical( got, '../file1' );
 
-  /* throwing */
+  /* */
 
-  test.case = 'relative text link to missing';
+  test.case = 'relative text link to missing, allowingMissed off throwing off';
   provider.filesDelete( testPath );
   test.mustNotThrowError( () =>
   {
-    provider.textLink
+    got = provider.textLink
     ({
       dstPath : linkPath1,
       srcPath : '../file1',
@@ -21809,16 +21813,17 @@ function textLinkSync( test )
       throwing : 0
     });
   })
+  test.identical( got, null );
   test.is( !provider.isTextLink( linkPath1 ) );
   test.is( !provider.fileExists( filePath1 ) );
 
-  test.case = 'rewrite existing';
+  test.case = 'rewrite existing, rewriting off throwing off';
   provider.filesDelete( testPath );
   provider.fileWrite( linkPath1,linkPath1 );
   provider.fileWrite( filePath1,filePath1 );
   test.mustNotThrowError( () =>
   {
-    provider.textLink
+    got = provider.textLink
     ({
       dstPath : linkPath1,
       srcPath : filePath1,
@@ -21826,11 +21831,296 @@ function textLinkSync( test )
       throwing : 0
     });
   })
+  test.identical( got, null );
   test.is( !provider.isTextLink( linkPath1 ) );
   test.is( provider.isTerminal( filePath1 ) );
   test.is( provider.isTerminal( linkPath1 ) );
 
   /*  */
+
+  test.open( 'link already exists' );
+
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1,filePath1 );
+  provider.textLink
+  ({
+    dstPath : linkPath1,
+    srcPath : filePath1,
+    rewriting : 0,
+    throwing : 1
+  });
+
+  test.mustNotThrowError( function( )
+  {
+    provider.textLink
+    ({
+      dstPath : linkPath1,
+      srcPath : filePath1,
+      rewriting : 1,
+      throwing : 1,
+      sync : 1,
+    });
+  });
+  test.is( provider.isTextLink( linkPath1 ) );
+  test.identical( provider.pathResolveTextLink( linkPath1 ), filePath1 );
+
+  test.mustNotThrowError( function( )
+  {
+    provider.textLink
+    ({
+      dstPath : linkPath1,
+      srcPath : filePath1,
+      rewriting : 1,
+      throwing : 0,
+      sync : 1,
+    });
+  });
+  test.is( provider.isTextLink( linkPath1 ) );
+  test.identical( provider.pathResolveTextLink( linkPath1 ), filePath1 );
+
+  //alredy linked returns true
+  test.mustNotThrowError( function( )
+  {
+    provider.textLink
+    ({
+      dstPath : linkPath1,
+      srcPath : filePath1,
+      rewriting : 0,
+      throwing : 1,
+      sync : 1,
+    });
+  });
+  test.is( provider.isTextLink( linkPath1 ) );
+  test.identical( provider.pathResolveTextLink( linkPath1 ), filePath1 );
+
+  test.mustNotThrowError( function( )
+  {
+    provider.textLink
+    ({
+      dstPath : linkPath1,
+      srcPath : filePath1,
+      rewriting : 0,
+      throwing : 1,
+      sync : 1,
+    });
+  });
+  test.is( provider.isTextLink( linkPath1 ) );
+  test.identical( provider.pathResolveTextLink( linkPath1 ), filePath1 );
+
+  test.close( 'link already exists' );
+
+  test.case = 'src equal to dst, src exists'
+  provider.filesDelete( testPath );
+  provider.fileWrite( filePath1,filePath1 );
+  test.mustNotThrowError( function()
+  {
+    got = provider.textLink
+    ({
+      srcPath : filePath1,
+      dstPath : filePath1,
+      sync : 1,
+      rewriting : 1,
+      throwing : 1,
+      allowingMissed : 1
+    });
+  });
+  test.identical( got, true );
+  test.is( provider.isTextLink( filePath1 ) );
+  test.identical( provider.pathResolveTextLink( filePath1 ), filePath1 );
+
+  test.case = 'src equal to dst, src does not exist'
+  provider.filesDelete( filePath1 );
+  test.mustNotThrowError( function()
+  {
+    got = provider.textLink
+    ({
+      srcPath : filePath1,
+      dstPath : filePath1,
+      sync : 1,
+      rewriting : 0,
+      allowingMissed : 1,
+      throwing : 1
+    });
+  });
+  test.identical( got, true );
+  test.is( provider.isTextLink( filePath1 ) );
+
+  test.case = 'src equal to dst, src does not exist'
+  provider.filesDelete( filePath1 );
+  test.mustNotThrowError( function()
+  {
+    got = provider.textLink
+    ({
+      srcPath : filePath1,
+      dstPath : filePath1,
+      sync : 1,
+      rewriting : 1,
+      allowingMissed : 1,
+      throwing : 0
+    });
+  });
+  test.identical( got, true );
+  test.is( provider.isTextLink( filePath1 ) );
+
+  test.case = 'src equal to dst, src does not exist'
+  provider.filesDelete( filePath1 );
+  test.shouldThrowError( function()
+  {
+    got = provider.textLink
+    ({
+      srcPath : filePath1,
+      dstPath : filePath1,
+      sync : 1,
+      rewriting : 0,
+      allowingMissed : 0,
+      throwing : 1
+    });
+  });
+  test.is( !provider.isTextLink( filePath1 ) );
+
+  test.case = 'src equal to dst, src does not exist'
+  provider.filesDelete( filePath1 );
+  test.mustNotThrowError( function()
+  {
+    got = provider.textLink
+    ({
+      srcPath : filePath1,
+      dstPath : filePath1,
+      sync : 1,
+      rewriting : 0,
+      allowingMissed : 0,
+      throwing : 0
+    });
+  });
+  test.identical( got, null );
+  test.is( !provider.isTextLink( filePath1 ) );
+
+  test.case = 'makingDirectory off, throwing on'
+  provider.filesDelete( testPath );
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.textLink
+    ({
+      srcPath : linkPath1,
+      dstPath : filePath1,
+      sync : 1,
+      rewriting : 1,
+      allowingMissed : 1,
+      throwing : 1
+    });
+  })
+  test.is( !provider.isTextLink(  linkPath1 ) );
+
+  test.case = 'makingDirectory off, throwing off'
+  provider.filesDelete( testPath );
+  test.mustNotThrowError( () =>
+  {
+    got = provider.textLink
+    ({
+      srcPath : linkPath1,
+      dstPath : filePath1,
+      sync : 1,
+      rewriting : 1,
+      allowingMissed : 1,
+      throwing : 0
+    });
+  })
+  test.identical( got, null );
+  test.is( !provider.isTextLink(  linkPath1 ) );
+
+  test.case = 'rewrite dir, rewritingDirs off throwing on'
+  provider.filesDelete( testPath );
+  provider.dirMake( linkPath1 );
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.textLink
+    ({
+      srcPath : filePath1,
+      dstPath : linkPath1,
+      sync : 1,
+      rewriting : 1,
+      rewritingDirs : 0,
+      allowingMissed : 1,
+      throwing : 1
+    });
+  })
+  test.is( !provider.isTextLink( linkPath1 ) );
+  test.is( provider.isDir( linkPath1 ) );
+
+  test.case = 'rewrite dir, rewritingDirs off throwing off'
+  provider.filesDelete( testPath );
+  provider.dirMake( linkPath1 );
+  test.mustNotThrowError( () =>
+  {
+    got = provider.textLink
+    ({
+      srcPath : filePath1,
+      dstPath : linkPath1,
+      sync : 1,
+      rewriting : 1,
+      rewritingDirs : 0,
+      allowingMissed : 1,
+      throwing : 0
+    });
+  })
+  test.identical( got, null );
+  test.is( !provider.isTextLink( linkPath1 ) );
+  test.is( provider.isDir( linkPath1 ) );
+
+  test.case = 'rewrite dir, rewritingDirs on throwing on'
+  provider.filesDelete( testPath );
+  provider.dirMake( linkPath1 );
+  provider.textLink
+  ({
+    srcPath : filePath1,
+    dstPath : linkPath1,
+    sync : 1,
+    rewriting : 1,
+    rewritingDirs : 1,
+    allowingMissed : 1,
+    throwing : 1
+  });
+  test.is( provider.isTextLink( linkPath1 ) );
+  test.identical( provider.pathResolveTextLink( linkPath1 ), filePath1 );
+
+  test.case = 'rewrite dir, rewritingDirs on rewriting off throwing on'
+  provider.filesDelete( testPath );
+  provider.dirMake( linkPath1 );
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.textLink
+    ({
+      srcPath : filePath1,
+      dstPath : linkPath1,
+      sync : 1,
+      rewriting : 0,
+      rewritingDirs : 1,
+      allowingMissed : 1,
+      throwing : 1
+    });
+  })
+  test.is( !provider.isTextLink( linkPath1 ) );
+  test.is( provider.isDir( linkPath1 ) );
+
+  test.case = 'rewrite dir, rewritingDirs on rewriting off throwing off'
+  provider.filesDelete( testPath );
+  provider.dirMake( linkPath1 );
+  test.mustNotThrowError( () =>
+  {
+    got = provider.textLink
+    ({
+      srcPath : filePath1,
+      dstPath : linkPath1,
+      sync : 1,
+      rewriting : 0,
+      rewritingDirs : 1,
+      allowingMissed : 1,
+      throwing : 0
+    });
+  })
+  test.identical( got, null )
+  test.is( !provider.isTextLink( linkPath1 ) );
+  test.is( provider.isDir( linkPath1 ) );
 
   self.provider.fieldPop( 'usingTextLink', 1 );
 }

@@ -13123,6 +13123,484 @@ filesDeleteAsync.timeOut = 20000;
 
 //
 
+function filesDelete2( test )
+{
+  let context = this;
+  let path = context.provider.path;
+  let provider = context.provider;
+  let hub = context.hub;
+
+  var testPath = path.join( context.testSuitePath, test.name );
+
+  var tree = _.FileProvider.Extract
+  ({
+    protocol : 'src',
+    filesTree :
+    {
+      file : 'file',
+      empty1 : {},
+      dir1 :
+      {
+        file : 'file',
+        empty2 : {},
+        dir2 :
+        {
+          file : 'file',
+          empty3 : {},
+        }
+      }
+    }
+  })
+
+  tree.providerRegisterTo( hub );
+
+  test.open( 'recursive' );
+
+  // test.case = 'recursive : 0';
+  // provider.filesDelete( testPath );
+  // hub.filesReflect({ reflectMap : { 'src:///' : 'current://' + testPath } });
+  // var got = provider.filesDelete({ filePath : testPath, recursive : 0 });
+  // var deleted = _.select( got, '*/relative' );
+  // var expected = [];
+  // test.identical( deleted, expected );
+
+  // test.case = 'recursive : 1';
+  // provider.filesDelete( testPath );
+  // hub.filesReflect({ reflectMap : { 'src:///' : 'current://' + testPath } });
+  // var got = provider.filesDelete({ filePath : testPath, recursive : 1 });
+  // var deleted = _.select( got, '*/relative' );
+  // var expected = [];
+  // test.identical( deleted, expected );
+
+  test.case = 'recursive : 2';
+  provider.filesDelete( testPath );
+  hub.filesReflect({ reflectMap : { 'src:///' : 'current://' + testPath } });
+  var got = provider.filesDelete({ filePath : testPath, recursive : 2 });
+  var deleted = _.select( got, '*/relative' );
+  var expected =
+  [
+    '.',
+    './file',
+    './dir1',
+    './dir1/file',
+    './dir1/dir2',
+    './dir1/dir2/file',
+    './dir1/dir2/empty3',
+    './dir1/empty2',
+    './empty1'
+  ];
+  test.identical( deleted, expected );
+
+  test.close( 'recursive' );
+
+  test.open( 'includingTerminals' );
+
+  test.case = 'includingTerminals off';
+  provider.filesDelete( testPath );
+  hub.filesReflect({ reflectMap : { 'src:///' : 'current://' + testPath } });
+  test.shouldThrowError( () => provider.filesDelete({ filePath : testPath, includingTerminals : 0 }) );
+  var files = provider.filesFindRecursive({ filePath : testPath, outputFormat : 'relative'});
+  var expected =
+  [
+    '.',
+    './file',
+    './dir1',
+    './dir1/file',
+    './dir1/dir2',
+    './dir1/dir2/file',
+    './dir1/dir2/empty3',
+    './dir1/empty2',
+    './empty1'
+  ]
+  test.identical( files, expected );
+
+  test.case = 'includingTerminals off';
+  provider.filesDelete( testPath );
+  hub.filesReflect({ reflectMap : { 'src:///' : 'current://' + testPath } });
+  var got = provider.filesDelete({ filePath : testPath, includingTerminals : 0, throwing : 0 });
+  var deleted = _.select( got, '*/relative' );
+  var expected =
+  [
+    './dir1/dir2/empty3',
+    './dir1/empty2',
+    './empty1'
+  ]
+  test.identical( deleted, expected );
+  var files = provider.filesFindRecursive({ filePath : testPath, outputFormat : 'relative'});
+  var expected =
+  [
+    '.',
+    './file',
+    './dir1',
+    './dir1/file',
+    './dir1/dir2',
+    './dir1/dir2/file',
+    './dir1/dir2/empty3',
+    './dir1/empty2',
+    './empty1'
+  ]
+  test.identical( files, expected );
+
+
+  test.case = 'includingTerminals off';
+  provider.filesDelete( testPath );
+  hub.filesReflect({ reflectMap : { 'src:///' : 'current://' + testPath } });
+  var got = provider.filesDelete({ filePath : testPath, includingTerminals : 1 });
+  var deleted = _.select( got, '*/relative' );
+  var expected =
+  [
+    '.',
+    './file',
+    './dir1',
+    './dir1/file',
+    './dir1/dir2',
+    './dir1/dir2/file',
+    './dir1/dir2/empty3',
+    './dir1/empty2',
+    './empty1'
+  ];
+  test.identical( deleted, expected );
+
+  test.close( 'includingTerminals' );
+
+  test.open( 'resolvingSoftLink' );
+
+  test.case = 'soft link to terminal';
+  provider.filesDelete( testPath );
+  hub.filesReflect({ reflectMap : { 'src:///' : 'current://' + testPath } });
+  provider.softLink( path.join( testPath, 'softLink' ),path.join( testPath, 'dir1/dir2/file' )  )
+  var got = provider.filesDelete({ filePath : testPath, resolvingSoftLink : 0 });
+  var deleted = _.select( got, '*/relative' );
+  var expected =
+  [
+    '.',
+    './file',
+    './softLink',
+    './dir1',
+    './dir1/file',
+    './dir1/dir2',
+    './dir1/dir2/file',
+    './dir1/dir2/empty3',
+    './dir1/empty2',
+    './empty1'
+  ];
+  test.identical( deleted, expected );
+
+  test.case = 'soft link to dir';
+  provider.filesDelete( testPath );
+  hub.filesReflect({ reflectMap : { 'src:///' : 'current://' + testPath } });
+  provider.softLink( path.join( testPath, 'softLink' ),path.join( testPath, 'dir1/dir2' )  )
+  var got = provider.filesDelete({ filePath : testPath, resolvingSoftLink : 0 });
+  var deleted = _.select( got, '*/relative' );
+  var expected =
+  [
+    '.',
+    './file',
+    './softLink',
+    './dir1',
+    './dir1/file',
+    './dir1/dir2',
+    './dir1/dir2/file',
+    './dir1/dir2/empty3',
+    './dir1/empty2',
+    './empty1'
+  ];
+  test.identical( deleted, expected );
+
+  test.case = 'soft link to terminal';
+  provider.filesDelete( testPath );
+  hub.filesReflect({ reflectMap : { 'src:///' : 'current://' + testPath } });
+  provider.softLink( path.join( testPath, 'softLink' ),path.join( testPath, 'dir1/dir2/file' )  )
+  test.shouldThrowError( () => provider.filesDelete({ filePath : testPath, resolvingSoftLink : 1 }) );
+
+  test.close( 'resolvingSoftLink' );
+
+  test.open( 'resolvingTextLink' );
+
+  test.case = 'soft link to terminal';
+  provider.filesDelete( testPath );
+  hub.filesReflect({ reflectMap : { 'src:///' : 'current://' + testPath } });
+  provider.textLink( path.join( testPath, 'textLink' ),path.join( testPath, 'dir1/dir2/file' )  )
+  var got = provider.filesDelete({ filePath : testPath, resolvingTextLink : 0 });
+  var deleted = _.select( got, '*/relative' );
+  var expected =
+  [
+    '.',
+    './file',
+    './textLink',
+    './dir1',
+    './dir1/file',
+    './dir1/dir2',
+    './dir1/dir2/file',
+    './dir1/dir2/empty3',
+    './dir1/empty2',
+    './empty1'
+  ];
+  test.identical( deleted, expected );
+
+  test.case = 'soft link to dir';
+  provider.filesDelete( testPath );
+  hub.filesReflect({ reflectMap : { 'src:///' : 'current://' + testPath } });
+  provider.textLink( path.join( testPath, 'textLink' ),path.join( testPath, 'dir1/dir2' )  )
+  var got = provider.filesDelete({ filePath : testPath, resolvingTextLink : 0 });
+  var deleted = _.select( got, '*/relative' );
+  var expected =
+  [
+    '.',
+    './file',
+    './textLink',
+    './dir1',
+    './dir1/file',
+    './dir1/dir2',
+    './dir1/dir2/file',
+    './dir1/dir2/empty3',
+    './dir1/empty2',
+    './empty1'
+  ];
+  test.identical( deleted, expected );
+
+  test.case = 'soft link to terminal';
+  provider.filesDelete( testPath );
+  hub.filesReflect({ reflectMap : { 'src:///' : 'current://' + testPath } });
+  provider.textLink( path.join( testPath, 'textLink' ),path.join( testPath, 'dir1/dir2/file' )  )
+  test.shouldThrowError( () => provider.filesDelete({ filePath : testPath, resolvingTextLink : 1 }) );
+
+  test.close( 'resolvingTextLink' );
+
+  test.open( 'writing' );
+
+  test.case = 'writing off';
+  provider.filesDelete( testPath );
+  hub.filesReflect({ reflectMap : { 'src:///' : 'current://' + testPath } });
+  var got = provider.filesDelete({ filePath : testPath, writing : 0 });
+  var deleted = _.select( got, '*/relative' );
+  var expected = [ ];
+  test.identical( deleted, expected );
+  var files = provider.filesFindRecursive({ filePath : testPath, outputFormat : 'relative'});
+  var expected =
+  [
+    '.',
+    './file',
+    './dir1',
+    './dir1/file',
+    './dir1/dir2',
+    './dir1/dir2/file',
+    './dir1/dir2/empty3',
+    './dir1/empty2',
+    './empty1'
+  ]
+  test.identical( files, expected );
+
+  test.case = 'writing on';
+  provider.filesDelete( testPath );
+  hub.filesReflect({ reflectMap : { 'src:///' : 'current://' + testPath } });
+  var got = provider.filesDelete({ filePath : testPath, writing : 1 });
+  var deleted = _.select( got, '*/relative' );
+  var expected =
+  [
+    '.',
+    './file',
+    './dir1',
+    './dir1/file',
+    './dir1/dir2',
+    './dir1/dir2/file',
+    './dir1/dir2/empty3',
+    './dir1/empty2',
+    './empty1'
+  ]
+  test.identical( deleted, expected );
+  var files = provider.filesFindRecursive({ filePath : testPath, outputFormat : 'relative'});
+  var expected =
+  [
+  ]
+  test.identical( files, expected );
+
+  test.close( 'writing' );
+  tree.finit();
+
+}
+
+//
+
+function filesDeleteDeletingEmptyDirs( test )
+{
+  let context = this;
+  let path = context.provider.path;
+  let provider = context.provider;
+  let hub = context.hub;
+
+  var testPath = path.join( context.testSuitePath, test.name );
+
+  var tree = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      file : 'file',
+      empty1 : {},
+      dir1 :
+      {
+        file : 'file',
+        empty2 : {},
+        dir2 :
+        {
+          file : 'file',
+          empty3 : {},
+        }
+      }
+    }
+  })
+
+  //
+
+  test.case = 'mask dir, deletingEmptyDirs off'
+  provider.filesDelete( testPath );
+  tree.readToProvider( provider, testPath );
+  var filter = { maskDirectory : /dir.$/g }
+  var got = provider.filesDelete({ filePath : testPath, filter : filter, deletingEmptyDirs : 0 });
+  var deleted = _.select( got, '*/relative');
+  var expected =
+  [
+    './file',
+    './dir1/file',
+    './dir1/dir2/file',
+  ]
+  test.will = 'filtered empty dirs should not be deleted';
+  test.identical( deleted, expected );
+
+  test.case = 'mask dir, deletingEmptyDirs on'
+  provider.filesDelete( testPath );
+  tree.readToProvider( provider, testPath );
+  var filter = { maskDirectory : /dir.$/g }
+  var got = provider.filesDelete({ filePath : testPath, filter : filter, deletingEmptyDirs : 1 });
+  var deleted = _.select( got, '*/relative');
+  var expected =
+  [
+    '.',
+    './file',
+    './dir1/file',
+    './dir1/dir2/file',
+    './dir1/dir2/empty3',
+    './dir1/empty1',
+    './empty1'
+  ]
+  test.will = 'filtered empty dirs should be deleted';
+  test.identical( deleted, expected );
+
+  test.case = 'everything is actual, deletingEmptyDirs off'
+  provider.filesDelete( testPath );
+  tree.readToProvider( provider, testPath );
+  var got = provider.filesDelete({ filePath : testPath, deletingEmptyDirs : 0 });
+  var deleted = _.select( got, '*/relative');
+  var expected =
+  [
+    '.',
+    './file',
+    './dir1/file',
+    './dir1/dir2/file',
+    './dir1/dir2/empty3',
+    './dir1/empty1',
+    './empty1'
+  ]
+  test.will = 'all files should be deleted';
+  test.identical( deleted, expected );
+
+  test.case = 'everything is actual, deletingEmptyDirs on'
+  provider.filesDelete( testPath );
+  tree.readToProvider( provider, testPath );
+  var got = provider.filesDelete({ filePath : testPath, deletingEmptyDirs : 1 });
+  var deleted = _.select( got, '*/relative');
+  var expected =
+  [
+    '.',
+    './file',
+    './dir1/file',
+    './dir1/dir2/file',
+    './dir1/dir2/empty3',
+    './dir1/empty1',
+    './empty1'
+  ]
+  test.will = 'all files should be deleted';
+  test.identical( deleted, expected );
+
+  test.case = 'exclude empty dirs,deletingEmptyDirs off'
+  provider.filesDelete( testPath );
+  tree.readToProvider( provider, testPath );
+  var filter = { maskDirectory : { excludeAny : 'empty'} }
+  var got = provider.filesDelete({ filePath : testPath, filter : filter, deletingEmptyDirs : 0 });
+  var deleted = _.select( got, '*/relative');
+  var expected =
+  [
+    './file',
+    './dir1/file',
+    './dir1/dir2/file',
+  ]
+  test.will = 'empty dirs should be preserved';
+  test.identical( deleted, expected );
+
+  test.case = 'exclude empty dirs,deletingEmptyDirs on'
+  provider.filesDelete( testPath );
+  tree.readToProvider( provider, testPath );
+  var filter = { maskDirectory : { excludeAny : 'empty'} }
+  var got = provider.filesDelete({ filePath : testPath, filter : filter, deletingEmptyDirs : 1 });
+  var deleted = _.select( got, '*/relative');
+  var expected =
+  [
+    '.',
+    './file',
+    './dir1/file',
+    './dir1/dir2/file',
+    './dir1/dir2/empty3',
+    './dir1/empty1',
+    './empty1'
+  ]
+  test.will = 'all files should be deleted';
+  test.identical( deleted, expected );
+
+  test.case = 'exclude dirs,deletingEmptyDirs off'
+  provider.filesDelete( testPath );
+  tree.readToProvider( provider, testPath );
+  var filter = { maskDirectory : { excludeAny : /dir.$/g } }
+  var got = provider.filesDelete({ filePath : testPath, filter : filter, deletingEmptyDirs : 1 });
+  var deleted = _.select( got, '*/relative');
+  var expected =
+  [
+    '.',
+    './file',
+    './dir1',
+    './dir1/file',
+    './dir1/dir2',
+    './dir1/dir2/file',
+    './dir1/dir2/empty3',
+    './dir1/empty2',
+    './empty1'
+  ]
+  test.will = 'all files should be deleted';
+  test.identical( deleted, expected );
+
+  test.case = 'exclude dirs,deletingEmptyDirs on'
+  provider.filesDelete( testPath );
+  tree.readToProvider( provider, testPath );
+  var filter = { maskDirectory : { excludeAny : /dir.$/g } }
+  var got = provider.filesDelete({ filePath : testPath, filter : filter, deletingEmptyDirs : 0 });
+  var deleted = _.select( got, '*/relative');
+  var expected =
+  [
+    './file',
+    './dir1/file',
+    './dir1/dir2/file',
+    './dir1/dir2/empty3',
+    './dir1/empty2',
+    './empty1'
+  ]
+  test.will = 'only terminals and empty* dirs should be deleted';
+  test.identical( deleted, expected );
+
+}
+
+filesDeleteDeletingEmptyDirs.timeOut = 20000;
+
+//
+
 function filesDeleteEmptyDirs( test )
 {
   let context = this;
@@ -14449,8 +14927,6 @@ function filesCopyWithAdapter( test )
   let path = context.provider.path;
   let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
 
-  let context = this;
-  let path = context.provider.path;
   var testRoutineDir = path.join( context.testSuitePath, test.name );
 
   var samples =
@@ -14725,7 +15201,7 @@ function filesCopyWithAdapter( test )
         {
           srcAction : null,
           srcAllow : true,
-          reason : 'dstDeleting',
+          reason : 'srcLooking',
           action : 'directory preserved',
           allow : true,
           relative : './c'
@@ -14733,10 +15209,18 @@ function filesCopyWithAdapter( test )
         {
           srcAction : 'fileDelete',
           srcAllow : true,
-          reason : 'dstDeleting',
+          reason : 'srcLooking',
           action : 'copied',
           allow : true,
           relative : './c/b3.b'
+        },
+        {
+          srcAction : null,
+          srcAllow : true,
+          reason : 'dstDeleting',
+          action : 'fileDelete',
+          allow : false,
+          relative : './c/dstdir'
         },
         {
           srcAction : null,
@@ -14758,23 +15242,7 @@ function filesCopyWithAdapter( test )
           srcAction : null,
           srcAllow : true,
           reason : 'dstDeleting',
-          action : 'fileDelete',
-          allow : false,
-          relative : './c/dstdir'
-        },
-        {
-          srcAction : null,
-          srcAllow : true,
-          reason : 'dstDeleting',
           action : 'directory preserved',
-          allow : true,
-          relative : './c/e'
-        },
-        {
-          srcAction : null,
-          srcAllow : true,
-          reason : 'dstDeleting',
-          action : 'fileDelete',
           allow : false,
           relative : './c/srcfile-dstdir'
         },
@@ -16279,7 +16747,9 @@ var Self =
     filesReflectTo,
 
     filesDelete,
+    filesDelete2,
     filesDeleteAsync,
+    filesDeleteDeletingEmptyDirs,
     filesDeleteEmptyDirs,
     filesDeleteTerminals,
     // filesDeleteAndAsyncWrite,

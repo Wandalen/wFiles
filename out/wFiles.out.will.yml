@@ -18,7 +18,7 @@ about:
     get access to all sophisticated general algorithms on files for free. Who
     said files is only externals? Files makes possible to treat internals of a
     program as files system(s). Use the module to keep DRY.
-  version: 0.6.558
+  version: 0.6.567
   enabled: 1
   interpreters:
     - nodejs >= 6.0.0
@@ -38,11 +38,11 @@ path:
   out:
     path: out
   out.debug:
-    path: ./out.debug
+    path: ./out/debug
     criterion:
       debug: 1
   out.release:
-    path: ./out.release
+    path: ./out/release
     criterion:
       debug: 0
   repository:
@@ -133,7 +133,7 @@ reflector:
   reflect.proto.:
     srcFilter:
       filePath:
-        ./proto: ./out.release
+        ./proto: ./out/release
       maskAll:
         excludeAny:
           - !<tag:yaml.org,2002:js/regexp> /(\W|^)node_modules(\W|$)/
@@ -154,7 +154,7 @@ reflector:
   reflect.proto.debug:
     srcFilter:
       filePath:
-        ./proto: ./out.debug
+        ./proto: ./out/debug
       maskAll:
         excludeAny:
           - !<tag:yaml.org,2002:js/regexp> /(\W|^)node_modules(\W|$)/
@@ -393,7 +393,7 @@ build:
       - 'step::export.proto'
 exported:
   proto.export:
-    version: 0.6.558
+    version: 0.6.567
     criterion:
       default: 1
       debug: 1

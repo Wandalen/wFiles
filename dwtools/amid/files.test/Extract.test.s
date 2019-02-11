@@ -46,6 +46,8 @@ var filesTree =
 function onSuiteBegin( test )
 {
   let context = this;
+  debugger;
+  Parent.onSuiteBegin.apply( this, arguments );
   context.provider = _.FileProvider.Extract({ filesTree : filesTree, usingExtraStat : 1, protocol : 'current' });
   context.hub = _.FileProvider.Hub({ providers : [ context.provider ] });
   let path = context.provider.path;

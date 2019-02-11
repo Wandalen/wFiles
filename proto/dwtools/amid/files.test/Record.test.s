@@ -43,11 +43,6 @@ function onSuiteEnd()
 
 //
 
-/*
-  qqq : split the test routine
-  aaa : done
-*/
-
 function record( test )
 {
 
@@ -119,27 +114,27 @@ function record( test )
   /*absolute path, not exist*/
 
   var filePath = _.path.join( dir, 'invalid.txt' );
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   test.identical( got.isActual, true );
   check( got, filePath );
 
   /*absolute path, terminal file*/
 
   var filePath = _.path.normalize( __filename );
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   check( got, filePath );
 
   /*absolute path, dir*/
 
   var filePath = _.path.normalize( dir );
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   check( got, filePath, factory );
 
   /*absolute path, change dir to it root, filePath - dir*/
 
   var filePath = _.path.normalize( dir );
   var factory = _.FileRecordFactory.TollerantFrom( o, { dirPath : _.path.dir( dir ) } ).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   check( got, filePath, factory );
   test.identical( got.stat.isDir(), true )
   test.identical( got.isDir, true );
@@ -150,28 +145,28 @@ function record( test )
   // var factory = _.FileRecordFactory.TollerantFrom( o, {} );
   // test.shouldThrowErrorSync( function()
   // {
-  //   factory.record({ input : filePath, /*context*/factory : factory });
+  //   factory.record({ input : filePath, factory : factory });
   // });
 
   /*relative path with dir option*/
 
   var filePath = _.path.relative( dir, __filename );
   var factory = _.FileRecordFactory.TollerantFrom( o, { dirPath : dir } ).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   check( got, __filename, factory );
 
   /*relative path with relative option*/
 
   var filePath = _.path.relative( dir, __filename );
   var factory = _.FileRecordFactory.TollerantFrom( o, { basePath : dir } ).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   check( got, __filename, factory );
 
   /*relative path with dir+relative, relative is root of dir*/
 
   var filePath = _.path.relative( dir, __filename );
   var factory = _.FileRecordFactory.TollerantFrom( o, { dirPath : dir, basePath : _.path.dir( dir ) } ).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   // test.identical( got.relative, './file.test/Record.test.s' );
   test.identical( got.relative, './' + _.path.relative( _.path.join( __filename, '../..' ) , __filename ) );
   test.identical( got.stat.isTerminal(), true );
@@ -180,7 +175,7 @@ function record( test )
 
   var filePath = _.path.normalize( __filename );
   var factory = _.FileRecordFactory.TollerantFrom( o, { basePath : '/X' } ).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   test.identical( got.relative, '..' + filePath );
   test.identical( got.absolute, filePath );
   test.identical( got.stat.isTerminal(), true );
@@ -189,7 +184,7 @@ function record( test )
 
   var filePath = _.path.normalize( __filename );
   var factory = _.FileRecordFactory.TollerantFrom( o, { dirPath : '/X' } ).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   test.identical( got.relative, '..' + filePath );
   test.identical( got.absolute, filePath );
   test.identical( got.stat.isTerminal(), true );
@@ -198,7 +193,7 @@ function record( test )
 
   var filePath = _.path.normalize( __filename );
   var factory = _.FileRecordFactory.TollerantFrom( o, { basePath : 'X:\\x' } ).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   test.identical( got.relative, '../..' + filePath );
   test.identical( got.absolute, filePath );
   test.identical( got.stat.isTerminal(), true );
@@ -207,7 +202,7 @@ function record( test )
 
   var filePath = _.path.normalize( __filename );
   var factory = _.FileRecordFactory.TollerantFrom( o, { basePath : 'X:\\x' } ).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   test.identical( got.relative, '../..' + filePath );
   test.identical( got.absolute, filePath );
   test.identical( got.stat.isTerminal(), true );
@@ -237,7 +232,7 @@ function record( test )
   /*dir - path to other disk*/
 
   var factory = _.FileRecordFactory.TollerantFrom( o, { dirPath : '/X'  } ).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   test.identical( got.relative, '..' + filePath );
   test.identical( got.absolute, filePath );
   test.identical( got.real, filePath );
@@ -247,7 +242,7 @@ function record( test )
   /*relative - path to other disk*/
 
   var factory = _.FileRecordFactory.TollerantFrom( o, { basePath : '/X'  } ).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   test.identical( got.relative, '..' + filePath );
   test.identical( got.absolute, filePath );
   test.identical( got.real, filePath );
@@ -257,7 +252,7 @@ function record( test )
   /*dir - path to dir that contains that file*/
 
   var factory = _.FileRecordFactory.TollerantFrom( o, { dirPath : __dirname  } ).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   test.identical( got.relative, './' + _.path.name({ path : filePath, withExtension : 1 }) );
   test.identical( got.absolute, filePath );
   test.identical( got.real, filePath );
@@ -267,7 +262,7 @@ function record( test )
   /*relative - path to dir that contains that file*/
 
   var factory = _.FileRecordFactory.TollerantFrom( o, { basePath : __dirname  } ).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   test.identical( got.relative, './' + _.path.name({ path : filePath, withExtension : 1 }) );
   test.identical( got.absolute, filePath );
   test.identical( got.real, filePath );
@@ -277,7 +272,7 @@ function record( test )
   /*dir === filePath */
 
   var factory = _.FileRecordFactory.TollerantFrom( o, { dirPath : filePath  } ).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   test.identical( got.relative, '.');
   test.identical( got.absolute, filePath );
   test.identical( got.real, filePath );
@@ -287,7 +282,7 @@ function record( test )
   /*relative === filePath */
 
   var factory = _.FileRecordFactory.TollerantFrom( o, { basePath : filePath  } ).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   test.identical( got.relative, '.');
   test.identical( got.absolute, filePath );
   test.identical( got.real, filePath );
@@ -297,7 +292,7 @@ function record( test )
   /*dir + relative, affects only on record.relative */
 
   var factory = _.FileRecordFactory.TollerantFrom( o, { dirPath : '/a', basePath : '/x'  } ).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   test.identical( got.relative, '..' + filePath );
   test.identical( got.absolute, filePath );
   test.identical( got.real, filePath );
@@ -325,14 +320,14 @@ function record( test )
 
   _.fileProvider.fieldPush( 'safe', 1 );
   var factory = _.FileRecordFactory.TollerantFrom( o, { dirPath : '/X' } ).form();
-  test.mustNotThrowError( () => factory.record({ input : filePath, /*context*/factory : factory }) );
+  test.mustNotThrowError( () => factory.record({ input : filePath, factory : factory }) );
   _.fileProvider.fieldPush( 'safe', 1 );
 
   /*relative - path to other disk*/
 
   _.fileProvider.fieldPush( 'safe', 0 );
   var factory = _.FileRecordFactory.TollerantFrom( o, { basePath : '/X' } ).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   test.identical( got.relative, filePath );
   test.identical( got.absolute, _.path.join( factory.basePath, name ) );
   test.identical( got.real, _.path.join( factory.basePath, name ) );
@@ -343,7 +338,7 @@ function record( test )
   /*dir - path to dir with file*/
 
   var factory = _.FileRecordFactory.TollerantFrom( o, { dirPath : __dirname } ).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   test.identical( got.relative, filePath );
   test.identical( got.absolute, _.path.join( factory.dirPath, name ) );
   test.identical( got.real, got.absolute );
@@ -353,7 +348,7 @@ function record( test )
   /*relative - path to dir with file*/
 
   var factory = _.FileRecordFactory.TollerantFrom( o, { basePath : __dirname } ).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   test.identical( got.relative, filePath );
   test.identical( got.absolute, _.path.join( factory.basePath, name ) );
   test.identical( got.real, got.absolute );
@@ -363,7 +358,7 @@ function record( test )
   /*dir === filePath*/
 
   var factory = _.FileRecordFactory.TollerantFrom( o, { dirPath : __filename } ).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   test.identical( got.relative, filePath );
   test.identical( got.absolute, _.path.join( factory.dirPath, name ) );
   test.identical( got.real, got.absolute );
@@ -373,7 +368,7 @@ function record( test )
   /*relative === filePath*/
 
   var factory = _.FileRecordFactory.TollerantFrom( o, { basePath : __filename } ).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   test.identical( got.relative, filePath );
   test.identical( got.absolute, _.path.join( factory.basePath, name ) );
   test.identical( got.real, got.absolute );
@@ -384,7 +379,7 @@ function record( test )
 
   _.fileProvider.fieldPush( 'safe', 0 );
   var factory = _.FileRecordFactory.TollerantFrom( o, { dirPath : '/x', basePath : '/a' } ).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   test.identical( got.relative, '..' + _.path.join( factory.dirPath, name ) );
   test.identical( got.absolute, _.path.join( factory.dirPath, name ) );
   test.identical( got.real, got.absolute );
@@ -428,7 +423,7 @@ function record( test )
   }
   var filePath = _.path.normalize( __filename );
   var factory = _.FileRecordFactory.TollerantFrom( o, { dirPath : dir, onRecord : _onRecord} ).form();
-  factory.record({ input : filePath, /*context*/factory : factory });
+  factory.record({ input : filePath, factory : factory });
 
   //
 
@@ -438,7 +433,7 @@ function record( test )
 
   var filePath = _.path.normalize( __filename );
   var factory = _.FileRecordFactory.TollerantFrom( o, { dirPath : _.path.dir( filePath ) } ).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   test.shouldThrowErrorSync( function()
   {
     got.newProperty = 1;
@@ -448,7 +443,7 @@ function record( test )
 
   var filePath = _.path.normalize( __filename );
   var factory = _.FileRecordFactory.TollerantFrom( o, { dirPath : _.path.dir( filePath ), strict : 0 } ).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   test.mustNotThrowError( function()
   {
     got.newProperty = 1;
@@ -494,80 +489,80 @@ function filtering( test )
   /*maskAll#1*/
 
   var mask = _.RegexpObject( 'Record', 'includeAny' );
-  var filter = makeFilter({  maskAll : mask, basePath : filePath, /*inFilePath*/filePath : filePath })
+  var filter = makeFilter({  maskAll : mask, basePath : filePath, filePath : filePath })
   var factory = _.FileRecordFactory.TollerantFrom( o, { filter : filter, basePath : filePath } ).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   test.identical( got.isActual, false );
 
   var mask = _.RegexpObject( '.', 'includeAny' );
-  var filter = makeFilter({  maskAll : mask, basePath : filePath, /*inFilePath*/filePath : filePath })
+  var filter = makeFilter({  maskAll : mask, basePath : filePath, filePath : filePath })
   var factory = _.FileRecordFactory.TollerantFrom( o, { filter : filter, basePath : filePath } ).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   test.identical( got.isActual, true );
 
   /*maskAll#2*/
 
   var mask = _.RegexpObject( 'Abc', 'includeAny' );
-  var filter = makeFilter({  maskAll : mask, basePath : filePath, /*inFilePath*/filePath : filePath })
+  var filter = makeFilter({  maskAll : mask, basePath : filePath, filePath : filePath })
   var factory = _.FileRecordFactory.TollerantFrom( o, { filter : filter, basePath : filePath } ).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   test.identical( got.isActual, false );
 
   /*maskTerminal*/
 
   var mask = _.RegexpObject( 'Record', 'includeAny' );
-  var filter = makeFilter({  maskTerminal : mask, basePath : filePath, /*inFilePath*/filePath : filePath })
+  var filter = makeFilter({  maskTerminal : mask, basePath : filePath, filePath : filePath })
   var factory = _.FileRecordFactory.TollerantFrom( o, { filter : filter, basePath : filePath } ).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   test.identical( got.isActual, false );
 
   var mask = _.RegexpObject( '.', 'includeAny' );
-  var filter = makeFilter({  maskAll : mask, basePath : filePath, /*inFilePath*/filePath : filePath })
+  var filter = makeFilter({  maskAll : mask, basePath : filePath, filePath : filePath })
   var factory = _.FileRecordFactory.TollerantFrom( o, { filter : filter, basePath : filePath } ).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   test.identical( got.isActual, true );
 
   /*maskTerminal, filePath is not terminal*/
 
   var filePath = _.path.normalize( dir );
   var mask = _.RegexpObject( 'Record', 'includeAny' );
-  var filter = makeFilter({  maskTerminal : mask, basePath : filePath, /*inFilePath*/filePath : filePath })
+  var filter = makeFilter({  maskTerminal : mask, basePath : filePath, filePath : filePath })
   var factory = _.FileRecordFactory.TollerantFrom( o, { filter : filter, basePath : filePath } ).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   test.identical( got.isActual, true );
 
   /*maskDirectory, filePath is dir*/
 
   var filePath = _.path.normalize( dir );
   var mask = _.RegexpObject( 'test', 'includeAny' );
-  var filter = makeFilter({  maskDirectory : mask, basePath : filePath, /*inFilePath*/filePath : filePath })
+  var filter = makeFilter({  maskDirectory : mask, basePath : filePath, filePath : filePath })
   var factory = _.FileRecordFactory.TollerantFrom( o, { filter : filter, basePath : filePath } ).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   test.identical( got.isActual, false );
 
   var filePath = _.path.normalize( dir );
   var mask = _.RegexpObject( '.', 'includeAny' );
-  var filter = makeFilter({  maskDirectory : mask, basePath : filePath, /*inFilePath*/filePath : filePath })
+  var filter = makeFilter({  maskDirectory : mask, basePath : filePath, filePath : filePath })
   var factory = _.FileRecordFactory.TollerantFrom( o, { filter : filter, basePath : filePath } ).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   test.identical( got.isActual, true );
 
   /*maskDirectory, filePath is dir*/
 
   var filePath = _.path.normalize( dir );
   var mask = _.RegexpObject( 'Record', 'includeAny' );
-  var filter = makeFilter({  maskDirectory : mask, basePath : filePath, /*inFilePath*/filePath : filePath })
+  var filter = makeFilter({  maskDirectory : mask, basePath : filePath, filePath : filePath })
   var factory = _.FileRecordFactory.TollerantFrom( o, { filter : filter, basePath : filePath } ).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   test.identical( got.isActual, false );
 
   /*maskDirectory, filePath is terminal*/
 
   var filePath = _.path.normalize( __filename );
   var mask = _.RegexpObject( 'Record', 'includeAny' );
-  var filter = makeFilter({  maskDirectory : mask, basePath : filePath, /*inFilePath*/filePath : filePath })
+  var filter = makeFilter({  maskDirectory : mask, basePath : filePath, filePath : filePath })
   var factory = _.FileRecordFactory.TollerantFrom( o, { filter : filter, basePath : filePath } ).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   test.identical( got.isActual, true );
 
   //
@@ -577,34 +572,34 @@ function filtering( test )
   /*notOlder*/
 
   var filePath = _.path.normalize( __filename );
-  var filter = makeFilter({ notOlder : new Date( Date.UTC( 1900, 1, 1 ) ), basePath : filePath, /*inFilePath*/filePath : filePath })
+  var filter = makeFilter({ notOlder : new Date( Date.UTC( 1900, 1, 1 ) ), basePath : filePath, filePath : filePath })
   var factory = _.FileRecordFactory.TollerantFrom( o, { filter : filter, basePath : filePath  }).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   console.log( got.mtime )
   test.identical( got.isActual, true );
 
   /*notNewer*/
 
   var filePath = _.path.normalize( __filename );
-  var filter = makeFilter({ notNewer : new Date( Date.UTC( 1900, 1, 1 ) ), basePath : filePath, /*inFilePath*/filePath : filePath })
+  var filter = makeFilter({ notNewer : new Date( Date.UTC( 1900, 1, 1 ) ), basePath : filePath, filePath : filePath })
   var factory = _.FileRecordFactory.TollerantFrom( o, { filter : filter, basePath : filePath  }).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   test.identical( got.isActual, false );
 
   /* notOlderAge */
 
   var filePath = _.path.normalize( __filename );
-  var filter = makeFilter({ notOlderAge : new Date( Date.UTC( 1970, 1, 1 ) ), basePath : filePath, /*inFilePath*/filePath : filePath })
+  var filter = makeFilter({ notOlderAge : new Date( Date.UTC( 1970, 1, 1 ) ), basePath : filePath, filePath : filePath })
   var factory = _.FileRecordFactory.TollerantFrom( o, { filter : filter, basePath : filePath  }).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   test.identical( got.isActual, true );
 
   /* notNewerAge */
 
   var filePath = _.path.normalize( __filename );
-  var filter = makeFilter({ notNewerAge : new Date( Date.UTC( 1970, 1, 1 ) ), basePath : filePath, /*inFilePath*/filePath : filePath })
+  var filter = makeFilter({ notNewerAge : new Date( Date.UTC( 1970, 1, 1 ) ), basePath : filePath, filePath : filePath })
   var factory = _.FileRecordFactory.TollerantFrom( o, { filter : filter, basePath : filePath  }).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   test.identical( got.isActual, false );
 
   test.case = 'both not* and mask* are used';
@@ -615,10 +610,10 @@ function filtering( test )
   ({
     maskTerminal : maskTerminal,
     notOlder : new Date( Date.UTC( 1970, 1, 1 ) ),
-    /*inFilePath*/filePath : _.path.dir( filePath )
+    filePath : _.path.dir( filePath )
   })
   var factory = _.FileRecordFactory.TollerantFrom( o, { filter : filter, basePath : _.path.dir( filePath ) }).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   test.identical( got.isActual, true );
 
   /* notNewer check gives false, maskTerminal will be ignored */
@@ -629,10 +624,10 @@ function filtering( test )
   ({
     maskTerminal : maskTerminal,
     notNewer : new Date( Date.UTC( 1900, 1, 1 ) ),
-    /*inFilePath*/filePath : _.path.dir( filePath )
+    filePath : _.path.dir( filePath )
   })
   var factory = _.FileRecordFactory.TollerantFrom( o, { filter : filter, basePath : _.path.dir( filePath )  }).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   test.identical( got.isActual, false );
 
   //
@@ -647,7 +642,7 @@ function filtering( test )
   }
   var filePath = _.path.normalize( __filename );
   var factory = _.FileRecordFactory.TollerantFrom( o, { dirPath : dir, onRecord : _onRecord} ).form();
-  factory.record({ input : filePath, /*context*/factory : factory });
+  factory.record({ input : filePath, factory : factory });
 
   //
 
@@ -657,7 +652,7 @@ function filtering( test )
 
   var filePath = _.path.normalize( __filename );
   var factory = _.FileRecordFactory.TollerantFrom( o, { dirPath : _.path.dir( filePath ) } ).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   test.shouldThrowErrorSync( function()
   {
     got.newProperty = 1;
@@ -667,7 +662,7 @@ function filtering( test )
 
   var filePath = _.path.normalize( __filename );
   var factory = _.FileRecordFactory.TollerantFrom( o, { dirPath : _.path.dir( filePath ), strict : 0 } ).form();
-  var got = factory.record({ input : filePath, /*context*/factory : factory });
+  var got = factory.record({ input : filePath, factory : factory });
   test.mustNotThrowError( function()
   {
     got.newProperty = 1;
@@ -1329,40 +1324,6 @@ function recordForRelativeLink( test )
 
 //
 
-function recordFilterClone( test )
-{
-
-  let provider = _.fileProvider;
-  let filter = new _.FileRecordFilter({ defaultFileProvider : provider });
-
-  filter.prefixPath = '/some/path';
-
-  filter.basePath =
-  {
-    '.module/mod/builder.coffee' : '.module/mod',
-  }
-
-  filter.filePath =
-  {
-    '.module/mod/builder.coffee' : true,
-  }
-
-  test.identical( filter.formed, 1 );
-
-  let filter2 = filter.clone().form();
-  let filter3 = filter.clone().form();
-  filter.form();
-  let filter4 = filter.clone();
-
-  test.identical( filter.formed, 5 );
-  test.identical( filter2.formed, 5 );
-  test.identical( filter3.formed, 5 );
-  test.identical( filter4.formed, 1 );
-
-}
-
-//
-
 function recordStating( test )
 {
   test.case = 'get stat with stating off';
@@ -1394,6 +1355,462 @@ function recordStating( test )
   test.is( _.fileStatIs( stat ) );
 }
 
+//
+
+function recordFilter( test )
+{
+  let provider = new _.FileProvider.Extract();
+
+  /* */
+
+  test.case = 'filter from options map';
+  var filter = provider.recordFilter({ filePath : '/src' });
+  logger.log( filter );
+  test.identical( filter.filePath, '/src' );
+  test.identical( filter.prefixPath, null );
+  test.identical( filter.postfixPath, null );
+  test.identical( filter.basePath, null );
+  test.identical( filter.formed, 1 );
+
+  filter.form();
+  logger.log( filter );
+  test.identical( filter.filePath, '/src' );
+  test.identical( filter.prefixPath, null );
+  test.identical( filter.postfixPath, null );
+  test.identical( filter.basePath, { '/src' : '/src' } );
+  test.identical( filter.formed, 5 );
+
+  /* */
+
+  test.case = 'filter from string';
+  var filter = provider.recordFilter( '/src' );
+  logger.log( filter );
+  test.identical( filter.filePath, '/src' );
+  test.identical( filter.prefixPath, null );
+  test.identical( filter.postfixPath, null );
+  test.identical( filter.basePath, null );
+  test.identical( filter.formed, 1 );
+
+  filter.form();
+  logger.log( filter );
+  test.identical( filter.filePath, '/src' );
+  test.identical( filter.prefixPath, null );
+  test.identical( filter.postfixPath, null );
+  test.identical( filter.basePath, { '/src' : '/src' } );
+  test.identical( filter.formed, 5 );
+
+  /* */
+
+  test.case = 'filter from array';
+  var filter = provider.recordFilter([ '/src/a', '/src/b' ]);
+  logger.log( filter );
+  test.identical( filter.filePath, [ '/src/a', '/src/b' ] );
+  test.identical( filter.prefixPath, null );
+  test.identical( filter.postfixPath, null );
+  test.identical( filter.basePath, null );
+  test.identical( filter.formed, 1 );
+
+  filter.form();
+  logger.log( filter );
+  test.identical( filter.filePath, [ '/src/a', '/src/b' ] );
+  test.identical( filter.prefixPath, null );
+  test.identical( filter.postfixPath, null );
+  test.identical( filter.basePath, { '/src/a' : '/src/a', '/src/b' : '/src/b' } );
+  test.identical( filter.formed, 5 );
+
+  /* */
+
+  test.case = 'filter from array, have relative path';
+  var filter = provider.recordFilter([ '/src/a', 'src/b' ]);
+  logger.log( filter );
+  test.identical( filter.filePath, [ '/src/a', 'src/b' ] );
+  test.identical( filter.prefixPath, null );
+  test.identical( filter.postfixPath, null );
+  test.identical( filter.basePath, null );
+  test.identical( filter.formed, 1 );
+
+  filter.form();
+  logger.log( filter );
+  test.identical( filter.filePath, [ '/src/a', '/src/a/src/b' ] );
+  test.identical( filter.prefixPath, null );
+  test.identical( filter.postfixPath, null );
+  test.identical( filter.basePath, { '/src/a' : '/src/a', '/src/a/src/b' : '/src/a' } );
+  test.identical( filter.formed, 5 );
+
+  /* */
+
+  if( !Config.debug )
+  return;
+
+  /* */
+
+  test.description = 'bad options';
+
+  test.shouldThrowError( () => provider.recordFilter({ '/xx' : '/src' }) );
+  test.shouldThrowError( () => provider.recordFilter( 1 ) );
+
+}
+
+//
+
+function recordFilterReflect( test )
+{
+
+  var extract1 = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      src :
+      {
+        f1: '1',
+        d : { f2 : '2', f3 : '3' },
+      },
+      dst :
+      {
+        f1: 'dst',
+        d : 'dst',
+      }
+    },
+  });
+
+  /* - */
+
+  test.case = 'src and dst filters with prefixes and reflect map';
+
+  var files = extract1.filesReflect
+  ({
+    reflectMap : { 'src' : 'dst' },
+    srcFilter : { prefixPath : '/' },
+    dstFilter : { prefixPath : '/' },
+  });
+
+  var expSrc = [ '/src', '/src/f1', '/src/d', '/src/d/f2', '/src/d/f3' ];
+  var gotSrc = _.select( files, '*/src/absolute' );
+  var expDst = [ '/src', '/src/f1', '/src/d', '/src/d/f2', '/src/d/f3' ];
+  var gotDst = _.select( files, '*/src/absolute' );
+
+  test.identical( gotSrc, expSrc );
+  test.identical( gotDst, expDst );
+
+  /* - */
+
+  test.case = 'src filter with prefixes and reflect map';
+
+  var files = extract1.filesReflect
+  ({
+    reflectMap : { 'src' : '/dst' },
+    srcFilter : { prefixPath : '/' },
+    // dstFilter : { prefixPath : '/' },
+  });
+
+  var expSrc = [ '/src', '/src/f1', '/src/d', '/src/d/f2', '/src/d/f3' ];
+  var gotSrc = _.select( files, '*/src/absolute' );
+  var expDst = [ '/src', '/src/f1', '/src/d', '/src/d/f2', '/src/d/f3' ];
+  var gotDst = _.select( files, '*/src/absolute' );
+
+  test.identical( gotSrc, expSrc );
+  test.identical( gotDst, expDst );
+
+  /* - */
+
+  test.case = 'dst filter with prefixes and reflect map';
+
+  var files = extract1.filesReflect
+  ({
+    reflectMap : { '/src' : 'dst' },
+    // srcFilter : { prefixPath : '/' },
+    dstFilter : { prefixPath : '/' },
+  });
+
+  var expSrc = [ '/src', '/src/f1', '/src/d', '/src/d/f2', '/src/d/f3' ];
+  var gotSrc = _.select( files, '*/src/absolute' );
+  var expDst = [ '/src', '/src/f1', '/src/d', '/src/d/f2', '/src/d/f3' ];
+  var gotDst = _.select( files, '*/src/absolute' );
+
+  test.identical( gotSrc, expSrc );
+  test.identical( gotDst, expDst );
+
+  /* */
+
+  if( !Config.debug )
+  return;
+
+  /* */
+
+  test.description = 'cant deduce base path';
+
+  test.shouldThrowError( () =>
+  {
+    extract1.filesReflect
+    ({
+      reflectMap : { 'src' : 'dst' },
+      // srcFilter : { prefixPath : '/' },
+      // dstFilter : { prefixPath : '/' },
+    });
+  });
+
+  test.shouldThrowError( () =>
+  {
+    extract1.filesReflect
+    ({
+      reflectMap : { 'src' : 'dst' },
+      srcFilter : { prefixPath : '/' },
+      // dstFilter : { prefixPath : '/' },
+    });
+  });
+
+  test.shouldThrowError( () =>
+  {
+    extract1.filesReflect
+    ({
+      reflectMap : { 'src' : 'dst' },
+      // srcFilter : { prefixPath : '/' },
+      dstFilter : { prefixPath : '/' },
+    });
+  });
+
+}
+
+//
+
+function recordFilterClone( test )
+{
+  let provider = _.fileProvider;
+  let filter = new _.FileRecordFilter({ defaultFileProvider : provider });
+
+  filter.prefixPath = '/some/path';
+
+  filter.basePath =
+  {
+    '.module/mod/builder.coffee' : '.module/mod',
+  }
+
+  filter.filePath =
+  {
+    '.module/mod/builder.coffee' : true,
+  }
+
+  test.identical( filter.formed, 1 );
+
+  let filter2 = filter.clone().form();
+  let filter3 = filter.clone().form();
+  filter.form();
+  let filter4 = filter.clone();
+
+  test.identical( filter.formed, 5 );
+  test.identical( filter2.formed, 5 );
+  test.identical( filter3.formed, 5 );
+  test.identical( filter4.formed, 1 );
+
+}
+
+//
+
+function recordFilterPrefixesApply( test )
+{
+  let context = this;
+  let provider = new _.FileProvider.Extract();
+  let path = provider.path;
+
+  var extract1 = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      f : '1',
+    },
+  });
+
+  /* */
+
+  test.case = 'trivial';
+
+  var f1 = extract1.recordFilter();
+  var expectedBasePath = { '/dir/filter1/f' : '/dir/filter1/proto', '/dir/filter1/d' : '/dir/filter1/proto', '/dir/filter1/ex' : '/dir/filter1/proto' }
+  var expectedFilePath = { '/dir/filter1/f' : true, '/dir/filter1/d' : true, '/dir/filter1/ex' : false }
+
+  f1./*inFilePath*/filePath = { 'f' : true, 'd' : true, 'ex' : false }
+  f1.prefixPath = '/dir/filter1'
+  f1.basePath = './proto';
+
+  f1.prefixesApply();
+
+  test.identical( f1.prefixPath, null );
+  test.identical( f1.basePath, expectedBasePath );
+  test.identical( f1./*inFilePath*/filePath, expectedFilePath );
+
+  /* */
+
+  test.case = 'base path is relative and current';
+
+  var f1 = extract1.recordFilter();
+  var expectedBasePath = { '/dir/filter1/f' : '/dir/filter1','/dir/filter1/ex' : '/dir/filter1' }
+  var expectedFilePath = { '/dir/filter1/f' : true, '/dir/filter1/ex' : false }
+
+  f1./*inFilePath*/filePath = { 'f' : true, 'ex' : false }
+  f1.prefixPath = '/dir/filter1'
+  f1.basePath = '.';
+
+  f1.prefixesApply();
+
+  test.identical( f1.prefixPath, null );
+  test.identical( f1.basePath, expectedBasePath );
+  test.identical( f1./*inFilePath*/filePath, expectedFilePath );
+
+  /* */
+
+  test.case = 'no base path';
+
+  var f1 = extract1.recordFilter();
+  var expectedBasePath = null;
+  var expectedFilePath = { '/dir/filter1/f' : true, '/dir/filter1/ex' : false }
+
+  f1./*inFilePath*/filePath = { 'f' : true, 'ex' : false }
+  f1.prefixPath = '/dir/filter1'
+  f1.basePath = null;
+
+  f1.prefixesApply();
+
+  test.identical( f1.prefixPath, null );
+  test.identical( f1.basePath, expectedBasePath );
+  test.identical( f1./*inFilePath*/filePath, expectedFilePath );
+
+  /* */
+
+  test.case = 'prefix is relative';
+
+  var f1 = extract1.recordFilter();
+  var expectedBasePath = { './dir/f' : '/base', './dir/ex' : '/base' };
+  var expectedFilePath = { './dir/f' : true, './dir/ex' : false }
+
+  f1./*inFilePath*/filePath = { 'f' : true, 'ex' : false }
+  f1.prefixPath = './dir'
+  f1.basePath = '/base';
+
+  f1.prefixesApply();
+
+  test.identical( f1.prefixPath, null );
+  test.identical( f1.basePath, expectedBasePath );
+  test.identical( f1./*inFilePath*/filePath, expectedFilePath );
+
+  /* */
+
+  test.case = 'some in file paths are absolute';
+
+  var f1 = extract1.recordFilter();
+  var expectedBasePath =
+  {
+    '/dir/filter1/f' : '/dir/filter1/proto',
+    '/dir/filter1/d' : '/dir/filter1/proto',
+    '/dir/ex' : '/dir/filter1/proto',
+  }
+  var expectedFilePath = { '/dir/filter1/f' : true, '/dir/filter1/d' : true, '/dir/ex' : false }
+
+  f1./*inFilePath*/filePath = { 'f' : true, '/dir/filter1/d' : true, '/dir/ex' : false }
+  f1.prefixPath = '/dir/filter1'
+  f1.basePath = './proto';
+
+  f1.prefixesApply();
+
+  test.identical( f1.prefixPath, null );
+  test.identical( f1.basePath, expectedBasePath );
+  test.identical( f1./*inFilePath*/filePath, expectedFilePath );
+
+  /* */
+
+  test.case = 'base path is absolute';
+
+  var f1 = extract1.recordFilter();
+  var expectedBasePath =
+  {
+    '/dir/filter1/d' : '/proto',
+    '/dir/ex' : '/proto',
+    '/dir/filter1/f' : '/proto',
+  }
+
+  var expectedFilePath = { '/dir/filter1/f' : true, '/dir/filter1/d' : true, '/dir/ex' : false }
+
+  f1./*inFilePath*/filePath = { 'f' : true, '/dir/filter1/d' : true, '/dir/ex' : false }
+  f1.prefixPath = '/dir/filter1'
+  f1.basePath = '/proto';
+
+  f1.prefixesApply();
+
+  test.identical( f1.prefixPath, null );
+  test.identical( f1.basePath, expectedBasePath );
+  test.identical( f1./*inFilePath*/filePath, expectedFilePath );
+
+  /* */
+
+  test.case = 'no filePath';
+
+  var f1 = extract1.recordFilter();
+  var expectedBasePath = { '/dir/filter1' : '/dir/filter1/proto' };
+  var expectedFilePath = '/dir/filter1';
+
+  f1.prefixPath = '/dir/filter1';
+  f1.basePath = './proto';
+
+  f1.prefixesApply();
+
+  test.identical( f1.prefixPath, null );
+  test.identical( f1.postfixPath, null );
+  test.identical( f1.basePath, expectedBasePath );
+  test.identical( f1./*inFilePath*/filePath, expectedFilePath );
+
+}
+
+//
+
+function recordFilterInherit( test )
+{
+  let context = this;
+  let provider = new _.FileProvider.Extract();
+  let path = provider.path;
+
+  var extract1 = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      f : '1',
+    },
+  });
+
+  var f1 = extract1.recordFilter();
+
+  f1.prefixPath = '/commonDir/filter1'
+  f1.basePath = './proto';
+  f1./*inFilePath*/filePath = { 'f' : true, 'd' : true, 'ex' : false, 'f1' : true, 'd1' : true, 'ex1' : false }
+
+  var f2 = extract1.recordFilter();
+
+  f2.prefixPath = '/commonDir/filter2'
+  f2.basePath = './proto';
+  f2./*inFilePath*/filePath = { 'f' : true, 'd' : true, 'ex' : false, 'f2' : true, 'd2' : true, 'ex2' : false }
+
+  var f3 = extract1.recordFilter();
+  f3.pathsInherit( f1 ).pathsInherit( f2 );
+
+  var expectedBasePath =
+  {
+    '/commonDir/filter1/f' : '/commonDir/filter1/proto',
+    '/commonDir/filter1/d' : '/commonDir/filter1/proto',
+    '/commonDir/filter1/ex' : '/commonDir/filter1/proto',
+    '/commonDir/filter1/f1' : '/commonDir/filter1/proto',
+    '/commonDir/filter1/d1' : '/commonDir/filter1/proto',
+    '/commonDir/filter1/ex1' : '/commonDir/filter1/proto',
+    '/commonDir/filter2/f' : '/commonDir/filter2/proto',
+    '/commonDir/filter2/d' : '/commonDir/filter2/proto',
+    '/commonDir/filter2/ex' : '/commonDir/filter2/proto',
+    '/commonDir/filter2/f2' : '/commonDir/filter2/proto',
+    '/commonDir/filter2/d2' : '/commonDir/filter2/proto',
+    '/commonDir/filter2/ex2' : '/commonDir/filter2/proto',
+  }
+
+  test.identical( f3.prefixPath, null );
+  test.identical( f3.basePath, expectedBasePath );
+
+}
+
 // --
 // proto
 // --
@@ -1404,21 +1821,23 @@ var Self =
   name : 'Tools/mid/files/Record',
   silencing : 1,
 
-  onSuiteBegin : onSuiteBegin,
-  onSuiteEnd : onSuiteEnd,
+  onSuiteBegin,
+  onSuiteEnd,
 
   tests :
   {
 
     record,
     filtering,
-
     recordForLink,
     recordForRelativeLink,
+    recordStating,
 
+    recordFilter,
+    recordFilterReflect,
     recordFilterClone,
-
-    recordStating
+    recordFilterPrefixesApply,
+    recordFilterInherit,
 
   },
 

@@ -87,8 +87,8 @@ function filesReflectSingle_body( o )
   _.assert( !o.dstFilter.hasFiltering(), 'Not supported options' );
   _.assert( o.srcFilter.formed === 5 );
   _.assert( o.dstFilter.formed === 5 );
-  _.assert( o.srcFilter.stemPath === o.srcPath );
-  _.assert( o.dstFilter.stemPath === o.dstPath );
+  _.assert( o.srcFilter.filePath === o.srcPath );
+  // _.assert( o.dstFilter.filePath === o.dstPath );
   _.assert( o.filter === null || !o.filter.hasFiltering(), 'Not supported options' );
   _.assert( !!o.recursive, 'Not supported options' );
 
@@ -111,14 +111,14 @@ function filesReflectSingle_body( o )
   /* */
 
   // o.dstFilter.inFilePath = o.dstPath;
-  let dstFileProvider = o.dstFilter.pathProvider();
+  let dstFileProvider = o.dstFilter.providerForPath();
   let srcPath = o.srcPath;
   let dstPath = o.dstPath;
 
   if( _.mapIs( srcPath ) )
   {
     _.assert( _.mapVals( srcPath ).length === 1 );
-    _.assert( _.mapVals( srcPath )[ 0 ] === true );
+    _.assert( _.mapVals( srcPath )[ 0 ] === true || _.mapVals( srcPath )[ 0 ] === dstPath );
     srcPath = _.mapKeys( srcPath )[ 0 ];
   }
 

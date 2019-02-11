@@ -1138,6 +1138,36 @@ function fileDeleteAct( o )
 
     if( stat && stat.isDir() )
     File.rmdirSync( filePath );
+    else if( process.platform === 'win32' )
+    {
+      /*
+        The problem is that on windows, when you unlink a file that is opened, it doesn't really get deleted.
+        It is just marked for deletion, but the directory entry is still there until the file is closed
+
+        rename + unlink combination fixes the problem:
+
+        rename moves file to temp directory, unlink marks file fo delete, it is not longer located in the original directory
+        and will be deleted when original file is closed.
+
+        Limitation : rename fails if temp directory is located on other device
+      */
+      let fileName = self.path.name({ path : o.filePath, withExtension : 1 });
+      let tempPath = self.path.join( self.pathDirTempAct(), fileName );
+      tempPath = self.path.nativize( tempPath );
+      try
+      {
+        File.renameSync( filePath,tempPath );
+        File.unlink( tempPath );
+      }
+      catch( err )
+      {
+        if( err.code != 'EXDEV' )
+        throw err;
+
+        File.unlinkSync( filePath );
+      }
+
+    }
     else
     File.unlinkSync( filePath );
 
@@ -1158,6 +1188,22 @@ function fileDeleteAct( o )
 
       if( stat && stat.isDir() )
       File.rmdir( filePath, handleResult );
+      else if( process.platform === 'win32' )
+      {
+        let fileName = self.path.name({ path : o.filePath, withExtension : 1 });
+        let tempPath = self.path.join( self.pathDirTempAct(), fileName );
+        tempPath = self.path.nativize( tempPath );
+
+        File.rename( filePath,tempPath, ( err ) =>
+        {
+          if( !err )
+          filePath = tempPath;
+          else if( err.code != 'EXDEV' )
+          return con.error( err );
+
+          File.unlink( filePath, handleResult );
+        });
+      }
       else
       File.unlink( filePath, handleResult );
     })

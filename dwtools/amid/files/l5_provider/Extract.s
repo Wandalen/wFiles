@@ -913,9 +913,11 @@ function fileDeleteAct( o )
 
   function act()
   {
+    let filePath = o.filePath;
+
     let stat = self.statReadAct
     ({
-      filePath : o.filePath,
+      filePath : filePath,
       resolvingSoftLink : 0,
       sync : 1,
       throwing : 0,
@@ -927,19 +929,22 @@ function fileDeleteAct( o )
       throw _.err( 'Path', _.strQuote( o.filePath ), 'doesn`t exist!' );
     }
 
-    let file = self._descriptorRead( o.filePath );
+    // Vova: intermediate dirs should be resolved, stat.filePath stores that resolved path
+    filePath = stat.filePath;
+
+    let file = self._descriptorRead( filePath );
     if( self._descriptorIsDir( file ) && Object.keys( file ).length )
     {
       debugger;
       throw _.err( 'Directory is not empty : ' + _.strQuote( o.filePath ) );
     }
 
-    let dirPath = self.path.dir( o.filePath );
+    let dirPath = self.path.dir( filePath );
     let dir = self._descriptorRead( dirPath );
 
     _.sure( !!dir, () => 'Cant delete root directory ' + _.strQuote( o.filePath ) );
 
-    let fileName = self.path.name({ path : o.filePath, withExtension : 1 });
+    let fileName = self.path.name({ path : filePath, withExtension : 1 });
     delete dir[ fileName ];
 
     // for( let k in self.extraStats[ o.filePath ] )
@@ -1327,6 +1332,9 @@ function hardLinkAct( o )
     self._descriptorWrite( o.srcPath, descriptor );
     self._descriptorWrite( o.dstPath, descriptor );
 
+    // if( self.usingExtraStat )
+    // self.extraStats[ o.dstPath ] = self.extraStats[ o.srcPath ];///Vova : check which stats hardlinked files should have in common
+
     return true;
   }
   else
@@ -1551,7 +1559,7 @@ function filesTreeRead( o )
 
   _.routineOptions( filesTreeRead, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.strIs( o.glob ) || _.strsAre( o.glob ) || _.strIs( o.srcPath ) );
+  _.assert( _.strIs( o.glob ) || _.strsAreAll( o.glob ) || _.strIs( o.srcPath ) );
   _.assert( _.objectIs( o.srcProvider ) );
   _.assert( o.filePath === undefined );
 

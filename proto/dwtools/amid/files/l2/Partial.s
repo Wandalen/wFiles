@@ -1863,6 +1863,9 @@ function recordFilter( filter )
 
   _.assert( arguments.length === 0 || arguments.length === 1 );
 
+  if( _.strIs( filter ) || _.arrayIs( filter ) )
+  filter = { filePath : filter }
+
   if( !filter.defaultFileProvider )
   filter.defaultFileProvider = self;
 

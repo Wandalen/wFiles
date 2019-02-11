@@ -381,7 +381,7 @@ function pathResolveSoftLinkAct( o )
 
     result = File.readlinkSync( self.path.nativize( o.filePath ) );
 
-    debugger;
+    // debugger;
     /* qqq : why? add experiment please? */
     /* aaa : makes path relative to link instead of directory where link is located */
     if( !self.path.isAbsolute( self.path.normalize( result ) ) )
@@ -1581,6 +1581,39 @@ function hardLinkAct( o )
 
 _.routineExtend( hardLinkAct, Parent.prototype.hardLinkAct );
 
+//
+
+function filesAreHardLinkedAct( o )
+{
+  let self = this;
+
+  _.assertRoutineOptions( filesAreHardLinkedAct, arguments );
+  _.assert( o.filePath.length === 2, 'Expects exactly two arguments' );
+
+  if( o.filePath[ 0 ] === o.filePath[ 1 ] )
+  {
+    if( self.UsingBigIntForStat )
+    return true;
+    return _.maybe;
+  }
+
+  let statFirst = self.statRead( o.filePath[ 0 ] );
+  if( !statFirst )
+  return false;
+
+  let statSecond = self.statRead( o.filePath[ 1 ] );
+  if( !statSecond )
+  return false;
+
+  /*
+    should return _.maybe, not true if result is not precise
+  */
+
+  return _.statsAreHardLinked( statFirst, statSecond );
+}
+
+_.routineExtend( filesAreHardLinkedAct, Parent.prototype.filesAreHardLinkedAct );
+
 // --
 // etc
 // --
@@ -1801,7 +1834,7 @@ let Extend =
 
   // link
 
-  // qqq : implement filesAreHardLinkedAct
+  filesAreHardLinkedAct, // qqq : implement filesAreHardLinkedAct Vova : done, pass tests
 
   // etc
 

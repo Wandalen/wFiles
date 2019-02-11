@@ -9,7 +9,6 @@ if( typeof module !== 'undefined' )
 
   _.include( 'wTesting' );
 
-  // if( !_global_.wTools.FileProvider )
   require( '../files/UseTop.s' );
 
   var crypto = require( 'crypto' );
@@ -22,14 +21,13 @@ if( typeof module !== 'undefined' )
 var _ = _global_.wTools;
 var Parent = wTester;
 
-//
+// --
+// context
+// --
 
 function onSuiteBegin( test )
 {
   let context = this;
-  let path = context.provider.path;
-  // context.testSuitePath = path.dirTempOpen( 'FilesFind' );
-  // context.testSuitePath = context.provider.dirTempOpen( path.join( __dirname, '../..'  ), 'FileProvider/Abstract' );
 }
 
 //
@@ -418,331 +416,6 @@ var filesTree =
 // test
 // --
 
-function recordFilterPrefixesApply( test )
-{
-  let context = this;
-  let provider = context.provider;
-  let hub = context.hub;
-  let path = context.provider.path;
-  let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
-
-  var extract1 = _.FileProvider.Extract
-  ({
-    filesTree :
-    {
-      f : '1',
-    },
-  });
-
-  /* */
-
-  test.case = 'trivial';
-
-  var f1 = extract1.recordFilter();
-  var expectedBasePath = { '/dir/filter1/f' : '/dir/filter1/proto', '/dir/filter1/d' : '/dir/filter1/proto', '/dir/filter1/ex' : '/dir/filter1/proto' }
-  var expectedFilePath = { '/dir/filter1/f' : true, '/dir/filter1/d' : true, '/dir/filter1/ex' : false }
-
-  f1.inFilePath = { 'f' : true, 'd' : true, 'ex' : false }
-  f1.prefixPath = '/dir/filter1'
-  f1.basePath = './proto';
-
-  f1.prefixesApply();
-
-  test.identical( f1.prefixPath, null );
-  test.identical( f1.basePath, expectedBasePath );
-  test.identical( f1.inFilePath, expectedFilePath );
-
-  /* */
-
-  test.case = 'base path is relative and current';
-
-  var f1 = extract1.recordFilter();
-  var expectedBasePath = { '/dir/filter1/f' : '/dir/filter1','/dir/filter1/ex' : '/dir/filter1' }
-  var expectedFilePath = { '/dir/filter1/f' : true, '/dir/filter1/ex' : false }
-
-  f1.inFilePath = { 'f' : true, 'ex' : false }
-  f1.prefixPath = '/dir/filter1'
-  f1.basePath = '.';
-
-  f1.prefixesApply();
-
-  test.identical( f1.prefixPath, null );
-  test.identical( f1.basePath, expectedBasePath );
-  test.identical( f1.inFilePath, expectedFilePath );
-
-  /* */
-
-  test.case = 'no base path';
-
-  var f1 = extract1.recordFilter();
-  var expectedBasePath = null;
-  var expectedFilePath = { '/dir/filter1/f' : true, '/dir/filter1/ex' : false }
-
-  f1.inFilePath = { 'f' : true, 'ex' : false }
-  f1.prefixPath = '/dir/filter1'
-  f1.basePath = null;
-
-  f1.prefixesApply();
-
-  test.identical( f1.prefixPath, null );
-  test.identical( f1.basePath, expectedBasePath );
-  test.identical( f1.inFilePath, expectedFilePath );
-
-  /* */
-
-  test.case = 'prefix is relative';
-
-  var f1 = extract1.recordFilter();
-  var expectedBasePath = { './dir/f' : '/base', './dir/ex' : '/base' };
-  var expectedFilePath = { './dir/f' : true, './dir/ex' : false }
-
-  f1.inFilePath = { 'f' : true, 'ex' : false }
-  f1.prefixPath = './dir'
-  f1.basePath = '/base';
-
-  f1.prefixesApply();
-
-  test.identical( f1.prefixPath, null );
-  test.identical( f1.basePath, expectedBasePath );
-  test.identical( f1.inFilePath, expectedFilePath );
-
-  /* */
-
-  test.case = 'some in file paths are absolute';
-
-  var f1 = extract1.recordFilter();
-  var expectedBasePath =
-  {
-    '/dir/filter1/f' : '/dir/filter1/proto',
-    '/dir/filter1/d' : '/dir/filter1/proto',
-    '/dir/ex' : '/dir/filter1/proto',
-  }
-  var expectedFilePath = { '/dir/filter1/f' : true, '/dir/filter1/d' : true, '/dir/ex' : false }
-
-  f1.inFilePath = { 'f' : true, '/dir/filter1/d' : true, '/dir/ex' : false }
-  f1.prefixPath = '/dir/filter1'
-  f1.basePath = './proto';
-
-  f1.prefixesApply();
-
-  test.identical( f1.prefixPath, null );
-  test.identical( f1.basePath, expectedBasePath );
-  test.identical( f1.inFilePath, expectedFilePath );
-
-  /* */
-
-  test.case = 'base path is absolute';
-
-  var f1 = extract1.recordFilter();
-  var expectedBasePath =
-  {
-    '/dir/filter1/d' : '/proto',
-    '/dir/ex' : '/proto',
-    '/dir/filter1/f' : '/proto',
-  }
-
-  var expectedFilePath = { '/dir/filter1/f' : true, '/dir/filter1/d' : true, '/dir/ex' : false }
-
-  f1.inFilePath = { 'f' : true, '/dir/filter1/d' : true, '/dir/ex' : false }
-  f1.prefixPath = '/dir/filter1'
-  f1.basePath = '/proto';
-
-  f1.prefixesApply();
-
-  test.identical( f1.prefixPath, null );
-  test.identical( f1.basePath, expectedBasePath );
-  test.identical( f1.inFilePath, expectedFilePath );
-
-  /* */
-
-  test.case = 'no filePath';
-
-  var f1 = extract1.recordFilter();
-  var expectedBasePath = { '/dir/filter1' : '/dir/filter1/proto' };
-  var expectedFilePath = '/dir/filter1';
-
-  f1.prefixPath = '/dir/filter1';
-  f1.basePath = './proto';
-
-  f1.prefixesApply();
-
-  test.identical( f1.prefixPath, null );
-  test.identical( f1.postfixPath, null );
-  test.identical( f1.basePath, expectedBasePath );
-  test.identical( f1.inFilePath, expectedFilePath );
-
-}
-
-//
-
-function recordFilterInherit( test )
-{
-  let context = this;
-  let provider = context.provider;
-  let hub = context.hub;
-  let path = context.provider.path;
-  let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
-
-  var extract1 = _.FileProvider.Extract
-  ({
-    filesTree :
-    {
-      f : '1',
-    },
-  });
-
-  var f1 = extract1.recordFilter();
-
-  f1.prefixPath = '/commonDir/filter1'
-  f1.basePath = './proto';
-  f1.inFilePath = { 'f' : true, 'd' : true, 'ex' : false, 'f1' : true, 'd1' : true, 'ex1' : false }
-
-  var f2 = extract1.recordFilter();
-
-  f2.prefixPath = '/commonDir/filter2'
-  f2.basePath = './proto';
-  f2.inFilePath = { 'f' : true, 'd' : true, 'ex' : false, 'f2' : true, 'd2' : true, 'ex2' : false }
-
-  var f3 = extract1.recordFilter();
-  f3.pathsInherit( f1 ).pathsInherit( f2 );
-
-  var expectedBasePath =
-  {
-    '/commonDir/filter1/f' : '/commonDir/filter1/proto',
-    '/commonDir/filter1/d' : '/commonDir/filter1/proto',
-    '/commonDir/filter1/ex' : '/commonDir/filter1/proto',
-    '/commonDir/filter1/f1' : '/commonDir/filter1/proto',
-    '/commonDir/filter1/d1' : '/commonDir/filter1/proto',
-    '/commonDir/filter1/ex1' : '/commonDir/filter1/proto',
-    '/commonDir/filter2/f' : '/commonDir/filter2/proto',
-    '/commonDir/filter2/d' : '/commonDir/filter2/proto',
-    '/commonDir/filter2/ex' : '/commonDir/filter2/proto',
-    '/commonDir/filter2/f2' : '/commonDir/filter2/proto',
-    '/commonDir/filter2/d2' : '/commonDir/filter2/proto',
-    '/commonDir/filter2/ex2' : '/commonDir/filter2/proto',
-  }
-
-  test.identical( f3.prefixPath, null );
-  test.identical( f3.basePath, expectedBasePath );
-
-}
-
-//
-
-function recordFilter( test )
-{
-
-  var extract1 = _.FileProvider.Extract
-  ({
-    filesTree :
-    {
-      src :
-      {
-        f1: '1',
-        d : { f2 : '2', f3 : '3' },
-      },
-      dst :
-      {
-        f1: 'dst',
-        d : 'dst',
-      }
-    },
-  });
-
-  /* */
-
-  var files = extract1.filesReflect
-  ({
-    reflectMap : { 'src' : 'dst' },
-    srcFilter : { prefixPath : '/' },
-    dstFilter : { prefixPath : '/' },
-  });
-
-  var expSrc = [ '/src', '/src/f1', '/src/d', '/src/d/f2', '/src/d/f3' ];
-  var gotSrc = _.select( files, '*/src/absolute' );
-  var expDst = [ '/src', '/src/f1', '/src/d', '/src/d/f2', '/src/d/f3' ];
-  var gotDst = _.select( files, '*/src/absolute' );
-
-  test.identical( gotSrc, expSrc );
-  test.identical( gotDst, expDst );
-
-  /* */
-
-  var files = extract1.filesReflect
-  ({
-    reflectMap : { 'src' : '/dst' },
-    srcFilter : { prefixPath : '/' },
-    // dstFilter : { prefixPath : '/' },
-  });
-
-  var expSrc = [ '/src', '/src/f1', '/src/d', '/src/d/f2', '/src/d/f3' ];
-  var gotSrc = _.select( files, '*/src/absolute' );
-  var expDst = [ '/src', '/src/f1', '/src/d', '/src/d/f2', '/src/d/f3' ];
-  var gotDst = _.select( files, '*/src/absolute' );
-
-  test.identical( gotSrc, expSrc );
-  test.identical( gotDst, expDst );
-
-  /* */
-
-  var files = extract1.filesReflect
-  ({
-    reflectMap : { '/src' : 'dst' },
-    // srcFilter : { prefixPath : '/' },
-    dstFilter : { prefixPath : '/' },
-  });
-
-  var expSrc = [ '/src', '/src/f1', '/src/d', '/src/d/f2', '/src/d/f3' ];
-  var gotSrc = _.select( files, '*/src/absolute' );
-  var expDst = [ '/src', '/src/f1', '/src/d', '/src/d/f2', '/src/d/f3' ];
-  var gotDst = _.select( files, '*/src/absolute' );
-
-  test.identical( gotSrc, expSrc );
-  test.identical( gotDst, expDst );
-
-  /* */
-
-  if( !Config.debug )
-  return;
-
-  /* */
-
-  test.description = 'cant deduce base path';
-
-  test.shouldThrowError( () =>
-  {
-    extract1.filesReflect
-    ({
-      reflectMap : { 'src' : 'dst' },
-      // srcFilter : { prefixPath : '/' },
-      // dstFilter : { prefixPath : '/' },
-    });
-  });
-
-  test.shouldThrowError( () =>
-  {
-    extract1.filesReflect
-    ({
-      reflectMap : { 'src' : 'dst' },
-      srcFilter : { prefixPath : '/' },
-      // dstFilter : { prefixPath : '/' },
-    });
-  });
-
-  test.shouldThrowError( () =>
-  {
-    extract1.filesReflect
-    ({
-      reflectMap : { 'src' : 'dst' },
-      // srcFilter : { prefixPath : '/' },
-      dstFilter : { prefixPath : '/' },
-    });
-  });
-
-}
-
-//
-
 function filesFindTrivial( test )
 {
   let context = this;
@@ -909,36 +582,6 @@ function filesFindTrivial( test )
   var expected = [ '.', './dir1', './dir1/dir11', './dir2' ];
   test.identical( got, expected );
 
-  // xxx
-
-  // var extract1 = _.FileProvider.Extract
-  // ({
-  //   filesTree :
-  //   {
-  //     dir1 : { a : '1', b : '1', c : '1', dir11 : {}, dirSoft : [{ softLink : '../../dir3' }], fileSoft : [{ softLink : '../../dir3/dirSoft/c' }] },
-  //     dir2 : { c : '2', d : '2' },
-  //     dir3 : { c : '3', d : '3', dirSoft : [{ softLink : '../../dir2' }], fileSoft : [{ softLink : '../../dir2/c' }] },
-  //   },
-  // });
-  //
-  // test.case = 'setup trivial';
-  //
-  // extract1.readToProvider({ dstProvider : provider, dstPath : context.testSuitePath, allowDelete : 1 });
-  // var gotTree = _.FileProvider.Extract().rewriteFromProvider( provider, context.testSuitePath );
-  // test.identical( gotTree.filesTree, extract1.filesTree );
-  //
-  // logger.log( 'context.testSuitePath', _.fileProvider.path.nativize( context.testSuitePath ) );
-
-  // /* */
-  //
-  // // var o1 = { filePath : path.join( context.testSuitePath ), outputFormat : 'relative' }
-  // // var o2 = { recursive : 2, includingStem : 1, includingTransient : 1, includingTerminals : 1 }
-  // // test.case = 'find includingTerminals:0';
-  // //
-  // // var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
-  // // var expected = [ '.', './dir1', './dir1/dir11', './dir2' ];
-  // // test.identical( got, expected );
-  //
 }
 
 // //
@@ -1064,7 +707,7 @@ function filesFindCriticalCases( test )
     prefixPath : '/',
   });
 
-  filter.inFilePath = [ '/dir1', '/dir2' ];
+  filter./*inFilePath*/filePath = [ '/dir1', '/dir2' ];
   filter._formBasePath();
   var found = extract.filesFind
   ({
@@ -1089,7 +732,7 @@ function filesFindCriticalCases( test )
       prefixPath : '/',
     });
 
-    filter.inFilePath = [ '/dir1', '/dir2' ];
+    filter./*inFilePath*/filePath = [ '/dir1', '/dir2' ];
     filter._formBasePath();
 
     test.shouldThrowErrorSync( () =>
@@ -10464,22 +10107,23 @@ function filesReflector( test )
   src.finit();
 
   //
-
-  var src = context.makeStandardExtract({ originPath : 'src://' });
-  src.providerRegisterTo( hub );
-
-  var reflect = hub.filesReflector
-  ({
-    srcFilter : { basePath : 'src:///' },
-    dstFilter : { basePath : 'current:///' },
-  });
-  test.shouldThrowError( () => reflect( '/' ) );
-  var found = dst.filesFind({ filePath : testPath, allowingMissed : 1 });
-  test.identical( found.length, 0 );
-
-  dst.filesDelete( testPath );
-  src.finit();
-
+  //
+  // var src = context.makeStandardExtract({ originPath : 'src://' });
+  // src.providerRegisterTo( hub );
+  //
+  // var reflect = hub.filesReflector
+  // ({
+  //   srcFilter : { basePath : 'src:///' },
+  //   dstFilter : { basePath : 'current:///' },
+  // });
+  // // test.shouldThrowError( () => reflect( '/' ) );
+  // reflect( '/' );
+  // var found = dst.filesFind({ filePath : testPath, allowingMissed : 1 });
+  // test.identical( found.length, 0 );
+  //
+  // dst.filesDelete( testPath );
+  // src.finit();
+  //
   //
 
   var src = context.makeStandardExtract({ originPath : 'src://' });
@@ -12351,10 +11995,19 @@ function filesDelete( test )
   let hub = context.hub;
   let path = context.provider.path;
   let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
-
   var softLinkIsSupported = context.softLinkIsSupported();
   var terminalPath = path.join( testPath, 'terminal' );
   var dirPath = path.join( testPath, 'dir' );
+
+  var find = provider.filesFinder
+  ({
+    recursive : 2,
+    includingTerminals : 1,
+    includingDirs : 1,
+    includingTransient : 1,
+    allowingMissed : 1,
+    outputFormat : 'relative',
+  });
 
   /* */
 
@@ -12370,7 +12023,6 @@ function filesDelete( test )
   });
 
   extract1.filesDelete( '/' );
-
   test.identical( extract1.filesTree, {} );
 
   /* */
@@ -12378,9 +12030,12 @@ function filesDelete( test )
   test.case = 'delete terminal file';
   provider.fileWrite( terminalPath, 'a' );
   var deleted = provider.filesDelete( terminalPath );
-  test.identical( _.select( deleted, '*/relative' ), [ './terminal' ] );
+  test.identical( _.select( deleted, '*/relative' ), [ '.' ] );
   var stat = provider.statResolvedRead( terminalPath );
   test.identical( stat, null );
+
+  var found = find( terminalPath );
+  test.identical( found, [] );
 
   /* */
 
@@ -16711,9 +16366,9 @@ var Self =
   tests :
   {
 
-    recordFilterPrefixesApply,
-    recordFilterInherit,
-    recordFilter,
+    // recordFilterPrefixesApply,
+    // recordFilterInherit,
+    // recordFilter,
 
     filesFindTrivial,
     filesFindMaskTerminal,

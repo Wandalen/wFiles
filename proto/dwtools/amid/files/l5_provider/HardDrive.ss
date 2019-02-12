@@ -875,6 +875,8 @@ function fileExistsAct( o )
     { /*
         Used to check if symlink is present on Unix when referenced file doesn't exist.
         qqq: Check if same behavior can be obtained by using combination of File.constants in accessSync
+        aaa : possible solution is to use faccessat, it accepts flag that disables resolving of the soft links.
+        But we need to implement own c++ addon for faccessat. https://linux.die.net/man/2/faccessat.
       */
       if( process.platform != 'win32' )
       return !!self.statReadAct({ filePath : o.filePath, sync : 1, throwing : 0, resolvingSoftLink : 0 });

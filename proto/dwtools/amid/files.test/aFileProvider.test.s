@@ -20288,6 +20288,23 @@ function softLinkActSync( test )
 
   //
 
+  test.case = 'create link in not existing directory';
+  provider.filesDelete( testPath );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath,
+    type : null,
+    sync : 1
+  }
+  test.shouldThrowErrorSync( () => provider.softLinkAct( o ) );
+  test.will = 'parent directory of dstPath must not be created';
+  test.is( !provider.fileExists( path.dir( dstPath ) ) );
+
+  //
+
   if( !Config.debug )
   return;
 
@@ -23830,6 +23847,26 @@ function hardLinkActSync( test )
 
   //
 
+  test.case = 'create link in not existing directory';
+  provider.filesDelete( testPath );
+  provider.fileWrite( srcPath, srcPath );
+  var dstMissingPath = path.join( testPath,'dir/dst' );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstMissingPath,
+    originalSrcPath : srcPath,
+    originalDstPath : dstMissingPath,
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 0,
+    sync : 1
+  }
+  test.shouldThrowErrorSync( () => provider.hardLinkAct( o ) );
+  test.will = 'parent directory of dstPath must not be created';
+  test.is( !provider.fileExists( path.dir( dstMissingPath ) ) );
+
+  //
+
   if( !Config.debug )
   return;
 
@@ -25005,6 +25042,32 @@ function hardLinkActAsync( test )
       got = _.mapOwnKeys( o );
       test.identical( got, expected );
       provider.filesDelete( /*dir*/testPath );
+      return null;
+    })
+  })
+
+  .finally( () =>
+  {
+    test.case = 'create link in not existing directory';
+    var srcPath = path.join( testPath,'src' );
+    var dstMissingPath = path.join( testPath,'dir/dst' );
+    provider.filesDelete( testPath );
+    provider.fileWrite( srcPath, srcPath );
+    var o =
+    {
+      srcPath : srcPath,
+      dstPath : dstMissingPath,
+      originalSrcPath : srcPath,
+      originalDstPath : dstMissingPath,
+      breakingSrcHardLink : 0,
+      breakingDstHardLink : 0,
+      sync : 0
+    }
+    return test.shouldThrowErrorAsync( provider.hardLinkAct( o ) )
+    .thenKeep( () =>
+    {
+      test.will = 'parent directory of dstPath must not be created';
+      test.is( !provider.fileExists( path.dir( dstMissingPath ) ) );
       return null;
     })
   })

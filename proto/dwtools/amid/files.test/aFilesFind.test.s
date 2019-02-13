@@ -12875,26 +12875,137 @@ function filesDelete2( test )
       }
     }
   })
-
   tree.providerRegisterTo( hub );
+
+  //
+
+  test.case = 'mask single directory';
+  var tree2 = _.FileProvider.Extract
+  ({
+    protocol : 'src2',
+    filesTree :
+    {
+      dir :
+      {
+        dir1 : { file : 'file' },
+        dir2 : {},
+      }
+    }
+  })
+  tree2.providerRegisterTo( hub );
+  provider.filesDelete( testPath );
+  hub.filesReflect({ reflectMap : { 'src2:///' : 'current://' + testPath } });
+  var filter =
+  {
+    maskDirectory : /dir1$/g
+  }
+  var got = provider.filesDelete({ filePath : testPath, recursive : 2, throwing : 1, filter : filter });
+  var deleted = _.select( got, '*/relative' );
+  var expected =
+  [
+    './dir/dir1',
+    './dir/dir1/file'
+  ]
+  test.identical( deleted, expected );
+  var files = provider.filesFindRecursive({ filePath : testPath, outputFormat : 'relative' });
+  test.will = 'nothing deleted';
+  var expected =
+  [
+    '.',
+    './dir',
+    './dir/dir2'
+  ]
+  test.identical( files, expected );
+  tree2.finit();
+
+  //
+
+  test.case = 'mask single terminal';
+  var tree2 = _.FileProvider.Extract
+  ({
+    protocol : 'src2',
+    filesTree :
+    {
+      dir :
+      {
+        file1 : 'file1',
+        file2 : 'file2',
+      }
+    }
+  })
+  tree2.providerRegisterTo( hub );
+  provider.filesDelete( testPath );
+  hub.filesReflect({ reflectMap : { 'src2:///' : 'current://' + testPath } });
+  var filter =
+  {
+    maskTerminal : /file1$/g
+  }
+  var got = provider.filesDelete({ filePath : testPath, recursive : 2, throwing : 1, filter : filter });
+  var deleted = _.select( got, '*/relative' );
+  var expected =
+  [
+    './dir/file1'
+  ]
+  test.identical( deleted, expected );
+  var files = provider.filesFindRecursive({ filePath : testPath, outputFormat : 'relative' });
+  test.will = 'nothing deleted';
+  var expected =
+  [
+    '.',
+    './dir',
+    './dir/file2',
+  ]
+  test.identical( files, expected );
+  tree2.finit();
+
+  //
 
   test.open( 'recursive' );
 
-  // test.case = 'recursive : 0';
-  // provider.filesDelete( testPath );
-  // hub.filesReflect({ reflectMap : { 'src:///' : 'current://' + testPath } });
-  // var got = provider.filesDelete({ filePath : testPath, recursive : 0 });
-  // var deleted = _.select( got, '*/relative' );
-  // var expected = [];
-  // test.identical( deleted, expected );
+  test.case = 'recursive : 0';
+  provider.filesDelete( testPath );
+  hub.filesReflect({ reflectMap : { 'src:///' : 'current://' + testPath } });
+  test.shouldThrowErrorSync( () => provider.filesDelete({ filePath : testPath, recursive : 0 }) );
+  var files = provider.filesFindRecursive({ filePath : testPath, outputFormat : 'relative' });
+  test.will = 'nothing deleted';
+  var expected =
+  [
+    '.',
+    './file',
+    './dir1',
+    './dir1/file',
+    './dir1/dir2',
+    './dir1/dir2/file',
+    './dir1/dir2/empty3',
+    './dir1/empty2',
+    './empty1'
+  ]
+  test.identical( files, expected );
 
-  // test.case = 'recursive : 1';
-  // provider.filesDelete( testPath );
-  // hub.filesReflect({ reflectMap : { 'src:///' : 'current://' + testPath } });
-  // var got = provider.filesDelete({ filePath : testPath, recursive : 1 });
-  // var deleted = _.select( got, '*/relative' );
-  // var expected = [];
-  // test.identical( deleted, expected );
+  test.case = 'recursive : 1';
+  provider.filesDelete( testPath );
+  hub.filesReflect({ reflectMap : { 'src:///' : 'current://' + testPath } });
+  var got = provider.filesDelete({ filePath : testPath, recursive : 1 });
+  var deleted = _.select( got, '*/relative' );
+  test.will = 'only terminals from root and empty dirs'
+  var expected =
+  [
+    './file',
+    './empty1'
+  ];
+  test.identical( deleted, expected );
+  var files = provider.filesFindRecursive({ filePath : testPath, outputFormat : 'relative' });
+  var expected =
+  [
+    '.',
+    './dir1',
+    './dir1/file',
+    './dir1/dir2',
+    './dir1/dir2/file',
+    './dir1/dir2/empty3',
+    './dir1/empty2',
+  ];
+  test.identical( files, expected );
 
   test.case = 'recursive : 2';
   provider.filesDelete( testPath );
@@ -12922,8 +13033,16 @@ function filesDelete2( test )
   test.case = 'includingTerminals off';
   provider.filesDelete( testPath );
   hub.filesReflect({ reflectMap : { 'src:///' : 'current://' + testPath } });
-  test.shouldThrowError( () => provider.filesDelete({ filePath : testPath, includingTerminals : 0 }) );
-  var files = provider.filesFindRecursive({ filePath : testPath, outputFormat : 'relative'});
+  var got = provider.filesDelete({ filePath : testPath, includingTerminals : 0 });
+  var deleted = _.select( got, '*/relative' );
+  var expected =
+  [
+    './dir1/dir2/empty3',
+    './dir1/empty2',
+    './empty1'
+  ]
+  test.identical( deleted, expected );
+  var files = provider.filesFindRecursive({ filePath : testPath, outputFormat : 'relative' });
   var expected =
   [
     '.',
@@ -12931,17 +13050,14 @@ function filesDelete2( test )
     './dir1',
     './dir1/file',
     './dir1/dir2',
-    './dir1/dir2/file',
-    './dir1/dir2/empty3',
-    './dir1/empty2',
-    './empty1'
+    './dir1/dir2/file'
   ]
   test.identical( files, expected );
 
   test.case = 'includingTerminals off';
   provider.filesDelete( testPath );
   hub.filesReflect({ reflectMap : { 'src:///' : 'current://' + testPath } });
-  var got = provider.filesDelete({ filePath : testPath, includingTerminals : 0, throwing : 0 });
+  var got = provider.filesDelete({ filePath : testPath, includingTerminals : 0, throwing : 1 });
   var deleted = _.select( got, '*/relative' );
   var expected =
   [
@@ -12951,6 +13067,7 @@ function filesDelete2( test )
   ]
   test.identical( deleted, expected );
   var files = provider.filesFindRecursive({ filePath : testPath, outputFormat : 'relative'});
+  test.will = 'only empty dirs should be deleted'
   var expected =
   [
     '.',
@@ -12958,10 +13075,7 @@ function filesDelete2( test )
     './dir1',
     './dir1/file',
     './dir1/dir2',
-    './dir1/dir2/file',
-    './dir1/dir2/empty3',
-    './dir1/empty2',
-    './empty1'
+    './dir1/dir2/file'
   ]
   test.identical( files, expected );
 
@@ -13098,7 +13212,19 @@ function filesDelete2( test )
   hub.filesReflect({ reflectMap : { 'src:///' : 'current://' + testPath } });
   var got = provider.filesDelete({ filePath : testPath, writing : 0 });
   var deleted = _.select( got, '*/relative' );
-  var expected = [ ];
+  var expected =
+  [
+    '.',
+    './file',
+    './dir1',
+    './dir1/file',
+    './dir1/dir2',
+    './dir1/dir2/file',
+    './dir1/dir2/empty3',
+    './dir1/empty2',
+    './empty1'
+  ];
+  test.will = 'result must include files that should be deleted when writing is on'
   test.identical( deleted, expected );
   var files = provider.filesFindRecursive({ filePath : testPath, outputFormat : 'relative'});
   var expected =
@@ -13140,9 +13266,12 @@ function filesDelete2( test )
   test.identical( files, expected );
 
   test.close( 'writing' );
+
   tree.finit();
 
 }
+
+filesDelete2.timeOut = 30000;
 
 //
 

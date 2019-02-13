@@ -3708,6 +3708,25 @@ function fileCopyActSync( test )
 
   //
 
+  test.case = 'use terminal as parent directory';
+  provider.filesDelete( testPath );
+  provider.fileWrite( srcPath, srcPath );
+  var dstPath2 = path.join( srcPath,'dst' );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath2,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath2,
+    sync : 1,
+    breakingDstHardLink : 0,
+  }
+  test.shouldThrowErrorSync( () => provider.fileCopyAct( o ) );
+  test.is( provider.isTerminal( srcPath ) );
+  test.is( !provider.fileExists( dstPath2 ) );
+
+  //
+
   test.case = 'no src';
   provider.filesDelete( /*dir*/testPath );
   test.shouldThrowError( () =>
@@ -11338,6 +11357,25 @@ function fileRenameActSync( test )
   test.identical( srcPath, dstFile );
   test.identical( o, expected );
   provider.filesDelete( /*dir*/testPath );
+
+  //
+
+  test.case = 'use terminal as parent directory';
+  var srcPath = path.join( testPath,'src' );
+  var dstPath2 = path.join( srcPath, 'dst' );
+  provider.filesDelete( testPath );
+  provider.fileWrite( srcPath, srcPath );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath2,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath2,
+    sync : 1
+  }
+  test.shouldThrowErrorSync( () => provider.fileRenameAct( o ) );
+  test.is( provider.isTerminal( srcPath ) );
+  test.is( !provider.fileExists( dstPath2 ) );
 
   //
 
@@ -20305,6 +20343,26 @@ function softLinkActSync( test )
 
   //
 
+  test.case = 'use terminal as parent directory';
+  var srcPath = path.join( testPath,'src' );
+  var dstPath2 = path.join( srcPath, 'dst' );
+  provider.filesDelete( testPath );
+  provider.fileWrite( srcPath, srcPath );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath2,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath2,
+    type : null,
+    sync : 1
+  }
+  test.shouldThrowErrorSync( () => provider.softLinkAct( o ) );
+  test.is( provider.isTerminal( srcPath ) );
+  test.is( !provider.fileExists( dstPath2 ) );
+
+  //
+
   if( !Config.debug )
   return;
 
@@ -23867,6 +23925,27 @@ function hardLinkActSync( test )
 
   //
 
+  test.case = 'use terminal as parent directory';
+  var srcPath = path.join( testPath,'src' );
+  var dstPath2 = path.join( srcPath, 'dst' );
+  provider.filesDelete( testPath );
+  provider.fileWrite( srcPath, srcPath );
+  var o =
+  {
+    srcPath : srcPath,
+    dstPath : dstPath2,
+    originalSrcPath : srcPath,
+    originalDstPath : dstPath2,
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 0,
+    sync : 1
+  }
+  test.shouldThrowErrorSync( () => provider.hardLinkAct( o ) );
+  test.is( provider.isTerminal( srcPath ) );
+  test.is( !provider.fileExists( dstPath2 ) );
+
+  //
+
   if( !Config.debug )
   return;
 
@@ -25068,6 +25147,34 @@ function hardLinkActAsync( test )
     {
       test.will = 'parent directory of dstPath must not be created';
       test.is( !provider.fileExists( path.dir( dstMissingPath ) ) );
+      return null;
+    })
+  })
+
+  //
+
+  .finally( () =>
+  {
+    test.case = 'use terminal as parent directory';
+    var srcPath = path.join( testPath,'src' );
+    var dstPath2 = path.join( srcPath, 'dst' );
+    provider.filesDelete( testPath );
+    provider.fileWrite( srcPath, srcPath );
+    var o =
+    {
+      srcPath : srcPath,
+      dstPath : dstPath2,
+      originalSrcPath : srcPath,
+      originalDstPath : dstPath2,
+      breakingSrcHardLink : 0,
+      breakingDstHardLink : 0,
+      sync : 0
+    }
+    return test.shouldThrowErrorAsync( provider.hardLinkAct( o ) )
+    .thenKeep( () =>
+    {
+      test.is( provider.isTerminal( srcPath ) );
+      test.is( !provider.fileExists( dstPath2 ) );
       return null;
     })
   })

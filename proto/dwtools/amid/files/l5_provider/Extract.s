@@ -707,10 +707,11 @@ function fileWriteAct( o )
     }
 
     // let dstName = self.path.name({ path : filePath, withExtension : 1 });
-    let dstDir = self.path.dir( filePath );
-
-    if( !self._descriptorRead( dstDir ) )
-    throw _.err( 'Dirs structure :' , dstDir, 'doesn`t exist' );
+    let dstDir = self._descriptorRead( self.path.dir( filePath ) );
+    if( !dstDir )
+    throw _.err( 'Directory for', filePath, 'does not exist' );
+    else if( !self._descriptorIsDir( dstDir ) )
+    throw _.err( 'Parent of', filePath, 'is not a directory' );
 
     if( self._descriptorIsDir( descriptor ) )
     throw _.err( 'Incorrect path to file!\nCan`t rewrite dir :', filePath );
@@ -989,7 +990,13 @@ function dirMakeAct( o )
       throw _.err( 'File', _.strQuote( o.filePath ), 'already exists!' );
     }
 
-    _.assert( !!self._descriptorRead( self.path.dir( o.filePath ) ), 'Directory ', _.strQuote( o.filePath ), ' doesn\'t exist!' );
+    // _.assert( !!self._descriptorRead( self.path.dir( o.filePath ) ), 'Directory ', _.strQuote( o.filePath ), ' doesn\'t exist!' );
+
+    let dstDir = self._descriptorRead( self.path.dir( o.filePath ) );
+    if( !dstDir )
+    throw _.err( 'Directory for', o.filePath, 'does not exist' );
+    else if( !self._descriptorIsDir( dstDir ) )
+    throw _.err( 'Parent of', o.filePath, 'is not a directory' );
 
     self._descriptorWrite( o.filePath, Object.create( null ) );
 
@@ -1037,11 +1044,15 @@ function fileRenameAct( o )
     if( !srcDir || !srcDir[ srcName ] )
     throw _.err( 'Source path', _.strQuote( o.srcPath ), 'doesn`t exist!' );
 
+    /*  */
+
     let dstDir = self._descriptorRead( dstDirPath );
     if( !dstDir )
-    throw _.err( 'Destination folders structure : ' + dstDirPath + ' doesn`t exist' );
+    throw _.err( 'Directory for', o.dstPath, 'does not exist' );
+    else if( !self._descriptorIsDir( dstDir ) )
+    throw _.err( 'Parent of', o.dstPath, 'is not a directory' );
     if( dstDir[ dstName ] )
-    throw _.err( 'Destination path', _.strQuote( o.dstPath ), 'already exist!' );
+    throw _.err( 'Destination path', _.strQuote( o.dstPath ), 'already exists!' );
 
     dstDir[ dstName ] = srcDir[ srcName ];
     delete srcDir[ srcName ];
@@ -1222,9 +1233,15 @@ function fileCopyAct( o )
     if( self._descriptorIsDir( srcFile ) )
     throw _.err( o.srcPath, ' is not a terminal file!' );
 
+    // let dstDir = self._descriptorRead( self.path.dir( o.dstPath ) );
+    // if( !dstDir )
+    // throw _.err( 'Directory for', o.dstPath, 'does not exist' );
+
     let dstDir = self._descriptorRead( self.path.dir( o.dstPath ) );
     if( !dstDir )
     throw _.err( 'Directory for', o.dstPath, 'does not exist' );
+    else if( !self._descriptorIsDir( dstDir ) )
+    throw _.err( 'Parent of', o.dstPath, 'is not a directory' );
 
     let dstPath = self._descriptorRead( o.dstPath );
     if( self._descriptorIsDir( dstPath ) )
@@ -1262,6 +1279,8 @@ function softLinkAct( o )
     if( self.statRead( o.dstPath ) )
     throw _.err( 'softLinkAct', o.dstPath, 'already exists' );
 
+    dstDirCheck();
+
     self._descriptorWrite( o.dstPath, self._descriptorSoftLinkMake( o.srcPath ) );
 
     return true;
@@ -1280,10 +1299,23 @@ function softLinkAct( o )
       if( stat )
       throw _.err( 'softLinkAct', o.dstPath, 'already exists' );
 
+      dstDirCheck();
+
       self._descriptorWrite( o.dstPath, self._descriptorSoftLinkMake( o.srcPath ) );
 
       return true;
     })
+  }
+
+  /*  */
+
+  function dstDirCheck()
+  {
+    let dstDir = self._descriptorRead( self.path.dir( o.dstPath ) );
+    if( !dstDir )
+    throw _.err( 'Directory for', o.dstPath, 'does not exist' );
+    else if( !self._descriptorIsDir( dstDir ) )
+    throw _.err( 'Parent of', o.dstPath, 'is not a directory' );
   }
 }
 
@@ -1322,9 +1354,7 @@ function hardLinkAct( o )
     if( dstExists )
     throw _.err( o.dstPath, 'already exists' );
 
-    let dstDir = self.isDir( self.path.dir( o.dstPath ) );
-    if( !dstDir )
-    throw _.err( 'Directory for', o.dstPath, 'does not exist' );
+    dstDirCheck();
 
     let srcDescriptor = self._descriptorRead( o.srcPath );
     let descriptor = self._descriptorHardLinkMake( [ o.dstPath, o.srcPath ], srcDescriptor );
@@ -1368,9 +1398,7 @@ function hardLinkAct( o )
       if( dstExists )
       throw _.err( o.dstPath, 'already exists' );
 
-      let dstDir = self.isDir( self.path.dir( o.dstPath ) );
-      if( !dstDir )
-      throw _.err( 'Directory for', o.dstPath, 'does not exist' );
+      dstDirCheck();
 
       let srcDescriptor = self._descriptorRead( o.srcPath );
       let descriptor = self._descriptorHardLinkMake( [ o.dstPath, o.srcPath ], srcDescriptor );
@@ -1411,6 +1439,18 @@ function hardLinkAct( o )
     //   return true;
     // })
   }
+
+  /*  */
+
+  function dstDirCheck()
+  {
+    let dstDir = self._descriptorRead( self.path.dir( o.dstPath ) );
+    if( !dstDir )
+    throw _.err( 'Directory for', o.dstPath, 'does not exist' );
+    else if( !self._descriptorIsDir( dstDir ) )
+    throw _.err( 'Parent of', o.dstPath, 'is not a directory' );
+  }
+
 }
 
 _.routineExtend( hardLinkAct, Parent.prototype.hardLinkAct );

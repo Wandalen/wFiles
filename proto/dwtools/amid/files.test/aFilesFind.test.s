@@ -584,6 +584,75 @@ function filesFindTrivial( test )
 
 }
 
+//
+
+function filesFindTrivialAsync( test )
+{
+  let context = this;
+  let provider = context.provider;
+  let hub = context.hub;
+  let path = context.provider.path;
+  let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
+
+  let con = new _.Consequence().take( null );
+
+  /* */
+  var extract1 = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      dir1 : { a : '1', b : '1', dir11 : {} },
+      dir2 : { c : '1' },
+      d : '1',
+    },
+  });
+
+  test.case = 'setup trivial';
+
+  extract1.readToProvider({ dstProvider : provider, dstPath : context.testSuitePath, allowDelete : 1 });
+  var gotTree = _.FileProvider.Extract().rewriteFromProvider( provider, context.testSuitePath );
+  test.identical( gotTree.filesTree, extract1.filesTree );
+
+  extract1.readToProvider( provider, context.testSuitePath );
+
+  //
+
+  con.thenKeep( () =>
+  {
+    test.case = 'trivial async';
+    var o =
+    {
+      filePath : path.join( context.testSuitePath ),
+      outputFormat : 'relative',
+      sync : 0,
+      recursive : 2,
+      includingTerminals : 1,
+      includingDirs : 1
+    }
+
+    return provider.filesFind( _.mapExtend( null, o ) )
+    .finally( ( err, got ) =>
+    {
+      test.identical( err, undefined );
+      var expected =
+      [
+        '.',
+        './d',
+        './dir1',
+        './dir1/a',
+        './dir1/b',
+        './dir1/dir11',
+        './dir2',
+        './dir2/c'
+      ]
+      test.identical( got,expected )
+      return null;
+    })
+  })
+
+  return con;
+}
+
 // //
 //
 // function filesFindTrivial( test )
@@ -16371,6 +16440,7 @@ var Self =
     // recordFilter,
 
     filesFindTrivial,
+    filesFindTrivialAsync,
     filesFindMaskTerminal,
     filesFindCriticalCases,
     filesFindPreset,

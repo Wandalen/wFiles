@@ -16877,6 +16877,64 @@ experiment.experimental = 1;
 //
 // filesFindExperiment.experimental = 1;
 
+//
+
+function filesReflectExperiment( test )
+{
+  let context = this;
+  let path = context.provider.path;
+  let provider = context.provider;
+
+  var testPath = path.join( context.testSuitePath, test.name );
+
+  var srcPath = path.join( testPath, 'src' );
+  var dstPath = path.join( testPath, 'dst' );
+
+  var filesTree =
+  {
+    'src' : { a : 'a', b : { c : '' } },
+    'dst' : {},
+  }
+
+  _.FileProvider.Extract.readToProvider
+  ({
+    dstProvider : _.fileProvider,
+    dstPath : testPath,
+    filesTree : filesTree,
+    allowWrite : 1,
+    allowDelete : 1,
+    sameTime : 1,
+  });
+
+  test.case = 'directory for terminal is not created, as the result fileCopy fails'
+
+  var filesReflectOptions =
+  {
+    reflectMap : { [ srcPath ] : dstPath },
+    dstDeleting: 0,
+    dstRewriting: 1,
+    dstRewritingByDistinct: true,
+    includingDirs: 0,
+    includingDst: 1,
+    includingTerminals: 1,
+    recursive: 2,
+    srcDeleting: 1
+  }
+
+  provider.filesReflect( filesReflectOptions );
+
+  var expected =
+  {
+    a : 'a', b : { c : '' }
+  }
+  var got = provider.filesExtract( dstPath );
+  test.identical( got.filesTree, expected )
+
+}
+
+filesReflectExperiment.experimental = 1;
+
+
 // --
 // declare
 // --
@@ -16960,6 +17018,7 @@ var Self =
     // experiment,
     // experiment2,
     // filesFindExperiment,
+    filesReflectExperiment
 
   },
 

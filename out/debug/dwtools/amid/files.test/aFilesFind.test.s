@@ -13588,13 +13588,9 @@ function filesDeleteDeletingEmptyDirs( test )
   var deleted = _.select( got, '*/relative');
   var expected =
   [
-    '.',
     './file',
     './dir1/file',
-    './dir1/dir2/file',
-    './dir1/dir2/empty3',
-    './dir1/empty1',
-    './empty1'
+    './dir1/dir2/file'
   ]
   test.will = 'filtered empty dirs should be deleted';
   test.identical( deleted, expected );
@@ -13608,14 +13604,19 @@ function filesDeleteDeletingEmptyDirs( test )
   [
     '.',
     './file',
+    './dir1',
     './dir1/file',
+    './dir1/dir2',
     './dir1/dir2/file',
     './dir1/dir2/empty3',
-    './dir1/empty1',
+    './dir1/empty2',
     './empty1'
   ]
   test.will = 'all files should be deleted';
   test.identical( deleted, expected );
+  var files = provider.filesFindRecursive({ filePath : testPath, includingTerminals : 1, includingDirs : 1, outputFormat : 'relative' })
+  var expected = [];
+  test.identical( files, expected )
 
   test.case = 'everything is actual, deletingEmptyDirs on'
   provider.filesDelete( testPath );
@@ -13624,16 +13625,19 @@ function filesDeleteDeletingEmptyDirs( test )
   var deleted = _.select( got, '*/relative');
   var expected =
   [
+    '..',
     '.',
     './file',
+    './dir1',
     './dir1/file',
+    './dir1/dir2',
     './dir1/dir2/file',
     './dir1/dir2/empty3',
-    './dir1/empty1',
+    './dir1/empty2',
     './empty1'
   ]
-  test.will = 'all files should be deleted';
-  test.identical( deleted, expected );
+  test.will = 'all files should be deleted + empty parent dirs of root';
+  test.is( _.arrayHasAll( deleted, expected ) );
 
   test.case = 'exclude empty dirs,deletingEmptyDirs off'
   provider.filesDelete( testPath );
@@ -13658,16 +13662,24 @@ function filesDeleteDeletingEmptyDirs( test )
   var deleted = _.select( got, '*/relative');
   var expected =
   [
-    '.',
     './file',
     './dir1/file',
-    './dir1/dir2/file',
-    './dir1/dir2/empty3',
-    './dir1/empty1',
-    './empty1'
+    './dir1/dir2/file'
   ]
-  test.will = 'all files should be deleted';
+  test.will = 'only terminals should be deleted';
   test.identical( deleted, expected );
+  var files = provider.filesFindRecursive({ filePath : testPath, includingTerminals : 1, includingDirs : 1, outputFormat : 'relative' })
+  var expected =
+  [
+    '.',
+    './dir1',
+    './dir1/dir2',
+    './dir1/dir2/empty3',
+    './dir1/empty2',
+    './empty1'
+  ];
+  test.will = 'empty dirs should be preserved';
+  test.identical( files, expected )
 
   test.case = 'exclude dirs,deletingEmptyDirs off'
   provider.filesDelete( testPath );
@@ -13677,18 +13689,24 @@ function filesDeleteDeletingEmptyDirs( test )
   var deleted = _.select( got, '*/relative');
   var expected =
   [
-    '.',
     './file',
-    './dir1',
     './dir1/file',
-    './dir1/dir2',
     './dir1/dir2/file',
     './dir1/dir2/empty3',
     './dir1/empty2',
     './empty1'
   ]
-  test.will = 'all files should be deleted';
+  test.will = 'only empty dirs and terminals should be deleted';
   test.identical( deleted, expected );
+  var files = provider.filesFindRecursive({ filePath : testPath, includingTerminals : 1, includingDirs : 1, outputFormat : 'relative' })
+  var expected =
+  [
+    '.',
+    './dir1',
+    './dir1/dir2',
+  ];
+  test.will = 'dirs should be preserved';
+  test.identical( files, expected )
 
   test.case = 'exclude dirs,deletingEmptyDirs on'
   provider.filesDelete( testPath );

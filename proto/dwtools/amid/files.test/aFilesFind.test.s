@@ -10541,9 +10541,20 @@ function filesReflectLinkWithHub( test )
   test.is( dst.isTerminal( _.path.join( dstPath, 'terminal' ) ) );
   test.is( !dst.isTerminal( _.path.join( dstPath, 'link' ) ) );
   test.is( dst.isSoftLink( _.path.join( dstPath, 'link' ) ) );
-  var got = dst.fileRead( _.path.join( dstPath, 'link' ) );
-  var expected = 'terminal';
-  test.identical( got, expected );
+  if( dst instanceof _.FileProvider.HardDrive )
+  {
+    test.shouldThrowErrorSync( () =>
+    {
+      dst.fileRead( _.path.join( dstPath, 'link' ) )
+    })
+  }
+  else
+  {
+    var got = dst.fileRead( _.path.join( dstPath, 'link' ) );
+    var expected = 'terminal';
+    test.identical( got, expected );
+  }
+
 
   /* */
 

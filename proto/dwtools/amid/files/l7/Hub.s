@@ -381,7 +381,7 @@ function _localFromGlobal( filePath, provider )
 let localsFromGlobals = _.routineVectorize_functor
 ({
   routine : localFromGlobal,
-  vectorizingMap : 0,
+  vectorizingMapVals : 0,
 });
 
 //

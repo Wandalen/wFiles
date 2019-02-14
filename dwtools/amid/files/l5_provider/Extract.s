@@ -1262,6 +1262,11 @@ function softLinkAct( o )
     if( self.statRead( o.dstPath ) )
     throw _.err( 'softLinkAct', o.dstPath, 'already exists' );
 
+    /*
+      qqq : add tests for linking act routines
+      qqq : don't forget throwing cases
+    */
+
     self._descriptorWrite( o.dstPath, self._descriptorSoftLinkMake( o.srcPath ) );
 
     return true;

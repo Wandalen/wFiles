@@ -330,6 +330,8 @@ function pathDirTempForClose( tempDirPath )
   _.assert( this.pathDirTempForMap[ devicePath ], 'Not found temp dir for device:', devicePath );
   _.assert( this.pathDirTempForMap[ devicePath ] === tempDirPath, 'Known and provided temp dir path are different:', this.pathDirTempForMap[ devicePath ], tempDirPath );
 
+  delete this.pathDirTempForMap[ devicePath ];
+
   this.fileProvider.filesDelete( tempDirPath );
 }
 

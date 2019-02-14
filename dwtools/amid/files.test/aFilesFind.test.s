@@ -12248,7 +12248,7 @@ function filesReflectTo( test )
 
 //
 
-function filesDeleteTrivial( test )
+function filesDelete( test )
 {
   let context = this;
   let provider = context.provider;
@@ -12658,7 +12658,7 @@ filesDeleteTrivial.timeOut = 20000;
 
 //
 
-function filesDelete( test )
+function filesDelete2( test )
 {
   let context = this;
   let path = context.provider.path;
@@ -16663,8 +16663,8 @@ var Self =
     filesReflectLinked,
     filesReflectTo,
 
-    filesDeleteTrivial,
     filesDelete,
+    filesDelete2,
     filesDeleteAsync,
     filesDeleteDeletingEmptyDirs,
     filesDeleteEmptyDirs,

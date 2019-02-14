@@ -63,8 +63,8 @@ function _vectorizeKeysAndVals( routine, select )
   ({
     routine : [ routineName ],
     vectorizingArray : 1,
-    vectorizingMap : 1,
-    vectorizingKeys : 1,
+    vectorizingMapVals : 1,
+    vectorizingMapKeys : 1,
     select : select,
   });
 
@@ -116,8 +116,8 @@ function _vectorize( routine, select )
   ({
     routine : [ routineName ],
     vectorizingArray : 1,
-    vectorizingMap : 0,
-    vectorizingKeys : 0,
+    vectorizingMapVals : 0,
+    vectorizingMapKeys : 0,
     select : select,
   });
 
@@ -5298,7 +5298,7 @@ function _link_functor( gen )
       // zzz : why two?
       /* aaa : to split execution into veryfication and linking:
       linking stage needs own exception handler,
-      linking stage will not be launched if error was thrown on veryfication or stage ended early
+      linking stage will not be launched if error was thrown on veryfication or stage ended earlier
       */
 
     }
@@ -5433,7 +5433,7 @@ function _link_functor( gen )
 
       c.con1.thenKeep( () =>
       {
-        if( c.result !== undefined ) //return result if ended early
+        if( c.result !== undefined ) //return result if ended earlier
         return c.result;
         //prepare options map and launch main part
         o2 = c.options2 = _.mapOnly( o, c.linkAct.defaults );
@@ -5953,6 +5953,7 @@ function _link_functor( gen )
       if( !c.dstStat && self.providersWithProtocolMap )
       if( self.isLink( o.dstPath ) )
       {
+        debugger;
         //Vova: temporary allow broken dst link for linking operation through Hub
         let methodName = _.strReplaceAll( actMethodName, 'Act', '' );
         self.logger.warn( 'Warning: Hub.' + methodName + '.validateSize failed to get stat for broken dst link:', dstPath );
@@ -6294,7 +6295,7 @@ function _fileCopyAct( c )
   }
   else if( c.srcStat.isSoftLink() )
   {
-    debugger;
+    // debugger;
 
     /* should not throw error for missed neither for cycled */
     let srcResolvedPath = self.pathResolveSoftLink

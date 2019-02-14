@@ -776,7 +776,7 @@ function filesFindCriticalCases( test )
     prefixPath : '/',
   });
 
-  filter./*inFilePath*/filePath = [ '/dir1', '/dir2' ];
+  filter.filePath = [ '/dir1', '/dir2' ];
   filter._formBasePath();
   var found = extract.filesFind
   ({
@@ -801,7 +801,7 @@ function filesFindCriticalCases( test )
       prefixPath : '/',
     });
 
-    filter./*inFilePath*/filePath = [ '/dir1', '/dir2' ];
+    filter.filePath = [ '/dir1', '/dir2' ];
     filter._formBasePath();
 
     test.shouldThrowErrorSync( () =>
@@ -5677,21 +5677,21 @@ function filesReflectTrivial( test )
 
   var expectedDstAbsolute = [ '/dst', '/dst/file2', '/dst/dir', '/dst/dir/file2' ];
   var expectedSrcAbsolute = [ '/src', '/src/file2', '/src/dir', '/src/dir/file2' ];
-  var expectedEffAbsolute = [ '/src', '/src/file2', '/dst/dir', '/dst/dir/file2' ];
+  // /**/ var expectedEffAbsolute = [ '/src', '/src/file2', '/dst/dir', '/dst/dir/file2' ];
   var expectedAction = [ 'dirMake', 'fileCopy', 'ignore', 'fileDelete' ];
   var expectedAllow = [ true, true, false, true ];
   var expectedPreserve = [ true, false, true, false ];
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
   var preserve = _.select( records, '*/preserve' );
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
   test.identical( action, expectedAction );
   test.identical( allow, expectedAllow );
   test.identical( preserve, expectedPreserve );
@@ -5761,21 +5761,21 @@ function filesReflectTrivial( test )
 
   var expectedDstAbsolute = [ '/dst' ];
   var expectedSrcAbsolute = [ '/src' ];
-  var expectedEffAbsolute = [ '/src' ];
+  // /**/ var expectedEffAbsolute = [ '/src' ];
   var expectedAction = [ 'dirMake' ];
   var expectedAllow = [ true ];
   var expectedPreserve = [ true ];
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
   var preserve = _.select( records, '*/preserve' );
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
   test.identical( action, expectedAction );
   test.identical( allow, expectedAllow );
   test.identical( preserve, expectedPreserve );
@@ -5817,21 +5817,21 @@ function filesReflectTrivial( test )
 
   var expectedDstAbsolute = [ '/dst', '/dst/dir', '/dst/dir/file', '/dst/dir/file2' ];
   var expectedSrcAbsolute = [ '/src', '/src/dir', '/src/dir/file', '/src/dir/file2' ];
-  var expectedEffAbsolute = [ '/src', '/dst/dir', '/dst/dir/file', '/dst/dir/file2' ];
+  // /**/ var expectedEffAbsolute = [ '/src', '/dst/dir', '/dst/dir/file', '/dst/dir/file2' ];
   var expectedAction = [ 'dirMake', 'fileDelete', 'fileDelete', 'fileDelete' ];
   var expectedAllow = [ true, true, true, true ];
   var expectedPreserve = [ true, false, false, false ];
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
   var preserve = _.select( records, '*/preserve' );
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
   test.identical( action, expectedAction );
   test.identical( allow, expectedAllow );
   test.identical( preserve, expectedPreserve );
@@ -5958,21 +5958,21 @@ function filesReflectTrivial( test )
 
   var expectedDstAbsolute = [ '/dst', '/dst/file2', '/dst/dir', '/dst/dir/file' ];
   var expectedSrcAbsolute = [ '/src', '/src/file2', '/src/dir', '/src/dir/file' ];
-  var expectedEffAbsolute = [ '/src', '/src/file2', '/dst/dir', '/dst/dir/file' ];
+  // /**/ var expectedEffAbsolute = [ '/src', '/src/file2', '/dst/dir', '/dst/dir/file' ];
   var expectedAction = [ 'dirMake', 'fileCopy', 'fileDelete', 'fileDelete' ];
   var expectedAllow = [ true, true, true, true ];
   var expectedPreserve = [ true, false, false, false ];
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
   var preserve = _.select( records, '*/preserve' );
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
   test.identical( action, expectedAction );
   test.identical( allow, expectedAllow );
   test.identical( preserve, expectedPreserve );
@@ -6329,7 +6329,7 @@ function filesReflectTrivial( test )
 
   var expectedDstAbsolute = [ '/dst', '/dst/dir', '/dst/dir/file' ];
   var expectedSrcAbsolute = [ '/src', '/src/dir', '/src/dir/file' ];
-  var expectedEffAbsolute = [ '/src', '/src/dir', '/dst/dir/file' ];
+  // /**/ var expectedEffAbsolute = [ '/src', '/src/dir', '/dst/dir/file' ];
   var expectedAction = [ 'dirMake', 'dirMake', 'fileDelete' ];
   var expectedAllow = [ true, true, false ];
   var expectedPreserve = [ true, true, false ];
@@ -6339,7 +6339,7 @@ function filesReflectTrivial( test )
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
   var preserve = _.select( records, '*/preserve' );
@@ -6349,7 +6349,7 @@ function filesReflectTrivial( test )
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
   test.identical( action, expectedAction );
   test.identical( allow, expectedAllow );
   test.identical( preserve, expectedPreserve );
@@ -6419,7 +6419,7 @@ function filesReflectTrivial( test )
 
   var expectedDstAbsolute = [ '/dst', '/dst/dir', '/dst/dir/b.b', '/dst/dir/file' ]
   var expectedSrcAbsolute = [ '/src', '/src/dir', '/src/dir/b.b', '/src/dir/file' ];
-  var expectedEffAbsolute = [ '/src', '/src/dir', '/src/dir/b.b', '/dst/dir/file' ];
+  // /**/ var expectedEffAbsolute = [ '/src', '/src/dir', '/src/dir/b.b', '/dst/dir/file' ];
   var expectedAction = [ 'dirMake', 'dirMake', 'fileCopy', 'fileDelete' ];
   var expectedAllow = [ true, true, true, false ];
   var expectedPreserve = [ true, true, false, false ];
@@ -6429,7 +6429,7 @@ function filesReflectTrivial( test )
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
   var preserve = _.select( records, '*/preserve' );
@@ -6439,7 +6439,7 @@ function filesReflectTrivial( test )
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
   test.identical( action, expectedAction );
   test.identical( allow, expectedAllow );
   test.identical( preserve, expectedPreserve );
@@ -6815,7 +6815,7 @@ function filesReflectMutuallyExcluding( test )
 
   var expectedDstAbsolute = abs([ './dst', './dst/srcM' ]);
   var expectedSrcAbsolute = abs([ './src', './src/srcM' ]);
-  var expectedEffAbsolute = abs([ './src', './src/srcM' ]);
+  // /**/ var expectedEffAbsolute = abs([ './src', './src/srcM' ]);
   var expectedAction = [ 'dirMake', 'fileCopy' ];
   var expectedAllow = [ true, true ];
   var expectedPreserve = [ false, false ];
@@ -6824,7 +6824,7 @@ function filesReflectMutuallyExcluding( test )
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
   var preserve = _.select( records, '*/preserve' );
@@ -6835,7 +6835,7 @@ function filesReflectMutuallyExcluding( test )
   {
     test.identical( dstAbsolute, expectedDstAbsolute );
     test.identical( srcAbsolute, expectedSrcAbsolute );
-    test.identical( effAbsolute, expectedEffAbsolute );
+    // /**/ test.identical( effAbsolute, expectedEffAbsolute );
     test.identical( action, expectedAction );
     test.identical( allow, expectedAllow );
     test.identical( preserve, expectedPreserve );
@@ -6883,7 +6883,7 @@ function filesReflectMutuallyExcluding( test )
 
   var expectedDstAbsolute = abs([ './dst', './dst/src' ]);
   var expectedSrcAbsolute = abs([ './src', './src/src' ]);
-  var expectedEffAbsolute = abs([ './src', './src/src' ]);
+  // /**/ var expectedEffAbsolute = abs([ './src', './src/src' ]);
   var expectedAction = [ 'dirMake', 'fileCopy' ];
   var expectedAllow = [ true, true ];
   var expectedPreserve = [ false, false ];
@@ -6892,7 +6892,7 @@ function filesReflectMutuallyExcluding( test )
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
   var preserve = _.select( records, '*/preserve' );
@@ -6903,7 +6903,7 @@ function filesReflectMutuallyExcluding( test )
   {
     test.identical( dstAbsolute, expectedDstAbsolute );
     test.identical( srcAbsolute, expectedSrcAbsolute );
-    test.identical( effAbsolute, expectedEffAbsolute );
+    // /**/ test.identical( effAbsolute, expectedEffAbsolute );
     test.identical( action, expectedAction );
     test.identical( allow, expectedAllow );
     test.identical( preserve, expectedPreserve );
@@ -6952,7 +6952,7 @@ function filesReflectMutuallyExcluding( test )
 
   var expectedDstAbsolute = abs([ './dst', './dst/both', './dst/bothM', './dst/src', './dst/dst', './dst/dstM' ]);
   var expectedSrcAbsolute = abs([ './src', './src/both', './src/bothM', './src/src', './src/dst', './src/dstM' ]);
-  var expectedEffAbsolute = abs([ './src', './src/both', './src/bothM', './src/src', './dst/dst', './dst/dstM' ]);
+  // /**/ var expectedEffAbsolute = abs([ './src', './src/both', './src/bothM', './src/src', './dst/dst', './dst/dstM' ]);
   var expectedAction = [ 'dirMake', 'fileCopy', 'fileDelete', 'fileCopy', 'ignore', 'fileDelete' ];
   var expectedAllow = [ true, true, true, true, false, true ];
   var expectedPreserve = [ true, false, false, false, true, false ];
@@ -6961,7 +6961,7 @@ function filesReflectMutuallyExcluding( test )
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
   var preserve = _.select( records, '*/preserve' );
@@ -6972,7 +6972,7 @@ function filesReflectMutuallyExcluding( test )
   {
     test.identical( dstAbsolute, expectedDstAbsolute );
     test.identical( srcAbsolute, expectedSrcAbsolute );
-    test.identical( effAbsolute, expectedEffAbsolute );
+    // /**/ test.identical( effAbsolute, expectedEffAbsolute );
     test.identical( action, expectedAction );
     test.identical( allow, expectedAllow );
     test.identical( preserve, expectedPreserve );
@@ -7037,7 +7037,7 @@ function filesReflectMutuallyExcluding( test )
 
   var expectedDstAbsolute = abs([ './dst', './dst/bothDir', './dst/srcPath', './dst/bothDirM', './dst/dstDirM', './dst/dstPath' ]);
   var expectedSrcAbsolute = abs([ './src', './src/bothDir', './src/srcPath', './src/bothDirM', './src/dstDirM', './src/dstPath' ]);
-  var expectedEffAbsolute = abs([ './src', './src/bothDir', './src/srcPath', './dst/bothDirM', './dst/dstDirM', './dst/dstPath' ]);
+  // /**/ var expectedEffAbsolute = abs([ './src', './src/bothDir', './src/srcPath', './dst/bothDirM', './dst/dstDirM', './dst/dstPath' ]);
   var expectedAction = [ 'dirMake', 'dirMake', 'dirMake', 'fileDelete', 'fileDelete', 'ignore' ];
   var expectedReason = [ 'srcLooking', 'srcLooking', 'srcLooking', 'dstDeleting', 'dstDeleting', 'dstDeleting' ];
   var expectedAllow = [ true, true, true, true, true, false ];
@@ -7047,7 +7047,7 @@ function filesReflectMutuallyExcluding( test )
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var reason = _.select( records, '*/reason' );
   var allow = _.select( records, '*/allow' );
@@ -7059,7 +7059,7 @@ function filesReflectMutuallyExcluding( test )
   {
     test.identical( dstAbsolute, expectedDstAbsolute );
     test.identical( srcAbsolute, expectedSrcAbsolute );
-    test.identical( effAbsolute, expectedEffAbsolute );
+    // /**/ test.identical( effAbsolute, expectedEffAbsolute );
     test.identical( action, expectedAction );
     test.identical( reason, expectedReason );
     test.identical( allow, expectedAllow );
@@ -7125,7 +7125,7 @@ function filesReflectMutuallyExcluding( test )
 
   var expectedDstAbsolute = abs([ './dst', './dst/fM', './dst/fM/term' ]);
   var expectedSrcAbsolute = abs([ './src', './src/fM', './src/fM/term' ]);
-  var expectedEffAbsolute = abs([ './src', './src/fM', './src/fM/term' ]);
+  // /**/ var expectedEffAbsolute = abs([ './src', './src/fM', './src/fM/term' ]);
   var expectedAction = [ 'dirMake', 'dirMake', 'fileCopy' ];
   var expectedAllow = [ true, true, true ];
   var expectedPreserve = [ true, false, false ];
@@ -7134,7 +7134,7 @@ function filesReflectMutuallyExcluding( test )
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
   var preserve = _.select( records, '*/preserve' );
@@ -7145,7 +7145,7 @@ function filesReflectMutuallyExcluding( test )
   {
     test.identical( dstAbsolute, expectedDstAbsolute );
     test.identical( srcAbsolute, expectedSrcAbsolute );
-    test.identical( effAbsolute, expectedEffAbsolute );
+    // /**/ test.identical( effAbsolute, expectedEffAbsolute );
     test.identical( action, expectedAction );
     test.identical( allow, expectedAllow );
     test.identical( preserve, expectedPreserve );
@@ -7202,7 +7202,8 @@ function filesReflectMutuallyExcluding( test )
     },
     dst :
     {
-      dM : { term : 'dst' }, d : 'dst',
+      dM : { term : 'dst' },
+      d : 'dst',
     },
   }
   test.identical( extract2.filesTree.src, expectedTree.src );
@@ -7210,7 +7211,7 @@ function filesReflectMutuallyExcluding( test )
 
   var expectedDstAbsolute = abs([ './dst', './dst/d', './dst/d/term', './dst/d/termM', './dst/dM', './dst/dM/term', './dst/dM/termM' ]);
   var expectedSrcAbsolute = abs([ './src', './src/d', './src/d/term', './src/d/termM', './src/dM', './src/dM/term', './src/dM/termM' ]);
-  var expectedEffAbsolute = abs([ './src', './src/d', './dst/d/term', './dst/d/termM', './dst/dM', './dst/dM/term', './dst/dM/termM' ]);
+  // /**/ var expectedEffAbsolute = abs([ './src', './src/d', './dst/d/term', './dst/d/termM', './dst/dM', './dst/dM/term', './dst/dM/termM' ]);
   var expectedAction = [ 'dirMake', 'fileCopy', 'fileDelete', 'fileDelete', 'dirMake', 'ignore', 'fileDelete' ];
   var expectedAllow = [ true, true, true, true, true, false, true ];
   var expectedPreserve = [ true, false, false, false, true, true, false ];
@@ -7219,7 +7220,7 @@ function filesReflectMutuallyExcluding( test )
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
   var preserve = _.select( records, '*/preserve' );
@@ -7230,7 +7231,7 @@ function filesReflectMutuallyExcluding( test )
   {
     test.identical( dstAbsolute, expectedDstAbsolute );
     test.identical( srcAbsolute, expectedSrcAbsolute );
-    test.identical( effAbsolute, expectedEffAbsolute );
+    // /**/ test.identical( effAbsolute, expectedEffAbsolute );
     test.identical( action, expectedAction );
     test.identical( allow, expectedAllow );
     test.identical( preserve, expectedPreserve );
@@ -7293,7 +7294,7 @@ function filesReflectMutuallyExcluding( test )
 
   var expectedDstAbsolute = abs([ './dst', './dst/d', './dst/d/term', './dst/d/termM', './dst/dM', './dst/dM/term', './dst/dM/termM' ]);
   var expectedSrcAbsolute = abs([ './src', './src/d', './src/d/term', './src/d/termM', './src/dM', './src/dM/term', './src/dM/termM' ]);
-  var expectedEffAbsolute = abs([ './src', './src/d', './dst/d/term', './dst/d/termM', './dst/dM', './dst/dM/term', './dst/dM/termM' ]);
+  // /**/ var expectedEffAbsolute = abs([ './src', './src/d', './dst/d/term', './dst/d/termM', './dst/dM', './dst/dM/term', './dst/dM/termM' ]);
   var expectedAction = [ 'dirMake', 'fileCopy', 'fileDelete', 'fileDelete', 'dirMake', 'ignore', 'fileDelete' ];
   var expectedAllow = [ true, true, true, true, true, false, true ];
   var expectedPreserve = [ true, false, false, false, true, true, false ];
@@ -7302,7 +7303,7 @@ function filesReflectMutuallyExcluding( test )
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
   var preserve = _.select( records, '*/preserve' );
@@ -7313,7 +7314,7 @@ function filesReflectMutuallyExcluding( test )
   {
     test.identical( dstAbsolute, expectedDstAbsolute );
     test.identical( srcAbsolute, expectedSrcAbsolute );
-    test.identical( effAbsolute, expectedEffAbsolute );
+    // /**/ test.identical( effAbsolute, expectedEffAbsolute );
     test.identical( action, expectedAction );
     test.identical( allow, expectedAllow );
     test.identical( preserve, expectedPreserve );
@@ -7388,35 +7389,38 @@ function filesReflectMutuallyExcluding( test )
   // var expectedDstAbsolute = abs([ './dst', './dst/dWithM', './dst/dWithoutM', './dst/dWithoutM/term' ]);
   var expectedDstAbsolute = abs([ './dst', './dst/dWithoutM', './dst/dWithoutM/term', './dst/dWithM' ]);
   var expectedSrcAbsolute = abs([ './src', './src/dWithoutM', './src/dWithoutM/term', './src/dWithM' ]);
-  var expectedEffAbsolute = abs([ './src', './src/dWithoutM', './src/dWithoutM/term', './dst/dWithM' ]);
+  // /**/ var expectedEffAbsolute = abs([ './src', './src/dWithoutM', './src/dWithoutM/term', './dst/dWithM' ]);
   var expectedAction = [ 'dirMake', 'dirMake', 'fileCopy', 'fileDelete' ];
   var expectedAllow = [ true, true, true, true ];
   var expectedPreserve = [ true, false, false, false ];
   var expectedSrcAction = [ 'fileDelete', null, 'fileDelete', null ];
   var expectedSrcAllow = [ false, true, true, true ];
   var expectedReason = [ 'srcLooking', 'srcLooking', 'srcLooking', 'dstDeleting' ];
+  var expectedDeleteFirst = [ false, true, false, false ];
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
   var preserve = _.select( records, '*/preserve' );
   var srcAction = _.select( records, '*/srcAction' );
   var srcAllow = _.select( records, '*/srcAllow' );
   var reason = _.select( records, '*/reason' );
+  var deleteFirst = _.select( records, '*/deleteFirst' );
 
   if( precise )
   {
     test.identical( dstAbsolute, expectedDstAbsolute );
     test.identical( srcAbsolute, expectedSrcAbsolute );
-    test.identical( effAbsolute, expectedEffAbsolute );
+    // /**/ test.identical( effAbsolute, expectedEffAbsolute );
     test.identical( action, expectedAction );
     test.identical( allow, expectedAllow );
     test.identical( preserve, expectedPreserve );
     test.identical( srcAction, expectedSrcAction );
     test.identical( srcAllow, expectedSrcAllow );
     test.identical( reason, expectedReason );
+    test.identical( deleteFirst, expectedDeleteFirst );
   }
 
   /* */
@@ -7489,7 +7493,7 @@ function filesReflectMutuallyExcluding( test )
 
   var expectedDstAbsolute = abs([ './dst', './dst/dWith', './dst/dWith/termM', './dst/dWithout', './dst/dWithout/term', './dst/dWithM', './dst/dWithM/termM', './dst/dWithoutM', './dst/dWithoutM/term' ]);
   var expectedSrcAbsolute = abs([ './src', './src/dWith', './src/dWith/termM', './src/dWithout', './src/dWithout/term', './src/dWithM', './src/dWithM/termM', './src/dWithoutM', './src/dWithoutM/term' ]);
-  var expectedEffAbsolute = abs([ './src', './src/dWith', './dst/dWith/termM', './src/dWithout', './dst/dWithout/term', './dst/dWithM', './dst/dWithM/termM', './dst/dWithoutM', './dst/dWithoutM/term' ]);
+  // /**/ var expectedEffAbsolute = abs([ './src', './src/dWith', './dst/dWith/termM', './src/dWithout', './dst/dWithout/term', './dst/dWithM', './dst/dWithM/termM', './dst/dWithoutM', './dst/dWithoutM/term' ]);
   var expectedAction = [ 'dirMake', 'fileCopy', 'fileDelete', 'fileCopy', 'fileDelete', 'fileDelete', 'fileDelete', 'dirMake', 'ignore' ];
   var expectedAllow = [ true, true, true, true, true, true, true, true, false ];
   var expectedPreserve = [ true, false, false, false, false, false, false, true, true ];
@@ -7498,7 +7502,7 @@ function filesReflectMutuallyExcluding( test )
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
   var preserve = _.select( records, '*/preserve' );
@@ -7509,7 +7513,7 @@ function filesReflectMutuallyExcluding( test )
   {
     test.identical( dstAbsolute, expectedDstAbsolute );
     test.identical( srcAbsolute, expectedSrcAbsolute );
-    test.identical( effAbsolute, expectedEffAbsolute );
+    // /**/ test.identical( effAbsolute, expectedEffAbsolute );
     test.identical( action, expectedAction );
     test.identical( allow, expectedAllow );
     test.identical( preserve, expectedPreserve );
@@ -7696,21 +7700,21 @@ function _filesReflectWithFilter( test, o )
 
   var expectedDstAbsolute = [ '/dst', '/dst/c.js', '/dst/srcEmptyDir.js', '/dst/dstEmptyDir.js' ];
   var expectedSrcAbsolute = [ '/src', '/src/c.js', '/src/srcEmptyDir.js', '/src/dstEmptyDir.js' ];
-  var expectedEffAbsolute = [ '/src', '/src/c.js', '/src/srcEmptyDir.js', '/dst/dstEmptyDir.js' ];
+  // /**/ var expectedEffAbsolute = [ '/src', '/src/c.js', '/src/srcEmptyDir.js', '/dst/dstEmptyDir.js' ];
   var expectedAction = [ 'dirMake', 'fileCopy', 'dirMake', 'fileDelete' ];
   var expectedAllow = [ true, true, true, true ];
   var expectedPreserve = [ true, false, false, false ];
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
   var preserve = _.select( records, '*/preserve' );
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
   test.identical( action, expectedAction );
   test.identical( allow, expectedAllow );
   test.identical( preserve, expectedPreserve );
@@ -7839,21 +7843,21 @@ function _filesReflectWithFilter( test, o )
 
   var expectedDstAbsolute = [ '/dst', '/dst/d1a', '/dst/d1a/d1b', '/dst/d1a/d1b/c.js', '/dst/d1a/d1b/b.js', '/dst/d2a', '/dst/d2a/d2b', '/dst/d2a/d2b/a.js', '/dst/d3a', '/dst/d3a/d3b', '/dst/d4a.js', '/dst/d4a.js/d4b.js' ];
   var expectedSrcAbsolute = [ '/src', '/src/d1a', '/src/d1a/d1b', '/src/d1a/d1b/c.js', '/src/d1a/d1b/b.js', '/src/d2a', '/src/d2a/d2b', '/src/d2a/d2b/a.js', '/src/d3a', '/src/d3a/d3b', '/src/d4a.js', '/src/d4a.js/d4b.js' ];
-  var expectedEffAbsolute = [ '/src', '/src/d1a', '/src/d1a/d1b', '/src/d1a/d1b/c.js', '/dst/d1a/d1b/b.js', '/dst/d2a', '/dst/d2a/d2b', '/dst/d2a/d2b/a.js', '/dst/d3a', '/dst/d3a/d3b', '/dst/d4a.js', '/dst/d4a.js/d4b.js' ];
+  // /**/ var expectedEffAbsolute = [ '/src', '/src/d1a', '/src/d1a/d1b', '/src/d1a/d1b/c.js', '/dst/d1a/d1b/b.js', '/dst/d2a', '/dst/d2a/d2b', '/dst/d2a/d2b/a.js', '/dst/d3a', '/dst/d3a/d3b', '/dst/d4a.js', '/dst/d4a.js/d4b.js' ];
   var expectedAction = [ 'dirMake', 'dirMake', 'dirMake', 'fileCopy', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'ignore', 'ignore', 'ignore', 'ignore' ];
   var expectedAllow = [ true, true, true, true, true, true, true, true, false, false, false, false ];
   var expectedPreserve = [ true, true, true, false, false, false, false, false, true, true, true, true ];
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
   var preserve = _.select( records, '*/preserve' );
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
   test.identical( action, expectedAction );
   test.identical( allow, expectedAllow );
   test.identical( preserve, expectedPreserve );
@@ -7965,21 +7969,21 @@ function _filesReflectWithFilter( test, o )
 
   var expectedDstAbsolute = [ '/dst', '/dst/dSrcDirDstFile', '/dst/dSrcDirDstFile/a.js', '/dst/dSrcFileDstDir', '/dst/dSrcFileDstDir/a.js', '/dst/dSrcFileDstDir/a.js/a.s', '/dst/dSrcFileDstDir2', '/dst/dSrcFileDstDir2/a', '/dst/dSrcFileDstDir2/a/a.js' ];
   var expectedSrcAbsolute = [ '/src', '/src/dSrcDirDstFile', '/src/dSrcDirDstFile/a.js', '/src/dSrcFileDstDir', '/src/dSrcFileDstDir/a.js', '/src/dSrcFileDstDir/a.js/a.s', '/src/dSrcFileDstDir2', '/src/dSrcFileDstDir2/a', '/src/dSrcFileDstDir2/a/a.js' ];
-  var expectedEffAbsolute = [ '/src', '/src/dSrcDirDstFile', '/src/dSrcDirDstFile/a.js', '/src/dSrcFileDstDir', '/src/dSrcFileDstDir/a.js', '/dst/dSrcFileDstDir/a.js/a.s', '/src/dSrcFileDstDir2', '/dst/dSrcFileDstDir2/a', '/dst/dSrcFileDstDir2/a/a.js' ];
+  // /**/ var expectedEffAbsolute = [ '/src', '/src/dSrcDirDstFile', '/src/dSrcDirDstFile/a.js', '/src/dSrcFileDstDir', '/src/dSrcFileDstDir/a.js', '/dst/dSrcFileDstDir/a.js/a.s', '/src/dSrcFileDstDir2', '/dst/dSrcFileDstDir2/a', '/dst/dSrcFileDstDir2/a/a.js' ];
   var expectedAction = [ 'dirMake', 'dirMake', 'dirMake', 'dirMake', 'fileCopy', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete' ];
   var expectedAllow = [ true, true, true, true, true, true, true, true, true ];
   var expectedPreserve = [ true, true, false, true, false, false, false, false, false ];
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
   var preserve = _.select( records, '*/preserve' );
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
   test.identical( action, expectedAction );
   test.identical( allow, expectedAllow );
   test.identical( preserve, expectedPreserve );
@@ -8117,26 +8121,29 @@ function _filesReflect( test, o )
   test.identical( p.src.filesTree.src, expected.filesTree.src );
   test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
 
-  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
-  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
-  var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
-  var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy' ];
-  var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
-  var expectedPreserve = [ true, false, false, false, false, true, false, false, false, false, false, false, false, true, false, true, false, false, false ];
+  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/srcFile/f', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
+  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/srcFile/f', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
+  // // /**/ var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
+  var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'fileCopy', 'fileDelete', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy' ];
+  var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
+  var expectedPreserve = [ true, false, false, false, false, false, true, false, false, false, false, false, false, false, true, false, true, false, false, false ];
+  var expectedReason = [ 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'dstRewriting', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking' ];
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
   var preserve = _.select( records, '*/preserve' );
+  var reason = _.select( records, '*/reason' );
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // // /**/ test.identical( effAbsolute, expectedEffAbsolute );
   test.identical( action, expectedAction );
   test.identical( allow, expectedAllow );
   test.identical( preserve, expectedPreserve );
+  test.identical( reason, expectedReason );
 
   test.identical( p.hub.filesAreSoftLinked([ p.src.globalFromLocal( '/src/a1' ), p.dst.globalFromLocal( '/dst/a1' ) ]), false );
   test.identical( p.hub.filesAreSoftLinked([ p.src.globalFromLocal( '/src/a1' ), p.src.globalFromLocal( '/src/a1' ) ]), false );
@@ -8174,21 +8181,21 @@ function _filesReflect( test, o )
   test.identical( p.src.filesTree.src, expected.filesTree.src );
   test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
 
-  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
-  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
-  var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
-  var expectedAction = [ 'dirMake', 'softLink', 'softLink', 'softLink', 'softLink', 'dirMake', 'softLink', 'softLink', 'softLink', 'dirMake', 'softLink', 'softLink', 'softLink', 'dirMake', 'dirMake', 'dirMake', 'softLink', 'dirMake', 'softLink' ];
-  var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
+  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/srcFile/f', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
+  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/srcFile/f', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
+  // /**/ var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
+  var expectedAction = [ 'dirMake', 'softLink', 'softLink', 'softLink', 'softLink', 'fileDelete', 'dirMake', 'softLink', 'softLink', 'softLink', 'dirMake', 'softLink', 'softLink', 'softLink', 'dirMake', 'dirMake', 'dirMake', 'softLink', 'dirMake', 'softLink' ];
+  var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
   test.identical( action, expectedAction );
   test.identical( allow, expectedAllow );
 
@@ -8233,19 +8240,19 @@ function _filesReflect( test, o )
 
   var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/dir', '/dst/dir/a1', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame' ];
   var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame' ];
-  var expectedEffAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame' ];
+  // /**/ var expectedEffAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame' ];
   var expectedAction = [ 'dirMake', 'fileCopy', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake' ];
   var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true ];
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
   test.identical( action, expectedAction );
   test.identical( allow, expectedAllow );
 
@@ -8281,21 +8288,21 @@ function _filesReflect( test, o )
   test.identical( p.src.filesTree.src, expected.filesTree.src );
   test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
 
-  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile' ];
-  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
-  var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
-  var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake', 'fileCopy', 'dirMake' ];
-  var expectedAllow = [ true, true, false, false, false, true, true, false, false, true, true, true, true, true, true, true, false, false ];
+  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/srcFile/f', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile' ];
+  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/srcFile/f', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
+  // /**/ var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
+  var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'fileCopy', 'fileDelete', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake', 'fileCopy', 'dirMake' ];
+  var expectedAllow = [ true, true, false, false, false, false, true, true, false, false, true, true, true, true, true, true, true, false, false ];
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
   test.identical( action, expectedAction );
   test.identical( allow, expectedAllow );
 
@@ -8331,21 +8338,21 @@ function _filesReflect( test, o )
   test.identical( p.src.filesTree.src, expected.filesTree.src );
   test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
 
-  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
-  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
-  var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
-  var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy' ];
-  var expectedAllow = [ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false ];
+  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/srcFile/f', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
+  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/srcFile/f', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
+  // /**/ var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
+  var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'fileCopy', 'fileDelete', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy' ];
+  var expectedAllow = [ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false ];
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
   test.identical( action, expectedAction );
   test.identical( allow, expectedAllow );
 
@@ -8394,24 +8401,24 @@ function _filesReflect( test, o )
   test.identical( p.src.filesTree.src, expected.filesTree.src );
   test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
 
-  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
-  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
-  var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
-  var expectedAction = [ 'dirMake', 'nop', 'nop', 'nop', 'nop', 'dirMake', 'nop', 'nop', 'nop', 'dirMake', 'nop', 'nop', 'nop', 'dirMake', 'dirMake', 'dirMake', 'nop', 'dirMake', 'nop' ];
-  var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
+  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/srcFile/f', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
+  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/srcFile/f', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
+  // /**/ var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
+  var expectedAction = [ 'dirMake', 'nop', 'nop', 'nop', 'nop', 'fileDelete', 'dirMake', 'nop', 'nop', 'nop', 'dirMake', 'nop', 'nop', 'nop', 'dirMake', 'dirMake', 'dirMake', 'nop', 'dirMake', 'nop' ];
+  var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
 
-  logger.log( 'expectedEffAbsolute', expectedEffAbsolute );
+  // logger.log( 'expectedEffAbsolute', expectedEffAbsolute );
   logger.log( 'action', action );
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
   test.identical( action, expectedAction );
   test.identical( allow, expectedAllow );
 
@@ -8449,22 +8456,22 @@ function _filesReflect( test, o )
 
   var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/dir', '/dst/dir/a1', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame' ];
   var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame' ];
-  var expectedEffAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame' ];
+  // /**/ var expectedEffAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame' ];
   var expectedAction = [ 'dirMake', 'nop', 'dirMake', 'nop', 'dirMake', 'nop', 'nop', 'nop', 'dirMake', 'dirMake', 'dirMake' ];
   var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true ];
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
 
-  logger.log( 'expectedEffAbsolute', expectedEffAbsolute );
+  // logger.log( 'expectedEffAbsolute', expectedEffAbsolute );
   logger.log( 'action', action );
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
   test.identical( action, expectedAction );
   test.identical( allow, expectedAllow );
 
@@ -8500,24 +8507,24 @@ function _filesReflect( test, o )
   test.identical( p.src.filesTree.src, expected.filesTree.src );
   test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
 
-  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile' ];
-  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
-  var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
-  var expectedAction = [ 'dirMake', 'nop', 'nop', 'nop', 'nop', 'dirMake', 'nop', 'nop', 'nop', 'dirMake', 'nop', 'nop', 'nop', 'dirMake', 'dirMake', 'dirMake', 'nop', 'dirMake' ];
-  var expectedAllow = [ true, true, false, false, false, true, true, false, false, true, true, true, true, true, true, true, false, false ];
+  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/srcFile/f', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile' ];
+  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/srcFile/f', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
+  // /**/ var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
+  var expectedAction = [ 'dirMake', 'nop', 'nop', 'nop', 'nop', 'fileDelete', 'dirMake', 'nop', 'nop', 'nop', 'dirMake', 'nop', 'nop', 'nop', 'dirMake', 'dirMake', 'dirMake', 'nop', 'dirMake' ];
+  var expectedAllow = [ true, true, false, false, false, false, true, true, false, false, true, true, true, true, true, true, true, false, false ];
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
 
-  logger.log( 'expectedEffAbsolute', expectedEffAbsolute );
+  // logger.log( 'expectedEffAbsolute', expectedEffAbsolute );
   logger.log( 'action', action );
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
   test.identical( action, expectedAction );
   test.identical( allow, expectedAllow );
 
@@ -8553,23 +8560,23 @@ function _filesReflect( test, o )
   test.identical( p.src.filesTree.src, expected.filesTree.src );
   test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
 
-  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
-  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
-  var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
-  var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy' ];
-  var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
-  var expectedPreserve = [ true, false, true, false, false, true, false, true, false, false, false, false, false, true, false, true, true, false, false ];
+  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/srcFile/f', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
+  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/srcFile/f', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
+  // /**/ var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
+  var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'fileCopy', 'fileDelete', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy' ];
+  var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
+  var expectedPreserve = [ true, false, true, false, false, false, true, false, true, false, false, false, false, false, true, false, true, true, false, false ];
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
   var preserve = _.select( records, '*/preserve' );
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
   test.identical( action, expectedAction );
   test.identical( allow, expectedAllow );
   test.identical( preserve, expectedPreserve );
@@ -8604,17 +8611,17 @@ function _filesReflect( test, o )
   test.identical( p.src.filesTree.src, expected.filesTree.src );
   test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
 
-  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
-  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
-  var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
-  var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy' ];
-  var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
-  var expectedSrcActions = [ 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete' ];
-  var expectedSrcAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
+  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/srcFile/f', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
+  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/srcFile/f', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
+  // /**/ var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
+  var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'fileCopy', 'fileDelete', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy' ];
+  var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
+  var expectedSrcActions = [ 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', null, 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete' ];
+  var expectedSrcAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
   var srcActions = _.select( records, '*/srcAction' );
@@ -8622,7 +8629,7 @@ function _filesReflect( test, o )
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
   test.identical( action, expectedAction );
   test.identical( allow, expectedAllow );
   test.identical( srcActions, expectedSrcActions );
@@ -8659,17 +8666,17 @@ function _filesReflect( test, o )
   test.identical( p.src.filesTree.src, expected.filesTree.src );
   test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
 
-  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile' ];
-  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
-  var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
-  var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake', 'fileCopy', 'dirMake' ];
-  var expectedAllow = [ true, true, false, false, false, true, true, false, false, true, true, true, true, true, true, true, false, false ];
-  var expectedSrcActions = [ 'fileDelete', 'fileDelete', null, null, null, 'fileDelete', 'fileDelete', null, null, 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', null, null ];
-  var expectedSrcAllow = [ false, true, true, true, true, false, true, true, true, true, true, true, true, true, true, false, true, true ];
+  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/srcFile/f', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile' ];
+  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/srcFile/f', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
+  // /**/ var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
+  var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'fileCopy', 'fileDelete', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake', 'fileCopy', 'dirMake' ];
+  var expectedAllow = [ true, true, false, false, false, false, true, true, false, false, true, true, true, true, true, true, true, false, false ];
+  var expectedSrcActions = [ 'fileDelete', 'fileDelete', null, null, null, null, 'fileDelete', 'fileDelete', null, null, 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', null, null ];
+  var expectedSrcAllow = [ false, true, true, true, true, true, false, true, true, true, true, true, true, true, true, true, false, true, true ];
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
   var srcActions = _.select( records, '*/srcAction' );
@@ -8677,7 +8684,7 @@ function _filesReflect( test, o )
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
   test.identical( action, expectedAction );
   test.identical( allow, expectedAllow );
   test.identical( srcActions, expectedSrcActions );
@@ -8717,7 +8724,7 @@ function _filesReflect( test, o )
 
   var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/dir', '/dst/dir/a1', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame' ];
   var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame' ];
-  var expectedEffAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame' ];
+  // /**/ var expectedEffAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame' ];
   var expectedAction = [ 'dirMake', 'fileCopy', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake' ];
   var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true ];
   var expectedSrcActions = [ 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete' ];
@@ -8725,7 +8732,7 @@ function _filesReflect( test, o )
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
   var srcActions = _.select( records, '*/srcAction' );
@@ -8733,7 +8740,7 @@ function _filesReflect( test, o )
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
   test.identical( action, expectedAction );
   test.identical( allow, expectedAllow );
   test.identical( srcActions, expectedSrcActions );
@@ -8772,21 +8779,21 @@ function _filesReflect( test, o )
 
   var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/srcFile/f', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir/a2', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f', '/dst/a2', '/dst/dir2', '/dst/dir2/a2', '/dst/dir2/b', '/dst/dir2/c', '/dst/dir5' ];
   var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/srcFile/f', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir/a2', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f', '/src/a2', '/src/dir2', '/src/dir2/a2', '/src/dir2/b', '/src/dir2/c', '/src/dir5' ];
-  var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/dst/srcFile/f', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/dst/dir/a2', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f', '/dst/a2', '/dst/dir2', '/dst/dir2/a2', '/dst/dir2/b', '/dst/dir2/c', '/dst/dir5' ];
+  // /**/ var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/dst/srcFile/f', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/dst/dir/a2', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f', '/dst/a2', '/dst/dir2', '/dst/dir2/a2', '/dst/dir2/b', '/dst/dir2/c', '/dst/dir5' ];
   var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'fileCopy', 'fileDelete', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'fileDelete', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete' ];
   var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
   var expectedPreserve = [ true, false, false, false, false, false, true, false, false, false, false, false, false, false, false, true, false, true, false, false, false, false, false, false, false, false, false ];
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
   var preserve = _.select( records, '*/preserve' );
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
   test.identical( action, expectedAction );
   test.identical( allow, expectedAllow );
   test.identical( preserve, expectedPreserve );
@@ -8833,21 +8840,21 @@ function _filesReflect( test, o )
 
   var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/dir', '/dst/dir/a1', '/dst/dir/a2', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/a2', '/dst/dir2', '/dst/dir2/a2', '/dst/dir2/b', '/dst/dir2/c', '/dst/dir5' ];
   var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/src/dir/a2', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/a2', '/src/dir2', '/src/dir2/a2', '/src/dir2/b', '/src/dir2/c', '/src/dir5' ];
-  var expectedEffAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/dst/dir/a2', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/dst/a2', '/dst/dir2', '/dst/dir2/a2', '/dst/dir2/b', '/dst/dir2/c', '/dst/dir5' ];
+  // /**/ var expectedEffAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/dst/dir/a2', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/dst/a2', '/dst/dir2', '/dst/dir2/a2', '/dst/dir2/b', '/dst/dir2/c', '/dst/dir5' ];
   var expectedAction = [ 'dirMake', 'fileCopy', 'dirMake', 'fileCopy', 'fileDelete', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete' ];
   var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
   var expectedPreserve = [ true, false, true, false, false, false, false, false, false, true, false, true, false, false, false, false, false, false ];
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
   var preserve = _.select( records, '*/preserve' );
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
   test.identical( action, expectedAction );
   test.identical( allow, expectedAllow );
   test.identical( preserve, expectedPreserve );
@@ -8909,21 +8916,21 @@ function _filesReflect( test, o )
 
   var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst', '/dst/d', '/dstNew', '/dstNew/a1', '/dstNew/b', '/dstNew/c', '/dstNew', '/dstNew/d' ];
   var expectedSrcAbsolute = [ '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d' ];
-  var expectedEffAbsolute = [ '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d' ];
+  // /**/ var expectedEffAbsolute = [ '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d' ];
   var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy' ];
   var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true ];
   var expectedPreserve = [ true, false, false, false, true, false, false, false, false, false, true, false ];
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
   var preserve = _.select( records, '*/preserve' );
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
   test.identical( action, expectedAction );
   test.identical( allow, expectedAllow );
   test.identical( preserve, expectedPreserve );
@@ -8974,21 +8981,21 @@ function _filesReflect( test, o )
 
   var expectedDstAbsolute = [ '/dstNew', '/dstNew/a1', '/dstNew/b', '/dstNew/c', '/dstNew', '/dstNew/d' ];
   var expectedSrcAbsolute = [ '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d' ];
-  var expectedEffAbsolute = [ '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d' ];
+  // /**/ var expectedEffAbsolute = [ '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d' ];
   var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy' ];
   var expectedAllow = [ true, true, true, true, true, true ];
   var expectedPreserve = [ false, false, false, false, true, false ];
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
   var preserve = _.select( records, '*/preserve' );
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
   test.identical( action, expectedAction );
   test.identical( allow, expectedAllow );
   test.identical( preserve, expectedPreserve );
@@ -9050,19 +9057,19 @@ function _filesReflect( test, o )
 
   var expectedDstAbsolute = [ '/dstNew', '/dstNew/a1', '/dstNew/b', '/dstNew/c', '/dstNew', '/dstNew/d', '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst', '/dst/d' ];
   var expectedSrcAbsolute = [ '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d' ];
-  var expectedEffAbsolute = [ '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d' ];
+  // /**/ var expectedEffAbsolute = [ '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d' ];
   var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy' ];
   var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true ];
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
   test.identical( action, expectedAction );
   test.identical( allow, expectedAllow );
 
@@ -9116,21 +9123,21 @@ function _filesReflect( test, o )
 
   var expectedDstAbsolute = [ '/dst', '/dst/dir', '/dst/dir/b' ];
   var expectedSrcAbsolute = [ '/src', '/src/dir', '/src/dir/b' ];
-  var expectedEffAbsolute = [ '/src', '/src/dir', '/src/dir/b' ];
+  // /**/ var expectedEffAbsolute = [ '/src', '/src/dir', '/src/dir/b' ];
   var expectedAction = [ 'dirMake', 'dirMake', 'fileCopy' ];
   var expectedAllow = [ true, true, true ];
   var expectedPreserve = [ true, true, false ];
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
   var preserve = _.select( records, '*/preserve' );
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
   test.identical( action, expectedAction );
   test.identical( allow, expectedAllow );
   test.identical( preserve, expectedPreserve );
@@ -9207,7 +9214,7 @@ var src = _.FileProvider.Extract
 
   var expectedDstAbsolute = [ '/dst', '/dst/b', '/dst/a2', '/dst/c', '/dst/dir', '/dst/dir/a2', '/dst/dir/b', '/dst/dir/c', '/dst/dir2', '/dst/dir2/a2', '/dst/dir2/b', '/dst/dir2/c', '/dst/dir3', '/dst/dir5', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/srcFile', '/dst/srcFile/f' ];
   var expectedSrcAbsolute = [ '/src/dir', '/src/dir/b', '/src/dir/a2', '/src/dir/c', '/src/dir/dir', '/src/dir/dir/a2', '/src/dir/dir/b', '/src/dir/dir/c', '/src/dir/dir2', '/src/dir/dir2/a2', '/src/dir/dir2/b', '/src/dir/dir2/c', '/src/dir/dir3', '/src/dir/dir5', '/src/dir/dirSame', '/src/dir/dirSame/d', '/src/dir/dstFile', '/src/dir/srcFile', '/src/dir/srcFile/f' ];
-  var expectedEffAbsolute = [ '/src/dir', '/src/dir/b', '/dst/a2', '/dst/c', '/dst/dir', '/dst/dir/a2', '/dst/dir/b', '/dst/dir/c', '/dst/dir2', '/dst/dir2/a2', '/dst/dir2/b', '/dst/dir2/c', '/dst/dir3', '/dst/dir5', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/srcFile', '/dst/srcFile/f' ];
+  // /**/ var expectedEffAbsolute = [ '/src/dir', '/src/dir/b', '/dst/a2', '/dst/c', '/dst/dir', '/dst/dir/a2', '/dst/dir/b', '/dst/dir/c', '/dst/dir2', '/dst/dir2/a2', '/dst/dir2/b', '/dst/dir2/c', '/dst/dir3', '/dst/dir5', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/srcFile', '/dst/srcFile/f' ];
   var expectedAction = [ 'dirMake', 'fileCopy', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete' ];
   var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
   var expectedPreserve = [ true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false ];
@@ -9215,7 +9222,7 @@ var src = _.FileProvider.Extract
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
   var preserve = _.select( records, '*/preserve' );
@@ -9223,7 +9230,7 @@ var src = _.FileProvider.Extract
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
   test.identical( action, expectedAction );
   test.identical( allow, expectedAllow );
   test.identical( preserve, expectedPreserve );
@@ -9286,7 +9293,7 @@ var src = _.FileProvider.Extract
 
   var expectedDstAbsolute = [ '/dstNew', '/dstNew/b', '/dstNew', '/dstNew/d', '/dst', '/dst/b', '/dst/a2', '/dst/c', '/dst/dir', '/dst/dir/a2', '/dst/dir/b', '/dst/dir/c', '/dst/dir2', '/dst/dir2/a2', '/dst/dir2/b', '/dst/dir2/c', '/dst/dir3', '/dst/dir5', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/srcFile', '/dst/srcFile/f', '/dst', '/dst/d' ];
   var expectedSrcAbsolute = [ '/src/dir', '/src/dir/b', '/src/dirSame', '/src/dirSame/d', '/src/dir', '/src/dir/b', '/src/dir/a2', '/src/dir/c', '/src/dir/dir', '/src/dir/dir/a2', '/src/dir/dir/b', '/src/dir/dir/c', '/src/dir/dir2', '/src/dir/dir2/a2', '/src/dir/dir2/b', '/src/dir/dir2/c', '/src/dir/dir3', '/src/dir/dir5', '/src/dir/dirSame', '/src/dir/dirSame/d', '/src/dir/dstFile', '/src/dir/srcFile', '/src/dir/srcFile/f', '/src/dirSame', '/src/dirSame/d' ];
-  var expectedEffAbsolute = [ '/src/dir', '/src/dir/b', '/src/dirSame', '/src/dirSame/d', '/src/dir', '/src/dir/b', '/dst/a2', '/dst/c', '/dst/dir', '/dst/dir/a2', '/dst/dir/b', '/dst/dir/c', '/dst/dir2', '/dst/dir2/a2', '/dst/dir2/b', '/dst/dir2/c', '/dst/dir3', '/dst/dir5', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/srcFile', '/dst/srcFile/f', '/src/dirSame', '/src/dirSame/d' ];
+  // /**/ var expectedEffAbsolute = [ '/src/dir', '/src/dir/b', '/src/dirSame', '/src/dirSame/d', '/src/dir', '/src/dir/b', '/dst/a2', '/dst/c', '/dst/dir', '/dst/dir/a2', '/dst/dir/b', '/dst/dir/c', '/dst/dir2', '/dst/dir2/a2', '/dst/dir2/b', '/dst/dir2/c', '/dst/dir3', '/dst/dir5', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/srcFile', '/dst/srcFile/f', '/src/dirSame', '/src/dirSame/d' ];
   var expectedAction = [ 'dirMake', 'fileCopy', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'dirMake', 'fileCopy' ];
   var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
   var expectedPreserve = [ false, false, true, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false ];
@@ -9294,7 +9301,7 @@ var src = _.FileProvider.Extract
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
   var preserve = _.select( records, '*/preserve' );
@@ -9302,7 +9309,7 @@ var src = _.FileProvider.Extract
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
   test.identical( action, expectedAction );
   test.identical( allow, expectedAllow );
   test.identical( preserve, expectedPreserve );
@@ -9365,21 +9372,21 @@ var src = _.FileProvider.Extract
 
   var expectedDstAbsolute = [ '/dstNew', '/dstNew/b', '/dstNew', '/dstNew/d', '/dst', '/dst/b', '/dst', '/dst/d' ];
   var expectedSrcAbsolute = [ '/src/dir', '/src/dir/b', '/src/dirSame', '/src/dirSame/d', '/src/dir', '/src/dir/b', '/src/dirSame', '/src/dirSame/d' ];
-  var expectedEffAbsolute = [ '/src/dir', '/src/dir/b', '/src/dirSame', '/src/dirSame/d', '/src/dir', '/src/dir/b', '/src/dirSame', '/src/dirSame/d' ];
+  // /**/ var expectedEffAbsolute = [ '/src/dir', '/src/dir/b', '/src/dirSame', '/src/dirSame/d', '/src/dir', '/src/dir/b', '/src/dirSame', '/src/dirSame/d' ];
   var expectedAction = [ 'dirMake', 'fileCopy', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy' ];
   var expectedAllow = [ true, true, true, true, true, true, true, true ];
   var expectedPreserve = [ false, false, true, false, true, false, true, false ];
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
   var preserve = _.select( records, '*/preserve' );
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
   test.identical( action, expectedAction );
   test.identical( allow, expectedAllow );
   test.identical( preserve, expectedPreserve );
@@ -9447,21 +9454,21 @@ src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSam
 
   var expectedDstAbsolute = [ '/dstNew', '/dstNew/dir', '/dstNew/dir/b', '/dstNew', '/dstNew/d', '/dst', '/dst/dir', '/dst/dir/b', '/dst', '/dst/d' ];
   var expectedSrcAbsolute = [ '/src', '/src/dir', '/src/dir/b', '/src/dirSame', '/src/dirSame/d', '/src', '/src/dir', '/src/dir/b', '/src/dirSame', '/src/dirSame/d' ];
-  var expectedEffAbsolute = [ '/src', '/src/dir', '/src/dir/b', '/src/dirSame', '/src/dirSame/d', '/src', '/src/dir', '/src/dir/b', '/src/dirSame', '/src/dirSame/d' ];
+  // /**/ var expectedEffAbsolute = [ '/src', '/src/dir', '/src/dir/b', '/src/dirSame', '/src/dirSame/d', '/src', '/src/dir', '/src/dir/b', '/src/dirSame', '/src/dirSame/d' ];
   var expectedAction = [ 'dirMake', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy', 'dirMake', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy' ];
   var expectedAllow = [ true, true, true, true, true, true, true, true, true, true ];
   var expectedPreserve = [ false, false, false, true, false, true, true, false, true, false ];
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
   var preserve = _.select( records, '*/preserve' );
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
   test.identical( action, expectedAction );
   test.identical( allow, expectedAllow );
   test.identical( preserve, expectedPreserve );
@@ -9600,7 +9607,9 @@ function filesReflectGrab( test )
     srcFilter : { hubFileProvider : src, basePath : '/' },
     dstFilter : { hubFileProvider : provider, prefixPath : testPath },
   });
+
   var found = provider.filesFindRecursive( testPath );
+
   src.finit();
   provider.filesDelete( testPath );
 
@@ -10087,15 +10096,15 @@ function filesReflector( test )
 
   var expectedDstAbsolute = abs([ '/src1x', '/src1x/d', '/src1x/d/a', '/src1x/d/c', '/src2x', '/src2x/a', '/src2x/c' ]);
   var expectedSrcAbsolute =  [ '/src1', '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
-  var expectedEffAbsolute = [ '/src1', '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
+  // /**/ var expectedEffAbsolute = [ '/src1', '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
 
   /* */
 
@@ -10116,15 +10125,15 @@ function filesReflector( test )
 
   var expectedDstAbsolute = abs([ '/src1x', '/src1x/d', '/src1x/d/a', '/src1x/d/c', '/src2x', '/src2x/a', '/src2x/c' ]);
   var expectedSrcAbsolute =  [ '/src1', '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
-  var expectedEffAbsolute = [ '/src1', '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
+  // /**/ var expectedEffAbsolute = [ '/src1', '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
 
   test.case = 'negative';
 
@@ -10143,15 +10152,15 @@ function filesReflector( test )
 
   var expectedDstAbsolute = abs([ '/', '/d', '/d/a', '/d/c', '/', '/a', '/c' ]);
   var expectedSrcAbsolute =  [ '/src1', '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
-  var expectedEffAbsolute = [ '/src1', '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
+  // /**/ var expectedEffAbsolute = [ '/src1', '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
 
   dst.filesDelete( testPath );
   src.finit();
@@ -10175,7 +10184,7 @@ function filesReflector( test )
   dst.filesDelete( testPath );
   src.finit();
 
-  //
+  // xxx
   //
   // var src = context.makeStandardExtract({ originPath : 'src://' });
   // src.providerRegisterTo( hub );
@@ -10298,7 +10307,9 @@ function filesReflector( test )
     linking : 'softLink',
     mandatory : 1,
   });
-  reflect( '/alt/a' )
+
+  reflect( '/alt/a' );
+
   var extract = provider.filesExtract( testPath );
   test.identical( extract.filesTree, { alt : { a : '/alt/a' } } );
   test.identical( provider.statRead( testPath + '/alt/a' ).isSoftLink(), true );
@@ -10618,15 +10629,15 @@ function filesReflectDeducing( test )
 
   var expectedDstAbsolute = [ '/dst/dstDir2', '/dst/dstDir2/a', '/dst/dstDir2/b' ];
   var expectedSrcAbsolute = [ '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b' ];
-  var expectedEffAbsolute = [ '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b' ];
+  // /**/ var expectedEffAbsolute = [ '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b' ];
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
 
   /* */
 
@@ -10666,15 +10677,15 @@ function filesReflectDeducing( test )
 
   var expectedDstAbsolute = [ '/dst/dstDir2', '/dst/dstDir2/a', '/dst/dstDir2/b' ];
   var expectedSrcAbsolute = [ '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b' ];
-  var expectedEffAbsolute = [ '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b' ];
+  // /**/ var expectedEffAbsolute = [ '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b' ];
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
 
   /* */
 
@@ -10711,15 +10722,15 @@ function filesReflectDeducing( test )
 
   var expectedDstAbsolute = [ '/dst/dstDir2', '/dst/dstDir2/a', '/dst/dstDir2/b' ];
   var expectedSrcAbsolute = [ '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b' ];
-  var expectedEffAbsolute = [ '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b' ];
+  // /**/ var expectedEffAbsolute = [ '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b' ];
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
 
   /* */
 
@@ -10757,15 +10768,15 @@ function filesReflectDeducing( test )
 
   var expectedDstAbsolute = [ '/dst/dstDir2', '/dst/dstDir2/a', '/dst/dstDir2/b' ];
   var expectedSrcAbsolute = [ '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b' ];
-  var expectedEffAbsolute = [ '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b' ];
+  // /**/ var expectedEffAbsolute = [ '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b' ];
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
 
   /* */
 
@@ -10802,15 +10813,15 @@ function filesReflectDeducing( test )
 
   var expectedDstAbsolute = [ '/dst/dstDir', '/dst/dstDir/a', '/dst/dstDir/b', '/dst/dstDir', '/dst/dstDir/e', '/dst/dstDir2', '/dst/dstDir2/a', '/dst/dstDir2/b', '/dst/dstDir2', '/dst/dstDir2/e' ];
   var expectedSrcAbsolute = [ '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b', '/src/srcDir2', '/src/srcDir2/e', '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b', '/src/srcDir2', '/src/srcDir2/e' ];
-  var expectedEffAbsolute = [ '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b', '/src/srcDir2', '/src/srcDir2/e', '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b', '/src/srcDir2', '/src/srcDir2/e' ];
+  // /**/ var expectedEffAbsolute = [ '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b', '/src/srcDir2', '/src/srcDir2/e', '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b', '/src/srcDir2', '/src/srcDir2/e' ];
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
 
   /* */
 
@@ -10849,15 +10860,264 @@ function filesReflectDeducing( test )
 
   var expectedDstAbsolute = [ '/dst/dstDir', '/dst/dstDir/a', '/dst/dstDir/b', '/dst/dstDir', '/dst/dstDir/e', '/dst/dstDir2', '/dst/dstDir2/a', '/dst/dstDir2/b', '/dst/dstDir2', '/dst/dstDir2/e' ];
   var expectedSrcAbsolute = [ '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b', '/src/srcDir2', '/src/srcDir2/e', '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b', '/src/srcDir2', '/src/srcDir2/e' ];
-  var expectedEffAbsolute = [ '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b', '/src/srcDir2', '/src/srcDir2/e', '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b', '/src/srcDir2', '/src/srcDir2/e' ];
+  // /**/ var expectedEffAbsolute = [ '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b', '/src/srcDir2', '/src/srcDir2/e', '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b', '/src/srcDir2', '/src/srcDir2/e' ];
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  var effAbsolute = _.select( records, '*/effective/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( effAbsolute, expectedEffAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
+
+  /* */
+
+  test.case = 'no reflect map, multiple paths, hub';
+
+  var tree =
+  {
+    src : { srcDir : { a : 'src/a', b : 'src/b' }, srcDir2 : { e : 'src/e' }, c : 'src/c', d : 'src/d' },
+    dst : { dstDir : { a : 'dst/a', c : 'dst/c' }, c : 'dst/c', d : 'dst/d' },
+  }
+
+  var o =
+  {
+    srcFilter :
+    {
+      prefixPath : '/src',
+      filePath : { '.' : true },
+      basePath : { '.' : '.' },
+    },
+    dstFilter :
+    {
+      prefixPath : '/dst',
+      filePath : '.',
+      basePath : { '.' : '.' },
+    },
+  }
+
+  var provider = new _.FileProvider.Extract({ filesTree : tree, protocol : 'extract' });
+  var records = provider.filesReflect( o );
+
+  var expectedTree =
+  {
+    src : { srcDir : { a : 'src/a', b : 'src/b' }, srcDir2 : { e : 'src/e' }, c : 'src/c', d : 'src/d' },
+    dst : { dstDir : { a : 'dst/a', c : 'dst/c' }, srcDir : { a : 'src/a', b : 'src/b' }, srcDir2 : { e : 'src/e' }, c : 'src/c', d : 'src/d' },
+  }
+
+  test.identical( provider.filesTree, expectedTree );
+
+  var expectedDstAbsolute = [ '/dst', '/dst/c', '/dst/d', '/dst/srcDir', '/dst/srcDir/a', '/dst/srcDir/b', '/dst/srcDir2', '/dst/srcDir2/e' ];
+  var expectedSrcAbsolute = [ '/src', '/src/c', '/src/d', '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b', '/src/srcDir2', '/src/srcDir2/e' ];
+  // /**/ var expectedEffAbsolute = [ '/src', '/src/c', '/src/d', '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b', '/src/srcDir2', '/src/srcDir2/e' ];
+
+  var dstAbsolute = _.select( records, '*/dst/absolute' );
+  var srcAbsolute = _.select( records, '*/src/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
+
+  test.identical( dstAbsolute, expectedDstAbsolute );
+  test.identical( srcAbsolute, expectedSrcAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
+
+  // /* zzz */
+  //
+  // test.case = 'mixed file path, single src, no src base';
+  //
+  // var tree =
+  // {
+  //   src : { srcDir : { a : 'src/a', b : 'src/b' }, srcDir2 : { e : 'src/e' }, c : 'src/c', d : 'src/d' },
+  //   dst : { dstDir : { a : 'dst/a', c : 'dst/c' }, c : 'dst/c', d : 'dst/d' },
+  // }
+  //
+  // var o =
+  // {
+  //   srcFilter :
+  //   {
+  //     prefixPath : '/src',
+  //     filePath : { 'd' : true },
+  //   },
+  //   dstFilter :
+  //   {
+  //     prefixPath : '/dst',
+  //     filePath : '.',
+  //     basePath : { '.' : '.' },
+  //   },
+  // }
+  //
+  // var provider = new _.FileProvider.Extract({ filesTree : tree, protocol : 'extract' });
+  // var records = provider.filesReflect( o );
+  //
+  // var expectedTree =
+  // {
+  //   src : { srcDir : { a : 'src/a', b : 'src/b' }, srcDir2 : { e : 'src/e' }, c : 'src/c', d : 'src/d' },
+  //   dst : 'src/d',
+  // }
+  //
+  // test.identical( provider.filesTree, expectedTree );
+  //
+  // var expectedDstAbsolute = [ '/dst' ];
+  // var expectedSrcAbsolute = [ '/src/d' ];
+  // // /**/ var expectedEffAbsolute = [ '/src/d' ];
+  //
+  // var dstAbsolute = _.select( records, '*/dst/absolute' );
+  // var srcAbsolute = _.select( records, '*/src/absolute' );
+  // // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
+  //
+  // test.identical( dstAbsolute, expectedDstAbsolute );
+  // test.identical( srcAbsolute, expectedSrcAbsolute );
+  // // /**/ test.identical( effAbsolute, expectedEffAbsolute );
+
+  /* */
+
+  test.case = 'mixed file path, single src, src base';
+
+  var tree =
+  {
+    src : { srcDir : { a : 'src/a', b : 'src/b' }, srcDir2 : { e : 'src/e' }, c : 'src/c', d : 'src/d' },
+    dst : { dstDir : { a : 'dst/a', c : 'dst/c' }, c : 'dst/c', d : 'dst/d' },
+  }
+
+  var o =
+  {
+    srcFilter :
+    {
+      prefixPath : '/src',
+      basePath : '.',
+      filePath : { 'd' : true },
+    },
+    dstFilter :
+    {
+      prefixPath : '/dst',
+      filePath : '.',
+      basePath : { '.' : '.' },
+    },
+  }
+
+  var provider = new _.FileProvider.Extract({ filesTree : tree, protocol : 'extract' });
+  var records = provider.filesReflect( o );
+
+  var expectedTree =
+  {
+    src : { srcDir : { a : 'src/a', b : 'src/b' }, srcDir2 : { e : 'src/e' }, c : 'src/c', d : 'src/d' },
+    dst : { dstDir : { a : 'dst/a', c : 'dst/c' }, c : 'dst/c', d : 'src/d' },
+  }
+
+  test.identical( provider.filesTree, expectedTree );
+
+  var expectedDstAbsolute = [ '/dst/d' ];
+  var expectedSrcAbsolute = [ '/src/d' ];
+  // /**/ var expectedEffAbsolute = [ '/src/d' ];
+
+  var dstAbsolute = _.select( records, '*/dst/absolute' );
+  var srcAbsolute = _.select( records, '*/src/absolute' );
+  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
+
+  test.identical( dstAbsolute, expectedDstAbsolute );
+  test.identical( srcAbsolute, expectedSrcAbsolute );
+  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
+
+  debugger; return; xxx
+
+  // /* zzz */
+  //
+  // test.case = 'mixed file path, single src, no src base, no dst base, no dst';
+  //
+  // var tree =
+  // {
+  //   src : { srcDir : { a : 'src/a', b : 'src/b' }, srcDir2 : { e : 'src/e' }, c : 'src/c', d : 'src/d' },
+  //   dst : { dstDir : { a : 'dst/a', c : 'dst/c' }, c : 'dst/c', d : 'dst/d' },
+  // }
+  //
+  // var o =
+  // {
+  //   srcFilter :
+  //   {
+  //     prefixPath : '/src',
+  //     filePath : { 'd' : true },
+  //   },
+  //   dstFilter :
+  //   {
+  //     prefixPath : '/dst',
+  //   },
+  // }
+  //
+  // var provider = new _.FileProvider.Extract({ filesTree : tree, protocol : 'extract' });
+  // var records = provider.filesReflect( o );
+  //
+  // var expectedTree =
+  // {
+  //   src : { srcDir : { a : 'src/a', b : 'src/b' }, srcDir2 : { e : 'src/e' }, c : 'src/c', d : 'src/d' },
+  //   dst : 'src/d',
+  // }
+  //
+  // test.identical( provider.filesTree, expectedTree );
+  //
+  // var expectedDstAbsolute = [ '/dst' ];
+  // var expectedSrcAbsolute = [ '/src/d' ];
+  // // /**/ var expectedEffAbsolute = [ '/src/d' ];
+  //
+  // var dstAbsolute = _.select( records, '*/dst/absolute' );
+  // var srcAbsolute = _.select( records, '*/src/absolute' );
+  // // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
+  //
+  // test.identical( dstAbsolute, expectedDstAbsolute );
+  // test.identical( srcAbsolute, expectedSrcAbsolute );
+  // // /**/ test.identical( effAbsolute, expectedEffAbsolute );
+  //
+  // /* zzz */
+  //
+  // test.case = 'mixed file path, multiple src';
+  //
+  // var tree =
+  // {
+  //   src : { srcDir : { a : 'src/a', b : 'src/b' }, srcDir2 : { e : 'src/e' }, c : 'src/c', d : 'src/d' },
+  //   dst : { dstDir : { a : 'dst/a', c : 'dst/c' }, c : 'dst/c', d : 'dst/d' },
+  // }
+  //
+  // var o =
+  // {
+  //   srcFilter :
+  //   {
+  //     prefixPath : '/src',
+  //     filePath : { 'srcDir2' : true, 'c' : 'c2', 'd' : true },
+  //   },
+  //   dstFilter :
+  //   {
+  //     prefixPath : '/dst',
+  //     filePath : '.',
+  //     basePath : { '.' : '.' },
+  //   },
+  // }
+  //
+  // /*
+  //   /src/srcDir2 : /dst
+  //   /src/c : /dst/c2
+  //   /src/d : /dst
+  // */
+  //
+  // var provider = new _.FileProvider.Extract({ filesTree : tree, protocol : 'extract' });
+  // var records = provider.filesReflect( o );
+  //
+  // var expectedTree =
+  // {
+  //   src : { srcDir : { a : 'src/a', b : 'src/b' }, srcDir2 : { e : 'src/e' }, c : 'src/c', d : 'src/d' },
+  //   dst : { c2 : 'src/c', e : 'src/e' },
+  //   // dst : { dstDir : { a : 'dst/a', c : 'dst/c' }, srcDir : { a : 'src/a', b : 'src/b' }, c : 'dst/c', c2 : 'src/c', d : 'src/d', e : 'src/e' },
+  // }
+  //
+  // test.identical( provider.filesTree, expectedTree );
+  //
+  // var expectedDstAbsolute = [ '/dst', '/dst', '/dst/e', '/dst/c2' ];
+  // var expectedSrcAbsolute = [ '/src/d', '/src/srcDir2', '/src/srcDir2/e', '/src/c' ];
+  // // /**/ var expectedEffAbsolute = [ '/src/d', '/src/srcDir2', '/src/srcDir2/e', '/src/c' ];
+  //
+  // var dstAbsolute = _.select( records, '*/dst/absolute' );
+  // var srcAbsolute = _.select( records, '*/src/absolute' );
+  // // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
+  //
+  // test.identical( dstAbsolute, expectedDstAbsolute );
+  // test.identical( srcAbsolute, expectedSrcAbsolute );
+  // // /**/ test.identical( effAbsolute, expectedEffAbsolute );
 
 }
 

@@ -6774,6 +6774,29 @@ function filesReflectMutuallyExcluding( test )
     return path.s.join( testPath, filePath )
   }
 
+  function filesTreeAdapt( extract )
+  {
+    //simplifies trees comparison by converting terminals to strings
+
+    if( !( provider instanceof _.FileProvider.HardDrive ) )
+    return;
+
+    extract.filesFindRecursive
+    ({
+      filePath : '/',
+      includingTerminals : 1,
+      includingDirs : 0,
+      includingStem : 0,
+      onDown : handleDown
+    })
+
+    function handleDown( record )
+    {
+      extract.fileWrite( record.absolute, extract.fileRead( record.absolute ) )
+      return record;
+    }
+  }
+
   /* */
 
   test.case = 'terminals, no dst, exclude src root'
@@ -6803,6 +6826,7 @@ function filesReflectMutuallyExcluding( test )
   debugger;
   var records = provider.filesReflect( o );
   var extract2 = provider.filesExtract( testPath );
+  filesTreeAdapt( extract2 );
   provider.filesDelete( testPath );
 
   var expectedTree =
@@ -6871,6 +6895,7 @@ function filesReflectMutuallyExcluding( test )
   extract.filesReflectTo( provider, testPath );
   var records = provider.filesReflect( o );
   var extract2 = provider.filesExtract( testPath );
+  filesTreeAdapt( extract2 );
   provider.filesDelete( testPath );
 
   var expectedTree =
@@ -6940,6 +6965,7 @@ function filesReflectMutuallyExcluding( test )
   extract.filesReflectTo( provider, testPath );
   var records = provider.filesReflect( o );
   var extract2 = provider.filesExtract( testPath );
+  filesTreeAdapt( extract2 );
   provider.filesDelete( testPath );
 
   var expectedTree =
@@ -7107,6 +7133,7 @@ function filesReflectMutuallyExcluding( test )
   extract.filesReflectTo( provider, testPath );
   var records = provider.filesReflect( o );
   var extract2 = provider.filesExtract( testPath );
+  filesTreeAdapt( extract2 );
   provider.filesDelete( testPath );
 
   var expectedTree =
@@ -7192,6 +7219,7 @@ function filesReflectMutuallyExcluding( test )
   extract.filesReflectTo( provider, testPath );
   var records = provider.filesReflect( o );
   var extract2 = provider.filesExtract( testPath );
+  filesTreeAdapt( extract2 );
   provider.filesDelete( testPath );
 
   var expectedTree =
@@ -7276,6 +7304,7 @@ function filesReflectMutuallyExcluding( test )
   extract.filesReflectTo( provider, testPath );
   var records = provider.filesReflect( o );
   var extract2 = provider.filesExtract( testPath );
+  filesTreeAdapt( extract2 );
   provider.filesDelete( testPath );
 
   var expectedTree =
@@ -7365,6 +7394,7 @@ function filesReflectMutuallyExcluding( test )
   extract.filesReflectTo( provider, testPath );
   var records = provider.filesReflect( o );
   var extract2 = provider.filesExtract( testPath );
+  filesTreeAdapt( extract2 );
   provider.filesDelete( testPath );
 
   var expectedTree =
@@ -7466,6 +7496,7 @@ function filesReflectMutuallyExcluding( test )
   extract.filesReflectTo( provider, testPath );
   var records = provider.filesReflect( o );
   var extract2 = provider.filesExtract( testPath );
+  filesTreeAdapt( extract2 );
   provider.filesDelete( testPath );
 
   var expectedTree =

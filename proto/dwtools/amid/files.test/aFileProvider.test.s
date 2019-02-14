@@ -37804,6 +37804,12 @@ function hardLinkExperiment( test )
   let terminalPath = test.context.pathFor( 'written/hardLinkExperiment/terminal' );
   let linkPath = test.context.pathFor( 'written/hardLinkExperiment/hardLink' );
 
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  {
+    test.identical( 1,1 );
+    return;
+  }
+
   provider.filesDelete( testPath );
   provider.fileWrite( terminalPath, terminalPath );
   provider.hardLink( linkPath, terminalPath );

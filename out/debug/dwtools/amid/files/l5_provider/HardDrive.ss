@@ -1159,7 +1159,11 @@ function fileDeleteAct( o )
       try
       {
         File.renameSync( filePath,tempPath );
-        File.unlink( tempPath );
+        File.unlink( tempPath, ( err ) =>
+        {
+          if( err )
+          throw err;
+        });
       }
       catch( err )
       {

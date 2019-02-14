@@ -248,6 +248,94 @@ function dirTempClose( filePath )
 
 //
 
+function pathDirTempForOpen( filePath )
+{
+  _.assert( arguments.length === 1 );
+  _.assert( !!this.fileProvider );
+  _.assert( this.isAbsolute( filePath ) );
+
+  filePath = this.normalize( filePath );
+
+  if( !this.pathDirTempForMap )
+  {
+    this.pathDirTempForMap = Object.create( null );
+    let tempPath = this.dirTemp();
+    this.pathDirTempForMap[ devicePathGet( tempPath ) ] = tempPath;
+  }
+
+  let devicePath = devicePathGet( filePath );
+
+  if( this.pathDirTempForMap[ devicePath ] )
+  return this.pathDirTempForMap[ devicePath ];
+
+  let result = this.pathDirTempForAnother( filePath );
+
+  this.pathDirTempForMap[ devicePath ] = result;
+
+  return result;
+
+  /* */
+
+  function devicePathGet( path )
+  {
+    return path.substring( 0, path.indexOf( '/', 1 ) )
+  }
+
+}
+
+//
+
+function pathDirTempForAnother( filePath )
+{
+  _.assert( arguments.length === 1 );
+  _.assert( !!this.fileProvider );
+  _.assert( this.isAbsolute( filePath ) );
+  _.assert( this.isNormalized( filePath ) );
+
+  let path;
+  let dirsPath = this.chainToRoot( this.dir( filePath ) );
+
+  for( let i = 0, l = dirsPath.length ; i < l ; i++ )
+  {
+    path = dirsPath[ i ] + '/tmp.tmp';
+    if( this.fileProvider.fileExists( path ) )
+    return path;
+
+    try
+    {
+      this.fileProvider.dirMakeAct({ filePath : path, sync : 1 });
+      return path;
+    }
+    catch( err )
+    {
+      this.fileProvider.logger.log( 'pathDirTempForOpen: can`t create temp dir at :', path );
+    }
+  }
+
+  return path;
+}
+
+//
+
+function pathDirTempForClose( tempDirPath )
+{
+  _.assert( arguments.length === 1 );
+  _.assert( !!this.fileProvider );
+  _.assert( this.isAbsolute( filePath ) );
+  _.assert( this.isNormalized( filePath ) );
+
+  let devicePath = tempDirPath.substring( 0, tempDirPath.indexOf( '/', 1 ) );
+
+  _.assert( this.pathDirTempForMap );
+  _.assert( this.pathDirTempForMap[ devicePath ], 'Not found temp dir for device:', devicePath );
+  _.assert( this.pathDirTempForMap[ devicePath ] === tempDirPath, 'Known and provided temp dir path are different:', this.pathDirTempForMap[ devicePath ], tempDirPath );
+
+  this.fileProvider.filesDelete( tempDirPath );
+}
+
+
+//
+
 function forCopy_pre( routine, args )
 {
 
@@ -419,6 +507,10 @@ let Proto =
   dirTempFor,
   dirTempOpen,
   dirTempClose,
+
+  pathDirTempForOpen,
+  pathDirTempForAnother,
+  pathDirTempForClose,
 
   forCopy,
   firstAvailable,

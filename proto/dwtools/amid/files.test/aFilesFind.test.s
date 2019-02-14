@@ -10214,6 +10214,11 @@ function filesReflector( test )
   });
   reflect( '/' );
   var extract = provider.filesExtract( testPath );
+  if( provider instanceof _.FileProvider.HardDrive )
+  {
+    var files = extract.filesFindRecursive({ filePath : '/', includingTerminals : 1, includingDirs : 0, includingStem : 0 })
+    _.each( files, ( f ) => extract.fileWrite( f.absolute, extract.fileRead( f.absolute ) ) )
+  }
   test.identical( extract.filesTree, src.filesTree );
 
   dst.filesDelete( testPath );
@@ -10231,6 +10236,11 @@ function filesReflector( test )
   });
   reflect( '/alt/a' );
   var extract = provider.filesExtract( testPath );
+  if( provider instanceof _.FileProvider.HardDrive )
+  {
+    var files = extract.filesFindRecursive({ filePath : '/', includingTerminals : 1, includingDirs : 0, includingStem : 0 })
+    _.each( files, ( f ) => extract.fileWrite( f.absolute, extract.fileRead( f.absolute ) ) )
+  }
   test.identical( extract.filesTree, { alt : { a : '/alt/a' } } );
 
   dst.filesDelete( testPath );
@@ -10273,6 +10283,11 @@ function filesReflector( test )
     }
   }
   var extract = provider.filesExtract( testPath );
+  if( provider instanceof _.FileProvider.HardDrive )
+  {
+    var files = extract.filesFindRecursive({ filePath : '/', includingTerminals : 1, includingDirs : 0, includingStem : 0 })
+    _.each( files, ( f ) => extract.fileWrite( f.absolute, extract.fileRead( f.absolute ) ) )
+  }
   test.identical( extract.filesTree, expected );
 
   dst.filesDelete( testPath );
@@ -10290,6 +10305,11 @@ function filesReflector( test )
   });
   reflect( '/alt/a' )
   var extract = provider.filesExtract( testPath );
+  if( provider instanceof _.FileProvider.HardDrive )
+  {
+    var files = extract.filesFindRecursive({ filePath : '/', includingTerminals : 1, includingDirs : 0, includingStem : 0 })
+    _.each( files, ( f ) => extract.fileWrite( f.absolute, extract.fileRead( f.absolute ) ) )
+  }
   test.identical( extract.filesTree, { alt : { a : '/alt/a' } } );
 
   dst.filesDelete( testPath );
@@ -10310,9 +10330,16 @@ function filesReflector( test )
 
   reflect( '/alt/a' );
 
-  var extract = provider.filesExtract( testPath );
-  test.identical( extract.filesTree, { alt : { a : '/alt/a' } } );
-  test.identical( provider.statRead( testPath + '/alt/a' ).isSoftLink(), true );
+  if( provider instanceof _.FileProvider.HardDrive )
+  {
+    test.shouldThrowErrorSync( () => provider.fileRead( abs( '/alt/a' ) ))
+  }
+  else
+  {
+    var extract = provider.filesExtract( testPath );
+    test.identical( extract.filesTree, { alt : { a : '/alt/a' } } );
+    test.identical( provider.statRead( testPath + '/alt/a' ).isSoftLink(), true );
+  }
 
   dst.filesDelete( testPath );
   src.finit();

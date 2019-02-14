@@ -12723,7 +12723,7 @@ function filesDeleteTrivial( test )
 
 }
 
-filesDelete.timeOut = 20000;
+filesDeleteTrivial.timeOut = 30000;
 
 //
 

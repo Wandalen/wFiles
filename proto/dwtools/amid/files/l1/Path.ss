@@ -259,7 +259,8 @@ function pathDirTempForOpen( filePath )
   if( !this.pathDirTempForMap )
   {
     this.pathDirTempForMap = Object.create( null );
-    let tempPath = this.dirTemp();
+    let tempPath = this.join( this.dirTemp(), 'tmp-' + _.idWithGuid() + '.tmp' );
+    this.fileProvider.dirMake( tempPath );
     this.pathDirTempForMap[ devicePathGet( tempPath ) ] = tempPath;
   }
 
@@ -297,7 +298,7 @@ function pathDirTempForAnother( filePath )
 
   for( let i = 0, l = dirsPath.length ; i < l ; i++ )
   {
-    path = dirsPath[ i ] + '/tmp.tmp';
+    path = dirsPath[ i ] + '/tmp-' + _.idWithGuid() + '.tmp';
     if( this.fileProvider.fileExists( path ) )
     return path;
 
@@ -321,8 +322,8 @@ function pathDirTempForClose( tempDirPath )
 {
   _.assert( arguments.length === 1 );
   _.assert( !!this.fileProvider );
-  _.assert( this.isAbsolute( filePath ) );
-  _.assert( this.isNormalized( filePath ) );
+  _.assert( this.isAbsolute( tempDirPath ) );
+  _.assert( this.isNormalized( tempDirPath ) );
 
   let devicePath = tempDirPath.substring( 0, tempDirPath.indexOf( '/', 1 ) );
 
@@ -332,7 +333,7 @@ function pathDirTempForClose( tempDirPath )
 
   delete this.pathDirTempForMap[ devicePath ];
 
-  this.fileProvider.filesDelete( tempDirPath );
+  this.fileProvider.filesDelete({ filePath : tempDirPath, safe : 0 });
 }
 
 

@@ -3961,11 +3961,33 @@ function filesDelete_body( o )
     for( let f1 = 0 ; f1 < o.result.length ; f1++ )
     {
       let file1 = o.result[ f1 ];
-      if( file1.isActual && ( file1.isTransient || file1.isTerminal ) )
-      continue;
+
+      if( file1.isActual /* && ( file1.isTransient || file1.isTerminal ) */ )
+      {
+        if( file1.isTerminal )
+        continue;
+
+        if( file1.isTransient )
+        {
+          /* delete dir if:
+            recursive : 0
+            its empty
+            terminals from dir will be included in result
+          */
+
+          if( !o.recursive )
+          continue;
+          if( o.recursive === 2 && o.includingTerminals )
+          continue;
+          if( provider.dirIsEmpty( file1.absolute ) )
+          continue;
+        }
+      }
 
       o.result.splice( f1, 1 );
       f1 -= 1;
+
+      if( !file1.isActual || !file1.isTransient )
       for( let f2 = f1 ; f2 >= 0 ; f2-- )
       {
         let file2 = o.result[ f2 ];

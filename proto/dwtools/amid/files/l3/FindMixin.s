@@ -543,6 +543,8 @@ filesFindSingle_body.defaults =
   onUp : [],
   onDown : [],
 
+  safe : null
+
 }
 
 // filesFindSingle_body.paths =
@@ -4145,30 +4147,49 @@ _.assert( !!filesDelete.defaults.includingDirs );
 
 //
 
-function filesDeleteTerminals( o )
+function filesDeleteTerminals_body( o )
 {
   let self = this;
 
-  o = self.filesFindLike_pre( arguments );
-
-  _.routineOptions( filesDeleteTerminals, o );
-
+  _.assertRoutineOptions( filesDeleteTerminals_body, arguments );
   _.assert( o.includingTerminals );
   _.assert( !o.includingDirs );
-  _.assert( !o.includingTransient );
+  _.assert( !o.includingTransient, 'Transient files should not be included' );
+  _.assert( o.resolvingTextLink === 0 || o.resolvingTextLink === false );
+  _.assert( o.resolvingSoftLink === 0 || o.resolvingSoftLink === false );
+  _.assert( _.numberIs( o.safe ) );
+  _.assert( arguments.length === 1 );
 
-  _.assert( 0, 'not tested' ); // qqq
+  /* */
 
-  return self.filesDelete( o );
+  let o2 = _.mapOnly( o, self.filesFind.defaults );
+
+  o2.onDown = _.arrayAppendElement( _.arrayAs( o.onDown ), handleDown );
+
+  let files = self.filesFind.body.call( self, o2 );
+
+  return files;
+
+  /* */
+
+  function handleDown( record )
+  {
+    if( o.writing )
+    self.fileDelete({ filePath : record.absolute, throwing : o.throwing, verbosity : o.verbosity });
+    return record;
+  }
 }
 
-_.routineExtend( filesDeleteTerminals, filesDelete );
+_.routineExtend( filesDeleteTerminals_body, filesDelete );
 
-var defaults = filesDeleteTerminals.defaults;
+var defaults = filesDeleteTerminals_body.defaults;
+
 defaults.recursive = 2;
 defaults.includingTerminals = 1;
 defaults.includingDirs = 0;
 defaults.includingTransient = 0;
+
+let filesDeleteTerminals = _.routineFromPreAndBody( filesFind.pre, filesDeleteTerminals_body );
 
 //
 

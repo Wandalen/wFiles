@@ -6774,6 +6774,29 @@ function filesReflectMutuallyExcluding( test )
     return path.s.join( testPath, filePath )
   }
 
+  function filesTreeAdapt( extract )
+  {
+    //simplifies trees comparison by converting terminals to strings
+
+    if( !( provider instanceof _.FileProvider.HardDrive ) )
+    return;
+
+    extract.filesFindRecursive
+    ({
+      filePath : '/',
+      includingTerminals : 1,
+      includingDirs : 0,
+      includingStem : 0,
+      onDown : handleDown
+    })
+
+    function handleDown( record )
+    {
+      extract.fileWrite( record.absolute, extract.fileRead( record.absolute ) )
+      return record;
+    }
+  }
+
   /* */
 
   test.case = 'terminals, no dst, exclude src root'
@@ -6803,6 +6826,7 @@ function filesReflectMutuallyExcluding( test )
   debugger;
   var records = provider.filesReflect( o );
   var extract2 = provider.filesExtract( testPath );
+  filesTreeAdapt( extract2 );
   provider.filesDelete( testPath );
 
   var expectedTree =
@@ -6871,6 +6895,7 @@ function filesReflectMutuallyExcluding( test )
   extract.filesReflectTo( provider, testPath );
   var records = provider.filesReflect( o );
   var extract2 = provider.filesExtract( testPath );
+  filesTreeAdapt( extract2 );
   provider.filesDelete( testPath );
 
   var expectedTree =
@@ -6940,6 +6965,7 @@ function filesReflectMutuallyExcluding( test )
   extract.filesReflectTo( provider, testPath );
   var records = provider.filesReflect( o );
   var extract2 = provider.filesExtract( testPath );
+  filesTreeAdapt( extract2 );
   provider.filesDelete( testPath );
 
   var expectedTree =
@@ -7107,6 +7133,7 @@ function filesReflectMutuallyExcluding( test )
   extract.filesReflectTo( provider, testPath );
   var records = provider.filesReflect( o );
   var extract2 = provider.filesExtract( testPath );
+  filesTreeAdapt( extract2 );
   provider.filesDelete( testPath );
 
   var expectedTree =
@@ -7192,6 +7219,7 @@ function filesReflectMutuallyExcluding( test )
   extract.filesReflectTo( provider, testPath );
   var records = provider.filesReflect( o );
   var extract2 = provider.filesExtract( testPath );
+  filesTreeAdapt( extract2 );
   provider.filesDelete( testPath );
 
   var expectedTree =
@@ -7276,6 +7304,7 @@ function filesReflectMutuallyExcluding( test )
   extract.filesReflectTo( provider, testPath );
   var records = provider.filesReflect( o );
   var extract2 = provider.filesExtract( testPath );
+  filesTreeAdapt( extract2 );
   provider.filesDelete( testPath );
 
   var expectedTree =
@@ -7365,6 +7394,7 @@ function filesReflectMutuallyExcluding( test )
   extract.filesReflectTo( provider, testPath );
   var records = provider.filesReflect( o );
   var extract2 = provider.filesExtract( testPath );
+  filesTreeAdapt( extract2 );
   provider.filesDelete( testPath );
 
   var expectedTree =
@@ -7466,6 +7496,7 @@ function filesReflectMutuallyExcluding( test )
   extract.filesReflectTo( provider, testPath );
   var records = provider.filesReflect( o );
   var extract2 = provider.filesExtract( testPath );
+  filesTreeAdapt( extract2 );
   provider.filesDelete( testPath );
 
   var expectedTree =
@@ -10214,6 +10245,11 @@ function filesReflector( test )
   });
   reflect( '/' );
   var extract = provider.filesExtract( testPath );
+  if( provider instanceof _.FileProvider.HardDrive )
+  {
+    var files = extract.filesFindRecursive({ filePath : '/', includingTerminals : 1, includingDirs : 0, includingStem : 0 })
+    _.each( files, ( f ) => extract.fileWrite( f.absolute, extract.fileRead( f.absolute ) ) )
+  }
   test.identical( extract.filesTree, src.filesTree );
 
   dst.filesDelete( testPath );
@@ -10231,6 +10267,11 @@ function filesReflector( test )
   });
   reflect( '/alt/a' );
   var extract = provider.filesExtract( testPath );
+  if( provider instanceof _.FileProvider.HardDrive )
+  {
+    var files = extract.filesFindRecursive({ filePath : '/', includingTerminals : 1, includingDirs : 0, includingStem : 0 })
+    _.each( files, ( f ) => extract.fileWrite( f.absolute, extract.fileRead( f.absolute ) ) )
+  }
   test.identical( extract.filesTree, { alt : { a : '/alt/a' } } );
 
   dst.filesDelete( testPath );
@@ -10273,6 +10314,11 @@ function filesReflector( test )
     }
   }
   var extract = provider.filesExtract( testPath );
+  if( provider instanceof _.FileProvider.HardDrive )
+  {
+    var files = extract.filesFindRecursive({ filePath : '/', includingTerminals : 1, includingDirs : 0, includingStem : 0 })
+    _.each( files, ( f ) => extract.fileWrite( f.absolute, extract.fileRead( f.absolute ) ) )
+  }
   test.identical( extract.filesTree, expected );
 
   dst.filesDelete( testPath );
@@ -10290,6 +10336,11 @@ function filesReflector( test )
   });
   reflect( '/alt/a' )
   var extract = provider.filesExtract( testPath );
+  if( provider instanceof _.FileProvider.HardDrive )
+  {
+    var files = extract.filesFindRecursive({ filePath : '/', includingTerminals : 1, includingDirs : 0, includingStem : 0 })
+    _.each( files, ( f ) => extract.fileWrite( f.absolute, extract.fileRead( f.absolute ) ) )
+  }
   test.identical( extract.filesTree, { alt : { a : '/alt/a' } } );
 
   dst.filesDelete( testPath );
@@ -10310,9 +10361,16 @@ function filesReflector( test )
 
   reflect( '/alt/a' );
 
-  var extract = provider.filesExtract( testPath );
-  test.identical( extract.filesTree, { alt : { a : '/alt/a' } } );
-  test.identical( provider.statRead( testPath + '/alt/a' ).isSoftLink(), true );
+  if( provider instanceof _.FileProvider.HardDrive )
+  {
+    test.shouldThrowErrorSync( () => provider.fileRead( abs( '/alt/a' ) ))
+  }
+  else
+  {
+    var extract = provider.filesExtract( testPath );
+    test.identical( extract.filesTree, { alt : { a : '/alt/a' } } );
+    test.identical( provider.statRead( testPath + '/alt/a' ).isSoftLink(), true );
+  }
 
   dst.filesDelete( testPath );
   src.finit();
@@ -10541,9 +10599,20 @@ function filesReflectLinkWithHub( test )
   test.is( dst.isTerminal( _.path.join( dstPath, 'terminal' ) ) );
   test.is( !dst.isTerminal( _.path.join( dstPath, 'link' ) ) );
   test.is( dst.isSoftLink( _.path.join( dstPath, 'link' ) ) );
-  var got = dst.fileRead( _.path.join( dstPath, 'link' ) );
-  var expected = 'terminal';
-  test.identical( got, expected );
+  if( dst instanceof _.FileProvider.HardDrive )
+  {
+    test.shouldThrowErrorSync( () =>
+    {
+      dst.fileRead( _.path.join( dstPath, 'link' ) )
+    })
+  }
+  else
+  {
+    var got = dst.fileRead( _.path.join( dstPath, 'link' ) );
+    var expected = 'terminal';
+    test.identical( got, expected );
+  }
+
 
   /* */
 
@@ -12685,6 +12754,22 @@ function filesDeleteTrivial( test )
   extract.finit();
   test.identical( _.mapKeys( hub.providersWithProtocolMap ), [ 'current' ] );
 
+  //
+
+  test.open( 'safe' );
+
+  var tempDirPath = path.pathDirTempForAnother( path.normalize( __filename ) );
+
+  test.case = 'delete temp dir, safe : 0'
+  test.shouldThrowErrorSync( () => provider.filesDelete({ filePath : tempDirPath, safe : 1 }) );
+  test.is( provider.fileExists( tempDirPath ) );
+
+  test.case = 'delete temp dir, safe : 1'
+  provider.filesDelete({ filePath : tempDirPath, safe : 0 })
+  test.is( !provider.fileExists( tempDirPath ) )
+
+  test.close( 'safe' );
+
   /* - */
 
   if( !softLinkIsSupported )
@@ -13177,7 +13262,7 @@ function filesDeleteAsync( test )
     return provider.filesDelete({ filePath : terminalPath, sync : 0 })
     .thenKeep( ( deleted ) =>
     {
-      test.identical( _.select( deleted, '*/relative' ), [ './terminal' ] );
+      test.identical( _.select( deleted, '*/relative' ), [ '.' ] );
       var stat = provider.statResolvedRead( terminalPath );
       test.identical( stat, null );
       return true;
@@ -13625,7 +13710,6 @@ function filesDeleteDeletingEmptyDirs( test )
   var deleted = _.select( got, '*/relative');
   var expected =
   [
-    '..',
     '.',
     './file',
     './dir1',
@@ -14265,20 +14349,20 @@ function filesDeleteTerminals( test )
 
   //
 
-  test.case = 'deleting empty dirs';
-  provider.filesDelete( testPath );
-  tree.readToProvider( provider, testPath );
-  provider.filesDeleteTerminals({ filePath : testPath, deletingEmptyDirs : 1 });
-  var expected =
-  [
-    './dir1',
-    './dir1/dir2',
-    './dir1/dir2/emptyDir2',
-    './dir1/emptyDir1',
-    './emptyDir0'
-  ]
-  var got = provider.filesFindRecursive({ filePath : testPath, outputFormat : 'relative', includingStem : 0 });
-  test.identical( got, expected );
+  // test.case = 'deleting empty dirs';
+  // provider.filesDelete( testPath );
+  // tree.readToProvider( provider, testPath );
+  // provider.filesDeleteTerminals({ filePath : testPath, deletingEmptyDirs : 1 });
+  // var expected =
+  // [
+  //   './dir1',
+  //   './dir1/dir2',
+  //   './dir1/dir2/emptyDir2',
+  //   './dir1/emptyDir1',
+  //   './emptyDir0'
+  // ]
+  // var got = provider.filesFindRecursive({ filePath : testPath, outputFormat : 'relative', includingStem : 0 });
+  // test.identical( got, expected );
 
   //
 
@@ -16809,6 +16893,64 @@ experiment.experimental = 1;
 //
 // filesFindExperiment.experimental = 1;
 
+//
+
+function filesReflectExperiment( test )
+{
+  let context = this;
+  let path = context.provider.path;
+  let provider = context.provider;
+
+  var testPath = path.join( context.testSuitePath, test.name );
+
+  var srcPath = path.join( testPath, 'src' );
+  var dstPath = path.join( testPath, 'dst' );
+
+  var filesTree =
+  {
+    'src' : { a : 'a', b : { c : '' } },
+    'dst' : {},
+  }
+
+  _.FileProvider.Extract.readToProvider
+  ({
+    dstProvider : _.fileProvider,
+    dstPath : testPath,
+    filesTree : filesTree,
+    allowWrite : 1,
+    allowDelete : 1,
+    sameTime : 1,
+  });
+
+  test.case = 'directory for terminal is not created, as the result fileCopy fails'
+
+  var filesReflectOptions =
+  {
+    reflectMap : { [ srcPath ] : dstPath },
+    dstDeleting: 0,
+    dstRewriting: 1,
+    dstRewritingByDistinct: true,
+    includingDirs: 0,
+    includingDst: 1,
+    includingTerminals: 1,
+    recursive: 2,
+    srcDeleting: 1
+  }
+
+  provider.filesReflect( filesReflectOptions );
+
+  var expected =
+  {
+    a : 'a', b : { c : '' }
+  }
+  var got = provider.filesExtract( dstPath );
+  test.identical( got.filesTree, expected )
+
+}
+
+filesReflectExperiment.experimental = 1;
+
+
 // --
 // declare
 // --
@@ -16892,6 +17034,7 @@ var Self =
     // experiment,
     // experiment2,
     // filesFindExperiment,
+    filesReflectExperiment
 
   },
 

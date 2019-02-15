@@ -257,12 +257,7 @@ function pathDirTempForOpen( filePath )
   filePath = this.normalize( filePath );
 
   if( !this.pathDirTempForMap )
-  {
-    this.pathDirTempForMap = Object.create( null );
-    let tempPath = this.join( this.dirTemp(), 'tmp-' + _.idWithGuid() + '.tmp' );
-    this.fileProvider.dirMake( tempPath );
-    this.pathDirTempForMap[ devicePathGet( tempPath ) ] = tempPath;
-  }
+  this.pathDirTempForMap = Object.create( null );
 
   let devicePath = devicePathGet( filePath );
 
@@ -294,6 +289,15 @@ function pathDirTempForAnother( filePath )
   _.assert( this.isNormalized( filePath ) );
 
   let path;
+  var osTempDir = this.dirTemp();
+
+  if( devicePathGet( osTempDir ) === devicePathGet( filePath ) )
+  {
+    path = this.join( osTempDir, 'tmp-' + _.idWithGuid() + '.tmp' );
+    this.fileProvider.dirMakeAct({ filePath : path, sync : 1 });
+    return path;
+  }
+
   let dirsPath = this.chainToRoot( this.dir( filePath ) );
 
   for( let i = 0, l = dirsPath.length ; i < l ; i++ )
@@ -311,6 +315,13 @@ function pathDirTempForAnother( filePath )
     {
       this.fileProvider.logger.log( 'pathDirTempForOpen: can`t create temp dir at :', path );
     }
+  }
+
+  /* */
+
+  function devicePathGet( path )
+  {
+    return path.substring( 0, path.indexOf( '/', 1 ) )
   }
 
   return path;

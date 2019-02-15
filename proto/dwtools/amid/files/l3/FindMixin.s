@@ -143,8 +143,6 @@ function filesFind_pre( routine, args )
   {
     _.assert( o.maskPreset === 'default.exclude', 'Not supported preset', o.maskPreset );
     o.filter = o.filter || Object.create( null );
-    if( o.filter.formed == 5 )
-    debugger;
     if( !o.filter.formed || o.filter.formed < 5 )
     o.filter.maskAll = _.files.regexpMakeSafe( o.filter.maskAll || null );
   }
@@ -183,12 +181,11 @@ function _filesFilterForm( o )
   if( o.filePath instanceof _.FileRecordFilter )
   {
     debugger;
-    // _.assert( o.filter.isEmpty(), 'Filter should be empty if it passed via {- o.filePath -} option' );
     o.filter.pathsExtend( o.filePath ).and( o.filePath );
     o.filePath = null;
   }
 
-  if( o.maskPreset && !o.filter.formed ) // !!!
+  if( o.maskPreset && !o.filter.formed )
   {
     _.assert( o.maskPreset === 'default.exclude', 'Not supported preset', o.maskPreset );
     let filter2 = { maskAll : _.files.regexpMakeSafe() };
@@ -204,22 +201,26 @@ function _filesFilterForm( o )
       '{- o.filePath -} and {- o.filter./*inFilePath*/filePath -} should be exactly same or null'
     );
 
-    // debugger;
     if( o.filePath !== null )
     o.filter.filePath = o.filePath;
     o.filter.form();
-    // debugger;
+
     if( _.mapIs( o.filter.filePath ) )
     o.filePath = o.filter.srcPathGet();
     else
     o.filePath = o.filter.filePath;
+
+  }
+
+  if( !o.filePath )
+  {
+    o.filePath = o.filter.filePath
   }
 
   /* get keys */
 
   if( _.mapIs( o.filePath ) )
   {
-    // debugger;
     _.assert( _.all( _.mapVals( o.filePath ), ( f ) => !!f ) );
     o.filePath = _.mapKeys( o.filePath );
   }
@@ -227,9 +228,7 @@ function _filesFilterForm( o )
   if( _.arrayIs( o.filePath ) )
   _.strsSort( o.filePath );
 
-  // debugger;
   _.assert( _.arraySetIdentical( _.mapKeys( o.filter.filePath ), o.filePath ) );
-  // _.assert( o.filePath === o.filter.filePath ); // yyy
   _.assert( !self.hub || o.filter.hubFileProvider === self.hub );
   _.assert( !!o.filter.effectiveFileProvider );
   _.assert( path.s.allAreNormalized( o.filePath ) )
@@ -2695,7 +2694,7 @@ function filesReflectSingle_body( o )
         for( let d in dirsMap )
         if( _.strBegins( dirPath, d ) )
         {
-          debugger;
+          // debugger;
           dirsMap[ dirPath ] = true;
           break;
         }
@@ -3031,16 +3030,16 @@ function filesReflect_pre( routine, args )
     if( o.srcFilter.filePath !== '.' && o.reflectMap !== '.' )
     if( o.srcFilter.filePath !== o.reflectMap )
     {
-      let filePath1 = path.fileMapExtend( null, o.srcFilter.filePath );
-      let filePath2 = path.fileMapExtend( null, o.reflectMap );
+      let filePath1 = path.pathMapExtend( null, o.srcFilter.filePath );
+      let filePath2 = path.pathMapExtend( null, o.reflectMap );
       _.assert( _.entityIdentical( filePath1, filePath2 ) );
     }
     o.srcFilter.filePath = o.reflectMap;
     delete o.reflectMap;
   }
 
-  o.srcFilter.filePathWithDestination( o.dstFilter );
-  o.reflectMap = o.srcFilter.filePath;
+  o.srcFilter.pairFilePathRefine( o.dstFilter );
+  o.reflectMap = o.srcFilter.filePath; // xxx
 
   // // _.assert( o.srcFilter.dst === null || o.srcFilter.dst === o.dstFilter );
   // // _.assert( o.dstFilter.src === null || o.dstFilter.src === o.srcFilter );
@@ -3093,13 +3092,13 @@ function filesReflect_pre( routine, args )
   //   let dstPath = o.dstFilter.filePathArrayGet();
   //   // debugger;
   //
-  //   o.reflectMap = path.fileMapExtend( null, o.srcFilter.filePath, dstPath );
-  //   // o.reflectMap = path.fileMapExtend( null, o.srcFilter.filePath, o.dstFilter.filePath ); // yyy
+  //   o.reflectMap = path.pathMapExtend( null, o.srcFilter.filePath, dstPath );
+  //   // o.reflectMap = path.pathMapExtend( null, o.srcFilter.filePath, o.dstFilter.filePath ); // yyy
   //
   // }
   // else
   // {
-  //   o.reflectMap = path.fileMapExtend( null, o.reflectMap );
+  //   o.reflectMap = path.pathMapExtend( null, o.reflectMap );
   //   // o.srcFilter.filePath = _.mapKeys( o.reflectMap ); // yyy
   //   // o.dstFilter.filePath = _.arrayFlattenOnce( _.mapVals( o.reflectMap ) ).filter( ( e ) => _.strIs( e ) ? e : false ); // yyy
   // }
@@ -3110,7 +3109,7 @@ function filesReflect_pre( routine, args )
   // // o.srcFilter.dst = o.dstFilter;
   // // o.dstFilter.dst = o.srcFilter;
   //
-  // o.srcFilter.useDestination( o.dstFilter );
+  // o.srcFilter.pairWithDst( o.dstFilter );
   //
   // if( _.arrayIs( o.dstFilter.filePath ) && o.dstFilter.filePath.length === 0 )
   // o.dstFilter.filePath = _.entityShallowClone( o.dstFilter.prefixPath );
@@ -3152,10 +3151,12 @@ function filesReflect_body( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( o.srcFilter.formed <= 3 );
   _.assert( o.dstFilter.formed <= 3 );
+  _.assert( o.dstFilter.src === o.srcFilter );
+  _.assert( o.srcFilter.dst === o.dstFilter );
 
   /* */
 
-  let groupedByDstMap = path.fileMapGroupByDst( o.reflectMap );
+  let groupedByDstMap = path.pathMapGroupByDst( o.reflectMap );
   for( let dstPath in groupedByDstMap )
   {
 
@@ -3163,79 +3164,57 @@ function filesReflect_body( o )
     let o2 = _.mapOnly( o, self.filesReflectSingle.body.defaults );
 
     o2.result = [];
-    o2.dstFilter = o2.dstFilter.clone();
-    o2.srcFilter = o2.srcFilter.clone();
-    o2.srcFilter.useDestination( o2.dstFilter );
+    o2.srcFilter = o2.srcFilter.pairFor( srcPath, dstPath )
+    o2.dstFilter = o2.srcFilter.dst;
 
-    /* */
+    o2.srcPath = o2.srcFilter.filePath;
+    o2.dstPath = o2.dstFilter.filePathSimplest();
 
-    // debugger;
-    let filePath = path.fileMapExtend( null, srcPath, dstPath );
-
-    try
-    {
-      // o2.dstFilter = o2.dstFilter.clone();
-      if( _.mapIs( o2.dstFilter.basePath ) )
-      for( let dstPath2 in groupedByDstMap )
-      if( dstPath !== dstPath2 )
-      {
-        _.assert( !!o2.dstFilter.basePath );
-        _.assert( _.strIs( o2.dstFilter.basePath[ dstPath2 ] ), () => 'No base path for ' + dstPath2 );
-        delete o2.dstFilter.basePath[ dstPath2 ];
-      }
-      // o2.dstFilter.filePath = dstPath;
-      o2.dstFilter.filePath = filePath;
-      // debugger;
-      o2.dstFilter.form();
-      // debugger;
-      // o2.dstPath = o2.dstFilter.filePath;
-      o2.dstPath = o2.dstFilter.filePathSimplest();
-      _.assert( _.strIs( o2.dstPath ) );
-      filePath = o2.dstFilter.filePath;
-    }
-    catch( err )
-    {
-      throw _.err( 'Failed to form destination filter\n', err );
-    }
-
-    // debugger;
-
-    try
-    {
-      // o2.srcFilter = o2.srcFilter.clone();
-      // _.assert( o2.srcFilter.filePath === null || o2.srcFilter.filePath === srcPath );
-      // o2.srcFilter.filePath = srcPath;
-      o2.srcFilter.filePath = filePath;
-      _.assert( o2.srcFilter.filePath === o2.dstFilter.filePath );
-      // o2.srcFilter.useDestination( o2.dstFilter );
-      // debugger;
-      o2.srcFilter.form();
-      // debugger;
-      o2.srcPath = o2.srcFilter.filePath;
-      // o2.dstFilter.filePath = o2.srcFilter.filePath;
-      _.assert( o2.srcFilter.filePath === o2.dstFilter.filePath );
-    }
-    catch( err )
-    {
-      throw _.err( 'Failed to form source filter\n', err );
-    }
-
-    /* */
-
-    // debugger;
-    _.assert( o2.srcFilter.filePath === o2.srcPath );
-    _.assert( o2.srcFilter.filePath === o2.dstFilter.filePath );
-    // debugger;
-
-    // o2.srcFilter.useDestination( o2.dstFilter );
-    // o2.srcFilter.form();
-    // o2.dstFilter.form();
+    // o2.dstFilter = o2.dstFilter.clone();
+    // o2.srcFilter = o2.srcFilter.clone();
+    // o2.srcFilter.pairWithDst( o2.dstFilter );
     //
-    // debugger;
-    // _.assert( o2.srcPath === o2.srcFilter.filePath );
-    // debugger;
+    // let filePath = path.pathMapExtend( null, srcPath, dstPath );
+    //
+    // try
+    // {
+    //   if( _.mapIs( o2.dstFilter.basePath ) )
+    //   for( let dstPath2 in groupedByDstMap )
+    //   if( dstPath !== dstPath2 )
+    //   {
+    //     _.assert( !!o2.dstFilter.basePath );
+    //     _.assert( _.strIs( o2.dstFilter.basePath[ dstPath2 ] ), () => 'No base path for ' + dstPath2 );
+    //     delete o2.dstFilter.basePath[ dstPath2 ];
+    //   }
+    //   o2.dstFilter.filePath = filePath;
+    //   o2.dstFilter.form();
+    //   o2.dstPath = o2.dstFilter.filePathSimplest();
+    //   _.assert( _.strIs( o2.dstPath ) );
+    //   filePath = o2.dstFilter.filePath;
+    // }
+    // catch( err )
+    // {
+    //   throw _.err( 'Failed to form destination filter\n', err );
+    // }
+    //
+    // try
+    // {
+    //   o2.srcFilter.filePath = filePath;
+    //   _.assert( o2.srcFilter.filePath === o2.dstFilter.filePath );
+    //   o2.srcFilter.form();
+    //   o2.srcPath = o2.srcFilter.filePath;
+    //   _.assert( o2.srcFilter.filePath === o2.dstFilter.filePath );
+    // }
+    // catch( err )
+    // {
+    //   throw _.err( 'Failed to form source filter\n', err );
+    // }
+    //
+    // /* */
+    //
+    // _.assert( o2.srcFilter.filePath === o2.srcPath );
+    // _.assert( o2.srcFilter.filePath === o2.dstFilter.filePath );
 
-    // debugger;
     let src = o2.srcFilter.effectiveFileProvider;
     let r = src.filesReflectSingle.body.call( src, o2 );
     cons.push( r );
@@ -3246,6 +3225,8 @@ function filesReflect_body( o )
     _.arrayAppendArray( o.result, o2.result );
 
   }
+
+  /* */
 
   if( _.any( cons, ( con ) => _.consequenceIs( con ) ) )
   {

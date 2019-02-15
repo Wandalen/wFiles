@@ -276,7 +276,7 @@ function _providerDefaults( o )
   _.assert( _.objectIs( o ), 'Expects map { o }' );
 
   if( o.verbosity === null && self.verbosity !== null )
-  o.verbosity = _.numberClamp( self.verbosity - 3, 0, 9 );
+  o.verbosity = _.numberClamp( self.verbosity - 4, 0, 9 );
 
   for( let k in self.ProviderDefaults )
   {
@@ -320,7 +320,7 @@ function _preFilePathScalarWithoutProviderDefaults( routine, args )
 
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
   _.assert( _.objectIs( args[ 0 ] ) || path.is( args[ 0 ] ), 'Expects options map or path' );
-  _.assert( args && args.length === 1, 'Routine ' + routine.name + ' expects exactly one arguments' );
+  _.assert( args && args.length === 1, 'Routine ' + routine.name + ' expects exactly one argument' );
 
   let o = args[ 0 ];
 
@@ -344,8 +344,8 @@ function _preFilePathScalarWithProviderDefaults( routine, args )
 
   let o = self._preFilePathScalarWithoutProviderDefaults.apply( self, arguments );
 
-  if( o.verbosity === null )
-  o.verbosity = _.numberClamp( self.verbosity - 4, 0, 9 );
+  // if( o.verbosity === null )
+  // o.verbosity = _.numberClamp( self.verbosity - 4, 0, 9 );
 
   self._providerDefaults( o );
 
@@ -360,7 +360,7 @@ function _preFilePathVectorWithoutProviderDefaults( routine, args )
   let path = self.path;
 
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
-  _.assert( args && args.length === 1, 'Routine ' + routine.name + ' expects exactly one arguments' );
+  _.assert( args && args.length === 1, 'Routine ' + routine.name + ' expects exactly one argument' );
 
   let o = args[ 0 ];
 
@@ -388,11 +388,45 @@ function _preFilePathVectorWithProviderDefaults( routine, args )
 
   let o = self._preFilePathVectorWithoutProviderDefaults.apply( self, arguments );
 
-  if( o.verbosity === null )
-  o.verbosity = _.numberClamp( self.verbosity - 4, 0, 9 );
-
   self._providerDefaults( o );
 
+  return o;
+}
+
+//
+
+function _preFileFilterWithoutProviderDefaults( routine, args )
+{
+  let self = this;
+  let path = self.path;
+
+  _.assert( arguments.length === 2, 'Expects exactly two arguments' );
+  _.assert( args && args.length === 1, 'Routine ' + routine.name + ' expects exactly one argument' );
+
+  let o = args[ 0 ];
+
+  // if( path.like( o ) )
+  // o = { fileFilter : path.from( o ) };
+  // else if( _.arrayIs( o ) )
+  // o = { fileFilter : path.s.from( o ) };
+  // else if( _.arrayIs( o.fileFilter ) )
+  // o.fileFilter = path.s.from( o.fileFilter );
+
+  o.fileFilter = self.recordFilter( o.fileFilter );
+
+  _.routineOptions( routine, o );
+  _.assert( path.s.allAreAbsolute( o.fileFilter.filePath ), () => 'Expects absolute path {-o.fileFilter-}, but got ' + _.strQuote( o.fileFilter.filePath ) );
+
+  return o;
+}
+
+//
+
+function _preFileFilterWithProviderDefaults( routine, args )
+{
+  let self = this;
+  let o = self._preFileFilterWithoutProviderDefaults.apply( self, arguments );
+  self._providerDefaults( o );
   return o;
 }
 
@@ -436,8 +470,8 @@ function _preSrcDstPathWithProviderDefaults( routine, args )
 
   let o = self._preSrcDstPathWithoutProviderDefaults.apply( self, arguments );
 
-  if( o.verbosity === null )
-  o.verbosity = _.numberClamp( self.verbosity - 4, 0, 9 );
+  // if( o.verbosity === null )
+  // o.verbosity = _.numberClamp( self.verbosity - 4, 0, 9 );
 
   self._providerDefaults( o );
 
@@ -2111,6 +2145,10 @@ var operates = filesSize.operates = Object.create( null );
 
 //
 
+/*
+qqq : extend test, check cases when does not exist, check throwing option
+*/
+
 function fileSize_body( o )
 {
   let self = this;
@@ -2118,6 +2156,9 @@ function fileSize_body( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
 
   let stat = self.statResolvedRead( o );
+
+  if( !o.throwing && stat === null )
+  return null;
 
   _.sure( _.objectIs( stat ) );
 
@@ -2324,8 +2365,8 @@ function fileRead_pre( routine, args )
 
   let o = self._preFilePathScalarWithoutProviderDefaults.apply( self, arguments );
 
-  if( o.verbosity === null )
-  o.verbosity = _.numberClamp( self.verbosity - 5, 0, 9 );
+  // if( o.verbosity === null )
+  // o.verbosity = _.numberClamp( self.verbosity - 5, 0, 9 );
 
   self._providerDefaults( o );
 
@@ -7536,6 +7577,8 @@ let Proto =
   _preFilePathScalarWithProviderDefaults,
   _preFilePathVectorWithoutProviderDefaults,
   _preFilePathVectorWithProviderDefaults,
+  _preFileFilterWithoutProviderDefaults,
+  _preFileFilterWithProviderDefaults,
   _preSrcDstPathWithoutProviderDefaults,
   _preSrcDstPathWithProviderDefaults,
   EncodersGenerate,

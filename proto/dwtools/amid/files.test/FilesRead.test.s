@@ -46,12 +46,12 @@ function onSuiteEnd()
 // read
 // --
 
-function filesRead( test )
+function filesReadOld( test )
 {
   test.case = 'basic';
 
   var files = _.fileProvider.filesGlob({ filePath : _.path.normalize( __dirname ) + '/**' });
-  var read = _.fileProvider.filesRead({ paths : files, preset : 'js' });
+  var read = _.fileProvider.filesReadOld({ paths : files, preset : 'js' });
 
   test.identical( read.errs, {} );
   test.is( read.err === undefined );
@@ -72,7 +72,7 @@ function filesRead( test )
     provider.fileWrite( p, path );
     return p;
   });
-  var result = provider.filesRead
+  var result = provider.filesReadOld
   ({
     paths : paths,
     sync : 1,
@@ -94,7 +94,7 @@ function filesRead( test )
   paths.push( paths[ 0 ] + '_' );
   test.shouldThrowError( () =>
   {
-    provider.filesRead
+    provider.filesReadOld
     ({
       paths : paths,
       sync : 1,
@@ -112,7 +112,7 @@ function filesRead( test )
     return p;
   });
   paths.push( paths[ 0 ] + '_' );
-  var result = provider.filesRead
+  var result = provider.filesReadOld
   ({
     paths : paths,
     sync : 1,
@@ -726,7 +726,7 @@ var Self =
   tests :
   {
 
-    filesRead : filesRead,
+    filesReadOld : filesReadOld,
     filesTreeRead : filesTreeRead,
     filesTreeWrite : filesTreeWrite,
     // readToProvider : readToProvider,

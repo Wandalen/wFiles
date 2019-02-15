@@ -162,7 +162,6 @@ function filesReflectSingle_body( o )
 
   if( _.mapIs( srcPath ) )
   {
-    debugger;
     _.assert( _.mapVals( srcPath ).length === 1 );
     _.assert( _.mapVals( srcPath )[ 0 ] === true || _.mapVals( srcPath )[ 0 ] === dstPath );
     srcPath = _.mapKeys( srcPath )[ 0 ];

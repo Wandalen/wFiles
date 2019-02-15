@@ -1374,7 +1374,7 @@ function recordFilter( test )
 
   filter.form();
   logger.log( filter );
-  test.identical( filter.filePath, '/src' );
+  test.identical( filter.filePath, { '/src' : true } );
   test.identical( filter.prefixPath, null );
   test.identical( filter.postfixPath, null );
   test.identical( filter.basePath, { '/src' : '/src' } );
@@ -1393,7 +1393,7 @@ function recordFilter( test )
 
   filter.form();
   logger.log( filter );
-  test.identical( filter.filePath, '/src' );
+  test.identical( filter.filePath, { '/src' : true } );
   test.identical( filter.prefixPath, null );
   test.identical( filter.postfixPath, null );
   test.identical( filter.basePath, { '/src' : '/src' } );
@@ -1412,7 +1412,7 @@ function recordFilter( test )
 
   filter.form();
   logger.log( filter );
-  test.identical( filter.filePath, [ '/src/a', '/src/b' ] );
+  test.identical( filter.filePath, { '/src/a' : true, '/src/b' : true } );
   test.identical( filter.prefixPath, null );
   test.identical( filter.postfixPath, null );
   test.identical( filter.basePath, { '/src/a' : '/src/a', '/src/b' : '/src/b' } );
@@ -1431,7 +1431,7 @@ function recordFilter( test )
 
   filter.form();
   logger.log( filter );
-  test.identical( filter.filePath, [ '/src/a', '/src/a/src/b' ] );
+  test.identical( filter.filePath, { '/src/a' : true, '/src/a/src/b' : true } );
   test.identical( filter.prefixPath, null );
   test.identical( filter.postfixPath, null );
   test.identical( filter.basePath, { '/src/a' : '/src/a', '/src/a/src/b' : '/src/a' } );
@@ -1625,10 +1625,11 @@ function recordFilterPrefixesApply( test )
   test.case = 'trivial';
 
   var f1 = extract1.recordFilter();
-  var expectedBasePath = { '/dir/filter1/f' : '/dir/filter1/proto', '/dir/filter1/d' : '/dir/filter1/proto', '/dir/filter1/ex' : '/dir/filter1/proto' }
+  // var expectedBasePath = { '/dir/filter1/f' : '/dir/filter1/proto', '/dir/filter1/d' : '/dir/filter1/proto', '/dir/filter1/ex' : '/dir/filter1/proto' }
+  var expectedBasePath = '/dir/filter1/proto';
   var expectedFilePath = { '/dir/filter1/f' : true, '/dir/filter1/d' : true, '/dir/filter1/ex' : false }
 
-  f1./*inFilePath*/filePath = { 'f' : true, 'd' : true, 'ex' : false }
+  f1.filePath = { 'f' : true, 'd' : true, 'ex' : false }
   f1.prefixPath = '/dir/filter1'
   f1.basePath = './proto';
 
@@ -1636,17 +1637,18 @@ function recordFilterPrefixesApply( test )
 
   test.identical( f1.prefixPath, null );
   test.identical( f1.basePath, expectedBasePath );
-  test.identical( f1./*inFilePath*/filePath, expectedFilePath );
+  test.identical( f1.filePath, expectedFilePath );
 
   /* */
 
   test.case = 'base path is relative and current';
 
   var f1 = extract1.recordFilter();
-  var expectedBasePath = { '/dir/filter1/f' : '/dir/filter1','/dir/filter1/ex' : '/dir/filter1' }
+  // var expectedBasePath = { '/dir/filter1/f' : '/dir/filter1','/dir/filter1/ex' : '/dir/filter1' }
+  var expectedBasePath = '/dir/filter1';
   var expectedFilePath = { '/dir/filter1/f' : true, '/dir/filter1/ex' : false }
 
-  f1./*inFilePath*/filePath = { 'f' : true, 'ex' : false }
+  f1.filePath = { 'f' : true, 'ex' : false }
   f1.prefixPath = '/dir/filter1'
   f1.basePath = '.';
 
@@ -1654,7 +1656,7 @@ function recordFilterPrefixesApply( test )
 
   test.identical( f1.prefixPath, null );
   test.identical( f1.basePath, expectedBasePath );
-  test.identical( f1./*inFilePath*/filePath, expectedFilePath );
+  test.identical( f1.filePath, expectedFilePath );
 
   /* */
 
@@ -1664,7 +1666,7 @@ function recordFilterPrefixesApply( test )
   var expectedBasePath = null;
   var expectedFilePath = { '/dir/filter1/f' : true, '/dir/filter1/ex' : false }
 
-  f1./*inFilePath*/filePath = { 'f' : true, 'ex' : false }
+  f1.filePath = { 'f' : true, 'ex' : false }
   f1.prefixPath = '/dir/filter1'
   f1.basePath = null;
 
@@ -1672,17 +1674,18 @@ function recordFilterPrefixesApply( test )
 
   test.identical( f1.prefixPath, null );
   test.identical( f1.basePath, expectedBasePath );
-  test.identical( f1./*inFilePath*/filePath, expectedFilePath );
+  test.identical( f1.filePath, expectedFilePath );
 
   /* */
 
   test.case = 'prefix is relative';
 
   var f1 = extract1.recordFilter();
-  var expectedBasePath = { './dir/f' : '/base', './dir/ex' : '/base' };
+  // var expectedBasePath = { './dir/f' : '/base', './dir/ex' : '/base' };
+  var expectedBasePath = '/base';
   var expectedFilePath = { './dir/f' : true, './dir/ex' : false }
 
-  f1./*inFilePath*/filePath = { 'f' : true, 'ex' : false }
+  f1.filePath = { 'f' : true, 'ex' : false }
   f1.prefixPath = './dir'
   f1.basePath = '/base';
 
@@ -1690,22 +1693,23 @@ function recordFilterPrefixesApply( test )
 
   test.identical( f1.prefixPath, null );
   test.identical( f1.basePath, expectedBasePath );
-  test.identical( f1./*inFilePath*/filePath, expectedFilePath );
+  test.identical( f1.filePath, expectedFilePath );
 
   /* */
 
   test.case = 'some in file paths are absolute';
 
   var f1 = extract1.recordFilter();
-  var expectedBasePath =
-  {
-    '/dir/filter1/f' : '/dir/filter1/proto',
-    '/dir/filter1/d' : '/dir/filter1/proto',
-    '/dir/ex' : '/dir/filter1/proto',
-  }
+  // var expectedBasePath =
+  // {
+  //   '/dir/filter1/f' : '/dir/filter1/proto',
+  //   '/dir/filter1/d' : '/dir/filter1/proto',
+  //   '/dir/ex' : '/dir/filter1/proto',
+  // }
+  var expectedBasePath = '/dir/filter1/proto';
   var expectedFilePath = { '/dir/filter1/f' : true, '/dir/filter1/d' : true, '/dir/ex' : false }
 
-  f1./*inFilePath*/filePath = { 'f' : true, '/dir/filter1/d' : true, '/dir/ex' : false }
+  f1.filePath = { 'f' : true, '/dir/filter1/d' : true, '/dir/ex' : false }
   f1.prefixPath = '/dir/filter1'
   f1.basePath = './proto';
 
@@ -1713,23 +1717,24 @@ function recordFilterPrefixesApply( test )
 
   test.identical( f1.prefixPath, null );
   test.identical( f1.basePath, expectedBasePath );
-  test.identical( f1./*inFilePath*/filePath, expectedFilePath );
+  test.identical( f1.filePath, expectedFilePath );
 
   /* */
 
   test.case = 'base path is absolute';
 
   var f1 = extract1.recordFilter();
-  var expectedBasePath =
-  {
-    '/dir/filter1/d' : '/proto',
-    '/dir/ex' : '/proto',
-    '/dir/filter1/f' : '/proto',
-  }
+  // var expectedBasePath =
+  // {
+  //   '/dir/filter1/d' : '/proto',
+  //   '/dir/ex' : '/proto',
+  //   '/dir/filter1/f' : '/proto',
+  // }
 
+  var expectedBasePath = '/proto';
   var expectedFilePath = { '/dir/filter1/f' : true, '/dir/filter1/d' : true, '/dir/ex' : false }
 
-  f1./*inFilePath*/filePath = { 'f' : true, '/dir/filter1/d' : true, '/dir/ex' : false }
+  f1.filePath = { 'f' : true, '/dir/filter1/d' : true, '/dir/ex' : false }
   f1.prefixPath = '/dir/filter1'
   f1.basePath = '/proto';
 
@@ -1737,14 +1742,15 @@ function recordFilterPrefixesApply( test )
 
   test.identical( f1.prefixPath, null );
   test.identical( f1.basePath, expectedBasePath );
-  test.identical( f1./*inFilePath*/filePath, expectedFilePath );
+  test.identical( f1.filePath, expectedFilePath );
 
   /* */
 
   test.case = 'no filePath';
 
   var f1 = extract1.recordFilter();
-  var expectedBasePath = { '/dir/filter1' : '/dir/filter1/proto' };
+  // var expectedBasePath = { '/dir/filter1' : '/dir/filter1/proto' };
+  var expectedBasePath = '/dir/filter1/proto';
   var expectedFilePath = '/dir/filter1';
 
   f1.prefixPath = '/dir/filter1';
@@ -1755,7 +1761,7 @@ function recordFilterPrefixesApply( test )
   test.identical( f1.prefixPath, null );
   test.identical( f1.postfixPath, null );
   test.identical( f1.basePath, expectedBasePath );
-  test.identical( f1./*inFilePath*/filePath, expectedFilePath );
+  test.identical( f1.filePath, expectedFilePath );
 
 }
 
@@ -1779,13 +1785,13 @@ function recordFilterInherit( test )
 
   f1.prefixPath = '/commonDir/filter1'
   f1.basePath = './proto';
-  f1./*inFilePath*/filePath = { 'f' : true, 'd' : true, 'ex' : false, 'f1' : true, 'd1' : true, 'ex1' : false }
+  f1.filePath = { 'f' : true, 'd' : true, 'ex' : false, 'f1' : true, 'd1' : true, 'ex1' : false }
 
   var f2 = extract1.recordFilter();
 
   f2.prefixPath = '/commonDir/filter2'
   f2.basePath = './proto';
-  f2./*inFilePath*/filePath = { 'f' : true, 'd' : true, 'ex' : false, 'f2' : true, 'd2' : true, 'ex2' : false }
+  f2.filePath = { 'f' : true, 'd' : true, 'ex' : false, 'f2' : true, 'd2' : true, 'ex2' : false }
 
   var f3 = extract1.recordFilter();
   f3.pathsInherit( f1 ).pathsInherit( f2 );

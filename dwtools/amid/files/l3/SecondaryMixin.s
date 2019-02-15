@@ -40,7 +40,153 @@ Self.shortName = 'Secondary';
 // files read
 // --
 
-function filesRead( o )
+function filesRead_pre( routine, args )
+{
+  let self = this;
+  let o = self._preFileFilterWithProviderDefaults.apply( self, arguments );
+
+  // o.fileFilter = self.recordFilter( o.fileFilter );
+  o.fileFilter.form();
+
+  return o;
+}
+
+//
+
+/*
+qqq : new filesRead requires tests
+*/
+
+function filesRead_body( o )
+{
+  let self = this;
+  let path = self.path;
+  let con = new _.Consequence();
+
+  let r = Object.create( null );
+  r.errors = [];
+  r.options = o;
+  r.dataMap = Object.create( null );
+
+  r.fileMap = Object.create( null );
+  r.dstMap = Object.create( null );
+
+  r.pathGroupedByDstMap = path.pathMapGroupByDst( o.fileFilter.filePath );
+
+  /* */
+
+  for( let dstPath in r.pathGroupedByDstMap ) ( function( dstPath )
+  {
+    let srcPath = r.pathGroupedByDstMap[ dstPath ];
+    let o2 = _.mapOnly( o, self.filesReflectSingle.body.defaults );
+
+    con.finallyGive( 1 );
+
+    o2.filter = o.fileFilter.clone();
+    o2.filter.filePath = path.pathMapExtend( null, srcPath, dstPath );
+    o2.filter.form();
+
+    // debugger;
+    // let dstDescriptor = r.dstMap[ dstPath ] = Object.create( null );
+    // // dstDescriptor.relative = o.fileFilter.relativeFor( dstPath );
+    // dstDescriptor.dstPath = dstPath;
+    // dstDescriptor.dataMap = Object.create( null );
+    // debugger;
+
+    _.Consequence.From( self.filesFind( o2 ) )
+    .finally( ( err, files ) =>
+    {
+      if( err )
+      {
+        r.errors.push( err );
+        con.take( null );
+        return null;
+      }
+      files.forEach( ( record ) => fileRead( record, dstPath ) );
+      con.take( null );
+      return null;
+    });
+
+  })( dstPath );
+
+  /* */
+
+  con.take( null );
+  con.finally( () =>
+  {
+    if( r.errors.length )
+    {
+      debugger;
+      if( o.throwing )
+      throw r.errors[ 0 ];
+      // else
+      // return null;
+    }
+    return r;
+  });
+
+  debugger;
+
+  return con.toResourceMaybe();
+
+  /* */
+
+  function fileRead( record, dstBasePath )
+  {
+
+    // let dstPath = path.join( dstBasePath, record.relative );
+    let dstPath = dstBasePath;
+    let dstDescriptor = r.dstMap[ dstPath ];
+
+    if( !dstDescriptor )
+    {
+      dstDescriptor = r.dstMap[ dstPath ] = Object.create( null );
+      // dstDescriptor.relative = o.fileFilter.relativeFor( dstPath );
+      dstDescriptor.dstPath = dstPath;
+      dstDescriptor.dataMap = Object.create( null );
+    }
+
+    try
+    {
+      r.fileMap[ record.absolute ] = dstDescriptor.dstPath;
+      r.dataMap[ record.absolute ] = self.fileRead({ filePath : record.absolute, sync : o.sync });
+      con.finallyGive( 1 );
+      _.Consequence.From( r.dataMap[ record.absolute ] )
+      .finally( ( err, data ) =>
+      {
+        if( err )
+        {
+          r.errors.push( err );
+          return null;
+        }
+        r.dataMap[ record.absolute ] = data;
+        dstDescriptor.dataMap[ record.absolute ] = data;
+        return null;
+      })
+      .finally( con );
+    }
+    catch( err )
+    {
+      r.errors.push( err );
+    }
+  }
+
+}
+
+filesRead_body.defaults =
+{
+  fileFilter : null,
+  sync : 1,
+  throwing : null,
+}
+
+//
+
+let filesRead = _.routineFromPreAndBody( filesRead_pre, filesRead_body );
+
+//
+
+function filesReadOld( o )
 {
   let self = this;
 
@@ -51,11 +197,11 @@ function filesRead( o )
 
   if( o.preset )
   {
-    _.assert( _.objectIs( filesRead.presets[ o.preset ] ), 'unknown preset',o.preset );
-    _.mapSupplementAppending( o, filesRead.presets[ o.preset ] );
+    _.assert( _.objectIs( filesReadOld.presets[ o.preset ] ), 'unknown preset',o.preset );
+    _.mapSupplementAppending( o, filesReadOld.presets[ o.preset ] );
   }
 
-  _.routineOptions( filesRead,o );
+  _.routineOptions( filesReadOld,o );
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.arrayIs( o.paths ) || _.objectIs( o.paths ) || _.strIs( o.paths ) );
 
@@ -100,20 +246,20 @@ function filesRead( o )
 
   /* */
 
-  o._filesReadEnd = _filesReadEnd;
+  o._filesReadOldEnd = _filesReadOldEnd;
   o._optionsForFileRead = _optionsForFileRead;
 
   /* begin */
 
-  _filesReadBegin();
+  _filesReadOldBegin();
 
   if( o.sync )
   {
-    return self._filesReadSync( o );
+    return self._filesReadOldSync( o );
   }
   else
   {
-    return self._filesReadAsync( o );
+    return self._filesReadOldAsync( o );
   }
 
   /* - */
@@ -141,7 +287,7 @@ function filesRead( o )
 
   /* */
 
-  function _filesReadBegin()
+  function _filesReadOldBegin()
   {
     if( !onBegin.length )
     return;
@@ -151,7 +297,7 @@ function filesRead( o )
 
   /* */
 
-  function _filesReadEnd( errs, got )
+  function _filesReadOldEnd( errs, got )
   {
     let err;
     let errsArray = [];
@@ -233,7 +379,7 @@ function filesRead( o )
 
 }
 
-filesRead.defaults =
+filesReadOld.defaults =
 {
   paths : null,
   onEach : null,
@@ -242,13 +388,11 @@ filesRead.defaults =
   preset : null,
 }
 
-// _.routineExtend( filesRead, fileRead );
+filesReadOld.defaults.__proto__ = fileRead.defaults;
 
-filesRead.defaults.__proto__ = fileRead.defaults;
+filesReadOld.presets = Object.create( null );
 
-filesRead.presets = Object.create( null );
-
-filesRead.presets.js =
+filesReadOld.presets.js =
 {
   onEnd : function format( o )
   {
@@ -264,7 +408,7 @@ filesRead.presets.js =
 
 //
 
-function _filesReadSync( o )
+function _filesReadOldSync( o )
 {
   let self = this;
 
@@ -273,8 +417,8 @@ function _filesReadSync( o )
   let read = [];
   let errs = Object.create( null );
 
-  let _filesReadEnd = o._filesReadEnd;
-  delete o._filesReadEnd;
+  let _filesReadOldEnd = o._filesReadOldEnd;
+  delete o._filesReadOldEnd;
 
   let _optionsForFileRead = o._optionsForFileRead;
   delete o._optionsForFileRead;
@@ -305,7 +449,7 @@ function _filesReadSync( o )
 
   /* end */
 
-  let result = _filesReadEnd( errs, read );
+  let result = _filesReadOldEnd( errs, read );
 
   /* */
 
@@ -314,7 +458,7 @@ function _filesReadSync( o )
 
 //
 
-function _filesReadAsync( o )
+function _filesReadOldAsync( o )
 {
   let self = this;
   let con = new _.Consequence();
@@ -325,8 +469,8 @@ function _filesReadAsync( o )
   let errs = [];
   let err = null;
 
-  let _filesReadEnd = o._filesReadEnd;
-  delete o._filesReadEnd;
+  let _filesReadOldEnd = o._filesReadOldEnd;
+  delete o._filesReadOldEnd;
 
   let _optionsForFileRead = o._optionsForFileRead;
   delete o._optionsForFileRead;
@@ -340,7 +484,7 @@ function _filesReadAsync( o )
 
     let readOptions = _optionsForFileRead( o.paths[ p ] );
 
-    _.Consequence.From( self.fileRead( readOptions ) ).got( function filesReadFileEnd( _err,arg )
+    _.Consequence.From( self.fileRead( readOptions ) ).got( function filesReadOldFileEnd( _err,arg )
     {
 
       if( _err || arg === undefined || arg === null )
@@ -361,9 +505,9 @@ function _filesReadAsync( o )
 
   /* end */
 
-  con.take( null ).got( function filesReadEnd()
+  con.take( null ).got( function filesReadOldEnd()
   {
-    let result = _filesReadEnd( errs, read );
+    let result = _filesReadOldEnd( errs, read );
     con.take( o.throwing ? err : undefined , result );
   });
 
@@ -1052,8 +1196,10 @@ let Supplement =
   // files read
 
   filesRead,
-  _filesReadAsync,
-  _filesReadSync,
+
+  filesReadOld,
+  _filesReadOldAsync,
+  _filesReadOldSync,
 
   // etc
 

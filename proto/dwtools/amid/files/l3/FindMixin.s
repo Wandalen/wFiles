@@ -544,6 +544,8 @@ filesFindSingle_body.defaults =
   onUp : [],
   onDown : [],
 
+  safe : null
+
 }
 
 // filesFindSingle_body.paths =

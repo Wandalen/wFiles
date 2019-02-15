@@ -974,6 +974,89 @@ function dirTemp( test )
   test.shouldThrowError( () => _.path.dirTempOpen( _.path.resolve( __dirname, '../..'), '/absolute/path' ) );
 }
 
+//
+
+function pathDirTempForTrivial( test )
+{
+  test.case = 'file is on same device with os temp';
+  var filePath = _.path.join( _.path.dirTemp(), 'file' );
+  var tempPath = _.path.pathDirTempForOpen( filePath );
+  test.identical( pathDeviceGet( tempPath ), pathDeviceGet( filePath ) )
+  test.is( _.path.fileProvider.isDir( tempPath ) );
+  test.will = 'second call should return same temp dir path';
+  var tempPath2 = _.path.pathDirTempForOpen( filePath );
+  test.identical( pathDeviceGet( tempPath2 ), pathDeviceGet( filePath ) )
+  test.identical( tempPath, tempPath2 );
+  _.path.pathDirTempForClose( tempPath );
+  test.is( !_.path.fileProvider.fileExists( tempPath ) );
+  test.shouldThrowErrorSync( () => _.path.pathDirTempForClose( filePath ) )
+
+  test.case = 'file is on different device';
+  var filePath = _.path.normalize( __filename );
+  var tempPath = _.path.pathDirTempForOpen( filePath );
+  test.identical( pathDeviceGet( tempPath ), pathDeviceGet( filePath ) )
+  test.is( _.path.fileProvider.isDir( tempPath ) );
+  _.path.pathDirTempForClose( tempPath );
+  test.is( !_.path.fileProvider.fileExists( tempPath ) );
+
+  test.case = 'same temp path each call'
+  var filePath = _.path.normalize( __filename );
+  var tempPath = _.path.pathDirTempForOpen( filePath );
+  var tempPath2 = _.path.pathDirTempForOpen( filePath );
+  test.identical( pathDeviceGet( tempPath ), pathDeviceGet( tempPath2 ) )
+  test.identical( tempPath,tempPath2 );
+  test.is( _.path.fileProvider.isDir( tempPath ) );
+  _.path.fileProvider.fileDelete({ filePath : tempPath, safe : 0 });
+  _.path.fileProvider.filesDelete({ filePath : tempPath2, safe : 0 });
+
+  test.case = 'new temp path each call'
+  var filePath = _.path.normalize( __filename );
+  var tempPath = _.path.pathDirTempForAnother( filePath );
+  var tempPath2 = _.path.pathDirTempForAnother( filePath );
+  test.is( _.path.fileProvider.isDir( tempPath ) );
+  test.is( _.path.fileProvider.isDir( tempPath2 ) );
+  test.notIdentical( tempPath,tempPath2 );
+  _.path.fileProvider.fileDelete({ filePath : tempPath, safe : 0 });
+  _.path.fileProvider.fileDelete({ filePath : tempPath2, safe : 0 });
+
+  //
+
+  // var filePath = _.path.join( _.path.dirTemp(), 'file' );
+  // var t1 = _.timeNow();
+  // var tempPath;
+  // for( var i = 0; i < 100; i++ )
+  // {
+  //   tempPath = _.path.pathDirTempForOpen( filePath );
+  // }
+  // var t2 = _.timeNow();
+  // logger.log( 'pathDirTempForOpen:', t2 - t1 )
+  // _.path.pathDirTempForClose( tempPath );
+
+  //
+
+  // var filePath = _.path.join( _.path.dirTemp(), 'file' );
+  // var t1 = _.timeNow();
+  // var paths = [];
+  // for( var i = 0; i < 100; i++ )
+  // {
+  //   paths.push( _.path.pathDirTempForAnother( filePath ) );
+  // }
+  // var t2 = _.timeNow();
+  // logger.log( 'pathDirTempForAnother:', t2 - t1 )
+  // _.each( paths, ( p ) =>
+  // {
+  //   _.path.fileProvider.fileDelete( p );
+  // })
+
+  /* */
+
+  function pathDeviceGet( filePath )
+  {
+    return filePath.substring( 0, filePath.indexOf( '/', 1 ) );
+  }
+}
+
+
 // --
 // declare
 // --
@@ -1020,7 +1103,9 @@ var Self =
 
     relative : relative,
 
-    dirTemp : dirTemp
+    dirTemp : dirTemp,
+
+    pathDirTempForTrivial,
 
   },
 

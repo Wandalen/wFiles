@@ -1140,7 +1140,7 @@ function fileDeleteAct( o )
 
     if( stat && stat.isDir() )
     File.rmdirSync( filePath );
-    else if( process.platform === 'win32' )
+    else if( stat && process.platform === 'win32' )
     {
       /*
         The problem is that on windows, when you unlink a file that is opened, it doesn't really get deleted.

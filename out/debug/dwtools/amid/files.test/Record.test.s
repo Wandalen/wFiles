@@ -20,7 +20,9 @@ var _ = _global_.wTools;
 var Parent = wTester;
 var testSuitePath;
 
-//
+// --
+// context
+// --
 
 function onSuiteBegin()
 {
@@ -41,9 +43,11 @@ function onSuiteEnd()
   }
 }
 
-//
+// --
+// tests
+// --
 
-function record( test )
+function recordFields( test )
 {
 
   var path = '/dir1/dir2/terminal.ext';
@@ -463,7 +467,7 @@ function record( test )
 
 //
 
-function filtering( test )
+function recordFiltering( test )
 {
   var dir = _.path.normalize( __dirname );
   var fileRecord = _.FileRecord;
@@ -1382,6 +1386,25 @@ function recordFilter( test )
 
   /* */
 
+  test.case = 'filter copy string';
+  var filter = provider.recordFilter( '/src' );
+  logger.log( filter );
+  test.identical( filter.filePath, '/src' );
+  test.identical( filter.prefixPath, null );
+  test.identical( filter.postfixPath, null );
+  test.identical( filter.basePath, null );
+  test.identical( filter.formed, 1 );
+
+  filter.copy( '/dst' );
+  logger.log( filter );
+  test.identical( filter.filePath, '/dst' );
+  test.identical( filter.prefixPath, null );
+  test.identical( filter.postfixPath, null );
+  test.identical( filter.basePath, null );
+  test.identical( filter.formed, 1 );
+
+  /* */
+
   test.case = 'filter from string';
   var filter = provider.recordFilter( '/src' );
   logger.log( filter );
@@ -1833,8 +1856,8 @@ var Self =
   tests :
   {
 
-    record,
-    filtering,
+    recordFields,
+    recordFiltering,
     recordForLink,
     recordForRelativeLink,
     recordStating,

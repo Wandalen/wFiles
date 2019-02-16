@@ -28,6 +28,16 @@ _.assert( !!_.regexpsEscape );
 //
 // --
 
+function TollerantFrom( o )
+{
+  _.assert( arguments.length >= 1, 'Expects at least one argument' );
+  _.assert( _.objectIs( Self.prototype.Composes ) );
+  o = _.mapsExtend( null, arguments );
+  return new Self( _.mapOnly( o, Self.prototype.fieldsOfCopyableGroups ) );
+}
+
+//
+
 function init( o )
 {
   let filter = this;
@@ -45,12 +55,18 @@ function init( o )
 
 //
 
-function TollerantFrom( o )
+function copy( src )
 {
-  _.assert( arguments.length >= 1, 'Expects at least one argument' );
-  _.assert( _.objectIs( Self.prototype.Composes ) );
-  o = _.mapsExtend( null, arguments );
-  return new Self( _.mapOnly( o, Self.prototype.fieldsOfCopyableGroups ) );
+  let filter = this;
+
+  _.assert( arguments.length === 1 );
+
+  if( _.strIs( src ) )
+  src = { filePath : src }
+
+  let result = _.Copyable.prototype.copy.call( filter, src );
+
+  return result;
 }
 
 // --
@@ -1021,6 +1037,26 @@ function basePathNormalize( basePath )
   return basePath;
 }
 
+//
+
+function basePathSimplify()
+{
+  let filter = this;
+  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let path = fileProvider.path;
+
+  if( !filter.basePath || _.strIs( filter.basePath ) )
+  return;
+
+  let basePath = _.arrayAppendArrayOnce( [], _.mapVals( filter.basePath ) );
+
+  if( basePath.length !== 1 )
+  return;
+
+  filter.basePath = basePath[ 0 ];
+
+}
+
 // --
 // file path
 // --
@@ -1671,6 +1707,40 @@ function pathsNormalize()
 
 }
 
+//
+
+function pathsRelativePrefix( prefixPath )
+{
+  let filter = this;
+  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let path = fileProvider.path;
+
+  _.assert( arguments.length === 0 || arguments.length === 1 );
+  _.assert( filter.prefixPath === null );
+
+  if( filter.filePath && !prefixPath )
+  {
+    prefixPath = path.common( filter.filePath );
+    filter.filePath = path.s.relative( prefixPath, filter.filePath );
+
+    if( _.strIs( filter.basePath ) )
+    filter.basePath = path.s.relative( prefixPath, filter.basePath );
+    else if( _.mapIs( filter.basePath ) )
+    for( let filePath in filter.basePath )
+    {
+      let basePath = filter.basePath[ filePath ];
+      delete filter.basePath[ filePath ];
+      filter.basePath[ path.relative( prefixPath, filePath ) ] = path.relative( prefixPath, basePath );
+    }
+
+  }
+
+  if( prefixPath )
+  filter.prefixPath = prefixPath;
+
+  return prefixPath;
+}
+
 // --
 // pair
 // --
@@ -2306,8 +2376,13 @@ function toStr()
   for( let m in filter.MaskNames )
   {
     let maskName = filter.MaskNames[ m ];
-    if( filter[ maskName ] !== null && !filter[ maskName ].isEmpty() )
-    result += '\n' + '  ' + maskName + ' : ' + !filter[ maskName ].isEmpty();
+    if( filter[ maskName ] !== null )
+    {
+      if( filter[ maskName ].isEmpty )
+      result += '\n' + '  ' + maskName + ' : ' + !filter[ maskName ].isEmpty();
+      else
+      result += '\n' + '  ' + maskName + ' : ' + true;
+    }
   }
 
   let FieldNames =
@@ -2575,8 +2650,9 @@ let Accessors =
 let Extend =
 {
 
-  init,
   TollerantFrom,
+  init,
+  copy,
 
   // former
 
@@ -2606,6 +2682,7 @@ let Extend =
   basePathStringNormalize,
   basePathMapNormalize,
   basePathNormalize,
+  basePathSimplify,
 
   // file path
 
@@ -2629,6 +2706,7 @@ let Extend =
   prefixesApply,
   pathLocalize,
   pathsNormalize,
+  pathsRelativePrefix,
 
   // pair
 

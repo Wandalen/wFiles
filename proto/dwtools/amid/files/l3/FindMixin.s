@@ -1881,7 +1881,9 @@ function filesReflectEvaluate_body( o )
         }
         else if( o.dstRewritingPreserving )
         {
-          if( self.filesHasTerminal( record.dst.absoluteGlobalMaybe ) )
+          debugger;
+          // console.log( dst );
+          if( record.dst.factory.effectiveFileProvider.filesHasTerminal( record.dst.absolute ) ); // xxx
           throw _.err( 'Can\'t rewrite directory ' + _.strQuote( record.dst.absolute ) + ' by terminal ' + _.strQuote( record.src.absolute ) + ', directory has terminal(s)' );
         }
 
@@ -2867,6 +2869,7 @@ function filesReflectSingle_body( o )
         resolvingDstSoftLink : o.resolvingDstSoftLink,
         resolvingDstTextLink : o.resolvingDstTextLink,
       });
+
     }
     else if( record.action === 'softLink' )
     {

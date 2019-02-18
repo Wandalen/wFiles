@@ -12873,6 +12873,17 @@ function fileDeleteLocked( test )
 
   //
 
+  // for( let i = 0; i < 1000; i++ )
+  // {
+  //   provider.fileWrite( terminalPath, terminalPath );
+  //   var fd = fs.openSync( provider.path.nativize( terminalPath ), 'r' );
+  //   provider.fileDelete( terminalPath );
+  //   test.is( !provider.fileExists( terminalPath ) );
+  //   fs.closeSync( fd );
+  // }
+
+  //
+
   test.case = 'try to delete opened file using fs.createReadStream';
   provider.fileWrite( terminalPath, terminalPath );
   var stream = provider.streamRead( terminalPath );
@@ -12897,6 +12908,40 @@ function fileDeleteLocked( test )
 
 
 }
+
+//
+
+function fileDeletePerfomance( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let path = provider.path;
+
+  //
+
+  let testPath = self.pathFor( 'write/fileDeletePerfomance' );
+  let files = 1;
+
+  var data = _.strDup( 'terminal', 1000000 );
+  data = _.strDup( data, 1000 );
+  var filePaths = [];
+
+  for( var i = 0; i < files; i++ )
+  {
+    let filePath = path.join( testPath, 'terminal' + i );
+    filePaths.push( filePath );
+    provider.fileWrite( filePath, data )
+  }
+
+  var t = _.timeNow();
+  for( var i = 0; i < files; i++ )
+  provider.fileDeleteAct({ filePath : filePaths[ i ], sync : 1 });
+  var spent = _.timeSpent( t );
+  console.log( spent, 'for', files, 'files' );
+
+}
+
+fileDeletePerfomance.experimental = 1;
 
 //
 
@@ -38029,6 +38074,7 @@ var Self =
     fileDeleteActSync,
     fileDeleteAsync,
     fileDeleteLocked,
+    fileDeletePerfomance,
 
     statResolvedReadSync,
     statReadActSync,

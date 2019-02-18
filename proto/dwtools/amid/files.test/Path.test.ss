@@ -1019,6 +1019,22 @@ function pathDirTempForTrivial( test )
   _.path.fileProvider.fileDelete({ filePath : tempPath, safe : 0 });
   _.path.fileProvider.fileDelete({ filePath : tempPath2, safe : 0 });
 
+  test.case = 'path to root of device';
+  var filePath = pathDeviceGet( _.path.normalize( __filename ) );
+  var tempPath = _.path.pathDirTempForAnother( filePath );
+  test.is( _.path.fileProvider.isDir( tempPath ) );
+  _.path.fileProvider.fileDelete({ filePath : tempPath, safe : 0 });
+
+  test.case = 'close removes only temp dirs made by open';
+  var filePath = _.path.normalize( __filename );
+  var tempPath = _.path.pathDirTempForOpen( filePath );
+  _.path.pathDirTempForClose( tempPath );
+  test.is( !_.path.fileProvider.fileExists( tempPath ) );
+  test.will = 'repeat close call on same temp dir path, should throw error'
+  test.shouldThrowErrorSync( () => _.path.pathDirTempForClose( tempPath ) );
+  test.will = 'try to close other dir, should throw error'
+  test.shouldThrowErrorSync( () => _.path.pathDirTempForClose( testPath ) );
+
   //
 
   // var filePath = _.path.join( _.path.dirTemp(), 'file' );

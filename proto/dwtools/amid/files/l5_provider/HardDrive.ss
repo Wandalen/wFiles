@@ -1167,8 +1167,7 @@ function fileDeleteAct( o )
       }
       catch( err )
       {
-        if( err.code != 'EXDEV' )
-        throw err;
+        _.errLogOnce( err );
 
         File.unlinkSync( filePath );
       }
@@ -1202,10 +1201,10 @@ function fileDeleteAct( o )
 
         File.rename( filePath,tempPath, ( err ) =>
         {
-          if( !err )
+          if( err )
+          _.errLogOnce( err );
+          else
           filePath = tempPath;
-          else if( err.code != 'EXDEV' )
-          return con.error( err );
 
           File.unlink( filePath, handleResult );
         });

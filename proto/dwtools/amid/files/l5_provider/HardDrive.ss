@@ -1153,24 +1153,22 @@ function fileDeleteAct( o )
 
         Limitation : rename fails if temp directory is located on other device
       */
-      let fileName = self.path.name({ path : o.filePath, withExtension : 1 });
-      let tempPath = self.path.join( self.pathDirTempAct(), fileName );
-      tempPath = self.path.nativize( tempPath );
+      let tempPath = tempPathGet();
       try
       {
         File.renameSync( filePath,tempPath );
-        File.unlink( tempPath, ( err ) =>
-        {
-          if( err )
-          throw err;
-        });
       }
       catch( err )
       {
         _.errLogOnce( err );
-
-        File.unlinkSync( filePath );
+        return File.unlinkSync( filePath );
       }
+
+      File.unlink( tempPath, ( err ) =>
+      {
+        if( err )
+        throw err;
+      });
 
     }
     else
@@ -1195,10 +1193,7 @@ function fileDeleteAct( o )
       File.rmdir( filePath, handleResult );
       else if( process.platform === 'win32' )
       {
-        let fileName = self.path.name({ path : o.filePath, withExtension : 1 });
-        let tempPath = self.path.join( self.pathDirTempAct(), fileName );
-        tempPath = self.path.nativize( tempPath );
-
+        let tempPath = tempPathGet();
         File.rename( filePath,tempPath, ( err ) =>
         {
           if( err )
@@ -1224,6 +1219,18 @@ function fileDeleteAct( o )
     }
 
     return con;
+  }
+
+  /**/
+
+  function tempPathGet()
+  {
+    let fileName = self.path.name({ path : o.filePath, withExtension : 1 });
+    let tempName = fileName + '-' + _.idWithGuid() + '.tmp';
+    let tempDirPath = self.path.pathDirTempForOpen( o.filePath );
+    let tempPath = self.path.join( tempDirPath, tempName );
+    tempPath = self.path.nativize( tempPath );
+    return tempPath;
   }
 
 }

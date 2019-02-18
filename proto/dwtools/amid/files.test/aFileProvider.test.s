@@ -12851,6 +12851,28 @@ function fileDeleteLocked( test )
 
   //
 
+  test.case = 'try to delete opened file, using fileDelete';
+  provider.fileWrite( terminalPath, terminalPath );
+  var fd = fs.openSync( provider.path.nativize( terminalPath ), 'r' );
+  var got = provider.fileDelete( terminalPath );
+  test.will = 'terminal should be removed';
+  test.is( !provider.fileExists( terminalPath ) );
+  var read = provider.dirRead( testPath );
+  test.identical( read, [] );
+  provider.fileDelete( testPath );
+  test.is( !provider.fileExists( testPath ) );
+  test.will = 'file is still available through fd';
+  var buffer = Buffer.alloc( 50 );
+  fs.readSync( fd, buffer, 0, buffer.byteLength );
+  var got =  buffer.toString();
+  test.is( got.length )
+  test.is( _.strHas( terminalPath, got ) )
+  fs.closeSync( fd );
+  test.will = 'terminal is closed and removed';
+  test.is( !provider.fileExists( terminalPath ) );
+
+  //
+
   test.case = 'try to delete opened file using fs.createReadStream';
   provider.fileWrite( terminalPath, terminalPath );
   var stream = provider.streamRead( terminalPath );

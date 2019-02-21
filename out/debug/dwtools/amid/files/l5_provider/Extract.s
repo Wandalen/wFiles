@@ -788,7 +788,7 @@ function fileWriteAct( o )
     self._descriptorWrite( filePath, data );
 
     /* what for is that needed ??? */
-    /*self._descriptorRead({ query : dstDir, set : structure });*/
+    /*self._descriptorRead({ selector : dstDir, set : structure });*/
 
     return true;
   }
@@ -1280,7 +1280,7 @@ function softLinkAct( o )
     throw _.err( 'softLinkAct', o.dstPath, 'already exists' );
 
     dstDirCheck();
-    
+
     /*
       qqq : add tests for linking act routines
       qqq : don't forget throwing cases
@@ -1707,11 +1707,11 @@ function filesTreeRead( o )
           if( i )
           p = p + o.upToken + paths[ i ];
 
-          if( !_.select({ container : result, query : p, upToken : o.upToken }) )
+          if( !_.select({ src : result, selector : p, upToken : o.upToken }) )
           _.selectSet
           ({
-            container : result,
-            query : p,
+            src : result,
+            selector : p,
             upToken : o.upToken,
             set : Object.create( null )
           });
@@ -1721,8 +1721,8 @@ function filesTreeRead( o )
       if( path !== hereStr )
       _.selectSet
       ({
-        container : result,
-        query : path,
+        src : result,
+        selector : path,
         upToken : o.upToken,
         set : element,
       });
@@ -2094,15 +2094,15 @@ function _descriptorRead( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( !path.isGlobal( o.filePath ), 'Expects local path, but got', o.filePath );
 
-  let optionsSelect = Object.create( null );
+  let o2 = Object.create( null );
 
-  optionsSelect.setting = 0;
-  optionsSelect.query = o.filePath;
-  optionsSelect.container = o.filesTree;
-  optionsSelect.upToken = o.upToken;
-  optionsSelect.usingIndexedAccessToMap = 0;
+  o2.setting = 0;
+  o2.selector = o.filePath;
+  o2.src = o.filesTree;
+  o2.upToken = o.upToken;
+  o2.usingIndexedAccessToMap = 0;
 
-  let result = _.select( optionsSelect );
+  let result = _.select( o2 );
 
   return result;
 }
@@ -2450,8 +2450,8 @@ function _descriptorWrite( o )
 
     o2.setting = 1;
     o2.set = o.data;
-    o2.query = o.filePath;
-    o2.container = o.filesTree;
+    o2.selector = o.filePath;
+    o2.src = o.filesTree;
     o2.upToken = o.upToken;
     o2.usingIndexedAccessToMap = 0;
 

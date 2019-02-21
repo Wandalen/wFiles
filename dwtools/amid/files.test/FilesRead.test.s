@@ -244,7 +244,7 @@ function filesTreeRead( test )
       _.select
       ({
         container : result,
-        query : _.path.relative( currentTestDir, p ),
+        selector : _.path.relative( currentTestDir, p ),
         set : val,
         setting : 1,
         usingIndexedAccessToMap : 0

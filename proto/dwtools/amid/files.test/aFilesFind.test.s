@@ -12754,31 +12754,6 @@ function filesDeleteTrivial( test )
   extract.finit();
   test.identical( _.mapKeys( hub.providersWithProtocolMap ), [ 'current' ] );
 
-  //
-
-  test.open( 'safe' );
-
-  var tempDirPath = path.pathDirTempForAnother( terminalPath );
-
-  test.case = 'delete temp dir, safe : 0'
-  if( provider instanceof _.FileProvider.HardDrive )
-  {
-    test.shouldThrowErrorSync( () => provider.filesDelete({ filePath : tempDirPath, safe : 1 }) );
-    test.is( provider.fileExists( tempDirPath ) );
-  }
-  else
-  {
-    provider.filesDelete({ filePath : tempDirPath, safe : 1 });
-    test.is( !provider.fileExists( tempDirPath ) );
-  }
-
-
-  test.case = 'delete temp dir, safe : 1'
-  provider.filesDelete({ filePath : tempDirPath, safe : 0 })
-  test.is( !provider.fileExists( tempDirPath ) )
-
-  test.close( 'safe' );
-
   /* - */
 
   if( !softLinkIsSupported )

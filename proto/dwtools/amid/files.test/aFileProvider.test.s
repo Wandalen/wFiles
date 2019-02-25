@@ -29070,6 +29070,8 @@ function isTerminal( test )
 
 };
 
+isTerminal.timeOut = 20000;
+
 //
 
 function isSoftLink( test )
@@ -31198,6 +31200,8 @@ function isHardLink( test )
 
   provider.fieldPop( 'usingTextLink', 1 );
 }
+
+isHardLink.timeOut = 20000;
 
 //
 

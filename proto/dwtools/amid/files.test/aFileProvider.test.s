@@ -33520,7 +33520,12 @@ function filesSize( test )
 
   test.case = 'single path that not exists';
   path = test.context.pathFor( 'filesSize/filesSize/notExistingPath' );
-  test.shouldThrowError( () => provider.filesSize( path ) );
+  test.shouldThrowError( () => provider.filesSize({ filePath : path, throwing : 1 }) );
+
+  test.case = 'single path that not exists';
+  path = test.context.pathFor( 'filesSize/filesSize/notExistingPath' );
+  var got = provider.filesSize({ filePath : path, throwing : 0 });
+  test.identical( got, null );
 
   test.case = 'not existing path in array';
   path = test.context.pathFor( 'filesSize/filesSize/notExistingPath' );

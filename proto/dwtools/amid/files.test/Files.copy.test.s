@@ -611,7 +611,7 @@ function filesCopyWithAdapter2( test )
       _.selectSet
       ({
         container : tree,
-        query : _.path.undot( r.relative ),
+        selector : _.path.undot( r.relative ),
         upToken : '/',
         set : set,
         usingIndexedAccessToMap : 0

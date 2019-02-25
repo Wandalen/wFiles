@@ -610,7 +610,7 @@ function filesCopyWithAdapter2( test )
 
       _.selectSet
       ({
-        container : tree,
+        src : tree,
         selector : _.path.undot( r.relative ),
         upToken : '/',
         set : set,

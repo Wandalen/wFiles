@@ -1010,6 +1010,8 @@ let FilteredRoutines =
   hardLinkBreakAct : Routines.hardLinkBreakAct,
   softLinkBreakAct : Routines.softLinkBreakAct,
 
+  filesAreSame : Routines.filesAreSame
+
 }
 
 // --

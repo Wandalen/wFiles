@@ -3576,7 +3576,7 @@ defaults.default = NaN;
 var having = filesAreSame_body.having = Object.create( null );
 having.writing = 0;
 having.reading = 1;
-having.driving = 0;
+having.driving = 1;
 having.aspect = 'body';
 
 var operates = filesAreSame_body.operates = Object.create( null );

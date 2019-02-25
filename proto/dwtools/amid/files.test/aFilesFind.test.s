@@ -12758,11 +12758,20 @@ function filesDeleteTrivial( test )
 
   test.open( 'safe' );
 
-  var tempDirPath = path.pathDirTempForAnother( path.normalize( __filename ) );
+  var tempDirPath = path.pathDirTempForAnother( terminalPath );
 
   test.case = 'delete temp dir, safe : 0'
-  test.shouldThrowErrorSync( () => provider.filesDelete({ filePath : tempDirPath, safe : 1 }) );
-  test.is( provider.fileExists( tempDirPath ) );
+  if( provider instanceof _.FileProvider.HardDrive )
+  {
+    test.shouldThrowErrorSync( () => provider.filesDelete({ filePath : tempDirPath, safe : 1 }) );
+    test.is( provider.fileExists( tempDirPath ) );
+  }
+  else
+  {
+    provider.filesDelete({ filePath : tempDirPath, safe : 1 });
+    test.is( !provider.fileExists( tempDirPath ) );
+  }
+
 
   test.case = 'delete temp dir, safe : 1'
   provider.filesDelete({ filePath : tempDirPath, safe : 0 })

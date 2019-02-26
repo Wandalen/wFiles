@@ -1553,8 +1553,8 @@ function linksRebase( o )
       debugger;
       descriptor = descriptor[ 0 ];
       let was = descriptor.hardLink;
-      let url = _.uri.parseAtomic( descriptor.hardLink );
-      url.localPath = self.path.rebase( url.localPath, o.oldPath, o.newPath );
+      let url = _.uri.parseAtomic( descriptor.hardLink ); debugger; xxx
+      url.longPath = self.path.rebase( url.longPath, o.oldPath, o.newPath );
       descriptor.hardLink = _.uri.str( url );
       logger.log( '* linksRebase :', descriptor.hardLink, '<-', was );
       debugger;

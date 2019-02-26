@@ -1282,7 +1282,7 @@ function filesReflectEvaluate_body( o )
     let dstRecordFactory = _.FileRecordFactory.TollerantFrom( o, dstOp ).form();
 
     _.assert( _.strIs( dstOp.basePath ) );
-    _.assert( dstRecordFactory.basePath === _.uri.parse( o.dstFilter.basePath[ o.dstPath ] ).localPath );
+    _.assert( dstRecordFactory.basePath === _.uri.parse( o.dstFilter.basePath[ o.dstPath ] ).longPath );
 
     return dstRecordFactory;
   }

@@ -713,10 +713,10 @@ function localFromGlobal( globalPath )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.mapIs( globalPath ) ) ;
-  _.assert( _.strIs( globalPath.localPath ) );
+  _.assert( _.strIs( globalPath.longPath ) );
   _.assert( !self.protocols || !globalPath.protocol || _.arrayHas( self.protocols, globalPath.protocol ) );
 
-  return globalPath.localPath;
+  return globalPath.longPath;
 }
 
 //

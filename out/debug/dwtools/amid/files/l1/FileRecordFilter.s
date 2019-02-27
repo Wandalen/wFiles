@@ -2313,14 +2313,14 @@ function hasFiltering()
 
 //
 
-function hasData()
+function hasSomePath()
 {
   let filter = this;
 
+  _.assert( arguments.length === 0 );
   _.assert( filter.basePath === null || _.strIs( filter.basePath ) || _.mapIs( filter.basePath ) );
   _.assert( filter.prefixPath === null || _.strIs( filter.prefixPath ) );
   _.assert( filter.postfixPath === null || _.strIs( filter.postfixPath ) );
-  _.assert( filter.filePath === null || _.strIs( filter.filePath ) || _.arrayIs( filter.filePath ) );
   _.assert( filter.filePath === null || _.strIs( filter.filePath ) || _.arrayIs( filter.filePath ) || _.mapIs( filter.filePath ) );
 
   if( _.strIs( filter.basePath ) || _.mapIsPopulated( filter.basePath ) )
@@ -2338,7 +2338,22 @@ function hasData()
   if( _.strIs( filter.filePath ) || _.arrayIsPopulated( filter.filePath ) || _.mapIsPopulated( filter.filePath ) )
   return true;
 
-  return filter.hasFiltering();
+  return false;
+}
+
+//
+
+function hasData()
+{
+  let filter = this;
+
+  if( filter.hasSomePath() )
+  return true;
+
+  if( filter.hasFiltering() )
+  return true;
+
+  return false;
 }
 
 // --
@@ -2731,6 +2746,7 @@ let Extend =
 
   hasMask,
   hasFiltering,
+  hasSomePath,
   hasData,
 
   // exporter

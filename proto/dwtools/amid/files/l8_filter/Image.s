@@ -167,8 +167,8 @@ function _routineFunctor( routine, routineName )
 
       if( pre )
       {
-        debugger;
-        _.assert( 0, 'not tested' );
+        // debugger;
+        // _.assert( 0, 'not tested' );
         op2.args = pre.call( this.originalFileProvider, resultRoutine, op2.args );
         if( !_.unrollIs( op2.args ) )
         op2.args = _.unrollFrom([ op2.args ]);

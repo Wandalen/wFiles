@@ -56,7 +56,8 @@ function onSuiteBegin()
   self.providerEffective = _.FileProvider.Extract
   ({
     filesTree : filesTree,
-    protocols : [ 'extract' ]
+    protocols : [ 'extract' ],
+    usingExtraStat : 1
   });
   self.provider.providerRegister( self.providerEffective );
 

@@ -1883,7 +1883,7 @@ function filesReflectEvaluate_body( o )
         {
           debugger;
           // console.log( dst );
-          if( record.dst.factory.effectiveFileProvider.filesHasTerminal( record.dst.absolute ) ); // xxx
+          if( record.dst.factory.effectiveFileProvider.filesHasTerminal( record.dst.absolute ) ) // xxx
           throw _.err( 'Can\'t rewrite directory ' + _.strQuote( record.dst.absolute ) + ' by terminal ' + _.strQuote( record.src.absolute ) + ', directory has terminal(s)' );
         }
 

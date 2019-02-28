@@ -69,7 +69,7 @@ function pathIsolateGlobalAndLocal( filePath )
   let path = self.path;
 
   let parsed = path.parseConsecutive( filePath );
-  let splits = _.strIsolateBeginOrAll( parsed.longPath, '.git/' );
+  let splits = _.strIsolateLeftOrAll( parsed.longPath, '.git/' );
 
   parsed.longPath = splits[ 0 ] + splits[ 1 ];
 

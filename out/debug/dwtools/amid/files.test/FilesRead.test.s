@@ -243,7 +243,7 @@ function filesTreeRead( test )
 
       _.select
       ({
-        container : result,
+        src : result,
         selector : _.path.relative( currentTestDir, p ),
         set : val,
         setting : 1,

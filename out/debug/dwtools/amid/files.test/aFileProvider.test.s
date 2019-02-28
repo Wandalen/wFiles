@@ -12851,6 +12851,39 @@ function fileDeleteLocked( test )
 
   //
 
+  test.case = 'try to delete opened file, using fileDelete';
+  provider.fileWrite( terminalPath, terminalPath );
+  var fd = fs.openSync( provider.path.nativize( terminalPath ), 'r' );
+  var got = provider.fileDelete( terminalPath );
+  test.will = 'terminal should be removed';
+  test.is( !provider.fileExists( terminalPath ) );
+  var read = provider.dirRead( testPath );
+  test.identical( read, [] );
+  provider.fileDelete( testPath );
+  test.is( !provider.fileExists( testPath ) );
+  test.will = 'file is still available through fd';
+  var buffer = Buffer.alloc( 50 );
+  fs.readSync( fd, buffer, 0, buffer.byteLength );
+  var got =  buffer.toString();
+  test.is( got.length )
+  test.is( _.strHas( terminalPath, got ) )
+  fs.closeSync( fd );
+  test.will = 'terminal is closed and removed';
+  test.is( !provider.fileExists( terminalPath ) );
+
+  //
+
+  // for( let i = 0; i < 1000; i++ )
+  // {
+  //   provider.fileWrite( terminalPath, terminalPath );
+  //   var fd = fs.openSync( provider.path.nativize( terminalPath ), 'r' );
+  //   provider.fileDelete( terminalPath );
+  //   test.is( !provider.fileExists( terminalPath ) );
+  //   fs.closeSync( fd );
+  // }
+
+  //
+
   test.case = 'try to delete opened file using fs.createReadStream';
   provider.fileWrite( terminalPath, terminalPath );
   var stream = provider.streamRead( terminalPath );
@@ -12875,6 +12908,40 @@ function fileDeleteLocked( test )
 
 
 }
+
+//
+
+function fileDeletePerfomance( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let path = provider.path;
+
+  //
+
+  let testPath = self.pathFor( 'write/fileDeletePerfomance' );
+  let files = 1;
+
+  var data = _.strDup( 'terminal', 1000000 );
+  data = _.strDup( data, 1000 );
+  var filePaths = [];
+
+  for( var i = 0; i < files; i++ )
+  {
+    let filePath = path.join( testPath, 'terminal' + i );
+    filePaths.push( filePath );
+    provider.fileWrite( filePath, data )
+  }
+
+  var t = _.timeNow();
+  for( var i = 0; i < files; i++ )
+  provider.fileDeleteAct({ filePath : filePaths[ i ], sync : 1 });
+  var spent = _.timeSpent( t );
+  console.log( spent, 'for', files, 'files' );
+
+}
+
+fileDeletePerfomance.experimental = 1;
 
 //
 
@@ -29003,6 +29070,8 @@ function isTerminal( test )
 
 };
 
+isTerminal.timeOut = 20000;
+
 //
 
 function isSoftLink( test )
@@ -31131,6 +31200,8 @@ function isHardLink( test )
 
   provider.fieldPop( 'usingTextLink', 1 );
 }
+
+isHardLink.timeOut = 20000;
 
 //
 
@@ -33453,7 +33524,12 @@ function filesSize( test )
 
   test.case = 'single path that not exists';
   path = test.context.pathFor( 'filesSize/filesSize/notExistingPath' );
-  test.shouldThrowError( () => provider.filesSize( path ) );
+  test.shouldThrowError( () => provider.filesSize({ filePath : path, throwing : 1 }) );
+
+  test.case = 'single path that not exists';
+  path = test.context.pathFor( 'filesSize/filesSize/notExistingPath' );
+  var got = provider.filesSize({ filePath : path, throwing : 0 });
+  test.identical( got, null );
 
   test.case = 'not existing path in array';
   path = test.context.pathFor( 'filesSize/filesSize/notExistingPath' );
@@ -38007,6 +38083,7 @@ var Self =
     fileDeleteActSync,
     fileDeleteAsync,
     fileDeleteLocked,
+    fileDeletePerfomance,
 
     statResolvedReadSync,
     statReadActSync,

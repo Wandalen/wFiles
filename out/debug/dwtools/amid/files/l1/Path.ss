@@ -298,11 +298,12 @@ function pathDirTempForAnother( filePath )
     return path;
   }
 
-  let dirsPath = this.chainToRoot( this.dir( filePath ) );
+  let dirsPath = this.chainToRoot( filePath );
 
-  for( let i = 0, l = dirsPath.length ; i < l ; i++ )
+  for( let i = 0, l = dirsPath.length - 1 || dirsPath.length ; i < l ; i++ )
   {
     path = dirsPath[ i ] + '/tmp-' + _.idWithGuid() + '.tmp';
+
     if( this.fileProvider.fileExists( path ) )
     return path;
 
@@ -313,7 +314,7 @@ function pathDirTempForAnother( filePath )
     }
     catch( err )
     {
-      this.fileProvider.logger.log( 'pathDirTempForOpen: can`t create temp dir at :', path );
+      this.fileProvider.logger.log( 'pathDirTempForAnother: can`t create temp dir at :', path );
     }
   }
 
@@ -331,20 +332,38 @@ function pathDirTempForAnother( filePath )
 
 function pathDirTempForClose( tempDirPath )
 {
-  _.assert( arguments.length === 1 );
+  _.assert( arguments.length <= 1 );
   _.assert( !!this.fileProvider );
-  _.assert( this.isAbsolute( tempDirPath ) );
-  _.assert( this.isNormalized( tempDirPath ) );
 
-  let devicePath = tempDirPath.substring( 0, tempDirPath.indexOf( '/', 1 ) );
+  if( !this.pathDirTempForMap )
+  return;
 
-  _.assert( this.pathDirTempForMap );
-  _.assert( this.pathDirTempForMap[ devicePath ], 'Not found temp dir for device:', devicePath );
-  _.assert( this.pathDirTempForMap[ devicePath ] === tempDirPath, 'Known and provided temp dir path are different:', this.pathDirTempForMap[ devicePath ], tempDirPath );
+  if( !arguments.length )
+  {
+    for( let d in this.pathDirTempForMap )
+    {
+      this.fileProvider.filesDelete({ filePath : this.pathDirTempForMap[ d ], safe : 0, throwing : 1 });
+      delete this.pathDirTempForMap[ d ];
+    }
+  }
+  else
+  {
+    _.assert( this.isAbsolute( tempDirPath ) );
+    _.assert( this.isNormalized( tempDirPath ) );
 
-  delete this.pathDirTempForMap[ devicePath ];
+    let devicePath = tempDirPath.substring( 0, tempDirPath.indexOf( '/', 1 ) );
 
-  this.fileProvider.filesDelete({ filePath : tempDirPath, safe : 0 });
+    if( !this.pathDirTempForMap[ devicePath ] )
+    throw _.err( 'Not found temp dir for device:', devicePath );
+    if( this.pathDirTempForMap[ devicePath ] != tempDirPath )
+    throw _.err( 'Known and provided temp dir path are different:', this.pathDirTempForMap[ devicePath ], tempDirPath );
+
+    this.fileProvider.filesDelete({ filePath : tempDirPath, safe : 0, throwing : 1 });
+
+    _.assert( !this.fileProvider.fileExists( tempDirPath ) );
+
+    delete this.pathDirTempForMap[ devicePath ];
+  }
 }
 
 

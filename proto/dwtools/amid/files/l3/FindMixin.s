@@ -3043,7 +3043,12 @@ function filesReflect_pre( routine, args )
     delete o.reflectMap;
   }
 
-  o.srcFilter.pairFilePathRefine( o.dstFilter );
+  o.srcFilter.pairRefine( o.dstFilter );
+
+  _.assert( _.mapIs( o.srcFilter.filePath ), 'Cant deduce source filter' );
+  _.assert( _.mapIs( o.dstFilter.filePath ), 'Cant deduce destination filter' );
+  _.assert( o.srcFilter.filePath === o.dstFilter.filePath );
+
   o.reflectMap = o.srcFilter.filePath; // xxx
 
   // // _.assert( o.srcFilter.dst === null || o.srcFilter.dst === o.dstFilter );

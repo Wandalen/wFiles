@@ -86,13 +86,6 @@ function filesRead_body( o )
     o2.filter.filePath = path.pathMapExtend( null, srcPath, dstPath );
     o2.filter.form();
 
-    // debugger;
-    // let dstDescriptor = r.dstMap[ dstPath ] = Object.create( null );
-    // // dstDescriptor.relative = o.fileFilter.relativeFor( dstPath );
-    // dstDescriptor.dstPath = dstPath;
-    // dstDescriptor.dataMap = Object.create( null );
-    // debugger;
-
     _.Consequence.From( self.filesFind( o2 ) )
     .finally( ( err, files ) =>
     {
@@ -119,8 +112,6 @@ function filesRead_body( o )
       debugger;
       if( o.throwing )
       throw r.errors[ 0 ];
-      // else
-      // return null;
     }
     return r;
   });
@@ -134,14 +125,12 @@ function filesRead_body( o )
   function fileRead( record, dstBasePath )
   {
 
-    // let dstPath = path.join( dstBasePath, record.relative );
     let dstPath = dstBasePath;
     let dstDescriptor = r.dstMap[ dstPath ];
 
     if( !dstDescriptor )
     {
       dstDescriptor = r.dstMap[ dstPath ] = Object.create( null );
-      // dstDescriptor.relative = o.fileFilter.relativeFor( dstPath );
       dstDescriptor.dstPath = dstPath;
       dstDescriptor.dataMap = Object.create( null );
     }

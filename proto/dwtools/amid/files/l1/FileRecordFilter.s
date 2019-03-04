@@ -742,6 +742,7 @@ function pathsInherit( src )
   filter.basePath = filter.basePathStringNormalize( filter.basePath, filter.filePath );
   _.assert( filter.basePath === null || _.mapIs( filter.basePath ) );
 
+  _.assert( !src.basePath || _.mapIs( src.basePath ) );
   if( _.mapIs( src.basePath ) )
   filter.basePath = _.mapExtend( filter.basePath, src.basePath );
   // else if( filter.basePath === null )
@@ -1780,13 +1781,17 @@ function pathsRelativePrefix( prefixPath )
   {
     return function relative( filePath, it )
     {
+      if( filePath === 'git+https:///github.com/Wandalen/wPathFundamentals.git' )
+      debugger;
       if( !side || it.side === side )
       {
         if( !_.strIs( filePath ) )
         return filePath;
 
+        _.assert( path.isGlobal( prefixPath ) ^ path.isGlobal( filePath ) ^ true );
+
         if( path.isAbsolute( prefixPath ) ^ path.isAbsolute( filePath ) )
-        return filePath
+        return filePath;
 
         return path.relative( prefixPath, filePath );
       }

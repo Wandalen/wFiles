@@ -1,6 +1,6 @@
 ( function _Git_ss_( ) {
 
-'use strict'; /*aaa*/
+'use strict';
 
 if( typeof module !== 'undefined' )
 {

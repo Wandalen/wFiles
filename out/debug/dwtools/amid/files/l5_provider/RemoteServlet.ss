@@ -1,6 +1,6 @@
 // ( function _RemoteServlet_ss_() {
 //
-// 'use strict'; /*aaa*/ xxx
+// 'use strict'; xxx
 //
 // if( typeof module !== 'undefined' )
 // {

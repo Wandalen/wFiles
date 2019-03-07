@@ -1,6 +1,6 @@
 ( function _Extract_s_() {
 
-'use strict'; /*aaa*/
+'use strict';
 
 if( typeof module !== 'undefined' )
 {

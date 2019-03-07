@@ -1,6 +1,6 @@
 ( function _Abstract_s_() {
 
-'use strict'; /*aaa*/
+'use strict';
 
 var _global = _global_;
 var _ = _global_.wTools;

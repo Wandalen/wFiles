@@ -1,6 +1,6 @@
 ( function _Http_js_() {
 
-'use strict'; /*aaa*/
+'use strict';
 
 if( typeof module !== 'undefined' )
 {

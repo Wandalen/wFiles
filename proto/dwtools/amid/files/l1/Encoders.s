@@ -1,6 +1,6 @@
 (function _Encoders_s_() {
 
-'use strict'; /*aaa*/
+'use strict';
 
 let _global = _global_;
 let _ = _global_.wTools;

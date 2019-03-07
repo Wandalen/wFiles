@@ -1,6 +1,6 @@
 ( function _FileStat_s_() {
 
-'use strict'; /*aaa*/
+'use strict';
 
 let File;
 

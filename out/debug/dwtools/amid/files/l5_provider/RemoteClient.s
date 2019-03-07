@@ -1,6 +1,6 @@
 // ( function _RemoteClient_s_() {
 //
-// 'use strict'; /*aaa*/
+// 'use strict';
 //
 // if( typeof module !== 'undefined' )
 // {

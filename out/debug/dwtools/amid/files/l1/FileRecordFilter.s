@@ -1675,14 +1675,14 @@ function prefixesApply( o )
 
   function filePathEach( it )
   {
-    _.assert( it.value === null || _.strIs( it.value ) || _.boolLike( it.value ) );
+    _.assert( it.value === null || _.strIs( it.value ) || _.boolLike( it.value ) || _.arrayIs( it.value ) );
 
     if( filter.src )
     {
       if( it.side === 'source' )
       return;
     }
-    else
+    else if( filter.dst )
     {
       if( it.side === 'destination' )
       return;
@@ -1690,7 +1690,7 @@ function prefixesApply( o )
 
     if( filter.prefixPath || filter.postfixPath )
     {
-      if( _.boolIs( it.value ) )
+      if( _.boolLike( it.value ) )
       {
         if( it.value )
         it.value = path.s.join( filter.prefixPath || '.', filter.postfixPath || '.' );
@@ -1979,7 +1979,7 @@ function pairRefine( dstFilter )
         dstPath = true;
         lackOfDst = true;
       }
-      _.assert( _.strIs( dstPath ) || _.arrayIs( dstPath ) || _.boolIs( dstPath ) );
+      _.assert( _.strIs( dstPath ) || _.arrayIs( dstPath ) || _.boolLike( dstPath ) );
       srcFilter.filePath = dstFilter.filePath = path.pathMapExtend( null, srcFilter.filePath, dstPath );
     }
     else
@@ -2029,7 +2029,7 @@ function pairRefine( dstFilter )
   if( lackOfDst )
   _.assert( srcFilter.filePath === null || _.all( srcFilter.filePath, ( e, k ) => _.boolLike( e ) || path.is( e ) || path.s.allAre( e ) ) );
   else
-  _.assert( srcFilter.filePath === null || _.all( srcFilter.filePath, ( e, k ) => e === false || path.is( e ) || path.s.allAre( e ) ) );
+  _.assert( srcFilter.filePath === null || _.all( srcFilter.filePath, ( e, k ) => e === false || e === 0 || path.is( e ) || path.s.allAre( e ) ) );
 
   /* */
 
@@ -2292,7 +2292,7 @@ function sureRelativeOrGlobal( o )
   {
     _.sure
     (
-      it.value === null || _.boolLike( it.value ) || path.isRelative( it.value ) || path.isGlobal( it.value ),
+      it.value === null || _.boolLike( it.value ) || path.s.allAreRelative( it.value ) || path.s.allAreGlobal( it.value ),
       () => 'Filter should have relative ' + it.fieldName + ', but has ' + _.toStr( it.value )
     );
     // return true;

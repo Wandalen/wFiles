@@ -1,6 +1,6 @@
 ( function _Record_test_s_( ) {
 
-'use strict'; /*aaa*/
+'use strict'; // xxx
 
 if( typeof module !== 'undefined' )
 {

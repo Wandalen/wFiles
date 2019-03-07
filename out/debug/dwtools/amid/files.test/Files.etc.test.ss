@@ -6,24 +6,8 @@
 
 if( typeof module !== 'undefined' )
 {
-  if( typeof _global_ === 'undefined' || !_global_.wBase )
-  {
-    let toolsPath = '../../../dwtools/Base.s';
-    let toolsExternal = 0;
-    try
-    {
-      toolsPath = require.resolve( toolsPath );
-    }
-    catch( err )
-    {
-      toolsExternal = 1;
-      require( 'wTools' );
-    }
-    if( !toolsExternal )
-    require( toolsPath );
-  }
 
-  var _ = _global_.wTools;
+  let _ = require( '../../Tools.s' );
 
   if( !_global_.wTools.FileProvider )
   require( '../files/UseTop.s' );
@@ -41,7 +25,7 @@ var Parent = wTester;
 // var suitFileLocation = _.diagnosticLocation().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
 
 var FileRecord = _.FileRecord;
-var testRootDirectory = _.fileProvider.path.nativize( _.path.dirTempOpen( _.path.join( __dirname, '../..'  ), 'FilesIndividualTest' ) );
+var testSuitePath = _.fileProvider.path.nativize( _.path.resolve( __dirname + '/../../../../tmp.tmp/sample/FilesIndividualTest' ) );
 
 //
 
@@ -58,7 +42,7 @@ function createTestsDirectory( path, rmIfExists )
 
 function createInTD( path )
 {
-  return createTestsDirectory( _.path.join( testRootDirectory, path ) );
+  return createTestsDirectory( _.path.join( testSuitePath, path ) );
 }
 
 //
@@ -66,9 +50,9 @@ function createInTD( path )
 function createTestFile( path, data, decoding )
 {
   var dataToWrite = ( decoding === 'json' ) ? JSON.stringify( data ) : data;
-  // File.createFileSync( _.path.join( testRootDirectory, path ) );
-  // dataToWrite && File.writeFileSync( _.path.join( testRootDirectory, path ), dataToWrite );
-  _.fileProvider.fileWrite({ filePath : _.path.join( testRootDirectory, path ), data : dataToWrite })
+  // File.createFileSync( _.path.join( testSuitePath, path ) );
+  // dataToWrite && File.writeFileSync( _.path.join( testSuitePath, path ), dataToWrite );
+  _.fileProvider.fileWrite({ filePath : _.path.join( testSuitePath, path ), data : dataToWrite })
 }
 
 //
@@ -103,8 +87,8 @@ function createTestSymLink( path, target, type, data )
   }
   else throw new Error( 'unexpected type' );
 
-  path = _.path.join( testRootDirectory, path );
-  origin = _.path.resolve( _.path.join( testRootDirectory, origin ) );
+  path = _.path.join( testSuitePath, path );
+  origin = _.path.resolve( _.path.join( testSuitePath, origin ) );
 
   // File.existsSync( path ) && File.removeSync( path );
   if( _.fileProvider.statResolvedRead( path ) )
@@ -134,8 +118,8 @@ function createTestHardLink( path, target, data )
   data = data || 'test origin';
   createTestFile( origin, data );
 
-  path = _.path.join( testRootDirectory, path );
-  origin = _.path.resolve( _.path.join( testRootDirectory, origin ) );
+  path = _.path.join( testSuitePath, path );
+  origin = _.path.resolve( _.path.join( testSuitePath, origin ) );
 
   // File.existsSync( path ) && File.removeSync( path );
   if( _.fileProvider.statResolvedRead( path ) )
@@ -219,15 +203,13 @@ function createTestResources( cases, dir )
         break;
     }
   }
-
-  return null;
 }
 
 //
 
 function mergePath( path )
 {
-  return _.path.join( testRootDirectory, path );
+  return _.path.join( testSuitePath, path );
 }
 
 // --
@@ -282,7 +264,7 @@ function mergePath( path )
 //   for( let testCheck of testChecks )
 //   {
 //     test.description = testCheck.name;
-//     let got = !! _.fileProvider.isDir( _.path.join( testRootDirectory, testCheck.path ) );
+//     let got = !! _.fileProvider.isDir( _.path.join( testSuitePath, testCheck.path ) );
 //     test.identical( got , testCheck.expected );
 //   }
 
@@ -590,7 +572,7 @@ function _fileOptionsGet( test ) {
 //         content : null,
 //         exist : null
 //       },
-//       path = _.path.join( testRootDirectory, testCheck.path );
+//       path = _.path.join( testSuitePath, testCheck.path );
 
 //     // clear
 //     // File.existsSync( path ) && File.removeSync( path );
@@ -1461,7 +1443,7 @@ function _fileOptionsGet( test ) {
 //
 //     try
 //     {
-//       got = _.fileProvider.filesSame({ ins1 :  file1, ins2 : file2, usingTime : testCheck.checkTime, usingSymlink : 1 } );
+//       got = _.fileProvider.filesSame({ ins1 :  file1, ins2 : file2, usingExtraStat : testCheck.checkTime, usingSymlink : 1 } );
 //     }
 //     catch( err ) {
 //       console.log( err );
@@ -1492,8 +1474,8 @@ function _fileOptionsGet( test ) {
 //   path1 = _.path.resolve( mergePath( path1 ) ),
 //   path2 = _.path.resolve( mergePath( path2 ) );
 //
-//   var file1 = _.fileProvider.fileRecordContext().fileRecord( path1 ),
-//     file2 = _.fileProvider.fileRecordContext().fileRecord( path2 );
+//   var file1 = _.fileProvider.recordFactory().record( path1 ),
+//     file2 = _.fileProvider.recordFactory().record( path2 );
 //
 //   try
 //   {
@@ -1514,8 +1496,8 @@ function _fileOptionsGet( test ) {
 //   path1 = _.path.resolve( mergePath( path1 ) ),
 //     path2 = _.path.resolve( mergePath( path2 ) );
 //
-//   var file1 = _.fileProvider.fileRecordContext().fileRecord( path1 ),
-//     file2 = _.fileProvider.fileRecordContext().fileRecord( path2 );
+//   var file1 = _.fileProvider.recordFactory().record( path1 ),
+//     file2 = _.fileProvider.recordFactory().record( path2 );
 //
 //   try
 //   {
@@ -1538,7 +1520,7 @@ function _fileOptionsGet( test ) {
 //   link = _.path.resolve( mergePath( link ) );
 //   path2 = mergePath( path2 );
 //
-//   var file1 = _.fileProvider.fileRecordContext().fileRecord( path1 );
+//   var file1 = _.fileProvider.recordFactory().record( path1 );
 //   // File.symlinkSync( path2, link, 'file' );
 //   _.fileProvider.softLink( link, path2 );
 //   try
@@ -1608,14 +1590,14 @@ function _fileOptionsGet( test ) {
 //         expected : false
 //       },
 //       {
-//         name : 'hardlink to file with  binary content',
+//         name : 'hardLink to file with  binary content',
 //         path : [ 'tmp.tmp/filesLinked/identical5', 'tmp.tmp/filesLinked/identical6' ],
 //         type : 'hf',
 //         createResource : bufferData1,
 //         expected : true
 //       },
 //       {
-//         name : 'hardlink to file with  text content : file record',
+//         name : 'hardLink to file with  text content : file record',
 //         path : [ 'tmp.tmp/filesLinked/identical7', 'tmp.tmp/filesLinked/identical8' ],
 //         type : 'hf',
 //         fileRecord : true,
@@ -1643,8 +1625,8 @@ function _fileOptionsGet( test ) {
 //
 //     if( testCheck.fileRecord )
 //     {
-//       file1 = _.fileProvider.fileRecordContext().fileRecord( file1 );
-//       file2 = _.fileProvider.fileRecordContext().fileRecord( file2 );
+//       file1 = _.fileProvider.recordFactory().record( file1 );
+//       file2 = _.fileProvider.recordFactory().record( file2 );
 //     }
 //
 //     test.case = testCheck.name;
@@ -2454,7 +2436,6 @@ function filesNewer( test )
     test.description = 'two files created at different time';
     var got = _.files.filesNewer( file1, file3 );
     test.identical( got, file3 );
-    return null;
   });
 
   if( Config.debug )
@@ -2506,7 +2487,6 @@ function filesOlder( test )
     test.description = 'two files created at different time';
     var got = _.files.filesOlder( file1, file3 );
     test.identical( got, file1 );
-    return null;
   });
 
   if( Config.debug )
@@ -3208,7 +3188,7 @@ function filesAreUpToDate2( test )
   }
 */
 
-  var con = new _.Consequence( ).take( null );
+  var con = new _.Consequence( ).take( );
   for( let tc of testChecks )
   {
     ( function( tc )
@@ -3218,7 +3198,6 @@ function filesAreUpToDate2( test )
         console.log( 'tc : ' + tc.name );
         createTestResources( tc.createFirst );
         console.log( '--> files create first' );
-        return null;
       })
 
       con.finally( _.routineSeal( _,_.timeOut,[ 1000 ] ) );
@@ -3252,7 +3231,6 @@ function filesAreUpToDate2( test )
           console.log( err );
         }
         test.identical( got, tc.expected );
-        return null;
       } );
     } )( _.mapExtend( null, tc ) );
   }
@@ -3325,7 +3303,7 @@ var Self =
 
 };
 
-createTestsDirectory( testRootDirectory, true );
+createTestsDirectory( testSuitePath, true );
 
 Self = wTestSuite( Self )
 if( typeof module !== 'undefined' && !module.parent )

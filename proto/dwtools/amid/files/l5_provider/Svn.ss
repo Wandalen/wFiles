@@ -1,6 +1,6 @@
 ( function _Svn_ss_() {
 
-'use strict';
+'use strict'; /*aaa*/
 
 if( typeof module !== 'undefined' )
 {
@@ -114,7 +114,7 @@ function _fileDownload( filePath )
     con.error( _.err( err ) );
   });
 
-  con.ifNoErrorThen( function()
+  con.ifNoErrorThen( function( arg/*aaa*/ )
   {
     return tempPath;
   });
@@ -161,7 +161,7 @@ function fileReadAct( o )
     if( o.sync )
     return data;
     else
-    return con.give( data );
+    return con.take( data );
 
   }
 
@@ -227,7 +227,7 @@ fileReadAct.isOriginalReader = 1;
 
 //
 
-function fileStatAct( o )
+function statReadAct( o )
 {
   let self = this;
 
@@ -235,7 +235,7 @@ function fileStatAct( o )
   _.assert( _.strIs( o.filePath ) );
   _.assert( !o.sync,'not implemented' );
 
-  let o = _.routineOptions( fileStatAct,o );
+  o = _.routineOptions( statReadAct,o );
   let result = null;
 
   /* */
@@ -247,9 +247,9 @@ function fileStatAct( o )
   stat.dev = 0;
   stat.nlink = 1;
 
-  let result = self._fileDownload.ifNoErrorThen( function( filePath )
+  result = self._fileDownload.ifNoErrorThen( function( filePath )
   {
-    let localStat = self.hardDrive.fileStat({ filePath : filePath });
+    let localStat = self.hardDrive.statResolvedRead({ filePath : filePath });
     stat.size = localStat.size;
     return stat;
   });
@@ -278,15 +278,15 @@ function fileStatAct( o )
   return stat;
 }
 
-fileStatAct.defaults = {};
-fileStatAct.defaults.__proto__ = Parent.prototype.fileStatAct.defaults;
+statReadAct.defaults = {};
+statReadAct.defaults.__proto__ = Parent.prototype.statReadAct.defaults;
 
 //
 
-function directoryReadAct( o )
+function dirReadAct( o )
 {
   let self = this;
-  let o = _.routineOptions( directoryReadAct,o );
+  o = _.routineOptions( dirReadAct,o );
 
   _.assert( o.sync );
 
@@ -297,8 +297,8 @@ function directoryReadAct( o )
   return result;
 }
 
-directoryReadAct.defaults = {};
-directoryReadAct.defaults.__proto__ = Parent.prototype.directoryReadAct.defaults;
+dirReadAct.defaults = {};
+dirReadAct.defaults.__proto__ = Parent.prototype.dirReadAct.defaults;
 
 // --
 // encoder
@@ -364,9 +364,9 @@ let Proto =
 
   fileReadAct : fileReadAct,
   streamReadAct : null,
-  fileStatAct : fileStatAct,
+  statReadAct : statReadAct,
 
-  directoryReadAct : directoryReadAct,
+  dirReadAct : dirReadAct,
 
 
   //
@@ -404,7 +404,7 @@ _.FileProvider[ Self.shortName ] = Self;
 
 if( typeof module !== 'undefined' )
 if( _global_.WTOOLS_PRIVATE )
-delete require.cache[ module.id ];
+{ /* delete require.cache[ module.id ]; */ }
 
 if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = Self;

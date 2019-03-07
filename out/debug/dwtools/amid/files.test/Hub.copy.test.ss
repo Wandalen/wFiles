@@ -1,6 +1,6 @@
 ( function _FileProvider_Hub_copy_test_ss_( ) {
 
-'use strict';
+'use strict'; /*aaa*/
 
 // !!! disabled because Provider.Hub is in implementation phase
 

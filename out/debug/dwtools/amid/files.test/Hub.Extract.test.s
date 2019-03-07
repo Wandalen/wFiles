@@ -1,6 +1,6 @@
 ( function _FileProvider_Hub_Extract_test_s_( ) {
 
-'use strict';
+'use strict'; /*aaa*/
 
 if( typeof module !== 'undefined' )
 {

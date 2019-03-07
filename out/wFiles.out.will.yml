@@ -120,6 +120,7 @@ path:
       - proto/dwtools/amid/files.test/Hub.HardDrive.test.ss
       - proto/dwtools/amid/files.test/Path.test.ss
       - proto/dwtools/amid/files.test/Record.test.s
+      - proto/dwtools/amid/files.test/RecordFilter.test.s
       - proto/dwtools/amid/files.test/Uri.test.ss
       - proto/dwtools/atop
     criterion:
@@ -266,6 +267,7 @@ reflector:
         dwtools/amid/files.test/Hub.HardDrive.test.ss: true
         dwtools/amid/files.test/Path.test.ss: true
         dwtools/amid/files.test/Record.test.s: true
+        dwtools/amid/files.test/RecordFilter.test.s: true
         dwtools/amid/files.test/Uri.test.ss: true
         dwtools/atop: true
       basePath: .

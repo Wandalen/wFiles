@@ -1,6 +1,6 @@
 ( function _Npm_ss_( ) {
 
-'use strict';
+'use strict'; /*aaa*/
 
 if( typeof module !== 'undefined' )
 {

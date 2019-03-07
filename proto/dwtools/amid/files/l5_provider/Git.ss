@@ -167,9 +167,7 @@ function filesReflectSingle_body( o )
     srcPath = _.mapKeys( srcPath )[ 0 ];
   }
 
-  debugger;
   let paths = self.pathParse( srcPath );
-  debugger;
 
   /* */
 
@@ -247,7 +245,6 @@ function filesReflectSingle_body( o )
 
   if( !gitConfigExists )
   {
-    debugger;
     /* !!! delete dst dir maybe */
     if( !dstFileProvider.fileExists( path.join( dstPath, '.git' ) ) )
     shell( 'git clone ' + paths.compact + ' ' + '.' );

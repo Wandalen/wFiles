@@ -299,6 +299,7 @@ function pathDirTempForAnother( filePath )
   }
 
   let dirsPath = this.chainToRoot( filePath );
+  let err;
 
   for( let i = 0, l = dirsPath.length - 1 || dirsPath.length ; i < l ; i++ )
   {
@@ -312,11 +313,17 @@ function pathDirTempForAnother( filePath )
       this.fileProvider.dirMakeAct({ filePath : path, sync : 1 });
       return path;
     }
-    catch( err )
+    catch( e )
     {
+      err = e;
       this.fileProvider.logger.log( 'pathDirTempForAnother: can`t create temp dir at :', path );
     }
   }
+
+  if( err )
+  throw _.err( 'pathDirTempForAnother: can`t create temp dir for:', filePath, '\n', err )
+
+  return path;
 
   /* */
 
@@ -324,8 +331,6 @@ function pathDirTempForAnother( filePath )
   {
     return path.substring( 0, path.indexOf( '/', 1 ) )
   }
-
-  return path;
 }
 
 //

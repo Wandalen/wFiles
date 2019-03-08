@@ -682,13 +682,13 @@ function filesFindMaskTerminal( test )
   let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
   var terminalPath = path.join( testPath, 'package.json' );
 
-  _.fileProvider.filesDelete( testPath );
-  _.fileProvider.fileWrite( terminalPath, terminalPath );
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalPath, terminalPath );
 
   test.case = 'relative to current dir';
 
   var filter =  { maskTerminal : './package.json' }
-  var got = _.fileProvider.filesFind({ filePath : testPath, filter : filter, recursive : 1 });
+  var got = provider.filesFind({ filePath : testPath, filter : filter, recursive : 1 });
   test.identical( got.length, 1 );
 
   /* */
@@ -696,7 +696,7 @@ function filesFindMaskTerminal( test )
   test.case = 'relative to parent dir';
 
   var filter =  { maskTerminal : './filesFindMaskTerminal/package.json' }
-  var got = _.fileProvider.filesFind({ filePath : testPath, filter : filter });
+  var got = provider.filesFind({ filePath : testPath, filter : filter });
   test.identical( got.length, 0 );
   // test.identical( got[ 0 ].absolute, terminalPath );
   // test.identical( got[ 0 ].relative, './package.json' );
@@ -925,7 +925,7 @@ function filesFind( test )
   /* */
 
   test.case = 'native path';
-  var got = _.fileProvider.filesFind
+  var got = provider.filesFind
   ({
     filePath : __filename,
     includingTerminals : 1,
@@ -956,7 +956,7 @@ function filesFind( test )
     return r;
   }
 
-  var got = _.fileProvider.filesFind
+  var got = provider.filesFind
   ({
     filePath : __dirname,
     includingTerminals : 1,
@@ -973,7 +973,7 @@ function filesFind( test )
 
   //
 
-  _.fileProvider.safe = 1;
+  provider.safe = 1;
 
   var combinations = [];
   var testsInfo = [];
@@ -1063,9 +1063,9 @@ function filesFind( test )
       }
 
       if( options.filePath === null )
-      return test.shouldThrowError( () => _.fileProvider.filesFind( options ) );
+      return test.shouldThrowError( () => provider.filesFind( options ) );
 
-      var files = _.fileProvider.filesFind( options );
+      var files = provider.filesFind( options );
 
       if( options.outputFormat === 'nothing' )
       {
@@ -1142,7 +1142,7 @@ function filesFind( test )
     info.level = levels;
     info.number = ++n;
     test.case = _.toStr( info, { levels : 3 } )
-    var files = _.fileProvider.filesFind( _.cloneJust( o ) );
+    var files = provider.filesFind( _.cloneJust( o ) );
     var tester = path.globRegexpsForTerminal( glob, testPath, info.filter.basePath );
     var expected = allFiles.slice();
     expected = expected.filter( ( p ) =>
@@ -1203,8 +1203,8 @@ function filesFind( test )
 
   function prepareFiles( level )
   {
-    if( _.fileProvider.statResolvedRead( testPath ) )
-    _.fileProvider.filesDelete( testPath );
+    if( provider.statResolvedRead( testPath ) )
+    provider.filesDelete( testPath );
 
     var dirForFile = testPath;
     for( var i = 0; i <= level; i++ )
@@ -1215,7 +1215,7 @@ function filesFind( test )
       for( var j = 0; j < filesNames.length; j++ )
       {
         let terminalPath = path.join( dirForFile, filesNames[ j ] );
-        _.fileProvider.fileWrite( terminalPath, '' );
+        provider.fileWrite( terminalPath, '' );
       }
 
     }
@@ -1228,7 +1228,7 @@ function filesFind( test )
   {
     var expected = [];
     var dirPath = testPath;
-    var isDir = _.fileProvider.isDir( o.filePath );
+    var isDir = provider.isDir( o.filePath );
 
     if( isDir && o._includingDirs && o.includingStem )
     {
@@ -1365,7 +1365,7 @@ function filesFind( test )
       }
     }
 
-    _.fileProvider.filesDelete( testPath );
+    provider.filesDelete( testPath );
 
     for( var i = 0; i < numberOfDuplicates; i++ )
     {
@@ -1398,7 +1398,7 @@ function filesFind( test )
     }
     makePaths( tree , testPath );
     paths.sort();
-    paths.forEach( ( p ) => _.fileProvider.fileWrite( p, '' ) )
+    paths.forEach( ( p ) => provider.fileWrite( p, '' ) )
     return paths;
   }
 

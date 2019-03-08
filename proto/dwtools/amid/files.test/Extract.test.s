@@ -67,8 +67,9 @@ function onSuiteEnd()
 //
 
 function pathFor( filePath )
-{
-  return '/' + filePath;
+{ 
+  let self = this;
+  return self.provider.path.normalize('/' + filePath );
 }
 
 // --

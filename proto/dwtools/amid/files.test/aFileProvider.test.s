@@ -34049,7 +34049,7 @@ function pathResolve( test )
   var got = resolve( '.','aa','cc','..','..' );
   test.identical( got, expected );
 
-  var expected = _.strIsolateEndOrNone( current(),'/' )[ 0 ];
+  var expected = _.strIsolateRightOrNone( current(),'/' )[ 0 ];
   if( current() === '/' )
   expected = '/..';
   var got = resolve( 'aa','cc','..','..','..' );

@@ -39,7 +39,7 @@ function onSuiteEnd()
 {
   if( !this.isBrowser )
   {
-    _.assert( _.strEnds( this.testSuitePath, 'Path' ) );
+    _.assert( _.strHas( this.testSuitePath, 'Path' ) );
     _.path.dirTempClose( this.testSuitePath );
   }
 }
@@ -344,7 +344,7 @@ function pathResolve( test )
 
   console.log( '_.path.current()',_.path.current() );
   var paths = [  'aa','cc','..','..','..' ];
-  var expected = _.strIsolateEndOrNone( _.path.current(),'/' )[ 0 ];
+  var expected = _.strIsolateRightOrNone( _.path.current(),'/' )[ 0 ];
   if( _.path.current() === '/' )
   expected = '/..';
   var got = provider.path.resolve.apply( provider.path, paths );
@@ -1021,9 +1021,31 @@ function pathDirTempForTrivial( test )
 
   test.case = 'path to root of device';
   var filePath = pathDeviceGet( _.path.normalize( __filename ) );
-  var tempPath = _.path.pathDirTempForAnother( filePath );
-  test.is( _.path.fileProvider.isDir( tempPath ) );
-  _.path.fileProvider.fileDelete({ filePath : tempPath, safe : 0 });
+  var possiblePath = _.path.join( filePath, 'tmp-' + _.idWithGuid() + '.tmp' );
+  var shouldThrowError = false;
+  try
+  {
+    _.path.fileProvider.dirMake( possiblePath );
+    _.path.fileProvider.fileDelete({ filePath : possiblePath, safe : 0 });
+  }
+  catch( err )
+  {
+    shouldThrowError = true;
+  }
+  if( shouldThrowError )
+  {
+    test.shouldThrowErrorSync( () =>
+    {
+      _.path.pathDirTempForAnother( filePath );
+    })
+  }
+  else
+  {
+    var tempPath = _.path.pathDirTempForAnother( filePath );
+    test.is( _.path.fileProvider.isDir( tempPath ) );
+    _.path.fileProvider.fileDelete({ filePath : tempPath, safe : 0 });
+  }
+
 
   test.case = 'close removes only temp dirs made by open';
   var filePath = _.path.normalize( __filename );

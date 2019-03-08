@@ -203,6 +203,8 @@ function createTestResources( cases, dir )
         break;
     }
   }
+
+  return null;
 }
 
 //
@@ -2436,6 +2438,7 @@ function filesNewer( test )
     test.description = 'two files created at different time';
     var got = _.files.filesNewer( file1, file3 );
     test.identical( got, file3 );
+    return null;
   });
 
   if( Config.debug )
@@ -2487,6 +2490,7 @@ function filesOlder( test )
     test.description = 'two files created at different time';
     var got = _.files.filesOlder( file1, file3 );
     test.identical( got, file1 );
+    return null;
   });
 
   if( Config.debug )
@@ -3188,7 +3192,7 @@ function filesAreUpToDate2( test )
   }
 */
 
-  var con = new _.Consequence( ).take( );
+  var con = new _.Consequence( ).take( null );
   for( let tc of testChecks )
   {
     ( function( tc )
@@ -3198,6 +3202,7 @@ function filesAreUpToDate2( test )
         console.log( 'tc : ' + tc.name );
         createTestResources( tc.createFirst );
         console.log( '--> files create first' );
+        return null;
       })
 
       con.finally( _.routineSeal( _,_.timeOut,[ 1000 ] ) );
@@ -3231,6 +3236,7 @@ function filesAreUpToDate2( test )
           console.log( err );
         }
         test.identical( got, tc.expected );
+        return null;
       } );
     } )( _.mapExtend( null, tc ) );
   }

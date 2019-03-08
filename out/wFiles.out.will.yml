@@ -18,7 +18,7 @@ about:
     get access to all sophisticated general algorithms on files for free. Who
     said files is only externals? Files makes possible to treat internals of a
     program as files system(s). Use the module to keep DRY.
-  version: 0.6.558
+  version: 0.6.580
   enabled: 1
   interpreters:
     - nodejs >= 6.0.0
@@ -28,23 +28,25 @@ about:
     - wTools
 execution:
   scripts:
-    test: wtest staging
+    test: wtest proto
     docgen: wdocgen staging
 path:
-  proto:
-    path: ./proto
   in:
-    path: .
+    path: ..
+  temp:
+    path: out
   out:
     path: out
   out.debug:
-    path: ./out.debug
+    path: ./out/debug
     criterion:
       debug: 1
   out.release:
-    path: ./out.release
+    path: ./out/release
     criterion:
       debug: 0
+  proto:
+    path: ./proto
   repository:
     path: 'git+https://github.com/Wandalen/wFiles.git'
   bugs:
@@ -61,65 +63,66 @@ path:
       public: 1
   exportedFiles.proto.export:
     path:
-      - .
-      - ./dwtools
-      - ./dwtools/Tools.s
-      - ./dwtools/abase
-      - ./dwtools/amid
-      - ./dwtools/amid/files
-      - ./dwtools/amid/files/UseBase.s
-      - ./dwtools/amid/files/UseMid.s
-      - ./dwtools/amid/files/UseTop.s
-      - ./dwtools/amid/files/l1
-      - ./dwtools/amid/files/l1/Encoders.s
-      - ./dwtools/amid/files/l1/FileRecord.s
-      - ./dwtools/amid/files/l1/FileRecordFactory.s
-      - ./dwtools/amid/files/l1/FileRecordFilter.s
-      - ./dwtools/amid/files/l1/FileRoutines.s
-      - ./dwtools/amid/files/l1/FileStat.s
-      - ./dwtools/amid/files/l1/Path.s
-      - ./dwtools/amid/files/l1/Path.ss
-      - ./dwtools/amid/files/l2
-      - ./dwtools/amid/files/l2/Abstract.s
-      - ./dwtools/amid/files/l2/Partial.s
-      - ./dwtools/amid/files/l3
-      - ./dwtools/amid/files/l3/FindMixin.s
-      - ./dwtools/amid/files/l3/SecondaryMixin.s
-      - ./dwtools/amid/files/l5_provider
-      - ./dwtools/amid/files/l5_provider/Extract.s
-      - ./dwtools/amid/files/l5_provider/Git.ss
-      - ./dwtools/amid/files/l5_provider/HardDrive.ss
-      - ./dwtools/amid/files/l5_provider/HtmlDocument.js
-      - ./dwtools/amid/files/l5_provider/Http.js
-      - ./dwtools/amid/files/l5_provider/Http.ss
-      - ./dwtools/amid/files/l5_provider/Npm.ss
-      - ./dwtools/amid/files/l5_provider/RemoteClient.s
-      - ./dwtools/amid/files/l5_provider/RemoteServlet.ss
-      - ./dwtools/amid/files/l5_provider/Svn.ss
-      - ./dwtools/amid/files/l7
-      - ./dwtools/amid/files/l7/Hub.s
-      - ./dwtools/amid/files/l8_filter
-      - ./dwtools/amid/files/l8_filter/Image.s
-      - ./dwtools/amid/files/l8_filter/Reroot.s
-      - ./dwtools/amid/files/l9
-      - ./dwtools/amid/files.test
-      - ./dwtools/amid/files.test/aFileProvider.test.s
-      - ./dwtools/amid/files.test/aFilesFind.test.s
-      - ./dwtools/amid/files.test/Extract.html
-      - ./dwtools/amid/files.test/Extract.test.s
-      - ./dwtools/amid/files.test/Files.copy.test.s
-      - ./dwtools/amid/files.test/Files.etc.test.ss
-      - ./dwtools/amid/files.test/FilesFind.Extract.test.s
-      - ./dwtools/amid/files.test/FilesFind.HardDrive.test.ss
-      - ./dwtools/amid/files.test/FilesRead.test.s
-      - ./dwtools/amid/files.test/HardDrive.test.ss
-      - ./dwtools/amid/files.test/Hub.copy.test.ss
-      - ./dwtools/amid/files.test/Hub.Extract.test.s
-      - ./dwtools/amid/files.test/Hub.HardDrive.test.ss
-      - ./dwtools/amid/files.test/Path.test.ss
-      - ./dwtools/amid/files.test/Record.test.s
-      - ./dwtools/amid/files.test/Uri.test.ss
-      - ./dwtools/atop
+      - proto
+      - proto/dwtools
+      - proto/dwtools/Tools.s
+      - proto/dwtools/abase
+      - proto/dwtools/amid
+      - proto/dwtools/amid/files
+      - proto/dwtools/amid/files/UseBase.s
+      - proto/dwtools/amid/files/UseMid.s
+      - proto/dwtools/amid/files/UseTop.s
+      - proto/dwtools/amid/files/l1
+      - proto/dwtools/amid/files/l1/Encoders.s
+      - proto/dwtools/amid/files/l1/FileRecord.s
+      - proto/dwtools/amid/files/l1/FileRecordFactory.s
+      - proto/dwtools/amid/files/l1/FileRecordFilter.s
+      - proto/dwtools/amid/files/l1/FileRoutines.s
+      - proto/dwtools/amid/files/l1/FileStat.s
+      - proto/dwtools/amid/files/l1/Path.s
+      - proto/dwtools/amid/files/l1/Path.ss
+      - proto/dwtools/amid/files/l2
+      - proto/dwtools/amid/files/l2/Abstract.s
+      - proto/dwtools/amid/files/l2/Partial.s
+      - proto/dwtools/amid/files/l3
+      - proto/dwtools/amid/files/l3/FindMixin.s
+      - proto/dwtools/amid/files/l3/SecondaryMixin.s
+      - proto/dwtools/amid/files/l5_provider
+      - proto/dwtools/amid/files/l5_provider/Extract.s
+      - proto/dwtools/amid/files/l5_provider/Git.ss
+      - proto/dwtools/amid/files/l5_provider/HardDrive.ss
+      - proto/dwtools/amid/files/l5_provider/HtmlDocument.js
+      - proto/dwtools/amid/files/l5_provider/Http.js
+      - proto/dwtools/amid/files/l5_provider/Http.ss
+      - proto/dwtools/amid/files/l5_provider/Npm.ss
+      - proto/dwtools/amid/files/l5_provider/RemoteClient.s
+      - proto/dwtools/amid/files/l5_provider/RemoteServlet.ss
+      - proto/dwtools/amid/files/l5_provider/Svn.ss
+      - proto/dwtools/amid/files/l7
+      - proto/dwtools/amid/files/l7/Hub.s
+      - proto/dwtools/amid/files/l8_filter
+      - proto/dwtools/amid/files/l8_filter/Image.s
+      - proto/dwtools/amid/files/l8_filter/Reroot.s
+      - proto/dwtools/amid/files/l9
+      - proto/dwtools/amid/files.test
+      - proto/dwtools/amid/files.test/aFileProvider.test.s
+      - proto/dwtools/amid/files.test/aFilesFind.test.s
+      - proto/dwtools/amid/files.test/Extract.html
+      - proto/dwtools/amid/files.test/Extract.test.s
+      - proto/dwtools/amid/files.test/Files.copy.test.s
+      - proto/dwtools/amid/files.test/Files.etc.test.ss
+      - proto/dwtools/amid/files.test/FilesFind.Extract.test.s
+      - proto/dwtools/amid/files.test/FilesFind.HardDrive.test.ss
+      - proto/dwtools/amid/files.test/FilesRead.test.s
+      - proto/dwtools/amid/files.test/HardDrive.test.ss
+      - proto/dwtools/amid/files.test/Hub.copy.test.ss
+      - proto/dwtools/amid/files.test/Hub.Extract.test.s
+      - proto/dwtools/amid/files.test/Hub.HardDrive.test.ss
+      - proto/dwtools/amid/files.test/Path.test.ss
+      - proto/dwtools/amid/files.test/Record.test.s
+      - proto/dwtools/amid/files.test/RecordFilter.test.s
+      - proto/dwtools/amid/files.test/Uri.test.ss
+      - proto/dwtools/atop
     criterion:
       default: 1
       debug: 1
@@ -131,9 +134,9 @@ path:
 submodule: {}
 reflector:
   reflect.proto.:
-    srcFilter:
+    src:
       filePath:
-        ./proto: ./out.release
+        .: .
       maskAll:
         excludeAny:
           - !<tag:yaml.org,2002:js/regexp> /(\W|^)node_modules(\W|$)/
@@ -146,15 +149,17 @@ reflector:
           - !<tag:yaml.org,2002:js/regexp> /\.debug($|\.|\/)/i
           - !<tag:yaml.org,2002:js/regexp> /\.test($|\.|\/)/i
           - !<tag:yaml.org,2002:js/regexp> /\.experiment($|\.|\/)/i
-      prefixPath: .
+      prefixPath: proto
+    dst:
+      prefixPath: out/release
     criterion:
       debug: 0
     inherit:
       - predefined.*
   reflect.proto.debug:
-    srcFilter:
+    src:
       filePath:
-        ./proto: ./out.debug
+        .: .
       maskAll:
         excludeAny:
           - !<tag:yaml.org,2002:js/regexp> /(\W|^)node_modules(\W|$)/
@@ -165,13 +170,15 @@ reflector:
           - !<tag:yaml.org,2002:js/regexp> /\.DS_Store$/
           - !<tag:yaml.org,2002:js/regexp> /(^|\/)-/
           - !<tag:yaml.org,2002:js/regexp> /\.release($|\.|\/)/i
-      prefixPath: .
+      prefixPath: proto
+    dst:
+      prefixPath: out/debug
     criterion:
       debug: 1
     inherit:
       - predefined.*
   reflect.submodules:
-    srcFilter:
+    src:
       maskAll:
         excludeAny:
           - !<tag:yaml.org,2002:js/regexp> /(\W|^)node_modules(\W|$)/
@@ -182,80 +189,97 @@ reflector:
           - !<tag:yaml.org,2002:js/regexp> /\.DS_Store$/
           - !<tag:yaml.org,2002:js/regexp> /(^|\/)-/
           - !<tag:yaml.org,2002:js/regexp> /\.release($|\.|\/)/i
-      prefixPath: .
     criterion:
       debug: 1
     inherit:
       - predefined.*
   exported.proto.export:
-    srcFilter:
-      filePath: ./proto
-      prefixPath: .
-  exportedFiles.proto.export:
-    recursive: 0
-    srcFilter:
+    src:
       filePath:
         .: true
-        ./dwtools: true
-        ./dwtools/Tools.s: true
-        ./dwtools/abase: true
-        ./dwtools/amid: true
-        ./dwtools/amid/files: true
-        ./dwtools/amid/files/UseBase.s: true
-        ./dwtools/amid/files/UseMid.s: true
-        ./dwtools/amid/files/UseTop.s: true
-        ./dwtools/amid/files/l1: true
-        ./dwtools/amid/files/l1/Encoders.s: true
-        ./dwtools/amid/files/l1/FileRecord.s: true
-        ./dwtools/amid/files/l1/FileRecordFactory.s: true
-        ./dwtools/amid/files/l1/FileRecordFilter.s: true
-        ./dwtools/amid/files/l1/FileRoutines.s: true
-        ./dwtools/amid/files/l1/FileStat.s: true
-        ./dwtools/amid/files/l1/Path.s: true
-        ./dwtools/amid/files/l1/Path.ss: true
-        ./dwtools/amid/files/l2: true
-        ./dwtools/amid/files/l2/Abstract.s: true
-        ./dwtools/amid/files/l2/Partial.s: true
-        ./dwtools/amid/files/l3: true
-        ./dwtools/amid/files/l3/FindMixin.s: true
-        ./dwtools/amid/files/l3/SecondaryMixin.s: true
-        ./dwtools/amid/files/l5_provider: true
-        ./dwtools/amid/files/l5_provider/Extract.s: true
-        ./dwtools/amid/files/l5_provider/Git.ss: true
-        ./dwtools/amid/files/l5_provider/HardDrive.ss: true
-        ./dwtools/amid/files/l5_provider/HtmlDocument.js: true
-        ./dwtools/amid/files/l5_provider/Http.js: true
-        ./dwtools/amid/files/l5_provider/Http.ss: true
-        ./dwtools/amid/files/l5_provider/Npm.ss: true
-        ./dwtools/amid/files/l5_provider/RemoteClient.s: true
-        ./dwtools/amid/files/l5_provider/RemoteServlet.ss: true
-        ./dwtools/amid/files/l5_provider/Svn.ss: true
-        ./dwtools/amid/files/l7: true
-        ./dwtools/amid/files/l7/Hub.s: true
-        ./dwtools/amid/files/l8_filter: true
-        ./dwtools/amid/files/l8_filter/Image.s: true
-        ./dwtools/amid/files/l8_filter/Reroot.s: true
-        ./dwtools/amid/files/l9: true
-        ./dwtools/amid/files.test: true
-        ./dwtools/amid/files.test/aFileProvider.test.s: true
-        ./dwtools/amid/files.test/aFilesFind.test.s: true
-        ./dwtools/amid/files.test/Extract.html: true
-        ./dwtools/amid/files.test/Extract.test.s: true
-        ./dwtools/amid/files.test/Files.copy.test.s: true
-        ./dwtools/amid/files.test/Files.etc.test.ss: true
-        ./dwtools/amid/files.test/FilesFind.Extract.test.s: true
-        ./dwtools/amid/files.test/FilesFind.HardDrive.test.ss: true
-        ./dwtools/amid/files.test/FilesRead.test.s: true
-        ./dwtools/amid/files.test/HardDrive.test.ss: true
-        ./dwtools/amid/files.test/Hub.copy.test.ss: true
-        ./dwtools/amid/files.test/Hub.Extract.test.s: true
-        ./dwtools/amid/files.test/Hub.HardDrive.test.ss: true
-        ./dwtools/amid/files.test/Path.test.ss: true
-        ./dwtools/amid/files.test/Record.test.s: true
-        ./dwtools/amid/files.test/Uri.test.ss: true
-        ./dwtools/atop: true
+      prefixPath: proto
+    criterion:
+      default: 1
+      debug: 1
+      raw: 1
+      proto: 1
+      export: 1
+      tar: 1
+      public: 1
+  exportedFiles.proto.export:
+    recursive: 0
+    src:
+      filePath:
+        .: true
+        dwtools: true
+        dwtools/Tools.s: true
+        dwtools/abase: true
+        dwtools/amid: true
+        dwtools/amid/files: true
+        dwtools/amid/files/UseBase.s: true
+        dwtools/amid/files/UseMid.s: true
+        dwtools/amid/files/UseTop.s: true
+        dwtools/amid/files/l1: true
+        dwtools/amid/files/l1/Encoders.s: true
+        dwtools/amid/files/l1/FileRecord.s: true
+        dwtools/amid/files/l1/FileRecordFactory.s: true
+        dwtools/amid/files/l1/FileRecordFilter.s: true
+        dwtools/amid/files/l1/FileRoutines.s: true
+        dwtools/amid/files/l1/FileStat.s: true
+        dwtools/amid/files/l1/Path.s: true
+        dwtools/amid/files/l1/Path.ss: true
+        dwtools/amid/files/l2: true
+        dwtools/amid/files/l2/Abstract.s: true
+        dwtools/amid/files/l2/Partial.s: true
+        dwtools/amid/files/l3: true
+        dwtools/amid/files/l3/FindMixin.s: true
+        dwtools/amid/files/l3/SecondaryMixin.s: true
+        dwtools/amid/files/l5_provider: true
+        dwtools/amid/files/l5_provider/Extract.s: true
+        dwtools/amid/files/l5_provider/Git.ss: true
+        dwtools/amid/files/l5_provider/HardDrive.ss: true
+        dwtools/amid/files/l5_provider/HtmlDocument.js: true
+        dwtools/amid/files/l5_provider/Http.js: true
+        dwtools/amid/files/l5_provider/Http.ss: true
+        dwtools/amid/files/l5_provider/Npm.ss: true
+        dwtools/amid/files/l5_provider/RemoteClient.s: true
+        dwtools/amid/files/l5_provider/RemoteServlet.ss: true
+        dwtools/amid/files/l5_provider/Svn.ss: true
+        dwtools/amid/files/l7: true
+        dwtools/amid/files/l7/Hub.s: true
+        dwtools/amid/files/l8_filter: true
+        dwtools/amid/files/l8_filter/Image.s: true
+        dwtools/amid/files/l8_filter/Reroot.s: true
+        dwtools/amid/files/l9: true
+        dwtools/amid/files.test: true
+        dwtools/amid/files.test/aFileProvider.test.s: true
+        dwtools/amid/files.test/aFilesFind.test.s: true
+        dwtools/amid/files.test/Extract.html: true
+        dwtools/amid/files.test/Extract.test.s: true
+        dwtools/amid/files.test/Files.copy.test.s: true
+        dwtools/amid/files.test/Files.etc.test.ss: true
+        dwtools/amid/files.test/FilesFind.Extract.test.s: true
+        dwtools/amid/files.test/FilesFind.HardDrive.test.ss: true
+        dwtools/amid/files.test/FilesRead.test.s: true
+        dwtools/amid/files.test/HardDrive.test.ss: true
+        dwtools/amid/files.test/Hub.copy.test.ss: true
+        dwtools/amid/files.test/Hub.Extract.test.s: true
+        dwtools/amid/files.test/Hub.HardDrive.test.ss: true
+        dwtools/amid/files.test/Path.test.ss: true
+        dwtools/amid/files.test/Record.test.s: true
+        dwtools/amid/files.test/RecordFilter.test.s: true
+        dwtools/amid/files.test/Uri.test.ss: true
+        dwtools/atop: true
       basePath: .
       prefixPath: proto
+    criterion:
+      default: 1
+      debug: 1
+      raw: 1
+      proto: 1
+      export: 1
+      tar: 1
+      public: 1
 step:
   clean.out.:
     criterion:
@@ -376,7 +400,7 @@ build:
       - 'step::export.proto'
 exported:
   proto.export:
-    version: 0.6.558
+    version: 0.6.580
     criterion:
       default: 1
       debug: 1

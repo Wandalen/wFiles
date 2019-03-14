@@ -159,28 +159,12 @@ function form()
 {
   let factory = this;
 
-  // if( factory.stemPath === 'tmp:///' )
-  // debugger;
-
   _.assert( arguments.length === 0 );
   _.assert( !factory.formed );
 
-  // if( factory.basePath === '/dst' )
-  // debugger;
   factory._formAssociations();
 
   /* */
-
-  // if( factory.filter )
-  // {
-  //   factory.hubFileProvider = factory.hubFileProvider || factory.filter.hubFileProvider;
-  //   factory.effectiveFileProvider = factory.effectiveFileProvider || factory.filter.effectiveFileProvider;
-  //   factory.defaultFileProvider = factory.defaultFileProvider || factory.filter.defaultFileProvider;
-  // }
-  //
-  // let effectiveFileProvider = factory.effectiveFileProvider || factory.hubFileProvider;
-  // if( factory.hubFileProvider && factory.hubFileProvider.hub )
-  // factory.hubFileProvider = factory.hubFileProvider.hub;
 
   factory._formAssociations();
 
@@ -241,12 +225,12 @@ function form()
   }
 
   if( !factory.basePath && factory.filter && factory.stemPath )
-  factory.basePath = factory.filter.basePath[ factory.stemPath ];
+  {
+    _.assert( factory.filter.formed === 5 );
+    factory.basePath = factory.filter.formedBasePath[ factory.stemPath ];
+  }
 
   /* */
-
-  // if( !factory.effectiveFileProvider )
-  // factory.effectiveFileProvider = effectiveFileProvider;
 
   if( !factory.hubFileProvider )
   factory.hubFileProvider = factory.defaultFileProvider;
@@ -278,8 +262,8 @@ function form()
 
     if( factory.filter )
     {
-      _.assert( !!factory.filter.formed );
-      _.assert( factory.filter.basePath[ factory.stemPath ] === factory.basePath );
+      _.assert( factory.filter.formed === 5 );
+      _.assert( factory.filter.formedBasePath[ factory.stemPath ] === factory.basePath );
       _.assert( factory.filter.effectiveFileProvider === factory.effectiveFileProvider );
       _.assert( factory.filter.hubFileProvider === factory.hubFileProvider || factory.filter.hubFileProvider === null );
       _.assert( factory.filter.defaultFileProvider === factory.defaultFileProvider );

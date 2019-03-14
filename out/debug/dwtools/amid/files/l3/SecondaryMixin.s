@@ -45,6 +45,7 @@ function filesRead_pre( routine, args )
   let self = this;
   let o = self._preFileFilterWithProviderDefaults.apply( self, arguments );
 
+  // debugger;
   // o.fileFilter = self.recordFilter( o.fileFilter );
   o.fileFilter.form();
 
@@ -63,15 +64,17 @@ function filesRead_body( o )
   let path = self.path;
   let con = new _.Consequence();
 
+  _.assert( o.fileFilter.formed === 5 );
+
   let r = Object.create( null );
   r.errors = [];
   r.options = o;
   r.dataMap = Object.create( null );
-
   r.fileMap = Object.create( null );
   r.dstMap = Object.create( null );
 
   r.pathGroupedByDstMap = path.pathMapGroupByDst( o.fileFilter.filePath );
+  // r.pathGroupedByDstMap = path.pathMapGroupByDst( o.fileFilter.formedFilePath );
 
   /* */
 
@@ -83,7 +86,7 @@ function filesRead_body( o )
     con.finallyGive( 1 );
 
     o2.filter = o.fileFilter.clone();
-    o2.filter.filePath = path.pathMapExtend( null, srcPath, dstPath );
+    o2.filter.filePathSelect( srcPath, dstPath );
     o2.filter.form();
 
     _.Consequence.From( self.filesFind( o2 ) )
@@ -117,7 +120,6 @@ function filesRead_body( o )
   });
 
   debugger;
-
   return con.toResourceMaybe();
 
   /* */
@@ -167,6 +169,7 @@ filesRead_body.defaults =
   fileFilter : null,
   sync : 1,
   throwing : null,
+  recursive : 2,
 }
 
 //

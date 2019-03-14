@@ -64,7 +64,7 @@ function make( test )
 
   filter.form();
   logger.log( filter );
-  test.identical( filter.filePath, { '/src' : true } );
+  test.identical( filter.filePath, { '/src' : null } );
   test.identical( filter.prefixPath, null );
   test.identical( filter.postfixPath, null );
   test.identical( filter.basePath, { '/src' : '/src' } );
@@ -102,7 +102,7 @@ function make( test )
 
   filter.form();
   logger.log( filter );
-  test.identical( filter.filePath, { '/src' : true } );
+  test.identical( filter.filePath, { '/src' : null } );
   test.identical( filter.prefixPath, null );
   test.identical( filter.postfixPath, null );
   test.identical( filter.basePath, { '/src' : '/src' } );
@@ -121,7 +121,7 @@ function make( test )
 
   filter.form();
   logger.log( filter );
-  test.identical( filter.filePath, { '/src/a' : true, '/src/b' : true } );
+  test.identical( filter.filePath, { '/src/a' : null, '/src/b' : null } );
   test.identical( filter.prefixPath, null );
   test.identical( filter.postfixPath, null );
   test.identical( filter.basePath, { '/src/a' : '/src/a', '/src/b' : '/src/b' } );
@@ -140,7 +140,7 @@ function make( test )
 
   filter.form();
   logger.log( filter );
-  test.identical( filter.filePath, { '/src/a' : true, '/src/a/src/b' : true } );
+  test.identical( filter.filePath, { '/src/a' : null, '/src/a/src/b' : null } );
   test.identical( filter.prefixPath, null );
   test.identical( filter.postfixPath, null );
   test.identical( filter.basePath, { '/src/a' : '/src/a', '/src/a/src/b' : '/src/a' } );
@@ -339,10 +339,10 @@ function prefixesApply( test )
 
   var f1 = extract1.recordFilter({});
   var expectedBasePath = '/dir/filter1/proto';
-  var expectedFilePath = { '/dir/filter1/f' : true, '/dir/filter1/d' : true, '/dir/filter1/ex' : false }
+  var expectedFilePath = { '/dir/filter1/f' : '/dir/filter1', '/dir/filter1/d' : '/dir/filter1', '/dir/filter1/ex' : false }
 
   f1.filePath = { 'f' : true, 'd' : true, 'ex' : false }
-  f1.prefixPath = '/dir/filter1'
+  f1.prefixPath = '/dir/filter1';
   f1.basePath = './proto';
 
   f1.prefixesApply();
@@ -357,7 +357,7 @@ function prefixesApply( test )
 
   var f1 = extract1.recordFilter();
   var expectedBasePath = '/dir/filter1';
-  var expectedFilePath = { '/dir/filter1/f' : true, '/dir/filter1/ex' : false }
+  var expectedFilePath = { '/dir/filter1/f' : '/dir/filter1', '/dir/filter1/ex' : false }
 
   f1.filePath = { 'f' : true, 'ex' : false }
   f1.prefixPath = '/dir/filter1'
@@ -375,7 +375,7 @@ function prefixesApply( test )
 
   var f1 = extract1.recordFilter();
   var expectedBasePath = null;
-  var expectedFilePath = { '/dir/filter1/f' : true, '/dir/filter1/ex' : false }
+  var expectedFilePath = { '/dir/filter1/f' : '/dir/filter1', '/dir/filter1/ex' : false }
 
   f1.filePath = { 'f' : true, 'ex' : false }
   f1.prefixPath = '/dir/filter1'
@@ -393,7 +393,7 @@ function prefixesApply( test )
 
   var f1 = extract1.recordFilter();
   var expectedBasePath = '/base';
-  var expectedFilePath = { './dir/f' : true, './dir/ex' : false }
+  var expectedFilePath = { './dir/f' : './dir', './dir/ex' : false }
 
   f1.filePath = { 'f' : true, 'ex' : false }
   f1.prefixPath = './dir'
@@ -411,7 +411,7 @@ function prefixesApply( test )
 
   var f1 = extract1.recordFilter();
   var expectedBasePath = '/dir/filter1/proto';
-  var expectedFilePath = { '/dir/filter1/f' : true, '/dir/filter1/d' : true, '/dir/ex' : false }
+  var expectedFilePath = { '/dir/filter1/d' : '/dir/filter1', '/dir/filter1/f' : '/dir/filter1', '/dir/ex' : false }
 
   f1.filePath = { 'f' : true, '/dir/filter1/d' : true, '/dir/ex' : false }
   f1.prefixPath = '/dir/filter1'
@@ -429,7 +429,7 @@ function prefixesApply( test )
 
   var f1 = extract1.recordFilter();
   var expectedBasePath = '/proto';
-  var expectedFilePath = { '/dir/filter1/f' : true, '/dir/filter1/d' : true, '/dir/ex' : false }
+  var expectedFilePath = { '/dir/filter1/d' : '/dir/filter1', '/dir/filter1/f' : '/dir/filter1', '/dir/ex' : false }
 
   f1.filePath = { 'f' : true, '/dir/filter1/d' : true, '/dir/ex' : false }
   f1.prefixPath = '/dir/filter1'
@@ -468,9 +468,7 @@ function prefixesApply( test )
 
   test.case = 'trivial';
 
-  debugger;
-  var f1 = extract1.recordFilter({ dst : extract1.recordFilter() });
-  debugger;
+  var f1 = extract1.recordFilter({ dstFilter : extract1.recordFilter() });
   var expectedBasePath = '/dir/filter1/proto';
   var expectedFilePath = { '/dir/filter1/f' : true, '/dir/filter1/d' : true, '/dir/filter1/ex' : false }
 
@@ -488,7 +486,7 @@ function prefixesApply( test )
 
   test.case = 'base path is relative and current';
 
-  var f1 = extract1.recordFilter({ dst : extract1.recordFilter() });
+  var f1 = extract1.recordFilter({ dstFilter : extract1.recordFilter() });
   var expectedBasePath = '/dir/filter1';
   var expectedFilePath = { '/dir/filter1/f' : true, '/dir/filter1/ex' : false }
 
@@ -506,7 +504,7 @@ function prefixesApply( test )
 
   test.case = 'no base path';
 
-  var f1 = extract1.recordFilter({ dst : extract1.recordFilter() });
+  var f1 = extract1.recordFilter({ dstFilter : extract1.recordFilter() });
   var expectedBasePath = null;
   var expectedFilePath = { '/dir/filter1/f' : true, '/dir/filter1/ex' : false }
 
@@ -524,7 +522,7 @@ function prefixesApply( test )
 
   test.case = 'prefix is relative';
 
-  var f1 = extract1.recordFilter({ dst : extract1.recordFilter() });
+  var f1 = extract1.recordFilter({ dstFilter : extract1.recordFilter() });
   var expectedBasePath = '/base';
   var expectedFilePath = { './dir/f' : true, './dir/ex' : false }
 
@@ -542,7 +540,7 @@ function prefixesApply( test )
 
   test.case = 'some in file paths are absolute';
 
-  var f1 = extract1.recordFilter({ dst : extract1.recordFilter() });
+  var f1 = extract1.recordFilter({ dstFilter : extract1.recordFilter() });
   var expectedBasePath = '/dir/filter1/proto';
   var expectedFilePath = { '/dir/filter1/f' : true, '/dir/filter1/d' : true, '/dir/ex' : false }
 
@@ -560,7 +558,7 @@ function prefixesApply( test )
 
   test.case = 'base path is absolute';
 
-  var f1 = extract1.recordFilter({ dst : extract1.recordFilter() });
+  var f1 = extract1.recordFilter({ dstFilter : extract1.recordFilter() });
   var expectedBasePath = '/proto';
   var expectedFilePath = { '/dir/filter1/f' : true, '/dir/filter1/d' : true, '/dir/ex' : false }
 
@@ -578,7 +576,7 @@ function prefixesApply( test )
 
   test.case = 'no filePath';
 
-  var f1 = extract1.recordFilter({ dst : extract1.recordFilter() });
+  var f1 = extract1.recordFilter({ dstFilter : extract1.recordFilter() });
   var expectedBasePath = '/dir/filter1/proto';
   var expectedFilePath = '/dir/filter1';
 
@@ -601,12 +599,12 @@ function prefixesApply( test )
 
   test.case = 'trivial';
 
-  var f1 = extract1.recordFilter({ src : extract1.recordFilter() });
+  var f1 = extract1.recordFilter({ srcFilter : extract1.recordFilter() });
   var expectedBasePath = '/dir/filter1/proto';
-  var expectedFilePath = { '/dir/filter1/f' : true, '/dir/filter1/d' : true, '/dir/filter1/ex' : false }
+  var expectedFilePath = { 'f' : '/dir/filter1', 'd' : '/dir/filter1', 'ex' : false }
 
   f1.filePath = { 'f' : true, 'd' : true, 'ex' : false }
-  f1.prefixPath = '/dir/filter1'
+  f1.prefixPath = '/dir/filter1';
   f1.basePath = './proto';
 
   f1.prefixesApply();
@@ -619,12 +617,12 @@ function prefixesApply( test )
 
   test.case = 'base path is relative and current';
 
-  var f1 = extract1.recordFilter({ src : extract1.recordFilter() });
+  var f1 = extract1.recordFilter({ srcFilter : extract1.recordFilter() });
   var expectedBasePath = '/dir/filter1';
-  var expectedFilePath = { '/dir/filter1/f' : true, '/dir/filter1/ex' : false }
+  var expectedFilePath = { 'f' : '/dir/filter1', 'ex' : false }
 
   f1.filePath = { 'f' : true, 'ex' : false }
-  f1.prefixPath = '/dir/filter1'
+  f1.prefixPath = '/dir/filter1';
   f1.basePath = '.';
 
   f1.prefixesApply();
@@ -637,9 +635,9 @@ function prefixesApply( test )
 
   test.case = 'no base path';
 
-  var f1 = extract1.recordFilter({ src : extract1.recordFilter() });
+  var f1 = extract1.recordFilter({ srcFilter : extract1.recordFilter() });
   var expectedBasePath = null;
-  var expectedFilePath = { '/dir/filter1/f' : true, '/dir/filter1/ex' : false }
+  var expectedFilePath = { 'f' : '/dir/filter1', 'ex' : false }
 
   f1.filePath = { 'f' : true, 'ex' : false }
   f1.prefixPath = '/dir/filter1'
@@ -655,11 +653,11 @@ function prefixesApply( test )
 
   test.case = 'prefix is relative';
 
-  var f1 = extract1.recordFilter({ src : extract1.recordFilter() });
+  var f1 = extract1.recordFilter({ srcFilter : extract1.recordFilter() });
   var expectedBasePath = '/base';
-  var expectedFilePath = { './dir/f' : true, './dir/ex' : false }
+  var expectedFilePath = { 'f' : './dir/dir', 'ex' : false }
 
-  f1.filePath = { 'f' : true, 'ex' : false }
+  f1.filePath = { 'f' : './dir', 'ex' : false }
   f1.prefixPath = './dir'
   f1.basePath = '/base';
 
@@ -673,12 +671,12 @@ function prefixesApply( test )
 
   test.case = 'some in file paths are absolute';
 
-  var f1 = extract1.recordFilter({ src : extract1.recordFilter() });
+  var f1 = extract1.recordFilter({ srcFilter : extract1.recordFilter() });
   var expectedBasePath = '/dir/filter1/proto';
-  var expectedFilePath = { '/dir/filter1/f' : true, '/dir/filter1/d' : true, '/dir/ex' : false }
+  var expectedFilePath = { 'f' : '/dir/filter1', '/dir/filter1/d' : '/dir/filter1', '/dir/ex' : false }
 
   f1.filePath = { 'f' : true, '/dir/filter1/d' : true, '/dir/ex' : false }
-  f1.prefixPath = '/dir/filter1'
+  f1.prefixPath = '/dir/filter1';
   f1.basePath = './proto';
 
   f1.prefixesApply();
@@ -691,12 +689,12 @@ function prefixesApply( test )
 
   test.case = 'base path is absolute';
 
-  var f1 = extract1.recordFilter({ src : extract1.recordFilter() });
+  var f1 = extract1.recordFilter({ srcFilter : extract1.recordFilter() });
   var expectedBasePath = '/proto';
-  var expectedFilePath = { '/dir/filter1/f' : true, '/dir/filter1/d' : true, '/dir/ex' : false }
+  var expectedFilePath = { 'f' : '/dir/filter1', '/dir/filter1/d' : '/dir/filter1', '/dir/ex' : false }
 
   f1.filePath = { 'f' : true, '/dir/filter1/d' : true, '/dir/ex' : false }
-  f1.prefixPath = '/dir/filter1'
+  f1.prefixPath = '/dir/filter1';
   f1.basePath = '/proto';
 
   f1.prefixesApply();
@@ -709,7 +707,7 @@ function prefixesApply( test )
 
   test.case = 'no filePath';
 
-  var f1 = extract1.recordFilter({ src : extract1.recordFilter() });
+  var f1 = extract1.recordFilter({ srcFilter : extract1.recordFilter() });
   var expectedBasePath = '/dir/filter1/proto';
   var expectedFilePath = '/dir/filter1';
 
@@ -1050,7 +1048,7 @@ function inherit( test )
 
   /* */
 
-  test.case = 'trivial';
+  test.case = 'multiple';
 
   var f1 = extract1.recordFilter();
   f1.prefixPath = '/commonDir';
@@ -1059,10 +1057,7 @@ function inherit( test )
   var f2 = extract1.recordFilter();
   f2.prefixPath = '/commonDir';
   f2.filePath = { 'filter1/f' : 'out/dir' }
-
-  debugger;
   f1.pathsInherit( f2 );
-  debugger;
   test.identical( f1.prefixPath, null );
   test.identical( f1.basePath, null );
   test.identical( f1.filePath, { '/commonDir/*exclude*' : 0, '/commonDir/filter1/f' : '/commonDir/out/dir' } );
@@ -1070,15 +1065,37 @@ function inherit( test )
   test.identical( f2.basePath, null );
   test.identical( f2.filePath, { '/commonDir/filter1/f' : '/commonDir/out/dir' } );
 
-  debugger; return; xxx
-
   var f3 = extract1.recordFilter();
   f3.prefixPath = '/commonDir';
   f3.filePath = { 'filter1/f' : 'out/dir' }
+  f1.pathsInherit( f3 );
+  test.identical( f1.prefixPath, '/commonDir' );
+  test.identical( f1.basePath, null );
+  test.identical( f1.filePath, { '/commonDir/*exclude*' : 0, '/commonDir/filter1/f' : '/commonDir/out/dir', 'filter1/f' : 'out/dir' } );
+  test.identical( f3.prefixPath, '/commonDir' );
+  test.identical( f3.basePath, null );
+  test.identical( f3.filePath, { 'filter1/f' : 'out/dir' } );
 
   var f4 = extract1.recordFilter();
   f4.prefixPath = '/commonDir/filter1'
   f4.filePath = { 'f' : 'out/dir' }
+  f1.pathsInherit( f4 );
+  test.identical( f1.prefixPath, null );
+  test.identical( f1.basePath, null );
+  test.identical( f1.filePath, { '/commonDir/*exclude*' : 0, '/commonDir/filter1/f' : [ '/commonDir/out/dir', '/commonDir/filter1/out/dir' ] } );
+  test.identical( f4.prefixPath, null );
+  test.identical( f4.basePath, null );
+  test.identical( f4.filePath, { '/commonDir/filter1/f' : '/commonDir/filter1/out/dir' } );
+
+  var f5 = extract1.recordFilter();
+  f5.filePath = { '/commonDir/filter1/f' : '/commonDir/out/dir' }
+  f1.pathsInherit( f5 );
+  test.identical( f1.prefixPath, null );
+  test.identical( f1.basePath, null );
+  test.identical( f1.filePath, { '/commonDir/*exclude*' : 0, '/commonDir/filter1/f' : [ '/commonDir/out/dir', '/commonDir/filter1/out/dir' ] } );
+  test.identical( f5.prefixPath, null );
+  test.identical( f5.basePath, null );
+  test.identical( f5.filePath, { '/commonDir/filter1/f' : '/commonDir/out/dir' } );
 
 }
 
@@ -1488,6 +1505,8 @@ function pairRefine( test )
 
 }
 
+inherit.timeOut = 30000;
+
 //
 
 function hasAnyPath( test )
@@ -1548,6 +1567,51 @@ function hasAnyPath( test )
 
 }
 
+//
+
+function filePathSelect( test )
+{
+
+  var filter = _.fileProvider.recordFilter();
+  filter.filePath =
+  {
+    '/src' : '/dst',
+    '/src/**.test*' : true,
+    '/src/**.release*' : false,
+  }
+  filter.basePath = '/';
+  test.identical( filter.formed, 1 );
+
+  var srcPath =
+  {
+    '/src' : '/dst',
+    '/src/**.test*' : true,
+    '/src/**.release*' : false,
+  }
+  var dstPath = '/dst';
+
+  debugger;
+  filter.filePathSelect( srcPath, dstPath );
+
+  test.identical( filter.formed, 5 );
+  test.identical( filter.filePath, { '/src' : '/dst', '/src/**.test*' : true, '/src/**.release*' : false } );
+  test.identical( filter.basePath, { '/src' : '/', '/src/**.test*' : '/', '/src/**.release*' : '/' } );
+  test.identical( filter.prefixPath, null );
+  test.identical( filter.postfixPath, null );
+  debugger;
+
+/*
+    filePath : {
+  /C/pro/web/Dave/git/trunk/builder/include/dwtools/atop/will.test/asset/concat/proto : [ '/C/pro/web/Dave/git/' ... 't/out/debug.compiled' ],
+  /C/pro/web/Dave/git/trunk/builder/include/dwtools/atop/will.test/asset/concat/proto/**.test* : 1
+}
+  basePath : {
+  /C/pro/web/Dave/git/trunk/builder/include/dwtools/atop/will.test/asset/concat/proto : [ '/C/pro/web/Dave/git/' ... 't/asset/concat/proto' ],
+  /C/pro/web/Dave/git/trunk/builder/include/dwtools/atop/will.test/asset/concat/proto/**.test* : [ '/C/pro/web/Dave/git/' ... 't/asset/concat/proto' ]
+*/
+
+}
+
 // --
 // proto
 // --
@@ -1572,6 +1636,7 @@ var Self =
     inherit,
     pairRefine,
     hasAnyPath,
+    filePathSelect,
 
   },
 

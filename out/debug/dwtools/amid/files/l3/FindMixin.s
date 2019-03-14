@@ -3487,7 +3487,7 @@ function filesFindSame_body( o )
       let minSize = Math.min( file1.stat.size, file2.stat.size );
       let maxSize = Math.max( file1.stat.size, file2.stat.size );
 
-      if( _./*statsCouldBeLinked*/statsAreHardLinked( file1.stat, file2.stat ) )
+      if( _.statsAreHardLinked( file1.stat, file2.stat ) )
       {
         linkAdd();
         continue;

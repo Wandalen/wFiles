@@ -247,7 +247,7 @@ let Globals =
   fileStatIs,
   statsHaveDifferentContent,
   statsAreHardLinked,
-  // /*statsCouldBeLinked*/statsAreHardLinked,
+  // statsAreHardLinked,
   statHash2Get,
 }
 

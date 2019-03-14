@@ -5161,7 +5161,7 @@ function _linkMultiple( o, link )
   for( let p = 0 ; p < records.length ; p++ )
   {
     let record = records[ p ];
-    if( !record.stat || !_./*statsCouldBeLinked*/statsAreHardLinked( newestRecord.stat, record.stat ) )
+    if( !record.stat || !_.statsAreHardLinked( newestRecord.stat, record.stat ) )
     {
       needed = 1;
       break;
@@ -5261,7 +5261,7 @@ function _linkMultiple( o, link )
       }
     }
 
-    if( !record.stat || !_./*statsCouldBeLinked*/statsAreHardLinked( mostLinkedRecord.stat , record.stat ) )
+    if( !record.stat || !_.statsAreHardLinked( mostLinkedRecord.stat , record.stat ) )
     {
       let linkOptions = _.mapExtend( null, o );
       linkOptions.allowingMissed = 0; // Vova : hardLink does not allow missing srcPath

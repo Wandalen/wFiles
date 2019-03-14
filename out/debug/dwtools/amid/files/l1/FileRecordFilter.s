@@ -195,7 +195,7 @@ function _formPaths()
   filter.pathsNormalize();
 
   if( _.mapIs( filter.filePath ) )
-  filter.filePath = filter.filePathGlobSimplify( filter.filePath );
+  filter.filePath = filter.filePathGlobSimplify( filter.basePath, filter.filePath );
 
   filter.formed = 3;
 }
@@ -1773,15 +1773,16 @@ function filePathAbsolutize()
 
 //
 
-function filePathGlobSimplify( filePath )
+function filePathGlobSimplify( basePath, filePath )
 {
   let filter = this;
   let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
   let path = fileProvider.path;
 
+  basePath = basePath || filter.basePath;
   filePath = filePath || filter.filePath;
 
-  _.assert( arguments.length === 0 || arguments.length === 1 );
+  _.assert( arguments.length === 0 || arguments.length === 2 );
   _.assert( _.mapIs( filePath ) );
 
   let dst = filter.filePathDstArrayGet();
@@ -1801,14 +1802,20 @@ function filePathGlobSimplify( filePath )
 
   function simplify( src, what )
   {
-    debugger;
     let src2 = path.normalize( _.strRemoveEnd( src, what ) );
     if( !path.isGlob( src2 ) )
     {
-      debugger;
       _.assert( filePath[ src2 ] === undefined )
       filePath[ src2 ] = filePath[ src ];
       delete filePath[ src ];
+
+      if( _.mapIs( basePath ) )
+      {
+        _.assert( basePath[ src2 ] === undefined )
+        basePath[ src2 ] = basePath[ src ];
+        delete basePath[ src ];
+      }
+
     }
     else
     {

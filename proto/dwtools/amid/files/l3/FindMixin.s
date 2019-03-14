@@ -3057,7 +3057,8 @@ function filesReflect_pre( routine, args )
     o.reflectMap = null;
   }
 
-  o.srcFilter.pairRefine( o.dstFilter );
+  o.srcFilter.pairWithDst( o.dstFilter );
+  o.srcFilter.pairRefine();
   o.dstFilter._formPaths();
   o.srcFilter._formPaths();
 

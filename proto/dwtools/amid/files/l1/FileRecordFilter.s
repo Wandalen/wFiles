@@ -1228,7 +1228,7 @@ function pathsInherit( src )
     let isDst = !!filter.srcFilter || !!src.srcFilter;
     if( ( _.mapIs( filter.filePath ) && _.mapIs( src.filePath ) ) || !isDst )
     {
-      filter.filePath = path.pathMapExtend( filter.filePath, src.filePath, true );
+      filter.filePath = path.pathMapExtend( filter.filePath, src.filePath, null );
     }
     else if( !_.mapIs( src.filePath ) )
     {
@@ -2282,7 +2282,7 @@ function pairRefine( dstFilter )
       // _.assert( srcFilter.filePath === null || _.strIs( srcFilter.filePath ) || _.arrayIs( srcFilter.filePath ) );
       // return;
       if( _.strIs( srcFilter.filePath ) )
-      srcFilter.filePath = { [ srcFilter.filePath ] : true }
+      srcFilter.filePath = { [ srcFilter.filePath ] : null }
     }
 
   }

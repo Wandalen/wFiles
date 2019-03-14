@@ -196,7 +196,7 @@ reflector:
   exported.proto.export:
     src:
       filePath:
-        .: true
+        .: null
       prefixPath: proto
     criterion:
       default: 1
@@ -210,66 +210,66 @@ reflector:
     recursive: 0
     src:
       filePath:
-        .: true
-        dwtools: true
-        dwtools/Tools.s: true
-        dwtools/abase: true
-        dwtools/amid: true
-        dwtools/amid/files: true
-        dwtools/amid/files/UseBase.s: true
-        dwtools/amid/files/UseMid.s: true
-        dwtools/amid/files/UseTop.s: true
-        dwtools/amid/files/l1: true
-        dwtools/amid/files/l1/Encoders.s: true
-        dwtools/amid/files/l1/FileRecord.s: true
-        dwtools/amid/files/l1/FileRecordFactory.s: true
-        dwtools/amid/files/l1/FileRecordFilter.s: true
-        dwtools/amid/files/l1/FileRoutines.s: true
-        dwtools/amid/files/l1/FileStat.s: true
-        dwtools/amid/files/l1/Path.s: true
-        dwtools/amid/files/l1/Path.ss: true
-        dwtools/amid/files/l2: true
-        dwtools/amid/files/l2/Abstract.s: true
-        dwtools/amid/files/l2/Partial.s: true
-        dwtools/amid/files/l3: true
-        dwtools/amid/files/l3/FindMixin.s: true
-        dwtools/amid/files/l3/SecondaryMixin.s: true
-        dwtools/amid/files/l5_provider: true
-        dwtools/amid/files/l5_provider/Extract.s: true
-        dwtools/amid/files/l5_provider/Git.ss: true
-        dwtools/amid/files/l5_provider/HardDrive.ss: true
-        dwtools/amid/files/l5_provider/HtmlDocument.js: true
-        dwtools/amid/files/l5_provider/Http.js: true
-        dwtools/amid/files/l5_provider/Http.ss: true
-        dwtools/amid/files/l5_provider/Npm.ss: true
-        dwtools/amid/files/l5_provider/RemoteClient.s: true
-        dwtools/amid/files/l5_provider/RemoteServlet.ss: true
-        dwtools/amid/files/l5_provider/Svn.ss: true
-        dwtools/amid/files/l7: true
-        dwtools/amid/files/l7/Hub.s: true
-        dwtools/amid/files/l8_filter: true
-        dwtools/amid/files/l8_filter/Image.s: true
-        dwtools/amid/files/l8_filter/Reroot.s: true
-        dwtools/amid/files/l9: true
-        dwtools/amid/files.test: true
-        dwtools/amid/files.test/aFileProvider.test.s: true
-        dwtools/amid/files.test/aFilesFind.test.s: true
-        dwtools/amid/files.test/Extract.html: true
-        dwtools/amid/files.test/Extract.test.s: true
-        dwtools/amid/files.test/Files.copy.test.s: true
-        dwtools/amid/files.test/Files.etc.test.ss: true
-        dwtools/amid/files.test/FilesFind.Extract.test.s: true
-        dwtools/amid/files.test/FilesFind.HardDrive.test.ss: true
-        dwtools/amid/files.test/FilesRead.test.s: true
-        dwtools/amid/files.test/HardDrive.test.ss: true
-        dwtools/amid/files.test/Hub.copy.test.ss: true
-        dwtools/amid/files.test/Hub.Extract.test.s: true
-        dwtools/amid/files.test/Hub.HardDrive.test.ss: true
-        dwtools/amid/files.test/Path.test.ss: true
-        dwtools/amid/files.test/Record.test.s: true
-        dwtools/amid/files.test/RecordFilter.test.s: true
-        dwtools/amid/files.test/Uri.test.ss: true
-        dwtools/atop: true
+        .: null
+        dwtools: null
+        dwtools/Tools.s: null
+        dwtools/abase: null
+        dwtools/amid: null
+        dwtools/amid/files: null
+        dwtools/amid/files/UseBase.s: null
+        dwtools/amid/files/UseMid.s: null
+        dwtools/amid/files/UseTop.s: null
+        dwtools/amid/files/l1: null
+        dwtools/amid/files/l1/Encoders.s: null
+        dwtools/amid/files/l1/FileRecord.s: null
+        dwtools/amid/files/l1/FileRecordFactory.s: null
+        dwtools/amid/files/l1/FileRecordFilter.s: null
+        dwtools/amid/files/l1/FileRoutines.s: null
+        dwtools/amid/files/l1/FileStat.s: null
+        dwtools/amid/files/l1/Path.s: null
+        dwtools/amid/files/l1/Path.ss: null
+        dwtools/amid/files/l2: null
+        dwtools/amid/files/l2/Abstract.s: null
+        dwtools/amid/files/l2/Partial.s: null
+        dwtools/amid/files/l3: null
+        dwtools/amid/files/l3/FindMixin.s: null
+        dwtools/amid/files/l3/SecondaryMixin.s: null
+        dwtools/amid/files/l5_provider: null
+        dwtools/amid/files/l5_provider/Extract.s: null
+        dwtools/amid/files/l5_provider/Git.ss: null
+        dwtools/amid/files/l5_provider/HardDrive.ss: null
+        dwtools/amid/files/l5_provider/HtmlDocument.js: null
+        dwtools/amid/files/l5_provider/Http.js: null
+        dwtools/amid/files/l5_provider/Http.ss: null
+        dwtools/amid/files/l5_provider/Npm.ss: null
+        dwtools/amid/files/l5_provider/RemoteClient.s: null
+        dwtools/amid/files/l5_provider/RemoteServlet.ss: null
+        dwtools/amid/files/l5_provider/Svn.ss: null
+        dwtools/amid/files/l7: null
+        dwtools/amid/files/l7/Hub.s: null
+        dwtools/amid/files/l8_filter: null
+        dwtools/amid/files/l8_filter/Image.s: null
+        dwtools/amid/files/l8_filter/Reroot.s: null
+        dwtools/amid/files/l9: null
+        dwtools/amid/files.test: null
+        dwtools/amid/files.test/aFileProvider.test.s: null
+        dwtools/amid/files.test/aFilesFind.test.s: null
+        dwtools/amid/files.test/Extract.html: null
+        dwtools/amid/files.test/Extract.test.s: null
+        dwtools/amid/files.test/Files.copy.test.s: null
+        dwtools/amid/files.test/Files.etc.test.ss: null
+        dwtools/amid/files.test/FilesFind.Extract.test.s: null
+        dwtools/amid/files.test/FilesFind.HardDrive.test.ss: null
+        dwtools/amid/files.test/FilesRead.test.s: null
+        dwtools/amid/files.test/HardDrive.test.ss: null
+        dwtools/amid/files.test/Hub.copy.test.ss: null
+        dwtools/amid/files.test/Hub.Extract.test.s: null
+        dwtools/amid/files.test/Hub.HardDrive.test.ss: null
+        dwtools/amid/files.test/Path.test.ss: null
+        dwtools/amid/files.test/Record.test.s: null
+        dwtools/amid/files.test/RecordFilter.test.s: null
+        dwtools/amid/files.test/Uri.test.ss: null
+        dwtools/atop: null
       basePath: .
       prefixPath: proto
     criterion:

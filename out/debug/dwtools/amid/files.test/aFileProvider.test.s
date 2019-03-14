@@ -7947,6 +7947,7 @@ function fileCopyLinks( test )
   provider.softLink( dstPath, srcPathTerminal );
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 0 };
   var dstStatBefore = provider.statRead( dstPath );
+  _.timeOut( 1000 ).deasync();
   fileCopy( o );
   var dstStatAfter = provider.statRead( dstPath );
   test.is( dstStatBefore.mtime.getTime() !== dstStatAfter.mtime.getTime() );
@@ -12825,6 +12826,12 @@ function fileDeleteLocked( test )
     return;
   }
 
+  if( process.platform != 'win32' )
+  {
+    test.identical( 1,1 );
+    return;
+  }
+
   //
 
   let fs = require( 'fs' );
@@ -13035,6 +13042,11 @@ function statReadActSync( test )
 
   var mp = _.routineJoin( test.context, test.context.pathFor );
   var /*dir*/testPath = mp( 'statReadActSync' );
+
+  let expectedNlinkDir = 1;
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  if( process.platform != 'win32' )
+  expectedNlinkDir = 2;
 
   provider.fieldPush( 'usingTextLink', 1 );
 
@@ -13486,13 +13498,13 @@ function statReadActSync( test )
   test.is( !stat.isFIFO() );
   test.is( !stat.isSocket() );
   if( provider.UsingBigIntForStat )
-  test.identical( stat.nlink, BigInt( 1 ) )
+  test.identical( stat.nlink, BigInt( expectedNlinkDir ) )
   else
-  test.identical( stat.nlink, 1 );
+  test.identical( stat.nlink, expectedNlinkDir );
   if( provider.UsingBigIntForStat )
-  test.is( stat.size === BigInt( 0 ) || stat.size === null );
+  test.is( stat.size >= BigInt( 0 ) || stat.size === null );
   else
-  test.is( stat.size === 0 || stat.size === null );
+  test.is( stat.size >= 0 || stat.size === null );
 
   test.description = 'file2';
   var o =
@@ -13517,13 +13529,13 @@ function statReadActSync( test )
   test.is( !stat.isFIFO() );
   test.is( !stat.isSocket() );
   if( provider.UsingBigIntForStat )
-  test.identical( stat.nlink, BigInt( 1 ) )
+  test.identical( stat.nlink, BigInt( expectedNlinkDir ) )
   else
-  test.identical( stat.nlink, 1 );
+  test.identical( stat.nlink, expectedNlinkDir );
   if( provider.UsingBigIntForStat )
-  test.is( stat.size === BigInt( 0 ) || stat.size === null );
+  test.is( stat.size >= BigInt( 0 ) || stat.size === null );
   else
-  test.is( stat.size === 0 || stat.size === null );
+  test.is( stat.size >= 0 || stat.size === null );
 
   /* - */
 
@@ -13953,7 +13965,7 @@ function statReadActLinkedHead( test )
   let provider = self.provider;
   let path = provider.path;
 
-  var testPath = test.context.pathFor( 'written', test.name );
+  var testPath = test.context.pathFor( 'written/statReadActLinkedHead' )
   var dirPath = path.join( testPath, 'dir' );
   var dirPath2 = path.join( testPath, 'dir2' );
   var terminalPath = path.join( dirPath, 'terminal' );
@@ -34049,7 +34061,7 @@ function pathResolve( test )
   var got = resolve( '.','aa','cc','..','..' );
   test.identical( got, expected );
 
-  var expected = _.strIsolateEndOrNone( current(),'/' )[ 0 ];
+  var expected = _.strIsolateRightOrNone( current(),'/' )[ 0 ];
   if( current() === '/' )
   expected = '/..';
   var got = resolve( 'aa','cc','..','..','..' );

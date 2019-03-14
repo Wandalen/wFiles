@@ -66,6 +66,14 @@ function pathIsolateGlobalAndLocal( longPath )
 
 //
 
+function pathCurrentAct()
+{
+  let self = this;
+  return self.path._rootStr;
+}
+
+//
+
 function filesReflectSingle_body( o )
 {
   let self = this;
@@ -303,6 +311,7 @@ let Proto =
 
   localFromGlobal : localFromGlobal,
   pathIsolateGlobalAndLocal : pathIsolateGlobalAndLocal,
+  pathCurrentAct : pathCurrentAct,
 
   // etc
 

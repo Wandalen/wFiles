@@ -46,6 +46,7 @@ function onSuiteBegin( test )
 
   let path = context.provider.path;
   context.testSuitePath = path.dirTempOpen( 'FilesFind' );
+  context.testSuitePath = context.provider.pathResolveLinkFull({ filePath : context.testSuitePath, resolvingSoftLink : 1 });
   // let path = this.provider.path;
   // this.testSuitePath = path.dirTempOpen( path.join( __dirname, '../..'  ), 'Provider/HardDrive' );
 }

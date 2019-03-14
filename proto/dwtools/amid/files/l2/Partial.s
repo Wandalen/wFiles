@@ -2162,6 +2162,9 @@ function fileSize_body( o )
 
   _.sure( _.objectIs( stat ) );
 
+  if( stat.isDir() )
+  return 0;
+
   return stat.size;
 }
 
@@ -5547,6 +5550,24 @@ function _link_functor( gen )
 
       /* equal paths */
 
+      if( verifyEqualPaths() )
+      return true;
+
+      /* skipping */
+
+      if( onVerify2 )
+      {
+        let r = onVerify2.call( self, c );
+        _.assert( r === undefined );
+      }
+
+      return false;
+    }
+
+    /* - */
+
+    function verifyEqualPaths()
+    {
       if( o.dstPath === o.srcPath )
       {
 
@@ -5562,19 +5583,12 @@ function _link_functor( gen )
           error( err );
           return true;
         }
-
-      }
-
-      /* skipping */
-
-      if( onVerify2 )
-      {
-        let r = onVerify2.call( self, c );
-        _.assert( r === undefined );
       }
 
       return false;
     }
+
+    /* - */
 
     function verify2Async()
     {
@@ -5655,6 +5669,9 @@ function _link_functor( gen )
       _.assert( path.isAbsolute( o.srcPath ) );
       _.assert( path.isAbsolute( o.dstPath ) );
 
+      /* check if equal early */
+
+      verifyEqualPaths();
     }
 
     /* */

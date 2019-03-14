@@ -833,6 +833,8 @@ function statReadAct( o )
 
   function isHardLink()
   {
+    if( !this.isFile() )
+    return false;
     return this.nlink >= 2;
   }
 
@@ -1443,7 +1445,7 @@ function softLinkAct( o )
     if( _.strBegins( o.srcPath, './' ) )
     o.srcPath = _.strIsolateBeginOrNone( o.srcPath, './' )[ 2 ];
     if( _.strBegins( o.srcPath, '..' ) )
-    o.srcPath = '.' + _.strIsolateBeginOrNone( o.srcPath, '..' )[ 2 ];
+    o.srcPath = '.' + _.strIsolateLeftOrNone( o.srcPath, '..' )[ 2 ];
   }
 
   let srcPath = o.srcPath;

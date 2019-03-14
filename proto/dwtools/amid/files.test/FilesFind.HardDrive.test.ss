@@ -25,6 +25,7 @@ function onSuiteBegin( test )
   context.hub = _.FileProvider.Hub({ providers : [ context.provider ] });
   let path = context.provider.path;
   context.testSuitePath = path.dirTempOpen( 'suite-' + 'FilesFind' );
+  context.testSuitePath = context.provider.pathResolveLinkFull({ filePath : context.testSuitePath, resolvingSoftLink : 1 });
 }
 
 //

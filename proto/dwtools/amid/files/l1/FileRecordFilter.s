@@ -2307,7 +2307,7 @@ function pairRefine()
       dstPath = dstPath[ 0 ];
       if( _.arrayIs( dstPath ) && dstPath.length === 0 )
       {
-        dstPath = true;
+        dstPath = null;
         lackOfDst = true;
       }
       _.assert( _.strIs( dstPath ) || _.arrayIs( dstPath ) || _.boolLike( dstPath ) || dstPath === null );

@@ -300,17 +300,18 @@ function pathDirTempForAnother( filePath )
 
   let dirsPath = this.chainToRoot( filePath );
   let err;
+  let tempPath = 'temp/tmp-' + _.idWithGuid() + '.tmp';
 
   for( let i = 0, l = dirsPath.length - 1 || dirsPath.length ; i < l ; i++ )
   {
-    path = dirsPath[ i ] + '/tmp-' + _.idWithGuid() + '.tmp';
+    path = dirsPath[ i ] + '/' + tempPath;
 
     if( this.fileProvider.fileExists( path ) )
     return path;
 
     try
     {
-      this.fileProvider.dirMakeAct({ filePath : path, sync : 1 });
+      this.fileProvider.dirMake( path );
       return path;
     }
     catch( e )

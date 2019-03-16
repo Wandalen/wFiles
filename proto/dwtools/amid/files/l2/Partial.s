@@ -237,6 +237,8 @@ function init( o )
   if( self.verbosity >= 2 )
   self.logger.log( 'new', _.strType( self ) );
 
+  _.appRegisterExitHandler( () => { debugger;self.path.pathDirTempForClose() } );
+
 }
 
 //

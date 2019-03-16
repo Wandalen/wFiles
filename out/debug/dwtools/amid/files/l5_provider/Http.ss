@@ -284,11 +284,11 @@ function filesReflectSingle_body( o )
 
   /* log */
 
-  logger.log( '' );
-  logger.log( 'srcPath', srcPath );
-  logger.log( 'dstPath', dstPath );
-  logger.log( '' );
-  debugger;
+  // logger.log( '' );
+  // logger.log( 'srcPath', srcPath );
+  // logger.log( 'dstPath', dstPath );
+  // logger.log( '' );
+  // debugger;
 
   /* */
 

@@ -25,7 +25,7 @@ let Self = function wFileProviderFind( o )
 
 Self.shortName = 'Find';
 
-let debugPath = '/dst';
+let debugPath = '/dir';
 
 // --
 // etc
@@ -307,8 +307,8 @@ function filesFindSingle_body( o )
 
   let recordFactory = _.FileRecordFactory.TollerantFrom( o, o2 ).form();
 
-  if( _.strEnds( o.filePath, '/dst/dst' ) )
-  debugger;
+  // if( _.strEnds( o.filePath, '/dst/dst' ) )
+  // debugger;
 
   let stemRecord = recordFactory.record( o.filePath );
   // console.log( 'stemRecord.isActual', stemRecord.isActual );
@@ -806,8 +806,8 @@ function filesFinder_functor( routine )
         op2.filter = op2.filter || Object.create( null );
         if( op2.filter.filePath === undefined )
         op2.filter.filePath = '.';
-        if( op2.filter.basePath === undefined )
-        op2.filter.basePath = '.';
+        // if( op2.filter.basePath === undefined )
+        // op2.filter.basePath = '.';
 
         o.filter.and( op2.filter );
         o.filter.pathsJoin( op2.filter );
@@ -1423,8 +1423,8 @@ function filesReflectEvaluate_body( o )
   function handleUp( record, op )
   {
 
-    // if( _.strEnds( record.dst.absolute, debugPath ) )
-    // debugger;
+    if( _.strEnds( record.dst.absolute, debugPath ) )
+    debugger;
 
     if( touchMap[ record.dst.absolute ] )
     touch( record, touchMap[ record.dst.absolute ] );
@@ -1479,6 +1479,9 @@ function filesReflectEvaluate_body( o )
   function handleUp2( record, op )
   {
 
+    if( _.strEnds( record.dst.absolute, debugPath ) )
+    debugger;
+
     let a = actionMap[ record.dst.absolute ];
     let t = touchMap[ record.dst.absolute ];
 
@@ -1526,11 +1529,6 @@ function filesReflectEvaluate_body( o )
       {
         /* both src and dst are dir */
 
-        // if( record.reason === 'srcLooking' && record.dst.isActual && !record.src.isActual )
-        // debugger;
-        // if( record.reason === 'srcLooking' && record.dst.isActual && !record.src.isActual && !record.src.isTransient )
-        // debugger;
-
         if( record.reason === 'srcLooking' && record.dst.isActual && !record.src.isActual && !record.src.isTransient )
         {
           debugger;
@@ -1560,7 +1558,6 @@ function filesReflectEvaluate_body( o )
           record.allow = false;
           dirMake( record );
           preserve( record );
-          // debugger;
           forbid( record ); // zzz
         }
         else
@@ -1610,12 +1607,8 @@ function filesReflectEvaluate_body( o )
 
           if( !o.dstRewriting )
           {
-            // debugger;
             forbid( record );
           }
-
-          // if( !record.preserve ) // zzz
-          // record.deleteFirst = true;
 
           link( record );
 
@@ -1623,12 +1616,15 @@ function filesReflectEvaluate_body( o )
         else
         {
 
-          // if( o.dstDeleting )
-          // debugger;
-          if( o.dstDeleting )
+          if( record.reason !== 'srcLooking' && o.dstDeleting )
           fileDelete( record );
           else
           record.include = false;
+
+          // if( o.dstDeleting ) // yyy
+          // fileDelete( record );
+          // else
+          // record.include = false;
 
         }
 
@@ -1644,8 +1640,8 @@ function filesReflectEvaluate_body( o )
   function handleDown( record, op )
   {
 
-    // if( _.strEnds( record.dst.absolute, debugPath ) )
-    // debugger;
+    if( _.strEnds( record.dst.absolute, debugPath ) )
+    debugger;
 
     if( touchMap[ record.dst.absolute ] )
     touch( record, touchMap[ record.dst.absolute ] );
@@ -1660,6 +1656,12 @@ function filesReflectEvaluate_body( o )
     if( !record.include )
     return end( false );
 
+    if( !record.src.isActual && !record.src.isDir && record.reason === 'srcLooking' ) // yyy
+    return end( false );
+
+    // if( !record.dst.isActual && record.reason === 'dstDeleting' ) // yyy
+    // return end( false );
+
     if( !o.includingDst && record.reason === 'dstDeleting' )
     return end( record );
 
@@ -1673,20 +1675,11 @@ function filesReflectEvaluate_body( o )
     let r = o.onDown.call( self, record, o );
     _.assert( r !== _.dont );
 
-    // debugger;
-    // _.assert( record.include === true );
     _.assert( record.action !== 'exclude' || record.touch === false, () => 'Attempt to exclude touched ' + record.dst.absolute );
 
-    // if( record.action === 'exclude' )
-    // debugger;
     if( record.action === 'exclude' )
     return end( false );
 
-    // if( touchMap[ record.dst.absolute ] )
-    // debugger;
-    // if( touchMap[ record.dst.absolute ] )
-    // touch( record, touchMap[ record.dst.absolute ] );
-    // debugger;
     _.assert( touchMap[ record.dst.absolute ] === record.touch || !record.touch );
 
     if( !srcExists && record.reason === 'srcLooking' )
@@ -3228,23 +3221,13 @@ function filesReflector_functor( routine )
         op2 = { reflectMap : { [ op2 ] : true } }
 
         op2.filter = op2.filter || Object.create( null );
-        // if( op2.filter.filePath === undefined )
-        // op2.filter.filePath = '.';
-        // if( op2.filter.basePath === undefined )
-        // op2.filter.basePath = '.';
-
         op2.srcFilter = op2.srcFilter || Object.create( null );
         if( op2.srcFilter.filePath === undefined )
         op2.srcFilter.filePath = '.';
-        if( op2.srcFilter.basePath === undefined )
-        op2.srcFilter.basePath = '.';
+        // if( op2.srcFilter.basePath === undefined )
+        // op2.srcFilter.basePath = '.';
 
         op2.dstFilter = op2.dstFilter || Object.create( null );
-
-        // if( op2.dstFilter.filePath === undefined )
-        // op2.dstFilter.filePath = '.';
-        // if( op2.dstFilter.basePath === undefined )
-        // op2.dstFilter.basePath = '.';
 
         o.filter.and( op2.filter );
         o.filter.pathsJoin( op2.filter );

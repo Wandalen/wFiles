@@ -119,7 +119,7 @@ function filesRead_body( o )
     return r;
   });
 
-  debugger;
+  // debugger;
   return con.toResourceMaybe();
 
   /* */

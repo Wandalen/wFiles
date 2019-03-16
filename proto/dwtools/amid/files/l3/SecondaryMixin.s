@@ -45,8 +45,6 @@ function filesRead_pre( routine, args )
   let self = this;
   let o = self._preFileFilterWithProviderDefaults.apply( self, arguments );
 
-  // debugger;
-  // o.fileFilter = self.recordFilter( o.fileFilter );
   o.fileFilter.form();
 
   return o;
@@ -73,6 +71,7 @@ function filesRead_body( o )
   r.fileMap = Object.create( null );
   r.dstMap = Object.create( null );
 
+  // debugger;
   r.pathGroupedByDstMap = path.pathMapGroupByDst( o.fileFilter.filePath );
   // r.pathGroupedByDstMap = path.pathMapGroupByDst( o.fileFilter.formedFilePath );
 
@@ -89,6 +88,7 @@ function filesRead_body( o )
     o2.filter.filePathSelect( srcPath, dstPath );
     o2.filter.form();
 
+    // debugger;
     _.Consequence.From( self.filesFind( o2 ) )
     .finally( ( err, files ) =>
     {

@@ -424,6 +424,11 @@ function filesFindTrivial( test )
   let path = context.provider.path;
   let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
 
+  function abs( filePath )
+  {
+    return path.join( testPath, filePath );
+  }
+
   /* */
 
   var extract1 = _.FileProvider.Extract
@@ -435,18 +440,11 @@ function filesFindTrivial( test )
 
   test.case = 'setup';
 
-/*
-  extract1.readToProvider( provider, context.testSuitePath );
-  var gotTree = _.FileProvider.Extract().rewriteFromProvider( provider, context.testSuitePath );
-  test.identical( gotTree.filesTree, extract1.filesTree );
-  extract1.readToProvider( provider, context.testSuitePath );
-*/
-
-  extract1.filesReflectTo( provider, context.testSuitePath );
+  extract1.filesReflectTo( provider, testPath );
 
   /* */
 
-  var o1 = { filePath : path.join( context.testSuitePath ), outputFormat : 'relative' }
+  var o1 = { filePath : path.join( testPath ), outputFormat : 'relative' }
   var o2 = { recursive : 2, includingStem : 1, includingTransient : 1, includingTerminals : 1, includingDirs : 1 }
   test.case = 'find single terminal file . includingTransient : 1';
 
@@ -456,7 +454,7 @@ function filesFindTrivial( test )
 
   /* */
 
-  var o1 = { filePath : path.join( context.testSuitePath ), outputFormat : 'relative' }
+  var o1 = { filePath : path.join( testPath ), outputFormat : 'relative' }
   var o2 = { recursive : 2, includingStem : 1, includingTransient : 0, includingTerminals : 1 }
   test.case = 'find single terminal file . includingTransient : 0';
 
@@ -466,7 +464,7 @@ function filesFindTrivial( test )
 
   /* */
 
-  var o1 = { filePath : path.join( context.testSuitePath ), outputFormat : 'relative' }
+  var o1 = { filePath : path.join( testPath ), outputFormat : 'relative' }
   var o2 = { recursive : 2, includingStem : 0, includingTransient : 1, includingTerminals : 1 }
   test.case = 'find single terminal file . includingStem : 0';
 
@@ -486,15 +484,15 @@ function filesFindTrivial( test )
 
   test.case = 'setup trivial';
 
-  extract1.readToProvider( provider, context.testSuitePath );
-  var gotTree = _.FileProvider.Extract().rewriteFromProvider( provider, context.testSuitePath );
+  extract1.readToProvider( provider, testPath );
+  var gotTree = _.FileProvider.Extract().rewriteFromProvider( provider, testPath );
   test.identical( gotTree.filesTree, extract1.filesTree );
 
-  extract1.readToProvider( provider, context.testSuitePath );
+  extract1.readToProvider( provider, testPath );
 
   /* */
 
-  var o1 = { filePath : path.join( context.testSuitePath, 'f' ), outputFormat : 'relative' }
+  var o1 = { filePath : path.join( testPath, 'f' ), outputFormat : 'relative' }
   var o2 = { recursive : 2, includingStem : 1, includingTransient : 1, includingTerminals : 1 }
   test.case = 'find single terminal file . includingTerminals : 1';
 
@@ -504,7 +502,7 @@ function filesFindTrivial( test )
 
   /* */
 
-  var o1 = { filePath : path.join( context.testSuitePath, 'f' ), outputFormat : 'relative' }
+  var o1 = { filePath : path.join( testPath, 'f' ), outputFormat : 'relative' }
   var o2 = { recursive : 2, includingStem : 1, includingTransient : 1, includingTerminals : 0 }
   test.case = 'find single terminal file . includingTerminals : 0';
 
@@ -514,7 +512,7 @@ function filesFindTrivial( test )
 
   /* */
 
-  var o1 = { filePath : path.join( context.testSuitePath, 'f' ), outputFormat : 'relative' }
+  var o1 = { filePath : path.join( testPath, 'f' ), outputFormat : 'relative' }
   var o2 = { recursive : 2, includingStem : 0, includingTransient : 1, includingTerminals : 1 }
   test.case = 'find single terminal file . includingStem : 0';
 
@@ -536,14 +534,14 @@ function filesFindTrivial( test )
 
   test.case = 'setup trivial';
 
-  extract1.readToProvider({ dstProvider : provider, dstPath : context.testSuitePath, allowDelete : 1 });
-  var gotTree = _.FileProvider.Extract().rewriteFromProvider( provider, context.testSuitePath );
+  extract1.readToProvider({ dstProvider : provider, dstPath : testPath, allowDelete : 1 });
+  var gotTree = _.FileProvider.Extract().rewriteFromProvider( provider, testPath );
   test.identical( gotTree.filesTree, extract1.filesTree );
-  extract1.readToProvider( provider, context.testSuitePath );
+  extract1.readToProvider( provider, testPath );
 
   /* */
 
-  var o1 = { filePath : path.join( context.testSuitePath ), outputFormat : 'relative' }
+  var o1 = { filePath : path.join( testPath ), outputFormat : 'relative' }
   var o2 = { recursive : 2, includingStem : 1, includingTransient : 1, includingTerminals : 1, includingDirs : 1 }
   test.case = 'find includingStem : 1';
 
@@ -553,7 +551,7 @@ function filesFindTrivial( test )
 
   /* */
 
-  var o1 = { filePath : path.join( context.testSuitePath ), outputFormat : 'relative' }
+  var o1 = { filePath : path.join( testPath ), outputFormat : 'relative' }
   var o2 = { recursive : 2, includingStem : 0, includingTransient : 1, includingTerminals : 1, includingDirs : 1 }
   test.case = 'find includingStem:0';
 
@@ -563,7 +561,7 @@ function filesFindTrivial( test )
 
   /* */
 
-  var o1 = { filePath : path.join( context.testSuitePath ), outputFormat : 'relative' }
+  var o1 = { filePath : path.join( testPath ), outputFormat : 'relative' }
   var o2 = { recursive : 2, includingStem : 1, includingTransient : 1, includingTerminals : 1, includingDirs : 0 }
   test.case = 'find includingTransient:0';
 
@@ -573,7 +571,7 @@ function filesFindTrivial( test )
 
   /* */
 
-  var o1 = { filePath : path.join( context.testSuitePath ), outputFormat : 'relative' }
+  var o1 = { filePath : path.join( testPath ), outputFormat : 'relative' }
   var o2 = { recursive : 2, includingStem : 1, includingTransient : 1, includingTerminals : 0, includingDirs : 1 }
   test.case = 'find includingTerminals:0';
 
@@ -584,7 +582,7 @@ function filesFindTrivial( test )
   /* */
 
   var filePath = { 'dir1' : null, '**b**' : 0 };
-  var filter = { prefixPath : path.join( context.testSuitePath ), filePath : filePath }
+  var filter = { prefixPath : path.join( testPath ), filePath : filePath }
   var o1 = { filter : filter, outputFormat : 'relative' }
   var o2 = { recursive : 2, includingStem : 1, includingTransient : 1, includingTerminals : 1, includingDirs : 1 }
   test.case = 'find with excluding file path';
@@ -595,7 +593,7 @@ function filesFindTrivial( test )
   /* */
 
   var filePath = { 'dir1' : true, '**b**' : 0 };
-  var filter = { prefixPath : path.join( context.testSuitePath ), filePath : filePath }
+  var filter = { prefixPath : path.join( testPath ), filePath : filePath }
   var o1 = { filter : filter, outputFormat : 'relative' }
   var o2 = { recursive : 2, includingStem : 1, includingTransient : 1, includingTerminals : 1, includingDirs : 1 }
   test.case = 'find with excluding file path';
@@ -606,12 +604,46 @@ function filesFindTrivial( test )
   /* */
 
   var filePath = { 'dir1' : null, '**b**' : 0, '**a**' : 1 };
-  var filter = { prefixPath : path.join( context.testSuitePath ), filePath : filePath }
+  var filter = { prefixPath : path.join( testPath ), filePath : filePath }
   var o1 = { filter : filter, outputFormat : 'relative' }
   var o2 = { recursive : 2, includingStem : 1, includingTransient : 1, includingTerminals : 1, includingDirs : 1 }
   test.case = 'find with excluding file path';
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [ '.', './a', './dir11' ];
+  test.identical( got, expected );
+
+  /* */
+
+  var extract1 = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      dir1 : { a : 'dir1', b : 'dir1', dir11 : { a : 'dir11', b : 'dir11', c : 'dir11' }, dira : {}, dirb : {} },
+      dir2 : { a : 'dir2', b : 'dir2', c : 'dir2' },
+      d : '/',
+    },
+  });
+
+  test.case = 'setup trivial';
+  provider.filesDelete( testPath );
+  extract1.readToProvider( provider, testPath );
+
+  test.case = 'several nulls';
+  var filePath = { [ abs( 'dir1/' + '**a**' ) ] : null, [ abs( 'dir1/' + '**b**' ) ] : null };
+  var filter = { filePath : filePath }
+  var o1 = { filter : filter, outputFormat : 'relative' }
+  var o2 = { recursive : 2, includingStem : 1, includingTransient : 0, includingTerminals : 1, includingDirs : 1 }
+  var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
+  var expected = [ './a', './b', './dir11/a', './dir11/b', './dira', './dirb' ];
+  test.identical( got, expected );
+
+  test.case = 'several nulls : { dir1/**a** : null, dir2**b** : null }';
+  var filePath = { [ abs( 'dir1/' + '**a**' ) ] : null, [ abs( 'dir2' + '**b**' ) ] : null };
+  var filter = { filePath : filePath }
+  var o1 = { filter : filter, outputFormat : 'relative' }
+  var o2 = { recursive : 2, includingStem : 1, includingTransient : 0, includingTerminals : 1, includingDirs : 1 }
+  var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
+  var expected = [ './dir2/b', './a', './dir11/a', './dira' ];
   test.identical( got, expected );
 
 }
@@ -5453,7 +5485,29 @@ function filesFindGlob( test )
   // test.identical( gotAbsolute, expectedAbsolute );
   // test.identical( gotRelative, expectedRelative );
 
-  test.case = 'globAll filePath : { /ctrl2** : 1, /alt2** : 1 }';
+  test.case = 'globAll filePath : { /ctrl2/** : null, /alt2** : null }';
+
+  clean();
+  var expectedAbsolute = abs([ '.', './alt2', './alt2/a', './alt2/d', './alt2/d/a', './ctrl2', './ctrl2/a', './ctrl2/d', './ctrl2/d/a' ]);
+  var expectedRelative = [ '.', './alt2', './alt2/a', './alt2/d', './alt2/d/a', '.', './a', './d', './d/a' ];
+  var records = globAll({ filePath : abs({ './ctrl2/**' : null, './alt2**' : null }), filter : { prefixPath : null, basePath : null } } );
+  var gotAbsolute = _.select( records, '*/absolute' );
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotAbsolute, expectedAbsolute );
+  test.identical( gotRelative, expectedRelative );
+
+  test.case = 'globAll filePath : { /ctrl2/** : null, /alt2** : null }';
+
+  clean();
+  var expectedAbsolute = abs([ '.', './alt2', './alt2/a', './alt2/d', './alt2/d/a', './ctrl2', './ctrl2/a', './ctrl2/d', './ctrl2/d/a' ]);
+  var expectedRelative = [ '.', './alt2', './alt2/a', './alt2/d', './alt2/d/a', '.', './a', './d', './d/a' ];
+  var records = globAll({ filePath : abs({ './alt2**' : null, './ctrl2/**' : null }), filter : { prefixPath : null, basePath : null } } );
+  var gotAbsolute = _.select( records, '*/absolute' );
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotAbsolute, expectedAbsolute );
+  test.identical( gotRelative, expectedRelative );
+
+  test.case = 'globAll filePath : { /ctrl2/** : 1, /alt2** : 1 }';
 
   clean();
   var expectedAbsolute = abs([ '.', './alt2', './alt2/a', './alt2/d', './alt2/d/a', './ctrl2', './ctrl2/a', './ctrl2/d', './ctrl2/d/a' ]);
@@ -5464,7 +5518,7 @@ function filesFindGlob( test )
   test.identical( gotAbsolute, expectedAbsolute );
   test.identical( gotRelative, expectedRelative );
 
-  test.case = 'globAll filePath : { /ctrl2** : 1, /alt2** : 1 }';
+  test.case = 'globAll filePath : { /ctrl2/** : 1, /alt2** : 1 }';
 
   clean();
   var expectedAbsolute = abs([ '.', './alt2', './alt2/a', './alt2/d', './alt2/d/a', './ctrl2', './ctrl2/a', './ctrl2/d', './ctrl2/d/a' ]);
@@ -17139,7 +17193,6 @@ var Self =
   abstract : 1,
   silencing : 1,
   routineTimeOut : 30000,
-  // verbosity : 7,
 
   onSuiteBegin,
   onSuiteEnd,

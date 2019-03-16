@@ -3124,6 +3124,7 @@ function filesReflect_body( o )
     o2.dstPath = o2.dstFilter.filePathSimplest();
 
     let src = o2.srcFilter.effectiveFileProvider;
+    _.assert( _.routineIs( src.filesReflectSingle ), () => 'Method filesReflectSingle is not implemented' );
     let r = src.filesReflectSingle.body.call( src, o2 );
     cons.push( r );
 

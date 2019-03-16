@@ -19,9 +19,9 @@ let Self = function wFileProviderHttp( o )
   return _.instanceConstructor( Self, this, arguments );
 }
 
-Self.shortName = 'Url';
+Self.shortName = 'Http';
 
-_.assert( !_.FileProvider.Url );
+_.assert( !_.FileProvider.Http );
 
 // --
 // inter
@@ -475,10 +475,13 @@ let Composes =
 
   safe : 0,
   stating : 0,
-  protocols : _.define.own([ 'http' ]),
+  protocols : _.define.own([ 'http', 'https' ]),
 
   resolvingSoftLink : 0,
   resolvingTextLink : 0,
+  usingSoftLink : 0,
+  usingTextLink : 0,
+  usingGlobalPath : 1,
 
 }
 
@@ -507,21 +510,21 @@ let Statics =
 let Proto =
 {
 
-  init : init,
+  init,
 
   // read
 
-  pathCurrentAct : pathCurrentAct,
-  statReadAct : statReadAct,
-  fileReadAct : fileReadAct,
+  pathCurrentAct,
+  statReadAct,
+  fileReadAct,
 
   //
 
-  Composes : Composes,
-  Aggregates : Aggregates,
-  Associates : Associates,
-  Restricts : Restricts,
-  Statics : Statics,
+  Composes,
+  Aggregates,
+  Associates,
+  Restricts,
+  Statics,
 
 }
 

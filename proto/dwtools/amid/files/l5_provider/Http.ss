@@ -230,20 +230,178 @@ fileReadAct.advanced =
 
 //
 
+function filesReflectSingle_body( o )
+{
+  let self = this;
+  let path = self.path;
+
+  o.extra = o.extra || Object.create( null );
+  _.routineOptions( filesReflectSingle_body, o.extra, filesReflectSingle_body.extra );
+
+  _.assertRoutineOptions( filesReflectSingle_body, o );
+  _.assert( o.mandatory === undefined )
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( _.routineIs( o.onUp ) && o.onUp.composed && o.onUp.composed.elements.length === 0, 'Not supported options' );
+  _.assert( _.routineIs( o.onDown ) && o.onDown.composed && o.onDown.composed.elements.length === 0, 'Not supported options' );
+  _.assert( _.routineIs( o.onWriteDstUp ) && o.onWriteDstUp.composed && o.onWriteDstUp.composed.elements.length === 0, 'Not supported options' );
+  _.assert( _.routineIs( o.onWriteDstDown ) && o.onWriteDstDown.composed && o.onWriteDstDown.composed.elements.length === 0, 'Not supported options' );
+  _.assert( _.routineIs( o.onWriteSrcUp ) && o.onWriteSrcUp.composed && o.onWriteSrcUp.composed.elements.length === 0, 'Not supported options' );
+  _.assert( _.routineIs( o.onWriteSrcDown ) && o.onWriteSrcDown.composed && o.onWriteSrcDown.composed.elements.length === 0, 'Not supported options' );
+  _.assert( o.outputFormat === 'record' || o.outputFormat === 'nothing', 'Not supported options' );
+  _.assert( o.linking === 'fileCopy' || o.linking === 'hardLinkMaybe' || o.linking === 'softLinkMaybe', 'Not supported options' );
+  _.assert( !o.srcFilter.hasFiltering(), 'Not supported options' );
+  _.assert( !o.dstFilter.hasFiltering(), 'Not supported options' );
+  _.assert( o.srcFilter.formed === 5 );
+  _.assert( o.dstFilter.formed === 5 );
+  _.assert( o.srcFilter.filePath === o.srcPath );
+  _.assert( o.filter === null || !o.filter.hasFiltering(), 'Not supported options' );
+
+  /* */
+
+  let con = new _.Consequence();
+  let dstFileProvider = o.dstFilter.providerForPath();
+  let srcPath = o.srcPath;
+  let dstPath = o.dstPath;
+  let srcCurrentPath;
+
+  if( _.mapIs( srcPath ) )
+  {
+    _.assert( _.mapVals( srcPath ).length === 1 );
+    _.assert( _.mapVals( srcPath )[ 0 ] === true || _.mapVals( srcPath )[ 0 ] === dstPath );
+    srcPath = _.mapKeys( srcPath )[ 0 ];
+  }
+
+  srcPath = srcPath.replace( '///', '//' );
+
+  /* */
+
+  _.sure( _.strIs( srcPath ) );
+  _.sure( _.strIs( dstPath ) );
+  _.assert( dstFileProvider instanceof _.FileProvider.HardDrive || dstFileProvider.originalFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
+  _.sure( !o.srcFilter || !o.srcFilter.hasFiltering(), 'Does not support filtering, but {o.srcFilter} is not empty' );
+  _.sure( !o.dstFilter || !o.dstFilter.hasFiltering(), 'Does not support filtering, but {o.dstFilter} is not empty' );
+  _.sure( !o.filter || !o.filter.hasFiltering(), 'Does not support filtering, but {o.filter} is not empty' );
+
+  /* log */
+
+  logger.log( '' );
+  logger.log( 'srcPath', srcPath );
+  logger.log( 'dstPath', dstPath );
+  logger.log( '' );
+  debugger;
+
+  /* */
+
+  dstFileProvider.dirMake( dstFileProvider.path.dir( dstPath ) );
+
+  let writeStream = null;
+  writeStream = dstFileProvider.streamWrite({ filePath : dstPath });
+  writeStream.on( 'error', onError );
+  writeStream.on( 'finish', function( )
+  {
+    writeStream.close( function( )
+    {
+      con.take( null );
+    })
+  });
+
+  self.streamRead({ filePath : srcPath })
+  .got( function( err, response )
+  {
+    response.pipe( writeStream );
+    response.on( 'error', onError );
+  });
+
+  /* handle error if any */
+
+  con
+  .finally( function( err, arg )
+  {
+    debugger;
+    if( err )
+    throw _.err( err );
+    return recordsMake();
+  });
+
+  return con;
+
+  /* */
+
+  function recordsMake()
+  {
+    /* xxx : fast solution to return records instead of empty arrray */
+    debugger;
+    o.result = dstFileProvider.filesReflectEvaluate
+    ({
+      srcPath : dstPath,
+      dstPath : dstPath,
+    });
+    debugger;
+    return o.result;
+  }
+
+  /* begin */
+
+  function onError( err )
+  {
+    debugger;
+    try
+    {
+      HardDrive.fileDelete( o.filePath );
+    }
+    catch( err )
+    {
+    }
+    con.error( _.err( err ) );
+  }
+
+}
+
+_.routineExtend( filesReflectSingle_body, _.FileProvider.Find.prototype.filesReflectSingle );
+
+var extra = filesReflectSingle_body.extra = Object.create( null );
+extra.fetching = 1;
+
+var defaults = filesReflectSingle_body.defaults;
+let filesReflectSingle = _.routineFromPreAndBody( _.FileProvider.Find.prototype.filesReflectSingle.pre, filesReflectSingle_body );
+
+//
+
 function fileCopyToHardDriveAct( o )
 {
   let self = this;
   let con = new _.Consequence( );
 
-  // if( _.strIs( o ) )
-  // {
-  //   let filePath = self.path.join( self.path.realMainDir( ), self.path.name({ path : o, withExtension : 1 }) );
-  //   o = { url : o, filePath : filePath };
-  // }
-
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.strIs( o.url ),'fileCopyToHardDriveAct :','Expects {-o.filePath-}' );
   _.assert( _.strIs( o.filePath ),'fileCopyToHardDriveAct :','Expects {-o.filePath-}' );
+
+ //
+
+  let dstFileProvider = _.FileProvider.HardDrive( );
+  let writeStream = null;
+  let dstPath = dstFileProvider.path.nativize( o.filePath );
+
+  console.log( 'dstPath', dstPath );
+
+  writeStream = dstFileProvider.streamWrite({ filePath : dstPath });
+  writeStream.on( 'error', onError );
+  writeStream.on( 'finish', function( )
+  {
+    writeStream.close( function( )
+    {
+      con.take( o.dstPath );
+    })
+  });
+
+  self.streamReadAct({ filePath : o.url })
+  .got( function( err, response )
+  {
+    response.pipe( writeStream );
+    response.on( 'error', onError );
+  });
+
+  return con;
 
   /* begin */
 
@@ -259,37 +417,6 @@ function fileCopyToHardDriveAct( o )
     con.error( _.err( err ) );
   }
 
- //
-
-  let fileProvider = _.FileProvider.HardDrive( );
-  let writeStream = null;
-
-  let filePath = fileProvider.path.nativize( o.filePath );
-
-  console.log( 'filePath',filePath );
-
-  writeStream = fileProvider.streamWrite({ filePath : filePath });
-
-  writeStream.on( 'error', onError );
-
-  writeStream.on( 'finish', function( )
-  {
-    writeStream.close( function( )
-    {
-      con.take( o.filePath );
-    })
-  });
-
-  self.streamReadAct({ filePath : o.url })
-  .got( function( err, response )
-  {
-    response.pipe( writeStream );
-
-   response.on( 'error', onError );
-
-  });
-
-  return con;
 }
 
 var defaults = fileCopyToHardDriveAct.defaults = Object.create( Parent.prototype.fileReadAct.defaults );
@@ -335,6 +462,7 @@ function fileCopyToHardDrive( o )
       {
       }
     }
+
   }
 
   return self.fileCopyToHardDriveAct( o );
@@ -431,10 +559,13 @@ let Composes =
 {
 
   safe : 0,
-  protocols : _.define.own([ 'http' ]),
+  protocols : _.define.own([ 'http', 'https' ]),
 
   resolvingSoftLink : 0,
   resolvingTextLink : 0,
+  usingSoftLink : 0,
+  usingTextLink : 0,
+  usingGlobalPath : 1,
 
 }
 
@@ -462,25 +593,29 @@ let Statics =
 let Proto =
 {
 
-  init : init,
+  init,
 
   // read
 
-  streamReadAct : streamReadAct,
-  fileReadAct : fileReadAct,
+  streamReadAct,
+  fileReadAct,
+
+  // write
+
+  filesReflectSingle,
 
   // special
 
-  fileCopyToHardDriveAct : fileCopyToHardDriveAct,
-  fileCopyToHardDrive : fileCopyToHardDrive,
+  fileCopyToHardDriveAct,
+  fileCopyToHardDrive,
 
   //
 
-  Composes : Composes,
-  Aggregates : Aggregates,
-  Associates : Associates,
-  Restricts : Restricts,
-  Statics : Statics,
+  Composes,
+  Aggregates,
+  Associates,
+  Restricts,
+  Statics,
 
 }
 
@@ -505,9 +640,9 @@ _.FileProvider[ Self.shortName ] = Self;
 // export
 // --
 
-if( typeof module !== 'undefined' )
-if( _global_.WTOOLS_PRIVATE )
-{ /* delete require.cache[ module.id ]; */ }
+// if( typeof module !== 'undefined' )
+// if( _global_.WTOOLS_PRIVATE )
+// { /* delete require.cache[ module.id ]; */ }
 
 if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = Self;

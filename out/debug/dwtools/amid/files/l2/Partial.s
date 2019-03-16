@@ -716,8 +716,15 @@ function localFromGlobal( globalPath )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.mapIs( globalPath ) ) ;
   _.assert( _.strIs( globalPath.longPath ) );
-  _.assert( !self.protocols || !globalPath.protocol || _.arrayHas( self.protocols, globalPath.protocol ) );
+  _.assert
+  (
+    !self.protocols || !globalPath.protocol || _.arrayHas( self.protocols, globalPath.protocol ),
+    () => 'File provider ' + self.nickName + ' does not support protocol ' + _.strQuote( globalPath.protocol )
+  );
 
+  if( self.usingGlobalPath )
+  return globalPath.full;
+  else
   return globalPath.longPath;
 }
 
@@ -7498,6 +7505,7 @@ let Composes =
   throwing : 1,
   safe : 1,
   stating : 1,
+  usingGlobalPath : 0,
 
 }
 

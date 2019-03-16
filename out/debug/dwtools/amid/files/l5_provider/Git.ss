@@ -128,7 +128,7 @@ function filesReflectSingle_body( o )
 {
   let self = this;
   let path = self.path;
-  let con2 = new _.Consequence();
+  let con = new _.Consequence();
 
   o.extra = o.extra || Object.create( null );
   _.routineOptions( filesReflectSingle_body, o.extra, filesReflectSingle_body.extra );
@@ -149,7 +149,6 @@ function filesReflectSingle_body( o )
   _.assert( o.srcFilter.formed === 5 );
   _.assert( o.dstFilter.formed === 5 );
   _.assert( o.srcFilter.filePath === o.srcPath );
-  // _.assert( o.dstFilter.filePath === o.dstPath );
   _.assert( o.filter === null || !o.filter.hasFiltering(), 'Not supported options' );
   _.assert( !!o.recursive, 'Not supported options' );
 
@@ -190,20 +189,18 @@ function filesReflectSingle_body( o )
 
   /* */
 
-  // console.log( 'filesReflectSingle', o.verbosity );
-
-  let result = _.Consequence().take( null );
+  let ready = _.Consequence().take( null );
   let shell = _.sheller
   ({
     verbosity : o.verbosity - 1,
-    ready : result,
+    ready : ready,
     currentPath : dstPath,
   });
 
   let shellAll = _.sheller
   ({
     verbosity : o.verbosity - 1,
-    ready : result,
+    ready : ready,
     currentPath : dstPath,
     throwingExitCode : 0,
     outputCollecting : 1,
@@ -217,8 +214,8 @@ function filesReflectSingle_body( o )
   /* already have repository here */
 
   if( gitConfigExists )
-  result
-  .got( () => GitConfig( dstFileProvider.path.nativize( dstPath ), result.tolerantCallback() ) )
+  ready
+  .got( () => GitConfig( dstFileProvider.path.nativize( dstPath ), ready.tolerantCallback() ) )
   .ifNoErrorThen( function( arg )
   {
 
@@ -262,7 +259,7 @@ function filesReflectSingle_body( o )
     ([
       'git status',
     ]);
-    result
+    ready
     .ifNoErrorThen( function( arg )
     {
       _.assert( arg.length === 2 );
@@ -273,14 +270,13 @@ function filesReflectSingle_body( o )
 
   /* stash changes and checkout branch/commit */
 
-  // result.except( con2 ); // xxx !!!
-  result.except( ( err ) =>
+  ready.except( ( err ) =>
   {
-    con2.error( err );
+    con.error( err );
     throw err;
   });
 
-  result.ifNoErrorThen( ( arg ) =>
+  ready.ifNoErrorThen( ( arg ) =>
   {
 
     if( localChanges )
@@ -291,14 +287,14 @@ function filesReflectSingle_body( o )
     if( localChanges )
     shell({ path : 'git stash pop', throwingExitCode : 0 });
 
-    result.finally( con2 );
+    ready.finally( con );
 
     return arg;
   });
 
   /* handle error if any */
 
-  con2
+  con
   .finally( function( err, arg )
   {
     if( err )
@@ -306,13 +302,13 @@ function filesReflectSingle_body( o )
     return recordsMake();
   });
 
-  return con2;
+  return con;
 
   /* */
 
   function recordsMake()
   {
-    /* xxx : fast solution to return some records instead of empty arrray */
+    /* xxx : fast solution to return records instead of empty array */
     o.result = dstFileProvider.filesReflectEvaluate
     ({
       srcPath : dstPath,
@@ -326,11 +322,9 @@ function filesReflectSingle_body( o )
 _.routineExtend( filesReflectSingle_body, _.FileProvider.Find.prototype.filesReflectSingle );
 
 var extra = filesReflectSingle_body.extra = Object.create( null );
-
 extra.fetching = 1;
 
 var defaults = filesReflectSingle_body.defaults;
-
 let filesReflectSingle = _.routineFromPreAndBody( _.FileProvider.Find.prototype.filesReflectSingle.pre, filesReflectSingle_body );
 
 //
@@ -344,26 +338,22 @@ function isUpToDate( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( !!self.hub );
 
-  // console.log( 'isUpToDate:begin' );
-
   let srcCurrentPath;
   let dstFileProvider = self.hub.providerForPath( o.localPath );
   let paths = self.pathParse( o.remotePath );
-  let result = _.Consequence().take( null );
+  let ready = _.Consequence().take( null );
 
   let shell = _.sheller
   ({
     verbosity : o.verbosity - 1,
-    // verbosity : 2,
-    ready : result,
+    ready : ready,
     currentPath : o.localPath,
   });
 
   let shellAll = _.sheller
   ({
     verbosity : o.verbosity - 1,
-    // verbosity : 2,
-    ready : result,
+    ready : ready,
     currentPath : o.localPath,
     throwingExitCode : 0,
     outputCollecting : 1,
@@ -380,8 +370,8 @@ function isUpToDate( o )
   return false;
 
   if( gitConfigExists )
-  result
-  .got( () => GitConfig( dstFileProvider.path.nativize( o.localPath ), result.tolerantCallback() ) )
+  ready
+  .got( () => GitConfig( dstFileProvider.path.nativize( o.localPath ), ready.tolerantCallback() ) )
   .ifNoErrorThen( function( arg )
   {
     if( !arg.remote || !arg.remote.origin || !_.strIs( arg.remote.origin.url ) )
@@ -397,7 +387,7 @@ function isUpToDate( o )
 
   shell( 'git fetch origin' );
 
-  result.finally( ( err, arg ) =>
+  ready.finally( ( err, arg ) =>
   {
     // console.log( 'isUpToDate:1' );
     if( err )
@@ -413,7 +403,7 @@ function isUpToDate( o )
     'git status',
   ]);
 
-  result
+  ready
   .ifNoErrorThen( function( arg )
   {
     _.assert( arg.length === 2 );
@@ -427,33 +417,16 @@ function isUpToDate( o )
 
     return result;
   })
-  // .ifNoErrorThen( function( arg )
-  // {
-  //   // console.log( 'isUpToDate:2' );
-  //   _.assert( arg.length === 5 );
-  //   let diffRemote = arg[ 0 ].exitCode !== 0;
-  //   let diffLocal = arg[ 1 ].exitCode !== 0;
-  //   let commitsRemote = _.strHas( arg[ 2 ].output, '[ahead' );
-  //   let commitsLocal = _.strHas( arg[ 3 ].output, 'Changes to be committed' );
-  //   let result = !diffRemote && !commitsRemote;
-  //
-  //   if( o.verbosity )
-  //   self.logger.log( o.remotePath, result ? 'is up to date' : 'is not up to date' );
-  //
-  //   return result;
-  // })
-  ;
 
-  result
+  ready
   .finally( function( err, arg )
   {
-    // console.log( 'isUpToDate:end' );
     if( err )
     throw _.err( err );
     return arg;
   });
 
-  return result.split();
+  return ready.split();
 }
 
 var defaults = isUpToDate.defaults = Object.create( null );

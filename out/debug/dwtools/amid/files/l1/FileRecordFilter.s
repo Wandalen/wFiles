@@ -742,7 +742,8 @@ function pathLocalize( filePath )
   if( !path.isGlobal( filePath ) )
   return filePath;
 
-  let provider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let provider = filter.effectiveFileProvider || filter.hubFileProvider || filter.defaultFileProvider;
+  debugger;
   let result = provider.localFromGlobal( filePath );
   return result;
 }
@@ -1614,9 +1615,6 @@ function filePathNormalize( filePath )
   let path = fileProvider.path;
 
   _.assert( arguments.length === 1 );
-
-  // filePath = path.s.normalize( filePath );
-  // filePath = path.pathMapExtend( null, filePath );
 
   if( !_.mapIs( filePath ) )
   filePath = path.pathMapExtend( null, filePath );

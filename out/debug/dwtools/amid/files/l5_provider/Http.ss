@@ -390,7 +390,7 @@ function fileCopyToHardDriveAct( o )
   {
     writeStream.close( function( )
     {
-      con.take( o.dstPath );
+      con.take( o.filePath );
     })
   });
 

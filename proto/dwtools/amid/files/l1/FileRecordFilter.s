@@ -1228,7 +1228,7 @@ function pathsInherit( src )
     }
     else if( !_.mapIs( filter.filePath ) )
     {
-      debugger;
+      // debugger;
       filter.filePath = path.pathMapExtend( null, src.filePath, filter.filePath );
     }
 

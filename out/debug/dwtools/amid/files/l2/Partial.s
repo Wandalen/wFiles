@@ -2499,6 +2499,8 @@ function fileRead_body( o )
 
     if( o.verbosity >= 1 )
     self.logger.log( ' . Read :', o.filePath );
+    // if( o.verbosity >= 1 )
+    // debugger;
 
     o.result = data;
 

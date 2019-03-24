@@ -138,22 +138,7 @@ reflector:
   reflect.proto.:
     src:
       filePath:
-        .: .
-      prefixPath: proto
-      maskAll:
-        excludeAny:
-          - !<tag:yaml.org,2002:js/regexp> /(\W|^)node_modules(\W|$)/
-          - !<tag:yaml.org,2002:js/regexp> /\.unique$/
-          - !<tag:yaml.org,2002:js/regexp> /\.git$/
-          - !<tag:yaml.org,2002:js/regexp> /\.svn$/
-          - !<tag:yaml.org,2002:js/regexp> /\.hg$/
-          - !<tag:yaml.org,2002:js/regexp> /\.DS_Store$/
-          - !<tag:yaml.org,2002:js/regexp> /(^|\/)-/
-          - !<tag:yaml.org,2002:js/regexp> /\.debug($|\.|\/)/i
-          - !<tag:yaml.org,2002:js/regexp> /\.test($|\.|\/)/i
-          - !<tag:yaml.org,2002:js/regexp> /\.experiment($|\.|\/)/i
-    dst:
-      prefixPath: out/release
+        'path::proto': 'path::out.*=1'
     criterion:
       debug: 0
     inherit:
@@ -161,36 +146,15 @@ reflector:
   reflect.proto.debug:
     src:
       filePath:
-        .: .
-      prefixPath: proto
-      maskAll:
-        excludeAny:
-          - !<tag:yaml.org,2002:js/regexp> /(\W|^)node_modules(\W|$)/
-          - !<tag:yaml.org,2002:js/regexp> /\.unique$/
-          - !<tag:yaml.org,2002:js/regexp> /\.git$/
-          - !<tag:yaml.org,2002:js/regexp> /\.svn$/
-          - !<tag:yaml.org,2002:js/regexp> /\.hg$/
-          - !<tag:yaml.org,2002:js/regexp> /\.DS_Store$/
-          - !<tag:yaml.org,2002:js/regexp> /(^|\/)-/
-          - !<tag:yaml.org,2002:js/regexp> /\.release($|\.|\/)/i
-    dst:
-      prefixPath: out/debug
+        'path::proto': 'path::out.*=1'
     criterion:
       debug: 1
     inherit:
       - predefined.*
   reflect.submodules:
     src:
-      maskAll:
-        excludeAny:
-          - !<tag:yaml.org,2002:js/regexp> /(\W|^)node_modules(\W|$)/
-          - !<tag:yaml.org,2002:js/regexp> /\.unique$/
-          - !<tag:yaml.org,2002:js/regexp> /\.git$/
-          - !<tag:yaml.org,2002:js/regexp> /\.svn$/
-          - !<tag:yaml.org,2002:js/regexp> /\.hg$/
-          - !<tag:yaml.org,2002:js/regexp> /\.DS_Store$/
-          - !<tag:yaml.org,2002:js/regexp> /(^|\/)-/
-          - !<tag:yaml.org,2002:js/regexp> /\.release($|\.|\/)/i
+      filePath:
+        'submodule::*/exported::*=1/path::exportedDir*=1': 'path::out.*=1'
     criterion:
       debug: 1
     inherit:
@@ -211,71 +175,9 @@ reflector:
   exportedFiles.proto.export:
     recursive: 0
     src:
-      filePath:
-        .: null
-        dwtools: null
-        dwtools/Tools.s: null
-        dwtools/abase: null
-        dwtools/amid: null
-        dwtools/amid/files: null
-        dwtools/amid/files/UseBase.s: null
-        dwtools/amid/files/UseMid.s: null
-        dwtools/amid/files/UseTop.s: null
-        dwtools/amid/files/l1: null
-        dwtools/amid/files/l1/Encoders.s: null
-        dwtools/amid/files/l1/FileRecord.s: null
-        dwtools/amid/files/l1/FileRecordFactory.s: null
-        dwtools/amid/files/l1/FileRecordFilter.s: null
-        dwtools/amid/files/l1/FileRoutines.s: null
-        dwtools/amid/files/l1/FileStat.s: null
-        dwtools/amid/files/l1/Path.s: null
-        dwtools/amid/files/l1/Path.ss: null
-        dwtools/amid/files/l2: null
-        dwtools/amid/files/l2/Abstract.s: null
-        dwtools/amid/files/l2/Partial.s: null
-        dwtools/amid/files/l3: null
-        dwtools/amid/files/l3/FindMixin.s: null
-        dwtools/amid/files/l3/SecondaryMixin.s: null
-        dwtools/amid/files/l5_provider: null
-        dwtools/amid/files/l5_provider/Extract.s: null
-        dwtools/amid/files/l5_provider/Git.ss: null
-        dwtools/amid/files/l5_provider/HardDrive.ss: null
-        dwtools/amid/files/l5_provider/HtmlDocument.js: null
-        dwtools/amid/files/l5_provider/Http.js: null
-        dwtools/amid/files/l5_provider/Http.ss: null
-        dwtools/amid/files/l5_provider/Npm.ss: null
-        dwtools/amid/files/l5_provider/RemoteClient.s: null
-        dwtools/amid/files/l5_provider/RemoteServlet.ss: null
-        dwtools/amid/files/l5_provider/Svn.ss: null
-        dwtools/amid/files/l7: null
-        dwtools/amid/files/l7/Hub.s: null
-        dwtools/amid/files/l8_filter: null
-        dwtools/amid/files/l8_filter/Image.s: null
-        dwtools/amid/files/l8_filter/Reroot.s: null
-        dwtools/amid/files/l9: null
-        dwtools/amid/files.test: null
-        dwtools/amid/files.test/aFileProvider.test.s: null
-        dwtools/amid/files.test/aFilesFind.test.s: null
-        dwtools/amid/files.test/Extract.html: null
-        dwtools/amid/files.test/Extract.test.s: null
-        dwtools/amid/files.test/Files.copy.test.s: null
-        dwtools/amid/files.test/Files.etc.test.ss: null
-        dwtools/amid/files.test/FilesFind.Extract.test.s: null
-        dwtools/amid/files.test/FilesFind.HardDrive.test.ss: null
-        dwtools/amid/files.test/FilesRead.test.s: null
-        dwtools/amid/files.test/Git.test.ss: null
-        dwtools/amid/files.test/HardDrive.test.ss: null
-        dwtools/amid/files.test/Hub.copy.test.ss: null
-        dwtools/amid/files.test/Hub.Extract.test.s: null
-        dwtools/amid/files.test/Hub.HardDrive.test.ss: null
-        dwtools/amid/files.test/Npm.test.ss: null
-        dwtools/amid/files.test/Path.test.ss: null
-        dwtools/amid/files.test/Record.test.s: null
-        dwtools/amid/files.test/RecordFilter.test.s: null
-        dwtools/amid/files.test/Uri.test.ss: null
-        dwtools/atop: null
+      filePath: 'path::exportedFiles.proto.export'
       basePath: .
-      prefixPath: proto
+      prefixPath: 'path::exportedDir.proto.export'
     criterion:
       default: 1
       debug: 1
@@ -345,6 +247,13 @@ step:
       raw: 1
     opts:
       reflector: 'reflector::reflect.submodules*=1'
+    inherit:
+      - predefined.reflect
+  reflect.submodules:
+    criterion:
+      debug: 1
+    opts:
+      reflector: 'reflector::reflect.submodules*'
     inherit:
       - predefined.reflect
   export.proto:

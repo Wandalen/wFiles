@@ -1891,7 +1891,7 @@ function readToProvider( o )
       contentPath = _srcPath.join( o.basePath, contentPath );
       if( o.absolutePathForLink || descriptor.absolute )
       contentPath = _.uri.resolve( dstPath, '..', contentPath );
-      dstPath = o.dstProvider.localFromGlobal( dstPath );
+      dstPath = o.dstProvider.path.localFromGlobal( dstPath );
       if( terminating )
       {
         o.dstProvider.fileCopy( dstPath, contentPath );
@@ -1943,7 +1943,7 @@ function readToProvider( o )
       contentPath = _srcPath.join( o.basePath, contentPath );
       if( o.absolutePathForLink || descriptor.absolute )
       contentPath = _.uri.resolve( dstPath, '..', descriptor.hardLink );
-      contentPath = o.dstProvider.localFromGlobal( contentPath );
+      contentPath = o.dstProvider.path.localFromGlobal( contentPath );
       if( terminating )
       o.dstProvider.fileCopy( dstPath, contentPath );
       else

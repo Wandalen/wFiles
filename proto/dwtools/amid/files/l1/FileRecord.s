@@ -585,7 +585,7 @@ function _absoluteGlobalGet()
   let record = this;
   let f = record.factory;
   let fileProvider = f.effectiveFileProvider;
-  return fileProvider.globalFromLocal( record.absolute );
+  return fileProvider.path.globalFromLocal( record.absolute );
 }
 
 //
@@ -595,7 +595,7 @@ function _realGlobalGet()
   let record = this;
   let f = record.factory;
   let fileProvider = f.effectiveFileProvider;
-  return fileProvider.globalFromLocal( record.real );
+  return fileProvider.path.globalFromLocal( record.real );
 }
 
 //

@@ -177,7 +177,7 @@ function filesNewer( dst,src )
   else if( !_.objectIs( src ) )
   throw _.err( 'unknown src type' );
 
-  if( _.fileStatIs( src ) )
+  if( _.fileStatIs( dst ) )
   dst = { stat : dst };
   else if( _.strIs( dst ) )
   dst = { stat : _.fileProvider.statRead( dst ) };

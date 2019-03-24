@@ -136,13 +136,13 @@ function resolveTextLink( path )
   return this.fileProvider.pathResolveTextLink.apply( this.fileProvider, arguments );
 }
 
+// //
 //
-
-function _resolveTextLink( path )
-{
-  _.assert( !!this.fileProvider );
-  return this.fileProvider._pathResolveTextLink.apply( this.fileProvider, arguments );
-}
+// function _resolveTextLink( path )
+// {
+//   _.assert( !!this.fileProvider );
+//   return this.fileProvider._pathResolveTextLink.apply( this.fileProvider, arguments );
+// }
 
 //
 
@@ -539,7 +539,7 @@ let Proto =
   effectiveMainDir,
 
   resolveTextLink,
-  _resolveTextLink,
+  // _resolveTextLink,
 
   dirUserHome,
   dirTemp,

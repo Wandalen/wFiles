@@ -337,7 +337,7 @@ function fieldPop()
 // path
 // --
 
-function localFromGlobal( filePath )
+function localFromGlobalAct( filePath )
 {
   let self = this;
   _.assert( arguments.length === 1, 'Expects single argument' );
@@ -369,20 +369,20 @@ function _localFromGlobal( filePath, provider )
 
   _.assert( _.objectIs( r.provider ), () => 'No provider for path ' + _.strQuote( filePath ) );
 
-  r.localPath = r.provider.localFromGlobal( r.parsedPath );
+  r.localPath = r.provider.path.localFromGlobal( r.parsedPath );
 
   _.assert( _.strIs( r.localPath ) );
 
   return r;
 }
 
+// //
 //
-
-let localsFromGlobals = _.routineVectorize_functor
-({
-  routine : localFromGlobal,
-  vectorizingMapVals : 0,
-});
+// let localsFromGlobals = _.routineVectorize_functor
+// ({
+//   routine : localFromGlobal,
+//   vectorizingMapVals : 0,
+// });
 
 //
 
@@ -930,7 +930,7 @@ function routinesGenerate()
         }
         else
         {
-          o[ p ] = self.localFromGlobal( o[ p ] );
+          o[ p ] = self.path.localFromGlobal( o[ p ] );
         }
       }
 
@@ -1110,9 +1110,9 @@ let Proto =
 
   // path
 
-  localFromGlobal,
+  localFromGlobalAct,
   _localFromGlobal,
-  localsFromGlobals,
+  // localsFromGlobals,
 
   pathCurrentAct,
 
@@ -1120,7 +1120,7 @@ let Proto =
   pathResolveLinkTail,
   pathResolveSoftLink,
 
-  //
+  // read
 
   fileRead,
 

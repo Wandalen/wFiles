@@ -54,12 +54,12 @@ function init( o )
 // path
 // --
 
-function localFromGlobal( uri )
-{
-  let self = this;
-  let path = self.path;
-  return path.str( uri );
-}
+// function localFromGlobal( uri )
+// {
+//   let self = this;
+//   let path = self.path;
+//   return path.str( uri );
+// }
 
 //
 
@@ -510,6 +510,7 @@ let Composes =
   resolvingSoftLink : 0,
   resolvingTextLink : 0,
   limitedImplementation : 1,
+  usingGlobalPath : 1,
 
 }
 
@@ -548,7 +549,7 @@ let Proto =
 
   // path
 
-  localFromGlobal,
+  // localFromGlobal,
   pathIsolateGlobalAndLocal,
   pathParse,
 

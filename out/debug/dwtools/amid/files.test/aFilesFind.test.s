@@ -5649,7 +5649,7 @@ function filesGlob( test )
   test.case = 'simple glob';
 
   var glob = '*';
-  var got = /*ttt*/provider.filesGlob( completeOptions( glob ) );
+  var got = provider.filesGlob( completeOptions( glob ) );
   var expected =
   [
     './a.js',
@@ -5660,7 +5660,7 @@ function filesGlob( test )
   test.identical( got, expected );
 
   var glob = '**'
-  var got = /*ttt*/provider.filesGlob( completeOptions( glob ) );
+  var got = provider.filesGlob( completeOptions( glob ) );
   var expected =
   [
     './a.js',
@@ -5684,7 +5684,7 @@ function filesGlob( test )
 
   var  glob = 'a/*.js';
   var options = completeOptions( glob );
-  var got = /*ttt*/provider.filesGlob( options );
+  var got = provider.filesGlob( options );
   var expected =
   [
     './a.js',
@@ -5693,7 +5693,7 @@ function filesGlob( test )
 
   var  glob = 'a/a.*';
   var options = completeOptions( glob );
-  var got = /*ttt*/provider.filesGlob( options );
+  var got = provider.filesGlob( options );
   var expected =
   [
     './a.js',
@@ -5705,7 +5705,7 @@ function filesGlob( test )
 
   var  glob = 'a/a.j?';
   var options = completeOptions( glob );
-  var got = /*ttt*/provider.filesGlob( options );
+  var got = provider.filesGlob( options );
   var expected =
   [
     './a.js',
@@ -5714,7 +5714,7 @@ function filesGlob( test )
 
   var  glob = 'a/[!cb].s';
   var options = completeOptions( glob );
-  var got = /*ttt*/provider.filesGlob( options );
+  var got = provider.filesGlob( options );
   var expected =
   [
     './a.s',
@@ -5727,7 +5727,7 @@ function filesGlob( test )
 
   var  glob = '**/a/a.?';
   var options = completeOptions( glob );
-  var got = /*ttt*/provider.filesGlob( options );
+  var got = provider.filesGlob( options );
   var expected =
   [
     './a/a.s', './b/a/x/a/a.s'
@@ -5736,7 +5736,7 @@ function filesGlob( test )
 
   var  glob = '**/x/**/a.??';
   var options = completeOptions( glob );
-  var got = /*ttt*/provider.filesGlob( options );
+  var got = provider.filesGlob( options );
   var expected =
   [
     './b/a/x/a/a.js',
@@ -5746,7 +5746,7 @@ function filesGlob( test )
 
   var  glob = '**/[!ab]/*.?s';
   var options = completeOptions( glob );
-  var got = /*ttt*/provider.filesGlob( options );
+  var got = provider.filesGlob( options );
   var expected =
   [
     './a/c/c.js',
@@ -5756,7 +5756,7 @@ function filesGlob( test )
 
   var  glob = 'b/[a-c]/**/a/*';
   var options = completeOptions( glob );
-  var got = /*ttt*/provider.filesGlob( options );
+  var got = provider.filesGlob( options );
   var expected =
   [
     './a/x/a/a.js',
@@ -5768,7 +5768,7 @@ function filesGlob( test )
 
   var glob = '[ab]/**/[!xc]/*';
   var options = completeOptions( glob );
-  var got = /*ttt*/provider.filesGlob( options );
+  var got = provider.filesGlob( options );
   var expected = [ './b/a/x/a/a.js', './b/a/x/a/a.s', './b/a/x/a/a.ss', './b/a/x/a/a.txt' ];
   test.identical( got, expected );
 
@@ -5781,7 +5781,7 @@ function filesGlob( test )
     outputFormat : 'relative',
     filter: { basePath : testPath }
   }
-  var got = /*ttt*/provider.filesGlob( options );
+  var got = provider.filesGlob( options );
   var expected =
   [
     './a/c/c.s',
@@ -5794,7 +5794,7 @@ function filesGlob( test )
 
   // var  glob = 'a/{x.*, a.*}';
   // var options = completeOptions( glob );
-  // var got = /*ttt*/provider.filesGlob( options );
+  // var got = provider.filesGlob( options );
   // var expected =
   // [
   //   './a.js',
@@ -5806,7 +5806,7 @@ function filesGlob( test )
   //
   // var  glob = '**/c/{x.*, c.*}';
   // var options = completeOptions( glob );
-  // var got = /*ttt*/provider.filesGlob( options );
+  // var got = provider.filesGlob( options );
   // var expected =
   // [
   //   './a/c/c.js',
@@ -5818,7 +5818,7 @@ function filesGlob( test )
   //
   // var  glob = 'b/*/{x, c}/a/*';
   // var options = completeOptions( glob );
-  // var got = /*ttt*/provider.filesGlob( options );
+  // var got = provider.filesGlob( options );
   // var expected =
   // [
   //   './a/x/a/a.js',
@@ -5827,6 +5827,48 @@ function filesGlob( test )
   //   './a/x/a/a.txt'
   // ]
   // test.identical( got, expected );
+
+}
+
+//
+
+function filesFindGroups( test )
+{
+  let context = this;
+  let provider = context.provider;
+  let hub = context.hub;
+  let path = context.provider.path;
+  let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
+
+  var filesTree =
+  {
+    'a.js' : 'a.js',
+    'b.js' : 'b.js',
+    'a.txt' : 'a.txt',
+    'b.txt' : 'b.txt',
+    'dir' :
+    {
+      'a.js' : 'dir/a.js',
+      'b.js' : 'dir/b.js',
+      'a.txt' : 'dir/a.txt',
+      'b.txt' : 'dir/b.txt',
+    }
+  }
+
+  var extract1 = new _.FileProvider.Extract({ filesTree : filesTree });
+  extract1.filesReflectTo( provider, testPath );
+
+  var expected = {}
+  var filePath =
+  {
+    '*.txt' : 'Produced.txt',
+    '*.js' : 'Produced.js',
+  }
+  debugger;
+  var found = provider.filesFindGroups({ fileFilter : { filePath : filePath } });
+  debugger;
+
+  test.identical( found, expected );
 
 }
 
@@ -8357,7 +8399,6 @@ function _filesReflect( test, o )
 
   var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/srcFile/f', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
   var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/srcFile/f', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
-  // // /**/ var expectedEffAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
   var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'fileCopy', 'fileDelete', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy' ];
   var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
   var expectedPreserve = [ true, false, false, false, false, false, true, false, false, false, false, false, false, false, true, false, true, false, false, false ];
@@ -8365,7 +8406,6 @@ function _filesReflect( test, o )
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  // // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
   var action = _.select( records, '*/action' );
   var allow = _.select( records, '*/allow' );
   var preserve = _.select( records, '*/preserve' );
@@ -8373,16 +8413,15 @@ function _filesReflect( test, o )
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  // // /**/ test.identical( effAbsolute, expectedEffAbsolute );
   test.identical( action, expectedAction );
   test.identical( allow, expectedAllow );
   test.identical( preserve, expectedPreserve );
   test.identical( reason, expectedReason );
 
-  test.identical( p.hub.filesAreSoftLinked([ p.src.globalFromLocal( '/src/a1' ), p.dst.globalFromLocal( '/dst/a1' ) ]), false );
-  test.identical( p.hub.filesAreSoftLinked([ p.src.globalFromLocal( '/src/a1' ), p.src.globalFromLocal( '/src/a1' ) ]), false );
-  test.identical( p.hub.filesAreHardLinked([ p.src.globalFromLocal( '/src/a1' ), p.dst.globalFromLocal( '/dst/a1' ) ]), false );
-  test.identical( p.hub.filesAreHardLinked([ p.src.globalFromLocal( '/src/a1' ), p.src.globalFromLocal( '/src/a1' ) ]), true );
+  test.identical( p.hub.filesAreSoftLinked([ p.src.path.globalFromLocal( '/src/a1' ), p.dst.path.globalFromLocal( '/dst/a1' ) ]), false );
+  test.identical( p.hub.filesAreSoftLinked([ p.src.path.globalFromLocal( '/src/a1' ), p.src.path.globalFromLocal( '/src/a1' ) ]), false );
+  test.identical( p.hub.filesAreHardLinked([ p.src.path.globalFromLocal( '/src/a1' ), p.dst.path.globalFromLocal( '/dst/a1' ) ]), false );
+  test.identical( p.hub.filesAreHardLinked([ p.src.path.globalFromLocal( '/src/a1' ), p.src.path.globalFromLocal( '/src/a1' ) ]), true );
 
   /* */
 
@@ -8408,7 +8447,7 @@ function _filesReflect( test, o )
     filesTree :
     {
       src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-      dst : { a2 : '2', a1 : [{ softLink : p.src.globalFromLocal( '/src/a1' ) }], b : [{ softLink : p.src.globalFromLocal( '/src/b' ) }], c : [{ softLink : p.src.globalFromLocal( '/src/c' ) }], dir : { a2 : '2', a1 : [{ softLink : p.src.globalFromLocal( '/src/dir/a1' ) }], b : [{ softLink : p.src.globalFromLocal( '/src/dir/b' ) }], c : [{ softLink : p.src.globalFromLocal( '/src/dir/c' ) }] }, dirSame : { d : [{ softLink : p.src.globalFromLocal( '/src/dirSame/d' ) }] }, dir1 : { a1 : [{ softLink : p.src.globalFromLocal( '/src/dir1/a1' ) }], b : [{ softLink : p.src.globalFromLocal( '/src/dir1/b' ) }], c : [{ softLink : p.src.globalFromLocal( '/src/dir1/c' ) }] }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir4 : {}, dir5 : {}, srcFile : [{ softLink : p.src.globalFromLocal( '/src/srcFile' ) }], dstFile : { f : [{ softLink : p.src.globalFromLocal( '/src/dstFile/f' ) }] } },
+      dst : { a2 : '2', a1 : [{ softLink : p.src.path.globalFromLocal( '/src/a1' ) }], b : [{ softLink : p.src.path.globalFromLocal( '/src/b' ) }], c : [{ softLink : p.src.path.globalFromLocal( '/src/c' ) }], dir : { a2 : '2', a1 : [{ softLink : p.src.path.globalFromLocal( '/src/dir/a1' ) }], b : [{ softLink : p.src.path.globalFromLocal( '/src/dir/b' ) }], c : [{ softLink : p.src.path.globalFromLocal( '/src/dir/c' ) }] }, dirSame : { d : [{ softLink : p.src.path.globalFromLocal( '/src/dirSame/d' ) }] }, dir1 : { a1 : [{ softLink : p.src.path.globalFromLocal( '/src/dir1/a1' ) }], b : [{ softLink : p.src.path.globalFromLocal( '/src/dir1/b' ) }], c : [{ softLink : p.src.path.globalFromLocal( '/src/dir1/c' ) }] }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir4 : {}, dir5 : {}, srcFile : [{ softLink : p.src.path.globalFromLocal( '/src/srcFile' ) }], dstFile : { f : [{ softLink : p.src.path.globalFromLocal( '/src/dstFile/f' ) }] } },
     },
   });
 
@@ -8433,12 +8472,12 @@ function _filesReflect( test, o )
   test.identical( action, expectedAction );
   test.identical( allow, expectedAllow );
 
-  test.identical( p.hub.filesAreSoftLinked([ p.src.globalFromLocal( '/src/a1' ), p.dst.globalFromLocal( '/dst/a1' ) ]), true );
-  test.identical( p.hub.filesAreSoftLinked([ p.src.globalFromLocal( '/src/a2' ), p.dst.globalFromLocal( '/dst/a2' ) ]), false );
-  test.identical( p.hub.filesAreSoftLinked([ p.src.globalFromLocal( '/src/b' ), p.dst.globalFromLocal( '/dst/b' ) ]), true );
-  test.identical( p.hub.filesAreSoftLinked([ p.src.globalFromLocal( '/src/dir/a1' ), p.dst.globalFromLocal( '/dst/dir/a1' ) ]), true );
-  test.identical( p.hub.filesAreSoftLinked([ p.src.globalFromLocal( '/src/dir/a2' ), p.dst.globalFromLocal( '/dst/dir/a2' ) ]), false );
-  test.identical( p.hub.filesAreSoftLinked([ p.src.globalFromLocal( '/src/dir/b' ), p.dst.globalFromLocal( '/dst/dir/b' ) ]), true );
+  test.identical( p.hub.filesAreSoftLinked([ p.src.path.globalFromLocal( '/src/a1' ), p.dst.path.globalFromLocal( '/dst/a1' ) ]), true );
+  test.identical( p.hub.filesAreSoftLinked([ p.src.path.globalFromLocal( '/src/a2' ), p.dst.path.globalFromLocal( '/dst/a2' ) ]), false );
+  test.identical( p.hub.filesAreSoftLinked([ p.src.path.globalFromLocal( '/src/b' ), p.dst.path.globalFromLocal( '/dst/b' ) ]), true );
+  test.identical( p.hub.filesAreSoftLinked([ p.src.path.globalFromLocal( '/src/dir/a1' ), p.dst.path.globalFromLocal( '/dst/dir/a1' ) ]), true );
+  test.identical( p.hub.filesAreSoftLinked([ p.src.path.globalFromLocal( '/src/dir/a2' ), p.dst.path.globalFromLocal( '/dst/dir/a2' ) ]), false );
+  test.identical( p.hub.filesAreSoftLinked([ p.src.path.globalFromLocal( '/src/dir/b' ), p.dst.path.globalFromLocal( '/dst/dir/b' ) ]), true );
 
   /* */
 
@@ -10685,8 +10724,8 @@ function filesReflectWithHub( test )
 
   test.case = 'files from Extract to HardDrive, using global uris'
   dstProvider.filesDelete( dstPath );
-  var srcUrl = srcProvider.globalFromLocal( srcPath );
-  var dstUrl = dstProvider.globalFromLocal( dstPath );
+  var srcUrl = srcProvider.path.globalFromLocal( srcPath );
+  var dstUrl = dstProvider.path.globalFromLocal( dstPath );
   var o1 = { reflectMap : { [ srcUrl ] : dstUrl } };
   var o2 =
   {
@@ -17230,6 +17269,8 @@ var Self =
 
     filesFindGlob,
     filesGlob,
+
+    filesFindGroups,
 
     filesReflectTrivial,
     filesReflectMutuallyExcluding,

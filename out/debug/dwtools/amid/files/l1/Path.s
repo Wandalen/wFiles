@@ -21,6 +21,34 @@ let Self = _global_.wTools.path;
 _.assert( _.objectIs( Self ) );
 
 // --
+// functor
+// --
+
+function _vectorizeKeysAndVals( routine, select )
+{
+  select = select || 1;
+
+  let routineName = routine.name;
+
+  _.assert( _.routineIs( routine ) );
+  _.assert( _.strDefined( routineName ) );
+  _.assert( arguments.length === 1 || arguments.length === 2 );
+
+  let routine2 = _.routineVectorize_functor
+  ({
+    routine : [ routineName ],
+    vectorizingArray : 1,
+    vectorizingMapVals : 1,
+    vectorizingMapKeys : 1,
+    select : select,
+  });
+
+  _.routineExtend( routine2, routine );
+
+  return routine2;
+}
+
+// --
 // routines
 // --
 
@@ -118,6 +146,45 @@ function current()
   return result;
 }
 
+//
+
+function localFromGlobal( globalPath )
+{
+  let path = this;
+  let provider = this.fileProvider;
+  return provider.localFromGlobalAct( globalPath );
+}
+
+//
+
+function globalFromLocal( localPath )
+{
+  let path = this;
+  let provider = this.fileProvider;
+  return provider.globalFromLocalAct( localPath );
+}
+
+//
+
+function hasLocally( filePath )
+{
+  let path = this;
+  let provider = this.fileProvider;
+
+  if( !path.isGlobal( filePath ) )
+  return true;
+
+  let parsed = _.uri.parse( filePath );
+
+  if( !parsed.protocol )
+  return true;
+
+  if( _.arrayHas( provider.protocols, parsed.protocol ) )
+  return true;
+
+  return false;
+}
+
 // --
 // declare
 // --
@@ -125,11 +192,17 @@ function current()
 let Proto =
 {
 
-  from : from,
-  pathsFrom : pathsFrom,
+  from,
+  pathsFrom,
 
-  nativize : nativize,
-  current : current,
+  localFromGlobal,
+  localsFromGlobals : _vectorizeKeysAndVals( localFromGlobal ),
+  globalFromLocal,
+  globalsFromLocals : _vectorizeKeysAndVals( globalFromLocal ),
+
+  nativize,
+  current,
+  hasLocally,
 
 }
 
@@ -139,9 +212,9 @@ _.mapExtend( Self, Proto );
 // export
 // --
 
-if( typeof module !== 'undefined' )
-if( _global_.WTOOLS_PRIVATE )
-{ /* delete require.cache[ module.id ]; */ }
+// if( typeof module !== 'undefined' )
+// if( _global_.WTOOLS_PRIVATE )
+// { /* delete require.cache[ module.id ]; */ }
 
 if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = Self;

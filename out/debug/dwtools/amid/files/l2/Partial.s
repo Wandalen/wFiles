@@ -68,33 +68,6 @@ function _vectorizeKeysAndVals( routine, select )
     select : select,
   });
 
-  // function routine2( srcs )
-  // {
-  //   _.assert( arguments.length === 1 );
-  //   if( _.mapIs( srcs ) )
-  //   {
-  //     let result = Object.create( null );
-  //     for( let s in srcs )
-  //     {
-  //       let val = routine.call( this, srcs[ s ] );
-  //       let key = routine.call( this, s );
-  //       result[ key ] = val;
-  //     }
-  //     return result;
-  //   }
-  //   else if( _.arrayIs( srcs ) )
-  //   {
-  //     let result = [];
-  //     for( let s = 0 ; s < srcs.length ; s++ )
-  //     result[ s ] = routine.call( this, srcs[ s ] );
-  //     return result;
-  //   }
-  //   else
-  //   {
-  //     return routine.call( this, srcs );
-  //   }
-  // }
-
   _.routineExtend( routine2, routine );
 
   return routine2;
@@ -698,8 +671,31 @@ function hasProvider( provider )
 // --
 // path
 // --
+//
+// function hasLocally( filePath )
+// {
+//   let self = this;
+//   let path = self.this;
+//
+//   debugger;
+//
+//   if( !path.isGlobal( filePath ) )
+//   return true;
+//
+//   let parsed = _.uri.parse( filePath );
+//
+//   if( !parsed.protocol )
+//   return true;
+//
+//   if( _.arrayHas( self.protocols, parsed.protocol ) )
+//   return true;
+//
+//   return false;
+// }
 
-function localFromGlobal( globalPath )
+//
+
+function localFromGlobalAct( globalPath )
 {
   let self = this;
 
@@ -730,7 +726,7 @@ function localFromGlobal( globalPath )
 
 //
 
-function globalFromLocal( localPath )
+function globalFromLocalAct( localPath )
 {
   let self = this;
   let path = self.path.parse ? self.path : _.uri;
@@ -7623,11 +7619,11 @@ let Proto =
 
   // path
 
-  localFromGlobal,
-  localsFromGlobals : _vectorizeKeysAndVals( localFromGlobal ),
-
-  globalFromLocal,
-  globalsFromLocals : _vectorizeKeysAndVals( globalFromLocal ),
+  // hasLocally,
+  localFromGlobalAct,
+  // localsFromGlobals : _vectorizeKeysAndVals( localFromGlobal ),
+  globalFromLocalAct,
+  // globalsFromLocals : _vectorizeKeysAndVals( globalFromLocal ),
 
   pathNativizeAct,
   pathCurrentAct : null,

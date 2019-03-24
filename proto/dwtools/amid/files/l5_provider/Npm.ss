@@ -48,12 +48,12 @@ function init( o )
 // path
 // --
 
-function localFromGlobal( uri )
-{
-  let self = this;
-  let path = self.path;
-  return path.str( uri );
-}
+// function localFromGlobal( uri )
+// {
+//   let self = this;
+//   let path = self.path;
+//   return path.str( uri );
+// }
 
 //
 
@@ -304,27 +304,27 @@ let Forbids =
 let Proto =
 {
 
-  finit : finit,
-  init : init,
+  finit,
+  init,
 
   // path
 
-  localFromGlobal : localFromGlobal,
-  pathIsolateGlobalAndLocal : pathIsolateGlobalAndLocal,
-  pathCurrentAct : pathCurrentAct,
+  // localFromGlobal,
+  pathIsolateGlobalAndLocal,
+  pathCurrentAct,
 
   // etc
 
-  filesReflectSingle : filesReflectSingle,
+  filesReflectSingle,
 
   //
 
-  Composes : Composes,
-  Aggregates : Aggregates,
-  Associates : Associates,
-  Restricts : Restricts,
-  Statics : Statics,
-  Forbids : Forbids,
+  Composes,
+  Aggregates,
+  Associates,
+  Restricts,
+  Statics,
+  Forbids,
 
 }
 

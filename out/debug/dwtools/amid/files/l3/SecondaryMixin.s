@@ -81,6 +81,7 @@ function filesRead_body( o )
   {
     let srcPath = r.pathGroupedByDstMap[ dstPath ];
     let o2 = _.mapOnly( o, self.filesReflectSingle.body.defaults );
+    // let o2 = _.mapOnly( o, self.filesReflectSingle.body.defaults );
 
     con.finallyGive( 1 );
 

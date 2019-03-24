@@ -63,6 +63,8 @@ function copy( src )
 
   if( _.strIs( src ) )
   src = { filePath : src }
+  else if( _.arrayIs( src ) )
+  src = { filePath : src }
 
   let result = _.Copyable.prototype.copy.call( filter, src );
 
@@ -745,7 +747,7 @@ function pathLocalize( filePath )
   return filePath;
 
   let provider = filter.effectiveFileProvider || filter.hubFileProvider || filter.defaultFileProvider;
-  let result = provider.localFromGlobal( filePath );
+  let result = provider.path.localFromGlobal( filePath );
   return result;
 }
 

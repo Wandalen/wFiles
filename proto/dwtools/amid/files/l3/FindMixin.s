@@ -847,11 +847,12 @@ function filesFindGroups_body( o )
     o2.filter.filePathSelect( srcPath, dstPath );
     o2.filter.form();
 
-    debugger;
+    // debugger;
     _.Consequence.From( self.filesFind( o2 ) )
     .finally( ( err, files ) =>
     {
-      debugger;
+
+      // debugger;
       r.filesGrouped[ dstPath ] = files;
       if( err )
       {
@@ -923,80 +924,44 @@ function filesRead_body( o )
 
   /* */
 
-  con = _.Consequence.From( con ).then( ( result ) =>
+  con = _.Consequence.From( con );
+
+  con.then( ( result ) =>
   {
     r = result;
     r.dataMap = Object.create( null );
+    r.grouped = Object.create( null );
 
     for( let dstPath in r.filesGrouped )
     {
-      let file = r.filesGrouped[ dstPath ];
-      fileRead( file, dstPath );
+      let files = r.filesGrouped[ dstPath ];
+      for( let f = 0 ; f < files.length ; f++ )
+      fileRead( files[ f ], dstPath );
     }
 
+    return r;
   });
-
-  // for( let dstPath in r.pathGroupedByDstMap ) ( function( dstPath )
-  // {
-  //   let srcPath = r.pathGroupedByDstMap[ dstPath ];
-  //   let o2 = _.mapOnly( o, self.filesReflectSingle.body.defaults );
-  //
-  //   con.finallyGive( 1 );
-  //
-  //   o2.filter = o.fileFilter.clone();
-  //   o2.filter.filePathSelect( srcPath, dstPath );
-  //   o2.filter.form();
-  //
-  //   _.Consequence.From( self.filesFind( o2 ) )
-  //   .finally( ( err, files ) =>
-  //   {
-  //     if( err )
-  //     {
-  //       r.errors.push( err );
-  //       con.take( null );
-  //       return null;
-  //     }
-  //     files.forEach( ( record ) => fileRead( record, dstPath ) );
-  //     con.take( null );
-  //     return null;
-  //   });
-  //
-  // })( dstPath );
-  //
-  // /* */
-  //
-  // con.take( null );
-  // con.finally( () =>
-  // {
-  //   if( r.errors.length )
-  //   {
-  //     debugger;
-  //     if( o.throwing )
-  //     throw r.errors[ 0 ];
-  //   }
-  //   return r;
-  // });
 
   return con.toResourceMaybe();
 
   /* */
 
-  function fileRead( record, dstBasePath )
+  function fileRead( record, dstPath )
   {
 
-    let dstPath = dstBasePath;
-    let dstDescriptor = r.dstMap[ dstPath ];
+    let descriptor = r.grouped[ dstPath ];
 
-    if( !dstDescriptor )
+    if( !descriptor )
     {
-      dstDescriptor = r.dstMap[ dstPath ] = Object.create( null );
-      dstDescriptor.dstPath = dstPath;
-      dstDescriptor.dataMap = Object.create( null );
+      descriptor = r.grouped[ dstPath ] = Object.create( null );
+      descriptor.dstPath = dstPath;
+      descriptor.pathsGrouped = r.pathsGrouped[ dstPath ];
+      descriptor.filesGrouped = r.filesGrouped[ dstPath ];
+      descriptor.dataMap = Object.create( null );
     }
 
     try
     {
-      r.fileMap[ record.absolute ] = dstDescriptor.dstPath;
       r.dataMap[ record.absolute ] = self.fileRead({ filePath : record.absolute, sync : o.sync });
       con.finallyGive( 1 );
       _.Consequence.From( r.dataMap[ record.absolute ] )
@@ -1008,7 +973,7 @@ function filesRead_body( o )
           return null;
         }
         r.dataMap[ record.absolute ] = data;
-        dstDescriptor.dataMap[ record.absolute ] = data;
+        descriptor.dataMap[ record.absolute ] = data;
         return null;
       })
       .finally( con );
@@ -1020,116 +985,9 @@ function filesRead_body( o )
 
   }
 
-  //
-  // let r = Object.create( null );
-  // r.errors = [];
-  // r.options = o;
-  // r.dataMap = Object.create( null );
-  // r.fileMap = Object.create( null );
-  // r.dstMap = Object.create( null );
-  //
-  // // debugger;
-  // r.pathGroupedByDstMap = path.pathMapGroupByDst( o.fileFilter.filePath );
-  // // r.pathGroupedByDstMap = path.pathMapGroupByDst( o.fileFilter.formedFilePath );
-  //
-  // /* */
-  //
-  // for( let dstPath in r.pathGroupedByDstMap ) ( function( dstPath )
-  // {
-  //   let srcPath = r.pathGroupedByDstMap[ dstPath ];
-  //   let o2 = _.mapOnly( o, self.filesReflectSingle.body.defaults );
-  //   // let o2 = _.mapOnly( o, self.filesReflectSingle.body.defaults );
-  //
-  //   con.finallyGive( 1 );
-  //
-  //   o2.filter = o.fileFilter.clone();
-  //   o2.filter.filePathSelect( srcPath, dstPath );
-  //   o2.filter.form();
-  //
-  //   // debugger;
-  //   _.Consequence.From( self.filesFind( o2 ) )
-  //   .finally( ( err, files ) =>
-  //   {
-  //     if( err )
-  //     {
-  //       r.errors.push( err );
-  //       con.take( null );
-  //       return null;
-  //     }
-  //     files.forEach( ( record ) => fileRead( record, dstPath ) );
-  //     con.take( null );
-  //     return null;
-  //   });
-  //
-  // })( dstPath );
-  //
-  // /* */
-  //
-  // con.take( null );
-  // con.finally( () =>
-  // {
-  //   if( r.errors.length )
-  //   {
-  //     debugger;
-  //     if( o.throwing )
-  //     throw r.errors[ 0 ];
-  //   }
-  //   return r;
-  // });
-  //
-  // // debugger;
-  // return con.toResourceMaybe();
-  //
-  // /* */
-  //
-  // function fileRead( record, dstBasePath )
-  // {
-  //
-  //   let dstPath = dstBasePath;
-  //   let dstDescriptor = r.dstMap[ dstPath ];
-  //
-  //   if( !dstDescriptor )
-  //   {
-  //     dstDescriptor = r.dstMap[ dstPath ] = Object.create( null );
-  //     dstDescriptor.dstPath = dstPath;
-  //     dstDescriptor.dataMap = Object.create( null );
-  //   }
-  //
-  //   try
-  //   {
-  //     r.fileMap[ record.absolute ] = dstDescriptor.dstPath;
-  //     r.dataMap[ record.absolute ] = self.fileRead({ filePath : record.absolute, sync : o.sync });
-  //     con.finallyGive( 1 );
-  //     _.Consequence.From( r.dataMap[ record.absolute ] )
-  //     .finally( ( err, data ) =>
-  //     {
-  //       if( err )
-  //       {
-  //         r.errors.push( err );
-  //         return null;
-  //       }
-  //       r.dataMap[ record.absolute ] = data;
-  //       dstDescriptor.dataMap[ record.absolute ] = data;
-  //       return null;
-  //     })
-  //     .finally( con );
-  //   }
-  //   catch( err )
-  //   {
-  //     r.errors.push( err );
-  //   }
-  // }
-
 }
 
 filesRead_body.defaults = Object.create( filesFindGroups.defaults );
-
-// {
-//   fileFilter : null,
-//   sync : 1,
-//   throwing : null,
-//   recursive : 2,
-// }
 
 let filesRead = _.routineFromPreAndBody( filesFindGroups.pre, filesRead_body );
 

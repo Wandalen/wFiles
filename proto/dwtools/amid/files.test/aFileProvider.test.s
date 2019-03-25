@@ -1,6 +1,6 @@
 ( function _FileProvider_test_s_( ) {
 
-'use strict'; /*aaa*/
+'use strict';
 
 if( typeof module !== 'undefined' )
 {
@@ -1481,7 +1481,7 @@ function readWriteAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'fileRead, invalid path';
     var con = provider.fileRead
@@ -1513,7 +1513,7 @@ function readWriteAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'fileRead, path ways to not a terminal file';
     filePath = test.context.pathFor( 'written/readWriteAsync/dir' );
@@ -1523,7 +1523,7 @@ function readWriteAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.fileRead
     ({
@@ -1554,7 +1554,7 @@ function readWriteAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'fileRead,simple file read ';
     provider.filesDelete( /*dir*/testPath );
@@ -1567,7 +1567,7 @@ function readWriteAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.fileRead
     ({
@@ -1586,7 +1586,7 @@ function readWriteAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.fileRead
     ({
@@ -1614,7 +1614,7 @@ function readWriteAsync( test )
 
   //
 
-  .finally( function( err, arg/*aaa*/ )
+  .finally( function( err, arg )
   {
     test.case = 'fileRead,file read with common encodings';
     provider.filesDelete( /*dir*/testPath );
@@ -1624,7 +1624,7 @@ function readWriteAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     testData = { a : 'abc' };
     provider.fileWrite( filePath, JSON.stringify( testData ) );
@@ -1645,7 +1645,7 @@ function readWriteAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
     testData = 'module.exports = { a : 1 }';
@@ -1684,7 +1684,7 @@ function readWriteAsync( test )
 
   //
 
-  .ifNoErrorThen( ( arg/*aaa*/ ) =>
+  .ifNoErrorThen( ( arg ) =>
   {
     testData = filePath;
     provider.fileWrite( filePath, testData );
@@ -1714,7 +1714,7 @@ function readWriteAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'fileRead,onBegin,onEnd,onError';
     provider.filesDelete( /*dir*/testPath );
@@ -1739,7 +1739,7 @@ function readWriteAsync( test )
 
   /*onBegin returningRead 0*/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.fileRead
     ({
@@ -1753,7 +1753,7 @@ function readWriteAsync( test )
       onError : null,
     });
     return test.mustNotThrowError( con )
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       test.identical( _.objectIs( got ), true );
       return null;
@@ -1762,7 +1762,7 @@ function readWriteAsync( test )
 
   /*onBegin returningRead 1*/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.fileRead
     ({
@@ -1776,7 +1776,7 @@ function readWriteAsync( test )
       onError : null,
     });
     return test.mustNotThrowError( con )
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       test.identical( _.objectIs( got ), true );
       return null;
@@ -1785,7 +1785,7 @@ function readWriteAsync( test )
 
   /*onEnd returningRead 0*/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.fileRead
     ({
@@ -1799,7 +1799,7 @@ function readWriteAsync( test )
       onError : null,
     });
     return test.mustNotThrowError( con )
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       test.identical( got.result, testData );
       return null;
@@ -1807,7 +1807,7 @@ function readWriteAsync( test )
   })
 
   /*onEnd returningRead 1*/
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.fileRead
     ({
@@ -1821,7 +1821,7 @@ function readWriteAsync( test )
       onError : null,
     });
     return test.mustNotThrowError( con )
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       test.identical( got.result, testData );
       return null;
@@ -1829,7 +1829,7 @@ function readWriteAsync( test )
   })
 
   /*onError is no called*/
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.fileRead
     ({
@@ -1851,7 +1851,7 @@ function readWriteAsync( test )
   })
 
   /*onError is no called*/
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.fileRead
     ({
@@ -1874,7 +1874,7 @@ function readWriteAsync( test )
 
   /*onError is no called*/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.fileRead
     ({
@@ -1888,7 +1888,7 @@ function readWriteAsync( test )
       onError : onError,
     });
     return test.mustNotThrowError( con )
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       test.identical( _.errIs( got ), true );
       return null;
@@ -1896,7 +1896,7 @@ function readWriteAsync( test )
   })
 
   /*onError is no called*/
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.fileRead
     ({
@@ -1919,7 +1919,7 @@ function readWriteAsync( test )
 
   //fileWrite
 
-  .finally( function( err, arg/*aaa*/ )
+  .finally( function( err, arg )
   {
     test.case = 'fileWrite, path not exist,default settings';
     provider.filesDelete( /*dir*/testPath );
@@ -1930,7 +1930,7 @@ function readWriteAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     return provider.fileWrite
     ({
@@ -1939,7 +1939,7 @@ function readWriteAsync( test )
        data : testData,
     })
   })
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var files = provider.dirRead( /*dir*/testPath );
     test.identical( files, [ 'file' ] );
@@ -1955,7 +1955,7 @@ function readWriteAsync( test )
 
   /*path includes not existing directory*/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     filePath = test.context.pathFor( 'written/readWriteAsync/files/file.txt' );
     return provider.fileWrite
@@ -1965,7 +1965,7 @@ function readWriteAsync( test )
        data : testData
     })
   })
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var files = provider.dirRead( test.context.pathFor( 'written/readWriteAsync/files' ) );
     test.identical( files, [ 'file.txt' ] );
@@ -1978,7 +1978,7 @@ function readWriteAsync( test )
     return null;
   })
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'fileWrite, path already exist,default settings';
     provider.filesDelete( /*dir*/testPath );
@@ -1990,7 +1990,7 @@ function readWriteAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     return provider.fileWrite
     ({
@@ -1999,7 +1999,7 @@ function readWriteAsync( test )
        data : testData
     })
   })
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var files = provider.dirRead( /*dir*/testPath );
     test.identical( files, [ 'file' ] );
@@ -2014,7 +2014,7 @@ function readWriteAsync( test )
 
   /*try rewrite folder*/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.fileWrite
     ({
@@ -2039,7 +2039,7 @@ function readWriteAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     return provider.fileWrite
     ({
@@ -2050,7 +2050,7 @@ function readWriteAsync( test )
       purging : 1,
     });
   })
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var files = provider.dirRead( /*dir*/testPath );
     test.identical( files, [ 'file' ] );
@@ -2065,7 +2065,7 @@ function readWriteAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     return provider.fileWrite
     ({
@@ -2077,7 +2077,7 @@ function readWriteAsync( test )
     });
 
   })
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var files = provider.dirRead( /*dir*/testPath );
     test.identical( files, [ 'file' ] );
@@ -2092,7 +2092,7 @@ function readWriteAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     return provider.fileWrite
     ({
@@ -2103,7 +2103,7 @@ function readWriteAsync( test )
       purging : 0,
     });
   })
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var files = provider.dirRead( /*dir*/testPath );
     test.identical( files, [ 'file' ] );
@@ -2118,7 +2118,7 @@ function readWriteAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'fileWrite, path not exist';
     provider.filesDelete( /*dir*/testPath );
@@ -2129,7 +2129,7 @@ function readWriteAsync( test )
 
   /*path includes not existing directory*/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.fileWrite
     ({
@@ -2150,7 +2150,7 @@ function readWriteAsync( test )
 
   /*file not exist*/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.dirMake( /*dir*/testPath );
     var con = provider.fileWrite
@@ -2163,7 +2163,7 @@ function readWriteAsync( test )
     });
     return test.mustNotThrowError( con );
   })
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var files = provider.dirRead( /*dir*/testPath );
     test.identical( files, [ 'file' ] );
@@ -2178,7 +2178,7 @@ function readWriteAsync( test )
 
   /*purging non existing filePath*/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( filePath );
     var con = provider.fileWrite
@@ -2191,7 +2191,7 @@ function readWriteAsync( test )
     });
     return test.mustNotThrowError( con );
   })
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var files = provider.dirRead( /*dir*/testPath );
     test.identical( files, [ 'file' ] );
@@ -2206,7 +2206,7 @@ function readWriteAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'fileWrite, different write modes';
     provider.filesDelete( /*dir*/testPath );
@@ -2217,7 +2217,7 @@ function readWriteAsync( test )
 
   /*rewrite*/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.fileWrite( filePath, ' ' );
     return provider.fileWrite
@@ -2229,7 +2229,7 @@ function readWriteAsync( test )
     });
 
   })
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     got = provider.fileRead
     ({
@@ -2244,7 +2244,7 @@ function readWriteAsync( test )
 
   /*prepend*/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.fileWrite( filePath, testData );
     return provider.fileWrite
@@ -2255,7 +2255,7 @@ function readWriteAsync( test )
       writeMode : 'prepend'
     });
   })
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     got = provider.fileRead
     ({
@@ -2270,7 +2270,7 @@ function readWriteAsync( test )
 
   /*append*/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.fileWrite( filePath, testData );
     return provider.fileWrite
@@ -2281,7 +2281,7 @@ function readWriteAsync( test )
       writeMode : 'append'
     });
   })
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     got = provider.fileRead
     ({
@@ -2296,7 +2296,7 @@ function readWriteAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'fileWrite, any writeMode should create file it not exist';
     provider.filesDelete( /*dir*/testPath );
@@ -2307,7 +2307,7 @@ function readWriteAsync( test )
 
   /*rewrite*/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     return provider.fileWrite
     ({
@@ -2317,7 +2317,7 @@ function readWriteAsync( test )
       writeMode : 'rewrite'
     });
   })
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     got = provider.fileRead
     ({
@@ -2332,7 +2332,7 @@ function readWriteAsync( test )
 
   /*prepend*/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( filePath );
     return provider.fileWrite
@@ -2343,7 +2343,7 @@ function readWriteAsync( test )
       writeMode : 'prepend'
     });
   })
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     got = provider.fileRead
     ({
@@ -2358,7 +2358,7 @@ function readWriteAsync( test )
 
   /*append*/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( filePath );
     return provider.fileWrite
@@ -2369,7 +2369,7 @@ function readWriteAsync( test )
       writeMode : 'append'
     });
   })
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     got = provider.fileRead
     ({
@@ -2384,7 +2384,7 @@ function readWriteAsync( test )
 
   /* resolvingSoftLink */
 
-  .ifNoErrorThen( ( arg/*aaa*/ ) =>
+  .ifNoErrorThen( ( arg ) =>
   {
 
     if( !softLinkIsSupported )
@@ -2409,7 +2409,7 @@ function readWriteAsync( test )
     })
   })
 
-  .ifNoErrorThen( ( arg/*aaa*/ ) =>
+  .ifNoErrorThen( ( arg ) =>
   {
     if( !softLinkIsSupported )
     return null;
@@ -2433,7 +2433,7 @@ function readWriteAsync( test )
 
   })
 
-  .ifNoErrorThen( ( arg/*aaa*/ ) =>
+  .ifNoErrorThen( ( arg ) =>
   {
     if( !softLinkIsSupported )
     return null;
@@ -2457,7 +2457,7 @@ function readWriteAsync( test )
     })
   })
 
-  .ifNoErrorThen( ( arg/*aaa*/ ) =>
+  .ifNoErrorThen( ( arg ) =>
   {
     if( !softLinkIsSupported )
     return null;
@@ -2497,7 +2497,7 @@ function readWriteAsync( test )
     })
   })
 
-  .ifNoErrorThen( ( arg/*aaa*/ ) =>
+  .ifNoErrorThen( ( arg ) =>
   {
     if( !softLinkIsSupported )
     return null;
@@ -2543,7 +2543,7 @@ function readWriteAsync( test )
     })
   })
 
-  .ifNoErrorThen( ( arg/*aaa*/ ) =>
+  .ifNoErrorThen( ( arg ) =>
   {
     if( !softLinkIsSupported )
     return null;
@@ -2596,7 +2596,7 @@ function readWriteAsync( test )
 
   if( Config.platform === 'nodejs' )
   {
-    consequence.ifNoErrorThen( function( arg/*aaa*/ )
+    consequence.ifNoErrorThen( function( arg )
     {
       test.case = 'fileWrite, data is raw buffer';
       provider.filesDelete( /*dir*/testPath );
@@ -2608,7 +2608,7 @@ function readWriteAsync( test )
 
     /**/
 
-    consequence.ifNoErrorThen( function( arg/*aaa*/ )
+    consequence.ifNoErrorThen( function( arg )
     {
       return provider.fileWrite
       ({
@@ -2617,7 +2617,7 @@ function readWriteAsync( test )
         sync : 0,
       });
     })
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       got = provider.fileRead
       ({
@@ -2632,7 +2632,7 @@ function readWriteAsync( test )
 
     //
 
-    consequence.ifNoErrorThen( function( arg/*aaa*/ )
+    consequence.ifNoErrorThen( function( arg )
     {
       test.case = 'encoder not finded';
       var encoding = 'unknown';
@@ -2647,7 +2647,7 @@ function readWriteAsync( test )
       });
       return test.shouldThrowError( con );
     })
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       test.case = 'other encodings';
       provider.filesDelete( /*dir*/testPath );
@@ -2655,7 +2655,7 @@ function readWriteAsync( test )
       testData = 'abc';
       return null;
     })
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       provider.fileWrite( filePath, testData );
       return provider.fileRead
@@ -2667,7 +2667,7 @@ function readWriteAsync( test )
       })
       .finally( ( err, got ) => test.is( _.bufferNodeIs( got ) ) )
     })
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       provider.fileWrite( filePath, testData );
       return provider.fileRead
@@ -3390,7 +3390,7 @@ function fileTouch( test )
 
   /**/
 
-  .ifNoErrorThen( ( arg/*aaa*/ ) =>
+  .ifNoErrorThen( ( arg ) =>
   {
     test.case = 'filePath is a terminal';
     provider.filesDelete( srcPath );
@@ -3410,7 +3410,7 @@ function fileTouch( test )
 
   /**/
 
-  .ifNoErrorThen( ( arg/*aaa*/ ) =>
+  .ifNoErrorThen( ( arg ) =>
   {
     test.case = 'terminal, filePath as record';
     provider.filesDelete( srcPath );
@@ -3664,7 +3664,7 @@ function writeAsyncThrowingError( test )
   var consequence = new _.Consequence().take( null );
 
   consequence
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
 
     test.case = 'async, try to rewrite dir';
@@ -6247,7 +6247,7 @@ function fileCopyAsync( test )
   //
 
   consequence
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'src not exist';
     return null;
@@ -6255,7 +6255,7 @@ function fileCopyAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.fileCopy
     ({
@@ -6290,7 +6290,7 @@ function fileCopyAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.fileCopy
     ({
@@ -6325,7 +6325,7 @@ function fileCopyAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'copy bigger file';
     var data = _.strDup( 'Lorem Ipsum is simply text', 10000 );
@@ -6352,7 +6352,7 @@ function fileCopyAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'dst path not exist';
     provider.fileWrite( srcPath, ' ' );
@@ -6361,7 +6361,7 @@ function fileCopyAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.fileCopy
     ({
@@ -6372,7 +6372,7 @@ function fileCopyAsync( test )
       throwing : 1
     });
     return test.mustNotThrowError( con )
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       var files = provider.dirRead( /*dir*/testPath );
       test.identical( files, [ 'dst.txt', 'src.txt' ] );
@@ -6382,7 +6382,7 @@ function fileCopyAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( dstPath );
     var con = provider.fileCopy
@@ -6394,7 +6394,7 @@ function fileCopyAsync( test )
       throwing : 1
     });
     return test.mustNotThrowError( con )
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       var files = provider.dirRead( /*dir*/testPath );
       test.identical( files, [ 'dst.txt', 'src.txt' ] );
@@ -6404,7 +6404,7 @@ function fileCopyAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( dstPath );
     var con = provider.fileCopy
@@ -6416,7 +6416,7 @@ function fileCopyAsync( test )
       throwing : 0
     });
     return test.mustNotThrowError( con )
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       var files = provider.dirRead( /*dir*/testPath );
       test.identical( files, [ 'dst.txt', 'src.txt' ] );
@@ -6426,7 +6426,7 @@ function fileCopyAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( dstPath );
     var con = provider.fileCopy
@@ -6438,7 +6438,7 @@ function fileCopyAsync( test )
       throwing : 0
     });
     return test.mustNotThrowError( con )
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       var files = provider.dirRead( /*dir*/testPath );
       test.identical( files, [ 'dst.txt', 'src.txt' ] );
@@ -6448,7 +6448,7 @@ function fileCopyAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'dst path exist';
     provider.filesDelete( /*dir*/testPath );
@@ -6459,7 +6459,7 @@ function fileCopyAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.fileCopy
     ({
@@ -6470,7 +6470,7 @@ function fileCopyAsync( test )
       throwing : 1
     });
     return test.mustNotThrowError( con )
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       var files = provider.dirRead( /*dir*/testPath );
       test.identical( files, [ 'dst.txt', 'src.txt' ] );
@@ -6480,7 +6480,7 @@ function fileCopyAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.fileCopy
     ({
@@ -6491,7 +6491,7 @@ function fileCopyAsync( test )
       throwing : 0
     });
     return test.mustNotThrowError( con )
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       var files = provider.dirRead( /*dir*/testPath );
       test.identical( files, [ 'dst.txt', 'src.txt' ] );
@@ -6501,7 +6501,7 @@ function fileCopyAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.fileCopy
     ({
@@ -6522,7 +6522,7 @@ function fileCopyAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.fileCopy
     ({
@@ -6544,7 +6544,7 @@ function fileCopyAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'src is equal to dst';
     provider.filesDelete( /*dir*/testPath );
@@ -6554,7 +6554,7 @@ function fileCopyAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.fileCopy
     ({
@@ -6576,7 +6576,7 @@ function fileCopyAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.fileCopy
     ({
@@ -6598,7 +6598,7 @@ function fileCopyAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.fileCopy
     ({
@@ -6620,7 +6620,7 @@ function fileCopyAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.fileCopy
     ({
@@ -6804,7 +6804,7 @@ function fileCopyLinksAsync( test )
       // breakingDstSoftLink : 0,
       breakingDstHardLink : 0
     })
-    .ifNoErrorThen( ( arg/*aaa*/ ) =>
+    .ifNoErrorThen( ( arg ) =>
     {
       test.is( provider.isHardLink( dstPath ) );
       var dstFile = provider.fileRead( dstPath );
@@ -6838,7 +6838,7 @@ function fileCopyLinksAsync( test )
       // breakingDstSoftLink : 1,
       breakingDstHardLink : 0
     })
-    .ifNoErrorThen( ( arg/*aaa*/ ) =>
+    .ifNoErrorThen( ( arg ) =>
     {
       test.is( provider.isHardLink( dstPath ) );
       var dstFile = provider.fileRead( dstPath );
@@ -6872,7 +6872,7 @@ function fileCopyLinksAsync( test )
       // breakingDstSoftLink : 0,
       breakingDstHardLink : 1
     })
-    .ifNoErrorThen( ( arg/*aaa*/ ) =>
+    .ifNoErrorThen( ( arg ) =>
     {
       test.is( !provider.isHardLink( dstPath ) );
       var dstFile = provider.fileRead( dstPath );
@@ -6906,7 +6906,7 @@ function fileCopyLinksAsync( test )
       // breakingDstSoftLink : 1,
       breakingDstHardLink : 1
     })
-    .ifNoErrorThen( ( arg/*aaa*/ ) =>
+    .ifNoErrorThen( ( arg ) =>
     {
       test.is( !provider.isHardLink( dstPath ) );
       var dstFile = provider.fileRead( dstPath );
@@ -6945,7 +6945,7 @@ function fileCopyLinksAsync( test )
       // breakingDstSoftLink : 0,
       breakingDstHardLink : 0
     })
-    .ifNoErrorThen( ( arg/*aaa*/ ) =>
+    .ifNoErrorThen( ( arg ) =>
     {
       test.is( provider.isTerminal( dstPath ) );
       var dstFile = provider.fileRead( dstPath );
@@ -8877,7 +8877,7 @@ function fileCopyAsyncThrowingError( test )
 //   var consequence = new _.Consequence().take( null );
 
 //   consequence
-//   .ifNoErrorThen( function( arg/*aaa*/ )
+//   .ifNoErrorThen( function( arg )
 //   {
 //     test.case = 'async, throwing error';
 //     var con = provider.fileCopy
@@ -8889,7 +8889,7 @@ function fileCopyAsyncThrowingError( test )
 
 //     return test.shouldThrowError( con );
 //   })
-//   .ifNoErrorThen( function( arg/*aaa*/ )
+//   .ifNoErrorThen( function( arg )
 //   {
 //     test.case = 'async,try rewrite dir';
 //     var con = provider.fileCopy
@@ -8901,7 +8901,7 @@ function fileCopyAsyncThrowingError( test )
 
 //     return test.shouldThrowErrorAsync( con );
 //   })
-//   .ifNoErrorThen( function( arg/*aaa*/ )
+//   .ifNoErrorThen( function( arg )
 //   {
 //     test.case = 'async copy dir';
 //     try
@@ -10247,7 +10247,7 @@ function fileRenameAsync( test )
   var consequence = new _.Consequence().take( null );
 
   consequence
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'src not exist';
     return null;
@@ -10255,7 +10255,7 @@ function fileRenameAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.fileRename
     ({
@@ -10294,7 +10294,7 @@ function fileRenameAsync( test )
   /**/
 
   consequence
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.fileRename
     ({
@@ -10331,7 +10331,7 @@ function fileRenameAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'rename in same directory,dst not exist';
     return null;
@@ -10339,7 +10339,7 @@ function fileRenameAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.fileWrite( srcPath, ' ' );
     var con = provider.fileRename
@@ -10363,7 +10363,7 @@ function fileRenameAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( /*dir*/testPath );
     provider.fileWrite( srcPath, ' ' );
@@ -10388,7 +10388,7 @@ function fileRenameAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( /*dir*/testPath );
     provider.fileWrite( srcPath, ' ' );
@@ -10413,7 +10413,7 @@ function fileRenameAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( /*dir*/testPath );
     provider.fileWrite( srcPath, ' ' );
@@ -10438,7 +10438,7 @@ function fileRenameAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'rename with rewriting in same directory';
     return null;
@@ -10446,7 +10446,7 @@ function fileRenameAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.fileWrite( srcPath, ' ' );
     var con = provider.fileRename
@@ -10471,7 +10471,7 @@ function fileRenameAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.fileWrite( srcPath, ' ' );
     var con = provider.fileRename
@@ -10496,7 +10496,7 @@ function fileRenameAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.fileWrite( srcPath, ' ' );
     var con = provider.fileRename
@@ -10513,7 +10513,7 @@ function fileRenameAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.fileWrite( srcPath, ' ' );
     var con = provider.fileRename
@@ -10535,7 +10535,7 @@ function fileRenameAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'rename /*dir*/testPath, dst not exist';
     provider.filesDelete( /*dir*/testPath );
@@ -10544,7 +10544,7 @@ function fileRenameAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.dirMake( srcPath );
     var con = provider.fileRename
@@ -10568,7 +10568,7 @@ function fileRenameAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( dstPath );
     provider.dirMake( srcPath );
@@ -10593,7 +10593,7 @@ function fileRenameAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( dstPath );
     provider.dirMake( srcPath );
@@ -10618,7 +10618,7 @@ function fileRenameAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( dstPath );
     provider.dirMake( srcPath );
@@ -10643,7 +10643,7 @@ function fileRenameAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'rename moving to other existing dir';
     dstPath = test.context.pathFor( 'written/fileRenameAsync/testPath/dst' );
@@ -10652,7 +10652,7 @@ function fileRenameAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( /*dir*/testPath );
     provider.fileWrite( srcPath,' ' );
@@ -10678,7 +10678,7 @@ function fileRenameAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( /*dir*/testPath );
     provider.fileWrite( srcPath,' ' );
@@ -10704,7 +10704,7 @@ function fileRenameAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( /*dir*/testPath );
     provider.fileWrite( srcPath,' ' );
@@ -10730,7 +10730,7 @@ function fileRenameAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( /*dir*/testPath );
     provider.fileWrite( srcPath,' ' );
@@ -10756,7 +10756,7 @@ function fileRenameAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'rename moving to not existing dir';
     dstPath = test.context.pathFor( 'written/fileRename/testPath/dst' );
@@ -10765,7 +10765,7 @@ function fileRenameAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( /*dir*/testPath );
     provider.fileWrite( srcPath,' ' );
@@ -10789,7 +10789,7 @@ function fileRenameAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( /*dir*/testPath );
     provider.fileWrite( srcPath,' ' );
@@ -10813,7 +10813,7 @@ function fileRenameAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( /*dir*/testPath );
     provider.fileWrite( srcPath,' ' );
@@ -10838,7 +10838,7 @@ function fileRenameAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( /*dir*/testPath );
     provider.fileWrite( srcPath,' ' );
@@ -10863,7 +10863,7 @@ function fileRenameAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'dst is not empty dir';
     dstPath = test.context.pathFor( 'written/fileRenameAsync/testPath/dst' );
@@ -10872,7 +10872,7 @@ function fileRenameAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( /*dir*/testPath );
     provider.fileWrite( srcPath,' ' );
@@ -10899,7 +10899,7 @@ function fileRenameAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( /*dir*/testPath );
     provider.fileWrite( srcPath,' ' );
@@ -10926,7 +10926,7 @@ function fileRenameAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( /*dir*/testPath );
     provider.fileWrite( srcPath,' ' );
@@ -10945,7 +10945,7 @@ function fileRenameAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( /*dir*/testPath );
     provider.fileWrite( srcPath,' ' );
@@ -10971,7 +10971,7 @@ function fileRenameAsync( test )
 
   //src is equal to dst
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'src is equal to dst';
     provider.filesDelete( /*dir*/testPath );
@@ -10981,7 +10981,7 @@ function fileRenameAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.fileRename
     ({
@@ -11004,7 +11004,7 @@ function fileRenameAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.fileRename
     ({
@@ -11027,7 +11027,7 @@ function fileRenameAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.fileRename
     ({
@@ -12460,7 +12460,7 @@ function fileDeleteAsync( test )
   var consequence = new _.Consequence().take( null );
 
   consequence
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'removing not existing path';
     return null;
@@ -12468,7 +12468,7 @@ function fileDeleteAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.fileDelete
     ({
@@ -12498,7 +12498,7 @@ function fileDeleteAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'removing file';
     filePath = test.context.pathFor( 'written/fileDeleteAsync/file.txt');
@@ -12507,7 +12507,7 @@ function fileDeleteAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.fileWrite( filePath,' ' );
     var con = provider.fileDelete
@@ -12518,7 +12518,7 @@ function fileDeleteAsync( test )
     });
 
     return test.mustNotThrowError( con )
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       var stat = provider.statResolvedRead( filePath );
       test.identical( stat, null );
@@ -12528,7 +12528,7 @@ function fileDeleteAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.fileWrite( filePath,' ' );
     var con = provider.fileDelete
@@ -12539,7 +12539,7 @@ function fileDeleteAsync( test )
     });
 
     return test.mustNotThrowError( con )
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       var stat = provider.statResolvedRead( filePath );
       test.identical( stat, null );
@@ -12549,7 +12549,7 @@ function fileDeleteAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'removing existing empty folder';
     filePath = test.context.pathFor( 'written/fileDeleteAsync/folder');
@@ -12558,7 +12558,7 @@ function fileDeleteAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.dirMake( filePath );
     var con = provider.fileDelete
@@ -12568,7 +12568,7 @@ function fileDeleteAsync( test )
       throwing : 0
     });
     return test.mustNotThrowError( con )
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       var stat = provider.statResolvedRead( filePath );
       test.identical( stat, null );
@@ -12578,7 +12578,7 @@ function fileDeleteAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.dirMake( filePath );
     var con = provider.fileDelete
@@ -12588,7 +12588,7 @@ function fileDeleteAsync( test )
       throwing : 1
     });
     return test.mustNotThrowError( con )
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       var stat = provider.statResolvedRead( filePath );
       test.identical( stat, null );
@@ -12598,7 +12598,7 @@ function fileDeleteAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'removing existing folder with file';
     filePath = test.context.pathFor( 'written/fileDeleteAsync/folder/file.txt');
@@ -12608,7 +12608,7 @@ function fileDeleteAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     folder = self.provider.path.dir( filePath );
     provider.fileWrite( filePath,' ' );
@@ -12630,7 +12630,7 @@ function fileDeleteAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.fileDelete
     ({
@@ -12648,7 +12648,7 @@ function fileDeleteAsync( test )
       return got;
     });
   })
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     if( provider.constructor.name !== 'wFileProviderExtract' )
     return null;
@@ -12708,7 +12708,7 @@ function fileDeleteAsync( test )
     filePath = /*_.path*/path.join( /*dir*/testPath, 'file' );
     return null;
   })
-  // .ifNoErrorThen( ( arg/*aaa*/ ) =>
+  // .ifNoErrorThen( ( arg ) =>
   // {
   //   test.case = 'delete hard link, resolvingHardLink 1';
   //   provider.filesDelete( /*dir*/testPath );
@@ -12722,7 +12722,7 @@ function fileDeleteAsync( test )
   //     sync : 0,
   //     throwing : 1
   //   })
-  //   .ifNoErrorThen( ( arg/*aaa*/ ) =>
+  //   .ifNoErrorThen( ( arg ) =>
   //   {
   //     var stat = provider.statResolvedRead( dst );
   //     test.identical( stat, null );
@@ -12731,7 +12731,7 @@ function fileDeleteAsync( test )
   //     provider.fieldPop( 'resolvingHardLink', 1 );
   //   })
   // })
-  // .ifNoErrorThen( ( arg/*aaa*/ ) =>
+  // .ifNoErrorThen( ( arg ) =>
   // {
   //   test.case = 'delete hard link, resolvingHardLink 0';
   //   provider.filesDelete( /*dir*/testPath );
@@ -12745,7 +12745,7 @@ function fileDeleteAsync( test )
   //     sync : 0,
   //     throwing : 1
   //   })
-  //   .ifNoErrorThen( ( arg/*aaa*/ ) =>
+  //   .ifNoErrorThen( ( arg ) =>
   //   {
   //     var stat = provider.statResolvedRead( dst );
   //     test.identical( stat, null );
@@ -12758,7 +12758,7 @@ function fileDeleteAsync( test )
   if( !test.context.softLinkIsSupported() )
   return consequence;
 
-  consequence.ifNoErrorThen( ( arg/*aaa*/ ) =>
+  consequence.ifNoErrorThen( ( arg ) =>
   {
     var filePath = /*_.path*/path.join( /*dir*/testPath, 'file' );
     test.case = 'delete soft link, resolvingSoftLink 1';
@@ -12772,7 +12772,7 @@ function fileDeleteAsync( test )
       sync : 0,
       throwing : 1
     })
-    .ifNoErrorThen( ( arg/*aaa*/ ) =>
+    .ifNoErrorThen( ( arg ) =>
     {
       var stat = provider.statResolvedRead( dst );
       test.identical( stat, null );
@@ -12783,7 +12783,7 @@ function fileDeleteAsync( test )
     })
 
   })
-  .ifNoErrorThen( ( arg/*aaa*/ ) =>
+  .ifNoErrorThen( ( arg ) =>
   {
     test.case = 'delete soft link, resolvingSoftLink 0';
     provider.filesDelete( /*dir*/testPath );
@@ -12797,7 +12797,7 @@ function fileDeleteAsync( test )
       sync : 0,
       throwing : 1
     })
-    .ifNoErrorThen( ( arg/*aaa*/ ) =>
+    .ifNoErrorThen( ( arg ) =>
     {
       var stat = provider.statResolvedRead( dst );
       test.identical( stat, null );
@@ -13865,7 +13865,7 @@ function statResolvedReadAsync( test )
   //
 
   consequence
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     filePath = test.context.pathFor( 'read/statResolvedReadAsync/src.txt' );
     provider.fileWrite( filePath, 'Excepteur sint occaecat cupidatat non proident' );
@@ -13876,7 +13876,7 @@ function statResolvedReadAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     debugger
     return provider.statResolvedRead
@@ -13896,7 +13896,7 @@ function statResolvedReadAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     return provider.statResolvedRead
     ({
@@ -13915,7 +13915,7 @@ function statResolvedReadAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'invalid path';
     filePath = test.context.pathFor( '///bad path///test.txt' );
@@ -13924,7 +13924,7 @@ function statResolvedReadAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     return provider.statResolvedRead
     ({
@@ -13942,7 +13942,7 @@ function statResolvedReadAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.statResolvedRead
     ({
@@ -14905,7 +14905,7 @@ function dirMakeAsync( test )
   //
 
   consequence
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'synchronous mkdir';
     filePath = test.context.pathFor( 'written/dirMakeAsync/make_dir' );
@@ -14914,7 +14914,7 @@ function dirMakeAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     return provider.dirMake
     ({
@@ -14923,7 +14923,7 @@ function dirMakeAsync( test )
       recursive : 1,
       rewritingTerminal : 1
     })
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       var files = provider.dirRead( /*dir*/testPath );
       test.identical( files, [ 'make_dir' ] );
@@ -14933,7 +14933,7 @@ function dirMakeAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'synchronous mkdir force';
     provider.filesDelete( filePath );
@@ -14944,7 +14944,7 @@ function dirMakeAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     return provider.dirMake
     ({
@@ -14953,7 +14953,7 @@ function dirMakeAsync( test )
       recursive : 1,
       rewritingTerminal : 1
     })
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       var files = provider.dirRead( self.provider.path.dir( filePath ) );
       test.identical( files, [ 'dir1' ] );
@@ -14963,7 +14963,7 @@ function dirMakeAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( self.provider.path.dir( filePath ) );
     var con = provider.dirMake
@@ -14988,7 +14988,7 @@ function dirMakeAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     return provider.dirMake
     ({
@@ -14997,7 +14997,7 @@ function dirMakeAsync( test )
       recursive : 1,
       rewritingTerminal : 1
     })
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       var files = provider.dirRead( self.provider.path.dir( filePath ) );
       test.identical( files, [ 'terminal.txt' ] );
@@ -15007,7 +15007,7 @@ function dirMakeAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( /*dir*/testPath );
     provider.fileWrite( filePath, ' ' );
@@ -15032,7 +15032,7 @@ function dirMakeAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( /*dir*/testPath )
     provider.dirMake( filePath );
@@ -15043,7 +15043,7 @@ function dirMakeAsync( test )
       recursive : 1,
       rewritingTerminal : 1
     })
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       var files = provider.dirRead( self.provider.path.dir( filePath ) );
       test.identical( files, [ 'empty' ] );
@@ -15053,7 +15053,7 @@ function dirMakeAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( /*dir*/testPath )
     provider.dirMake( filePath );
@@ -15064,7 +15064,7 @@ function dirMakeAsync( test )
       recursive : 1,
       rewritingTerminal : 0
     })
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       var files = provider.dirRead( /*dir*/testPath );
       test.identical( files, [ 'empty' ] );
@@ -15074,7 +15074,7 @@ function dirMakeAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( /*dir*/testPath )
     provider.dirMake( filePath );
@@ -15115,7 +15115,7 @@ function dirMakeAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( filePath );
     provider.dirMake( filePath );
@@ -15141,7 +15141,7 @@ function dirMakeAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.fileWrite( filePath, ' ' );
     var con = provider.dirMake
@@ -15181,7 +15181,7 @@ function dirMakeAsync( test )
       recursive : 1,
       rewritingTerminal : 1
     })
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       var files = provider.dirRead( /*dir*/testPath );
       test.identical( files, [ 'make_dir' ] );
@@ -15191,7 +15191,7 @@ function dirMakeAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'folders structure not exist';
     provider.filesDelete( /*dir*/testPath );
@@ -15201,7 +15201,7 @@ function dirMakeAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.dirMake
     ({
@@ -15238,7 +15238,7 @@ function dirMakeAsync( test )
         recursive : 1,
         rewritingTerminal : 0
     })
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       var files = provider.dirRead( /*dir*/testPath );
       test.identical( files, [ 'testPath' ] );
@@ -15248,7 +15248,7 @@ function dirMakeAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( /*dir*/testPath );
     return provider.dirMake
@@ -15258,7 +15258,7 @@ function dirMakeAsync( test )
         recursive : 1,
         rewritingTerminal : 1
     })
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       var files = provider.dirRead( /*dir*/testPath );
       test.identical( files, [ 'testPath' ] );
@@ -15405,7 +15405,7 @@ function hashReadAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'async filehash';
     data = 'Excepteur sint occaecat cupidatat non proident';
@@ -15414,7 +15414,7 @@ function hashReadAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.fileWrite( filePath, data );
     return provider.hashRead
@@ -15434,7 +15434,7 @@ function hashReadAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'invalid path';
     filePath = test.context.pathFor( 'invalid.txt' );
@@ -15442,7 +15442,7 @@ function hashReadAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     return provider.hashRead
     ({
@@ -15459,7 +15459,7 @@ function hashReadAsync( test )
 
   /*invalid path throwing enabled*/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.hashRead
     ({
@@ -15490,7 +15490,7 @@ function hashReadAsync( test )
 
   /*is not terminal file*/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.hashRead
     ({
@@ -15784,7 +15784,7 @@ function dirReadAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'synchronous read';
     filePath = test.context.pathFor( 'read/dirReadAsync/1.txt' );
@@ -15793,7 +15793,7 @@ function dirReadAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.fileWrite( filePath,' ' );
     return provider.dirRead
@@ -15812,7 +15812,7 @@ function dirReadAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.fileWrite( filePath,' ' );
     return provider.dirRead
@@ -15831,7 +15831,7 @@ function dirReadAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'synchronous, filePath points to file';
     filePath = test.context.pathFor( 'read/dirReadAsync/1.txt' );
@@ -15840,7 +15840,7 @@ function dirReadAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.fileWrite( filePath,' ' );
     return provider.dirRead
@@ -15860,7 +15860,7 @@ function dirReadAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.fileWrite( filePath,' ' );
     return provider.dirRead
@@ -15880,7 +15880,7 @@ function dirReadAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'path not exist';
     filePath = test.context.pathFor( 'non_existing_folder' );
@@ -15889,7 +15889,7 @@ function dirReadAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     return provider.dirRead
     ({
@@ -15907,7 +15907,7 @@ function dirReadAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.dirRead
     ({
@@ -16737,7 +16737,7 @@ function fileWriteAsync( test )
   /*writeMode rewrite*/
   var data = "LOREM"
   consequence
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case ='rewrite, file not exist ';
     var con = provider.fileWrite
@@ -16760,7 +16760,7 @@ function fileWriteAsync( test )
     test.identical( got, expected )
     return null;
   })
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case ='rewrite existing file ';
     data = "LOREM LOREM";
@@ -16827,7 +16827,7 @@ function fileWriteAsync( test )
     test.identical( got, expected );
     return null;
   })
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case ='append, to file ';
     var con = provider.fileWrite
@@ -16895,7 +16895,7 @@ function fileWriteAsync( test )
     test.identical( got, expected );
     return null;
   })
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     data = 'new text';
     test.case ='prepend to file ';
@@ -18360,7 +18360,7 @@ function softLinkAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'make link async';
     srcPath  = test.context.pathFor( 'written/softLinkAsync/link_test.txt' );
@@ -18371,7 +18371,7 @@ function softLinkAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     return provider.softLink
     ({
@@ -18379,7 +18379,7 @@ function softLinkAsync( test )
       dstPath : dstPath,
       sync : 0,
     })
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       provider.fileWrite
       ({
@@ -18401,7 +18401,7 @@ function softLinkAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'make for file that not exist';
     provider.filesDelete( /*dir*/testPath );
@@ -18412,7 +18412,7 @@ function softLinkAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.softLink
     ({
@@ -18438,7 +18438,7 @@ function softLinkAsync( test )
       throwing : 0
     });
     return test.mustNotThrowError( con )
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       var files = provider.dirRead( /*dir*/testPath );
       test.identical( files, null );
@@ -18448,7 +18448,7 @@ function softLinkAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'link already exists';
     srcPath = test.context.pathFor( 'written/softLinkAsync/link_test.txt' );
@@ -18466,7 +18466,7 @@ function softLinkAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.softLink
     ({
@@ -18477,7 +18477,7 @@ function softLinkAsync( test )
       sync : 0,
     });
     return test.mustNotThrowError( con )
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       var files = provider.dirRead( /*dir*/testPath );
       test.identical( files, [ 'link.txt', 'link_test.txt' ] )
@@ -18487,7 +18487,7 @@ function softLinkAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.softLink
     ({
@@ -18498,7 +18498,7 @@ function softLinkAsync( test )
       sync : 0,
     });
     return test.mustNotThrowError( con )
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       var files = provider.dirRead( /*dir*/testPath );
       test.identical( files, [ 'link.txt', 'link_test.txt' ] )
@@ -18508,7 +18508,7 @@ function softLinkAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.softLink
     ({
@@ -18537,7 +18537,7 @@ function softLinkAsync( test )
   })
 
   //
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'src is equal to dst';
     provider.filesDelete( /*dir*/testPath );
@@ -18548,7 +18548,7 @@ function softLinkAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     return provider.softLink
     ({
@@ -18568,7 +18568,7 @@ function softLinkAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( srcPath );
     return provider.softLink
@@ -18590,7 +18590,7 @@ function softLinkAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( srcPath );
     return provider.softLink
@@ -18612,7 +18612,7 @@ function softLinkAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( srcPath );
     return provider.softLink
@@ -18634,7 +18634,7 @@ function softLinkAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( srcPath );
     return provider.softLink
@@ -18654,7 +18654,7 @@ function softLinkAsync( test )
     })
   })
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( srcPath );
     var con = provider.softLink
@@ -18688,7 +18688,7 @@ function softLinkAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     return provider.softLink
     ({
@@ -18698,7 +18698,7 @@ function softLinkAsync( test )
       throwing : 1,
       sync : 0,
     })
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       var files = provider.dirRead( /*dir*/testPath );
       test.identical( files, [ 'link', 'link_test' ]  );
@@ -18708,7 +18708,7 @@ function softLinkAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.softLink
     ({
@@ -18733,7 +18733,7 @@ function softLinkAsync( test )
       throwing : 0,
       sync : 0,
     })
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       var files = provider.dirRead( /*dir*/testPath );
       test.identical( files, [ 'link', 'link_test' ]  );
@@ -18847,7 +18847,7 @@ function softLinkAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.softLink
     ({
@@ -19875,7 +19875,7 @@ function fileReadAsync( test )
   provider.fileWrite( self.testFile, src );
 
   consequence
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case ='read from file';
     var con = provider.fileRead
@@ -19894,7 +19894,7 @@ function fileReadAsync( test )
     test.identical( got, expected );
     return null;
   })
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case ='read from file, encoding : ascii';
     var con = provider.fileRead
@@ -19913,7 +19913,7 @@ function fileReadAsync( test )
     test.identical( got , expected );
     return null;
   })
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case ='read from file, encoding : utf16le';
     var con = provider.fileRead
@@ -19932,7 +19932,7 @@ function fileReadAsync( test )
     test.identical( got , expected );
     return null;
   })
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case ='read from file, encoding : ucs2';
     var con = provider.fileRead
@@ -19951,7 +19951,7 @@ function fileReadAsync( test )
     test.identical( got , expected );
     return null;
   })
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case ='read from file, encoding : base64';
     var con = provider.fileRead
@@ -19971,7 +19971,7 @@ function fileReadAsync( test )
     test.identical( got , expected );
     return null;
   })
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case ='read from file, encoding : arraybuffer';
     var con = provider.fileRead
@@ -19991,7 +19991,7 @@ function fileReadAsync( test )
     test.identical( got , expected );
     return null;
   })
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case ='read from file, encoding : buffer';
     var con = provider.fileRead
@@ -24214,7 +24214,7 @@ function hardLinkAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'make link async';
     srcPath  = test.context.pathFor( 'written/hardLinkAsync/link_test.txt' );
@@ -24225,7 +24225,7 @@ function hardLinkAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     return provider.hardLink
     ({
@@ -24233,7 +24233,7 @@ function hardLinkAsync( test )
       dstPath : dstPath,
       sync : 0,
     })
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       provider.fileWrite
       ({
@@ -24253,7 +24253,7 @@ function hardLinkAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'make for file that not exist';
     provider.filesDelete( /*dir*/testPath );
@@ -24264,7 +24264,7 @@ function hardLinkAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.hardLink
     ({
@@ -24279,7 +24279,7 @@ function hardLinkAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     return provider.hardLink
     ({
@@ -24289,7 +24289,7 @@ function hardLinkAsync( test )
       rewriting : 1,
       throwing : 0
     })
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       var files = provider.dirRead( /*dir*/testPath );
       test.identical( files, null );
@@ -24299,7 +24299,7 @@ function hardLinkAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'link already exists';
     srcPath = test.context.pathFor( 'written/hardLinkAsync/link_test.txt' );
@@ -24317,7 +24317,7 @@ function hardLinkAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     return provider.hardLink
     ({
@@ -24327,7 +24327,7 @@ function hardLinkAsync( test )
       throwing : 1,
       sync : 0,
     })
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       var files = provider.dirRead( /*dir*/testPath );
       test.identical( files, [ 'link.txt', 'link_test.txt' ] )
@@ -24337,7 +24337,7 @@ function hardLinkAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     return provider.hardLink
     ({
@@ -24347,7 +24347,7 @@ function hardLinkAsync( test )
       throwing : 0,
       sync : 0,
     })
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       var files = provider.dirRead( /*dir*/testPath );
       test.identical( files, [ 'link.txt', 'link_test.txt' ] )
@@ -24357,7 +24357,7 @@ function hardLinkAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     return provider.hardLink
     ({
@@ -24380,7 +24380,7 @@ function hardLinkAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.hardLink
     ({
@@ -24395,7 +24395,7 @@ function hardLinkAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'src is equal to dst';
     provider.filesDelete( /*dir*/testPath );
@@ -24406,7 +24406,7 @@ function hardLinkAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     return provider.hardLink
     ({
@@ -24427,7 +24427,7 @@ function hardLinkAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     return provider.hardLink
     ({
@@ -24448,7 +24448,7 @@ function hardLinkAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     return provider.hardLink
     ({
@@ -24469,7 +24469,7 @@ function hardLinkAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     return provider.hardLink
     ({
@@ -24490,7 +24490,7 @@ function hardLinkAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'try make hardLink for folder';
     provider.filesDelete( /*dir*/testPath );
@@ -24502,7 +24502,7 @@ function hardLinkAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.hardLink
     ({
@@ -24517,7 +24517,7 @@ function hardLinkAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.hardLink
     ({
@@ -24532,7 +24532,7 @@ function hardLinkAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.hardLink
     ({
@@ -24547,7 +24547,7 @@ function hardLinkAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var con = provider.hardLink
     ({
@@ -24570,7 +24570,7 @@ function hardLinkAsync( test )
 
   /**/
 
-  consequence.ifNoErrorThen( function( arg/*aaa*/ )
+  consequence.ifNoErrorThen( function( arg )
   {
     test.case = 'dstPath option, files are not linked';
     var paths = makeFiles( fileNames, currentTestDir );
@@ -24586,7 +24586,7 @@ function hardLinkAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'dstPath option, linking files from different dirs';
     paths = fileNames.map( ( n ) => /*_.path*/path.join( 'dir_'+ n, n ) );
@@ -24603,7 +24603,7 @@ function hardLinkAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'dstPath option, try to link already linked files';
     var paths = makeFiles( fileNames, currentTestDir );
@@ -24627,7 +24627,7 @@ function hardLinkAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'dstPath, rewriting off, try to rewrite existing files';
     var paths = makeFiles( fileNames, currentTestDir );
@@ -24655,7 +24655,7 @@ function hardLinkAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'dstPath option, groups of linked files ';
     fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
@@ -24665,7 +24665,7 @@ function hardLinkAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var groups = [ [ 0,1 ],[ 2,3,4 ],[ 5 ] ];
     var paths = makeFiles( fileNames, currentTestDir );
@@ -24682,7 +24682,7 @@ function hardLinkAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var groups = [ [ 0,1 ],[ 1,2,3 ],[ 3,4,5 ] ];
     var paths = makeFiles( fileNames, currentTestDir );
@@ -24697,7 +24697,7 @@ function hardLinkAsync( test )
     .finally( () => test.identical( provider.filesAreHardLinked( paths ), hardLinked ) );
   })
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var groups = [ [ 0,1,2,3 ],[ 4,5 ] ];
     var paths = makeFiles( fileNames, currentTestDir );
@@ -24714,7 +24714,7 @@ function hardLinkAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     var groups = [ [ 0,1,2,3,4 ],[ 0,5 ] ];
     var paths = makeFiles( fileNames, currentTestDir );
@@ -24731,7 +24731,7 @@ function hardLinkAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'dstPath option, only first path exists';
     var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
@@ -24757,7 +24757,7 @@ function hardLinkAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'dstPath option, only first path exists';
     var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
@@ -24785,7 +24785,7 @@ function hardLinkAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'dstPath option, all paths not exist';
     var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
@@ -24802,7 +24802,7 @@ function hardLinkAsync( test )
     return test.shouldThrowError( con );
   })
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'dstPath option, all paths not exist';
     var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
@@ -24881,7 +24881,7 @@ function hardLinkAsync( test )
 
   /* sourceMode */
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'sourceMode: source newest file with min hardlinks count ';
     var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
@@ -24897,7 +24897,7 @@ function hardLinkAsync( test )
       sourceMode : 'modified>hardlinks<',
       sync : 0
     })
-    .ifNoErrorThen( ( arg/*aaa*/ ) =>
+    .ifNoErrorThen( ( arg ) =>
     {
       test.identical( provider.filesAreHardLinked( paths ), hardLinked );
       var srcPath = paths[ paths.length - 1 ];
@@ -24911,7 +24911,7 @@ function hardLinkAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'sourceMode: source must be a file with max amount of links';
     var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
@@ -24931,7 +24931,7 @@ function hardLinkAsync( test )
       sync : 0,
       sourceMode : 'hardlinks>'
     })
-    .ifNoErrorThen( ( arg/*aaa*/ ) =>
+    .ifNoErrorThen( ( arg ) =>
     {
       test.identical( provider.filesAreHardLinked( paths ), hardLinked );
       var srcPath = paths[ 0 ];
@@ -25845,7 +25845,7 @@ function fileExchangeAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'swap two files content';
     srcPath = test.context.pathFor( 'written/fileExchangeAsync/src' );
@@ -25855,7 +25855,7 @@ function fileExchangeAsync( test )
 
   /*default setting*/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.fileWrite( srcPath, 'src' );
     provider.fileWrite( dstPath, 'dst' );
@@ -25867,7 +25867,7 @@ function fileExchangeAsync( test )
       allowingMissed : 1,
       throwing : 1
     })
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       var files = provider.dirRead( /*dir*/testPath );
       test.identical( files, [ 'dst', 'src' ] );
@@ -25880,7 +25880,7 @@ function fileExchangeAsync( test )
 
   /**/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.fileWrite( srcPath, 'src' );
     provider.fileWrite( dstPath, 'dst' );
@@ -25892,7 +25892,7 @@ function fileExchangeAsync( test )
       allowingMissed : 1,
       throwing : 0
     })
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       var files = provider.dirRead( /*dir*/testPath );
       test.identical( files, [ 'dst', 'src' ] );
@@ -25905,7 +25905,7 @@ function fileExchangeAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'swap two dirs content';
     srcPath = test.context.pathFor( 'written/fileExchangeAsync/src/src.txt' );
@@ -25915,7 +25915,7 @@ function fileExchangeAsync( test )
 
   /*throwing on*/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( /*dir*/testPath );
     provider.fileWrite( srcPath, 'src' );
@@ -25928,7 +25928,7 @@ function fileExchangeAsync( test )
       allowingMissed : 1,
       throwing : 1
     })
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       src = provider.dirRead( self.provider.path.dir( srcPath ) );
       dst = provider.dirRead( self.provider.path.dir( dstPath ) );
@@ -25942,7 +25942,7 @@ function fileExchangeAsync( test )
 
   /*throwing off*/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( /*dir*/testPath );
     provider.fileWrite( srcPath, 'src' );
@@ -25955,7 +25955,7 @@ function fileExchangeAsync( test )
       allowingMissed : 1,
       throwing : 0
     })
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       src = provider.dirRead( self.provider.path.dir( srcPath ) );
       dst = provider.dirRead( self.provider.path.dir( dstPath ) );
@@ -25969,7 +25969,7 @@ function fileExchangeAsync( test )
 
   //
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     test.case = 'path not exist';
     srcPath = test.context.pathFor( 'written/fileExchangeAsync/src' );
@@ -25979,7 +25979,7 @@ function fileExchangeAsync( test )
 
   /*src not exist, throwing on*/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( /*dir*/testPath );
     provider.fileWrite( dstPath, 'dst' );
@@ -26002,7 +26002,7 @@ function fileExchangeAsync( test )
 
   /*src not exist, throwing on, allowingMissed on*/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( /*dir*/testPath );
     provider.fileWrite( dstPath, 'dst' );
@@ -26015,7 +26015,7 @@ function fileExchangeAsync( test )
       throwing : 1
     });
     return test.mustNotThrowError( con )
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       var files  = provider.dirRead( /*dir*/testPath );
       test.identical( files, [ 'src' ] );
@@ -26025,7 +26025,7 @@ function fileExchangeAsync( test )
 
   /*src not exist, throwing off,allowingMissed on*/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( /*dir*/testPath );
     provider.fileWrite( dstPath, 'dst' );
@@ -26038,7 +26038,7 @@ function fileExchangeAsync( test )
       throwing : 0
     });
     return test.mustNotThrowError( con )
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       var files  = provider.dirRead( /*dir*/testPath );
       test.identical( files, [ 'src' ] );
@@ -26048,7 +26048,7 @@ function fileExchangeAsync( test )
 
   /*dst not exist, throwing on,allowingMissed off*/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( /*dir*/testPath );
     provider.fileWrite( srcPath, 'src' );
@@ -26071,7 +26071,7 @@ function fileExchangeAsync( test )
 
   /*dst not exist, throwing off,allowingMissed on*/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( /*dir*/testPath );
     provider.fileWrite( srcPath, 'src' );
@@ -26084,7 +26084,7 @@ function fileExchangeAsync( test )
       throwing : 0
     });
     return test.mustNotThrowError( con )
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       var files  = provider.dirRead( /*dir*/testPath );
       test.identical( files, [ 'dst' ] );
@@ -26094,7 +26094,7 @@ function fileExchangeAsync( test )
 
   /*dst not exist, throwing on,allowingMissed on*/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( /*dir*/testPath );
     provider.fileWrite( srcPath, 'src' );
@@ -26107,7 +26107,7 @@ function fileExchangeAsync( test )
       throwing : 1
     });
     return test.mustNotThrowError( con )
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       var files  = provider.dirRead( /*dir*/testPath );
       test.identical( files, [ 'dst' ] );
@@ -26117,7 +26117,7 @@ function fileExchangeAsync( test )
 
   /*dst not exist, throwing off,allowingMissed off*/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( /*dir*/testPath );
     provider.fileWrite( srcPath, 'src' );
@@ -26130,7 +26130,7 @@ function fileExchangeAsync( test )
       throwing : 0
     });
     return test.mustNotThrowError( con )
-    .ifNoErrorThen( function( arg/*aaa*/ )
+    .ifNoErrorThen( function( arg )
     {
       var files  = provider.dirRead( /*dir*/testPath );
       test.identical( files, [ 'src' ] );
@@ -26140,7 +26140,7 @@ function fileExchangeAsync( test )
 
   /*dst & src not exist, throwing on,allowingMissed on*/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     provider.filesDelete( /*dir*/testPath );
     var con = provider.fileExchange
@@ -26161,7 +26161,7 @@ function fileExchangeAsync( test )
 
   /*dst & src not exist, throwing off,allowingMissed off*/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     // provider.filesDelete( /*dir*/testPath );
     var con = provider.fileExchange
@@ -26182,7 +26182,7 @@ function fileExchangeAsync( test )
 
   /*dst & src not exist, throwing on,allowingMissed off*/
 
-  .ifNoErrorThen( function( arg/*aaa*/ )
+  .ifNoErrorThen( function( arg )
   {
     // provider.filesDelete( /*dir*/testPath );
     var con = provider.fileExchange
@@ -27393,7 +27393,7 @@ function hardLinkAsyncRunner( test )
 
   for( var i = 0; i < runsLimit; i++ )(function()
   {
-    con.ifNoErrorThen( ( arg/*aaa*/ ) =>
+    con.ifNoErrorThen( ( arg ) =>
     {
       return tests.hardLinkAsync.call( self, test )
       .finally( ( err, got ) =>
@@ -37887,27 +37887,30 @@ function hardLinkExperiment( test )
 {
   let self = this;
   let provider = self.provider;
-
-  let testPath = test.context.pathFor( 'written/hardLinkExperiment' );
-  let terminalPath = test.context.pathFor( 'written/hardLinkExperiment/terminal' );
-  let linkPath = test.context.pathFor( 'written/hardLinkExperiment/hardLink' );
+  let testPath = test.context.pathFor( 'hardLinkExperiment' );
+  let terminalPath = test.context.pathFor( 'hardLinkExperiment/terminal' );
+  let linkPath = test.context.pathFor( 'hardLinkExperiment/hardLink' );
 
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   {
-    test.identical( 1,1 );
+    test.identical( 1, 1 );
     return;
   }
 
   provider.filesDelete( testPath );
   provider.fileWrite( terminalPath, terminalPath );
   provider.hardLink( linkPath, terminalPath );
+  debugger;
   var statTerminal = provider.statRead( terminalPath );
   var statLink = provider.statRead( linkPath );
+  debugger;
   test.identical( statTerminal.ino, statLink.ino );
-  var got = _.statsAreHardLinked( statTerminal,statLink );
+  debugger;
+  var got = _.statsAreHardLinked( statTerminal, statLink );
   test.identical( got, _.maybe );
-  var got = provider.filesAreHardLinked([ linkPath,terminalPath ]);
+  var got = provider.filesAreHardLinked([ linkPath, terminalPath ]);
   test.identical( got, true );
+
 }
 
 //

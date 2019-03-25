@@ -17165,6 +17165,68 @@ experiment.experimental = 1;
 
 //
 
+function filesFindExperiment2( test )
+{
+  let context = this;
+  let provider = context.provider;
+  let path = context.provider.path;
+  let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
+
+  var filesTree =
+  {
+    a :
+    {
+      b :
+      {
+        terminal : 'terminal'
+      }
+    }
+  }
+
+  provider.filesDelete( testPath );
+
+  _.FileProvider.Extract.readToProvider
+  ({
+    dstProvider : provider,
+    dstPath : testPath,
+    filesTree : filesTree,
+    allowWrite : 1,
+    allowDelete : 1,
+    sameTime : 1,
+  });
+
+  /*  */
+
+  debugger
+
+  var got = provider.filesFind
+  ({
+    filePath : testPath,
+    recursive : 2,
+    includingTransient : 1,
+    includingDirs : 1,
+    includingTerminals : 1,
+    outputFormat : 'relative'
+  })
+
+  var expected =
+  [
+    '.',
+    './a',
+    './a/b',
+    './a/b/terminal'
+  ]
+
+  debugger
+
+  test.identical( got, expected );
+
+}
+
+filesFindExperiment2.experimental = 1;
+
+//
+
 function filesReflectExperiment( test )
 {
   let context = this;
@@ -17301,6 +17363,7 @@ var Self =
     // experiment,
     // experiment2,
     // filesFindExperiment,
+    filesFindExperiment2,
     filesReflectExperiment
 
   },

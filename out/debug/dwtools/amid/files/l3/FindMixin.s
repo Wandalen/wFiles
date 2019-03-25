@@ -915,17 +915,17 @@ function filesRead_body( o )
 {
   let self = this;
   let path = self.path;
-  let con = new _.Consequence();
 
   _.assert( o.fileFilter.formed === 5 );
 
   let con = self.filesFindGroups( o );
+  let r;
 
   /* */
 
-  con = _.Consequence.From( con ).then( ( r ) =>
+  con = _.Consequence.From( con ).then( ( result ) =>
   {
-
+    r = result;
     r.dataMap = Object.create( null );
 
     for( let dstPath in r.filesGrouped )

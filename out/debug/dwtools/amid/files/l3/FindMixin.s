@@ -2414,8 +2414,8 @@ function filesReflectEvaluate_body( o )
       dstRecords.splice( f, 1 );
     }
 
-    if( _.strEnds( record.dst.absolute, debugPath ) )
-    debugger;
+    // if( _.strEnds( record.dst.absolute, debugPath ) )
+    // debugger;
 
     for( let f = 0 ; f < dstRecords.length ; f++ )
     {

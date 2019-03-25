@@ -205,36 +205,12 @@ function _filesFilterForm( o )
     o.filter.filePath = o.filePath;
     o.filter.form();
 
-    // if( _.mapIs( o.filter.filePath ) )
-    // o.filePath = o.filter.filePathSrcNormalizedGet();
-    // else
-    // o.filePath = o.filter.filePath;
-
   }
 
   o.filePath = null;
-
-  // if( !o.filePath )
-  // {
-  //   o.filePath = o.filter.filePath
-  // }
-
-  // /* get keys */
-  //
-  // if( _.mapIs( o.filePath ) )
-  // {
-  //   _.assert( _.all( _.mapVals( o.filePath ), ( f ) => !!f ) );
-  //   o.filePath = _.mapKeys( o.filePath );
-  // }
-
-  // if( _.arrayIs( o.filePath ) )
-  // _.strsSort( o.filePath );
-
-  // _.assert( _.arraySetIdentical( _.mapKeys( o.filter.filePath ), o.filePath ) );
   _.assert( !self.hub || o.filter.hubFileProvider === self.hub );
   _.assert( !!o.filter.effectiveFileProvider );
   _.assert( path.s.allAreNormalized( o.filter.filePath ) );
-  // _.assert( path.s.allAreNormalized( o.filePath ) );
 
   return o;
 }
@@ -306,12 +282,7 @@ function filesFindSingle_body( o )
   _.assert( _.strDefined( o2.basePath ), 'No base path for', o.filePath );
 
   let recordFactory = _.FileRecordFactory.TollerantFrom( o, o2 ).form();
-
-  // if( _.strEnds( o.filePath, '/dst/dst' ) )
-  // debugger;
-
   let stemRecord = recordFactory.record( o.filePath );
-  // console.log( 'stemRecord.isActual', stemRecord.isActual );
 
   _.assert( recordFactory.basePath === o.filter.formedBasePath[ o.filePath ] );
   _.assert( recordFactory.dirPath === null );
@@ -331,7 +302,6 @@ function filesFindSingle_body( o )
     throw _.err( 'Stem file does not exist', _.strQuote( stemRecord.absolute ) );
   }
 
-  // logger.log( 'filesFind', o.filePath );
   forStem( stemRecord, o );
 
   return o.result;
@@ -340,6 +310,7 @@ function filesFindSingle_body( o )
 
   function forStem( record, o )
   {
+    // debugger;
     forDirectory( record, o )
     forTerminal( record, o )
   }
@@ -857,12 +828,7 @@ function filesFindGroups_body( o )
   _.assert( o.fileFilter.formed === 5 );
 
   let r = Object.create( null );
-  // r.errors = [];
-  // r.options = o;
-  // r.dataMap = Object.create( null );
-  // r.fileMap = Object.create( null );
-  // r.dstMap = Object.create( null );
-
+  r.options = o;
   r.pathsGrouped = path.pathMapGroupByDst( o.fileFilter.filePath );
   r.filesGrouped = Object.create( null );
   r.errors = [];
@@ -876,40 +842,25 @@ function filesFindGroups_body( o )
 
     con.finallyGive( 1 );
 
+    o2.result = [];
     o2.filter = o.fileFilter.clone();
     o2.filter.filePathSelect( srcPath, dstPath );
     o2.filter.form();
 
+    debugger;
     _.Consequence.From( self.filesFind( o2 ) )
     .finally( ( err, files ) =>
     {
+      debugger;
       r.filesGrouped[ dstPath ] = files;
-      // files.forEach( ( record ) => fileRead( record, dstPath ) );
       if( err )
       {
         r.errors.push( err );
-        // con.take( null );
-        // return null;
       }
-      // files.forEach( ( record ) => fileRead( record, dstPath ) );
 
       con.take( null );
       return null;
     });
-
-    // _.Consequence.From( self.filesFind( o2 ) )
-    // .finally( ( err, files ) =>
-    // {
-    //   if( err )
-    //   {
-    //     r.errors.push( err );
-    //     con.take( null );
-    //     return null;
-    //   }
-    //   files.forEach( ( record ) => fileRead( record, dstPath ) );
-    //   con.take( null );
-    //   return null;
-    // });
 
   })( dstPath );
 
@@ -928,7 +879,207 @@ function filesFindGroups_body( o )
   });
 
   return con.toResourceMaybe();
+}
 
+var defaults = filesFindGroups_body.defaults = _.mapExtend( null, filesFind.defaults );
+
+delete defaults.filePath;
+delete defaults.filter;
+
+defaults.fileFilter = null;
+defaults.sync = 1;
+defaults.throwing = null;
+defaults.recursive = 2;
+
+//
+
+let filesFindGroups = _.routineFromPreAndBody( filesFindGroups_pre, filesFindGroups_body );
+
+// function filesRead_pre( routine, args )
+// {
+//   let self = this;
+//   let o = self._preFileFilterWithProviderDefaults.apply( self, arguments );
+//
+//   o.fileFilter.form();
+//
+//   return o;
+// }
+
+//
+
+/*
+qqq : new filesRead requires tests
+*/
+
+function filesRead_body( o )
+{
+  let self = this;
+  let path = self.path;
+  let con = new _.Consequence();
+
+  _.assert( o.fileFilter.formed === 5 );
+
+  let con = self.filesFindGroups( o );
+
+  /* */
+
+  con = _.Consequence.From( con ).then( ( r ) =>
+  {
+
+    r.dataMap = Object.create( null );
+
+    for( let dstPath in r.filesGrouped )
+    {
+      let file = r.filesGrouped[ dstPath ];
+      fileRead( file, dstPath );
+    }
+
+  });
+
+  // for( let dstPath in r.pathGroupedByDstMap ) ( function( dstPath )
+  // {
+  //   let srcPath = r.pathGroupedByDstMap[ dstPath ];
+  //   let o2 = _.mapOnly( o, self.filesReflectSingle.body.defaults );
+  //
+  //   con.finallyGive( 1 );
+  //
+  //   o2.filter = o.fileFilter.clone();
+  //   o2.filter.filePathSelect( srcPath, dstPath );
+  //   o2.filter.form();
+  //
+  //   _.Consequence.From( self.filesFind( o2 ) )
+  //   .finally( ( err, files ) =>
+  //   {
+  //     if( err )
+  //     {
+  //       r.errors.push( err );
+  //       con.take( null );
+  //       return null;
+  //     }
+  //     files.forEach( ( record ) => fileRead( record, dstPath ) );
+  //     con.take( null );
+  //     return null;
+  //   });
+  //
+  // })( dstPath );
+  //
+  // /* */
+  //
+  // con.take( null );
+  // con.finally( () =>
+  // {
+  //   if( r.errors.length )
+  //   {
+  //     debugger;
+  //     if( o.throwing )
+  //     throw r.errors[ 0 ];
+  //   }
+  //   return r;
+  // });
+
+  return con.toResourceMaybe();
+
+  /* */
+
+  function fileRead( record, dstBasePath )
+  {
+
+    let dstPath = dstBasePath;
+    let dstDescriptor = r.dstMap[ dstPath ];
+
+    if( !dstDescriptor )
+    {
+      dstDescriptor = r.dstMap[ dstPath ] = Object.create( null );
+      dstDescriptor.dstPath = dstPath;
+      dstDescriptor.dataMap = Object.create( null );
+    }
+
+    try
+    {
+      r.fileMap[ record.absolute ] = dstDescriptor.dstPath;
+      r.dataMap[ record.absolute ] = self.fileRead({ filePath : record.absolute, sync : o.sync });
+      con.finallyGive( 1 );
+      _.Consequence.From( r.dataMap[ record.absolute ] )
+      .finally( ( err, data ) =>
+      {
+        if( err )
+        {
+          r.errors.push( err );
+          return null;
+        }
+        r.dataMap[ record.absolute ] = data;
+        dstDescriptor.dataMap[ record.absolute ] = data;
+        return null;
+      })
+      .finally( con );
+    }
+    catch( err )
+    {
+      r.errors.push( err );
+    }
+
+  }
+
+  //
+  // let r = Object.create( null );
+  // r.errors = [];
+  // r.options = o;
+  // r.dataMap = Object.create( null );
+  // r.fileMap = Object.create( null );
+  // r.dstMap = Object.create( null );
+  //
+  // // debugger;
+  // r.pathGroupedByDstMap = path.pathMapGroupByDst( o.fileFilter.filePath );
+  // // r.pathGroupedByDstMap = path.pathMapGroupByDst( o.fileFilter.formedFilePath );
+  //
+  // /* */
+  //
+  // for( let dstPath in r.pathGroupedByDstMap ) ( function( dstPath )
+  // {
+  //   let srcPath = r.pathGroupedByDstMap[ dstPath ];
+  //   let o2 = _.mapOnly( o, self.filesReflectSingle.body.defaults );
+  //   // let o2 = _.mapOnly( o, self.filesReflectSingle.body.defaults );
+  //
+  //   con.finallyGive( 1 );
+  //
+  //   o2.filter = o.fileFilter.clone();
+  //   o2.filter.filePathSelect( srcPath, dstPath );
+  //   o2.filter.form();
+  //
+  //   // debugger;
+  //   _.Consequence.From( self.filesFind( o2 ) )
+  //   .finally( ( err, files ) =>
+  //   {
+  //     if( err )
+  //     {
+  //       r.errors.push( err );
+  //       con.take( null );
+  //       return null;
+  //     }
+  //     files.forEach( ( record ) => fileRead( record, dstPath ) );
+  //     con.take( null );
+  //     return null;
+  //   });
+  //
+  // })( dstPath );
+  //
+  // /* */
+  //
+  // con.take( null );
+  // con.finally( () =>
+  // {
+  //   if( r.errors.length )
+  //   {
+  //     debugger;
+  //     if( o.throwing )
+  //     throw r.errors[ 0 ];
+  //   }
+  //   return r;
+  // });
+  //
+  // // debugger;
+  // return con.toResourceMaybe();
+  //
   // /* */
   //
   // function fileRead( record, dstBasePath )
@@ -971,17 +1122,16 @@ function filesFindGroups_body( o )
 
 }
 
-filesFindGroups_body.defaults =
-{
-  fileFilter : null,
-  sync : 1,
-  throwing : null,
-  recursive : 2,
-}
+filesRead_body.defaults = Object.create( filesFindGroups.defaults );
 
-//
+// {
+//   fileFilter : null,
+//   sync : 1,
+//   throwing : null,
+//   recursive : 2,
+// }
 
-let filesFindGroups = _.routineFromPreAndBody( filesFindGroups_pre, filesFindGroups_body );
+let filesRead = _.routineFromPreAndBody( filesFindGroups.pre, filesRead_body );
 
 // --
 //
@@ -4550,6 +4700,7 @@ let Supplement =
   //
 
   filesFindGroups,
+  filesRead,
 
   // reflect
 

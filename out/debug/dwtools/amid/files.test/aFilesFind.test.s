@@ -5840,6 +5840,11 @@ function filesFindGroups( test )
   let path = context.provider.path;
   let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
 
+  function abs( filePath )
+  {
+    return path.s.join( testPath, filePath )
+  }
+
   var filesTree =
   {
     'a.js' : 'a.js',
@@ -5858,14 +5863,41 @@ function filesFindGroups( test )
   var extract1 = new _.FileProvider.Extract({ filesTree : filesTree });
   extract1.filesReflectTo( provider, testPath );
 
-  var expected = {}
+  var expected =
+  {
+    'pathsGrouped' :
+    {
+      [ abs( 'Produced.txt' ) ] : { [ abs( '**.txt' ) ] : null },
+      [ abs( 'Produced.js' ) ] : { [ abs( '**.js' ) ] : null }
+    },
+    'filesGrouped' :
+    {
+      [ abs( 'Produced.txt' ) ] :
+      [
+        './a.txt', './b.txt', './dir/a.txt', './dir/b.txt'
+      ],
+      [ abs( 'Produced.js' ) ] :
+      [
+        './a.js', './b.js', './dir/a.js', './dir/b.js'
+      ]
+    },
+    'errors' : [],
+    'options' : true,
+  }
   var filePath =
   {
-    '*.txt' : 'Produced.txt',
-    '*.js' : 'Produced.js',
+    '**.txt' : 'Produced.txt',
+    '**.js' : 'Produced.js',
   }
+  var fileFilter =
+  {
+    filePath : filePath,
+    prefixPath : testPath,
+  }
+
   debugger;
-  var found = provider.filesFindGroups({ fileFilter : { filePath : filePath } });
+  var found = provider.filesFindGroups({ fileFilter : fileFilter, outputFormat : 'relative' });
+  found.options = !!found.options;
   debugger;
 
   test.identical( found, expected );

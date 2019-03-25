@@ -390,7 +390,7 @@ function _preFileFilterWithoutProviderDefaults( routine, args )
   o.fileFilter = self.recordFilter( o.fileFilter );
 
   _.routineOptions( routine, o );
-  _.assert( path.s.allAreAbsolute( o.fileFilter.filePath ), () => 'Expects absolute path {-o.fileFilter-}, but got ' + _.strQuote( o.fileFilter.filePath ) );
+  // _.assert( path.s.allAreAbsolute( o.fileFilter.filePath ), () => 'Expects absolute path {-o.fileFilter.filePath-}' );
 
   return o;
 }

@@ -2901,11 +2901,7 @@ function _applyToRecordMasks( record )
   _.assert( !!filter, 'Cant resolve filter map for stem path', () => _.strQuote( f.stemPath ) );
   _.assert( !!f.formed, 'Record factor was not formed!' );
 
-  // if( _.strHas( record.relative, 'File1.js' ) )
-  // debugger;
-  // if( _.strHas( record.relative, 'src1' ) )
-  // debugger;
-  // if( _.strHas( record.absolute, '/dst/dst' ) )
+  // if( _.strHas( record.absolute, 'txt' ) )
   // debugger;
 
   /* */

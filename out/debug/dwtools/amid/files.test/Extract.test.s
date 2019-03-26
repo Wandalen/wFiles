@@ -46,7 +46,7 @@ var filesTree =
 function onSuiteBegin( test )
 {
   let context = this;
-  debugger;
+  // debugger;
   Parent.onSuiteBegin.apply( this, arguments );
   context.provider = _.FileProvider.Extract({ filesTree : filesTree, usingExtraStat : 1, protocol : 'current' });
   context.hub = _.FileProvider.Hub({ providers : [ context.provider ] });
@@ -67,7 +67,7 @@ function onSuiteEnd()
 //
 
 function pathFor( filePath )
-{ 
+{
   let self = this;
   return self.provider.path.normalize('/' + filePath );
 }

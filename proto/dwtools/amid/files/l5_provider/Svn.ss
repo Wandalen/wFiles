@@ -1,6 +1,6 @@
 // ( function _Svn_ss_() {
 //
-// 'use strict';
+// 'use strict'; 
 //
 // if( typeof module !== 'undefined' )
 // {
@@ -114,7 +114,7 @@
 //     con.error( _.err( err ) );
 //   });
 //
-//   con.ifNoErrorThen( function( arg/*aaa*/ )
+//   con.ifNoErrorThen( function( arg )
 //   {
 //     return tempPath;
 //   });

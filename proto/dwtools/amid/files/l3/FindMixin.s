@@ -4014,12 +4014,12 @@ function filesDelete_body( o )
       let file = o.result[ f ];
 
       // qqq : temp hack. comment it out please
-      if( file.isDir )
-      if( !provider.dirIsEmpty( file.absolute ) )
-      {
-        o.result.splice( f, 1 );
-        continue;
-      }
+      // if( file.isDir )
+      // if( !provider.dirIsEmpty( file.absolute ) )
+      // {
+      //   o.result.splice( f, 1 );
+      //   continue;
+      // }
       // qqq
 
       if( file.isActual && file.absolute !== '/' )

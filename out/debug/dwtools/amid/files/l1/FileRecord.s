@@ -1,6 +1,6 @@
 ( function _FileRecord_s_() {
 
-'use strict'; 
+'use strict';
 
 if( typeof module !== 'undefined' )
 {
@@ -56,7 +56,7 @@ function init( o )
 
   if( !f.formed )
   {
-    if( !f.basePath && !f.dirPath && !f.stemPath )
+    if( !f.basePath && !f.dirPath && !f.stemPath ) // xxx
     {
       f.basePath = _.uri.dir( o.input );
       f.stemPath = f.basePath;

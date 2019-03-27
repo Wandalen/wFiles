@@ -3956,51 +3956,36 @@ function filesDelete_body( o )
   _.assert( !o.includingTransient );
   _.assert( o.result === o2.result );
 
+  /* qqq : this is not async aaa : done*/
+
+  // debugger;
+
   if( o.sync )
   {
     provider.filesFind.body.call( provider, o2 );
     handleResult();
+
+    if( o.writing )
+    handleWriting();
+
+    if( o.deletingEmptyDirs && o.result.length )
+    deletingEmptyDirs();
   }
   else
   {
     con.thenKeep( () => provider.filesFind.body.call( provider, o2 ) );
     con.thenKeep( () => handleResult() );
-  }
 
-  // debugger;
+    if( o.writing )
+    con.thenKeep( () => handleWriting() );
 
-  /* */
-
-  /* qqq : this is not async */
-  if( o.writing )
-  for( let f = o.result.length-1 ; f >= 0 ; f-- )
-  {
-    let file = o.result[ f ];
-
-    // qqq : temp hack. comment it out please
-    if( file.isDir )
-    if( !provider.dirIsEmpty( file.absolute ) )
+    if( o.deletingEmptyDirs )
+    con.thenKeep( () =>
     {
-      o.result.splice( f, 1 );
-      continue;
-    }
-    // qqq
-
-    if( file.isActual && file.absolute !== '/' )
-    if( o.sync )
-    fileDelete( file );
-    else
-    con.thenKeep( () => fileDelete( file ) );
-  }
-
-  /* */
-
-  if( o.deletingEmptyDirs && o.result.length )
-  {
-    if( o.sync )
-    deletingEmptyDirs();
-    else
-    con.thenKeep( () => deletingEmptyDirs() );
+      if( !o.result.length )
+      return null;
+      return deletingEmptyDirs();
+    })
   }
 
   /* */
@@ -4017,6 +4002,36 @@ function filesDelete_body( o )
   return end();
 
   /* - */
+
+  function handleWriting()
+  {
+    let con;
+    if( !o.sync )
+    con = new _.Consequence().take( null );
+
+    for( let f = o.result.length-1 ; f >= 0 ; f-- )
+    {
+      let file = o.result[ f ];
+
+      // qqq : temp hack. comment it out please
+      // if( file.isDir )
+      // if( !provider.dirIsEmpty( file.absolute ) )
+      // {
+      //   o.result.splice( f, 1 );
+      //   continue;
+      // }
+      // qqq
+
+      if( file.isActual && file.absolute !== '/' )
+      if( o.sync )
+      fileDelete( file )
+      else
+      con.thenKeep( () => fileDelete( file ) );
+    }
+    return con;
+  }
+
+  /*  */
 
   function handleResult()
   {

@@ -819,12 +819,12 @@ function fileConfigPathGet_body( o )
       if( self.fileExists( filePath2 ) )
       if( o.outputFormat === 'array' )
       {
-        result.push({ particularPath : filePath2, abstractPath : filePath, encoding : exts[ ext ], ext : ext });
+        result.push({ particularPath : filePath2, abstractPath : filePath, encoding : exts[ ext ]/*, ext : ext*/ });
       }
       else
       {
         _.sure( result[ filePath ] === undefined, () => 'Several configs exists for ' + _.strQuote( filePath ) );
-        result[ filePath ] = { particularPath : filePath2, abstractPath : filePath, encoding : exts[ ext ], ext : ext };
+        result[ filePath ] = { particularPath : filePath2, abstractPath : filePath, encoding : exts[ ext ]/*, ext : ext*/ };
       }
     });
   });
@@ -835,7 +835,6 @@ function fileConfigPathGet_body( o )
 }
 
 var defaults = fileConfigPathGet_body.defaults = Object.create( null );
-
 defaults.filePath = null;
 defaults.outputFormat = 'array';
 
@@ -887,34 +886,75 @@ function fileConfigRead_body( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.arrayHas( [ 'all', 'any' ], o.many ) );
 
-  let found = self.fileConfigPathGet({ filePath : o.filePath });
+  if( !o.found )
+  o.found = self.fileConfigPathGet({ filePath : o.filePath });
 
   /* */
 
   if( o.many === 'all' )
   {
-    let abstractPath1 = _.arrayAs( o.filePath );
-    let abstractPath2 = found.map( ( f ) => f.abstractPath );
-    if( _.arraySetBut( abstractPath1.slice(), abstractPath2 ).length )
+    let filePath = _.arrayAs( o.filePath ).slice();
+    let found = o.found.slice();
+
+    for( let f1 = filePath.length-1 ; f1 >= 0 ; f1-- )
+    {
+      let filePath1 = filePath[ f1 ];
+      for( let f2 = found.length-1 ; f2 >= 0 ; f2-- )
+      if( found[ f2 ].abstractPath === filePath1 || found[ f2 ].particularPath === filePath1 )
+      {
+        filePath.splice( f1, 1 );
+        found.splice( f2, 1 );
+        continue;
+      }
+    }
+
+    for( let f1 = filePath.length-1 ; f1 >= 0 ; f1-- )
+    {
+      let filePath1 = filePath[ f1 ];
+      debugger;
+      throw _.err( 'None config was found\n', _.strQuote( filePath1 ) );
+    }
+
+    for( let f2 = found.length-1 ; f2 >= 0 ; f2-- )
     {
       debugger;
-      throw _.err( 'None config was found\n', _.strQuote( _.arraySetBut( abstractPath1.slice(), abstractPath2 ) ) );
+      throw _.err( 'Some configs were loaded several times\n', _.strQuote( found[ f2 ].particularPath ) );
     }
-    if( abstractPath1.length !== abstractPath2.length )
-    {
-      debugger;
-      throw _.err( 'Some configs were loaded several times' );
-    }
+
+    // if( _.arraySetBut( abstractPath1.slice(), abstractPath2 ).length )
+    // {
+    //   debugger;
+    //   throw _.err( 'None config was found\n', _.strQuote( _.arraySetBut( abstractPath1.slice(), abstractPath2 ) ) );
+    // }
+    //
+    // if( abstractPath1.length !== abstractPath2.length )
+    // {
+    //   debugger;
+    //   throw _.err( 'Some configs were loaded several times' );
+    // }
+
+    //   let abstractPath2 = o.found.map( ( f ) => f.abstractPath );
+    //   if( _.arraySetBut( abstractPath1.slice(), abstractPath2 ).length )
+    //   {
+    //     debugger;
+    //     throw _.err( 'None config was found\n', _.strQuote( _.arraySetBut( abstractPath1.slice(), abstractPath2 ) ) );
+    //   }
+    //   if( abstractPath1.length !== abstractPath2.length )
+    //   {
+    //     debugger;
+    //     throw _.err( 'Some configs were loaded several times' );
+    //   }
+    // }
   }
 
   /* */
 
-  if( found && found.length )
+  if( o.found && o.found.length )
   {
 
-    for( let f = 0 ; f < found.length ; f++ )
+    for( let f = 0 ; f < o.found.length ; f++ )
     {
-      let file = found[ f ];
+      let file = o.found[ f ];
 
       let o2 = _.mapExtend( null,o );
       o2.filePath = file.particularPath;
@@ -922,6 +962,7 @@ function fileConfigRead_body( o )
       // if( o2.verbosity >= 2 )
       // o2.verbosity = 5;
       delete o2.many;
+      delete o2.found;
 
       let read = self.fileRead( o2 );
 
@@ -957,6 +998,7 @@ var defaults = fileConfigRead_body.defaults;
 
 defaults.encoding = null;
 defaults.many = 'all';
+defaults.found = null;
 
 //
 

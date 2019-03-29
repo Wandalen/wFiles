@@ -2901,7 +2901,7 @@ function _applyToRecordMasks( record )
   _.assert( !!filter, 'Cant resolve filter map for stem path', () => _.strQuote( f.stemPath ) );
   _.assert( !!f.formed, 'Record factor was not formed!' );
 
-  // if( _.strHas( record.absolute, 'txt' ) )
+  // if( _.strHas( record.absolute, '.will' ) )
   // debugger;
 
   /* */

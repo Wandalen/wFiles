@@ -2494,7 +2494,7 @@ function fileRead_body( o )
     }
 
     if( o.verbosity >= 1 )
-    self.logger.log( ' . Read :', o.filePath );
+    self.logger.log( ' . Read :', _.color.strFormat( o.filePath, 'path' ) );
     // if( o.verbosity >= 1 )
     // debugger;
 

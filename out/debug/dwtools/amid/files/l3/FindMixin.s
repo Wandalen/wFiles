@@ -4099,7 +4099,7 @@ function filesDelete_body( o )
   function endSync()
   {
     if( o.verbosity >= 1 )
-    provider.logger.log( ' - filesDelete ' + o.result.length + ' files at ' + path.commonReport( _.mapKeys( o.filter.formedFilePath ) ) + ' in ' + _.timeSpent( time ) );
+    provider.logger.log( ' - filesDelete ' + o.result.length + ' files at ' + _.color.strFormat( path.commonReport( _.mapKeys( o.filter.formedFilePath ) ), 'path' ) + ' in ' + _.timeSpent( time ) );
 
     if( o.outputFormat === 'absolute' )
     o.result = _.select( o.result, '*/absolute' );

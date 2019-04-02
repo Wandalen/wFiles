@@ -814,9 +814,9 @@ function fileConfigPathGet_body( o )
     {
       _.assert( _.strIs( ext ) );
       _.assert( _.strIs( filePath ) );
-      // let filePath2 = filePath + '.' + ext;
+      // let filePath2 = filePath + '.' + ext; 
       let filePath2 = _.strAppendOnce( filePath, '.' + ext );
-      if( self.fileExists( filePath2 ) )
+      if( self.statRead( filePath2 ) )
       if( o.outputFormat === 'array' )
       {
         result.push({ particularPath : filePath2, abstractPath : filePath, encoding : exts[ ext ]/*, ext : ext*/ });
@@ -837,6 +837,7 @@ function fileConfigPathGet_body( o )
 var defaults = fileConfigPathGet_body.defaults = Object.create( null );
 defaults.filePath = null;
 defaults.outputFormat = 'array';
+// defaults.recursive = 1;
 
 let fileConfigPathGet = _.routineFromPreAndBody( Partial.prototype._preFilePathVectorWithProviderDefaults, fileConfigPathGet_body );
 

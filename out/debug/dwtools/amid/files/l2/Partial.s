@@ -4987,7 +4987,7 @@ function dirMake_body( o )
   {
 
     let stat = o2.stat;
-    _.assert( !!stat );
+    _.assert( !!stat, () => 'No access to file ' + filePath );
     if( stat.isTerminal() )
     if( o.rewritingTerminal )
     self.fileDelete( filePath );

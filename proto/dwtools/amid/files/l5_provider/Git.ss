@@ -1,6 +1,6 @@
 ( function _Git_ss_( ) {
 
-'use strict'; 
+'use strict';
 
 if( typeof module !== 'undefined' )
 {
@@ -13,7 +13,7 @@ if( typeof module !== 'undefined' )
 
 let _global = _global_;
 let _ = _global_.wTools;
-let GitConfig;
+let GitConfig, Ini;
 
 //
 
@@ -46,39 +46,16 @@ function init( o )
   if( !GitConfig )
   GitConfig = require( 'gitconfiglocal' );
 
+  if( !Ini )
+  Ini = require( 'ini' );
+
   Parent.prototype.init.call( self,o );
 
 }
 
 // --
-// path
+// vcs
 // --
-
-// function localFromGlobal( uri )
-// {
-//   let self = this;
-//   let path = self.path;
-//   return path.str( uri );
-// }
-
-//
-
-function pathIsolateGlobalAndLocal( filePath )
-{
-  let self = this;
-  let path = self.path;
-
-  let parsed = path.parseConsecutive( filePath );
-  let splits = _.strIsolateLeftOrAll( parsed.longPath, '.git/' );
-
-  parsed.longPath = splits[ 0 ] + ( splits[ 1 ] || '' );
-
-  let globalPath = path.str( parsed );
-
-  return [ globalPath, splits[ 2 ] ]
-}
-
-//
 
 function pathParse( remotePath )
 {
@@ -90,39 +67,336 @@ function pathParse( remotePath )
   _.assert( _.strIs( remotePath ) );
   _.assert( path.isGlobal( remotePath ) )
 
+  /* */
+
   let parsed1 = path.parseConsecutive( remotePath );
   parsed1.hash = parsed1.hash || 'master';
-  parsed1.longPath = self.pathIsolateGlobalAndLocal( parsed1.longPath )[ 0 ];
+  _.mapExtend( result, parsed1 );
+
+  let p = pathIsolateGlobalAndLocal( parsed1.longPath );
+  result.localVcsPath = p[ 1 ];
 
   /* */
 
   let parsed2 = _.mapExtend( null, parsed1 );
   parsed2.protocol = null;
   parsed2.hash = null;
-  parsed2.longPath = _.strRemoveBegin( parsed2.longPath, '/' )
-  result.stripped = path.str( parsed2 );
+  parsed2.longPath = _.strRemoveEnd( _.strRemoveBegin( p[ 0 ], '/' ), '/' );
+  result.remoteVcsPath = path.str( parsed2 );
 
   /* */
 
   let parsed3 = _.mapExtend( null, parsed1 );
   parsed3.protocols = parsed3.protocol ? parsed3.protocol.split( '+' ) : [];
+  parsed3.longPath = parsed2.longPath;
   if( parsed3.protocols.length > 0 && parsed3.protocols[ 0 ].toLowerCase() === 'git' )
   {
     parsed3.protocols.splice( 0,1 );
-    parsed3.longPath = _.strRemoveBegin( parsed3.longPath, '/' )
   }
   parsed3.protocol = null;
   parsed3.hash = null;
-  result.compact = path.str( parsed3 );
+  result.longerRemoteVcsPath = path.str( parsed3 );
 
   /* */
 
-  _.mapExtend( result, parsed1 );
-
   return result
+
+/*
+
+  remotePath : 'git+https:///github.com/Wandalen/wTools.git/out/wTools#master'
+
+  protocol : 'git+https',
+  hash : 'master',
+  longPath : '/github.com/Wandalen/wTools.git/out/wTools',
+  localVcsPath : 'out/wTools',
+  remoteVcsPath : 'github.com/Wandalen/wTools.git',
+  longerRemoteVcsPath : 'https://github.com/Wandalen/wTools.git'
+
+*/
+
+  /* */
+
+  function pathIsolateGlobalAndLocal( remotePath )
+  {
+    let parsed = path.parseConsecutive( remotePath );
+    let splits = _.strIsolateLeftOrAll( parsed.longPath, '.git/' );
+    parsed.longPath = splits[ 0 ] + ( splits[ 1 ] || '' );
+    let globalPath = path.str( parsed );
+    return [ globalPath, splits[ 2 ] ];
+  }
+
 }
 
 //
+
+function pathIsFixated( filePath )
+{
+  let self = this;
+  let path = self.path;
+  let parsed = self.pathParse( filePath );
+
+  if( !parsed.hash )
+  return false;
+
+  if( parsed.hash.length < 7 )
+  return false;
+
+  if( !/[0-9a-f]+/.test( parsed.hash ) )
+  return false;
+
+  return true;
+}
+
+//
+
+function pathFixate( o )
+{
+  let self = this;
+  let path = self.path;
+
+  if( !_.mapIs( o ) )
+  o = { remotePath : o }
+  _.routineOptions( pathFixate, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+
+  let parsed = self.pathParse( o.remotePath );
+  let latestVersion = self.versionLatestRetrive
+  ({
+    remotePath : o.remotePath,
+    verbosity : o.verbosity,
+  });
+
+  let result = path.str
+  ({
+    protocol : parsed.protocol,
+    longPath : parsed.longPath,
+    hash : latestVersion,
+  });
+
+  return result;
+}
+
+var defaults = pathFixate.defaults = Object.create( null );
+defaults.remotePath = null;
+defaults.verbosity = 0;
+
+//
+
+function versionCurrentRetrive( o )
+{
+  let self = this;
+  let path = self.path;
+
+  if( !_.mapIs( o ) )
+  o = { localPath : o }
+
+  _.routineOptions( versionCurrentRetrive, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( !!self.hub );
+
+  if( !self.isDownloaded( o ) )
+  return false;
+
+  let localProvider = self.hub.providerForPath( o.localPath );
+
+  _.assert( localProvider instanceof _.FileProvider.HardDrive || localProvider.originalFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
+
+  let currentVersion = localProvider.fileRead( path.join( o.localPath, '.git/HEAD' ) );
+  let r = /^ref: refs\/heads\/(.+)\s*$/;
+
+  let found = r.exec( currentVersion );
+  if( found )
+  currentVersion = found[ 1 ];
+
+  return currentVersion.trim() || null;
+}
+
+var defaults = versionCurrentRetrive.defaults = Object.create( null );
+defaults.localPath = null;
+defaults.verbosity = 0;
+
+//
+
+function versionLatestRetrive( o )
+{
+  let self = this;
+  let path = self.path;
+
+  if( !_.mapIs( o ) )
+  o = { remotePath : o }
+
+  _.routineOptions( versionLatestRetrive, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( !!self.hub );
+
+  let parsed = self.pathParse( o.remotePath );
+  let shell = _.sheller
+  ({
+    verbosity : self.verbosity - 1,
+    sync : 1,
+    deasync : 0,
+    outputCollecting : 1,
+  });
+
+  let got = shell( 'git ls-remote ' + parsed.longerRemoteVcsPath );
+  let latestVersion = /([0-9a-f]+)\s+HEAD/.exec( got.output );
+  if( !latestVersion || !latestVersion[ 1 ] )
+  return null;
+
+  latestVersion = latestVersion[ 1 ];
+
+  return latestVersion;
+}
+
+var defaults = versionLatestRetrive.defaults = Object.create( null );
+defaults.remotePath = null;
+defaults.verbosity = 0;
+
+//
+
+function isUpToDate( o )
+{
+  let self = this;
+  let path = self.path;
+
+  _.routineOptions( isUpToDate, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( !!self.hub );
+
+  let srcCurrentPath;
+  let localProvider = self.hub.providerForPath( o.localPath );
+  let parsed = self.pathParse( o.remotePath );
+  let ready = _.Consequence().take( null );
+
+  let shell = _.sheller
+  ({
+    verbosity : o.verbosity - 1,
+    ready : ready,
+    currentPath : o.localPath,
+  });
+
+  let shellAll = _.sheller
+  ({
+    verbosity : o.verbosity - 1,
+    ready : ready,
+    currentPath : o.localPath,
+    throwingExitCode : 0,
+    outputCollecting : 1,
+  });
+
+  _.assert( localProvider instanceof _.FileProvider.HardDrive || localProvider.originalFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
+
+  if( !localProvider.fileExists( o.localPath ) )
+  return false;
+
+  let gitConfigExists = localProvider.fileExists( path.join( o.localPath, '.git' ) );
+
+  if( !gitConfigExists )
+  return false;
+
+  if( gitConfigExists )
+  ready
+  .got( () => GitConfig( localProvider.path.nativize( o.localPath ), ready.tolerantCallback() ) )
+  .ifNoErrorThen( function( arg )
+  {
+    if( !arg.remote || !arg.remote.origin || !_.strIs( arg.remote.origin.url ) )
+    return false;
+
+    srcCurrentPath = arg.remote.origin.url;
+
+    if( !_.strEnds( srcCurrentPath, parsed.remoteVcsPath ) )
+    return false;
+
+    return true;
+  });
+
+  shell( 'git fetch origin' );
+
+  ready.finally( ( err, arg ) =>
+  {
+    if( err )
+    throw _.err( err );
+    return null;
+  });
+
+  shellAll
+  ([
+    // 'git diff origin/master --quiet --exit-code',
+    // 'git diff --quiet --exit-code',
+    // 'git branch -v',
+    'git status',
+  ]);
+
+  ready
+  .ifNoErrorThen( function( arg )
+  {
+    _.assert( arg.length === 2 );
+
+    let result = !_.strHas( arg[ 0 ].output, 'Your branch is behind' );
+
+    if( o.verbosity )
+    self.logger.log( o.remotePath, result ? 'is up to date' : 'is not up to date' );
+
+    return result;
+  })
+
+  ready
+  .finally( function( err, arg )
+  {
+    if( err )
+    throw _.err( err );
+    return arg;
+  });
+
+  return ready.split();
+}
+
+var defaults = isUpToDate.defaults = Object.create( null );
+defaults.localPath = null;
+defaults.remotePath = null;
+defaults.verbosity = 0;
+
+//
+
+function isDownloaded( o )
+{
+  let self = this;
+  let path = self.path;
+
+  _.routineOptions( isDownloaded, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( !!self.hub );
+
+  let srcCurrentPath;
+  let localProvider = self.hub.providerForPath( o.localPath );
+  let result = false;
+
+  _.assert( localProvider instanceof _.FileProvider.HardDrive || localProvider.originalFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
+
+  if( !localProvider.fileExists( o.localPath ) )
+  return false;
+
+  let gitConfigExists = localProvider.fileExists( path.join( o.localPath, '.git' ) );
+
+  if( !gitConfigExists )
+  return false;
+
+  if( gitConfigExists )
+  {
+    if( !localProvider.isTerminal( path.join( o.localPath, '.git/config' ) ) )
+    return false;
+  }
+
+  return true;
+}
+
+var defaults = isDownloaded.defaults = Object.create( null );
+defaults.localPath = null;
+defaults.verbosity = 0;
+
+// --
+// etc
+// --
 
 function filesReflectSingle_body( o )
 {
@@ -154,7 +428,7 @@ function filesReflectSingle_body( o )
 
   /* */
 
-  let dstFileProvider = o.dstFilter.providerForPath();
+  let localProvider = o.dstFilter.providerForPath();
   let srcPath = o.srcPath;
   let dstPath = o.dstPath;
   let srcCurrentPath;
@@ -166,26 +440,18 @@ function filesReflectSingle_body( o )
     srcPath = _.mapKeys( srcPath )[ 0 ];
   }
 
-  let paths = self.pathParse( srcPath );
+  let parsed = self.pathParse( srcPath );
 
   /* */
 
-  _.sure( _.strDefined( paths.stripped ) );
-  _.sure( _.strDefined( paths.compact ) );
-  _.sure( _.strDefined( paths.hash ) );
+  _.sure( _.strDefined( parsed.remoteVcsPath ) );
+  _.sure( _.strDefined( parsed.longerRemoteVcsPath ) );
+  _.sure( _.strDefined( parsed.hash ) );
   _.sure( _.strIs( dstPath ) );
-  _.assert( dstFileProvider instanceof _.FileProvider.HardDrive || dstFileProvider.originalFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
+  _.assert( localProvider instanceof _.FileProvider.HardDrive || localProvider.originalFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
   _.sure( !o.srcFilter || !o.srcFilter.hasFiltering(), 'Does not support filtering, but {o.srcFilter} is not empty' );
   _.sure( !o.dstFilter || !o.dstFilter.hasFiltering(), 'Does not support filtering, but {o.dstFilter} is not empty' );
   _.sure( !o.filter || !o.filter.hasFiltering(), 'Does not support filtering, but {o.filter} is not empty' );
-
-  /* log */
-
-  // logger.log( '' );
-  // logger.log( 'srcPath', srcPath );
-  // logger.log( 'srcStrippedPath', srcStrippedPath );
-  // logger.log( 'dstPath', dstPath );
-  // logger.log( '' );
 
   /* */
 
@@ -206,16 +472,25 @@ function filesReflectSingle_body( o )
     outputCollecting : 1,
   });
 
-  if( !dstFileProvider.fileExists( dstPath ) )
-  dstFileProvider.dirMake( dstPath );
+  if( !localProvider.fileExists( dstPath ) )
+  localProvider.dirMake( dstPath );
 
-  let gitConfigExists = dstFileProvider.fileExists( path.join( dstPath, '.git' ) );
+  let gitConfigExists = localProvider.fileExists( path.join( dstPath, '.git' ) );
 
   /* already have repository here */
 
+  // !!! : remove GitConfig
+  // if( gitConfigExists )
+  // {
+  //   debugger;
+  //   let read = localProvider.fileRead( path.join( dstPath, '.git/config' ) );
+  //   let config = Ini.parse( read );
+  //   debugger;
+  // }
+
   if( gitConfigExists )
   ready
-  .got( () => GitConfig( dstFileProvider.path.nativize( dstPath ), ready.tolerantCallback() ) )
+  .got( () => GitConfig( localProvider.path.nativize( dstPath ), ready.tolerantCallback() ) )
   .ifNoErrorThen( function( arg )
   {
 
@@ -229,10 +504,10 @@ function filesReflectSingle_body( o )
 
     _.sure
     (
-      _.strEnds( srcCurrentPath, paths.stripped ),
+      _.strEnds( _.strRemoveEnd( srcCurrentPath, '/' ), _.strRemoveEnd( parsed.remoteVcsPath, '/' ) ),
       () => 'GIT repository at directory ' + _.strQuote( dstPath ) + '\n' +
       'Has origin ' + _.strQuote( srcCurrentPath ) + '\n' +
-      'Should have ' + _.strQuote( paths.compact )
+      'Should have ' + _.strQuote( parsed.longerRemoteVcsPath )
     );
 
     return arg || null;
@@ -243,8 +518,8 @@ function filesReflectSingle_body( o )
   if( !gitConfigExists )
   {
     /* !!! delete dst dir maybe */
-    if( !dstFileProvider.fileExists( path.join( dstPath, '.git' ) ) )
-    shell( 'git clone ' + paths.compact + ' ' + '.' );
+    if( !localProvider.fileExists( path.join( dstPath, '.git' ) ) )
+    shell( 'git clone ' + parsed.longerRemoteVcsPath + ' ' + '.' );
   }
   else
   {
@@ -281,8 +556,8 @@ function filesReflectSingle_body( o )
 
     if( localChanges )
     shell( 'git stash' );
-    shell( 'git checkout ' + paths.hash );
-    if( paths.hash.length < 7 || !_.strIsHex( paths.hash ) ) /* qqq : probably does not work for all cases */
+    shell( 'git checkout ' + parsed.hash );
+    if( parsed.hash.length < 7 || !_.strIsHex( parsed.hash ) ) /* qqq : probably does not work for all cases */
     shell( 'git merge' );
     if( localChanges )
     shell({ path : 'git stash pop', throwingExitCode : 0 });
@@ -309,7 +584,7 @@ function filesReflectSingle_body( o )
   function recordsMake()
   {
     /* xxx : fast solution to return records instead of empty array */
-    o.result = dstFileProvider.filesReflectEvaluate
+    o.result = localProvider.filesReflectEvaluate
     ({
       srcPath : dstPath,
       dstPath : dstPath,
@@ -327,176 +602,6 @@ extra.fetching = 1;
 var defaults = filesReflectSingle_body.defaults;
 let filesReflectSingle = _.routineFromPreAndBody( _.FileProvider.Find.prototype.filesReflectSingle.pre, filesReflectSingle_body );
 
-//
-
-function isUpToDate( o )
-{
-  let self = this;
-  let path = self.path;
-
-  _.routineOptions( isUpToDate, o );
-  _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( !!self.hub );
-
-  let srcCurrentPath;
-  let dstFileProvider = self.hub.providerForPath( o.localPath );
-  let paths = self.pathParse( o.remotePath );
-  let ready = _.Consequence().take( null );
-
-  let shell = _.sheller
-  ({
-    verbosity : o.verbosity - 1,
-    ready : ready,
-    currentPath : o.localPath,
-  });
-
-  let shellAll = _.sheller
-  ({
-    verbosity : o.verbosity - 1,
-    ready : ready,
-    currentPath : o.localPath,
-    throwingExitCode : 0,
-    outputCollecting : 1,
-  });
-
-  _.assert( dstFileProvider instanceof _.FileProvider.HardDrive || dstFileProvider.originalFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
-
-  if( !dstFileProvider.fileExists( o.localPath ) )
-  return false;
-
-  let gitConfigExists = dstFileProvider.fileExists( path.join( o.localPath, '.git' ) );
-
-  if( !gitConfigExists )
-  return false;
-
-  if( gitConfigExists )
-  ready
-  .got( () => GitConfig( dstFileProvider.path.nativize( o.localPath ), ready.tolerantCallback() ) )
-  .ifNoErrorThen( function( arg )
-  {
-    if( !arg.remote || !arg.remote.origin || !_.strIs( arg.remote.origin.url ) )
-    return false;
-
-    srcCurrentPath = arg.remote.origin.url;
-
-    if( !_.strEnds( srcCurrentPath, paths.stripped ) )
-    return false;
-
-    return true;
-  });
-
-  shell( 'git fetch origin' );
-
-  ready.finally( ( err, arg ) =>
-  {
-    // console.log( 'isUpToDate:1' );
-    if( err )
-    throw _.err( err );
-    return null;
-  });
-
-  shellAll
-  ([
-    // 'git diff origin/master --quiet --exit-code',
-    // 'git diff --quiet --exit-code',
-    // 'git branch -v',
-    'git status',
-  ]);
-
-  ready
-  .ifNoErrorThen( function( arg )
-  {
-    _.assert( arg.length === 2 );
-
-    // self.logger.log( o.remotePath, arg[ 0 ].output );
-
-    let result = !_.strHas( arg[ 0 ].output, 'Your branch is behind' );
-
-    if( o.verbosity )
-    self.logger.log( o.remotePath, result ? 'is up to date' : 'is not up to date' );
-
-    return result;
-  })
-
-  ready
-  .finally( function( err, arg )
-  {
-    if( err )
-    throw _.err( err );
-    return arg;
-  });
-
-  return ready.split();
-}
-
-var defaults = isUpToDate.defaults = Object.create( null );
-
-defaults.localPath = null;
-defaults.remotePath = null;
-defaults.verbosity = 0;
-
-//
-
-function isDownloaded( o )
-{
-  let self = this;
-  let path = self.path;
-
-  _.routineOptions( isUpToDate, o );
-  _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( !!self.hub );
-
-  // logger.log( 'isDownloaded:begin' );
-
-  let srcCurrentPath;
-  let dstFileProvider = self.hub.providerForPath( o.localPath );
-  let paths = self.pathParse( o.remotePath );
-  let result = _.Consequence().take( null );
-
-  _.assert( dstFileProvider instanceof _.FileProvider.HardDrive || dstFileProvider.originalFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
-
-  if( !dstFileProvider.fileExists( o.localPath ) )
-  return false;
-
-  let gitConfigExists = dstFileProvider.fileExists( path.join( o.localPath, '.git' ) );
-
-  if( !gitConfigExists )
-  return false;
-
-  if( gitConfigExists )
-  result
-  .got( () => GitConfig( dstFileProvider.path.nativize( o.localPath ), result.tolerantCallback() ) )
-  .ifNoErrorThen( function( arg )
-  {
-    if( !arg.remote || !arg.remote.origin || !_.strIs( arg.remote.origin.url ) )
-    return false;
-
-    srcCurrentPath = arg.remote.origin.url;
-
-    if( !_.strEnds( srcCurrentPath, paths.stripped ) )
-    return false;
-
-    return true;
-  });
-
-  result
-  .finally( function( err, arg )
-  {
-    // logger.log( 'isDownloaded:end' );
-    if( err )
-    throw _.err( err );
-    return arg;
-  });
-
-  return result.split();
-}
-
-var defaults = isUpToDate.defaults = Object.create( null );
-
-defaults.localPath = null;
-defaults.remotePath = null;
-defaults.verbosity = 0;
-
 // --
 // relationship
 // --
@@ -510,6 +615,7 @@ let Composes =
   resolvingSoftLink : 0,
   resolvingTextLink : 0,
   limitedImplementation : 1,
+  isVcs : 1,
   usingGlobalPath : 1,
 
 }
@@ -547,17 +653,19 @@ let Proto =
   finit,
   init,
 
-  // path
+  // vcs
 
-  // localFromGlobal,
-  pathIsolateGlobalAndLocal,
   pathParse,
+  pathIsFixated,
+  pathFixate,
+  versionCurrentRetrive,
+  versionLatestRetrive,
+  isUpToDate,
+  isDownloaded,
 
   // etc
 
   filesReflectSingle,
-  isUpToDate,
-  isDownloaded,
 
   //
 

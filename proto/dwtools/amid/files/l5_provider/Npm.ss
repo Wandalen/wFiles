@@ -1,6 +1,6 @@
 ( function _Npm_ss_( ) {
 
-'use strict'; 
+'use strict';
 
 if( typeof module !== 'undefined' )
 {
@@ -48,31 +48,274 @@ function init( o )
 // path
 // --
 
-// function localFromGlobal( uri )
-// {
-//   let self = this;
-//   let path = self.path;
-//   return path.str( uri );
-// }
-
-//
-
-function pathIsolateGlobalAndLocal( longPath )
+function pathParse( remotePath )
 {
   let self = this;
   let path = self.path;
-  return [ longPath, '' ]
+  let result = Object.create( null );
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( remotePath ) );
+  _.assert( path.isGlobal( remotePath ) )
+
+  /* */
+
+  let parsed1 = path.parseConsecutive( remotePath );
+  _.mapExtend( result, parsed1 );
+
+  let p = pathIsolateGlobalAndLocal( parsed1.longPath );
+  result.localVcsPath = p[ 1 ];
+
+  /* */
+
+  let parsed2 = _.mapExtend( null, parsed1 );
+  parsed2.protocol = null;
+  parsed2.hash = null;
+  parsed2.longPath = p[ 0 ];
+  result.remoteVcsPath = path.str( parsed2 );
+
+  /* */
+
+  let parsed3 = _.mapExtend( null, parsed1 );
+  parsed3.longPath = parsed2.longPath;
+  parsed3.protocol = null;
+  parsed3.hash = null;
+  result.longerRemoteVcsPath = path.str( parsed3 );
+  if( parsed1.hash )
+  result.longerRemoteVcsPath += '@' + parsed1.hash;
+
+  /* */
+
+  return result
+
+/*
+
+  remotePath : 'npm:///wColor/out/wColor#0.3.100'
+
+  protocol : 'npm',
+  hash : '0.3.100',
+  longPath : '/wColor/out/wColor',
+  localVcsPath : 'out/wColor',
+  remoteVcsPath : 'wColor',
+  longerRemoteVcsPath : 'wColor@0.3.100'
+
+*/
+
+  /* */
+
+  function pathIsolateGlobalAndLocal( longPath )
+  {
+    let parsed = path.parseConsecutive( longPath );
+    let splits = _.strIsolateLeftOrAll( parsed.longPath, /^\/?\w+\/?/ );
+    parsed.longPath = _.strRemoveEnd( _.strRemoveBegin( splits[ 1 ], '/' ), '/' );
+    let globalPath = path.str( parsed );
+    return [ globalPath, splits[ 2 ] ];
+  }
+
 }
 
 //
 
-function pathCurrentAct()
+function pathIsFixated( filePath )
 {
   let self = this;
-  return self.path._rootStr;
+  let path = self.path;
+  let parsed = self.pathParse( filePath );
+
+  if( !parsed.hash )
+  return false;
+
+  return true;
 }
 
 //
+
+function pathFixate( o )
+{
+  let self = this;
+  let path = self.path;
+
+  if( !_.mapIs( o ) )
+  o = { remotePath : o }
+  _.routineOptions( pathFixate, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+
+  let parsed = self.pathParse( o.remotePath );
+  let latestVersion = self.versionLatestRetrive
+  ({
+    remotePath : o.remotePath,
+    verbosity : o.verbosity,
+  });
+
+  let result = path.str
+  ({
+    protocol : parsed.protocol,
+    longPath : parsed.longPath,
+    hash : latestVersion,
+  });
+
+  return result;
+}
+
+var defaults = pathFixate.defaults = Object.create( null );
+defaults.remotePath = null;
+defaults.verbosity = 0;
+
+//
+
+function versionCurrentRetrive( o )
+{
+  let self = this;
+  let path = self.path;
+
+  if( !_.mapIs( o ) )
+  o = { localPath : o }
+
+  _.routineOptions( versionCurrentRetrive, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( !!self.hub );
+
+  if( !self.isDownloaded( o ) )
+  return false;
+
+  let localProvider = self.hub.providerForPath( o.localPath );
+
+  _.assert( localProvider instanceof _.FileProvider.HardDrive || localProvider.originalFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
+
+  let currentVersion;
+  try
+  {
+    let read = localProvider.fileRead({ filePath : path.join( o.localPath, 'package.json' ), encoding : 'json' });
+    currentVersion = read.version;
+  }
+  catch( err )
+  {
+    debugger;
+    return null;
+  }
+
+  return currentVersion || null;
+}
+
+var defaults = versionCurrentRetrive.defaults = Object.create( null );
+defaults.localPath = null;
+defaults.verbosity = 0;
+
+//
+
+function versionLatestRetrive( o )
+{
+  let self = this;
+  let path = self.path;
+
+  if( !_.mapIs( o ) )
+  o = { remotePath : o }
+
+  _.routineOptions( versionLatestRetrive, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( !!self.hub );
+
+  let parsed = self.pathParse( o.remotePath );
+  let shell = _.sheller
+  ({
+    verbosity : o.verbosity - 1,
+    outputCollecting : 1,
+    sync : 1,
+    deasync : 0,
+  });
+
+  let got = shell( 'npm show ' + parsed.remoteVcsPath );
+  let latestVersion = /latest.*?:.*?([0-9\.][0-9\.][0-9\.]+)/.exec( got.output );
+
+  if( !latestVersion )
+  {
+    debugger;
+    throw _.err( 'Failed to get information about NPM package', parsed.remoteVcsPath );
+  }
+
+  latestVersion = latestVersion[ 1 ];
+
+  return latestVersion;
+}
+
+var defaults = versionLatestRetrive.defaults = Object.create( null );
+defaults.remotePath = null;
+defaults.verbosity = 0;
+
+//
+
+function isUpToDate( o )
+{
+  let self = this;
+  let path = self.path;
+
+  _.routineOptions( isUpToDate, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( !!self.hub );
+
+  let parsed = self.pathParse( o.remotePath );
+
+  let currentVersion = self.versionCurrentRetrive
+  ({
+    localPath : o.localPath,
+    verbosity : o.verbosity,
+  });
+
+  if( !currentVersion )
+  return false;
+
+  if( parsed.hash === currentVersion )
+  return true;
+
+  let latestVersion = self.versionLatestRetrive
+  ({
+    remotePath : o.remotePath,
+    verbosity : o.verbosity,
+  });
+
+  return currentVersion === latestVersion;
+}
+
+var defaults = isUpToDate.defaults = Object.create( null );
+defaults.localPath = null;
+defaults.remotePath = null;
+defaults.verbosity = 0;
+
+//
+
+function isDownloaded( o )
+{
+  let self = this;
+  let path = self.path;
+
+  _.routineOptions( isDownloaded, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( !!self.hub );
+
+  let srcCurrentPath;
+  let localProvider = self.hub.providerForPath( o.localPath );
+
+  _.assert( localProvider instanceof _.FileProvider.HardDrive || localProvider.originalFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
+
+  if( !localProvider.fileExists( o.localPath ) )
+  return false;
+
+  // if( !localProvider.isDir( path.join( o.localPath, 'node_modules' ) ) )
+  // return false;
+
+  if( !localProvider.isTerminal( path.join( o.localPath, 'package.json' ) ) )
+  return false;
+
+  return true;
+}
+
+var defaults = isDownloaded.defaults = Object.create( null );
+defaults.localPath = null;
+defaults.verbosity = 0;
+
+// --
+// etc
+// --
 
 function filesReflectSingle_body( o )
 {
@@ -96,21 +339,8 @@ function filesReflectSingle_body( o )
   _.assert( o.srcFilter.formed === 5 );
   _.assert( o.dstFilter.formed === 5 );
   _.assert( o.srcFilter.filePath === o.srcPath );
-  // _.assert( o.dstFilter.filePath === o.dstPath );
   _.assert( o.filter === null || !o.filter.hasFiltering(), 'Not supported options' );
   _.assert( !!o.recursive, 'Not supported options' );
-
-  // o.onWriteDstUp = _.routinesCompose( o.onWriteDstUp );
-  // o.onWriteDstDown = _.routinesCompose( o.onWriteDstDown );
-  // o.onWriteSrcUp = _.routinesCompose( o.onWriteSrcUp );
-  // o.onWriteSrcDown = _.routinesCompose( o.onWriteSrcDown );
-  //
-  // if( !_.arrayIs( o.onUp ) )
-  // o.onUp = o.onUp ? [ o.onUp ] : [];
-  // if( !_.arrayIs( o.onDown ) )
-  // o.onDown = o.onDown ? [ o.onDown ] : [];
-  // if( o.result === null )
-  // o.result = [];
 
   defaults.dstRewriting = 1;
   defaults.dstRewritingByDistinct = 1;
@@ -118,8 +348,7 @@ function filesReflectSingle_body( o )
 
   /* */
 
-  // o.dstFilter.inFilePath = o.dstPath;
-  let dstFileProvider = o.dstFilter.providerForPath();
+  let localProvider = o.dstFilter.providerForPath();
   let srcPath = o.srcPath;
   let dstPath = o.dstPath;
 
@@ -130,112 +359,89 @@ function filesReflectSingle_body( o )
     srcPath = _.mapKeys( srcPath )[ 0 ];
   }
 
-  let srcCurrentPath, parsed;
-  let srcOriginalPath = srcPath;
-  let srcParsed = path.parseConsecutive( srcPath );
-  srcParsed.hash = srcParsed.hash || 'master';
-
-  parsed = _.mapExtend( null, srcParsed );
-  parsed.protocol = null;
-  parsed.hash = null;
-  let srcStrippedPath = path.str( parsed );
-
-  parsed = _.mapExtend( null, srcParsed );
-  parsed.protocols = null;
-  parsed.protocol = null;
-  parsed.hash = null;
-  srcPath = path.relative( '/', path.str( parsed ) );
+  let parsed = self.pathParse( srcPath );
 
   /* */
 
   _.sure( _.strIs( srcPath ) );
   _.sure( _.strIs( dstPath ) );
-  _.assert( dstFileProvider instanceof _.FileProvider.HardDrive || dstFileProvider.originalFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
+  _.assert( localProvider instanceof _.FileProvider.HardDrive || localProvider.originalFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
   _.sure( !o.srcFilter || !o.srcFilter.hasFiltering(), 'Does not support filtering, but {o.srcFilter} is not empty' );
   _.sure( !o.dstFilter || !o.dstFilter.hasFiltering(), 'Does not support filtering, but {o.dstFilter} is not empty' );
   _.sure( !o.filter || !o.filter.hasFiltering(), 'Does not support filtering, but {o.filter} is not empty' );
-
-  /* log */
-
-  // logger.log( '' );
-  // logger.log( 'srcPath', srcPath );
-  // logger.log( 'srcStrippedPath', srcStrippedPath );
-  // logger.log( 'dstPath', dstPath );
-  // logger.log( '' );
 
   /* */
 
   let result = [];
   let shell = _.sheller
   ({
-    verbosity : o.verbosity >= 3 ? 1 : 0,
+    verbosity : o.verbosity - 1,
+    sync : 1,
+    deasync : 0,
+    outputCollecting : 1,
   });
 
-  if( !dstFileProvider.fileExists( path.dir( dstPath ) ) )
-  dstFileProvider.dirMake( path.dir( dstPath ) );
+  if( !localProvider.fileExists( path.dir( dstPath ) ) )
+  localProvider.dirMake( path.dir( dstPath ) );
 
-  let exists = dstFileProvider.fileExists( dstPath );
-  let isDir = dstFileProvider.isDir( dstPath );
+  let exists = localProvider.fileExists( dstPath );
+  let isDir = localProvider.isDir( dstPath );
   if( exists && !isDir )
-  throw occupiedErr;
+  throw occupiedErr();
+
+  /* */
 
   if( exists )
   {
-    if( dstFileProvider.dirRead( dstPath ).length === 0 )
+    if( localProvider.dirRead( dstPath ).length === 0 )
     {
-      dstFileProvider.fileDelete( dstPath );
+      localProvider.fileDelete( dstPath );
       exists = false;
     }
   }
 
-  if( !exists )
+  if( exists )
   {
 
-    let tmpPath = dstPath + '-' + _.idWithGuid();
-    let tmpEssentialPath = path.join( tmpPath, 'node_modules', srcPath );
-    result = shell( 'npm install --prefix ' + dstFileProvider.path.nativize( tmpPath ) + ' ' + srcPath )
-    result.ifNoErrorThen( ( arg ) => dstFileProvider.fileRename( dstPath, tmpEssentialPath ) );
-    result.ifNoErrorThen( ( arg ) => dstFileProvider.fileDelete( path.dir( tmpEssentialPath ) ) || null );
-    result.ifNoErrorThen( ( arg ) => dstFileProvider.fileDelete( path.dir( path.dir( tmpEssentialPath ) ) ) || null );
-
-    /* handle error if any */
-
-    result
-    .finally( function( err, arg )
-    {
-      if( err )
-      throw _.err( err );
-      debugger;
-      return recordsMake();
-    });
-
-  }
-  else
-  {
     let packageFilePath = path.join( dstPath, 'package.json' );
-    if( !dstFileProvider.isTerminal( packageFilePath ) )
-    throw occupiedErr();
+    if( !localProvider.isTerminal( packageFilePath ) )
+    throw occupiedErr( '. Directory is occupied!' );
+
     try
     {
-      let read = dstFileProvider.fileRead({ filePath : packageFilePath, encoding : 'json' });
-      if( !read || read.name !== srcPath )
-      throw _.err( occupiedErr );
+      let read = localProvider.fileRead({ filePath : packageFilePath, encoding : 'json' });
+      if( !read || read.name !== parsed.remoteVcsPath )
+      throw _.err( 'Directory is occupied!' );
     }
     catch( err )
     {
-      throw _.err( occupiedErr, err );
+      throw _.err( occupiedErr( '' ), err );
     }
-    result = recordsMake();
+
+    localProvider.filesDelete( dstPath );
+
   }
 
-  return result;
+  /* */
+
+  let tmpPath = dstPath + '-' + _.idWithGuid();
+  let tmpEssentialPath = path.join( tmpPath, 'node_modules', parsed.remoteVcsPath );
+  let got = shell( 'npm install --prefix ' + localProvider.path.nativize( tmpPath ) + ' ' + parsed.longerRemoteVcsPath )
+
+  _.assert( got.exitCode === 0 );
+
+  localProvider.fileRename( dstPath, tmpEssentialPath )
+  localProvider.fileDelete( path.dir( tmpEssentialPath ) );
+  localProvider.fileDelete( path.dir( path.dir( tmpEssentialPath ) ) );
+
+  return recordsMake();
 
   /* */
 
   function recordsMake()
   {
     /* xxx : fast solution to return some records instead of empty arrray */
-    o.result = dstFileProvider.filesReflectEvaluate
+    o.result = localProvider.filesReflectEvaluate
     ({
       srcPath : dstPath,
       dstPath : dstPath,
@@ -245,9 +451,10 @@ function filesReflectSingle_body( o )
 
   /* */
 
-  function occupiedErr()
+  function occupiedErr( msg )
   {
-    return _.err( 'Cant download NPM package to', _.strQuote( dstPath ), 'it is occupied' )
+    debugger;
+    return _.err( 'Cant download NPM package ' + _.color.strFormat( parsed.longerRemoteVcsPath, 'path' ) + ' to ' + _.color.strFormat( dstPath, 'path' ) + ( msg || '' ) )
   }
 
 }
@@ -271,6 +478,8 @@ let Composes =
   resolvingSoftLink : 0,
   resolvingTextLink : 0,
   limitedImplementation : 1,
+  isVcs : 1,
+  usingGlobalPath : 1,
 
 }
 
@@ -284,8 +493,6 @@ let Associates =
 
 let Restricts =
 {
-  // claimMap : _.define.own({}),
-  // claimProvider : null,
 }
 
 let Statics =
@@ -307,11 +514,16 @@ let Proto =
   finit,
   init,
 
-  // path
 
-  // localFromGlobal,
-  pathIsolateGlobalAndLocal,
-  pathCurrentAct,
+  // vcs
+
+  pathParse,
+  pathIsFixated,
+  pathFixate,
+  versionCurrentRetrive,
+  versionLatestRetrive,
+  isUpToDate,
+  isDownloaded,
 
   // etc
 
@@ -348,9 +560,9 @@ _.FileProvider[ Self.shortName ] = Self;
 // export
 // --
 
-if( typeof module !== 'undefined' )
-if( _global_.WTOOLS_PRIVATE )
-{ /* delete require.cache[ module.id ]; */ }
+// if( typeof module !== 'undefined' )
+// if( _global_.WTOOLS_PRIVATE )
+// { /* delete require.cache[ module.id ]; */ }
 
 if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = Self;

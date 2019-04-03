@@ -61,7 +61,7 @@ _.assert( _.routineIs( _.FileRecord ) );
  * @throws {Error} if passed more than one argument.
  * @see {@link wTools~RegexpObject} RegexpObject
  * @method regexpMakeSafe
- * @memberof wTools
+ * @memberof module:Tools/mid/Files
  */
 
 function regexpMakeSafe( mask )
@@ -107,7 +107,7 @@ function regexpMakeSafe( mask )
  * @throws {Error} If passed extra arguments
  * @throws {Error} If missed `PathFiile`
  * @method _fileOptionsGet
- * @memberof wTools
+ * @memberof module:Tools/mid/Files
  */
 
 function _fileOptionsGet( filePath,o )
@@ -160,7 +160,7 @@ function _fileOptionsGet( filePath,o )
  * @returns {string|File.Stats}
  * @throws {Error} if type of one of arguments is not string/file.Stats
  * @method filesNewer
- * @memberof wTools
+ * @memberof module:Tools/mid/Files
  */
 
 function filesNewer( dst,src )
@@ -224,7 +224,7 @@ function filesNewer( dst,src )
  * @returns {string|File.Stats}
  * @throws {Error} if type of one of arguments is not string/file.Stats
  * @method filesOlder
- * @memberof wTools
+ * @memberof module:Tools/mid/Files
  */
 
 function filesOlder( dst,src )
@@ -280,7 +280,7 @@ function filesOlder( dst,src )
    * @throws {Error} If count of arguments are different from one.
    * @throws {Error} If `src` is not absolute path or FileRecord.
    * @method filesSpectre
-   * @memberof wTools
+   * @memberof module:Tools/mid/Files
    */
 
 function filesSpectre( src )
@@ -321,7 +321,7 @@ function filesSpectre( src )
    * @param {Function} [onReady]
    * @returns {number}
    * @method filesSimilarity
-   * @memberof wTools
+   * @memberof module:Tools/mid/Files
    */
 
 function filesSimilarity( o )

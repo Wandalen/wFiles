@@ -3315,19 +3315,25 @@ function filesReflect_body( o )
 
   function end()
   {
+
     if( o.mandatory )
     if( !o.result.length )
     {
-      debugger;
-      throw _.err( 'No file moved\n', _.toStr( o.reflectMap, { levels : 2, multiline : 1, wrap : 0 } ) );
+      let srcFilter = o.srcFilter.cloneBoth();
+      srcFilter.form();
+      srcFilter.dstFilter.form();
+      let src = srcFilter.filePathSrcCommon();
+      let dst = srcFilter.dstFilter.filePathDstCommon();
+      throw _.err( 'Error. No file moved :', path.moveReport( dst, src ) );
     }
 
     if( o.verbosity >= 1 )
     {
-      let srcFilter = o.srcFilter.clone().form();
-      let dstFilter = o.dstFilter.clone().form();
+      let srcFilter = o.srcFilter.cloneBoth();
+      srcFilter.form();
+      srcFilter.dstFilter.form();
       let src = srcFilter.filePathSrcCommon();
-      let dst = dstFilter.filePathDstCommon();
+      let dst = srcFilter.dstFilter.filePathDstCommon();
       self.logger.log( ' + Reflect ' + o.result.length + ' files ' + path.moveReport( dst, src ) + ' in ' + _.timeSpent( time ) );
     }
 

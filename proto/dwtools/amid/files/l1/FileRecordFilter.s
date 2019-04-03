@@ -71,6 +71,33 @@ function copy( src )
   return result;
 }
 
+//
+
+function cloneBoth()
+{
+  let filter = this;
+
+  let result = filter.clone();
+
+  if( filter.srcFilter )
+  {
+    result.srcFilter = filter.srcFilter.clone();
+    result.srcFilter.pairWithDst( result );
+    result.srcFilter.pairRefineLight();
+    return result;
+  }
+
+  if( filter.dstFilter )
+  {
+    result.dstFilter = filter.dstFilter.clone();
+    result.pairWithDst( result.dstFilter );
+    result.pairRefineLight();
+    return result;
+  }
+
+  return result;
+}
+
 // --
 // former
 // --
@@ -3138,6 +3165,7 @@ let Extend =
   TollerantFrom,
   init,
   copy,
+  cloneBoth,
 
   // former
 

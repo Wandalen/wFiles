@@ -28,6 +28,11 @@ _.assert( _.routineIs( fileRead ) );
 
 //
 
+/**
+ @class wFileProviderSecondary
+ @memberof module:Tools/mid/Files
+*/
+
 let Parent = null;
 let Self = function wFileProviderSecondary( o )
 {
@@ -460,7 +465,7 @@ having.driving = 0;
  * @returns {boolean}
  * @throws {Error} If passed object has unexpected parameter.
  * @method filesAreUpToDate2
- * @memberof wTools
+ * @memberof module:Tools/mid/Files.wFileProviderSecondary
  */
 
 function filesAreUpToDate2( o )

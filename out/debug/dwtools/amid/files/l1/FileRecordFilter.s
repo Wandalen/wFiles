@@ -1201,11 +1201,6 @@ function pathsExtend2( src )
   if( !( src instanceof Self ) )
   src = fileProvider.recordFilter( src );
 
-  if( src.prefixPath === '/C/pro/web/Dave/git/trunk/builder/include/dwtools/atop/will.test/asset/submodules-mixed/.module/UriFundamentals/proto' )
-  debugger;
-  if( src.prefixPath === '/C/pro/web/Dave/git/trunk/builder/include/dwtools/atop/will.test/asset/submodules-mixed/.module/Proto/proto' )
-  debugger;
-
   // if( src.prefixPath )
   // src.prefixesApply();
   //
@@ -1354,12 +1349,6 @@ function pathsInherit( src )
   if( filter.filePath && src.filePath )
   {
 
-    // let dstArray = filter.filePathDstArrayGet().filter;
-    // if( !filter.filePathDstArrayGet().filter( ( e ) => _.boolLike( e ) ).length )
-
-    // debugger;
-    // let xxx = filter.filePathDstArrayGet();
-    // debugger;
     if( filter.filePathDstAllBools() )
     {
       if( filter.srcFilter && !_.mapIs( filter.srcFilter ) )
@@ -1370,7 +1359,6 @@ function pathsInherit( src )
     }
     else
     {
-      // debugger;
       let srcPath = filter.filePathSrcArrayGet();
       if( srcPath.length === 1 && srcPath[ 0 ] === '.' )
       {
@@ -1378,28 +1366,10 @@ function pathsInherit( src )
         let dstPath = filter.filePathDstArrayGet();
         if( !dstPath.length )
         dstPath = null;
-        filter.filePath = path.pathMapExtend( null, src.filePath, dstPath );
+        filter.filePath = path.pathMapExtend( null, src.filePathSrcArrayGet(), dstPath );
       }
 
-      // filter.filePath = path.pathMapExtend( null, filter.filePath, null );
-      // filter.filePath = path.pathMapExtend( filter.filePath, src.filePath, null );
     }
-
-    // let isDst = !!filter.srcFilter || !!src.srcFilter;
-    // if( ( _.mapIs( filter.filePath ) && _.mapIs( src.filePath ) ) || !isDst )
-    // {
-    //   filter.filePath = path.pathMapExtend( filter.filePath, src.filePath, null );
-    // }
-    // else if( !_.mapIs( src.filePath ) )
-    // {
-    //   debugger; xxx
-    //   filter.filePath = path.pathMapExtend( filter.filePath, filter.filePath, src.filePath );
-    // }
-    // else if( !_.mapIs( filter.filePath ) )
-    // {
-    //   // debugger;
-    //   filter.filePath = path.pathMapExtend( null, src.filePath, filter.filePath );
-    // }
 
   }
   else

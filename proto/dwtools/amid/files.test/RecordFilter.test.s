@@ -1142,11 +1142,30 @@ function prefixesRelative( test )
 
 //
 
-function inherit( test )
+function pathsExtend2( test )
 {
   let context = this;
   let provider = new _.FileProvider.Extract();
   let path = provider.path;
+
+  /* */
+
+  test.case = 'two strings';
+
+  var extract1 = _.FileProvider.Extract();
+
+  var f1 = extract1.recordFilter();
+  f1.filePath = '/a';
+
+  var f2 = extract1.recordFilter();
+  f2.filePath = '/b';
+
+  var f3 = extract1.recordFilter();
+  f3.pathsExtend2( f1 ).pathsExtend2( f2 );
+
+  test.identical( f3.prefixPath, null );
+  test.identical( f3.filePath, { '/a' : null } );
+  test.identical( f3.basePath, null );
 
   /* */
 
@@ -1171,7 +1190,7 @@ function inherit( test )
   f2.filePath = { 'f' : true, 'd' : true, 'ex' : false, 'f2' : true, 'd2' : true, 'ex2' : false, 'ex3' : false, 'ex4' : true }
 
   var f3 = extract1.recordFilter();
-  f3.pathsInherit( f1 ).pathsInherit( f2 );
+  f3.pathsExtend2( f1 ).pathsExtend2( f2 );
 
   var expectedFilePath =
   {
@@ -1230,7 +1249,7 @@ function inherit( test )
   f2.filePath = { 'f' : null, 'd' : null, 'ex' : false, 'f2' : null, 'd2' : null, 'ex2' : false, 'ex3' : false, 'ex4' : null }
 
   var f3 = extract1.recordFilter();
-  f3.pathsInherit( f1 ).pathsInherit( f2 );
+  f3.pathsExtend2( f1 ).pathsExtend2( f2 );
 
   var expectedFilePath =
   {
@@ -1283,6 +1302,245 @@ function inherit( test )
   var f2 = extract1.recordFilter();
   f2.prefixPath = '/commonDir';
   f2.filePath = { 'filter1/f' : 'out/dir' }
+  f1.pathsExtend2( f2 );
+  test.identical( f1.prefixPath, null );
+  test.identical( f1.basePath, null );
+  test.identical( f1.filePath, { '*exclude*' : 0, '/commonDir/filter1/f' : '/commonDir/out/dir' } );
+  test.identical( f2.prefixPath, null );
+  test.identical( f2.basePath, null );
+  test.identical( f2.filePath, { '/commonDir/filter1/f' : '/commonDir/out/dir' } );
+
+  var f3 = extract1.recordFilter();
+  f3.prefixPath = '/commonDir';
+  f3.filePath = { 'filter1/f' : 'out/dir' }
+  f1.pathsExtend2( f3 );
+  test.identical( f1.prefixPath, '/commonDir' );
+  test.identical( f1.basePath, null );
+  test.identical( f1.filePath, { '*exclude*' : 0, '/commonDir/filter1/f' : '/commonDir/out/dir', 'filter1/f' : 'out/dir' } );
+  test.identical( f3.prefixPath, '/commonDir' );
+  test.identical( f3.basePath, null );
+  test.identical( f3.filePath, { 'filter1/f' : 'out/dir' } );
+
+  var f4 = extract1.recordFilter();
+  f4.prefixPath = '/commonDir/filter1'
+  f4.filePath = { 'f' : 'out/dir' }
+  f1.pathsExtend2( f4 );
+  test.identical( f1.prefixPath, null );
+  test.identical( f1.basePath, null );
+  test.identical( f1.filePath, { '*exclude*' : 0, '/commonDir/filter1/f' : [ '/commonDir/out/dir', '/commonDir/filter1/out/dir' ] } );
+  test.identical( f4.prefixPath, null );
+  test.identical( f4.basePath, null );
+  test.identical( f4.filePath, { '/commonDir/filter1/f' : '/commonDir/filter1/out/dir' } );
+
+  var f5 = extract1.recordFilter();
+  f5.filePath = { '/commonDir/filter1/f' : '/commonDir/out/dir' }
+  f1.pathsExtend2( f5 );
+  test.identical( f1.prefixPath, null );
+  test.identical( f1.basePath, null );
+  test.identical( f1.filePath, { '*exclude*' : 0, '/commonDir/filter1/f' : [ '/commonDir/out/dir', '/commonDir/filter1/out/dir' ] } );
+  test.identical( f5.prefixPath, null );
+  test.identical( f5.basePath, null );
+  test.identical( f5.filePath, { '/commonDir/filter1/f' : '/commonDir/out/dir' } );
+
+}
+
+//
+
+function pathsInherit( test )
+{
+  let context = this;
+  let provider = new _.FileProvider.Extract();
+  let path = provider.path;
+
+/*
+﻿
+filter.toStr()
+"Filter
+  filePath : {
+  . : [ '/C/pro/web/Dave/git/' ... '-exports-doc/doc.out' ]
+}"
+src.toStr()
+"Filter
+  filePath : { /C/pro/web/Dave/git/trunk/builder/include/dwtools/atop/will.test/asset/multiple-exports-doc/doc : null, /C/pro/web/Dave/git/trunk/builder/include/dwtools/atop/will.test/asset/multiple-exports-doc/doc/file.md : null }
+  basePath : '/C/pro/web/Dave/git/trunk/builder/include/dwtools/atop/will.test/asset/multiple-exports-doc/doc'"
+
+*/
+
+  /* */
+
+  test.case = 'src is single dot';
+
+  var extract1 = _.FileProvider.Extract();
+
+  var f1 = extract1.recordFilter();
+  f1.filePath = { '.' : '/dst/a' };
+
+  var f2 = extract1.recordFilter();
+  f2.filePath = { '/src/dir' : null, '/src/dir/a' : null };
+  f2.basePath = '/src/dir';
+
+  var f3 = extract1.recordFilter();
+  f3.pathsInherit( f1 );
+  f3.pathsInherit( f2 );
+
+  test.identical( f3.prefixPath, null );
+  test.identical( f3.filePath, { '/src/dir' : '/dst/a', '/src/dir/a' : '/dst/a' } );
+  test.identical( f3.basePath, '/src/dir' );
+
+  /* */
+
+  test.case = 'two strings';
+
+  var extract1 = _.FileProvider.Extract();
+
+  var f1 = extract1.recordFilter();
+  f1.filePath = '/a';
+
+  var f2 = extract1.recordFilter();
+  f2.filePath = '/b';
+
+  var f3 = extract1.recordFilter();
+  f3.pathsInherit( f1 ).pathsInherit( f2 );
+
+  test.identical( f3.prefixPath, null );
+  test.identical( f3.filePath, '/a' );
+  test.identical( f3.basePath, null );
+
+  /* */
+
+  test.case = 'bools only';
+
+  var extract1 = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      f : '1',
+    },
+  });
+
+  var f1 = extract1.recordFilter();
+  f1.prefixPath = '/commonDir/filter1'
+  f1.basePath = './proto';
+  f1.filePath = { 'f' : true, 'd' : true, 'ex' : false, 'f1' : true, 'd1' : true, 'ex1' : false, 'ex3' : true, 'ex4' : false }
+
+  var f2 = extract1.recordFilter();
+  f2.prefixPath = '/commonDir/filter2'
+  f2.basePath = './proto';
+  f2.filePath = { 'f' : true, 'd' : true, 'ex' : false, 'f2' : true, 'd2' : true, 'ex2' : false, 'ex3' : false, 'ex4' : true }
+
+  var f3 = extract1.recordFilter();
+  f3.pathsInherit( f1 ).pathsInherit( f2 );
+
+  var expectedFilePath =
+  {
+    'f' : true,
+    'd' : true,
+    'ex' : false,
+    'f1' : true,
+    'd1' : true,
+    'f2' : true,
+    'd2' : true,
+    'ex1' : false,
+    'ex2' : false,
+    'ex3' : false,
+    'ex4' : true,
+  }
+
+  var expectedBasePath =
+  {
+    'f' : '/commonDir/filter1/proto',
+    'd' : '/commonDir/filter1/proto',
+    'ex' : '/commonDir/filter1/proto',
+    'f1' : '/commonDir/filter1/proto',
+    'd1' : '/commonDir/filter1/proto',
+    'f2' : '/commonDir/filter1/proto',
+    'd2' : '/commonDir/filter1/proto',
+    'ex1' : '/commonDir/filter1/proto',
+    'ex2' : '/commonDir/filter1/proto',
+    'ex3' : '/commonDir/filter1/proto',
+    'ex4' : '/commonDir/filter1/proto',
+  }
+
+  test.identical( f3.prefixPath, null );
+  test.identical( f3.filePath, expectedFilePath );
+  test.identical( f3.basePath, expectedBasePath );
+
+  /* */
+
+  test.case = 'nulls';
+
+  var extract1 = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      f : '1',
+    },
+  });
+
+  var f1 = extract1.recordFilter();
+  f1.prefixPath = '/commonDir/filter1'
+  f1.basePath = './proto';
+  f1.filePath = { 'f' : null, 'd' : null, 'ex' : false, 'f1' : null, 'd1' : null, 'ex1' : false, 'ex3' : null, 'ex4' : false }
+
+  var f2 = extract1.recordFilter();
+  f2.prefixPath = '/commonDir/filter2'
+  f2.basePath = './proto';
+  f2.filePath = { 'f' : null, 'd' : null, 'ex' : false, 'f2' : null, 'd2' : null, 'ex2' : false, 'ex3' : false, 'ex4' : null }
+
+  var f3 = extract1.recordFilter();
+  f3.pathsInherit( f1 ).pathsInherit( f2 );
+
+  var expectedFilePath =
+  {
+    'ex' : false,
+    'ex1' : false,
+    'ex4' : false,
+    '/commonDir/filter1/f' : '/commonDir/filter1',
+    '/commonDir/filter1/d' : '/commonDir/filter1',
+    '/commonDir/filter1/f1' : '/commonDir/filter1',
+    '/commonDir/filter1/d1' : '/commonDir/filter1',
+    '/commonDir/filter1/ex3' : '/commonDir/filter1',
+    // 'ex2' : false,
+    // 'ex3' : false,
+    // '/commonDir/filter2/f' : '/commonDir/filter2',
+    // '/commonDir/filter2/d' : '/commonDir/filter2',
+    // '/commonDir/filter2/f2' : '/commonDir/filter2',
+    // '/commonDir/filter2/d2' : '/commonDir/filter2',
+    // '/commonDir/filter2/ex4' : '/commonDir/filter2'
+  }
+  var expectedBasePath =
+  {
+    'ex' : '/commonDir/filter1/proto',
+    'ex1' : '/commonDir/filter1/proto',
+    'ex4' : '/commonDir/filter1/proto',
+    '/commonDir/filter1/f' : '/commonDir/filter1/proto',
+    '/commonDir/filter1/d' : '/commonDir/filter1/proto',
+    '/commonDir/filter1/f1' : '/commonDir/filter1/proto',
+    '/commonDir/filter1/d1' : '/commonDir/filter1/proto',
+    '/commonDir/filter1/ex3' : '/commonDir/filter1/proto',
+    // 'ex2' : '/commonDir/filter2/proto',
+    // 'ex3' : '/commonDir/filter2/proto',
+    // '/commonDir/filter2/f' : '/commonDir/filter2/proto',
+    // '/commonDir/filter2/d' : '/commonDir/filter2/proto',
+    // '/commonDir/filter2/f2' : '/commonDir/filter2/proto',
+    // '/commonDir/filter2/d2' : '/commonDir/filter2/proto',
+    // '/commonDir/filter2/ex4' : '/commonDir/filter2/proto'
+  }
+  test.identical( f3.prefixPath, null );
+  test.identical( f3.filePath, expectedFilePath );
+  test.identical( f3.basePath, expectedBasePath );
+
+  /* */
+
+  test.case = 'multiple';
+
+  var f1 = extract1.recordFilter();
+  f1.prefixPath = '/commonDir';
+  f1.filePath = { '*exclude*' : 0 }
+
+  var f2 = extract1.recordFilter();
+  f2.prefixPath = '/commonDir';
+  f2.filePath = { 'filter1/f' : 'out/dir' }
   f1.pathsInherit( f2 );
   test.identical( f1.prefixPath, null );
   test.identical( f1.basePath, null );
@@ -1297,7 +1555,8 @@ function inherit( test )
   f1.pathsInherit( f3 );
   test.identical( f1.prefixPath, '/commonDir' );
   test.identical( f1.basePath, null );
-  test.identical( f1.filePath, { '*exclude*' : 0, '/commonDir/filter1/f' : '/commonDir/out/dir', 'filter1/f' : 'out/dir' } );
+  test.identical( f1.filePath, { '*exclude*' : 0, '/commonDir/filter1/f' : '/commonDir/out/dir' } );
+  // test.identical( f1.filePath, { '*exclude*' : false, '/commonDir/filter1/f' : '/commonDir/out/dir', 'filter1/f' : 'out/dir' } );
   test.identical( f3.prefixPath, '/commonDir' );
   test.identical( f3.basePath, null );
   test.identical( f3.filePath, { 'filter1/f' : 'out/dir' } );
@@ -1308,7 +1567,8 @@ function inherit( test )
   f1.pathsInherit( f4 );
   test.identical( f1.prefixPath, null );
   test.identical( f1.basePath, null );
-  test.identical( f1.filePath, { '*exclude*' : 0, '/commonDir/filter1/f' : [ '/commonDir/out/dir', '/commonDir/filter1/out/dir' ] } );
+  // test.identical( f1.filePath, { '*exclude*' : false, '/commonDir/filter1/f' : [ '/commonDir/out/dir', '/commonDir/filter1/out/dir' ] } );
+  test.identical( f1.filePath, { '*exclude*' : 0, '/commonDir/filter1/f' : '/commonDir/out/dir' } );
   test.identical( f4.prefixPath, null );
   test.identical( f4.basePath, null );
   test.identical( f4.filePath, { '/commonDir/filter1/f' : '/commonDir/filter1/out/dir' } );
@@ -1318,7 +1578,8 @@ function inherit( test )
   f1.pathsInherit( f5 );
   test.identical( f1.prefixPath, null );
   test.identical( f1.basePath, null );
-  test.identical( f1.filePath, { '*exclude*' : 0, '/commonDir/filter1/f' : [ '/commonDir/out/dir', '/commonDir/filter1/out/dir' ] } );
+  // test.identical( f1.filePath, { '*exclude*' : false, '/commonDir/filter1/f' : [ '/commonDir/out/dir', '/commonDir/filter1/out/dir' ] } );
+  test.identical( f1.filePath, { '*exclude*' : 0, '/commonDir/filter1/f' : '/commonDir/out/dir' } );
   test.identical( f5.prefixPath, null );
   test.identical( f5.basePath, null );
   test.identical( f5.filePath, { '/commonDir/filter1/f' : '/commonDir/out/dir' } );
@@ -1846,8 +2107,6 @@ Filter
 
 }
 
-inherit.timeOut = 30000;
-
 //
 
 function hasAnyPath( test )
@@ -1911,6 +2170,45 @@ function hasAnyPath( test )
 
 //
 
+function pairRefineLight( test )
+{
+
+  test.case = 'pair, file path map';
+
+  var src = _.fileProvider.recordFilter();
+  src.filePath = { '.' : null };
+  src.prefixPath = '/a/b';
+  src.postfixPath = null;
+  src.basePath = null;
+
+  var dst = _.fileProvider.recordFilter();
+  dst.filePath = '/a/dst/file';
+  dst.prefixPath = '/a/dst';
+  dst.postfixPath = null;
+  dst.basePath = null;
+
+  test.identical( src.hasAnyPath(), true );
+  test.identical( dst.hasAnyPath(), true );
+  src.pairWithDst( dst )
+  src.pairRefineLight();
+  test.identical( src.hasAnyPath(), true );
+  test.identical( dst.hasAnyPath(), true );
+  test.is( src.filePath === dst.filePath );
+  test.is( _.mapIs( src.filePath ) );
+
+  test.identical( src.filePath, { '.' : '/a/dst/file' } );
+  test.identical( src.prefixPath, '/a/b' );
+  test.identical( src.postfixPath, null );
+  test.identical( src.basePath, null );
+  test.identical( dst.filePath, { '.' : '/a/dst/file' } );
+  test.identical( dst.prefixPath, '/a/dst' );
+  test.identical( dst.postfixPath, null );
+  test.identical( dst.basePath, null );
+
+}
+
+//
+
 function filePathSelect( test )
 {
 
@@ -1963,7 +2261,7 @@ var Self =
 
   name : 'Tools/mid/files/RecordFilter',
   silencing : 1,
-  routineTimeOut : 3000, // xxx
+  routineTimeOut : 300000, // xxx
 
   onSuiteBegin,
   onSuiteEnd,
@@ -1978,8 +2276,10 @@ var Self =
     clone,
     prefixesApply,
     prefixesRelative,
-    inherit,
+    pathsExtend2,
+    pathsInherit,
     pairRefine,
+    pairRefineLight,
     hasAnyPath,
     filePathSelect,
 

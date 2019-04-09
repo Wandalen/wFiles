@@ -819,7 +819,7 @@ function fileConfigPathGet_body( o )
     {
       _.assert( _.strIs( ext ) );
       _.assert( _.strIs( filePath ) );
-      // let filePath2 = filePath + '.' + ext; 
+      // let filePath2 = filePath + '.' + ext;
       let filePath2 = _.strAppendOnce( filePath, '.' + ext );
       if( self.statRead( filePath2 ) )
       if( o.outputFormat === 'array' )
@@ -971,6 +971,9 @@ function fileConfigRead_body( o )
       delete o2.found;
 
       let read = self.fileRead( o2 );
+
+      if( read === undefined )
+      read = Object.create( null );
 
       _.sure( _.mapIs( read ), () => 'Expects map, but read ' + _.toStrShort( result ) + ' from ' + o2.filePath );
 

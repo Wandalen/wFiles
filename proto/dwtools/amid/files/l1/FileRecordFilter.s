@@ -525,17 +525,21 @@ function prefixesApply( o )
   let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
   let path = fileProvider.path;
   let adjustingFilePath = true;
+  let paired = false;
 
   if( filter.prefixPath === null && filter.postfixPath === null )
   return filter;
+
+  if( filter.srcFilter && filter.srcFilter.filePath === filter.filePath )
+  paired = true;
+
+  if( filter.dstFilter && filter.dstFilter.filePath === filter.filePath )
+  paired = true;
 
   o = _.routineOptions( prefixesApply, arguments );
   _.assert( filter.prefixPath === null || _.strIs( filter.prefixPath ) || _.strsAreAll( filter.prefixPath ) );
   _.assert( filter.postfixPath === null || _.strIs( filter.postfixPath ) || _.strsAreAll( filter.postfixPath ) );
   _.assert( filter.postfixPath === null, 'not implemented' );
-
-  // if( _.arrayIs( filter.prefixPath ) )
-  // debugger;
 
   if( !filter.filePath )
   {
@@ -552,9 +556,6 @@ function prefixesApply( o )
     let o2 = { basePath : 0, fixes : 0, filePath : 1, onEach : filePathEach }
     filter.allPaths( o2 );
   }
-
-  // let o3 = { basePath : 1, fixes : 0, filePath : 0, onEach : basePathEach }
-  // filter.allPaths( o3 );
 
   if( filter.basePath )
   {
@@ -575,6 +576,14 @@ function prefixesApply( o )
 
   if( filter.basePath && filter.filePath )
   filter.assertBasePath();
+
+  // debugger;
+
+  if( paired && filter.srcFilter && filter.srcFilter.filePath !== filter.filePath )
+  filter.srcFilter.filePath = filter.filePath;
+
+  if( paired && filter.dstFilter && filter.dstFilter.filePath !== filter.filePath )
+  filter.dstFilter.filePath = filter.filePath;
 
   return filter;
 
@@ -639,19 +648,6 @@ function prefixesApply( o )
     }
 
   }
-
-  //
-  // /* */
-  //
-  // function basePathEach( it )
-  // {
-  //   _.assert( it.value === null || _.strIs( it.value ) );
-  //   if( filter.prefixPath || filter.postfixPath )
-  //   if( _.strIs( it.value ) )
-  //   {
-  //     it.value = path.s.join( filter.prefixPath || '.', it.value, filter.postfixPath || '.' );
-  //   }
-  // }
 
 }
 
@@ -1168,9 +1164,142 @@ function pathsJoinWithoutNull()
 
 //
 
+function pathsExtend2( src )
+{
+  let filter = this;
+
+  if( arguments.length > 1 )
+  {
+    for( let a = 0 ; a < arguments.length ; a++ )
+    filter.pathsJoin( arguments[ a ] );
+    return filter;
+  }
+
+  if( Config.debug )
+  if( src && !( src instanceof filter.Self ) )
+  _.assertMapHasOnly( src, filter.fieldsOfCopyableGroups );
+
+  _.assert( _.instanceIs( filter ) );
+  _.assert( !filter.formed || filter.formed <= 1 );
+  _.assert( !src.formed || src.formed <= 1 );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( filter.formedFilterMap === null );
+  _.assert( filter.applyTo === null );
+  _.assert( !filter.hubFileProvider || !src.hubFileProvider || filter.hubFileProvider === src.hubFileProvider );
+  _.assert( src !== filter );
+
+  let fileProvider = filter.effectiveFileProvider || filter.hubFileProvider || filter.defaultFileProvider || src.effectiveFileProvider || src.hubFileProvider || src.defaultFileProvider;
+  let path = fileProvider.path;
+
+  /* */
+
+  if( src.hubFileProvider )
+  filter.hubFileProvider = src.hubFileProvider;
+
+  /* */
+
+  if( !( src instanceof Self ) )
+  src = fileProvider.recordFilter( src );
+
+  if( src.prefixPath === '/C/pro/web/Dave/git/trunk/builder/include/dwtools/atop/will.test/asset/submodules-mixed/.module/UriFundamentals/proto' )
+  debugger;
+  if( src.prefixPath === '/C/pro/web/Dave/git/trunk/builder/include/dwtools/atop/will.test/asset/submodules-mixed/.module/Proto/proto' )
+  debugger;
+
+  // if( src.prefixPath )
+  // src.prefixesApply();
+  //
+  // if( filter.prefixPath )
+  // filter.prefixesApply();
+
+  if( src.prefixPath && filter.prefixPath )
+  {
+    src.prefixesApply();
+    filter.prefixesApply();
+  }
+
+  if( src.prefixPath && src.filePath )
+  {
+    src.prefixesApply();
+  }
+
+  if( filter.prefixPath && filter.filePath )
+  {
+    filter.prefixesApply();
+  }
+
+  _.assert( src.prefixPath === null || filter.prefixPath === null );
+  _.assert( src.postfixPath === null || filter.postfixPath === null );
+  _.assert( src.postfixPath === null && filter.postfixPath === null, 'not implemented' );
+
+  filter.prefixPath = src.prefixPath || filter.prefixPath;
+  filter.postfixPath = src.postfixPath || filter.postfixPath;
+
+  /* */
+
+  if( src.basePath && filter.basePath )
+  {
+
+    if( _.strIs( src.basePath ) )
+    src.basePath = src.basePathFrom( src.basePath, src.filePath || {} );
+    _.assert( src.basePath === null || _.mapIs( src.basePath ) );
+
+    if( _.strIs( filter.basePath ) )
+    filter.basePath = filter.basePathFrom( filter.basePath, filter.filePath || {} );
+    _.assert( filter.basePath === null || _.mapIs( filter.basePath ) );
+
+    if( _.mapIs( src.basePath ) )
+    filter.basePath = _.mapExtend( filter.basePath, src.basePath );
+
+  }
+  else
+  {
+    filter.basePath = filter.basePath || src.basePath;
+  }
+
+  /* */
+
+  if( filter.filePath && src.filePath )
+  {
+
+    let isDst = !!filter.srcFilter || !!src.srcFilter;
+    if( ( _.mapIs( filter.filePath ) && _.mapIs( src.filePath ) ) || !isDst )
+    {
+      filter.filePath = path.pathMapExtend( filter.filePath, src.filePath, null );
+    }
+    else if( !_.mapIs( src.filePath ) )
+    {
+      debugger; xxx
+      filter.filePath = path.pathMapExtend( filter.filePath, filter.filePath, src.filePath );
+    }
+    else if( !_.mapIs( filter.filePath ) )
+    {
+      filter.filePath = path.pathMapExtend( null, src.filePath, filter.filePath );
+    }
+
+  }
+  else
+  {
+    filter.filePath = filter.filePath || src.filePath;
+  }
+
+  /* */
+
+  return filter;
+}
+
+//
+
 function pathsInherit( src )
 {
   let filter = this;
+  let paired = false;
+
+  if( filter.srcFilter && filter.srcFilter.filePath === filter.filePath )
+  paired = true;
+
+  if( filter.dstFilter && filter.dstFilter.filePath === filter.filePath )
+  paired = true;
 
   if( arguments.length > 1 )
   {
@@ -1220,6 +1349,66 @@ function pathsInherit( src )
   filter.prefixPath = filter.prefixPath || src.prefixPath;
   filter.postfixPath = filter.postfixPath || src.postfixPath;
 
+  /* xxx */
+
+  if( filter.filePath && src.filePath )
+  {
+
+    // let dstArray = filter.filePathDstArrayGet().filter;
+    // if( !filter.filePathDstArrayGet().filter( ( e ) => _.boolLike( e ) ).length )
+
+    // debugger;
+    // let xxx = filter.filePathDstArrayGet();
+    // debugger;
+    if( filter.filePathDstAllBools() )
+    {
+      if( filter.srcFilter && !_.mapIs( filter.srcFilter ) )
+      filter.filePath = path.pathMapExtend( null, filter.filePath, null );
+      if( src.srcFilter && !_.mapIs( src.srcFilter ) )
+      src.filePath = path.pathMapExtend( null, src.filePath, null );
+      filter.filePath = path.pathMapExtend( filter.filePath, src.filePath, null );
+    }
+    else
+    {
+      // debugger;
+      let srcPath = filter.filePathSrcArrayGet();
+      if( srcPath.length === 1 && srcPath[ 0 ] === '.' )
+      {
+        debugger;
+        let dstPath = filter.filePathDstArrayGet();
+        if( !dstPath.length )
+        dstPath = null;
+        filter.filePath = path.pathMapExtend( null, src.filePath, dstPath );
+      }
+
+      // filter.filePath = path.pathMapExtend( null, filter.filePath, null );
+      // filter.filePath = path.pathMapExtend( filter.filePath, src.filePath, null );
+    }
+
+    // let isDst = !!filter.srcFilter || !!src.srcFilter;
+    // if( ( _.mapIs( filter.filePath ) && _.mapIs( src.filePath ) ) || !isDst )
+    // {
+    //   filter.filePath = path.pathMapExtend( filter.filePath, src.filePath, null );
+    // }
+    // else if( !_.mapIs( src.filePath ) )
+    // {
+    //   debugger; xxx
+    //   filter.filePath = path.pathMapExtend( filter.filePath, filter.filePath, src.filePath );
+    // }
+    // else if( !_.mapIs( filter.filePath ) )
+    // {
+    //   // debugger;
+    //   filter.filePath = path.pathMapExtend( null, src.filePath, filter.filePath );
+    // }
+
+  }
+  else
+  {
+    filter.filePath = filter.filePath || src.filePath;
+  }
+
+  /* */
+
   if( src.basePath && filter.basePath )
   {
 
@@ -1232,7 +1421,16 @@ function pathsInherit( src )
     _.assert( filter.basePath === null || _.mapIs( filter.basePath ) );
 
     if( _.mapIs( src.basePath ) )
-    filter.basePath = _.mapExtend( filter.basePath, src.basePath );
+    {
+      for( let filePath in src.basePath )
+      {
+        let basePath = src.basePath[ filePath ];
+        if( !_.mapIs( filter.filePath ) || filter.filePath[ filePath ] !== undefined )
+        if( !filter.basePath[ filePath ] )
+        filter.basePath[ filePath ] = basePath;
+      }
+      // filter.basePath = _.mapExtend( filter.basePath, src.basePath );
+    }
 
   }
   else
@@ -1242,30 +1440,11 @@ function pathsInherit( src )
 
   /* */
 
-  if( filter.filePath && src.filePath )
-  {
+  if( paired && filter.srcFilter && filter.srcFilter.filePath !== filter.filePath )
+  filter.srcFilter.filePath = filter.filePath;
 
-    let isDst = !!filter.srcFilter || !!src.srcFilter;
-    if( ( _.mapIs( filter.filePath ) && _.mapIs( src.filePath ) ) || !isDst )
-    {
-      filter.filePath = path.pathMapExtend( filter.filePath, src.filePath, null );
-    }
-    else if( !_.mapIs( src.filePath ) )
-    {
-      debugger; xxx
-      filter.filePath = path.pathMapExtend( filter.filePath, filter.filePath, src.filePath );
-    }
-    else if( !_.mapIs( filter.filePath ) )
-    {
-      // debugger;
-      filter.filePath = path.pathMapExtend( null, src.filePath, filter.filePath );
-    }
-
-  }
-  else
-  {
-    filter.filePath = filter.filePath || src.filePath;
-  }
+  if( paired && filter.dstFilter && filter.dstFilter.filePath !== filter.filePath )
+  filter.dstFilter.filePath = filter.filePath;
 
   return filter;
 }
@@ -2032,6 +2211,35 @@ function filePathSrcArrayGet( filePath )
   _.assert( _.arrayIs( filePath ) );
 
   return filePath;
+}
+
+//
+
+function filePathDstAllBools( filePath )
+{
+  let filter = this;
+  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let path = fileProvider.path;
+
+  filePath = filter.filePathDstArrayGet( filePath );
+
+  if( !filePath.length )
+  return true;
+
+  return !filePath.filter( ( e ) => !_.boolLike( e ) ).length;
+}
+
+//
+
+function filePathDstAnyBools( filePath )
+{
+  let filter = this;
+  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let path = fileProvider.path;
+
+  filePath = filter.filePathDstArrayGet( filePath );
+
+  return !!filePath.filter( ( e ) => _.boolLike( e ) ).length;
 }
 
 //
@@ -3197,6 +3405,7 @@ let Extend =
   _pathsJoin,
   pathsJoin,
   pathsJoinWithoutNull,
+  pathsExtend2,
   pathsInherit,
   pathsExtend,
 
@@ -3225,6 +3434,8 @@ let Extend =
   filePathSimplest,
   filePathNullizeMaybe,
   filePathHasGlob,
+  filePathDstAllBools,
+  filePathDstAnyBools,
 
   filePathArrayGet,
   filePathDstArrayGet,

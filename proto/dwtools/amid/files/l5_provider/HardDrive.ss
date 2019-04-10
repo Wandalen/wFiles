@@ -1,6 +1,6 @@
 ( function _HardDrive_ss_() {
 
-'use strict'; 
+'use strict';
 
 let File, StandardFile, Os;
 
@@ -21,6 +21,7 @@ if( typeof module !== 'undefined' )
 //
 
 /**
+ @classdesc Class to perform file operations on local drive.
  @class wFileProviderHardDrive
  @memberof module:Tools/mid/Files
 */
@@ -465,7 +466,7 @@ function pathDirTempAct()
  * for windows environment variables.
  * @returns {string}
  * @method pathDirUserHomeAct
- * @memberof module:Tools/mid/Files.wFileProviderHardDrive
+ * @memberof module:Tools/mid/Files.wFileProviderHardDrive#
  */
 
 function pathDirUserHomeAct()
@@ -942,7 +943,7 @@ _.routineExtend( fileExistsAct, Parent.prototype.fileExistsAct );
  * @throws {Error} If `data` argument or options.data is not string or Buffer,
  * @throws {Error} If options has unexpected property.
  * @method fileWriteAct
- * @memberof module:Tools/mid/Files.wFileProviderHardDrive
+ * @memberof module:Tools/mid/Files.wFileProviderHardDrive#
  */
 
 function fileWriteAct( o )
@@ -1120,7 +1121,7 @@ _.routineExtend( fileTimeSetAct, Parent.prototype.fileTimeSetAct );
  * @throws {Error} If filePath is not string.
  * @throws {Error} If options object has unexpected property.
  * @method fileDeleteAct
- * @memberof module:Tools/mid/Files.wFileProviderHardDrive
+ * @memberof module:Tools/mid/Files.wFileProviderHardDrive#
  */
 
 function fileDeleteAct( o )
@@ -1562,7 +1563,7 @@ _.routineExtend( softLinkAct, Parent.prototype.softLinkAct );
  * @throws {Error} if one of arguments is not string.
  * @throws {Error} if file `o.dstPath` is not exist.
  * @method hardLinkAct
- * @memberof module:Tools/mid/Files.wFileProviderHardDrive
+ * @memberof module:Tools/mid/Files.wFileProviderHardDrive#
  */
 
 function hardLinkAct( o )

@@ -29,6 +29,7 @@ _.assert( _.routineIs( fileRead ) );
 //
 
 /**
+ @classdesc Mixin to add operations on group of files with very specific purpose. For example, it has a method to search for text in files.
  @class wFileProviderSecondary
  @memberof module:Tools/mid/Files
 */
@@ -465,7 +466,7 @@ having.driving = 0;
  * @returns {boolean}
  * @throws {Error} If passed object has unexpected parameter.
  * @method filesAreUpToDate2
- * @memberof module:Tools/mid/Files.wFileProviderSecondary
+ * @memberof module:Tools/mid/Files.wFileProviderSecondary#
  */
 
 function filesAreUpToDate2( o )

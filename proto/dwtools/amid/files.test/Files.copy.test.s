@@ -1,6 +1,6 @@
 ( function _Files_copy_test_s_( ) {
 
-'use strict'; 
+'use strict'; /* aaa */ 
 
 if( typeof module !== 'undefined' )
 {

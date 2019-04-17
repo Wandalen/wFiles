@@ -1,6 +1,6 @@
 ( function _File_etc_test_ss_( ) {
 
-'use strict'; 
+'use strict'; /* aaa */ 
 
 // return; /* deprecated */
 

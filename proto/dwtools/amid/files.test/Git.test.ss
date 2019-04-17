@@ -1,6 +1,6 @@
 ( function _FileProvider_Git_test_ss_( ) {
 
-'use strict';
+'use strict'; /* aaa */
 
 if( typeof module !== 'undefined' )
 {

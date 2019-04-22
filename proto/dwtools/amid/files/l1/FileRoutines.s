@@ -387,7 +387,7 @@ function fileReport( file )
 {
   let report = '';
 
-  let file = _.FileRecord( file );
+  file = _.FileRecord( file );
 
   let fileTypes = {};
 

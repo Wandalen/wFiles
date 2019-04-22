@@ -53,6 +53,30 @@ function init( o )
 
 }
 
+//
+
+function _gitConfigRead( filePath )
+{
+  let self = this;
+  let path = self.path;
+  let hd = self.hub.providersWithProtocolMap.file;
+
+  debugger;
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( filePath ) );
+
+  let read = hd.fileRead( path.join( filePath, '.git/config' ) );
+  let config = Ini.parse( read );
+
+  debugger;
+
+  //   let read = localProvider.fileRead( path.join( dstPath, '.git/config' ) );
+  //   let config = Ini.parse( read );
+
+  return config;
+}
+
 // --
 // vcs
 // --
@@ -296,9 +320,13 @@ function isUpToDate( o )
 
   if( gitConfigExists )
   ready
-  .got( () => GitConfig( localProvider.path.nativize( o.localPath ), ready.tolerantCallback() ) )
+  // .got( () => GitConfig( localProvider.path.nativize( o.localPath ), ready.tolerantCallback() ) )
+  .then( () => self._gitConfigRead( o.localPath ) )
   .ifNoErrorThen( function( arg )
   {
+
+    debugger;
+
     if( !arg.remote || !arg.remote.origin || !_.strIs( arg.remote.origin.url ) )
     return false;
 
@@ -489,11 +517,16 @@ function filesReflectSingle_body( o )
   // }
 
   if( gitConfigExists )
+  debugger;
+
+  if( gitConfigExists )
   ready
-  .got( () => GitConfig( localProvider.path.nativize( dstPath ), ready.tolerantCallback() ) )
+  // .got( () => GitConfig( localProvider.path.nativize( dstPath ), ready.tolerantCallback() ) )
+  .then( () => self._gitConfigRead( dstPath ) )
   .ifNoErrorThen( function( arg )
   {
 
+    debugger;
     _.sure
     (
       !!arg.remote && !!arg.remote.origin && _.strIs( arg.remote.origin.url ),
@@ -654,6 +687,8 @@ let Proto =
   init,
 
   // vcs
+
+  _gitConfigRead,
 
   pathParse,
   pathIsFixated,

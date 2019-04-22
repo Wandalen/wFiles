@@ -3019,6 +3019,7 @@ function filesReflectSingle_body( o )
 
   function link( record )
   {
+
     _.assert( !record.upToDate );
     _.assert( !!record.src.isActual );
     _.assert( !!record.touch );

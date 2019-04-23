@@ -327,10 +327,10 @@ function isUpToDate( o )
 
     debugger;
 
-    if( !arg.remote || !arg.remote.origin || !_.strIs( arg.remote.origin.url ) )
+    if( !arg[ 'remote "origin"' ] || !arg[ 'remote "origin"' ] || !_.strIs( arg[ 'remote "origin"' ].url ) )
     return false;
 
-    srcCurrentPath = arg.remote.origin.url;
+    srcCurrentPath = arg[ 'remote "origin"' ].url;
 
     if( !_.strEnds( srcCurrentPath, parsed.remoteVcsPath ) )
     return false;
@@ -529,11 +529,11 @@ function filesReflectSingle_body( o )
     debugger;
     _.sure
     (
-      !!arg.remote && !!arg.remote.origin && _.strIs( arg.remote.origin.url ),
+      !!arg[ 'remote "origin"' ] && !!arg[ 'remote "origin"' ] && _.strIs( arg[ 'remote "origin"' ].url ),
       'GIT config does not have {-remote.origin.url-}'
     );
 
-    srcCurrentPath = arg.remote.origin.url;
+    srcCurrentPath = arg[ 'remote "origin"' ].url;
 
     _.sure
     (

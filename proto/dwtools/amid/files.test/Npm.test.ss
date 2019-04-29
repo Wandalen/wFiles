@@ -1,6 +1,6 @@
 ( function _FileProvider_Npm_test_ss_( ) {
 
-'use strict'; /* aaa */
+'use strict'; 
 
 if( typeof module !== 'undefined' )
 {

@@ -1225,26 +1225,49 @@ function fileCopyAct( o )
 
   function _copyPre( )
   {
-    srcFile  = self._descriptorRead( o.srcPath );
 
-    if( !srcFile )
-    throw _.err( 'File', _.strQuote( o.srcPath ), 'doesn`t exist!' );
+    let srcIsTerminal = self.isTerminal( o.srcPath );
+    if( !srcIsTerminal )
+    {
+      debugger;
+      throw _.err( 'File', _.strQuote( o.srcPath ), 'doesn`t exist or isn`t terminal!' );
+    }
 
-    if( self._descriptorIsDir( srcFile ) )
-    throw _.err( o.srcPath, ' is not a terminal file!' );
+    let dstDirIsDir = self.isDir( self.path.dir( o.dstPath ) );
+    if( !dstDirIsDir )
+    {
+      debugger;
+      throw _.err( 'File', _.strQuote( self.path.dir( o.dstPath ) ), 'doesn`t exist or isn`t directory!' );
+    }
+
+    // srcFile  = self._descriptorRead( o.srcPath );
+    //
+    // if( !srcFile )
+    // {
+    //   debugger;
+    //   throw _.err( 'File', _.strQuote( o.srcPath ), 'doesn`t exist!' );
+    // }
+    //
+    // if( self._descriptorIsDir( srcFile ) )
+    // {
+    //   debugger;
+    //   throw _.err( o.srcPath, ' is not a terminal file!' );
+    // }
 
     // let dstDir = self._descriptorRead( self.path.dir( o.dstPath ) );
     // if( !dstDir )
     // throw _.err( 'Directory for', o.dstPath, 'does not exist' );
 
-    let dstDir = self._descriptorRead( self.path.dir( o.dstPath ) );
-    if( !dstDir )
-    throw _.err( 'Directory for', o.dstPath, 'does not exist' );
-    else if( !self._descriptorIsDir( dstDir ) )
-    throw _.err( 'Parent of', o.dstPath, 'is not a directory' );
+    // let dstDir = self._descriptorRead( self.path.dir( o.dstPath ) );
+    // if( !dstDir )
+    // throw _.err( 'Directory for', o.dstPath, 'does not exist' );
+    // else if( !self._descriptorIsDir( dstDir ) )
+    // throw _.err( 'Parent of', o.dstPath, 'is not a directory' );
 
-    let dstPath = self._descriptorRead( o.dstPath );
-    if( self._descriptorIsDir( dstPath ) )
+    let dstIsDir = self.fileExists( o.dstPath );
+    // let dstPath = self._descriptorRead( o.dstPath );
+    // if( self._descriptorIsDir( dstPath ) )
+    if( dstIsDir )
     throw _.err( 'Can`t rewrite directory by terminal file : ' + o.dstPath );
 
     return true;

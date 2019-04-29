@@ -1,6 +1,6 @@
 ( function _FilesFind_HardDrive_test_ss_( ) {
 
-'use strict'; /* aaa */
+'use strict'; 
 
 if( typeof module !== 'undefined' )
 {

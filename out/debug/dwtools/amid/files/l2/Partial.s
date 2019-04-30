@@ -387,16 +387,24 @@ function _preFileFilterWithoutProviderDefaults( routine, args )
   let o = args[ 0 ];
 
   // if( path.like( o ) )
-  // o = { fileFilter : path.from( o ) };
+  // o = { /*fileFilter*/src : path.from( o ) };
   // else if( _.arrayIs( o ) )
-  // o = { fileFilter : path.s.from( o ) };
-  // else if( _.arrayIs( o.fileFilter ) )
-  // o.fileFilter = path.s.from( o.fileFilter );
-
-  o.fileFilter = self.recordFilter( o.fileFilter );
+  // o = { /*fileFilter*/src : path.s.from( o ) };
+  // else if( _.arrayIs( o./*fileFilter*/src ) )
+  // o./*fileFilter*/src = path.s.from( o./*fileFilter*/src );
 
   _.routineOptions( routine, o );
-  // _.assert( path.s.allAreAbsolute( o.fileFilter.filePath ), () => 'Expects absolute path {-o.fileFilter.filePath-}' );
+  // _.assert( path.s.allAreAbsolute( o./*fileFilter*/src.filePath ), () => 'Expects absolute path {-o./*fileFilter*/src.filePath-}' );
+
+  o./*fileFilter*/src = self.recordFilter( o./*fileFilter*/src );
+  // o./*fileFilter*/src.prefixPath = o./*fileFilter*/src.prefixPath || path.current();
+
+  if( o.dst !== undefined && o.dst !== null )
+  {
+    o./*fileFilter*/dst = self.recordFilter( o./*fileFilter*/dst );
+    // o./*fileFilter*/dst.prefixPath = o./*fileFilter*/dst.prefixPath || path.current();
+    o.src.pairWithDst( o.dst );
+  }
 
   return o;
 }
@@ -4307,7 +4315,10 @@ function fileWrite_body( o )
   let o2 = _.mapOnly( o, self.fileWriteAct.defaults );
 
   if( encoder && encoder.onBegin )
-  _.sure( encoder.onBegin.call( self, { operation : o2, encoder : encoder, data : o2.data } ) === undefined );
+  {
+    let r = encoder.onBegin.call( self, { operation : o2, encoder : encoder, data : o2.data } );
+    _.sure( r === undefined );
+  }
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 

@@ -809,7 +809,15 @@ function filesFindGroups_pre( routine, args )
 {
   let self = this;
   let o = self._preFileFilterWithProviderDefaults.apply( self, arguments );
-  o.fileFilter.form();
+
+  if( o.dst )
+  {
+    o.src.pairRefineLight();
+    o.dst.form();
+  }
+
+  o./*fileFilter*/src.form();
+
   return o;
 }
 
@@ -825,12 +833,13 @@ function filesFindGroups_body( o )
   let path = self.path;
   let con = new _.Consequence();
 
-  _.assert( o.fileFilter.formed === 5 );
+  _.assert( o./*fileFilter*/src.formed === 5 );
 
   let r = Object.create( null );
   r.options = o;
-  r.pathsGrouped = path.pathMapGroupByDst( o.fileFilter.filePath );
+  r.pathsGrouped = path.pathMapGroupByDst( o./*fileFilter*/src.filePath );
   r.filesGrouped = Object.create( null );
+  r.srcFiles = Object.create( null );
   r.errors = [];
 
   /* */
@@ -843,17 +852,23 @@ function filesFindGroups_body( o )
     con.finallyGive( 1 );
 
     o2.result = [];
-    o2.filter = o.fileFilter.clone();
+    o2.filter = o./*fileFilter*/src.clone();
     o2.filter.filePathSelect( srcPath, dstPath );
     o2.filter.form();
 
-    // debugger;
     _.Consequence.From( self.filesFind( o2 ) )
     .finally( ( err, files ) =>
     {
 
-      // debugger;
       r.filesGrouped[ dstPath ] = files;
+      files.forEach( ( file ) =>
+      {
+        if( _.strIs( file ) )
+        r.srcFiles[ file ] = file;
+        else
+        r.srcFiles[ file.absolute ] = file;
+      });
+
       if( err )
       {
         r.errors.push( err );
@@ -887,7 +902,8 @@ var defaults = filesFindGroups_body.defaults = _.mapExtend( null, filesFind.defa
 delete defaults.filePath;
 delete defaults.filter;
 
-defaults.fileFilter = null;
+defaults./*fileFilter*/src = null;
+defaults./*fileFilter*/dst = null;
 defaults.sync = 1;
 defaults.throwing = null;
 defaults.recursive = 2;
@@ -901,7 +917,7 @@ let filesFindGroups = _.routineFromPreAndBody( filesFindGroups_pre, filesFindGro
 //   let self = this;
 //   let o = self._preFileFilterWithProviderDefaults.apply( self, arguments );
 //
-//   o.fileFilter.form();
+//   o./*fileFilter*/src.form();
 //
 //   return o;
 // }
@@ -917,7 +933,7 @@ function filesRead_body( o )
   let self = this;
   let path = self.path;
 
-  _.assert( o.fileFilter.formed === 5 );
+  _.assert( o./*fileFilter*/src.formed === 5 );
 
   let con = self.filesFindGroups( o );
   let r;

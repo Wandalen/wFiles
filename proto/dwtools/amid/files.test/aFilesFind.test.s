@@ -5889,14 +5889,14 @@ function filesFindGroups( test )
     '**.txt' : 'Produced.txt',
     '**.js' : 'Produced.js',
   }
-  var fileFilter =
+  var /*fileFilter*/src =
   {
     filePath : filePath,
     prefixPath : testPath,
   }
 
   debugger;
-  var found = provider.filesFindGroups({ fileFilter : fileFilter, outputFormat : 'relative' });
+  var found = provider.filesFindGroups({ /*fileFilter*/src : /*fileFilter*/src, outputFormat : 'relative' });
   found.options = !!found.options;
   debugger;
 

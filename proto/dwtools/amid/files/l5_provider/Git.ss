@@ -61,7 +61,7 @@ function _gitConfigRead( filePath )
   let path = self.path;
   let hd = self.hub.providersWithProtocolMap.file;
 
-  debugger;
+  // debugger;
 
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( filePath ) );
@@ -69,7 +69,7 @@ function _gitConfigRead( filePath )
   let read = hd.fileRead( path.join( filePath, '.git/config' ) );
   let config = Ini.parse( read );
 
-  debugger;
+  // debugger;
 
   //   let read = localProvider.fileRead( path.join( dstPath, '.git/config' ) );
   //   let config = Ini.parse( read );
@@ -516,8 +516,8 @@ function filesReflectSingle_body( o )
   //   debugger;
   // }
 
-  if( gitConfigExists )
-  debugger;
+  // if( gitConfigExists )
+  // debugger;
 
   if( gitConfigExists )
   ready
@@ -526,7 +526,7 @@ function filesReflectSingle_body( o )
   .ifNoErrorThen( function( arg )
   {
 
-    debugger;
+    // debugger;
     _.sure
     (
       !!arg[ 'remote "origin"' ] && !!arg[ 'remote "origin"' ] && _.strIs( arg[ 'remote "origin"' ].url ),

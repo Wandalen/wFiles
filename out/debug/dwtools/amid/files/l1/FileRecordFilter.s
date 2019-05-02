@@ -276,9 +276,9 @@ function _formFinal()
     _.assert( arguments.length === 0 );
     _.assert( filter.formed === 4 );
     _.assert( _.strIs( filter.filePath ) || _.arrayIs( filter.filePath ) || _.mapIs( filter.filePath ) );
-    _.assert( _.mapIs( filter.formedBasePath ) );
+    _.assert( _.mapIs( filter.formedBasePath ) || _.mapKeys( filter.formedFilePath ).length === 0 );
     _.assert( _.mapIs( filter.formedFilePath ) );
-    _.assert( _.objectIs( filter.basePath ) );
+    _.assert( _.mapIs( filter.basePath ) || _.mapKeys( filter.formedFilePath ).length === 0 );
     _.assert( _.objectIs( filter.effectiveFileProvider ) );
     _.assert( filter.hubFileProvider === filter.effectiveFileProvider.hub || filter.hubFileProvider === filter.effectiveFileProvider );
     _.assert( filter.hubFileProvider instanceof _.FileProvider.Abstract );
@@ -288,6 +288,7 @@ function _formFinal()
     _.assert( path.s.noneAreGlob( filePath ) );
     _.assert( path.s.allAreAbsolute( filePath ) || path.s.allAreGlobal( filePath ) );
 
+    if( _.mapIs( filter.formedBasePath ) )
     for( let p in filter.formedBasePath )
     {
       let filePath = p;
@@ -797,7 +798,7 @@ function pathsNormalize()
   _.assert( _.mapIs( filter.filePath ) );
 
   filter.basePath = filter.basePathNormalize( filter.basePath, filter.filePath );
-  _.assert( _.mapIs( filter.basePath ) || filter.basePath === null );
+  _.assert( _.mapIs( filter.basePath ) || filter.basePath === null || _.mapKeys( filter.filePath ).length === 0 );
 
   filter.filePathAbsolutize();
 
@@ -1704,6 +1705,8 @@ function basePathNormalize( basePath, filePath )
   }
   else _.assert( 0 );
 
+  _.assert( _.mapIs( basePath ) || basePath === null || _.mapKeys( filePath ).length === 0 );
+
   return basePath;
 }
 
@@ -1839,6 +1842,8 @@ function filePathNormalize( filePath )
 
   }
 
+  _.assert( _.mapIs( filePath ) );
+
   return filePath;
 }
 
@@ -1968,6 +1973,9 @@ function filePathAbsolutize()
   let filter = this;
   let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
   let path = fileProvider.path;
+
+  if( _.mapKeys( filter.filePath ).length === 0 )
+  return;
 
   _.assert( _.mapIs( filter.basePath ) );
   _.assert( _.mapIs( filter.filePath ) );

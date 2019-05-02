@@ -763,6 +763,23 @@ function filesFindCriticalCases( test )
 
   /* */
 
+  test.case = 'base path + empty file path';
+
+  var extract = _.FileProvider.Extract
+  ({
+    filesTree : {},
+  });
+
+  var got = extract.filesFind
+  ({
+    filter : { basePath : '/' },
+    filePath : [],
+  });
+  var expected = [];
+  test.identical( got, expected );
+
+  /* */
+
   test.case = 'filePath : filter';
 
   var extract = _.FileProvider.Extract

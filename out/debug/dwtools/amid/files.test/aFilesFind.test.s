@@ -5129,6 +5129,7 @@ function filesFindGlob( test )
 
   }
 
+  // zzz
   // test.case = 'globTerminals [ /doubledir/d1/**, /doubledir/d2/** ] with basePath:.';
   //
   // clean();
@@ -5151,16 +5152,14 @@ function filesFindGlob( test )
   // var gotRelative = _.select( records, '*/relative' );
   // test.identical( gotAbsolute, expectedAbsolute );
   // test.identical( gotRelative, expectedRelative );
-  //
+  // zzz
 
   test.case = 'globTerminals [ /doubledir/d1/**, /doubledir/d2/** ] with basePath:+/doubledir';
 
   clean();
   var expectedAbsolute = abs([]);
   var expectedRelative = [];
-  debugger;
   var records = globTerminals({ filePath : [ './doubledir/d1/**', './doubledir/d2/**' ], filter : { basePath : './doubledir' } });
-  debugger;
   var gotAbsolute = _.select( records, '*/absolute' );
   var gotRelative = _.select( records, '*/relative' );
   test.identical( gotAbsolute, expectedAbsolute );
@@ -5897,6 +5896,17 @@ function filesFindGroups( test )
       [
         './a.js', './b.js', './dir/a.js', './dir/b.js'
       ]
+    },
+    'srcFiles' :
+    {
+      './a.txt' : './a.txt',
+      './b.txt' : './b.txt',
+      './dir/a.txt' : './dir/a.txt',
+      './dir/b.txt' : './dir/b.txt',
+      './a.js' : './a.js',
+      './b.js' : './b.js',
+      './dir/a.js' : './dir/a.js',
+      './dir/b.js' : './dir/b.js',
     },
     'errors' : [],
     'options' : true,

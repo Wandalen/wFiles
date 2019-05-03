@@ -438,13 +438,45 @@ function prefixesApply( test )
   f1.prefixPath = '/dir/filter1';
   f1.basePath = './proto';
 
-  debugger;
   f1.prefixesApply();
-  debugger;
 
   test.identical( f1.prefixPath, null );
   test.identical( f1.basePath, expectedBasePath );
   test.identical( f1.filePath, expectedFilePath );
+
+  /* */
+
+  test.case = 'no filePath';
+
+  var f1 = extract1.recordFilter({});
+  var expectedBasePath = '/dir/filter1/proto';
+
+  f1.filePath = null;
+  f1.prefixPath = '/dir/filter1';
+  f1.basePath = './proto';
+
+  f1.prefixesApply();
+
+  test.identical( f1.prefixPath, null );
+  test.identical( f1.basePath, expectedBasePath );
+  test.identical( f1.filePath, null );
+
+  /* */
+
+  test.case = 'filePath is empty map';
+
+  var f1 = extract1.recordFilter({});
+  var expectedBasePath = '/dir/filter1/proto';
+
+  f1.filePath = {};
+  f1.prefixPath = '/dir/filter1';
+  f1.basePath = './proto';
+
+  f1.prefixesApply();
+
+  test.identical( f1.prefixPath, null );
+  test.identical( f1.basePath, expectedBasePath );
+  test.identical( f1.filePath, {} );
 
   /* */
 
@@ -562,7 +594,7 @@ function prefixesApply( test )
 
   var f1 = extract1.recordFilter();
   var expectedBasePath = '/dir/filter1/proto';
-  var expectedFilePath = '/dir/filter1';
+  // var expectedFilePath = '/dir/filter1';
 
   f1.prefixPath = '/dir/filter1';
   f1.basePath = './proto';
@@ -572,7 +604,7 @@ function prefixesApply( test )
   test.identical( f1.prefixPath, null );
   test.identical( f1.postfixPath, null );
   test.identical( f1.basePath, expectedBasePath );
-  test.identical( f1.filePath, expectedFilePath );
+  test.identical( f1.filePath, null );
 
   /* - */
 
@@ -693,7 +725,7 @@ function prefixesApply( test )
 
   var f1 = extract1.recordFilter({ dstFilter : extract1.recordFilter() });
   var expectedBasePath = '/dir/filter1/proto';
-  var expectedFilePath = '/dir/filter1';
+  // var expectedFilePath = '/dir/filter1';
 
   f1.prefixPath = '/dir/filter1';
   f1.basePath = './proto';
@@ -703,7 +735,7 @@ function prefixesApply( test )
   test.identical( f1.prefixPath, null );
   test.identical( f1.postfixPath, null );
   test.identical( f1.basePath, expectedBasePath );
-  test.identical( f1.filePath, expectedFilePath );
+  test.identical( f1.filePath, null );
 
   /* - */
 
@@ -824,7 +856,7 @@ function prefixesApply( test )
 
   var f1 = extract1.recordFilter({ srcFilter : extract1.recordFilter() });
   var expectedBasePath = '/dir/filter1/proto';
-  var expectedFilePath = '/dir/filter1';
+  // var expectedFilePath = '/dir/filter1';
 
   f1.prefixPath = '/dir/filter1';
   f1.basePath = './proto';
@@ -834,7 +866,7 @@ function prefixesApply( test )
   test.identical( f1.prefixPath, null );
   test.identical( f1.postfixPath, null );
   test.identical( f1.basePath, expectedBasePath );
-  test.identical( f1.filePath, expectedFilePath );
+  test.identical( f1.filePath, null );
 
   /* - */
 
@@ -1148,28 +1180,87 @@ function pathsExtend2( test )
   let provider = new _.FileProvider.Extract();
   let path = provider.path;
 
-  /* */
-
-  test.case = 'two strings';
-
-  var extract1 = _.FileProvider.Extract();
-
-  var f1 = extract1.recordFilter();
-  f1.filePath = '/a';
-
-  var f2 = extract1.recordFilter();
-  f2.filePath = '/b';
-
-  var f3 = extract1.recordFilter();
-  f3.pathsExtend2( f1 ).pathsExtend2( f2 );
-
-  test.identical( f3.prefixPath, null );
-  test.identical( f3.filePath, { '/a' : null } );
-  test.identical( f3.basePath, null );
-
-  /* */
-
-  test.case = 'bools only';
+  // /* */
+  //
+  // test.case = 'two strings';
+  //
+  // var extract1 = _.FileProvider.Extract();
+  //
+  // var f1 = extract1.recordFilter();
+  // f1.filePath = '/a';
+  //
+  // var f2 = extract1.recordFilter();
+  // f2.filePath = '/b';
+  //
+  // var f3 = extract1.recordFilter();
+  // f3.pathsExtend2( f1 ).pathsExtend2( f2 );
+  //
+  // test.identical( f3.prefixPath, null );
+  // test.identical( f3.filePath, { '/a' : null, '/b' : null } );
+  // test.identical( f3.basePath, null );
+  //
+  // /* */
+  //
+  // test.case = 'bools only';
+  //
+  // var extract1 = _.FileProvider.Extract
+  // ({
+  //   filesTree :
+  //   {
+  //     f : '1',
+  //   },
+  // });
+  //
+  // var f1 = extract1.recordFilter();
+  // f1.prefixPath = '/commonDir/filter1'
+  // f1.basePath = './proto';
+  // f1.filePath = { 'f' : true, 'd' : true, 'ex' : false, 'f1' : true, 'd1' : true, 'ex1' : false, 'ex3' : true, 'ex4' : false }
+  //
+  // var f2 = extract1.recordFilter();
+  // f2.prefixPath = '/commonDir/filter2'
+  // f2.basePath = './proto';
+  // f2.filePath = { 'f' : true, 'd' : true, 'ex' : false, 'f2' : true, 'd2' : true, 'ex2' : false, 'ex3' : false, 'ex4' : true }
+  //
+  // var f3 = extract1.recordFilter();
+  // f3.pathsExtend2( f1 ).pathsExtend2( f2 );
+  //
+  // var expectedFilePath =
+  // {
+  //   'f' : true,
+  //   'd' : true,
+  //   'ex' : false,
+  //   'f1' : true,
+  //   'd1' : true,
+  //   'f2' : true,
+  //   'd2' : true,
+  //   'ex1' : false,
+  //   'ex2' : false,
+  //   'ex3' : false,
+  //   'ex4' : true,
+  // }
+  //
+  // var expectedBasePath =
+  // {
+  //   'f' : '/commonDir/filter2/proto',
+  //   'd' : '/commonDir/filter2/proto',
+  //   'ex' : '/commonDir/filter2/proto',
+  //   'f1' : '/commonDir/filter1/proto',
+  //   'd1' : '/commonDir/filter1/proto',
+  //   'f2' : '/commonDir/filter2/proto',
+  //   'd2' : '/commonDir/filter2/proto',
+  //   'ex1' : '/commonDir/filter1/proto',
+  //   'ex2' : '/commonDir/filter2/proto',
+  //   'ex3' : '/commonDir/filter2/proto',
+  //   'ex4' : '/commonDir/filter2/proto',
+  // }
+  //
+  // test.identical( f3.prefixPath, null );
+  // test.identical( f3.filePath, expectedFilePath );
+  // test.identical( f3.basePath, expectedBasePath );
+  //
+  // /* */
+  //
+  // test.case = 'nulls';
 
   var extract1 = _.FileProvider.Extract
   ({
@@ -1179,121 +1270,62 @@ function pathsExtend2( test )
     },
   });
 
-  var f1 = extract1.recordFilter();
-  f1.prefixPath = '/commonDir/filter1'
-  f1.basePath = './proto';
-  f1.filePath = { 'f' : true, 'd' : true, 'ex' : false, 'f1' : true, 'd1' : true, 'ex1' : false, 'ex3' : true, 'ex4' : false }
-
-  var f2 = extract1.recordFilter();
-  f2.prefixPath = '/commonDir/filter2'
-  f2.basePath = './proto';
-  f2.filePath = { 'f' : true, 'd' : true, 'ex' : false, 'f2' : true, 'd2' : true, 'ex2' : false, 'ex3' : false, 'ex4' : true }
-
-  var f3 = extract1.recordFilter();
-  f3.pathsExtend2( f1 ).pathsExtend2( f2 );
-
-  var expectedFilePath =
-  {
-    'f' : true,
-    'd' : true,
-    'ex' : false,
-    'f1' : true,
-    'd1' : true,
-    'f2' : true,
-    'd2' : true,
-    'ex1' : false,
-    'ex2' : false,
-    'ex3' : false,
-    'ex4' : true,
-  }
-
-  var expectedBasePath =
-  {
-    'f' : '/commonDir/filter2/proto',
-    'd' : '/commonDir/filter2/proto',
-    'ex' : '/commonDir/filter2/proto',
-    'f1' : '/commonDir/filter1/proto',
-    'd1' : '/commonDir/filter1/proto',
-    'f2' : '/commonDir/filter2/proto',
-    'd2' : '/commonDir/filter2/proto',
-    'ex1' : '/commonDir/filter1/proto',
-    'ex2' : '/commonDir/filter2/proto',
-    'ex3' : '/commonDir/filter2/proto',
-    'ex4' : '/commonDir/filter2/proto',
-  }
-
-  test.identical( f3.prefixPath, null );
-  test.identical( f3.filePath, expectedFilePath );
-  test.identical( f3.basePath, expectedBasePath );
-
-  /* */
-
-  test.case = 'nulls';
-
-  var extract1 = _.FileProvider.Extract
-  ({
-    filesTree :
-    {
-      f : '1',
-    },
-  });
-
-  var f1 = extract1.recordFilter();
-  f1.prefixPath = '/commonDir/filter1'
-  f1.basePath = './proto';
-  f1.filePath = { 'f' : null, 'd' : null, 'ex' : false, 'f1' : null, 'd1' : null, 'ex1' : false, 'ex3' : null, 'ex4' : false }
-
-  var f2 = extract1.recordFilter();
-  f2.prefixPath = '/commonDir/filter2'
-  f2.basePath = './proto';
-  f2.filePath = { 'f' : null, 'd' : null, 'ex' : false, 'f2' : null, 'd2' : null, 'ex2' : false, 'ex3' : false, 'ex4' : null }
-
-  var f3 = extract1.recordFilter();
-  f3.pathsExtend2( f1 ).pathsExtend2( f2 );
-
-  var expectedFilePath =
-  {
-    'ex' : false,
-    'ex1' : false,
-    'ex4' : false,
-    '/commonDir/filter1/f' : '/commonDir/filter1',
-    '/commonDir/filter1/d' : '/commonDir/filter1',
-    '/commonDir/filter1/f1' : '/commonDir/filter1',
-    '/commonDir/filter1/d1' : '/commonDir/filter1',
-    '/commonDir/filter1/ex3' : '/commonDir/filter1',
-    'ex2' : false,
-    'ex3' : false,
-    '/commonDir/filter2/f' : '/commonDir/filter2',
-    '/commonDir/filter2/d' : '/commonDir/filter2',
-    '/commonDir/filter2/f2' : '/commonDir/filter2',
-    '/commonDir/filter2/d2' : '/commonDir/filter2',
-    '/commonDir/filter2/ex4' : '/commonDir/filter2'
-  }
-  var expectedBasePath =
-  {
-    'ex' : '/commonDir/filter2/proto',
-    'ex1' : '/commonDir/filter1/proto',
-    'ex4' : '/commonDir/filter1/proto',
-    '/commonDir/filter1/f' : '/commonDir/filter1/proto',
-    '/commonDir/filter1/d' : '/commonDir/filter1/proto',
-    '/commonDir/filter1/f1' : '/commonDir/filter1/proto',
-    '/commonDir/filter1/d1' : '/commonDir/filter1/proto',
-    '/commonDir/filter1/ex3' : '/commonDir/filter1/proto',
-    'ex2' : '/commonDir/filter2/proto',
-    'ex3' : '/commonDir/filter2/proto',
-    '/commonDir/filter2/f' : '/commonDir/filter2/proto',
-    '/commonDir/filter2/d' : '/commonDir/filter2/proto',
-    '/commonDir/filter2/f2' : '/commonDir/filter2/proto',
-    '/commonDir/filter2/d2' : '/commonDir/filter2/proto',
-    '/commonDir/filter2/ex4' : '/commonDir/filter2/proto'
-  }
-  test.identical( f3.prefixPath, null );
-  test.identical( f3.filePath, expectedFilePath );
-  test.identical( f3.basePath, expectedBasePath );
-
-  /* */
-
-  test.case = 'multiple';
+  // var f1 = extract1.recordFilter();
+  // f1.prefixPath = '/commonDir/filter1'
+  // f1.basePath = './proto';
+  // f1.filePath = { 'f' : null, 'd' : null, 'ex' : false, 'f1' : null, 'd1' : null, 'ex1' : false, 'ex3' : null, 'ex4' : false }
+  //
+  // var f2 = extract1.recordFilter();
+  // f2.prefixPath = '/commonDir/filter2'
+  // f2.basePath = './proto';
+  // f2.filePath = { 'f' : null, 'd' : null, 'ex' : false, 'f2' : null, 'd2' : null, 'ex2' : false, 'ex3' : false, 'ex4' : null }
+  //
+  // var f3 = extract1.recordFilter();
+  // f3.pathsExtend2( f1 ).pathsExtend2( f2 );
+  //
+  // var expectedFilePath =
+  // {
+  //   'ex' : false,
+  //   'ex1' : false,
+  //   'ex4' : false,
+  //   '/commonDir/filter1/f' : '/commonDir/filter1',
+  //   '/commonDir/filter1/d' : '/commonDir/filter1',
+  //   '/commonDir/filter1/f1' : '/commonDir/filter1',
+  //   '/commonDir/filter1/d1' : '/commonDir/filter1',
+  //   '/commonDir/filter1/ex3' : '/commonDir/filter1',
+  //   'ex2' : false,
+  //   'ex3' : false,
+  //   '/commonDir/filter2/f' : '/commonDir/filter2',
+  //   '/commonDir/filter2/d' : '/commonDir/filter2',
+  //   '/commonDir/filter2/f2' : '/commonDir/filter2',
+  //   '/commonDir/filter2/d2' : '/commonDir/filter2',
+  //   '/commonDir/filter2/ex4' : '/commonDir/filter2'
+  // }
+  // var expectedBasePath =
+  // {
+  //   'ex' : '/commonDir/filter2/proto',
+  //   'ex1' : '/commonDir/filter1/proto',
+  //   'ex4' : '/commonDir/filter1/proto',
+  //   '/commonDir/filter1/f' : '/commonDir/filter1/proto',
+  //   '/commonDir/filter1/d' : '/commonDir/filter1/proto',
+  //   '/commonDir/filter1/f1' : '/commonDir/filter1/proto',
+  //   '/commonDir/filter1/d1' : '/commonDir/filter1/proto',
+  //   '/commonDir/filter1/ex3' : '/commonDir/filter1/proto',
+  //   'ex2' : '/commonDir/filter2/proto',
+  //   'ex3' : '/commonDir/filter2/proto',
+  //   '/commonDir/filter2/f' : '/commonDir/filter2/proto',
+  //   '/commonDir/filter2/d' : '/commonDir/filter2/proto',
+  //   '/commonDir/filter2/f2' : '/commonDir/filter2/proto',
+  //   '/commonDir/filter2/d2' : '/commonDir/filter2/proto',
+  //   '/commonDir/filter2/ex4' : '/commonDir/filter2/proto'
+  // }
+  // test.identical( f3.prefixPath, null );
+  // test.identical( f3.filePath, expectedFilePath );
+  // test.identical( f3.basePath, expectedBasePath );
+  //
+  // /* */
+  //
+  // test.case = 'multiple';
 
   var f1 = extract1.recordFilter();
   f1.prefixPath = '/commonDir';
@@ -1314,12 +1346,13 @@ function pathsExtend2( test )
   f3.prefixPath = '/commonDir';
   f3.filePath = { 'filter1/f' : 'out/dir' }
   f1.pathsExtend2( f3 );
-  test.identical( f1.prefixPath, '/commonDir' );
+  // test.identical( f1.prefixPath, '/commonDir' );
+  test.identical( f1.prefixPath, null );
   test.identical( f1.basePath, null );
-  test.identical( f1.filePath, { '*exclude*' : 0, '/commonDir/filter1/f' : '/commonDir/out/dir', 'filter1/f' : 'out/dir' } );
-  test.identical( f3.prefixPath, '/commonDir' );
+  test.identical( f1.filePath, { '*exclude*' : 0, '/commonDir/filter1/f' : '/commonDir/out/dir' } );
+  test.identical( f3.prefixPath, null );
   test.identical( f3.basePath, null );
-  test.identical( f3.filePath, { 'filter1/f' : 'out/dir' } );
+  test.identical( f3.filePath, { '/commonDir/filter1/f' : '/commonDir/out/dir' } );
 
   var f4 = extract1.recordFilter();
   f4.prefixPath = '/commonDir/filter1'
@@ -1494,6 +1527,8 @@ src.toStr()
   {
     'ex' : false,
     'ex1' : false,
+    'ex2' : false,
+    'ex3' : false,
     'ex4' : false,
     '/commonDir/filter1/f' : '/commonDir/filter1',
     '/commonDir/filter1/d' : '/commonDir/filter1',
@@ -1510,9 +1545,9 @@ src.toStr()
   }
   var expectedBasePath =
   {
-    'ex' : '/commonDir/filter1/proto',
-    'ex1' : '/commonDir/filter1/proto',
-    'ex4' : '/commonDir/filter1/proto',
+    // 'ex' : '/commonDir/filter1/proto',
+    // 'ex1' : '/commonDir/filter1/proto',
+    // 'ex4' : '/commonDir/filter1/proto',
     '/commonDir/filter1/f' : '/commonDir/filter1/proto',
     '/commonDir/filter1/d' : '/commonDir/filter1/proto',
     '/commonDir/filter1/f1' : '/commonDir/filter1/proto',
@@ -2235,7 +2270,8 @@ function filePathSelect( test )
 
   test.identical( filter.formed, 5 );
   test.identical( filter.filePath, { '/src' : '/dst', '/src/**.test*' : true, '/src/**.release*' : false } );
-  test.identical( filter.basePath, { '/src' : '/', '/src/**.test*' : '/', '/src/**.release*' : '/' } );
+  test.identical( filter.basePath, { '/src' : '/' } );
+  // test.identical( filter.basePath, { '/src' : '/', '/src/**.test*' : '/', '/src/**.release*' : '/' } );
   test.identical( filter.prefixPath, null );
   test.identical( filter.postfixPath, null );
   debugger;

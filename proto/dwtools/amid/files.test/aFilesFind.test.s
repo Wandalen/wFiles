@@ -12773,7 +12773,7 @@ function filesDeleteTrivial( test )
   test.case = 'delete terminal file';
   provider.fileWrite( terminalPath, 'a' );
   var deleted = provider.filesDelete( terminalPath );
-  test.identical( _.select( deleted, '*/relative' ), [ '.' ] );
+  test.identical( _.select( deleted, '*/relative' ), [ './terminal' ] );
   var stat = provider.statResolvedRead( terminalPath );
   test.identical( stat, null );
 
@@ -13591,7 +13591,7 @@ function filesDeleteAsync( test )
     return provider.filesDelete({ filePath : terminalPath, sync : 0 })
     .thenKeep( ( deleted ) =>
     {
-      test.identical( _.select( deleted, '*/relative' ), [ '.' ] );
+      test.identical( _.select( deleted, '*/relative' ), [ './terminal' ] );
       var stat = provider.statResolvedRead( terminalPath );
       test.identical( stat, null );
       return true;

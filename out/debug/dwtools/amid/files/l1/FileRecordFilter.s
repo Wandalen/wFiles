@@ -1362,11 +1362,8 @@ function pathsInherit( src )
   if( filter.filePath && src.filePath )
   {
 
-    debugger;
     let srcPathMap = src.filePathOnlyBools();
-    debugger;
     let filterPathArray = filter.filePathSrcArrayNonBoolGet( filter.filePath, 0 );
-    debugger;
 
     if( filterPathArray.length === 0 )
     {

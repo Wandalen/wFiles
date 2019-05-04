@@ -261,6 +261,9 @@ function _formFinal()
 {
   let filter = this;
 
+  if( filter.filePath && filter.filePath.length === 2 )
+  debugger;
+
   if( filter.formed < 4 )
   filter._formMasks();
 
@@ -1999,7 +2002,6 @@ function filePathAbsolutize()
 
   if( path.s.anyAreRelative( filePath ) )
   {
-    debugger;
     if( path.s.anyAreAbsolute( filePath ) )
     filter.filePathMultiplyRelatives( filter.filePath, filter.basePath );
     else

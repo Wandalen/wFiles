@@ -37938,7 +37938,7 @@ function EncodersGenerate( test )
 
   test.will = 'encoder and converter should not exist';
   test.is( !_.FileWriteEncoders[ 'testEncoder' ] );
-  test.is( !_.Gdf.ExtMap[ 'testEncoder' ] );
+  test.is( !_.Gdf.ExtMap[ 'testEncoder' ] || !_.Gdf.ExtMap[ 'testEncoder' ].length );
   var testConverter =
   {
     ext : [ 'testEncoder' ],

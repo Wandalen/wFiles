@@ -33869,15 +33869,15 @@ function localsFromGlobals( test )
   test.open( 'string' );
 
   test.case = 'local';
-  var got = provider.localsFromGlobals( '/a' );
+  var got = provider.path.localsFromGlobals( '/a' );
   test.identical( got, '/a' );
 
   test.case = 'relative';
-  var got = provider.localsFromGlobals( 'a' );
+  var got = provider.path.localsFromGlobals( 'a' );
   test.identical( got, 'a' );
 
   test.case = 'single global string';
-  var got = provider.localsFromGlobals( 'global:///a' );
+  var got = provider.path.localsFromGlobals( 'global:///a' );
   test.identical( got, '/a' )
 
   test.close( 'string' );
@@ -33885,33 +33885,33 @@ function localsFromGlobals( test )
   test.open( 'array' );
 
   test.case = 'single global in array';
-  var got = provider.localsFromGlobals( [ 'global:///a' ] );
+  var got = provider.path.localsFromGlobals( [ 'global:///a' ] );
   test.identical( got, [ '/a' ] )
 
   test.case = 'globals in array';
-  var got = provider.localsFromGlobals( [ 'global:///a', 'global:///a/b' ] );
+  var got = provider.path.localsFromGlobals( [ 'global:///a', 'global:///a/b' ] );
   test.identical( got, [ '/a', '/a/b' ] )
 
   test.close( 'array' );
 
   test.open( 'map' );
 
-  var got = provider.localsFromGlobals( { 'global:///a' : 'global:///a' } );
+  var got = provider.path.localsFromGlobals( { 'global:///a' : 'global:///a' } );
   test.identical( got, { '/a' : '/a'} )
 
-  var got = provider.localsFromGlobals( { '/a' : 'global:///a' } );
+  var got = provider.path.localsFromGlobals( { '/a' : 'global:///a' } );
   test.identical( got, { '/a' : '/a'} )
 
-  var got = provider.localsFromGlobals( { 'global:///a' : '/a' } );
+  var got = provider.path.localsFromGlobals( { 'global:///a' : '/a' } );
   test.identical( got, { '/a' : '/a'} )
 
-  var got = provider.localsFromGlobals( { 'global:///a' : 1 } );
+  var got = provider.path.localsFromGlobals( { 'global:///a' : 1 } );
   test.identical( got, { '/a' : 1 } )
 
-  var got = provider.localsFromGlobals( { 1 : 'global:///a' } );
+  var got = provider.path.localsFromGlobals( { 1 : 'global:///a' } );
   test.identical( got, { 1 : '/a' } )
 
-  var got = provider.localsFromGlobals( { 1 : 1 } );
+  var got = provider.path.localsFromGlobals( { 1 : 1 } );
   test.identical( got, { 1 : 1 } )
 
   test.close( 'map' );
@@ -33919,13 +33919,13 @@ function localsFromGlobals( test )
   if( !Config.debug )
   return;
 
-  test.shouldThrowErrorSync( () => provider.localsFromGlobals( '/a', '/b' ) );
-  test.shouldThrowErrorSync( () => provider.localsFromGlobals( 'b:///a' ) );
-  test.shouldThrowErrorSync( () => provider.localsFromGlobals( [ 'b:///a' ] ) );
-  test.shouldThrowErrorSync( () => provider.localsFromGlobals( { 'b:///a' : '/a' } ) );
-  test.shouldThrowErrorSync( () => provider.localsFromGlobals( { '/a' : 'b:///a' } ) );
-  test.shouldThrowErrorSync( () => provider.localsFromGlobals( { '/a' : [] } ) );
-  test.shouldThrowErrorSync( () => provider.localsFromGlobals( { '/a' : {} } ) );
+  test.shouldThrowErrorSync( () => provider.path.localsFromGlobals( '/a', '/b' ) );
+  test.shouldThrowErrorSync( () => provider.path.localsFromGlobals( 'b:///a' ) );
+  test.shouldThrowErrorSync( () => provider.path.localsFromGlobals( [ 'b:///a' ] ) );
+  test.shouldThrowErrorSync( () => provider.path.localsFromGlobals( { 'b:///a' : '/a' } ) );
+  test.shouldThrowErrorSync( () => provider.path.localsFromGlobals( { '/a' : 'b:///a' } ) );
+  test.shouldThrowErrorSync( () => provider.path.localsFromGlobals( { '/a' : [] } ) );
+  test.shouldThrowErrorSync( () => provider.path.localsFromGlobals( { '/a' : {} } ) );
 
   provider.finit();
 

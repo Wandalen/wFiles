@@ -87,6 +87,9 @@ function pathParse( remotePath )
   let path = self.path;
   let result = Object.create( null );
 
+  if( _.mapIs( remotePath ) )
+  return remotePath;
+
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( remotePath ) );
   _.assert( path.isGlobal( remotePath ) )
@@ -120,6 +123,8 @@ function pathParse( remotePath )
   parsed3.protocol = null;
   parsed3.hash = null;
   result.longerRemoteVcsPath = path.str( parsed3 );
+
+  result.isFixated = self.pathIsFixated( result );
 
   /* */
 
@@ -184,7 +189,7 @@ function pathFixate( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
 
   let parsed = self.pathParse( o.remotePath );
-  let latestVersion = self.versionLatestRetrive
+  let latestVersion = self.versionRemoteLatestRetrive
   ({
     remotePath : o.remotePath,
     verbosity : o.verbosity,
@@ -206,7 +211,7 @@ defaults.verbosity = 0;
 
 //
 
-function versionCurrentRetrive( o )
+function versionLocalRetrive( o )
 {
   let self = this;
   let path = self.path;
@@ -214,7 +219,7 @@ function versionCurrentRetrive( o )
   if( !_.mapIs( o ) )
   o = { localPath : o }
 
-  _.routineOptions( versionCurrentRetrive, o );
+  _.routineOptions( versionLocalRetrive, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( !!self.hub );
 
@@ -235,13 +240,13 @@ function versionCurrentRetrive( o )
   return currentVersion.trim() || null;
 }
 
-var defaults = versionCurrentRetrive.defaults = Object.create( null );
+var defaults = versionLocalRetrive.defaults = Object.create( null );
 defaults.localPath = null;
 defaults.verbosity = 0;
 
 //
 
-function versionLatestRetrive( o )
+function versionRemoteLatestRetrive( o )
 {
   let self = this;
   let path = self.path;
@@ -249,7 +254,7 @@ function versionLatestRetrive( o )
   if( !_.mapIs( o ) )
   o = { remotePath : o }
 
-  _.routineOptions( versionLatestRetrive, o );
+  _.routineOptions( versionRemoteLatestRetrive, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( !!self.hub );
 
@@ -272,7 +277,32 @@ function versionLatestRetrive( o )
   return latestVersion;
 }
 
-var defaults = versionLatestRetrive.defaults = Object.create( null );
+var defaults = versionRemoteLatestRetrive.defaults = Object.create( null );
+defaults.remotePath = null;
+defaults.verbosity = 0;
+
+//
+
+function versionRemoteCurrentRetrive( o )
+{
+  let self = this;
+  let path = self.path;
+
+  if( !_.mapIs( o ) )
+  o = { remotePath : o }
+
+  _.routineOptions( versionRemoteCurrentRetrive, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( !!self.hub );
+
+  let parsed = self.pathParse( o.remotePath );
+  if( parsed.isFixated )
+  return parsed.hash;
+
+  return self.versionRemoteLatestRetrive( o );
+}
+
+var defaults = versionRemoteCurrentRetrive.defaults = Object.create( null );
 defaults.remotePath = null;
 defaults.verbosity = 0;
 
@@ -693,8 +723,9 @@ let Proto =
   pathParse,
   pathIsFixated,
   pathFixate,
-  versionCurrentRetrive,
-  versionLatestRetrive,
+  versionLocalRetrive,
+  versionRemoteLatestRetrive,
+  versionRemoteCurrentRetrive,
   isUpToDate,
   isDownloaded,
 

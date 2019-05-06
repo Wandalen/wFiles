@@ -21,8 +21,8 @@ execution :
 
 path :
 
-  repository : git+https://github.com/Wandalen/wFiles.git
-  bugs : https://github.com/Wandalen/wFiles/issues
+  repository : git+https:///github.com/Wandalen/wFiles.git
+  bugs : https:///github.com/Wandalen/wFiles/issues
 
 step :
 

@@ -17305,12 +17305,11 @@ function filesReflectExperiment( test )
 
   _.FileProvider.Extract.readToProvider
   ({
-    dstProvider : _.fileProvider,
+    dstProvider : provider,
     dstPath : testPath,
     filesTree : filesTree,
     allowWrite : 1,
     allowDelete : 1,
-    sameTime : 1,
   });
 
   test.case = 'directory for terminal is not created, as the result fileCopy fails'

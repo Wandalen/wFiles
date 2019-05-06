@@ -53,6 +53,7 @@ function onSuiteEnd( test )
 // --
 
 function filesReflectTrivial( test )
+{ 
   let context = this;
   let providerSrc = context.providerSrc;
   let providerDst = context.providerDst;

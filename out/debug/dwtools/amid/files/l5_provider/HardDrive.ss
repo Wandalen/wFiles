@@ -393,7 +393,7 @@ function pathResolveSoftLinkAct( o )
     if( !self.path.isAbsolute( self.path.normalize( result ) ) )
     {
       if( _.strBegins( result, '.\\' ) )
-      result = _.strIsolateBeginOrNone( result, '.\\' )[ 2 ];
+      result = _.strIsolateLeftOrNone( result, '.\\' )[ 2 ];
       result = '..\\' + result;
     }
 
@@ -1449,7 +1449,7 @@ function softLinkAct( o )
   {
     o.srcPath = o.originalSrcPath;
     if( _.strBegins( o.srcPath, './' ) )
-    o.srcPath = _.strIsolateBeginOrNone( o.srcPath, './' )[ 2 ];
+    o.srcPath = _.strIsolateLeftOrNone( o.srcPath, './' )[ 2 ];
     if( _.strBegins( o.srcPath, '..' ) )
     o.srcPath = '.' + _.strIsolateLeftOrNone( o.srcPath, '..' )[ 2 ];
   }

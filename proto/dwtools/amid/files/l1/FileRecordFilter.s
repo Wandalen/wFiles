@@ -261,6 +261,9 @@ function _formFinal()
 {
   let filter = this;
 
+  if( filter.filePath && filter.filePath.length === 2 )
+  debugger;
+
   if( filter.formed < 4 )
   filter._formMasks();
 
@@ -1359,11 +1362,8 @@ function pathsInherit( src )
   if( filter.filePath && src.filePath )
   {
 
-    debugger;
     let srcPathMap = src.filePathOnlyBools();
-    debugger;
     let filterPathArray = filter.filePathSrcArrayNonBoolGet( filter.filePath, 0 );
-    debugger;
 
     if( filterPathArray.length === 0 )
     {
@@ -1999,7 +1999,6 @@ function filePathAbsolutize()
 
   if( path.s.anyAreRelative( filePath ) )
   {
-    debugger;
     if( path.s.anyAreAbsolute( filePath ) )
     filter.filePathMultiplyRelatives( filter.filePath, filter.basePath );
     else

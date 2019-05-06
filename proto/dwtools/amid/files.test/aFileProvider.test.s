@@ -33941,19 +33941,19 @@ function globalsFromLocals( test )
   test.open( 'string' );
 
   test.case = 'local';
-  var got = provider.globalsFromLocals( '/a' );
+  var got = provider.path.globalsFromLocals( '/a' );
   test.identical( got, 'global:///a' );
 
   test.case = 'relative';
-  var got = provider.globalsFromLocals( 'a' );
+  var got = provider.path.globalsFromLocals( 'a' );
   test.identical( got, 'global://a' );
 
   test.case = 'global string';
-  var got = provider.globalsFromLocals( 'global:///a' );
+  var got = provider.path.globalsFromLocals( 'global:///a' );
   test.identical( got, 'global:///a' )
 
   test.case = 'global string';
-  var got = provider.globalsFromLocals( 'other:///a' );
+  var got = provider.path.globalsFromLocals( 'other:///a' );
   test.identical( got, 'other:///a' )
 
   test.close( 'string' );
@@ -33961,46 +33961,46 @@ function globalsFromLocals( test )
   test.open( 'array' );
 
   test.case = 'single global in array';
-  var got = provider.globalsFromLocals( [ 'global:///a' ] );
+  var got = provider.path.globalsFromLocals( [ 'global:///a' ] );
   test.identical( got, [ 'global:///a' ] )
 
   test.case = 'single global in array';
-  var got = provider.globalsFromLocals( [ 'other:///a' ] );
+  var got = provider.path.globalsFromLocals( [ 'other:///a' ] );
   test.identical( got, [ 'other:///a' ] )
 
   test.case = 'globals in array';
-  var got = provider.globalsFromLocals( [ 'global:///a', '/a/b', 'other:///a' ] );
+  var got = provider.path.globalsFromLocals( [ 'global:///a', '/a/b', 'other:///a' ] );
   test.identical( got, [ 'global:///a', 'global:///a/b', 'other:///a' ] )
 
   test.close( 'array' );
 
   test.open( 'map' );
 
-  var got = provider.globalsFromLocals( { 'global:///a' : 'other:///a' } );
+  var got = provider.path.globalsFromLocals( { 'global:///a' : 'other:///a' } );
   test.identical( got, { 'global:///a' : 'other:///a' } )
 
-  var got = provider.globalsFromLocals( { 'other:///a' : 'global:///a' } );
+  var got = provider.path.globalsFromLocals( { 'other:///a' : 'global:///a' } );
   test.identical( got, { 'other:///a' : 'global:///a' } )
 
-  var got = provider.globalsFromLocals( { '/a' : 'global:///a' } );
+  var got = provider.path.globalsFromLocals( { '/a' : 'global:///a' } );
   test.identical( got, { 'global:///a' : 'global:///a' } )
 
-  var got = provider.globalsFromLocals( { '/a' : '/a' } );
+  var got = provider.path.globalsFromLocals( { '/a' : '/a' } );
   test.identical( got, { 'global:///a' : 'global:///a' } )
 
-  var got = provider.globalsFromLocals( { 'global:///a' : '/a' } );
+  var got = provider.path.globalsFromLocals( { 'global:///a' : '/a' } );
   test.identical( got, { 'global:///a' : 'global:///a' } )
 
-  var got = provider.globalsFromLocals( { 'global:///a' : 1 } );
+  var got = provider.path.globalsFromLocals( { 'global:///a' : 1 } );
   test.identical( got, { 'global:///a' : 1 } )
 
-  var got = provider.globalsFromLocals( { 1 : '/a' } );
+  var got = provider.path.globalsFromLocals( { 1 : '/a' } );
   test.identical( got, { 'global://1' : 'global:///a' } )
 
-  var got = provider.globalsFromLocals( { 1 : 'global:///a' } );
+  var got = provider.path.globalsFromLocals( { 1 : 'global:///a' } );
   test.identical( got, { 'global://1' : 'global:///a' } )
 
-  var got = provider.globalsFromLocals( { 1 : 1 } );
+  var got = provider.path.globalsFromLocals( { 1 : 1 } );
   test.identical( got, { 'global://1' : 1 } )
 
   test.close( 'map' );
@@ -34008,9 +34008,9 @@ function globalsFromLocals( test )
   if( !Config.debug )
   return;
 
-  test.shouldThrowErrorSync( () => provider.globalsFromLocals( '/a', '/b' ) );
-  test.shouldThrowErrorSync( () => provider.globalsFromLocals( { '/a' : [] } ) );
-  test.shouldThrowErrorSync( () => provider.globalsFromLocals( { '/a' : {} } ) );
+  test.shouldThrowErrorSync( () => provider.path.globalsFromLocals( '/a', '/b' ) );
+  test.shouldThrowErrorSync( () => provider.path.globalsFromLocals( { '/a' : [] } ) );
+  test.shouldThrowErrorSync( () => provider.path.globalsFromLocals( { '/a' : {} } ) );
 
   provider.finit();
 

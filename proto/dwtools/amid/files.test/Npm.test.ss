@@ -52,7 +52,7 @@ function filesReflectTrivial( test )
   let path = context.providerDst.path;
   let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
   let installPath = path.join( testPath, 'wPathFundamentals' );
-  let installPathGlobal = providerDst.globalFromLocal( installPath );
+  let installPathGlobal = providerDst.path.globalFromLocal( installPath );
 
   let con = new _.Consequence().take( null )
 
@@ -108,142 +108,12 @@ function filesReflectTrivial( test )
 
   .thenKeep( () =>
   {
-    test.case = 'with hash, no trailing /';
-    providerDst.filesDelete( installPath );
-    let remotePath = 'npm:///wpathfundamentals#master'
-    return hub.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
-  })
-  .thenKeep( ( got ) =>
-  {
-    let files = providerDst.dirRead( installPath );
-    let expected =
-    [
-      'LICENSE',
-      'package.json',
-      'README.md',
-      'out',
-      'proto',
-      'node_modules',
-    ]
-    test.identical( files.sort(), expected.sort() );
-    return got;
-  })
-
-  /*  */
-
-  .thenKeep( () =>
-  {
-    test.case = 'with hash, with trailing /';
-    providerDst.filesDelete( installPath );
-    let remotePath = 'npm:///wpathfundamentals/#master'
-    debugger
-    return hub.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
-  })
-  .thenKeep( ( got ) =>
-  {
-    let files = providerDst.dirRead( installPath );
-    let expected =
-    [
-      'LICENSE',
-      'package.json',
-      'README.md',
-      'out',
-      'proto',
-      'node_modules',
-    ]
-    test.identical( files.sort(), expected.sort() );
-    return got;
-  })
-
-  /*  */
-
-  .thenKeep( () =>
-  {
-    test.case = 'githubname/reponame';
-    providerDst.filesDelete( installPath );
-    let remotePath = 'npm:///Wandalen/wPathFundamentals'
-    return hub.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
-  })
-  .thenKeep( ( got ) =>
-  {
-    let files = providerDst.dirRead( installPath );
-    let expected =
-    [
-      'LICENSE',
-      'package.json',
-      'README.md',
-      'out',
-      'proto',
-      'node_modules',
-    ]
-    test.identical( files.sort(), expected.sort() );
-    return got;
-  })
-
-  /*  */
-
-  .thenKeep( () =>
-  {
-    test.case = 'githubname/reponame#hash';
-    providerDst.filesDelete( installPath );
-    let remotePath = 'npm:///Wandalen/wPathFundamentals#05930d3a7964b253ea3bbfeca7eb86848f550e96'
-    return hub.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
-  })
-  .thenKeep( ( got ) =>
-  {
-    let files = providerDst.dirRead( installPath );
-    let expected =
-    [
-      'LICENSE',
-      'package.json',
-      'README.md',
-      'out',
-      'proto',
-      'node_modules',
-    ]
-    test.identical( files.sort(), expected.sort() );
-    var packagePath = providerDst.path.join( installPath, 'package.json' );
-    var packageRead = providerDst.fileRead({ filePath : packagePath, encoding : 'json' });
-    test.identical( packageRead.version, '0.6.157' )
-    return got;
-  })
-
-  /*  */
-
-  .thenKeep( () =>
-  {
-    test.case = 'npm url';
-    providerDst.filesDelete( installPath );
-    let remotePath = 'npm:///Wandalen/wPathFundamentals'
-    return hub.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
-  })
-  .thenKeep( ( got ) =>
-  {
-    let files = providerDst.dirRead( installPath );
-    let expected =
-    [
-      'LICENSE',
-      'package.json',
-      'README.md',
-      'out',
-      'proto',
-      'node_modules',
-    ]
-    test.identical( files.sort(), expected.sort() );
-    return got;
-  })
-
-  /*  */
-
-  .thenKeep( () =>
-  {
     test.case = 'already exists';
     providerDst.filesDelete( installPath );
     let remotePath = 'npm:///wpathfundamentals';
     let o = { reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 };
-    let con = hub.filesReflect( _.mapExtend( null, o ) );
-    con.thenKeep( () => hub.filesReflect( _.mapExtend( null, o ) ) );
-    return con;
+    hub.filesReflect( _.cloneJust( o ) )
+    return hub.filesReflect( _.cloneJust( o ) );
   })
   .thenKeep( ( got ) =>
   {
@@ -288,6 +158,34 @@ function filesReflectTrivial( test )
     test.identical( packageRead.version, '0.6.154' )
     return got;
   })
+  
+  /*  */
+  
+  .thenKeep( () =>
+  {
+    test.case = 'specific tag';
+    providerDst.filesDelete( installPath );
+    let remotePath = 'npm:///wpathfundamentals#latest'
+    return hub.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
+  })
+  .thenKeep( ( got ) =>
+  {
+    let files = providerDst.dirRead( installPath );
+    let expected =
+    [
+      'LICENSE',
+      'package.json',
+      'README.md',
+      'out',
+      'proto',
+      'node_modules',
+    ]
+    test.identical( files.sort(), expected.sort() );
+    var packagePath = providerDst.path.join( installPath, 'package.json' );
+    var packageRead = providerDst.fileRead({ filePath : packagePath, encoding : 'json' });
+    test.identical( packageRead._requested.fetchSpec, 'latest' )
+    return got;
+  })
 
   /*  */
 
@@ -297,8 +195,7 @@ function filesReflectTrivial( test )
     providerDst.filesDelete( installPath );
     providerDst.fileWrite( installPath, installPath );
     let remotePath = 'npm:///wpathfundamentals';
-    let con = hub.filesReflect( { reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 } );
-    return test.shouldThrowErrorAsync( con );
+    return test.shouldThrowErrorSync( () => hub.filesReflect( { reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 } ));
   })
   .thenKeep( () =>
   {
@@ -313,8 +210,7 @@ function filesReflectTrivial( test )
     test.case = 'wrong package name';
     providerDst.filesDelete( installPath );
     let remotePath = 'npm:///wpathFundamentals';
-    let con = hub.filesReflect( { reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 } );
-    return test.shouldThrowErrorAsync( con );
+    return test.shouldThrowErrorSync( () => hub.filesReflect( { reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 } ) );
   })
   .thenKeep( () =>
   {
@@ -329,202 +225,204 @@ filesReflectTrivial.timeOut = 120000;
 
 //
 
-function filesReflectLocalPath( test )
-{
-  let context = this;
-  let providerSrc = context.providerSrc;
-  let providerDst = context.providerDst;
-  let path = context.providerDst.path;
-  let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
-  let installPath = path.join( testPath, 'wPathFundamentals' );
+//Vova: commented out test routine, because npm provider supports only global paths 
 
-  let con = new _.Consequence().take( null )
+// function filesReflectLocalPath( test )
+// {
+//   let context = this;
+//   let providerSrc = context.providerSrc;
+//   let providerDst = context.providerDst;
+//   let path = context.providerDst.path;
+//   let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
+//   let installPath = path.join( testPath, 'wPathFundamentals' );
 
-  .thenKeep( () =>
-  {
-    test.case = 'localPath';
-    providerDst.filesDelete( installPath );
-    let remotePath = '/wpathfundamentals';
-    return providerSrc.filesReflect
-    ({
-      reflectMap : { [ remotePath ] : installPath },
-      dstFilter : { effectiveFileProvider : providerDst },
-      verbosity : 3
-    });
-  })
-  .thenKeep( ( got ) =>
-  {
-    let files = providerDst.dirRead( installPath );
-    let expected =
-    [
-      'LICENSE',
-      'package.json',
-      'README.md',
-      'out',
-      'proto',
-      'node_modules',
-    ]
-    test.contains( files.sort(), expected.sort() );
-    return got;
-  })
+//   let con = new _.Consequence().take( null )
 
-  /*  */
+//   .thenKeep( () =>
+//   {
+//     test.case = 'localPath';
+//     providerDst.filesDelete( installPath );
+//     let remotePath = '/wpathfundamentals';
+//     return providerSrc.filesReflect
+//     ({
+//       reflectMap : { [ remotePath ] : installPath },
+//       dstFilter : { effectiveFileProvider : providerDst },
+//       verbosity : 3
+//     });
+//   })
+//   .thenKeep( ( got ) =>
+//   {
+//     let files = providerDst.dirRead( installPath );
+//     let expected =
+//     [
+//       'LICENSE',
+//       'package.json',
+//       'README.md',
+//       'out',
+//       'proto',
+//       'node_modules',
+//     ]
+//     test.contains( files.sort(), expected.sort() );
+//     return got;
+//   })
 
-  .thenKeep( () =>
-  {
-    test.case = 'localPath with hash';
-    providerDst.filesDelete( installPath );
-    let remotePath = '/wpathfundamentals#0.6.154';
-    return providerSrc.filesReflect
-    ({
-      reflectMap : { [ remotePath ] : installPath },
-      dstFilter : { effectiveFileProvider : providerDst },
-      verbosity : 3
-    });
-  })
-  .thenKeep( ( got ) =>
-  {
-    let files = providerDst.dirRead( installPath );
-    let expected =
-    [
-      'LICENSE',
-      'package.json',
-      'README.md',
-      'out',
-      'proto',
-      'node_modules',
-    ]
-    test.contains( files.sort(), expected.sort() );
-    var packagePath = providerDst.path.join( installPath, 'package.json' );
-    var packageRead = providerDst.fileRead({ filePath : packagePath, encoding : 'json' });
-    test.identical( packageRead.version, '0.6.154' )
-    return got;
-  })
+//   /*  */
 
-  /*  */
+//   .thenKeep( () =>
+//   {
+//     test.case = 'localPath with hash';
+//     providerDst.filesDelete( installPath );
+//     let remotePath = '/wpathfundamentals#0.6.154';
+//     return providerSrc.filesReflect
+//     ({
+//       reflectMap : { [ remotePath ] : installPath },
+//       dstFilter : { effectiveFileProvider : providerDst },
+//       verbosity : 3
+//     });
+//   })
+//   .thenKeep( ( got ) =>
+//   {
+//     let files = providerDst.dirRead( installPath );
+//     let expected =
+//     [
+//       'LICENSE',
+//       'package.json',
+//       'README.md',
+//       'out',
+//       'proto',
+//       'node_modules',
+//     ]
+//     test.contains( files.sort(), expected.sort() );
+//     var packagePath = providerDst.path.join( installPath, 'package.json' );
+//     var packageRead = providerDst.fileRead({ filePath : packagePath, encoding : 'json' });
+//     test.identical( packageRead.version, '0.6.154' )
+//     return got;
+//   })
 
-  .thenKeep( () =>
-  {
-    test.case = 'localPath with trailing slash and hash';
-    providerDst.filesDelete( installPath );
-    let remotePath = '/wpathfundamentals/#0.6.154';
-    return providerSrc.filesReflect
-    ({
-      reflectMap : { [ remotePath ] : installPath },
-      dstFilter : { effectiveFileProvider : providerDst },
-      verbosity : 3
-    });
-  })
-  .thenKeep( ( got ) =>
-  {
-    let files = providerDst.dirRead( installPath );
-    let expected =
-    [
-      'LICENSE',
-      'package.json',
-      'README.md',
-      'out',
-      'proto',
-      'node_modules',
-    ]
-    test.contains( files.sort(), expected.sort() );
-    return got;
-  })
+//   /*  */
 
-  /*  */
+//   .thenKeep( () =>
+//   {
+//     test.case = 'localPath with trailing slash and hash';
+//     providerDst.filesDelete( installPath );
+//     let remotePath = '/wpathfundamentals/#0.6.154';
+//     return providerSrc.filesReflect
+//     ({
+//       reflectMap : { [ remotePath ] : installPath },
+//       dstFilter : { effectiveFileProvider : providerDst },
+//       verbosity : 3
+//     });
+//   })
+//   .thenKeep( ( got ) =>
+//   {
+//     let files = providerDst.dirRead( installPath );
+//     let expected =
+//     [
+//       'LICENSE',
+//       'package.json',
+//       'README.md',
+//       'out',
+//       'proto',
+//       'node_modules',
+//     ]
+//     test.contains( files.sort(), expected.sort() );
+//     return got;
+//   })
 
-  .thenKeep( () =>
-  {
-    test.case = 'rewrite existing';
-    providerDst.filesDelete( installPath );
-    let remotePath = '/wpathfundamentals';
-    let o =
-    {
-      reflectMap : { [ remotePath ] : installPath },
-      dstFilter : { effectiveFileProvider : providerDst },
-      verbosity : 3
-    }
-    let con = providerSrc.filesReflect( _.mapExtend( null, o ) );
-    con.thenKeep( () => providerSrc.filesReflect( _.mapExtend( null, o ) ) );
-    return con;
-  })
-  .thenKeep( ( got ) =>
-  {
-    let files = providerDst.dirRead( installPath );
-    let expected =
-    [
-      'LICENSE',
-      'package.json',
-      'README.md',
-      'out',
-      'proto',
-      'node_modules',
-    ]
-    test.contains( files.sort(), expected.sort() );
-    return got;
-  })
+//   /*  */
 
-  /*  */
+//   .thenKeep( () =>
+//   {
+//     test.case = 'rewrite existing';
+//     providerDst.filesDelete( installPath );
+//     let remotePath = '/wpathfundamentals';
+//     let o =
+//     {
+//       reflectMap : { [ remotePath ] : installPath },
+//       dstFilter : { effectiveFileProvider : providerDst },
+//       verbosity : 3
+//     }
+//     let con = providerSrc.filesReflect( _.mapExtend( null, o ) );
+//     con.thenKeep( () => providerSrc.filesReflect( _.mapExtend( null, o ) ) );
+//     return con;
+//   })
+//   .thenKeep( ( got ) =>
+//   {
+//     let files = providerDst.dirRead( installPath );
+//     let expected =
+//     [
+//       'LICENSE',
+//       'package.json',
+//       'README.md',
+//       'out',
+//       'proto',
+//       'node_modules',
+//     ]
+//     test.contains( files.sort(), expected.sort() );
+//     return got;
+//   })
 
-  .thenKeep( () =>
-  {
-    test.case = 'githubname/reponame';
-    providerDst.filesDelete( installPath );
-    let remotePath = '/Wandalen/wPathFundamentals';
-    return providerSrc.filesReflect
-    ({
-      reflectMap : { [ remotePath ] : installPath },
-      dstFilter : { effectiveFileProvider : providerDst },
-      verbosity : 3
-    });
-  })
-  .thenKeep( ( got ) =>
-  {
-    let files = providerDst.dirRead( installPath );
-    let expected =
-    [
-      'LICENSE',
-      'package.json',
-      'README.md',
-      'out',
-      'proto',
-      'node_modules',
-    ]
-    test.contains( files.sort(), expected.sort() );
-    var packagePath = providerDst.path.join( installPath, 'package.json' );
-    var packageRead = providerDst.fileRead({ filePath : packagePath, encoding : 'json' });
-    test.identical( packageRead.version, '0.6.154' )
-    return got;
-  })
+//   /*  */
 
-  /*  */
+//   .thenKeep( () =>
+//   {
+//     test.case = 'githubname/reponame';
+//     providerDst.filesDelete( installPath );
+//     let remotePath = '/Wandalen/wPathFundamentals';
+//     return providerSrc.filesReflect
+//     ({
+//       reflectMap : { [ remotePath ] : installPath },
+//       dstFilter : { effectiveFileProvider : providerDst },
+//       verbosity : 3
+//     });
+//   })
+//   .thenKeep( ( got ) =>
+//   {
+//     let files = providerDst.dirRead( installPath );
+//     let expected =
+//     [
+//       'LICENSE',
+//       'package.json',
+//       'README.md',
+//       'out',
+//       'proto',
+//       'node_modules',
+//     ]
+//     test.contains( files.sort(), expected.sort() );
+//     var packagePath = providerDst.path.join( installPath, 'package.json' );
+//     var packageRead = providerDst.fileRead({ filePath : packagePath, encoding : 'json' });
+//     test.identical( packageRead.version, '0.6.154' )
+//     return got;
+//   })
 
-  .thenKeep( () =>
-  {
-    test.case = 'path is occupied by terminal';
-    providerDst.filesDelete( installPath );
-    providerDst.fileWrite( installPath,installPath );
-    let remotePath = '/wpathfundamentals';
-    let o =
-    {
-      reflectMap : { [ remotePath ] : installPath },
-      dstFilter : { effectiveFileProvider : providerDst },
-      verbosity : 3
-    }
-    let con = providerSrc.filesReflect( o );
-    return test.shouldThrowErrorAsync( con );
-  })
-  .thenKeep( ( got ) =>
-  {
-    test.is( providerDst.isTerminal( installPath ) );
-    return got;
-  })
+//   /*  */
+
+//   .thenKeep( () =>
+//   {
+//     test.case = 'path is occupied by terminal';
+//     providerDst.filesDelete( installPath );
+//     providerDst.fileWrite( installPath,installPath );
+//     let remotePath = '/wpathfundamentals';
+//     let o =
+//     {
+//       reflectMap : { [ remotePath ] : installPath },
+//       dstFilter : { effectiveFileProvider : providerDst },
+//       verbosity : 3
+//     }
+//     let con = providerSrc.filesReflect( o );
+//     return test.shouldThrowErrorAsync( con );
+//   })
+//   .thenKeep( ( got ) =>
+//   {
+//     test.is( providerDst.isTerminal( installPath ) );
+//     return got;
+//   })
 
 
-  return con;
-}
+//   return con;
+// }
 
-filesReflectLocalPath.timeOut = 120000;
+// filesReflectLocalPath.timeOut = 120000;
 
 
 // --
@@ -554,7 +452,7 @@ var Proto =
   tests :
   {
     filesReflectTrivial : filesReflectTrivial,
-    filesReflectLocalPath : filesReflectLocalPath,
+    // filesReflectLocalPath : filesReflectLocalPath,
   },
 
 }

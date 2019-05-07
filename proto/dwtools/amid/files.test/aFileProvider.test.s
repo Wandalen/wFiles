@@ -4713,10 +4713,10 @@ function fileCopyActSync( test )
     breakingDstHardLink : 0,
     sync : 1
   }
-  test.shouldThrowError( () =>
-  { 
-    provider.fileCopyAct( o );
-  })
+  if( !self.providerIsInstanceOf( _.FileProvider.Hub ) )
+  test.shouldThrowError( () => provider.fileCopyAct( o ) );
+  else
+  test.mustNotThrowError( () => provider.fileCopyAct( o ) );
   provider.filesDelete( /*dir*/testPath );
 
   //
@@ -11450,10 +11450,10 @@ function fileRenameActSync( test )
     originalDstPath : dstPath,
     sync : 1
   }
-  test.shouldThrowError( () =>
-  {
-    provider.fileRenameAct( o );
-  })
+  if( !self.providerIsInstanceOf( _.FileProvider.Hub ) )
+  test.shouldThrowError( () => provider.fileRenameAct( o ) );
+  else
+  test.mustNotThrowError( () => provider.fileRenameAct( o ) );
   provider.filesDelete( /*dir*/testPath );
 
   //
@@ -15746,7 +15746,7 @@ function dirReadSyncOutputFormats( test )
     outputFormat : 'relative',
     basePath : basePath
   })
-  test.identical( got, [ '../file' ] );
+  test.identical( got, [ test.context.globalFromLocal( '../file' ) ] );
 
   test.case = 'directory';
   provider.fileWrite( filePath, filePath );
@@ -15756,7 +15756,7 @@ function dirReadSyncOutputFormats( test )
     outputFormat : 'relative',
     basePath : basePath
   })
-  test.identical( got, [ '../file' ] );
+  test.identical( got, [ test.context.globalFromLocal( '../file' ) ] );
 
 }
 
@@ -24089,7 +24089,7 @@ function hardLinkActSync( test )
   });
 
   //
-
+  
   test.case = 'should expect normalized path, but not nativized';
   var srcPath = /*dir*/testPath + '\\src';
   provider.fileWrite( srcPath, srcPath );
@@ -24104,10 +24104,10 @@ function hardLinkActSync( test )
     breakingDstHardLink : 1,
     sync : 1
   }
-  test.shouldThrowError( () =>
-  {
-    provider.hardLinkAct( o );
-  })
+  if( !self.providerIsInstanceOf( _.FileProvider.Hub ) )
+  test.shouldThrowError( () => provider.hardLinkAct( o ) );
+  else
+  test.mustNotThrowError( () => provider.hardLinkAct( o ) );
   provider.filesDelete( /*dir*/testPath );
 
   //
@@ -33842,20 +33842,17 @@ function fileExistsCompliantBehavior( test )
 function record( test )
 {
   let self = this;
-  let provider = self.provider;
-  let path = provider.path;
-  let join = _.routineJoin( provider.path, provider.path.join );
-  let hub = self.hub;
+  let hub = self.hub || self.provider;
+  let providerEffective = self.providerEffective || self.provider;
 
-  // let term1Path = self.pathFor( 'record/term1' );
-  // provider.fileWrite( term1Path, term1Path );
+  test.is( providerEffective.hub === hub );
+  test.is( _.arrayHas( _.mapKeys( hub.providersWithProtocolMap ), providerEffective.protocol ) );
+  
+  let filePath = test.context.globalFromLocal( '/record/terminal' );
+  
+  var record = self.provider.record( filePath );
 
-  test.is( provider.hub === hub );
-  test.identical( _.mapKeys( hub.providersWithProtocolMap ), [ 'current' ] );
-
-  var record = provider.record( '/some/file/terminal' );
-
-  test.identical( record.absolute, '/some/file/terminal' );
+  test.identical( record.absolute, filePath );
 
 }
 

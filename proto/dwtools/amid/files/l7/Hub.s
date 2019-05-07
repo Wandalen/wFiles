@@ -239,8 +239,8 @@ function _recordFactoryFormEnd( recordFactory )
   _.assert( recordFactory instanceof _.FileRecordFactory );
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( recordFactory.effectiveFileProvider instanceof _.FileProvider.Abstract, 'No provider for base path', recordFactory.basePath, 'found' );
-  _.assert( !_.path.isGlobal( recordFactory.basePath ) );
-  _.assert( recordFactory.stemPath === null || !_.path.isGlobal( recordFactory.stemPath ) );
+  // _.assert( !_.path.isGlobal( recordFactory.basePath ) );
+  // _.assert( recordFactory.stemPath === null || !_.path.isGlobal( recordFactory.stemPath ) );
 
   return recordFactory;
 }
@@ -978,7 +978,10 @@ function routinesGenerate()
 
         }
         else
-        {
+        { 
+          if( o[ p ] instanceof _.FileRecord )
+          continue;
+          
           o[ p ] = self.path.localFromGlobal( o[ p ] );
         }
       }

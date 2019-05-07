@@ -12820,8 +12820,10 @@ function fileDeleteLocked( test )
   let self = this;
   let provider = self.provider;
   let path = provider.path;
+  
+  let skip = !self.providerIsInstanceOf( _.FileProvider.HardDrive ) || self.providerIsInstanceOf( _.FileProvider.Hub );
 
-  if( !self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  if( skip )
   {
     test.identical( 1,1 );
     return;
@@ -36602,7 +36604,7 @@ function pathResolveSoftLink( test )
   var got = provider.pathResolveSoftLink( { filePath : linkPath } );
   test.identical( got, linkPath2 );
   var got1 = provider.pathResolveSoftLink( { filePath : got } );
-  test.identical( got1, '../file0' );
+  test.identical( got1, test.context.globalFromLocal( '../file0' ) );
   var got2 = provider.path.resolve( linkPath2, got1 );
   test.identical( got2, filePath + '0' );
 
@@ -37358,7 +37360,7 @@ function pathResolveLinkFullSpecial( test )
   }
   var o = _.mapExtend( null, o1, o2 );
   var got = provider.pathResolveLinkFull( o );
-  var expected = '../file';
+  var expected = test.context.globalFromLocal( '../file' );
   test.identical( got, expected );
 
   //

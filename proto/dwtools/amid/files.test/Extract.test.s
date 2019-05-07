@@ -52,7 +52,7 @@ function onSuiteBegin( test )
   context.hub = _.FileProvider.Hub({ providers : [ context.provider ] });
   let path = context.provider.path;
   context.testSuitePath = path.dirTempOpen( 'FilesFind' );
-  context.globalFromLocal = _.routineJoin( context.provider.path, context.provider.path.globalFromLocal );
+  context.globalFromLocal = function globalFromLocal( path ){ return path };
 }
 
 //

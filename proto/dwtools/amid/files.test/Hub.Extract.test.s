@@ -63,6 +63,7 @@ function onSuiteBegin()
 
   self.provider.defaultProvider = self.providerEffective;
   self.globalFromLocal = _.routineJoin( self.providerEffective.path, self.providerEffective.path.globalFromLocal );
+  self.provider.UsingBigIntForStat = self.providerEffective.UsingBigIntForStat;
   // self.provider.defaultOrigin = self.providerEffective.originPath;
   // self.provider.defaultProtocol = self.providerEffective.protocol;
 }

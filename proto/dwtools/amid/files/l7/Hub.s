@@ -765,6 +765,26 @@ let fileCopyAct = _link_functor
 // link
 // --
 
+function hardLinkBreak_body( o )
+{
+  let self = this;
+
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  
+  let r = self._localFromGlobal( o.filePath );
+  let o2 = _.mapExtend( null, o );
+  
+  o2.filePath = r.localPath;
+
+  return r.provider.hardLinkBreak.body.call( r.provider, o2 );
+}
+
+_.routineExtend( hardLinkBreak_body, Parent.prototype.hardLinkBreak );
+
+let hardLinkBreak = _.routineFromPreAndBody( Parent.prototype._preFilePathScalarWithProviderDefaults, hardLinkBreak_body );
+
+//
+
 function filesAreHardLinkedAct( o )
 {
   let self = this;
@@ -1194,7 +1214,9 @@ let Proto =
   fileCopyAct,
 
   // link
-
+  
+  hardLinkBreak,
+  
   filesAreHardLinkedAct,
 
   // accessor

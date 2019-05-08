@@ -20368,10 +20368,12 @@ function softLinkActSync( test )
   }
 
   var expected = _.mapExtend( null, o );
+  
+  if( !( provider instanceof _.FileProvider.Hub ) )
   if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   if( process.platform === 'win32' )
   expected.type = 'file'
-
+  
   provider.softLinkAct( o );
   test.identical( o, expected );
   test.is( provider.isSoftLink( dstPath ) );
@@ -23073,7 +23075,7 @@ function hardLinkMultipleSync( test )
   });
   test.identical( provider.filesAreHardLinked( paths ), hardLinked );
   var srcPath = paths[ 2 ];
-  test.identical( selectedFile.absolute, srcPath );
+  test.identical( selectedFile.absolute, provider.path.localFromGlobal( srcPath ) );
   var src = provider.fileRead( srcPath );
   var dst = provider.fileRead( paths[ 1 ] );
   test.identical( src, dst );
@@ -23095,7 +23097,7 @@ function hardLinkMultipleSync( test )
   });
   test.identical( provider.filesAreHardLinked( paths ), hardLinked );
   var srcPath = paths[ paths.length - 1 ];
-  test.identical( selectedFile.absolute, srcPath );
+  test.identical( selectedFile.absolute, provider.path.localFromGlobal( srcPath ) );
   var src = provider.fileRead( srcPath );
   var dst = provider.fileRead( paths[ 0 ] );
   test.identical( src, dst );
@@ -23117,7 +23119,7 @@ function hardLinkMultipleSync( test )
   });
   test.identical( provider.filesAreHardLinked( paths ), hardLinked );
   var srcPath = paths[ 0 ];
-  test.identical( selectedFile.absolute, srcPath );
+  test.identical( selectedFile.absolute, provider.path.localFromGlobal( srcPath ) );
   var src = provider.fileRead( srcPath );
   var dst = provider.fileRead( paths[ paths.length - 1 ] );
   test.identical( src, dst );
@@ -23137,7 +23139,7 @@ function hardLinkMultipleSync( test )
   });
   test.identical( provider.filesAreHardLinked( paths ), hardLinked );
   var srcPath = paths[ 0 ];
-  test.identical( selectedFile.absolute, srcPath );
+  test.identical( selectedFile.absolute, provider.path.localFromGlobal( srcPath ) );
   var src = provider.fileRead( srcPath );
   var dst = provider.fileRead( paths[ paths.length - 1 ] );
   test.identical( src, dst );
@@ -23162,7 +23164,7 @@ function hardLinkMultipleSync( test )
   });
   test.identical( provider.filesAreHardLinked( paths ), hardLinked );
   var srcPath = paths[ 2 ];
-  test.identical( selectedFile.absolute, srcPath );
+  test.identical( selectedFile.absolute, provider.path.localFromGlobal( srcPath ) );
   var src = provider.fileRead( srcPath );
   var dst = provider.fileRead( paths[ 0 ] );
   test.identical( src, dst );
@@ -23187,7 +23189,7 @@ function hardLinkMultipleSync( test )
   });
   test.identical( provider.filesAreHardLinked( paths ), hardLinked );
   var srcPath = paths[ 0 ];
-  test.identical( selectedFile.absolute, srcPath );
+  test.identical( selectedFile.absolute, provider.path.localFromGlobal( srcPath ) );
   var src = provider.fileRead( srcPath );
   var dst = provider.fileRead( paths[ 2 ] );
   var ok = test.identical( src, dst );
@@ -24903,7 +24905,7 @@ function hardLinkAsync( test )
     {
       test.identical( provider.filesAreHardLinked( paths ), hardLinked );
       var srcPath = paths[ paths.length - 1 ];
-      test.identical( selectedFile.absolute, srcPath );
+      test.identical( selectedFile.absolute, provider.path.localFromGlobal( srcPath ) );
       var src = provider.fileRead( srcPath );
       var dst = provider.fileRead( paths[ 1 ] );
       test.identical( src, dst )
@@ -24937,7 +24939,7 @@ function hardLinkAsync( test )
     {
       test.identical( provider.filesAreHardLinked( paths ), hardLinked );
       var srcPath = paths[ 0 ];
-      test.identical( selectedFile.absolute, srcPath );
+      test.identical( selectedFile.absolute, provider.path.localFromGlobal( srcPath ) );
       var dstPath = paths[ 1 ];
       var src = provider.fileRead( srcPath );
       var dst = provider.fileRead( dstPath );
@@ -28544,7 +28546,7 @@ function isTerminal( test )
   test.identical( got.isSoftLink(), false );
   test.identical( got.isTextLink(), true );
 
-  test.case = 'soft to text to terminal'
+  test.case = 'soft to text to terminal';
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath );
   provider.fileWrite( linkPath2, 'link ' + filePath );
@@ -29697,7 +29699,7 @@ function isTextLink( test )
   let filePath = test.context.pathFor( 'written/isTextLink/file' );
   let filePath2 = test.context.pathFor( 'written/isTextLink/file2' );
   let linkPath = test.context.pathFor( 'written/isTextLink/link' );
-
+  
   /**/
 
   provider.fieldPush( 'usingTextLink', 0 )
@@ -37922,7 +37924,7 @@ function EncodersGenerate( test )
   let provider = self.provider;
   let writeConverters = _.Gdf.InMap[ 'structure' ];
   let readConverters = _.Gdf.OutMap[ 'structure' ];
-
+  
   //
 
   test.case = 'check if all write encoders are generated';
@@ -37963,7 +37965,7 @@ function EncodersGenerate( test )
   test.is( _.mapIs( encoder ) );
   test.identical( encoder.exts, converter.ext );
   test.identical( encoder.converter, converter );
-
+  
   test.will = 'finit converter, encoder should exist';
   converter.finit();
   test.is( _.mapIs( _.FileWriteEncoders[ 'testEncoder' ] ) );
@@ -37972,21 +37974,34 @@ function EncodersGenerate( test )
   test.is( !_.FileWriteEncoders[ 'testEncoder' ] );
 
   //
-
+  
   test.case = 'adjust converter exts'
-  var converter = readConverters[ 0 ];
-  var originalExt = converter.ext.slice();
+  var testConverter =
+  {
+    ext : [ 'testEncoder' ],
+    in : [ 'structure' ],
+    out : [ 'string' ],
+
+    onEncode : function( op )
+    {
+      op.out.data = _.toStr( op.out.data, { levels : 99 } );
+      op.out.format = 'string';
+    }
+  }
+  var converter = _.Gdf([ testConverter ])[ 0 ];
   var ext = 'testExt';
+  let originalExt = converter.ext.slice();
   converter.ext = [ ext ];
-  test.is( !_.mapIs( _.FileReadEncoders[ ext ] ) );
+  test.is( !_.mapIs( _.FileWriteEncoders[ ext ] ) );
   provider.EncodersGenerate();
-  var encoder = _.FileReadEncoders[ ext ];
+  var encoder = _.FileWriteEncoders[ ext ];
   test.is( _.mapIs( encoder ) );
   test.identical( encoder.exts, converter.ext );
   test.identical( encoder.converter, converter );
   converter.ext = originalExt.slice();
+  converter.finit();
   provider.EncodersGenerate();
-  test.is( !_.mapIs( _.FileReadEncoders[ ext ] ) );
+  test.is( !_.mapIs( _.FileWriteEncoders[ ext ] ) );
 
   /* - */
 

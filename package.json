@@ -55,7 +55,8 @@
     "wRegexpObject": "",
     "wselector": "",
     "wverbal": "",
-    "wLogger": ""
+    "wLogger": "",
+    "ini": ""
   },
   "devDependencies": {
     "wait-sync": "",

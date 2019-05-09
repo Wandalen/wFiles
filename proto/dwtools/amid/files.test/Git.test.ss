@@ -7,6 +7,15 @@ if( typeof module !== 'undefined' )
   let _ = require( '../../Tools.s' );
 
   _.include( 'wTesting' );
+  
+  try
+  {
+    require( 'gitconfiglocal' )
+  }
+  catch( err )
+  { 
+    return;
+  }
 
   require( '../files/UseTop.s' );
 }
@@ -44,7 +53,7 @@ function onSuiteEnd( test )
 // --
 
 function filesReflectTrivial( test )
-{
+{ 
   let context = this;
   let providerSrc = context.providerSrc;
   let providerDst = context.providerDst;

@@ -239,8 +239,8 @@ function _recordFactoryFormEnd( recordFactory )
   _.assert( recordFactory instanceof _.FileRecordFactory );
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( recordFactory.effectiveFileProvider instanceof _.FileProvider.Abstract, 'No provider for base path', recordFactory.basePath, 'found' );
-  _.assert( !_.path.isGlobal( recordFactory.basePath ) );
-  _.assert( recordFactory.stemPath === null || !_.path.isGlobal( recordFactory.stemPath ) );
+  // _.assert( !_.path.isGlobal( recordFactory.basePath ) );
+  // _.assert( recordFactory.stemPath === null || !_.path.isGlobal( recordFactory.stemPath ) );
 
   return recordFactory;
 }
@@ -420,20 +420,34 @@ function pathResolveLinkFull_body( o )
   o.filePath = r.localPath;
 
   let result = r.provider.pathResolveLinkFull.body.call( r.provider, o );
-
-  if( result === null )
-  return null;
-
-  result = self.path.join( r.provider.originPath, result );
-
-  if( result === o.filePath )
+  
+  if( o.sync )
   {
-    debugger;
-    _.assert( 0, 'not tested' );
-    // return r.originalPath;
+    return handleResult( result );
   }
-
-  return result;
+  else
+  { 
+    result.then( handleResult );
+    return result;
+  }
+  
+  /*  */
+  
+  function handleResult( result )
+  { 
+    if( result === null )
+    return null;
+  
+    result = self.path.join( r.provider.originPath, result );
+  
+    if( result === o.filePath )
+    {
+      debugger;
+      _.assert( 0, 'not tested' );
+      // return r.originalPath;
+    }
+    return result;
+  }
 }
 
 _.routineExtend( pathResolveLinkFull_body, Parent.prototype.pathResolveLinkFull );
@@ -503,6 +517,41 @@ function pathResolveSoftLink_body( o )
 _.routineExtend( pathResolveSoftLink_body, Parent.prototype.pathResolveSoftLink );
 
 let pathResolveSoftLink = _.routineFromPreAndBody( Parent.prototype.pathResolveSoftLink.pre, pathResolveSoftLink_body );
+
+//
+
+function pathResolveTextLink_body( o )
+{
+  let self = this;
+
+  _.assert( arguments.length === 1, 'Expects single argument' );
+
+  let r = self._localFromGlobal( o.filePath );
+
+  o.filePath = r.localPath;
+
+  let result = r.provider.pathResolveTextLink.body.call( r.provider, o );
+
+  if( result === null )
+  return result;
+
+  _.assert( !!result );
+
+  result = self.path.join( r.provider.originPath, result );
+
+  if( result === o.filePath )
+  {
+    debugger;
+    _.assert( 0, 'not tested' );
+    return r.originalPath;
+  }
+
+  return result;
+}
+
+_.routineExtend( pathResolveTextLink_body, Parent.prototype.pathResolveTextLink );
+
+let pathResolveTextLink = _.routineFromPreAndBody( Parent.prototype.pathResolveTextLink.pre, pathResolveTextLink_body );
 
 //
 
@@ -715,6 +764,26 @@ let fileCopyAct = _link_functor
 // --
 // link
 // --
+
+function hardLinkBreak_body( o )
+{
+  let self = this;
+
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  
+  let r = self._localFromGlobal( o.filePath );
+  let o2 = _.mapExtend( null, o );
+  
+  o2.filePath = r.localPath;
+
+  return r.provider.hardLinkBreak.body.call( r.provider, o2 );
+}
+
+_.routineExtend( hardLinkBreak_body, Parent.prototype.hardLinkBreak );
+
+let hardLinkBreak = _.routineFromPreAndBody( Parent.prototype._preFilePathScalarWithProviderDefaults, hardLinkBreak_body );
+
+//
 
 function filesAreHardLinkedAct( o )
 {
@@ -929,7 +998,10 @@ function routinesGenerate()
 
         }
         else
-        {
+        { 
+          if( o[ p ] instanceof _.FileRecord )
+          continue;
+          
           o[ p ] = self.path.localFromGlobal( o[ p ] );
         }
       }
@@ -948,25 +1020,29 @@ function routinesGenerate()
         if( _.strIs( o ) )
         o = { filePath : o }
       }
-
+      
       if( pre )
       o = pre.call( this, wrap, arguments );
-      else if( wrap.defaults )
-      _.routineOptions( wrap, o );
-
+      
+      let o2 = _.mapExtend( null, o );
+      
+      if( !pre && wrap.defaults )
+      if( !wrap.having || !wrap.having.driving )
+      _.routineOptions( wrap, o2 );
+      
       let provider = self;
 
-      provider = resolve.call( self, o );
+      provider = resolve.call( self, o2 );
 
       if( provider === self )
       {
         _.assert( _.routineIs( original ), 'No original method for', name );
-        return original.call( provider, o );
+        return original.call( provider, o2 );
       }
       else
       {
         _.assert( _.routineIs( provider[ name ] ) );
-        return provider[ name ].call( provider, o );
+        return provider[ name ].call( provider, o2 );
       }
     }
 
@@ -1119,6 +1195,7 @@ let Proto =
   pathResolveLinkFull,
   pathResolveLinkTail,
   pathResolveSoftLink,
+  pathResolveTextLink,
 
   // read
 
@@ -1137,7 +1214,9 @@ let Proto =
   fileCopyAct,
 
   // link
-
+  
+  hardLinkBreak,
+  
   filesAreHardLinkedAct,
 
   // accessor

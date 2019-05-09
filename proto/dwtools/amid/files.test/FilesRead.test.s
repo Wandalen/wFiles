@@ -36,8 +36,8 @@ function onSuiteBegin()
 function onSuiteEnd()
 {
   if( !this.isBrowser )
-  {
-    _.assert( _.strEnds( this.testSuitePath, 'FilesRead' ) );
+  { 
+    _.assert( _.strHas( this.testSuitePath, 'FilesRead' ) );
     _.path.dirTempClose(  this.testSuitePath );
   }
 }
@@ -640,13 +640,19 @@ function fileConfigRead( test )
   provider.fileWrite({ filePath : filePath, data : src1, encoding : 'json.fine' });
   var filePath = path.changeExt( terminalPath, 'bson' );
   provider.fileWrite({ filePath : filePath, data : src2, encoding : 'bson' });
-  test.shouldThrowErrorSync( () =>
+  var got = provider.fileConfigRead({ filePath : terminalPath });
+  var expected = 
   {
+    null : null,
+    number : 13,
+    string : 'something',
+    map : { a : '1', dir : { b : 2 }, c : [ 1,2,3 ] },
+    array : [ { a : '1', dir : { b : 2 }, c : [ 1,2,3 ] } ],
+  };
+  test.identical( got, expected );
+  test.shouldThrowErrorSync( () =>
+  { 
     provider.fileConfigRead({ filePath : [ terminalPath, terminalPath ] });
-  })
-  test.shouldThrowErrorSync( () =>
-  {
-    provider.fileConfigRead({ filePath : terminalPath });
   })
 
   //

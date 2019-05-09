@@ -52,6 +52,7 @@ function onSuiteBegin( test )
   context.hub = _.FileProvider.Hub({ providers : [ context.provider ] });
   let path = context.provider.path;
   context.testSuitePath = path.dirTempOpen( 'FilesFind' );
+  context.globalFromLocal = function globalFromLocal( path ){ return path };
 }
 
 //
@@ -151,6 +152,7 @@ var Proto =
   {
     filesTree : filesTree,
     provider : _.FileProvider.Extract( { filesTree : filesTree, usingExtraStat : 1 } ),
+    globalFromLocal : null,
     pathFor : pathFor,
     testFile : '/file1'
   },

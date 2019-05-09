@@ -37,6 +37,8 @@ function onSuiteBegin()
 
   self.provider.providerRegister( self.providerEffective );
   self.provider.defaultProvider = self.providerEffective;
+  self.globalFromLocal = _.routineJoin( self.providerEffective.path, self.providerEffective.path.globalFromLocal );
+  self.provider.UsingBigIntForStat = self.providerEffective.UsingBigIntForStat;
   // self.provider.defaultOrigin = self.providerEffective.originPath;
   // self.provider.defaultProtocol = self.providerEffective.protocol;
 
@@ -71,6 +73,7 @@ var Proto =
     testSuitePath : null,
 
     pathFor : pathFor,
+    globalFromLocal : null
     // testFile : null,
     // testSuitePath : __dirname + '/../../../../tmp.tmp/hard-drive',
     // testFile : __dirname + '/../../../../tmp.tmp/hard-drive/test.txt',

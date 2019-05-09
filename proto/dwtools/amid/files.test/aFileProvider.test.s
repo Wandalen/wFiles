@@ -4713,10 +4713,10 @@ function fileCopyActSync( test )
     breakingDstHardLink : 0,
     sync : 1
   }
-  test.shouldThrowError( () =>
-  {
-    provider.fileCopyAct( o );
-  })
+  if( !self.providerIsInstanceOf( _.FileProvider.Hub ) )
+  test.shouldThrowError( () => provider.fileCopyAct( o ) );
+  else
+  test.mustNotThrowError( () => provider.fileCopyAct( o ) );
   provider.filesDelete( /*dir*/testPath );
 
   //
@@ -5261,7 +5261,7 @@ function fileCopySync( test )
   provider.fileCopy
   ({
     srcPath : srcPath,
-    dstPath : '../dst',
+    dstPath : test.context.globalFromLocal( '../dst' ),
     sync : 1,
     rewriting : 1,
     throwing : 1
@@ -5277,7 +5277,7 @@ function fileCopySync( test )
   provider.fileWrite( srcPath, srcPath );
   provider.fileCopy
   ({
-    srcPath : '../src',
+    srcPath : test.context.globalFromLocal( '../src' ),
     dstPath : dstPath,
     sync : 1,
     rewriting : 1,
@@ -5299,8 +5299,8 @@ function fileCopySync( test )
   {
     provider.fileCopy
     ({
-      srcPath : '../src',
-      dstPath : '../dst',
+      srcPath : test.context.globalFromLocal( '../src' ),
+      dstPath : test.context.globalFromLocal( '../dst' ),
       sync : 1,
       rewriting : 1,
       throwing : 1
@@ -6271,7 +6271,8 @@ function fileCopyAsync( test )
   /**/
 
   .finally( function()
-  {
+  { 
+    debugger
     var con = provider.fileCopy
     ({
       srcPath : test.context.pathFor( 'not_existing_path' ),
@@ -6996,7 +6997,7 @@ function fileCopySoftLinkResolving( test )
   let self = this;
   let provider = self.provider;
   let path = provider.path;
-
+ 
   if( !_.routineIs( provider.fileCopy ) )
   {
     test.identical( 1,1 );
@@ -7263,10 +7264,10 @@ function fileCopySoftLinkResolving( test )
   test.open( 'self cycled' );
 
   /* dst does not exist */
-
+  
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 0, allowingMissed : 0, throwing : 0 };
   var got = fileCopy( o );
   test.identical( got, true );
@@ -7274,26 +7275,26 @@ function fileCopySoftLinkResolving( test )
   test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( provider.pathResolveSoftLink( dstPath ), '../src' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../src' ) );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 0, allowingMissed : 0, throwing : 1 };
   test.shouldThrowError( () => fileCopy( o ) );
   test.identical( o.srcPath, srcPath );
   test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( !provider.fileExists( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
   //test.identical( provider.statResolvedRead( srcPath ), null );
 
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 0, allowingMissed : 1, allowingCycled : 1, throwing : 0 };
   var got = fileCopy( o );
   test.identical( got, true );
@@ -7302,13 +7303,13 @@ function fileCopySoftLinkResolving( test )
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
   // test.is( !provider.fileExists( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( provider.pathResolveSoftLink( dstPath ), '../src' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../src' ) );
   //test.identical( provider.statResolvedRead( srcPath ), null );
 
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 0, allowingMissed : 1, allowingCycled : 1, throwing : 1 };
   var got = fileCopy( o );
   test.identical( got, true );
@@ -7317,16 +7318,16 @@ function fileCopySoftLinkResolving( test )
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
   // test.is( !provider.fileExists( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( provider.pathResolveSoftLink( dstPath ), '../src' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../src' ) );
   //test.identical( provider.statResolvedRead( srcPath ), null );
 
   /* both are self links */
 
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
-  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 0, allowingMissed : 0, throwing : 0 };
   var got = fileCopy( o );
   test.identical( got, true );
@@ -7334,15 +7335,15 @@ function fileCopySoftLinkResolving( test )
   test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( provider.pathResolveSoftLink( dstPath ), '../src' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../src' ) );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
-  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 0, allowingMissed : 1, throwing : 0 };
   var got = fileCopy( o );
   test.identical( got, true );
@@ -7350,15 +7351,15 @@ function fileCopySoftLinkResolving( test )
   test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( provider.pathResolveSoftLink( dstPath ), '../src' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../src' ) );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
-  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 0, allowingMissed : 0, throwing : 1 };
   var got = fileCopy( o );
   test.identical( got, true );
@@ -7366,15 +7367,15 @@ function fileCopySoftLinkResolving( test )
   test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( provider.pathResolveSoftLink( dstPath ), '../src' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../src' ) );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
-  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 0, allowingMissed : 1, throwing : 1 };
   var got = fileCopy( o );
   test.identical( got, true );
@@ -7382,8 +7383,8 @@ function fileCopySoftLinkResolving( test )
   test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( provider.pathResolveSoftLink( dstPath ), '../src' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../src' ) );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
@@ -7391,8 +7392,8 @@ function fileCopySoftLinkResolving( test )
 
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
-  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 0, allowingMissed : 0,  throwing : 0 };
   var got = fileCopy( o );
   test.identical( got, null );
@@ -7400,15 +7401,15 @@ function fileCopySoftLinkResolving( test )
   test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( provider.pathResolveSoftLink( dstPath ), '../dst' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../dst' ) );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
-  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 0, allowingMissed : 1, allowingCycled : 1, throwing : 0 };
   var got = fileCopy( o );
   test.identical( got, true );
@@ -7416,30 +7417,30 @@ function fileCopySoftLinkResolving( test )
   test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( provider.pathResolveSoftLink( dstPath ), '../src' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../src' ) );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
-  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 0, allowingMissed : 0, throwing : 1 };
   test.shouldThrowError( () => fileCopy( o ) );
   test.identical( o.srcPath, srcPath );
   test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( provider.pathResolveSoftLink( dstPath ), '../dst' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../dst' ) );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
-  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 0, allowingMissed : 1, allowingCycled : 1, throwing : 1 };
   var got = fileCopy( o );
   test.identical( got, true );
@@ -7447,8 +7448,8 @@ function fileCopySoftLinkResolving( test )
   test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( provider.pathResolveSoftLink( dstPath ), '../src' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../src' ) );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
@@ -7456,8 +7457,8 @@ function fileCopySoftLinkResolving( test )
 
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
-  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 1, allowingMissed : 0, throwing : 0 };
   var got = fileCopy( o );
   test.identical( got, true );
@@ -7465,15 +7466,15 @@ function fileCopySoftLinkResolving( test )
   test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( provider.pathResolveSoftLink( dstPath ), '../src' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../src' ) );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
-  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 1, allowingMissed : 1, throwing : 0 };
   var got = fileCopy( o );
   test.identical( got, true );
@@ -7481,15 +7482,15 @@ function fileCopySoftLinkResolving( test )
   test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( provider.pathResolveSoftLink( dstPath ), '../src' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../src' ) );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
-  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 1, allowingMissed : 0, throwing : 1 };
   var got = fileCopy( o );
   test.identical( got, true );
@@ -7497,15 +7498,15 @@ function fileCopySoftLinkResolving( test )
   test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( provider.pathResolveSoftLink( dstPath ), '../src' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../src' ) );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
-  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 1, allowingMissed : 1, throwing : 1 };
   var got = fileCopy( o );
   test.identical( got, true );
@@ -7513,8 +7514,8 @@ function fileCopySoftLinkResolving( test )
   test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( provider.pathResolveSoftLink( dstPath ), '../src' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../src' ) );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
@@ -7522,8 +7523,8 @@ function fileCopySoftLinkResolving( test )
 
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
-  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 1, allowingMissed : 0, throwing : 0 };
   var got = fileCopy( o );
   test.identical( got, null );
@@ -7531,15 +7532,15 @@ function fileCopySoftLinkResolving( test )
   test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( provider.pathResolveSoftLink( dstPath ), '../dst' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../dst' ) );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
-  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 1, allowingMissed : 1, allowingCycled : 1, throwing : 0 };
   var got = fileCopy( o );
   test.identical( got, true );
@@ -7547,30 +7548,30 @@ function fileCopySoftLinkResolving( test )
   test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( provider.pathResolveSoftLink( dstPath ), '../src' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../src' ) );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
-  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 1, allowingMissed : 0, throwing : 1 };
   test.shouldThrowError( () => fileCopy( o ) );
   test.identical( o.srcPath, srcPath );
   test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( provider.pathResolveSoftLink( dstPath ), '../dst' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../dst' ) );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
-  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 1, allowingMissed : 1, allowingCycled : 1, throwing : 1 };
   var got = fileCopy( o );
   test.identical( got, true );
@@ -7578,8 +7579,8 @@ function fileCopySoftLinkResolving( test )
   test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( provider.pathResolveSoftLink( dstPath ), '../src' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../src' ) );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
@@ -7878,7 +7879,7 @@ function fileCopyLinks( test )
   test.case = 'src self link';
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 0, allowingMissed : 0, throwing : 0 };
   var got = fileCopy( o );
   test.identical( got, true );
@@ -7886,14 +7887,14 @@ function fileCopyLinks( test )
   test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( provider.pathResolveSoftLink( dstPath ), '../src' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../src' ) );
 
   test.case = 'both are self links';
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
-  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 0, allowingMissed : 0, throwing : 0 };
   var got = fileCopy( o );
   test.identical( got, true );
@@ -7901,8 +7902,8 @@ function fileCopyLinks( test )
   test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( provider.pathResolveSoftLink( dstPath ), '../src' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../src' ) );
 
   test.case = 'src cycled';
   provider.filesDelete( /*workDir*/testPath );
@@ -11449,10 +11450,10 @@ function fileRenameActSync( test )
     originalDstPath : dstPath,
     sync : 1
   }
-  test.shouldThrowError( () =>
-  {
-    provider.fileRenameAct( o );
-  })
+  if( !self.providerIsInstanceOf( _.FileProvider.Hub ) )
+  test.shouldThrowError( () => provider.fileRenameAct( o ) );
+  else
+  test.mustNotThrowError( () => provider.fileRenameAct( o ) );
   provider.filesDelete( /*dir*/testPath );
 
   //
@@ -11742,57 +11743,57 @@ function fileRenameSoftLinkResolving( test )
 
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
-  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 0 };
   fileRename( o );
   test.identical( o.srcPath, srcPath );
   test.identical( o.dstPath, dstPath );
   test.is( !provider.fileExists( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( dstPath ), '../src' );
+  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../src' ) );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
-  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 0 };
   test.shouldThrowError( () => fileRename( o ) );
   test.identical( o.srcPath, srcPath );
   test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( provider.pathResolveSoftLink( dstPath ), '../dst' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../dst' ) );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
-  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 1 };
   fileRename( o );
   test.identical( o.srcPath, srcPath );
   test.identical( o.dstPath, dstPath );
   test.is( !provider.fileExists( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( dstPath ), '../src' );
+  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../src' ) );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
-  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 1 };
   test.shouldThrowError( () => fileRename( o ) );
   test.identical( o.srcPath, srcPath );
   test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( provider.pathResolveSoftLink( dstPath ), '../dst' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../dst' ) );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
@@ -12819,8 +12820,10 @@ function fileDeleteLocked( test )
   let self = this;
   let provider = self.provider;
   let path = provider.path;
+  
+  let skip = !self.providerIsInstanceOf( _.FileProvider.HardDrive ) || self.providerIsInstanceOf( _.FileProvider.Hub );
 
-  if( !self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  if( skip )
   {
     test.identical( 1,1 );
     return;
@@ -14445,10 +14448,9 @@ function dirMakeSync( test )
 
   test.case = 'synchronous mkdir force';
   provider.filesDelete( filePath );
-  filePath = test.context.pathFor( 'written/dirMake/make_dir/dir1/' );
+  filePath = test.context.pathFor( 'written/dirMake/make_dir/dir1' );
 
   /**/
-
   provider.dirMake
   ({
     filePath : filePath,
@@ -15744,7 +15746,7 @@ function dirReadSyncOutputFormats( test )
     outputFormat : 'relative',
     basePath : basePath
   })
-  test.identical( got, [ '../file' ] );
+  test.identical( got, [ test.context.globalFromLocal( '../file' ) ] );
 
   test.case = 'directory';
   provider.fileWrite( filePath, filePath );
@@ -15754,7 +15756,7 @@ function dirReadSyncOutputFormats( test )
     outputFormat : 'relative',
     basePath : basePath
   })
-  test.identical( got, [ '../file' ] );
+  test.identical( got, [ test.context.globalFromLocal( '../file' ) ] );
 
 }
 
@@ -18886,7 +18888,7 @@ function softLinkRelativePath( test )
   provider.filesDelete( testPath );
   provider.fileWrite( pathToFile, pathToFile );
 
-  var srcPath = '../file';
+  var srcPath = test.context.globalFromLocal( '../file' );
   var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
   provider.filesDelete( dstPath );
   provider.softLink( dstPath, srcPath );
@@ -18898,7 +18900,7 @@ function softLinkRelativePath( test )
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, /*_.path*/path.normalize( srcPath ) );
 
-  var srcPath = './../file';
+  var srcPath = test.context.globalFromLocal( './../file' );
   var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
   provider.filesDelete( dstPath );
   provider.softLink( dstPath, srcPath );
@@ -18910,7 +18912,7 @@ function softLinkRelativePath( test )
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, /*_.path*/path.normalize( srcPath ) );
 
-  var srcPath = '../../file';
+  var srcPath = test.context.globalFromLocal( '../../file' );
   var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstPath/dstFile' );
   provider.filesDelete( dstPath );
   provider.dirMakeForFile( dstPath )
@@ -18923,7 +18925,7 @@ function softLinkRelativePath( test )
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, /*_.path*/path.normalize( srcPath ) );
 
-  var srcPath = './../../file';
+  var srcPath = test.context.globalFromLocal( './../../file' );
   var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstPath/dstFile' );
   provider.filesDelete( dstPath );
   provider.dirMakeForFile( dstPath )
@@ -18936,7 +18938,7 @@ function softLinkRelativePath( test )
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, /*_.path*/path.normalize( srcPath ) );
 
-  var srcPath = './../../../file';
+  var srcPath = test.context.globalFromLocal( './../../../file' );
   var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/a/file' );
   provider.fileWrite( pathToFile2, pathToFile2 );
   var dstPath = test.context.pathFor( 'written/softLinkRelativePath/a/b/c/dstFile' );
@@ -18951,7 +18953,7 @@ function softLinkRelativePath( test )
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, /*_.path*/path.normalize( srcPath ) );
 
-  var srcPath = '../../../file';
+  var srcPath = test.context.globalFromLocal( '../../../file' );
   var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/a/file' );
   provider.fileWrite( pathToFile2, pathToFile2 );
   var dstPath = test.context.pathFor( 'written/softLinkRelativePath/a/b/c/dstFile' );
@@ -18966,7 +18968,7 @@ function softLinkRelativePath( test )
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, /*_.path*/path.normalize( srcPath ) );
 
-  var srcPath = './.././a/b/c';
+  var srcPath = test.context.globalFromLocal( './.././a/b/c' );
   var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/a/b/c' );
   provider.filesDelete( pathToFile2 );
   provider.fileWrite( pathToFile2, pathToFile2 );
@@ -18982,7 +18984,7 @@ function softLinkRelativePath( test )
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, /*_.path*/path.normalize( srcPath ) );
 
-  var srcPath = '.././a/b/c';
+  var srcPath = test.context.globalFromLocal( '.././a/b/c' );
   var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/a/b/c' );
   provider.filesDelete( pathToFile2 );
   provider.fileWrite( pathToFile2, pathToFile2 );
@@ -18998,7 +19000,7 @@ function softLinkRelativePath( test )
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, /*_.path*/path.normalize( srcPath ) );
 
-  var srcPath = '.\\..\\.\\a\\b\\c';
+  var srcPath = test.context.globalFromLocal( '.\\..\\.\\a\\b\\c' );
   var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/a/b/c' );
   provider.filesDelete( pathToFile2 );
   provider.fileWrite( pathToFile2, pathToFile2 );
@@ -19014,7 +19016,7 @@ function softLinkRelativePath( test )
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, /*_.path*/path.normalize( srcPath ) );
 
-  var srcPath = '..\\.\\a\\b\\c';
+  var srcPath = test.context.globalFromLocal( '..\\.\\a\\b\\c' );
   var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/a/b/c' );
   provider.filesDelete( pathToFile2 );
   provider.fileWrite( pathToFile2, pathToFile2 );
@@ -19030,7 +19032,7 @@ function softLinkRelativePath( test )
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, /*_.path*/path.normalize( srcPath ) );
 
-  var srcPath = './../a/b/c/../..';
+  var srcPath = test.context.globalFromLocal( './../a/b/c/../..' );
   var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/a' );
   provider.filesDelete( pathToFile2 );
   provider.fileWrite( pathToFile2, pathToFile2 );
@@ -19046,7 +19048,7 @@ function softLinkRelativePath( test )
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, /*_.path*/path.normalize( srcPath ) );
 
-  var srcPath = '../a/b/c/../..';
+  var srcPath = test.context.globalFromLocal( '../a/b/c/../..' );
   var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/a' );
   provider.filesDelete( pathToFile2 );
   provider.fileWrite( pathToFile2, pathToFile2 );
@@ -19062,7 +19064,7 @@ function softLinkRelativePath( test )
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, /*_.path*/path.normalize( srcPath ) );
 
-  var srcPath = '.\\..\\a\\b\\c\\..\\..';
+  var srcPath = test.context.globalFromLocal( '.\\..\\a\\b\\c\\..\\..' );
   var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/a' );
   provider.filesDelete( pathToFile2 );
   provider.fileWrite( pathToFile2, pathToFile2 );
@@ -19078,7 +19080,7 @@ function softLinkRelativePath( test )
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, /*_.path*/path.normalize( srcPath ) );
 
-  var srcPath = '..\\a\\b\\c\\..\\..';
+  var srcPath = test.context.globalFromLocal( '..\\a\\b\\c\\..\\..' );
   var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/a' );
   provider.filesDelete( pathToFile2 );
   provider.fileWrite( pathToFile2, pathToFile2 );
@@ -19094,7 +19096,7 @@ function softLinkRelativePath( test )
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, /*_.path*/path.normalize( srcPath ) );
 
-  var srcPath = '..\\a\\b\\c\\..\\..';
+  var srcPath = test.context.globalFromLocal( '..\\a\\b\\c\\..\\..' );
   var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/a' );
   provider.filesDelete( pathToFile2 );
   var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
@@ -19113,7 +19115,7 @@ function softLinkRelativePath( test )
   provider.fileWrite( /*_.path*/path.join( pathToDir, 'fileInDir' ), 'fileInDir' );
   provider.dirMake( pathToDir );
 
-  var srcPath = '../dir';
+  var srcPath = test.context.globalFromLocal( '../dir' );
   var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstPath' );
   provider.filesDelete( dstPath );
   provider.softLink( dstPath, srcPath );
@@ -19125,7 +19127,7 @@ function softLinkRelativePath( test )
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, /*_.path*/path.normalize( srcPath ) );
 
-  var srcPath = './../dir';
+  var srcPath = test.context.globalFromLocal( './../dir' );
   var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstPath' );
   provider.filesDelete( dstPath );
   provider.softLink( dstPath, srcPath );
@@ -19137,7 +19139,7 @@ function softLinkRelativePath( test )
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, /*_.path*/path.normalize( srcPath ) );
 
-  var srcPath = '../../dir';
+  var srcPath = test.context.globalFromLocal( '../../dir' );
   var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstPath/dstDirLink' );
   provider.filesDelete( self.provider.path.dir( dstPath ) );
   provider.dirMakeForFile( dstPath )
@@ -19150,7 +19152,7 @@ function softLinkRelativePath( test )
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, /*_.path*/path.normalize( srcPath ) );
 
-  var srcPath = './../../dir';
+  var srcPath = test.context.globalFromLocal( './../../dir' );
   var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstPath/dstDirLink' );
   provider.filesDelete( self.provider.path.dir( dstPath ) );
   provider.dirMakeForFile( dstPath )
@@ -19163,7 +19165,7 @@ function softLinkRelativePath( test )
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, /*_.path*/path.normalize( srcPath ) );
 
-  var srcPath = '../../../dir';
+  var srcPath = test.context.globalFromLocal( '../../../dir' );
   var pathToDir2 = test.context.pathFor( 'written/softLinkRelativePath/a/dir' );
   provider.filesDelete( self.provider.path.dir( pathToDir2 ) );
   provider.dirMake( pathToDir2 );
@@ -19180,7 +19182,7 @@ function softLinkRelativePath( test )
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, /*_.path*/path.normalize( srcPath ) );
 
-  var srcPath = './../../../dir';
+  var srcPath = test.context.globalFromLocal( './../../../dir' );
   var pathToDir2 = test.context.pathFor( 'written/softLinkRelativePath/a/dir' );
   provider.filesDelete( self.provider.path.dir( pathToDir2 ) );
   provider.dirMake( pathToDir2 );
@@ -19199,7 +19201,7 @@ function softLinkRelativePath( test )
 
   //
 
-  var srcPath = './.././a/b/c';
+  var srcPath = test.context.globalFromLocal( './.././a/b/c' );
   var pathToDir2 = test.context.pathFor( 'written/softLinkRelativePath/a/b/c' );
   provider.filesDelete( self.provider.path.dir( pathToDir2 ) );
   provider.dirMake( pathToDir2 );
@@ -19216,7 +19218,7 @@ function softLinkRelativePath( test )
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, /*_.path*/path.normalize( srcPath ) );
 
-  var srcPath = '.././a/b/c';
+  var srcPath = test.context.globalFromLocal( '.././a/b/c' );
   var pathToDir2 = test.context.pathFor( 'written/softLinkRelativePath/a/b/c' );
   provider.filesDelete( self.provider.path.dir( pathToDir2 ) );
   provider.dirMake( pathToDir2 );
@@ -19233,7 +19235,7 @@ function softLinkRelativePath( test )
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, /*_.path*/path.normalize( srcPath ) );
 
-  var srcPath = '.\\..\\.\\a\\b\\c';
+  var srcPath = test.context.globalFromLocal( '.\\..\\.\\a\\b\\c' );
   var pathToDir2 = test.context.pathFor( 'written/softLinkRelativePath/a/b/c' );
   provider.filesDelete( self.provider.path.dir( pathToDir2 ) );
   provider.dirMake( pathToDir2 );
@@ -19250,7 +19252,7 @@ function softLinkRelativePath( test )
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, /*_.path*/path.normalize( srcPath ) );
 
-  var srcPath = '..\\.\\a\\b\\c';
+  var srcPath = test.context.globalFromLocal( '..\\.\\a\\b\\c' );
   var pathToDir2 = test.context.pathFor( 'written/softLinkRelativePath/a/b/c' );
   provider.filesDelete( self.provider.path.dir( pathToDir2 ) );
   provider.dirMake( pathToDir2 );
@@ -19268,7 +19270,7 @@ function softLinkRelativePath( test )
   test.identical( got, /*_.path*/path.normalize( srcPath ) );
 
 
-  var srcPath = './../a/b/c/../..';
+  var srcPath = test.context.globalFromLocal( './../a/b/c/../..' );
   var pathToDir2 = test.context.pathFor( 'written/softLinkRelativePath/a' );
   provider.filesDelete( self.provider.path.dir( pathToDir2 ) );
   provider.dirMake( pathToDir2 );
@@ -19285,25 +19287,7 @@ function softLinkRelativePath( test )
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, /*_.path*/path.normalize( srcPath ) );
 
-  var srcPath = '../a/b/c/../..';
-  var pathToDir2 = test.context.pathFor( 'written/softLinkRelativePath/a' );
-  provider.filesDelete( self.provider.path.dir( pathToDir2 ) );
-  provider.dirMake( pathToDir2 );
-  provider.fileWrite( /*_.path*/path.join( pathToDir2, 'fileInDir' ) , 'fileInDir' );
-  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstPath' );
-  provider.filesDelete( dstPath );
-  provider.dirMakeForFile( dstPath )
-  provider.softLink( dstPath, srcPath );
-  var got = provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
-  test.identical( got, pathToDir2 );
-  test.is( provider.isSoftLink( dstPath ) );
-  var got = provider.dirRead({ filePath : dstPath });
-  test.identical( got,[ 'fileInDir' ] );
-  var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
-  test.identical( got, /*_.path*/path.normalize( srcPath ) );
-
-
-  var srcPath = '.\\..\\a\\b\\c\\..\\..';
+  var srcPath = test.context.globalFromLocal( '../a/b/c/../..' );
   var pathToDir2 = test.context.pathFor( 'written/softLinkRelativePath/a' );
   provider.filesDelete( self.provider.path.dir( pathToDir2 ) );
   provider.dirMake( pathToDir2 );
@@ -19321,7 +19305,7 @@ function softLinkRelativePath( test )
   test.identical( got, /*_.path*/path.normalize( srcPath ) );
 
 
-  var srcPath = '..\\a\\b\\c\\..\\..';
+  var srcPath = test.context.globalFromLocal( '.\\..\\a\\b\\c\\..\\..' );
   var pathToDir2 = test.context.pathFor( 'written/softLinkRelativePath/a' );
   provider.filesDelete( self.provider.path.dir( pathToDir2 ) );
   provider.dirMake( pathToDir2 );
@@ -19338,7 +19322,25 @@ function softLinkRelativePath( test )
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, /*_.path*/path.normalize( srcPath ) );
 
-  var srcPath = '..\\a\\b\\c\\..\\..';
+
+  var srcPath = test.context.globalFromLocal( '..\\a\\b\\c\\..\\..' );
+  var pathToDir2 = test.context.pathFor( 'written/softLinkRelativePath/a' );
+  provider.filesDelete( self.provider.path.dir( pathToDir2 ) );
+  provider.dirMake( pathToDir2 );
+  provider.fileWrite( /*_.path*/path.join( pathToDir2, 'fileInDir' ) , 'fileInDir' );
+  var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstPath' );
+  provider.filesDelete( dstPath );
+  provider.dirMakeForFile( dstPath )
+  provider.softLink( dstPath, srcPath );
+  var got = provider.pathResolveLinkFull({ filePath : dstPath, resolvingSoftLink : 1 });
+  test.identical( got, pathToDir2 );
+  test.is( provider.isSoftLink( dstPath ) );
+  var got = provider.dirRead({ filePath : dstPath });
+  test.identical( got,[ 'fileInDir' ] );
+  var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
+  test.identical( got, /*_.path*/path.normalize( srcPath ) );
+
+  var srcPath = test.context.globalFromLocal( '..\\a\\b\\c\\..\\..' );
   var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/a' );
   provider.filesDelete( pathToFile2 );
   var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
@@ -19355,7 +19357,7 @@ function softLinkRelativePath( test )
   provider.fileWrite( pathToFile, pathToFile );
 
   var srcPath = pathToFile;
-  var dstPath = '../dstFile';
+  var dstPath = test.context.globalFromLocal( '../dstFile' );
   var dstPathResolved = /*_.path*/path.resolve( srcPath, dstPath );
   provider.filesDelete( dstPathResolved );
   provider.softLink( dstPath, srcPath );
@@ -19366,7 +19368,7 @@ function softLinkRelativePath( test )
   test.identical( got,pathToFile );
 
   var srcPath = pathToFile;
-  var dstPath = './../dstFile';
+  var dstPath = test.context.globalFromLocal( './../dstFile' );
   var dstPathResolved = /*_.path*/path.resolve( srcPath, dstPath );
   provider.filesDelete( dstPathResolved );
   provider.softLink( dstPath, srcPath );
@@ -19377,7 +19379,7 @@ function softLinkRelativePath( test )
   test.identical( got,pathToFile );
 
   var srcPath = pathToFile;
-  var dstPath = './../../dstFile';
+  var dstPath = test.context.globalFromLocal( './../../dstFile' );
   var dstPathResolved = /*_.path*/path.resolve( srcPath, dstPath );
   provider.filesDelete( dstPathResolved );
   provider.softLink( dstPath, srcPath );
@@ -19388,7 +19390,7 @@ function softLinkRelativePath( test )
   test.identical( got,pathToFile );
 
   var srcPath = pathToFile;
-  var dstPath = './../../dstFile';
+  var dstPath = test.context.globalFromLocal( './../../dstFile' );
   var dstPathResolved = /*_.path*/path.resolve( srcPath, dstPath );
   provider.filesDelete( dstPathResolved );
   provider.softLink( dstPath, srcPath );
@@ -19399,7 +19401,7 @@ function softLinkRelativePath( test )
   test.identical( got,pathToFile );
 
   var srcPath = pathToFile;
-  var dstPath = '../a/b/dstFile';
+  var dstPath = test.context.globalFromLocal( '../a/b/dstFile' );
   var dstPathResolved = /*_.path*/path.resolve( srcPath, dstPath );
   provider.dirMakeForFile( dstPathResolved );
   provider.filesDelete( dstPathResolved );
@@ -19411,7 +19413,7 @@ function softLinkRelativePath( test )
   test.identical( got,pathToFile );
 
   var srcPath = pathToFile;
-  var dstPath = './../a/b/dstFile';
+  var dstPath = test.context.globalFromLocal( './../a/b/dstFile' );
   var dstPathResolved = /*_.path*/path.resolve( srcPath, dstPath );
   provider.dirMakeForFile( dstPathResolved );
   provider.filesDelete( dstPathResolved );
@@ -19433,7 +19435,7 @@ function softLinkRelativePath( test )
   provider.dirMake( pathToDir );
 
   var srcPath = pathToDir;
-  var dstPath = '../dstPath'
+  var dstPath = test.context.globalFromLocal( '../dstPath' );
   var dstPathResolved = /*_.path*/path.resolve( srcPath, dstPath );
   provider.filesDelete( dstPathResolved );
   provider.softLink( dstPath, srcPath );
@@ -19444,7 +19446,7 @@ function softLinkRelativePath( test )
   test.identical( got,[ 'fileInDir' ] );
 
   var srcPath = pathToDir;
-  var dstPath = './../dstPath'
+  var dstPath = test.context.globalFromLocal( './../dstPath' );
   var dstPathResolved = /*_.path*/path.resolve( srcPath, dstPath );
   provider.filesDelete( dstPathResolved );
   provider.softLink( dstPath, srcPath );
@@ -19455,7 +19457,7 @@ function softLinkRelativePath( test )
   test.identical( got,[ 'fileInDir' ] );
 
   var srcPath = pathToDir;
-  var dstPath = '../../dstPath'
+  var dstPath = test.context.globalFromLocal( '../../dstPath' )
   var dstPathResolved = /*_.path*/path.resolve( srcPath, dstPath );
   provider.filesDelete( dstPathResolved );
   provider.softLink( dstPath, srcPath );
@@ -19466,7 +19468,7 @@ function softLinkRelativePath( test )
   test.identical( got,[ 'fileInDir' ] );
 
   var srcPath = pathToDir;
-  var dstPath = './../../dstPath'
+  var dstPath = test.context.globalFromLocal( './../../dstPath' );
   var dstPathResolved = /*_.path*/path.resolve( srcPath, dstPath );
   provider.filesDelete( dstPathResolved );
   provider.softLink( dstPath, srcPath );
@@ -19477,7 +19479,7 @@ function softLinkRelativePath( test )
   test.identical( got,[ 'fileInDir' ] );
 
   var srcPath = pathToDir;
-  var dstPath = '../a/b/dstPath'
+  var dstPath = test.context.globalFromLocal( '../a/b/dstPath' );
   var dstPathResolved = /*_.path*/path.resolve( srcPath, dstPath );
   provider.filesDelete( dstPathResolved );
   provider.dirMakeForFile( dstPathResolved );
@@ -19489,7 +19491,7 @@ function softLinkRelativePath( test )
   test.identical( got,[ 'fileInDir' ] );
 
   var srcPath = pathToDir;
-  var dstPath = './../a/b/dstPath'
+  var dstPath = test.context.globalFromLocal( './../a/b/dstPath' );
   var dstPathResolved = /*_.path*/path.resolve( srcPath, dstPath );
   provider.filesDelete( dstPathResolved );
   provider.dirMakeForFile( dstPathResolved );
@@ -19506,7 +19508,7 @@ function softLinkRelativePath( test )
 
   test.open( 'allowingMissed on, relative path to src' );
 
-  var srcPath = '../file';
+  var srcPath = test.context.globalFromLocal( '../file' );
   var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
   provider.filesDelete( testPath );
   provider.dirMakeForFile( dstPath );
@@ -19544,7 +19546,7 @@ function softLinkRelativePath( test )
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, srcPath );
 
-  var srcPath = '../file';
+  var srcPath = test.context.globalFromLocal( '../file' );
   var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
   provider.filesDelete( testPath );
   provider.dirMakeForFile( dstPath );
@@ -19582,7 +19584,7 @@ function softLinkRelativePath( test )
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, srcPath );
 
-  var srcPath = '../file';
+  var srcPath = test.context.globalFromLocal( '../file' );
   var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
   provider.filesDelete( testPath );
   provider.dirMakeForFile( dstPath );
@@ -19620,7 +19622,7 @@ function softLinkRelativePath( test )
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, srcPath );
 
-  var srcPath = '../file';
+  var srcPath = test.context.globalFromLocal( '../file' );
   var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
   provider.filesDelete( testPath );
   provider.dirMakeForFile( dstPath );
@@ -19664,7 +19666,7 @@ function softLinkRelativePath( test )
 
   test.open( 'allowingMissed on, same path' );
 
-  var srcPath = '../file';
+  var srcPath = test.context.globalFromLocal( '../file' );
   var dstPath = pathToFile;
   provider.filesDelete( testPath );
   provider.fileWrite( pathToFile, pathToFile );
@@ -19693,7 +19695,7 @@ function softLinkRelativePath( test )
   //
 
   var srcPath = pathToFile;
-  var dstPath = '../file';
+  var dstPath = test.context.globalFromLocal( '../file' );
   var dstPathResolved = provider.path.resolve( srcPath, dstPath );
   provider.filesDelete( testPath );
   provider.fileWrite( pathToFile, pathToFile );
@@ -19725,7 +19727,7 @@ function softLinkRelativePath( test )
 
   test.open( 'allowingMissed off, relative path to src' );
 
-  var srcPath = '../file';
+  var srcPath = test.context.globalFromLocal( '../file' );
   var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
   provider.filesDelete( testPath );
   test.shouldThrowError( () =>
@@ -19741,7 +19743,7 @@ function softLinkRelativePath( test )
   })
   test.is( !provider.isSoftLink( dstPath ) );
 
-  var srcPath = '../file';
+  var srcPath = test.context.globalFromLocal( '../file' );
   var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
   provider.filesDelete( testPath );
   test.mustNotThrowError( () =>
@@ -19757,7 +19759,7 @@ function softLinkRelativePath( test )
   })
   test.is( !provider.isSoftLink( dstPath ) );
 
-  var srcPath = '../file';
+  var srcPath = test.context.globalFromLocal( '../file' );
   var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
   provider.filesDelete( testPath );
   test.mustNotThrowError( () =>
@@ -19773,7 +19775,7 @@ function softLinkRelativePath( test )
   })
   test.is( !provider.isSoftLink( dstPath ) );
 
-  var srcPath = '../file';
+  var srcPath = test.context.globalFromLocal( '../file' );
   var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
   provider.filesDelete( testPath );
   test.shouldThrowError( () =>
@@ -19793,7 +19795,7 @@ function softLinkRelativePath( test )
 
   test.open( 'allowingMissed off, same path' );
 
-  var srcPath = '../file';
+  var srcPath = test.context.globalFromLocal( '../file' );
   var dstPath = pathToFile;
   provider.filesDelete( testPath );
   provider.fileWrite( pathToFile, pathToFile );
@@ -19811,7 +19813,7 @@ function softLinkRelativePath( test )
   test.is( !provider.isSoftLink( dstPath ) );
 
   var srcPath = pathToFile;
-  var dstPath = '../file';
+  var dstPath = test.context.globalFromLocal( '../file' );
   var dstPathResolved = provider.path.resolve( srcPath, dstPath );
   provider.filesDelete( testPath );
   provider.fileWrite( pathToFile, pathToFile );
@@ -20366,10 +20368,12 @@ function softLinkActSync( test )
   }
 
   var expected = _.mapExtend( null, o );
+  
+  if( !( provider instanceof _.FileProvider.Hub ) )
   if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   if( process.platform === 'win32' )
   expected.type = 'file'
-
+  
   provider.softLinkAct( o );
   test.identical( o, expected );
   test.is( provider.isSoftLink( dstPath ) );
@@ -20868,61 +20872,61 @@ function softLinkSoftLinkResolving( test )
 
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
-  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 0 };
   softLink( o );
   test.identical( o.srcPath, srcPath );
   test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
   test.identical( provider.pathResolveSoftLink( dstPath ), srcPath );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
-  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 0 };
   test.shouldThrowError( () => softLink( o ) );
   test.identical( o.srcPath, srcPath );
   test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( provider.pathResolveSoftLink( dstPath ), '../dst' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../dst' ) );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
-  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 1 };
   softLink( o );
   test.identical( o.srcPath, srcPath );
   test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
   test.identical( provider.pathResolveSoftLink( dstPath ), srcPath );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
-  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 1 };
   test.shouldThrowError( () => softLink( o ) );
   test.identical( o.srcPath, srcPath );
   test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( provider.pathResolveSoftLink( dstPath ), '../dst' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../dst' ) );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
@@ -21397,61 +21401,61 @@ function softLinkRelativeLinkResolving( test )
 
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
-  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 0 };
   softLink( o );
   test.identical( o.srcPath, srcPath );
   test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
   test.identical( provider.pathResolveSoftLink( dstPath ), srcPath );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
-  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 0 };
   test.shouldThrowError( () => softLink( o ) );
   test.identical( o.srcPath, srcPath );
   test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( provider.pathResolveSoftLink( dstPath ), '../dst' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../dst' ) );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
-  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 1 };
   softLink( o );
   test.identical( o.srcPath, srcPath );
   test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
   test.identical( provider.pathResolveSoftLink( dstPath ), srcPath );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
-  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 1 };
   test.shouldThrowError( () => softLink( o ) );
   test.identical( o.srcPath, srcPath );
   test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( provider.pathResolveSoftLink( dstPath ), '../dst' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../dst' ) );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
@@ -21464,9 +21468,9 @@ function softLinkRelativeLinkResolving( test )
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
   provider.softLink({ dstPath : srcPath, srcPath : srcPathRelative2, allowingMissed : 1 });
-  provider.softLink({ dstPath : srcPath2, srcPath : '../src', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath2, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
   provider.softLink({ dstPath : dstPath, srcPath : dstPathRelative2, allowingMissed : 1 });
-  provider.softLink({ dstPath : dstPath2, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : dstPath2, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 0 };
   softLink( o );
   test.identical( o.srcPath, srcPath );
@@ -21475,17 +21479,17 @@ function softLinkRelativeLinkResolving( test )
   test.is( provider.isSoftLink( srcPath2 ) );
   test.is( provider.isSoftLink( dstPath ) );
   test.is( provider.isSoftLink( dstPath2 ) );
-  test.identical( provider.pathResolveSoftLink( srcPath2 ), '../src' );
+  test.identical( provider.pathResolveSoftLink( srcPath2 ), test.context.globalFromLocal( '../src' ) );
   test.identical( provider.pathResolveSoftLink( dstPath ), srcPath );
-  test.identical( provider.pathResolveSoftLink( dstPath2 ), '../dst' );
+  test.identical( provider.pathResolveSoftLink( dstPath2 ), test.context.globalFromLocal( '../dst' ) );
   test.identical( provider.pathResolveLinkFull( dstPath ), srcPath );
 
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
   provider.softLink({ dstPath : srcPath, srcPath : srcPathRelative2, allowingMissed : 1 });
-  provider.softLink({ dstPath : srcPath2, srcPath : '../src', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath2, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
   provider.softLink({ dstPath : dstPath, srcPath : dstPathRelative2, allowingMissed : 1 });
-  provider.softLink({ dstPath : dstPath2, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : dstPath2, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 0 };
   test.shouldThrowError( () => softLink( o ) );
   test.identical( o.srcPath, srcPath );
@@ -21496,17 +21500,17 @@ function softLinkRelativeLinkResolving( test )
   test.is( provider.isSoftLink( dstPath2 ) );
   test.identical( provider.pathResolveSoftLink( srcPath ), srcPathRelative2 );
   test.identical( provider.pathResolveSoftLink( dstPath ), dstPathRelative2 );
-  test.identical( provider.pathResolveSoftLink( srcPath2 ), '../src' );
-  test.identical( provider.pathResolveSoftLink( dstPath2 ), '../dst' );
+  test.identical( provider.pathResolveSoftLink( srcPath2 ), test.context.globalFromLocal( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath2 ), test.context.globalFromLocal( '../dst' ) );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
   provider.softLink({ dstPath : srcPath, srcPath : srcPathRelative2, allowingMissed : 1 });
-  provider.softLink({ dstPath : srcPath2, srcPath : '../src', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath2, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
   provider.softLink({ dstPath : dstPath, srcPath : dstPathRelative2, allowingMissed : 1 });
-  provider.softLink({ dstPath : dstPath2, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : dstPath2, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 1 };
   softLink( o );
   test.identical( o.srcPath, srcPath );
@@ -21517,17 +21521,17 @@ function softLinkRelativeLinkResolving( test )
   test.is( provider.isSoftLink( dstPath2 ) );
   test.identical( provider.pathResolveSoftLink( srcPath ), srcPathRelative2 );
   test.identical( provider.pathResolveSoftLink( dstPath ), srcPath );
-  test.identical( provider.pathResolveSoftLink( srcPath2 ), '../src' );
-  test.identical( provider.pathResolveSoftLink( dstPath2 ), '../dst' );
+  test.identical( provider.pathResolveSoftLink( srcPath2 ), test.context.globalFromLocal( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath2 ), test.context.globalFromLocal( '../dst' ) );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
   provider.softLink({ dstPath : srcPath, srcPath : srcPathRelative2, allowingMissed : 1 });
-  provider.softLink({ dstPath : srcPath2, srcPath : '../src', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath2, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
   provider.softLink({ dstPath : dstPath, srcPath : dstPathRelative2, allowingMissed : 1 });
-  provider.softLink({ dstPath : dstPath2, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : dstPath2, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 1 };
   test.shouldThrowError( () => softLink( o ) );
   test.identical( o.srcPath, srcPath );
@@ -21538,8 +21542,8 @@ function softLinkRelativeLinkResolving( test )
   test.is( provider.isSoftLink( dstPath2 ) );
   test.identical( provider.pathResolveSoftLink( srcPath ), srcPathRelative2 );
   test.identical( provider.pathResolveSoftLink( dstPath ), dstPathRelative2 );
-  test.identical( provider.pathResolveSoftLink( srcPath2 ), '../src' );
-  test.identical( provider.pathResolveSoftLink( dstPath2 ), '../dst' );
+  test.identical( provider.pathResolveSoftLink( srcPath2 ), test.context.globalFromLocal( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath2 ), test.context.globalFromLocal( '../dst' ) );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
@@ -21659,14 +21663,14 @@ function softLinkMakeAndResolve( test )
   provider.dirMake( /*workDir*/testPath );
   provider.softLink({ dstPath : linkPath, srcPath : '../file', allowingMissed : 1 });
   var resolved = provider.pathResolveSoftLink( linkPath );
-  test.identical( resolved, '../file' );
+  test.identical( resolved, test.context.globalFromLocal( '../file' ) );
 
   test.case = 'self link'
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
   provider.softLink({ dstPath : linkPath, srcPath : '../link', allowingMissed : 1 });
   var resolved = provider.pathResolveSoftLink( linkPath );
-  test.identical( resolved, '../link' );
+  test.identical( resolved, test.context.globalFromLocal( '../link' ) );
 
   test.case = 'two relative links in chain'
   provider.filesDelete( /*workDir*/testPath );
@@ -21674,7 +21678,7 @@ function softLinkMakeAndResolve( test )
   provider.softLink({ dstPath : linkPath2, srcPath : '../file', allowingMissed : 1 });
   provider.softLink({ dstPath : linkPath, srcPath : '../link2', allowingMissed : 1 });
   var resolved = provider.pathResolveSoftLink( linkPath );
-  test.identical( resolved, '../link2' );
+  test.identical( resolved, test.context.globalFromLocal( '../link2' ) );
 
   test.case = 'relative to dir'
   provider.filesDelete( /*workDir*/testPath );
@@ -21683,7 +21687,7 @@ function softLinkMakeAndResolve( test )
   provider.dirMake( dirPath );
   provider.softLink({ dstPath : linkPath, srcPath : '../dir', allowingMissed : 1 });
   var resolved = provider.pathResolveSoftLink( linkPath );
-  test.identical( resolved, '../dir' );
+  test.identical( resolved, test.context.globalFromLocal( '../dir' ) );
 
   test.case = 'path contains link to empty dir'
   provider.filesDelete( /*workDir*/testPath );
@@ -21937,7 +21941,7 @@ function textLinkSync( test )
   test.is( provider.isTextLink( linkPath1 ) );
   test.is( !provider.fileExists( filePath1 ) );
   var got = provider.pathResolveTextLink( linkPath1 );
-  test.identical( got, '../file1' );
+  test.identical( got, test.context.globalFromLocal( '../file1' ) );
 
   test.case = 'relative text link to terminal';
   provider.filesDelete( testPath );
@@ -21951,7 +21955,7 @@ function textLinkSync( test )
   test.is( provider.isTextLink( linkPath1 ) );
   test.is( provider.isTerminal( filePath1 ) );
   var got = provider.pathResolveTextLink( linkPath1 );
-  test.identical( got, '../file1' );
+  test.identical( got, test.context.globalFromLocal( '../file1' ) );
 
   /* */
 
@@ -23071,7 +23075,7 @@ function hardLinkMultipleSync( test )
   });
   test.identical( provider.filesAreHardLinked( paths ), hardLinked );
   var srcPath = paths[ 2 ];
-  test.identical( selectedFile.absolute, srcPath );
+  test.identical( selectedFile.absolute, provider.path.localFromGlobal( srcPath ) );
   var src = provider.fileRead( srcPath );
   var dst = provider.fileRead( paths[ 1 ] );
   test.identical( src, dst );
@@ -23093,7 +23097,7 @@ function hardLinkMultipleSync( test )
   });
   test.identical( provider.filesAreHardLinked( paths ), hardLinked );
   var srcPath = paths[ paths.length - 1 ];
-  test.identical( selectedFile.absolute, srcPath );
+  test.identical( selectedFile.absolute, provider.path.localFromGlobal( srcPath ) );
   var src = provider.fileRead( srcPath );
   var dst = provider.fileRead( paths[ 0 ] );
   test.identical( src, dst );
@@ -23115,7 +23119,7 @@ function hardLinkMultipleSync( test )
   });
   test.identical( provider.filesAreHardLinked( paths ), hardLinked );
   var srcPath = paths[ 0 ];
-  test.identical( selectedFile.absolute, srcPath );
+  test.identical( selectedFile.absolute, provider.path.localFromGlobal( srcPath ) );
   var src = provider.fileRead( srcPath );
   var dst = provider.fileRead( paths[ paths.length - 1 ] );
   test.identical( src, dst );
@@ -23135,7 +23139,7 @@ function hardLinkMultipleSync( test )
   });
   test.identical( provider.filesAreHardLinked( paths ), hardLinked );
   var srcPath = paths[ 0 ];
-  test.identical( selectedFile.absolute, srcPath );
+  test.identical( selectedFile.absolute, provider.path.localFromGlobal( srcPath ) );
   var src = provider.fileRead( srcPath );
   var dst = provider.fileRead( paths[ paths.length - 1 ] );
   test.identical( src, dst );
@@ -23160,7 +23164,7 @@ function hardLinkMultipleSync( test )
   });
   test.identical( provider.filesAreHardLinked( paths ), hardLinked );
   var srcPath = paths[ 2 ];
-  test.identical( selectedFile.absolute, srcPath );
+  test.identical( selectedFile.absolute, provider.path.localFromGlobal( srcPath ) );
   var src = provider.fileRead( srcPath );
   var dst = provider.fileRead( paths[ 0 ] );
   test.identical( src, dst );
@@ -23185,7 +23189,7 @@ function hardLinkMultipleSync( test )
   });
   test.identical( provider.filesAreHardLinked( paths ), hardLinked );
   var srcPath = paths[ 0 ];
-  test.identical( selectedFile.absolute, srcPath );
+  test.identical( selectedFile.absolute, provider.path.localFromGlobal( srcPath ) );
   var src = provider.fileRead( srcPath );
   var dst = provider.fileRead( paths[ 2 ] );
   var ok = test.identical( src, dst );
@@ -24087,7 +24091,7 @@ function hardLinkActSync( test )
   });
 
   //
-
+  
   test.case = 'should expect normalized path, but not nativized';
   var srcPath = /*dir*/testPath + '\\src';
   provider.fileWrite( srcPath, srcPath );
@@ -24102,10 +24106,10 @@ function hardLinkActSync( test )
     breakingDstHardLink : 1,
     sync : 1
   }
-  test.shouldThrowError( () =>
-  {
-    provider.hardLinkAct( o );
-  })
+  if( !self.providerIsInstanceOf( _.FileProvider.Hub ) )
+  test.shouldThrowError( () => provider.hardLinkAct( o ) );
+  else
+  test.mustNotThrowError( () => provider.hardLinkAct( o ) );
   provider.filesDelete( /*dir*/testPath );
 
   //
@@ -24901,7 +24905,7 @@ function hardLinkAsync( test )
     {
       test.identical( provider.filesAreHardLinked( paths ), hardLinked );
       var srcPath = paths[ paths.length - 1 ];
-      test.identical( selectedFile.absolute, srcPath );
+      test.identical( selectedFile.absolute, provider.path.localFromGlobal( srcPath ) );
       var src = provider.fileRead( srcPath );
       var dst = provider.fileRead( paths[ 1 ] );
       test.identical( src, dst )
@@ -24935,7 +24939,7 @@ function hardLinkAsync( test )
     {
       test.identical( provider.filesAreHardLinked( paths ), hardLinked );
       var srcPath = paths[ 0 ];
-      test.identical( selectedFile.absolute, srcPath );
+      test.identical( selectedFile.absolute, provider.path.localFromGlobal( srcPath ) );
       var dstPath = paths[ 1 ];
       var src = provider.fileRead( srcPath );
       var dst = provider.fileRead( dstPath );
@@ -25699,8 +25703,8 @@ function fileExchangeSync( test )
 
   test.case = 'two self cycled soft links, cycled allowed';
   provider.filesDelete( testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1, makingDirectory : 1 });
-  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1, makingDirectory : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   provider.fileExchange
   ({
     srcPath : srcPath,
@@ -25712,13 +25716,13 @@ function fileExchangeSync( test )
   });
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../dst' );
-  test.identical( provider.pathResolveSoftLink( dstPath ), '../src' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../dst' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../src' ) );
 
   test.case = 'two self cycled soft links, cycled not allowed';
   provider.filesDelete( testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1, makingDirectory : 1 });
-  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1, makingDirectory : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   test.shouldThrowErrorSync( () =>
   {
     provider.fileExchange
@@ -25733,13 +25737,13 @@ function fileExchangeSync( test )
   })
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( provider.pathResolveSoftLink( dstPath ), '../dst' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../dst' ) );
 
   test.case = 'two self cycled soft links, cycled not allowed, throwing off';
   provider.filesDelete( testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1, makingDirectory : 1 });
-  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1, makingDirectory : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   got = provider.fileExchange
   ({
     srcPath : srcPath,
@@ -25752,12 +25756,12 @@ function fileExchangeSync( test )
   test.identical( got, null );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( provider.pathResolveSoftLink( dstPath ), '../dst' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../dst' ) );
 
   test.case = 'self cycled and terminal, cycled allowed';
   provider.filesDelete( testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1, makingDirectory : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1, makingDirectory : 1 });
   provider.fileWrite( dstPathTerminal, dstPathTerminal )
   provider.fileExchange
   ({
@@ -25771,11 +25775,11 @@ function fileExchangeSync( test )
   test.is( provider.isTerminal( srcPath ) );
   test.is( provider.isSoftLink( dstPathTerminal ) );
   test.identical( provider.fileRead( srcPath ), dstPathTerminal );
-  test.identical( provider.pathResolveSoftLink( dstPathTerminal ), '../src' );
+  test.identical( provider.pathResolveSoftLink( dstPathTerminal ), test.context.globalFromLocal( '../src' ) );
 
   test.case = 'self cycled and terminal, cycled not allowed';
   provider.filesDelete( testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1, makingDirectory : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1, makingDirectory : 1 });
   provider.fileWrite( dstPathTerminal, dstPathTerminal )
   test.shouldThrowErrorSync( () =>
   {
@@ -25792,11 +25796,11 @@ function fileExchangeSync( test )
   test.is( provider.isTerminal( dstPathTerminal ) );
   test.is( provider.isSoftLink( srcPath ) );
   test.identical( provider.fileRead( dstPathTerminal ), dstPathTerminal );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
 
   test.case = 'self cycled and terminal, cycled not allowed, throwing off';
   provider.filesDelete( testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1, makingDirectory : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1, makingDirectory : 1 });
   provider.fileWrite( dstPathTerminal, dstPathTerminal )
   got = provider.fileExchange
   ({
@@ -25811,7 +25815,7 @@ function fileExchangeSync( test )
   test.is( provider.isTerminal( dstPathTerminal ) );
   test.is( provider.isSoftLink( srcPath ) );
   test.identical( provider.fileRead( dstPathTerminal ), dstPathTerminal );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
 
 }
 
@@ -26397,8 +26401,8 @@ function fileExchangeAsync( test )
   {
     test.case = 'two self cycled soft links, cycled allowed';
     provider.filesDelete( testPath );
-    provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1, makingDirectory : 1 });
-    provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+    provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1, makingDirectory : 1 });
+    provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
     return provider.fileExchange
     ({
       srcPath : srcPath,
@@ -26412,8 +26416,8 @@ function fileExchangeAsync( test )
     {
       test.is( provider.isSoftLink( srcPath ) );
       test.is( provider.isSoftLink( dstPath ) );
-      test.identical( provider.pathResolveSoftLink( srcPath ), '../dst' );
-      test.identical( provider.pathResolveSoftLink( dstPath ), '../src' );
+      test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../dst' ) );
+      test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../src' ) );
       return got;
     })
   })
@@ -26424,8 +26428,8 @@ function fileExchangeAsync( test )
   {
     test.case = 'two self cycled soft links, cycled not allowed';
     provider.filesDelete( testPath );
-    provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1, makingDirectory : 1 });
-    provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+    provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1, makingDirectory : 1 });
+    provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
     let con = provider.fileExchange
     ({
       srcPath : srcPath,
@@ -26440,8 +26444,8 @@ function fileExchangeAsync( test )
     {
       test.is( provider.isSoftLink( srcPath ) );
       test.is( provider.isSoftLink( dstPath ) );
-      test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
-      test.identical( provider.pathResolveSoftLink( dstPath ), '../dst' );
+      test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
+      test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../dst' ) );
       return null;
     })
 
@@ -26453,8 +26457,8 @@ function fileExchangeAsync( test )
   {
     test.case = 'two self cycled soft links, cycled not allowed, throwing off';
     provider.filesDelete( testPath );
-    provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1, makingDirectory : 1 });
-    provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+    provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1, makingDirectory : 1 });
+    provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
     return provider.fileExchange
     ({
       srcPath : srcPath,
@@ -26469,8 +26473,8 @@ function fileExchangeAsync( test )
       test.identical( got, null );
       test.is( provider.isSoftLink( srcPath ) );
       test.is( provider.isSoftLink( dstPath ) );
-      test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
-      test.identical( provider.pathResolveSoftLink( dstPath ), '../dst' );
+      test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
+      test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../dst' ) );
       return null;
     })
   })
@@ -26481,7 +26485,7 @@ function fileExchangeAsync( test )
   {
     test.case = 'self cycled and terminal, cycled allowed';
     provider.filesDelete( testPath );
-    provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1, makingDirectory : 1 });
+    provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1, makingDirectory : 1 });
     provider.fileWrite( dstPathTerminal, dstPathTerminal )
     return provider.fileExchange
     ({
@@ -26497,7 +26501,7 @@ function fileExchangeAsync( test )
       test.is( provider.isTerminal( srcPath ) );
       test.is( provider.isSoftLink( dstPathTerminal ) );
       test.identical( provider.fileRead( srcPath ), dstPathTerminal );
-      test.identical( provider.pathResolveSoftLink( dstPathTerminal ), '../src' );
+      test.identical( provider.pathResolveSoftLink( dstPathTerminal ), test.context.globalFromLocal( '../src' ) );
       return got;
     })
 
@@ -26509,7 +26513,7 @@ function fileExchangeAsync( test )
   {
     test.case = 'self cycled and terminal, cycled not allowed';
     provider.filesDelete( testPath );
-    provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1, makingDirectory : 1 });
+    provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1, makingDirectory : 1 });
     provider.fileWrite( dstPathTerminal, dstPathTerminal )
     let con = provider.fileExchange
     ({
@@ -26526,7 +26530,7 @@ function fileExchangeAsync( test )
       test.is( provider.isTerminal( dstPathTerminal ) );
       test.is( provider.isSoftLink( srcPath ) );
       test.identical( provider.fileRead( dstPathTerminal ), dstPathTerminal );
-      test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
+      test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
       return null;
     })
   })
@@ -26537,7 +26541,7 @@ function fileExchangeAsync( test )
   {
     test.case = 'self cycled and terminal, cycled not allowed, throwing off';
     provider.filesDelete( testPath );
-    provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1, makingDirectory : 1 });
+    provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1, makingDirectory : 1 });
     provider.fileWrite( dstPathTerminal, dstPathTerminal )
     return provider.fileExchange
     ({
@@ -26554,7 +26558,7 @@ function fileExchangeAsync( test )
       test.is( provider.isTerminal( dstPathTerminal ) );
       test.is( provider.isSoftLink( srcPath ) );
       test.identical( provider.fileRead( dstPathTerminal ), dstPathTerminal );
-      test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
+      test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
       return null;
     })
   })
@@ -26870,61 +26874,61 @@ function hardLinkSoftLinkResolving( test )
 
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
-  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 0 };
   test.shouldThrowError( () => hardLink( o ) );
   test.identical( o.srcPath, srcPath );
   test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( provider.pathResolveSoftLink( dstPath ), '../dst' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../dst' ) );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
-  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 0 };
   test.shouldThrowError( () => hardLink( o ) );
   test.identical( o.srcPath, srcPath );
   test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( provider.pathResolveSoftLink( dstPath ), '../dst' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../dst' ) );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
-  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 1 };
   test.shouldThrowError( () => hardLink( o ) );
   test.identical( o.srcPath, srcPath );
   test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( provider.pathResolveSoftLink( dstPath ), '../dst' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../dst' ) );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
-  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 1 };
   test.shouldThrowError( () => hardLink( o ) );
   test.identical( o.srcPath, srcPath );
   test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( provider.pathResolveSoftLink( dstPath ), '../dst' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../dst' ) );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
@@ -28542,7 +28546,7 @@ function isTerminal( test )
   test.identical( got.isSoftLink(), false );
   test.identical( got.isTextLink(), true );
 
-  test.case = 'soft to text to terminal'
+  test.case = 'soft to text to terminal';
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath );
   provider.fileWrite( linkPath2, 'link ' + filePath );
@@ -29695,7 +29699,7 @@ function isTextLink( test )
   let filePath = test.context.pathFor( 'written/isTextLink/file' );
   let filePath2 = test.context.pathFor( 'written/isTextLink/file2' );
   let linkPath = test.context.pathFor( 'written/isTextLink/link' );
-
+  
   /**/
 
   provider.fieldPush( 'usingTextLink', 0 )
@@ -33840,20 +33844,17 @@ function fileExistsCompliantBehavior( test )
 function record( test )
 {
   let self = this;
-  let provider = self.provider;
-  let path = provider.path;
-  let join = _.routineJoin( provider.path, provider.path.join );
-  let hub = self.hub;
+  let hub = self.hub || self.provider;
+  let providerEffective = self.providerEffective || self.provider;
 
-  // let term1Path = self.pathFor( 'record/term1' );
-  // provider.fileWrite( term1Path, term1Path );
+  test.is( providerEffective.hub === hub );
+  test.is( _.arrayHas( _.mapKeys( hub.providersWithProtocolMap ), providerEffective.protocol ) );
+  
+  let filePath = test.context.globalFromLocal( '/record/terminal' );
+  
+  var record = self.provider.record( filePath );
 
-  test.is( provider.hub === hub );
-  test.identical( _.mapKeys( hub.providersWithProtocolMap ), [ 'current' ] );
-
-  var record = provider.record( '/some/file/terminal' );
-
-  test.identical( record.absolute, '/some/file/terminal' );
+  test.identical( record.absolute, filePath );
 
 }
 
@@ -33864,20 +33865,21 @@ function record( test )
 function localsFromGlobals( test )
 {
   let self = this;
-  let provider = new self.provider.constructor({ protocol : 'global' });
+  let srcProvider = self.providerEffective || self.provider;
+  let provider = new srcProvider.constructor({ protocol : 'global' });
 
   test.open( 'string' );
 
   test.case = 'local';
-  var got = provider.localsFromGlobals( '/a' );
+  var got = provider.path.localsFromGlobals( '/a' );
   test.identical( got, '/a' );
 
   test.case = 'relative';
-  var got = provider.localsFromGlobals( 'a' );
+  var got = provider.path.localsFromGlobals( 'a' );
   test.identical( got, 'a' );
-
+  
   test.case = 'single global string';
-  var got = provider.localsFromGlobals( 'global:///a' );
+  var got = provider.path.localsFromGlobals( 'global:///a' );
   test.identical( got, '/a' )
 
   test.close( 'string' );
@@ -33885,33 +33887,33 @@ function localsFromGlobals( test )
   test.open( 'array' );
 
   test.case = 'single global in array';
-  var got = provider.localsFromGlobals( [ 'global:///a' ] );
+  var got = provider.path.localsFromGlobals( [ 'global:///a' ] );
   test.identical( got, [ '/a' ] )
 
   test.case = 'globals in array';
-  var got = provider.localsFromGlobals( [ 'global:///a', 'global:///a/b' ] );
+  var got = provider.path.localsFromGlobals( [ 'global:///a', 'global:///a/b' ] );
   test.identical( got, [ '/a', '/a/b' ] )
 
   test.close( 'array' );
 
   test.open( 'map' );
 
-  var got = provider.localsFromGlobals( { 'global:///a' : 'global:///a' } );
+  var got = provider.path.localsFromGlobals( { 'global:///a' : 'global:///a' } );
   test.identical( got, { '/a' : '/a'} )
 
-  var got = provider.localsFromGlobals( { '/a' : 'global:///a' } );
+  var got = provider.path.localsFromGlobals( { '/a' : 'global:///a' } );
   test.identical( got, { '/a' : '/a'} )
 
-  var got = provider.localsFromGlobals( { 'global:///a' : '/a' } );
+  var got = provider.path.localsFromGlobals( { 'global:///a' : '/a' } );
   test.identical( got, { '/a' : '/a'} )
 
-  var got = provider.localsFromGlobals( { 'global:///a' : 1 } );
+  var got = provider.path.localsFromGlobals( { 'global:///a' : 1 } );
   test.identical( got, { '/a' : 1 } )
 
-  var got = provider.localsFromGlobals( { 1 : 'global:///a' } );
+  var got = provider.path.localsFromGlobals( { 1 : 'global:///a' } );
   test.identical( got, { 1 : '/a' } )
 
-  var got = provider.localsFromGlobals( { 1 : 1 } );
+  var got = provider.path.localsFromGlobals( { 1 : 1 } );
   test.identical( got, { 1 : 1 } )
 
   test.close( 'map' );
@@ -33919,13 +33921,13 @@ function localsFromGlobals( test )
   if( !Config.debug )
   return;
 
-  test.shouldThrowErrorSync( () => provider.localsFromGlobals( '/a', '/b' ) );
-  test.shouldThrowErrorSync( () => provider.localsFromGlobals( 'b:///a' ) );
-  test.shouldThrowErrorSync( () => provider.localsFromGlobals( [ 'b:///a' ] ) );
-  test.shouldThrowErrorSync( () => provider.localsFromGlobals( { 'b:///a' : '/a' } ) );
-  test.shouldThrowErrorSync( () => provider.localsFromGlobals( { '/a' : 'b:///a' } ) );
-  test.shouldThrowErrorSync( () => provider.localsFromGlobals( { '/a' : [] } ) );
-  test.shouldThrowErrorSync( () => provider.localsFromGlobals( { '/a' : {} } ) );
+  test.shouldThrowErrorSync( () => provider.path.localsFromGlobals( '/a', '/b' ) );
+  test.shouldThrowErrorSync( () => provider.path.localsFromGlobals( 'b:///a' ) );
+  test.shouldThrowErrorSync( () => provider.path.localsFromGlobals( [ 'b:///a' ] ) );
+  test.shouldThrowErrorSync( () => provider.path.localsFromGlobals( { 'b:///a' : '/a' } ) );
+  test.shouldThrowErrorSync( () => provider.path.localsFromGlobals( { '/a' : 'b:///a' } ) );
+  test.shouldThrowErrorSync( () => provider.path.localsFromGlobals( { '/a' : [] } ) );
+  test.shouldThrowErrorSync( () => provider.path.localsFromGlobals( { '/a' : {} } ) );
 
   provider.finit();
 
@@ -33936,24 +33938,25 @@ function localsFromGlobals( test )
 function globalsFromLocals( test )
 {
   let self = this;
-  let provider = new self.provider.constructor({ protocol : 'global' });
+  let srcProvider = self.providerEffective || self.provider;
+  let provider = new srcProvider.constructor({ protocol : 'global' });
 
   test.open( 'string' );
 
   test.case = 'local';
-  var got = provider.globalsFromLocals( '/a' );
+  var got = provider.path.globalsFromLocals( '/a' );
   test.identical( got, 'global:///a' );
 
   test.case = 'relative';
-  var got = provider.globalsFromLocals( 'a' );
+  var got = provider.path.globalsFromLocals( 'a' );
   test.identical( got, 'global://a' );
 
   test.case = 'global string';
-  var got = provider.globalsFromLocals( 'global:///a' );
+  var got = provider.path.globalsFromLocals( 'global:///a' );
   test.identical( got, 'global:///a' )
 
   test.case = 'global string';
-  var got = provider.globalsFromLocals( 'other:///a' );
+  var got = provider.path.globalsFromLocals( 'other:///a' );
   test.identical( got, 'other:///a' )
 
   test.close( 'string' );
@@ -33961,46 +33964,46 @@ function globalsFromLocals( test )
   test.open( 'array' );
 
   test.case = 'single global in array';
-  var got = provider.globalsFromLocals( [ 'global:///a' ] );
+  var got = provider.path.globalsFromLocals( [ 'global:///a' ] );
   test.identical( got, [ 'global:///a' ] )
 
   test.case = 'single global in array';
-  var got = provider.globalsFromLocals( [ 'other:///a' ] );
+  var got = provider.path.globalsFromLocals( [ 'other:///a' ] );
   test.identical( got, [ 'other:///a' ] )
 
   test.case = 'globals in array';
-  var got = provider.globalsFromLocals( [ 'global:///a', '/a/b', 'other:///a' ] );
+  var got = provider.path.globalsFromLocals( [ 'global:///a', '/a/b', 'other:///a' ] );
   test.identical( got, [ 'global:///a', 'global:///a/b', 'other:///a' ] )
 
   test.close( 'array' );
 
   test.open( 'map' );
 
-  var got = provider.globalsFromLocals( { 'global:///a' : 'other:///a' } );
+  var got = provider.path.globalsFromLocals( { 'global:///a' : 'other:///a' } );
   test.identical( got, { 'global:///a' : 'other:///a' } )
 
-  var got = provider.globalsFromLocals( { 'other:///a' : 'global:///a' } );
+  var got = provider.path.globalsFromLocals( { 'other:///a' : 'global:///a' } );
   test.identical( got, { 'other:///a' : 'global:///a' } )
 
-  var got = provider.globalsFromLocals( { '/a' : 'global:///a' } );
+  var got = provider.path.globalsFromLocals( { '/a' : 'global:///a' } );
   test.identical( got, { 'global:///a' : 'global:///a' } )
 
-  var got = provider.globalsFromLocals( { '/a' : '/a' } );
+  var got = provider.path.globalsFromLocals( { '/a' : '/a' } );
   test.identical( got, { 'global:///a' : 'global:///a' } )
 
-  var got = provider.globalsFromLocals( { 'global:///a' : '/a' } );
+  var got = provider.path.globalsFromLocals( { 'global:///a' : '/a' } );
   test.identical( got, { 'global:///a' : 'global:///a' } )
 
-  var got = provider.globalsFromLocals( { 'global:///a' : 1 } );
+  var got = provider.path.globalsFromLocals( { 'global:///a' : 1 } );
   test.identical( got, { 'global:///a' : 1 } )
 
-  var got = provider.globalsFromLocals( { 1 : '/a' } );
+  var got = provider.path.globalsFromLocals( { 1 : '/a' } );
   test.identical( got, { 'global://1' : 'global:///a' } )
 
-  var got = provider.globalsFromLocals( { 1 : 'global:///a' } );
+  var got = provider.path.globalsFromLocals( { 1 : 'global:///a' } );
   test.identical( got, { 'global://1' : 'global:///a' } )
 
-  var got = provider.globalsFromLocals( { 1 : 1 } );
+  var got = provider.path.globalsFromLocals( { 1 : 1 } );
   test.identical( got, { 'global://1' : 1 } )
 
   test.close( 'map' );
@@ -34008,9 +34011,9 @@ function globalsFromLocals( test )
   if( !Config.debug )
   return;
 
-  test.shouldThrowErrorSync( () => provider.globalsFromLocals( '/a', '/b' ) );
-  test.shouldThrowErrorSync( () => provider.globalsFromLocals( { '/a' : [] } ) );
-  test.shouldThrowErrorSync( () => provider.globalsFromLocals( { '/a' : {} } ) );
+  test.shouldThrowErrorSync( () => provider.path.globalsFromLocals( '/a', '/b' ) );
+  test.shouldThrowErrorSync( () => provider.path.globalsFromLocals( { '/a' : [] } ) );
+  test.shouldThrowErrorSync( () => provider.path.globalsFromLocals( { '/a' : {} } ) );
 
   provider.finit();
 
@@ -34683,7 +34686,7 @@ function pathResolveLinkTailChain( test )
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   provider.pathResolveLinkTailChain( o );
   var expectedFound = [ linkPath, filePath ]
-  var expectedResult = [ linkPath, '../file' ]
+  var expectedResult = [ linkPath, test.context.globalFromLocal( '../file' ) ]
   test.identical( o.result, expectedResult );
   test.identical( o.found, expectedFound );
 
@@ -34804,7 +34807,7 @@ function pathResolveLinkTailChain( test )
   var expectedResult =
   [
     linkPath,
-    '../file',
+    test.context.globalFromLocal( '../file' ),
     null
   ]
   test.identical( o.result, expectedResult );
@@ -35000,8 +35003,8 @@ function pathResolveLinkTailChain( test )
   var expectedResult =
   [
     linkPath,
-    '../link2',
-    '../link3',
+    test.context.globalFromLocal( '../link2' ),
+    test.context.globalFromLocal( '../link3' ),
     filePath
   ]
   test.identical( o.result, expectedResult );
@@ -35040,7 +35043,7 @@ function pathResolveLinkTailChain( test )
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.found, [ linkPath, linkPath2, filePath ] )
-    test.identical( o.result, [ linkPath, '../link2', filePath ]  )
+    test.identical( o.result, [ linkPath, test.context.globalFromLocal( '../link2' ), filePath ]  )
 
   // /* chain, resolvingHeadDirectories : [ 0, 1 ] */
 
@@ -35561,7 +35564,7 @@ function pathResolveLinkTailChain( test )
   provider.softLink({ dstPath : linkPath, srcPath : '../file', allowingMissed : 1, makingDirectory : 1 });
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   test.shouldThrowError( () => provider.pathResolveLinkTailChain( o ) );
-  test.identical( o.result, [ linkPath,'../file', null ] )
+  test.identical( o.result, [ linkPath,test.context.globalFromLocal( '../file' ), null ] )
   test.identical( o.found, [ linkPath, filePath, null ] )
 
   test.case = 'textLink to missing';
@@ -35577,7 +35580,7 @@ function pathResolveLinkTailChain( test )
   provider.textLink({ dstPath : linkPath, srcPath : '../file', allowingMissed : 1, makingDirectory : 1 });
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   test.shouldThrowError( () => provider.pathResolveLinkTailChain( o ) );
-  test.identical( o.result, [ linkPath,'../file', null ] )
+  test.identical( o.result, [ linkPath,test.context.globalFromLocal( '../file' ), null ] )
   test.identical( o.found, [ linkPath,filePath, null ] )
 
   test.case = 'double textLink to missing';
@@ -35695,7 +35698,7 @@ function pathResolveLinkTailChain( test )
   provider.softLink({ dstPath : linkPath, srcPath : '../file', allowingMissed : 1, makingDirectory : 1 });
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   test.mustNotThrowError( () => provider.pathResolveLinkTailChain( o ) );
-  test.identical( o.result, [ linkPath,'../file', null ] )
+  test.identical( o.result, [ linkPath,test.context.globalFromLocal( '../file' ), null ] )
   test.identical( o.found, [ linkPath, filePath, null ] )
 
   test.case = 'textLink to missing';
@@ -35711,7 +35714,7 @@ function pathResolveLinkTailChain( test )
   provider.textLink({ dstPath : linkPath, srcPath : '../file', allowingMissed : 1, makingDirectory : 1 });
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   test.mustNotThrowError( () => provider.pathResolveLinkTailChain( o ) );
-  test.identical( o.result, [ linkPath, '../file', null ] )
+  test.identical( o.result, [ linkPath, test.context.globalFromLocal( '../file' ), null ] )
   test.identical( o.found, [ linkPath, filePath, null ] )
 
   test.case = 'double textLink to missing';
@@ -36537,7 +36540,7 @@ function pathResolveSoftLink( test )
   provider.softLink( linkPath, '../file' );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
   var got = provider.pathResolveSoftLink( o );
-  test.identical( got, '../file' );
+  test.identical( got, test.context.globalFromLocal( '../file' ) );
 
   test.case = 'absolute softlink to missing'
   provider.filesDelete( /*workDir*/testPath );
@@ -36588,7 +36591,7 @@ function pathResolveSoftLink( test )
   var got = provider.pathResolveSoftLink( { filePath : linkPath } );
   test.identical( got, linkPath2 );
   var got1 = provider.pathResolveSoftLink( { filePath : got } );
-  test.identical( got1, '../file' );
+  test.identical( got1, test.context.globalFromLocal( '../file' ) );
   var got2 = provider.path.resolve( linkPath2, got1 );
   test.identical( got2, filePath );
 
@@ -36600,7 +36603,7 @@ function pathResolveSoftLink( test )
   var got = provider.pathResolveSoftLink( { filePath : linkPath } );
   test.identical( got, linkPath2 );
   var got1 = provider.pathResolveSoftLink( { filePath : got } );
-  test.identical( got1, '../file0' );
+  test.identical( got1, test.context.globalFromLocal( '../file0' ) );
   var got2 = provider.path.resolve( linkPath2, got1 );
   test.identical( got2, filePath + '0' );
 
@@ -36706,7 +36709,7 @@ function pathResolveSoftLink( test )
   provider.filesDelete( /*workDir*/testPath );
   provider.fileWrite( filePath, filePath );
   provider.softLink( linkPath, '..' );
-  provider.softLink( linkPath2, '../file' );
+  provider.softLink( linkPath2, test.context.globalFromLocal( '../file' ) );
   var pathToResolve = provider.path.join( /*workDir*/testPath, 'link/link2' )
   var o = _.mapExtend( null, o1, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 0 } );
   var got = provider.pathResolveSoftLink( o );
@@ -36885,7 +36888,7 @@ function pathResolveTextLink( test )
   provider.textLink({ dstPath : linkPath, srcPath : '../file2', allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath };
   var got = provider.pathResolveTextLink( o );
-  test.identical( got, '../file2' );
+  test.identical( got, test.context.globalFromLocal( '../file2' ) );
 
   test.case = 'relative textLink to regular file';
   provider.filesDelete( /*workDir*/testPath );
@@ -36893,7 +36896,7 @@ function pathResolveTextLink( test )
   provider.textLink({ dstPath : linkPath, srcPath : '../file' });
   var o = { filePath : linkPath };
   var got = provider.pathResolveTextLink( o );
-  test.identical( got, '../file' );
+  test.identical( got, test.context.globalFromLocal( '../file' ) );
 
   test.case = 'absolute softLink to file that does not exist';
   provider.filesDelete( /*workDir*/testPath );  // remove temp files created by previous test case
@@ -36937,7 +36940,7 @@ function pathResolveTextLink( test )
   var got = provider.pathResolveTextLink( { filePath : linkPath } );
   test.identical( got, linkPath2 );
   var got1 = provider.pathResolveTextLink( { filePath : got } );
-  test.identical( got1, '../file' );
+  test.identical( got1, test.context.globalFromLocal( '../file' ) );
   var got2 = provider.path.resolve( linkPath2, got1 );
   test.identical( got2, filePath );
 
@@ -36949,7 +36952,7 @@ function pathResolveTextLink( test )
   var got = provider.pathResolveTextLink( { filePath : linkPath } );
   test.identical( got, linkPath2 );
   var got1 = provider.pathResolveTextLink( { filePath : got } );
-  test.identical( got1, '../file0' );
+  test.identical( got1, test.context.globalFromLocal( '../file0' ) );
   var got2 = provider.path.resolve( linkPath2, got1 );
   test.identical( got2, filePath + '0' );
 
@@ -37202,7 +37205,7 @@ function pathResolveTextLink( test )
   test.case = 'two text links in path';
   provider.filesDelete( /*workDir*/testPath );
   provider.fileWrite( filePath, filePath );
-  provider.textLink( linkPath, '..' );
+  provider.textLink( linkPath, test.context.globalFromLocal( '..' ) );
   provider.textLink( linkPath2, '../file' );
   var pathToResolve = provider.path.join( /*workDir*/testPath, 'link/link2' )
   var o = _.mapExtend( null, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 0 } );
@@ -37356,7 +37359,7 @@ function pathResolveLinkFullSpecial( test )
   }
   var o = _.mapExtend( null, o1, o2 );
   var got = provider.pathResolveLinkFull( o );
-  var expected = '../file';
+  var expected = test.context.globalFromLocal( '../file' );
   test.identical( got, expected );
 
   //
@@ -37612,8 +37615,8 @@ function fileCopyExperiment( test )
 
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
-  provider.softLink({ dstPath : srcPath, srcPath : '../src', allowingMissed : 1 });
-  provider.softLink({ dstPath : dstPath, srcPath : '../dst', allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
+  provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromLocal( '../dst' ), allowingMissed : 1 });
   var got = provider.fileCopy
   ({
       srcPath : srcPath,
@@ -37631,8 +37634,8 @@ function fileCopyExperiment( test )
   test.identical( dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( srcPath ), '../src' );
-  test.identical( provider.pathResolveSoftLink( dstPath ), '../src' );
+  test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromLocal( '../src' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromLocal( '../src' ) );
 
 }
 
@@ -37921,7 +37924,7 @@ function EncodersGenerate( test )
   let provider = self.provider;
   let writeConverters = _.Gdf.InMap[ 'structure' ];
   let readConverters = _.Gdf.OutMap[ 'structure' ];
-
+  
   //
 
   test.case = 'check if all write encoders are generated';
@@ -37938,7 +37941,7 @@ function EncodersGenerate( test )
 
   test.will = 'encoder and converter should not exist';
   test.is( !_.FileWriteEncoders[ 'testEncoder' ] );
-  test.is( !_.Gdf.ExtMap[ 'testEncoder' ] );
+  test.is( !_.Gdf.ExtMap[ 'testEncoder' ] || !_.Gdf.ExtMap[ 'testEncoder' ].length );
   var testConverter =
   {
     ext : [ 'testEncoder' ],
@@ -37962,7 +37965,7 @@ function EncodersGenerate( test )
   test.is( _.mapIs( encoder ) );
   test.identical( encoder.exts, converter.ext );
   test.identical( encoder.converter, converter );
-
+  
   test.will = 'finit converter, encoder should exist';
   converter.finit();
   test.is( _.mapIs( _.FileWriteEncoders[ 'testEncoder' ] ) );
@@ -37971,21 +37974,34 @@ function EncodersGenerate( test )
   test.is( !_.FileWriteEncoders[ 'testEncoder' ] );
 
   //
-
+  
   test.case = 'adjust converter exts'
-  var converter = readConverters[ 0 ];
-  var originalExt = converter.ext.slice();
+  var testConverter =
+  {
+    ext : [ 'testEncoder' ],
+    in : [ 'structure' ],
+    out : [ 'string' ],
+
+    onEncode : function( op )
+    {
+      op.out.data = _.toStr( op.out.data, { levels : 99 } );
+      op.out.format = 'string';
+    }
+  }
+  var converter = _.Gdf([ testConverter ])[ 0 ];
   var ext = 'testExt';
+  let originalExt = converter.ext.slice();
   converter.ext = [ ext ];
-  test.is( !_.mapIs( _.FileReadEncoders[ ext ] ) );
+  test.is( !_.mapIs( _.FileWriteEncoders[ ext ] ) );
   provider.EncodersGenerate();
-  var encoder = _.FileReadEncoders[ ext ];
+  var encoder = _.FileWriteEncoders[ ext ];
   test.is( _.mapIs( encoder ) );
   test.identical( encoder.exts, converter.ext );
   test.identical( encoder.converter, converter );
   converter.ext = originalExt.slice();
+  converter.finit();
   provider.EncodersGenerate();
-  test.is( !_.mapIs( _.FileReadEncoders[ ext ] ) );
+  test.is( !_.mapIs( _.FileWriteEncoders[ ext ] ) );
 
   /* - */
 

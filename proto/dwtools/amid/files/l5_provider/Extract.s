@@ -1264,7 +1264,7 @@ function fileCopyAct( o )
     // else if( !self._descriptorIsDir( dstDir ) )
     // throw _.err( 'Parent of', o.dstPath, 'is not a directory' );
 
-    let dstIsDir = self.fileExists( o.dstPath );
+    let dstIsDir = self.isDir( o.dstPath );
     // let dstPath = self._descriptorRead( o.dstPath );
     // if( self._descriptorIsDir( dstPath ) )
     if( dstIsDir )

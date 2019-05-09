@@ -128,12 +128,12 @@ function pathParse( remotePath )
 
   /* */
 
+  _.assert( !_.boolLike( result.hash ) );
   return result
 
 /*
 
   remotePath : 'git+https:///github.com/Wandalen/wTools.git/out/wTools#master'
-
   protocol : 'git+https',
   hash : 'master',
   longPath : '/github.com/Wandalen/wTools.git/out/wTools',
@@ -224,7 +224,7 @@ function versionLocalRetrive( o )
   _.assert( !!self.hub );
 
   if( !self.isDownloaded( o ) )
-  return false;
+  return '';
 
   let localProvider = self.hub.providerForPath( o.localPath );
 

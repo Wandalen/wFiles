@@ -181,7 +181,7 @@ function versionLocalRetrive( o )
   _.assert( !!self.hub );
 
   if( !self.isDownloaded( o ) )
-  return false;
+  return '';
 
   let localProvider = self.hub.providerForPath( o.localPath );
 

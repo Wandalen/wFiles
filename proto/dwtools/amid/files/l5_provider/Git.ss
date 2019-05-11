@@ -390,7 +390,20 @@ function isUpToDate( o )
   {
     _.assert( arg.length === 2 );
 
-    let result = !_.strHas( arg[ 0 ].output, 'Your branch is behind' );
+    let result = false;
+    let detachedRegexp = /HEAD detached at (\w+)/;
+    let detachedParsed = detachedRegexp.exec( arg[ 0 ].output );
+
+    debugger;
+
+    if( detachedParsed )
+    {
+      result = _.strBegins( parsed.hash, detachedParsed[ 1 ] );
+    }
+    else
+    {
+      result = !_.strHas( arg[ 0 ].output, 'Your branch is behind' );
+    }
 
     if( o.verbosity )
     self.logger.log( o.remotePath, result ? 'is up to date' : 'is not up to date' );

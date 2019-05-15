@@ -418,8 +418,8 @@ function dirReadAct( o )
       }
       else
       {
-        // result = [ self.path.name({ path : o.filePath, withExtension : 1 }) ];
-        result = self.path.name({ path : o.filePath, withExtension : 1 });
+        // result = [ self.path.name({ path : o.filePath, full : 1 }) ];
+        result = self.path.name({ path : o.filePath, full : 1 });
       }
     }
     else
@@ -706,7 +706,7 @@ function fileWriteAct( o )
 
     }
 
-    // let dstName = self.path.name({ path : filePath, withExtension : 1 });
+    // let dstName = self.path.name({ path : filePath, full : 1 });
     let dstDir = self._descriptorRead( self.path.dir( filePath ) );
     if( !dstDir )
     throw _.err( 'Directory for', filePath, 'does not exist' );
@@ -945,7 +945,7 @@ function fileDeleteAct( o )
 
     _.sure( !!dir, () => 'Cant delete root directory ' + _.strQuote( o.filePath ) );
 
-    let fileName = self.path.name({ path : filePath, withExtension : 1 });
+    let fileName = self.path.name({ path : filePath, full : 1 });
     delete dir[ fileName ];
 
     // for( let k in self.extraStats[ o.filePath ] )
@@ -1035,8 +1035,8 @@ function fileRenameAct( o )
 
   function rename( )
   {
-    let dstName = self.path.name({ path : o.dstPath, withExtension : 1 });
-    let srcName = self.path.name({ path : o.srcPath, withExtension : 1 });
+    let dstName = self.path.name({ path : o.dstPath, full : 1 });
+    let srcName = self.path.name({ path : o.srcPath, full : 1 });
     let srcDirPath = self.path.dir( o.srcPath );
     let dstDirPath = self.path.dir( o.dstPath );
 
@@ -2084,7 +2084,7 @@ function _pathResolveIntermediateDirs( filePath )
 
   if( _.strCount( filePath, self.path._upStr ) > 1 )
   {
-    let fileName = self.path.name({ path : filePath, withExtension : 1 });
+    let fileName = self.path.name({ path : filePath, full : 1 });
     filePath = self.pathResolveSoftLinkAct
     ({
       filePath : self.path.dir( filePath ),

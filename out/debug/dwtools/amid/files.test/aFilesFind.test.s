@@ -1321,7 +1321,7 @@ qqq : adjust for both providers
         if( o.glob )
         {
           if( relative === '.' )
-          var toTest = path.dot( path.name({ path : o.filePath, withExtension : 1 }) );
+          var toTest = path.dot( path.name({ path : o.filePath, full : 1 }) );
           else
           var toTest = relative;
 
@@ -3222,8 +3222,8 @@ function filesFindResolving( test )
       isDir : true
     },
     {
-      absolute : path.join( softLink, path.name({ path : terminalPath, withExtension : 1 }) ),
-      real : path.join( srcDirPath, path.name({ path : terminalPath, withExtension : 1 }) ),
+      absolute : path.join( softLink, path.name({ path : terminalPath, full : 1 }) ),
+      real : path.join( srcDirPath, path.name({ path : terminalPath, full : 1 }) ),
       isDir : false
     }
   ]
@@ -3277,8 +3277,8 @@ function filesFindResolving( test )
       isDir : true
     },
     {
-      absolute : path.join( softLink, path.name({ path : terminalPath, withExtension : 1 }) ),
-      real : path.join( srcDirPath, path.name({ path : terminalPath, withExtension : 1 }) ),
+      absolute : path.join( softLink, path.name({ path : terminalPath, full : 1 }) ),
+      real : path.join( srcDirPath, path.name({ path : terminalPath, full : 1 }) ),
       isDir : false
     }
   ]
@@ -6741,9 +6741,51 @@ function filesReflectTrivial( test )
   test.identical( srcAllow, expectedSrcAllow );
   test.identical( reason, expectedReason );
 
+  // //
   //
+  // test.case = 'onUp should return original record'
+  // var tree =
+  // {
+  //   'src' :
+  //   {
+  //      a : 'a',
+  //      b : 'b'
+  //   },
+  //   'dst' :
+  //   {
+  //   },
+  // }
+  //
+  // function onUp1( record )
+  // {
+  //   debugger;
+  //   record.dst.absolute = record.dst.absolute + '.ext';
+  //   return {};
+  //   return null;
+  // }
+  //
+  // var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
+  // var o =
+  // {
+  //   reflectMap : { '/src' : '/dst' },
+  //   onUp : onUp1,
+  //   includingDst : 0,
+  //   includingTerminals : 1,
+  //   includingDirs : 0,
+  //   recursive : 2,
+  //   writing : 1,
+  //   srcDeleting : 0,
+  //   linking : 'nop'
+  // }
+  //
+  // test.shouldThrowError( () => extract.filesReflect( o ) );
+  // test.identical( extract.filesTree, tree );
+  //
+  // debugger; return;
+  //
+  // //
 
-  test.case = 'onUp should return original record'
+  test.case = 'onUp changes dst path'
   var tree =
   {
     'src' :
@@ -6756,8 +6798,23 @@ function filesReflectTrivial( test )
     },
   }
 
-  function onUp( record )
+  var expectedTree =
   {
+    'src' :
+    {
+       a : 'a',
+       b : 'b'
+    },
+    'dst' :
+    {
+      'a.ext' : 'a',
+      'b.ext' : 'b'
+    },
+  }
+
+  function onUp2( record )
+  {
+    debugger;
     record.dst.absolute = record.dst.absolute + '.ext';
     return record;
   }
@@ -6766,18 +6823,18 @@ function filesReflectTrivial( test )
   var o =
   {
     reflectMap : { '/src' : '/dst' },
-    onUp : onUp,
+    onUp : onUp2,
     includingDst : 0,
     includingTerminals : 1,
     includingDirs : 0,
     recursive : 2,
     writing : 1,
     srcDeleting : 0,
-    linking : 'nop'
+    // linking : 'nop'
   }
 
-  test.shouldThrowError( () => extract.filesReflect( o ) );
-  test.identical( extract.filesTree, tree );
+  extract.filesReflect( o );
+  test.identical( extract.filesTree, expectedTree );
 
   //
 
@@ -9835,17 +9892,11 @@ function filesReflectGrab( test )
     reflectMap : recipe,
     srcFilter : { hubFileProvider : src },
     dstFilter : { hubFileProvider : provider, prefixPath : testPath },
+    mandatory : 0,
   });
   var found = provider.filesFindRecursive( testPath );
   src.finit();
   provider.filesDelete( testPath );
-
-  // var expectedDstRelative = [ '/' ];
-  // var expectedSrcRelative = [ '/' ];
-  // var expectedEffRelative = [ '/' ];
-  // var expectedAction = [ 'dirMake' ];
-  // var expectedAllow = [ true ];
-  // var expectedPreserve = [ true ];
 
   var expectedDstRelative = [];
   var expectedSrcRelative = [];
@@ -9886,6 +9937,7 @@ function filesReflectGrab( test )
     reflectMap : recipe,
     srcFilter : { hubFileProvider : src },
     dstFilter : { hubFileProvider : provider },
+    mandatory : 0,
   });
   var found = provider.filesFindRecursive( testPath );
   src.finit();
@@ -9897,13 +9949,6 @@ function filesReflectGrab( test )
   var expectedAction = [];
   var expectedAllow = [];
   var expectedPreserve = [];
-
-  // var expectedDstRelative = [ '/' ];
-  // var expectedSrcRelative = [ '/' ];
-  // var expectedEffRelative = [ '/' ];
-  // var expectedAction = [ 'dirMake' ];
-  // var expectedAllow = [ true ];
-  // var expectedPreserve = [ true ];
 
   var dstRelative = _.select( records, '*/dst/relative' );
   var srcRelative = _.select( records, '*/src/relative' );
@@ -10502,15 +10547,12 @@ function filesReflector( test )
 
   var expectedDstAbsolute = abs([ '/src1x', '/src1x/d', '/src1x/d/a', '/src1x/d/c', '/src2x', '/src2x/a', '/src2x/c' ]);
   var expectedSrcAbsolute =  [ '/src1', '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
-  // /**/ var expectedEffAbsolute = [ '/src1', '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
 
   test.case = 'negative';
 
@@ -10529,15 +10571,12 @@ function filesReflector( test )
 
   var expectedDstAbsolute = abs([ '/', '/d', '/d/a', '/d/c', '/', '/a', '/c' ]);
   var expectedSrcAbsolute =  [ '/src1', '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
-  // /**/ var expectedEffAbsolute = [ '/src1', '/src1/d', '/src1/d/a', '/src1/d/c', '/src2/d', '/src2/d/a', '/src2/d/c' ];
 
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-  // /**/ var effAbsolute = _.select( records, '*/effective/absolute' );
 
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-  // /**/ test.identical( effAbsolute, expectedEffAbsolute );
 
   dst.filesDelete( testPath );
   src.finit();
@@ -10561,7 +10600,6 @@ function filesReflector( test )
   dst.filesDelete( testPath );
   src.finit();
 
-  debugger;
   // xxx zzz
   //
   // var src = context.makeStandardExtract({ originPath : 'src://' });
@@ -10633,6 +10671,7 @@ function filesReflector( test )
   ({
     srcFilter : { prefixPath : 'src:///', basePath : 'src:///' },
     dstFilter : { prefixPath : 'current://' + testPath, basePath : 'current://' + testPath },
+    mandatory : 0,
   });
   reflect( '/alt/alt' );
   var extract = provider.filesExtract( testPath );
@@ -10724,8 +10763,6 @@ function filesReflector( test )
 
   test.close( 'reflect current dir' );
 }
-
-filesReflector.timeOut = 30000;
 
 //
 
@@ -12615,6 +12652,7 @@ function filesReflectLinked( test )
   ({
     reflectMap : { [ srcPath ] : dstPath },
     allowingMissed : 1,
+    mandatory : 0,
   })
 
   test.will = 'dstPath/link should not be rewritten by srcPath/link'
@@ -17351,7 +17389,7 @@ var Self =
   name : 'Tools/mid/files/FilesFind/Abstract',
   abstract : 1,
   silencing : 1,
-  routineTimeOut : 30000,
+  routineTimeOut : 60000,
 
   onSuiteBegin,
   onSuiteEnd,

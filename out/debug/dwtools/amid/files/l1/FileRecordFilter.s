@@ -261,8 +261,8 @@ function _formFinal()
 {
   let filter = this;
 
-  if( filter.filePath && filter.filePath.length === 2 )
-  debugger;
+  // if( filter.filePath && filter.filePath.length === 2 )
+  // debugger;
 
   if( filter.formed < 4 )
   filter._formMasks();

@@ -38,7 +38,7 @@ function onSuiteEnd()
 {
   if( Config.platform === 'nodejs' )
   {
-    _.assert( _.strEnds( testSuitePath, 'FileRecordFilter' ) );
+    _.assert( _.strHas( testSuitePath, 'FileRecordFilter' ) );
     _.path.dirTempClose( testSuitePath );
   }
 }
@@ -1462,7 +1462,29 @@ src.toStr()
   f2.filePath = { 'f' : true, 'd' : true, 'ex' : false, 'f2' : true, 'd2' : true, 'ex2' : false, 'ex3' : false, 'ex4' : true }
 
   var f3 = extract1.recordFilter();
-  f3.pathsInherit( f1 ).pathsInherit( f2 );
+  f3.pathsInherit( f1 )
+
+  var expectedFilePath =
+  {
+    'f' : true,
+    'd' : true,
+    'ex' : false,
+    'f1' : true,
+    'd1' : true,
+    'ex1' : false,
+    'ex3' : true,
+    'ex4' : false
+  }
+
+  var expectedBasePath = './proto';
+
+  test.identical( f3.prefixPath, '/commonDir/filter1' );
+  test.identical( f3.filePath, expectedFilePath );
+  test.identical( f3.basePath, expectedBasePath );
+
+  debugger;
+  f3.pathsInherit( f2 );
+  debugger;
 
   var expectedFilePath =
   {
@@ -1483,14 +1505,14 @@ src.toStr()
   {
     'f' : '/commonDir/filter1/proto',
     'd' : '/commonDir/filter1/proto',
-    'ex' : '/commonDir/filter1/proto',
+    // 'ex' : '/commonDir/filter1/proto',
     'f1' : '/commonDir/filter1/proto',
     'd1' : '/commonDir/filter1/proto',
     'f2' : '/commonDir/filter1/proto',
     'd2' : '/commonDir/filter1/proto',
-    'ex1' : '/commonDir/filter1/proto',
-    'ex2' : '/commonDir/filter1/proto',
-    'ex3' : '/commonDir/filter1/proto',
+    // 'ex1' : '/commonDir/filter1/proto',
+    // 'ex2' : '/commonDir/filter1/proto',
+    // 'ex3' : '/commonDir/filter1/proto',
     'ex4' : '/commonDir/filter1/proto',
   }
 

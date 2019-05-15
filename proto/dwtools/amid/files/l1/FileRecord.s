@@ -43,10 +43,13 @@ function init( o )
 
   _.instanceInit( record );
 
-  record[ isTransientSymbol ] = null;
-  record[ isActualSymbol ] = null;
-  record[ statSymbol ] = 0;
-  record[ realSymbol ] = 0;
+  record._filterReset();
+  record._statReset();
+
+  // record[ isTransientSymbol ] = null;
+  // record[ isActualSymbol ] = null;
+  // record[ statSymbol ] = 0;
+  // record[ realSymbol ] = 0;
 
   record.copy( o );
 
@@ -56,7 +59,7 @@ function init( o )
 
   if( !f.formed )
   {
-    if( !f.basePath && !f.dirPath && !f.stemPath ) // xxx
+    if( !f.basePath && !f.dirPath && !f.stemPath )
     {
       f.basePath = _.uri.dir( o.input );
       f.stemPath = f.basePath;
@@ -153,85 +156,7 @@ function toAbsolute( record )
 
 //
 
-function _pathsForm()
-{
-  let record = this;
-  let f = record.factory;
-  let fileProvider = f.effectiveFileProvider;
-  let path = record.path
-  let filePath = record.input;
-  let isAbsolute = path.isAbsolute( filePath );
-
-  _.assert( arguments.length === 0 );
-  _.assert( _.strIs( f.basePath ) );
-  _.assert( _.strIs( f.stemPath ) );
-  _.assert( path.isAbsolute( f.stemPath ) );
-
-  /* path */
-
-  if( !isAbsolute )
-  if( f.dirPath )
-  filePath = path.join( f.basePath, f.dirPath, f.stemPath, filePath );
-  else if( f.basePath )
-  filePath = path.join( f.basePath, f.stemPath, filePath );
-  else if( !path.isAbsolute( filePath ) )
-  _.assert( 0, 'FileRecordFactory expects defined fields {-dirPath-} or {-basePath-} or absolute path' );
-
-  filePath = path.normalize( filePath );
-
-  /* relative */
-
-  record.relative = fileProvider.path.relative( f.basePath, filePath );
-  _.assert( record.relative[ 0 ] !== '/' );
-  record.relative = path.dot( record.relative );
-
-  /*  */
-
-  if( f.basePath )
-  record.absolute = fileProvider.path.resolve( f.basePath, record.relative );
-  else
-  record.absolute = filePath;
-
-  record.absolute = path.normalize( record.absolute );
-
-  f.hubFileProvider._recordFormBegin( record );
-
-  // record.absoluteGlobalMaybe = record.absolute;
-  // record.real = record.absolute;
-  // record.realGlobalMaybe = record.absolute;
-
-  /* */
-
-  record.factory.hubFileProvider._recordPathForm( record );
-
-  return record;
-}
-
-//
-
-function _filterApply()
-{
-  let record = this;
-  let f = record.factory;
-
-  _.assert( arguments.length === 0 );
-
-  if( record[ isTransientSymbol ] === null )
-  record[ isTransientSymbol ] = true;
-  if( record[ isActualSymbol ] === null )
-  record[ isActualSymbol ] = true;
-
-  if( f.filter )
-  {
-    _.assert( f.filter.formed === 5, 'Expects formed filter' );
-    f.filter.applyTo( record );
-  }
-
-}
-
-//
-
-function _isSafe()
+function _safeCheck()
 {
   let record = this;
   let path = record.path;
@@ -259,6 +184,108 @@ function _isSafe()
 
 //
 
+function _pathsForm()
+{
+  let record = this;
+  let f = record.factory;
+  let fileProvider = f.effectiveFileProvider;
+  let path = record.path
+  let inputPath = record.input;
+
+  _.assert( arguments.length === 0 );
+  _.assert( _.strIs( f.basePath ) );
+  _.assert( _.strIs( f.stemPath ) );
+  _.assert( path.isAbsolute( f.stemPath ) );
+
+  inputPath = path.normalize( inputPath );
+  let isAbsolute = path.isAbsolute( inputPath );
+
+  /* input path */
+
+  if( !isAbsolute )
+  if( f.dirPath )
+  inputPath = path.join( f.basePath, f.dirPath, f.stemPath, inputPath );
+  else if( f.basePath )
+  inputPath = path.join( f.basePath, f.stemPath, inputPath );
+  else if( !path.isAbsolute( inputPath ) )
+  _.assert( 0, 'FileRecordFactory expects defined fields {-dirPath-} or {-basePath-} or absolute path' );
+
+  /* relative path */
+
+  record[ relativeSymbol ] = fileProvider.path.relative( f.basePath, inputPath );
+  _.assert( record.relative[ 0 ] !== '/' );
+  record[ relativeSymbol ] = path.dot( record.relative );
+
+  /* absolute path */
+
+  if( f.basePath )
+  record[ absoluteSymbol ] = fileProvider.path.resolve( f.basePath, record.relative );
+  else
+  record[ absoluteSymbol ] = inputPath;
+
+  record[ absoluteSymbol ] = path.normalize( record[ absoluteSymbol ] );
+
+  /* */
+
+  // f.hubFileProvider._recordFormBegin( record );
+  f.hubFileProvider._recordFormBegin( record );
+  // f.hubFileProvider._recordPathForm( record );
+
+  return record;
+}
+
+//
+
+function _filterReset()
+{
+  let record = this;
+  let f = record.factory;
+
+  _.assert( arguments.length === 0 );
+
+  record[ isTransientSymbol ] = null;
+  record[ isActualSymbol ] = null;
+
+}
+
+//
+
+function _filterApply()
+{
+  let record = this;
+  let f = record.factory;
+
+  _.assert( arguments.length === 0 );
+
+  if( record[ isTransientSymbol ] === null )
+  record[ isTransientSymbol ] = true;
+  if( record[ isActualSymbol ] === null )
+  record[ isActualSymbol ] = true;
+
+  if( f.filter )
+  {
+    _.assert( f.filter.formed === 5, 'Expects formed filter' );
+    f.filter.applyTo( record );
+  }
+
+}
+
+//
+
+function _statReset()
+{
+  let record = this;
+  let f = record.factory;
+
+  _.assert( arguments.length === 0 );
+
+  record[ realSymbol ] = null;
+  record[ statSymbol ] = 0;
+
+}
+
+//
+
 function _statRead()
 {
   let record = this;
@@ -266,9 +293,6 @@ function _statRead()
   let stat;
 
   _.assert( arguments.length === 0 );
-
-  // if( _.strEnds( record.absolute, '/dst/link' ) )
-  // debugger;
 
   record[ realSymbol ] = record.absolute;
 
@@ -334,29 +358,26 @@ function _statAnalyze()
   if( f.stating )
   {
     _.assert( record.stat === null || _.fileStatIs( record.stat ) );
-    record._isSafe();
+    record._safeCheck();
   }
 
-  record.factory.hubFileProvider._recordFormEnd( record );
+  f.hubFileProvider._recordFormEnd( record );
 
 }
 
 //
 
-function reval()
+function reset()
 {
   let record = this;
 
   _.assert( arguments.length === 0 );
 
-  record[ Symbo.for( 'isActual' ) ] = null;
-  record[ Symbo.for( 'isTransient' ) ] = null;
+  record._filterReset();
+  record._statReset();
 
-  record[ statSymbol ] = 0;
-  record[ realSymbol ] = 0;
-
-  record._statRead();
-  record._statAnalyze();
+  // record._statRead();
+  // record._statAnalyze();
 
 }
 
@@ -366,9 +387,9 @@ function changeExt( ext )
 {
   let record = this;
   let path = record.path;
-  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( arguments.length === 1, 'Expects single argument' ); debugger;
   record.input = path.changeExt( record.input, ext );
-  record.form();
+  // record.form();
 }
 
 //
@@ -535,10 +556,70 @@ function _isLinkGet()
 {
   let record = this;
   let f = record.factory;
-
-  debugger;
-
   return record._isSoftLinkGet() || record._isTextLinkGet();
+}
+
+//
+
+function absoluteSet( src )
+{
+  let record = this;
+  let f = record.factory;
+  let formed = !!record[ absoluteSymbol ];
+
+  record.reset();
+
+  if( src )
+  {
+    record[ absoluteSymbol ] = null;
+    record[ relativeSymbol ] = null;
+    record[ inputSymbol ] = src;
+    if( formed )
+    record._pathsForm();
+  }
+
+}
+
+//
+
+function relativeSet( src )
+{
+  let record = this;
+  let f = record.factory;
+  let formed = !!record[ absoluteSymbol ];
+
+  record.reset();
+
+  if( src )
+  {
+    record[ absoluteSymbol ] = null;
+    record[ relativeSymbol ] = null;
+    record[ inputSymbol ] = src;
+    if( formed )
+    record._pathsForm();
+  }
+
+}
+
+//
+
+function inputSet( src )
+{
+  let record = this;
+  let f = record.factory;
+  let formed = !!record[ absoluteSymbol ];
+
+  record.reset();
+
+  if( src )
+  {
+    record[ absoluteSymbol ] = null;
+    record[ relativeSymbol ] = null;
+    record[ inputSymbol ] = src;
+    if( formed )
+    record._pathsForm();
+  }
+
 }
 
 //
@@ -570,7 +651,7 @@ function _statGet()
 function _realGet()
 {
   let record = this;
-  if( record[ realSymbol ] === 0 )
+  if( record[ realSymbol ] === null )
   {
     record._statRead();
     record._statAnalyze();
@@ -712,21 +793,16 @@ let realSymbol = Symbol.for( 'real' );
 let isTransientSymbol = Symbol.for( 'isTransient' );
 let isActualSymbol = Symbol.for( 'isActual' );
 
+let inputSymbol = Symbol.for( 'input' );
+let relativeSymbol = Symbol.for( 'relative' );
+let absoluteSymbol = Symbol.for( 'absolute' );
+
 let Composes =
 {
 
   absolute : null,
-  // real : 0,
   relative : null,
-
-  // absoluteGlobalMaybe : null,
-  // realGlobalMaybe : null,
   input : null,
-
-  /* */
-
-  // isTransient : null,
-  // isActual : null,
   hash : null,
 
 }
@@ -737,7 +813,6 @@ let Aggregates =
 
 let Associates =
 {
-  // stat : 0,
   factory : null,
   associated : null,
 }
@@ -822,6 +897,10 @@ let Accessors =
   isTextLink : { readOnly : 1 },
   isLink : { readOnly : 1 },
 
+  absolute : { setter : absoluteSet },
+  relative : { setter : relativeSet },
+  input : { setter : inputSet },
+
 }
 
 // --
@@ -838,13 +917,15 @@ let Proto =
   FromMany,
   toAbsolute,
 
+  _safeCheck,
   _pathsForm,
+  _filterReset,
   _filterApply,
-  _isSafe,
+  _statReset,
   _statRead,
   _statAnalyze,
 
-  reval,
+  reset,
   changeExt,
   hashRead,
 
@@ -859,6 +940,10 @@ let Proto =
   _isSoftLinkGet,
   _isTextLinkGet,
   _isLinkGet,
+
+  absoluteSet,
+  relativeSet,
+  inputSet,
 
   _pathGet,
   _statGet,
@@ -913,10 +998,6 @@ require( './FileRecordFactory.s' );
 // --
 
 _[ Self.shortName ] = Self;
-
-// if( typeof module !== 'undefined' )
-// if( _global_.WTOOLS_PRIVATE )
-// { /* delete require.cache[ module.id ]; */ }
 
 if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = Self;

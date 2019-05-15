@@ -660,8 +660,8 @@ function dirReadAct( o )
       }
       else
       {
-        // result = [ self.path.name({ path : o.filePath, withExtension : 1 }) ];
-        result = self.path.name({ path : o.filePath, withExtension : 1 });
+        // result = [ self.path.name({ path : o.filePath, full : 1 }) ];
+        result = self.path.name({ path : o.filePath, full : 1 });
       }
     }
     catch ( err )
@@ -712,8 +712,8 @@ function dirReadAct( o )
       }
       else
       {
-        // result = [ self.path.name({ path : o.filePath, withExtension : 1 }) ];
-        result = self.path.name({ path : o.filePath, withExtension : 1 });
+        // result = [ self.path.name({ path : o.filePath, full : 1 }) ];
+        result = self.path.name({ path : o.filePath, full : 1 });
         con.take( result );
       }
     });
@@ -1233,7 +1233,7 @@ function fileDeleteAct( o )
 
   function tempPathGet()
   {
-    let fileName = self.path.name({ path : o.filePath, withExtension : 1 });
+    let fileName = self.path.name({ path : o.filePath, full : 1 });
     let tempName = fileName + '-' + _.idWithGuid() + '.tmp';
     let tempDirPath = self.path.pathDirTempForOpen( o.filePath );
     let tempPath = self.path.join( tempDirPath, tempName );

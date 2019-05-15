@@ -1,6 +1,6 @@
 ( function _Hub_s_() {
 
-'use strict'; 
+'use strict';
 
 if( typeof module !== 'undefined' )
 {
@@ -257,16 +257,16 @@ function _recordFormBegin( record )
   return record;
 }
 
+// //
 //
-
-function _recordPathForm( record )
-{
-  let self = this;
-  _.assert( record instanceof _.FileRecord );
-  _.assert( arguments.length === 1, 'Expects single argument' );
-
-  return record;
-}
+// function _recordPathForm( record )
+// {
+//   let self = this;
+//   _.assert( record instanceof _.FileRecord );
+//   _.assert( arguments.length === 1, 'Expects single argument' );
+//
+//   return record;
+// }
 
 //
 
@@ -420,26 +420,26 @@ function pathResolveLinkFull_body( o )
   o.filePath = r.localPath;
 
   let result = r.provider.pathResolveLinkFull.body.call( r.provider, o );
-  
+
   if( o.sync )
   {
     return handleResult( result );
   }
   else
-  { 
+  {
     result.then( handleResult );
     return result;
   }
-  
+
   /*  */
-  
+
   function handleResult( result )
-  { 
+  {
     if( result === null )
     return null;
-  
+
     result = self.path.join( r.provider.originPath, result );
-  
+
     if( result === o.filePath )
     {
       debugger;
@@ -770,10 +770,10 @@ function hardLinkBreak_body( o )
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  
+
   let r = self._localFromGlobal( o.filePath );
   let o2 = _.mapExtend( null, o );
-  
+
   o2.filePath = r.localPath;
 
   return r.provider.hardLinkBreak.body.call( r.provider, o2 );
@@ -998,10 +998,10 @@ function routinesGenerate()
 
         }
         else
-        { 
+        {
           if( o[ p ] instanceof _.FileRecord )
           continue;
-          
+
           o[ p ] = self.path.localFromGlobal( o[ p ] );
         }
       }
@@ -1020,16 +1020,16 @@ function routinesGenerate()
         if( _.strIs( o ) )
         o = { filePath : o }
       }
-      
+
       if( pre )
       o = pre.call( this, wrap, arguments );
-      
+
       let o2 = _.mapExtend( null, o );
-      
+
       if( !pre && wrap.defaults )
       if( !wrap.having || !wrap.having.driving )
       _.routineOptions( wrap, o2 );
-      
+
       let provider = self;
 
       provider = resolve.call( self, o2 );
@@ -1175,7 +1175,7 @@ let Proto =
 
   _recordFactoryFormEnd,
   _recordFormBegin,
-  _recordPathForm,
+  // _recordPathForm,
   _recordFormEnd,
 
   _recordAbsoluteGlobalMaybeGet,
@@ -1214,9 +1214,9 @@ let Proto =
   fileCopyAct,
 
   // link
-  
+
   hardLinkBreak,
-  
+
   filesAreHardLinkedAct,
 
   // accessor

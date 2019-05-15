@@ -440,7 +440,7 @@ function fileCopyToHardDrive( o )
 
   if( _.strIs( o ) )
   {
-    let filePath = self.path.join( self.path.realMainDir( ), self.path.name({ path : o, withExtension : 1 }) );
+    let filePath = self.path.join( self.path.realMainDir( ), self.path.name({ path : o, full : 1 }) );
     o = { url : o, filePath : filePath };
   }
   else

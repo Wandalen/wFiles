@@ -1,6 +1,6 @@
 ( function _Record_test_s_( ) {
 
-'use strict';  
+'use strict';
 
 if( typeof module !== 'undefined' )
 {
@@ -38,7 +38,7 @@ function onSuiteEnd()
 {
   if( Config.platform === 'nodejs' )
   {
-    _.assert( _.strEnds( testSuitePath, 'FileRecord' ) );
+    _.assert( _.strHas( testSuitePath, 'FileRecord' ) );
     _.path.dirTempClose( testSuitePath );
   }
 }
@@ -257,7 +257,7 @@ function recordFields( test )
 
   var factory = _.FileRecordFactory.TollerantFrom( o, { dirPath : __dirname  } ).form();
   var got = factory.record({ input : filePath, factory : factory });
-  test.identical( got.relative, './' + _.path.name({ path : filePath, withExtension : 1 }) );
+  test.identical( got.relative, './' + _.path.name({ path : filePath, full : 1 }) );
   test.identical( got.absolute, filePath );
   test.identical( got.real, filePath );
   test.identical( got.dir, _.path.normalize( __dirname ) );
@@ -267,7 +267,7 @@ function recordFields( test )
 
   var factory = _.FileRecordFactory.TollerantFrom( o, { basePath : __dirname  } ).form();
   var got = factory.record({ input : filePath, factory : factory });
-  test.identical( got.relative, './' + _.path.name({ path : filePath, withExtension : 1 }) );
+  test.identical( got.relative, './' + _.path.name({ path : filePath, full : 1 }) );
   test.identical( got.absolute, filePath );
   test.identical( got.real, filePath );
   test.identical( got.dir, _.path.normalize( __dirname ) );
@@ -306,7 +306,7 @@ function recordFields( test )
   //
 
   test.case = 'filePath relative dir/relative options'
-  var name = _.path.name({ path : _.path.normalize( __filename ), withExtension : 1 });
+  var name = _.path.name({ path : _.path.normalize( __filename ), full : 1 });
   var filePath = './' + name;
 
   //
@@ -1359,6 +1359,33 @@ function recordStating( test )
   test.is( _.fileStatIs( stat ) );
 }
 
+//
+
+function change( test )
+{
+
+  test.case = 'setup';
+
+  var inputPath = __filename;
+  var record = _.fileProvider.record( inputPath );
+  test.identical( record.input, inputPath );
+  test.identical( record.absolute, _.path.normalize( inputPath ) );
+  test.identical( record.relative, _.path.dot( _.path.relative( __dirname, inputPath ) ) );
+
+  var inputPath = __filename + '/terminal';
+  record.absolute = inputPath;
+  test.identical( record.input, inputPath );
+  test.identical( record.absolute, _.path.normalize( inputPath ) );
+  test.identical( record.relative, _.path.dot( _.path.relative( __dirname, inputPath ) ) );
+
+  var inputPath = 'terminal2';
+  record.relative = 'terminal2';
+  test.identical( record.input, inputPath );
+  test.identical( record.absolute, _.path.normalize( __dirname + '/terminal2' ) );
+  test.identical( record.relative, _.path.dot( _.path.relative( __dirname, __dirname + '/terminal2' ) ) );
+
+}
+
 // --
 // proto
 // --
@@ -1380,6 +1407,8 @@ var Self =
     recordForLink,
     recordForRelativeLink,
     recordStating,
+
+    change,
 
   },
 

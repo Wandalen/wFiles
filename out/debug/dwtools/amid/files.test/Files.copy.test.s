@@ -67,7 +67,7 @@ function prepareFile( path, type, link, level )
 {
   if( level > 0 )
   {
-    var name = _.path.name({ path : path, withExtension : 1 });
+    var name = _.path.name({ path : path, full : 1 });
     path = _.path.dir( path );
 
     for( var l = 1 ; l <= level; l++ )

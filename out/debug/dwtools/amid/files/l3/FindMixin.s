@@ -1631,12 +1631,21 @@ function filesReflectEvaluate_body( o )
     _.assert( _.routineIs( o.onUp ) );
     _.assert( arguments.length === 2 );
 
-    handleUp2.call( self, record, o );
-
+    // yyy
     let result = true;
     let r = o.onUp.call( self, record, o );
     if( r === _.dont )
     return end( false );
+    // yyy
+
+    handleUp2.call( self, record, o );
+
+    // // yyy
+    // let result = true;
+    // let r = o.onUp.call( self, record, o );
+    // if( r === _.dont )
+    // return end( false );
+    // // yyy
 
     return end( record );
 
@@ -1971,11 +1980,6 @@ function filesReflectEvaluate_body( o )
       {
         /* src is dir, dst does not exist */
 
-        // if( record.reason === 'srcLooking' && touchMap[ record.dst.absolute ] )
-        // {
-        //
-        // }
-
         if( !record.src.isActual )
         {
           if( record.touch === 'constructive' )
@@ -2242,7 +2246,7 @@ function filesReflectEvaluate_body( o )
 
     if( o.filesGraph && !record.src.isDir && !record.upToDate )
     {
-      record.dst.reval();
+      record.dst.reset();
       o.filesGraph.dependencyAdd( record.dst, record.src );
     }
 
@@ -3362,7 +3366,7 @@ function filesReflect_body( o )
 var defaults = filesReflect_body.defaults = Object.create( filesReflectSingleDefaults );
 
 defaults.reflectMap = null;
-defaults.mandatory = 0;
+defaults.mandatory = 1;
 
 defaults.onWriteDstUp = null;
 defaults.onWriteDstDown = null;
@@ -3514,7 +3518,7 @@ function filesReflectTo_body( o )
   _.assert( src.hub === dst.hub );
 
   let filePath = { [ src.path.globalFromLocal( o.srcPath ) ] : dst.path.globalFromLocal( o.dstPath ) }
-  let result = hub.filesReflect({ reflectMap : filePath });
+  let result = hub.filesReflect({ reflectMap : filePath, mandatory : o.mandatory });
 
   _.assert( !_.consequenceIs( result ), 'not implemented' );
 
@@ -3533,6 +3537,7 @@ var defaults = filesReflectTo_body.defaults = Object.create( null );
 defaults.dstProvider = null;
 defaults.dstPath = '/';
 defaults.srcPath = '/';
+defaults.mandatory = 0;
 
 let filesReflectTo = _.routineFromPreAndBody( filesReflectTo_pre, filesReflectTo_body );
 

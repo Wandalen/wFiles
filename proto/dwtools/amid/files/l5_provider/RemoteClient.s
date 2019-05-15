@@ -426,7 +426,7 @@
 //       }
 //       else
 //       {
-//         result = [ self.path.name({ path : self.path.refine( o.filePath ), withExtension : 1 }) ];
+//         result = [ self.path.name({ path : self.path.refine( o.filePath ), full : 1 }) ];
 //       }
 //     }
 //     catch ( err )
@@ -477,7 +477,7 @@
 //       }
 //       else
 //       {
-//         result = [ self.path.name({ path : self.path.refine( o.filePath ), withExtension : 1 }) ];
+//         result = [ self.path.name({ path : self.path.refine( o.filePath ), full : 1 }) ];
 //         con.take( result );
 //       }
 //     });

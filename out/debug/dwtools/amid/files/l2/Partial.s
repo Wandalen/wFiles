@@ -1716,13 +1716,13 @@ function _recordFormBegin( record )
   return record;
 }
 
+// //
 //
-
-function _recordPathForm( record )
-{
-  let self = this;
-  return record;
-}
+// function _recordPathForm( record )
+// {
+//   let self = this;
+//   return record;
+// }
 
 //
 
@@ -7582,6 +7582,7 @@ let Forbids =
   isTextLinkAct : 'isTextLinkAct',
   isSoftLinkAct : 'isSoftLinkAct',
   isHardLinkAct : 'isHardLinkAct',
+  _recordPathForm : '_recordPathForm',
 
 }
 
@@ -7665,7 +7666,7 @@ let Proto =
 
   _recordFactoryFormEnd,
   _recordFormBegin,
-  _recordPathForm,
+  // _recordPathForm,
   _recordFormEnd,
 
   _recordAbsoluteGlobalMaybeGet,

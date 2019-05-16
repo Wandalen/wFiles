@@ -11,6 +11,12 @@ if( typeof module !== 'undefined' )
 
 //
 
+/**
+ @classdesc Class to transfer data over http protocol using GET/POST methods. Implementation for a server side.
+ @class wFileProviderHttp
+ @memberof module:Tools/mid/Files.wTools.FileProvider
+*/
+
 let _global = _global_;
 let _ = _global_.wTools;
 let Parent = _.FileProvider.Partial;
@@ -82,6 +88,27 @@ streamReadAct.having = Object.create( Parent.prototype.streamReadAct.having );
 
 
 //
+
+/**
+ * @summary Reads content of a remote resourse performing GET request.
+ * @description Accepts single argument - map with options. Expects that map `o` contains all necessary options and don't have redundant fields.
+ * If `o.sync` is false, return instance of wConsequence, that gives a message with concent of a file when reading is finished.
+ * 
+ * @param {Object} o Options map.
+ * @param {String} o.filePath Remote url.
+ * @param {String} o.encoding Desired encoding of a file concent.
+ * @param {Boolean} o.resolvingSoftLink Enable resolving of soft links.
+ * @param {String} o.sync Determines how to read a file, synchronously or asynchronously.
+ * @param {Object} o.advanced Advanced options for http method
+ * @param {} o.advanced.send Data to send.
+ * @param {String} o.advanced.method Which http method to use: 'GET' or 'POST'.
+ * @param {String} o.advanced.user Username, is used in authorization
+ * @param {String} o.advanced.password Password, is used in authorization
+ * 
+ * @function fileReadAct
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHttp#
+*/
+
 
 function fileReadAct( o )
 {
@@ -367,6 +394,26 @@ let filesReflectSingle = _.routineFromPreAndBody( _.FileProvider.Find.prototype.
 
 //
 
+/**
+ * @summary Saves content of a remote resourse to the hard drive. Actual implementation.
+ * @description Accepts single argument - map with options. Expects that map `o` contains all necessary options and don't have redundant fields.
+ * 
+ * @param {Object} o Options map.
+ * @param {String} o.url Remote url.
+ * @param {String} o.filePath Destination path.
+ * @param {String} o.encoding Desired encoding of a file concent.
+ * @param {Boolean} o.resolvingSoftLink Enable resolving of soft links.
+ * @param {String} o.sync Determines how to read a file, synchronously or asynchronously.
+ * @param {Object} o.advanced Advanced options for http method
+ * @param {} o.advanced.send Data to send.
+ * @param {String} o.advanced.method Which http method to use: 'GET' or 'POST'.
+ * @param {String} o.advanced.user Username, is used in authorization
+ * @param {String} o.advanced.password Password, is used in authorization
+ * 
+ * @function fileCopyToHardDriveAct
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHttp#
+*/
+
 function fileCopyToHardDriveAct( o )
 {
   let self = this;
@@ -433,6 +480,26 @@ fileCopyToHardDriveAct.advanced =
 }
 
 //
+
+/**
+ * @summary Saves content of a remote resourse to the hard drive.
+ * @description Accepts single argument - map with options. Expects that map `o` contains all necessary options and don't have redundant fields.
+ * 
+ * @param {Object} o Options map.
+ * @param {String} o.url Remote url.
+ * @param {String} o.filePath Destination path.
+ * @param {String} o.encoding Desired encoding of a file concent.
+ * @param {Boolean} o.resolvingSoftLink Enable resolving of soft links.
+ * @param {String} o.sync Determines how to read a file, synchronously or asynchronously.
+ * @param {Object} o.advanced Advanced options for http method
+ * @param {} o.advanced.send Data to send.
+ * @param {String} o.advanced.method Which http method to use: 'GET' or 'POST'.
+ * @param {String} o.advanced.user Username, is used in authorization
+ * @param {String} o.advanced.password Password, is used in authorization
+ * 
+ * @function fileCopyToHardDriveAct
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHttp#
+*/
 
 function fileCopyToHardDrive( o )
 {
@@ -554,6 +621,19 @@ fileReadAct.encoders = WriteEncoders;
 // --
 // relationship
 // --
+
+/**
+ * @typedef {Object} Fields
+ * @param {Boolean} safe=0
+ * @param {Boolean} stating=0
+ * @param {String[]} protocols=[ 'http', 'https' ]
+ * @param {Boolean} resolvingSoftLink=0
+ * @param {Boolean} resolvingTextLink=0
+ * @param {Boolean} usingSoftLink=0
+ * @param {Boolean} usingTextLink=0
+ * @param {Boolean} usingGlobalPath=1
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHttp
+*/
 
 let Composes =
 {

@@ -31,7 +31,7 @@ _.assert( _.routineIs( fileRead ) );
 /**
  @classdesc Mixin to add operations on group of files with very specific purpose. For example, it has a method to search for text in files.
  @class wFileProviderSecondary
- @memberof module:Tools/mid/Files
+ @memberof module:Tools/mid/Files.wTools.FileProvider
 */
 
 let Parent = null;
@@ -380,6 +380,15 @@ function _filesReadOldAsync( o )
 // etc
 // --
 
+/**
+ * @summary Returns true if file from `dst` is newer than file from `src`.
+ * @param {String} src Source path.
+ * @param {String} dst Destination path.
+ * @returns {Boolean} Returns result of comparison as boolean.
+ * @function filesAreUpToDate
+ * @memberof module:Tools/mid/Files.wFileProviderSecondary#
+ */
+
 function filesAreUpToDate( dst,src )
 {
   let self = this;
@@ -465,7 +474,7 @@ having.driving = 0;
  * @param {boolean} [o.verbosity=true] turns on/off logging
  * @returns {boolean}
  * @throws {Error} If passed object has unexpected parameter.
- * @method filesAreUpToDate2
+ * @function filesAreUpToDate2
  * @memberof module:Tools/mid/Files.wFileProviderSecondary#
  */
 
@@ -535,6 +544,12 @@ having.reading = 1;
 having.driving = 0;
 
 //
+
+/**
+ * @summary Calculates date resolution time in milliseconds for current file system.
+ * @function systemBitrateTimeGet
+ * @memberof module:Tools/mid/Files.wFileProviderSecondary#
+ */
 
 function systemBitrateTimeGet()
 {
@@ -779,6 +794,17 @@ _fileConfigRead2.defaults = fileConfigRead2.defaults;
 
 //
 
+/**
+ * @description Finds config files that have name of files from `o.filePath`.
+ * Mixes name of files from `o.filePath` with different extensions to find config files that can be read by availbale read encoders.
+ * Returns results as array or map.
+ * @param {Object} o Options map.
+ * @param {Array|String} o.filePath Source paths.
+ * @param {String} o.outputFormat='array', Possible formats: array,map.
+ * @function fileConfigPathGet
+ * @memberof module:Tools/mid/Files.wFileProviderSecondary#
+ */
+
 function fileConfigPathGet_body( o )
 {
   let self = this;
@@ -884,6 +910,17 @@ filePath : fullPath.json
 filePath : fullPath
 both should work fine
 */
+
+/**
+ * @summary Read config files one by one and extends result with fields from each config file.
+ * @description Finds config files if they were not provided through option `o.found`.
+ * @param {Object} o Options map.
+ * @param {Array|String} o.filePath Source paths.
+ * @param {Array|Object} o.found Container to store found config files.
+ * @param {String} o.many='all' Checks if each of files `o.filePath` have at least one config file.
+ * @function fileConfigRead
+ * @memberof module:Tools/mid/Files.wFileProviderSecondary#
+ */
 
 function fileConfigRead_body( o )
 {
@@ -1017,6 +1054,20 @@ var fileConfigRead = _.routineFromPreAndBody( Partial.prototype._preFilePathVect
 fileConfigRead.having.aspect = 'entry';
 
 //
+
+/**
+ * @summary Read source code from provided file `o.filePath` and wraps it with self enclosed function of name `o.name`.
+ * @param {Object} o Options map.
+ * @param {String} o.filePath Source path.
+ * @param {String} o.encoding='utf8' Encoding used in file reading.
+ * @param {Boolean} o.wrapping=1 Adds custom `o.prefix` and `o.postfix` to source code.
+ * @param {Boolean} o.routine=0 Creates routine from result string.
+ * @param {String} o.name Name for self enclosed function.
+ * @param {String} o.prefix Inserts this string before source code.
+ * @param {String} o.postfix Inserts this string after source code.
+ * @function fileCodeRead
+ * @memberof module:Tools/mid/Files.wFileProviderSecondary#
+ */
 
 function fileCodeRead_body( o )
 {

@@ -17,6 +17,12 @@ let GitConfig, Ini;
 
 //
 
+/**
+ @classdesc Class that allows file manipulations on a git repository. For example, cloning of the repositoty.
+ @class wFileProviderGit
+ @memberof module:Tools/mid/Files.wTools.FileProvider
+*/
+
 let Parent = _.FileProvider.Partial;
 let Self = function wFileProviderGit( o )
 {
@@ -681,6 +687,18 @@ let filesReflectSingle = _.routineFromPreAndBody( _.FileProvider.Find.prototype.
 // --
 // relationship
 // --
+
+/**
+ * @typedef {Object} Fields
+ * @property {Boolean} safe
+ * @property {String[]} protocols=[ 'git', 'git+http', 'git+https', 'git+ssh' ]
+ * @property {Boolean} resolvingSoftLink=0
+ * @property {Boolean} resolvingTextLink=0
+ * @property {Boolean} limitedImplementation=1
+ * @property {Boolean} isVcs=1
+ * @property {Boolean} usingGlobalPath=1
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderGit
+ */
 
 let Composes =
 {

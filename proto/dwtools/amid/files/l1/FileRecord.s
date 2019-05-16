@@ -13,6 +13,12 @@ if( typeof module !== 'undefined' )
 //
 // --
 
+/**
+ * @classdesc Class to create record for a file.
+ * @class wFileRecord
+ * @memberof module:Tools/mid/Files
+*/
+
 let _global = _global_;
 let _ = _global_.wTools;
 let Parent = null;
@@ -97,6 +103,12 @@ function form()
 
 //
 
+/**
+ * @summary Returns a clone of current file record.
+ * @function clone
+ * @memberof module:Tools/mid/Files.wFileRecord#
+*/
+
 function clone( src )
 {
   let record = this;
@@ -114,12 +126,26 @@ function clone( src )
 
 //
 
+/**
+ * @summary Creates instance of FileRecord from provided entity `src`.
+ * @param {Object|String} src Options map or path to a file.
+ * @function From
+ * @memberof module:Tools/mid/Files.wFileRecord
+*/
+
 function From( src )
 {
   return Self( src );
 }
 
 //
+
+/**
+ * @summary Creates several instances of FileRecord from provided arguments.
+ * @param {Array} src Array with options or paths.
+ * @function FromMany
+ * @memberof module:Tools/mid/Files.wFileRecord
+*/
 
 function FromMany( src )
 {
@@ -135,6 +161,14 @@ function FromMany( src )
 }
 
 //
+
+/**
+ * @summary Returns absolute path to a file associated with provided `record`.
+ * @description Uses current instance if no argument provided.
+ * @param {Object} record Instance of FileRecord.
+ * @function toAbsolute
+ * @memberof module:Tools/mid/Files.wFileRecord#
+*/
 
 function toAbsolute( record )
 {
@@ -367,6 +401,12 @@ function _statAnalyze()
 
 //
 
+/**
+ * @summary Resets stats and filter values of current instance.
+ * @function reset
+ * @memberof module:Tools/mid/Files.wFileRecord#
+*/
+
 function reset()
 {
   let record = this;
@@ -383,6 +423,13 @@ function reset()
 
 //
 
+/**
+ * @summary Changes file extension of current record.
+ * @param {String} ext New file extension.
+ * @function changeExt
+ * @memberof module:Tools/mid/Files.wFileRecord#
+*/
+
 function changeExt( ext )
 {
   let record = this;
@@ -393,6 +440,12 @@ function changeExt( ext )
 }
 
 //
+
+/**
+ * @summary Returns file hash of current record.
+ * @function hashRead
+ * @memberof module:Tools/mid/Files.wFileRecord#
+*/
 
 function hashRead()
 {
@@ -796,6 +849,16 @@ let isActualSymbol = Symbol.for( 'isActual' );
 let inputSymbol = Symbol.for( 'input' );
 let relativeSymbol = Symbol.for( 'relative' );
 let absoluteSymbol = Symbol.for( 'absolute' );
+
+/**
+ * @typedef {Object} Fields
+ * @property {String} absolute Absolute path to a file.
+ * @property {String} relative Relative path to a file.
+ * @property {String} input Source path to a file.
+ * @property {String} hash Hash of a file.
+ * @property {Object} factory Instance of FileRecordFactory.
+ * @memberof module:Tools/mid/Files.wFileRecord
+*/
 
 let Composes =
 {

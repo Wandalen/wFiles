@@ -14,6 +14,11 @@ let _ = _global_.wTools;
 
 //
 
+/**
+ @class wFileProviderNpm
+ @memberof module:Tools/mid/Files.wTools.FileProvider
+*/
+
 let Parent = _.FileProvider.Partial;
 let Self = function wFileProviderNpm( o )
 {
@@ -47,6 +52,24 @@ function init( o )
 // --
 // path
 // --
+
+/**
+ * @typedef {Object} RemotePathComponents
+ * @property {String} protocol
+ * @property {String} hash
+ * @property {String} longPath
+ * @property {String} localVcsPath
+ * @property {String} remoteVcsPath 
+ * @property {String} longerRemoteVcsPath
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm
+ */
+
+/**
+ * @summary Parses provided `remotePath` and returns object with components {@link module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm.RemotePathComponents}.
+ * @param {String} remotePath Remote path.
+ * @function pathParse
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm#
+ */
 
 function pathParse( remotePath )
 {
@@ -121,6 +144,13 @@ function pathParse( remotePath )
 
 //
 
+/**
+ * @summary Returns true if remote path `filePath` has fixed version of npm package.
+ * @param {String} filePath Global path.
+ * @function pathIsFixated
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm#
+ */
+
 function pathIsFixated( filePath )
 {
   let self = this;
@@ -134,6 +164,15 @@ function pathIsFixated( filePath )
 }
 
 //
+
+/**
+ * @summary Changes version of package specified in path `o.remotePath` to latest available.
+ * @param {Object} o Options map.
+ * @param {String} o.remotePath Remote path.
+ * @param {Number} o.verbosity=0 Level of verbosity.
+ * @function pathIsFixated
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm#
+ */
 
 function pathFixate( o )
 {
@@ -167,6 +206,15 @@ defaults.remotePath = null;
 defaults.verbosity = 0;
 
 //
+
+/**
+ * @summary Returns version of npm package located at `o.localPath`.
+ * @param {Object} o Options map.
+ * @param {String} o.localPath Path to npm package on hard drive.
+ * @param {Number} o.verbosity=0 Level of verbosity.
+ * @function versionLocalRetrive
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm#
+ */
 
 function versionLocalRetrive( o )
 {
@@ -207,6 +255,16 @@ defaults.localPath = null;
 defaults.verbosity = 0;
 
 //
+
+/**
+ * @summary Returns latest version of npm package using its remote path `o.remotePath`.
+ * @param {Object} o Options map.
+ * @param {String} o.remotePath Remote path.
+ * @param {Number} o.verbosity=0 Level of verbosity.
+ * @function versionRemoteLatestRetrive
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm#
+ */
+
 
 function versionRemoteLatestRetrive( o )
 {
@@ -249,6 +307,16 @@ defaults.verbosity = 0;
 
 //
 
+/**
+ * @summary Returns current version of npm package using its remote path `o.remotePath`.
+ * @description Returns latest version if no version specified in remote path.
+ * @param {Object} o Options map.
+ * @param {String} o.remotePath Remote path.
+ * @param {Number} o.verbosity=0 Level of verbosity.
+ * @function versionRemoteCurrentRetrive
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm#
+ */
+
 function versionRemoteCurrentRetrive( o )
 {
   let self = this;
@@ -273,6 +341,16 @@ defaults.remotePath = null;
 defaults.verbosity = 0;
 
 //
+
+/**
+ * @summary Returns true if local copy of package `o.localPath` is up to date with remote version `o.remotePath`.
+ * @param {Object} o Options map.
+ * @param {String} o.localPath Local path to package.
+ * @param {String} o.remotePath Remote path to package.
+ * @param {Number} o.verbosity=0 Level of verbosity.
+ * @function isUpToDate
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm#
+ */
 
 function isUpToDate( o )
 {
@@ -312,6 +390,15 @@ defaults.remotePath = null;
 defaults.verbosity = 0;
 
 //
+
+/**
+ * @summary Returns true if path `o.localPath` contains a package.
+ * @param {Object} o Options map.
+ * @param {String} o.localPath Local path to package.
+ * @param {Number} o.verbosity=0 Level of verbosity.
+ * @function isDownloaded
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm#
+ */
 
 function isDownloaded( o )
 {
@@ -498,6 +585,18 @@ let filesReflectSingle = _.routineFromPreAndBody( _.FileProvider.Find.prototype.
 // --
 // relationship
 // --
+
+/**
+ * @typedef {Object} Fields
+ * @property {Boolean} safe=0
+ * @property {String[]} protocols=[ 'npm' ]
+ * @property {Boolean} resolvingSoftLink=0
+ * @property {Boolean} resolvingTextLink=0
+ * @property {Boolean} limitedImplementation=1
+ * @property {Boolean} isVcs=1
+ * @property {Boolean} usingGlobalPath=1
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm
+*/
 
 let Composes =
 {

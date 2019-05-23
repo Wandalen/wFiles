@@ -40,7 +40,7 @@ _.assert( _.routineIs( _.path.join ) );
 /**
  @classdesc Defines single interface, called ( FileProvider ) to perform file operations in the same manner with different sources/destinations.
  @class wFileProviderPartial
- @memberof module:Tools/mid/Files
+ @memberof module:Tools/mid/Files.wTools.FileProvider
 */
 
 let Parent = _.FileProvider.Abstract;
@@ -591,7 +591,7 @@ function EncodersGenerate()
  * @throws {Error} If passed extra arguments
  * @throws {Error} If missed `PathFiile`
  * @method _fileOptionsGet
- * @memberof module:Tools/mid/Files.wFileProviderPartial#
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial#
  */
 
 function _fileOptionsGet( filePath, o )
@@ -2084,7 +2084,7 @@ statRead_body.having.aspect = 'body';
  * @throws { Exception } If no arguments provided.
  * @throws { Exception } If ( o.filePath ) is not a String or instance of wFileRecord.
  * @throws { Exception } If ( o.filePath ) path to a file doesn't exist.
- * @memberof module:Tools/mid/Files.wFileProviderPartial#
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial#
  */
 
 let statRead = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, statRead_body );
@@ -2125,7 +2125,7 @@ statResolvedRead.defaults.resolvingTextLink = null;
  * @param {Function} [o.onEnd] callback.
  * @returns {number} size in bytes
  * @method filesSize
- * @memberof module:Tools/mid/Files.wFileProviderPartial#
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial#
  */
 
 function filesSize( o )
@@ -2290,7 +2290,7 @@ _.routineExtend( fileExistsAct, _fileExistsAct );
  * @throws { Exception } If no arguments provided.
  * @throws { Exception } If ( o.filePath ) is not a String or instance of wFileRecord.
  * @throws { Exception } If ( o.filePath ) path to a file doesn't exist.
- * @memberof module:Tools/mid/Files.wFileProviderPartial#
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial#
  */
 
 function fileExists_body( o )
@@ -2641,7 +2641,7 @@ _.assert( _.objectIs( fileRead_body.encoders ) );
  * @throws {Error} If missed arguments.
  * @throws {Error} If ( o ) has extra parameters.
  * @method fileRead
- * @memberof module:Tools/mid/Files.wFileProviderPartial#
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial#
  */
 
 /**
@@ -2715,7 +2715,7 @@ fileRead.having.hubResolving = 1;
  * @throws {Error} if missed arguments
  * @throws {Error} if `o` has extra parameters
  * @method fileReadSync
- * @memberof module:Tools/mid/Files.wFileProviderPartial#
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial#
  */
 
 let fileReadSync = _.routineFromPreAndBody( fileRead.pre, fileRead.body );
@@ -2758,7 +2758,7 @@ having.aspect = 'body';
  * @returns {*}
  * @throws {Error} If missed arguments, or passed more then one argument.
  * @method fileReadJson
- * @memberof module:Tools/mid/Files.wFileProviderPartial#
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial#
  */
 
 let fileReadJson = _.routineFromPreAndBody( fileRead.pre, fileReadJson_body );
@@ -3075,7 +3075,7 @@ operates.filePath = { pathToRead : 1 }
  * @throws { Exception } If no arguments provided.
  * @throws { Exception } If ( o.filePath ) is not a String or instance of wFileRecord.
  * @throws { Exception } If ( o.filePath ) path to a file doesn't exist or file is a directory.
- * @memberof module:Tools/mid/Files.wFileProviderPartial#
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial#
  */
 
 function hashRead_body( o )
@@ -3326,7 +3326,7 @@ having.aspect = 'body';
  * @throws { Exception } If no arguments provided.
  * @throws { Exception } If ( o.filePath ) path is not a String or instance of FileRecord @see{@link wFileRecord}
  * @throws { Exception } If ( o.filePath ) path doesn't exist.
- * @memberof module:Tools/mid/Files.wFileProviderPartial#
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial#
  */
 
 let dirRead = _.routineFromPreAndBody( dirRead_pre, dirRead_body );
@@ -3457,7 +3457,7 @@ having.driving = 0;
     if they are different, method returns false.
  * @returns {boolean}
  * @method filesAreSame
- * @memberof module:Tools/mid/Files.wFileProviderPartial#
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial#
  */
 
 function filesAreSame_pre( routine, args )
@@ -3647,7 +3647,7 @@ filesAreSame.having.aspect = 'entry';
  * @throws {Error} If passed unexpected parameter in o.
  * @throws {Error} If filePath is not string.
  * @method fileSize
- * @memberof module:Tools/mid/Files.wFileProviderPartial#
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial#
  */
 
 let fileSize = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, fileSize_body );
@@ -3720,7 +3720,7 @@ operates.filePath = { pathToRead : 1 }
  * @param {string} filePath Path string
  * @returns {boolean}
  * @method isTerminal
- * @memberof module:Tools/mid/Files.wFileProviderPartial#
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial#
  */
 
 let isTerminal = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isTerminal_body );
@@ -3736,7 +3736,7 @@ isTerminal.having.aspect = 'entry';
  * @param {string} filePath Path string
  * @returns {boolean}
  * @method resolvedIsTerminal
- * @memberof module:Tools/mid/Files.wFileProviderPartial#
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial#
  */
 
 let resolvedIsTerminal = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isTerminal_body );
@@ -3813,7 +3813,7 @@ operates.filePath = { pathToRead : 1 }
  * @param {string} filePath Tested path string
  * @returns {boolean}
  * @method isDir
- * @memberof module:Tools/mid/Files.wFileProviderPartial#
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial#
  */
 
 let isDir = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isDir_body );
@@ -3830,7 +3830,7 @@ isDir.having.aspect = 'entry';
  * @param {string} filePath Tested path string
  * @returns {boolean}
  * @method resolvedIsDir
- * @memberof module:Tools/mid/Files.wFileProviderPartial#
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial#
  */
 
 let resolvedIsDir = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isDir_body );
@@ -3847,7 +3847,7 @@ resolvedIsDir.having.aspect = 'entry';
  * @param filePath
  * @returns {boolean}
  * @method isHardLink
- * @memberof module:Tools/mid/Files.wFileProviderPartial#
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial#
  */
 
 function isHardLink_body( o )
@@ -3939,7 +3939,7 @@ resolvedIsHardLink.having.aspect = 'entry';
  * @param filePath
  * @returns {boolean}
  * @method isSoftLink
- * @memberof module:Tools/mid/Files.wFileProviderPartial#
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial#
  */
 
 function isSoftLink_body( o )
@@ -4168,7 +4168,7 @@ resolvedIsLink.having.aspect = 'entry';
  * @param {string} filePath - Path to the directory.
  * @returns {boolean}
  * @method dirIsEmpty
- * @memberof module:Tools/mid/Files.wFileProviderPartial#
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial#
  */
 
 function dirIsEmpty( filePath )
@@ -4455,7 +4455,7 @@ _.assert( _.objectIs( fileWrite_body.encoders ) );
  * @throws {Error} If `data` argument or options.data is not string or Buffer,
  * @throws {Error} If options has unexpected property.
  * @method fileWrite
- * @memberof module:Tools/mid/Files.wFileProviderPartial#
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial#
  */
 
 let fileWrite = _.routineFromPreAndBody( fileWrite_pre, fileWrite_body );
@@ -4597,7 +4597,7 @@ _.assert( _.boolLike( _.toJson.defaults.cloning ) );
  * @throws {Error} If `filePath` argument or options.PathFile is not string.
  * @throws {Error} If options has unexpected property.
  * @method fileWriteJson
- * @memberof module:Tools/mid/Files.wFileProviderPartial#
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial#
 */
 
 let fileWriteJson = _.routineFromPreAndBody( fileWrite_pre, fileWriteJson_body );
@@ -4957,7 +4957,7 @@ having.aspect = 'body';
  * @throws { Exception } If no arguments provided.
  * @throws { Exception } If ( o.filePath ) is not a String or instance of wFileRecord.
  * @throws { Exception } If ( o.filePath ) path to a file doesn't exist or file is an directory with files.
- * @memberof module:Tools/mid/Files.wFileProviderPartial#
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial#
  */
 
 let fileDelete = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, fileDelete_body );
@@ -6239,7 +6239,7 @@ operates.dstPath = { pathToWrite : 1 }
  * @throws { Exception } If ( o.dstPath ) is not a String or instance of wFileRecord.
  * @throws { Exception } If ( o.srcPath ) path to a file doesn't exist.
  * @throws { Exception } If destination( o.dstPath ) and source( o.srcPath ) files exist and ( o.rewriting ) is disabled.
- * @memberof module:Tools/mid/Files.wFileProviderPartial#
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial#
  */
 
 function _fileRenameAct( c )
@@ -6339,7 +6339,7 @@ operates.dstPath = { pathToWrite : 1 }
  * @throws {Error} If ( o.rewriting ) is false and destination path exists.
  * @throws {Error} If path to source file( srcPath ) not exists and ( o.throwing ) is enabled, otherwise returns false.
  * @method fileCopy
- * @memberof module:Tools/mid/Files.wFileProviderPartial#
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial#
  */
 
 function _fileCopyVerify2( c )
@@ -6457,7 +6457,7 @@ defaults.resolvingDstTextLink = 0;
  * If source( o.srcPath ) and destination( o.dstPath ) paths are equal, operiation is considered as successful.
  *
  * @method hardLinkAct
- * @memberof module:Tools/mid/Files.wFileProviderPartial#
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial#
  */
 
 let hardLinkAct = Object.create( null );
@@ -6506,7 +6506,7 @@ operates.dstPath = { pathToWrite : 1 }
  * @method hardLink
  * @throws { exception } If( o.srcPath ) doesn`t exist.
  * @throws { exception } If cant link ( o.srcPath ) with ( o.dstPath ).
- * @memberof module:Tools/mid/Files.wFileProviderPartial#
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial#
  */
 
 function _hardLinkVerify1( c )
@@ -6651,7 +6651,7 @@ operates.dstPath = { pathToWrite : 1 }
  * @method softLink
  * @throws { exception } If( o.srcPath ) doesn`t exist.
  * @throws { exception } If cant link ( o.srcPath ) with ( o.dstPath ).
- * @memberof module:Tools/mid/Files.wFileProviderPartial#
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial#
  */
 
 function _softLinkAct( c )
@@ -6763,7 +6763,7 @@ operates.dstPath = { pathToWrite : 1 }
  * @method textLink
  * @throws { exception } If( o.srcPath ) doesn`t exist.
  * @throws { exception } If cant link ( o.srcPath ) with ( o.dstPath ).
- * @memberof module:Tools/mid/Files.wFileProviderPartial#
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial#
  */
 
 function _textLinkAct( c )
@@ -7054,7 +7054,7 @@ having.aspect = 'body';
  * @throws { Exception } If ( o.dstPath ) is not a String or instance of wFileRecord.
  * @throws { Exception } If ( o.srcPath ) path to a file doesn't exist.
  * @throws { Exception } If destination( o.dstPath ) and source( o.srcPath ) files exist and ( o.rewriting ) is disabled.
- * @memberof module:Tools/mid/Files.wFileProviderPartial#
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial#
  */
 
 let fileExchange = _.routineFromPreAndBody( fileExchange_pre, fileExchange_body );
@@ -7206,7 +7206,7 @@ operates.filePath = { pathToRead : 1, vector : [ 2, 2 ] }
  * @returns {boolean}
  * @throws {Error} if missed one of arguments or pass more then 2 arguments.
  * @method filesAreHardLinked
- * @memberof module:Tools/mid/Files.wFileProviderPartial#
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial#
  */
 
 function filesAreLinked_pre( routine, args )
@@ -7497,6 +7497,29 @@ let ProviderDefaults =
   'safe' : null,
   'hub' : null,
 }
+
+/**
+ * @typedef {Object} Fields
+ * @property {String[]} protocols=[]
+ * @property {String} encoding='utf8'
+ * @property {Number} hashFileSizeLimit=1<<22
+ * @property {Boolean} resolvingSoftLink=1
+ * @property {Boolean} resolvingTextLink=0
+ * @property {Boolean} usingSoftLink=1
+ * @property {Boolean} usingTextLink=0
+ * @property {Number} verbosity=0
+ * @property {Boolean} sync=1
+ * @property {Boolean} throwing=1
+ * @property {Boolean} safe=1
+ * @property {Boolean} stating=1
+ * @property {Boolean} usingGlobalPath=0
+ * @property {Object} path
+ * @property {Object} logger
+ * @property {Object} hub
+ * @property {String} protocol
+ * @property {String} originPath
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial
+ */
 
 // --
 // relationship

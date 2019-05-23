@@ -12,6 +12,12 @@ if( typeof module !== 'undefined' )
 
 //
 
+/**
+ @classdesc Class that allows file manipulations between different file providers using global paths.
+ @class wFileProviderHub
+ @memberof module:Tools/mid/Files.wTools.FileProvider
+*/
+
 let _global = _global_;
 let _ = _global_.wTools;
 let Routines = Object.create( null );
@@ -64,6 +70,14 @@ function init( o )
 // provider
 // --
 
+/**
+ @summary Changes default file provider.
+ @description Sets default provider to `null` if no argument provided.
+ @param {Object} [provider] Provider to set as default.
+ @function providerDefaultSet
+ @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHub#
+*/
+
 function providerDefaultSet( provider )
 {
   let self = this;
@@ -93,6 +107,13 @@ function providerDefaultSet( provider )
 
 }
 
+/**
+ @summary Short-cut for {@link module:Tools/mid/Files.wTools.FileProvider.wFileProviderHub.providerRegister}. Registers several file providers.
+ @param {Object|Object[]} fileProvider Provider(s) to register.
+ @function providerRegister
+ @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHub#
+*/
+
 //
 
 function providersRegister( src )
@@ -112,6 +133,14 @@ function providersRegister( src )
 }
 
 //
+
+/**
+ @summary Adds provider to the inner registry.
+ @description Provider should have protocol and origin path defined.
+ @param {Object} fileProvider Provider to register.
+ @function providerRegister
+ @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHub#
+*/
 
 function providerRegister( fileProvider )
 {
@@ -147,6 +176,14 @@ function providerRegister( fileProvider )
 
 //
 
+/**
+ @summary Removes provider from the inner registry.
+ @description Provider must be registered in current hub.
+ @param {Object} fileProvider Provider to unregister.
+ @function providerUnregister
+ @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHub#
+*/
+
 function providerUnregister( fileProvider )
 {
   let self = this;
@@ -163,6 +200,14 @@ function providerUnregister( fileProvider )
 }
 
 //
+
+/**
+ @summary Selects file provider for specified global path.
+ @description Returns default file provider if hub doesn't have provider for specified path.
+ @param {String} url Source url.
+ @function providerForPath
+ @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHub#
+*/
 
 function providerForPath( url )
 {
@@ -220,6 +265,13 @@ function protocolNameGenerate( skip )
 }
 
 //
+
+/**
+ @summary Returns true if current hub has specified file `provider` in the registry.
+ @param {Object} provider File provider to check.
+ @function hasProvider
+ @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHub#
+*/
 
 function hasProvider( provider )
 {
@@ -337,6 +389,13 @@ function fieldPop()
 // path
 // --
 
+/**
+ @summary Converts global path `filePath` to local.
+ @param {String} filePath Global path.
+ @function localFromGlobalAct
+ @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHub#
+*/
+
 function localFromGlobalAct( filePath )
 {
   let self = this;
@@ -397,6 +456,13 @@ function pathNativizeAct( filePath )
 }
 
 //
+
+/**
+ @summary Returns current working directory of default provider.
+ @description Changes current working directory if new path is provided.
+ @function pathCurrentAct
+ @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHub#
+*/
 
 function pathCurrentAct()
 {
@@ -1104,6 +1170,23 @@ _.assert( _.prototypeHas( Path, _.uri ) );
 let defaultProviderSymbol = Symbol.for( 'defaultProvider' );
 let defaultProtocolSymbol = Symbol.for( 'defaultProtocol' );
 let defaultOriginSymbol = Symbol.for( 'defaultOrigin' );
+
+/**
+ * @typedef {Object} Fields
+ * @property {String} defaultProtocol
+ * @property {Object} providersWithProtocolMap={}
+ * @property {Object} defaultProvider
+ * @property {Boolean} safe=0
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHub
+*/
+
+/**
+ * @typedef {Object} Medials
+ * @property {Boolean} empty=0
+ * @property {Object[]} providers
+ * @property {String} defaultOrigin
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHub
+*/
 
 let Composes =
 {

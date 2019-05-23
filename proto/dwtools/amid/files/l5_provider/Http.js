@@ -11,6 +11,12 @@ if( typeof module !== 'undefined' )
 
 //
 
+/**
+ @classdesc Class to transfer data over http protocol using GET/POST methods. Implementation for a browser.
+ @class wFileProviderHttp
+ @memberof module:Tools/mid/Files.wTools.FileProvider
+*/
+
 let _global = _global_;
 let _ = _global_.wTools;
 let Parent = _.FileProvider.Partial;
@@ -35,6 +41,14 @@ function init( o )
 
 //
 
+/**
+ * @summary Return path to current working directory.
+ * @description Changes current path to `path` if argument is provided.
+ * @param {String} [path] New current path.
+ * @function pathCurrentAct
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHttp#
+*/
+
 function pathCurrentAct()
 {
   let self = this;
@@ -54,6 +68,18 @@ function pathCurrentAct()
 }
 
 //
+
+/**
+ * @summary Returns stats object for a remote resource `o.filePath`.
+ * @description Changes current path to `path` if argument is provided.
+ * @param {Object} o Options map.
+ * @param {Object} o.filePath Url of a resource.
+ * @param {String} o.sync Determines how to read a file, synchronously or asynchronously.
+ * @param {String} o.throwing Controls error throwing. Returns null if disabled and error occurs.
+ * @param {Boolean} o.resolvingSoftLink Enable resolving of soft links.
+ * @function statReadAct
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHttp#
+*/
 
 function statReadAct( o )
 {
@@ -144,6 +170,26 @@ statReadAct.defaults = Object.create( Parent.prototype.statReadAct.defaults );
 statReadAct.having = Object.create( Parent.prototype.statReadAct.having );
 
 //
+
+/**
+ * @summary Reads content of a remote resourse performing GET request.
+ * @description Accepts single argument - map with options. Expects that map `o` contains all necessary options and don't have redundant fields.
+ * If `o.sync` is false, return instance of wConsequence, that gives a message with concent of a file when reading is finished.
+ * 
+ * @param {Object} o Options map.
+ * @param {String} o.filePath Remote url.
+ * @param {String} o.encoding Desired encoding of a file concent.
+ * @param {Boolean} o.resolvingSoftLink Enable resolving of soft links.
+ * @param {String} o.sync Determines how to read a file, synchronously or asynchronously.
+ * @param {Object} o.advanced Advanced options for http method
+ * @param {} o.advanced.send Data to send.
+ * @param {String} o.advanced.method Which http method to use: 'GET' or 'POST'.
+ * @param {String} o.advanced.user Username, is used in authorization
+ * @param {String} o.advanced.password Password, is used in authorization
+ * 
+ * @function fileReadAct
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHttp#
+*/
 
 function fileReadAct( o )
 {
@@ -469,6 +515,19 @@ fileReadAct.encoders = encoders;
 // --
 // relationship
 // --
+
+/**
+ * @typedef {Object} Fields
+ * @param {Boolean} safe=0
+ * @param {Boolean} stating=0
+ * @param {String[]} protocols=[ 'http', 'https' ]
+ * @param {Boolean} resolvingSoftLink=0
+ * @param {Boolean} resolvingTextLink=0
+ * @param {Boolean} usingSoftLink=0
+ * @param {Boolean} usingTextLink=0
+ * @param {Boolean} usingGlobalPath=1
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHttp
+ */
 
 let Composes =
 {

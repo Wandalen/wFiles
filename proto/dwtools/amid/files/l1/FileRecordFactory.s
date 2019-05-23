@@ -11,6 +11,11 @@ if( typeof module !== 'undefined' )
 
 //
 
+/**
+ * @class wFileRecordFactory
+ * @memberof module:Tools/mid/Files
+*/
+
 let _global = _global_;
 let _ = _global_.wTools;
 let Parent = null;
@@ -70,6 +75,13 @@ function init( o )
 }
 
 //
+
+/**
+ * @summary Creates factory instance ignoring unknown options.
+ * @param {Object} o Options map.
+ * @function TollerantFrom
+ * @memberof module:Tools/mid/Files.wFileRecordFactory
+*/
 
 function TollerantFrom( o )
 {
@@ -278,6 +290,13 @@ function form()
 
 //
 
+/**
+ * @summary Creates instance of FileRecord.
+ * @param {Object} o Options map.
+ * @function record
+ * @memberof module:Tools/mid/Files.wFileRecordFactory#
+*/
+
 function record( o )
 {
   let factory = this;
@@ -306,6 +325,20 @@ function record( o )
 }
 
 //
+
+/**
+ * @summary Creates instances of FileRecord for provided file paths.
+ * @param {Array} filePaths Paths to files.
+ * @function records
+ * @memberof module:Tools/mid/Files.wFileRecordFactory#
+*/
+
+/**
+ * @summary Creates instances of FileRecord for provided file paths ignoring files that don't exist in file system.
+ * @param {Array} filePaths Paths to files.
+ * @function recordsFiltered
+ * @memberof module:Tools/mid/Files.wFileRecordFactory#
+*/
 
 function recordsFiltered( filePaths,fileContext )
 {
@@ -448,6 +481,23 @@ let usingTextLinkSymbol = Symbol.for( 'usingTextLink' );
 let resolvingTextLinkSymbol = Symbol.for( 'resolvingTextLink' );
 let statingSymbol = Symbol.for( 'stating' );
 let safeSymbol = Symbol.for( 'safe' );
+
+/**
+ * @typedef {Object} Fields
+ * @property {String} dirPath
+ * @property {String} basePath
+ * @property {String} stemPath
+ * @property {Boolean} strict=1
+ * @property {Boolean} allowingMissed
+ * @property {Boolean} allowingCycled
+ * @property {Boolean} resolvingSoftLink
+ * @property {Boolean} resolvingTextLink
+ * @property {Boolean} usingTextLink
+ * @property {Boolean} stating
+ * @property {Boolean} resolving
+ * @property {Boolean} safe
+ * @memberof module:Tools/mid/Files.wFileRecordFactory
+*/
 
 let Composes =
 {

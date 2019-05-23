@@ -17,6 +17,11 @@ let FileRecord = _.FileRecord;
 
 //
 
+/**
+ @class wFileProviderFind
+ @memberof module:Tools/mid/Files.wTools.FileProvider
+*/
+
 let Parent = null;
 let Self = function wFileProviderFind( o )
 {
@@ -535,6 +540,39 @@ let filesFindSingle = _.routineFromPreAndBody( filesFindSingle_pre, filesFindSin
 
 //
 
+/** 
+ * @summary Searches for files in the specified path `o.filePath`.
+ * @returns Returns flat array with FileRecord instances of found files.
+ * @param {Object} o Options map.
+ * 
+ * @param {} o.filePath
+ * @param {} o.filter
+ * @param {} o.includingTerminals=1
+ * @param {} o.includingDirs=0
+ * @param {} o.includingStem=1
+ * @param {} o.includingActual=1
+ * @param {} o.includingTransient=0
+ * @param {} o.allowingMissed=0
+ * @param {} o.allowingCycled=0
+ * @param {} o.recursive=1
+ * @param {} o.resolvingSoftLink=0
+ * @param {} o.resolvingTextLink=0
+ * @param {} o.maskPreset='default.exclude'
+ * @param {} o.outputFormat='record'
+ * @param {} o.safe=null
+ * @param {} o.sync=1
+ * @param {} o.orderingExclusion=[]
+ * @param {} o.sortingWithArray
+ * @param {} o.verbosity
+ * @param {} o.mandatory
+ * @param {} o.result=[]
+ * @param {} o.onUp=[]
+ * @param {} o.onDown=[]
+ * 
+ * @function filesFind
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderFind#
+ */
+
 function filesFind_body( o )
 {
   let self = this;
@@ -690,6 +728,40 @@ filesFind.having.aspect = 'entry';
 
 //
 
+/** 
+ * @description Short-cut for {@link module:Tools/mid/Files.wTools.FileProvider.wFileProviderFind.filesFind}.
+ * Performs recursive search for files from specified path `o.filePath`. 
+ * Includes terminals,directories and transient files into the result array.
+ * @param {Object} o Options map.
+ * 
+ * @param {} o.filePath
+ * @param {} o.filter
+ * @param {} o.includingTerminals=1
+ * @param {} o.includingDirs=1
+ * @param {} o.includingStem=1
+ * @param {} o.includingActual=1
+ * @param {} o.includingTransient=1
+ * @param {} o.allowingMissed=1
+ * @param {} o.allowingCycled=1
+ * @param {} o.recursive=2
+ * @param {} o.resolvingSoftLink=0
+ * @param {} o.resolvingTextLink=0
+ * @param {} o.maskPreset='default.exclude'
+ * @param {} o.outputFormat='record'
+ * @param {} o.safe=null
+ * @param {} o.sync=1
+ * @param {} o.orderingExclusion=[]
+ * @param {} o.sortingWithArray
+ * @param {} o.verbosity
+ * @param {} o.mandatory
+ * @param {} o.result=[]
+ * @param {} o.onUp=[]
+ * @param {} o.onDown=[]
+ * 
+ * @function filesFindRecursive
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderFind#
+ */
+
 let filesFindRecursive = _.routineFromPreAndBody( filesFind_pre, filesFind_body );
 
 var defaults = filesFindRecursive.defaults;
@@ -702,6 +774,40 @@ defaults.allowingMissed = 1;
 defaults.allowingCycled = 1;
 
 //
+
+/** 
+ * @description Short-cut for {@link module:Tools/mid/Files.wTools.FileProvider.wFileProviderFind.filesFind}.
+ * Performs recursive search for files using glob pattern `o.filePath` using glob pattern. 
+ * Includes terminals,directories into the result array.
+ * @param {Object} o Options map.
+ * 
+ * @param {} o.filePath
+ * @param {} o.filter
+ * @param {} o.includingTerminals=1
+ * @param {} o.includingDirs=1
+ * @param {} o.includingStem=1
+ * @param {} o.includingActual=1
+ * @param {} o.includingTransient=0
+ * @param {} o.allowingMissed=0
+ * @param {} o.allowingCycled=0
+ * @param {} o.recursive=2
+ * @param {} o.resolvingSoftLink=0
+ * @param {} o.resolvingTextLink=0
+ * @param {} o.maskPreset='default.exclude'
+ * @param {} o.outputFormat='absolute'
+ * @param {} o.safe=null
+ * @param {} o.sync=1
+ * @param {} o.orderingExclusion=[]
+ * @param {} o.sortingWithArray
+ * @param {} o.verbosity
+ * @param {} o.mandatory
+ * @param {} o.result=[]
+ * @param {} o.onUp=[]
+ * @param {} o.onDown=[]
+ * 
+ * @function filesGlob
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderFind#
+ */
 
 function filesGlob( o )
 {
@@ -745,6 +851,15 @@ defaults.includingDirs = 1;
 defaults.includingTransient = 0;
 
 //
+
+/** 
+ * @description Functor for {@link module:Tools/mid/Files.wTools.FileProvider.wFileProviderFind.filesFind} routine. 
+ * Creates a filesFind routine with options saved in inner context.
+ * It allows to reuse created routine changing only necessary options and don't worry about other options.
+ * @param {Object} o Options map. Please see {@link module:Tools/mid/Files.wTools.FileProvider.wFileProviderFind.filesFind} for options description.
+ * @function filesFinder
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderFind#
+ */
 
 function filesFinder_functor( routine )
 {
@@ -3270,6 +3385,44 @@ function filesReflect_pre( routine, args )
 }
 
 //
+
+/**
+ * @summary Reflects files from source to the destination using `o.reflectMap`.
+ * @description Reflect map contains key:value pairs. In signle pair key is a source path and value is a destination path.
+ * @param {Object} o Options map.
+ * @param {Object} o.reflectMap Map with keys as source path and values as destination path.
+ * @param {Object} o.filesGraph
+ * @param {Object} o.filter
+ * @param {Object} o.srcFilter
+ * @param {Object} o.dstFilter
+ * @param {Array} o.result
+ * @param {String} o.outputFormat='record'
+ * @param {Number} o.verbosity=0
+ * @param {Boolean} o.allowingMissed=0
+ * @param {Boolean} o.allowingCycled=0
+ * @param {Boolean} o.includingTerminals=1
+ * @param {Boolean} o.includingDirs=1
+ * @param {Boolean} o.includingNonAllowed=1
+ * @param {Boolean} o.includingDst
+ * @param {Number} o.recursive=2
+ * @param {String} o.linking='fileCopy'
+ * @param {Boolean} o.writing=1
+ * @param {Boolean} o.srcDeleting=0
+ * @param {Boolean} o.dstDeleting=0
+ * @param {Boolean} o.dstDeletingCleanedDirs=1
+ * @param {Boolean} o.dstRewriting=1
+ * @param {Boolean} o.dstRewritingByDistinct=1
+ * @param {Boolean} o.dstRewritingPreserving=0
+ * @param {Boolean} o.preservingTime=0
+ * @param {Boolean} o.preservingSame=0
+ * @param {} o.extral
+ * @param {Function} o.onUp 
+ * @param {Function} o.onDown
+ * @param {Function} o.onDstName
+ * 
+ * @function filesReflect
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderFind#
+ */
 
 function filesReflect_body( o )
 {

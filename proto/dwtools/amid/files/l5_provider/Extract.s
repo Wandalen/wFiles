@@ -26,6 +26,14 @@ _.assert( !_.FileProvider.Extract );
 
 //
 
+/**
+ @classdesc Class that allows file manipulations on filesTree - object based on some folders/files tree, 
+ where folders are nested objects with same depth level as in real folder and contains some files that are properties
+ with corresponding names and file content as a values.
+ @class wFileProviderExtract
+ @memberof module:Tools/mid/Files.wTools.FileProvider
+*/
+
 let Parent = Partial;
 let Self = function wFileProviderExtract( o )
 {
@@ -52,6 +60,14 @@ function init( o )
 // path
 // --
 
+/**
+ * @summary Return path to current working directory.
+ * @description Changes current path to `path` if argument is provided.
+ * @param {String} [path] New current path.
+ * @function pathCurrentAct
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderExtract#
+*/
+
 function pathCurrentAct()
 {
   let self = this;
@@ -71,6 +87,18 @@ function pathCurrentAct()
 }
 
 //
+
+/**
+ * @summary Resolves soft link `o.filePath`.
+ * @description Accepts single argument - map with options. Expects that map `o` contains all necessary options and don't have redundant fields.
+ * Returns input path `o.filePath` if source file is not a soft link.
+ * @param {Object} o Options map.
+ * @param {String} o.filePath Path to soft link.
+ * @param {Boolean} o.resolvingMultiple=0 Resolves chain of terminal links.
+ * @param {Boolean} o.resolvingIntermediateDirectories=0 Resolves intermediate soft links.
+ * @function pathResolveSoftLinkAct
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderExtract#
+*/
 
 function pathResolveSoftLinkAct( o )
 {
@@ -146,6 +174,18 @@ function pathResolveSoftLinkAct( o )
 _.routineExtend( pathResolveSoftLinkAct, Parent.prototype.pathResolveSoftLinkAct )
 
 //
+
+/**
+ * @summary Resolves text link `o.filePath`.
+ * @description Accepts single argument - map with options. Expects that map `o` contains all necessary options and don't have redundant fields.
+ * Returns input path `o.filePath` if source file is not a text link.
+ * @param {Object} o Options map.
+ * @param {String} o.filePath Path to text link.
+ * @param {Boolean} o.resolvingMultiple=0 Resolves chain of text links.
+ * @param {Boolean} o.resolvingIntermediateDirectories=0 Resolves intermediate text links.
+ * @function pathResolveTextLinkAct
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderExtract#
+*/
 
 function pathResolveTextLinkAct( o )
 {
@@ -231,6 +271,20 @@ _.routineExtend( pathResolveTextLinkAct, Parent.prototype.pathResolveTextLinkAct
 // --
 // read
 // --
+
+/**
+ * @summary Reads content of a terminal file.
+ * @description Accepts single argument - map with options. Expects that map `o` contains all necessary options and don't have redundant fields.
+ * If `o.sync` is false, return instance of wConsequence, that gives a message with concent of a file when reading is finished.
+ * @param {Object} o Options map.
+ * @param {String} o.filePath Path to terminal file.
+ * @param {String} o.encoding Desired encoding of a file concent.
+ * @param {} o.advanced
+ * @param {Boolean} o.resolvingSoftLink Enable resolving of soft links.
+ * @param {String} o.sync Determines how to read a file, synchronously or asynchronously.
+ * @function fileReadAct
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderExtract#
+*/
 
 function fileReadAct( o )
 {
@@ -2780,6 +2834,15 @@ writeEncoders[ 'original.type' ] =
 // --
 // relationship
 // --
+
+/**
+ * @typedef {Object} Fields
+ * @property {Boolean} usingExtraStat
+ * @property {Array} protocols
+ * @property {Boolean} safe
+ * @property {Object} filesTree
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderExtract
+ */
 
 let Composes =
 {

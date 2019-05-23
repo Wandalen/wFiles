@@ -17,6 +17,12 @@ let GitConfig, Ini;
 
 //
 
+/**
+ @classdesc Class that allows file manipulations on a git repository. For example, cloning of the repositoty.
+ @class wFileProviderGit
+ @memberof module:Tools/mid/Files.wTools.FileProvider
+*/
+
 let Parent = _.FileProvider.Partial;
 let Self = function wFileProviderGit( o )
 {
@@ -80,6 +86,24 @@ function _gitConfigRead( filePath )
 // --
 // vcs
 // --
+
+/**
+ * @typedef {Object} RemotePathComponents
+ * @property {String} protocol
+ * @property {String} hash
+ * @property {String} longPath
+ * @property {String} localVcsPath
+ * @property {String} remoteVcsPath 
+ * @property {String} longerRemoteVcsPath
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderGit
+ */
+
+/**
+ * @summary Parses provided `remotePath` and returns object with components {@link module:Tools/mid/Files.wTools.FileProvider.wFileProviderGit.RemotePathComponents}.
+ * @param {String} remotePath Remote path.
+ * @function pathParse
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderGit#
+ */
 
 function pathParse( remotePath )
 {
@@ -158,6 +182,13 @@ function pathParse( remotePath )
 
 //
 
+/**
+ * @summary Returns true if remote path `filePath` contains hash of specific commit.
+ * @param {String} filePath Global path.
+ * @function pathIsFixated
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderGit#
+ */
+
 function pathIsFixated( filePath )
 {
   let self = this;
@@ -177,6 +208,15 @@ function pathIsFixated( filePath )
 }
 
 //
+
+/**
+ * @summary Changes hash in provided path `o.remotePath` to hash of latest commit available.
+ * @param {Object} o Options map.
+ * @param {String} o.remotePath Remote path.
+ * @param {Number} o.verbosity=0 Level of verbosity.
+ * @function pathFixate
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderGit#
+ */
 
 function pathFixate( o )
 {
@@ -210,6 +250,15 @@ defaults.remotePath = null;
 defaults.verbosity = 0;
 
 //
+
+/**
+ * @summary Returns hash of latest commit from git repository located at `o.localPath`.
+ * @param {Object} o Options map.
+ * @param {String} o.localPath Path to git repository on hard drive.
+ * @param {Number} o.verbosity=0 Level of verbosity.
+ * @function versionLocalRetrive
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderGit#
+ */
 
 function versionLocalRetrive( o )
 {
@@ -245,6 +294,15 @@ defaults.localPath = null;
 defaults.verbosity = 0;
 
 //
+
+/**
+ * @summary Returns hash of latest commit from git repository using its remote path `o.remotePath`.
+ * @param {Object} o Options map.
+ * @param {String} o.remotePath Remote path to git repository.
+ * @param {Number} o.verbosity=0 Level of verbosity.
+ * @function versionRemoteLatestRetrive
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderGit#
+ */
 
 function versionRemoteLatestRetrive( o )
 {
@@ -283,6 +341,16 @@ defaults.verbosity = 0;
 
 //
 
+/**
+ * @summary Returns commit hash from remote path `o.remotePath`.
+ * @description Returns hash of latest commit if no hash specified in remote path.
+ * @param {Object} o Options map.
+ * @param {String} o.remotePath Remote path.
+ * @param {Number} o.verbosity=0 Level of verbosity.
+ * @function versionRemoteCurrentRetrive
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderGit#
+ */
+
 function versionRemoteCurrentRetrive( o )
 {
   let self = this;
@@ -307,6 +375,16 @@ defaults.remotePath = null;
 defaults.verbosity = 0;
 
 //
+
+/**
+ * @summary Returns true if local copy of repository `o.localPath` is up to date with remote repository `o.remotePath`.
+ * @param {Object} o Options map.
+ * @param {String} o.localPath Local path to repository.
+ * @param {String} o.remotePath Remote path to repository.
+ * @param {Number} o.verbosity=0 Level of verbosity.
+ * @function isUpToDate
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderGit#
+ */
 
 function isUpToDate( o )
 {
@@ -428,6 +506,15 @@ defaults.remotePath = null;
 defaults.verbosity = 0;
 
 //
+
+/**
+ * @summary Returns true if path `o.localPath` contains a git repository.
+ * @param {Object} o Options map.
+ * @param {String} o.localPath Local path to package.
+ * @param {Number} o.verbosity=0 Level of verbosity.
+ * @function isDownloaded
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderGit#
+ */
 
 function isDownloaded( o )
 {
@@ -681,6 +768,18 @@ let filesReflectSingle = _.routineFromPreAndBody( _.FileProvider.Find.prototype.
 // --
 // relationship
 // --
+
+/**
+ * @typedef {Object} Fields
+ * @property {Boolean} safe
+ * @property {String[]} protocols=[ 'git', 'git+http', 'git+https', 'git+ssh' ]
+ * @property {Boolean} resolvingSoftLink=0
+ * @property {Boolean} resolvingTextLink=0
+ * @property {Boolean} limitedImplementation=1
+ * @property {Boolean} isVcs=1
+ * @property {Boolean} usingGlobalPath=1
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderGit
+ */
 
 let Composes =
 {

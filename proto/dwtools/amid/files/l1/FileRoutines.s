@@ -2,6 +2,11 @@
 
 'use strict';
 
+/**
+ * @namespace "wTools.files"
+ * @memberof module:Tools/mid/Files
+ */
+
 let _global = _global_;
 let _ = _global_.wTools;
 let FileRecord = _.FileRecord;
@@ -14,54 +19,54 @@ _.assert( _.routineIs( _.FileRecord ) );
 // --
 
 /**
- * Creates RegexpObject based on passed path, array of paths, or RegexpObject.
-   Paths turns into regexps and adds to 'includeAny' property of result Object.
-   Methods adds to 'excludeAny' property the next paths by default :
-   'node_modules',
-   '.unique',
-   '.git',
-   '.svn',
-   /(^|\/)\.(?!$|\/|\.)/, // any hidden paths
-   /(^|\/)-(?!$|\/)/,
- * @example :
+ * @description Creates RegexpObject based on passed path, array of paths, or RegexpObject.
+ * Paths turns into regexps and adds to 'includeAny' property of result Object.
+ * Methods adds to 'excludeAny' property the next paths by default :
+ * 'node_modules',
+ * '.unique',
+ * '.git',
+ * '.svn',
+ * /(^|\/)\.(?!$|\/|\.)/, // any hidden paths
+ * /(^|\/)-(?!$|\/)/,
+ * @example
  * let paths =
-    {
-      includeAny : [ 'foo/bar', 'foo2/bar2/baz', 'some.txt' ],
-      includeAll : [ 'index.js' ],
-      excludeAny : [ 'Gruntfile.js', 'gulpfile.js' ],
-      excludeAll : [ 'package.json', 'bower.json' ]
-    };
-   let regObj = regexpMakeSafe( paths );
- //  {
- //    includeAny :
- //      [
- //        /foo\/bar/,
- //        /foo2\/bar2\/baz/,
- //        /some\.txt/
- //      ],
- //    includeAll :
- //      [
- //        /index\.js/
- //      ],
- //    excludeAny :
- //      [
- //        /Gruntfile\.js/,
- //        /gulpfile\.js/,
- //        /node_modules/,
- //        /\.unique/,
- //        /\.git/,
- //        /\.svn/,
- //        /(^|\/)\.(?!$|\/|\.)/,
- //        /(^|\/)-(?!$|\/)/
- //      ],
- //    excludeAll : [ /package\.json/, /bower\.json/ ]
- //  }
+ *  {
+ *    includeAny : [ 'foo/bar', 'foo2/bar2/baz', 'some.txt' ],
+ *    includeAll : [ 'index.js' ],
+ *    excludeAny : [ 'Gruntfile.js', 'gulpfile.js' ],
+ *    excludeAll : [ 'package.json', 'bower.json' ]
+ *  };
+ * let regObj = regexpMakeSafe( paths );
+ *  //  {
+ *  //    includeAny :
+ *  //      [
+ *  //        /foo\/bar/,
+ *  //        /foo2\/bar2\/baz/,
+ *  //        /some\.txt/
+ *  //      ],
+ *  //    includeAll :
+ *  //      [
+ *  //        /index\.js/
+ *  //      ],
+ *  //    excludeAny :
+ *  //      [
+ *  //        /Gruntfile\.js/,
+ *  //        /gulpfile\.js/,
+ *  //        /node_modules/,
+ *  //        /\.unique/,
+ *  //        /\.git/,
+ *  //        /\.svn/,
+ *  //        /(^|\/)\.(?!$|\/|\.)/,
+ *  //        /(^|\/)-(?!$|\/)/
+ *  //      ],
+ *  //    excludeAll : [ /package\.json/, /bower\.json/ ]
+ *  //  }
  * @param {string|string[]|RegexpObject} [mask]
  * @returns {RegexpObject}
  * @throws {Error} if passed more than one argument.
  * @see {@link wTools~RegexpObject} RegexpObject
- * @method regexpMakeSafe
- * @memberof module:Tools/mid/Files
+ * @function regexpMakeSafe
+ * @memberof module:Tools/mid/Files.wTools.files
  */
 
 function regexpMakeSafe( mask )
@@ -106,8 +111,8 @@ function regexpMakeSafe( mask )
  * @throws {Error} If arguments is missed
  * @throws {Error} If passed extra arguments
  * @throws {Error} If missed `PathFiile`
- * @method _fileOptionsGet
- * @memberof module:Tools/mid/Files
+ * @function _fileOptionsGet
+ * @memberof module:Tools/mid/Files.wTools.files
  */
 
 function _fileOptionsGet( filePath,o )
@@ -159,8 +164,8 @@ function _fileOptionsGet( filePath,o )
  * @param {string|File.Stats} src second file path/stat
  * @returns {string|File.Stats}
  * @throws {Error} if type of one of arguments is not string/file.Stats
- * @method filesNewer
- * @memberof module:Tools/mid/Files
+ * @function filesNewer
+ * @memberof @memberof module:Tools/mid/Files.wTools.files
  */
 
 function filesNewer( dst,src )
@@ -223,8 +228,8 @@ function filesNewer( dst,src )
  * @param {string|File.Stats} src second file path/stat
  * @returns {string|File.Stats}
  * @throws {Error} if type of one of arguments is not string/file.Stats
- * @method filesOlder
- * @memberof module:Tools/mid/Files
+ * @function filesOlder
+ * @memberof module:Tools/mid/Files.wTools.files
  */
 
 function filesOlder( dst,src )
@@ -245,43 +250,43 @@ function filesOlder( dst,src )
 
 //
 
-  /**
-   * Returns spectre of file content.
-   * @example
-   * let path = '/home/tmp/sample/file1',
-     textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
-
-     wTools.fileWrite( { filePath : path, data : textData1 } );
-     let spectre = wTools.filesSpectre( path );
-     //{
-     //   L : 1,
-     //   o : 4,
-     //   r : 3,
-     //   e : 5,
-     //   m : 3,
-     //   ' ' : 7,
-     //   i : 6,
-     //   p : 2,
-     //   s : 4,
-     //   u : 2,
-     //   d : 2,
-     //   l : 2,
-     //   t : 5,
-     //   a : 2,
-     //   ',' : 1,
-     //   c : 3,
-     //   n : 2,
-     //   g : 1,
-     //   '.' : 1,
-     //   length : 56
-     // }
-   * @param {string|wFileRecord} src absolute path or FileRecord instance
-   * @returns {Object}
-   * @throws {Error} If count of arguments are different from one.
-   * @throws {Error} If `src` is not absolute path or FileRecord.
-   * @method filesSpectre
-   * @memberof module:Tools/mid/Files
-   */
+/**
+ * Returns spectre of file content.
+ * @example
+ * let path = '/home/tmp/sample/file1',
+ * textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+ *
+ * wTools.fileWrite( { filePath : path, data : textData1 } );
+ * let spectre = wTools.filesSpectre( path );
+ * //{
+ * //   L : 1,
+ * //   o : 4,
+ * //   r : 3,
+ * //   e : 5,
+ * //   m : 3,
+ * //   ' ' : 7,
+ * //   i : 6,
+ * //   p : 2,
+ * //   s : 4,
+ * //   u : 2,
+ * //   d : 2,
+ * //   l : 2,
+ * //   t : 5,
+ * //   a : 2,
+ * //   ',' : 1,
+ * //   c : 3,
+ * //   n : 2,
+ * //   g : 1,
+ * //   '.' : 1,
+ * //   length : 56
+ * // }
+ * @param {string|wFileRecord} src absolute path or FileRecord instance
+ * @returns {Object}
+ * @throws {Error} If count of arguments are different from one.
+ * @throws {Error} If `src` is not absolute path or FileRecord.
+ * @function filesSpectre
+ * @memberof module:Tools/mid/Files.wTools.files
+*/
 
 function filesSpectre( src )
 {
@@ -304,25 +309,25 @@ function filesSpectre( src )
 
 //
 
-  /**
-   * Compares specters of two files. Returns the rational number between 0 and 1. For the same specters returns 1. If
-      specters do not have the same letters, method returns 0.
-   * @example
-   * let path1 = 'tmp/sample/file1',
-     path2 = 'tmp/sample/file2',
-     textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
-
-     wTools.fileWrite( { filePath : path1, data : textData1 } );
-     wTools.fileWrite( { filePath : path2, data : textData1 } );
-     let similarity = wTools.filesSimilarity( path1, path2 ); // 1
-   * @param {string} src1 path string 1
-   * @param {string} src2 path string 2
-   * @param {Object} [o]
-   * @param {Function} [onReady]
-   * @returns {number}
-   * @method filesSimilarity
-   * @memberof module:Tools/mid/Files
-   */
+/**
+ * Compares specters of two files. Returns the rational number between 0 and 1. For the same specters returns 1. If
+ * specters do not have the same letters, method returns 0.
+ * @example
+ * let path1 = 'tmp/sample/file1',
+ * path2 = 'tmp/sample/file2',
+ * textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+ *
+ * wTools.fileWrite( { filePath : path1, data : textData1 } );
+ * wTools.fileWrite( { filePath : path2, data : textData1 } );
+ * let similarity = wTools.filesSimilarity( path1, path2 ); // 1
+ * @param {string} src1 path string 1
+ * @param {string} src2 path string 2
+ * @param {Object} [o]
+ * @param {Function} [onReady]
+ * @returns {number}
+ * @function filesSimilarity
+ * @memberof module:Tools/mid/Files.wTools.files
+*/
 
 function filesSimilarity( o )
 {

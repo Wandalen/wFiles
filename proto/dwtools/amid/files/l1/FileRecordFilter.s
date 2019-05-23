@@ -12,6 +12,11 @@ if( typeof module !== 'undefined' )
 
 //
 
+/**
+ * @class wFileRecordFilter
+ * @memberof module:Tools/mid/Files
+*/
+
 let _global = _global_;
 let _ = _global_.wTools;
 let Parent = null;
@@ -28,6 +33,13 @@ _.assert( !!_.regexpsEscape );
 // --
 //
 // --
+
+/**
+ * @summary Creates filter instance ignoring unknown options.
+ * @param {Object} o Options map.
+ * @function TollerantFrom
+ * @memberof module:Tools/mid/Files.wFileRecordFilter
+*/
 
 function TollerantFrom( o )
 {
@@ -339,6 +351,12 @@ function _formFinal()
 // mutator
 // --
 
+/**
+ * @summary Applies file extension mask to the filter.
+ * @function maskExtensionApply
+ * @memberof module:Tools/mid/Files.wFileRecordFilter#
+*/
+
 function maskExtensionApply()
 {
   let filter = this;
@@ -358,6 +376,12 @@ function maskExtensionApply()
 
 //
 
+/**
+ * @summary Applies file begins mask to the filter.
+ * @function maskBeginsApply
+ * @memberof module:Tools/mid/Files.wFileRecordFilter#
+*/
+
 function maskBeginsApply()
 {
   let filter = this;
@@ -374,6 +398,12 @@ function maskBeginsApply()
   }
 
 }
+
+/**
+ * @summary Applies file ends mask to the filter.
+ * @function maskEndsApply
+ * @memberof module:Tools/mid/Files.wFileRecordFilter#
+*/
 
 //
 
@@ -395,6 +425,12 @@ function maskEndsApply()
 }
 
 //
+
+/**
+ * @descriptionNeeded
+ * @function filePathGenerate
+ * @memberof module:Tools/mid/Files.wFileRecordFilter#
+*/
 
 function filePathGenerate()
 {
@@ -454,6 +490,14 @@ function filePathGenerate()
 }
 
 //
+
+/**
+ * @descriptionNeeded
+ * @param {String} srcPath
+ * @param {String} dstPath
+ * @function filePathSelect
+ * @memberof module:Tools/mid/Files.wFileRecordFilter#
+*/
 
 function filePathSelect( srcPath, dstPath )
 {
@@ -521,6 +565,14 @@ function filePathSelect( srcPath, dstPath )
 }
 
 //
+
+/**
+ * @descriptionNeeded
+ * @param {Object} o Options map.
+ * @param {Boolean} o.applicableToTrue=false
+ * @function prefixesApply
+ * @memberof module:Tools/mid/Files.wFileRecordFilter#
+*/
 
 function prefixesApply( o )
 {
@@ -665,6 +717,13 @@ prefixesApply.defaults =
 
 //
 
+/**
+ * @descriptionNeeded
+ * @param {String} prefixPath 
+ * @function prefixesRelative
+ * @memberof module:Tools/mid/Files.wFileRecordFilter#
+*/
+
 function prefixesRelative( prefixPath )
 {
   let filter = this;
@@ -748,6 +807,13 @@ function prefixesRelative( prefixPath )
 
 //
 
+/**
+ * @summary Converts global path into local.
+ * @param {String} filePath Input file path.
+ * @function prefixesRelative
+ * @memberof module:Tools/mid/Files.wFileRecordFilter#
+*/
+
 function pathLocalize( filePath )
 {
   let filter = this;
@@ -782,6 +848,12 @@ function pathLocalize( filePath )
 }
 
 //
+
+/**
+ * @summary Normalizes path properties of the filter.
+ * @function pathsNormalize
+ * @memberof module:Tools/mid/Files.wFileRecordFilter#
+*/
 
 function pathsNormalize()
 {
@@ -830,6 +902,12 @@ function pathsNormalize()
 
 //
 
+/**
+ * @summary Converts local paths of filter into global.
+ * @function globalsFromLocals
+ * @memberof module:Tools/mid/Files.wFileRecordFilter#
+*/
+
 function globalsFromLocals()
 {
   let filter = this;
@@ -848,6 +926,12 @@ function globalsFromLocals()
 // --
 // combiner
 // --
+
+/**
+ * @descriptionNeeded
+ * @function And
+ * @memberof module:Tools/mid/Files.wFileRecordFilter
+*/
 
 function And()
 {
@@ -875,6 +959,12 @@ function And()
 }
 
 //
+
+/**
+ * @descriptionNeeded
+ * @function and
+ * @memberof module:Tools/mid/Files.wFileRecordFilter#
+*/
 
 function and( src )
 {
@@ -1500,6 +1590,12 @@ function pathsExtend( src )
 // base path
 // --
 
+/**
+ * @summary Returns relative path for provided path `filePath`.
+ * @function relativeFor
+ * @memberof module:Tools/mid/Files.wFileRecordFilter#
+*/
+
 function relativeFor( filePath )
 {
   let filter = this;
@@ -1513,6 +1609,13 @@ function relativeFor( filePath )
 }
 
 //
+
+/**
+ * @summary Returns base path for provided path `filePath`.
+ * @param {String|Boolean} filePath Source file path.
+ * @function basePathForFilePath
+ * @memberof module:Tools/mid/Files.wFileRecordFilter#
+*/
 
 function basePathForFilePath( filePath )
 {
@@ -1546,6 +1649,13 @@ function basePathForFilePath( filePath )
 }
 
 //
+
+/**
+ * @summary Returns base path for provided path `filePath`.
+ * @param {String|Boolean} filePath Source file path.
+ * @function basePathFor
+ * @memberof module:Tools/mid/Files.wFileRecordFilter#
+*/
 
 function basePathFor( filePath )
 {
@@ -3462,6 +3572,31 @@ function _applyToRecordFull( record )
 
   return record.isActual;
 }
+
+/**
+ * @typedef {Object} Fields
+ * @property {String} filePath
+ * @property {String} basePath
+ * @property {String} prefixPath
+ * @property {String} postfixPath
+ *
+ * @property {String} hasExtension
+ * @property {String} begins
+ * @property {String} ends
+ *
+ * @property {String|Array|RegExp} maskTransientAll
+ * @property {String|Array|RegExp} maskTransientTerminal,
+ * @property {String|Array|RegExp} maskTransientDirectory
+ * @property {String|Array|RegExp} maskAll
+ * @property {String|Array|RegExp} maskTerminal
+ * @property {String|Array|RegExp} maskDirectory
+ *
+ * @property {Date} notOlder
+ * @property {Date} notNewer
+ * @property {Date} notOlderAge
+ * @property {Date} notNewerAge
+ * @memberof module:Tools/mid/Files.wFileRecordFilter
+*/
 
 // --
 // relations

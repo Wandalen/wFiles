@@ -30,9 +30,9 @@ _.assert( _.objectIs( Self ) );
 
 /**
  * Returns path for main module (module that running directly by node).
- * @returns {string}
- * @method realMainFile
- * @memberof wTools.path
+ * @returns {String}
+ * @function realMainFile
+ * @memberof module:Tools/base/Path.wTools.path
  */
 
 let _pathRealMainFile;
@@ -47,9 +47,9 @@ function realMainFile()
 
 /**
  * Returns path dir name for main module (module that running directly by node).
- * @returns {string}
- * @method realMainDir
- * @memberof wTools.path
+ * @returns {String}
+ * @function realMainDir
+ * @memberof module:Tools/base/Path.wTools.path
  */
 
 let _pathRealMainDir;
@@ -70,10 +70,10 @@ function realMainDir()
 
 /**
  * Returns absolute path for file running directly by node
- * @returns {string}
+ * @returns {String}
  * @throws {Error} If passed any argument.
- * @method effectiveMainFile
- * @memberof wTools.path
+ * @function effectiveMainFile
+ * @memberof module:Tools/base/Path.wTools.path
  */
 
 let effectiveMainFile = ( function effectiveMainFile()
@@ -113,10 +113,10 @@ let effectiveMainFile = ( function effectiveMainFile()
 
 /**
  * Returns path dirname for file running directly by node
- * @returns {string}
+ * @returns {String}
  * @throws {Error} If passed any argument.
- * @method effectiveMainDir
- * @memberof wTools.path
+ * @function effectiveMainDir
+ * @memberof module:Tools/base/Path.wTools.path
  */
 
 function effectiveMainDir()
@@ -149,9 +149,9 @@ function resolveTextLink( path )
 /**
  * Returns `home` directory. On depend from OS it's will be value of 'HOME' for posix systems or 'USERPROFILE'
  * for windows environment variables.
- * @returns {string}
- * @method userHome
- * @memberof wTools.path
+ * @returns {String}
+ * @function userHome
+ * @memberof module:Tools/base/Path.wTools.path
  */
 
 function dirUserHome()
@@ -468,8 +468,8 @@ having.aspect = 'body';
  * @throws {Error} If missed argument, or passed more then one.
  * @throws {Error} If passed object has unexpected property.
  * @throws {Error} If file for `o.path` is not exists.
- * @method forCopy
- * @memberof wTools.path
+ * @function forCopy
+ * @memberof module:Tools/base/Path.wTools.path
  */
 
 let forCopy = _.routineFromPreAndBody( forCopy_pre, forCopy_body );

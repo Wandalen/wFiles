@@ -13,6 +13,16 @@ _.assert( _.routineIs( _.FileRecord ) );
 _.assert( _.routineIs( FileRecordFilter ) );
 _.assert( _.routineIs( FileRecordFactory ) );
 
+/**
+ * @namespace "wTools.FileProvider"
+ * @memberof module:Tools/mid/Files
+ */
+
+/**
+ * @class wFileProviderAbstract
+ * @memberof module:Tools/mid/Files.wTools.FileProvider
+*/
+
 var Parent = null;
 var Self = function wFileProviderAbstract( o )
 {

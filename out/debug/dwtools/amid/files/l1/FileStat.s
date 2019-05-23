@@ -21,6 +21,11 @@ if( typeof module !== 'undefined' )
 
 //
 
+/**
+ * @class wFileStat
+ * @memberof module:Tools/mid/Files
+*/
+
 let _global = _global_;
 let _ = _global_.wTools;
 let Parent = null;
@@ -52,6 +57,13 @@ function init( o )
 //
 // --
 
+/**
+ * @summary Returns true if entity `src` is a file stats object.
+ * @param {Object} src Entity to check.
+ * @function fileStatIs
+ * @memberof module:Tools/mid/Files.Tools( module::Files )
+ */
+
 function fileStatIs( src )
 {
   if( File )
@@ -63,6 +75,15 @@ function fileStatIs( src )
 }
 
 //
+
+/**
+ * @summary Determines if two files have different content by comparing their stat object.
+ * @description Returns `true` if files have different concents, `false` if files have same concent and `null` if result is not precise.
+ * @param {Object} stat1 Stat object of first file.
+ * @param {Object} stat2 Stat object of second file.
+ * @function statsHaveDifferentContent
+ * @memberof module:Tools/mid/Files.Tools( module::Files )
+ */
 
 // function statResolvedReadsCouldHaveSameContent( stat1,stat2 )
 function statsHaveDifferentContent( stat1, stat2 )
@@ -83,6 +104,15 @@ function statsHaveDifferentContent( stat1, stat2 )
 }
 
 //
+
+/**
+ * @summary Determines if two files are hard linked by comparing their stat object.
+ * @description Returns `true` if files have different concents, `false` if files have same concent and `null` if result is not precise.
+ * @param {Object} stat1 Stat object of first file.
+ * @param {Object} stat2 Stat object of second file.
+ * @function statsAreHardLinked
+ * @memberof module:Tools/mid/Files.Tools( module::Files )
+ */
 
 function statsAreHardLinked( stat1, stat2 )
 {
@@ -136,6 +166,13 @@ function statsAreHardLinked( stat1, stat2 )
 
 //
 
+/**
+ * @summary Generates hash from stat object.
+ * @param {Object} stat Stat object.
+ * @function statHash2Get
+ * @memberof module:Tools/mid/Files.Tools( module::Files )
+ */
+
 function statHash2Get( stat )
 {
 
@@ -161,6 +198,12 @@ function statHash2Get( stat )
 
 //
 
+/**
+ * @summary Returns true if current stats object refers to soft or text link.
+ * @function isLink
+ * @memberof module:Tools/mid/Files.wFileStat#
+*/
+
 function isLink()
 {
   let stat = this;
@@ -183,6 +226,26 @@ function returnFalse()
 {
   return false;
 }
+
+/**
+ * @typedef {Object} Fields
+ * @property {Number} dev
+ * @property {Number} mode
+ * @property {Number} nlink
+ * @property {Number} uid
+ * @property {Number} gid
+ * @property {Number} rdev
+ * @property {Number} blksize
+ * @property {Number} ino
+ * @property {Number} size
+ * @property {Number} blocks
+ * @property {Date} atime
+ * @property {Date} mtime
+ * @property {Date} ctime
+ * @property {Date} birthtime
+ * @property {String} filePath
+ * @memberof module:Tools/mid/Files.wFileStat
+*/
 
 // --
 //

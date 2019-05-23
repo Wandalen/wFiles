@@ -11,6 +11,11 @@
  * @file files/UseTop.s.
  */
 
+/**
+ * @namespace Tools( module::Files )
+ * @memberof module:Tools/mid/Files
+ */
+
 if( typeof module !== 'undefined' )
 {
 

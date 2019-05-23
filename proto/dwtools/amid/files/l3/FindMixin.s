@@ -299,7 +299,7 @@ function filesFindSingle_body( o )
       return o.result;
     }
     debugger;
-    throw _.err( 'Stem file does not exist', _.strQuote( stemRecord.absolute ) );
+    throw _.err( 'Nothing found. Stem file', _.strQuote( stemRecord.absolute ), 'does not exist!' );
   }
 
   forStem( stemRecord, o );
@@ -3345,6 +3345,7 @@ function filesReflect_body( o )
       srcFilter.dstFilter.form();
       let src = srcFilter.filePathSrcCommon();
       let dst = srcFilter.dstFilter.filePathDstCommon();
+      debugger;
       throw _.err( 'Error. No file moved :', path.moveReport( dst, src ) );
     }
 

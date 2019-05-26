@@ -719,7 +719,7 @@ prefixesApply.defaults =
 
 /**
  * @descriptionNeeded
- * @param {String} prefixPath 
+ * @param {String} prefixPath
  * @function prefixesRelative
  * @memberof module:Tools/mid/Files.wFileRecordFilter#
 */

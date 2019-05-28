@@ -1,0 +1,389 @@
+format: willfile-1.0.0
+about:
+  name: wFiles
+  description: >-
+    Collection of classes to abstract files systems. Many interfaces provide
+    files, but not called as file systems and treated differently. For example
+    server-side gives access to local files and browser-side HTTP/HTTPS protocol
+    gives access to files as well, but in the very different way, it does the
+    first. This problem forces a developer to break fundamental programming
+    principle DRY and make code written to solve a problem not applicable to the
+    same problem, on another platform/technology. Files treats any
+    file-system-like interface as files system. Files combines all files
+    available to the application into the single namespace where each file has
+    unique Path/URI, so that operating with several files on different files
+    systems is not what user of the module should worry about. If Files does not
+    have an adapter for your files system you may design it providing a short
+    list of stupid methods fulfilling completely or partly good defined API and
+    get access to all sophisticated general algorithms on files for free. Who
+    said files is only externals? Files makes possible to treat internals of a
+    program as files system(s). Use the module to keep DRY.
+  enabled: 1
+  version: 0.6.580
+  values:
+    enabled: 1
+    name: wFiles
+    interpreters:
+      - nodejs >= 6.0.0
+      - chrome >= 60.0.0
+      - firefox >= 60.0.0
+    keywords:
+      - wTools
+path:
+  module.willfiles:
+    path: out/wFiles.out.will.yml
+    criterion:
+      predefined: 1
+  module.original.willfiles:
+    path:
+      - .im.will.yml
+      - .ex.will.yml
+    criterion:
+      predefined: 1
+  module.dir:
+    path: out
+    criterion:
+      predefined: 1
+  local:
+    criterion:
+      predefined: 1
+  remote:
+    criterion:
+      predefined: 1
+  in:
+    path: ..
+  temp:
+    path: out
+  out:
+    path: out
+  out.debug:
+    path: ./out/debug
+    criterion:
+      debug: 1
+  out.release:
+    path: ./out/release
+    criterion:
+      debug: 0
+  proto:
+    path: ./proto
+  repository:
+    path: 'git+https:///github.com/Wandalen/wFiles.git'
+  bugs:
+    path: 'https:///github.com/Wandalen/wFiles/issues'
+  exported.dir.proto.export:
+    path: ./proto
+    criterion:
+      default: 1
+      debug: 1
+      raw: 1
+      proto: 1
+      export: 1
+      tar: 1
+      public: 1
+  exported.files.proto.export:
+    path:
+      - proto
+      - proto/dwtools
+      - proto/dwtools/Tools.s
+      - proto/dwtools/abase
+      - proto/dwtools/amid
+      - proto/dwtools/amid/files
+      - proto/dwtools/amid/files/UseBase.s
+      - proto/dwtools/amid/files/UseMid.s
+      - proto/dwtools/amid/files/UseTop.s
+      - proto/dwtools/amid/files/l1
+      - proto/dwtools/amid/files/l1/Encoders.s
+      - proto/dwtools/amid/files/l1/FileRecord.s
+      - proto/dwtools/amid/files/l1/FileRecordFactory.s
+      - proto/dwtools/amid/files/l1/FileRecordFilter.s
+      - proto/dwtools/amid/files/l1/FileRoutines.s
+      - proto/dwtools/amid/files/l1/FileStat.s
+      - proto/dwtools/amid/files/l1/Path.s
+      - proto/dwtools/amid/files/l1/Path.ss
+      - proto/dwtools/amid/files/l2
+      - proto/dwtools/amid/files/l2/Abstract.s
+      - proto/dwtools/amid/files/l2/Partial.s
+      - proto/dwtools/amid/files/l3
+      - proto/dwtools/amid/files/l3/FindMixin.s
+      - proto/dwtools/amid/files/l3/SecondaryMixin.s
+      - proto/dwtools/amid/files/l5_provider
+      - proto/dwtools/amid/files/l5_provider/Extract.s
+      - proto/dwtools/amid/files/l5_provider/Git.ss
+      - proto/dwtools/amid/files/l5_provider/HardDrive.ss
+      - proto/dwtools/amid/files/l5_provider/HtmlDocument.js
+      - proto/dwtools/amid/files/l5_provider/Http.js
+      - proto/dwtools/amid/files/l5_provider/Http.ss
+      - proto/dwtools/amid/files/l5_provider/Npm.ss
+      - proto/dwtools/amid/files/l5_provider/RemoteClient.s
+      - proto/dwtools/amid/files/l5_provider/RemoteServlet.ss
+      - proto/dwtools/amid/files/l5_provider/Svn.ss
+      - proto/dwtools/amid/files/l7
+      - proto/dwtools/amid/files/l7/Hub.s
+      - proto/dwtools/amid/files/l8_filter
+      - proto/dwtools/amid/files/l8_filter/Image.s
+      - proto/dwtools/amid/files/l8_filter/Reroot.s
+      - proto/dwtools/amid/files/l9
+      - proto/dwtools/amid/files.test
+      - proto/dwtools/amid/files.test/aFileProvider.test.s
+      - proto/dwtools/amid/files.test/aFilesFind.test.s
+      - proto/dwtools/amid/files.test/Extract.html
+      - proto/dwtools/amid/files.test/Extract.test.s
+      - proto/dwtools/amid/files.test/Files.copy.test.s
+      - proto/dwtools/amid/files.test/Files.etc.test.ss
+      - proto/dwtools/amid/files.test/FilesFind.Extract.test.s
+      - proto/dwtools/amid/files.test/FilesFind.HardDrive.test.ss
+      - proto/dwtools/amid/files.test/FilesRead.test.s
+      - proto/dwtools/amid/files.test/Git.test.ss
+      - proto/dwtools/amid/files.test/HardDrive.test.ss
+      - proto/dwtools/amid/files.test/Hub.copy.test.ss
+      - proto/dwtools/amid/files.test/Hub.Extract.test.s
+      - proto/dwtools/amid/files.test/Hub.HardDrive.test.ss
+      - proto/dwtools/amid/files.test/Npm.test.ss
+      - proto/dwtools/amid/files.test/Path.test.ss
+      - proto/dwtools/amid/files.test/Record.test.s
+      - proto/dwtools/amid/files.test/RecordFilter.test.s
+      - proto/dwtools/amid/files.test/Uri.test.ss
+      - proto/dwtools/atop
+    criterion:
+      default: 1
+      debug: 1
+      raw: 1
+      proto: 1
+      export: 1
+      tar: 1
+      public: 1
+submodule: {}
+reflector:
+  reflect.proto.:
+    src:
+      filePath:
+        .: .
+      prefixPath: proto
+      maskAll:
+        excludeAny:
+          - !<tag:yaml.org,2002:js/regexp> /(\W|^)node_modules(\W|$)/
+          - !<tag:yaml.org,2002:js/regexp> /\.unique$/
+          - !<tag:yaml.org,2002:js/regexp> /\.git$/
+          - !<tag:yaml.org,2002:js/regexp> /\.svn$/
+          - !<tag:yaml.org,2002:js/regexp> /\.hg$/
+          - !<tag:yaml.org,2002:js/regexp> /\.DS_Store$/
+          - !<tag:yaml.org,2002:js/regexp> /(^|\/)-/
+          - !<tag:yaml.org,2002:js/regexp> /\.debug($|\.|\/)/i
+          - !<tag:yaml.org,2002:js/regexp> /\.experiment($|\.|\/)/i
+    dst:
+      prefixPath: out/release
+    criterion:
+      debug: 0
+    mandatory: 1
+    inherit:
+      - predefined.*
+  reflect.proto.debug:
+    src:
+      filePath:
+        .: .
+      prefixPath: proto
+      maskAll:
+        excludeAny:
+          - !<tag:yaml.org,2002:js/regexp> /(\W|^)node_modules(\W|$)/
+          - !<tag:yaml.org,2002:js/regexp> /\.unique$/
+          - !<tag:yaml.org,2002:js/regexp> /\.git$/
+          - !<tag:yaml.org,2002:js/regexp> /\.svn$/
+          - !<tag:yaml.org,2002:js/regexp> /\.hg$/
+          - !<tag:yaml.org,2002:js/regexp> /\.DS_Store$/
+          - !<tag:yaml.org,2002:js/regexp> /(^|\/)-/
+          - !<tag:yaml.org,2002:js/regexp> /\.release($|\.|\/)/i
+    dst:
+      prefixPath: out/debug
+    criterion:
+      debug: 1
+    mandatory: 1
+    inherit:
+      - predefined.*
+  reflect.submodules:
+    src:
+      maskAll:
+        excludeAny:
+          - !<tag:yaml.org,2002:js/regexp> /(\W|^)node_modules(\W|$)/
+          - !<tag:yaml.org,2002:js/regexp> /\.unique$/
+          - !<tag:yaml.org,2002:js/regexp> /\.git$/
+          - !<tag:yaml.org,2002:js/regexp> /\.svn$/
+          - !<tag:yaml.org,2002:js/regexp> /\.hg$/
+          - !<tag:yaml.org,2002:js/regexp> /\.DS_Store$/
+          - !<tag:yaml.org,2002:js/regexp> /(^|\/)-/
+          - !<tag:yaml.org,2002:js/regexp> /\.release($|\.|\/)/i
+    criterion:
+      debug: 1
+    mandatory: 1
+    inherit:
+      - predefined.*
+  exported.proto.export:
+    src:
+      filePath:
+        .: null
+      prefixPath: proto
+    criterion:
+      default: 1
+      debug: 1
+      raw: 1
+      proto: 1
+      export: 1
+      tar: 1
+      public: 1
+    mandatory: 1
+  exported.files.proto.export:
+    src:
+      filePath: 'path::exported.files.proto.export'
+      basePath: .
+      prefixPath: 'path::exported.dir.proto.export'
+    criterion:
+      default: 1
+      debug: 1
+      raw: 1
+      proto: 1
+      export: 1
+      tar: 1
+      public: 1
+    recursive: 0
+    mandatory: 1
+step:
+  clean.out.:
+    criterion:
+      debug: 0
+    opts:
+      filePath: 'path::out.debug'
+    inherit:
+      - predefined.delete
+  clean.out.debug:
+    criterion:
+      debug: 1
+    opts:
+      filePath: 'path::out.debug'
+    inherit:
+      - predefined.delete
+  reflect.proto.:
+    criterion:
+      debug: 0
+      raw: 0
+    opts:
+      reflector: 'reflector::reflect.proto.*=1'
+    inherit:
+      - predefined.reflect
+  reflect.proto.debug:
+    criterion:
+      debug: 1
+      raw: 0
+    opts:
+      reflector: 'reflector::reflect.proto.*=1'
+    inherit:
+      - predefined.reflect
+  reflect.proto.raw:
+    criterion:
+      debug: 0
+      raw: 1
+    opts:
+      reflector: 'reflector::reflect.proto.*=1'
+    inherit:
+      - predefined.reflect
+  reflect.proto.debug.raw:
+    criterion:
+      debug: 1
+      raw: 1
+    opts:
+      reflector: 'reflector::reflect.proto.*=1'
+    inherit:
+      - predefined.reflect
+  reflect.submodules.:
+    criterion:
+      debug: 1
+      raw: 0
+    opts:
+      reflector: 'reflector::reflect.submodules*=1'
+    inherit:
+      - predefined.reflect
+  reflect.submodules.raw:
+    criterion:
+      debug: 1
+      raw: 1
+    opts:
+      reflector: 'reflector::reflect.submodules*=1'
+    inherit:
+      - predefined.reflect
+  reflect.submodules:
+    criterion:
+      debug: 1
+    opts:
+      reflector: 'reflector::reflect.submodules*'
+    inherit:
+      - predefined.reflect
+  export.proto:
+    criterion:
+      debug: 1
+      proto: 1
+    opts:
+      export: 'path::proto'
+      tar: 0
+    inherit:
+      - module.export
+build:
+  debug.raw:
+    criterion:
+      default: 1
+      debug: 1
+      raw: 1
+    steps:
+      - 'step::clean.out*=1'
+      - 'step::reflect.proto.*=1'
+  debug.compiled:
+    criterion:
+      debug: 1
+      raw: 0
+    steps:
+      - 'step::clean.out*=1'
+      - 'step::reflect.proto.*=1'
+  release.raw:
+    criterion:
+      debug: 0
+      raw: 1
+    steps:
+      - 'step::clean.out*=1'
+      - 'step::reflect.proto.*=1'
+  release.compiled:
+    criterion:
+      debug: 0
+      raw: 0
+    steps:
+      - 'step::clean.out*=1'
+      - 'step::reflect.proto.*=1'
+  all:
+    steps:
+      - 'build::debug.raw'
+      - 'build::release.compiled'
+  proto.export:
+    criterion:
+      default: 1
+      debug: 1
+      raw: 1
+      proto: 1
+      export: 1
+      tar: 1
+      public: 1
+    steps:
+      - 'build::debug.raw'
+      - 'step::export.proto'
+exported:
+  proto.export:
+    version: 0.6.580
+    criterion:
+      default: 1
+      debug: 1
+      raw: 1
+      proto: 1
+      export: 1
+      tar: 1
+      public: 1
+    exportedReflector: 'reflector::exported.proto.export'
+    exportedFilesReflector: 'reflector::exported.files.proto.export'
+    exportedDirPath: 'path::exported.dir.proto.export'
+    exportedFilesPath: 'path::exported.files.proto.export'
+module:
+  wFiles.out: root

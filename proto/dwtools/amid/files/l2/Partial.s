@@ -7544,6 +7544,7 @@ let Composes =
   safe : 1,
   stating : 1,
   usingGlobalPath : 0,
+  globing : 1,
 
 }
 

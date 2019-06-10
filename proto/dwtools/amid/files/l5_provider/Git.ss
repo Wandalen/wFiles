@@ -93,7 +93,7 @@ function _gitConfigRead( filePath )
  * @property {String} hash
  * @property {String} longPath
  * @property {String} localVcsPath
- * @property {String} remoteVcsPath 
+ * @property {String} remoteVcsPath
  * @property {String} longerRemoteVcsPath
  * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderGit
  */
@@ -120,33 +120,64 @@ function pathParse( remotePath )
 
   /* */
 
+  // debugger;
   let parsed1 = path.parseConsecutive( remotePath );
+  // debugger;
   parsed1.hash = parsed1.hash || 'master';
   _.mapExtend( result, parsed1 );
 
-  let p = pathIsolateGlobalAndLocal( parsed1.longPath );
+  // debugger;
+  // let p = pathIsolateGlobalAndLocal( parsed1.longPath );
+  let p = pathIsolateGlobalAndLocal();
+  // debugger;
   result.localVcsPath = p[ 1 ];
 
   /* */
 
   let parsed2 = _.mapExtend( null, parsed1 );
-  parsed2.protocol = null;
+  // parsed2.protocol = null;
   parsed2.hash = null;
-  parsed2.longPath = _.strRemoveEnd( _.strRemoveBegin( p[ 0 ], '/' ), '/' );
+  parsed2.protocols = parsed2.protocol ? parsed2.protocol.split( '+' ) : [];
+  delete parsed2.protocol;
+  let isHardDrive = !_.arrayHasAny( parsed2.protocols, [ 'http', 'https', 'ssh' ] );
+
+  if( parsed2.protocols.length > 0 && parsed2.protocols[ 0 ].toLowerCase() === 'git' )
+  {
+    parsed2.protocols.splice( 0,1 );
+  }
+
+  // if( !isHardDrive ) // xxx
+  // debugger;
+  if( !isHardDrive ) // xxx
+  parsed2.longPath = _.strRemoveBegin( p[ 0 ], '/' );
+  parsed2.longPath = _.strRemoveEnd( p[ 0 ], '/' );
+  delete parsed2.query;
+
   result.remoteVcsPath = path.str( parsed2 );
+
+  if( isHardDrive )
+  result.remoteVcsPath = _.fileProvider.path.nativize( result.remoteVcsPath );
 
   /* */
 
   let parsed3 = _.mapExtend( null, parsed1 );
-  parsed3.protocols = parsed3.protocol ? parsed3.protocol.split( '+' ) : [];
+  // parsed3.protocols = parsed3.protocol ? parsed3.protocol.split( '+' ) : [];
   parsed3.longPath = parsed2.longPath;
+
+  // let isHardDrive = !_.arrayHasAny( parsed3.protocols, [ 'http', 'https', 'ssh' ] );
+
+  parsed3.protocols = parsed2.protocols.slice();
   if( parsed3.protocols.length > 0 && parsed3.protocols[ 0 ].toLowerCase() === 'git' )
   {
     parsed3.protocols.splice( 0,1 );
   }
   parsed3.protocol = null;
   parsed3.hash = null;
+  delete parsed3.query;
   result.longerRemoteVcsPath = path.str( parsed3 );
+
+  if( isHardDrive )
+  result.longerRemoteVcsPath = _.fileProvider.path.nativize( result.longerRemoteVcsPath );
 
   result.isFixated = self.pathIsFixated( result );
 
@@ -169,6 +200,22 @@ function pathParse( remotePath )
 
   /* */
 
+  function pathIsolateGlobalAndLocal()
+  {
+    let splits = _.strIsolateLeftOrAll( parsed1.longPath, '.git/' );
+    // debugger;
+    if( parsed1.query )
+    {
+      // debugger;
+      let query = _.strToMap({ src : parsed1.query, keyValDelimeter : '=', entryDelimeter : '&' });
+      if( query.out )
+      splits[ 2 ] = path.join( splits[ 2 ], query.out );
+    }
+    let globalPath = splits[ 0 ] + ( splits[ 1 ] || '' );
+    return [ globalPath, splits[ 2 ] ];
+  }
+
+/*
   function pathIsolateGlobalAndLocal( remotePath )
   {
     let parsed = path.parseConsecutive( remotePath );
@@ -177,6 +224,8 @@ function pathParse( remotePath )
     let globalPath = path.str( parsed );
     return [ globalPath, splits[ 2 ] ];
   }
+
+*/
 
 }
 
@@ -670,7 +719,7 @@ function filesReflectSingle_body( o )
       _.strEnds( _.strRemoveEnd( srcCurrentPath, '/' ), _.strRemoveEnd( parsed.remoteVcsPath, '/' ) ),
       () => 'GIT repository at directory ' + _.strQuote( dstPath ) + '\n' +
       'Has origin ' + _.strQuote( srcCurrentPath ) + '\n' +
-      'Should have ' + _.strQuote( parsed.longerRemoteVcsPath )
+      'Should have ' + _.strQuote( parsed.remoteVcsPath )
     );
 
     return arg || null;
@@ -792,6 +841,7 @@ let Composes =
   limitedImplementation : 1,
   isVcs : 1,
   usingGlobalPath : 1,
+  globing : 0,
 
 }
 

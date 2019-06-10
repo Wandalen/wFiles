@@ -279,7 +279,11 @@ function _formFinal()
   if( filter.formed < 4 )
   filter._formMasks();
 
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  /*
+    should use effectiveFileProvider because of option globbing of file provider
+  */
+
+  let fileProvider = filter.effectiveFileProvider || filter.hubFileProvider || filter.defaultFileProvider;
   let path = fileProvider.path;
 
   /* - */
@@ -440,9 +444,12 @@ function filePathGenerate()
 
   _.assert( arguments.length === 0 );
 
+  // debugger;
   let globFound = !filter.srcFilter;
   if( globFound )
   globFound = filter.filePathHasGlob();
+  // if( globFound )
+  // debugger;
 
   if( globFound )
   {
@@ -451,9 +458,7 @@ function filePathGenerate()
     _.assert( filter.formedFilterMap === null );
     filter.formedFilterMap = Object.create( null );
 
-    // debugger;
     let _processed = path.pathMapToRegexps( filter.filePath, filter.basePath  );
-    // debugger;
 
     filter.formedBasePath = _processed.unglobedBasePath;
     filter.formedFilePath = _processed.unglobedFilePath;
@@ -468,7 +473,6 @@ function filePathGenerate()
       let regexps = _processed.regexpMap[ p ];
       _.assert( !filter.formedFilterMap[ relative ] );
       let subfilter = filter.formedFilterMap[ relative ] = Object.create( null );
-      // _.assert( regexps.actual.length === 0 );
       subfilter.maskAll = _.RegexpObject.Or( filter.maskAll.clone(), { includeAll : regexps.actualAll, includeAny : regexps.actualAny, excludeAny : regexps.notActual } );
       subfilter.maskTerminal = filter.maskTerminal.clone();
       subfilter.maskDirectory = filter.maskDirectory.clone();
@@ -477,7 +481,6 @@ function filePathGenerate()
       // subfilter.maskTransientTerminal = filter.maskTransientTerminal.clone(); // zzz
       subfilter.maskTransientDirectory = _.RegexpObject.Or( filter.maskTransientDirectory.clone(), { includeAny : regexps.transient } );
       _.assert( subfilter.maskAll !== filter.maskAll );
-      // debugger;
     }
 
   }
@@ -2230,7 +2233,13 @@ function filePathNullizeMaybe( filePath )
 function filePathHasGlob( filePath )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  // let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+
+  /*
+    should use effectiveFileProvider because of option globbing of file provider
+  */
+
+  let fileProvider = filter.effectiveFileProvider || filter.hubFileProvider || filter.defaultFileProvider;
   let path = fileProvider.path;
   filePath = filePath || filter.filePath;
 

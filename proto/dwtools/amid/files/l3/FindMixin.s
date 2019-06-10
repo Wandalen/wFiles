@@ -1009,7 +1009,7 @@ function filesFindGroups_body( o )
     return r;
   });
 
-  return con.toResourceMaybe();
+  return con.syncMaybe();
 }
 
 var defaults = filesFindGroups_body.defaults = _.mapExtend( null, filesFind.defaults );
@@ -1073,7 +1073,7 @@ function filesRead_body( o )
     return r;
   });
 
-  return con.toResourceMaybe();
+  return con.syncMaybe();
 
   /* */
 

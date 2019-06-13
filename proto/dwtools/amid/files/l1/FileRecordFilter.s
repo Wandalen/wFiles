@@ -845,6 +845,8 @@ function pathLocalize( filePath )
   if( !path.isGlobal( filePath ) )
   return filePath;
 
+  _.assert( !path.isTrailed( filePath ) );
+
   let provider = filter.effectiveFileProvider || filter.hubFileProvider || filter.defaultFileProvider;
   let result = provider.path.localFromGlobal( filePath );
   return result;
@@ -2153,7 +2155,7 @@ function filePathGlobSimplify( basePath, filePath )
 
   function simplify( src, what )
   {
-    let src2 = path.normalize( _.strRemoveEnd( src, what ) );
+    let src2 = path.normalizeStrict( _.strRemoveEnd( src, what ) );
     if( !path.isGlob( src2 ) )
     {
       _.assert( filePath[ src2 ] === undefined )

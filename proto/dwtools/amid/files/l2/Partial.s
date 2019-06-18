@@ -5840,7 +5840,7 @@ function _link_functor( gen )
     {
       if( !o.verbosity || o.verbosity < 2 )
       return;
-      self.logger.log( ' +', entryMethodName, ':', path.moveReport( o.dstPath, o.srcPath ) );
+      self.logger.log( ' +', entryMethodName, ':', path.moveTextualReport( o.dstPath, o.srcPath ) );
     }
 
     /* - */
@@ -6670,7 +6670,7 @@ function _softLinkVerify2( c )
   if( !o.allowingMissed )
   // if( self.filesAreSoftLinked([ o.dstPath, o.srcPath ]) )
   if( o.dstPath === o.srcPath )
-  c.error( _.err( 'Soft link cycle', path.moveReport( o.dstPath, o.srcPath ) ) );
+  c.error( _.err( 'Soft link cycle', path.moveTextualReport( o.dstPath, o.srcPath ) ) );
 
   // if( o.dstPath !== o.srcPath && self.filesAreSoftLinked([ o.dstPath, o.srcPath ]) )
   // if( o.dstPath === o.srcPath )

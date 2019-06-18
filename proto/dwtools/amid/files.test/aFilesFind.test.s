@@ -1771,11 +1771,12 @@ function filesFind2( test )
   expected[ i ] = './' + expected[ i ];
   test.identical( got, expected );
 
-  /*terminalPath - directory, maskDirectory, includingTransient */
+  /* terminalPath - directory, maskDirectory, includingTransient */
 
   terminalPath = path.join( context.testSuitePath, 'tmp/dir' );
   provider.dirMake( terminalPath );
 
+  debugger;
   got = provider.filesFind
   ({
     filePath : terminalPath,
@@ -1790,6 +1791,7 @@ function filesFind2( test )
     includingDirs : 1,
     recursive : 2
   });
+  debugger;
   expected = provider.dirRead( path.dir( terminalPath ) );
   expected = expected.filter( function( element )
   {
@@ -5551,7 +5553,7 @@ function filesFindGlob( test )
 
 }
 
-filesFindGlob.timeOut = 150000;
+filesFindGlob.timeOut = 300000;
 
 /*
 
@@ -7915,8 +7917,6 @@ function filesReflectMutuallyExcluding( test )
 
 }
 
-filesReflectMutuallyExcluding.timeOut = 30000;
-
 //
 
 function filesReflectWithFilter( test )
@@ -7978,8 +7978,6 @@ function filesReflectWithFilter( test )
   context._filesReflectWithFilter( test, o );
 
 }
-
-filesReflectWithFilter.timeOut = 30000;
 
 //
 
@@ -8459,7 +8457,7 @@ function filesReflect( test )
 
 }
 
-filesReflect.timeOut = 30000;
+filesReflect.timeOut = 300000;
 
 //
 
@@ -10470,8 +10468,6 @@ function filesReflectGrab( test )
 
 }
 
-filesReflectGrab.timeOut = 30000;
-
 //
 
 function filesReflector( test )
@@ -10485,7 +10481,7 @@ function filesReflector( test )
 
   function abs( filePath )
   {
-    return path.s.reroot( testPath, filePath )
+    return path.s.normalizeStrict( path.s.reroot( testPath, filePath ) );
   }
 
   /* */
@@ -13175,8 +13171,6 @@ function filesDeleteTrivial( test )
 
 }
 
-filesDeleteTrivial.timeOut = 30000;
-
 //
 
 function filesDelete( test )
@@ -13602,8 +13596,6 @@ function filesDelete( test )
   tree.finit();
 
 }
-
-filesDelete.timeOut = 30000;
 
 //
 

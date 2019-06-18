@@ -823,7 +823,9 @@ function pathLocalize( filePath )
   let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
   let path = fileProvider.path;
 
-  filePath = path.normalize( filePath );
+  _.assert( _.strIs( filePath ) );
+
+  filePath = path.normalizeStrict( filePath );
 
   if( filter.effectiveFileProvider && !path.isGlobal( filePath ) )
   return filePath;

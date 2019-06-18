@@ -30,7 +30,7 @@ let Self = function wFileProviderFind( o )
 
 Self.shortName = 'Find';
 
-// let debugPath = '/dir';
+let debugPath = '/release';
 
 // --
 // etc
@@ -540,11 +540,11 @@ let filesFindSingle = _.routineFromPreAndBody( filesFindSingle_pre, filesFindSin
 
 //
 
-/** 
+/**
  * @summary Searches for files in the specified path `o.filePath`.
  * @returns Returns flat array with FileRecord instances of found files.
  * @param {Object} o Options map.
- * 
+ *
  * @param {} o.filePath
  * @param {} o.filter
  * @param {} o.includingTerminals=1
@@ -568,7 +568,7 @@ let filesFindSingle = _.routineFromPreAndBody( filesFindSingle_pre, filesFindSin
  * @param {} o.result=[]
  * @param {} o.onUp=[]
  * @param {} o.onDown=[]
- * 
+ *
  * @function filesFind
  * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderFind#
  */
@@ -664,7 +664,7 @@ function filesFind_body( o )
     if( !o.result.length )
     {
       debugger;
-      throw _.err( 'No file found at ' + path.commonReport( o.filter.filePath || o.filePath ) );
+      throw _.err( 'No file found at ' + path.commonTextualReport( o.filter.filePath || o.filePath ) );
     }
 
     /* timing */
@@ -728,12 +728,12 @@ filesFind.having.aspect = 'entry';
 
 //
 
-/** 
+/**
  * @description Short-cut for {@link module:Tools/mid/Files.wTools.FileProvider.wFileProviderFind.filesFind}.
- * Performs recursive search for files from specified path `o.filePath`. 
+ * Performs recursive search for files from specified path `o.filePath`.
  * Includes terminals,directories and transient files into the result array.
  * @param {Object} o Options map.
- * 
+ *
  * @param {} o.filePath
  * @param {} o.filter
  * @param {} o.includingTerminals=1
@@ -757,7 +757,7 @@ filesFind.having.aspect = 'entry';
  * @param {} o.result=[]
  * @param {} o.onUp=[]
  * @param {} o.onDown=[]
- * 
+ *
  * @function filesFindRecursive
  * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderFind#
  */
@@ -775,12 +775,12 @@ defaults.allowingCycled = 1;
 
 //
 
-/** 
+/**
  * @description Short-cut for {@link module:Tools/mid/Files.wTools.FileProvider.wFileProviderFind.filesFind}.
- * Performs recursive search for files using glob pattern `o.filePath` using glob pattern. 
+ * Performs recursive search for files using glob pattern `o.filePath` using glob pattern.
  * Includes terminals,directories into the result array.
  * @param {Object} o Options map.
- * 
+ *
  * @param {} o.filePath
  * @param {} o.filter
  * @param {} o.includingTerminals=1
@@ -804,7 +804,7 @@ defaults.allowingCycled = 1;
  * @param {} o.result=[]
  * @param {} o.onUp=[]
  * @param {} o.onDown=[]
- * 
+ *
  * @function filesGlob
  * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderFind#
  */
@@ -852,8 +852,8 @@ defaults.includingTransient = 0;
 
 //
 
-/** 
- * @description Functor for {@link module:Tools/mid/Files.wTools.FileProvider.wFileProviderFind.filesFind} routine. 
+/**
+ * @description Functor for {@link module:Tools/mid/Files.wTools.FileProvider.wFileProviderFind.filesFind} routine.
  * Creates a filesFind routine with options saved in inner context.
  * It allows to reuse created routine changing only necessary options and don't worry about other options.
  * @param {Object} o Options map. Please see {@link module:Tools/mid/Files.wTools.FileProvider.wFileProviderFind.filesFind} for options description.
@@ -1719,8 +1719,8 @@ function filesReflectEvaluate_body( o )
   function handleUp( record, op )
   {
 
-    // if( _.strEnds( record.dst.absolute, debugPath ) )
-    // debugger;
+    if( _.strEnds( record.dst.absolute, debugPath ) )
+    debugger;
 
     if( touchMap[ record.dst.absolute ] )
     touch( record, touchMap[ record.dst.absolute ] );
@@ -1945,8 +1945,8 @@ function filesReflectEvaluate_body( o )
   function handleDown( record, op )
   {
 
-    // if( _.strEnds( record.dst.absolute, debugPath ) )
-    // debugger;
+    if( _.strEnds( record.dst.absolute, debugPath ) )
+    debugger;
 
     if( touchMap[ record.dst.absolute ] )
     touch( record, touchMap[ record.dst.absolute ] );
@@ -2447,7 +2447,7 @@ function filesReflectEvaluate_body( o )
 
     do
     {
-      absolutePath = dst.path.dir( absolutePath );
+      absolutePath = dst.path.detrail( dst.path.dir( absolutePath ) );
       dstDeleteMap[ absolutePath ] = 1;
     }
     while( absolutePath !== o.dstPath && absolutePath !== '/' );
@@ -2504,7 +2504,7 @@ function filesReflectEvaluate_body( o )
 
     while( absolutePath !== o.dstPath && absolutePath !== '/' )
     {
-      absolutePath = dst.path.dir( absolutePath );
+      absolutePath = dst.path.detrail( dst.path.dir( absolutePath ) );
       touchAct( absolutePath, kind );
     }
 
@@ -3416,10 +3416,10 @@ function filesReflect_pre( routine, args )
  * @param {Boolean} o.preservingTime=0
  * @param {Boolean} o.preservingSame=0
  * @param {} o.extral
- * @param {Function} o.onUp 
+ * @param {Function} o.onUp
  * @param {Function} o.onDown
  * @param {Function} o.onDstName
- * 
+ *
  * @function filesReflect
  * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderFind#
  */
@@ -3499,7 +3499,7 @@ function filesReflect_body( o )
       let src = srcFilter.filePathSrcCommon();
       let dst = srcFilter.dstFilter.filePathDstCommon();
       debugger;
-      throw _.err( 'Error. No file moved :', path.moveReport( dst, src ) );
+      throw _.err( 'Error. No file moved :', path.moveTextualReport( dst, src ) );
     }
 
     if( o.verbosity >= 1 )
@@ -3509,7 +3509,7 @@ function filesReflect_body( o )
       srcFilter.dstFilter.form();
       let src = srcFilter.filePathSrcCommon();
       let dst = srcFilter.dstFilter.filePathDstCommon();
-      self.logger.log( ' + Reflect ' + o.result.length + ' files ' + path.moveReport( dst, src ) + ' in ' + _.timeSpent( time ) );
+      self.logger.log( ' + Reflect ' + o.result.length + ' files ' + path.moveTextualReport( dst, src ) + ' in ' + _.timeSpent( time ) );
     }
 
     return o.result;
@@ -4097,8 +4097,6 @@ function filesDelete_body( o )
   _.assert( o.filter.formed === 5 );
   _.assert( arguments.length === 1 );
 
-  // debugger;
-
   /* */
 
   let filePath = o.filter.filePathArrayGet( o.filter.formedFilePath );
@@ -4107,9 +4105,11 @@ function filesDelete_body( o )
     filePath = filePath[ 0 ];
     if( !provider.fileExists( filePath ) )
     return end();
+
     /*
       reminder : masks are not applicable to stem file
     */
+
     if( provider.isTerminal( filePath ) )
     {
       let file = provider.record( filePath );
@@ -4138,9 +4138,7 @@ function filesDelete_body( o )
   _.assert( !o.includingTransient );
   _.assert( o.result === o2.result );
 
-  /* qqq : this is not async aaa : done*/
-
-  // debugger;
+  /* */
 
   if( o.sync )
   {
@@ -4152,6 +4150,15 @@ function filesDelete_body( o )
 
     if( o.deletingEmptyDirs && o.result.length )
     deletingEmptyDirs();
+
+    /* qqq : refactor please this brute-hack ( filesDelete_body )
+      does it work at all??
+      result array should not depend on option writing!
+      deletingEmptyDirs should not delete files, but only change result array.
+      handleWriting should be only deleting subroutine
+      deletingEmptyDirs should goes between handleResult and handleWriting
+    */
+
   }
   else
   {
@@ -4172,15 +4179,6 @@ function filesDelete_body( o )
 
   /* */
 
-  /*
-  workaround to fix phantom issue on windows+nodejs
-  program exits before actually deleting several dir files
-  */
-
-  // _.timeBegin( 5 );
-
-  /* */
-
   return end();
 
   /* - */
@@ -4194,16 +4192,6 @@ function filesDelete_body( o )
     for( let f = o.result.length-1 ; f >= 0 ; f-- )
     {
       let file = o.result[ f ];
-
-      // qqq : temp hack. comment it out please
-      // if( file.isDir )
-      // if( !provider.dirIsEmpty( file.absolute ) )
-      // {
-      //   o.result.splice( f, 1 );
-      //   continue;
-      // }
-      // qqq
-
       if( file.isActual && file.absolute !== '/' )
       if( o.sync )
       fileDelete( file )
@@ -4217,7 +4205,6 @@ function filesDelete_body( o )
 
   function handleResult()
   {
-    // debugger;
     for( let f1 = 0 ; f1 < o.result.length ; f1++ )
     {
       let file1 = o.result[ f1 ];
@@ -4280,8 +4267,27 @@ function filesDelete_body( o )
 
   function endSync()
   {
+
     if( o.verbosity >= 1 )
-    provider.logger.log( ' - filesDelete ' + o.result.length + ' files at ' + _.color.strFormat( path.commonReport( _.mapKeys( o.filter.formedFilePath ) ), 'path' ) + ' in ' + _.timeSpent( time ) );
+    {
+
+      let spentTime = _.timeNow() - time;
+      debugger;
+      let groupsMap = path.group({ keys : o.filter.filePath, vals : o.result });
+      let textualReport = path.groupTextualReport
+      ({
+        explanation : ' - Deleted ',
+        groupsMap : groupsMap,
+        verbosity : o.verbosity,
+        spentTime : spentTime,
+      });
+
+      provider.logger.log( textualReport );
+      debugger;
+    }
+
+    // if( o.verbosity >= 1 )
+    // provider.logger.log( ' - filesDelete ' + o.result.length + ' files at ' + _.color.strFormat( path.commonTextualReport( _.mapKeys( o.filter.formedFilePath ) ), 'path' ) + ' in ' + _.timeSpent( time ) );
 
     if( o.outputFormat === 'absolute' )
     o.result = _.select( o.result, '*/absolute' );
@@ -4300,7 +4306,8 @@ function filesDelete_body( o )
     {
       filePath : file.absolute,
       throwing : o.throwing,
-      verbosity : o.verbosity-1,
+      // verbosity : o.verbosity-1,
+      verbosity : 0,
       safe : o.safe,
       sync : o.sync,
     }
@@ -4315,20 +4322,16 @@ function filesDelete_body( o )
   function deletingEmptyDirs()
   {
     let delMap = Object.create( null );
-    // let dirMap = Object.create( null );
     let factory = o.result[ 0 ].factory;
 
     for( let f = o.result.length-1 ; f >= 0 ; f-- )
     {
       let file = o.result[ f ];
-      // dirMap[ file.dir ] = 1;
       delMap[ file.absolute ] = 1;
     }
 
     let dirsFile = [];
     let dirsPath = path.chainToRoot( o.result[ 0 ].dir );
-
-    // debugger;
 
     for( let d = dirsPath.length-1 ; d >= 0 ; d-- )
     {
@@ -4341,10 +4344,7 @@ function filesDelete_body( o )
 
       if( files.length > 0 )
       break;
-      // if( files.length === 1 && !delMap[ files[ 0 ] ] )
-      // break;
 
-      // dirMap[ dirPath ] = 1;
       delMap[ dirPath ] = 1;
 
       let file = factory.record( dirPath );
@@ -4407,23 +4407,6 @@ var having = filesDelete.having;
 _.assert( !!defaults );
 _.assert( !!having );
 _.assert( !!filesDelete.defaults.includingDirs );
-
-// //
-//
-// function filesDeleteForce( o )
-// {
-//   let self = this;
-//
-//   o = self.filesFindLike_pre( arguments );
-//
-//   _.routineOptions( filesDeleteForce, o );
-//
-//   return self.filesDelete( o );
-// }
-//
-// _.routineExtend( filesDeleteForce, filesDelete );
-//
-// var defaults = filesDeleteForce.defaults;
 
 //
 

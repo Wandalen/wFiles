@@ -136,22 +136,28 @@ function pathParse( remotePath )
   delete parsed2.protocol;
 
   // let isHardDrive = !_.arrayHasAny( parsed2.protocols, [ 'http', 'https', 'ssh' ] );
+  let isHardDrive = _.arrayHasAny( parsed2.protocols, [ 'hd' ] );
   let isRelative = path.isRelative( parsed2.longPath );
 
-  if( parsed2.protocols.length >= 1 && parsed2.protocols[ 0 ].toLowerCase() === 'git' )
+  if( parsed2.protocols.length > 0 && parsed2.protocols[ 0 ].toLowerCase() === 'git' )
+  {
+    parsed2.protocols.splice( 0,1 );
+  }
+
+  if( parsed2.protocols.length > 0 && parsed2.protocols[ 0 ].toLowerCase() === 'hd' )
   {
     parsed2.protocols.splice( 0,1 );
   }
 
   parsed2.longPath = p[ 0 ];
-  if( !isRelative ) // xxx
+  if( !isHardDrive )
   parsed2.longPath = _.strRemoveBegin( parsed2.longPath, '/' );
   parsed2.longPath = _.strRemoveEnd( parsed2.longPath, '/' );
   delete parsed2.query;
 
   result.remoteVcsPath = path.str( parsed2 );
 
-  if( isRelative )
+  if( isHardDrive )
   result.remoteVcsPath = _.fileProvider.path.nativize( result.remoteVcsPath );
 
   /* */
@@ -165,7 +171,7 @@ function pathParse( remotePath )
   delete parsed3.query;
   result.longerRemoteVcsPath = path.str( parsed3 );
 
-  if( isRelative )
+  if( isHardDrive )
   result.longerRemoteVcsPath = _.fileProvider.path.nativize( result.longerRemoteVcsPath );
 
   result.isFixated = self.pathIsFixated( result );
@@ -822,7 +828,7 @@ let Composes =
 {
 
   safe : 0,
-  protocols : _.define.own([ 'git', 'git+http', 'git+https', 'git+ssh' ]),
+  protocols : _.define.own([ 'git', 'git+http', 'git+https', 'git+ssh', 'git+hd' ]),
 
   resolvingSoftLink : 0,
   resolvingTextLink : 0,

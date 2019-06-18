@@ -120,69 +120,59 @@ function pathParse( remotePath )
 
   /* */
 
-  // debugger;
+  debugger;
   let parsed1 = path.parseConsecutive( remotePath );
-  // debugger;
   parsed1.hash = parsed1.hash || 'master';
   _.mapExtend( result, parsed1 );
 
-  // debugger;
-  // let p = pathIsolateGlobalAndLocal( parsed1.longPath );
   let p = pathIsolateGlobalAndLocal();
-  // debugger;
   result.localVcsPath = p[ 1 ];
 
   /* */
 
   let parsed2 = _.mapExtend( null, parsed1 );
-  // parsed2.protocol = null;
   parsed2.hash = null;
   parsed2.protocols = parsed2.protocol ? parsed2.protocol.split( '+' ) : [];
   delete parsed2.protocol;
-  let isHardDrive = !_.arrayHasAny( parsed2.protocols, [ 'http', 'https', 'ssh' ] );
 
-  if( parsed2.protocols.length > 0 && parsed2.protocols[ 0 ].toLowerCase() === 'git' )
+  // let isHardDrive = !_.arrayHasAny( parsed2.protocols, [ 'http', 'https', 'ssh' ] );
+  let isRelative = path.isRelative( parsed2.longPath );
+
+  if( parsed2.protocols.length >= 1 && parsed2.protocols[ 0 ].toLowerCase() === 'git' )
   {
     parsed2.protocols.splice( 0,1 );
   }
 
-  // if( !isHardDrive ) // xxx
-  // debugger;
-  if( !isHardDrive ) // xxx
-  parsed2.longPath = _.strRemoveBegin( p[ 0 ], '/' );
-  parsed2.longPath = _.strRemoveEnd( p[ 0 ], '/' );
+  parsed2.longPath = p[ 0 ];
+  if( !isRelative ) // xxx
+  parsed2.longPath = _.strRemoveBegin( parsed2.longPath, '/' );
+  parsed2.longPath = _.strRemoveEnd( parsed2.longPath, '/' );
   delete parsed2.query;
 
   result.remoteVcsPath = path.str( parsed2 );
 
-  if( isHardDrive )
+  if( isRelative )
   result.remoteVcsPath = _.fileProvider.path.nativize( result.remoteVcsPath );
 
   /* */
 
   let parsed3 = _.mapExtend( null, parsed1 );
-  // parsed3.protocols = parsed3.protocol ? parsed3.protocol.split( '+' ) : [];
   parsed3.longPath = parsed2.longPath;
 
-  // let isHardDrive = !_.arrayHasAny( parsed3.protocols, [ 'http', 'https', 'ssh' ] );
-
   parsed3.protocols = parsed2.protocols.slice();
-  if( parsed3.protocols.length > 0 && parsed3.protocols[ 0 ].toLowerCase() === 'git' )
-  {
-    parsed3.protocols.splice( 0,1 );
-  }
   parsed3.protocol = null;
   parsed3.hash = null;
   delete parsed3.query;
   result.longerRemoteVcsPath = path.str( parsed3 );
 
-  if( isHardDrive )
+  if( isRelative )
   result.longerRemoteVcsPath = _.fileProvider.path.nativize( result.longerRemoteVcsPath );
 
   result.isFixated = self.pathIsFixated( result );
 
   /* */
 
+  debugger;
   _.assert( !_.boolLike( result.hash ) );
   return result
 
@@ -203,10 +193,8 @@ function pathParse( remotePath )
   function pathIsolateGlobalAndLocal()
   {
     let splits = _.strIsolateLeftOrAll( parsed1.longPath, '.git/' );
-    // debugger;
     if( parsed1.query )
     {
-      // debugger;
       let query = _.strToMap({ src : parsed1.query, keyValDelimeter : '=', entryDelimeter : '&' });
       if( query.out )
       splits[ 2 ] = path.join( splits[ 2 ], query.out );

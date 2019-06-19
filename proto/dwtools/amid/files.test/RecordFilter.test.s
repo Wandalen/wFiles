@@ -165,6 +165,80 @@ function make( test )
 function form( test )
 {
 
+  test.case = 'base path is relative';
+  var filter = _.fileProvider.recordFilter();
+  filter.filePath = [ '/a/b/*', '/a/c/*' ];
+  filter.basePath = '..';
+  filter.form();
+  test.identical( filter.formed, 5 );
+  test.identical( filter.formedFilePath, { '/a/b' : null, '/a/c' : null } );
+  test.identical( filter.formedBasePath, { '/a/b' : '/a', '/a/c' : '/a' } );
+  test.identical( filter.filePath, { '/a/b/*' : null, '/a/c/*' : null } );
+  test.identical( filter.basePath, { '/a/b/*' : '/a', '/a/c/*' : '/a' } );
+  test.identical( filter.prefixPath, null );
+  test.identical( filter.postfixPath, null );
+
+  test.case = 'base path and file path are relative, without glob';
+  var filter = _.fileProvider.recordFilter();
+  filter.prefixPath = '/src';
+  filter.basePath = '.';
+  filter.filePath = { 'd' : true };
+  filter.form();
+  test.identical( filter.formed, 5 );
+  test.identical( filter.formedFilePath, { '/src/d' : '/src' } );
+  test.identical( filter.formedBasePath, { '/src/d' : '/src' } );
+  test.identical( filter.filePath, { '/src/d' : '/src' } );
+  test.identical( filter.basePath, { '/src/d' : '/src' } );
+  test.identical( filter.prefixPath, null );
+  test.identical( filter.postfixPath, null );
+
+  test.case = 'base path and file path are relative, without glob, complex';
+  var filter = _.fileProvider.recordFilter();
+  filter.prefixPath = '/src';
+  filter.basePath = '.';
+  filter.filePath = { 'a/b' : true, 'a/c' : true };
+  filter.form();
+  test.identical( filter.formed, 5 );
+  test.identical( filter.formedFilePath, { '/src/a/b' : '/src', '/src/a/c' : '/src' } );
+  test.identical( filter.formedBasePath, { '/src/a/b' : '/src', '/src/a/c' : '/src' } );
+  test.identical( filter.filePath, { '/src/a/b' : '/src', '/src/a/c' : '/src' } );
+  test.identical( filter.basePath, { '/src/a/b' : '/src', '/src/a/c' : '/src' } );
+  test.identical( filter.prefixPath, null );
+  test.identical( filter.postfixPath, null );
+
+  test.case = 'base path and file path are relative, with glob, complex';
+  var filter = _.fileProvider.recordFilter();
+  filter.prefixPath = '/src/*';
+  filter.basePath = '.';
+  filter.filePath = { 'a/b' : true, 'a/c' : true };
+  filter.form();
+  test.identical( filter.formed, 5 );
+  test.identical( filter.formedFilePath, { '/src' : '/src' } );
+  test.identical( filter.formedBasePath, { '/src' : '/src' } );
+  test.identical( filter.filePath, { '/src/*/a/b' : '/src', '/src/*/a/c' : '/src' } );
+  test.identical( filter.basePath, { '/src/*/a/b' : '/src', '/src/*/a/c' : '/src' } );
+  test.identical( filter.prefixPath, null );
+  test.identical( filter.postfixPath, null );
+
+  if( Config.debug )
+  {
+
+    test.case = 'different base paths for the same file path';
+    var filter = _.fileProvider.recordFilter();
+    filter.prefixPath = '/src/*';
+    filter.basePath = { 'a/b' : '/src', 'a/c' : '/dst' };
+    filter.filePath = { 'a/b' : true, 'a/c' : true };
+    test.shouldThrowErrorSync( () => filter.form() );
+    test.identical( filter.formed, 3 );
+    test.identical( filter.formedFilePath, null );
+    test.identical( filter.formedBasePath, null );
+    test.identical( filter.filePath, { '/src/*/a/b' : '/src', '/src/*/a/c' : '/src' } );
+    test.identical( filter.basePath, { '/src/*/a/b' : '/src', '/src/*/a/c' : '/dst' } );
+    test.identical( filter.prefixPath, null );
+    test.identical( filter.postfixPath, null );
+
+  }
+
   test.case = 'glob simplification';
   var filter = _.fileProvider.recordFilter();
   filter.filePath = '/a/b/**';
@@ -198,7 +272,8 @@ function form( test )
   test.identical( filter.formedFilePath, null );
   test.identical( filter.formedBasePath, null );
   test.identical( filter.filePath, { '/a/b/*x*' : null, '/a/c/*x*' : null } );
-  test.identical( filter.basePath, { '/a/b/*x*' : '.', '/a/c/*x*' : '.' } );
+  // test.identical( filter.basePath, { '/a/b/*x*' : '.', '/a/c/*x*' : '.' } ); // yyy
+  test.identical( filter.basePath, { '/a/b/*x*' : '/a/b', '/a/c/*x*' : '/a/c' } );
   test.identical( filter.prefixPath, null );
   test.identical( filter.postfixPath, null );
 
@@ -211,7 +286,8 @@ function form( test )
   test.identical( filter.formedFilePath, null );
   test.identical( filter.formedBasePath, null );
   test.identical( filter.filePath, { 'a/b/*x*' : null, 'a/c/*x*' : null } );
-  test.identical( filter.basePath, { 'a/b/*x*' : '.', 'a/c/*x*' : '.' } );
+  // test.identical( filter.basePath, { 'a/b/*x*' : '.', 'a/c/*x*' : '.' } ); // yyy
+  test.identical( filter.basePath, { 'a/b/*x*' : 'a/b', 'a/c/*x*' : 'a/c' } );
   test.identical( filter.prefixPath, null );
   test.identical( filter.postfixPath, null );
 
@@ -879,267 +955,267 @@ function prefixesApply( test )
 function prefixesRelative( test )
 {
 
-  // /* */
-  //
-  // test.case = 'file path - map, single';
-  // var osrc =
-  // {
-  //   filePath : { '/src' : '/dst' }
-  // }
-  // var src = _.fileProvider.recordFilter( osrc );
-  // src.prefixesRelative();
-  //
-  // test.identical( src.formed, 1 );
-  // test.identical( src.filePath, { '.' : '../dst' } );
-  // test.identical( src.prefixPath, '/src' );
-  //
-  // /* */
-  //
-  // test.case = 'file path - map, single, src relative';
-  // var osrc =
-  // {
-  //   filePath : { './src' : '/dst' }
-  // }
-  // var src = _.fileProvider.recordFilter( osrc );
-  // src.prefixesRelative();
-  //
-  // test.identical( src.formed, 1 );
-  // test.identical( src.filePath, { '.' : '/dst' } );
-  // test.identical( src.prefixPath, './src' );
-  //
-  // /* */
-  //
-  // test.case = 'file path - map, single, dst relative';
-  // var osrc =
-  // {
-  //   filePath : { '/src' : './dst' }
-  // }
-  // var src = _.fileProvider.recordFilter( osrc );
-  // src.prefixesRelative();
-  //
-  // test.identical( src.formed, 1 );
-  // test.identical( src.filePath, { '.' : './dst' } );
-  // test.identical( src.prefixPath, '/src' );
-  //
-  // /* */
-  //
-  // test.case = 'file path - map, single, dst is true';
-  // var osrc =
-  // {
-  //   filePath : { '/src/a' : true, '/src/b' : '/dst/b' }
-  // }
-  // var src = _.fileProvider.recordFilter( osrc );
-  // src.prefixesRelative();
-  //
-  // test.identical( src.formed, 1 );
-  // test.identical( src.filePath, { 'a' : true, 'b' : '../dst/b' } );
-  // test.identical( src.prefixPath, '/src' );
-  //
-  // /* */
-  //
-  // test.case = 'file path - map';
-  // var osrc =
-  // {
-  //   filePath : { '/src' : '/dst' }
-  // }
-  // var odst =
-  // {
-  //   filePath : osrc.filePath
-  // }
-  // var src = _.fileProvider.recordFilter( osrc );
-  // var dst = _.fileProvider.recordFilter( odst );
-  // src.filePath = dst.filePath; // xxx
-  // test.is( src.filePath === dst.filePath );
-  // src.pairWithDst( dst );
-  // test.is( src.filePath === dst.filePath );
-  //
-  // src.prefixesRelative();
-  // test.identical( src.formed, 1 );
-  // test.identical( src.filePath, { '.' : '/dst' } );
-  // test.identical( src.prefixPath, '/src' );
-  // test.identical( dst.formed, 1 );
-  // test.identical( dst.filePath, { '.' : '/dst' } );
-  // test.identical( dst.prefixPath, null );
-  // test.is( src.filePath === dst.filePath );
-  //
-  // dst.prefixesRelative();
-  // test.identical( src.formed, 1 );
-  // test.identical( src.filePath, { '.' : '.' } );
-  // test.identical( src.prefixPath, '/src' );
-  // test.identical( dst.formed, 1 );
-  // test.identical( dst.filePath, { '.' : '.' } );
-  // test.identical( dst.prefixPath, '/dst' );
-  // test.is( src.filePath === dst.filePath );
-  //
-  // /* */
-  //
-  // test.case = 'file path - map, with bools';
-  // var osrc =
-  // {
-  //   filePath : { '/src/a' : '/dst', '/src/b' : true }
-  // }
-  // var odst =
-  // {
-  //   filePath : osrc.filePath
-  // }
-  // var src = _.fileProvider.recordFilter( osrc );
-  // var dst = _.fileProvider.recordFilter( odst );
-  // src.filePath = dst.filePath; // xxx
-  // test.is( src.filePath === dst.filePath );
-  // src.pairWithDst( dst );
-  // test.is( src.filePath === dst.filePath );
-  //
-  // src.prefixesRelative();
-  // test.identical( src.formed, 1 );
-  // test.identical( src.filePath, { 'a' : '/dst', 'b' : true } );
-  // test.identical( src.prefixPath, '/src' );
-  // test.identical( dst.formed, 1 );
-  // test.identical( dst.filePath, { 'a' : '/dst', 'b' : true } );
-  // test.identical( dst.prefixPath, null );
-  // test.is( src.filePath === dst.filePath );
-  //
-  // dst.prefixesRelative();
-  // test.identical( src.formed, 1 );
-  // test.identical( src.filePath, { 'a' : '.', 'b' : true } );
-  // test.identical( src.prefixPath, '/src' );
-  // test.identical( dst.formed, 1 );
-  // test.identical( dst.filePath, { 'a' : '.', 'b' : true } );
-  // test.identical( dst.prefixPath, '/dst' );
-  // test.is( src.filePath === dst.filePath );
-  //
-  // /* */
-  //
-  // test.case = 'file path - absolute map, prefix path - absolute string, base path - absolute map, no argument';
-  // var osrc =
-  // {
-  //   filePath : { '/src' : '/dst' },
-  //   prefixPath : '/srcPrefix',
-  //   basePath : { '/src' : '/srcPrefix' },
-  // }
-  // var odst =
-  // {
-  //   filePath : { '/src' : '/dst' },
-  //   prefixPath : '/dstPrefix',
-  //   basePath : { '/dst' : '/dstPrefix' },
-  // }
-  // var src = _.fileProvider.recordFilter( osrc );
-  // var dst = _.fileProvider.recordFilter( odst );
-  // src.filePath = dst.filePath; // xxx
-  // test.is( src.filePath === dst.filePath );
-  // src.pairWithDst( dst );
-  // test.is( src.filePath === dst.filePath );
-  //
-  // src.prefixesRelative();
-  // test.identical( src.formed, 1 );
-  // test.identical( src.filePath, { '../src' : '/dst' } );
-  // test.identical( src.prefixPath, '/srcPrefix' );
-  // test.identical( src.basePath, { '../src' : '.' } );
-  // test.identical( dst.formed, 1 );
-  // test.identical( dst.filePath, { '../src' : '/dst' } );
-  // test.identical( dst.prefixPath, '/dstPrefix' );
-  // test.identical( dst.basePath, { '/dst' : '/dstPrefix' } );
-  // test.is( src.filePath === dst.filePath );
-  //
-  // dst.prefixesRelative();
-  // test.identical( src.formed, 1 );
-  // test.identical( src.filePath, { '../src' : '../dst' } );
-  // test.identical( src.prefixPath, '/srcPrefix' );
-  // test.identical( src.basePath, { '../src' : '.' } );
-  // test.identical( dst.formed, 1 );
-  // test.identical( dst.filePath, { '../src' : '../dst' } );
-  // test.identical( dst.prefixPath, '/dstPrefix' );
-  // test.identical( dst.basePath, { '../dst' : '.' } );
-  // test.is( src.filePath === dst.filePath );
-  //
-  // /* */
-  //
-  // test.case = 'file path - absolute map, base path - absolute map, argument';
-  // var osrc =
-  // {
-  //   filePath : { '/src' : '/dst' },
-  //   prefixPath :  null,
-  //   basePath : { '/src' : '/srcPrefix' },
-  // }
-  // var odst =
-  // {
-  //   filePath : { '/src' : '/dst' },
-  //   prefixPath : null,
-  //   basePath : { '/dst' : '/dstPrefix' },
-  // }
-  // var src = _.fileProvider.recordFilter( osrc );
-  // var dst = _.fileProvider.recordFilter( odst );
-  // src.filePath = dst.filePath; // xxx
-  // test.is( src.filePath === dst.filePath );
-  // src.pairWithDst( dst );
-  // test.is( src.filePath === dst.filePath );
-  //
-  // src.prefixesRelative( '/srcPrefix' );
-  // test.identical( src.formed, 1 );
-  // test.identical( src.filePath, { '../src' : '/dst' } );
-  // test.identical( src.prefixPath, '/srcPrefix' );
-  // test.identical( src.basePath, { '../src' : '.' } );
-  // test.identical( dst.formed, 1 );
-  // test.identical( dst.filePath, { '../src' : '/dst' } );
-  // test.identical( dst.prefixPath, null );
-  // test.identical( dst.basePath, { '/dst' : '/dstPrefix' } );
-  // test.is( src.filePath === dst.filePath );
-  //
-  // dst.prefixesRelative( '/dstPrefix' );
-  // test.identical( src.formed, 1 );
-  // test.identical( src.filePath, { '../src' : '../dst' } );
-  // test.identical( src.prefixPath, '/srcPrefix' );
-  // test.identical( src.basePath, { '../src' : '.' } );
-  // test.identical( dst.formed, 1 );
-  // test.identical( dst.filePath, { '../src' : '../dst' } );
-  // test.identical( dst.prefixPath, '/dstPrefix' );
-  // test.identical( dst.basePath, { '../dst' : '.' } );
-  // test.is( src.filePath === dst.filePath );
-  //
-  // /* */
-  //
-  // test.case = 'file path - relative map, prefix path - absolute string, base path - relative map, no argument';
-  // var osrc =
-  // {
-  //   filePath : { '../src' : '../dst' },
-  //   prefixPath : '/srcPrefix',
-  //   basePath : { '../src' : '.' },
-  // }
-  // var odst =
-  // {
-  //   filePath : { '../src' : '../dst' },
-  //   prefixPath : '/dstPrefix',
-  //   basePath : { '../dst' : '.' },
-  // }
-  // var src = _.fileProvider.recordFilter( osrc );
-  // var dst = _.fileProvider.recordFilter( odst );
-  // src.filePath = dst.filePath; // xxx
-  // test.is( src.filePath === dst.filePath );
-  // src.pairWithDst( dst );
-  // test.is( src.filePath === dst.filePath );
-  //
-  // src.prefixesRelative();
-  // test.identical( src.formed, 1 );
-  // test.identical( src.filePath, { '../src' : '../dst' } );
-  // test.identical( src.prefixPath, '/srcPrefix' );
-  // test.identical( src.basePath, { '../src' : '.' } );
-  // test.identical( dst.formed, 1 );
-  // test.identical( dst.filePath, { '../src' : '../dst' } );
-  // test.identical( dst.prefixPath, '/dstPrefix' );
-  // test.identical( dst.basePath, { '../dst' : '.' } );
-  // test.is( src.filePath === dst.filePath );
-  //
-  // dst.prefixesRelative();
-  // test.identical( src.formed, 1 );
-  // test.identical( src.filePath, { '../src' : '../dst' } );
-  // test.identical( src.prefixPath, '/srcPrefix' );
-  // test.identical( src.basePath, { '../src' : '.' } );
-  // test.identical( dst.formed, 1 );
-  // test.identical( dst.filePath, { '../src' : '../dst' } );
-  // test.identical( dst.prefixPath, '/dstPrefix' );
-  // test.identical( dst.basePath, { '../dst' : '.' } );
-  // test.is( src.filePath === dst.filePath );
-  //
-  // /* */
+  /* */
+
+  test.case = 'file path - map, single';
+  var osrc =
+  {
+    filePath : { '/src' : '/dst' }
+  }
+  var src = _.fileProvider.recordFilter( osrc );
+  src.prefixesRelative();
+
+  test.identical( src.formed, 1 );
+  test.identical( src.filePath, { '.' : '../dst' } );
+  test.identical( src.prefixPath, '/src' );
+
+  /* */
+
+  test.case = 'file path - map, single, src relative';
+  var osrc =
+  {
+    filePath : { './src' : '/dst' }
+  }
+  var src = _.fileProvider.recordFilter( osrc );
+  src.prefixesRelative();
+
+  test.identical( src.formed, 1 );
+  test.identical( src.filePath, { '.' : '/dst' } );
+  test.identical( src.prefixPath, './src' );
+
+  /* */
+
+  test.case = 'file path - map, single, dst relative';
+  var osrc =
+  {
+    filePath : { '/src' : './dst' }
+  }
+  var src = _.fileProvider.recordFilter( osrc );
+  src.prefixesRelative();
+
+  test.identical( src.formed, 1 );
+  test.identical( src.filePath, { '.' : './dst' } );
+  test.identical( src.prefixPath, '/src' );
+
+  /* */
+
+  test.case = 'file path - map, single, dst is true';
+  var osrc =
+  {
+    filePath : { '/src/a' : true, '/src/b' : '/dst/b' }
+  }
+  var src = _.fileProvider.recordFilter( osrc );
+  src.prefixesRelative();
+
+  test.identical( src.formed, 1 );
+  test.identical( src.filePath, { 'a' : true, 'b' : '../dst/b' } );
+  test.identical( src.prefixPath, '/src' );
+
+  /* */
+
+  test.case = 'file path - map';
+  var osrc =
+  {
+    filePath : { '/src' : '/dst' }
+  }
+  var odst =
+  {
+    filePath : osrc.filePath
+  }
+  var src = _.fileProvider.recordFilter( osrc );
+  var dst = _.fileProvider.recordFilter( odst );
+  src.filePath = dst.filePath;
+  test.is( src.filePath === dst.filePath );
+  src.pairWithDst( dst );
+  test.is( src.filePath === dst.filePath );
+
+  src.prefixesRelative();
+  test.identical( src.formed, 1 );
+  test.identical( src.filePath, { '.' : '/dst' } );
+  test.identical( src.prefixPath, '/src' );
+  test.identical( dst.formed, 1 );
+  test.identical( dst.filePath, { '.' : '/dst' } );
+  test.identical( dst.prefixPath, null );
+  test.is( src.filePath === dst.filePath );
+
+  dst.prefixesRelative();
+  test.identical( src.formed, 1 );
+  test.identical( src.filePath, { '.' : '.' } );
+  test.identical( src.prefixPath, '/src' );
+  test.identical( dst.formed, 1 );
+  test.identical( dst.filePath, { '.' : '.' } );
+  test.identical( dst.prefixPath, '/dst' );
+  test.is( src.filePath === dst.filePath );
+
+  /* */
+
+  test.case = 'file path - map, with bools';
+  var osrc =
+  {
+    filePath : { '/src/a' : '/dst', '/src/b' : true }
+  }
+  var odst =
+  {
+    filePath : osrc.filePath
+  }
+  var src = _.fileProvider.recordFilter( osrc );
+  var dst = _.fileProvider.recordFilter( odst );
+  src.filePath = dst.filePath;
+  test.is( src.filePath === dst.filePath );
+  src.pairWithDst( dst );
+  test.is( src.filePath === dst.filePath );
+
+  src.prefixesRelative();
+  test.identical( src.formed, 1 );
+  test.identical( src.filePath, { 'a' : '/dst', 'b' : true } );
+  test.identical( src.prefixPath, '/src' );
+  test.identical( dst.formed, 1 );
+  test.identical( dst.filePath, { 'a' : '/dst', 'b' : true } );
+  test.identical( dst.prefixPath, null );
+  test.is( src.filePath === dst.filePath );
+
+  dst.prefixesRelative();
+  test.identical( src.formed, 1 );
+  test.identical( src.filePath, { 'a' : '.', 'b' : true } );
+  test.identical( src.prefixPath, '/src' );
+  test.identical( dst.formed, 1 );
+  test.identical( dst.filePath, { 'a' : '.', 'b' : true } );
+  test.identical( dst.prefixPath, '/dst' );
+  test.is( src.filePath === dst.filePath );
+
+  /* */
+
+  test.case = 'file path - absolute map, prefix path - absolute string, base path - absolute map, no argument';
+  var osrc =
+  {
+    filePath : { '/src' : '/dst' },
+    prefixPath : '/srcPrefix',
+    basePath : { '/src' : '/srcPrefix' },
+  }
+  var odst =
+  {
+    filePath : { '/src' : '/dst' },
+    prefixPath : '/dstPrefix',
+    basePath : { '/dst' : '/dstPrefix' },
+  }
+  var src = _.fileProvider.recordFilter( osrc );
+  var dst = _.fileProvider.recordFilter( odst );
+  src.filePath = dst.filePath;
+  test.is( src.filePath === dst.filePath );
+  src.pairWithDst( dst );
+  test.is( src.filePath === dst.filePath );
+
+  src.prefixesRelative();
+  test.identical( src.formed, 1 );
+  test.identical( src.filePath, { '../src' : '/dst' } );
+  test.identical( src.prefixPath, '/srcPrefix' );
+  test.identical( src.basePath, { '../src' : '.' } );
+  test.identical( dst.formed, 1 );
+  test.identical( dst.filePath, { '../src' : '/dst' } );
+  test.identical( dst.prefixPath, '/dstPrefix' );
+  test.identical( dst.basePath, { '/dst' : '/dstPrefix' } );
+  test.is( src.filePath === dst.filePath );
+
+  dst.prefixesRelative();
+  test.identical( src.formed, 1 );
+  test.identical( src.filePath, { '../src' : '../dst' } );
+  test.identical( src.prefixPath, '/srcPrefix' );
+  test.identical( src.basePath, { '../src' : '.' } );
+  test.identical( dst.formed, 1 );
+  test.identical( dst.filePath, { '../src' : '../dst' } );
+  test.identical( dst.prefixPath, '/dstPrefix' );
+  test.identical( dst.basePath, { '../dst' : '.' } );
+  test.is( src.filePath === dst.filePath );
+
+  /* */
+
+  test.case = 'file path - absolute map, base path - absolute map, argument';
+  var osrc =
+  {
+    filePath : { '/src' : '/dst' },
+    prefixPath :  null,
+    basePath : { '/src' : '/srcPrefix' },
+  }
+  var odst =
+  {
+    filePath : { '/src' : '/dst' },
+    prefixPath : null,
+    basePath : { '/dst' : '/dstPrefix' },
+  }
+  var src = _.fileProvider.recordFilter( osrc );
+  var dst = _.fileProvider.recordFilter( odst );
+  src.filePath = dst.filePath;
+  test.is( src.filePath === dst.filePath );
+  src.pairWithDst( dst );
+  test.is( src.filePath === dst.filePath );
+
+  src.prefixesRelative( '/srcPrefix' );
+  test.identical( src.formed, 1 );
+  test.identical( src.filePath, { '../src' : '/dst' } );
+  test.identical( src.prefixPath, '/srcPrefix' );
+  test.identical( src.basePath, { '../src' : '.' } );
+  test.identical( dst.formed, 1 );
+  test.identical( dst.filePath, { '../src' : '/dst' } );
+  test.identical( dst.prefixPath, null );
+  test.identical( dst.basePath, { '/dst' : '/dstPrefix' } );
+  test.is( src.filePath === dst.filePath );
+
+  dst.prefixesRelative( '/dstPrefix' );
+  test.identical( src.formed, 1 );
+  test.identical( src.filePath, { '../src' : '../dst' } );
+  test.identical( src.prefixPath, '/srcPrefix' );
+  test.identical( src.basePath, { '../src' : '.' } );
+  test.identical( dst.formed, 1 );
+  test.identical( dst.filePath, { '../src' : '../dst' } );
+  test.identical( dst.prefixPath, '/dstPrefix' );
+  test.identical( dst.basePath, { '../dst' : '.' } );
+  test.is( src.filePath === dst.filePath );
+
+  /* */
+
+  test.case = 'file path - relative map, prefix path - absolute string, base path - relative map, no argument';
+  var osrc =
+  {
+    filePath : { '../src' : '../dst' },
+    prefixPath : '/srcPrefix',
+    basePath : { '../src' : '.' },
+  }
+  var odst =
+  {
+    filePath : { '../src' : '../dst' },
+    prefixPath : '/dstPrefix',
+    basePath : { '../dst' : '.' },
+  }
+  var src = _.fileProvider.recordFilter( osrc );
+  var dst = _.fileProvider.recordFilter( odst );
+  src.filePath = dst.filePath;
+  test.is( src.filePath === dst.filePath );
+  src.pairWithDst( dst );
+  test.is( src.filePath === dst.filePath );
+
+  src.prefixesRelative();
+  test.identical( src.formed, 1 );
+  test.identical( src.filePath, { '../src' : '../dst' } );
+  test.identical( src.prefixPath, '/srcPrefix' );
+  test.identical( src.basePath, { '../src' : '.' } );
+  test.identical( dst.formed, 1 );
+  test.identical( dst.filePath, { '../src' : '../dst' } );
+  test.identical( dst.prefixPath, '/dstPrefix' );
+  test.identical( dst.basePath, { '../dst' : '.' } );
+  test.is( src.filePath === dst.filePath );
+
+  dst.prefixesRelative();
+  test.identical( src.formed, 1 );
+  test.identical( src.filePath, { '../src' : '../dst' } );
+  test.identical( src.prefixPath, '/srcPrefix' );
+  test.identical( src.basePath, { '../src' : '.' } );
+  test.identical( dst.formed, 1 );
+  test.identical( dst.filePath, { '../src' : '../dst' } );
+  test.identical( dst.prefixPath, '/dstPrefix' );
+  test.identical( dst.basePath, { '../dst' : '.' } );
+  test.is( src.filePath === dst.filePath );
+
+  /* */
 
   test.case = 'file path - relative map, prefix path - absolute string, base path - relative map, no argument';
   var osrc =
@@ -1156,9 +1232,7 @@ function prefixesRelative( test )
   test.identical( src.filePath, null );
   test.identical( dst.filePath, '/a/b' );
 
-  debugger;
   dst.prefixesRelative();
-  debugger;
   test.identical( src.formed, 1 );
   test.identical( src.filePath, null );
   test.identical( src.prefixPath, null );
@@ -1168,7 +1242,6 @@ function prefixesRelative( test )
   test.identical( dst.prefixPath, '/a/b' );
   test.identical( dst.basePath, '.' );
   test.is( src.filePath !== dst.filePath );
-  debugger;
 
 }
 
@@ -1452,12 +1525,12 @@ src.toStr()
   });
 
   var f1 = extract1.recordFilter();
-  f1.prefixPath = '/commonDir/filter1'
+  f1.prefixPath = '/commonDir/filter1';
   f1.basePath = './proto';
   f1.filePath = { 'f' : true, 'd' : true, 'ex' : false, 'f1' : true, 'd1' : true, 'ex1' : false, 'ex3' : true, 'ex4' : false }
 
   var f2 = extract1.recordFilter();
-  f2.prefixPath = '/commonDir/filter2'
+  f2.prefixPath = '/commonDir/filter2';
   f2.basePath = './proto';
   f2.filePath = { 'f' : true, 'd' : true, 'ex' : false, 'f2' : true, 'd2' : true, 'ex2' : false, 'ex3' : false, 'ex4' : true }
 
@@ -1482,9 +1555,7 @@ src.toStr()
   test.identical( f3.filePath, expectedFilePath );
   test.identical( f3.basePath, expectedBasePath );
 
-  debugger;
   f3.pathsInherit( f2 );
-  debugger;
 
   var expectedFilePath =
   {
@@ -2109,8 +2180,6 @@ function pairRefine( test )
 
   test.is( dst.filePath === src.filePath );
 
-  debugger; return; xxx
-
 /*
 
 reflector.src.toStr()
@@ -2319,7 +2388,6 @@ var Self =
 
   name : 'Tools/mid/files/RecordFilter',
   silencing : 1,
-  routineTimeOut : 300000, // xxx
 
   onSuiteBegin,
   onSuiteEnd,

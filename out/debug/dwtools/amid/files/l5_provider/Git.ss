@@ -120,7 +120,7 @@ function pathParse( remotePath )
 
   /* */
 
-  debugger;
+  // debugger;
   let parsed1 = path.parseConsecutive( remotePath );
   parsed1.hash = parsed1.hash || 'master';
   _.mapExtend( result, parsed1 );
@@ -178,7 +178,7 @@ function pathParse( remotePath )
 
   /* */
 
-  debugger;
+  // debugger;
   _.assert( !_.boolLike( result.hash ) );
   return result
 

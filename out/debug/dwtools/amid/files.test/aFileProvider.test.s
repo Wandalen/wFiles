@@ -4588,7 +4588,7 @@ function fileCopyActSync( test )
 
   //
 
-  test.case = 'should not extend or delete fields of options map, no _providerDefaults, routineOptions';
+  test.case = 'should not extend or delete fields of options map, no _providerDefaultsApply, routineOptions';
   provider.filesDelete( /*dir*/testPath );
   var srcPath = /*_.path*/path.join( /*dir*/testPath,'src' );
   provider.fileWrite( srcPath, srcPath );
@@ -4662,7 +4662,7 @@ function fileCopyActSync( test )
 
   //
 
-  test.case = 'should not extend or delete fields of options map, no _providerDefaults, routineOptions';
+  test.case = 'should not extend or delete fields of options map, no _providerDefaultsApply, routineOptions';
   var srcPath = /*_.path*/path.join( /*dir*/testPath,'src' );;
   var dstPath = /*_.path*/path.join( /*dir*/testPath,'dst' );
 
@@ -11312,7 +11312,7 @@ function fileRenameActSync( test )
 
   //
 
-  test.case = 'should not extend or delete fields of options map, no _providerDefaults, routineOptions';
+  test.case = 'should not extend or delete fields of options map, no _providerDefaultsApply, routineOptions';
   provider.filesDelete( /*dir*/testPath );
   var srcPath = /*_.path*/path.join( /*dir*/testPath,'src' );
   provider.fileWrite( srcPath, srcPath );
@@ -11402,7 +11402,7 @@ function fileRenameActSync( test )
 
   //
 
-  test.case = 'should not extend or delete fields of options map, no _providerDefaults, routineOptions';
+  test.case = 'should not extend or delete fields of options map, no _providerDefaultsApply, routineOptions';
   var srcPath = /*_.path*/path.join( /*dir*/testPath,'src' );;
   var dstPath = /*_.path*/path.join( /*dir*/testPath,'dst' );
 
@@ -12323,7 +12323,7 @@ function fileDeleteActSync( test )
 
   //
 
-  test.case = 'should not extend or delete fields of options map, no _providerDefaults, routineOptions';
+  test.case = 'should not extend or delete fields of options map, no _providerDefaultsApply, routineOptions';
   var srcPath = /*_.path*/path.join( /*dir*/testPath,'src' );
   provider.fileWrite( srcPath, srcPath );
   var o =
@@ -12358,7 +12358,7 @@ function fileDeleteActSync( test )
 
   //
 
-  test.case = 'should not extend or delete fields of options map, no _providerDefaults, routineOptions';
+  test.case = 'should not extend or delete fields of options map, no _providerDefaultsApply, routineOptions';
   var srcPath = /*_.path*/path.join( /*dir*/testPath,'src' );
 
   /* sync option is missed */
@@ -13594,7 +13594,7 @@ function statReadActSync( test )
 
   //
 
-  test.case = 'should not extend or delete fields of options map, no _providerDefaults, routineOptions';
+  test.case = 'should not extend or delete fields of options map, no _providerDefaultsApply, routineOptions';
   var srcPath = /*_.path*/path.join( /*dir*/testPath,'src' );
   provider.fileWrite( srcPath, srcPath );
   var o =
@@ -13692,7 +13692,7 @@ function statReadActSync( test )
 
   //
 
-  test.case = 'should not extend or delete fields of options map, no _providerDefaults, routineOptions';
+  test.case = 'should not extend or delete fields of options map, no _providerDefaultsApply, routineOptions';
   var srcPath = /*_.path*/path.join( /*dir*/testPath,'src' );
 
   /* sync option is missed */
@@ -20383,7 +20383,7 @@ function softLinkActSync( test )
 
   //
 
-  test.case = 'should not extend or delete fields of options map, no _providerDefaults, routineOptions';
+  test.case = 'should not extend or delete fields of options map, no _providerDefaultsApply, routineOptions';
   var srcPath = /*_.path*/path.join( /*dir*/testPath,'src' );
   provider.fileWrite( srcPath, srcPath );
   var dstPath = /*_.path*/path.join( /*dir*/testPath,'dst' );
@@ -20470,7 +20470,7 @@ function softLinkActSync( test )
 
   //
 
-  test.case = 'should not extend or delete fields of options map, no _providerDefaults, routineOptions';
+  test.case = 'should not extend or delete fields of options map, no _providerDefaultsApply, routineOptions';
   var srcPath = /*_.path*/path.join( /*dir*/testPath,'src' );;
   var dstPath = /*_.path*/path.join( /*dir*/testPath,'dst' );
 
@@ -23962,7 +23962,7 @@ function hardLinkActSync( test )
 
   //
 
-  test.case = 'should not extend or delete fields of options map, no _providerDefaults, routineOptions';
+  test.case = 'should not extend or delete fields of options map, no _providerDefaultsApply, routineOptions';
   var srcPath = /*_.path*/path.join( /*dir*/testPath,'src' );
   provider.fileWrite( srcPath, srcPath );
   var dstPath = /*_.path*/path.join( /*dir*/testPath,'dst' );
@@ -24052,7 +24052,7 @@ function hardLinkActSync( test )
 
   //
 
-  test.case = 'should not extend or delete fields of options map, no _providerDefaults, routineOptions';
+  test.case = 'should not extend or delete fields of options map, no _providerDefaultsApply, routineOptions';
   var srcPath = /*_.path*/path.join( /*dir*/testPath,'src' );;
   var dstPath = /*_.path*/path.join( /*dir*/testPath,'dst' );
 

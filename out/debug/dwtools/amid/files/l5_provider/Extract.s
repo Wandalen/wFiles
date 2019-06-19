@@ -2221,7 +2221,7 @@ function _descriptorResolve( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( o.descriptor );
   _.routineOptions( _descriptorResolve, o );
-  self._providerDefaults( o );
+  self._providerDefaultsApply( o );
   _.assert( !o.resolvingTextLink );
 
   if( self._descriptorIsHardLink( o.descriptor ) /* && self.resolvingHardLink */ )
@@ -2267,7 +2267,7 @@ _descriptorResolve.defaults =
 //   _.assert( arguments.length === 1, 'Expects single argument' );
 //   _.assert( o.descriptor );
 //   _.routineOptions( _descriptorResolve, o );
-//   self._providerDefaults( o );
+//   self._providerDefaultsApply( o );
 //   _.assert( !o.resolvingTextLink );
 
 //   let descriptor = self._descriptorRead( o.descriptor );

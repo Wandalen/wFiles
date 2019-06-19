@@ -27,7 +27,7 @@ _.assert( _.routineIs( _.path.join ) );
  Act version of method :
 
 - should assert that path is absolute
-- should not extend or delete fields of options map, no _providerDefaults, routineOptions
+- should not extend or delete fields of options map, no _providerDefaultsApply, routineOptions
 - should path.nativize all paths in options map if needed by its own means
 - should expect normalized path, but not nativized
 - should expect ready options map, no complex arguments preprocessing
@@ -250,7 +250,7 @@ function MakeDefault()
 // etc
 // --
 
-function _providerDefaults( o )
+function _providerDefaultsApply( o )
 {
   let self = this;
 
@@ -276,18 +276,20 @@ function _providerDefaults( o )
 
 }
 
+//
+
 function assertProviderDefaults( o )
 {
   let self = this;
 
-  _.assert( _.objectIs( o ), 'Expects map { o }' );
-  _.assert( o.verbosity === null, 'Verbosity was not set to provider default' )
+  _.assert( _.mapIs( o ), 'Expects options map { o }' );
+  _.assert( o.verbosity !== null, 'Verbosity was not set to provider default' );
 
   for( let k in self.ProviderDefaults )
   {
     if( o[ k ] === null )
     if( self[ k ] !== undefined && self[ k ] !== null )
-    _.assert( 0, k, 'was not set to provider default' )
+    _.assert( 0, k, 'was not set to provider default' );
   }
 
 }
@@ -328,7 +330,7 @@ function _preFilePathScalarWithProviderDefaults( routine, args )
   // if( o.verbosity === null )
   // o.verbosity = _.numberClamp( self.verbosity - 4, 0, 9 );
 
-  self._providerDefaults( o );
+  self._providerDefaultsApply( o );
 
   return o;
 }
@@ -369,7 +371,7 @@ function _preFilePathVectorWithProviderDefaults( routine, args )
 
   let o = self._preFilePathVectorWithoutProviderDefaults.apply( self, arguments );
 
-  self._providerDefaults( o );
+  self._providerDefaultsApply( o );
 
   return o;
 }
@@ -415,7 +417,7 @@ function _preFileFilterWithProviderDefaults( routine, args )
 {
   let self = this;
   let o = self._preFileFilterWithoutProviderDefaults.apply( self, arguments );
-  self._providerDefaults( o );
+  self._providerDefaultsApply( o );
   return o;
 }
 
@@ -462,7 +464,7 @@ function _preSrcDstPathWithProviderDefaults( routine, args )
   // if( o.verbosity === null )
   // o.verbosity = _.numberClamp( self.verbosity - 4, 0, 9 );
 
-  self._providerDefaults( o );
+  self._providerDefaultsApply( o );
 
   return o;
 }
@@ -2390,7 +2392,7 @@ function fileRead_pre( routine, args )
   // if( o.verbosity === null )
   // o.verbosity = _.numberClamp( self.verbosity - 5, 0, 9 );
 
-  self._providerDefaults( o );
+  self._providerDefaultsApply( o );
 
   return o;
 }
@@ -2508,9 +2510,7 @@ function fileRead_body( o )
     }
 
     if( o.verbosity >= 1 )
-    self.logger.log( ' . Read :', _.color.strFormat( o.filePath, 'path' ) );
-    // if( o.verbosity >= 1 )
-    // debugger;
+    self.logger.log( ' . Read .', _.color.strFormat( o.filePath, 'path' ) );
 
     o.result = data;
 
@@ -2807,7 +2807,7 @@ function _fileInterpret_pre( routine, args )
 
   _.routineOptions( routine, o );
   let encoding = o.encoding;
-  self._providerDefaults( o );
+  self._providerDefaultsApply( o );
   o.encoding = encoding;
 
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
@@ -3165,7 +3165,7 @@ function dirRead_pre( routine, args )
   // o = { filePath : self.path.from( o ) };
   //
   // _.routineOptions( routine, o );
-  // self._providerDefaults( o );
+  // self._providerDefaultsApply( o );
   //
   // _.assert( self.path.isAbsolute( o.filePath ) );
   //
@@ -4294,7 +4294,7 @@ function fileWrite_pre( routine, args )
 
   _.assert( o.data !== undefined, 'Expects defined {-o.data-}' );
   _.routineOptions( routine, o );
-  self._providerDefaults( o );
+  self._providerDefaultsApply( o );
   _.assert( _.strIs( o.filePath ), 'Expects string {-o.filePath-}' );
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
 
@@ -4640,7 +4640,7 @@ function fileTouch_pre( routine, args )
   }
 
   _.routineOptions( routine, o );
-  self._providerDefaults( o );
+  self._providerDefaultsApply( o );
   _.assert( _.strIs( o.filePath ), 'Expects string {-o.filePath-}, but got', _.strType( o.filePath ) );
 
   return o;
@@ -6833,7 +6833,7 @@ function fileExchange_pre( routine, args )
   }
 
   _.routineOptions( routine, o );
-  self._providerDefaults( o );
+  self._providerDefaultsApply( o );
   _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
 
   return o;
@@ -7638,7 +7638,7 @@ let Proto =
   // etc
 
   _fileOptionsGet,
-  _providerDefaults,
+  _providerDefaultsApply,
   assertProviderDefaults,
   _preFilePathScalarWithoutProviderDefaults,
   _preFilePathScalarWithProviderDefaults,

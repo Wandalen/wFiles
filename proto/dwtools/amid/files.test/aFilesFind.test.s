@@ -744,10 +744,6 @@ function filesFindMaskTerminal( test )
   var filter =  { maskTerminal : './filesFindMaskTerminal/package.json' }
   var got = provider.filesFind({ filePath : testPath, filter : filter });
   test.identical( got.length, 0 );
-  // test.identical( got[ 0 ].absolute, terminalPath );
-  // test.identical( got[ 0 ].relative, './package.json' );
-  // test.identical( got[ 0 ].superRelative, './filesFindMaskTerminal/package.json' );
-  // test.identical( got[ 0 ].isActual, true );
 
 }
 
@@ -853,6 +849,42 @@ function filesFindCriticalCases( test )
 
   var expected = [ './dir1', './dir1/a', './dir1/b', './dir2', './dir2/c' ];
   test.identical( found, expected );
+
+  /* */
+
+  test.case = 'base path + empty file path';
+
+  var extract = _.FileProvider.Extract
+  ({
+    filesTree : { dir1 : { a : 1, b : 2 }, dir2 : { c : 3 }, dir3 : { d : 4 }, e : 5 },
+  });
+
+  let op =
+  {
+    'filePath' : '/dir1',
+    'recursive' : null,
+    'filter' :
+    {
+      'maskTerminal' :
+      {
+        'excludeAny' :
+        [
+          /\.DS_Store$/,
+          /(^|\/)-/,
+          /\.out(\.|$)/,
+        ],
+        'includeAll' : []
+      }
+    },
+    'maskPreset' : 0,
+    'outputFormat' : 'relative',
+  }
+
+  var got = extract.filesFind( op );
+  var expected = [ './a', './b' ];
+  test.identical( got, expected );
+
+  /* */
 
   if( Config.debug )
   {

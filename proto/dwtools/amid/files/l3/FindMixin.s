@@ -30,7 +30,7 @@ let Self = function wFileProviderFind( o )
 
 Self.shortName = 'Find';
 
-let debugPath = '/release';
+// let debugPath = '/release';
 
 // --
 // etc
@@ -1699,8 +1699,8 @@ function filesReflectEvaluate_body( o )
   function handleUp( record, op )
   {
 
-    if( _.strEnds( record.dst.absolute, debugPath ) )
-    debugger;
+    // if( _.strEnds( record.dst.absolute, debugPath ) )
+    // debugger;
 
     if( touchMap[ record.dst.absolute ] )
     touch( record, touchMap[ record.dst.absolute ] );
@@ -1919,8 +1919,8 @@ function filesReflectEvaluate_body( o )
   function handleDown( record, op )
   {
 
-    if( _.strEnds( record.dst.absolute, debugPath ) )
-    debugger;
+    // if( _.strEnds( record.dst.absolute, debugPath ) )
+    // debugger;
 
     if( touchMap[ record.dst.absolute ] )
     touch( record, touchMap[ record.dst.absolute ] );

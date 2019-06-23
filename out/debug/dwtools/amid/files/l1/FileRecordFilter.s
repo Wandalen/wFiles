@@ -770,11 +770,11 @@ function prefixesRelative( prefixPath )
     if( filter.filePath )
     {
       if( filter.srcFilter )
-      filter.filePath = path.pathMapRefilter( filter.filePath, relative_functor( 'dst' ) );
+      filter.filePath = path.pathMapFilterInplace( filter.filePath, relative_functor( 'dst' ) );
       else if( filter.dstFilter )
-      filter.filePath = path.pathMapRefilter( filter.filePath, relative_functor( 'src' ) );
+      filter.filePath = path.pathMapFilterInplace( filter.filePath, relative_functor( 'src' ) );
       else
-      filter.filePath = path.pathMapRefilter( filter.filePath, relative_functor() );
+      filter.filePath = path.pathMapFilterInplace( filter.filePath, relative_functor() );
     }
 
     filter.prefixPath = prefixPath;
@@ -2183,7 +2183,7 @@ function filePathNullizeMaybe( filePath )
   if( _.any( filePath2, ( e ) => !_.boolLike( e ) ) )
   return filePath;
 
-  return path.pathMapRefilter( filePath, ( e ) => _.boolLike( e ) && e ? null : e );
+  return path.pathMapFilterInplace( filePath, ( e ) => _.boolLike( e ) && e ? null : e );
 }
 
 //

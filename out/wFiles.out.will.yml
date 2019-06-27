@@ -31,14 +31,14 @@ path:
     path: wFiles.out.will.yml
     criterion:
       predefined: 1
+  module.common:
+    path: wFiles.out
+    criterion:
+      predefined: 1
   module.original.willfiles:
     path:
       - ../.im.will.yml
       - ../.ex.will.yml
-    criterion:
-      predefined: 1
-  module.common:
-    path: wFiles.out
     criterion:
       predefined: 1
   local:

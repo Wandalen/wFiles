@@ -6271,7 +6271,7 @@ function fileCopyAsync( test )
   /**/
 
   .finally( function()
-  { 
+  {
     debugger
     var con = provider.fileCopy
     ({
@@ -6997,7 +6997,7 @@ function fileCopySoftLinkResolving( test )
   let self = this;
   let provider = self.provider;
   let path = provider.path;
- 
+
   if( !_.routineIs( provider.fileCopy ) )
   {
     test.identical( 1,1 );
@@ -7264,7 +7264,7 @@ function fileCopySoftLinkResolving( test )
   test.open( 'self cycled' );
 
   /* dst does not exist */
-  
+
   provider.filesDelete( /*workDir*/testPath );
   provider.dirMake( /*workDir*/testPath );
   provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromLocal( '../src' ), allowingMissed : 1 });
@@ -12820,7 +12820,7 @@ function fileDeleteLocked( test )
   let self = this;
   let provider = self.provider;
   let path = provider.path;
-  
+
   let skip = !self.providerIsInstanceOf( _.FileProvider.HardDrive ) || self.providerIsInstanceOf( _.FileProvider.Hub );
 
   if( skip )
@@ -12926,9 +12926,6 @@ function fileDeletePerfomance( test )
   let self = this;
   let provider = self.provider;
   let path = provider.path;
-
-  //
-
   let testPath = self.pathFor( 'write/fileDeletePerfomance' );
   let files = 1;
 
@@ -20368,12 +20365,12 @@ function softLinkActSync( test )
   }
 
   var expected = _.mapExtend( null, o );
-  
+
   if( !( provider instanceof _.FileProvider.Hub ) )
   if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   if( process.platform === 'win32' )
   expected.type = 'file'
-  
+
   provider.softLinkAct( o );
   test.identical( o, expected );
   test.is( provider.isSoftLink( dstPath ) );
@@ -24091,7 +24088,7 @@ function hardLinkActSync( test )
   });
 
   //
-  
+
   test.case = 'should expect normalized path, but not nativized';
   var srcPath = /*dir*/testPath + '\\src';
   provider.fileWrite( srcPath, srcPath );
@@ -29699,7 +29696,7 @@ function isTextLink( test )
   let filePath = test.context.pathFor( 'written/isTextLink/file' );
   let filePath2 = test.context.pathFor( 'written/isTextLink/file2' );
   let linkPath = test.context.pathFor( 'written/isTextLink/link' );
-  
+
   /**/
 
   provider.fieldPush( 'usingTextLink', 0 )
@@ -33849,9 +33846,9 @@ function record( test )
 
   test.is( providerEffective.hub === hub );
   test.is( _.arrayHas( _.mapKeys( hub.providersWithProtocolMap ), providerEffective.protocol ) );
-  
+
   let filePath = test.context.globalFromLocal( '/record/terminal' );
-  
+
   var record = self.provider.record( filePath );
 
   test.identical( record.absolute, filePath );
@@ -33877,7 +33874,7 @@ function localsFromGlobals( test )
   test.case = 'relative';
   var got = provider.path.localsFromGlobals( 'a' );
   test.identical( got, 'a' );
-  
+
   test.case = 'single global string';
   var got = provider.path.localsFromGlobals( 'global:///a' );
   test.identical( got, '/a' )
@@ -37924,7 +37921,7 @@ function EncodersGenerate( test )
   let provider = self.provider;
   let writeConverters = _.Gdf.InMap[ 'structure' ];
   let readConverters = _.Gdf.OutMap[ 'structure' ];
-  
+
   //
 
   test.case = 'check if all write encoders are generated';
@@ -37965,7 +37962,7 @@ function EncodersGenerate( test )
   test.is( _.mapIs( encoder ) );
   test.identical( encoder.exts, converter.ext );
   test.identical( encoder.converter, converter );
-  
+
   test.will = 'finit converter, encoder should exist';
   converter.finit();
   test.is( _.mapIs( _.FileWriteEncoders[ 'testEncoder' ] ) );
@@ -37974,7 +37971,7 @@ function EncodersGenerate( test )
   test.is( !_.FileWriteEncoders[ 'testEncoder' ] );
 
   //
-  
+
   test.case = 'adjust converter exts'
   var testConverter =
   {

@@ -335,6 +335,8 @@ function filesFindSingle_body( o )
     if( !r.isTransient && !r.isActual )
     return;
 
+    // logger.log( 'forDirectory', r.absolute );
+
     let or = r;
     let isTransient = r.isTransient;
     let includingTransient = ( o.includingTransient && r.isTransient && o.includingDirs );
@@ -381,18 +383,6 @@ function filesFindSingle_body( o )
 
       files = self.path.s.join( or.absolute, files );
       files = or.factory.records( files );
-
-      // if( Config.debug )
-      // for( let f = 0 ; f < files.length ; f++ )
-      // {
-      //   let file = files[ f ];
-      //   if( file.absolute === or.absolute )
-      //   {
-      //     debugger;
-      //     let files = o.filter.effectiveFileProvider.dirRead({ filePath : or.absolute, outputFormat : 'absolute' });
-      //     _.assert( file.absolute !== or.absolute, 'Something wrong with {- dirRead -}' );
-      //   }
-      // }
 
       /* terminals */
 

@@ -11982,6 +11982,60 @@ function filesReflectDstPreserving( test )
   test.is( extract.isTerminal( '/dst/dir-s/file' ) );
   test.identical( context.select( extract.filesTree, '/src/dir-d/file-d' ), context.select( filesTree, '/src/dir-d/file-d' ) );
   test.identical( context.select( extract.filesTree, '/dst/dir-d/file-d' ), context.select( filesTree, '/dst/dir-d/file-d' ) );
+  
+  /*  */
+  
+  var filesTree = 
+  {
+    src : 
+    {
+      file1 : 'file1',
+      file2 : 'file2',
+    },
+    dst : 
+    {
+    } 
+  }
+  
+  test.case = 'reflect two terminals to same dst path, src termianls have different content, dstRewritingPreserving : 0';
+  var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
+  var o =
+  {
+    reflectMap : 
+    { 
+      '/src/file1' : '/dst/file',
+      '/src/file2' : '/dst/file' 
+    },
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingPreserving : 0
+  }
+  test.mustNotThrowError( () => extract.filesReflect( o ) );
+  test.is( extract.isTerminal( '/dst/file' )  );
+  test.identical( context.select( extract.filesTree, '/src/file2' ), context.select( extract.filesTree, '/dst/file' ) );
+  
+  //
+  
+  test.case = 'reflect two terminals to same dst path, src termianls have different content, dstRewritingPreserving : 1';
+  var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
+  var o =
+  {
+    reflectMap : 
+    { 
+      '/src/file1' : '/dst/file',
+      '/src/file2' : '/dst/file' 
+    },
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingPreserving : 1
+  }
+  test.shouldThrowErrorSync( () => extract.filesReflect( o ) );
+  test.is( !extract.fileExists( '/dst/file' )  );
+  test.identical( context.select( extract.filesTree, '/src/file1' ), 'file1' );
+  test.identical( context.select( extract.filesTree, '/src/file2' ), 'file2' );
+  test.is( !context.select( extract.filesTree, '/dst/file' ) );
 }
 
 //

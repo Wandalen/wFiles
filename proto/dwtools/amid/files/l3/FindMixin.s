@@ -1756,7 +1756,7 @@ function filesReflectEvaluate_body( o )
 
     // if( _.strEnds( record.dst.absolute, debugPath ) )
     // debugger;
-
+    
     let a = actionMap[ record.dst.absolute ];
     let t = touchMap[ record.dst.absolute ];
 
@@ -1768,7 +1768,7 @@ function filesReflectEvaluate_body( o )
       record.include = false;
       return record
     }
-
+    
     // if( _.strEnds( record.dst.absolute, debugPath ) )
     // debugger;
 
@@ -1847,8 +1847,14 @@ function filesReflectEvaluate_body( o )
     {
 
       if( !record.dst.stat )
-      {
+      { 
         /* src is terminal, dst does not exist */
+        
+        /* checks if terminals with equal dst path are same before link */
+        if( record.src.isTerminal )
+        if( o.writing && o.dstRewriting && o.dstRewritingPreserving && a )
+        checkSrcTerminalsSameDst( record, op );
+        
         link( record );
 
       }
@@ -1872,7 +1878,7 @@ function filesReflectEvaluate_body( o )
 
         if( record.src.isActual )
         {
-
+          
           if( shouldPreserve( record ) )
           record.preserve = true;
 
@@ -1889,7 +1895,7 @@ function filesReflectEvaluate_body( o )
         }
         else
         {
-
+          
           if( record.reason !== 'srcLooking' && o.dstDeleting )
           fileDelete( record );
           else
@@ -2693,7 +2699,34 @@ function filesReflectEvaluate_body( o )
     }
 
   }
-
+  
+  //
+  
+  function checkSrcTerminalsSameDst( record, op )
+  { 
+    for( let i = op.result.length - 1; i >= 0; i-- )
+    {
+      let result = op.result[ i ];
+      if( result.dst.absolute === record.dst.absolute )
+      { 
+        if( result.src.isTerminal )
+        {  
+          if( !self.filesAreSame( result.src, record.src, true ) )
+          if( result.src.stat.size !== 0 || record.src.stat.size !== 0 )
+          { 
+            debugger
+            throw _.err
+            (
+              'Can\'t rewrite' + ' ' + 'terminal file ' + _.strQuote( record.dst.absolute ) + '\n' +
+              'by terminal file ' + _.strQuote( record.src.absolute ) + '\n' +
+              'files have different content'
+            );
+          }
+        } 
+        break;
+      }
+    }
+  }
 }
 
 let filesReflectSingleDefaults = Object.create( null );

@@ -5984,8 +5984,13 @@ function _link_functor( gen )
     /* - */
 
     function tempNameMake( filePath )
-    {
-      return filePath + '-' + _.idWithGuid() + '.tmp';
+    { 
+      let postfix = '-' + _.idWithGuid() + '.tmp';
+      
+      if( _.strEnds( filePath, '/' ) )
+      return _.strReplaceEnd( filePath, '/', postfix )
+      
+      return filePath + postfix;
     }
 
     /* - */

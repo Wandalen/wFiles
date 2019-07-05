@@ -34029,7 +34029,7 @@ function pathResolve( test )
 
   test.case = 'join windows os paths';
   var got = resolve( 'c:\\', 'foo\\', 'bar\\' );
-  var expected = '/c/foo/bar';
+  var expected = '/c/foo/bar/';
   test.identical( got, expected );
 
   test.case = 'join unix os paths';

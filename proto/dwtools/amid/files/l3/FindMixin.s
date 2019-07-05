@@ -4005,13 +4005,12 @@ function filesDelete_body( o )
       file.isTransient = true;
       o.result.push( file );
       if( o.writing )
-      {
-        if( o.sync )
-        fileDelete( file );
-        else
-        con.thenKeep( () => fileDelete( file ) );
-      }
+      fileDelete( file );
+      
+      if( o.sync )
       return end();
+      else
+      return con.then( () => end() );
     }
   }
 
@@ -4027,69 +4026,51 @@ function filesDelete_body( o )
   _.assert( o.result === o2.result );
 
   /* */
-
+  
+  /* qqq : refactor please this brute-hack ( filesDelete_body )
+    does it work at all??
+    result array should not depend on option writing!
+    deletingEmptyDirs should not delete files, but only change result array.
+    handleWriting should be only deleting subroutine
+    deletingEmptyDirs should goes between handleResult and handleWriting
+  */
+  
   if( o.sync )
   {
-    provider.filesFind.body.call( provider, o2 );
+    provider.filesFind.body.call( provider, o2 )
     handleResult();
-
+    if( o.deletingEmptyDirs )
+    deletingEmptyDirs();
     if( o.writing )
     handleWriting();
-
-    if( o.deletingEmptyDirs && o.result.length )
-    deletingEmptyDirs();
-
-    /* qqq : refactor please this brute-hack ( filesDelete_body )
-      does it work at all??
-      result array should not depend on option writing!
-      deletingEmptyDirs should not delete files, but only change result array.
-      handleWriting should be only deleting subroutine
-      deletingEmptyDirs should goes between handleResult and handleWriting
-    */
-
+    return end();
   }
   else
   {
-    con.thenKeep( () => provider.filesFind.body.call( provider, o2 ) );
-    con.thenKeep( () => handleResult() );
-
-    if( o.writing )
-    con.thenKeep( () => handleWriting() );
-
+    con.then( provider.filesFind.body.call( provider, o2 ) );
+    con.then( () => handleResult() );
     if( o.deletingEmptyDirs )
-    con.thenKeep( () =>
-    {
-      if( !o.result.length )
-      return null;
-      return deletingEmptyDirs();
-    })
+    con.then( () => deletingEmptyDirs() );
+    if( o.writing )
+    con.then( () => handleWriting() );
+    con.then( () => end() );
+    return con;
   }
 
-  /* */
-
-  return end();
-
   /* - */
-
+  
   function handleWriting()
   {
-    let con;
-    if( !o.sync )
-    con = new _.Consequence().take( null );
-
     for( let f = o.result.length-1 ; f >= 0 ; f-- )
     {
       let file = o.result[ f ];
       if( file.isActual && file.absolute !== '/' )
-      if( o.sync )
-      fileDelete( file )
-      else
-      con.thenKeep( () => fileDelete( file ) );
+      fileDelete( file );
     }
-    return con;
+    return true;
   }
-
-  /*  */
+  
+  /* - */
 
   function handleResult()
   {
@@ -4140,25 +4121,14 @@ function filesDelete_body( o )
 
     return true;
   }
-
+  
   /* - */
-
+  
   function end()
-  {
-    if( o.sync )
-    return endSync();
-    else
-    return con.thenKeep( () => endSync() );
-  }
-
-  /* - */
-
-  function endSync()
   {
 
     if( o.verbosity >= 1 )
     {
-
       let spentTime = _.timeNow() - time;
       let groupsMap = path.group({ keys : o.filter.filePath, vals : o.result });
       let textualReport = path.groupTextualReport
@@ -4186,8 +4156,16 @@ function filesDelete_body( o )
   }
 
   /* - */
-
+  
   function fileDelete( file )
+  {
+    if( o.sync )
+    _fileDelete( file );
+    else
+    con.then( () => _fileDelete( file ) );
+  }
+
+  function _fileDelete( file )
   {
     let o2 =
     {
@@ -4198,6 +4176,7 @@ function filesDelete_body( o )
       safe : o.safe,
       sync : o.sync,
     }
+    
     let r = file.factory.effectiveFileProvider.fileDelete( o2 );
     if( r === null )
     if( o.verbosity )
@@ -4208,58 +4187,44 @@ function filesDelete_body( o )
   /* - */
 
   function deletingEmptyDirs()
-  {
-    let delMap = Object.create( null );
-    let factory = o.result[ 0 ].factory;
-
-    for( let f = o.result.length-1 ; f >= 0 ; f-- )
-    {
-      let file = o.result[ f ];
-      delMap[ file.absolute ] = 1;
-    }
-
-    let dirsFile = [];
+  { 
+    if( !o.result.length )
+    return true;
+    
     let dirsPath = path.chainToRoot( o.result[ 0 ].dir );
-
+    let factory = o.result[ 0 ].factory;
+    let filesMap = Object.create( null );
+    
+    _.each( o.result, ( r ) => filesMap[ r.absolute ] = r );
+    
     for( let d = dirsPath.length-1 ; d >= 0 ; d-- )
-    {
+    { 
       let dirPath = dirsPath[ d ];
       let files = provider.dirRead({ filePath : dirPath, outputFormat : 'absolute' });
 
       for( let f = files.length-1 ; f >= 0 ; f-- )
-      if( delMap[ files[ f ] ] )
-      files.splice( f, 1 )
-
-      if( files.length > 0 )
+      {
+        let file = files[ f ];
+        if( !filesMap[ file ] )
+        break;
+        files.splice( f, 1 )
+      }
+      
+      if( files.length )
       break;
-
-      delMap[ dirPath ] = 1;
-
+      
+      _.assert( !filesMap[ dirPath ] )
+      
       let file = factory.record( dirPath );
       file.isActual = true;
       file.isTransient = true;
-      dirsFile.unshift( file );
-
+      
+      filesMap[ dirPath ] = file;
+      
+      o.result.unshift( file )
     }
-
-    _.arrayPrependArray( o.result, dirsFile );
-
-    let con;
-
-    if( !o.sync )
-    con = new _.Consequence().take( null );
-
-    if( o.writing )
-    for( let d = dirsFile.length-1 ; d >= 0 ; d-- )
-    {
-      let file = dirsFile[ d ];
-      if( o.sync )
-      fileDelete( file );
-      else
-      con.thenKeep( () => fileDelete( file ) );
-    }
-
-    return con;
+    
+    return true;
   }
 
 }

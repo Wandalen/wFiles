@@ -34222,7 +34222,7 @@ function uriResolve( test )
   test.identical( got, join( current(), 'http://www.site.com:13/.a./b/.c.' ) );
 
   var got = resolve( 'http://www.site.com:13','a/../' );
-  test.identical( got, join( current(), 'http://www.site.com:13' ) );
+  test.identical( got, join( current(), 'http://www.site.com:13/' ) );
 
   test.close( 'with protocol' );
 
@@ -34255,7 +34255,7 @@ function uriResolve( test )
   test.identical( got, join( current(), '://www.site.com:13/.a./b/.c.' ) );
 
   var got = resolve( '://www.site.com:13','a/../' );
-  test.identical( got, join( current(), '://www.site.com:13' ) );
+  test.identical( got, join( current(), '://www.site.com:13/' ) );
 
   test.close( 'with null protocol' );
 
@@ -34295,10 +34295,10 @@ function uriResolve( test )
   test.identical( got, ':///www.site.com:13/.a./b/.c.' );
 
   var got = resolve( ':///www.site.com:13','a/../' );
-  test.identical( got, ':///www.site.com:13' );
+  test.identical( got, ':///www.site.com:13/' );
 
   var got = resolve( ':///www.site.com:13/','a/../' );
-  test.identical( got, ':///www.site.com:13' );
+  test.identical( got, ':///www.site.com:13/' );
 
   /* */
 
@@ -34339,10 +34339,10 @@ function uriResolve( test )
   test.identical( got, '/some/staging/index.html/.a./b/.c.' );
 
   var got = resolve( '/some/staging/index.html','a/../' );
-  test.identical( got, '/some/staging/index.html' );
+  test.identical( got, '/some/staging/index.html/' );
 
   var got = resolve( '/some/staging/index.html/','a/../' );
-  test.identical( got, '/some/staging/index.html' );
+  test.identical( got, '/some/staging/index.html/' );
 
   var got = resolve( '//some/staging/index.html', '.', 'a' );
   test.identical( got, '//some/staging/index.html/a' )

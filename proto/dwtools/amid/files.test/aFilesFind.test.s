@@ -12201,6 +12201,81 @@ function filesReflectDstPreserving( test )
   test.identical( context.select( extract.filesTree, '/src/file3' ), context.select( extract.filesTree, '/dst/file' ) );
   test.notIdentical( context.select( extract.filesTree, '/src/file4' ), context.select( extract.filesTree, '/dst/file' ) );
   
+  /*  */
+  
+  test.case = 'mixed file path, multiple src, dstRewritingPreserving : 0';
+
+  var tree =
+  {
+    src : { srcDir : { a : 'src/a', b : 'src/b' }, srcDir2 : { e : 'src/e' }, c : 'src/c', d : 'src/d' },
+    dst : { dstDir : { a : 'dst/a', c : 'dst/c' }, c : 'dst/c', d : 'dst/d' },
+  }
+
+  var o =
+  {
+    srcFilter :
+    {
+      prefixPath : '/src',
+      filePath : { 'c' : '/dst/c2', 'd' : '/dst' },
+    },
+    dstRewritingPreserving : 0
+  }
+
+  var extract = new _.FileProvider.Extract({ filesTree : tree, protocol : 'extract' });
+  var records = extract.filesReflect( o );
+
+  var expectedTree =
+  {
+    src : { srcDir : { a : 'src/a', b : 'src/b' }, srcDir2 : { e : 'src/e' }, c : 'src/c', d : 'src/d' },
+    dst : 'src/d',
+  }
+
+  test.identical( extract.filesTree, expectedTree );
+
+  var expectedDstAbsolute = [ '/dst/c2', '/dst', '/dst/c', '/dst/c2', '/dst/d', '/dst/dstDir', '/dst/dstDir/a', '/dst/dstDir/c' ];
+  var expectedSrcAbsolute = [ '/src/c', '/src/d', '/src/d/c', '/src/d/c2', '/src/d/d', '/src/d/dstDir', '/src/d/dstDir/a', '/src/d/dstDir/c' ];
+
+  var dstAbsolute = _.select( records, '*/dst/absolute' );
+  var srcAbsolute = _.select( records, '*/src/absolute' );
+
+  test.identical( dstAbsolute, expectedDstAbsolute );
+  test.identical( srcAbsolute, expectedSrcAbsolute );
+  
+  //
+  
+  test.case = 'mixed file path, multiple src, dstRewritingPreserving : 1';
+
+  var tree =
+  {
+    src : { srcDir : { a : 'src/a', b : 'src/b' }, srcDir2 : { e : 'src/e' }, c : 'src/c', d : 'src/d' },
+    dst : { dstDir : { a : 'dst/a', c : 'dst/c' }, c : 'dst/c', d : 'dst/d' },
+  }
+
+  var o =
+  {
+    srcFilter :
+    {
+      prefixPath : '/src',
+      filePath : { 'c' : '/dst/c2', 'd' : '/dst' },
+    },
+    dstRewritingPreserving : 1
+  }
+
+  var extract = new _.FileProvider.Extract({ filesTree : _.cloneJust( tree ), protocol : 'extract' });
+  test.shouldThrowErrorSync( () => extract.filesReflect( o ) );
+
+  /*
+    xxx qqq : problem with option dstRewritingPreserving here also!
+    should throw error because of overwriting!
+  */
+ 
+  var expectedTree = 
+  {
+    src : { srcDir : { a : 'src/a', b : 'src/b' }, srcDir2 : { e : 'src/e' }, c : 'src/c', d : 'src/d' },
+    dst : { dstDir : { a : 'dst/a', c : 'dst/c' }, c : 'dst/c', c2 : 'src/c', d : 'dst/d' },
+  }
+
+  test.identical( extract.filesTree, expectedTree );
 }
 
 //

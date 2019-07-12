@@ -246,7 +246,7 @@ filesReflectTrivial.timeOut = 120000;
 //     return providerSrc.filesReflect
 //     ({
 //       reflectMap : { [ remotePath ] : installPath },
-//       dstFilter : { effectiveFileProvider : providerDst },
+//       /*dstFilter*/dst : { effectiveFileProvider : providerDst },
 //       verbosity : 3
 //     });
 //   })
@@ -276,7 +276,7 @@ filesReflectTrivial.timeOut = 120000;
 //     return providerSrc.filesReflect
 //     ({
 //       reflectMap : { [ remotePath ] : installPath },
-//       dstFilter : { effectiveFileProvider : providerDst },
+//       /*dstFilter*/dst : { effectiveFileProvider : providerDst },
 //       verbosity : 3
 //     });
 //   })
@@ -309,7 +309,7 @@ filesReflectTrivial.timeOut = 120000;
 //     return providerSrc.filesReflect
 //     ({
 //       reflectMap : { [ remotePath ] : installPath },
-//       dstFilter : { effectiveFileProvider : providerDst },
+//       /*dstFilter*/dst : { effectiveFileProvider : providerDst },
 //       verbosity : 3
 //     });
 //   })
@@ -339,7 +339,7 @@ filesReflectTrivial.timeOut = 120000;
 //     let o =
 //     {
 //       reflectMap : { [ remotePath ] : installPath },
-//       dstFilter : { effectiveFileProvider : providerDst },
+//       /*dstFilter*/dst : { effectiveFileProvider : providerDst },
 //       verbosity : 3
 //     }
 //     let con = providerSrc.filesReflect( _.mapExtend( null, o ) );
@@ -372,7 +372,7 @@ filesReflectTrivial.timeOut = 120000;
 //     return providerSrc.filesReflect
 //     ({
 //       reflectMap : { [ remotePath ] : installPath },
-//       dstFilter : { effectiveFileProvider : providerDst },
+//       /*dstFilter*/dst : { effectiveFileProvider : providerDst },
 //       verbosity : 3
 //     });
 //   })
@@ -406,7 +406,7 @@ filesReflectTrivial.timeOut = 120000;
 //     let o =
 //     {
 //       reflectMap : { [ remotePath ] : installPath },
-//       dstFilter : { effectiveFileProvider : providerDst },
+//       /*dstFilter*/dst : { effectiveFileProvider : providerDst },
 //       verbosity : 3
 //     }
 //     let con = providerSrc.filesReflect( o );

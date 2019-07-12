@@ -1,6 +1,6 @@
 ( function _Http_ss_( ) {
 
-'use strict'; 
+'use strict';
 
 if( typeof module !== 'undefined' )
 {
@@ -93,7 +93,7 @@ streamReadAct.having = Object.create( Parent.prototype.streamReadAct.having );
  * @summary Reads content of a remote resourse performing GET request.
  * @description Accepts single argument - map with options. Expects that map `o` contains all necessary options and don't have redundant fields.
  * If `o.sync` is false, return instance of wConsequence, that gives a message with concent of a file when reading is finished.
- * 
+ *
  * @param {Object} o Options map.
  * @param {String} o.filePath Remote url.
  * @param {String} o.encoding Desired encoding of a file concent.
@@ -104,7 +104,7 @@ streamReadAct.having = Object.create( Parent.prototype.streamReadAct.having );
  * @param {String} o.advanced.method Which http method to use: 'GET' or 'POST'.
  * @param {String} o.advanced.user Username, is used in authorization
  * @param {String} o.advanced.password Password, is used in authorization
- * 
+ *
  * @function fileReadAct
  * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHttp#
 */
@@ -266,7 +266,7 @@ function filesReflectSingle_body( o )
   _.routineOptions( filesReflectSingle_body, o.extra, filesReflectSingle_body.extra );
 
   _.assertRoutineOptions( filesReflectSingle_body, o );
-  _.assert( o.mandatory === undefined )
+  // _.assert( o.mandatory === undefined )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.routineIs( o.onUp ) && o.onUp.composed && o.onUp.composed.elements.length === 0, 'Not supported options' );
   _.assert( _.routineIs( o.onDown ) && o.onDown.composed && o.onDown.composed.elements.length === 0, 'Not supported options' );
@@ -276,27 +276,30 @@ function filesReflectSingle_body( o )
   _.assert( _.routineIs( o.onWriteSrcDown ) && o.onWriteSrcDown.composed && o.onWriteSrcDown.composed.elements.length === 0, 'Not supported options' );
   _.assert( o.outputFormat === 'record' || o.outputFormat === 'nothing', 'Not supported options' );
   _.assert( o.linking === 'fileCopy' || o.linking === 'hardLinkMaybe' || o.linking === 'softLinkMaybe', 'Not supported options' );
-  _.assert( !o.srcFilter.hasFiltering(), 'Not supported options' );
-  _.assert( !o.dstFilter.hasFiltering(), 'Not supported options' );
-  _.assert( o.srcFilter.formed === 5 );
-  _.assert( o.dstFilter.formed === 5 );
-  _.assert( o.srcFilter.filePath === o.srcPath );
-  _.assert( o.filter === null || !o.filter.hasFiltering(), 'Not supported options' );
+  _.assert( !o./*srcFilter*/src.hasFiltering(), 'Not supported options' );
+  _.assert( !o./*dstFilter*/dst.hasFiltering(), 'Not supported options' );
+  _.assert( o./*srcFilter*/src.formed === 5 );
+  _.assert( o./*dstFilter*/dst.formed === 5 );
+  _.assert( o.srcPath === undefined );
+  // _.assert( o.filter === null || !o.filter.hasFiltering(), 'Not supported options' );
+  _.assert( o.filter === undefined );
 
   /* */
 
   let con = new _.Consequence();
-  let dstFileProvider = o.dstFilter.providerForPath();
-  let srcPath = o.srcPath;
-  let dstPath = o.dstPath;
+  let dstFileProvider = o./*dstFilter*/dst.providerForPath();
+  let srcPath = o.src.filePathSimplest();
+  let dstPath = o.dst.filePathSimplest();
+  // let srcPath = o.srcPath;
+  // let dstPath = o.dstPath;
   let srcCurrentPath;
 
-  if( _.mapIs( srcPath ) )
-  {
-    _.assert( _.mapVals( srcPath ).length === 1 );
-    _.assert( _.mapVals( srcPath )[ 0 ] === true || _.mapVals( srcPath )[ 0 ] === dstPath );
-    srcPath = _.mapKeys( srcPath )[ 0 ];
-  }
+  // if( _.mapIs( srcPath ) )
+  // {
+  //   _.assert( _.mapVals( srcPath ).length === 1 );
+  //   _.assert( _.mapVals( srcPath )[ 0 ] === true || _.mapVals( srcPath )[ 0 ] === dstPath );
+  //   srcPath = _.mapKeys( srcPath )[ 0 ];
+  // }
 
   srcPath = srcPath.replace( '///', '//' );
 
@@ -305,9 +308,9 @@ function filesReflectSingle_body( o )
   _.sure( _.strIs( srcPath ) );
   _.sure( _.strIs( dstPath ) );
   _.assert( dstFileProvider instanceof _.FileProvider.HardDrive || dstFileProvider.originalFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
-  _.sure( !o.srcFilter || !o.srcFilter.hasFiltering(), 'Does not support filtering, but {o.srcFilter} is not empty' );
-  _.sure( !o.dstFilter || !o.dstFilter.hasFiltering(), 'Does not support filtering, but {o.dstFilter} is not empty' );
-  _.sure( !o.filter || !o.filter.hasFiltering(), 'Does not support filtering, but {o.filter} is not empty' );
+  _.sure( !o./*srcFilter*/src || !o./*srcFilter*/src.hasFiltering(), 'Does not support filtering, but {o./*srcFilter*/src} is not empty' );
+  _.sure( !o./*dstFilter*/dst || !o./*dstFilter*/dst.hasFiltering(), 'Does not support filtering, but {o./*dstFilter*/dst} is not empty' );
+  // _.sure( !o.filter || !o.filter.hasFiltering(), 'Does not support filtering, but {o.filter} is not empty' );
 
   /* log */
 
@@ -360,8 +363,8 @@ function filesReflectSingle_body( o )
     debugger;
     o.result = dstFileProvider.filesReflectEvaluate
     ({
-      srcPath : dstPath,
-      dstPath : dstPath,
+      src : { filePath : dstPath },
+      dst : { filePath : dstPath },
     });
     debugger;
     return o.result;
@@ -397,7 +400,7 @@ let filesReflectSingle = _.routineFromPreAndBody( _.FileProvider.Find.prototype.
 /**
  * @summary Saves content of a remote resourse to the hard drive. Actual implementation.
  * @description Accepts single argument - map with options. Expects that map `o` contains all necessary options and don't have redundant fields.
- * 
+ *
  * @param {Object} o Options map.
  * @param {String} o.url Remote url.
  * @param {String} o.filePath Destination path.
@@ -409,7 +412,7 @@ let filesReflectSingle = _.routineFromPreAndBody( _.FileProvider.Find.prototype.
  * @param {String} o.advanced.method Which http method to use: 'GET' or 'POST'.
  * @param {String} o.advanced.user Username, is used in authorization
  * @param {String} o.advanced.password Password, is used in authorization
- * 
+ *
  * @function fileCopyToHardDriveAct
  * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHttp#
 */
@@ -484,7 +487,7 @@ fileCopyToHardDriveAct.advanced =
 /**
  * @summary Saves content of a remote resourse to the hard drive.
  * @description Accepts single argument - map with options. Expects that map `o` contains all necessary options and don't have redundant fields.
- * 
+ *
  * @param {Object} o Options map.
  * @param {String} o.url Remote url.
  * @param {String} o.filePath Destination path.
@@ -496,7 +499,7 @@ fileCopyToHardDriveAct.advanced =
  * @param {String} o.advanced.method Which http method to use: 'GET' or 'POST'.
  * @param {String} o.advanced.user Username, is used in authorization
  * @param {String} o.advanced.password Password, is used in authorization
- * 
+ *
  * @function fileCopyToHardDriveAct
  * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHttp#
 */

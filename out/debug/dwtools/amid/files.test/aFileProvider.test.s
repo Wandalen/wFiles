@@ -22,22 +22,14 @@ if( typeof module !== 'undefined' )
 var _ = _global_.wTools;
 var Parent = wTester;
 
-// //
+// --
 //
-// function onSuiteBegin( test )
-// {
-//   let path = this.provider.path;
-//   this.testSuitePath = path.dirTempOpen( path.join( __dirname, '../..'  ), 'FileProvider/Abstract' );
-// }
-
-//
+// --
 
 function onSuiteBegin( test )
 {
   let context = this;
   let path = context.provider.path;
-  // context.testSuitePath = path.dirTempOpen( 'FilesFind' );
-  // context.testSuitePath = context.provider.dirTempOpen( path.join( __dirname, '../..'  ), 'FileProvider/Abstract' );
 }
 
 //
@@ -51,6 +43,18 @@ function onSuiteEnd()
   this.hub.finit();
 }
 
+//
+
+function onRoutineEnd( test )
+{
+  let context = this;
+  let provider = context.provider;
+  let hub = context.hub;
+  let path = context.provider.path;
+  _.sure( _.entityIdentical( _.mapKeys( hub.providersWithProtocolMap ), [ 'current' ] ), test.name, 'has not restored hub!' );
+}
+
+//
 //
 
 function pathFor( filePath )
@@ -38059,6 +38063,8 @@ var Self =
   // verbosity : 7,
 
   onSuiteBegin,
+  onSuiteEnd,
+  onRoutineEnd,
 
   context :
   {

@@ -64,6 +64,7 @@ function init( o )
     self.providerDefaultSet( _.fileProvider );
   }
 
+  _.assert( self.providers === undefined );
 }
 
 // --
@@ -142,7 +143,7 @@ function providersRegister( src )
  @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHub#
 */
 
-function providerRegister( fileProvider )
+function providerRegister( fileProvider ) // xxx
 {
   let self = this;
 
@@ -153,19 +154,17 @@ function providerRegister( fileProvider )
   _.assert( _.strDefined( fileProvider.originPath ) );
   _.assert( fileProvider.protocols && fileProvider.protocols.length, 'Cant register file provider without protocols', _.strQuote( fileProvider.nickName ) );
 
+  let protocolMap = self.providersWithProtocolMap;
+  for( let p = 0 ; p < fileProvider.protocols.length ; p++ )
   {
-    let protocolMap = self.providersWithProtocolMap;
-    for( let p = 0 ; p < fileProvider.protocols.length ; p++ )
-    {
-      let protocol = fileProvider.protocols[ p ];
-      if( protocolMap[ protocol ] )
-      _.assert
-      (
-        !protocolMap[ protocol ] || protocolMap[ protocol ] === fileProvider,
-        () => _.strQuote( fileProvider.nickName ) + ' is trying to reserve protocol, reserved by ' + _.strQuote( protocolMap[ protocol ].nickName )
-      );
-      protocolMap[ protocol ] = fileProvider;
-    }
+    let protocol = fileProvider.protocols[ p ];
+    if( protocolMap[ protocol ] )
+    _.assert
+    (
+      !protocolMap[ protocol ] || protocolMap[ protocol ] === fileProvider,
+      () => _.strQuote( fileProvider.nickName ) + ' is trying to reserve protocol ' + _.strQuote( protocol ) + ', which is reserved by ' + _.strQuote( protocolMap[ protocol ].nickName )
+    );
+    protocolMap[ protocol ] = fileProvider;
   }
 
   _.assert( !fileProvider.hub || fileProvider.hub === self, () => 'File provider ' + fileProvider.nickName + ' already has a hub ' + fileProvider.hub.nickName );

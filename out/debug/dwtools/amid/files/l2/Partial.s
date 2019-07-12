@@ -389,22 +389,22 @@ function _preFileFilterWithoutProviderDefaults( routine, args )
   let o = args[ 0 ];
 
   // if( path.like( o ) )
-  // o = { /*fileFilter*/src : path.from( o ) };
+  // o = { src : path.from( o ) };
   // else if( _.arrayIs( o ) )
-  // o = { /*fileFilter*/src : path.s.from( o ) };
-  // else if( _.arrayIs( o./*fileFilter*/src ) )
-  // o./*fileFilter*/src = path.s.from( o./*fileFilter*/src );
+  // o = { src : path.s.from( o ) };
+  // else if( _.arrayIs( o.src ) )
+  // o.src = path.s.from( o.src );
 
   _.routineOptions( routine, o );
-  // _.assert( path.s.allAreAbsolute( o./*fileFilter*/src.filePath ), () => 'Expects absolute path {-o./*fileFilter*/src.filePath-}' );
+  // _.assert( path.s.allAreAbsolute( o.src.filePath ), () => 'Expects absolute path {-o.src.filePath-}' );
 
-  o./*fileFilter*/src = self.recordFilter( o./*fileFilter*/src );
-  // o./*fileFilter*/src.prefixPath = o./*fileFilter*/src.prefixPath || path.current();
+  o.src = self.recordFilter( o.src );
+  // o.src.prefixPath = o.src.prefixPath || path.current();
 
   if( o.dst !== undefined && o.dst !== null )
   {
-    o./*fileFilter*/dst = self.recordFilter( o./*fileFilter*/dst );
-    // o./*fileFilter*/dst.prefixPath = o./*fileFilter*/dst.prefixPath || path.current();
+    o.dst = self.recordFilter( o.dst );
+    // o.dst.prefixPath = o.dst.prefixPath || path.current();
     o.src.pairWithDst( o.dst );
   }
 
@@ -1918,13 +1918,22 @@ function recordFilter( filter )
 
   _.assert( arguments.length === 0 || arguments.length === 1 );
 
+  let filePath = null;
   if( _.strIs( filter ) || _.arrayIs( filter ) )
-  filter = { filePath : filter }
+  {
+    filePath = filter;
+    filter = {};
+  }
 
   if( !filter.defaultFileProvider )
   filter.defaultFileProvider = self;
 
-  return _.FileRecordFilter( filter );
+  let result = _.FileRecordFilter( filter );
+
+  if( filePath )
+  result.copy( filePath );
+
+  return result;
 }
 
 var having = recordFilter.having = Object.create( null );

@@ -74,10 +74,11 @@ function copy( src )
 
   _.assert( arguments.length === 1 );
 
-  if( _.strIs( src ) )
-  src = { filePath : src }
-  else if( _.arrayIs( src ) )
-  src = { filePath : src }
+  if( _.strIs( src ) || _.arrayIs( src ) )
+  src = { prefixPath : src, filePath : '.' }
+
+  // if( _.strIs( src ) || _.arrayIs( src ) )
+  // src = { prefixPath : src, filePath : src }
 
   let result = _.Copyable.prototype.copy.call( filter, src );
 
@@ -86,24 +87,24 @@ function copy( src )
 
 //
 
-function cloneBoth()
+function pairedClone()
 {
   let filter = this;
 
   let result = filter.clone();
 
-  if( filter.srcFilter )
+  if( filter./*srcFilter*/src )
   {
-    result.srcFilter = filter.srcFilter.clone();
-    result.srcFilter.pairWithDst( result );
-    result.srcFilter.pairRefineLight();
+    result./*srcFilter*/src = filter./*srcFilter*/src.clone();
+    result./*srcFilter*/src.pairWithDst( result );
+    result./*srcFilter*/src.pairRefineLight();
     return result;
   }
 
-  if( filter.dstFilter )
+  if( filter./*dstFilter*/dst )
   {
-    result.dstFilter = filter.dstFilter.clone();
-    result.pairWithDst( result.dstFilter );
+    result./*dstFilter*/dst = filter./*dstFilter*/dst.clone();
+    result.pairWithDst( result./*dstFilter*/dst );
     result.pairRefineLight();
     return result;
   }
@@ -217,6 +218,9 @@ function _formPaths()
 {
   let filter = this;
 
+  // if( filter.prefixPath === '/src/*' )
+  // debugger;
+
   if( filter.formed === 3 )
   return;
   if( filter.formed < 2 )
@@ -230,7 +234,7 @@ function _formPaths()
 
   let applicableToTrue = false;
   if( filter.filePath )
-  applicableToTrue = !path.pathMapDstFromSrc( filter.filePath ).filter( ( e ) => !_.boolLike( e ) ).length;
+  applicableToTrue = !path.mapDstFromSrc( filter.filePath ).filter( ( e ) => !_.boolLike( e ) ).length;
   filter.prefixesApply({ applicableToTrue : applicableToTrue });
 
   filter.pathsNormalize();
@@ -253,8 +257,31 @@ function _formMasks()
   let fileProvider = filter.effectiveFileProvider || filter.defaultFileProvider || filter.hubFileProvider;
   let path = fileProvider.path;
 
-  _.assert( arguments.length === 0 );
-  _.assert( filter.formed === 3 );
+  /* */
+
+  if( Config.debug )
+  {
+
+    _.assert( arguments.length === 0 );
+    _.assert( filter.formed === 3 );
+
+    if( filter.basePath )
+    filter.assertBasePath();
+
+    _.assert
+    (
+         ( _.arrayIs( filter.filePath ) && filter.filePath.length === 0 )
+      || ( _.mapIs( filter.filePath ) && _.mapKeys( filter.filePath ).length === 0 )
+      || ( _.mapIs( filter.basePath ) && _.mapKeys( filter.basePath ).length > 0 )
+      || _.strIs( filter.basePath )
+      , 'Cant deduce base path'
+    );
+
+    // _.assert( _.mapIs( filter.filePath ) || !filter./*srcFilter*/src, 'Destination filter should have file map' );
+    _.assert( _.mapIs( filter.filePath ), 'filePath of file record filter is not defined' );
+    // _.assert( _.strIs( filter.filePath ) || _.arrayIs( filter.filePath ) || _.mapIs( filter.filePath ), 'filePath of file record filter is not defined' );
+
+  }
 
   /* */
 
@@ -292,7 +319,7 @@ function _formFinal()
     _.assert( _.strIs( filter.filePath ) || _.arrayIs( filter.filePath ) || _.mapIs( filter.filePath ) );
     _.assert( _.mapIs( filter.formedBasePath ) || _.mapKeys( filter.formedFilePath ).length === 0 );
     _.assert( _.mapIs( filter.formedFilePath ) );
-    _.assert( _.mapIs( filter.basePath ) || _.mapKeys( filter.formedFilePath ).length === 0 );
+    // _.assert( _.mapIs( filter.basePath ) || _.mapKeys( filter.formedFilePath ).length === 0 );
     _.assert( _.objectIs( filter.effectiveFileProvider ) );
     _.assert( filter.hubFileProvider === filter.effectiveFileProvider.hub || filter.hubFileProvider === filter.effectiveFileProvider );
     _.assert( filter.hubFileProvider instanceof _.FileProvider.Abstract );
@@ -440,18 +467,20 @@ function filePathGenerate()
 
   _.assert( arguments.length === 0 );
 
-  let globFound = !filter.srcFilter;
+  let globFound = !filter./*srcFilter*/src;
   if( globFound )
   globFound = filter.filePathHasGlob();
 
   if( globFound )
   {
 
-    _.assert( !filter.srcFilter );
+    _.assert( !filter./*srcFilter*/src );
     _.assert( filter.formedFilterMap === null );
     filter.formedFilterMap = Object.create( null );
 
+    // debugger;
     let _processed = path.pathMapToRegexps( filter.filePath, filter.basePath  );
+    // debugger;
 
     filter.formedBasePath = _processed.unglobedBasePath;
     filter.formedFilePath = _processed.unglobedFilePath;
@@ -479,7 +508,11 @@ function filePathGenerate()
   }
   else
   {
+    /* if base path is redundant then return empty map */
+    if( _.mapIs( filter.basePath ) )
     filter.formedBasePath = _.entityShallowClone( filter.basePath );
+    else
+    filter.formedBasePath = Object.create( null );
     filter.formedFilePath = _.entityShallowClone( filter.filePath );
   }
 
@@ -497,36 +530,36 @@ function filePathGenerate()
 
 function filePathSelect( srcPath, dstPath )
 {
-  let srcFilter = this;
-  let dstFilter = srcFilter.dstFilter;
-  let fileProvider = srcFilter.hubFileProvider || srcFilter.effectiveFileProvider || srcFilter.defaultFileProvider;
+  let /*srcFilter*/src = this;
+  let /*dstFilter*/dst = /*srcFilter*/src./*dstFilter*/dst;
+  let fileProvider = /*srcFilter*/src.hubFileProvider || /*srcFilter*/src.effectiveFileProvider || /*srcFilter*/src.defaultFileProvider;
   let path = fileProvider.path;
 
   _.assert( arguments.length === 2 );
   _.assert( _.mapIs( srcPath ) );
   _.assert( _.strIs( dstPath ) );
 
-  let filePath = path.pathMapExtend( null, srcPath, dstPath );
+  let filePath = path.mapExtend( null, srcPath, dstPath );
 
-  if( dstFilter )
+  if( /*dstFilter*/dst )
   try
   {
 
-    if( _.mapIs( dstFilter.basePath ) )
-    for( let dstPath2 in dstFilter.basePath )
+    if( _.mapIs( /*dstFilter*/dst.basePath ) )
+    for( let dstPath2 in /*dstFilter*/dst.basePath )
     {
       if( dstPath !== dstPath2 )
       {
-        _.assert( _.strIs( dstFilter.basePath[ dstPath2 ] ), () => 'No base path for ' + dstPath2 );
-        delete dstFilter.basePath[ dstPath2 ];
+        _.assert( _.strIs( /*dstFilter*/dst.basePath[ dstPath2 ] ), () => 'No base path for ' + dstPath2 );
+        delete /*dstFilter*/dst.basePath[ dstPath2 ];
       }
     }
 
-    dstFilter.filePath = filePath;
-    dstFilter.form();
-    dstPath = dstFilter.filePathSimplest();
+    /*dstFilter*/dst.filePath = filePath;
+    /*dstFilter*/dst.form();
+    dstPath = /*dstFilter*/dst.filePathSimplest();
     _.assert( _.strIs( dstPath ) );
-    filePath = dstFilter.filePath;
+    filePath = /*dstFilter*/dst.filePath;
   }
   catch( err )
   {
@@ -537,20 +570,20 @@ function filePathSelect( srcPath, dstPath )
   try
   {
 
-    if( _.mapIs( srcFilter.basePath ) )
-    for( let srcPath2 in srcFilter.basePath )
+    if( _.mapIs( /*srcFilter*/src.basePath ) )
+    for( let srcPath2 in /*srcFilter*/src.basePath )
     {
       if( filePath[ srcPath2 ] === undefined )
       {
-        _.assert( _.strIs( srcFilter.basePath[ srcPath2 ] ), () => 'No base path for ' + srcPath2 );
-        delete srcFilter.basePath[ srcPath2 ];
+        _.assert( _.strIs( /*srcFilter*/src.basePath[ srcPath2 ] ), () => 'No base path for ' + srcPath2 );
+        delete /*srcFilter*/src.basePath[ srcPath2 ];
       }
     }
 
-    srcFilter.filePath = filePath;
-    _.assert( dstFilter === null || srcFilter.filePath === dstFilter.filePath );
-    srcFilter.form();
-    _.assert( dstFilter === null || srcFilter.filePath === dstFilter.filePath );
+    /*srcFilter*/src.filePath = filePath;
+    _.assert( /*dstFilter*/dst === null || /*srcFilter*/src.filePath === /*dstFilter*/dst.filePath );
+    /*srcFilter*/src.form();
+    _.assert( /*dstFilter*/dst === null || /*srcFilter*/src.filePath === /*dstFilter*/dst.filePath );
   }
   catch( err )
   {
@@ -581,10 +614,10 @@ function prefixesApply( o )
   if( filter.prefixPath === null && filter.postfixPath === null )
   return filter;
 
-  if( filter.srcFilter && filter.srcFilter.filePath === filter.filePath )
+  if( filter./*srcFilter*/src && filter./*srcFilter*/src.filePath === filter.filePath )
   paired = true;
 
-  if( filter.dstFilter && filter.dstFilter.filePath === filter.filePath )
+  if( filter./*dstFilter*/dst && filter./*dstFilter*/dst.filePath === filter.filePath )
   paired = true;
 
   o = _.routineOptions( prefixesApply, arguments );
@@ -603,8 +636,17 @@ function prefixesApply( o )
 
   if( adjustingFilePath )
   {
-    let o2 = { basePath : 0, fixes : 0, filePath : 1, onEach : filePathEach }
+    let o2 = { basePath : 0, fixes : 0, filePath : 1, inplace : 1, onEach : filePathEach }
     filter.allPaths( o2 );
+  }
+  else
+  {
+    if( filter./*srcFilter*/src )
+    filter.filePath = path.mapsPair( filter.prefixPath, null );
+    else if( filter./*dstFilter*/dst )
+    filter.filePath = path.mapsPair( null, filter.prefixPath );
+    else
+    filter.filePath = filter.prefixPath;
   }
 
   if( filter.basePath )
@@ -627,34 +669,35 @@ function prefixesApply( o )
   if( filter.basePath && filter.filePath )
   filter.assertBasePath();
 
-  if( paired && filter.srcFilter && filter.srcFilter.filePath !== filter.filePath )
-  filter.srcFilter.filePath = filter.filePath;
+  if( paired && filter./*srcFilter*/src && filter./*srcFilter*/src.filePath !== filter.filePath )
+  filter./*srcFilter*/src.filePath = filter.filePath;
 
-  if( paired && filter.dstFilter && filter.dstFilter.filePath !== filter.filePath )
-  filter.dstFilter.filePath = filter.filePath;
+  if( paired && filter./*dstFilter*/dst && filter./*dstFilter*/dst.filePath !== filter.filePath )
+  filter./*dstFilter*/dst.filePath = filter.filePath;
 
   return filter;
 
   /* */
 
-  function filePathEach( it )
+  function filePathEach( element, it )
   {
     _.assert( it.value === null || _.strIs( it.value ) || _.boolLike( it.value ) || _.arrayIs( it.value ) );
 
-    if( filter.srcFilter )
+    if( filter./*srcFilter*/src )
     {
-      if( it.side === 'source' )
-      return;
+      if( it.side === 'src' ) // yyy
+      return it.value;
     }
-    else if( filter.dstFilter )
+    else if( filter./*dstFilter*/dst )
     {
-      if( it.side === 'destination' )
-      return;
+      if( it.side === 'dst' ) // yyy
+      return it.value;
     }
 
-    if( it.side === 'source' && _.boolLike( filter.filePath[ it.value ] ) )
+    if( !o.applicableToTrue )
+    if( it.side === 'src' && _.boolLike( it.dst ) ) // yyy
     {
-      return;
+      return it.value;
     }
 
     if( filter.prefixPath || filter.postfixPath )
@@ -669,9 +712,10 @@ function prefixesApply( o )
       }
     }
 
-    if( it.side === 'destination' && _.strIs( it.value ) )
+    if( it.side === 'dst' && _.strIs( it.value ) ) // yyy
     it.value = path.fromGlob( it.value );
 
+    return it.value;
   }
 
   /* */
@@ -685,15 +729,6 @@ function prefixesApply( o )
 
     basePath = path.s.join( filter.prefixPath || '.', basePath, filter.postfixPath || '.' );
 
-    // if( filePath === null )
-    // return basePath;
-    // if( filter.filePath === null )
-    // {
-    //   return basePath;
-    // }
-
-    // _.assert( !!filter.filePath );
-    // if( !_.boolLike( filter.filePath[ filePath ] ) )
     if( !_.boolLike( filePath ) )
     filePath = path.s.join( filter.prefixPath || '.', filePath, filter.postfixPath || '.' );
 
@@ -741,23 +776,29 @@ function prefixesRelative( prefixPath )
   if( filter.filePath && !prefixPath )
   {
 
-    let filePath;
-    if( filter.srcFilter )
-    filePath = path.pathMapDstFromDst( filter.filePath );
-    else
-    filePath = path.pathMapSrcFromSrc( filter.filePath );
+    prefixPath = filter.prefixPathFromFilePath({ usingBools : 1 });
 
-    if( filePath )
-    {
-      filePath = filePath.filter( ( filePath ) => _.strIs( filePath ) );
-      if( path.s.anyAreAbsolute( filePath ) )
-      filePath = filePath.filter( ( filePath ) => path.isAbsolute( filePath ) );
-    }
-
-    if( filePath && filePath.length )
-    {
-      prefixPath = path.detrail( path.common( filePath ) );
-    }
+    // // debugger; // xxx
+    //
+    // let filePath = filter.filePathArrayNonBoolGet( filter.filePath, 1 );
+    //
+    // // let filePath;
+    // // if( filter./*srcFilter*/src )
+    // // filePath = path.mapDstFromDst( filter.filePath );
+    // // else
+    // // filePath = path.mapSrcFromSrc( filter.filePath );
+    //
+    // if( filePath )
+    // {
+    //   filePath = filePath.filter( ( filePath ) => _.strIs( filePath ) );
+    //   if( path.s.anyAreAbsolute( filePath ) )
+    //   filePath = filePath.filter( ( filePath ) => path.isAbsolute( filePath ) );
+    // }
+    //
+    // if( filePath && filePath.length )
+    // {
+    //   prefixPath = path.fromGlob( path.detrail( path.common( filePath ) ) );
+    // }
 
   }
 
@@ -765,16 +806,16 @@ function prefixesRelative( prefixPath )
   {
 
     if( filter.basePath )
-    filter.basePath = path.pathMapFilter( filter.basePath, relative_functor() );
+    filter.basePath = path.filter( filter.basePath, relative_functor() );
 
     if( filter.filePath )
     {
-      if( filter.srcFilter )
-      filter.filePath = path.pathMapFilterInplace( filter.filePath, relative_functor( 'dst' ) );
-      else if( filter.dstFilter )
-      filter.filePath = path.pathMapFilterInplace( filter.filePath, relative_functor( 'src' ) );
+      if( filter./*srcFilter*/src )
+      filter.filePath = path.filterInplace( filter.filePath, relative_functor( 'dst' ) );
+      else if( filter./*dstFilter*/dst )
+      filter.filePath = path.filterInplace( filter.filePath, relative_functor( 'src' ) );
       else
-      filter.filePath = path.pathMapFilterInplace( filter.filePath, relative_functor() );
+      filter.filePath = path.filterInplace( filter.filePath, relative_functor() );
     }
 
     filter.prefixPath = prefixPath;
@@ -810,6 +851,54 @@ function prefixesRelative( prefixPath )
 
 //
 
+function prefixPathFromFilePath( o )
+{
+  let filter = this;
+  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let path = fileProvider.path;
+
+  _.routineOptions( prefixPathFromFilePath, arguments );
+
+  let result = o.filePath || filter.filePath;
+
+  if( result === null )
+  return null;
+
+  _.assert( arguments.length === 0 || arguments.length === 1 );
+  _.assert( !!result );
+
+  if( o.usingBools )
+  result = filter.filePathArrayGet( result );
+  else
+  result = filter.filePathArrayNonBoolGet( result, 1 );
+
+  if( result )
+  {
+    result = result.filter( ( filePath ) => _.strIs( filePath ) );
+    if( path.s.anyAreAbsolute( result ) )
+    result = result.filter( ( filePath ) => path.isAbsolute( filePath ) );
+  }
+
+  if( result && result.length )
+  {
+    result = path.fromGlob( path.detrail( path.common( result ) ) );
+  }
+  else
+  {
+    result = null;
+  }
+
+  return result;
+}
+
+prefixPathFromFilePath.defaults =
+{
+  filePath : null,
+  usingBools : 1,
+}
+
+//
+
 /**
  * @summary Converts global path into local.
  * @param {String} filePath Input file path.
@@ -825,7 +914,7 @@ function pathLocalize( filePath )
 
   _.assert( _.strIs( filePath ) );
 
-  filePath = path.normalizeStrict( filePath );
+  filePath = path.normalizeCanonical( filePath );
 
   if( filter.effectiveFileProvider && !path.isGlobal( filePath ) )
   return filePath;
@@ -874,8 +963,8 @@ function pathsNormalize()
   _.assert( filter.prefixPath === null, 'Prefixes should be applied so far' );
   _.assert( filter.postfixPath === null, 'Posftixes should be applied so far' );
   _.assert( filter.basePath === null || _.strIs( filter.basePath ) || _.mapIs( filter.basePath ) );
-  _.assert( _.strIs( filter.filePath ) || _.arrayIs( filter.filePath ) || _.mapIs( filter.filePath ), 'filePath of file record filter is not defined' );
-  _.assert( _.mapIs( filter.filePath ) || !filter.srcFilter, 'Destination filter should have file map' );
+  // _.assert( _.strIs( filter.filePath ) || _.arrayIs( filter.filePath ) || _.mapIs( filter.filePath ), 'filePath of file record filter is not defined' );
+  // _.assert( _.mapIs( filter.filePath ) || !filter./*srcFilter*/src, 'Destination filter should have file map' );
 
   /* */
 
@@ -883,27 +972,27 @@ function pathsNormalize()
   _.assert( _.mapIs( filter.filePath ) );
 
   filter.basePath = filter.basePathNormalize( filter.basePath, filter.filePath );
-  _.assert( _.mapIs( filter.basePath ) || filter.basePath === null || _.mapKeys( filter.filePath ).length === 0 );
+  _.assert( _.mapIs( filter.basePath ) || filter.basePath === null || filter.filePathArrayNonBoolGet( filter.filePath, 1 ).filter( ( e ) => e !== null ).length === 0 );
 
   filter.filePathAbsolutize();
-
   filter.providersNormalize();
 
-  /* */
-
-  if( !Config.debug )
-  return;
-
-  if( filter.basePath )
-  filter.assertBasePath();
-
-  _.assert
-  (
-       ( _.arrayIs( filter.filePath ) && filter.filePath.length === 0 )
-    || ( _.mapIs( filter.filePath ) && _.mapKeys( filter.filePath ).length === 0 )
-    || ( _.mapIs( filter.basePath ) && _.mapKeys( filter.basePath ).length > 0 )
-    , 'Cant deduce base path'
-  );
+  // /* */
+  //
+  // if( !Config.debug )
+  // return;
+  //
+  // if( filter.basePath )
+  // filter.assertBasePath();
+  //
+  // _.assert
+  // (
+  //      ( _.arrayIs( filter.filePath ) && filter.filePath.length === 0 )
+  //   || ( _.mapIs( filter.filePath ) && _.mapKeys( filter.filePath ).length === 0 )
+  //   || ( _.mapIs( filter.basePath ) && _.mapKeys( filter.basePath ).length > 0 )
+  //   || _.strIs( filter.basePath )
+  //   , 'Cant deduce base path'
+  // );
 
 }
 
@@ -944,25 +1033,25 @@ function And()
 {
   _.assert( !_.instanceIs( this ) );
 
-  let dstFilter = null;
+  let /*dstFilter*/dst = null;
 
   if( arguments.length === 1 )
   return this.Self( arguments[ 0 ] );
 
   for( let a = 0 ; a < arguments.length ; a++ )
   {
-    let srcFilter = arguments[ a ];
+    let /*srcFilter*/src = arguments[ a ];
 
-    if( dstFilter )
-    dstFilter = this.Self( dstFilter );
-    if( dstFilter )
-    dstFilter.and( srcFilter );
+    if( /*dstFilter*/dst )
+    /*dstFilter*/dst = this.Self( /*dstFilter*/dst );
+    if( /*dstFilter*/dst )
+    /*dstFilter*/dst.and( /*srcFilter*/src );
     else
-    dstFilter = this.Self( srcFilter );
+    /*dstFilter*/dst = this.Self( /*srcFilter*/src );
 
   }
 
-  return dstFilter;
+  return /*dstFilter*/dst;
 }
 
 //
@@ -1114,15 +1203,43 @@ function _pathsJoin_body( o )
   _.assert( !filter.hubFileProvider || !o.src.hubFileProvider || filter.hubFileProvider === o.src.hubFileProvider );
   _.assert( o.src !== filter );
   _.assert( _.objectIs( o.src ) );
-  _.assert( o.src.filePath === null || o.src.filePath === undefined || o.src.filePath === '.' || _.strIs( o.src.filePath ) );
+  // _.assert( o.src.filePath === null || o.src.filePath === undefined || o.src.filePath === '.' || _.strIs( o.src.filePath ) );
 
   let fileProvider = filter.hubFileProvider || filter.defaultFileProvider || filter.effectiveFileProvider || o.src.hubFileProvider || o.src.defaultFileProvider || o.src.effectiveFileProvider;
   let path = fileProvider.path;
 
-  /* */
-
   if( o.src.hubFileProvider )
   filter.hubFileProvider = o.src.hubFileProvider;
+
+  /* */
+
+  for( let n in o.joiningAsPathMap )
+  if( o.src[ n ] !== undefined && o.src[ n ] !== null )
+  {
+    if( filter[ n ] === null )
+    {
+      filter[ n ] = o.src[ n ];
+      continue;
+    }
+    // _.assert( !!filter./*dstFilter*/dst || !!filter./*srcFilter*/src, 'Filters should be paired first!' );
+    if( filter./*srcFilter*/src )
+    {
+      debugger;
+      if( !_.mapIs( filter[ n ] ) )
+      filter[ n ] = path.mapExtend( null, null, filter[ n ] );
+      path.mapExtend( filter[ n ], o.src[ n ], null );
+    }
+    else
+    {
+      debugger;
+      path.mapExtend( filter[ n ], o.src[ n ], null );
+    }
+    // _.assert( o.src[ n ] === null || _.strIs( o.src[ n ] ) );
+    // _.assert( filter[ n ] === null || _.strIs( filter[ n ] ) );
+    // filter[ n ] = path.join( filter[ n ], o.src[ n ] );
+  }
+
+  /* */
 
   for( let n in o.joiningWithoutNullMap )
   if( o.src[ n ] !== undefined && o.src[ n ] !== null )
@@ -1173,9 +1290,14 @@ _pathsJoin_body.defaults =
 
   src : null,
 
-  joiningWithoutNullMap :
+  joiningAsPathMap :
   {
     filePath : null,
+  },
+
+  joiningWithoutNullMap :
+  {
+    // filePath : null, // yyy
   },
 
   joiningMap :
@@ -1201,9 +1323,13 @@ function pathsJoin()
   return filter._pathsJoin
   ({
     src : arguments,
-    joiningWithoutNullMap :
+    joiningAsPathMap :
     {
       filePath : null,
+    },
+    joiningWithoutNullMap :
+    {
+      // filePath : null,
     },
     joiningMap :
     {
@@ -1225,9 +1351,13 @@ function pathsJoinWithoutNull()
   return filter._pathsJoin
   ({
     src : arguments,
-    joiningWithoutNullMap :
+    joiningAsPathMap :
     {
       filePath : null,
+    },
+    joiningWithoutNullMap :
+    {
+      // filePath : null,
       basePath : null,
     },
     joiningMap :
@@ -1342,20 +1472,20 @@ function pathsExtend2( src )
   if( filter.filePath && src.filePath )
   {
 
-    let isDst = !!filter.srcFilter || !!src.srcFilter;
+    let isDst = !!filter./*srcFilter*/src || !!src./*srcFilter*/src;
     if( ( _.mapIs( filter.filePath ) && _.mapIs( src.filePath ) ) || !isDst )
     {
-      filter.filePath = path.pathMapExtend( filter.filePath, src.filePath, null );
+      filter.filePath = path.mapExtend( filter.filePath, src.filePath, null );
     }
     else if( !_.mapIs( src.filePath ) )
     {
       debugger;
       _.assert( 0, 'not tested' );
-      filter.filePath = path.pathMapExtend( filter.filePath, filter.filePath, src.filePath );
+      filter.filePath = path.mapExtend( filter.filePath, filter.filePath, src.filePath );
     }
     else if( !_.mapIs( filter.filePath ) )
     {
-      filter.filePath = path.pathMapExtend( null, src.filePath, filter.filePath );
+      filter.filePath = path.mapExtend( null, src.filePath, filter.filePath );
     }
 
   }
@@ -1376,10 +1506,10 @@ function pathsInherit( src )
   let filter = this;
   let paired = false;
 
-  if( filter.srcFilter && filter.srcFilter.filePath === filter.filePath )
+  if( filter./*srcFilter*/src && filter./*srcFilter*/src.filePath === filter.filePath )
   paired = true;
 
-  if( filter.dstFilter && filter.dstFilter.filePath === filter.filePath )
+  if( filter./*dstFilter*/dst && filter./*dstFilter*/dst.filePath === filter.filePath )
   paired = true;
 
   if( arguments.length > 1 )
@@ -1434,18 +1564,105 @@ function pathsInherit( src )
 
   /* */
 
+  let dstSrcNonBoolPaths = filter.filePathSrcArrayNonBoolGet( filter.filePath, 0 );
+  let srcOnlyBoolPathMap = src.filePathMapOnlyBools( src.filePath );
+  let srcSrcNonBoolPaths = src.filePathSrcArrayNonBoolGet( src.filePath, 0 );
+
+  let dstFilePath = filter.filePath;
+  let srcFilePath = src.filePath;
+  if( dstSrcNonBoolPaths.length === 0 && srcSrcNonBoolPaths.length === 0 )
+  {
+    if( dstFilePath )
+    dstFilePath = path.filter( dstFilePath, ( e ) => _.boolLike( e ) && e ? null : e );
+    if( srcFilePath )
+    srcFilePath = path.filter( srcFilePath, ( e ) => _.boolLike( e ) && e ? null : e );
+  }
+
+  let dstSrcIsDot = false;
+  if( dstSrcNonBoolPaths.length === 1 && dstSrcNonBoolPaths[ 0 ] === '.' )
+  {
+    dstSrcIsDot = true;
+    dstSrcNonBoolPaths = [];
+  }
+
+  /* */
+
   if( filter.basePath === null && _.mapIs( src.basePath ) )
   {
-    let dstNonBoolPaths = filter.filePathSrcArrayNonBoolGet( filter.filePath, 0 );
-    for( let p = 0 ; p < dstNonBoolPaths.length ; p++ )
+
+    for( let p = 0 ; p < dstSrcNonBoolPaths.length ; p++ )
     {
-      let filePath = dstNonBoolPaths[ p ];
+      let filePath = dstSrcNonBoolPaths[ p ];
       if( src.basePath[ p ] === undefined )
       {
         filter.basePath = filter.basePath || Object.create( null );
         filter.basePath[ filePath ] = filePath;
       }
     }
+
+  }
+
+  if( src.basePath && filter.basePath )
+  {
+
+    if( _.strIs( src.basePath ) )
+    src.basePath = src.basePathFrom( src.basePath, src.filePath || {} );
+    _.assert( _.mapIs( src.basePath ) || _.strIs( src.basePath ) );
+
+    if( _.strIs( filter.basePath ) )
+    filter.basePath = filter.basePathFrom( filter.basePath, filter.filePath || {} );
+    _.assert( _.mapIs( filter.basePath ) || _.strIs( filter.basePath ) );
+
+  }
+
+  /* */
+
+  if( filter.filePath && src.filePath )
+  {
+
+    if( dstSrcNonBoolPaths.length === 0 && !dstSrcIsDot )
+    {
+      if( filter./*srcFilter*/src && !_.mapIs( filter./*srcFilter*/src ) )
+      filter.filePath = path.mapExtend( null, filter.filePath, null );
+
+      if( src./*srcFilter*/src && !_.mapIs( src./*srcFilter*/src ) )
+      src.filePath = path.mapExtend( null, src.filePath, null );
+
+      filter.filePath = path.mapExtend( filter.filePath, src.filePath, null );
+    }
+    else if( Object.keys( srcOnlyBoolPathMap ).length )
+    {
+      if( filter./*srcFilter*/src && !_.mapIs( filter./*srcFilter*/src ) )
+      filter.filePath = path.mapExtend( null, filter.filePath, null );
+      filter.filePath = path.mapExtend( filter.filePath, srcOnlyBoolPathMap, null );
+    }
+    else
+    {
+      let dstSrcPath = filter.filePathSrcArrayGet();
+      if( dstSrcPath.length === 1 && dstSrcPath[ 0 ] === '.' )
+      {
+        let dstDstPath = filter.filePathDstArrayGet();
+        if( !dstDstPath.length )
+        dstDstPath = null;
+        filter.filePath = path.mapExtend( null, src.filePathSrcArrayGet(), dstDstPath );
+      }
+      else
+      {
+        // let dstDstPath = filter.filePathDstArrayGet();
+        // if( !dstDstPath.length )
+        // dstDstPath = null;
+        // _.assert( !_.arrayIs( dstDstPath ) || !_.arrayHas( dstDstPath, null ) );
+        // if( dstDstPath === null ) // yyy
+        // filter.filePath = filter.filePath;
+        // // else
+        // // filter.filePath = path.mapExtend( filter.filePath, src.filePathSrcArrayGet(), dstDstPath );
+      }
+    }
+
+  }
+  else
+  {
+    filter.filePath = filter.filePath || src.filePath;
   }
 
   /* */
@@ -1453,25 +1670,21 @@ function pathsInherit( src )
   if( src.basePath && filter.basePath )
   {
 
-    if( _.strIs( src.basePath ) )
-    src.basePath = src.basePathFrom( src.basePath, src.filePath || {} );
-    _.assert( src.basePath === null || _.mapIs( src.basePath ) || _.strIs( src.basePath ) ); // yyy
-
-    // _.assert( src.basePath === null || _.mapIs( src.basePath ) );
-
-    if( _.strIs( filter.basePath ) )
-    filter.basePath = filter.basePathFrom( filter.basePath, filter.filePath || {} );
-    _.assert( filter.basePath === null || _.mapIs( filter.basePath ) || _.strIs( filter.basePath ) ); // yyy
-
-    if( _.mapIs( src.basePath ) )
+    if( _.mapIs( filter.basePath ) )
+    for( let filePath in filter.basePath )
     {
-      for( let filePath in src.basePath )
-      {
-        let basePath = src.basePath[ filePath ];
-        if( !_.mapIs( filter.filePath ) || filter.filePath[ filePath ] !== undefined )
-        if( !filter.basePath[ filePath ] )
-        filter.basePath[ filePath ] = basePath;
-      }
+      if( _.boolLike( srcFilePath[ filePath ] ) && !srcFilePath[ filePath ] )
+      delete filter.basePath[ filePath ];
+    }
+
+    _.assert( _.mapIs( filter.filePath ) || filter.filePath === null );
+    if( _.mapIs( src.basePath ) )
+    for( let filePath in src.basePath )
+    {
+      let basePath = src.basePath[ filePath ];
+      if( filter.filePath[ filePath ] !== undefined )
+      if( !filter.basePath[ filePath ] )
+      filter.basePath[ filePath ] = basePath;
     }
 
   }
@@ -1482,150 +1695,68 @@ function pathsInherit( src )
 
   /* */
 
-  if( filter.filePath && src.filePath )
-  {
+  if( paired && filter./*srcFilter*/src && filter./*srcFilter*/src.filePath !== filter.filePath )
+  filter./*srcFilter*/src.filePath = filter.filePath;
 
-    let srcOnlyBoolPaths = src.filePathOnlyBools();
-    let dstNonBoolPaths = filter.filePathSrcArrayNonBoolGet( filter.filePath, 0 );
-
-    if( dstNonBoolPaths.length === 0 )
-    {
-      if( filter.srcFilter && !_.mapIs( filter.srcFilter ) )
-      filter.filePath = path.pathMapExtend( null, filter.filePath, null );
-
-      if( src.srcFilter && !_.mapIs( src.srcFilter ) )
-      src.filePath = path.pathMapExtend( null, src.filePath, null );
-
-      filter.filePath = path.pathMapExtend( filter.filePath, src.filePath, null );
-    }
-    else if( Object.keys( srcOnlyBoolPaths ).length )
-    {
-      if( filter.srcFilter && !_.mapIs( filter.srcFilter ) )
-      filter.filePath = path.pathMapExtend( null, filter.filePath, null );
-      filter.filePath = path.pathMapExtend( filter.filePath, srcOnlyBoolPaths, null );
-    }
-    else
-    {
-      let srcPath = filter.filePathSrcArrayGet();
-      if( srcPath.length === 1 && srcPath[ 0 ] === '.' )
-      {
-        let dstPath = filter.filePathDstArrayGet();
-        if( !dstPath.length )
-        dstPath = null;
-        filter.filePath = path.pathMapExtend( null, src.filePathSrcArrayGet(), dstPath );
-      }
-      else
-      {
-        debugger;
-        let dstPath = filter.filePathDstArrayGet();
-        if( !dstPath.length )
-        dstPath = null;
-        filter.filePath = path.pathMapExtend( filter.filePath, src.filePathSrcArrayGet(), dstPath );
-      }
-    }
-
-  }
-  else
-  {
-    filter.filePath = filter.filePath || src.filePath;
-  }
-
-  // /* */
-  //
-  // if( src.basePath && filter.basePath )
-  // {
-  //
-  //   if( _.strIs( src.basePath ) )
-  //   src.basePath = src.basePathFrom( src.basePath, src.filePath || {} );
-  //   _.assert( src.basePath === null || _.mapIs( src.basePath ) || _.strIs( src.basePath ) ); // yyy
-  //
-  //   // _.assert( src.basePath === null || _.mapIs( src.basePath ) );
-  //
-  //   if( _.strIs( filter.basePath ) )
-  //   filter.basePath = filter.basePathFrom( filter.basePath, filter.filePath || {} );
-  //   _.assert( filter.basePath === null || _.mapIs( filter.basePath ) || _.strIs( filter.basePath ) ); // yyy
-  //
-  //   if( _.mapIs( src.basePath ) )
-  //   {
-  //     for( let filePath in src.basePath )
-  //     {
-  //       let basePath = src.basePath[ filePath ];
-  //       if( !_.mapIs( filter.filePath ) || filter.filePath[ filePath ] !== undefined )
-  //       if( !filter.basePath[ filePath ] )
-  //       filter.basePath[ filePath ] = basePath;
-  //     }
-  //   }
-  //
-  // }
-  // else
-  // {
-  //   filter.basePath = filter.basePath || src.basePath;
-  // }
-
-  /* */
-
-  if( paired && filter.srcFilter && filter.srcFilter.filePath !== filter.filePath )
-  filter.srcFilter.filePath = filter.filePath;
-
-  if( paired && filter.dstFilter && filter.dstFilter.filePath !== filter.filePath )
-  filter.dstFilter.filePath = filter.filePath;
+  if( paired && filter./*dstFilter*/dst && filter./*dstFilter*/dst.filePath !== filter.filePath )
+  filter./*dstFilter*/dst.filePath = filter.filePath;
 
   return filter;
 }
 
+// //
 //
-
-function pathsExtend( src )
-{
-  let filter = this;
-
-  if( arguments.length > 1 )
-  {
-    for( let a = 0 ; a < arguments.length ; a++ )
-    filter.pathsExtend( arguments[ a ] );
-    return filter;
-  }
-
-  if( Config.debug )
-  if( src && !( src instanceof filter.Self ) )
-  _.assertMapHasOnly( src, filter.fieldsOfCopyableGroups );
-
-  _.assert( _.instanceIs( filter ) );
-  _.assert( !filter.formed || filter.formed <= 1 );
-  _.assert( !src.formed || src.formed <= 1 );
-  _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( filter.formedFilterMap === null );
-  _.assert( filter.applyTo === null );
-  _.assert( filter.filePath === null );
-  _.assert( !filter.hubFileProvider || !src.hubFileProvider || filter.hubFileProvider === src.hubFileProvider );
-  _.assert( src !== filter );
-  _.assert( src.filePath === null || src.filePath === undefined || filter.filePath === null );
-
-  let fileProvider = filter.effectiveFileProvider || filter.hubFileProvider || filter.defaultFileProvider || src.effectiveFileProvider || src.hubFileProvider || src.defaultFileProvider;
-  let path = fileProvider.path;
-
-  let replacing =
-  {
-
-    hubFileProvider : null,
-    basePath : null,
-    filePath : null,
-    prefixPath : null,
-    postfixPath : null,
-
-  }
-
-  /* */
-
-  for( let s in replacing )
-  {
-    if( src[ s ] === null || src[ s ] === undefined )
-    continue;
-    filter[ s ] = src[ s ];
-  }
-
-  return filter;
-}
+// function pathsExtend( src )
+// {
+//   let filter = this;
+//
+//   if( arguments.length > 1 )
+//   {
+//     for( let a = 0 ; a < arguments.length ; a++ )
+//     filter.pathsExtend( arguments[ a ] );
+//     return filter;
+//   }
+//
+//   if( Config.debug )
+//   if( src && !( src instanceof filter.Self ) )
+//   _.assertMapHasOnly( src, filter.fieldsOfCopyableGroups );
+//
+//   _.assert( _.instanceIs( filter ) );
+//   _.assert( !filter.formed || filter.formed <= 1 );
+//   _.assert( !src.formed || src.formed <= 1 );
+//   _.assert( arguments.length === 1, 'Expects single argument' );
+//   _.assert( filter.formedFilterMap === null );
+//   _.assert( filter.applyTo === null );
+//   _.assert( filter.filePath === null );
+//   _.assert( !filter.hubFileProvider || !src.hubFileProvider || filter.hubFileProvider === src.hubFileProvider );
+//   _.assert( src !== filter );
+//   _.assert( src.filePath === null || src.filePath === undefined || filter.filePath === null );
+//
+//   let fileProvider = filter.effectiveFileProvider || filter.hubFileProvider || filter.defaultFileProvider || src.effectiveFileProvider || src.hubFileProvider || src.defaultFileProvider;
+//   let path = fileProvider.path;
+//
+//   let replacing =
+//   {
+//
+//     hubFileProvider : null,
+//     basePath : null,
+//     filePath : null,
+//     prefixPath : null,
+//     postfixPath : null,
+//
+//   }
+//
+//   /* */
+//
+//   for( let s in replacing )
+//   {
+//     if( src[ s ] === null || src[ s ] === undefined )
+//     continue;
+//     filter[ s ] = src[ s ];
+//   }
+//
+//   return filter;
+// }
 
 // --
 // base path
@@ -1752,7 +1883,7 @@ function basePathsGet()
   _.assert( filter.basePath === null || _.strIs( filter.basePath ) || _.mapIs( filter.basePath ) );
 
   if( _.objectIs( filter.basePath ) )
-  return _.arrayUnique( _.mapVals( filter.basePath ) )
+  return _.longUnduplicate( null, _.mapVals( filter.basePath ) )
   else if( _.strIs( filter.basePath ) )
   return [ filter.basePath ];
   else
@@ -1771,14 +1902,13 @@ function basePathFrom( basePath, filePath )
   basePath = filter.basePath
   if( filePath === undefined )
   filePath = filter.prefixPath || filter.filePath;
-  // if( filePath === undefined ) // yyy
-  // filePath = filter.filePath;
 
+  _.assert( basePath === null || _.strIs( basePath ) );
   _.assert( arguments.length === 0 || arguments.length === 2 );
 
   if( basePath )
   basePath = filter.pathLocalize( basePath );
-  filePath = filter.filePathArrayNonBoolGet( filePath );
+  filePath = filter.filePathArrayNonBoolGet( filePath, 1 ).filter( ( e ) => e !== null );
 
   let basePath2 = Object.create( null );
 
@@ -1788,7 +1918,7 @@ function basePathFrom( basePath, filePath )
     {
       let thisFilePath = filePath[ s ];
       if( path.isRelative( basePath ) )
-      basePath2[ thisFilePath ] = path.detrail( path.join( path.fromGlob( thisFilePath ), basePath ) ); // yyy
+      basePath2[ thisFilePath ] = path.detrail( path.join( path.fromGlob( thisFilePath ), basePath ) );
       else
       basePath2[ thisFilePath ] = basePath;
     }
@@ -1861,7 +1991,8 @@ function basePathNormalize( basePath, filePath )
   }
   else _.assert( 0 );
 
-  _.assert( _.mapIs( basePath ) || basePath === null || _.mapKeys( filePath ).length === 0 );
+  _.assert( _.mapIs( basePath ) || basePath === null || filter.filePathArrayNonBoolGet( filePath, 1 ).filter( ( e ) => e !== null ).length === 0 );
+  // _.assert( _.mapIs( basePath ) || basePath === null || _.mapKeys( filePath ).length === 0 );
 
   return basePath;
 }
@@ -1883,6 +2014,36 @@ function basePathSimplify()
   return;
 
   filter.basePath = basePath[ 0 ];
+
+}
+
+//
+
+function basePathDotUnwrap()
+{
+  let filter = this;
+  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let path = fileProvider.path;
+
+  _.assert( arguments.length === 0 );
+
+  if( !filter.basePath )
+  return;
+
+  if( _.strIs( filter.basePath ) && filter.basePath !== '.' )
+  return;
+
+  if( _.mapIs( filter.basePath ) && !_.mapsAreIdentical( filter.basePath, { '.' : '.' } ) )
+  return;
+
+  debugger;
+  let filePath = filter.filePathArrayNonBoolGet(); // xxx : boolFallingBack?
+
+  let basePath = _.mapIs( filter.basePath ) ? filter.basePath : Object.create( null );
+  delete basePath[ '.' ];
+  filter.basePath = basePath;
+
+  filePath.forEach( ( fp ) => basePath[ fp ] = fp );
 
 }
 
@@ -1932,10 +2093,86 @@ function basePathEach( onEach )
 // file path
 // --
 
+function filePathCopy( o )
+{
+
+  _.assertRoutineOptions( filePathCopy, arguments );
+
+  /* get */
+
+  if( o.value === null )
+  if( _.instanceIs( o.srcInstance ) )
+  {
+    o.value = o.srcInstance[ filePathSymbol ];
+  }
+  else if( o.srcInstance )
+  {
+    debugger;
+    o.value = o.srcInstance.filePath;
+  }
+
+  if( o.srcInstance && o.dstInstance )
+  {
+    o.value = _.entityShallowClone( o.value );
+  }
+
+  /* set */
+
+  if( _.instanceIs( o.dstInstance ) )
+  {
+    _.assert( o.value === null || _.strIs( o.value ) || _.arrayIs( o.value ) || _.mapIs( o.value ) );
+
+    if( o.dstInstance./*srcFilter*/src )
+    {
+      let fileProvider = o.dstInstance.hubFileProvider || o.dstInstance.effectiveFileProvider || o.dstInstance.defaultFileProvider;
+      let path = fileProvider.path;
+      if( _.strIs( o.value ) || _.arrayIs( o.value ) || _.boolLike( o.value ) )
+      o.value = path.mapsPair( o.value, null );
+      _.assert( o.value === null || _.mapIs( o.value ), () => 'Paired filter could have only path map as file path, not ' + _.strType( o.value ) );
+      if( o.value !== o.dstInstance./*srcFilter*/src.filePath )
+      o.dstInstance./*srcFilter*/src[ filePathSymbol ] = o.value;
+    }
+    else if( o.dstInstance./*dstFilter*/dst )
+    {
+      let fileProvider = o.dstInstance.hubFileProvider || o.dstInstance.effectiveFileProvider || o.dstInstance.defaultFileProvider;
+      let path = fileProvider.path;
+      if( _.strIs( o.value ) || _.arrayIs( o.value ) || _.boolLike( o.value ) )
+      o.value = path.mapsPair( null, o.value );
+      _.assert( o.value === null || _.mapIs( o.value ), () => 'Paired filter could have only path map as file path, not ' + _.strType( o.value ) );
+      if( o.value !== o.dstInstance./*dstFilter*/dst.filePath )
+      o.dstInstance./*dstFilter*/dst[ filePathSymbol ] = o.value;
+    }
+
+    o.dstInstance[ filePathSymbol ] = o.value;
+  }
+  else if( o.dstInstance )
+  {
+    debugger;
+    o.dstInstance.filePath = o.value;
+  }
+
+  /* */
+
+  return o;
+}
+
+filePathCopy.defaults =
+{
+  dstInstance : null,
+  srcInstance : null,
+  instanceKey : null,
+  srcContainer : null,
+  dstContainer : null,
+  containerKey : null,
+  value : null,
+}
+
+//
+
 function filePathGet()
 {
   let filter = this;
-  return filter.filePath;
+  return filter[ filePathSymbol ];
 }
 
 //
@@ -1943,8 +2180,32 @@ function filePathGet()
 function filePathSet( src )
 {
   let filter = this;
+
   _.assert( src === null || _.strIs( src ) || _.arrayIs( src ) || _.mapIs( src ) );
-  filter.filePath = src;
+
+  if( filter./*srcFilter*/src )
+  {
+    let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+    let path = fileProvider.path;
+    if( _.strIs( src ) || _.arrayIs( src ) || _.boolLike( src ) )
+    src = path.mapsPair( src, null );
+    _.assert( src === null || _.mapIs( src ), () => 'Paired filter could have only path map as file path, not ' + _.strType( src ) );
+    if( src !== filter./*srcFilter*/src.filePath )
+    filter./*srcFilter*/src[ filePathSymbol ] = src;
+  }
+  else if( filter./*dstFilter*/dst )
+  {
+    let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+    let path = fileProvider.path;
+    if( _.strIs( src ) || _.arrayIs( src ) || _.boolLike( src ) )
+    src = path.mapsPair( null, src );
+    _.assert( src === null || _.mapIs( src ), () => 'Paired filter could have only path map as file path, not ' + _.strType( src ) );
+    if( src !== filter./*dstFilter*/dst.filePath )
+    filter./*dstFilter*/dst[ filePathSymbol ] = src;
+  }
+
+  filter[ filePathSymbol ] = src;
+
   return src;
 }
 
@@ -1959,9 +2220,9 @@ function filePathNormalize( filePath )
   _.assert( arguments.length === 1 );
 
   if( !_.mapIs( filePath ) )
-  filePath = path.pathMapExtend( null, filePath );
+  filePath = path.mapExtend( null, filePath );
 
-  if( filter.srcFilter )
+  if( filter./*srcFilter*/src )
   {
 
     for( let srcPath in filePath )
@@ -2013,16 +2274,21 @@ function filePathPrependBasePath( filePath, basePath )
   _.assert( _.mapIs( filePath ) );
   _.assert( _.mapIs( basePath ) );
 
-  if( filter.srcFilter )
+  if( filter./*srcFilter*/src )
   {
-
     debugger;
+
     for( let srcPath in filePath )
     {
 
       let dstPath = filePath[ srcPath ];
       let b = basePath[ dstPath ];
-      if( !_.strIs( dstPath ) || path.isAbsolute( dstPath ) )
+
+      if( path.isAbsolute( dstPath ) )
+      continue;
+      if( !b )
+      continue;
+      if( !path.isAbsolute( b ) )
       continue;
 
       _.assert( path.isAbsolute( b ) );
@@ -2032,21 +2298,47 @@ function filePathPrependBasePath( filePath, basePath )
       {
         delete basePath[ dstPath ];
         basePath[ joinedPath ] = b;
-        filePath[ srcPath ] = joinedPath;
+        delete filePath[ srcPath ];
+        path.mapExtend( filePath, srcPath, joinedPath );
       }
 
     }
-    debugger;
 
+    debugger;
   }
+  // {
+  //
+  //   debugger;
+  //   for( let srcPath in filePath )
+  //   {
+  //
+  //     let dstPath = filePath[ srcPath ];
+  //     let b = basePath[ dstPath ];
+  //     if( !_.strIs( dstPath ) || path.isAbsolute( dstPath ) )
+  //     continue;
+  //
+  //     _.assert( path.isAbsolute( b ) );
+  //
+  //     let joinedPath = path.join( b, dstPath );
+  //     if( joinedPath !== dstPath )
+  //     {
+  //       delete basePath[ dstPath ];
+  //       basePath[ joinedPath ] = b;
+  //       filePath[ srcPath ] = joinedPath;
+  //     }
+  //
+  //   }
+  //   debugger;
+  //
+  // }
   else
   {
 
     for( let srcPath in filePath )
     {
 
-      let b = basePath[ srcPath ];
       let dstPath = filePath[ srcPath ];
+      let b = basePath[ srcPath ];
 
       if( path.isAbsolute( srcPath ) )
       continue;
@@ -2063,7 +2355,7 @@ function filePathPrependBasePath( filePath, basePath )
         delete basePath[ srcPath ];
         basePath[ joinedPath ] = b;
         delete filePath[ srcPath ];
-        path.pathMapExtend( filePath, joinedPath, dstPath );
+        path.mapExtend( filePath, joinedPath, dstPath );
       }
 
     }
@@ -2083,7 +2375,10 @@ function filePathMultiplyRelatives( filePath, basePath )
   _.assert( arguments.length === 2 );
   _.assert( _.mapIs( filePath ) );
   _.assert( _.mapIs( basePath ) );
-  _.assert( !filter.srcFilter );
+  // _.assert( !filter./*srcFilter*/src );
+
+  // if( !filter./*srcFilter*/src )
+  // debugger;
 
   let relativePath = _.mapExtend( null, filePath );
 
@@ -2129,7 +2424,7 @@ function filePathAbsolutize()
   if( _.mapKeys( filter.filePath ).length === 0 )
   return;
 
-  _.assert( _.mapIs( filter.basePath ) );
+  // _.assert( _.mapIs( filter.basePath ) );
   _.assert( _.mapIs( filter.filePath ) );
 
   let filePath = filter.filePathArrayGet().filter( ( e ) => _.strIs( e ) );
@@ -2145,6 +2440,11 @@ function filePathAbsolutize()
 }
 
 //
+
+/*
+Easy optimization. No need to enable slower glob searching if glob is "**".
+Result of such glob is equivalent to result of recursive searching.
+*/
 
 function filePathGlobSimplify( basePath, filePath )
 {
@@ -2175,7 +2475,7 @@ function filePathGlobSimplify( basePath, filePath )
 
   function simplify( src, what )
   {
-    let src2 = path.normalizeStrict( _.strRemoveEnd( src, what ) );
+    let src2 = path.normalizeCanonical( _.strRemoveEnd( src, what ) );
     if( !path.isGlob( src2 ) )
     {
       _.assert( filePath[ src2 ] === undefined )
@@ -2215,19 +2515,44 @@ function filePathFromFixes()
 
 //
 
-function filePathSimplest()
+function filePathSimplest( filePath )
 {
   let filter = this;
 
-  let filePath = filter.filePathNormalizedGet();
+  filePath = filePath || filter.filePathArrayNonBoolGet();
+  // filePath = filePath || filter.filePathNormalizedGet();
 
   _.assert( !_.mapIs( filePath ) );
+  _.assert( arguments.length === 0 || arguments.length === 1 );
 
   if( _.arrayIs( filePath ) && filePath.length === 1 )
   return filePath[ 0 ];
 
+  if( _.arrayIs( filePath ) && filePath.length === 0 )
+  return null;
+
   return filePath;
 }
+
+//
+// //
+//
+// function filePathSimplest()
+// {
+//   let filter = this;
+//
+//   let filePath = filter.filePathNormalizedGet();
+//
+//   _.assert( !_.mapIs( filePath ) );
+//
+//   if( _.arrayIs( filePath ) && filePath.length === 1 )
+//   return filePath[ 0 ];
+//
+//   if( _.arrayIs( filePath ) && filePath.length === 0 )
+//   return null;
+//
+//   return filePath;
+// }
 
 //
 
@@ -2242,7 +2567,7 @@ function filePathNullizeMaybe( filePath )
   if( _.any( filePath2, ( e ) => !_.boolLike( e ) ) )
   return filePath;
 
-  return path.pathMapFilterInplace( filePath, ( e ) => _.boolLike( e ) && e ? null : e );
+  return path.filterInplace( filePath, ( e ) => _.boolLike( e ) && e ? null : e );
 }
 
 //
@@ -2298,7 +2623,7 @@ function filePathDstHasAnyBools( filePath )
 
 //
 
-function filePathOnlyBools( filePath )
+function filePathMapOnlyBools( filePath )
 {
   let filter = this;
   let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
@@ -2337,13 +2662,13 @@ function filePathDstArrayGet( filePath )
 
   _.assert( arguments.length === 0 || arguments.length === 1 );
 
-  if( filter.srcFilter )
+  if( filter./*srcFilter*/src )
   {
-    return path.pathMapDstFromDst( filePath );
+    return path.mapDstFromDst( filePath );
   }
   else
   {
-    return path.pathMapDstFromSrc( filePath );
+    return path.mapDstFromSrc( filePath );
   }
 
   _.assert( _.arrayIs( filePath ) );
@@ -2366,13 +2691,13 @@ function filePathSrcArrayGet( filePath )
 
   _.assert( arguments.length === 0 || arguments.length === 1 );
 
-  if( filter.srcFilter )
+  if( filter./*srcFilter*/src )
   {
-    return path.pathMapSrcFromDst( filePath );
+    return path.mapSrcFromDst( filePath );
   }
   else
   {
-    return path.pathMapSrcFromSrc( filePath );
+    return path.mapSrcFromSrc( filePath );
   }
 
   _.assert( _.arrayIs( filePath ) );
@@ -2394,13 +2719,13 @@ function filePathArrayGet( filePath )
 
   _.assert( arguments.length === 0 || arguments.length === 1 );
 
-  if( filter.srcFilter )
+  if( filter./*srcFilter*/src )
   {
-    filePath = path.pathMapDstFromDst( filePath );
+    filePath = path.mapDstFromDst( filePath );
   }
   else
   {
-    filePath = path.pathMapSrcFromSrc( filePath );
+    filePath = path.mapSrcFromSrc( filePath );
   }
 
   _.assert( _.arrayIs( filePath ) );
@@ -2418,25 +2743,39 @@ function filePathDstArrayNonBoolGet( filePath, boolFallingBack )
 
   filePath = filePath || filter.filePath;
 
+  // if( boolFallingBack === undefined )
+  // boolFallingBack = true;
+
   if( boolFallingBack === undefined )
-  boolFallingBack = 1;
+  boolFallingBack = false;
 
   _.assert( arguments.length === 0 || arguments.length === 1 || arguments.length === 2 );
 
-  if( filter.srcFilter )
+  if( filter./*srcFilter*/src )
   {
-    filePath = path.pathMapDstFromDst( filePath );
+    filePath = path.mapDstFromDst( filePath );
   }
   else
   {
-    filePath = path.pathMapDstFromSrc( filePath );
+    filePath = path.mapDstFromSrc( filePath );
   }
 
   let filePath2 = filePath.filter( ( e ) => !_.boolLike( e ) );
   if( filePath2.length || !boolFallingBack )
-  filePath = filePath2;
+  {
+    filePath = filePath2;
+  }
   else
-  filePath = filePath.filter( ( e ) => !!e );
+  {
+    filePath = _.filter( filePath, ( e ) =>
+    {
+      if( !_.boolLike( e ) )
+      return e;
+      if( e )
+      return null;
+      return undefined;
+    });
+  }
 
   _.assert( _.arrayIs( filePath ) );
 
@@ -2453,8 +2792,11 @@ function filePathSrcArrayNonBoolGet( filePath, boolFallingBack )
 
   filePath = filePath || filter.filePath;
 
+  // if( boolFallingBack === undefined )
+  // boolFallingBack = true;
+
   if( boolFallingBack === undefined )
-  boolFallingBack = 1;
+  boolFallingBack = false;
 
   if( filePath === null )
   return [];
@@ -2483,17 +2825,18 @@ function filePathSrcArrayNonBoolGet( filePath, boolFallingBack )
   }
   else
   {
-    if( filter.srcFilter )
+    if( filter./*srcFilter*/src )
     {
-      filePath = path.pathMapSrcFromDst( filePath );
+      filePath = path.mapSrcFromDst( filePath );
     }
     else
     {
-      filePath = path.pathMapSrcFromSrc( filePath );
+      filePath = path.mapSrcFromSrc( filePath );
     }
   }
 
   _.assert( _.arrayIs( filePath ) );
+  _.longUnduplicate( filePath );
 
   return filePath;
 }
@@ -2512,7 +2855,7 @@ function filePathArrayNonBoolGet( filePath, boolFallingBack )
 
   _.assert( arguments.length === 0 || arguments.length === 1 || arguments.length === 2 );
 
-  if( filter.srcFilter )
+  if( filter./*srcFilter*/src )
   {
     return filter.filePathDstArrayNonBoolGet( filePath, boolFallingBack );
   }
@@ -2535,20 +2878,17 @@ function filePathDstArrayBoolGet( filePath )
 
   _.assert( arguments.length === 0 || arguments.length === 1 );
 
-  if( filter.srcFilter )
+  if( filter./*srcFilter*/src )
   {
-    filePath = path.pathMapDstFromDst( filePath );
+    filePath = path.mapDstFromDst( filePath );
   }
   else
   {
-    filePath = path.pathMapDstFromSrc( filePath );
+    filePath = path.mapDstFromSrc( filePath );
   }
 
-  debugger;
-  _.assert( 0, 'not tested' );
-
-  let filePath2 = filePath.filter( ( e ) => _.boolLike( e ) );
-  filePath = filePath2;
+  let filePath2 = _.filter( filePath, ( e ) => _.boolLike( e ) ? !!e : undefined );
+  filePath = _.longUnduplicate( null, filePath2 );
 
   _.assert( _.arrayIs( filePath ) );
 
@@ -2572,7 +2912,7 @@ function filePathSrcArrayBoolGet( filePath )
 
   if( _.mapIs( filePath ) )
   {
-    let r = []; debugger;
+    let r = [];
 
     for( let src in filePath )
     {
@@ -2586,14 +2926,15 @@ function filePathSrcArrayBoolGet( filePath )
   }
   else
   {
-    if( filter.srcFilter )
-    {
-      filePath = path.pathMapSrcFromDst( filePath );
-    }
-    else
-    {
-      filePath = path.pathMapSrcFromSrc( filePath );
-    }
+    filePath = [];
+    // if( filter./*srcFilter*/src )
+    // {
+    //   filePath = path.mapSrcFromDst( filePath );
+    // }
+    // else
+    // {
+    //   filePath = path.mapSrcFromSrc( filePath );
+    // }
   }
 
   _.assert( _.arrayIs( filePath ) );
@@ -2615,7 +2956,7 @@ function filePathArrayBoolGet( filePath )
 
   _.assert( arguments.length === 0 || arguments.length === 1 );
 
-  if( filter.srcFilter )
+  if( filter./*srcFilter*/src )
   {
     return filter.filePathDstArrayBoolGet( filePath );
   }
@@ -2731,7 +3072,7 @@ function filePathSrcNormalizedGet( filePath )
 function filePathNormalizedGet( filePath )
 {
   let filter = this;
-  if( filter.srcFilter )
+  if( filter./*srcFilter*/src )
   return filter.filePathDstNormalizedGet( filePath );
   else
   return filter.filePathSrcNormalizedGet( filePath );
@@ -2742,7 +3083,7 @@ function filePathNormalizedGet( filePath )
 function filePathCommon( filePath )
 {
   let filter = this;
-  if( filter.srcFilter )
+  if( filter./*srcFilter*/src )
   return filter.filePathDstCommon( filePath );
   else
   return filter.filePathSrcCommon( filePath );
@@ -2778,38 +3119,49 @@ function filePathSrcCommon()
 // pair
 // --
 
-function pairFor( srcPath, dstPath )
+// function pairFor( srcPath, dstPath ) // xxx : remove maybe
+// {
+//   let /*srcFilter*/src = this;
+//   let /*dstFilter*/dst = /*srcFilter*/src./*dstFilter*/dst;
+//   let fileProvider = /*srcFilter*/src.hubFileProvider || /*srcFilter*/src.effectiveFileProvider || /*srcFilter*/src.defaultFileProvider;
+//   let path = fileProvider.path;
+//
+//   _.assert( /*dstFilter*/dst instanceof Self );
+//   _.assert( /*dstFilter*/dst./*srcFilter*/src === /*srcFilter*/src );
+//
+//   /*dstFilter*/dst = /*dstFilter*/dst.clone();
+//   /*srcFilter*/src = /*srcFilter*/src.clone();
+//   /*srcFilter*/src.pairWithDst( /*dstFilter*/dst );
+//   /*srcFilter*/src.filePathSelect( srcPath, dstPath );
+//
+//   return /*srcFilter*/src;
+// }
+
+//
+
+function pairedFilterGet()
 {
-  let srcFilter = this;
-  let dstFilter = srcFilter.dstFilter;
-  let fileProvider = srcFilter.hubFileProvider || srcFilter.effectiveFileProvider || srcFilter.defaultFileProvider;
-  let path = fileProvider.path;
-
-  _.assert( dstFilter instanceof Self );
-  _.assert( dstFilter.srcFilter === srcFilter );
-
-  dstFilter = dstFilter.clone();
-  srcFilter = srcFilter.clone();
-  srcFilter.pairWithDst( dstFilter );
-
-  srcFilter.filePathSelect( srcPath, dstPath );
-
-  return srcFilter;
+  let filter = this;
+  _.assert( arguments.length === 0 );
+  if( filter.src )
+  return filter.src
+  else
+  return filter.dst;
 }
 
 //
 
-function pairWithDst( dstFilter )
+function pairWithDst( /*dstFilter*/dst )
 {
   let filter = this;
 
-  _.assert( dstFilter instanceof Self );
+  _.assert( /*dstFilter*/dst instanceof Self );
   _.assert( filter instanceof Self );
-  _.assert( filter.dstFilter === null || filter.dstFilter === dstFilter );
-  _.assert( dstFilter.srcFilter === null || dstFilter.srcFilter === filter );
+  _.assert( filter./*dstFilter*/dst === null || filter./*dstFilter*/dst === /*dstFilter*/dst );
+  _.assert( /*dstFilter*/dst./*srcFilter*/src === null || /*dstFilter*/dst./*srcFilter*/src === filter );
 
-  filter.dstFilter = dstFilter;
-  dstFilter.srcFilter = filter;
+  filter./*dstFilter*/dst = /*dstFilter*/dst;
+  /*dstFilter*/dst./*srcFilter*/src = filter;
 
   return filter;
 }
@@ -2818,178 +3170,208 @@ function pairWithDst( dstFilter )
 
 function pairRefineLight()
 {
-  let srcFilter = this;
-  let dstFilter = srcFilter.dstFilter;
-  let fileProvider = srcFilter.hubFileProvider || srcFilter.effectiveFileProvider || srcFilter.defaultFileProvider;
+  let /*srcFilter*/src = this;
+  let /*dstFilter*/dst = /*srcFilter*/src./*dstFilter*/dst;
+  let fileProvider = /*srcFilter*/src.hubFileProvider || /*srcFilter*/src.effectiveFileProvider || /*srcFilter*/src.defaultFileProvider;
   let path = fileProvider.path;
 
-  _.assert( dstFilter instanceof Self );
-  _.assert( srcFilter instanceof Self );
-  _.assert( dstFilter.srcFilter === srcFilter );
-  _.assert( srcFilter.dstFilter === dstFilter );
+  _.assert( /*dstFilter*/dst instanceof Self );
+  _.assert( /*srcFilter*/src instanceof Self );
+  _.assert( /*dstFilter*/dst./*srcFilter*/src === /*srcFilter*/src );
+  _.assert( /*srcFilter*/src./*dstFilter*/dst === /*dstFilter*/dst );
   _.assert( arguments.length === 0 );
 
-  srcFilter.pairWithDst( dstFilter );
-  srcFilter.filePath = dstFilter.filePath = path.pathMapPairSrcAndDst( srcFilter.filePath, dstFilter.filePath );
+  /*srcFilter*/src.filePath = /*dstFilter*/dst.filePath = path.mapsPair( /*dstFilter*/dst.filePath, /*srcFilter*/src.filePath );
 
-  _.assert( srcFilter.filePath !== undefined );
+  _.assert( /*srcFilter*/src.filePath !== undefined );
+  _.assert( _.mapIs( /*srcFilter*/src.filePath ) || /*srcFilter*/src.filePath === null );
+  _.assert( /*srcFilter*/src.filePath === /*dstFilter*/dst.filePath );
 
 }
 
 //
 
-function pairRefine()
+function isPaired( aFilter )
 {
-  let srcFilter = this;
-  let dstFilter = srcFilter.dstFilter;
-  let fileProvider = srcFilter.hubFileProvider || srcFilter.effectiveFileProvider || srcFilter.defaultFileProvider;
-  let path = fileProvider.path;
-  let lackOfDst = false;
+  let /*srcFilter*/src = this;
+  let /*dstFilter*/dst = /*srcFilter*/src./*dstFilter*/dst;
 
-  _.assert( arguments.length === 0 );
+  aFilter = aFilter || /*srcFilter*/src./*dstFilter*/dst || /*srcFilter*/src./*srcFilter*/src;
 
-  if( _.mapIs( srcFilter.filePath ) && _.entityIdentical( srcFilter.filePath, dstFilter.filePath ) )
+  if( /*srcFilter*/src./*srcFilter*/src )
   {
-    dstFilter.filePath = srcFilter.filePath;
+    /*dstFilter*/dst = /*srcFilter*/src;
+    /*srcFilter*/src = /*srcFilter*/src./*srcFilter*/src;
+    if( aFilter !== /*srcFilter*/src )
+    return false;
+  }
+  else
+  {
+    if( aFilter !== /*dstFilter*/dst )
+    return false;
   }
 
-  /* deduce src path if required */
+  _.assert( !!/*dstFilter*/dst );
+  _.assert( /*srcFilter*/src./*dstFilter*/dst === /*dstFilter*/dst );
+  _.assert( /*dstFilter*/dst./*srcFilter*/src === /*srcFilter*/src );
+  _.assert( /*srcFilter*/src./*srcFilter*/src === null );
+  _.assert( /*dstFilter*/dst./*dstFilter*/dst === null );
 
-  if( !srcFilter.filePath )
-  {
-    if( _.mapIs( dstFilter.filePath ) )
-    srcFilter.filePath = dstFilter.filePath;
-    else if( !srcFilter.filePath && ( srcFilter.prefixPath || srcFilter.postfixPath ) )
-    srcFilter.filePath = path.join( srcFilter.prefixPath || '.', srcFilter.postfixPath || '.' );
-    else
-    {}
-  }
-
-  /* deduce dst path if required */
-
-  let dstRequired = _.mapIs( srcFilter.filePath ) && _.any( srcFilter.filePath, ( e, k ) => e === null );
-  if( dstRequired || _.arrayIs( srcFilter.filePath ) || _.strIs( srcFilter.filePath ) )
-  {
-
-    if( _.entityIdentical( dstFilter.basePath, { '.' : '.' } ) )
-    dstFilter.basePath = '.';
-
-    if( _.arrayIs( dstFilter.filePath ) && dstFilter.filePath.length === 1 )
-    dstFilter.filePath = dstFilter.filePath[ 0 ];
-    if( dstFilter.filePath === '.' )
-    {
-      _.assert( dstFilter.basePath === null || dstFilter.basePath === '.' || _.entityIdentical( dstFilter.basePath, { '.' : '.' } ) );
-      dstFilter.filePath = null;
-    }
-
-    if( !dstFilter.filePath )
-    {
-      if( dstFilter.prefixPath || dstFilter.postfixPath )
-      dstFilter.filePath = path.join( dstFilter.prefixPath || '.', dstFilter.postfixPath || '.' );
-    }
-    else
-    {
-      let dstPath1 = path.pathMapDstFromSrc( srcFilter.filePath ).filter( ( e, k ) => _.strIs( e ) );
-      let dstPath2 = path.pathMapDstFromDst( dstFilter.filePath ).filter( ( e, k ) => _.strIs( e ) );
-      _.assert( dstPath1.length === 0 || dstPath2.length === 0 || _.arraySetIdentical( dstPath1, dstPath2 ) );
-    }
-
-    srcFilter._formAssociations();
-    if( srcFilter.filePath )
-    srcFilter.prefixesApply();
-
-    dstFilter._formAssociations();
-    if( dstFilter.filePath )
-    dstFilter.prefixesApply()
-
-    if( dstFilter.filePath )
-    {
-      srcVerify();
-      let dstPath = dstFilter.filePathDstNormalizedGet();
-      if( _.arrayIs( dstPath ) && dstPath.length === 1 )
-      dstPath = dstPath[ 0 ];
-      if( _.arrayIs( dstPath ) && dstPath.length === 0 )
-      {
-        dstPath = null;
-        lackOfDst = true;
-      }
-      _.assert( _.strIs( dstPath ) || _.arrayIs( dstPath ) || _.boolLike( dstPath ) || dstPath === null );
-      srcFilter.filePath = dstFilter.filePath = path.pathMapExtend( null, srcFilter.filePath, dstPath );
-    }
-    else
-    {
-      lackOfDst = true;
-      if( _.strIs( srcFilter.filePath ) )
-      srcFilter.filePath = { [ srcFilter.filePath ] : null }
-    }
-
-  }
-
-  /* assign destination path */
-
-  _.assert( srcFilter.filePath === null || _.mapIs( srcFilter.filePath ) );
-
-  if( dstFilter.filePath && dstFilter.filePath !== srcFilter.filePath )
-  {
-
-    srcVerify();
-    dstVerify();
-
-    if( _.mapIs( dstFilter.filePath ) )
-    {
-    }
-    else if( srcFilter.filePath && !_.mapIs( dstFilter.filePath ) )
-    {
-      dstFilter.filePath = _.arrayAs( dstFilter.filePath );
-      _.assert( _.strsAreAll( dstFilter.filePath ) );
-      dstVerify();
-    }
-
-  }
-
-  if( dstFilter.filePath !== srcFilter.filePath && srcFilter.filePath )
-  dstFilter.filePath = srcFilter.filePath;
-
-  /* validate */
-
-  let dstFilePath = srcFilter.filePathSrcArrayGet();
-
-  _.assert( srcFilter.filePath === null || dstFilter.filePath === null || srcFilter.filePath === dstFilter.filePath )
-  _.assert( srcFilter.filePath === null || _.all( srcFilter.filePath, ( e, k ) => path.is( k ) ) );
-  _.assert( srcFilter.filePath === null || _.all( dstFilePath, ( e, k ) => _.boolLike( e ) || path.s.allAre( e ) ) );
-
-  /* */
-
-  function srcVerify()
-  {
-    if( dstFilter.filePath && srcFilter.filePath && Config.debug )
-    {
-      let srcPath1 = path.pathMapSrcFromSrc( srcFilter.filePath );
-      let srcPath2 = path.pathMapSrcFromDst( dstFilter.filePath );
-      _.assert( srcPath1.length === 0 || srcPath2.length === 0 || _.arraySetIdentical( srcPath1, srcPath2 ), () => 'Source paths are inconsistent ' + _.toStr( srcPath1 ) + ' ' + _.toStr( srcPath2 ) );
-    }
-  }
-
-  /* */
-
-  function dstVerify()
-  {
-    if( dstFilter.filePath && srcFilter.filePath && Config.debug )
-    {
-      let dstPath1 = path.pathMapDstFromSrc( srcFilter.filePath );
-      let dstPath2 = path.pathMapDstFromDst( dstFilter.filePath );
-      _.arrayRemove( dstPath2, '.' );
-      _.assert( dstPath1.length === 0 || dstPath2.length === 0 || _.arraySetIdentical( dstPath1, dstPath2 ), () => 'Destination paths are inconsistent ' + _.toStr( dstPath1 ) + ' ' + _.toStr( dstPath2 ) );
-    }
-  }
-
+  return true;
 }
+
+// //
+//
+// function pairRefine()
+// {
+//   let /*srcFilter*/src = this;
+//   let /*dstFilter*/dst = /*srcFilter*/src./*dstFilter*/dst;
+//   let fileProvider = /*srcFilter*/src.hubFileProvider || /*srcFilter*/src.effectiveFileProvider || /*srcFilter*/src.defaultFileProvider;
+//   let path = fileProvider.path;
+//   let lackOfDst = false;
+//
+//   _.assert( arguments.length === 0 );
+//
+//   if( _.mapIs( /*srcFilter*/src.filePath ) && _.entityIdentical( /*srcFilter*/src.filePath, /*dstFilter*/dst.filePath ) )
+//   {
+//     /*dstFilter*/dst.filePath = /*srcFilter*/src.filePath;
+//   }
+//
+//   /* deduce src path if required */
+//
+//   if( !/*srcFilter*/src.filePath )
+//   {
+//     if( _.mapIs( /*dstFilter*/dst.filePath ) )
+//     /*srcFilter*/src.filePath = /*dstFilter*/dst.filePath;
+//     else if( !/*srcFilter*/src.filePath && ( /*srcFilter*/src.prefixPath || /*srcFilter*/src.postfixPath ) )
+//     /*srcFilter*/src.filePath = path.join( /*srcFilter*/src.prefixPath || '.', /*srcFilter*/src.postfixPath || '.' );
+//     else
+//     {}
+//   }
+//
+//   /* deduce dst path if required */
+//
+//   let dstRequired = _.mapIs( /*srcFilter*/src.filePath ) && _.any( /*srcFilter*/src.filePath, ( e, k ) => e === null );
+//   if( dstRequired || _.arrayIs( /*srcFilter*/src.filePath ) || _.strIs( /*srcFilter*/src.filePath ) )
+//   {
+//
+//     if( _.entityIdentical( /*dstFilter*/dst.basePath, { '.' : '.' } ) )
+//     /*dstFilter*/dst.basePath = '.';
+//
+//     if( _.arrayIs( /*dstFilter*/dst.filePath ) && /*dstFilter*/dst.filePath.length === 1 )
+//     /*dstFilter*/dst.filePath = /*dstFilter*/dst.filePath[ 0 ];
+//     if( /*dstFilter*/dst.filePath === '.' )
+//     {
+//       _.assert( /*dstFilter*/dst.basePath === null || /*dstFilter*/dst.basePath === '.' || _.entityIdentical( /*dstFilter*/dst.basePath, { '.' : '.' } ) );
+//       /*dstFilter*/dst.filePath = null;
+//     }
+//
+//     if( !/*dstFilter*/dst.filePath )
+//     {
+//       if( /*dstFilter*/dst.prefixPath || /*dstFilter*/dst.postfixPath )
+//       /*dstFilter*/dst.filePath = path.join( /*dstFilter*/dst.prefixPath || '.', /*dstFilter*/dst.postfixPath || '.' );
+//     }
+//     else
+//     {
+//       let dstPath1 = path.mapDstFromSrc( /*srcFilter*/src.filePath ).filter( ( e, k ) => _.strIs( e ) );
+//       let dstPath2 = path.mapDstFromDst( /*dstFilter*/dst.filePath ).filter( ( e, k ) => _.strIs( e ) );
+//       _.assert( dstPath1.length === 0 || dstPath2.length === 0 || _.arraySetIdentical( dstPath1, dstPath2 ) );
+//     }
+//
+//     /*srcFilter*/src._formAssociations();
+//     if( /*srcFilter*/src.filePath )
+//     /*srcFilter*/src.prefixesApply();
+//
+//     /*dstFilter*/dst._formAssociations();
+//     if( /*dstFilter*/dst.filePath )
+//     /*dstFilter*/dst.prefixesApply()
+//
+//     if( /*dstFilter*/dst.filePath )
+//     {
+//       srcVerify();
+//       let dstPath = /*dstFilter*/dst.filePathDstNormalizedGet();
+//       if( _.arrayIs( dstPath ) && dstPath.length === 1 )
+//       dstPath = dstPath[ 0 ];
+//       if( _.arrayIs( dstPath ) && dstPath.length === 0 )
+//       {
+//         dstPath = null;
+//         lackOfDst = true;
+//       }
+//       _.assert( _.strIs( dstPath ) || _.arrayIs( dstPath ) || _.boolLike( dstPath ) || dstPath === null );
+//       /*srcFilter*/src.filePath = /*dstFilter*/dst.filePath = path.mapExtend( null, /*srcFilter*/src.filePath, dstPath );
+//     }
+//     else
+//     {
+//       lackOfDst = true;
+//       if( _.strIs( /*srcFilter*/src.filePath ) )
+//       /*srcFilter*/src.filePath = { [ /*srcFilter*/src.filePath ] : null }
+//     }
+//
+//   }
+//
+//   /* assign destination path */
+//
+//   _.assert( /*srcFilter*/src.filePath === null || _.mapIs( /*srcFilter*/src.filePath ) );
+//
+//   if( /*dstFilter*/dst.filePath && /*dstFilter*/dst.filePath !== /*srcFilter*/src.filePath )
+//   {
+//
+//     srcVerify();
+//     dstVerify();
+//
+//     if( _.mapIs( /*dstFilter*/dst.filePath ) )
+//     {
+//     }
+//     else if( /*srcFilter*/src.filePath && !_.mapIs( /*dstFilter*/dst.filePath ) )
+//     {
+//       /*dstFilter*/dst.filePath = _.arrayAs( /*dstFilter*/dst.filePath );
+//       _.assert( _.strsAreAll( /*dstFilter*/dst.filePath ) );
+//       dstVerify();
+//     }
+//
+//   }
+//
+//   if( /*dstFilter*/dst.filePath !== /*srcFilter*/src.filePath && /*srcFilter*/src.filePath )
+//   /*dstFilter*/dst.filePath = /*srcFilter*/src.filePath;
+//
+//   /* validate */
+//
+//   let dstFilePath = /*srcFilter*/src.filePathSrcArrayGet();
+//
+//   _.assert( /*srcFilter*/src.filePath === null || /*dstFilter*/dst.filePath === null || /*srcFilter*/src.filePath === /*dstFilter*/dst.filePath )
+//   _.assert( /*srcFilter*/src.filePath === null || _.all( /*srcFilter*/src.filePath, ( e, k ) => path.is( k ) ) );
+//   _.assert( /*srcFilter*/src.filePath === null || _.all( dstFilePath, ( e, k ) => _.boolLike( e ) || path.s.allAre( e ) ) );
+//
+//   /* */
+//
+//   function srcVerify()
+//   {
+//     if( /*dstFilter*/dst.filePath && /*srcFilter*/src.filePath && Config.debug )
+//     {
+//       let srcPath1 = path.mapSrcFromSrc( /*srcFilter*/src.filePath );
+//       let srcPath2 = path.mapSrcFromDst( /*dstFilter*/dst.filePath );
+//       _.assert( srcPath1.length === 0 || srcPath2.length === 0 || _.arraySetIdentical( srcPath1, srcPath2 ), () => 'Source paths are inconsistent ' + _.toStr( srcPath1 ) + ' ' + _.toStr( srcPath2 ) );
+//     }
+//   }
+//
+//   /* */
+//
+//   function dstVerify()
+//   {
+//     if( /*dstFilter*/dst.filePath && /*srcFilter*/src.filePath && Config.debug )
+//     {
+//       let dstPath1 = path.mapDstFromSrc( /*srcFilter*/src.filePath );
+//       let dstPath2 = path.mapDstFromDst( /*dstFilter*/dst.filePath );
+//       _.arrayRemove( dstPath2, '.' );
+//       _.assert( dstPath1.length === 0 || dstPath2.length === 0 || _.arraySetIdentical( dstPath1, dstPath2 ), () => 'Destination paths are inconsistent ' + _.toStr( dstPath1 ) + ' ' + _.toStr( dstPath2 ) );
+//     }
+//   }
+//
+// }
 
 // --
 // etc
 // --
-
-//
 
 function providersNormalize()
 {
@@ -3071,35 +3453,22 @@ function allPaths( o )
 
   function each( thePath, fieldName )
   {
-    let it = Object.create( null );
-
-    // it.options = o;
+    // let it = Object.create( null );
     // it.fieldName = fieldName;
-    it.fieldName = fieldName;
-    it.side = null;
-    // it.field = thePath;
-    it.value = thePath;
+    // it.side = null;
+    // it.value = thePath;
+    // let result = path.pathMapIterate({ iteration : it, filePath : thePath, onEach : o.onEach });
 
-    let result = path.pathMapIterate({ iteration : it, filePath : thePath, onEach : o.onEach });
+    // debugger;
+    let result = o.inplace ? path.filterInplace( thePath, o.onEach ) : path.filter( thePath, o.onEach );
+    // debugger;
 
-    filter[ fieldName ] = it.value;
+    // filter[ fieldName ] = it.value;
+    if( o.inplace )
+    filter[ fieldName ] = result;
 
-    return it.result;
-
-    // if( thePath === null || _.strIs( thePath ) )
-    // {
-    //   if( o.onEach( it ) === false )
-    //   return false;
-    //   if( filter[ fieldName ] !== it.value )
-    //   filter[ fieldName ] = it.value;
-    // }
-    // else
-    // {
-    //   return path.pathMapIterate({ iteration : it, filePath : thePath, onEach : o.onEach });
-    // }
-    //
-    // return true;
-
+    // return it.result;
+    return result;
   }
 
 }
@@ -3109,8 +3478,8 @@ allPaths.defaults =
   onEach : null,
   fixes : 1,
   basePath : 1,
-  // filePath : 1,
   filePath : 1,
+  inplace : 1,
 }
 
 //
@@ -3128,23 +3497,22 @@ function isRelative( o )
 
   let o2 = _.mapExtend( null, o );
   o2.onEach = onEach;
+  o2.inplace = 0;
 
   return filter.allPaths( o2 );
 
   /* - */
 
-  function onEach( it )
+  function onEach( element, it )
   {
+    debugger;
+    _.assert( 0, 'not tested' );
     if( it.value === null )
     return;
     if( path.isRelative( it.value ) )
     return;
-    it.value = false;
-    // if( it.value === null )
-    // return true;
-    // if( path.isRelative( it.value ) )
-    // return true;
-    // return false;
+    // it.value = false; // yyy
+    return it.value;
   }
 
 }
@@ -3171,19 +3539,19 @@ function sureRelative( o )
 
   let o2 = _.mapExtend( null, o );
   o2.onEach = onEach;
+  o2.inplace = 0;
 
   return filter.allPaths( o2 );
 
   /* - */
 
-  function onEach( it )
+  function onEach( element, it )
   {
     _.sure
     (
       it.value === null || path.isRelative( it.value ),
       () => 'Filter should have relative ' + it.fieldName + ', but has  ' + _.toStr( it.value )
     );
-    // return true;
   }
 
 }
@@ -3208,6 +3576,7 @@ function sureRelativeOrGlobal( o )
 
   let o2 = _.mapExtend( null, o );
   o2.onEach = onEach;
+  o2.inplace = 0;
 
   let result = filter.allPaths( o2 );
 
@@ -3215,14 +3584,13 @@ function sureRelativeOrGlobal( o )
 
   /* - */
 
-  function onEach( it )
+  function onEach( element, it )
   {
     _.sure
     (
       it.value === null || _.boolLike( it.value ) || path.s.allAreRelative( it.value ) || path.s.allAreGlobal( it.value ),
       () => 'Filter should have relative ' + it.fieldName + ', but has ' + _.toStr( it.value )
     );
-    // return true;
   }
 
 }
@@ -3243,7 +3611,7 @@ function sureBasePath( basePath, filePath )
   let path = fileProvider.path;
 
   basePath = basePath || filter.basePath;
-  filePath = filter.filePathArrayNonBoolGet( filePath || filter.filePath );
+  filePath = filter.filePathArrayNonBoolGet( filePath || filter.filePath, 1 );
   filePath = filePath.filter( ( e ) => _.strIs( e ) );
 
   _.assert( arguments.length === 0 || arguments.length === 2 );
@@ -3366,10 +3734,26 @@ function hasAnyPath()
   if( _.any( filter.postfixPath, ( e ) => _.strIs( e ) ) )
   return true;
 
-  let filePath = filter.filePathArrayGet();
+  // let filePath = filter.filePathArrayGet();
+  let filePath = filter.filePathArrayNonBoolGet();
 
-  if( _.any( filePath, ( e ) => _.strIs( e ) ) )
+  if( filePath.length === 1 )
+  if( filePath[ 0 ] === '.' || filePath[ 0 ] === '' || filePath[ 0 ] === null )
+  {
+    /*
+    exception for dst filter
+    actually, exception for src filter
+    */
+    if( filePath[ 0 ] === '.' && filter./*srcFilter*/src )
+    return true;
+    return false;
+  }
+
+  if( filePath.length )
   return true;
+
+  // if( _.any( filePath, ( e ) => _.strIs( e ) ) )
+  // return true;
 
   return false;
 }
@@ -3392,6 +3776,30 @@ function hasData()
 // --
 // exporter
 // --
+
+function moveTextualReport()
+{
+  let filter = this;
+  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let path = fileProvider.path;
+
+  _.assert( filter.isPaired() );
+
+  filter = filter.pairedClone();
+  filter._formPaths();
+  filter.pairedFilter._formPaths();
+
+  let srcFilter = filter.src ? filter.src : filter;
+  let dstFilter = srcFilter.dst;
+
+  let srcPath = srcFilter.filePathSrcCommon();
+  let dstPath = dstFilter.filePathDstCommon();
+  let result = path.moveTextualReport( dstPath, srcPath );
+
+  return result;
+}
+
+//
 
 function compactField( it )
 {
@@ -3605,6 +4013,7 @@ function _applyToRecordFull( record )
 
 let isTransientSymbol = Symbol.for( 'isTransient' );
 let isActualSymbol = Symbol.for( 'isActual' );
+let filePathSymbol = Symbol.for( 'filePath' );
 
 let MaskNames =
 [
@@ -3644,6 +4053,7 @@ let Composes =
 
 let Aggregates =
 {
+
 }
 
 let Associates =
@@ -3663,16 +4073,16 @@ let Restricts =
   applyTo : null,
   formed : 0,
 
-  srcFilter : null,
-  dstFilter : null,
+  /*srcFilter*/src : null,
+  /*dstFilter*/dst : null,
 
 }
 
 let Medials =
 {
 
-  srcFilter : null,
-  dstFilter : null,
+  // /*srcFilter*/src : null,
+  // /*dstFilter*/dst : null,
 
 }
 
@@ -3705,8 +4115,8 @@ let Forbids =
   test : 'test',
   inFilePath : 'inFilePath',
   stemPath : 'stemPath',
-  src : 'src',
-  dst : 'dst',
+  // src : 'src',
+  // dst : 'dst',
   globFound : 'globFound',
 
 }
@@ -3714,7 +4124,9 @@ let Forbids =
 let Accessors =
 {
 
+  filePath : {},
   basePaths : { getter : basePathsGet, readOnly : 1 },
+  pairedFilter : { getter : pairedFilterGet, readOnly : 1 },
 
 }
 
@@ -3728,7 +4140,7 @@ let Extend =
   TollerantFrom,
   init,
   copy,
-  cloneBoth,
+  pairedClone,
 
   // former
 
@@ -3749,6 +4161,7 @@ let Extend =
 
   prefixesApply,
   prefixesRelative,
+  prefixPathFromFilePath,
   pathLocalize,
   pathsNormalize,
   globalsFromLocals,
@@ -3762,7 +4175,7 @@ let Extend =
   pathsJoinWithoutNull,
   pathsExtend2,
   pathsInherit,
-  pathsExtend,
+  // pathsExtend,
 
   // base path
 
@@ -3774,12 +4187,15 @@ let Extend =
   basePathMapNormalize,
   basePathNormalize,
   basePathSimplify,
+  basePathDotUnwrap,
   basePathEach,
 
   // file path
 
-  filePathGet,
-  filePathSet,
+  filePathCopy,
+  // filePathGet,
+  // filePathSet,
+
   filePathNormalize,
   filePathPrependBasePath,
   filePathMultiplyRelatives,
@@ -3792,7 +4208,7 @@ let Extend =
 
   filePathDstHasAllBools,
   filePathDstHasAnyBools,
-  filePathOnlyBools,
+  filePathMapOnlyBools,
 
   filePathDstArrayGet,
   filePathSrcArrayGet,
@@ -3806,9 +4222,9 @@ let Extend =
   filePathSrcArrayBoolGet,
   filePathArrayBoolGet,
 
-  filePathDstNormalizedGet,
-  filePathSrcNormalizedGet,
-  filePathNormalizedGet,
+  filePathDstNormalizedGet, /* xxx : remove maybe? */
+  filePathSrcNormalizedGet, /* xxx : remove maybe? */
+  filePathNormalizedGet, /* xxx : remove maybe? */
 
   filePathCommon,
   filePathDstCommon,
@@ -3816,10 +4232,11 @@ let Extend =
 
   // pair
 
-  pairFor,
+  pairedFilterGet,
+  // pairFor,
   pairWithDst,
   pairRefineLight,
-  pairRefine,
+  isPaired,
 
   // etc
 
@@ -3843,6 +4260,7 @@ let Extend =
 
   // exporter
 
+  moveTextualReport,
   compactField,
   toStr,
 

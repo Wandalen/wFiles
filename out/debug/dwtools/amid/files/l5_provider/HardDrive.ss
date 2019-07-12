@@ -739,6 +739,7 @@ function statReadAct( o )
   let result = null;
 
   _.assert( self.path.isAbsolute( o.filePath ), 'Expects absolute {-o.FilePath-}, but got', o.filePath );
+  _.assert( self.path.isNormalized( o.filePath ), 'Expects normalized {-o.FilePath-}, but got', o.filePath );
   _.assertRoutineOptions( statReadAct, arguments );
 
   let fileNativePath = self.path.nativize( o.filePath );

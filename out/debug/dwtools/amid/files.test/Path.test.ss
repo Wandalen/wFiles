@@ -303,7 +303,7 @@ function pathResolve( test )
 
   test.case = 'join windows os paths';
   var paths = [ 'c:\\', 'foo\\', 'bar\\' ];
-  var expected = '/c/foo/bar';
+  var expected = '/c/foo/bar/';
   var got = provider.path.resolve.apply( provider.path, paths );
   test.identical( got, expected );
 
@@ -433,11 +433,11 @@ function pathsResolve( test )
   test.identical( got, expected );
 
   var got = provider.path.s.resolve( '../a', [ 'b', '.c' ] );
-  var expected = [ _.path.dir( currentPath ) + '/a/b', _.path.dir( currentPath ) + '/a/.c' ]
+  var expected = [ _.path.dir( currentPath ) + 'a/b', _.path.dir( currentPath ) + 'a/.c' ]
   test.identical( got, expected );
 
   var got = provider.path.s.resolve( '../a', [ '/b', '.c' ], './d' );
-  var expected = [ '/b/d', _.path.dir( currentPath ) + '/a/.c/d' ];
+  var expected = [ '/b/d', _.path.dir( currentPath ) + 'a/.c/d' ];
   test.identical( got, expected );
 
   var got = provider.path.s.resolve( [ '/a', '/a' ],[ 'b', 'c' ] );
@@ -453,7 +453,7 @@ function pathsResolve( test )
   test.identical( got, expected );
 
   var got = provider.path.s.resolve( '.', '../', './', [ 'a', 'b' ] );
-  var expected = [ _.path.dir( currentPath ) + '/a', _.path.dir( currentPath ) + '/b' ];
+  var expected = [ _.path.dir( currentPath ) + 'a', _.path.dir( currentPath ) + 'b' ];
   test.identical( got, expected );
 
   //
@@ -475,6 +475,14 @@ function pathsResolve( test )
   var got = provider.path.s.resolve( '/a' );
   var expected = provider.path.resolve( '/a' );
   test.identical( got, expected );
+  
+  //
+  
+  test.case = 'empty'
+  
+  var got = provider.path.s.resolve();
+  var expected = [];
+  test.identical( got, expected );
 
   //
 
@@ -487,7 +495,7 @@ function pathsResolve( test )
   test.case = 'array + array with single arguments'
 
   var got = provider.path.s.resolve( [ '/a' ], [ 'b/../' ] );
-  var expected = [ '/a' ];
+  var expected = [ '/a/' ];
   test.identical( got, expected );
 
   test.case = 'single array';
@@ -499,7 +507,7 @@ function pathsResolve( test )
     _.path.join( currentPath, 'b' ),
     _.path.join( currentPath, 'b' ),
     _.path.join( _.path.dir( currentPath ), 'b' ),
-    _.path.dir( currentPath )
+    _.path.normalizeStrict( _.path.dir( currentPath ) )
   ];
   test.identical( got, expected );
 
@@ -512,11 +520,6 @@ function pathsResolve( test )
   test.shouldThrowError( function()
   {
     provider.path.s.resolve( [ '/b', '.c' ], [ '/b' ] );
-  });
-
-  test.shouldThrowError( function()
-  {
-    provider.path.s.resolve();
   });
 
   test.case = 'inner arrays'
@@ -676,14 +679,14 @@ function realMainDir( test )
   test.case = 'absolute paths'; /* */
   var from = _.path.realMainDir();
   var to = _.path.realMainFile();
-  var expected = _.path.name({ path : _.path.realMainFile(), withExtension : 1 });
+  var expected = _.path.name({ path : _.path.realMainFile(), full : 1 });
   var got = _.path.relative( from, to );
   test.identical( got, expected );
 
   test.case = 'absolute paths, from === to'; /* */
   var from = _.path.realMainDir();
   var to = _.path.realMainDir();
-  var expected = '.';
+  var expected = './';
   var got = _.path.relative( from, to );
   test.identical( got, expected );
 
@@ -868,7 +871,7 @@ function relative( test )
 
   var from = _.fileProvider.recordFactory().record( _.path.current() );
   var to = _.path.dir( _.path.current() );
-  var expected = '..';
+  var expected = '../';
   var got = _.path.relative( from, to );
   test.identical( got, expected );
 
@@ -880,13 +883,13 @@ function relative( test )
 
   var from = _.path.dir( _.path.current() );
   var to = _.fileProvider.recordFactory().record( _.path.current() );
-  var expected = _.path.name({ path : to.absolute, withExtension : 1 });
+  var expected = _.path.name({ path : to.absolute, full : 1 });
   var got = _.path.relative( from, to );
   test.identical( got, expected );
 
   var from = _.fileProvider.recordFactory().record( _.path.current() );
   var to = _.fileProvider.recordFactory().record( _.path.dir( _.path.current() ) );
-  var expected = '..';
+  var expected = '../';
   var got = _.path.relative( from, to );
   test.identical( got, expected );
 

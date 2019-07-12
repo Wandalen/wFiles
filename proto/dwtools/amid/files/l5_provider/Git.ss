@@ -766,11 +766,13 @@ function filesReflectSingle_body( o )
     if( localChanges )
     shell( 'git stash' );
     shell( 'git checkout ' + parsed.hash );
-    if( parsed.hash.length < 7 || !_.strIsHex( parsed.hash ) ) /* qqq : probably does not work for all cases */ // !!! xxx
+    if( parsed.hash.length < 7 || !_.strIsHex( parsed.hash ) ) /* qqq : probably does not work for all cases */
+    if( localChanges )
     {
-      debugger;
-      // shell( 'git merge' );
+      shell( 'git config merge.defaultToUpstream true' );
+      shell( 'git merge' );
     }
+      
     if( localChanges )
     shell({ path : 'git stash pop', throwingExitCode : 0 });
 

@@ -1,6 +1,6 @@
 ( function _Path_test_ss_( ) {
 
-'use strict'; /*aaa*/
+'use strict';
 
 if( typeof module !== 'undefined' )
 {
@@ -475,11 +475,11 @@ function pathsResolve( test )
   var got = provider.path.s.resolve( '/a' );
   var expected = provider.path.resolve( '/a' );
   test.identical( got, expected );
-  
+
   //
-  
+
   test.case = 'empty'
-  
+
   var got = provider.path.s.resolve();
   var expected = [];
   test.identical( got, expected );

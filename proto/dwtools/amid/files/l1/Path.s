@@ -1,6 +1,6 @@
-(function _Path_ss_() {
+(function _Path_s_() {
 
-'use strict'; 
+'use strict';
 
 if( typeof module !== 'undefined' )
 {
@@ -79,9 +79,9 @@ function from( src )
 
 }
 
+// //
 //
-
-let pathsFrom = _.routineVectorize_functor( from );
+// let pathsFrom = _.routineVectorize_functor( from );
 
 //
 
@@ -214,7 +214,7 @@ let Proto =
 {
 
   from,
-  pathsFrom,
+  // pathsFrom,
 
   localFromGlobal,
   localsFromGlobals : _vectorizeKeysAndVals( localFromGlobal ),

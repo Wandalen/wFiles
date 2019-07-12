@@ -2749,9 +2749,9 @@ function filesReflectEvaluate_body( o )
             debugger
             throw _.err
             (
-              'Can\'t rewrite' + ' ' + 'terminal file ' + _.strQuote( record.dst.absolute ) + '\n' +
-              'by terminal file ' + _.strQuote( record.src.absolute ) + '\n' +
-              'files have different content'
+              'Source terminal files: \n' + _.strQuote( result.src.absolute ) + ' and ' + _.strQuote( record.src.absolute ) + '\n' +
+              'have same destination path: ' + _.strQuote( record.dst.absolute ) +', but different content.' + '\n' + 
+              'Can\'t perform rewrite operation when option dstRewritingPreserving is enabled.'
             );
           }
         }

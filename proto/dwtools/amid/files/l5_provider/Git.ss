@@ -737,17 +737,22 @@ function filesReflectSingle_body( o )
   }
 
   let localChanges = false;
+  let mergeIsNeeded = false;
+  let hashIsBranchName = false;
   if( gitConfigExists )
   {
     shellAll
     ([
       'git status',
+      'git branch'
     ]);
     ready
     .ifNoErrorThen( function( arg )
     {
-      _.assert( arg.length === 2 );
+      _.assert( arg.length === 3 );
       localChanges = _.strHas( arg[ 0 ].output, 'Changes to be committed' );
+      mergeIsNeeded = !_.strHas( arg[ 0 ].output, 'Your branch is up to date' );
+      hashIsBranchName = _.strHas( arg[ 1 ].output, parsed.hash );
       return localChanges;
     })
   }
@@ -766,11 +771,13 @@ function filesReflectSingle_body( o )
     if( localChanges )
     shell( 'git stash' );
     shell( 'git checkout ' + parsed.hash );
-    if( parsed.hash.length < 7 || !_.strIsHex( parsed.hash ) ) /* qqq : probably does not work for all cases */ // !!! xxx
-    {
-      debugger;
-      // shell( 'git merge' );
+    
+    if( mergeIsNeeded && hashIsBranchName )
+    { 
+      shell( 'git config merge.defaultToUpstream true' );
+      shell( 'git merge' );
     }
+      
     if( localChanges )
     shell({ path : 'git stash pop', throwingExitCode : 0 });
 

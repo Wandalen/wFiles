@@ -61,7 +61,7 @@ function filesReflectTrivial( test )
   let path = context.providerDst.path;
   let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
   let localPath = path.join( testPath, 'wPathFundamentals' );
-  let clonePathGlobal = providerDst.globalFromLocal( localPath );
+  let clonePathGlobal = providerDst.path.globalFromLocal( localPath );
 
   let con = new _.Consequence().take( null )
 
@@ -337,6 +337,225 @@ function filesReflectTrivial( test )
     });
     test.identical( packageRead.version, '0.6.157' );
     return got;
+  })
+  
+  /*  */
+
+  .thenKeep( () =>
+  {
+    test.case = 'local is behind remote';
+    providerDst.filesDelete( localPath );
+    let remotePath = 'git+https:///github.com/Wandalen/wPathFundamentals.git';
+    
+    let ready = hub.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
+    
+    _.shell
+    ({
+      execPath : 'git reset --hard HEAD~1',
+      currentPath : localPath,
+      ready : ready
+    })
+    
+    ready.then( () => hub.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 }) );
+    
+    _.shell
+    ({
+      execPath : 'git status',
+      currentPath : localPath,
+      ready : ready,
+      outputCollecting : 1
+    })
+    
+    ready.then( ( got ) => 
+    { 
+      test.identical( got.exitCode, 0 );
+      test.is( _.strHas( got.output, `Your branch is up to date with 'origin/master'.` ) ) 
+      return null;
+    })
+    
+    return ready;
+  })
+  
+  /*  */
+
+  .thenKeep( () =>
+  {
+    test.case = 'local has new commit, remote up to date, no merge required';
+    providerDst.filesDelete( localPath );
+    let remotePath = 'git+https:///github.com/Wandalen/wPathFundamentals.git';
+    
+    let ready = hub.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
+    
+    _.shell
+    ({
+      execPath : 'git commit --allow-empty -m emptycommit',
+      currentPath : localPath,
+      ready : ready
+    })
+    
+    ready.then( () => hub.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 }) );
+    
+    _.shell
+    ({
+      execPath : 'git status',
+      currentPath : localPath,
+      ready : ready,
+      outputCollecting : 1
+    })
+    
+    ready.then( ( got ) => 
+    { 
+      test.identical( got.exitCode, 0 );
+      test.is( _.strHas( got.output, `Your branch is ahead of 'origin/master' by 1 commit` ) ) 
+      return null;
+    })
+    
+    _.shell
+    ({
+      execPath : 'git log -n 2',
+      currentPath : localPath,
+      ready : ready,
+      outputCollecting : 1
+    })
+    
+    ready.then( ( got ) => 
+    { 
+      test.identical( got.exitCode, 0 );
+      test.is( !_.strHas( got.output, `Merge remote-tracking branch 'refs/remotes/origin/master'` ) ) 
+      test.is( _.strHas( got.output, `emptycommit` ) ) 
+      return null;
+    })
+    
+    return ready;
+  })
+  
+  /*  */
+
+  .thenKeep( () =>
+  {
+    test.case = 'local and remote have one new commit, should be merged';
+    providerDst.filesDelete( localPath );
+    let remotePath = 'git+https:///github.com/Wandalen/wPathFundamentals.git';
+    
+    let ready = hub.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
+    
+    _.shell
+    ({
+      execPath : 'git reset --hard HEAD~1',
+      currentPath : localPath,
+      ready : ready
+    })
+    
+    _.shell
+    ({
+      execPath : 'git commit --allow-empty -m emptycommit',
+      currentPath : localPath,
+      ready : ready
+    })
+    
+    ready.then( () => hub.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 }) );
+    
+    _.shell
+    ({
+      execPath : 'git status',
+      currentPath : localPath,
+      ready : ready,
+      outputCollecting : 1
+    })
+    
+    ready.then( ( got ) => 
+    { 
+      test.identical( got.exitCode, 0 );
+      test.is( _.strHas( got.output, `Your branch is ahead of 'origin/master' by 2 commits` ) ) 
+      return null;
+    })
+    
+    _.shell
+    ({
+      execPath : 'git log -n 2',
+      currentPath : localPath,
+      ready : ready,
+      outputCollecting : 1
+    })
+    
+    ready.then( ( got ) => 
+    { 
+      test.identical( got.exitCode, 0 );
+      test.is( _.strHas( got.output, `Merge remote-tracking branch 'refs/remotes/origin/master'` ) ) 
+      test.is( _.strHas( got.output, `emptycommit` ) ) 
+      return null;
+    })
+    
+    return ready;
+  })
+  
+  /*  */
+
+  .thenKeep( () =>
+  {
+    test.case = 'local version is fixate and has local commit, update to latest';
+    providerDst.filesDelete( localPath );
+    let remotePathFixate = 'git+https:///github.com/Wandalen/wPathFundamentals.git#05930d3a7964b253ea3bbfeca7eb86848f550e96';
+    let remotePath = 'git+https:///github.com/Wandalen/wPathFundamentals.git';
+    
+    let ready = hub.filesReflect({ reflectMap : { [ remotePathFixate ] : clonePathGlobal }, verbosity : 5 });
+    
+    _.shell
+    ({
+      execPath : 'git commit --allow-empty -m emptycommit',
+      currentPath : localPath,
+      ready : ready
+    })
+    
+    ready.then( () => hub.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 }) );
+    
+    _.shell
+    ({
+      execPath : 'git status',
+      currentPath : localPath,
+      ready : ready,
+      outputCollecting : 1
+    })
+    
+    ready.then( ( got ) => 
+    { 
+      test.identical( got.exitCode, 0 );
+      test.is( _.strHas( got.output, `Your branch is up to date with 'origin/master'.` ) ) 
+      return null;
+    })
+    
+    return ready;
+  })
+  
+  /*  */
+
+  .thenKeep( () =>
+  {
+    test.case = 'local has fixed version, update to latest';
+    providerDst.filesDelete( localPath );
+    let remotePathFixate = 'git+https:///github.com/Wandalen/wPathFundamentals.git#05930d3a7964b253ea3bbfeca7eb86848f550e96';
+    let remotePath = 'git+https:///github.com/Wandalen/wPathFundamentals.git';
+    
+    let ready = hub.filesReflect({ reflectMap : { [ remotePathFixate ] : clonePathGlobal }, verbosity : 5 });
+    
+    ready.then( () => hub.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 }) );
+    
+    _.shell
+    ({
+      execPath : 'git status',
+      currentPath : localPath,
+      ready : ready,
+      outputCollecting : 1
+    })
+    
+    ready.then( ( got ) => 
+    { 
+      test.identical( got.exitCode, 0 );
+      test.is( _.strHas( got.output, `Your branch is up to date with 'origin/master'.` ) ) 
+      return null;
+    })
+    
+    return ready;
   })
 
   return con;

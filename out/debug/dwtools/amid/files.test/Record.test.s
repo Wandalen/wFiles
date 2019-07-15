@@ -240,7 +240,7 @@ function recordFields( test )
   test.identical( got.relative, '..' + filePath );
   test.identical( got.absolute, filePath );
   test.identical( got.real, filePath );
-  test.identical( got.dir, _.path.normalize( __dirname ) );
+  test.identical( _.path.normalizeStrict( got.dir ), _.path.normalize( __dirname ) );
   test.identical( _.objectIs( got.stat), true );
 
   /*relative - path to other disk*/
@@ -250,7 +250,7 @@ function recordFields( test )
   test.identical( got.relative, '..' + filePath );
   test.identical( got.absolute, filePath );
   test.identical( got.real, filePath );
-  test.identical( got.dir, _.path.normalize( __dirname ) );
+  test.identical( _.path.normalizeStrict( got.dir ), _.path.normalize( __dirname ) );
   test.identical( _.objectIs( got.stat), true );
 
   /*dir - path to dir that contains that file*/
@@ -260,7 +260,7 @@ function recordFields( test )
   test.identical( got.relative, './' + _.path.name({ path : filePath, full : 1 }) );
   test.identical( got.absolute, filePath );
   test.identical( got.real, filePath );
-  test.identical( got.dir, _.path.normalize( __dirname ) );
+  test.identical( _.path.normalizeStrict( got.dir ), _.path.normalize( __dirname ) );
   test.identical( _.objectIs( got.stat), true );
 
   /*relative - path to dir that contains that file*/
@@ -270,7 +270,7 @@ function recordFields( test )
   test.identical( got.relative, './' + _.path.name({ path : filePath, full : 1 }) );
   test.identical( got.absolute, filePath );
   test.identical( got.real, filePath );
-  test.identical( got.dir, _.path.normalize( __dirname ) );
+  test.identical( _.path.normalizeStrict( got.dir ), _.path.normalize( __dirname ) );
   test.identical( _.objectIs( got.stat), true );
 
   /*dir === filePath */
@@ -280,7 +280,7 @@ function recordFields( test )
   test.identical( got.relative, '.');
   test.identical( got.absolute, filePath );
   test.identical( got.real, filePath );
-  test.identical( got.dir, _.path.normalize( __dirname ) );
+  test.identical( _.path.normalizeStrict( got.dir ), _.path.normalize( __dirname ) );
   test.identical( _.objectIs( got.stat), true );
 
   /*relative === filePath */
@@ -290,7 +290,7 @@ function recordFields( test )
   test.identical( got.relative, '.');
   test.identical( got.absolute, filePath );
   test.identical( got.real, filePath );
-  test.identical( got.dir, _.path.normalize( __dirname ));
+  test.identical( _.path.normalizeStrict( got.dir ), _.path.normalize( __dirname ));
   test.identical( _.objectIs( got.stat), true );
 
   /*dir + relative, affects only on record.relative */
@@ -300,7 +300,7 @@ function recordFields( test )
   test.identical( got.relative, '..' + filePath );
   test.identical( got.absolute, filePath );
   test.identical( got.real, filePath );
-  test.identical( got.dir, _.path.normalize( __dirname ));
+  test.identical( _.path.normalizeStrict( got.dir ), _.path.normalize( __dirname ));
   test.identical( _.objectIs( got.stat), true );
 
   //
@@ -335,7 +335,7 @@ function recordFields( test )
   test.identical( got.relative, filePath );
   test.identical( got.absolute, _.path.join( factory.basePath, name ) );
   test.identical( got.real, _.path.join( factory.basePath, name ) );
-  test.identical( got.dir, factory.basePath );
+  test.identical( _.path.normalizeStrict( got.dir ), factory.basePath );
   test.identical( got.stat, null );
   _.fileProvider.fieldPop( 'safe', 0 );
 
@@ -346,7 +346,7 @@ function recordFields( test )
   test.identical( got.relative, filePath );
   test.identical( got.absolute, _.path.join( factory.dirPath, name ) );
   test.identical( got.real, got.absolute );
-  test.identical( got.dir, factory.dirPath );
+  test.identical( _.path.normalizeStrict( got.dir ), factory.dirPath );
   test.identical( _.objectIs( got.stat ), true );
 
   /*relative - path to dir with file*/
@@ -356,7 +356,7 @@ function recordFields( test )
   test.identical( got.relative, filePath );
   test.identical( got.absolute, _.path.join( factory.basePath, name ) );
   test.identical( got.real, got.absolute );
-  test.identical( got.dir, factory.basePath );
+  test.identical( _.path.normalizeStrict( got.dir ), factory.basePath );
   test.identical( _.objectIs( got.stat ), true );
 
   /*dir === filePath*/
@@ -366,7 +366,7 @@ function recordFields( test )
   test.identical( got.relative, filePath );
   test.identical( got.absolute, _.path.join( factory.dirPath, name ) );
   test.identical( got.real, got.absolute );
-  test.identical( got.dir, factory.dirPath );
+  test.identical( _.path.normalizeStrict( got.dir ), factory.dirPath );
   test.identical( got.stat, null );
 
   /*relative === filePath*/
@@ -376,7 +376,7 @@ function recordFields( test )
   test.identical( got.relative, filePath );
   test.identical( got.absolute, _.path.join( factory.basePath, name ) );
   test.identical( got.real, got.absolute );
-  test.identical( got.dir, factory.basePath );
+  test.identical( _.path.normalizeStrict( got.dir ), factory.basePath );
   test.identical( got.stat, null );
 
   /*dir+relative, relative affects only record.relative, dir affects on record.absolute, record.real*/
@@ -387,7 +387,7 @@ function recordFields( test )
   test.identical( got.relative, '..' + _.path.join( factory.dirPath, name ) );
   test.identical( got.absolute, _.path.join( factory.dirPath, name ) );
   test.identical( got.real, got.absolute );
-  test.identical( got.dir, factory.dirPath );
+  test.identical( _.path.normalizeStrict( got.dir ), factory.dirPath );
   test.identical( got.stat, null );
   _.fileProvider.fieldPop( 'safe', 0 );
 
@@ -579,7 +579,7 @@ function recordFiltering( test )
   var filter = makeFilter({ notOlder : new Date( Date.UTC( 1900, 1, 1 ) ), basePath : filePath, filePath : filePath })
   var factory = _.FileRecordFactory.TollerantFrom( o, { filter : filter, basePath : filePath  }).form();
   var got = factory.record({ input : filePath, factory : factory });
-  console.log( got.mtime )
+  console.log( got.stat.mtime )
   test.identical( got.isActual, true );
 
   /*notNewer*/

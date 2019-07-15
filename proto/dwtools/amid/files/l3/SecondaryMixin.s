@@ -827,14 +827,6 @@ function fileConfigPathGet_body( o )
     exts[ encoder.exts[ s ] ] = e;
   }
 
-  // debugger;
-  // _.each( o.filePath, ( filePath ) =>
-  // {
-  //   let ext = path.ext( filePath );
-  //   debugger;
-  // });
-  // debugger;
-
   o.filePath = _.arrayAs( o.filePath );
   _.assert( _.strsAreAll( o.filePath ) );
 
@@ -896,7 +888,7 @@ let fileConfigPathGet = _.routineFromPreAndBody( Partial.prototype._preFilePathV
 //   if( o.verbosity === null )
 //   o.verbosity = _.numberClamp( self.verbosity - 4, 0, 9 );
 //
-//   self._providerDefaults( o );
+//   self._providerDefaultsApply( o );
 //
 //   return o;
 // }
@@ -965,30 +957,6 @@ function fileConfigRead_body( o )
       throw _.err( 'Some configs were loaded several times\n', _.strQuote( found[ f2 ].particularPath ) );
     }
 
-    // if( _.arraySetBut( abstractPath1.slice(), abstractPath2 ).length )
-    // {
-    //   debugger;
-    //   throw _.err( 'None config was found\n', _.strQuote( _.arraySetBut( abstractPath1.slice(), abstractPath2 ) ) );
-    // }
-    //
-    // if( abstractPath1.length !== abstractPath2.length )
-    // {
-    //   debugger;
-    //   throw _.err( 'Some configs were loaded several times' );
-    // }
-
-    //   let abstractPath2 = o.found.map( ( f ) => f.abstractPath );
-    //   if( _.arraySetBut( abstractPath1.slice(), abstractPath2 ).length )
-    //   {
-    //     debugger;
-    //     throw _.err( 'None config was found\n', _.strQuote( _.arraySetBut( abstractPath1.slice(), abstractPath2 ) ) );
-    //   }
-    //   if( abstractPath1.length !== abstractPath2.length )
-    //   {
-    //     debugger;
-    //     throw _.err( 'Some configs were loaded several times' );
-    //   }
-    // }
   }
 
   /* */
@@ -1152,7 +1120,6 @@ let Supplement =
 
   // files read
 
-  // filesRead,
   filesReadOld,
   _filesReadOldAsync,
   _filesReadOldSync,

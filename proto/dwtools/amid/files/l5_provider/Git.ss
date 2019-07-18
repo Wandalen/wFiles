@@ -523,7 +523,7 @@ function isUpToDate( o )
     }
     else
     {
-      result = !_.strHas( arg[ 0 ].output, 'Your branch is behind' );
+      result = !_.strHasAny( arg[ 0 ].output, [ 'Your branch is behind', 'have diverged' ] );
     }
 
     if( o.verbosity )

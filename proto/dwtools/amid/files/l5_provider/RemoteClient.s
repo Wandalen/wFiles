@@ -448,7 +448,7 @@
 //       sync : 0,
 //       throwing : 1,
 //     })
-//     .got( function( err, stat )
+//     .give( function( err, stat )
 //     {
 //       if( err )
 //       {
@@ -652,7 +652,7 @@
 //    console.log( fs.existsSync( path ) ); // true (file exists)
 //    let con = fileProvider.fileDelete( delOptions );
 //
-//    con.got( function(err)
+//    con.give( function(err)
 //    {
 //      console.log( fs.existsSync( path ) ); // false (file does not exist)
 //    } );
@@ -738,7 +738,7 @@
 //    console.log( fs.existsSync( path ) ); // true (file exists)
 //    let con = fileProvider.fileDelete( delOptions );
 //
-//    con.got( function(err)
+//    con.give( function(err)
 //    {
 //      console.log( fs.existsSync( path ) ); // false (file does not exist)
 //    } );
@@ -1076,7 +1076,7 @@
 //       filePath : o.dstPath,
 //       sync : 0
 //     })
-//     .got( function( err, stat )
+//     .give( function( err, stat )
 //     {
 //       if( stat )
 //       return con.error ( _.err( 'softLinkAct',o.dstPath,'already exists' ) );
@@ -1152,7 +1152,7 @@
 //         throwing : 0
 //       });
 //     })
-//     .got( function( err,stat )
+//     .give( function( err,stat )
 //     {
 //       if( err )
 //       return con.error( err );

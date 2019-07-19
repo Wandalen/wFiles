@@ -597,7 +597,7 @@ function _fileOptionsGet( test ) {
 
 //     if ( testCheck.data && testCheck.data.sync === false )
 //     {
-//       gotFW.got( ( ) =>
+//       gotFW.give( ( ) =>
 //       {
 //         // recorded file should exists
 //         // got.exist = File.existsSync( path );
@@ -2915,7 +2915,7 @@ function filesSimilarity( test )
 //         if( testCheck.delOptions && !!testCheck.delOptions.sync === false )
 //         {
 //           continueFlag = true;
-//           gotFD.got( ( err ) =>
+//           gotFD.give( ( err ) =>
 //           {
 //             // deleted file should  not exists
 //             got.exist = !!_.fileProvider.statResolvedRead( path );

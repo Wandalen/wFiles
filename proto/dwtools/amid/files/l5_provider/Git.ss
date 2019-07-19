@@ -471,7 +471,7 @@ function isUpToDate( o )
 
   if( gitConfigExists )
   ready
-  // .got( () => GitConfig( localProvider.path.nativize( o.localPath ), ready.tolerantCallback() ) )
+  // .give( () => GitConfig( localProvider.path.nativize( o.localPath ), ready.tolerantCallback() ) )
   .then( () => self._gitConfigRead( o.localPath ) )
   .ifNoErrorThen( function( arg )
   {
@@ -619,10 +619,10 @@ function filesReflectSingle_body( o )
   _.assert( _.routineIs( o.onWriteSrcDown ) && o.onWriteSrcDown.composed && o.onWriteSrcDown.composed.elements.length === 0, 'Not supported options' );
   _.assert( o.outputFormat === 'record' || o.outputFormat === 'nothing', 'Not supported options' );
   _.assert( o.linking === 'fileCopy' || o.linking === 'hardLinkMaybe' || o.linking === 'softLinkMaybe', 'Not supported options' );
-  _.assert( !o./*srcFilter*/src.hasFiltering(), 'Not supported options' );
-  _.assert( !o./*dstFilter*/dst.hasFiltering(), 'Not supported options' );
-  _.assert( o./*srcFilter*/src.formed === 5 );
-  _.assert( o./*dstFilter*/dst.formed === 5 );
+  _.assert( !o.src.hasFiltering(), 'Not supported options' );
+  _.assert( !o.dst.hasFiltering(), 'Not supported options' );
+  _.assert( o.src.formed === 5 );
+  _.assert( o.dst.formed === 5 );
   _.assert( o.srcPath === undefined );
   // _.assert( o.filter === null || !o.filter.hasFiltering(), 'Not supported options' );
   _.assert( o.filter === undefined );
@@ -630,7 +630,7 @@ function filesReflectSingle_body( o )
 
   /* */
 
-  let localProvider = o./*dstFilter*/dst.providerForPath();
+  let localProvider = o.dst.providerForPath();
   let srcPath = o.src.filePathSimplest();
   let dstPath = o.dst.filePathSimplest();
   // let srcPath = o.srcPath;
@@ -653,8 +653,8 @@ function filesReflectSingle_body( o )
   _.sure( _.strDefined( parsed.hash ) );
   _.sure( _.strIs( dstPath ) );
   _.assert( localProvider instanceof _.FileProvider.HardDrive || localProvider.originalFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
-  _.sure( !o./*srcFilter*/src || !o./*srcFilter*/src.hasFiltering(), 'Does not support filtering, but {o./*srcFilter*/src} is not empty' );
-  _.sure( !o./*dstFilter*/dst || !o./*dstFilter*/dst.hasFiltering(), 'Does not support filtering, but {o./*dstFilter*/dst} is not empty' );
+  _.sure( !o.src || !o.src.hasFiltering(), 'Does not support filtering, but {o.src} is not empty' );
+  _.sure( !o.dst || !o.dst.hasFiltering(), 'Does not support filtering, but {o.dst} is not empty' );
   // _.sure( !o.filter || !o.filter.hasFiltering(), 'Does not support filtering, but {o.filter} is not empty' );
 
   /* */
@@ -697,7 +697,7 @@ function filesReflectSingle_body( o )
 
   if( gitConfigExists )
   ready
-  // .got( () => GitConfig( localProvider.path.nativize( dstPath ), ready.tolerantCallback() ) )
+  // .give( () => GitConfig( localProvider.path.nativize( dstPath ), ready.tolerantCallback() ) )
   .then( () => self._gitConfigRead( dstPath ) )
   .ifNoErrorThen( function( arg )
   {
@@ -759,7 +759,7 @@ function filesReflectSingle_body( o )
 
   /* stash changes and checkout branch/commit */
 
-  ready.except( ( err ) =>
+  ready.catch( ( err ) =>
   {
     con.error( err );
     throw err;

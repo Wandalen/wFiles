@@ -2083,7 +2083,7 @@ statRead_body.having.aspect = 'body';
  *  filePath : './existingDir/test.txt',
  *  sync : 0
  * });
- * consequence.got( ( err, stats ) =>
+ * consequence.give( ( err, stats ) =>
  * {
  *    if( err )
  *    throw err;
@@ -2289,7 +2289,7 @@ _.routineExtend( fileExistsAct, _fileExistsAct );
  *  filePath : './existingDir/test.txt',
  *  sync : 0
  * });
- * consequence.got( ( err, stats ) =>
+ * consequence.give( ( err, stats ) =>
  * {
  *    if( err )
  *    throw err;
@@ -2472,7 +2472,7 @@ function fileRead_body( o )
 
     result
     .thenKeep( handleEnd )
-    .except( handleError )
+    .catch( handleError )
     ;
 
     return result;
@@ -2597,7 +2597,7 @@ _.assert( _.objectIs( fileRead_body.encoders ) );
  * Accepts single paramenter - path to a file ( o.filePath ) or options map( o ).
  * Returns wConsequence instance. If `o` sync parameter is set to true (by default) and returnRead is set to true,
     method returns encoded content of a file.
- * There are several way to get read content : as argument for function passed to wConsequence.got(), as second argument
+ * There are several way to get read content : as argument for function passed to wConsequence.give(), as second argument
     for `o.onEnd` callback, and as direct method returns, if `o.returnRead` is set to true.
  *
  * @example
@@ -2620,7 +2620,7 @@ _.assert( _.objectIs( fileRead_body.encoders ) );
    fileReadOptions.onEnd = null;
    let con2 = wTools.fileProvider.fileRead( fileReadOptions );
 
-   con2.got(function( err, result )
+   con2.give(function( err, result )
    {
      console.log(result); // { a : 1, b : 's', c : [ 1, 3, 4 ] }
    });
@@ -3072,7 +3072,7 @@ operates.filePath = { pathToRead : 1 }
  *  filePath : './existingDir/test.txt',
  *  sync : 0
  * });
- * consequence.got( ( err, hash ) =>
+ * consequence.give( ( err, hash ) =>
  * {
  *    if( err )
  *    throw err;
@@ -3323,7 +3323,7 @@ having.aspect = 'body';
  *  filePath : './existingDir',
  *  sync : 0
  * });
- * consequence.got( ( err, files ) =>
+ * consequence.give( ( err, files ) =>
  * {
  *    if( err )
  *    throw err;
@@ -4441,7 +4441,7 @@ _.assert( _.objectIs( fileWrite_body.encoders ) );
         sync : false,
       };
     let con = wTools.fileWrite( options );
-    con.got( function()
+    con.give( function()
     {
         console.log('write finished');
     });
@@ -4954,7 +4954,7 @@ having.aspect = 'body';
  *  filePath : './existingDir/test.txt',
  *  sync : 0
  * });
- * consequence.got( ( err, result ) =>
+ * consequence.give( ( err, result ) =>
  * {
  *    if( err )
  *    throw err;
@@ -5479,7 +5479,7 @@ function _link_functor( gen )
         return true;
       });
 
-      c.con2.except( ( err ) =>
+      c.con2.catch( ( err ) =>
       {
         return c.tempRenameRevert()
         .finally( () =>
@@ -6239,7 +6239,7 @@ operates.dstPath = { pathToWrite : 1 }
  *  srcPath : '/existingDir/existingSrc',
  *  sync : 0
  * });
- * consequence.got( ( err, got ) =>
+ * consequence.give( ( err, got ) =>
  * {
  *    if( err )
  *    throw err;
@@ -6330,7 +6330,7 @@ operates.dstPath = { pathToWrite : 1 }
      dstPath : 'dst.txt',
      sync : 0
    });
-   consequence.got( function( err, got )
+   consequence.give( function( err, got )
    {
      if( err )
      throw err;
@@ -6960,7 +6960,7 @@ function fileExchange_body( o )
       return self.fileRename( _.mapExtend( null, o2 ) );
     });
 
-    con.except( ( err ) =>
+    con.catch( ( err ) =>
     {
       if( !o.throwing )
       return null;
@@ -7054,7 +7054,7 @@ having.aspect = 'body';
  *  srcPath : '/existingDir/existingSrc',
  *  sync : 0
  * });
- * consequence.got( ( err, got ) =>
+ * consequence.give( ( err, got ) =>
  * {
  *    if( err )
  *    throw err;

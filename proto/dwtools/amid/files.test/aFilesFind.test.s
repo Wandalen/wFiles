@@ -4113,6 +4113,24 @@ function filesFindGlob( test )
 
   /* */
 
+  test.case = 'globTerminals src(1|2)/**';
+
+  clean();
+  var expectedRelative = [ './src/f', './src1/a', './src1/b', './src1/c', './src1/d/a', './src1/d/b', './src1/d/c', './src2/a', './src2/b', './src2/c', './src2/d/a', './src2/d/b', './src2/d/c' ];
+  var records = globTerminals({ filePath : 'src(1|2|)/**', filter : { prefixPath : abs( '.' ) } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  test.case = 'globAll src(1|2)/**';
+
+  clean();
+  var expectedRelative = [ '.', './src', './src/f', './src1', './src1/a', './src1/b', './src1/c', './src1/d', './src1/d/a', './src1/d/b', './src1/d/c', './src2', './src2/a', './src2/b', './src2/c', './src2/d', './src2/d/a', './src2/d/b', './src2/d/c' ];
+  var records = globAll({ filePath : 'src(1|2|)/**', filter : { prefixPath : abs( '.' ) } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* */
+
   test.case = 'globTerminals src1/**';
 
   clean();
@@ -4939,6 +4957,101 @@ function filesFindGlob( test )
 
   /* - */
 
+  test.open( 'base marker ()' );
+
+  /* - */
+
+  test.case = 'globTerminals src1()';
+
+  clean();
+  var expectedRelative = [];
+  var records = globTerminals({ filePath : './src1()' });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  test.case = 'globAll src1()';
+
+  clean();
+  var expectedRelative = [ '.', './src1' ];
+  var records = globAll({ filePath : './src1()' });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* */
+
+  test.case = 'globTerminals src1/a()';
+
+  clean();
+  var expectedRelative = [ './src1/a' ];
+  var records = globTerminals({ filePath : './src1/a()' });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  test.case = 'globAll src1/a()';
+
+  clean();
+  var expectedRelative = [ './src1', './src1/a' ];
+  var records = globAll({ filePath : './src1/a()' });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* */
+
+  test.case = 'globTerminals src1/()a';
+
+  clean();
+  var expectedRelative = [ './src1/a' ];
+  var records = globTerminals({ filePath : './src1/()a' });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  test.case = 'globAll src1/()a';
+
+  clean();
+  var expectedRelative = [ './src1', './src1/a' ];
+  var records = globAll({ filePath : './src1/()a' });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* */
+
+  test.case = 'globTerminals ()src1/a';
+
+  clean();
+  var expectedRelative = [ './src1/a' ];
+  var records = globTerminals({ filePath : './()src1/a' });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  test.case = 'globAll ()src1/a';
+
+  clean();
+  var expectedRelative = [ '.', './src1', './src1/a' ];
+  var records = globAll({ filePath : './()src1/a' });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* */
+
+  test.case = 'globTerminals sr()c1/a';
+
+  clean();
+  var expectedRelative = [ './src1/a' ];
+  var records = globTerminals({ filePath : './sr()c1/a' });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  test.case = 'globAll sr()c1/a';
+
+  clean();
+  var expectedRelative = [ '.', './src1', './src1/a' ];
+  var records = globAll({ filePath : './sr()c1/a' });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* - */
+
+  test.close( 'base marker ()' );
   test.open( 'base marker *()' );
 
   /* - */
@@ -6056,8 +6169,8 @@ function filesReflectEvaluate( test )
 
   var o1 =
   {
-    /*srcFilter*/src : abs( '/dir' ),
-    /*dstFilter*/dst : abs( '/dir/dst' ),
+    src : abs( '/dir' ),
+    dst : abs( '/dir/dst' ),
   }
 
   var records = provider.filesReflectEvaluate( _.mapExtend( null, o1 ) );
@@ -6186,11 +6299,11 @@ function filesReflectTrivial( test )
     {
       '/src' : '/dst'
     },
-    /*srcFilter*/src :
+    src :
     {
       maskAll : { excludeAny : 'file' }
     },
-    /*dstFilter*/dst :
+    dst :
     {
       maskAll : { includeAny : 'file' }
     },
@@ -6242,11 +6355,11 @@ function filesReflectTrivial( test )
     {
       '/src' : '/dst'
     },
-    /*srcFilter*/src :
+    src :
     {
       maskAll : { excludeAny : 'file' }
     },
-    /*dstFilter*/dst :
+    dst :
     {
       maskAll : { includeAny : 'file' }
     },
@@ -6356,7 +6469,7 @@ function filesReflectTrivial( test )
     {
       '/src' : '/dst'
     },
-    /*dstFilter*/dst :
+    dst :
     {
       maskAll : { excludeAny : 'file' }
     },
@@ -6375,7 +6488,7 @@ function filesReflectTrivial( test )
 
   /* */
 
-  test.case = 'dstDeleting:1 srcDeleting:0 /*dstFilter*/dst only'
+  test.case = 'dstDeleting:1 srcDeleting:0 dst only'
   var tree =
   {
     src : { file2 : 'file2' },
@@ -6387,7 +6500,7 @@ function filesReflectTrivial( test )
     {
       '/src' : '/dst'
     },
-    /*dstFilter*/dst :
+    dst :
     {
       maskAll : { includeAny : 'file' }
     },
@@ -6439,7 +6552,7 @@ function filesReflectTrivial( test )
     {
       '/src' : '/dst'
     },
-    /*srcFilter*/src :
+    src :
     {
       maskAll : { excludeAny : 'file' }
     },
@@ -6458,7 +6571,7 @@ function filesReflectTrivial( test )
 
   /* */
 
-  test.case = 'deleting disabled, /*srcFilter*/src excludes file'
+  test.case = 'deleting disabled, src excludes file'
   var tree =
   {
     src : { file : 'file' },
@@ -6470,7 +6583,7 @@ function filesReflectTrivial( test )
     {
       '/src' : '/dst'
     },
-    /*srcFilter*/src :
+    src :
     {
       maskAll : { excludeAny : 'file' }
     },
@@ -6489,7 +6602,7 @@ function filesReflectTrivial( test )
 
   /* */
 
-  test.case = 'deleting disabled, /*dstFilter*/dst excludes file'
+  test.case = 'deleting disabled, dst excludes file'
   var tree =
   {
     src : { file : 'file' },
@@ -6501,7 +6614,7 @@ function filesReflectTrivial( test )
     {
       '/src' : '/dst'
     },
-    /*dstFilter*/dst :
+    dst :
     {
       maskAll : { excludeAny : 'file' }
     },
@@ -6601,7 +6714,7 @@ function filesReflectTrivial( test )
     writing : 1,
     includingDirs : 1,
     dstRewriting : 1,
-    /*srcFilter*/src : { ends : '.a' },
+    src : { ends : '.a' },
     srcDeleting : 1,
     dstDeleting : 0,
   }
@@ -6648,7 +6761,7 @@ function filesReflectTrivial( test )
     },
     writing : 1,
     dstRewriting : 1,
-    /*srcFilter*/src : { ends : '.a' },
+    src : { ends : '.a' },
     srcDeleting : 1,
     dstDeleting : 0,
     includingDst : 1,
@@ -6698,7 +6811,7 @@ function filesReflectTrivial( test )
     },
     writing : 1,
     dstRewriting : 1,
-    /*srcFilter*/src : { ends : '.a' },
+    src : { ends : '.a' },
     srcDeleting : 1,
     dstDeleting : 1,
     includingDst : 1,
@@ -6743,7 +6856,7 @@ function filesReflectTrivial( test )
   var o =
   {
     reflectMap : { '/src' : '/dst' },
-    /*srcFilter*/src : { ends : '.b' },
+    src : { ends : '.b' },
     includingDst : 1,
     includingTerminals : 1,
     includingDirs : 1,
@@ -6831,7 +6944,7 @@ function filesReflectTrivial( test )
   var o =
   {
     reflectMap : { '/src' : '/dst' },
-    /*srcFilter*/src : { ends : '.b' },
+    src : { ends : '.b' },
     includingDst : 1,
     includingTerminals : 1,
     includingDirs : 1,
@@ -7018,7 +7131,7 @@ function filesReflectTrivial( test )
   {
     reflectMap : { '/src' : '/dst' },
     onWriteDstUp : onWriteDstUp1,
-    /*srcFilter*/src : { maskTerminal : { includeAny : 'a' } },
+    src : { maskTerminal : { includeAny : 'a' } },
     recursive : 2,
     writing : 1,
     dstDeleting : 0,
@@ -7073,7 +7186,7 @@ function filesReflectTrivial( test )
   {
     reflectMap : { '/src' : '/dst' },
     onWriteDstUp : onWriteDstUp2,
-    /*srcFilter*/src : { maskTerminal : { includeAny : 'a' } },
+    src : { maskTerminal : { includeAny : 'a' } },
     recursive : 2,
     writing : 1,
     dstDeleting : 0,
@@ -7314,11 +7427,11 @@ function filesReflectMutuallyExcluding( test )
     {
       [ abs( './src' ) ] : abs( './dst' )
     },
-    /*srcFilter*/src :
+    src :
     {
       maskAll : { includeAny : /M$/ }
     },
-    /*dstFilter*/dst :
+    dst :
     {
       maskAll : { excludeAny : /M$/ }
     },
@@ -7380,11 +7493,11 @@ function filesReflectMutuallyExcluding( test )
     {
       [ abs( './src' ) ] : abs( './dst' )
     },
-    /*srcFilter*/src :
+    src :
     {
       maskAll : { excludeAny : /M$/ }
     },
-    /*dstFilter*/dst :
+    dst :
     {
       maskAll : { includeAny : /M$/ }
     },
@@ -7447,11 +7560,11 @@ function filesReflectMutuallyExcluding( test )
     {
       [ abs( './src' ) ] : abs( './dst' )
     },
-    /*srcFilter*/src :
+    src :
     {
       maskAll : { excludeAny : /M$/ }
     },
-    /*dstFilter*/dst :
+    dst :
     {
       maskAll : { includeAny : /M$/ }
     },
@@ -7554,11 +7667,11 @@ function filesReflectMutuallyExcluding( test )
     {
       [ abs( './src' ) ] : abs( './dst' )
     },
-    /*srcFilter*/src :
+    src :
     {
       maskAll : { excludeAny : /M$/ }
     },
-    /*dstFilter*/dst :
+    dst :
     {
       maskAll : { includeAny : /M$/ }
     },
@@ -7641,11 +7754,11 @@ function filesReflectMutuallyExcluding( test )
     {
       [ abs( './src' ) ] : abs( './dst' )
     },
-    /*srcFilter*/src :
+    src :
     {
       maskAll : { excludeAny : /M$/ }
     },
-    /*dstFilter*/dst :
+    dst :
     {
       maskAll : { includeAny : /M$/ }
     },
@@ -7727,11 +7840,11 @@ function filesReflectMutuallyExcluding( test )
     {
       [ abs( './src' ) ] : abs( './dst' )
     },
-    /*srcFilter*/src :
+    src :
     {
       maskAll : { excludeAny : /M$/ }
     },
-    /*dstFilter*/dst :
+    dst :
     {
       maskAll : { includeAny : /M$/ }
     },
@@ -7809,11 +7922,11 @@ function filesReflectMutuallyExcluding( test )
     {
       [ abs( './src' ) ] : abs( './dst' )
     },
-    /*srcFilter*/src :
+    src :
     {
       maskAll : { excludeAny : /M$/ }
     },
-    /*dstFilter*/dst :
+    dst :
     {
       maskAll : { includeAny : /M$/ }
     },
@@ -7896,11 +8009,11 @@ function filesReflectMutuallyExcluding( test )
     {
       [ abs( './src' ) ] : abs( './dst' )
     },
-    /*srcFilter*/src :
+    src :
     {
       maskAll : { excludeAny : /M$/ }
     },
-    /*dstFilter*/dst :
+    dst :
     {
       maskAll : { includeAny : /M$/ }
     },
@@ -7998,11 +8111,11 @@ function filesReflectMutuallyExcluding( test )
     {
       [ abs( './src' ) ] : abs( './dst' )
     },
-    /*srcFilter*/src :
+    src :
     {
       maskAll : { excludeAny : /M$/ }
     },
-    /*dstFilter*/dst :
+    dst :
     {
       maskAll : { includeAny : /M$/ }
     },
@@ -8148,12 +8261,12 @@ function _filesReflectWithFilter( test, o )
       {
         [ '/srcExt' ] : '/dstExt'
       },
-      /*srcFilter*/src :
+      src :
       {
         effectiveFileProvider : p.src,
         hasExtension : 'js',
       },
-      /*dstFilter*/dst :
+      dst :
       {
         effectiveFileProvider : p.dst,
         hasExtension : 'js',
@@ -8625,8 +8738,8 @@ function _filesReflect( test, o )
     var options =
     {
       reflectMap : { '/src' : '/dst' },
-      /*srcFilter*/src : { effectiveFileProvider : p.src },
-      /*dstFilter*/dst : { effectiveFileProvider : p.dst },
+      src : { effectiveFileProvider : p.src },
+      dst : { effectiveFileProvider : p.dst },
     }
     return options;
   }
@@ -10051,8 +10164,8 @@ function filesReflectToItself( test )
 
   var o1 =
   {
-    /*srcFilter*/src : abs( '/dir' ),
-    /*dstFilter*/dst : abs( '/dir/dst' ),
+    src : abs( '/dir' ),
+    dst : abs( '/dir/dst' ),
   }
 
   var records = provider.filesReflect( _.mapExtend( null, o1 ) );
@@ -10117,7 +10230,7 @@ function filesReflectToItself( test )
 
   var o1 =
   {
-    /*srcFilter*/src :
+    src :
     {
       filePath :
       {
@@ -10150,7 +10263,7 @@ function filesReflectToItself( test )
 
   var o1 =
   {
-    /*srcFilter*/src :
+    src :
     {
       filePath :
       {
@@ -10205,8 +10318,8 @@ function filesReflectGrab( test )
   var records = hub.filesReflect
   ({
     reflectMap : recipe,
-    /*srcFilter*/src : { hubFileProvider : src },
-    /*dstFilter*/dst : { hubFileProvider : provider, prefixPath : testPath },
+    src : { hubFileProvider : src },
+    dst : { hubFileProvider : provider, prefixPath : testPath },
     mandatory : 0,
   });
   var found = provider.filesFindRecursive( testPath );
@@ -10250,8 +10363,8 @@ function filesReflectGrab( test )
   var records = hub.filesReflect
   ({
     reflectMap : recipe,
-    /*srcFilter*/src : { hubFileProvider : src },
-    /*dstFilter*/dst : { hubFileProvider : provider },
+    src : { hubFileProvider : src },
+    dst : { hubFileProvider : provider },
     mandatory : 0,
   });
   var found = provider.filesFindRecursive( testPath );
@@ -10296,8 +10409,8 @@ function filesReflectGrab( test )
   var records = hub.filesReflect
   ({
     reflectMap : recipe,
-    /*srcFilter*/src : { hubFileProvider : src, basePath : '/' },
-    /*dstFilter*/dst : { hubFileProvider : provider, prefixPath : testPath },
+    src : { hubFileProvider : src, basePath : '/' },
+    dst : { hubFileProvider : provider, prefixPath : testPath },
   });
 
   var found = provider.filesFindRecursive( testPath );
@@ -10341,8 +10454,8 @@ function filesReflectGrab( test )
   var records = hub.filesReflect
   ({
     reflectMap : recipe,
-    /*srcFilter*/src : { hubFileProvider : src, basePath : '/' },
-    /*dstFilter*/dst : { hubFileProvider : provider, prefixPath : testPath },
+    src : { hubFileProvider : src, basePath : '/' },
+    dst : { hubFileProvider : provider, prefixPath : testPath },
   });
 
   var found = provider.filesFindRecursive( testPath );
@@ -10388,8 +10501,8 @@ function filesReflectGrab( test )
   var records = hub.filesReflect
   ({
     reflectMap : recipe,
-    /*srcFilter*/src : { hubFileProvider : src, prefixPath : '/' },
-    /*dstFilter*/dst : { hubFileProvider : provider, prefixPath : testPath },
+    src : { hubFileProvider : src, prefixPath : '/' },
+    dst : { hubFileProvider : provider, prefixPath : testPath },
   });
   var found = provider.filesFindRecursive( testPath );
   src.finit();
@@ -10434,8 +10547,8 @@ function filesReflectGrab( test )
   var records = hub.filesReflect
   ({
     reflectMap : recipe,
-    /*srcFilter*/src : { hubFileProvider : src, prefixPath : '/' },
-    /*dstFilter*/dst : { hubFileProvider : provider, prefixPath : testPath },
+    src : { hubFileProvider : src, prefixPath : '/' },
+    dst : { hubFileProvider : provider, prefixPath : testPath },
   });
   var found = provider.filesFindRecursive( testPath );
   src.finit();
@@ -10479,8 +10592,8 @@ function filesReflectGrab( test )
   var records = hub.filesReflect
   ({
     reflectMap : recipe,
-    /*srcFilter*/src : { basePath : '/' },
-    /*dstFilter*/dst : { prefixPath : 'current://' + testPath },
+    src : { basePath : '/' },
+    dst : { prefixPath : 'current://' + testPath },
   });
   src.finit();
   provider.filesDelete( testPath );
@@ -10524,8 +10637,8 @@ function filesReflectGrab( test )
   var records = hub.filesReflect
   ({
     reflectMap : recipe,
-    /*srcFilter*/src : { hubFileProvider : src, basePath : '/' },
-    /*dstFilter*/dst : { hubFileProvider : provider, prefixPath : testPath },
+    src : { hubFileProvider : src, basePath : '/' },
+    dst : { hubFileProvider : provider, prefixPath : testPath },
   });
   src.finit();
   provider.filesDelete( testPath );
@@ -10569,8 +10682,8 @@ function filesReflectGrab( test )
   var records = hub.filesReflect
   ({
     reflectMap : recipe,
-    /*srcFilter*/src : { hubFileProvider : src, prefixPath : '/', basePath : '/' },
-    /*dstFilter*/dst : { hubFileProvider : provider, prefixPath : testPath },
+    src : { hubFileProvider : src, prefixPath : '/', basePath : '/' },
+    dst : { hubFileProvider : provider, prefixPath : testPath },
   });
   src.finit();
   provider.filesDelete( testPath );
@@ -10614,8 +10727,8 @@ function filesReflectGrab( test )
   var records = hub.filesReflect
   ({
     reflectMap : recipe,
-    /*srcFilter*/src : { hubFileProvider : src, basePath : '/' },
-    /*dstFilter*/dst : { hubFileProvider : provider, prefixPath : testPath },
+    src : { hubFileProvider : src, basePath : '/' },
+    dst : { hubFileProvider : provider, prefixPath : testPath },
   });
 
   src.finit();
@@ -10660,8 +10773,8 @@ function filesReflectGrab( test )
   var records = hub.filesReflect
   ({
     reflectMap : recipe,
-    /*srcFilter*/src : { hubFileProvider : src, basePath : '/' },
-    /*dstFilter*/dst : { hubFileProvider : provider, prefixPath : testPath, basePath : testPath },
+    src : { hubFileProvider : src, basePath : '/' },
+    dst : { hubFileProvider : provider, prefixPath : testPath, basePath : testPath },
   });
   src.finit();
   provider.filesDelete( testPath );
@@ -10705,8 +10818,8 @@ function filesReflectGrab( test )
   var records = hub.filesReflect
   ({
     reflectMap : recipe,
-    /*srcFilter*/src : { hubFileProvider : src, basePath : '/' },
-    /*dstFilter*/dst : { hubFileProvider : provider, prefixPath : testPath },
+    src : { hubFileProvider : src, basePath : '/' },
+    dst : { hubFileProvider : provider, prefixPath : testPath },
   });
   var found = provider.filesFindRecursive( testPath );
   src.finit();
@@ -10810,8 +10923,8 @@ function filesReflector( test )
 
   var reflect = hub.filesReflector
   ({
-    /*srcFilter*/src : { hubFileProvider : src },
-    /*dstFilter*/dst : { hubFileProvider : dst, prefixPath : testPath },
+    src : { hubFileProvider : src },
+    dst : { hubFileProvider : dst, prefixPath : testPath },
   });
 
   test.case = 'negative + dst + src base path';
@@ -10851,7 +10964,7 @@ function filesReflector( test )
   var records = reflect
   ({
     reflectMap : recipe,
-    /*srcFilter*/src : { basePath : null },
+    src : { basePath : null },
   });
 
   var expectedDstAbsolute = abs([ '/src1x', '/src1x/d', '/src1x/d/a', '/src1x/d/c', '/src2x', '/src2x/a', '/src2x/c' ]);
@@ -10875,7 +10988,7 @@ function filesReflector( test )
   var records = reflect
   ({
     reflectMap : recipe,
-    /*srcFilter*/src : { basePath : null },
+    src : { basePath : null },
   });
 
   var expectedDstAbsolute = abs([ '/', '/d', '/d/a', '/d/c', '/', '/a', '/c' ]);
@@ -10899,8 +11012,8 @@ function filesReflector( test )
 
   var reflect = hub.filesReflector
   ({
-    /*srcFilter*/src : {},
-    /*dstFilter*/dst : {},
+    src : {},
+    dst : {},
   });
   test.shouldThrowError( () => reflect( '/' ) );
   var found = dst.filesFind({ filePath : testPath, allowingMissed : 1 });
@@ -10916,8 +11029,8 @@ function filesReflector( test )
 
   var reflect = hub.filesReflector
   ({
-    /*srcFilter*/src : { basePath : 'src:///' },
-    /*dstFilter*/dst : { filePath : 'current:///' },
+    src : { basePath : 'src:///' },
+    dst : { filePath : 'current:///' },
   });
   reflect( '/' );
   var found = dst.filesFind({ filePath : testPath, allowingMissed : 1 });
@@ -10936,8 +11049,8 @@ function filesReflector( test )
 
     var reflect = hub.filesReflector
     ({
-      /*srcFilter*/src : { basePath : 'src:///' },
-      /*dstFilter*/dst : { basePath : 'current:///' },
+      src : { basePath : 'src:///' },
+      dst : { basePath : 'current:///' },
     });
     test.shouldThrowErrorSync( () => reflect( '/' ) );
 
@@ -10956,8 +11069,8 @@ function filesReflector( test )
 
     var reflect = hub.filesReflector
     ({
-      /*srcFilter*/src : { basePath : 'src:///' },
-      /*dstFilter*/dst : { basePath : 'current:///' },
+      src : { basePath : 'src:///' },
+      dst : { basePath : 'current:///' },
     });
     test.shouldThrowError( () => reflect( '/' ) );
 
@@ -10973,8 +11086,8 @@ function filesReflector( test )
 
   var reflect = hub.filesReflector
   ({
-    /*srcFilter*/src : { prefixPath : 'src:///' },
-    /*dstFilter*/dst : { prefixPath : 'current://' + testPath },
+    src : { prefixPath : 'src:///' },
+    dst : { prefixPath : 'current://' + testPath },
   });
   reflect( '/' );
   var extract = provider.filesExtract( testPath );
@@ -10995,8 +11108,8 @@ function filesReflector( test )
 
   var reflect = hub.filesReflector
   ({
-    /*srcFilter*/src : { prefixPath : 'src:///', basePath : 'src:///' },
-    /*dstFilter*/dst : { prefixPath : 'current://' + testPath, basePath : 'current://' + testPath },
+    src : { prefixPath : 'src:///', basePath : 'src:///' },
+    dst : { prefixPath : 'current://' + testPath, basePath : 'current://' + testPath },
   });
   reflect( '/alt/a' );
   var extract = provider.filesExtract( testPath );
@@ -11017,8 +11130,8 @@ function filesReflector( test )
 
   var reflect = hub.filesReflector
   ({
-    /*srcFilter*/src : { prefixPath : 'src:///', basePath : 'src:///' },
-    /*dstFilter*/dst : { prefixPath : 'current://' + testPath, basePath : 'current://' + testPath },
+    src : { prefixPath : 'src:///', basePath : 'src:///' },
+    dst : { prefixPath : 'current://' + testPath, basePath : 'current://' + testPath },
     mandatory : 0,
   });
   reflect( '/alt/alt' );
@@ -11035,8 +11148,8 @@ function filesReflector( test )
 
   var reflect = hub.filesReflector
   ({
-    /*srcFilter*/src : { prefixPath : 'src:///', basePath : 'src:///a/b' },
-    /*dstFilter*/dst : { prefixPath : 'current://' + testPath + '/1/2', basePath : 'current://' + testPath + '/1/2' },
+    src : { prefixPath : 'src:///', basePath : 'src:///a/b' },
+    dst : { prefixPath : 'current://' + testPath + '/1/2', basePath : 'current://' + testPath + '/1/2' },
   });
   reflect( 'alt' );
   var expected =
@@ -11065,8 +11178,8 @@ function filesReflector( test )
 
   var reflect = hub.filesReflector
   ({
-    /*srcFilter*/src : { prefixPath : 'src:///', basePath : 'src:///' },
-    /*dstFilter*/dst : { prefixPath : 'current://' + testPath, basePath : 'current://' + testPath + '/a/b' },
+    src : { prefixPath : 'src:///', basePath : 'src:///' },
+    dst : { prefixPath : 'current://' + testPath, basePath : 'current://' + testPath + '/a/b' },
   });
   reflect( '/alt/a' )
   var extract = provider.filesExtract( testPath );
@@ -11087,8 +11200,8 @@ function filesReflector( test )
 
   var reflect = hub.filesReflector
   ({
-    /*srcFilter*/src : { prefixPath : 'src:///', basePath : 'src:///' },
-    /*dstFilter*/dst : { prefixPath : 'current://' + testPath, basePath : 'current://' + testPath },
+    src : { prefixPath : 'src:///', basePath : 'src:///' },
+    dst : { prefixPath : 'current://' + testPath, basePath : 'current://' + testPath },
     linking : 'softLink',
     mandatory : 1,
   });
@@ -11146,8 +11259,8 @@ function filesReflectWithHub( test )
   var o1 =
   {
     reflectMap : { [ srcPath ] : dstPath },
-    /*srcFilter*/src : { effectiveFileProvider : srcProvider },
-    /*dstFilter*/dst : { effectiveFileProvider : dstProvider },
+    src : { effectiveFileProvider : srcProvider },
+    dst : { effectiveFileProvider : dstProvider },
   };
   var o2 =
   {
@@ -11220,11 +11333,11 @@ function filesReflectLinkWithHub( test )
 
   hub.filesReflect
   ({
-    /*dstFilter*/dst :
+    dst :
     {
       prefixPath : _.uri.join( 'current://', dstPath ),
     },
-    /*srcFilter*/src :
+    src :
     {
       prefixPath : _.uri.join( 'src://', '/' ),
     },
@@ -11251,11 +11364,11 @@ function filesReflectLinkWithHub( test )
 
   hub.filesReflect
   ({
-    /*dstFilter*/dst :
+    dst :
     {
       filePath : _.uri.join( 'current://', dstPath ),
     },
-    /*srcFilter*/src :
+    src :
     {
       filePath : _.uri.join( 'src://', '/' ),
     },
@@ -11282,11 +11395,11 @@ function filesReflectLinkWithHub( test )
 
   hub.filesReflect
   ({
-    /*dstFilter*/dst :
+    dst :
     {
       filePath : _.uri.join( 'current://', dstPath ),
     },
-    /*srcFilter*/src :
+    src :
     {
       filePath : _.uri.join( 'src://', '/' ),
     },
@@ -11313,11 +11426,11 @@ function filesReflectLinkWithHub( test )
 
   hub.filesReflect
   ({
-    /*dstFilter*/dst :
+    dst :
     {
       filePath : _.uri.join( 'current://', dstPath ),
     },
-    /*srcFilter*/src :
+    src :
     {
       filePath : _.uri.join( 'src://', '/' ),
     },
@@ -11354,11 +11467,11 @@ function filesReflectLinkWithHub( test )
 
   var reflect = hub.filesReflector
   ({
-    /*dstFilter*/dst :
+    dst :
     {
       prefixPath : _.uri.join( 'current://', dstPath ),
     },
-    /*srcFilter*/src :
+    src :
     {
       prefixPath : _.uri.join( 'src://', '/' ),
     },
@@ -11407,11 +11520,11 @@ function filesReflectDeducing( test )
     {
       '.' : '.',
     },
-    /*srcFilter*/src :
+    src :
     {
       prefixPath : '/src/srcDir',
     },
-    /*dstFilter*/dst :
+    dst :
     {
       prefixPath : '/dst/dstDir2',
     },
@@ -11455,11 +11568,11 @@ function filesReflectDeducing( test )
     {
       '/src/srcDir' : '.',
     },
-    /*srcFilter*/src :
+    src :
     {
       prefixPath : '/src/srcDir2',
     },
-    /*dstFilter*/dst :
+    dst :
     {
       prefixPath : '/dst/dstDir2',
     },
@@ -11500,11 +11613,11 @@ function filesReflectDeducing( test )
   var o =
   {
     reflectMap : null,
-    /*srcFilter*/src :
+    src :
     {
       filePath : '/src/srcDir',
     },
-    /*dstFilter*/dst :
+    dst :
     {
       filePath : '/dst/dstDir2',
     },
@@ -11545,12 +11658,12 @@ function filesReflectDeducing( test )
   var o =
   {
     reflectMap : null,
-    /*srcFilter*/src :
+    src :
     {
       prefixPath : '/src',
       filePath : { 'srcDir' : 'dstDir2' },
     },
-    /*dstFilter*/dst :
+    dst :
     {
       prefixPath : '/dst',
     },
@@ -11591,11 +11704,11 @@ function filesReflectDeducing( test )
   var o =
   {
     reflectMap : null,
-    /*srcFilter*/src :
+    src :
     {
       filePath : [ '/src/srcDir', '/src/srcDir2' ],
     },
-    /*dstFilter*/dst :
+    dst :
     {
       filePath : [ '/dst/dstDir', '/dst/dstDir2' ]
     },
@@ -11636,11 +11749,11 @@ function filesReflectDeducing( test )
   var o =
   {
     reflectMap : null,
-    /*srcFilter*/src :
+    src :
     {
       filePath : [ 'extract:///src/srcDir', 'extract:///src/srcDir2' ],
     },
-    /*dstFilter*/dst :
+    dst :
     {
       filePath : [ 'extract:///dst/dstDir', 'extract:///dst/dstDir2' ]
     },
@@ -11679,13 +11792,13 @@ function filesReflectDeducing( test )
 
   var o =
   {
-    /*srcFilter*/src :
+    src :
     {
       prefixPath : '/src',
       filePath : { '.' : true },
       basePath : { '.' : '.' },
     },
-    /*dstFilter*/dst :
+    dst :
     {
       prefixPath : '/dst',
       filePath : '.',
@@ -11725,12 +11838,12 @@ function filesReflectDeducing( test )
 
   var o =
   {
-    /*srcFilter*/src :
+    src :
     {
       prefixPath : '/src',
       filePath : { 'd' : true },
     },
-    /*dstFilter*/dst :
+    dst :
     {
       prefixPath : '/dst',
       filePath : '.',
@@ -11770,13 +11883,13 @@ function filesReflectDeducing( test )
 
   var o =
   {
-    /*srcFilter*/src :
+    src :
     {
       prefixPath : '/src',
       basePath : '.',
       filePath : { 'd' : true },
     },
-    /*dstFilter*/dst :
+    dst :
     {
       prefixPath : '/dst',
       basePath : { '.' : '.' },
@@ -11816,12 +11929,12 @@ function filesReflectDeducing( test )
 
   var o =
   {
-    /*srcFilter*/src :
+    src :
     {
       prefixPath : '/src',
       filePath : { 'd' : true },
     },
-    /*dstFilter*/dst :
+    dst :
     {
       prefixPath : '/dst',
     },
@@ -11859,12 +11972,12 @@ function filesReflectDeducing( test )
 
   var o =
   {
-    /*srcFilter*/src :
+    src :
     {
       prefixPath : '/src',
       filePath : { 'c' : 'c2', 'd' : null },
     },
-    /*dstFilter*/dst :
+    dst :
     {
       prefixPath : '/dst',
       filePath : '.',
@@ -11908,12 +12021,12 @@ function filesReflectDeducing( test )
 
   var o =
   {
-    /*srcFilter*/src :
+    src :
     {
       prefixPath : '/src',
       filePath : { 'srcDir2' : null, 'c' : 'c2', 'd' : null },
     },
-    /*dstFilter*/dst :
+    dst :
     {
       prefixPath : '/dst',
       filePath : '.',
@@ -12687,7 +12800,7 @@ function filesReflectDstDeletingDirs( test )
     writing : 1,
     dstDeleting : 1,
     dstDeletingCleanedDirs : 1,
-    /*dstFilter*/dst : { maskAll : { excludeAny : 'dir' } }
+    dst : { maskAll : { excludeAny : 'dir' } }
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   var expected =
@@ -12712,7 +12825,7 @@ function filesReflectDstDeletingDirs( test )
     writing : 1,
     dstDeleting : 1,
     dstDeletingCleanedDirs : 0,
-    /*dstFilter*/dst : { maskAll : { excludeAny : 'dir' } }
+    dst : { maskAll : { excludeAny : 'dir' } }
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   var expected =
@@ -12737,7 +12850,7 @@ function filesReflectDstDeletingDirs( test )
     writing : 1,
     dstDeleting : 1,
     dstDeletingCleanedDirs : 1,
-    /*dstFilter*/dst : { maskAll : { includeAny : 'file' } }
+    dst : { maskAll : { includeAny : 'file' } }
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   var expected =
@@ -12762,7 +12875,7 @@ function filesReflectDstDeletingDirs( test )
     writing : 1,
     dstDeleting : 1,
     dstDeletingCleanedDirs : 1,
-    /*dstFilter*/dst : { maskAll : { includeAny : [ 'file', 'dir' ] } }
+    dst : { maskAll : { includeAny : [ 'file', 'dir' ] } }
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   var expected =
@@ -12787,7 +12900,7 @@ function filesReflectDstDeletingDirs( test )
     writing : 1,
     dstDeleting : 1,
     dstDeletingCleanedDirs : 0,
-    /*dstFilter*/dst : { maskAll : { includeAny : 'file' } }
+    dst : { maskAll : { includeAny : 'file' } }
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   var expected =
@@ -12812,7 +12925,7 @@ function filesReflectDstDeletingDirs( test )
     writing : 1,
     dstDeleting : 1,
     dstDeletingCleanedDirs : 0,
-    /*dstFilter*/dst : { maskAll : { includeAny : [ 'file', 'dir' ] } }
+    dst : { maskAll : { includeAny : [ 'file', 'dir' ] } }
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   var expected =
@@ -12837,7 +12950,7 @@ function filesReflectDstDeletingDirs( test )
     writing : 1,
     dstDeleting : 1,
     dstDeletingCleanedDirs : 1,
-    /*dstFilter*/dst : { maskAll : { includeAny : 'file', excludeAny : 'dir' } }
+    dst : { maskAll : { includeAny : 'file', excludeAny : 'dir' } }
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   var expected =
@@ -12862,7 +12975,7 @@ function filesReflectDstDeletingDirs( test )
     writing : 1,
     dstDeleting : 1,
     dstDeletingCleanedDirs : 0,
-    /*dstFilter*/dst : { maskAll : { includeAny : 'file', excludeAny : 'dir' } }
+    dst : { maskAll : { includeAny : 'file', excludeAny : 'dir' } }
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   var expected =
@@ -12887,7 +13000,7 @@ function filesReflectDstDeletingDirs( test )
     writing : 1,
     dstDeleting : 1,
     dstDeletingCleanedDirs : 1,
-    /*dstFilter*/dst : { maskAll : { includeAny : 'file1' } }
+    dst : { maskAll : { includeAny : 'file1' } }
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   var expected =
@@ -12910,7 +13023,7 @@ function filesReflectDstDeletingDirs( test )
     writing : 1,
     dstDeleting : 1,
     dstDeletingCleanedDirs : 0,
-    /*dstFilter*/dst : { maskAll : { includeAny : 'file1' } }
+    dst : { maskAll : { includeAny : 'file1' } }
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   var expected =
@@ -12933,7 +13046,7 @@ function filesReflectDstDeletingDirs( test )
     writing : 1,
     dstDeleting : 1,
     dstDeletingCleanedDirs : 1,
-    /*dstFilter*/dst : { maskAll : { includeAny : 'file' } }
+    dst : { maskAll : { includeAny : 'file' } }
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   var expected =
@@ -12956,7 +13069,7 @@ function filesReflectDstDeletingDirs( test )
     writing : 1,
     dstDeleting : 1,
     dstDeletingCleanedDirs : 0,
-    /*dstFilter*/dst : { maskAll : { includeAny : 'file' } }
+    dst : { maskAll : { includeAny : 'file' } }
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   var expected =
@@ -12979,7 +13092,7 @@ function filesReflectDstDeletingDirs( test )
     writing : 1,
     dstDeleting : 1,
     dstDeletingCleanedDirs : 1,
-    /*dstFilter*/dst : { maskAll : { includeAny : 'file' } }
+    dst : { maskAll : { includeAny : 'file' } }
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   var expected =
@@ -13002,7 +13115,7 @@ function filesReflectDstDeletingDirs( test )
     writing : 1,
     dstDeleting : 1,
     dstDeletingCleanedDirs : 0,
-    /*dstFilter*/dst : { maskAll : { includeAny : 'file' } }
+    dst : { maskAll : { includeAny : 'file' } }
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   var expected =
@@ -16110,7 +16223,7 @@ function filesFindDifference( test )
       recursive : 2,
       onDown : function( record ){ test.identical( _.objectIs( record ), true ); },
       onUp : function( record ){ test.identical( _.objectIs( record ), true ); },
-      /*srcFilter*/src : { ends : sample.ends }
+      src : { ends : sample.ends }
     }
 
     _.mapExtend( o, sample.options || {} );

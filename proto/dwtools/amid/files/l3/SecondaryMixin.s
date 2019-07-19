@@ -340,11 +340,11 @@ function _filesReadOldAsync( o )
   for( let p = 0 ; p < o.paths.length ; p++ ) ( function( p )
   {
 
-    con.done( 1 );
+    con.give( 1 );
 
     let readOptions = _optionsForFileRead( o.paths[ p ] );
 
-    _.Consequence.From( self.fileRead( readOptions ) ).got( function filesReadOldFileEnd( _err,arg )
+    _.Consequence.From( self.fileRead( readOptions ) ).give( function filesReadOldFileEnd( _err,arg )
     {
 
       if( _err || arg === undefined || arg === null )
@@ -365,7 +365,7 @@ function _filesReadOldAsync( o )
 
   /* end */
 
-  con.take( null ).got( function filesReadOldEnd()
+  con.take( null ).give( function filesReadOldEnd()
   {
     let result = _filesReadOldEnd( errs, read );
     con.take( o.throwing ? err : undefined , result );

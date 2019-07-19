@@ -684,7 +684,7 @@ function dirReadAct( o )
       resolvingSoftLink : 1,
       throwing : 1,
     })
-    .got( function( err, stat )
+    .give( function( err, stat )
     {
       if( err )
       {
@@ -921,7 +921,7 @@ _.routineExtend( fileExistsAct, Parent.prototype.fileExistsAct );
         sync : false,
       };
     let con = wTools.fileWrite( options );
-    con.got( function()
+    con.give( function()
     {
         console.log('write finished');
     });
@@ -1107,7 +1107,7 @@ _.routineExtend( fileTimeSetAct, Parent.prototype.fileTimeSetAct );
    console.log( StandardFile.existsSync( path ) ); // true (file exists)
    let con = fileProvider.fileDelete( delOptions );
 
-   con.got( function(err)
+   con.give( function(err)
    {
      console.log( StandardFile.existsSync( path ) ); // false (file does not exist)
    } );
@@ -1193,7 +1193,7 @@ function fileDeleteAct( o )
       sync : 0,
       throwing : 0,
     });
-    con.got( ( err, stat ) =>
+    con.give( ( err, stat ) =>
     {
       if( err )
       return con.error( err );
@@ -1627,7 +1627,7 @@ function hardLinkAct( o )
       throwing : 0,
       resolvingSoftLink : 0,
     })
-    .got( function( err, stat )
+    .give( function( err, stat )
     {
       if( err )
       return con.error( err );

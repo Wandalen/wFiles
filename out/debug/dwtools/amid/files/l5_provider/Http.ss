@@ -196,7 +196,7 @@ function fileReadAct( o )
   _.sure( encoder.onBegin.call( self, { operation : o, encoder : encoder }) === undefined );
 
   self.streamReadAct({ filePath :  o.filePath })
-  .got( function( err, response )
+  .give( function( err, response )
   {
     debugger;
 
@@ -276,10 +276,10 @@ function filesReflectSingle_body( o )
   _.assert( _.routineIs( o.onWriteSrcDown ) && o.onWriteSrcDown.composed && o.onWriteSrcDown.composed.elements.length === 0, 'Not supported options' );
   _.assert( o.outputFormat === 'record' || o.outputFormat === 'nothing', 'Not supported options' );
   _.assert( o.linking === 'fileCopy' || o.linking === 'hardLinkMaybe' || o.linking === 'softLinkMaybe', 'Not supported options' );
-  _.assert( !o./*srcFilter*/src.hasFiltering(), 'Not supported options' );
-  _.assert( !o./*dstFilter*/dst.hasFiltering(), 'Not supported options' );
-  _.assert( o./*srcFilter*/src.formed === 5 );
-  _.assert( o./*dstFilter*/dst.formed === 5 );
+  _.assert( !o.src.hasFiltering(), 'Not supported options' );
+  _.assert( !o.dst.hasFiltering(), 'Not supported options' );
+  _.assert( o.src.formed === 5 );
+  _.assert( o.dst.formed === 5 );
   _.assert( o.srcPath === undefined );
   // _.assert( o.filter === null || !o.filter.hasFiltering(), 'Not supported options' );
   _.assert( o.filter === undefined );
@@ -287,7 +287,7 @@ function filesReflectSingle_body( o )
   /* */
 
   let con = new _.Consequence();
-  let dstFileProvider = o./*dstFilter*/dst.providerForPath();
+  let dstFileProvider = o.dst.providerForPath();
   let srcPath = o.src.filePathSimplest();
   let dstPath = o.dst.filePathSimplest();
   // let srcPath = o.srcPath;
@@ -308,8 +308,8 @@ function filesReflectSingle_body( o )
   _.sure( _.strIs( srcPath ) );
   _.sure( _.strIs( dstPath ) );
   _.assert( dstFileProvider instanceof _.FileProvider.HardDrive || dstFileProvider.originalFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
-  _.sure( !o./*srcFilter*/src || !o./*srcFilter*/src.hasFiltering(), 'Does not support filtering, but {o./*srcFilter*/src} is not empty' );
-  _.sure( !o./*dstFilter*/dst || !o./*dstFilter*/dst.hasFiltering(), 'Does not support filtering, but {o./*dstFilter*/dst} is not empty' );
+  _.sure( !o.src || !o.src.hasFiltering(), 'Does not support filtering, but {o.src} is not empty' );
+  _.sure( !o.dst || !o.dst.hasFiltering(), 'Does not support filtering, but {o.dst} is not empty' );
   // _.sure( !o.filter || !o.filter.hasFiltering(), 'Does not support filtering, but {o.filter} is not empty' );
 
   /* log */
@@ -336,7 +336,7 @@ function filesReflectSingle_body( o )
   });
 
   self.streamRead({ filePath : srcPath })
-  .got( function( err, response )
+  .give( function( err, response )
   {
     response.pipe( writeStream );
     response.on( 'error', onError );
@@ -445,7 +445,7 @@ function fileCopyToHardDriveAct( o )
   });
 
   self.streamReadAct({ filePath : o.url })
-  .got( function( err, response )
+  .give( function( err, response )
   {
     response.pipe( writeStream );
     response.on( 'error', onError );

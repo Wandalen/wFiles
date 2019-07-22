@@ -380,81 +380,82 @@ function _filesReadOldAsync( o )
 // etc
 // --
 
-/**
- * @summary Returns true if file from `dst` is newer than file from `src`.
- * @param {String} src Source path.
- * @param {String} dst Destination path.
- * @returns {Boolean} Returns result of comparison as boolean.
- * @function filesAreUpToDate
- * @memberof module:Tools/mid/Files.wFileProviderSecondary#
- */
-
-function filesAreUpToDate( dst,src )
-{
-  let self = this;
-  let odst = dst;
-  let osrc = src;
-
-  _.assert( arguments.length === 2, 'Expects exactly two arguments' );
-
-  /* */
-
-  dst = from( dst );
-  src = from( src );
-
-  // logger.log( 'dst',dst[ 0 ] );
-  // logger.log( 'src',src[ 0 ] );
-
-  let dstMax = _.entityMax( dst, function( e ){ return e.stat ? e.stat.mtime : Infinity; } );
-  let srcMax = _.entityMax( src, function( e ){ return e.stat ? e.stat.mtime : Infinity; } );
-
-  // logger.log( 'dstMax.element.stat.mtime',dstMax.element.stat.mtime );
-  // logger.log( 'srcMax.element.stat.mtime',srcMax.element.stat.mtime );
-
-  if( !dstMax.element.stat )
-  return false;
-
-  if( !srcMax.element.stat )
-  return false;
-
-  if( dstMax.element.stat.mtime >= srcMax.element.stat.mtime )
-  return true;
-  else
-  return false;
-
-  /* */
-
-  function _from( file )
-  {
-    if( _.fileStatIs( file ) )
-    return  { stat : file };
-    else if( _.strIs( file ) )
-    return { stat : self.statResolvedRead( file ) };
-    else if( !_.objectIs( file ) )
-    throw _.err( 'unknown descriptor of file' );
-  }
-
-  /* */
-
-  function from( file )
-  {
-    if( _.arrayIs( file ) )
-    {
-      let result = [];
-      for( let i = 0 ; i < file.length ; i++ )
-      result[ i ] = _from( file[ i ] );
-      return result;
-    }
-    return [ _from( file ) ];
-  }
-
-}
-
-var having = filesAreUpToDate.having = Object.create( null );
-
-having.writing = 0;
-having.reading = 1;
-having.driving = 0;
+// /**
+//  * @summary Returns true if file from `dst` is newer than file from `src`.
+//  * @param {String} src Source path.
+//  * @param {String} dst Destination path.
+//  * @returns {Boolean} Returns result of comparison as boolean.
+//  * @function filesAreUpToDate
+//  * @memberof module:Tools/mid/Files.wFileProviderSecondary#
+//  */
+//
+// function filesAreUpToDate( dst,src )
+// {
+//   let self = this;
+//   let odst = dst;
+//   let osrc = src;
+//
+//   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
+//
+//   /* */
+//
+//   dst = from( dst );
+//   src = from( src );
+//
+//   // logger.log( 'dst',dst[ 0 ] );
+//   // logger.log( 'src',src[ 0 ] );
+//
+//   let dstMax = _.entityMax( dst, function( e ){ return e.stat ? e.stat.mtime : Infinity; } );
+//   let srcMax = _.entityMax( src, function( e ){ return e.stat ? e.stat.mtime : Infinity; } );
+//
+//   debugger;
+//   // logger.log( 'dstMax.element.stat.mtime',dstMax.element.stat.mtime );
+//   // logger.log( 'srcMax.element.stat.mtime',srcMax.element.stat.mtime );
+//
+//   if( !dstMax.element.stat )
+//   return false;
+//
+//   if( !srcMax.element.stat )
+//   return false;
+//
+//   if( dstMax.element.stat.mtime >= srcMax.element.stat.mtime )
+//   return true;
+//   else
+//   return false;
+//
+//   /* */
+//
+//   function _from( file )
+//   {
+//     if( _.fileStatIs( file ) )
+//     return  { stat : file };
+//     else if( _.strIs( file ) )
+//     return { stat : self.statResolvedRead( file ) };
+//     else if( !_.objectIs( file ) )
+//     throw _.err( 'unknown descriptor of file' );
+//   }
+//
+//   /* */
+//
+//   function from( file )
+//   {
+//     if( _.arrayIs( file ) )
+//     {
+//       let result = [];
+//       for( let i = 0 ; i < file.length ; i++ )
+//       result[ i ] = _from( file[ i ] );
+//       return result;
+//     }
+//     return [ _from( file ) ];
+//   }
+//
+// }
+//
+// var having = filesAreUpToDate.having = Object.create( null );
+//
+// having.writing = 0;
+// having.reading = 1;
+// having.driving = 0;
 
 //
 
@@ -478,6 +479,12 @@ having.driving = 0;
  * @memberof module:Tools/mid/Files.wFileProviderSecondary#
  */
 
+/*
+qqq :
+- add GOOD coverage for the routine filesAreUpToDate2
+- make pre/body for the routine
+*/
+
 function filesAreUpToDate2( o )
 {
   let self = this;
@@ -486,7 +493,6 @@ function filesAreUpToDate2( o )
   _.assert( !o.newer || _.dateIs( o.newer ) );
   _.routineOptions( filesAreUpToDate2,o );
 
-  // debugger;
   let srcFiles = self.recordFactory().recordsFiltered( o.src );
 
   if( !srcFiles.length )

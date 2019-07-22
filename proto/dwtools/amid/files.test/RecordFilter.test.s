@@ -287,7 +287,6 @@ function form( test )
   test.identical( filter.formedFilePath, null );
   test.identical( filter.formedBasePath, null );
   test.identical( filter.filePath, { '/a/b/*x*' : null, '/a/c/*x*' : null } );
-  // test.identical( filter.basePath, { '/a/b/*x*' : '.', '/a/c/*x*' : '.' } ); // yyy
   test.identical( filter.basePath, { '/a/b/*x*' : '/a/b', '/a/c/*x*' : '/a/c' } );
   test.identical( filter.prefixPath, null );
   test.identical( filter.postfixPath, null );
@@ -301,7 +300,6 @@ function form( test )
   test.identical( filter.formedFilePath, null );
   test.identical( filter.formedBasePath, null );
   test.identical( filter.filePath, { 'a/b/*x*' : null, 'a/c/*x*' : null } );
-  // test.identical( filter.basePath, { 'a/b/*x*' : '.', 'a/c/*x*' : '.' } ); // yyy
   test.identical( filter.basePath, { 'a/b/*x*' : 'a/b', 'a/c/*x*' : 'a/c' } );
   test.identical( filter.prefixPath, null );
   test.identical( filter.postfixPath, null );
@@ -332,15 +330,49 @@ function form( test )
   test.identical( filter.prefixPath, null );
   test.identical( filter.postfixPath, null );
 
-/*
-filter.toStr()
-"Filter
-  filePath : [
-  [ '/temp/tmp.tmp/suite-' ... 'Glob/doubledir/d1/ **' ],
-  [ '/temp/tmp.tmp/suite-' ... 'Glob/doubledir/d2/ **' ]
-]
-  basePath : '.'"
-*/
+  /* */
+
+  test.case = 'paired, src.prefix, src.file, src.base, dst.prefix, dst.file';
+  var src = _.fileProvider.recordFilter();
+  src.filePath = '/main/*';
+  src.prefixPath = '/';
+  src.basePath = '/main/';
+  var dst = _.fileProvider.recordFilter();
+  dst.filePath = '.';
+  dst.prefixPath = '/out/Main.s';
+  src.pairWithDst( dst );
+  src.pairRefineLight();
+
+  test.is( src.filePath === dst.filePath );
+  test.identical( src.filePath, { '/main/*' : '.' } );
+  test.identical( src.prefixPath, '/' );
+  test.identical( src.postfixPath, null );
+  test.identical( src.basePath, '/main/' );
+  test.identical( src.formed, 1 );
+  test.identical( dst.filePath, { '/main/*' : '.' } );
+  test.identical( dst.prefixPath, '/out/Main.s' );
+  test.identical( dst.postfixPath, null );
+  test.identical( dst.basePath, null );
+  test.identical( dst.formed, 1 );
+
+  dst.form();
+  src.form();
+
+  test.identical( src.formedFilePath, { '/main' : '/out/Main.s' } );
+  test.identical( src.formedBasePath, { '/main' : '/main' } );
+  test.identical( src.filePath, { '/main/*' : '/out/Main.s' } );
+  test.identical( src.basePath, { '/main/*' : '/main' } );
+  test.identical( src.prefixPath, null );
+  test.identical( src.postfixPath, null );
+  test.identical( src.formed, 5 );
+
+  test.identical( src.formedFilePath, { '/main' : '/out/Main.s' } );
+  test.identical( src.formedBasePath, { '/main' : '/main' } );
+  test.identical( dst.filePath, { '/main/*' : '/out/Main.s' } );
+  test.identical( dst.basePath, { '/out/Main.s' : '/out/Main.s' } );
+  test.identical( dst.prefixPath, null );
+  test.identical( dst.postfixPath, null );
+  test.identical( dst.formed, 5 );
 
 }
 

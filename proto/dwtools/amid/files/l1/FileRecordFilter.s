@@ -218,9 +218,6 @@ function _formPaths()
 {
   let filter = this;
 
-  // if( filter.prefixPath === '/src/*' )
-  // debugger;
-
   if( filter.formed === 3 )
   return;
   if( filter.formed < 2 )
@@ -239,6 +236,7 @@ function _formPaths()
 
   filter.pathsNormalize();
 
+  if( !filter.src )
   if( _.mapIs( filter.filePath ) )
   filter.filePath = filter.filePathGlobSimplify( filter.basePath, filter.filePath );
 
@@ -319,7 +317,6 @@ function _formFinal()
     _.assert( _.strIs( filter.filePath ) || _.arrayIs( filter.filePath ) || _.mapIs( filter.filePath ) );
     _.assert( _.mapIs( filter.formedBasePath ) || _.mapKeys( filter.formedFilePath ).length === 0 );
     _.assert( _.mapIs( filter.formedFilePath ) );
-    // _.assert( _.mapIs( filter.basePath ) || _.mapKeys( filter.formedFilePath ).length === 0 );
     _.assert( _.objectIs( filter.effectiveFileProvider ) );
     _.assert( filter.hubFileProvider === filter.effectiveFileProvider.hub || filter.hubFileProvider === filter.effectiveFileProvider );
     _.assert( filter.hubFileProvider instanceof _.FileProvider.Abstract );
@@ -327,7 +324,7 @@ function _formFinal()
 
     let filePath = filter.filePathArrayGet( filter.formedFilePath ).filter( ( e ) => _.strIs( e ) );
     _.assert( path.s.noneAreGlob( filePath ) );
-    _.assert( path.s.allAreAbsolute( filePath ) || path.s.allAreGlobal( filePath ) );
+    _.assert( path.s.allAreAbsolute( filePath ) || path.s.allAreGlobal( filePath ), () => 'Expects absolute or global file path, but got\n' + _.toJson( filePath ) );
 
     if( _.mapIs( filter.formedBasePath ) )
     for( let p in filter.formedBasePath )
@@ -915,7 +912,7 @@ function pathLocalize( filePath )
 
   _.assert( _.strIs( filePath ) );
 
-  filePath = path.normalizeCanonical( filePath );
+  filePath = path.canonize( filePath );
 
   if( filter.effectiveFileProvider && !path.isGlobal( filePath ) )
   return filePath;
@@ -2207,6 +2204,31 @@ function filePathGet()
 
 //
 
+function basePathSet( src )
+{
+  let filter = this;
+  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+
+  if( Config.debug )
+  if( src && fileProvider )
+  {
+    let path = fileProvider.path;
+    path.filter( src, ( basePath, it ) =>
+    {
+      if( it.side === 'src' )
+      return;
+      _.assert( !path.isGlob( basePath ), () => 'Base path should be non-glob, but ' + _.strQuote( basePath ) + ' is glob' );
+    });
+  }
+
+  if( _.mapIs( src ) )
+  src = _.mapExtend( null, src );
+
+  return filter[ basePathSymbol ] = src;
+}
+
+//
+
 function filePathSet( src )
 {
   let filter = this;
@@ -2487,6 +2509,7 @@ function filePathGlobSimplify( basePath, filePath )
 
   _.assert( arguments.length === 0 || arguments.length === 2 );
   _.assert( _.mapIs( filePath ) );
+  _.assert( !filter.src, 'Not applicable to destination filter, only to source filter' );
 
   let dst = filter.filePathDstArrayGet();
 
@@ -2505,7 +2528,7 @@ function filePathGlobSimplify( basePath, filePath )
 
   function simplify( src, what )
   {
-    let src2 = path.normalizeCanonical( _.strRemoveEnd( src, what ) );
+    let src2 = path.canonize( _.strRemoveEnd( src, what ) );
     if( !path.isGlob( src2 ) )
     {
       _.assert( filePath[ src2 ] === undefined )
@@ -2514,7 +2537,8 @@ function filePathGlobSimplify( basePath, filePath )
 
       if( _.mapIs( basePath ) )
       {
-        _.assert( basePath[ src2 ] === undefined )
+        _.assert( basePath[ src2 ] === undefined || basePath[ src2 ] === basePath[ src ], () => 'Base path for file path ' + _.strQuote( src2 ) + ' is already defined and has value ' + _.strQuote( basePath[ src2 ] ) );
+        _.assert( basePath[ src ] !== undefined, () => 'No base path for file path ' + _.strQuote( src ) );
         basePath[ src2 ] = basePath[ src ];
         delete basePath[ src ];
       }
@@ -3655,7 +3679,11 @@ function sureBasePath( basePath, filePath )
 
   for( let g in basePath )
   {
-    _.sure( !path.isGlob( basePath[ g ] ) );
+    _.sure
+    (
+      !path.isGlob( basePath[ g ] ),
+      () => 'Base path should not be glob, but base path ' + _.strQuote( basePath[ g ] ) + ' for file path ' + _.strQuote( g ) + ' is glob'
+    );
   }
 
 }
@@ -4045,6 +4073,7 @@ function _applyToRecordFull( record )
 let isTransientSymbol = Symbol.for( 'isTransient' );
 let isActualSymbol = Symbol.for( 'isActual' );
 let filePathSymbol = Symbol.for( 'filePath' );
+let basePathSymbol = Symbol.for( 'basePath' );
 
 let MaskNames =
 [
@@ -4111,10 +4140,6 @@ let Restricts =
 
 let Medials =
 {
-
-  // src : null,
-  // dst : null,
-
 }
 
 let Statics =
@@ -4146,8 +4171,7 @@ let Forbids =
   test : 'test',
   inFilePath : 'inFilePath',
   stemPath : 'stemPath',
-  // src : 'src',
-  // dst : 'dst',
+  distinct : 'distinct',
   globFound : 'globFound',
 
 }
@@ -4156,6 +4180,7 @@ let Accessors =
 {
 
   filePath : {},
+  basePath : { setter : basePathSet },
   basePaths : { getter : basePathsGet, readOnly : 1 },
   pairedFilter : { getter : pairedFilterGet, readOnly : 1 },
 

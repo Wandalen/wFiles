@@ -687,29 +687,6 @@ function hasProvider( provider )
 // --
 // path
 // --
-//
-// function hasLocally( filePath )
-// {
-//   let self = this;
-//   let path = self.this;
-//
-//   debugger;
-//
-//   if( !path.isGlobal( filePath ) )
-//   return true;
-//
-//   let parsed = _.uri.parse( filePath );
-//
-//   if( !parsed.protocol )
-//   return true;
-//
-//   if( _.arrayHas( self.protocols, parsed.protocol ) )
-//   return true;
-//
-//   return false;
-// }
-
-//
 
 function localFromGlobalAct( globalPath )
 {
@@ -1052,9 +1029,6 @@ function pathResolveLinkFull_body( o )
       because resolving does not guarantee reading stat
     */
 
-    // if( _.strEnds( o.filePath, '/statReadActSync/src' ) )
-    // debugger;
-
     if( !o.stat )
     o.stat = self.statReadAct
     ({
@@ -1082,9 +1056,6 @@ function pathResolveLinkFull_body( o )
 
       return result;
     }
-
-    // if( o.resolvingSoftLink )
-    // debugger;
 
     if( o.resolvingHeadDirect )
     {
@@ -2138,6 +2109,10 @@ statResolvedRead.defaults.resolvingTextLink = null;
  * @method filesSize
  * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial#
  */
+
+/*
+qqq : split pre / body
+*/
 
 function filesSize( o )
 {
@@ -4331,8 +4306,6 @@ function fileWrite_body( o )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  // debugger;
-  // if( !path.isSafe( o.filePath, o.safe ) )
   if( !path.isSafe( o.filePath, self.safe ) )
   {
     debugger;
@@ -5993,12 +5966,12 @@ function _link_functor( gen )
     /* - */
 
     function tempNameMake( filePath )
-    { 
+    {
       let postfix = '-' + _.idWithGuid() + '.tmp';
-      
+
       if( _.strEnds( filePath, '/' ) )
       return _.strReplaceEnd( filePath, '/', postfix )
-      
+
       return filePath + postfix;
     }
 

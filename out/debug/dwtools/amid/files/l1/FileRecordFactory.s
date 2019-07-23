@@ -1,6 +1,6 @@
 ( function _FileRecordFactory_s_() {
 
-'use strict'; 
+'use strict';
 
 if( typeof module !== 'undefined' )
 {
@@ -340,7 +340,7 @@ function record( o )
  * @memberof module:Tools/mid/Files.wFileRecordFactory#
 */
 
-function recordsFiltered( filePaths,fileContext )
+function recordsFiltered( filePaths )
 {
   var factory = this;
 
@@ -406,8 +406,9 @@ function _usingTextLinkGet()
 {
   let factory = this;
 
-  if( !factory.resolving )
-  return false;
+  /* using knows nothing about resolving */
+  // if( !factory.resolving )
+  // return false;
 
   if( factory[ usingTextLinkSymbol ] !== null )
   return factory[ usingTextLinkSymbol ];
@@ -425,6 +426,9 @@ function _usingTextLinkGet()
 function _resolvingTextLinkGet()
 {
   let factory = this;
+
+  if( !factory.resolving )
+  return false;
 
   if( factory[ resolvingTextLinkSymbol ] !== null )
   return factory[ resolvingTextLinkSymbol ];
@@ -506,9 +510,7 @@ let Composes =
   basePath : null,
   stemPath : null,
 
-  // onRecord : null,
   strict : 1,
-
   allowingMissed : 0,
   allowingCycled : 0,
   resolvingSoftLink : null,

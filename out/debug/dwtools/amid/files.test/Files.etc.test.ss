@@ -1,6 +1,6 @@
 ( function _File_etc_test_ss_( ) {
 
-'use strict';  
+'use strict';
 
 // return; /* deprecated */
 
@@ -2406,6 +2406,12 @@ function filesLink( test )
 
 };
 
+//
+
+/*
+qqq : rewrite test routine for filesNewer, filesOlder. coverage should be Good
+*/
+
 function filesNewer( test )
 {
   var file1 = 'tmp.tmp/filesNewer/test1',
@@ -2458,6 +2464,8 @@ function filesNewer( test )
 
   return con;
 };
+
+//
 
 function filesOlder( test )
 {
@@ -3126,122 +3134,122 @@ function filesSimilarity( test )
 //     }
 //   }
 // };
-
 //
-
-function filesAreUpToDate2( test )
-{
-  var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    textData2 = ' Aenean non feugiat mauris',
-    bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
-    bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] );
-
-  // regular tests
-  var testChecks =
-    [
-      {
-        name : 'files is up to date',
-        createFirst :
-        {
-          path : [ 'tmp.tmp/filesIsUpToDate1/file1', 'tmp.tmp/filesIsUpToDate1/file2.txt' ],
-          type : 'f',
-          createResource : [ bufferData1, textData1 ]
-        },
-        createSecond :
-        {
-          path : [ 'tmp.tmp/filesIsUpToDate1/file3', 'tmp.tmp/filesIsUpToDate1/file4.txt' ],
-          type : 'f',
-          createResource : [ bufferData2, textData2 ]
-        },
-        src : [ 'tmp.tmp/filesIsUpToDate1/file1', 'tmp.tmp/filesIsUpToDate1/file2.txt' ],
-        dst : [ 'tmp.tmp/filesIsUpToDate1/file3', 'tmp.tmp/filesIsUpToDate1/file4.txt' ],
-        expected : true
-      },
-      {
-        name : 'files is not up to date',
-        createFirst :
-        {
-          path : [ 'tmp.tmp/filesIsUpToDate2/file1', 'tmp.tmp/filesIsUpToDate2/file2.txt' ],
-          type : 'f',
-          createResource : [ bufferData1, textData1 ]
-        },
-        createSecond :
-        {
-          path : [ 'tmp.tmp/filesIsUpToDate2/file3', 'tmp.tmp/filesIsUpToDate2/file4.txt' ],
-          type : 'f',
-          createResource : [ bufferData2, textData2 ]
-        },
-        src : [ 'tmp.tmp/filesIsUpToDate2/file1', 'tmp.tmp/filesIsUpToDate2/file4.txt' ],
-        dst : [ 'tmp.tmp/filesIsUpToDate2/file3', 'tmp.tmp/filesIsUpToDate2/file2.txt' ],
-        expected : false
-      },
-    ];
-
-/*
-  function createWithDelay( fileLists, delay )
-  {
-    delay = delay || 0;
-    var con = wConsequence( );
-    setTimeout( function( )
-    {
-      createTestResources( fileLists );
-      console.log( '--> files created second' );
-      con.take( );
-    }, delay );
-    return con;
-  }
-*/
-
-  var con = new _.Consequence( ).take( null );
-  for( let tc of testChecks )
-  {
-    ( function( tc )
-    {
-      con.finally( () =>
-      {
-        console.log( 'tc : ' + tc.name );
-        createTestResources( tc.createFirst );
-        console.log( '--> files create first' );
-        return null;
-      })
-
-      con.finally( _.routineSeal( _,_.timeOut,[ 1000 ] ) );
-      con.finally( _.routineSeal( null,createTestResources,[ tc.createSecond ] ) );
-      con.finally( _.routineSeal( console,console.log,[ '--> files created second' ] ) );
-
-/*
-      try
-      {
-        con = createWithDelay( tc.createSecond, 500 )
-      }
-      catch( err )
-      {
-        console.log( err );
-      }
-*/
-
-      con.finally( ( ) =>
-      {
-        test.description = tc.name;
-        try
-        {
-          var got = _.fileProvider.filesAreUpToDate2
-          ({
-            src : tc.src.map( ( v ) => _.path.resolve( mergePath( v ) ) ),
-            dst : tc.dst.map( ( v ) => _.path.resolve( mergePath( v ) ) )
-          });
-        }
-        catch( err )
-        {
-          console.log( err );
-        }
-        test.identical( got, tc.expected );
-        return null;
-      } );
-    } )( _.mapExtend( null, tc ) );
-  }
-  return con;
-};
+// //
+//
+// function filesAreUpToDate2( test )
+// {
+//   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+//     textData2 = ' Aenean non feugiat mauris',
+//     bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
+//     bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] );
+//
+//   // regular tests
+//   var testChecks =
+//     [
+//       {
+//         name : 'files is up to date',
+//         createFirst :
+//         {
+//           path : [ 'tmp.tmp/filesIsUpToDate1/file1', 'tmp.tmp/filesIsUpToDate1/file2.txt' ],
+//           type : 'f',
+//           createResource : [ bufferData1, textData1 ]
+//         },
+//         createSecond :
+//         {
+//           path : [ 'tmp.tmp/filesIsUpToDate1/file3', 'tmp.tmp/filesIsUpToDate1/file4.txt' ],
+//           type : 'f',
+//           createResource : [ bufferData2, textData2 ]
+//         },
+//         src : [ 'tmp.tmp/filesIsUpToDate1/file1', 'tmp.tmp/filesIsUpToDate1/file2.txt' ],
+//         dst : [ 'tmp.tmp/filesIsUpToDate1/file3', 'tmp.tmp/filesIsUpToDate1/file4.txt' ],
+//         expected : true
+//       },
+//       {
+//         name : 'files is not up to date',
+//         createFirst :
+//         {
+//           path : [ 'tmp.tmp/filesIsUpToDate2/file1', 'tmp.tmp/filesIsUpToDate2/file2.txt' ],
+//           type : 'f',
+//           createResource : [ bufferData1, textData1 ]
+//         },
+//         createSecond :
+//         {
+//           path : [ 'tmp.tmp/filesIsUpToDate2/file3', 'tmp.tmp/filesIsUpToDate2/file4.txt' ],
+//           type : 'f',
+//           createResource : [ bufferData2, textData2 ]
+//         },
+//         src : [ 'tmp.tmp/filesIsUpToDate2/file1', 'tmp.tmp/filesIsUpToDate2/file4.txt' ],
+//         dst : [ 'tmp.tmp/filesIsUpToDate2/file3', 'tmp.tmp/filesIsUpToDate2/file2.txt' ],
+//         expected : false
+//       },
+//     ];
+//
+// /*
+//   function createWithDelay( fileLists, delay )
+//   {
+//     delay = delay || 0;
+//     var con = wConsequence( );
+//     setTimeout( function( )
+//     {
+//       createTestResources( fileLists );
+//       console.log( '--> files created second' );
+//       con.take( );
+//     }, delay );
+//     return con;
+//   }
+// */
+//
+//   var con = new _.Consequence( ).take( null );
+//   for( let tc of testChecks )
+//   {
+//     ( function( tc )
+//     {
+//       con.finally( () =>
+//       {
+//         console.log( 'tc : ' + tc.name );
+//         createTestResources( tc.createFirst );
+//         console.log( '--> files create first' );
+//         return null;
+//       })
+//
+//       con.finally( _.routineSeal( _,_.timeOut,[ 1000 ] ) );
+//       con.finally( _.routineSeal( null,createTestResources,[ tc.createSecond ] ) );
+//       con.finally( _.routineSeal( console,console.log,[ '--> files created second' ] ) );
+//
+// /*
+//       try
+//       {
+//         con = createWithDelay( tc.createSecond, 500 )
+//       }
+//       catch( err )
+//       {
+//         console.log( err );
+//       }
+// */
+//
+//       con.finally( ( ) =>
+//       {
+//         test.description = tc.name;
+//         try
+//         {
+//           var got = _.fileProvider.filesAreUpToDate2
+//           ({
+//             src : tc.src.map( ( v ) => _.path.resolve( mergePath( v ) ) ),
+//             dst : tc.dst.map( ( v ) => _.path.resolve( mergePath( v ) ) )
+//           });
+//         }
+//         catch( err )
+//         {
+//           console.log( err );
+//         }
+//         test.identical( got, tc.expected );
+//         return null;
+//       } );
+//     } )( _.mapExtend( null, tc ) );
+//   }
+//   return con;
+// };
 
 //
 
@@ -3301,7 +3309,7 @@ var Self =
 
     // filesList : filesList,
 
-    filesAreUpToDate2 : filesAreUpToDate2,
+    // filesAreUpToDate2 : filesAreUpToDate2,
 
     // testDelaySample : testDelaySample,
 

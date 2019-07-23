@@ -1674,14 +1674,13 @@ function filesFind2( test )
     });
   })
 
-  test.case = 'terminalPath - not exist';
+  test.case = 'terminalPath - not exist, mandatory : 1';
 
   got = provider.filesFind
   ({
     filePath : nonexistentPath,
     allowingMissed : 1,
   });
-  // var expected = [ provider.recordFactory({ basePath : '/invalid path', filter : got[ 0 ].context.filter }).record( '/invalid path' ) ];
   var expected = [];
   test.identical( got, expected );
 
@@ -1691,10 +1690,22 @@ function filesFind2( test )
     ({
       filePath : nonexistentPath,
       allowingMissed : 0,
+      mandatory : 1,
     });
   })
 
-  test.case = 'terminalPath - some paths dont exist';
+  test.case = 'terminalPath - not exist, mandatory : 0';
+
+  var expected = [];
+  got = provider.filesFind
+  ({
+    filePath : nonexistentPath,
+    allowingMissed : 0,
+    mandatory : 0,
+  });
+  test.identical( got, expected );
+
+  test.case = 'terminalPath - some paths dont exist, mandatory : 1';
 
   got = provider.filesFind
   ({
@@ -1710,8 +1721,21 @@ function filesFind2( test )
     ({
       filePath : [ nonexistentPath, terminalPath ],
       allowingMissed : 0,
+      mandatory : 1,
     });
   });
+
+  test.case = 'terminalPath - some paths dont exist, mandatory : 0';
+
+  var expected = [ '.' ]
+  var got = provider.filesFind
+  ({
+    filePath : [ nonexistentPath, terminalPath ],
+    allowingMissed : 0,
+    mandatory : 0,
+    outputFormat : 'relative',
+  });
+  test.identical( got, expected );
 
   /*terminalPath - some paths not exist, allowingMissed on*/
 
@@ -6007,7 +6031,7 @@ function filesGlob( test )
 
   /**/
 
-  /* {} are not supported, yet zzz */
+  /* {} are not supported zzz */
 
   // var  glob = 'a/{x.*, a.*}';
   // var options = completeOptions( glob );
@@ -6048,6 +6072,440 @@ function filesGlob( test )
 }
 
 //
+
+function filesFindDistinct( test )
+{
+  let context = this;
+  let provider = context.provider;
+  let hub = context.hub;
+  let path = context.provider.path;
+  let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
+
+  function abs( filePath )
+  {
+    return path.s.join( testPath, filePath );
+  }
+
+  /* - */
+
+  test.case = 'setup';
+
+  var extract1 = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      dir1 :
+      {
+        t1 : '/dir1/t1',
+        t2 : '/dir1/t2',
+        dir11 : { t3 : '/dir1/dir11/t3' }
+      },
+      dir2 :
+      {
+        t21 : '/dir2/t21'
+      }
+    },
+  });
+
+  extract1.filesReflectTo( provider, testPath );
+
+  /* */
+
+  test.case = 'exist';
+
+  var filter =
+  {
+    filePath : abs( 'dir1' ),
+  }
+
+  var o1 =
+  {
+    outputFormat : 'absolute',
+    distinct : 1,
+    filter,
+  }
+
+  var got = provider.filesFind( _.mapExtend( null, o1 ) );
+  var expected = abs([ 'dir1' ]);
+  test.identical( got, expected );
+
+  /* */
+
+  test.case = 'exist, includingDirs : 0';
+
+  var filter =
+  {
+    filePath : abs( 'dir1' ),
+  }
+
+  var o1 =
+  {
+    outputFormat : 'absolute',
+    includingDirs : 0,
+    distinct : 1,
+    filter,
+  }
+
+  var got = provider.filesFind( _.mapExtend( null, o1 ) );
+  var expected = abs([]);
+  test.identical( got, expected );
+
+  /* */
+
+  test.case = 'exist, glob';
+
+  var filter =
+  {
+    filePath : abs( 'dir1*/*/*' ),
+  }
+
+  var o1 =
+  {
+    outputFormat : 'absolute',
+    distinct : 1,
+    filter,
+  }
+
+  var got = provider.filesFind( _.mapExtend( null, o1 ) );
+  var expected = abs([ 'dir1/t1', 'dir1/t2', 'dir1/dir11/t3' ]);
+  test.identical( got, expected );
+
+  /* */
+
+  test.case = 'exist, glob, includingDirs : 0';
+
+  var filter =
+  {
+    filePath : abs( 'dir1*/*/*' ),
+  }
+
+  var o1 =
+  {
+    outputFormat : 'absolute',
+    includingDirs : 0,
+    distinct : 1,
+    filter,
+  }
+
+  var got = provider.filesFind( _.mapExtend( null, o1 ) );
+  var expected = abs([ 'dir1/t1', 'dir1/t2', 'dir1/dir11/t3' ]);
+  test.identical( got, expected );
+
+  /* */
+
+  test.case = 'exist, glob, includingDirs : 1';
+
+  var filter =
+  {
+    filePath : abs( 'dir1*/*/*' ),
+  }
+
+  var o1 =
+  {
+    outputFormat : 'absolute',
+    includingDirs : 1,
+    distinct : 1,
+    filter,
+  }
+
+  var got = provider.filesFind( _.mapExtend( null, o1 ) );
+  var expected = abs([ 'dir1', 'dir1/t1', 'dir1/t2', 'dir1/dir11', 'dir1/dir11/t3' ]);
+  test.identical( got, expected );
+
+  /* */
+
+  test.case = 'does not exist';
+
+  var filter =
+  {
+    filePath : abs( 'dirX' ),
+  }
+
+  var o1 =
+  {
+    outputFormat : 'absolute',
+    distinct : 1,
+    filter,
+  }
+
+  var got = provider.filesFind( _.mapExtend( null, o1 ) );
+  var expected = abs([ 'dirX' ]);
+  test.identical( got, expected );
+
+  /* */
+
+  test.case = 'does not exist 2';
+
+  var filter =
+  {
+    filePath : abs( 'dirX/dirY' ),
+  }
+
+  var o1 =
+  {
+    outputFormat : 'absolute',
+    distinct : 1,
+    filter,
+  }
+
+  var got = provider.filesFind( _.mapExtend( null, o1 ) );
+  var expected = abs([ 'dirX/dirY' ]);
+  test.identical( got, expected );
+
+  /* */
+
+  test.case = 'does not exist, mandatory : 1';
+
+  var filter =
+  {
+    filePath : abs( 'dirX' ),
+  }
+
+  var o1 =
+  {
+    outputFormat : 'absolute',
+    mandatory : 1,
+    distinct : 1,
+    filter,
+  }
+
+  test.shouldThrowErrorSync( () =>
+  {
+    var got = provider.filesFind( _.mapExtend( null, o1 ) );
+    var expected = abs([]);
+    test.identical( got, expected );
+  });
+
+  /* */
+
+  test.case = 'does not exist, glob';
+
+  var filter =
+  {
+    filePath : abs( 'dirX*/*/*' ),
+  }
+
+  var o1 =
+  {
+    outputFormat : 'absolute',
+    distinct : 1,
+    filter,
+  }
+
+  test.shouldThrowErrorSync( () =>
+  {
+    var got = provider.filesFind( _.mapExtend( null, o1 ) );
+    var expected = abs([]);
+    test.identical( got, expected );
+  });
+
+  /* */
+
+  test.case = 'does not exist, glob, mandatory : 0';
+
+  var filter =
+  {
+    filePath : abs( 'dirX*/*/*' ),
+  }
+
+  var o1 =
+  {
+    outputFormat : 'absolute',
+    mandatory : 0,
+    distinct : 1,
+    filter,
+  }
+
+  var got = provider.filesFind( _.mapExtend( null, o1 ) );
+  var expected = abs([]);
+  test.identical( got, expected );
+
+  /* */
+
+  test.case = 'does not exist, glob, mandatory : 0, includingDirs : 1, includingStem : 1';
+
+  var filter =
+  {
+    filePath : abs( 'dirX*/*/*' ),
+  }
+
+  var o1 =
+  {
+    outputFormat : 'absolute',
+    mandatory : 0,
+    includingDirs : 1,
+    includingStem : 1,
+    distinct : 1,
+    filter,
+  }
+
+  var got = provider.filesFind( _.mapExtend( null, o1 ) );
+  var expected = abs([]);
+  test.identical( got, expected );
+
+  /* - */
+
+}
+
+//
+
+/*
+test glob simplifying feature
+optimization which does not add glob masks because it changes nothing
+*/
+
+function filesFindSimplifyGlob( test )
+{
+  let context = this;
+  let provider = context.provider;
+  let hub = context.hub;
+  let path = context.provider.path;
+  let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
+
+  function abs( filePath )
+  {
+    return path.s.join( testPath, filePath );
+  }
+
+  /* - */
+
+  test.case = 'setup';
+
+  var extract1 = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      dir1 :
+      {
+        t1 : '/dir1/t1',
+        t2 : '/dir1/t2',
+        dir11 : { t3 : '/dir1/dir11/t3' }
+      },
+      dir2 :
+      {
+        t21 : '/dir2/t21'
+      }
+    },
+  });
+
+  extract1.filesReflectTo( provider, testPath );
+
+  /* */
+
+  test.case = 'dir1/**, distinct:0';
+
+  var filter =
+  {
+    filePath : abs( 'dir1/**' ),
+  }
+
+  var o =
+  {
+    outputFormat : 'absolute',
+    distinct : 0,
+    filter,
+  }
+
+  var got = provider.filesFind( o );
+  var expected = abs([ 'dir1/t1', 'dir1/t2', 'dir1/dir11/t3' ]);
+  test.identical( got, expected );
+  test.identical( o.mandatory, false )
+  test.identical( o.recursive, 2 )
+  test.identical( o.includingTerminals, true );
+  test.identical( o.includingDirs, false );
+  test.identical( o.includingStem, true );
+  test.identical( o.includingActual, 1 );
+  test.identical( o.includingTransient, 0 );
+
+  test.identical( o.filter.formedFilterMap, null );
+  test.identical( o.filter.formed, 5 );
+  test.identical( o.filter.formedFilePath, { [ abs( 'dir1' ) ] : null } );
+  test.identical( o.filter.formedBasePath, { [ abs( 'dir1' ) ] : abs( 'dir1' ) } );
+  test.identical( o.filter.filePath, { [ abs( 'dir1\/**' ) ] : null } );
+  test.identical( o.filter.basePath, { [ abs( 'dir1\/**' ) ] : abs( 'dir1' ) } );
+  test.identical( o.filter.prefixPath, null );
+  test.identical( o.filter.postfixPath, null );
+
+  /* */
+
+  test.case = 'dir1/**, distinct:1';
+
+  var filter =
+  {
+    filePath : abs( 'dir1/**' ),
+  }
+
+  var o =
+  {
+    outputFormat : 'absolute',
+    distinct : 1,
+    filter,
+  }
+
+  var got = provider.filesFind( o );
+  var expected = abs([ 'dir1/t1', 'dir1/t2', 'dir1/dir11/t3' ]);
+  test.identical( got, expected );
+  test.identical( o.mandatory, true )
+  test.identical( o.recursive, 2 )
+  test.identical( o.includingTerminals, true );
+  test.identical( o.includingDirs, false );
+  test.identical( o.includingStem, true );
+  test.identical( o.includingActual, 1 );
+  test.identical( o.includingTransient, 0 );
+
+  test.identical( o.filter.formedFilterMap, null );
+  test.identical( o.filter.formed, 5 );
+  test.identical( o.filter.formedFilePath, { [ abs( 'dir1' ) ] : null } );
+  test.identical( o.filter.formedBasePath, { [ abs( 'dir1' ) ] : abs( 'dir1' ) } );
+  test.identical( o.filter.filePath, { [ abs( 'dir1\/**' ) ] : null } );
+  test.identical( o.filter.basePath, { [ abs( 'dir1\/**' ) ] : abs( 'dir1' ) } );
+  test.identical( o.filter.prefixPath, null );
+  test.identical( o.filter.postfixPath, null );
+
+  /* */
+
+  test.case = 'dir1/*, distinct:0';
+
+  var filter =
+  {
+    filePath : abs( 'dir1/*' ),
+  }
+
+  var o =
+  {
+    outputFormat : 'absolute',
+    distinct : 0,
+    filter,
+  }
+
+  var got = provider.filesFind( o );
+  var expected = abs([ 'dir1/t1', 'dir1/t2' ]);
+  test.identical( got, expected );
+  test.identical( o.mandatory, false )
+  test.identical( o.recursive, 2 )
+  test.identical( o.includingTerminals, true );
+  test.identical( o.includingDirs, false );
+  test.identical( o.includingStem, true );
+  test.identical( o.includingActual, 1 );
+  test.identical( o.includingTransient, 0 );
+
+  test.setsAreIdentical( _.mapKeys( o.filter.formedFilterMap ), [ abs( 'dir1' ) ] );
+  test.identical( o.filter.formedFilterMap[ abs( 'dir1' ) ].maskAll.includeAny.length, 1 );
+  test.identical( o.filter.formed, 5 );
+  test.identical( o.filter.formedFilePath, { [ abs( 'dir1' ) ] : null } );
+  test.identical( o.filter.formedBasePath, { [ abs( 'dir1' ) ] : abs( 'dir1' ) } );
+  test.identical( o.filter.filePath, { [ abs( 'dir1\/*' ) ] : null } );
+  test.identical( o.filter.basePath, { [ abs( 'dir1\/*' ) ] : abs( 'dir1' ) } );
+  test.identical( o.filter.prefixPath, null );
+  test.identical( o.filter.postfixPath, null );
+
+}
+
+//
+
+/*
+qqq : extend coverage of filesFindGroups
+*/
 
 function filesFindGroups( test )
 {
@@ -10911,7 +11369,7 @@ function filesReflector( test )
 
   function abs( filePath )
   {
-    return path.s.normalizeCanonical( path.s.reroot( testPath, filePath ) );
+    return path.s.canonize( path.s.reroot( testPath, filePath ) );
   }
 
   /* */
@@ -18093,17 +18551,16 @@ var Self =
     filesFindMaskTerminal,
     filesFindCriticalCases,
     filesFindPreset,
-
     filesFind,
     filesFind2,
     filesFindRecursive,
     filesFindLinked,
-
     filesFindResolving,
     filesFindPerformance,
-
     filesFindGlob,
     filesGlob,
+    filesFindDistinct,
+    filesFindSimplifyGlob,
 
     filesFindGroups,
 

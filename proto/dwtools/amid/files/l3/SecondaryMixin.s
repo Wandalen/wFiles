@@ -57,11 +57,11 @@ function filesReadOld( o )
 
   if( o.preset )
   {
-    _.assert( _.objectIs( filesReadOld.presets[ o.preset ] ), 'unknown preset',o.preset );
+    _.assert( _.objectIs( filesReadOld.presets[ o.preset ] ), 'unknown preset', o.preset );
     _.mapSupplementAppending( o, filesReadOld.presets[ o.preset ] );
   }
 
-  _.routineOptions( filesReadOld,o );
+  _.routineOptions( filesReadOld, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.arrayIs( o.paths ) || _.objectIs( o.paths ) || _.strIs( o.paths ) );
 
@@ -152,7 +152,7 @@ function filesReadOld( o )
     if( !onBegin.length )
     return;
     debugger;
-    _.routinesCall( self,onBegin,[ result ] );
+    _.routinesCall( self, onBegin, [ result ] );
   }
 
   /* */
@@ -168,14 +168,14 @@ function filesReadOld( o )
     if( errsArray.length )
     {
       errs.total = errsArray.length;
-      err = _.err.apply( _,errsArray );
+      err = _.err.apply( _, errsArray );
     }
 
     let read = got;
     // if( !o.returningRead )
     // debugger;
     if( !o.returningRead )
-    read = _.entityMap( got,( e ) => e.result );
+    read = _.entityMap( got, ( e ) => e.result );
 
     if( o.map === 'name' )
     {
@@ -231,7 +231,7 @@ function filesReadOld( o )
 
     if( onEnd.length )
     {
-      _.routinesCall( self,onEnd,[ result ] );
+      _.routinesCall( self, onEnd, [ result ] );
     }
 
     return result;
@@ -272,7 +272,7 @@ function _filesReadOldSync( o )
 {
   let self = this;
 
-  _.assert( !o.onProgress,'not implemented' );
+  _.assert( !o.onProgress, 'not implemented' );
 
   let read = [];
   let errs = Object.create( null );
@@ -323,7 +323,7 @@ function _filesReadOldAsync( o )
   let self = this;
   let con = new _.Consequence();
 
-  _.assert( !o.onProgress,'not implemented' );
+  _.assert( !o.onProgress, 'not implemented' );
 
   let read = [];
   let errs = [];
@@ -344,7 +344,7 @@ function _filesReadOldAsync( o )
 
     let readOptions = _optionsForFileRead( o.paths[ p ] );
 
-    _.Consequence.From( self.fileRead( readOptions ) ).give( function filesReadOldFileEnd( _err,arg )
+    _.Consequence.From( self.fileRead( readOptions ) ).give( function filesReadOldFileEnd( _err, arg )
     {
 
       if( _err || arg === undefined || arg === null )
@@ -380,81 +380,82 @@ function _filesReadOldAsync( o )
 // etc
 // --
 
-/**
- * @summary Returns true if file from `dst` is newer than file from `src`.
- * @param {String} src Source path.
- * @param {String} dst Destination path.
- * @returns {Boolean} Returns result of comparison as boolean.
- * @function filesAreUpToDate
- * @memberof module:Tools/mid/Files.wFileProviderSecondary#
- */
-
-function filesAreUpToDate( dst,src )
-{
-  let self = this;
-  let odst = dst;
-  let osrc = src;
-
-  _.assert( arguments.length === 2, 'Expects exactly two arguments' );
-
-  /* */
-
-  dst = from( dst );
-  src = from( src );
-
-  // logger.log( 'dst',dst[ 0 ] );
-  // logger.log( 'src',src[ 0 ] );
-
-  let dstMax = _.entityMax( dst, function( e ){ return e.stat ? e.stat.mtime : Infinity; } );
-  let srcMax = _.entityMax( src, function( e ){ return e.stat ? e.stat.mtime : Infinity; } );
-
-  // logger.log( 'dstMax.element.stat.mtime',dstMax.element.stat.mtime );
-  // logger.log( 'srcMax.element.stat.mtime',srcMax.element.stat.mtime );
-
-  if( !dstMax.element.stat )
-  return false;
-
-  if( !srcMax.element.stat )
-  return false;
-
-  if( dstMax.element.stat.mtime >= srcMax.element.stat.mtime )
-  return true;
-  else
-  return false;
-
-  /* */
-
-  function _from( file )
-  {
-    if( _.fileStatIs( file ) )
-    return  { stat : file };
-    else if( _.strIs( file ) )
-    return { stat : self.statResolvedRead( file ) };
-    else if( !_.objectIs( file ) )
-    throw _.err( 'unknown descriptor of file' );
-  }
-
-  /* */
-
-  function from( file )
-  {
-    if( _.arrayIs( file ) )
-    {
-      let result = [];
-      for( let i = 0 ; i < file.length ; i++ )
-      result[ i ] = _from( file[ i ] );
-      return result;
-    }
-    return [ _from( file ) ];
-  }
-
-}
-
-var having = filesAreUpToDate.having = Object.create( null );
-
-having.writing = 0;
-having.reading = 1;
-having.driving = 0;
+// /**
+//  * @summary Returns true if file from `dst` is newer than file from `src`.
+//  * @param {String} src Source path.
+//  * @param {String} dst Destination path.
+//  * @returns {Boolean} Returns result of comparison as boolean.
+//  * @function filesAreUpToDate
+//  * @memberof module:Tools/mid/Files.wFileProviderSecondary#
+//  */
+//
+// function filesAreUpToDate( dst, src )
+// {
+//   let self = this;
+//   let odst = dst;
+//   let osrc = src;
+//
+//   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
+//
+//   /* */
+//
+//   dst = from( dst );
+//   src = from( src );
+//
+//   // logger.log( 'dst', dst[ 0 ] );
+//   // logger.log( 'src', src[ 0 ] );
+//
+//   let dstMax = _.entityMax( dst, function( e ){ return e.stat ? e.stat.mtime : Infinity; } );
+//   let srcMax = _.entityMax( src, function( e ){ return e.stat ? e.stat.mtime : Infinity; } );
+//
+//   debugger;
+//   // logger.log( 'dstMax.element.stat.mtime', dstMax.element.stat.mtime );
+//   // logger.log( 'srcMax.element.stat.mtime', srcMax.element.stat.mtime );
+//
+//   if( !dstMax.element.stat )
+//   return false;
+//
+//   if( !srcMax.element.stat )
+//   return false;
+//
+//   if( dstMax.element.stat.mtime >= srcMax.element.stat.mtime )
+//   return true;
+//   else
+//   return false;
+//
+//   /* */
+//
+//   function _from( file )
+//   {
+//     if( _.fileStatIs( file ) )
+//     return  { stat : file };
+//     else if( _.strIs( file ) )
+//     return { stat : self.statResolvedRead( file ) };
+//     else if( !_.objectIs( file ) )
+//     throw _.err( 'unknown descriptor of file' );
+//   }
+//
+//   /* */
+//
+//   function from( file )
+//   {
+//     if( _.arrayIs( file ) )
+//     {
+//       let result = [];
+//       for( let i = 0 ; i < file.length ; i++ )
+//       result[ i ] = _from( file[ i ] );
+//       return result;
+//     }
+//     return [ _from( file ) ];
+//   }
+//
+// }
+//
+// var having = filesAreUpToDate.having = Object.create( null );
+//
+// having.writing = 0;
+// having.reading = 1;
+// having.driving = 0;
 
 //
 
@@ -478,63 +479,109 @@ having.driving = 0;
  * @memberof module:Tools/mid/Files.wFileProviderSecondary#
  */
 
+/*
+qqq :
+- add GOOD coverage for the routine filesAreUpToDate2
+- make pre/body for the routine
+*/
+
 function filesAreUpToDate2( o )
 {
   let self = this;
+  let factory = self.recordFactory({ allowingMissed : 1 });
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( !o.newer || _.dateIs( o.newer ) );
-  _.routineOptions( filesAreUpToDate2,o );
+  _.routineOptions( filesAreUpToDate2, o );
 
   // debugger;
-  let srcFiles = self.recordFactory().recordsFiltered( o.src );
+  // let srcFiles = self.recordFactory().recordsFiltered( o.src );
+  let srcFiles = factory.records( _.arrayAs( o.src ) );
 
   if( !srcFiles.length )
   {
     if( o.verbosity )
-    logger.log( 'Nothing to parse' );
+    logger.log( 'No source' );
     return true;
   }
 
-  let srcNewest = _.entityMax( srcFiles,function( file ){ return file.stat.mtime.getTime() } ).element;
+  /*
+    stat could have no mtime
+  */
+
+  let srcNewest = _.entityMax( srcFiles, function( file )
+  {
+    if( !file.stat )
+    return +Infinity;
+    if( !file.stat.mtime )
+    return +Infinity;
+    return file.stat.mtime.getTime()
+  }).value;
 
   /* */
 
-  let dstFiles = self.recordFactory().recordsFiltered( o.dst );
-
+  // let dstFiles = self.recordFactory().recordsFiltered( o.dst );
+  let dstFiles = factory.records( _.arrayAs( o.dst ) );
   if( !dstFiles.length )
   {
+    if( o.verbosity )
+    logger.log( 'No destination' );
     return false;
   }
 
-  let dstOldest = _.entityMin( dstFiles,function( file ){ return file.stat.mtime.getTime() } ).element;
+  // let dstOldest = _.entityMin( dstFiles, function( file ) { return file.stat.mtime.getTime() } ).element;
+  let dstOldest = _.entityMin( dstFiles, function( file )
+  {
+    // debugger;
+    if( !file.stat )
+    return -Infinity;
+    if( !file.stat.mtime )
+    return -Infinity;
+    return file.stat.mtime.getTime()
+  }).value;
 
   /* */
 
-  if( o.notOlder )
+  if( o.youngerThan )
   {
-    if( !( o.notOlder.getTime() <= dstOldest.stat.mtime.getTime() ) )
-    return false;
+    if( o.youngerThan.getTime() >= dstOldest )
+    {
+      if( o.verbosity )
+      logger.log( 'Younger' );
+      return true;
+    }
+    else
+    {
+      if( o.verbosity )
+      logger.log( 'Older' );
+      return false;
+    }
+  }
+  else
+  {
+    if( srcNewest <= dstOldest )
+    {
+      if( o.verbosity )
+      logger.log( 'Up to date' );
+      return true;
+    }
+    else
+    {
+      if( o.verbosity )
+      logger.log( 'Outdated' );
+      return false;
+    }
   }
 
-  if( srcNewest.stat.mtime.getTime() <= dstOldest.stat.mtime.getTime() )
-  {
-
-    if( o.verbosity )
-    logger.log( 'Up to date' );
-    return true;
-
-  }
-
-  return false;
 }
 
 filesAreUpToDate2.defaults =
 {
   src : null,
   dst : null,
-  verbosity : 1,
-  notOlder : null,
+  verbosity : 0,
+  youngerThan : null,
+  // notOlder : null,
 }
 
 var having = filesAreUpToDate2.having = Object.create( null );
@@ -612,7 +659,7 @@ function filesSearchText( o )
   let self = this;
   let result = [];
 
-  _.routineOptions( filesSearchText,o );
+  _.routineOptions( filesSearchText, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
   o.ins = _.arrayAs( o.ins );
@@ -698,7 +745,7 @@ function fileConfigRead2( o )
   if( o.result === undefined )
   o.result = Object.create( null );
 
-  _.routineOptions( fileConfigRead2,o );
+  _.routineOptions( fileConfigRead2, o );
 
   if( !o.name )
   {
@@ -742,7 +789,7 @@ function _fileConfigRead2( o )
   if( o.name === undefined )
   o.name = 'config';
 
-  let terminal = self.path.join( o.dir,o.name );
+  let terminal = self.path.join( o.dir, o.name );
 
   /**/
 
@@ -757,7 +804,7 @@ function _fileConfigRead2( o )
       {
         filename : fileName,
       });
-      _.mapExtend( o.result,read );
+      _.mapExtend( o.result, read );
 
     }
   }
@@ -770,7 +817,7 @@ function _fileConfigRead2( o )
 
     read = self.fileReadSync( fileName );
     read = JSON.parse( read );
-    _.mapExtend( o.result,read );
+    _.mapExtend( o.result, read );
 
   }
 
@@ -783,7 +830,7 @@ function _fileConfigRead2( o )
     debugger;
     read = self.fileReadSync( fileName );
     read = _.exec( read );
-    _.mapExtend( o.result,read );
+    _.mapExtend( o.result, read );
 
   }
 
@@ -800,7 +847,7 @@ _fileConfigRead2.defaults = fileConfigRead2.defaults;
  * Returns results as array or map.
  * @param {Object} o Options map.
  * @param {Array|String} o.filePath Source paths.
- * @param {String} o.outputFormat='array', Possible formats: array,map.
+ * @param {String} o.outputFormat='array', Possible formats: array, map.
  * @function fileConfigPathGet
  * @memberof module:Tools/mid/Files.wFileProviderSecondary#
  */
@@ -968,7 +1015,7 @@ function fileConfigRead_body( o )
     {
       let file = o.found[ f ];
 
-      let o2 = _.mapExtend( null,o );
+      let o2 = _.mapExtend( null, o );
       o2.filePath = file.particularPath;
       o2.encoding = file.encoding;
       // if( o2.verbosity >= 2 )
@@ -1041,7 +1088,7 @@ function fileCodeRead_body( o )
 {
   let self = this;
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( o.sync,'not implemented' );
+  _.assert( o.sync, 'not implemented' );
 
   let o2 = _.mapOnly( o, self.fileRead.defaults );
   let result = self.fileRead( o2 );
@@ -1126,7 +1173,7 @@ let Supplement =
 
   // etc
 
-  filesAreUpToDate,
+  // filesAreUpToDate,
   filesAreUpToDate2,
 
   filesSearchText,

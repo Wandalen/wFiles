@@ -2244,6 +2244,7 @@ function basePathSet( src )
   let filter = this;
   let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
 
+  if( 0 )
   if( Config.debug )
   if( src && fileProvider )
   {

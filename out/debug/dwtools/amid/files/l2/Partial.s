@@ -2110,6 +2110,10 @@ statResolvedRead.defaults.resolvingTextLink = null;
  * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial#
  */
 
+/*
+qqq : split pre / body
+*/
+
 function filesSize( o )
 {
   let self = this;

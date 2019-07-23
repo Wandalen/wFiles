@@ -1904,13 +1904,27 @@ function basePathFor( filePath )
   _.assert( _.mapIs( filter.basePath ) );
 
   result = filter.basePath[ filePath ];
+
+  if( result )
+  return result;
+
+  let basePath = _.mapExtend( null, filter.basePath );
+  for( let f in basePath )
+  {
+    let b = basePath[ f ];
+    delete basePath[ f ];
+    basePath[ path.fromGlob( f ) ] = b;
+  }
+
+  result = basePath[ filePath ];
+
   if( !result && !_.strBegins( filePath, '..' ) && !_.strBegins( filePath, '/..' ) )
   {
 
     let filePath2 = path.join( filePath, '..' );
     while( filePath2 !== '..' && filePath2 !== '/..' )
     {
-      result = filter.basePath[ filePath2 ];
+      result = basePath[ filePath2 ];
       if( result )
       break;
       filePath2 = path.join( filePath2, '..' );

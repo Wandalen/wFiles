@@ -236,9 +236,9 @@ function _formPaths()
 
   filter.pathsNormalize();
 
-  if( !filter.src )
-  if( _.mapIs( filter.filePath ) )
-  filter.filePath = filter.filePathGlobSimplify( filter.basePath, filter.filePath );
+  // if( !filter.src )
+  // if( _.mapIs( filter.filePath ) )
+  // filter.filePath = filter.filePathGlobSimplify( filter.filePath, filter.basePath );
 
   filter.formed = 3;
 }
@@ -472,45 +472,66 @@ function filePathGenerate()
   {
 
     _.assert( !filter.src );
-    _.assert( filter.formedFilterMap === null );
-    filter.formedFilterMap = Object.create( null );
-
-    // debugger;
-    let _processed = path.pathMapToRegexps( filter.filePath, filter.basePath  );
-    // debugger;
-
-    filter.formedBasePath = _processed.unglobedBasePath;
-    filter.formedFilePath = _processed.unglobedFilePath;
-
-    filter.assertBasePath();
-
-    for( let p in _processed.regexpMap )
+    let filePath = _.mapExtend( null, filter.filePath );
+    let basePath = _.mapExtend( null, filter.basePath );
+    filter.filePathGlobSimplify( filePath, basePath );
+    if( !_.entityIdentical( filePath, filter.filePath ) )
     {
-      let basePath = filter.formedBasePath[ p ];
-      _.assert( _.strDefined( basePath ), 'No base path for', p );
-      let relative = p;
-      let regexps = _processed.regexpMap[ p ];
-      _.assert( !filter.formedFilterMap[ relative ] );
-      let subfilter = filter.formedFilterMap[ relative ] = Object.create( null );
-      subfilter.maskAll = _.RegexpObject.Or( filter.maskAll.clone(), { includeAll : regexps.actualAll, includeAny : regexps.actualAny, excludeAny : regexps.notActual } );
-      subfilter.maskTerminal = filter.maskTerminal.clone();
-      subfilter.maskDirectory = filter.maskDirectory.clone();
-      subfilter.maskTransientAll = filter.maskTransientAll.clone();
-      subfilter.maskTransientTerminal = _.RegexpObject.Or( filter.maskTransientTerminal.clone(), { includeAny : /$_^/ } );
-      // subfilter.maskTransientTerminal = filter.maskTransientTerminal.clone(); // zzz
-      subfilter.maskTransientDirectory = _.RegexpObject.Or( filter.maskTransientDirectory.clone(), { includeAny : regexps.transient } );
-      _.assert( subfilter.maskAll !== filter.maskAll );
+      globFound = filter.filePathHasGlob( filePath );
+    }
+
+    if( globFound )
+    {
+      _.assert( !filter.src );
+      _.assert( filter.formedFilterMap === null );
+      filter.formedFilterMap = Object.create( null );
+
+      let _processed = path.pathMapToRegexps( filter.filePath, filter.basePath  );
+
+      filter.formedBasePath = _processed.unglobedBasePath;
+      filter.formedFilePath = _processed.unglobedFilePath;
+
+      filter.assertBasePath();
+
+      for( let p in _processed.regexpMap )
+      {
+        let basePath = filter.formedBasePath[ p ];
+        _.assert( _.strDefined( basePath ), 'No base path for', p );
+        let relative = p;
+        let regexps = _processed.regexpMap[ p ];
+        _.assert( !filter.formedFilterMap[ relative ] );
+        let subfilter = filter.formedFilterMap[ relative ] = Object.create( null );
+        subfilter.maskAll = _.RegexpObject.Or( filter.maskAll.clone(), { includeAll : regexps.actualAll, includeAny : regexps.actualAny, excludeAny : regexps.notActual } );
+        subfilter.maskTerminal = filter.maskTerminal.clone();
+        subfilter.maskDirectory = filter.maskDirectory.clone();
+        subfilter.maskTransientAll = filter.maskTransientAll.clone();
+        subfilter.maskTransientTerminal = _.RegexpObject.Or( filter.maskTransientTerminal.clone(), { includeAny : /$_^/ } );
+        // subfilter.maskTransientTerminal = filter.maskTransientTerminal.clone(); // zzz
+        subfilter.maskTransientDirectory = _.RegexpObject.Or( filter.maskTransientDirectory.clone(), { includeAny : regexps.transient } );
+        _.assert( subfilter.maskAll !== filter.maskAll );
+      }
+    }
+    else
+    {
+      copy( filePath, basePath );
     }
 
   }
   else
   {
+    copy( filter.filePath, filter.basePath );
+  }
+
+  function copy( filePath, basePath )
+  {
+
     /* if base path is redundant then return empty map */
-    if( _.mapIs( filter.basePath ) )
-    filter.formedBasePath = _.entityShallowClone( filter.basePath );
+    if( _.mapIs( basePath ) )
+    filter.formedBasePath = _.entityShallowClone( basePath );
     else
     filter.formedBasePath = Object.create( null );
-    filter.formedFilePath = _.entityShallowClone( filter.filePath );
+    filter.formedFilePath = _.entityShallowClone( filePath );
+
   }
 
 }
@@ -969,7 +990,7 @@ function pathsNormalize()
   filter.filePath = filter.filePathNormalize( filter.filePath );
   _.assert( _.mapIs( filter.filePath ) );
 
-  filter.basePath = filter.basePathNormalize( filter.basePath, filter.filePath );
+  filter.basePath = filter.basePathNormalize( filter.filePath, filter.basePath );
   _.assert( _.mapIs( filter.basePath ) || filter.basePath === null || filter.filePathArrayNonBoolGet( filter.filePath, 1 ).filter( ( e ) => e !== null ).length === 0 );
 
   filter.filePathAbsolutize();
@@ -1447,12 +1468,12 @@ function pathsExtend( src )
   {
 
     if( _.strIs( src.basePath ) )
-    src.basePath = src.basePathFrom( src.basePath, src.filePath || {} );
+    src.basePath = src.basePathFrom( src.filePath || {}, src.basePath );
     _.assert( src.basePath === null || _.mapIs( src.basePath ) || _.strIs( src.basePath ) ); // yyy
     // _.assert( src.basePath === null || _.mapIs( src.basePath ) );
 
     if( _.strIs( filter.basePath ) )
-    filter.basePath = filter.basePathFrom( filter.basePath, filter.filePath || {} );
+    filter.basePath = filter.basePathFrom( filter.filePath || {}, filter.basePath );
     _.assert( filter.basePath === null || _.mapIs( filter.basePath ) || _.strIs( filter.basePath ) ); // yyy
     // _.assert( filter.basePath === null || _.mapIs( filter.basePath ) );
 
@@ -1606,11 +1627,11 @@ function pathsInherit( src )
   {
 
     if( _.strIs( src.basePath ) )
-    src.basePath = src.basePathFrom( src.basePath, src.filePath || {} );
+    src.basePath = src.basePathFrom( src.filePath || {}, src.basePath );
     _.assert( _.mapIs( src.basePath ) || _.strIs( src.basePath ) );
 
     if( _.strIs( filter.basePath ) )
-    filter.basePath = filter.basePathFrom( filter.basePath, filter.filePath || {} );
+    filter.basePath = filter.basePathFrom( filter.filePath || {}, filter.basePath );
     _.assert( _.mapIs( filter.basePath ) || _.strIs( filter.basePath ) );
 
   }
@@ -1919,7 +1940,7 @@ function basePathsGet()
 
 //
 
-function basePathFrom( basePath, filePath )
+function basePathFrom( filePath, basePath )
 {
   let filter = this;
   let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
@@ -1996,7 +2017,7 @@ function basePathMapNormalize( basePathMap )
 
 //
 
-function basePathNormalize( basePath, filePath )
+function basePathNormalize( filePath, basePath )
 {
   let filter = this;
   let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
@@ -2010,7 +2031,7 @@ function basePathNormalize( basePath, filePath )
 
   if( basePath === null || _.strIs( basePath ) )
   {
-    basePath = filter.basePathFrom( basePath, filePath );
+    basePath = filter.basePathFrom( filePath, basePath );
   }
   else if( _.mapIs( basePath ) )
   {
@@ -2088,8 +2109,8 @@ function basePathEach( onEach )
   let basePath = filter.basePath;
   if( !_.mapIs( basePath ) )
   {
-    // basePath = filter.basePathFrom( basePath, filter.filePath ); // yyy
-    basePath = filter.basePathFrom( basePath, filter.prefixPath || filter.filePath );
+    // basePath = filter.basePathFrom( filter.filePath, basePath ); // yyy
+    basePath = filter.basePathFrom( filter.prefixPath || filter.filePath, basePath );
   }
 
   if( _.strIs( basePath ) )
@@ -2498,7 +2519,8 @@ Easy optimization. No need to enable slower glob searching if glob is "**".
 Result of such glob is equivalent to result of recursive searching.
 */
 
-function filePathGlobSimplify( basePath, filePath )
+// function filePathGlobSimplify( basePath, filePath )
+function filePathGlobSimplify( filePath, basePath )
 {
   let filter = this;
   let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
@@ -2639,8 +2661,8 @@ function filePathHasGlob( filePath )
   filePath = filePath || filter.filePath;
 
   let globFound = true;
-  if( _.none( path.s.areGlob( filter.filePath ) ) )
-  if( !filter.filePathDstArrayGet().filter( ( e ) => _.boolLike( e ) ).length )
+  if( _.none( path.s.areGlob( filePath ) ) )
+  if( !filter.filePathDstArrayGet( filePath ).filter( ( e ) => _.boolLike( e ) ).length )
   globFound = false;
 
   return globFound;
@@ -3658,7 +3680,8 @@ sureRelative.defaults =
 
 //
 
-function sureBasePath( basePath, filePath )
+// function sureBasePath( basePath, filePath )
+function sureBasePath( filePath, basePath )
 {
   let filter = this;
   let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
@@ -3690,7 +3713,7 @@ function sureBasePath( basePath, filePath )
 
 //
 
-function assertBasePath( basePath, filePath )
+function assertBasePath( filePath, basePath )
 {
   let filter = this;
 
@@ -3699,7 +3722,7 @@ function assertBasePath( basePath, filePath )
 
   _.assert( arguments.length === 0 || arguments.length === 2 );
 
-  return filter.sureBasePath( basePath, filePath );
+  return filter.sureBasePath( filePath, basePath );
 }
 
 function filteringClear()

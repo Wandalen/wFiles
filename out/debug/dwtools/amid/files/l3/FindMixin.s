@@ -174,6 +174,8 @@ function filesFind_pre( routine, args )
     o.mandatory = false;
   }
 
+  o.includingTerminals = !!o.includingTerminals;
+
   if( o.distinct && o.includingDirs === null )
   {
     o.includingDirs = !hasGlob;
@@ -983,22 +985,24 @@ function filesFindGroups_body( o )
     o2.filter.filePathSelect( srcPath, dstPath );
     o2.filter.form();
 
-    _.Consequence.From( self.filesFind( o2 ) )
+    _.Consequence.Try( () => self.filesFind( o2 ) )
     .finally( ( err, files ) =>
     {
-
-      r.filesGrouped[ dstPath ] = files;
-      files.forEach( ( file ) =>
-      {
-        if( _.strIs( file ) )
-        r.srcFiles[ file ] = file;
-        else
-        r.srcFiles[ file.absolute ] = file;
-      });
 
       if( err )
       {
         r.errors.push( err );
+      }
+      else
+      {
+        r.filesGrouped[ dstPath ] = files;
+        files.forEach( ( file ) =>
+        {
+          if( _.strIs( file ) )
+          r.srcFiles[ file ] = file;
+          else
+          r.srcFiles[ file.absolute ] = file;
+        });
       }
 
       con.take( null );
@@ -1034,6 +1038,7 @@ defaults.dst = null;
 defaults.sync = 1;
 defaults.throwing = null;
 defaults.recursive = 2;
+defaults.distinct = 1;
 
 //
 

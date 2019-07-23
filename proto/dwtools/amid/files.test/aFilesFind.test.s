@@ -6350,6 +6350,160 @@ function filesFindDistinct( test )
 //
 
 /*
+test glob simplifying feature
+optimization which does not add glob masks because it changes nothing
+*/
+
+function filesFindSimplifyGlob( test )
+{
+  let context = this;
+  let provider = context.provider;
+  let hub = context.hub;
+  let path = context.provider.path;
+  let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
+
+  function abs( filePath )
+  {
+    return path.s.join( testPath, filePath );
+  }
+
+  /* - */
+
+  test.case = 'setup';
+
+  var extract1 = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      dir1 :
+      {
+        t1 : '/dir1/t1',
+        t2 : '/dir1/t2',
+        dir11 : { t3 : '/dir1/dir11/t3' }
+      },
+      dir2 :
+      {
+        t21 : '/dir2/t21'
+      }
+    },
+  });
+
+  extract1.filesReflectTo( provider, testPath );
+
+  /* */
+
+  test.case = 'dir1/**, distinct:0';
+
+  var filter =
+  {
+    filePath : abs( 'dir1/**' ),
+  }
+
+  var o =
+  {
+    outputFormat : 'absolute',
+    distinct : 0,
+    filter,
+  }
+
+  var got = provider.filesFind( o );
+  var expected = abs([ 'dir1/t1', 'dir1/t2', 'dir1/dir11/t3' ]);
+  test.identical( got, expected );
+  test.identical( o.mandatory, false )
+  test.identical( o.recursive, 2 )
+  test.identical( o.includingTerminals, true );
+  test.identical( o.includingDirs, false );
+  test.identical( o.includingStem, true );
+  test.identical( o.includingActual, 1 );
+  test.identical( o.includingTransient, 0 );
+
+  test.identical( o.filter.formedFilterMap, null );
+  test.identical( o.filter.formed, 5 );
+  test.identical( o.filter.formedFilePath, { [ abs( 'dir1' ) ] : null } );
+  test.identical( o.filter.formedBasePath, { [ abs( 'dir1' ) ] : abs( 'dir1' ) } );
+  test.identical( o.filter.filePath, { [ abs( 'dir1\/**' ) ] : null } );
+  test.identical( o.filter.basePath, { [ abs( 'dir1\/**' ) ] : abs( 'dir1' ) } );
+  test.identical( o.filter.prefixPath, null );
+  test.identical( o.filter.postfixPath, null );
+
+  /* */
+
+  test.case = 'dir1/**, distinct:1';
+
+  var filter =
+  {
+    filePath : abs( 'dir1/**' ),
+  }
+
+  var o =
+  {
+    outputFormat : 'absolute',
+    distinct : 1,
+    filter,
+  }
+
+  var got = provider.filesFind( o );
+  var expected = abs([ 'dir1/t1', 'dir1/t2', 'dir1/dir11/t3' ]);
+  test.identical( got, expected );
+  test.identical( o.mandatory, true )
+  test.identical( o.recursive, 2 )
+  test.identical( o.includingTerminals, true );
+  test.identical( o.includingDirs, false );
+  test.identical( o.includingStem, true );
+  test.identical( o.includingActual, 1 );
+  test.identical( o.includingTransient, 0 );
+
+  test.identical( o.filter.formedFilterMap, null );
+  test.identical( o.filter.formed, 5 );
+  test.identical( o.filter.formedFilePath, { [ abs( 'dir1' ) ] : null } );
+  test.identical( o.filter.formedBasePath, { [ abs( 'dir1' ) ] : abs( 'dir1' ) } );
+  test.identical( o.filter.filePath, { [ abs( 'dir1\/**' ) ] : null } );
+  test.identical( o.filter.basePath, { [ abs( 'dir1\/**' ) ] : abs( 'dir1' ) } );
+  test.identical( o.filter.prefixPath, null );
+  test.identical( o.filter.postfixPath, null );
+
+  /* */
+
+  test.case = 'dir1/*, distinct:0';
+
+  var filter =
+  {
+    filePath : abs( 'dir1/*' ),
+  }
+
+  var o =
+  {
+    outputFormat : 'absolute',
+    distinct : 0,
+    filter,
+  }
+
+  var got = provider.filesFind( o );
+  var expected = abs([ 'dir1/t1', 'dir1/t2' ]);
+  test.identical( got, expected );
+  test.identical( o.mandatory, false )
+  test.identical( o.recursive, 2 )
+  test.identical( o.includingTerminals, true );
+  test.identical( o.includingDirs, false );
+  test.identical( o.includingStem, true );
+  test.identical( o.includingActual, 1 );
+  test.identical( o.includingTransient, 0 );
+
+  test.setsAreIdentical( _.mapKeys( o.filter.formedFilterMap ), [ abs( 'dir1' ) ] );
+  test.identical( o.filter.formedFilterMap[ abs( 'dir1' ) ].maskAll.includeAny.length, 1 );
+  test.identical( o.filter.formed, 5 );
+  test.identical( o.filter.formedFilePath, { [ abs( 'dir1' ) ] : null } );
+  test.identical( o.filter.formedBasePath, { [ abs( 'dir1' ) ] : abs( 'dir1' ) } );
+  test.identical( o.filter.filePath, { [ abs( 'dir1\/*' ) ] : null } );
+  test.identical( o.filter.basePath, { [ abs( 'dir1\/*' ) ] : abs( 'dir1' ) } );
+  test.identical( o.filter.prefixPath, null );
+  test.identical( o.filter.postfixPath, null );
+
+}
+
+//
+
+/*
 qqq : extend coverage of filesFindGroups
 */
 
@@ -18406,6 +18560,7 @@ var Self =
     filesFindGlob,
     filesGlob,
     filesFindDistinct,
+    filesFindSimplifyGlob,
 
     filesFindGroups,
 

@@ -564,7 +564,7 @@ function filesReflectSingle_body( o )
     let got = shell({ execPath : 'npm install', args : npmArgs });
     _.assert( got.exitCode === 0 );
     
-    debugger
+    
     localProvider.fileRename( dstPath, tmpEssentialPath )
     localProvider.fileDelete( path.dir( tmpEssentialPath ) );
     localProvider.fileDelete( path.dir( path.dir( tmpEssentialPath ) ) );

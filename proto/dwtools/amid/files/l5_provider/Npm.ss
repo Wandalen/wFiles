@@ -552,10 +552,19 @@ function filesReflectSingle_body( o )
   let tmpEssentialPath = path.join( tmpPath, 'node_modules', parsed.remoteVcsPath );
   
   if( o.extra.usingNpm )
-  {
-    let got = shell( 'npm install --prefix ' + localProvider.path.nativize( tmpPath ) + ' ' + parsed.longerRemoteVcsPath )
+  { 
+    let npmArgs = 
+    [ 
+      '--no-package-lock',
+      '--legacy-bundling', 
+      '--prefix', 
+      localProvider.path.nativize( tmpPath ), 
+      parsed.longerRemoteVcsPath 
+    ];
+    let got = shell({ execPath : 'npm install', args : npmArgs });
     _.assert( got.exitCode === 0 );
     
+    debugger
     localProvider.fileRename( dstPath, tmpEssentialPath )
     localProvider.fileDelete( path.dir( tmpEssentialPath ) );
     localProvider.fileDelete( path.dir( path.dir( tmpEssentialPath ) ) );

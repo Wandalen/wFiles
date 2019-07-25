@@ -2112,17 +2112,34 @@ statResolvedRead.defaults.resolvingTextLink = null;
 
 /*
 qqq : split pre / body
+Dmytro : split routine. Create simple ( smoke ) test routines filesSize() and fileSize().
 */
 
-function filesSize( o )
+function filesSize_pre( routine, args )
 {
-  let self = this;
-  o = o || Object.create( null );
+  let o = args[ 0 ] || Object.create( null );
+
+  _.assert( arguments.length === 2 );
+  _.assert( args.length === 1, 'Expects single argument' );
+  _.assert( _.strIs( o ) || _.arrayIs( o ) || _.mapIs( o ) );
 
   if( _.strIs( o ) || _.arrayIs( o ) )
   o = { filePath : o };
 
-  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.routineOptions( routine, o );
+
+  return o;
+}
+
+function filesSize_body( o )
+{
+  let self = this;
+  // o = o || Object.create( null );
+  //
+  // if( _.strIs( o ) || _.arrayIs( o ) )
+  // o = { filePath : o };
+  //
+  // _.assert( arguments.length === 1, 'Expects single argument' );
 
   o.filePath = _.arrayAs( o.filePath );
 
@@ -2140,13 +2157,21 @@ function filesSize( o )
   return result;
 }
 
-var having = filesSize.having = Object.create( null );
+_.routineExtend( filesSize_body, statResolvedRead );
+// filesSize_body.defaults =
+// {
+//   filePath : null,
+// };
+
+var having = filesSize_body.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
 having.driving = 0;
 
-var operates = filesSize.operates = Object.create( null );
+var operates = filesSize_body.operates = Object.create( null );
+
+let filesSize = _.routineFromPreAndBody( filesSize_pre, filesSize_body );
 
 //
 

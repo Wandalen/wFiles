@@ -3793,7 +3793,7 @@ function filesFindResolvingExperiment( test )
 function filesFindPerformance( test )
 {
   let context = this;
-  let provider = context.provider;
+  // let provider = context.provider;
   let hub = context.hub;
   let path = context.provider.path;
   let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
@@ -16013,7 +16013,7 @@ function filesDeleteAndAsyncWrite( test )
   let provider = context.provider;
   let hub = context.hub;
   let path = context.provider.path;
-  let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
+  // let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
 
   test.case = 'try to delete dir before async write will be completed';
 

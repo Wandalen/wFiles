@@ -2170,7 +2170,7 @@ function _fileOptionsGet( test ) {
 //         },
 //         readOptions : fileReadOptions2
 //       },
-
+//
 //       {
 //         name : 'read buffer from file 2',
 //         createResource : bufferData2,
@@ -2182,7 +2182,7 @@ function _fileOptionsGet( test ) {
 //         },
 //         readOptions : fileReadOptions3
 //       },
-
+//
 //       {
 //         name : 'read json from file',
 //         createResource : dataToJSON1,
@@ -2206,41 +2206,41 @@ function _fileOptionsGet( test ) {
 //         readOptions : fileReadOptions5
 //       },
 //     ];
-
-
-
+//
+//
+//
 //   // regular tests
 //   for( let testCheck of testChecks )
 //   {
 //     // join several test aspects together
 //     let path = mergePath( testCheck.path );
-
+//
 //     // clear
 //     // File.existsSync( path ) && File.removeSync( path );
 //     if( _.fileProvider.statResolvedRead( path ) )
 //     _.fileProvider.fileDelete( path );
-
+//
 //     // prepare to write if need
 //     testCheck.createResource !== undefined
 //     && createTestFile( testCheck.path, testCheck.createResource, testCheck.readOptions.encoding );
-
+//
 //     var o = _.mapExtend( null, testCheck.readOptions, { filePath : path } );
 //     // let got = _.fileProvider.fileReadSync( path, testCheck.readOptions );
 //     let got = _.fileProvider.fileReadSync( o );
-
+//
 //     if( got instanceof ArrayBuffer )
 //     {
 //       //got = Buffer.from( got );
 //     //   got = toBuffer( got );
 //       got = _.bufferNodeFrom( got );
 //     }
-
+//
 //     test.description = testCheck.name;
 //     test.identical( got, testCheck.expected.content );
 //   }
-
+//
 //   // exception tests
-
+//
 //   if( Config.debug )
 //   {
 //     test.description = 'missed arguments';
@@ -2248,22 +2248,119 @@ function _fileOptionsGet( test ) {
 //     {
 //       _.fileProvider.fileReadSync( );
 //     } );
-
+//
 //     test.description = 'passed unexpected property in options';
 //     test.shouldThrowErrorSync( function( )
 //     {
 //       _.fileProvider.fileReadSync( wrongReadOptions0 );
 //     } );
-
+//
 //     test.description = 'filePath is not defined';
 //     test.shouldThrowErrorSync( function( )
 //     {
 //      _.fileProvider.fileReadSync( { encoding : 'json' } );
 //     } );
-
+//
 //   }
-
+//
 // };
+
+function filesSize( test )
+{
+  /* file creation */
+
+  var file1 = 'tmp.tmp/filesAreUpToDate/src/test1',
+      file2 = 'tmp.tmp/filesAreUpToDate/dst/test2',
+      file3 = 'tmp.tmp/filesAreUpToDate/src/test3',
+      file4 = 'tmp.tmp/filesAreUpToDate/dst/test4';
+
+  var delay = _.fileProvider.systemBitrateTimeGet() / 1000;
+
+  createTestFile( file1, 'test1, any text' );
+  waitSync( delay );
+  createTestFile( file2, 'test2' );
+  waitSync( delay );
+  createTestFile( file3, 'test3' );
+
+  file1 = mergePath( file1 );
+  file2 = mergePath( file2 );
+  file3 = mergePath( file3 );
+
+  file1 = _.fileProvider.path.nativize( file1 );
+  file2 = _.fileProvider.path.nativize( file2 );
+  file3 = _.fileProvider.path.nativize( file3 );
+
+  /* - */
+
+  test.case = 'string in arg';
+  var got = _.fileProvider.filesSize( file2 );
+  test.equivalent( got, 5 );
+
+  test.case = 'array in arg';
+  var got = _.fileProvider.filesSize( [ file1, file2, file3 ] );
+  test.equivalent( got, 25 );
+
+  test.case = 'map options, one file';
+  var got = _.fileProvider.filesSize( { filePath : file1 } );
+  test.equivalent( got, 15 );
+
+  test.case = 'map options, aray';
+  var got = _.fileProvider.filesSize( { filePath : [ file1, file2, file3 ] } );
+  test.equivalent( got, 25 );
+
+  if( !Config.debug )
+  return;
+
+  test.case = 'without arguments';
+  test.shouldThrowErrorSync( () => _.fileProvider.filesSize() );
+
+  test.case = 'extra arguments';
+  test.shouldThrowErrorSync( () => _.fileProvider.filesSize( file1, file2, file3 ) );
+
+  test.case = 'wrong arguments';
+  test.shouldThrowErrorSync( () => _.fileProvider.filesSize( 1 ) );
+}
+
+//
+
+function fileSize( test )
+{
+  /* file creation */
+
+  var file1 = 'tmp.tmp/filesAreUpToDate/src/test1',
+      file2 = 'tmp.tmp/filesAreUpToDate/dst/test2';
+
+  var delay = _.fileProvider.systemBitrateTimeGet() / 1000;
+
+  createTestFile( file1, 'test1, any text' );
+  waitSync( delay );
+  createTestFile( file2, 'test2' );
+
+  file1 = mergePath( file1 );
+  file2 = mergePath( file2 );
+
+  file1 = _.fileProvider.path.nativize( file1 );
+  file2 = _.fileProvider.path.nativize( file2 );
+
+  /* - */
+
+  test.description = 'string in arg';
+  var got = _.fileProvider.fileSize( file1 );
+  test.equivalent( got, 15 );
+
+  test.description = 'array in arg';
+  var got = _.fileProvider.fileSize( file2 );
+  test.equivalent( got, 5 );
+
+  if( !Config.debug )
+  return;
+
+  test.case = 'without arguments';
+  test.shouldThrowErrorSync( () => _.fileProvider.fileSize() );
+
+  test.case = 'extra arguments';
+  test.shouldThrowErrorSync( () => _.fileProvider.fileSize( file1, file1 ) );
+}
 
 //
 
@@ -3136,9 +3233,108 @@ function filesSimilarity( test )
 // };
 //
 // //
-//
-// function filesAreUpToDate2( test )
-// {
+
+function filesAreUpToDate2( test )
+{
+  /* file creation */
+
+  var file1 = 'tmp.tmp/filesAreUpToDate/src/test1',
+      file2 = 'tmp.tmp/filesAreUpToDate/dst/test2',
+      file3 = 'tmp.tmp/filesAreUpToDate/src/test3',
+      file4 = 'tmp.tmp/filesAreUpToDate/dst/test4';
+
+  var delay = _.fileProvider.systemBitrateTimeGet() / 1000;
+
+  createTestFile( file1, 'test1' );
+  waitSync( delay );
+  createTestFile( file2, 'test2' );
+  waitSync( delay );
+  createTestFile( file3, 'test3' );
+  waitSync( delay );
+  createTestFile( file4, 'test4' );
+
+  file1 = mergePath( file1 );
+  file2 = mergePath( file2 );
+  file3 = mergePath( file3 );
+  file4 = mergePath( file4 );
+
+  file1 = _.fileProvider.path.nativize( file1 );
+  file2 = _.fileProvider.path.nativize( file2 );
+  file3 = _.fileProvider.path.nativize( file3 );
+  file4 = _.fileProvider.path.nativize( file4 );
+
+  /* - */
+
+  test.description = 'src files is up to date';
+  var got = _.fileProvider.filesAreUpToDate2( { src : file1, dst : file2 } );
+  test.identical( got, true );
+
+  var map = { src : [ file1, file2 ], dst : [ file3, file4 ] };
+  var got = _.fileProvider.filesAreUpToDate2( map );
+  test.identical( got, true );
+
+  test.description = 'src files is up to date, youngerThan';
+  var map =
+  {
+    src : [ file1, file2 ],
+    dst : [ file3, file4 ],
+    youngerThan : 30000,
+    verbosity : 3
+  };
+  var got = _.fileProvider.filesAreUpToDate2( map );
+  test.identical( got, false );
+
+
+  /* Dmytro : need help to write
+  test.description = 'src files is up to date, verbosity';
+  var map = { src : [ file1, file2 ], dst : [ file3, file4 ], verbosity : 4 };
+  var got = _.fileProvider.filesAreUpToDate2( map );
+  test.identical( got, true );
+  */
+
+  /* - */
+
+  test.description = 'src files is outdated';
+  var got = _.fileProvider.filesAreUpToDate2( { src : file2, dst : file1 } );
+  test.identical( got, false );
+
+  var map = { src : [ file3, file4 ], dst : [ file1, file2 ] };
+  var got = _.fileProvider.filesAreUpToDate2( map );
+  test.identical( got, false );
+
+  test.description = 'src files is up to date, youngerThan';
+  var map =
+  {
+    src : [ file3, file4 ],
+    dst : [ file1, file2 ],
+    youngerThan : 1,
+    verbosity : 3
+  };
+  var got = _.fileProvider.filesAreUpToDate2( map );
+  test.identical( got, true );
+
+  /* - */
+
+  if( !Config.debug )
+  return;
+
+  test.case = 'without arguments';
+  test.shouldThrowErrorSync( () => _.fileProvider.filesAreUpToDate2() );
+
+  test.case = 'extra arguments';
+  var map = { src : file1, dst : file2 };
+  test.shouldThrowErrorSync( () => _.fileProvider.filesAreUpToDate2( map, map ) );
+
+  test.case = 'wrong arguments';
+  var map = { src : file1, dst : file2 };
+  test.shouldThrowErrorSync( () => _.fileProvider.filesAreUpToDate2( 'str' ) );
+  test.shouldThrowErrorSync( () => _.fileProvider.filesAreUpToDate2( file1 ) );
+
+  test.case = 'o.newer settled, not a date';
+  var map = { src : file1, dst : file2, newer : 1 };
+  test.shouldThrowErrorSync( () => _.fileProvider.filesAreUpToDate2( map ) );
+
+
 //   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 //     textData2 = ' Aenean non feugiat mauris',
 //     bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
@@ -3249,7 +3445,7 @@ function filesSimilarity( test )
 //     } )( _.mapExtend( null, tc ) );
 //   }
 //   return con;
-// };
+};
 
 //
 
@@ -3297,6 +3493,9 @@ var Self =
 
     // fileReadSync : fileReadSync,
 
+    filesSize,
+    fileSize,
+
     filesLink : filesLink,
 
     filesNewer : filesNewer,
@@ -3309,7 +3508,7 @@ var Self =
 
     // filesList : filesList,
 
-    // filesAreUpToDate2 : filesAreUpToDate2,
+    filesAreUpToDate2 : filesAreUpToDate2,
 
     // testDelaySample : testDelaySample,
 

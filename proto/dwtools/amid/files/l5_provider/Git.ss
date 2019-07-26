@@ -19,8 +19,8 @@ let GitConfig, Ini;
 
 /**
  @classdesc Class that allows file manipulations on a git repository. For example, cloning of the repositoty.
- @class wFileProviderGit
- @memberof module:Tools/mid/Files.wTools.FileProvider
+  @class wFileProviderGit
+  @memberof module:Tools/mid/Files.wTools.FileProvider
 */
 
 let Parent = _.FileProvider.Partial;
@@ -290,6 +290,56 @@ function pathFixate( o )
 
 var defaults = pathFixate.defaults = Object.create( null );
 defaults.remotePath = null;
+defaults.verbosity = 0;
+
+//
+
+function versionLocalChange( o )
+{
+  let self = this;
+  let path = self.path;
+
+  if( !_.mapIs( o ) )
+  o = { localPath : o }
+
+  _.routineOptions( versionLocalChange, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( !!self.hub );
+  
+  let localVersion = self.versionLocalRetrive({ localPath : o.localPath, verbosity : o.verbosity });
+  
+  if( !localVersion )
+  return false;
+  
+  if( localVersion === o.version )
+  return true;
+
+  let shell = _.sheller
+  ({
+    verbosity : self.verbosity - 1,
+    sync : 1,
+    deasync : 0,
+    outputCollecting : 1,
+    currentPath : o.localPath
+  });
+  
+  let result = shell( 'git status' );
+  let localChanges = _.strHas( result.output, 'Changes to be committed' );
+  
+  if( localChanges )
+  shell( 'git stash' )
+  
+  shell( 'git checkout ' + o.version );
+  
+  if( localChanges )
+  shell( 'git pop' )
+  
+  return true;
+}
+
+var defaults = versionLocalChange.defaults = Object.create( null );
+defaults.localPath = null;
+defaults.version = null
 defaults.verbosity = 0;
 
 //
@@ -892,6 +942,7 @@ let Proto =
   pathParse,
   pathIsFixated,
   pathFixate,
+  versionLocalChange,
   versionLocalRetrive,
   versionRemoteLatestRetrive,
   versionRemoteCurrentRetrive,

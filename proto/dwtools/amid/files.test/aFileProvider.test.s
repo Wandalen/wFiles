@@ -31222,7 +31222,7 @@ function isHardLink( test )
   provider.fieldPop( 'usingTextLink', 1 );
 }
 
-isHardLink.timeOut = 20000;
+isHardLink.timeOut = 25000;
 
 //
 

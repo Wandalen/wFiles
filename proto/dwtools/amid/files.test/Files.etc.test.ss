@@ -2803,7 +2803,9 @@ function filesLink( test )
 {
   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     textData2 = ' Aenean non feugiat mauris',
-    bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
+    bufferData1 = new Uint8Array( [ 0x01, 0x02, 0x03, 0x04 ] ),
+    // To new NodeJS it is not correct syntax
+    //bufferData1 = new Uint8Array( [ 0x01, 0x02, 0x03, 0x04 ] ),
 
     testChecks = [
       {

@@ -751,8 +751,8 @@ function filesSimilarity( test )
 {
   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     textData2 = ' Aenean non feugiat mauris',
-    bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
-    bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ),
+    bufferData1 = new Uint8Array( [ 0x01, 0x02, 0x03, 0x04 ] ),
+    bufferData2 = new Uint8Array( [ 0x07, 0x06, 0x05 ] ),
 
     testChecks = [
 

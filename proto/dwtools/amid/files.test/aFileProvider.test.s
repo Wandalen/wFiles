@@ -9379,7 +9379,8 @@ function fileRenameSync( test )
   got = provider.fileRename
   ({
     srcPath : srcPath,
-    dstPath : self.provider.path.dir( dstPath ),
+    dstPath : dstPath,
+    // dstPath : self.provider.path.dir( dstPath ),
     sync : 1,
     rewriting : 1,
     rewritingDirs : 1,
@@ -9398,7 +9399,8 @@ function fileRenameSync( test )
   got = provider.fileRename
   ({
     srcPath : srcPath,
-    dstPath : self.provider.path.dir( dstPath ),
+    dstPath : dstPath,
+    // dstPath : self.provider.path.dir( dstPath ),
     sync : 1,
     rewriting : 1,
     rewritingDirs : 1,
@@ -10885,7 +10887,8 @@ function fileRenameAsync( test )
     var con = provider.fileRename
     ({
       srcPath : srcPath,
-      dstPath : self.provider.path.dir( dstPath ),
+      dstPath : dstPath,
+      // dstPath : self.provider.path.dir( dstPath ),
       sync : 0,
       rewriting : 1,
       rewritingDirs : 1,
@@ -10912,7 +10915,8 @@ function fileRenameAsync( test )
     var con = provider.fileRename
     ({
       srcPath : srcPath,
-      dstPath : self.provider.path.dir( dstPath ),
+      dstPath : dstPath,
+      // dstPath : self.provider.path.dir( dstPath ),
       sync : 0,
       rewriting : 1,
       rewritingDirs : 1,
@@ -29087,7 +29091,7 @@ function isTerminal( test )
 
 };
 
-isTerminal.timeOut = 20000;
+isTerminal.timeOut = 30000;
 
 //
 

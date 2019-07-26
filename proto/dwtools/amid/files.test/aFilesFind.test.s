@@ -3793,7 +3793,7 @@ function filesFindResolvingExperiment( test )
 function filesFindPerformance( test )
 {
   let context = this;
-  // let provider = context.provider;
+  let provider = context.provider;
   let hub = context.hub;
   let path = context.provider.path;
   let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
@@ -3803,7 +3803,7 @@ function filesFindPerformance( test )
   /*prepare files */
 
   var dir = path.join( context.testSuitePath, test.name );
-  var provider = _.FileProvider.HardDrive();
+  // var provider = _.FileProvider.HardDrive();
 
   var filesNumber = 2000;
   var levels = 5;

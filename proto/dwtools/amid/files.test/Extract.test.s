@@ -144,7 +144,7 @@ var Proto =
   silencing : 1,
   abstract : 0,
   enabled : 1,
-  routineTimeOut : 25000,
+  routineTimeOut : 30000,
 
   onSuiteBegin,
   onSuiteEnd,

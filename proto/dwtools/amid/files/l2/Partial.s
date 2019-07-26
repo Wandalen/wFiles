@@ -2112,7 +2112,7 @@ statResolvedRead.defaults.resolvingTextLink = null;
 
 /*
 qqq : split pre / body
-Dmytro : split routine. Create simple ( smoke ) test routines filesSize() and fileSize().
+Dmytro : split routine. Create simple ( smoke ) test routines filesSize().
 */
 
 function filesSize_pre( routine, args )
@@ -2175,6 +2175,46 @@ let filesSize = _.routineFromPreAndBody( filesSize_pre, filesSize_body );
 
 //
 
+/**
+ * Return file size in bytes. For symbolic links return false. If onEnd callback
+ * is defined, method returns instance of wConsequence.
+ *
+ * @param {string|Object} o - object or path string
+ * @param {string} o.filePath - path to file
+ * @param {Function} [o.onBegin] - callback that invokes before calculation size.
+ * @param {Function} o.onEnd - this callback invoked in end of pathCurrent js event
+ * loop and accepts file size as argument.
+ *
+ * @example
+ * let path = 'tmp/fileSize/data4',
+ * bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] ), // size 4
+ * bufferData2 = Buffer.from( [ 0x07, 0x06, 0x05 ] ); // size 3
+ *
+ * wTools.fileWrite( { filePath : path, data : bufferData1 } );
+ *
+ * let size1 = wTools.fileSize( path );
+ * console.log(size1); // 4
+ *
+ * let con = wTools.fileSize
+ * ({
+ *   filePath : path,
+ *   onEnd : function( size )
+ *   {
+ *     console.log( size ); // 7
+ *   }
+ * });
+ *
+ * wTools.fileWrite( { filePath : path, data : bufferData2, append : 1 } );
+ *
+ * @method fileSize
+ * @returns {number|boolean|wConsequence}
+ * @throws {Error} If passed less or more than one argument.
+ * @throws {Error} If passed unexpected parameter in o.
+ * @throws {Error} If filePath is not string.
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial#
+ *
+ */
+
 /*
 qqq : extend test, check cases when does not exist, check throwing option
 */
@@ -2204,6 +2244,12 @@ var having = fileSize_body.having;
 having.driving = 0;
 having.aspect = 'body';
 having.hubRedirecting = 0;
+
+let fileSize = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, fileSize_body );
+
+fileSize.having.aspect = 'entry';
+
+_.assert( fileSize.having.hubRedirecting === 0 );
 
 //
 
@@ -3620,50 +3666,6 @@ operates.ins2 = { pathToRead : 1 };
 
 let filesAreSame = _.routineFromPreAndBody( filesAreSame_pre, filesAreSame_body );
 filesAreSame.having.aspect = 'entry';
-
-//
-
-/**
- * Return file size in bytes. For symbolic links return false. If onEnd callback is defined, method returns instance
-    of wConsequence.
- * @example
- * let path = 'tmp/fileSize/data4',
-     bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] ), // size 4
-     bufferData2 = Buffer.from( [ 0x07, 0x06, 0x05 ] ); // size 3
-
-   wTools.fileWrite( { filePath : path, data : bufferData1 } );
-
-   let size1 = wTools.fileSize( path );
-   console.log(size1); // 4
-
-   let con = wTools.fileSize( {
-     filePath : path,
-     onEnd : function( size )
-     {
-       console.log( size ); // 7
-     }
-   } );
-
-   wTools.fileWrite( { filePath : path, data : bufferData2, append : 1 } );
-
- * @param {string|Object} o o object or path string
- * @param {string} o.filePath path to file
- * @param {Function} [o.onBegin] callback that invokes before calculation size.
- * @param {Function} o.onEnd this callback invoked in end of pathCurrent js event loop and accepts file size as
-    argument.
- * @returns {number|boolean|wConsequence}
- * @throws {Error} If passed less or more than one argument.
- * @throws {Error} If passed unexpected parameter in o.
- * @throws {Error} If filePath is not string.
- * @method fileSize
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial#
- */
-
-let fileSize = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, fileSize_body );
-
-fileSize.having.aspect = 'entry';
-
-_.assert( fileSize.having.hubRedirecting === 0 );
 
 //
 

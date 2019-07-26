@@ -52,7 +52,7 @@ function createTestFile( path, data, decoding )
   var dataToWrite = ( decoding === 'json' ) ? JSON.stringify( data ) : data;
   // File.createFileSync( _.path.join( testSuitePath, path ) );
   // dataToWrite && File.writeFileSync( _.path.join( testSuitePath, path ), dataToWrite );
-  _.fileProvider.fileWrite({ filePath : _.path.join( testSuitePath, path ), data : dataToWrite })
+  _.fileProvider.fileWrite({ filePath : _.path.join( testSuitePath, path ), data : dataToWrite });
 }
 
 //
@@ -1069,8 +1069,9 @@ function fileSize( test )
 {
   /* file creation */
 
-  var file1 = 'tmp.tmp/filesAreUpToDate/src/test1',
-      file2 = 'tmp.tmp/filesAreUpToDate/dst/test2';
+  var file1 = 'tmp.tmp/fileSize/test1',
+      file2 = 'tmp.tmp/fileSize/test2',
+      dir = 'tmp.tmp/fileSize/';
 
   var delay = _.fileProvider.systemBitrateTimeGet() / 1000;
 
@@ -1086,13 +1087,26 @@ function fileSize( test )
 
   /* - */
 
-  test.description = 'string in arg';
+  test.case = 'string in arg';
   var got = _.fileProvider.fileSize( file1 );
   test.equivalent( got, 15 );
 
-  test.description = 'array in arg';
-  var got = _.fileProvider.fileSize( file2 );
+  test.case = 'map in arg';
+  var got = _.fileProvider.fileSize( { filePath : file2 } );
   test.equivalent( got, 5 );
+
+  /* - */
+
+  test.case = 'onEnd';
+  var map =
+  {
+    filePath : testSuitePath,
+    throwing : 0,
+  }
+  var got = _.fileProvider.fileSize( map );
+  test.equivalent( got, 0 );
+
+  /* - */
 
   if( !Config.debug )
   return;

@@ -1,6 +1,6 @@
 ( function _FileProvider_HardDrive_test_ss_( ) {
 
-'use strict';  
+'use strict';
 
 if( typeof module !== 'undefined' )
 {
@@ -63,7 +63,7 @@ var Proto =
   abstract : 0,
   silencing : 1,
   enabled : 1,
-  verbosity : 4,
+  verbosity : 3,
 
   // routine : 'pathResolveSoftLink',
 

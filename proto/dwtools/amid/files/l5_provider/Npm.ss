@@ -635,6 +635,7 @@ function filesReflectSingle_body( o )
 _.routineExtend( filesReflectSingle_body, _.FileProvider.Find.prototype.filesReflectSingle );
 
 var extra = filesReflectSingle_body.extra = Object.create( null );
+extra.fetching = 0;
 extra.usingNpm = 1;
 
 var defaults = filesReflectSingle_body.defaults;

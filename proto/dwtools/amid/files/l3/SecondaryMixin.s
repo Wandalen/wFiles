@@ -557,10 +557,7 @@ function filesAreUpToDate2_body( o )
 
   if( o.youngerThan )
   {
-    // Dmytro : neet to accept youngerThan format
-    o.youngerThan = _.timeNow() - o.youngerThan;
-    if( o.youngerThan >= dstOldest )
-    // if( o.youngerThan.getTime() >= dstOldest )
+    if( o.youngerThan.getTime() >= dstOldest )
     {
       if( o.verbosity )
       logger.log( 'Younger', o.youngerThan, dstOldest );

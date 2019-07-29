@@ -833,13 +833,16 @@ function filesReflectSingle_body( o )
       
     if( localChanges )
     shell( stashOptions )
-    .ifErrorThen( ( err ) => 
+    .finally( ( err, got ) => 
     { 
-      if( !_.strHas( stashOptions.output, 'CONFLICT' ) )
-      throw _.err( err );
-      _.errAttend( err );
-      if( o.verbosity )
-      logger.log( 'Failed to merge uncommitted changes in repository at directory ' + _.strQuote( dstPath ) )
+      if( err )
+      {
+        if( !_.strHas( stashOptions.output, 'CONFLICT' ) )
+        throw _.err( err );
+        _.errAttend( err );
+        if( o.verbosity )
+        logger.log( 'Failed to merge uncommitted changes in repository at directory ' + _.strQuote( dstPath ) )
+      }
       return null;
     })
 

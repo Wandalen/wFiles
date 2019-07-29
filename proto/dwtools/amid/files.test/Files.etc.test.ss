@@ -2986,11 +2986,11 @@ function filesAreUpToDate2( test )
   {
     src : [ file1, file2 ],
     dst : [ file3, file4 ],
-    youngerThan : 30000,
+    youngerThan : new Date(),
     verbosity : 3
   };
   var got = _.fileProvider.filesAreUpToDate2( map );
-  test.identical( got, false );
+  test.identical( got, true );
 
 
   /* Dmytro : need help to write
@@ -3015,7 +3015,7 @@ function filesAreUpToDate2( test )
   {
     src : [ file3, file4 ],
     dst : [ file1, file2 ],
-    youngerThan : 1,
+    youngerThan : new Date( 2019, 7, 17),
     verbosity : 3
   };
   var got = _.fileProvider.filesAreUpToDate2( map );

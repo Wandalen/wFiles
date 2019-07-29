@@ -17,7 +17,7 @@
   Чому саме модуль <code>Files</code>?
 </details>
 <details><summary><a href="./tutorial/FileProvider.md">
-      Клас <code>FileProvider</code>
+      Файлові операції на фізичних накопичувачах
   </a></summary>
-  Основи використання модуля <code>Files</code>. Клас <code>FileProvider</code>.
+  Як використовувати клас <code>FileProvider</code> для роботи з фізичними накопичувачами.
 </details>

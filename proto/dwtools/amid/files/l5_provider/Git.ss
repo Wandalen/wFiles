@@ -487,7 +487,7 @@ function isUpToDate( o )
   _.routineOptions( isUpToDate, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( !!self.hub );
-
+  
   let srcCurrentPath;
   let localProvider = self.hub.providerForPath( o.localPath );
   let parsed = self.pathParse( o.remotePath );
@@ -564,6 +564,7 @@ function isUpToDate( o )
     let result = false;
     let detachedRegexp = /HEAD detached at (\w+)/;
     let detachedParsed = detachedRegexp.exec( arg[ 0 ].output );
+    let versionLocal = self.versionLocalRetrive({ localPath : o.localPath, verbosity : o.verbosity });
 
     debugger;
 
@@ -571,7 +572,7 @@ function isUpToDate( o )
     {
       result = _.strBegins( parsed.hash, detachedParsed[ 1 ] );
     }
-    else
+    else if( _.strBegins( parsed.hash, versionLocal ) )
     {
       result = !_.strHasAny( arg[ 0 ].output, [ 'Your branch is behind', 'have diverged' ] );
     }

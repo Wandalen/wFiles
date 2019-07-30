@@ -877,12 +877,10 @@ function filesReflectSingle_body( o )
     { 
       if( err )
       { 
-        _.errAttend( err );
-        if( _.strHas( o.output, 'fatal: reference' ) )
-        throw _.err( 'Failed to checkout. Commit: ' + _.strQuote( parsed.hash ) + ' doesn\'t exist in repository at ' + _.strQuote( dstPath ) )
-        if( _.strHas( o.output, 'error: pathspec' ) )
-        throw _.err( 'Failed to checkout. Branch: ' + _.strQuote( parsed.hash ) + ' doesn\'t exist in repository at ' + _.strQuote( dstPath ) )
+        if( !_.strHasAny( o.output, [ 'fatal: reference', 'error: pathspec' ] ) )
         throw _.err( err );
+        _.errAttend( err );
+        handleGitError( 'Failed to checkout, branch/commit: ' + _.strQuote( parsed.hash ) + ' doesn\'t exist in repository at ' + _.strQuote( dstPath ) );
       }
       return null;
     })
@@ -914,15 +912,11 @@ function filesReflectSingle_body( o )
       { 
         if( err )
         {
-          if( _.strHas( o.output, 'CONFLICT' ) )
-          { 
-            if( o.verbosity )
-            self.logger.log( 'Failed to merge changes in repository at ' + _.strQuote( dstPath ) );
-            gitMergeFailed = true;
-            _.errAttend( err );
-          }
-          else
-          throw _.err( err );
+          if( !_.strHas( o.output, 'CONFLICT' ) )
+          throw _.err( err )
+          _.errAttend( err );
+          gitMergeFailed = true;
+          handleGitError( 'Automatic merge of remote-tracking branch failed in repository at ' + _.strQuote( dstPath ) + '. Fix conflict(s) manually.' );
         }
         return null;
       }) 
@@ -955,19 +949,25 @@ function filesReflectSingle_body( o )
     { 
       if( err )
       {
-        if( _.strHas( o.output, 'CONFLICT' ) )
-        { 
-          if( o.verbosity )
-          self.logger.log( 'Failed to merge stashed changes in repository at ' + _.strQuote( dstPath ) );
-          _.errAttend( err );
-        }
-        else
+        if( !_.strHas( o.output, 'CONFLICT' ) )
         throw _.err( err );
+        _.errAttend( err );
+        handleGitError( 'Automatic merge of stashed changes failed in repository at ' + _.strQuote( dstPath ) + '. Fix conflict(s) manually.' );
       }
       return null;
     })
     
     return con;
+  }
+  
+  /* */
+  
+  function handleGitError( err )
+  {
+    if( self.throwingGitErrors )
+    throw _.errBriefly( err );
+    else if( o.verbosity )
+    self.logger.log( err );
   }
   
 }
@@ -1008,6 +1008,8 @@ let Composes =
   isVcs : 1,
   usingGlobalPath : 1,
   globing : 0,
+  
+  throwingGitErrors : 1
 
 }
 

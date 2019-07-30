@@ -560,7 +560,7 @@ function filesAreUpToDate2_body( o )
     if( o.youngerThan.getTime() >= dstOldest )
     {
       if( o.verbosity )
-      logger.log( 'Younger', o.youngerThan, dstOldest );
+      logger.log( 'Younger' );
       return true;
     }
     else

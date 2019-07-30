@@ -6,7 +6,7 @@
 
 Основні класи, що забезпечують реалізацію інтерфейсу `FileProvider`:
 
-- `HardDrive` - здійснення файлових операцій на фізичному накопичувачу під управлінням операційних систем `Windows`, `MacOs`, `Linux`-дистрибутивів.
+- `HardDrive` - здійснення файлових операцій на постійному накопичувачу під управлінням операційних систем `Windows`, `MacOs`, `Linux`-дистрибутивів.
 - `Extract` - для створення віртуальної файлової системи в оперативній пам'яті та здійснення файлових операцій в ній.
 
 Додаткові класи, що розширюють можливості модуля:
@@ -58,7 +58,7 @@ var _ = wTools;
 
 // provider
 
-fileProvider = _.FileProvider.HardDrive();
+var fileProvider = _.FileProvider.HardDrive();
 
 // path
 
@@ -73,7 +73,7 @@ var record = fileProvider.fileWrite(  pathFile, 'Hello, world' );
 
 Внесіть в файл `Create.js` відповідний код.
 
-В коді файла `Create.js`, змінній `fileProvider` присвоєно провайдер `HardDrive`. Це свідчить про те, що модуль буде взаємодіяти з фізичним накопичувачем в оточенні вашої операційної системи.
+В коді файла `Create.js`, змінній `fileProvider` присвоєно провайдер `HardDrive`. Це свідчить про те, що модуль буде взаємодіяти з постійним накопичувачем в оточенні вашої операційної системи.
 
 Для того, щоб створити файл, провайдер `fileProvider` використовує рутину `fileWrite`. В рутину `fileWrite` передано шлях до файла `pathFile` та дані, котрі будуть записані в нього. В даному випадку, це рядок `Hello, world`.
 
@@ -85,7 +85,7 @@ var record = fileProvider.fileWrite(  pathFile, 'Hello, world' );
     <summary><u>Вивід команд <code>ls -l</code> i <code>ls -l ./dir</code></u></summary>
 
 ```   
-$ls -l
+$ ls -l
 total 44
 -rw-r--r--  1 user user   242 Jul 29 14:18 Create.js
 drwxr-xr-x  2 user user  4096 Jul 29 14:19 dir
@@ -96,7 +96,7 @@ drwxr-xr-x 71 user user  4096 Jul 29 12:51 node_modules
 ```
 
 ```   
-$ls -l ./dir
+$ ls -l ./dir
 total 4
 -rw-r--r-- 1 user user 8 Jul 29 14:53 File.txt
 ```
@@ -112,10 +112,7 @@ total 4
 fileProvider
       ├── dir
       |    └── File.js
-      ├── node_modules
-      |        ├── ...
-      |        ├── ...
-      |       
+      ├── node_modules  
       ├── Create.js
       ├── ReadDelete.js
       ├── package-lock.json
@@ -177,7 +174,7 @@ Hello, world
     <summary><u>Вивід команд <code>ls -l</code> i <code>ls -l ./dir</code></u></summary>
 
 ```   
-$ls -l ./dir
+$ ls -l ./dir
 total 0
 ```
 

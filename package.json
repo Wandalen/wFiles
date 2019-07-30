@@ -56,7 +56,8 @@
     "wselector": "",
     "wverbal": "",
     "wLogger": "",
-    "ini": ""
+    "ini": "",
+    "tar": ""
   },
   "devDependencies": {
     "wait-sync": "",

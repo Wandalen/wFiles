@@ -7,6 +7,9 @@ if( typeof module !== 'undefined' )
   let _ = require( '../../../Tools.s' );
   if( !_.FileProvider )
   require( '../UseMid.s' );
+  
+  var Tar = require( 'tar' );
+  
 }
 
 let _global = _global_;
@@ -438,6 +441,9 @@ function filesReflectSingle_body( o )
 {
   let self = this;
   let path = self.path;
+  
+  o.extra = o.extra || Object.create( null );
+  _.routineOptions( filesReflectSingle_body, o.extra, filesReflectSingle_body.extra );
 
   _.assertRoutineOptions( filesReflectSingle_body, o );
   // _.assert( o.mandatory === undefined )
@@ -541,18 +547,67 @@ function filesReflectSingle_body( o )
   }
 
   /* */
-
+  
   let tmpPath = dstPath + '-' + _.idWithGuid();
   let tmpEssentialPath = path.join( tmpPath, 'node_modules', parsed.remoteVcsPath );
-  let got = shell( 'npm install --prefix ' + localProvider.path.nativize( tmpPath ) + ' ' + parsed.longerRemoteVcsPath )
-
-  _.assert( got.exitCode === 0 );
-
-  localProvider.fileRename( dstPath, tmpEssentialPath )
-  localProvider.fileDelete( path.dir( tmpEssentialPath ) );
-  localProvider.fileDelete( path.dir( path.dir( tmpEssentialPath ) ) );
-
-  return recordsMake();
+  
+  if( o.extra.usingNpm )
+  { 
+    let npmArgs = 
+    [ 
+      '--no-package-lock',
+      '--legacy-bundling', 
+      '--prefix', 
+      localProvider.path.nativize( tmpPath ), 
+      parsed.longerRemoteVcsPath 
+    ];
+    let got = shell({ execPath : 'npm install', args : npmArgs });
+    _.assert( got.exitCode === 0 );
+    
+    
+    localProvider.fileRename( dstPath, tmpEssentialPath )
+    localProvider.fileDelete( path.dir( tmpEssentialPath ) );
+    localProvider.fileDelete( path.dir( path.dir( tmpEssentialPath ) ) );
+    
+    return recordsMake();
+  }
+  else
+  {  
+    let providerHttp = _.FileProvider.Http();
+    let tmpPackagePath = localProvider.path.join( tmpEssentialPath, 'package' );
+    let version = parsed.hash || 'latest';
+    let registryUrl = `https://registry.npmjs.org/${parsed.remoteVcsPath}/${version}`;
+    let tarballDstPath;
+    
+    let ready = providerHttp.fileRead({ filePath : registryUrl, sync : 0 })
+    .then( ( response ) => 
+    { 
+      response = JSON.parse( response );
+      let fileName = providerHttp.path.name({ path : response.dist.tarball, full : 1 });
+      tarballDstPath = localProvider.path.join( tmpEssentialPath, fileName );
+      return providerHttp.fileCopyToHardDrive({ url : response.dist.tarball, filePath : tarballDstPath });
+    })
+    .then( () => 
+    { 
+      Tar.x
+      ({ 
+        file : localProvider.path.nativize( tarballDstPath ), 
+        cwd : localProvider.path.nativize( tmpEssentialPath ),
+        sync : 1 
+      });
+      localProvider.fileRename( dstPath, tmpPackagePath );
+      localProvider.filesDelete( tmpPath );
+      return null;
+    })
+    .finally( ( err, got ) => 
+    { 
+      if( err )
+      throw _.err( occupiedErr( '' ), err );
+      return recordsMake();
+    })
+    
+    return ready;
+  }
 
   /* */
 
@@ -578,6 +633,10 @@ function filesReflectSingle_body( o )
 }
 
 _.routineExtend( filesReflectSingle_body, _.FileProvider.Find.prototype.filesReflectSingle );
+
+var extra = filesReflectSingle_body.extra = Object.create( null );
+extra.fetching = 0;
+extra.usingNpm = 1;
 
 var defaults = filesReflectSingle_body.defaults;
 

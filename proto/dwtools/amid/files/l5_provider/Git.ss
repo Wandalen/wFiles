@@ -731,6 +731,7 @@ function filesReflectSingle_body( o )
   localProvider.dirMake( dstPath );
 
   let gitConfigExists = localProvider.fileExists( path.join( dstPath, '.git' ) );
+  let gitMergeFailed = false;
 
   /* already have repository here */
 
@@ -818,25 +819,16 @@ function filesReflectSingle_body( o )
 
   ready.ifNoErrorThen( ( arg ) =>
   {
-
     if( localChanges )
     shell( 'git stash' );
-    shell( 'git checkout ' + parsed.hash );
+    
+    ready.then( () => gitCheckout() )
     
     if( mergeIsNeeded && hashIsBranchName )
-    { 
-      let mergeOptions = { execPath : 'git merge', outputCollecting : 1 }
-      shell( 'git config merge.defaultToUpstream true' );
-      shell( 'git merge' );
-      afterMerge( mergeOptions );
-    }
-    
+    ready.then( () => gitMerge() )
+          
     if( localChanges )
-    { 
-      let stashOptions = { execPath : 'git stash pop', outputCollecting : 1 };
-      shell( stashOptions )
-      afterMerge( stashOptions );
-    }
+    ready.then( () => gitStashPop() )
     
     ready.finally( con );
 
@@ -870,22 +862,114 @@ function filesReflectSingle_body( o )
   
   /* */
   
-  function afterMerge( shellOptions )
+  function gitCheckout()
   {
-    ready.finally( ( err, got ) => 
+    let o = 
+    { 
+      execPath : 'git checkout ' + parsed.hash, 
+      outputCollecting : 1, 
+      ready : null 
+    }
+    
+    let con = shell( o );
+    
+    con.finally( ( err, got ) => 
     { 
       if( err )
-      {
-        if( !_.strHas( shellOptions.output, 'CONFLICT' ) )
-        throw _.err( err );
+      { 
         _.errAttend( err );
-        if( o.verbosity )
-        logger.log( 'Failed to merge changes in repository at directory ' + _.strQuote( dstPath ) )
+        if( _.strHas( o.output, 'fatal: reference' ) )
+        throw _.err( 'Failed to checkout. Commit: ' + _.strQuote( parsed.hash ) + ' doesn\'t exist in repository at ' + _.strQuote( dstPath ) )
+        if( _.strHas( o.output, 'error: pathspec' ) )
+        throw _.err( 'Failed to checkout. Branch: ' + _.strQuote( parsed.hash ) + ' doesn\'t exist in repository at ' + _.strQuote( dstPath ) )
+        throw _.err( err );
       }
       return null;
     })
+    
+    return con;
   }
-
+  
+  /*  */
+  
+  function gitMerge()
+  { 
+    let con = shell
+    ({ 
+      execPath : 'git config merge.defaultToUpstream true', 
+      ready : null 
+    });
+    
+    con.then( () => 
+    {  
+      let o = 
+      { 
+        execPath : 'git merge', 
+        outputCollecting : 1, 
+        ready : null 
+      }
+      
+      return shell( o )
+      .finally( ( err, got ) => 
+      { 
+        if( err )
+        {
+          if( _.strHas( o.output, 'CONFLICT' ) )
+          { 
+            if( o.verbosity )
+            self.logger.log( 'Failed to merge changes in repository at ' + _.strQuote( dstPath ) );
+            gitMergeFailed = true;
+            _.errAttend( err );
+          }
+          else
+          throw _.err( err );
+        }
+        return null;
+      }) 
+    })
+    
+    return con;
+  }
+  
+  /* */
+  
+  function gitStashPop()
+  {
+    if( gitMergeFailed )
+    { 
+      if( o.verbosity )
+      self.logger.log( 'Can\'t pop stashed changes due merge conflict at ' + _.strQuote( dstPath ) );
+      return null;
+    }
+    
+    let o = 
+    { 
+      execPath : 'git stash pop', 
+      outputCollecting : 1, 
+      ready : null 
+    };
+    
+    let con = shell( o );
+    
+    con.finally( ( err, got ) => 
+    { 
+      if( err )
+      {
+        if( _.strHas( o.output, 'CONFLICT' ) )
+        { 
+          if( o.verbosity )
+          self.logger.log( 'Failed to merge stashed changes in repository at ' + _.strQuote( dstPath ) );
+          _.errAttend( err );
+        }
+        else
+        throw _.err( err );
+      }
+      return null;
+    })
+    
+    return con;
+  }
+  
 }
 
 _.routineExtend( filesReflectSingle_body, _.FileProvider.Find.prototype.filesReflectSingle );

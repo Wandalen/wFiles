@@ -1,14 +1,16 @@
 
 if( typeof module !== 'undefined' )
-require( 'wFiles' )
+var _ = require( '..' )
 
-var _ = wTools;
+_.include( 'wExternalFundamentals' )
 
-if( _.filesFind )
+let o = 
 {
-
-  var files = _.filesFind( __dirname,_.regexpSafeShrink() );
-  console.log( 'at ' + __dirname );
-  console.log( _.entitySelect( files,'*.absolute' ) );
-
+  currentPath : __dirname,
+  sync : 1
 }
+
+let shell = _.sheller( o );
+
+debugger
+shell( 'ls' )

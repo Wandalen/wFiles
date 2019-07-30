@@ -3803,7 +3803,7 @@ function filesFindPerformance( test )
   /*prepare files */
 
   var dir = path.join( context.testSuitePath, test.name );
-  var provider = _.FileProvider.HardDrive();
+  provider = _.FileProvider.HardDrive();
 
   var filesNumber = 2000;
   var levels = 5;
@@ -16017,8 +16017,7 @@ function filesDeleteAndAsyncWrite( test )
 
   test.case = 'try to delete dir before async write will be completed';
 
-  var testPath = path.join( context.testSuitePath, test.name );
-
+  testPath = path.join( context.testSuitePath, test.name );
 
   var cons = [];
 

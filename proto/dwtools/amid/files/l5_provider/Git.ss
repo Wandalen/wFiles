@@ -825,27 +825,19 @@ function filesReflectSingle_body( o )
     
     if( mergeIsNeeded && hashIsBranchName )
     { 
+      let mergeOptions = { execPath : 'git merge', outputCollecting : 1 }
       shell( 'git config merge.defaultToUpstream true' );
       shell( 'git merge' );
+      afterMerge( mergeOptions );
     }
     
-    let stashOptions = { execPath : 'git stash pop', throwingExitCode : 1, outputCollecting : 1 };
-      
     if( localChanges )
-    shell( stashOptions )
-    .finally( ( err, got ) => 
     { 
-      if( err )
-      {
-        if( !_.strHas( stashOptions.output, 'CONFLICT' ) )
-        throw _.err( err );
-        _.errAttend( err );
-        if( o.verbosity )
-        logger.log( 'Failed to merge uncommitted changes in repository at directory ' + _.strQuote( dstPath ) )
-      }
-      return null;
-    })
-
+      let stashOptions = { execPath : 'git stash pop', outputCollecting : 1 };
+      shell( stashOptions )
+      afterMerge( stashOptions );
+    }
+    
     ready.finally( con );
 
     return arg;
@@ -874,6 +866,24 @@ function filesReflectSingle_body( o )
       dst : { filePath : dstPath },
     });
     return o.result;
+  }
+  
+  /* */
+  
+  function afterMerge( shellOptions )
+  {
+    ready.finally( ( err, got ) => 
+    { 
+      if( err )
+      {
+        if( !_.strHas( shellOptions.output, 'CONFLICT' ) )
+        throw _.err( err );
+        _.errAttend( err );
+        if( o.verbosity )
+        logger.log( 'Failed to merge changes in repository at directory ' + _.strQuote( dstPath ) )
+      }
+      return null;
+    })
   }
 
 }

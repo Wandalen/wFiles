@@ -2217,6 +2217,9 @@ let filesSize = _.routineFromPreAndBody( filesSize_pre, filesSize_body );
 
 /*
 qqq : extend test, check cases when does not exist, check throwing option
+Dmytro : extended test routine. Throwing option is checked. Async mode is used.
+         Description of routine has callback onEnd, but now it is not used because
+         _.routineFromPreAndBody check srcMap and screenMap in assert.
 */
 
 function fileSize_body( o )

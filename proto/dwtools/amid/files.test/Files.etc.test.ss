@@ -419,9 +419,15 @@ function filesNewer( test )
     var path = 'tmp.tmp/s.txt';
     test.shouldThrowErrorSync( () => _.files.filesNewer( path, path, path ) );
 
+    test.case = 'one argument is missed';
+    var path = 'tmp.tmp'
+    test.shouldThrowErrorSync( () => _.files.filesNewer( path, path + '/file' ) );
+    test.shouldThrowErrorSync( () => _.files.filesNewer( path + '/file', path ) );
+
     test.case = 'type of arguments is not file.Stat or string';
     test.shouldThrowErrorSync( () => _.files.filesNewer( null, '/tmp.tmp/s.txt' ) );
     test.shouldThrowErrorSync( () => _.files.filesNewer( 'tmp.tmp', [ 'tmp.tmp' ] ) );
+    test.shouldThrowErrorSync( () => _.files.filesNewer( [ file1 ], [ file2 ] ) );
   }
 
   return con;
@@ -493,9 +499,15 @@ function filesOlder( test )
     var path = 'tmp.tmp/s.txt';
     test.shouldThrowErrorSync( () => _.files.filesOlder( path, path, path ) );
 
+    test.case = 'one argument is missed';
+    var path = 'tmp.tmp'
+    test.shouldThrowErrorSync( () => _.files.filesOlder( path, path + '/file' ) );
+    test.shouldThrowErrorSync( () => _.files.filesOlder( path + '/file', path ) );
+
     test.case = 'type of arguments is not file.Stat or string';
     test.shouldThrowErrorSync( () => _.files.filesOlder( null, '/tmp.tmp/s.txt' ) );
     test.shouldThrowErrorSync( () => _.files.filesOlder( 'tmp.tmp', [ 'tmp.tmp' ] ) );
+    test.shouldThrowErrorSync( () => _.files.filesOlder( [ file1 ], [ file2 ] ) );
   }
 
   return con;
@@ -1071,7 +1083,7 @@ function fileSize( test )
 
   var file1 = 'tmp.tmp/fileSize/test1',
       file2 = 'tmp.tmp/fileSize/test2',
-      dir = 'tmp.tmp/fileSize/';
+      file3 = 'tmp.tmp/fileSize/test3';
 
   var delay = _.fileProvider.systemBitrateTimeGet() / 1000;
 
@@ -1085,9 +1097,18 @@ function fileSize( test )
   file1 = _.fileProvider.path.nativize( file1 );
   file2 = _.fileProvider.path.nativize( file2 );
 
+  /* asynchronous file creation */
+
+  let fileCreate = _.timeOut( 10, function()
+  {
+    createTestFile( file3, 'test3, any text' );
+    file3 = mergePath( file3 );
+    file3 = _.fileProvider.path.nativize( file3 );
+  });
+
   /* - */
 
-  test.case = 'string in arg';
+  test.case = 'string path in arg';
   var got = _.fileProvider.fileSize( file1 );
   test.equivalent( got, 15 );
 
@@ -1095,16 +1116,32 @@ function fileSize( test )
   var got = _.fileProvider.fileSize( { filePath : file2 } );
   test.equivalent( got, 5 );
 
+  test.case = 'file is dir';
+  var got = _.fileProvider.fileSize( { filePath : _.path.current() } );
+  test.equivalent( got, 0 );
+
   /* - */
 
-  test.case = 'onEnd';
+  test.case = 'throwing : 0, stat === null';
   var map =
   {
-    filePath : testSuitePath,
+    filePath : '/string',
     throwing : 0,
   }
   var got = _.fileProvider.fileSize( map );
-  test.equivalent( got, 0 );
+  test.equivalent( got, null );
+
+  test.case = 'asynchronous file creation test';
+  let check1 = _.timeOut( 0, function()
+  {
+    if( Config.debug )
+    test.shouldThrowErrorSync( () => _.fileProvider.fileSize( file3 ) );
+  });
+  let check2 = _.timeOut( 50, function()
+  {
+    var got = _.fileProvider.fileSize( file3 );
+    test.identical( got, 15 );
+  });
 
   /* - */
 
@@ -1116,6 +1153,26 @@ function fileSize( test )
 
   test.case = 'extra arguments';
   test.shouldThrowErrorSync( () => _.fileProvider.fileSize( file1, file1 ) );
+
+  test.case = 'throwing : 1, stats === null';
+  var map =
+  {
+    filePath : '/string',
+    throwing : 1,
+  }
+  test.shouldThrowErrorSync( () => _.fileProvider.fileSize( map ) );
+
+  test.case = 'wrong argument';
+  test.shouldThrowErrorSync( () => _.fileProvider.fileSize( 1 ) );
+  test.shouldThrowErrorSync( () => _.fileProvider.fileSize( [ file1 ] ) );
+
+  test.case = 'unnecessary field in map';
+  var map =
+  {
+    filePath : file1,
+    onUp : () => 0,
+  }
+  test.shouldThrowErrorSync( () => _.fileProvider.fileSize( map ) );
 }
 
 //

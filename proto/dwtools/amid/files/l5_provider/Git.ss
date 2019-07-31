@@ -19,8 +19,8 @@ let GitConfig, Ini;
 
 /**
  @classdesc Class that allows file manipulations on a git repository. For example, cloning of the repositoty.
- @class wFileProviderGit
- @memberof module:Tools/mid/Files.wTools.FileProvider
+  @class wFileProviderGit
+  @memberof module:Tools/mid/Files.wTools.FileProvider
 */
 
 let Parent = _.FileProvider.Partial;
@@ -294,6 +294,56 @@ defaults.verbosity = 0;
 
 //
 
+function versionLocalChange( o )
+{
+  let self = this;
+  let path = self.path;
+
+  if( !_.mapIs( o ) )
+  o = { localPath : o }
+
+  _.routineOptions( versionLocalChange, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( !!self.hub );
+  
+  let localVersion = self.versionLocalRetrive({ localPath : o.localPath, verbosity : o.verbosity });
+  
+  if( !localVersion )
+  return false;
+  
+  if( localVersion === o.version )
+  return true;
+
+  let shell = _.sheller
+  ({
+    verbosity : self.verbosity - 1,
+    sync : 1,
+    deasync : 0,
+    outputCollecting : 1,
+    currentPath : o.localPath
+  });
+  
+  let result = shell( 'git status' );
+  let localChanges = _.strHas( result.output, 'Changes to be committed' );
+  
+  if( localChanges )
+  shell( 'git stash' )
+  
+  shell( 'git checkout ' + o.version );
+  
+  if( localChanges )
+  shell( 'git pop' )
+  
+  return true;
+}
+
+var defaults = versionLocalChange.defaults = Object.create( null );
+defaults.localPath = null;
+defaults.version = null
+defaults.verbosity = 0;
+
+//
+
 /**
  * @summary Returns hash of latest commit from git repository located at `o.localPath`.
  * @param {Object} o Options map.
@@ -437,7 +487,7 @@ function isUpToDate( o )
   _.routineOptions( isUpToDate, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( !!self.hub );
-
+  
   let srcCurrentPath;
   let localProvider = self.hub.providerForPath( o.localPath );
   let parsed = self.pathParse( o.remotePath );
@@ -514,6 +564,7 @@ function isUpToDate( o )
     let result = false;
     let detachedRegexp = /HEAD detached at (\w+)/;
     let detachedParsed = detachedRegexp.exec( arg[ 0 ].output );
+    let versionLocal = self.versionLocalRetrive({ localPath : o.localPath, verbosity : o.verbosity });
 
     debugger;
 
@@ -521,9 +572,9 @@ function isUpToDate( o )
     {
       result = _.strBegins( parsed.hash, detachedParsed[ 1 ] );
     }
-    else
+    else if( _.strBegins( parsed.hash, versionLocal ) )
     {
-      result = !_.strHas( arg[ 0 ].output, 'Your branch is behind' );
+      result = !_.strHasAny( arg[ 0 ].output, [ 'Your branch is behind', 'have diverged' ] );
     }
 
     if( o.verbosity )
@@ -680,6 +731,7 @@ function filesReflectSingle_body( o )
   localProvider.dirMake( dstPath );
 
   let gitConfigExists = localProvider.fileExists( path.join( dstPath, '.git' ) );
+  let gitMergeFailed = false;
 
   /* already have repository here */
 
@@ -737,17 +789,22 @@ function filesReflectSingle_body( o )
   }
 
   let localChanges = false;
+  let mergeIsNeeded = false;
+  let hashIsBranchName = false;
   if( gitConfigExists )
   {
     shellAll
     ([
       'git status',
+      'git branch'
     ]);
     ready
     .ifNoErrorThen( function( arg )
     {
-      _.assert( arg.length === 2 );
-      localChanges = _.strHas( arg[ 0 ].output, 'Changes to be committed' );
+      _.assert( arg.length === 3 );
+      localChanges = _.strHasAny( arg[ 0 ].output, [ 'Changes to be committed', 'Changes not staged for commit' ] );
+      mergeIsNeeded = !_.strHas( arg[ 0 ].output, 'Your branch is up to date' );
+      hashIsBranchName = _.strHas( arg[ 1 ].output, parsed.hash );
       return localChanges;
     })
   }
@@ -762,18 +819,17 @@ function filesReflectSingle_body( o )
 
   ready.ifNoErrorThen( ( arg ) =>
   {
-
     if( localChanges )
     shell( 'git stash' );
-    shell( 'git checkout ' + parsed.hash );
-    if( parsed.hash.length < 7 || !_.strIsHex( parsed.hash ) ) /* qqq : probably does not work for all cases */ // !!! xxx
-    {
-      debugger;
-      // shell( 'git merge' );
-    }
+    
+    ready.then( () => gitCheckout() )
+    
+    if( mergeIsNeeded && hashIsBranchName )
+    ready.then( () => gitMerge() )
+          
     if( localChanges )
-    shell({ path : 'git stash pop', throwingExitCode : 0 });
-
+    ready.then( () => gitStashPop() )
+    
     ready.finally( con );
 
     return arg;
@@ -783,7 +839,7 @@ function filesReflectSingle_body( o )
 
   con
   .finally( function( err, arg )
-  {
+  { 
     if( err )
     throw _.err( err );
     return recordsMake();
@@ -803,7 +859,117 @@ function filesReflectSingle_body( o )
     });
     return o.result;
   }
-
+  
+  /* */
+  
+  function gitCheckout()
+  {
+    let o = 
+    { 
+      execPath : 'git checkout ' + parsed.hash, 
+      outputCollecting : 1, 
+      ready : null 
+    }
+    
+    let con = shell( o );
+    
+    con.finally( ( err, got ) => 
+    { 
+      if( err )
+      { 
+        if( !_.strHasAny( o.output, [ 'fatal: reference', 'error: pathspec' ] ) )
+        throw _.err( err );
+        _.errAttend( err );
+        handleGitError( 'Failed to checkout, branch/commit: ' + _.strQuote( parsed.hash ) + ' doesn\'t exist in repository at ' + _.strQuote( dstPath ) );
+      }
+      return null;
+    })
+    
+    return con;
+  }
+  
+  /*  */
+  
+  function gitMerge()
+  { 
+    let con = shell
+    ({ 
+      execPath : 'git config merge.defaultToUpstream true', 
+      ready : null 
+    });
+    
+    con.then( () => 
+    {  
+      let o = 
+      { 
+        execPath : 'git merge', 
+        outputCollecting : 1, 
+        ready : null 
+      }
+      
+      return shell( o )
+      .finally( ( err, got ) => 
+      { 
+        if( err )
+        {
+          if( !_.strHas( o.output, 'CONFLICT' ) )
+          throw _.err( err )
+          _.errAttend( err );
+          gitMergeFailed = true;
+          handleGitError( 'Automatic merge of remote-tracking branch failed in repository at ' + _.strQuote( dstPath ) + '. Fix conflict(s) manually.' );
+        }
+        return null;
+      }) 
+    })
+    
+    return con;
+  }
+  
+  /* */
+  
+  function gitStashPop()
+  {
+    if( gitMergeFailed )
+    { 
+      if( o.verbosity )
+      self.logger.log( 'Can\'t pop stashed changes due merge conflict at ' + _.strQuote( dstPath ) );
+      return null;
+    }
+    
+    let o = 
+    { 
+      execPath : 'git stash pop', 
+      outputCollecting : 1, 
+      ready : null 
+    };
+    
+    let con = shell( o );
+    
+    con.finally( ( err, got ) => 
+    { 
+      if( err )
+      {
+        if( !_.strHas( o.output, 'CONFLICT' ) )
+        throw _.err( err );
+        _.errAttend( err );
+        handleGitError( 'Automatic merge of stashed changes failed in repository at ' + _.strQuote( dstPath ) + '. Fix conflict(s) manually.' );
+      }
+      return null;
+    })
+    
+    return con;
+  }
+  
+  /* */
+  
+  function handleGitError( err )
+  {
+    if( self.throwingGitErrors )
+    throw _.errBriefly( err );
+    else if( o.verbosity )
+    self.logger.log( err );
+  }
+  
 }
 
 _.routineExtend( filesReflectSingle_body, _.FileProvider.Find.prototype.filesReflectSingle );
@@ -842,6 +1008,8 @@ let Composes =
   isVcs : 1,
   usingGlobalPath : 1,
   globing : 0,
+  
+  throwingGitErrors : 1
 
 }
 
@@ -885,6 +1053,7 @@ let Proto =
   pathParse,
   pathIsFixated,
   pathFixate,
+  versionLocalChange,
   versionLocalRetrive,
   versionRemoteLatestRetrive,
   versionRemoteCurrentRetrive,

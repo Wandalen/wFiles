@@ -16157,8 +16157,7 @@ function filesDeleteAndAsyncWrite( test )
 
   test.case = 'try to delete dir before async write will be completed';
 
-  var testPath = path.join( context.testSuitePath, test.name );
-
+  testPath = path.join( context.testSuitePath, test.name );
 
   var cons = [];
 

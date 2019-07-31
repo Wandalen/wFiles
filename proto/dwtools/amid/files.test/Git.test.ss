@@ -558,6 +558,112 @@ function filesReflectTrivial( test )
     
     return ready;
   })
+  
+  /*  */
+  
+  .thenKeep( () =>
+  {
+    test.case = 'local has changes, checkout throws an error';
+    providerDst.filesDelete( localPath );
+    let remotePath = 'git+https:///github.com/Wandalen/wPathFundamentals.git';
+    let remotePathUnknownHash = 'git+https:///github.com/Wandalen/wPathFundamentals.git#other';
+    
+    let ready = hub.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
+    
+    ready.then( ( got ) => 
+    { 
+      providerDst.fileWrite( providerDst.path.join( localPath, 'README.md' ), 'test' );
+      return null;
+    })
+    
+    _.shell
+    ({
+      execPath : 'git status',
+      currentPath : localPath,
+      ready : ready,
+      outputCollecting : 1
+    })
+    
+    ready.then( ( got ) => 
+    { 
+      test.identical( got.exitCode, 0 );
+      test.is( _.strHas( got.output, `modified:   README.md` ) ) 
+      return null;
+    })
+    
+    ready.then( () => 
+    {
+      let con = hub.filesReflect({ reflectMap : { [ remotePathUnknownHash ] : clonePathGlobal }, verbosity : 5 });
+      return test.shouldThrowErrorAsync( con );
+    })
+    
+    _.shell
+    ({
+      execPath : 'git status',
+      currentPath : localPath,
+      ready : ready,
+      outputCollecting : 1
+    })
+    
+    ready.then( ( got ) => 
+    { 
+      test.identical( got.exitCode, 0 );
+      test.is( _.strHas( got.output, `modified:   README.md` ) ) 
+      return null;
+    })
+    
+    return ready;
+  })
+  
+  /* */
+  
+  .thenKeep( () =>
+  {
+    test.case = 'no local changes, checkout throws an error';
+    providerDst.filesDelete( localPath );
+    let remotePath = 'git+https:///github.com/Wandalen/wPathFundamentals.git';
+    let remotePathUnknownHash = 'git+https:///github.com/Wandalen/wPathFundamentals.git#other';
+    
+    let ready = hub.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
+    
+    _.shell
+    ({
+      execPath : 'git status',
+      currentPath : localPath,
+      ready : ready,
+      outputCollecting : 1
+    })
+    
+    ready.then( ( got ) => 
+    { 
+      test.identical( got.exitCode, 0 );
+      test.is( _.strHas( got.output, `Your branch is up to date with 'origin/master'.` ) ) 
+      return null;
+    })
+    
+    ready.then( () => 
+    {
+      let con = hub.filesReflect({ reflectMap : { [ remotePathUnknownHash ] : clonePathGlobal }, verbosity : 5 });
+      return test.shouldThrowErrorAsync( con );
+    })
+    
+    _.shell
+    ({
+      execPath : 'git status',
+      currentPath : localPath,
+      ready : ready,
+      outputCollecting : 1
+    })
+    
+    ready.then( ( got ) => 
+    { 
+      test.identical( got.exitCode, 0 );
+      test.is( _.strHas( got.output, `Your branch is up to date with 'origin/master'.` ) ) 
+      return null;
+    })
+    
+    return ready;
+  })
 
   return con;
 }

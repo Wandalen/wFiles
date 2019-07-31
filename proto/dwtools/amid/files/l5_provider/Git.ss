@@ -877,6 +877,16 @@ function filesReflectSingle_body( o )
     { 
       if( err )
       { 
+        if( localChanges )
+        shell
+        ({ 
+          execPath : 'git stash pop',
+          sync : 1,
+          deasync : 0,
+          throwingExitCode : 0, 
+          ready : null 
+        })
+        
         if( !_.strHasAny( o.output, [ 'fatal: reference', 'error: pathspec' ] ) )
         throw _.err( err );
         _.errAttend( err );

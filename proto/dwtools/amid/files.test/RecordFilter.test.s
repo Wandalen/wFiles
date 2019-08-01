@@ -64,7 +64,7 @@ function make( test )
 
   filter.form();
   logger.log( filter );
-  test.identical( filter.filePath, { '/src' : null } );
+  test.identical( filter.filePath, { '/src' : '' } );
   test.identical( filter.prefixPath, null );
   test.identical( filter.postfixPath, null );
   test.identical( filter.basePath, { '/src' : '/src' } );
@@ -117,7 +117,7 @@ function make( test )
 
   filter.form();
   logger.log( filter );
-  test.identical( filter.filePath, { '/src' : null } );
+  test.identical( filter.filePath, { '/src' : '' } );
   test.identical( filter.prefixPath, null );
   test.identical( filter.postfixPath, null );
   test.identical( filter.basePath, { '/src' : '/src' } );
@@ -136,7 +136,7 @@ function make( test )
 
   filter.form();
   logger.log( filter );
-  test.identical( filter.filePath, { '/src/a' : null, '/src/b' : null } );
+  test.identical( filter.filePath, { '/src/a' : '', '/src/b' : '' } );
   test.identical( filter.prefixPath, null );
   test.identical( filter.postfixPath, null );
   test.identical( filter.basePath, { '/src/a' : '/src/a', '/src/b' : '/src/b' } );
@@ -155,7 +155,7 @@ function make( test )
 
   filter.form();
   logger.log( filter );
-  test.identical( filter.filePath, { '/src/a' : null, '/src/a/src/b' : null } );
+  test.identical( filter.filePath, { '/src/a' : '', '/src/a/src/b' : '' } );
   test.identical( filter.prefixPath, null );
   test.identical( filter.postfixPath, null );
   test.identical( filter.basePath, { '/src/a' : '/src/a', '/src/a/src/b' : '/src/a' } );
@@ -186,9 +186,9 @@ function form( test )
   filter.basePath = '..';
   filter.form();
   test.identical( filter.formed, 5 );
-  test.identical( filter.formedFilePath, { '/a/b' : null, '/a/c' : null } );
+  test.identical( filter.formedFilePath, { '/a/b' : '', '/a/c' : '' } );
   test.identical( filter.formedBasePath, { '/a/b' : '/a', '/a/c' : '/a' } );
-  test.identical( filter.filePath, { '/a/b/*' : null, '/a/c/*' : null } );
+  test.identical( filter.filePath, { '/a/b/*' : '', '/a/c/*' : '' } );
   test.identical( filter.basePath, { '/a/b/*' : '/a', '/a/c/*' : '/a' } );
   test.identical( filter.prefixPath, null );
   test.identical( filter.postfixPath, null );
@@ -259,10 +259,10 @@ function form( test )
   filter.filePath = '/a/b/**';
   filter.form();
   test.identical( filter.formed, 5 );
-  test.identical( filter.formedFilePath, { '/a/b' : null } );
+  test.identical( filter.formedFilePath, { '/a/b' : '' } );
   test.identical( filter.formedBasePath, { '/a/b' : '/a/b' } );
-  test.identical( filter.filePath, { '/a/b' : null } );
-  test.identical( filter.basePath, { '/a/b' : '/a/b' } );
+  test.identical( filter.filePath, { '/a/b/**' : '' } );
+  test.identical( filter.basePath, { '/a/b/**' : '/a/b' } );
   test.identical( filter.prefixPath, null );
   test.identical( filter.postfixPath, null );
 
@@ -271,9 +271,9 @@ function form( test )
   filter.filePath = '/a/**/b';
   filter.form();
   test.identical( filter.formed, 5 );
-  test.identical( filter.formedFilePath, { '/a' : null } );
+  test.identical( filter.formedFilePath, { '/a' : '' } );
   test.identical( filter.formedBasePath, { '/a' : '/a' } );
-  test.identical( filter.filePath, { '/a/**/b' : null } );
+  test.identical( filter.filePath, { '/a/**/b' : '' } );
   test.identical( filter.basePath, { '/a/**/b' : '/a' } );
   test.identical( filter.prefixPath, null );
   test.identical( filter.postfixPath, null );
@@ -286,7 +286,7 @@ function form( test )
   test.identical( filter.formed, 3 );
   test.identical( filter.formedFilePath, null );
   test.identical( filter.formedBasePath, null );
-  test.identical( filter.filePath, { '/a/b/*x*' : null, '/a/c/*x*' : null } );
+  test.identical( filter.filePath, { '/a/b/*x*' : '', '/a/c/*x*' : '' } );
   test.identical( filter.basePath, { '/a/b/*x*' : '/a/b', '/a/c/*x*' : '/a/c' } );
   test.identical( filter.prefixPath, null );
   test.identical( filter.postfixPath, null );
@@ -299,7 +299,7 @@ function form( test )
   test.identical( filter.formed, 3 );
   test.identical( filter.formedFilePath, null );
   test.identical( filter.formedBasePath, null );
-  test.identical( filter.filePath, { 'a/b/*x*' : null, 'a/c/*x*' : null } );
+  test.identical( filter.filePath, { 'a/b/*x*' : '', 'a/c/*x*' : '' } );
   test.identical( filter.basePath, { 'a/b/*x*' : 'a/b', 'a/c/*x*' : 'a/c' } );
   test.identical( filter.prefixPath, null );
   test.identical( filter.postfixPath, null );
@@ -310,9 +310,9 @@ function form( test )
   filter.basePath = '';
   filter.form();
   test.identical( filter.formed, 5 );
-  test.identical( filter.formedFilePath, { '/a/b' : null, '/a/c' : null } );
+  test.identical( filter.formedFilePath, { '/a/b' : '', '/a/c' : '' } );
   test.identical( filter.formedBasePath, { '/a/b' : '/a/b', '/a/c' : '/a/c' } );
-  test.identical( filter.filePath, { '/a/b/*x*' : null, '/a/c/*x*' : null } );
+  test.identical( filter.filePath, { '/a/b/*x*' : '', '/a/c/*x*' : '' } );
   test.identical( filter.basePath, { '/a/b/*x*' : '/a/b', '/a/c/*x*' : '/a/c' } );
   test.identical( filter.prefixPath, null );
   test.identical( filter.postfixPath, null );
@@ -325,7 +325,7 @@ function form( test )
   test.identical( filter.formed, 3 );
   test.identical( filter.formedFilePath, null );
   test.identical( filter.formedBasePath, null );
-  test.identical( filter.filePath, { 'a/b/*x*' : null, 'a/c/*x*' : null } );
+  test.identical( filter.filePath, { 'a/b/*x*' : '', 'a/c/*x*' : '' } );
   test.identical( filter.basePath, { 'a/b/*x*' : 'a/b', 'a/c/*x*' : 'a/c' } );
   test.identical( filter.prefixPath, null );
   test.identical( filter.postfixPath, null );
@@ -858,7 +858,7 @@ function prefixesApply( test )
   test.identical( src.prefixPath, null );
   test.identical( src.postfixPath, null );
   test.identical( src.basePath, '/dir/filter1/proto' );
-  test.identical( src.filePath, { '/dir/filter1' : null } );
+  test.identical( src.filePath, { '/dir/filter1' : '' } );
 
   /* - */
 
@@ -1162,6 +1162,34 @@ function prefixesRelative( test )
 
   /* */
 
+  test.case = 'file path - map with empty str dst and abs src';
+  var osrc =
+  {
+    filePath : { '/src' : '' }
+  }
+  var src = _.fileProvider.recordFilter( osrc );
+  src.prefixesRelative();
+
+  test.identical( src.formed, 1 );
+  test.identical( src.filePath, { '.' : '' } );
+  test.identical( src.prefixPath, '/src' );
+
+  /* */
+
+  test.case = 'file path - map with empty str dst and dot src';
+  var osrc =
+  {
+    filePath : { '.' : '' }
+  }
+  var src = _.fileProvider.recordFilter( osrc );
+  src.prefixesRelative();
+
+  test.identical( src.formed, 1 );
+  test.identical( src.filePath, { '.' : '' } );
+  test.identical( src.prefixPath, '.' );
+
+  /* */
+
   test.case = 'file path - map, single, src relative';
   var osrc =
   {
@@ -1236,6 +1264,44 @@ function prefixesRelative( test )
   test.identical( dst.formed, 1 );
   test.identical( dst.filePath, { '.' : '.' } );
   test.identical( dst.prefixPath, '/dst' );
+  test.is( src.filePath === dst.filePath );
+
+  /* xxx */
+
+  test.case = 'file path - map';
+  var osrc =
+  {
+    filePath : { '.' : '' }
+  }
+  var odst =
+  {
+    filePath : osrc.filePath
+  }
+  var src = _.fileProvider.recordFilter( osrc );
+  var dst = _.fileProvider.recordFilter( odst );
+  src.filePath = dst.filePath;
+  test.is( src.filePath === dst.filePath );
+  src.pairWithDst( dst );
+  test.is( src.filePath === dst.filePath );
+
+  src.prefixesRelative();
+  test.identical( src.formed, 1 );
+  test.identical( src.filePath, { '.' : '' } );
+  test.identical( src.prefixPath, '.' );
+  test.identical( dst.formed, 1 );
+  test.identical( dst.filePath, { '.' : '' } );
+  test.identical( dst.prefixPath, null );
+  test.is( src.filePath === dst.filePath );
+
+  debugger;
+  dst.prefixesRelative();
+  debugger;
+  test.identical( src.formed, 1 );
+  test.identical( src.filePath, { '.' : '' } );
+  test.identical( src.prefixPath, '.' );
+  test.identical( dst.formed, 1 );
+  test.identical( dst.filePath, { '.' : '' } );
+  test.identical( dst.prefixPath, null );
   test.is( src.filePath === dst.filePath );
 
   /* */
@@ -1474,7 +1540,7 @@ function pathsExtend( test )
   f3.pathsExtend( f1 ).pathsExtend( f2 );
 
   test.identical( f3.prefixPath, null );
-  test.identical( f3.filePath, { '/a' : null, '/b' : null } );
+  test.identical( f3.filePath, { '/a' : '', '/b' : '' } );
   test.identical( f3.basePath, null );
 
   /* */
@@ -1662,7 +1728,7 @@ function pathsExtend( test )
   f1.pathsExtend( f2 );
   test.identical( f1.prefixPath, null );
   test.identical( f1.basePath, '/a' );
-  test.identical( f1.filePath, { '/a/b1' : null, '/a/b2' : null, } );
+  test.identical( f1.filePath, { '/a/b1' : '', '/a/b2' : '', } );
   test.identical( f2.prefixPath, null );
   test.identical( f2.basePath, '/a' );
   test.identical( f2.filePath, { '/a/b1' : null, '/a/b2' : null, } );
@@ -2794,8 +2860,8 @@ function pairRefineLight( test )
 
   test.identical( src.formed, 1 );
   test.identical( dst.formed, 1 );
-  test.identical( src.filePath, { '/src' : null, '/src2' : '/dst' } );
-  test.identical( dst.filePath, { '/src' : null, '/src2' : '/dst' } );
+  test.identical( src.filePath, { '/src' : '', '/src2' : '/dst' } );
+  test.identical( dst.filePath, { '/src' : '', '/src2' : '/dst' } );
   test.is( src.filePath === dst.filePath );
 
   /* */
@@ -2930,8 +2996,8 @@ function pairRefineLight( test )
 
   test.identical( src.formed, 1 );
   test.identical( dst.formed, 1 );
-  test.identical( src.filePath, { '/src' : null } );
-  test.identical( dst.filePath, { '/src' : null } );
+  test.identical( src.filePath, { '/src' : '' } );
+  test.identical( dst.filePath, { '/src' : '' } );
   test.is( src.filePath === dst.filePath );
 
   /* */
@@ -3039,10 +3105,10 @@ function pairRefineLight( test )
 
   test.identical( src.formed, 1 );
   test.identical( src.prefixPath, null );
-  test.identical( src.filePath, { '.' : null } );
+  test.identical( src.filePath, { '.' : '' } );
   test.identical( dst.formed, 1 );
   test.identical( dst.prefixPath, '/a/b' );
-  test.identical( dst.filePath, { '.' : null } );
+  test.identical( dst.filePath, { '.' : '' } );
   test.is( dst.filePath === src.filePath );
 
   /* */
@@ -3443,7 +3509,7 @@ function hasAnyPath( test )
   src.pairRefineLight();
   test.identical( src.hasAnyPath(), false );
   test.identical( dst.hasAnyPath(), false );
-  test.identical( src.filePath, { '.' : null } );
+  test.identical( src.filePath, { '.' : '' } );
   test.is( src.filePath === dst.filePath );
 
   test.case = 'src.file = dot, dst.file = dot';
@@ -3728,13 +3794,13 @@ function filePathArrayGet( test )
   src.pairRefineLight();
 
   test.description = 'filePathDstArrayNonBoolGet, boolFallingBack : 0';
-  var expected = [ null, 'str', 'a', 'b' ];
+  var expected = [ '', 'str', 'a', 'b' ];
   var got = src.filePathDstArrayNonBoolGet( src.filePath, 0 );
   test.identical( got, expected );
   var got = dst.filePathDstArrayNonBoolGet( dst.filePath, 0 );
   test.identical( got, expected );
   test.description = 'filePathDstArrayNonBoolGet, boolFallingBack : 1';
-  var expected = [ null, 'str', 'a', 'b' ];
+  var expected = [ '', 'str', 'a', 'b' ];
   var got = src.filePathDstArrayNonBoolGet( src.filePath, 1 );
   test.identical( got, expected );
   var got = dst.filePathDstArrayNonBoolGet( dst.filePath, 1 );

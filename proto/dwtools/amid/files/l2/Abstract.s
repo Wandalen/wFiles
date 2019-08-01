@@ -26,7 +26,7 @@ _.assert( _.routineIs( FileRecordFactory ) );
 var Parent = null;
 var Self = function wFileProviderAbstract( o )
 {
-  return _.instanceConstructor( Self, this, arguments );
+  return _.workpiece.construct( Self, this, arguments );
 }
 
 Self.shortName = 'Abstract';

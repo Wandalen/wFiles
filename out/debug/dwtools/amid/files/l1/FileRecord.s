@@ -24,7 +24,7 @@ let _ = _global_.wTools;
 let Parent = null;
 let Self = function wFileRecord( o )
 {
-  return _.instanceConstructor( Self, this, arguments );
+  return _.workpiece.construct( Self, this, arguments );
 }
 
 Self.shortName = 'FileRecord';
@@ -47,7 +47,7 @@ function init( o )
   _.assert( _.strIs( o.input ), () => 'Expects string {-o.input-}, but got ' + _.strType( o.input ) );
   _.assert( _.objectIs( o.factory ) );
 
-  _.instanceInit( record );
+  _.workpiece.initFields( record );
 
   record._filterReset();
   record._statReset();

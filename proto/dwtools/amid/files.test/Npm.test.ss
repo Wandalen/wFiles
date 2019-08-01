@@ -1,6 +1,6 @@
 ( function _FileProvider_Npm_test_ss_( ) {
 
-'use strict'; 
+'use strict';
 
 if( typeof module !== 'undefined' )
 {
@@ -158,9 +158,9 @@ function filesReflectTrivial( test )
     test.identical( packageRead.version, '0.6.154' )
     return got;
   })
-  
+
   /*  */
-  
+
   .thenKeep( () =>
   {
     test.case = 'specific tag';
@@ -225,7 +225,7 @@ filesReflectTrivial.timeOut = 120000;
 
 //
 
-//Vova: commented out test routine, because npm provider supports only global paths 
+//Vova: commented out test routine, because npm provider supports only global paths
 
 // function filesReflectLocalPath( test )
 // {

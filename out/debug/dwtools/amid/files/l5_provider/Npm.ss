@@ -7,9 +7,9 @@ if( typeof module !== 'undefined' )
   let _ = require( '../../../Tools.s' );
   if( !_.FileProvider )
   require( '../UseMid.s' );
-  
+
   var Tar = require( 'tar' );
-  
+
 }
 
 let _global = _global_;
@@ -25,7 +25,7 @@ let _ = _global_.wTools;
 let Parent = _.FileProvider.Partial;
 let Self = function wFileProviderNpm( o )
 {
-  return _.instanceConstructor( Self, this, arguments );
+  return _.workpiece.construct( Self, this, arguments );
 }
 
 Self.shortName = 'Npm';
@@ -441,7 +441,7 @@ function filesReflectSingle_body( o )
 {
   let self = this;
   let path = self.path;
-  
+
   o.extra = o.extra || Object.create( null );
   _.routineOptions( filesReflectSingle_body, o.extra, filesReflectSingle_body.extra );
 
@@ -547,65 +547,65 @@ function filesReflectSingle_body( o )
   }
 
   /* */
-  
+
   let tmpPath = dstPath + '-' + _.idWithGuid();
   let tmpEssentialPath = path.join( tmpPath, 'node_modules', parsed.remoteVcsPath );
-  
+
   if( o.extra.usingNpm )
-  { 
-    let npmArgs = 
-    [ 
+  {
+    let npmArgs =
+    [
       '--no-package-lock',
-      '--legacy-bundling', 
-      '--prefix', 
-      localProvider.path.nativize( tmpPath ), 
-      parsed.longerRemoteVcsPath 
+      '--legacy-bundling',
+      '--prefix',
+      localProvider.path.nativize( tmpPath ),
+      parsed.longerRemoteVcsPath
     ];
     let got = shell({ execPath : 'npm install', args : npmArgs });
     _.assert( got.exitCode === 0 );
-    
-    
+
+
     localProvider.fileRename( dstPath, tmpEssentialPath )
     localProvider.fileDelete( path.dir( tmpEssentialPath ) );
     localProvider.fileDelete( path.dir( path.dir( tmpEssentialPath ) ) );
-    
+
     return recordsMake();
   }
   else
-  {  
+  {
     let providerHttp = _.FileProvider.Http();
     let tmpPackagePath = localProvider.path.join( tmpEssentialPath, 'package' );
     let version = parsed.hash || 'latest';
     let registryUrl = `https://registry.npmjs.org/${parsed.remoteVcsPath}/${version}`;
     let tarballDstPath;
-    
+
     let ready = providerHttp.fileRead({ filePath : registryUrl, sync : 0 })
-    .then( ( response ) => 
-    { 
+    .then( ( response ) =>
+    {
       response = JSON.parse( response );
       let fileName = providerHttp.path.name({ path : response.dist.tarball, full : 1 });
       tarballDstPath = localProvider.path.join( tmpEssentialPath, fileName );
       return providerHttp.fileCopyToHardDrive({ url : response.dist.tarball, filePath : tarballDstPath });
     })
-    .then( () => 
-    { 
+    .then( () =>
+    {
       Tar.x
-      ({ 
-        file : localProvider.path.nativize( tarballDstPath ), 
+      ({
+        file : localProvider.path.nativize( tarballDstPath ),
         cwd : localProvider.path.nativize( tmpEssentialPath ),
-        sync : 1 
+        sync : 1
       });
       localProvider.fileRename( dstPath, tmpPackagePath );
       localProvider.filesDelete( tmpPath );
       return null;
     })
-    .finally( ( err, got ) => 
-    { 
+    .finally( ( err, got ) =>
+    {
       if( err )
       throw _.err( occupiedErr( '' ), err );
       return recordsMake();
     })
-    
+
     return ready;
   }
 

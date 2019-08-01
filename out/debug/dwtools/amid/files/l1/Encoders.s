@@ -1,6 +1,6 @@
 (function _Encoders_s_() {
 
-'use strict'; 
+'use strict';
 
 let _global = _global_;
 let _ = _global_.wTools;
@@ -202,9 +202,9 @@ Object.assign( _.FileReadEncoders, FileReadEncoders );
 Object.assign( _.FileWriteEncoders, FileWriteEncoders );
 
 if( _.FileProvider && _.FileProvider.Partial && _.FileProvider.Partial.prototype.fileRead.encoders )
-_.assert( _.prototypeOf( _.FileReadEncoders, _.FileProvider.Partial.prototype.fileRead.encoders ) );
+_.assert( _.isPrototypeOf( _.FileReadEncoders, _.FileProvider.Partial.prototype.fileRead.encoders ) );
 if( _.FileProvider && _.FileProvider.Partial && _.FileProvider.Partial.prototype.fileWrite.encoders )
-_.assert( _.prototypeOf( _.FileWriteEncoders, _.FileProvider.Partial.prototype.fileWrite.encoders ) );
+_.assert( _.isPrototypeOf( _.FileWriteEncoders, _.FileProvider.Partial.prototype.fileWrite.encoders ) );
 
 // --
 // export

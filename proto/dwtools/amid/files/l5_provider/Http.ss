@@ -22,7 +22,7 @@ let _ = _global_.wTools;
 let Parent = _.FileProvider.Partial;
 let Self = function wFileProviderHttp( o )
 {
-  return _.instanceConstructor( Self, this, arguments );
+  return _.workpiece.construct( Self, this, arguments );
 }
 
 Self.shortName = 'Http';

@@ -31,7 +31,7 @@ let _ = _global_.wTools;
 let Parent = null;
 let Self = function wFileStat( o )
 {
-  return _.instanceConstructor( Self, this, arguments );
+  return _.workpiece.construct( Self, this, arguments );
 }
 
 Self.shortName = 'FileStat';
@@ -44,7 +44,7 @@ function init( o )
 {
   let self = this;
 
-  _.instanceInit( self );
+  _.workpiece.initFields( self );
 
   if( o )
   self.copy( o );

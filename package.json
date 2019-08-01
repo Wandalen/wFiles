@@ -27,9 +27,9 @@
     "production"
   ],
   "scripts": {
-    "test": "wtest proto",
-    "test2": "wtest proto/dwtools/amid/file.test/Provider.HardDrive.test.ss routine : linkHardSyncRunner",
-    "test3": "wtest proto/dwtools/amid/file.test/Provider.HardDrive.test.ss routine : linkHardAsyncRunner",
+    "test": "wtest .run proto/**",
+    "test2": "wtest .run proto/**/dwtools/amid/file.test/Provider.HardDrive.test.ss routine : linkHardSyncRunner",
+    "test3": "wtest .run proto/**/dwtools/amid/file.test/Provider.HardDrive.test.ss routine : linkHardAsyncRunner",
     "docgen": "wdocgen proto"
   },
   "repository": {

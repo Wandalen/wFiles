@@ -138,7 +138,10 @@ function filesFind_pre( routine, args )
     _.assert( o.maskPreset === 'default.exclude', 'Not supported preset', o.maskPreset );
     o.filter = o.filter || Object.create( null );
     if( !o.filter.formed || o.filter.formed < 5 )
-    o.filter.maskAll = _.files.regexpMakeSafe( o.filter.maskAll || null );
+    {
+      _.files.filterSafer( o.filter );
+      // o.filter.maskAll = _.files.regexpMakeSafe( o.filter.maskAll || null );
+    }
   }
 
   if( Config.debug )

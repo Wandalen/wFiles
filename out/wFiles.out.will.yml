@@ -86,7 +86,6 @@ path:
       - ../proto
       - ../proto/dwtools
       - ../proto/dwtools/Tools.s
-      - ../proto/dwtools/abase
       - ../proto/dwtools/amid
       - ../proto/dwtools/amid/files
       - ../proto/dwtools/amid/files/UseBase.s
@@ -123,7 +122,6 @@ path:
       - ../proto/dwtools/amid/files/l8_filter
       - ../proto/dwtools/amid/files/l8_filter/Image.s
       - ../proto/dwtools/amid/files/l8_filter/Reroot.s
-      - ../proto/dwtools/amid/files/l9
       - ../proto/dwtools/amid/files.test
       - ../proto/dwtools/amid/files.test/aFileProvider.test.s
       - ../proto/dwtools/amid/files.test/aFilesFind.test.s
@@ -144,7 +142,6 @@ path:
       - ../proto/dwtools/amid/files.test/Record.test.s
       - ../proto/dwtools/amid/files.test/RecordFilter.test.s
       - ../proto/dwtools/amid/files.test/Uri.test.ss
-      - ../proto/dwtools/atop
     criterion:
       default: 1
       debug: 1
@@ -440,7 +437,6 @@ module:
           - proto
           - proto/dwtools
           - proto/dwtools/Tools.s
-          - proto/dwtools/abase
           - proto/dwtools/amid
           - proto/dwtools/amid/files
           - proto/dwtools/amid/files/UseBase.s
@@ -477,7 +473,6 @@ module:
           - proto/dwtools/amid/files/l8_filter
           - proto/dwtools/amid/files/l8_filter/Image.s
           - proto/dwtools/amid/files/l8_filter/Reroot.s
-          - proto/dwtools/amid/files/l9
           - proto/dwtools/amid/files.test
           - proto/dwtools/amid/files.test/aFileProvider.test.s
           - proto/dwtools/amid/files.test/aFilesFind.test.s
@@ -498,7 +493,6 @@ module:
           - proto/dwtools/amid/files.test/Record.test.s
           - proto/dwtools/amid/files.test/RecordFilter.test.s
           - proto/dwtools/amid/files.test/Uri.test.ss
-          - proto/dwtools/atop
         criterion:
           default: 1
           debug: 1

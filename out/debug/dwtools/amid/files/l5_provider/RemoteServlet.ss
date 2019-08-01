@@ -27,7 +27,7 @@
 // let Parent = null;
 // let Self = function wRemoteServerForFileProvider( o )
 // {
-//   return _.instanceConstructor( Self, this, arguments );
+//   return _.workpiece.construct( Self, this, arguments );
 // }
 //
 // Self.shortName = 'RemoteServerForFileProvider';
@@ -40,7 +40,7 @@
 // {
 //   let self = this;
 //
-//   _.instanceInit( self );
+//   _.workpiece.initFields( self );
 //
 //   if( self.Self === Self )
 //   Object.preventExtensions( self );
@@ -136,7 +136,7 @@
 // {
 //   _.assert( !_.instanceIs( this ) );
 //
-//   let self = new _.constructorGet( this )();
+//   let self = new _.constructorOf( this )();
 //   let args = _.appArgs();
 //
 //   if( args.subject )

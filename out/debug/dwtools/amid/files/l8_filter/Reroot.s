@@ -29,7 +29,7 @@ var Default = _.FileProvider.Default;
 var Parent = null;
 var Self = function wFileFilterReroot( o )
 {
-  return _.instanceConstructor( Self, this, arguments );
+  return _.workpiece.construct( Self, this, arguments );
 }
 
 Self.shortName = 'Reroot';
@@ -41,7 +41,7 @@ function init( o )
   var self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.instanceInit( self );
+  _.workpiece.initFields( self );
   Object.preventExtensions( self );
 
   if( o )

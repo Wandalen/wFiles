@@ -26,7 +26,7 @@ let GitConfig, Ini;
 let Parent = _.FileProvider.Partial;
 let Self = function wFileProviderGit( o )
 {
-  return _.instanceConstructor( Self, this, arguments );
+  return _.workpiece.construct( Self, this, arguments );
 }
 
 Self.shortName = 'Git';

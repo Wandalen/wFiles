@@ -27,7 +27,7 @@ _.assert( !_.FileProvider.Extract );
 //
 
 /**
- @classdesc Class that allows file manipulations on filesTree - object based on some folders/files tree, 
+ @classdesc Class that allows file manipulations on filesTree - object based on some folders/files tree,
  where folders are nested objects with same depth level as in real folder and contains some files that are properties
  with corresponding names and file content as a values.
  @class wFileProviderExtract
@@ -37,7 +37,7 @@ _.assert( !_.FileProvider.Extract );
 let Parent = Partial;
 let Self = function wFileProviderExtract( o )
 {
-  return _.instanceConstructor( Self, this, arguments );
+  return _.workpiece.construct( Self, this, arguments );
 }
 
 Self.shortName = 'Extract';
@@ -1621,6 +1621,7 @@ function linksRebase( o )
 
   _.routineOptions( linksRebase, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( 0, 'not tested' );
 
   function onUp( file )
   {
@@ -1658,470 +1659,465 @@ linksRebase.defaults =
   newPath : '',
 }
 
+// //
 //
-
-/** usage
-
-    let treeWriten = _.filesTreeRead
-    ({
-      filePath : dir,
-      readingTerminals : 0,
-    });
-
-    logger.log( 'treeWriten :', _.toStr( treeWriten, { levels : 99 } ) );
-
-*/
-
-function filesTreeRead( o )
-{
-  let self = this;
-  let result = Object.create( null );
-  let hereStr = '.';
-  // let _srcPath = o.srcProvider ? o.srcProvider.path : _.path;
-
-  if( _.strIs( o ) )
-  o = { glob : o };
-
-  _.routineOptions( filesTreeRead, o );
-  _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.strIs( o.glob ) || _.strsAreAll( o.glob ) || _.strIs( o.srcPath ) );
-  _.assert( _.objectIs( o.srcProvider ) );
-  _.assert( o.filePath === undefined );
-
-  o.filePath = o.srcPath;
-  delete o.srcPath;
-
-  // o.outputFormat = 'record';
-
-  if( self.verbosity >= 2 )
-  logger.log( 'filesTreeRead at ' + ( o.glob || o.filePath ) );
-
-  /* */
-
-  o.onUp = _.arrayPrependElement( _.arrayAs( o.onUp ), function( record )
-  {
-
-    let element;
-    _.assert( !!record.stat, 'file does not exists', record.absolute );
-    let isDir = record.stat.isDir();
-
-    /* */
-
-    if( isDir )
-    {
-      element = Object.create( null );
-    }
-    else
-    {
-      if( o.readingTerminals === 'hardLink' )
-      {
-        element = [{ hardLink : record.full, absolute : 1 }];
-        if( o.delayedLinksTermination )
-        element[ 0 ].terminating = 1;
-      }
-      else if( o.readingTerminals === 'softLink' )
-      {
-        element = [{ softLink : record.full, absolute : 1 }];
-        if( o.delayedLinksTermination )
-        element[ 0 ].terminating = 1;
-      }
-      else if( o.readingTerminals )
-      {
-        // if( o.srcProvider.isSoftLink
-        // ({
-        //   filePath : record.absolute,
-        //   resolvingSoftLink : o.resolvingSoftLink,
-        //   resolvingTextLink : o.resolvingTextLink,
-        //   usingTextLink : o.usingTextLink,
-        // }))
-        // element = null;
-        _.assert( _.boolLike( o.readingTerminals ), 'unknown value of { o.readingTerminals }', _.strQuote( o.readingTerminals ) );
-        if( element === undefined )
-        element = o.srcProvider.fileReadSync( record.absolute );
-      }
-      else
-      {
-        element = null;
-      }
-    }
-
-    if( !isDir && o.onFileTerminal )
-    {
-      element = o.onFileTerminal( element, record, o );
-    }
-
-    if( isDir && o.onFileDir )
-    {
-      element = o.onFileDir( element, record, o );
-    }
-
-    /* */
-
-    let path = record.relative;
-
-    /* removes leading './' characher */
-
-    if( path.length > 2 )
-    path = o.srcProvider.path.undot( path );
-
-    if( o.asFlatMap )
-    {
-      result[ record.absolute ] = element;
-    }
-    else
-    {
-      if( !o.includingDirs && _.strHas( path, o.upToken ) )
-      {
-        let paths = _.strSplit
-        ({
-          src : path,
-          delimeter : o.upToken,
-          preservingDelimeters : 0,
-          preservingEmpty : 0,
-          stripping : 1,
-        });
-        let p = paths[ 0 ];
-        for( let i = 0, l = paths.length - 1; i < l; i++ )
-        {
-          if( i )
-          p = p + o.upToken + paths[ i ];
-
-          if( !_.select({ src : result, selector : p, upToken : o.upToken }) )
-          _.selectSet
-          ({
-            src : result,
-            selector : p,
-            upToken : o.upToken,
-            set : Object.create( null )
-          });
-        }
-      }
-
-      if( path !== hereStr )
-      _.selectSet
-      ({
-        src : result,
-        selector : path,
-        upToken : o.upToken,
-        set : element,
-      });
-      else
-      result = element;
-    }
-
-    return record;
-  });
-
-  /* */
-
-  o.srcProvider.fieldPush( 'resolvingSoftLink', 1 );
-  let found = o.srcProvider.filesGlob( _.mapOnly( o, o.srcProvider.filesGlob.defaults ) );
-  o.srcProvider.fieldPop( 'resolvingSoftLink', 1 );
-
-  return result;
-}
-
-// var defaults = filesTreeRead.defaults = Object.create( Find.prototype._filesFindMasksAdjust.defaults );
-var defaults = filesTreeRead.defaults = Object.create( null );
-let defaults2 =
-{
-
-  srcProvider : null,
-  srcPath : null,
-  basePath : null,
-
-  recursive : 2,
-  allowingMissed : 0,
-  includingTerminals : 1,
-  includingDirs : 1,
-  includingTransient : 1,
-  resolvingSoftLink : 0,
-  resolvingTextLink : 0,
-  usingTextLink : 0,
-
-  asFlatMap : 0,
-  result : [],
-  orderingExclusion : [],
-
-  readingTerminals : 1,
-  delayedLinksTermination : 0,
-  upToken : '/',
-
-  onRecord : [],
-  onUp : [],
-  onDown : [],
-  onFileTerminal : null,
-  onFileDir : null,
-
-  maskAll : _.files.regexpMakeSafe ? _.files.regexpMakeSafe() : null,
-
-}
-
-_.mapExtend( defaults, defaults2 );
-
-var having = filesTreeRead.having = Object.create( null );
-
-having.writing = 0;
-having.reading = 1;
-having.driving = 0;
-
+// /** usage
 //
-
-function rewriteFromProvider( o )
-{
-  let self = this;
-
-  if( arguments[ 1 ] !== undefined )
-  {
-    o = { srcProvider : arguments[ 0 ], srcPath : arguments[ 1 ] }
-    _.assert( arguments.length === 2, 'Expects exactly two arguments' );
-  }
-  else
-  {
-    _.assert( arguments.length === 1, 'Expects single argument' );
-  }
-
-  let result = self.filesTreeRead( o );
-
-  self.filesTree = result;
-
-  return self;
-}
-
-_.routineExtend( rewriteFromProvider, filesTreeRead );
-
-// rewriteFromProvider.defaults = Object.create( filesTreeRead.defaults );
-// rewriteFromProvider.having = Object.create( filesTreeRead.having );
-
+//     let treeWriten = _.filesTreeRead
+//     ({
+//       filePath : dir,
+//       readingTerminals : 0,
+//     });
 //
-
-function readToProvider( o )
-{
-  let self = this;
-  let srcProvider = self;
-  let _dstPath = o.dstProvider ? o.dstProvider.path : _.path;
-  let _srcPath = _.instanceIs( srcProvider ) ? srcProvider.path : _.path;
-
-  if( arguments[ 1 ] !== undefined )
-  {
-    o = { dstProvider : arguments[ 0 ], dstPath : arguments[ 1 ] }
-    _.assert( arguments.length === 2, 'Expects exactly two arguments' );
-  }
-  else
-  {
-    _.assert( arguments.length === 1, 'Expects single argument' );
-  }
-
-  if( !o.filesTree )
-  o.filesTree = self.filesTree;
-
-  _.routineOptions( readToProvider, o );
-  _.assert( _.strIs( o.dstPath ) );
-  _.assert( _.objectIs( o.dstProvider ) );
-
-  o.basePath = o.basePath || o.dstPath;
-  o.basePath = _dstPath.relative( o.dstPath, o.basePath );
-
-  if( self.verbosity > 1 )
-  logger.log( 'readToProvider to ' + o.dstPath );
-
-  let srcPath = '/';
-
-  /* */
-
-  let stat = null;
-  function handleWritten( dstPath )
-  {
-    if( !o.allowWrite )
-    return;
-    if( !o.sameTime )
-    return;
-    if( !stat )
-    stat = o.dstProvider.statResolvedRead( dstPath );
-    else
-    {
-      o.dstProvider.fileTimeSet( dstPath, stat.atime, stat.mtime );
-      //creation of new file updates timestamps of the parent directory, calling fileTimeSet again to preserve same time
-      o.dstProvider.fileTimeSet( _dstPath.dir( dstPath ), stat.atime, stat.mtime );
-    }
-  }
-
-  /* */
-
-  function writeSoftLink( dstPath, srcPath, descriptor, exists )
-  {
-
-    var defaults =
-    {
-      softLink : null,
-      absolute : null,
-      terminating : null,
-    };
-
-    _.assert( _.strIs( dstPath ) );
-    _.assert( _.strIs( descriptor.softLink ) );
-    _.assertMapHasOnly( descriptor, defaults );
-
-    let terminating = descriptor.terminating || o.breakingSoftLink;
-
-    if( o.allowWrite && !exists )
-    {
-      let contentPath = descriptor.softLink;
-      contentPath = _srcPath.join( o.basePath, contentPath );
-      if( o.absolutePathForLink || descriptor.absolute )
-      contentPath = _.uri.resolve( dstPath, '..', contentPath );
-      dstPath = o.dstProvider.path.localFromGlobal( dstPath );
-      if( terminating )
-      {
-        o.dstProvider.fileCopy( dstPath, contentPath );
-      }
-      else
-      {
-        debugger;
-        let srcPathResolved = _srcPath.resolve( srcPath, contentPath );
-        let srcStat = srcProvider.statResolvedRead( srcPathResolved );
-        let type = null;
-        if( srcStat )
-        type = srcStat.isDirectory() ? 'dir' : 'file';
-
-        o.dstProvider.softLink
-        ({
-          dstPath : dstPath,
-          srcPath : contentPath,
-          allowingMissed : 1,
-          type : type
-        });
-      }
-    }
-
-    handleWritten( dstPath );
-  }
-
-  /* */
-
-  function writeHardLink( dstPath, descriptor, exists )
-  {
-
-    var defaults =
-    {
-      hardLink : null,
-      absolute : null,
-      terminating : null,
-    };
-
-    _.assert( _.strIs( dstPath ) );
-    _.assert( _.strIs( descriptor.hardLink ) );
-    _.assertMapHasOnly( descriptor, defaults );
-
-    let terminating = descriptor.terminating || o.terminatingHardLinks;
-
-    if( o.allowWrite && !exists )
-    {
-      debugger;
-      let contentPath = descriptor.hardLink;
-      contentPath = _srcPath.join( o.basePath, contentPath );
-      if( o.absolutePathForLink || descriptor.absolute )
-      contentPath = _.uri.resolve( dstPath, '..', descriptor.hardLink );
-      contentPath = o.dstProvider.path.localFromGlobal( contentPath );
-      if( terminating )
-      o.dstProvider.fileCopy( dstPath, contentPath );
-      else
-      o.dstProvider.hardLink( dstPath, contentPath );
-    }
-
-    handleWritten( dstPath );
-  }
-
-  /* */
-
-  function write( dstPath, srcPath, descriptor )
-  {
-
-    _.assert( _.strIs( dstPath ) );
-    _.assert( self._descriptorIsTerminal( descriptor ) || _.objectIs( descriptor ) || _.arrayIs( descriptor ) );
-
-    let stat = o.dstProvider.statResolvedRead( dstPath );
-    if( stat )
-    {
-      if( o.allowDelete )
-      {
-        o.dstProvider.filesDelete( dstPath );
-        stat = false;
-      }
-      else if( o.allowDeleteForRelinking )
-      {
-        let _isSoftLink = self._descriptorIsSoftLink( descriptor );
-        if( _isSoftLink )
-        {
-          o.dstProvider.filesDelete( dstPath );
-          stat = false;
-        }
-      }
-    }
-
-    /* */
-
-    if( Self._descriptorIsTerminal( descriptor ) )
-    {
-      if( o.allowWrite && !stat )
-      o.dstProvider.fileWrite( dstPath, descriptor );
-      handleWritten( dstPath );
-    }
-    else if( Self._descriptorIsDir( descriptor ) )
-    {
-      if( o.allowWrite && !stat )
-      o.dstProvider.dirMake({ filePath : dstPath, recursive : 1 });
-      handleWritten( dstPath );
-      for( let t in descriptor )
-      {
-        write( _dstPath.join( dstPath, t ), _srcPath.join( srcPath, t ), descriptor[ t ]  );
-      }
-    }
-    else if( _.arrayIs( descriptor ) )
-    {
-      _.assert( descriptor.length === 1, 'Dont know how to interpret tree' );
-      descriptor = descriptor[ 0 ];
-
-      if( descriptor.softLink )
-      writeSoftLink( dstPath, srcPath, descriptor, stat );
-      else if( descriptor.hardLink )
-      writeHardLink( dstPath, descriptor, stat );
-      else throw _.err( 'unknown kind of file linking', descriptor );
-    }
-
-  }
-
-  /* */
-
-  o.dstProvider.fieldPush( 'resolvingSoftLink', 0 );
-  write( o.dstPath, srcPath, o.filesTree );
-  o.dstProvider.fieldPop( 'resolvingSoftLink', 0 );
-
-  return self;
-}
-
-readToProvider.defaults =
-{
-  filesTree : null,
-  dstProvider : null,
-  dstPath : null,
-  basePath : null,
-  sameTime : 0,
-  absolutePathForLink : 0,
-  allowWrite : 1,
-  allowDelete : 0,
-  allowDeleteForRelinking : 0,
-  verbosity : 0,
-
-  breakingSoftLink : 0,
-  terminatingHardLinks : 0,
-}
-
-var having = readToProvider.having = Object.create( null );
-
-having.writing = 1;
-having.reading = 0;
-having.driving = 0;
+//     logger.log( 'treeWriten :', _.toStr( treeWriten, { levels : 99 } ) );
+//
+// */
+//
+// function filesTreeRead( o )
+// {
+//   let self = this;
+//   let result = Object.create( null );
+//   let hereStr = '.';
+//
+//   if( _.strIs( o ) )
+//   o = { glob : o };
+//
+//   _.routineOptions( filesTreeRead, o );
+//   _.assert( arguments.length === 1, 'Expects single argument' );
+//   _.assert( _.strIs( o.glob ) || _.strsAreAll( o.glob ) || _.strIs( o.srcPath ) );
+//   _.assert( _.objectIs( o.srcProvider ) );
+//   _.assert( o.filePath === undefined );
+//
+//   if( o.upToken === null )
+//   o.upToken = [ './', '/' ];
+//
+//   o.filePath = o.srcPath;
+//   delete o.srcPath;
+//
+//   if( self.verbosity >= 2 )
+//   logger.log( 'filesTreeRead at ' + ( o.glob || o.filePath ) );
+//
+//   /* */
+//
+//   o.onUp = _.arrayPrependElement( _.arrayAs( o.onUp ), function( record )
+//   {
+//
+//     let element;
+//     _.assert( !!record.stat, 'file does not exists', record.absolute );
+//     let isDir = record.stat.isDir();
+//
+//     /* */
+//
+//     if( isDir )
+//     {
+//       element = Object.create( null );
+//     }
+//     else
+//     {
+//       if( o.readingTerminals === 'hardLink' )
+//       {
+//         element = [{ hardLink : record.full, absolute : 1 }];
+//         if( o.delayedLinksTermination )
+//         element[ 0 ].terminating = 1;
+//       }
+//       else if( o.readingTerminals === 'softLink' )
+//       {
+//         element = [{ softLink : record.full, absolute : 1 }];
+//         if( o.delayedLinksTermination )
+//         element[ 0 ].terminating = 1;
+//       }
+//       else if( o.readingTerminals )
+//       {
+//         _.assert( _.boolLike( o.readingTerminals ), 'unknown value of { o.readingTerminals }', _.strQuote( o.readingTerminals ) );
+//         if( element === undefined )
+//         element = o.srcProvider.fileReadSync( record.absolute );
+//       }
+//       else
+//       {
+//         element = null;
+//       }
+//     }
+//
+//     if( !isDir && o.onFileTerminal )
+//     {
+//       element = o.onFileTerminal( element, record, o );
+//     }
+//
+//     if( isDir && o.onFileDir )
+//     {
+//       element = o.onFileDir( element, record, o );
+//     }
+//
+//     /* */
+//
+//     let path = record.relative;
+//
+//     /* removes leading './' characher */
+//
+//     if( path.length > 2 )
+//     path = o.srcProvider.path.undot( path );
+//
+//     if( o.asFlatMap )
+//     {
+//       result[ record.absolute ] = element;
+//     }
+//     else
+//     {
+//       if( !o.includingDirs && _.strHas( path, o.upToken ) )
+//       {
+//         let paths = _.strSplit
+//         ({
+//           src : path,
+//           delimeter : o.upToken,
+//           preservingDelimeters : 0,
+//           preservingEmpty : 0,
+//           stripping : 1,
+//         });
+//         let p = paths[ 0 ];
+//         for( let i = 0, l = paths.length - 1; i < l; i++ )
+//         {
+//           if( i )
+//           p = p + o.upToken + paths[ i ];
+//
+//           if( !_.select({ src : result, selector : p, upToken : o.upToken }) )
+//           _.selectSet
+//           ({
+//             src : result,
+//             selector : p,
+//             upToken : o.upToken,
+//             set : Object.create( null )
+//           });
+//         }
+//       }
+//
+//       if( path !== hereStr )
+//       _.selectSet
+//       ({
+//         src : result,
+//         selector : path,
+//         upToken : o.upToken,
+//         set : element,
+//       });
+//       else
+//       result = element;
+//     }
+//
+//     return record;
+//   });
+//
+//   /* */
+//
+//   o.srcProvider.fieldPush( 'resolvingSoftLink', 1 );
+//   let found = o.srcProvider.filesGlob( _.mapOnly( o, o.srcProvider.filesGlob.defaults ) );
+//   o.srcProvider.fieldPop( 'resolvingSoftLink', 1 );
+//
+//   return result;
+// }
+//
+// // var defaults = filesTreeRead.defaults = Object.create( Find.prototype._filesFindMasksAdjust.defaults );
+// var defaults = filesTreeRead.defaults = Object.create( null );
+// let defaults2 =
+// {
+//
+//   srcProvider : null,
+//   srcPath : null,
+//   basePath : null,
+//
+//   recursive : 2,
+//   allowingMissed : 0,
+//   includingTerminals : 1,
+//   includingDirs : 1,
+//   includingTransient : 1,
+//   resolvingSoftLink : 0,
+//   resolvingTextLink : 0,
+//   usingTextLink : 0,
+//
+//   asFlatMap : 0,
+//   result : null,
+//   orderingExclusion : null,
+//
+//   // result : [],
+//   // orderingExclusion : [],
+//
+//   readingTerminals : 1,
+//   delayedLinksTermination : 0,
+//   upToken : null,
+//
+//   onRecord : [],
+//   onUp : [],
+//   onDown : [],
+//   onFileTerminal : null,
+//   onFileDir : null,
+//
+//   maskAll : _.files.regexpMakeSafe ? _.files.regexpMakeSafe() : null,
+//
+// }
+//
+// _.mapExtend( defaults, defaults2 );
+//
+// var having = filesTreeRead.having = Object.create( null );
+//
+// having.writing = 0;
+// having.reading = 1;
+// having.driving = 0;
+// //
+// // //
+// //
+// // function rewriteFromProvider( o )
+// // {
+// //   let self = this;
+// //
+// //   if( arguments[ 1 ] !== undefined )
+// //   {
+// //     o = { srcProvider : arguments[ 0 ], srcPath : arguments[ 1 ] }
+// //     _.assert( arguments.length === 2, 'Expects exactly two arguments' );
+// //   }
+// //   else
+// //   {
+// //     _.assert( arguments.length === 1, 'Expects single argument' );
+// //   }
+// //
+// //   let result = self.filesTreeRead( o );
+// //
+// //   self.filesTree = result;
+// //
+// //   return self;
+// // }
+// //
+// // _.routineExtend( rewriteFromProvider, filesTreeRead );
+// //
+// // // rewriteFromProvider.defaults = Object.create( filesTreeRead.defaults );
+// // // rewriteFromProvider.having = Object.create( filesTreeRead.having );
+//
+// //
+//
+// function readToProvider( o )
+// {
+//   let self = this;
+//   let srcProvider = self;
+//   let _dstPath = o.dstProvider ? o.dstProvider.path : _.path;
+//   let _srcPath = _.instanceIs( srcProvider ) ? srcProvider.path : _.path;
+//
+//   if( arguments[ 1 ] !== undefined )
+//   {
+//     o = { dstProvider : arguments[ 0 ], dstPath : arguments[ 1 ] }
+//     _.assert( arguments.length === 2, 'Expects exactly two arguments' );
+//   }
+//   else
+//   {
+//     _.assert( arguments.length === 1, 'Expects single argument' );
+//   }
+//
+//   if( !o.filesTree )
+//   o.filesTree = self.filesTree;
+//
+//   _.routineOptions( readToProvider, o );
+//   _.assert( _.strIs( o.dstPath ) );
+//   _.assert( _.objectIs( o.dstProvider ) );
+//
+//   o.basePath = o.basePath || o.dstPath;
+//   o.basePath = _dstPath.relative( o.dstPath, o.basePath );
+//
+//   if( self.verbosity > 1 )
+//   logger.log( 'readToProvider to ' + o.dstPath );
+//
+//   let srcPath = '/';
+//
+//   /* */
+//
+//   let stat = null;
+//   function handleWritten( dstPath )
+//   {
+//     if( !o.allowWrite )
+//     return;
+//     if( !o.sameTime )
+//     return;
+//     if( !stat )
+//     stat = o.dstProvider.statResolvedRead( dstPath );
+//     else
+//     {
+//       o.dstProvider.fileTimeSet( dstPath, stat.atime, stat.mtime );
+//       //creation of new file updates timestamps of the parent directory, calling fileTimeSet again to preserve same time
+//       o.dstProvider.fileTimeSet( _dstPath.dir( dstPath ), stat.atime, stat.mtime );
+//     }
+//   }
+//
+//   /* */
+//
+//   function writeSoftLink( dstPath, srcPath, descriptor, exists )
+//   {
+//
+//     var defaults =
+//     {
+//       softLink : null,
+//       absolute : null,
+//       terminating : null,
+//     };
+//
+//     _.assert( _.strIs( dstPath ) );
+//     _.assert( _.strIs( descriptor.softLink ) );
+//     _.assertMapHasOnly( descriptor, defaults );
+//
+//     let terminating = descriptor.terminating || o.breakingSoftLink;
+//
+//     if( o.allowWrite && !exists )
+//     {
+//       let contentPath = descriptor.softLink;
+//       contentPath = _srcPath.join( o.basePath, contentPath );
+//       if( o.absolutePathForLink || descriptor.absolute )
+//       contentPath = _.uri.resolve( dstPath, '..', contentPath );
+//       dstPath = o.dstProvider.path.localFromGlobal( dstPath );
+//       if( terminating )
+//       {
+//         o.dstProvider.fileCopy( dstPath, contentPath );
+//       }
+//       else
+//       {
+//         debugger;
+//         let srcPathResolved = _srcPath.resolve( srcPath, contentPath );
+//         let srcStat = srcProvider.statResolvedRead( srcPathResolved );
+//         let type = null;
+//         if( srcStat )
+//         type = srcStat.isDirectory() ? 'dir' : 'file';
+//
+//         o.dstProvider.softLink
+//         ({
+//           dstPath : dstPath,
+//           srcPath : contentPath,
+//           allowingMissed : 1,
+//           type : type
+//         });
+//       }
+//     }
+//
+//     handleWritten( dstPath );
+//   }
+//
+//   /* */
+//
+//   function writeHardLink( dstPath, descriptor, exists )
+//   {
+//
+//     var defaults =
+//     {
+//       hardLink : null,
+//       absolute : null,
+//       terminating : null,
+//     };
+//
+//     _.assert( _.strIs( dstPath ) );
+//     _.assert( _.strIs( descriptor.hardLink ) );
+//     _.assertMapHasOnly( descriptor, defaults );
+//
+//     let terminating = descriptor.terminating || o.terminatingHardLinks;
+//
+//     if( o.allowWrite && !exists )
+//     {
+//       debugger;
+//       let contentPath = descriptor.hardLink;
+//       contentPath = _srcPath.join( o.basePath, contentPath );
+//       if( o.absolutePathForLink || descriptor.absolute )
+//       contentPath = _.uri.resolve( dstPath, '..', descriptor.hardLink );
+//       contentPath = o.dstProvider.path.localFromGlobal( contentPath );
+//       if( terminating )
+//       o.dstProvider.fileCopy( dstPath, contentPath );
+//       else
+//       o.dstProvider.hardLink( dstPath, contentPath );
+//     }
+//
+//     handleWritten( dstPath );
+//   }
+//
+//   /* */
+//
+//   function write( dstPath, srcPath, descriptor )
+//   {
+//
+//     _.assert( _.strIs( dstPath ) );
+//     _.assert( self._descriptorIsTerminal( descriptor ) || _.objectIs( descriptor ) || _.arrayIs( descriptor ) );
+//
+//     let stat = o.dstProvider.statResolvedRead( dstPath );
+//     if( stat )
+//     {
+//       if( o.allowDelete )
+//       {
+//         o.dstProvider.filesDelete( dstPath );
+//         stat = false;
+//       }
+//       else if( o.allowDeleteForRelinking )
+//       {
+//         let _isSoftLink = self._descriptorIsSoftLink( descriptor );
+//         if( _isSoftLink )
+//         {
+//           o.dstProvider.filesDelete( dstPath );
+//           stat = false;
+//         }
+//       }
+//     }
+//
+//     /* */
+//
+//     if( Self._descriptorIsTerminal( descriptor ) )
+//     {
+//       if( o.allowWrite && !stat )
+//       o.dstProvider.fileWrite( dstPath, descriptor );
+//       handleWritten( dstPath );
+//     }
+//     else if( Self._descriptorIsDir( descriptor ) )
+//     {
+//       if( o.allowWrite && !stat )
+//       o.dstProvider.dirMake({ filePath : dstPath, recursive : 1 });
+//       handleWritten( dstPath );
+//       for( let t in descriptor )
+//       {
+//         write( _dstPath.join( dstPath, t ), _srcPath.join( srcPath, t ), descriptor[ t ]  );
+//       }
+//     }
+//     else if( _.arrayIs( descriptor ) )
+//     {
+//       _.assert( descriptor.length === 1, 'Dont know how to interpret tree' );
+//       descriptor = descriptor[ 0 ];
+//
+//       if( descriptor.softLink )
+//       writeSoftLink( dstPath, srcPath, descriptor, stat );
+//       else if( descriptor.hardLink )
+//       writeHardLink( dstPath, descriptor, stat );
+//       else throw _.err( 'unknown kind of file linking', descriptor );
+//     }
+//
+//   }
+//
+//   /* */
+//
+//   o.dstProvider.fieldPush( 'resolvingSoftLink', 0 );
+//   write( o.dstPath, srcPath, o.filesTree );
+//   o.dstProvider.fieldPop( 'resolvingSoftLink', 0 );
+//
+//   return self;
+// }
+//
+// readToProvider.defaults =
+// {
+//   filesTree : null,
+//   dstProvider : null,
+//   dstPath : null,
+//   basePath : null,
+//   sameTime : 0,
+//   absolutePathForLink : 0,
+//   allowWrite : 1,
+//   allowDelete : 0,
+//   allowDeleteForRelinking : 0,
+//   verbosity : 0,
+//
+//   breakingSoftLink : 0,
+//   terminatingHardLinks : 0,
+// }
+//
+// var having = readToProvider.having = Object.create( null );
+//
+// having.writing = 1;
+// having.reading = 0;
+// having.driving = 0;
 
 //
 //
@@ -2164,14 +2160,16 @@ function _descriptorRead( o )
   if( _.strIs( arguments[ 0 ] ) )
   o = { filePath : arguments[ 0 ] };
 
+  _.routineOptions( _descriptorRead, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( !path.isGlobal( o.filePath ), 'Expects local path, but got', o.filePath );
+
+  if( o.upToken === null )
+  o.upToken = [ './', '/' ];
   if( o.filePath === '.' )
   o.filePath = '';
   if( !o.filesTree )
   o.filesTree = self.filesTree;
-
-  _.routineOptions( _descriptorRead, o );
-  _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( !path.isGlobal( o.filePath ), 'Expects local path, but got', o.filePath );
 
   let o2 = Object.create( null );
 
@@ -2190,7 +2188,7 @@ _descriptorRead.defaults =
 {
   filePath : null,
   filesTree : null,
-  upToken : [ './', '/' ],
+  upToken : null,
 }
 
 //
@@ -2501,6 +2499,11 @@ function _descriptorWrite( o )
   if( _.strIs( arguments[ 0 ] ) )
   o = { filePath : arguments[ 0 ], data : arguments[ 1 ] };
 
+  _.routineOptions( _descriptorWrite, o );
+  _.assert( arguments.length === 1 || arguments.length === 2 );
+
+  if( o.upToken === null )
+  o.upToken = [ './', '/' ];
   if( o.filePath === '.' )
   o.filePath = '';
 
@@ -2509,9 +2512,6 @@ function _descriptorWrite( o )
     _.assert( _.objectLike( self.filesTree ) );
     o.filesTree = self.filesTree;
   }
-
-  _.routineOptions( _descriptorWrite, o );
-  _.assert( arguments.length === 1 || arguments.length === 2 );
 
   let file = self._descriptorRead( o.filePath );
   let willBeCreated = file === undefined;
@@ -2564,7 +2564,7 @@ _descriptorWrite.defaults =
   filePath : null,
   filesTree : null,
   data : null,
-  upToken : [ './', '/' ],
+  upToken : null,
   breakingHardLink : false
 }
 
@@ -2869,9 +2869,8 @@ let Restricts =
 let Statics =
 {
 
-  filesTreeRead,
-
-  readToProvider,
+  // filesTreeRead,
+  // readToProvider,
 
   _descriptorIsDir,
   _descriptorIsTerminal,
@@ -2936,9 +2935,9 @@ let Proto =
   // etc
 
   linksRebase,
-  filesTreeRead,
-  rewriteFromProvider,
-  readToProvider,
+  // filesTreeRead,
+  // rewriteFromProvider,
+  // readToProvider,
 
   //
 

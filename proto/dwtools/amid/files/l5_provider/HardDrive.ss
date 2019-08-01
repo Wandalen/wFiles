@@ -32,7 +32,7 @@ let FileRecord = _.FileRecord;
 let Parent = _.FileProvider.Partial;
 let Self = function wFileProviderHardDrive( o )
 {
-  return _.instanceConstructor( Self, this, arguments );
+  return _.workpiece.construct( Self, this, arguments );
 }
 
 Self.shortName = 'HardDrive';

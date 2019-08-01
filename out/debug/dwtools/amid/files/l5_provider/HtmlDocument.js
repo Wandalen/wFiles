@@ -29,7 +29,7 @@ _.assert( !_.FileProvider.HtmlDocument );
 let Parent = Partial;
 let Self = function wFileProviderHtmlDocument( o )
 {
-  return _.instanceConstructor( Self, this, arguments );
+  return _.workpiece.construct( Self, this, arguments );
 }
 
 Self.shortName = 'HtmlDocument';

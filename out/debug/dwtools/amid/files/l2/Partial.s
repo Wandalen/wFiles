@@ -46,7 +46,7 @@ _.assert( _.routineIs( _.path.join ) );
 let Parent = _.FileProvider.Abstract;
 let Self = function wFileProviderPartial( o )
 {
-  return _.instanceConstructor( Self, this, arguments );
+  return _.workpiece.construct( Self, this, arguments );
 }
 
 Self.shortName = 'Partial';
@@ -175,7 +175,7 @@ function init( o )
   // self[ protocolsSymbol ] = [];
   // self[ protocolSymbol ] = null;
 
-  _.instanceInit( self );
+  _.workpiece.initFields( self );
 
   _.assert( _.arrayIs( self.protocols ) );
   _.assert( self.protocol !== undefined );
@@ -216,7 +216,7 @@ function init( o )
   if( self.verbosity >= 2 )
   self.logger.log( 'new', _.strType( self ) );
 
-  _.appRegisterExitHandler( () => { debugger;self.path.pathDirTempForClose() } );
+  _.appExitHandlerOnce( () => { debugger;self.path.pathDirTempForClose() } );
 
 }
 
@@ -4536,7 +4536,8 @@ defaults.prefix = '';
 defaults.jsLike = 0;
 defaults.pretty = 1;
 defaults.sync = null;
-defaults.cloning = _.toJson.cloning;
+defaults.cloning = _.toJson.defaults.cloning;
+_.assert( defaults.cloning !== undefined );
 
 var having = fileWriteJson_body.having;
 having.driving = 0;

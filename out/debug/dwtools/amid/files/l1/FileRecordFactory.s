@@ -55,7 +55,7 @@ function init( o )
 
   _.assert( arguments.length === 0 || arguments.length === 1, 'Expects single argument' );
 
-  _.instanceInit( factory );
+  _.workpiece.initFields( factory );
   Object.preventExtensions( factory );
 
   /* */

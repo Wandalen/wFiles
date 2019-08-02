@@ -22,7 +22,7 @@ let Abstract = _.FileProvider.Abstract;
 let Parent = Abstract;
 let Self = function wFileFilterImage( o )
 {
-  return _.instanceConstructor( Self, this, arguments );
+  return _.workpiece.construct( Self, this, arguments );
 }
 
 Self.shortName = 'Image';
@@ -36,7 +36,7 @@ function init( o )
   let self = this;
 
   _.assert( arguments.length <= 1 );
-  _.instanceInit( self )
+  _.workpiece.initFields( self )
   Object.preventExtensions( self );
 
   if( o )

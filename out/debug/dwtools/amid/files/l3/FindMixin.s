@@ -25,7 +25,7 @@ let FileRecord = _.FileRecord;
 let Parent = null;
 let Self = function wFileProviderFind( o )
 {
-  return _.instanceConstructor( Self, this, arguments );
+  return _.workpiece.construct( Self, this, arguments );
 }
 
 Self.shortName = 'Find';
@@ -138,7 +138,10 @@ function filesFind_pre( routine, args )
     _.assert( o.maskPreset === 'default.exclude', 'Not supported preset', o.maskPreset );
     o.filter = o.filter || Object.create( null );
     if( !o.filter.formed || o.filter.formed < 5 )
-    o.filter.maskAll = _.files.regexpMakeSafe( o.filter.maskAll || null );
+    {
+      _.files.filterSafer( o.filter );
+      // o.filter.maskAll = _.files.regexpMakeSafe( o.filter.maskAll || null );
+    }
   }
 
   if( Config.debug )
@@ -173,6 +176,18 @@ function filesFind_pre( routine, args )
     else
     o.mandatory = false;
   }
+
+  if( o.onUp === null )
+  o.onUp = [];
+
+  if( o.onDown === null )
+  o.onDown = [];
+
+  if( o.result === null )
+  o.result = [];
+
+  if( o.orderingExclusion === null )
+  o.orderingExclusion = [];
 
   o.includingTerminals = !!o.includingTerminals;
 
@@ -542,9 +557,9 @@ filesFindSingle_body.defaults =
 
   maskPreset : 'default.exclude',
   outputFormat : 'record',
-  result : [],
-  onUp : [],
-  onDown : [],
+  result : null,
+  onUp : null,
+  onDown : null,
 
   safe : null
 
@@ -725,7 +740,7 @@ _.routineExtend( filesFind_body, filesFindSingle.body );
 
 var defaults = filesFind_body.defaults;
 defaults.sync = 1;
-defaults.orderingExclusion = [];
+defaults.orderingExclusion = null;
 defaults.sortingWithArray = null;
 defaults.verbosity = null;
 defaults.mandatory = null;
@@ -2750,12 +2765,8 @@ function filesReflectEvaluate_body( o )
   }
 }
 
-let filesReflectSingleDefaults = Object.create( null );
-var defaults = filesReflectSingleDefaults;
-
-defaults.filesGraph = null;
-defaults.src = null;
-defaults.dst = null;
+let filesReflectSinglePrimeDefaults = Object.create( null );
+var defaults = filesReflectSinglePrimeDefaults;
 
 defaults.result = null;
 defaults.outputFormat = 'record';
@@ -2785,9 +2796,14 @@ defaults.onUp = null;
 defaults.onDown = null;
 defaults.onDstName = null;
 
+let filesReflectSingleDefaults = Object.create( filesReflectSinglePrimeDefaults );
+var defaults = filesReflectSingleDefaults;
+
+defaults.filesGraph = null;
+defaults.src = null;
+defaults.dst = null;
+
 var defaults = filesReflectEvaluate_body.defaults = Object.create( filesReflectSingleDefaults );
-// defaults.srcPath = null; // xxx
-// defaults.dstPath = null; // xxx
 
 var having = filesReflectEvaluate_body.having = Object.create( null );
 having.writing = 0;
@@ -3225,14 +3241,19 @@ function filesReflect_pre( routine, args )
 
   self.filesReflectSingle.pre.call( self, routine, args );
 
-  // debugger;
-  _.assert( o.reflectMap === null || o.src.filePathSimplest() === null || o.src.filePathSimplest() === '.' );
-  _.assert( o.reflectMap === null || o.dst.filePathSimplest() === null || o.dst.filePathSimplest() === '.' );
-  // _.assert( o.src.filePath === null || o.src.filePath === '.' || o.src.filePath === o.reflectMap || o.reflectMap === null );
-  // _.assert( o.dst.filePath === null || o.dst.filePath === '.' || o.reflectMap === null );
-  // _.assert( o.src.filePath === null || o.src.filePath === '.' || o.src.filePath === o.reflectMap || o.reflectMap === null );
-  _.assert( o.filter === null || o.src.filePath === '.' || o.filter.filePath === null || o.filter.filePath === undefined );
-  _.assert( o.src.isPaired( o.dst ) );
+  if( Config.debug )
+  {
+    let srcFilePath = o.src.filePathSimplest();
+    let dstFilePath = o.dst.filePathSimplest();
+    _.assert( o.reflectMap === null || srcFilePath === null || srcFilePath === '' );
+    _.assert( o.reflectMap === null || dstFilePath === null || dstFilePath === '' );
+    // _.assert( o.reflectMap === null || srcFilePath === null || srcFilePath === '' || srcFilePath === '.' );
+    // _.assert( o.reflectMap === null || dstFilePath === null || dstFilePath === '' || dstFilePath === '.' );
+    // _.assert( o.reflectMap === null || o.src.filePathSimplest() === null || o.src.filePathSimplest() === '.' );
+    // _.assert( o.reflectMap === null || o.dst.filePathSimplest() === null || o.dst.filePathSimplest() === '.' );
+    _.assert( o.filter === null || o.src.filePath === '.' || o.filter.filePath === null || o.filter.filePath === undefined );
+    _.assert( o.src.isPaired( o.dst ) );
+  }
 
   if( o.reflectMap )
   {
@@ -3243,14 +3264,6 @@ function filesReflect_pre( routine, args )
       let filePath2 = path.mapExtend( null, o.reflectMap );
       _.assert( _.entityIdentical( filePath1, filePath2 ) );
     }
-    // if( o.src.filePath !== null && o.reflectMap !== null )
-    // if( o.src.filePath !== '.' && o.reflectMap !== '.' )
-    // if( o.src.filePath !== o.reflectMap )
-    // {
-    //   let filePath1 = path.mapExtend( null, o.src.filePath );
-    //   let filePath2 = path.mapExtend( null, o.reflectMap );
-    //   _.assert( _.entityIdentical( filePath1, filePath2 ) );
-    // }
     o.src.filePath = o.reflectMap;
     o.reflectMap = null;
   }
@@ -3457,7 +3470,8 @@ function filesReflector_functor( routine )
         op2.filter = op2.filter || Object.create( null );
         op2.src = op2.src || Object.create( null );
         if( op2.src.filePath === undefined )
-        op2.src.filePath = '.';
+        op2.src.filePath = '';
+        // op2.src.filePath = '.'; // yyy
 
         op2.dst = op2.dst || Object.create( null );
 
@@ -3557,7 +3571,13 @@ function filesReflectTo_body( o )
   _.assert( src.hub === dst.hub );
 
   let filePath = { [ src.path.globalFromLocal( o.srcPath ) ] : dst.path.globalFromLocal( o.dstPath ) }
-  let result = hub.filesReflect({ reflectMap : filePath, mandatory : o.mandatory });
+
+  let o2 = _.mapOnly( o, filesReflect.defaults );
+  o2.reflectMap = filePath;
+
+  let result = hub.filesReflect( o2 );
+
+  // let result = hub.filesReflect({ reflectMap : filePath, mandatory : o.mandatory });
 
   _.assert( !_.consequenceIs( result ), 'not implemented' );
 
@@ -3572,7 +3592,8 @@ function filesReflectTo_body( o )
   return result;
 }
 
-var defaults = filesReflectTo_body.defaults = Object.create( null );
+var defaults = filesReflectTo_body.defaults = Object.create( filesReflectSinglePrimeDefaults );
+
 defaults.dstProvider = null;
 defaults.dstPath = '/';
 defaults.srcPath = '/';

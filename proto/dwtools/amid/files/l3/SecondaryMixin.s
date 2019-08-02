@@ -37,7 +37,7 @@ _.assert( _.routineIs( fileRead ) );
 let Parent = null;
 let Self = function wFileProviderSecondary( o )
 {
-  return _.instanceConstructor( Self, this, arguments );
+  return _.workpiece.construct( Self, this, arguments );
 }
 
 Self.shortName = 'Secondary';

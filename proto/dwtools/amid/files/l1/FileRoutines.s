@@ -36,7 +36,7 @@ _.assert( _.routineIs( _.FileRecord ) );
  *    excludeAny : [ 'Gruntfile.js', 'gulpfile.js' ],
  *    excludeAll : [ 'package.json', 'bower.json' ]
  *  };
- * let regObj = regexpMakeSafe( paths );
+ * let regObj = regexpAllSafe( paths );
  *  //  {
  *  //    includeAny :
  *  //      [
@@ -65,11 +65,11 @@ _.assert( _.routineIs( _.FileRecord ) );
  * @returns {RegexpObject}
  * @throws {Error} if passed more than one argument.
  * @see {@link wTools~RegexpObject} RegexpObject
- * @function regexpMakeSafe
+ * @function regexpAllSafe
  * @memberof module:Tools/mid/Files.wTools.files
  */
 
-function regexpMakeSafe( mask )
+function regexpAllSafe( mask )
 {
 
   _.assert( arguments.length === 0 || arguments.length === 1 );
@@ -85,6 +85,31 @@ function regexpMakeSafe( mask )
       /\.hg$/,
       /\.tmp($|\/)/,
       /\.DS_Store$/,
+      // /(^|\/)\.(?!$|\/|\.)/,
+      /(^|\/)-/,
+    ],
+  });
+
+  if( mask )
+  {
+    mask = _.RegexpObject( mask || Object.create( null ), 'includeAny' );
+    excludeMask = excludeMask.and( mask );
+  }
+
+  return excludeMask;
+}
+
+//
+
+function regexpTerminalSafe( mask )
+{
+
+  _.assert( arguments.length === 0 || arguments.length === 1 );
+
+  let excludeMask = _.RegexpObject
+  ({
+    excludeAny :
+    [
       /(^|\/)\.(?!$|\/|\.)/,
       /(^|\/)-/,
     ],
@@ -97,6 +122,23 @@ function regexpMakeSafe( mask )
   }
 
   return excludeMask;
+}
+
+//
+
+function filterSafer( filter )
+{
+  _.assert( filter === null || _.mapIs( filter ) || filter instanceof _.FileRecordFilter );
+
+  filter = filter || Object.create( null );
+
+  // filter.maskAll = filter.maskAll || Object.create( null );
+  // filter.maskTerminal = filter.maskTerminal || Object.create( null );
+
+  filter.maskAll = _.files.regexpAllSafe( filter.maskAll );
+  filter.maskTerminal = _.files.regexpTerminalSafe( filter.maskTerminal );
+
+  return filter;
 }
 
 //
@@ -468,27 +510,30 @@ function nodeJsIsSameOrNewer( src )
 let Proto =
 {
 
-  regexpMakeSafe : regexpMakeSafe,
+  regexpMakeSafe : regexpAllSafe,
+  regexpAllSafe,
+  regexpTerminalSafe,
+  filterSafer,
 
-  _fileOptionsGet : _fileOptionsGet,
+  _fileOptionsGet,
 
-  filesNewer : filesNewer,
-  filesOlder : filesOlder,
+  filesNewer,
+  filesOlder,
 
-  filesSpectre : filesSpectre,
-  filesSimilarity : filesSimilarity,
+  filesSpectre,
+  filesSimilarity,
 
-  // filesAreUpToDate : filesAreUpToDate,
+  // filesAreUpToDate,
 
-  filesShadow : filesShadow,
+  filesShadow,
 
-  fileReport : fileReport,
+  fileReport,
 
-  // statIs : statIs,
+  // statIs,
 
-  nodeJsIsSameOrNewer : nodeJsIsSameOrNewer,
+  nodeJsIsSameOrNewer,
 
-  // routineFromPreAndBody : routineFromPreAndBody,
+  // routineFromPreAndBody,
 
 }
 

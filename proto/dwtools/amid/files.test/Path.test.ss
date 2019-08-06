@@ -478,14 +478,6 @@ function pathsResolve( test )
 
   //
 
-  test.case = 'empty'
-
-  var got = provider.path.s.resolve();
-  var expected = [];
-  test.identical( got, expected );
-
-  //
-
   test.case = 'scalar + array with single argument'
 
   var got = provider.path.s.resolve( '/a', [ 'b/..' ] );
@@ -507,7 +499,7 @@ function pathsResolve( test )
     _.path.join( currentPath, 'b' ),
     _.path.join( currentPath, 'b' ),
     _.path.join( _.path.dir( currentPath ), 'b' ),
-    _.path.normalizeStrict( _.path.dir( currentPath ) )
+    _.path.canonize( _.path.dir( currentPath ) )
   ];
   test.identical( got, expected );
 
@@ -515,6 +507,12 @@ function pathsResolve( test )
 
   if( !Config.debug )
   return
+  
+  test.case = 'empty'
+  test.shouldThrowError( function()
+  {
+    rovider.path.s.resolve()
+  });
 
   test.case = 'arrays with different length'
   test.shouldThrowError( function()

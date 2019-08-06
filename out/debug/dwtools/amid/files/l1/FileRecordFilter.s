@@ -744,9 +744,20 @@ function prefixesApply( o )
     if( !filter.prefixPath && !filter.postfixPath )
     return;
 
+    let prefixPath = filter.prefixPath;
+    if( prefixPath )
+    prefixPath = path.s.fromGlob( prefixPath );
+
+    let postfixPath = filter.postfixPath;
+    if( postfixPath )
+    postfixPath = path.s.fromGlob( postfixPath );
+
     let r = Object.create( null );
 
-    basePath = path.s.join( filter.prefixPath || '.', basePath, filter.postfixPath || '.' );
+    basePath = path.s.join( prefixPath || '.', basePath, postfixPath || '.' );
+
+    // if( !_.boolLike( filePath ) )
+    // filePath = path.s.join( prefixPath || '.', filePath, postfixPath || '.' );
 
     if( !_.boolLike( filePath ) )
     filePath = path.s.join( filter.prefixPath || '.', filePath, filter.postfixPath || '.' );
@@ -1947,7 +1958,8 @@ function basePathFrom( filePath, basePath )
 
   if( basePath )
   basePath = filter.pathLocalize( basePath );
-  filePath = filter.filePathArrayNonBoolGet( filePath, 1 ).filter( ( e ) => e !== null );
+  filePath = filter.filePathArrayNonBoolGet( filePath, 1 ).filter( ( e ) => _.strIs( e ) && e );
+  // filePath = filter.filePathArrayNonBoolGet( filePath, 1 ).filter( ( e ) => e !== null ); // yyy
 
   let basePath2 = Object.create( null );
 
@@ -2097,17 +2109,22 @@ function basePathEach( onEach )
   _.assert( filter.basePath === null || _.strIs( filter.basePath ) || _.mapIs( filter.basePath ) );
   _.assert( arguments.length === 1 );
 
+  /*
+  don't use file path neither prefix path
+  */
+
   let basePath = filter.basePath;
-  if( !_.mapIs( basePath ) )
-  {
-    // basePath = filter.basePathFrom( filter.filePath, basePath ); // yyy
-    basePath = filter.basePathFrom( filter.prefixPath || filter.filePath, basePath );
-  }
+
+  // if( !_.mapIs( basePath ) )
+  // {
+  //   // basePath = filter.basePathFrom( filter.filePath, basePath ); // yyy
+  //   basePath = filter.basePathFrom( filter.prefixPath || filter.filePath, basePath );
+  // }
 
   if( _.strIs( basePath ) )
   {
     let r = onEach( null, basePath );
-    _.assert( r === undefined || _.strIs( r ) );
+    _.assert( r === undefined || _.strIs( r ) || _.mapIs( r ) );
     if( r )
     basePath = r;
   }
@@ -2126,6 +2143,37 @@ function basePathEach( onEach )
 
   filter.basePath = basePath;
 
+}
+
+//
+
+function basePathUse( basePath )
+{
+  let filter = this;
+  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let path = fileProvider.path;
+
+  _.assert( arguments.length === 1 );
+
+  filter = fileProvider.recordFilter( filter );
+
+  if( filter.basePath || basePath )
+  filter.basePath = path.join( basePath || '.', filter.basePath || '.' );
+
+  if( basePath )
+  filter.prefixPath = path.s.join( basePath, filter.prefixPath || '.' )
+
+  filter.prefixesApply();
+
+  if( !filter.basePath && path.s.anyAreGlob( filter.filePath ) )
+  filter.basePath = filter.basePathFrom();
+  filter.basePath = filter.basePath || path.current();
+  filter.prefixPath = path.current();
+  filter.prefixesApply();
+
+  basePath = path.resolve( basePath || filter.basePaths[ 0 ] );
+
+  return basePath;
 }
 
 // --
@@ -3781,7 +3829,7 @@ function _applyToRecordMasks( record )
   _.assert( !!filter, 'Cant resolve filter map for stem path', () => _.strQuote( f.stemPath ) );
   _.assert( !!f.formed, 'Record factor was not formed!' );
 
-  if( _.strHas( record.absolute, 'dir1/t2' ) )
+  if( _.strHas( record.absolute, 'node_modules/wTools/proto/dwtools/abase/l1/cErr.s' ) )
   debugger;
 
   /* */
@@ -4089,7 +4137,8 @@ let Extend =
   basePathNormalize,
   basePathSimplify,
   basePathDotUnwrap,
-  basePathEach,
+  basePathEach, /* qqq : cover routine basePathEach */
+  basePathUse,
 
   // file path
 

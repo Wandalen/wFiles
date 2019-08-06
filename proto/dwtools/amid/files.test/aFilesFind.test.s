@@ -18518,54 +18518,125 @@ function filesReflectExperiment( test )
 
   var testPath = path.join( context.testSuitePath, test.name );
 
-  var srcPath = path.join( testPath, 'src' );
-  var dstPath = path.join( testPath, 'dst' );
+  // var srcPath = path.join( testPath, 'src' );
+  // var dstPath = path.join( testPath, 'dst' );
 
+  // var filesTree =
+  // {
+  //   'src' : { a : 'a', b : { c : '' } },
+  //   'dst' : {},
+  // }
+
+  // _.FileProvider.Extract({ filesTree : filesTree }).filesReflectTo
+  // ({
+  //   dstPath : testPath,
+  //   dstProvider : provider,
+  // })
+
+  // // _.FileProvider.Extract.readToProvider
+  // // ({
+  // //   dstProvider : provider,
+  // //   dstPath : testPath,
+  // //   filesTree : filesTree,
+  // //   allowWrite : 1,
+  // //   allowDelete : 1,
+  // // });
+
+  // test.case = 'directory for terminal is not created, as the result fileCopy fails'
+
+  // var filesReflectOptions =
+  // {
+  //   reflectMap : { [ srcPath ] : dstPath },
+  //   dstDeleting: 0,
+  //   dstRewriting: 1,
+  //   dstRewritingByDistinct: true,
+  //   includingDirs: 0,
+  //   includingDst: 1,
+  //   includingTerminals: 1,
+  //   recursive: 2,
+  //   srcDeleting: 1
+  // }
+
+  // provider.filesReflect( filesReflectOptions );
+
+  // var expected =
+  // {
+  //   a : 'a', b : { c : '' }
+  // }
+  // var got = provider.filesExtract( dstPath );
+  // test.identical( got.filesTree, expected )
+  
+  /* */
+  
   var filesTree =
   {
-    'src' : { a : 'a', b : { c : '' } },
-    'dst' : {},
+    'src1' : 
+    { 
+      'proto' : 
+      {
+        'amid' : 
+        { 
+          'file' : 'file' 
+        }
+      }
+    },
+    
+    'src2' : 
+    { 
+      'proto' : {}
+    },
+    
+    'dst' : 
+    {
+      'proto' : 
+      {
+        'amid' : 
+        { 
+          'file' : 'file' 
+        }
+      }
+    },
   }
-
-  _.FileProvider.Extract({ filesTree : filesTree }).filesReflectTo
-  ({
-    dstPath : testPath,
-    dstProvider : provider,
-  })
-
-  // _.FileProvider.Extract.readToProvider
-  // ({
-  //   dstProvider : provider,
-  //   dstPath : testPath,
-  //   filesTree : filesTree,
-  //   allowWrite : 1,
-  //   allowDelete : 1,
-  // });
-
-  test.case = 'directory for terminal is not created, as the result fileCopy fails'
-
-  var filesReflectOptions =
+  
+  let extract = new _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree ) });
+  
+  let o = 
   {
-    reflectMap : { [ srcPath ] : dstPath },
-    dstDeleting: 0,
-    dstRewriting: 1,
-    dstRewritingByDistinct: true,
-    includingDirs: 0,
-    includingDst: 1,
-    includingTerminals: 1,
-    recursive: 2,
-    srcDeleting: 1
+    src : 
+    {
+      filePath : 
+      {
+        'src1/proto/amid' : '.',
+        'src1/proto/amid/file' : '.',
+        'src1/proto' : '.',
+        'src2/proto/amid' : '.',
+        'src2/proto' : '.'
+      },
+      basePath : 
+      {
+        'src1/proto/amid' : 'src1',
+        'src1/proto/amid/file' : 'src1',
+        'src1/proto' : 'src1',
+        'src2/proto/amid' : 'src2',
+        'src2/proto' : 'src2',
+      },
+      prefixPath : '/'
+    },
+    dst : 
+    {
+      basePath : '.',
+      prefixPath : '/dst'
+    },
+    recursive : 0
   }
-
-  provider.filesReflect( filesReflectOptions );
-
-  var expected =
-  {
-    a : 'a', b : { c : '' }
-  }
-  var got = provider.filesExtract( dstPath );
-  test.identical( got.filesTree, expected )
-
+  
+  test.shouldThrowErrorSync( () => 
+  { 
+    debugger
+    extract.filesReflect( o ) 
+  });
+  
+  test.identical( extract.filesTree, filesTree );
 }
 
 filesReflectExperiment.experimental = 1;

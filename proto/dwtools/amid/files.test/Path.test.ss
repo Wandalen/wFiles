@@ -1038,14 +1038,14 @@ function pathDirTempForTrivial( test )
     _.path.fileProvider.fileDelete({ filePath : possiblePath, safe : 0 });
   }
   catch( err )
-  {
+  { 
     shouldThrowError = true;
   }
   if( shouldThrowError )
   {
     test.shouldThrowErrorSync( () =>
     {
-      _.path.pathDirTempForAnother( filePath );
+      _.path.pathDirTempForAnother( possiblePath );
     })
   }
   else
@@ -1064,7 +1064,7 @@ function pathDirTempForTrivial( test )
   test.will = 'repeat close call on same temp dir path, should throw error'
   test.shouldThrowErrorSync( () => _.path.pathDirTempForClose( tempPath ) );
   test.will = 'try to close other dir, should throw error'
-  test.shouldThrowErrorSync( () => _.path.pathDirTempForClose( testPath ) );
+  test.shouldThrowErrorSync( () => _.path.pathDirTempForClose( _.path.dir( filePath ) ) );
 
   //
 

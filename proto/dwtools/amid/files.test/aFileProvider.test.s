@@ -18985,8 +18985,8 @@ function softLinkRelativePath( test )
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, /*_.path*/path.normalize( srcPath ) );
 
-  var srcPath = test.context.globalFromLocal( '.././a/b/c' );
-  var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/a/b/c' );
+  var srcPath = test.context.globalFromLocal( '.././z/b/c' );
+  var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/z/b/c' );
   provider.filesDelete( pathToFile2 );
   provider.fileWrite( pathToFile2, pathToFile2 );
   var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
@@ -19001,8 +19001,8 @@ function softLinkRelativePath( test )
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, /*_.path*/path.normalize( srcPath ) );
 
-  var srcPath = test.context.globalFromLocal( '.\\..\\.\\a\\b\\c' );
-  var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/a/b/c' );
+  var srcPath = test.context.globalFromLocal( '.\\..\\.\\z\\b\\c' );
+  var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/z/b/c' );
   provider.filesDelete( pathToFile2 );
   provider.fileWrite( pathToFile2, pathToFile2 );
   var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );
@@ -19017,8 +19017,8 @@ function softLinkRelativePath( test )
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, /*_.path*/path.normalize( srcPath ) );
 
-  var srcPath = test.context.globalFromLocal( '..\\.\\a\\b\\c' );
-  var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/a/b/c' );
+  var srcPath = test.context.globalFromLocal( '..\\.\\z\\b\\c' );
+  var pathToFile2 = test.context.pathFor( 'written/softLinkRelativePath/z/b/c' );
   provider.filesDelete( pathToFile2 );
   provider.fileWrite( pathToFile2, pathToFile2 );
   var dstPath = test.context.pathFor( 'written/softLinkRelativePath/dstFile' );

@@ -441,13 +441,13 @@ function _preSrcDstPathWithoutProviderDefaults( routine, args )
   if( o.dstPath !== null )
   {
     o.dstPath = path.s.from( o.dstPath );
-    o.dstPath = path.s.normalize( o.dstPath );
+    o.dstPath = path.s.canonize( o.dstPath );
   }
 
   if( o.srcPath !== null )
   {
     o.srcPath = path.s.from( o.srcPath );
-    o.srcPath = path.s.normalize( o.srcPath );
+    o.srcPath = path.s.canonize( o.srcPath );
   }
 
   return o;

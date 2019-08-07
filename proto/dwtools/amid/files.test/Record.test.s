@@ -1386,6 +1386,41 @@ function change( test )
 
 }
 
+//
+
+function recordHubExperiment( test )
+{
+  let self = this;
+  
+  let hub = _.FileProvider.Hub({ empty : 1 });
+  let provider = new _.FileProvider.HardDrive();
+  hub.providerRegister( provider );
+  
+  let filePathLocal = provider.path.normalize( __filename );
+  let fileName = provider.path.name({ path : __filename, full : 1 });
+  let filePathGlobal = provider.path.globalFromLocal( filePathLocal );
+  let filePathRelativeGlobal = provider.path.globalFromLocal( fileName );
+  let basePathGlobal = hub.path.dir( filePathGlobal );
+  
+  let factory = hub.recordFactory();
+  let record = factory.record( filePathGlobal );
+  
+  test.identical( factory.basePath, basePathGlobal );
+  test.identical( record.absolute, filePathGlobal );
+  test.identical( record.relative, filePathRelativeGlobal );
+  
+  test.mustNotThrowError( () => 
+  {
+    let stat = record.stat;
+    test.is( stat.isTerminal() );
+  })
+  
+  provider.finit();
+  hub.finit();
+}
+
+recordHubExperiment.experimental = 1;
+
 // --
 // proto
 // --
@@ -1409,6 +1444,8 @@ var Self =
     recordStating,
 
     change,
+    
+    recordHubExperiment
 
   },
 

@@ -2980,12 +2980,12 @@ function fileReadWithEncoding( test )
     //
 
     var data = 'module.exports = { data : 1 '
-    var filePath3 = test.context.pathFor( 'written/fileReadWithEncoding/dstFile3' );
-    provider.filesDelete( filePath3 );
-    provider.fileWrite({ filePath : filePath3, data : data });
+    var linkPath3 = test.context.pathFor( 'written/fileReadWithEncoding/dstFile3' );
+    provider.filesDelete( linkPath3 );
+    provider.fileWrite({ filePath : linkPath3, data : data });
     test.shouldThrowError( () =>
     {
-      provider.fileRead({ filePath : filePath3, encoding : 'js.node' });
+      provider.fileRead({ filePath : linkPath3, encoding : 'js.node' });
     })
   }
 }
@@ -27537,7 +27537,7 @@ function isDir( test )
 
   test.case = 'soft to text to missing'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isDir( o );
@@ -27550,7 +27550,7 @@ function isDir( test )
   test.case = 'soft to text to terminal'
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isDir( o );
@@ -27563,7 +27563,7 @@ function isDir( test )
   test.case = 'soft to text to directory'
   provider.filesDelete( dirPath );
   provider.dirMake( filePath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isDir( o );
@@ -27612,7 +27612,7 @@ function isDir( test )
   // test.case = 'hardLink -> soft -> text -> dir'
   // provider.filesDelete( dirPath );
   // provider.dirMake( filePath );
-  // provider.fileWrite( linkPath3, 'link ' + filePath );
+  // provider.fileWrite( linkPath3, 'link ' + provider.path.localFromGlobal( filePath ));
   // provider.softLink( linkPath2, linkPath3 );
   // provider.hardLink( linkPath, linkPath2 );
   // var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
@@ -27628,7 +27628,7 @@ function isDir( test )
   provider.filesDelete( dirPath );
   provider.dirMake( filePath );
   provider.softLink( linkPath3, filePath );
-  provider.fileWrite( linkPath2, 'link ' + linkPath3 );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath3 ) );
   provider.hardLink( linkPath, linkPath2 );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isDir( o );
@@ -27641,7 +27641,7 @@ function isDir( test )
 
   test.case = 'text to missing'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isDir( o );
   test.identical( got, false );
@@ -27655,7 +27655,7 @@ function isDir( test )
   test.case = 'text to dir'
   provider.filesDelete( dirPath );
   provider.dirMake( filePath )
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isDir( o );
   test.identical( got, false )
@@ -27670,7 +27670,7 @@ function isDir( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath )
   provider.softLink( linkPath2, filePath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isDir( o );
   test.identical( got, false )
@@ -27685,7 +27685,7 @@ function isDir( test )
   provider.filesDelete( dirPath );
   provider.dirMake( filePath )
   provider.softLink( linkPath2, filePath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isDir( o );
   test.identical( got, false )
@@ -27711,8 +27711,8 @@ function isDir( test )
 
   test.case = 'text cycled'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath2, 'link ' + linkPath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath ) );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isDir( o );
   test.identical( got, false )
@@ -27979,7 +27979,7 @@ function isTerminal( test )
 
   test.case = 'soft to text to missing'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isTerminal( o );
@@ -27991,7 +27991,7 @@ function isTerminal( test )
   test.case = 'soft to text to terminal'
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isTerminal( o );
@@ -28003,7 +28003,7 @@ function isTerminal( test )
   test.case = 'soft to text to directory'
   provider.filesDelete( dirPath );
   provider.dirMake( filePath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ) );
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isTerminal( o );
@@ -28047,7 +28047,7 @@ function isTerminal( test )
   // test.case = 'hardLink -> soft -> text -> terminal'
   // provider.filesDelete( dirPath );
   // provider.fileWrite( filePath,filePath );
-  // provider.fileWrite( linkPath3, 'link ' + filePath );
+  // provider.fileWrite( linkPath3, 'link ' + provider.path.localFromGlobal( filePath ));
   // provider.softLink( linkPath2, linkPath3 );
   // provider.hardLink( linkPath, linkPath2 );
   // var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
@@ -28062,7 +28062,7 @@ function isTerminal( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath,filePath );
   provider.softLink( linkPath3, filePath );
-  provider.fileWrite( linkPath2, 'link ' + linkPath3 );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath3 ) );
   provider.hardLink( linkPath, linkPath2 );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isTerminal( o );
@@ -28089,7 +28089,7 @@ function isTerminal( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath,filePath);
   provider.hardLink({ dstPath : linkPath3, srcPath : filePath });
-  provider.fileWrite( linkPath2, 'link ' + linkPath3 )
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath3 ) )
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isTerminal( o );
@@ -28101,7 +28101,7 @@ function isTerminal( test )
 
   test.case = 'text to missing'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isTerminal( o );
   test.identical( got, true );
@@ -28114,7 +28114,7 @@ function isTerminal( test )
   test.case = 'text to terminal'
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath )
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isTerminal( o );
   test.identical( got, true )
@@ -28127,7 +28127,7 @@ function isTerminal( test )
   test.case = 'text to dir'
   provider.filesDelete( dirPath );
   provider.dirMake( filePath )
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isTerminal( o );
   test.identical( got, true )
@@ -28141,7 +28141,7 @@ function isTerminal( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath )
   provider.softLink( linkPath2, filePath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isTerminal( o );
   test.identical( got, true )
@@ -28155,7 +28155,7 @@ function isTerminal( test )
   provider.filesDelete( dirPath );
   provider.dirMake( filePath )
   provider.softLink( linkPath2, filePath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isTerminal( o );
   test.identical( got, true )
@@ -28179,8 +28179,8 @@ function isTerminal( test )
 
   test.case = 'text cycled'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath2, 'link ' + linkPath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath ) );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isTerminal( o );
   test.identical( got, true )
@@ -28491,7 +28491,7 @@ function isTerminal( test )
 
   test.case = 'soft to text to missing'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
   var got = provider.isTerminal( _.mapExtend( null, o ) );
@@ -28502,7 +28502,7 @@ function isTerminal( test )
 
   test.case = 'soft to text to missing'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
   var got = provider.isTerminal( _.mapExtend( null, o ) );
@@ -28514,7 +28514,7 @@ function isTerminal( test )
 
   test.case = 'soft to text to missing'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
   var got = provider.isTerminal( _.mapExtend( null, o ) );
@@ -28525,7 +28525,7 @@ function isTerminal( test )
   test.case = 'soft to text to terminal'
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
   var got = provider.isTerminal( _.mapExtend( null, o ) );
@@ -28537,7 +28537,7 @@ function isTerminal( test )
   test.case = 'soft to text to terminal'
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
   var got = provider.isTerminal( _.mapExtend( null, o ) );
@@ -28550,7 +28550,7 @@ function isTerminal( test )
   test.case = 'soft to text to terminal';
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
   var got = provider.isTerminal( _.mapExtend( null, o ) );
@@ -28563,7 +28563,7 @@ function isTerminal( test )
   test.case = 'soft to text to directory'
   provider.filesDelete( dirPath );
   provider.dirMake( filePath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
   var got = provider.isTerminal( _.mapExtend( null, o ) );
@@ -28575,7 +28575,7 @@ function isTerminal( test )
   test.case = 'soft to text to directory'
   provider.filesDelete( dirPath );
   provider.dirMake( filePath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
   var got = provider.isTerminal( _.mapExtend( null, o ) );
@@ -28588,7 +28588,7 @@ function isTerminal( test )
   test.case = 'soft to text to directory'
   provider.filesDelete( dirPath );
   provider.dirMake( filePath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
   var got = provider.isTerminal( _.mapExtend( null, o ) );
@@ -28694,7 +28694,7 @@ function isTerminal( test )
   // test.case = 'hardLink -> soft -> text -> terminal'
   // provider.filesDelete( dirPath );
   // provider.fileWrite( filePath,filePath );
-  // provider.fileWrite( linkPath3, 'link ' + filePath );
+  // provider.fileWrite( linkPath3, 'link ' + provider.path.localFromGlobal( filePath ));
   // provider.softLink( linkPath2, linkPath3 );
   // provider.hardLink( linkPath, linkPath2 );
   // var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
@@ -28709,7 +28709,7 @@ function isTerminal( test )
   // test.case = 'hardLink -> soft -> text -> terminal'
   // provider.filesDelete( dirPath );
   // provider.fileWrite( filePath,filePath );
-  // provider.fileWrite( linkPath3, 'link ' + filePath );
+  // provider.fileWrite( linkPath3, 'link ' + provider.path.localFromGlobal( filePath ));
   // provider.softLink( linkPath2, linkPath3 );
   // provider.hardLink( linkPath, linkPath2 );
   // var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
@@ -28725,7 +28725,7 @@ function isTerminal( test )
   // test.case = 'hardLink -> soft -> text -> terminal'
   // provider.filesDelete( dirPath );
   // provider.fileWrite( filePath,filePath );
-  // provider.fileWrite( linkPath3, 'link ' + filePath );
+  // provider.fileWrite( linkPath3, 'link ' + provider.path.localFromGlobal( filePath ));
   // provider.softLink( linkPath2, linkPath3 );
   // provider.hardLink( linkPath, linkPath2 );
   // var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
@@ -28741,7 +28741,7 @@ function isTerminal( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath,filePath );
   provider.softLink( linkPath3, filePath );
-  provider.fileWrite( linkPath2, 'link ' + linkPath3 );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath3 ) );
   provider.hardLink( linkPath, linkPath2 );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
   var got = provider.isTerminal( _.mapExtend( null, o ) );
@@ -28756,7 +28756,7 @@ function isTerminal( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath,filePath );
   provider.softLink( linkPath3, filePath );
-  provider.fileWrite( linkPath2, 'link ' + linkPath3 );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath3 ) );
   provider.hardLink( linkPath, linkPath2 );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
   var got = provider.isTerminal( _.mapExtend( null, o ) );
@@ -28771,7 +28771,7 @@ function isTerminal( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath,filePath );
   provider.softLink( linkPath3, filePath );
-  provider.fileWrite( linkPath2, 'link ' + linkPath3 );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath3 ) );
   provider.hardLink( linkPath, linkPath2 );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
   var got = provider.isTerminal( _.mapExtend( null, o ) );
@@ -28828,7 +28828,7 @@ function isTerminal( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath,filePath);
   provider.hardLink({ dstPath : linkPath3, srcPath : filePath });
-  provider.fileWrite( linkPath2, 'link ' + linkPath3 )
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath3 ) )
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
   var got = provider.isTerminal( _.mapExtend( null, o ) );
@@ -28842,7 +28842,7 @@ function isTerminal( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath,filePath);
   provider.hardLink({ dstPath : linkPath3, srcPath : filePath });
-  provider.fileWrite( linkPath2, 'link ' + linkPath3 )
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath3 ) )
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
   var got = provider.isTerminal( _.mapExtend( null, o ) );
@@ -28857,7 +28857,7 @@ function isTerminal( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath,filePath);
   provider.hardLink({ dstPath : linkPath3, srcPath : filePath });
-  provider.fileWrite( linkPath2, 'link ' + linkPath3 )
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath3 ) )
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
   var got = provider.isTerminal( _.mapExtend( null, o ) );
@@ -28870,7 +28870,7 @@ function isTerminal( test )
 
   test.case = 'text to missing'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
   var got = provider.isTerminal( _.mapExtend( null, o ) );
   test.identical( got, false );
@@ -28879,7 +28879,7 @@ function isTerminal( test )
 
   test.case = 'text to missing'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
   var got = provider.isTerminal( _.mapExtend( null, o ) );
   test.identical( got, true );
@@ -28890,7 +28890,7 @@ function isTerminal( test )
 
   test.case = 'text to missing'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
   var got = provider.isTerminal( _.mapExtend( null, o ) );
   test.identical( got, false );
@@ -28900,7 +28900,7 @@ function isTerminal( test )
   test.case = 'text to terminal'
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath )
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
   var got = provider.isTerminal( _.mapExtend( null, o ) );
   test.identical( got, true )
@@ -28913,7 +28913,7 @@ function isTerminal( test )
   test.case = 'text to terminal'
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath )
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
   var got = provider.isTerminal( _.mapExtend( null, o ) );
   test.identical( got, true )
@@ -28926,7 +28926,7 @@ function isTerminal( test )
   test.case = 'text to terminal'
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath )
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
   var got = provider.isTerminal( _.mapExtend( null, o ) );
   test.identical( got, true )
@@ -28939,7 +28939,7 @@ function isTerminal( test )
   test.case = 'text to dir'
   provider.filesDelete( dirPath );
   provider.dirMake( filePath )
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
   var got = provider.isTerminal( _.mapExtend( null, o ) );
   test.identical( got, false )
@@ -28953,7 +28953,7 @@ function isTerminal( test )
   test.case = 'text to dir'
   provider.filesDelete( dirPath );
   provider.dirMake( filePath )
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
   var got = provider.isTerminal( _.mapExtend( null, o ) );
   test.identical( got, true )
@@ -28967,7 +28967,7 @@ function isTerminal( test )
   test.case = 'text to dir'
   provider.filesDelete( dirPath );
   provider.dirMake( filePath )
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
   var got = provider.isTerminal( _.mapExtend( null, o ) );
   test.identical( got, false )
@@ -28982,7 +28982,7 @@ function isTerminal( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath )
   provider.softLink( linkPath2, filePath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
   var got = provider.isTerminal( _.mapExtend( null, o ) );
   test.identical( got, false )
@@ -28996,7 +28996,7 @@ function isTerminal( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath )
   provider.softLink( linkPath2, filePath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
   var got = provider.isTerminal( _.mapExtend( null, o ) );
   test.identical( got, true )
@@ -29010,7 +29010,7 @@ function isTerminal( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath )
   provider.softLink( linkPath2, filePath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
   var got = provider.isTerminal( _.mapExtend( null, o ) );
   test.identical( got, true )
@@ -29052,8 +29052,8 @@ function isTerminal( test )
 
   test.case = 'text cycled'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath2, 'link ' + linkPath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath ) );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
   var got = provider.isTerminal( _.mapExtend( null, o ) );
   test.identical( got, true )
@@ -29062,8 +29062,8 @@ function isTerminal( test )
 
   test.case = 'text cycled'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath2, 'link ' + linkPath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath ) );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
   var got = provider.isTerminal( _.mapExtend( null, o ) );
   test.identical( got, true )
@@ -29075,8 +29075,8 @@ function isTerminal( test )
 
   test.case = 'text cycled'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath2, 'link ' + linkPath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath ) );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
   var got = provider.isTerminal( _.mapExtend( null, o ) );
   test.identical( got, true )
@@ -29205,7 +29205,7 @@ function isSoftLink( test )
 
   test.case = 'soft to text to missing'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0 };
   var got = provider.isSoftLink( o );
@@ -29217,7 +29217,7 @@ function isSoftLink( test )
   test.case = 'soft to text to terminal'
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0 };
   var got = provider.isSoftLink( o );
@@ -29229,7 +29229,7 @@ function isSoftLink( test )
   test.case = 'soft to text to directory'
   provider.filesDelete( dirPath );
   provider.dirMake( filePath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0 };
   var got = provider.isSoftLink( o );
@@ -29274,7 +29274,7 @@ function isSoftLink( test )
   // test.case = 'hardLink -> soft -> text -> terminal'
   // provider.filesDelete( dirPath );
   // provider.fileWrite( filePath,filePath );
-  // provider.fileWrite( linkPath3, 'link ' + filePath );
+  // provider.fileWrite( linkPath3, 'link ' + provider.path.localFromGlobal( filePath ));
   // provider.softLink( linkPath2, linkPath3 );
   // provider.hardLink( linkPath, linkPath2 );
   // var o = { filePath : linkPath, resolvingTextLink : 0 };
@@ -29289,7 +29289,7 @@ function isSoftLink( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath,filePath );
   provider.softLink( linkPath3, filePath );
-  provider.fileWrite( linkPath2, 'link ' + linkPath3 );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath3 ) );
   provider.hardLink( linkPath, linkPath2 );
   var o = { filePath : linkPath, resolvingTextLink : 0 };
   var got = provider.isSoftLink( o );
@@ -29316,7 +29316,7 @@ function isSoftLink( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath,filePath);
   provider.hardLink({ dstPath : linkPath3, srcPath : filePath });
-  provider.fileWrite( linkPath2, 'link ' + linkPath3 )
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath3 ) )
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = { filePath : linkPath, resolvingTextLink : 0 };
   var got = provider.isSoftLink( o );
@@ -29328,7 +29328,7 @@ function isSoftLink( test )
 
   test.case = 'text to missing'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 0 };
   var got = provider.isSoftLink( o );
   test.identical( got, false );
@@ -29341,7 +29341,7 @@ function isSoftLink( test )
   test.case = 'text to terminal'
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath )
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 0 };
   var got = provider.isSoftLink( o );
   test.identical( got, false )
@@ -29354,7 +29354,7 @@ function isSoftLink( test )
   test.case = 'text to dir'
   provider.filesDelete( dirPath );
   provider.dirMake( filePath )
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 0 };
   var got = provider.isSoftLink( o );
   test.identical( got, false )
@@ -29368,7 +29368,7 @@ function isSoftLink( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath )
   provider.softLink( linkPath2, filePath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 0 };
   var got = provider.isSoftLink( o );
   test.identical( got, false )
@@ -29382,7 +29382,7 @@ function isSoftLink( test )
   provider.filesDelete( dirPath );
   provider.dirMake( filePath )
   provider.softLink( linkPath2, filePath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 0 };
   var got = provider.isSoftLink( o );
   test.identical( got, false )
@@ -29406,8 +29406,8 @@ function isSoftLink( test )
 
   test.case = 'text cycled'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath2, 'link ' + linkPath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath ) );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 0 };
   var got = provider.isSoftLink( o );
   test.identical( got, false )
@@ -29530,7 +29530,7 @@ function isSoftLink( test )
 
   test.case = 'soft to text to missing'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1 };
   var got = provider.isSoftLink( _.mapExtend( null, o ) );
@@ -29542,7 +29542,7 @@ function isSoftLink( test )
   test.case = 'soft to text to terminal'
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1 };
   var got = provider.isSoftLink( _.mapExtend( null, o ) );
@@ -29554,7 +29554,7 @@ function isSoftLink( test )
   test.case = 'soft to text to directory'
   provider.filesDelete( dirPath );
   provider.dirMake( filePath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1 };
   var got = provider.isSoftLink( _.mapExtend( null, o ) );
@@ -29588,7 +29588,7 @@ function isSoftLink( test )
   // test.case = 'hardLink -> soft -> text -> terminal'
   // provider.filesDelete( dirPath );
   // provider.fileWrite( filePath,filePath );
-  // provider.fileWrite( linkPath3, 'link ' + filePath );
+  // provider.fileWrite( linkPath3, 'link ' + provider.path.localFromGlobal( filePath ));
   // provider.softLink( linkPath2, linkPath3 );
   // provider.hardLink( linkPath, linkPath2 );
   // var o = { filePath : linkPath, resolvingTextLink : 1 };
@@ -29615,7 +29615,7 @@ function isSoftLink( test )
 
   test.case = 'text to missing'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1 };
   var got = provider.isSoftLink( _.mapExtend( null, o ) );
   test.identical( got, false );
@@ -29625,7 +29625,7 @@ function isSoftLink( test )
   test.case = 'text to terminal'
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath )
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1 };
   var got = provider.isSoftLink( _.mapExtend( null, o ) );
   test.identical( got, false )
@@ -29638,7 +29638,7 @@ function isSoftLink( test )
   test.case = 'text to dir'
   provider.filesDelete( dirPath );
   provider.dirMake( filePath )
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1 };
   var got = provider.isSoftLink( _.mapExtend( null, o ) );
   test.identical( got, false )
@@ -29653,7 +29653,7 @@ function isSoftLink( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath )
   provider.softLink( linkPath2, filePath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 1 };
   var got = provider.isSoftLink( _.mapExtend( null, o ) );
   test.identical( got, true )
@@ -29674,8 +29674,8 @@ function isSoftLink( test )
 
   test.case = 'text cycled'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath2, 'link ' + linkPath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath ) );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 1 };
   var got = provider.isSoftLink( _.mapExtend( null, o ) );
   test.identical( got, false );
@@ -29707,42 +29707,42 @@ function isTextLink( test )
 
   test.case = 'to missing'
   provider.filesDelete( filePath );
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   test.is( !provider.isTextLink( linkPath ) );
 
   test.case = 'to terminal'
   provider.filesDelete( filePath );
   provider.fileWrite( filePath, filePath );
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   test.is( !provider.isTextLink( linkPath ) );
 
   test.case = 'to directory'
   provider.filesDelete( filePath );
   provider.dirMake( filePath );
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   test.is( !provider.isTextLink( linkPath ) );
 
   test.case = 'to text link'
   provider.filesDelete( filePath );
   provider.fileWrite( filePath, 'link ' + dirPath );
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   test.is( !provider.isTextLink( linkPath ) );
 
   test.case = 'self cycled'
   provider.filesDelete( filePath );
-  provider.fileWrite( linkPath, 'link ' + linkPath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath ) );
   test.mustNotThrowError( () => provider.isTextLink( linkPath ) );
 
   test.case = 'cycled'
   provider.filesDelete( filePath );
-  provider.fileWrite( filePath, 'link ' + linkPath );
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( filePath, 'link ' + provider.path.localFromGlobal( linkPath ) );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   test.mustNotThrowError( () => provider.isTextLink( linkPath ) );
 
   test.case = 'to cycled soft link'
   provider.filesDelete( filePath );
   provider.softLink({ dstPath : filePath, srcPath : filePath, allowingMissed : 1 });
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.fieldPush( 'resolvingSoftLink', 1 )
   test.is( !provider.isTextLink( linkPath ) );
   provider.fieldPop( 'resolvingSoftLink', 1 );
@@ -29790,42 +29790,42 @@ function isTextLink( test )
   provider.filesDelete( dirPath );
 
   test.case = 'to missing'
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   test.is( provider.isTextLink( linkPath ) );
 
   test.case = 'to terminal'
   provider.filesDelete( filePath );
   provider.fileWrite( filePath, filePath );
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   test.is( provider.isTextLink( linkPath ) );
 
   test.case = 'to directory'
   provider.filesDelete( filePath );
   provider.dirMake( filePath );
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   test.is( provider.isTextLink( linkPath ) );
 
   test.case = 'to text link'
   provider.filesDelete( filePath );
   provider.fileWrite( filePath, 'link ' + dirPath );
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   test.is( provider.isTextLink( linkPath ) );
 
   test.case = 'self cycled'
   provider.filesDelete( filePath );
-  provider.fileWrite( linkPath, 'link ' + linkPath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath ) );
   test.is( provider.isTextLink( linkPath ) );
 
   test.case = 'cycled'
   provider.filesDelete( filePath );
-  provider.fileWrite( filePath, 'link ' + linkPath );
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( filePath, 'link ' + provider.path.localFromGlobal( linkPath ) );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   test.is( provider.isTextLink( linkPath ) );
 
   test.case = 'to cycled soft link'
   provider.filesDelete( filePath );
   provider.softLink({ dstPath : filePath, srcPath : filePath, allowingMissed : 1 });
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.fieldPush( 'resolvingSoftLink', 1 )
   test.is( provider.isTextLink( linkPath ) );
   provider.fieldPop( 'resolvingSoftLink', 1 );
@@ -29873,7 +29873,7 @@ function isTextLink( test )
   provider.filesDelete( dirPath );
 
   test.case = 'to missing'
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   test.is( provider.isTextLink({ filePath : linkPath, resolvingSoftLink : 1 }) );
   var got = provider.statRead({ filePath : linkPath, resolvingSoftLink : 1, resolvingTextLink : 0 });
   test.identical( got.isTerminal(), true );
@@ -29885,7 +29885,7 @@ function isTextLink( test )
   test.case = 'to terminal'
   provider.filesDelete( filePath );
   provider.fileWrite( filePath, filePath );
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   test.is( provider.isTextLink({ filePath : linkPath, resolvingSoftLink : 1 }) );
   var got = provider.statRead({ filePath : linkPath, resolvingSoftLink : 1, resolvingTextLink : 0 });
   test.identical( got.isTerminal(), true );
@@ -29897,7 +29897,7 @@ function isTextLink( test )
   test.case = 'to directory'
   provider.filesDelete( filePath );
   provider.dirMake( filePath );
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   test.is( provider.isTextLink({ filePath : linkPath, resolvingSoftLink : 1 }) );
   var got = provider.statRead({ filePath : linkPath, resolvingSoftLink : 1, resolvingTextLink : 0 });
   test.identical( got.isTerminal(), true );
@@ -29909,7 +29909,7 @@ function isTextLink( test )
   test.case = 'to text link'
   provider.filesDelete( filePath );
   provider.fileWrite( filePath, 'link ' + dirPath );
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   test.is( provider.isTextLink({ filePath : linkPath, resolvingSoftLink : 1 }) );
   var got = provider.statRead({ filePath : linkPath, resolvingSoftLink : 1, resolvingTextLink : 0 });
   test.identical( got.isTerminal(), true );
@@ -29920,7 +29920,7 @@ function isTextLink( test )
 
   test.case = 'self cycled'
   provider.filesDelete( filePath );
-  provider.fileWrite( linkPath, 'link ' + linkPath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath ) );
   test.is( provider.isTextLink({ filePath : linkPath, resolvingSoftLink : 1 }) );
   var got = provider.statRead({ filePath : linkPath, resolvingSoftLink : 1, resolvingTextLink : 0 });
   test.identical( got.isTerminal(), true );
@@ -29931,8 +29931,8 @@ function isTextLink( test )
 
   test.case = 'cycled'
   provider.filesDelete( filePath );
-  provider.fileWrite( filePath, 'link ' + linkPath );
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( filePath, 'link ' + provider.path.localFromGlobal( linkPath ) );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   test.is( provider.isTextLink({ filePath : linkPath, resolvingSoftLink : 1 }) );
   var got = provider.statRead({ filePath : linkPath, resolvingSoftLink : 1, resolvingTextLink : 0 });
   test.identical( got.isTerminal(), true );
@@ -29944,7 +29944,7 @@ function isTextLink( test )
   test.case = 'to cycled soft link'
   provider.filesDelete( filePath );
   provider.softLink({ dstPath : filePath, srcPath : '../file', allowingMissed : 1 });
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.fieldPush( 'resolvingSoftLink', 1 )
   test.is( provider.isTextLink({ filePath : linkPath, resolvingSoftLink : 1 }) );
   provider.fieldPop( 'resolvingSoftLink', 1 );
@@ -30146,7 +30146,7 @@ function isHardLink( test )
 
   test.case = 'soft to text to missing'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isHardLink( o );
@@ -30159,7 +30159,7 @@ function isHardLink( test )
   test.case = 'soft to text to terminal'
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isHardLink( o );
@@ -30172,7 +30172,7 @@ function isHardLink( test )
   test.case = 'soft to text to directory'
   provider.filesDelete( dirPath );
   provider.dirMake( filePath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isHardLink( o );
@@ -30219,7 +30219,7 @@ function isHardLink( test )
   // test.case = 'hardLink -> soft -> text -> terminal'
   // provider.filesDelete( dirPath );
   // provider.fileWrite( filePath,filePath );
-  // provider.fileWrite( linkPath3, 'link ' + filePath );
+  // provider.fileWrite( linkPath3, 'link ' + provider.path.localFromGlobal( filePath ));
   // provider.softLink( linkPath2, linkPath3 );
   // provider.hardLink( linkPath, linkPath2 );
   // var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
@@ -30234,7 +30234,7 @@ function isHardLink( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath,filePath );
   provider.softLink( linkPath3, filePath );
-  provider.fileWrite( linkPath2, 'link ' + linkPath3 );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath3 ) );
   provider.hardLink( linkPath, linkPath2 );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isHardLink( o );
@@ -30261,7 +30261,7 @@ function isHardLink( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath,filePath);
   provider.hardLink({ dstPath : linkPath3, srcPath : filePath });
-  provider.fileWrite( linkPath2, 'link ' + linkPath3 )
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath3 ) )
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isHardLink( o );
@@ -30273,7 +30273,7 @@ function isHardLink( test )
 
   test.case = 'text to missing'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isHardLink( o );
   test.identical( got, false );
@@ -30286,7 +30286,7 @@ function isHardLink( test )
   test.case = 'text to terminal'
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath )
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isHardLink( o );
   test.identical( got, false )
@@ -30299,7 +30299,7 @@ function isHardLink( test )
   test.case = 'text to dir'
   provider.filesDelete( dirPath );
   provider.dirMake( filePath )
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isHardLink( o );
   test.identical( got, false )
@@ -30313,7 +30313,7 @@ function isHardLink( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath )
   provider.softLink( linkPath2, filePath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isHardLink( o );
   test.identical( got, false )
@@ -30327,7 +30327,7 @@ function isHardLink( test )
   provider.filesDelete( dirPath );
   provider.dirMake( filePath )
   provider.softLink( linkPath2, filePath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isHardLink( o );
   test.identical( got, false )
@@ -30339,7 +30339,7 @@ function isHardLink( test )
 
   test.case = 'text self cycled'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath, 'link ' + linkPath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath ) );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isHardLink( o );
   test.identical( got, false )
@@ -30351,8 +30351,8 @@ function isHardLink( test )
 
   test.case = 'text cycled'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath2, 'link ' + linkPath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath ) );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isHardLink( o );
   test.identical( got, false )
@@ -30667,7 +30667,7 @@ function isHardLink( test )
 
   test.case = 'soft to text to missing'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
   var got = provider.isHardLink( _.mapExtend( null, o ) );
@@ -30678,7 +30678,7 @@ function isHardLink( test )
 
   test.case = 'soft to text to missing'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
   var got = provider.isHardLink( _.mapExtend( null, o ) );
@@ -30691,7 +30691,7 @@ function isHardLink( test )
 
   test.case = 'soft to text to missing'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
   var got = provider.isHardLink( _.mapExtend( null, o ) );
@@ -30702,7 +30702,7 @@ function isHardLink( test )
   test.case = 'soft to text to terminal'
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
   var got = provider.isHardLink( _.mapExtend( null, o ) );
@@ -30714,7 +30714,7 @@ function isHardLink( test )
   test.case = 'soft to text to terminal'
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
   var got = provider.isHardLink( _.mapExtend( null, o ) );
@@ -30728,7 +30728,7 @@ function isHardLink( test )
   test.case = 'soft to text to terminal'
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
   var got = provider.isHardLink( _.mapExtend( null, o ) );
@@ -30742,7 +30742,7 @@ function isHardLink( test )
   test.case = 'soft to text to directory'
   provider.filesDelete( dirPath );
   provider.dirMake( filePath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
   var got = provider.isHardLink( _.mapExtend( null, o ) );
@@ -30754,7 +30754,7 @@ function isHardLink( test )
   test.case = 'soft to text to directory'
   provider.filesDelete( dirPath );
   provider.dirMake( filePath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
   var got = provider.isHardLink( _.mapExtend( null, o ) );
@@ -30768,7 +30768,7 @@ function isHardLink( test )
   test.case = 'soft to text to directory'
   provider.filesDelete( dirPath );
   provider.dirMake( filePath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
   var got = provider.isHardLink( _.mapExtend( null, o ) );
@@ -30872,7 +30872,7 @@ function isHardLink( test )
   // test.case = 'hardLink -> soft -> text -> terminal'
   // provider.filesDelete( dirPath );
   // provider.fileWrite( filePath,filePath );
-  // provider.fileWrite( linkPath3, 'link ' + filePath );
+  // provider.fileWrite( linkPath3, 'link ' + provider.path.localFromGlobal( filePath ));
   // provider.softLink( linkPath2, linkPath3 );
   // provider.hardLink( linkPath, linkPath2 );
   // var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
@@ -30887,7 +30887,7 @@ function isHardLink( test )
   // test.case = 'hardLink -> soft -> text -> terminal'
   // provider.filesDelete( dirPath );
   // provider.fileWrite( filePath,filePath );
-  // provider.fileWrite( linkPath3, 'link ' + filePath );
+  // provider.fileWrite( linkPath3, 'link ' + provider.path.localFromGlobal( filePath ));
   // provider.softLink( linkPath2, linkPath3 );
   // provider.hardLink( linkPath, linkPath2 );
   // var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
@@ -30902,7 +30902,7 @@ function isHardLink( test )
   // test.case = 'hardLink -> soft -> text -> terminal'
   // provider.filesDelete( dirPath );
   // provider.fileWrite( filePath,filePath );
-  // provider.fileWrite( linkPath3, 'link ' + filePath );
+  // provider.fileWrite( linkPath3, 'link ' + provider.path.localFromGlobal( filePath ));
   // provider.softLink( linkPath2, linkPath3 );
   // provider.hardLink( linkPath, linkPath2 );
   // var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
@@ -30958,7 +30958,7 @@ function isHardLink( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath,filePath);
   provider.hardLink({ dstPath : linkPath3, srcPath : filePath });
-  provider.fileWrite( linkPath2, 'link ' + linkPath3 )
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath3 ) )
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
   var got = provider.isHardLink( _.mapExtend( null, o ) );
@@ -30972,7 +30972,7 @@ function isHardLink( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath,filePath);
   provider.hardLink({ dstPath : linkPath3, srcPath : filePath });
-  provider.fileWrite( linkPath2, 'link ' + linkPath3 )
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath3 ) )
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
   var got = provider.isHardLink( _.mapExtend( null, o ) );
@@ -30987,7 +30987,7 @@ function isHardLink( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath,filePath);
   provider.hardLink({ dstPath : linkPath3, srcPath : filePath });
-  provider.fileWrite( linkPath2, 'link ' + linkPath3 )
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath3 ) )
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
   var got = provider.isHardLink( _.mapExtend( null, o ) );
@@ -31000,7 +31000,7 @@ function isHardLink( test )
 
   test.case = 'text to missing'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
   var got = provider.isHardLink( _.mapExtend( null, o ) );
   test.identical( got, false );
@@ -31009,7 +31009,7 @@ function isHardLink( test )
 
   test.case = 'text to missing'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
   var got = provider.isHardLink( _.mapExtend( null, o ) );
   test.identical( got, false );
@@ -31021,7 +31021,7 @@ function isHardLink( test )
 
   test.case = 'text to missing'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
   var got = provider.isHardLink( _.mapExtend( null, o ) );
   test.identical( got, false );
@@ -31031,7 +31031,7 @@ function isHardLink( test )
   test.case = 'text to terminal'
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath )
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
   var got = provider.isHardLink( _.mapExtend( null, o ) );
   test.identical( got, false )
@@ -31044,7 +31044,7 @@ function isHardLink( test )
   test.case = 'text to terminal'
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath )
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
   var got = provider.isHardLink( _.mapExtend( null, o ) );
   test.identical( got, false )
@@ -31057,7 +31057,7 @@ function isHardLink( test )
   test.case = 'text to terminal'
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath )
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
   var got = provider.isHardLink( _.mapExtend( null, o ) );
   test.identical( got, false )
@@ -31070,7 +31070,7 @@ function isHardLink( test )
   test.case = 'text to dir'
   provider.filesDelete( dirPath );
   provider.dirMake( filePath )
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
   var got = provider.isHardLink( _.mapExtend( null, o ) );
   test.identical( got, false )
@@ -31084,7 +31084,7 @@ function isHardLink( test )
   test.case = 'text to dir'
   provider.filesDelete( dirPath );
   provider.dirMake( filePath )
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
   var got = provider.isHardLink( _.mapExtend( null, o ) );
   test.identical( got, false )
@@ -31098,7 +31098,7 @@ function isHardLink( test )
   test.case = 'text to dir'
   provider.filesDelete( dirPath );
   provider.dirMake( filePath )
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
   var got = provider.isHardLink( _.mapExtend( null, o ) );
   test.identical( got, false )
@@ -31113,7 +31113,7 @@ function isHardLink( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath )
   provider.softLink( linkPath2, filePath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
   var got = provider.isHardLink( _.mapExtend( null, o ) );
   test.identical( got, false )
@@ -31127,7 +31127,7 @@ function isHardLink( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath )
   provider.softLink( linkPath2, filePath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
   var got = provider.isHardLink( _.mapExtend( null, o ) );
   test.identical( got, false )
@@ -31141,7 +31141,7 @@ function isHardLink( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath )
   provider.softLink( linkPath2, filePath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
   var got = provider.isHardLink( _.mapExtend( null, o ) );
   test.identical( got, false )
@@ -31184,8 +31184,8 @@ function isHardLink( test )
 
   test.case = 'text cycled'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath2, 'link ' + linkPath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath ) );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
   var got = provider.isHardLink( _.mapExtend( null, o ) );
   test.identical( got, false );
@@ -31194,8 +31194,8 @@ function isHardLink( test )
 
   test.case = 'text cycled'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath2, 'link ' + linkPath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath ) );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
   var got = provider.isHardLink( _.mapExtend( null, o ) );
   test.identical( got, false )
@@ -31207,8 +31207,8 @@ function isHardLink( test )
 
   test.case = 'text cycled'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath2, 'link ' + linkPath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath ) );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
   var got = provider.isHardLink( _.mapExtend( null, o ) );
   test.identical( got, false );
@@ -31359,7 +31359,7 @@ function isLink( test )
 
   test.case = 'soft to text to missing'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isLink( _.mapExtend( null, o ) );
@@ -31374,7 +31374,7 @@ function isLink( test )
   test.case = 'soft to text to terminal'
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isLink( _.mapExtend( null, o ) );
@@ -31389,7 +31389,7 @@ function isLink( test )
   test.case = 'soft to text to directory'
   provider.filesDelete( dirPath );
   provider.dirMake( filePath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isLink( _.mapExtend( null, o ) );
@@ -31445,7 +31445,7 @@ function isLink( test )
   // test.case = 'hardLink -> soft -> text -> terminal'
   // provider.filesDelete( dirPath );
   // provider.fileWrite( filePath,filePath );
-  // provider.fileWrite( linkPath3, 'link ' + filePath );
+  // provider.fileWrite( linkPath3, 'link ' + provider.path.localFromGlobal( filePath ));
   // provider.softLink( linkPath2, linkPath3 );
   // provider.hardLink( linkPath, linkPath2 );
   // var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
@@ -31462,7 +31462,7 @@ function isLink( test )
   // provider.filesDelete( dirPath );
   // provider.fileWrite( filePath,filePath );
   // provider.softLink( linkPath3, filePath );
-  // provider.fileWrite( linkPath2, 'link ' + linkPath3 );
+  // provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath3 ) );
   // provider.hardLink( linkPath, linkPath2 );
   // var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   // var got = provider.isLink( _.mapExtend( null, o ) );
@@ -31493,7 +31493,7 @@ function isLink( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath,filePath);
   provider.hardLink({ dstPath : linkPath3, srcPath : filePath });
-  provider.fileWrite( linkPath2, 'link ' + linkPath3 )
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath3 ) )
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isLink( _.mapExtend( null, o ) );
@@ -31507,7 +31507,7 @@ function isLink( test )
 
   test.case = 'text to missing'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isLink( _.mapExtend( null, o ) );
   test.identical( got, true );
@@ -31521,7 +31521,7 @@ function isLink( test )
   test.case = 'text to terminal'
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath )
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isLink( _.mapExtend( null, o ) );
   test.identical( got, true )
@@ -31535,7 +31535,7 @@ function isLink( test )
   test.case = 'text to dir'
   provider.filesDelete( dirPath );
   provider.dirMake( filePath )
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isLink( _.mapExtend( null, o ) );
   test.identical( got, true )
@@ -31550,7 +31550,7 @@ function isLink( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath )
   provider.softLink( linkPath2, filePath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isLink( _.mapExtend( null, o ) );
   test.identical( got, true )
@@ -31565,7 +31565,7 @@ function isLink( test )
   provider.filesDelete( dirPath );
   provider.dirMake( filePath )
   provider.softLink( linkPath2, filePath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isLink( _.mapExtend( null, o ) );
   test.identical( got, true )
@@ -31591,8 +31591,8 @@ function isLink( test )
 
   test.case = 'text cycled'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath2, 'link ' + linkPath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath ) );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isLink( _.mapExtend( null, o ) );
   test.identical( got, true )
@@ -31949,7 +31949,7 @@ function isLink( test )
 
   test.case = 'soft to text to missing'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
   var got = provider.isLink( _.mapExtend( null, o ) );
@@ -31963,7 +31963,7 @@ function isLink( test )
 
   test.case = 'soft to text to missing'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
   var got = provider.isLink( _.mapExtend( null, o ) );
@@ -31977,7 +31977,7 @@ function isLink( test )
 
   test.case = 'soft to text to missing'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
   var got = provider.isLink( _.mapExtend( null, o ) );
@@ -31988,7 +31988,7 @@ function isLink( test )
   test.case = 'soft to text to terminal'
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
   var got = provider.isLink( _.mapExtend( null, o ) );
@@ -32003,7 +32003,7 @@ function isLink( test )
   test.case = 'soft to text to terminal'
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
   var got = provider.isLink( _.mapExtend( null, o ) );
@@ -32018,7 +32018,7 @@ function isLink( test )
   test.case = 'soft to text to terminal'
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
   var got = provider.isLink( _.mapExtend( null, o ) );
@@ -32033,7 +32033,7 @@ function isLink( test )
   test.case = 'soft to text to directory'
   provider.filesDelete( dirPath );
   provider.dirMake( filePath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
   var got = provider.isLink( _.mapExtend( null, o ) );
@@ -32048,7 +32048,7 @@ function isLink( test )
   test.case = 'soft to text to directory'
   provider.filesDelete( dirPath );
   provider.dirMake( filePath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
   var got = provider.isLink( _.mapExtend( null, o ) );
@@ -32063,7 +32063,7 @@ function isLink( test )
   test.case = 'soft to text to directory'
   provider.filesDelete( dirPath );
   provider.dirMake( filePath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
   var got = provider.isLink( _.mapExtend( null, o ) );
@@ -32188,7 +32188,7 @@ function isLink( test )
   // test.case = 'hardLink -> soft -> text -> terminal'
   // provider.filesDelete( dirPath );
   // provider.fileWrite( filePath,filePath );
-  // provider.fileWrite( linkPath3, 'link ' + filePath );
+  // provider.fileWrite( linkPath3, 'link ' + provider.path.localFromGlobal( filePath ));
   // provider.softLink( linkPath2, linkPath3 );
   // provider.hardLink( linkPath, linkPath2 );
   // var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
@@ -32205,7 +32205,7 @@ function isLink( test )
   // test.case = 'hardLink -> soft -> text -> terminal'
   // provider.filesDelete( dirPath );
   // provider.fileWrite( filePath,filePath );
-  // provider.fileWrite( linkPath3, 'link ' + filePath );
+  // provider.fileWrite( linkPath3, 'link ' + provider.path.localFromGlobal( filePath ));
   // provider.softLink( linkPath2, linkPath3 );
   // provider.hardLink( linkPath, linkPath2 );
   // var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
@@ -32222,7 +32222,7 @@ function isLink( test )
   // test.case = 'hardLink -> soft -> text -> terminal'
   // provider.filesDelete( dirPath );
   // provider.fileWrite( filePath,filePath );
-  // provider.fileWrite( linkPath3, 'link ' + filePath );
+  // provider.fileWrite( linkPath3, 'link ' + provider.path.localFromGlobal( filePath ));
   // provider.softLink( linkPath2, linkPath3 );
   // provider.hardLink( linkPath, linkPath2 );
   // var o = { filePath : linkPath, resolvingTextLink :1, resolvingSoftLink : 1 };
@@ -32240,7 +32240,7 @@ function isLink( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath,filePath );
   provider.softLink( linkPath3, filePath );
-  provider.fileWrite( linkPath2, 'link ' + linkPath3 );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath3 ) );
   provider.hardLink( linkPath, linkPath2 );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
   var got = provider.isLink( _.mapExtend( null, o ) );
@@ -32257,7 +32257,7 @@ function isLink( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath,filePath );
   provider.softLink( linkPath3, filePath );
-  provider.fileWrite( linkPath2, 'link ' + linkPath3 );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath3 ) );
   provider.hardLink( linkPath, linkPath2 );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
   var got = provider.isLink( _.mapExtend( null, o ) );
@@ -32274,7 +32274,7 @@ function isLink( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath,filePath );
   provider.softLink( linkPath3, filePath );
-  provider.fileWrite( linkPath2, 'link ' + linkPath3 );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath3 ) );
   provider.hardLink( linkPath, linkPath2 );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
   var got = provider.isLink( _.mapExtend( null, o ) );
@@ -32339,7 +32339,7 @@ function isLink( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath,filePath);
   provider.hardLink({ dstPath : linkPath3, srcPath : filePath });
-  provider.fileWrite( linkPath2, 'link ' + linkPath3 )
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath3 ) )
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
   var got = provider.isLink( _.mapExtend( null, o ) );
@@ -32356,7 +32356,7 @@ function isLink( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath,filePath);
   provider.hardLink({ dstPath : linkPath3, srcPath : filePath });
-  provider.fileWrite( linkPath2, 'link ' + linkPath3 )
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath3 ) )
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
   var got = provider.isLink( _.mapExtend( null, o ) );
@@ -32373,7 +32373,7 @@ function isLink( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath,filePath);
   provider.hardLink({ dstPath : linkPath3, srcPath : filePath });
-  provider.fileWrite( linkPath2, 'link ' + linkPath3 )
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath3 ) )
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
   var got = provider.isLink( _.mapExtend( null, o ) );
@@ -32388,7 +32388,7 @@ function isLink( test )
 
   test.case = 'text to missing'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
   var got = provider.isLink( _.mapExtend( null, o ) );
   test.identical( got, false );
@@ -32397,7 +32397,7 @@ function isLink( test )
 
   test.case = 'text to missing'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
   var got = provider.isLink( _.mapExtend( null, o ) );
   test.identical( got, true );
@@ -32411,7 +32411,7 @@ function isLink( test )
 
   test.case = 'text to missing'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
   var got = provider.isLink( _.mapExtend( null, o ) );
   test.identical( got, false );
@@ -32421,7 +32421,7 @@ function isLink( test )
   test.case = 'text to terminal'
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath )
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
   var got = provider.isLink( _.mapExtend( null, o ) );
   test.identical( got, false )
@@ -32437,7 +32437,7 @@ function isLink( test )
   test.case = 'text to terminal'
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath )
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
   var got = provider.isLink( _.mapExtend( null, o ) );
   test.identical( got, true )
@@ -32452,7 +32452,7 @@ function isLink( test )
   test.case = 'text to terminal'
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath )
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
   var got = provider.isLink( _.mapExtend( null, o ) );
   test.identical( got, false )
@@ -32467,7 +32467,7 @@ function isLink( test )
   test.case = 'text to dir'
   provider.filesDelete( dirPath );
   provider.dirMake( filePath )
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
   var got = provider.isLink( _.mapExtend( null, o ) );
   test.identical( got, false )
@@ -32482,7 +32482,7 @@ function isLink( test )
   test.case = 'text to dir'
   provider.filesDelete( dirPath );
   provider.dirMake( filePath )
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
   var got = provider.isLink( _.mapExtend( null, o ) );
   test.identical( got, true )
@@ -32497,7 +32497,7 @@ function isLink( test )
   test.case = 'text to dir'
   provider.filesDelete( dirPath );
   provider.dirMake( filePath )
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
   var got = provider.isLink( _.mapExtend( null, o ) );
   test.identical( got, false )
@@ -32513,7 +32513,7 @@ function isLink( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath )
   provider.softLink( linkPath2, filePath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
   var got = provider.isLink( _.mapExtend( null, o ) );
   test.identical( got, true )
@@ -32529,7 +32529,7 @@ function isLink( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath )
   provider.softLink( linkPath2, filePath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
   var got = provider.isLink( _.mapExtend( null, o ) );
   test.identical( got, true )
@@ -32545,7 +32545,7 @@ function isLink( test )
   provider.filesDelete( dirPath );
   provider.fileWrite( filePath, filePath )
   provider.softLink( linkPath2, filePath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
   var got = provider.isLink( _.mapExtend( null, o ) );
   test.identical( got, false )
@@ -32561,7 +32561,7 @@ function isLink( test )
   provider.filesDelete( dirPath );
   provider.dirMake( filePath )
   provider.softLink( linkPath2, filePath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
   var got = provider.isLink( _.mapExtend( null, o ) );
   test.identical( got, true )
@@ -32577,7 +32577,7 @@ function isLink( test )
   provider.filesDelete( dirPath );
   provider.dirMake( filePath )
   provider.softLink( linkPath2, filePath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
   var got = provider.isLink( _.mapExtend( null, o ) );
   test.identical( got, true )
@@ -32593,7 +32593,7 @@ function isLink( test )
   provider.filesDelete( dirPath );
   provider.dirMake( filePath )
   provider.softLink( linkPath2, filePath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 1 };
   var got = provider.isLink( _.mapExtend( null, o ) );
   test.identical( got, false )
@@ -32639,8 +32639,8 @@ function isLink( test )
 
   test.case = 'text cycled'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath2, 'link ' + linkPath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath ) );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
   var got = provider.isLink( _.mapExtend( null, o ) );
   test.identical( got, true );
@@ -32649,8 +32649,8 @@ function isLink( test )
 
   test.case = 'text cycled'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath2, 'link ' + linkPath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath ) );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 1 };
   var got = provider.isLink( _.mapExtend( null, o ) );
   test.identical( got, true )
@@ -32664,8 +32664,8 @@ function isLink( test )
 
   test.case = 'text cycled'
   provider.filesDelete( dirPath );
-  provider.fileWrite( linkPath2, 'link ' + linkPath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath ) );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = { filePath : linkPath, resolvingTextLink : 1, resolvingSoftLink : 0 };
   var got = provider.isLink( _.mapExtend( null, o ) );
   test.identical( got, true );
@@ -34694,7 +34694,7 @@ function pathResolveLinkTailChain( test )
   test.case = 'textLink';
   provider.filesDelete( self.provider.path.dir( filePath ) );
   provider.fileWrite( filePath, filePath );
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
   var got = provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, filePath ] )
@@ -34925,8 +34925,8 @@ function pathResolveLinkTailChain( test )
   test.case = 'text-text-file';
   provider.filesDelete( self.provider.path.dir( filePath ) );
   provider.fileWrite( filePath, filePath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, linkPath2, filePath ] );
@@ -34935,8 +34935,8 @@ function pathResolveLinkTailChain( test )
   test.case = 'text-text-file, preservingRelative';
   provider.filesDelete( self.provider.path.dir( filePath ) );
   provider.fileWrite( filePath, filePath );
-  provider.fileWrite( linkPath2, 'link ' + filePath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( filePath ));
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, linkPath2, filePath ] );
@@ -34946,7 +34946,7 @@ function pathResolveLinkTailChain( test )
   provider.filesDelete( self.provider.path.dir( filePath ) );
   provider.fileWrite( filePath, filePath );
   provider.softLink( linkPath3, filePath );
-  provider.fileWrite( linkPath2, 'link ' + linkPath3 );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath3 ) );
   provider.softLink( linkPath, linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
   provider.pathResolveLinkTailChain( o );
@@ -34957,7 +34957,7 @@ function pathResolveLinkTailChain( test )
   provider.filesDelete( self.provider.path.dir( filePath ) );
   provider.fileWrite( filePath, filePath );
   provider.softLink( linkPath3, filePath );
-  provider.fileWrite( linkPath2, 'link ' + linkPath3 );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath3 ) );
   provider.softLink( linkPath, linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   provider.pathResolveLinkTailChain( o );
@@ -34967,9 +34967,9 @@ function pathResolveLinkTailChain( test )
   test.case = 'text-soft-text-file';
   provider.filesDelete( self.provider.path.dir( filePath ) );
   provider.fileWrite( filePath, filePath );
-  provider.fileWrite( linkPath3, 'link ' + filePath );
+  provider.fileWrite( linkPath3, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink( linkPath2, linkPath3 );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, linkPath2, linkPath3, filePath ] );
@@ -34978,9 +34978,9 @@ function pathResolveLinkTailChain( test )
   test.case = 'text-soft-text-file, preservingRelative';
   provider.filesDelete( self.provider.path.dir( filePath ) );
   provider.fileWrite( filePath, filePath );
-  provider.fileWrite( linkPath3, 'link ' + filePath );
+  provider.fileWrite( linkPath3, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.softLink( linkPath2, linkPath3 );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, linkPath2, linkPath3, filePath ] );
@@ -35016,7 +35016,7 @@ function pathResolveLinkTailChain( test )
   test.case = 'soft-hard-text-file';
   provider.filesDelete( self.provider.path.dir( filePath ) );
   provider.fileWrite( filePath, filePath );
-  provider.fileWrite( linkPath3, 'link ' + filePath );
+  provider.fileWrite( linkPath3, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.hardLink( linkPath2, linkPath3 );
   provider.softLink( linkPath, linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
@@ -35027,7 +35027,7 @@ function pathResolveLinkTailChain( test )
   test.case = 'relative soft-hard-text-file';
   provider.filesDelete( self.provider.path.dir( filePath ) );
   provider.fileWrite( filePath, filePath );
-  provider.fileWrite( linkPath3, 'link ' + filePath );
+  provider.fileWrite( linkPath3, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.hardLink( linkPath2, linkPath3 );
   provider.softLink( linkPath, provider.path.relative( linkPath, linkPath2 ) );
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 0 } );
@@ -35038,7 +35038,7 @@ function pathResolveLinkTailChain( test )
   test.case = 'relative soft-hard-text-file';
   provider.filesDelete( self.provider.path.dir( filePath ) );
   provider.fileWrite( filePath, filePath );
-  provider.fileWrite( linkPath3, 'link ' + filePath );
+  provider.fileWrite( linkPath3, 'link ' + provider.path.localFromGlobal( filePath ));
   provider.hardLink( linkPath2, linkPath3 );
   provider.softLink( linkPath, provider.path.relative( linkPath, linkPath2 ) );
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
@@ -35419,8 +35419,8 @@ function pathResolveLinkTailChain( test )
 
   test.case = 'cycle text link, throwing on'
   provider.filesDelete( self.provider.path.dir( filePath ) );
-  provider.fileWrite( linkPath2, 'link ' + linkPath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath ) );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissed : 1 } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath,linkPath2,linkPath, null ] );
@@ -35428,15 +35428,15 @@ function pathResolveLinkTailChain( test )
 
   test.case = 'cycle text link, throwing on'
   provider.filesDelete( self.provider.path.dir( filePath ) );
-  provider.fileWrite( linkPath2, 'link ' + linkPath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath ) );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissed : 0, allowingCycled : 0 } );
   test.shouldThrowError( () => provider.pathResolveLinkTailChain( o ) );
 
   test.case = 'cycle text link, throwing off'
   provider.filesDelete( self.provider.path.dir( filePath ) );
-  provider.fileWrite( linkPath2, 'link ' + linkPath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath ) );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0, allowingMissed : 1 } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath,linkPath2,linkPath, null ] );
@@ -35444,8 +35444,8 @@ function pathResolveLinkTailChain( test )
 
   test.case = 'cycle text link, throwing off'
   provider.filesDelete( self.provider.path.dir( filePath ) );
-  provider.fileWrite( linkPath2, 'link ' + linkPath );
-  provider.fileWrite( linkPath, 'link ' + linkPath2 );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath ) );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( linkPath2 ) );
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0, allowingMissed : 1 } );
   provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath,linkPath2,linkPath, null ] );
@@ -35453,7 +35453,7 @@ function pathResolveLinkTailChain( test )
 
   test.case = 'cycle soft text, throwing on'
   provider.filesDelete( self.provider.path.dir( filePath ) );
-  provider.fileWrite( linkPath2, 'link ' + linkPath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath ) );
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissed : 1 } );
   provider.pathResolveLinkTailChain( o );
@@ -35462,14 +35462,14 @@ function pathResolveLinkTailChain( test )
 
   test.case = 'cycle soft text, throwing on'
   provider.filesDelete( self.provider.path.dir( filePath ) );
-  provider.fileWrite( linkPath2, 'link ' + linkPath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath ) );
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissed : 0, allowingCycled : 0 } );
   test.shouldThrowError( () => provider.pathResolveLinkTailChain( o ) );
 
   test.case = 'cycle soft text, throwing off'
   provider.filesDelete( self.provider.path.dir( filePath ) );
-  provider.fileWrite( linkPath2, 'link ' + linkPath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath ) );
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0, allowingMissed : 1 } );
   provider.pathResolveLinkTailChain( o );
@@ -35478,7 +35478,7 @@ function pathResolveLinkTailChain( test )
 
   test.case = 'cycle soft text, throwing off'
   provider.filesDelete( self.provider.path.dir( filePath ) );
-  provider.fileWrite( linkPath2, 'link ' + linkPath );
+  provider.fileWrite( linkPath2, 'link ' + provider.path.localFromGlobal( linkPath ) );
   provider.softLink({ dstPath : linkPath, srcPath : linkPath2, allowingMissed : 1, makingDirectory : 1 });
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 0, allowingMissed : 0 } );
   provider.pathResolveLinkTailChain( o );
@@ -35538,7 +35538,7 @@ function pathResolveLinkTailChain( test )
   test.case = 'textLink';
   provider.filesDelete( self.provider.path.dir( filePath ) );
   provider.fileWrite( filePath, filePath );
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
   var got = provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, filePath ] )
@@ -35672,7 +35672,7 @@ function pathResolveLinkTailChain( test )
   test.case = 'textLink';
   provider.filesDelete( self.provider.path.dir( filePath ) );
   provider.fileWrite( filePath, filePath );
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
   var got = provider.pathResolveLinkTailChain( o );
   test.identical( o.result, [ linkPath, filePath ] )
@@ -36498,7 +36498,7 @@ function pathResolveSoftLink( test )
   test.case = 'textlink';
   provider.filesDelete( /*workDir*/testPath );
   provider.fileWrite( filePath, testData );
-  provider.fileWrite( linkPath, 'link ' + filePath );
+  provider.fileWrite( linkPath, 'link ' + provider.path.localFromGlobal( filePath ));
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
   var got = provider.pathResolveSoftLink( o );
   test.identical( got, linkPath );

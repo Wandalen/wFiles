@@ -48,9 +48,8 @@ function onSuiteEnd()
 function onRoutineEnd( test )
 {
   let context = this;
-  let provider = context.provider;
-  let hub = context.hub;
-  let path = context.provider.path;
+  let hub = context.hub || context.provider;
+  _.sure( hub instanceof _.FileProvider.Hub );
   _.sure( _.entityIdentical( _.mapKeys( hub.providersWithProtocolMap ), [ 'current' ] ), test.name, 'has not restored hub!' );
 }
 
@@ -180,10 +179,11 @@ function mustNotThrowError( test )
   test.case = 'mustNotThrowError must return con with message';
 
   var con = new _.Consequence().take( '123' );
-  test.mustNotThrowError( con )
+  return test.mustNotThrowError( con )
   .ifNoErrorThen( function( got )
   {
     test.identical( got, '123' );
+    return got;
   })
 
 }

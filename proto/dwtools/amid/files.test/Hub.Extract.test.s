@@ -56,7 +56,7 @@ function onSuiteBegin()
   self.providerEffective = _.FileProvider.Extract
   ({
     filesTree : filesTree,
-    protocols : [ 'extract' ],
+    protocols : [ 'current' ],
     usingExtraStat : 1
   });
   self.provider.providerRegister( self.providerEffective );
@@ -66,6 +66,13 @@ function onSuiteBegin()
   self.provider.UsingBigIntForStat = self.providerEffective.UsingBigIntForStat;
   // self.provider.defaultOrigin = self.providerEffective.originPath;
   // self.provider.defaultProtocol = self.providerEffective.protocol;
+}
+
+function onSuiteEnd()
+{ 
+  let self = this;
+  self.providerEffective.finit();
+  self.provider.finit();
 }
 
 // --
@@ -80,7 +87,8 @@ var Proto =
   silencing : 1,
   enabled : 1,
 
-  onSuiteBegin : onSuiteBegin,
+  onSuiteBegin,
+  onSuiteEnd,
 
   context :
   {

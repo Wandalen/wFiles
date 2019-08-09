@@ -147,6 +147,7 @@ function filesFind_pre( routine, args )
   if( Config.debug )
   {
 
+    _.assert( _.arrayHas( [ 'legacy', 'distinct' ], o.mode ), () => 'Unknown mode ' + _.strQuote( o.mode ) );
     _.assert( arguments.length === 2 );
     _.assert( 1 <= args.length && args.length <= 3 );
     _.assert( o.basePath === undefined );
@@ -163,7 +164,8 @@ function filesFind_pre( routine, args )
 
   if( o.recursive === null )
   {
-    if( o.distinct )
+    // if( o.distinct )
+    if( o.mode === 'distinct' )
     o.recursive = hasGlob ? 2 : 0;
     else
     o.recursive = hasGlob ? 2 : 1;
@@ -171,7 +173,7 @@ function filesFind_pre( routine, args )
 
   if( o.mandatory === null )
   {
-    if( o.distinct )
+    if( o.mode === 'distinct' )
     o.mandatory = hasGlob;
     else
     o.mandatory = false;
@@ -191,7 +193,7 @@ function filesFind_pre( routine, args )
 
   o.includingTerminals = !!o.includingTerminals;
 
-  if( o.distinct && o.includingDirs === null )
+  if( o.mode === 'distinct' && o.includingDirs === null )
   {
     o.includingDirs = !hasGlob;
   }
@@ -546,7 +548,7 @@ filesFindSingle_body.defaults =
   includingActual : 1,
   includingTransient : 0,
 
-  distinct : 0,
+  mode : 'legacy',
   mandatory : null,
   allowingMissed : 0,
   allowingCycled : 0,
@@ -887,6 +889,67 @@ defaults.includingTransient = 0;
  * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderFind#
  */
 
+// function filesFinder_functor( routine )
+// {
+//
+//   _.assert( arguments.length === 1 );
+//   _.assert( _.routineIs( routine ) );
+//   _.routineExtend( finder, routine );
+//   return finder;
+//
+//   function finder()
+//   {
+//     let self = this;
+//     let path = self.path;
+//     let op0 = self.filesFindLike_pre( arguments );
+//     _.assertMapHasOnly( op0, finder.defaults );
+//     return er;
+//
+//     function er()
+//     {
+//       let o = _.mapExtend( null, op0 );
+//       o.filter = self.recordFilter( o.filter );
+//       if( o.filePath )
+//       {
+//         o.filter.filePath = path.mapExtend( o.filter.filePath, o.filePath );
+//         o.filePath = null;
+//       }
+//
+//       for( let a = 0 ; a < arguments.length ; a++ )
+//       {
+//         let op2 = arguments[ a ];
+//
+//         if( !_.objectIs( op2 ) )
+//         op2 = { filePath : op2 }
+//
+//         op2.filter = self.recordFilter( op2.filter || Object.create( null ) );
+//
+//         if( op2.filePath )
+//         {
+//           op2.filter.filePath = path.mapExtend( op2.filter.filePath, op2.filePath );
+//           op2.filePath = null;
+//         }
+//
+//         o.filter.and( op2.filter );
+//         o.filter.pathsJoin( op2.filter );
+//
+//         op2.filter = o.filter;
+//         op2.filePath = o.filePath;
+//
+//         _.mapExtend( o, op2 );
+//
+//       }
+//
+//       return routine.call( self, o );
+//     }
+//
+//   }
+//
+// }
+//
+// let filesFinder = filesFinder_functor( filesFind );
+// let filesGlober = filesFinder_functor( filesGlob );
+
 function filesFinder_functor( routine )
 {
 
@@ -899,7 +962,6 @@ function filesFinder_functor( routine )
   {
     let self = this;
     let op0 = self.filesFindLike_pre( arguments );
-    // let op0 = self.filesFind.pre.call( self, self.filesFind, arguments );
     _.assertMapHasOnly( op0, finder.defaults );
     return er;
 
@@ -918,8 +980,6 @@ function filesFinder_functor( routine )
         op2.filter = op2.filter || Object.create( null );
         if( op2.filter.filePath === undefined )
         op2.filter.filePath = '.';
-        // if( op2.filter.basePath === undefined )
-        // op2.filter.basePath = '.';
 
         o.filter.and( op2.filter );
         o.filter.pathsJoin( op2.filter );
@@ -1053,7 +1113,7 @@ defaults.dst = null;
 defaults.sync = 1;
 defaults.throwing = null;
 defaults.recursive = 2;
-defaults.distinct = 1;
+defaults.mode = 'distinct';
 
 //
 

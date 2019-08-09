@@ -85,7 +85,6 @@ function regexpAllSafe( mask )
       /\.hg$/,
       /\.tmp($|\/)/,
       /\.DS_Store$/,
-      // /(^|\/)\.(?!$|\/|\.)/,
       /(^|\/)-/,
     ],
   });
@@ -102,6 +101,30 @@ function regexpAllSafe( mask )
 //
 
 function regexpTerminalSafe( mask )
+{
+
+  _.assert( arguments.length === 0 || arguments.length === 1 );
+
+  let excludeMask = _.RegexpObject
+  ({
+    excludeAny :
+    [
+      /\.DS_Store$/,
+    ],
+  });
+
+  if( mask )
+  {
+    mask = _.RegexpObject( mask || Object.create( null ), 'includeAny' );
+    excludeMask = excludeMask.and( mask );
+  }
+
+  return excludeMask;
+}
+
+//
+
+function regexpDirSafe( mask )
 {
 
   _.assert( arguments.length === 0 || arguments.length === 1 );
@@ -132,11 +155,10 @@ function filterSafer( filter )
 
   filter = filter || Object.create( null );
 
-  // filter.maskAll = filter.maskAll || Object.create( null );
-  // filter.maskTerminal = filter.maskTerminal || Object.create( null );
-
   filter.maskAll = _.files.regexpAllSafe( filter.maskAll );
   filter.maskTerminal = _.files.regexpTerminalSafe( filter.maskTerminal );
+  filter.maskDirectory = _.files.regexpDirSafe( filter.maskDirectory );
+  filter.maskTransientDirectory = _.files.regexpDirSafe( filter.maskTransientDirectory );
 
   return filter;
 }
@@ -513,6 +535,7 @@ let Proto =
   regexpMakeSafe : regexpAllSafe,
   regexpAllSafe,
   regexpTerminalSafe,
+  regexpDirSafe,
   filterSafer,
 
   _fileOptionsGet,

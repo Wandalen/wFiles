@@ -1,6 +1,6 @@
 ( function _Http_js_() {
 
-'use strict'; 
+'use strict';
 
 if( typeof module !== 'undefined' )
 {
@@ -36,7 +36,7 @@ _.assert( !_.FileProvider.Http );
 function init( o )
 {
   let self = this;
-  Parent.prototype.init.call( self,o );
+  Parent.prototype.init.call( self, o );
 }
 
 //
@@ -88,7 +88,7 @@ function statReadAct( o )
   let con;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertRoutineOptions( statReadAct,arguments );
+  _.assertRoutineOptions( statReadAct, arguments );
 
   /* */
 
@@ -175,7 +175,7 @@ statReadAct.having = Object.create( Parent.prototype.statReadAct.having );
  * @summary Reads content of a remote resourse performing GET request.
  * @description Accepts single argument - map with options. Expects that map `o` contains all necessary options and don't have redundant fields.
  * If `o.sync` is false, return instance of wConsequence, that gives a message with concent of a file when reading is finished.
- * 
+ *
  * @param {Object} o Options map.
  * @param {String} o.filePath Remote url.
  * @param {String} o.encoding Desired encoding of a file concent.
@@ -186,7 +186,7 @@ statReadAct.having = Object.create( Parent.prototype.statReadAct.having );
  * @param {String} o.advanced.method Which http method to use: 'GET' or 'POST'.
  * @param {String} o.advanced.user Username, is used in authorization
  * @param {String} o.advanced.password Password, is used in authorization
- * 
+ *
  * @function fileReadAct
  * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHttp#
 */
@@ -195,31 +195,27 @@ function fileReadAct( o )
 {
   let self = this;
   let con = _.Consequence();
-  let Reqeust,request,total,result;
+  let Reqeust, request, total, result;
 
-  // if( _.strIs( o ) )
-  // o = { filePath : o };
-
-  _.assertRoutineOptions( fileReadAct,arguments );
+  _.assertRoutineOptions( fileReadAct, arguments );
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.strIs( o.filePath ),'fileReadAct :','Expects {-o.filePath-}' );
-  _.assert( _.strIs( o.encoding ),'fileReadAct :','Expects {-o.encoding-}' );
-  // _.assert( !o.sync,'fileReadAct :','synchronous version is not implemented' );
+  _.assert( _.strIs( o.filePath ), 'fileReadAct :', 'Expects {-o.filePath-}' );
+  _.assert( _.strIs( o.encoding ), 'fileReadAct :', 'Expects {-o.encoding-}' );
 
   o.encoding = o.encoding.toLowerCase();
   let encoder = fileReadAct.encoders[ o.encoding ];
 
-  // advanced
+  /* advanced */
 
   if( !o.advanced )
   o.advanced = {};
 
-  _.mapComplement( o.advanced,fileReadAct.advanced );
-  _.assertMapHasOnly( o.advanced,fileReadAct.advanced );
+  _.mapComplement( o.advanced, fileReadAct.advanced );
+  _.assertMapHasOnly( o.advanced, fileReadAct.advanced );
 
   o.advanced.method = o.advanced.method.toUpperCase();
 
-  // http request
+  /* http request */
 
   if( typeof XMLHttpRequest !== 'undefined' )
   Reqeust = XMLHttpRequest;
@@ -229,6 +225,42 @@ function fileReadAct( o )
   {
     throw _.err( 'not implemented' );
   }
+
+  /* set */
+
+  request = o.request = new Reqeust();
+
+  if( !o.sync )
+  request.responseType = 'text';
+
+  request.addEventListener( 'progress', handleProgress );
+  request.addEventListener( 'load', handleEnd );
+  request.addEventListener( 'error', handleErrorEvent );
+  request.addEventListener( 'timeout', handleErrorEvent );
+  request.addEventListener( 'readystatechange', handleState );
+  request.open( o.advanced.method, o.filePath, !o.sync, o.advanced.user, o.advanced.password );
+  /*request.setRequestHeader( 'Content-type', 'application/octet-stream' );*/
+
+  handleBegin();
+
+  try
+  {
+    if( o.advanced && o.advanced.send !== null )
+    request.send( o.advanced.send );
+    else
+    request.send();
+  }
+  catch( err )
+  {
+    handleError( err );
+  }
+
+  if( o.sync )
+  return result;
+  else
+  return con;
+
+  /* - */
 
   /* handler */
 
@@ -245,9 +277,6 @@ function fileReadAct( o )
 
   function handleBegin()
   {
-
-    // if( o.encoding !== 'utf8' )
-    // debugger;
 
     if( encoder && encoder.onBegin )
     _.sure( encoder.onBegin.call( self, { operation : o, encoder : encoder }) === undefined );
@@ -292,7 +321,7 @@ function fileReadAct( o )
   function handleProgress( e )
   {
     console.debug( 'REMINDER : implement handleProgress' );
-    // not implemented well
+    /* qqq : not implemented well, please implement */
     if( e.lengthComputable )
     if( o.onProgress )
     _.Consequence.Take( o.onProgress,
@@ -314,11 +343,11 @@ function fileReadAct( o )
     {
       err = _._err
       ({
-        args : [ stack,'\nfileReadAct( ',o.filePath,' )\n',err ],
+        args : [ stack, '\nfileReadAct( ', o.filePath, ' )\n', err ],
         usingSourceCode : 0,
         level : 0,
       });
-      err = encoder.onError.call( self,{ error : err, operation : o, encoder : encoder })
+      err = encoder.onError.call( self, { error : err, operation : o, encoder : encoder })
     }
     catch( err2 )
     {
@@ -333,7 +362,7 @@ function fileReadAct( o )
 
   function handleErrorEvent( e )
   {
-    let err = _.err( 'Network error',e );
+    let err = _.err( 'Network error', e );
     return handleError( err );
   }
 
@@ -357,7 +386,7 @@ function fileReadAct( o )
       if( !total ) total = this.getResponseHeader( 'Content-Length' );
       total = Number( total ) || 1;
       if( isNaN( total ) ) return;
-      handleProgress( data.length / total,o );
+      handleProgress( data.length / total, o );
 
     }
     else if( this.readyState === 4 )
@@ -387,39 +416,6 @@ function fileReadAct( o )
 
   }
 
-  /* set */
-
-  request = o.request = new Reqeust();
-
-  if( !o.sync )
-  request.responseType = 'text';
-
-  request.addEventListener( 'progress', handleProgress );
-  request.addEventListener( 'load', handleEnd );
-  request.addEventListener( 'error', handleErrorEvent );
-  request.addEventListener( 'timeout', handleErrorEvent );
-  request.addEventListener( 'readystatechange', handleState );
-  request.open( o.advanced.method, o.filePath, !o.sync, o.advanced.user, o.advanced.password );
-  /*request.setRequestHeader( 'Content-type','application/octet-stream' );*/
-
-  handleBegin();
-
-  try
-  {
-    if( o.advanced && o.advanced.send !== null )
-    request.send( o.advanced.send );
-    else
-    request.send();
-  }
-  catch( err )
-  {
-    handleError( err );
-  }
-
-  if( o.sync )
-  return result;
-  else
-  return con;
 }
 
 fileReadAct.defaults = Object.create( Parent.prototype.fileReadAct.defaults );
@@ -447,7 +443,6 @@ encoders[ 'utf8' ] =
   responseType : 'text',
   onBegin : function( e )
   {
-    // e.operation.encoding = 'text';
   },
 
 }
@@ -458,7 +453,6 @@ encoders[ 'buffer.raw' ] =
   responseType : 'arraybuffer',
   onBegin : function( e )
   {
-    // e.operation.encoding = 'arraybuffer';
   },
 
 }
@@ -617,9 +611,9 @@ if( !_.FileProvider.Default )
 
 _.FileProvider[ Self.shortName ] = Self;
 
-if( typeof module !== 'undefined' )
-if( _global_.WTOOLS_PRIVATE )
-{ /* delete require.cache[ module.id ]; */ }
+// if( typeof module !== 'undefined' )
+// if( _global_.WTOOLS_PRIVATE )
+// { /* delete require.cache[ module.id ]; */ }
 
 if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = Self;

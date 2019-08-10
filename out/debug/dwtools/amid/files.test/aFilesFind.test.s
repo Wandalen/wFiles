@@ -11218,322 +11218,322 @@ function filesReflectGrab( test )
 
   /* */
 
-  // test.case = 'nothing to grab + prefix';
-  //
-  // var src = context.makeStandardExtract();
-  // src.originPath = 'extract+src://';
-  // src.providerRegisterTo( hub );
-  //
-  // var recipe =
-  // {
-  //   '/dir**' : true,
-  // }
-  //
-  // var records = hub.filesReflect
-  // ({
-  //   reflectMap : recipe,
-  //   src : { hubFileProvider : src },
-  //   dst : { hubFileProvider : provider, prefixPath : testPath },
-  //   mandatory : 0,
-  // });
-  // var found = provider.filesFindRecursive( testPath );
-  // src.finit();
-  // provider.filesDelete( testPath );
-  //
-  // var expectedDstRelative = [];
-  // var expectedSrcRelative = [];
-  // var expectedEffRelative = [];
-  // var expectedAction = [];
-  // var expectedAllow = [];
-  // var expectedPreserve = [];
-  //
-  // var dstRelative = _.select( records, '*/dst/relative' );
-  // var srcRelative = _.select( records, '*/src/relative' );
-  // var effRelative = _.select( records, '*/effective/relative' );
-  // var action = _.select( records, '*/action' );
-  // var allow = _.select( records, '*/allow' );
-  // var preserve = _.select( records, '*/preserve' );
-  //
-  // test.identical( dstRelative, expectedDstRelative );
-  // test.identical( srcRelative, expectedSrcRelative );
-  // test.identical( effRelative, expectedEffRelative );
-  // test.identical( action, expectedAction );
-  // test.identical( allow, expectedAllow );
-  // test.identical( preserve, expectedPreserve );
-  //
-  // /* */
-  //
-  // test.case = 'nothing to grab + dst';
-  //
-  // var src = context.makeStandardExtract();
-  // src.originPath = 'extract+src://';
-  // src.providerRegisterTo( hub );
-  //
-  // var recipe =
-  // {
-  //   '/dir**' : testPath,
-  // }
-  //
-  // var records = hub.filesReflect
-  // ({
-  //   reflectMap : recipe,
-  //   src : { hubFileProvider : src },
-  //   dst : { hubFileProvider : provider },
-  //   mandatory : 0,
-  // });
-  // var found = provider.filesFindRecursive( testPath );
-  // src.finit();
-  // provider.filesDelete( testPath );
-  //
-  // var expectedDstRelative = [];
-  // var expectedSrcRelative = [];
-  // var expectedEffRelative = [];
-  // var expectedAction = [];
-  // var expectedAllow = [];
-  // var expectedPreserve = [];
-  //
-  // var dstRelative = _.select( records, '*/dst/relative' );
-  // var srcRelative = _.select( records, '*/src/relative' );
-  // var effRelative = _.select( records, '*/effective/relative' );
-  // var action = _.select( records, '*/action' );
-  // var allow = _.select( records, '*/allow' );
-  // var preserve = _.select( records, '*/preserve' );
-  //
-  // test.identical( dstRelative, expectedDstRelative );
-  // test.identical( srcRelative, expectedSrcRelative );
-  // test.identical( effRelative, expectedEffRelative );
-  // test.identical( action, expectedAction );
-  // test.identical( allow, expectedAllow );
-  // test.identical( preserve, expectedPreserve );
-  //
-  // /* */
-  //
-  // test.case = 'trivial + src.basePath, dst null';
-  //
-  // var src = context.makeStandardExtract();
-  // src.originPath = 'extract+src://';
-  // src.providerRegisterTo( hub );
-  //
-  // var recipe =
-  // {
-  //   './src1/d**' : null,
-  //   './src2/d/**' : null,
-  // }
-  //
-  // var records = hub.filesReflect
-  // ({
-  //   reflectMap : recipe,
-  //   src : { hubFileProvider : src, basePath : '/' },
-  //   dst : { hubFileProvider : provider, prefixPath : testPath },
-  // });
-  //
-  // var found = provider.filesFindRecursive( testPath );
-  //
-  // src.finit();
-  // provider.filesDelete( testPath );
-  //
-  // var expectedDstRelative = [ './src1', './src1/d', './src1/d/a', './src1/d/b', './src1/d/c', './src2/d', './src2/d/a', './src2/d/b', './src2/d/c' ];
-  // var expectedSrcRelative = [ './src1', './src1/d', './src1/d/a', './src1/d/b', './src1/d/c', './src2/d', './src2/d/a', './src2/d/b', './src2/d/c' ];
-  // var expectedEffRelative = [ './src1', './src1/d', './src1/d/a', './src1/d/b', './src1/d/c', './src2/d', './src2/d/a', './src2/d/b', './src2/d/c' ];
-  // var expectedAction = [ 'dirMake', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy' ];
-  // var expectedAllow = [ true, true, true, true, true, true, true, true, true ];
-  // var expectedPreserve = [ false, false, false, false, false, false, false, false, false ];
-  //
-  // var dstRelative = _.select( records, '*/dst/relative' );
-  // var srcRelative = _.select( records, '*/src/relative' );
-  // var effRelative = _.select( records, '*/effective/relative' );
-  // var action = _.select( records, '*/action' );
-  // var allow = _.select( records, '*/allow' );
-  // var preserve = _.select( records, '*/preserve' );
-  //
-  // test.identical( dstRelative, expectedDstRelative );
-  // test.identical( srcRelative, expectedSrcRelative );
-  // test.identical( effRelative, expectedEffRelative );
-  // test.identical( action, expectedAction );
-  // test.identical( allow, expectedAllow );
-  // test.identical( preserve, expectedPreserve );
-  //
-  // test.case = 'trivial + src.basePath, dst true';
-  //
-  // var src = context.makeStandardExtract();
-  // src.originPath = 'extract+src://';
-  // src.providerRegisterTo( hub );
-  //
-  // var recipe =
-  // {
-  //   './src1/d**' : true,
-  //   './src2/d/**' : true,
-  // }
-  //
-  // debugger;
-  // var records = hub.filesReflect
-  // ({
-  //   reflectMap : recipe,
-  //   src : { hubFileProvider : src, basePath : '/' },
-  //   dst : { hubFileProvider : provider, prefixPath : testPath },
-  // });
-  // debugger;
-  //
-  // var found = provider.filesFindRecursive( testPath );
-  //
-  // src.finit();
-  // provider.filesDelete( testPath );
-  //
-  // var expectedDstRelative = [ './src1', './src1/d', './src1/d/a', './src1/d/b', './src1/d/c', './src2/d', './src2/d/a', './src2/d/b', './src2/d/c' ];
-  // var expectedSrcRelative = [ './src1', './src1/d', './src1/d/a', './src1/d/b', './src1/d/c', './src2/d', './src2/d/a', './src2/d/b', './src2/d/c' ];
-  // var expectedEffRelative = [ './src1', './src1/d', './src1/d/a', './src1/d/b', './src1/d/c', './src2/d', './src2/d/a', './src2/d/b', './src2/d/c' ];
-  // var expectedAction = [ 'dirMake', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy' ];
-  // var expectedAllow = [ true, true, true, true, true, true, true, true, true ];
-  // var expectedPreserve = [ false, false, false, false, false, false, false, false, false ];
-  //
-  // var dstRelative = _.select( records, '*/dst/relative' );
-  // var srcRelative = _.select( records, '*/src/relative' );
-  // var effRelative = _.select( records, '*/effective/relative' );
-  // var action = _.select( records, '*/action' );
-  // var allow = _.select( records, '*/allow' );
-  // var preserve = _.select( records, '*/preserve' );
-  //
-  // test.identical( dstRelative, expectedDstRelative );
-  // test.identical( srcRelative, expectedSrcRelative );
-  // test.identical( effRelative, expectedEffRelative );
-  // test.identical( action, expectedAction );
-  // test.identical( allow, expectedAllow );
-  // test.identical( preserve, expectedPreserve );
-  //
-  // /* */
-  //
-  // test.case = 'trivial + not defined src.basePath, did not exist';
-  //
-  // var src = context.makeStandardExtract();
-  // src.originPath = 'extract+src://';
-  // src.providerRegisterTo( hub );
-  //
-  // var recipe =
-  // {
-  //   './src1/d**' : true,
-  //   './src2/d/**' : true,
-  // }
-  //
-  // var records = hub.filesReflect
-  // ({
-  //   reflectMap : recipe,
-  //   src : { hubFileProvider : src, prefixPath : '/' },
-  //   dst : { hubFileProvider : provider, prefixPath : testPath },
-  // });
-  // var found = provider.filesFindRecursive( testPath );
-  // src.finit();
-  // provider.filesDelete( testPath );
-  //
-  // var expectedDstRelative = [ '.', './d', './d/a', './d/b', './d/c', '.', './a', './b', './c' ];
-  // var expectedSrcRelative = [ '.', './d', './d/a', './d/b', './d/c', '.', './a', './b', './c' ];
-  // var expectedEffRelative = [ '.', './d', './d/a', './d/b', './d/c', '.', './a', './b', './c' ];
-  // var expectedAction = [ 'dirMake', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy' ];
-  // var expectedAllow = [ true, true, true, true, true, true, true, true, true ];
-  // var expectedPreserve = [ false, false, false, false, false, true, false, false, false ];
-  //
-  // var dstRelative = _.select( records, '*/dst/relative' );
-  // var srcRelative = _.select( records, '*/src/relative' );
-  // var effRelative = _.select( records, '*/effective/relative' );
-  // var action = _.select( records, '*/action' );
-  // var allow = _.select( records, '*/allow' );
-  // var preserve = _.select( records, '*/preserve' );
-  //
-  // test.identical( dstRelative, expectedDstRelative );
-  // test.identical( srcRelative, expectedSrcRelative );
-  // test.identical( effRelative, expectedEffRelative );
-  // test.identical( action, expectedAction );
-  // test.identical( allow, expectedAllow );
-  // test.identical( preserve, expectedPreserve );
-  //
-  // /* */
-  //
-  // test.case = 'trivial + not defined src.basePath, did exist';
-  //
-  // var src = context.makeStandardExtract();
-  // src.originPath = 'extract+src://';
-  // src.providerRegisterTo( hub );
-  //
-  // var recipe =
-  // {
-  //   './src1/d**' : true,
-  //   './src2/d/**' : true,
-  // }
-  //
-  // provider.dirMake( testPath );
-  // var records = hub.filesReflect
-  // ({
-  //   reflectMap : recipe,
-  //   src : { hubFileProvider : src, prefixPath : '/' },
-  //   dst : { hubFileProvider : provider, prefixPath : testPath },
-  // });
-  // var found = provider.filesFindRecursive( testPath );
-  // src.finit();
-  // provider.filesDelete( testPath );
-  //
-  // var expectedDstRelative = [ '.', './d', './d/a', './d/b', './d/c', '.', './a', './b', './c' ];
-  // var expectedSrcRelative = [ '.', './d', './d/a', './d/b', './d/c', '.', './a', './b', './c' ];
-  // var expectedEffRelative = [ '.', './d', './d/a', './d/b', './d/c', '.', './a', './b', './c' ];
-  // var expectedAction = [ 'dirMake', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy' ];
-  // var expectedAllow = [ true, true, true, true, true, true, true, true, true ];
-  // var expectedPreserve = [ true, false, false, false, false, true, false, false, false ];
-  //
-  // var dstRelative = _.select( records, '*/dst/relative' );
-  // var srcRelative = _.select( records, '*/src/relative' );
-  // var effRelative = _.select( records, '*/effective/relative' );
-  // var action = _.select( records, '*/action' );
-  // var allow = _.select( records, '*/allow' );
-  // var preserve = _.select( records, '*/preserve' );
-  //
-  // test.identical( dstRelative, expectedDstRelative );
-  // test.identical( srcRelative, expectedSrcRelative );
-  // test.identical( effRelative, expectedEffRelative );
-  // test.identical( action, expectedAction );
-  // test.identical( allow, expectedAllow );
-  // test.identical( preserve, expectedPreserve );
-  //
-  // /* */
-  //
-  // test.case = 'trivial + URIs';
-  //
-  // var src = context.makeStandardExtract();
-  // src.originPath = 'extract+src://';
-  // src.providerRegisterTo( hub );
-  //
-  // var recipe =
-  // {
-  //   'extract+src:///src1/d**' : true,
-  //   'extract+src:///src2/d/**' : true,
-  // }
-  //
-  // var records = hub.filesReflect
-  // ({
-  //   reflectMap : recipe,
-  //   src : { basePath : '/' },
-  //   dst : { prefixPath : 'current://' + testPath },
-  // });
-  // src.finit();
-  // provider.filesDelete( testPath );
-  //
-  // var expectedDstRelative = [ './src1', './src1/d', './src1/d/a', './src1/d/b', './src1/d/c', './src2/d', './src2/d/a', './src2/d/b', './src2/d/c' ];
-  // var expectedSrcRelative = [ './src1', './src1/d', './src1/d/a', './src1/d/b', './src1/d/c', './src2/d', './src2/d/a', './src2/d/b', './src2/d/c' ];
-  // var expectedEffRelative = [ './src1', './src1/d', './src1/d/a', './src1/d/b', './src1/d/c', './src2/d', './src2/d/a', './src2/d/b', './src2/d/c' ];
-  // var expectedAction = [ 'dirMake', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy' ];
-  // var expectedAllow = [ true, true, true, true, true, true, true, true, true ];
-  // var expectedPreserve = [ false, false, false, false, false, false, false, false, false ];
-  //
-  // var dstRelative = _.select( records, '*/dst/relative' );
-  // var srcRelative = _.select( records, '*/src/relative' );
-  // var effRelative = _.select( records, '*/effective/relative' );
-  // var action = _.select( records, '*/action' );
-  // var allow = _.select( records, '*/allow' );
-  // var preserve = _.select( records, '*/preserve' );
-  //
-  // test.identical( dstRelative, expectedDstRelative );
-  // test.identical( srcRelative, expectedSrcRelative );
-  // test.identical( effRelative, expectedEffRelative );
-  // test.identical( action, expectedAction );
-  // test.identical( allow, expectedAllow );
-  // test.identical( preserve, expectedPreserve );
+  test.case = 'nothing to grab + prefix';
+
+  var src = context.makeStandardExtract();
+  src.originPath = 'extract+src://';
+  src.providerRegisterTo( hub );
+
+  var recipe =
+  {
+    '/dir**' : true,
+  }
+
+  var records = hub.filesReflect
+  ({
+    reflectMap : recipe,
+    src : { hubFileProvider : src },
+    dst : { hubFileProvider : provider, prefixPath : testPath },
+    mandatory : 0,
+  });
+  var found = provider.filesFindRecursive( testPath );
+  src.finit();
+  provider.filesDelete( testPath );
+
+  var expectedDstRelative = [];
+  var expectedSrcRelative = [];
+  var expectedEffRelative = [];
+  var expectedAction = [];
+  var expectedAllow = [];
+  var expectedPreserve = [];
+
+  var dstRelative = _.select( records, '*/dst/relative' );
+  var srcRelative = _.select( records, '*/src/relative' );
+  var effRelative = _.select( records, '*/effective/relative' );
+  var action = _.select( records, '*/action' );
+  var allow = _.select( records, '*/allow' );
+  var preserve = _.select( records, '*/preserve' );
+
+  test.identical( dstRelative, expectedDstRelative );
+  test.identical( srcRelative, expectedSrcRelative );
+  test.identical( effRelative, expectedEffRelative );
+  test.identical( action, expectedAction );
+  test.identical( allow, expectedAllow );
+  test.identical( preserve, expectedPreserve );
+
+  /* */
+
+  test.case = 'nothing to grab + dst';
+
+  var src = context.makeStandardExtract();
+  src.originPath = 'extract+src://';
+  src.providerRegisterTo( hub );
+
+  var recipe =
+  {
+    '/dir**' : testPath,
+  }
+
+  var records = hub.filesReflect
+  ({
+    reflectMap : recipe,
+    src : { hubFileProvider : src },
+    dst : { hubFileProvider : provider },
+    mandatory : 0,
+  });
+  var found = provider.filesFindRecursive( testPath );
+  src.finit();
+  provider.filesDelete( testPath );
+
+  var expectedDstRelative = [];
+  var expectedSrcRelative = [];
+  var expectedEffRelative = [];
+  var expectedAction = [];
+  var expectedAllow = [];
+  var expectedPreserve = [];
+
+  var dstRelative = _.select( records, '*/dst/relative' );
+  var srcRelative = _.select( records, '*/src/relative' );
+  var effRelative = _.select( records, '*/effective/relative' );
+  var action = _.select( records, '*/action' );
+  var allow = _.select( records, '*/allow' );
+  var preserve = _.select( records, '*/preserve' );
+
+  test.identical( dstRelative, expectedDstRelative );
+  test.identical( srcRelative, expectedSrcRelative );
+  test.identical( effRelative, expectedEffRelative );
+  test.identical( action, expectedAction );
+  test.identical( allow, expectedAllow );
+  test.identical( preserve, expectedPreserve );
+
+  /* */
+
+  test.case = 'trivial + src.basePath, dst null';
+
+  var src = context.makeStandardExtract();
+  src.originPath = 'extract+src://';
+  src.providerRegisterTo( hub );
+
+  var recipe =
+  {
+    './src1/d**' : null,
+    './src2/d/**' : null,
+  }
+
+  var records = hub.filesReflect
+  ({
+    reflectMap : recipe,
+    src : { hubFileProvider : src, basePath : '/' },
+    dst : { hubFileProvider : provider, prefixPath : testPath },
+  });
+
+  var found = provider.filesFindRecursive( testPath );
+
+  src.finit();
+  provider.filesDelete( testPath );
+
+  var expectedDstRelative = [ './src1', './src1/d', './src1/d/a', './src1/d/b', './src1/d/c', './src2/d', './src2/d/a', './src2/d/b', './src2/d/c' ];
+  var expectedSrcRelative = [ './src1', './src1/d', './src1/d/a', './src1/d/b', './src1/d/c', './src2/d', './src2/d/a', './src2/d/b', './src2/d/c' ];
+  var expectedEffRelative = [ './src1', './src1/d', './src1/d/a', './src1/d/b', './src1/d/c', './src2/d', './src2/d/a', './src2/d/b', './src2/d/c' ];
+  var expectedAction = [ 'dirMake', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy' ];
+  var expectedAllow = [ true, true, true, true, true, true, true, true, true ];
+  var expectedPreserve = [ false, false, false, false, false, false, false, false, false ];
+
+  var dstRelative = _.select( records, '*/dst/relative' );
+  var srcRelative = _.select( records, '*/src/relative' );
+  var effRelative = _.select( records, '*/effective/relative' );
+  var action = _.select( records, '*/action' );
+  var allow = _.select( records, '*/allow' );
+  var preserve = _.select( records, '*/preserve' );
+
+  test.identical( dstRelative, expectedDstRelative );
+  test.identical( srcRelative, expectedSrcRelative );
+  test.identical( effRelative, expectedEffRelative );
+  test.identical( action, expectedAction );
+  test.identical( allow, expectedAllow );
+  test.identical( preserve, expectedPreserve );
+
+  test.case = 'trivial + src.basePath, dst true';
+
+  var src = context.makeStandardExtract();
+  src.originPath = 'extract+src://';
+  src.providerRegisterTo( hub );
+
+  var recipe =
+  {
+    './src1/d**' : true,
+    './src2/d/**' : true,
+  }
+
+  debugger;
+  var records = hub.filesReflect
+  ({
+    reflectMap : recipe,
+    src : { hubFileProvider : src, basePath : '/' },
+    dst : { hubFileProvider : provider, prefixPath : testPath },
+  });
+  debugger;
+
+  var found = provider.filesFindRecursive( testPath );
+
+  src.finit();
+  provider.filesDelete( testPath );
+
+  var expectedDstRelative = [ './src1', './src1/d', './src1/d/a', './src1/d/b', './src1/d/c', './src2/d', './src2/d/a', './src2/d/b', './src2/d/c' ];
+  var expectedSrcRelative = [ './src1', './src1/d', './src1/d/a', './src1/d/b', './src1/d/c', './src2/d', './src2/d/a', './src2/d/b', './src2/d/c' ];
+  var expectedEffRelative = [ './src1', './src1/d', './src1/d/a', './src1/d/b', './src1/d/c', './src2/d', './src2/d/a', './src2/d/b', './src2/d/c' ];
+  var expectedAction = [ 'dirMake', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy' ];
+  var expectedAllow = [ true, true, true, true, true, true, true, true, true ];
+  var expectedPreserve = [ false, false, false, false, false, false, false, false, false ];
+
+  var dstRelative = _.select( records, '*/dst/relative' );
+  var srcRelative = _.select( records, '*/src/relative' );
+  var effRelative = _.select( records, '*/effective/relative' );
+  var action = _.select( records, '*/action' );
+  var allow = _.select( records, '*/allow' );
+  var preserve = _.select( records, '*/preserve' );
+
+  test.identical( dstRelative, expectedDstRelative );
+  test.identical( srcRelative, expectedSrcRelative );
+  test.identical( effRelative, expectedEffRelative );
+  test.identical( action, expectedAction );
+  test.identical( allow, expectedAllow );
+  test.identical( preserve, expectedPreserve );
+
+  /* */
+
+  test.case = 'trivial + not defined src.basePath, did not exist';
+
+  var src = context.makeStandardExtract();
+  src.originPath = 'extract+src://';
+  src.providerRegisterTo( hub );
+
+  var recipe =
+  {
+    './src1/d**' : true,
+    './src2/d/**' : true,
+  }
+
+  var records = hub.filesReflect
+  ({
+    reflectMap : recipe,
+    src : { hubFileProvider : src, prefixPath : '/' },
+    dst : { hubFileProvider : provider, prefixPath : testPath },
+  });
+  var found = provider.filesFindRecursive( testPath );
+  src.finit();
+  provider.filesDelete( testPath );
+
+  var expectedDstRelative = [ '.', './d', './d/a', './d/b', './d/c', '.', './a', './b', './c' ];
+  var expectedSrcRelative = [ '.', './d', './d/a', './d/b', './d/c', '.', './a', './b', './c' ];
+  var expectedEffRelative = [ '.', './d', './d/a', './d/b', './d/c', '.', './a', './b', './c' ];
+  var expectedAction = [ 'dirMake', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy' ];
+  var expectedAllow = [ true, true, true, true, true, true, true, true, true ];
+  var expectedPreserve = [ false, false, false, false, false, true, false, false, false ];
+
+  var dstRelative = _.select( records, '*/dst/relative' );
+  var srcRelative = _.select( records, '*/src/relative' );
+  var effRelative = _.select( records, '*/effective/relative' );
+  var action = _.select( records, '*/action' );
+  var allow = _.select( records, '*/allow' );
+  var preserve = _.select( records, '*/preserve' );
+
+  test.identical( dstRelative, expectedDstRelative );
+  test.identical( srcRelative, expectedSrcRelative );
+  test.identical( effRelative, expectedEffRelative );
+  test.identical( action, expectedAction );
+  test.identical( allow, expectedAllow );
+  test.identical( preserve, expectedPreserve );
+
+  /* */
+
+  test.case = 'trivial + not defined src.basePath, did exist';
+
+  var src = context.makeStandardExtract();
+  src.originPath = 'extract+src://';
+  src.providerRegisterTo( hub );
+
+  var recipe =
+  {
+    './src1/d**' : true,
+    './src2/d/**' : true,
+  }
+
+  provider.dirMake( testPath );
+  var records = hub.filesReflect
+  ({
+    reflectMap : recipe,
+    src : { hubFileProvider : src, prefixPath : '/' },
+    dst : { hubFileProvider : provider, prefixPath : testPath },
+  });
+  var found = provider.filesFindRecursive( testPath );
+  src.finit();
+  provider.filesDelete( testPath );
+
+  var expectedDstRelative = [ '.', './d', './d/a', './d/b', './d/c', '.', './a', './b', './c' ];
+  var expectedSrcRelative = [ '.', './d', './d/a', './d/b', './d/c', '.', './a', './b', './c' ];
+  var expectedEffRelative = [ '.', './d', './d/a', './d/b', './d/c', '.', './a', './b', './c' ];
+  var expectedAction = [ 'dirMake', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy' ];
+  var expectedAllow = [ true, true, true, true, true, true, true, true, true ];
+  var expectedPreserve = [ true, false, false, false, false, true, false, false, false ];
+
+  var dstRelative = _.select( records, '*/dst/relative' );
+  var srcRelative = _.select( records, '*/src/relative' );
+  var effRelative = _.select( records, '*/effective/relative' );
+  var action = _.select( records, '*/action' );
+  var allow = _.select( records, '*/allow' );
+  var preserve = _.select( records, '*/preserve' );
+
+  test.identical( dstRelative, expectedDstRelative );
+  test.identical( srcRelative, expectedSrcRelative );
+  test.identical( effRelative, expectedEffRelative );
+  test.identical( action, expectedAction );
+  test.identical( allow, expectedAllow );
+  test.identical( preserve, expectedPreserve );
+
+  /* */
+
+  test.case = 'trivial + URIs';
+
+  var src = context.makeStandardExtract();
+  src.originPath = 'extract+src://';
+  src.providerRegisterTo( hub );
+
+  var recipe =
+  {
+    'extract+src:///src1/d**' : true,
+    'extract+src:///src2/d/**' : true,
+  }
+
+  var records = hub.filesReflect
+  ({
+    reflectMap : recipe,
+    src : { basePath : '/' },
+    dst : { prefixPath : 'current://' + testPath },
+  });
+  src.finit();
+  provider.filesDelete( testPath );
+
+  var expectedDstRelative = [ './src1', './src1/d', './src1/d/a', './src1/d/b', './src1/d/c', './src2/d', './src2/d/a', './src2/d/b', './src2/d/c' ];
+  var expectedSrcRelative = [ './src1', './src1/d', './src1/d/a', './src1/d/b', './src1/d/c', './src2/d', './src2/d/a', './src2/d/b', './src2/d/c' ];
+  var expectedEffRelative = [ './src1', './src1/d', './src1/d/a', './src1/d/b', './src1/d/c', './src2/d', './src2/d/a', './src2/d/b', './src2/d/c' ];
+  var expectedAction = [ 'dirMake', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy' ];
+  var expectedAllow = [ true, true, true, true, true, true, true, true, true ];
+  var expectedPreserve = [ false, false, false, false, false, false, false, false, false ];
+
+  var dstRelative = _.select( records, '*/dst/relative' );
+  var srcRelative = _.select( records, '*/src/relative' );
+  var effRelative = _.select( records, '*/effective/relative' );
+  var action = _.select( records, '*/action' );
+  var allow = _.select( records, '*/allow' );
+  var preserve = _.select( records, '*/preserve' );
+
+  test.identical( dstRelative, expectedDstRelative );
+  test.identical( srcRelative, expectedSrcRelative );
+  test.identical( effRelative, expectedEffRelative );
+  test.identical( action, expectedAction );
+  test.identical( allow, expectedAllow );
+  test.identical( preserve, expectedPreserve );
 
   /* */
 
@@ -11550,14 +11550,12 @@ function filesReflectGrab( test )
     '**/b' : false,
   }
 
-  debugger;
   var records = hub.filesReflect
   ({
     reflectMap : recipe,
     src : { hubFileProvider : src, basePath : '/' },
     dst : { hubFileProvider : provider, prefixPath : testPath },
   });
-  debugger;
   src.finit();
   provider.filesDelete( testPath );
 
@@ -11581,9 +11579,6 @@ function filesReflectGrab( test )
   test.identical( action, expectedAction );
   test.identical( allow, expectedAllow );
   test.identical( preserve, expectedPreserve );
-
-  xxx
-  debugger; return; xxx
 
   /* */
 

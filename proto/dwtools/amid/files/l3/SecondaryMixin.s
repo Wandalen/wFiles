@@ -485,14 +485,27 @@ qqq :
 - make pre/body for the routine
 */
 
-function filesAreUpToDate2( o )
+function filesAreUpToDate2_pre( routine, args )
+{
+  var o = args[ 0 ];
+
+  _.assert( args.length === 1, 'Expects single argument' )
+  _.assert( arguments.length === 2 );
+  _.assert( !o.newer || _.dateIs( o.newer ) );
+
+  _.routineOptions( routine, o );
+
+  return o;
+}
+
+function filesAreUpToDate2_body( o )
 {
   let self = this;
   let factory = self.recordFactory({ allowingMissed : 1 });
 
-  _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( !o.newer || _.dateIs( o.newer ) );
-  _.routineOptions( filesAreUpToDate2, o );
+  // _.assert( arguments.length === 1, 'Expects single argument' );
+  // _.assert( !o.newer || _.dateIs( o.newer ) );
+  // _.routineOptions( filesAreUpToDate2, o );
 
   // debugger;
   // let srcFiles = self.recordFactory().recordsFiltered( o.src );
@@ -515,7 +528,7 @@ function filesAreUpToDate2( o )
     return +Infinity;
     if( !file.stat.mtime )
     return +Infinity;
-    return file.stat.mtime.getTime()
+    return file.stat.mtime.getTime();
   }).value;
 
   /* */
@@ -537,7 +550,7 @@ function filesAreUpToDate2( o )
     return -Infinity;
     if( !file.stat.mtime )
     return -Infinity;
-    return file.stat.mtime.getTime()
+    return file.stat.mtime.getTime();
   }).value;
 
   /* */
@@ -575,7 +588,7 @@ function filesAreUpToDate2( o )
 
 }
 
-filesAreUpToDate2.defaults =
+filesAreUpToDate2_body.defaults =
 {
   src : null,
   dst : null,
@@ -584,11 +597,13 @@ filesAreUpToDate2.defaults =
   // notOlder : null,
 }
 
-var having = filesAreUpToDate2.having = Object.create( null );
+var having = filesAreUpToDate2_body.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
 having.driving = 0;
+
+var filesAreUpToDate2 = _.routineFromPreAndBody( filesAreUpToDate2_pre, filesAreUpToDate2_body );
 
 //
 

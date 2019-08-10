@@ -326,10 +326,6 @@ function _preFilePathScalarWithProviderDefaults( routine, args )
   let self = this;
 
   let o = self._preFilePathScalarWithoutProviderDefaults.apply( self, arguments );
-
-  // if( o.verbosity === null )
-  // o.verbosity = _.numberClamp( self.verbosity - 4, 0, 9 );
-
   self._providerDefaultsApply( o );
 
   return o;
@@ -370,7 +366,6 @@ function _preFilePathVectorWithProviderDefaults( routine, args )
   let self = this;
 
   let o = self._preFilePathVectorWithoutProviderDefaults.apply( self, arguments );
-
   self._providerDefaultsApply( o );
 
   return o;
@@ -388,23 +383,13 @@ function _preFileFilterWithoutProviderDefaults( routine, args )
 
   let o = args[ 0 ];
 
-  // if( path.like( o ) )
-  // o = { src : path.from( o ) };
-  // else if( _.arrayIs( o ) )
-  // o = { src : path.s.from( o ) };
-  // else if( _.arrayIs( o.src ) )
-  // o.src = path.s.from( o.src );
-
   _.routineOptions( routine, o );
-  // _.assert( path.s.allAreAbsolute( o.src.filePath ), () => 'Expects absolute path {-o.src.filePath-}' );
 
   o.src = self.recordFilter( o.src );
-  // o.src.prefixPath = o.src.prefixPath || path.current();
 
   if( o.dst !== undefined && o.dst !== null )
   {
     o.dst = self.recordFilter( o.dst );
-    // o.dst.prefixPath = o.dst.prefixPath || path.current();
     o.src.pairWithDst( o.dst );
   }
 
@@ -460,10 +445,6 @@ function _preSrcDstPathWithProviderDefaults( routine, args )
   let self = this;
 
   let o = self._preSrcDstPathWithoutProviderDefaults.apply( self, arguments );
-
-  // if( o.verbosity === null )
-  // o.verbosity = _.numberClamp( self.verbosity - 4, 0, 9 );
-
   self._providerDefaultsApply( o );
 
   return o;
@@ -2112,17 +2093,34 @@ statResolvedRead.defaults.resolvingTextLink = null;
 
 /*
 qqq : split pre / body
+Dmytro : split routine. Create simple ( smoke ) test routines filesSize().
 */
 
-function filesSize( o )
+function filesSize_pre( routine, args )
 {
-  let self = this;
-  o = o || Object.create( null );
+  let o = args[ 0 ] || Object.create( null );
+
+  _.assert( arguments.length === 2 );
+  _.assert( args.length === 1, 'Expects single argument' );
+  _.assert( _.strIs( o ) || _.arrayIs( o ) || _.mapIs( o ) );
 
   if( _.strIs( o ) || _.arrayIs( o ) )
   o = { filePath : o };
 
-  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.routineOptions( routine, o );
+
+  return o;
+}
+
+function filesSize_body( o )
+{
+  let self = this;
+  // o = o || Object.create( null );
+  //
+  // if( _.strIs( o ) || _.arrayIs( o ) )
+  // o = { filePath : o };
+  //
+  // _.assert( arguments.length === 1, 'Expects single argument' );
 
   o.filePath = _.arrayAs( o.filePath );
 
@@ -2140,18 +2138,69 @@ function filesSize( o )
   return result;
 }
 
-var having = filesSize.having = Object.create( null );
+_.routineExtend( filesSize_body, statResolvedRead );
+// filesSize_body.defaults =
+// {
+//   filePath : null,
+// };
+
+var having = filesSize_body.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
 having.driving = 0;
 
-var operates = filesSize.operates = Object.create( null );
+var operates = filesSize_body.operates = Object.create( null );
+
+let filesSize = _.routineFromPreAndBody( filesSize_pre, filesSize_body );
 
 //
 
+/**
+ * Return file size in bytes. For symbolic links return false. If onEnd callback
+ * is defined, method returns instance of wConsequence.
+ *
+ * @param {string|Object} o - object or path string
+ * @param {string} o.filePath - path to file
+ * @param {Function} [o.onBegin] - callback that invokes before calculation size.
+ * @param {Function} o.onEnd - this callback invoked in end of pathCurrent js event
+ * loop and accepts file size as argument.
+ *
+ * @example
+ * let path = 'tmp/fileSize/data4',
+ * bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] ), // size 4
+ * bufferData2 = Buffer.from( [ 0x07, 0x06, 0x05 ] ); // size 3
+ *
+ * wTools.fileWrite( { filePath : path, data : bufferData1 } );
+ *
+ * let size1 = wTools.fileSize( path );
+ * console.log(size1); // 4
+ *
+ * let con = wTools.fileSize
+ * ({
+ *   filePath : path,
+ *   onEnd : function( size )
+ *   {
+ *     console.log( size ); // 7
+ *   }
+ * });
+ *
+ * wTools.fileWrite( { filePath : path, data : bufferData2, append : 1 } );
+ *
+ * @method fileSize
+ * @returns {number|boolean|wConsequence}
+ * @throws {Error} If passed less or more than one argument.
+ * @throws {Error} If passed unexpected parameter in o.
+ * @throws {Error} If filePath is not string.
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial#
+ *
+ */
+
 /*
 qqq : extend test, check cases when does not exist, check throwing option
+Dmytro : extended test routine. Throwing option is checked. Async mode is used.
+         Description of routine has callback onEnd, but now it is not used because
+         _.routineFromPreAndBody check srcMap and screenMap in assert.
 */
 
 function fileSize_body( o )
@@ -2179,6 +2228,12 @@ var having = fileSize_body.having;
 having.driving = 0;
 having.aspect = 'body';
 having.hubRedirecting = 0;
+
+let fileSize = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, fileSize_body );
+
+fileSize.having.aspect = 'entry';
+
+_.assert( fileSize.having.hubRedirecting === 0 );
 
 //
 
@@ -3595,50 +3650,6 @@ operates.ins2 = { pathToRead : 1 };
 
 let filesAreSame = _.routineFromPreAndBody( filesAreSame_pre, filesAreSame_body );
 filesAreSame.having.aspect = 'entry';
-
-//
-
-/**
- * Return file size in bytes. For symbolic links return false. If onEnd callback is defined, method returns instance
-    of wConsequence.
- * @example
- * let path = 'tmp/fileSize/data4',
-     bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] ), // size 4
-     bufferData2 = Buffer.from( [ 0x07, 0x06, 0x05 ] ); // size 3
-
-   wTools.fileWrite( { filePath : path, data : bufferData1 } );
-
-   let size1 = wTools.fileSize( path );
-   console.log(size1); // 4
-
-   let con = wTools.fileSize( {
-     filePath : path,
-     onEnd : function( size )
-     {
-       console.log( size ); // 7
-     }
-   } );
-
-   wTools.fileWrite( { filePath : path, data : bufferData2, append : 1 } );
-
- * @param {string|Object} o o object or path string
- * @param {string} o.filePath path to file
- * @param {Function} [o.onBegin] callback that invokes before calculation size.
- * @param {Function} o.onEnd this callback invoked in end of pathCurrent js event loop and accepts file size as
-    argument.
- * @returns {number|boolean|wConsequence}
- * @throws {Error} If passed less or more than one argument.
- * @throws {Error} If passed unexpected parameter in o.
- * @throws {Error} If filePath is not string.
- * @method fileSize
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial#
- */
-
-let fileSize = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, fileSize_body );
-
-fileSize.having.aspect = 'entry';
-
-_.assert( fileSize.having.hubRedirecting === 0 );
 
 //
 
@@ -5121,7 +5132,11 @@ dirMakeForFile.having.aspect = 'entry';
 function _link_pre( routine, args )
 {
   let self = this;
-  let o = self._preSrcDstPathWithProviderDefaults.apply( self, arguments );
+  // let o = self._preSrcDstPathWithProviderDefaults.apply( self, arguments );
+
+  let o = self._preSrcDstPathWithoutProviderDefaults.apply( self, arguments );
+  self._providerDefaultsApply( o );
+
   _.mapSupplementNulls( o, routine.defaults );
   return o;
 }
@@ -7221,7 +7236,10 @@ function filesAreLinked_pre( routine, args )
 
   _.assert( _.mapIs( o ) );
 
-  o = self._preFilePathVectorWithProviderDefaults.call( self, routine, [ o ] );
+  // o = self._preFilePathVectorWithProviderDefaults.call( self, routine, [ o ] );
+
+  o = self._preFilePathVectorWithoutProviderDefaults.call( self, routine, [ o ] );
+  self._providerDefaultsApply( o );
 
   return o;
 }
@@ -7628,10 +7646,12 @@ let Proto =
   _fileOptionsGet,
   _providerDefaultsApply,
   assertProviderDefaults,
+
   _preFilePathScalarWithoutProviderDefaults,
   _preFilePathScalarWithProviderDefaults,
   _preFilePathVectorWithoutProviderDefaults,
   _preFilePathVectorWithProviderDefaults,
+
   _preFileFilterWithoutProviderDefaults,
   _preFileFilterWithProviderDefaults,
   _preSrcDstPathWithoutProviderDefaults,

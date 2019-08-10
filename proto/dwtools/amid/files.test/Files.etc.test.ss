@@ -52,7 +52,7 @@ function createTestFile( path, data, decoding )
   var dataToWrite = ( decoding === 'json' ) ? JSON.stringify( data ) : data;
   // File.createFileSync( _.path.join( testSuitePath, path ) );
   // dataToWrite && File.writeFileSync( _.path.join( testSuitePath, path ), dataToWrite );
-  _.fileProvider.fileWrite({ filePath : _.path.join( testSuitePath, path ), data : dataToWrite })
+  _.fileProvider.fileWrite({ filePath : _.path.join( testSuitePath, path ), data : dataToWrite });
 }
 
 //
@@ -347,7 +347,833 @@ function _fileOptionsGet( test ) {
       _.fileProvider._fileOptionsGet.call( defaultContextObj, path3, wrongOptions );
     } );
   }
+}
+
+//
+
+/*
+qqq : rewrite test routine for filesNewer, filesOlder. coverage should be Good
+*/
+
+function filesNewer( test )
+{
+  /* files creation */
+
+  var file1 = 'tmp.tmp/filesNewer/test1',
+      file2 = 'tmp.tmp/filesNewer/test2',
+      file3 = 'tmp.tmp/filesNewer/test3',
+      file4 = 'tmp.tmp/filesNewer/test4';
+
+  var delay = _.fileProvider.systemBitrateTimeGet() / 1000;
+
+  createTestFile( file1, 'test1' );
+  waitSync( delay );
+  createTestFile( file2, 'test2' );
+  waitSync( delay );
+  createTestFile( file3, 'test3' );
+
+  file1 = mergePath( file1 );
+  file2 = mergePath( file2 );
+  file3 = mergePath( file3 );
+
+  file1 = _.fileProvider.path.nativize( file1 );
+  file2 = _.fileProvider.path.nativize( file2 );
+  file3 = _.fileProvider.path.nativize( file3 );
+
+  /* tests */
+
+  test.case = 'two files created at different time';
+  var got = _.files.filesNewer( file1, file2 );
+  test.identical( got, file2 );
+
+  test.case = 'one files modified after creation';
+  _.fileProvider.fileTimeSet( file1, _.timeNow(), _.timeNow() );
+  var got = _.files.filesNewer( file2, file1 );
+  test.identical( got, file1 );
+
+  test.case = 'two files modified at the same time';
+  let timeSet = _.timeNow();
+  _.fileProvider.fileTimeSet( file1, timeSet, timeSet );
+  _.fileProvider.fileTimeSet( file2, timeSet, timeSet );
+  var got = _.files.filesNewer( file1, file2 );
+  test.identical( got, null );
+
+  var con = _.timeOut( 50 );
+  con.finally( () =>
+  {
+    createTestFile( file4, 'test4' );
+    file4 = mergePath( file4 );
+    file4 = _.fileProvider.path.nativize( file4 );
+    test.case = 'two files created at different time, async test';
+    var got = _.files.filesNewer( file3, file4 );
+    test.identical( got, file4 );
+    return null;
+  });
+
+  if( Config.debug )
+  {
+    test.case = 'missed arguments';
+    test.shouldThrowErrorSync( () => _.files.filesNewer() );
+
+    test.case = 'extra arguments';
+    var path = 'tmp.tmp/s.txt';
+    test.shouldThrowErrorSync( () => _.files.filesNewer( path, path, path ) );
+
+    test.case = 'one argument is missed';
+    var path = 'tmp.tmp'
+    test.shouldThrowErrorSync( () => _.files.filesNewer( path, path + '/file' ) );
+    test.shouldThrowErrorSync( () => _.files.filesNewer( path + '/file', path ) );
+
+    test.case = 'type of arguments is not file.Stat or string';
+    test.shouldThrowErrorSync( () => _.files.filesNewer( null, '/tmp.tmp/s.txt' ) );
+    test.shouldThrowErrorSync( () => _.files.filesNewer( 'tmp.tmp', [ 'tmp.tmp' ] ) );
+    test.shouldThrowErrorSync( () => _.files.filesNewer( [ file1 ], [ file2 ] ) );
+  }
+
+  return con;
+}
+
+//
+
+function filesOlder( test )
+{
+  /* files creation */
+
+  var file1 = 'tmp.tmp/filesOlder/test1',
+      file2 = 'tmp.tmp/filesOlder/test2',
+      file3 = 'tmp.tmp/filesOlder/test3',
+      file4 = 'tmp.tmp/filesOlder/test4';
+
+  var delay = _.fileProvider.systemBitrateTimeGet() / 1000;
+
+  createTestFile( file1, 'test1' );
+  waitSync( delay );
+  createTestFile( file2, 'test2' );
+  waitSync( delay );
+  createTestFile( file3, 'test3' );
+
+  file1 = mergePath( file1 );
+  file2 = mergePath( file2 );
+  file3 = mergePath( file3 );
+
+  file1 = _.fileProvider.path.nativize( file1 );
+  file2 = _.fileProvider.path.nativize( file2 );
+  file3 = _.fileProvider.path.nativize( file3 );
+
+  /* tests */
+
+  test.case = 'two files created at different time';
+  var got = _.files.filesOlder( file1, file2 );
+  test.identical( got, file1 );
+
+  test.case = 'one files modified after creation';
+  _.fileProvider.fileTimeSet( file1, _.timeNow(), _.timeNow() );
+  var got = _.files.filesOlder( file2, file1 );
+  test.identical( got, file2 );
+
+  test.case = 'two files modified at the same time';
+  let timeSet = _.timeNow();
+  _.fileProvider.fileTimeSet( file1, timeSet, timeSet );
+  _.fileProvider.fileTimeSet( file2, timeSet, timeSet );
+  var got = _.files.filesOlder( file1, file2 );
+  test.identical( got, null );
+
+  var con = _.timeOut( 50 );
+  con.finally( () =>
+  {
+    createTestFile( file4, 'test4' );
+    file4 = mergePath( file4 );
+    file4 = _.fileProvider.path.nativize( file4 );
+    test.case = 'two files created at different time, async test';
+    var got = _.files.filesOlder( file3, file4 );
+    test.identical( got, file3 );
+    return null;
+  });
+
+  if( Config.debug )
+  {
+    test.case = 'missed arguments';
+    test.shouldThrowErrorSync( () => _.files.filesOlder() );
+
+    test.case = 'extra arguments';
+    var path = 'tmp.tmp/s.txt';
+    test.shouldThrowErrorSync( () => _.files.filesOlder( path, path, path ) );
+
+    test.case = 'one argument is missed';
+    var path = 'tmp.tmp'
+    test.shouldThrowErrorSync( () => _.files.filesOlder( path, path + '/file' ) );
+    test.shouldThrowErrorSync( () => _.files.filesOlder( path + '/file', path ) );
+
+    test.case = 'type of arguments is not file.Stat or string';
+    test.shouldThrowErrorSync( () => _.files.filesOlder( null, '/tmp.tmp/s.txt' ) );
+    test.shouldThrowErrorSync( () => _.files.filesOlder( 'tmp.tmp', [ 'tmp.tmp' ] ) );
+    test.shouldThrowErrorSync( () => _.files.filesOlder( [ file1 ], [ file2 ] ) );
+  }
+
+  return con;
+}
+
+//
+
+function filesSpectre( test )
+{
+  var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+    textData2 = ' Aenean non feugiat mauris',
+
+    testChecks = [
+
+      {
+        name : 'file with empty content',
+        path : 'tmp.tmp/filesSpectre/sample.txt',
+        type : 'f',
+        createResource : '',
+        expected :
+        {
+          length : 0
+        }
+      },
+      {
+        name : 'text file 1',
+        path : 'tmp.tmp/filesSpectre/some.txt',
+        type : 'f',
+        createResource : textData1,
+        expected :
+        {
+          L : 1,
+          o : 4,
+          r : 3,
+          e : 5,
+          m : 3,
+          ' ' : 7,
+          i : 6,
+          p : 2,
+          s : 4,
+          u : 2,
+          d : 2,
+          l : 2,
+          t : 5,
+          a : 2,
+          ',' : 1,
+          c : 3,
+          n : 2,
+          g : 1,
+          '.' : 1,
+          length : 56
+        }
+      },
+      {
+        name : 'text file 2',
+        path : 'tmp.tmp/filesSpectre/text1.txt',
+        type : 'f',
+        createResource : textData2,
+        expected :
+        {
+          ' ' : 4,
+          A : 1,
+          e : 3,
+          n : 4,
+          a : 3,
+          o : 1,
+          f : 1,
+          u : 2,
+          g : 1,
+          i : 2,
+          t : 1,
+          m : 1,
+          r : 1,
+          s : 1,
+          length : 26
+        }
+      }
+    ];
+
+  createTestResources( testChecks )
+
+  // regular tests
+  for( let testCheck of testChecks )
+  {
+    // join several test aspects together
+
+    let path = _.path.resolve( mergePath( testCheck.path ) ),
+      got;
+
+    test.description = testCheck.name;
+
+    try
+    {
+      got = _.files.filesSpectre( path );
+    }
+    catch( err )
+    {
+      _.errLogOnce( err );
+    }
+
+    var expected = testCheck.expected;
+
+    if( _.objectLike( expected ) )
+    {
+      var result = new U32x( 257 );
+      result[ 256 ] = expected.length;
+
+      delete expected.length;
+
+      for( var k in expected )
+      {
+        result[ k.charCodeAt() ] = expected[ k ];
+      }
+
+      expected = result;
+    }
+
+    test.identical( got, expected );
+  }
+
+  // exception tests
+
+  if( Config.debug )
+  {
+    test.description = 'missed arguments';
+    test.shouldThrowErrorSync( function( )
+    {
+      _.files.filesSpectre( );
+    } );
+
+    test.description = 'extra arguments';
+    test.shouldThrowErrorSync( function( )
+    {
+      _.files.filesSpectre( 'tmp.tmp/filesSame/text1.txt', 'tmp.tmp/filesSame/text2.txt' );
+    } );
+  }
 };
+
+//
+
+// function filesSimilarity( test )
+// {
+//   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+//     textData2 = ' Aenean non feugiat mauris',
+//     bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] ),
+//     bufferData2 = Buffer.from( [ 0x07, 0x06, 0x05 ] ),
+//
+//     testChecks = [
+//
+//       {
+//         name : 'two different files with empty content',
+//         path : [ 'tmp.tmp/filesSimilarity/empty1.txt', 'tmp.tmp/filesSimilarity/empty2.txt' ],
+//         type : 'f',
+//         createResource : '',
+//         expected : 1
+//       },
+//       {
+//         name : 'same text file',
+//         path : [ 'tmp.tmp/filesSimilarity/same_text.txt', 'tmp.tmp/filesSimilarity/same_text.txt' ],
+//         type : 'f',
+//         createResource : textData1,
+//         expected : 1
+//       },
+//       {
+//         name : 'files with identical text content',
+//         path : [ 'tmp.tmp/filesSimilarity/identical_text1.txt', 'tmp.tmp/filesSimilarity/identical_text2.txt' ],
+//         type : 'f',
+//         createResource : textData1,
+//         expected : 1
+//       },
+//       {
+//         name : 'files with identical binary content',
+//         path : [ 'tmp.tmp/filesSimilarity/identical2', 'tmp.tmp/filesSimilarity/identical2.txt' ],
+//         type : 'f',
+//         createResource : bufferData1,
+//         expected : 1
+//       },
+//       {
+//         name : 'files with identical content',
+//         path : [ 'tmp.tmp/filesSimilarity/identical3', 'tmp.tmp/filesSimilarity/identical4' ],
+//         type : 'f',
+//         createResource : bufferData2,
+//         expected : 1
+//       },
+//       {
+//         name : 'files with non identical text content',
+//         path : [ 'tmp.tmp/filesSimilarity/identical_text3.txt', 'tmp.tmp/filesSimilarity/identical_text4.txt' ],
+//         type : 'f',
+//         createResource : [ textData1, textData2 ],
+//         expected : 0.375
+//       },
+//       {
+//         name : 'files with non identical binary content',
+//         path : [ 'tmp.tmp/filesSimilarity/noidentical1', 'tmp.tmp/filesSimilarity/noidentical2' ],
+//         type : 'f',
+//         createResource : [ bufferData1, bufferData2 ],
+//         expected : 0
+//       },
+//       {
+//         name : 'file and symlink to file',
+//         path : [ 'tmp.tmp/filesSimilarity/testsymlink', 'tmp.tmp/filesSimilarity/testfile' ],
+//         type : 'sf',
+//         createResource :  bufferData1,
+//         expected : 1
+//       },
+//       // undefined behavior
+//       // {
+//       //   name : 'not existing path',
+//       //   path : [ 'tmp.tmp/filesSimilarity/nofile1', 'tmp.tmp/filesSimilarity/noidentical2' ],
+//       //   type : 'na',
+//       //   expected : NaN
+//       // }
+//     ];
+//
+//   createTestResources( testChecks );
+//
+//   // regular tests
+//   for( let testCheck of testChecks )
+//   {
+//     // join several test aspects together
+//
+//     let path1 = _.path.resolve( mergePath( testCheck.path[0] ) ),
+//       path2 = _.path.resolve( mergePath( testCheck.path[1] ) ),
+//       got;
+//
+//     test.case = testCheck.name;
+//
+//     try
+//     {
+//       got = _.filesSimilarity( { src1 : path1, src2 : path2 });
+//     }
+//     catch( err )
+//     {
+//       _.errLog( err );
+//     }
+//     test.identical( got, testCheck.expected );
+//   }
+//
+//   // exception tests
+//
+//   if( Config.debug )
+//   {
+//     test.case = 'missed arguments';
+//     test.shouldThrowErrorSync( function( )
+//     {
+//       _.filesSimilarity( );
+//     } );
+//   }
+// };
+//
+
+function filesSimilarity( test )
+{
+  var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+    textData2 = ' Aenean non feugiat mauris',
+    bufferData1 = new Uint8Array( [ 0x01, 0x02, 0x03, 0x04 ] ),
+    bufferData2 = new Uint8Array( [ 0x07, 0x06, 0x05 ] ),
+
+    testChecks = [
+
+      {
+        name : 'two different files with empty content',
+        path : [ 'tmp.tmp/filesSimilarity/empty1.txt', 'tmp.tmp/filesSimilarity/empty2.txt' ],
+        type : 'f',
+        createResource : '',
+        expected : NaN
+      },
+      {
+        name : 'same text file',
+        path : [ 'tmp.tmp/filesSimilarity/same_text.txt', 'tmp.tmp/filesSimilarity/same_text.txt' ],
+        type : 'f',
+        createResource : textData1,
+        expected : 1
+      },
+      {
+        name : 'files with identical text content',
+        path : [ 'tmp.tmp/filesSimilarity/identical_text1.txt', 'tmp.tmp/filesSimilarity/identical_text2.txt' ],
+        type : 'f',
+        createResource : textData1,
+        expected : 1
+      },
+      {
+        name : 'files with identical binary content',
+        path : [ 'tmp.tmp/filesSimilarity/identical2', 'tmp.tmp/filesSimilarity/identical2.txt' ],
+        type : 'f',
+        createResource : bufferData1,
+        expected : 1
+      },
+      {
+        name : 'files with identical content',
+        path : [ 'tmp.tmp/filesSimilarity/identical3', 'tmp.tmp/filesSimilarity/identical4' ],
+        type : 'f',
+        createResource : bufferData2,
+        expected : 1
+      },
+      {
+        name : 'files with non identical text content',
+        path : [ 'tmp.tmp/filesSimilarity/identical_text3.txt', 'tmp.tmp/filesSimilarity/identical_text4.txt' ],
+        type : 'f',
+        createResource : [ textData1, textData2 ],
+        expected : 0.10714285714285715
+      },
+      {
+        name : 'files with non identical binary content',
+        path : [ 'tmp.tmp/filesSimilarity/noidentical1', 'tmp.tmp/filesSimilarity/noidentical2' ],
+        type : 'f',
+        createResource : [ bufferData1, bufferData2 ],
+        expected : 0
+      },
+      {
+        name : 'file and symlink to file',
+        path : [ 'tmp.tmp/filesSimilarity/testsymlink', 'tmp.tmp/filesSimilarity/testfile' ],
+        type : 'sf',
+        createResource :  bufferData1,
+        expected : 1
+      },
+      // undefined behavior
+      // {
+      //   name : 'not existing path',
+      //   path : [ 'tmp.tmp/filesSimilarity/nofile1', 'tmp.tmp/filesSimilarity/noidentical2' ],
+      //   type : 'na',
+      //   expected : NaN
+      // }
+    ];
+
+  createTestResources( testChecks );
+
+  // regular tests
+  for( let testCheck of testChecks )
+  {
+    // join several test aspects together
+
+    let path1 = _.path.resolve( mergePath( testCheck.path[0] ) ),
+      path2 = _.path.resolve( mergePath( testCheck.path[1] ) ),
+      got;
+
+    test.description = testCheck.name;
+
+    try
+    {
+      got = _.files.filesSimilarity( { src1 : path1, src2 : path2 });
+    }
+    catch( err )
+    {
+      _.errLog( err );
+    }
+    test.identical( got, testCheck.expected );
+  }
+
+  // exception tests
+
+  if( Config.debug )
+  {
+    test.description = 'missed arguments';
+    test.shouldThrowErrorSync( function( )
+    {
+      _.files.filesSimilarity( );
+    } );
+  }
+};
+
+//
+
+// function filesSize( test )
+// {
+//   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+//     textData2 = ' Aenean non feugiat mauris',
+//     bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] ),
+//     bufferData2 = Buffer.from( [ 0x07, 0x06, 0x05 ] ),
+//     testChecks =
+//     [
+//       {
+//         name : 'read empty text file',
+//         data : '',
+//         path : 'tmp.tmp/rtext1.txt',
+//         expected :
+//         {
+//           error : null,
+//           content : '',
+//         },
+//         createResource : '',
+//         readOptions : fileReadOptions0
+//       },
+//       {
+//         name : 'read text from file',
+//         createResource : textData1,
+//         path : 'tmp.tmp/text2.txt',
+//         expected :
+//         {
+//           error : null,
+//           content : textData1,
+//         },
+//         readOptions : fileReadOptions0
+//       },
+//       {
+//         name : 'read text from file 2',
+//         createResource : textData2,
+//         path : 'tmp.tmp/text3.txt',
+//         expected :
+//         {
+//           error : null,
+//           content : textData2,
+//         },
+//         readOptions : fileReadOptions1
+//       },
+//       {
+//         name : 'read buffer from file',
+//         createResource : bufferData1,
+//         path : 'tmp.tmp/data0',
+//         expected :
+//         {
+//           error : null,
+//           content : bufferData1,
+//         },
+//         readOptions : fileReadOptions2
+//       },
+//
+//       {
+//         name : 'read buffer from file 2',
+//         createResource : bufferData2,
+//         path : 'tmp.tmp/data2',
+//         expected :
+//         {
+//           error : null,
+//           content : bufferData2,
+//         },
+//         readOptions : fileReadOptions3
+//       },
+//
+//       {
+//         name : 'read json from file',
+//         createResource : dataToJSON1,
+//         path : 'tmp.tmp/jason1.json',
+//         expected :
+//         {
+//           error : null,
+//           content : dataToJSON1,
+//         },
+//         readOptions : fileReadOptions4
+//       },
+//       {
+//         name : 'read json from file 2',
+//         createResource : dataToJSON2,
+//         path : 'tmp.tmp/json2.json',
+//         expected :
+//         {
+//           error : null,
+//           content : dataToJSON2,
+//         },
+//         readOptions : fileReadOptions5
+//       },
+//     ];
+//
+//
+//
+//   // regular tests
+//   for( let testCheck of testChecks )
+//   {
+//     // join several test aspects together
+//     let path = mergePath( testCheck.path );
+//
+//     // clear
+//     // File.existsSync( path ) && File.removeSync( path );
+//     if( _.fileProvider.statResolvedRead( path ) )
+//     _.fileProvider.fileDelete( path );
+//
+//     // prepare to write if need
+//     testCheck.createResource !== undefined
+//     && createTestFile( testCheck.path, testCheck.createResource, testCheck.readOptions.encoding );
+//
+//     var o = _.mapExtend( null, testCheck.readOptions, { filePath : path } );
+//     // let got = _.fileProvider.fileReadSync( path, testCheck.readOptions );
+//     let got = _.fileProvider.fileReadSync( o );
+//
+//     if( got instanceof ArrayBuffer )
+//     {
+//       //got = Buffer.from( got );
+//     //   got = toBuffer( got );
+//       got = _.bufferNodeFrom( got );
+//     }
+//
+//     test.description = testCheck.name;
+//     test.identical( got, testCheck.expected.content );
+//   }
+//
+//   // exception tests
+//
+//   if( Config.debug )
+//   {
+//     test.description = 'missed arguments';
+//     test.shouldThrowErrorSync( function( )
+//     {
+//       _.fileProvider.fileReadSync( );
+//     } );
+//
+//     test.description = 'passed unexpected property in options';
+//     test.shouldThrowErrorSync( function( )
+//     {
+//       _.fileProvider.fileReadSync( wrongReadOptions0 );
+//     } );
+//
+//     test.description = 'filePath is not defined';
+//     test.shouldThrowErrorSync( function( )
+//     {
+//      _.fileProvider.fileReadSync( { encoding : 'json' } );
+//     } );
+//
+//   }
+//
+// };
+
+function filesSize( test )
+{
+  /* file creation */
+
+  var file1 = 'tmp.tmp/filesAreUpToDate/src/test1',
+      file2 = 'tmp.tmp/filesAreUpToDate/dst/test2',
+      file3 = 'tmp.tmp/filesAreUpToDate/src/test3',
+      file4 = 'tmp.tmp/filesAreUpToDate/dst/test4';
+
+  var delay = _.fileProvider.systemBitrateTimeGet() / 1000;
+
+  createTestFile( file1, 'test1, any text' );
+  waitSync( delay );
+  createTestFile( file2, 'test2' );
+  waitSync( delay );
+  createTestFile( file3, 'test3' );
+
+  file1 = mergePath( file1 );
+  file2 = mergePath( file2 );
+  file3 = mergePath( file3 );
+
+  file1 = _.fileProvider.path.nativize( file1 );
+  file2 = _.fileProvider.path.nativize( file2 );
+  file3 = _.fileProvider.path.nativize( file3 );
+
+  /* - */
+
+  test.case = 'string in arg';
+  var got = _.fileProvider.filesSize( file2 );
+  test.equivalent( got, 5 );
+
+  test.case = 'array in arg';
+  var got = _.fileProvider.filesSize( [ file1, file2, file3 ] );
+  test.equivalent( got, 25 );
+
+  test.case = 'map options, one file';
+  var got = _.fileProvider.filesSize( { filePath : file1 } );
+  test.equivalent( got, 15 );
+
+  test.case = 'map options, aray';
+  var got = _.fileProvider.filesSize( { filePath : [ file1, file2, file3 ] } );
+  test.equivalent( got, 25 );
+
+  if( !Config.debug )
+  return;
+
+  test.case = 'without arguments';
+  test.shouldThrowErrorSync( () => _.fileProvider.filesSize() );
+
+  test.case = 'extra arguments';
+  test.shouldThrowErrorSync( () => _.fileProvider.filesSize( file1, file2, file3 ) );
+
+  test.case = 'wrong arguments';
+  test.shouldThrowErrorSync( () => _.fileProvider.filesSize( 1 ) );
+}
+
+//
+
+function fileSize( test )
+{
+  /* file creation */
+
+  var file1 = 'tmp.tmp/fileSize/test1',
+      file2 = 'tmp.tmp/fileSize/test2',
+      file3 = 'tmp.tmp/fileSize/test3';
+
+  var delay = _.fileProvider.systemBitrateTimeGet() / 1000;
+
+  createTestFile( file1, 'test1, any text' );
+  waitSync( delay );
+  createTestFile( file2, 'test2' );
+
+  file1 = mergePath( file1 );
+  file2 = mergePath( file2 );
+
+  file1 = _.fileProvider.path.nativize( file1 );
+  file2 = _.fileProvider.path.nativize( file2 );
+
+  /* asynchronous file creation */
+
+  let fileCreate = _.timeOut( 10, function()
+  {
+    createTestFile( file3, 'test3, any text' );
+    file3 = mergePath( file3 );
+    file3 = _.fileProvider.path.nativize( file3 );
+  });
+
+  /* - */
+
+  test.case = 'string path in arg';
+  var got = _.fileProvider.fileSize( file1 );
+  test.equivalent( got, 15 );
+
+  test.case = 'map in arg';
+  var got = _.fileProvider.fileSize( { filePath : file2 } );
+  test.equivalent( got, 5 );
+
+  test.case = 'file is dir';
+  var got = _.fileProvider.fileSize( { filePath : _.path.current() } );
+  test.equivalent( got, 0 );
+
+  /* - */
+
+  test.case = 'throwing : 0, stat === null';
+  var map =
+  {
+    filePath : '/string',
+    throwing : 0,
+  }
+  var got = _.fileProvider.fileSize( map );
+  test.equivalent( got, null );
+
+  test.case = 'asynchronous file creation test';
+  let check1 = _.timeOut( 0, function()
+  {
+    if( Config.debug )
+    test.shouldThrowErrorSync( () => _.fileProvider.fileSize( file3 ) );
+  });
+  let check2 = _.timeOut( 50, function()
+  {
+    var got = _.fileProvider.fileSize( file3 );
+    test.identical( got, 15 );
+  });
+
+  /* - */
+
+  if( !Config.debug )
+  return;
+
+  test.case = 'without arguments';
+  test.shouldThrowErrorSync( () => _.fileProvider.fileSize() );
+
+  test.case = 'extra arguments';
+  test.shouldThrowErrorSync( () => _.fileProvider.fileSize( file1, file1 ) );
+
+  test.case = 'throwing : 1, stats === null';
+  var map =
+  {
+    filePath : '/string',
+    throwing : 1,
+  }
+  test.shouldThrowErrorSync( () => _.fileProvider.fileSize( map ) );
+
+  test.case = 'wrong argument';
+  test.shouldThrowErrorSync( () => _.fileProvider.fileSize( 1 ) );
+  test.shouldThrowErrorSync( () => _.fileProvider.fileSize( [ file1 ] ) );
+
+  test.case = 'unnecessary field in map';
+  var map =
+  {
+    filePath : file1,
+    onUp : () => 0,
+  }
+  test.shouldThrowErrorSync( () => _.fileProvider.fileSize( map ) );
+}
 
 //
 
@@ -967,7 +1793,6 @@ function _fileOptionsGet( test ) {
 //     } );
 
 //   }
-
 // };
 
 //
@@ -977,7 +1802,6 @@ function _fileOptionsGet( test ) {
 
 //   var wrongReadOptions0 =
 //     {
-
 //       silent : 0,
 
 //       filePath : 'tmp.tmp/text2.txt',
@@ -1656,1114 +2480,8 @@ function _fileOptionsGet( test ) {
 //   // }
 // };
 //
-// function filesLink( test )
-// {
-//   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-//     textData2 = ' Aenean non feugiat mauris',
-//     bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] ),
-//
-//     testChecks = [
-//       {
-//         name : 'create link to text file with same path',
-//         path : 'tmp.tmp/filesLink/same_text.txt',
-//         link : 'tmp.tmp/filesLink/same_text.txt',
-//         type : 'f',
-//         createResource : textData1,
-//         expected : { result : true, isExists : true, err : false, ishard : false }
-//       },
-//       {
-//         name : 'link to file with text content',
-//         path : [ 'tmp.tmp/filesLink/identical_text1.txt', 'tmp.tmp/filesLink/identical_text2.txt' ],
-//         link : 'tmp.tmp/filesLink/identical_text2.txt',
-//         type : 'f',
-//         createResource : textData2,
-//         expected : { result : true, isExists : true, err : false, ishard : true }
-//       },
-//       {
-//         name : 'link to file with binary content',
-//         path : 'tmp.tmp/filesLink/identical1',
-//         link : 'tmp.tmp/filesLink/identical2',
-//         type : 'f',
-//         createResource : bufferData1,
-//         expected : { result : true, isExists : true, err : false, ishard : true }
-//       },
-//       {
-//         name : 'not existing path',
-//         path : 'tmp.tmp/filesLink/nofile1',
-//         link : 'tmp.tmp/filesLink/linktonofile',
-//         type : 'na',
-//         expected : { result : false, isExists : false, err : true, ishard : false }
-//       },
-//
-//       {
-//         name : 'try to create hard link to folder',
-//         path : 'tmp.tmp/fileHardlink/folder',
-//         link : 'tmp.tmp/fileHardlink/hard_folder',
-//         type : 'd',
-//         expected : { result : false, isExists : false, err : true, ishard : false }
-//       },
-//
-//     ];
-//
-//   createTestResources( testChecks );
-//
-//   function checkHardLink( link, src )
-//   {
-//     link = _.path.resolve( link );
-//     src = _.path.resolve( src );
-//     // var statLink = File.lstatSync( link ),
-//     var statLink = _.fileProvider.statResolvedRead({ filePath : link, resolvingSoftLink : 0 }),
-//       // statSource = File.lstatSync( src );
-//       statSource = _.fileProvider.statResolvedRead({ filePath : src, resolvingSoftLink : 0 })
-//
-//     if ( !statLink || !statSource ) return false; // both files should be exists
-//     if ( statSource.nlink !== 2 ) return false;
-//     if ( statLink.ino !== statSource.ino ) return false; // both names should be associated with same file on device.
-//
-//     // File.unlinkSync( link );
-//     _.fileProvider.fileDelete( link );
-//     statSource = _.fileProvider.statResolvedRead({ filePath : src, resolvingSoftLink : 0 });
-//
-//     if ( statSource.nlink !== 1 ) return false;
-//
-//     return true;
-//   }
-//
-//   // regular tests
-//   for( let testCheck of testChecks )
-//   {
-//     // join several test aspects together
-//
-//     let file = Array.isArray( testCheck.path) ? mergePath( testCheck.path[0] ) : mergePath( testCheck.path ),
-//       link = mergePath( testCheck.link ),
-//       got = { result : false, isExists : false, ishard : false, err : false };
-//
-//     test.case = testCheck.name;
-//
-//     try
-//     {
-//       got.result = _.fileProvider.hardLink({ dstPath :  link, srcPath : file, sync : 1 });
-//       // got.isExists = File.existsSync(  _.path.resolve( link ) );
-//       got.isExists = !!_.fileProvider.statResolvedRead(  _.path.resolve( link ) );
-//       got.ishard = checkHardLink( link, file );
-//     }
-//     catch( err )
-//     {
-//       _.errLog( err );
-//       got.err = true;
-//     }
-//     finally
-//     {
-//       got.err = !!got.err;
-//       got.ishard = !!got.ishard;
-//       test.identical( got, testCheck.expected );
-//     }
-//   }
-//
-//   // exception tests
-//
-//   if( Config.debug )
-//   {
-//     test.case = 'missed arguments';
-//     test.shouldThrowErrorSync( function( )
-//     {
-//       _.fileProvider.hardLink( );
-//     } );
-//
-//     test.case = 'extra arguments';
-//     test.shouldThrowErrorSync( function( )
-//     {
-//       _.fileProvider.hardLink( 'tmp.tmp/filesLink/identical1', 'tmp.tmp/filesLink/same_text.txt', 'tmp.tmp/filesLink/same_text.txt' );
-//     } );
-//
-//     test.case = 'argumetns is not string';
-//     test.shouldThrowErrorSync( function( )
-//     {
-//       _.fileProvider.hardLink( 34, {} );
-//     } );
-//
-//     test.case = 'passed unexpected property';
-//     test.shouldThrowErrorSync( function( )
-//     {
-//       _.fileProvider.hardLink( {
-//         dstPath : 'tmp.tmp/fileHardlink/src1',
-//         srcPath : 'tmp.tmp/fileHardlink/hard_text.txt',
-//         dir : 'tmp.tmp/fileHardlink'
-//       } );
-//     } );
-//   }
-//
-// };
-//
-// function filesNewer( test )
-// {
-//   var file1 = 'tmp.tmp/filesNewer/test1',
-//     file2 = 'tmp.tmp/filesNewer/test2',
-//     file3 = 'tmp.tmp/filesNewer/test3';
-//
-//   createTestFile( file1, 'test1' );
-//   createTestFile( file2, 'test2' );
-//
-//   file1 = mergePath( file1 );
-//   file2 = mergePath( file2 );
-//
-//   file1 = _.fileProvider.path.nativize( file1 );
-//   file2 = _.fileProvider.path.nativize( file2 );
-//
-//   test.case = 'two files created at different time';
-//   var got = _.filesNewer( file1, file2 );
-//   test.identical( got, file2 );
-//
-//   var con = _.timeOut( 50 );
-//   con.finally( ( ) =>
-//   {
-//     createTestFile( file3, 'test3' );
-//     file3 = mergePath( file3 );
-//     file3 = _.fileProvider.path.nativize( file3 );
-//
-//     test.case = 'two files created at different time';
-//     var got = _.filesNewer( file1, file3 );
-//     test.identical( got, file3 );
-//   });
-//
-//   if( Config.debug )
-//   {
-//     test.case = 'missed arguments';
-//     test.shouldThrowErrorSync( function( )
-//     {
-//       _.filesNewer( );
-//     } );
-//
-//     test.case = 'type of arguments is not file.Stat or string';
-//     test.shouldThrowErrorSync( function( )
-//     {
-//       _.filesNewer( null, '/tmp.tmp/s.txt' );
-//     } );
-//   }
-//
-//   return con;
-// };
-//
-// function filesOlder( test )
-// {
-//   var file1 = 'tmp.tmp/filesNewer/test1',
-//     file2 = 'tmp.tmp/filesNewer/test2',
-//     file3 = 'tmp.tmp/filesNewer/test3';
-//
-//   createTestFile( file1, 'test1' );
-//   createTestFile( file2, 'test2' );
-//
-//   file1 = mergePath( file1 );
-//   file2 = mergePath( file2 );
-//
-//   file1 = _.fileProvider.path.nativize( file1 );
-//   file2 = _.fileProvider.path.nativize( file2 );
-//
-//   test.case = 'two files created at different time';
-//   var got = _.filesOlder( file1, file2 );
-//   test.identical( got, file1 );
-//
-//   var con = _.timeOut( 50 );
-//   con.finally( ( ) =>
-//   {
-//     createTestFile( file3, 'test3' );
-//     file3 = mergePath( file3 );
-//     file3 = _.fileProvider.path.nativize( file3 );
-//     test.case = 'two files created at different time';
-//     var got = _.filesOlder( file1, file3 );
-//     test.identical( got, file1 );
-//   });
-//
-//   if( Config.debug )
-//   {
-//     test.case = 'missed arguments';
-//     test.shouldThrowErrorSync( function( )
-//     {
-//       _.filesOlder( );
-//     } );
-//
-//     test.case = 'type of arguments is not file.Stat or string';
-//     test.shouldThrowErrorSync( function( )
-//     {
-//       _.filesOlder( null, '/tmp.tmp/s.txt' );
-//     } );
-//   }
-//
-//   return con;
-// };
-//
-// function filesSpectre( test )
-// {
-//   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-//     textData2 = ' Aenean non feugiat mauris',
-//
-//     testChecks = [
-//
-//       {
-//         name : 'file with empty content',
-//         path : 'tmp.tmp/filesSpectre/sample.txt',
-//         type : 'f',
-//         createResource : '',
-//         expected :
-//         {
-//           length : 0
-//         }
-//       },
-//       {
-//         name : 'text file 1',
-//         path : 'tmp.tmp/filesSpectre/some.txt',
-//         type : 'f',
-//         createResource : textData1,
-//         expected :
-//         {
-//           L : 1,
-//           o : 4,
-//           r : 3,
-//           e : 5,
-//           m : 3,
-//           ' ' : 7,
-//           i : 6,
-//           p : 2,
-//           s : 4,
-//           u : 2,
-//           d : 2,
-//           l : 2,
-//           t : 5,
-//           a : 2,
-//           ',' : 1,
-//           c : 3,
-//           n : 2,
-//           g : 1,
-//           '.' : 1,
-//           length : 56
-//         }
-//       },
-//       {
-//         name : 'text file 2',
-//         path : 'tmp.tmp/filesSpectre/text1.txt',
-//         type : 'f',
-//         createResource : textData2,
-//         expected :
-//         {
-//           ' ' : 4,
-//           A : 1,
-//           e : 3,
-//           n : 4,
-//           a : 3,
-//           o : 1,
-//           f : 1,
-//           u : 2,
-//           g : 1,
-//           i : 2,
-//           t : 1,
-//           m : 1,
-//           r : 1,
-//           s : 1,
-//           length : 26
-//         }
-//       }
-//     ];
-//
-//   createTestResources( testChecks )
-//
-//   // regular tests
-//   for( let testCheck of testChecks )
-//   {
-//     // join several test aspects together
-//
-//     let path = _.path.resolve( mergePath( testCheck.path ) ),
-//       got;
-//
-//     test.case = testCheck.name;
-//
-//     try
-//     {
-//       got = _.filesSpectre( path );
-//     }
-//     catch( err )
-//     {
-//       _.errLogOnce( err );
-//     }
-//     test.identical( got, testCheck.expected );
-//   }
-//
-//   // exception tests
-//
-//   if( Config.debug )
-//   {
-//     test.case = 'missed arguments';
-//     test.shouldThrowErrorSync( function( )
-//     {
-//       _.filesSpectre( );
-//     } );
-//
-//     test.case = 'extra arguments';
-//     test.shouldThrowErrorSync( function( )
-//     {
-//       _.filesSpectre( 'tmp.tmp/filesSame/text1.txt', 'tmp.tmp/filesSame/text2.txt' );
-//     } );
-//   }
-// };
-//
 // //
 //
-// function filesSimilarity( test )
-// {
-//   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-//     textData2 = ' Aenean non feugiat mauris',
-//     bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] ),
-//     bufferData2 = Buffer.from( [ 0x07, 0x06, 0x05 ] ),
-//
-//     testChecks = [
-//
-//       {
-//         name : 'two different files with empty content',
-//         path : [ 'tmp.tmp/filesSimilarity/empty1.txt', 'tmp.tmp/filesSimilarity/empty2.txt' ],
-//         type : 'f',
-//         createResource : '',
-//         expected : 1
-//       },
-//       {
-//         name : 'same text file',
-//         path : [ 'tmp.tmp/filesSimilarity/same_text.txt', 'tmp.tmp/filesSimilarity/same_text.txt' ],
-//         type : 'f',
-//         createResource : textData1,
-//         expected : 1
-//       },
-//       {
-//         name : 'files with identical text content',
-//         path : [ 'tmp.tmp/filesSimilarity/identical_text1.txt', 'tmp.tmp/filesSimilarity/identical_text2.txt' ],
-//         type : 'f',
-//         createResource : textData1,
-//         expected : 1
-//       },
-//       {
-//         name : 'files with identical binary content',
-//         path : [ 'tmp.tmp/filesSimilarity/identical2', 'tmp.tmp/filesSimilarity/identical2.txt' ],
-//         type : 'f',
-//         createResource : bufferData1,
-//         expected : 1
-//       },
-//       {
-//         name : 'files with identical content',
-//         path : [ 'tmp.tmp/filesSimilarity/identical3', 'tmp.tmp/filesSimilarity/identical4' ],
-//         type : 'f',
-//         createResource : bufferData2,
-//         expected : 1
-//       },
-//       {
-//         name : 'files with non identical text content',
-//         path : [ 'tmp.tmp/filesSimilarity/identical_text3.txt', 'tmp.tmp/filesSimilarity/identical_text4.txt' ],
-//         type : 'f',
-//         createResource : [ textData1, textData2 ],
-//         expected : 0.375
-//       },
-//       {
-//         name : 'files with non identical binary content',
-//         path : [ 'tmp.tmp/filesSimilarity/noidentical1', 'tmp.tmp/filesSimilarity/noidentical2' ],
-//         type : 'f',
-//         createResource : [ bufferData1, bufferData2 ],
-//         expected : 0
-//       },
-//       {
-//         name : 'file and symlink to file',
-//         path : [ 'tmp.tmp/filesSimilarity/testsymlink', 'tmp.tmp/filesSimilarity/testfile' ],
-//         type : 'sf',
-//         createResource :  bufferData1,
-//         expected : 1
-//       },
-//       // undefined behavior
-//       // {
-//       //   name : 'not existing path',
-//       //   path : [ 'tmp.tmp/filesSimilarity/nofile1', 'tmp.tmp/filesSimilarity/noidentical2' ],
-//       //   type : 'na',
-//       //   expected : NaN
-//       // }
-//     ];
-//
-//   createTestResources( testChecks );
-//
-//   // regular tests
-//   for( let testCheck of testChecks )
-//   {
-//     // join several test aspects together
-//
-//     let path1 = _.path.resolve( mergePath( testCheck.path[0] ) ),
-//       path2 = _.path.resolve( mergePath( testCheck.path[1] ) ),
-//       got;
-//
-//     test.case = testCheck.name;
-//
-//     try
-//     {
-//       got = _.filesSimilarity( { src1 : path1, src2 : path2 });
-//     }
-//     catch( err )
-//     {
-//       _.errLog( err );
-//     }
-//     test.identical( got, testCheck.expected );
-//   }
-//
-//   // exception tests
-//
-//   if( Config.debug )
-//   {
-//     test.case = 'missed arguments';
-//     test.shouldThrowErrorSync( function( )
-//     {
-//       _.filesSimilarity( );
-//     } );
-//   }
-// };
-//
-// function filesSize( test )
-// {
-//   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-//     textData2 = ' Aenean non feugiat mauris',
-//     bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] ),
-//     bufferData2 = Buffer.from( [ 0x07, 0x06, 0x05 ] ),
-//     testChecks =
-//     [
-//       {
-//         name : 'read empty text file',
-//         data : '',
-//         path : 'tmp.tmp/rtext1.txt',
-//         expected :
-//         {
-//           error : null,
-//           content : '',
-//         },
-//         createResource : '',
-//         readOptions : fileReadOptions0
-//       },
-//       {
-//         name : 'read text from file',
-//         createResource : textData1,
-//         path : 'tmp.tmp/text2.txt',
-//         expected :
-//         {
-//           error : null,
-//           content : textData1,
-//         },
-//         readOptions : fileReadOptions0
-//       },
-//       {
-//         name : 'read text from file 2',
-//         createResource : textData2,
-//         path : 'tmp.tmp/text3.txt',
-//         expected :
-//         {
-//           error : null,
-//           content : textData2,
-//         },
-//         readOptions : fileReadOptions1
-//       },
-//       {
-//         name : 'read buffer from file',
-//         createResource : bufferData1,
-//         path : 'tmp.tmp/data0',
-//         expected :
-//         {
-//           error : null,
-//           content : bufferData1,
-//         },
-//         readOptions : fileReadOptions2
-//       },
-
-//       {
-//         name : 'read buffer from file 2',
-//         createResource : bufferData2,
-//         path : 'tmp.tmp/data2',
-//         expected :
-//         {
-//           error : null,
-//           content : bufferData2,
-//         },
-//         readOptions : fileReadOptions3
-//       },
-
-//       {
-//         name : 'read json from file',
-//         createResource : dataToJSON1,
-//         path : 'tmp.tmp/jason1.json',
-//         expected :
-//         {
-//           error : null,
-//           content : dataToJSON1,
-//         },
-//         readOptions : fileReadOptions4
-//       },
-//       {
-//         name : 'read json from file 2',
-//         createResource : dataToJSON2,
-//         path : 'tmp.tmp/json2.json',
-//         expected :
-//         {
-//           error : null,
-//           content : dataToJSON2,
-//         },
-//         readOptions : fileReadOptions5
-//       },
-//     ];
-
-
-
-//   // regular tests
-//   for( let testCheck of testChecks )
-//   {
-//     // join several test aspects together
-//     let path = mergePath( testCheck.path );
-
-//     // clear
-//     // File.existsSync( path ) && File.removeSync( path );
-//     if( _.fileProvider.statResolvedRead( path ) )
-//     _.fileProvider.fileDelete( path );
-
-//     // prepare to write if need
-//     testCheck.createResource !== undefined
-//     && createTestFile( testCheck.path, testCheck.createResource, testCheck.readOptions.encoding );
-
-//     var o = _.mapExtend( null, testCheck.readOptions, { filePath : path } );
-//     // let got = _.fileProvider.fileReadSync( path, testCheck.readOptions );
-//     let got = _.fileProvider.fileReadSync( o );
-
-//     if( got instanceof ArrayBuffer )
-//     {
-//       //got = Buffer.from( got );
-//     //   got = toBuffer( got );
-//       got = _.bufferNodeFrom( got );
-//     }
-
-//     test.description = testCheck.name;
-//     test.identical( got, testCheck.expected.content );
-//   }
-
-//   // exception tests
-
-//   if( Config.debug )
-//   {
-//     test.description = 'missed arguments';
-//     test.shouldThrowErrorSync( function( )
-//     {
-//       _.fileProvider.fileReadSync( );
-//     } );
-
-//     test.description = 'passed unexpected property in options';
-//     test.shouldThrowErrorSync( function( )
-//     {
-//       _.fileProvider.fileReadSync( wrongReadOptions0 );
-//     } );
-
-//     test.description = 'filePath is not defined';
-//     test.shouldThrowErrorSync( function( )
-//     {
-//      _.fileProvider.fileReadSync( { encoding : 'json' } );
-//     } );
-
-//   }
-
-// };
-
-//
-
-function filesLink( test )
-{
-  var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    textData2 = ' Aenean non feugiat mauris',
-    bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
-
-    testChecks = [
-      {
-        name : 'create link to text file with same path',
-        path : 'tmp.tmp/filesLink/same_text.txt',
-        link : 'tmp.tmp/filesLink/same_text.txt',
-        type : 'f',
-        createResource : textData1,
-        expected : { result : true, isExists : true, err : false, ishard : false }
-      },
-      {
-        name : 'link to file with text content',
-        path : [ 'tmp.tmp/filesLink/identical_text1.txt', 'tmp.tmp/filesLink/identical_text2.txt' ],
-        link : 'tmp.tmp/filesLink/identical_text2.txt',
-        type : 'f',
-        createResource : textData2,
-        expected : { result : true, isExists : true, err : false, ishard : true }
-      },
-      {
-        name : 'link to file with binary content',
-        path : 'tmp.tmp/filesLink/identical1',
-        link : 'tmp.tmp/filesLink/identical2',
-        type : 'f',
-        createResource : bufferData1,
-        expected : { result : true, isExists : true, err : false, ishard : true }
-      },
-      {
-        name : 'not existing path',
-        path : 'tmp.tmp/filesLink/nofile1',
-        link : 'tmp.tmp/filesLink/linktonofile',
-        type : 'na',
-        expected : { result : false, isExists : false, err : true, ishard : false }
-      },
-
-      {
-        name : 'try to create hard link to folder',
-        path : 'tmp.tmp/fileHardlink/folder',
-        link : 'tmp.tmp/fileHardlink/hard_folder',
-        type : 'd',
-        expected : { result : false, isExists : false, err : true, ishard : false }
-      },
-
-    ];
-
-  createTestResources( testChecks );
-
-  function checkHardLink( link, src )
-  {
-    link = _.path.resolve( link );
-    src = _.path.resolve( src );
-    // var statLink = File.lstatSync( link ),
-    var statLink = _.fileProvider.statResolvedRead({ filePath : link, resolvingSoftLink : 0 }),
-      // statSource = File.lstatSync( src );
-      statSource = _.fileProvider.statResolvedRead({ filePath : src, resolvingSoftLink : 0 })
-
-    if ( !statLink || !statSource ) return false; // both files should be exists
-    if ( Number( statSource.nlink ) !== 2 ) return false;
-    if ( statLink.ino !== statSource.ino ) return false; // both names should be associated with same file on device.
-
-    // File.unlinkSync( link );
-    _.fileProvider.fileDelete( link );
-    statSource = _.fileProvider.statResolvedRead({ filePath : src, resolvingSoftLink : 0 });
-
-    if ( Number( statSource.nlink ) !== 1 ) return false;
-
-    return true;
-  }
-
-  // regular tests
-  for( let testCheck of testChecks )
-  {
-    // join several test aspects together
-
-    let file = Array.isArray( testCheck.path) ? mergePath( testCheck.path[0] ) : mergePath( testCheck.path ),
-      link = mergePath( testCheck.link ),
-      got = { result : false, isExists : false, ishard : false, err : false };
-
-    test.description = testCheck.name;
-
-    try
-    {
-      got.result = _.fileProvider.hardLink({ dstPath :  link, srcPath : file, sync : 1 });
-      // got.isExists = File.existsSync(  _.path.resolve( link ) );
-      got.isExists = !!_.fileProvider.statResolvedRead(  _.path.resolve( link ) );
-      got.ishard = checkHardLink( link, file );
-    }
-    catch( err )
-    {
-      _.errLog( err );
-      got.err = true;
-    }
-    finally
-    {
-      got.err = !!got.err;
-      got.ishard = !!got.ishard;
-      test.identical( got, testCheck.expected );
-    }
-  }
-
-  // exception tests
-
-  if( Config.debug )
-  {
-    test.description = 'missed arguments';
-    test.shouldThrowErrorSync( function( )
-    {
-      _.fileProvider.hardLink( );
-    } );
-
-    test.description = 'extra arguments';
-    test.shouldThrowErrorSync( function( )
-    {
-      _.fileProvider.hardLink( 'tmp.tmp/filesLink/identical1', 'tmp.tmp/filesLink/same_text.txt', 'tmp.tmp/filesLink/same_text.txt' );
-    } );
-
-    test.description = 'argumetns is not string';
-    test.shouldThrowErrorSync( function( )
-    {
-      _.fileProvider.hardLink( 34, {} );
-    } );
-
-    test.description = 'passed unexpected property';
-    test.shouldThrowErrorSync( function( )
-    {
-      _.fileProvider.hardLink( {
-        dstPath : 'tmp.tmp/fileHardlink/src1',
-        srcPath : 'tmp.tmp/fileHardlink/hard_text.txt',
-        dir : 'tmp.tmp/fileHardlink'
-      } );
-    } );
-  }
-
-};
-
-//
-
-/*
-qqq : rewrite test routine for filesNewer, filesOlder. coverage should be Good
-*/
-
-function filesNewer( test )
-{
-  var file1 = 'tmp.tmp/filesNewer/test1',
-    file2 = 'tmp.tmp/filesNewer/test2',
-    file3 = 'tmp.tmp/filesNewer/test3';
-
-  var delay = _.fileProvider.systemBitrateTimeGet() / 1000;
-
-  createTestFile( file1, 'test1' );
-  waitSync( delay );
-  createTestFile( file2, 'test2' );
-
-  file1 = mergePath( file1 );
-  file2 = mergePath( file2 );
-
-  file1 = _.fileProvider.path.nativize( file1 );
-  file2 = _.fileProvider.path.nativize( file2 );
-
-  test.description = 'two files created at different time';
-  var got = _.files.filesNewer( file1, file2 );
-  test.identical( got, file2 );
-
-  var con = _.timeOut( 50 );
-  con.finally( ( ) =>
-  {
-    createTestFile( file3, 'test3' );
-    file3 = mergePath( file3 );
-    file3 = _.fileProvider.path.nativize( file3 );
-
-    test.description = 'two files created at different time';
-    var got = _.files.filesNewer( file1, file3 );
-    test.identical( got, file3 );
-    return null;
-  });
-
-  if( Config.debug )
-  {
-    test.description = 'missed arguments';
-    test.shouldThrowErrorSync( function( )
-    {
-      _.files.filesNewer( );
-    } );
-
-    test.description = 'type of arguments is not file.Stat or string';
-    test.shouldThrowErrorSync( function( )
-    {
-      _.files.filesNewer( null, '/tmp.tmp/s.txt' );
-    } );
-  }
-
-  return con;
-};
-
-//
-
-function filesOlder( test )
-{
-  var file1 = 'tmp.tmp/filesNewer/test1',
-    file2 = 'tmp.tmp/filesNewer/test2',
-    file3 = 'tmp.tmp/filesNewer/test3';
-
-  var delay = _.fileProvider.systemBitrateTimeGet() / 1000;
-
-  createTestFile( file1, 'test1' );
-  waitSync( delay );
-  createTestFile( file2, 'test2' );
-
-  file1 = mergePath( file1 );
-  file2 = mergePath( file2 );
-
-  file1 = _.fileProvider.path.nativize( file1 );
-  file2 = _.fileProvider.path.nativize( file2 );
-
-  test.description = 'two files created at different time';
-  var got = _.files.filesOlder( file1, file2 );
-  test.identical( got, file1 );
-
-  var con = _.timeOut( 50 );
-  con.finally( ( ) =>
-  {
-    createTestFile( file3, 'test3' );
-    file3 = mergePath( file3 );
-    file3 = _.fileProvider.path.nativize( file3 );
-    test.description = 'two files created at different time';
-    var got = _.files.filesOlder( file1, file3 );
-    test.identical( got, file1 );
-    return null;
-  });
-
-  if( Config.debug )
-  {
-    test.description = 'missed arguments';
-    test.shouldThrowErrorSync( function( )
-    {
-      _.files.filesOlder( );
-    } );
-
-    test.description = 'type of arguments is not file.Stat or string';
-    test.shouldThrowErrorSync( function( )
-    {
-      _.files.filesOlder( null, '/tmp.tmp/s.txt' );
-    } );
-  }
-
-  return con;
-};
-
-function filesSpectre( test )
-{
-  var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    textData2 = ' Aenean non feugiat mauris',
-
-    testChecks = [
-
-      {
-        name : 'file with empty content',
-        path : 'tmp.tmp/filesSpectre/sample.txt',
-        type : 'f',
-        createResource : '',
-        expected :
-        {
-          length : 0
-        }
-      },
-      {
-        name : 'text file 1',
-        path : 'tmp.tmp/filesSpectre/some.txt',
-        type : 'f',
-        createResource : textData1,
-        expected :
-        {
-          L : 1,
-          o : 4,
-          r : 3,
-          e : 5,
-          m : 3,
-          ' ' : 7,
-          i : 6,
-          p : 2,
-          s : 4,
-          u : 2,
-          d : 2,
-          l : 2,
-          t : 5,
-          a : 2,
-          ',' : 1,
-          c : 3,
-          n : 2,
-          g : 1,
-          '.' : 1,
-          length : 56
-        }
-      },
-      {
-        name : 'text file 2',
-        path : 'tmp.tmp/filesSpectre/text1.txt',
-        type : 'f',
-        createResource : textData2,
-        expected :
-        {
-          ' ' : 4,
-          A : 1,
-          e : 3,
-          n : 4,
-          a : 3,
-          o : 1,
-          f : 1,
-          u : 2,
-          g : 1,
-          i : 2,
-          t : 1,
-          m : 1,
-          r : 1,
-          s : 1,
-          length : 26
-        }
-      }
-    ];
-
-  createTestResources( testChecks )
-
-  // regular tests
-  for( let testCheck of testChecks )
-  {
-    // join several test aspects together
-
-    let path = _.path.resolve( mergePath( testCheck.path ) ),
-      got;
-
-    test.description = testCheck.name;
-
-    try
-    {
-      got = _.files.filesSpectre( path );
-    }
-    catch( err )
-    {
-      _.errLogOnce( err );
-    }
-
-    var expected = testCheck.expected;
-
-    if( _.objectLike( expected ) )
-    {
-      var result = new U32x( 257 );
-      result[ 256 ] = expected.length;
-
-      delete expected.length;
-
-      for( var k in expected )
-      {
-        result[ k.charCodeAt() ] = expected[ k ];
-      }
-
-      expected = result;
-    }
-
-    test.identical( got, expected );
-  }
-
-  // exception tests
-
-  if( Config.debug )
-  {
-    test.description = 'missed arguments';
-    test.shouldThrowErrorSync( function( )
-    {
-      _.files.filesSpectre( );
-    } );
-
-    test.description = 'extra arguments';
-    test.shouldThrowErrorSync( function( )
-    {
-      _.files.filesSpectre( 'tmp.tmp/filesSame/text1.txt', 'tmp.tmp/filesSame/text2.txt' );
-    } );
-  }
-};
-
-//
-
-function filesSimilarity( test )
-{
-  var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    textData2 = ' Aenean non feugiat mauris',
-    bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
-    bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] ),
-
-    testChecks = [
-
-      {
-        name : 'two different files with empty content',
-        path : [ 'tmp.tmp/filesSimilarity/empty1.txt', 'tmp.tmp/filesSimilarity/empty2.txt' ],
-        type : 'f',
-        createResource : '',
-        expected : NaN
-      },
-      {
-        name : 'same text file',
-        path : [ 'tmp.tmp/filesSimilarity/same_text.txt', 'tmp.tmp/filesSimilarity/same_text.txt' ],
-        type : 'f',
-        createResource : textData1,
-        expected : 1
-      },
-      {
-        name : 'files with identical text content',
-        path : [ 'tmp.tmp/filesSimilarity/identical_text1.txt', 'tmp.tmp/filesSimilarity/identical_text2.txt' ],
-        type : 'f',
-        createResource : textData1,
-        expected : 1
-      },
-      {
-        name : 'files with identical binary content',
-        path : [ 'tmp.tmp/filesSimilarity/identical2', 'tmp.tmp/filesSimilarity/identical2.txt' ],
-        type : 'f',
-        createResource : bufferData1,
-        expected : 1
-      },
-      {
-        name : 'files with identical content',
-        path : [ 'tmp.tmp/filesSimilarity/identical3', 'tmp.tmp/filesSimilarity/identical4' ],
-        type : 'f',
-        createResource : bufferData2,
-        expected : 1
-      },
-      {
-        name : 'files with non identical text content',
-        path : [ 'tmp.tmp/filesSimilarity/identical_text3.txt', 'tmp.tmp/filesSimilarity/identical_text4.txt' ],
-        type : 'f',
-        createResource : [ textData1, textData2 ],
-        expected : 0.10714285714285715
-      },
-      {
-        name : 'files with non identical binary content',
-        path : [ 'tmp.tmp/filesSimilarity/noidentical1', 'tmp.tmp/filesSimilarity/noidentical2' ],
-        type : 'f',
-        createResource : [ bufferData1, bufferData2 ],
-        expected : 0
-      },
-      {
-        name : 'file and symlink to file',
-        path : [ 'tmp.tmp/filesSimilarity/testsymlink', 'tmp.tmp/filesSimilarity/testfile' ],
-        type : 'sf',
-        createResource :  bufferData1,
-        expected : 1
-      },
-      // undefined behavior
-      // {
-      //   name : 'not existing path',
-      //   path : [ 'tmp.tmp/filesSimilarity/nofile1', 'tmp.tmp/filesSimilarity/noidentical2' ],
-      //   type : 'na',
-      //   expected : NaN
-      // }
-    ];
-
-  createTestResources( testChecks );
-
-  // regular tests
-  for( let testCheck of testChecks )
-  {
-    // join several test aspects together
-
-    let path1 = _.path.resolve( mergePath( testCheck.path[0] ) ),
-      path2 = _.path.resolve( mergePath( testCheck.path[1] ) ),
-      got;
-
-    test.description = testCheck.name;
-
-    try
-    {
-      got = _.files.filesSimilarity( { src1 : path1, src2 : path2 });
-    }
-    catch( err )
-    {
-      _.errLog( err );
-    }
-    test.identical( got, testCheck.expected );
-  }
-
-  // exception tests
-
-  if( Config.debug )
-  {
-    test.description = 'missed arguments';
-    test.shouldThrowErrorSync( function( )
-    {
-      _.files.filesSimilarity( );
-    } );
-  }
-};
-
-//
-
 // function fileDelete( test ) {
 //   var fileDelOptions =
 //     {
@@ -2994,6 +2712,507 @@ function filesSimilarity( test )
 //     } );
 //   }
 // };
+//
+// //
+//
+// function filesLink( test )
+// {
+//   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+//     textData2 = ' Aenean non feugiat mauris',
+//     bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] ),
+//
+//     testChecks = [
+//       {
+//         name : 'create link to text file with same path',
+//         path : 'tmp.tmp/filesLink/same_text.txt',
+//         link : 'tmp.tmp/filesLink/same_text.txt',
+//         type : 'f',
+//         createResource : textData1,
+//         expected : { result : true, isExists : true, err : false, ishard : false }
+//       },
+//       {
+//         name : 'link to file with text content',
+//         path : [ 'tmp.tmp/filesLink/identical_text1.txt', 'tmp.tmp/filesLink/identical_text2.txt' ],
+//         link : 'tmp.tmp/filesLink/identical_text2.txt',
+//         type : 'f',
+//         createResource : textData2,
+//         expected : { result : true, isExists : true, err : false, ishard : true }
+//       },
+//       {
+//         name : 'link to file with binary content',
+//         path : 'tmp.tmp/filesLink/identical1',
+//         link : 'tmp.tmp/filesLink/identical2',
+//         type : 'f',
+//         createResource : bufferData1,
+//         expected : { result : true, isExists : true, err : false, ishard : true }
+//       },
+//       {
+//         name : 'not existing path',
+//         path : 'tmp.tmp/filesLink/nofile1',
+//         link : 'tmp.tmp/filesLink/linktonofile',
+//         type : 'na',
+//         expected : { result : false, isExists : false, err : true, ishard : false }
+//       },
+//
+//       {
+//         name : 'try to create hard link to folder',
+//         path : 'tmp.tmp/fileHardlink/folder',
+//         link : 'tmp.tmp/fileHardlink/hard_folder',
+//         type : 'd',
+//         expected : { result : false, isExists : false, err : true, ishard : false }
+//       },
+//
+//     ];
+//
+//   createTestResources( testChecks );
+//
+//   function checkHardLink( link, src )
+//   {
+//     link = _.path.resolve( link );
+//     src = _.path.resolve( src );
+//     // var statLink = File.lstatSync( link ),
+//     var statLink = _.fileProvider.statResolvedRead({ filePath : link, resolvingSoftLink : 0 }),
+//       // statSource = File.lstatSync( src );
+//       statSource = _.fileProvider.statResolvedRead({ filePath : src, resolvingSoftLink : 0 })
+//
+//     if ( !statLink || !statSource ) return false; // both files should be exists
+//     if ( statSource.nlink !== 2 ) return false;
+//     if ( statLink.ino !== statSource.ino ) return false; // both names should be associated with same file on device.
+//
+//     // File.unlinkSync( link );
+//     _.fileProvider.fileDelete( link );
+//     statSource = _.fileProvider.statResolvedRead({ filePath : src, resolvingSoftLink : 0 });
+//
+//     if ( statSource.nlink !== 1 ) return false;
+//
+//     return true;
+//   }
+//
+//   // regular tests
+//   for( let testCheck of testChecks )
+//   {
+//     // join several test aspects together
+//
+//     let file = Array.isArray( testCheck.path) ? mergePath( testCheck.path[0] ) : mergePath( testCheck.path ),
+//       link = mergePath( testCheck.link ),
+//       got = { result : false, isExists : false, ishard : false, err : false };
+//
+//     test.case = testCheck.name;
+//
+//     try
+//     {
+//       got.result = _.fileProvider.hardLink({ dstPath :  link, srcPath : file, sync : 1 });
+//       // got.isExists = File.existsSync(  _.path.resolve( link ) );
+//       got.isExists = !!_.fileProvider.statResolvedRead(  _.path.resolve( link ) );
+//       got.ishard = checkHardLink( link, file );
+//     }
+//     catch( err )
+//     {
+//       _.errLog( err );
+//       got.err = true;
+//     }
+//     finally
+//     {
+//       got.err = !!got.err;
+//       got.ishard = !!got.ishard;
+//       test.identical( got, testCheck.expected );
+//     }
+//   }
+//
+//   // exception tests
+//
+//   if( Config.debug )
+//   {
+//     test.case = 'missed arguments';
+//     test.shouldThrowErrorSync( function( )
+//     {
+//       _.fileProvider.hardLink( );
+//     } );
+//
+//     test.case = 'extra arguments';
+//     test.shouldThrowErrorSync( function( )
+//     {
+//       _.fileProvider.hardLink( 'tmp.tmp/filesLink/identical1', 'tmp.tmp/filesLink/same_text.txt', 'tmp.tmp/filesLink/same_text.txt' );
+//     } );
+//
+//     test.case = 'argumetns is not string';
+//     test.shouldThrowErrorSync( function( )
+//     {
+//       _.fileProvider.hardLink( 34, {} );
+//     } );
+//
+//     test.case = 'passed unexpected property';
+//     test.shouldThrowErrorSync( function( )
+//     {
+//       _.fileProvider.hardLink( {
+//         dstPath : 'tmp.tmp/fileHardlink/src1',
+//         srcPath : 'tmp.tmp/fileHardlink/hard_text.txt',
+//         dir : 'tmp.tmp/fileHardlink'
+//       } );
+//     } );
+//   }
+//
+// };
+//
+// //
+
+function filesLink( test )
+{
+  var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+    textData2 = ' Aenean non feugiat mauris',
+    bufferData1 = new Uint8Array( [ 0x01, 0x02, 0x03, 0x04 ] ),
+    // To new NodeJS it is not correct syntax
+    //bufferData1 = new Uint8Array( [ 0x01, 0x02, 0x03, 0x04 ] ),
+
+    testChecks = [
+      {
+        name : 'create link to text file with same path',
+        path : 'tmp.tmp/filesLink/same_text.txt',
+        link : 'tmp.tmp/filesLink/same_text.txt',
+        type : 'f',
+        createResource : textData1,
+        expected : { result : true, isExists : true, err : false, ishard : false }
+      },
+      {
+        name : 'link to file with text content',
+        path : [ 'tmp.tmp/filesLink/identical_text1.txt', 'tmp.tmp/filesLink/identical_text2.txt' ],
+        link : 'tmp.tmp/filesLink/identical_text2.txt',
+        type : 'f',
+        createResource : textData2,
+        expected : { result : true, isExists : true, err : false, ishard : true }
+      },
+      {
+        name : 'link to file with binary content',
+        path : 'tmp.tmp/filesLink/identical1',
+        link : 'tmp.tmp/filesLink/identical2',
+        type : 'f',
+        createResource : bufferData1,
+        expected : { result : true, isExists : true, err : false, ishard : true }
+      },
+      {
+        name : 'not existing path',
+        path : 'tmp.tmp/filesLink/nofile1',
+        link : 'tmp.tmp/filesLink/linktonofile',
+        type : 'na',
+        expected : { result : false, isExists : false, err : true, ishard : false }
+      },
+
+      {
+        name : 'try to create hard link to folder',
+        path : 'tmp.tmp/fileHardlink/folder',
+        link : 'tmp.tmp/fileHardlink/hard_folder',
+        type : 'd',
+        expected : { result : false, isExists : false, err : true, ishard : false }
+      },
+
+    ];
+
+  createTestResources( testChecks );
+
+  function checkHardLink( link, src )
+  {
+    link = _.path.resolve( link );
+    src = _.path.resolve( src );
+    // var statLink = File.lstatSync( link ),
+    var statLink = _.fileProvider.statResolvedRead({ filePath : link, resolvingSoftLink : 0 }),
+      // statSource = File.lstatSync( src );
+      statSource = _.fileProvider.statResolvedRead({ filePath : src, resolvingSoftLink : 0 })
+
+    if ( !statLink || !statSource ) return false; // both files should be exists
+    if ( Number( statSource.nlink ) !== 2 ) return false;
+    if ( statLink.ino !== statSource.ino ) return false; // both names should be associated with same file on device.
+
+    // File.unlinkSync( link );
+    _.fileProvider.fileDelete( link );
+    statSource = _.fileProvider.statResolvedRead({ filePath : src, resolvingSoftLink : 0 });
+
+    if ( Number( statSource.nlink ) !== 1 ) return false;
+
+    return true;
+  }
+
+  // regular tests
+  for( let testCheck of testChecks )
+  {
+    // join several test aspects together
+
+    let file = Array.isArray( testCheck.path) ? mergePath( testCheck.path[0] ) : mergePath( testCheck.path ),
+      link = mergePath( testCheck.link ),
+      got = { result : false, isExists : false, ishard : false, err : false };
+
+    test.description = testCheck.name;
+
+    try
+    {
+      got.result = _.fileProvider.hardLink({ dstPath :  link, srcPath : file, sync : 1 });
+      // got.isExists = File.existsSync(  _.path.resolve( link ) );
+      got.isExists = !!_.fileProvider.statResolvedRead(  _.path.resolve( link ) );
+      got.ishard = checkHardLink( link, file );
+    }
+    catch( err )
+    {
+      _.errLog( err );
+      got.err = true;
+    }
+    finally
+    {
+      got.err = !!got.err;
+      got.ishard = !!got.ishard;
+      test.identical( got, testCheck.expected );
+    }
+  }
+
+  // exception tests
+
+  if( Config.debug )
+  {
+    test.description = 'missed arguments';
+    test.shouldThrowErrorSync( function( )
+    {
+      _.fileProvider.hardLink( );
+    } );
+
+    test.description = 'extra arguments';
+    test.shouldThrowErrorSync( function( )
+    {
+      _.fileProvider.hardLink( 'tmp.tmp/filesLink/identical1', 'tmp.tmp/filesLink/same_text.txt', 'tmp.tmp/filesLink/same_text.txt' );
+    } );
+
+    test.description = 'argumetns is not string';
+    test.shouldThrowErrorSync( function( )
+    {
+      _.fileProvider.hardLink( 34, {} );
+    } );
+
+    test.description = 'passed unexpected property';
+    test.shouldThrowErrorSync( function( )
+    {
+      _.fileProvider.hardLink( {
+        dstPath : 'tmp.tmp/fileHardlink/src1',
+        srcPath : 'tmp.tmp/fileHardlink/hard_text.txt',
+        dir : 'tmp.tmp/fileHardlink'
+      } );
+    } );
+  }
+
+};
+
+//
+
+function filesAreUpToDate2( test )
+{
+  /* file creation */
+
+  var file1 = 'tmp.tmp/filesAreUpToDate/src/test1',
+      file2 = 'tmp.tmp/filesAreUpToDate/dst/test2',
+      file3 = 'tmp.tmp/filesAreUpToDate/src/test3',
+      file4 = 'tmp.tmp/filesAreUpToDate/dst/test4';
+
+  var delay = _.fileProvider.systemBitrateTimeGet() / 1000;
+
+  createTestFile( file1, 'test1' );
+  waitSync( delay );
+  createTestFile( file2, 'test2' );
+  waitSync( delay );
+  createTestFile( file3, 'test3' );
+  waitSync( delay );
+  createTestFile( file4, 'test4' );
+
+  file1 = mergePath( file1 );
+  file2 = mergePath( file2 );
+  file3 = mergePath( file3 );
+  file4 = mergePath( file4 );
+
+  file1 = _.fileProvider.path.nativize( file1 );
+  file2 = _.fileProvider.path.nativize( file2 );
+  file3 = _.fileProvider.path.nativize( file3 );
+  file4 = _.fileProvider.path.nativize( file4 );
+
+  /* - */
+
+  test.description = 'src files is up to date';
+  var got = _.fileProvider.filesAreUpToDate2( { src : file1, dst : file2 } );
+  test.identical( got, true );
+
+  var map = { src : [ file1, file2 ], dst : [ file3, file4 ] };
+  var got = _.fileProvider.filesAreUpToDate2( map );
+  test.identical( got, true );
+
+  test.description = 'src files is up to date, youngerThan';
+  var map =
+  {
+    src : [ file1, file2 ],
+    dst : [ file3, file4 ],
+    youngerThan : new Date(),
+    verbosity : 3
+  };
+  var got = _.fileProvider.filesAreUpToDate2( map );
+  test.identical( got, true );
+
+
+  /* Dmytro : need help to write
+  test.description = 'src files is up to date, verbosity';
+  var map = { src : [ file1, file2 ], dst : [ file3, file4 ], verbosity : 4 };
+  var got = _.fileProvider.filesAreUpToDate2( map );
+  test.identical( got, true );
+  */
+
+  /* - */
+
+  test.description = 'src files is outdated';
+  var got = _.fileProvider.filesAreUpToDate2( { src : file2, dst : file1 } );
+  test.identical( got, false );
+
+  var map = { src : [ file3, file4 ], dst : [ file1, file2 ] };
+  var got = _.fileProvider.filesAreUpToDate2( map );
+  test.identical( got, false );
+
+  test.description = 'src files is up to date, youngerThan';
+  var map =
+  {
+    src : [ file3, file4 ],
+    dst : [ file1, file2 ],
+    youngerThan : new Date( 2019, 7, 17),
+    verbosity : 3
+  };
+  var got = _.fileProvider.filesAreUpToDate2( map );
+  test.identical( got, true );
+
+  /* - */
+
+  if( !Config.debug )
+  return;
+
+  test.case = 'without arguments';
+  test.shouldThrowErrorSync( () => _.fileProvider.filesAreUpToDate2() );
+
+  test.case = 'extra arguments';
+  var map = { src : file1, dst : file2 };
+  test.shouldThrowErrorSync( () => _.fileProvider.filesAreUpToDate2( map, map ) );
+
+  test.case = 'wrong arguments';
+  var map = { src : file1, dst : file2 };
+  test.shouldThrowErrorSync( () => _.fileProvider.filesAreUpToDate2( 'str' ) );
+  test.shouldThrowErrorSync( () => _.fileProvider.filesAreUpToDate2( file1 ) );
+
+  test.case = 'o.newer settled, not a date';
+  var map = { src : file1, dst : file2, newer : 1 };
+  test.shouldThrowErrorSync( () => _.fileProvider.filesAreUpToDate2( map ) );
+
+
+//   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+//     textData2 = ' Aenean non feugiat mauris',
+//     bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
+//     bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] );
+//
+//   // regular tests
+//   var testChecks =
+//     [
+//       {
+//         name : 'files is up to date',
+//         createFirst :
+//         {
+//           path : [ 'tmp.tmp/filesIsUpToDate1/file1', 'tmp.tmp/filesIsUpToDate1/file2.txt' ],
+//           type : 'f',
+//           createResource : [ bufferData1, textData1 ]
+//         },
+//         createSecond :
+//         {
+//           path : [ 'tmp.tmp/filesIsUpToDate1/file3', 'tmp.tmp/filesIsUpToDate1/file4.txt' ],
+//           type : 'f',
+//           createResource : [ bufferData2, textData2 ]
+//         },
+//         src : [ 'tmp.tmp/filesIsUpToDate1/file1', 'tmp.tmp/filesIsUpToDate1/file2.txt' ],
+//         dst : [ 'tmp.tmp/filesIsUpToDate1/file3', 'tmp.tmp/filesIsUpToDate1/file4.txt' ],
+//         expected : true
+//       },
+//       {
+//         name : 'files is not up to date',
+//         createFirst :
+//         {
+//           path : [ 'tmp.tmp/filesIsUpToDate2/file1', 'tmp.tmp/filesIsUpToDate2/file2.txt' ],
+//           type : 'f',
+//           createResource : [ bufferData1, textData1 ]
+//         },
+//         createSecond :
+//         {
+//           path : [ 'tmp.tmp/filesIsUpToDate2/file3', 'tmp.tmp/filesIsUpToDate2/file4.txt' ],
+//           type : 'f',
+//           createResource : [ bufferData2, textData2 ]
+//         },
+//         src : [ 'tmp.tmp/filesIsUpToDate2/file1', 'tmp.tmp/filesIsUpToDate2/file4.txt' ],
+//         dst : [ 'tmp.tmp/filesIsUpToDate2/file3', 'tmp.tmp/filesIsUpToDate2/file2.txt' ],
+//         expected : false
+//       },
+//     ];
+//
+// /*
+//   function createWithDelay( fileLists, delay )
+//   {
+//     delay = delay || 0;
+//     var con = wConsequence( );
+//     setTimeout( function( )
+//     {
+//       createTestResources( fileLists );
+//       console.log( '--> files created second' );
+//       con.take( );
+//     }, delay );
+//     return con;
+//   }
+// */
+//
+//   var con = new _.Consequence( ).take( null );
+//   for( let tc of testChecks )
+//   {
+//     ( function( tc )
+//     {
+//       con.finally( () =>
+//       {
+//         console.log( 'tc : ' + tc.name );
+//         createTestResources( tc.createFirst );
+//         console.log( '--> files create first' );
+//         return null;
+//       })
+//
+//       con.finally( _.routineSeal( _,_.timeOut,[ 1000 ] ) );
+//       con.finally( _.routineSeal( null,createTestResources,[ tc.createSecond ] ) );
+//       con.finally( _.routineSeal( console,console.log,[ '--> files created second' ] ) );
+//
+// /*
+//       try
+//       {
+//         con = createWithDelay( tc.createSecond, 500 )
+//       }
+//       catch( err )
+//       {
+//         console.log( err );
+//       }
+// */
+//
+//       con.finally( ( ) =>
+//       {
+//         test.description = tc.name;
+//         try
+//         {
+//           var got = _.fileProvider.filesAreUpToDate2
+//           ({
+//             src : tc.src.map( ( v ) => _.path.resolve( mergePath( v ) ) ),
+//             dst : tc.dst.map( ( v ) => _.path.resolve( mergePath( v ) ) )
+//           });
+//         }
+//         catch( err )
+//         {
+//           console.log( err );
+//         }
+//         test.identical( got, tc.expected );
+//         return null;
+//       } );
+//     } )( _.mapExtend( null, tc ) );
+//   }
+//   return con;
+};
+
+//
 
 // function filesList( test )
 // {
@@ -3136,122 +3355,6 @@ function filesSimilarity( test )
 // };
 //
 // //
-//
-// function filesAreUpToDate2( test )
-// {
-//   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-//     textData2 = ' Aenean non feugiat mauris',
-//     bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
-//     bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] );
-//
-//   // regular tests
-//   var testChecks =
-//     [
-//       {
-//         name : 'files is up to date',
-//         createFirst :
-//         {
-//           path : [ 'tmp.tmp/filesIsUpToDate1/file1', 'tmp.tmp/filesIsUpToDate1/file2.txt' ],
-//           type : 'f',
-//           createResource : [ bufferData1, textData1 ]
-//         },
-//         createSecond :
-//         {
-//           path : [ 'tmp.tmp/filesIsUpToDate1/file3', 'tmp.tmp/filesIsUpToDate1/file4.txt' ],
-//           type : 'f',
-//           createResource : [ bufferData2, textData2 ]
-//         },
-//         src : [ 'tmp.tmp/filesIsUpToDate1/file1', 'tmp.tmp/filesIsUpToDate1/file2.txt' ],
-//         dst : [ 'tmp.tmp/filesIsUpToDate1/file3', 'tmp.tmp/filesIsUpToDate1/file4.txt' ],
-//         expected : true
-//       },
-//       {
-//         name : 'files is not up to date',
-//         createFirst :
-//         {
-//           path : [ 'tmp.tmp/filesIsUpToDate2/file1', 'tmp.tmp/filesIsUpToDate2/file2.txt' ],
-//           type : 'f',
-//           createResource : [ bufferData1, textData1 ]
-//         },
-//         createSecond :
-//         {
-//           path : [ 'tmp.tmp/filesIsUpToDate2/file3', 'tmp.tmp/filesIsUpToDate2/file4.txt' ],
-//           type : 'f',
-//           createResource : [ bufferData2, textData2 ]
-//         },
-//         src : [ 'tmp.tmp/filesIsUpToDate2/file1', 'tmp.tmp/filesIsUpToDate2/file4.txt' ],
-//         dst : [ 'tmp.tmp/filesIsUpToDate2/file3', 'tmp.tmp/filesIsUpToDate2/file2.txt' ],
-//         expected : false
-//       },
-//     ];
-//
-// /*
-//   function createWithDelay( fileLists, delay )
-//   {
-//     delay = delay || 0;
-//     var con = wConsequence( );
-//     setTimeout( function( )
-//     {
-//       createTestResources( fileLists );
-//       console.log( '--> files created second' );
-//       con.take( );
-//     }, delay );
-//     return con;
-//   }
-// */
-//
-//   var con = new _.Consequence( ).take( null );
-//   for( let tc of testChecks )
-//   {
-//     ( function( tc )
-//     {
-//       con.finally( () =>
-//       {
-//         console.log( 'tc : ' + tc.name );
-//         createTestResources( tc.createFirst );
-//         console.log( '--> files create first' );
-//         return null;
-//       })
-//
-//       con.finally( _.routineSeal( _,_.timeOut,[ 1000 ] ) );
-//       con.finally( _.routineSeal( null,createTestResources,[ tc.createSecond ] ) );
-//       con.finally( _.routineSeal( console,console.log,[ '--> files created second' ] ) );
-//
-// /*
-//       try
-//       {
-//         con = createWithDelay( tc.createSecond, 500 )
-//       }
-//       catch( err )
-//       {
-//         console.log( err );
-//       }
-// */
-//
-//       con.finally( ( ) =>
-//       {
-//         test.description = tc.name;
-//         try
-//         {
-//           var got = _.fileProvider.filesAreUpToDate2
-//           ({
-//             src : tc.src.map( ( v ) => _.path.resolve( mergePath( v ) ) ),
-//             dst : tc.dst.map( ( v ) => _.path.resolve( mergePath( v ) ) )
-//           });
-//         }
-//         catch( err )
-//         {
-//           console.log( err );
-//         }
-//         test.identical( got, tc.expected );
-//         return null;
-//       } );
-//     } )( _.mapExtend( null, tc ) );
-//   }
-//   return con;
-// };
-
-//
 
 function testDelaySample( test )
 {
@@ -3289,7 +3392,20 @@ var Self =
 
   tests :
   {
+    // from l1/FileRoutines.s
+
     _fileOptionsGet : _fileOptionsGet,
+
+    filesNewer : filesNewer,
+    filesOlder : filesOlder,
+
+    filesSpectre : filesSpectre,
+    filesSimilarity : filesSimilarity,
+
+    // from l2/Partial.s
+
+    filesSize,
+    fileSize,
 
     // fileWrite : fileWrite,
 
@@ -3299,17 +3415,15 @@ var Self =
 
     filesLink : filesLink,
 
-    filesNewer : filesNewer,
-    filesOlder : filesOlder,
-
-    filesSpectre : filesSpectre,
-    filesSimilarity : filesSimilarity,
-
     // fileDelete : fileDelete,
 
-    // filesList : filesList,
+    // from l3/SecondaryMixin.s
 
-    // filesAreUpToDate2 : filesAreUpToDate2,
+    filesAreUpToDate2 : filesAreUpToDate2,
+
+    // etc
+
+    // filesList : filesList,
 
     // testDelaySample : testDelaySample,
 

@@ -492,14 +492,19 @@ function pathsResolve( test )
 
   test.case = 'single array';
 
-  var got = _.path.s.resolve( [ '/a', 'b', './b', '../b', '..' ] );
+  var got = _.path.s.resolve( [ '/a', 'b', './b', '../b', '../' ] );
   var expected =
   [
     '/a',
     _.path.join( currentPath, 'b' ),
     _.path.join( currentPath, 'b' ),
     _.path.join( _.path.dir( currentPath ), 'b' ),
+   
     _.path.canonize( _.path.dir( currentPath ) )
+    //_.path.normalize( _.path.dir( currentPath ) ),
+    // routine normalizeStrict does not exist now
+    // _.path.normalizeStrict( _.path.dir( currentPath ) )
+
   ];
   test.identical( got, expected );
 
@@ -513,6 +518,9 @@ function pathsResolve( test )
   {
     rovider.path.s.resolve()
   });
+
+  test.case = 'without arguments';
+  test.shouldThrowErrorSync( () => provider.path.s.resolve() )
 
   test.case = 'arrays with different length'
   test.shouldThrowError( function()
@@ -1046,6 +1054,8 @@ function pathDirTempForTrivial( test )
     test.shouldThrowErrorSync( () =>
     {
       _.path.pathDirTempForAnother( possiblePath );
+      // routine pathDirTempForAnother make correct filePath
+      // _.path.pathDirTempForAnother( filePath );
     })
   }
   else

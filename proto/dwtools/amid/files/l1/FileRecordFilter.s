@@ -320,7 +320,11 @@ function _formFinal()
 
     let filePath = filter.filePathArrayGet( filter.formedFilePath ).filter( ( e ) => _.strIs( e ) && e );
     _.assert( path.s.noneAreGlob( filePath ) );
-    _.assert( path.s.allAreAbsolute( filePath ) || path.s.allAreGlobal( filePath ), () => 'Expects absolute or global file path, but got\n' + _.toJson( filePath ) );
+    _.assert
+    (
+      path.s.allAreAbsolute( filePath ) || path.s.allAreGlobal( filePath ),
+      () => 'Expects absolute or global file path, but got\n' + _.toJson( filePath )
+    );
 
     if( _.mapIs( filter.formedBasePath ) )
     for( let p in filter.formedBasePath )

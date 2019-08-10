@@ -7036,22 +7036,19 @@ function filesFindGroups( test )
     prefixPath : testPath,
   }
 
-  // debugger;
-  // var found = provider.filesFindGroups({ src : src, dst : dst, outputFormat : 'relative' });
-
   /* tests */
 
   test.case = 'default settings';
-  var found = provider.filesFindGroups({ src : src, outputFormat : 'relative' });
+  var found = provider.filesFindGroups({ src, dst, outputFormat : 'relative' });
   found.options = !!found.options;
   test.identical( found, expected );
 
-  // test.identical( found, expected ); debugger;
 
   test.case = 'mandatory : 1';
   var map =
   {
-    src : src,
+    src,
+    dst,
     outputFormat : 'relative',
     mandatory : 1,
   }
@@ -7059,16 +7056,16 @@ function filesFindGroups( test )
   found.options = !!found.options;
   test.identical( found, expected );
 
-  // xxx
 
   test.case = 'mandatory : 0';
   var map =
   {
-    src : src,
+    src,
+    dst,
     outputFormat : 'relative',
     mandatory : 0,
   }
-  var found = provider.filesFindGroups( map );
+  var found = provider.filesFindGroups( map ); /* qqq : bad naming! */
   found.options = !!found.options;
   test.identical( found, expected );
 
@@ -7076,7 +7073,8 @@ function filesFindGroups( test )
   test.case = 'sync : 0';
   var map =
   {
-    src : src,
+    src,
+    dst,
     outputFormat : 'relative',
     sync : 0,
   }
@@ -7085,12 +7083,13 @@ function filesFindGroups( test )
   test.identical( found, expected );
 
 
-  test.case = 'distinct : 0';
+  test.case = 'mode : legacy';
   var map =
   {
-    src : src,
+    src,
+    dst,
     outputFormat : 'relative',
-    distinct : 0,
+    mode : 'legacy',
   }
   var found = provider.filesFindGroups( map );
   found.options = !!found.options;
@@ -7102,8 +7101,8 @@ function filesFindGroups( test )
   {
     'pathsGrouped' :
     {
-      [ abs( 'Produced.txt' ) ] : { [ abs( '**.txt' ) ] : null },
-      [ abs( 'Produced.js' ) ] : { [ abs( '**.js' ) ] : null }
+      [ abs( 'Produced.txt' ) ] : { [ abs( '**.txt' ) ] : '' },
+      [ abs( 'Produced.js' ) ] : { [ abs( '**.js' ) ] : '' }
     },
     'filesGrouped' :
     {
@@ -7128,7 +7127,8 @@ function filesFindGroups( test )
   }
   var map =
   {
-    src : src,
+    src,
+    dst,
     outputFormat : 'relative',
     recursive : 1,
   }
@@ -7142,8 +7142,8 @@ function filesFindGroups( test )
   {
     'pathsGrouped' :
     {
-      [ abs( 'Produced.txt' ) ] : { [ abs( '**.txt' ) ] : null },
-      [ abs( 'Produced.js' ) ] : { [ abs( '**.js' ) ] : null }
+      [ abs( 'Produced.txt' ) ] : { [ abs( '**.txt' ) ] : '' },
+      [ abs( 'Produced.js' ) ] : { [ abs( '**.js' ) ] : '' }
     },
     'filesGrouped' :
     {
@@ -7158,7 +7158,8 @@ function filesFindGroups( test )
   }
   var map =
   {
-    src : src,
+    src,
+    dst,
     outputFormat : 'relative',
     recursive : 0,
     mandatory : 0,
@@ -7176,7 +7177,8 @@ function filesFindGroups( test )
     {
       var map =
       {
-        src : src,
+        src,
+        dst,
         outputFormat : 'relative',
         recursive : 0,
         mandatory : 1,
@@ -7186,6 +7188,7 @@ function filesFindGroups( test )
       test.identical( found, expected );
     });
   }
+
 }
 
 //

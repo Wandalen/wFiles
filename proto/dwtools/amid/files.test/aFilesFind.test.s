@@ -498,7 +498,13 @@ function filesFindTrivial( test )
   provider.filesDelete( testPath );
   extract1.filesReflectTo( provider, testPath );
   var gotTree = provider.filesExtract( testPath );
+  gotTree.filesFind({ filePath : '/', recursive : 2, onDown : function onDown( r, o ) 
+  { 
+    if( r.isTerminal )
+    gotTree.fileWrite( r.absolute, gotTree.fileRead( r.absolute ) );
+  }})
   test.identical( gotTree.filesTree, extract1.filesTree );
+   
 
   extract1.filesReflectTo( provider, testPath );
 
@@ -549,6 +555,11 @@ function filesFindTrivial( test )
   provider.filesDelete( testPath );
   extract1.filesReflectTo({ dstProvider : provider, dstPath : testPath });
   var gotTree = provider.filesExtract( testPath );
+  gotTree.filesFind({ filePath : '/', recursive : 2, onDown : function onDown( r, o ) 
+  { 
+    if( r.isTerminal )
+    gotTree.fileWrite( r.absolute, gotTree.fileRead( r.absolute ) );
+  }})
   test.identical( gotTree.filesTree, extract1.filesTree );
   extract1.filesReflectTo( provider, testPath );
 
@@ -702,6 +713,11 @@ function filesFindTrivialAsync( test )
   extract1.filesReflectTo({ dstProvider : provider, dstPath : context.testSuitePath });
   // var gotTree = _.FileProvider.Extract().rewriteFromProvider( provider, context.testSuitePath );
   var gotTree = provider.filesExtract( context.testSuitePath );
+  gotTree.filesFind({ filePath : '/', recursive : 2, onDown : function onDown( r, o ) 
+  { 
+    if( r.isTerminal )
+    gotTree.fileWrite( r.absolute, gotTree.fileRead( r.absolute ) );
+  }})
   test.identical( gotTree.filesTree, extract1.filesTree );
 
   extract1.filesReflectTo( provider, context.testSuitePath );
@@ -7255,6 +7271,11 @@ function filesReflectEvaluate( test )
   test.identical( preserve, expectedPreserve );
 
   var extract2 = provider.filesExtract( testPath );
+  extract2.filesFind({ filePath : '/', recursive : 2, onDown : function onDown( r, o ) 
+  { 
+    if( r.isTerminal )
+    extract2.fileWrite( r.absolute, extract2.fileRead( r.absolute ) );
+  }})
   test.identical( extract2.filesTree, extract1.filesTree );
 
 }
@@ -11265,6 +11286,11 @@ function filesReflectToItself( test )
     }
   }
   var extract2 = provider.filesExtract( testPath );
+  extract2.filesFind({ filePath : '/', recursive : 2, onDown : function onDown( r, o ) 
+  { 
+    if( r.isTerminal )
+    extract2.fileWrite( r.absolute, extract2.fileRead( r.absolute ) );
+  }})
   test.identical( extract2.filesTree, expectedTree );
 
   /* */
@@ -12095,7 +12121,7 @@ function filesReflector( test )
     src : { basePath : 'src:///' },
     dst : { filePath : 'current:///' },
   });
-  reflect( '/' );
+  test.mustNotThrowError( () => reflect( '/' ) );
   var found = dst.filesFind({ filePath : testPath, allowingMissed : 1 });
   test.identical( found.length, 0 );
 
@@ -12152,7 +12178,7 @@ function filesReflector( test )
     src : { prefixPath : 'src:///' },
     dst : { prefixPath : 'current://' + testPath },
   });
-  reflect( '/' );
+  test.mustNotThrowError( () => reflect( '/' ) );
   var extract = provider.filesExtract( testPath );
   if( provider instanceof _.FileProvider.HardDrive )
   {
@@ -12338,9 +12364,13 @@ function filesReflectWithHub( test )
   test.is( records.length >= 0 );
 
   // var got = _.FileProvider.Extract.filesTreeRead({ srcPath : dstPath, srcProvider : dstProvider });
-  var got = dstProvider.filesExtract( dstPath ).filesTree;
-
-  test.identical( got, context.select( filesTree, srcPath ) )
+  var extract2 = dstProvider.filesExtract( dstPath );
+  extract2.filesFind({ filePath : '/', recursive : 2, onDown : function onDown( r, o ) 
+  { 
+    if( r.isTerminal )
+    extract2.fileWrite( r.absolute, extract2.fileRead( r.absolute ) );
+  }})
+  test.identical( extract2.filesTree, context.select( filesTree, srcPath ) )
 
   /* */
 
@@ -12362,8 +12392,13 @@ function filesReflectWithHub( test )
   test.is( records.length >= 0 );
 
   // var got = _.FileProvider.Extract.filesTreeRead({ srcPath : dstPath, srcProvider : dstProvider });
-  var got = dstProvider.filesExtract( dstPath ).filesTree;
-  test.identical( got, context.select( filesTree, '/src' ) );
+  var extract2 = dstProvider.filesExtract( dstPath );
+  extract2.filesFind({ filePath : '/', recursive : 2, onDown : function onDown( r, o ) 
+  { 
+    if( r.isTerminal )
+    extract2.fileWrite( r.absolute, extract2.fileRead( r.absolute ) );
+  }})
+  test.identical( extract2.filesTree, context.select( filesTree, '/src' ) );
 
   dstProvider.filesDelete( dstPath );
   srcProvider.finit();
@@ -14595,6 +14630,89 @@ function filesReflectTo( test )
   test.identical( found, expected );
   provider.filesDelete( testPath );
 
+}
+
+//
+
+function filesReflectDstIgnoring( test )
+{ 
+  let context = this;
+  let provider = context.provider;
+  let hub = context.hub;
+  let path = context.provider.path;
+  let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
+  
+  test.case = 'two srcs with same dst path, src2/proto/amid does not exist, dst/proto/amid exists before copy'
+  
+  var filesTree =
+  {
+    'src1' : 
+    { 
+      'proto' : 
+      {
+        'amid' : 
+        { 
+          'file' : 'file' 
+        }
+      }
+    },
+    
+    'src2' : 
+    { 
+      'proto' : {}
+    },
+    
+    'dst' : 
+    {
+      'proto' : 
+      {
+        'amid' : 
+        { 
+          'file' : 'file' 
+        }
+      }
+    },
+  }
+  
+  let extract = new _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree ) });
+  
+  let o = 
+  {
+    src : 
+    {
+      filePath : 
+      {
+        'src1/proto/amid' : '.',
+        'src1/proto/amid/file' : '.',
+        'src1/proto' : '.',
+        'src2/proto/amid' : '.',
+        'src2/proto' : '.'
+      },
+      basePath : 
+      {
+        'src1/proto/amid' : 'src1',
+        'src1/proto/amid/file' : 'src1',
+        'src1/proto' : 'src1',
+        'src2/proto/amid' : 'src2',
+        'src2/proto' : 'src2',
+      },
+      prefixPath : '/'
+    },
+    dst : 
+    {
+      basePath : '.',
+      prefixPath : '/dst'
+    },
+    recursive : 0
+  }
+  
+  test.mustNotThrowError( () => 
+  { 
+    debugger
+    extract.filesReflect( o ) 
+  });
+  
+  test.identical( extract.filesTree, filesTree );
 }
 
 //
@@ -19119,7 +19237,6 @@ function filesReflectExperiment( test )
   }
   var got = provider.filesExtract( dstPath );
   test.identical( got.filesTree, expected )
-
 }
 
 filesReflectExperiment.experimental = 1;
@@ -19193,6 +19310,7 @@ var Self =
     filesReflectDstDeletingDirs,
     filesReflectLinked,
     filesReflectTo,
+    filesReflectDstIgnoring,
 
     filesDeleteTrivial,
     filesDelete,

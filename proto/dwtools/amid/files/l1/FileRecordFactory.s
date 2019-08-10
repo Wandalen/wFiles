@@ -275,7 +275,8 @@ function form()
     if( factory.filter )
     {
       _.assert( factory.filter.formed === 5 );
-      _.assert( factory.filter.formedBasePath[ factory.stemPath ] === factory.basePath );
+      _.assert( !!factory.filter.formedBasePath );
+      _.assert( !!factory.filter.src || factory.filter.formedBasePath[ factory.stemPath ] === factory.basePath ); // yyy
       _.assert( factory.filter.effectiveFileProvider === factory.effectiveFileProvider );
       _.assert( factory.filter.hubFileProvider === factory.hubFileProvider || factory.filter.hubFileProvider === null );
       _.assert( factory.filter.defaultFileProvider === factory.defaultFileProvider );

@@ -1,6 +1,6 @@
 ( function _FileProvider_Extract_test_s_( ) {
 
-'use strict'; 
+'use strict';
 
 if( typeof module !== 'undefined' )
 {
@@ -144,6 +144,7 @@ var Proto =
   silencing : 1,
   abstract : 0,
   enabled : 1,
+  routineTimeOut : 30000,
 
   onSuiteBegin,
   onSuiteEnd,

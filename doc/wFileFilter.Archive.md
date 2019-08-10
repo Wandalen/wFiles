@@ -11,12 +11,14 @@ Archive contains several maps that stores info about file changes:
 The key of each map is a absolute path to a file. Value store by the key is a object with a properties:
 
 For a **directory** is:
+
 |  Name 	|Type| Description  	|
 |---	|---	|---  |
 |mtime |number | time of last modification
 |absolutePath |string | absolute path to a directory
 
 For a **terminal** file:
+
 |  Name 	|Type| Description  	|
 |---	|---	|---  |
 |mtime |number | time of last modification

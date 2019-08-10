@@ -7036,12 +7036,156 @@ function filesFindGroups( test )
     prefixPath : testPath,
   }
 
-  debugger;
-  var found = provider.filesFindGroups({ src : src, dst : dst, outputFormat : 'relative' });
+  // debugger;
+  // var found = provider.filesFindGroups({ src : src, dst : dst, outputFormat : 'relative' });
+
+  /* tests */
+
+  test.case = 'default settings';
+  var found = provider.filesFindGroups({ src : src, outputFormat : 'relative' });
   found.options = !!found.options;
+  test.identical( found, expected );
 
-  test.identical( found, expected ); debugger;
+  // test.identical( found, expected ); debugger;
 
+  test.case = 'mandatory : 1';
+  var map =
+  {
+    src : src,
+    outputFormat : 'relative',
+    mandatory : 1,
+  }
+  var found = provider.filesFindGroups( map );
+  found.options = !!found.options;
+  test.identical( found, expected );
+
+  // xxx
+
+  test.case = 'mandatory : 0';
+  var map =
+  {
+    src : src,
+    outputFormat : 'relative',
+    mandatory : 0,
+  }
+  var found = provider.filesFindGroups( map );
+  found.options = !!found.options;
+  test.identical( found, expected );
+
+
+  test.case = 'sync : 0';
+  var map =
+  {
+    src : src,
+    outputFormat : 'relative',
+    sync : 0,
+  }
+  var found = provider.filesFindGroups( map );
+  found.options = !!found.options;
+  test.identical( found, expected );
+
+
+  test.case = 'distinct : 0';
+  var map =
+  {
+    src : src,
+    outputFormat : 'relative',
+    distinct : 0,
+  }
+  var found = provider.filesFindGroups( map );
+  found.options = !!found.options;
+  test.identical( found, expected );
+
+
+  test.case = 'recursive : 1, mandatory : 0';
+  var expected =
+  {
+    'pathsGrouped' :
+    {
+      [ abs( 'Produced.txt' ) ] : { [ abs( '**.txt' ) ] : null },
+      [ abs( 'Produced.js' ) ] : { [ abs( '**.js' ) ] : null }
+    },
+    'filesGrouped' :
+    {
+      [ abs( 'Produced.txt' ) ] :
+      [
+        './a.txt', './b.txt'
+      ],
+      [ abs( 'Produced.js' ) ] :
+      [
+        './a.js', './b.js'
+      ]
+    },
+    'srcFiles' :
+    {
+      './a.txt' : './a.txt',
+      './b.txt' : './b.txt',
+      './a.js' : './a.js',
+      './b.js' : './b.js',
+    },
+    'errors' : [],
+    'options' : true,
+  }
+  var map =
+  {
+    src : src,
+    outputFormat : 'relative',
+    recursive : 1,
+  }
+  var found = provider.filesFindGroups( map );
+  found.options = !!found.options;
+  test.identical( found, expected );
+
+
+  test.case = 'recursive : 0';
+  var expected =
+  {
+    'pathsGrouped' :
+    {
+      [ abs( 'Produced.txt' ) ] : { [ abs( '**.txt' ) ] : null },
+      [ abs( 'Produced.js' ) ] : { [ abs( '**.js' ) ] : null }
+    },
+    'filesGrouped' :
+    {
+      [ abs( 'Produced.txt' ) ] : [],
+      [ abs( 'Produced.js' ) ] : [],
+    },
+    'srcFiles' :
+    {
+    },
+    'errors' : [],
+    'options' : true,
+  }
+  var map =
+  {
+    src : src,
+    outputFormat : 'relative',
+    recursive : 0,
+    mandatory : 0,
+  }
+  var found = provider.filesFindGroups( map );
+  found.options = !!found.options;
+  test.identical( found, expected );
+
+  /* - */
+
+  if( Config.debug )
+  {
+    test.case = 'recursive : 0, mandatory : 1';
+    test.shouldThrowErrorSync( () =>
+    {
+      var map =
+      {
+        src : src,
+        outputFormat : 'relative',
+        recursive : 0,
+        mandatory : 1,
+      }
+      var found = provider.filesFindGroups( map );
+      found.options = !!found.options;
+      test.identical( found, expected );
+    });
+  }
 }
 
 //
@@ -16462,7 +16606,7 @@ function filesDeleteAndAsyncWrite( test )
   let provider = context.provider;
   let hub = context.hub;
   let path = context.provider.path;
-  let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
+  // let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
 
   test.case = 'try to delete dir before async write will be completed';
 

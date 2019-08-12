@@ -326,10 +326,6 @@ function _preFilePathScalarWithProviderDefaults( routine, args )
   let self = this;
 
   let o = self._preFilePathScalarWithoutProviderDefaults.apply( self, arguments );
-
-  // if( o.verbosity === null )
-  // o.verbosity = _.numberClamp( self.verbosity - 4, 0, 9 );
-
   self._providerDefaultsApply( o );
 
   return o;
@@ -370,7 +366,6 @@ function _preFilePathVectorWithProviderDefaults( routine, args )
   let self = this;
 
   let o = self._preFilePathVectorWithoutProviderDefaults.apply( self, arguments );
-
   self._providerDefaultsApply( o );
 
   return o;
@@ -388,23 +383,13 @@ function _preFileFilterWithoutProviderDefaults( routine, args )
 
   let o = args[ 0 ];
 
-  // if( path.like( o ) )
-  // o = { src : path.from( o ) };
-  // else if( _.arrayIs( o ) )
-  // o = { src : path.s.from( o ) };
-  // else if( _.arrayIs( o.src ) )
-  // o.src = path.s.from( o.src );
-
   _.routineOptions( routine, o );
-  // _.assert( path.s.allAreAbsolute( o.src.filePath ), () => 'Expects absolute path {-o.src.filePath-}' );
 
   o.src = self.recordFilter( o.src );
-  // o.src.prefixPath = o.src.prefixPath || path.current();
 
   if( o.dst !== undefined && o.dst !== null )
   {
     o.dst = self.recordFilter( o.dst );
-    // o.dst.prefixPath = o.dst.prefixPath || path.current();
     o.src.pairWithDst( o.dst );
   }
 
@@ -441,13 +426,13 @@ function _preSrcDstPathWithoutProviderDefaults( routine, args )
   if( o.dstPath !== null )
   {
     o.dstPath = path.s.from( o.dstPath );
-    o.dstPath = path.s.normalize( o.dstPath );
+    o.dstPath = path.s.canonize( o.dstPath );
   }
 
   if( o.srcPath !== null )
   {
     o.srcPath = path.s.from( o.srcPath );
-    o.srcPath = path.s.normalize( o.srcPath );
+    o.srcPath = path.s.canonize( o.srcPath );
   }
 
   return o;
@@ -460,10 +445,6 @@ function _preSrcDstPathWithProviderDefaults( routine, args )
   let self = this;
 
   let o = self._preSrcDstPathWithoutProviderDefaults.apply( self, arguments );
-
-  // if( o.verbosity === null )
-  // o.verbosity = _.numberClamp( self.verbosity - 4, 0, 9 );
-
   self._providerDefaultsApply( o );
 
   return o;
@@ -5151,7 +5132,11 @@ dirMakeForFile.having.aspect = 'entry';
 function _link_pre( routine, args )
 {
   let self = this;
-  let o = self._preSrcDstPathWithProviderDefaults.apply( self, arguments );
+  // let o = self._preSrcDstPathWithProviderDefaults.apply( self, arguments );
+
+  let o = self._preSrcDstPathWithoutProviderDefaults.apply( self, arguments );
+  self._providerDefaultsApply( o );
+
   _.mapSupplementNulls( o, routine.defaults );
   return o;
 }
@@ -7251,7 +7236,10 @@ function filesAreLinked_pre( routine, args )
 
   _.assert( _.mapIs( o ) );
 
-  o = self._preFilePathVectorWithProviderDefaults.call( self, routine, [ o ] );
+  // o = self._preFilePathVectorWithProviderDefaults.call( self, routine, [ o ] );
+
+  o = self._preFilePathVectorWithoutProviderDefaults.call( self, routine, [ o ] );
+  self._providerDefaultsApply( o );
 
   return o;
 }
@@ -7658,10 +7646,12 @@ let Proto =
   _fileOptionsGet,
   _providerDefaultsApply,
   assertProviderDefaults,
+
   _preFilePathScalarWithoutProviderDefaults,
   _preFilePathScalarWithProviderDefaults,
   _preFilePathVectorWithoutProviderDefaults,
   _preFilePathVectorWithProviderDefaults,
+
   _preFileFilterWithoutProviderDefaults,
   _preFileFilterWithProviderDefaults,
   _preSrcDstPathWithoutProviderDefaults,

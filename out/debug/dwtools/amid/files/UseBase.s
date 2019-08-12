@@ -1,6 +1,6 @@
 ( function _UseBase_s_() {
 
-'use strict'; 
+'use strict';
 
 if( typeof module !== 'undefined' )
 {
@@ -15,6 +15,7 @@ if( typeof module !== 'undefined' )
   _.include( 'wPathFundamentals' );
   _.include( 'wUriFundamentals' );
   _.include( 'wWebUriFundamentals' );
+  _.include( 'wPathTools' );
   _.include( 'wLogger' );
   _.include( 'wRegexpObject' );
   _.include( 'wFieldsStack' );

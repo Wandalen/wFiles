@@ -499,9 +499,12 @@ function pathsResolve( test )
     _.path.join( currentPath, 'b' ),
     _.path.join( currentPath, 'b' ),
     _.path.join( _.path.dir( currentPath ), 'b' ),
-    _.path.normalize( _.path.dir( currentPath ) ),
+   
+    _.path.canonize( _.path.dir( currentPath ) )
+    //_.path.normalize( _.path.dir( currentPath ) ),
     // routine normalizeStrict does not exist now
     // _.path.normalizeStrict( _.path.dir( currentPath ) )
+
   ];
   test.identical( got, expected );
 
@@ -509,6 +512,12 @@ function pathsResolve( test )
 
   if( !Config.debug )
   return
+  
+  test.case = 'empty'
+  test.shouldThrowError( function()
+  {
+    rovider.path.s.resolve()
+  });
 
   test.case = 'without arguments';
   test.shouldThrowErrorSync( () => provider.path.s.resolve() )
@@ -538,14 +547,13 @@ function regexpMakeSafe( test )
     includeAll : [],
     excludeAny :
     [
-      /(\W|^)node_modules(\W|$)/,
-      /\.unique$/,
-      /\.git$/,
-      /\.svn$/,
-      /\.hg$/,
-      /\.tmp($|\/)/,
-      /\.DS_Store$/,
-      /(^|\/)\.(?!$|\/|\.)/,
+      /(\W|^)node_modules(\W|$)/, 
+      /\.unique$/, 
+      /\.git$/, 
+      /\.svn$/, 
+      /\.hg$/, 
+      /\.tmp($|\/)/, 
+      /\.DS_Store$/, 
       /(^|\/)-/
     ],
     excludeAll : []
@@ -553,7 +561,10 @@ function regexpMakeSafe( test )
   var got = _.files.regexpMakeSafe();
   // logger.log( 'got',_.toStr( got,{ levels : 3 } ) );
   // logger.log( 'expected1',_.toStr( expected1,{ levels : 3 } ) );
-  test.contains( got, expected1 );
+  test.identical( got.includeAny, expected1.includeAny );
+  test.identical( got.includeAll, expected1.includeAll );
+  test.identical( got.excludeAny, expected1.excludeAny );
+  test.identical( got.excludeAll, expected1.excludeAll );
 
   test.case = 'single path for include any mask'; /* */
   var path2 = 'foo/bar';
@@ -563,20 +574,22 @@ function regexpMakeSafe( test )
     includeAll : [],
     excludeAny :
     [
-      /(\W|^)node_modules(\W|$)/,
-      /\.unique$/,
-      /\.git$/,
-      /\.svn$/,
-      /\.hg$/,
-      /\.tmp($|\/)/,
-      /\.DS_Store$/,
-      /(^|\/)\.(?!$|\/|\.)/,
+      /(\W|^)node_modules(\W|$)/, 
+      /\.unique$/, 
+      /\.git$/, 
+      /\.svn$/, 
+      /\.hg$/, 
+      /\.tmp($|\/)/, 
+      /\.DS_Store$/, 
       /(^|\/)-/
     ],
     excludeAll : []
   };
   var got = _.files.regexpMakeSafe( path2 );
-  test.contains( got, expected2 );
+  test.identical( got.includeAny, expected2.includeAny );
+  test.identical( got.includeAll, expected2.includeAll );
+  test.identical( got.excludeAny, expected2.excludeAny );
+  test.identical( got.excludeAll, expected2.excludeAll );
 
   test.case = 'array of paths for include any mask'; /* */
   var path3 = [ 'foo/bar', 'foo2/bar2/baz', 'some.txt' ];
@@ -586,20 +599,22 @@ function regexpMakeSafe( test )
     includeAll : [],
     excludeAny :
     [
-      /(\W|^)node_modules(\W|$)/,
-      /\.unique$/,
-      /\.git$/,
-      /\.svn$/,
-      /\.hg$/,
-      /\.tmp($|\/)/,
-      /\.DS_Store$/,
-      /(^|\/)\.(?!$|\/|\.)/,
+      /(\W|^)node_modules(\W|$)/, 
+      /\.unique$/, 
+      /\.git$/, 
+      /\.svn$/, 
+      /\.hg$/, 
+      /\.tmp($|\/)/, 
+      /\.DS_Store$/, 
       /(^|\/)-/
     ],
     excludeAll : []
   };
   var got = _.files.regexpMakeSafe( path3 );
-  test.contains( got, expected3 );
+  test.identical( got.includeAny, expected3.includeAny );
+  test.identical( got.includeAll, expected3.includeAll );
+  test.identical( got.excludeAny, expected3.excludeAny );
+  test.identical( got.excludeAll, expected3.excludeAll );
 
   test.case = 'regex object passed as mask for include any mask'; /* */
   var paths4 =
@@ -615,14 +630,13 @@ function regexpMakeSafe( test )
     includeAll : [ /index\.js/ ],
     excludeAny :
     [
-      /(\W|^)node_modules(\W|$)/,
-      /\.unique$/,
-      /\.git$/,
-      /\.svn$/,
-      /\.hg$/,
-      /\.tmp($|\/)/,
-      /\.DS_Store$/,
-      /(^|\/)\.(?!$|\/|\.)/,
+      /(\W|^)node_modules(\W|$)/, 
+      /\.unique$/, 
+      /\.git$/, 
+      /\.svn$/, 
+      /\.hg$/, 
+      /\.tmp($|\/)/, 
+      /\.DS_Store$/, 
       /(^|\/)-/,
       /aa\.js/,
       /bb\.js/
@@ -630,7 +644,10 @@ function regexpMakeSafe( test )
     excludeAll : [ /package\.json/, /bower\.json/ ]
   };
   var got = _.files.regexpMakeSafe( paths4 );
-  test.contains( got, expected4 );
+  test.identical( got.includeAny, expected4.includeAny );
+  test.identical( got.includeAll, expected4.includeAll );
+  test.identical( got.excludeAny, expected4.excludeAny );
+  test.identical( got.excludeAll, expected4.excludeAll );
 
   if( Config.debug ) //
   {
@@ -1029,7 +1046,7 @@ function pathDirTempForTrivial( test )
     _.path.fileProvider.fileDelete({ filePath : possiblePath, safe : 0 });
   }
   catch( err )
-  {
+  { 
     shouldThrowError = true;
   }
   if( shouldThrowError )
@@ -1057,7 +1074,7 @@ function pathDirTempForTrivial( test )
   test.will = 'repeat close call on same temp dir path, should throw error'
   test.shouldThrowErrorSync( () => _.path.pathDirTempForClose( tempPath ) );
   test.will = 'try to close other dir, should throw error'
-  test.shouldThrowErrorSync( () => _.path.pathDirTempForClose( testPath ) );
+  test.shouldThrowErrorSync( () => _.path.pathDirTempForClose( _.path.dir( filePath ) ) );
 
   //
 

@@ -2078,7 +2078,7 @@ function basePathSimplify()
 
 }
 
-//
+// xxx : remove maybe?
 
 function basePathDotUnwrap()
 {
@@ -4036,17 +4036,23 @@ function hasAnyPath()
   let filePath = filter.filePathArrayNonBoolGet();
 
   if( filePath.length === 1 )
-  if( filePath[ 0 ] === '.' || filePath[ 0 ] === '' || filePath[ 0 ] === null ) // xxx
+  if( filePath[ 0 ] === '' || filePath[ 0 ] === null ) // xxx
   {
-    /*
-    exception for dst filter
-    actually, exception for src filter
-    */
-    if( filter.src )
-    if( filePath[ 0 ] === '.' ) // xxx
-    return true;
     return false;
   }
+
+  // if( filePath.length === 1 )
+  // if( filePath[ 0 ] === '.' || filePath[ 0 ] === '' || filePath[ 0 ] === null ) // xxx
+  // {
+  //   /*
+  //   exception for dst filter
+  //   actually, exception for src filter
+  //   */
+  //   if( filter.src )
+  //   if( filePath[ 0 ] === '.' ) // xxx
+  //   return true;
+  //   return false;
+  // }
 
   if( filePath.length )
   return true;

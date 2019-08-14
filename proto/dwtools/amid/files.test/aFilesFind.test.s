@@ -19372,6 +19372,10 @@ filesFindExperiment2.experimental = 1;
 
 //
 
+/*
+qqq : not sure, why it should work differently?
+*/
+
 function filesReflectExperiment( test )
 {
   let context = this;
@@ -19394,15 +19398,6 @@ function filesReflectExperiment( test )
     dstPath : testPath,
     dstProvider : provider,
   })
-
-  // _.FileProvider.Extract.readToProvider
-  // ({
-  //   dstProvider : provider,
-  //   dstPath : testPath,
-  //   filesTree : filesTree,
-  //   allowWrite : 1,
-  //   allowDelete : 1,
-  // });
 
   test.case = 'directory for terminal is not created, as the result fileCopy fails'
 
@@ -19430,7 +19425,6 @@ function filesReflectExperiment( test )
 }
 
 filesReflectExperiment.experimental = 1;
-
 
 // --
 // declare

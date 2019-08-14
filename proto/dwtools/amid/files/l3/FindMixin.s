@@ -931,7 +931,7 @@ function filesFinder_functor( routine )
 
       }
 
-      debugger;
+      // debugger;
       return routine.call( self, o );
     }
 

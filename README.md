@@ -153,3 +153,4 @@ If sync option is avaible - method supports sync/async modes. Use `true` for syn
 >  - sync  { Boolean } - sync/async mode switch, default = false;
 >  - pathFile { String } - path to target file; -->
 
+

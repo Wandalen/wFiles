@@ -7,16 +7,17 @@ if( typeof module !== 'undefined' )
   let _ = require( '../../../Tools.s' );
   if( !_.FileProvider )
   require( '../UseMid.s' );
-  
+
   var Tar;
-  
+
   try
   {
     Tar = require( 'tar' );
   }
-  catch
+  catch( err )
   {
   }
+
 }
 
 let _global = _global_;
@@ -578,9 +579,9 @@ function filesReflectSingle_body( o )
     return recordsMake();
   }
   else
-  { 
+  {
     _.assert( Tar !== undefined, 'o.extra.usingNpm:0 mode can\'t be used without package "tar"' );
-    
+
     let providerHttp = _.FileProvider.Http();
     let tmpPackagePath = localProvider.path.join( tmpEssentialPath, 'package' );
     let version = parsed.hash || 'latest';

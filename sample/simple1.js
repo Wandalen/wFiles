@@ -2,7 +2,7 @@
 if( typeof module !== 'undefined' )
 var _ = require( '..' )
 
-_.include( 'wExternalFundamentals' )
+_.include( 'wAppBasic' )
 
 let o = 
 {

@@ -8,13 +8,13 @@ if( typeof module !== 'undefined' )
   let _ = require( '../../Tools.s' );
 
   _.include( 'wSelector' );
-  _.include( 'wExternalFundamentals' );
-  _.include( 'wRoutineFundamentals' );
+  _.include( 'wAppBasic' );
+  _.include( 'wRoutineBasic' );
   _.include( 'wProto' );
 
-  _.include( 'wPathFundamentals' );
-  _.include( 'wUriFundamentals' );
-  _.include( 'wWebUriFundamentals' );
+  _.include( 'wPathBasic' );
+  _.include( 'wUriBasic' );
+  _.include( 'wWebUriBasic' );
   _.include( 'wPathTools' );
   _.include( 'wLogger' );
   _.include( 'wRegexpObject' );

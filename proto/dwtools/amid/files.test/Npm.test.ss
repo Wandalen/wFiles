@@ -51,7 +51,7 @@ function filesReflectTrivial( test )
   let hub = context.hub;
   let path = context.providerDst.path;
   let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
-  let installPath = path.join( testPath, 'wPathFundamentals' );
+  let installPath = path.join( testPath, 'wPathBasic' );
   let installPathGlobal = providerDst.path.globalFromLocal( installPath );
 
   let con = new _.Consequence().take( null )
@@ -60,7 +60,7 @@ function filesReflectTrivial( test )
   {
     test.case = 'no hash, no trailing /';
     providerDst.filesDelete( installPath );
-    let remotePath = 'npm:///wpathfundamentals';
+    let remotePath = 'npm:///wpathbasic';
     return hub.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
   })
   .thenKeep( ( got ) =>
@@ -85,7 +85,7 @@ function filesReflectTrivial( test )
   {
     test.case = 'no hash, with trailing /';
     providerDst.filesDelete( installPath );
-    let remotePath = 'npm:///wpathfundamentals/'
+    let remotePath = 'npm:///wpathbasic/'
     return hub.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
   })
   .thenKeep( ( got ) =>
@@ -110,7 +110,7 @@ function filesReflectTrivial( test )
   {
     test.case = 'already exists';
     providerDst.filesDelete( installPath );
-    let remotePath = 'npm:///wpathfundamentals';
+    let remotePath = 'npm:///wpathbasic';
     let o = { reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 };
     hub.filesReflect( _.cloneJust( o ) )
     return hub.filesReflect( _.cloneJust( o ) );
@@ -137,7 +137,7 @@ function filesReflectTrivial( test )
   {
     test.case = 'specific version';
     providerDst.filesDelete( installPath );
-    let remotePath = 'npm:///wpathfundamentals#0.6.154'
+    let remotePath = 'npm:///wpathbasic#0.6.154'
     return hub.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
   })
   .thenKeep( ( got ) =>
@@ -165,7 +165,7 @@ function filesReflectTrivial( test )
   {
     test.case = 'specific tag';
     providerDst.filesDelete( installPath );
-    let remotePath = 'npm:///wpathfundamentals#latest'
+    let remotePath = 'npm:///wpathbasic#latest'
     return hub.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
   })
   .thenKeep( ( got ) =>
@@ -194,7 +194,7 @@ function filesReflectTrivial( test )
     test.case = 'path is occupied';
     providerDst.filesDelete( installPath );
     providerDst.fileWrite( installPath, installPath );
-    let remotePath = 'npm:///wpathfundamentals';
+    let remotePath = 'npm:///wpathbasic';
     return test.shouldThrowErrorSync( () => hub.filesReflect( { reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 } ));
   })
   .thenKeep( () =>
@@ -234,7 +234,7 @@ filesReflectTrivial.timeOut = 120000;
 //   let providerDst = context.providerDst;
 //   let path = context.providerDst.path;
 //   let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
-//   let installPath = path.join( testPath, 'wPathFundamentals' );
+//   let installPath = path.join( testPath, 'wPathBasic' );
 
 //   let con = new _.Consequence().take( null )
 
@@ -242,7 +242,7 @@ filesReflectTrivial.timeOut = 120000;
 //   {
 //     test.case = 'localPath';
 //     providerDst.filesDelete( installPath );
-//     let remotePath = '/wpathfundamentals';
+//     let remotePath = '/wpathbasic';
 //     return providerSrc.filesReflect
 //     ({
 //       reflectMap : { [ remotePath ] : installPath },
@@ -272,7 +272,7 @@ filesReflectTrivial.timeOut = 120000;
 //   {
 //     test.case = 'localPath with hash';
 //     providerDst.filesDelete( installPath );
-//     let remotePath = '/wpathfundamentals#0.6.154';
+//     let remotePath = '/wpathbasic#0.6.154';
 //     return providerSrc.filesReflect
 //     ({
 //       reflectMap : { [ remotePath ] : installPath },
@@ -305,7 +305,7 @@ filesReflectTrivial.timeOut = 120000;
 //   {
 //     test.case = 'localPath with trailing slash and hash';
 //     providerDst.filesDelete( installPath );
-//     let remotePath = '/wpathfundamentals/#0.6.154';
+//     let remotePath = '/wpathbasic/#0.6.154';
 //     return providerSrc.filesReflect
 //     ({
 //       reflectMap : { [ remotePath ] : installPath },
@@ -335,7 +335,7 @@ filesReflectTrivial.timeOut = 120000;
 //   {
 //     test.case = 'rewrite existing';
 //     providerDst.filesDelete( installPath );
-//     let remotePath = '/wpathfundamentals';
+//     let remotePath = '/wpathbasic';
 //     let o =
 //     {
 //       reflectMap : { [ remotePath ] : installPath },
@@ -368,7 +368,7 @@ filesReflectTrivial.timeOut = 120000;
 //   {
 //     test.case = 'githubname/reponame';
 //     providerDst.filesDelete( installPath );
-//     let remotePath = '/Wandalen/wPathFundamentals';
+//     let remotePath = '/Wandalen/wPathBasic';
 //     return providerSrc.filesReflect
 //     ({
 //       reflectMap : { [ remotePath ] : installPath },
@@ -402,7 +402,7 @@ filesReflectTrivial.timeOut = 120000;
 //     test.case = 'path is occupied by terminal';
 //     providerDst.filesDelete( installPath );
 //     providerDst.fileWrite( installPath,installPath );
-//     let remotePath = '/wpathfundamentals';
+//     let remotePath = '/wpathbasic';
 //     let o =
 //     {
 //       reflectMap : { [ remotePath ] : installPath },

@@ -1261,7 +1261,7 @@ let filesRead = _.routineFromPreAndBody( filesFindGroups.pre, filesRead_body );
 
 //   _.routineOptions( filesCopyWithAdapter, o );
 //   self._providerDefaultsApply( o );
-  
+
 //   if( o.onUp === null )
 //   o.onUp = [];
 //   if( o.onDown === null )
@@ -1825,9 +1825,17 @@ function filesReflectEvaluate_body( o )
     // if( _.strEnds( record.dst.absolute, debugPath ) )
     // debugger;
 
+    // if( touchMap[ record.dst.absolute ] )
+    // debugger;
     if( touchMap[ record.dst.absolute ] )
     touch( record, touchMap[ record.dst.absolute ] );
     _.assert( touchMap[ record.dst.absolute ] === record.touch || !record.touch );
+
+    // if( actionMap[ record.dst.absolute ] )
+    // debugger;
+    // if( actionMap[ record.dst.absolute ] ) // yyy
+    // action( record, actionMap[ record.dst.absolute ] ); // yyy
+    // _.assert( actionMap[ record.dst.absolute ] === record.action || !record.action ); // yyy
 
     _.sure( !_.strBegins( record.dst.absolute, '/../' ), () => 'Destination path ' + _.strQuote( record.dst.absolute ) + ' leads out of file system.' );
 
@@ -2042,6 +2050,7 @@ function filesReflectEvaluate_body( o )
     // if( _.strEnds( record.dst.absolute, debugPath ) )
     // debugger;
 
+    // _.assert( touchMap[ record.dst.absolute ] === record.touch || !record.touch ); // yyy
     if( touchMap[ record.dst.absolute ] )
     touch( record, touchMap[ record.dst.absolute ] );
     _.assert( touchMap[ record.dst.absolute ] === record.touch || !record.touch );
@@ -2114,11 +2123,17 @@ function filesReflectEvaluate_body( o )
 
     if( record.reason === 'srcLooking' )
     {
-      if( !record.src.stat )
-      debugger;
-      if( ( !record.src.isActual || !record.src.stat ) && !record.touch )
+      // if( !record.src.stat )
+      // debugger;
+      // if( ( !record.src.isActual || !record.src.stat ) && !record.touch )
+      if( !record.src.isActual || !record.src.stat )
+      if( !record.touch || actionMap[ record.dst.absolute ] )
       {
+        if( !record.touch )
         action( record, 'exclude' );
+        else if( actionMap[ record.dst.absolute ] )
+        action( record, actionMap[ record.dst.absolute ] );
+        _.assert( !!record.action );
         return;
       }
     }

@@ -207,12 +207,8 @@ function fileReadAct( o )
 
   /* advanced */
 
-  if( !o.advanced )
-  o.advanced = {};
-
-  _.mapComplement( o.advanced, fileReadAct.advanced );
-  _.assertMapHasOnly( o.advanced, fileReadAct.advanced );
-
+  debugger;
+  o.advanced = _.routineOptions( fileReadAct, o.advanced, fileReadAct.advanced );
   o.advanced.method = o.advanced.method.toUpperCase();
 
   /* http request */
@@ -421,15 +417,11 @@ function fileReadAct( o )
 fileReadAct.defaults = Object.create( Parent.prototype.fileReadAct.defaults );
 fileReadAct.having = Object.create( Parent.prototype.fileReadAct.having );
 
-fileReadAct.advanced =
-{
-
-  send : null,
-  method : 'GET',
-  user : null,
-  password : null,
-
-}
+var advanced = fileReadAct.advanced = Object.create( null );
+advanced.send = null;
+advanced.method = 'GET';
+advanced.user = null;
+advanced.password = null;
 
 // --
 // encoders

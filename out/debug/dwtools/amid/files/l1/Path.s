@@ -10,7 +10,7 @@ if( typeof module !== 'undefined' )
   let _global = _global_;
   let _ = _global_.wTools;
 
-  _.include( 'wPathFundamentals' );
+  _.include( 'wPathBasic' );
 
 }
 
@@ -78,10 +78,6 @@ function from( src )
   else _.assert( 0, 'Expects string, but got', _.strType( src ) );
 
 }
-
-// //
-//
-// let pathsFrom = _.routineVectorize_functor( from );
 
 //
 

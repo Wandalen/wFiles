@@ -1238,205 +1238,210 @@ let filesRead = _.routineFromPreAndBody( filesFindGroups.pre, filesRead_body );
 
 //
 
-function filesCopyWithAdapter( o )
-{
-  let self = this;
+// function filesCopyWithAdapter( o )
+// {
+//   let self = this;
 
-  if( arguments.length === 2 )
-  o = { dst : arguments[ 0 ] , src : arguments[ 1 ] }
+//   if( arguments.length === 2 )
+//   o = { dst : arguments[ 0 ] , src : arguments[ 1 ] }
 
-  _.assert( arguments.length === 1 || arguments.length === 2 );
+//   _.assert( arguments.length === 1 || arguments.length === 2 );
 
-  if( !o.allowDelete && o.investigateDestination === undefined )
-  o.investigateDestination = 0;
+//   if( !o.allowDelete && o.investigateDestination === undefined )
+//   o.investigateDestination = 0;
 
-  if( o.allowRewrite === undefined )
-  o.allowRewrite = filesCopyWithAdapter.defaults.allowRewrite;
+//   if( o.allowRewrite === undefined )
+//   o.allowRewrite = filesCopyWithAdapter.defaults.allowRewrite;
 
-  if( o.allowRewrite && o.allowWrite === undefined )
-  o.allowWrite = 1;
+//   if( o.allowRewrite && o.allowWrite === undefined )
+//   o.allowWrite = 1;
 
-  if( o.allowRewrite && o.allowRewriteFileByDir === undefined  )
-  o.allowRewriteFileByDir = true;
+//   if( o.allowRewrite && o.allowRewriteFileByDir === undefined  )
+//   o.allowRewriteFileByDir = true;
 
-  _.routineOptions( filesCopyWithAdapter, o );
-  self._providerDefaultsApply( o );
+//   _.routineOptions( filesCopyWithAdapter, o );
+//   self._providerDefaultsApply( o );
 
-  /* safe */
+//   if( o.onUp === null )
+//   o.onUp = [];
+//   if( o.onDown === null )
+//   o.onDown = [];
 
-  // if( self.safe )
-  // if( o.removingSource && ( !o.allowWrite || !o.allowRewrite ) )
-  // throw _.err( 'not safe removingSource:1 with allowWrite:0 or allowRewrite:0' );
+//   /* safe */
 
-  o.src = self.path.normalize( o.src );
-  o.dst = self.path.normalize( o.dst );
+//   // if( self.safe )
+//   // if( o.removingSource && ( !o.allowWrite || !o.allowRewrite ) )
+//   // throw _.err( 'not safe removingSource:1 with allowWrite:0 or allowRewrite:0' );
 
-  let options = Object.create( null );
-  _.mapExtend( options, _.mapOnly( o, filesReflect.defaults ) );
+//   o.src = self.path.normalize( o.src );
+//   o.dst = self.path.normalize( o.dst );
 
-  /*
-    'investigateDestination',
-    'verbosity',
-    'silentPreserve?',
-    'resolvingSoftLink',
-    'resolvingTextLink',
-    'allowDelete',
-    'allowWrite',
-    'allowRewrite',
-    'allowRewriteFileByDir',
-    'removingSourceTerminals',
-    'removingSource',
-    'tryingPreserve',
-    'ext?',
-    'maxSize?',
-    'usingExtraStat?',
-  */
+//   let options = Object.create( null );
+//   _.mapExtend( options, _.mapOnly( o, filesReflect.defaults ) );
 
-  options.linking = options.linking ? 'hardLink' : 'fileCopy';
-  options.srcDeleting = o.removingSource || o.removingSourceTerminals; // check it
-  options.dstDeleting = o.allowDelete;
-  options.writing = o.allowWrite;
-  options.dstRewriting = o.allowRewrite;
-  options.dstRewritingByDistinct = o.allowRewriteFileByDir; // check it
-  options.preservingTime = o.preservingTime;
-  options.preservingSame = o.tryingPreserve; // check it
-  options.includingDst = o.investigateDestination;
+//   /*
+//     'investigateDestination',
+//     'verbosity',
+//     'silentPreserve?',
+//     'resolvingSoftLink',
+//     'resolvingTextLink',
+//     'allowDelete',
+//     'allowWrite',
+//     'allowRewrite',
+//     'allowRewriteFileByDir',
+//     'removingSourceTerminals',
+//     'removingSource',
+//     'tryingPreserve',
+//     'ext?',
+//     'maxSize?',
+//     'usingExtraStat?',
+//   */
 
-  /*
-  zzz : wrong! resolving*Link and resolvingSoftLink are not related, as well as resolvingTextLink
-  Vova : low priority
-  */
+//   options.linking = options.linking ? 'hardLink' : 'fileCopy';
+//   options.srcDeleting = o.removingSource || o.removingSourceTerminals; // check it
+//   options.dstDeleting = o.allowDelete;
+//   options.writing = o.allowWrite;
+//   options.dstRewriting = o.allowRewrite;
+//   options.dstRewritingByDistinct = o.allowRewriteFileByDir; // check it
+//   options.preservingTime = o.preservingTime;
+//   options.preservingSame = o.tryingPreserve; // check it
+//   options.includingDst = o.investigateDestination;
 
-  options.resolvingSrcSoftLink = o.resolvingSoftLink;
-  options.resolvingDstSoftLink = o.resolvingSoftLink;
-  options.resolvingSrcTextLink = o.resolvingTextLink;
-  options.resolvingDstTextLink = o.resolvingTextLink;
+//   /*
+//   zzz : wrong! resolving*Link and resolvingSoftLink are not related, as well as resolvingTextLink
+//   Vova : low priority
+//   */
 
-  options.onWriteDstUp = o.onUp;
-  options.onWriteDstDown = o.onDown;
+//   options.resolvingSrcSoftLink = o.resolvingSoftLink;
+//   options.resolvingDstSoftLink = o.resolvingSoftLink;
+//   options.resolvingSrcTextLink = o.resolvingTextLink;
+//   options.resolvingDstTextLink = o.resolvingTextLink;
 
-  delete options.onUp;
-  delete options.onDown;
+//   options.onWriteDstUp = o.onUp;
+//   options.onWriteDstDown = o.onDown;
 
-  options.reflectMap = Object.create( null );
-  options.reflectMap[ o.src ] = o.dst;
+//   delete options.onUp;
+//   delete options.onDown;
 
-  // options.srcProvider = self;
-  // options.dstProvider = self;
+//   options.reflectMap = Object.create( null );
+//   options.reflectMap[ o.src ] = o.dst;
 
-  if( !options.filter )
-  options.filter = Object.create( null );
+//   // options.srcProvider = self;
+//   // options.dstProvider = self;
 
-  if( options.filter instanceof _.FileRecordFilter )
-  {
-    options.src = options.filter.clone();
-    // options.dst = options.filter.clone();
-  }
-  else
-  {
-    options.src = self.recordFilter( options.filter );
-    // options.dst = self.recordFilter( options.filter );
-  }
+//   if( !options.filter )
+//   options.filter = Object.create( null );
 
-  options.filter = null;
+//   if( options.filter instanceof _.FileRecordFilter )
+//   {
+//     options.src = options.filter.clone();
+//     // options.dst = options.filter.clone();
+//   }
+//   else
+//   {
+//     options.src = self.recordFilter( options.filter );
+//     // options.dst = self.recordFilter( options.filter );
+//   }
 
-  options.src.effectiveFileProvider = self;
-  // options.dst.effectiveFileProvider = self;
+//   options.filter = null;
 
-  if( o.ext )
-  {
-    _.assert( _.strIs( o.ext ) );
-    _.assert( !o.onDstName, 'o.ext is not compatible with o.onDstName' );
-    let ext = o.ext;
-    options.onDstName = function( relative, dstRecordFactory, op, o, srcRecord )
-    {
-      if( !srcRecord.isDir )
-      return self.path.changeExt( relative, ext );
-      return relative;
-    }
-  }
+//   options.src.effectiveFileProvider = self;
+//   // options.dst.effectiveFileProvider = self;
 
-  let result = self.filesReflect( options );
+//   if( o.ext )
+//   {
+//     _.assert( _.strIs( o.ext ) );
+//     _.assert( !o.onDstName, 'o.ext is not compatible with o.onDstName' );
+//     let ext = o.ext;
+//     options.onDstName = function( relative, dstRecordFactory, op, o, srcRecord )
+//     {
+//       if( !srcRecord.isDir )
+//       return self.path.changeExt( relative, ext );
+//       return relative;
+//     }
+//   }
 
-  result.forEach( ( r ) =>
-  {
+//   let result = self.filesReflect( options );
 
-    if( !r.relative )
-    r.relative = r.effective.relative;
+//   result.forEach( ( r ) =>
+//   {
 
-    if( r.action === 'dirMake' )
-    if( r.preserve )
-    r.action = 'directory preserved';
-    else
-    r.action = 'directory new';
+//     if( !r.relative )
+//     r.relative = r.effective.relative;
 
-    if( r.action === 'fileCopy' )
-    if( r.preserve )
-    r.action = 'same';
-    else
-    r.action = 'copied'
+//     if( r.action === 'dirMake' )
+//     if( r.preserve )
+//     r.action = 'directory preserved';
+//     else
+//     r.action = 'directory new';
 
-  })
+//     if( r.action === 'fileCopy' )
+//     if( r.preserve )
+//     r.action = 'same';
+//     else
+//     r.action = 'copied'
 
-  return result;
-}
+//   })
 
-filesCopyWithAdapter.defaults =
-{
-  outputFormat : 'record',
-  ext : null,
-  investigateDestination : 1,
+//   return result;
+// }
 
-  maxSize : 1 << 21,
-  usingExtraStat : 1,
-  recursive : 0,
+// filesCopyWithAdapter.defaults =
+// {
+//   outputFormat : 'record',
+//   ext : null,
+//   investigateDestination : 1,
 
-  includingTerminals : 1,
-  includingDirs : 1,
+//   maxSize : 1 << 21,
+//   usingExtraStat : 1,
+//   recursive : 0,
 
-  resolvingSoftLink : 0,
-  resolvingTextLink : 0,
+//   includingTerminals : 1,
+//   includingDirs : 1,
 
-  filter : null,
-  result : null,
-  src : null,
-  dst : null,
+//   resolvingSoftLink : 0,
+//   resolvingTextLink : 0,
 
-  onUp : [],
-  onDown : [],
-}
+//   filter : null,
+//   result : null,
+//   src : null,
+//   dst : null,
 
-// filesCopyWithAdapter.defaults.__proto__ = filesFindMasksAdjust.defaults
-// var paths = filesCopyWithAdapter.paths = Object.create( null );
-// paths.src = null;
-// paths.dst = null;
+//   onUp : null,
+//   onDown : null,
+// }
 
-var having = filesCopyWithAdapter.having = Object.create( null );
-having.writing = 0;
-having.reading = 1;
-having.driving = 0;
+// // filesCopyWithAdapter.defaults.__proto__ = filesFindMasksAdjust.defaults
+// // var paths = filesCopyWithAdapter.paths = Object.create( null );
+// // paths.src = null;
+// // paths.dst = null;
 
-// _.routineExtend( filesCopyWithAdapter, filesFindDifference );
+// var having = filesCopyWithAdapter.having = Object.create( null );
+// having.writing = 0;
+// having.reading = 1;
+// having.driving = 0;
 
-var defaults = filesCopyWithAdapter.defaults;
+// // _.routineExtend( filesCopyWithAdapter, filesFindDifference );
 
-defaults.verbosity = 1;
-defaults.linking = 0;
-defaults.resolvingSoftLink = 0;
-defaults.resolvingTextLink = 0;
+// var defaults = filesCopyWithAdapter.defaults;
 
-defaults.removingSource = 0;
-defaults.removingSourceTerminals = 0;
+// defaults.verbosity = 1;
+// defaults.linking = 0;
+// defaults.resolvingSoftLink = 0;
+// defaults.resolvingTextLink = 0;
 
-defaults.recursive = 2;
-defaults.allowDelete = 0;
-defaults.allowWrite = 0;
-defaults.allowRewrite = 1;
-defaults.allowRewriteFileByDir = 0;
+// defaults.removingSource = 0;
+// defaults.removingSourceTerminals = 0;
 
-defaults.tryingPreserve = 1;
-defaults.silentPreserve = 1;
-defaults.preservingTime = 1;
+// defaults.recursive = 2;
+// defaults.allowDelete = 0;
+// defaults.allowWrite = 0;
+// defaults.allowRewrite = 1;
+// defaults.allowRewriteFileByDir = 0;
+
+// defaults.tryingPreserve = 1;
+// defaults.silentPreserve = 1;
+// defaults.preservingTime = 1;
 
 
 //
@@ -1820,9 +1825,17 @@ function filesReflectEvaluate_body( o )
     // if( _.strEnds( record.dst.absolute, debugPath ) )
     // debugger;
 
+    // if( touchMap[ record.dst.absolute ] )
+    // debugger;
     if( touchMap[ record.dst.absolute ] )
     touch( record, touchMap[ record.dst.absolute ] );
     _.assert( touchMap[ record.dst.absolute ] === record.touch || !record.touch );
+
+    // if( actionMap[ record.dst.absolute ] )
+    // debugger;
+    // if( actionMap[ record.dst.absolute ] ) // yyy
+    // action( record, actionMap[ record.dst.absolute ] ); // yyy
+    // _.assert( actionMap[ record.dst.absolute ] === record.action || !record.action ); // yyy
 
     _.sure( !_.strBegins( record.dst.absolute, '/../' ), () => 'Destination path ' + _.strQuote( record.dst.absolute ) + ' leads out of file system.' );
 
@@ -2037,6 +2050,7 @@ function filesReflectEvaluate_body( o )
     // if( _.strEnds( record.dst.absolute, debugPath ) )
     // debugger;
 
+    // _.assert( touchMap[ record.dst.absolute ] === record.touch || !record.touch ); // yyy
     if( touchMap[ record.dst.absolute ] )
     touch( record, touchMap[ record.dst.absolute ] );
     _.assert( touchMap[ record.dst.absolute ] === record.touch || !record.touch );
@@ -2109,11 +2123,17 @@ function filesReflectEvaluate_body( o )
 
     if( record.reason === 'srcLooking' )
     {
-      if( !record.src.stat )
-      debugger;
-      if( ( !record.src.isActual || !record.src.stat ) && !record.touch )
+      // if( !record.src.stat )
+      // debugger;
+      // if( ( !record.src.isActual || !record.src.stat ) && !record.touch )
+      if( !record.src.isActual || !record.src.stat )
+      if( !record.touch || actionMap[ record.dst.absolute ] )
       {
+        if( !record.touch )
         action( record, 'exclude' );
+        else if( actionMap[ record.dst.absolute ] )
+        action( record, actionMap[ record.dst.absolute ] );
+        _.assert( !!record.action );
         return;
       }
     }
@@ -4687,7 +4707,7 @@ let Supplement =
 
   // reflect
 
-  filesCopyWithAdapter,
+  // filesCopyWithAdapter,
 
   _filesPrepareFilters,
 

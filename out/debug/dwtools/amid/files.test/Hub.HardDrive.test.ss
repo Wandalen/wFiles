@@ -45,10 +45,18 @@ function onSuiteBegin()
 }
 
 function onSuiteEnd()
-{
-  _.assert( _.strEnds( this.testSuitePath, 'Hub/HardDrive' ) );
+{ 
+  _.assert( _.strHas( this.testSuitePath, 'Hub/HardDrive' ) );
   // this.providerEffective.filesDelete({ filePath : this.testSuitePath });
   _.path.dirTempClose( this.testSuitePath );
+}
+
+function onRoutineEnd( test )
+{
+  let context = this;
+  let hub = context.hub || context.provider;
+  _.sure( hub instanceof _.FileProvider.Hub );
+  _.sure( _.entityIdentical( _.mapKeys( hub.providersWithProtocolMap ), [ 'file', 'hd' ] ), test.name, 'has not restored hub!' );
 }
 
 // --
@@ -63,8 +71,9 @@ var Proto =
   silencing : 1,
   enabled : 1,
 
-  onSuiteBegin : onSuiteBegin,
-  onSuiteEnd : onSuiteEnd,
+  onSuiteBegin,
+  onSuiteEnd,
+  onRoutineEnd,
 
   context :
   {

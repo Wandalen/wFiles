@@ -268,7 +268,6 @@ defaults.verbosity = 0;
  * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm#
  */
 
-
 function versionRemoteLatestRetrive( o )
 {
   let self = this;

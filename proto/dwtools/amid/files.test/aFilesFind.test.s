@@ -8512,16 +8512,7 @@ function filesReflectMandatory( test )
 
   var extract = new _.FileProvider.Extract({ filesTree : tree });
 
-  extract.reflectTo( provider, routinePath )
-
-  var o =
-  {
-    filter :
-    {
-      filePath : filePath,
-    },
-    mandatory : 1,
-  }
+  extract.filesReflectTo( provider, routinePath );
 
   var filePath =
   {
@@ -8532,7 +8523,21 @@ function filesReflectMandatory( test )
     "moduleB/amid" : `.`
   }
 
-  var records = extract.filesReflect( o );
+  var o =
+  {
+    src :
+    {
+      prefixPath : routinePath + '/src',
+      filePath,
+    },
+    dst :
+    {
+      prefixPath : routinePath + '/dst'
+    },
+    mandatory : 1,
+  }
+
+  var records = provider.filesReflect( o );
 
   /* */
 
@@ -19442,7 +19447,7 @@ function filesFindExperiment2( test )
     '.',
     './a',
     './a/b',
-    './a/b/terminal'if( !Esprima && !_global.esprima )
+    './a/b/terminal',
   ]
 
   test.identical( got, expected );

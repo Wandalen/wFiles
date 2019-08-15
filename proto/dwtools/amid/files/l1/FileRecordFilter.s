@@ -1293,8 +1293,8 @@ function _pathsExtend( o )
     if( !basePathReady )
     if( side === ( filter.src ? 'dst' : 'src' ) )
     {
-      let dstBasePath = filter.basePathForFilePath( dstFilePath );
-      let srcBasePath = o.src.basePathForFilePath( srcFilePath );
+      let dstBasePath = filter.basePathForTrunkPath( dstFilePath );
+      let srcBasePath = o.src.basePathForTrunkPath( srcFilePath );
       if( srcBasePath || dstBasePath )
       if( o.supplementing )
       basePath2[ result ] = path.join( srcBasePath || '.', dstBasePath || '.' );
@@ -1580,7 +1580,7 @@ function prefixesApply( o )
 
     _.assert( _.strIs( filePath ) );
 
-    let basePath = filter.basePathForFilePath( filePath );
+    let basePath = filter.basePathForTrunkPath( filePath );
     if( basePath )
     {
       let extend = basePathEach( filePath, basePath, prefixPath, postfixPath );
@@ -1772,7 +1772,7 @@ prefixPathFromFilePath.defaults =
 function relativeFor( filePath )
 {
   let filter = this;
-  let basePath = filter.basePathForFilePath( filePath );
+  let basePath = filter.basePathForTrunkPath( filePath );
   let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
   let path = fileProvider.path;
 
@@ -1812,11 +1812,11 @@ function basePathSet( src )
 /**
  * @summary Returns base path for provided path `filePath`.
  * @param {String|Boolean} filePath Source file path.
- * @function basePathForFilePath
+ * @function basePathForTrunkPath
  * @memberof module:Tools/mid/Files.wFileRecordFilter#
 */
 
-function basePathForFilePath( filePath )
+function basePathForTrunkPath( filePath )
 {
   let filter = this;
   let result = null;
@@ -1852,11 +1852,11 @@ function basePathForFilePath( filePath )
 /**
  * @summary Returns base path for provided path `filePath`.
  * @param {String|Boolean} filePath Source file path.
- * @function basePathForFilePathLook
+ * @function basePathForBasePath
  * @memberof module:Tools/mid/Files.wFileRecordFilter#
 */
 
-function basePathForFilePathLook( filePath )
+function basePathForBasePath( filePath )
 {
   let filter = this;
   let result = null;
@@ -3234,7 +3234,7 @@ function filePathDstNormalizedGet( filePath )
     if( p === null )
     {
       if( !!p )
-      return filter.prefixPath || filter.basePathForFilePath( p ) || undefined;
+      return filter.prefixPath || filter.basePathForTrunkPath( p ) || undefined;
       return;
     }
 
@@ -4582,8 +4582,8 @@ let Extend =
 
   relativeFor,
   basePathSet,
-  basePathForFilePath,
-  basePathForFilePathLook,
+  basePathForTrunkPath,
+  basePathForBasePath,
   basePathsGet,
   basePathMapFromString,
   basePathMapLocalize,

@@ -1140,7 +1140,7 @@ function fileSize( test )
   let check2 = _.timeOut( 50, function()
   {
     var got = _.fileProvider.fileSize( file3 );
-    test.identical( got, 15 );
+    test.equivalent( got, 15 );
   });
 
   /* - */

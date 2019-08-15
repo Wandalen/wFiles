@@ -1404,9 +1404,6 @@ function softLinkAct( o )
 
 _.routineExtend( softLinkAct, Parent.prototype.softLinkAct );
 
-// var defaults = softLinkAct.defaults = Object.create( Parent.prototype.softLinkAct.defaults );
-// var having = softLinkAct.having = Object.create( Parent.prototype.softLinkAct.having );
-
 //
 
 function hardLinkAct( o )
@@ -1416,8 +1413,6 @@ function hardLinkAct( o )
   _.assertRoutineOptions( hardLinkAct, arguments );
   _.assert( self.path.isNormalized( o.srcPath ) );
   _.assert( self.path.isNormalized( o.dstPath ) );
-
-  debugger;
 
   if( o.sync )
   {

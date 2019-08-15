@@ -498,13 +498,13 @@ function filesFindTrivial( test )
   provider.filesDelete( testPath );
   extract1.filesReflectTo( provider, testPath );
   var gotTree = provider.filesExtract( testPath );
-  gotTree.filesFind({ filePath : '/', recursive : 2, onDown : function onDown( r, o ) 
-  { 
+  gotTree.filesFind({ filePath : '/', recursive : 2, onDown : function onDown( r, o )
+  {
     if( r.isTerminal )
     gotTree.fileWrite( r.absolute, gotTree.fileRead( r.absolute ) );
   }})
   test.identical( gotTree.filesTree, extract1.filesTree );
-   
+
 
   extract1.filesReflectTo( provider, testPath );
 
@@ -555,8 +555,8 @@ function filesFindTrivial( test )
   provider.filesDelete( testPath );
   extract1.filesReflectTo({ dstProvider : provider, dstPath : testPath });
   var gotTree = provider.filesExtract( testPath );
-  gotTree.filesFind({ filePath : '/', recursive : 2, onDown : function onDown( r, o ) 
-  { 
+  gotTree.filesFind({ filePath : '/', recursive : 2, onDown : function onDown( r, o )
+  {
     if( r.isTerminal )
     gotTree.fileWrite( r.absolute, gotTree.fileRead( r.absolute ) );
   }})
@@ -713,8 +713,8 @@ function filesFindTrivialAsync( test )
   extract1.filesReflectTo({ dstProvider : provider, dstPath : context.testSuitePath });
   // var gotTree = _.FileProvider.Extract().rewriteFromProvider( provider, context.testSuitePath );
   var gotTree = provider.filesExtract( context.testSuitePath );
-  gotTree.filesFind({ filePath : '/', recursive : 2, onDown : function onDown( r, o ) 
-  { 
+  gotTree.filesFind({ filePath : '/', recursive : 2, onDown : function onDown( r, o )
+  {
     if( r.isTerminal )
     gotTree.fileWrite( r.absolute, gotTree.fileRead( r.absolute ) );
   }})
@@ -4839,7 +4839,7 @@ function filesFindGlob( test )
   test.case = 'globTerminals src1Terminal/** with basePath and prefixPath, several op';
 
   clean();
-  var expectedRelative = [ '.' ];
+  var expectedRelative = [ './src1Terminal' ];
   var expectedAbsolute = abs([ './src1Terminal' ]);
   var records = globTerminals
   (
@@ -4854,7 +4854,7 @@ function filesFindGlob( test )
   test.case = 'globAll src1Terminal/** with basePath and prefixPath, several op';
 
   clean();
-  var expectedRelative = [ '.' ];
+  var expectedRelative = [ './src1Terminal' ];
   var records = globAll
   (
     { filter : { basePath : '.' } },
@@ -5578,10 +5578,32 @@ function filesFindGlob( test )
 
   /* */
 
-  test.case = 'globTerminals [ /doubledir/d1/**, /doubledir/d2/** ] with basePath:.';
+  test.case = 'globTerminals [ /doubledir/d1/**, /doubledir/d2/** ] with basePath:empty';
   clean();
   var expectedAbsolute = abs([ './doubledir/d1/a', './doubledir/d1/d11/b', './doubledir/d1/d11/c', './doubledir/d2/b', './doubledir/d2/d22/c', './doubledir/d2/d22/d' ]);
   var expectedRelative = [ './a', './d11/b', './d11/c', './b', './d22/c', './d22/d' ];
+  var records = globTerminals( { filePath : abs([ './doubledir/d1/**', './doubledir/d2/**' ]) }, { filter : { basePath : '' } } );
+  var gotAbsolute = _.select( records, '*/absolute' );
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotAbsolute, expectedAbsolute );
+  test.identical( gotRelative, expectedRelative );
+
+  test.case = 'globAll [ /doubledir/d1/**, /doubledir/d2/** ] with basePath:empty';
+  clean();
+  var expectedAbsolute = abs([ './doubledir/d1', './doubledir/d1/a', './doubledir/d1/d11', './doubledir/d1/d11/b', './doubledir/d1/d11/c', './doubledir/d2', './doubledir/d2/b', './doubledir/d2/d22', './doubledir/d2/d22/c', './doubledir/d2/d22/d' ]);
+  var expectedRelative = [ '.', './a', './d11', './d11/b', './d11/c', '.', './b', './d22', './d22/c', './d22/d' ];
+  var records = globAll({ filePath : abs([ './doubledir/d1/**', './doubledir/d2/**' ]) }, { filter : { basePath : '' } } );
+  var gotAbsolute = _.select( records, '*/absolute' );
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotAbsolute, expectedAbsolute );
+  test.identical( gotRelative, expectedRelative );
+
+  /* */
+
+  test.case = 'globTerminals [ /doubledir/d1/**, /doubledir/d2/** ] with basePath:.';
+  clean();
+  var expectedAbsolute = abs([ './doubledir/d1/a', './doubledir/d1/d11/b', './doubledir/d1/d11/c', './doubledir/d2/b', './doubledir/d2/d22/c', './doubledir/d2/d22/d' ]);
+  var expectedRelative = [ './doubledir/d1/a', './doubledir/d1/d11/b', './doubledir/d1/d11/c', './doubledir/d2/b', './doubledir/d2/d22/c', './doubledir/d2/d22/d' ];
   var records = globTerminals( { filePath : abs([ './doubledir/d1/**', './doubledir/d2/**' ]), filter : { basePath : null } }, { filter : { basePath : '.' } } );
   var gotAbsolute = _.select( records, '*/absolute' );
   var gotRelative = _.select( records, '*/relative' );
@@ -5591,7 +5613,7 @@ function filesFindGlob( test )
   test.case = 'globAll [ /doubledir/d1/**, /doubledir/d2/** ] with basePath:.';
   clean();
   var expectedAbsolute = abs([ './doubledir/d1', './doubledir/d1/a', './doubledir/d1/d11', './doubledir/d1/d11/b', './doubledir/d1/d11/c', './doubledir/d2', './doubledir/d2/b', './doubledir/d2/d22', './doubledir/d2/d22/c', './doubledir/d2/d22/d' ]);
-  var expectedRelative = [ '.', './a', './d11', './d11/b', './d11/c', '.', './b', './d22', './d22/c', './d22/d' ];
+  var expectedRelative = [ './doubledir/d1', './doubledir/d1/a', './doubledir/d1/d11', './doubledir/d1/d11/b', './doubledir/d1/d11/c', './doubledir/d2', './doubledir/d2/b', './doubledir/d2/d22', './doubledir/d2/d22/c', './doubledir/d2/d22/d' ];
   var records = globAll({ filePath : abs([ './doubledir/d1/**', './doubledir/d2/**' ]), filter : { basePath : null } }, { filter : { basePath : '.' } } );
   var gotAbsolute = _.select( records, '*/absolute' );
   var gotRelative = _.select( records, '*/relative' );
@@ -7271,8 +7293,8 @@ function filesReflectEvaluate( test )
   test.identical( preserve, expectedPreserve );
 
   var extract2 = provider.filesExtract( testPath );
-  extract2.filesFind({ filePath : '/', recursive : 2, onDown : function onDown( r, o ) 
-  { 
+  extract2.filesFind({ filePath : '/', recursive : 2, onDown : function onDown( r, o )
+  {
     if( r.isTerminal )
     extract2.fileWrite( r.absolute, extract2.fileRead( r.absolute ) );
   }})
@@ -11286,8 +11308,8 @@ function filesReflectToItself( test )
     }
   }
   var extract2 = provider.filesExtract( testPath );
-  extract2.filesFind({ filePath : '/', recursive : 2, onDown : function onDown( r, o ) 
-  { 
+  extract2.filesFind({ filePath : '/', recursive : 2, onDown : function onDown( r, o )
+  {
     if( r.isTerminal )
     extract2.fileWrite( r.absolute, extract2.fileRead( r.absolute ) );
   }})
@@ -12365,8 +12387,8 @@ function filesReflectWithHub( test )
 
   // var got = _.FileProvider.Extract.filesTreeRead({ srcPath : dstPath, srcProvider : dstProvider });
   var extract2 = dstProvider.filesExtract( dstPath );
-  extract2.filesFind({ filePath : '/', recursive : 2, onDown : function onDown( r, o ) 
-  { 
+  extract2.filesFind({ filePath : '/', recursive : 2, onDown : function onDown( r, o )
+  {
     if( r.isTerminal )
     extract2.fileWrite( r.absolute, extract2.fileRead( r.absolute ) );
   }})
@@ -12393,8 +12415,8 @@ function filesReflectWithHub( test )
 
   // var got = _.FileProvider.Extract.filesTreeRead({ srcPath : dstPath, srcProvider : dstProvider });
   var extract2 = dstProvider.filesExtract( dstPath );
-  extract2.filesFind({ filePath : '/', recursive : 2, onDown : function onDown( r, o ) 
-  { 
+  extract2.filesFind({ filePath : '/', recursive : 2, onDown : function onDown( r, o )
+  {
     if( r.isTerminal )
     extract2.fileWrite( r.absolute, extract2.fileRead( r.absolute ) );
   }})
@@ -14634,53 +14656,218 @@ function filesReflectTo( test )
 
 //
 
+/*
+two srcs with same dst path, src2/proto/amid does not exist, dst/proto/amid exists before copy
+*/
+
 function filesReflectDstIgnoring( test )
-{ 
+{
   let context = this;
   let provider = context.provider;
   let hub = context.hub;
   let path = context.provider.path;
   let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
-  
-  test.case = 'two srcs with same dst path, src2/proto/amid does not exist, dst/proto/amid exists before copy'
-  
+
+  /* */
+
+  test.case = 'simplest';
+
   var filesTree =
   {
-    'src1' : 
-    { 
-      'proto' : 
+
+    'src1' :
+    {
+      'proto' :
       {
-        'amid' : 
-        { 
-          'file' : 'file' 
+        'amid' :
+        {
+          'file' : 'file'
         }
       }
     },
-    
-    'src2' : 
-    { 
+
+    'src2' :
+    {
+    },
+
+    'dst' :
+    {
+      'proto' :
+      {
+        'amid' :
+        {
+        }
+      }
+    },
+
+  }
+
+  var extract = new _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree ) });
+
+  test.case = 'simplest';
+  var o =
+  {
+    src :
+    {
+      filePath :
+      {
+        '/src1/proto/amid' : '/dst',
+        '/src2/proto/amid' : '/dst',
+      },
+      basePath :
+      {
+        '/src1/proto/amid' : '/src1',
+        '/src2/proto/amid' : '/src2',
+      },
+    },
+    recursive : 0
+  }
+
+  test.mustNotThrowError( () =>
+  {
+    debugger
+    extract.filesReflect( o );
+    debugger;
+  });
+
+  test.identical( extract.filesTree, filesTree );
+
+  /* */
+
+  test.case = 'simplest';
+
+  var expected =
+  {
+
+    'src1' :
+    {
+      'proto' :
+      {
+        'amid' :
+        {
+          'file' : 'file'
+        }
+      }
+    },
+
+    'src2' :
+    {
+    },
+
+    'dst' :
+    {
+      'proto' :
+      {
+        'amid' :
+        {
+          'file' : 'file'
+        }
+      }
+    },
+
+  }
+
+  var filesTree =
+  {
+
+    'src1' :
+    {
+      'proto' :
+      {
+        'amid' :
+        {
+          'file' : 'file'
+        }
+      }
+    },
+
+    'src2' :
+    {
+    },
+
+    'dst' :
+    {
+      'proto' :
+      {
+        'amid' :
+        {
+        }
+      }
+    },
+
+  }
+
+  var extract = new _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree ) });
+
+  test.case = 'simplest';
+  var o =
+  {
+    src :
+    {
+      filePath :
+      {
+        '/src1/proto/amid' : '/dst',
+        '/src2/proto/amid' : '/dst',
+      },
+      basePath :
+      {
+        '/src1/proto/amid' : '/src1',
+        '/src2/proto/amid' : '/src2',
+      },
+    },
+    recursive : 2,
+  }
+
+  test.mustNotThrowError( () =>
+  {
+    extract.filesReflect( o );
+  });
+
+  test.identical( extract.filesTree, expected );
+
+  /* */
+
+  test.case = 'more files';
+
+  var filesTree =
+  {
+
+    'src1' :
+    {
+      'proto' :
+      {
+        'amid' :
+        {
+          'file' : 'file'
+        }
+      }
+    },
+
+    'src2' :
+    {
       'proto' : {}
     },
-    
-    'dst' : 
+
+    'dst' :
     {
-      'proto' : 
+      'proto' :
       {
-        'amid' : 
-        { 
-          'file' : 'file' 
+        'amid' :
+        {
+          'file' : 'file'
         }
       }
     },
+
   }
-  
-  let extract = new _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree ) });
-  
-  let o = 
+
+  var extract = new _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree ) });
+
+  var o =
   {
-    src : 
+    src :
     {
-      filePath : 
+      filePath :
       {
         'src1/proto/amid' : '.',
         'src1/proto/amid/file' : '.',
@@ -14688,7 +14875,7 @@ function filesReflectDstIgnoring( test )
         'src2/proto/amid' : '.',
         'src2/proto' : '.'
       },
-      basePath : 
+      basePath :
       {
         'src1/proto/amid' : 'src1',
         'src1/proto/amid/file' : 'src1',
@@ -14698,21 +14885,25 @@ function filesReflectDstIgnoring( test )
       },
       prefixPath : '/'
     },
-    dst : 
+    dst :
     {
       basePath : '.',
       prefixPath : '/dst'
     },
     recursive : 0
   }
-  
-  test.mustNotThrowError( () => 
-  { 
-    debugger
-    extract.filesReflect( o ) 
+
+  test.mustNotThrowError( () =>
+  {
+    debugger;
+    extract.filesReflect( o );
+    debugger;
   });
-  
+
   test.identical( extract.filesTree, filesTree );
+
+  /* */
+
 }
 
 //
@@ -15580,7 +15771,7 @@ function filesDeleteAsync( test )
     })
   })
 
-  //
+  /* */
 
   .finally( () =>
   {
@@ -15595,7 +15786,7 @@ function filesDeleteAsync( test )
     })
   })
 
-  //
+  /* */
 
   .finally( () =>
   {
@@ -15615,7 +15806,7 @@ function filesDeleteAsync( test )
     })
   })
 
-  //
+  /* */
 
   .finally( () =>
   {
@@ -15680,7 +15871,7 @@ function filesDeleteAsync( test )
     })
   })
 
-  //
+  /* */
 
   .finally( () =>
   {
@@ -15752,7 +15943,7 @@ function filesDeleteAsync( test )
 
   })
 
-  //
+  /* */
 
   .finally( () =>
   {
@@ -15825,8 +16016,7 @@ function filesDeleteAsync( test )
 
   })
 
-  //
-
+  /* */
 
   .finally( () =>
   {
@@ -15879,7 +16069,7 @@ function filesDeleteAsync( test )
     })
   })
 
-  //
+  /* */
 
   if( !softLinkIsSupported )
   return con;
@@ -19182,6 +19372,10 @@ filesFindExperiment2.experimental = 1;
 
 //
 
+/*
+qqq : not sure, why it should work differently?
+*/
+
 function filesReflectExperiment( test )
 {
   let context = this;
@@ -19204,15 +19398,6 @@ function filesReflectExperiment( test )
     dstPath : testPath,
     dstProvider : provider,
   })
-
-  // _.FileProvider.Extract.readToProvider
-  // ({
-  //   dstProvider : provider,
-  //   dstPath : testPath,
-  //   filesTree : filesTree,
-  //   allowWrite : 1,
-  //   allowDelete : 1,
-  // });
 
   test.case = 'directory for terminal is not created, as the result fileCopy fails'
 
@@ -19240,7 +19425,6 @@ function filesReflectExperiment( test )
 }
 
 filesReflectExperiment.experimental = 1;
-
 
 // --
 // declare
@@ -19298,7 +19482,7 @@ var Self =
     filesReflectTrivial,
     filesReflectMutuallyExcluding,
     filesReflectWithFilter,
-    filesReflect,
+    filesReflect, /* qqq : Extract test case which fails from filesReflect to separate test routine. Then fix, please. */
     filesReflectRecursive,
     filesReflectToItself,
     filesReflectGrab,

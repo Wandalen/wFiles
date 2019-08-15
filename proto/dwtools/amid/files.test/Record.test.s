@@ -255,9 +255,9 @@ function recordFields( test )
   test.identical( got.real, filePath );
   //test.identical( _.path.canonize( got.dir ), _.path.normalize( __dirname ) );
   /*
-  Dmytro : new wPathFundamentals module has routine normalizeCanonical(). Now it is
+  Dmytro : new wPathBasic module has routine normalizeCanonical(). Now it is
   named canonize().
-  So, after new build of wPathFundamentals actual line:
+  So, after new build of wPathBasic actual line:
 
   test.identical( _.path.normalize( got.dir ), _.path.normalize( __dirname ) + '/' );
 

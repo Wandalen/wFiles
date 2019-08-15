@@ -8,7 +8,15 @@ if( typeof module !== 'undefined' )
   if( !_.FileProvider )
   require( '../UseMid.s' );
 
-  var Tar = require( 'tar' );
+  var Tar;
+
+  try
+  {
+    Tar = require( 'tar' );
+  }
+  catch( err )
+  {
+  }
 
 }
 
@@ -267,7 +275,6 @@ defaults.verbosity = 0;
  * @function versionRemoteLatestRetrive
  * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm#
  */
-
 
 function versionRemoteLatestRetrive( o )
 {
@@ -573,6 +580,8 @@ function filesReflectSingle_body( o )
   }
   else
   {
+    _.assert( Tar !== undefined, 'o.extra.usingNpm:0 mode can\'t be used without package "tar"' );
+
     let providerHttp = _.FileProvider.Http();
     let tmpPackagePath = localProvider.path.join( tmpEssentialPath, 'package' );
     let version = parsed.hash || 'latest';

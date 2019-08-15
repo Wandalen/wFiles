@@ -14,7 +14,7 @@ if( typeof module !== 'undefined' )
 
   let _ = _global_.wTools;
 
-  _.include( 'wPathFundamentals' );
+  _.include( 'wPathBasic' );
 
 }
 

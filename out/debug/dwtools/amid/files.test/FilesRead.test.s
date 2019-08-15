@@ -130,342 +130,342 @@ function filesReadOld( test )
 
 //
 
-function filesTreeRead( test )
-{
-  var currentTestDir = _.path.join( test.context.testSuitePath, test.name );
-  var provider = _.fileProvider;
-  provider.safe = 1;
-  var filesTreeReadFixedOptions =
-  {
-    recursive : 2,
-    // relative : null,
-    // filePath : null,
-    // strict : 1,
-    // ignoreNonexistent : 1,
-    result : [],
-    orderingExclusion : [],
-    // sortingWithArray : null,
-    upToken : '/',
-    onFileTerminal : null,
-    onFileDir : null,
-  }
+// function filesTreeRead( test )
+// {
+//   var currentTestDir = _.path.join( test.context.testSuitePath, test.name );
+//   var provider = _.fileProvider;
+//   provider.safe = 1;
+//   var filesTreeReadFixedOptions =
+//   {
+//     recursive : 2,
+//     // relative : null,
+//     // filePath : null,
+//     // strict : 1,
+//     // ignoreNonexistent : 1,
+//     result : [],
+//     orderingExclusion : [],
+//     // sortingWithArray : null,
+//     upToken : '/',
+//     onFileTerminal : null,
+//     onFileDir : null,
+//   }
 
-  var map =
-  {
-    includingTerminals : [ 0, 1 ],
-    includingTransient : [ 0, 1 ],
-    includingDirs : [ 0, 1 ],
-    asFlatMap : [ 0, 1 ],
-    readingTerminals : [ 0, 1 ]
-  }
+//   var map =
+//   {
+//     includingTerminals : [ 0, 1 ],
+//     includingTransient : [ 0, 1 ],
+//     includingDirs : [ 0, 1 ],
+//     asFlatMap : [ 0, 1 ],
+//     readingTerminals : [ 0, 1 ]
+//   }
 
-  var combinations = [];
-  var keys = _.mapOwnKeys( map );
+//   var combinations = [];
+//   var keys = _.mapOwnKeys( map );
 
-  function combine( i, o )
-  {
-    if( i === undefined )
-    i = 0;
+//   function combine( i, o )
+//   {
+//     if( i === undefined )
+//     i = 0;
 
-    if( o === undefined )
-    o = {};
+//     if( o === undefined )
+//     o = {};
 
-    var currentKey = keys[ i ];
-    var values = map[ currentKey ];
+//     var currentKey = keys[ i ];
+//     var values = map[ currentKey ];
 
-    values.forEach( ( val ) =>
-    {
-      o[ currentKey ] = val;
+//     values.forEach( ( val ) =>
+//     {
+//       o[ currentKey ] = val;
 
-      if( i + 1 < keys.length )
-      combine( i + 1, o )
-      else
-      combinations.push( _.mapSupplement( {}, o ) )
-    });
-  }
+//       if( i + 1 < keys.length )
+//       combine( i + 1, o )
+//       else
+//       combinations.push( _.mapSupplement( {}, o ) )
+//     });
+//   }
 
-  function flatMapFromTree( tree, currentPath, paths, o )
-  {
-    if( paths === undefined )
-    {
-      paths = Object.create( null );
-    }
+//   function flatMapFromTree( tree, currentPath, paths, o )
+//   {
+//     if( paths === undefined )
+//     {
+//       paths = Object.create( null );
+//     }
 
-    if( o.includingDirs )
-    if( !paths[ currentTestDir] )
-    paths[ currentTestDir ] = Object.create( null );
+//     if( o.includingDirs )
+//     if( !paths[ currentTestDir] )
+//     paths[ currentTestDir ] = Object.create( null );
 
-    for( var k in tree )
-    {
-      if( _.objectIs( tree[ k ] ) )
-      {
-        if( o.includingDirs )
-        paths[ _.path.resolve( currentPath, k ) ] = Object.create( null );
+//     for( var k in tree )
+//     {
+//       if( _.objectIs( tree[ k ] ) )
+//       {
+//         if( o.includingDirs )
+//         paths[ _.path.resolve( currentPath, k ) ] = Object.create( null );
 
-        flatMapFromTree( tree[ k ], _.path.join( currentPath, k ), paths, o );
-      }
-      else
-      {
-        if( o.includingTerminals )
-        {
-          var val = null;
-          if( o.readingTerminals )
-          val = tree[ k ];
+//         flatMapFromTree( tree[ k ], _.path.join( currentPath, k ), paths, o );
+//       }
+//       else
+//       {
+//         if( o.includingTerminals )
+//         {
+//           var val = null;
+//           if( o.readingTerminals )
+//           val = tree[ k ];
 
-          paths[ _.path.resolve( currentPath, k ) ] = val;
-        }
-      }
-    }
+//           paths[ _.path.resolve( currentPath, k ) ] = val;
+//         }
+//       }
+//     }
 
-    return paths;
-  }
+//     return paths;
+//   }
 
-  function flatMapToTree( map, o )
-  {
-    var paths = _.mapOwnKeys( map );
-    _.arrayRemoveElementOnce( paths, currentTestDir );
-    var result = Object.create( null );
-    var tree = new _.FileProvider.Extract({ filesTree : result })
-    // result[ '.' ] = Object.create( null );
-    // var inner = result[ '.' ];
+//   function flatMapToTree( map, o )
+//   {
+//     var paths = _.mapOwnKeys( map );
+//     _.arrayRemoveElementOnce( paths, currentTestDir );
+//     var result = Object.create( null );
+//     var tree = new _.FileProvider.Extract({ filesTree : result })
+//     // result[ '.' ] = Object.create( null );
+//     // var inner = result[ '.' ];
 
-    paths.forEach( ( p ) =>
-    {
-      var isTerminal = o.readingTerminals ? _.strIs( map[ p ] ) : map[ p ] === null;
-      if( isTerminal && o.includingTerminals || o.includingDirs && !isTerminal )
-      {
-        var val = map[ p ];
-        if( isTerminal && !o.readingTerminals )
-        val = null;
-      }
+//     paths.forEach( ( p ) =>
+//     {
+//       var isTerminal = o.readingTerminals ? _.strIs( map[ p ] ) : map[ p ] === null;
+//       if( isTerminal && o.includingTerminals || o.includingDirs && !isTerminal )
+//       {
+//         var val = map[ p ];
+//         if( isTerminal && !o.readingTerminals )
+//         val = null;
+//       }
 
-      tree.dirMakeForFile( '/' + _.path.relative( currentTestDir, p ) );
+//       tree.dirMakeForFile( '/' + _.path.relative( currentTestDir, p ) );
 
-      _.select
-      ({
-        src : result,
-        selector : _.path.relative( currentTestDir, p ),
-        set : val,
-        setting : 1,
-        usingIndexedAccessToMap : 0
-      });
-    })
+//       _.select
+//       ({
+//         src : result,
+//         selector : _.path.relative( currentTestDir, p ),
+//         set : val,
+//         setting : 1,
+//         usingIndexedAccessToMap : 0
+//       });
+//     })
 
-    return result;
-  }
+//     return result;
+//   }
 
-  //
+//   //
 
-  var filesTree =
-  {
-    a  :
-    {
-      b  :
-      {
-        c  :
-        {
-          d :
-          {
-            e :
-            {
-              e_a  : '1',
-              e_b  : '2',
-              e_c  : '3',
-              e_d : {}
-            }
-          },
-          d_a  : '4',
-          d_b  : '5',
-          d_c  : '6',
-          d_d : {}
-        },
-        c_a  : '7',
-        c_b  : '8',
-        c_c  : '9',
-        c_d : {}
-      },
-      b_a  : '0',
-      b_b  : '1',
-      b_c  : '2',
-      b_d : {}
-    },
-    a_a  : '3',
-    a_b  : '4',
-    a_c  : '5',
-    a_d : {}
-  }
+//   var filesTree =
+//   {
+//     a  :
+//     {
+//       b  :
+//       {
+//         c  :
+//         {
+//           d :
+//           {
+//             e :
+//             {
+//               e_a  : '1',
+//               e_b  : '2',
+//               e_c  : '3',
+//               e_d : {}
+//             }
+//           },
+//           d_a  : '4',
+//           d_b  : '5',
+//           d_c  : '6',
+//           d_d : {}
+//         },
+//         c_a  : '7',
+//         c_b  : '8',
+//         c_c  : '9',
+//         c_d : {}
+//       },
+//       b_a  : '0',
+//       b_b  : '1',
+//       b_c  : '2',
+//       b_d : {}
+//     },
+//     a_a  : '3',
+//     a_b  : '4',
+//     a_c  : '5',
+//     a_d : {}
+//   }
 
-  provider.filesDelete( currentTestDir );
+//   provider.filesDelete( currentTestDir );
 
-  _.FileProvider.Extract.readToProvider
-  ({
-    filesTree : filesTree,
-    dstPath : currentTestDir,
-    dstProvider : provider
-  })
+//   _.FileProvider.Extract.readToProvider
+//   ({
+//     filesTree : filesTree,
+//     dstPath : currentTestDir,
+//     dstProvider : provider
+//   })
 
-  var n = 0;
+//   var n = 0;
 
-  var testsInfo = [];
+//   var testsInfo = [];
 
-  combine();
-  combinations.forEach( ( c ) =>
-  {
-    var info = _.mapSupplement( {}, c );
-    info.number = ++n;
-    test.case = _.toStr( info, { levels : 3 } )
-    var checks = [];
-    var options = _.mapSupplement( {}, c );
-    _.mapSupplement( options, filesTreeReadFixedOptions );
+//   combine();
+//   combinations.forEach( ( c ) =>
+//   {
+//     var info = _.mapSupplement( {}, c );
+//     info.number = ++n;
+//     test.case = _.toStr( info, { levels : 3 } )
+//     var checks = [];
+//     var options = _.mapSupplement( {}, c );
+//     _.mapSupplement( options, filesTreeReadFixedOptions );
 
-    options.srcPath = currentTestDir;
-    options.srcProvider = provider;
+//     options.srcPath = currentTestDir;
+//     options.srcProvider = provider;
 
-    var files = _.FileProvider.Extract.filesTreeRead( options );
-    var expected = {};
-    flatMapFromTree( filesTree, currentTestDir, expected, options );
+//     var files = _.FileProvider.Extract.filesTreeRead( options );
+//     var expected = {};
+//     flatMapFromTree( filesTree, currentTestDir, expected, options );
 
-    if( !options.asFlatMap )
-    expected = flatMapToTree( expected, options );
+//     if( !options.asFlatMap )
+//     expected = flatMapToTree( expected, options );
 
-    checks.push( test.identical( files, expected ) );
+//     checks.push( test.identical( files, expected ) );
 
-    info.passed = true;
-    checks.forEach( ( check ) => { info.passed &= check; } )
-    testsInfo.push( info );
-  })
+//     info.passed = true;
+//     checks.forEach( ( check ) => { info.passed &= check; } )
+//     testsInfo.push( info );
+//   })
 
-  console.log( _.toStr( testsInfo, { levels : 3 } ) )
-}
+//   console.log( _.toStr( testsInfo, { levels : 3 } ) )
+// }
 
-filesTreeRead.timeOut = 30000;
+// filesTreeRead.timeOut = 30000;
 
 //
 
-function filesTreeWrite( test )
-{
-  test.case = 'filesTreeWrite';
+// function filesTreeWrite( test )
+// {
+//   test.case = 'filesTreeWrite';
 
-  var currentTestDir = _.path.join( test.context.testSuitePath, test.name );
-  var provider = _.fileProvider;
+//   var currentTestDir = _.path.join( test.context.testSuitePath, test.name );
+//   var provider = _.fileProvider;
 
-  var fixedOptions =
-  {
-    filesTree : null,
-    allowWrite : 1,
-    allowDelete : 1,
-    verbosity : 0,
-  }
+//   var fixedOptions =
+//   {
+//     filesTree : null,
+//     allowWrite : 1,
+//     allowDelete : 1,
+//     verbosity : 0,
+//   }
 
-  var map =
-  {
-    sameTime : [ 0, 1 ],
-    absolutePathForLink : [ 0, 1 ],
-    breakingSoftLink : [ 0, 1 ],
-    terminatingHardLinks : [ 0, 1 ],
-  }
+//   var map =
+//   {
+//     sameTime : [ 0, 1 ],
+//     absolutePathForLink : [ 0, 1 ],
+//     breakingSoftLink : [ 0, 1 ],
+//     terminatingHardLinks : [ 0, 1 ],
+//   }
 
-  var srcs =
-  [
-    {
-      a  :
-      {
-        b  :
-        {
-          c  :
-          {
-            d :
-            {
-              e :
-              {
-                e_a  : '1',
-                e_b  : '2',
-                e_c  : '3',
-                e_d : {}
-              }
-            },
-            d_a  : '4',
-            d_b  : '5',
-            d_c  : '6',
-            d_d : {}
-          },
-          c_a  : '7',
-          c_b  : '8',
-          c_c  : '9',
-          c_d : {}
-        },
-        b_a  : '0',
-        b_b  : '1',
-        b_c  : '2',
-        b_d : {}
-      },
-      a_a  : '3',
-      a_b  : '4',
-      a_c  : '5',
-      a_d : {}
-    }
-  ]
+//   var srcs =
+//   [
+//     {
+//       a  :
+//       {
+//         b  :
+//         {
+//           c  :
+//           {
+//             d :
+//             {
+//               e :
+//               {
+//                 e_a  : '1',
+//                 e_b  : '2',
+//                 e_c  : '3',
+//                 e_d : {}
+//               }
+//             },
+//             d_a  : '4',
+//             d_b  : '5',
+//             d_c  : '6',
+//             d_d : {}
+//           },
+//           c_a  : '7',
+//           c_b  : '8',
+//           c_c  : '9',
+//           c_d : {}
+//         },
+//         b_a  : '0',
+//         b_b  : '1',
+//         b_c  : '2',
+//         b_d : {}
+//       },
+//       a_a  : '3',
+//       a_b  : '4',
+//       a_c  : '5',
+//       a_d : {}
+//     }
+//   ]
 
-  var combinations = [];
-  var keys = _.mapOwnKeys( map );
+//   var combinations = [];
+//   var keys = _.mapOwnKeys( map );
 
-  function combine( i, o )
-  {
-    if( i === undefined )
-    i = 0;
+//   function combine( i, o )
+//   {
+//     if( i === undefined )
+//     i = 0;
 
-    if( o === undefined )
-    o = {};
+//     if( o === undefined )
+//     o = {};
 
-    var currentKey = keys[ i ];
-    var values = map[ currentKey ];
+//     var currentKey = keys[ i ];
+//     var values = map[ currentKey ];
 
-    values.forEach( ( val ) =>
-    {
-      o[ currentKey ] = val;
+//     values.forEach( ( val ) =>
+//     {
+//       o[ currentKey ] = val;
 
-      if( i + 1 < keys.length )
-      combine( i + 1, o )
-      else
-      combinations.push( _.mapSupplement( {}, o ) )
-    });
-  }
+//       if( i + 1 < keys.length )
+//       combine( i + 1, o )
+//       else
+//       combinations.push( _.mapSupplement( {}, o ) )
+//     });
+//   }
 
 
-  var n = 0;
+//   var n = 0;
 
-  var testsInfo = [];
+//   var testsInfo = [];
 
-  combine();
-  srcs.forEach( ( tree ) =>
-  {
-    combinations.forEach( ( c ) =>
-    {
-      var info = _.mapSupplement( {}, c );
-      info.number = ++n;
-      test.case = _.toStr( info, { levels : 3 } )
-      var checks = [];
-      var options = _.mapSupplement( {}, c );
-      _.mapSupplement( options, fixedOptions );
+//   combine();
+//   srcs.forEach( ( tree ) =>
+//   {
+//     combinations.forEach( ( c ) =>
+//     {
+//       var info = _.mapSupplement( {}, c );
+//       info.number = ++n;
+//       test.case = _.toStr( info, { levels : 3 } )
+//       var checks = [];
+//       var options = _.mapSupplement( {}, c );
+//       _.mapSupplement( options, fixedOptions );
 
-      provider.filesDelete( currentTestDir );
-      options.dstPath = currentTestDir;
-      options.filesTree = tree;
-      options.dstProvider = provider;
+//       provider.filesDelete( currentTestDir );
+//       options.dstPath = currentTestDir;
+//       options.filesTree = tree;
+//       options.dstProvider = provider;
 
-      _.FileProvider.Extract.readToProvider( options );
+//       _.FileProvider.Extract.readToProvider( options );
 
-      var got = _.FileProvider.Extract.filesTreeRead
-      ({
-        srcPath : currentTestDir,
-        srcProvider : provider,
-      });
-      test.identical( got, tree );
-    })
-  })
-}
+//       var got = _.FileProvider.Extract.filesTreeRead
+//       ({
+//         srcPath : currentTestDir,
+//         srcProvider : provider,
+//       });
+//       test.identical( got, tree );
+//     })
+//   })
+// }
 
-filesTreeWrite.timeOut = 20000;
+// filesTreeWrite.timeOut = 20000;
 
 //
 
@@ -733,8 +733,8 @@ var Self =
   {
 
     filesReadOld : filesReadOld,
-    filesTreeRead : filesTreeRead,
-    filesTreeWrite : filesTreeWrite,
+    // filesTreeRead : filesTreeRead,
+    // filesTreeWrite : filesTreeWrite,
     // readToProvider : readToProvider,
 
     fileConfigRead : fileConfigRead

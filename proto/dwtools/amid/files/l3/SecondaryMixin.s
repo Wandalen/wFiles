@@ -799,7 +799,7 @@ function _fileConfigRead2( o )
   let self = this;
   let read;
 
-  // _.include( 'wExternalFundamentals' );
+  // _.include( 'wAppBasic' );
 
   if( o.name === undefined )
   o.name = 'config';

@@ -68,7 +68,7 @@ function init( o )
 //
 // //
 //
-// function _pathNativizeUnix( filePath )
+// function _pathNativizePosix( filePath )
 // {
 //   _.assert( _.strIs( filePath ), 'Expects string' );
 //   return filePath;
@@ -76,7 +76,7 @@ function init( o )
 
 //
 
-let pathNativizeAct = process.platform === 'win32' ? _.path._pathNativizeWindows : _.path._pathNativizeUnix;
+let pathNativizeAct = process.platform === 'win32' ? _.path._pathNativizeWindows : _.path._pathNativizePosix;
 
 _.assert( _.routineIs( pathNativizeAct ) );
 
@@ -1846,7 +1846,7 @@ let Restricts =
 let Statics =
 {
   // _pathNativizeWindows : _pathNativizeWindows,
-  // _pathNativizeUnix : _pathNativizeUnix,
+  // _pathNativizePosix : _pathNativizePosix,
   pathNativizeAct : pathNativizeAct,
   KnownNativeEncodings : KnownNativeEncodings,
   UsingBigIntForStat : UsingBigIntForStat,

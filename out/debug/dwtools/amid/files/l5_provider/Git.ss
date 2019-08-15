@@ -201,7 +201,7 @@ function pathParse( remotePath )
     let splits = _.strIsolateLeftOrAll( parsed1.longPath, '.git/' );
     if( parsed1.query )
     {
-      let query = _.strToMap({ src : parsed1.query, keyValDelimeter : '=', entryDelimeter : '&' });
+      let query = _.strStructureParse({ src : parsed1.query, keyValDelimeter : '=', entryDelimeter : '&' });
       if( query.out )
       splits[ 2 ] = path.join( splits[ 2 ], query.out );
     }
@@ -559,7 +559,7 @@ function isUpToDate( o )
   ready
   .ifNoErrorThen( function( arg )
   {
-    _.assert( arg.length === 2 );
+    _.assert( arg.length === 1 );
 
     let result = false;
     let detachedRegexp = /HEAD detached at (\w+)/;
@@ -801,7 +801,7 @@ function filesReflectSingle_body( o )
     ready
     .ifNoErrorThen( function( arg )
     {
-      _.assert( arg.length === 3 );
+      _.assert( arg.length === 2 );
       localChanges = _.strHasAny( arg[ 0 ].output, [ 'Changes to be committed', 'Changes not staged for commit' ] );
       mergeIsNeeded = !_.strHas( arg[ 0 ].output, 'Your branch is up to date' );
       hashIsBranchName = _.strHas( arg[ 1 ].output, parsed.hash );
@@ -876,15 +876,15 @@ function filesReflectSingle_body( o )
     con.finally( ( err, got ) =>
     {
       if( err )
-      { 
+      {
         if( localChanges )
         shell
-        ({ 
+        ({
           execPath : 'git stash pop',
           sync : 1,
           deasync : 0,
-          throwingExitCode : 0, 
-          ready : null 
+          throwingExitCode : 0,
+          ready : null
         })
 
         if( !_.strHasAny( o.output, [ 'fatal: reference', 'error: pathspec' ] ) )

@@ -1885,6 +1885,7 @@ function filesReflectEvaluate_body( o )
     {
       /* src does not exist or is not actual */
 
+      if( 0 ) // xxx
       if( o.mandatory )
       if( record.src.isStem )
       throw _.err

@@ -154,15 +154,15 @@ function current()
 /**
  * @summary Converts global path `globalPath` to local.
  * @param {String} globalPath Source path.
- * @function localFromGlobal
+ * @function preferredFromGlobal
  * @memberof module:Tools/PathBasic.wTools.path
 */
 
-function localFromGlobal( globalPath )
+function preferredFromGlobal( globalPath )
 {
   let path = this;
   let provider = this.fileProvider;
-  return provider.localFromGlobalAct( globalPath );
+  return provider.preferredFromGlobalAct( globalPath );
 }
 
 //
@@ -170,15 +170,15 @@ function localFromGlobal( globalPath )
 /**
  * @summary Converts local path `localPath` to global.
  * @param {String} localPath Source path.
- * @function localFromGlobal
+ * @function globalFromPreferred
  * @memberof module:Tools/PathBasic.wTools.path
 */
 
-function globalFromLocal( localPath )
+function globalFromPreferred( localPath )
 {
   let path = this;
   let provider = this.fileProvider;
-  return provider.globalFromLocalAct( localPath );
+  return provider.globalFromPreferredAct( localPath );
 }
 
 //
@@ -212,10 +212,10 @@ let Proto =
   from,
   // pathsFrom,
 
-  localFromGlobal,
-  localsFromGlobals : _vectorizeKeysAndVals( localFromGlobal ),
-  globalFromLocal,
-  globalsFromLocals : _vectorizeKeysAndVals( globalFromLocal ),
+  preferredFromGlobal,
+  localsFromGlobals : _vectorizeKeysAndVals( preferredFromGlobal ),
+  globalFromPreferred,
+  globalsFromLocals : _vectorizeKeysAndVals( globalFromPreferred ),
 
   nativize,
   current,

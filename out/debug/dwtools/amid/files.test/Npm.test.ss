@@ -52,7 +52,7 @@ function filesReflectTrivial( test )
   let path = context.providerDst.path;
   let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
   let installPath = path.join( routinePath, 'wPathBasic' );
-  let installPathGlobal = providerDst.path.globalFromLocal( installPath );
+  let installPathGlobal = providerDst.path.globalFromPreferred( installPath );
 
   let con = new _.Consequence().take( null )
 

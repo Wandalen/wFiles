@@ -3502,6 +3502,9 @@ function pathLocalize( filePath )
 
   _.assert( _.strIs( filePath ) );
 
+  if( _.strHas( filePath, 'git+https' ) )
+  debugger;
+
   filePath = path.canonize( filePath );
 
   if( filter.effectiveFileProvider && !path.isGlobal( filePath ) )
@@ -3527,7 +3530,7 @@ function pathLocalize( filePath )
   _.assert( !path.isTrailed( filePath ) );
 
   let provider = filter.effectiveFileProvider || filter.hubFileProvider || filter.defaultFileProvider;
-  let result = provider.path.localFromGlobal( filePath );
+  let result = provider.path.preferredFromGlobal( filePath );
   return result;
 }
 

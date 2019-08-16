@@ -719,7 +719,7 @@ function _absoluteGlobalGet()
   let record = this;
   let f = record.factory;
   let fileProvider = f.effectiveFileProvider;
-  return fileProvider.path.globalFromLocal( record.absolute );
+  return fileProvider.path.globalFromPreferred( record.absolute );
 }
 
 //
@@ -729,7 +729,7 @@ function _realGlobalGet()
   let record = this;
   let f = record.factory;
   let fileProvider = f.effectiveFileProvider;
-  return fileProvider.path.globalFromLocal( record.real );
+  return fileProvider.path.globalFromPreferred( record.real );
 }
 
 //

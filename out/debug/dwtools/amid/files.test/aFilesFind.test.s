@@ -10722,10 +10722,10 @@ function _filesReflect( test, o )
   test.identical( preserve, expectedPreserve );
   test.identical( reason, expectedReason );
 
-  test.identical( p.hub.filesAreSoftLinked([ p.src.path.globalFromLocal( '/src/a1' ), p.dst.path.globalFromLocal( '/dst/a1' ) ]), false );
-  test.identical( p.hub.filesAreSoftLinked([ p.src.path.globalFromLocal( '/src/a1' ), p.src.path.globalFromLocal( '/src/a1' ) ]), false );
-  test.identical( p.hub.filesAreHardLinked([ p.src.path.globalFromLocal( '/src/a1' ), p.dst.path.globalFromLocal( '/dst/a1' ) ]), false );
-  test.identical( p.hub.filesAreHardLinked([ p.src.path.globalFromLocal( '/src/a1' ), p.src.path.globalFromLocal( '/src/a1' ) ]), true );
+  test.identical( p.hub.filesAreSoftLinked([ p.src.path.globalFromPreferred( '/src/a1' ), p.dst.path.globalFromPreferred( '/dst/a1' ) ]), false );
+  test.identical( p.hub.filesAreSoftLinked([ p.src.path.globalFromPreferred( '/src/a1' ), p.src.path.globalFromPreferred( '/src/a1' ) ]), false );
+  test.identical( p.hub.filesAreHardLinked([ p.src.path.globalFromPreferred( '/src/a1' ), p.dst.path.globalFromPreferred( '/dst/a1' ) ]), false );
+  test.identical( p.hub.filesAreHardLinked([ p.src.path.globalFromPreferred( '/src/a1' ), p.src.path.globalFromPreferred( '/src/a1' ) ]), true );
 
   /* */
 
@@ -10751,7 +10751,7 @@ function _filesReflect( test, o )
     filesTree :
     {
       src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-      dst : { a2 : '2', a1 : [{ softLink : p.src.path.globalFromLocal( '/src/a1' ) }], b : [{ softLink : p.src.path.globalFromLocal( '/src/b' ) }], c : [{ softLink : p.src.path.globalFromLocal( '/src/c' ) }], dir : { a2 : '2', a1 : [{ softLink : p.src.path.globalFromLocal( '/src/dir/a1' ) }], b : [{ softLink : p.src.path.globalFromLocal( '/src/dir/b' ) }], c : [{ softLink : p.src.path.globalFromLocal( '/src/dir/c' ) }] }, dirSame : { d : [{ softLink : p.src.path.globalFromLocal( '/src/dirSame/d' ) }] }, dir1 : { a1 : [{ softLink : p.src.path.globalFromLocal( '/src/dir1/a1' ) }], b : [{ softLink : p.src.path.globalFromLocal( '/src/dir1/b' ) }], c : [{ softLink : p.src.path.globalFromLocal( '/src/dir1/c' ) }] }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir4 : {}, dir5 : {}, srcFile : [{ softLink : p.src.path.globalFromLocal( '/src/srcFile' ) }], dstFile : { f : [{ softLink : p.src.path.globalFromLocal( '/src/dstFile/f' ) }] } },
+      dst : { a2 : '2', a1 : [{ softLink : p.src.path.globalFromPreferred( '/src/a1' ) }], b : [{ softLink : p.src.path.globalFromPreferred( '/src/b' ) }], c : [{ softLink : p.src.path.globalFromPreferred( '/src/c' ) }], dir : { a2 : '2', a1 : [{ softLink : p.src.path.globalFromPreferred( '/src/dir/a1' ) }], b : [{ softLink : p.src.path.globalFromPreferred( '/src/dir/b' ) }], c : [{ softLink : p.src.path.globalFromPreferred( '/src/dir/c' ) }] }, dirSame : { d : [{ softLink : p.src.path.globalFromPreferred( '/src/dirSame/d' ) }] }, dir1 : { a1 : [{ softLink : p.src.path.globalFromPreferred( '/src/dir1/a1' ) }], b : [{ softLink : p.src.path.globalFromPreferred( '/src/dir1/b' ) }], c : [{ softLink : p.src.path.globalFromPreferred( '/src/dir1/c' ) }] }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir4 : {}, dir5 : {}, srcFile : [{ softLink : p.src.path.globalFromPreferred( '/src/srcFile' ) }], dstFile : { f : [{ softLink : p.src.path.globalFromPreferred( '/src/dstFile/f' ) }] } },
     },
   });
 
@@ -10776,12 +10776,12 @@ function _filesReflect( test, o )
   test.identical( action, expectedAction );
   test.identical( allow, expectedAllow );
 
-  test.identical( p.hub.filesAreSoftLinked([ p.src.path.globalFromLocal( '/src/a1' ), p.dst.path.globalFromLocal( '/dst/a1' ) ]), true );
-  test.identical( p.hub.filesAreSoftLinked([ p.src.path.globalFromLocal( '/src/a2' ), p.dst.path.globalFromLocal( '/dst/a2' ) ]), false );
-  test.identical( p.hub.filesAreSoftLinked([ p.src.path.globalFromLocal( '/src/b' ), p.dst.path.globalFromLocal( '/dst/b' ) ]), true );
-  test.identical( p.hub.filesAreSoftLinked([ p.src.path.globalFromLocal( '/src/dir/a1' ), p.dst.path.globalFromLocal( '/dst/dir/a1' ) ]), true );
-  test.identical( p.hub.filesAreSoftLinked([ p.src.path.globalFromLocal( '/src/dir/a2' ), p.dst.path.globalFromLocal( '/dst/dir/a2' ) ]), false );
-  test.identical( p.hub.filesAreSoftLinked([ p.src.path.globalFromLocal( '/src/dir/b' ), p.dst.path.globalFromLocal( '/dst/dir/b' ) ]), true );
+  test.identical( p.hub.filesAreSoftLinked([ p.src.path.globalFromPreferred( '/src/a1' ), p.dst.path.globalFromPreferred( '/dst/a1' ) ]), true );
+  test.identical( p.hub.filesAreSoftLinked([ p.src.path.globalFromPreferred( '/src/a2' ), p.dst.path.globalFromPreferred( '/dst/a2' ) ]), false );
+  test.identical( p.hub.filesAreSoftLinked([ p.src.path.globalFromPreferred( '/src/b' ), p.dst.path.globalFromPreferred( '/dst/b' ) ]), true );
+  test.identical( p.hub.filesAreSoftLinked([ p.src.path.globalFromPreferred( '/src/dir/a1' ), p.dst.path.globalFromPreferred( '/dst/dir/a1' ) ]), true );
+  test.identical( p.hub.filesAreSoftLinked([ p.src.path.globalFromPreferred( '/src/dir/a2' ), p.dst.path.globalFromPreferred( '/dst/dir/a2' ) ]), false );
+  test.identical( p.hub.filesAreSoftLinked([ p.src.path.globalFromPreferred( '/src/dir/b' ), p.dst.path.globalFromPreferred( '/dst/dir/b' ) ]), true );
 
   /* */
 
@@ -13219,8 +13219,8 @@ function filesReflectWithHub( test )
 
   test.case = 'files from Extract to HardDrive, using global uris'
   dstProvider.filesDelete( dstPath );
-  var srcUrl = srcProvider.path.globalFromLocal( srcPath );
-  var dstUrl = dstProvider.path.globalFromLocal( dstPath );
+  var srcUrl = srcProvider.path.globalFromPreferred( srcPath );
+  var dstUrl = dstProvider.path.globalFromPreferred( dstPath );
   var o1 = { reflectMap : { [ srcUrl ] : dstUrl } };
   var o2 =
   {

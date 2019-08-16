@@ -3696,7 +3696,7 @@ function filesReflectTo_body( o )
 
   _.assert( src.hub === dst.hub );
 
-  let filePath = { [ src.path.globalFromLocal( o.srcPath ) ] : dst.path.globalFromLocal( o.dstPath ) }
+  let filePath = { [ src.path.globalFromPreferred( o.srcPath ) ] : dst.path.globalFromPreferred( o.dstPath ) }
 
   let o2 = _.mapOnly( o, filesReflect.defaults );
   o2.reflectMap = filePath;

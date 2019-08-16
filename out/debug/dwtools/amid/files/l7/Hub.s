@@ -391,20 +391,20 @@ function fieldPop()
 /**
  @summary Converts global path `filePath` to local.
  @param {String} filePath Global path.
- @function localFromGlobalAct
+ @function preferredFromGlobalAct
  @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHub#
 */
 
-function localFromGlobalAct( filePath )
+function preferredFromGlobalAct( filePath )
 {
   let self = this;
   _.assert( arguments.length === 1, 'Expects single argument' );
-  return self._localFromGlobal( filePath ).localPath;
+  return self._preferredFromGlobalAct( filePath ).localPath;
 }
 
 //
 
-function _localFromGlobal( filePath, provider )
+function _preferredFromGlobalAct( filePath, provider )
 {
   let self = this;
   let path = self.path;
@@ -427,27 +427,19 @@ function _localFromGlobal( filePath, provider )
 
   _.assert( _.objectIs( r.provider ), () => 'No provider for path ' + _.strQuote( filePath ) );
 
-  r.localPath = r.provider.path.localFromGlobal( r.parsedPath );
+  r.localPath = r.provider.path.preferredFromGlobal( r.parsedPath );
 
   _.assert( _.strIs( r.localPath ) );
 
   return r;
 }
 
-// //
-//
-// let localsFromGlobals = _.routineVectorize_functor
-// ({
-//   routine : localFromGlobal,
-//   vectorizingMapVals : 0,
-// });
-
 //
 
 function pathNativizeAct( filePath )
 {
   let self = this;
-  let r = self._localFromGlobal.apply( self, arguments );
+  let r = self._preferredFromGlobalAct.apply( self, arguments );
   r.localPath = r.provider.path.nativize( r.localPath );
   _.assert( 0, 'not implemented' ); xxx
   _.assert( _.objectIs( r.provider ), 'No provider for path', filePath );
@@ -481,7 +473,7 @@ function pathResolveLinkFull_body( o )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  let r = self._localFromGlobal( o.filePath );
+  let r = self._preferredFromGlobalAct( o.filePath );
   o.filePath = r.localPath;
 
   let result = r.provider.pathResolveLinkFull.body.call( r.provider, o );
@@ -527,7 +519,7 @@ function pathResolveLinkTail_body( o )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  let r = self._localFromGlobal( o.filePath );
+  let r = self._preferredFromGlobalAct( o.filePath );
   o.filePath = r.localPath;
 
   let result = r.provider.pathResolveLinkTail.body.call( r.provider, o );
@@ -556,7 +548,7 @@ function pathResolveSoftLink_body( o )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  let r = self._localFromGlobal( o.filePath );
+  let r = self._preferredFromGlobalAct( o.filePath );
 
   o.filePath = r.localPath;
 
@@ -591,7 +583,7 @@ function pathResolveTextLink_body( o )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  let r = self._localFromGlobal( o.filePath );
+  let r = self._preferredFromGlobalAct( o.filePath );
 
   o.filePath = r.localPath;
 
@@ -635,7 +627,7 @@ function fileRead_body( o )
     resolvingTextLink : o.resolvingTextLink,
   });
 
-  let r = self._localFromGlobal( o.filePath );
+  let r = self._preferredFromGlobalAct( o.filePath );
   let o2 = _.mapExtend( null, o );
 
   o2.resolvingSoftLink = 0;
@@ -702,8 +694,8 @@ function _link_functor( fop )
 
     /* */
 
-    op.originalDst = self._localFromGlobal( op.options.originalDstPath );
-    op.originalSrc = self._localFromGlobal( op.options.originalSrcPath );
+    op.originalDst = self._preferredFromGlobalAct( op.options.originalDstPath );
+    op.originalSrc = self._preferredFromGlobalAct( op.options.originalSrcPath );
 
     _.assert( !!op.originalDst.provider, 'No provider for path', op.options.originalDstPath );
     _.assert( !!op.originalSrc.provider, 'No provider for path', op.options.originalSrcPath );
@@ -720,8 +712,8 @@ function _link_functor( fop )
 
     /* */
 
-    op.dst = self._localFromGlobal( op.options.dstPath );
-    op.src = self._localFromGlobal( op.options.srcPath );
+    op.dst = self._preferredFromGlobalAct( op.options.dstPath );
+    op.src = self._preferredFromGlobalAct( op.options.srcPath );
 
     _.assert( !!op.dst.provider, 'No provider for path', op.options.dstPath );
     _.assert( !!op.src.provider, 'No provider for path', op.options.srcPath );
@@ -836,7 +828,7 @@ function hardLinkBreak_body( o )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  let r = self._localFromGlobal( o.filePath );
+  let r = self._preferredFromGlobalAct( o.filePath );
   let o2 = _.mapExtend( null, o );
 
   o2.filePath = r.localPath;
@@ -857,8 +849,8 @@ function filesAreHardLinkedAct( o )
   _.assertRoutineOptions( filesAreHardLinkedAct, arguments );
   _.assert( o.filePath.length === 2, 'Expects exactly two arguments' );
 
-  let dst = self._localFromGlobal( o.filePath[ 0 ] );
-  let src = self._localFromGlobal( o.filePath[ 1 ] );
+  let dst = self._preferredFromGlobalAct( o.filePath[ 0 ] );
+  let src = self._preferredFromGlobalAct( o.filePath[ 1 ] );
 
   _.assert( !!dst.provider, 'No provider for path', o.filePath[ 0 ] );
   _.assert( !!src.provider, 'No provider for path', o.filePath[ 1 ] );
@@ -1055,7 +1047,7 @@ function routinesGenerate()
             resolvingTextLink : o.resolvingTextLink || false,
           });
 
-          r = self._localFromGlobal( o[ p ] );
+          r = self._preferredFromGlobalAct( o[ p ] );
           o[ p ] = r.localPath;
           provider = r.provider;
 
@@ -1067,7 +1059,7 @@ function routinesGenerate()
           if( o[ p ] instanceof _.FileRecord )
           continue;
 
-          o[ p ] = self.path.localFromGlobal( o[ p ] );
+          o[ p ] = self.path.preferredFromGlobal( o[ p ] );
         }
       }
 
@@ -1268,9 +1260,8 @@ let Proto =
 
   // path
 
-  localFromGlobalAct,
-  _localFromGlobal,
-  // localsFromGlobals,
+  preferredFromGlobalAct,
+  _preferredFromGlobalAct,
 
   pathCurrentAct,
 

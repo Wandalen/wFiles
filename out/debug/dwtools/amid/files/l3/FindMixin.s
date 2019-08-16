@@ -30,7 +30,7 @@ let Self = function wFileProviderFind( o )
 
 Self.shortName = 'Find';
 
-// let debugPath = '/release';
+let debugPath = '/dstNew';
 
 // --
 // etc
@@ -658,7 +658,7 @@ function filesFind_body( o )
   if( o.verbosity >= 3 )
   self.logger.log( 'filesFind', _.toStr( o, { levels : 2 } ) );
 
-  let dirToFile = Object.create( null );
+  // let dirToFile = Object.create( null );
   o.filePath = [];
 
   for( let src in o.filter.formedFilePath )
@@ -680,32 +680,6 @@ function filesFind_body( o )
   forPaths( o.filePath, _.mapExtend( null, o ) );
 
   return end();
-
-  // /* */
-  //
-  // function visited( filePath )
-  // {
-  //   debugger;
-  //   let dirs = path.trackToRoot( filePath );
-  //   dirs.forEach( ( dir ) =>
-  //   {
-  //     if( dirToFile[ dir ] )
-  //     visited( dirToFile[ dir ], filePath );
-  //     dirToFile[ dir ] = filePath;
-  //   });
-  // }
-  //
-  // /* */
-  //
-  // function visit( oldPath, newPath )
-  // {
-  //   debugger;
-  //   let dirs = path.trackToRoot( oldPath );
-  //   dirs.forEach( ( dir ) =>
-  //   {
-  //     dirToFile[ dir ] = newPath
-  //   });
-  // }
 
   /* */
 
@@ -1823,8 +1797,8 @@ function filesReflectEvaluate_body( o )
   function handleUp( record, op )
   {
 
-    // if( _.strEnds( record.dst.absolute, debugPath ) )
-    // debugger;
+    if( _.strEnds( record.dst.absolute, debugPath ) )
+    debugger;
 
     // if( touchMap[ record.dst.absolute ] )
     // debugger;
@@ -1887,8 +1861,8 @@ function filesReflectEvaluate_body( o )
   function handleUp2( record, op )
   {
 
-    // if( _.strEnds( record.dst.absolute, debugPath ) )
-    // debugger;
+    if( _.strEnds( record.dst.absolute, debugPath ) )
+    debugger;
 
     let a = actionMap[ record.dst.absolute ];
     let t = touchMap[ record.dst.absolute ];
@@ -1910,6 +1884,14 @@ function filesReflectEvaluate_body( o )
     if( !record.src.stat )
     {
       /* src does not exist or is not actual */
+
+      if( o.mandatory )
+      if( record.src.isStem )
+      throw _.err
+      (
+        `Stem file does not exist: ${_.strQuote( record.src.absolute )}` +
+        `\nTo fix it you may set option mandatory to false or exclude the file from filePath of source filter`
+      );
 
       if( record.reason === 'dstDeleting' && !record.dst.isActual )
       {
@@ -2048,8 +2030,8 @@ function filesReflectEvaluate_body( o )
   function handleDown( record, op )
   {
 
-    // if( _.strEnds( record.dst.absolute, debugPath ) )
-    // debugger;
+    if( _.strEnds( record.dst.absolute, debugPath ) )
+    debugger;
 
     // _.assert( touchMap[ record.dst.absolute ] === record.touch || !record.touch ); // yyy
     if( touchMap[ record.dst.absolute ] )
@@ -2116,8 +2098,8 @@ function filesReflectEvaluate_body( o )
   function handleDown2( record, op )
   {
 
-    // if( _.strEnds( record.dst.absolute, debugPath ) )
-    // debugger;
+    if( _.strEnds( record.dst.absolute, debugPath ) )
+    debugger;
 
     _.assert( arguments.length === 2 );
     _.assert( !!record.touch === !!touchMap[ record.dst.absolute ] );
@@ -2131,10 +2113,15 @@ function filesReflectEvaluate_body( o )
       if( !record.touch || actionMap[ record.dst.absolute ] )
       {
         if( !record.touch )
-        action( record, 'exclude' );
-        else if( actionMap[ record.dst.absolute ] )
-        action( record, actionMap[ record.dst.absolute ] );
-        _.assert( !!record.action );
+        {
+          action( record, 'exclude' );
+        }
+        else if( actionMap[ record.dst.absolute ] === 'dirMake' )
+        {
+          dirMake( record );
+          preserve( record );
+        }
+        _.assert( !!record.action, () => 'Not clear what action to apply to ' + record.src.absolute );
         return;
       }
     }

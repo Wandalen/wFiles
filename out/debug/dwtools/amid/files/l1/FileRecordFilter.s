@@ -4288,8 +4288,8 @@ function _applyToRecordMasks( record )
   _.assert( !!filter, 'Cant resolve filter map for stem path', () => _.strQuote( f.stemPath ) );
   _.assert( !!f.formed, 'Record factor was not formed!' );
 
-  // if( _.strHas( record.absolute, 'src1/d/b' ) )
-  // debugger;
+  if( _.strHas( record.absolute, 'dir1/dir2' ) )
+  debugger;
 
   /* */
 

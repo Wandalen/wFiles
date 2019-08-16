@@ -435,9 +435,11 @@ function filesFindTrivial( test )
   let path = context.provider.path;
   let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
 
-  function abs( filePath )
+  function abs()
   {
-    return path.join( routinePath, filePath );
+    let args = _.longSlice( arguments );
+    args.unshift( routinePath );
+    return path.s.join.apply( path.s, args );
   }
 
   /* */
@@ -2089,9 +2091,11 @@ function filesFindRecursive( test )
   let path = context.provider.path;
   let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
 
-  function abs( filePath )
+  function abs()
   {
-    return path.s.join( routinePath, filePath )
+    let args = _.longSlice( arguments );
+    args.unshift( routinePath );
+    return path.s.join.apply( path.s, args );
   }
 
   var extract = _.FileProvider.Extract
@@ -4001,9 +4005,11 @@ function filesFindGlob( test )
     onDownRelativeActuals = [];
   }
 
-  function abs( filePath )
+  function abs()
   {
-    return path.s.join( routinePath, filePath )
+    let args = _.longSlice( arguments );
+    args.unshift( routinePath );
+    return path.s.join.apply( path.s, args );
   }
 
   var globTerminals = provider.filesGlober
@@ -6410,9 +6416,11 @@ function filesFindDistinct( test )
   let path = context.provider.path;
   let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
 
-  function abs( filePath )
+  function abs()
   {
-    return path.s.join( routinePath, filePath );
+    let args = _.longSlice( arguments );
+    args.unshift( routinePath );
+    return path.s.join.apply( path.s, args );
   }
 
   /* - */
@@ -6739,9 +6747,11 @@ function filesFindSimplifyGlob( test )
   let path = context.provider.path;
   let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
 
-  function abs( filePath )
+  function abs()
   {
-    return path.s.join( routinePath, filePath );
+    let args = _.longSlice( arguments );
+    args.unshift( routinePath );
+    return path.s.join.apply( path.s, args );
   }
 
   /* - */
@@ -7395,105 +7405,198 @@ function filesFinder( test )
   let path = context.provider.path;
   let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
 
-  var extract1 = _.FileProvider.Extract
-  ({
-    filesTree :
+  function abs()
+  {
+    let args = _.longSlice( arguments );
+    args.unshift( routinePath );
+    return path.s.join.apply( path.s, args );
+  }
+
+  /* - */
+
+  // var extract1 = _.FileProvider.Extract
+  // ({
+  //   filesTree :
+  //   {
+  //     'package.json' : '/dir2/package.json',
+  //     'node_modules' : '/node_modules',
+  //     dir1 :
+  //     {
+  //       t1 : '/dir1/t1',
+  //       t2 : '/dir1/t2',
+  //       dir11 : { t3 : '/dir1/dir11/t3' },
+  //       node_modules :
+  //       {
+  //         t2 : '/dir1/node_modules/t2',
+  //         dir11 : { t3 : '/dir1/node_modules/dir11/t3' },
+  //       },
+  //     },
+  //     dir2 :
+  //     {
+  //       t21 : '/dir2/t21',
+  //       'package.json' : '/dir2/package.json',
+  //       node_modules :
+  //       {
+  //         t2 : '/dir2/node_modules/t2',
+  //         dir11 : { t3 : '/dir2/node_modules/dir11/t3' },
+  //       },
+  //     },
+  //   },
+  // });
+  //
+  // extract1.filesReflectTo( provider, routinePath );
+  //
+  // /**/
+  //
+  // test.case = 'bools, no glob';
+  //
+  // var find = provider.filesFinder
+  // ({
+  //   recursive : 2,
+  //   allowingMissed : 1,
+  //   maskPreset : 0,
+  //   outputFormat : 'relative',
+  //   filter :
+  //   {
+  //     filePath : { 'node_modules' : 0, 'package.json' : 0 },
+  //   }
+  // });
+  //
+  // var expected = [ './dir1/t1', './dir1/t2', './dir1/dir11/t3', './dir1/node_modules/t2', './dir1/node_modules/dir11/t3', './dir2/package.json', './dir2/t21', './dir2/node_modules/t2', './dir2/node_modules/dir11/t3' ];
+  // var got = find( routinePath );
+  // test.identical( got, expected );
+  //
+  // /**/
+  //
+  // test.case = 'bools, glob';
+  //
+  // var find = provider.filesFinder
+  // ({
+  //   recursive : 2,
+  //   allowingMissed : 1,
+  //   maskPreset : 0,
+  //   outputFormat : 'relative',
+  //   filter :
+  //   {
+  //     filePath : { '**/node_modules/**' : 0, '**/package.json' : 0 },
+  //   }
+  // });
+  //
+  // var expected = [ './dir1/t1', './dir1/t2', './dir1/dir11/t3', './dir2/t21' ];
+  // var got = find( routinePath );
+  // test.identical( got, expected );
+  //
+  // /**/
+  //
+  // test.case = 'bools, glob, include all';
+  //
+  // var find = provider.filesFinder
+  // ({
+  //   recursive : 2,
+  //   includingTerminals : 1,
+  //   includingDirs : 1,
+  //   includingTransient : 1,
+  //   allowingMissed : 1,
+  //   maskPreset : 0,
+  //   outputFormat : 'relative',
+  //   filter :
+  //   {
+  //     filePath : { '**/node_modules/**' : 0, '**/package.json' : 0 },
+  //   }
+  // });
+  //
+  // /*
+  //   zzz : extend optimization "certainly"
+  // */
+  //
+  // var expected = [ '.', './dir1', './dir1/t1', './dir1/t2', './dir1/dir11', './dir1/dir11/t3', './dir2', './dir2/t21' ];
+  // var got = find( routinePath );
+  // test.identical( got, expected );
+
+  /* - */
+
+  var tree =
+  {
+    src :
     {
-      'package.json' : '/dir2/package.json',
-      'node_modules' : '/node_modules',
-      dir1 :
+      proto :
       {
-        t1 : '/dir1/t1',
-        t2 : '/dir1/t2',
-        dir11 : { t3 : '/dir1/dir11/t3' },
-        node_modules :
+        '-f' : 'src/proto/-f',
+        'f' : 'src/proto/f',
+        'f.js' : 'src/proto/f.js',
+        'f.s' : 'src/proto/f.s',
+        'f.ss' : 'src/proto/f.ss',
+        'f.test.js' : 'src/proto/f.test.js',
+        'f.test.s' : 'src/proto/f.test.s',
+        'f.test.ss' : 'src/proto/f.test.ss',
+        dir1 :
         {
-          t2 : '/dir1/node_modules/t2',
-          dir11 : { t3 : '/dir1/node_modules/dir11/t3' },
-        },
-      },
-      dir2 :
-      {
-        t21 : '/dir2/t21',
-        'package.json' : '/dir2/package.json',
-        node_modules :
-        {
-          t2 : '/dir2/node_modules/t2',
-          dir11 : { t3 : '/dir2/node_modules/dir11/t3' },
-        },
-      },
-    },
-  });
-
-  extract1.filesReflectTo( provider, routinePath );
-
-  /**/
-
-  test.case = 'bools, no glob';
-
-  var find = provider.filesFinder
-  ({
-    recursive : 2,
-    allowingMissed : 1,
-    maskPreset : 0,
-    outputFormat : 'relative',
-    filter :
-    {
-      filePath : { 'node_modules' : 0, 'package.json' : 0 },
+          dir2 :
+          {
+            '-f' : 'dir1/dir2/src/proto/-f',
+            'f' : 'dir1/dir2/src/proto/f',
+            'f.js' : 'dir1/dir2/src/proto/f.js',
+            'f.s' : 'dir1/dir2/src/proto/f.s',
+            'f.ss' : 'dir1/dir2/src/proto/f.ss',
+            'f.test.js' : 'dir1/dir2/src/proto/f.test.js',
+            'f.test.s' : 'dir1/dir2/src/proto/f.test.s',
+            'f.test.ss' : 'dir1/dir2/src/proto/f.test.ss',
+          }
+        }
+      }
     }
-  });
+  }
+  var extract = new _.FileProvider.Extract({ filesTree : tree });
 
-  var expected = [ './dir1/t1', './dir1/t2', './dir1/dir11/t3', './dir1/node_modules/t2', './dir1/node_modules/dir11/t3', './dir2/package.json', './dir2/t21', './dir2/node_modules/t2', './dir2/node_modules/dir11/t3' ];
-  var got = find( routinePath );
-  test.identical( got, expected );
-
-  /**/
-
-  test.case = 'bools, glob';
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
 
   var find = provider.filesFinder
   ({
-    recursive : 2,
-    allowingMissed : 1,
-    maskPreset : 0,
-    outputFormat : 'relative',
-    filter :
-    {
-      filePath : { '**/node_modules/**' : 0, '**/package.json' : 0 },
-    }
-  });
-
-  var expected = [ './dir1/t1', './dir1/t2', './dir1/dir11/t3', './dir2/t21' ];
-  var got = find( routinePath );
-  test.identical( got, expected );
-
-  /**/
-
-  test.case = 'bools, glob, include all';
-
-  var find = provider.filesFinder
-  ({
-    recursive : 2,
     includingTerminals : 1,
     includingDirs : 1,
     includingTransient : 1,
-    allowingMissed : 1,
-    maskPreset : 0,
-    outputFormat : 'relative',
+    recursive : 2,
     filter :
     {
-      filePath : { '**/node_modules/**' : 0, '**/package.json' : 0 },
+      prefixPath : routinePath,
     }
   });
 
-  /*
-    zzz : extend optimization "certainly"
-  */
+  /* - */
 
-  var expected = [ '.', './dir1', './dir1/t1', './dir1/t2', './dir1/dir11', './dir1/dir11/t3', './dir2', './dir2/t21' ];
-  var got = find( routinePath );
-  test.identical( got, expected );
+  test.case = 'exclude tests, include js';
 
+/*
+{
+  "./proto/src3.js" : `./out/compiled.debug/Main.s`,
+  "./**.test*" : false,
+  "./**.test/**" : false,
+  "./**.(js|s|ss)" : true
+}
+  basePath :
+{
+  "./proto" : `./proto`
+}"
+*/
+
+  var expectedRelative = [ 'x' ];
+  var basePath = path.join( routinePath, 'src/proto' );
+  var filePath = abs
+  ({
+    "./src/proto" : `./out`,
+    // "./src/**.test*" : false,
+    // "./src/**.test/**" : false,
+    "./src/**.(js|s|ss)" : true,
+  });
+  debugger;
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* - */
+
+  debugger; return; xxx
 }
 
 //
@@ -7510,9 +7613,11 @@ function filesFindGroups( test )
   let path = context.provider.path;
   let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
 
-  function abs( filePath )
+  function abs()
   {
-    return path.s.join( routinePath, filePath )
+    let args = _.longSlice( arguments );
+    args.unshift( routinePath );
+    return path.s.join.apply( path.s, args );
   }
 
   var filesTree =
@@ -7746,9 +7851,11 @@ function filesReflectEvaluate( test )
   let path = context.provider.path;
   let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
 
-  function abs( filePath )
+  function abs()
   {
-    return path.reroot( routinePath, filePath );
+    let args = _.longSlice( arguments );
+    args.unshift( routinePath );
+    return path.s.join.apply( path.s, args );
   }
 
   /* */
@@ -9312,9 +9419,11 @@ function filesReflectMutuallyExcluding( test )
   let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
   var precise = true;
 
-  function abs( filePath )
+  function abs()
   {
-    return path.s.join( routinePath, filePath )
+    let args = _.longSlice( arguments );
+    args.unshift( routinePath );
+    return path.s.join.apply( path.s, args );
   }
 
   function filesTreeAdapt( extract )
@@ -12061,9 +12170,11 @@ function filesReflectToItself( test )
   let path = context.provider.path;
   let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
 
-  function abs( filePath )
+  function abs()
   {
-    return path.reroot( routinePath, filePath );
+    let args = _.longSlice( arguments );
+    args.unshift( routinePath );
+    return path.s.join.apply( path.s, args );
   }
 
   /* */
@@ -12842,9 +12953,11 @@ function filesReflector( test )
   let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
   let dst = provider;
 
-  function abs( filePath )
+  function abs()
   {
-    return path.s.canonize( path.s.reroot( routinePath, filePath ) );
+    let args = _.longSlice( arguments );
+    args.unshift( routinePath );
+    return path.s.join.apply( path.s, args );
   }
 
   /* */

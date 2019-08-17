@@ -298,7 +298,7 @@ function pathDirTempForAnother( filePath )
     return path;
   }
 
-  let dirsPath = this.chainToRoot( filePath );
+  let dirsPath = this.trackToRoot( filePath );
   let err;
   let tempPath = 'temp/tmp-' + _.idWithGuid() + '.tmp';
 

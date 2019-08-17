@@ -153,6 +153,39 @@ path:
       - ../proto/dwtools/amid/files.test/RecordFilter.test.s
       - ../proto/dwtools/amid/files.test/Uri.test.ss
       - ../proto/dwtools/atop
+      - ../proto/dwtools/tmp.tmp
+      - ../proto/dwtools/tmp.tmp/FilesRead-194418-101-79a
+      - ../proto/dwtools/tmp.tmp/FilesRead-194418-101-79a/routine-fileConfigRead
+      - >-
+        ../proto/dwtools/tmp.tmp/FilesRead-194418-101-79a/routine-fileConfigRead/terminal.json
+      - ../proto/dwtools/tmp.tmp/Hub
+      - ../proto/dwtools/tmp.tmp/Path-194418-409-3c34
+      - ../proto/dwtools/tmp.tmp/Path-194418-409-3c34/tmp
+      - ../proto/dwtools/tmp.tmp/Path-194418-409-3c34/tmp/forCopy
+      - >-
+        ../proto/dwtools/tmp.tmp/Path-194418-409-3c34/tmp/forCopy/test_original.txt
+      - ../proto/dwtools/tmp.tmp/Path-194418-409-3c34/tmp/forCopy/test_original2
+      - >-
+        ../proto/dwtools/tmp.tmp/Path-194418-409-3c34/tmp/forCopy/test_original2-backup
+      - >-
+        ../proto/dwtools/tmp.tmp/Path-194418-409-3c34/tmp/forCopy/test_original2-backup-1
+      - ../proto/dwtools/tmp.tmp/Path-194418-409-3c34/tmp/get
+      - ../proto/dwtools/tmp.tmp/Path-194418-409-3c34/tmp/get/test.txt
+      - ../proto/dwtools/tmp.tmp/SecondaryMixin-194416-837-72c1
+      - >-
+        ../proto/dwtools/tmp.tmp/SecondaryMixin-194416-837-72c1/systemBitrateTimeGet
+      - ../proto/dwtools/tmp.tmp/SecondaryMixin-194416-954-471b
+      - >-
+        ../proto/dwtools/tmp.tmp/SecondaryMixin-194416-954-471b/systemBitrateTimeGet
+      - ../proto/dwtools/tmp.tmp/SecondaryMixin-194417-589-4f59
+      - >-
+        ../proto/dwtools/tmp.tmp/SecondaryMixin-194417-589-4f59/systemBitrateTimeGet
+      - ../proto/dwtools/tmp.tmp/SecondaryMixin-194417-688-775d
+      - >-
+        ../proto/dwtools/tmp.tmp/SecondaryMixin-194417-688-775d/systemBitrateTimeGet
+      - ../proto/dwtools/tmp.tmp/SecondaryMixin-194417-978-2160
+      - >-
+        ../proto/dwtools/tmp.tmp/SecondaryMixin-194417-978-2160/systemBitrateTimeGet
 submodule: {}
 reflector:
   reflect.proto.:
@@ -507,6 +540,41 @@ module:
           - proto/dwtools/amid/files.test/RecordFilter.test.s
           - proto/dwtools/amid/files.test/Uri.test.ss
           - proto/dwtools/atop
+          - proto/dwtools/tmp.tmp
+          - proto/dwtools/tmp.tmp/FilesRead-194418-101-79a
+          - >-
+            proto/dwtools/tmp.tmp/FilesRead-194418-101-79a/routine-fileConfigRead
+          - >-
+            proto/dwtools/tmp.tmp/FilesRead-194418-101-79a/routine-fileConfigRead/terminal.json
+          - proto/dwtools/tmp.tmp/Hub
+          - proto/dwtools/tmp.tmp/Path-194418-409-3c34
+          - proto/dwtools/tmp.tmp/Path-194418-409-3c34/tmp
+          - proto/dwtools/tmp.tmp/Path-194418-409-3c34/tmp/forCopy
+          - >-
+            proto/dwtools/tmp.tmp/Path-194418-409-3c34/tmp/forCopy/test_original.txt
+          - >-
+            proto/dwtools/tmp.tmp/Path-194418-409-3c34/tmp/forCopy/test_original2
+          - >-
+            proto/dwtools/tmp.tmp/Path-194418-409-3c34/tmp/forCopy/test_original2-backup
+          - >-
+            proto/dwtools/tmp.tmp/Path-194418-409-3c34/tmp/forCopy/test_original2-backup-1
+          - proto/dwtools/tmp.tmp/Path-194418-409-3c34/tmp/get
+          - proto/dwtools/tmp.tmp/Path-194418-409-3c34/tmp/get/test.txt
+          - proto/dwtools/tmp.tmp/SecondaryMixin-194416-837-72c1
+          - >-
+            proto/dwtools/tmp.tmp/SecondaryMixin-194416-837-72c1/systemBitrateTimeGet
+          - proto/dwtools/tmp.tmp/SecondaryMixin-194416-954-471b
+          - >-
+            proto/dwtools/tmp.tmp/SecondaryMixin-194416-954-471b/systemBitrateTimeGet
+          - proto/dwtools/tmp.tmp/SecondaryMixin-194417-589-4f59
+          - >-
+            proto/dwtools/tmp.tmp/SecondaryMixin-194417-589-4f59/systemBitrateTimeGet
+          - proto/dwtools/tmp.tmp/SecondaryMixin-194417-688-775d
+          - >-
+            proto/dwtools/tmp.tmp/SecondaryMixin-194417-688-775d/systemBitrateTimeGet
+          - proto/dwtools/tmp.tmp/SecondaryMixin-194417-978-2160
+          - >-
+            proto/dwtools/tmp.tmp/SecondaryMixin-194417-978-2160/systemBitrateTimeGet
     submodule: {}
     reflector:
       reflect.proto.:

@@ -669,7 +669,7 @@ function hasProvider( provider )
 // path
 // --
 
-function localFromGlobalAct( globalPath )
+function preferredFromGlobalAct( globalPath )
 {
   let self = this;
 
@@ -700,7 +700,7 @@ function localFromGlobalAct( globalPath )
 
 //
 
-function globalFromLocalAct( localPath )
+function globalFromPreferredAct( localPath )
 {
   let self = this;
   let path = self.path.parse ? self.path : _.uri;
@@ -7669,11 +7669,8 @@ let Proto =
 
   // path
 
-  // hasLocally,
-  localFromGlobalAct,
-  // localsFromGlobals : _vectorizeKeysAndVals( localFromGlobal ),
-  globalFromLocalAct,
-  // globalsFromLocals : _vectorizeKeysAndVals( globalFromLocal ),
+  preferredFromGlobalAct,
+  globalFromPreferredAct,
 
   pathNativizeAct,
   pathCurrentAct : null,

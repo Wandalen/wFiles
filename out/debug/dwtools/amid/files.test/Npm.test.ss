@@ -50,9 +50,9 @@ function filesReflectTrivial( test )
   let providerDst = context.providerDst;
   let hub = context.hub;
   let path = context.providerDst.path;
-  let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
-  let installPath = path.join( testPath, 'wPathBasic' );
-  let installPathGlobal = providerDst.path.globalFromLocal( installPath );
+  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let installPath = path.join( routinePath, 'wPathBasic' );
+  let installPathGlobal = providerDst.path.globalFromPreferred( installPath );
 
   let con = new _.Consequence().take( null )
 
@@ -233,8 +233,8 @@ filesReflectTrivial.timeOut = 120000;
 //   let providerSrc = context.providerSrc;
 //   let providerDst = context.providerDst;
 //   let path = context.providerDst.path;
-//   let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
-//   let installPath = path.join( testPath, 'wPathBasic' );
+//   let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+//   let installPath = path.join( routinePath, 'wPathBasic' );
 
 //   let con = new _.Consequence().take( null )
 

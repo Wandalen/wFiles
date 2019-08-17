@@ -45,10 +45,10 @@ function copy( test )
   self.hub.providerRegister( hardDrive );
   self.hub.providerRegister( simpleStructure );
 
-  var hdUrl = hardDrive.path.globalFromLocal( _.path.normalize( __dirname ) );
-  var hdUrlDst = hardDrive.path.globalFromLocal( _.path.join( self.testSuitePath, test.name + '_copy' ) );
-  var ssUrl = simpleStructure.path.globalFromLocal( '/root/files/copy' );
-  var ssUrlDst = simpleStructure.path.globalFromLocal( '/root/files/_copy' );
+  var hdUrl = hardDrive.path.globalFromPreferred( _.path.normalize( __dirname ) );
+  var hdUrlDst = hardDrive.path.globalFromPreferred( _.path.join( self.testSuitePath, test.name + '_copy' ) );
+  var ssUrl = simpleStructure.path.globalFromPreferred( '/root/files/copy' );
+  var ssUrlDst = simpleStructure.path.globalFromPreferred( '/root/files/_copy' );
 
   //
 

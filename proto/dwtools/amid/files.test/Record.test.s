@@ -1439,8 +1439,8 @@ function recordHubExperiment( test )
   
   let filePathLocal = provider.path.normalize( __filename );
   let fileName = provider.path.name({ path : __filename, full : 1 });
-  let filePathGlobal = provider.path.globalFromLocal( filePathLocal );
-  let filePathRelativeGlobal = provider.path.globalFromLocal( fileName );
+  let filePathGlobal = provider.path.globalFromPreferred( filePathLocal );
+  let filePathRelativeGlobal = provider.path.globalFromPreferred( fileName );
   let basePathGlobal = hub.path.dir( filePathGlobal );
   
   let factory = hub.recordFactory();

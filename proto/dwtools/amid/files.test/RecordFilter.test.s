@@ -6056,9 +6056,29 @@ function hasAnyPath( test )
   test.is( src.filePath === dst.filePath );
   test.is( _.mapIs( src.filePath ) );
 
-  test.case = 'src.file = dot, dst.file = null';
+  test.case = 'src.file = map with empty, dst.file = map with empty';
   var src = provider.recordFilter();
-  src.filePath = '.';
+  src.filePath = { '' : '' };
+  src.prefixPath = null;
+  src.postfixPath = null;
+  src.basePath = null;
+  var dst = provider.recordFilter();
+  dst.filePath = { '' : '' };
+  dst.prefixPath = null;
+  dst.postfixPath = null;
+  dst.basePath = null;
+  test.identical( src.hasAnyPath(), false );
+  test.identical( dst.hasAnyPath(), false );
+  src.pairWithDst( dst )
+  src.pairRefineLight();
+  test.identical( src.hasAnyPath(), false );
+  test.identical( dst.hasAnyPath(), false );
+  test.identical( src.filePath, {} );
+  test.is( src.filePath === dst.filePath );
+
+  test.case = 'src.file = empty, dst.file = null';
+  var src = provider.recordFilter();
+  src.filePath = '';
   src.prefixPath = null;
   src.postfixPath = null;
   src.basePath = null;
@@ -6072,6 +6092,46 @@ function hasAnyPath( test )
   src.pairWithDst( dst )
   src.pairRefineLight();
   test.identical( src.hasAnyPath(), false );
+  test.identical( dst.hasAnyPath(), false );
+  test.identical( src.filePath, null );
+  test.is( src.filePath === dst.filePath );
+
+  test.case = 'src.file = null, dst.file = empty';
+  var src = provider.recordFilter();
+  src.filePath = null;
+  src.prefixPath = null;
+  src.postfixPath = null;
+  src.basePath = null;
+  var dst = provider.recordFilter();
+  dst.filePath = '';
+  dst.prefixPath = null;
+  dst.postfixPath = null;
+  dst.basePath = null;
+  test.identical( src.hasAnyPath(), false );
+  test.identical( dst.hasAnyPath(), false );
+  src.pairWithDst( dst )
+  src.pairRefineLight();
+  test.identical( src.hasAnyPath(), false );
+  test.identical( dst.hasAnyPath(), false );
+  test.identical( src.filePath, null );
+  test.is( src.filePath === dst.filePath );
+
+  test.case = 'src.file = dot, dst.file = null';
+  var src = provider.recordFilter();
+  src.filePath = '.';
+  src.prefixPath = null;
+  src.postfixPath = null;
+  src.basePath = null;
+  var dst = provider.recordFilter();
+  dst.filePath = null;
+  dst.prefixPath = null;
+  dst.postfixPath = null;
+  dst.basePath = null;
+  test.identical( src.hasAnyPath(), true );
+  test.identical( dst.hasAnyPath(), false );
+  src.pairWithDst( dst )
+  src.pairRefineLight();
+  test.identical( src.hasAnyPath(), true );
   test.identical( dst.hasAnyPath(), false );
   test.identical( src.filePath, { '.' : '' } );
   test.is( src.filePath === dst.filePath );
@@ -6087,13 +6147,13 @@ function hasAnyPath( test )
   dst.prefixPath = null;
   dst.postfixPath = null;
   dst.basePath = null;
-  test.identical( src.hasAnyPath(), false );
-  test.identical( dst.hasAnyPath(), false );
+  test.identical( src.hasAnyPath(), true );
+  test.identical( dst.hasAnyPath(), true );
   src.pairWithDst( dst )
-  test.identical( src.hasAnyPath(), false );
+  test.identical( src.hasAnyPath(), true );
   test.identical( dst.hasAnyPath(), true );
   src.pairRefineLight();
-  test.identical( src.hasAnyPath(), false );
+  test.identical( src.hasAnyPath(), true );
   test.identical( dst.hasAnyPath(), true );
   test.identical( src.filePath, { '.' : '.' } );
   test.is( src.filePath === dst.filePath );

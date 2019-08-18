@@ -988,16 +988,16 @@ function _pathsExtend( o )
 
   let dstFilePathArrayNonBool = filter.filePathArrayNonBoolGet();
   let srcFilePathArrayNonBool = o.src.filePathArrayNonBoolGet();
-  let addingPrefixPathToFilePath = !dstFilePathArrayNonBool.length && !srcFilePathArrayNonBool.length;
-  let booleanFallingBack = addingPrefixPathToFilePath ? true : false;
-  addingPrefixPathToFilePath = true;
+  let filePathDeducingFromFixes = !dstFilePathArrayNonBool.length && !srcFilePathArrayNonBool.length;
+  let booleanFallingBack = filePathDeducingFromFixes ? true : false;
+  filePathDeducingFromFixes = true;
   booleanFallingBack = false;
 
   if( o.src.prefixPath && filter.prefixPath )
   {
     let prefixPath = o.src.prefixPath;
-    o.src.prefixesApply({ addingPrefixPathToFilePath, booleanFallingBack });
-    filter.prefixesApply({ addingPrefixPathToFilePath, booleanFallingBack });
+    o.src.prefixesApply({ filePathDeducingFromFixes, booleanFallingBack });
+    filter.prefixesApply({ filePathDeducingFromFixes, booleanFallingBack });
     _.assert( !_.mapIs( filter.filePath ) || !!_.mapKeys( filter.filePath ).length );
     // if( filter.filePath === null ) // yyy
     // filter.prefixPath = prefixPath;
@@ -1005,12 +1005,12 @@ function _pathsExtend( o )
 
   if( o.src.prefixPath && ( o.src.filePath || o.src.basePath ) )
   {
-    o.src.prefixesApply({ addingPrefixPathToFilePath, booleanFallingBack });
+    o.src.prefixesApply({ filePathDeducingFromFixes, booleanFallingBack });
   }
 
   if( filter.prefixPath && ( filter.filePath || filter.basePath ) )
   {
-    filter.prefixesApply({ addingPrefixPathToFilePath, booleanFallingBack });
+    filter.prefixesApply({ filePathDeducingFromFixes, booleanFallingBack });
   }
 
   _.assert( o.src.prefixPath === null || filter.prefixPath === null );
@@ -1423,63 +1423,16 @@ function prefixesApply( o )
 
   /* */
 
-  _.assert( filter.postfixPath === null || !path.s.AllAreGlob( filter.postfixPath ) );
-
-  let basePath2 = Object.create( null );
+  let basePath2 = Object.create( null ); debugger;
 
   if( filter.filePath )
   filter.filePath = path.filterInplace( filter.filePath, filePathEach );
 
-  if( !regularPathHaving && o.addingPrefixPathToFilePath )
+  if( o.filePathDeducingFromFixes && !regularPathHaving )
   if( !o.applyingToTrue || !dstArray.length )
-  {
-    let negatives = Object.create( null );
-    if( _.mapIs( filter.filePath ) )
-    for( let f in filter.filePath )
-    if( _.boolLike( filter.filePath[ f ] ) && !filter.filePath[ f ] )
-    negatives[ f ] = filter.filePath[ f ];
-    prefixArray.forEach( ( prefixPath ) =>
-    {
-      postfixArray.forEach( ( postfixPath ) =>
-      {
-        let filePathFromPrefixes = path.join( prefixPath, postfixPath );
-        let addedBase = basePathsForFilePaths( filePathFromPrefixes, prefixPath, postfixPath, filter.basePath );
-        if( filter.src )
-        filter.filePath = path.mapExtend( filter.filePath, { '' : filePathFromPrefixes } ); // xxx : check all path.mapExtend
-        else
-        filter.filePath = path.mapExtend( filter.filePath, filePathFromPrefixes );
-      });
-    });
-    if( Object.keys( negatives ).length )
-    {
-      for( let src in negatives )
-      {
-        let dst = negatives[ src ];
-        if( basePath2[ src ] )
-        delete basePath2[ src ];
-        filter.filePath[ src ] = dst;
-      }
-    }
-    filter.filePath = path.simplify( filter.filePath );
-  }
+  filePathDeduceFromFixes();
 
-  if( _.mapKeys( basePath2 ).length )
-  {
-    for( let filePath in basePath2 )
-    if( _.arrayIs( basePath2[ filePath ] ) )
-    basePath2[ filePath ] = basePath2[ filePath ][ 0 ];
-
-    if( _.mapIs( filter.basePath ) )
-    {
-      _.mapDelete( filter.basePath ); // xxx : cover
-      _.mapExtend( filter.basePath, basePath2 );
-    }
-    else
-    {
-      filter.basePath = basePath2;
-      filter.basePathSimplify();
-    }
-  }
+  basePathUpdate();
 
   /* */
 
@@ -1499,6 +1452,66 @@ function prefixesApply( o )
 
   /* */
 
+  function basePathUpdate()
+  {
+
+    if( _.mapKeys( basePath2 ).length )
+    {
+      for( let filePath in basePath2 )
+      if( _.arrayIs( basePath2[ filePath ] ) )
+      basePath2[ filePath ] = basePath2[ filePath ][ 0 ];
+
+      if( _.mapIs( filter.basePath ) )
+      {
+        debugger;
+        _.mapDelete( filter.basePath ); // xxx : cover
+        _.mapExtend( filter.basePath, basePath2 );
+      }
+      else
+      {
+        filter.basePath = basePath2;
+        filter.basePathSimplify();
+      }
+    }
+
+  }
+
+  /* */
+
+  function filePathDeduceFromFixes()
+  {
+    let negatives = Object.create( null );
+    if( _.mapIs( filter.filePath ) )
+    for( let f in filter.filePath )
+    if( _.boolLike( filter.filePath[ f ] ) && !filter.filePath[ f ] )
+    negatives[ f ] = filter.filePath[ f ];
+    prefixArray.forEach( ( prefixPath ) =>
+    {
+      postfixArray.forEach( ( postfixPath ) =>
+      {
+        let filePathFromPrefixes = path.join( prefixPath, postfixPath );
+        let addedBase = basePathsForFilePaths( filePathFromPrefixes, prefixPath, postfixPath, filter.basePath );
+        if( filter.src )
+        filter.filePath = path.mapExtend( filter.filePath, { '' : filePathFromPrefixes } );
+        else
+        filter.filePath = path.mapExtend( filter.filePath, filePathFromPrefixes );
+      });
+    });
+    if( Object.keys( negatives ).length )
+    {
+      for( let src in negatives )
+      {
+        let dst = negatives[ src ];
+        if( basePath2[ src ] )
+        delete basePath2[ src ];
+        filter.filePath[ src ] = dst;
+      }
+    }
+    filter.filePath = path.simplify( filter.filePath );
+  }
+
+  /* */
+
   function filePathEach( element, it )
   {
 
@@ -1512,7 +1525,14 @@ function prefixesApply( o )
     else if( filter.dst || filter.src === null )
     {
       if( it.side === 'dst' )
-      return it.value;
+      {
+        if( o.applyingToTrue && _.boolLike( it.value ) && it.value )
+        {
+          debugger;
+          return '';
+        }
+        return it.value;
+      }
     }
 
     let value = it.value;
@@ -1527,6 +1547,7 @@ function prefixesApply( o )
       {
         let currentValue = it.value;
 
+        debugger;
         if( _.boolLike( it.value ) && it.side === 'dst' )
         if( !it.value || !o.applyingToTrue )
         {
@@ -1559,14 +1580,17 @@ function prefixesApply( o )
             }
           }
           basePathsForFilePaths( currentValue, prefixPath, postfixPath, _.mapIs( filter.basePath ) );
-          // basePathsForFilePaths( currentValue, prefixPath, postfixPath, _.mapIs( filter.basePath ) || it.side === 'dst' ); // yyy
+        }
+        else if( !o.filePathDeducingFromFixes && _.mapIs( filter.basePath ) && _.strIs( value ) && filter.basePath[ value ] )
+        {
+          let basePath = filter.basePath[ value ];
+          delete filter.basePath[ value ];
+          filter.basePath[ currentValue ] = basePath;
+          basePathsForFilePaths( currentValue, prefixPath, postfixPath, _.mapIs( filter.basePath ) );
         }
 
       });
     });
-
-    // if( it.side === 'dst' && _.strIs( it.value ) )
-    // it.value = path.fromGlob( it.value );
 
     it.value = result;
     return it.value;
@@ -1641,7 +1665,7 @@ function prefixesApply( o )
 
 prefixesApply.defaults =
 {
-  addingPrefixPathToFilePath : 1,
+  filePathDeducingFromFixes : 1,
   booleanFallingBack : 0,
   applyingToTrue : null,
 }
@@ -2792,9 +2816,9 @@ function filePathAbsolutize( prefixPath )
   if( prefixPath )
   {
     if( filter.prefixPath )
-    filter.prefixesApply({ applyingToTrue : 0, addingPrefixPathToFilePath : 0 });
+    filter.prefixesApply({ applyingToTrue : 0, filePathDeducingFromFixes : 0 });
     filter.prefixPath = prefixPath;
-    filter.prefixesApply({ applyingToTrue : 0, addingPrefixPathToFilePath : 0 });
+    filter.prefixesApply({ applyingToTrue : 0, filePathDeducingFromFixes : 0 });
     return;
   }
 

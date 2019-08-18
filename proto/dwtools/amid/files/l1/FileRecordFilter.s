@@ -742,7 +742,7 @@ function and( src )
 //
 // //
 //
-// function pathsInherit( src )
+// function pathsSupplementJoining( src )
 // {
 //   let filter = this;
 //   let paired = false;
@@ -953,7 +953,7 @@ function and( src )
 
 //
 
-function _pathsExtend( o )
+function _pathsAmmend( o )
 {
   let filter = this;
 
@@ -964,7 +964,7 @@ function _pathsExtend( o )
     return filter;
   }
 
-  _.assertRoutineOptions( _pathsExtend, arguments );
+  _.assertRoutineOptions( _pathsAmmend, arguments );
   _.assert( _.instanceIs( filter ) );
   _.assert( !filter.formed || filter.formed <= 1 );
   _.assert( !o.src.formed || o.src.formed <= 1 );
@@ -1039,7 +1039,7 @@ function _pathsExtend( o )
 
   /* base path */
 
-  // debugger;
+  debugger;
 
   let basePathReady = false;
   if( o.src.basePath && filter.basePath )
@@ -1320,7 +1320,7 @@ function _pathsExtend( o )
 
 }
 
-_pathsExtend.defaults =
+_pathsAmmend.defaults =
 {
   src : null,
   joining : 0,
@@ -1332,7 +1332,7 @@ _pathsExtend.defaults =
 function pathsExtend( src )
 {
   let filter = this;
-  return filter._pathsExtend
+  return filter._pathsAmmend
   ({
     src : src,
     joining : 0,
@@ -1345,7 +1345,7 @@ function pathsExtend( src )
 function pathsExtendJoining( src )
 {
   let filter = this;
-  return filter._pathsExtend
+  return filter._pathsAmmend
   ({
     src : src,
     joining : 1,
@@ -1358,7 +1358,7 @@ function pathsExtendJoining( src )
 function pathsSupplement( src )
 {
   let filter = this;
-  return filter._pathsExtend
+  return filter._pathsAmmend
   ({
     src : src,
     joining : 0,
@@ -1371,7 +1371,7 @@ function pathsSupplement( src )
 function pathsSupplementJoining( src )
 {
   let filter = this;
-  return filter._pathsExtend
+  return filter._pathsAmmend
   ({
     src : src,
     joining : 1,
@@ -1423,7 +1423,7 @@ function prefixesApply( o )
 
   /* */
 
-  let basePath2 = Object.create( null ); debugger;
+  let basePath2 = Object.create( null );
 
   if( filter.filePath )
   filter.filePath = path.filterInplace( filter.filePath, filePathEach );
@@ -1463,7 +1463,6 @@ function prefixesApply( o )
 
       if( _.mapIs( filter.basePath ) )
       {
-        debugger;
         _.mapDelete( filter.basePath ); // xxx : cover
         _.mapExtend( filter.basePath, basePath2 );
       }
@@ -1547,7 +1546,7 @@ function prefixesApply( o )
       {
         let currentValue = it.value;
 
-        debugger;
+        // debugger;
         if( _.boolLike( it.value ) && it.side === 'dst' )
         if( !it.value || !o.applyingToTrue )
         {
@@ -4816,13 +4815,14 @@ let Extend =
 
   And,
   and,
+
   // _pathsJoin, /* xxx : deprecate maybe? */
   // pathsJoin, /* xxx : deprecate maybe? */
   // pathsJoinWithoutNull, /* xxx : deprecate maybe? */
-  // pathsInherit, /* xxx : deprecate maybe? */
-  pathsInherit : pathsSupplementJoining,
+  // pathsSupplementJoining, /* xxx : deprecate maybe? */
+  // pathsSupplementJoining : pathsSupplementJoining,
 
-  _pathsExtend,
+  _pathsAmmend,
   pathsExtend,
   pathsExtendJoining,
   pathsSupplement,

@@ -2150,7 +2150,7 @@ function basePathFromDecoratedFilePath( filePath )
     {
       if( !_.strIs( it.dst ) )
       return;
-      if( !_.strHas( it.dst, '*()' ) && !_.strHas( it.dst, '\0' ) )
+      if( !_.strHas( it.dst, '()' ) && !_.strHas( it.dst, '\0' ) )
       return;
       basePath[ path.globNormalize( path.undot( it.dst ) ) ] = path.fromGlob( it.dst );
     }
@@ -2158,7 +2158,7 @@ function basePathFromDecoratedFilePath( filePath )
     {
       if( !_.strIs( it.src ) )
       return;
-      if( !_.strHas( it.src, '*()' ) && !_.strHas( it.src, '\0' ) )
+      if( !_.strHas( it.src, '()' ) && !_.strHas( it.src, '\0' ) )
       return;
       basePath[ path.globNormalize( path.undot( it.src ) ) ] = path.fromGlob( it.src );
     }
@@ -2582,55 +2582,20 @@ function filePathNormalize( filePath )
   {
     if( filter.src )
     {
-      it.dst = path.normalize( it.dst );
-      it.dst = filter.pathLocalize( it.dst );
+      if( !_.boolLike( it.dst ) )
+      {
+        it.dst = path.normalize( it.dst );
+        it.dst = filter.pathLocalize( it.dst );
+      }
     }
     else
     {
       it.src = path.normalize( it.src );
       it.src = filter.pathLocalize( it.src );
-      it.src = path.globNormalize( it.src );
+      // it.src = path.globNormalize( it.src );
     }
     return { [ it.src ] : it.dst }
   });
-
-  // if( filter.src )
-  // {
-  //
-  //   for( let srcPath in filePath )
-  //   {
-  //     let dstPath = filePath[ srcPath ];
-  //
-  //     if( !_.strIs( dstPath ) )
-  //     continue;
-  //
-  //     let dstPath2 = path.normalize( dstPath );
-  //     dstPath2 = filter.pathLocalize( dstPath2 );
-  //
-  //     if( dstPath === dstPath2 )
-  //     continue;
-  //     _.assert( _.strIs( dstPath2 ) );
-  //     filePath[ srcPath ] = dstPath2;
-  //   }
-  //
-  // }
-  // else
-  // {
-  //
-  //   for( let srcPath in filePath )
-  //   {
-  //     let srcPath2 = path.normalize( srcPath );
-  //     srcPath2 = filter.pathLocalize( srcPath2 );
-  //     srcPath2 = path.globNormalize( srcPath2 );
-  //
-  //     if( srcPath === srcPath2 )
-  //     continue;
-  //     _.assert( _.strIs( srcPath2 ) );
-  //     filePath[ srcPath2 ] = filePath[ srcPath ];
-  //     delete filePath[ srcPath ];
-  //   }
-  //
-  // }
 
   _.assert( _.mapIs( filePath ) );
 
@@ -2857,6 +2822,33 @@ function filePathGlobSimplify( filePath, basePath )
   _.assert( arguments.length === 0 || arguments.length === 2 );
   _.assert( _.mapIs( filePath ) );
   _.assert( !filter.src, 'Not applicable to destination filter, only to source filter' );
+
+  /**/
+
+  debugger;
+  filePath = path.filterPairsInplace( filePath, ( it ) =>
+  {
+    if( filter.src )
+    {
+    }
+    else
+    {
+      let normalized = path.globNormalize( it.src );
+      if( it.src !== normalized )
+      debugger;
+      if( it.src !== normalized )
+      if( _.mapIs( basePath ) && basePath[ it.src ] )
+      {
+        let base = basePath[ it.src ];
+        delete basePath[ it.src ];
+        basePath[ normalized ] = base;
+      }
+      it.src = normalized;
+    }
+    return { [ it.src ] : it.dst }
+  });
+
+  /**/
 
   let dst = filter.filePathDstArrayGet();
 
@@ -3790,14 +3782,12 @@ function pathsRefine()
 
   if( _.mapKeys( basePath ).length )
   {
-    debugger;
     _.assert( filter.basePath === null || _.mapIs( filter.basePath ) );
     basePath = path.filterPairs( basePath, ( it ) =>
     {
       let b = path.join( filter.basePathForStemPath( it.src ) || '', it.dst );
       return { [ it.src ] : b }
     });
-    debugger;
     filter.basePath = _.mapExtend( filter.basePath, basePath );
   }
 
@@ -4422,21 +4412,22 @@ function masksGenerate()
     return;
   }
 
-  let globFound = filter.filePathIsComplex();
+  debugger;
+  let filePath = filter.filePath;
+  let basePath = filter.basePath;
+  let globFound = filter.filePathIsComplex( filePath );
   if( !globFound )
   {
-    copy( filter.filePath, filter.basePath );
+    copy( filePath, basePath );
     return;
   }
 
   _.assert( !filter.src );
-  let filePath = _.mapExtend( null, filter.filePath );
-  let basePath = _.mapExtend( null, filter.basePath );
-  filter.filePathGlobSimplify( filePath, basePath );
-  if( !_.entityIdentical( filePath, filter.filePath ) )
-  {
-    globFound = filter.filePathIsComplex( filePath );
-  }
+  let filePath2 = _.mapExtend( null, filePath );
+  let basePath2 = _.mapExtend( null, basePath );
+  filter.filePathGlobSimplify( filePath2, basePath2 );
+  if( !_.entityIdentical( filePath2, filePath ) )
+  globFound = filter.filePathIsComplex( filePath2 );
 
   if( globFound )
   {
@@ -4444,7 +4435,7 @@ function masksGenerate()
     _.assert( filter.formedFilterMap === null );
     filter.formedFilterMap = Object.create( null );
 
-    let _processed = path.pathMapToRegexps( filePath, basePath  );
+    let _processed = path.pathMapToRegexps( filePath2, basePath2  );
 
     filter.formedBasePath = _processed.unglobedBasePath;
     filter.formedFilePath = _processed.unglobedFilePath;
@@ -4484,7 +4475,7 @@ function masksGenerate()
   }
   else
   {
-    copy( filePath, basePath );
+    copy( filePath2, basePath2 );
   }
 
   function copy( filePath, basePath )

@@ -1039,8 +1039,6 @@ function _pathsAmmend( o )
 
   /* base path */
 
-  debugger;
-
   let basePathReady = false;
   if( o.src.basePath && filter.basePath )
   {
@@ -2152,7 +2150,7 @@ function basePathFromDecoratedFilePath( filePath )
       return;
       if( !_.strHas( it.dst, '()' ) && !_.strHas( it.dst, '\0' ) )
       return;
-      basePath[ path.globNormalize( path.undot( it.dst ) ) ] = path.fromGlob( it.dst );
+      basePath[ path.undot( path.canonize( it.dst ) ) ] = path.fromGlob( it.dst );
     }
     else
     {
@@ -2160,7 +2158,7 @@ function basePathFromDecoratedFilePath( filePath )
       return;
       if( !_.strHas( it.src, '()' ) && !_.strHas( it.src, '\0' ) )
       return;
-      basePath[ path.globNormalize( path.undot( it.src ) ) ] = path.fromGlob( it.src );
+      basePath[ path.undot( path.canonize( it.src ) ) ] = path.fromGlob( it.src );
     }
 
   });
@@ -2825,7 +2823,6 @@ function filePathGlobSimplify( filePath, basePath )
 
   /**/
 
-  debugger;
   filePath = path.filterPairsInplace( filePath, ( it ) =>
   {
     if( filter.src )
@@ -2834,8 +2831,6 @@ function filePathGlobSimplify( filePath, basePath )
     else
     {
       let normalized = path.globNormalize( it.src );
-      if( it.src !== normalized )
-      debugger;
       if( it.src !== normalized )
       if( _.mapIs( basePath ) && basePath[ it.src ] )
       {
@@ -3765,6 +3760,7 @@ function pathsRefine()
   if( prefix )
   prefix = filter.pathLocalize( prefix );
 
+  debugger;
   let basePath = filter.basePathFromDecoratedFilePath( filter.filePath );
 
   filter.filePath = filter.filePathNormalize( filter.filePath );
@@ -4412,7 +4408,6 @@ function masksGenerate()
     return;
   }
 
-  debugger;
   let filePath = filter.filePath;
   let basePath = filter.basePath;
   let globFound = filter.filePathIsComplex( filePath );
@@ -4519,7 +4514,8 @@ function _applyToRecordMasks( record )
   let relative = record.relative;
   let f = record.factory;
   let path = record.path;
-  filter = filter.formedFilterMap ? filter.formedFilterMap[ f.stemPath ] : filter;
+  let masks = filter;
+  masks = filter.formedFilterMap ? masks.formedFilterMap[ f.stemPath ] : filter;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( !!filter, 'Cant resolve filter map for stem path', () => _.strQuote( f.stemPath ) );
@@ -4529,9 +4525,9 @@ function _applyToRecordMasks( record )
   // debugger;
   // if( _.strEnds( record.absolute, 'src' ) )
   // debugger;
-  // if( _.strEnds( record.absolute, 'proto' ) )
+  // if( _.strEnds( record.absolute, 'src1Terminal' ) )
   // debugger;
-  // if( _.strEnds( record.absolute, 'proto2' ) )
+  // if( _.strHas( record.absolute, '-' ) )
   // debugger;
 
   /* */
@@ -4539,29 +4535,29 @@ function _applyToRecordMasks( record )
   if( record.isDir )
   {
 
-    if( record.isTransient && filter.maskTransientAll )
-    record[ isTransientSymbol ] = filter.maskTransientAll.test( relative );
-    if( record.isTransient && filter.maskTransientDirectory )
-    record[ isTransientSymbol ] = filter.maskTransientDirectory.test( relative );
+    if( record.isTransient && masks.maskTransientAll )
+    record[ isTransientSymbol ] = masks.maskTransientAll.test( relative );
+    if( record.isTransient && masks.maskTransientDirectory )
+    record[ isTransientSymbol ] = masks.maskTransientDirectory.test( relative );
 
-    if( record.isActual && filter.maskAll )
-    record[ isActualSymbol ] = filter.maskAll.test( relative );
-    if( record.isActual && filter.maskDirectory )
-    record[ isActualSymbol ] = filter.maskDirectory.test( relative );
+    if( record.isActual && masks.maskAll )
+    record[ isActualSymbol ] = masks.maskAll.test( relative );
+    if( record.isActual && masks.maskDirectory )
+    record[ isActualSymbol ] = masks.maskDirectory.test( relative );
 
   }
   else
   {
 
-    if( record.isActual && filter.maskAll )
-    record[ isActualSymbol ] = filter.maskAll.test( relative );
-    if( record.isActual && filter.maskTerminal )
-    record[ isActualSymbol ] = filter.maskTerminal.test( relative );
+    if( record.isActual && masks.maskAll )
+    record[ isActualSymbol ] = masks.maskAll.test( relative );
+    if( record.isActual && masks.maskTerminal )
+    record[ isActualSymbol ] = masks.maskTerminal.test( relative );
 
-    if( record.isTransient && filter.maskTransientAll )
-    record[ isTransientSymbol ] = filter.maskTransientAll.test( relative );
-    if( record.isTransient && filter.maskTransientTerminal )
-    record[ isTransientSymbol ] = filter.maskTransientTerminal.test( relative );
+    if( record.isTransient && masks.maskTransientAll )
+    record[ isTransientSymbol ] = masks.maskTransientAll.test( relative );
+    if( record.isTransient && masks.maskTransientTerminal )
+    record[ isTransientSymbol ] = masks.maskTransientTerminal.test( relative );
 
   }
 

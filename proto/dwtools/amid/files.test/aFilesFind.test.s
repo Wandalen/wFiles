@@ -58,32 +58,30 @@ function onRoutineEnd( test )
 function softLinkIsSupported()
 {
   let context = this;
-  let provider = context.provider;
-  let hub = context.hub;
   let path = context.provider.path;
 
   if( Config.platform === 'nodejs' && typeof process !== undefined )
   if( process.platform === 'win32' )
   {
-    var allowed = false;
+    var allow = false;
     var dir = path.join( context.testSuitePath, 'softLinkIsSupported' );
-    var srcPath = path.join( context.testSuitePath, 'softLinkIsSupported/src' );
-    var dstPath = path.join( context.testSuitePath, 'softLinkIsSupported/dst' );
+    var srcPath = path.join( dir, 'src' );
+    var dstPath = path.join( dir, 'dst' );
 
-    context.provider.filesDelete( dir );
-    context.provider.fileWrite( srcPath, srcPath );
+    _.fileProvider.filesDelete( dir );
+    _.fileProvider.fileWrite( srcPath, srcPath );
 
     try
     {
-      context.provider.softLink({ dstPath : dstPath, srcPath : srcPath, throwing : 1, sync : 1 });
-      allowed = context.provider.isSoftLink( dstPath );
+      _.fileProvider.softLink({ dstPath : dstPath, srcPath : srcPath, throwing : 1, sync : 1 });
+      allow = _.fileProvider.isSoftLink( dstPath );
     }
     catch( err )
     {
       logger.error( err );
     }
 
-    return allowed;
+    return allow;
   }
 
   return true;
@@ -286,142 +284,6 @@ function makeStandardExtract( o )
 
   return extract;
 }
-
-//
-
-function _generatePath( dir, levels )
-{
-  let context = this;
-  let path = context.provider.path;
-  var foldersPath = dir;
-  var fileName = _.idWithGuid();
-
-  for( var j = 0; j < levels; j++ )
-  {
-    var temp = _.idWithGuid().substring( 0, Math.random() * levels );
-    foldersPath = path.join( foldersPath , temp );
-  }
-
-  return path.join( foldersPath, fileName );
-}
-
-//
-
-function softLinkIsSupported()
-{
-  let context = this;
-  let path = context.provider.path;
-
-  if( Config.platform === 'nodejs' && typeof process !== undefined )
-  if( process.platform === 'win32' )
-  {
-    var allow = false;
-    var dir = path.join( context.testSuitePath, 'softLinkIsSupported' );
-    var srcPath = path.join( dir, 'src' );
-    var dstPath = path.join( dir, 'dst' );
-
-    _.fileProvider.filesDelete( dir );
-    _.fileProvider.fileWrite( srcPath, srcPath );
-
-    try
-    {
-      _.fileProvider.softLink({ dstPath : dstPath, srcPath : srcPath, throwing : 1, sync : 1 });
-      allow = _.fileProvider.isSoftLink( dstPath );
-    }
-    catch( err )
-    {
-      logger.error( err );
-    }
-
-    return allow;
-  }
-
-  return true;
-}
-
-//
-
-/*
-!!! implement and cover _.routineExtend( null, routine );
-*/
-
-// var select = _.routineFromPreAndBody( _.select.pre, _.select.body );
-// var defaults = select.defaults;
-// defaults.upToken = [ '/', '.' ];
-
-// --
-// filesTree
-// --
-
-// var filesTree =
-// {
-//
-//   initialCommon :
-//   {
-//     'src' :
-//     {
-//       'a.a' : 'a',
-//       'b1.b' : 'b1',
-//       'b2.b' : 'b2x',
-//       'c' :
-//       {
-//         'b3.b' : 'b3x',
-//         'e' : { 'd2.d' : 'd2x', 'e1.e' : 'd1' },
-//         'srcfile' : 'srcfile',
-//         'srcdir' : {},
-//         'srcdir-dstfile' : { 'srcdir-dstfile-file' : 'srcdir-dstfile-file' },
-//         'srcfile-dstdir' : 'x',
-//       },
-//     },
-//     'dst' :
-//     {
-//       'a.a' : 'a',
-//       'b1.b' : 'b1',
-//       'b2.b' : 'b2',
-//       'c' :
-//       {
-//         'b3.b' : 'b3',
-//         'e' : { 'd2.d' : 'd2', 'e1.e' : 'd1' },
-//         'dstfile.d' : 'd1',
-//         'dstdir' : {},
-//         'srcdir-dstfile' : 'x',
-//         'srcfile-dstdir' : { 'srcfile-dstdir-file' : 'srcfile-dstdir-file' },
-//       },
-//     },
-//   },
-//
-//   //
-//
-//   exclude :
-//   {
-//     'src' :
-//     {
-//       'a' : 'a',
-//       'b' : { 'b1' : 'b1', 'b2' : { 'b22' : 'b22', 'x' : 'x' } },
-//     },
-//     'dst' :
-//     {
-//       'b' : { 'b1' : 'b1', 'b2' : { 'b22' : 'b22', 'x' : 'x' } },
-//       'c' : { 'c1' : 'c1', 'c2' : { 'c22' : 'c22' }, },
-//     },
-//   },
-//
-//   //
-//
-//   softLink :
-//   {
-//     'src' :
-//     {
-//       'a' : 'a',
-//       'b' : { '.b1' : 'b1', 'b2' : { 'b22' : 'b22' } },
-//       'c' : [{ softLink : './b' }]
-//     },
-//     'dst' :
-//     {
-//     },
-//   },
-//
-// }
 
 // --
 // test
@@ -3866,91 +3728,6 @@ function filesFindResolvingExperiment( test )
 
 }
 
-// //
-//
-// function filesFindPerformance( test )
-// {
-//   let context = this;
-//   let provider = context.provider;
-//   let hub = context.hub;
-//   let path = context.provider.path;
-//   let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
-//
-//   test.description = 'filesFind time test';
-//
-//   /*prepare files */
-//
-//   var dir = path.join( context.testSuitePath, test.name );
-//   var filesNumber = 2000;
-//   var levels = 5;
-//
-//   if( !_.fileProvider.statResolvedRead( dir ) )
-//   {
-//     logger.log( 'Creating ', filesNumber, ' random files tree. ' );
-//     var t1 = _.timeNow();
-//     for( var i = 0; i < filesNumber; i++ )
-//     {
-//       terminalPath = context._generatePath( dir, Math.random() * levels );
-//       provider.fileWrite({ filePath : terminalPath, data : 'abc', writeMode : 'rewrite' } );
-//     }
-//
-//     logger.log( _.timeSpent( 'Spent to make ' + filesNumber +' files tree', t1 ) );
-//   }
-//
-//   var times = 10;
-//
-//   /* default filesFind */
-//
-//   var t2 = _.timeNow();
-//   for( var i = 0; i < times; i++)
-//   {
-//     var files = provider.filesFind
-//     ({
-//       filePath : dir,
-//       recursive : 2
-//     });
-//   }
-//
-//   logger.log( _.timeSpent( 'Spent to make  provider.filesFind x' + times + ' times in dir with ' + filesNumber +' files tree', t2 ) );
-//
-//   test.identical( files.length, filesNumber );
-//
-//   /*stats filter filesFind*/
-//
-//   // var filter = _.fileProvider.Caching({ original : filter, cachingDirs : 0 });
-//   // var times = 10;
-//   // var t2 = _.timeNow();
-//   // for( var i = 0; i < times; i++)
-//   // {
-//   //   filter.filesFind
-//   //   ({
-//   //     filePath : dir,
-//   //     recursive : 2
-//   //   });
-//   // }
-//   // logger.log( _.timeSpent( 'Spent to make CachingStats.filesFind x' + times + ' times in dir with ' + filesNumber +' files tree', t2 ) );
-//
-//   /*stats, dirRead filters filesFind*/
-//
-//   // var filter = _.FileFilter.Caching();
-//   // var t2 = _.timeNow();
-//   // for( var i = 0; i < times; i++)
-//   // {
-//   //   var files = filter.filesFind
-//   //   ({
-//   //     filePath : dir,
-//   //     recursive : 2
-//   //   });
-//   // }
-//
-//   // logger.log( _.timeSpent( 'Spent to make filesFind with three filters x' + times + ' times in dir with ' + filesNumber +' files tree', t2 ) );
-//
-//   // test.identical( files.length, filesNumber );
-// }
-//
-// filesFindPerformance.timeOut = 150000;
-// filesFindPerformance.rapidity = -2;
-
 //
 
 function filesFindGlob( test )
@@ -4228,7 +4005,9 @@ function filesFindGlob( test )
   var gotRelative = _.select( records, '*/relative' );
   test.identical( gotRelative, expectedRelative );
 
-  test.case = 'globTerminals src**?'; /* */
+  /* */
+
+  test.case = 'globTerminals src**?';
   var expectedRelative = [ './src1Terminal', './srcT', './src/f', './src1/a', './src1/b', './src1/c', './src1/d/a', './src1/d/b', './src1/d/c', './src1b/a', './src2/a', './src2/b', './src2/c', './src2/d/a', './src2/d/b', './src2/d/c', './src3.js/a', './src3.js/b.s', './src3.js/c.js', './src3.js/d/a', './src3.s/a', './src3.s/b.s', './src3.s/c.js', './src3.s/d/a' ];
   var records = globTerminals( abs( 'src**?' ) );
   var gotRelative = _.select( records, '*/relative' );
@@ -4240,7 +4019,51 @@ function filesFindGlob( test )
   var gotRelative = _.select( records, '*/relative' );
   test.identical( gotRelative, expectedRelative );
 
-  test.case = 'globTerminals src?**'; /* */
+  /* */
+
+  test.case = 'globTerminals src**????';
+  var expectedRelative = [ './src1Terminal', './src3.js/c.js', './src3.s/c.js' ];
+  var records = globTerminals( abs( 'src**????' ) );
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  test.case = 'globAll src**????';
+  var expectedRelative = [ '.', './src1Terminal', './src', './src1', './src1/d', './src1b', './src2', './src2/d', './src3.js', './src3.js/c.js', './src3.js/d', './src3.s', './src3.s/c.js', './src3.s/d' ];
+  var records = globAll( abs( 'src**????' ) );
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* */
+
+  test.case = 'globTerminals src**?????????';
+  var expectedRelative = [ './src1Terminal' ];
+  var records = globTerminals( abs( 'src**?????????' ) );
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  test.case = 'globAll src**?????????';
+  var expectedRelative = [ '.', './src1Terminal', './src', './src1', './src1/d', './src1b', './src2', './src2/d', './src3.js', './src3.js/d', './src3.s', './src3.s/d' ];
+  var records = globAll( abs( 'src**?????????' ) );
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* */
+
+  test.case = 'globTerminals src**??????????';
+  var expectedRelative = [];
+  var records = globTerminals( abs( 'src**??????????' ) );
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  test.case = 'globAll src**??????????';
+  var expectedRelative = [ '.', './src', './src1', './src1/d', './src1b', './src2', './src2/d', './src3.js', './src3.js/d', './src3.s', './src3.s/d' ];
+  var records = globAll( abs( 'src**??????????' ) );
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* */
+
+  test.case = 'globTerminals src?**';
   var expectedRelative = [ './src1Terminal', './srcT', './src1/a', './src1/b', './src1/c', './src1/d/a', './src1/d/b', './src1/d/c', './src1b/a', './src2/a', './src2/b', './src2/c', './src2/d/a', './src2/d/b', './src2/d/c', './src3.js/a', './src3.js/b.s', './src3.js/c.js', './src3.js/d/a', './src3.s/a', './src3.s/b.s', './src3.s/c.js', './src3.s/d/a' ];
   var records = globTerminals( abs( 'src?**' ) );
   var gotRelative = _.select( records, '*/relative' );
@@ -4803,8 +4626,6 @@ function filesFindGlob( test )
   test.identical( gotRelative, expectedRelative );
   test.identical( gotRelative, expectedRelative );
 
-  // debugger; return; xxx
-
   test.case = 'globAll filePath : **, prefixPath : /doubledir/d1/**, basePath:/doubledir/d1/d11';
   var expectedRelative = [ './doubledir/d1', './doubledir/d1/a', './doubledir/d1/d11', './doubledir/d1/d11/b', './doubledir/d1/d11/c' ];
   var expectedRelative = [ '..', '../a', '.', './b', './c' ];
@@ -5148,6 +4969,8 @@ function filesFindGlob( test )
   /* */
 
   test.case = 'globTerminals { /doubledir/d1/** : null, /doubledir/d2/** : null, ../../**b** : 0 } with prefixPath:null, basePath:/doubledir/d1/d11';
+  // var expectedAbsolute = abs([ 'doubledir/d1/a', 'doubledir/d1/d11/c', 'doubledir/d2/d22/c', 'doubledir/d2/d22/d' ]);
+  // var expectedRelative = [ '../a', './c', '../../d2/d22/c', '../../d2/d22/d' ];
   var expectedAbsolute = abs([]);
   var expectedRelative = [];
   var records = globTerminals({ filePath : { [ abs( './doubledir/d1/**' ) ] : null, [ abs( './doubledir/d2/**' ) ] : null, '../../**b**' : 0 }, filter : { prefixPath : null, basePath : abs( './doubledir/d1/d11' ) } });
@@ -5157,8 +4980,10 @@ function filesFindGlob( test )
   test.identical( gotRelative, expectedRelative );
 
   test.case = 'globAll { /doubledir/d1/** : null, /doubledir/d2/** : null, ../../**b** : 0 } with prefixPath:null, basePath:/doubledir/d1/d11';
-  var expectedAbsolute = abs([ './doubledir/d1', './doubledir/d1/d11', './doubledir/d2', './doubledir/d2/d22' ]);
-  var expectedRelative = [ '..', '.', '../../d2', '../../d2/d22' ];
+  // var expectedAbsolute = abs([ 'doubledir/d1', 'doubledir/d1/a', 'doubledir/d1/d11', 'doubledir/d1/d11/c', 'doubledir/d2', 'doubledir/d2/d22', 'doubledir/d2/d22/c', 'doubledir/d2/d22/d' ]);
+  // var expectedRelative = [ '..', '../a', '.', './c', '../../d2', '../../d2/d22', '../../d2/d22/c', '../../d2/d22/d' ];
+  var expectedAbsolute = abs([]);
+  var expectedRelative = [];
   var records = globAll({ filePath : { [ abs( './doubledir/d1/**' ) ] : null, [ abs( './doubledir/d2/**' ) ] : null, '../../**b**' : 0 }, filter : { prefixPath : null, basePath : abs( './doubledir/d1/d11' ) } });
   var gotAbsolute = _.select( records, '*/absolute' );
   var gotRelative = _.select( records, '*/relative' );
@@ -5187,19 +5012,21 @@ function filesFindGlob( test )
 
   /* */
 
-  test.case = 'globTerminals { /doubledir/d1/** : 1, /doubledir/d2/** : 1, ../../**b** : 0 } with prefixPath:null, basePath:/doubledir/d1/d11';
-  var expectedAbsolute = abs([]);
-  var expectedRelative = [];
-  var records = globTerminals({ filePath : { [ abs( './doubledir/d1/**' ) ] : 1, [ abs( './doubledir/d2/**' ) ] : 1, '../../**b**' : 0 }, filter : { prefixPath : null, basePath : abs( './doubledir/d1/d11' ) } });
+  test.case = 'globTerminals { /doubledir/d1/** : 1, /doubledir/d2/** : 1, ../../**c** : 0 } with prefixPath:null, basePath:/doubledir/d1/d11';
+  var expectedAbsolute = abs([ 'doubledir/d1/a', 'doubledir/d1/d11/b', 'doubledir/d2/b', 'doubledir/d2/d22/d' ]);
+  var expectedRelative = [ '../a', './b', '../../d2/b', '../../d2/d22/d' ];
+  var records = globTerminals({ filePath : { [ abs( './doubledir/d1/**' ) ] : 1, [ abs( './doubledir/d2/**' ) ] : 1, '../../**c**' : 0 }, filter : { prefixPath : null, basePath : abs( './doubledir/d1/d11' ) } });
   var gotAbsolute = _.select( records, '*/absolute' );
   var gotRelative = _.select( records, '*/relative' );
   test.identical( gotAbsolute, expectedAbsolute );
   test.identical( gotRelative, expectedRelative );
 
-  test.case = 'globAll { /doubledir/d1/** : 1, /doubledir/d2/** : 1, ../../**b** : 0 } with prefixPath:null, basePath:/doubledir/d1/d11';
-  var expectedAbsolute = abs([ 'doubledir/d1', 'doubledir/d1/d11', 'doubledir/d2', 'doubledir/d2/d22' ]);
-  var expectedRelative = [ '..', '.', '../../d2', '../../d2/d22' ];
-  var records = globAll({ filePath : { [ abs( './doubledir/d1/**' ) ] : 1, [ abs( './doubledir/d2/**' ) ] : 1, '../../**b**' : 0 }, filter : { prefixPath : null, basePath : abs( './doubledir/d1/d11' ) } });
+  test.case = 'globAll { /doubledir/d1/** : 1, /doubledir/d2/** : 1, ../../**c** : 0 } with prefixPath:null, basePath:/doubledir/d1/d11';
+  // var expectedAbsolute = abs([ 'doubledir/d1', 'doubledir/d1/d11', 'doubledir/d2', 'doubledir/d2/d22' ]);
+  // var expectedRelative = [ '..', '.', '../../d2', '../../d2/d22' ];
+  var expectedAbsolute = abs([ 'doubledir/d1', 'doubledir/d1/a', 'doubledir/d1/d11', 'doubledir/d1/d11/b', 'doubledir/d2', 'doubledir/d2/b', 'doubledir/d2/d22', 'doubledir/d2/d22/d' ]);
+  var expectedRelative = [ '..', '../a', '.', './b', '../../d2', '../../d2/b', '../../d2/d22', '../../d2/d22/d' ];
+  var records = globAll({ filePath : { [ abs( './doubledir/d1/**' ) ] : 1, [ abs( './doubledir/d2/**' ) ] : 1, '../../**c**' : 0 }, filter : { prefixPath : null, basePath : abs( './doubledir/d1/d11' ) } });
   var gotAbsolute = _.select( records, '*/absolute' );
   var gotRelative = _.select( records, '*/relative' );
   test.identical( gotAbsolute, expectedAbsolute );
@@ -5269,9 +5096,9 @@ function filesFindGlob( test )
 
   test.case = 'globTerminals { /doubledir/d1/** : empty, /doubledir/d2/** : empty, **b** : 0 } with basePath:/doubledir/d1/d11';
   // var expectedAbsolute = abs([ './doubledir/d1/a', './doubledir/d1/d11/c', './doubledir/d2/d22/c', './doubledir/d2/d22/d' ]);
-  var expectedAbsolute = abs([]);
-  var expectedRelative = [];
-  var records = globTerminalsWithPrefix({ filePath : { [ abs( './doubledir/d1/**' ) ] : '', [ abs( './doubledir/d2/**' ) ] : '', '**b**' : 0 }, filter : { basePath : './doubledir/d1/d11' } });
+  var expectedAbsolute = abs([ 'doubledir/d1/a', 'doubledir/d1/d11/b', 'doubledir/d2/b', 'doubledir/d2/d22/d' ]);
+  var expectedRelative = [ '../a', './b', '../../d2/b', '../../d2/d22/d' ];
+  var records = globTerminalsWithPrefix({ filePath : { [ abs( './doubledir/d1/**' ) ] : '', [ abs( './doubledir/d2/**' ) ] : '', '**c**' : 0 }, filter : { basePath : './doubledir/d1/d11' } });
   var gotAbsolute = _.select( records, '*/absolute' );
   var gotRelative = _.select( records, '*/relative' );
   test.identical( gotAbsolute, expectedAbsolute );
@@ -5280,33 +5107,33 @@ function filesFindGlob( test )
   test.case = 'globAll { /doubledir/d1/** : empty, /doubledir/d2/** : empty, **b** : 0 } with prefixPath : [ ../../d1, ../../d2 ], basePath:/doubledir/d1/d11';
   // var expectedAbsolute = abs([ './doubledir/d1', './doubledir/d1/a', './doubledir/d1/d11', './doubledir/d1/d11/c', './doubledir/d2', './doubledir/d2/d22', './doubledir/d2/d22/c', './doubledir/d2/d22/d' ]);
   // var expectedRelative = [ '..', '../a', '.', './c', '../../d2', '../../d2/d22', '../../d2/d22/c', '../../d2/d22/d' ];
-  var expectedAbsolute = abs([ './doubledir/d1', './doubledir/d1/d11', './doubledir/d2', './doubledir/d2/d22' ]);
-  var expectedRelative = [ '..', '.', '../../d2', '../../d2/d22' ];
-  var records = globAllWithPrefix({ filePath : { [ abs( './doubledir/d1/**' ) ] : '', [ abs( './doubledir/d2/**' ) ] : '', '**b**' : 0 }, filter : { basePath : './doubledir/d1/d11' } });
+  var expectedAbsolute = abs([ 'doubledir/d1', 'doubledir/d1/a', 'doubledir/d1/d11', 'doubledir/d1/d11/b', 'doubledir/d2', 'doubledir/d2/b', 'doubledir/d2/d22', 'doubledir/d2/d22/d' ]);
+  var expectedRelative = [ '..', '../a', '.', './b', '../../d2', '../../d2/b', '../../d2/d22', '../../d2/d22/d' ];
+  var records = globAllWithPrefix({ filePath : { [ abs( './doubledir/d1/**' ) ] : '', [ abs( './doubledir/d2/**' ) ] : '', '**c**' : 0 }, filter : { basePath : './doubledir/d1/d11' } });
   var gotAbsolute = _.select( records, '*/absolute' );
   var gotRelative = _.select( records, '*/relative' );
   test.identical( gotAbsolute, expectedAbsolute );
   test.identical( gotRelative, expectedRelative );
 
-  // /* xxx : does not work */
-  //
-  // test.case = 'globTerminals filePath : { . : empty, **b** : 0 }, prefixPath : [ /doubledir/d1/**, /doubledir/d2/** ], basePath : /doubledir/d1/d11';
-  // var expectedAbsolute = abs([ './doubledir/d1/a', './doubledir/d1/d11/c', './doubledir/d2/d22/c', './doubledir/d2/d22/d' ]);
-  // var expectedRelative = [ '../a', './c', '../../d2/d22/c', '../../d2/d22/d' ];
-  // var records = globTerminals({ filePath : { [ abs( './doubledir/**b**' ) ] : '' }, filter : { basePath : abs( './doubledir/doubledir' ) } });
-  // var gotAbsolute = _.select( records, '*/absolute' );
-  // var gotRelative = _.select( records, '*/relative' );
-  // test.identical( gotAbsolute, expectedAbsolute );
-  // test.identical( gotRelative, expectedRelative );
-  //
-  // test.case = 'globAll filePath : { . : empty, **b** : 0 }, prefixPath : [ /doubledir/d1/**, /doubledir/d2/** ], basePath : /doubledir/d1/d11';
-  // var expectedAbsolute = abs([ './doubledir/d1', './doubledir/d1/a', './doubledir/d1/d11', './doubledir/d1/d11/c', './doubledir/d2', './doubledir/d2/d22', './doubledir/d2/d22/c', './doubledir/d2/d22/d' ]);
-  // var expectedRelative = [ '..', '../a', '.', './c', '../../d2', '../../d2/d22', '../../d2/d22/c', '../../d2/d22/d' ];
-  // var records = globAll({ filePath : { '.' : '', '**b**' : 0 }, filter : { prefixPath : abs([ './doubledir/d1/**', './doubledir/d2/**' ]), basePath : './doubledir/d1/d11' } } );
-  // var gotAbsolute = _.select( records, '*/absolute' );
-  // var gotRelative = _.select( records, '*/relative' );
-  // test.identical( gotAbsolute, expectedAbsolute );
-  // test.identical( gotRelative, expectedRelative );
+  /* */
+
+  test.case = 'globTerminals filePath : { . : empty, **b** : 0 }, prefixPath : [ /doubledir/d1/**, /doubledir/d2/** ], basePath : /doubledir/d1/d11';
+  var expectedAbsolute = abs([ 'doubledir/d1/d11/b', 'doubledir/d2/b' ]);
+  var expectedRelative = [ '../d1/d11/b', '../d2/b' ];
+  var records = globTerminals({ filePath : { [ abs( './doubledir/**b**' ) ] : '' }, filter : { basePath : abs( './doubledir/doubledir' ) } });
+  var gotAbsolute = _.select( records, '*/absolute' );
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotAbsolute, expectedAbsolute );
+  test.identical( gotRelative, expectedRelative );
+
+  test.case = 'globAll filePath : { . : empty, **b** : 0 }, prefixPath : [ /doubledir/d1/**, /doubledir/d2/** ], basePath : /doubledir/d1/d11';
+  var expectedAbsolute = abs([ 'doubledir', 'doubledir/d1', 'doubledir/d1/d11', 'doubledir/d1/d11/b', 'doubledir/d2', 'doubledir/d2/b', 'doubledir/d2/d22' ]);
+  var expectedRelative = [ '..', '../d1', '../d1/d11', '../d1/d11/b', '../d2', '../d2/b', '../d2/d22' ];
+  var records = globAll({ filePath : { [ abs( './doubledir/**b**' ) ] : '' }, filter : { basePath : abs( './doubledir/doubledir' ) } });
+  var gotAbsolute = _.select( records, '*/absolute' );
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotAbsolute, expectedAbsolute );
+  test.identical( gotRelative, expectedRelative );
 
   /* */
 
@@ -5328,25 +5155,25 @@ function filesFindGlob( test )
   test.identical( gotAbsolute, expectedAbsolute );
   test.identical( gotRelative, expectedRelative );
 
-  // /* xxx : does not work */
-  //
-  // test.case = 'globTerminals filePath : { . : empty, **b** : 0 }, prefixPath : [ /doubledir/d1/**, /doubledir/d2/** ], basePath : /doubledir/d1/d11';
-  // var expectedAbsolute = abs([ './doubledir/d1/a', './doubledir/d1/d11/c', './doubledir/d2/d22/c', './doubledir/d2/d22/d' ]);
-  // var expectedRelative = [ '../a', './c', '../../d2/d22/c', '../../d2/d22/d' ];
-  // var records = globTerminals({ filePath : { '.' : '', [ abs( './doubledir/**b**' ) ] : 0 }, filter : { prefixPath : abs([ './doubledir/d1/**', './doubledir/d2/**' ]), basePath : '.' } });
-  // var gotAbsolute = _.select( records, '*/absolute' );
-  // var gotRelative = _.select( records, '*/relative' );
-  // test.identical( gotAbsolute, expectedAbsolute );
-  // test.identical( gotRelative, expectedRelative );
-  //
-  // test.case = 'globAll filePath : { . : empty, **b** : 0 }, prefixPath : [ /doubledir/d1/**, /doubledir/d2/** ], basePath : /doubledir/d1/d11';
-  // var expectedAbsolute = abs([ './doubledir/d1', './doubledir/d1/a', './doubledir/d1/d11', './doubledir/d1/d11/c', './doubledir/d2', './doubledir/d2/d22', './doubledir/d2/d22/c', './doubledir/d2/d22/d' ]);
-  // var expectedRelative = [ '..', '../a', '.', './c', '../../d2', '../../d2/d22', '../../d2/d22/c', '../../d2/d22/d' ];
-  // var records = globAll({ filePath : { '.' : '', '**b**' : 0 }, filter : { prefixPath : abs([ './doubledir/d1/**', './doubledir/d2/**' ]), basePath : '.' } } );
-  // var gotAbsolute = _.select( records, '*/absolute' );
-  // var gotRelative = _.select( records, '*/relative' );
-  // test.identical( gotAbsolute, expectedAbsolute );
-  // test.identical( gotRelative, expectedRelative );
+  /* */
+
+  test.case = 'globTerminals filePath : { . : empty, **b** : 0 }, prefixPath : [ /doubledir/d1/**, /doubledir/d2/** ], basePath : /doubledir/d1/d11';
+  var expectedAbsolute = abs([ './doubledir/d1/a', './doubledir/d1/d11/c', './doubledir/d2/d22/c', './doubledir/d2/d22/d' ]);
+  var expectedRelative = [ './a', './d11/c', './d22/c', './d22/d' ];
+  var records = globTerminals({ filePath : { '.' : '', [ abs( './doubledir/**b**' ) ] : 0 }, filter : { prefixPath : abs([ './doubledir/d1/**', './doubledir/d2/**' ]), basePath : '.' } });
+  var gotAbsolute = _.select( records, '*/absolute' );
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotAbsolute, expectedAbsolute );
+  test.identical( gotRelative, expectedRelative );
+
+  test.case = 'globAll filePath : { . : empty, **b** : 0 }, prefixPath : [ /doubledir/d1/**, /doubledir/d2/** ], basePath : /doubledir/d1/d11';
+  var expectedAbsolute = abs([ './doubledir/d1', './doubledir/d1/a', './doubledir/d1/d11', './doubledir/d1/d11/c', './doubledir/d2', './doubledir/d2/d22', './doubledir/d2/d22/c', './doubledir/d2/d22/d' ]);
+  var expectedRelative = [ '.', './a', './d11', './d11/c', '.', './d22', './d22/c', './d22/d' ];
+  var records = globAll({ filePath : { '.' : '', [ abs( './doubledir/**b**' ) ] : 0 }, filter : { prefixPath : abs([ './doubledir/d1/**', './doubledir/d2/**' ]), basePath : '.' } } );
+  var gotAbsolute = _.select( records, '*/absolute' );
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotAbsolute, expectedAbsolute );
+  test.identical( gotRelative, expectedRelative );
 
   /* */
 
@@ -5698,7 +5525,7 @@ function filesFindBaseFromGlob( test )
   /* */
 
   test.case = 'globTerminals src1/a()';
-  var expectedRelative = [ './src1/a' ];
+  var expectedRelative = [ './a' ];
   var expectedAbsolute = abs([ './src1/a' ]);
   var records = globTerminals({ filePath : './src1/a()' });
   var gotRelative = _.select( records, '*/relative' );
@@ -5707,7 +5534,7 @@ function filesFindBaseFromGlob( test )
   test.identical( gotAbsolute, expectedAbsolute );
 
   test.case = 'globAll src1/a()';
-  var expectedRelative = [ './src1/a' ];
+  var expectedRelative = [ './a' ];
   var expectedAbsolute = abs([ './src1/a' ]);
   var records = globAll({ filePath : './src1/a()' });
   var gotRelative = _.select( records, '*/relative' );
@@ -5718,7 +5545,7 @@ function filesFindBaseFromGlob( test )
   /* */
 
   test.case = 'globTerminals src1/()a';
-  var expectedRelative = [ './src1/a' ];
+  var expectedRelative = [ './a' ];
   var expectedAbsolute = abs([ './src1/a' ]);
   var records = globTerminals({ filePath : './src1/()a' });
   var gotRelative = _.select( records, '*/relative' );
@@ -5727,7 +5554,7 @@ function filesFindBaseFromGlob( test )
   test.identical( gotAbsolute, expectedAbsolute );
 
   test.case = 'globAll src1/()a';
-  var expectedRelative = [ './src1/a' ];
+  var expectedRelative = [ './a' ];
   var expectedAbsolute = abs([ './src1/a' ]);
   var records = globAll({ filePath : './src1/()a' });
   var gotRelative = _.select( records, '*/relative' );
@@ -5802,7 +5629,7 @@ function filesFindBaseFromGlob( test )
 
   /* */
 
-  test.case = 'globTerminals src1/d';
+  test.case = 'globTerminals : src1/d, base : src1';
   var expectedRelative = [ './d/a', './d/b', './d/c' ];
   var expectedAbsolute = abs([ './src1/d/a', './src1/d/b', './src1/d/c' ]);
   var records = globTerminals({ filter : { filePath : abs( './src1/d' ), basePath : abs( './src1' ) } });
@@ -5811,7 +5638,7 @@ function filesFindBaseFromGlob( test )
   test.identical( gotRelative, expectedRelative );
   test.identical( gotAbsolute, expectedAbsolute );
 
-  test.case = 'globAll src1/d';
+  test.case = 'globAll : src1/d, base : src1';
   var expectedRelative = [ './d', './d/a', './d/b', './d/c' ];
   var expectedAbsolute = abs([ './src1/d', './src1/d/a', './src1/d/b', './src1/d/c' ]);
   var records = globAll({ filter : { filePath : abs( './src1/d' ), basePath : abs( './src1' ) } });
@@ -6242,8 +6069,51 @@ function filesGlob( test )
   var glob = '[ab]/**/[!xc]/*';
   var options = completeOptions( glob );
   var got = provider.filesGlob( options );
+  // var expected = [ './a/a.js', './a/a.s', './a/a.ss', './a/a.txt', './a/c/c.js', './a/c/c.s', './a/c/c.ss', './a/c/c.txt', './b/a/x/a/a.js', './b/a/x/a/a.s', './b/a/x/a/a.ss', './b/a/x/a/a.txt' ]
   var expected = [ './b/a/x/a/a.js', './b/a/x/a/a.s', './b/a/x/a/a.ss', './b/a/x/a/a.txt' ];
   test.identical( got, expected );
+
+/*
+  var filesTree =
+  {
+    'a' :
+    {
+      'a.js' : '',
+      'a.s' : '',
+      'a.ss' : '',
+      'a.txt' : '',
+      'c' :
+      {
+        'c.js' : '',
+        'c.s' : '',
+        'c.ss' : '',
+        'c.txt' : '',
+      }
+    },
+    'b' :
+    {
+      'a' :
+      {
+        'x' :
+        {
+          'a' :
+          {
+            'a.js' : '',
+            'a.s' : '',
+            'a.ss' : '',
+            'a.txt' : '',
+          }
+        }
+      }
+    },
+
+    'a.js' : '',
+    'a.s' : '',
+    'a.ss' : '',
+    'a.txt' : '',
+  }
+
+*/
 
   /**/
 
@@ -7294,7 +7164,373 @@ function filesFindMandatoryMap( test )
 
 //
 
-function filesFindRelative( test )
+function filesFindExcludingNodeModules( test )
+{
+  let context = this;
+  let provider = context.provider;
+  let hub = context.hub;
+  let path = context.provider.path;
+  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+
+  function abs()
+  {
+    let args = _.longSlice( arguments );
+    args.unshift( routinePath );
+    return path.s.join.apply( path.s, args );
+  }
+
+  /* - */
+
+  var extract1 = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      'package.json' : '/dir2/package.json',
+      'node_modules' : '/node_modules',
+      dir1 :
+      {
+        t1 : '/dir1/t1',
+        t2 : '/dir1/t2',
+        dir11 : { t3 : '/dir1/dir11/t3' },
+        node_modules :
+        {
+          t2 : '/dir1/node_modules/t2',
+          dir11 : { t3 : '/dir1/node_modules/dir11/t3' },
+        },
+      },
+      dir2 :
+      {
+        t21 : '/dir2/t21',
+        'package.json' : '/dir2/package.json',
+        node_modules :
+        {
+          t2 : '/dir2/node_modules/t2',
+          dir11 : { t3 : '/dir2/node_modules/dir11/t3' },
+        },
+      },
+    },
+  });
+
+  extract1.filesReflectTo( provider, routinePath );
+
+  /* */
+
+  test.case = 'bools, no glob';
+
+  var find = provider.filesFinder
+  ({
+    recursive : 2,
+    allowingMissed : 1,
+    maskPreset : 0,
+    outputFormat : 'relative',
+    filter :
+    {
+      filePath : { 'node_modules' : 0, 'package.json' : 0 },
+    }
+  });
+
+  var expected = [ './dir1/t1', './dir1/t2', './dir1/dir11/t3', './dir1/node_modules/t2', './dir1/node_modules/dir11/t3', './dir2/package.json', './dir2/t21', './dir2/node_modules/t2', './dir2/node_modules/dir11/t3' ];
+  var got = find( routinePath );
+  test.identical( got, expected );
+
+  /* */
+
+  test.case = 'bools, glob';
+
+  var find = provider.filesFinder
+  ({
+    recursive : 2,
+    allowingMissed : 1,
+    maskPreset : 0,
+    outputFormat : 'relative',
+    filter :
+    {
+      filePath : { '**/node_modules/**' : 0, '**/package.json' : 0 },
+    }
+  });
+
+  var expected = [ './dir1/t1', './dir1/t2', './dir1/dir11/t3', './dir2/t21' ];
+  var got = find( routinePath );
+  test.identical( got, expected );
+
+  /* */
+
+  test.case = 'bools, glob, include all';
+
+  var find = provider.filesFinder
+  ({
+    recursive : 2,
+    includingTerminals : 1,
+    includingDirs : 1,
+    includingTransient : 1,
+    allowingMissed : 1,
+    maskPreset : 0,
+    outputFormat : 'relative',
+    filter :
+    {
+      filePath : { '**/node_modules/**' : 0, '**/package.json' : 0 },
+    }
+  });
+
+  /*
+    zzz : extend optimization "certainly"
+  */
+
+  var expected = [ '.', './dir1', './dir1/t1', './dir1/t2', './dir1/dir11', './dir1/dir11/t3', './dir2', './dir2/t21' ];
+  var got = find( routinePath );
+  test.identical( got, expected );
+
+}
+
+//
+
+function filesFindGlobComplex( test )
+{
+  let context = this;
+  let provider = context.provider;
+  let hub = context.hub;
+  let path = context.provider.path;
+  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+
+  function abs()
+  {
+    let args = _.longSlice( arguments );
+    args.unshift( routinePath );
+    return path.s.join.apply( path.s, args );
+  }
+
+  var tree =
+  {
+    src :
+    {
+      proto :
+      {
+        '-ile' : 'src/proto/-ile',
+        'file' : 'src/proto/file',
+        'f.cc' : 'src/proto/f.cc',
+        'f.js' : 'src/proto/f.js',
+        'f.ss' : 'src/proto/f.ss',
+        'f.test.js' : 'src/proto/f.test.js',
+        'f.test.ss' : 'src/proto/f.test.ss',
+        dir1 :
+        {
+          dir2 :
+          {
+            '-ile' : 'dir1/dir2/src/proto/-ile',
+            'file' : 'dir1/dir2/src/proto/file',
+            'f.cc' : 'dir1/dir2/src/proto/f.cc',
+            'f.js' : 'dir1/dir2/src/proto/f.js',
+            'f.ss' : 'dir1/dir2/src/proto/f.ss',
+            'f.test.js' : 'dir1/dir2/src/proto/f.test.js',
+            'f.test.ss' : 'dir1/dir2/src/proto/f.test.ss',
+          }
+        }
+      },
+      proto2 :
+      {
+        '-ile' : 'src/proto2/-ile',
+        'file' : 'src/proto2/file',
+        'f.cc' : 'src/proto2/f.cc',
+        'f.js' : 'src/proto2/f.js',
+        'f.ss' : 'src/proto2/f.ss',
+        'f.test.js' : 'src/proto2/f.test.js',
+        'f.test.ss' : 'src/proto2/f.test.ss',
+        dir1 :
+        {
+          dir2 :
+          {
+            '-ile' : 'dir1/dir2/src/proto2/-ile',
+            'file' : 'dir1/dir2/src/proto2/file',
+            'f.cc' : 'dir1/dir2/src/proto2/f.cc',
+            'f.js' : 'dir1/dir2/src/proto2/f.js',
+            'f.ss' : 'dir1/dir2/src/proto2/f.ss',
+            'f.test.js' : 'dir1/dir2/src/proto2/f.test.js',
+            'f.test.ss' : 'dir1/dir2/src/proto2/f.test.ss',
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+  var extract = new _.FileProvider.Extract({ filesTree : tree });
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+
+  var find = provider.filesFinder
+  ({
+    includingTerminals : 1,
+    includingDirs : 1,
+    includingTransient : 1,
+    recursive : 2,
+    filter :
+    {
+      prefixPath : routinePath,
+    }
+  });
+
+  /* */
+
+  test.case = 'include js';
+
+  var expectedRelative = [ '.', './f.js', './f.ss', './f.test.js', './f.test.ss', './dir1', './dir1/dir2', './dir1/dir2/f.js', './dir1/dir2/f.ss', './dir1/dir2/f.test.js', './dir1/dir2/f.test.ss' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/**.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* */
+
+  test.case = 'exclude tests, include js';
+
+  var expectedRelative = [ '.', './f.js', './f.ss', './dir1', './dir1/dir2', './dir1/dir2/f.js', './dir1/dir2/f.ss' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/**.test*' : false,
+    './src/**.test/**' : false,
+    './src/**.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* */
+
+  test.case = 'control1 for negative is below';
+
+  var expectedRelative = [ '.', './f.cc', './f.js', './f.ss', './f.test.js', './f.test.ss', './file' ];
+  var basePath = null;
+  var filePath = abs
+  ({
+    './src/proto/dir1/dir2/**' : './out',
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* */
+
+  test.case = 'control2 for negative is below';
+
+  var expectedRelative = [ '.', './f.cc', './f.js', './f.ss', './f.test.js', './f.test.ss', './file' ];
+  var basePath = null;
+  var filePath = abs
+  ({
+    './src/proto/dir1/dir2/**' : './out',
+    './**protx**' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* */
+
+  test.case = 'negative is below';
+
+  var expectedRelative = [];
+  var basePath = null;
+  var filePath = abs
+  ({
+    './src/proto/dir1/dir2/**' : './out',
+    './**proto**' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* */
+
+  test.case = 'complex glob';
+
+  var expectedRelative = [ '.', './proto', './proto/dir1', './proto/dir1/dir2', './proto/dir1/dir2/f.cc', './proto/dir1/dir2/f.js', './proto/dir1/dir2/f.ss', './proto/dir1/dir2/f.test.js', './proto/dir1/dir2/f.test.ss', './proto/dir1/dir2/file', './proto2', './proto2/dir1', './proto2/dir1/dir2', './proto2/dir1/dir2/f.cc', './proto2/dir1/dir2/f.js', './proto2/dir1/dir2/f.ss', './proto2/dir1/dir2/f.test.js', './proto2/dir1/dir2/f.test.ss', './proto2/dir1/dir2/file' ];
+  var basePath = null;
+  var filePath = abs
+  ({
+    './src/**di**r2**' : './out',
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* */
+
+  test.case = './**src**dir2** control1';
+
+  var expectedRelative = [ '.', './f.cc', './f.js', './f.ss', './f.test.js', './f.test.ss', './file', './dir1', './dir1/dir2', './dir1/dir2/f.cc', './dir1/dir2/f.js', './dir1/dir2/f.ss', './dir1/dir2/f.test.js', './dir1/dir2/f.test.ss', './dir1/dir2/file' ];
+  var basePath = null;
+  var filePath = abs
+  ({
+    './src/proto/**' : './out',
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* */
+
+  test.case = './**src**dir2**, control2';
+
+  var expectedRelative = [ '.', './f.cc', './f.js', './f.ss', './f.test.js', './f.test.ss', './file', './dir1', './dir1/dir2', './dir1/dir2/f.cc', './dir1/dir2/f.js', './dir1/dir2/f.ss', './dir1/dir2/f.test.js', './dir1/dir2/f.test.ss', './dir1/dir2/file' ];
+  var basePath = null;
+  var filePath = abs
+  ({
+    './src/proto/**' : './out',
+    './**srcx**dir2**' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* */
+
+  test.case = './**src**dir2** : false';
+
+  var expectedRelative = [ '.', './f.cc', './f.js', './f.ss', './f.test.js', './f.test.ss', './file', './dir1' ];
+  var basePath = null;
+  var filePath = abs
+  ({
+    './src/proto/**' : './out',
+    './**src**dir2**' : false,
+  });
+  debugger;
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* */
+
+  test.case = './**src**dir2** : true';
+
+  var expectedRelative = [ '.', './dir1', './dir1/dir2', './dir1/dir2/f.cc', './dir1/dir2/f.js', './dir1/dir2/f.ss', './dir1/dir2/f.test.js', './dir1/dir2/f.test.ss', './dir1/dir2/file' ];
+  var basePath = null;
+  var filePath = abs
+  ({
+    './src/proto/**' : './out',
+    './**src**dir2**' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* - */
+
+  debugger; return; xxx
+}
+
+//
+
+function filesFindAnyPositive( test )
 {
   let context = this;
   let provider = context.provider;
@@ -7387,7 +7623,887 @@ function filesFindRelative( test )
 
   /* - */
 
-  test.open( 'single dasterisk, filePath=src/proto, basePath=src/proto' );
+  test.open( 'filePath=src/proto, basePath=src/proto' );
+
+  /* - */
+
+  test.case = 'filter=*/?.(js|s|ss)';
+
+  var expectedRelative = [];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/*/?.(js|s|ss)';
+
+  var expectedRelative = [ '.', './f.js', './f.ss' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/*/?.(js|s|ss)';
+
+  var expectedRelative = [ '.', './f.js', './f.ss', './dir1' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/dir1/*/?.(js|s|ss)';
+
+  var expectedRelative = [ '.', './dir1', './dir1/dir2', './dir1/dir2/f.js', './dir1/dir2/f.ss' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto/dir1/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/dir1/dir2/dir3/*/?.(js|s|ss)';
+
+  var expectedRelative = [ '.', './dir1', './dir1/dir2' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto/dir1/dir2/dir3/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/dir3/*/?.(js|s|ss)';
+
+  var expectedRelative = [ '.' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto/dir3/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/*/?.(js|s|ss)';
+
+  var expectedRelative = [ '.', './f.cc', './f.js', './f.ss', './f.test.js', './f.test.ss', './file', './dir1', './dir1/dir2', './dir1/dir2/f.cc', './dir1/dir2/f.js', './dir1/dir2/f.ss', './dir1/dir2/f.test.js', './dir1/dir2/f.test.ss', './dir1/dir2/file' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto2/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/dir1/*/?.(js|s|ss)';
+
+  var expectedRelative = [ '.', './f.cc', './f.js', './f.ss', './f.test.js', './f.test.ss', './file', './dir1', './dir1/dir2', './dir1/dir2/f.cc', './dir1/dir2/f.js', './dir1/dir2/f.ss', './dir1/dir2/f.test.js', './dir1/dir2/f.test.ss', './dir1/dir2/file' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto2/dir1/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/dir1/dir2/dir3/*/?.(js|s|ss)';
+
+  var expectedRelative = [ '.', './f.cc', './f.js', './f.ss', './f.test.js', './f.test.ss', './file', './dir1', './dir1/dir2', './dir1/dir2/f.cc', './dir1/dir2/f.js', './dir1/dir2/f.ss', './dir1/dir2/f.test.js', './dir1/dir2/f.test.ss', './dir1/dir2/file' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto2/dir1/dir2/dir3/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/dir3/*/?.(js|s|ss)';
+
+  var expectedRelative = [ '.', './f.cc', './f.js', './f.ss', './f.test.js', './f.test.ss', './file', './dir1', './dir1/dir2', './dir1/dir2/f.cc', './dir1/dir2/f.js', './dir1/dir2/f.ss', './dir1/dir2/f.test.js', './dir1/dir2/f.test.ss', './dir1/dir2/file' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto2/dir3/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* - */
+
+  test.close( 'filePath=src/proto, basePath=src/proto' );
+
+  test.open( 'filePath=src, basePath=src/proto' );
+
+  /* - */
+
+  test.case = 'filter=*/?.(js|s|ss)';
+
+  var expectedRelative = [ '..', '.', './f.js', './f.ss' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/*/?.(js|s|ss)';
+
+  var expectedRelative = [ '..', '.', './f.js', './f.ss', './dir1', '../proto2', '../proto2/f.js', '../proto2/f.ss' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/*/?.(js|s|ss)';
+
+  var expectedRelative = [ '..', '.', './f.js', './f.ss', './dir1' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/proto/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/dir1/*/?.(js|s|ss)';
+
+  var expectedRelative = [ '..', '.', './dir1', './dir1/dir2', './dir1/dir2/f.js', './dir1/dir2/f.ss' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/proto/dir1/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/dir1/dir2/dir3/*/?.(js|s|ss)';
+
+  var expectedRelative = [ '..', '.', './dir1', './dir1/dir2' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/proto/dir1/dir2/dir3/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/dir3/*/?.(js|s|ss)';
+
+  var expectedRelative = [ '..', '.' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/proto/dir3/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/*/?.(js|s|ss)';
+
+  var expectedRelative = [ '..', '../proto2', '../proto2/f.js', '../proto2/f.ss', '../proto2/dir1' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/proto2/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/dir1/*/?.(js|s|ss)';
+
+  var expectedRelative = [ '..', '../proto2', '../proto2/dir1', '../proto2/dir1/dir2', '../proto2/dir1/dir2/f.js', '../proto2/dir1/dir2/f.ss' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/proto2/dir1/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/dir1/dir2/dir3/*/?.(js|s|ss)';
+
+  var expectedRelative = [ '..', '../proto2', '../proto2/dir1', '../proto2/dir1/dir2' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/proto2/dir1/dir2/dir3/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/dir3/*/?.(js|s|ss)';
+
+  var expectedRelative = [ '..', '../proto2' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/proto2/dir3/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* - */
+
+  test.close( 'filePath=src, basePath=src/proto' );
+
+  test.open( 'filePath=src, basePath=.' );
+
+  /* - */
+
+  test.case = 'filter=*/?.(js|s|ss)';
+
+  var expectedRelative = [ './src' ];
+  var basePath = abs( '.' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/*/?.(js|s|ss)';
+
+  var expectedRelative = [ './src', './src/proto', './src/proto/f.js', './src/proto/f.ss', './src/proto2', './src/proto2/f.js', './src/proto2/f.ss' ];
+  var basePath = abs( '.' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/*/?.(js|s|ss)';
+
+  var expectedRelative = [ './src', './src/proto', './src/proto/f.js', './src/proto/f.ss', './src/proto/dir1' ];
+  var basePath = abs( '.' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/proto/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/dir1/*/?.(js|s|ss)';
+
+  var expectedRelative = [ './src', './src/proto', './src/proto/dir1', './src/proto/dir1/dir2', './src/proto/dir1/dir2/f.js', './src/proto/dir1/dir2/f.ss' ];
+  var basePath = abs( '.' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/proto/dir1/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/dir1/dir2/dir3/*/?.(js|s|ss)';
+
+  var expectedRelative = [ './src', './src/proto', './src/proto/dir1', './src/proto/dir1/dir2' ];
+  var basePath = abs( '.' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/proto/dir1/dir2/dir3/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/dir3/*/?.(js|s|ss)';
+
+  var expectedRelative = [ './src', './src/proto' ];
+  var basePath = abs( '.' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/proto/dir3/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/*/?.(js|s|ss)';
+
+  var expectedRelative = [ './src', './src/proto2', './src/proto2/f.js', './src/proto2/f.ss', './src/proto2/dir1' ];
+  var basePath = abs( '.' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/proto2/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/dir1/*/?.(js|s|ss)';
+
+  var expectedRelative = [ './src', './src/proto2', './src/proto2/dir1', './src/proto2/dir1/dir2', './src/proto2/dir1/dir2/f.js', './src/proto2/dir1/dir2/f.ss' ];
+  var basePath = abs( '.' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/proto2/dir1/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/dir1/dir2/dir3/*/?.(js|s|ss)';
+
+  var expectedRelative = [ './src', './src/proto2', './src/proto2/dir1', './src/proto2/dir1/dir2' ];
+  var basePath = abs( '.' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/proto2/dir1/dir2/dir3/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/dir3/*/?.(js|s|ss)';
+
+  var expectedRelative = [ './src', './src/proto2' ];
+  var basePath = abs( '.' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/proto2/dir3/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* - */
+
+  test.close( 'filePath=src, basePath=.' );
+
+  test.open( 'filePath=src/proto, basePath=src' );
+
+  /* - */
+
+  test.case = 'filter=*/?.(js|s|ss)';
+
+  var expectedRelative = [];
+  var basePath = abs( 'src' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/*/?.(js|s|ss)';
+
+  var expectedRelative = [ './proto', './proto/f.js', './proto/f.ss' ];
+  var basePath = abs( 'src' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/*/?.(js|s|ss)';
+
+  var expectedRelative = [ './proto', './proto/f.js', './proto/f.ss', './proto/dir1' ];
+  var basePath = abs( 'src' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/dir1/*/?.(js|s|ss)';
+
+  var expectedRelative = [ './proto', './proto/dir1', './proto/dir1/dir2', './proto/dir1/dir2/f.js', './proto/dir1/dir2/f.ss' ];
+  var basePath = abs( 'src' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto/dir1/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/dir1/dir2/dir3/*/?.(js|s|ss)';
+
+  var expectedRelative = [ './proto', './proto/dir1', './proto/dir1/dir2' ];
+  var basePath = abs( 'src' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto/dir1/dir2/dir3/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/dir3/*/?.(js|s|ss)';
+
+  var expectedRelative = [ './proto' ];
+  var basePath = abs( 'src' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto/dir3/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/*/?.(js|s|ss)';
+
+  var expectedRelative = [ './proto', './proto/f.cc', './proto/f.js', './proto/f.ss', './proto/f.test.js', './proto/f.test.ss', './proto/file', './proto/dir1', './proto/dir1/dir2', './proto/dir1/dir2/f.cc', './proto/dir1/dir2/f.js', './proto/dir1/dir2/f.ss', './proto/dir1/dir2/f.test.js', './proto/dir1/dir2/f.test.ss', './proto/dir1/dir2/file' ];
+  var basePath = abs( 'src' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto2/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/dir1/*/?.(js|s|ss)';
+
+  var expectedRelative = [ './proto', './proto/f.cc', './proto/f.js', './proto/f.ss', './proto/f.test.js', './proto/f.test.ss', './proto/file', './proto/dir1', './proto/dir1/dir2', './proto/dir1/dir2/f.cc', './proto/dir1/dir2/f.js', './proto/dir1/dir2/f.ss', './proto/dir1/dir2/f.test.js', './proto/dir1/dir2/f.test.ss', './proto/dir1/dir2/file' ];
+  var basePath = abs( 'src' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto2/dir1/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/dir1/dir2/dir3/*/?.(js|s|ss)';
+
+  var expectedRelative = [ './proto', './proto/f.cc', './proto/f.js', './proto/f.ss', './proto/f.test.js', './proto/f.test.ss', './proto/file', './proto/dir1', './proto/dir1/dir2', './proto/dir1/dir2/f.cc', './proto/dir1/dir2/f.js', './proto/dir1/dir2/f.ss', './proto/dir1/dir2/f.test.js', './proto/dir1/dir2/f.test.ss', './proto/dir1/dir2/file' ];
+  var basePath = abs( 'src' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto2/dir1/dir2/dir3/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/dir3/*/?.(js|s|ss)';
+
+  var expectedRelative = [ './proto', './proto/f.cc', './proto/f.js', './proto/f.ss', './proto/f.test.js', './proto/f.test.ss', './proto/file', './proto/dir1', './proto/dir1/dir2', './proto/dir1/dir2/f.cc', './proto/dir1/dir2/f.js', './proto/dir1/dir2/f.ss', './proto/dir1/dir2/f.test.js', './proto/dir1/dir2/f.test.ss', './proto/dir1/dir2/file' ];
+  var basePath = abs( 'src' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto2/dir3/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* - */
+
+  test.close( 'filePath=src/proto, basePath=src' );
+
+  test.open( 'filePath=src/proto, basePath=src/proto2/proto3' );
+
+  /* - */
+
+  test.case = 'filter=*/?.(js|s|ss)';
+
+  var expectedRelative = [];
+  var basePath = abs( 'src/proto2/proto3' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/*/?.(js|s|ss)';
+
+  var expectedRelative = [ '../../proto', '../../proto/f.js', '../../proto/f.ss' ];
+  var basePath = abs( 'src/proto2/proto3' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/*/?.(js|s|ss)';
+
+  var expectedRelative = [ '../../proto', '../../proto/f.js', '../../proto/f.ss', '../../proto/dir1' ];
+  var basePath = abs( 'src/proto2/proto3' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/dir1/*/?.(js|s|ss)';
+
+  var expectedRelative = [ '../../proto', '../../proto/dir1', '../../proto/dir1/dir2', '../../proto/dir1/dir2/f.js', '../../proto/dir1/dir2/f.ss' ];
+  var basePath = abs( 'src/proto2/proto3' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto/dir1/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/dir1/dir2/dir3/*/?.(js|s|ss)';
+
+  var expectedRelative = [ '../../proto', '../../proto/dir1', '../../proto/dir1/dir2' ];
+  var basePath = abs( 'src/proto2/proto3' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto/dir1/dir2/dir3/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/dir3/*/?.(js|s|ss)';
+
+  var expectedRelative = [ '../../proto' ];
+  var basePath = abs( 'src/proto2/proto3' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto/dir3/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/*/?.(js|s|ss)';
+
+  var expectedRelative = [ '../../proto', '../../proto/f.cc', '../../proto/f.js', '../../proto/f.ss', '../../proto/f.test.js', '../../proto/f.test.ss', '../../proto/file', '../../proto/dir1', '../../proto/dir1/dir2', '../../proto/dir1/dir2/f.cc', '../../proto/dir1/dir2/f.js', '../../proto/dir1/dir2/f.ss', '../../proto/dir1/dir2/f.test.js', '../../proto/dir1/dir2/f.test.ss', '../../proto/dir1/dir2/file' ];
+  var basePath = abs( 'src/proto2/proto3' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto2/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/dir1/*/?.(js|s|ss)';
+
+  var expectedRelative = [ '../../proto', '../../proto/f.cc', '../../proto/f.js', '../../proto/f.ss', '../../proto/f.test.js', '../../proto/f.test.ss', '../../proto/file', '../../proto/dir1', '../../proto/dir1/dir2', '../../proto/dir1/dir2/f.cc', '../../proto/dir1/dir2/f.js', '../../proto/dir1/dir2/f.ss', '../../proto/dir1/dir2/f.test.js', '../../proto/dir1/dir2/f.test.ss', '../../proto/dir1/dir2/file' ];
+  var basePath = abs( 'src/proto2/proto3' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto2/dir1/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/dir1/dir2/dir3/*/?.(js|s|ss)';
+
+  var expectedRelative = [ '../../proto', '../../proto/f.cc', '../../proto/f.js', '../../proto/f.ss', '../../proto/f.test.js', '../../proto/f.test.ss', '../../proto/file', '../../proto/dir1', '../../proto/dir1/dir2', '../../proto/dir1/dir2/f.cc', '../../proto/dir1/dir2/f.js', '../../proto/dir1/dir2/f.ss', '../../proto/dir1/dir2/f.test.js', '../../proto/dir1/dir2/f.test.ss', '../../proto/dir1/dir2/file' ];
+  var basePath = abs( 'src/proto2/proto3' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto2/dir1/dir2/dir3/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/dir3/*/?.(js|s|ss)';
+
+  var expectedRelative = [ '../../proto', '../../proto/f.cc', '../../proto/f.js', '../../proto/f.ss', '../../proto/f.test.js', '../../proto/f.test.ss', '../../proto/file', '../../proto/dir1', '../../proto/dir1/dir2', '../../proto/dir1/dir2/f.cc', '../../proto/dir1/dir2/f.js', '../../proto/dir1/dir2/f.ss', '../../proto/dir1/dir2/f.test.js', '../../proto/dir1/dir2/f.test.ss', '../../proto/dir1/dir2/file' ];
+  var basePath = abs( 'src/proto2/proto3' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto2/dir3/*/?.(js|s|ss)' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* - */
+
+  test.close( 'filePath=src/proto, basePath=src/proto2/proto3' );
+
+  /* - */
+
+  debugger; return; xxx
+} /* end of filesFindAnyPositive */
+
+//
+
+function filesFindTotalPositive( test )
+{
+  let context = this;
+  let provider = context.provider;
+  let hub = context.hub;
+  let path = context.provider.path;
+  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+
+  function abs()
+  {
+    let args = _.longSlice( arguments );
+    args.unshift( routinePath );
+    return path.s.join.apply( path.s, args );
+  }
+
+  /* - */
+
+  var tree =
+  {
+    src :
+    {
+      proto :
+      {
+        '-ile' : 'src/proto/-ile',
+        'file' : 'src/proto/file',
+        'f.cc' : 'src/proto/f.cc',
+        'f.js' : 'src/proto/f.js',
+        'f.ss' : 'src/proto/f.ss',
+        'f.test.js' : 'src/proto/f.test.js',
+        'f.test.ss' : 'src/proto/f.test.ss',
+        dir1 :
+        {
+          dir2 :
+          {
+            '-ile' : 'dir1/dir2/src/proto/-ile',
+            'file' : 'dir1/dir2/src/proto/file',
+            'f.cc' : 'dir1/dir2/src/proto/f.cc',
+            'f.js' : 'dir1/dir2/src/proto/f.js',
+            'f.ss' : 'dir1/dir2/src/proto/f.ss',
+            'f.test.js' : 'dir1/dir2/src/proto/f.test.js',
+            'f.test.ss' : 'dir1/dir2/src/proto/f.test.ss',
+          }
+        }
+      },
+      proto2 :
+      {
+        '-ile' : 'src/proto2/-ile',
+        'file' : 'src/proto2/file',
+        'f.cc' : 'src/proto2/f.cc',
+        'f.js' : 'src/proto2/f.js',
+        'f.ss' : 'src/proto2/f.ss',
+        'f.test.js' : 'src/proto2/f.test.js',
+        'f.test.ss' : 'src/proto2/f.test.ss',
+        dir1 :
+        {
+          dir2 :
+          {
+            '-ile' : 'dir1/dir2/src/proto2/-ile',
+            'file' : 'dir1/dir2/src/proto2/file',
+            'f.cc' : 'dir1/dir2/src/proto2/f.cc',
+            'f.js' : 'dir1/dir2/src/proto2/f.js',
+            'f.ss' : 'dir1/dir2/src/proto2/f.ss',
+            'f.test.js' : 'dir1/dir2/src/proto2/f.test.js',
+            'f.test.ss' : 'dir1/dir2/src/proto2/f.test.ss',
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+  var extract = new _.FileProvider.Extract({ filesTree : tree });
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+
+  var find = provider.filesFinder
+  ({
+    includingTerminals : 1,
+    includingDirs : 1,
+    includingTransient : 1,
+    recursive : 2,
+    filter :
+    {
+      prefixPath : routinePath,
+    }
+  });
+
+  /* - */
+
+  test.open( 'filePath=src/proto, basePath=src/proto' );
 
   /* - */
 
@@ -7541,8 +8657,8 @@ function filesFindRelative( test )
 
   /* - */
 
-  test.close( 'single dasterisk, filePath=src/proto, basePath=src/proto' );
-  test.open( 'single dasterisk, filePath=src, basePath=src/proto' );
+  test.close( 'filePath=src/proto, basePath=src/proto' );
+  test.open( 'filePath=src, basePath=src/proto' );
 
   /* - */
 
@@ -7696,9 +8812,9 @@ function filesFindRelative( test )
 
   /* - */
 
-  test.close( 'single dasterisk, filePath=src, basePath=src/proto' );
+  test.close( 'filePath=src, basePath=src/proto' );
 
-  test.open( 'single dasterisk, filePath=src, basePath=.' );
+  test.open( 'filePath=src, basePath=.' );
 
   /* - */
 
@@ -7735,7 +8851,7 @@ function filesFindRelative( test )
   test.case = 'filter=src/proto/**.(js|s|ss)';
 
   var expectedRelative = [ './src', './src/proto', './src/proto/f.js', './src/proto/f.ss', './src/proto/f.test.js', './src/proto/f.test.ss', './src/proto/dir1', './src/proto/dir1/dir2', './src/proto/dir1/dir2/f.js', './src/proto/dir1/dir2/f.ss', './src/proto/dir1/dir2/f.test.js', './src/proto/dir1/dir2/f.test.ss' ];
-  var basePath = abs( '.' );;
+  var basePath = abs( '.' );
   var filePath = abs
   ({
     './src' : './out',
@@ -7750,7 +8866,7 @@ function filesFindRelative( test )
   test.case = 'filter=src/proto/dir1/**.(js|s|ss)';
 
   var expectedRelative = [ './src', './src/proto', './src/proto/dir1', './src/proto/dir1/dir2', './src/proto/dir1/dir2/f.js', './src/proto/dir1/dir2/f.ss', './src/proto/dir1/dir2/f.test.js', './src/proto/dir1/dir2/f.test.ss' ];
-  var basePath = abs( '.' );;
+  var basePath = abs( '.' );
   var filePath = abs
   ({
     './src' : './out',
@@ -7765,7 +8881,7 @@ function filesFindRelative( test )
   test.case = 'filter=src/proto/dir1/dir2/dir3/**.(js|s|ss)';
 
   var expectedRelative = [ './src', './src/proto', './src/proto/dir1', './src/proto/dir1/dir2' ];
-  var basePath = abs( '.' );;
+  var basePath = abs( '.' );
   var filePath = abs
   ({
     './src' : './out',
@@ -7780,7 +8896,7 @@ function filesFindRelative( test )
   test.case = 'filter=src/proto/dir3/**.(js|s|ss)';
 
   var expectedRelative = [ './src', './src/proto' ];
-  var basePath = abs( '.' );;
+  var basePath = abs( '.' );
   var filePath = abs
   ({
     './src' : './out',
@@ -7795,7 +8911,7 @@ function filesFindRelative( test )
   test.case = 'filter=src/proto2/**.(js|s|ss)';
 
   var expectedRelative = [ './src', './src/proto2', './src/proto2/f.js', './src/proto2/f.ss', './src/proto2/f.test.js', './src/proto2/f.test.ss', './src/proto2/dir1', './src/proto2/dir1/dir2', './src/proto2/dir1/dir2/f.js', './src/proto2/dir1/dir2/f.ss', './src/proto2/dir1/dir2/f.test.js', './src/proto2/dir1/dir2/f.test.ss' ];
-  var basePath = abs( '.' );;
+  var basePath = abs( '.' );
   var filePath = abs
   ({
     './src' : './out',
@@ -7810,7 +8926,7 @@ function filesFindRelative( test )
   test.case = 'filter=src/proto2/dir1/**.(js|s|ss)';
 
   var expectedRelative = [ './src', './src/proto2', './src/proto2/dir1', './src/proto2/dir1/dir2', './src/proto2/dir1/dir2/f.js', './src/proto2/dir1/dir2/f.ss', './src/proto2/dir1/dir2/f.test.js', './src/proto2/dir1/dir2/f.test.ss' ];
-  var basePath = abs( '.' );;
+  var basePath = abs( '.' );
   var filePath = abs
   ({
     './src' : './out',
@@ -7825,7 +8941,7 @@ function filesFindRelative( test )
   test.case = 'filter=src/proto2/dir1/dir2/dir3/**.(js|s|ss)';
 
   var expectedRelative = [ './src', './src/proto2', './src/proto2/dir1', './src/proto2/dir1/dir2' ];
-  var basePath = abs( '.' );;
+  var basePath = abs( '.' );
   var filePath = abs
   ({
     './src' : './out',
@@ -7840,7 +8956,7 @@ function filesFindRelative( test )
   test.case = 'filter=src/proto2/dir3/**.(js|s|ss)';
 
   var expectedRelative = [ './src', './src/proto2' ];
-  var basePath = abs( '.' );;
+  var basePath = abs( '.' );
   var filePath = abs
   ({
     './src' : './out',
@@ -7852,8 +8968,8 @@ function filesFindRelative( test )
 
   /* - */
 
-  test.close( 'single dasterisk, filePath=src, basePath=.' );
-  test.open( 'single dasterisk, filePath=src/proto, basePath=src' );
+  test.close( 'filePath=src, basePath=.' );
+  test.open( 'filePath=src/proto, basePath=src' );
 
   /* - */
 
@@ -8007,8 +9123,8 @@ function filesFindRelative( test )
 
   /* - */
 
-  test.close( 'single dasterisk, filePath=src/proto, basePath=src' );
-  test.open( 'single dasterisk, filePath=src/proto, basePath=src/proto2/proto3' );
+  test.close( 'filePath=src/proto, basePath=src' );
+  test.open( 'filePath=src/proto, basePath=src/proto2/proto3' );
 
   /* - */
 
@@ -8162,16 +9278,16 @@ function filesFindRelative( test )
 
   /* - */
 
-  test.close( 'single dasterisk, filePath=src/proto, basePath=src/proto2/proto3' );
+  test.close( 'filePath=src/proto, basePath=src/proto2/proto3' );
 
   /* - */
 
   debugger; return; xxx
-}
+} /* end of filesFindTotalPositive */
 
 //
 
-function filesFinder( test )
+function filesFindSeveralTotalPositive( test )
 {
   let context = this;
   let provider = context.provider;
@@ -8185,107 +9301,6 @@ function filesFinder( test )
     args.unshift( routinePath );
     return path.s.join.apply( path.s, args );
   }
-
-  /* - */
-
-  var extract1 = _.FileProvider.Extract
-  ({
-    filesTree :
-    {
-      'package.json' : '/dir2/package.json',
-      'node_modules' : '/node_modules',
-      dir1 :
-      {
-        t1 : '/dir1/t1',
-        t2 : '/dir1/t2',
-        dir11 : { t3 : '/dir1/dir11/t3' },
-        node_modules :
-        {
-          t2 : '/dir1/node_modules/t2',
-          dir11 : { t3 : '/dir1/node_modules/dir11/t3' },
-        },
-      },
-      dir2 :
-      {
-        t21 : '/dir2/t21',
-        'package.json' : '/dir2/package.json',
-        node_modules :
-        {
-          t2 : '/dir2/node_modules/t2',
-          dir11 : { t3 : '/dir2/node_modules/dir11/t3' },
-        },
-      },
-    },
-  });
-
-  extract1.filesReflectTo( provider, routinePath );
-
-  /**/
-
-  test.case = 'bools, no glob';
-
-  var find = provider.filesFinder
-  ({
-    recursive : 2,
-    allowingMissed : 1,
-    maskPreset : 0,
-    outputFormat : 'relative',
-    filter :
-    {
-      filePath : { 'node_modules' : 0, 'package.json' : 0 },
-    }
-  });
-
-  var expected = [ './dir1/t1', './dir1/t2', './dir1/dir11/t3', './dir1/node_modules/t2', './dir1/node_modules/dir11/t3', './dir2/package.json', './dir2/t21', './dir2/node_modules/t2', './dir2/node_modules/dir11/t3' ];
-  var got = find( routinePath );
-  test.identical( got, expected );
-
-  /**/
-
-  test.case = 'bools, glob';
-
-  var find = provider.filesFinder
-  ({
-    recursive : 2,
-    allowingMissed : 1,
-    maskPreset : 0,
-    outputFormat : 'relative',
-    filter :
-    {
-      filePath : { '**/node_modules/**' : 0, '**/package.json' : 0 },
-    }
-  });
-
-  var expected = [ './dir1/t1', './dir1/t2', './dir1/dir11/t3', './dir2/t21' ];
-  var got = find( routinePath );
-  test.identical( got, expected );
-
-  /**/
-
-  test.case = 'bools, glob, include all';
-
-  var find = provider.filesFinder
-  ({
-    recursive : 2,
-    includingTerminals : 1,
-    includingDirs : 1,
-    includingTransient : 1,
-    allowingMissed : 1,
-    maskPreset : 0,
-    outputFormat : 'relative',
-    filter :
-    {
-      filePath : { '**/node_modules/**' : 0, '**/package.json' : 0 },
-    }
-  });
-
-  /*
-    zzz : extend optimization "certainly"
-  */
-
-  var expected = [ '.', './dir1', './dir1/t1', './dir1/t2', './dir1/dir11', './dir1/dir11/t3', './dir2', './dir2/t21' ];
-  var got = find( routinePath );
-  test.identical( got, expected );
 
   /* - */
 
@@ -8315,8 +9330,36 @@ function filesFinder( test )
             'f.test.ss' : 'dir1/dir2/src/proto/f.test.ss',
           }
         }
+      },
+      proto2 :
+      {
+        '-ile' : 'src/proto2/-ile',
+        'file' : 'src/proto2/file',
+        'f.cc' : 'src/proto2/f.cc',
+        'f.js' : 'src/proto2/f.js',
+        'f.ss' : 'src/proto2/f.ss',
+        'f.test.js' : 'src/proto2/f.test.js',
+        'f.test.ss' : 'src/proto2/f.test.ss',
+        dir1 :
+        {
+          dir2 :
+          {
+            '-ile' : 'dir1/dir2/src/proto2/-ile',
+            'file' : 'dir1/dir2/src/proto2/file',
+            'f.cc' : 'dir1/dir2/src/proto2/f.cc',
+            'f.js' : 'dir1/dir2/src/proto2/f.js',
+            'f.ss' : 'dir1/dir2/src/proto2/f.ss',
+            'f.test.js' : 'dir1/dir2/src/proto2/f.test.js',
+            'f.test.ss' : 'dir1/dir2/src/proto2/f.test.ss',
+          }
+        }
       }
-    }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
   }
   var extract = new _.FileProvider.Extract({ filesTree : tree });
 
@@ -8337,14 +9380,61 @@ function filesFinder( test )
 
   /* - */
 
-  test.case = 'include js';
+  test.open( 'filePath=src/proto, basePath=src/proto' );
 
-  var expectedRelative = [ '.', './f.js', './f.ss', './f.test.js', './f.test.ss', './dir1', './dir1/dir2', './dir1/dir2/f.js', './dir1/dir2/f.ss', './dir1/dir2/f.test.js', './dir1/dir2/f.test.ss' ];
+  /* - */
+
+  test.case = 'filter=**srcx**dir2**';
+
+  var expectedRelative = [ '.', './dir1', './dir1/dir2' ];
   var basePath = abs( 'src/proto' );
   var filePath = abs
   ({
     './src/proto' : './out',
-    './src/**.(js|s|ss)' : true,
+    './**srcx**dir2**' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  test.case = 'filter=**src**dir2**';
+
+  var expectedRelative = [ '.', './dir1', './dir1/dir2', './dir1/dir2/f.cc', './dir1/dir2/f.js', './dir1/dir2/f.ss', './dir1/dir2/f.test.js', './dir1/dir2/f.test.ss', './dir1/dir2/file' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './**src**dir2**' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/**dir1**dir2**';
+
+  var expectedRelative = [ '.', './dir1', './dir1/dir2', './dir1/dir2/f.cc', './dir1/dir2/f.js', './dir1/dir2/f.ss', './dir1/dir2/f.test.js', './dir1/dir2/f.test.ss', './dir1/dir2/file' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/**dir1**dir2**' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/**dir1**dir2**';
+
+  var expectedRelative = [ '.', './dir1', './dir1/dir2', './dir1/dir2/f.cc', './dir1/dir2/f.js', './dir1/dir2/f.ss', './dir1/dir2/f.test.js', './dir1/dir2/f.test.ss', './dir1/dir2/file' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto/**dir1**dir2**' : true,
   });
   var records = find({ filter : { filePath, basePath } });
   var gotRelative = _.select( records, '*/relative' );
@@ -8352,25 +9442,1198 @@ function filesFinder( test )
 
   /* - */
 
-  test.case = 'exclude tests, include js';
+  test.close( 'filePath=src/proto, basePath=src/proto' );
 
-  var expectedRelative = [ '.', './f.js', './f.ss', './dir1', './dir1/dir2', './dir1/dir2/f.js', './dir1/dir2/f.ss' ];
+  test.open( 'filePath=src, basePath=src/proto' );
+
+  /* - */
+
+  test.case = 'filter=**src**dir2**';
+
+  var expectedRelative = [ '..', '.', './dir1', './dir1/dir2', './dir1/dir2/f.cc', './dir1/dir2/f.js', './dir1/dir2/f.ss', './dir1/dir2/f.test.js', './dir1/dir2/f.test.ss', './dir1/dir2/file', '../proto2', '../proto2/dir1', '../proto2/dir1/dir2', '../proto2/dir1/dir2/f.cc', '../proto2/dir1/dir2/f.js', '../proto2/dir1/dir2/f.ss', '../proto2/dir1/dir2/f.test.js', '../proto2/dir1/dir2/f.test.ss', '../proto2/dir1/dir2/file' ];
   var basePath = abs( 'src/proto' );
   var filePath = abs
   ({
-    './src/proto' : './out',
-    './src/**.test*' : false,
-    './src/**.test/**' : false,
-    './src/**.(js|s|ss)' : true,
+    './src' : './out',
+    './**src**dir2**' : true,
   });
   var records = find({ filter : { filePath, basePath } });
   var gotRelative = _.select( records, '*/relative' );
   test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/**dir1**dir2**';
+
+  var expectedRelative = [ '..', '.', './dir1', './dir1/dir2', './dir1/dir2/f.cc', './dir1/dir2/f.js', './dir1/dir2/f.ss', './dir1/dir2/f.test.js', './dir1/dir2/f.test.ss', './dir1/dir2/file', '../proto2', '../proto2/dir1', '../proto2/dir1/dir2', '../proto2/dir1/dir2/f.cc', '../proto2/dir1/dir2/f.js', '../proto2/dir1/dir2/f.ss', '../proto2/dir1/dir2/f.test.js', '../proto2/dir1/dir2/f.test.ss', '../proto2/dir1/dir2/file' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/**dir1**dir2**' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/**dir1**dir2**';
+
+  var expectedRelative = [ '..', '.', './dir1', './dir1/dir2', './dir1/dir2/f.cc', './dir1/dir2/f.js', './dir1/dir2/f.ss', './dir1/dir2/f.test.js', './dir1/dir2/f.test.ss', './dir1/dir2/file' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/proto/**dir1**dir2**' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/dir1/**dir1**dir2**';
+
+  var expectedRelative = [ '..', '.', './dir1', './dir1/dir2' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/proto/dir1/**dir1**dir2**' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/**dir1**dir2**';
+
+  var expectedRelative = [ '..', '../proto2', '../proto2/dir1', '../proto2/dir1/dir2', '../proto2/dir1/dir2/f.cc', '../proto2/dir1/dir2/f.js', '../proto2/dir1/dir2/f.ss', '../proto2/dir1/dir2/f.test.js', '../proto2/dir1/dir2/f.test.ss', '../proto2/dir1/dir2/file' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/proto2/**dir1**dir2**' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* - */
+
+  test.close( 'filePath=src, basePath=src/proto' );
+
+  test.open( 'filePath=src, basePath=.' );
+
+  /* - */
+
+  test.case = 'filter=**src**dir2**';
+
+  var expectedRelative = [ './src', './src/proto', './src/proto/dir1', './src/proto/dir1/dir2', './src/proto/dir1/dir2/f.cc', './src/proto/dir1/dir2/f.js', './src/proto/dir1/dir2/f.ss', './src/proto/dir1/dir2/f.test.js', './src/proto/dir1/dir2/f.test.ss', './src/proto/dir1/dir2/file', './src/proto2', './src/proto2/dir1', './src/proto2/dir1/dir2', './src/proto2/dir1/dir2/f.cc', './src/proto2/dir1/dir2/f.js', './src/proto2/dir1/dir2/f.ss', './src/proto2/dir1/dir2/f.test.js', './src/proto2/dir1/dir2/f.test.ss', './src/proto2/dir1/dir2/file' ];
+  var basePath = abs( '.' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './**src**dir2**' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/**proto**dir2**';
+
+  var expectedRelative = [ './src', './src/proto', './src/proto/dir1', './src/proto/dir1/dir2', './src/proto/dir1/dir2/f.cc', './src/proto/dir1/dir2/f.js', './src/proto/dir1/dir2/f.ss', './src/proto/dir1/dir2/f.test.js', './src/proto/dir1/dir2/f.test.ss', './src/proto/dir1/dir2/file', './src/proto2', './src/proto2/dir1', './src/proto2/dir1/dir2', './src/proto2/dir1/dir2/f.cc', './src/proto2/dir1/dir2/f.js', './src/proto2/dir1/dir2/f.ss', './src/proto2/dir1/dir2/f.test.js', './src/proto2/dir1/dir2/f.test.ss', './src/proto2/dir1/dir2/file' ];
+  var basePath = abs( '.' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/**proto**dir2**' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/**dir1**dir2**';
+
+  var expectedRelative = [ './src', './src/proto', './src/proto/dir1', './src/proto/dir1/dir2', './src/proto/dir1/dir2/f.cc', './src/proto/dir1/dir2/f.js', './src/proto/dir1/dir2/f.ss', './src/proto/dir1/dir2/f.test.js', './src/proto/dir1/dir2/f.test.ss', './src/proto/dir1/dir2/file' ];
+  var basePath = abs( '.' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/proto/**dir1**dir2**' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/dir1/**dir1**dir2**';
+
+  var expectedRelative = [ './src', './src/proto', './src/proto/dir1', './src/proto/dir1/dir2' ];
+  var basePath = abs( '.' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/proto/dir1/**dir1**dir2**' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/**dir1**dir2**';
+
+  var expectedRelative = [ './src', './src/proto2', './src/proto2/dir1', './src/proto2/dir1/dir2', './src/proto2/dir1/dir2/f.cc', './src/proto2/dir1/dir2/f.js', './src/proto2/dir1/dir2/f.ss', './src/proto2/dir1/dir2/f.test.js', './src/proto2/dir1/dir2/f.test.ss', './src/proto2/dir1/dir2/file' ];
+  var basePath = abs( '.' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/proto2/**dir1**dir2**' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* - */
+
+  test.close( 'filePath=src, basePath=.' );
+
+  test.open( 'filePath=src/proto, basePath=src' );
+
+  /* - */
+
+  test.case = 'filter=**src**dir2**';
+
+  var expectedRelative = [ './proto', './proto/dir1', './proto/dir1/dir2', './proto/dir1/dir2/f.cc', './proto/dir1/dir2/f.js', './proto/dir1/dir2/f.ss', './proto/dir1/dir2/f.test.js', './proto/dir1/dir2/f.test.ss', './proto/dir1/dir2/file' ];
+  var basePath = abs( 'src' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './**src**dir2**' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/**proto**dir2**';
+
+  var expectedRelative = [ './proto', './proto/dir1', './proto/dir1/dir2', './proto/dir1/dir2/f.cc', './proto/dir1/dir2/f.js', './proto/dir1/dir2/f.ss', './proto/dir1/dir2/f.test.js', './proto/dir1/dir2/f.test.ss', './proto/dir1/dir2/file' ];
+  var basePath = abs( 'src' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/**proto**dir2**' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/**dir1**dir2**';
+
+  var expectedRelative = [ './proto', './proto/dir1', './proto/dir1/dir2', './proto/dir1/dir2/f.cc', './proto/dir1/dir2/f.js', './proto/dir1/dir2/f.ss', './proto/dir1/dir2/f.test.js', './proto/dir1/dir2/f.test.ss', './proto/dir1/dir2/file' ];
+  var basePath = abs( 'src' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto/**dir1**dir2**' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/dir1/**dir1**dir2**';
+
+  var expectedRelative = [ './proto', './proto/dir1', './proto/dir1/dir2' ];
+  var basePath = abs( 'src' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto/dir1/**dir1**dir2**' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* - */
+
+  test.close( 'filePath=src/proto, basePath=src' );
+  test.open( 'filePath=src/proto, basePath=src/proto2/proto3' );
+
+  /* - */
+
+  test.case = 'filter=**src**dir2**';
+
+  var expectedRelative = [ '../../proto', '../../proto/dir1', '../../proto/dir1/dir2', '../../proto/dir1/dir2/f.cc', '../../proto/dir1/dir2/f.js', '../../proto/dir1/dir2/f.ss', '../../proto/dir1/dir2/f.test.js', '../../proto/dir1/dir2/f.test.ss', '../../proto/dir1/dir2/file' ];
+  var basePath = abs( 'src/proto2/proto3' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './**src**dir2**' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/**proto**dir2**';
+
+  var expectedRelative = [ '../../proto', '../../proto/dir1', '../../proto/dir1/dir2', '../../proto/dir1/dir2/f.cc', '../../proto/dir1/dir2/f.js', '../../proto/dir1/dir2/f.ss', '../../proto/dir1/dir2/f.test.js', '../../proto/dir1/dir2/f.test.ss', '../../proto/dir1/dir2/file' ];
+  var basePath = abs( 'src/proto2/proto3' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/**proto**dir2**' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/**dir1**dir2**';
+
+  var expectedRelative = [ '../../proto', '../../proto/dir1', '../../proto/dir1/dir2', '../../proto/dir1/dir2/f.cc', '../../proto/dir1/dir2/f.js', '../../proto/dir1/dir2/f.ss', '../../proto/dir1/dir2/f.test.js', '../../proto/dir1/dir2/f.test.ss', '../../proto/dir1/dir2/file' ];
+  var basePath = abs( 'src/proto2/proto3' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto/**dir1**dir2**' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/dir1/**dir1**dir2**';
+
+  var expectedRelative = [ '../../proto', '../../proto/dir1', '../../proto/dir1/dir2' ];
+  var basePath = abs( 'src/proto2/proto3' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto/dir1/**dir1**dir2**' : true,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* - */
+
+  test.close( 'filePath=src/proto, basePath=src/proto2/proto3' );
 
   /* - */
 
   debugger; return; xxx
-}
+} /* end of filesFindSeveralTotalPositive */
+
+//
+
+function filesFindTotalNegative( test )
+{
+  let context = this;
+  let provider = context.provider;
+  let hub = context.hub;
+  let path = context.provider.path;
+  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+
+  function abs()
+  {
+    let args = _.longSlice( arguments );
+    args.unshift( routinePath );
+    return path.s.join.apply( path.s, args );
+  }
+
+  /* - */
+
+  var tree =
+  {
+    src :
+    {
+      proto :
+      {
+        '-ile' : 'src/proto/-ile',
+        'file' : 'src/proto/file',
+        'f.cc' : 'src/proto/f.cc',
+        'f.js' : 'src/proto/f.js',
+        'f.ss' : 'src/proto/f.ss',
+        'f.test.js' : 'src/proto/f.test.js',
+        'f.test.ss' : 'src/proto/f.test.ss',
+        dir1 :
+        {
+          dir2 :
+          {
+            '-ile' : 'dir1/dir2/src/proto/-ile',
+            'file' : 'dir1/dir2/src/proto/file',
+            'f.cc' : 'dir1/dir2/src/proto/f.cc',
+            'f.js' : 'dir1/dir2/src/proto/f.js',
+            'f.ss' : 'dir1/dir2/src/proto/f.ss',
+            'f.test.js' : 'dir1/dir2/src/proto/f.test.js',
+            'f.test.ss' : 'dir1/dir2/src/proto/f.test.ss',
+          }
+        }
+      },
+      proto2 :
+      {
+        '-ile' : 'src/proto2/-ile',
+        'file' : 'src/proto2/file',
+        'f.cc' : 'src/proto2/f.cc',
+        'f.js' : 'src/proto2/f.js',
+        'f.ss' : 'src/proto2/f.ss',
+        'f.test.js' : 'src/proto2/f.test.js',
+        'f.test.ss' : 'src/proto2/f.test.ss',
+        dir1 :
+        {
+          dir2 :
+          {
+            '-ile' : 'dir1/dir2/src/proto2/-ile',
+            'file' : 'dir1/dir2/src/proto2/file',
+            'f.cc' : 'dir1/dir2/src/proto2/f.cc',
+            'f.js' : 'dir1/dir2/src/proto2/f.js',
+            'f.ss' : 'dir1/dir2/src/proto2/f.ss',
+            'f.test.js' : 'dir1/dir2/src/proto2/f.test.js',
+            'f.test.ss' : 'dir1/dir2/src/proto2/f.test.ss',
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+  var extract = new _.FileProvider.Extract({ filesTree : tree });
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+
+  var find = provider.filesFinder
+  ({
+    includingTerminals : 1,
+    includingDirs : 1,
+    includingTransient : 1,
+    recursive : 2,
+    filter :
+    {
+      prefixPath : routinePath,
+    }
+  });
+
+  /**/
+
+  test.case = 'control check';
+
+  var expectedRelative = [ '.', './f.cc', './f.js', './f.ss', './f.test.js', './f.test.ss', './file', './dir1', './dir1/dir2', './dir1/dir2/f.cc', './dir1/dir2/f.js', './dir1/dir2/f.ss', './dir1/dir2/f.test.js', './dir1/dir2/f.test.ss', './dir1/dir2/file' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src/proto/**' : './out',
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* - */
+
+  test.open( 'filePath=src/proto, basePath=src/proto' );
+
+  /* - */
+
+  test.case = 'filter=**.(js|s|ss)';
+
+  var expectedRelative = [ '.', './f.cc', './file', './dir1', './dir1/dir2', './dir1/dir2/f.cc', './dir1/dir2/file' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src/proto/**' : './out',
+    './**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/**.(js|s|ss)';
+
+  var expectedRelative = [ '.', './f.cc', './file', './dir1', './dir1/dir2', './dir1/dir2/f.cc', './dir1/dir2/file' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/**.(js|s|ss)';
+
+  var expectedRelative = [ '.', './f.cc', './file', './dir1', './dir1/dir2', './dir1/dir2/f.cc', './dir1/dir2/file' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/dir1/**.(js|s|ss)';
+
+  var expectedRelative = [ '.', './f.cc', './f.js', './f.ss', './f.test.js', './f.test.ss', './file', './dir1', './dir1/dir2', './dir1/dir2/f.cc', './dir1/dir2/file' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto/dir1/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/dir1/dir2/dir3/**.(js|s|ss)';
+
+  var expectedRelative = [ '.', './f.cc', './f.js', './f.ss', './f.test.js', './f.test.ss', './file', './dir1', './dir1/dir2', './dir1/dir2/f.cc', './dir1/dir2/f.js', './dir1/dir2/f.ss', './dir1/dir2/f.test.js', './dir1/dir2/f.test.ss', './dir1/dir2/file' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto/dir1/dir2/dir3/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/dir3/**.(js|s|ss)';
+
+  var expectedRelative = [ '.', './f.cc', './f.js', './f.ss', './f.test.js', './f.test.ss', './file', './dir1', './dir1/dir2', './dir1/dir2/f.cc', './dir1/dir2/f.js', './dir1/dir2/f.ss', './dir1/dir2/f.test.js', './dir1/dir2/f.test.ss', './dir1/dir2/file' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto/dir3/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/**.(js|s|ss)';
+
+  var expectedRelative = [ '.', './f.cc', './f.js', './f.ss', './f.test.js', './f.test.ss', './file', './dir1', './dir1/dir2', './dir1/dir2/f.cc', './dir1/dir2/f.js', './dir1/dir2/f.ss', './dir1/dir2/f.test.js', './dir1/dir2/f.test.ss', './dir1/dir2/file' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto2/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/dir1/**.(js|s|ss)';
+
+  var expectedRelative = [ '.', './f.cc', './f.js', './f.ss', './f.test.js', './f.test.ss', './file', './dir1', './dir1/dir2', './dir1/dir2/f.cc', './dir1/dir2/f.js', './dir1/dir2/f.ss', './dir1/dir2/f.test.js', './dir1/dir2/f.test.ss', './dir1/dir2/file' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto2/dir1/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/dir1/dir2/dir3/**.(js|s|ss)';
+
+  var expectedRelative = [ '.', './f.cc', './f.js', './f.ss', './f.test.js', './f.test.ss', './file', './dir1', './dir1/dir2', './dir1/dir2/f.cc', './dir1/dir2/f.js', './dir1/dir2/f.ss', './dir1/dir2/f.test.js', './dir1/dir2/f.test.ss', './dir1/dir2/file' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto2/dir1/dir2/dir3/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/dir3/**.(js|s|ss)';
+
+  var expectedRelative = [ '.', './f.cc', './f.js', './f.ss', './f.test.js', './f.test.ss', './file', './dir1', './dir1/dir2', './dir1/dir2/f.cc', './dir1/dir2/f.js', './dir1/dir2/f.ss', './dir1/dir2/f.test.js', './dir1/dir2/f.test.ss', './dir1/dir2/file' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto2/dir3/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* - */
+
+  test.close( 'filePath=src/proto, basePath=src/proto' );
+  test.open( 'filePath=src, basePath=src/proto' );
+
+  /* - */
+
+  test.case = 'filter=**.(js|s|ss)';
+
+  var expectedRelative = [ '..', '.', './f.cc', './file', './dir1', './dir1/dir2', './dir1/dir2/f.cc', './dir1/dir2/file', '../proto2', '../proto2/f.cc', '../proto2/file', '../proto2/dir1', '../proto2/dir1/dir2', '../proto2/dir1/dir2/f.cc', '../proto2/dir1/dir2/file' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/**.(js|s|ss)';
+
+  var expectedRelative = [ '..', '.', './f.cc', './file', './dir1', './dir1/dir2', './dir1/dir2/f.cc', './dir1/dir2/file', '../proto2', '../proto2/f.cc', '../proto2/file', '../proto2/dir1', '../proto2/dir1/dir2', '../proto2/dir1/dir2/f.cc', '../proto2/dir1/dir2/file' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/**.(js|s|ss)';
+
+  var expectedRelative = [ '..', '.', './f.cc', './file', './dir1', './dir1/dir2', './dir1/dir2/f.cc', './dir1/dir2/file', '../proto2', '../proto2/f.cc', '../proto2/f.js', '../proto2/f.ss', '../proto2/f.test.js', '../proto2/f.test.ss', '../proto2/file', '../proto2/dir1', '../proto2/dir1/dir2', '../proto2/dir1/dir2/f.cc', '../proto2/dir1/dir2/f.js', '../proto2/dir1/dir2/f.ss', '../proto2/dir1/dir2/f.test.js', '../proto2/dir1/dir2/f.test.ss', '../proto2/dir1/dir2/file' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/proto/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/dir1/**.(js|s|ss)';
+
+  var expectedRelative = [ '..', '.', './f.cc', './f.js', './f.ss', './f.test.js', './f.test.ss', './file', './dir1', './dir1/dir2', './dir1/dir2/f.cc', './dir1/dir2/file', '../proto2', '../proto2/f.cc', '../proto2/f.js', '../proto2/f.ss', '../proto2/f.test.js', '../proto2/f.test.ss', '../proto2/file', '../proto2/dir1', '../proto2/dir1/dir2', '../proto2/dir1/dir2/f.cc', '../proto2/dir1/dir2/f.js', '../proto2/dir1/dir2/f.ss', '../proto2/dir1/dir2/f.test.js', '../proto2/dir1/dir2/f.test.ss', '../proto2/dir1/dir2/file' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/proto/dir1/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/dir1/dir2/dir3/**.(js|s|ss)';
+
+  var expectedRelative = [ '..', '.', './f.cc', './f.js', './f.ss', './f.test.js', './f.test.ss', './file', './dir1', './dir1/dir2', './dir1/dir2/f.cc', './dir1/dir2/f.js', './dir1/dir2/f.ss', './dir1/dir2/f.test.js', './dir1/dir2/f.test.ss', './dir1/dir2/file', '../proto2', '../proto2/f.cc', '../proto2/f.js', '../proto2/f.ss', '../proto2/f.test.js', '../proto2/f.test.ss', '../proto2/file', '../proto2/dir1', '../proto2/dir1/dir2', '../proto2/dir1/dir2/f.cc', '../proto2/dir1/dir2/f.js', '../proto2/dir1/dir2/f.ss', '../proto2/dir1/dir2/f.test.js', '../proto2/dir1/dir2/f.test.ss', '../proto2/dir1/dir2/file' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/proto/dir1/dir2/dir3/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/dir3/**.(js|s|ss)';
+
+  var expectedRelative = [ '..', '.', './f.cc', './f.js', './f.ss', './f.test.js', './f.test.ss', './file', './dir1', './dir1/dir2', './dir1/dir2/f.cc', './dir1/dir2/f.js', './dir1/dir2/f.ss', './dir1/dir2/f.test.js', './dir1/dir2/f.test.ss', './dir1/dir2/file', '../proto2', '../proto2/f.cc', '../proto2/f.js', '../proto2/f.ss', '../proto2/f.test.js', '../proto2/f.test.ss', '../proto2/file', '../proto2/dir1', '../proto2/dir1/dir2', '../proto2/dir1/dir2/f.cc', '../proto2/dir1/dir2/f.js', '../proto2/dir1/dir2/f.ss', '../proto2/dir1/dir2/f.test.js', '../proto2/dir1/dir2/f.test.ss', '../proto2/dir1/dir2/file' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/proto/dir3/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/**.(js|s|ss)';
+
+  var expectedRelative = [ '..', '.', './f.cc', './f.js', './f.ss', './f.test.js', './f.test.ss', './file', './dir1', './dir1/dir2', './dir1/dir2/f.cc', './dir1/dir2/f.js', './dir1/dir2/f.ss', './dir1/dir2/f.test.js', './dir1/dir2/f.test.ss', './dir1/dir2/file', '../proto2', '../proto2/f.cc', '../proto2/file', '../proto2/dir1', '../proto2/dir1/dir2', '../proto2/dir1/dir2/f.cc', '../proto2/dir1/dir2/file' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/proto2/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/dir1/**.(js|s|ss)';
+
+  var expectedRelative = [ '..', '.', './f.cc', './f.js', './f.ss', './f.test.js', './f.test.ss', './file', './dir1', './dir1/dir2', './dir1/dir2/f.cc', './dir1/dir2/f.js', './dir1/dir2/f.ss', './dir1/dir2/f.test.js', './dir1/dir2/f.test.ss', './dir1/dir2/file', '../proto2', '../proto2/f.cc', '../proto2/f.js', '../proto2/f.ss', '../proto2/f.test.js', '../proto2/f.test.ss', '../proto2/file', '../proto2/dir1', '../proto2/dir1/dir2', '../proto2/dir1/dir2/f.cc', '../proto2/dir1/dir2/file' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/proto2/dir1/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/dir1/dir2/dir3/**.(js|s|ss)';
+
+  var expectedRelative = [ '..', '.', './f.cc', './f.js', './f.ss', './f.test.js', './f.test.ss', './file', './dir1', './dir1/dir2', './dir1/dir2/f.cc', './dir1/dir2/f.js', './dir1/dir2/f.ss', './dir1/dir2/f.test.js', './dir1/dir2/f.test.ss', './dir1/dir2/file', '../proto2', '../proto2/f.cc', '../proto2/f.js', '../proto2/f.ss', '../proto2/f.test.js', '../proto2/f.test.ss', '../proto2/file', '../proto2/dir1', '../proto2/dir1/dir2', '../proto2/dir1/dir2/f.cc', '../proto2/dir1/dir2/f.js', '../proto2/dir1/dir2/f.ss', '../proto2/dir1/dir2/f.test.js', '../proto2/dir1/dir2/f.test.ss', '../proto2/dir1/dir2/file' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/proto2/dir1/dir2/dir3/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/dir3/**.(js|s|ss)';
+
+  var expectedRelative = [ '..', '.', './f.cc', './f.js', './f.ss', './f.test.js', './f.test.ss', './file', './dir1', './dir1/dir2', './dir1/dir2/f.cc', './dir1/dir2/f.js', './dir1/dir2/f.ss', './dir1/dir2/f.test.js', './dir1/dir2/f.test.ss', './dir1/dir2/file', '../proto2', '../proto2/f.cc', '../proto2/f.js', '../proto2/f.ss', '../proto2/f.test.js', '../proto2/f.test.ss', '../proto2/file', '../proto2/dir1', '../proto2/dir1/dir2', '../proto2/dir1/dir2/f.cc', '../proto2/dir1/dir2/f.js', '../proto2/dir1/dir2/f.ss', '../proto2/dir1/dir2/f.test.js', '../proto2/dir1/dir2/f.test.ss', '../proto2/dir1/dir2/file' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/proto2/dir3/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* - */
+
+  test.close( 'filePath=src, basePath=src/proto' );
+
+  test.open( 'filePath=src, basePath=.' );
+
+  /* - */
+
+  test.case = 'filter=**.(js|s|ss)';
+
+  var expectedRelative = [ './src', './src/proto', './src/proto/f.cc', './src/proto/file', './src/proto/dir1', './src/proto/dir1/dir2', './src/proto/dir1/dir2/f.cc', './src/proto/dir1/dir2/file', './src/proto2', './src/proto2/f.cc', './src/proto2/file', './src/proto2/dir1', './src/proto2/dir1/dir2', './src/proto2/dir1/dir2/f.cc', './src/proto2/dir1/dir2/file' ];
+  var basePath = abs( '.' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/**.(js|s|ss)';
+
+  var expectedRelative = [ './src', './src/proto', './src/proto/f.cc', './src/proto/file', './src/proto/dir1', './src/proto/dir1/dir2', './src/proto/dir1/dir2/f.cc', './src/proto/dir1/dir2/file', './src/proto2', './src/proto2/f.cc', './src/proto2/file', './src/proto2/dir1', './src/proto2/dir1/dir2', './src/proto2/dir1/dir2/f.cc', './src/proto2/dir1/dir2/file' ];
+  var basePath = abs( '.' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/**.(js|s|ss)';
+
+  var expectedRelative = [ './src', './src/proto', './src/proto/f.cc', './src/proto/file', './src/proto/dir1', './src/proto/dir1/dir2', './src/proto/dir1/dir2/f.cc', './src/proto/dir1/dir2/file', './src/proto2', './src/proto2/f.cc', './src/proto2/f.js', './src/proto2/f.ss', './src/proto2/f.test.js', './src/proto2/f.test.ss', './src/proto2/file', './src/proto2/dir1', './src/proto2/dir1/dir2', './src/proto2/dir1/dir2/f.cc', './src/proto2/dir1/dir2/f.js', './src/proto2/dir1/dir2/f.ss', './src/proto2/dir1/dir2/f.test.js', './src/proto2/dir1/dir2/f.test.ss', './src/proto2/dir1/dir2/file' ];
+  var basePath = abs( '.' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/proto/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/dir1/**.(js|s|ss)';
+
+  var expectedRelative = [ './src', './src/proto', './src/proto/f.cc', './src/proto/f.js', './src/proto/f.ss', './src/proto/f.test.js', './src/proto/f.test.ss', './src/proto/file', './src/proto/dir1', './src/proto/dir1/dir2', './src/proto/dir1/dir2/f.cc', './src/proto/dir1/dir2/file', './src/proto2', './src/proto2/f.cc', './src/proto2/f.js', './src/proto2/f.ss', './src/proto2/f.test.js', './src/proto2/f.test.ss', './src/proto2/file', './src/proto2/dir1', './src/proto2/dir1/dir2', './src/proto2/dir1/dir2/f.cc', './src/proto2/dir1/dir2/f.js', './src/proto2/dir1/dir2/f.ss', './src/proto2/dir1/dir2/f.test.js', './src/proto2/dir1/dir2/f.test.ss', './src/proto2/dir1/dir2/file' ];
+  var basePath = abs( '.' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/proto/dir1/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/dir1/dir2/dir3/**.(js|s|ss)';
+
+  var expectedRelative = [ './src', './src/proto', './src/proto/f.cc', './src/proto/f.js', './src/proto/f.ss', './src/proto/f.test.js', './src/proto/f.test.ss', './src/proto/file', './src/proto/dir1', './src/proto/dir1/dir2', './src/proto/dir1/dir2/f.cc', './src/proto/dir1/dir2/f.js', './src/proto/dir1/dir2/f.ss', './src/proto/dir1/dir2/f.test.js', './src/proto/dir1/dir2/f.test.ss', './src/proto/dir1/dir2/file', './src/proto2', './src/proto2/f.cc', './src/proto2/f.js', './src/proto2/f.ss', './src/proto2/f.test.js', './src/proto2/f.test.ss', './src/proto2/file', './src/proto2/dir1', './src/proto2/dir1/dir2', './src/proto2/dir1/dir2/f.cc', './src/proto2/dir1/dir2/f.js', './src/proto2/dir1/dir2/f.ss', './src/proto2/dir1/dir2/f.test.js', './src/proto2/dir1/dir2/f.test.ss', './src/proto2/dir1/dir2/file' ];
+  var basePath = abs( '.' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/proto/dir1/dir2/dir3/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/dir3/**.(js|s|ss)';
+
+  var expectedRelative = [ './src', './src/proto', './src/proto/f.cc', './src/proto/f.js', './src/proto/f.ss', './src/proto/f.test.js', './src/proto/f.test.ss', './src/proto/file', './src/proto/dir1', './src/proto/dir1/dir2', './src/proto/dir1/dir2/f.cc', './src/proto/dir1/dir2/f.js', './src/proto/dir1/dir2/f.ss', './src/proto/dir1/dir2/f.test.js', './src/proto/dir1/dir2/f.test.ss', './src/proto/dir1/dir2/file', './src/proto2', './src/proto2/f.cc', './src/proto2/f.js', './src/proto2/f.ss', './src/proto2/f.test.js', './src/proto2/f.test.ss', './src/proto2/file', './src/proto2/dir1', './src/proto2/dir1/dir2', './src/proto2/dir1/dir2/f.cc', './src/proto2/dir1/dir2/f.js', './src/proto2/dir1/dir2/f.ss', './src/proto2/dir1/dir2/f.test.js', './src/proto2/dir1/dir2/f.test.ss', './src/proto2/dir1/dir2/file' ];
+  var basePath = abs( '.' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/proto/dir3/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/**.(js|s|ss)';
+
+  var expectedRelative = [ './src', './src/proto', './src/proto/f.cc', './src/proto/f.js', './src/proto/f.ss', './src/proto/f.test.js', './src/proto/f.test.ss', './src/proto/file', './src/proto/dir1', './src/proto/dir1/dir2', './src/proto/dir1/dir2/f.cc', './src/proto/dir1/dir2/f.js', './src/proto/dir1/dir2/f.ss', './src/proto/dir1/dir2/f.test.js', './src/proto/dir1/dir2/f.test.ss', './src/proto/dir1/dir2/file', './src/proto2', './src/proto2/f.cc', './src/proto2/file', './src/proto2/dir1', './src/proto2/dir1/dir2', './src/proto2/dir1/dir2/f.cc', './src/proto2/dir1/dir2/file' ];
+  var basePath = abs( '.' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/proto2/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/dir1/**.(js|s|ss)';
+
+  var expectedRelative = [ './src', './src/proto', './src/proto/f.cc', './src/proto/f.js', './src/proto/f.ss', './src/proto/f.test.js', './src/proto/f.test.ss', './src/proto/file', './src/proto/dir1', './src/proto/dir1/dir2', './src/proto/dir1/dir2/f.cc', './src/proto/dir1/dir2/f.js', './src/proto/dir1/dir2/f.ss', './src/proto/dir1/dir2/f.test.js', './src/proto/dir1/dir2/f.test.ss', './src/proto/dir1/dir2/file', './src/proto2', './src/proto2/f.cc', './src/proto2/f.js', './src/proto2/f.ss', './src/proto2/f.test.js', './src/proto2/f.test.ss', './src/proto2/file', './src/proto2/dir1', './src/proto2/dir1/dir2', './src/proto2/dir1/dir2/f.cc', './src/proto2/dir1/dir2/file' ];
+  var basePath = abs( '.' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/proto2/dir1/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/dir1/dir2/dir3/**.(js|s|ss)';
+
+  var expectedRelative = [ './src', './src/proto', './src/proto/f.cc', './src/proto/f.js', './src/proto/f.ss', './src/proto/f.test.js', './src/proto/f.test.ss', './src/proto/file', './src/proto/dir1', './src/proto/dir1/dir2', './src/proto/dir1/dir2/f.cc', './src/proto/dir1/dir2/f.js', './src/proto/dir1/dir2/f.ss', './src/proto/dir1/dir2/f.test.js', './src/proto/dir1/dir2/f.test.ss', './src/proto/dir1/dir2/file', './src/proto2', './src/proto2/f.cc', './src/proto2/f.js', './src/proto2/f.ss', './src/proto2/f.test.js', './src/proto2/f.test.ss', './src/proto2/file', './src/proto2/dir1', './src/proto2/dir1/dir2', './src/proto2/dir1/dir2/f.cc', './src/proto2/dir1/dir2/f.js', './src/proto2/dir1/dir2/f.ss', './src/proto2/dir1/dir2/f.test.js', './src/proto2/dir1/dir2/f.test.ss', './src/proto2/dir1/dir2/file' ];
+  var basePath = abs( '.' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/proto2/dir1/dir2/dir3/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/dir3/**.(js|s|ss)';
+
+  var expectedRelative = [ './src', './src/proto', './src/proto/f.cc', './src/proto/f.js', './src/proto/f.ss', './src/proto/f.test.js', './src/proto/f.test.ss', './src/proto/file', './src/proto/dir1', './src/proto/dir1/dir2', './src/proto/dir1/dir2/f.cc', './src/proto/dir1/dir2/f.js', './src/proto/dir1/dir2/f.ss', './src/proto/dir1/dir2/f.test.js', './src/proto/dir1/dir2/f.test.ss', './src/proto/dir1/dir2/file', './src/proto2', './src/proto2/f.cc', './src/proto2/f.js', './src/proto2/f.ss', './src/proto2/f.test.js', './src/proto2/f.test.ss', './src/proto2/file', './src/proto2/dir1', './src/proto2/dir1/dir2', './src/proto2/dir1/dir2/f.cc', './src/proto2/dir1/dir2/f.js', './src/proto2/dir1/dir2/f.ss', './src/proto2/dir1/dir2/f.test.js', './src/proto2/dir1/dir2/f.test.ss', './src/proto2/dir1/dir2/file' ];
+  var basePath = abs( '.' );
+  var filePath = abs
+  ({
+    './src' : './out',
+    './src/proto2/dir3/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* - */
+
+  test.close( 'filePath=src, basePath=.' );
+
+  test.open( 'filePath=src/proto, basePath=src' );
+
+  /* - */
+
+  test.case = 'filter=**.(js|s|ss)';
+
+  var expectedRelative = [ './proto', './proto/f.cc', './proto/file', './proto/dir1', './proto/dir1/dir2', './proto/dir1/dir2/f.cc', './proto/dir1/dir2/file' ];
+  var basePath = abs( 'src' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/**.(js|s|ss)';
+
+  var expectedRelative = [ './proto', './proto/f.cc', './proto/file', './proto/dir1', './proto/dir1/dir2', './proto/dir1/dir2/f.cc', './proto/dir1/dir2/file' ];
+  var basePath = abs( 'src' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/**.(js|s|ss)';
+
+  var expectedRelative = [ './proto', './proto/f.cc', './proto/file', './proto/dir1', './proto/dir1/dir2', './proto/dir1/dir2/f.cc', './proto/dir1/dir2/file' ];
+  var basePath = abs( 'src' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/dir1/**.(js|s|ss)';
+
+  var expectedRelative = [ './proto', './proto/f.cc', './proto/f.js', './proto/f.ss', './proto/f.test.js', './proto/f.test.ss', './proto/file', './proto/dir1', './proto/dir1/dir2', './proto/dir1/dir2/f.cc', './proto/dir1/dir2/file' ];
+  var basePath = abs( 'src' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto/dir1/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/dir1/dir2/dir3/**.(js|s|ss)';
+
+  var expectedRelative = [ './proto', './proto/f.cc', './proto/f.js', './proto/f.ss', './proto/f.test.js', './proto/f.test.ss', './proto/file', './proto/dir1', './proto/dir1/dir2', './proto/dir1/dir2/f.cc', './proto/dir1/dir2/f.js', './proto/dir1/dir2/f.ss', './proto/dir1/dir2/f.test.js', './proto/dir1/dir2/f.test.ss', './proto/dir1/dir2/file' ];
+  var basePath = abs( 'src' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto/dir1/dir2/dir3/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/dir3/**.(js|s|ss)';
+
+  var expectedRelative = [ './proto', './proto/f.cc', './proto/f.js', './proto/f.ss', './proto/f.test.js', './proto/f.test.ss', './proto/file', './proto/dir1', './proto/dir1/dir2', './proto/dir1/dir2/f.cc', './proto/dir1/dir2/f.js', './proto/dir1/dir2/f.ss', './proto/dir1/dir2/f.test.js', './proto/dir1/dir2/f.test.ss', './proto/dir1/dir2/file' ];
+  var basePath = abs( 'src' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto/dir3/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/**.(js|s|ss)';
+
+  var expectedRelative = [ './proto', './proto/f.cc', './proto/f.js', './proto/f.ss', './proto/f.test.js', './proto/f.test.ss', './proto/file', './proto/dir1', './proto/dir1/dir2', './proto/dir1/dir2/f.cc', './proto/dir1/dir2/f.js', './proto/dir1/dir2/f.ss', './proto/dir1/dir2/f.test.js', './proto/dir1/dir2/f.test.ss', './proto/dir1/dir2/file' ];
+  var basePath = abs( 'src' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto2/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/dir1/**.(js|s|ss)';
+
+  var expectedRelative = [ './proto', './proto/f.cc', './proto/f.js', './proto/f.ss', './proto/f.test.js', './proto/f.test.ss', './proto/file', './proto/dir1', './proto/dir1/dir2', './proto/dir1/dir2/f.cc', './proto/dir1/dir2/f.js', './proto/dir1/dir2/f.ss', './proto/dir1/dir2/f.test.js', './proto/dir1/dir2/f.test.ss', './proto/dir1/dir2/file' ];
+  var basePath = abs( 'src' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto2/dir1/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/dir1/dir2/dir3/**.(js|s|ss)';
+
+  var expectedRelative = [ './proto', './proto/f.cc', './proto/f.js', './proto/f.ss', './proto/f.test.js', './proto/f.test.ss', './proto/file', './proto/dir1', './proto/dir1/dir2', './proto/dir1/dir2/f.cc', './proto/dir1/dir2/f.js', './proto/dir1/dir2/f.ss', './proto/dir1/dir2/f.test.js', './proto/dir1/dir2/f.test.ss', './proto/dir1/dir2/file' ];
+  var basePath = abs( 'src' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto2/dir1/dir2/dir3/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/dir3/**.(js|s|ss)';
+
+  var expectedRelative = [ './proto', './proto/f.cc', './proto/f.js', './proto/f.ss', './proto/f.test.js', './proto/f.test.ss', './proto/file', './proto/dir1', './proto/dir1/dir2', './proto/dir1/dir2/f.cc', './proto/dir1/dir2/f.js', './proto/dir1/dir2/f.ss', './proto/dir1/dir2/f.test.js', './proto/dir1/dir2/f.test.ss', './proto/dir1/dir2/file' ];
+  var basePath = abs( 'src' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto2/dir3/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* - */
+
+  test.close( 'filePath=src/proto, basePath=src' );
+
+  test.open( 'filePath=src/proto, basePath=src/proto2/proto3' );
+
+  /* - */
+
+  test.case = 'filter=**.(js|s|ss)';
+
+  var expectedRelative = [ '../../proto', '../../proto/f.cc', '../../proto/file', '../../proto/dir1', '../../proto/dir1/dir2', '../../proto/dir1/dir2/f.cc', '../../proto/dir1/dir2/file' ];
+  var basePath = abs( 'src/proto2/proto3' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/**.(js|s|ss)';
+
+  var expectedRelative = [ '../../proto', '../../proto/f.cc', '../../proto/file', '../../proto/dir1', '../../proto/dir1/dir2', '../../proto/dir1/dir2/f.cc', '../../proto/dir1/dir2/file' ];
+  var basePath = abs( 'src/proto2/proto3' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/**.(js|s|ss)';
+
+  var expectedRelative = [ '../../proto', '../../proto/f.cc', '../../proto/file', '../../proto/dir1', '../../proto/dir1/dir2', '../../proto/dir1/dir2/f.cc', '../../proto/dir1/dir2/file' ];
+  var basePath = abs( 'src/proto2/proto3' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/dir1/**.(js|s|ss)';
+
+  var expectedRelative = [ '../../proto', '../../proto/f.cc', '../../proto/f.js', '../../proto/f.ss', '../../proto/f.test.js', '../../proto/f.test.ss', '../../proto/file', '../../proto/dir1', '../../proto/dir1/dir2', '../../proto/dir1/dir2/f.cc', '../../proto/dir1/dir2/file' ];
+  var basePath = abs( 'src/proto2/proto3' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto/dir1/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/dir1/dir2/dir3/**.(js|s|ss)';
+
+  var expectedRelative = [ '../../proto', '../../proto/f.cc', '../../proto/f.js', '../../proto/f.ss', '../../proto/f.test.js', '../../proto/f.test.ss', '../../proto/file', '../../proto/dir1', '../../proto/dir1/dir2', '../../proto/dir1/dir2/f.cc', '../../proto/dir1/dir2/f.js', '../../proto/dir1/dir2/f.ss', '../../proto/dir1/dir2/f.test.js', '../../proto/dir1/dir2/f.test.ss', '../../proto/dir1/dir2/file' ];
+  var basePath = abs( 'src/proto2/proto3' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto/dir1/dir2/dir3/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto/dir3/**.(js|s|ss)';
+
+  var expectedRelative = [ '../../proto', '../../proto/f.cc', '../../proto/f.js', '../../proto/f.ss', '../../proto/f.test.js', '../../proto/f.test.ss', '../../proto/file', '../../proto/dir1', '../../proto/dir1/dir2', '../../proto/dir1/dir2/f.cc', '../../proto/dir1/dir2/f.js', '../../proto/dir1/dir2/f.ss', '../../proto/dir1/dir2/f.test.js', '../../proto/dir1/dir2/f.test.ss', '../../proto/dir1/dir2/file' ];
+  var basePath = abs( 'src/proto2/proto3' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto/dir3/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/**.(js|s|ss)';
+
+  var expectedRelative = [ '../../proto', '../../proto/f.cc', '../../proto/f.js', '../../proto/f.ss', '../../proto/f.test.js', '../../proto/f.test.ss', '../../proto/file', '../../proto/dir1', '../../proto/dir1/dir2', '../../proto/dir1/dir2/f.cc', '../../proto/dir1/dir2/f.js', '../../proto/dir1/dir2/f.ss', '../../proto/dir1/dir2/f.test.js', '../../proto/dir1/dir2/f.test.ss', '../../proto/dir1/dir2/file' ];
+  var basePath = abs( 'src/proto2/proto3' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto2/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/dir1/**.(js|s|ss)';
+
+  var expectedRelative = [ '../../proto', '../../proto/f.cc', '../../proto/f.js', '../../proto/f.ss', '../../proto/f.test.js', '../../proto/f.test.ss', '../../proto/file', '../../proto/dir1', '../../proto/dir1/dir2', '../../proto/dir1/dir2/f.cc', '../../proto/dir1/dir2/f.js', '../../proto/dir1/dir2/f.ss', '../../proto/dir1/dir2/f.test.js', '../../proto/dir1/dir2/f.test.ss', '../../proto/dir1/dir2/file' ];
+  var basePath = abs( 'src/proto2/proto3' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto2/dir1/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/dir1/dir2/dir3/**.(js|s|ss)';
+
+  var expectedRelative = [ '../../proto', '../../proto/f.cc', '../../proto/f.js', '../../proto/f.ss', '../../proto/f.test.js', '../../proto/f.test.ss', '../../proto/file', '../../proto/dir1', '../../proto/dir1/dir2', '../../proto/dir1/dir2/f.cc', '../../proto/dir1/dir2/f.js', '../../proto/dir1/dir2/f.ss', '../../proto/dir1/dir2/f.test.js', '../../proto/dir1/dir2/f.test.ss', '../../proto/dir1/dir2/file' ];
+  var basePath = abs( 'src/proto2/proto3' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto2/dir1/dir2/dir3/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /**/
+
+  test.case = 'filter=src/proto2/dir3/**.(js|s|ss)';
+
+  var expectedRelative = [ '../../proto', '../../proto/f.cc', '../../proto/f.js', '../../proto/f.ss', '../../proto/f.test.js', '../../proto/f.test.ss', '../../proto/file', '../../proto/dir1', '../../proto/dir1/dir2', '../../proto/dir1/dir2/f.cc', '../../proto/dir1/dir2/f.js', '../../proto/dir1/dir2/f.ss', '../../proto/dir1/dir2/f.test.js', '../../proto/dir1/dir2/f.test.ss', '../../proto/dir1/dir2/file' ];
+  var basePath = abs( 'src/proto2/proto3' );
+  var filePath = abs
+  ({
+    './src/proto' : './out',
+    './src/proto2/dir3/**.(js|s|ss)' : false,
+  });
+  var records = find({ filter : { filePath, basePath } });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* - */
+
+  test.close( 'filePath=src/proto, basePath=src/proto2/proto3' );
+
+  /* - */
+
+  debugger; return; xxx
+} /* end of filesFindTotalNegative */
 
 //
 
@@ -11038,7 +13301,8 @@ function filesReflectWithFilter( test )
     prepare : prepareSingle,
   }
 
-  context._filesReflectWithFilter( test, o );
+  debugger;
+  _filesReflectWithFilter.call( context, test, o );
 
   /* */
 
@@ -11047,7 +13311,7 @@ function filesReflectWithFilter( test )
     prepare : prepareTwo,
   }
 
-  context._filesReflectWithFilter( test, o );
+  _filesReflectWithFilter.call( context, test, o );
 
 }
 
@@ -11516,7 +13780,7 @@ function filesReflect( test )
     prepare : prepareSingle,
   }
 
-  context._filesReflect( test, o );
+  _filesReflect.call( context, test, o );
 
   /* */
 
@@ -11525,7 +13789,7 @@ function filesReflect( test )
     prepare : prepareTwo,
   }
 
-  context._filesReflect( test, o );
+  _filesReflect.call( context, test, o );
 
 }
 
@@ -21123,13 +23387,8 @@ var Self =
     hub : null,
     testSuitePath : null,
 
-    makeStandardExtract,
-    _generatePath,
-    _filesReflect,
-    // _filesReflectBrokenCases,
-    _filesReflectWithFilter,
     softLinkIsSupported,
-    // select,
+    makeStandardExtract,
 
   },
 
@@ -21146,7 +23405,6 @@ var Self =
     filesFindRecursive,
     filesFindLinked,
     filesFindResolving,
-    // filesFindPerformance,
     filesFindGlob,
     filesFindOn,
     filesFindBaseFromGlob,
@@ -21155,9 +23413,13 @@ var Self =
     filesFindSimplifyGlob,
     filesFindMandatoryString,
     filesFindMandatoryMap,
-    filesFindRelative,
-    filesFinder,
+    filesFindExcludingNodeModules,
+    filesFindGlobComplex,
 
+    filesFindAnyPositive,
+    filesFindTotalPositive,
+    filesFindSeveralTotalPositive,
+    filesFindTotalNegative,
 
     filesFindGroups,
 
@@ -21167,8 +23429,7 @@ var Self =
     filesReflectMandatory,
     filesReflectMutuallyExcluding,
     filesReflectWithFilter,
-    filesReflect, /* qqq : Extract test case which fails from filesReflect to separate test routine. Then fix, please. */
-    // filesReflectBrokenCases,
+    filesReflect,
     filesReflectRecursive,
     filesReflectToItself,
     filesReflectGrab,

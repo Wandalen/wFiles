@@ -4275,119 +4275,114 @@ function pathsExtendJoiningOnlyBasePath( test )
   /* - */
 
   test.case = 'dst base is string, src base is string';
-
   var dst = provider.recordFilter();
   dst.basePath = '/dst/base';
-
   var src = provider.recordFilter();
   src.basePath = '.';
-
   dst.pathsExtendJoining( src );
 
   test.identical( dst.prefixPath, null );
   test.identical( dst.filePath, null );
   test.identical( dst.basePath, '/dst/base' );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, null );
+  test.identical( src.basePath, '.' );
 
   /* - */
 
   test.case = 'dst base is string, src base is string';
-
   var dst = provider.recordFilter();
   dst.basePath = 'dst/base';
-
   var src = provider.recordFilter();
   src.basePath = 'src/base';
-
   dst.pathsExtendJoining( src );
 
   test.identical( dst.prefixPath, null );
   test.identical( dst.filePath, null );
   test.identical( dst.basePath, 'dst/base/src/base' );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, null );
+  test.identical( src.basePath, 'src/base' );
 
   /* - */
 
   test.case = 'dst base is map with no src, src base is string';
-
   var dst = provider.recordFilter();
   dst.basePath = { '' : 'dst/base' };
-
   var src = provider.recordFilter();
   src.basePath = 'src/base';
-
-  var dst = provider.recordFilter();
-  dst.pathsExtendJoining( dst ).pathsExtendJoining( src );
+  dst.pathsExtendJoining( src );
 
   test.identical( dst.prefixPath, null );
   test.identical( dst.filePath, null );
   test.identical( dst.basePath, 'dst/base/src/base' );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, null );
+  test.identical( src.basePath, 'src/base' );
 
   /* - */
 
   test.case = 'dst base is map, src base is string';
-
   var dst = provider.recordFilter();
   dst.basePath = { '.' : 'dst/base' };
-
   var src = provider.recordFilter();
   src.basePath = 'src/base';
-
-  var dst = provider.recordFilter();
-  dst.pathsExtendJoining( dst ).pathsExtendJoining( src );
+  dst.pathsExtendJoining( src );
 
   test.identical( dst.prefixPath, null );
   test.identical( dst.filePath, null );
   test.identical( dst.basePath, 'src/base' );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, null );
+  test.identical( src.basePath, 'src/base' );
 
   /* - */
 
   test.case = 'dst base is string, src base is map';
-
   var dst = provider.recordFilter();
   dst.basePath = 'dst/base';
-
   var src = provider.recordFilter();
   src.basePath = { '.' : 'src/base' };
-
-  var dst = provider.recordFilter();
-  dst.pathsExtendJoining( dst ).pathsExtendJoining( src );
+  dst.pathsExtendJoining( src );
 
   test.identical( dst.prefixPath, null );
   test.identical( dst.filePath, null );
   test.identical( dst.basePath, { '.' : 'src/base' } );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, null );
+  test.identical( src.basePath, { '.' : 'src/base' } );
 
   /* - */
 
   test.case = 'dst base is map, src base is map, collising';
-
   var dst = provider.recordFilter();
   dst.basePath = { '.' : 'dst/base' };
-
   var src = provider.recordFilter();
   src.basePath = { '.' : 'src/base' };
-
-  var dst = provider.recordFilter();
-  dst.pathsExtendJoining( dst ).pathsExtendJoining( src );
+  dst.pathsExtendJoining( src );
 
   test.identical( dst.prefixPath, null );
   test.identical( dst.filePath, null );
   test.identical( dst.basePath, { '.' : 'dst/base/src/base' } );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, null );
+  test.identical( src.basePath, { '.' : 'src/base' } );
 
   /* - */
 
   test.case = 'dst base is map, src base is map, no collising';
-
   var dst = provider.recordFilter();
   dst.basePath = { 'dst' : 'dst/base' };
-
   var src = provider.recordFilter();
   src.basePath = { 'src' : 'src/base' };
-
-  var dst = provider.recordFilter();
-  dst.pathsExtendJoining( dst ).pathsExtendJoining( src );
+  dst.pathsExtendJoining( src );
 
   test.identical( dst.prefixPath, null );
   test.identical( dst.filePath, null );
   test.identical( dst.basePath, { 'src' : 'src/base' } );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, null );
+  test.identical( src.basePath, { 'src' : 'src/base' } );
 
 }
 

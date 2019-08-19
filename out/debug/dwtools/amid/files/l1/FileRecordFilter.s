@@ -2823,25 +2823,25 @@ function filePathGlobSimplify( filePath, basePath )
 
   /**/
 
-  filePath = path.filterPairsInplace( filePath, ( it ) =>
-  {
-    if( filter.src )
-    {
-    }
-    else
-    {
-      let normalized = path.globNormalize( it.src );
-      if( it.src !== normalized )
-      if( _.mapIs( basePath ) && basePath[ it.src ] )
-      {
-        let base = basePath[ it.src ];
-        delete basePath[ it.src ];
-        basePath[ normalized ] = base;
-      }
-      it.src = normalized;
-    }
-    return { [ it.src ] : it.dst }
-  });
+  // filePath = path.filterPairsInplace( filePath, ( it ) =>
+  // {
+  //   if( filter.src )
+  //   {
+  //   }
+  //   else
+  //   {
+  //     let normalized = path.globNormalize( it.src );
+  //     if( it.src !== normalized )
+  //     if( _.mapIs( basePath ) && basePath[ it.src ] )
+  //     {
+  //       let base = basePath[ it.src ];
+  //       delete basePath[ it.src ];
+  //       basePath[ normalized ] = base;
+  //     }
+  //     it.src = normalized;
+  //   }
+  //   return { [ it.src ] : it.dst }
+  // });
 
   /**/
 
@@ -3751,6 +3751,8 @@ function pathsRefine()
   _.assert( filter.formed === 2 );
   _.assert( filter.basePath === null || _.strIs( filter.basePath ) || _.mapIs( filter.basePath ) );
 
+  debugger;
+
   filter.prefixesApply({ booleanFallingBack : 1 });
 
   _.assert( filter.prefixPath === null, 'Prefixes should be applied so far' );
@@ -3760,7 +3762,6 @@ function pathsRefine()
   if( prefix )
   prefix = filter.pathLocalize( prefix );
 
-  debugger;
   let basePath = filter.basePathFromDecoratedFilePath( filter.filePath );
 
   filter.filePath = filter.filePathNormalize( filter.filePath );
@@ -4424,54 +4425,56 @@ function masksGenerate()
   if( !_.entityIdentical( filePath2, filePath ) )
   globFound = filter.filePathIsComplex( filePath2 );
 
-  if( globFound )
-  {
-    _.assert( !filter.src );
-    _.assert( filter.formedFilterMap === null );
-    filter.formedFilterMap = Object.create( null );
-
-    let _processed = path.pathMapToRegexps( filePath2, basePath2  );
-
-    filter.formedBasePath = _processed.unglobedBasePath;
-    filter.formedFilePath = _processed.unglobedFilePath;
-
-    filter.assertBasePath();
-
-    for( let p in _processed.regexpMap )
-    {
-      let basePath = filter.formedBasePath[ p ];
-      _.assert( _.strDefined( basePath ), 'No base path for', p );
-      let relative = p;
-      let regexps = _processed.regexpMap[ p ];
-      _.assert( !filter.formedFilterMap[ relative ] );
-      let subfilter = filter.formedFilterMap[ relative ] = Object.create( null );
-
-      subfilter.maskAll = _.RegexpObject.Or( filter.maskAll.clone(), { includeAll : regexps.actualAll, includeAny : regexps.actualAny, excludeAny : regexps.actualNone } );
-      subfilter.maskTerminal = filter.maskTerminal.clone();
-      subfilter.maskDirectory = filter.maskDirectory.clone();
-
-      subfilter.maskTransientAll = filter.maskTransientAll.clone();
-      subfilter.maskTransientTerminal = _.RegexpObject.Or( filter.maskTransientTerminal.clone(), { includeAny : /$_^/ } );
-      // subfilter.maskTransientTerminal = filter.maskTransientTerminal.clone(); // zzz
-      // subfilter.maskTransientDirectory = _.RegexpObject.Or( filter.maskTransientDirectory.clone(), { includeAny : regexps.transient } ); // yyy
-      subfilter.maskTransientDirectory = _.RegexpObject.Or( filter.maskTransientDirectory.clone(), { includeAll : regexps.transient } );
-
-      regexps.actualNone.forEach( ( none ) =>
-      {
-        let certainly = regexps.certainlyHash.get( none );
-        if( certainly )
-        subfilter.maskTransientDirectory.excludeAny.push( certainly );
-      });
-
-      _.assert( subfilter.maskAll !== filter.maskAll );
-    }
-
-    end();
-  }
-  else
+  if( !globFound )
   {
     copy( filePath2, basePath2 );
+    end();
+    return;
   }
+
+  _.assert( !filter.src );
+  _.assert( filter.formedFilterMap === null );
+  filter.formedFilterMap = Object.create( null );
+
+  let _processed = path.pathMapToRegexps( filePath2, basePath2  );
+
+  filter.formedBasePath = _processed.unglobedBasePath;
+  filter.formedFilePath = _processed.unglobedFilePath;
+
+  filter.assertBasePath();
+
+  for( let p in _processed.regexpMap )
+  {
+    let basePath = filter.formedBasePath[ p ];
+    _.assert( _.strDefined( basePath ), 'No base path for', p );
+    let relative = p;
+    let regexps = _processed.regexpMap[ p ];
+    _.assert( !filter.formedFilterMap[ relative ] );
+    let subfilter = filter.formedFilterMap[ relative ] = Object.create( null );
+
+    subfilter.maskAll = _.RegexpObject.Or( filter.maskAll.clone(), { includeAll : regexps.actualAll, includeAny : regexps.actualAny, excludeAny : regexps.actualNone } );
+    subfilter.maskTerminal = filter.maskTerminal.clone();
+    subfilter.maskDirectory = filter.maskDirectory.clone();
+
+    subfilter.maskTransientAll = filter.maskTransientAll.clone();
+    subfilter.maskTransientTerminal = _.RegexpObject.Or( filter.maskTransientTerminal.clone(), { includeAny : /$_^/ } );
+    // subfilter.maskTransientTerminal = filter.maskTransientTerminal.clone(); // zzz
+    // subfilter.maskTransientDirectory = _.RegexpObject.Or( filter.maskTransientDirectory.clone(), { includeAny : regexps.transient } ); // yyy
+    subfilter.maskTransientDirectory = _.RegexpObject.Or( filter.maskTransientDirectory.clone(), { includeAll : regexps.transient } );
+
+    regexps.actualNone.forEach( ( none ) =>
+    {
+      let certainly = regexps.certainlyHash.get( none );
+      if( certainly )
+      subfilter.maskTransientDirectory.excludeAny.push( certainly );
+    });
+
+    _.assert( subfilter.maskAll !== filter.maskAll );
+  }
+
+  end();
+
+  /* */
 
   function copy( filePath, basePath )
   {
@@ -4485,6 +4488,8 @@ function masksGenerate()
 
     end();
   }
+
+  /* */
 
   function end()
   {
@@ -4527,6 +4532,10 @@ function _applyToRecordMasks( record )
   // debugger;
   // if( _.strEnds( record.absolute, 'src1Terminal' ) )
   // debugger;
+
+  if( _.strEnds( record.absolute, 'src1' ) )
+  debugger;
+
   // if( _.strHas( record.absolute, '-' ) )
   // debugger;
 

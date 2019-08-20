@@ -10729,6 +10729,7 @@ function filesFindGroups( test )
   found.options = !!found.options;
   test.identical( found, expected );
 
+  /* */
 
   test.case = 'mandatory : 1';
   var map =
@@ -10738,10 +10739,11 @@ function filesFindGroups( test )
     outputFormat : 'relative',
     mandatory : 1,
   }
-  var found = provider.filesFindGroups( map );
+  var found = provider.filesFindGroups( op );
   found.options = !!found.options;
   test.identical( found, expected );
 
+  /* */
 
   test.case = 'mandatory : 0';
   var map =
@@ -10751,10 +10753,11 @@ function filesFindGroups( test )
     outputFormat : 'relative',
     mandatory : 0,
   }
-  var found = provider.filesFindGroups( map ); /* qqq : bad naming! */
+  var found = provider.filesFindGroups( op ); /* qqq : bad naming! */
   found.options = !!found.options;
   test.identical( found, expected );
 
+  /* */
 
   test.case = 'sync : 0';
   var map =
@@ -10764,10 +10767,11 @@ function filesFindGroups( test )
     outputFormat : 'relative',
     sync : 0,
   }
-  var found = provider.filesFindGroups( map );
+  var found = provider.filesFindGroups( op );
   found.options = !!found.options;
   test.identical( found, expected );
 
+  /* */
 
   test.case = 'mode : legacy';
   var map =
@@ -10777,10 +10781,11 @@ function filesFindGroups( test )
     outputFormat : 'relative',
     mode : 'legacy',
   }
-  var found = provider.filesFindGroups( map );
+  var found = provider.filesFindGroups( op );
   found.options = !!found.options;
   test.identical( found, expected );
 
+  /* */
 
   test.case = 'recursive : 1, mandatory : 0';
   var expected =
@@ -10818,10 +10823,11 @@ function filesFindGroups( test )
     outputFormat : 'relative',
     recursive : 1,
   }
-  var found = provider.filesFindGroups( map );
+  var found = provider.filesFindGroups( op );
   found.options = !!found.options;
   test.identical( found, expected );
 
+  /* */
 
   test.case = 'recursive : 0';
   var expected =
@@ -10850,7 +10856,7 @@ function filesFindGroups( test )
     recursive : 0,
     mandatory : 0,
   }
-  var found = provider.filesFindGroups( map );
+  var found = provider.filesFindGroups( op );
   found.options = !!found.options;
   test.identical( found, expected );
 

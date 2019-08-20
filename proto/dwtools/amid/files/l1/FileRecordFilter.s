@@ -1013,29 +1013,26 @@ function _pathsAmmend( o )
     filter.prefixesApply({ filePathDeducingFromFixes, booleanFallingBack });
   }
 
-  _.assert( o.src.prefixPath === null || filter.prefixPath === null );
-  _.assert( o.src.postfixPath === null || filter.postfixPath === null );
-  _.assert( o.src.postfixPath === null && filter.postfixPath === null, 'not implemented' );
-
-  if( o.src.prefixPath === '' )
+  if( filter.prefixPath === '' )
   {
     filter.prefixPath = null;
     debugger; /* qqq : cover please */
   }
-  else
-  {
-    filter.prefixPath = filter.prefixPath || o.src.prefixPath;
-  }
 
-  if( o.src.postfixPath === '' )
+  if( filter.postfixPath === '' )
   {
     filter.postfixPath = null;
     debugger; /* qqq : cover please */
   }
-  else
-  {
-    filter.postfixPath = filter.postfixPath || o.src.postfixPath;
-  }
+
+  _.assert( o.src.prefixPath === '' || o.src.prefixPath === null || filter.prefixPath === null );
+  _.assert( o.src.postfixPath === '' || o.src.postfixPath === null || filter.postfixPath === null );
+
+  if( o.src.prefixPath !== null )
+  filter.prefixPath = o.src.prefixPath || null;
+
+  if( o.src.postfixPath !== null )
+  filter.postfixPath = o.src.postfixPath || null;
 
   /* base path */
 
@@ -2526,7 +2523,7 @@ function filePathSelect( srcPath, dstPath )
     }
 
     dst.filePath = filePath;
-    dst.form();
+    dst._formPaths(); // yyy
     dstPath = dst.filePathSimplest();
     _.assert( _.strIs( dstPath ) );
     filePath = dst.filePath;
@@ -2552,7 +2549,7 @@ function filePathSelect( srcPath, dstPath )
 
     src.filePath = filePath;
     _.assert( dst === null || src.filePath === dst.filePath );
-    src.form();
+    src._formPaths(); // yyy
     _.assert( dst === null || src.filePath === dst.filePath );
   }
   catch( err )
@@ -3751,8 +3748,6 @@ function pathsRefine()
   _.assert( filter.formed === 2 );
   _.assert( filter.basePath === null || _.strIs( filter.basePath ) || _.mapIs( filter.basePath ) );
 
-  debugger;
-
   filter.prefixesApply({ booleanFallingBack : 1 });
 
   _.assert( filter.prefixPath === null, 'Prefixes should be applied so far' );
@@ -4423,12 +4418,13 @@ function masksGenerate()
   let basePath2 = _.mapExtend( null, basePath );
   filter.filePathGlobSimplify( filePath2, basePath2 );
   if( !_.entityIdentical( filePath2, filePath ) )
-  globFound = filter.filePathIsComplex( filePath2 );
+  {
+    globFound = filter.filePathIsComplex( filePath2 );
+  }
 
   if( !globFound )
   {
     copy( filePath2, basePath2 );
-    end();
     return;
   }
 
@@ -4438,29 +4434,77 @@ function masksGenerate()
 
   let _processed = path.pathMapToRegexps( filePath2, basePath2  );
 
-  filter.formedBasePath = _processed.unglobedBasePath;
-  filter.formedFilePath = _processed.unglobedFilePath;
+  // filter.formedBasePath = _processed.unglobedBasePath;
+  // filter.formedFilePath = _processed.unglobedFilePath;
 
-  filter.assertBasePath();
-
-  for( let p in _processed.regexpMap )
+  if( filter.recursive === 2 )
   {
-    let basePath = filter.formedBasePath[ p ];
-    _.assert( _.strDefined( basePath ), 'No base path for', p );
-    let relative = p;
-    let regexps = _processed.regexpMap[ p ];
-    _.assert( !filter.formedFilterMap[ relative ] );
-    let subfilter = filter.formedFilterMap[ relative ] = Object.create( null );
+    filter.formedBasePath = _processed.optimizedUnglobedBasePath;
+    filter.formedFilePath = _processed.optimizedUnglobedFilePath;
+  }
+  else
+  {
+    filter.formedBasePath = _processed.unglobedBasePath;
+    filter.formedFilePath = _processed.unglobedFilePath;
+  }
 
-    subfilter.maskAll = _.RegexpObject.Or( filter.maskAll.clone(), { includeAll : regexps.actualAll, includeAny : regexps.actualAny, excludeAny : regexps.actualNone } );
+  filter.assertBasePath( filter.formedFilePath, filter.formedBasePath );
+
+  let regexpsMap = filter.recursive === 2 ? _processed.optimalRegexpsMap : _processed.regexpsMap;
+  for( let stemPath in regexpsMap )
+  masksSet( stemPath, regexpsMap[ stemPath ], filter.formedFilterMap );
+
+  end();
+
+  /* */
+
+  function masksSet( stemPath, regexps, dstMap )
+  {
+
+    let basePath = filter.formedBasePath[ stemPath ];
+    _.assert( _.strDefined( basePath ), 'No base path for', stemPath );
+    // let relative = stemPath;
+    // let regexps = _processed.optimalRegexpsMap[ stemPath ];
+    _.assert( !dstMap[ stemPath ] );
+    let subfilter = dstMap[ stemPath ] = Object.create( null );
+
+    // subfilter.maskAll = _.RegexpObject.Extend( filter.maskAll.clone(), { includeAll : regexps.actualAll, includeAny : regexps.actualAny, excludeAny : regexps.actualNone } );
+    // subfilter.maskTerminal = filter.maskTerminal.clone();
+    // subfilter.maskDirectory = filter.maskDirectory.clone();
+
+    // debugger;
+    subfilter.maskAll = filter.maskAll.clone().extend
+    ({
+      includeAll : regexps.actualAll,
+      includeAny : regexps.actualAny,
+      excludeAny : regexps.actualNone,
+    });
     subfilter.maskTerminal = filter.maskTerminal.clone();
     subfilter.maskDirectory = filter.maskDirectory.clone();
 
+    // subfilter.maskTerminal = filter.maskTerminal.clone().extend
+    // ({
+    //   includeAny : regexps.actualAny2,
+    // });
+    // subfilter.maskDirectory = filter.maskDirectory.clone().extend
+    // ({
+    //   includeAny : regexps.actualAny2,
+    // });
+
     subfilter.maskTransientAll = filter.maskTransientAll.clone();
-    subfilter.maskTransientTerminal = _.RegexpObject.Or( filter.maskTransientTerminal.clone(), { includeAny : /$_^/ } );
-    // subfilter.maskTransientTerminal = filter.maskTransientTerminal.clone(); // zzz
-    // subfilter.maskTransientDirectory = _.RegexpObject.Or( filter.maskTransientDirectory.clone(), { includeAny : regexps.transient } ); // yyy
-    subfilter.maskTransientDirectory = _.RegexpObject.Or( filter.maskTransientDirectory.clone(), { includeAll : regexps.transient } );
+    subfilter.maskTransientTerminal = filter.maskTransientTerminal.clone().extend
+    ({
+      includeAny : /$_^/
+    });
+    subfilter.maskTransientDirectory = filter.maskTransientDirectory.clone().extend
+    ({
+      includeAny : regexps.transient
+    });
+
+    // subfilter.maskTransientTerminal = _.RegexpObject.Extend( filter.maskTransientTerminal.clone(), { includeAny : /$_^/ } );
+    // // subfilter.maskTransientTerminal = filter.maskTransientTerminal.clone(); // zzz
+    // // subfilter.maskTransientDirectory = _.RegexpObject.Extend( filter.maskTransientDirectory.clone(), { includeAny : regexps.transient } ); // yyy
+    // subfilter.maskTransientDirectory = _.RegexpObject.Extend( filter.maskTransientDirectory.clone(), { includeAll : regexps.transient } );
 
     regexps.actualNone.forEach( ( none ) =>
     {
@@ -4469,10 +4513,16 @@ function masksGenerate()
       subfilter.maskTransientDirectory.excludeAny.push( certainly );
     });
 
-    _.assert( subfilter.maskAll !== filter.maskAll );
-  }
+    // regexps.actualAll.forEach( ( none ) =>
+    // {
+    //   let certainly = regexps.certainlyHash.get( none );
+    //   if( certainly )
+    //   subfilter.maskTransientDirectory.excludeAny.push( certainly );
+    // });
 
-  end();
+    _.assert( subfilter.maskAll !== filter.maskAll );
+
+  }
 
   /* */
 
@@ -4520,24 +4570,20 @@ function _applyToRecordMasks( record )
   let f = record.factory;
   let path = record.path;
   let masks = filter;
-  masks = filter.formedFilterMap ? masks.formedFilterMap[ f.stemPath ] : filter;
+  masks = filter.formedFilterMap ? filter.formedFilterMap[ f.stemPath ] : filter;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( !!filter, 'Cant resolve filter map for stem path', () => _.strQuote( f.stemPath ) );
+  _.assert( !!masks, 'Cant resolve filter map for stem path', () => _.strQuote( f.stemPath ) );
   _.assert( !!f.formed, 'Record factor was not formed!' );
 
-  // if( _.strEnds( record.absolute, 'dir1/dir2' ) )
+  // if( _.strEnds( record.absolute, 'proto2' ) )
   // debugger;
-  // if( _.strEnds( record.absolute, 'src' ) )
+  // if( _.strEnds( record.absolute, 'proto' ) )
   // debugger;
-  // if( _.strEnds( record.absolute, 'src1Terminal' ) )
+  // if( _.strEnds( record.absolute, 'proto/f.js' ) )
   // debugger;
-
-  if( _.strEnds( record.absolute, 'src1' ) )
+  if( _.strHas( record.absolute, 'dir2' ) )
   debugger;
-
-  // if( _.strHas( record.absolute, '-' ) )
-  // debugger;
 
   /* */
 
@@ -4696,6 +4742,7 @@ let Composes =
   hasExtension : null,
   begins : null,
   ends : null,
+  recursive : null,
 
   maskTransientAll : null,
   maskTransientTerminal : null,

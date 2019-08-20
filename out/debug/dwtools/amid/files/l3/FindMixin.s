@@ -45,7 +45,7 @@ function recordsOrder( records, orderingExclusion )
   if( !orderingExclusion.length )
   return records;
 
-  orderingExclusion = _.RegexpObject.order( orderingExclusion || [] );
+  orderingExclusion = _.RegexpObject.Order( orderingExclusion || [] );
 
   let removed = [];
   let result = [];
@@ -165,7 +165,7 @@ function _filesFindPrepare1( routine, args )
 
   let hasGlob = o.filter.filePathHasGlob();
 
-  o.filter.effectiveFileProvider._providerDefaultsApply( o );
+  // o.filter.effectiveFileProvider._providerDefaultsApply( o );
 
   if( o.recursive === null )
   {
@@ -174,6 +174,8 @@ function _filesFindPrepare1( routine, args )
     else
     o.recursive = hasGlob ? 2 : 1;
   }
+  if( o.filter.recursive === null )
+  o.filter.recursive = o.recursive;
 
   if( o.includingDefunct === null )
   {
@@ -215,9 +217,20 @@ function _filesFindPrepare1( routine, args )
   o.includingStem = 1;
   o.includingStem = !!o.includingStem;
 
+  // self._filesFindFilterPrepare( o );
+
+  if( !o.filter.formed || o.filter.formed < 5 )
+  o.filter.form();
+
+  o.filter.effectiveFileProvider._providerDefaultsApply( o );
+
   if( Config.debug )
   {
     _.assert( o.recursive === 0 || o.recursive === 1 || o.recursive === 2, () => 'Incorrect value of recursive option', _.strQuote( o.recursive ), ', should be 0, 1 or 2' );
+    _.assert( !self.hub || o.filter.hubFileProvider === self.hub );
+    _.assert( !!o.filter.effectiveFileProvider );
+    _.assert( path.s.allAreNormalized( o.filter.filePath ) );
+    _.assert( o.filter.recursive === o.recursive );
   }
 
   return o;
@@ -235,9 +248,19 @@ function _filesFindFilterPrepare( o )
 
   o.filter = self.recordFilter( o.filter || {} );
 
-  if( o.filePath instanceof _.FileRecordFilter )
+  if( o.filePath )
   {
-    o.filter.pathsExtend( o.filePath ).and( o.filePath );
+    if( o.filePath instanceof _.FileRecordFilter )
+    {
+      o.filter.pathsExtend( o.filePath ).and( o.filePath );
+      o.filePath = null;
+    }
+    else
+    {
+      // if( o.filter.filePath )
+      // debugger;
+      o.filter.filePath = path.mapExtend( o.filter.filePath, o.filePath );
+    }
     o.filePath = null;
   }
 
@@ -248,31 +271,42 @@ function _filesFindFilterPrepare( o )
     o.filter.and( filter2 );
   }
 
-  _.assert
-  (
-    o.filter.filePath === null || o.filePath === null || o.filter.filePath === o.filePath || o.filter.filePath === '.',
-    '{- o.filePath -} and {- o.filter.filePath -} should be exactly same or null'
-  );
+  // _.assert
+  // (
+  //   o.filter.filePath === null || o.filePath === null || o.filter.filePath === o.filePath || o.filter.filePath === '.',
+  //   '{- o.filePath -} and {- o.filter.filePath -} should be exactly same or null'
+  // );
 
-  if( !o.filter.formed || o.filter.formed < 5 )
+  if( o.filter.recursive === null )
   {
-
-    if( o.filePath !== null )
-    o.filter.filePath = o.filePath;
-    o.filter.form();
-
+    _.assert( !o.filter.formed || o.filter.formed < 5, 'o.filter.recursive should have the same value o.recursive' );
+    o.filter.recursive = o.recursive;
   }
 
-  o.filePath = null;
-  _.assert( !self.hub || o.filter.hubFileProvider === self.hub );
-  _.assert( !!o.filter.effectiveFileProvider );
-  _.assert( path.s.allAreNormalized( o.filter.filePath ) );
+  if( !o.filter.formed )
+  o.filter._formAssociations();
+
+  // if( !o.filter.formed || o.filter.formed < 5 )
+  // {
+  //
+  //   // if( o.filePath !== null )
+  //   // o.filter.filePath = o.filePath;
+  //   o.filter.form();
+  //
+  // }
+
+  // o.filePath = null;
+
+  // _.assert( !self.hub || o.filter.hubFileProvider === self.hub );
+  // _.assert( !!o.filter.effectiveFileProvider );
+  // _.assert( path.s.allAreNormalized( o.filter.filePath ) );
+  // _.assert( o.filter.recursive === o.recursive );
 
   return o;
 }
 
-_.assert( _.objectIs( _.FileRecordFilter.prototype.Composes ) );
-_filesFindFilterPrepare.defaults = Object.create( _.FileRecordFilter.prototype.Composes );
+// _.assert( _.objectIs( _.FileRecordFilter.prototype.Composes ) );
+// _filesFindFilterPrepare.defaults = Object.create( _.FileRecordFilter.prototype.Composes );
 
 //
 
@@ -299,6 +333,7 @@ function filesFindSingle_pre( routine, args )
   _.assert( _.boolLike( o.mandatory ) );
   _.assert( o.filter.effectiveFileProvider instanceof _.FileProvider.Abstract );
   _.assert( o.filter.defaultFileProvider instanceof _.FileProvider.Abstract );
+  _.assert( o.filter.recursive === o.recursive );
 
   return o;
 }
@@ -311,6 +346,7 @@ function filesFindSingle_body( o )
   let path = self.path;
 
   _.assertRoutineOptions( filesFindSingle_body, arguments );
+  _.assert( o.filter.recursive === o.recursive );
   o.filter.effectiveFileProvider.assertProviderDefaults( o );
 
   /* handler */
@@ -648,7 +684,7 @@ function filesFind_body( o )
   let path = self.path;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( !o.filePath );
+  _.assert( o.filePath === null );
   _.assert( o.filter.formed === 5 );
 
   let time;
@@ -658,17 +694,17 @@ function filesFind_body( o )
   if( o.verbosity >= 3 )
   self.logger.log( 'filesFind', _.toStr( o, { levels : 2 } ) );
 
-  // let dirToFile = Object.create( null );
+  let pathMap = o.filter.formedFilePath;
+  // if( o.recursive === 2 )
+  // pathMap = path.mapOptimize( pathMap );
+
   o.filePath = [];
 
-  for( let src in o.filter.formedFilePath )
+  for( let src in pathMap )
   {
-    let dst = o.filter.formedFilePath[ src ];
-    // if( !_.boolLike( dst ) || dst )
+    let dst = pathMap[ src ];
     if( _.boolLike( dst ) )
     continue;
-
-    // if( !visited( src ) )
     o.filePath.push( src );
   }
 
@@ -980,12 +1016,15 @@ function filesFindGroups_pre( routine, args )
 
   let o = self._preFileFilterWithoutProviderDefaults.apply( self, arguments );
 
-  o.dst = self.recordFilter( o.dst );
-  o.src.pairWithDst( o.dst );
-  o.src.pairRefineLight();
-  o.dst.form();
+  // o.dst = self.recordFilter( o.dst );
+  // o.src.pairWithDst( o.dst );
+  // o.src.pairRefineLight();
+  // o.dst.form();
 
-  self._providerDefaultsApply( o );
+  // o.src._formPaths();
+  // if( o.dst )
+  // o.dst._formPaths();
+  // o.src.effectiveFileProvider._providerDefaultsApply( o );
 
   // if( o.dst )
   // {
@@ -993,7 +1032,7 @@ function filesFindGroups_pre( routine, args )
   //   o.dst.form();
   // }
 
-  o.src.form();
+  // o.src.form();
 
   return o;
 }
@@ -1013,7 +1052,8 @@ function filesFindGroups_body( o )
   let path = self.path;
   let con = new _.Consequence();
 
-  _.assert( o.src.formed === 5 );
+  _.assert( o.src.formed === 3 );
+  _.assert( o.dst.formed === 3 );
 
   let r = Object.create( null );
   r.options = o;
@@ -1034,7 +1074,9 @@ function filesFindGroups_body( o )
     o2.result = [];
     o2.filter = o.src.clone();
     o2.filter.filePathSelect( srcPath, dstPath );
-    o2.filter.form();
+    _.assert( o2.filter.formed === 3 );
+    // o2.filter._formPaths();
+    // o2.filter.form();
 
     _.Consequence.Try( () => self.filesFind( o2 ) )
     .finally( ( err, files ) =>
@@ -1442,6 +1484,11 @@ function _filesFiltersPrepare( routine, o )
     o.dst.and( o.filter ).pathsSupplement( o.filter );
   }
 
+  if( o.src.recursive === null )
+  o.src.recursive = o.recursive;
+  if( o.dst.recursive === null )
+  o.dst.recursive = 2;
+
   /* */
 
   _.assert( _.objectIs( o.src ) );
@@ -1458,6 +1505,9 @@ function _filesFiltersPrepare( routine, o )
 
   _.assert( o.srcProvider === undefined );
   _.assert( o.dstProvider === undefined );
+
+  _.assert( o.src.recursive === o.recursive );
+  _.assert( o.dst.recursive === 2 );
 
 }
 
@@ -1569,7 +1619,6 @@ function filesReflectEvaluate_body( o )
 
   /* find */
 
-  // debugger;
   let found = self.filesFind( srcOptions );
 
   return o.result;
@@ -1582,6 +1631,7 @@ function filesReflectEvaluate_body( o )
     if( !o.src.formed || o.src.formed < 5 )
     {
       o.src.hubFileProvider = o.src.hubFileProvider || self;
+      o.src.recursive = o.recursive;
       o.src.form();
     }
 
@@ -1616,6 +1666,7 @@ function filesReflectEvaluate_body( o )
     if( o.dst.formed < 5 )
     {
       o.dst.hubFileProvider = o.dst.hubFileProvider || self;
+      o.dst.recursive = 2;
       o.dst.form();
     }
 
@@ -4129,7 +4180,7 @@ function filesDelete_body( o )
   _.assert( o.filter.formed === 5 );
   _.assert( arguments.length === 1 );
 
-  /* */
+  /* qqq xxx : strange code! */
 
   let filePath = o.filter.filePathArrayGet( o.filter.formedFilePath );
   if( filePath.length === 1 && !o.deletingEmptyDirs )
@@ -4184,7 +4235,7 @@ function filesDelete_body( o )
     provider.filesFind.body.call( provider, o2 )
     handleResult();
     if( o.deletingEmptyDirs )
-    deletingEmptyDirs();
+    deleteEmptyDirs();
     if( o.writing )
     handleWriting();
     return end();
@@ -4194,7 +4245,7 @@ function filesDelete_body( o )
     con.then( provider.filesFind.body.call( provider, o2 ) );
     con.then( () => handleResult() );
     if( o.deletingEmptyDirs )
-    con.then( () => deletingEmptyDirs() );
+    con.then( () => deleteEmptyDirs() );
     if( o.writing )
     con.then( () => handleWriting() );
     con.then( () => end() );
@@ -4299,7 +4350,7 @@ function filesDelete_body( o )
     return o.result;
   }
 
-  /* - */
+  /* */
 
   function fileDelete( file )
   {
@@ -4308,6 +4359,8 @@ function filesDelete_body( o )
     else
     con.then( () => _fileDelete( file ) );
   }
+
+  /* */
 
   function _fileDelete( file )
   {
@@ -4330,12 +4383,12 @@ function filesDelete_body( o )
 
   /* - */
 
-  function deletingEmptyDirs()
+  function deleteEmptyDirs()
   {
     if( !o.result.length )
     return true;
 
-    let dirsPath = path.trackToRoot( o.result[ 0 ].dir );
+    let dirsPath = path.traceToRoot( o.result[ 0 ].dir );
     let factory = o.result[ 0 ].factory;
     let filesMap = Object.create( null );
 

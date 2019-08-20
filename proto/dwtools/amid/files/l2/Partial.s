@@ -391,7 +391,19 @@ function _preFileFilterWithoutProviderDefaults( routine, args )
   {
     o.dst = self.recordFilter( o.dst );
     o.src.pairWithDst( o.dst );
+    if( o.dst.recursive === null )
+    o.dst.recursive = 2;
   }
+
+  if( o.src.recursive === null && o.recursive !== null && o.recursive !== undefined )
+  o.src.recursive = o.recursive;
+  if( o.recursive === null )
+  o.src.recursive = o.recursive;
+
+  o.src._formPaths();
+  if( o.dst )
+  o.dst._formPaths();
+  o.src.effectiveFileProvider._providerDefaultsApply( o );
 
   return o;
 }

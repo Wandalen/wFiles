@@ -1713,6 +1713,7 @@ function _descriptorRead( o )
   o2.src = o.filesTree;
   o2.upToken = o.upToken;
   o2.usingIndexedAccessToMap = 0;
+  o2.globing = 0;
 
   let result = _.select( o2 );
 
@@ -2068,6 +2069,7 @@ function _descriptorWrite( o )
     o2.src = o.filesTree;
     o2.upToken = o.upToken;
     o2.usingIndexedAccessToMap = 0;
+    o2.globing = 0;
 
     result = _.select( o2 );
   }

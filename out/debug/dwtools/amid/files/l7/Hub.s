@@ -1087,6 +1087,7 @@ function routinesGenerate()
     {
       let self = this;
       let provider = self;
+      let filePath;
 
       for( let p in operates )
       if( o[ p ] )
@@ -1104,13 +1105,13 @@ function routinesGenerate()
           });
 
           if( operates[ p ].allowingMissed )
-          r = self._pathLocalizeMaybe( o[ p ] ); 
+          r = self._pathLocalizeMaybe( o[ p ] );
           else
           r = self._pathLocalize( o[ p ] );
-          o[ p ] = r.localPath;
-          provider = r.provider;
 
-          _.assert( _.objectIs( provider ), 'No provider for path', o[ p ] );
+          filePath = o[ p ];
+          provider = r.provider;
+          o[ p ] = r.localPath;
 
         }
         else
@@ -1122,46 +1123,51 @@ function routinesGenerate()
         }
       }
 
+      _.assert( _.objectIs( provider ), 'No provider for path', filePath );
       return provider;
     }
 
     /* */
 
-    let wrap = Routines[ r ] = function hub( o )
+    let _routine =
     {
-      let self = this;
-
-      if( arguments.length === 1 && wrap.defaults )
+      [ r + 'Hub' ] : function( o )
       {
-        if( _.strIs( o ) )
-        o = { filePath : o }
-      }
+        let self = this;
 
-      if( pre )
-      o = pre.call( this, wrap, arguments );
+        if( arguments.length === 1 && wrap.defaults )
+        {
+          if( _.strIs( o ) )
+          o = { filePath : o }
+        }
 
-      let o2 = _.mapExtend( null, o );
+        if( pre )
+        o = pre.call( this, wrap, arguments );
 
-      if( !pre && wrap.defaults )
-      if( !wrap.having || !wrap.having.driving )
-      _.routineOptions( wrap, o2 );
+        let o2 = _.mapExtend( null, o );
 
-      let provider = self;
+        if( !pre && wrap.defaults )
+        if( !wrap.having || !wrap.having.driving )
+        _.routineOptions( wrap, o2 );
 
-      provider = resolve.call( self, o2 );
+        let provider = self;
 
-      if( provider === self )
-      {
-        _.assert( _.routineIs( original ), 'No original method for', name );
-        return original.call( provider, o2 );
-      }
-      else
-      {
-        _.assert( _.routineIs( provider[ name ] ) );
-        return provider[ name ].call( provider, o2 );
+        provider = resolve.call( self, o2 );
+
+        if( provider === self )
+        {
+          _.assert( _.routineIs( original ), 'No original method for', name );
+          return original.call( provider, o2 );
+        }
+        else
+        {
+          _.assert( _.routineIs( provider[ name ] ) );
+          return provider[ name ].call( provider, o2 );
+        }
       }
     }
 
+    let wrap = Routines[ r ] = _routine[ r + 'Hub' ];
     _.routineExtend( wrap, original );
 
   })();

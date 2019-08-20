@@ -3724,6 +3724,7 @@ function filesReflectTo_body( o )
   let result;
 
   _.assertRoutineOptions( filesReflectTo_body, arguments );
+  _.assert( !src.hub || !dst.hub || src.hub === dst.hub, 'not implemented' );
 
   if( src.hub )
   {
@@ -3743,10 +3744,16 @@ function filesReflectTo_body( o )
   let srcRegistered = hub.providersWithProtocolMap[ src.protocol ] === src;
   let dstRegistered = hub.providersWithProtocolMap[ dst.protocol ] === dst;
 
+  // debugger;
+  // if( !src.protocol )
+  // src.protocol = hub.protocolNameGenerate( 0 );
+  // if( !dst.protocol )
+  // dst.protocol = hub.protocolNameGenerate( 1 );
+
   if( !src.protocol )
-  src.protocol = hub.protocolNameGenerate( 0 );
+  src.protocol = src.constructor.shortName + src.id;
   if( !dst.protocol )
-  dst.protocol = hub.protocolNameGenerate( 1 );
+  dst.protocol = dst.constructor.shortName + dst.id;
 
   try
   {

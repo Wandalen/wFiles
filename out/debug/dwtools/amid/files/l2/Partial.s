@@ -172,9 +172,6 @@ function init( o )
 
   Parent.prototype.init.call( self );
 
-  // self[ protocolsSymbol ] = [];
-  // self[ protocolSymbol ] = null;
-
   _.workpiece.initFields( self );
 
   _.assert( _.arrayIs( self.protocols ) );
@@ -196,10 +193,11 @@ function init( o )
     self.logger = new _.Logger({ output : console });
   }
 
+  Self.Counter += 1;
+  self.id = Self.Counter;
+
   if( self.path === null )
-  {
-    self.path = self.Path.CloneExtending({ fileProvider : self });
-  }
+  self.path = self.Path.CloneExtending({ fileProvider : self });
 
   if( self.logger === null )
   self.logger = new _.Logger({ output : _global.logger });
@@ -216,7 +214,11 @@ function init( o )
   if( self.verbosity >= 2 )
   self.logger.log( 'new', _.strType( self ) );
 
-  _.appExitHandlerOnce( () => { debugger;self.path.pathDirTempForClose() } );
+  _.appExitHandlerOnce( () =>
+  {
+    debugger;
+    self.path.pathDirTempForClose()
+  });
 
 }
 
@@ -1132,7 +1134,10 @@ function pathResolveLinkFull_body( o )
     }
     catch( err )
     {
+      // if( o.throwing )
       throw _.err( `Failed to resolve ${o.filePath}\n`, err );
+      // else
+      // return null;
     }
   }
 
@@ -1258,7 +1263,10 @@ function pathResolveLinkFull_body( o )
 
     con.catch( ( err ) =>
     {
+      // if( o.throwing )
       throw _.err( `Failed to resolve ${o.filePath}\n`, err );
+      // else
+      // return null;
     });
 
     return con;
@@ -1934,7 +1942,7 @@ having.reading = 1;
 having.driving = 1;
 
 var operates = statReadAct.operates = Object.create( null );
-operates.filePath = { pathToRead : 1 }
+operates.filePath = { pathToRead : 1, allowingMissed : 1 }
 
 //
 
@@ -5811,7 +5819,6 @@ function _link_functor( fop )
 
         /* */
 
-        debugger;
         if( o.resolvingSrcSoftLink || ( o.resolvingSrcTextLink && self.usingTextLink ) )
         {
           let o2 =
@@ -6140,7 +6147,6 @@ function _link_functor( fop )
       // if( resolvingSrcTextLink === undefined || resolvingSrcTextLink === null )
       // resolvingSrcTextLink = 1;
 
-      debugger;
       let srcStat = c.srcResolvedStat;
 
       if( !srcStat && o.allowingMissed )
@@ -6521,9 +6527,13 @@ function _fileCopyVerify2( c )
 function _fileCopyAct( c )
 {
   let self = this;
-  let o = c.options2;
+  // let o = c.options2;
+  let o = c.options;
 
   _.assert( _.fileStatIs( c.srcStat ) || c.srcStat === null );
+
+  if( o.srcPath === 'extract4:///src/proto/terLink1' )
+  debugger;
 
   if( c.srcStat === null )
   {
@@ -6533,22 +6543,48 @@ function _fileCopyAct( c )
   {
     // debugger;
 
-    /* should not throw error for missed neither for cycled */
-    let srcResolvedPath = self.pathResolveSoftLink
-    ({
-      filePath : o.srcPath,
-      // allowingMissed : o.allowingMissed,
-      // allowingCycled : o.allowingCycled,
-    });
+    // qqq : ?
+    // /* should not throw error for missed neither for cycled */
+    // let srcResolvedPath = self.pathResolveSoftLink
+    // ({
+    //   filePath : o.srcPath,
+    //   // allowingMissed : o.allowingMissed,
+    //   // allowingCycled : o.allowingCycled,
+    // });
 
     return self.softLinkAct
     ({
       dstPath : o.dstPath,
-      srcPath : srcResolvedPath,
+      srcPath : o.srcPath,
       originalDstPath : o.originalDstPath,
-      originalSrcPath : srcResolvedPath,
+      originalSrcPath : o.originalSrcPath,
       sync : o.sync,
       type : null,
+    });
+
+    // return self.softLinkAct
+    // ({
+    //   dstPath : o.dstPath,
+    //   srcPath : srcResolvedPath,
+    //   originalDstPath : o.originalDstPath,
+    //   originalSrcPath : srcResolvedPath,
+    //   sync : o.sync,
+    //   type : null,
+    // });
+
+  }
+  else if( c.srcStat.isTextLink() )
+  {
+
+    // qqq : cover
+
+    return self.textLinkAct
+    ({
+      dstPath : o.dstPath,
+      srcPath : o.srcPath,
+      originalDstPath : o.originalDstPath,
+      originalSrcPath : o.originalSrcPath,
+      sync : o.sync,
     });
 
   }
@@ -7719,6 +7755,7 @@ let Associates =
 
 let Restricts =
 {
+  id : 0,
 }
 
 let Medials =
@@ -7733,7 +7770,8 @@ let Statics =
   Path : _.path.CloneExtending({ fileProvider : Self }),
   WriteMode : WriteMode,
   ProviderDefaults : ProviderDefaults,
-  EncodersGenerate : EncodersGenerate
+  EncodersGenerate : EncodersGenerate,
+  Counter : 0,
 }
 
 let Forbids =

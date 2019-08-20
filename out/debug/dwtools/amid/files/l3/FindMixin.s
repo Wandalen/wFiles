@@ -1148,7 +1148,7 @@ function filesRead_body( o )
   let self = this;
   let path = self.path;
 
-  _.assert( o.src.formed === 5 );
+  _.assert( o.src.formed === 3 );
 
   let con = self.filesFindGroups( o );
   let r;

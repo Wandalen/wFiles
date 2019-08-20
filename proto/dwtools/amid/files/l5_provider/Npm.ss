@@ -467,8 +467,8 @@ function filesReflectSingle_body( o )
   _.assert( o.linking === 'fileCopy' || o.linking === 'hardLinkMaybe' || o.linking === 'softLinkMaybe', 'Not supported options' );
   _.assert( !o.src.hasFiltering(), 'Not supported options' );
   _.assert( !o.dst.hasFiltering(), 'Not supported options' );
-  _.assert( o.src.formed === 5 );
-  _.assert( o.dst.formed === 5 );
+  _.assert( o.src.formed === 3 );
+  _.assert( o.dst.formed === 3 );
   _.assert( o.srcPath === undefined );
   // _.assert( o.filter === null || !o.filter.hasFiltering(), 'Not supported options' );
   _.assert( o.filter === undefined );

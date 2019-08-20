@@ -37,30 +37,7 @@ _.assert( _.routineIs( _.FileRecord ) );
  *    excludeAll : [ 'package.json', 'bower.json' ]
  *  };
  * let regObj = regexpAllSafe( paths );
- *  //  {
- *  //    includeAny :
- *  //      [
- *  //        /foo\/bar/,
- *  //        /foo2\/bar2\/baz/,
- *  //        /some\.txt/
- *  //      ],
- *  //    includeAll :
- *  //      [
- *  //        /index\.js/
- *  //      ],
- *  //    excludeAny :
- *  //      [
- *  //        /Gruntfile\.js/,
- *  //        /gulpfile\.js/,
- *  //        /node_modules/,
- *  //        /\.unique/,
- *  //        /\.git/,
- *  //        /\.svn/,
- *  //        /(^|\/)\.(?!$|\/|\.)/,
- *  //        /(^|\/)-(?!$|\/)/
- *  //      ],
- *  //    excludeAll : [ /package\.json/, /bower\.json/ ]
- *  //  }
+ *
  * @param {string|string[]|RegexpObject} [mask]
  * @returns {RegexpObject}
  * @throws {Error} if passed more than one argument.
@@ -78,13 +55,14 @@ function regexpAllSafe( mask )
   ({
     excludeAny :
     [
-      /(\W|^)node_modules(\W|$)/,
-      /\.unique$/,
-      /\.git$/,
-      /\.svn$/,
-      /\.hg$/,
-      /\.tmp($|\/)/,
-      /\.DS_Store$/,
+      // /(\W|^)node_modules(\W|$)/,
+      // /\.unique(?:$|\/)/,
+      // /\.git(?:$|\/)/,
+      // /\.svn(?:$|\/)/,
+      // /\.hg(?:$|\/)/,
+      // /\.DS_Store(?:$|\/)/,
+      // /\.tmp(?:$|\/)/,
+      /\.(?:unique|git|svn|hg|DS_Store|tmp)(?:$|\/)/,
       /(^|\/)-/,
     ],
   });
@@ -109,7 +87,6 @@ function regexpTerminalSafe( mask )
   ({
     excludeAny :
     [
-      /\.DS_Store$/,
     ],
   });
 
@@ -134,7 +111,7 @@ function regexpDirSafe( mask )
     excludeAny :
     [
       /(^|\/)\.(?!$|\/|\.)/,
-      /(^|\/)-/,
+      // /(^|\/)-/,
     ],
   });
 
@@ -158,6 +135,8 @@ function filterSafer( filter )
   filter.maskAll = _.files.regexpAllSafe( filter.maskAll );
   filter.maskTerminal = _.files.regexpTerminalSafe( filter.maskTerminal );
   filter.maskDirectory = _.files.regexpDirSafe( filter.maskDirectory );
+  filter.maskTransientAll = _.files.regexpAllSafe( filter.maskTransientAll );
+  // filter.maskTransientTerminal = _.files.regexpTerminalSafe( filter.maskTransientTerminal );
   filter.maskTransientDirectory = _.files.regexpDirSafe( filter.maskTransientDirectory );
 
   return filter;

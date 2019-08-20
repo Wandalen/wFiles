@@ -607,10 +607,8 @@ function statReadAct( o )
 
       _.assert( result.size >= 0 );
 
-
       result.isTextLink = function isTextLink()
       {
-        debugger;
         if( !self.usingTextLink )
         return false;
         return self._descriptorIsTextLink( d );
@@ -2001,7 +1999,7 @@ function _descriptorIsTextLink( file )
   if( _.objectIs( file ) )
   return false;
 
-  let regexp = /link ([^\n]+)\n?$/;
+  let regexp = /^link ([^\n]+)\n?$/;
   if( _.bufferRawIs( file ) || _.bufferTypedIs( file ) )
   file = _.bufferToStr( file )
   _.assert( _.strIs( file ) );
@@ -2537,10 +2535,6 @@ _.FileProvider.Secondary.mixin( Self );
 // --
 
 _.FileProvider[ Self.shortName ] = Self;
-
-// if( typeof module !== 'undefined' )
-// if( _global_.WTOOLS_PRIVATE )
-// { /* delete require.cache[ module.id ]; */ }
 
 if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = Self;

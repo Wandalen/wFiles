@@ -4582,8 +4582,8 @@ function _applyToRecordMasks( record )
   // debugger;
   // if( _.strEnds( record.absolute, 'proto/f.js' ) )
   // debugger;
-  if( _.strHas( record.absolute, 'dir2' ) )
-  debugger;
+  // if( _.strHas( record.absolute, 'dir2' ) )
+  // debugger;
 
   /* */
 

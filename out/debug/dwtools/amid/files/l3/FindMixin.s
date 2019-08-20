@@ -151,7 +151,7 @@ function _filesFindPrepare1( routine, args )
     _.assert( o.prefixPath === undefined );
     _.assert( o.postfixPath === undefined );
 
-    let knownFormats = [ 'absolute', 'relative', 'record', 'nothing' ];
+    let knownFormats = [ 'absolute', 'relative', 'real', 'record', 'nothing' ];
     _.assert
     (
       _.arrayHas( knownFormats, o.outputFormat ),
@@ -577,6 +577,13 @@ function filesFindSingle_body( o )
     {
       _.assert( arguments.length === 1, 'Expects single argument' );
       o.result.push( record.relative );
+    }
+    else if( o.outputFormat === 'real' )
+    recordAdd = function addReal( record )
+    {
+      _.assert( arguments.length === 1, 'Expects single argument' );
+      // debugger;
+      o.result.push( record.real );
     }
     else if( o.outputFormat === 'record' )
     recordAdd = function addRecord( record )
@@ -3253,8 +3260,8 @@ function filesReflectSingle_body( o )
 
       hub.softLink
       ({
-        dstPath : record.dst.absoluteGlobalMaybe,
-        srcPath : record.src.absoluteGlobalMaybe,
+        dstPath : record.dst.absolutePreferred,
+        srcPath : record.src.absolutePreferred,
         makingDirectory : 0,
         allowingMissed : 1,
         allowingCycled : 1,
@@ -3268,8 +3275,8 @@ function filesReflectSingle_body( o )
     {
       hub.textLink
       ({
-        dstPath : record.dst.absoluteGlobalMaybe,
-        srcPath : record.src.absoluteGlobalMaybe,
+        dstPath : record.dst.absolutePreferred,
+        srcPath : record.src.absolutePreferred,
         makingDirectory : 0,
         allowingMissed : 1,
         allowingCycled : 1,
@@ -3283,8 +3290,8 @@ function filesReflectSingle_body( o )
     {
       hub.fileCopy
       ({
-        dstPath : record.dst.absoluteGlobalMaybe,
-        srcPath : record.src.absoluteGlobalMaybe,
+        dstPath : record.dst.absolutePreferred,
+        srcPath : record.src.absolutePreferred,
         makingDirectory : 0,
         allowingMissed : 1,
         resolvingSrcSoftLink : o.resolvingSrcSoftLink,
@@ -3694,14 +3701,14 @@ function filesReflectTo_pre( routine, args )
   let o = args[ 0 ];
 
   if( args[ 1 ] !== undefined || !_.mapIs( args[ 0 ] ) )
-  o = { dstProvider : args[ 0 ], dstPath : args[ 1 ] }
+  o = { dstProvider : args[ 0 ], dst : args[ 1 ] }
 
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
   _.assert( 1 === args.length || 2 === args.length );
   _.routineOptions( routine, o );
   _.assert( o.dstProvider instanceof _.FileProvider.Abstract, () => 'Expects file provider {- o.dstProvider -}, but got ' + _.strType( o.dstProvider ) );
-  _.assert( path.isAbsolute( o.dstPath ) );
-  _.assert( path.isAbsolute( o.srcPath ) );
+  // _.assert( path.s.isAbsolute( o.dst ), 'Expects simple path string {- o.dst -}' );
+  // _.assert( path.s.isAbsolute( o.src ), 'Expects simple path string {- o.src -}' );
 
   return o;
 }
@@ -3714,6 +3721,7 @@ function filesReflectTo_body( o )
   let src = self;
   let dst = o.dstProvider;
   let hub;
+  let result;
 
   _.assertRoutineOptions( filesReflectTo_body, arguments );
 
@@ -3740,31 +3748,47 @@ function filesReflectTo_body( o )
   if( !dst.protocol )
   dst.protocol = hub.protocolNameGenerate( 1 );
 
-  if( !srcRegistered )
-  src.providerRegisterTo( hub );
-  if( !dstRegistered )
-  dst.providerRegisterTo( hub );
+  try
+  {
 
-  _.assert( src.hub === dst.hub );
+    if( !srcRegistered )
+    src.providerRegisterTo( hub );
+    if( !dstRegistered )
+    dst.providerRegisterTo( hub );
 
-  let filePath = { [ src.path.globalFromPreferred( o.srcPath ) ] : dst.path.globalFromPreferred( o.dstPath ) }
+    _.assert( src.hub === dst.hub );
 
-  let o2 = _.mapOnly( o, filesReflect.defaults );
-  o2.reflectMap = filePath;
+    // let filePath = { [ src.path.globalFromPreferred( o.srcPath ) ] : dst.path.globalFromPreferred( o.dstPath ) }
+    // let filePath = { [ src.path.globalFromPreferred( o.src ) ] : dst.path.globalFromPreferred( o.dst ) }
 
-  let result = hub.filesReflect( o2 );
+    o.src = src.recordFilter( o.src );
+    o.dst = dst.recordFilter( o.dst );
 
-  // let result = hub.filesReflect({ reflectMap : filePath, mandatory : o.mandatory });
+    let o2 = _.mapOnly( o, filesReflect.defaults );
 
-  _.assert( !_.consequenceIs( result ), 'not implemented' );
+    // o2.reflectMap = filePath;
+    // delete o2.src;
+    // delete o2.dst;
 
-  if( !srcRegistered )
-  src.providerUnregister();
-  if( !dstRegistered )
-  dst.providerUnregister();
+    result = hub.filesReflect( o2 );
 
-  if( !srcRegistered && !dstRegistered )
-  hub.finit();
+    _.assert( !_.consequenceIs( result ), 'not implemented' );
+
+  }
+  catch( err )
+  {
+    debugger;
+    throw _.err( err );
+  }
+  finally
+  {
+    if( !srcRegistered )
+    src.providerUnregister();
+    if( !dstRegistered )
+    dst.providerUnregister();
+    if( !srcRegistered && !dstRegistered )
+    hub.finit();
+  }
 
   return result;
 }
@@ -3772,9 +3796,16 @@ function filesReflectTo_body( o )
 var defaults = filesReflectTo_body.defaults = Object.create( filesReflectSinglePrimeDefaults );
 
 defaults.dstProvider = null;
-defaults.dstPath = '/';
-defaults.srcPath = '/';
+defaults.dst = '/';
+defaults.src = '/';
 defaults.mandatory = 0;
+
+defaults.breakingSrcHardLink = null;
+defaults.resolvingSrcSoftLink = null;
+defaults.resolvingSrcTextLink = null;
+defaults.breakingDstHardLink = null;
+defaults.resolvingDstSoftLink = null;
+defaults.resolvingDstTextLink = null;
 
 let filesReflectTo = _.routineFromPreAndBody( filesReflectTo_pre, filesReflectTo_body );
 
@@ -3787,12 +3818,12 @@ function filesExtract_pre( routine, args )
   let o = args[ 0 ];
 
   if( !_.mapIs( o ) )
-  o = { filePath : o }
+  o = { src : o }
 
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
   _.assert( args.length === 1 );
   _.routineOptions( routine, o );
-  _.assert( path.isAbsolute( o.filePath ) );
+  // _.assert( path.isAbsolute( o.filePath ) );
 
   return o;
 }
@@ -3802,21 +3833,20 @@ function filesExtract_pre( routine, args )
 function filesExtract_body( o )
 {
   let self = this;
-  let extract = new _.FileProvider.Extract();
 
-  let result = self.filesReflectTo
-  ({
-    srcPath : o.filePath,
-    dstProvider : extract,
-  });
+  _.assert( o.dstProvider === null );
+
+  if( o.dstProvider === null )
+  o.dstProvider = new _.FileProvider.Extract();
+
+  let result = self.filesReflectTo( o )
 
   _.assert( !_.consequenceIs( result ), 'not implemented' );
 
-  return extract;
+  return o.dstProvider;
 }
 
-var defaults = filesExtract_body.defaults = Object.create( null );
-defaults.filePath = '/';
+var defaults = filesExtract_body.defaults = Object.create( filesReflectTo.defaults );
 
 let filesExtract = _.routineFromPreAndBody( filesExtract_pre, filesExtract_body );
 
@@ -4636,18 +4666,18 @@ function softLinksRebase( o )
     return;
 
     record.isSoftLink;
-    let resolvedPath = self.pathResolveSoftLink( record.absoluteGlobalMaybe );
+    let resolvedPath = self.pathResolveSoftLink( record.absolutePreferred );
     let rebasedPath = self.path.rebase( resolvedPath, o.oldPath, o.newPath );
-    self.fileDelete({ filePath : record.absoluteGlobalMaybe, verbosity : 0 });
+    self.fileDelete({ filePath : record.absolutePreferred, verbosity : 0 });
     self.softLink
     ({
-      dstPath : record.absoluteGlobalMaybe,
+      dstPath : record.absolutePreferred,
       srcPath : rebasedPath,
       allowingMissed : 1,
       allowingCycled : 1,
     });
 
-    _.assert( !!self.statResolvedRead({ filePath : record.absoluteGlobalMaybe, resolvingSoftLink : 0 }) );
+    _.assert( !!self.statResolvedRead({ filePath : record.absolutePreferred, resolvingSoftLink : 0 }) );
 
   });
 

@@ -11973,7 +11973,9 @@ function filesFindGroups( test )
   /* tests */
 
   test.case = 'default settings';
+  debugger;
   var found = provider.filesFindGroups({ src, dst, outputFormat : 'relative' });
+  debugger;
   found.options = !!found.options;
   test.identical( found, expected );
 

@@ -337,7 +337,10 @@ function filesFindSingle_body( o )
   o.onUp = _.routinesComposeAllReturningLast( o.onUp );
 
   if( _.arrayIs( o.onDown ) )
-  o.onDown = _.routinesCompose( o.onDown );
+  o.onDown = _.routinesComposeReturningLast( o.onDown );
+
+  // if( _.arrayIs( o.onDown ) )
+  // o.onDown = _.routinesCompose( o.onDown );
 
   _.assert( _.routineIs( o.onUp ) );
   _.assert( _.routineIs( o.onDown ) );
@@ -372,10 +375,11 @@ function filesFindSingle_body( o )
   {
     if( o.includingDefunct )
     {
-      let r = handleUp( stemRecord, o );
-      if( !r )
+      // let r = handleUp( stemRecord, o );
+      if( handleUp( stemRecord, o ) === _.dont )
       return o;
-      o.onRecord( stemRecord, o );
+      // o.onRecord( stemRecord, o );
+      handleRecord( stemRecord, o  );
       handleDown( stemRecord, o );
     }
     // if( o.allowingMissed || !o.mandatory )
@@ -423,15 +427,16 @@ function filesFindSingle_body( o )
 
     if( including )
     {
-      let res = handleUp( r, op );
-      if( !res )
+      // let res = handleUp( r, op );
+      if( handleUp( r, op ) === _.dont )
       {
         handleDown( r, op ); // xxx yyy
         return false;
       }
-      _.assert( res === r );
+      // _.assert( res === r );
       // recordAdd( r );
-      op.onRecord( r, op );
+      // op.onRecord( r, op );
+      handleRecord( r, op );
     }
 
     /* read */
@@ -510,11 +515,12 @@ function filesFindSingle_body( o )
     if( !including )
     return;
 
-    let res = handleUp( r, op );
-    if( !res )
+    // let res = handleUp( r, op );
+    if( handleUp( r, op ) === _.dont )
     return false;
-    _.assert( r === res );
-    op.onRecord( r, op );
+    // _.assert( r === res );
+    // op.onRecord( r, op );
+    handleRecord( r, op );
     // recordAdd( r );
 
     handleDown( r, op );
@@ -525,11 +531,11 @@ function filesFindSingle_body( o )
   function handleUp( record, op )
   {
     _.assert( arguments.length === 2 );
-    let result = op.onUp.call( self, record, op );
-    _.assert( result === false || result === record, 'onUp should return original record or false, but got', _.toStrShort( result ) );
-    if( result === false )
+    let r = op.onUp.call( self, record, op );
+    _.assert( r === _.dont || r === record, 'onUp should return original record or false, but returned', _.toStrShort( r ) );
+    if( r === _.dont )
     return false;
-    return result;
+    return r;
   }
 
   /* - */
@@ -537,8 +543,19 @@ function filesFindSingle_body( o )
   function handleDown( record, op )
   {
     _.assert( arguments.length === 2 );
-    let result = op.onDown.call( self, record, op );
-    return result;
+    let r = op.onDown.call( self, record, op );
+    _.assert( r === undefined, 'onDown should return nothing( undefined ), but returned', _.toStrShort( r ) );
+    // return r;
+  }
+
+  /* - */
+
+  function handleRecord( record, op )
+  {
+    _.assert( arguments.length === 2 );
+    let r = op.onRecord.call( self, record, op );
+    _.assert( r === undefined || r === record, 'onRecord should return original record or undefined, but returned', _.toStrShort( r ) );
+    // return r;
   }
 
   //
@@ -761,7 +778,6 @@ function filesFind_body( o )
 
   forStems( o.filePath, o );
 
-  debugger;
   return end();
 
   /* - */
@@ -824,7 +840,6 @@ function filesFind_body( o )
     _.assert( o3.factory.hubFileProvider === o3.filter.hubFileProvider || o3.filter.hubFileProvider === null );
     _.assert( o3.factory.defaultFileProvider === o3.filter.defaultFileProvider );
 
-    debugger;
     let counterWas = counter;
 
     return _.Consequence.Try( () =>
@@ -833,7 +848,6 @@ function filesFind_body( o )
     })
     .then( ( op ) =>
     {
-      debugger;
       if( !o.mandatory )
       return op;
 
@@ -874,7 +888,7 @@ function filesFind_body( o )
 
   function recordAdd_functor( fop )
   {
-    let recordAdd; debugger;
+    let recordAdd;
 
     if( fop.outputFormat === 'absolute' )
     recordAdd = function addAbsolute( record, op )
@@ -1262,7 +1276,7 @@ function filesFindGroups_body( o )
   for( let dstPath in r.pathsGrouped ) ( function( dstPath )
   {
     let srcPath = r.pathsGrouped[ dstPath ];
-    let o2 = _.mapOnly( o, self.filesFindSingle.body.defaults );
+    let o2 = _.mapOnly( o, self.filesFind.body.defaults );
 
     con.finallyGive( 1 );
 
@@ -1723,7 +1737,8 @@ function _filesReflectPrepare( routine, args )
   self._providerDefaultsApply( o );
 
   o.onUp = _.routinesComposeAll( o.onUp );
-  o.onDown = _.routinesCompose( o.onDown );
+  // o.onDown = _.routinesCompose( o.onDown );
+  o.onDown = _.routinesComposeReturningLast( o.onDown );
 
   if( o.result === null )
   o.result = [];
@@ -2308,7 +2323,8 @@ function filesReflectEvaluate_body( o )
 
     handleDown2.call( self, record, o );
     let r = o.onDown.call( self, record, o );
-    _.assert( r !== _.dont );
+    // _.assert( r !== _.dont );
+    _.assert( r === undefined, () => 'onDown should return nothing( undefined ), but returned ' + _.toStrShort( r ) );
 
     _.assert( record.action !== 'exclude' || record.touch === false, () => 'Attempt to exclude touched ' + record.dst.absolute );
 
@@ -2606,7 +2622,7 @@ function filesReflectEvaluate_body( o )
   {
     let record = dstRecord.associated;
     handleDown( record, op );
-    return record;
+    // return record;
   }
 
   /* */
@@ -2683,6 +2699,7 @@ function filesReflectEvaluate_body( o )
     return srcRecord;
     else
     return _.dont;
+    // return _.dont;
   }
 
   /* */
@@ -2709,7 +2726,7 @@ function filesReflectEvaluate_body( o )
       o.filesGraph.actionEnd();
     }
 
-    return record;
+    // return record;
   }
 
   function dstDelete( record, op )
@@ -4714,7 +4731,7 @@ function filesDeleteTerminals_body( o )
   {
     if( o.writing )
     self.fileDelete({ filePath : record.absolute, throwing : o.throwing, verbosity : o.verbosity });
-    return record;
+    // return record;
   }
 }
 
@@ -4782,7 +4799,7 @@ function filesDeleteEmptyDirs_body( o )
       throw _.err( err );
     }
 
-    return record;
+    // return record;
   }
 
 }

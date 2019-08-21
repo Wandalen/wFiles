@@ -6089,7 +6089,7 @@ function filesFindOn( test )
     onDownRelativeTransients.push( record.relative );
     if( record.isActual )
     onDownRelativeActuals.push( record.relative );
-    return record;
+    // return record;
   }
 
   function selectTransients( records )

@@ -6089,7 +6089,7 @@ function filesFindOn( test )
     onDownRelativeTransients.push( record.relative );
     if( record.isActual )
     onDownRelativeActuals.push( record.relative );
-    return record;
+    // return record;
   }
 
   function selectTransients( records )
@@ -11973,7 +11973,9 @@ function filesFindGroups( test )
   /* tests */
 
   test.case = 'default settings';
+  debugger;
   var found = provider.filesFindGroups({ src, dst, outputFormat : 'relative' });
+  debugger;
   found.options = !!found.options;
   test.identical( found, expected );
 
@@ -19952,6 +19954,7 @@ function filesReflectToWithSoftLinks( test )
         'file1' : 'src/proto/file1',
         'file2' : 'src/proto/file2',
 
+        // 'terLink1' : [{ softLink : '/src/proto/file1' }],
         'terLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/terLink1' }],
         'terLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/terLink2' }],
         'terLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto/terLink3' }],

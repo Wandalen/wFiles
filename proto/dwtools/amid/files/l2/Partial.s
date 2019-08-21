@@ -3188,12 +3188,6 @@ hashRead.having.aspect = 'entry';
 
 //
 
-// let hashRead = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, hashRead_body );
-//
-// hashRead.having.aspect = 'entry';
-
-//
-
 let dirReadAct = Object.create( null );
 dirReadAct.name = 'dirReadAct';
 
@@ -3217,20 +3211,6 @@ function dirRead_pre( routine, args )
   let self = this;
   let o = self._preFilePathScalarWithProviderDefaults.apply( self, arguments );
   return o;
-  // _.assert( arguments.length === 2, 'Expects exactly two arguments' );
-  // _.assert( args.length === 0 || args.length === 1 );
-  //
-  // let o = args[ 0 ] || Object.create( null );
-  //
-  // if( self.path.like( o ) )
-  // o = { filePath : self.path.from( o ) };
-  //
-  // _.routineOptions( routine, o );
-  // self._providerDefaultsApply( o );
-  //
-  // _.assert( self.path.isAbsolute( o.filePath ) );
-  //
-  // return o;
 }
 
 //

@@ -5383,6 +5383,7 @@ function _link_functor( fop )
     c.tempPathSrc = undefined;
     c.dstStat = undefined;
     c.srcStat = undefined;
+    c.originalSrcResolvedPath = undefined;
     c.srcResolvedStat = undefined;
     c.options = o;
     c.options2 = undefined;
@@ -5775,7 +5776,9 @@ function _link_functor( fop )
 
       _.assert( path.isAbsolute( o.srcPath ) );
       _.assert( path.isAbsolute( o.dstPath ) );
-
+      
+      c.originalSrcResolvedPath = o.srcPath;
+      
       /* check if equal early */
 
       verifyEqualPaths();
@@ -5909,6 +5912,7 @@ function _link_functor( fop )
             sync : 0,
             throwing : o.throwing
           }
+          
           return self.pathResolveLinkFull( o2 )
           .then( ( srcPath ) =>
           {
@@ -6515,6 +6519,9 @@ function _fileCopyVerify2( c )
 
   if( c.srcStat === null )
   return;
+  
+  if( o.resolvingSrcSoftLink || o.resolvingSrcTextLink )
+  c.srcStat = self.statRead({ filePath : c.originalSrcResolvedPath, sync : 1, resolvingSoftLink : 0, resolvingTextLink : 0 });
 
   if( c.srcStat.isDir() )
   {

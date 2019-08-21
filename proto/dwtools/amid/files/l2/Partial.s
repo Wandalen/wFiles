@@ -6529,7 +6529,7 @@ function _fileCopyAct( c )
 
   _.assert( _.fileStatIs( c.srcStat ) || c.srcStat === null );
 
-  // if( o.srcPath === 'extract4:///src/proto/terLink1' )
+  if( o.srcPath === 'extract4:///src/proto/terLink1' )
   debugger;
   
   let srcStat = c.srcStat;
@@ -6540,27 +6540,7 @@ function _fileCopyAct( c )
   if( srcStat.isSoftLink() )
   { 
     if( o.resolvingSrcSoftLink === 2 )
-    {
-      if( c.srcResolvedStat === null )
-      return null;
-      
-      if( c.srcResolvedStat.isDir() )
-      return self.dirMakeAct
-      ({
-        filePath : o.dstPath,
-        sync : o.sync
-      })
-      
-      return self.fileCopyAct
-      ({
-        dstPath : o.dstPath,
-        srcPath : o.srcPath,
-        originalDstPath : o.originalDstPath,
-        originalSrcPath : o.originalSrcPath,
-        breakingDstHardLink : o.breakingDstHardLink,
-        sync : o.sync,
-      });
-    }
+    return resolvingSrcLink2();
     
     return self.softLinkAct
     ({
@@ -6575,27 +6555,7 @@ function _fileCopyAct( c )
   else if( srcStat.isTextLink() )
   {
     if( o.resolvingSrcTextLink === 2 )
-    {
-      if( c.srcResolvedStat === null )
-      return self.fileDeleteAct({ filePath : o.dstPath, sync : o.sync });
-      
-      if( c.srcResolvedStat.isDir() )
-      return self.dirMakeAct
-      ({
-        filePath : o.dstPath,
-        sync : o.sync
-      })
-      
-      return self.fileCopyAct
-      ({
-        dstPath : o.dstPath,
-        srcPath : o.srcPath,
-        originalDstPath : o.originalDstPath,
-        originalSrcPath : o.originalSrcPath,
-        breakingDstHardLink : o.breakingDstHardLink,
-        sync : o.sync,
-      });
-    }
+    return resolvingSrcLink2();
     
     // qqq : cover
 
@@ -6624,6 +6584,31 @@ function _fileCopyAct( c )
       sync : o.sync,
     });
 
+  }
+  
+  /* */
+  
+  function resolvingSrcLink2()
+  {
+    if( c.srcResolvedStat === null )
+    return null;
+    
+    if( c.srcResolvedStat.isDir() )
+    return self.dirMakeAct
+    ({
+      filePath : o.dstPath,
+      sync : o.sync
+    })
+    
+    return self.fileCopyAct
+    ({
+      dstPath : o.dstPath,
+      srcPath : o.srcPath,
+      originalDstPath : o.originalDstPath,
+      originalSrcPath : o.originalSrcPath,
+      breakingDstHardLink : o.breakingDstHardLink,
+      sync : o.sync,
+    });  
   }
 
 }

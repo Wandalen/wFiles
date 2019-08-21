@@ -58,7 +58,8 @@
     "wverbal": "",
     "wLogger": "",
     "ini": "",
-    "tar": ""
+    "tar": "",
+    "gitconfiglocal" : ""
   },
   "devDependencies": {
     "wait-sync": "",

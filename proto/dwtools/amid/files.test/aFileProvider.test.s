@@ -8369,16 +8369,326 @@ function fileCopyError( test )
 
 //
 
+function fileCopySoftLinkExtended( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let path = provider.path;
+
+  let testPath = test.context.pathFor( 'written/fileCopySoftLinkExtended' );
+  let srcPath = test.context.pathFor( 'written/fileCopySoftLinkExtended/src' );
+  let dstPath = test.context.pathFor( 'written/fileCopySoftLinkExtended/dst' );
+  let terminalPath = test.context.pathFor( 'written/fileCopySoftLinkExtended/terminal' );
+  let missingPath = test.context.pathFor( 'written/fileCopySoftLinkExtended/missing' );
+  
+  /* */
+  
+  test.open( 'src soft link to terminal, dst missing' );
+  
+  test.case = 'resolvingSrcSoftLink : 0'
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalPath, terminalPath );
+  provider.softLink( srcPath, terminalPath );
+  provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 0, resolvingSrcTextLink : 0 });
+  test.identical( provider.pathResolveSoftLink( dstPath ), srcPath )
+  
+  test.case = 'resolvingSrcSoftLink : 1'
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalPath, terminalPath );
+  provider.softLink( srcPath, terminalPath );
+  provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 1, resolvingSrcTextLink : 0 });
+  test.identical( provider.pathResolveSoftLink( dstPath ), terminalPath )
+  
+  test.case = 'resolvingSrcSoftLink : 2'
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalPath, terminalPath );
+  provider.softLink( srcPath, terminalPath );
+  provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 2, resolvingSrcTextLink : 0 });
+  test.is( provider.isTerminal( dstPath ) );
+  test.identical( provider.fileRead( dstPath ), terminalPath );
+  
+  test.close( 'src soft link to terminal, dst missing' );
+  
+  /* */
+  
+  test.open( 'src soft link to terminal, dst terminal' );
+  
+  test.case = 'resolvingSrcSoftLink : 0'
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalPath, terminalPath );
+  provider.fileWrite( dstPath, dstPath );
+  provider.softLink( srcPath, terminalPath );
+  provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 0, resolvingSrcTextLink : 0 });
+  test.identical( provider.pathResolveSoftLink( dstPath ), srcPath )
+  
+  test.case = 'resolvingSrcSoftLink : 1'
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalPath, terminalPath );
+  provider.fileWrite( dstPath, dstPath );
+  provider.softLink( srcPath, terminalPath );
+  provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 1, resolvingSrcTextLink : 0 });
+  test.identical( provider.pathResolveSoftLink( dstPath ), terminalPath )
+  
+  test.case = 'resolvingSrcSoftLink : 2'
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalPath, terminalPath );
+  provider.softLink( srcPath, terminalPath );
+  provider.fileWrite( dstPath, dstPath );
+  provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 2, resolvingSrcTextLink : 0 });
+  test.is( provider.isTerminal( dstPath ) );
+  test.identical( provider.fileRead( dstPath ), terminalPath );
+  
+  test.close( 'src soft link to terminal, dst terminal' );
+  
+  /* */
+  
+  test.open( 'src soft link to dir, dst missing' );
+  
+  test.case = 'resolvingSrcSoftLink : 0'
+  provider.filesDelete( testPath );
+  provider.dirMake( terminalPath );
+  provider.softLink( srcPath, terminalPath );
+  provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 0, resolvingSrcTextLink : 0 });
+  test.identical( provider.pathResolveSoftLink( dstPath ), srcPath )
+  
+  test.case = 'resolvingSrcSoftLink : 1'
+  provider.filesDelete( testPath );
+  provider.dirMake( terminalPath );
+  provider.softLink( srcPath, terminalPath );
+  provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 1, resolvingSrcTextLink : 0 });
+  test.identical( provider.pathResolveSoftLink( dstPath ), terminalPath )
+  
+  test.case = 'resolvingSrcSoftLink : 2'
+  provider.filesDelete( testPath );
+  provider.dirMake( terminalPath );
+  provider.softLink( srcPath, terminalPath );
+  provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 2, resolvingSrcTextLink : 0 });
+  test.is( provider.isDir( dstPath ) );
+  
+  test.close( 'src soft link to dir, dst missing' );
+  
+  /* */
+  
+  test.open( 'src dir, dst missing' );
+  
+  test.case = 'resolvingSrcSoftLink : 0'
+  provider.filesDelete( testPath );
+  provider.dirMake( srcPath );
+  test.shouldThrowErrorSync( () => 
+  { 
+    provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 0, resolvingSrcTextLink : 0 }) 
+  });
+  test.is( provider.isDir( srcPath ) );
+  test.is( !provider.fileExists( dstPath ) );
+  
+  test.case = 'resolvingSrcSoftLink : 1'
+  provider.filesDelete( testPath );
+  provider.dirMake( srcPath );
+  test.shouldThrowErrorSync( () => 
+  { 
+    provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 1, resolvingSrcTextLink : 0 }) 
+  });
+  test.is( provider.isDir( srcPath ) );
+  test.is( !provider.fileExists( dstPath ) );
+  
+  test.case = 'resolvingSrcSoftLink : 2'
+  provider.filesDelete( testPath );
+  provider.dirMake( srcPath );
+  test.shouldThrowErrorSync( () => 
+  { 
+    provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 2, resolvingSrcTextLink : 0 }) 
+  });
+  test.is( provider.isDir( srcPath ) );
+  test.is( !provider.fileExists( dstPath ) );
+  
+  test.close( 'src dir, dst missing' );
+  
+  /* */
+  
+  test.open( 'src missing, dst missing' );
+  
+  test.case = 'resolvingSrcSoftLink : 0'
+  provider.filesDelete( testPath );
+  test.shouldThrowErrorSync( () => 
+  { 
+    provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 0, resolvingSrcTextLink : 0 }) 
+  });
+  test.is( !provider.fileExists( srcPath ) );
+  test.is( !provider.fileExists( dstPath ) );
+  
+  test.case = 'resolvingSrcSoftLink : 1'
+  provider.filesDelete( testPath );
+  test.shouldThrowErrorSync( () => 
+  { 
+    provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 1, resolvingSrcTextLink : 0 }) 
+  });
+  test.is( !provider.fileExists( srcPath ) );
+  test.is( !provider.fileExists( dstPath ) );
+  
+  test.case = 'resolvingSrcSoftLink : 2'
+  provider.filesDelete( testPath );
+  test.shouldThrowErrorSync( () => 
+  { 
+    provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 2, resolvingSrcTextLink : 0 }) 
+  });
+  test.is( !provider.fileExists( srcPath ) );
+  test.is( !provider.fileExists( dstPath ) );
+  
+  test.close( 'src missing, dst missing' );
+  
+  /* */
+  
+  test.open( 'src soft link to missing, dst missing' );
+  
+  test.case = 'resolvingSrcSoftLink : 0, allowingMissed : 0'
+  provider.filesDelete( testPath );
+  provider.dirMakeForFile( srcPath );
+  provider.softLink({ dstPath : srcPath, srcPath : terminalPath, allowingMissed : 1 });
+  provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 0, resolvingSrcTextLink : 0, allowingMissed : 0 });
+  test.is( provider.isSoftLink( srcPath ) );
+  test.is( provider.isSoftLink( dstPath ) );
+  test.identical( provider.pathResolveSoftLink( srcPath ), terminalPath )
+  test.identical( provider.pathResolveSoftLink( dstPath ), srcPath )
+  
+  test.case = 'resolvingSrcSoftLink : 0, allowingMissed : 1'
+  provider.filesDelete( testPath );
+  provider.dirMakeForFile( srcPath );
+  provider.softLink({ dstPath : srcPath, srcPath : terminalPath, allowingMissed : 1 });
+  provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 0, resolvingSrcTextLink : 0, allowingMissed : 1 });
+  test.is( provider.isSoftLink( srcPath ) );
+  test.is( provider.isSoftLink( dstPath ) );
+  test.identical( provider.pathResolveSoftLink( srcPath ), terminalPath )
+  test.identical( provider.pathResolveSoftLink( dstPath ), srcPath )
+  
+  test.case = 'resolvingSrcSoftLink : 1, allowingMissed : 0'
+  provider.filesDelete( testPath );
+  provider.dirMakeForFile( srcPath );
+  provider.softLink({ dstPath : srcPath, srcPath : terminalPath, allowingMissed : 1 });
+  test.shouldThrowErrorSync( () => 
+  { 
+    provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 1, resolvingSrcTextLink : 0, allowingMissed : 0 });
+  });
+  test.is( provider.isSoftLink( srcPath ) );
+  test.identical( provider.pathResolveSoftLink( srcPath ), terminalPath )
+  
+  test.case = 'resolvingSrcSoftLink : 1, allowingMissed : 1'
+  provider.filesDelete( testPath );
+  provider.dirMakeForFile( srcPath );
+  provider.softLink({ dstPath : srcPath, srcPath : terminalPath, allowingMissed : 1 });
+  provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 1, resolvingSrcTextLink : 0, allowingMissed : 1 });
+  test.is( provider.isSoftLink( srcPath ) );
+  test.is( provider.isSoftLink( dstPath ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), terminalPath );
+  
+  test.case = 'resolvingSrcSoftLink : 2, allowingMissed : 0'
+  provider.filesDelete( testPath );
+  provider.dirMakeForFile( srcPath );
+  provider.softLink({ dstPath : srcPath, srcPath : terminalPath, allowingMissed : 1 });
+  test.shouldThrowErrorSync( () => 
+  { 
+    provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 2, resolvingSrcTextLink : 0, allowingMissed : 0 });
+  });
+  test.is( provider.isSoftLink( srcPath ) );
+  test.identical( provider.pathResolveSoftLink( srcPath ), terminalPath )
+  
+  test.case = 'resolvingSrcSoftLink : 2, allowingMissed : 1'
+  provider.filesDelete( testPath );
+  provider.dirMakeForFile( srcPath );
+  provider.softLink({ dstPath : srcPath, srcPath : terminalPath, allowingMissed : 1 });
+  provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 2, resolvingSrcTextLink : 0, allowingMissed : 1 });
+  test.is( provider.isSoftLink( srcPath ) );
+  test.is( !provider.fileExists( dstPath ) );
+  test.identical( provider.pathResolveSoftLink( srcPath ), terminalPath )
+  
+  test.close( 'src soft link to missing, dst missing' );
+  
+  /* */
+
+  test.open( 'src soft link to missing, dst terminal' );
+  
+  test.case = 'resolvingSrcSoftLink : 0, allowingMissed : 0'
+  provider.filesDelete( testPath );
+  provider.dirMakeForFile( srcPath );
+  provider.fileWrite( dstPath, dstPath );
+  provider.softLink({ dstPath : srcPath, srcPath : terminalPath, allowingMissed : 1 });
+  provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 0, resolvingSrcTextLink : 0, allowingMissed : 0 });
+  test.is( provider.isSoftLink( srcPath ) );
+  test.is( provider.isSoftLink( dstPath ) );
+  test.identical( provider.pathResolveSoftLink( srcPath ), terminalPath )
+  test.identical( provider.pathResolveSoftLink( dstPath ), srcPath )
+  
+  test.case = 'resolvingSrcSoftLink : 0, allowingMissed : 1'
+  provider.filesDelete( testPath );
+  provider.dirMakeForFile( srcPath );
+  provider.fileWrite( dstPath, dstPath );
+  provider.softLink({ dstPath : srcPath, srcPath : terminalPath, allowingMissed : 1 });
+  provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 0, resolvingSrcTextLink : 0, allowingMissed : 1 });
+  test.is( provider.isSoftLink( srcPath ) );
+  test.is( provider.isSoftLink( dstPath ) );
+  test.identical( provider.pathResolveSoftLink( srcPath ), terminalPath )
+  test.identical( provider.pathResolveSoftLink( dstPath ), srcPath )
+  
+  test.case = 'resolvingSrcSoftLink : 1, allowingMissed : 0'
+  provider.filesDelete( testPath );
+  provider.dirMakeForFile( srcPath );
+  provider.fileWrite( dstPath, dstPath );
+  provider.softLink({ dstPath : srcPath, srcPath : terminalPath, allowingMissed : 1 });
+  test.shouldThrowErrorSync( () => 
+  { 
+    provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 1, resolvingSrcTextLink : 0, allowingMissed : 0 });
+  });
+  test.is( provider.isSoftLink( srcPath ) );
+  test.is( provider.isTerminal( dstPath ) );
+  test.identical( provider.pathResolveSoftLink( srcPath ), terminalPath )
+  
+  test.case = 'resolvingSrcSoftLink : 1, allowingMissed : 1'
+  provider.filesDelete( testPath );
+  provider.dirMakeForFile( srcPath );
+  provider.fileWrite( dstPath, dstPath );
+  provider.softLink({ dstPath : srcPath, srcPath : terminalPath, allowingMissed : 1 });
+  provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 1, resolvingSrcTextLink : 0, allowingMissed : 1 });
+  test.is( provider.isSoftLink( srcPath ) );
+  test.is( provider.isSoftLink( dstPath ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), terminalPath );
+  
+  test.case = 'resolvingSrcSoftLink : 2, allowingMissed : 0'
+  provider.filesDelete( testPath );
+  provider.dirMakeForFile( srcPath );
+  provider.fileWrite( dstPath, dstPath );
+  provider.softLink({ dstPath : srcPath, srcPath : terminalPath, allowingMissed : 1 });
+  test.shouldThrowErrorSync( () => 
+  { 
+    provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 2, resolvingSrcTextLink : 0, allowingMissed : 0 });
+  });
+  test.is( provider.isSoftLink( srcPath ) );
+  test.is( provider.isTerminal( dstPath ) );
+  test.identical( provider.pathResolveSoftLink( srcPath ), terminalPath )
+  
+  test.case = 'resolvingSrcSoftLink : 2, allowingMissed : 1'
+  provider.filesDelete( testPath );
+  provider.dirMakeForFile( srcPath );
+  provider.fileWrite( dstPath, dstPath );
+  provider.softLink({ dstPath : srcPath, srcPath : terminalPath, allowingMissed : 1 });
+  provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 2, resolvingSrcTextLink : 0, allowingMissed : 1 });
+  test.is( provider.isSoftLink( srcPath ) );
+  test.is( !provider.fileExists( dstPath ) );
+  test.identical( provider.pathResolveSoftLink( srcPath ), terminalPath )
+  
+  test.close( 'src soft link to missing, dst terminal' );
+}
+
+//
+
 function fileCopyAsyncThrowingError( test )
 {
   let self = this;
   let provider = self.provider;
   let path = provider.path;
 
-  let testPath = test.context.pathFor( 'written/fileCopyError' );
-  let srcPath = test.context.pathFor( 'written/fileCopyError/src' );
-  let dstPath = test.context.pathFor( 'written/fileCopyError/dst' );
-  let missingPath = test.context.pathFor( 'written/fileCopyError/missing' );
+  let testPath = test.context.pathFor( 'written/fileCopyAsyncThrowingError' );
+  let srcPath = test.context.pathFor( 'written/fileCopyAsyncThrowingError/src' );
+  let dstPath = test.context.pathFor( 'written/fileCopyAsyncThrowingError/dst' );
+  let missingPath = test.context.pathFor( 'written/fileCopyAsyncThrowingError/missing' );
 
   let con = new _.Consequence().take( null )
 
@@ -38142,6 +38452,7 @@ var Self =
     fileCopyAsyncThrowingError,
     fileCopyLinks,
     fileCopyError,
+    fileCopySoftLinkExtended,
 
     fileRenameSync,
     fileRenameRelativePath,

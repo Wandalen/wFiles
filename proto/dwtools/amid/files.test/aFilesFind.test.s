@@ -19952,6 +19952,7 @@ function filesReflectToWithSoftLinks( test )
         'file1' : 'src/proto/file1',
         'file2' : 'src/proto/file2',
 
+        // 'terLink1' : [{ softLink : '/src/proto/file1' }],
         'terLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/terLink1' }],
         'terLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/terLink2' }],
         'terLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto/terLink3' }],

@@ -3271,165 +3271,172 @@ function filesFindSoftLinksExtract( test )
 
   test.close( 'relative links, double' );
 
-  test.open( 'relative links, double, provider' );
-
-  /* - xxx - */
-
-  var filesTree =
-  {
-    src :
-    {
-      proto :
-      {
-        'file1' : 'src/proto/file1',
-        'file2' : 'src/proto/file2',
-
-        'terLink1' : [{ softLink : '../file1' }],
-        'terLink2' : [{ softLink : '../dir1/dir2/file1' }],
-        'terLink3' : [{ softLink : '../../proto2/dir3/dir4/file1' }],
-        // 'dirLink1' : [{ softLink : '..' }],
-        'dirLink2' : [{ softLink : '../dir1/dir2' }],
-        'dirLink3' : [{ softLink : '../../proto2/dir3' }],
-
-        'dualTerLink1' : [{ softLink : '../terLink1' }],
-        'dualTerLink2' : [{ softLink : '../../proto2/dir3/dir4/terLink' }],
-        // 'dualDirLink1' : [{ softLink : '../dirLink1' }],
-        'dualDirLink2' : [{ softLink : '../dirLink2' }],
-        'dualDirLink3' : [{ softLink : '../dirLink3' }],
-        'dualDirLink4' : [{ softLink : '../../proto2/dir3/dir4' }],
-
-        dir1 :
-        {
-          dir2 :
-          {
-            'file1' : 'src/proto/dir1/dir2/file1',
-            'file2' : 'src/proto/dir1/dir2/file1',
-          }
-        },
-
-      },
-      proto2 :
-      {
-        'file1' : 'src/proto2/file1',
-        'file2' : 'src/proto2/file2',
-        dir3 :
-        {
-          dir4 :
-          {
-            'file1' : 'src/proto2/dir3/dir4/file1',
-            'file2' : 'src/proto2/dir3/dir4/file2',
-            'terLink' : [{ softLink : '../../../file1' }],
-            'dirLink' : [{ softLink : '../../../../proto/dir1' }],
-          }
-        }
-      }
-    },
-    'f' : 'f',
-    dst :
-    {
-      'f' : 'dst/f',
-    },
-  }
-
-  var extract = new _.FileProvider.Extract({ filesTree });
-  extract.filesReflectTo( provider, routinePath );
-  var find = provider.filesFinder
-  ({
-    filePath : abs( 'src/proto' ),
-    includingDirs : 1,
-    recursive : 2,
-  });
-
-  /* */
-
-  test.case = 'default resolving';
-  var expected =
-  [
-    '. - /src/proto - /src/proto',
-    './dirLink2 - /src/proto/dirLink2 - /src/proto/dirLink2',
-    './dirLink3 - /src/proto/dirLink3 - /src/proto/dirLink3',
-    './dualDirLink2 - /src/proto/dualDirLink2 - /src/proto/dualDirLink2',
-    './dualDirLink3 - /src/proto/dualDirLink3 - /src/proto/dualDirLink3',
-    './dualDirLink4 - /src/proto/dualDirLink4 - /src/proto/dualDirLink4',
-    './dualTerLink1 - /src/proto/dualTerLink1 - /src/proto/dualTerLink1',
-    './dualTerLink2 - /src/proto/dualTerLink2 - /src/proto/dualTerLink2',
-    './file1 - /src/proto/file1 - /src/proto/file1',
-    './file2 - /src/proto/file2 - /src/proto/file2',
-    './terLink1 - /src/proto/terLink1 - /src/proto/terLink1',
-    './terLink2 - /src/proto/terLink2 - /src/proto/terLink2',
-    './terLink3 - /src/proto/terLink3 - /src/proto/terLink3',
-    './dir1 - /src/proto/dir1 - /src/proto/dir1',
-    './dir1/dir2 - /src/proto/dir1/dir2 - /src/proto/dir1/dir2',
-    './dir1/dir2/file1 - /src/proto/dir1/dir2/file1 - /src/proto/dir1/dir2/file1',
-    './dir1/dir2/file2 - /src/proto/dir1/dir2/file2 - /src/proto/dir1/dir2/file2'
-  ]
-  var got = find
-  ({
-  });
-  got = got.map( ( r ) => `${r.relative} - ${rel( r.absolute )} - ${rel( r.real )}` );
-  test.identical( got, expected );
-
-  /* */
-
-  test.case = 'resolving on';
-  var expected =
-  [
-    '. - /src/proto - /src/proto',
-    './dualTerLink1 - /src/proto/dualTerLink1 - /src/proto/file1',
-    './dualTerLink2 - /src/proto/dualTerLink2 - /src/proto2/file1',
-    './file1 - /src/proto/file1 - /src/proto/file1',
-    './file2 - /src/proto/file2 - /src/proto/file2',
-    './terLink1 - /src/proto/terLink1 - /src/proto/file1',
-    './terLink2 - /src/proto/terLink2 - /src/proto/dir1/dir2/file1',
-    './terLink3 - /src/proto/terLink3 - /src/proto2/dir3/dir4/file1',
-    './dir1 - /src/proto/dir1 - /src/proto/dir1',
-    './dir1/dir2 - /src/proto/dir1/dir2 - /src/proto/dir1/dir2',
-    './dir1/dir2/file1 - /src/proto/dir1/dir2/file1 - /src/proto/dir1/dir2/file1',
-    './dir1/dir2/file2 - /src/proto/dir1/dir2/file2 - /src/proto/dir1/dir2/file2',
-    './dirLink2 - /src/proto/dirLink2 - /src/proto/dir1/dir2',
-    './dirLink2/file1 - /src/proto/dirLink2/file1 - /src/proto/dir1/dir2/file1',
-    './dirLink2/file2 - /src/proto/dirLink2/file2 - /src/proto/dir1/dir2/file2',
-    './dirLink3 - /src/proto/dirLink3 - /src/proto2/dir3',
-    './dirLink3/dir4 - /src/proto/dirLink3/dir4 - /src/proto2/dir3/dir4',
-    './dirLink3/dir4/file1 - /src/proto/dirLink3/dir4/file1 - /src/proto2/dir3/dir4/file1',
-    './dirLink3/dir4/file2 - /src/proto/dirLink3/dir4/file2 - /src/proto2/dir3/dir4/file2',
-    './dirLink3/dir4/terLink - /src/proto/dirLink3/dir4/terLink - /src/proto2/file1',
-    './dirLink3/dir4/dirLink - /src/proto/dirLink3/dir4/dirLink - /src/proto/dir1',
-    './dirLink3/dir4/dirLink/dir2 - /src/proto/dirLink3/dir4/dirLink/dir2 - /src/proto/dir1/dir2',
-    './dirLink3/dir4/dirLink/dir2/file1 - /src/proto/dirLink3/dir4/dirLink/dir2/file1 - /src/proto/dir1/dir2/file1',
-    './dirLink3/dir4/dirLink/dir2/file2 - /src/proto/dirLink3/dir4/dirLink/dir2/file2 - /src/proto/dir1/dir2/file2',
-    './dualDirLink2 - /src/proto/dualDirLink2 - /src/proto/dir1/dir2',
-    './dualDirLink2/file1 - /src/proto/dualDirLink2/file1 - /src/proto/dir1/dir2/file1',
-    './dualDirLink2/file2 - /src/proto/dualDirLink2/file2 - /src/proto/dir1/dir2/file2',
-    './dualDirLink3 - /src/proto/dualDirLink3 - /src/proto2/dir3',
-    './dualDirLink3/dir4 - /src/proto/dualDirLink3/dir4 - /src/proto2/dir3/dir4',
-    './dualDirLink3/dir4/file1 - /src/proto/dualDirLink3/dir4/file1 - /src/proto2/dir3/dir4/file1',
-    './dualDirLink3/dir4/file2 - /src/proto/dualDirLink3/dir4/file2 - /src/proto2/dir3/dir4/file2',
-    './dualDirLink3/dir4/terLink - /src/proto/dualDirLink3/dir4/terLink - /src/proto2/file1',
-    './dualDirLink3/dir4/dirLink - /src/proto/dualDirLink3/dir4/dirLink - /src/proto/dir1',
-    './dualDirLink3/dir4/dirLink/dir2 - /src/proto/dualDirLink3/dir4/dirLink/dir2 - /src/proto/dir1/dir2',
-    './dualDirLink3/dir4/dirLink/dir2/file1 - /src/proto/dualDirLink3/dir4/dirLink/dir2/file1 - /src/proto/dir1/dir2/file1',
-    './dualDirLink3/dir4/dirLink/dir2/file2 - /src/proto/dualDirLink3/dir4/dirLink/dir2/file2 - /src/proto/dir1/dir2/file2',
-    './dualDirLink4 - /src/proto/dualDirLink4 - /src/proto2/dir3/dir4',
-    './dualDirLink4/file1 - /src/proto/dualDirLink4/file1 - /src/proto2/dir3/dir4/file1',
-    './dualDirLink4/file2 - /src/proto/dualDirLink4/file2 - /src/proto2/dir3/dir4/file2',
-    './dualDirLink4/terLink - /src/proto/dualDirLink4/terLink - /src/proto2/file1',
-    './dualDirLink4/dirLink - /src/proto/dualDirLink4/dirLink - /src/proto/dir1',
-    './dualDirLink4/dirLink/dir2 - /src/proto/dualDirLink4/dirLink/dir2 - /src/proto/dir1/dir2',
-    './dualDirLink4/dirLink/dir2/file1 - /src/proto/dualDirLink4/dirLink/dir2/file1 - /src/proto/dir1/dir2/file1',
-    './dualDirLink4/dirLink/dir2/file2 - /src/proto/dualDirLink4/dirLink/dir2/file2 - /src/proto/dir1/dir2/file2'
-  ]
-  var got = find
-  ({
-    resolvingSoftLink : 1,
-    resolvingTextLink : 1,
-  });
-  got = got.map( ( r ) => `${r.relative} - ${rel( r.absolute )} - ${rel( r.real )}` );
-  test.identical( got, expected );
-
-  /* - */
-
-  test.close( 'relative links, double, provider' );
+  // test.open( 'relative links, double, provider' );
+  //
+  // /* - xxx - */
+  //
+  // var filesTree =
+  // {
+  //   src :
+  //   {
+  //     proto :
+  //     {
+  //       'file1' : 'src/proto/file1',
+  //       'file2' : 'src/proto/file2',
+  //
+  //       'terLink1' : [{ softLink : '../file1' }],
+  //       'terLink2' : [{ softLink : '../dir1/dir2/file1' }],
+  //       'terLink3' : [{ softLink : '../../proto2/dir3/dir4/file1' }],
+  //       // 'dirLink1' : [{ softLink : '..' }],
+  //       'dirLink2' : [{ softLink : '../dir1/dir2' }],
+  //       'dirLink3' : [{ softLink : '../../proto2/dir3' }],
+  //
+  //       'dualTerLink1' : [{ softLink : '../terLink1' }],
+  //       'dualTerLink2' : [{ softLink : '../../proto2/dir3/dir4/terLink' }],
+  //       // 'dualDirLink1' : [{ softLink : '../dirLink1' }],
+  //       'dualDirLink2' : [{ softLink : '../dirLink2' }],
+  //       'dualDirLink3' : [{ softLink : '../dirLink3' }],
+  //       'dualDirLink4' : [{ softLink : '../../proto2/dir3/dir4' }],
+  //
+  //       dir1 :
+  //       {
+  //         dir2 :
+  //         {
+  //           'file1' : 'src/proto/dir1/dir2/file1',
+  //           'file2' : 'src/proto/dir1/dir2/file1',
+  //         }
+  //       },
+  //
+  //     },
+  //     proto2 :
+  //     {
+  //       'file1' : 'src/proto2/file1',
+  //       'file2' : 'src/proto2/file2',
+  //       dir3 :
+  //       {
+  //         dir4 :
+  //         {
+  //           'file1' : 'src/proto2/dir3/dir4/file1',
+  //           'file2' : 'src/proto2/dir3/dir4/file2',
+  //           'terLink' : [{ softLink : '../../../file1' }],
+  //           'dirLink' : [{ softLink : '../../../../proto/dir1' }],
+  //         }
+  //       }
+  //     }
+  //   },
+  //   'f' : 'f',
+  //   dst :
+  //   {
+  //     'f' : 'dst/f',
+  //   },
+  // }
+  //
+  // var extract = new _.FileProvider.Extract({ filesTree });
+  // debugger;
+  // extract.filesReflectTo
+  // ({
+  //   dstProvider : provider,
+  //   dst : routinePath,
+  //   resolvingSrcSoftLink : 0,
+  // });
+  // debugger;
+  // var find = provider.filesFinder
+  // ({
+  //   filePath : abs( 'src/proto' ),
+  //   includingDirs : 1,
+  //   recursive : 2,
+  // });
+  //
+  // /* */
+  //
+  // test.case = 'default resolving';
+  // var expected =
+  // [
+  //   '. - /src/proto - /src/proto',
+  //   './dirLink2 - /src/proto/dirLink2 - /src/proto/dirLink2',
+  //   './dirLink3 - /src/proto/dirLink3 - /src/proto/dirLink3',
+  //   './dualDirLink2 - /src/proto/dualDirLink2 - /src/proto/dualDirLink2',
+  //   './dualDirLink3 - /src/proto/dualDirLink3 - /src/proto/dualDirLink3',
+  //   './dualDirLink4 - /src/proto/dualDirLink4 - /src/proto/dualDirLink4',
+  //   './dualTerLink1 - /src/proto/dualTerLink1 - /src/proto/dualTerLink1',
+  //   './dualTerLink2 - /src/proto/dualTerLink2 - /src/proto/dualTerLink2',
+  //   './file1 - /src/proto/file1 - /src/proto/file1',
+  //   './file2 - /src/proto/file2 - /src/proto/file2',
+  //   './terLink1 - /src/proto/terLink1 - /src/proto/terLink1',
+  //   './terLink2 - /src/proto/terLink2 - /src/proto/terLink2',
+  //   './terLink3 - /src/proto/terLink3 - /src/proto/terLink3',
+  //   './dir1 - /src/proto/dir1 - /src/proto/dir1',
+  //   './dir1/dir2 - /src/proto/dir1/dir2 - /src/proto/dir1/dir2',
+  //   './dir1/dir2/file1 - /src/proto/dir1/dir2/file1 - /src/proto/dir1/dir2/file1',
+  //   './dir1/dir2/file2 - /src/proto/dir1/dir2/file2 - /src/proto/dir1/dir2/file2'
+  // ]
+  // var got = find
+  // ({
+  // });
+  // got = got.map( ( r ) => `${r.relative} - ${rel( r.absolute )} - ${rel( r.real )}` );
+  // test.identical( got, expected );
+  //
+  // /* */
+  //
+  // test.case = 'resolving on';
+  // var expected =
+  // [
+  //   '. - /src/proto - /src/proto',
+  //   './dualTerLink1 - /src/proto/dualTerLink1 - /src/proto/file1',
+  //   './dualTerLink2 - /src/proto/dualTerLink2 - /src/proto2/file1',
+  //   './file1 - /src/proto/file1 - /src/proto/file1',
+  //   './file2 - /src/proto/file2 - /src/proto/file2',
+  //   './terLink1 - /src/proto/terLink1 - /src/proto/file1',
+  //   './terLink2 - /src/proto/terLink2 - /src/proto/dir1/dir2/file1',
+  //   './terLink3 - /src/proto/terLink3 - /src/proto2/dir3/dir4/file1',
+  //   './dir1 - /src/proto/dir1 - /src/proto/dir1',
+  //   './dir1/dir2 - /src/proto/dir1/dir2 - /src/proto/dir1/dir2',
+  //   './dir1/dir2/file1 - /src/proto/dir1/dir2/file1 - /src/proto/dir1/dir2/file1',
+  //   './dir1/dir2/file2 - /src/proto/dir1/dir2/file2 - /src/proto/dir1/dir2/file2',
+  //   './dirLink2 - /src/proto/dirLink2 - /src/proto/dir1/dir2',
+  //   './dirLink2/file1 - /src/proto/dirLink2/file1 - /src/proto/dir1/dir2/file1',
+  //   './dirLink2/file2 - /src/proto/dirLink2/file2 - /src/proto/dir1/dir2/file2',
+  //   './dirLink3 - /src/proto/dirLink3 - /src/proto2/dir3',
+  //   './dirLink3/dir4 - /src/proto/dirLink3/dir4 - /src/proto2/dir3/dir4',
+  //   './dirLink3/dir4/file1 - /src/proto/dirLink3/dir4/file1 - /src/proto2/dir3/dir4/file1',
+  //   './dirLink3/dir4/file2 - /src/proto/dirLink3/dir4/file2 - /src/proto2/dir3/dir4/file2',
+  //   './dirLink3/dir4/terLink - /src/proto/dirLink3/dir4/terLink - /src/proto2/file1',
+  //   './dirLink3/dir4/dirLink - /src/proto/dirLink3/dir4/dirLink - /src/proto/dir1',
+  //   './dirLink3/dir4/dirLink/dir2 - /src/proto/dirLink3/dir4/dirLink/dir2 - /src/proto/dir1/dir2',
+  //   './dirLink3/dir4/dirLink/dir2/file1 - /src/proto/dirLink3/dir4/dirLink/dir2/file1 - /src/proto/dir1/dir2/file1',
+  //   './dirLink3/dir4/dirLink/dir2/file2 - /src/proto/dirLink3/dir4/dirLink/dir2/file2 - /src/proto/dir1/dir2/file2',
+  //   './dualDirLink2 - /src/proto/dualDirLink2 - /src/proto/dir1/dir2',
+  //   './dualDirLink2/file1 - /src/proto/dualDirLink2/file1 - /src/proto/dir1/dir2/file1',
+  //   './dualDirLink2/file2 - /src/proto/dualDirLink2/file2 - /src/proto/dir1/dir2/file2',
+  //   './dualDirLink3 - /src/proto/dualDirLink3 - /src/proto2/dir3',
+  //   './dualDirLink3/dir4 - /src/proto/dualDirLink3/dir4 - /src/proto2/dir3/dir4',
+  //   './dualDirLink3/dir4/file1 - /src/proto/dualDirLink3/dir4/file1 - /src/proto2/dir3/dir4/file1',
+  //   './dualDirLink3/dir4/file2 - /src/proto/dualDirLink3/dir4/file2 - /src/proto2/dir3/dir4/file2',
+  //   './dualDirLink3/dir4/terLink - /src/proto/dualDirLink3/dir4/terLink - /src/proto2/file1',
+  //   './dualDirLink3/dir4/dirLink - /src/proto/dualDirLink3/dir4/dirLink - /src/proto/dir1',
+  //   './dualDirLink3/dir4/dirLink/dir2 - /src/proto/dualDirLink3/dir4/dirLink/dir2 - /src/proto/dir1/dir2',
+  //   './dualDirLink3/dir4/dirLink/dir2/file1 - /src/proto/dualDirLink3/dir4/dirLink/dir2/file1 - /src/proto/dir1/dir2/file1',
+  //   './dualDirLink3/dir4/dirLink/dir2/file2 - /src/proto/dualDirLink3/dir4/dirLink/dir2/file2 - /src/proto/dir1/dir2/file2',
+  //   './dualDirLink4 - /src/proto/dualDirLink4 - /src/proto2/dir3/dir4',
+  //   './dualDirLink4/file1 - /src/proto/dualDirLink4/file1 - /src/proto2/dir3/dir4/file1',
+  //   './dualDirLink4/file2 - /src/proto/dualDirLink4/file2 - /src/proto2/dir3/dir4/file2',
+  //   './dualDirLink4/terLink - /src/proto/dualDirLink4/terLink - /src/proto2/file1',
+  //   './dualDirLink4/dirLink - /src/proto/dualDirLink4/dirLink - /src/proto/dir1',
+  //   './dualDirLink4/dirLink/dir2 - /src/proto/dualDirLink4/dirLink/dir2 - /src/proto/dir1/dir2',
+  //   './dualDirLink4/dirLink/dir2/file1 - /src/proto/dualDirLink4/dirLink/dir2/file1 - /src/proto/dir1/dir2/file1',
+  //   './dualDirLink4/dirLink/dir2/file2 - /src/proto/dualDirLink4/dirLink/dir2/file2 - /src/proto/dir1/dir2/file2'
+  // ]
+  // var got = find
+  // ({
+  //   resolvingSoftLink : 1,
+  //   resolvingTextLink : 1,
+  // });
+  // got = got.map( ( r ) => `${r.relative} - ${rel( r.absolute )} - ${rel( r.real )}` );
+  // test.identical( got, expected );
+  //
+  // /* - */
+  //
+  // test.close( 'relative links, double, provider' );
 
   /* - */
 
@@ -7979,7 +7986,7 @@ function filesFindMandatoryMap( test )
 
 //
 
-function filesFindExcludingNodeModules( test )
+function filesFindExcluding( test )
 {
   let context = this;
   let provider = context.provider;
@@ -7993,6 +8000,10 @@ function filesFindExcludingNodeModules( test )
     args.unshift( routinePath );
     return path.s.join.apply( path.s, args );
   }
+
+  /* - */
+
+  test.open( 'node_modules' );
 
   /* - */
 
@@ -8095,7 +8106,131 @@ function filesFindExcludingNodeModules( test )
   var got = find( routinePath );
   test.identical( got, expected );
 
-}
+  /* - */
+
+  test.close( 'node_modules' );
+
+  test.open( '+*' );
+
+  /* - */
+
+  var extract1 = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      '+t' : '/+t',
+      't' : '/t',
+      '+ter' : '/+ter',
+      'ter' : '/ter',
+      '+dir1' :
+      {
+        '+t' : '/+t',
+        't' : '/t',
+        '+ter' : '/+ter',
+        'ter' : '/ter',
+      },
+      dir2 :
+      {
+        dir3 :
+        {
+          '+t' : '/+t',
+          't' : '/t',
+          '+ter' : '/+ter',
+          'ter' : '/ter',
+        },
+        '+dir4' :
+        {
+          '+t' : '/+t',
+          't' : '/t',
+          '+ter' : '/+ter',
+          'ter' : '/ter',
+        },
+      },
+    },
+  });
+
+  provider.filesDelete( routinePath );
+  extract1.filesReflectTo( provider, routinePath );
+
+  var find = provider.filesFinder
+  ({
+    recursive : 2,
+    maskPreset : 0,
+    outputFormat : 'relative',
+  });
+
+  /* */
+
+  test.case = 'control';
+  var expectedRelative =
+  [
+    './+t',
+    './+ter',
+    './t',
+    './ter',
+    './+dir1/+t',
+    './+dir1/+ter',
+    './+dir1/t',
+    './+dir1/ter',
+    './dir2/+dir4/+t',
+    './dir2/+dir4/+ter',
+    './dir2/+dir4/t',
+    './dir2/+dir4/ter',
+    './dir2/dir3/+t',
+    './dir2/dir3/+ter',
+    './dir2/dir3/t',
+    './dir2/dir3/ter'
+  ]
+  var gotRelative = find({ filePath : { [abs( '.' )] : '' } });
+  test.identical( gotRelative, expectedRelative );
+
+  /* */
+
+  test.case = 'control';
+  var expectedRelative =
+  [
+    './t',
+    './ter',
+    './+dir1/+t',
+    './+dir1/+ter',
+    './+dir1/t',
+    './+dir1/ter',
+    './dir2/+dir4/+t',
+    './dir2/+dir4/+ter',
+    './dir2/+dir4/t',
+    './dir2/+dir4/ter',
+    './dir2/dir3/+t',
+    './dir2/dir3/+ter',
+    './dir2/dir3/t',
+    './dir2/dir3/ter'
+  ]
+  var gotRelative = find({ filePath : { [abs( '.' )] : '', '+*' : 0 } });
+  test.identical( gotRelative, expectedRelative );
+
+  /* */
+
+  test.case = '+**';
+  var expectedRelative =
+  [
+    './t',
+    './ter',
+    './dir2/+dir4/+t',
+    './dir2/+dir4/+ter',
+    './dir2/+dir4/t',
+    './dir2/+dir4/ter',
+    './dir2/dir3/+t',
+    './dir2/dir3/+ter',
+    './dir2/dir3/t',
+    './dir2/dir3/ter'
+  ]
+  var gotRelative = find({ filePath : { [abs( '.' )] : '', '+**' : 0 } });
+  test.identical( gotRelative, expectedRelative );
+
+  /* - */
+
+  test.close( '+*' );
+
+} /* end of filesFindExcluding */
 
 //
 
@@ -24946,7 +25081,7 @@ var Self =
     filesFindSimplifyGlob,
     filesFindMandatoryString,
     filesFindMandatoryMap,
-    filesFindExcludingNodeModules,
+    filesFindExcluding,
     filesFindGlobLogic,
     filesFindGlobComplex,
 

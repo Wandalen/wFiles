@@ -4576,8 +4576,8 @@ function _applyToRecordMasks( record )
   _.assert( !!masks, 'Cant resolve filter map for stem path', () => _.strQuote( f.stemPath ) );
   _.assert( !!f.formed, 'Record factor was not formed!' );
 
-  // if( _.strEnds( record.absolute, 'proto2' ) )
-  // debugger;
+  if( _.strEnds( record.absolute, 'ter' ) )
+  debugger;
   // if( _.strEnds( record.absolute, 'proto' ) )
   // debugger;
   // if( _.strEnds( record.absolute, 'proto/f.js' ) )

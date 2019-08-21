@@ -5320,6 +5320,8 @@ function _link_functor( fop )
   let entryMethodName = _.strRemoveEnd( fop.actMethodName, 'Act' );
   let onVerify1 = fop.onVerify1;
   let onVerify2 = fop.onVerify2;
+  let onIsLink2 = fop.onIsLink;
+  let onStat2 = fop.onStat;
   // let onSizeCheck = fop.onSizeCheck;
   let renaming = fop.renaming;
   let skippingSamePath = fop.skippingSamePath;
@@ -5542,34 +5544,29 @@ function _link_functor( fop )
     {
       if( stat.isSoftLink() )
       return true;
-      if( actMethodName === 'textLinkAct' )
-      {
-        let r = false;
-        self.fieldPush( 'usingTextLink', 1 );
-        r = stat.isTextLink();
-        self.fieldPop( 'usingTextLink', 1 );
-        return r;
-      }
+      
+      if( onIsLink2 )
+      return onIsLink2.call( self, stat );
+          
       return false;
     }
 
     /* */
 
     function onStat( filePath, resolving )
-    {
-      if( actMethodName === 'textLinkAct' )
-      self.fieldPush( 'usingTextLink', 1 );
-      let result = self.statRead
+    { 
+      if( onStat2 )
+      return onStat2.call( self, filePath, resolving );
+      
+      return self.statRead
       ({
         filePath : filePath,
         throwing : 0,
         resolvingSoftLink : resolving,
-        resolvingTextLink : resolving && actMethodName === 'textLinkAct' ? 1 : 0,
+        // resolvingTextLink : resolving && actMethodName === 'textLinkAct' ? 1 : 0,
+        resolvingTextLink : 0,
         sync : 1,
       });
-      if( actMethodName === 'textLinkAct' )
-      self.fieldPop( 'usingTextLink', 1 );
-      return result;
     }
 
     /* */
@@ -6239,6 +6236,8 @@ _link_functor.defaults =
   onAct : null,
   onVerify1 : null,
   onVerify2 : null,
+  onIsLink : null,
+  onStat : null,
   // onSizeCheck : null,
 
   renaming : true,
@@ -6963,11 +6962,39 @@ function _textLinkVerify2( c )
   c.end( true );
 }
 
+function _textIsLink( stat )
+{ 
+  let self = this;
+  let r = false;
+  self.fieldPush( 'usingTextLink', 1 );
+  r = stat.isTextLink();
+  self.fieldPop( 'usingTextLink', 1 );
+  return r;
+}
+
+function _textOnStat( filePath, resolving )
+{ 
+  let self = this;
+  self.fieldPush( 'usingTextLink', 1 );
+  let result = self.statRead
+  ({
+    filePath : filePath,
+    throwing : 0,
+    resolvingSoftLink : resolving,
+    resolvingTextLink : resolving,
+    sync : 1,
+  });
+  self.fieldPop( 'usingTextLink', 1 );
+  return result;
+}
+
 let textLink = _link_functor
 ({
   actMethodName : 'textLinkAct',
   onAct : _textLinkAct,
   onVerify2 : _textLinkVerify2,
+  onIsLink : _textIsLink,
+  onStat : _textOnStat,
   skippingSamePath : false,
   skippingMissed : false,
 });

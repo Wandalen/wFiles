@@ -6513,22 +6513,12 @@ function _fileCopyVerify2( c )
 
   _.assert( _.strIs( o.srcPath ) );
   _.assert( _.fileStatIs( c.srcStat ) || c.srcStat === null );
-
+  
   if( c.srcStat === undefined )
   c.srcStat = self.statRead({ filePath : o.srcPath, sync : 1 });
-
-  if( c.srcStat === null )
-  return;
   
-  if( o.resolvingSrcSoftLink || o.resolvingSrcTextLink )
-  c.srcStat = self.statRead({ filePath : c.originalSrcResolvedPath, sync : 1, resolvingSoftLink : 0, resolvingTextLink : 0 });
-
-  if( c.srcStat.isDir() )
-  {
-    debugger;
-    c.error( _.err( 'Cant copy directory ' + _.strQuote( o.srcPath ) + ', consider method filesReflect'  ) );
-  }
-
+  // if( c.srcStat === null )
+  // return;
 }
 
 function _fileCopyAct( c )
@@ -6539,26 +6529,39 @@ function _fileCopyAct( c )
 
   _.assert( _.fileStatIs( c.srcStat ) || c.srcStat === null );
 
-  if( o.srcPath === 'extract4:///src/proto/terLink1' )
+  // if( o.srcPath === 'extract4:///src/proto/terLink1' )
   debugger;
-
-  if( c.srcStat === null )
-  {
-    // return self.fileDeleteAct({ filePath : o.dstPath, sync : o.sync });
-  }
-  else if( c.srcStat.isSoftLink() )
-  {
-    // debugger;
-
-    // qqq : ?
-    // /* should not throw error for missed neither for cycled */
-    // let srcResolvedPath = self.pathResolveSoftLink
-    // ({
-    //   filePath : o.srcPath,
-    //   // allowingMissed : o.allowingMissed,
-    //   // allowingCycled : o.allowingCycled,
-    // });
-
+  
+  let srcStat = c.srcStat;
+  
+  if( o.resolvingSrcSoftLink || o.resolvingSrcTextLink )
+  srcStat = self.statRead({ filePath : c.originalSrcResolvedPath, sync : 1, resolvingSoftLink : 0, resolvingTextLink : 0 });
+  
+  if( srcStat.isSoftLink() )
+  { 
+    if( o.resolvingSrcSoftLink === 2 )
+    {
+      if( c.srcResolvedStat === null )
+      return null;
+      
+      if( c.srcResolvedStat.isDir() )
+      return self.dirMakeAct
+      ({
+        filePath : o.dstPath,
+        sync : o.sync
+      })
+      
+      return self.fileCopyAct
+      ({
+        dstPath : o.dstPath,
+        srcPath : o.srcPath,
+        originalDstPath : o.originalDstPath,
+        originalSrcPath : o.originalSrcPath,
+        breakingDstHardLink : o.breakingDstHardLink,
+        sync : o.sync,
+      });
+    }
+    
     return self.softLinkAct
     ({
       dstPath : o.dstPath,
@@ -6568,21 +6571,32 @@ function _fileCopyAct( c )
       sync : o.sync,
       type : null,
     });
-
-    // return self.softLinkAct
-    // ({
-    //   dstPath : o.dstPath,
-    //   srcPath : srcResolvedPath,
-    //   originalDstPath : o.originalDstPath,
-    //   originalSrcPath : srcResolvedPath,
-    //   sync : o.sync,
-    //   type : null,
-    // });
-
   }
-  else if( c.srcStat.isTextLink() )
+  else if( srcStat.isTextLink() )
   {
-
+    if( o.resolvingSrcTextLink === 2 )
+    {
+      if( c.srcResolvedStat === null )
+      return self.fileDeleteAct({ filePath : o.dstPath, sync : o.sync });
+      
+      if( c.srcResolvedStat.isDir() )
+      return self.dirMakeAct
+      ({
+        filePath : o.dstPath,
+        sync : o.sync
+      })
+      
+      return self.fileCopyAct
+      ({
+        dstPath : o.dstPath,
+        srcPath : o.srcPath,
+        originalDstPath : o.originalDstPath,
+        originalSrcPath : o.originalSrcPath,
+        breakingDstHardLink : o.breakingDstHardLink,
+        sync : o.sync,
+      });
+    }
+    
     // qqq : cover
 
     return self.textLinkAct
@@ -6596,7 +6610,9 @@ function _fileCopyAct( c )
 
   }
   else
-  {
+  { 
+    if( c.srcStat.isDir() )
+    throw _.err( 'Cant copy directory ' + _.strQuote( o.srcPath ) + ', consider method filesReflect'  );
 
     return self.fileCopyAct
     ({

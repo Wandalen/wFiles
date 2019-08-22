@@ -1344,6 +1344,8 @@ function softLinkAct( o )
   _.assert( self.path.isNormalized( o.dstPath ) );
 
   if( !self.path.isAbsolute( o.originalSrcPath ) )
+  debugger;
+  if( !self.path.isAbsolute( o.originalSrcPath ) )
   o.srcPath = o.originalSrcPath;
 
   if( o.sync )

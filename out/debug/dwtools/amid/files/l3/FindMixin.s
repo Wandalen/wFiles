@@ -3452,6 +3452,105 @@ function filesReflectSingle_body( o )
 
   /* */
 
+  function linkRebasing( record )
+  {
+
+    if( !o.rebasingLink )
+    return false;
+
+    let isSoftLink = record.src.isSoftLink;
+    let isTextLink = record.src.isTextLink;
+    if( !isSoftLink && !isTextLink )
+    return false;
+
+    let srcPath;
+    let srcAbsolute = record.src.real;
+    /* xxx qqq : use resolvingMultiple / recursive option instead of if-else */
+
+    if( o.rebasingLink === 1 )
+    {
+      srcPath = src.pathResolveLinkStep
+      ({
+        filePath : srcAbsolute,
+        resolvingSoftLink : 1,
+        resolvingTextLink : 1,
+        throwing : o.throwing,
+        allowingMissed : o.allowingMissed,
+        allowingCycled : o.allowingCycled,
+      });
+      srcAbsolute = path.join( srcAbsolute, srcPath );
+    }
+    else if( o.rebasingLink === 2 )
+    {
+      srcAbsolute = src.pathResolveLinkFull
+      ({
+        filePath : srcAbsolute,
+        resolvingSoftLink : 1,
+        resolvingTextLink : 1,
+        throwing : o.throwing,
+        allowingMissed : o.allowingMissed,
+        allowingCycled : o.allowingCycled,
+      });
+      srcPath = srcAbsolute;
+    }
+    else _.assert( 0 );
+
+    if( !o.visited[ srcAbsolute ] )
+    debugger;
+    if( !o.visited[ srcAbsolute ] )
+    return false
+
+    let srcRecord = o.visited[ srcAbsolute ];
+    let dstRecord = srcToDst( srcRecord );
+    if( record.src === dstRecord )
+    debugger;
+    if( record.src === dstRecord )
+    return false;
+
+    if( path.isAbsolute( srcPath ) )
+    srcPath = record.src.absolutePreferred;
+
+    record.src = dstRecord;
+    let action = isSoftLink ? 'softLink' : 'textLink';
+
+    if( action === 'softLink' )
+    {
+      /* zzz : should not change time of file if it is already linked */
+      hub.softLink
+      ({
+        dstPath : record.dst.absolutePreferred,
+        srcPath : srcPath,
+        makingDirectory : 0,
+        allowingMissed : 1,
+        allowingCycled : 1,
+        resolvingSrcSoftLink : o.resolvingSrcSoftLink,
+        resolvingSrcTextLink : o.resolvingSrcTextLink,
+        resolvingDstSoftLink : o.resolvingDstSoftLink,
+        resolvingDstTextLink : o.resolvingDstTextLink,
+      });
+    }
+    else if( action === 'textLink' )
+    {
+      /* zzz : should not change time of file if it is already linked */
+      hub.textLink
+      ({
+        dstPath : record.dst.absolutePreferred,
+        srcPath : srcPath,
+        makingDirectory : 0,
+        allowingMissed : 1,
+        allowingCycled : 1,
+        resolvingSrcSoftLink : o.resolvingSrcSoftLink,
+        resolvingSrcTextLink : o.resolvingSrcTextLink,
+        resolvingDstSoftLink : o.resolvingDstSoftLink,
+        resolvingDstTextLink : o.resolvingDstTextLink,
+      });
+    }
+
+    return true;
+  }
+
+  /* */
+
   function link( record )
   {
 
@@ -3464,67 +3563,12 @@ function filesReflectSingle_body( o )
     return;
 
     if( record.action === 'nop' )
-    return;
+    return false;
 
     let action = record.action;
 
-    if( o.rebasingLink )
-    {
-      let isSoftLink = record.src.isSoftLink;
-      let isTextLink = record.src.isTextLink;
-      if( isSoftLink || isTextLink )
-      {
-        let srcReal = record.src.real; debugger;
-        /* xxx qqq : use resolvingMultiple / recursive option instead of if-else */
-
-        if( o.rebasingLink === 2 )
-        {
-          srcReal = src.pathResolveLinkFull
-          ({
-            filePath : srcReal,
-            resolvingSoftLink : 1,
-            resolvingTextLink : 1,
-            throwing : o.throwing,
-            allowingMissed : o.allowingMissed,
-            allowingCycled : o.allowingCycled,
-          });
-        }
-        else if( o.rebasingLink === 1 )
-        {
-          srcReal = src.pathResolveLinkStep
-          ({
-            filePath : srcReal,
-            resolvingSoftLink : 1,
-            resolvingTextLink : 1,
-            throwing : o.throwing,
-            allowingMissed : o.allowingMissed,
-            allowingCycled : o.allowingCycled,
-          });
-        }
-        else _.assert( 0 );
-
-        if( o.visited[ srcReal ] )
-        {
-          debugger;
-          let srcRecord = o.visited[ srcReal ];
-          let dstRecord = srcToDst( srcRecord );
-          if( record.src !== dstRecord )
-          {
-            debugger;
-            record.src = dstRecord;
-            action = isSoftLink ? 'softLink' : 'textLink';
-          }
-          else
-          {
-            debugger;
-          }
-        }
-        else
-        {
-          debugger;
-        }
-      }
-    }
+    if( linkRebasing( record ) )
+    return true;
 
     if( action === 'hardLink' )
     {
@@ -3561,6 +3605,7 @@ function filesReflectSingle_body( o )
     }
     else if( action === 'textLink' )
     {
+      /* zzz : should not change time of file if it is already linked */
       hub.textLink
       ({
         dstPath : record.dst.absolutePreferred,
@@ -3590,6 +3635,7 @@ function filesReflectSingle_body( o )
     }
     else _.assert( 0 );
 
+    return true;
   }
 
   /* */

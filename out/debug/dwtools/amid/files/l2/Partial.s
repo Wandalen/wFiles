@@ -5385,6 +5385,9 @@ function _link_functor( fop )
   _.assert( onSizeCheck === null || _.routineIs( onSizeCheck ) );
 
   _.routineExtend( _link_body, onAct )
+  _link_body.defaults = _.mapExtend( null, _link_body.defaults );
+  delete _link_body.defaults.originalSrcPath;
+  delete _link_body.defaults.originalDstPath;
 
   var having = _link_body.having;
 
@@ -5596,20 +5599,20 @@ function _link_functor( fop )
     {
       if( stat.isSoftLink() )
       return true;
-      
+
       if( onIsLink2 )
       return onIsLink2.call( self, stat );
-          
+
       return false;
     }
 
     /* */
 
     function onStat( filePath, resolving )
-    { 
+    {
       if( onStat2 )
       return onStat2.call( self, filePath, resolving );
-      
+
       return self.statRead
       ({
         filePath : filePath,
@@ -5635,6 +5638,8 @@ function _link_functor( fop )
       _.assert( _.boolLike( o.resolvingDstTextLink ) );
       _.assert( _.boolLike( o.allowingMissed ) );
       _.assert( _.boolLike( o.allowingCycled ) );
+      _.assert( o.originalSrcPath === undefined );
+      _.assert( o.originalDstPath === undefined );
 
       if( onVerify1 )
       {
@@ -5783,9 +5788,6 @@ function _link_functor( fop )
     function pathResolve()
     {
 
-      _.assert( o.originalSrcPath === null, 'not tested' );
-      _.assert( o.originalDstPath === null, 'not tested' );
-
       if( !o.originalSrcPath )
       o.originalSrcPath = o.srcPath;
       if( !o.originalDstPath )
@@ -5805,9 +5807,9 @@ function _link_functor( fop )
 
       _.assert( path.isAbsolute( o.srcPath ) );
       _.assert( path.isAbsolute( o.dstPath ) );
-      
+
       c.originalSrcResolvedPath = o.srcPath;
-      
+
       /* check if equal early */
 
       verifyEqualPaths();
@@ -5941,7 +5943,7 @@ function _link_functor( fop )
             sync : 0,
             throwing : o.throwing
           }
-          
+
           return self.pathResolveLinkFull( o2 )
           .then( ( srcPath ) =>
           {
@@ -6127,9 +6129,9 @@ function _link_functor( fop )
     {
       if( !Config.debug )
       return;
-      
+
       return;//xxx
-      
+
       // debugger
 
       // if( !c.srcStat )
@@ -6527,20 +6529,20 @@ function _fileCopySizeCheck( c )
 {
   let self = this;
   let o = c.options;
-  
+
   if( c.srcStat.isLink() )
   if( c.srcResolvedStat === null )
-  { 
+  {
     let isSoftLink = c.srcStat.isSoftLink();
     let isTextLink = c.srcStat.isTextLink();
-    
+
     if( ( o.resolvingSrcSoftLink === 2 && isSoftLink ) || ( o.resolvingSrcTextLink === 2 && isTextLink ) )
-    { 
+    {
       if( self.fileExists( o.dstPath ) )
       throw _.err( `Destination file ${o.dstPath} shouldn't exist` );
     }
-    else 
-    { 
+    else
+    {
       let dstPath = isSoftLink ? self.pathResolveSoftLink( o.dstPath ) : self.pathResolveTextLink( o.dstPath );
       if( dstPath !== o.srcPath )
       throw _.err( `Destination file ${o.dstPath} should be a link to ${o.srcPath}` );
@@ -6555,10 +6557,10 @@ function _fileCopyVerify2( c )
 
   _.assert( _.strIs( o.srcPath ) );
   _.assert( _.fileStatIs( c.srcStat ) || c.srcStat === null );
-  
+
   if( c.srcStat === undefined )
   c.srcStat = self.statRead({ filePath : o.srcPath, sync : 1 });
-  
+
   // if( c.srcStat === null )
   // return;
 }
@@ -6573,21 +6575,21 @@ function _fileCopyAct( c )
 
   if( o.srcPath === 'extract4:///src/proto/terLink1' )
   debugger;
-  
+
   let srcStat = c.srcStat;
-    
+
   if( o.resolvingSrcSoftLink || o.resolvingSrcTextLink )
   if( self.fileExists( c.originalSrcResolvedPath ) )
   c.srcStat = self.statRead({ filePath : c.originalSrcResolvedPath, sync : 1, resolvingSoftLink : 0, resolvingTextLink : 0 });
-  
+
   if( c.srcStat === null )
   return null;
-  
+
   if( c.srcStat.isSoftLink() )
-  { 
+  {
     if( o.resolvingSrcSoftLink === 2 )
     return resolvingSrcLink2();
-    
+
     return self.softLinkAct
     ({
       dstPath : o.dstPath,
@@ -6602,7 +6604,7 @@ function _fileCopyAct( c )
   {
     if( o.resolvingSrcTextLink === 2 )
     return resolvingSrcLink2();
-    
+
     // qqq : cover
 
     return self.textLinkAct
@@ -6617,20 +6619,20 @@ function _fileCopyAct( c )
   }
   else
   {
-    return act(); 
+    return act();
   }
 
   /* */
-  
+
   function resolvingSrcLink2()
   {
     if( c.srcResolvedStat === null )
     return null;
-    return act(); 
+    return act();
   }
-  
+
   /* */
-  
+
   function act()
   {
     if( srcStat.isDir() )
@@ -7019,7 +7021,7 @@ function _textLinkVerify2( c )
 }
 
 function _textIsLink( stat )
-{ 
+{
   let self = this;
   let r = false;
   self.fieldPush( 'usingTextLink', 1 );
@@ -7029,7 +7031,7 @@ function _textIsLink( stat )
 }
 
 function _textOnStat( filePath, resolving )
-{ 
+{
   let self = this;
   self.fieldPush( 'usingTextLink', 1 );
   let result = self.statRead

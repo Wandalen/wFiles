@@ -3133,8 +3133,8 @@ function filesReflectEvaluate_body( o )
   }
 }
 
-let filesReflectSinglePrimeDefaults = Object.create( null );
-var defaults = filesReflectSinglePrimeDefaults;
+let filesReflectPrimeDefaults = Object.create( null );
+var defaults = filesReflectPrimeDefaults;
 
 defaults.result = null;
 defaults.verbosity = 0;
@@ -3164,7 +3164,7 @@ defaults.onUp = null;
 defaults.onDown = null;
 defaults.onDstName = null;
 
-var defaults = filesReflectEvaluate_body.defaults = Object.create( filesReflectSinglePrimeDefaults );
+var defaults = filesReflectEvaluate_body.defaults = Object.create( filesReflectPrimeDefaults );
 
 defaults.filesGraph = null;
 defaults.src = null;
@@ -3563,9 +3563,8 @@ function filesReflectSingle_body( o )
 
 }
 
-var defaults = filesReflectSingle_body.defaults = Object.create( filesReflectEvaluate.defaults );
-
-// defaults.mandatory = 1;
+let filesReflectAdvancedDefaults = Object.create( null );
+var defaults = filesReflectAdvancedDefaults;
 
 defaults.onWriteDstUp = null;
 defaults.onWriteDstDown = null;
@@ -3578,6 +3577,10 @@ defaults.resolvingSrcTextLink = null;
 defaults.breakingDstHardLink = null;
 defaults.resolvingDstSoftLink = null;
 defaults.resolvingDstTextLink = null;
+defaults.rebasingLink = 0;
+
+var defaults = filesReflectSingle_body.defaults = Object.create( filesReflectEvaluate.defaults );
+_.mapExtend( defaults, filesReflectAdvancedDefaults );
 
 var having = filesReflectSingle_body.having = Object.create( null );
 having.writing = 0;
@@ -3811,22 +3814,23 @@ function filesReflect_body( o )
 
 var defaults = filesReflect_body.defaults = Object.create( filesReflectEvaluate.defaults );
 
+_.mapExtend( defaults, filesReflectAdvancedDefaults );
+
 defaults.filter = null;
 defaults.reflectMap = null;
-// defaults.mandatory = filesReflectSingle.defaults.mandatory;
 defaults.outputFormat = 'record';
 
-defaults.onWriteDstUp = null;
-defaults.onWriteDstDown = null;
-defaults.onWriteSrcUp = null;
-defaults.onWriteSrcDown = null;
-
-defaults.breakingSrcHardLink = null;
-defaults.resolvingSrcSoftLink = null;
-defaults.resolvingSrcTextLink = null;
-defaults.breakingDstHardLink = null;
-defaults.resolvingDstSoftLink = null;
-defaults.resolvingDstTextLink = null;
+// defaults.onWriteDstUp = null;
+// defaults.onWriteDstDown = null;
+// defaults.onWriteSrcUp = null;
+// defaults.onWriteSrcDown = null;
+//
+// defaults.breakingSrcHardLink = null;
+// defaults.resolvingSrcSoftLink = null;
+// defaults.resolvingSrcTextLink = null;
+// defaults.breakingDstHardLink = null;
+// defaults.resolvingDstSoftLink = null;
+// defaults.resolvingDstTextLink = null;
 
 let filesReflect = _.routineFromPreAndBody( filesReflect_pre, filesReflect_body );
 
@@ -4006,7 +4010,7 @@ function filesReflectTo_body( o )
   return result;
 }
 
-var defaults = filesReflectTo_body.defaults = Object.create( filesReflectSinglePrimeDefaults );
+var defaults = filesReflectTo_body.defaults = Object.create( filesReflectPrimeDefaults );
 
 defaults.dstProvider = null;
 defaults.dst = '/';

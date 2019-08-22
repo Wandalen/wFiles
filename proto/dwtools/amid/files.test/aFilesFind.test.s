@@ -21449,8 +21449,6 @@ function filesReflectToWithSoftLinksRebasing( test )
 
   test.close( 'relative links, to extract, resolvingSrcSoftLink:0, rebasingLink:1' );
 
-  debugger; return; xxx
-
   test.open( 'relative links, to extract, resolvingSrcSoftLink:0, rebasingLink:2' );
 
   /* - */
@@ -26412,7 +26410,7 @@ var Self =
     filesReflectLinked,
     filesReflectTo,
     filesReflectToWithSoftLinks,
-    // filesReflectToWithSoftLinksRebasing, // xxx
+    filesReflectToWithSoftLinksRebasing, // xxx
     filesReflectDstIgnoring,
 
     filesDeleteTrivial,
@@ -26421,8 +26419,8 @@ var Self =
     filesDeleteDeletingEmptyDirs,
     filesDeleteEmptyDirs,
     filesDeleteTerminals,
-    // filesDeleteAndAsyncWrite,
 
+    // filesDeleteAndAsyncWrite,
     // filesFindDifference,
     // filesCopyWithAdapter,
 

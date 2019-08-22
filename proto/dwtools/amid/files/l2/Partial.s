@@ -5322,7 +5322,7 @@ function _link_functor( fop )
   let onVerify2 = fop.onVerify2;
   let onIsLink2 = fop.onIsLink;
   let onStat2 = fop.onStat;
-  // let onSizeCheck = fop.onSizeCheck;
+  let onSizeCheck = fop.onSizeCheck;
   let renaming = fop.renaming;
   let skippingSamePath = fop.skippingSamePath;
   let skippingMissed = fop.skippingMissed;
@@ -5331,6 +5331,9 @@ function _link_functor( fop )
   _.assert( _.objectIs( onAct.defaults ) );
   _.assert( onVerify1 === null || _.routineIs( onVerify1 ) );
   _.assert( onVerify2 === null || _.routineIs( onVerify2 ) );
+  _.assert( onIsLink2 === null || _.routineIs( onIsLink2 ) );
+  _.assert( onStat2 === null || _.routineIs( onStat2 ) );
+  _.assert( onSizeCheck === null || _.routineIs( onSizeCheck ) );
 
   _.routineExtend( _link_body, onAct )
 
@@ -6075,6 +6078,8 @@ function _link_functor( fop )
     {
       if( !Config.debug )
       return;
+      
+      debugger
 
       // if( !c.srcStat )
       // return;
@@ -6088,7 +6093,8 @@ function _link_functor( fop )
       let dstPath = o.dstPath;
 
       // xxx onSizeCheck
-      // onSizeCheck.call( self, c );
+      if( onSizeCheck )
+      onSizeCheck.call( self, c );
 
       // if( actMethodName === 'fileCopyAct' )
       // {
@@ -6144,7 +6150,7 @@ function _link_functor( fop )
 
       if( !srcStat )
       {
-        let err = `Faield to ${entryMethodName} ${o.dstPath} from ${o.srcPath}. Source file does not exist.`;
+        let err = `Failed to ${entryMethodName} ${o.dstPath} from ${o.srcPath}. Source file does not exist.`;
         debugger;
         throw _.err( err );
       }
@@ -6238,7 +6244,7 @@ _link_functor.defaults =
   onVerify2 : null,
   onIsLink : null,
   onStat : null,
-  // onSizeCheck : null,
+  onSizeCheck : null,
 
   renaming : true,
   skippingSamePath : true,
@@ -6465,25 +6471,30 @@ operates.dstPath = { pathToWrite : 1 }
  * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial#
  */
 
-// function _fileCopySizeCheck( c )
-// {
-//   let self = this;
-//   let o = c.options;
-//
-//   if( c.srcStat.isSoftLink() )
-//   {
-//     let srcPathResolved = self.pathResolveSoftLink( srcPath );
-//     srcPath = self.path.join( srcPath, srcPathResolved );
-//     let srcStat = self.statReadAct({ filePath : srcPath, throwing : 0, resolvingSoftLink : 0, sync : 1 });
-//     if( srcStat )
-//     {
-//       c.srcStat = srcStat;
-//       let dstPathResolved = self.pathResolveSoftLink( dstPath );
-//       dstPath = self.path.join( dstPath, dstPathResolved );
-//     }
-//   }
-//
-// }
+function _fileCopySizeCheck( c )
+{
+  let self = this;
+  let o = c.options;
+  
+  if( c.srcStat.isLink() )
+  if( c.srcResolvedStat === null )
+  { 
+    let isSoftLink = c.srcStat.isSoftLink();
+    let isTextLink = c.srcStat.isTextLink();
+    
+    if( ( o.resolvingSrcSoftLink === 2 && isSoftLink ) || ( o.resolvingSrcTextLink === 2 && isTextLink ) )
+    { 
+      if( self.fileExists( o.dstPath ) )
+      throw _.err( `Destination file ${o.dstPath} shouldn't exist` );
+    }
+    else 
+    { 
+      let dstPath = isSoftLink ? self.pathResolveSoftLink( o.dstPath ) : self.pathResolveTextLink( o.dstPath );
+      if( dstPath !== o.srcPath )
+      throw _.err( `Destination file ${o.dstPath} should be a link to ${o.srcPath}` );
+    }
+  }
+}
 
 function _fileCopyVerify2( c )
 {
@@ -6514,9 +6525,9 @@ function _fileCopyAct( c )
   let srcStat = c.srcStat;
   
   if( o.resolvingSrcSoftLink || o.resolvingSrcTextLink )
-  srcStat = self.statRead({ filePath : c.originalSrcResolvedPath, sync : 1, resolvingSoftLink : 0, resolvingTextLink : 0 });
+  c.srcStat = self.statRead({ filePath : c.originalSrcResolvedPath, sync : 1, resolvingSoftLink : 0, resolvingTextLink : 0 });
   
-  if( srcStat.isSoftLink() )
+  if( c.srcStat.isSoftLink() )
   { 
     if( o.resolvingSrcSoftLink === 2 )
     return resolvingSrcLink2();
@@ -6531,7 +6542,7 @@ function _fileCopyAct( c )
       type : null,
     });
   }
-  else if( srcStat.isTextLink() )
+  else if( c.srcStat.isTextLink() )
   {
     if( o.resolvingSrcTextLink === 2 )
     return resolvingSrcLink2();
@@ -6550,7 +6561,7 @@ function _fileCopyAct( c )
   }
   else
   { 
-    if( c.srcStat.isDir() )
+    if( srcStat.isDir() )
     throw _.err( 'Cant copy directory ' + _.strQuote( o.srcPath ) + ', consider method filesReflect'  );
 
     return self.fileCopyAct
@@ -6599,7 +6610,7 @@ let fileCopy = _link_functor
   actMethodName : 'fileCopyAct',
   onAct : _fileCopyAct,
   onVerify2 : _fileCopyVerify2,
-  // onSizeCheck : _fileCopySizeCheck,
+  onSizeCheck : _fileCopySizeCheck,
   skippingSamePath : true,
   skippingMissed : false,
 });

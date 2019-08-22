@@ -17741,7 +17741,7 @@ function filesReflectorBasic( test )
   src.finit();
 
   /* */
-  
+
   if( Config.debug )
   {
 
@@ -17920,7 +17920,7 @@ function filesReflectorBasic( test )
 
   dst.filesDelete( routinePath );
   src.finit();
-  
+
   /* */
 
   var src = context.makeStandardExtract({ originPath : 'src://' });
@@ -18102,7 +18102,7 @@ function filesReflectLinkWithHub( test )
     var expected = 'terminal';
     test.identical( got, expected );
   }
-  
+
   /* */
 
   test.case = 'resolvingSrcSoftLink : 2, with prefixPath';
@@ -18174,7 +18174,7 @@ function filesReflectLinkWithHub( test )
     var expected = 'terminal';
     test.identical( got, expected );
   }
-  
+
   /* */
 
   test.case = 'resolvingSrcSoftLink : 2, with filePath';
@@ -18246,7 +18246,7 @@ function filesReflectLinkWithHub( test )
     var expected = 'terminal';
     test.identical( got, expected );
   }
-  
+
   /* */
 
   test.case = 'resolvingSrcSoftLink : 2, with filePath';
@@ -18361,7 +18361,7 @@ function filesReflectLinkWithHub( test )
     var expected = 'terminal';
     test.identical( got, expected );
   }
-  
+
   /* */
 
   test.case = 'resolvingSrcSoftLink : 2, with reflector';
@@ -20103,8 +20103,8 @@ function filesReflectLinked( test )
     allowingMissed : 1,
   });
 
-  test.is( provider.fileExists( path.join( dstPath, 'file' ) ) )
-  test.is( !provider.fileExists( dstLinkPath ) )
+  test.is( provider.fileExists( path.join( dstPath, 'file' ) ) );
+  test.is( !provider.fileExists( dstLinkPath ) );
 
   /**/
 
@@ -20223,9 +20223,6 @@ function filesReflectLinked( test )
   test.is( !provider.isSoftLink( dstLinkPath ) );
   var dstLink1 = provider.pathResolveSoftLink( dstLinkPath );
   test.identical( dstLink1, path.join( dstPath, 'link' ) );
-
-  xxx
-  debugger; return; xxx
 
   /* */
 
@@ -20748,9 +20745,9 @@ function filesReflectToWithSoftLinks( test )
   test.close( 'relative links, to extract, resolvingSrcSoftLink:0' );
 
   test.open( 'relative links, to extract, resolvingSrcSoftLink:1' );
-  
+
   /* - */
-  
+
   var filesTree =
   {
     src :
@@ -20759,21 +20756,21 @@ function filesReflectToWithSoftLinks( test )
       {
         'file1' : 'src/proto/file1',
         'file2' : 'src/proto/file2',
-  
+
         'terLink1' : [{ softLink : '../file1' }],
         'terLink2' : [{ softLink : '../dir1/dir2/file1' }],
         'terLink3' : [{ softLink : '../../proto2/dir3/dir4/file1' }],
         // 'dirLink1' : [{ softLink : '..' }],
         'dirLink2' : [{ softLink : '../dir1/dir2' }],
         'dirLink3' : [{ softLink : '../../proto2/dir3' }],
-  
+
         'dualTerLink1' : [{ softLink : '../terLink1' }],
         'dualTerLink2' : [{ softLink : '../../proto2/dir3/dir4/terLink' }],
         // 'dualDirLink1' : [{ softLink : '../dirLink1' }],
         'dualDirLink2' : [{ softLink : '../dirLink2' }],
         'dualDirLink3' : [{ softLink : '../dirLink3' }],
         'dualDirLink4' : [{ softLink : '../../proto2/dir3/dir4' }],
-  
+
         dir1 :
         {
           dir2 :
@@ -20782,7 +20779,7 @@ function filesReflectToWithSoftLinks( test )
             'file2' : 'src/proto/dir1/dir2/file1',
           }
         },
-  
+
       },
       proto2 :
       {
@@ -20806,9 +20803,9 @@ function filesReflectToWithSoftLinks( test )
       'f' : 'dst/f',
     },
   }
-  
+
   var extract = new _.FileProvider.Extract({ filesTree });
-  
+
   var expected =
   {
     src :
@@ -20817,21 +20814,21 @@ function filesReflectToWithSoftLinks( test )
       {
         'file1' : 'src/proto/file1',
         'file2' : 'src/proto/file2',
-  
+
         'terLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/file1' }],
         'terLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dir1/dir2/file1' }],
         'terLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3/dir4/file1' }],
         // 'dirLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/dirLink1' }],
         'dirLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dir1/dir2' }],
         'dirLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3' }],
-  
+
         'dualTerLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/file1' }],
         'dualTerLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto2/file1' }],
         // 'dualDirLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualDirLink1' }],
         'dualDirLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dir1/dir2' }],
         'dualDirLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3' }],
         'dualDirLink4' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3/dir4' }],
-  
+
         dir1 :
         {
           dir2 :
@@ -20840,7 +20837,7 @@ function filesReflectToWithSoftLinks( test )
             'file2' : 'src/proto/dir1/dir2/file1',
           }
         },
-  
+
       },
       proto2 :
       {
@@ -20864,7 +20861,7 @@ function filesReflectToWithSoftLinks( test )
       'f' : 'dst/f',
     },
   }
-  
+
   var extract2 = new _.FileProvider.Extract();
   extract.filesReflectTo
   ({
@@ -20875,15 +20872,15 @@ function filesReflectToWithSoftLinks( test )
     resolvingSrcTextLink : 0,
     allowingMissed : 0,
   });
-  
+
   test.identical( extract2.filesTree, expected );
-  
+
   /* - */
-  
+
   test.close( 'relative links, to extract, resolvingSrcSoftLink:1' );
 
   /* - */
-  
+
   test.open( 'absolute links, to extract, resolvingSrcSoftLink:1' );
 
   /* - */
@@ -20954,21 +20951,21 @@ function filesReflectToWithSoftLinks( test )
       {
         'file1' : 'src/proto/file1',
         'file2' : 'src/proto/file2',
-  
+
         'terLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/file1' }],
         'terLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dir1/dir2/file1' }],
         'terLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3/dir4/file1' }],
         // 'dirLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/dirLink1' }],
         'dirLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dir1/dir2' }],
         'dirLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3' }],
-  
+
         'dualTerLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/file1' }],
         'dualTerLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto2/file1' }],
         // 'dualDirLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualDirLink1' }],
         'dualDirLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dir1/dir2' }],
         'dualDirLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3' }],
         'dualDirLink4' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3/dir4' }],
-  
+
         dir1 :
         {
           dir2 :
@@ -20977,7 +20974,7 @@ function filesReflectToWithSoftLinks( test )
             'file2' : 'src/proto/dir1/dir2/file1',
           }
         },
-  
+
       },
       proto2 :
       {
@@ -26375,7 +26372,7 @@ var Self =
     filesFindRecursive,
     filesFindLinked,
     filesFindSoftLinksExtract,
-    // filesFindSoftLinks, // xxx
+    // filesFindSoftLinks, // xxx : implement rebasingLink of filesReflect first
     filesFindResolving,
     filesFindGlob,
     filesFindOn,
@@ -26412,7 +26409,7 @@ var Self =
     filesReflectDeducing,
     filesReflectDstPreserving,
     filesReflectDstDeletingDirs,
-    // filesReflectLinked, // xxx
+    filesReflectLinked,
     filesReflectTo,
     filesReflectToWithSoftLinks,
     // filesReflectToWithSoftLinksRebasing, // xxx

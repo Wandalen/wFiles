@@ -8380,6 +8380,7 @@ function fileCopySoftLinkExtended( test )
   let dstPath = test.context.pathFor( 'written/fileCopySoftLinkExtended/dst' );
   let terminalPath = test.context.pathFor( 'written/fileCopySoftLinkExtended/terminal' );
   let dirPath = test.context.pathFor( 'written/fileCopySoftLinkExtended/dir' );
+  let terminalInDirPath = test.context.pathFor( 'written/fileCopySoftLinkExtended/dir/terminal' );
   let missingPath = test.context.pathFor( 'written/fileCopySoftLinkExtended/missing' );
   
   /* */
@@ -8560,6 +8561,195 @@ function fileCopySoftLinkExtended( test )
   test.is( !provider.fileExists( dstPath ) );
   
   test.close( 'src missing, dst missing' );
+  
+  /* */
+  
+  test.open( 'src missing, dst terminal' );
+  
+  test.case = 'resolvingSrcSoftLink : 0'
+  provider.filesDelete( testPath );
+  provider.fileWrite( dstPath, dstPath );
+  test.shouldThrowErrorSync( () => 
+  { 
+    provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 0, resolvingSrcTextLink : 0 }) 
+  });
+  test.is( !provider.fileExists( srcPath ) );
+  test.is( provider.isTerminal( dstPath ) );
+  
+  test.case = 'resolvingSrcSoftLink : 0, allowingMissed : 1'
+  provider.filesDelete( testPath );
+  provider.fileWrite( dstPath, dstPath );
+  provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 0, resolvingSrcTextLink : 0, allowingMissed : 1 }) 
+  test.is( !provider.fileExists( srcPath ) );
+  test.is( !provider.fileExists( dstPath ) );
+  
+  test.case = 'resolvingSrcSoftLink : 1'
+  provider.filesDelete( testPath );
+  provider.fileWrite( dstPath, dstPath );
+  test.shouldThrowErrorSync( () => 
+  { 
+    provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 1, resolvingSrcTextLink : 0 }) 
+  });
+  test.is( !provider.fileExists( srcPath ) );
+  test.is( provider.isTerminal( dstPath ) );
+  
+  test.case = 'resolvingSrcSoftLink : 1, allowingMissed : 1 '
+  provider.filesDelete( testPath );
+  provider.fileWrite( dstPath, dstPath );
+  provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 1, resolvingSrcTextLink : 0, allowingMissed : 1 }) 
+  test.is( !provider.fileExists( srcPath ) );
+  test.is( !provider.fileExists( dstPath ) );
+  
+  test.case = 'resolvingSrcSoftLink : 2'
+  provider.filesDelete( testPath );
+  provider.fileWrite( dstPath, dstPath );
+  test.shouldThrowErrorSync( () => 
+  { 
+    provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 2, resolvingSrcTextLink : 0 }) 
+  });
+  test.is( !provider.fileExists( srcPath ) );
+  test.is( provider.isTerminal( dstPath ) );
+  
+  test.case = 'resolvingSrcSoftLink : 2, allowingMissed : 1 '
+  provider.filesDelete( testPath );
+  provider.fileWrite( dstPath, dstPath );
+  provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 2, resolvingSrcTextLink : 0, allowingMissed : 1 }) 
+  test.is( !provider.fileExists( srcPath ) );
+  test.is( !provider.fileExists( dstPath ) );
+  
+  test.close( 'src missing, dst terminal' );
+  
+  /* */
+  
+  test.open( 'src missing, dst empty directory' );
+  
+  test.case = 'resolvingSrcSoftLink : 0'
+  provider.filesDelete( testPath );
+  provider.dirMake( dstPath );
+  test.shouldThrowErrorSync( () => 
+  { 
+    provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 0, resolvingSrcTextLink : 0 }) 
+  });
+  test.is( !provider.fileExists( srcPath ) );
+  test.is( provider.isDir( dstPath ) );
+  
+  test.case = 'resolvingSrcSoftLink : 0, allowingMissed : 1'
+  provider.filesDelete( testPath );
+  provider.dirMake( dstPath );
+  test.shouldThrowErrorSync( () => 
+  { 
+    provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 0, resolvingSrcTextLink : 0, allowingMissed : 1 }) 
+  });
+  test.is( !provider.fileExists( srcPath ) );
+  test.is( provider.isDir( dstPath ) );
+  
+  test.case = 'resolvingSrcSoftLink : 1'
+  provider.filesDelete( testPath );
+  provider.dirMake( dstPath );
+  test.shouldThrowErrorSync( () => 
+  { 
+    provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 1, resolvingSrcTextLink : 0 }) 
+  });
+  test.is( !provider.fileExists( srcPath ) );
+  test.is( provider.isDir( dstPath ) );
+  
+  test.case = 'resolvingSrcSoftLink : 1, allowingMissed : 1'
+  provider.filesDelete( testPath );
+  provider.dirMake( dstPath );
+  test.shouldThrowErrorSync( () => 
+  { 
+    provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 1, resolvingSrcTextLink : 0, allowingMissed : 1 }) 
+  });
+  test.is( !provider.fileExists( srcPath ) );
+  test.is( provider.isDir( dstPath ) );
+  
+  test.case = 'resolvingSrcSoftLink : 2'
+  provider.filesDelete( testPath );
+  provider.dirMake( dstPath );
+  test.shouldThrowErrorSync( () => 
+  { 
+    provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 2, resolvingSrcTextLink : 0 }) 
+  });
+  test.is( !provider.fileExists( srcPath ) );
+  test.is( provider.isDir( dstPath ) );
+  
+  test.case = 'resolvingSrcSoftLink : 2, allowingMissed : 1'
+  provider.filesDelete( testPath );
+  provider.dirMake( dstPath );
+  test.shouldThrowErrorSync( () => 
+  { 
+    provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 2, resolvingSrcTextLink : 0, allowingMissed : 1 }) 
+  });
+  test.is( !provider.fileExists( srcPath ) );
+  test.is( provider.isDir( dstPath ) );
+  
+  test.close( 'src missing, dst empty directory' );
+  
+  /* */
+  
+  test.open( 'src missing, dst directory' );
+  
+  test.case = 'resolvingSrcSoftLink : 0'
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalInDirPath, terminalInDirPath );
+  test.shouldThrowErrorSync( () => 
+  { 
+    provider.fileCopy({ srcPath : srcPath, dstPath : dirPath, resolvingSrcSoftLink : 0, resolvingSrcTextLink : 0 }) 
+  });
+  test.is( !provider.fileExists( srcPath ) );
+  test.is( provider.isDir( dirPath ) );
+  
+  test.case = 'resolvingSrcSoftLink : 0, allowingMissed : 1'
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalInDirPath, terminalInDirPath );
+  test.shouldThrowErrorSync( () => 
+  { 
+    provider.fileCopy({ srcPath : srcPath, dstPath : dirPath, resolvingSrcSoftLink : 0, resolvingSrcTextLink : 0, allowingMissed : 1  }) 
+  });
+  test.is( !provider.fileExists( srcPath ) );
+  test.is( provider.isDir( dirPath ) );
+  
+  test.case = 'resolvingSrcSoftLink : 1'
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalInDirPath, terminalInDirPath );
+  test.shouldThrowErrorSync( () => 
+  { 
+    provider.fileCopy({ srcPath : srcPath, dstPath : dirPath, resolvingSrcSoftLink : 1, resolvingSrcTextLink : 0 }) 
+  });
+  test.is( !provider.fileExists( srcPath ) );
+  test.is( provider.isDir( dirPath ) );
+  
+  test.case = 'resolvingSrcSoftLink : 1, allowingMissed : 1'
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalInDirPath, terminalInDirPath );
+  test.shouldThrowErrorSync( () => 
+  { 
+    provider.fileCopy({ srcPath : srcPath, dstPath : dirPath, resolvingSrcSoftLink : 1, resolvingSrcTextLink : 0, allowingMissed : 1  }) 
+  });
+  test.is( !provider.fileExists( srcPath ) );
+  test.is( provider.isDir( dirPath ) );
+  
+  test.case = 'resolvingSrcSoftLink : 2'
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalInDirPath, terminalInDirPath );
+  test.shouldThrowErrorSync( () => 
+  { 
+    provider.fileCopy({ srcPath : srcPath, dstPath : dirPath, resolvingSrcSoftLink : 2, resolvingSrcTextLink : 0 }) 
+  });
+  test.is( !provider.fileExists( srcPath ) );
+  test.is( provider.isDir( dirPath ) );
+  
+  test.case = 'resolvingSrcSoftLink : 2, allowingMissed : 1'
+  provider.filesDelete( testPath );
+  provider.fileWrite( terminalInDirPath, terminalInDirPath );
+  test.shouldThrowErrorSync( () => 
+  { 
+    provider.fileCopy({ srcPath : srcPath, dstPath : dirPath, resolvingSrcSoftLink : 0, resolvingSrcTextLink : 0, allowingMissed : 1  }) 
+  });
+  test.is( !provider.fileExists( srcPath ) );
+  test.is( provider.isDir( dirPath ) );
+  
+  test.close( 'src missing, dst directory' );
   
   /* */
   

@@ -6079,6 +6079,8 @@ function _link_functor( fop )
       if( !Config.debug )
       return;
       
+      return;//xxx
+      
       // debugger
 
       // if( !c.srcStat )

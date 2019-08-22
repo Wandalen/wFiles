@@ -32,7 +32,6 @@ Self.shortName = 'Hub';
 
 _.assert( _.routineIs( _.uri.join ) );
 _.assert( _.routineIs( _.uri.normalize ) );
-// _.assert( _.routineIs( _.uri.urisNormalize ) );
 _.assert( _.routineIs( _.uri.isNormalized ) );
 
 // --
@@ -1413,10 +1412,6 @@ _.assert( Self.Path === Self.prototype.Path );
 // --
 // export
 // --
-
-// if( typeof module !== 'undefined' )
-// if( _global_.WTOOLS_PRIVATE )
-// { /* delete require.cache[ module.id ]; */ }
 
 _.FileProvider[ Self.shortName ] = Self;
 

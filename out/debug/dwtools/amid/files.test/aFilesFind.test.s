@@ -2254,6 +2254,7 @@ function filesFindLinked( test )
     includingDirs : 1,
     recursive : 2,
     includingStem : 1,
+    once : 0,
   })
   console.log( got[ 1 ].real );
 
@@ -2288,6 +2289,7 @@ function filesFindLinked( test )
     includingDirs : 1,
     recursive : 2,
     includingStem : 1,
+    once : 0,
   })
   test.identical( select( got, '*/absolute' ), [ '/', '/double', '/normal', '/terminal' ] );
   test.identical( select( got, '*/real' ), [ '/', '/double', '/normal', '/terminal' ] );
@@ -2302,6 +2304,7 @@ function filesFindLinked( test )
     includingDirs : 1,
     recursive : 2,
     includingStem : 1,
+    once : 0,
   })
   test.identical( select( got, '*/absolute' ), [ '/', '/double', '/normal', '/terminal' ] );
   test.identical( select( got, '*/real' ), [ '/', '/terminal', '/terminal', '/terminal' ] );
@@ -2338,6 +2341,7 @@ function filesFindLinked( test )
     resolvingSoftLink : 0,
     allowingMissed : 0,
     allowingCycled : 0,
+    once : 0,
   })
   test.identical( select( got, '*/absolute' ), [ '/', '/broken', '/normal', '/terminal' ] );
   test.identical( select( got, '*/real' ), [ '/', '/broken', '/normal', '/terminal' ] );
@@ -2358,6 +2362,7 @@ function filesFindLinked( test )
     resolvingSoftLink : 1,
     allowingMissed : 1,
     allowingCycled : 0,
+    once : 0,
   })
   test.identical( select( got, '*/absolute' ), [ '/', '/broken', '/normal', '/terminal' ] );
   test.identical( select( got, '*/real' ), [ '/', '/missing', '/terminal', '/terminal' ] );
@@ -2379,6 +2384,7 @@ function filesFindLinked( test )
       resolvingSoftLink : 1,
       allowingMissed : 0,
       allowingCycled : 1,
+      once : 0,
     })
   });
 
@@ -2416,6 +2422,7 @@ function filesFindLinked( test )
     resolvingSoftLink : 0,
     allowingMissed : 0,
     allowingCycled : 0,
+    once : 0,
   })
   test.identical( select( got, '*/absolute' ), [ '/', '/auto', '/normal', '/terminal' ] );
   test.identical( select( got, '*/real' ), [ '/', '/auto', '/normal', '/terminal' ] );
@@ -2437,6 +2444,7 @@ function filesFindLinked( test )
     resolvingSoftLink : 1,
     allowingMissed : 0,
     allowingCycled : 1,
+    once : 0,
   })
   test.identical( select( got, '*/absolute' ), [ '/', '/auto', '/normal', '/terminal' ] );
   test.identical( select( got, '*/real' ), [ '/', '/auto', '/terminal', '/terminal' ] );
@@ -2460,6 +2468,7 @@ function filesFindLinked( test )
       resolvingSoftLink : 1,
       allowingMissed : 1,
       allowingCycled : 0,
+      once : 0,
     })
   });
 
@@ -2492,6 +2501,7 @@ function filesFindLinked( test )
     includingDirs : 1,
     recursive : 2,
     includingStem : 1,
+    once : 0,
   })
   test.identical( select( got, '*/absolute' ), [ '/', '/one', '/terminal', '/two' ] );
   test.identical( select( got, '*/real' ), [ '/', '/one', '/terminal', '/two' ] );
@@ -2509,6 +2519,7 @@ function filesFindLinked( test )
       includingDirs : 1,
       recursive : 2,
       includingStem : 1,
+      once : 0,
     })
   })
 
@@ -2523,6 +2534,7 @@ function filesFindLinked( test )
     includingDirs : 1,
     recursive : 2,
     includingStem : 1,
+    once : 0,
   })
   test.identical( select( got, '*/absolute' ), [ '/', '/one', '/terminal', '/two' ] );
   test.identical( select( got, '*/real' ), [ '/', '/one', '/terminal', '/two' ] );
@@ -2555,6 +2567,7 @@ function filesFindLinked( test )
     includingDirs : 1,
     recursive : 2,
     includingStem : 1,
+    once : 0,
   })
   test.identical( select( got, '*/absolute' ), [ '/', '/normala', '/normalb', '/terminal' ] );
   test.identical( select( got, '*/real' ), [ '/', '/normala', '/normalb', '/terminal' ] );
@@ -2569,6 +2582,7 @@ function filesFindLinked( test )
     includingDirs : 1,
     recursive : 2,
     includingStem : 1,
+    once : 0,
   })
   test.identical( select( got, '*/absolute' ), [ '/', '/normala', '/normalb', '/terminal' ] );
   test.identical( select( got, '*/real' ), [ '/', '/terminal', '/terminal', '/terminal' ] );
@@ -2604,6 +2618,7 @@ function filesFindLinked( test )
     includingDirs : 1,
     recursive : 2,
     includingStem : 1,
+    once : 0,
   })
 
   test.identical( select( got, '*/absolute' ), [ '/toDir'  ] );
@@ -2619,6 +2634,7 @@ function filesFindLinked( test )
     includingDirs : 1,
     includingStem : 1,
     recursive : 2,
+    once : 0,
   })
 
   test.identical( select( got, '*/absolute' ), [ '/toDir', '/toDir/terminal'  ] );
@@ -2655,6 +2671,7 @@ function filesFindLinked( test )
     includingDirs : 1,
     recursive : 2,
     includingStem : 1,
+    once : 0,
   })
 
   test.identical( select( got, '*/absolute' ), [ '/', '/toDir', '/directory', '/directory/terminal'  ] );
@@ -2670,11 +2687,13 @@ function filesFindLinked( test )
     includingDirs : 1,
     recursive : 2,
     includingStem : 1,
+    once : 0,
   })
   test.identical( select( got, '*/absolute' ), [ '/', '/directory', '/directory/terminal', '/toDir', '/toDir/terminal'  ] );
   test.identical( select( got, '*/real' ), [ '/', '/directory', '/directory/terminal', '/directory', '/directory/terminal'  ] );
 
   test.close( 'link to processed directory' );
+
 } /* end of filesFindLinked */
 
 //
@@ -2790,7 +2809,7 @@ function filesFindSoftLinksExtract( test )
 
   /* */
 
-  test.case = 'resolving on';
+  test.case = 'resolving on, once off';
   var expected =
   [
     '. - /src/proto - /src/proto',
@@ -2820,6 +2839,34 @@ function filesFindSoftLinksExtract( test )
   ({
     resolvingSoftLink : 1,
     resolvingTextLink : 1,
+    once : 0,
+  });
+  got = got.map( ( r ) => `${r.relative} - ${r.absolute} - ${r.real}` );
+  test.identical( got, expected );
+
+  /* */
+
+  test.case = 'resolving on, once on';
+  var expected =
+  [
+    '. - /src/proto - /src/proto',
+    './file1 - /src/proto/file1 - /src/proto/file1',
+    './file2 - /src/proto/file2 - /src/proto/file2',
+    './terLink2 - /src/proto/terLink2 - /src/proto/dir1/dir2/file1',
+    './terLink3 - /src/proto/terLink3 - /src/proto2/dir3/dir4/file1',
+    './dir1 - /src/proto/dir1 - /src/proto/dir1',
+    './dir1/dir2 - /src/proto/dir1/dir2 - /src/proto/dir1/dir2',
+    './dir1/dir2/file2 - /src/proto/dir1/dir2/file2 - /src/proto/dir1/dir2/file2',
+    './dirLink3 - /src/proto/dirLink3 - /src/proto2/dir3',
+    './dirLink3/dir4 - /src/proto/dirLink3/dir4 - /src/proto2/dir3/dir4',
+    './dirLink3/dir4/file2 - /src/proto/dirLink3/dir4/file2 - /src/proto2/dir3/dir4/file2',
+    './dirLink3/dir4/terLink - /src/proto/dirLink3/dir4/terLink - /src/proto2/file1'
+  ]
+  var got = find
+  ({
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    once : 1,
   });
   got = got.map( ( r ) => `${r.relative} - ${r.absolute} - ${r.real}` );
   test.identical( got, expected );
@@ -2915,7 +2962,7 @@ function filesFindSoftLinksExtract( test )
 
   /* */
 
-  test.case = 'resolving on';
+  test.case = 'resolving on, once off';
   var expected =
   [
     '. - /src/proto - /src/proto',
@@ -2945,6 +2992,34 @@ function filesFindSoftLinksExtract( test )
   ({
     resolvingSoftLink : 1,
     resolvingTextLink : 1,
+    once : 0,
+  });
+  got = got.map( ( r ) => `${r.relative} - ${r.absolute} - ${r.real}` );
+  test.identical( got, expected );
+
+  /* */
+
+  test.case = 'resolving on, once on';
+  var expected =
+  [
+    '. - /src/proto - /src/proto',
+    './file1 - /src/proto/file1 - /src/proto/file1',
+    './file2 - /src/proto/file2 - /src/proto/file2',
+    './terLink2 - /src/proto/terLink2 - /src/proto/dir1/dir2/file1',
+    './terLink3 - /src/proto/terLink3 - /src/proto2/dir3/dir4/file1',
+    './dir1 - /src/proto/dir1 - /src/proto/dir1',
+    './dir1/dir2 - /src/proto/dir1/dir2 - /src/proto/dir1/dir2',
+    './dir1/dir2/file2 - /src/proto/dir1/dir2/file2 - /src/proto/dir1/dir2/file2',
+    './dirLink3 - /src/proto/dirLink3 - /src/proto2/dir3',
+    './dirLink3/dir4 - /src/proto/dirLink3/dir4 - /src/proto2/dir3/dir4',
+    './dirLink3/dir4/file2 - /src/proto/dirLink3/dir4/file2 - /src/proto2/dir3/dir4/file2',
+    './dirLink3/dir4/terLink - /src/proto/dirLink3/dir4/terLink - /src/proto2/file1'
+  ]
+  var got = find
+  ({
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    once : 1,
   });
   got = got.map( ( r ) => `${r.relative} - ${r.absolute} - ${r.real}` );
   test.identical( got, expected );
@@ -3052,7 +3127,7 @@ function filesFindSoftLinksExtract( test )
 
   /* */
 
-  test.case = 'resolving on';
+  test.case = 'resolving on, once off';
   var expected =
   [
     '. - /src/proto - /src/proto',
@@ -3104,6 +3179,34 @@ function filesFindSoftLinksExtract( test )
   ({
     resolvingSoftLink : 1,
     resolvingTextLink : 1,
+    once : 0,
+  });
+  got = got.map( ( r ) => `${r.relative} - ${r.absolute} - ${r.real}` );
+  test.identical( got, expected );
+
+  /* */
+
+  test.case = 'resolving on, once on';
+  var expected =
+  [
+    '. - /src/proto - /src/proto',
+    './dualTerLink1 - /src/proto/dualTerLink1 - /src/proto/file1',
+    './dualTerLink2 - /src/proto/dualTerLink2 - /src/proto2/file1',
+    './file2 - /src/proto/file2 - /src/proto/file2',
+    './terLink2 - /src/proto/terLink2 - /src/proto/dir1/dir2/file1',
+    './terLink3 - /src/proto/terLink3 - /src/proto2/dir3/dir4/file1',
+    './dir1 - /src/proto/dir1 - /src/proto/dir1',
+    './dir1/dir2 - /src/proto/dir1/dir2 - /src/proto/dir1/dir2',
+    './dir1/dir2/file2 - /src/proto/dir1/dir2/file2 - /src/proto/dir1/dir2/file2',
+    './dirLink3 - /src/proto/dirLink3 - /src/proto2/dir3',
+    './dirLink3/dir4 - /src/proto/dirLink3/dir4 - /src/proto2/dir3/dir4',
+    './dirLink3/dir4/file2 - /src/proto/dirLink3/dir4/file2 - /src/proto2/dir3/dir4/file2'
+  ]
+  var got = find
+  ({
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    once : 1,
   });
   got = got.map( ( r ) => `${r.relative} - ${r.absolute} - ${r.real}` );
   test.identical( got, expected );
@@ -3211,7 +3314,7 @@ function filesFindSoftLinksExtract( test )
 
   /* */
 
-  test.case = 'resolving on';
+  test.case = 'resolving on, once off';
   var expected =
   [
     '. - /src/proto - /src/proto',
@@ -3263,6 +3366,34 @@ function filesFindSoftLinksExtract( test )
   ({
     resolvingSoftLink : 1,
     resolvingTextLink : 1,
+    once : 0,
+  });
+  got = got.map( ( r ) => `${r.relative} - ${r.absolute} - ${r.real}` );
+  test.identical( got, expected );
+
+  /* */
+
+  test.case = 'resolving on, once on';
+  var expected =
+  [
+    '. - /src/proto - /src/proto',
+    './dualTerLink1 - /src/proto/dualTerLink1 - /src/proto/file1',
+    './dualTerLink2 - /src/proto/dualTerLink2 - /src/proto2/file1',
+    './file2 - /src/proto/file2 - /src/proto/file2',
+    './terLink2 - /src/proto/terLink2 - /src/proto/dir1/dir2/file1',
+    './terLink3 - /src/proto/terLink3 - /src/proto2/dir3/dir4/file1',
+    './dir1 - /src/proto/dir1 - /src/proto/dir1',
+    './dir1/dir2 - /src/proto/dir1/dir2 - /src/proto/dir1/dir2',
+    './dir1/dir2/file2 - /src/proto/dir1/dir2/file2 - /src/proto/dir1/dir2/file2',
+    './dirLink3 - /src/proto/dirLink3 - /src/proto2/dir3',
+    './dirLink3/dir4 - /src/proto/dirLink3/dir4 - /src/proto2/dir3/dir4',
+    './dirLink3/dir4/file2 - /src/proto/dirLink3/dir4/file2 - /src/proto2/dir3/dir4/file2'
+  ]
+  var got = find
+  ({
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    once : 1,
   });
   got = got.map( ( r ) => `${r.relative} - ${r.absolute} - ${r.real}` );
   test.identical( got, expected );
@@ -3270,178 +3401,437 @@ function filesFindSoftLinksExtract( test )
   /* - */
 
   test.close( 'relative links, double' );
+  test.open( 'absolute links, loops' );
 
-  // test.open( 'relative links, double, provider' );
-  //
-  // /* - xxx - */
-  //
-  // var filesTree =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : [{ softLink : '../file1' }],
-  //       'terLink2' : [{ softLink : '../dir1/dir2/file1' }],
-  //       'terLink3' : [{ softLink : '../../proto2/dir3/dir4/file1' }],
-  //       // 'dirLink1' : [{ softLink : '..' }],
-  //       'dirLink2' : [{ softLink : '../dir1/dir2' }],
-  //       'dirLink3' : [{ softLink : '../../proto2/dir3' }],
-  //
-  //       'dualTerLink1' : [{ softLink : '../terLink1' }],
-  //       'dualTerLink2' : [{ softLink : '../../proto2/dir3/dir4/terLink' }],
-  //       // 'dualDirLink1' : [{ softLink : '../dirLink1' }],
-  //       'dualDirLink2' : [{ softLink : '../dirLink2' }],
-  //       'dualDirLink3' : [{ softLink : '../dirLink3' }],
-  //       'dualDirLink4' : [{ softLink : '../../proto2/dir3/dir4' }],
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : [{ softLink : '../../../file1' }],
-  //           'dirLink' : [{ softLink : '../../../../proto/dir1' }],
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  // var extract = new _.FileProvider.Extract({ filesTree });
-  // debugger;
-  // extract.filesReflectTo
-  // ({
-  //   dstProvider : provider,
-  //   dst : routinePath,
-  //   resolvingSrcSoftLink : 0,
-  // });
-  // debugger;
-  // var find = provider.filesFinder
-  // ({
-  //   filePath : abs( 'src/proto' ),
-  //   includingDirs : 1,
-  //   recursive : 2,
-  // });
-  //
-  // /* */
-  //
-  // test.case = 'default resolving';
-  // var expected =
-  // [
-  //   '. - /src/proto - /src/proto',
-  //   './dirLink2 - /src/proto/dirLink2 - /src/proto/dirLink2',
-  //   './dirLink3 - /src/proto/dirLink3 - /src/proto/dirLink3',
-  //   './dualDirLink2 - /src/proto/dualDirLink2 - /src/proto/dualDirLink2',
-  //   './dualDirLink3 - /src/proto/dualDirLink3 - /src/proto/dualDirLink3',
-  //   './dualDirLink4 - /src/proto/dualDirLink4 - /src/proto/dualDirLink4',
-  //   './dualTerLink1 - /src/proto/dualTerLink1 - /src/proto/dualTerLink1',
-  //   './dualTerLink2 - /src/proto/dualTerLink2 - /src/proto/dualTerLink2',
-  //   './file1 - /src/proto/file1 - /src/proto/file1',
-  //   './file2 - /src/proto/file2 - /src/proto/file2',
-  //   './terLink1 - /src/proto/terLink1 - /src/proto/terLink1',
-  //   './terLink2 - /src/proto/terLink2 - /src/proto/terLink2',
-  //   './terLink3 - /src/proto/terLink3 - /src/proto/terLink3',
-  //   './dir1 - /src/proto/dir1 - /src/proto/dir1',
-  //   './dir1/dir2 - /src/proto/dir1/dir2 - /src/proto/dir1/dir2',
-  //   './dir1/dir2/file1 - /src/proto/dir1/dir2/file1 - /src/proto/dir1/dir2/file1',
-  //   './dir1/dir2/file2 - /src/proto/dir1/dir2/file2 - /src/proto/dir1/dir2/file2'
-  // ]
-  // var got = find
-  // ({
-  // });
-  // got = got.map( ( r ) => `${r.relative} - ${rel( r.absolute )} - ${rel( r.real )}` );
-  // test.identical( got, expected );
-  //
-  // /* */
-  //
-  // test.case = 'resolving on';
-  // var expected =
-  // [
-  //   '. - /src/proto - /src/proto',
-  //   './dualTerLink1 - /src/proto/dualTerLink1 - /src/proto/file1',
-  //   './dualTerLink2 - /src/proto/dualTerLink2 - /src/proto2/file1',
-  //   './file1 - /src/proto/file1 - /src/proto/file1',
-  //   './file2 - /src/proto/file2 - /src/proto/file2',
-  //   './terLink1 - /src/proto/terLink1 - /src/proto/file1',
-  //   './terLink2 - /src/proto/terLink2 - /src/proto/dir1/dir2/file1',
-  //   './terLink3 - /src/proto/terLink3 - /src/proto2/dir3/dir4/file1',
-  //   './dir1 - /src/proto/dir1 - /src/proto/dir1',
-  //   './dir1/dir2 - /src/proto/dir1/dir2 - /src/proto/dir1/dir2',
-  //   './dir1/dir2/file1 - /src/proto/dir1/dir2/file1 - /src/proto/dir1/dir2/file1',
-  //   './dir1/dir2/file2 - /src/proto/dir1/dir2/file2 - /src/proto/dir1/dir2/file2',
-  //   './dirLink2 - /src/proto/dirLink2 - /src/proto/dir1/dir2',
-  //   './dirLink2/file1 - /src/proto/dirLink2/file1 - /src/proto/dir1/dir2/file1',
-  //   './dirLink2/file2 - /src/proto/dirLink2/file2 - /src/proto/dir1/dir2/file2',
-  //   './dirLink3 - /src/proto/dirLink3 - /src/proto2/dir3',
-  //   './dirLink3/dir4 - /src/proto/dirLink3/dir4 - /src/proto2/dir3/dir4',
-  //   './dirLink3/dir4/file1 - /src/proto/dirLink3/dir4/file1 - /src/proto2/dir3/dir4/file1',
-  //   './dirLink3/dir4/file2 - /src/proto/dirLink3/dir4/file2 - /src/proto2/dir3/dir4/file2',
-  //   './dirLink3/dir4/terLink - /src/proto/dirLink3/dir4/terLink - /src/proto2/file1',
-  //   './dirLink3/dir4/dirLink - /src/proto/dirLink3/dir4/dirLink - /src/proto/dir1',
-  //   './dirLink3/dir4/dirLink/dir2 - /src/proto/dirLink3/dir4/dirLink/dir2 - /src/proto/dir1/dir2',
-  //   './dirLink3/dir4/dirLink/dir2/file1 - /src/proto/dirLink3/dir4/dirLink/dir2/file1 - /src/proto/dir1/dir2/file1',
-  //   './dirLink3/dir4/dirLink/dir2/file2 - /src/proto/dirLink3/dir4/dirLink/dir2/file2 - /src/proto/dir1/dir2/file2',
-  //   './dualDirLink2 - /src/proto/dualDirLink2 - /src/proto/dir1/dir2',
-  //   './dualDirLink2/file1 - /src/proto/dualDirLink2/file1 - /src/proto/dir1/dir2/file1',
-  //   './dualDirLink2/file2 - /src/proto/dualDirLink2/file2 - /src/proto/dir1/dir2/file2',
-  //   './dualDirLink3 - /src/proto/dualDirLink3 - /src/proto2/dir3',
-  //   './dualDirLink3/dir4 - /src/proto/dualDirLink3/dir4 - /src/proto2/dir3/dir4',
-  //   './dualDirLink3/dir4/file1 - /src/proto/dualDirLink3/dir4/file1 - /src/proto2/dir3/dir4/file1',
-  //   './dualDirLink3/dir4/file2 - /src/proto/dualDirLink3/dir4/file2 - /src/proto2/dir3/dir4/file2',
-  //   './dualDirLink3/dir4/terLink - /src/proto/dualDirLink3/dir4/terLink - /src/proto2/file1',
-  //   './dualDirLink3/dir4/dirLink - /src/proto/dualDirLink3/dir4/dirLink - /src/proto/dir1',
-  //   './dualDirLink3/dir4/dirLink/dir2 - /src/proto/dualDirLink3/dir4/dirLink/dir2 - /src/proto/dir1/dir2',
-  //   './dualDirLink3/dir4/dirLink/dir2/file1 - /src/proto/dualDirLink3/dir4/dirLink/dir2/file1 - /src/proto/dir1/dir2/file1',
-  //   './dualDirLink3/dir4/dirLink/dir2/file2 - /src/proto/dualDirLink3/dir4/dirLink/dir2/file2 - /src/proto/dir1/dir2/file2',
-  //   './dualDirLink4 - /src/proto/dualDirLink4 - /src/proto2/dir3/dir4',
-  //   './dualDirLink4/file1 - /src/proto/dualDirLink4/file1 - /src/proto2/dir3/dir4/file1',
-  //   './dualDirLink4/file2 - /src/proto/dualDirLink4/file2 - /src/proto2/dir3/dir4/file2',
-  //   './dualDirLink4/terLink - /src/proto/dualDirLink4/terLink - /src/proto2/file1',
-  //   './dualDirLink4/dirLink - /src/proto/dualDirLink4/dirLink - /src/proto/dir1',
-  //   './dualDirLink4/dirLink/dir2 - /src/proto/dualDirLink4/dirLink/dir2 - /src/proto/dir1/dir2',
-  //   './dualDirLink4/dirLink/dir2/file1 - /src/proto/dualDirLink4/dirLink/dir2/file1 - /src/proto/dir1/dir2/file1',
-  //   './dualDirLink4/dirLink/dir2/file2 - /src/proto/dualDirLink4/dirLink/dir2/file2 - /src/proto/dir1/dir2/file2'
-  // ]
-  // var got = find
-  // ({
-  //   resolvingSoftLink : 1,
-  //   resolvingTextLink : 1,
-  // });
-  // got = got.map( ( r ) => `${r.relative} - ${rel( r.absolute )} - ${rel( r.real )}` );
-  // test.identical( got, expected );
-  //
-  // /* - */
-  //
-  // test.close( 'relative links, double, provider' );
+  /* - */
+
+  var filesTree =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '/src/proto' }],
+        'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
+        'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
+        'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
+        'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
+        'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
+        'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : [{ softLink : '/src/proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var find = extract.filesFinder
+  ({
+    filePath : '/src/proto',
+    includingDirs : 1,
+    recursive : 2,
+  });
+
+  /* */
+
+  test.case = 'default resolving';
+  var expected =
+  [
+    '. - /src/proto - /src/proto',
+    './dirLink1 - /src/proto/dirLink1 - /src/proto/dirLink1',
+    './dirLink2 - /src/proto/dirLink2 - /src/proto/dirLink2',
+    './dirLink3 - /src/proto/dirLink3 - /src/proto/dirLink3',
+    './dualDirLink1 - /src/proto/dualDirLink1 - /src/proto/dualDirLink1',
+    './dualDirLink2 - /src/proto/dualDirLink2 - /src/proto/dualDirLink2',
+    './dualDirLink3 - /src/proto/dualDirLink3 - /src/proto/dualDirLink3',
+    './dualDirLink4 - /src/proto/dualDirLink4 - /src/proto/dualDirLink4',
+    './dualTerLink1 - /src/proto/dualTerLink1 - /src/proto/dualTerLink1',
+    './dualTerLink2 - /src/proto/dualTerLink2 - /src/proto/dualTerLink2',
+    './file1 - /src/proto/file1 - /src/proto/file1',
+    './file2 - /src/proto/file2 - /src/proto/file2',
+    './terLink1 - /src/proto/terLink1 - /src/proto/terLink1',
+    './terLink2 - /src/proto/terLink2 - /src/proto/terLink2',
+    './terLink3 - /src/proto/terLink3 - /src/proto/terLink3',
+    './dir1 - /src/proto/dir1 - /src/proto/dir1',
+    './dir1/dir2 - /src/proto/dir1/dir2 - /src/proto/dir1/dir2',
+    './dir1/dir2/file1 - /src/proto/dir1/dir2/file1 - /src/proto/dir1/dir2/file1',
+    './dir1/dir2/file2 - /src/proto/dir1/dir2/file2 - /src/proto/dir1/dir2/file2'
+  ]
+  var got = find
+  ({
+  });
+  got = got.map( ( r ) => `${r.relative} - ${r.absolute} - ${r.real}` );
+  test.identical( got, expected );
+
+  /* */
+
+  test.case = 'resolving on';
+  var expected =
+  [
+    '. - /src/proto - /src/proto',
+    './dualTerLink1 - /src/proto/dualTerLink1 - /src/proto/file1',
+    './dualTerLink2 - /src/proto/dualTerLink2 - /src/proto2/file1',
+    './file2 - /src/proto/file2 - /src/proto/file2',
+    './terLink2 - /src/proto/terLink2 - /src/proto/dir1/dir2/file1',
+    './terLink3 - /src/proto/terLink3 - /src/proto2/dir3/dir4/file1',
+    './dir1 - /src/proto/dir1 - /src/proto/dir1',
+    './dir1/dir2 - /src/proto/dir1/dir2 - /src/proto/dir1/dir2',
+    './dir1/dir2/file2 - /src/proto/dir1/dir2/file2 - /src/proto/dir1/dir2/file2',
+    './dirLink3 - /src/proto/dirLink3 - /src/proto2/dir3',
+    './dirLink3/dir4 - /src/proto/dirLink3/dir4 - /src/proto2/dir3/dir4',
+    './dirLink3/dir4/file2 - /src/proto/dirLink3/dir4/file2 - /src/proto2/dir3/dir4/file2'
+  ]
+  var got = find
+  ({
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    once : 1,
+  });
+  got = got.map( ( r ) => `${r.relative} - ${r.absolute} - ${r.real}` );
+  test.identical( got, expected );
+
+  /* - */
+
+  test.close( 'absolute links, loops' );
+  test.open( 'relative links, loops' );
+
+  /* - */
+
+  var filesTree =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '../file1' }],
+        'terLink2' : [{ softLink : '../dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '../../proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '..' }],
+        'dirLink2' : [{ softLink : '../dir1/dir2' }],
+        'dirLink3' : [{ softLink : '../../proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '../terLink1' }],
+        'dualTerLink2' : [{ softLink : '../../proto2/dir3/dir4/terLink' }],
+        'dualDirLink1' : [{ softLink : '../dirLink1' }],
+        'dualDirLink2' : [{ softLink : '../dirLink2' }],
+        'dualDirLink3' : [{ softLink : '../dirLink3' }],
+        'dualDirLink4' : [{ softLink : '../../proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '../../../file1' }],
+            'dirLink' : [{ softLink : '../../../../proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var find = extract.filesFinder
+  ({
+    filePath : '/src/proto',
+    includingDirs : 1,
+    recursive : 2,
+  });
+
+  /* */
+
+  test.case = 'default resolving';
+  var expected =
+  [
+    '. - /src/proto - /src/proto',
+    './dirLink1 - /src/proto/dirLink1 - /src/proto/dirLink1',
+    './dirLink2 - /src/proto/dirLink2 - /src/proto/dirLink2',
+    './dirLink3 - /src/proto/dirLink3 - /src/proto/dirLink3',
+    './dualDirLink1 - /src/proto/dualDirLink1 - /src/proto/dualDirLink1',
+    './dualDirLink2 - /src/proto/dualDirLink2 - /src/proto/dualDirLink2',
+    './dualDirLink3 - /src/proto/dualDirLink3 - /src/proto/dualDirLink3',
+    './dualDirLink4 - /src/proto/dualDirLink4 - /src/proto/dualDirLink4',
+    './dualTerLink1 - /src/proto/dualTerLink1 - /src/proto/dualTerLink1',
+    './dualTerLink2 - /src/proto/dualTerLink2 - /src/proto/dualTerLink2',
+    './file1 - /src/proto/file1 - /src/proto/file1',
+    './file2 - /src/proto/file2 - /src/proto/file2',
+    './terLink1 - /src/proto/terLink1 - /src/proto/terLink1',
+    './terLink2 - /src/proto/terLink2 - /src/proto/terLink2',
+    './terLink3 - /src/proto/terLink3 - /src/proto/terLink3',
+    './dir1 - /src/proto/dir1 - /src/proto/dir1',
+    './dir1/dir2 - /src/proto/dir1/dir2 - /src/proto/dir1/dir2',
+    './dir1/dir2/file1 - /src/proto/dir1/dir2/file1 - /src/proto/dir1/dir2/file1',
+    './dir1/dir2/file2 - /src/proto/dir1/dir2/file2 - /src/proto/dir1/dir2/file2'
+  ]
+  var got = find
+  ({
+    once : 0
+  });
+  got = got.map( ( r ) => `${r.relative} - ${r.absolute} - ${r.real}` );
+  test.identical( got, expected );
+
+  /* */
+
+  test.case = 'resolving on';
+  var expected =
+  [
+    '. - /src/proto - /src/proto',
+    './dualTerLink1 - /src/proto/dualTerLink1 - /src/proto/file1',
+    './dualTerLink2 - /src/proto/dualTerLink2 - /src/proto2/file1',
+    './file2 - /src/proto/file2 - /src/proto/file2',
+    './terLink2 - /src/proto/terLink2 - /src/proto/dir1/dir2/file1',
+    './terLink3 - /src/proto/terLink3 - /src/proto2/dir3/dir4/file1',
+    './dir1 - /src/proto/dir1 - /src/proto/dir1',
+    './dir1/dir2 - /src/proto/dir1/dir2 - /src/proto/dir1/dir2',
+    './dir1/dir2/file2 - /src/proto/dir1/dir2/file2 - /src/proto/dir1/dir2/file2',
+    './dirLink3 - /src/proto/dirLink3 - /src/proto2/dir3',
+    './dirLink3/dir4 - /src/proto/dirLink3/dir4 - /src/proto2/dir3/dir4',
+    './dirLink3/dir4/file2 - /src/proto/dirLink3/dir4/file2 - /src/proto2/dir3/dir4/file2'
+  ]
+  var got = find
+  ({
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    once : 1,
+  });
+  got = got.map( ( r ) => `${r.relative} - ${r.absolute} - ${r.real}` );
+  test.identical( got, expected );
+
+  /* - */
+
+  test.close( 'relative links, loops' );
+
+  /* - */
+
+} /* end of filesFindSoftLinksExtract */
+
+//
+
+function filesFindSoftLinks( test )
+{
+  let context = this;
+  let provider = context.provider;
+  let hub = context.hub;
+  let path = context.provider.path;
+  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+
+  function abs()
+  {
+    let args = _.longSlice( arguments );
+    args.unshift( routinePath );
+    return path.s.join.apply( path.s, args );
+  }
+
+  function rel()
+  {
+    let args = _.longSlice( arguments );
+    args.unshift( routinePath );
+    return path.s.relative.apply( path.s, args );
+  }
+
+  test.open( 'relative links, loops' );
+
+  /* - */
+
+  var filesTree =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '../file1' }],
+        'terLink2' : [{ softLink : '../dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '../../proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '..' }],
+        'dirLink2' : [{ softLink : '../dir1/dir2' }],
+        'dirLink3' : [{ softLink : '../../proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '../terLink1' }],
+        'dualTerLink2' : [{ softLink : '../../proto2/dir3/dir4/terLink' }],
+        'dualDirLink1' : [{ softLink : '../dirLink1' }],
+        'dualDirLink2' : [{ softLink : '../dirLink2' }],
+        'dualDirLink3' : [{ softLink : '../dirLink3' }],
+        'dualDirLink4' : [{ softLink : '../../proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '../../../file1' }],
+            'dirLink' : [{ softLink : '../../../../proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  var extract = new _.FileProvider.Extract({ filesTree });
+  debugger;
+  extract.filesReflectTo
+  ({
+    dstProvider : provider,
+    dst : routinePath,
+    resolvingSrcSoftLink : 0,
+  });
+  debugger;
+  var find = provider.filesFinder
+  ({
+    filePath : abs( 'src/proto' ),
+    includingDirs : 1,
+    recursive : 2,
+  });
+
+  /* */
+
+  test.case = 'default resolving';
+  var expected =
+  [
+    '. - /src/proto - /src/proto',
+    './dirLink1 - /src/proto/dirLink1 - /src/proto/dirLink1',
+    './dirLink2 - /src/proto/dirLink2 - /src/proto/dirLink2',
+    './dirLink3 - /src/proto/dirLink3 - /src/proto/dirLink3',
+    './dualDirLink1 - /src/proto/dualDirLink1 - /src/proto/dualDirLink1',
+    './dualDirLink2 - /src/proto/dualDirLink2 - /src/proto/dualDirLink2',
+    './dualDirLink3 - /src/proto/dualDirLink3 - /src/proto/dualDirLink3',
+    './dualDirLink4 - /src/proto/dualDirLink4 - /src/proto/dualDirLink4',
+    './dualTerLink1 - /src/proto/dualTerLink1 - /src/proto/dualTerLink1',
+    './dualTerLink2 - /src/proto/dualTerLink2 - /src/proto/dualTerLink2',
+    './file1 - /src/proto/file1 - /src/proto/file1',
+    './file2 - /src/proto/file2 - /src/proto/file2',
+    './terLink1 - /src/proto/terLink1 - /src/proto/terLink1',
+    './terLink2 - /src/proto/terLink2 - /src/proto/terLink2',
+    './terLink3 - /src/proto/terLink3 - /src/proto/terLink3',
+    './dir1 - /src/proto/dir1 - /src/proto/dir1',
+    './dir1/dir2 - /src/proto/dir1/dir2 - /src/proto/dir1/dir2',
+    './dir1/dir2/file1 - /src/proto/dir1/dir2/file1 - /src/proto/dir1/dir2/file1',
+    './dir1/dir2/file2 - /src/proto/dir1/dir2/file2 - /src/proto/dir1/dir2/file2'
+  ]
+  var got = find
+  ({
+    once : 0
+  });
+  got = got.map( ( r ) => `${r.relative} - ${r.absolute} - ${r.real}` );
+  test.identical( got, expected );
+
+  /* */
+
+  test.case = 'resolving on';
+  var expected =
+  [
+    '. - /src/proto - /src/proto',
+    './dualTerLink1 - /src/proto/dualTerLink1 - /src/proto/file1',
+    './dualTerLink2 - /src/proto/dualTerLink2 - /src/proto2/file1',
+    './file2 - /src/proto/file2 - /src/proto/file2',
+    './terLink2 - /src/proto/terLink2 - /src/proto/dir1/dir2/file1',
+    './terLink3 - /src/proto/terLink3 - /src/proto2/dir3/dir4/file1',
+    './dir1 - /src/proto/dir1 - /src/proto/dir1',
+    './dir1/dir2 - /src/proto/dir1/dir2 - /src/proto/dir1/dir2',
+    './dir1/dir2/file2 - /src/proto/dir1/dir2/file2 - /src/proto/dir1/dir2/file2',
+    './dirLink3 - /src/proto/dirLink3 - /src/proto2/dir3',
+    './dirLink3/dir4 - /src/proto/dirLink3/dir4 - /src/proto2/dir3/dir4',
+    './dirLink3/dir4/file2 - /src/proto/dirLink3/dir4/file2 - /src/proto2/dir3/dir4/file2'
+  ]
+  var got = find
+  ({
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    once : 1,
+  });
+  got = got.map( ( r ) => `${r.relative} - ${r.absolute} - ${r.real}` );
+  test.identical( got, expected );
+
+  /* - */
+
+  test.close( 'relative links, loops' );
 
   /* - */
 
   debugger; return; xxx
-}
+} /* end of filesFindSoftLinks */
 
 //
 
@@ -3457,7 +3847,6 @@ function filesFindResolving( test )
 
   var fixedOptions =
   {
-    // basePath : null,
     allowingMissed : 1,
     orderingExclusion : [],
     sortingWithArray : null,
@@ -3466,7 +3855,8 @@ function filesFindResolving( test )
     includingTerminals : 1,
     includingTransient : 1,
     includingDirs : 1,
-    recursive : 2
+    recursive : 2,
+    once : 0,
   }
 
   function recordSimplify( record )
@@ -3753,7 +4143,7 @@ function filesFindResolving( test )
     },
   ]
 
-  test.identical( filtered, expected )
+  test.identical( filtered, expected );
   var srcFileStat = provider.statResolvedRead( srcFilePath );
   var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
   test.identical( srcFileStat.ino, textLinkStat.ino );
@@ -19605,7 +19995,7 @@ function filesReflectLinked( test )
 
   /* */
 
-  test.case = 'src - link to missing, dst - link to missing';
+  test.case = 'src - link to missing, dst - link to missing, resolvingSrcSoftLink - 0';
   provider.filesDelete( routinePath );
   provider.softLink
   ({
@@ -19631,7 +20021,40 @@ function filesReflectLinked( test )
   test.will = 'dstPath/link should not be rewritten by srcPath/link';
   test.is( provider.isSoftLink( dstLinkPath ) );
   var dstLink1 = provider.pathResolveSoftLink( dstLinkPath );
-  test.identical( dstLink1, path.join( srcPath, 'fileNotExists' ) );
+  test.identical( dstLink1, path.join( srcPath, 'link' ) );
+
+  /* */
+
+  test.case = 'src - link to missing, dst - link to missing, resolvingSrcSoftLink - 1';
+  provider.filesDelete( routinePath );
+  provider.softLink
+  ({
+    srcPath : path.join( srcPath, 'fileNotExists' ),
+    dstPath : srcLinkPath,
+    allowingMissed : 1,
+    makingDirectory : 1,
+  })
+  provider.softLink
+  ({
+    srcPath : path.join( dstPath, 'fileNotExists' ),
+    dstPath : dstLinkPath,
+    allowingMissed : 1,
+    makingDirectory : 1,
+  })
+  provider.filesReflect
+  ({
+    reflectMap : { [ srcPath ] : dstPath },
+    allowingMissed : 1,
+    resolvingSrcSoftLink : 1,
+  })
+
+  test.will = 'dstPath/link should not be rewritten by srcPath/link';
+  test.is( !provider.isSoftLink( dstLinkPath ) );
+  var dstLink1 = provider.pathResolveSoftLink( dstLinkPath );
+  test.identical( dstLink1, path.join( dstPath, 'link' ) );
+
+  xxx
+  debugger; return; xxx
 
   /* */
 
@@ -25075,6 +25498,7 @@ var Self =
     filesFindRecursive,
     filesFindLinked,
     filesFindSoftLinksExtract,
+    // filesFindSoftLinks, // xxx
     filesFindResolving,
     filesFindGlob,
     filesFindOn,
@@ -25098,7 +25522,7 @@ var Self =
     filesReflectEvaluate,
     filesReflectTrivial,
     filesReflectOutputFormat,
-    filesReflectMandatory,
+    // filesReflectMandatory, // xxx : ucomment later, after transition to willfiles
     filesReflectMutuallyExcluding,
     filesReflectWithFilter,
     filesReflect,
@@ -25111,7 +25535,7 @@ var Self =
     filesReflectDeducing,
     filesReflectDstPreserving,
     filesReflectDstDeletingDirs,
-    filesReflectLinked,
+    // filesReflectLinked, // xxx
     filesReflectTo,
     filesReflectToWithSoftLinks,
     filesReflectDstIgnoring,

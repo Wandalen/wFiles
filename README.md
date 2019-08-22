@@ -52,20 +52,17 @@ var provider = _.FileProvider.Extract({ filesTree : tree });
 ###### Example #1
 ```javascript
 /*Read file synchronously*/
-var data = provider.fileRead
-({
-  pathFile : 'my_file',
-  sync : 1
-});
+var data = provider.fileRead( '/path/to/terminal' );
 console.log( data );
 
 /*Read file asynchronously*/
-provider.fileRead({ pathFile : 'my_file' })
-.got( function( err, data )
+provider.fileRead({ filePath : '/path/to/terminal', sync : 0 })
+.finally( function( err, data )
 {
   if( err )
   throw err;
   console.log( data );
+  return null;
 });
 ```
 ###### Example #2
@@ -73,62 +70,65 @@ provider.fileRead({ pathFile : 'my_file' })
 /*Write to file synchronously*/
 provider.fileWrite
 ({
-  pathFile : 'my_file',
+  filePath : '/path/to/terminal',
   data : 'some data'
 })
 
 /*Write to file asynchronously*/
 provider.fileWrite
 ({
-  pathFile : 'my_file',
+  filePath : '/path/to/terminal',
   data : 'some data',
   sync : 0
 })
-.got( function( err )
+.finally( function( err, got )
 {
   if( err )
   throw err;
   console.log( 'Success' );
+  return null;
 });
 ```
 ###### Example #3
 ```javascript
 /*Create dir synchronously*/
-provider.directoryMake( 'my_dir' );
+provider.dirMake( '/path/to/dir' );
 
 /*Create dir asynchronously*/
-provider.directoryMake
+provider.dirMake
 ({
-   pathFile : 'a',
+   filePath : '/path/to/dir',
    sync : 0
  })
-.got( function( err )
+.finally( function( err, got )
 {
   if( err )
   throw err;
   /*some code after dir creation*/
+  return null;
 });
 ```
 ###### Example #4
 ```javascript
 /*Getting file stats object sync*/
 /*error throwing is disabled by default, use throwing : 1 to turn on*/
-var stats = provider.fileStat( 'my_dir' );
+var stats = provider.statRead( '/path/to/file' );
 if( stats )
 console.log( stats );
 
 /*async*/
 provider.fileStat
 ({
-   pathFile : 'my_dir',
+   filePath : '/path/to/file',
    throwing : 1,
    sync : 0
 })
-.got( function( err, stats )
+.finally( function( err, stats )
 {
   if( err )
   throw err;
   console.log( stats );
+  return null;
 });
 ```
 ###### Example #5
@@ -136,8 +136,8 @@ provider.fileStat
 /*Copy file sync*/
 provider.fileCopy
 ({
-  pathDst : 'my_file2',
-  pathSrc : 'my_file'
+  dstPath : '/path/to/dst',
+  srcPath : '/path/to/src'
 });
 
 ```
@@ -147,11 +147,11 @@ provider.fileCopy
 If sync option is avaible - method supports sync/async modes. Use `true` for synchronous and `false` for async. In asynchronous mode [wConsequence]( https://github.com/Wandalen/wConsequence ) object is returned.
 * ##### fileReadAct - returns file content in specified `encoding`.
 >  - sync  { Boolean } - sync/async mode switch, default = false;
->  - pathFile { String } - path to target file;
+>  - filePath { String } - path to target file;
 >  - encoding { String } - sets encoding, default = 'utf8'.
-* ##### createReadStreamAct - creates readable stream for file specified by `pathFile`.
+* ##### createReadStreamAct - creates readable stream for file specified by `filePath`.
 >  - sync  { Boolean } - sync/async mode switch, default = false;
->  - pathFile { String } - path to target file; -->
+>  - filePath { String } - path to target file; -->
 
 
 

@@ -5369,7 +5369,9 @@ function _link_functor( fop )
   let entryMethodName = _.strRemoveEnd( fop.actMethodName, 'Act' );
   let onVerify1 = fop.onVerify1;
   let onVerify2 = fop.onVerify2;
-  // let onSizeCheck = fop.onSizeCheck;
+  let onIsLink2 = fop.onIsLink;
+  let onStat2 = fop.onStat;
+  let onSizeCheck = fop.onSizeCheck;
   let renaming = fop.renaming;
   let skippingSamePath = fop.skippingSamePath;
   let skippingMissed = fop.skippingMissed;
@@ -5378,6 +5380,9 @@ function _link_functor( fop )
   _.assert( _.objectIs( onAct.defaults ) );
   _.assert( onVerify1 === null || _.routineIs( onVerify1 ) );
   _.assert( onVerify2 === null || _.routineIs( onVerify2 ) );
+  _.assert( onIsLink2 === null || _.routineIs( onIsLink2 ) );
+  _.assert( onStat2 === null || _.routineIs( onStat2 ) );
+  _.assert( onSizeCheck === null || _.routineIs( onSizeCheck ) );
 
   _.routineExtend( _link_body, onAct )
 
@@ -5412,6 +5417,7 @@ function _link_functor( fop )
     c.tempPathSrc = undefined;
     c.dstStat = undefined;
     c.srcStat = undefined;
+    c.originalSrcResolvedPath = undefined;
     c.srcResolvedStat = undefined;
     c.options = o;
     c.options2 = undefined;
@@ -5590,34 +5596,29 @@ function _link_functor( fop )
     {
       if( stat.isSoftLink() )
       return true;
-      if( actMethodName === 'textLinkAct' )
-      {
-        let r = false;
-        self.fieldPush( 'usingTextLink', 1 );
-        r = stat.isTextLink();
-        self.fieldPop( 'usingTextLink', 1 );
-        return r;
-      }
+      
+      if( onIsLink2 )
+      return onIsLink2.call( self, stat );
+          
       return false;
     }
 
     /* */
 
     function onStat( filePath, resolving )
-    {
-      if( actMethodName === 'textLinkAct' )
-      self.fieldPush( 'usingTextLink', 1 );
-      let result = self.statRead
+    { 
+      if( onStat2 )
+      return onStat2.call( self, filePath, resolving );
+      
+      return self.statRead
       ({
         filePath : filePath,
         throwing : 0,
         resolvingSoftLink : resolving,
-        resolvingTextLink : resolving && actMethodName === 'textLinkAct' ? 1 : 0,
+        // resolvingTextLink : resolving && actMethodName === 'textLinkAct' ? 1 : 0,
+        resolvingTextLink : 0,
         sync : 1,
       });
-      if( actMethodName === 'textLinkAct' )
-      self.fieldPop( 'usingTextLink', 1 );
-      return result;
     }
 
     /* */
@@ -5804,7 +5805,9 @@ function _link_functor( fop )
 
       _.assert( path.isAbsolute( o.srcPath ) );
       _.assert( path.isAbsolute( o.dstPath ) );
-
+      
+      c.originalSrcResolvedPath = o.srcPath;
+      
       /* check if equal early */
 
       verifyEqualPaths();
@@ -5938,6 +5941,7 @@ function _link_functor( fop )
             sync : 0,
             throwing : o.throwing
           }
+          
           return self.pathResolveLinkFull( o2 )
           .then( ( srcPath ) =>
           {
@@ -6123,6 +6127,10 @@ function _link_functor( fop )
     {
       if( !Config.debug )
       return;
+      
+      return;//xxx
+      
+      // debugger
 
       // if( !c.srcStat )
       // return;
@@ -6134,9 +6142,6 @@ function _link_functor( fop )
 
       let srcPath = o.srcPath;
       let dstPath = o.dstPath;
-
-      // xxx onSizeCheck
-      // onSizeCheck.call( self, c );
 
       // if( actMethodName === 'fileCopyAct' )
       // {
@@ -6187,12 +6192,17 @@ function _link_functor( fop )
         // srcStat = c.onStat( o.srcPath, 0 );
         srcStat = c.srcStat;
         if( srcStat )
-        return;
+        {
+          // xxx onSizeCheck
+          if( onSizeCheck )
+          onSizeCheck.call( self, c );
+          return;
+        }
       }
 
       if( !srcStat )
       {
-        let err = `Faield to ${entryMethodName} ${o.dstPath} from ${o.srcPath}. Source file does not exist.`;
+        let err = `Failed to ${entryMethodName} ${o.dstPath} from ${o.srcPath}. Source file does not exist.`;
         debugger;
         throw _.err( err );
       }
@@ -6284,7 +6294,9 @@ _link_functor.defaults =
   onAct : null,
   onVerify1 : null,
   onVerify2 : null,
-  // onSizeCheck : null,
+  onIsLink : null,
+  onStat : null,
+  onSizeCheck : null,
 
   renaming : true,
   skippingSamePath : true,
@@ -6511,25 +6523,30 @@ operates.dstPath = { pathToWrite : 1 }
  * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial#
  */
 
-// function _fileCopySizeCheck( c )
-// {
-//   let self = this;
-//   let o = c.options;
-//
-//   if( c.srcStat.isSoftLink() )
-//   {
-//     let srcPathResolved = self.pathResolveSoftLink( srcPath );
-//     srcPath = self.path.join( srcPath, srcPathResolved );
-//     let srcStat = self.statReadAct({ filePath : srcPath, throwing : 0, resolvingSoftLink : 0, sync : 1 });
-//     if( srcStat )
-//     {
-//       c.srcStat = srcStat;
-//       let dstPathResolved = self.pathResolveSoftLink( dstPath );
-//       dstPath = self.path.join( dstPath, dstPathResolved );
-//     }
-//   }
-//
-// }
+function _fileCopySizeCheck( c )
+{
+  let self = this;
+  let o = c.options;
+  
+  if( c.srcStat.isLink() )
+  if( c.srcResolvedStat === null )
+  { 
+    let isSoftLink = c.srcStat.isSoftLink();
+    let isTextLink = c.srcStat.isTextLink();
+    
+    if( ( o.resolvingSrcSoftLink === 2 && isSoftLink ) || ( o.resolvingSrcTextLink === 2 && isTextLink ) )
+    { 
+      if( self.fileExists( o.dstPath ) )
+      throw _.err( `Destination file ${o.dstPath} shouldn't exist` );
+    }
+    else 
+    { 
+      let dstPath = isSoftLink ? self.pathResolveSoftLink( o.dstPath ) : self.pathResolveTextLink( o.dstPath );
+      if( dstPath !== o.srcPath )
+      throw _.err( `Destination file ${o.dstPath} should be a link to ${o.srcPath}` );
+    }
+  }
+}
 
 function _fileCopyVerify2( c )
 {
@@ -6538,19 +6555,12 @@ function _fileCopyVerify2( c )
 
   _.assert( _.strIs( o.srcPath ) );
   _.assert( _.fileStatIs( c.srcStat ) || c.srcStat === null );
-
+  
   if( c.srcStat === undefined )
   c.srcStat = self.statRead({ filePath : o.srcPath, sync : 1 });
-
-  if( c.srcStat === null )
-  return;
-
-  if( c.srcStat.isDir() )
-  {
-    debugger;
-    c.error( _.err( 'Cant copy directory ' + _.strQuote( o.srcPath ) + ', consider method filesReflect'  ) );
-  }
-
+  
+  // if( c.srcStat === null )
+  // return;
 }
 
 function _fileCopyAct( c )
@@ -6563,24 +6573,21 @@ function _fileCopyAct( c )
 
   if( o.srcPath === 'extract4:///src/proto/terLink1' )
   debugger;
-
+  
+  let srcStat = c.srcStat;
+    
+  if( o.resolvingSrcSoftLink || o.resolvingSrcTextLink )
+  if( self.fileExists( c.originalSrcResolvedPath ) )
+  c.srcStat = self.statRead({ filePath : c.originalSrcResolvedPath, sync : 1, resolvingSoftLink : 0, resolvingTextLink : 0 });
+  
   if( c.srcStat === null )
-  {
-    // return self.fileDeleteAct({ filePath : o.dstPath, sync : o.sync });
-  }
-  else if( c.srcStat.isSoftLink() )
-  {
-    // debugger;
-
-    // qqq : ?
-    // /* should not throw error for missed neither for cycled */
-    // let srcResolvedPath = self.pathResolveSoftLink
-    // ({
-    //   filePath : o.srcPath,
-    //   // allowingMissed : o.allowingMissed,
-    //   // allowingCycled : o.allowingCycled,
-    // });
-
+  return null;
+  
+  if( c.srcStat.isSoftLink() )
+  { 
+    if( o.resolvingSrcSoftLink === 2 )
+    return resolvingSrcLink2();
+    
     return self.softLinkAct
     ({
       dstPath : o.dstPath,
@@ -6590,21 +6597,12 @@ function _fileCopyAct( c )
       sync : o.sync,
       type : null,
     });
-
-    // return self.softLinkAct
-    // ({
-    //   dstPath : o.dstPath,
-    //   srcPath : srcResolvedPath,
-    //   originalDstPath : o.originalDstPath,
-    //   originalSrcPath : srcResolvedPath,
-    //   sync : o.sync,
-    //   type : null,
-    // });
-
   }
   else if( c.srcStat.isTextLink() )
   {
-
+    if( o.resolvingSrcTextLink === 2 )
+    return resolvingSrcLink2();
+    
     // qqq : cover
 
     return self.textLinkAct
@@ -6619,6 +6617,24 @@ function _fileCopyAct( c )
   }
   else
   {
+    return act(); 
+  }
+
+  /* */
+  
+  function resolvingSrcLink2()
+  {
+    if( c.srcResolvedStat === null )
+    return null;
+    return act(); 
+  }
+  
+  /* */
+  
+  function act()
+  {
+    if( srcStat.isDir() )
+    throw _.err( 'Cant copy directory ' + _.strQuote( o.srcPath ) + ', consider method filesReflect'  );
 
     return self.fileCopyAct
     ({
@@ -6629,9 +6645,7 @@ function _fileCopyAct( c )
       breakingDstHardLink : o.breakingDstHardLink,
       sync : o.sync,
     });
-
   }
-
 }
 
 _.routineExtend( _fileCopyAct, fileCopyAct );
@@ -6641,7 +6655,7 @@ let fileCopy = _link_functor
   actMethodName : 'fileCopyAct',
   onAct : _fileCopyAct,
   onVerify2 : _fileCopyVerify2,
-  // onSizeCheck : _fileCopySizeCheck,
+  onSizeCheck : _fileCopySizeCheck,
   skippingSamePath : true,
   skippingMissed : false,
 });
@@ -7004,11 +7018,39 @@ function _textLinkVerify2( c )
   c.end( true );
 }
 
+function _textIsLink( stat )
+{ 
+  let self = this;
+  let r = false;
+  self.fieldPush( 'usingTextLink', 1 );
+  r = stat.isTextLink();
+  self.fieldPop( 'usingTextLink', 1 );
+  return r;
+}
+
+function _textOnStat( filePath, resolving )
+{ 
+  let self = this;
+  self.fieldPush( 'usingTextLink', 1 );
+  let result = self.statRead
+  ({
+    filePath : filePath,
+    throwing : 0,
+    resolvingSoftLink : resolving,
+    resolvingTextLink : resolving,
+    sync : 1,
+  });
+  self.fieldPop( 'usingTextLink', 1 );
+  return result;
+}
+
 let textLink = _link_functor
 ({
   actMethodName : 'textLinkAct',
   onAct : _textLinkAct,
   onVerify2 : _textLinkVerify2,
+  onIsLink : _textIsLink,
+  onStat : _textOnStat,
   skippingSamePath : false,
   skippingMissed : false,
 });

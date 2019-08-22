@@ -3166,14 +3166,10 @@ function filesFindSoftLinksExtract( test )
     './dualDirLink3/dir4/dirLink/dir2 - /src/proto/dualDirLink3/dir4/dirLink/dir2 - /src/proto/dir1/dir2',
     './dualDirLink3/dir4/dirLink/dir2/file1 - /src/proto/dualDirLink3/dir4/dirLink/dir2/file1 - /src/proto/dir1/dir2/file1',
     './dualDirLink3/dir4/dirLink/dir2/file2 - /src/proto/dualDirLink3/dir4/dirLink/dir2/file2 - /src/proto/dir1/dir2/file2',
-    './dualDirLink4 - /src/proto/dualDirLink4 - /src/proto2/dir3/dir4',
-    './dualDirLink4/file1 - /src/proto/dualDirLink4/file1 - /src/proto2/dir3/dir4/file1',
-    './dualDirLink4/file2 - /src/proto/dualDirLink4/file2 - /src/proto2/dir3/dir4/file2',
-    './dualDirLink4/terLink - /src/proto/dualDirLink4/terLink - /src/proto2/file1',
-    './dualDirLink4/dirLink - /src/proto/dualDirLink4/dirLink - /src/proto/dir1',
-    './dualDirLink4/dirLink/dir2 - /src/proto/dualDirLink4/dirLink/dir2 - /src/proto/dir1/dir2',
-    './dualDirLink4/dirLink/dir2/file1 - /src/proto/dualDirLink4/dirLink/dir2/file1 - /src/proto/dir1/dir2/file1',
-    './dualDirLink4/dirLink/dir2/file2 - /src/proto/dualDirLink4/dirLink/dir2/file2 - /src/proto/dir1/dir2/file2'
+    './dualDirLink4 - /src/proto/dualDirLink4 - /src/proto/dir1',
+    './dualDirLink4/dir2 - /src/proto/dualDirLink4/dir2 - /src/proto/dir1/dir2',
+    './dualDirLink4/dir2/file1 - /src/proto/dualDirLink4/dir2/file1 - /src/proto/dir1/dir2/file1',
+    './dualDirLink4/dir2/file2 - /src/proto/dualDirLink4/dir2/file2 - /src/proto/dir1/dir2/file2'
   ]
   var got = find
   ({

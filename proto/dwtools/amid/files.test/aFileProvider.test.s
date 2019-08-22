@@ -8962,6 +8962,43 @@ function fileCopySoftLinkBasic( test )
 
 //
 
+function fileCopyGlobal( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let path = provider.path;
+
+  let routinePath = test.context.pathFor( 'written/fileCopyGlobal' );
+  let srcPath = test.context.pathFor( 'written/fileCopyGlobal/src' );
+  let dstPath = test.context.pathFor( 'written/fileCopyGlobal/dst' );
+  
+  var srcPathDefault = path.globalFromPreferred( srcPath );
+  var dstPathDefault = path.globalFromPreferred( dstPath );
+  
+  var srcPathSecond = 'second://' + srcPath;
+  var dstPathSecond = 'second://' + dstPath;
+  
+  /*  */
+  
+  test.case = 'default protocol';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  provider.fileCopy( dstPathDefault, srcPathDefault );
+  test.is( provider.isTerminal( srcPath ) );
+  test.is( provider.isTerminal( dstPath ) );
+  test.identical( provider.fileRead( dstPath ), srcPath );
+  
+  test.case = 'other protocol';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  provider.fileCopy( dstPathSecond, srcPathSecond );
+  test.is( provider.isTerminal( srcPath ) );
+  test.is( provider.isTerminal( dstPath ) );
+  test.identical( provider.fileRead( dstPath ), srcPath );
+}
+
+//
+
 function fileCopyAsyncThrowingError( test )
 {
   let self = this;
@@ -12660,6 +12697,43 @@ function fileRenameSoftLinkBasic( test )
   test.is( !provider.fileExists( src3Path ) );
   test.is( provider.isTerminal( dstPath ) );
   test.identical( provider.fileRead( dstPath ), src3Path );
+}
+
+//
+
+function fileRenameGlobal( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let path = provider.path;
+
+  let routinePath = test.context.pathFor( 'written/fileRenameGlobal' );
+  let srcPath = test.context.pathFor( 'written/fileRenameGlobal/src' );
+  let dstPath = test.context.pathFor( 'written/fileRenameGlobal/dst' );
+  
+  var srcPathDefault = path.globalFromPreferred( srcPath );
+  var dstPathDefault = path.globalFromPreferred( dstPath );
+  
+  var srcPathSecond = 'second://' + srcPath;
+  var dstPathSecond = 'second://' + dstPath;
+  
+  /*  */
+  
+  test.case = 'default protocol';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  provider.fileRename( dstPathDefault, srcPathDefault );
+  test.is( !provider.fileExists( srcPath ) );
+  test.is( provider.isTerminal( dstPath ) );
+  test.identical( provider.fileRead( dstPath ), srcPath );
+  
+  test.case = 'other protocol';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  provider.fileRename( dstPathSecond, srcPathSecond );
+  test.is( !provider.fileExists( srcPath ) );
+  test.is( provider.isTerminal( dstPath ) );
+  test.identical( provider.fileRead( dstPath ), srcPath );
 }
 
 //
@@ -22505,6 +22579,43 @@ function softLinkSoftLinkBasic( test )
 
 //
 
+function softLinkGlobal( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let path = provider.path;
+
+  let routinePath = test.context.pathFor( 'written/softLinkGlobal' );
+  let srcPath = test.context.pathFor( 'written/softLinkGlobal/src' );
+  let dstPath = test.context.pathFor( 'written/softLinkGlobal/dst' );
+  
+  var srcPathDefault = path.globalFromPreferred( srcPath );
+  var dstPathDefault = path.globalFromPreferred( dstPath );
+  
+  var srcPathSecond = 'second://' + srcPath;
+  var dstPathSecond = 'second://' + dstPath;
+  
+  /*  */
+  
+  test.case = 'default protocol';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  provider.softLink( dstPathDefault, srcPathDefault );
+  test.is( provider.isTerminal( srcPath ) );
+  test.is( provider.isSoftLink( dstPath ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), srcPath );
+  
+  test.case = 'other protocol';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  provider.softLink( dstPathSecond, srcPathSecond );
+  test.is( provider.isTerminal( srcPath ) );
+  test.is( provider.isSoftLink( dstPath ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), srcPath );
+}
+
+//
+
 function textLinkSync( test )
 {
   let self = this;
@@ -23138,6 +23249,43 @@ function textLinkSoftLinkBasic( test )
   test.is( provider.isTerminal( src3Path ) );
   test.is( provider.isSoftLink( dstPath ) );
   test.identical( provider.pathResolveSoftLink( dstPath ), src3Path );
+}
+
+//
+
+function textLinkGlobal( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let path = provider.path;
+
+  let routinePath = test.context.pathFor( 'written/textLinkGlobal' );
+  let srcPath = test.context.pathFor( 'written/textLinkGlobal/src' );
+  let dstPath = test.context.pathFor( 'written/textLinkGlobal/dst' );
+  
+  var srcPathDefault = path.globalFromPreferred( srcPath );
+  var dstPathDefault = path.globalFromPreferred( dstPath );
+  
+  var srcPathSecond = 'second://' + srcPath;
+  var dstPathSecond = 'second://' + dstPath;
+  
+  /*  */
+  
+  test.case = 'default protocol';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  provider.textLink( dstPathDefault, srcPathDefault );
+  test.is( provider.isTerminal( srcPath ) );
+  test.is( provider.isTextLink( dstPath ) );
+  test.identical( provider.pathResolveTextLink( dstPath ), srcPath );
+  
+  test.case = 'other protocol';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  provider.textLink( dstPathSecond, srcPathSecond );
+  test.is( provider.isTerminal( srcPath ) );
+  test.is( provider.isTextLink( dstPath ) );
+  test.identical( provider.pathResolveTextLink( dstPath ), srcPath );
 }
 
 //
@@ -28288,6 +28436,41 @@ function hardLinkSoftLinkBasic( test )
   test.is( provider.isTerminal( src3Path ) );
   test.is( provider.isTerminal( dstPath ) );
   test.is( provider.filesAreHardLinked([ src3Path, dstPath ]) )
+}
+
+function hardLinkGlobal( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let path = provider.path;
+
+  let routinePath = test.context.pathFor( 'written/hardLinkGlobal' );
+  let srcPath = test.context.pathFor( 'written/hardLinkGlobal/src' );
+  let dstPath = test.context.pathFor( 'written/hardLinkGlobal/dst' );
+  
+  var srcPathDefault = path.globalFromPreferred( srcPath );
+  var dstPathDefault = path.globalFromPreferred( dstPath );
+  
+  var srcPathSecond = 'second://' + srcPath;
+  var dstPathSecond = 'second://' + dstPath;
+  
+  /*  */
+  
+  test.case = 'default protocol';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  provider.hardLink( dstPathDefault, srcPathDefault );
+  test.is( provider.isTerminal( srcPath ) );
+  test.is( provider.isTerminal( dstPath ) );
+  test.is( provider.filesAreHardLinked([ srcPath, dstPath ]) );
+  
+  test.case = 'other protocol';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  provider.hardLink( dstPathSecond, srcPathSecond );
+  test.is( provider.isTerminal( srcPath ) );
+  test.is( provider.isTerminal( dstPath ) );
+  test.is( provider.filesAreHardLinked([ srcPath, dstPath ]) );
 }
 
 //
@@ -39037,6 +39220,7 @@ var Self =
     fileCopyError,
     fileCopySoftLinkExtended,
     fileCopySoftLinkBasic,
+    fileCopyGlobal,
 
     fileRenameSync,
     fileRenameRelativePath,
@@ -39045,6 +39229,7 @@ var Self =
     fileRenameSync2,
     fileRenameSoftLinkResolving,
     fileRenameSoftLinkBasic,
+    fileRenameGlobal,
 
     fileDeleteSync,
     fileDeleteActSync,
@@ -39084,9 +39269,11 @@ var Self =
     softLinkRelativeLinkResolving,
     softLinkMakeAndResolve,
     softLinkSoftLinkBasic,
+    softLinkGlobal,
 
     textLinkSync,
     textLinkSoftLinkBasic,
+    textLinkGlobal,
 
     hardLinkSync,
     hardLinkMultipleSync,
@@ -39099,6 +39286,7 @@ var Self =
     hardLinkSoftLinkResolving,
     hardLinkHardLinkBreaking,
     hardLinkSoftLinkBasic,
+    hardLinkGlobal,
 
     fileExchangeSync,
     fileExchangeAsync,

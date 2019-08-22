@@ -8379,6 +8379,7 @@ function fileCopySoftLinkExtended( test )
   let srcPath = test.context.pathFor( 'written/fileCopySoftLinkExtended/src' );
   let dstPath = test.context.pathFor( 'written/fileCopySoftLinkExtended/dst' );
   let terminalPath = test.context.pathFor( 'written/fileCopySoftLinkExtended/terminal' );
+  let dirPath = test.context.pathFor( 'written/fileCopySoftLinkExtended/dir' );
   let missingPath = test.context.pathFor( 'written/fileCopySoftLinkExtended/missing' );
   
   /* */
@@ -8446,24 +8447,30 @@ function fileCopySoftLinkExtended( test )
   
   test.case = 'resolvingSrcSoftLink : 0'
   provider.filesDelete( testPath );
-  provider.dirMake( terminalPath );
-  provider.softLink( srcPath, terminalPath );
+  provider.dirMake( dirPath );
+  provider.softLink( srcPath, dirPath );
   provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 0, resolvingSrcTextLink : 0 });
   test.identical( provider.pathResolveSoftLink( dstPath ), srcPath )
   
   test.case = 'resolvingSrcSoftLink : 1'
   provider.filesDelete( testPath );
-  provider.dirMake( terminalPath );
-  provider.softLink( srcPath, terminalPath );
+  provider.dirMake( dirPath );
+  provider.softLink( srcPath, dirPath );
   provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 1, resolvingSrcTextLink : 0 });
-  test.identical( provider.pathResolveSoftLink( dstPath ), terminalPath )
+  test.identical( provider.pathResolveSoftLink( dstPath ), dirPath )
   
   test.case = 'resolvingSrcSoftLink : 2'
   provider.filesDelete( testPath );
-  provider.dirMake( terminalPath );
-  provider.softLink( srcPath, terminalPath );
-  provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 2, resolvingSrcTextLink : 0 });
-  test.is( provider.isDir( dstPath ) );
+  provider.dirMake( dirPath );
+  provider.softLink( srcPath, dirPath );
+  test.shouldThrowErrorSync( () => 
+  {
+    provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 2, resolvingSrcTextLink : 0 });
+  })
+  test.is( provider.isSoftLink( srcPath ) );
+  test.identical( provider.pathResolveSoftLink( srcPath ), dirPath );
+  test.is( provider.isDir( dirPath ) );
+  test.is( !provider.fileExists( dstPath ) );
   
   test.close( 'src soft link to dir, dst missing' );
   
@@ -8516,6 +8523,12 @@ function fileCopySoftLinkExtended( test )
   test.is( !provider.fileExists( srcPath ) );
   test.is( !provider.fileExists( dstPath ) );
   
+  test.case = 'resolvingSrcSoftLink : 0, allowingMissed : 1'
+  provider.filesDelete( testPath );
+  provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 0, resolvingSrcTextLink : 0, allowingMissed : 1 }) 
+  test.is( !provider.fileExists( srcPath ) );
+  test.is( !provider.fileExists( dstPath ) );
+  
   test.case = 'resolvingSrcSoftLink : 1'
   provider.filesDelete( testPath );
   test.shouldThrowErrorSync( () => 
@@ -8525,12 +8538,24 @@ function fileCopySoftLinkExtended( test )
   test.is( !provider.fileExists( srcPath ) );
   test.is( !provider.fileExists( dstPath ) );
   
+  test.case = 'resolvingSrcSoftLink : 1, allowingMissed : 1 '
+  provider.filesDelete( testPath );
+  provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 1, resolvingSrcTextLink : 0, allowingMissed : 1 }) 
+  test.is( !provider.fileExists( srcPath ) );
+  test.is( !provider.fileExists( dstPath ) );
+  
   test.case = 'resolvingSrcSoftLink : 2'
   provider.filesDelete( testPath );
   test.shouldThrowErrorSync( () => 
   { 
     provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 2, resolvingSrcTextLink : 0 }) 
   });
+  test.is( !provider.fileExists( srcPath ) );
+  test.is( !provider.fileExists( dstPath ) );
+  
+  test.case = 'resolvingSrcSoftLink : 2, allowingMissed : 1 '
+  provider.filesDelete( testPath );
+  provider.fileCopy({ srcPath : srcPath, dstPath : dstPath, resolvingSrcSoftLink : 2, resolvingSrcTextLink : 0, allowingMissed : 1 }) 
   test.is( !provider.fileExists( srcPath ) );
   test.is( !provider.fileExists( dstPath ) );
   

@@ -6092,10 +6092,6 @@ function _link_functor( fop )
       let srcPath = o.srcPath;
       let dstPath = o.dstPath;
 
-      // xxx onSizeCheck
-      if( onSizeCheck )
-      onSizeCheck.call( self, c );
-
       // if( actMethodName === 'fileCopyAct' )
       // {
       //   if( c.srcStat.isSoftLink() )
@@ -6145,7 +6141,12 @@ function _link_functor( fop )
         // srcStat = c.onStat( o.srcPath, 0 );
         srcStat = c.srcStat;
         if( srcStat )
-        return;
+        {
+          // xxx onSizeCheck
+          if( onSizeCheck )
+          onSizeCheck.call( self, c );
+          return;
+        }
       }
 
       if( !srcStat )
@@ -6523,9 +6524,13 @@ function _fileCopyAct( c )
   debugger;
   
   let srcStat = c.srcStat;
-  
+    
   if( o.resolvingSrcSoftLink || o.resolvingSrcTextLink )
+  if( self.fileExists( c.originalSrcResolvedPath ) )
   c.srcStat = self.statRead({ filePath : c.originalSrcResolvedPath, sync : 1, resolvingSoftLink : 0, resolvingTextLink : 0 });
+  
+  if( c.srcStat === null )
+  return null;
   
   if( c.srcStat.isSoftLink() )
   { 
@@ -6560,7 +6565,23 @@ function _fileCopyAct( c )
 
   }
   else
-  { 
+  {
+    return act(); 
+  }
+
+  /* */
+  
+  function resolvingSrcLink2()
+  {
+    if( c.srcResolvedStat === null )
+    return null;
+    return act(); 
+  }
+  
+  /* */
+  
+  function act()
+  {
     if( srcStat.isDir() )
     throw _.err( 'Cant copy directory ' + _.strQuote( o.srcPath ) + ', consider method filesReflect'  );
 
@@ -6573,34 +6594,7 @@ function _fileCopyAct( c )
       breakingDstHardLink : o.breakingDstHardLink,
       sync : o.sync,
     });
-
   }
-  
-  /* */
-  
-  function resolvingSrcLink2()
-  {
-    if( c.srcResolvedStat === null )
-    return null;
-    
-    if( c.srcResolvedStat.isDir() )
-    return self.dirMakeAct
-    ({
-      filePath : o.dstPath,
-      sync : o.sync
-    })
-    
-    return self.fileCopyAct
-    ({
-      dstPath : o.dstPath,
-      srcPath : o.srcPath,
-      originalDstPath : o.originalDstPath,
-      originalSrcPath : o.originalSrcPath,
-      breakingDstHardLink : o.breakingDstHardLink,
-      sync : o.sync,
-    });  
-  }
-
 }
 
 _.routineExtend( _fileCopyAct, fileCopyAct );

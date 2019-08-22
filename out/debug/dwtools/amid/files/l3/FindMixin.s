@@ -894,8 +894,10 @@ function filesFind_body( o )
         debugger;
         return _.dont;
       }
-      o.visited[ record.real ] = record;
     }
+
+    if( o.visited )
+    o.visited[ record.real ] = record;
 
     return record;
   }
@@ -1779,18 +1781,8 @@ function filesReflectEvaluate_pre( routine, args )
   let self = this;
   let o = self._filesReflectPrepare( routine, args );
 
-  _.assert( o.srcPath === undefined );
-  _.assert( o.dstPath === undefined );
-  _.assert( o.src.isPaired( o.dst ) );
   _.assert( o.filter === undefined );
-  _.assert( !o.dstDeleting || o.includingDst );
-  _.assert( o.onDstName === null || _.routineIs( o.onDstName ) );
-  _.assert( _.boolLike( o.includingDst ) );
-  _.assert( _.boolLike( o.dstDeleting ) );
-  _.assert( _.arrayIs( o.result ) );
-  _.assert( _.routineIs( o.onUp ) );
-  _.assert( _.routineIs( o.onDown ) );
-  _.assert( _.arrayHas( [ 'fileCopy', 'hardLink', 'hardLinkMaybe', 'softLink', 'softLinkMaybe', 'nop' ], o.linking ), 'unknown kind of linking', o.linking );
+  _.assert( o.rebasingLink === undefined );
 
   return o;
 }
@@ -1840,6 +1832,8 @@ function filesReflectEvaluate_body( o )
 
   let found = self.filesFind( srcOptions );
 
+  o.visited = srcOptions.visited;
+
   return o.result;
 
   /* src options */
@@ -1869,6 +1863,7 @@ function filesReflectEvaluate_body( o )
     srcOptions.maskPreset = 0;
     srcOptions.filter = o.src;
     srcOptions.result = null;
+    srcOptions.visited = o.visited;
     srcOptions.onUp = [ handleSrcUp ];
     srcOptions.onDown = [ handleSrcDown ];
 
@@ -3137,9 +3132,12 @@ let filesReflectPrimeDefaults = Object.create( null );
 var defaults = filesReflectPrimeDefaults;
 
 defaults.result = null;
+defaults.visited = null;
+defaults.extra = null;
+defaults.linking = 'fileCopy';
+
 defaults.verbosity = 0;
 defaults.mandatory = 1;
-
 defaults.allowingMissed = 0;
 defaults.allowingCycled = 0;
 defaults.includingTerminals = 1;
@@ -3148,7 +3146,6 @@ defaults.includingNonAllowed = 1;
 defaults.includingDst = null;
 defaults.recursive = 2;
 
-defaults.linking = 'fileCopy';
 defaults.writing = 1;
 defaults.srcDeleting = 0;
 defaults.dstDeleting = 0;
@@ -3159,7 +3156,6 @@ defaults.dstRewritingPreserving = 0;
 defaults.preservingTime = 0;
 defaults.preservingSame = 0;
 
-defaults.extra = null;
 defaults.onUp = null;
 defaults.onDown = null;
 defaults.onDstName = null;
@@ -3184,7 +3180,12 @@ function filesReflectSingle_pre( routine, args )
 {
   let self = this;
   let o = self._filesReflectPrepare( routine, args );
-  // let o = self.filesReflectEvaluate.pre.call( self, routine, args );
+
+  if( o.rebasingLink === false )
+  o.rebasingLink = 0
+  else if( o.rebasingLink === true )
+  o.rebasingLink = 2;
+  _.assert( _.arrayHas( [ 0, 1, 2 ], o.rebasingLink ) );
 
   o.onWriteDstUp = _.routinesCompose( o.onWriteDstUp );
   o.onWriteDstDown = _.routinesCompose( o.onWriteDstDown );
@@ -3200,6 +3201,7 @@ function filesReflectSingle_body( o )
 {
   let self = this;
   let path = self.path;
+  let srcToDstHash = null;
 
   _.assertRoutineOptions( filesReflectSingle_body, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
@@ -3209,8 +3211,12 @@ function filesReflectSingle_body( o )
   _.assert( o.dst.src === o.src );
   _.assert( o.outputFormat === undefined );
 
+  if( o.rebasingLink && o.visited === null )
+  {
+    o.visited = Object.create( null );
+  }
+
   let o2 = _.mapOnly( o, self.filesReflectEvaluate.body.defaults );
-  // o2.outputFormat = 'record';
   o2.result = [];
   _.assert( _.arrayIs( o2.result ) );
   self.filesReflectEvaluate.body.call( self, o2 );
@@ -3254,6 +3260,19 @@ function filesReflectSingle_body( o )
     }
 
     return o.result;
+  }
+
+  /* */
+
+  function srcToDst( srcRecord )
+  {
+    if( !srcToDstHash )
+    {
+      srcToDstHash = new Map();
+      for( let r = 0 ; r < o.result.length ; r++ )
+      srcToDstHash.set( o.result[ r ].src, o.result[ r ].dst );
+    }
+    return srcToDstHash.get( srcRecord );
   }
 
   /* */
@@ -3444,7 +3463,70 @@ function filesReflectSingle_body( o )
     if( !record.allow || record.preserve )
     return;
 
-    if( record.action === 'hardLink' )
+    if( record.action === 'nop' )
+    return;
+
+    let action = record.action;
+
+    if( o.rebasingLink )
+    {
+      let isSoftLink = record.src.isSoftLink;
+      let isTextLink = record.src.isTextLink;
+      if( isSoftLink || isTextLink )
+      {
+        let srcReal = record.src.real; debugger;
+        /* xxx qqq : use resolvingMultiple / recursive option instead of if-else */
+
+        if( o.rebasingLink === 2 )
+        {
+          srcReal = src.pathResolveLinkFull
+          ({
+            filePath : srcReal,
+            resolvingSoftLink : 1,
+            resolvingTextLink : 1,
+            throwing : o.throwing,
+            allowingMissed : o.allowingMissed,
+            allowingCycled : o.allowingCycled,
+          });
+        }
+        else if( o.rebasingLink === 1 )
+        {
+          srcReal = src.pathResolveLinkStep
+          ({
+            filePath : srcReal,
+            resolvingSoftLink : 1,
+            resolvingTextLink : 1,
+            throwing : o.throwing,
+            allowingMissed : o.allowingMissed,
+            allowingCycled : o.allowingCycled,
+          });
+        }
+        else _.assert( 0 );
+
+        if( o.visited[ srcReal ] )
+        {
+          debugger;
+          let srcRecord = o.visited[ srcReal ];
+          let dstRecord = srcToDst( srcRecord );
+          if( record.src !== dstRecord )
+          {
+            debugger;
+            record.src = dstRecord;
+            action = isSoftLink ? 'softLink' : 'textLink';
+          }
+          else
+          {
+            debugger;
+          }
+        }
+        else
+        {
+          debugger;
+        }
+      }
+    }
+
+    if( action === 'hardLink' )
     {
       /* zzz : should not change time of file if it is already linked */
 
@@ -3460,7 +3542,7 @@ function filesReflectSingle_body( o )
       });
 
     }
-    else if( record.action === 'softLink' )
+    else if( action === 'softLink' )
     {
       /* zzz : should not change time of file if it is already linked */
 
@@ -3477,7 +3559,7 @@ function filesReflectSingle_body( o )
         resolvingDstTextLink : o.resolvingDstTextLink,
       });
     }
-    else if( record.action === 'textLink' )
+    else if( action === 'textLink' )
     {
       hub.textLink
       ({
@@ -3492,7 +3574,7 @@ function filesReflectSingle_body( o )
         resolvingDstTextLink : o.resolvingDstTextLink,
       });
     }
-    else if( record.action === 'fileCopy' )
+    else if( action === 'fileCopy' )
     {
       hub.fileCopy
       ({
@@ -3505,9 +3587,6 @@ function filesReflectSingle_body( o )
         resolvingDstSoftLink : o.resolvingDstSoftLink,
         resolvingDstTextLink : o.resolvingDstTextLink,
       });
-    }
-    else if( record.action === 'nop' )
-    {
     }
     else _.assert( 0 );
 
@@ -4012,17 +4091,12 @@ function filesReflectTo_body( o )
 
 var defaults = filesReflectTo_body.defaults = Object.create( filesReflectPrimeDefaults );
 
+_.mapExtend( defaults, filesReflectAdvancedDefaults );
+
+defaults.mandatory = 0;
 defaults.dstProvider = null;
 defaults.dst = '/';
 defaults.src = '/';
-defaults.mandatory = 0;
-
-defaults.breakingSrcHardLink = null;
-defaults.resolvingSrcSoftLink = null;
-defaults.resolvingSrcTextLink = null;
-defaults.breakingDstHardLink = null;
-defaults.resolvingDstSoftLink = null;
-defaults.resolvingDstTextLink = null;
 
 let filesReflectTo = _.routineFromPreAndBody( filesReflectTo_pre, filesReflectTo_body );
 

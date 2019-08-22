@@ -323,7 +323,7 @@ function pathResolveTextLinkAct( o )
   result = m[ 1 ];
 
   if( o.resolvingMultiple )
-  return resolvingMultiple();
+  return multipleResolve();
 
   return result;
 
@@ -352,7 +352,7 @@ function pathResolveTextLinkAct( o )
 
   /**/
 
-  function resolvingMultiple()
+  function multipleResolve()
   {
     result = self.path.join( o.filePath, self.path.normalize( result ) );
     if( !self.isTextLink( result ) )
@@ -385,6 +385,8 @@ function pathResolveSoftLinkAct( o )
     if( !self.isSoftLink( o.filePath ) )
     return o.filePath;
 
+    /* qqq : optimize for resolvingMultiple:1 case */
+
     result = File.readlinkSync( self.path.nativize( o.filePath ) );
 
     // debugger;
@@ -398,7 +400,7 @@ function pathResolveSoftLinkAct( o )
     }
 
     if( o.resolvingMultiple )
-    return resolvingMultiple();
+    return multipleResolve();
 
     return result;
   }
@@ -436,7 +438,7 @@ function pathResolveSoftLinkAct( o )
 
   /**/
 
-  function resolvingMultiple()
+  function multipleResolve()
   {
     result = self.path.join( o.filePath, self.path.normalize( result ) );
     if( !self.isSoftLink( result ) )

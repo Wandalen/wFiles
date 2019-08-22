@@ -849,6 +849,7 @@ pathResolveSoftLinkAct.name = 'pathResolveSoftLinkAct';
 var defaults = pathResolveSoftLinkAct.defaults = Object.create( null );
 defaults.filePath = null;
 defaults.resolvingMultiple = 0;
+/* qqq : rename option resolvingMultiple to recursive and teach all routines to accept 3 values 0, 1, 2 */
 defaults.resolvingIntermediateDirectories = 0;
 
 var having = pathResolveSoftLinkAct.having = Object.create( null );
@@ -856,7 +857,7 @@ having.writing = 0;
 having.reading = 1;
 having.driving = 1;
 
-var operates = pathResolveSoftLinkAct.operates  = Object.create( null );
+var operates = pathResolveSoftLinkAct.operates = Object.create( null );
 operates.filePath = { pathToRead : 1 };
 
 //
@@ -947,7 +948,7 @@ function pathResolveTextLink_body( o )
   if( !result )
   return o.filePath;
 
-  self.logger.log( 'pathResolveTextLink :', o.filePath, '->', result );
+  // self.logger.log( 'pathResolveTextLink :', o.filePath, '->', result );
 
   return result;
 }
@@ -965,7 +966,7 @@ let pathResolveTextLink = _.routineFromPreAndBody( pathResolveTextLink_pre, path
 let _pathResolveLink = Object.create( null );
 
 var defaults = _pathResolveLink.defaults = Object.create( null );
-defaults.hub = null;
+// defaults.hub = null;
 defaults.filePath = null;
 defaults.resolvingSoftLink = null;
 defaults.resolvingTextLink = null;
@@ -983,14 +984,68 @@ operates.filePath = { pathToRead : 1 };
 
 //
 
-function pathResolveLinkFull_pre()
+function pathResolveLinkStep_pre()
 {
   let self = this;
   let o = self._preFilePathScalarWithProviderDefaults.apply( self, arguments );
   return o;
 }
 
+function pathResolveLinkStep_body( o )
+{
+  let self = this;
+  let path = self.path;
+
+  if( o.resolvingSoftLink )
+  {
+    let o2 = o2From( o );
+    let result = self.pathResolveSoftLink( o2 );
+
+    if( o.resolvingTextLink )
+    if( result === o2.filePath )
+    {
+      let o2 = o2From( o );
+      result = self.pathResolveTextLink( o2 );
+    }
+
+    return result;
+  }
+  else if( o.resolvingTextLink )
+  {
+    let o2 = o2From( o );
+    result = self.pathResolveTextLink( o2 );
+    return result;
+  }
+
+  return o.filePath;
+
+  function o2From( o )
+  {
+    let o2 = _.mapExtend( null, o );
+    delete o2.resolvingTextLink;
+    delete o2.resolvingSoftLink;
+    /* qqq : enable options "throwing", "allowingMissed", "allowingCycled" */
+    delete o2.throwing;
+    delete o2.allowingMissed;
+    delete o2.allowingCycled;
+    /* qqq */
+    return o2;
+  }
+}
+
+_.routineExtend( pathResolveLinkStep_body, _pathResolveLink );
+
+let pathResolveLinkStep = _.routineFromPreAndBody( pathResolveLinkStep_pre, pathResolveLinkStep_body );
+pathResolveLinkStep.having.aspect = 'entry';
+
 //
+
+function pathResolveLinkFull_pre()
+{
+  let self = this;
+  let o = self._preFilePathScalarWithProviderDefaults.apply( self, arguments );
+  return o;
+}
 
 function pathResolveLinkFull_body( o )
 {
@@ -1276,6 +1331,8 @@ function pathResolveLinkFull_body( o )
 _.routineExtend( pathResolveLinkFull_body, _pathResolveLink );
 
 var defaults = pathResolveLinkFull_body.defaults;
+
+defaults.hub = null;
 defaults.stat = null;
 defaults.sync = null;
 defaults.resolvingHeadDirect = 1;
@@ -1349,6 +1406,8 @@ function pathResolveLinkTail_body( o )
 _.routineExtend( pathResolveLinkTail_body, _pathResolveLink );
 
 var defaults = pathResolveLinkTail_body.defaults;
+
+defaults.hub = null;
 defaults.stat = null;
 defaults.preservingRelative = 0;
 
@@ -1599,6 +1658,8 @@ function pathResolveLinkHeadDirect_body( o )
 _.routineExtend( pathResolveLinkHeadDirect_body, _pathResolveLink );
 
 var defaults = pathResolveLinkHeadDirect_body.defaults;
+
+defaults.hub = null;
 defaults.stat = null;
 
 //
@@ -1638,11 +1699,6 @@ function pathResolveLinkHeadReverse_body( o )
   let prefixPath = o.filePath;
   let postfixPath = '';
 
-  // console.log( 'pathResolveLinkHeadReverse', o.filePath );
-
-  // if( o.filePath === 'extract+src:///src/a1' )
-  // debugger;
-
   while( !path.isRoot( prefixPath ) )
   {
     let o2 = _.mapExtend( null, o );
@@ -1654,9 +1710,6 @@ function pathResolveLinkHeadReverse_body( o )
     _.assert( !_.strBegins( prefixPath, '/..' ) && !_.strHas( prefixPath, '///..' ) )
   }
 
-  // if( o.filePath === 'extract+src:///src/a1' )
-  // debugger;
-
   let result = '/' + postfixPath;
 
   if( path.parse )
@@ -1666,6 +1719,10 @@ function pathResolveLinkHeadReverse_body( o )
 }
 
 _.routineExtend( pathResolveLinkHeadReverse_body, _pathResolveLink );
+
+var defaults = pathResolveLinkHeadReverse_body.defaults;
+
+defaults.hub = null;
 
 //
 
@@ -1691,14 +1748,6 @@ function _recordFormBegin( record )
   let self = this;
   return record;
 }
-
-// //
-//
-// function _recordPathForm( record )
-// {
-//   let self = this;
-//   return record;
-// }
 
 //
 
@@ -7894,9 +7943,9 @@ let Proto =
   pathResolveSoftLink,
 
   pathResolveTextLinkAct,
-  // _pathResolveTextLink,
   pathResolveTextLink,
 
+  pathResolveLinkStep,
   pathResolveLinkFull,
   pathResolveLinkTail,
   pathResolveLinkTailChain,
@@ -7907,7 +7956,6 @@ let Proto =
 
   _recordFactoryFormEnd,
   _recordFormBegin,
-  // _recordPathForm,
   _recordFormEnd,
 
   _recordAbsoluteGlobalMaybeGet,

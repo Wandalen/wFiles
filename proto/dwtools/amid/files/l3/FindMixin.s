@@ -30,7 +30,7 @@ let Self = function wFileProviderFind( o )
 
 Self.shortName = 'Find';
 
-let debugPath = '/dstNew';
+// let debugPath = '/dstNew';
 
 // --
 // etc
@@ -379,7 +379,7 @@ function filesFindSingle_body( o )
       if( handleUp( stemRecord, o ) === _.dont )
       return o;
       // o.onRecord( stemRecord, o );
-      handleRecord( stemRecord, o  );
+      // handleRecord( stemRecord, o  );
       handleDown( stemRecord, o );
     }
     // if( o.allowingMissed || !o.mandatory )
@@ -430,13 +430,14 @@ function filesFindSingle_body( o )
       // let res = handleUp( r, op );
       if( handleUp( r, op ) === _.dont )
       {
+        debugger;
         handleDown( r, op ); // xxx yyy
         return false;
       }
       // _.assert( res === r );
       // recordAdd( r );
       // op.onRecord( r, op );
-      handleRecord( r, op );
+      // handleRecord( r, op );
     }
 
     /* read */
@@ -516,14 +517,16 @@ function filesFindSingle_body( o )
     return;
 
     // let res = handleUp( r, op );
-    if( handleUp( r, op ) === _.dont )
-    return false;
+    // if( handleUp( r, op ) === _.dont )
+    // return false;
     // _.assert( r === res );
     // op.onRecord( r, op );
-    handleRecord( r, op );
+    // handleRecord( r, op );
     // recordAdd( r );
 
+    handleUp( r, op );
     handleDown( r, op );
+
   }
 
   /* - */
@@ -533,8 +536,6 @@ function filesFindSingle_body( o )
     _.assert( arguments.length === 2 );
     let r = op.onUp.call( self, record, op );
     _.assert( r === _.dont || r === record, 'onUp should return original record or false, but returned', _.toStrShort( r ) );
-    if( r === _.dont )
-    return false;
     return r;
   }
 
@@ -548,15 +549,15 @@ function filesFindSingle_body( o )
     // return r;
   }
 
-  /* - */
-
-  function handleRecord( record, op )
-  {
-    _.assert( arguments.length === 2 );
-    let r = op.onRecord.call( self, record, op );
-    _.assert( r === undefined || r === record, 'onRecord should return original record or undefined, but returned', _.toStrShort( r ) );
-    // return r;
-  }
+  // /* - */
+  //
+  // function handleRecord( record, op )
+  // {
+  //   _.assert( arguments.length === 2 );
+  //   let r = op.onRecord.call( self, record, op );
+  //   _.assert( r === undefined || r === record, 'onRecord should return original record or undefined, but returned', _.toStrShort( r ) );
+  //   // return r;
+  // }
 
   //
   // /* - */
@@ -616,25 +617,14 @@ filesFindSingle_body.defaults =
   resolvingSoftLink : 0,
   resolvingTextLink : 0,
 
-  // mode : 'legacy',
-  // once : 1,
-  // onceHardLinked : 0,
-
-  // mandatory : null,
   allowingMissed : 0,
   allowingCycled : 0,
   recursive : null,
   sync : 1,
-  // safe : null,
 
-  // maskPreset : 'default.exclude',
-  // outputFormat : 'record',
-  // result : null,
-
-  // visited : null,
   onUp : null,
   onDown : null,
-  onRecord : null,
+  // onRecord : null,
 
 }
 
@@ -730,6 +720,12 @@ function filesFind_pre( routine, args )
   if( o.orderingExclusion === null )
   o.orderingExclusion = [];
 
+  if( o.resolvingSoftLink || o.resolvingTextLink )
+  {
+    if( o.once === null )
+    o.once = 1;
+  }
+
   if( o.once || o.onceHardLinked )
   if( o.visited === null )
   o.visited = Object.create( null );
@@ -749,8 +745,14 @@ function filesFind_body( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( o.filePath === null );
   _.assert( o.filter.formed === 5 );
-  _.assert( o.onRecord === null, 'not implemented' );
+  // _.assert( o.onRecord === null, 'not implemented' );
   // _.assert( o.sync );
+
+  if( _.arrayIs( o.onUp ) )
+  if( o.onUp.length === 0 )
+  o.onUp = function( record ){ return record };
+  else
+  o.onUp = _.routinesComposeAllReturningLast( o.onUp );
 
   let time;
   if( o.verbosity >= 1 )
@@ -806,7 +808,8 @@ function filesFind_body( o )
     delete o2.visited;
     delete o2.result;
 
-    o2.onRecord = recordAdd_functor( op );
+    o2.onUp = recordAdd_functor( op );
+    // o2.onRecord = recordAdd_functor( op );
 
     for( let p = 0 ; p < stemPaths.length ; p++ ) ready.then( () =>
     {
@@ -873,15 +876,28 @@ function filesFind_body( o )
 
   /* - */
 
-  function recordIsEnabled( record, op )
+  function handleRecord( record, op )
   {
-    if( op.once )
+
+    _.assert( arguments.length === 2, 'Expects single argument' );
+    counter += 1;
+
+    let r = o.onUp.call( self, record, op );
+    _.assert( r === _.dont || r === record, 'onUp should return original record or false, but returned', _.toStrShort( r ) );
+    if( r === _.dont )
+    return _.dont;
+
+    if( o.once )
     {
-      if( op.visited[ record.real ] )
-      return false;
-      op.visited[ record.real ] = record;
+      if( o.visited[ record.real ] )
+      {
+        debugger;
+        return _.dont;
+      }
+      o.visited[ record.real ] = record;
     }
-    return true;
+
+    return record;
   }
 
   /* - */
@@ -893,47 +909,41 @@ function filesFind_body( o )
     if( fop.outputFormat === 'absolute' )
     recordAdd = function addAbsolute( record, op )
     {
-      _.assert( arguments.length === 2, 'Expects single argument' );
-      counter += 1;
-      if( !recordIsEnabled( record, op ) )
-      return;
+      if( handleRecord.apply( this, arguments ) === _.dont )
+      return _.dont;
       fop.result.push( record.absolute );
       return record;
     }
     else if( fop.outputFormat === 'relative' )
     recordAdd = function addRelative( record, op )
     {
-      _.assert( arguments.length === 2, 'Expects single argument' );
-      counter += 1;
-      if( !recordIsEnabled( record, op ) )
-      return;
+      if( handleRecord.apply( this, arguments ) === _.dont )
+      return _.dont;
       fop.result.push( record.relative );
       return record;
     }
     else if( fop.outputFormat === 'real' )
     recordAdd = function addReal( record, op )
     {
-      _.assert( arguments.length === 2, 'Expects single argument' );
-      counter += 1;
-      if( !recordIsEnabled( record, op ) )
-      return;
+      if( handleRecord.apply( this, arguments ) === _.dont )
+      return _.dont;
       fop.result.push( record.real );
       return record;
     }
     else if( fop.outputFormat === 'record' )
     recordAdd = function addRecord( record, op )
     {
-      _.assert( arguments.length === 2, 'Expects single argument' );
-      counter += 1;
-      if( !recordIsEnabled( record, op ) )
-      return;
+      if( handleRecord.apply( this, arguments ) === _.dont )
+      return _.dont;
       fop.result.push( record );
       return record;
     }
     else if( fop.outputFormat === 'nothing' )
     recordAdd = function addNothing( record, op )
     {
-      counter += 1;
+      if( handleRecord.apply( this, arguments ) === _.dont )
+      return _.dont;
+      return record;
     }
     else _.assert( 0, 'Unknown output format :', o.outputFormat );
 
@@ -1009,9 +1019,8 @@ defaults.safe = null;
 defaults.maskPreset = 'default.exclude';
 defaults.outputFormat = 'record';
 defaults.result = null;
-
 defaults.mode = 'legacy';
-defaults.once = 1;
+defaults.once = null;
 defaults.onceHardLinked = 0;
 defaults.visited = null;
 
@@ -2058,8 +2067,8 @@ function filesReflectEvaluate_body( o )
   function handleUp( record, op )
   {
 
-    if( _.strEnds( record.dst.absolute, debugPath ) )
-    debugger;
+    // if( _.strEnds( record.dst.absolute, debugPath ) )
+    // debugger;
 
     // if( touchMap[ record.dst.absolute ] )
     // debugger;
@@ -2122,8 +2131,8 @@ function filesReflectEvaluate_body( o )
   function handleUp2( record, op )
   {
 
-    if( _.strEnds( record.dst.absolute, debugPath ) )
-    debugger;
+    // if( _.strEnds( record.dst.absolute, debugPath ) )
+    // debugger;
 
     let a = actionMap[ record.dst.absolute ];
     let t = touchMap[ record.dst.absolute ];
@@ -2292,8 +2301,8 @@ function filesReflectEvaluate_body( o )
   function handleDown( record, op )
   {
 
-    if( _.strEnds( record.dst.absolute, debugPath ) )
-    debugger;
+    // if( _.strEnds( record.dst.absolute, debugPath ) )
+    // debugger;
 
     // _.assert( touchMap[ record.dst.absolute ] === record.touch || !record.touch ); // yyy
     if( touchMap[ record.dst.absolute ] )
@@ -2361,8 +2370,8 @@ function filesReflectEvaluate_body( o )
   function handleDown2( record, op )
   {
 
-    if( _.strEnds( record.dst.absolute, debugPath ) )
-    debugger;
+    // if( _.strEnds( record.dst.absolute, debugPath ) )
+    // debugger;
 
     _.assert( arguments.length === 2 );
     _.assert( !!record.touch === !!touchMap[ record.dst.absolute ] );
@@ -3128,7 +3137,6 @@ let filesReflectSinglePrimeDefaults = Object.create( null );
 var defaults = filesReflectSinglePrimeDefaults;
 
 defaults.result = null;
-// defaults.outputFormat = 'record';
 defaults.verbosity = 0;
 defaults.mandatory = 1;
 
@@ -3155,13 +3163,6 @@ defaults.extra = null;
 defaults.onUp = null;
 defaults.onDown = null;
 defaults.onDstName = null;
-
-// let filesReflectSingleDefaults = Object.create( filesReflectSinglePrimeDefaults );
-// var defaults = filesReflectSingleDefaults;
-//
-// defaults.filesGraph = null;
-// defaults.src = null;
-// defaults.dst = null;
 
 var defaults = filesReflectEvaluate_body.defaults = Object.create( filesReflectSinglePrimeDefaults );
 

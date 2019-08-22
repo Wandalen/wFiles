@@ -3482,7 +3482,7 @@ function filesReflectSingle_body( o )
     }
     else if( o.rebasingLink === 2 )
     {
-      srcAbsolute = src.pathResolveLinkFull
+      let srcAbsolute2 = src.pathResolveLinkFull
       ({
         filePath : srcAbsolute,
         resolvingSoftLink : 1,
@@ -3491,6 +3491,7 @@ function filesReflectSingle_body( o )
         allowingMissed : o.allowingMissed,
         allowingCycled : o.allowingCycled,
       });
+      // if(  )
       srcPath = srcAbsolute;
     }
     else _.assert( 0 );
@@ -3506,11 +3507,13 @@ function filesReflectSingle_body( o )
     debugger;
     if( record.src === dstRecord )
     return false;
+    record.src = dstRecord;
 
+    if( path.isAbsolute( srcPath ) )
+    debugger;
     if( path.isAbsolute( srcPath ) )
     srcPath = record.src.absolutePreferred;
 
-    record.src = dstRecord;
     let action = isSoftLink ? 'softLink' : 'textLink';
 
     if( action === 'softLink' )

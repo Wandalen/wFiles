@@ -6079,7 +6079,7 @@ function _link_functor( fop )
       if( !Config.debug )
       return;
       
-      debugger
+      // debugger
 
       // if( !c.srcStat )
       // return;

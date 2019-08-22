@@ -1089,7 +1089,7 @@ function filesFind( test )
   {
     test.identical( onDownMap[ r.absolute ], undefined )
     onDownMap[ r.absolute ] = 1;
-    return r;
+    // return r;
   }
 
   var got = provider.filesFind
@@ -1281,7 +1281,7 @@ function filesFind( test )
     var files = provider.filesFind( _.cloneJust( o ) );
 
     // var tester = path.globRegexpsForTerminal( glob, routinePath, info.filter.basePath );
-    var tester = path.globsFullToRegexps( glob, routinePath, info.filter.basePath ).actual;
+    var tester = path.globsFullToRegexps( glob, routinePath, info.filter.basePath, true ).actual;
 
     var expected = allFiles.slice();
     expected = expected.filter( ( p ) =>
@@ -1450,7 +1450,7 @@ function filesFind( test )
           // if( o.glob )
           // passed = path.globRegexpsForTerminal( o.glob, o.filePath, o.basePath || routinePath ).test( relative );
           if( o.glob )
-          passed = path.globsFullToRegexps( o.glob, o.filePath, o.basePath || routinePath ).actual.test( relative );
+          passed = path.globsFullToRegexps( o.glob, o.filePath, o.basePath || routinePath, true ).actual.test( relative );
 
           if( passed )
           {
@@ -14121,7 +14121,6 @@ function filesReflectMutuallyExcluding( test )
     function handleDown( record )
     {
       extract.fileWrite( record.absolute, extract.fileRead( record.absolute ) )
-      return record;
     }
   }
 
@@ -17746,24 +17745,7 @@ function filesReflectorBasic( test )
   src.finit();
 
   /* */
-
-  var src = context.makeStandardExtract({ originPath : 'src://' });
-  src.providerRegisterTo( hub );
-
-  var reflect = hub.filesReflector
-  ({
-    src : { basePath : 'src:///' },
-    dst : { filePath : 'current:///' },
-  });
-  test.mustNotThrowError( () => reflect( '/' ) );
-  var found = dst.filesFind({ filePath : routinePath, allowingMissed : 1 });
-  test.identical( found.length, 0 );
-
-  dst.filesDelete( routinePath );
-  src.finit();
-
-  /* */
-
+  
   if( Config.debug )
   {
 
@@ -17925,6 +17907,33 @@ function filesReflectorBasic( test )
   ({
     src : { prefixPath : 'src:///', basePath : 'src:///' },
     dst : { prefixPath : 'current://' + routinePath, basePath : 'current://' + routinePath },
+    linking : 'fileCopy',
+    mandatory : 1,
+  });
+
+  reflect( '/alt/a' );
+
+  var extract = provider.filesExtract( routinePath );
+  extract.filesFind({ filePath : '/', recursive : 2, onDown : function onDown( r, o )
+  {
+    if( r.isTerminal )
+    extract.fileWrite( r.absolute, extract.fileRead( r.absolute ) );
+  }})
+  test.identical( extract.filesTree, { alt : { a : '/alt/a' } } );
+  test.identical( provider.statRead( routinePath + '/alt/a' ).isTerminal(), true );
+
+  dst.filesDelete( routinePath );
+  src.finit();
+  
+  /* */
+
+  var src = context.makeStandardExtract({ originPath : 'src://' });
+  src.providerRegisterTo( hub );
+
+  var reflect = hub.filesReflector
+  ({
+    src : { prefixPath : 'src:///', basePath : 'src:///' },
+    dst : { prefixPath : 'current://' + routinePath, basePath : 'current://' + routinePath },
     linking : 'softLink',
     mandatory : 1,
   });
@@ -17938,7 +17947,7 @@ function filesReflectorBasic( test )
   else
   {
     var extract = provider.filesExtract( routinePath );
-    test.identical( extract.filesTree, { alt : { a : '/alt/a' } } );
+    test.identical( extract.filesTree, { alt : { a : [{ softLink : 'src:///alt/a' }] } } );
     test.identical( provider.statRead( routinePath + '/alt/a' ).isSoftLink(), true );
   }
 
@@ -18082,6 +18091,47 @@ function filesReflectLinkWithHub( test )
   var expected = [ 'link', 'terminal' ];
   test.identical( got, expected );
   test.is( dst.isTerminal( _.path.join( dstPath, 'terminal' ) ) );
+  test.is( !dst.isTerminal( _.path.join( dstPath, 'link' ) ) );
+  test.is( dst.isSoftLink( _.path.join( dstPath, 'link' ) ) );
+  if( dst instanceof _.FileProvider.HardDrive )
+  {
+    test.shouldThrowErrorSync( () =>
+    {
+      dst.fileRead( _.path.join( dstPath, 'link' ) )
+    })
+  }
+  else
+  {
+    var got = dst.fileRead( _.path.join( dstPath, 'link' ) );
+    var expected = 'terminal';
+    test.identical( got, expected );
+  }
+  
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 2, with prefixPath';
+
+  dst.filesDelete( dstPath );
+  hub.filesReflect({ reflectMap : { [ 'src:///' ] : 'current://' + dstPath } });
+
+  hub.filesReflect
+  ({
+    dst :
+    {
+      prefixPath : _.uri.join( 'current://', dstPath ),
+    },
+    src :
+    {
+      prefixPath : _.uri.join( 'src://', '/' ),
+    },
+    mandatory : 1,
+    resolvingSrcSoftLink : 2,
+  });
+
+  var got = dst.dirRead( dstPath );
+  var expected = [ 'link', 'terminal' ];
+  test.identical( got, expected );
+  test.is( dst.isTerminal( _.path.join( dstPath, 'terminal' ) ) );
   test.is( dst.isTerminal( _.path.join( dstPath, 'link' ) ) );
   test.is( !dst.isSoftLink( _.path.join( dstPath, 'link' ) ) );
   var got = dst.fileRead( _.path.join( dstPath, 'link' ) );
@@ -18113,6 +18163,47 @@ function filesReflectLinkWithHub( test )
   var expected = [ 'link', 'terminal' ];
   test.identical( got, expected );
   test.is( dst.isTerminal( _.path.join( dstPath, 'terminal' ) ) );
+  test.is( !dst.isTerminal( _.path.join( dstPath, 'link' ) ) );
+  test.is( dst.isSoftLink( _.path.join( dstPath, 'link' ) ) );
+  if( dst instanceof _.FileProvider.HardDrive )
+  {
+    test.shouldThrowErrorSync( () =>
+    {
+      dst.fileRead( _.path.join( dstPath, 'link' ) )
+    })
+  }
+  else
+  {
+    var got = dst.fileRead( _.path.join( dstPath, 'link' ) );
+    var expected = 'terminal';
+    test.identical( got, expected );
+  }
+  
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 2, with filePath';
+
+  dst.filesDelete( dstPath );
+  hub.filesReflect({ reflectMap : { [ 'src:///' ] : 'current://' + dstPath } });
+
+  hub.filesReflect
+  ({
+    dst :
+    {
+      filePath : _.uri.join( 'current://', dstPath ),
+    },
+    src :
+    {
+      filePath : _.uri.join( 'src://', '/' ),
+    },
+    mandatory : 1,
+    resolvingSrcSoftLink : 2,
+  });
+
+  var got = dst.dirRead( dstPath );
+  var expected = [ 'link', 'terminal' ];
+  test.identical( got, expected );
+  test.is( dst.isTerminal( _.path.join( dstPath, 'terminal' ) ) );
   test.is( dst.isTerminal( _.path.join( dstPath, 'link' ) ) );
   test.is( !dst.isSoftLink( _.path.join( dstPath, 'link' ) ) );
   var got = dst.fileRead( _.path.join( dstPath, 'link' ) );
@@ -18138,6 +18229,47 @@ function filesReflectLinkWithHub( test )
     },
     mandatory : 1,
     resolvingSrcSoftLink : 1,
+  });
+
+  var got = dst.dirRead( dstPath );
+  var expected = [ 'link', 'terminal' ];
+  test.identical( got, expected );
+  test.is( dst.isTerminal( _.path.join( dstPath, 'terminal' ) ) );
+  test.is( !dst.isTerminal( _.path.join( dstPath, 'link' ) ) );
+  test.is( dst.isSoftLink( _.path.join( dstPath, 'link' ) ) );
+  if( dst instanceof _.FileProvider.HardDrive )
+  {
+    test.shouldThrowErrorSync( () =>
+    {
+      dst.fileRead( _.path.join( dstPath, 'link' ) )
+    })
+  }
+  else
+  {
+    var got = dst.fileRead( _.path.join( dstPath, 'link' ) );
+    var expected = 'terminal';
+    test.identical( got, expected );
+  }
+  
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 2, with filePath';
+
+  dst.filesDelete( dstPath );
+  hub.filesReflect({ reflectMap : { [ 'src:///' ] : 'current://' + dstPath } });
+
+  hub.filesReflect
+  ({
+    dst :
+    {
+      filePath : _.uri.join( 'current://', dstPath ),
+    },
+    src :
+    {
+      filePath : _.uri.join( 'src://', '/' ),
+    },
+    mandatory : 1,
+    resolvingSrcSoftLink : 2,
   });
 
   var got = dst.dirRead( dstPath );
@@ -18210,6 +18342,49 @@ function filesReflectLinkWithHub( test )
     },
     mandatory : 1,
     resolvingSrcSoftLink : null,
+  });
+
+  reflect( '.' );
+
+  var got = dst.dirRead( dstPath );
+  var expected = [ 'link', 'terminal' ];
+  test.identical( got, expected );
+  test.is( dst.isTerminal( _.path.join( dstPath, 'terminal' ) ) );
+  test.is( !dst.isTerminal( _.path.join( dstPath, 'link' ) ) );
+  test.is( dst.isSoftLink( _.path.join( dstPath, 'link' ) ) );
+  if( dst instanceof _.FileProvider.HardDrive )
+  {
+    test.shouldThrowErrorSync( () =>
+    {
+      dst.fileRead( _.path.join( dstPath, 'link' ) )
+    })
+  }
+  else
+  {
+    var got = dst.fileRead( _.path.join( dstPath, 'link' ) );
+    var expected = 'terminal';
+    test.identical( got, expected );
+  }
+  
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 2, with reflector';
+
+  dst.filesDelete( dstPath );
+  hub.filesReflect({ reflectMap : { [ 'src:///' ] : 'current://' + dstPath } });
+
+  var reflect = hub.filesReflector
+  ({
+    dst :
+    {
+      prefixPath : _.uri.join( 'current://', dstPath ),
+    },
+    src :
+    {
+      prefixPath : _.uri.join( 'src://', '/' ),
+    },
+    mandatory : 1,
+    resolvingSrcSoftLink : 2,
   });
 
   reflect( '.' );
@@ -25838,7 +26013,7 @@ var Self =
     // filesReflectLinked, // xxx
     filesReflectTo,
     filesReflectToWithSoftLinks,
-    filesReflectToWithSoftLinksRebasing,
+    // filesReflectToWithSoftLinksRebasing,
     filesReflectDstIgnoring,
 
     filesDeleteTrivial,

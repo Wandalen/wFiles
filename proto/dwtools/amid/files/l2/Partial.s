@@ -1117,7 +1117,7 @@ function pathResolveLinkFull_body( o )
         result.relativePath = result.filePath = result.absolutePath = self.pathResolveLinkHeadDirect.body.call( self, o2 );
 
       }
-
+      
       if( result )
       {
 
@@ -1128,7 +1128,7 @@ function pathResolveLinkFull_body( o )
           filePath : result.absolutePath,
           resolvingSoftLink : o.resolvingSoftLink,
           resolvingTextLink : o.resolvingTextLink,
-          preservingRelative : o.preservingRelative,
+          preservingRelative : true,
           allowingMissed : o.allowingMissed,
           allowingCycled : o.allowingCycled,
           throwing : o.throwing,
@@ -1142,6 +1142,10 @@ function pathResolveLinkFull_body( o )
           if( path.isRelative( r.filePath ) )
           r.filePath = r.relativePath;
         }
+        
+        if( !o.preservingRelative )
+        r.filePath = r.absolutePath;
+        
         result = r;
         o.stat = o2.stat;
         _.assert( o.stat !== undefined );
@@ -1179,8 +1183,22 @@ function pathResolveLinkFull_body( o )
         if( r !== result.absolutePath ) /* qqq : preserve relative path */
         debugger;
         if( r !== result.absolutePath )
-        result.relativePath = result.filePath = result.absolutePath = r.absolutePath;
-
+        {
+          result.filePath = result.absolutePath = r;
+          
+          if( r.relativePath && o.relativeOriginalFile )
+          {
+            if( path.isRelative( result.relativePath ) )
+            result.relativePath = path.relative( o.filePath, result.absolutePath );
+            if( path.isRelative( result.filePath ) )
+            result.filePath = r.relativePath;
+          }
+        
+          if( !path.isRelative( result.relativePath ) )
+          result.relativePath = result.absolutePath;
+          else if( o.preservingRelative )
+          result.filePath = result.relativePath;
+        }
       }
 
       // return _.mapIs( result ) ? result.filePath : result; // qqq xxx
@@ -6683,6 +6701,8 @@ function _fileCopyAct( c )
   let self = this;
   // let o = c.options2;
   let o = c.options;
+  
+  debugger
 
   _.assert( _.fileStatIs( c.srcStat ) || c.srcStat === null );
 

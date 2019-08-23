@@ -20380,6 +20380,8 @@ function filesReflectLinkedExperiment( test )
   test.identical( got, srcMissingPath )
 }
 
+filesReflectLinkedExperiment.experimental = 1;
+
 //
 
 function filesReflectTo( test )

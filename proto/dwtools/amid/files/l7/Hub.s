@@ -537,14 +537,10 @@ function pathResolveLinkFull_body( o )
     if( result === null )
     return null;
 
-    result = self.path.join( r.provider.originPath, result );
+    result.filePath = self.path.join( r.provider.originPath, result.filePath );
+    result.relativePath = self.path.join( r.provider.originPath, result.relativePath );
+    result.absolutePath = self.path.join( r.provider.originPath, result.absolutePath );
 
-    if( result === o.filePath )
-    {
-      debugger;
-      _.assert( 0, 'not tested' );
-      // return r.originalPath;
-    }
     return result;
   }
 }
@@ -754,6 +750,17 @@ function _link_functor( fop )
 
     /* */
 
+    op.relativeDst = self._pathLocalize( op.options.relativeDstPath );
+    if( allowingMissedSrc )
+    op.relativeSrc = self._pathLocalizeMaybe( op.options.relativeSrcPath );
+    else
+    op.relativeSrc = self._pathLocalize( op.options.relativeSrcPath );
+
+    _.assert( !!op.relativeDst.provider, 'No provider for path', op.options.relativeDstPath );
+    _.assert( allowingMissedSrc || !!op.relativeSrc.provider, 'No provider for path', op.options.relativeSrcPath );
+
+    /* */
+
     op.dst = self._pathLocalize( op.options.dstPath );
     if( allowingMissedSrc )
     op.src = self._pathLocalizeMaybe( op.options.srcPath );
@@ -762,6 +769,8 @@ function _link_functor( fop )
 
     _.assert( !!op.dst.provider, 'No provider for path', op.options.dstPath );
     _.assert( allowingMissedSrc || !!op.src.provider, 'No provider for path', op.options.srcPath );
+
+    /* */
 
     op.options.dstPath = op.dst.localPath;
 

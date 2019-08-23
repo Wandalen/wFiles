@@ -341,7 +341,7 @@ function _statRead()
       throwing : 1,
     }
 
-    record[ realSymbol ] = f.effectiveFileProvider.pathResolveLinkFull( o2 );
+    record[ realSymbol ] = f.effectiveFileProvider.pathResolveLinkFull( o2 ).filePath;
 
     stat = o2.stat;
 

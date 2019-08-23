@@ -38826,6 +38826,212 @@ function pathResolveLinkFullSpecial( test )
 
 //
 
+function pathResolveLinkFullResult( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let path = provider.path;
+
+  let routinePath = test.context.pathFor( 'written/pathResolveLinkFullResult' );
+  let srcPath = test.context.pathFor( 'written/pathResolveLinkFullResult/file' );
+  let src2Path = test.context.pathFor( 'written/pathResolveLinkFullResult/file2' );
+  let dstPath = test.context.pathFor( 'written/pathResolveLinkFullResult/link' );
+  
+  var o = 
+  {
+    resolvingHeadDirect : 1,
+    resolvingHeadReverse : 1,
+    preservingRelative : 0,
+    relativeOriginalFile : 1,
+    resolvingSoftLink : null,
+    resolvingTextLink : null,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1
+  }
+  
+  test.case = 'missing path';
+  provider.filesDelete( routinePath );
+  var o2 = { filePath : srcPath };
+  var got = provider.pathResolveLinkFull( _.mapExtend( null, o, o2 ));
+  test.identical( got.filePath, srcPath );
+  test.identical( got.relativePath, srcPath );
+  test.identical( got.absolutePath, srcPath );
+  
+  test.case = 'terminal';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  var o2 = { filePath : srcPath };
+  var got = provider.pathResolveLinkFull( _.mapExtend( null, o, o2 ));
+  test.identical( got.filePath, srcPath );
+  test.identical( got.relativePath, srcPath );
+  test.identical( got.absolutePath, srcPath );
+  
+  /* */
+  
+  test.open( 'soft links' );
+  
+  test.case = 'absolute soft link to terminal';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  provider.softLink( dstPath, srcPath )
+  var o2 = { filePath : dstPath };
+  var got = provider.pathResolveLinkFull( _.mapExtend( null, o, o2 ));
+  test.identical( got.filePath, srcPath );
+  test.identical( got.relativePath, srcPath );
+  test.identical( got.absolutePath, srcPath );
+  
+  test.case = 'relative soft link to terminal';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  provider.softLink( dstPath, '../file' )
+  var o2 = { filePath : dstPath };
+  var got = provider.pathResolveLinkFull( _.mapExtend( null, o, o2 ));
+  test.identical( got.filePath, srcPath );
+  test.identical( got.relativePath, srcPath );
+  test.identical( got.absolutePath, srcPath );
+  
+  test.case = 'relative soft link to terminal, preservingRelative:1';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  provider.softLink( dstPath, '../file' )
+  var o2 = { filePath : dstPath, preservingRelative : 1 };
+  var got = provider.pathResolveLinkFull( _.mapExtend( null, o, o2 ));
+  test.identical( got.filePath, '../file' );
+  test.identical( got.relativePath, '../file' );
+  test.identical( got.absolutePath, srcPath );
+  
+  test.case = 'relative soft link to terminal, preservingRelative:0';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  provider.softLink( dstPath, '../file' )
+  var o2 = { filePath : dstPath, preservingRelative : 0 };
+  var got = provider.pathResolveLinkFull( _.mapExtend( null, o, o2 ));
+  test.identical( got.filePath, srcPath );
+  test.identical( got.relativePath, '../file' );
+  test.identical( got.absolutePath, srcPath );
+  
+  test.case = 'chain of absolute soft links'
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  provider.softLink( src2Path,  srcPath )
+  provider.softLink( dstPath,  src2Path )
+  var o2 = { filePath : dstPath };
+  var got = provider.pathResolveLinkFull( _.mapExtend( null, o, o2 ));
+  test.identical( got.filePath, srcPath );
+  test.identical( got.relativePath, srcPath );
+  test.identical( got.absolutePath, srcPath );
+  
+  test.case = 'chain of absolute soft links, preservingRelative:1'
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  provider.softLink( src2Path,  '../file' )
+  provider.softLink( dstPath,  '../file2' )
+  var o2 = { filePath : dstPath, preservingRelative : 1 };
+  var got = provider.pathResolveLinkFull( _.mapExtend( null, o, o2 ));
+  test.identical( got.filePath, '../file' );
+  test.identical( got.relativePath, '../file' );
+  test.identical( got.absolutePath, srcPath );
+  
+  test.case = 'chain of relative soft links, preservingRelative:0'
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  provider.softLink( src2Path,  '../file' )
+  provider.softLink( dstPath,  '../file2' )
+  var o2 = { filePath : dstPath, preservingRelative : 0 };
+  var got = provider.pathResolveLinkFull( _.mapExtend( null, o, o2 ));
+  test.identical( got.filePath, srcPath );
+  test.identical( got.relativePath, '../file' );
+  test.identical( got.absolutePath, srcPath );
+  
+  test.close( 'soft links' );
+  
+  /* */
+  
+  test.open( 'text links' );
+  
+  provider.fieldPush( 'usingTextLink', 1 );
+  
+  test.case = 'absolute text link to terminal';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  provider.textLink( dstPath, srcPath )
+  var o2 = { filePath : dstPath, resolvingTextLink : 1 };
+  var got = provider.pathResolveLinkFull( _.mapExtend( null, o, o2 ));
+  test.identical( got.filePath, srcPath );
+  test.identical( got.relativePath, srcPath );
+  test.identical( got.absolutePath, srcPath );
+  
+  test.case = 'relative soft link to terminal';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  provider.textLink( dstPath, '../file' )
+  var o2 = { filePath : dstPath, resolvingTextLink : 1 };
+  var got = provider.pathResolveLinkFull( _.mapExtend( null, o, o2 ));
+  test.identical( got.filePath, srcPath );
+  test.identical( got.relativePath, srcPath );
+  test.identical( got.absolutePath, srcPath );
+  
+  test.case = 'relative soft link to terminal, preservingRelative:1';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  provider.textLink( dstPath, '../file' )
+  var o2 = { filePath : dstPath, resolvingTextLink : 1, preservingRelative : 1 };
+  var got = provider.pathResolveLinkFull( _.mapExtend( null, o, o2 ));
+  test.identical( got.filePath, '../file' );
+  test.identical( got.relativePath, '../file' );
+  test.identical( got.absolutePath, srcPath );
+  
+  test.case = 'relative soft link to terminal, preservingRelative:0';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  provider.textLink( dstPath, '../file' )
+  var o2 = { filePath : dstPath, resolvingTextLink : 1, preservingRelative : 0 };
+  var got = provider.pathResolveLinkFull( _.mapExtend( null, o, o2 ));
+  test.identical( got.filePath, srcPath );
+  test.identical( got.relativePath, '../file' );
+  test.identical( got.absolutePath, srcPath );
+  
+  test.case = 'chain of absolute soft links'
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  provider.textLink( src2Path,  srcPath )
+  provider.textLink( dstPath,  src2Path )
+  var o2 = { filePath : dstPath, resolvingTextLink : 1 };
+  var got = provider.pathResolveLinkFull( _.mapExtend( null, o, o2 ));
+  test.identical( got.filePath, srcPath );
+  test.identical( got.relativePath, srcPath );
+  test.identical( got.absolutePath, srcPath );
+  
+  test.case = 'chain of absolute soft links, preservingRelative:1'
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  provider.textLink( src2Path,  '../file' )
+  provider.textLink( dstPath,  '../file2' )
+  var o2 = { filePath : dstPath, resolvingTextLink : 1, preservingRelative : 1 };
+  var got = provider.pathResolveLinkFull( _.mapExtend( null, o, o2 ));
+  test.identical( got.filePath, '../file' );
+  test.identical( got.relativePath, '../file' );
+  test.identical( got.absolutePath, srcPath );
+  
+  test.case = 'chain of relative soft links, preservingRelative:0'
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  provider.textLink( src2Path,  '../file' )
+  provider.textLink( dstPath,  '../file2' )
+  var o2 = { filePath : dstPath, resolvingTextLink : 1, preservingRelative : 0 };
+  var got = provider.pathResolveLinkFull( _.mapExtend( null, o, o2 ));
+  test.identical( got.filePath, srcPath );
+  test.identical( got.relativePath, '../file' );
+  test.identical( got.absolutePath, srcPath );
+  
+  provider.fieldPop( 'usingTextLink', 1 );
+  
+  test.close( 'text links' );
+}
+
+//
+
 function pathNativize( t )
 {
   let self = this;
@@ -39569,6 +39775,7 @@ var Self =
     pathResolveSoftLink,
     pathResolveTextLink,
     pathResolveLinkFullSpecial,
+    pathResolveLinkFullResult,
 
     pathNativize,
 

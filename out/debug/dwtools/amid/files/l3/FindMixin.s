@@ -3310,8 +3310,8 @@ function filesReflectSingle_body( o )
     let srcAbsolute = record.src.real;
     /* xxx qqq : use ( resolvingMultiple / recursive ) option instead of if-else */
 
-    if( _.strHas( srcAbsolute, 'dirLink' ) )
-    debugger;
+    // if( _.strHas( srcAbsolute, 'dirLink' ) )
+    // debugger;
 
     if( o.rebasingLink === 2 || o.resolvingSrcSoftLink === 2 )
     {
@@ -3369,14 +3369,14 @@ function filesReflectSingle_body( o )
       if( o.resolvingSrcSoftLink === 2 )
       linkWithAction( record.dst.absolutePreferred, srcPath, 'fileCopy' );
       else
-      linkWithAction( record.dst.absolutePreferred, srcPath, action );
+      linkWithAction( record.dst.absolutePreferred, srcPath, action, 1 );
     }
     else if( action === 'textLink' )
     {
       if( o.resolvingSrcTextLink === 2 )
       linkWithAction( record.dst.absolutePreferred, srcPath, 'fileCopy' );
       else
-      linkWithAction( record.dst.absolutePreferred, srcPath, action );
+      linkWithAction( record.dst.absolutePreferred, srcPath, action, 1 );
     }
 
     return true;
@@ -3384,7 +3384,7 @@ function filesReflectSingle_body( o )
 
   /* */
 
-  function linkWithAction( dstPath, srcPath, action )
+  function linkWithAction( dstPath, srcPath, action, allowingMissed )
   {
 
     if( action === 'nop' )
@@ -3397,7 +3397,7 @@ function filesReflectSingle_body( o )
         dstPath,
         srcPath,
         makingDirectory : 0,
-        allowingMissed : o.allowingMissed,
+        allowingMissed : o.allowingMissed || allowingMissed,
         allowingCycled : o.allowingCycled,
         resolvingSrcSoftLink : o.resolvingSrcSoftLink,
         resolvingSrcTextLink : o.resolvingSrcTextLink,
@@ -3414,7 +3414,7 @@ function filesReflectSingle_body( o )
         dstPath,
         srcPath,
         makingDirectory : 0,
-        allowingMissed : o.allowingMissed,
+        allowingMissed : o.allowingMissed || allowingMissed,
         allowingCycled : o.allowingCycled,
         resolvingSrcSoftLink : o.resolvingSrcSoftLink,
         resolvingSrcTextLink : o.resolvingSrcTextLink,
@@ -3432,7 +3432,7 @@ function filesReflectSingle_body( o )
         dstPath,
         srcPath,
         makingDirectory : 0,
-        allowingMissed : o.allowingMissed,
+        allowingMissed : o.allowingMissed || allowingMissed,
         allowingCycled : o.allowingCycled,
         resolvingSrcSoftLink : o.resolvingSrcSoftLink,
         resolvingSrcTextLink : o.resolvingSrcTextLink,
@@ -3448,7 +3448,7 @@ function filesReflectSingle_body( o )
         dstPath,
         srcPath,
         makingDirectory : 0,
-        allowingMissed : o.allowingMissed,
+        allowingMissed : o.allowingMissed || allowingMissed,
         allowingCycled : o.allowingCycled,
         resolvingSrcSoftLink : o.resolvingSrcSoftLink,
         resolvingSrcTextLink : o.resolvingSrcTextLink,

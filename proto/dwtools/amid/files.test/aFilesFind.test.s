@@ -20072,6 +20072,7 @@ function filesReflectLinked( test )
   let provider = context.provider;
   let hub = context.hub;
   let path = context.provider.path;
+
   let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
   var srcPath = path.join( routinePath, 'src' );
   var dstPath = path.join( routinePath, 'dst' );
@@ -20081,6 +20082,7 @@ function filesReflectLinked( test )
   /* - */
 
   test.case = 'first';
+  
 
   logger.log( 'routinePath', routinePath );
 
@@ -20096,12 +20098,13 @@ function filesReflectLinked( test )
     dstPath : srcLinkPath,
     allowingMissed : 1,
   })
-
+  
   provider.filesReflect
   ({
     reflectMap : { [ srcPath ] : dstPath },
     allowingMissed : 1,
   });
+  provider.pathResolveSoftLink( dstLinkPath );
 
   test.is( provider.fileExists( path.join( dstPath, 'file' ) ) );
   test.is( !provider.fileExists( dstLinkPath ) );
@@ -20340,6 +20343,42 @@ function filesReflectLinked( test )
   var dstLink4 = provider.pathResolveSoftLink({ filePath : dstLinkPath });
   test.identical( dstLink4, path.join( dstPath, 'fileNotExists' ) );
 
+}
+
+//
+
+function filesReflectLinkedExperiment( test )
+{
+  let context = this;
+  let provider = context.provider;
+  let hub = context.hub;
+  let path = context.provider.path;
+  
+  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  var srcPath = path.join( routinePath, 'src' );
+  var dstPath = path.join( routinePath, 'dst' );
+  var dstLinkPath = path.join( dstPath, 'link' );
+  var srcLinkPath = path.join( srcPath, 'link' );
+  var srcMissingPath = path.join( srcPath, 'missing' )
+
+  /* - */
+
+  provider.filesDelete( routinePath );
+  provider.dirMake( srcPath );
+  provider.softLink
+  ({
+    srcPath : srcMissingPath,
+    dstPath : srcLinkPath,
+    allowingMissed : 1,
+  })
+  provider.filesReflect
+  ({
+    reflectMap : { [ srcPath ] : dstPath },
+    allowingMissed : 1,
+    resolvingSrcSoftLink : 1
+  });
+  let got = provider.pathResolveSoftLink( dstLinkPath );
+  test.identical( got, srcMissingPath )
 }
 
 //
@@ -26429,8 +26468,9 @@ var Self =
 
     experiment,
     filesFindExperiment2,
-    filesReflectExperiment
-
+    filesReflectExperiment,
+    filesReflectLinkedExperiment
+    
   },
 
 };

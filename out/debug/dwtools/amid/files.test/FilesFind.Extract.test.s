@@ -55,7 +55,7 @@ function onSuiteBegin( test )
   let context = this;
   Parent.onSuiteBegin.apply( this, arguments );
   context.provider = _.FileProvider.Extract({ usingExtraStat : 1, protocol : 'current' });
-  context.hub = _.FileProvider.Hub({ providers : [ context.provider ] });
+  context.hub = _.FileProvider.System({ providers : [ context.provider ] });
   let path = context.provider.path;
   context.testSuitePath = path.dirTempOpen( 'suite-' + 'FilesFind' );
 }

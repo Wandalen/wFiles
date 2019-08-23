@@ -1,8 +1,8 @@
-( function _FileProvider_Hub_copy_test_ss_( ) {
+( function _FileProvider_System_copy_test_ss_( ) {
 
 'use strict';
 
-// !!! disabled because Provider.Hub is in implementation phase
+// !!! disabled because Provider.System is in implementation phase
 
 if( typeof module !== 'undefined' )
 {
@@ -187,7 +187,7 @@ function copy( test )
 var Proto =
 {
 
-  name : 'Tools/mid/files/fileProvider/Hub/copy',
+  name : 'Tools/mid/files/fileProvider/System/copy',
   abstract : 0,
   silencing : 1,
   enabled : 0,
@@ -197,7 +197,7 @@ var Proto =
 
   context :
   {
-    hub : _.FileProvider.Hub({ empty : 1 }),
+    hub : _.FileProvider.System({ empty : 1 }),
     testSuitePath : null,
   },
 

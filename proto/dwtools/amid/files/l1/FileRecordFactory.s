@@ -122,7 +122,7 @@ function _formAssociations()
 
   // if( factory.defaultFileProvider )
   // {
-  //   if( factory.defaultFileProvider instanceof _.FileProvider.Hub )
+  //   if( factory.defaultFileProvider instanceof _.FileProvider.System )
   //   {
   //     _.assert( factory.hubFileProvider === null || factory.hubFileProvider === factory.defaultFileProvider );
   //     factory.hubFileProvider = factory.defaultFileProvider;
@@ -138,7 +138,7 @@ function _formAssociations()
 
   if( factory.effectiveFileProvider )
   {
-    if( factory.effectiveFileProvider instanceof _.FileProvider.Hub )
+    if( factory.effectiveFileProvider instanceof _.FileProvider.System )
     {
       _.assert( factory.hubFileProvider === null || factory.hubFileProvider === factory.effectiveFileProvider );
       factory.hubFileProvider = factory.effectiveFileProvider;
@@ -161,7 +161,7 @@ function _formAssociations()
 
   _.assert( !factory.hubFileProvider || factory.hubFileProvider instanceof _.FileProvider.Abstract, 'Expects {- factory.hubFileProvider -}' );
   _.assert( factory.defaultFileProvider instanceof _.FileProvider.Abstract );
-  _.assert( !factory.effectiveFileProvider || !( factory.effectiveFileProvider instanceof _.FileProvider.Hub ) );
+  _.assert( !factory.effectiveFileProvider || !( factory.effectiveFileProvider instanceof _.FileProvider.System ) );
 
 }
 

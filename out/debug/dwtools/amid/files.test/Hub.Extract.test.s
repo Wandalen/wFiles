@@ -1,4 +1,4 @@
-( function _FileProvider_Hub_Extract_test_s_( ) {
+( function _FileProvider_System_Extract_test_s_( ) {
 
 'use strict';  
 
@@ -82,7 +82,7 @@ function onSuiteEnd()
 var Proto =
 {
 
-  name : 'Tools/mid/files/fileProvider/Hub/withExtract',
+  name : 'Tools/mid/files/fileProvider/System/withExtract',
   abstract : 0,
   silencing : 1,
   enabled : 1,
@@ -92,7 +92,7 @@ var Proto =
 
   context :
   {
-    provider : _.FileProvider.Hub({ empty : 1 }),
+    provider : _.FileProvider.System({ empty : 1 }),
     providerEffective : null,
     filesTree : filesTree,
     pathFor : pathFor,

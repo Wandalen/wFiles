@@ -75,7 +75,7 @@ function providerIsInstanceOf( src )
   if( provider instanceof src )
   return true;
 
-  if( _.FileProvider.Hub && provider instanceof _.FileProvider.Hub )
+  if( _.FileProvider.System && provider instanceof _.FileProvider.System )
   {
     var routinePath = self.pathFor( 'routinePath' );
     var provider2 = provider.providerForPath( routinePath );
@@ -4717,7 +4717,7 @@ function fileCopyActSync( test )
     breakingDstHardLink : 0,
     sync : 1
   }
-  if( !self.providerIsInstanceOf( _.FileProvider.Hub ) )
+  if( !self.providerIsInstanceOf( _.FileProvider.System ) )
   test.shouldThrowError( () => provider.fileCopyAct( o ) );
   else
   test.mustNotThrowError( () => provider.fileCopyAct( o ) );
@@ -12163,7 +12163,7 @@ function fileRenameActSync( test )
     relativeDstPath : dstPath,
     sync : 1
   }
-  if( !self.providerIsInstanceOf( _.FileProvider.Hub ) )
+  if( !self.providerIsInstanceOf( _.FileProvider.System ) )
   test.shouldThrowError( () => provider.fileRenameAct( o ) );
   else
   test.mustNotThrowError( () => provider.fileRenameAct( o ) );
@@ -13697,7 +13697,7 @@ function fileDeleteLocked( test )
   let provider = self.provider;
   let path = provider.path;
 
-  let skip = !self.providerIsInstanceOf( _.FileProvider.HardDrive ) || self.providerIsInstanceOf( _.FileProvider.Hub );
+  let skip = !self.providerIsInstanceOf( _.FileProvider.HardDrive ) || self.providerIsInstanceOf( _.FileProvider.System );
 
   if( skip )
   {
@@ -21242,7 +21242,7 @@ function softLinkActSync( test )
 
   var expected = _.mapExtend( null, o );
 
-  if( !( provider instanceof _.FileProvider.Hub ) )
+  if( !( provider instanceof _.FileProvider.System ) )
   if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   if( process.platform === 'win32' )
   expected.type = 'file'
@@ -25292,7 +25292,7 @@ function hardLinkActSync( test )
     breakingDstHardLink : 1,
     sync : 1
   }
-  if( !self.providerIsInstanceOf( _.FileProvider.Hub ) )
+  if( !self.providerIsInstanceOf( _.FileProvider.System ) )
   test.shouldThrowError( () => provider.hardLinkAct( o ) );
   else
   test.mustNotThrowError( () => provider.hardLinkAct( o ) );

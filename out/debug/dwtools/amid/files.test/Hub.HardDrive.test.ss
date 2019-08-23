@@ -1,4 +1,4 @@
-( function _FileProvider_Hub_HardDrive_test_ss_( ) {
+( function _FileProvider_System_HardDrive_test_ss_( ) {
 
 'use strict';  
 
@@ -33,7 +33,7 @@ function onSuiteBegin()
 {
   var self = this;
 
-  self.testSuitePath = _.path.dirTempOpen( _.path.join( __dirname, '../..'  ), 'Hub/HardDrive' );
+  self.testSuitePath = _.path.dirTempOpen( _.path.join( __dirname, '../..'  ), 'System/HardDrive' );
 
   self.provider.providerRegister( self.providerEffective );
   self.provider.defaultProvider = self.providerEffective;
@@ -46,7 +46,7 @@ function onSuiteBegin()
 
 function onSuiteEnd()
 { 
-  _.assert( _.strHas( this.testSuitePath, 'Hub/HardDrive' ) );
+  _.assert( _.strHas( this.testSuitePath, 'System/HardDrive' ) );
   // this.providerEffective.filesDelete({ filePath : this.testSuitePath });
   _.path.dirTempClose( this.testSuitePath );
 }
@@ -55,7 +55,7 @@ function onRoutineEnd( test )
 {
   let context = this;
   let hub = context.hub || context.provider;
-  _.sure( hub instanceof _.FileProvider.Hub );
+  _.sure( hub instanceof _.FileProvider.System );
   _.sure( _.entityIdentical( _.mapKeys( hub.providersWithProtocolMap ), [ 'file', 'hd' ] ), test.name, 'has not restored hub!' );
 }
 
@@ -66,7 +66,7 @@ function onRoutineEnd( test )
 var Proto =
 {
 
-  name : 'Tools/mid/files/fileProvider/Hub/withHardDrive',
+  name : 'Tools/mid/files/fileProvider/System/withHardDrive',
   abstract : 0,
   silencing : 1,
   enabled : 1,
@@ -77,7 +77,7 @@ var Proto =
 
   context :
   {
-    provider : _.FileProvider.Hub({ empty : 1 }),
+    provider : _.FileProvider.System({ empty : 1 }),
     providerEffective : _.FileProvider.HardDrive(),
     testSuitePath : null,
 

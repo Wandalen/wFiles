@@ -627,13 +627,16 @@ function filesFind_pre( routine, args )
 
   if( o.resolvingSoftLink || o.resolvingTextLink )
   {
-    if( o.once === null )
-    o.once = 1;
+    if( o.revisiting === null )
+    o.revisiting = 2;
   }
 
-  if( o.once || o.onceHardLinked )
-  if( o.visited === null )
-  o.visited = Object.create( null );
+  _.assert( o.revisiting === 0 || o.revisiting === 1 || o.revisiting === 2 );
+  _.assert( o.revisitingHardLinked === 0 || o.revisitingHardLinked === 1 );
+
+  if( o.revisiting === 0 || o.revisitingHardLinked === 0 )
+  if( o.visitedMap === null )
+  o.visitedMap = Object.create( null );
 
   o = self._filesFindPrepare1( routine, [ o ] );
 
@@ -708,9 +711,9 @@ function filesFind_body( o )
     delete o2.mandatory;
     delete o2.outputFormat;
     delete o2.safe;
-    delete o2.once;
-    delete o2.onceHardLinked;
-    delete o2.visited;
+    delete o2.revisiting;
+    delete o2.revisitingHardLinked;
+    delete o2.visitedMap;
     delete o2.result;
 
     o2.onUp = recordAdd_functor( op );
@@ -792,16 +795,16 @@ function filesFind_body( o )
     if( r === _.dont )
     return _.dont;
 
-    if( o.once )
+    if( o.revisiting === 0 )
     {
-      if( o.visited[ record.real ] )
+      if( o.visitedMap[ record.real ] )
       {
         return _.dont;
       }
     }
 
-    if( o.visited )
-    o.visited[ record.real ] = record;
+    if( o.visitedMap )
+    o.visitedMap[ record.real ] = record;
 
     return record;
   }
@@ -926,9 +929,9 @@ defaults.maskPreset = 'default.exclude';
 defaults.outputFormat = 'record';
 defaults.result = null;
 defaults.mode = 'legacy';
-defaults.once = null;
-defaults.onceHardLinked = 0;
-defaults.visited = null;
+defaults.revisiting = 2;
+defaults.revisitingHardLinked = 1;
+defaults.visitedMap = null;
 
 _.assert( defaults.maskAll === undefined );
 _.assert( defaults.glob === undefined );
@@ -1624,8 +1627,8 @@ function _filesFiltersPrepare( routine, o )
   _.assert( _.objectIs( o.src.defaultFileProvider ) );
   _.assert( _.objectIs( o.dst.defaultFileProvider ) );
 
-  _.assert( !( o.src.effectiveFileProvider instanceof _.FileProvider.Hub ) );
-  _.assert( !( o.dst.effectiveFileProvider instanceof _.FileProvider.Hub ) );
+  _.assert( !( o.src.effectiveFileProvider instanceof _.FileProvider.System ) );
+  _.assert( !( o.dst.effectiveFileProvider instanceof _.FileProvider.System ) );
 
   _.assert( o.srcProvider === undefined );
   _.assert( o.dstProvider === undefined );
@@ -1714,9 +1717,9 @@ function filesReflectEvaluate_body( o )
   let dst = o.dst.effectiveFileProvider;
   let src = o.src.effectiveFileProvider;
 
-  _.assert( o.dst.hubFileProvider.hasProvider( o.dst.effectiveFileProvider ), 'Hub should have destination and source file providers' );
-  _.assert( o.src.hubFileProvider.hasProvider( o.src.effectiveFileProvider ), 'Hub should have destination and source file providers' );
-  _.assert( o.dst.hubFileProvider === o.src.hubFileProvider, 'Hub should have the same destination and source hub' );
+  _.assert( o.dst.hubFileProvider.hasProvider( o.dst.effectiveFileProvider ), 'System should have destination and source file providers' );
+  _.assert( o.src.hubFileProvider.hasProvider( o.src.effectiveFileProvider ), 'System should have destination and source file providers' );
+  _.assert( o.dst.hubFileProvider === o.src.hubFileProvider, 'System should have the same destination and source hub' );
   _.assert( o.dst.effectiveFileProvider === dstRecordFactory.effectiveFileProvider );
   _.assert( o.dst.defaultFileProvider === dstRecordFactory.defaultFileProvider );
   _.assert( o.dst.hubFileProvider === dstRecordFactory.hubFileProvider || o.dst.hubFileProvider === null );
@@ -1736,7 +1739,7 @@ function filesReflectEvaluate_body( o )
 
   let found = self.filesFind( srcOptions );
 
-  o.visited = srcOptions.visited;
+  o.visitedMap = srcOptions.visitedMap;
 
   return o.result;
 
@@ -2966,7 +2969,7 @@ let filesReflectPrimeDefaults = Object.create( null );
 var defaults = filesReflectPrimeDefaults;
 
 defaults.result = null;
-defaults.visited = null;
+defaults.visitedMap = null;
 defaults.extra = null;
 defaults.linking = 'fileCopy';
 
@@ -3046,9 +3049,9 @@ function filesReflectSingle_body( o )
   _.assert( o.dst.src === o.src );
   _.assert( o.outputFormat === undefined );
 
-  if( o.rebasingLink && o.visited === null )
+  if( o.rebasingLink && o.visitedMap === null )
   {
-    o.visited = Object.create( null );
+    o.visitedMap = Object.create( null );
   }
 
   let o2 = _.mapOnly( o, self.filesReflectEvaluate.body.defaults );
@@ -3310,8 +3313,8 @@ function filesReflectSingle_body( o )
     let srcAbsolute = record.src.real;
     /* xxx qqq : use ( resolvingMultiple / recursive ) option instead of if-else */
 
-    // if( _.strHas( srcAbsolute, 'dirLink' ) )
-    // debugger;
+    if( _.strHas( srcAbsolute, 'dirLink' ) )
+    debugger;
 
     if( o.rebasingLink === 2 || o.resolvingSrcSoftLink === 2 )
     {
@@ -3349,12 +3352,12 @@ function filesReflectSingle_body( o )
     }
     else _.assert( 0 );
 
-    if( !o.visited[ srcAbsolute ] )
+    if( !o.visitedMap[ srcAbsolute ] )
     debugger;
-    if( !o.visited[ srcAbsolute ] )
+    if( !o.visitedMap[ srcAbsolute ] )
     return false
 
-    let srcRecord = o.visited[ srcAbsolute ];
+    let srcRecord = o.visitedMap[ srcAbsolute ];
     let dstRecord = srcToDst( srcRecord );
     if( record.src === dstRecord )
     debugger;
@@ -3918,7 +3921,7 @@ function filesReflectTo_body( o )
   }
   else
   {
-    hub = new _.FileProvider.Hub({ empty : 1 });
+    hub = new _.FileProvider.System({ empty : 1 });
   }
 
   let srcProtocol = src.protocol;

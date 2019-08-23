@@ -1,4 +1,4 @@
-( function _Hub_s_() {
+( function _System_s_() {
 
 'use strict';
 
@@ -14,7 +14,7 @@ if( typeof module !== 'undefined' )
 
 /**
  @classdesc Class that allows file manipulations between different file providers using global paths.
- @class wFileProviderHub
+ @class wFileSystem
  @memberof module:Tools/mid/Files.wTools.FileProvider
 */
 
@@ -23,12 +23,12 @@ let _ = _global_.wTools;
 let Routines = Object.create( null );
 let FileRecord = _.FileRecord;
 let Parent = _.FileProvider.Partial;
-let Self = function wFileProviderHub( o )
+let Self = function wFileSystem( o )
 {
   return _.workpiece.construct( Self, this, arguments );
 }
 
-Self.shortName = 'Hub';
+Self.shortName = 'System';
 
 _.assert( _.routineIs( _.uri.join ) );
 _.assert( _.routineIs( _.uri.normalize ) );
@@ -75,7 +75,7 @@ function init( o )
  @description Sets default provider to `null` if no argument provided.
  @param {Object} [provider] Provider to set as default.
  @function providerDefaultSet
- @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHub#
+ @memberof module:Tools/mid/Files.wTools.FileProvider.wFileSystem#
 */
 
 function providerDefaultSet( provider )
@@ -108,10 +108,10 @@ function providerDefaultSet( provider )
 }
 
 /**
- @summary Short-cut for {@link module:Tools/mid/Files.wTools.FileProvider.wFileProviderHub.providerRegister}. Registers several file providers.
+ @summary Short-cut for {@link module:Tools/mid/Files.wTools.FileProvider.wFileSystem.providerRegister}. Registers several file providers.
  @param {Object|Object[]} fileProvider Provider(s) to register.
  @function providerRegister
- @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHub#
+ @memberof module:Tools/mid/Files.wTools.FileProvider.wFileSystem#
 */
 
 //
@@ -139,7 +139,7 @@ function providersRegister( src )
  @description Provider should have protocol and origin path defined.
  @param {Object} fileProvider Provider to register.
  @function providerRegister
- @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHub#
+ @memberof module:Tools/mid/Files.wTools.FileProvider.wFileSystem#
 */
 
 function providerRegister( fileProvider ) // xxx
@@ -179,7 +179,7 @@ function providerRegister( fileProvider ) // xxx
  @description Provider must be registered in current hub.
  @param {Object} fileProvider Provider to unregister.
  @function providerUnregister
- @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHub#
+ @memberof module:Tools/mid/Files.wTools.FileProvider.wFileSystem#
 */
 
 function providerUnregister( fileProvider )
@@ -204,7 +204,7 @@ function providerUnregister( fileProvider )
  @description Returns default file provider if hub doesn't have provider for specified path.
  @param {String} url Source url.
  @function providerForPath
- @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHub#
+ @memberof module:Tools/mid/Files.wTools.FileProvider.wFileSystem#
 */
 
 function providerForPath( url )
@@ -268,7 +268,7 @@ function protocolNameGenerate( skip )
  @summary Returns true if current hub has specified file `provider` in the registry.
  @param {Object} provider File provider to check.
  @function hasProvider
- @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHub#
+ @memberof module:Tools/mid/Files.wTools.FileProvider.wFileSystem#
 */
 
 function hasProvider( provider )
@@ -391,7 +391,7 @@ function fieldPop()
  @summary Converts global path `filePath` to local.
  @param {String} filePath Global path.
  @function preferredFromGlobalAct
- @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHub#
+ @memberof module:Tools/mid/Files.wTools.FileProvider.wFileSystem#
 */
 
 function preferredFromGlobalAct( filePath )
@@ -480,7 +480,7 @@ function pathNativizeAct( filePath )
  @summary Returns current working directory of default provider.
  @description Changes current working directory if new path is provided.
  @function pathCurrentAct
- @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHub#
+ @memberof module:Tools/mid/Files.wTools.FileProvider.wFileSystem#
 */
 
 function pathCurrentAct()
@@ -490,7 +490,7 @@ function pathCurrentAct()
   if( self.defaultProvider )
   return self.defaultProvider.path.current.apply( self.defaultProvider.path, arguments );
 
-  _.assert( 0, 'Default provider is not set for the Hub', self.nickName );
+  _.assert( 0, 'Default provider is not set for the System', self.nickName );
 }
 
 //
@@ -772,10 +772,10 @@ function _link_functor( fop )
     op.options.relativeDstPath = op.relativeDst.localPath;
 
     if( op.dst.provider !== op.src.provider )
-    { 
+    {
       op.options.relativeDstPath = op.options.dstPath;
       op.options.relativeSrcPath = op.options.srcPath;
-      
+
       if( onDifferentProviders )
       {
         onDifferentProviders.call( self, op );
@@ -1151,7 +1151,7 @@ function routinesGenerate()
 
     let _routine =
     {
-      [ r + 'Hub' ] : function( o )
+      [ r + 'System' ] : function( o )
       {
         let self = this;
 
@@ -1187,7 +1187,7 @@ function routinesGenerate()
       }
     }
 
-    let wrap = Routines[ r ] = _routine[ r + 'Hub' ];
+    let wrap = Routines[ r ] = _routine[ r + 'System' ];
     _.routineExtend( wrap, original );
 
   })();
@@ -1253,7 +1253,7 @@ let defaultOriginSymbol = Symbol.for( 'defaultOrigin' );
  * @property {Object} providersWithProtocolMap={}
  * @property {Object} defaultProvider
  * @property {Boolean} safe=0
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHub
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileSystem
 */
 
 /**
@@ -1261,7 +1261,7 @@ let defaultOriginSymbol = Symbol.for( 'defaultOrigin' );
  * @property {Boolean} empty=0
  * @property {Object[]} providers
  * @property {String} defaultOrigin
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHub
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileSystem
 */
 
 let Composes =

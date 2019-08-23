@@ -32,7 +32,7 @@ function onSuiteBegin( test )
 
   context.providerSrc = _.FileProvider.Git();
   context.providerDst = _.FileProvider.HardDrive();
-  context.hub = _.FileProvider.Hub({ providers : [ context.providerSrc, context.providerDst ] });
+  context.hub = _.FileProvider.System({ providers : [ context.providerSrc, context.providerDst ] });
   context.hub.defaultProvider = context.providerDst;
 
   let path = context.providerDst.path;

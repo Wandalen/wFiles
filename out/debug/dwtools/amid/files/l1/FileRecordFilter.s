@@ -151,7 +151,7 @@ function _formAssociations()
 
   if( filter.effectiveFileProvider )
   {
-    if( filter.effectiveFileProvider instanceof _.FileProvider.Hub )
+    if( filter.effectiveFileProvider instanceof _.FileProvider.System )
     {
       _.assert( filter.hubFileProvider === null || filter.hubFileProvider === filter.effectiveFileProvider );
       filter.hubFileProvider = filter.effectiveFileProvider;
@@ -174,7 +174,7 @@ function _formAssociations()
 
   _.assert( !filter.hubFileProvider || filter.hubFileProvider instanceof _.FileProvider.Abstract, 'Expects {- filter.hubFileProvider -}' );
   _.assert( filter.defaultFileProvider instanceof _.FileProvider.Abstract );
-  _.assert( !filter.effectiveFileProvider || !( filter.effectiveFileProvider instanceof _.FileProvider.Hub ) );
+  _.assert( !filter.effectiveFileProvider || !( filter.effectiveFileProvider instanceof _.FileProvider.System ) );
 
   /* */
 
@@ -3715,7 +3715,7 @@ function pathLocalize( filePath )
     if( !filter.hubFileProvider )
     filter.hubFileProvider = filter.effectiveFileProvider.hub;
     _.assert( filter.effectiveFileProvider.hub === null || filter.hubFileProvider === filter.effectiveFileProvider.hub );
-    _.assert( filter.effectiveFileProvider.hub === null || filter.hubFileProvider instanceof _.FileProvider.Hub );
+    _.assert( filter.effectiveFileProvider.hub === null || filter.hubFileProvider instanceof _.FileProvider.System );
 
   }
 

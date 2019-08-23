@@ -35,7 +35,7 @@ function onSuiteBegin( test )
 function onSuiteEnd()
 {
   let path = this.provider.path;
-  _.assert( Object.keys( this.hub.providersWithProtocolMap ).length === 1, 'Hub should have single registered provider at the end of testing' );
+  _.assert( Object.keys( this.hub.providersWithProtocolMap ).length === 1, 'System should have single registered provider at the end of testing' );
   _.assert( _.strHas( this.testSuitePath, 'tmp.tmp' ) );
   path.dirTempClose( this.testSuitePath );
   this.provider.finit();
@@ -717,7 +717,7 @@ function filesFindCriticalCases( test )
 
   test.case = 'hub : empty file path array';
 
-  var hub2 = _.FileProvider.Hub({ providers : [] });
+  var hub2 = _.FileProvider.System({ providers : [] });
   _.FileProvider.Extract({ protocol : 'ext1' }).providerRegisterTo( hub2 );
   _.FileProvider.Extract({ protocol : 'ext2' }).providerRegisterTo( hub2 );
 
@@ -2254,7 +2254,7 @@ function filesFindLinked( test )
     includingDirs : 1,
     recursive : 2,
     includingStem : 1,
-    once : 0,
+    revisiting : 2,
   })
   console.log( got[ 1 ].real );
 
@@ -2289,7 +2289,7 @@ function filesFindLinked( test )
     includingDirs : 1,
     recursive : 2,
     includingStem : 1,
-    once : 0,
+    revisiting : 2,
   })
   test.identical( select( got, '*/absolute' ), [ '/', '/double', '/normal', '/terminal' ] );
   test.identical( select( got, '*/real' ), [ '/', '/double', '/normal', '/terminal' ] );
@@ -2304,7 +2304,7 @@ function filesFindLinked( test )
     includingDirs : 1,
     recursive : 2,
     includingStem : 1,
-    once : 0,
+    revisiting : 2,
   })
   test.identical( select( got, '*/absolute' ), [ '/', '/double', '/normal', '/terminal' ] );
   test.identical( select( got, '*/real' ), [ '/', '/terminal', '/terminal', '/terminal' ] );
@@ -2341,7 +2341,7 @@ function filesFindLinked( test )
     resolvingSoftLink : 0,
     allowingMissed : 0,
     allowingCycled : 0,
-    once : 0,
+    revisiting : 2,
   })
   test.identical( select( got, '*/absolute' ), [ '/', '/broken', '/normal', '/terminal' ] );
   test.identical( select( got, '*/real' ), [ '/', '/broken', '/normal', '/terminal' ] );
@@ -2362,7 +2362,7 @@ function filesFindLinked( test )
     resolvingSoftLink : 1,
     allowingMissed : 1,
     allowingCycled : 0,
-    once : 0,
+    revisiting : 2,
   })
   test.identical( select( got, '*/absolute' ), [ '/', '/broken', '/normal', '/terminal' ] );
   test.identical( select( got, '*/real' ), [ '/', '/missing', '/terminal', '/terminal' ] );
@@ -2384,7 +2384,7 @@ function filesFindLinked( test )
       resolvingSoftLink : 1,
       allowingMissed : 0,
       allowingCycled : 1,
-      once : 0,
+      revisiting : 2,
     })
   });
 
@@ -2422,7 +2422,7 @@ function filesFindLinked( test )
     resolvingSoftLink : 0,
     allowingMissed : 0,
     allowingCycled : 0,
-    once : 0,
+    revisiting : 2,
   })
   test.identical( select( got, '*/absolute' ), [ '/', '/auto', '/normal', '/terminal' ] );
   test.identical( select( got, '*/real' ), [ '/', '/auto', '/normal', '/terminal' ] );
@@ -2444,7 +2444,7 @@ function filesFindLinked( test )
     resolvingSoftLink : 1,
     allowingMissed : 0,
     allowingCycled : 1,
-    once : 0,
+    revisiting : 2,
   })
   test.identical( select( got, '*/absolute' ), [ '/', '/auto', '/normal', '/terminal' ] );
   test.identical( select( got, '*/real' ), [ '/', '/auto', '/terminal', '/terminal' ] );
@@ -2468,7 +2468,7 @@ function filesFindLinked( test )
       resolvingSoftLink : 1,
       allowingMissed : 1,
       allowingCycled : 0,
-      once : 0,
+      revisiting : 2,
     })
   });
 
@@ -2501,7 +2501,7 @@ function filesFindLinked( test )
     includingDirs : 1,
     recursive : 2,
     includingStem : 1,
-    once : 0,
+    revisiting : 2,
   })
   test.identical( select( got, '*/absolute' ), [ '/', '/one', '/terminal', '/two' ] );
   test.identical( select( got, '*/real' ), [ '/', '/one', '/terminal', '/two' ] );
@@ -2519,7 +2519,7 @@ function filesFindLinked( test )
       includingDirs : 1,
       recursive : 2,
       includingStem : 1,
-      once : 0,
+      revisiting : 2,
     })
   })
 
@@ -2534,7 +2534,7 @@ function filesFindLinked( test )
     includingDirs : 1,
     recursive : 2,
     includingStem : 1,
-    once : 0,
+    revisiting : 2,
   })
   test.identical( select( got, '*/absolute' ), [ '/', '/one', '/terminal', '/two' ] );
   test.identical( select( got, '*/real' ), [ '/', '/one', '/terminal', '/two' ] );
@@ -2567,7 +2567,7 @@ function filesFindLinked( test )
     includingDirs : 1,
     recursive : 2,
     includingStem : 1,
-    once : 0,
+    revisiting : 2,
   })
   test.identical( select( got, '*/absolute' ), [ '/', '/normala', '/normalb', '/terminal' ] );
   test.identical( select( got, '*/real' ), [ '/', '/normala', '/normalb', '/terminal' ] );
@@ -2582,7 +2582,7 @@ function filesFindLinked( test )
     includingDirs : 1,
     recursive : 2,
     includingStem : 1,
-    once : 0,
+    revisiting : 2,
   })
   test.identical( select( got, '*/absolute' ), [ '/', '/normala', '/normalb', '/terminal' ] );
   test.identical( select( got, '*/real' ), [ '/', '/terminal', '/terminal', '/terminal' ] );
@@ -2618,7 +2618,7 @@ function filesFindLinked( test )
     includingDirs : 1,
     recursive : 2,
     includingStem : 1,
-    once : 0,
+    revisiting : 2,
   })
 
   test.identical( select( got, '*/absolute' ), [ '/toDir'  ] );
@@ -2634,7 +2634,7 @@ function filesFindLinked( test )
     includingDirs : 1,
     includingStem : 1,
     recursive : 2,
-    once : 0,
+    revisiting : 2,
   })
 
   test.identical( select( got, '*/absolute' ), [ '/toDir', '/toDir/terminal'  ] );
@@ -2671,7 +2671,7 @@ function filesFindLinked( test )
     includingDirs : 1,
     recursive : 2,
     includingStem : 1,
-    once : 0,
+    revisiting : 2,
   })
 
   test.identical( select( got, '*/absolute' ), [ '/', '/toDir', '/directory', '/directory/terminal'  ] );
@@ -2687,7 +2687,7 @@ function filesFindLinked( test )
     includingDirs : 1,
     recursive : 2,
     includingStem : 1,
-    once : 0,
+    revisiting : 2,
   })
   test.identical( select( got, '*/absolute' ), [ '/', '/directory', '/directory/terminal', '/toDir', '/toDir/terminal'  ] );
   test.identical( select( got, '*/real' ), [ '/', '/directory', '/directory/terminal', '/directory', '/directory/terminal'  ] );
@@ -2809,7 +2809,7 @@ function filesFindSoftLinksExtract( test )
 
   /* */
 
-  test.case = 'resolving on, once off';
+  test.case = 'resolving on, revisiting : 2';
   var expected =
   [
     '. - /src/proto - /src/proto',
@@ -2839,14 +2839,14 @@ function filesFindSoftLinksExtract( test )
   ({
     resolvingSoftLink : 1,
     resolvingTextLink : 1,
-    once : 0,
+    revisiting : 2,
   });
   got = got.map( ( r ) => `${r.relative} - ${r.absolute} - ${r.real}` );
   test.identical( got, expected );
 
   /* */
 
-  test.case = 'resolving on, once on';
+  test.case = 'resolving on, revisiting : 0';
   var expected =
   [
     '. - /src/proto - /src/proto',
@@ -2866,7 +2866,7 @@ function filesFindSoftLinksExtract( test )
   ({
     resolvingSoftLink : 1,
     resolvingTextLink : 1,
-    once : 1,
+    revisiting : 0,
   });
   got = got.map( ( r ) => `${r.relative} - ${r.absolute} - ${r.real}` );
   test.identical( got, expected );
@@ -2962,7 +2962,7 @@ function filesFindSoftLinksExtract( test )
 
   /* */
 
-  test.case = 'resolving on, once off';
+  test.case = 'resolving on, revisiting : 2';
   var expected =
   [
     '. - /src/proto - /src/proto',
@@ -2992,14 +2992,14 @@ function filesFindSoftLinksExtract( test )
   ({
     resolvingSoftLink : 1,
     resolvingTextLink : 1,
-    once : 0,
+    revisiting : 2,
   });
   got = got.map( ( r ) => `${r.relative} - ${r.absolute} - ${r.real}` );
   test.identical( got, expected );
 
   /* */
 
-  test.case = 'resolving on, once on';
+  test.case = 'resolving on, revisiting : 0';
   var expected =
   [
     '. - /src/proto - /src/proto',
@@ -3019,7 +3019,7 @@ function filesFindSoftLinksExtract( test )
   ({
     resolvingSoftLink : 1,
     resolvingTextLink : 1,
-    once : 1,
+    revisiting : 0,
   });
   got = got.map( ( r ) => `${r.relative} - ${r.absolute} - ${r.real}` );
   test.identical( got, expected );
@@ -3127,7 +3127,7 @@ function filesFindSoftLinksExtract( test )
 
   /* */
 
-  test.case = 'resolving on, once off';
+  test.case = 'resolving on, revisiting : 2';
   var expected =
   [
     '. - /src/proto - /src/proto',
@@ -3179,14 +3179,14 @@ function filesFindSoftLinksExtract( test )
   ({
     resolvingSoftLink : 1,
     resolvingTextLink : 1,
-    once : 0,
+    revisiting : 2,
   });
   got = got.map( ( r ) => `${r.relative} - ${r.absolute} - ${r.real}` );
   test.identical( got, expected );
 
   /* */
 
-  test.case = 'resolving on, once on';
+  test.case = 'resolving on, revisiting : 0';
   var expected =
   [
     '. - /src/proto - /src/proto',
@@ -3206,7 +3206,7 @@ function filesFindSoftLinksExtract( test )
   ({
     resolvingSoftLink : 1,
     resolvingTextLink : 1,
-    once : 1,
+    revisiting : 0,
   });
   got = got.map( ( r ) => `${r.relative} - ${r.absolute} - ${r.real}` );
   test.identical( got, expected );
@@ -3314,7 +3314,7 @@ function filesFindSoftLinksExtract( test )
 
   /* */
 
-  test.case = 'resolving on, once off';
+  test.case = 'resolving on, revisiting : 2';
   var expected =
   [
     '. - /src/proto - /src/proto',
@@ -3366,14 +3366,14 @@ function filesFindSoftLinksExtract( test )
   ({
     resolvingSoftLink : 1,
     resolvingTextLink : 1,
-    once : 0,
+    revisiting : 2,
   });
   got = got.map( ( r ) => `${r.relative} - ${r.absolute} - ${r.real}` );
   test.identical( got, expected );
 
   /* */
 
-  test.case = 'resolving on, once on';
+  test.case = 'resolving on, revisiting : 0';
   var expected =
   [
     '. - /src/proto - /src/proto',
@@ -3393,7 +3393,7 @@ function filesFindSoftLinksExtract( test )
   ({
     resolvingSoftLink : 1,
     resolvingTextLink : 1,
-    once : 1,
+    revisiting : 0,
   });
   got = got.map( ( r ) => `${r.relative} - ${r.absolute} - ${r.real}` );
   test.identical( got, expected );
@@ -3522,7 +3522,7 @@ function filesFindSoftLinksExtract( test )
   ({
     resolvingSoftLink : 1,
     resolvingTextLink : 1,
-    once : 1,
+    revisiting : 0,
   });
   got = got.map( ( r ) => `${r.relative} - ${r.absolute} - ${r.real}` );
   test.identical( got, expected );
@@ -3625,7 +3625,7 @@ function filesFindSoftLinksExtract( test )
   ]
   var got = find
   ({
-    once : 0
+    revisiting : 2
   });
   got = got.map( ( r ) => `${r.relative} - ${r.absolute} - ${r.real}` );
   test.identical( got, expected );
@@ -3652,7 +3652,7 @@ function filesFindSoftLinksExtract( test )
   ({
     resolvingSoftLink : 1,
     resolvingTextLink : 1,
-    once : 1,
+    revisiting : 0,
   });
   got = got.map( ( r ) => `${r.relative} - ${r.absolute} - ${r.real}` );
   test.identical( got, expected );
@@ -3792,7 +3792,7 @@ function filesFindSoftLinks( test )
   ]
   var got = find
   ({
-    once : 0
+    revisiting : 2
   });
   got = got.map( ( r ) => `${r.relative} - ${r.absolute} - ${r.real}` );
   test.identical( got, expected );
@@ -3819,7 +3819,7 @@ function filesFindSoftLinks( test )
   ({
     resolvingSoftLink : 1,
     resolvingTextLink : 1,
-    once : 1,
+    revisiting : 0,
   });
   got = got.map( ( r ) => `${r.relative} - ${r.absolute} - ${r.real}` );
   test.identical( got, expected );
@@ -3856,7 +3856,7 @@ function filesFindResolving( test )
     includingTransient : 1,
     includingDirs : 1,
     recursive : 2,
-    once : 0,
+    revisiting : 2,
   }
 
   function recordSimplify( record )
@@ -14925,7 +14925,7 @@ function filesReflectWithFilter( test )
       {
       },
     });
-    var hub = new _.FileProvider.Hub({ empty : 1 });
+    var hub = new _.FileProvider.System({ empty : 1 });
     src.originPath = 'extract+src://';
     dst.originPath = 'extract+dst://';
     hub.providerRegister( src );
@@ -15404,7 +15404,7 @@ function filesReflect( test )
         src3 : { ax2 : '20', by : '20', cy : '20', dirx : { a : '20' } },
       },
     });
-    var hub = new _.FileProvider.Hub({ empty : 1 });
+    var hub = new _.FileProvider.System({ empty : 1 });
     src.originPath = 'extract+src://';
     dst.originPath = 'extract+dst://';
     hub.providerRegister( src );
@@ -17960,7 +17960,7 @@ function filesReflectorBasic( test )
 
 //
 
-function filesReflectWithHub( test )
+function filesReflectWithSystem( test )
 {
   let context = this;
   let provider = context.provider;
@@ -17981,7 +17981,7 @@ function filesReflectWithHub( test )
   var srcPath = '/src';
 
   // var dstPath = path.join( context.testSuitePath, test.name, 'dst' );
-  // var hub = new _.FileProvider.Hub({ empty : 1 });
+  // var hub = new _.FileProvider.System({ empty : 1 });
   // hub.providerRegister( srcProvider );
   // hub.providerRegister( dstProvider );
 
@@ -18048,7 +18048,7 @@ function filesReflectWithHub( test )
 
 //
 
-function filesReflectLinkWithHub( test )
+function filesReflectLinkWithSystem( test )
 {
   let context = this;
   let provider = context.provider;
@@ -18669,7 +18669,7 @@ function filesReflectDeducing( test )
   }
 
   var provider = new _.FileProvider.Extract({ filesTree : tree, protocol : 'extract' });
-  var hub = new _.FileProvider.Hub({ providers : [ provider ] });
+  var hub = new _.FileProvider.System({ providers : [ provider ] });
   var records = hub.filesReflect( o );
 
   var expectedTree =
@@ -22500,6 +22500,7 @@ function filesReflectToWithSoftLinksRebasing( test )
 
   var extract = new _.FileProvider.Extract({ filesTree });
   var extract2 = new _.FileProvider.Extract();
+  debugger;
   extract.filesReflectTo
   ({
     dstProvider : extract2,
@@ -28503,8 +28504,8 @@ var Self =
     filesReflectOverlap,
     filesReflectGrab,
     filesReflectorBasic,
-    filesReflectWithHub,
-    filesReflectLinkWithHub,
+    filesReflectWithSystem,
+    filesReflectLinkWithSystem,
     filesReflectDeducing,
     filesReflectDstPreserving,
     filesReflectDstDeletingDirs,

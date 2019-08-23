@@ -772,7 +772,10 @@ function _link_functor( fop )
     op.options.relativeDstPath = op.relativeDst.localPath;
 
     if( op.dst.provider !== op.src.provider )
-    {
+    { 
+      op.options.relativeDstPath = op.options.dstPath;
+      op.options.relativeSrcPath = op.options.srcPath;
+      
       if( onDifferentProviders )
       {
         onDifferentProviders.call( self, op );

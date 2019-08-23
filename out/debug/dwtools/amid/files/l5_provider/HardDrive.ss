@@ -1453,14 +1453,16 @@ function softLinkAct( o )
   {
 
     if( o.type === null )
-    {
+    { 
+      let srcPathResolved = srcPath;
+      
       /* not dir */
       if( !srcIsAbsolute )
-      srcPath = self.path.resolve( self.path.dir( o.dstPath ), srcPath );
+      srcPathResolved = self.path.resolve( self.path.dir( o.dstPath ), srcPath );
 
       let srcStat = self.statReadAct
       ({
-        filePath : srcPath,
+        filePath : srcPathResolved,
         resolvingSoftLink : 1,
         sync : 1,
         throwing : 0,

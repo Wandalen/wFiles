@@ -8978,6 +8978,8 @@ function fileCopyGlobal( test )
   var srcPathSecond = 'second://' + srcPath;
   var dstPathSecond = 'second://' + dstPath;
   
+  var dstPathUnknown = 'unknown://' + dstPath;
+  
   /*  */
   
   test.case = 'default protocol';
@@ -8995,6 +8997,13 @@ function fileCopyGlobal( test )
   test.is( provider.isTerminal( srcPath ) );
   test.is( provider.isTerminal( dstPath ) );
   test.identical( provider.fileRead( dstPath ), srcPath );
+  
+  test.case = 'src local, dst with unknown protocol';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  test.shouldThrowErrorSync( () => provider.fileCopy( dstPathUnknown, srcPath ) );
+  test.is( provider.isTerminal( srcPath ) );
+  test.is( !provider.fileExists( dstPath ) );
 }
 
 //
@@ -12717,6 +12726,8 @@ function fileRenameGlobal( test )
   var srcPathSecond = 'second://' + srcPath;
   var dstPathSecond = 'second://' + dstPath;
   
+  var dstPathUnknown = 'unknown://' + dstPath;
+  
   /*  */
   
   test.case = 'default protocol';
@@ -12734,6 +12745,13 @@ function fileRenameGlobal( test )
   test.is( !provider.fileExists( srcPath ) );
   test.is( provider.isTerminal( dstPath ) );
   test.identical( provider.fileRead( dstPath ), srcPath );
+  
+  test.case = 'src local, dst with unknown protocol';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  test.shouldThrowErrorSync( () => provider.fileRename( dstPathUnknown, srcPath ) );
+  test.is( provider.isTerminal( srcPath ) );
+  test.is( !provider.fileExists( dstPath ) );  
 }
 
 //
@@ -22595,6 +22613,8 @@ function softLinkGlobal( test )
   var srcPathSecond = 'second://' + srcPath;
   var dstPathSecond = 'second://' + dstPath;
   
+  var dstPathUnknown = 'unknown://' + dstPath;
+  
   /*  */
   
   test.case = 'default protocol';
@@ -22612,6 +22632,13 @@ function softLinkGlobal( test )
   test.is( provider.isTerminal( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
   test.identical( provider.pathResolveSoftLink( dstPath ), srcPath );
+  
+  test.case = 'src local, dst with unknown protocol';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  test.shouldThrowErrorSync( () => provider.softLink( dstPathUnknown, srcPath ) );
+  test.is( provider.isTerminal( srcPath ) );
+  test.is( !provider.fileExists( dstPath ) );
 }
 
 //
@@ -23269,6 +23296,8 @@ function textLinkGlobal( test )
   var srcPathSecond = 'second://' + srcPath;
   var dstPathSecond = 'second://' + dstPath;
   
+  var dstPathUnknown = 'unknown://' + dstPath;
+  
   /*  */
   
   test.case = 'default protocol';
@@ -23286,6 +23315,13 @@ function textLinkGlobal( test )
   test.is( provider.isTerminal( srcPath ) );
   test.is( provider.isTextLink( dstPath ) );
   test.identical( provider.pathResolveTextLink( dstPath ), srcPath );
+  
+  test.case = 'src local, dst with unknown protocol';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  test.shouldThrowErrorSync( () => provider.textLink( dstPathUnknown, srcPath ) );
+  test.is( provider.isTerminal( srcPath ) );
+  test.is( !provider.fileExists( dstPath ) );
 }
 
 //
@@ -28454,6 +28490,8 @@ function hardLinkGlobal( test )
   var srcPathSecond = 'second://' + srcPath;
   var dstPathSecond = 'second://' + dstPath;
   
+  var dstPathUnknown = 'unknown://' + dstPath;
+  
   /*  */
   
   test.case = 'default protocol';
@@ -28471,6 +28509,13 @@ function hardLinkGlobal( test )
   test.is( provider.isTerminal( srcPath ) );
   test.is( provider.isTerminal( dstPath ) );
   test.is( provider.filesAreHardLinked([ srcPath, dstPath ]) );
+  
+  test.case = 'src local, dst with unknown protocol';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  test.shouldThrowErrorSync( () => provider.hardLink( dstPathUnknown, srcPath ) );
+  test.is( provider.isTerminal( srcPath ) );
+  test.is( !provider.fileExists( dstPath ) );
 }
 
 //

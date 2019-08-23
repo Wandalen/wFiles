@@ -3516,21 +3516,60 @@ function filesReflectSingle_body( o )
     return false;
     record.src = dstRecord;
 
-    debugger;
-    // if( path.isAbsolute( srcPath ) )
-    // srcPath = record.src.absolutePreferred;
-    // if( path.isAbsolute( srcPath ) )
-    // srcPath = record.src.absolute;
-
     let action = isSoftLink ? 'softLink' : 'textLink';
 
     if( action === 'softLink' )
     {
       /* zzz : should not change time of file if it is already linked */
+      if( o.resolvingSrcSoftLink === 2 )
+      linkWithAction( record.dst.absolutePreferred, srcPath, 'fileCopy' );
+      else
+      linkWithAction( record.dst.absolutePreferred, srcPath, action );
+    }
+    else if( action === 'textLink' )
+    {
+      /* zzz : should not change time of file if it is already linked */
+      if( o.resolvingSrcSoftLink === 2 )
+      linkWithAction( record.dst.absolutePreferred, srcPath, 'fileCopy' );
+      else
+      linkWithAction( record.dst.absolutePreferred, srcPath, action );
+    }
+
+    return true;
+  }
+
+  /* */
+
+  function linkWithAction( dstPath, srcPath, action )
+  {
+
+    if( action === 'nop' )
+    return false;
+
+    if( action === 'hardLink' )
+    {
+      /* zzz : should not change time of file if it is already linked */
+
+      dst.hardLink
+      ({
+        dstPath,
+        srcPath,
+        makingDirectory : 0,
+        resolvingSrcSoftLink : o.resolvingSrcSoftLink,
+        resolvingSrcTextLink : o.resolvingSrcTextLink,
+        resolvingDstSoftLink : o.resolvingDstSoftLink,
+        resolvingDstTextLink : o.resolvingDstTextLink,
+      });
+
+    }
+    else if( action === 'softLink' )
+    {
+      /* zzz : should not change time of file if it is already linked */
+
       hub.softLink
       ({
-        dstPath : record.dst.absolutePreferred,
-        srcPath : srcPath,
+        dstPath,
+        srcPath,
         makingDirectory : 0,
         allowingMissed : 1,
         allowingCycled : 1,
@@ -3545,8 +3584,8 @@ function filesReflectSingle_body( o )
       /* zzz : should not change time of file if it is already linked */
       hub.textLink
       ({
-        dstPath : record.dst.absolutePreferred,
-        srcPath : srcPath,
+        dstPath,
+        srcPath,
         makingDirectory : 0,
         allowingMissed : 1,
         allowingCycled : 1,
@@ -3556,6 +3595,21 @@ function filesReflectSingle_body( o )
         resolvingDstTextLink : o.resolvingDstTextLink,
       });
     }
+    else if( action === 'fileCopy' )
+    {
+      hub.fileCopy
+      ({
+        dstPath,
+        srcPath,
+        makingDirectory : 0,
+        allowingMissed : 1,
+        resolvingSrcSoftLink : o.resolvingSrcSoftLink,
+        resolvingSrcTextLink : o.resolvingSrcTextLink,
+        resolvingDstSoftLink : o.resolvingDstSoftLink,
+        resolvingDstTextLink : o.resolvingDstTextLink,
+      });
+    }
+    else _.assert( 0 );
 
     return true;
   }
@@ -3581,72 +3635,7 @@ function filesReflectSingle_body( o )
     if( linkRebasing( record ) )
     return true;
 
-    if( action === 'hardLink' )
-    {
-      /* zzz : should not change time of file if it is already linked */
-
-      dst.hardLink
-      ({
-        dstPath : record.dst.absolute,
-        srcPath : record.src.absolute,
-        makingDirectory : 0,
-        resolvingSrcSoftLink : o.resolvingSrcSoftLink,
-        resolvingSrcTextLink : o.resolvingSrcTextLink,
-        resolvingDstSoftLink : o.resolvingDstSoftLink,
-        resolvingDstTextLink : o.resolvingDstTextLink,
-      });
-
-    }
-    else if( action === 'softLink' )
-    {
-      /* zzz : should not change time of file if it is already linked */
-
-      hub.softLink
-      ({
-        dstPath : record.dst.absolutePreferred,
-        srcPath : record.src.absolutePreferred,
-        makingDirectory : 0,
-        allowingMissed : 1,
-        allowingCycled : 1,
-        resolvingSrcSoftLink : o.resolvingSrcSoftLink,
-        resolvingSrcTextLink : o.resolvingSrcTextLink,
-        resolvingDstSoftLink : o.resolvingDstSoftLink,
-        resolvingDstTextLink : o.resolvingDstTextLink,
-      });
-    }
-    else if( action === 'textLink' )
-    {
-      /* zzz : should not change time of file if it is already linked */
-      hub.textLink
-      ({
-        dstPath : record.dst.absolutePreferred,
-        srcPath : record.src.absolutePreferred,
-        makingDirectory : 0,
-        allowingMissed : 1,
-        allowingCycled : 1,
-        resolvingSrcSoftLink : o.resolvingSrcSoftLink,
-        resolvingSrcTextLink : o.resolvingSrcTextLink,
-        resolvingDstSoftLink : o.resolvingDstSoftLink,
-        resolvingDstTextLink : o.resolvingDstTextLink,
-      });
-    }
-    else if( action === 'fileCopy' )
-    {
-      hub.fileCopy
-      ({
-        dstPath : record.dst.absolutePreferred,
-        srcPath : record.src.absolutePreferred,
-        makingDirectory : 0,
-        allowingMissed : 1,
-        resolvingSrcSoftLink : o.resolvingSrcSoftLink,
-        resolvingSrcTextLink : o.resolvingSrcTextLink,
-        resolvingDstSoftLink : o.resolvingDstSoftLink,
-        resolvingDstTextLink : o.resolvingDstTextLink,
-      });
-    }
-    else _.assert( 0 );
-
-    return true;
+    return linkWithAction( record.dst.absolutePreferred, record.src.absolutePreferred, action );
   }
 
   /* */

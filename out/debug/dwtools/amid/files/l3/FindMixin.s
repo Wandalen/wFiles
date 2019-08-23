@@ -3465,7 +3465,7 @@ function filesReflectSingle_body( o )
 
     let srcPath;
     let srcAbsolute = record.src.real;
-    /* xxx qqq : use resolvingMultiple / recursive option instead of if-else */
+    /* xxx qqq : use ( resolvingMultiple / recursive ) option instead of if-else */
 
     if( o.rebasingLink === 1 )
     {
@@ -3482,17 +3482,24 @@ function filesReflectSingle_body( o )
     }
     else if( o.rebasingLink === 2 )
     {
-      let srcAbsolute2 = src.pathResolveLinkFull
+      let resolved = src.pathResolveLinkFull
       ({
         filePath : srcAbsolute,
         resolvingSoftLink : 1,
         resolvingTextLink : 1,
+        preservingRelative : 1,
+        relativeOriginalFile : 1,
         throwing : o.throwing,
         allowingMissed : o.allowingMissed,
         allowingCycled : o.allowingCycled,
       });
-      // if(  )
-      srcPath = srcAbsolute;
+      if( !resolved )
+      {
+        debugger;
+        return false;
+      }
+      srcAbsolute = resolved.absolutePath;
+      srcPath = resolved.filePath;
     }
     else _.assert( 0 );
 
@@ -3509,8 +3516,6 @@ function filesReflectSingle_body( o )
     return false;
     record.src = dstRecord;
 
-    if( path.isAbsolute( srcPath ) )
-    debugger;
     if( path.isAbsolute( srcPath ) )
     srcPath = record.src.absolutePreferred;
 

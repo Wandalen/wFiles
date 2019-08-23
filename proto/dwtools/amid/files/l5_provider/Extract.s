@@ -314,7 +314,7 @@ function fileReadAct( o )
     filePath : o.filePath,
     resolvingSoftLink : o.resolvingSoftLink,
     resolvingTextLink : o.resolvingTextLink,
-  });
+  }).absolutePath;
 
   if( self.hub && _.path.isGlobal( o.filePath ) )
   {
@@ -460,7 +460,7 @@ function dirReadAct( o )
 
   function readDir()
   {
-    o.filePath = self.pathResolveLinkFull({ filePath : o.filePath, resolvingSoftLink : 1 });
+    o.filePath = self.pathResolveLinkFull({ filePath : o.filePath, resolvingSoftLink : 1 }).absolutePath;
 
     let file = self._descriptorRead( o.filePath );
 
@@ -472,14 +472,12 @@ function dirReadAct( o )
       }
       else
       {
-        // result = [ self.path.name({ path : o.filePath, full : 1 }) ];
         result = self.path.name({ path : o.filePath, full : 1 });
       }
     }
     else
     {
       result = null;
-      // if( o.throwing )
       throw _.err( 'File ', _.strQuote( o.filePath ), 'doesn`t exist!' );;
     }
   }
@@ -521,7 +519,6 @@ function statReadAct( o )
 
     if( o.resolvingSoftLink )
     {
-      // debugger;
 
       let o2 =
       {
@@ -530,7 +527,7 @@ function statReadAct( o )
         resolvingTextLink : 0,
       };
 
-      filePath = self.pathResolveLinkFull( o2 );
+      filePath = self.pathResolveLinkFull( o2 ).absolutePath;
       _.assert( o2.stat !== undefined );
 
       if( !o2.stat && o.throwing )
@@ -557,9 +554,6 @@ function statReadAct( o )
     if( self.extraStats && self.extraStats[ filePath ] )
     {
       let extraStat = self.extraStats[ filePath ];
-      // for( let k in extraStats )
-      // result[ k ] = new Date( extraStats[ k ] );
-      // debugger;
       result.atime = new Date( extraStat.atime );
       result.mtime = new Date( extraStat.mtime );
       result.ctime = new Date( extraStat.ctime );
@@ -742,7 +736,7 @@ function fileWriteAct( o )
         resolvingTextLink : 0,
         preservingRelative : 0,
         throwing : 1
-      })
+      }).absolutePath;
       descriptor = self._descriptorRead( resolvedPath );
       filePath = resolvedPath;
 
@@ -1195,7 +1189,7 @@ function fileCopyAct( o )
         resolvingTextLink : 0,
         preservingRelative : 0,
         throwing : 1
-      })
+      }).absolutePath;
     }
 
     self._descriptorWrite( o.dstPath, data );
@@ -1256,9 +1250,9 @@ function fileCopyAct( o )
         sync : 0,
         throwing : 1
       })
-      .thenKeep( ( dstPath ) =>
+      .thenKeep( ( resolved ) =>
       {
-        o.dstPath = dstPath;
+        o.dstPath = resolved.absolutePath;
         return true;
       })
 
@@ -1343,10 +1337,10 @@ function softLinkAct( o )
   _.assert( self.path.isNormalized( o.srcPath ) );
   _.assert( self.path.isNormalized( o.dstPath ) );
 
-  if( !self.path.isAbsolute( o.originalSrcPath ) )
-  debugger;
-  if( !self.path.isAbsolute( o.originalSrcPath ) )
-  o.srcPath = o.originalSrcPath;
+  // if( !self.path.isAbsolute( o.originalSrcPath ) )
+  // debugger;
+  // if( !self.path.isAbsolute( o.originalSrcPath ) )
+  // o.srcPath = o.originalSrcPath;
 
   if( o.sync )
   {
@@ -1363,8 +1357,7 @@ function softLinkAct( o )
       qqq : don't forget throwing cases
     */
 
-
-    self._descriptorWrite( o.dstPath, self._descriptorSoftLinkMake( o.srcPath ) );
+    self._descriptorWrite( o.dstPath, self._descriptorSoftLinkMake( o.relativeSrcPath ) );
 
     return true;
   }
@@ -1384,7 +1377,7 @@ function softLinkAct( o )
 
       dstDirCheck();
 
-      self._descriptorWrite( o.dstPath, self._descriptorSoftLinkMake( o.srcPath ) );
+      self._descriptorWrite( o.dstPath, self._descriptorSoftLinkMake( o.relativeSrcPath ) );
 
       return true;
     })

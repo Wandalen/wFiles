@@ -634,12 +634,6 @@ function dirReadAct( o )
 
   _.assertRoutineOptions( dirReadAct, arguments );
 
-  // /* xxx : temp fix of windows link chain problem */
-  // if( process.platform === 'win32' )
-  // {
-  //   o.filePath = self.pathResolveLinkFull({ filePath : o.filePath, resolvingSoftLink : 1, resolvingTextLink : 0 });
-  // }
-
   let fileNativePath = self.path.nativize( o.filePath );
 
   /* read dir */
@@ -662,13 +656,11 @@ function dirReadAct( o )
       }
       else
       {
-        // result = [ self.path.name({ path : o.filePath, full : 1 }) ];
         result = self.path.name({ path : o.filePath, full : 1 });
       }
     }
     catch ( err )
     {
-      // if( o.throwing )
       throw _.err( err );
       result = null;
     }
@@ -690,10 +682,7 @@ function dirReadAct( o )
     {
       if( err )
       {
-        // if( o.throwing )
         con.error( _.err( err ) );
-        // else
-        // con.take( result );
       }
       else if( stat.isDir() )
       {
@@ -701,10 +690,7 @@ function dirReadAct( o )
         {
           if( err )
           {
-            // if( o.throwing )
             con.error( _.err( err ) );
-            // else
-            // con.take( result );
           }
           else
           {
@@ -714,7 +700,6 @@ function dirReadAct( o )
       }
       else
       {
-        // result = [ self.path.name({ path : o.filePath, full : 1 }) ];
         result = self.path.name({ path : o.filePath, full : 1 });
         con.take( result );
       }
@@ -1326,7 +1311,8 @@ function fileRenameAct( o )
 }
 
 _.routineExtend( fileRenameAct, Parent.prototype.fileRenameAct );
-_.assert( fileRenameAct.defaults.originalDstPath !== undefined );
+_.assert( fileRenameAct.defaults.originalDstPath === undefined );
+_.assert( fileRenameAct.defaults.relativeDstPath !== undefined );
 
 //
 
@@ -1353,14 +1339,18 @@ function fileCopyAct( o )
   {
     if( self.fileExistsAct({ filePath : o.dstPath }) )
     self.fileDeleteAct({ filePath : o.dstPath, sync : 1 })
-    let srcPathResolved = self.pathResolveSoftLink( o.srcPath );
-    let srcPath = self.path.join( o.srcPath, srcPathResolved );
+    // let srcPathResolved = self.pathResolveSoftLink( o.srcPath );
+    // let srcPath = self.path.join( o.srcPath, srcPathResolved );
     return self.softLinkAct
     ({
-      originalDstPath : o.originalDstPath,
-      originalSrcPath : srcPathResolved,
-      srcPath : srcPath,
+      // originalDstPath : o.originalDstPath,
+      // originalSrcPath : srcPathResolved,
+      srcPath : o.srcPath,
       dstPath : o.dstPath,
+
+      relativeSrcPath : o.relativeSrcPath,
+      relativeDstPath : o.relativeDstPath,
+
       sync : o.sync,
       type : null
     })
@@ -1441,27 +1431,23 @@ _.routineExtend( fileCopyAct, Parent.prototype.fileCopyAct );
 function softLinkAct( o )
 {
   let self = this;
-  let srcIsAbsolute = self.path.isAbsolute( o.originalSrcPath );
+  // let srcIsAbsolute = self.path.isAbsolute( o.originalSrcPath );
+  let srcIsAbsolute = self.path.isAbsolute( o.relativeSrcPath );
+  let srcPath = o.relativeSrcPath;
 
   _.assertRoutineOptions( softLinkAct, arguments );
   _.assert( self.path.isAbsolute( o.dstPath ) );
   _.assert( self.path.isNormalized( o.srcPath ) );
   _.assert( self.path.isNormalized( o.dstPath ) );
+  _.assert( o.type === null || o.type === 'dir' ||  o.type === 'file' );
 
   if( !srcIsAbsolute )
   {
-    o.srcPath = o.originalSrcPath;
-    if( _.strBegins( o.srcPath, './' ) )
-    o.srcPath = _.strIsolateLeftOrNone( o.srcPath, './' )[ 2 ];
-    if( _.strBegins( o.srcPath, '..' ) )
-    o.srcPath = '.' + _.strIsolateLeftOrNone( o.srcPath, '..' )[ 2 ];
+    if( _.strBegins( srcPath, './' ) )
+    srcPath = _.strIsolateLeftOrNone( srcPath, './' )[ 2 ];
+    if( _.strBegins( srcPath, '..' ) )
+    srcPath = '.' + _.strIsolateLeftOrNone( srcPath, '..' )[ 2 ];
   }
-
-  let srcPath = o.srcPath;
-
-  _.assert( !!o.dstPath );
-  _.assert( !!o.srcPath );
-  _.assert( o.type === null || o.type === 'dir' ||  o.type === 'file' );
 
   if( process.platform === 'win32' )
   {
@@ -1488,7 +1474,7 @@ function softLinkAct( o )
   }
 
   let dstNativePath = self.path.nativize( o.dstPath );
-  let srcNativePath = self.path.nativize( o.srcPath );
+  let srcNativePath = self.path.nativize( srcPath );
 
   /* */
 

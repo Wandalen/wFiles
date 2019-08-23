@@ -21179,6 +21179,9 @@ function filesReflectToWithSoftLinksRebasing( test )
   /* - */
 
   test.close( 'absolute links, to extract, resolvingSrcSoftLink:0, rebasingLink:1' );
+
+  debugger; return; xxx
+
   test.open( 'absolute links, to extract, resolvingSrcSoftLink:0, rebasingLink:2' );
 
   /* - */
@@ -21469,11 +21472,11 @@ function filesReflectToWithSoftLinksRebasing( test )
         'dirLink2' : [{ softLink : '../dir1/dir2' }],
         'dirLink3' : [{ softLink : '../../proto2/dir3' }],
 
-        'dualTerLink1' : [{ softLink : '../terLink1' }],
-        'dualTerLink2' : [{ softLink : '../../proto2/dir3/dir4/terLink' }],
-        'dualDirLink1' : [{ softLink : '../dirLink1' }],
-        'dualDirLink2' : [{ softLink : '../dirLink2' }],
-        'dualDirLink3' : [{ softLink : '../dirLink3' }],
+        'dualTerLink1' : [{ softLink : '../file1' }],
+        'dualTerLink2' : [{ softLink : '../../proto2/file1' }],
+        'dualDirLink1' : [{ softLink : '..' }],
+        'dualDirLink2' : [{ softLink : '../dir1/dir2' }],
+        'dualDirLink3' : [{ softLink : '../../proto2/dir3' }],
         'dualDirLink4' : [{ softLink : '../../proto2/dir3/dir4' }],
 
         dir1 :

@@ -323,10 +323,10 @@ function filesFindSingle_body( o )
   let self = this;
   let path = self.path;
 
+  o.filter.effectiveFileProvider.assertProviderDefaults( o );
   _.assertRoutineOptions( filesFindSingle_body, arguments );
   _.assert( o.filter.recursive === o.recursive );
   _.assert( !!o.factory );
-  o.filter.effectiveFileProvider.assertProviderDefaults( o );
 
   /* handler */
 
@@ -339,29 +339,13 @@ function filesFindSingle_body( o )
   if( _.arrayIs( o.onDown ) )
   o.onDown = _.routinesComposeReturningLast( o.onDown );
 
-  // if( _.arrayIs( o.onDown ) )
-  // o.onDown = _.routinesCompose( o.onDown );
-
   _.assert( _.routineIs( o.onUp ) );
   _.assert( _.routineIs( o.onDown ) );
 
   /* */
 
-  // let recordAdd = recordAdd_functor( o );
-  // o.result = o.result || [];
   Object.freeze( o );
 
-  // let o2 =
-  // {
-  //   stemPath : o.filePath,
-  //   basePath : o.filter.formedBasePath[ o.filePath ],
-  // };
-  //
-  // _.assert( _.strDefined( o2.basePath ), 'No base path for', o.filePath );
-  //
-  // let recordFactory = _.FileRecordFactory.TollerantFrom( o, o2 ).form();
-
-  // let factory = o.factory;
   let stemRecord = o.factory.record( o.filePath );
   _.assert( stemRecord.isStem === true );
 
@@ -375,20 +359,10 @@ function filesFindSingle_body( o )
   {
     if( o.includingDefunct )
     {
-      // let r = handleUp( stemRecord, o );
       if( handleUp( stemRecord, o ) === _.dont )
       return o;
-      // o.onRecord( stemRecord, o );
-      // handleRecord( stemRecord, o  );
       handleDown( stemRecord, o );
     }
-    // if( o.allowingMissed || !o.mandatory )
-    // if( o.allowingMissed )
-    // {
-    //   return o;
-    // }
-    // debugger;
-    // throw _.err( 'Nothing found. Stem file', _.strQuote( stemRecord.absolute ), 'does not exist!' );
     return o;
   }
 
@@ -414,8 +388,6 @@ function filesFindSingle_body( o )
     if( !r.isTransient && !r.isActual )
     return;
 
-    // let or = r;
-    // let isTransient = r.isTransient;
     let includingTransient = ( op.includingTransient && r.isTransient && op.includingDirs );
     let includingActual = ( op.includingActual && r.isActual && op.includingDirs );
     let including = true;
@@ -427,17 +399,11 @@ function filesFindSingle_body( o )
 
     if( including )
     {
-      // let res = handleUp( r, op );
       if( handleUp( r, op ) === _.dont )
       {
-        debugger;
-        handleDown( r, op ); // xxx yyy
+        handleDown( r, op );
         return false;
       }
-      // _.assert( res === r );
-      // recordAdd( r );
-      // op.onRecord( r, op );
-      // handleRecord( r, op );
     }
 
     /* read */
@@ -505,7 +471,6 @@ function filesFindSingle_body( o )
     if( !r.isTransient && !r.isActual )
     return;
 
-    // let or = r;
     let includingTransient = ( op.includingTransient && r.isTransient && op.includingTerminals );
     let includingActual = ( op.includingActual && r.isActual && op.includingTerminals );
     let including = true;
@@ -515,14 +480,6 @@ function filesFindSingle_body( o )
 
     if( !including )
     return;
-
-    // let res = handleUp( r, op );
-    // if( handleUp( r, op ) === _.dont )
-    // return false;
-    // _.assert( r === res );
-    // op.onRecord( r, op );
-    // handleRecord( r, op );
-    // recordAdd( r );
 
     handleUp( r, op );
     handleDown( r, op );
@@ -546,58 +503,7 @@ function filesFindSingle_body( o )
     _.assert( arguments.length === 2 );
     let r = op.onDown.call( self, record, op );
     _.assert( r === undefined, 'onDown should return nothing( undefined ), but returned', _.toStrShort( r ) );
-    // return r;
   }
-
-  // /* - */
-  //
-  // function handleRecord( record, op )
-  // {
-  //   _.assert( arguments.length === 2 );
-  //   let r = op.onRecord.call( self, record, op );
-  //   _.assert( r === undefined || r === record, 'onRecord should return original record or undefined, but returned', _.toStrShort( r ) );
-  //   // return r;
-  // }
-
-  //
-  // /* - */
-  //
-  // function recordAdd_functor( o )
-  // {
-  //   let recordAdd;
-  //
-  //   if( o.outputFormat === 'absolute' )
-  //   recordAdd = function addAbsolute( record )
-  //   {
-  //     _.assert( arguments.length === 1, 'Expects single argument' );
-  //     o.result.push( record.absolute );
-  //   }
-  //   else if( o.outputFormat === 'relative' )
-  //   recordAdd = function addRelative( record )
-  //   {
-  //     _.assert( arguments.length === 1, 'Expects single argument' );
-  //     o.result.push( record.relative );
-  //   }
-  //   else if( o.outputFormat === 'real' )
-  //   recordAdd = function addReal( record )
-  //   {
-  //     _.assert( arguments.length === 1, 'Expects single argument' );
-  //     o.result.push( record.real );
-  //   }
-  //   else if( o.outputFormat === 'record' )
-  //   recordAdd = function addRecord( record )
-  //   {
-  //     _.assert( arguments.length === 1, 'Expects single argument' );
-  //     o.result.push( record );
-  //   }
-  //   else if( o.outputFormat === 'nothing' )
-  //   recordAdd = function addNothing( record )
-  //   {
-  //   }
-  //   else _.assert( 0, 'Unknown output format :', o.outputFormat );
-  //
-  //   return recordAdd;
-  // }
 
 }
 
@@ -624,7 +530,6 @@ filesFindSingle_body.defaults =
 
   onUp : null,
   onDown : null,
-  // onRecord : null,
 
 }
 
@@ -891,7 +796,6 @@ function filesFind_body( o )
     {
       if( o.visited[ record.real ] )
       {
-        debugger;
         return _.dont;
       }
     }
@@ -1852,18 +1756,15 @@ function filesReflectEvaluate_body( o )
     _.assert( o.dstPath === undefined );
 
     let srcOptions = _.mapOnly( o, self.filesFind.defaults );
-    // srcOptions.mandatory = 0;
-    srcOptions.mandatory = o.mandatory;
     srcOptions.includingStem = 1;
     srcOptions.includingTransient = 1;
-    srcOptions.includingDefunct = 1; // yyy
+    srcOptions.includingDefunct = 1;
     srcOptions.allowingMissed = 1;
     srcOptions.allowingCycled = 1;
     srcOptions.verbosity = 0;
     srcOptions.maskPreset = 0;
     srcOptions.filter = o.src;
     srcOptions.result = null;
-    srcOptions.visited = o.visited;
     srcOptions.onUp = [ handleSrcUp ];
     srcOptions.onDown = [ handleSrcDown ];
 
@@ -1938,49 +1839,12 @@ function filesReflectEvaluate_body( o )
   {
     let routine;
 
-    // if( o.outputFormat === 'src.absolute' )
-    // routine = function add( record )
-    // {
-    //   _.assert( arguments.length === 1, 'Expects single argument' );
-    //   _.assert( record.include === true );
-    //   o.result.push( record.src.absolute );
-    // }
-    // else if( o.outputFormat === 'src.relative' )
-    // routine = function add( record )
-    // {
-    //   debugger;
-    //   _.assert( arguments.length === 1, 'Expects single argument' );
-    //   _.assert( record.include === true );
-    //   o.result.push( record.src.relative );
-    // }
-    // else if( o.outputFormat === 'dst.absolute' )
-    // routine = function add( record )
-    // {
-    //   _.assert( arguments.length === 1, 'Expects single argument' );
-    //   _.assert( record.include === true );
-    //   o.result.push( record.dst.absolute );
-    // }
-    // else if( o.outputFormat === 'dst.relative' )
-    // routine = function add( record )
-    // {
-    //   _.assert( arguments.length === 1, 'Expects single argument' );
-    //   _.assert( record.include === true );
-    //   o.result.push( record.dst.relative );
-    // }
-    // else if( o.outputFormat === 'record' )
     routine = function add( record )
     {
       _.assert( arguments.length === 1, 'Expects single argument' );
       _.assert( record.include === true );
       o.result.push( record );
     }
-    // else if( o.outputFormat === 'nothing' )
-    // routine = function add( record )
-    // {
-    //   _.assert( arguments.length === 1, 'Expects single argument' );
-    //   _.assert( record.include === true );
-    // }
-    // else _.assert( 0, 'Unknown output format :', o.outputFormat );
 
     return routine;
   }
@@ -1991,41 +1855,11 @@ function filesReflectEvaluate_body( o )
   {
     let routine;
 
-    // if( o.outputFormat === 'src.absolute' )
-    // routine = function remove( record )
-    // {
-    //   _.assert( arguments.length === 1, 'Expects single argument' );
-    //   _.arrayRemoveElementOnceStrictly( o.result, record.src.absolute );
-    // }
-    // else if( o.outputFormat === 'src.relative' )
-    // routine = function remove( record )
-    // {
-    //   _.assert( arguments.length === 1, 'Expects single argument' );
-    //   _.arrayRemoveElementOnceStrictly( o.result, record.src.relative );
-    // }
-    // else if( o.outputFormat === 'dst.absolute' )
-    // routine = function remove( record )
-    // {
-    //   _.assert( arguments.length === 1, 'Expects single argument' );
-    //   _.arrayRemoveElementOnceStrictly( o.result, record.dst.absolute );
-    // }
-    // else if( o.outputFormat === 'dst.relative' )
-    // routine = function remove( record )
-    // {
-    //   _.assert( arguments.length === 1, 'Expects single argument' );
-    //   _.arrayRemoveElementOnceStrictly( o.result, record.dst.relative );
-    // }
-    // else if( o.outputFormat === 'record' )
     routine = function remove( record )
     {
       _.assert( arguments.length === 1, 'Expects single argument' );
       _.arrayRemoveElementOnceStrictly( o.result, record );
     }
-    // else if( o.outputFormat === 'nothing' )
-    // routine = function remove( record )
-    // {
-    // }
-    // else _.assert( 0, 'Unknown output format :', o.outputFormat );
 
     return routine;
   }
@@ -3145,6 +2979,7 @@ defaults.includingDirs = 1;
 defaults.includingNonAllowed = 1;
 defaults.includingDst = null;
 defaults.recursive = 2;
+defaults.resolvingSoftLink = 0;
 
 defaults.writing = 1;
 defaults.srcDeleting = 0;
@@ -3236,7 +3071,8 @@ function filesReflectSingle_body( o )
   if( o.writing )
   forEach( writeDstUp2, writeDstDown2 );
 
-  /* */
+  // if( o.writing && ( o.resolvingSrcSoftLink === 2 || o.resolvingSrcTextLink === 2 ) )
+  // forEach( writeDstUp3, writeDstDown3 );
 
   if( o.writing && o.srcDeleting )
   forEach( writeSrcUp, writeSrcDown );
@@ -3460,6 +3296,13 @@ function filesReflectSingle_body( o )
 
     let isSoftLink = record.src.isSoftLink;
     let isTextLink = record.src.isTextLink;
+
+    if( isSoftLink && o.resolvingSrcSoftLink === 2 )
+    return false;
+
+    if( isTextLink && o.resolvingSrcTextLink === 2 )
+    return false;
+
     if( !isSoftLink && !isTextLink )
     return false;
 
@@ -3467,20 +3310,10 @@ function filesReflectSingle_body( o )
     let srcAbsolute = record.src.real;
     /* xxx qqq : use ( resolvingMultiple / recursive ) option instead of if-else */
 
-    if( o.rebasingLink === 1 )
-    {
-      srcPath = src.pathResolveLinkStep
-      ({
-        filePath : srcAbsolute,
-        resolvingSoftLink : 1,
-        resolvingTextLink : 1,
-        throwing : o.throwing,
-        allowingMissed : o.allowingMissed,
-        allowingCycled : o.allowingCycled,
-      });
-      srcAbsolute = path.join( srcAbsolute, srcPath );
-    }
-    else if( o.rebasingLink === 2 )
+    if( _.strHas( srcAbsolute, 'dirLink' ) )
+    debugger;
+
+    if( o.rebasingLink === 2 || o.resolvingSrcSoftLink === 2 )
     {
       let resolved = src.pathResolveLinkFull
       ({
@@ -3501,6 +3334,19 @@ function filesReflectSingle_body( o )
       srcAbsolute = resolved.absolutePath;
       srcPath = resolved.filePath;
     }
+    else if( o.rebasingLink === 1 )
+    {
+      srcPath = src.pathResolveLinkStep
+      ({
+        filePath : srcAbsolute,
+        resolvingSoftLink : 1,
+        resolvingTextLink : 1,
+        throwing : o.throwing,
+        allowingMissed : o.allowingMissed,
+        allowingCycled : o.allowingCycled,
+      });
+      srcAbsolute = path.join( srcAbsolute, srcPath );
+    }
     else _.assert( 0 );
 
     if( !o.visited[ srcAbsolute ] )
@@ -3520,7 +3366,6 @@ function filesReflectSingle_body( o )
 
     if( action === 'softLink' )
     {
-      /* zzz : should not change time of file if it is already linked */
       if( o.resolvingSrcSoftLink === 2 )
       linkWithAction( record.dst.absolutePreferred, srcPath, 'fileCopy' );
       else
@@ -3528,8 +3373,7 @@ function filesReflectSingle_body( o )
     }
     else if( action === 'textLink' )
     {
-      /* zzz : should not change time of file if it is already linked */
-      if( o.resolvingSrcSoftLink === 2 )
+      if( o.resolvingSrcTextLink === 2 )
       linkWithAction( record.dst.absolutePreferred, srcPath, 'fileCopy' );
       else
       linkWithAction( record.dst.absolutePreferred, srcPath, action );
@@ -3546,7 +3390,22 @@ function filesReflectSingle_body( o )
     if( action === 'nop' )
     return false;
 
-    if( action === 'hardLink' )
+    if( action === 'fileCopy' )
+    {
+      hub.fileCopy
+      ({
+        dstPath,
+        srcPath,
+        makingDirectory : 0,
+        allowingMissed : 0,
+        allowingCycled : 1,
+        resolvingSrcSoftLink : o.resolvingSrcSoftLink,
+        resolvingSrcTextLink : o.resolvingSrcTextLink,
+        resolvingDstSoftLink : o.resolvingDstSoftLink,
+        resolvingDstTextLink : o.resolvingDstTextLink,
+      });
+    }
+    else if( action === 'hardLink' )
     {
       /* zzz : should not change time of file if it is already linked */
 
@@ -3555,6 +3414,8 @@ function filesReflectSingle_body( o )
         dstPath,
         srcPath,
         makingDirectory : 0,
+        allowingMissed : 0,
+        allowingCycled : 1,
         resolvingSrcSoftLink : o.resolvingSrcSoftLink,
         resolvingSrcTextLink : o.resolvingSrcTextLink,
         resolvingDstSoftLink : o.resolvingDstSoftLink,
@@ -3589,20 +3450,6 @@ function filesReflectSingle_body( o )
         makingDirectory : 0,
         allowingMissed : 1,
         allowingCycled : 1,
-        resolvingSrcSoftLink : o.resolvingSrcSoftLink,
-        resolvingSrcTextLink : o.resolvingSrcTextLink,
-        resolvingDstSoftLink : o.resolvingDstSoftLink,
-        resolvingDstTextLink : o.resolvingDstTextLink,
-      });
-    }
-    else if( action === 'fileCopy' )
-    {
-      hub.fileCopy
-      ({
-        dstPath,
-        srcPath,
-        makingDirectory : 0,
-        allowingMissed : 1,
         resolvingSrcSoftLink : o.resolvingSrcSoftLink,
         resolvingSrcTextLink : o.resolvingSrcTextLink,
         resolvingDstSoftLink : o.resolvingDstSoftLink,

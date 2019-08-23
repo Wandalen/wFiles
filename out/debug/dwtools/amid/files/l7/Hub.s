@@ -829,25 +829,36 @@ function _fileCopyActDifferent( op )
   let path = self.path;
   let o = op.options;
 
+  if( op.src.provider.isTextLink( op.src.localPath ) )
+  {
+    _.assert( 0, 'Expects terminal file, not text link' );
+  }
+
   if( op.src.provider.isSoftLink( op.src.localPath ) )
   {
-    let resolvedPath = op.src.provider.pathResolveSoftLink( op.src.localPath );
-    debugger;
-    c.result = op.dst.provider.softLink
-    ({
-      dstPath : op.dst.localPath,
-      srcPath : path.join( op.src.parsedPath.origin, resolvedPath ),
-      sync : o.sync,
-      allowingMissed : 1,
-    });
-    return op.end();
+    _.assert( 0, 'Expects terminal file, not soft link' );
+    // let resolvedPath = op.src.provider.pathResolveSoftLink( op.src.localPath );
+    // debugger;
+    // c.result = op.dst.provider.softLink
+    // ({
+    //   dstPath : op.dst.localPath,
+    //   srcPath : path.join( op.src.parsedPath.origin, resolvedPath ),
+    //   sync : o.sync,
+    //   allowingMissed : 1,
+    // });
+    // return op.end();
   }
+
+  /*
+    for extract resolving should be on
+    otherwise extract does not resolve intermediate directories
+  */
 
   let read = op.src.provider.fileRead
   ({
     filePath : op.src.localPath,
-    resolvingTextLink : 0,
-    resolvingSoftLink : 0,
+    resolvingTextLink : 1,
+    resolvingSoftLink : 1,
     encoding : 'original.type',
     sync : o.sync,
   });

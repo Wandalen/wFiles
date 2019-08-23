@@ -935,23 +935,21 @@ function formBaseDeducingFromFile( test )
   {
     '/a0/b/c' : '',
     '/a1/b/c' : '',
-    '/a2/b/c' : '',
-    '/a3/b/c' : '',
-    '/a4/b/c' : '',
-    '/a5/b/c' : '',
-    '/a6/b/c' : '',
-    '/a7/b/c' : ''
+    '/a2/b' : '',
+    '/a3/b' : '',
+    '/a4' : '',
+    '/a5' : '',
+    '/' : ''
   }
   var expectedFormedBasePath =
   {
     '/a0/b/c' : '/a0/b/c',
     '/a1/b/c' : '/a1/b/c',
-    '/a2/b/c' : '/a2/b',
-    '/a3/b/c' : '/a3/b',
-    '/a4/b/c' : '/a4',
-    '/a5/b/c' : '/a5',
-    '/a6/b/c' : '/',
-    '/a7/b/c' : '/'
+    '/a2/b' : '/a2/b',
+    '/a3/b' : '/a3/b',
+    '/a4' : '/a4',
+    '/a5' : '/a5',
+    '/' : '/'
   }
   var expectedFilePath =
   {
@@ -1001,65 +999,88 @@ function formBaseDeducingFromFile( test )
 
   /* */
 
-  test.case = 'file is array, base is string';
-  var expectedFormedFilePath =
-  {
-    '/a0/b/c' : '',
-    '/a1/b/c' : '',
-    '/a2/b/c' : '',
-    '/a3/b/c' : '',
-    '/a4/b/c' : '',
-    '/a5/b/c' : '',
-    '/a6/b/c' : '',
-    '/a7/b/c' : ''
-  }
-  var expectedFormedBasePath =
-  {
-    '/a0/b/c' : '/base',
-    '/a1/b/c' : '/base',
-    '/a2/b/c' : '/base',
-    '/a3/b/c' : '/base',
-    '/a4/b/c' : '/base',
-    '/a5/b/c' : '/base',
-    '/a6/b/c' : '/base',
-    '/a7/b/c' : '/base'
-  }
-  var expectedFilePath =
-  {
-    '/a0/b/c' : '',
-    '/a1/b/c' : '',
-    '/a1/b/c/()' : '',
-    '/a2/b/c()' : '',
-    '/a3/b/()c' : '',
-    '/a4/b()/c' : '',
-    '/a5/()b/c' : '',
-    '/a6()/b/c' : '',
-    '/()a7/b/c' : ''
-  }
-  var expectedBasePath =
-  {
-    '/a0/b/c' : '/base',
-    '/a1/b/c' : '/a1/b/c',
-    '/a1/b/c/()' : '/base',
-    '/a2/b/c()' : '/base',
-    '/a3/b/()c' : '/base',
-    '/a4/b()/c' : '/base',
-    '/a5/()b/c' : '/base',
-    '/a6()/b/c' : '/base',
-    '/()a7/b/c' : '/base'
-  }
+  test.case = 'collision of base paths';
   var filter = provider.recordFilter();
   filter.filePath =
   [
     '/a0/b/c',
     '/a1/b/c',
     '/a1/b/c/()',
+  ];
+  filter.basePath = '/base';
+  test.shouldThrowErrorSync( () =>
+  {
+    filter.form();
+    test.identical( filter.formed, 5 );
+    test.identical( filter.formedFilePath, expectedFormedFilePath );
+    test.identical( filter.formedBasePath, expectedFormedBasePath );
+    test.identical( filter.filePath, expectedFilePath );
+    test.identical( filter.basePath, expectedBasePath );
+    test.identical( filter.prefixPath, null );
+    test.identical( filter.postfixPath, null );
+  });
+
+  /* */
+
+  test.case = 'file is array, base is string';
+  var expectedFormedFilePath =
+  {
+    '/a0/b/c' : '',
+    '/a1/b/c' : '',
+    '/a2/b' : '',
+    '/a3/b' : '',
+    '/a4' : '',
+    '/a5' : '',
+    '/' : '',
+    '/a8/b/c' : ''
+  }
+  var expectedFormedBasePath =
+  {
+    '/a0/b/c' : '/base',
+    '/a1/b/c' : '/base',
+    '/a2/b' : '/a2/b',
+    '/a3/b' : '/a3/b',
+    '/a4' : '/a4',
+    '/a5' : '/a5',
+    '/' : '/',
+    '/a8/b/c' : '/a8/b/c'
+  }
+  var expectedFilePath =
+  {
+    '/a0/b/c' : '',
+    '/a1/b/c' : '',
+    '/a2/b/c()' : '',
+    '/a3/b/()c' : '',
+    '/a4/b()/c' : '',
+    '/a5/()b/c' : '',
+    '/a6()/b/c' : '',
+    '/()a7/b/c' : '',
+    '/a8/b/c/()' : ''
+  }
+  var expectedBasePath =
+  {
+    '/a0/b/c' : '/base',
+    '/a1/b/c' : '/base',
+    '/a2/b/c()' : '/a2/b',
+    '/a3/b/()c' : '/a3/b',
+    '/a4/b()/c' : '/a4',
+    '/a5/()b/c' : '/a5',
+    '/a6()/b/c' : '/',
+    '/()a7/b/c' : '/',
+    '/a8/b/c/()' : '/a8/b/c'
+  }
+  var filter = provider.recordFilter();
+  filter.filePath =
+  [
+    '/a0/b/c',
+    '/a1/b/c',
     '/a2/b/c()',
     '/a3/b/()c',
     '/a4/b()/c',
     '/a5/()b/c',
     '/a6()/b/c',
     '/()a7/b/c',
+    '/a8/b/c/()',
   ];
   filter.basePath = '/base';
   filter.form();
@@ -1083,23 +1104,21 @@ function formBaseDeducingFromFile( test )
   {
     '/a0/b/c' : '',
     '/a1/b/c' : '',
-    '/a2/b/c' : '',
-    '/a3/b/c' : '',
-    '/a4/b/c' : '',
-    '/a5/b/c' : '',
-    '/a6/b/c' : '',
-    '/a7/b/c' : ''
+    '/a2/b' : '',
+    '/a3/b' : '',
+    '/a4' : '',
+    '/a5' : '',
+    '/' : ''
   }
   var expectedFormedBasePath =
   {
     '/a0/b/c' : '/a0/b/c',
     '/a1/b/c' : '/a1/b/c',
-    '/a2/b/c' : '/a2/b',
-    '/a3/b/c' : '/a3/b',
-    '/a4/b/c' : '/a4',
-    '/a5/b/c' : '/a5',
-    '/a6/b/c' : '/',
-    '/a7/b/c' : '/'
+    '/a2/b' : '/a2/b',
+    '/a3/b' : '/a3/b',
+    '/a4' : '/a4',
+    '/a5' : '/a5',
+    '/' : '/'
   }
   var expectedFilePath =
   {
@@ -1154,28 +1173,25 @@ function formBaseDeducingFromFile( test )
   {
     '/a0/b/c' : '',
     '/a1/b/c' : '',
-    '/a2/b/c' : '',
-    '/a3/b/c' : '',
-    '/a4/b/c' : '',
-    '/a5/b/c' : '',
-    '/a6/b/c' : '',
-    '/a7/b/c' : ''
+    '/a2/b' : '',
+    '/a3/b' : '',
+    '/a4' : '',
+    '/a5' : '',
+    '/' : ''
   }
   var expectedFormedBasePath =
   {
     '/a0/b/c' : '/base',
-    '/a1/b/c' : '/base',
-    '/a2/b/c' : '/base',
-    '/a3/b/c' : '/base',
-    '/a4/b/c' : '/base',
-    '/a5/b/c' : '/base',
-    '/a6/b/c' : '/base',
-    '/a7/b/c' : '/base'
+    '/a1/b/c' : '/a1/b/c',
+    '/a2/b' : '/a2/b',
+    '/a3/b' : '/a3/b',
+    '/a4' : '/a4',
+    '/a5' : '/a5',
+    '/' : '/'
   }
   var expectedFilePath =
   {
     '/a0/b/c' : '',
-    '/a1/b/c' : '',
     '/a1/b/c/*()' : '',
     '/a2/b/c*()' : '',
     '/a3/b/*()c' : '',
@@ -1187,20 +1203,18 @@ function formBaseDeducingFromFile( test )
   var expectedBasePath =
   {
     '/a0/b/c' : '/base',
-    '/a1/b/c' : '/a1/b/c',
-    '/a1/b/c/*()' : '/base',
-    '/a2/b/c*()' : '/base',
-    '/a3/b/*()c' : '/base',
-    '/a4/b*()/c' : '/base',
-    '/a5/*()b/c' : '/base',
-    '/a6*()/b/c' : '/base',
-    '/*()a7/b/c' : '/base'
+    '/a1/b/c/*()' : '/a1/b/c',
+    '/a2/b/c*()' : '/a2/b',
+    '/a3/b/*()c' : '/a3/b',
+    '/a4/b*()/c' : '/a4',
+    '/a5/*()b/c' : '/a5',
+    '/a6*()/b/c' : '/',
+    '/*()a7/b/c' : '/'
   }
   var filter = provider.recordFilter();
   filter.filePath =
   [
     '/a0/b/c',
-    '/a1/b/c',
     '/a1/b/c/*()',
     '/a2/b/c*()',
     '/a3/b/*()c',
@@ -1231,23 +1245,21 @@ function formBaseDeducingFromFile( test )
   {
     '/a0/b/c' : '',
     '/a1/b/c' : '',
-    '/a2/b/c' : '',
-    '/a3/b/c' : '',
-    '/a4/b/c' : '',
-    '/a5/b/c' : '',
-    '/a6/b/c' : '',
-    '/a7/b/c' : ''
+    '/a2/b' : '',
+    '/a3/b' : '',
+    '/a4' : '',
+    '/a5' : '',
+    '/' : ''
   }
   var expectedFormedBasePath =
   {
     '/a0/b/c' : '/a0/b/c',
     '/a1/b/c' : '/a1/b/c',
-    '/a2/b/c' : '/a2/b',
-    '/a3/b/c' : '/a3/b',
-    '/a4/b/c' : '/a4',
-    '/a5/b/c' : '/a5',
-    '/a6/b/c' : '/',
-    '/a7/b/c' : '/'
+    '/a2/b' : '/a2/b',
+    '/a3/b' : '/a3/b',
+    '/a4' : '/a4',
+    '/a5' : '/a5',
+    '/' : '/'
   }
   var expectedFilePath =
   {
@@ -1302,28 +1314,25 @@ function formBaseDeducingFromFile( test )
   {
     '/a0/b/c' : '',
     '/a1/b/c' : '',
-    '/a2/b/c' : '',
-    '/a3/b/c' : '',
-    '/a4/b/c' : '',
-    '/a5/b/c' : '',
-    '/a6/b/c' : '',
-    '/a7/b/c' : ''
+    '/a2/b' : '',
+    '/a3/b' : '',
+    '/a4' : '',
+    '/a5' : '',
+    '/' : ''
   }
   var expectedFormedBasePath =
   {
     '/a0/b/c' : '/base',
-    '/a1/b/c' : '/base',
-    '/a2/b/c' : '/base',
-    '/a3/b/c' : '/base',
-    '/a4/b/c' : '/base',
-    '/a5/b/c' : '/base',
-    '/a6/b/c' : '/base',
-    '/a7/b/c' : '/base'
+    '/a1/b/c' : '/a1/b/c',
+    '/a2/b' : '/a2/b',
+    '/a3/b' : '/a3/b',
+    '/a4' : '/a4',
+    '/a5' : '/a5',
+    '/' : '/'
   }
   var expectedFilePath =
   {
     '/a0/b/c' : '',
-    '/a1/b/c' : '',
     '/a1/b/c/\0' : '',
     '/a2/b/c\0' : '',
     '/a3/b/\0c' : '',
@@ -1335,20 +1344,18 @@ function formBaseDeducingFromFile( test )
   var expectedBasePath =
   {
     '/a0/b/c' : '/base',
-    '/a1/b/c' : '/a1/b/c',
-    '/a1/b/c/\0' : '/base',
-    '/a2/b/c\0' : '/base',
-    '/a3/b/\0c' : '/base',
-    '/a4/b\0/c' : '/base',
-    '/a5/\0b/c' : '/base',
-    '/a6\0/b/c' : '/base',
-    '/\0a7/b/c' : '/base'
+    '/a1/b/c/\0' : '/a1/b/c',
+    '/a2/b/c\0' : '/a2/b',
+    '/a3/b/\0c' : '/a3/b',
+    '/a4/b\0/c' : '/a4',
+    '/a5/\0b/c' : '/a5',
+    '/a6\0/b/c' : '/',
+    '/\0a7/b/c' : '/'
   }
   var filter = provider.recordFilter();
   filter.filePath =
   [
     '/a0/b/c',
-    '/a1/b/c',
     '/a1/b/c/\0',
     '/a2/b/c\0',
     '/a3/b/\0c',
@@ -4473,7 +4480,7 @@ function filePathSelect( test )
 
   filter.filePathSelect( srcPath, dstPath );
 
-  test.identical( filter.formed, 5 );
+  test.identical( filter.formed, 3 );
   test.identical( filter.filePath, { '/src' : '/dst', '/src/**.test*' : true, '/src/**.release*' : false } );
   test.identical( filter.basePath, { '/src' : '/' } );
   test.identical( filter.prefixPath, null );
@@ -4843,6 +4850,8 @@ function pathsExtend( test )
   test.identical( src.filePath, 'b' );
   test.identical( src.basePath, null );
 
+  /* */
+
   test.case = 'src.filePath is relative path ( string ), dst.filePath is relative path ( string )';
   var dst = provider.recordFilter();
   dst.filePath = 'a';
@@ -4855,6 +4864,23 @@ function pathsExtend( test )
   test.identical( dst.basePath, null );
   test.identical( src.prefixPath, null );
   test.identical( src.filePath, 'b' );
+  test.identical( src.basePath, null );
+
+  /* */
+
+  test.case = 'dst.prefix is abs str, src.file is simple map, src.prefix is empty str';
+  var dst = provider.recordFilter();
+  dst.prefixPath = '/dir';
+  var src = provider.recordFilter();
+  src.prefixPath = '';
+  src.filePath = { "src1Terminal/**" : `` };
+  dst.pathsExtend( src );
+
+  test.identical( dst.prefixPath, null );
+  test.identical( dst.filePath, { "src1Terminal/**" : `` } );
+  test.identical( dst.basePath, null );
+  test.identical( src.prefixPath, '' );
+  test.identical( src.filePath, { "src1Terminal/**" : `` } );
   test.identical( src.basePath, null );
 
   /* - */

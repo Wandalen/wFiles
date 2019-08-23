@@ -673,8 +673,8 @@ function filesReflectSingle_body( o )
   _.assert( o.linking === 'fileCopy' || o.linking === 'hardLinkMaybe' || o.linking === 'softLinkMaybe', 'Not supported options' );
   _.assert( !o.src.hasFiltering(), 'Not supported options' );
   _.assert( !o.dst.hasFiltering(), 'Not supported options' );
-  _.assert( o.src.formed === 5 );
-  _.assert( o.dst.formed === 5 );
+  _.assert( o.src.formed === 3 );
+  _.assert( o.dst.formed === 3 );
   _.assert( o.srcPath === undefined );
   // _.assert( o.filter === null || !o.filter.hasFiltering(), 'Not supported options' );
   _.assert( o.filter === undefined );
@@ -1105,10 +1105,6 @@ _.FileProvider[ Self.shortName ] = Self;
 // --
 // export
 // --
-
-// if( typeof module !== 'undefined' )
-// if( _global_.WTOOLS_PRIVATE )
-// { /* delete require.cache[ module.id ]; */ }
 
 if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = Self;

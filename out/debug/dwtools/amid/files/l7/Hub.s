@@ -32,7 +32,6 @@ Self.shortName = 'Hub';
 
 _.assert( _.routineIs( _.uri.join ) );
 _.assert( _.routineIs( _.uri.normalize ) );
-// _.assert( _.routineIs( _.uri.urisNormalize ) );
 _.assert( _.routineIs( _.uri.isNormalized ) );
 
 // --
@@ -399,21 +398,61 @@ function preferredFromGlobalAct( filePath )
 {
   let self = this;
   _.assert( arguments.length === 1, 'Expects single argument' );
-  return self._preferredFromGlobalAct( filePath ).localPath;
+  return self._pathLocalize( filePath ).localPath;
 }
 
 //
 
-function _preferredFromGlobalAct( filePath, provider )
+function _pathLocalize( filePath )
+{
+  let self = this;
+  let path = self.path;
+  let r = self._pathLocalizeMaybe( filePath );
+
+  _.sure( _.objectIs( r.provider ), () => 'No provider for path ' + _.strQuote( filePath ) );
+
+  return r;
+
+  // let self = this;
+  // let path = self.path;
+  // let r = Object.create( null );
+  // r.originalPath = filePath;
+  // r.provider = self;
+  //
+  // _.assert( _.strIs( filePath ), 'Expects string' );
+  // _.assert( arguments.length === 1 );
+  //
+  // r.parsedPath = r.originalPath;
+  // if( _.strIs( filePath ) )
+  // r.parsedPath = path.parse( path.normalize( r.parsedPath ) );
+  //
+  // if( !r.provider )
+  // {
+  //   _.assert( _.arrayIs( r.parsedPath.protocols ) );
+  //   r.provider = self.providerForPath( r.parsedPath );
+  // }
+  //
+  // _.assert( _.objectIs( r.provider ), () => 'No provider for path ' + _.strQuote( filePath ) );
+  //
+  // r.localPath = r.provider.path.preferredFromGlobal( r.parsedPath );
+  //
+  // _.assert( _.strIs( r.localPath ) );
+  //
+  // return r;
+}
+
+//
+
+function _pathLocalizeMaybe( filePath )
 {
   let self = this;
   let path = self.path;
   let r = Object.create( null );
   r.originalPath = filePath;
-  r.provider = provider;
+  // r.provider = self;
 
   _.assert( _.strIs( filePath ), 'Expects string' );
-  _.assert( arguments.length === 1 || arguments.length === 2 );
+  _.assert( arguments.length === 1 );
 
   r.parsedPath = r.originalPath;
   if( _.strIs( filePath ) )
@@ -425,9 +464,12 @@ function _preferredFromGlobalAct( filePath, provider )
     r.provider = self.providerForPath( r.parsedPath );
   }
 
-  _.assert( _.objectIs( r.provider ), () => 'No provider for path ' + _.strQuote( filePath ) );
+  // _.assert( _.objectIs( r.provider ), () => 'No provider for path ' + _.strQuote( filePath ) );
 
+  if( r.provider )
   r.localPath = r.provider.path.preferredFromGlobal( r.parsedPath );
+  else
+  r.localPath = r.originalPath;
 
   _.assert( _.strIs( r.localPath ) );
 
@@ -439,7 +481,7 @@ function _preferredFromGlobalAct( filePath, provider )
 function pathNativizeAct( filePath )
 {
   let self = this;
-  let r = self._preferredFromGlobalAct.apply( self, arguments );
+  let r = self._pathLocalize( self, filePath );
   r.localPath = r.provider.path.nativize( r.localPath );
   _.assert( 0, 'not implemented' ); xxx
   _.assert( _.objectIs( r.provider ), 'No provider for path', filePath );
@@ -473,7 +515,7 @@ function pathResolveLinkFull_body( o )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  let r = self._preferredFromGlobalAct( o.filePath );
+  let r = self._pathLocalize( o.filePath );
   o.filePath = r.localPath;
 
   let result = r.provider.pathResolveLinkFull.body.call( r.provider, o );
@@ -495,14 +537,10 @@ function pathResolveLinkFull_body( o )
     if( result === null )
     return null;
 
-    result = self.path.join( r.provider.originPath, result );
+    result.filePath = self.path.join( r.provider.originPath, result.filePath );
+    result.relativePath = self.path.join( r.provider.originPath, result.relativePath );
+    result.absolutePath = self.path.join( r.provider.originPath, result.absolutePath );
 
-    if( result === o.filePath )
-    {
-      debugger;
-      _.assert( 0, 'not tested' );
-      // return r.originalPath;
-    }
     return result;
   }
 }
@@ -519,7 +557,7 @@ function pathResolveLinkTail_body( o )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  let r = self._preferredFromGlobalAct( o.filePath );
+  let r = self._pathLocalize( o.filePath );
   o.filePath = r.localPath;
 
   let result = r.provider.pathResolveLinkTail.body.call( r.provider, o );
@@ -548,7 +586,7 @@ function pathResolveSoftLink_body( o )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  let r = self._preferredFromGlobalAct( o.filePath );
+  let r = self._pathLocalize( o.filePath );
 
   o.filePath = r.localPath;
 
@@ -583,7 +621,7 @@ function pathResolveTextLink_body( o )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  let r = self._preferredFromGlobalAct( o.filePath );
+  let r = self._pathLocalize( o.filePath );
 
   o.filePath = r.localPath;
 
@@ -616,8 +654,6 @@ function fileRead_body( o )
 {
   let self = this;
 
-  // debugger;
-
   _.assert( arguments.length === 1 );
 
   o.filePath = self.pathResolveLinkFull
@@ -627,7 +663,7 @@ function fileRead_body( o )
     resolvingTextLink : o.resolvingTextLink,
   });
 
-  let r = self._preferredFromGlobalAct( o.filePath );
+  let r = self._pathLocalize( o.filePath );
   let o2 = _.mapExtend( null, o );
 
   o2.resolvingSoftLink = 0;
@@ -651,14 +687,13 @@ function _link_functor( fop )
 
   let routine = fop.routine;
   let routineName = routine.name;
-  // let allowDifferentProviders = fop.allowDifferentProviders;
+  let allowingMissedSrc = fop.allowingMissedSrc;
 
   _.assert( _.routineIs( fop.onDifferentProviders ) || _.boolIs( fop.onDifferentProviders ) );
   _.assert( _.strDefined( routineName ) );
   _.assert( _.objectIs( routine.defaults ) );
   _.assert( routine.paths === undefined );
   _.assert( _.objectIs( routine.having ) );
-  // _.assert( _.routineIs( onDifferentProviders ) );
 
   _.routineExtend( hubLink, routine );
 
@@ -694,29 +729,48 @@ function _link_functor( fop )
 
     /* */
 
-    op.originalDst = self._preferredFromGlobalAct( op.options.originalDstPath );
-    op.originalSrc = self._preferredFromGlobalAct( op.options.originalSrcPath );
-
-    _.assert( !!op.originalDst.provider, 'No provider for path', op.options.originalDstPath );
-    _.assert( !!op.originalSrc.provider, 'No provider for path', op.options.originalSrcPath );
-
-    op.options.originalDstPath = op.originalDst.localPath;
-
-    if( op.originalDst.provider !== op.originalSrc.provider )
-    {
-    }
-    else
-    {
-      op.options.originalSrcPath = op.originalSrc.localPath;
-    }
+    // op.originalDst = self._pathLocalize( op.options.originalDstPath );
+    // if( allowingMissedSrc )
+    // op.originalSrc = self._pathLocalizeMaybe( op.options.originalSrcPath );
+    // else
+    // op.originalSrc = self._pathLocalize( op.options.originalSrcPath );
+    //
+    // _.assert( !!op.originalDst.provider, 'No provider for path', op.options.originalDstPath );
+    // _.assert( allowingMissedSrc || !!op.originalSrc.provider, 'No provider for path', op.options.originalSrcPath );
+    //
+    // op.options.originalDstPath = op.originalDst.localPath;
+    //
+    // if( op.originalDst.provider !== op.originalSrc.provider )
+    // {
+    // }
+    // else
+    // {
+    //   op.options.originalSrcPath = op.originalSrc.localPath;
+    // }
 
     /* */
 
-    op.dst = self._preferredFromGlobalAct( op.options.dstPath );
-    op.src = self._preferredFromGlobalAct( op.options.srcPath );
+    op.relativeDst = self._pathLocalize( op.options.relativeDstPath );
+    if( allowingMissedSrc )
+    op.relativeSrc = self._pathLocalizeMaybe( op.options.relativeSrcPath );
+    else
+    op.relativeSrc = self._pathLocalize( op.options.relativeSrcPath );
+
+    _.assert( !!op.relativeDst.provider, 'No provider for path', op.options.relativeDstPath );
+    _.assert( allowingMissedSrc || !!op.relativeSrc.provider, 'No provider for path', op.options.relativeSrcPath );
+
+    /* */
+
+    op.dst = self._pathLocalize( op.options.dstPath );
+    if( allowingMissedSrc )
+    op.src = self._pathLocalizeMaybe( op.options.srcPath );
+    else
+    op.src = self._pathLocalize( op.options.srcPath );
 
     _.assert( !!op.dst.provider, 'No provider for path', op.options.dstPath );
-    _.assert( !!op.src.provider, 'No provider for path', op.options.srcPath );
+    _.assert( allowingMissedSrc || !!op.src.provider, 'No provider for path', op.options.srcPath );
+
+    /* */
 
     op.options.dstPath = op.dst.localPath;
 
@@ -748,7 +802,7 @@ _link_functor.defaults =
 {
   routine : null,
   onDifferentProviders : false,
-  // allowDifferentProviders : 0,
+  allowingMissedSrc : false,
 }
 
 //
@@ -756,8 +810,18 @@ _link_functor.defaults =
 let hardLinkAct = _link_functor({ routine : Parent.prototype.hardLinkAct });
 let fileRenameAct = _link_functor({ routine : Parent.prototype.fileRenameAct });
 
-let softLinkAct = _link_functor({ routine : Parent.prototype.softLinkAct, onDifferentProviders : true });
-let textLinkAct = _link_functor({ routine : Parent.prototype.textLinkAct, onDifferentProviders : true });
+let softLinkAct = _link_functor
+({
+  routine : Parent.prototype.softLinkAct,
+  onDifferentProviders : true,
+  allowingMissedSrc : true,
+});
+let textLinkAct = _link_functor
+({
+  routine : Parent.prototype.textLinkAct,
+  onDifferentProviders : true,
+  allowingMissedSrc : true,
+});
 
 //
 
@@ -828,7 +892,7 @@ function hardLinkBreak_body( o )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  let r = self._preferredFromGlobalAct( o.filePath );
+  let r = self._pathLocalize( o.filePath );
   let o2 = _.mapExtend( null, o );
 
   o2.filePath = r.localPath;
@@ -849,8 +913,8 @@ function filesAreHardLinkedAct( o )
   _.assertRoutineOptions( filesAreHardLinkedAct, arguments );
   _.assert( o.filePath.length === 2, 'Expects exactly two arguments' );
 
-  let dst = self._preferredFromGlobalAct( o.filePath[ 0 ] );
-  let src = self._preferredFromGlobalAct( o.filePath[ 1 ] );
+  let dst = self._pathLocalize( o.filePath[ 0 ] );
+  let src = self._pathLocalize( o.filePath[ 1 ] );
 
   _.assert( !!dst.provider, 'No provider for path', o.filePath[ 0 ] );
   _.assert( !!src.provider, 'No provider for path', o.filePath[ 1 ] );
@@ -1031,6 +1095,7 @@ function routinesGenerate()
     {
       let self = this;
       let provider = self;
+      let filePath;
 
       for( let p in operates )
       if( o[ p ] )
@@ -1047,11 +1112,14 @@ function routinesGenerate()
             resolvingTextLink : o.resolvingTextLink || false,
           });
 
-          r = self._preferredFromGlobalAct( o[ p ] );
-          o[ p ] = r.localPath;
-          provider = r.provider;
+          if( operates[ p ].allowingMissed )
+          r = self._pathLocalizeMaybe( o[ p ] );
+          else
+          r = self._pathLocalize( o[ p ] );
 
-          _.assert( _.objectIs( provider ), 'No provider for path', o[ p ] );
+          filePath = o[ p ];
+          provider = r.provider;
+          o[ p ] = r.localPath;
 
         }
         else
@@ -1063,46 +1131,51 @@ function routinesGenerate()
         }
       }
 
+      _.assert( _.objectIs( provider ), 'No provider for path', filePath );
       return provider;
     }
 
     /* */
 
-    let wrap = Routines[ r ] = function hub( o )
+    let _routine =
     {
-      let self = this;
-
-      if( arguments.length === 1 && wrap.defaults )
+      [ r + 'Hub' ] : function( o )
       {
-        if( _.strIs( o ) )
-        o = { filePath : o }
-      }
+        let self = this;
 
-      if( pre )
-      o = pre.call( this, wrap, arguments );
+        if( arguments.length === 1 && wrap.defaults )
+        {
+          if( _.strIs( o ) )
+          o = { filePath : o }
+        }
 
-      let o2 = _.mapExtend( null, o );
+        if( pre )
+        o = pre.call( this, wrap, arguments );
 
-      if( !pre && wrap.defaults )
-      if( !wrap.having || !wrap.having.driving )
-      _.routineOptions( wrap, o2 );
+        let o2 = _.mapExtend( null, o );
 
-      let provider = self;
+        if( !pre && wrap.defaults )
+        if( !wrap.having || !wrap.having.driving )
+        _.routineOptions( wrap, o2 );
 
-      provider = resolve.call( self, o2 );
+        let provider = self;
 
-      if( provider === self )
-      {
-        _.assert( _.routineIs( original ), 'No original method for', name );
-        return original.call( provider, o2 );
-      }
-      else
-      {
-        _.assert( _.routineIs( provider[ name ] ) );
-        return provider[ name ].call( provider, o2 );
+        provider = resolve.call( self, o2 );
+
+        if( provider === self )
+        {
+          _.assert( _.routineIs( original ), 'No original method for', name );
+          return original.call( provider, o2 );
+        }
+        else
+        {
+          _.assert( _.routineIs( provider[ name ] ) );
+          return provider[ name ].call( provider, o2 );
+        }
       }
     }
 
+    let wrap = Routines[ r ] = _routine[ r + 'Hub' ];
     _.routineExtend( wrap, original );
 
   })();
@@ -1261,7 +1334,8 @@ let Proto =
   // path
 
   preferredFromGlobalAct,
-  _preferredFromGlobalAct,
+  _pathLocalize,
+  _pathLocalizeMaybe,
 
   pathCurrentAct,
 
@@ -1347,10 +1421,6 @@ _.assert( Self.Path === Self.prototype.Path );
 // --
 // export
 // --
-
-// if( typeof module !== 'undefined' )
-// if( _global_.WTOOLS_PRIVATE )
-// { /* delete require.cache[ module.id ]; */ }
 
 _.FileProvider[ Self.shortName ] = Self;
 

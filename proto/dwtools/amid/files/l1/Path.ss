@@ -297,8 +297,8 @@ function pathDirTempForAnother( filePath )
     this.fileProvider.dirMakeAct({ filePath : path, sync : 1 });
     return path;
   }
-
-  let dirsPath = this.trackToRoot( filePath );
+  
+  let dirsPath = this.traceToRoot( filePath );
   let err;
   let tempPath = 'temp/tmp-' + _.idWithGuid() + '.tmp';
 

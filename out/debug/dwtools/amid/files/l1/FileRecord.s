@@ -92,9 +92,6 @@ function form()
   _.assert( record.factory instanceof _.FileRecordFactory, 'Expects instance of { FileRecordFactory }' );
 
   record._pathsForm();
-  // record._filterApply();
-  // record._statRead();
-  // record._statAnalyze();
 
   _.assert( record.fullName.indexOf( '/' ) === -1, 'something wrong with filename' );
 
@@ -261,9 +258,7 @@ function _pathsForm()
 
   /* */
 
-  // f.hubFileProvider._recordFormBegin( record );
   f.hubFileProvider._recordFormBegin( record );
-  // f.hubFileProvider._recordPathForm( record );
 
   return record;
 }
@@ -313,7 +308,7 @@ function _statReset()
 
   _.assert( arguments.length === 0 );
 
-  record[ realSymbol ] = null;
+  record[ realSymbol ] = 0;
   record[ statSymbol ] = 0;
 
 }
@@ -346,7 +341,7 @@ function _statRead()
       throwing : 1,
     }
 
-    record[ realSymbol ] = f.effectiveFileProvider.pathResolveLinkFull( o2 );
+    record[ realSymbol ] = f.effectiveFileProvider.pathResolveLinkFull( o2 ).filePath;
 
     stat = o2.stat;
 
@@ -704,8 +699,9 @@ function _statGet()
 function _realGet()
 {
   let record = this;
-  if( record[ realSymbol ] === null )
+  if( record[ realSymbol ] === 0 )
   {
+    debugger;
     record._statRead();
     record._statAnalyze();
   }
@@ -734,7 +730,7 @@ function _realGlobalGet()
 
 //
 
-function _absoluteGlobalMaybeGet()
+function _absolutePreferredGet()
 {
   let record = this;
   let f = record.factory;
@@ -744,7 +740,7 @@ function _absoluteGlobalMaybeGet()
 
 //
 
-function _realGlobalMaybeGet()
+function _realPreferredGet()
 {
   let record = this;
   let f = record.factory;
@@ -939,8 +935,8 @@ let Accessors =
   real : { readOnly : 1 },
   absoluteGlobal : { readOnly : 1 },
   realGlobal : { readOnly : 1 },
-  absoluteGlobalMaybe : { readOnly : 1 },
-  realGlobalMaybe : { readOnly : 1 },
+  absolutePreferred : { readOnly : 1 },
+  realPreferred : { readOnly : 1 },
 
   dir : { readOnly : 1 },
   exts : { readOnly : 1 },
@@ -1014,8 +1010,8 @@ let Proto =
   _realGet,
   _absoluteGlobalGet,
   _realGlobalGet,
-  _absoluteGlobalMaybeGet,
-  _realGlobalMaybeGet,
+  _absolutePreferredGet,
+  _realPreferredGet,
 
   _dirGet,
   _extsGet,

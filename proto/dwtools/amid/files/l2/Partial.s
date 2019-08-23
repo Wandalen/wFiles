@@ -1508,7 +1508,7 @@ defaults.sync = null;
 defaults.resolvingHeadDirect = 1;
 defaults.resolvingHeadReverse = 1;
 defaults.preservingRelative = 0;
-defaults.relativeOriginalFile = 1;
+defaults.relativeOriginalFile = 0;
 
 /*
 qqq : cover option relativeOriginalFile
@@ -2193,7 +2193,7 @@ function statRead_body( o )
   	allowingCycled : 0,
   }
 
-  let result = self.pathResolveLinkFull( o2 ).absolutePath;
+  let result = self.pathResolveLinkFull( o2 );
 
   if( o.sync )
   {
@@ -2207,7 +2207,9 @@ function statRead_body( o )
   /* - */
 
   function end( result )
-  {
+  { 
+    result = result.absolutePath;
+    
     if( result === null )
     {
       if( o.throwing )
@@ -6702,8 +6704,6 @@ function _fileCopyAct( c )
   // let o = c.options2;
   let o = c.options;
   
-  debugger
-
   _.assert( _.fileStatIs( c.srcStat ) || c.srcStat === null );
 
   // if( o.srcPath === 'extract4:///src/proto/terLink1' )

@@ -5938,7 +5938,7 @@ function _link_functor( fop )
 
       try
       {
-
+      
         _.assert( path.isAbsolute( o.srcPath ) );
         _.assert( path.isAbsolute( o.dstPath ) );
 
@@ -5978,6 +5978,7 @@ function _link_functor( fop )
           // o.srcPath = self.pathResolveLinkFull( o2 ).filePath;
           let resolved = self.pathResolveLinkFull( o2 );
           o.srcPath = resolved.absolutePath;
+          if( path.isRelative( resolved.relativePath ) )
           o.relativeSrcPath = resolved.relativePath;
 
           c.srcStat = o2.stat;
@@ -7051,6 +7052,8 @@ operates.relativeSrcPath = { pathToRead : 1 }
 function _softLinkAct( c )
 {
   let self = this;
+  if( _.strHas( c.options2.srcPath, 'file1' ) )
+  debugger
   return self.softLinkAct( c.options2 );
 }
 

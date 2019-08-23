@@ -773,6 +773,7 @@ function _link_functor( fop )
     /* */
 
     op.options.dstPath = op.dst.localPath;
+    op.options.relativeDstPath = op.relativeDst.localPath;
 
     if( op.dst.provider !== op.src.provider )
     {
@@ -790,6 +791,7 @@ function _link_functor( fop )
     else
     {
       op.options.srcPath = op.src.localPath;
+      op.options.relativeSrcPath = op.relativeSrc.localPath;
     }
 
     op.result = op.dst.provider[ routineName ]( op.options );

@@ -6700,15 +6700,18 @@ function _fileCopyAct( c )
 
   if( c.srcStat.isSoftLink() )
   {
+
     if( o.resolvingSrcSoftLink === 2 )
-    return resolvingSrcLink2();
+    {
+      if( c.srcResolvedStat === null )
+      return null;
+      return act();
+    }
 
     return self.softLinkAct
     ({
       dstPath : o.dstPath,
       srcPath : o.srcPath,
-      // originalDstPath : o.originalDstPath,
-      // originalSrcPath : o.originalSrcPath,
       relativeDstPath : o.relativeDstPath,
       relativeSrcPath : o.relativeSrcPath,
       sync : o.sync,
@@ -6717,17 +6720,19 @@ function _fileCopyAct( c )
   }
   else if( c.srcStat.isTextLink() )
   {
+
     if( o.resolvingSrcTextLink === 2 )
-    return resolvingSrcLink2();
+    {
+      if( c.srcResolvedStat === null )
+      return null;
+      return act();
+    }
 
-    // qqq : cover
-
+    /* qqq : cover, please */
     return self.textLinkAct
     ({
       dstPath : o.dstPath,
       srcPath : o.srcPath,
-      // originalDstPath : o.originalDstPath,
-      // originalSrcPath : o.originalSrcPath,
       relativeDstPath : o.relativeDstPath,
       relativeSrcPath : o.relativeSrcPath,
       sync : o.sync,
@@ -6741,32 +6746,38 @@ function _fileCopyAct( c )
 
   /* */
 
-  function resolvingSrcLink2()
-  {
-    if( c.srcResolvedStat === null )
-    return null;
-    return act();
-  }
-
-  /* */
-
   function act()
   {
-    if( srcStat.isDir() )
-    throw _.err( 'Cant copy directory ' + _.strQuote( o.srcPath ) + ', consider method filesReflect'  );
+
+    if( o.resolvingSrcSoftLink === 2 || o.resolvingSrcTextLink === 2 )
+    {
+      if( c.srcResolvedStat.isDir() )
+      return self.dirMakeAct
+      ({
+        filePath : o.dstPath,
+        sync : o.sync
+      })
+    }
+    else
+    {
+      if( srcStat.isDir() )
+      {
+        debugger;
+        throw _.err( 'Cant copy directory ' + _.strQuote( o.srcPath ) + ', consider method filesReflect'  );
+      }
+    }
 
     return self.fileCopyAct
     ({
       dstPath : o.dstPath,
       srcPath : o.srcPath,
-      // originalDstPath : o.originalDstPath,
-      // originalSrcPath : o.originalSrcPath,
       relativeDstPath : o.relativeDstPath,
       relativeSrcPath : o.relativeSrcPath,
       breakingDstHardLink : o.breakingDstHardLink,
       sync : o.sync,
     });
   }
+
 }
 
 _.routineExtend( _fileCopyAct, fileCopyAct );

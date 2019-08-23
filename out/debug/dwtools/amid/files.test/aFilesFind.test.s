@@ -21369,16 +21369,16 @@ function filesReflectToWithSoftLinksRebasing( test )
         'terLink1' : [{ softLink : '/src/proto/file1' }],
         'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
         'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
-        'dirLink1' : [{ softLink : '/src/proto' }],
-        'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
-        'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
+        'dirLink1' : {},
+        'dirLink2' : {},
+        'dirLink3' : {},
 
         'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
         'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
-        'dualDirLink1' : [{ softLink : '/src/proto' }],
-        'dualDirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
-        'dualDirLink3' : [{ softLink : '/src/proto2/dir3' }],
-        'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4/dirLink' }],
+        'dualDirLink1' : {},
+        'dualDirLink2' : {},
+        'dualDirLink3' : {},
+        'dualDirLink4' : {},
 
         dir1 :
         {

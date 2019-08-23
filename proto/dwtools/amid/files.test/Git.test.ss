@@ -67,14 +67,14 @@ function filesReflectTrivial( test )
 
   let con = new _.Consequence().take( null )
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'no hash, no trailing /';
     providerDst.filesDelete( localPath );
     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git';
     return hub.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }});
   })
-  .thenKeep( ( got ) =>
+  .then( ( got ) =>
   {
     let files = providerDst.filesFind
     ({
@@ -105,14 +105,14 @@ function filesReflectTrivial( test )
 
   /*  */
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'no hash, trailing /';
     providerDst.filesDelete( localPath );
     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git/';
     return hub.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }});
   })
-  .thenKeep( ( got ) =>
+  .then( ( got ) =>
   {
     let files = providerDst.filesFind
     ({
@@ -143,14 +143,14 @@ function filesReflectTrivial( test )
 
   /*  */
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'hash, no trailing /';
     providerDst.filesDelete( localPath );
     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git#master';
     return hub.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }});
   })
-  .thenKeep( ( got ) =>
+  .then( ( got ) =>
   {
     let files = providerDst.filesFind
     ({
@@ -181,7 +181,7 @@ function filesReflectTrivial( test )
 
   /*  */
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'not existing repository';
     providerDst.filesDelete( localPath );
@@ -189,7 +189,7 @@ function filesReflectTrivial( test )
     let result = hub.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }});
     return test.shouldThrowErrorAsync( result );
   })
-  .thenKeep( ( got ) =>
+  .then( ( got ) =>
   {
     let files = providerDst.filesFind
     ({
@@ -206,7 +206,7 @@ function filesReflectTrivial( test )
 
   /*  */
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'reflect twice in a row';
     providerDst.filesDelete( localPath );
@@ -219,7 +219,7 @@ function filesReflectTrivial( test )
 
     return ready;
   })
-  .thenKeep( ( got ) =>
+  .then( ( got ) =>
   {
     let files = providerDst.filesFind
     ({
@@ -250,7 +250,7 @@ function filesReflectTrivial( test )
 
   /*  */
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'reflect twice in a row, fetching off';
     providerDst.filesDelete( localPath );
@@ -267,7 +267,7 @@ function filesReflectTrivial( test )
 
     return ready;
   })
-  .thenKeep( ( got ) =>
+  .then( ( got ) =>
   {
     let files = providerDst.filesFind
     ({
@@ -298,14 +298,14 @@ function filesReflectTrivial( test )
 
   /*  */
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'commit hash, no trailing /';
     providerDst.filesDelete( localPath );
     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git#05930d3a7964b253ea3bbfeca7eb86848f550e96';
     return hub.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }});
   })
-  .thenKeep( ( got ) =>
+  .then( ( got ) =>
   {
     let files = providerDst.filesFind
     ({
@@ -343,7 +343,7 @@ function filesReflectTrivial( test )
 
   /*  */
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'local is behind remote';
     providerDst.filesDelete( localPath );
@@ -380,7 +380,7 @@ function filesReflectTrivial( test )
 
   /*  */
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'local has new commit, remote up to date, no merge required';
     providerDst.filesDelete( localPath );
@@ -433,7 +433,7 @@ function filesReflectTrivial( test )
 
   /*  */
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'local and remote have one new commit, should be merged';
     providerDst.filesDelete( localPath );
@@ -493,7 +493,7 @@ function filesReflectTrivial( test )
 
   /*  */
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'local version is fixate and has local commit, update to latest';
     providerDst.filesDelete( localPath );
@@ -531,7 +531,7 @@ function filesReflectTrivial( test )
 
   /*  */
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'local has fixed version, update to latest';
     providerDst.filesDelete( localPath );
@@ -562,7 +562,7 @@ function filesReflectTrivial( test )
 
   /*  */
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'local has changes, checkout throws an error';
     providerDst.filesDelete( localPath );
@@ -618,7 +618,7 @@ function filesReflectTrivial( test )
 
   /* */
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'no local changes, checkout throws an error';
     providerDst.filesDelete( localPath );

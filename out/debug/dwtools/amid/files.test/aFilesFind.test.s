@@ -586,7 +586,7 @@ function filesFindTrivialAsync( test )
 
   //
 
-  con.thenKeep( () =>
+  con.then( () =>
   {
     test.case = 'trivial async';
     var o =
@@ -17951,6 +17951,7 @@ function filesReflectorBasic( test )
   src.finit();
 
   test.close( 'reflect current dir' );
+
 } /* end of filesReflectorBasic */
 
 //
@@ -21180,7 +21181,7 @@ function filesReflectToWithSoftLinksRebasing( test )
 
   test.close( 'absolute links, to extract, resolvingSrcSoftLink:0, rebasingLink:1' );
 
-  debugger; return; xxx
+  // debugger; return; xxx
 
   test.open( 'absolute links, to extract, resolvingSrcSoftLink:0, rebasingLink:2' );
 
@@ -21451,7 +21452,6 @@ function filesReflectToWithSoftLinksRebasing( test )
   /* - */
 
   test.close( 'relative links, to extract, resolvingSrcSoftLink:0, rebasingLink:1' );
-
   test.open( 'relative links, to extract, resolvingSrcSoftLink:0, rebasingLink:2' );
 
   /* - */
@@ -22700,7 +22700,7 @@ function filesDeleteAsync( test )
     test.case = 'delete terminal file';
     provider.fileWrite( terminalPath, 'a' );
     return provider.filesDelete({ filePath : terminalPath, sync : 0 })
-    .thenKeep( ( deleted ) =>
+    .then( ( deleted ) =>
     {
       test.identical( _.select( deleted, '*/relative' ), [ './terminal' ] );
       var stat = provider.statResolvedRead( terminalPath );
@@ -22716,7 +22716,7 @@ function filesDeleteAsync( test )
     test.case = 'delete empty dir';
     provider.dirMake( dirPath );
     return provider.filesDelete({ filePath : dirPath, sync : 0 })
-    .thenKeep( ( deleted ) =>
+    .then( ( deleted ) =>
     {
       var stat = provider.statResolvedRead( dirPath );
       test.identical( stat, null );
@@ -22734,7 +22734,7 @@ function filesDeleteAsync( test )
     provider.fileWrite( terminalPath, 'a');
     provider.hardLink( dst, terminalPath );
     return provider.filesDelete({ filePath : dst, sync : 0 })
-    .thenKeep( ( deleted ) =>
+    .then( ( deleted ) =>
     {
       var stat = provider.statResolvedRead( dst );
       test.identical( stat, null );
@@ -22779,7 +22779,7 @@ function filesDeleteAsync( test )
     hub.filesReflect({ reflectMap : { 'src:///' : 'current://' + routinePath } });
     test.identical( provider.dirRead( routinePath ), [ 'src' ] );
     return provider.filesDelete({ filePath : routinePath, sync : 0 })
-    .thenKeep( ( deleted ) =>
+    .then( ( deleted ) =>
     {
       var expectedDeleted =
       [
@@ -22845,7 +22845,7 @@ function filesDeleteAsync( test )
     hub.filesReflect({ reflectMap : { 'src:///' : 'current://' + routinePath } });
     test.identical( provider.dirRead( routinePath ), [ 'src' ] );
     return provider.filesDelete({ filter : { filePath : routinePath, maskAll : { excludeAny : '/c' } }, sync : 0 })
-    .thenKeep( ( deleted ) =>
+    .then( ( deleted ) =>
     {
       var expectedDeleted =
       [
@@ -22918,7 +22918,7 @@ function filesDeleteAsync( test )
     hub.filesReflect({ reflectMap : { 'src:///' : 'current://' + routinePath } });
     test.identical( provider.dirRead( routinePath ), [ 'src' ] );
     return provider.filesDelete({ filter : { filePath : routinePath, maskAll : { excludeAny : '/src' } }, sync : 0 })
-    .thenKeep( ( deleted ) =>
+    .then( ( deleted ) =>
     {
       var expectedDeleted =
       [
@@ -22992,7 +22992,7 @@ function filesDeleteAsync( test )
       deletingEmptyDirs : 1,
       sync : 0
     })
-    .thenKeep( ( deleted ) =>
+    .then( ( deleted ) =>
     {
       var expected = [ '../..', '..', '.', './t' ];
       test.identical( _.select( deleted, '*/relative' ), expected );
@@ -23020,7 +23020,7 @@ function filesDeleteAsync( test )
     provider.fileWrite( terminalPath, ' ');
     provider.softLink( dst, terminalPath );
     return provider.filesDelete({ filePath : dst, sync : 0 })
-    .thenKeep( ( deleted ) =>
+    .then( ( deleted ) =>
     {
       var stat = provider.statResolvedRead( dst );
       test.identical( stat, null );
@@ -23039,7 +23039,7 @@ function filesDeleteAsync( test )
     provider.fileWrite( terminalPath, ' ');
     provider.softLink( dst, terminalPath );
     return provider.filesDelete({ filePath : dst, sync : 0 })
-    .thenKeep( ( deleted ) =>
+    .then( ( deleted ) =>
     {
       var stat = provider.statResolvedRead( dst );
       test.identical( stat, null );

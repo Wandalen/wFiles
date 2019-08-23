@@ -412,33 +412,6 @@ function _pathLocalize( filePath )
   _.sure( _.objectIs( r.provider ), () => 'No provider for path ' + _.strQuote( filePath ) );
 
   return r;
-
-  // let self = this;
-  // let path = self.path;
-  // let r = Object.create( null );
-  // r.originalPath = filePath;
-  // r.provider = self;
-  //
-  // _.assert( _.strIs( filePath ), 'Expects string' );
-  // _.assert( arguments.length === 1 );
-  //
-  // r.parsedPath = r.originalPath;
-  // if( _.strIs( filePath ) )
-  // r.parsedPath = path.parse( path.normalize( r.parsedPath ) );
-  //
-  // if( !r.provider )
-  // {
-  //   _.assert( _.arrayIs( r.parsedPath.protocols ) );
-  //   r.provider = self.providerForPath( r.parsedPath );
-  // }
-  //
-  // _.assert( _.objectIs( r.provider ), () => 'No provider for path ' + _.strQuote( filePath ) );
-  //
-  // r.localPath = r.provider.path.preferredFromGlobal( r.parsedPath );
-  //
-  // _.assert( _.strIs( r.localPath ) );
-  //
-  // return r;
 }
 
 //
@@ -449,22 +422,35 @@ function _pathLocalizeMaybe( filePath )
   let path = self.path;
   let r = Object.create( null );
   r.originalPath = filePath;
-  // r.provider = self;
+  r.parsedPath = r.originalPath;
 
   _.assert( _.strIs( filePath ), 'Expects string' );
   _.assert( arguments.length === 1 );
 
-  r.parsedPath = r.originalPath;
-  if( _.strIs( filePath ) )
+  self._pathRelocalize( r, null );
+
+  return r;
+}
+
+//
+
+function _pathRelocalize( r, provider )
+{
+  let self = this;
+  let path = self.path;
+
+  _.assert( _.strIs( r.originalPath ), 'Expects string' );
+  _.assert( _.strIs( r.parsedPath ) || _.mapIs( r.parsedPath ), 'Expects map or string parsedPath' );
+  _.assert( arguments.length === 2 );
+
+  if( _.strIs( r.parsedPath ) )
   r.parsedPath = path.parse( path.normalize( r.parsedPath ) );
 
   if( !r.provider )
-  {
-    _.assert( _.arrayIs( r.parsedPath.protocols ) );
-    r.provider = self.providerForPath( r.parsedPath );
-  }
-
-  // _.assert( _.objectIs( r.provider ), () => 'No provider for path ' + _.strQuote( filePath ) );
+  if( provider )
+  r.provider = provider;
+  if( !r.provider )
+  r.provider = self.providerForPath( r.parsedPath );
 
   if( r.provider )
   r.localPath = r.provider.path.preferredFromGlobal( r.parsedPath );
@@ -750,22 +736,32 @@ function _link_functor( fop )
 
     /* */
 
-    op.relativeDst = self._pathLocalize( op.options.relativeDstPath );
-    if( allowingMissedSrc )
+    // op.relativeDst = self._pathLocalize( op.options.relativeDstPath );
+    // if( allowingMissedSrc )
+    // op.relativeSrc = self._pathLocalizeMaybe( op.options.relativeSrcPath );
+    // else
+    // op.relativeSrc = self._pathLocalize( op.options.relativeSrcPath );
+
+    op.relativeDst = self._pathLocalizeMaybe( op.options.relativeDstPath );
     op.relativeSrc = self._pathLocalizeMaybe( op.options.relativeSrcPath );
-    else
-    op.relativeSrc = self._pathLocalize( op.options.relativeSrcPath );
+
+    if( !op.relativeSrc.provider && op.relativeDst.provider )
+    self._pathRelocalize( op.relativeSrc, op.relativeDst.provider );
+    if( op.relativeSrc.provider && !op.relativeDst.provider )
+    self._pathRelocalize( op.relativeDst, op.relativeSrc.provider );
 
     _.assert( !!op.relativeDst.provider, 'No provider for path', op.options.relativeDstPath );
     _.assert( allowingMissedSrc || !!op.relativeSrc.provider, 'No provider for path', op.options.relativeSrcPath );
 
     /* */
 
-    op.dst = self._pathLocalize( op.options.dstPath );
-    if( allowingMissedSrc )
+    op.dst = self._pathLocalizeMaybe( op.options.dstPath );
     op.src = self._pathLocalizeMaybe( op.options.srcPath );
-    else
-    op.src = self._pathLocalize( op.options.srcPath );
+
+    if( !op.src.provider && op.dst.provider )
+    self._pathRelocalize( op.src, op.dst.provider );
+    if( op.src.provider && !op.dst.provider )
+    self._pathRelocalize( op.dst, op.src.provider );
 
     _.assert( !!op.dst.provider, 'No provider for path', op.options.dstPath );
     _.assert( allowingMissedSrc || !!op.src.provider, 'No provider for path', op.options.srcPath );
@@ -773,6 +769,7 @@ function _link_functor( fop )
     /* */
 
     op.options.dstPath = op.dst.localPath;
+    op.options.relativeDstPath = op.relativeDst.localPath;
 
     if( op.dst.provider !== op.src.provider )
     {
@@ -790,6 +787,7 @@ function _link_functor( fop )
     else
     {
       op.options.srcPath = op.src.localPath;
+      op.options.relativeSrcPath = op.relativeSrc.localPath;
     }
 
     op.result = op.dst.provider[ routineName ]( op.options );
@@ -862,7 +860,7 @@ function _fileCopyActDifferent( op )
     encoding : 'original.type',
   });
   else
-  op.result = read.thenKeep( ( read ) =>
+  op.result = read.then( ( read ) =>
   {
     return op.dst.provider.fileWrite
     ({
@@ -1336,6 +1334,7 @@ let Proto =
   preferredFromGlobalAct,
   _pathLocalize,
   _pathLocalizeMaybe,
+  _pathRelocalize,
 
   pathCurrentAct,
 

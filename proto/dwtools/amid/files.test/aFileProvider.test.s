@@ -8977,7 +8977,7 @@ function fileCopyAsyncThrowingError( test )
 
   /**/
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'missing';
     provider.filesDelete( routinePath );
@@ -8990,7 +8990,7 @@ function fileCopyAsyncThrowingError( test )
       throwing : 1
     }
     return test.shouldThrowError( provider.fileCopy( o ) )
-    .thenKeep( () =>
+    .then( () =>
     {
       test.is( !provider.fileExists( srcPath ) );
       test.is( !provider.fileExists( dstPath ) );
@@ -9000,7 +9000,7 @@ function fileCopyAsyncThrowingError( test )
 
   //
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'missing';
     provider.filesDelete( routinePath );
@@ -9013,7 +9013,7 @@ function fileCopyAsyncThrowingError( test )
       throwing : 0
     }
     return provider.fileCopy( o )
-    .thenKeep( ( got ) =>
+    .then( ( got ) =>
     {
       test.identical( got, null );
       test.is( !provider.fileExists( srcPath ) );
@@ -9024,7 +9024,7 @@ function fileCopyAsyncThrowingError( test )
 
   //
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'try to copy dir';
     provider.filesDelete( routinePath );
@@ -9037,7 +9037,7 @@ function fileCopyAsyncThrowingError( test )
       throwing : 1
     }
     return test.shouldThrowError( provider.fileCopy( o ) )
-    .thenKeep( () =>
+    .then( () =>
     {
       test.is( provider.fileExists( srcPath ) );
       test.is( provider.isDir( srcPath ) );
@@ -9049,7 +9049,7 @@ function fileCopyAsyncThrowingError( test )
 
   //
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'try to copy dir';
     provider.filesDelete( routinePath );
@@ -9062,7 +9062,7 @@ function fileCopyAsyncThrowingError( test )
       throwing : 0
     }
     return provider.fileCopy( o )
-    .thenKeep( ( got ) =>
+    .then( ( got ) =>
     {
       test.identical( got, null );
       test.is( provider.fileExists( srcPath ) );
@@ -9075,7 +9075,7 @@ function fileCopyAsyncThrowingError( test )
 
   //
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'try to copy soft link to dir';
     provider.filesDelete( routinePath );
@@ -9090,7 +9090,7 @@ function fileCopyAsyncThrowingError( test )
       throwing : 1
     }
     return provider.fileCopy( o )
-    .thenKeep( ( got ) =>
+    .then( ( got ) =>
     {
       test.identical( got, true );
       test.is( provider.fileExists( srcPath ) );
@@ -9103,7 +9103,7 @@ function fileCopyAsyncThrowingError( test )
 
   //
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'try to copy soft link to dir';
     provider.filesDelete( routinePath );
@@ -9118,7 +9118,7 @@ function fileCopyAsyncThrowingError( test )
       throwing : 1
     }
     return provider.fileCopy( o )
-    .thenKeep( () =>
+    .then( () =>
     {
       test.is( provider.isSoftLink( srcPath ) );
       test.is( provider.isSoftLink( dstPath ) );
@@ -9129,7 +9129,7 @@ function fileCopyAsyncThrowingError( test )
 
   //
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'try to copy soft link to dir';
     provider.filesDelete( routinePath );
@@ -9144,7 +9144,7 @@ function fileCopyAsyncThrowingError( test )
       throwing : 0
     }
     return provider.fileCopy( o )
-    .thenKeep( ( got ) =>
+    .then( ( got ) =>
     {
       test.identical( got, true );
       test.is( provider.isSoftLink( srcPath ) );
@@ -9156,7 +9156,7 @@ function fileCopyAsyncThrowingError( test )
 
   //
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'rewriting terminal';
     provider.filesDelete( routinePath );
@@ -9171,7 +9171,7 @@ function fileCopyAsyncThrowingError( test )
       throwing : 1
     }
     return test.shouldThrowError( provider.fileCopy( o ) )
-    .thenKeep( () =>
+    .then( () =>
     {
       test.is( provider.isTerminal( srcPath ) );
       test.is( provider.isTerminal( dstPath ) );
@@ -9183,7 +9183,7 @@ function fileCopyAsyncThrowingError( test )
 
   //
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'rewriting terminal';
     provider.filesDelete( routinePath );
@@ -9198,7 +9198,7 @@ function fileCopyAsyncThrowingError( test )
       throwing : 0
     }
     return provider.fileCopy( o )
-    .thenKeep( ( got ) =>
+    .then( ( got ) =>
     {
       test.identical( got, null );
       test.is( provider.isTerminal( srcPath ) );
@@ -9212,7 +9212,7 @@ function fileCopyAsyncThrowingError( test )
 
   //
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'rewriting routinePath by terminal';
     provider.filesDelete( routinePath );
@@ -9228,7 +9228,7 @@ function fileCopyAsyncThrowingError( test )
       throwing : 1
     }
     return test.shouldThrowError( provider.fileCopy( o ) )
-    .thenKeep( () =>
+    .then( () =>
     {
       test.is( provider.isTerminal( srcPath ) );
       test.is( provider.isDir( dstPath ) );
@@ -9241,7 +9241,7 @@ function fileCopyAsyncThrowingError( test )
 
   //
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'rewriting routinePath by terminal';
     provider.filesDelete( routinePath );
@@ -9257,7 +9257,7 @@ function fileCopyAsyncThrowingError( test )
       throwing : 0
     }
     return provider.fileCopy( o )
-    .thenKeep( ( got ) =>
+    .then( ( got ) =>
     {
       test.identical( got, null );
       test.is( provider.isTerminal( srcPath ) );
@@ -9270,7 +9270,7 @@ function fileCopyAsyncThrowingError( test )
 
   //
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'error on resolve src';
     provider.filesDelete( routinePath );
@@ -9284,7 +9284,7 @@ function fileCopyAsyncThrowingError( test )
       throwing : 1
     }
     return test.shouldThrowError( provider.fileCopy( o ) )
-    .thenKeep( () =>
+    .then( () =>
     {
       test.is( !provider.fileExists( srcPath ) );
       test.is( provider.isTerminal( dstPath ) );
@@ -9295,7 +9295,7 @@ function fileCopyAsyncThrowingError( test )
 
   //
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'error on resolve src';
     provider.filesDelete( routinePath );
@@ -9322,7 +9322,7 @@ function fileCopyAsyncThrowingError( test )
 
   
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'error on resolve src';
     provider.filesDelete( routinePath );
@@ -9338,7 +9338,7 @@ function fileCopyAsyncThrowingError( test )
       allowingMissed : 1,
     }
     return provider.fileCopy( o )
-    .thenKeep( () =>
+    .then( () =>
     { 
       test.is( provider.isSoftLink( srcPath ) );
       test.is( provider.isSoftLink( dstPath ) );
@@ -9350,7 +9350,7 @@ function fileCopyAsyncThrowingError( test )
 
   //
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'error on resolve src';
     provider.filesDelete( routinePath );
@@ -9366,7 +9366,7 @@ function fileCopyAsyncThrowingError( test )
       allowingMissed : 0,
     }
     return test.shouldThrowErrorAsync( provider.fileCopy( o ) )
-    .thenKeep( () =>
+    .then( () =>
     {
       test.is( provider.isSoftLink( srcPath ) );
       test.is( !provider.isSoftLink( dstPath ) );
@@ -9378,7 +9378,7 @@ function fileCopyAsyncThrowingError( test )
 
   //
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'error on fileCopy missed link should not be throwen';
     provider.filesDelete( routinePath );
@@ -9394,7 +9394,7 @@ function fileCopyAsyncThrowingError( test )
       allowingMissed : 0,
     }
     return provider.fileCopy( o )
-    .thenKeep( ( got ) =>
+    .then( ( got ) =>
     {
       test.is( got );
       test.is( provider.isSoftLink( srcPath ) );
@@ -9407,7 +9407,7 @@ function fileCopyAsyncThrowingError( test )
 
   //
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'error on fileCopy missed link should not be throwen';
     provider.filesDelete( routinePath );
@@ -9423,7 +9423,7 @@ function fileCopyAsyncThrowingError( test )
       allowingMissed : 0,
     }
     return provider.fileCopy( o )
-    .thenKeep( ( got ) =>
+    .then( ( got ) =>
     {
       test.is( got );
       test.is( provider.isSoftLink( srcPath ) );
@@ -9435,7 +9435,7 @@ function fileCopyAsyncThrowingError( test )
 
   //
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'error on resolve src';
     provider.filesDelete( routinePath );
@@ -9451,7 +9451,7 @@ function fileCopyAsyncThrowingError( test )
       throwing : 1
     }
     return test.shouldThrowError( provider.fileCopy( o ) )
-    .thenKeep( () =>
+    .then( () =>
     {
       test.is( provider.isSoftLink( srcPath ) );
       test.is( provider.isTerminal( dstPath ) );
@@ -9463,7 +9463,7 @@ function fileCopyAsyncThrowingError( test )
 
   //
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'error on resolve src';
     provider.filesDelete( routinePath );
@@ -9479,7 +9479,7 @@ function fileCopyAsyncThrowingError( test )
       throwing : 0
     }
     return provider.fileCopy( o )
-    .thenKeep( ( got ) =>
+    .then( ( got ) =>
     {
       test.identical( got, null );
       test.is( provider.isSoftLink( srcPath ) );
@@ -26083,7 +26083,7 @@ function hardLinkActAsync( test )
       sync : 0
     }
     return test.shouldThrowErrorAsync( provider.hardLinkAct( o ) )
-    .thenKeep( () =>
+    .then( () =>
     {
       test.will = 'parent directory of dstPath must not be created';
       test.is( !provider.fileExists( path.dir( dstMissingPath ) ) );
@@ -26111,7 +26111,7 @@ function hardLinkActAsync( test )
       sync : 0
     }
     return test.shouldThrowErrorAsync( provider.hardLinkAct( o ) )
-    .thenKeep( () =>
+    .then( () =>
     {
       test.is( provider.isTerminal( srcPath ) );
       test.is( !provider.fileExists( dstPath2 ) );
@@ -27078,7 +27078,7 @@ function fileExchangeAsync( test )
     })
   })
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'two soft links to terminals';
     provider.filesDelete( routinePath );
@@ -27094,7 +27094,7 @@ function fileExchangeAsync( test )
       allowingMissed : 0,
       throwing : 1
     })
-    .thenKeep( ( got ) =>
+    .then( ( got ) =>
     {
       var src = provider.fileRead( srcPath );
       test.identical( src, dstPathTerminal );
@@ -27107,7 +27107,7 @@ function fileExchangeAsync( test )
 
   //
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'two text links to terminals';
     provider.fieldPush( 'resolvingTextLink', 1 );
@@ -27125,7 +27125,7 @@ function fileExchangeAsync( test )
       allowingMissed : 0,
       throwing : 1
     })
-    .thenKeep( ( got ) =>
+    .then( ( got ) =>
     {
       var src = provider.fileRead( srcPath );
       test.identical( src, dstPathTerminal );
@@ -27139,7 +27139,7 @@ function fileExchangeAsync( test )
 
   //
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'two soft links to missing, not allowed';
     provider.filesDelete( routinePath );
@@ -27154,7 +27154,7 @@ function fileExchangeAsync( test )
       throwing : 1
     });
     return test.shouldThrowError( con )
-    .thenKeep( () =>
+    .then( () =>
     {
       test.is( provider.fileExists( srcPath ) );
       test.is( provider.fileExists( dstPath ) );
@@ -27168,7 +27168,7 @@ function fileExchangeAsync( test )
 
   //
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'two soft links to missing, allowed';
     provider.filesDelete( routinePath );
@@ -27182,7 +27182,7 @@ function fileExchangeAsync( test )
       allowingMissed : 1,
       throwing : 1
     })
-    .thenKeep( ( got ) =>
+    .then( ( got ) =>
     {
       test.is( provider.fileExists( srcPath ) );
       test.is( provider.fileExists( dstPath ) );
@@ -27196,7 +27196,7 @@ function fileExchangeAsync( test )
 
   //
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'soft link and terminal';
     provider.filesDelete( routinePath );
@@ -27211,7 +27211,7 @@ function fileExchangeAsync( test )
       allowingMissed : 0,
       throwing : 1
     })
-    .thenKeep( ( got ) =>
+    .then( ( got ) =>
     {
       test.is( provider.fileExists( srcPath ) );
       test.is( provider.fileExists( dstPathTerminal ) );
@@ -27225,7 +27225,7 @@ function fileExchangeAsync( test )
 
   //
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'terminal and soft link';
     provider.filesDelete( routinePath );
@@ -27240,7 +27240,7 @@ function fileExchangeAsync( test )
       allowingMissed : 0,
       throwing : 1
     })
-    .thenKeep( ( got ) =>
+    .then( ( got ) =>
     {
       test.is( provider.fileExists( srcPathTerminal ) );
       test.is( provider.fileExists( dstPathTerminal ) );
@@ -27254,7 +27254,7 @@ function fileExchangeAsync( test )
 
   //cycled links
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'two self cycled soft links, cycled allowed';
     provider.filesDelete( routinePath );
@@ -27269,7 +27269,7 @@ function fileExchangeAsync( test )
       allowingCycled : 1,
       throwing : 1
     })
-    .thenKeep( ( got ) =>
+    .then( ( got ) =>
     {
       test.is( provider.isSoftLink( srcPath ) );
       test.is( provider.isSoftLink( dstPath ) );
@@ -27281,7 +27281,7 @@ function fileExchangeAsync( test )
 
   //
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'two self cycled soft links, cycled not allowed';
     provider.filesDelete( routinePath );
@@ -27297,7 +27297,7 @@ function fileExchangeAsync( test )
       throwing : 1
     });
     return test.shouldThrowErrorAsync( con )
-    .thenKeep( () =>
+    .then( () =>
     {
       test.is( provider.isSoftLink( srcPath ) );
       test.is( provider.isSoftLink( dstPath ) );
@@ -27310,7 +27310,7 @@ function fileExchangeAsync( test )
 
   //
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'two self cycled soft links, cycled not allowed, throwing off';
     provider.filesDelete( routinePath );
@@ -27325,7 +27325,7 @@ function fileExchangeAsync( test )
       allowingCycled : 0,
       throwing : 0
     })
-    .thenKeep( ( got ) =>
+    .then( ( got ) =>
     {
       test.identical( got, null );
       test.is( provider.isSoftLink( srcPath ) );
@@ -27338,7 +27338,7 @@ function fileExchangeAsync( test )
 
   //
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'self cycled and terminal, cycled allowed';
     provider.filesDelete( routinePath );
@@ -27353,7 +27353,7 @@ function fileExchangeAsync( test )
       allowingCycled : 1,
       throwing : 1
     })
-    .thenKeep( ( got ) =>
+    .then( ( got ) =>
     {
       test.is( provider.isTerminal( srcPath ) );
       test.is( provider.isSoftLink( dstPathTerminal ) );
@@ -27366,7 +27366,7 @@ function fileExchangeAsync( test )
 
   //
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'self cycled and terminal, cycled not allowed';
     provider.filesDelete( routinePath );
@@ -27382,7 +27382,7 @@ function fileExchangeAsync( test )
       throwing : 1
     });
     return test.shouldThrowErrorAsync( con )
-    .thenKeep( () =>
+    .then( () =>
     {
       test.is( provider.isTerminal( dstPathTerminal ) );
       test.is( provider.isSoftLink( srcPath ) );
@@ -27394,7 +27394,7 @@ function fileExchangeAsync( test )
 
   //
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'self cycled and terminal, cycled not allowed, throwing off';
     provider.filesDelete( routinePath );
@@ -27409,7 +27409,7 @@ function fileExchangeAsync( test )
       allowingCycled : 0,
       throwing : 0
     })
-    .thenKeep( ( got ) =>
+    .then( ( got ) =>
     {
       test.identical( got, null );
       test.is( provider.isTerminal( dstPathTerminal ) );

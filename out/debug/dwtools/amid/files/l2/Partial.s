@@ -5857,6 +5857,9 @@ function _link_functor( fop )
     function pathResolve()
     {
 
+      o.relativeSrcPath = o.srcPath;
+      o.relativeDstPath = o.dstPath;
+
       // if( !o.originalSrcPath )
       // o.originalSrcPath = o.srcPath;
       // if( !o.originalDstPath )
@@ -5865,13 +5868,23 @@ function _link_functor( fop )
       if( !path.isAbsolute( o.dstPath ) )
       {
         _.assert( path.isAbsolute( o.srcPath ), () => 'Expects absolute path {-o.srcPath-}, but got', _.strQuote( o.srcPath ) );
-        o.dstPath = path.resolve( o.srcPath, o.dstPath );
+        o.dstPath = path.join( o.srcPath, o.dstPath );
       }
       // else if( !_.path.isGlobal( o.srcPath ) && !path.isAbsolute( o.srcPath ) )
       else if( !path.isAbsolute( o.srcPath ) )
       {
         _.assert( path.isAbsolute( o.dstPath ), () => 'Expects absolute path {-o.dstPath-}, but got', _.strQuote( o.dstPath ) );
-        o.srcPath = path.resolve( o.dstPath, o.srcPath );
+        o.srcPath = path.join( o.dstPath, o.srcPath );
+      }
+      else
+      {
+        /*
+          add protocol if any
+        */
+        if( path.isGlobal( o.srcPath ) )
+        o.dstPath = path.join( o.srcPath, o.dstPath );
+        else if( path.isGlobal( o.dstPath ) )
+        o.srcPath = path.join( o.dstPath, o.srcPath );
       }
 
       _.assert( path.isAbsolute( o.srcPath ) );
@@ -5926,7 +5939,7 @@ function _link_functor( fop )
         }
         else
         {
-          o.relativeDstPath = o.dstPath;
+          // o.relativeDstPath = o.dstPath;
         }
 
         /* */
@@ -5959,7 +5972,7 @@ function _link_functor( fop )
         else
         {
           /* do not read stat if possible */
-          o.relativeSrcPath = o.srcPath;
+          // o.relativeSrcPath = o.srcPath;
           // c.srcStat = self.statRead({ filePath : o.srcPath, sync : 1 });
           c.srcStat = c.onStat( o.srcPath, 0 );
 

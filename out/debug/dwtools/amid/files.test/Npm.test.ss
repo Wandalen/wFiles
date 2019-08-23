@@ -56,14 +56,14 @@ function filesReflectTrivial( test )
 
   let con = new _.Consequence().take( null )
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'no hash, no trailing /';
     providerDst.filesDelete( installPath );
     let remotePath = 'npm:///wpathbasic';
     return hub.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
   })
-  .thenKeep( ( got ) =>
+  .then( ( got ) =>
   {
     let files = providerDst.dirRead( installPath );
     let expected =
@@ -81,14 +81,14 @@ function filesReflectTrivial( test )
 
   /*  */
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'no hash, with trailing /';
     providerDst.filesDelete( installPath );
     let remotePath = 'npm:///wpathbasic/'
     return hub.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
   })
-  .thenKeep( ( got ) =>
+  .then( ( got ) =>
   {
     let files = providerDst.dirRead( installPath );
     let expected =
@@ -106,7 +106,7 @@ function filesReflectTrivial( test )
 
   /*  */
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'already exists';
     providerDst.filesDelete( installPath );
@@ -115,7 +115,7 @@ function filesReflectTrivial( test )
     hub.filesReflect( _.cloneJust( o ) )
     return hub.filesReflect( _.cloneJust( o ) );
   })
-  .thenKeep( ( got ) =>
+  .then( ( got ) =>
   {
     let files = providerDst.dirRead( installPath );
     let expected =
@@ -133,14 +133,14 @@ function filesReflectTrivial( test )
 
   /*  */
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'specific version';
     providerDst.filesDelete( installPath );
     let remotePath = 'npm:///wpathbasic#0.6.154'
     return hub.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
   })
-  .thenKeep( ( got ) =>
+  .then( ( got ) =>
   {
     let files = providerDst.dirRead( installPath );
     let expected =
@@ -161,14 +161,14 @@ function filesReflectTrivial( test )
 
   /*  */
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'specific tag';
     providerDst.filesDelete( installPath );
     let remotePath = 'npm:///wpathbasic#latest'
     return hub.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
   })
-  .thenKeep( ( got ) =>
+  .then( ( got ) =>
   {
     let files = providerDst.dirRead( installPath );
     let expected =
@@ -189,7 +189,7 @@ function filesReflectTrivial( test )
 
   /*  */
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'path is occupied';
     providerDst.filesDelete( installPath );
@@ -197,7 +197,7 @@ function filesReflectTrivial( test )
     let remotePath = 'npm:///wpathbasic';
     return test.shouldThrowErrorSync( () => hub.filesReflect( { reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 } ));
   })
-  .thenKeep( () =>
+  .then( () =>
   {
     test.is( providerDst.isTerminal( installPath ) );
     return null;
@@ -205,14 +205,14 @@ function filesReflectTrivial( test )
 
   /*  */
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'wrong package name';
     providerDst.filesDelete( installPath );
     let remotePath = 'npm:///wpathFundamentals';
     return test.shouldThrowErrorSync( () => hub.filesReflect( { reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 } ) );
   })
-  .thenKeep( () =>
+  .then( () =>
   {
     test.is( !providerDst.fileExists( installPath ) );
     return null;
@@ -238,7 +238,7 @@ filesReflectTrivial.timeOut = 120000;
 
 //   let con = new _.Consequence().take( null )
 
-//   .thenKeep( () =>
+//   .then( () =>
 //   {
 //     test.case = 'localPath';
 //     providerDst.filesDelete( installPath );
@@ -250,7 +250,7 @@ filesReflectTrivial.timeOut = 120000;
 //       verbosity : 3
 //     });
 //   })
-//   .thenKeep( ( got ) =>
+//   .then( ( got ) =>
 //   {
 //     let files = providerDst.dirRead( installPath );
 //     let expected =
@@ -268,7 +268,7 @@ filesReflectTrivial.timeOut = 120000;
 
 //   /*  */
 
-//   .thenKeep( () =>
+//   .then( () =>
 //   {
 //     test.case = 'localPath with hash';
 //     providerDst.filesDelete( installPath );
@@ -280,7 +280,7 @@ filesReflectTrivial.timeOut = 120000;
 //       verbosity : 3
 //     });
 //   })
-//   .thenKeep( ( got ) =>
+//   .then( ( got ) =>
 //   {
 //     let files = providerDst.dirRead( installPath );
 //     let expected =
@@ -301,7 +301,7 @@ filesReflectTrivial.timeOut = 120000;
 
 //   /*  */
 
-//   .thenKeep( () =>
+//   .then( () =>
 //   {
 //     test.case = 'localPath with trailing slash and hash';
 //     providerDst.filesDelete( installPath );
@@ -313,7 +313,7 @@ filesReflectTrivial.timeOut = 120000;
 //       verbosity : 3
 //     });
 //   })
-//   .thenKeep( ( got ) =>
+//   .then( ( got ) =>
 //   {
 //     let files = providerDst.dirRead( installPath );
 //     let expected =
@@ -331,7 +331,7 @@ filesReflectTrivial.timeOut = 120000;
 
 //   /*  */
 
-//   .thenKeep( () =>
+//   .then( () =>
 //   {
 //     test.case = 'rewrite existing';
 //     providerDst.filesDelete( installPath );
@@ -343,10 +343,10 @@ filesReflectTrivial.timeOut = 120000;
 //       verbosity : 3
 //     }
 //     let con = providerSrc.filesReflect( _.mapExtend( null, o ) );
-//     con.thenKeep( () => providerSrc.filesReflect( _.mapExtend( null, o ) ) );
+//     con.then( () => providerSrc.filesReflect( _.mapExtend( null, o ) ) );
 //     return con;
 //   })
-//   .thenKeep( ( got ) =>
+//   .then( ( got ) =>
 //   {
 //     let files = providerDst.dirRead( installPath );
 //     let expected =
@@ -364,7 +364,7 @@ filesReflectTrivial.timeOut = 120000;
 
 //   /*  */
 
-//   .thenKeep( () =>
+//   .then( () =>
 //   {
 //     test.case = 'githubname/reponame';
 //     providerDst.filesDelete( installPath );
@@ -376,7 +376,7 @@ filesReflectTrivial.timeOut = 120000;
 //       verbosity : 3
 //     });
 //   })
-//   .thenKeep( ( got ) =>
+//   .then( ( got ) =>
 //   {
 //     let files = providerDst.dirRead( installPath );
 //     let expected =
@@ -397,7 +397,7 @@ filesReflectTrivial.timeOut = 120000;
 
 //   /*  */
 
-//   .thenKeep( () =>
+//   .then( () =>
 //   {
 //     test.case = 'path is occupied by terminal';
 //     providerDst.filesDelete( installPath );
@@ -412,7 +412,7 @@ filesReflectTrivial.timeOut = 120000;
 //     let con = providerSrc.filesReflect( o );
 //     return test.shouldThrowErrorAsync( con );
 //   })
-//   .thenKeep( ( got ) =>
+//   .then( ( got ) =>
 //   {
 //     test.is( providerDst.isTerminal( installPath ) );
 //     return got;

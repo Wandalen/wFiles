@@ -3516,8 +3516,11 @@ function filesReflectSingle_body( o )
     return false;
     record.src = dstRecord;
 
-    if( path.isAbsolute( srcPath ) )
-    srcPath = record.src.absolutePreferred;
+    debugger;
+    // if( path.isAbsolute( srcPath ) )
+    // srcPath = record.src.absolutePreferred;
+    // if( path.isAbsolute( srcPath ) )
+    // srcPath = record.src.absolute;
 
     let action = isSoftLink ? 'softLink' : 'textLink';
 

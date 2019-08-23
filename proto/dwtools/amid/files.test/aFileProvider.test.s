@@ -8982,6 +8982,8 @@ function fileCopyGlobal( test )
   
   /*  */
   
+  test.open( 'with hub' )
+  
   test.case = 'default protocol';
   provider.filesDelete( routinePath );
   provider.fileWrite( srcPath, srcPath );
@@ -9004,6 +9006,42 @@ function fileCopyGlobal( test )
   test.shouldThrowErrorSync( () => provider.fileCopy( dstPathUnknown, srcPath ) );
   test.is( provider.isTerminal( srcPath ) );
   test.is( !provider.fileExists( dstPath ) );
+  
+  test.close( 'with hub' )
+  
+  /* */
+  
+  test.open( 'without hub' )
+  
+  self.hub.providerUnregister( provider );
+  
+  test.case = 'default protocol';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  provider.fileCopy( dstPathDefault, srcPathDefault );
+  test.is( provider.isTerminal( srcPath ) );
+  test.is( provider.isTerminal( dstPath ) );
+  test.identical( provider.fileRead( dstPath ), srcPath );
+  
+  test.case = 'other protocol';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  provider.fileCopy( dstPathSecond, srcPathSecond );
+  test.is( provider.isTerminal( srcPath ) );
+  test.is( provider.isTerminal( dstPath ) );
+  test.identical( provider.fileRead( dstPath ), srcPath );
+  
+  test.case = 'src local, dst with unknown protocol';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  test.shouldThrowErrorSync( () => provider.fileCopy( dstPathUnknown, srcPath ) );
+  test.is( provider.isTerminal( srcPath ) );
+  test.is( !provider.fileExists( dstPath ) );
+  
+  self.hub.providerRegister( provider );
+  
+  test.close( 'without hub' )
+  
 }
 
 //
@@ -12728,7 +12766,9 @@ function fileRenameGlobal( test )
   
   var dstPathUnknown = 'unknown://' + dstPath;
   
-  /*  */
+  /* */
+  
+  test.open( 'with hub' );
   
   test.case = 'default protocol';
   provider.filesDelete( routinePath );
@@ -12752,6 +12792,41 @@ function fileRenameGlobal( test )
   test.shouldThrowErrorSync( () => provider.fileRename( dstPathUnknown, srcPath ) );
   test.is( provider.isTerminal( srcPath ) );
   test.is( !provider.fileExists( dstPath ) );  
+  
+  test.close( 'with hub' );
+  
+  /* */
+  
+  test.open( 'without hub' );
+  
+  self.hub.providerUnregister( provider );
+  
+  test.case = 'default protocol';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  provider.fileRename( dstPathDefault, srcPathDefault );
+  test.is( !provider.fileExists( srcPath ) );
+  test.is( provider.isTerminal( dstPath ) );
+  test.identical( provider.fileRead( dstPath ), srcPath );
+  
+  test.case = 'other protocol';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  provider.fileRename( dstPathSecond, srcPathSecond );
+  test.is( !provider.fileExists( srcPath ) );
+  test.is( provider.isTerminal( dstPath ) );
+  test.identical( provider.fileRead( dstPath ), srcPath );
+  
+  test.case = 'src local, dst with unknown protocol';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  test.shouldThrowErrorSync( () => provider.fileRename( dstPathUnknown, srcPath ) );
+  test.is( provider.isTerminal( srcPath ) );
+  test.is( !provider.fileExists( dstPath ) );  
+  
+  self.hub.providerRegister( provider );
+  
+  test.close( 'without hub' );
 }
 
 //
@@ -22617,6 +22692,8 @@ function softLinkGlobal( test )
   
   /*  */
   
+  test.open( 'with hub' );
+  
   test.case = 'default protocol';
   provider.filesDelete( routinePath );
   provider.fileWrite( srcPath, srcPath );
@@ -22639,6 +22716,42 @@ function softLinkGlobal( test )
   test.shouldThrowErrorSync( () => provider.softLink( dstPathUnknown, srcPath ) );
   test.is( provider.isTerminal( srcPath ) );
   test.is( !provider.fileExists( dstPath ) );
+  
+  test.close( 'with hub' );
+  
+  /*  */
+  
+  test.open( 'without hub' );
+  
+  self.hub.providerUnregister( provider );
+  
+  test.case = 'default protocol';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  provider.softLink( dstPathDefault, srcPathDefault );
+  test.is( provider.isTerminal( srcPath ) );
+  test.is( provider.isSoftLink( dstPath ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), srcPath );
+  
+  test.case = 'other protocol';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  provider.softLink( dstPathSecond, srcPathSecond );
+  test.is( provider.isTerminal( srcPath ) );
+  test.is( provider.isSoftLink( dstPath ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), srcPath );
+  
+  test.case = 'src local, dst with unknown protocol';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  test.shouldThrowErrorSync( () => provider.softLink( dstPathUnknown, srcPath ) );
+  test.is( provider.isTerminal( srcPath ) );
+  test.is( !provider.fileExists( dstPath ) );
+  
+  self.hub.providerRegister( provider );
+  
+  test.close( 'without hub' );
+  
 }
 
 //
@@ -23300,6 +23413,8 @@ function textLinkGlobal( test )
   
   /*  */
   
+  test.open( 'with hub' );
+  
   test.case = 'default protocol';
   provider.filesDelete( routinePath );
   provider.fileWrite( srcPath, srcPath );
@@ -23322,6 +23437,41 @@ function textLinkGlobal( test )
   test.shouldThrowErrorSync( () => provider.textLink( dstPathUnknown, srcPath ) );
   test.is( provider.isTerminal( srcPath ) );
   test.is( !provider.fileExists( dstPath ) );
+  
+  test.close( 'with hub' );
+  
+  /*  */
+  
+  test.open( 'without hub' );
+  
+  self.hub.providerUnregister( provider );
+  
+  test.case = 'default protocol';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  provider.textLink( dstPathDefault, srcPathDefault );
+  test.is( provider.isTerminal( srcPath ) );
+  test.is( provider.isTextLink( dstPath ) );
+  test.identical( provider.pathResolveTextLink( dstPath ), srcPath );
+  
+  test.case = 'other protocol';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  provider.textLink( dstPathSecond, srcPathSecond );
+  test.is( provider.isTerminal( srcPath ) );
+  test.is( provider.isTextLink( dstPath ) );
+  test.identical( provider.pathResolveTextLink( dstPath ), srcPath );
+  
+  test.case = 'src local, dst with unknown protocol';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  test.shouldThrowErrorSync( () => provider.textLink( dstPathUnknown, srcPath ) );
+  test.is( provider.isTerminal( srcPath ) );
+  test.is( !provider.fileExists( dstPath ) );
+  
+  self.hub.providerRegister( provider );
+  
+  test.close( 'without hub' );
 }
 
 //
@@ -28494,6 +28644,8 @@ function hardLinkGlobal( test )
   
   /*  */
   
+  test.open( 'with hub' );
+  
   test.case = 'default protocol';
   provider.filesDelete( routinePath );
   provider.fileWrite( srcPath, srcPath );
@@ -28516,6 +28668,42 @@ function hardLinkGlobal( test )
   test.shouldThrowErrorSync( () => provider.hardLink( dstPathUnknown, srcPath ) );
   test.is( provider.isTerminal( srcPath ) );
   test.is( !provider.fileExists( dstPath ) );
+  
+  test.close( 'with hub' );
+  
+  /* */
+  
+  test.open( 'without hub' );
+  
+  self.hub.providerUnregister( provider );
+  
+  test.case = 'default protocol';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  provider.hardLink( dstPathDefault, srcPathDefault );
+  test.is( provider.isTerminal( srcPath ) );
+  test.is( provider.isTerminal( dstPath ) );
+  test.is( provider.filesAreHardLinked([ srcPath, dstPath ]) );
+  
+  test.case = 'other protocol';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  provider.hardLink( dstPathSecond, srcPathSecond );
+  test.is( provider.isTerminal( srcPath ) );
+  test.is( provider.isTerminal( dstPath ) );
+  test.is( provider.filesAreHardLinked([ srcPath, dstPath ]) );
+  
+  test.case = 'src local, dst with unknown protocol';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  test.shouldThrowErrorSync( () => provider.hardLink( dstPathUnknown, srcPath ) );
+  test.is( provider.isTerminal( srcPath ) );
+  test.is( !provider.fileExists( dstPath ) );
+  
+  self.hub.providerRegister( provider );
+  
+  test.close( 'without hub' );
+  
 }
 
 //
@@ -34433,7 +34621,7 @@ function filesAreSame( test )
     test.case = 'missed arguments';
     test.shouldThrowErrorSync( function( )
     {
-      self.prvoider.filesSame( );
+      self.provider.filesSame( );
     } );
   }
 

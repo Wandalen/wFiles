@@ -20107,7 +20107,8 @@ function filesReflectLinked( test )
   provider.pathResolveSoftLink( dstLinkPath );
 
   test.is( provider.fileExists( path.join( dstPath, 'file' ) ) );
-  test.is( !provider.fileExists( dstLinkPath ) );
+  test.is( provider.isSoftLink( dstLinkPath ) );
+  test.identical( provider.pathResolveSoftLink( dstLinkPath ), path.join( srcPath, 'fileNotExists' ) )
 
   /**/
 
@@ -20162,10 +20163,10 @@ function filesReflectLinked( test )
     resolvingSrcSoftLink : 1,
   })
 
-  test.will = 'dstPath/link should not be rewritten by srcPath/link';
-  test.is( !provider.fileExists( dstLinkPath ) );
-  // var dstLink1 = provider.pathResolveSoftLink( dstLinkPath );
-  // test.identical( dstLink1, path.join( dstPath, 'fileNotExists' ) );
+  test.will = 'dstPath/link should be rewritten by srcPath/link';
+  test.is( provider.isSoftLink( dstLinkPath ) );
+  test.identical( provider.pathResolveSoftLink( dstLinkPath ), path.join( srcPath, 'fileNotExists' ) )
+ 
 
   /* */
 
@@ -20222,10 +20223,10 @@ function filesReflectLinked( test )
     resolvingSrcSoftLink : 1,
   })
 
-  test.will = 'dstPath/link should not be rewritten by srcPath/link';
-  test.is( !provider.isSoftLink( dstLinkPath ) );
+  test.will = 'dstPath/link should be rewritten by srcPath/link';
+  test.is( provider.isSoftLink( dstLinkPath ) );
   var dstLink1 = provider.pathResolveSoftLink( dstLinkPath );
-  test.identical( dstLink1, path.join( dstPath, 'link' ) );
+  test.identical( dstLink1, path.join( srcPath, 'fileNotExists' ) );
 
   /* */
 
@@ -20250,7 +20251,7 @@ function filesReflectLinked( test )
   ({
     reflectMap : { [ srcPath ] : dstPath },
     allowingMissed : 1,
-    resolvingSrcSoftLink : 1,
+    resolvingSrcSoftLink : 2,
   });
 
   test.will = 'delete dst link file';
@@ -20286,7 +20287,7 @@ function filesReflectLinked( test )
   test.is( provider.fileExists( dstLinkPath ) );
   test.is( provider.isSoftLink( dstLinkPath ) );
   var dstLink1 = provider.pathResolveSoftLink({ filePath : dstLinkPath });
-  test.identical( dstLink1, path.join( srcPath, 'fileNotExists' ) );
+  test.identical( dstLink1, srcLinkPath );
 
   /* */
 
@@ -20314,10 +20315,8 @@ function filesReflectLinked( test )
   })
 
   test.will = 'dstPath/link should be rewritten by srcPath/link'
-  test.is( !provider.isSoftLink( dstLinkPath ) );
-  test.is( provider.isTerminal( dstLinkPath ) );
-  var read = provider.fileRead({ filePath : dstLinkPath });
-  test.identical( read, 'file' );
+  test.is( provider.isSoftLink( dstLinkPath ) );
+  test.identical( provider.pathResolveSoftLink({ filePath : dstLinkPath }), path.join( srcPath, 'file' ) )
 
   /* */
 

@@ -20064,7 +20064,7 @@ function filesReflectDstDeletingDirs( test )
   test.identical( extract.filesTree, expected );
 }
 
-//
+//qqq:extend filesReflectLinked with new cases for resolvingSrcSoftLink: 0-2
 
 function filesReflectLinked( test )
 {
@@ -20082,7 +20082,6 @@ function filesReflectLinked( test )
   /* - */
 
   test.case = 'first';
-  
 
   logger.log( 'routinePath', routinePath );
 

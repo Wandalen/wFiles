@@ -26,6 +26,7 @@ function onSuiteBegin( test )
   let path = context.provider.path;
   context.testSuitePath = path.dirTempOpen( 'suite-' + 'FilesFind' );
   context.testSuitePath = context.provider.pathResolveLinkFull({ filePath : context.testSuitePath, resolvingSoftLink : 1 });
+  context.testSuitePath = context.testSuitePath.absolutePath;
 }
 
 //

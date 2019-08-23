@@ -6745,6 +6745,14 @@ function _fileCopyAct( c )
   {
     if( c.srcResolvedStat === null )
     return null;
+    
+    if( c.srcResolvedStat.isDir() )
+    return self.dirMakeAct
+    ({
+      filePath : o.dstPath,
+      sync : o.sync
+    })
+    
     return act();
   }
 

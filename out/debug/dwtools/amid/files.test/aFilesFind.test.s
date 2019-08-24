@@ -17861,6 +17861,7 @@ function filesReflectGrab( test )
     '/dir**' : true,
   }
 
+  debugger;
   var records = system.filesReflect
   ({
     reflectMap : recipe,
@@ -17868,6 +17869,7 @@ function filesReflectGrab( test )
     dst : { system : provider, prefixPath : routinePath },
     mandatory : 0,
   });
+  debugger;
   var found = provider.filesFindRecursive( routinePath );
   src.finit();
   provider.filesDelete( routinePath );

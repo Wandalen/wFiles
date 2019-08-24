@@ -135,7 +135,7 @@ function form()
 
 function _formAssociations()
 {
-  let filter = this;
+  let filter = this; debugger;
 
   /* find file system */
 
@@ -168,6 +168,8 @@ function _formAssociations()
   if( filter.system.system && filter.system.system !== filter.system )
   {
     _.assert( !( filter.system instanceof _.FileProvider.System ) );
+    if( !filter.effectiveProvider )
+    filter.effectiveProvider = filter.system;
     filter.system = filter.system.system;
   }
 

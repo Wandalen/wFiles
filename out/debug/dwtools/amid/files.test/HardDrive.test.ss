@@ -41,7 +41,7 @@ function onSuiteBegin( test )
 {
   let context = this;
 
-  context.provider = _.FileProvider.HardDrive({ protocol : 'current', protocols : [ 'current', 'second' ] });
+  context.provider = _.FileProvider.HardDrive({ /* protocol : 'current', */ protocols : [ 'current', 'second' ] });
   context.system = _.FileProvider.System({ providers : [ context.provider ] });
 
   let path = context.provider.path;

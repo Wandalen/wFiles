@@ -1,6 +1,6 @@
-( function _FileProvider_System_HardDrive_test_ss_( ) {
+( function _System_HardDrive_test_ss_( ) {
 
-'use strict';  
+'use strict';
 
 if( typeof module !== 'undefined' )
 {
@@ -45,7 +45,7 @@ function onSuiteBegin()
 }
 
 function onSuiteEnd()
-{ 
+{
   _.assert( _.strHas( this.testSuitePath, 'System/HardDrive' ) );
   // this.providerEffective.filesDelete({ filePath : this.testSuitePath });
   _.path.dirTempClose( this.testSuitePath );
@@ -66,7 +66,7 @@ function onRoutineEnd( test )
 var Proto =
 {
 
-  name : 'Tools/mid/files/fileProvider/System/withHardDrive',
+  name : 'Tools/mid/files/fileProvider/System/HardDrive',
   abstract : 0,
   silencing : 1,
   enabled : 1,

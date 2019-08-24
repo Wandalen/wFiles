@@ -1,4 +1,4 @@
-( function _FileProvider_System_copy_test_ss_( ) {
+( function _System_copy_test_ss_( ) {
 
 'use strict';
 

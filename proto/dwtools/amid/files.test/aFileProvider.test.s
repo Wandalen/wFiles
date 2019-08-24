@@ -22790,6 +22790,9 @@ function softLinkRelativeLinking( test )
     resolvingSrcSoftLink : 1
     - link dst -> ../src2 
     
+    src1 as :
+    - missing file
+    - link
     
     src2 as :
     - terminal
@@ -22797,6 +22800,70 @@ function softLinkRelativeLinking( test )
     - missing
   
   */
+ 
+  /* src1 missing absolute */
+ 
+  test.case = 'src1 is missing, allowingMissed:0';
+  provider.filesDelete( routinePath );
+  test.shouldThrowErrorSync( () => 
+  {
+    provider.softLink
+    ({ 
+      srcPath : src1Path, 
+      dstPath : dstPath, 
+      resolvingSrcSoftLink : 0, 
+      resolvingSrcTextLink : 0,
+      allowingMissed : 0 
+    });
+  })
+  test.is( !provider.fileExists( src1Path ) );
+  test.is( !provider.fileExists( dstPath ) );
+  
+  test.case = 'src1 is missing, allowingMissed:1';
+  provider.filesDelete( routinePath );
+  provider.softLink
+  ({ 
+    srcPath : src1Path, 
+    dstPath : dstPath, 
+    resolvingSrcSoftLink : 0, 
+    resolvingSrcTextLink : 0,
+    allowingMissed : 1 
+  });
+  test.is( !provider.fileExists( src1Path ) );
+  test.is( provider.isSoftLink( dstPath ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), src1Path );
+  
+  /* src1 missing relative */
+  
+  test.case = '../src1 is missing, allowingMissed:0';
+  provider.filesDelete( routinePath );
+  test.shouldThrowErrorSync( () => 
+  {
+    provider.softLink
+    ({ 
+      srcPath : '../src1', 
+      dstPath : dstPath, 
+      resolvingSrcSoftLink : 0, 
+      resolvingSrcTextLink : 0,
+      allowingMissed : 0 
+    });
+  })
+  test.is( !provider.fileExists( src1Path ) );
+  test.is( !provider.fileExists( dstPath ) );
+  
+  test.case = '../src1 is missing, allowingMissed:1';
+  provider.filesDelete( routinePath );
+  provider.softLink
+  ({ 
+    srcPath : '../src1', 
+    dstPath : dstPath, 
+    resolvingSrcSoftLink : 0, 
+    resolvingSrcTextLink : 0,
+    allowingMissed : 1 
+  });
+  test.is( !provider.fileExists( src1Path ) );
+  test.is( provider.isSoftLink( dstPath ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), '../src1' );
  
   test.case = 'src1 -> ../src2, softLink dst src1, resolvingSrcSoftLink : 0'
   provider.filesDelete( routinePath );
@@ -22896,6 +22963,14 @@ function softLinkRelativeLinking( test )
   test.is( !provider.fileExists( src2Path ) );
   test.is( !provider.fileExists( dstPath ) );
   
+  test.case = 'src1 -> ../src2, softLink dst src1, resolvingSrcSoftLink : 1, allowingMissed : 1'
+  provider.filesDelete( routinePath );
+  provider.softLink({ dstPath : src1Path, srcPath : '../src2', allowingMissed : 1, makingDirectory : 1 });
+  provider.softLink({ srcPath : src1Path, dstPath : dstPath, resolvingSrcSoftLink : 1, resolvingSrcTextLink : 0, allowingMissed : 1 });
+  test.is( provider.isSoftLink( src1Path ) );
+  test.is( provider.isSoftLink( dstPath ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), '../src2' );
+  
   test.case = 'src1 -> ../src2, softLink dst src1, resolvingSrcSoftLink : 2, allowingMissed : 0'
   provider.filesDelete( routinePath );
   provider.softLink({ dstPath : src1Path, srcPath : '../src2', allowingMissed : 1, makingDirectory : 1 });
@@ -22914,10 +22989,10 @@ function softLinkRelativeLinking( test )
   test.is( !provider.fileExists( src2Path ) );
   test.is( !provider.fileExists( dstPath ) );
   
-  test.case = 'src1 -> ../src2, softLink dst src1, resolvingSrcSoftLink : 0, allowingMissed : 1'
+  test.case = 'src1 -> ../src2, softLink dst src1, resolvingSrcSoftLink : 2, allowingMissed : 1'
   provider.filesDelete( routinePath );
   provider.softLink({ dstPath : src1Path, srcPath : '../src2', allowingMissed : 1, makingDirectory : 1 });
-  provider.softLink({ srcPath : src1Path, dstPath : dstPath, resolvingSrcSoftLink : 1, resolvingSrcTextLink : 0, allowingMissed : 1 });
+  provider.softLink({ srcPath : src1Path, dstPath : dstPath, resolvingSrcSoftLink : 2, resolvingSrcTextLink : 0, allowingMissed : 1 });
   test.is( provider.isSoftLink( src1Path ) );
   test.is( provider.isSoftLink( dstPath ) );
   test.identical( provider.pathResolveSoftLink( dstPath ), '../src2' );
@@ -22958,6 +23033,14 @@ function softLinkRelativeLinking( test )
   test.is( !provider.fileExists( src2Path ) );
   test.is( !provider.fileExists( dstPath ) );
   
+  test.case = 'src1 -> ../src2, softLink dst src1, resolvingSrcSoftLink : 1, allowingMissed : 1'
+  provider.filesDelete( routinePath );
+  provider.softLink({ dstPath : src1Path, srcPath : '../src2', allowingMissed : 1, makingDirectory : 1 });
+  provider.softLink({ srcPath : '../src1', dstPath : dstPath, resolvingSrcSoftLink : 1, resolvingSrcTextLink : 0, allowingMissed : 1 });
+  test.is( provider.isSoftLink( src1Path ) );
+  test.is( provider.isSoftLink( dstPath ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), '../src2' );
+  
   test.case = 'src1 -> ../src2, softLink dst src1, resolvingSrcSoftLink : 2, allowingMissed : 0'
   provider.filesDelete( routinePath );
   provider.softLink({ dstPath : src1Path, srcPath : '../src2', allowingMissed : 1, makingDirectory : 1 });
@@ -22976,11 +23059,10 @@ function softLinkRelativeLinking( test )
   test.is( !provider.fileExists( src2Path ) );
   test.is( !provider.fileExists( dstPath ) );
   
-  
-  test.case = 'src1 -> ../src2, softLink dst src1, resolvingSrcSoftLink : 0, allowingMissed : 1'
+  test.case = 'src1 -> ../src2, softLink dst src1, resolvingSrcSoftLink : 2, allowingMissed : 1'
   provider.filesDelete( routinePath );
   provider.softLink({ dstPath : src1Path, srcPath : '../src2', allowingMissed : 1, makingDirectory : 1 });
-  provider.softLink({ srcPath : '../src1', dstPath : dstPath, resolvingSrcSoftLink : 1, resolvingSrcTextLink : 0, allowingMissed : 1 });
+  provider.softLink({ srcPath : '../src1', dstPath : dstPath, resolvingSrcSoftLink : 2, resolvingSrcTextLink : 0, allowingMissed : 1 });
   test.is( provider.isSoftLink( src1Path ) );
   test.is( provider.isSoftLink( dstPath ) );
   test.identical( provider.pathResolveSoftLink( dstPath ), '../src2' );
@@ -23060,7 +23142,6 @@ function softLinkRelativeLinking( test )
   test.is( provider.isSoftLink( dstPath ) );
   test.is( provider.isTerminal( src3Path ) );
   test.identical( provider.pathResolveSoftLink( dstPath ), '../src3' );
-  
 }
 
 //

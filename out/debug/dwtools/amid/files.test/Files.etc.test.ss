@@ -2,8 +2,6 @@
 
 'use strict';
 
-// return; /* deprecated */
-
 if( typeof module !== 'undefined' )
 {
 

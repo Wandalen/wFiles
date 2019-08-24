@@ -5238,7 +5238,9 @@ function filesDeleteTerminals_body( o )
   if( _.arrayIs( o2.onDown ) )
   o2.onDown = _.routinesComposeReturningLast( o2.onDown );
 
+  debugger;
   let files = self.filesFind.body.call( self, o2 );
+  debugger;
 
   return files;
 
@@ -5246,13 +5248,20 @@ function filesDeleteTerminals_body( o )
 
   function handleDown( record )
   {
-    if( o.writing && record.included )
-    self.fileDelete({ filePath : record.absolute, throwing : o.throwing, verbosity : o.verbosity });
+    debugger;
+    if( o.writing )
+    if( record.isActual && record.isTerminal && record.included )
+    self.fileDelete
+    ({
+      filePath : record.absolute,
+      throwing : o.throwing,
+      verbosity : o.verbosity,
+    });
   }
 
 }
 
-_.routineExtend( filesDeleteTerminals_body, filesDelete );
+_.routineExtend( filesDeleteTerminals_body, filesDelete.body );
 
 var defaults = filesDeleteTerminals_body.defaults;
 
@@ -5261,7 +5270,7 @@ defaults.includingTerminals = 1;
 defaults.includingDirs = 0;
 defaults.includingTransient = 0;
 
-let filesDeleteTerminals = _.routineFromPreAndBody( filesFind.pre, filesDeleteTerminals_body );
+let filesDeleteTerminals = _.routineFromPreAndBody( filesFindRecursive.pre, filesDeleteTerminals_body );
 
 //
 

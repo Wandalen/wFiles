@@ -27925,7 +27925,7 @@ function filesDeleteTerminals( test )
     }
   })
 
-  //
+  /* */
 
   test.case = 'defaults'
   provider.filesDelete( routinePath );
@@ -27942,7 +27942,7 @@ function filesDeleteTerminals( test )
   var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', includingStem : 0 });
   test.identical( got, expected );
 
-  //
+  /* */
 
   test.case = 'recursion off'
   provider.filesDelete( routinePath );

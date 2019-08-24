@@ -28907,7 +28907,7 @@ function hardLinkSoftLinkResolving( test )
   provider.softLink( srcPath, srcPathTerminal );
   provider.softLink( dstPath, dstPathTerminal );
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 0 };
-  test.shouldThrowError( () => hardLink( o ) );
+  hardLink( o )
   test.identical( o.srcPath, srcPath );
   test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
@@ -28915,10 +28915,10 @@ function hardLinkSoftLinkResolving( test )
   test.is( provider.isTerminal( dstPathTerminal ) );
   test.is( provider.isTerminal( srcPathTerminal ) );
   test.identical( provider.pathResolveSoftLink( srcPath ), srcPathTerminal );
-  test.identical( provider.pathResolveSoftLink( dstPath ), dstPathTerminal );
+  test.identical( provider.pathResolveSoftLink( dstPath ), srcPath );
   test.identical( provider.fileRead( srcPathTerminal ), srcPathTerminal );
   test.identical( provider.fileRead( dstPathTerminal ), dstPathTerminal );
-
+  
   provider.filesDelete( routinePath );
   provider.fileWrite( srcPathTerminal, srcPathTerminal );
   provider.fileWrite( dstPathTerminal, dstPathTerminal );
@@ -28929,15 +28929,13 @@ function hardLinkSoftLinkResolving( test )
   test.identical( o.srcPath, srcPathTerminal );
   test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
-  test.is( provider.isHardLink( dstPath ) );
+  test.is( provider.isSoftLink( dstPath ) );
   test.is( provider.isTerminal( dstPathTerminal ) );
   test.is( provider.isTerminal( srcPathTerminal ) );
   test.identical( provider.pathResolveSoftLink( srcPath ), srcPathTerminal );
-  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  test.identical( provider.filesAreHardLinked([ dstPath, srcPathTerminal ]), hardLinked );
-  else
-  test.identical( provider.filesAreHardLinked([ dstPath, srcPathTerminal ]), true );
-  test.identical( provider.fileRead( dstPath ), srcPathTerminal );
+  test.identical( provider.pathResolveSoftLink( dstPath ), srcPathTerminal );
+  test.identical( provider.fileRead( srcPathTerminal ), srcPathTerminal );
+  test.identical( provider.fileRead( dstPathTerminal ), dstPathTerminal );
 
   provider.filesDelete( routinePath );
   provider.fileWrite( srcPathTerminal, srcPathTerminal );
@@ -28945,17 +28943,17 @@ function hardLinkSoftLinkResolving( test )
   provider.softLink( srcPath, srcPathTerminal );
   provider.softLink( dstPath, dstPathTerminal );
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 1 };
-  test.shouldThrowError( () => hardLink( o ) );
+  hardLink( o )
   test.identical( o.srcPath, srcPath );
   test.identical( o.dstPath, dstPathTerminal );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.is( provider.isTerminal( dstPathTerminal ) );
+  test.is( provider.isSoftLink( dstPathTerminal ) );
   test.is( provider.isTerminal( srcPathTerminal ) );
   test.identical( provider.pathResolveSoftLink( srcPath ), srcPathTerminal );
-  test.identical( provider.pathResolveSoftLink( dstPath ), dstPathTerminal );
+  test.identical( provider.pathResolveSoftLink( dstPathTerminal ), srcPath );
   test.identical( provider.fileRead( srcPathTerminal ), srcPathTerminal );
-  test.identical( provider.fileRead( dstPathTerminal ), dstPathTerminal );
+  test.identical( provider.fileRead( dstPathTerminal ), srcPathTerminal );
 
   provider.filesDelete( routinePath );
   provider.fileWrite( srcPathTerminal, srcPathTerminal );
@@ -28968,19 +28966,14 @@ function hardLinkSoftLinkResolving( test )
   test.identical( o.dstPath, dstPathTerminal );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  test.identical( provider.filesAreHardLinked([ dstPathTerminal, srcPathTerminal ]), hardLinked );
-  else
-  test.identical( provider.filesAreHardLinked([ dstPathTerminal, srcPathTerminal ]), true );
-  test.is( provider.isTerminal( dstPathTerminal ) );
-  test.is( provider.isTerminal( srcPathTerminal ) );
   test.identical( provider.pathResolveSoftLink( srcPath ), srcPathTerminal );
   test.identical( provider.pathResolveSoftLink( dstPath ), dstPathTerminal );
+  test.identical( provider.pathResolveSoftLink( dstPathTerminal ), srcPathTerminal );
   test.identical( provider.fileRead( srcPath ), srcPathTerminal );
   test.identical( provider.fileRead( dstPath ), srcPathTerminal );
 
   test.close( 'normal' );
-
+  
   /**/
 
   test.open( 'double' );
@@ -28993,9 +28986,7 @@ function hardLinkSoftLinkResolving( test )
   provider.softLink( dstPath2, dstPathTerminal );
   provider.softLink( dstPath, dstPath2 );
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 0 };
-  test.shouldThrowError( () => hardLink( o ) );
-  test.identical( o.srcPath, srcPath );
-  test.identical( o.dstPath, dstPath );
+  hardLink( o )
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( srcPath2 ) );
   test.is( provider.isTerminal( srcPathTerminal ) );
@@ -29004,10 +28995,10 @@ function hardLinkSoftLinkResolving( test )
   test.is( provider.isSoftLink( dstPath2 ) );
   test.identical( provider.pathResolveSoftLink( srcPath ), srcPath2 );
   test.identical( provider.pathResolveSoftLink( srcPath2 ), srcPathTerminal );
-  test.identical( provider.pathResolveSoftLink( dstPath ), dstPath2 );
+  test.identical( provider.pathResolveSoftLink( dstPath ), srcPath );
   test.identical( provider.pathResolveSoftLink( dstPath2 ), dstPathTerminal );
   test.identical( provider.fileRead( srcPath ), srcPathTerminal );
-  test.identical( provider.fileRead( dstPath ), dstPathTerminal );
+  test.identical( provider.fileRead( dstPath ), srcPathTerminal );
 
   provider.filesDelete( routinePath );
   provider.fileWrite( srcPathTerminal, srcPathTerminal );
@@ -29018,20 +29009,15 @@ function hardLinkSoftLinkResolving( test )
   provider.softLink( dstPath, dstPath2 );
   var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 0 };
   hardLink( o );
-  test.identical( o.srcPath, srcPathTerminal );
-  test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( srcPath2 ) );
   test.is( provider.isTerminal( srcPathTerminal ) );
   test.is( provider.isTerminal( dstPathTerminal ) );
-  test.is( provider.isHardLink( dstPath ) );
+  test.is( provider.isSoftLink( dstPath ) );
   test.is( provider.isSoftLink( dstPath2 ) );
   test.identical( provider.pathResolveSoftLink( srcPath ), srcPath2 );
   test.identical( provider.pathResolveSoftLink( srcPath2 ), srcPathTerminal );
-  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  test.identical( provider.filesAreHardLinked([ dstPath , srcPathTerminal ]), hardLinked );
-  else
-  test.identical( provider.filesAreHardLinked([ dstPath , srcPathTerminal ]), true );
+  test.identical( provider.pathResolveSoftLink( dstPath ), srcPathTerminal );
   test.identical( provider.pathResolveSoftLink( dstPath2 ), dstPathTerminal );
   test.identical( provider.fileRead( srcPath ), srcPathTerminal );
   test.identical( provider.fileRead( dstPath ), srcPathTerminal );
@@ -29044,22 +29030,21 @@ function hardLinkSoftLinkResolving( test )
   provider.softLink( dstPath2, dstPathTerminal );
   provider.softLink( dstPath, dstPath2 );
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 1 };
-  test.shouldThrowError( () => hardLink( o ) );
-  test.identical( o.srcPath, srcPath );
-  test.identical( o.dstPath, dstPathTerminal );
+  hardLink( o );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( srcPath2 ) );
   test.is( provider.isTerminal( srcPathTerminal ) );
-  test.is( provider.isTerminal( dstPathTerminal ) );
+  test.is( provider.isSoftLink( dstPathTerminal ) );
   test.is( provider.isSoftLink( dstPath ) );
   test.is( provider.isSoftLink( dstPath2 ) );
   test.identical( provider.pathResolveSoftLink( srcPath ), srcPath2 );
   test.identical( provider.pathResolveSoftLink( srcPath2 ), srcPathTerminal );
   test.identical( provider.pathResolveSoftLink( dstPath ), dstPath2 );
   test.identical( provider.pathResolveSoftLink( dstPath2 ), dstPathTerminal );
+  test.identical( provider.pathResolveSoftLink( dstPathTerminal ), srcPath );
   test.identical( provider.fileRead( srcPath ), srcPathTerminal );
-  test.identical( provider.fileRead( dstPath ), dstPathTerminal );
-
+  test.identical( provider.fileRead( dstPath ), srcPathTerminal );
+  
   provider.filesDelete( routinePath );
   provider.fileWrite( srcPathTerminal, srcPathTerminal );
   provider.fileWrite( dstPathTerminal, dstPathTerminal );
@@ -29069,25 +29054,22 @@ function hardLinkSoftLinkResolving( test )
   provider.softLink( dstPath, dstPath2 );
   var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 1 };
   hardLink( o );
-  test.identical( o.srcPath, srcPathTerminal );
-  test.identical( o.dstPath, dstPathTerminal );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( srcPath2 ) );
   test.is( provider.isTerminal( srcPathTerminal ) );
-  test.is( provider.isHardLink( dstPathTerminal ) );
+  test.is( provider.isSoftLink( dstPathTerminal ) );
+  test.is( provider.isSoftLink( dstPath ) );
   test.is( provider.isSoftLink( dstPath2 ) );
   test.identical( provider.pathResolveSoftLink( srcPath ), srcPath2 );
   test.identical( provider.pathResolveSoftLink( srcPath2 ), srcPathTerminal );
-  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  test.identical( provider.filesAreHardLinked([ dstPathTerminal , srcPathTerminal ]), hardLinked );
-  else
-  test.identical( provider.filesAreHardLinked([ dstPathTerminal , srcPathTerminal ]), true );
+  test.identical( provider.pathResolveSoftLink( dstPath ), dstPath2 );
   test.identical( provider.pathResolveSoftLink( dstPath2 ), dstPathTerminal );
+  test.identical( provider.pathResolveSoftLink( dstPathTerminal ), srcPathTerminal );
   test.identical( provider.fileRead( srcPath ), srcPathTerminal );
   test.identical( provider.fileRead( dstPath ), srcPathTerminal );
 
   test.close( 'double' );
-
+  
   /**/
 
   test.open( 'broken' );
@@ -29097,12 +29079,12 @@ function hardLinkSoftLinkResolving( test )
   provider.softLink({ dstPath : srcPath, srcPath : srcPathTerminal, allowingMissed : 1 });
   provider.softLink({ dstPath : dstPath, srcPath : dstPathTerminal, allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 0 };
-  test.shouldThrowError( () => hardLink( o ) );
+  hardLink( o )
   test.identical( o.srcPath, srcPath );
   test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( dstPath ), dstPathTerminal );
+  test.identical( provider.pathResolveSoftLink( dstPath ), srcPath );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
@@ -29126,13 +29108,15 @@ function hardLinkSoftLinkResolving( test )
   provider.softLink({ dstPath : srcPath, srcPath : srcPathTerminal, allowingMissed : 1 });
   provider.softLink({ dstPath : dstPath, srcPath : dstPathTerminal, allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 1 };
-  test.shouldThrowError( () => hardLink( o ) );
+  hardLink( o )
   test.identical( o.srcPath, srcPath );
   test.identical( o.dstPath, dstPathTerminal );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
+  test.is( provider.isSoftLink( dstPathTerminal ) );
   test.identical( provider.pathResolveSoftLink( srcPath ), srcPathTerminal );
   test.identical( provider.pathResolveSoftLink( dstPath ), dstPathTerminal );
+  test.identical( provider.pathResolveSoftLink( dstPathTerminal ), srcPath );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
@@ -29152,7 +29136,7 @@ function hardLinkSoftLinkResolving( test )
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
   test.close( 'broken' );
-
+  
   /**/
 
   test.open( 'self cycled' );
@@ -29162,13 +29146,11 @@ function hardLinkSoftLinkResolving( test )
   provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromPreferred( '../src' ), allowingMissed : 1 });
   provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromPreferred( '../dst' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 0 };
-  test.shouldThrowError( () => hardLink( o ) );
-  test.identical( o.srcPath, srcPath );
-  test.identical( o.dstPath, dstPath );
+  hardLink( o );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
   test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromPreferred( '../src' ) );
-  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromPreferred( '../dst' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromPreferred( srcPath ) );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
@@ -29192,13 +29174,13 @@ function hardLinkSoftLinkResolving( test )
   provider.softLink({ dstPath : srcPath, srcPath : test.context.globalFromPreferred( '../src' ), allowingMissed : 1 });
   provider.softLink({ dstPath : dstPath, srcPath : test.context.globalFromPreferred( '../dst' ), allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 1 };
-  test.shouldThrowError( () => hardLink( o ) );
+  hardLink( o );
   test.identical( o.srcPath, srcPath );
   test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
   test.identical( provider.pathResolveSoftLink( srcPath ), test.context.globalFromPreferred( '../src' ) );
-  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromPreferred( '../dst' ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromPreferred( srcPath ) );
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
@@ -29218,7 +29200,7 @@ function hardLinkSoftLinkResolving( test )
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
   test.close( 'self cycled' );
-
+  
   /* */
 
   test.open( 'cycled' );
@@ -29230,17 +29212,15 @@ function hardLinkSoftLinkResolving( test )
   provider.softLink({ dstPath : dstPath, srcPath : dstPath2, allowingMissed : 1 });
   provider.softLink({ dstPath : dstPath2, srcPath : dstPath, allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 0 };
-  test.shouldThrowError( () => hardLink( o ) );
-  test.identical( o.srcPath, srcPath );
-  test.identical( o.dstPath, dstPath );
+  hardLink( o )
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( srcPath2 ) );
   test.is( provider.isSoftLink( dstPath ) );
   test.is( provider.isSoftLink( dstPath2 ) );
+  test.identical( provider.pathResolveSoftLink( srcPath ), srcPath2 );
   test.identical( provider.pathResolveSoftLink( srcPath2 ), srcPath );
-  test.identical( provider.pathResolveSoftLink( dstPath ), dstPath2 );
+  test.identical( provider.pathResolveSoftLink( dstPath ), srcPath );
   test.identical( provider.pathResolveSoftLink( dstPath2 ), dstPath );
-  test.identical( provider.pathResolveLinkFull( dstPath ).absolutePath, dstPath );
 
   provider.filesDelete( routinePath );
   provider.dirMake( routinePath );
@@ -29270,15 +29250,13 @@ function hardLinkSoftLinkResolving( test )
   provider.softLink({ dstPath : dstPath, srcPath : dstPath2, allowingMissed : 1 });
   provider.softLink({ dstPath : dstPath2, srcPath : dstPath, allowingMissed : 1 });
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 1 };
-  test.shouldThrowError( () => hardLink( o ) );
-  test.identical( o.srcPath, srcPath );
-  test.identical( o.dstPath, dstPath );
+  hardLink( o )
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( srcPath2 ) );
   test.is( provider.isSoftLink( dstPath ) );
   test.is( provider.isSoftLink( dstPath2 ) );
   test.identical( provider.pathResolveSoftLink( srcPath ), srcPath2 );
-  test.identical( provider.pathResolveSoftLink( dstPath ), dstPath2 );
+  test.identical( provider.pathResolveSoftLink( dstPath ), srcPath );
   test.identical( provider.pathResolveSoftLink( srcPath2 ), srcPath );
   test.identical( provider.pathResolveSoftLink( dstPath2 ), dstPath );
   //test.identical( provider.statResolvedRead( srcPath ), null );
@@ -29306,7 +29284,7 @@ function hardLinkSoftLinkResolving( test )
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
   test.close( 'cycled' );
-
+  
   /**/
 
   test.open( 'links to same file' );
@@ -29316,13 +29294,13 @@ function hardLinkSoftLinkResolving( test )
   provider.softLink( srcPath, srcPathTerminal );
   provider.softLink( dstPath, srcPathTerminal );
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 0 };
-  test.shouldThrowError( () => hardLink( o ) );
+  hardLink( o );
   test.identical( o.srcPath, srcPath );
   test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
   test.identical( provider.pathResolveSoftLink( srcPath ), srcPathTerminal );
-  test.identical( provider.pathResolveSoftLink( dstPath ), srcPathTerminal );
+  test.identical( provider.pathResolveSoftLink( dstPath ), srcPath );
   test.identical( provider.fileRead( dstPath ), srcPathTerminal );
 
   provider.filesDelete( routinePath );
@@ -29331,35 +29309,22 @@ function hardLinkSoftLinkResolving( test )
   provider.softLink( dstPath, srcPathTerminal );
   var o = { resolvingSrcSoftLink : 1, resolvingDstSoftLink : 0 };
   hardLink( o );
-  test.identical( o.srcPath, srcPathTerminal );
-  test.identical( o.dstPath, dstPath );
   test.is( provider.isSoftLink( srcPath ) );
-  test.is( !provider.isSoftLink( dstPath ) );
-  test.is( provider.isHardLink( dstPath ) );
+  test.is( provider.isSoftLink( dstPath ) );
   test.identical( provider.pathResolveSoftLink( srcPath ), srcPathTerminal );
-  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  test.identical( provider.filesAreHardLinked( dstPath, srcPathTerminal ), hardLinked );
-  else
-  test.identical( provider.filesAreHardLinked( dstPath, srcPathTerminal ), true );
-  test.identical( provider.fileRead( dstPath ), srcPathTerminal );
+  test.identical( provider.pathResolveSoftLink( dstPath ), srcPathTerminal );
 
   provider.filesDelete( routinePath );
   provider.fileWrite( srcPathTerminal, srcPathTerminal );
   provider.softLink( srcPath, srcPathTerminal );
   provider.softLink( dstPath, srcPathTerminal );
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 1 };
-  var srcTerminalStat1 = provider.statRead( srcPathTerminal );
-  test.shouldThrowError( () => hardLink( o ) );
-  var srcTerminalStat2 = provider.statRead( srcPathTerminal );
-  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  test.identical( srcTerminalStat1.mtime.getTime(),srcTerminalStat2.mtime.getTime() )
-  test.identical( o.srcPath, srcPath );
-  test.identical( o.dstPath, srcPathTerminal );
+  hardLink( o );
   test.is( provider.isSoftLink( srcPath ) );
   test.is( provider.isSoftLink( dstPath ) );
   test.identical( provider.pathResolveSoftLink( srcPath ), srcPathTerminal );
   test.identical( provider.pathResolveSoftLink( dstPath ), srcPathTerminal );
-  test.identical( provider.fileRead( dstPath ), srcPathTerminal );
+  test.identical( provider.pathResolveSoftLink( srcPathTerminal ), srcPath );
 
   provider.filesDelete( routinePath );
   provider.fileWrite( srcPathTerminal, srcPathTerminal );
@@ -30465,7 +30430,8 @@ function isDir( test )
   test.identical( got, false )
   var got = provider.statRead( o );
   test.identical( got.isTerminal(), true );
-  test.identical( got.isHardLink(), true );
+  test.identical( got.isTextLink(), true );
+  test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isDirectory(), false );
 
@@ -30899,7 +30865,8 @@ function isTerminal( test )
   test.identical( got, true )
   var got = provider.statRead( o );
   test.identical( got.isTerminal(), true );
-  test.identical( got.isHardLink(), true );
+  test.identical( got.isTextLink(), true );
+  test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
 
   test.case = 'soft to hardLink'
@@ -31593,7 +31560,7 @@ function isTerminal( test )
   test.identical( got, true )
   var got = provider.statRead( _.mapExtend( null, o ) );
   test.identical( got.isTerminal(), true );
-  test.identical( got.isHardLink(), true );
+  test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isTextLink(), true );
 
@@ -32126,7 +32093,8 @@ function isSoftLink( test )
   test.identical( got, false )
   var got = provider.statRead( o );
   test.identical( got.isTerminal(), true );
-  test.identical( got.isHardLink(), true );
+  test.identical( got.isHardLink(), false );
+  test.identical( got.isTextLink(), true );
   test.identical( got.isSoftLink(), false );
 
   test.case = 'soft to hardLink'
@@ -33068,10 +33036,11 @@ function isHardLink( test )
   provider.hardLink( linkPath, linkPath2 );
   var o = { filePath : linkPath, resolvingTextLink : 0, resolvingSoftLink : 0 };
   var got = provider.isHardLink( o );
-  test.identical( got, true )
+  test.identical( got, false )
   var got = provider.statRead( o );
   test.identical( got.isTerminal(), true );
-  test.identical( got.isHardLink(), true );
+  test.identical( got.isHardLink(), false );
+  test.identical( got.isTextLink(), true );
   test.identical( got.isSoftLink(), false );
 
   test.case = 'soft to hardLink'
@@ -35094,7 +35063,7 @@ function isLink( test )
   test.identical( got, true )
   var got = provider.statRead( _.mapExtend( null, o ) );
   test.identical( got.isTerminal(), true );
-  test.identical( got.isHardLink(), true );
+  test.identical( got.isHardLink(), false );
   test.identical( got.isSoftLink(), false );
   test.identical( got.isTextLink(), true );
   test.identical( got.isDirectory(), false );
@@ -37853,8 +37822,8 @@ function pathResolveLinkTailChain( test )
   provider.softLink( linkPath, linkPath2 );
   var o = _.mapExtend( null, o1, { filePath : linkPath } );
   provider.pathResolveLinkTailChain( o );
-  test.identical( o.result, [ linkPath, linkPath2, filePath ] )
-  test.identical( o.found, [ linkPath, linkPath2, filePath ] )
+  test.identical( o.result, [ linkPath, linkPath2, linkPath3, filePath ] )
+  test.identical( o.found, [ linkPath, linkPath2, linkPath3, filePath ] )
 
   test.case = 'relative soft-hard-text-file';
   provider.filesDelete( self.provider.path.dir( filePath ) );
@@ -37864,8 +37833,8 @@ function pathResolveLinkTailChain( test )
   provider.softLink( linkPath, provider.path.relative( linkPath, linkPath2 ) );
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 0 } );
   provider.pathResolveLinkTailChain( o );
-  test.identical( o.result, [ linkPath, linkPath2, filePath ] )
-  test.identical( o.found, [ linkPath, linkPath2, filePath ] )
+  test.identical( o.result, [ linkPath, linkPath2, linkPath3, filePath ] )
+  test.identical( o.found, [ linkPath, linkPath2, linkPath3, filePath ] )
 
   test.case = 'relative soft-hard-text-file';
   provider.filesDelete( self.provider.path.dir( filePath ) );
@@ -37875,8 +37844,8 @@ function pathResolveLinkTailChain( test )
   provider.softLink( linkPath, provider.path.relative( linkPath, linkPath2 ) );
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   provider.pathResolveLinkTailChain( o );
-  test.identical( o.found, [ linkPath, linkPath2, filePath ] )
-    test.identical( o.result, [ linkPath, test.context.globalFromPreferred( '../link2' ), filePath ]  )
+  test.identical( o.found, [ linkPath, linkPath2, linkPath3,filePath ] )
+  test.identical( o.result, [ linkPath, test.context.globalFromPreferred( '../link2' ), linkPath3,filePath ]  )
 
   // /* chain, resolvingHeadDirectories : [ 0, 1 ] */
 

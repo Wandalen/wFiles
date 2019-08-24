@@ -678,7 +678,7 @@ function filesReflectSingle_body( o )
   _.assert( o.srcPath === undefined );
   // _.assert( o.filter === null || !o.filter.hasFiltering(), 'Not supported options' );
   _.assert( o.filter === undefined );
-  _.assert( !!o.recursive, 'Not supported options' );
+  // _.assert( !!o.recursive, 'Not supported options' );
 
   /* */
 

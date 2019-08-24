@@ -5882,7 +5882,7 @@ function _link_functor( fop )
     
     function pathsLocalizeSync()
     {
-      if( self instanceof _.FileProvider.Hub )
+      if( self instanceof _.FileProvider.System )
       return;
       
       if( self.path.isGlobal( o.dstPath ) )

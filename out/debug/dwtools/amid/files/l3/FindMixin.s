@@ -3053,6 +3053,7 @@ function filesReflectEvaluate_body( o )
       ({
         effectiveProvider : dstOptions.filter.effectiveProvider,
         system : dstOptions.filter.system,
+        recursive : 2,
       });
       filter2.filePath = null;
       filter2.basePath = record.dst.factory.basePath;
@@ -3155,6 +3156,7 @@ function filesReflectEvaluate_body( o )
       dstOptions2.filter.filePath = null;
       dstOptions2.filter.filePath = null;
       dstOptions2.filter.basePath = record.dst.factory.basePath;
+      dstOptions2.filter.recursive = 2;
       dstOptions2.mandatory = 0;
       dstOptions2.includingDefunct = 0;
       dstOptions2.onUp = [ _.routineJoin( null, handleDstUp, [ record.src.factory, 'dstDeleting', null ] ) ];

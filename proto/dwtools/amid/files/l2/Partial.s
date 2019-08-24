@@ -5979,7 +5979,7 @@ function _link_functor( fop )
           let resolved = self.pathResolveLinkFull( o2 );
           o.srcPath = resolved.absolutePath;
           if( path.isRelative( resolved.relativePath ) )
-          o.relativeSrcPath = resolved.relativePath;
+          o.relativeSrcPath = path.relative( o.dstPath, resolved.absolutePath );
 
           c.srcStat = o2.stat;
 
@@ -6072,6 +6072,8 @@ function _link_functor( fop )
             o.srcPath = resolved.absolutePath;
             o.relativeSrcPath = resolved.relativePath;
             // o.srcPath = resolved.filePath;
+            if( path.isRelative( resolved.relativePath ) )
+            o.relativeSrcPath = path.relative( o.dstPath, resolved.absolutePath );
             c.srcStat = o2.stat;
             return true;
           })

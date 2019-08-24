@@ -5980,8 +5980,11 @@ function _link_functor( fop )
           o.srcPath = resolved.absolutePath;
           
           if( resolved.relativePath )
-          if( path.isRelative( resolved.relativePath ) )
-          o.relativeSrcPath = path.relative( o.dstPath, resolved.absolutePath );
+          {
+            o.relativeSrcPath = resolved.relativePath;
+            if( path.isRelative( resolved.relativePath ) )
+            o.relativeSrcPath = path.relative( o.dstPath, resolved.absolutePath );
+          }
 
           c.srcStat = o2.stat;
 
@@ -6076,8 +6079,11 @@ function _link_functor( fop )
             // o.srcPath = resolved.filePath;
             
             if( resolved.relativePath )
-            if( path.isRelative( resolved.relativePath ) )
-            o.relativeSrcPath = path.relative( o.dstPath, resolved.absolutePath );
+            {
+              o.relativeSrcPath = resolved.relativePath;
+              if( path.isRelative( resolved.relativePath ) )
+              o.relativeSrcPath = path.relative( o.dstPath, resolved.absolutePath );
+            }
             
             c.srcStat = o2.stat;
             return true;
@@ -6565,7 +6571,159 @@ operates.relativeSrcPath = { pathToRead : 1 }
 function _fileRenameAct( c )
 {
   let self = this;
-  return self.fileRenameAct( c.options2 );
+  let o = c.options;
+  
+  _.assert( _.fileStatIs( c.srcStat ) || c.srcStat === null );
+
+  let srcStat = c.srcStat;
+
+  if( o.resolvingSrcSoftLink || o.resolvingSrcTextLink )
+  if( self.fileExists( c.originalSrcResolvedPath ) )
+  c.srcStat = self.statRead({ filePath : c.originalSrcResolvedPath, sync : 1, resolvingSoftLink : 0, resolvingTextLink : 0 });
+
+  if( c.srcStat === null )
+  return null;
+
+  if( c.srcStat.isSoftLink() )
+  {
+    let chain;
+    
+    if( c.srcResolvedStat === null && o.resolvingSrcSoftLink === 2 )
+    return null;
+    
+    if( !o.resolvingSrcSoftLink )
+    { 
+      chain = { result : [ c.originalSrcResolvedPath ], found : [ c.originalSrcResolvedPath ] }
+      let resolved = self.pathResolveSoftLink( c.originalSrcResolvedPath );
+      chain.result.push( resolved );
+      if( self.path.isRelative( resolved ) )
+      resolved = self.path.resolve( c.originalSrcResolvedPath )
+      chain.found.push( resolved );
+    }
+    else
+    { 
+      chain = 
+      { 
+        filePath : c.originalSrcResolvedPath, 
+        resolvingSoftLink : o.resolvingSrcSoftLink, 
+        resolvingTextLink : o.resolvingSrcTextLink,
+        allowingCycled : o.allowingCycled,
+        allowingMissed : o.allowingMissed,
+        preservingRelative : 1,
+        throwing : 1
+      }
+      self.pathResolveLinkTailChain( chain );
+      
+      if( c.srcResolvedStat === null )
+      { 
+        _.assert( chain.found[ chain.found.length -1 ] === null );
+        _.assert( chain.result[ chain.result.length -1 ] === null );
+        chain.found.pop();
+        chain.result.pop();
+      }
+    }
+    
+    o.srcPath = chain.found.pop();
+    o.relativeSrcPath = chain.result.pop()
+    
+    if( o.resolvingSrcSoftLink === 2 )
+    { 
+      c.options2.srcPath = o.srcPath;
+      c.options2.relativeSrcPath = o.relativeSrcPath;
+      self.fileRenameAct( c.options2 );
+    }
+    else
+    {
+      self.softLinkAct
+      ({
+        dstPath : o.dstPath,
+        srcPath : o.srcPath,
+        relativeDstPath : o.relativeDstPath,
+        relativeSrcPath : o.relativeSrcPath,
+        sync : o.sync,
+        type : null,
+      });
+    }
+   
+    _.each( chain.found, ( path ) => 
+    {
+      self.fileDelete( path );
+    })
+    
+    return true;
+  }
+  else if( c.srcStat.isTextLink() )
+  {
+    let chain;
+    
+    if( c.srcResolvedStat === null && o.resolvingSrcTextLink === 2 )
+    return null;
+    
+    if( !o.resolvingSrcTextLink )
+    { 
+      chain = { result : [ c.originalSrcResolvedPath ], found : [ c.originalSrcResolvedPath ] }
+      let resolved = self.pathResolveTextLink( c.originalSrcResolvedPath );
+      chain.result.push( resolved );
+      if( self.path.isRelative( resolved ) )
+      resolved = self.path.resolve( c.originalSrcResolvedPath )
+      chain.found.push( resolved );
+    }
+    else
+    { 
+      chain = 
+      { 
+        filePath : c.originalSrcResolvedPath, 
+        resolvingSoftLink : o.resolvingSrcSoftLink, 
+        resolvingTextLink : o.resolvingSrcTextLink,
+        allowingCycled : o.allowingCycled,
+        allowingMissed : o.allowingMissed,
+        preservingRelative : 1,
+        throwing : 1
+      }
+      self.pathResolveLinkTailChain( chain );
+      
+      if( c.srcResolvedStat === null )
+      { 
+        _.assert( chain.found[ chain.found.length -1 ] === null );
+        _.assert( chain.result[ chain.result.length -1 ] === null );
+        chain.found.pop();
+        chain.result.pop();
+      }
+    }
+    
+    o.srcPath = chain.found.pop();
+    o.relativeSrcPath = chain.result.pop()
+    
+    if( o.resolvingSrcTextLink === 2 )
+    { 
+      c.options2.srcPath = o.srcPath;
+      c.options2.relativeSrcPath = o.relativeSrcPath;
+      self.fileRenameAct( c.options2 );
+    }
+    else
+    {
+      self.softLinkAct
+      ({
+        dstPath : o.dstPath,
+        srcPath : o.srcPath,
+        relativeDstPath : o.relativeDstPath,
+        relativeSrcPath : o.relativeSrcPath,
+        sync : o.sync,
+        type : null,
+      });
+    }
+   
+    _.each( chain.found, ( path ) => 
+    {
+      self.fileDelete( path );
+    })
+    
+    return true;
+  }
+  else
+  {
+    return self.fileRenameAct( c.options2 );
+  }
 }
 
 _.routineExtend( _fileRenameAct, fileRenameAct );

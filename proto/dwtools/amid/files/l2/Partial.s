@@ -5556,11 +5556,11 @@ function _link_functor( fop )
       if( _.longIs( o.dstPath ) && c.linkAct.having.hardLinking )
       return _linkMultiple.call( self, o, _link_body );
       _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
-      
+
       c.pathsLocalize();
       if( c.ended )
       return c.end();
-      
+
       c.pathResolve();
       if( c.ended )
       return c.end();
@@ -5664,7 +5664,7 @@ function _link_functor( fop )
           return true;
         }
         _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
-        
+
         c.pathsLocalize();
         c.pathResolve();
         c.linksResolve();
@@ -5879,20 +5879,20 @@ function _link_functor( fop )
     }
 
     /* - */
-    
+
     function pathsLocalizeSync()
     {
       if( self instanceof _.FileProvider.System )
       return;
-      
+
       if( self.path.isGlobal( o.dstPath ) )
-      { 
+      {
         let dstParsed = _.uri.parse( o.dstPath );
         if( dstParsed.protocol && !_.arrayHas( self.protocols, dstParsed.protocol ) )
         c.error( 'File provider ' + self.nickName + ' does not support protocol ' + _.strQuote( globalPath.protocol ) );
         o.dstPath = dstParsed.longPath;
       }
-      
+
       if( self.path.isGlobal( o.srcPath ) )
       {
         let srcParsed = _.uri.parse( o.srcPath );
@@ -5900,9 +5900,9 @@ function _link_functor( fop )
         o.srcPath = srcParsed.longPath;
       }
     }
-    
+
     /* - */
-    
+
     function pathsLocalizeAsync()
     {
       c.con1.then( () =>
@@ -5911,7 +5911,7 @@ function _link_functor( fop )
         return null;
       });
     }
-    
+
     /* - */
 
     function pathResolve()
@@ -5978,7 +5978,7 @@ function _link_functor( fop )
 
       try
       {
-      
+
         _.assert( path.isAbsolute( o.srcPath ) );
         _.assert( path.isAbsolute( o.dstPath ) );
 
@@ -6018,7 +6018,7 @@ function _link_functor( fop )
           // o.srcPath = self.pathResolveLinkFull( o2 ).filePath;
           let resolved = self.pathResolveLinkFull( o2 );
           o.srcPath = resolved.absolutePath;
-          
+
           if( resolved.relativePath )
           {
             if( path.isRelative( resolved.relativePath ) || path.isRelative( o.relativeSrcPath ) )
@@ -6111,14 +6111,14 @@ function _link_functor( fop )
             sync : 0,
             throwing : o.throwing
           }
-          
+
           return self.pathResolveLinkFull( o2 )
           .then( ( resolved ) =>
-          { 
+          {
             o.srcPath = resolved.absolutePath;
             // o.relativeSrcPath = resolved.relativePath;
             // o.srcPath = resolved.filePath;
-            
+
             if( resolved.relativePath )
             {
               if( path.isRelative( resolved.relativePath ) || path.isRelative( o.relativeSrcPath ) )
@@ -6126,7 +6126,7 @@ function _link_functor( fop )
               else
               o.relativeSrcPath = resolved.relativePath;
             }
-            
+
             c.srcStat = o2.stat;
             return true;
           })
@@ -6397,9 +6397,9 @@ function _link_functor( fop )
       //   if( srcStat )
       //   return;
       // }
-      
+
       c.dstStat = c.onStat( dstPath, 1 );
-      
+
       if( !c.dstStat )
       {
         c.dstStat = c.onStat( dstPath, 0 );
@@ -6414,7 +6414,7 @@ function _link_functor( fop )
         let err = `Faield to ${entryMethodName} ${o.dstPath} from ${o.srcPath}. Destination file does not exist.`;
         throw _.err( err );
       }
-      
+
       //qqq: find better solution to check text links
       if( srcStat.isTextLink() && c.dstStat.isTextLink() )
       if( self.filesAreTextLinked([ c.dstStat.filePath, srcStat.filePath ]) )
@@ -6617,7 +6617,7 @@ function _fileRenameAct( c )
 {
   let self = this;
   let o = c.options;
-  
+
   _.assert( _.fileStatIs( c.srcStat ) || c.srcStat === null );
 
   let srcStat = c.srcStat;
@@ -6632,12 +6632,12 @@ function _fileRenameAct( c )
   if( c.srcStat.isSoftLink() )
   {
     let chain;
-    
+
     if( c.srcResolvedStat === null && o.resolvingSrcSoftLink === 2 )
     return null;
-    
+
     if( !o.resolvingSrcSoftLink )
-    { 
+    {
       chain = { result : [ c.originalSrcResolvedPath ], found : [ c.originalSrcResolvedPath ] }
       let resolved = self.pathResolveSoftLink( c.originalSrcResolvedPath );
       chain.result.push( resolved );
@@ -6646,11 +6646,11 @@ function _fileRenameAct( c )
       chain.found.push( resolved );
     }
     else
-    { 
-      chain = 
-      { 
-        filePath : c.originalSrcResolvedPath, 
-        resolvingSoftLink : o.resolvingSrcSoftLink, 
+    {
+      chain =
+      {
+        filePath : c.originalSrcResolvedPath,
+        resolvingSoftLink : o.resolvingSrcSoftLink,
         resolvingTextLink : o.resolvingSrcTextLink,
         allowingCycled : o.allowingCycled,
         allowingMissed : o.allowingMissed,
@@ -6658,16 +6658,16 @@ function _fileRenameAct( c )
         throwing : 1
       }
       self.pathResolveLinkTailChain( chain );
-      
+
       if( c.srcResolvedStat === null )
-      { 
+      {
         _.assert( chain.found[ chain.found.length -1 ] === null );
         _.assert( chain.result[ chain.result.length -1 ] === null );
         chain.found.pop();
         chain.result.pop();
       }
     }
-    
+
     o.srcPath = chain.found.pop();
     o.relativeSrcPath = chain.result.pop()
     
@@ -6705,12 +6705,12 @@ function _fileRenameAct( c )
   else if( c.srcStat.isTextLink() )
   {
     let chain;
-    
+
     if( c.srcResolvedStat === null && o.resolvingSrcTextLink === 2 )
     return null;
-    
+
     if( !o.resolvingSrcTextLink )
-    { 
+    {
       chain = { result : [ c.originalSrcResolvedPath ], found : [ c.originalSrcResolvedPath ] }
       let resolved = self.pathResolveTextLink( c.originalSrcResolvedPath );
       chain.result.push( resolved );
@@ -6719,11 +6719,11 @@ function _fileRenameAct( c )
       chain.found.push( resolved );
     }
     else
-    { 
-      chain = 
-      { 
-        filePath : c.originalSrcResolvedPath, 
-        resolvingSoftLink : o.resolvingSrcSoftLink, 
+    {
+      chain =
+      {
+        filePath : c.originalSrcResolvedPath,
+        resolvingSoftLink : o.resolvingSrcSoftLink,
         resolvingTextLink : o.resolvingSrcTextLink,
         allowingCycled : o.allowingCycled,
         allowingMissed : o.allowingMissed,
@@ -6731,16 +6731,16 @@ function _fileRenameAct( c )
         throwing : 1
       }
       self.pathResolveLinkTailChain( chain );
-      
+
       if( c.srcResolvedStat === null )
-      { 
+      {
         _.assert( chain.found[ chain.found.length -1 ] === null );
         _.assert( chain.result[ chain.result.length -1 ] === null );
         chain.found.pop();
         chain.result.pop();
       }
     }
-    
+
     o.srcPath = chain.found.pop();
     o.relativeSrcPath = chain.result.pop()
     
@@ -7139,21 +7139,21 @@ function _hardLinkVerify2( c )
 {
   let self = this;
   let o = c.options;
-  
+
   if( c.srcStat === undefined )
   c.srcStat = self.statRead({ filePath : o.srcPath, sync : 1 });
-  
+
   let srcStat = c.srcStat;
-  
+
   if( o.resolvingSrcSoftLink || o.resolvingSrcTextLink )
   if( self.fileExists( c.originalSrcResolvedPath ) )
   c.srcStat = self.statRead({ filePath : c.originalSrcResolvedPath, sync : 1, resolvingSoftLink : 0, resolvingTextLink : 0 });
-  
+
   if( c.srcStat && c.srcStat.isLink() )
   return;
-  
+
   _.assert( o.allowingMissed === 0 || _.longIs( o.dstPath ), 'o.allowingMissed could be disabled when linking two files' );
-  
+
   if( srcStat === null )
   {
     c.error( _.err( 'Source file should exist.' ) );
@@ -7174,7 +7174,7 @@ function _hardLinkAct( c )
 {
   let self = this;
   let o = c.options;
-  
+
   _.assert( _.fileStatIs( c.srcStat ) || c.srcStat === null );
 
   if( c.srcStat === null )
@@ -7227,9 +7227,9 @@ function _hardLinkAct( c )
   }
 
   /* */
-  
+
   function act()
-  { 
+  {
     if( o.resolvingSrcSoftLink === 2 || o.resolvingSrcTextLink === 2 )
     {
       if( c.srcResolvedStat.isDir() )
@@ -7239,9 +7239,9 @@ function _hardLinkAct( c )
         sync : o.sync
       })
     }
-    
+
     //
-    
+
     if( c.options.breakingSrcHardLink )
     if( !self.fileExists( c.options2.dstPath ) )
     {
@@ -7261,7 +7261,7 @@ function _hardLinkAct( c )
         c.options2.srcPath = dstPath;
       }
     }
-  
+
     return self.hardLinkAct( c.options2 );
   }
 }

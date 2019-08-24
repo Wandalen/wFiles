@@ -2259,9 +2259,7 @@ function filesReflectEvaluate_body( o )
 
   /* find */
 
-  debugger;
   let found = self.filesFind( srcOptions );
-  debugger;
   o.visitedMap = srcOptions.visitedMap;
 
   return o.result;
@@ -3857,8 +3855,8 @@ function filesReflectSingle_body( o )
     let srcAbsolute = record.src.real;
     /* xxx qqq : use ( resolvingMultiple / recursive ) option instead of if-else */
 
-    // if( _.strHas( srcAbsolute, 'dirLink' ) )
-    // debugger;
+    if( _.strHas( srcAbsolute, 'terLink' ) )
+    debugger;
 
     if( o.rebasingLink === 2 || o.resolvingSrcSoftLink === 2 )
     {
@@ -5141,6 +5139,8 @@ function filesDelete_body( o )
 
   function deleteEmptyDirs()
   {
+
+    debugger;
     if( !o.result.length )
     return true;
 
@@ -5171,6 +5171,7 @@ function filesDelete_body( o )
       let file = factory.record( dirPath );
       file.isActual = true;
       file.isTransient = true;
+      file.included = true;
 
       filesMap[ dirPath ] = file;
 
@@ -5237,7 +5238,9 @@ function filesDeleteTerminals_body( o )
   if( _.arrayIs( o2.onDown ) )
   o2.onDown = _.routinesComposeReturningLast( o2.onDown );
 
+  debugger;
   let files = self.filesFind.body.call( self, o2 );
+  debugger;
 
   return files;
 
@@ -5245,13 +5248,20 @@ function filesDeleteTerminals_body( o )
 
   function handleDown( record )
   {
-    if( o.writing && record.included )
-    self.fileDelete({ filePath : record.absolute, throwing : o.throwing, verbosity : o.verbosity });
+    debugger;
+    if( o.writing )
+    if( record.isActual && record.isTerminal && record.included )
+    self.fileDelete
+    ({
+      filePath : record.absolute,
+      throwing : o.throwing,
+      verbosity : o.verbosity,
+    });
   }
 
 }
 
-_.routineExtend( filesDeleteTerminals_body, filesDelete );
+_.routineExtend( filesDeleteTerminals_body, filesDelete.body );
 
 var defaults = filesDeleteTerminals_body.defaults;
 
@@ -5260,7 +5270,7 @@ defaults.includingTerminals = 1;
 defaults.includingDirs = 0;
 defaults.includingTransient = 0;
 
-let filesDeleteTerminals = _.routineFromPreAndBody( filesFind.pre, filesDeleteTerminals_body );
+let filesDeleteTerminals = _.routineFromPreAndBody( filesFindRecursive.pre, filesDeleteTerminals_body );
 
 //
 
@@ -5330,7 +5340,7 @@ defaults.outputFormat = 'absolute';
 defaults.includingTerminals = 0;
 defaults.includingDirs = 1;
 defaults.includingTransient = 0;
-defaults.recursive = 2;
+// defaults.recursive = 2;
 
 let filesDeleteEmptyDirs = _.routineFromPreAndBody( filesFindRecursive.pre, filesDeleteEmptyDirs_body );
 
@@ -5338,12 +5348,13 @@ let filesDeleteEmptyDirs = _.routineFromPreAndBody( filesFindRecursive.pre, file
 // other find
 // --
 
-function softLinksBreak( o )
+function softLinksBreak_body( o )
 {
   let self = this;
 
-  o = self.filesFind.pre.call( self, softLinksBreak, arguments );
+  // o = self.filesFind.pre.call( self, softLinksBreak, arguments );
 
+  _.assertRoutineOptions( softLinksBreak_body, arguments );
   _.assert( o.outputFormat === 'record' );
 
   /* */
@@ -5367,21 +5378,29 @@ function softLinksBreak( o )
   return files;
 }
 
-_.routineExtend( softLinksBreak, filesFind );
+// _.routineExtend( softLinksBreak, filesFind );
 
-var defaults = softLinksBreak.defaults;
+// var defaults = softLinksBreak_body.defaults;
+
+_.routineExtend( softLinksBreak_body, filesFind.body );
+
+var defaults = softLinksBreak_body.defaults;
+
 defaults.outputFormat = 'record';
 defaults.breakingSoftLink = 1;
 defaults.breakingTextLink = 0;
-defaults.recursive = 2;
+// defaults.recursive = 2;
+
+let softLinksBreak = _.routineFromPreAndBody( filesFindRecursive.pre, softLinksBreak_body );
 
 //
 
-function softLinksRebase( o )
+function softLinksRebase_body( o )
 {
   let self = this;
-  o = self.filesFind.pre.call( self, softLinksRebase, arguments );
+  // o = self.filesFind.pre.call( self, softLinksRebase, arguments );
 
+  _.assertRoutineOptions( softLinksRebase_body, arguments );
   _.assert( o.outputFormat === 'record' );
   _.assert( !o.resolvingSoftLink );
 
@@ -5415,14 +5434,20 @@ function softLinksRebase( o )
   return files;
 }
 
-_.routineExtend( softLinksRebase, filesFind );
+_.routineExtend( softLinksRebase_body, filesFind.body );
 
-var defaults = softLinksRebase.defaults;
+var defaults = softLinksRebase_body.defaults;
+
+// _.routineExtend( softLinksRebase, filesFind );
+// var defaults = softLinksRebase_body.defaults;
+
 defaults.outputFormat = 'record';
 defaults.oldPath = null;
 defaults.newPath = null;
-defaults.recursive = 2;
+// defaults.recursive = 2;
 defaults.resolvingSoftLink = 0;
+
+let softLinksRebase = _.routineFromPreAndBody( filesFindRecursive.pre, softLinksRebase_body );
 
 //
 

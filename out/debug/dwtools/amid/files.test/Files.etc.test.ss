@@ -2,8 +2,6 @@
 
 'use strict';
 
-// return; /* deprecated */
-
 if( typeof module !== 'undefined' )
 {
 
@@ -387,12 +385,12 @@ function filesNewer( test )
   test.identical( got, file2 );
 
   test.case = 'one files modified after creation';
-  _.fileProvider.fileTimeSet( file1, _.timeNow(), _.timeNow() );
+  _.fileProvider.fileTimeSet( file1, _.timeNow() / 1000, _.timeNow() / 1000 );
   var got = _.files.filesNewer( file2, file1 );
   test.identical( got, file1 );
 
   test.case = 'two files modified at the same time';
-  let timeSet = _.timeNow();
+  let timeSet = _.timeNow() / 1000;
   _.fileProvider.fileTimeSet( file1, timeSet, timeSet );
   _.fileProvider.fileTimeSet( file2, timeSet, timeSet );
   var got = _.files.filesNewer( file1, file2 );
@@ -467,12 +465,12 @@ function filesOlder( test )
   test.identical( got, file1 );
 
   test.case = 'one files modified after creation';
-  _.fileProvider.fileTimeSet( file1, _.timeNow(), _.timeNow() );
+  _.fileProvider.fileTimeSet( file1, _.timeNow() / 1000, _.timeNow() / 1000 );
   var got = _.files.filesOlder( file2, file1 );
   test.identical( got, file2 );
 
   test.case = 'two files modified at the same time';
-  let timeSet = _.timeNow();
+  let timeSet = _.timeNow() / 1000;
   _.fileProvider.fileTimeSet( file1, timeSet, timeSet );
   _.fileProvider.fileTimeSet( file2, timeSet, timeSet );
   var got = _.files.filesOlder( file1, file2 );
@@ -3072,7 +3070,7 @@ function filesAreUpToDate2( test )
   {
     src : [ file3, file4 ],
     dst : [ file1, file2 ],
-    youngerThan : new Date( 2019, 7, 17),
+    youngerThan : new Date( 2100, 7, 17),
     verbosity : 3
   };
   var got = _.fileProvider.filesAreUpToDate2( map );

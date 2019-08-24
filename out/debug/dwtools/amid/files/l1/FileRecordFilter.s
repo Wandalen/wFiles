@@ -135,7 +135,7 @@ function form()
 
 function _formAssociations()
 {
-  let filter = this; debugger;
+  let filter = this;
 
   /* find file system */
 
@@ -3754,19 +3754,32 @@ function pathLocalize( filePath )
   let filter = this;
   let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
+  let isGlobal = path.isGlobal( filePath );
 
   _.assert( _.strIs( filePath ) );
 
-  if( _.strHas( filePath, 'git+https' ) )
-  debugger;
-
   filePath = path.canonize( filePath );
 
-  if( filter.effectiveProvider && !path.isGlobal( filePath ) )
+  if( filter.effectiveProvider && !isGlobal )
   return filePath;
 
-  let effectiveProvider2 = fileProvider.providerForPath( filePath );
-  _.assert( filter.effectiveProvider === null || effectiveProvider2 === null || filter.effectiveProvider === effectiveProvider2, 'Record filter should have paths of single file provider' );
+  let effectiveProvider2;
+
+  if( !isGlobal && filter.defaultProvider && !( filter.defaultProvider instanceof _.FileProvider.System ) )
+  {
+    effectiveProvider2 = filter.defaultProvider
+  }
+  else
+  {
+    effectiveProvider2 = fileProvider.providerForPath( filePath );
+  }
+
+  _.assert
+  (
+    filter.effectiveProvider === null || effectiveProvider2 === null || filter.effectiveProvider === effectiveProvider2,
+    'Record filter should have paths of single file provider'
+  );
+
   filter.effectiveProvider = filter.effectiveProvider || effectiveProvider2;
 
   if( filter.effectiveProvider )
@@ -3779,7 +3792,7 @@ function pathLocalize( filePath )
 
   }
 
-  if( !path.isGlobal( filePath ) )
+  if( !isGlobal )
   return filePath;
 
   _.assert( !path.isTrailed( filePath ) );

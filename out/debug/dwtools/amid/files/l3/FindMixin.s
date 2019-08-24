@@ -2135,7 +2135,7 @@ function _filesFiltersPrepare( routine, o )
   o.src.recursive = 2;
   // if( o.src.recursive === null )
   // o.src.recursive = o.recursive;
-  if( o.dst.recursive === null )
+  // if( o.dst.recursive === null )
   o.dst.recursive = 2;
 
   /* */
@@ -2259,8 +2259,9 @@ function filesReflectEvaluate_body( o )
 
   /* find */
 
+  debugger;
   let found = self.filesFind( srcOptions );
-
+  debugger;
   o.visitedMap = srcOptions.visitedMap;
 
   return o.result;

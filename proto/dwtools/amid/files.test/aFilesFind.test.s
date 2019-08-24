@@ -14422,7 +14422,30 @@ function filesReflectRecursive( test )
     src : { a1 : '1', dir1 : { a2 : '2', dir2 : { a3 : '3' } } },
   }
 
-  //
+  /* */
+
+  var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
+  var o =
+  {
+    src : { recursive/**/ : 0 },
+    reflectMap : { '/src' : '/dst' },
+    writing : 1,
+    dstDeleting : 0,
+    dstRewriting : 0,
+    srcDeleting : 0,
+    includingDirs : 1,
+    includingTerminals : 1,
+    linking : 'fileCopy'
+  }
+  provider.filesReflect( o );
+  var expected =
+  {
+    src : tree.src,
+    dst : {}
+  }
+  test.identical( provider.filesTree, expected );
+
+  /* */
 
   var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
   var o =
@@ -14445,7 +14468,7 @@ function filesReflectRecursive( test )
   }
   test.identical( provider.filesTree, expected );
 
-  //
+  /* */
 
   var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
   var o =
@@ -14468,7 +14491,7 @@ function filesReflectRecursive( test )
   }
   test.identical( provider.filesTree, expected );
 
-  //
+  /* */
 
   var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
   var o =
@@ -14491,7 +14514,7 @@ function filesReflectRecursive( test )
   }
   test.identical( provider.filesTree, expected );
 
-  //
+  /* */
 
   var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
   var o =
@@ -14514,7 +14537,7 @@ function filesReflectRecursive( test )
   }
   test.identical( provider.filesTree, expected );
 
-  //
+  /* */
 
   var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
   var o =
@@ -14537,7 +14560,7 @@ function filesReflectRecursive( test )
   }
   test.identical( provider.filesTree, expected );
 
-  //
+  /* */
 
   var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
   var o =
@@ -14560,7 +14583,7 @@ function filesReflectRecursive( test )
   }
   test.identical( provider.filesTree, expected );
 
-  //
+  /* - */
 
   if( Config.debug )
   {

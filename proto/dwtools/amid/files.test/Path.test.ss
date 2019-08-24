@@ -491,7 +491,8 @@ function pathsResolve( test )
   test.identical( got, expected );
 
   test.case = 'single array';
-
+  
+  debugger
   var got = _.path.s.resolve( [ '/a', 'b', './b', '../b', '../' ] );
   var expected =
   [
@@ -500,7 +501,7 @@ function pathsResolve( test )
     _.path.join( currentPath, 'b' ),
     _.path.join( _.path.dir( currentPath ), 'b' ),
    
-    _.path.canonize( _.path.dir( currentPath ) )
+    _.path.normalize( _.path.dir( currentPath ) )
     //_.path.normalize( _.path.dir( currentPath ) ),
     // routine normalizeStrict does not exist now
     // _.path.normalizeStrict( _.path.dir( currentPath ) )

@@ -6021,9 +6021,10 @@ function _link_functor( fop )
           
           if( resolved.relativePath )
           {
-            o.relativeSrcPath = resolved.relativePath;
-            if( path.isRelative( resolved.relativePath ) )
+            if( path.isRelative( resolved.relativePath ) || path.isRelative( o.relativeSrcPath ) )
             o.relativeSrcPath = path.relative( o.dstPath, resolved.absolutePath );
+            else
+            o.relativeSrcPath = resolved.relativePath;
           }
 
           c.srcStat = o2.stat;
@@ -6115,14 +6116,15 @@ function _link_functor( fop )
           .then( ( resolved ) =>
           { 
             o.srcPath = resolved.absolutePath;
-            o.relativeSrcPath = resolved.relativePath;
+            // o.relativeSrcPath = resolved.relativePath;
             // o.srcPath = resolved.filePath;
             
             if( resolved.relativePath )
             {
-              o.relativeSrcPath = resolved.relativePath;
-              if( path.isRelative( resolved.relativePath ) )
+              if( path.isRelative( resolved.relativePath ) || path.isRelative( o.relativeSrcPath ) )
               o.relativeSrcPath = path.relative( o.dstPath, resolved.absolutePath );
+              else
+              o.relativeSrcPath = resolved.relativePath;
             }
             
             c.srcStat = o2.stat;
@@ -6626,7 +6628,7 @@ function _fileRenameAct( c )
 
   if( c.srcStat === null )
   return null;
-
+  
   if( c.srcStat.isSoftLink() )
   {
     let chain;
@@ -6669,31 +6671,36 @@ function _fileRenameAct( c )
     o.srcPath = chain.found.pop();
     o.relativeSrcPath = chain.result.pop()
     
-    if( o.resolvingSrcSoftLink === 2 )
+    let con = _.Consequence.Try( () => 
     { 
-      c.options2.srcPath = o.srcPath;
-      c.options2.relativeSrcPath = o.relativeSrcPath;
-      self.fileRenameAct( c.options2 );
-    }
-    else
+      let result;
+      if( o.resolvingSrcSoftLink === 2 )
+      { 
+        c.options2.srcPath = o.srcPath;
+        c.options2.relativeSrcPath = o.relativeSrcPath;
+        result = self.fileRenameAct( c.options2 );
+      }
+      else
+      {
+        result = self.softLinkAct
+        ({
+          dstPath : o.dstPath,
+          srcPath : o.srcPath,
+          relativeDstPath : o.relativeDstPath,
+          relativeSrcPath : o.relativeSrcPath,
+          sync : o.sync,
+          type : null,
+        });
+      }
+      return o.sync ? true : result;
+    })
+    .then( () =>
     {
-      self.softLinkAct
-      ({
-        dstPath : o.dstPath,
-        srcPath : o.srcPath,
-        relativeDstPath : o.relativeDstPath,
-        relativeSrcPath : o.relativeSrcPath,
-        sync : o.sync,
-        type : null,
-      });
-    }
-   
-    _.each( chain.found, ( path ) => 
-    {
-      self.fileDelete( path );
+      _.each( chain.found, ( path ) => self.fileDelete( path ) )
+      return true;
     })
     
-    return true;
+    return con.syncMaybe();
   }
   else if( c.srcStat.isTextLink() )
   {
@@ -6737,31 +6744,36 @@ function _fileRenameAct( c )
     o.srcPath = chain.found.pop();
     o.relativeSrcPath = chain.result.pop()
     
-    if( o.resolvingSrcTextLink === 2 )
+    let con = _.Consequence.Try( () => 
     { 
-      c.options2.srcPath = o.srcPath;
-      c.options2.relativeSrcPath = o.relativeSrcPath;
-      self.fileRenameAct( c.options2 );
-    }
-    else
+      let result;
+      if( o.resolvingSrcTextLink === 2 )
+      { 
+        c.options2.srcPath = o.srcPath;
+        c.options2.relativeSrcPath = o.relativeSrcPath;
+        result = self.fileRenameAct( c.options2 );
+      }
+      else
+      {
+        result = self.textLinkAct
+        ({
+          dstPath : o.dstPath,
+          srcPath : o.srcPath,
+          relativeDstPath : o.relativeDstPath,
+          relativeSrcPath : o.relativeSrcPath,
+          sync : o.sync,
+          type : null,
+        });
+      }
+      return o.sync ? true : result;
+    })
+    .then( () =>
     {
-      self.softLinkAct
-      ({
-        dstPath : o.dstPath,
-        srcPath : o.srcPath,
-        relativeDstPath : o.relativeDstPath,
-        relativeSrcPath : o.relativeSrcPath,
-        sync : o.sync,
-        type : null,
-      });
-    }
-   
-    _.each( chain.found, ( path ) => 
-    {
-      self.fileDelete( path );
+      _.each( chain.found, ( path ) => self.fileDelete( path ) )
+      return true;
     })
     
-    return true;
+    return con.syncMaybe();
   }
   else
   {
@@ -7370,8 +7382,6 @@ operates.relativeSrcPath = { pathToRead : 1 }
 function _softLinkAct( c )
 {
   let self = this;
-  if( _.strHas( c.options2.srcPath, 'file1' ) )
-  debugger
   return self.softLinkAct( c.options2 );
 }
 

@@ -5139,6 +5139,8 @@ function filesDelete_body( o )
 
   function deleteEmptyDirs()
   {
+
+    debugger;
     if( !o.result.length )
     return true;
 
@@ -5169,6 +5171,7 @@ function filesDelete_body( o )
       let file = factory.record( dirPath );
       file.isActual = true;
       file.isTransient = true;
+      file.included = true;
 
       filesMap[ dirPath ] = file;
 

@@ -51,7 +51,7 @@ function onRoutineEnd( test )
   let provider = context.provider;
   let hub = context.hub;
   let path = context.provider.path;
-  _.sure( _.entityIdentical( _.mapKeys( hub.providersWithProtocolMap ), [ 'current' ] ), test.name, 'has not restored hub!' );
+  _.sure( _.arraySetIdentical( _.mapKeys( hub.providersWithProtocolMap ), [ 'second', 'current' ] ), test.name, 'has not restored hub!', hub.providersWithProtocolMap );
 }
 
 //
@@ -9338,6 +9338,8 @@ function fileCopyGlobal( test )
   var dstPathSecond = 'second://' + dstPath;
   
   var dstPathUnknown = 'unknown://' + dstPath;
+  
+  test.identical( provider.protocols, [ 'current', 'second' ] )
   
   /*  */
   
@@ -24473,6 +24475,8 @@ function textLinkGlobal( test )
   
   var dstPathUnknown = 'unknown://' + dstPath;
   
+  provider.fieldPush( 'usingTextLink', 1 )
+  
   /*  */
   
   test.open( 'with hub' );
@@ -24530,6 +24534,8 @@ function textLinkGlobal( test )
   test.shouldThrowErrorSync( () => provider.textLink( dstPathUnknown, srcPath ) );
   test.is( provider.isTerminal( srcPath ) );
   test.is( !provider.fileExists( dstPath ) );
+  
+  provider.fieldPop( 'usingTextLink', 1 )
   
   self.hub.providerRegister( provider );
   
@@ -38152,7 +38158,7 @@ function pathResolveLinkTailChain( test )
   test.identical( o.found, expectedFound);
 
   debugger;
-
+  
   test.case = 'soft-hard-text-file';
   provider.filesDelete( self.provider.path.dir( filePath ) );
   provider.fileWrite( filePath, filePath );

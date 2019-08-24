@@ -5250,7 +5250,7 @@ function filesDeleteTerminals_body( o )
   {
     debugger;
     if( o.writing )
-    if( record.isActual && record.isTerminal && record.included )
+    if( record.isActual && !record.isDirectory && record.included )
     self.fileDelete
     ({
       filePath : record.absolute,

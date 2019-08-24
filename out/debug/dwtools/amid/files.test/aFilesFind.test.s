@@ -28059,7 +28059,7 @@ function filesDeleteTerminals( test )
   var linkPath = path.join( routinePath, 'linkToDir' );
   var dirPath = path.join( routinePath, 'dir1' );
   provider.softLink( linkPath, dirPath );
-  test.is( provider.isSoftLink( linkPath ) )
+  test.is( provider.isSoftLink( linkPath ) );
   provider.filesDeleteTerminals({ filePath : routinePath });
   var expected =
   [

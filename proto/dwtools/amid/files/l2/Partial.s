@@ -5512,6 +5512,7 @@ function _link_functor( fop )
     c.verify1 = o.sync ? verify1 : verify1Async;
     c.verify2 = o.sync ? verify2 : verify2Async;
     c.verifyDst = o.sync ? verifyDstSync : verifyDstAsync;
+    c.pathsLocalize = pathsLocalize;
     c.pathResolve = o.sync ? pathResolve : pathResolveAsync;
     c.linksResolve = o.sync ? linksResolve : linksResolveAsync;
     c.log = log;
@@ -5555,7 +5556,11 @@ function _link_functor( fop )
       if( _.longIs( o.dstPath ) && c.linkAct.having.hardLinking )
       return _linkMultiple.call( self, o, _link_body );
       _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
-
+      
+      c.pathsLocalize();
+      if( c.ended )
+      return c.end();
+      
       c.pathResolve();
       if( c.ended )
       return c.end();
@@ -5872,6 +5877,29 @@ function _link_functor( fop )
       })
     }
 
+    /* - */
+    
+    function pathsLocalize()
+    {
+      if( self instanceof _.FileProvider.Hub )
+      return;
+      
+      if( self.path.isGlobal( o.dstPath ) )
+      { 
+        let dstParsed = _.uri.parse( o.dstPath );
+        if( dstParsed.protocol && !_.arrayHas( self.protocols, dstParsed.protocol ) )
+        c.error( 'File provider ' + self.nickName + ' does not support protocol ' + _.strQuote( globalPath.protocol ) );
+        o.dstPath = dstParsed.longPath;
+      }
+      
+      if( self.path.isGlobal( o.srcPath ) )
+      {
+        let srcParsed = _.uri.parse( o.srcPath );
+        if( srcParsed.protocol && _.arrayHas( self.protocols, srcParsed.protocol ) )
+        o.srcPath = srcParsed.longPath;
+      }
+    }
+    
     /* - */
 
     function pathResolve()
@@ -6355,9 +6383,9 @@ function _link_functor( fop )
       //   if( srcStat )
       //   return;
       // }
-
+      
       c.dstStat = c.onStat( dstPath, 1 );
-
+      
       if( !c.dstStat )
       {
         c.dstStat = c.onStat( dstPath, 0 );
@@ -6372,6 +6400,11 @@ function _link_functor( fop )
         let err = `Faield to ${entryMethodName} ${o.dstPath} from ${o.srcPath}. Destination file does not exist.`;
         throw _.err( err );
       }
+      
+      //qqq: find better solution to check text links
+      if( srcStat.isTextLink() && c.dstStat.isTextLink() )
+      if( self.filesAreTextLinked([ c.dstStat.filePath, srcStat.filePath ]) )
+      return;
 
       let srcSize = srcStat ? srcStat.size : NaN;
       let dstSize = c.dstStat ? c.dstStat.size : NaN;
@@ -6841,8 +6874,8 @@ function _fileCopySizeCheck( c )
     else
     {
       let dstPath = isSoftLink ? self.pathResolveSoftLink( o.dstPath ) : self.pathResolveTextLink( o.dstPath );
-      if( dstPath !== o.srcPath )
-      throw _.err( `Destination file ${o.dstPath} should be a link to ${o.srcPath}` );
+      if( dstPath !== o.relativeSrcPath )
+      throw _.err( `Destination file ${o.dstPath} should be a link to ${o.relativeSrcPath}` );
     }
   }
 }

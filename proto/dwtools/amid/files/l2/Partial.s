@@ -6269,8 +6269,6 @@ function _link_functor( fop )
       if( !Config.debug )
       return;
 
-      return;//xxx
-
       // debugger
 
       // if( !c.srcStat )
@@ -6378,7 +6376,7 @@ function _link_functor( fop )
       let srcSize = srcStat ? srcStat.size : NaN;
       let dstSize = c.dstStat ? c.dstStat.size : NaN;
 
-      if( !( srcSize === dstSize ) )
+      if( !( srcSize == dstSize ) )
       {
         let err = `Failed to ${entryMethodName} ${o.dstPath} (${dstSize}) from ${o.srcPath} (${srcSize}). Have different size after ${entryMethodName} operation.`;
         debugger;

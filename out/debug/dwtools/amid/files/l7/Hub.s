@@ -166,8 +166,8 @@ function providerRegister( fileProvider ) // xxx
     protocolMap[ protocol ] = fileProvider;
   }
 
-  _.assert( !fileProvider.hub || fileProvider.hub === self, () => 'File provider ' + fileProvider.nickName + ' already has a hub ' + fileProvider.hub.nickName );
-  fileProvider.hub = self;
+  _.assert( !fileProvider.system || fileProvider.system === self, () => 'File provider ' + fileProvider.nickName + ' already has a system ' + fileProvider.system.nickName );
+  fileProvider.system = self;
 
   return self;
 }
@@ -176,7 +176,7 @@ function providerRegister( fileProvider ) // xxx
 
 /**
  @summary Removes provider from the inner registry.
- @description Provider must be registered in current hub.
+ @description Provider must be registered in current system.
  @param {Object} fileProvider Provider to unregister.
  @function providerUnregister
  @memberof module:Tools/mid/Files.wTools.FileProvider.wFileSystem#
@@ -189,10 +189,10 @@ function providerUnregister( fileProvider )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( fileProvider instanceof _.FileProvider.Abstract );
   _.assert( self.providersWithProtocolMap[ fileProvider.protocol ] === fileProvider );
-  _.assert( fileProvider.hub === self );
+  _.assert( fileProvider.system === self );
 
   delete self.providersWithProtocolMap[ fileProvider.protocol ];
-  fileProvider.hub = null;
+  fileProvider.system = null;
 
   return self;
 }
@@ -201,7 +201,7 @@ function providerUnregister( fileProvider )
 
 /**
  @summary Selects file provider for specified global path.
- @description Returns default file provider if hub doesn't have provider for specified path.
+ @description Returns default file provider if system doesn't have provider for specified path.
  @param {String} url Source url.
  @function providerForPath
  @memberof module:Tools/mid/Files.wTools.FileProvider.wFileSystem#
@@ -265,7 +265,7 @@ function protocolNameGenerate( skip )
 //
 
 /**
- @summary Returns true if current hub has specified file `provider` in the registry.
+ @summary Returns true if current system has specified file `provider` in the registry.
  @param {Object} provider File provider to check.
  @function hasProvider
  @memberof module:Tools/mid/Files.wTools.FileProvider.wFileSystem#
@@ -288,7 +288,7 @@ function _recordFactoryFormEnd( recordFactory )
 
   _.assert( recordFactory instanceof _.FileRecordFactory );
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( recordFactory.effectiveFileProvider instanceof _.FileProvider.Abstract, 'No provider for base path', recordFactory.basePath, 'found' );
+  _.assert( recordFactory.effectiveProvider instanceof _.FileProvider.Abstract, 'No provider for base path', recordFactory.basePath, 'found' );
   // _.assert( !_.path.isGlobal( recordFactory.basePath ) );
   // _.assert( recordFactory.stemPath === null || !_.path.isGlobal( recordFactory.stemPath ) );
 

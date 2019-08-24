@@ -54,9 +54,9 @@ function onSuiteEnd()
 function onRoutineEnd( test )
 {
   let context = this;
-  let hub = context.hub || context.provider;
-  _.sure( hub instanceof _.FileProvider.System );
-  _.sure( _.entityIdentical( _.mapKeys( hub.providersWithProtocolMap ), [ 'file', 'hd' ] ), test.name, 'has not restored hub!' );
+  let system = context.system || context.provider;
+  _.sure( system instanceof _.FileProvider.System );
+  _.sure( _.entityIdentical( _.mapKeys( system.providersWithProtocolMap ), [ 'file', 'hd' ] ), test.name, 'has not restored system!' );
 }
 
 // --

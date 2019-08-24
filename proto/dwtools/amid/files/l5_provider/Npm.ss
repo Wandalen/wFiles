@@ -237,12 +237,12 @@ function versionLocalRetrive( o )
 
   _.routineOptions( versionLocalRetrive, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( !!self.hub );
+  _.assert( !!self.system );
 
   if( !self.isDownloaded( o ) )
   return '';
 
-  let localProvider = self.hub.providerForPath( o.localPath );
+  let localProvider = self.system.providerForPath( o.localPath );
 
   _.assert( localProvider instanceof _.FileProvider.HardDrive || localProvider.originalFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
 
@@ -286,7 +286,7 @@ function versionRemoteLatestRetrive( o )
 
   _.routineOptions( versionRemoteLatestRetrive, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( !!self.hub );
+  _.assert( !!self.system );
 
   let parsed = self.pathParse( o.remotePath );
   let shell = _.sheller
@@ -337,7 +337,7 @@ function versionRemoteCurrentRetrive( o )
 
   _.routineOptions( versionRemoteCurrentRetrive, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( !!self.hub );
+  _.assert( !!self.system );
 
   let parsed = self.pathParse( o.remotePath );
   if( parsed.isFixated )
@@ -369,7 +369,7 @@ function isUpToDate( o )
 
   _.routineOptions( isUpToDate, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( !!self.hub );
+  _.assert( !!self.system );
 
   let parsed = self.pathParse( o.remotePath );
 
@@ -417,10 +417,10 @@ function isDownloaded( o )
 
   _.routineOptions( isDownloaded, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( !!self.hub );
+  _.assert( !!self.system );
 
   let srcCurrentPath;
-  let localProvider = self.hub.providerForPath( o.localPath );
+  let localProvider = self.system.providerForPath( o.localPath );
 
   _.assert( localProvider instanceof _.FileProvider.HardDrive || localProvider.originalFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
 

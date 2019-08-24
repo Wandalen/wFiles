@@ -32,8 +32,8 @@ function onSuiteBegin( test )
 
   context.providerSrc = _.FileProvider.Git();
   context.providerDst = _.FileProvider.HardDrive();
-  context.hub = _.FileProvider.System({ providers : [ context.providerSrc, context.providerDst ] });
-  context.hub.defaultProvider = context.providerDst;
+  context.system = _.FileProvider.System({ providers : [ context.providerSrc, context.providerDst ] });
+  context.system.defaultProvider = context.providerDst;
 
   let path = context.providerDst.path;
 
@@ -58,7 +58,7 @@ function filesReflectTrivial( test )
   let context = this;
   let providerSrc = context.providerSrc;
   let providerDst = context.providerDst;
-  let hub = context.hub;
+  let system = context.system;
   let path = context.providerDst.path;
   let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
   let localPath = path.join( testPath, 'wPathBasic' );
@@ -72,7 +72,7 @@ function filesReflectTrivial( test )
     test.case = 'no hash, no trailing /';
     providerDst.filesDelete( localPath );
     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git';
-    return hub.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }});
+    return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }});
   })
   .then( ( got ) =>
   {
@@ -110,7 +110,7 @@ function filesReflectTrivial( test )
     test.case = 'no hash, trailing /';
     providerDst.filesDelete( localPath );
     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git/';
-    return hub.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }});
+    return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }});
   })
   .then( ( got ) =>
   {
@@ -148,7 +148,7 @@ function filesReflectTrivial( test )
     test.case = 'hash, no trailing /';
     providerDst.filesDelete( localPath );
     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git#master';
-    return hub.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }});
+    return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }});
   })
   .then( ( got ) =>
   {
@@ -186,7 +186,7 @@ function filesReflectTrivial( test )
     test.case = 'not existing repository';
     providerDst.filesDelete( localPath );
     let remotePath = 'git+https:///DoesNotExist.git';
-    let result = hub.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }});
+    let result = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }});
     return test.shouldThrowErrorAsync( result );
   })
   .then( ( got ) =>
@@ -214,8 +214,8 @@ function filesReflectTrivial( test )
     let o = { reflectMap : { [ remotePath ] : clonePathGlobal }};
 
     let ready = new _.Consequence().take( null );
-    ready.then( () => hub.filesReflect( _.mapExtend( null, o ) ) )
-    ready.then( () => hub.filesReflect( _.mapExtend( null, o ) ) )
+    ready.then( () => system.filesReflect( _.mapExtend( null, o ) ) )
+    ready.then( () => system.filesReflect( _.mapExtend( null, o ) ) )
 
     return ready;
   })
@@ -262,8 +262,8 @@ function filesReflectTrivial( test )
     };
 
     let ready = new _.Consequence().take( null );
-    ready.then( () => hub.filesReflect( _.mapExtend( null, o ) ) )
-    ready.then( () => hub.filesReflect( _.mapExtend( null, o ) ) )
+    ready.then( () => system.filesReflect( _.mapExtend( null, o ) ) )
+    ready.then( () => system.filesReflect( _.mapExtend( null, o ) ) )
 
     return ready;
   })
@@ -303,7 +303,7 @@ function filesReflectTrivial( test )
     test.case = 'commit hash, no trailing /';
     providerDst.filesDelete( localPath );
     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git#05930d3a7964b253ea3bbfeca7eb86848f550e96';
-    return hub.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }});
+    return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }});
   })
   .then( ( got ) =>
   {
@@ -349,7 +349,7 @@ function filesReflectTrivial( test )
     providerDst.filesDelete( localPath );
     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git';
 
-    let ready = hub.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
+    let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
 
     _.shell
     ({
@@ -358,7 +358,7 @@ function filesReflectTrivial( test )
       ready : ready
     })
 
-    ready.then( () => hub.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 }) );
+    ready.then( () => system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 }) );
 
     _.shell
     ({
@@ -386,7 +386,7 @@ function filesReflectTrivial( test )
     providerDst.filesDelete( localPath );
     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git';
 
-    let ready = hub.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
+    let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
 
     _.shell
     ({
@@ -395,7 +395,7 @@ function filesReflectTrivial( test )
       ready : ready
     })
 
-    ready.then( () => hub.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 }) );
+    ready.then( () => system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 }) );
 
     _.shell
     ({
@@ -439,7 +439,7 @@ function filesReflectTrivial( test )
     providerDst.filesDelete( localPath );
     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git';
 
-    let ready = hub.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
+    let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
 
     _.shell
     ({
@@ -455,7 +455,7 @@ function filesReflectTrivial( test )
       ready : ready
     })
 
-    ready.then( () => hub.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 }) );
+    ready.then( () => system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 }) );
 
     _.shell
     ({
@@ -500,7 +500,7 @@ function filesReflectTrivial( test )
     let remotePathFixate = 'git+https:///github.com/Wandalen/wPathBasic.git#05930d3a7964b253ea3bbfeca7eb86848f550e96';
     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git';
 
-    let ready = hub.filesReflect({ reflectMap : { [ remotePathFixate ] : clonePathGlobal }, verbosity : 5 });
+    let ready = system.filesReflect({ reflectMap : { [ remotePathFixate ] : clonePathGlobal }, verbosity : 5 });
 
     _.shell
     ({
@@ -509,7 +509,7 @@ function filesReflectTrivial( test )
       ready : ready
     })
 
-    ready.then( () => hub.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 }) );
+    ready.then( () => system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 }) );
 
     _.shell
     ({
@@ -538,9 +538,9 @@ function filesReflectTrivial( test )
     let remotePathFixate = 'git+https:///github.com/Wandalen/wPathBasic.git#05930d3a7964b253ea3bbfeca7eb86848f550e96';
     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git';
 
-    let ready = hub.filesReflect({ reflectMap : { [ remotePathFixate ] : clonePathGlobal }, verbosity : 5 });
+    let ready = system.filesReflect({ reflectMap : { [ remotePathFixate ] : clonePathGlobal }, verbosity : 5 });
 
-    ready.then( () => hub.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 }) );
+    ready.then( () => system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 }) );
 
     _.shell
     ({
@@ -569,7 +569,7 @@ function filesReflectTrivial( test )
     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git';
     let remotePathUnknownHash = 'git+https:///github.com/Wandalen/wPathBasic.git#other';
 
-    let ready = hub.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
+    let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
 
     ready.then( ( got ) =>
     {
@@ -594,7 +594,7 @@ function filesReflectTrivial( test )
 
     ready.then( () =>
     {
-      let con = hub.filesReflect({ reflectMap : { [ remotePathUnknownHash ] : clonePathGlobal }, verbosity : 5 });
+      let con = system.filesReflect({ reflectMap : { [ remotePathUnknownHash ] : clonePathGlobal }, verbosity : 5 });
       return test.shouldThrowErrorAsync( con );
     })
 
@@ -625,7 +625,7 @@ function filesReflectTrivial( test )
     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git';
     let remotePathUnknownHash = 'git+https:///github.com/Wandalen/wPathBasic.git#other';
 
-    let ready = hub.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
+    let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
 
     _.shell
     ({
@@ -644,7 +644,7 @@ function filesReflectTrivial( test )
 
     ready.then( () =>
     {
-      let con = hub.filesReflect({ reflectMap : { [ remotePathUnknownHash ] : clonePathGlobal }, verbosity : 5 });
+      let con = system.filesReflect({ reflectMap : { [ remotePathUnknownHash ] : clonePathGlobal }, verbosity : 5 });
       return test.shouldThrowErrorAsync( con );
     })
 
@@ -678,7 +678,7 @@ function isUpToDate( test )
   let context = this;
   let providerSrc = context.providerSrc;
   let providerDst = context.providerDst;
-  let hub = context.hub;
+  let system = context.system;
   let path = context.providerDst.path;
   let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
   let localPath = path.join( testPath, 'wPathBasic' );
@@ -692,7 +692,7 @@ function isUpToDate( test )
     test.case = 'setup';
     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git';
     providerDst.filesDelete( localPath );
-    return hub.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }});
+    return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }});
   })
 
   .then( () =>
@@ -745,7 +745,7 @@ function isUpToDate( test )
     test.case = 'setup';
     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git#c94e0130358ba54fc47237e15bac1ab18024c0a9';
     providerDst.filesDelete( localPath );
-    return hub.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }});
+    return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }});
   })
 
   .then( () =>
@@ -798,7 +798,7 @@ function isUpToDate( test )
     providerDst.filesDelete( localPath );
     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git';
 
-    let ready = hub.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
+    let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
 
     _.shell
     ({
@@ -824,7 +824,7 @@ function isUpToDate( test )
     providerDst.filesDelete( localPath );
     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git';
 
-    let ready = hub.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
+    let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
 
     _.shell
     ({
@@ -850,7 +850,7 @@ function isUpToDate( test )
     providerDst.filesDelete( localPath );
     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git';
 
-    let ready = hub.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
+    let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
 
     _.shell
     ({
@@ -884,7 +884,7 @@ function isUpToDate( test )
     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git';
     let remotePathFixate = 'git+https:///github.com/Wandalen/wPathBasic.git#05930d3a7964b253ea3bbfeca7eb86848f550e96';
 
-    let ready = hub.filesReflect({ reflectMap : { [ remotePathFixate ] : clonePathGlobal }, verbosity : 5 });
+    let ready = system.filesReflect({ reflectMap : { [ remotePathFixate ] : clonePathGlobal }, verbosity : 5 });
 
     _.shell
     ({
@@ -930,7 +930,7 @@ var Proto =
     testSuitePath : null,
     providerSrc : null,
     providerDst : null,
-    hub : null
+    system : null
   },
 
   tests :

@@ -22,7 +22,7 @@ function onSuiteBegin( test )
 {
   let context = this;
   context.provider = _.FileProvider.HardDrive({ protocol : 'current' });
-  context.hub = _.FileProvider.System({ providers : [ context.provider ], defaultProvider : context.provider });
+  context.system = _.FileProvider.System({ providers : [ context.provider ], defaultProvider : context.provider });
   let path = context.provider.path;
   context.testSuitePath = path.dirTempOpen( 'suite-' + 'FilesFind' );
   context.testSuitePath = context.provider.pathResolveLinkFull({ filePath : context.testSuitePath, resolvingSoftLink : 1 });

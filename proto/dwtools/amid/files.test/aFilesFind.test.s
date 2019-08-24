@@ -8591,7 +8591,7 @@ function filesFindSimplifyGlob( test )
   var expected = abs([ 'dir1/t1', 'dir1/t2', 'dir1/dir11/t3' ]);
   test.identical( got, expected );
   test.identical( o.mandatory, false )
-  test.identical( o.recursive, 2 )
+  test.identical( o.filter.recursive, 2 )
   test.identical( o.includingTerminals, true );
   test.identical( o.includingDirs, false );
   test.identical( o.includingStem, true );
@@ -8627,7 +8627,7 @@ function filesFindSimplifyGlob( test )
   var expected = abs([ 'dir1/t1', 'dir1/t2', 'dir1/dir11/t3' ]);
   test.identical( got, expected );
   test.identical( o.mandatory, true )
-  test.identical( o.recursive, 2 )
+  test.identical( o.filter.recursive, 2 )
   test.identical( o.includingTerminals, true );
   test.identical( o.includingDirs, false );
   test.identical( o.includingStem, true );
@@ -8663,7 +8663,7 @@ function filesFindSimplifyGlob( test )
   var expected = abs([ 'dir1/t1', 'dir1/t2' ]);
   test.identical( got, expected );
   test.identical( o.mandatory, false )
-  test.identical( o.recursive, 2 )
+  test.identical( o.filter.recursive, 2 )
   test.identical( o.includingTerminals, true );
   test.identical( o.includingDirs, false );
   test.identical( o.includingStem, true );
@@ -8743,9 +8743,10 @@ function filesFindMandatoryString( test )
 
   test.case = 'includingDefunct : 0, mandatory : 0, filter : { recursive/**/ : 0 }';
   var o2 = _.mapExtend( null, o1 );
+  o2.filter = _.mapExtend( null, o2.filter );
   o2.includingDefunct = 0;
   o2.mandatory = 0;
-  o2.recursive = 0;
+  o2.filter.recursive = 0;
   var found = provider.filesFind( o2 );
   var expected = abs([]);
   test.identical( found, expected );
@@ -8754,9 +8755,10 @@ function filesFindMandatoryString( test )
 
   test.case = 'includingDefunct : 0, mandatory : 0, filter : { recursive/**/ : 1 }';
   var o2 = _.mapExtend( null, o1 );
+  o2.filter = _.mapExtend( null, o2.filter );
   o2.includingDefunct = 0;
   o2.mandatory = 0;
-  o2.recursive = 1;
+  o2.filter.recursive = 1;
   var found = provider.filesFind( o2 );
   var expected = abs([]);
   test.identical( found, expected );
@@ -8765,9 +8767,10 @@ function filesFindMandatoryString( test )
 
   test.case = 'includingDefunct : 0, mandatory : 1, filter : { recursive/**/ : 0 }';
   var o2 = _.mapExtend( null, o1 );
+  o2.filter = _.mapExtend( null, o2.filter );
   o2.includingDefunct = 0;
   o2.mandatory = 1;
-  o2.recursive = 0;
+  o2.filter.recursive = 0;
   test.shouldThrowErrorSync( () =>
   {
     var found = provider.filesFind( o2 );
@@ -8779,9 +8782,10 @@ function filesFindMandatoryString( test )
 
   test.case = 'includingDefunct : 0, mandatory : 1, filter : { recursive/**/ : 1 }';
   var o2 = _.mapExtend( null, o1 );
+  o2.filter = _.mapExtend( null, o2.filter );
   o2.includingDefunct = 0;
   o2.mandatory = 1;
-  o2.recursive = 1;
+  o2.filter.recursive = 1;
   test.shouldThrowErrorSync( () =>
   {
     var found = provider.filesFind( o2 );
@@ -8793,9 +8797,10 @@ function filesFindMandatoryString( test )
 
   test.case = 'includingDefunct : 1, mandatory : 0, filter : { recursive/**/ : 0 }';
   var o2 = _.mapExtend( null, o1 );
+  o2.filter = _.mapExtend( null, o2.filter );
   o2.includingDefunct = 1;
   o2.mandatory = 0;
-  o2.recursive = 0;
+  o2.filter.recursive = 0;
   var found = provider.filesFind( o2 );
   var expected = abs([ 'module2/amid' ]);
   test.identical( found, expected );
@@ -8804,9 +8809,10 @@ function filesFindMandatoryString( test )
 
   test.case = 'includingDefunct : 1, mandatory : 0, filter : { recursive/**/ : 1 }';
   var o2 = _.mapExtend( null, o1 );
+  o2.filter = _.mapExtend( null, o2.filter );
   o2.includingDefunct = 1;
   o2.mandatory = 0;
-  o2.recursive = 1;
+  o2.filter.recursive = 1;
   var found = provider.filesFind( o2 );
   var expected = abs([ 'module2/amid' ]);
   test.identical( found, expected );
@@ -8815,9 +8821,10 @@ function filesFindMandatoryString( test )
 
   test.case = 'includingDefunct : 1, mandatory : 1, filter : { recursive/**/ : 0 }';
   var o2 = _.mapExtend( null, o1 );
+  o2.filter = _.mapExtend( null, o2.filter );
   o2.includingDefunct = 1;
   o2.mandatory = 1;
-  o2.recursive = 0;
+  o2.filter.recursive = 0;
   test.shouldThrowErrorSync( () =>
   {
     var found = provider.filesFind( o2 );
@@ -8829,9 +8836,10 @@ function filesFindMandatoryString( test )
 
   test.case = 'includingDefunct : 1, mandatory : 1, filter : { recursive/**/ : 1 }';
   var o2 = _.mapExtend( null, o1 );
+  o2.filter = _.mapExtend( null, o2.filter );
   o2.includingDefunct = 1;
   o2.mandatory = 1;
-  o2.recursive = 1;
+  o2.filter.recursive = 1;
   test.shouldThrowErrorSync( () =>
   {
     var found = provider.filesFind( o2 );
@@ -8927,6 +8935,7 @@ function filesFindMandatoryMap( test )
 
   test.case = 'default';
   var o2 = _.mapExtend( null, o1 );
+  o2.filter = _.mapExtend( null, o2.filter );
   var found = provider.filesFind( o2 );
   var expected = abs
   ([
@@ -8945,7 +8954,8 @@ function filesFindMandatoryMap( test )
 
   test.case = 'recursive:0 mandatory:0 includingDefunct:0';
   var o2 = _.mapExtend( null, o1 );
-  o2.recursive = 0;
+  o2.filter = _.mapExtend( null, o2.filter );
+  o2.filter.recursive = 0;
   o2.mandatory = 0;
   o2.includingDefunct = 0;
   var found = provider.filesFind( o2 );
@@ -8963,7 +8973,8 @@ function filesFindMandatoryMap( test )
 
   test.case = 'recursive:0 mandatory:0 includingDefunct:1';
   var o2 = _.mapExtend( null, o1 );
-  o2.recursive = 0;
+  o2.filter = _.mapExtend( null, o2.filter );
+  o2.filter.recursive = 0;
   o2.mandatory = 0;
   o2.includingDefunct = 1;
   var found = provider.filesFind( o2 );
@@ -8982,7 +8993,8 @@ function filesFindMandatoryMap( test )
 
   test.case = 'recursive:0 mandatory:1 includingDefunct:0';
   var o2 = _.mapExtend( null, o1 );
-  o2.recursive = 0;
+  o2.filter = _.mapExtend( null, o2.filter );
+  o2.filter.recursive = 0;
   o2.mandatory = 1;
   o2.includingDefunct = 0;
   test.shouldThrowErrorSync( () =>
@@ -9003,7 +9015,8 @@ function filesFindMandatoryMap( test )
 
   test.case = 'recursive:0 mandatory:1 includingDefunct:1';
   var o2 = _.mapExtend( null, o1 );
-  o2.recursive = 0;
+  o2.filter = _.mapExtend( null, o2.filter );
+  o2.filter.recursive = 0;
   o2.mandatory = 1;
   o2.includingDefunct = 1;
   test.shouldThrowErrorSync( () =>
@@ -9025,7 +9038,8 @@ function filesFindMandatoryMap( test )
 
   test.case = 'recursive:1 mandatory:0 includingDefunct:0';
   var o2 = _.mapExtend( null, o1 );
-  o2.recursive = 1;
+  o2.filter = _.mapExtend( null, o2.filter );
+  o2.filter.recursive = 1;
   o2.mandatory = 0;
   o2.includingDefunct = 0;
   var found = provider.filesFind( o2 );
@@ -9046,7 +9060,8 @@ function filesFindMandatoryMap( test )
 
   test.case = 'recursive:1 mandatory:0 includingDefunct:1';
   var o2 = _.mapExtend( null, o1 );
-  o2.recursive = 1;
+  o2.filter = _.mapExtend( null, o2.filter );
+  o2.filter.recursive = 1;
   o2.mandatory = 0;
   o2.includingDefunct = 1;
   var found = provider.filesFind( o2 );
@@ -9068,7 +9083,8 @@ function filesFindMandatoryMap( test )
 
   test.case = 'recursive:1 mandatory:1 includingDefunct:0';
   var o2 = _.mapExtend( null, o1 );
-  o2.recursive = 1;
+  o2.filter = _.mapExtend( null, o2.filter );
+  o2.filter.recursive = 1;
   o2.mandatory = 1;
   o2.includingDefunct = 0;
   test.shouldThrowErrorSync( () =>
@@ -9092,7 +9108,8 @@ function filesFindMandatoryMap( test )
 
   test.case = 'recursive:1 mandatory:1 includingDefunct:1';
   var o2 = _.mapExtend( null, o1 );
-  o2.recursive = 1;
+  o2.filter = _.mapExtend( null, o2.filter );
+  o2.filter.recursive = 1;
   o2.mandatory = 1;
   o2.includingDefunct = 1;
   test.shouldThrowErrorSync( () =>
@@ -9116,7 +9133,8 @@ function filesFindMandatoryMap( test )
 
   test.case = 'recursive:2 mandatory:0 includingDefunct:0';
   var o2 = _.mapExtend( null, o1 );
-  o2.recursive = 2;
+  o2.filter = _.mapExtend( null, o2.filter );
+  o2.filter.recursive = 2;
   o2.mandatory = 0;
   o2.includingDefunct = 0;
   var found = provider.filesFind( o2 );
@@ -9140,7 +9158,8 @@ function filesFindMandatoryMap( test )
 
   test.case = 'recursive:2 mandatory:0 includingDefunct:1';
   var o2 = _.mapExtend( null, o1 );
-  o2.recursive = 2;
+  o2.filter = _.mapExtend( null, o2.filter );
+  o2.filter.recursive = 2;
   o2.mandatory = 0;
   o2.includingDefunct = 1;
   var found = provider.filesFind( o2 );
@@ -9165,7 +9184,8 @@ function filesFindMandatoryMap( test )
 
   test.case = 'recursive:2 mandatory:1 includingDefunct:0';
   var o2 = _.mapExtend( null, o1 );
-  o2.recursive = 2;
+  o2.filter = _.mapExtend( null, o2.filter );
+  o2.filter.recursive = 2;
   o2.mandatory = 1;
   o2.includingDefunct = 0;
   test.shouldThrowErrorSync( () =>
@@ -9177,7 +9197,8 @@ function filesFindMandatoryMap( test )
 
   test.case = 'recursive:2 mandatory:1 includingDefunct:1';
   var o2 = _.mapExtend( null, o1 );
-  o2.recursive = 2;
+  o2.filter = _.mapExtend( null, o2.filter );
+  o2.filter.recursive = 2;
   o2.mandatory = 1;
   o2.includingDefunct = 1;
   test.shouldThrowErrorSync( () =>
@@ -9250,13 +9271,13 @@ function filesFindExcluding( test )
 
   var find = provider.filesFinder
   ({
-    filter : { recursive/**/ : 2 },
     allowingMissed : 1,
     maskPreset : 0,
     outputFormat : 'relative',
     filter :
     {
       filePath : { 'node_modules' : 0, 'package.json' : 0 },
+      recursive/**/ : 2,
     }
   });
 
@@ -13184,58 +13205,63 @@ function filesFindGroups( test )
   found.options = !!found.options;
   test.identical( found, expected );
 
+  /* */
 
   test.case = 'mandatory : 1';
-  var map =
+  var o2 =
   {
     src,
     dst,
     outputFormat : 'relative',
     mandatory : 1,
   }
-  var found = provider.filesFindGroups( map );
+  var found = provider.filesFindGroups( o2 );
   found.options = !!found.options;
   test.identical( found, expected );
 
+  /* */
 
   test.case = 'mandatory : 0';
-  var map =
+  var o2 =
   {
     src,
     dst,
     outputFormat : 'relative',
     mandatory : 0,
   }
-  var found = provider.filesFindGroups( map ); /* qqq : bad naming! */
+  var found = provider.filesFindGroups( o2 ); /* qqq : bad naming! */
   found.options = !!found.options;
   test.identical( found, expected );
 
+  /* */
 
   test.case = 'sync : 0';
-  var map =
+  var o2 =
   {
     src,
     dst,
     outputFormat : 'relative',
     sync : 0,
   }
-  var found = provider.filesFindGroups( map );
+  var found = provider.filesFindGroups( o2 );
   found.options = !!found.options;
   test.identical( found, expected );
 
+  /* */
 
   test.case = 'mode : legacy';
-  var map =
+  var o2 =
   {
     src,
     dst,
     outputFormat : 'relative',
     mode : 'legacy',
   }
-  var found = provider.filesFindGroups( map );
+  var found = provider.filesFindGroups( o2 );
   found.options = !!found.options;
   test.identical( found, expected );
 
+  /* */
 
   test.case = 'filter : { recursive/**/ : 1 }, mandatory : 0';
   var expected =
@@ -13266,17 +13292,19 @@ function filesFindGroups( test )
     'errors' : [],
     'options' : true,
   }
-  var map =
+  var src2 = _.mapExtend( null, src );
+  src2.recursive = 1;
+  var o2 =
   {
-    src,
+    src : src2,
     dst,
     outputFormat : 'relative',
-    filter : { recursive/**/ : 1 },
   }
-  var found = provider.filesFindGroups( map );
+  var found = provider.filesFindGroups( o2 );
   found.options = !!found.options;
   test.identical( found, expected );
 
+  /* */
 
   test.case = 'filter : { recursive/**/ : 0 }';
   var expected =
@@ -13297,15 +13325,18 @@ function filesFindGroups( test )
     'errors' : [],
     'options' : true,
   }
-  var map =
+
+  var src2 = _.mapExtend( null, src );
+  src2.recursive = 0;
+
+  var o2 =
   {
-    src,
+    src : src2,
     dst,
     outputFormat : 'relative',
-    filter : { recursive/**/ : 0 },
     mandatory : 0,
   }
-  var found = provider.filesFindGroups( map );
+  var found = provider.filesFindGroups( o2 );
   found.options = !!found.options;
   test.identical( found, expected );
 
@@ -13316,15 +13347,16 @@ function filesFindGroups( test )
     test.case = 'filter : { recursive/**/ : 0 }, mandatory : 1';
     test.shouldThrowErrorSync( () =>
     {
-      var map =
+      var src2 = _.mapExtend( null, src );
+      src2.recursive = 0;
+      var o2 =
       {
-        src,
+        src : src2,
         dst,
         outputFormat : 'relative',
-        filter : { recursive/**/ : 0 },
         mandatory : 1,
       }
-      var found = provider.filesFindGroups( map );
+      var found = provider.filesFindGroups( o2 );
       found.options = !!found.options;
       test.identical( found, expected );
     });
@@ -14217,49 +14249,7 @@ function filesReflectTrivial( test )
   test.identical( srcAllow, expectedSrcAllow );
   test.identical( reason, expectedReason );
 
-  // //
   //
-  // test.case = 'onUp should return original record'
-  // var tree =
-  // {
-  //   'src' :
-  //   {
-  //      a : 'a',
-  //      b : 'b'
-  //   },
-  //   'dst' :
-  //   {
-  //   },
-  // }
-  //
-  // function onUp1( record )
-  // {
-  //   debugger;
-  //   record.dst.absolute = record.dst.absolute + '.ext';
-  //   return {};
-  //   return null;
-  // }
-  //
-  // var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
-  // var o =
-  // {
-  //   reflectMap : { '/src' : '/dst' },
-  //   onUp : onUp1,
-  //   includingDst : 0,
-  //   includingTerminals : 1,
-  //   includingDirs : 0,
-  //   filter : { recursive/**/ : 2 },
-  //   writing : 1,
-  //   srcDeleting : 0,
-  //   linking : 'nop'
-  // }
-  //
-  // test.shouldThrowError( () => extract.filesReflect( o ) );
-  // test.identical( extract.filesTree, tree );
-  //
-  // debugger; return;
-  //
-  // //
 
   test.case = 'onUp changes dst path'
   var tree =

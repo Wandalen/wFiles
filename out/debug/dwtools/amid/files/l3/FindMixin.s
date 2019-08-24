@@ -2967,6 +2967,9 @@ function filesReflectEvaluate_body( o )
   function handleDstUp( srcContext, reason, dst, dstRecord, op )
   {
 
+    if( !dstRecord.included )
+    return dstRecord;
+
     // if( _.strEnds( dstRecord.absolute, debugPath ) )
     // debugger;
 
@@ -2987,6 +2990,10 @@ function filesReflectEvaluate_body( o )
   function handleDstDown( dstRecord, op )
   {
     let record = dstRecord.associated;
+
+    if( !dstRecord.included )
+    return;
+
     handleDown( record, op );
     // return record;
   }
@@ -2995,6 +3002,10 @@ function filesReflectEvaluate_body( o )
 
   function handleSrcUp( srcRecord, op )
   {
+
+    if( !srcRecord.included )
+    return srcRecord;
+
     let relative = srcRecord.relative;
     if( o.onDstName )
     relative = o.onDstName.call( self, relative, dstRecordFactory, op, o, srcRecord );
@@ -3073,6 +3084,9 @@ function filesReflectEvaluate_body( o )
   function handleSrcDown( srcRecord, op )
   {
     let record = srcRecord.associated;
+
+    if( !srcRecord.included )
+    return;
 
     if( o.filesGraph && !record.src.isDir && !record.upToDate )
     {

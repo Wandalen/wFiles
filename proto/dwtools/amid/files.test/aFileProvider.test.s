@@ -228,7 +228,8 @@ function readWriteSync( test )
   /**/
 
   test.mustNotThrowError( function()
-  {
+  { 
+    debugger
     var got = provider.fileRead
     ({
       filePath : test.context.pathFor( 'invalid path' ),

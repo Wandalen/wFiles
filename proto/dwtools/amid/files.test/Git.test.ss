@@ -39,6 +39,7 @@ function onSuiteBegin( test )
 
   context.testSuitePath = path.dirTempOpen( 'FileProviderGit' );
   context.testSuitePath = context.providerDst.pathResolveLinkFull({ filePath : context.testSuitePath, resolvingSoftLink : 1 });
+  context.testSuitePath = context.testSuitePath.absolutePath;
 }
 
 function onSuiteEnd( test )
@@ -82,13 +83,12 @@ function filesReflectTrivial( test )
       includingTerminals : 1,
       includingDirs : 1,
       outputFormat : 'relative',
-      recursive : 2
+      filter : { recursive : 2 }
     });
 
     let expected =
     [
       '.',
-      './appveyor.yml',
       './LICENSE',
       './package.json',
       './README.md',
@@ -98,7 +98,7 @@ function filesReflectTrivial( test )
       './proto',
       './sample'
     ]
-
+    
     test.is( _.arraySetContainAll( files, expected ) )
     return got;
   })
@@ -120,13 +120,12 @@ function filesReflectTrivial( test )
       includingTerminals : 1,
       includingDirs : 1,
       outputFormat : 'relative',
-      recursive : 2
+      filter : { recursive : 2 }
     });
 
     let expected =
     [
       '.',
-      './appveyor.yml',
       './LICENSE',
       './package.json',
       './README.md',
@@ -158,13 +157,12 @@ function filesReflectTrivial( test )
       includingTerminals : 1,
       includingDirs : 1,
       outputFormat : 'relative',
-      recursive : 2
+      filter : { recursive : 2 }
     });
 
     let expected =
     [
       '.',
-      './appveyor.yml',
       './LICENSE',
       './package.json',
       './README.md',
@@ -197,7 +195,7 @@ function filesReflectTrivial( test )
       includingTerminals : 1,
       includingDirs : 1,
       outputFormat : 'relative',
-      recursive : 2
+      filter : { recursive : 2 }
     });
 
     test.identical( files, [ '.' ] );
@@ -227,13 +225,12 @@ function filesReflectTrivial( test )
       includingTerminals : 1,
       includingDirs : 1,
       outputFormat : 'relative',
-      recursive : 2
+      filter : { recursive : 2 }
     });
 
     let expected =
     [
       '.',
-      './appveyor.yml',
       './LICENSE',
       './package.json',
       './README.md',
@@ -275,13 +272,12 @@ function filesReflectTrivial( test )
       includingTerminals : 1,
       includingDirs : 1,
       outputFormat : 'relative',
-      recursive : 2
+      filter : { recursive : 2 }
     });
 
     let expected =
     [
       '.',
-      './appveyor.yml',
       './LICENSE',
       './package.json',
       './README.md',
@@ -313,23 +309,22 @@ function filesReflectTrivial( test )
       includingTerminals : 1,
       includingDirs : 1,
       outputFormat : 'relative',
-      recursive : 2
+      filter : { recursive : 2 }
     });
 
     let expected =
     [
       '.',
-      './appveyor.yml',
       './LICENSE',
       './package.json',
       './README.md',
       './out',
-      './out/wPathBasic.out.will.yml',
+      './out/wPathFundamentals.out.will.yml',
       './out/debug',
       './proto',
       './sample'
     ]
-
+    
     test.is( _.arraySetContainAll( files, expected ) )
     let packagePath = providerDst.path.join( localPath, 'package.json' );
     let packageRead = providerDst.fileRead

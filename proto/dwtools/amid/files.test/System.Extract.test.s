@@ -56,7 +56,7 @@ function onSuiteBegin()
   self.providerEffective = _.FileProvider.Extract
   ({
     filesTree : filesTree,
-    protocols : [ 'current' ],
+    protocols : [ 'current', 'second' ],
     usingExtraStat : 1
   });
   self.provider.providerRegister( self.providerEffective );
@@ -66,6 +66,13 @@ function onSuiteBegin()
   self.provider.UsingBigIntForStat = self.providerEffective.UsingBigIntForStat;
   // self.provider.defaultOrigin = self.providerEffective.originPath;
   // self.provider.defaultProtocol = self.providerEffective.protocol;
+}
+
+function onRoutineEnd( test )
+{
+  let context = this;
+  let provider = context.provider;
+  _.sure( _.arraySetIdentical( _.mapKeys( provider.providersWithProtocolMap ), [ 'second', 'current' ] ), test.name, 'has not restored system!' );
 }
 
 function onSuiteEnd()
@@ -89,6 +96,7 @@ var Proto =
 
   onSuiteBegin,
   onSuiteEnd,
+  onRoutineEnd,
 
   context :
   {

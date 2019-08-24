@@ -135,7 +135,7 @@ function form()
 
 function _formAssociations()
 {
-  let filter = this; debugger;
+  let filter = this;
 
   /* find file system */
 

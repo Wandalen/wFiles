@@ -2259,9 +2259,7 @@ function filesReflectEvaluate_body( o )
 
   /* find */
 
-  debugger;
   let found = self.filesFind( srcOptions );
-  debugger;
   o.visitedMap = srcOptions.visitedMap;
 
   return o.result;
@@ -3857,8 +3855,8 @@ function filesReflectSingle_body( o )
     let srcAbsolute = record.src.real;
     /* xxx qqq : use ( resolvingMultiple / recursive ) option instead of if-else */
 
-    // if( _.strHas( srcAbsolute, 'dirLink' ) )
-    // debugger;
+    if( _.strHas( srcAbsolute, 'terLink' ) )
+    debugger;
 
     if( o.rebasingLink === 2 || o.resolvingSrcSoftLink === 2 )
     {

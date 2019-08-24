@@ -137,44 +137,89 @@ function _formAssociations()
 {
   let filter = this;
 
+  /* find file system */
+
+  if( !filter.system )
+  if( filter.effectiveProvider && filter.effectiveProvider instanceof _.FileProvider.System )
+  {
+    filter.system = filter.effectiveProvider;
+    filter.effectiveProvider = null;
+  }
+
+  if( !filter.system )
+  if( filter.effectiveProvider && filter.effectiveProvider.system && filter.effectiveProvider.system instanceof _.FileProvider.System )
+  {
+    filter.system = filter.effectiveProvider.system;
+  }
+
+  if( !filter.system )
+  if( filter.defaultProvider && filter.defaultProvider instanceof _.FileProvider.System )
+  {
+    filter.system = filter.defaultProvider;
+  }
+
+  if( !filter.system )
+  if( filter.defaultProvider && filter.defaultProvider.system && filter.defaultProvider.system instanceof _.FileProvider.System )
+  {
+    filter.system = filter.defaultProvider.system;
+  }
+
+  if( filter.system )
+  if( filter.system.system && filter.system.system !== filter.system )
+  {
+    _.assert( !( filter.system instanceof _.FileProvider.System ) );
+    filter.system = filter.system.system;
+  }
+
+  /* find effective provider */
+
+  if( filter.effectiveProvider && filter.effectiveProvider instanceof _.FileProvider.System )
+  {
+    _.assert( filter.system === null || filter.system === filter.effectiveProvider );
+    filter.system = filter.effectiveProvider;
+    filter.effectiveProvider = null;
+  }
+
+  /* reset system */
+
+  if( filter.effectiveProvider && filter.effectiveProvider.system )
+  {
+    _.assert( filter.system === null || filter.system === filter.effectiveProvider.system );
+    filter.system = filter.effectiveProvider.system;
+  }
+
+  /* find default provider */
+
+  if( !filter.defaultProvider )
+  {
+    filter.defaultProvider = filter.defaultProvider || filter.effectiveProvider || filter.system;
+  }
+
+  /* reset system */
+
+  if( filter.system && !( filter.system instanceof _.FileProvider.System ) )
+  {
+    _.assert( filter.system === filter.defaultProvider || filter.system === filter.effectiveProvider )
+    filter.system = null;
+  }
+
   /* */
 
-  if( filter.hubFileProvider )
-  {
-    if( filter.hubFileProvider.hub && filter.hubFileProvider.hub !== filter.hubFileProvider )
-    {
-      _.assert( filter.effectiveFileProvider === null || filter.effectiveFileProvider === filter.hubFileProvider );
-      filter.effectiveFileProvider = filter.hubFileProvider;
-      filter.hubFileProvider = filter.hubFileProvider.hub;
-    }
-  }
-
-  if( filter.effectiveFileProvider )
-  {
-    if( filter.effectiveFileProvider instanceof _.FileProvider.Hub )
-    {
-      _.assert( filter.hubFileProvider === null || filter.hubFileProvider === filter.effectiveFileProvider );
-      filter.hubFileProvider = filter.effectiveFileProvider;
-      filter.effectiveFileProvider = null;
-    }
-  }
-
-  if( filter.effectiveFileProvider && filter.effectiveFileProvider.hub )
-  {
-    _.assert( filter.hubFileProvider === null || filter.hubFileProvider === filter.effectiveFileProvider.hub );
-    filter.hubFileProvider = filter.effectiveFileProvider.hub;
-  }
-
-  if( !filter.defaultFileProvider )
-  {
-    filter.defaultFileProvider = filter.defaultFileProvider || filter.effectiveFileProvider || filter.hubFileProvider;
-  }
-
-  /* */
-
-  _.assert( !filter.hubFileProvider || filter.hubFileProvider instanceof _.FileProvider.Abstract, 'Expects {- filter.hubFileProvider -}' );
-  _.assert( filter.defaultFileProvider instanceof _.FileProvider.Abstract );
-  _.assert( !filter.effectiveFileProvider || !( filter.effectiveFileProvider instanceof _.FileProvider.Hub ) );
+  _.assert
+  (
+    !filter.system || filter.system instanceof _.FileProvider.System,
+    () => '{- filter.system -} should be instance of {- _.FileProvider.System -}, but it is ' + _.toStrShort( filter.system )
+  );
+  _.assert
+  (
+    !filter.effectiveProvider || !( filter.effectiveProvider instanceof _.FileProvider.System ),
+    () => '{- filter.effectiveProvider -} cant be instance of {- _.FileProvider.System -}, but it is'
+  );
+  _.assert
+  (
+    filter.defaultProvider instanceof _.FileProvider.Abstract,
+    () => '{- filter.system -} should be instance of {- _.FileProvider.Abstract -}, but it is ' + _.toStrShort( filter.defaultProvider )
+  );
 
   /* */
 
@@ -200,7 +245,7 @@ function _formPre()
   if( filter.formed < 1 )
   filter._formAssociations();
 
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   _.assert( arguments.length === 0 );
@@ -241,7 +286,7 @@ function _formMasks()
   if( filter.formed < 3 )
   filter._formPaths();
 
-  let fileProvider = filter.effectiveFileProvider || filter.defaultFileProvider || filter.hubFileProvider;
+  let fileProvider = filter.effectiveProvider || filter.defaultProvider || filter.system;
   let path = fileProvider.path;
 
   /* */
@@ -296,10 +341,10 @@ function _formFinal()
   filter._formMasks();
 
   /*
-    should use effectiveFileProvider because of option globbing of file provider
+    should use effectiveProvider because of option globbing of file provider
   */
 
-  let fileProvider = filter.effectiveFileProvider || filter.hubFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.effectiveProvider || filter.system || filter.defaultProvider;
   let path = fileProvider.path;
 
   /* - */
@@ -312,10 +357,10 @@ function _formFinal()
     _.assert( _.strIs( filter.filePath ) || _.arrayIs( filter.filePath ) || _.mapIs( filter.filePath ) );
     _.assert( !!filter.src || _.mapIs( filter.formedBasePath ) || _.mapKeys( filter.formedFilePath ).length === 0 );
     _.assert( !!filter.src || _.mapIs( filter.formedFilePath ) );
-    _.assert( _.objectIs( filter.effectiveFileProvider ) );
-    _.assert( filter.hubFileProvider === filter.effectiveFileProvider.hub || filter.hubFileProvider === filter.effectiveFileProvider );
-    _.assert( filter.hubFileProvider instanceof _.FileProvider.Abstract );
-    _.assert( filter.defaultFileProvider instanceof _.FileProvider.Abstract );
+    _.assert( _.objectIs( filter.effectiveProvider ) );
+    _.assert( filter.system === filter.effectiveProvider.system || filter.system === filter.effectiveProvider );
+    _.assert( filter.system instanceof _.FileProvider.Abstract );
+    _.assert( filter.defaultProvider instanceof _.FileProvider.Abstract );
 
     let filePath = filter.filePathArrayGet( filter.formedFilePath ).filter( ( e ) => _.strIs( e ) && e );
     _.assert( path.s.noneAreGlob( filePath ) );
@@ -434,19 +479,19 @@ function and( src )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( filter.formedFilterMap === null );
   _.assert( filter.applyTo === null );
-  _.assert( !filter.effectiveFileProvider || !src.effectiveFileProvider || filter.effectiveFileProvider === src.effectiveFileProvider );
-  _.assert( !filter.hubFileProvider || !src.hubFileProvider || filter.hubFileProvider === src.hubFileProvider );
+  _.assert( !filter.effectiveProvider || !src.effectiveProvider || filter.effectiveProvider === src.effectiveProvider );
+  _.assert( !filter.system || !src.system || filter.system === src.system );
 
   if( src === filter )
   return filter;
 
   /* */
 
-  if( src.effectiveFileProvider )
-  filter.effectiveFileProvider = src.effectiveFileProvider
+  if( src.effectiveProvider )
+  filter.effectiveProvider = src.effectiveProvider
 
-  if( src.hubFileProvider )
-  filter.hubFileProvider = src.hubFileProvider
+  if( src.system )
+  filter.system = src.system
 
   /* */
 
@@ -551,16 +596,16 @@ function and( src )
 //   _.assert( arguments.length === 1, 'Expects single argument' );
 //   _.assert( filter.formedFilterMap === null );
 //   _.assert( filter.applyTo === null );
-//   _.assert( !filter.hubFileProvider || !o.src.hubFileProvider || filter.hubFileProvider === o.src.hubFileProvider );
+//   _.assert( !filter.system || !o.src.system || filter.system === o.src.system );
 //   _.assert( o.src !== filter );
 //   _.assert( _.objectIs( o.src ) );
 //   // _.assert( o.src.filePath === null || o.src.filePath === undefined || o.src.filePath === '.' || _.strIs( o.src.filePath ) );
 //
-//   let fileProvider = filter.hubFileProvider || filter.defaultFileProvider || filter.effectiveFileProvider || o.src.hubFileProvider || o.src.defaultFileProvider || o.src.effectiveFileProvider;
+//   let fileProvider = filter.system || filter.defaultProvider || filter.effectiveProvider || o.src.system || o.src.defaultProvider || o.src.effectiveProvider;
 //   let path = fileProvider.path;
 //
-//   if( o.src.hubFileProvider )
-//   filter.hubFileProvider = o.src.hubFileProvider;
+//   if( o.src.system )
+//   filter.system = o.src.system;
 //
 //   /* */
 //
@@ -770,16 +815,16 @@ function and( src )
 //   _.assert( arguments.length === 1, 'Expects single argument' );
 //   _.assert( filter.formedFilterMap === null );
 //   _.assert( filter.applyTo === null );
-//   _.assert( !filter.hubFileProvider || !src.hubFileProvider || filter.hubFileProvider === src.hubFileProvider );
+//   _.assert( !filter.system || !src.system || filter.system === src.system );
 //   _.assert( src !== filter );
 //
-//   let fileProvider = filter.effectiveFileProvider || filter.hubFileProvider || filter.defaultFileProvider || src.effectiveFileProvider || src.hubFileProvider || src.defaultFileProvider;
+//   let fileProvider = filter.effectiveProvider || filter.system || filter.defaultProvider || src.effectiveProvider || src.system || src.defaultProvider;
 //   let path = fileProvider.path;
 //
 //   /* */
 //
-//   if( src.hubFileProvider )
-//   filter.hubFileProvider = src.hubFileProvider;
+//   if( src.system )
+//   filter.system = src.system;
 //
 //   /* */
 //
@@ -971,16 +1016,16 @@ function _pathsAmmend( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( filter.formedFilterMap === null );
   _.assert( filter.applyTo === null );
-  _.assert( !filter.hubFileProvider || !o.src.hubFileProvider || filter.hubFileProvider === o.src.hubFileProvider );
+  _.assert( !filter.system || !o.src.system || filter.system === o.src.system );
   _.assert( o.src !== filter );
 
-  let fileProvider = filter.effectiveFileProvider || filter.hubFileProvider || filter.defaultFileProvider || o.src.effectiveFileProvider || o.src.hubFileProvider || o.src.defaultFileProvider;
+  let fileProvider = filter.effectiveProvider || filter.system || filter.defaultProvider || o.src.effectiveProvider || o.src.system || o.src.defaultProvider;
   let path = fileProvider.path;
 
   /* */
 
-  if( o.src.hubFileProvider )
-  filter.hubFileProvider = o.src.hubFileProvider;
+  if( o.src.system )
+  filter.system = o.src.system;
   if( !( o.src instanceof Self ) )
   o.src = fileProvider.recordFilter( o.src );
 
@@ -1389,7 +1434,7 @@ function pathsSupplementJoining( src )
 function prefixesApply( o )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   if( filter.prefixPath === null && filter.postfixPath === null )
@@ -1676,7 +1721,7 @@ prefixesApply.defaults =
 function prefixesRelative( prefixPath )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   prefixPath = prefixPath || filter.prefixPath;
@@ -1742,7 +1787,7 @@ function prefixesRelative( prefixPath )
 function prefixPathFromFilePath( o )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   _.routineOptions( prefixPathFromFilePath, arguments );
@@ -1793,7 +1838,7 @@ prefixPathFromFilePath.defaults =
 function prefixPathAbsoluteFrom( o )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   o = _.routineOptions( prefixPathAbsoluteFrom, arguments );
@@ -1881,7 +1926,7 @@ function relativeFor( filePath )
 {
   let filter = this;
   let basePath = filter.basePathForStemPath( filePath );
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   relativePath = path.relative( basePath, filePath );
@@ -1894,7 +1939,7 @@ function relativeFor( filePath )
 function basePathSet( src )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
 
   if( 0 )
   if( Config.debug )
@@ -1968,7 +2013,7 @@ function basePathForFilePath( filePath )
 {
   let filter = this;
   let result = null;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   _.assert( _.strIs( filePath ), 'Expects string' );
@@ -2047,7 +2092,7 @@ function basePathsGet()
 function basePathMapFromString( o )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   o = _.routineOptions( basePathMapFromString, arguments );
@@ -2102,7 +2147,7 @@ basePathMapFromString.defaults =
 function basePathMapLocalize( basePathMap )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   let basePathMap2 = Object.create( null );
@@ -2129,7 +2174,7 @@ function basePathMapLocalize( basePathMap )
 function basePathFromDecoratedFilePath( filePath )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
   let basePath = Object.create( null );
 
@@ -2168,7 +2213,7 @@ function basePathFromDecoratedFilePath( filePath )
 function basePathNormalize( filePath, basePath )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   if( filePath === undefined )
@@ -2214,7 +2259,7 @@ function basePathNormalize( filePath, basePath )
 function basePathSimplify()
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   if( !filter.basePath || _.strIs( filter.basePath ) )
@@ -2234,7 +2279,7 @@ function basePathSimplify()
 function basePathDotUnwrap()
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   _.assert( arguments.length === 0 );
@@ -2264,7 +2309,7 @@ function basePathDotUnwrap()
 function basePathEach( onEach )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   _.assert( filter.basePath === null || _.strIs( filter.basePath ) || _.mapIs( filter.basePath ) );
@@ -2331,7 +2376,7 @@ function basePathEach( onEach )
 function basePathUse( basePath )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   _.assert( arguments.length === 1 );
@@ -2394,7 +2439,7 @@ function filePathCopy( o )
 
     if( _.objectIs( o.dstInstance.src ) )
     {
-      let fileProvider = o.dstInstance.hubFileProvider || o.dstInstance.effectiveFileProvider || o.dstInstance.defaultFileProvider;
+      let fileProvider = o.dstInstance.system || o.dstInstance.effectiveProvider || o.dstInstance.defaultProvider;
       let path = fileProvider.path;
       if( _.strIs( o.value ) || _.arrayIs( o.value ) || _.boolLike( o.value ) )
       o.value = path.mapsPair( o.value, null );
@@ -2407,7 +2452,7 @@ function filePathCopy( o )
     }
     else if( _.objectIs( o.dstInstance.dst ) )
     {
-      let fileProvider = o.dstInstance.hubFileProvider || o.dstInstance.effectiveFileProvider || o.dstInstance.defaultFileProvider;
+      let fileProvider = o.dstInstance.system || o.dstInstance.effectiveProvider || o.dstInstance.defaultProvider;
       let path = fileProvider.path;
       if( _.strIs( o.value ) || _.arrayIs( o.value ) || _.boolLike( o.value ) )
       o.value = path.mapsPair( null, o.value );
@@ -2461,7 +2506,7 @@ filePathCopy.defaults =
 //
 //   if( filter.src )
 //   {
-//     let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+//     let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
 //     let path = fileProvider.path;
 //     if( _.strIs( src ) || _.arrayIs( src ) || _.boolLike( src ) )
 //     src = path.mapsPair( src, null );
@@ -2471,7 +2516,7 @@ filePathCopy.defaults =
 //   }
 //   else if( filter.dst )
 //   {
-//     let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+//     let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
 //     let path = fileProvider.path;
 //     if( _.strIs( src ) || _.arrayIs( src ) || _.boolLike( src ) )
 //     src = path.mapsPair( null, src );
@@ -2499,7 +2544,7 @@ function filePathSelect( srcPath, dstPath )
 {
   let src = this;
   let dst = src.dst;
-  let fileProvider = src.hubFileProvider || src.effectiveFileProvider || src.defaultFileProvider;
+  let fileProvider = src.system || src.effectiveProvider || src.defaultProvider;
   let path = fileProvider.path;
 
   _.assert( arguments.length === 2 );
@@ -2565,7 +2610,7 @@ function filePathSelect( srcPath, dstPath )
 function filePathNormalize( filePath )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   _.assert( arguments.length === 1 );
@@ -2602,7 +2647,7 @@ function filePathNormalize( filePath )
 function filePathPrependByBasePath( filePath, basePath )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   _.assert( arguments.length === 2 );
@@ -2682,7 +2727,7 @@ function filePathPrependByBasePath( filePath, basePath )
 function filePathMultiplyRelatives( filePath, basePath )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   _.assert( arguments.length === 2 );
@@ -2727,7 +2772,7 @@ function filePathMultiplyRelatives( filePath, basePath )
 function filePathFromBasePath( basePath )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
   let result = Object.create( null );
 
@@ -2765,7 +2810,7 @@ function filePathFromBasePath( basePath )
 function filePathAbsolutize( prefixPath )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   _.assert( _.mapIs( filter.filePath ) );
@@ -2806,7 +2851,7 @@ Result of such glob is equivalent to result of recursive searching.
 function filePathGlobSimplify( filePath, basePath )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   if( filePath === undefined )
@@ -2884,7 +2929,7 @@ function filePathGlobSimplify( filePath, basePath )
 function filePathFromFixes()
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   _.assert( arguments.length === 0 );
@@ -2924,7 +2969,7 @@ function filePathSimplest( filePath )
 function filePathNullizeMaybe( filePath )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   if( filePath === undefined )
@@ -2942,11 +2987,11 @@ function filePathNullizeMaybe( filePath )
 function filePathIsComplex( filePath )
 {
   let filter = this;
-  let fileProvider = filter.effectiveFileProvider || filter.hubFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.effectiveProvider || filter.system || filter.defaultProvider;
   let path = fileProvider.path;
 
   /*
-    should use effectiveFileProvider because of option globbing of file provider
+    should use effectiveProvider because of option globbing of file provider
   */
 
   if( filePath === undefined )
@@ -2965,15 +3010,19 @@ function filePathIsComplex( filePath )
 function filePathHasGlob( filePath )
 {
   let filter = this;
-  let fileProvider = filter.effectiveFileProvider || filter.hubFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.effectiveProvider || filter.system || filter.defaultProvider;
   let path = fileProvider.path;
 
   /*
-    should use effectiveFileProvider because of option globbing of file provider
+    should use effectiveProvider because of option globbing of file provider
   */
 
   if( filePath === undefined )
-  filePath = filter.filePath;
+  {
+    filePath = filter.filePath;
+    if( filePath === null )
+    filePath = filter.prefixPath;
+  }
 
   let globFound = true;
   if( _.none( path.s.areGlob( filePath ) ) )
@@ -2987,7 +3036,7 @@ function filePathHasGlob( filePath )
 function filePathDstHasAllBools( filePath )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   if( filePath === undefined )
@@ -3006,7 +3055,7 @@ function filePathDstHasAllBools( filePath )
 function filePathDstHasAnyBools( filePath )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   filePath = filter.filePathDstArrayGet( filePath );
@@ -3019,7 +3068,7 @@ function filePathDstHasAnyBools( filePath )
 function filePathMapOnlyBools( filePath )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   if( filePath === undefined )
@@ -3046,7 +3095,7 @@ function filePathMapOnlyBools( filePath )
 function filePathMap( filePath, booleanFallingBack )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   if( filePath === undefined )
@@ -3077,7 +3126,7 @@ function filePathMap( filePath, booleanFallingBack )
 function filePathDstArrayGet( filePath )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   if( filePath === undefined )
@@ -3107,7 +3156,7 @@ function filePathDstArrayGet( filePath )
 function filePathSrcArrayGet( filePath )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   if( filePath === undefined )
@@ -3137,7 +3186,7 @@ function filePathSrcArrayGet( filePath )
 function filePathArrayGet( filePath )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   if( filePath === undefined )
@@ -3167,7 +3216,7 @@ function filePathArrayGet( filePath )
 function filePathDstArrayNonBoolGet( filePath, booleanFallingBack )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   if( filePath === undefined )
@@ -3214,7 +3263,7 @@ function filePathDstArrayNonBoolGet( filePath, booleanFallingBack )
 function filePathSrcArrayNonBoolGet( filePath, booleanFallingBack )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   if( filePath === undefined )
@@ -3271,7 +3320,7 @@ function filePathSrcArrayNonBoolGet( filePath, booleanFallingBack )
 function filePathArrayNonBoolGet( filePath, booleanFallingBack )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   if( filePath === undefined )
@@ -3294,7 +3343,7 @@ function filePathArrayNonBoolGet( filePath, booleanFallingBack )
 function filePathDstArrayBoolGet( filePath )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   if( filePath === undefined )
@@ -3324,7 +3373,7 @@ function filePathDstArrayBoolGet( filePath )
 function filePathSrcArrayBoolGet( filePath )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   if( filePath === undefined )
@@ -3372,7 +3421,7 @@ function filePathSrcArrayBoolGet( filePath )
 function filePathArrayBoolGet( filePath )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   if( filePath === undefined )
@@ -3399,7 +3448,7 @@ function filePathArrayBoolGet( filePath )
 function filePathDstNormalizedGet( filePath )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   if( filePath === undefined )
@@ -3450,7 +3499,7 @@ function filePathDstNormalizedGet( filePath )
 function filePathSrcNormalizedGet( filePath )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   if( filePath === undefined )
@@ -3525,7 +3574,7 @@ function filePathCommon( filePath )
 function filePathDstCommon()
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   let filePath = filter.filePathDstNormalizedGet();
@@ -3538,7 +3587,7 @@ function filePathDstCommon()
 function filePathSrcCommon()
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   let filePath = filter.filePathSrcNormalizedGet();
@@ -3585,7 +3634,7 @@ function pairRefineLight()
 {
   let src = this;
   let dst = src.dst;
-  let fileProvider = src.hubFileProvider || src.effectiveFileProvider || src.defaultFileProvider;
+  let fileProvider = src.system || src.effectiveProvider || src.defaultProvider;
   let path = fileProvider.path;
 
   _.assert( dst instanceof Self );
@@ -3644,12 +3693,12 @@ function providersNormalize()
 {
   let filter = this;
 
-  if( !filter.effectiveFileProvider )
-  filter.effectiveFileProvider = filter.defaultFileProvider;
-  if( !filter.hubFileProvider )
-  filter.hubFileProvider = filter.effectiveFileProvider;
-  if( filter.hubFileProvider.hub )
-  filter.hubFileProvider = filter.hubFileProvider.hub;
+  if( !filter.effectiveProvider )
+  filter.effectiveProvider = filter.defaultProvider;
+  if( !filter.system )
+  filter.system = filter.effectiveProvider;
+  if( filter.system.system )
+  filter.system = filter.system.system;
 
 }
 
@@ -3661,25 +3710,25 @@ function providerForPath( filePath )
 
   _.assert( arguments.length === 0 || arguments.length === 1 );
 
-  if( filter.effectiveFileProvider )
-  return filter.effectiveFileProvider;
+  if( filter.effectiveProvider )
+  return filter.effectiveProvider;
 
   if( !filePath )
   filePath = filter.filePath;
 
   if( !filePath )
-  filePath = filter.filePath;
+  filePath = filter.prefixPath;
 
   if( !filePath )
   filePath = filter.basePath
 
   _.assert( _.strIs( filePath ), 'Expects string' );
 
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
 
-  filter.effectiveFileProvider = fileProvider.providerForPath( filePath );
+  filter.effectiveProvider = fileProvider.providerForPath( filePath );
 
-  return filter.effectiveFileProvider;
+  return filter.effectiveProvider;
 }
 
 /**
@@ -3692,7 +3741,7 @@ function providerForPath( filePath )
 function pathLocalize( filePath )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   _.assert( _.strIs( filePath ) );
@@ -3702,20 +3751,20 @@ function pathLocalize( filePath )
 
   filePath = path.canonize( filePath );
 
-  if( filter.effectiveFileProvider && !path.isGlobal( filePath ) )
+  if( filter.effectiveProvider && !path.isGlobal( filePath ) )
   return filePath;
 
   let effectiveProvider2 = fileProvider.providerForPath( filePath );
-  _.assert( filter.effectiveFileProvider === null || effectiveProvider2 === null || filter.effectiveFileProvider === effectiveProvider2, 'Record filter should have paths of single file provider' );
-  filter.effectiveFileProvider = filter.effectiveFileProvider || effectiveProvider2;
+  _.assert( filter.effectiveProvider === null || effectiveProvider2 === null || filter.effectiveProvider === effectiveProvider2, 'Record filter should have paths of single file provider' );
+  filter.effectiveProvider = filter.effectiveProvider || effectiveProvider2;
 
-  if( filter.effectiveFileProvider )
+  if( filter.effectiveProvider )
   {
 
-    if( !filter.hubFileProvider )
-    filter.hubFileProvider = filter.effectiveFileProvider.hub;
-    _.assert( filter.effectiveFileProvider.hub === null || filter.hubFileProvider === filter.effectiveFileProvider.hub );
-    _.assert( filter.effectiveFileProvider.hub === null || filter.hubFileProvider instanceof _.FileProvider.Hub );
+    if( !filter.system )
+    filter.system = filter.effectiveProvider.system;
+    _.assert( filter.effectiveProvider.system === null || filter.system === filter.effectiveProvider.system );
+    _.assert( filter.effectiveProvider.system === null || filter.system instanceof _.FileProvider.System );
 
   }
 
@@ -3724,7 +3773,7 @@ function pathLocalize( filePath )
 
   _.assert( !path.isTrailed( filePath ) );
 
-  let provider = filter.effectiveFileProvider || filter.hubFileProvider || filter.defaultFileProvider;
+  let provider = filter.effectiveProvider || filter.system || filter.defaultProvider;
   let result = provider.path.preferredFromGlobal( filePath );
   return result;
 }
@@ -3740,7 +3789,7 @@ function pathLocalize( filePath )
 function pathsRefine()
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
   let originalFilePath = filter.filePath;
 
@@ -3800,14 +3849,14 @@ function globalsFromLocals()
 {
   let filter = this;
 
-  if( !filter.effectiveFileProvider )
+  if( !filter.effectiveProvider )
   return;
 
   if( filter.basePath )
-  filter.basePath = filter.effectiveFileProvider.globalsFromLocals( filter.basePath );
+  filter.basePath = filter.effectiveProvider.globalsFromLocals( filter.basePath );
 
   if( filter.filePath )
-  filter.filePath = filter.effectiveFileProvider.globalsFromLocals( filter.filePath );
+  filter.filePath = filter.effectiveProvider.globalsFromLocals( filter.filePath );
 
 }
 
@@ -3818,7 +3867,7 @@ function globalsFromLocals()
 function allPaths( o )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
   let thePath;
 
@@ -3871,7 +3920,7 @@ allPaths.defaults =
 function isRelative( o )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
   let thePath;
 
@@ -3914,7 +3963,7 @@ isRelative.defaults =
 function sureRelative( o )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   o = _.routineOptions( sureRelative, arguments );
@@ -3953,7 +4002,7 @@ sureRelative.defaults =
 function sureRelativeOrGlobal( o )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   o = _.routineOptions( sureRelative, arguments );
@@ -3991,7 +4040,7 @@ sureRelative.defaults =
 function sureBasePath( filePath, basePath )
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   if( filePath === undefined )
@@ -4117,7 +4166,7 @@ function filteringClear()
 function moveTextualReport()
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   _.assert( filter.isPaired() );
@@ -4393,7 +4442,7 @@ function maskEndsApply()
 function masksGenerate()
 {
   let filter = this;
-  let fileProvider = filter.hubFileProvider || filter.effectiveFileProvider || filter.defaultFileProvider;
+  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   _.assert( arguments.length === 0 );
@@ -4765,9 +4814,9 @@ let Aggregates =
 
 let Associates =
 {
-  effectiveFileProvider : null,
-  defaultFileProvider : null,
-  hubFileProvider : null,
+  effectiveProvider : null,
+  defaultProvider : null,
+  system : null,
 }
 
 let Restricts =
@@ -4820,6 +4869,9 @@ let Forbids =
   stemPath : 'stemPath',
   distinct : 'distinct',
   globFound : 'globFound',
+  hubFileProvider : 'hubFileProvider',
+  effectiveFileProvider : 'effectiveFileProvider',
+  defaultFileProvider : 'defaultFileProvider',
 
 }
 

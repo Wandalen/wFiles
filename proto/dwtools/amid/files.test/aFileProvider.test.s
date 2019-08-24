@@ -40,7 +40,7 @@ function onSuiteEnd()
   _.assert( _.strHas( this.testSuitePath, 'tmp.tmp' ) );
   path.dirTempClose( this.testSuitePath );
   this.provider.finit();
-  this.hub.finit();
+  this.system.finit();
 }
 
 //
@@ -49,9 +49,9 @@ function onRoutineEnd( test )
 {
   let context = this;
   let provider = context.provider;
-  let hub = context.hub;
+  let system = context.system;
   let path = context.provider.path;
-  _.sure( _.arraySetIdentical( _.mapKeys( hub.providersWithProtocolMap ), [ 'second', 'current' ] ), test.name, 'has not restored hub!', hub.providersWithProtocolMap );
+  _.sure( _.arraySetIdentical( _.mapKeys( system.providersWithProtocolMap ), [ 'second', 'current' ] ), test.name, 'has not restored system!' );
 }
 
 //
@@ -75,7 +75,7 @@ function providerIsInstanceOf( src )
   if( provider instanceof src )
   return true;
 
-  if( _.FileProvider.Hub && provider instanceof _.FileProvider.Hub )
+  if( _.FileProvider.System && provider instanceof _.FileProvider.System )
   {
     var routinePath = self.pathFor( 'routinePath' );
     var provider2 = provider.providerForPath( routinePath );
@@ -4717,7 +4717,7 @@ function fileCopyActSync( test )
     breakingDstHardLink : 0,
     sync : 1
   }
-  if( !self.providerIsInstanceOf( _.FileProvider.Hub ) )
+  if( !self.providerIsInstanceOf( _.FileProvider.System ) )
   test.shouldThrowError( () => provider.fileCopyAct( o ) );
   else
   test.mustNotThrowError( () => provider.fileCopyAct( o ) );
@@ -9343,7 +9343,7 @@ function fileCopyGlobal( test )
   
   /*  */
   
-  test.open( 'with hub' )
+  test.open( 'with system' )
   
   test.case = 'default protocol';
   provider.filesDelete( routinePath );
@@ -9368,13 +9368,13 @@ function fileCopyGlobal( test )
   test.is( provider.isTerminal( srcPath ) );
   test.is( !provider.fileExists( dstPath ) );
   
-  test.close( 'with hub' )
+  test.close( 'with system' )
   
   /* */
   
-  test.open( 'without hub' )
+  test.open( 'without system' )
   
-  self.hub.providerUnregister( provider );
+  self.system.providerUnregister( provider );
   
   test.case = 'default protocol';
   provider.filesDelete( routinePath );
@@ -9399,9 +9399,9 @@ function fileCopyGlobal( test )
   test.is( provider.isTerminal( srcPath ) );
   test.is( !provider.fileExists( dstPath ) );
   
-  self.hub.providerRegister( provider );
+  self.system.providerRegister( provider );
   
-  test.close( 'without hub' )
+  test.close( 'without system' )
   
 }
 
@@ -12529,7 +12529,7 @@ function fileRenameActSync( test )
     relativeDstPath : dstPath,
     sync : 1
   }
-  if( !self.providerIsInstanceOf( _.FileProvider.Hub ) )
+  if( !self.providerIsInstanceOf( _.FileProvider.System ) )
   test.shouldThrowError( () => provider.fileRenameAct( o ) );
   else
   test.mustNotThrowError( () => provider.fileRenameAct( o ) );
@@ -13069,7 +13069,7 @@ function fileRenameGlobal( test )
   
   /* */
   
-  test.open( 'with hub' );
+  test.open( 'with system' );
   
   test.case = 'default protocol';
   provider.filesDelete( routinePath );
@@ -13094,13 +13094,13 @@ function fileRenameGlobal( test )
   test.is( provider.isTerminal( srcPath ) );
   test.is( !provider.fileExists( dstPath ) );  
   
-  test.close( 'with hub' );
+  test.close( 'with system' );
   
   /* */
   
-  test.open( 'without hub' );
+  test.open( 'without system' );
   
-  self.hub.providerUnregister( provider );
+  self.system.providerUnregister( provider );
   
   test.case = 'default protocol';
   provider.filesDelete( routinePath );
@@ -13125,9 +13125,9 @@ function fileRenameGlobal( test )
   test.is( provider.isTerminal( srcPath ) );
   test.is( !provider.fileExists( dstPath ) );  
   
-  self.hub.providerRegister( provider );
+  self.system.providerRegister( provider );
   
-  test.close( 'without hub' );
+  test.close( 'without system' );
 }
 
 //
@@ -14398,7 +14398,7 @@ function fileDeleteLocked( test )
   let provider = self.provider;
   let path = provider.path;
 
-  let skip = !self.providerIsInstanceOf( _.FileProvider.HardDrive ) || self.providerIsInstanceOf( _.FileProvider.Hub );
+  let skip = !self.providerIsInstanceOf( _.FileProvider.HardDrive ) || self.providerIsInstanceOf( _.FileProvider.System );
 
   if( skip )
   {
@@ -21943,7 +21943,7 @@ function softLinkActSync( test )
 
   var expected = _.mapExtend( null, o );
 
-  if( !( provider instanceof _.FileProvider.Hub ) )
+  if( !( provider instanceof _.FileProvider.System ) )
   if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   if( process.platform === 'win32' )
   expected.type = 'file'
@@ -23388,7 +23388,7 @@ function softLinkGlobal( test )
   
   /*  */
   
-  test.open( 'with hub' );
+  test.open( 'with system' );
   
   test.case = 'default protocol';
   provider.filesDelete( routinePath );
@@ -23413,13 +23413,13 @@ function softLinkGlobal( test )
   test.is( provider.isTerminal( srcPath ) );
   test.is( !provider.fileExists( dstPath ) );
   
-  test.close( 'with hub' );
+  test.close( 'with system' );
   
   /*  */
   
-  test.open( 'without hub' );
+  test.open( 'without system' );
   
-  self.hub.providerUnregister( provider );
+  self.system.providerUnregister( provider );
   
   test.case = 'default protocol';
   provider.filesDelete( routinePath );
@@ -23444,9 +23444,9 @@ function softLinkGlobal( test )
   test.is( provider.isTerminal( srcPath ) );
   test.is( !provider.fileExists( dstPath ) );
   
-  self.hub.providerRegister( provider );
+  self.system.providerRegister( provider );
   
-  test.close( 'without hub' );
+  test.close( 'without system' );
   
 }
 
@@ -24479,7 +24479,7 @@ function textLinkGlobal( test )
   
   /*  */
   
-  test.open( 'with hub' );
+  test.open( 'with system' );
   
   test.case = 'default protocol';
   provider.filesDelete( routinePath );
@@ -24504,13 +24504,13 @@ function textLinkGlobal( test )
   test.is( provider.isTerminal( srcPath ) );
   test.is( !provider.fileExists( dstPath ) );
   
-  test.close( 'with hub' );
+  test.close( 'with system' );
   
   /*  */
   
-  test.open( 'without hub' );
+  test.open( 'without system' );
   
-  self.hub.providerUnregister( provider );
+  self.system.providerUnregister( provider );
   
   test.case = 'default protocol';
   provider.filesDelete( routinePath );
@@ -24537,9 +24537,9 @@ function textLinkGlobal( test )
   
   provider.fieldPop( 'usingTextLink', 1 )
   
-  self.hub.providerRegister( provider );
+  self.system.providerRegister( provider );
   
-  test.close( 'without hub' );
+  test.close( 'without system' );
 }
 
 //
@@ -26736,7 +26736,7 @@ function hardLinkActSync( test )
     breakingDstHardLink : 1,
     sync : 1
   }
-  if( !self.providerIsInstanceOf( _.FileProvider.Hub ) )
+  if( !self.providerIsInstanceOf( _.FileProvider.System ) )
   test.shouldThrowError( () => provider.hardLinkAct( o ) );
   else
   test.mustNotThrowError( () => provider.hardLinkAct( o ) );
@@ -30048,7 +30048,7 @@ function hardLinkGlobal( test )
   
   /*  */
   
-  test.open( 'with hub' );
+  test.open( 'with system' );
   
   test.case = 'default protocol';
   provider.filesDelete( routinePath );
@@ -30073,13 +30073,13 @@ function hardLinkGlobal( test )
   test.is( provider.isTerminal( srcPath ) );
   test.is( !provider.fileExists( dstPath ) );
   
-  test.close( 'with hub' );
+  test.close( 'with system' );
   
   /* */
   
-  test.open( 'without hub' );
+  test.open( 'without system' );
   
-  self.hub.providerUnregister( provider );
+  self.system.providerUnregister( provider );
   
   test.case = 'default protocol';
   provider.filesDelete( routinePath );
@@ -30104,9 +30104,9 @@ function hardLinkGlobal( test )
   test.is( provider.isTerminal( srcPath ) );
   test.is( !provider.fileExists( dstPath ) );
   
-  self.hub.providerRegister( provider );
+  self.system.providerRegister( provider );
   
-  test.close( 'without hub' );
+  test.close( 'without system' );
   
 }
 
@@ -36989,11 +36989,11 @@ function fileExistsCompliantBehavior( test )
 function record( test )
 {
   let self = this;
-  let hub = self.hub || self.provider;
+  let system = self.system || self.provider;
   let providerEffective = self.providerEffective || self.provider;
 
-  test.is( providerEffective.hub === hub );
-  test.is( _.arrayHas( _.mapKeys( hub.providersWithProtocolMap ), providerEffective.protocol ) );
+  test.is( providerEffective.system === system );
+  test.is( _.arrayHas( _.mapKeys( system.providersWithProtocolMap ), providerEffective.protocol ) );
 
   let filePath = test.context.globalFromPreferred( '/record/terminal' );
 
@@ -37710,7 +37710,7 @@ function pathResolveLinkTailChain( test )
 
   let o1 =
   {
-    hub : null,
+    system : null,
     filePath : null,
     resolvingSoftLink : 1,
     resolvingTextLink : 1,

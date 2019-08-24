@@ -77,7 +77,7 @@ function recordFields( test )
   var filter = {}
   var o =
   {
-    defaultFileProvider : _.fileProvider,
+    defaultProvider : _.fileProvider,
     filter : null,
     allowingMissed : 1,
   };
@@ -516,7 +516,7 @@ function recordFiltering( test )
   var filter = {}
   var o =
   {
-    defaultFileProvider : _.fileProvider,
+    defaultProvider : _.fileProvider,
     filter : null
   };
 
@@ -525,7 +525,7 @@ function recordFiltering( test )
 
   function makeFilter( o )
   {
-    _.mapSupplement( o, { hubFileProvider : _.fileProvider } );
+    _.mapSupplement( o, { system : _.fileProvider } );
     var f = _.FileRecordFilter( o );
     f.form();
     return f;
@@ -740,7 +740,7 @@ function recordForLink( test )
   let dir = _.path.join( testSuitePath, test.name );
   let o =
   {
-    defaultFileProvider : _.fileProvider,
+    defaultProvider : _.fileProvider,
     basePath : dir
   }
   let pathToMissing = _.path.join( dir, 'missing' );
@@ -974,7 +974,7 @@ function recordForRelativeLink( test )
   let dir = _.path.join( testSuitePath, test.name );
   let o =
   {
-    defaultFileProvider : _.fileProvider,
+    defaultProvider : _.fileProvider,
     basePath : dir,
   }
   let pathToMissing = _.path.join( dir, 'missing' );
@@ -1374,7 +1374,7 @@ function recordStating( test )
   test.case = 'get stat with stating off';
   var o =
   {
-    defaultFileProvider : _.fileProvider,
+    defaultProvider : _.fileProvider,
     filter : null,
     basePath : _.path.normalize( __dirname ),
     stating : false
@@ -1388,7 +1388,7 @@ function recordStating( test )
   test.case = 'get stat with stating on';
   var o =
   {
-    defaultFileProvider : _.fileProvider,
+    defaultProvider : _.fileProvider,
     filter : null,
     basePath : _.path.normalize( __dirname ),
     stating : true
@@ -1429,21 +1429,21 @@ function change( test )
 
 //
 
-function recordHubExperiment( test )
+function recordSystemExperiment( test )
 {
   let self = this;
   
-  let hub = _.FileProvider.Hub({ empty : 1 });
+  let system = _.FileProvider.System({ empty : 1 });
   let provider = new _.FileProvider.HardDrive();
-  hub.providerRegister( provider );
+  system.providerRegister( provider );
   
   let filePathLocal = provider.path.normalize( __filename );
   let fileName = provider.path.name({ path : __filename, full : 1 });
   let filePathGlobal = provider.path.globalFromPreferred( filePathLocal );
   let filePathRelativeGlobal = provider.path.globalFromPreferred( fileName );
-  let basePathGlobal = hub.path.dir( filePathGlobal );
+  let basePathGlobal = system.path.dir( filePathGlobal );
   
-  let factory = hub.recordFactory();
+  let factory = system.recordFactory();
   let record = factory.record( filePathGlobal );
   
   test.identical( factory.basePath, basePathGlobal );
@@ -1457,10 +1457,10 @@ function recordHubExperiment( test )
   })
   
   provider.finit();
-  hub.finit();
+  system.finit();
 }
 
-recordHubExperiment.experimental = 1;
+recordSystemExperiment.experimental = 1;
 
 // --
 // proto
@@ -1486,7 +1486,7 @@ var Self =
 
     change,
     
-    recordHubExperiment
+    recordSystemExperiment
 
   },
 

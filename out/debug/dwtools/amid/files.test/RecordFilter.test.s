@@ -1387,7 +1387,7 @@ function formBaseDeducingFromFile( test )
 function clone( test )
 {
   let provider = _.fileProvider;
-  let filter = new _.FileRecordFilter({ defaultFileProvider : provider });
+  let filter = new _.FileRecordFilter({ defaultProvider : provider });
 
   filter.prefixPath = '/some/path';
 

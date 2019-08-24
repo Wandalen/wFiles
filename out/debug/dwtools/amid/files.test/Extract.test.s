@@ -49,7 +49,7 @@ function onSuiteBegin( test )
   // debugger;
   Parent.onSuiteBegin.apply( this, arguments );
   context.provider = _.FileProvider.Extract({ filesTree : filesTree, usingExtraStat : 1, protocol : 'current', protocols : [ 'current', 'second' ] });
-  context.hub = _.FileProvider.Hub({ providers : [ context.provider ] });
+  context.system = _.FileProvider.System({ providers : [ context.provider ] });
   let path = context.provider.path;
   context.testSuitePath = path.dirTempOpen( 'FilesFind' );
   context.globalFromPreferred = function globalFromPreferred( path ){ return path };

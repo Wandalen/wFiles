@@ -44,7 +44,7 @@ if( typeof module !== 'undefined' )
 
   /* l7 */
 
-  require( './l7/Hub.s' );
+  require( './l7/System.s' );
 
   /* l8 */
 

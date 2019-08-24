@@ -227,8 +227,8 @@ function init( o )
 function finit()
 {
   let self = this;
-  if( self.hub )
-  self.hub.providerUnregister( self );
+  if( self.system )
+  self.system.providerUnregister( self );
   _.Copyable.prototype.finit.call( self );
 }
 
@@ -405,7 +405,7 @@ function _preFileFilterWithoutProviderDefaults( routine, args )
   o.src._formPaths();
   if( o.dst )
   o.dst._formPaths();
-  o.src.effectiveFileProvider._providerDefaultsApply( o );
+  o.src.effectiveProvider._providerDefaultsApply( o );
 
   return o;
 }
@@ -652,10 +652,10 @@ function providerForPath( path )
 
 //
 
-function providerRegisterTo( hub )
+function providerRegisterTo( system )
 {
   let self = this;
-  hub.providerRegister( self );
+  system.providerRegister( self );
   return self;
 }
 
@@ -665,8 +665,8 @@ function providerUnregister()
 {
   let self = this;
   _.assert( arguments.length === 0 );
-  if( self.hub )
-  self.hub.providerUnregister( self );
+  if( self.system )
+  self.system.providerUnregister( self );
   return self;
 }
 
@@ -966,7 +966,7 @@ let pathResolveTextLink = _.routineFromPreAndBody( pathResolveTextLink_pre, path
 let _pathResolveLink = Object.create( null );
 
 var defaults = _pathResolveLink.defaults = Object.create( null );
-// defaults.hub = null;
+// defaults.system = null;
 defaults.filePath = null;
 defaults.resolvingSoftLink = null;
 defaults.resolvingTextLink = null;
@@ -1063,9 +1063,9 @@ function pathResolveLinkFull_body( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assertRoutineOptions( pathResolveLinkFull_body, arguments );
 
-  let hub = o.hub || self.hub;
-  if( hub && hub !== self && path.isGlobal( o.filePath ) )
-  return hub.pathResolveLinkFull.body.call( hub, o );
+  let system = o.system || self.system;
+  if( system && system !== self && path.isGlobal( o.filePath ) )
+  return system.pathResolveLinkFull.body.call( system, o );
 
   if( o.sync )
   return _pathResolveLinkFullSync();
@@ -1104,7 +1104,7 @@ function pathResolveLinkFull_body( o )
 
         let o2 =
         {
-          hub : hub,
+          system : system,
           filePath : result.absolutePath,
           resolvingSoftLink : o.resolvingSoftLink,
           resolvingTextLink : o.resolvingTextLink,
@@ -1117,14 +1117,14 @@ function pathResolveLinkFull_body( o )
         result.relativePath = result.filePath = result.absolutePath = self.pathResolveLinkHeadDirect.body.call( self, o2 );
 
       }
-      
+
       if( result )
       {
 
         let o2 =
         {
           stat : o.stat,
-          hub : hub,
+          system : system,
           filePath : result.absolutePath,
           resolvingSoftLink : o.resolvingSoftLink,
           resolvingTextLink : o.resolvingTextLink,
@@ -1142,10 +1142,10 @@ function pathResolveLinkFull_body( o )
           if( path.isRelative( r.filePath ) )
           r.filePath = r.relativePath;
         }
-        
+
         if( !o.preservingRelative )
         r.filePath = r.absolutePath;
-        
+
         result = r;
         o.stat = o2.stat;
         _.assert( o.stat !== undefined );
@@ -1170,7 +1170,7 @@ function pathResolveLinkFull_body( o )
 
         let o2 =
         {
-          hub : hub,
+          system : system,
           filePath : result.absolutePath,
           resolvingSoftLink : o.resolvingSoftLink,
           resolvingTextLink : o.resolvingTextLink,
@@ -1185,7 +1185,7 @@ function pathResolveLinkFull_body( o )
         if( r !== result.absolutePath )
         {
           result.filePath = result.absolutePath = r;
-          
+
           if( r.relativePath && o.relativeOriginalFile )
           {
             if( path.isRelative( result.relativePath ) )
@@ -1193,7 +1193,7 @@ function pathResolveLinkFull_body( o )
             if( path.isRelative( result.filePath ) )
             result.filePath = r.relativePath;
           }
-        
+
           if( !path.isRelative( result.relativePath ) )
           result.relativePath = result.absolutePath;
           else if( o.preservingRelative )
@@ -1281,7 +1281,7 @@ function pathResolveLinkFull_body( o )
     //     let filePath = result;
     //     let o2 =
     //     {
-    //       hub : hub,
+    //       system : system,
     //       filePath : result,
     //       resolvingSoftLink : o.resolvingSoftLink,
     //       resolvingTextLink : o.resolvingTextLink,
@@ -1301,7 +1301,7 @@ function pathResolveLinkFull_body( o )
     //     let o2 =
     //     {
     //       stat : o.stat,
-    //       hub : hub,
+    //       system : system,
     //       filePath : result,
     //       resolvingSoftLink : o.resolvingSoftLink,
     //       resolvingTextLink : o.resolvingTextLink,
@@ -1335,7 +1335,7 @@ function pathResolveLinkFull_body( o )
     //     let absolutePath = _.mapIs( result ) ? result.absolutePath : result;
     //     let o2 =
     //     {
-    //       hub : hub,
+    //       system : system,
     //       filePath : absolutePath,
     //       resolvingSoftLink : o.resolvingSoftLink,
     //       resolvingTextLink : o.resolvingTextLink,
@@ -1412,7 +1412,7 @@ function pathResolveLinkFull_body( o )
       //   let filePath = result;
       //   let o2 =
       //   {
-      //     hub : hub,
+      //     system : system,
       //     filePath : result,
       //     resolvingSoftLink : o.resolvingSoftLink,
       //     resolvingTextLink : o.resolvingTextLink,
@@ -1432,7 +1432,7 @@ function pathResolveLinkFull_body( o )
       //   let o2 =
       //   {
       //     stat : o.stat,
-      //     hub : hub,
+      //     system : system,
       //     filePath : result,
       //     resolvingSoftLink : o.resolvingSoftLink,
       //     resolvingTextLink : o.resolvingTextLink,
@@ -1466,7 +1466,7 @@ function pathResolveLinkFull_body( o )
       //   let absolutePath = _.mapIs( result ) ? result.absolutePath : result;
       //   let o2 =
       //   {
-      //     hub : hub,
+      //     system : system,
       //     filePath : absolutePath,
       //     resolvingSoftLink : o.resolvingSoftLink,
       //     resolvingTextLink : o.resolvingTextLink,
@@ -1502,7 +1502,7 @@ _.routineExtend( pathResolveLinkFull_body, _pathResolveLink );
 
 var defaults = pathResolveLinkFull_body.defaults;
 
-defaults.hub = null;
+defaults.system = null;
 defaults.stat = null;
 defaults.sync = null;
 defaults.resolvingHeadDirect = 1;
@@ -1587,7 +1587,7 @@ _.routineExtend( pathResolveLinkTail_body, _pathResolveLink );
 
 var defaults = pathResolveLinkTail_body.defaults;
 
-defaults.hub = null;
+defaults.system = null;
 defaults.stat = null;
 defaults.preservingRelative = 0;
 
@@ -1639,9 +1639,9 @@ function pathResolveLinkTailChain_body( o )
   _.assert( path.isAbsolute( o.filePath ) );
   _.assertRoutineOptions( pathResolveLinkTailChain_body, arguments );
 
-  let hub = o.hub || self.hub;
-  if( hub && hub !== self && path.isGlobal( o.filePath ) )
-  return hub.pathResolveLinkTailChain.body.call( hub, o );
+  let system = o.system || self.system;
+  if( system && system !== self && path.isGlobal( o.filePath ) )
+  return system.pathResolveLinkTailChain.body.call( system, o );
 
   if( _.arrayHas( o.found, o.filePath ) )
   {
@@ -1783,9 +1783,9 @@ function pathResolveLinkHeadDirect_body( o )
   _.assert( path.isAbsolute( o.filePath ) );
   _.assertRoutineOptions( pathResolveLinkHeadDirect_body, arguments );
 
-  let hub = o.hub || self.hub;
-  if( hub && hub !== self && path.isGlobal( o.filePath ) )
-  return hub.pathResolveLinkHeadDirect.body.call( hub, o );
+  let system = o.system || self.system;
+  if( system && system !== self && path.isGlobal( o.filePath ) )
+  return system.pathResolveLinkHeadDirect.body.call( system, o );
 
   if( !o.resolvingSoftLink && ( !o.resolvingTextLink || !self.usingTextLink ) )
   return o.filePath;
@@ -1839,7 +1839,7 @@ _.routineExtend( pathResolveLinkHeadDirect_body, _pathResolveLink );
 
 var defaults = pathResolveLinkHeadDirect_body.defaults;
 
-defaults.hub = null;
+defaults.system = null;
 defaults.stat = null;
 
 //
@@ -1872,9 +1872,9 @@ function pathResolveLinkHeadReverse_body( o )
   _.assert( path.isAbsolute( o.filePath ) );
   _.assertRoutineOptions( pathResolveLinkHeadReverse_body, arguments );
 
-  let hub = o.hub || self.hub;
-  if( hub && hub !== self && path.isGlobal( o.filePath ) )
-  return hub.pathResolveLinkHeadReverse.body.call( hub, o );
+  let system = o.system || self.system;
+  if( system && system !== self && path.isGlobal( o.filePath ) )
+  return system.pathResolveLinkHeadReverse.body.call( system, o );
 
   let prefixPath = o.filePath;
   let postfixPath = '';
@@ -1902,7 +1902,7 @@ _.routineExtend( pathResolveLinkHeadReverse_body, _pathResolveLink );
 
 var defaults = pathResolveLinkHeadReverse_body.defaults;
 
-defaults.hub = null;
+defaults.system = null;
 
 //
 
@@ -2076,19 +2076,19 @@ function recordFactory( factory )
   if( factory instanceof _.FileRecordFactory )
   {
 
-    if( !factory.hubFileProvider && self.hub )
-    factory.hubFileProvider = self.hub;
+    if( !factory.system && self.system )
+    factory.system = self.system;
 
-    if( !factory.defaultFileProvider )
-    factory.defaultFileProvider = self;
+    if( !factory.defaultProvider )
+    factory.defaultProvider = self;
 
     return factory
   }
 
   _.assert( arguments.length === 0 || arguments.length === 1 );
 
-  if( !factory.defaultFileProvider )
-  factory.defaultFileProvider = self;
+  if( !factory.defaultProvider )
+  factory.defaultProvider = self;
 
   return _.FileRecordFactory( factory );
 }
@@ -2110,11 +2110,11 @@ function recordFilter( filter )
   if( filter instanceof _.FileRecordFilter )
   {
 
-    if( !filter.hubFileProvider && self.hub )
-    filter.hubFileProvider = self.hub;
+    if( !filter.system && self.system )
+    filter.system = self.system;
 
-    if( !filter.defaultFileProvider )
-    filter.defaultFileProvider = self;
+    if( !filter.defaultProvider )
+    filter.defaultProvider = self;
 
     return filter
   }
@@ -2128,8 +2128,8 @@ function recordFilter( filter )
     filter = {};
   }
 
-  if( !filter.defaultFileProvider )
-  filter.defaultFileProvider = self;
+  if( !filter.defaultProvider )
+  filter.defaultProvider = self;
 
   let result = _.FileRecordFilter( filter );
 
@@ -2207,9 +2207,9 @@ function statRead_body( o )
   /* - */
 
   function end( result )
-  { 
+  {
     result = result.absolutePath;
-    
+
     if( result === null )
     {
       if( o.throwing )
@@ -3777,7 +3777,7 @@ function filesAreSame_body( o )
   if( !o.ins2.stat )
   return false;
 
-  if( o.ins1.factory.effectiveFileProvider === o.ins2.factory.effectiveFileProvider && o.ins1.stat.ino > 0 )
+  if( o.ins1.factory.effectiveProvider === o.ins2.factory.effectiveProvider && o.ins1.stat.ino > 0 )
   {
     let could = _.statsAreHardLinked( o.ins1.stat, o.ins2.stat );
     if( could === true || could === _.maybe )
@@ -3792,7 +3792,7 @@ function filesAreSame_body( o )
     return false;
     debugger;
 
-    if( o.ins1.factory.effectiveFileProvider === o.ins2.factory.effectiveFileProvider && o.ins1.stat.ino > 0 )
+    if( o.ins1.factory.effectiveProvider === o.ins2.factory.effectiveProvider && o.ins1.stat.ino > 0 )
     if( self.UsingBigIntForStat )
     return o.ins1.ino === o.ins2.ino;
     else
@@ -3831,7 +3831,7 @@ function filesAreSame_body( o )
 
   /* hard linked */
 
-  if( o.ins1.factory.effectiveFileProvider === o.ins2.factory.effectiveFileProvider && o.ins1.stat.ino > 0 )
+  if( o.ins1.factory.effectiveProvider === o.ins2.factory.effectiveProvider && o.ins1.stat.ino > 0 )
   if( self.UsingBigIntForStat )
   if( o.ins1.stat.ino === o.ins2.stat.ino )
   return true;
@@ -5491,7 +5491,7 @@ function _link_functor( fop )
   function _link_body( o )
   {
     let self = this;
-    let path = self.hub ? self.hub.path : self.path;
+    let path = self.system ? self.system.path : self.path;
     let o2;
     let c = Object.create( null );
 
@@ -6912,7 +6912,7 @@ function _fileCopyAct( c )
   let self = this;
   // let o = c.options2;
   let o = c.options;
-  
+
   _.assert( _.fileStatIs( c.srcStat ) || c.srcStat === null );
 
   // if( o.srcPath === 'extract4:///src/proto/terLink1' )
@@ -8246,7 +8246,7 @@ let ProviderDefaults =
   'sync' : null,
   'throwing' : null,
   'safe' : null,
-  'hub' : null,
+  'system' : null,
 }
 
 /**
@@ -8266,7 +8266,7 @@ let ProviderDefaults =
  * @property {Boolean} usingGlobalPath=0
  * @property {Object} path
  * @property {Object} logger
- * @property {Object} hub
+ * @property {Object} system
  * @property {String} protocol
  * @property {String} originPath
  * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial
@@ -8307,7 +8307,7 @@ let Associates =
 {
   path : null,
   logger : null,
-  hub : null,
+  system : null,
 }
 
 let Restricts =
@@ -8360,6 +8360,7 @@ let Forbids =
   isSoftLinkAct : 'isSoftLinkAct',
   isHardLinkAct : 'isHardLinkAct',
   _recordPathForm : '_recordPathForm',
+  hub : 'hub',
 
 }
 
@@ -8405,7 +8406,7 @@ let Proto =
   _preSrcDstPathWithProviderDefaults,
   EncodersGenerate,
 
-  // hub
+  // system
 
   protocolsForOrigins,
   originsForProtocols,

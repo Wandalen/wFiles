@@ -316,10 +316,10 @@ function fileReadAct( o )
     resolvingTextLink : o.resolvingTextLink,
   }).absolutePath;
 
-  if( self.hub && _.path.isGlobal( o.filePath ) )
+  if( self.system && _.path.isGlobal( o.filePath ) )
   {
-    _.assert( self.hub !== self );
-    return self.hub.fileReadAct( o );
+    _.assert( self.system !== self );
+    return self.system.fileReadAct( o );
   }
 
   result = self._descriptorRead( o.filePath );

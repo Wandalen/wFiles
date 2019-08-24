@@ -23,7 +23,7 @@ function onSuiteBegin( test )
 
   context.providerSrc = _.FileProvider.Npm();
   context.providerDst = _.FileProvider.HardDrive();
-  context.hub = _.FileProvider.Hub({ providers : [ context.providerSrc, context.providerDst ] });
+  context.system = _.FileProvider.System({ providers : [ context.providerSrc, context.providerDst ] });
 
   let path = context.providerDst.path;
 
@@ -48,7 +48,7 @@ function filesReflectTrivial( test )
   let context = this;
   let providerSrc = context.providerSrc;
   let providerDst = context.providerDst;
-  let hub = context.hub;
+  let system = context.system;
   let path = context.providerDst.path;
   let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
   let installPath = path.join( routinePath, 'wPathBasic' );
@@ -61,7 +61,7 @@ function filesReflectTrivial( test )
     test.case = 'no hash, no trailing /';
     providerDst.filesDelete( installPath );
     let remotePath = 'npm:///wpathbasic';
-    return hub.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
+    return system.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
   })
   .then( ( got ) =>
   {
@@ -86,7 +86,7 @@ function filesReflectTrivial( test )
     test.case = 'no hash, with trailing /';
     providerDst.filesDelete( installPath );
     let remotePath = 'npm:///wpathbasic/'
-    return hub.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
+    return system.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
   })
   .then( ( got ) =>
   {
@@ -112,8 +112,8 @@ function filesReflectTrivial( test )
     providerDst.filesDelete( installPath );
     let remotePath = 'npm:///wpathbasic';
     let o = { reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 };
-    hub.filesReflect( _.cloneJust( o ) )
-    return hub.filesReflect( _.cloneJust( o ) );
+    system.filesReflect( _.cloneJust( o ) )
+    return system.filesReflect( _.cloneJust( o ) );
   })
   .then( ( got ) =>
   {
@@ -138,7 +138,7 @@ function filesReflectTrivial( test )
     test.case = 'specific version';
     providerDst.filesDelete( installPath );
     let remotePath = 'npm:///wpathbasic#0.6.154'
-    return hub.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
+    return system.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
   })
   .then( ( got ) =>
   {
@@ -166,7 +166,7 @@ function filesReflectTrivial( test )
     test.case = 'specific tag';
     providerDst.filesDelete( installPath );
     let remotePath = 'npm:///wpathbasic#latest'
-    return hub.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
+    return system.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
   })
   .then( ( got ) =>
   {
@@ -195,7 +195,7 @@ function filesReflectTrivial( test )
     providerDst.filesDelete( installPath );
     providerDst.fileWrite( installPath, installPath );
     let remotePath = 'npm:///wpathbasic';
-    return test.shouldThrowErrorSync( () => hub.filesReflect( { reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 } ));
+    return test.shouldThrowErrorSync( () => system.filesReflect( { reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 } ));
   })
   .then( () =>
   {
@@ -210,7 +210,7 @@ function filesReflectTrivial( test )
     test.case = 'wrong package name';
     providerDst.filesDelete( installPath );
     let remotePath = 'npm:///wpathFundamentals';
-    return test.shouldThrowErrorSync( () => hub.filesReflect( { reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 } ) );
+    return test.shouldThrowErrorSync( () => system.filesReflect( { reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 } ) );
   })
   .then( () =>
   {
@@ -246,7 +246,7 @@ filesReflectTrivial.timeOut = 120000;
 //     return providerSrc.filesReflect
 //     ({
 //       reflectMap : { [ remotePath ] : installPath },
-//       dst : { effectiveFileProvider : providerDst },
+//       dst : { effectiveProvider : providerDst },
 //       verbosity : 3
 //     });
 //   })
@@ -276,7 +276,7 @@ filesReflectTrivial.timeOut = 120000;
 //     return providerSrc.filesReflect
 //     ({
 //       reflectMap : { [ remotePath ] : installPath },
-//       dst : { effectiveFileProvider : providerDst },
+//       dst : { effectiveProvider : providerDst },
 //       verbosity : 3
 //     });
 //   })
@@ -309,7 +309,7 @@ filesReflectTrivial.timeOut = 120000;
 //     return providerSrc.filesReflect
 //     ({
 //       reflectMap : { [ remotePath ] : installPath },
-//       dst : { effectiveFileProvider : providerDst },
+//       dst : { effectiveProvider : providerDst },
 //       verbosity : 3
 //     });
 //   })
@@ -339,7 +339,7 @@ filesReflectTrivial.timeOut = 120000;
 //     let o =
 //     {
 //       reflectMap : { [ remotePath ] : installPath },
-//       dst : { effectiveFileProvider : providerDst },
+//       dst : { effectiveProvider : providerDst },
 //       verbosity : 3
 //     }
 //     let con = providerSrc.filesReflect( _.mapExtend( null, o ) );
@@ -372,7 +372,7 @@ filesReflectTrivial.timeOut = 120000;
 //     return providerSrc.filesReflect
 //     ({
 //       reflectMap : { [ remotePath ] : installPath },
-//       dst : { effectiveFileProvider : providerDst },
+//       dst : { effectiveProvider : providerDst },
 //       verbosity : 3
 //     });
 //   })
@@ -406,7 +406,7 @@ filesReflectTrivial.timeOut = 120000;
 //     let o =
 //     {
 //       reflectMap : { [ remotePath ] : installPath },
-//       dst : { effectiveFileProvider : providerDst },
+//       dst : { effectiveProvider : providerDst },
 //       verbosity : 3
 //     }
 //     let con = providerSrc.filesReflect( o );
@@ -446,7 +446,7 @@ var Proto =
     testSuitePath : null,
     providerSrc : null,
     providerDst : null,
-    hub : null
+    system : null
   },
 
   tests :

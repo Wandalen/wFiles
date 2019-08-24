@@ -1395,8 +1395,8 @@ function filesFind( test )
   });
 
   test.is( got.length > 0 );
-  test.identical( got.length, _.mapOwnKeys( onUpMap ).length );
-  test.identical( got.length, _.mapOwnKeys( onDownMap ).length );
+  test.identical( got.length + 1, _.mapOwnKeys( onUpMap ).length );
+  test.identical( got.length + 1, _.mapOwnKeys( onDownMap ).length );
 
   //
 
@@ -1450,16 +1450,20 @@ function filesFind( test )
               var o =
               {
                 outputFormat : _outputFormat,
-                recursive : _recursive,
                 includingTerminals : _includingTerminals,
                 includingTransient : _includingTransients,
-                filePath : terminalPath
+                filePath : terminalPath,
               };
+              o.filter =
+              {
+                recursive : _recursive,
+              }
 
               if( o.outputFormat !== 'nothing' )
               o.glob = glob;
 
               _.mapSupplement( o, fixedOptions );
+              _.mapSupplement( o.filter, fixedOptions.filter );
               combinations.push( o );
             })
           });
@@ -1552,14 +1556,14 @@ function filesFind( test )
     var o =
     {
       outputFormat : 'absolute',
-      filter : { recursive/**/ : 2 },
       includingTerminals : 1,
       includingTransient : 0,
       filePath : path.join( routinePath, glob ),
       filter :
       {
         basePath : routinePath,
-        prefixPath : routinePath
+        prefixPath : routinePath,
+        recursive/**/ : 2,
       }
     };
 
@@ -1726,7 +1730,7 @@ function filesFind( test )
         }
       }
 
-      if( !o.recursive )
+      if( !o.filter.recursive )
       break;
 
       if( o.includingTerminals )
@@ -1753,7 +1757,7 @@ function filesFind( test )
         })
       }
 
-      if( o.recursive === 1 && l === 0  )
+      if( o.filter.recursive === 1 && l === 0  )
       break;
     }
 
@@ -14948,6 +14952,7 @@ function filesReflectMutuallyExcluding( test )
 
     function handleDown( record )
     {
+      if( record.included )
       extract.fileWrite( record.absolute, extract.fileRead( record.absolute ) )
     }
   }
@@ -28067,7 +28072,7 @@ function filesDeleteTerminals( test )
   var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', includingStem : 0 });
   test.identical( got, expected );
 
-  //
+  // qqq ?
 
   // test.case = 'deleting empty dirs';
   // provider.filesDelete( routinePath );

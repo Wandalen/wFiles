@@ -350,7 +350,7 @@ function fileReadAct( o )
   }
 
   if( self._descriptorIsDir( result ) )
-  return handleError( _.err( 'Can`t read from dir : ' + _.strQuote( o.filePath ) + ' method expects file' ) );
+  return handleError( _.err( 'Can`t read from dir : ' + _.strQuote( o.filePath ) + ' method expects terminal file' ) );
   else if( self._descriptorIsLink( result ) )
   return handleError( _.err( 'Can`t read from link : ' + _.strQuote( o.filePath ) + ', without link resolving enabled' ) );
   else if( !self._descriptorIsTerminal( result ) )

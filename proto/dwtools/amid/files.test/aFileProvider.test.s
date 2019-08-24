@@ -22801,39 +22801,7 @@ function softLinkRelativeLinking( test )
   
   */
  
-  /* src1 missing absolute */
- 
-  test.case = 'src1 is missing, allowingMissed:0';
-  provider.filesDelete( routinePath );
-  test.shouldThrowErrorSync( () => 
-  {
-    provider.softLink
-    ({ 
-      srcPath : src1Path, 
-      dstPath : dstPath, 
-      resolvingSrcSoftLink : 0, 
-      resolvingSrcTextLink : 0,
-      allowingMissed : 0 
-    });
-  })
-  test.is( !provider.fileExists( src1Path ) );
-  test.is( !provider.fileExists( dstPath ) );
-  
-  test.case = 'src1 is missing, allowingMissed:1';
-  provider.filesDelete( routinePath );
-  provider.softLink
-  ({ 
-    srcPath : src1Path, 
-    dstPath : dstPath, 
-    resolvingSrcSoftLink : 0, 
-    resolvingSrcTextLink : 0,
-    allowingMissed : 1 
-  });
-  test.is( !provider.fileExists( src1Path ) );
-  test.is( provider.isSoftLink( dstPath ) );
-  test.identical( provider.pathResolveSoftLink( dstPath ), src1Path );
-  
-  /* src1 missing relative */
+  /* src1 missing */
   
   test.case = '../src1 is missing, allowingMissed:0';
   provider.filesDelete( routinePath );
@@ -22859,6 +22827,7 @@ function softLinkRelativeLinking( test )
     dstPath : dstPath, 
     resolvingSrcSoftLink : 0, 
     resolvingSrcTextLink : 0,
+    makingDirectory : 1,
     allowingMissed : 1 
   });
   test.is( !provider.fileExists( src1Path ) );

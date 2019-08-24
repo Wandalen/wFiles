@@ -14422,7 +14422,30 @@ function filesReflectRecursive( test )
     src : { a1 : '1', dir1 : { a2 : '2', dir2 : { a3 : '3' } } },
   }
 
-  //
+  /* */
+
+  var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
+  var o =
+  {
+    src : { recursive/**/ : 0 },
+    reflectMap : { '/src' : '/dst' },
+    writing : 1,
+    dstDeleting : 0,
+    dstRewriting : 0,
+    srcDeleting : 0,
+    includingDirs : 1,
+    includingTerminals : 1,
+    linking : 'fileCopy'
+  }
+  provider.filesReflect( o );
+  var expected =
+  {
+    src : tree.src,
+    dst : {}
+  }
+  test.identical( provider.filesTree, expected );
+
+  /* */
 
   var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
   var o =
@@ -14445,7 +14468,7 @@ function filesReflectRecursive( test )
   }
   test.identical( provider.filesTree, expected );
 
-  //
+  /* */
 
   var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
   var o =
@@ -14468,7 +14491,7 @@ function filesReflectRecursive( test )
   }
   test.identical( provider.filesTree, expected );
 
-  //
+  /* */
 
   var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
   var o =
@@ -14491,7 +14514,7 @@ function filesReflectRecursive( test )
   }
   test.identical( provider.filesTree, expected );
 
-  //
+  /* */
 
   var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
   var o =
@@ -14514,7 +14537,7 @@ function filesReflectRecursive( test )
   }
   test.identical( provider.filesTree, expected );
 
-  //
+  /* */
 
   var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
   var o =
@@ -14537,7 +14560,7 @@ function filesReflectRecursive( test )
   }
   test.identical( provider.filesTree, expected );
 
-  //
+  /* */
 
   var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
   var o =
@@ -14560,7 +14583,7 @@ function filesReflectRecursive( test )
   }
   test.identical( provider.filesTree, expected );
 
-  //
+  /* - */
 
   if( Config.debug )
   {
@@ -17838,6 +17861,7 @@ function filesReflectGrab( test )
     '/dir**' : true,
   }
 
+  debugger;
   var records = system.filesReflect
   ({
     reflectMap : recipe,
@@ -17845,6 +17869,7 @@ function filesReflectGrab( test )
     dst : { system : provider, prefixPath : routinePath },
     mandatory : 0,
   });
+  debugger;
   var found = provider.filesFindRecursive( routinePath );
   src.finit();
   provider.filesDelete( routinePath );
@@ -30629,38 +30654,38 @@ var Self =
   tests :
   {
 
-    // filesFindTrivial,
-    // filesFindTrivialAsync,
-    // filesFindMaskTerminal,
-    // filesFindCriticalCases,
-    // filesFindPreset,
-    // filesFind,
-    // filesFind2,
-    // filesFindRecursive,
-    // filesFindLinked,
-    // filesFindSoftLinksExtract, /* qqq : implement filesFindTextLinksExtract */
-    // filesFindSoftLinksLoopsExtract, /* qqq : implement filesFindTextLinksLoopsExtract */
-    // // filesFindSoftLinks, // xxx : implement rebasingLink of filesReflect first
-    // filesFindResolving,
-    // filesFindGlob,
-    // filesFindOn,
-    // filesFindBaseFromGlob,
-    // filesGlob,
-    // filesFindDistinct,
-    // filesFindSimplifyGlob,
-    // filesFindMandatoryString,
-    // filesFindMandatoryMap,
-    // filesFindExcluding,
-    // filesFindGlobLogic,
-    // filesFindGlobComplex,
-    // filesFindAnyPositive,
-    // filesFindTotalPositive,
-    // filesFindSeveralTotalPositive,
-    // filesFindTotalNegative,
-    // /* qqq : implement filesFindTotalNegative, */
-    // /* qqq : implement filesFindSeveralTotalNegative, */
-    //
-    // filesFindGroups,
+    filesFindTrivial,
+    filesFindTrivialAsync,
+    filesFindMaskTerminal,
+    filesFindCriticalCases,
+    filesFindPreset,
+    filesFind,
+    filesFind2,
+    filesFindRecursive,
+    filesFindLinked,
+    filesFindSoftLinksExtract, /* qqq : implement filesFindTextLinksExtract */
+    filesFindSoftLinksLoopsExtract, /* qqq : implement filesFindTextLinksLoopsExtract */
+    // filesFindSoftLinks, // xxx : implement rebasingLink of filesReflect first
+    filesFindResolving,
+    filesFindGlob,
+    filesFindOn,
+    filesFindBaseFromGlob,
+    filesGlob,
+    filesFindDistinct,
+    filesFindSimplifyGlob,
+    filesFindMandatoryString,
+    filesFindMandatoryMap,
+    filesFindExcluding,
+    filesFindGlobLogic,
+    filesFindGlobComplex,
+    filesFindAnyPositive,
+    filesFindTotalPositive,
+    filesFindSeveralTotalPositive,
+    filesFindTotalNegative,
+    /* qqq : implement filesFindTotalNegative, */
+    /* qqq : implement filesFindSeveralTotalNegative, */
+
+    filesFindGroups,
 
     filesReflectEvaluate,
     filesReflectTrivial,

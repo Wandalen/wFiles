@@ -135,7 +135,7 @@ function form()
 
 function _formAssociations()
 {
-  let filter = this;
+  let filter = this; debugger;
 
   /* find file system */
 
@@ -168,6 +168,8 @@ function _formAssociations()
   if( filter.system.system && filter.system.system !== filter.system )
   {
     _.assert( !( filter.system instanceof _.FileProvider.System ) );
+    if( !filter.effectiveProvider )
+    filter.effectiveProvider = filter.system;
     filter.system = filter.system.system;
   }
 
@@ -469,11 +471,19 @@ function and( src )
     return filter;
   }
 
-  if( Config.debug )
-  if( src && !( src instanceof filter.Self ) )
-  _.assertMapHasOnly( src, filter.fieldsOfCopyableGroups );
+  // if( Config.debug )
+  // if( src && !( src instanceof filter.Self ) )
+  // _.assertMapHasOnly( src, filter.fieldsOfCopyableGroups );
 
-  _.assert( _.instanceIs( filter ) );
+  if( src === null )
+  return filter;
+
+  let fileProvider = filter.effectiveProvider || filter.system || filter.defaultProvider;
+  if( !( src instanceof _.FileRecordFilter ) )
+  src = fileProvider.recordFilter( src );
+
+  _.assert( filter instanceof _.FileRecordFilter );
+  _.assert( src instanceof _.FileRecordFilter );
   _.assert( !filter.formed || filter.formed <= 1 );
   _.assert( !src.formed || src.formed <= 1 );
   _.assert( arguments.length === 1, 'Expects single argument' );
@@ -526,6 +536,7 @@ function and( src )
 
   let once =
   {
+    recursive : null,
     notOlder : null,
     notNewer : null,
     notOlderAge : null,
@@ -535,7 +546,7 @@ function and( src )
   for( let n in once )
   {
     _.assert( !filter[ n ] || !src[ n ], 'Cant "and" filter with another filter, them both have field', n );
-    if( src[ n ] )
+    if( filter[ n ] === null && src[ n ] !== null )
     filter[ n ] = src[ n ];
   }
 

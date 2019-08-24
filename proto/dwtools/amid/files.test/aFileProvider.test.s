@@ -41450,6 +41450,8 @@ var Self =
     fileTimeSet,
 
     writeAsyncThrowingError,
+    
+    //qqq: extend linking routines with cases using resolvingSrcSoftLink:2 and resolvingSrcTextLink:0-2
 
     fileCopyActSync,
     fileCopySync,
@@ -41462,9 +41464,9 @@ var Self =
     fileCopyLinks,
     fileCopyError,
     fileCopySoftLinkExtended,
-    fileCopySoftLinkBasic,
+    fileCopySoftLinkBasic, //qqq: extend test routine for resolvingSrcTextLink:0-2
     fileCopyGlobal,
-    fileCopyRelativeLinking,
+    fileCopyRelativeLinking,//qqq: extend test routine for resolvingSrcTextLink:0-2
 
     fileRenameSync,
     fileRenameRelativePath,
@@ -41472,9 +41474,9 @@ var Self =
     fileRenameActSync,
     fileRenameSync2,
     fileRenameSoftLinkResolving,
-    fileRenameSoftLinkBasic,
+    fileRenameSoftLinkBasic, //qqq: extend test routine for resolvingSrcTextLink:0-2
     fileRenameGlobal,
-    fileRenameRelativeLinking,
+    fileRenameRelativeLinking,//qqq: extend test routine for resolvingSrcTextLink:0-2
 
     fileDeleteSync,
     fileDeleteActSync,
@@ -41513,14 +41515,14 @@ var Self =
     softLinkSoftLinkResolving,
     softLinkRelativeLinkResolving,
     softLinkMakeAndResolve,
-    softLinkSoftLinkBasic,
+    softLinkSoftLinkBasic,//qqq: extend test routine for resolvingSrcTextLink:0-2
     softLinkGlobal,
-    softLinkRelativeLinking,
+    softLinkRelativeLinking,//qqq: extend test routine for resolvingSrcTextLink:0-2
 
     textLinkSync,
-    textLinkSoftLinkBasic,
+    textLinkSoftLinkBasic,//qqq: extend test routine for resolvingSrcTextLink:0-2
     textLinkGlobal,
-    textLinkRelativeLinking,
+    textLinkRelativeLinking,//qqq: extend test routine for resolvingSrcTextLink:0-2
 
     hardLinkSync,
     hardLinkMultipleSync,
@@ -41532,9 +41534,9 @@ var Self =
     hardLinkActAsync,
     hardLinkSoftLinkResolving,
     hardLinkHardLinkBreaking,
-    hardLinkSoftLinkBasic,
+    hardLinkSoftLinkBasic,//qqq: extend test routine for resolvingSrcTextLink:0-2
     hardLinkGlobal,
-    hardLinkRelativeLinking,
+    hardLinkRelativeLinking,//qqq: extend test routine for resolvingSrcTextLink:0-2
 
     fileExchangeSync,
     fileExchangeAsync,

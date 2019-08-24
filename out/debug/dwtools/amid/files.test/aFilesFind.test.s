@@ -956,68 +956,68 @@ function filesFindCriticalCases( test )
 
   /* */
 
-  // test.case = 'base path + empty file path';
-  //
-  // var extract = _.FileProvider.Extract
-  // ({
-  //   filesTree : {},
-  // });
-  //
-  // var got = extract.filesFind
-  // ({
-  //   filter : { basePath : '/' },
-  //   filePath : [],
-  // });
-  // var expected = [];
-  // test.identical( got, expected );
-  //
-  // /* */
-  //
-  // test.case = 'filePath : filter';
-  //
-  // var extract = _.FileProvider.Extract
-  // ({
-  //   filesTree : { dir1 : { a : '1', b : '2' }, e : '5' },
-  // });
-  //
-  // extract.protocol = 'src';
-  // extract.providerRegisterTo( system );
-  // system.filesReflect({ reflectMap : { 'src:///' : 'current://' + routinePath } });
-  // extract.finit();
-  //
-  // var filter = provider.recordFilter({ filePath : routinePath + '/dir1' });
-  // var got = provider.filesFind({ filePath : filter });
-  // var relative = _.select( got, '*/relative' );
-  // var expectedRelative = [ './a', './b' ];
-  //
-  // test.identical( relative, expectedRelative );
-  //
-  // /* */
-  //
-  // test.case = 'extract : empty file path array';
-  //
-  // var extract = _.FileProvider.Extract
-  // ({
-  //   filesTree : {},
-  // });
-  //
-  // var got = extract.filesFind([]);
-  // var expected = [];
-  // test.identical( got, expected );
-  //
-  // /* */
-  //
-  // test.case = 'system : empty file path array';
-  //
-  // var hub2 = _.FileProvider.System({ providers : [] });
-  // _.FileProvider.Extract({ protocol : 'ext1' }).providerRegisterTo( hub2 );
-  // _.FileProvider.Extract({ protocol : 'ext2' }).providerRegisterTo( hub2 );
-  //
-  // var got = hub2.filesFind([]);
-  // var expected = [];
-  // test.identical( got, expected );
-  //
-  // /* */
+  test.case = 'base path + empty file path';
+
+  var extract = _.FileProvider.Extract
+  ({
+    filesTree : {},
+  });
+
+  var got = extract.filesFind
+  ({
+    filter : { basePath : '/' },
+    filePath : [],
+  });
+  var expected = [];
+  test.identical( got, expected );
+
+  /* */
+
+  test.case = 'filePath : filter';
+
+  var extract = _.FileProvider.Extract
+  ({
+    filesTree : { dir1 : { a : '1', b : '2' }, e : '5' },
+  });
+
+  extract.protocol = 'src';
+  extract.providerRegisterTo( system );
+  system.filesReflect({ reflectMap : { 'src:///' : 'current://' + routinePath } });
+  extract.finit();
+
+  var filter = provider.recordFilter({ filePath : routinePath + '/dir1' });
+  var got = provider.filesFind({ filePath : filter });
+  var relative = _.select( got, '*/relative' );
+  var expectedRelative = [ './a', './b' ];
+
+  test.identical( relative, expectedRelative );
+
+  /* */
+
+  test.case = 'extract : empty file path array';
+
+  var extract = _.FileProvider.Extract
+  ({
+    filesTree : {},
+  });
+
+  var got = extract.filesFind([]);
+  var expected = [];
+  test.identical( got, expected );
+
+  /* */
+
+  test.case = 'system : empty file path array';
+
+  var hub2 = _.FileProvider.System({ providers : [] });
+  _.FileProvider.Extract({ protocol : 'ext1' }).providerRegisterTo( hub2 );
+  _.FileProvider.Extract({ protocol : 'ext2' }).providerRegisterTo( hub2 );
+
+  var got = hub2.filesFind([]);
+  var expected = [];
+  test.identical( got, expected );
+
+  /* */
 
   test.case = 'filePath:null';
 
@@ -1030,14 +1030,13 @@ function filesFindCriticalCases( test )
   ({
     basePath : '.',
     prefixPath : '/',
+    recursive/**/ : 2,
   });
 
   filter.filePath = [ '/dir1', '/dir2' ];
   filter._formPaths();
-  debugger;
   var found = extract.filesFind
   ({
-    filter : { recursive/**/ : 2 },
     includingDirs : 1,
     includingTerminals : 1,
     mandatory : 0,
@@ -1047,8 +1046,6 @@ function filesFindCriticalCases( test )
 
   var expected = [ './dir1', './dir1/a', './dir1/b', './dir2', './dir2/c' ];
   test.identical( found, expected );
-
-  debugger; return; xxx
 
   /* */
 
@@ -1062,9 +1059,9 @@ function filesFindCriticalCases( test )
   let op =
   {
     'filePath' : '/dir1',
-    'recursive' : null,
     'filter' :
     {
+      'recursive' : null,
       'maskTerminal' :
       {
         'excludeAny' :

@@ -180,6 +180,8 @@ function _formAssociations()
     filter.effectiveProvider = null;
   }
 
+  /* reset system */
+
   if( filter.effectiveProvider && filter.effectiveProvider.system )
   {
     _.assert( filter.system === null || filter.system === filter.effectiveProvider.system );
@@ -193,11 +195,31 @@ function _formAssociations()
     filter.defaultProvider = filter.defaultProvider || filter.effectiveProvider || filter.system;
   }
 
+  /* reset system */
+
+  if( filter.system && !( filter.system instanceof _.FileProvider.System ) )
+  {
+    _.assert( filter.system === filter.defaultProvider || filter.system === filter.effectiveProvider )
+    filter.system = null;
+  }
+
   /* */
 
-  _.assert( !filter.system || filter.system instanceof _.FileProvider.System );
-  _.assert( !filter.effectiveProvider || !( filter.effectiveProvider instanceof _.FileProvider.System ) );
-  _.assert( filter.defaultProvider instanceof _.FileProvider.Abstract );
+  _.assert
+  (
+    !filter.system || filter.system instanceof _.FileProvider.System,
+    () => '{- filter.system -} should be instance of {- _.FileProvider.System -}, but it is ' + _.toStrShort( filter.system )
+  );
+  _.assert
+  (
+    !filter.effectiveProvider || !( filter.effectiveProvider instanceof _.FileProvider.System ),
+    () => '{- filter.effectiveProvider -} cant be instance of {- _.FileProvider.System -}, but it is'
+  );
+  _.assert
+  (
+    filter.defaultProvider instanceof _.FileProvider.Abstract,
+    () => '{- filter.system -} should be instance of {- _.FileProvider.Abstract -}, but it is ' + _.toStrShort( filter.defaultProvider )
+  );
 
   /* */
 

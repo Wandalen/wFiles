@@ -30654,38 +30654,38 @@ var Self =
   tests :
   {
 
-    // filesFindTrivial,
-    // filesFindTrivialAsync,
-    // filesFindMaskTerminal,
-    // filesFindCriticalCases,
-    // filesFindPreset,
-    // filesFind,
-    // filesFind2,
-    // filesFindRecursive,
-    // filesFindLinked,
-    // filesFindSoftLinksExtract, /* qqq : implement filesFindTextLinksExtract */
-    // filesFindSoftLinksLoopsExtract, /* qqq : implement filesFindTextLinksLoopsExtract */
-    // // filesFindSoftLinks, // xxx : implement rebasingLink of filesReflect first
-    // filesFindResolving,
-    // filesFindGlob,
-    // filesFindOn,
-    // filesFindBaseFromGlob,
-    // filesGlob,
-    // filesFindDistinct,
-    // filesFindSimplifyGlob,
-    // filesFindMandatoryString,
-    // filesFindMandatoryMap,
-    // filesFindExcluding,
-    // filesFindGlobLogic,
-    // filesFindGlobComplex,
-    // filesFindAnyPositive,
-    // filesFindTotalPositive,
-    // filesFindSeveralTotalPositive,
-    // filesFindTotalNegative,
-    // /* qqq : implement filesFindTotalNegative, */
-    // /* qqq : implement filesFindSeveralTotalNegative, */
-    //
-    // filesFindGroups,
+    filesFindTrivial,
+    filesFindTrivialAsync,
+    filesFindMaskTerminal,
+    filesFindCriticalCases,
+    filesFindPreset,
+    filesFind,
+    filesFind2,
+    filesFindRecursive,
+    filesFindLinked,
+    filesFindSoftLinksExtract, /* qqq : implement filesFindTextLinksExtract */
+    filesFindSoftLinksLoopsExtract, /* qqq : implement filesFindTextLinksLoopsExtract */
+    // filesFindSoftLinks, // xxx : implement rebasingLink of filesReflect first
+    filesFindResolving,
+    filesFindGlob,
+    filesFindOn,
+    filesFindBaseFromGlob,
+    filesGlob,
+    filesFindDistinct,
+    filesFindSimplifyGlob,
+    filesFindMandatoryString,
+    filesFindMandatoryMap,
+    filesFindExcluding,
+    filesFindGlobLogic,
+    filesFindGlobComplex,
+    filesFindAnyPositive,
+    filesFindTotalPositive,
+    filesFindSeveralTotalPositive,
+    filesFindTotalNegative,
+    /* qqq : implement filesFindTotalNegative, */
+    /* qqq : implement filesFindSeveralTotalNegative, */
+
+    filesFindGroups,
 
     filesReflectEvaluate,
     filesReflectTrivial,

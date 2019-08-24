@@ -1271,12 +1271,11 @@ function filesFindPreset( test )
   ({
     filePath : '/.system',
     outputFormat : 'relative',
-    filter : { recursive/**/ : 2 },
     maskPreset : 0,
-
     filter :
     {
       basePath : '/some/path',
+      recursive/**/ : 2,
     },
   });
 
@@ -2167,12 +2166,12 @@ function filesFind2( test )
     {
       basePath : path.dir( terminalPath ),
       maskDirectory : 'dir',
+      recursive/**/ : 2,
     },
     outputFormat : 'relative',
     includingStem : 1,
     includingTerminals : 1,
     includingDirs : 1,
-    filter : { recursive/**/ : 2 }
   });
   expected = provider.dirRead( path.dir( terminalPath ) );
   expected = expected.filter( function( element )
@@ -2222,8 +2221,7 @@ function filesFind2( test )
   got = provider.filesFind
   ({
     filePath : path.join( routinePath, 'src/dir' ),
-    filter : { basePath : relative },
-    filter : { recursive/**/ : 1 }
+    filter : { basePath : relative, recursive/**/ : 1 },
   });
   got = got[ 0 ].relative;
   var begins = './' + path.relative( relative, path.join( routinePath, 'src/dir' ) );
@@ -2356,12 +2354,11 @@ function filesFindRecursive( test )
   var got = provider.filesFind
   ({
     filePath : abs( './src/a1' ),
-    filter : { basePath : abs( './src' ) },
+    filter : { basePath : abs( './src' ), recursive/**/ : 1 },
     includingDirs : 1,
     includingTerminals : 1,
     includingTransient : 1,
     outputFormat : 'relative',
-    filter : { recursive/**/ : 1 },
   })
   var expected = [ './a1' ]
   test.identical( got, expected );
@@ -2375,8 +2372,7 @@ function filesFindRecursive( test )
     includingTerminals : 1,
     includingTransient : 1,
     outputFormat : 'relative',
-    filter : { basePath : path.join( routinePath, './src' ) },
-    filter : { recursive/**/ : 2 },
+    filter : { basePath : path.join( routinePath, './src' ), recursive/**/ : 2 },
   })
   var expected = [ './a1' ]
   test.identical( got, expected );

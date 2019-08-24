@@ -5512,7 +5512,7 @@ function _link_functor( fop )
     c.verify1 = o.sync ? verify1 : verify1Async;
     c.verify2 = o.sync ? verify2 : verify2Async;
     c.verifyDst = o.sync ? verifyDstSync : verifyDstAsync;
-    c.pathsLocalize = pathsLocalize;
+    c.pathsLocalize = o.sync ? pathsLocalizeSync : pathsLocalizeAsync;
     c.pathResolve = o.sync ? pathResolve : pathResolveAsync;
     c.linksResolve = o.sync ? linksResolve : linksResolveAsync;
     c.log = log;
@@ -5664,7 +5664,8 @@ function _link_functor( fop )
           return true;
         }
         _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
-
+        
+        c.pathsLocalize();
         c.pathResolve();
         c.linksResolve();
         c.verify2();
@@ -5879,7 +5880,7 @@ function _link_functor( fop )
 
     /* - */
     
-    function pathsLocalize()
+    function pathsLocalizeSync()
     {
       if( self instanceof _.FileProvider.Hub )
       return;
@@ -5898,6 +5899,17 @@ function _link_functor( fop )
         if( srcParsed.protocol && _.arrayHas( self.protocols, srcParsed.protocol ) )
         o.srcPath = srcParsed.longPath;
       }
+    }
+    
+    /* - */
+    
+    function pathsLocalizeAsync()
+    {
+      c.con1.then( () =>
+      {
+        pathsLocalizeSync();
+        return null;
+      });
     }
     
     /* - */

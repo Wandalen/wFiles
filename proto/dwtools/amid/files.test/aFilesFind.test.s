@@ -26994,7 +26994,8 @@ function filesDeleteAsync( test )
     return provider.filesDelete({ filePath : terminalPath, sync : 0 })
     .then( ( deleted ) =>
     {
-      test.identical( _.select( deleted, '*/relative' ), [ './terminal' ] );
+      // test.identical( _.select( deleted, '*/relative' ), [ './terminal' ] );
+      test.identical( _.select( deleted, '*/relative' ), [ '.' ] );
       var stat = provider.statResolvedRead( terminalPath );
       test.identical( stat, null );
       return true;
@@ -27574,7 +27575,7 @@ function filesDeleteEmptyDirs( test )
     }
   })
 
-  //
+  /* */
 
   test.case = 'defaults'
   provider.filesDelete( routinePath );
@@ -27591,7 +27592,7 @@ function filesDeleteEmptyDirs( test )
   var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', includingStem : 0 });
   test.identical( expected, got );
 
-  //
+  /* */
 
   test.case = 'not recursive'
   provider.filesDelete( routinePath );

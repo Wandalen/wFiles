@@ -5331,7 +5331,7 @@ defaults.outputFormat = 'absolute';
 defaults.includingTerminals = 0;
 defaults.includingDirs = 1;
 defaults.includingTransient = 0;
-defaults.recursive = 2;
+// defaults.recursive = 2;
 
 let filesDeleteEmptyDirs = _.routineFromPreAndBody( filesFindRecursive.pre, filesDeleteEmptyDirs_body );
 
@@ -5339,12 +5339,13 @@ let filesDeleteEmptyDirs = _.routineFromPreAndBody( filesFindRecursive.pre, file
 // other find
 // --
 
-function softLinksBreak( o )
+function softLinksBreak_body( o )
 {
   let self = this;
 
-  o = self.filesFind.pre.call( self, softLinksBreak, arguments );
+  // o = self.filesFind.pre.call( self, softLinksBreak, arguments );
 
+  _.assertRoutineOptions( softLinksBreak_body, arguments );
   _.assert( o.outputFormat === 'record' );
 
   /* */
@@ -5368,21 +5369,29 @@ function softLinksBreak( o )
   return files;
 }
 
-_.routineExtend( softLinksBreak, filesFind );
+// _.routineExtend( softLinksBreak, filesFind );
 
-var defaults = softLinksBreak.defaults;
+// var defaults = softLinksBreak_body.defaults;
+
+_.routineExtend( softLinksBreak_body, filesFind.body );
+
+var defaults = softLinksBreak_body.defaults;
+
 defaults.outputFormat = 'record';
 defaults.breakingSoftLink = 1;
 defaults.breakingTextLink = 0;
-defaults.recursive = 2;
+// defaults.recursive = 2;
+
+let softLinksBreak = _.routineFromPreAndBody( filesFindRecursive.pre, softLinksBreak_body );
 
 //
 
-function softLinksRebase( o )
+function softLinksRebase_body( o )
 {
   let self = this;
-  o = self.filesFind.pre.call( self, softLinksRebase, arguments );
+  // o = self.filesFind.pre.call( self, softLinksRebase, arguments );
 
+  _.assertRoutineOptions( softLinksRebase_body, arguments );
   _.assert( o.outputFormat === 'record' );
   _.assert( !o.resolvingSoftLink );
 
@@ -5416,14 +5425,20 @@ function softLinksRebase( o )
   return files;
 }
 
-_.routineExtend( softLinksRebase, filesFind );
+_.routineExtend( softLinksRebase_body, filesFind.body );
 
-var defaults = softLinksRebase.defaults;
+var defaults = softLinksRebase_body.defaults;
+
+// _.routineExtend( softLinksRebase, filesFind );
+// var defaults = softLinksRebase_body.defaults;
+
 defaults.outputFormat = 'record';
 defaults.oldPath = null;
 defaults.newPath = null;
-defaults.recursive = 2;
+// defaults.recursive = 2;
 defaults.resolvingSoftLink = 0;
+
+let softLinksRebase = _.routineFromPreAndBody( filesFindRecursive.pre, softLinksRebase_body );
 
 //
 

@@ -67,7 +67,7 @@ function prepareFile( path, type, link, level )
 {
   if( level > 0 )
   {
-    var name = _.path.name({ path : path, full : 1 });
+    var name = _.path.name({ path, full : 1 });
     path = _.path.dir( path );
 
     for( var l = 1 ; l <= level; l++ )
@@ -207,9 +207,9 @@ function drawInfo( info )
 //       {
 //         combinations.push
 //         ({
-//           level : level,
-//           type : type,
-//           linkage : linkage
+//           level,
+//           type,
+//           linkage
 //         })
 //       })
 //     })
@@ -224,12 +224,12 @@ function drawInfo( info )
 //   //   var info =
 //   //   {
 //   //     n : ++n,
-//   //     src : src,
+//   //     src,
 //   //     dst : null,
 //   //     checks : []
 //   //   };
 
-//   //   test.case = _.toStr( { src : src, dst : null }, { levels : 2, wrap : 0 } );
+//   //   test.case = _.toStr( { src, dst : null }, { levels : 2, wrap : 0 } );
 
 //   //   // console.log( _.toStr( info, { levels : 3 } ) )
 
@@ -287,8 +287,8 @@ function drawInfo( info )
 //       var info =
 //       {
 //         n : ++n,
-//         src : src,
-//         dst : dst,
+//         src,
+//         dst,
 //         checks : []
 //       };
 
@@ -300,7 +300,7 @@ function drawInfo( info )
 //       if( src.level !== dst.level )
 //       return;
 
-//       test.case = _.toStr( { src : src, dst : dst }, { levels : 2, wrap : 0 } );
+//       test.case = _.toStr( { src, dst }, { levels : 2, wrap : 0 } );
 
 //       /* prepare to run filesCopyOld */
 
@@ -414,11 +414,11 @@ function drawInfo( info )
 //   //   {
 //   //     n : ++n,
 //   //     src : null,
-//   //     dst : dst,
+//   //     dst,
 //   //     checks : []
 //   //   };
 
-//   //   test.case = _.toStr( { src : null, dst : dst }, { levels : 2, wrap : 0 } );
+//   //   test.case = _.toStr( { src : null, dst }, { levels : 2, wrap : 0 } );
 
 //   //   /* prepare to run filesCopyOld */
 
@@ -473,7 +473,7 @@ function drawInfo( info )
 //   //   var info =
 //   //   {
 //   //     n : ++n,
-//   //     level : level,
+//   //     level,
 //   //     src : null,
 //   //     dst : null,
 //   //     checks : []
@@ -588,7 +588,7 @@ function drawInfo( info )
 //   {
 //     var files = _.fileProvider.filesFind
 //     ({
-//       filePath : filePath,
+//       filePath,
 //       includingStem : 0,
 //       includingTransient : 1,
 //       includingDirs : 1,
@@ -613,7 +613,7 @@ function drawInfo( info )
 //         src : tree,
 //         selector : _.path.undot( r.relative ),
 //         upToken : '/',
-//         set : set,
+//         set,
 //         usingIndexedAccessToMap : 0
 //       });
 //     }
@@ -676,8 +676,8 @@ var Self =
   
   enabled : 0,
 
-  onSuiteBegin : onSuiteBegin,
-  onSuiteEnd : onSuiteEnd,
+  onSuiteBegin,
+  onSuiteEnd,
 
   context :
   {
@@ -690,15 +690,15 @@ var Self =
     filePathSoftSrc : null,
     filePathSoftDst : null,
 
-    statResolvedReads : statResolvedReads,
-    prepareFile : prepareFile,
-    drawInfo : drawInfo
+    statResolvedReads,
+    prepareFile,
+    drawInfo
   },
 
   tests :
   {
-    // filesCopyWithAdapter : filesCopyWithAdapter,
-    // filesCopyWithAdapter2 : filesCopyWithAdapter2
+    // filesCopyWithAdapter,
+    // filesCopyWithAdapter2
   },
 
 }

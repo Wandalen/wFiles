@@ -19,7 +19,7 @@ if( typeof module !== 'undefined' )
 
 let _global = _global_;
 let _ = _global_.wTools;
-let Parent = null;
+let Parent = _.FileRecordContext;
 let Self = function wFileRecordFilter( o )
 {
   return _.workpiece.construct( Self, this, arguments );
@@ -31,23 +31,23 @@ _.assert( !_.FileRecordFilter );
 _.assert( !!_.regexpsEscape );
 
 // --
-//
+// inter
 // --
 
-/**
- * @summary Creates filter instance ignoring unknown options.
- * @param {Object} o Options map.
- * @function TollerantFrom
- * @memberof module:Tools/mid/Files.wFileRecordFilter
-*/
-
-function TollerantFrom( o )
-{
-  _.assert( arguments.length >= 1, 'Expects at least one argument' );
-  _.assert( _.objectIs( Self.prototype.Composes ) );
-  o = _.mapsExtend( null, arguments );
-  return new Self( _.mapOnly( o, Self.prototype.fieldsOfCopyableGroups ) );
-}
+// /**
+//  * @summary Creates filter instance ignoring unknown options.
+//  * @param {Object} o Options map.
+//  * @function TolerantFrom
+//  * @memberof module:Tools/mid/Files.wFileRecordFilter
+// */
+//
+// function TolerantFrom( o )
+// {
+//   _.assert( arguments.length >= 1, 'Expects at least one argument' );
+//   _.assert( _.objectIs( Self.prototype.Composes ) );
+//   o = _.mapsExtend( null, arguments );
+//   return new Self( _.mapOnly( o, Self.prototype.fieldsOfCopyableGroups ) );
+// }
 
 //
 
@@ -76,9 +76,6 @@ function copy( src )
 
   if( _.strIs( src ) || _.arrayIs( src ) )
   src = { prefixPath : src, filePath : '.' }
-
-  // if( _.strIs( src ) || _.arrayIs( src ) )
-  // src = { prefixPath : src, filePath : src }
 
   let result = _.Copyable.prototype.copy.call( filter, src );
 
@@ -137,91 +134,93 @@ function _formAssociations()
 {
   let filter = this;
 
-  /* find file system */
+  let result = Parent.prototype._formAssociations.apply( filter, arguments );
 
-  if( !filter.system )
-  if( filter.effectiveProvider && filter.effectiveProvider instanceof _.FileProvider.System )
-  {
-    filter.system = filter.effectiveProvider;
-    filter.effectiveProvider = null;
-  }
-
-  if( !filter.system )
-  if( filter.effectiveProvider && filter.effectiveProvider.system && filter.effectiveProvider.system instanceof _.FileProvider.System )
-  {
-    filter.system = filter.effectiveProvider.system;
-  }
-
-  if( !filter.system )
-  if( filter.defaultProvider && filter.defaultProvider instanceof _.FileProvider.System )
-  {
-    filter.system = filter.defaultProvider;
-  }
-
-  if( !filter.system )
-  if( filter.defaultProvider && filter.defaultProvider.system && filter.defaultProvider.system instanceof _.FileProvider.System )
-  {
-    filter.system = filter.defaultProvider.system;
-  }
-
-  if( filter.system )
-  if( filter.system.system && filter.system.system !== filter.system )
-  {
-    _.assert( !( filter.system instanceof _.FileProvider.System ) );
-    if( !filter.effectiveProvider )
-    filter.effectiveProvider = filter.system;
-    filter.system = filter.system.system;
-  }
-
-  /* find effective provider */
-
-  if( filter.effectiveProvider && filter.effectiveProvider instanceof _.FileProvider.System )
-  {
-    _.assert( filter.system === null || filter.system === filter.effectiveProvider );
-    filter.system = filter.effectiveProvider;
-    filter.effectiveProvider = null;
-  }
-
-  /* reset system */
-
-  if( filter.effectiveProvider && filter.effectiveProvider.system )
-  {
-    _.assert( filter.system === null || filter.system === filter.effectiveProvider.system );
-    filter.system = filter.effectiveProvider.system;
-  }
-
-  /* find default provider */
-
-  if( !filter.defaultProvider )
-  {
-    filter.defaultProvider = filter.defaultProvider || filter.effectiveProvider || filter.system;
-  }
-
-  /* reset system */
-
-  if( filter.system && !( filter.system instanceof _.FileProvider.System ) )
-  {
-    _.assert( filter.system === filter.defaultProvider || filter.system === filter.effectiveProvider )
-    filter.system = null;
-  }
-
-  /* */
-
-  _.assert
-  (
-    !filter.system || filter.system instanceof _.FileProvider.System,
-    () => '{- filter.system -} should be instance of {- _.FileProvider.System -}, but it is ' + _.toStrShort( filter.system )
-  );
-  _.assert
-  (
-    !filter.effectiveProvider || !( filter.effectiveProvider instanceof _.FileProvider.System ),
-    () => '{- filter.effectiveProvider -} cant be instance of {- _.FileProvider.System -}, but it is'
-  );
-  _.assert
-  (
-    filter.defaultProvider instanceof _.FileProvider.Abstract,
-    () => '{- filter.system -} should be instance of {- _.FileProvider.Abstract -}, but it is ' + _.toStrShort( filter.defaultProvider )
-  );
+  // /* find file system */
+  //
+  // if( !filter.system )
+  // if( filter.effectiveProvider && filter.effectiveProvider instanceof _.FileProvider.System )
+  // {
+  //   filter.system = filter.effectiveProvider;
+  //   filter.effectiveProvider = null;
+  // }
+  //
+  // if( !filter.system )
+  // if( filter.effectiveProvider && filter.effectiveProvider.system && filter.effectiveProvider.system instanceof _.FileProvider.System )
+  // {
+  //   filter.system = filter.effectiveProvider.system;
+  // }
+  //
+  // if( !filter.system )
+  // if( filter.defaultProvider && filter.defaultProvider instanceof _.FileProvider.System )
+  // {
+  //   filter.system = filter.defaultProvider;
+  // }
+  //
+  // if( !filter.system )
+  // if( filter.defaultProvider && filter.defaultProvider.system && filter.defaultProvider.system instanceof _.FileProvider.System )
+  // {
+  //   filter.system = filter.defaultProvider.system;
+  // }
+  //
+  // if( filter.system )
+  // if( filter.system.system && filter.system.system !== filter.system )
+  // {
+  //   _.assert( !( filter.system instanceof _.FileProvider.System ) );
+  //   if( !filter.effectiveProvider )
+  //   filter.effectiveProvider = filter.system;
+  //   filter.system = filter.system.system;
+  // }
+  //
+  // /* find effective provider */
+  //
+  // if( filter.effectiveProvider && filter.effectiveProvider instanceof _.FileProvider.System )
+  // {
+  //   _.assert( filter.system === null || filter.system === filter.effectiveProvider );
+  //   filter.system = filter.effectiveProvider;
+  //   filter.effectiveProvider = null;
+  // }
+  //
+  // /* reset system */
+  //
+  // if( filter.effectiveProvider && filter.effectiveProvider.system )
+  // {
+  //   _.assert( filter.system === null || filter.system === filter.effectiveProvider.system );
+  //   filter.system = filter.effectiveProvider.system;
+  // }
+  //
+  // /* find default provider */
+  //
+  // if( !filter.defaultProvider )
+  // {
+  //   filter.defaultProvider = filter.defaultProvider || filter.effectiveProvider || filter.system;
+  // }
+  //
+  // /* reset system */
+  //
+  // if( filter.system && !( filter.system instanceof _.FileProvider.System ) )
+  // {
+  //   _.assert( filter.system === filter.defaultProvider || filter.system === filter.effectiveProvider )
+  //   filter.system = null;
+  // }
+  //
+  // /* */
+  //
+  // _.assert
+  // (
+  //   !filter.system || filter.system instanceof _.FileProvider.System,
+  //   () => '{- filter.system -} should be instance of {- _.FileProvider.System -}, but it is ' + _.toStrShort( filter.system )
+  // );
+  // _.assert
+  // (
+  //   !filter.effectiveProvider || !( filter.effectiveProvider instanceof _.FileProvider.System ),
+  //   () => '{- filter.effectiveProvider -} cant be instance of {- _.FileProvider.System -}, but it is'
+  // );
+  // _.assert
+  // (
+  //   filter.defaultProvider instanceof _.FileProvider.Abstract,
+  //   () => '{- filter.system -} should be instance of {- _.FileProvider.Abstract -}, but it is ' + _.toStrShort( filter.defaultProvider )
+  // );
 
   /* */
 
@@ -236,6 +235,7 @@ function _formAssociations()
   /* */
 
   filter.formed = 1;
+  return result;
 }
 
 //
@@ -4864,9 +4864,9 @@ let Medials =
 
 let Statics =
 {
-  TollerantFrom : TollerantFrom,
-  And : And,
-  MaskNames : MaskNames,
+  // TolerantFrom,
+  And,
+  MaskNames,
 }
 
 let Globals =
@@ -4916,7 +4916,7 @@ let Accessors =
 let Extend =
 {
 
-  TollerantFrom,
+  // TolerantFrom,
   init,
   copy,
   pairedClone,
@@ -5089,9 +5089,9 @@ _.classDeclare
   extend : Extend,
 });
 
-_.mapExtend( _,Globals );
+_.mapExtend( _, Globals );
 
-_.Copyable.mixin( Self );
+// _.Copyable.mixin( Self );
 
 // --
 // export

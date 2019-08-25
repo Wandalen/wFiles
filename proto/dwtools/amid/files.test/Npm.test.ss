@@ -448,8 +448,8 @@ var Proto =
 
   tests :
   {
-    filesReflectTrivial : filesReflectTrivial,
-    // filesReflectLocalPath : filesReflectLocalPath,
+    filesReflectTrivial,
+    // filesReflectLocalPath,
   },
 
 }

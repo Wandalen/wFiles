@@ -60,7 +60,7 @@ var Proto =
   context :
   {
     // provider : null,
-    // onSuiteBegin : onSuiteBegin,
+    // onSuiteBegin,
     testSuitePath : null,
   },
 

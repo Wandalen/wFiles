@@ -180,6 +180,11 @@ function init( o )
   if( self.Self === Self )
   Object.preventExtensions( self );
 
+  if( o && o.path )
+  self.path = o.path;
+  if( self.path === null )
+  self.path = self.Path.CloneExtending({ fileProvider : self });
+
   if( o )
   {
     if( o.logger )
@@ -195,9 +200,6 @@ function init( o )
 
   Self.Counter += 1;
   self.id = Self.Counter;
-
-  if( self.path === null )
-  self.path = self.Path.CloneExtending({ fileProvider : self });
 
   if( self.logger === null )
   self.logger = new _.Logger({ output : _global.logger });
@@ -6628,7 +6630,7 @@ function _fileRenameAct( c )
 
   if( c.srcStat === null )
   return null;
-  
+
   if( c.srcStat.isSoftLink() )
   {
     let chain;
@@ -6670,12 +6672,12 @@ function _fileRenameAct( c )
 
     o.srcPath = chain.found.pop();
     o.relativeSrcPath = chain.result.pop()
-    
-    let con = _.Consequence.Try( () => 
-    { 
+
+    let con = _.Consequence.Try( () =>
+    {
       let result;
       if( o.resolvingSrcSoftLink === 2 )
-      { 
+      {
         c.options2.srcPath = o.srcPath;
         c.options2.relativeSrcPath = o.relativeSrcPath;
         result = self.fileRenameAct( c.options2 );
@@ -6699,7 +6701,7 @@ function _fileRenameAct( c )
       _.each( chain.found, ( path ) => self.fileDelete( path ) )
       return true;
     })
-    
+
     return con.syncMaybe();
   }
   else if( c.srcStat.isTextLink() )
@@ -6743,12 +6745,12 @@ function _fileRenameAct( c )
 
     o.srcPath = chain.found.pop();
     o.relativeSrcPath = chain.result.pop()
-    
-    let con = _.Consequence.Try( () => 
-    { 
+
+    let con = _.Consequence.Try( () =>
+    {
       let result;
       if( o.resolvingSrcTextLink === 2 )
-      { 
+      {
         c.options2.srcPath = o.srcPath;
         c.options2.relativeSrcPath = o.relativeSrcPath;
         result = self.fileRenameAct( c.options2 );
@@ -6772,7 +6774,7 @@ function _fileRenameAct( c )
       _.each( chain.found, ( path ) => self.fileDelete( path ) )
       return true;
     })
-    
+
     return con.syncMaybe();
   }
   else

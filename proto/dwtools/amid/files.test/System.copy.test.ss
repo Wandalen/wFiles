@@ -192,8 +192,8 @@ var Proto =
   silencing : 1,
   enabled : 0,
 
-  onSuiteBegin : onSuiteBegin,
-  onSuiteEnd : onSuiteEnd,
+  onSuiteBegin,
+  onSuiteEnd,
 
   context :
   {
@@ -203,7 +203,7 @@ var Proto =
 
   tests :
   {
-    copy : copy
+    copy
   },
 
 }

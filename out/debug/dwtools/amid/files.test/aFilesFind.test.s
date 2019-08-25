@@ -73,7 +73,7 @@ function softLinkIsSupported()
 
     try
     {
-      _.fileProvider.softLink({ dstPath : dstPath, srcPath : srcPath, throwing : 1, sync : 1 });
+      _.fileProvider.softLink({ dstPath, srcPath, throwing : 1, sync : 1 });
       allow = _.fileProvider.isSoftLink( dstPath );
     }
     catch( err )
@@ -644,8 +644,8 @@ function filesFindTrivial( test )
   test.case = 'find with excluding file path';
   clean();
   var filePath = { 'dir1' : null, '**b**' : 0 };
-  var filter = { prefixPath : path.join( routinePath ), filePath : filePath, recursive : 2 }
-  var o1 = { filter : filter, outputFormat : 'relative', onUp, onDown }
+  var filter = { prefixPath : path.join( routinePath ), filePath, recursive : 2 }
+  var o1 = { filter, outputFormat : 'relative', onUp, onDown }
   var o2 = { includingStem : 1, includingTransient : 1, includingTerminals : 1, includingDirs : 1 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [ '.', './a', './dir11' ];
@@ -660,8 +660,8 @@ function filesFindTrivial( test )
   test.case = 'find with excluding file path';
   clean();
   var filePath = { 'dir1' : '', '**b**' : 0 };
-  var filter = { prefixPath : path.join( routinePath ), filePath : filePath, recursive : 2 }
-  var o1 = { filter : filter, outputFormat : 'relative', onUp, onDown }
+  var filter = { prefixPath : path.join( routinePath ), filePath, recursive : 2 }
+  var o1 = { filter, outputFormat : 'relative', onUp, onDown }
   var o2 = { includingStem : 1, includingTransient : 1, includingTerminals : 1, includingDirs : 1 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [ '.', './a', './dir11' ];
@@ -676,8 +676,8 @@ function filesFindTrivial( test )
   test.case = 'find with excluding file path';
   clean();
   var filePath = { 'dir1' : true, '**b**' : 0 };
-  var filter = { prefixPath : path.join( routinePath ), filePath : filePath, recursive/**/ : 2 }
-  var o1 = { filter : filter, outputFormat : 'relative', onUp, onDown }
+  var filter = { prefixPath : path.join( routinePath ), filePath, recursive/**/ : 2 }
+  var o1 = { filter, outputFormat : 'relative', onUp, onDown }
   var o2 = { includingStem : 1, includingTransient : 1, includingTerminals : 1, includingDirs : 1 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [ '.', './a', './dir11' ]
@@ -692,8 +692,8 @@ function filesFindTrivial( test )
   test.case = 'find with excluding file path';
   clean();
   var filePath = { 'dir1' : null, '**b**' : 0, '**a**' : 1 };
-  var filter = { prefixPath : path.join( routinePath ), filePath : filePath, recursive/**/ : 2 }
-  var o1 = { filter : filter, outputFormat : 'relative', onUp, onDown }
+  var filter = { prefixPath : path.join( routinePath ), filePath, recursive/**/ : 2 }
+  var o1 = { filter, outputFormat : 'relative', onUp, onDown }
   var o2 = { includingStem : 1, includingTransient : 1, includingTerminals : 1, includingDirs : 1 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [ '.', './a', './dir11' ];
@@ -722,8 +722,8 @@ function filesFindTrivial( test )
   test.case = 'several nulls';
   clean();
   var filePath = { [ abs( 'dir1/' + '**a**' ) ] : null, [ abs( 'dir1/' + '**b**' ) ] : null };
-  var filter = { filePath : filePath, recursive : 2 }
-  var o1 = { filter : filter, outputFormat : 'relative', onUp, onDown }
+  var filter = { filePath, recursive : 2 }
+  var o1 = { filter, outputFormat : 'relative', onUp, onDown }
   var o2 = { includingStem : 1, includingTransient : 0, includingTerminals : 1, includingDirs : 1 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [ './a', './b', './dir11/a', './dir11/b', './dira', './dirb' ];
@@ -756,8 +756,8 @@ function filesFindTrivial( test )
   test.case = 'several nulls : { dir1/**a** : null, dir2**b** : null }, includingDirs : 1';
   clean();
   var filePath = { [ abs( 'dir1/' + '**a**' ) ] : null, [ abs( 'dir2' + '**b**' ) ] : null };
-  var filter = { filePath : filePath, recursive : 2 }
-  var o1 = { filter : filter, outputFormat : 'relative', onUp, onDown }
+  var filter = { filePath, recursive : 2 }
+  var o1 = { filter, outputFormat : 'relative', onUp, onDown }
   var o2 = { includingStem : 1, includingTransient : 0, includingTerminals : 1, includingDirs : 1 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected =
@@ -798,8 +798,8 @@ function filesFindTrivial( test )
   test.case = 'several nulls : { dir1/**a** : null, dir2**b** : null }, includingDirs : 0';
   clean();
   var filePath = { [ abs( 'dir1/' + '**a**' ) ] : null, [ abs( 'dir2' + '**b**' ) ] : null };
-  var filter = { filePath : filePath, recursive : 2 }
-  var o1 = { filter : filter, outputFormat : 'relative', onUp, onDown }
+  var filter = { filePath, recursive : 2 }
+  var o1 = { filter, outputFormat : 'relative', onUp, onDown }
   var o2 = { includingStem : 1, includingTransient : 0, includingTerminals : 1, includingDirs : 0 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected =
@@ -931,7 +931,7 @@ function filesFindMaskTerminal( test )
   test.case = 'relative to current dir';
 
   var filter =  { maskTerminal : './package.json' }
-  var got = provider.filesFind({ filePath : routinePath, filter : filter, filter : { recursive/**/ : 1 } });
+  var got = provider.filesFind({ filePath : routinePath, filter, filter : { recursive/**/ : 1 } });
   test.identical( got.length, 1 );
 
   /* */
@@ -939,7 +939,7 @@ function filesFindMaskTerminal( test )
   test.case = 'relative to parent dir';
 
   var filter =  { maskTerminal : './filesFindMaskTerminal/package.json' }
-  var got = provider.filesFind({ filePath : routinePath, filter : filter });
+  var got = provider.filesFind({ filePath : routinePath, filter });
   test.identical( got.length, 0 );
 
 }
@@ -1041,7 +1041,7 @@ function filesFindCriticalCases( test )
     includingTerminals : 1,
     mandatory : 0,
     outputFormat : 'relative',
-    filter : filter,
+    filter,
   });
 
   var expected = [ './dir1', './dir1/a', './dir1/b', './dir2', './dir2/c' ];
@@ -1105,7 +1105,7 @@ function filesFindCriticalCases( test )
       },
     }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
 
   var filter =
   {
@@ -1114,7 +1114,7 @@ function filesFindCriticalCases( test )
     maskAll : { excludeAny : [ /(^|\/)-/, /\.release($|\.|\/)/i ] },
   }
 
-  var got = extract.filesFind({ filter : filter, outputFormat : 'relative' });
+  var got = extract.filesFind({ filter, outputFormat : 'relative' });
   var expected = [ './dir2/File.test.js', './dir3/File.test.js' ];
   test.identical( got, expected );
 
@@ -1125,7 +1125,7 @@ function filesFindCriticalCases( test )
     maskAll : { excludeAny : [ /(^|\/)-/, /\.release($|\.|\/)/i ] },
   }
 
-  var got = extract.filesFind({ filter : filter, outputFormat : 'relative' });
+  var got = extract.filesFind({ filter, outputFormat : 'relative' });
   var expected = [ './dir2/File.js', './dir2/File1.debug.js', './dir2/File2.debug.js', './dir3/File.js' ];
   test.identical( got, expected );
 
@@ -1155,7 +1155,7 @@ function filesFindCriticalCases( test )
       },
     }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
 
   var filter = extract.recordFilter
   ({
@@ -1169,7 +1169,7 @@ function filesFindCriticalCases( test )
   ({
     filePath : 'dir3',
     outputFormat : 'relative',
-    filter : filter,
+    filter,
   });
 
   var expected = [ './dir2/File.js', './dir2/File.test.js', './dir2/File1.debug.js', './dir2/File1.release.js', './dir2/File2.debug.js', './dir2/File2.release.js', './dir3/File.js', './dir3/File.test.js' ];
@@ -1196,7 +1196,7 @@ function filesFindCriticalCases( test )
   //     ({
   //       mandatory : 0,
   //       filePath : '/',
-  //       filter : filter,
+  //       filter,
   //     });
   //
   //   });
@@ -1389,8 +1389,8 @@ function filesFind( test )
     includingTerminals : 1,
     includingTransient : 1,
     outputFormat : 'absolute',
-    onUp : onUp,
-    onDown : onDown,
+    onUp,
+    onDown,
     filter : { recursive/**/ : 2 }
   });
 
@@ -1909,7 +1909,7 @@ function filesFind2( test )
 
   /*terminalPath - directory*/
 
-  got = provider.filesFind( routinePath );
+  got = provider.filesFind({ filePath : routinePath, filter : { recursive : 1 } });
   expected = provider.dirRead( routinePath );
   test.identical( check( got, expected ), true );
 
@@ -1917,7 +1917,7 @@ function filesFind2( test )
 
   terminalPath = path.join( routinePath, 'terminal' );
   provider.fileWrite( terminalPath, 'terminal' );
-  got = provider.filesFind( terminalPath );
+  got = provider.filesFind({ filePath : terminalPath, filter : { recursive : 1 } });
   expected = provider.dirRead( terminalPath );
   test.identical( check( got, expected ), true );
 
@@ -2042,7 +2042,7 @@ function filesFind2( test )
 
   /*terminalPath - directory, includingTerminals, includingTransient on*/
 
-  got = provider.filesFind({ filePath : routinePath, includingTerminals : 1, includingTransient : 1, includingStem : 0 });
+  got = provider.filesFind({ filePath : routinePath, includingTerminals : 1, includingTransient : 1, includingStem : 0, filter : { recursive : 1 } });
   expected = provider.dirRead( routinePath );
   test.identical( check( got, expected ), true );
 
@@ -2091,7 +2091,7 @@ function filesFind2( test )
 
   /*terminalPath - directory, outputFormat relative */
 
-  got = provider.filesFind({ filePath : routinePath, outputFormat : 'relative' });
+  got = provider.filesFind({ filePath : routinePath, outputFormat : 'relative', filter : { recursive : 1 } });
   expected = provider.dirRead( routinePath );
   for( var i = 0; i < expected.length; ++i )
   expected[ i ] = path.join( './', expected[ i ] );
@@ -2122,7 +2122,7 @@ function filesFind2( test )
   /*terminalPath - directory, result empty array*/
 
   got = [];
-  provider.filesFind({ filePath : routinePath, result : got });
+  provider.filesFind({ filePath : routinePath, result : got, filter : { recursive : 1 } });
   expected = provider.dirRead( routinePath );
   test.identical( check( got, expected ), true );
 
@@ -2204,7 +2204,7 @@ function filesFind2( test )
   got = provider.filesFind
   ({
     filePath : routinePath,
-    orderingExclusion : orderingExclusion,
+    orderingExclusion,
     includingDirs : 1,
     filter : { recursive/**/ : 1 },
     outputFormat : 'record'
@@ -5752,14 +5752,14 @@ function filesFindGlob( test )
   test.case = 'globTerminals map with bools';
   var expectedRelative = [ './doubledir/a', './doubledir/d1/a', './doubledir/d1/d11/b', './doubledir/d1/d11/c' ];
   var filePath = abs({ '**/d2/**' : 0, 'doubledir' : '' });
-  var records = globTerminals({ filePath : filePath });
+  var records = globTerminals({ filePath });
   var gotRelative = _.select( records, '*/relative' );
   test.identical( gotRelative, expectedRelative );
 
   test.case = 'globAll map with bools';
   var expectedRelative = [ './doubledir', './doubledir/a', './doubledir/d1', './doubledir/d1/a', './doubledir/d1/d11', './doubledir/d1/d11/b', './doubledir/d1/d11/c' ];
   var filePath = abs({ '**/d2/**' : 0, 'doubledir' : '' });
-  var records = globAll({ filePath : filePath });
+  var records = globAll({ filePath });
   var gotRelative = _.select( records, '*/relative' );
   test.identical( gotRelative, expectedRelative );
 
@@ -7274,8 +7274,8 @@ function filesFindOn( test )
 
   var globTerminals = provider.filesGlober
   ({
-    onUp : onUp,
-    onDown : onDown,
+    onUp,
+    onDown,
     includingTerminals : 1,
     includingDirs : 0,
     includingTransient : 0,
@@ -7286,8 +7286,8 @@ function filesFindOn( test )
 
   var globAll = provider.filesGlober
   ({
-    onUp : onUp,
-    onDown : onDown,
+    onUp,
+    onDown,
     includingTerminals : 1,
     includingDirs : 1,
     includingTransient : 1,
@@ -7298,8 +7298,8 @@ function filesFindOn( test )
 
   var globTerminalsWithPrefix = provider.filesGlober
   ({
-    onUp : onUp,
-    onDown : onDown,
+    onUp,
+    onDown,
     includingTerminals : 1,
     includingDirs : 0,
     includingTransient : 0,
@@ -7310,8 +7310,8 @@ function filesFindOn( test )
 
   var globAllWithPrefix = provider.filesGlober
   ({
-    onUp : onUp,
-    onDown : onDown,
+    onUp,
+    onDown,
     includingTerminals : 1,
     includingDirs : 1,
     includingTransient : 1,
@@ -7941,7 +7941,7 @@ function filesGlob( test )
     'a.txt' : '',
   }
 
-  var extract1 = new _.FileProvider.Extract({ filesTree : filesTree });
+  var extract1 = new _.FileProvider.Extract({ filesTree });
   extract1.filesReflectTo( provider, routinePath );
 
   var commonOptions  =
@@ -8929,6 +8929,7 @@ function filesFindMandatoryMap( test )
       prefixPath,
       filePath,
       basePath,
+      recursive : 1,
     },
     includingDirs : 1,
     includingTerminals : 1,
@@ -13149,7 +13150,7 @@ function filesFindGroups( test )
     }
   }
 
-  var extract1 = new _.FileProvider.Extract({ filesTree : filesTree });
+  var extract1 = new _.FileProvider.Extract({ filesTree });
   extract1.filesReflectTo( provider, routinePath );
 
   var expected =
@@ -13192,7 +13193,7 @@ function filesFindGroups( test )
   }
   var src =
   {
-    filePath : filePath,
+    filePath,
     prefixPath : routinePath,
   }
   var dst =
@@ -14891,30 +14892,8 @@ function filesReflectMandatory( test )
 
   /* */
 
-/*
-"Filter
-  prefixPath :
-`/C/pro/web/Dave/git/trunk/builder/include/dwtools/tmp.tmp/Will-154626-16-4c02/relfectSubmodulesWithNotExistingFile/module`
-  filePath :
-{
-  "module1" : `.`,
-  "module1/amid" : `.`,
-  "module1/amid/terminal" : `.`,
-  "module2" : `.`,
-  "module2/amid" : `.`
-}
-  basePath :
-{
-  "module1" : `module1`,
-  "module1/amid" : `module1`,
-  "module1/amid/terminal" : `module1`,
-  "module2" : `module2`,
-  "module2/amid" : `module2`
-}"
-*/
-
   debugger; return; xxx
-}
+} /* end of filesReflectMandatory */
 
 //
 
@@ -15763,7 +15742,7 @@ function filesReflectWithFilter( test )
     dst.originPath = 'extract+dst://';
     system.providerRegister( src );
     system.providerRegister( dst );
-    return { src : src, dst : dst, system : system };
+    return { src, dst, system };
   }
 
   /* */
@@ -16242,7 +16221,7 @@ function filesReflect( test )
     dst.originPath = 'extract+dst://';
     system.providerRegister( src );
     system.providerRegister( dst );
-    return { src : src, dst : dst, system : system };
+    return { src, dst, system };
   }
 
   /* */
@@ -18810,7 +18789,7 @@ function filesReflectWithSystem( test )
     src : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
   }
 
-  var srcProvider = _.FileProvider.Extract({ filesTree : filesTree, protocols : [ 'extract' ] });
+  var srcProvider = _.FileProvider.Extract({ filesTree, protocols : [ 'extract' ] });
   srcProvider.providerRegisterTo( system );
   // var dstProvider = new _.FileProvider.HardDrive();
   var srcPath = '/src';
@@ -18898,7 +18877,7 @@ function filesReflectLinkWithSystem( test )
     'terminal' : 'terminal',
     'link' : [{ softLink : '/terminal' }]
   }
-  var src = new _.FileProvider.Extract({ protocol : 'src', filesTree : filesTree });
+  var src = new _.FileProvider.Extract({ protocol : 'src', filesTree });
 
   src.providerRegisterTo( system );
 
@@ -20479,7 +20458,7 @@ function filesReflectDstDeletingDirs( test )
     src : {},
     dst : { dir : {} }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
   var o =
   {
     reflectMap : { '/src' : '/dst' },
@@ -20503,7 +20482,7 @@ function filesReflectDstDeletingDirs( test )
     src : {},
     dst : { dir : {} }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
   var o =
   {
     reflectMap : { '/src' : '/dst' },
@@ -20527,7 +20506,7 @@ function filesReflectDstDeletingDirs( test )
     src : {},
     dst : { dir : {} }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
   var o =
   {
     reflectMap : { '/src' : '/dst' },
@@ -20552,7 +20531,7 @@ function filesReflectDstDeletingDirs( test )
     src : {},
     dst : { dir : {} }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
   var o =
   {
     reflectMap : { '/src' : '/dst' },
@@ -20577,7 +20556,7 @@ function filesReflectDstDeletingDirs( test )
     src : {},
     dst : { dir : { file : 'file' } }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
   var o =
   {
     reflectMap : { '/src' : '/dst' },
@@ -20602,7 +20581,7 @@ function filesReflectDstDeletingDirs( test )
     src : {},
     dst : { dir : { file : 'file' } }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
   var o =
   {
     reflectMap : { '/src' : '/dst' },
@@ -20627,7 +20606,7 @@ function filesReflectDstDeletingDirs( test )
     src : {},
     dst : { dir : { file : 'file' } }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
   var o =
   {
     reflectMap : { '/src' : '/dst' },
@@ -20652,7 +20631,7 @@ function filesReflectDstDeletingDirs( test )
     src : {},
     dst : { dir : { file : 'file' } }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
   var o =
   {
     reflectMap : { '/src' : '/dst' },
@@ -20677,7 +20656,7 @@ function filesReflectDstDeletingDirs( test )
     src : {},
     dst : { dir : { file : 'file' } }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
   var o =
   {
     reflectMap : { '/src' : '/dst' },
@@ -20702,7 +20681,7 @@ function filesReflectDstDeletingDirs( test )
     src : {},
     dst : { dir : { file : 'file' } }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
   var o =
   {
     reflectMap : { '/src' : '/dst' },
@@ -20727,7 +20706,7 @@ function filesReflectDstDeletingDirs( test )
     src : {},
     dst : { dir : { file1 : 'file1', file2 : 'file2' } }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
   var o =
   {
     reflectMap : { '/src' : '/dst' },
@@ -20750,7 +20729,7 @@ function filesReflectDstDeletingDirs( test )
     src : {},
     dst : { dir : { file1 : 'file1', file2 : 'file2' } }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
   var o =
   {
     reflectMap : { '/src' : '/dst' },
@@ -20773,7 +20752,7 @@ function filesReflectDstDeletingDirs( test )
     src : {},
     dst : { dir : { file1 : 'file1', file2 : 'file2' } }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
   var o =
   {
     reflectMap : { '/src' : '/dst' },
@@ -20796,7 +20775,7 @@ function filesReflectDstDeletingDirs( test )
     src : {},
     dst : { dir : { file1 : 'file1', file2 : 'file2' } }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
   var o =
   {
     reflectMap : { '/src' : '/dst' },
@@ -20819,7 +20798,7 @@ function filesReflectDstDeletingDirs( test )
     src : { dir : {} },
     dst : { dir : { file1 : 'file1', file2 : 'file2' } }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
   var o =
   {
     reflectMap : { '/src' : '/dst' },
@@ -20842,7 +20821,7 @@ function filesReflectDstDeletingDirs( test )
     src : { dir : {} },
     dst : { dir : { file1 : 'file1', file2 : 'file2' } }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
   var o =
   {
     reflectMap : { '/src' : '/dst' },
@@ -20865,7 +20844,7 @@ function filesReflectDstDeletingDirs( test )
     src : { dir : {} },
     dst : { dir : { file1 : 'file1', file2 : 'file2' } }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
   var o =
   {
     reflectMap : { '/src' : '/dst' },
@@ -20887,7 +20866,7 @@ function filesReflectDstDeletingDirs( test )
     src : { dir : {} },
     dst : { dir : { file1 : 'file1', file2 : 'file2' } }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
   var o =
   {
     reflectMap : { '/src' : '/dst' },
@@ -21895,7 +21874,6 @@ function filesReflectToWithSoftLinks( test )
 
   test.close( 'absolute links, to extract, resolvingSrcSoftLink : 1' );
 
-  debugger; return; xxx
 } /* end of filesReflectToWithSoftLinks */
 
 //
@@ -21924,1354 +21902,1354 @@ function filesReflectToWithSoftLinksRebasing( test )
 
   /* - */
 
-  // test.open( 'absolute links, rebasingLink : 0, resolvingSrcSoftLink : 0' );
-  //
-  // /* - */
-  //
-  // var filesTree =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : [{ softLink : '/src/proto/file1' }],
-  //       'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
-  //       'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
-  //       'dirLink1' : [{ softLink : '/src/proto' }],
-  //       'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
-  //       'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
-  //
-  //       'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
-  //       'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
-  //       'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
-  //       'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
-  //       'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
-  //       'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : [{ softLink : '/src/proto2/file1' }],
-  //           'dirLink' : [{ softLink : '/src/proto/dir1' }],
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  // var extract = new _.FileProvider.Extract({ filesTree });
-  // var extract2 = new _.FileProvider.Extract();
-  // extract.filesReflectTo
-  // ({
-  //   dstProvider : extract2,
-  //   resolvingDstSoftLink : 0,
-  //   resolvingDstTextLink : 0,
-  //   resolvingSrcSoftLink : 0,
-  //   resolvingSrcTextLink : 0,
-  //   allowingMissed : 0,
-  //   rebasingLink : 0,
-  //   resolvingSoftLink : 0,
-  // });
-  //
-  // var expected =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/terLink1' }],
-  //       'terLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/terLink2' }],
-  //       'terLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto/terLink3' }],
-  //       'dirLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/dirLink1' }],
-  //       'dirLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dirLink2' }],
-  //       'dirLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto/dirLink3' }],
-  //
-  //       'dualTerLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualTerLink1' }],
-  //       'dualTerLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualTerLink2' }],
-  //       'dualDirLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualDirLink1' }],
-  //       'dualDirLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualDirLink2' }],
-  //       'dualDirLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualDirLink3' }],
-  //       'dualDirLink4' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualDirLink4' }],
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3/dir4/terLink' }],
-  //           'dirLink' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3/dir4/dirLink' }],
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  // test.identical( extract2.filesTree, expected );
-  //
-  // /* - */
-  //
-  // test.close( 'absolute links, rebasingLink : 0, resolvingSrcSoftLink : 0' );
-  // test.open( 'absolute links, rebasingLink : 0, resolvingSrcSoftLink : 1' );
-  //
-  // /* - */
-  //
-  // var filesTree =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : [{ softLink : '/src/proto/file1' }],
-  //       'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
-  //       'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
-  //       'dirLink1' : [{ softLink : '/src/proto' }],
-  //       'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
-  //       'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
-  //
-  //       'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
-  //       'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
-  //       'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
-  //       'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
-  //       'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
-  //       'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : [{ softLink : '/src/proto2/file1' }],
-  //           'dirLink' : [{ softLink : '/src/proto/dir1' }],
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  // var extract = new _.FileProvider.Extract({ filesTree });
-  // var extract2 = new _.FileProvider.Extract();
-  // extract.filesReflectTo
-  // ({
-  //   dstProvider : extract2,
-  //   resolvingDstSoftLink : 0,
-  //   resolvingDstTextLink : 0,
-  //   resolvingSrcSoftLink : 1,
-  //   resolvingSrcTextLink : 0,
-  //   allowingMissed : 0,
-  //   rebasingLink : 0,
-  //   resolvingSoftLink : 0,
-  // });
-  //
-  // var expected =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/file1' }],
-  //       'terLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dir1/dir2/file1' }],
-  //       'terLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3/dir4/file1' }],
-  //       'dirLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto' }],
-  //       'dirLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dir1/dir2' }],
-  //       'dirLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3' }],
-  //
-  //       'dualTerLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/file1' }],
-  //       'dualTerLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto2/file1' }],
-  //       'dualDirLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto' }],
-  //       'dualDirLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dir1/dir2' }],
-  //       'dualDirLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3' }],
-  //       'dualDirLink4' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3/dir4' }],
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : [{ softLink : 'extract' + extract.id + ':///src/proto2/file1' }],
-  //           'dirLink' : [{ softLink : 'extract' + extract.id + ':///src/proto/dir1' }],
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  // test.identical( extract2.filesTree, expected );
-  //
-  // /* - */
-  //
-  // test.close( 'absolute links, rebasingLink : 0, resolvingSrcSoftLink : 1' );
-  // test.open( 'absolute links, rebasingLink : 0, resolvingSrcSoftLink : 2' );
-  //
-  // /* - */
-  //
-  // var filesTree =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : [{ softLink : '/src/proto/file1' }],
-  //       'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
-  //       'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
-  //       'dirLink1' : [{ softLink : '/src/proto' }],
-  //       'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
-  //       'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
-  //
-  //       'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
-  //       'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
-  //       'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
-  //       'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
-  //       'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
-  //       'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : [{ softLink : '/src/proto2/file1' }],
-  //           'dirLink' : [{ softLink : '/src/proto/dir1' }],
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  // var extract = new _.FileProvider.Extract({ filesTree });
-  // var extract2 = new _.FileProvider.Extract();
-  // extract.filesReflectTo
-  // ({
-  //   dstProvider : extract2,
-  //   resolvingDstSoftLink : 0,
-  //   resolvingDstTextLink : 0,
-  //   resolvingSrcSoftLink : 2,
-  //   resolvingSrcTextLink : 0,
-  //   allowingMissed : 0,
-  //   rebasingLink : 0,
-  //   resolvingSoftLink : 0,
-  // });
-  //
-  // var expected =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : 'src/proto/file1',
-  //       'terLink2' : 'src/proto/dir1/dir2/file1',
-  //       'terLink3' : 'src/proto2/dir3/dir4/file1',
-  //       'dirLink1' : {},
-  //       'dirLink2' : {},
-  //       'dirLink3' : {},
-  //
-  //       'dualTerLink1' : 'src/proto/file1',
-  //       'dualTerLink2' : 'src/proto2/file1',
-  //       'dualDirLink1' : {},
-  //       'dualDirLink2' : {},
-  //       'dualDirLink3' : {},
-  //       'dualDirLink4' : {},
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : 'src/proto2/file1',
-  //           'dirLink' : {},
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  // test.identical( extract2.filesTree, expected );
-  //
-  // /* - */
-  //
-  // test.close( 'absolute links, rebasingLink : 0, resolvingSrcSoftLink : 2' );
-  // test.open( 'relative links, rebasingLink : 0, resolvingSrcSoftLink : 0' );
-  //
-  // /* - */
-  //
-  // var filesTree =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : [{ softLink : '../file1' }],
-  //       'terLink2' : [{ softLink : '../dir1/dir2/file1' }],
-  //       'terLink3' : [{ softLink : '../../proto2/dir3/dir4/file1' }],
-  //       'dirLink1' : [{ softLink : '..' }],
-  //       'dirLink2' : [{ softLink : '../dir1/dir2' }],
-  //       'dirLink3' : [{ softLink : '../../proto2/dir3' }],
-  //
-  //       'dualTerLink1' : [{ softLink : '../terLink1' }],
-  //       'dualTerLink2' : [{ softLink : '../../proto2/dir3/dir4/terLink' }],
-  //       'dualDirLink1' : [{ softLink : '../dirLink1' }],
-  //       'dualDirLink2' : [{ softLink : '../dirLink2' }],
-  //       'dualDirLink3' : [{ softLink : '../dirLink3' }],
-  //       'dualDirLink4' : [{ softLink : '../../proto2/dir3/dir4' }],
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : [{ softLink : '../../../file1' }],
-  //           'dirLink' : [{ softLink : '../../../../proto/dir1' }],
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  // var extract = new _.FileProvider.Extract({ filesTree });
-  // var extract2 = new _.FileProvider.Extract();
-  // extract.filesReflectTo
-  // ({
-  //   dstProvider : extract2,
-  //   resolvingDstSoftLink : 0,
-  //   resolvingDstTextLink : 0,
-  //   resolvingSrcSoftLink : 0,
-  //   resolvingSrcTextLink : 0,
-  //   allowingMissed : 0,
-  //   rebasingLink : 0,
-  //   resolvingSoftLink : 0,
-  // });
-  //
-  // var expected =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/terLink1' }],
-  //       'terLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/terLink2' }],
-  //       'terLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto/terLink3' }],
-  //       'dirLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/dirLink1' }],
-  //       'dirLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dirLink2' }],
-  //       'dirLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto/dirLink3' }],
-  //
-  //       'dualTerLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualTerLink1' }],
-  //       'dualTerLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualTerLink2' }],
-  //       'dualDirLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualDirLink1' }],
-  //       'dualDirLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualDirLink2' }],
-  //       'dualDirLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualDirLink3' }],
-  //       'dualDirLink4' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualDirLink4' }],
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3/dir4/terLink' }],
-  //           'dirLink' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3/dir4/dirLink' }],
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  // test.identical( extract2.filesTree, expected );
-  //
-  // /* - */
-  //
-  // test.close( 'relative links, rebasingLink : 0, resolvingSrcSoftLink : 0' );
-  // test.open( 'relative links, rebasingLink : 0, resolvingSrcSoftLink : 1' );
-  //
-  // /* - */
-  //
-  // var filesTree =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : [{ softLink : '../file1' }],
-  //       'terLink2' : [{ softLink : '../dir1/dir2/file1' }],
-  //       'terLink3' : [{ softLink : '../../proto2/dir3/dir4/file1' }],
-  //       'dirLink1' : [{ softLink : '..' }],
-  //       'dirLink2' : [{ softLink : '../dir1/dir2' }],
-  //       'dirLink3' : [{ softLink : '../../proto2/dir3' }],
-  //
-  //       'dualTerLink1' : [{ softLink : '../terLink1' }],
-  //       'dualTerLink2' : [{ softLink : '../../proto2/dir3/dir4/terLink' }],
-  //       'dualDirLink1' : [{ softLink : '../dirLink1' }],
-  //       'dualDirLink2' : [{ softLink : '../dirLink2' }],
-  //       'dualDirLink3' : [{ softLink : '../dirLink3' }],
-  //       'dualDirLink4' : [{ softLink : '../../proto2/dir3/dir4' }],
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : [{ softLink : '../../../file1' }],
-  //           'dirLink' : [{ softLink : '../../../../proto/dir1' }],
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  // var extract = new _.FileProvider.Extract({ filesTree });
-  // var extract2 = new _.FileProvider.Extract();
-  // extract.filesReflectTo
-  // ({
-  //   dstProvider : extract2,
-  //   resolvingDstSoftLink : 0,
-  //   resolvingDstTextLink : 0,
-  //   resolvingSrcSoftLink : 1,
-  //   resolvingSrcTextLink : 0,
-  //   allowingMissed : 0,
-  //   rebasingLink : 0,
-  //   resolvingSoftLink : 0,
-  // });
-  //
-  // var expected =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/file1' }],
-  //       'terLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dir1/dir2/file1' }],
-  //       'terLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3/dir4/file1' }],
-  //       'dirLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto' }],
-  //       'dirLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dir1/dir2' }],
-  //       'dirLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3' }],
-  //
-  //       'dualTerLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/file1' }],
-  //       'dualTerLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto2/file1' }],
-  //       'dualDirLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto' }],
-  //       'dualDirLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dir1/dir2' }],
-  //       'dualDirLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3' }],
-  //       'dualDirLink4' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3/dir4' }],
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : [{ softLink : 'extract' + extract.id + ':///src/proto2/file1' }],
-  //           'dirLink' : [{ softLink : 'extract' + extract.id + ':///src/proto/dir1' }],
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  // test.identical( extract2.filesTree, expected );
-  //
-  // /* - */
-  //
-  // test.close( 'relative links, rebasingLink : 0, resolvingSrcSoftLink : 1' );
-  // test.open( 'relative links, rebasingLink : 0, resolvingSrcSoftLink : 2' );
-  //
-  // /* - */
-  //
-  // var filesTree =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : [{ softLink : '../file1' }],
-  //       'terLink2' : [{ softLink : '../dir1/dir2/file1' }],
-  //       'terLink3' : [{ softLink : '../../proto2/dir3/dir4/file1' }],
-  //       'dirLink1' : [{ softLink : '..' }],
-  //       'dirLink2' : [{ softLink : '../dir1/dir2' }],
-  //       'dirLink3' : [{ softLink : '../../proto2/dir3' }],
-  //
-  //       'dualTerLink1' : [{ softLink : '../terLink1' }],
-  //       'dualTerLink2' : [{ softLink : '../../proto2/dir3/dir4/terLink' }],
-  //       'dualDirLink1' : [{ softLink : '../dirLink1' }],
-  //       'dualDirLink2' : [{ softLink : '../dirLink2' }],
-  //       'dualDirLink3' : [{ softLink : '../dirLink3' }],
-  //       'dualDirLink4' : [{ softLink : '../../proto2/dir3/dir4' }],
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : [{ softLink : '../../../file1' }],
-  //           'dirLink' : [{ softLink : '../../../../proto/dir1' }],
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  // var extract = new _.FileProvider.Extract({ filesTree });
-  // var extract2 = new _.FileProvider.Extract();
-  // extract.filesReflectTo
-  // ({
-  //   dstProvider : extract2,
-  //   resolvingDstSoftLink : 0,
-  //   resolvingDstTextLink : 0,
-  //   resolvingSrcSoftLink : 2,
-  //   resolvingSrcTextLink : 0,
-  //   allowingMissed : 0,
-  //   rebasingLink : 0,
-  //   resolvingSoftLink : 0,
-  // });
-  //
-  // var expected =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : 'src/proto/file1',
-  //       'terLink2' : 'src/proto/dir1/dir2/file1',
-  //       'terLink3' : 'src/proto2/dir3/dir4/file1',
-  //       'dirLink1' : {},
-  //       'dirLink2' : {},
-  //       'dirLink3' : {},
-  //
-  //       'dualTerLink1' : 'src/proto/file1',
-  //       'dualTerLink2' : 'src/proto2/file1',
-  //       'dualDirLink1' : {},
-  //       'dualDirLink2' : {},
-  //       'dualDirLink3' : {},
-  //       'dualDirLink4' : {},
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : 'src/proto2/file1',
-  //           'dirLink' : {},
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  // test.identical( extract2.filesTree, expected );
-  //
-  // /* - */
-  //
-  // test.close( 'relative links, rebasingLink : 0, resolvingSrcSoftLink : 2' );
-  //
-  // test.open( 'absolute links, rebasingLink : 1, resolvingSrcSoftLink : 0' );
-  //
-  // /* - */
-  //
-  // var filesTree =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : [{ softLink : '/src/proto/file1' }],
-  //       'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
-  //       'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
-  //       'dirLink1' : [{ softLink : '/src/proto' }],
-  //       'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
-  //       'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
-  //
-  //       'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
-  //       'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
-  //       'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
-  //       'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
-  //       'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
-  //       'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : [{ softLink : '/src/proto2/file1' }],
-  //           'dirLink' : [{ softLink : '/src/proto/dir1' }],
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  // var extract = new _.FileProvider.Extract({ filesTree });
-  // var extract2 = new _.FileProvider.Extract();
-  // extract.filesReflectTo
-  // ({
-  //   dstProvider : extract2,
-  //   resolvingDstSoftLink : 0,
-  //   resolvingDstTextLink : 0,
-  //   resolvingSrcSoftLink : 0,
-  //   resolvingSrcTextLink : 0,
-  //   allowingMissed : 0,
-  //   rebasingLink : 1,
-  // });
-  //
-  // var expected =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : [{ softLink : '/src/proto/file1' }],
-  //       'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
-  //       'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
-  //       'dirLink1' : [{ softLink : '/src/proto' }],
-  //       'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
-  //       'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
-  //
-  //       'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
-  //       'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
-  //       'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
-  //       'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
-  //       'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
-  //       'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : [{ softLink : '/src/proto2/file1' }],
-  //           'dirLink' : [{ softLink : '/src/proto/dir1' }],
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  // test.identical( extract2.filesTree, expected );
-  //
-  // /* - */
-  //
-  // test.close( 'absolute links, rebasingLink : 1, resolvingSrcSoftLink : 0' );
-  // test.open( 'absolute links, rebasingLink : 1, resolvingSrcSoftLink : 1' );
-  //
-  // /* - */
-  //
-  // var filesTree =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : [{ softLink : '/src/proto/file1' }],
-  //       'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
-  //       'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
-  //       'dirLink1' : [{ softLink : '/src/proto' }],
-  //       'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
-  //       'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
-  //
-  //       'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
-  //       'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
-  //       'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
-  //       'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
-  //       'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
-  //       'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : [{ softLink : '/src/proto2/file1' }],
-  //           'dirLink' : [{ softLink : '/src/proto/dir1' }],
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  //
-  // var extract = new _.FileProvider.Extract({ filesTree });
-  // var extract2 = new _.FileProvider.Extract();
-  // extract.filesReflectTo
-  // ({
-  //   dstProvider : extract2,
-  //   resolvingDstSoftLink : 0,
-  //   resolvingDstTextLink : 0,
-  //   resolvingSrcSoftLink : 1,
-  //   resolvingSrcTextLink : 0,
-  //   allowingMissed : 1,
-  //   rebasingLink : 1,
-  // });
-  //
-  // var expected =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : [{ softLink : '/src/proto/file1' }],
-  //       'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
-  //       'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
-  //       'dirLink1' : [{ softLink : '/src/proto' }],
-  //       'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
-  //       'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
-  //
-  //       'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
-  //       'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
-  //       'dualDirLink1' : [{ softLink : '/src/proto' }],
-  //       'dualDirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
-  //       'dualDirLink3' : [{ softLink : '/src/proto2/dir3' }],
-  //       'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : [{ softLink : '/src/proto2/file1' }],
-  //           'dirLink' : [{ softLink : '/src/proto/dir1' }],
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  // test.identical( extract2.filesTree, expected );
-  //
-  // /* - */
-  //
-  // test.close( 'absolute links, rebasingLink : 1, resolvingSrcSoftLink : 1' );
-  // test.open( 'absolute links, rebasingLink : 1, resolvingSrcSoftLink : 2' );
-  //
-  // /* - */
-  //
-  // var filesTree =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : [{ softLink : '/src/proto/file1' }],
-  //       'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
-  //       'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
-  //       'dirLink1' : [{ softLink : '/src/proto' }],
-  //       'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
-  //       'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
-  //
-  //       'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
-  //       'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
-  //       'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
-  //       'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
-  //       'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
-  //       'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : [{ softLink : '/src/proto2/file1' }],
-  //           'dirLink' : [{ softLink : '/src/proto/dir1' }],
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  // var extract = new _.FileProvider.Extract({ filesTree });
-  // var extract2 = new _.FileProvider.Extract();
-  // extract.filesReflectTo
-  // ({
-  //   dstProvider : extract2,
-  //   resolvingDstSoftLink : 0,
-  //   resolvingDstTextLink : 0,
-  //   resolvingSrcSoftLink : 2,
-  //   resolvingSrcTextLink : 0,
-  //   allowingMissed : 0,
-  //   rebasingLink : 1,
-  // });
-  //
-  // var expected =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : 'src/proto/file1',
-  //       'terLink2' : 'src/proto/dir1/dir2/file1',
-  //       'terLink3' : 'src/proto2/dir3/dir4/file1',
-  //       'dirLink1' : {},
-  //       'dirLink2' : {},
-  //       'dirLink3' : {},
-  //
-  //       'dualTerLink1' : 'src/proto/file1',
-  //       'dualTerLink2' : 'src/proto2/file1',
-  //       'dualDirLink1' : {},
-  //       'dualDirLink2' : {},
-  //       'dualDirLink3' : {},
-  //       'dualDirLink4' : {},
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : 'src/proto2/file1',
-  //           'dirLink' : {},
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  // test.identical( extract2.filesTree, expected );
-  //
-  // /* - */
-  //
-  // test.close( 'absolute links, rebasingLink : 1, resolvingSrcSoftLink : 2' );
-  // test.open( 'relative links, rebasingLink : 1, resolvingSrcSoftLink : 0' );
-  //
-  // /* - */
-  //
-  // var filesTree =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : [{ softLink : '../file1' }],
-  //       'terLink2' : [{ softLink : '../dir1/dir2/file1' }],
-  //       'terLink3' : [{ softLink : '../../proto2/dir3/dir4/file1' }],
-  //       'dirLink1' : [{ softLink : '..' }],
-  //       'dirLink2' : [{ softLink : '../dir1/dir2' }],
-  //       'dirLink3' : [{ softLink : '../../proto2/dir3' }],
-  //
-  //       'dualTerLink1' : [{ softLink : '../terLink1' }],
-  //       'dualTerLink2' : [{ softLink : '../../proto2/dir3/dir4/terLink' }],
-  //       'dualDirLink1' : [{ softLink : '../dirLink1' }],
-  //       'dualDirLink2' : [{ softLink : '../dirLink2' }],
-  //       'dualDirLink3' : [{ softLink : '../dirLink3' }],
-  //       'dualDirLink4' : [{ softLink : '../../proto2/dir3/dir4' }],
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : [{ softLink : '../../../file1' }],
-  //           'dirLink' : [{ softLink : '../../../../proto/dir1' }],
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  // var extract = new _.FileProvider.Extract({ filesTree });
-  // var extract2 = new _.FileProvider.Extract();
-  // extract.filesReflectTo
-  // ({
-  //   dstProvider : extract2,
-  //   resolvingDstSoftLink : 0,
-  //   resolvingDstTextLink : 0,
-  //   resolvingSrcSoftLink : 0,
-  //   resolvingSrcTextLink : 0,
-  //   allowingMissed : 1,
-  //   rebasingLink : 1,
-  // });
-  //
-  // var expected =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : [{ softLink : '../file1' }],
-  //       'terLink2' : [{ softLink : '../dir1/dir2/file1' }],
-  //       'terLink3' : [{ softLink : '../../proto2/dir3/dir4/file1' }],
-  //       'dirLink1' : [{ softLink : '..' }],
-  //       'dirLink2' : [{ softLink : '../dir1/dir2' }],
-  //       'dirLink3' : [{ softLink : '../../proto2/dir3' }],
-  //
-  //       'dualTerLink1' : [{ softLink : '../terLink1' }],
-  //       'dualTerLink2' : [{ softLink : '../../proto2/dir3/dir4/terLink' }],
-  //       'dualDirLink1' : [{ softLink : '../dirLink1' }],
-  //       'dualDirLink2' : [{ softLink : '../dirLink2' }],
-  //       'dualDirLink3' : [{ softLink : '../dirLink3' }],
-  //       'dualDirLink4' : [{ softLink : '../../proto2/dir3/dir4' }],
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : [{ softLink : '../../../file1' }],
-  //           'dirLink' : [{ softLink : '../../../../proto/dir1' }],
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  // test.identical( extract2.filesTree, expected );
-  //
-  // /* - */
-  //
-  // test.close( 'relative links, rebasingLink : 1, resolvingSrcSoftLink : 0' );
+  test.open( 'absolute links, rebasingLink : 0, resolvingSrcSoftLink : 0' );
+
+  /* - */
+
+  var filesTree =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '/src/proto' }],
+        'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
+        'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
+        'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
+        'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
+        'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
+        'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : [{ softLink : '/src/proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 0,
+    resolvingSrcTextLink : 0,
+    allowingMissed : 0,
+    rebasingLink : 0,
+    resolvingSoftLink : 0,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/terLink1' }],
+        'terLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/terLink2' }],
+        'terLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto/terLink3' }],
+        'dirLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/dirLink1' }],
+        'dirLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dirLink2' }],
+        'dirLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto/dirLink3' }],
+
+        'dualTerLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualTerLink1' }],
+        'dualTerLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualTerLink2' }],
+        'dualDirLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualDirLink1' }],
+        'dualDirLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualDirLink2' }],
+        'dualDirLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualDirLink3' }],
+        'dualDirLink4' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualDirLink4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3/dir4/terLink' }],
+            'dirLink' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3/dir4/dirLink' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.identical( extract2.filesTree, expected );
+
+  /* - */
+
+  test.close( 'absolute links, rebasingLink : 0, resolvingSrcSoftLink : 0' );
+  test.open( 'absolute links, rebasingLink : 0, resolvingSrcSoftLink : 1' );
+
+  /* - */
+
+  var filesTree =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '/src/proto' }],
+        'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
+        'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
+        'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
+        'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
+        'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
+        'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : [{ softLink : '/src/proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 1,
+    resolvingSrcTextLink : 0,
+    allowingMissed : 0,
+    rebasingLink : 0,
+    resolvingSoftLink : 0,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/file1' }],
+        'terLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto' }],
+        'dirLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dir1/dir2' }],
+        'dirLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/file1' }],
+        'dualTerLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto2/file1' }],
+        'dualDirLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto' }],
+        'dualDirLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dir1/dir2' }],
+        'dualDirLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3' }],
+        'dualDirLink4' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : 'extract' + extract.id + ':///src/proto2/file1' }],
+            'dirLink' : [{ softLink : 'extract' + extract.id + ':///src/proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.identical( extract2.filesTree, expected );
+
+  /* - */
+
+  test.close( 'absolute links, rebasingLink : 0, resolvingSrcSoftLink : 1' );
+  test.open( 'absolute links, rebasingLink : 0, resolvingSrcSoftLink : 2' );
+
+  /* - */
+
+  var filesTree =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '/src/proto' }],
+        'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
+        'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
+        'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
+        'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
+        'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
+        'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : [{ softLink : '/src/proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 2,
+    resolvingSrcTextLink : 0,
+    allowingMissed : 0,
+    rebasingLink : 0,
+    resolvingSoftLink : 0,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : 'src/proto/file1',
+        'terLink2' : 'src/proto/dir1/dir2/file1',
+        'terLink3' : 'src/proto2/dir3/dir4/file1',
+        'dirLink1' : {},
+        'dirLink2' : {},
+        'dirLink3' : {},
+
+        'dualTerLink1' : 'src/proto/file1',
+        'dualTerLink2' : 'src/proto2/file1',
+        'dualDirLink1' : {},
+        'dualDirLink2' : {},
+        'dualDirLink3' : {},
+        'dualDirLink4' : {},
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : 'src/proto2/file1',
+            'dirLink' : {},
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.identical( extract2.filesTree, expected );
+
+  /* - */
+
+  test.close( 'absolute links, rebasingLink : 0, resolvingSrcSoftLink : 2' );
+  test.open( 'relative links, rebasingLink : 0, resolvingSrcSoftLink : 0' );
+
+  /* - */
+
+  var filesTree =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '../file1' }],
+        'terLink2' : [{ softLink : '../dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '../../proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '..' }],
+        'dirLink2' : [{ softLink : '../dir1/dir2' }],
+        'dirLink3' : [{ softLink : '../../proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '../terLink1' }],
+        'dualTerLink2' : [{ softLink : '../../proto2/dir3/dir4/terLink' }],
+        'dualDirLink1' : [{ softLink : '../dirLink1' }],
+        'dualDirLink2' : [{ softLink : '../dirLink2' }],
+        'dualDirLink3' : [{ softLink : '../dirLink3' }],
+        'dualDirLink4' : [{ softLink : '../../proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '../../../file1' }],
+            'dirLink' : [{ softLink : '../../../../proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 0,
+    resolvingSrcTextLink : 0,
+    allowingMissed : 0,
+    rebasingLink : 0,
+    resolvingSoftLink : 0,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/terLink1' }],
+        'terLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/terLink2' }],
+        'terLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto/terLink3' }],
+        'dirLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/dirLink1' }],
+        'dirLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dirLink2' }],
+        'dirLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto/dirLink3' }],
+
+        'dualTerLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualTerLink1' }],
+        'dualTerLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualTerLink2' }],
+        'dualDirLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualDirLink1' }],
+        'dualDirLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualDirLink2' }],
+        'dualDirLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualDirLink3' }],
+        'dualDirLink4' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualDirLink4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3/dir4/terLink' }],
+            'dirLink' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3/dir4/dirLink' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.identical( extract2.filesTree, expected );
+
+  /* - */
+
+  test.close( 'relative links, rebasingLink : 0, resolvingSrcSoftLink : 0' );
+  test.open( 'relative links, rebasingLink : 0, resolvingSrcSoftLink : 1' );
+
+  /* - */
+
+  var filesTree =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '../file1' }],
+        'terLink2' : [{ softLink : '../dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '../../proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '..' }],
+        'dirLink2' : [{ softLink : '../dir1/dir2' }],
+        'dirLink3' : [{ softLink : '../../proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '../terLink1' }],
+        'dualTerLink2' : [{ softLink : '../../proto2/dir3/dir4/terLink' }],
+        'dualDirLink1' : [{ softLink : '../dirLink1' }],
+        'dualDirLink2' : [{ softLink : '../dirLink2' }],
+        'dualDirLink3' : [{ softLink : '../dirLink3' }],
+        'dualDirLink4' : [{ softLink : '../../proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '../../../file1' }],
+            'dirLink' : [{ softLink : '../../../../proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 1,
+    resolvingSrcTextLink : 0,
+    allowingMissed : 0,
+    rebasingLink : 0,
+    resolvingSoftLink : 0,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/file1' }],
+        'terLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto' }],
+        'dirLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dir1/dir2' }],
+        'dirLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/file1' }],
+        'dualTerLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto2/file1' }],
+        'dualDirLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto' }],
+        'dualDirLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dir1/dir2' }],
+        'dualDirLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3' }],
+        'dualDirLink4' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : 'extract' + extract.id + ':///src/proto2/file1' }],
+            'dirLink' : [{ softLink : 'extract' + extract.id + ':///src/proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.identical( extract2.filesTree, expected );
+
+  /* - */
+
+  test.close( 'relative links, rebasingLink : 0, resolvingSrcSoftLink : 1' );
+  test.open( 'relative links, rebasingLink : 0, resolvingSrcSoftLink : 2' );
+
+  /* - */
+
+  var filesTree =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '../file1' }],
+        'terLink2' : [{ softLink : '../dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '../../proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '..' }],
+        'dirLink2' : [{ softLink : '../dir1/dir2' }],
+        'dirLink3' : [{ softLink : '../../proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '../terLink1' }],
+        'dualTerLink2' : [{ softLink : '../../proto2/dir3/dir4/terLink' }],
+        'dualDirLink1' : [{ softLink : '../dirLink1' }],
+        'dualDirLink2' : [{ softLink : '../dirLink2' }],
+        'dualDirLink3' : [{ softLink : '../dirLink3' }],
+        'dualDirLink4' : [{ softLink : '../../proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '../../../file1' }],
+            'dirLink' : [{ softLink : '../../../../proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 2,
+    resolvingSrcTextLink : 0,
+    allowingMissed : 0,
+    rebasingLink : 0,
+    resolvingSoftLink : 0,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : 'src/proto/file1',
+        'terLink2' : 'src/proto/dir1/dir2/file1',
+        'terLink3' : 'src/proto2/dir3/dir4/file1',
+        'dirLink1' : {},
+        'dirLink2' : {},
+        'dirLink3' : {},
+
+        'dualTerLink1' : 'src/proto/file1',
+        'dualTerLink2' : 'src/proto2/file1',
+        'dualDirLink1' : {},
+        'dualDirLink2' : {},
+        'dualDirLink3' : {},
+        'dualDirLink4' : {},
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : 'src/proto2/file1',
+            'dirLink' : {},
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.identical( extract2.filesTree, expected );
+
+  /* - */
+
+  test.close( 'relative links, rebasingLink : 0, resolvingSrcSoftLink : 2' );
+
+  test.open( 'absolute links, rebasingLink : 1, resolvingSrcSoftLink : 0' );
+
+  /* - */
+
+  var filesTree =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '/src/proto' }],
+        'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
+        'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
+        'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
+        'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
+        'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
+        'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : [{ softLink : '/src/proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 0,
+    resolvingSrcTextLink : 0,
+    allowingMissed : 0,
+    rebasingLink : 1,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '/src/proto' }],
+        'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
+        'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
+        'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
+        'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
+        'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
+        'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : [{ softLink : '/src/proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.identical( extract2.filesTree, expected );
+
+  /* - */
+
+  test.close( 'absolute links, rebasingLink : 1, resolvingSrcSoftLink : 0' );
+  test.open( 'absolute links, rebasingLink : 1, resolvingSrcSoftLink : 1' );
+
+  /* - */
+
+  var filesTree =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '/src/proto' }],
+        'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
+        'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
+        'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
+        'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
+        'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
+        'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : [{ softLink : '/src/proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 1,
+    resolvingSrcTextLink : 0,
+    allowingMissed : 1,
+    rebasingLink : 1,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '/src/proto' }],
+        'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
+        'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '/src/proto/file1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/file1' }],
+        'dualDirLink1' : [{ softLink : '/src/proto' }],
+        'dualDirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
+        'dualDirLink3' : [{ softLink : '/src/proto2/dir3' }],
+        'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : [{ softLink : '/src/proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.identical( extract2.filesTree, expected );
+
+  /* - */
+
+  test.close( 'absolute links, rebasingLink : 1, resolvingSrcSoftLink : 1' );
+  test.open( 'absolute links, rebasingLink : 1, resolvingSrcSoftLink : 2' );
+
+  /* - */
+
+  var filesTree =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '/src/proto' }],
+        'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
+        'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
+        'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
+        'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
+        'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
+        'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : [{ softLink : '/src/proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 2,
+    resolvingSrcTextLink : 0,
+    allowingMissed : 0,
+    rebasingLink : 1,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : 'src/proto/file1',
+        'terLink2' : 'src/proto/dir1/dir2/file1',
+        'terLink3' : 'src/proto2/dir3/dir4/file1',
+        'dirLink1' : {},
+        'dirLink2' : {},
+        'dirLink3' : {},
+
+        'dualTerLink1' : 'src/proto/file1',
+        'dualTerLink2' : 'src/proto2/file1',
+        'dualDirLink1' : {},
+        'dualDirLink2' : {},
+        'dualDirLink3' : {},
+        'dualDirLink4' : {},
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : 'src/proto2/file1',
+            'dirLink' : {},
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.identical( extract2.filesTree, expected );
+
+  /* - */
+
+  test.close( 'absolute links, rebasingLink : 1, resolvingSrcSoftLink : 2' );
+  test.open( 'relative links, rebasingLink : 1, resolvingSrcSoftLink : 0' );
+
+  /* - */
+
+  var filesTree =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '../file1' }],
+        'terLink2' : [{ softLink : '../dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '../../proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '..' }],
+        'dirLink2' : [{ softLink : '../dir1/dir2' }],
+        'dirLink3' : [{ softLink : '../../proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '../terLink1' }],
+        'dualTerLink2' : [{ softLink : '../../proto2/dir3/dir4/terLink' }],
+        'dualDirLink1' : [{ softLink : '../dirLink1' }],
+        'dualDirLink2' : [{ softLink : '../dirLink2' }],
+        'dualDirLink3' : [{ softLink : '../dirLink3' }],
+        'dualDirLink4' : [{ softLink : '../../proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '../../../file1' }],
+            'dirLink' : [{ softLink : '../../../../proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 0,
+    resolvingSrcTextLink : 0,
+    allowingMissed : 1,
+    rebasingLink : 1,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '../file1' }],
+        'terLink2' : [{ softLink : '../dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '../../proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '..' }],
+        'dirLink2' : [{ softLink : '../dir1/dir2' }],
+        'dirLink3' : [{ softLink : '../../proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '../terLink1' }],
+        'dualTerLink2' : [{ softLink : '../../proto2/dir3/dir4/terLink' }],
+        'dualDirLink1' : [{ softLink : '../dirLink1' }],
+        'dualDirLink2' : [{ softLink : '../dirLink2' }],
+        'dualDirLink3' : [{ softLink : '../dirLink3' }],
+        'dualDirLink4' : [{ softLink : '../../proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '../../../file1' }],
+            'dirLink' : [{ softLink : '../../../../proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.identical( extract2.filesTree, expected );
+
+  /* - */
+
+  test.close( 'relative links, rebasingLink : 1, resolvingSrcSoftLink : 0' );
 
   test.open( 'relative links, rebasingLink : 1, resolvingSrcSoftLink : 1' );
 
@@ -23363,11 +23341,11 @@ function filesReflectToWithSoftLinksRebasing( test )
         'dirLink2' : [{ softLink : '../dir1/dir2' }],
         'dirLink3' : [{ softLink : '../../proto2/dir3' }],
 
-        'dualTerLink1' : [{ softLink : '../terLink1' }],
-        'dualTerLink2' : [{ softLink : '../../proto2/dir3/dir4/terLink' }],
-        'dualDirLink1' : [{ softLink : '../dirLink1' }],
-        'dualDirLink2' : [{ softLink : '../dirLink2' }],
-        'dualDirLink3' : [{ softLink : '../dirLink3' }],
+        'dualTerLink1' : [{ softLink : '../file1' }],
+        'dualTerLink2' : [{ softLink : '../../proto2/file1' }],
+        'dualDirLink1' : [{ softLink : '..' }],
+        'dualDirLink2' : [{ softLink : '../dir1/dir2' }],
+        'dualDirLink3' : [{ softLink : '../../proto2/dir3' }],
         'dualDirLink4' : [{ softLink : '../../proto2/dir3/dir4' }],
 
         dir1 :
@@ -23408,8 +23386,6 @@ function filesReflectToWithSoftLinksRebasing( test )
   /* - */
 
   test.close( 'relative links, rebasingLink : 1, resolvingSrcSoftLink : 1' );
-
-  debugger; return; xxx
 
   test.open( 'relative links, rebasingLink : 1, resolvingSrcSoftLink : 2' );
 
@@ -24352,8 +24328,9 @@ function filesReflectToWithSoftLinksRebasing( test )
 
   /* - */
 
-  debugger; return; xxx
 } /* end of filesReflectToWithSoftLinksRebasing */
+
+filesReflectToWithSoftLinksRebasing.timeOut = 300000;
 
 //
 
@@ -24381,7 +24358,7 @@ function filesReflectToWithSoftLinksResolving( test )
 
   /* - */
 
-  test.open( 'absolute links' );
+  test.open( 'absolute links, rebasingLink : 0' );
 
   /* - */
 
@@ -24443,7 +24420,7 @@ function filesReflectToWithSoftLinksResolving( test )
 
   /* */
 
-  test.case = 'rebasingLink : 0, resolvingSrcSoftLink : 0, revisiting : 0';
+  test.case = 'resolvingSrcSoftLink : 0, revisiting : 0';
   var extract = new _.FileProvider.Extract({ filesTree });
   var extract2 = new _.FileProvider.Extract();
   var got = extract.filesReflectTo
@@ -24537,7 +24514,7 @@ function filesReflectToWithSoftLinksResolving( test )
 
   /* */
 
-  test.case = 'rebasingLink : 0, resolvingSrcSoftLink : 0, revisiting : 1';
+  test.case = 'resolvingSrcSoftLink : 0, revisiting : 1';
   var extract = new _.FileProvider.Extract({ filesTree });
   var extract2 = new _.FileProvider.Extract();
   var got = extract.filesReflectTo
@@ -24707,7 +24684,7 @@ function filesReflectToWithSoftLinksResolving( test )
 
   /* */
 
-  test.case = 'rebasingLink : 0, resolvingSrcSoftLink : 0, revisiting : 2';
+  test.case = 'resolvingSrcSoftLink : 0, revisiting : 2';
   var extract = new _.FileProvider.Extract({ filesTree });
   var extract2 = new _.FileProvider.Extract();
   var got = extract.filesReflectTo
@@ -24940,7 +24917,7 @@ function filesReflectToWithSoftLinksResolving( test )
 
   /* */
 
-  test.case = 'rebasingLink : 0, resolvingSrcSoftLink : 1, revisiting : 0';
+  test.case = 'resolvingSrcSoftLink : 1, revisiting : 0';
   var extract = new _.FileProvider.Extract({ filesTree });
   var extract2 = new _.FileProvider.Extract();
   var got = extract.filesReflectTo
@@ -25034,7 +25011,7 @@ function filesReflectToWithSoftLinksResolving( test )
 
   /* */
 
-  test.case = 'rebasingLink : 0, resolvingSrcSoftLink : 1, revisiting : 1';
+  test.case = 'resolvingSrcSoftLink : 1, revisiting : 1';
   var extract = new _.FileProvider.Extract({ filesTree });
   var extract2 = new _.FileProvider.Extract();
   var got = extract.filesReflectTo
@@ -25204,7 +25181,7 @@ function filesReflectToWithSoftLinksResolving( test )
 
   /* */
 
-  test.case = 'rebasingLink : 0, resolvingSrcSoftLink : 1, revisiting : 2';
+  test.case = 'resolvingSrcSoftLink : 1, revisiting : 2';
   var extract = new _.FileProvider.Extract({ filesTree });
   var extract2 = new _.FileProvider.Extract();
   var got = extract.filesReflectTo
@@ -25437,7 +25414,7 @@ function filesReflectToWithSoftLinksResolving( test )
 
   /* */
 
-  test.case = 'rebasingLink : 0, resolvingSrcSoftLink : 2, revisiting : 0';
+  test.case = 'resolvingSrcSoftLink : 2, revisiting : 0';
   var extract = new _.FileProvider.Extract({ filesTree });
   var extract2 = new _.FileProvider.Extract();
   var got = extract.filesReflectTo
@@ -25532,7 +25509,7 @@ function filesReflectToWithSoftLinksResolving( test )
 
   /* */
 
-  test.case = 'rebasingLink : 0, resolvingSrcSoftLink : 2, revisiting : 1';
+  test.case = 'resolvingSrcSoftLink : 2, revisiting : 1';
   var extract = new _.FileProvider.Extract({ filesTree });
   var extract2 = new _.FileProvider.Extract();
   var got = extract.filesReflectTo
@@ -25704,7 +25681,7 @@ function filesReflectToWithSoftLinksResolving( test )
 
   /* */
 
-  test.case = 'rebasingLink : 0, resolvingSrcSoftLink : 2, revisiting : 2';
+  test.case = 'resolvingSrcSoftLink : 2, revisiting : 2';
   var extract = new _.FileProvider.Extract({ filesTree });
   var extract2 = new _.FileProvider.Extract();
   var got = extract.filesReflectTo
@@ -25881,12 +25858,3019 @@ function filesReflectToWithSoftLinksResolving( test )
 
   /* - */
 
-  test.close( 'absolute links' );
+  test.close( 'absolute links, rebasingLink : 0' );
+  test.open( 'absolute links, rebasingLink : 1' );
 
   /* - */
 
-  debugger; return; xxx
+  var filesTree =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '/src/proto' }],
+        'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
+        'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
+        'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
+        'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
+        'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
+        'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : [{ softLink : '/src/proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 0, revisiting : 0';
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  var got = extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 0,
+    resolvingSrcTextLink : 0,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    rebasingLink : 1,
+    revisiting : 0,
+    allowingMissed : 0,
+    allowingCycled : 0,
+  });
+
+  var expected =
+  [
+    '/',
+    '/f',
+    '/dst',
+    '/dst/f',
+    '/src',
+    '/src/proto',
+    '/src/proto/file1',
+    '/src/proto2/file1',
+    '/src/proto/file2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2',
+    '/src/proto2/file2'
+  ]
+  test.description = 'src/real';
+  var real = _.select( got, '*/src/real' );
+  test.identical( real, expected );
+  test.description = 'unique src/real';
+  var unique = _.arrayAppendArrayOnce( null, real );
+  test.identical( unique, real );
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file2' : 'src/proto/file2',
+
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink3' :
+        {
+          'dir4' :
+          {
+            'file2' : 'src/proto2/dir3/dir4/file2',
+          }
+        },
+
+        'dualTerLink1' : [{ softLink : '/src/proto/file1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/file1' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file2' : 'src/proto2/file2',
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.description = 'tree';
+  test.identical( extract2.filesTree, expected );
+
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 0, revisiting : 1';
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  var got = extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 0,
+    resolvingSrcTextLink : 0,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    rebasingLink : 1,
+    revisiting : 1,
+    allowingMissed : 0,
+    allowingCycled : 0,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+
+        'dualTerLink1' : [{ softLink : '/src/proto/file1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/file1' }],
+        'dualDirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dualDirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+        'dualDirLink4' :
+        {
+          'file1' : 'src/proto2/dir3/dir4/file1',
+          'file2' : 'src/proto2/dir3/dir4/file2',
+          'terLink' : [{ softLink : '/src/proto2/file1' }],
+          'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+        },
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' :
+            {
+              'dir2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' }
+            }
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.description = 'tree';
+  test.identical( extract2.filesTree, expected );
+
+  var expected =
+  [
+    '/',
+    '/f',
+    '/dst',
+    '/dst/f',
+    '/src',
+    '/src/proto',
+    '/src/proto/file1',
+    '/src/proto2/file1',
+    '/src/proto/file1',
+    '/src/proto/file2',
+    '/src/proto/file1',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2',
+    '/src/proto2/file1',
+    '/src/proto2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2'
+  ]
+  test.description = 'src/real';
+  test.identical( _.select( got, '*/src/real' ), expected );
+
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 0, revisiting : 2';
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  var got = extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 0,
+    resolvingSrcTextLink : 0,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    rebasingLink : 1,
+    revisiting : 2,
+    allowingMissed : 0,
+    allowingCycled : 0,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : {},
+        'dirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+
+        'dualTerLink1' : [{ softLink : '/src/proto/file1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/file1' }],
+        'dualDirLink1' : {},
+        'dualDirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dualDirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+        'dualDirLink4' :
+        {
+          'file1' : 'src/proto2/dir3/dir4/file1',
+          'file2' : 'src/proto2/dir3/dir4/file2',
+          'terLink' : [{ softLink : '/src/proto2/file1' }],
+          'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+        },
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' :
+            {
+              'dir2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' }
+            }
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.description = 'tree';
+  test.identical( extract2.filesTree, expected );
+  var expected =
+  [
+    '/',
+    '/f',
+    '/dst',
+    '/dst/f',
+    '/src',
+    '/src/proto',
+    '/src/proto/file1',
+    '/src/proto2/file1',
+    '/src/proto/file1',
+    '/src/proto/file2',
+    '/src/proto/file1',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2',
+    '/src/proto2/file1',
+    '/src/proto2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2'
+  ]
+  test.description = 'src/real';
+  var real = _.select( got, '*/src/real' );
+  test.identical( real, expected );
+
+  /* */
+
+  var filesTree =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '/src/proto' }],
+        'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
+        'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
+        'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
+        'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
+        'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
+        'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : [{ softLink : '/src/proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 1, revisiting : 0';
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  var got = extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 1,
+    resolvingSrcTextLink : 1,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    rebasingLink : 1,
+    revisiting : 0,
+    allowingMissed : 0,
+    allowingCycled : 0,
+  });
+
+  var expected =
+  [
+    '/',
+    '/f',
+    '/dst',
+    '/dst/f',
+    '/src',
+    '/src/proto',
+    '/src/proto/file1',
+    '/src/proto2/file1',
+    '/src/proto/file2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2',
+    '/src/proto2/file2'
+  ]
+  test.description = 'src/real';
+  var real = _.select( got, '*/src/real' );
+  test.identical( real, expected );
+  test.description = 'unique src/real';
+  var unique = _.arrayAppendArrayOnce( null, real );
+  test.identical( unique, real );
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file2' : 'src/proto/file2',
+
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink3' :
+        {
+          'dir4' :
+          {
+            'file2' : 'src/proto2/dir3/dir4/file2',
+          }
+        },
+
+        'dualTerLink1' : [{ softLink : '/src/proto/file1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/file1' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file2' : 'src/proto2/file2',
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.description = 'tree';
+  test.identical( extract2.filesTree, expected );
+
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 1, revisiting : 1';
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  var got = extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 1,
+    resolvingSrcTextLink : 1,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    rebasingLink : 1,
+    revisiting : 1,
+    allowingMissed : 0,
+    allowingCycled : 0,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+
+        'dualTerLink1' : [{ softLink : '/src/proto/file1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/file1' }],
+        'dualDirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dualDirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+        'dualDirLink4' :
+        {
+          'file1' : 'src/proto2/dir3/dir4/file1',
+          'file2' : 'src/proto2/dir3/dir4/file2',
+          'terLink' : [{ softLink : '/src/proto2/file1' }],
+          'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+        },
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' :
+            {
+              'dir2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' }
+            }
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.description = 'tree';
+  test.identical( extract2.filesTree, expected );
+  var expected =
+  [
+    '/',
+    '/f',
+    '/dst',
+    '/dst/f',
+    '/src',
+    '/src/proto',
+    '/src/proto/file1',
+    '/src/proto2/file1',
+    '/src/proto/file1',
+    '/src/proto/file2',
+    '/src/proto/file1',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2',
+    '/src/proto2/file1',
+    '/src/proto2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2'
+  ]
+  test.description = 'src/real';
+  test.identical( _.select( got, '*/src/real' ), expected );
+
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 1, revisiting : 2';
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  var got = extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 1,
+    resolvingSrcTextLink : 1,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    rebasingLink : 1,
+    revisiting : 2,
+    allowingMissed : 0,
+    allowingCycled : 0,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : {},
+        'dirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+
+        'dualTerLink1' : [{ softLink : '/src/proto/file1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/file1' }],
+        'dualDirLink1' : {},
+        'dualDirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dualDirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+        'dualDirLink4' :
+        {
+          'file1' : 'src/proto2/dir3/dir4/file1',
+          'file2' : 'src/proto2/dir3/dir4/file2',
+          'terLink' : [{ softLink : '/src/proto2/file1' }],
+          'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+        },
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' :
+            {
+              'dir2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' }
+            }
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.description = 'tree';
+  test.identical( extract2.filesTree, expected );
+  var expected =
+  [
+    '/',
+    '/f',
+    '/dst',
+    '/dst/f',
+    '/src',
+    '/src/proto',
+    '/src/proto/file1',
+    '/src/proto2/file1',
+    '/src/proto/file1',
+    '/src/proto/file2',
+    '/src/proto/file1',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2',
+    '/src/proto2/file1',
+    '/src/proto2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2'
+  ]
+  test.description = 'src/real';
+  var real = _.select( got, '*/src/real' );
+  test.identical( real, expected );
+
+  /* */
+
+  var filesTree =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '/src/proto' }],
+        'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
+        'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
+        'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
+        'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
+        'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
+        'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : [{ softLink : '/src/proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 2, revisiting : 0';
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  var got = extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 2,
+    resolvingSrcTextLink : 2,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    rebasingLink : 1,
+    revisiting : 0,
+    allowingMissed : 0,
+    allowingCycled : 0,
+  });
+
+  var expected =
+  [
+    '/',
+    '/f',
+    '/dst',
+    '/dst/f',
+    '/src',
+    '/src/proto',
+    '/src/proto/file1',
+    '/src/proto2/file1',
+    '/src/proto/file2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2',
+    '/src/proto2/file2'
+  ]
+  test.description = 'src/real';
+  var real = _.select( got, '*/src/real' );
+  test.identical( real, expected );
+  test.description = 'unique src/real';
+  var unique = _.arrayAppendArrayOnce( null, real );
+  test.identical( unique, real );
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file2' : 'src/proto/file2',
+
+        'terLink2' : 'src/proto/dir1/dir2/file1',
+        'terLink3' : 'src/proto2/dir3/dir4/file1',
+
+        'dirLink3' :
+        {
+          'dir4' :
+          {
+            'file2' : 'src/proto2/dir3/dir4/file2',
+          }
+        },
+
+        'dualTerLink1' : 'src/proto/file1',
+        'dualTerLink2' : 'src/proto2/file1',
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file2' : 'src/proto2/file2',
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.description = 'tree';
+  test.identical( extract2.filesTree, expected );
+
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 2, revisiting : 1';
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  var got = extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 2,
+    resolvingSrcTextLink : 2,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    rebasingLink : 1,
+    revisiting : 1,
+    allowingMissed : 0,
+    allowingCycled : 0,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : 'src/proto/file1',
+        'terLink2' : 'src/proto/dir1/dir2/file1',
+        'terLink3' : 'src/proto2/dir3/dir4/file1',
+
+        'dirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : 'src/proto2/file1',
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+
+        'dualTerLink1' : 'src/proto/file1',
+        'dualTerLink2' : 'src/proto2/file1',
+
+        'dualDirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dualDirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : 'src/proto2/file1',
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+        'dualDirLink4' :
+        {
+          'file1' : 'src/proto2/dir3/dir4/file1',
+          'file2' : 'src/proto2/dir3/dir4/file2',
+          'terLink' : 'src/proto2/file1',
+          'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+        },
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : 'src/proto2/file1',
+            'dirLink' :
+            {
+              'dir2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' }
+            }
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.description = 'tree';
+  test.identical( extract2.filesTree, expected );
+  var expected =
+  [
+    '/',
+    '/f',
+    '/dst',
+    '/dst/f',
+    '/src',
+    '/src/proto',
+    '/src/proto/file1',
+    '/src/proto2/file1',
+    '/src/proto/file1',
+    '/src/proto/file2',
+    '/src/proto/file1',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2',
+    '/src/proto2/file1',
+    '/src/proto2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2'
+  ]
+  test.description = 'src/real';
+  test.identical( _.select( got, '*/src/real' ), expected );
+
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 2, revisiting : 2';
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  var got = extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 2,
+    resolvingSrcTextLink : 2,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    rebasingLink : 1,
+    revisiting : 2,
+    allowingMissed : 0,
+    allowingCycled : 0,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : 'src/proto/file1',
+        'terLink2' : 'src/proto/dir1/dir2/file1',
+        'terLink3' : 'src/proto2/dir3/dir4/file1',
+
+        'dirLink1' : {},
+        'dirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : 'src/proto2/file1',
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+
+        'dualTerLink1' : 'src/proto/file1',
+        'dualTerLink2' : 'src/proto2/file1',
+
+        'dualDirLink1' : {},
+        'dualDirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dualDirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : 'src/proto2/file1',
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+        'dualDirLink4' :
+        {
+          'file1' : 'src/proto2/dir3/dir4/file1',
+          'file2' : 'src/proto2/dir3/dir4/file2',
+          'terLink' : 'src/proto2/file1',
+          'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+        },
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : 'src/proto2/file1',
+            'dirLink' :
+            {
+              'dir2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' }
+            }
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.description = 'tree';
+  test.identical( extract2.filesTree, expected );
+  var expected =
+  [
+    '/',
+    '/f',
+    '/dst',
+    '/dst/f',
+    '/src',
+    '/src/proto',
+    '/src/proto/file1',
+    '/src/proto2/file1',
+    '/src/proto/file1',
+    '/src/proto/file2',
+    '/src/proto/file1',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2',
+    '/src/proto2/file1',
+    '/src/proto2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2'
+  ]
+  test.description = 'src/real';
+  var real = _.select( got, '*/src/real' );
+  test.identical( real, expected );
+
+  /* - */
+
+  test.close( 'absolute links, rebasingLink : 1' );
+  test.open( 'absolute links, rebasingLink : 2' );
+
+  /* - */
+
+  var filesTree =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '/src/proto' }],
+        'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
+        'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
+        'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
+        'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
+        'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
+        'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : [{ softLink : '/src/proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 0, revisiting : 0';
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  var got = extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 0,
+    resolvingSrcTextLink : 0,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    rebasingLink : 2,
+    revisiting : 0,
+    allowingMissed : 0,
+    allowingCycled : 0,
+  });
+
+  var expected =
+  [
+    '/',
+    '/f',
+    '/dst',
+    '/dst/f',
+    '/src',
+    '/src/proto',
+    '/src/proto/file1',
+    '/src/proto2/file1',
+    '/src/proto/file2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2',
+    '/src/proto2/file2'
+  ]
+  test.description = 'src/real';
+  var real = _.select( got, '*/src/real' );
+  test.identical( real, expected );
+  test.description = 'unique src/real';
+  var unique = _.arrayAppendArrayOnce( null, real );
+  test.identical( unique, real );
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file2' : 'src/proto/file2',
+
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink3' :
+        {
+          'dir4' :
+          {
+            'file2' : 'src/proto2/dir3/dir4/file2',
+          }
+        },
+
+        'dualTerLink1' : [{ softLink : '/src/proto/file1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/file1' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file2' : 'src/proto2/file2',
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.description = 'tree';
+  test.identical( extract2.filesTree, expected );
+
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 0, revisiting : 1';
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  var got = extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 0,
+    resolvingSrcTextLink : 0,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    rebasingLink : 2,
+    revisiting : 1,
+    allowingMissed : 0,
+    allowingCycled : 0,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+
+        'dualTerLink1' : [{ softLink : '/src/proto/file1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/file1' }],
+        'dualDirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dualDirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+        'dualDirLink4' :
+        {
+          'file1' : 'src/proto2/dir3/dir4/file1',
+          'file2' : 'src/proto2/dir3/dir4/file2',
+          'terLink' : [{ softLink : '/src/proto2/file1' }],
+          'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+        },
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' :
+            {
+              'dir2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' }
+            }
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.description = 'tree';
+  test.identical( extract2.filesTree, expected );
+
+  var expected =
+  [
+    '/',
+    '/f',
+    '/dst',
+    '/dst/f',
+    '/src',
+    '/src/proto',
+    '/src/proto/file1',
+    '/src/proto2/file1',
+    '/src/proto/file1',
+    '/src/proto/file2',
+    '/src/proto/file1',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2',
+    '/src/proto2/file1',
+    '/src/proto2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2'
+  ]
+  test.description = 'src/real';
+  test.identical( _.select( got, '*/src/real' ), expected );
+
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 0, revisiting : 2';
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  var got = extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 0,
+    resolvingSrcTextLink : 0,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    rebasingLink : 2,
+    revisiting : 2,
+    allowingMissed : 0,
+    allowingCycled : 0,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : {},
+        'dirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+
+        'dualTerLink1' : [{ softLink : '/src/proto/file1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/file1' }],
+        'dualDirLink1' : {},
+        'dualDirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dualDirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+        'dualDirLink4' :
+        {
+          'file1' : 'src/proto2/dir3/dir4/file1',
+          'file2' : 'src/proto2/dir3/dir4/file2',
+          'terLink' : [{ softLink : '/src/proto2/file1' }],
+          'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+        },
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' :
+            {
+              'dir2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' }
+            }
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.description = 'tree';
+  test.identical( extract2.filesTree, expected );
+  var expected =
+  [
+    '/',
+    '/f',
+    '/dst',
+    '/dst/f',
+    '/src',
+    '/src/proto',
+    '/src/proto/file1',
+    '/src/proto2/file1',
+    '/src/proto/file1',
+    '/src/proto/file2',
+    '/src/proto/file1',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2',
+    '/src/proto2/file1',
+    '/src/proto2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2'
+  ]
+  test.description = 'src/real';
+  var real = _.select( got, '*/src/real' );
+  test.identical( real, expected );
+
+  /* */
+
+  var filesTree =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '/src/proto' }],
+        'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
+        'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
+        'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
+        'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
+        'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
+        'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : [{ softLink : '/src/proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 1, revisiting : 0';
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  var got = extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 1,
+    resolvingSrcTextLink : 1,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    rebasingLink : 2,
+    revisiting : 0,
+    allowingMissed : 0,
+    allowingCycled : 0,
+  });
+
+  var expected =
+  [
+    '/',
+    '/f',
+    '/dst',
+    '/dst/f',
+    '/src',
+    '/src/proto',
+    '/src/proto/file1',
+    '/src/proto2/file1',
+    '/src/proto/file2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2',
+    '/src/proto2/file2'
+  ]
+  test.description = 'src/real';
+  var real = _.select( got, '*/src/real' );
+  test.identical( real, expected );
+  test.description = 'unique src/real';
+  var unique = _.arrayAppendArrayOnce( null, real );
+  test.identical( unique, real );
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file2' : 'src/proto/file2',
+
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink3' :
+        {
+          'dir4' :
+          {
+            'file2' : 'src/proto2/dir3/dir4/file2',
+          }
+        },
+
+        'dualTerLink1' : [{ softLink : '/src/proto/file1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/file1' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file2' : 'src/proto2/file2',
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.description = 'tree';
+  test.identical( extract2.filesTree, expected );
+
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 1, revisiting : 1';
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  var got = extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 1,
+    resolvingSrcTextLink : 1,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    rebasingLink : 2,
+    revisiting : 1,
+    allowingMissed : 0,
+    allowingCycled : 0,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+
+        'dualTerLink1' : [{ softLink : '/src/proto/file1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/file1' }],
+        'dualDirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dualDirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+        'dualDirLink4' :
+        {
+          'file1' : 'src/proto2/dir3/dir4/file1',
+          'file2' : 'src/proto2/dir3/dir4/file2',
+          'terLink' : [{ softLink : '/src/proto2/file1' }],
+          'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+        },
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' :
+            {
+              'dir2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' }
+            }
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.description = 'tree';
+  test.identical( extract2.filesTree, expected );
+  var expected =
+  [
+    '/',
+    '/f',
+    '/dst',
+    '/dst/f',
+    '/src',
+    '/src/proto',
+    '/src/proto/file1',
+    '/src/proto2/file1',
+    '/src/proto/file1',
+    '/src/proto/file2',
+    '/src/proto/file1',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2',
+    '/src/proto2/file1',
+    '/src/proto2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2'
+  ]
+  test.description = 'src/real';
+  test.identical( _.select( got, '*/src/real' ), expected );
+
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 1, revisiting : 2';
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  var got = extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 1,
+    resolvingSrcTextLink : 1,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    rebasingLink : 2,
+    revisiting : 2,
+    allowingMissed : 0,
+    allowingCycled : 0,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : {},
+        'dirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+
+        'dualTerLink1' : [{ softLink : '/src/proto/file1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/file1' }],
+        'dualDirLink1' : {},
+        'dualDirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dualDirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+        'dualDirLink4' :
+        {
+          'file1' : 'src/proto2/dir3/dir4/file1',
+          'file2' : 'src/proto2/dir3/dir4/file2',
+          'terLink' : [{ softLink : '/src/proto2/file1' }],
+          'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+        },
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' :
+            {
+              'dir2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' }
+            }
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.description = 'tree';
+  test.identical( extract2.filesTree, expected );
+  var expected =
+  [
+    '/',
+    '/f',
+    '/dst',
+    '/dst/f',
+    '/src',
+    '/src/proto',
+    '/src/proto/file1',
+    '/src/proto2/file1',
+    '/src/proto/file1',
+    '/src/proto/file2',
+    '/src/proto/file1',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2',
+    '/src/proto2/file1',
+    '/src/proto2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2'
+  ]
+  test.description = 'src/real';
+  var real = _.select( got, '*/src/real' );
+  test.identical( real, expected );
+
+  /* */
+
+  var filesTree =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '/src/proto' }],
+        'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
+        'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
+        'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
+        'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
+        'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
+        'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : [{ softLink : '/src/proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 2, revisiting : 0';
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  var got = extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 2,
+    resolvingSrcTextLink : 2,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    rebasingLink : 2,
+    revisiting : 0,
+    allowingMissed : 0,
+    allowingCycled : 0,
+  });
+
+  var expected =
+  [
+    '/',
+    '/f',
+    '/dst',
+    '/dst/f',
+    '/src',
+    '/src/proto',
+    '/src/proto/file1',
+    '/src/proto2/file1',
+    '/src/proto/file2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2',
+    '/src/proto2/file2'
+  ]
+  test.description = 'src/real';
+  var real = _.select( got, '*/src/real' );
+  test.identical( real, expected );
+  test.description = 'unique src/real';
+  var unique = _.arrayAppendArrayOnce( null, real );
+  test.identical( unique, real );
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file2' : 'src/proto/file2',
+
+        'terLink2' : 'src/proto/dir1/dir2/file1',
+        'terLink3' : 'src/proto2/dir3/dir4/file1',
+
+        'dirLink3' :
+        {
+          'dir4' :
+          {
+            'file2' : 'src/proto2/dir3/dir4/file2',
+          }
+        },
+
+        'dualTerLink1' : 'src/proto/file1',
+        'dualTerLink2' : 'src/proto2/file1',
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file2' : 'src/proto2/file2',
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.description = 'tree';
+  test.identical( extract2.filesTree, expected );
+
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 2, revisiting : 1';
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  var got = extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 2,
+    resolvingSrcTextLink : 2,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    rebasingLink : 2,
+    revisiting : 1,
+    allowingMissed : 0,
+    allowingCycled : 0,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : 'src/proto/file1',
+        'terLink2' : 'src/proto/dir1/dir2/file1',
+        'terLink3' : 'src/proto2/dir3/dir4/file1',
+
+        'dirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : 'src/proto2/file1',
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+
+        'dualTerLink1' : 'src/proto/file1',
+        'dualTerLink2' : 'src/proto2/file1',
+
+        'dualDirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dualDirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : 'src/proto2/file1',
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+        'dualDirLink4' :
+        {
+          'file1' : 'src/proto2/dir3/dir4/file1',
+          'file2' : 'src/proto2/dir3/dir4/file2',
+          'terLink' : 'src/proto2/file1',
+          'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+        },
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : 'src/proto2/file1',
+            'dirLink' :
+            {
+              'dir2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' }
+            }
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.description = 'tree';
+  test.identical( extract2.filesTree, expected );
+  var expected =
+  [
+    '/',
+    '/f',
+    '/dst',
+    '/dst/f',
+    '/src',
+    '/src/proto',
+    '/src/proto/file1',
+    '/src/proto2/file1',
+    '/src/proto/file1',
+    '/src/proto/file2',
+    '/src/proto/file1',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2',
+    '/src/proto2/file1',
+    '/src/proto2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2'
+  ]
+  test.description = 'src/real';
+  test.identical( _.select( got, '*/src/real' ), expected );
+
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 2, revisiting : 2';
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  var got = extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 2,
+    resolvingSrcTextLink : 2,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    rebasingLink : 2,
+    revisiting : 2,
+    allowingMissed : 0,
+    allowingCycled : 0,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : 'src/proto/file1',
+        'terLink2' : 'src/proto/dir1/dir2/file1',
+        'terLink3' : 'src/proto2/dir3/dir4/file1',
+
+        'dirLink1' : {},
+        'dirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : 'src/proto2/file1',
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+
+        'dualTerLink1' : 'src/proto/file1',
+        'dualTerLink2' : 'src/proto2/file1',
+
+        'dualDirLink1' : {},
+        'dualDirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dualDirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : 'src/proto2/file1',
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+        'dualDirLink4' :
+        {
+          'file1' : 'src/proto2/dir3/dir4/file1',
+          'file2' : 'src/proto2/dir3/dir4/file2',
+          'terLink' : 'src/proto2/file1',
+          'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+        },
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : 'src/proto2/file1',
+            'dirLink' :
+            {
+              'dir2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' }
+            }
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.description = 'tree';
+  test.identical( extract2.filesTree, expected );
+  var expected =
+  [
+    '/',
+    '/f',
+    '/dst',
+    '/dst/f',
+    '/src',
+    '/src/proto',
+    '/src/proto/file1',
+    '/src/proto2/file1',
+    '/src/proto/file1',
+    '/src/proto/file2',
+    '/src/proto/file1',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2',
+    '/src/proto2/file1',
+    '/src/proto2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2'
+  ]
+  test.description = 'src/real';
+  var real = _.select( got, '*/src/real' );
+  test.identical( real, expected );
+
+  /* - */
+
+  test.close( 'absolute links, rebasingLink : 2' );
+
+  /* - */
+
+  /* qqq : implement relative links cases */
+
 } /* end of filesReflectToWithSoftLinksResolving */
+
+filesReflectToWithSoftLinksResolving.timeOut = 500000;
 
 //
 
@@ -26603,7 +29587,7 @@ function filesDelete( test )
   {
     maskDirectory : /dir1$/g
   }
-  var got = provider.filesDelete({ filePath : routinePath, filter : { recursive/**/ : 2 }, throwing : 1, filter : filter });
+  var got = provider.filesDelete({ filePath : routinePath, filter : { recursive/**/ : 2 }, throwing : 1, filter });
   var deleted = _.select( got, '*/relative' );
   var expected =
   [
@@ -26644,7 +29628,7 @@ function filesDelete( test )
   {
     maskTerminal : /file1$/g
   }
-  var got = provider.filesDelete({ filePath : routinePath, filter : { recursive/**/ : 2 }, throwing : 1, filter : filter });
+  var got = provider.filesDelete({ filePath : routinePath, filter : { recursive/**/ : 2 }, throwing : 1, filter });
   var deleted = _.select( got, '*/relative' );
   var expected =
   [
@@ -27391,7 +30375,7 @@ function filesDeleteDeletingEmptyDirs( test )
   provider.filesDelete( routinePath );
   tree.filesReflectTo( provider, routinePath );
   var filter = { maskDirectory : /dir.$/g }
-  var got = provider.filesDelete({ filePath : routinePath, filter : filter, deletingEmptyDirs : 0 });
+  var got = provider.filesDelete({ filePath : routinePath, filter, deletingEmptyDirs : 0 });
   var deleted = _.select( got, '*/relative');
   var expected =
   [
@@ -27406,7 +30390,7 @@ function filesDeleteDeletingEmptyDirs( test )
   provider.filesDelete( routinePath );
   tree.filesReflectTo( provider, routinePath );
   var filter = { maskDirectory : /dir.$/g }
-  var got = provider.filesDelete({ filePath : routinePath, filter : filter, deletingEmptyDirs : 1 });
+  var got = provider.filesDelete({ filePath : routinePath, filter, deletingEmptyDirs : 1 });
   var deleted = _.select( got, '*/relative');
   var expected =
   [
@@ -27464,7 +30448,7 @@ function filesDeleteDeletingEmptyDirs( test )
   provider.filesDelete( routinePath );
   tree.filesReflectTo( provider, routinePath );
   var filter = { maskDirectory : { excludeAny : 'empty'} }
-  var got = provider.filesDelete({ filePath : routinePath, filter : filter, deletingEmptyDirs : 0 });
+  var got = provider.filesDelete({ filePath : routinePath, filter, deletingEmptyDirs : 0 });
   var deleted = _.select( got, '*/relative');
   var expected =
   [
@@ -27479,7 +30463,7 @@ function filesDeleteDeletingEmptyDirs( test )
   provider.filesDelete( routinePath );
   tree.filesReflectTo( provider, routinePath );
   var filter = { maskDirectory : { excludeAny : 'empty'} }
-  var got = provider.filesDelete({ filePath : routinePath, filter : filter, deletingEmptyDirs : 1 });
+  var got = provider.filesDelete({ filePath : routinePath, filter, deletingEmptyDirs : 1 });
   var deleted = _.select( got, '*/relative');
   var expected =
   [
@@ -27506,7 +30490,7 @@ function filesDeleteDeletingEmptyDirs( test )
   provider.filesDelete( routinePath );
   tree.filesReflectTo( provider, routinePath );
   var filter = { maskDirectory : { excludeAny : /dir.$/g } }
-  var got = provider.filesDelete({ filePath : routinePath, filter : filter, deletingEmptyDirs : 1 });
+  var got = provider.filesDelete({ filePath : routinePath, filter, deletingEmptyDirs : 1 });
   var deleted = _.select( got, '*/relative');
   var expected =
   [
@@ -27533,7 +30517,7 @@ function filesDeleteDeletingEmptyDirs( test )
   provider.filesDelete( routinePath );
   tree.filesReflectTo( provider, routinePath );
   var filter = { maskDirectory : { excludeAny : /dir.$/g } }
-  var got = provider.filesDelete({ filePath : routinePath, filter : filter, deletingEmptyDirs : 0 });
+  var got = provider.filesDelete({ filePath : routinePath, filter, deletingEmptyDirs : 0 });
   var deleted = _.select( got, '*/relative');
   var expected =
   [
@@ -27636,7 +30620,7 @@ function filesDeleteEmptyDirs( test )
   provider.filesDelete( routinePath );
   tree.filesReflectTo( provider, routinePath );
   var filter = { maskDirectory : /empty2$/ };
-  provider.filesDeleteEmptyDirs({ filePath : routinePath, filter : filter  });
+  provider.filesDeleteEmptyDirs({ filePath : routinePath, filter  });
   /*
   {
     file : 'file',
@@ -27670,7 +30654,7 @@ function filesDeleteEmptyDirs( test )
   provider.filesDelete( routinePath );
   tree.filesReflectTo( provider, routinePath );
   var filter = { maskDirectory : 'emptyDir' };
-  provider.filesDeleteEmptyDirs({ filePath : routinePath, filter : filter });
+  provider.filesDeleteEmptyDirs({ filePath : routinePath, filter });
   /*
   {
     file : 'file',
@@ -27706,7 +30690,7 @@ function filesDeleteEmptyDirs( test )
   provider.filesDelete( routinePath );
   tree.filesReflectTo( provider, routinePath );
   var filter = { maskTerminal : 'file' };
-  provider.filesDeleteEmptyDirs({ filePath : routinePath, filter : filter });
+  provider.filesDeleteEmptyDirs({ filePath : routinePath, filter });
   /*
   {
     file : 'file',
@@ -27988,7 +30972,7 @@ function filesDeleteTerminals( test )
   provider.filesDelete( routinePath );
   tree.filesReflectTo( provider, routinePath );
   var filter = { maskTerminal : /terminal[01]$/ }
-  provider.filesDeleteTerminals({ filePath : routinePath, filter : filter });
+  provider.filesDeleteTerminals({ filePath : routinePath, filter });
   var expected =
   [
     './dir1',
@@ -28005,7 +30989,7 @@ function filesDeleteTerminals( test )
   provider.filesDelete( routinePath );
   tree.filesReflectTo( provider, routinePath );
   var filter = { maskDirectory : /dir2/ }
-  provider.filesDeleteTerminals({ filePath : routinePath, filter : filter });
+  provider.filesDeleteTerminals({ filePath : routinePath, filter });
   var expected =
   [
     './dir1',
@@ -28021,7 +31005,7 @@ function filesDeleteTerminals( test )
   provider.filesDelete( routinePath );
   tree.filesReflectTo( provider, routinePath );
   var filter = { maskTerminal : /missing/ }
-  provider.filesDeleteTerminals({ filePath : routinePath, filter : filter });
+  provider.filesDeleteTerminals({ filePath : routinePath, filter });
   var expected =
   [
     './terminal0',
@@ -30542,7 +33526,7 @@ function filesFindExperiment2( test )
 
   provider.filesDelete( routinePath );
 
-  _.FileProvider.Extract({ filesTree : filesTree }).filesReflectTo
+  _.FileProvider.Extract({ filesTree }).filesReflectTo
   ({
     dst : routinePath,
     dstProvider : provider,
@@ -30598,7 +33582,7 @@ function filesReflectExperiment( test )
     'dst' : {},
   }
 
-  _.FileProvider.Extract({ filesTree : filesTree }).filesReflectTo
+  _.FileProvider.Extract({ filesTree }).filesReflectTo
   ({
     dst : routinePath,
     dstProvider : provider,
@@ -30670,9 +33654,11 @@ var Self =
     filesFind2,
     filesFindRecursive,
     filesFindLinked,
-    filesFindSoftLinksExtract, /* qqq : implement filesFindTextLinksExtract */
-    filesFindSoftLinksLoopsExtract, /* qqq : implement filesFindTextLinksLoopsExtract */
+    filesFindSoftLinksExtract,
+    filesFindSoftLinksLoopsExtract,
     // filesFindSoftLinks, // xxx : implement rebasingLink of filesReflect first
+    /* qqq : implement filesFindTextLinksExtract */
+    /* qqq : implement filesFindTextLinksLoopsExtract */
     filesFindResolving,
     filesFindGlob,
     filesFindOn,

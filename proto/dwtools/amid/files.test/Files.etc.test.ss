@@ -1411,7 +1411,7 @@ function fileSize( test )
 
 //     var writeMode = testCheck.data.append ? 'append' : 'rewrite';
 //     let gotFW = typeof testCheck.data === 'object'
-//       ? ( testCheck.data.filePath = mergePath( testCheck.data.filePath ) ) && _.fileProvider.fileWrite({ filePath :  path, writeMode : writeMode,sync : testCheck.data.sync, data : testCheck.data.data })
+//       ? ( testCheck.data.filePath = mergePath( testCheck.data.filePath ) ) && _.fileProvider.fileWrite({ filePath :  path, writeMode,sync : testCheck.data.sync, data : testCheck.data.data })
 //       : _.fileProvider.fileWrite({ filePath :  path, data : testCheck.data })
 
 //     // fileWtrite must returns wConsequence
@@ -3392,38 +3392,38 @@ var Self =
   {
     // from l1/FileRoutines.s
 
-    _fileOptionsGet : _fileOptionsGet,
+    _fileOptionsGet,
 
-    filesNewer : filesNewer,
-    filesOlder : filesOlder,
+    filesNewer,
+    filesOlder,
 
-    filesSpectre : filesSpectre,
-    filesSimilarity : filesSimilarity,
+    filesSpectre,
+    filesSimilarity,
 
     // from l2/Partial.s
 
     filesSize,
     fileSize,
 
-    // fileWrite : fileWrite,
+    // fileWrite,
 
-    // fileRead : fileRead,
+    // fileRead,
 
-    // fileReadSync : fileReadSync,
+    // fileReadSync,
 
-    filesLink : filesLink,
+    filesLink,
 
-    // fileDelete : fileDelete,
+    // fileDelete,
 
     // from l3/SecondaryMixin.s
 
-    filesAreUpToDate2 : filesAreUpToDate2,
+    filesAreUpToDate2,
 
     // etc
 
-    // filesList : filesList,
+    // filesList,
 
-    // testDelaySample : testDelaySample,
+    // testDelaySample,
 
   },
 

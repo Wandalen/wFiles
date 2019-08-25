@@ -499,8 +499,8 @@ function pathsResolve( test )
     _.path.join( currentPath, 'b' ),
     _.path.join( currentPath, 'b' ),
     _.path.join( _.path.dir( currentPath ), 'b' ),
-   
-    _.path.canonize( _.path.dir( currentPath ) )
+
+    _.path.normalize( _.path.dir( currentPath ) )
     //_.path.normalize( _.path.dir( currentPath ) ),
     // routine normalizeStrict does not exist now
     // _.path.normalizeStrict( _.path.dir( currentPath ) )
@@ -508,28 +508,38 @@ function pathsResolve( test )
   ];
   test.identical( got, expected );
 
-  //
+  test.case = 'no arguments'
+  var expected = [];
+  var got = provider.path.s.resolve();
+  test.identical( got, expected );
+
+  /* - */
 
   if( !Config.debug )
   return
-  
-  test.case = 'empty'
-  test.shouldThrowError( function()
+
+  test.case = 'empty str'
+  test.shouldThrowErrorSync( function()
   {
-    rovider.path.s.resolve()
+    rovider.path.s.resolve( '' )
   });
 
-  test.case = 'without arguments';
-  test.shouldThrowErrorSync( () => provider.path.s.resolve() )
+  // test.case = 'without arguments';
+  // test.shouldThrowErrorSync( () =>
+  // {
+  //   debugger;
+  //   provider.path.s.resolve();
+  //   debugger;
+  // });
 
   test.case = 'arrays with different length'
-  test.shouldThrowError( function()
+  test.shouldThrowErrorSync( function()
   {
     provider.path.s.resolve( [ '/b', '.c' ], [ '/b' ] );
   });
 
   test.case = 'inner arrays'
-  test.shouldThrowError( function()
+  test.shouldThrowErrorSync( function()
   {
     provider.path.s.resolve( [ '/b', '.c' ], [ '/b', [ 'x' ] ] );
   });
@@ -547,14 +557,8 @@ function regexpMakeSafe( test )
     includeAll : [],
     excludeAny :
     [
-      /(\W|^)node_modules(\W|$)/, 
-      /\.unique$/, 
-      /\.git$/, 
-      /\.svn$/, 
-      /\.hg$/, 
-      /\.tmp($|\/)/, 
-      /\.DS_Store$/, 
-      /(^|\/)-/
+      /\.(?:unique|git|svn|hg|DS_Store|tmp)(?:$|\/)/,
+      /(^|\/)-/,
     ],
     excludeAll : []
   };
@@ -574,14 +578,8 @@ function regexpMakeSafe( test )
     includeAll : [],
     excludeAny :
     [
-      /(\W|^)node_modules(\W|$)/, 
-      /\.unique$/, 
-      /\.git$/, 
-      /\.svn$/, 
-      /\.hg$/, 
-      /\.tmp($|\/)/, 
-      /\.DS_Store$/, 
-      /(^|\/)-/
+      /\.(?:unique|git|svn|hg|DS_Store|tmp)(?:$|\/)/,
+      /(^|\/)-/,
     ],
     excludeAll : []
   };
@@ -599,14 +597,8 @@ function regexpMakeSafe( test )
     includeAll : [],
     excludeAny :
     [
-      /(\W|^)node_modules(\W|$)/, 
-      /\.unique$/, 
-      /\.git$/, 
-      /\.svn$/, 
-      /\.hg$/, 
-      /\.tmp($|\/)/, 
-      /\.DS_Store$/, 
-      /(^|\/)-/
+      /\.(?:unique|git|svn|hg|DS_Store|tmp)(?:$|\/)/,
+      /(^|\/)-/,
     ],
     excludeAll : []
   };
@@ -630,13 +622,7 @@ function regexpMakeSafe( test )
     includeAll : [ /index\.js/ ],
     excludeAny :
     [
-      /(\W|^)node_modules(\W|$)/, 
-      /\.unique$/, 
-      /\.git$/, 
-      /\.svn$/, 
-      /\.hg$/, 
-      /\.tmp($|\/)/, 
-      /\.DS_Store$/, 
+      /\.(?:unique|git|svn|hg|DS_Store|tmp)(?:$|\/)/,
       /(^|\/)-/,
       /aa\.js/,
       /bb\.js/
@@ -649,7 +635,9 @@ function regexpMakeSafe( test )
   test.identical( got.excludeAny, expected4.excludeAny );
   test.identical( got.excludeAll, expected4.excludeAll );
 
-  if( Config.debug ) //
+  /* - */
+
+  if( Config.debug )
   {
     test.case = 'extra arguments';
     test.shouldThrowErrorSync( function( )
@@ -987,8 +975,8 @@ function dirTemp( test )
   if( !Config.debug )
   return;
 
-  test.shouldThrowError( () => _.path.dirTempOpen( '/absolute/path' ) );
-  test.shouldThrowError( () => _.path.dirTempOpen( _.path.resolve( __dirname, '../..'), '/absolute/path' ) );
+  test.shouldThrowErrorSync( () => _.path.dirTempOpen( '/absolute/path' ) );
+  test.shouldThrowErrorSync( () => _.path.dirTempOpen( _.path.resolve( __dirname, '../..'), '/absolute/path' ) );
 }
 
 //
@@ -1039,17 +1027,17 @@ function pathDirTempForTrivial( test )
   test.case = 'path to root of device';
   var filePath = pathDeviceGet( _.path.normalize( __filename ) );
   var possiblePath = _.path.join( filePath, 'tmp-' + _.idWithGuid() + '.tmp' );
-  var shouldThrowError = false;
+  var shouldThrowErrorSync = false;
   try
   {
     _.path.fileProvider.dirMake( possiblePath );
     _.path.fileProvider.fileDelete({ filePath : possiblePath, safe : 0 });
   }
   catch( err )
-  { 
-    shouldThrowError = true;
+  {
+    shouldThrowErrorSync = true;
   }
-  if( shouldThrowError )
+  if( shouldThrowErrorSync )
   {
     test.shouldThrowErrorSync( () =>
     {
@@ -1124,43 +1112,43 @@ var Self =
   name : 'Tools/mid/files/Paths',
   silencing : 1,
 
-  onSuiteBegin : onSuiteBegin,
-  onSuiteEnd : onSuiteEnd,
+  onSuiteBegin,
+  onSuiteEnd,
 
   context :
   {
     testSuitePath : null,
     isBrowser : null,
 
-    createTestsDirectory : createTestsDirectory,
-    createInTD : createInTD,
-    createTestFile : createTestFile,
-    createTestSymLink : createTestSymLink,
-    createTestResources : createTestResources
+    createTestsDirectory,
+    createInTD,
+    createTestFile,
+    createTestSymLink,
+    createTestResources
   },
 
   tests :
   {
 
-    from : from,
-    forCopy : forCopy,
+    from,
+    forCopy,
 
-    pathResolve : pathResolve,
-    pathsResolve : pathsResolve,
+    pathResolve,
+    pathsResolve,
 
-    regexpMakeSafe : regexpMakeSafe,
+    regexpMakeSafe,
 
-    realMainFile : realMainFile,
-    realMainDir : realMainDir,
-    effectiveMainFile : effectiveMainFile,
-    effectiveMainDir : effectiveMainDir,
+    realMainFile,
+    realMainDir,
+    effectiveMainFile,
+    effectiveMainDir,
 
-    pathCurrent : pathCurrent,
-    pathCurrent2 : pathCurrent2,
+    pathCurrent,
+    pathCurrent2,
 
-    relative : relative,
+    relative,
 
-    dirTemp : dirTemp,
+    dirTemp,
 
     pathDirTempForTrivial,
 

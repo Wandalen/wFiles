@@ -77,32 +77,47 @@ function recordsOrder( records, orderingExclusion )
 // files find
 // --
 
-function _filesFindPrepare0( routine, args )
+function _filesFindPrepare0( routine, args ) /* qqq : cover each case */
 {
   let o;
 
   _.assert( arguments.length === 2 );
-  _.assert( args.length === 1 );
+  _.assert( args.length === 1 || args.length === 2 );
 
-  if( args.length === 1 && _.routineIs( args[ 0 ] ) )
+  if( args[ 0 ] && args[ 0 ] instanceof _.FileRecordFilter )
   {
-
+    o = o || Object.create( null );
+    o.filter = args[ 0 ];
+  }
+  else if( _.routineIs( args[ 0 ] ) )
+  {
     o = o || Object.create( null );
     o.onUp = args[ 0 ];
-
+  }
+  else if( _.objectIs( args[ 0 ] ) )
+  {
+    o = args[ 0 ];
   }
   else
   {
+    o = Object.create( null );
+    if( args[ 0 ] !== undefined )
+    o.filePath = args[ 0 ];
+  }
 
-    if( _.objectIs( args[ 0 ] ) )
+  if( args.length === 2 )
+  {
+    if( args[ 1 ] && args[ 1 ] instanceof _.FileRecordFilter )
     {
-      o = args[ 0 ];
+      _.assert( !o.filter )
+      o.filter = args[ 1 ];
     }
-    else
+    else if( _.routineIs( args[ 1 ] ) )
     {
-      o = { filePath : args[ 0 ] };
+      _.assert( !o.onUp );
+      o.onUp = args[ 1 ];
     }
-
+    else _.assert( 0, 'Expects filer or callback onUp as the second argument' );
   }
 
   _.routineOptions( routine, o );
@@ -111,23 +126,12 @@ function _filesFindPrepare0( routine, args )
 
   if( Config.debug )
   {
-
-    // _.assert( _.arrayHas( [ 'legacy', 'distinct' ], o.mode ), () => 'Unknown mode ' + _.strQuote( o.mode ) );
     _.assert( arguments.length === 2 );
     _.assert( 1 <= args.length && args.length <= 3 );
     _.assert( o.basePath === undefined );
     _.assert( o.prefixPath === undefined );
     _.assert( o.postfixPath === undefined );
     _.assert( _.objectIs( o.filter ) );
-
-    // let knownFormats = [ 'absolute', 'relative', 'real', 'record', 'nothing' ];
-    // _.assert
-    // (
-    //   _.arrayHas( knownFormats, o.outputFormat ),
-    //     'Unknown output format ' + _.toStrShort( o.outputFormat )
-    //   + '\nKnown output formats ' + _.toStr( knownFormats )
-    // );
-
   }
 
   return o;
@@ -178,7 +182,7 @@ function _filesFindPrepare1( routine, args )
     if( o.mode === 'distinct' )
     o.filter.recursive = hasGlob ? 2 : 0;
     else
-    o.filter.recursive = hasGlob ? 2 : 1;
+    o.filter.recursive = hasGlob ? 2 : 2;
   }
 
   // if( !o.filter.formed || o.filter.formed < 5 )
@@ -313,6 +317,7 @@ function _filesFindFilterAbsorb( routine, args )
 
   o.filter = self.recordFilter( o.filter || {} );
 
+  if( o.filter.formed < 5 )
   if( o.filePath )
   {
     if( o.filePath instanceof _.FileRecordFilter )
@@ -347,13 +352,35 @@ function filesFindNominal_pre( routine, args )
   let path = self.path;
 
   let o = self._filesFindPrepare0( routine, args );
-  // self._filesFindFilterAbsorb( routine, [ o ] );
+  self._filesFindFilterAbsorb( routine, [ o ] );
+  // o.filter = self.recordFilter( o.filter || {} );
   self._filesFindPrepare1( routine, [ o ] );
 
   if( !o.filter.formed || o.filter.formed < 5 )
   o.filter.form();
   _.assert( !!o.filter.effectiveProvider );
   o.filter.effectiveProvider._providerDefaultsApply( o );
+
+  if( !o.filePath )
+  o.filePath = o.filter.filePathSimplest();
+
+  _.assert( o.filePath && path.isNormalized( o.filePath ), 'Expects normalized path {-o.filePath-}' );
+  _.assert( o.filePath && path.isAbsolute( o.filePath ), 'Expects absolute path {-o.filePath-}' );
+
+  if( !o.factory )
+  {
+    let o2 =
+    {
+      stemPath : o.filePath,
+      basePath : o.filter.formedBasePath[ o.filePath ],
+      // resolvingSoftLink : o.resolvingSoftLink,
+      // resolvingTextLink : o.resolvingTextLink,
+      // allowingMissed : o.allowingMissed,
+      // allowingCycled : o.allowingCycled,
+    };
+    _.assert( _.strDefined( o2.basePath ), 'No base path for', o.filePath );
+    o.factory = _.FileRecordFactory.TolerantFrom( o, o2 ).form();
+  }
 
   if( Config.debug )
   {
@@ -370,8 +397,6 @@ function filesFindNominal_pre( routine, args )
     // _.assert( o.filter.recursive === o.recursive );
     _.assert( _.routineIs( o.onUp ) );
     _.assert( _.routineIs( o.onDown ) );
-    _.assert( path.isNormalized( o.filePath ), 'Expects normalized path {-o.filePath-}' );
-    _.assert( path.isAbsolute( o.filePath ), 'Expects absolute path {-o.filePath-}' );
     // _.assert( 0 <= o.recursive && o.recursive <= 2 );
     _.assert( o.filter.formed === 5, 'Expects formed filter' );
     _.assert( _.objectIs( o.filter.effectiveProvider ) );
@@ -391,6 +416,12 @@ function filesFindNominal_pre( routine, args )
     _.assert( o.mode === undefined );
     _.assert( o.result === undefined );
     _.assert( !!o.factory );
+
+    _.assert( o.factory.basePath === o.filter.formedBasePath[ o.filePath ] );
+    _.assert( o.factory.dirPath === null );
+    _.assert( o.factory.effectiveProvider === o.filter.effectiveProvider );
+    _.assert( o.factory.system === o.filter.system || o.filter.system === null );
+    _.assert( o.factory.defaultProvider === o.filter.defaultProvider );
 
   }
 
@@ -574,19 +605,17 @@ function filesFindNominal_body( o )
 
 }
 
-filesFindNominal_body.defaults =
-{
+var defaults = filesFindNominal_body.defaults = Object.create( null );
 
-  sync : 1,
-  filePath : null,
-  filter : null,
-  factory : null,
-  onUp : null,
-  onDown : null,
-
-}
+defaults.sync = 1;
+defaults.filePath = null;
+defaults.filter = null;
+defaults.factory = null;
+defaults.onUp = null;
+defaults.onDown = null;
 
 var having = filesFindNominal_body.having = Object.create( null );
+
 having.writing = 0;
 having.reading = 1;
 having.driving = 0;
@@ -667,7 +696,7 @@ function filesFindSingle_body( o )
   o2.onUp = handleUp;
   o2.onDown = handleDown;
 
-  let result = self.filesFindNominal( o2 );
+  let result = self.filesFindNominal.body.call( self, o2 );
   return result;
 
   /* - */
@@ -703,7 +732,9 @@ function filesFindSingle_body( o )
 
 }
 
-var defaults = filesFindSingle_body.defaults = _.mapExtend( null, filesFindNominal.defaults );
+_.routineExtend( filesFindSingle_body, filesFindNominal );
+
+var defaults = filesFindSingle_body.defaults = _.mapExtend( null, filesFindSingle_body.defaults );
 
 defaults.includingTerminals = 1;
 defaults.includingDirs = null;
@@ -712,11 +743,11 @@ defaults.includingTransient = 0;
 defaults.includingStem = 1;
 defaults.includingDefunct = null;
 
-var having = filesFindSingle_body.having = Object.create( null );
-
-having.writing = 0;
-having.reading = 1;
-having.driving = 0;
+// var having = filesFindSingle_body.having = Object.create( null );
+//
+// having.writing = 0;
+// having.reading = 1;
+// having.driving = 0;
 
 let filesFindSingle = _.routineFromPreAndBody( filesFindSingle_pre, filesFindSingle_body );
 
@@ -1155,7 +1186,7 @@ function filesFind_body( o )
       allowingCycled : o.allowingCycled,
     };
     _.assert( _.strDefined( o4.basePath ), 'No base path for', stemPath );
-    o3.factory = _.FileRecordFactory.TollerantFrom( o3, o4 ).form();
+    o3.factory = _.FileRecordFactory.TolerantFrom( o3, o4 ).form();
 
     _.assert( o3.factory.basePath === o3.filter.formedBasePath[ stemPath ] );
     _.assert( o3.factory.dirPath === null );
@@ -1419,7 +1450,9 @@ function filesFind_body( o )
 
 _.routineExtend( filesFind_body, filesFindSingle.body );
 
-var defaults = filesFind_body.defaults;
+var defaults = filesFind_body.defaults = _.mapExtend( null, filesFind_body.defaults );
+
+delete defaults.factory;
 
 defaults.sync = 1;
 defaults.orderingExclusion = null;
@@ -2259,8 +2292,10 @@ function filesReflectEvaluate_body( o )
 
   /* find */
 
+  // debugger;
   let found = self.filesFind( srcOptions );
   o.visitedMap = srcOptions.visitedMap;
+  // debugger;
 
   return o.result;
 
@@ -2352,7 +2387,7 @@ function filesReflectEvaluate_body( o )
     dstOp.stemPath = dstOp.stemPath[ 0 ];
 
     _.assert( !!dstOp.basePath, () => 'No base path for ' + _.strQuote( dstPath ) );
-    let dstRecordFactory = _.FileRecordFactory.TollerantFrom( o, dstOp ).form();
+    let dstRecordFactory = _.FileRecordFactory.TolerantFrom( o, dstOp ).form();
 
     _.assert( _.strIs( dstOp.basePath ) );
     _.assert( dstRecordFactory.basePath === _.uri.parse( dstPath ).longPath || dstRecordFactory.basePath === _.uri.parse( o.dst.formedBasePath[ dstPath ] ).longPath );
@@ -3842,6 +3877,20 @@ function filesReflectSingle_body( o )
     let isSoftLink = record.src.isSoftLink;
     let isTextLink = record.src.isTextLink;
 
+    if( !isSoftLink && !isTextLink )
+    if( ( o.resolvingSoftLink && self.usingSoftLink ) || ( o.resolvingTextLink && self.usingTextLink ) )
+    {
+      debugger;
+      let stat = record.src.factory.effectiveProvider.statRead
+      ({
+        filePath : record.src.absolute,
+        resolvingSoftLink : 0,
+        resolvingTextLink : 0,
+      });
+      isSoftLink = stat.isSoftLink();
+      isTextLink = stat.isTextLink();
+    }
+
     if( isSoftLink && o.resolvingSrcSoftLink === 2 )
     return false;
 
@@ -3855,10 +3904,14 @@ function filesReflectSingle_body( o )
     let srcAbsolute = record.src.real;
     /* xxx qqq : use ( resolvingMultiple / recursive ) option instead of if-else */
 
+    debugger;
     if( _.strHas( srcAbsolute, 'terLink' ) )
     debugger;
 
-    if( o.rebasingLink === 2 || o.resolvingSrcSoftLink === 2 )
+    let resolvingSrcSoftLink = self.usingSoftLink ? o.resolvingSrcSoftLink : 0;
+    let resolvingSrcTextLink = self.usingTextLink ? o.resolvingSrcTextLink : 0;
+
+    if( o.rebasingLink === 2 )
     {
       let resolved = src.pathResolveLinkFull
       ({
@@ -3881,16 +3934,46 @@ function filesReflectSingle_body( o )
     }
     else if( o.rebasingLink === 1 )
     {
-      srcPath = src.pathResolveLinkStep
-      ({
-        filePath : srcAbsolute,
-        resolvingSoftLink : 1,
-        resolvingTextLink : 1,
-        throwing : o.throwing,
-        allowingMissed : o.allowingMissed,
-        allowingCycled : o.allowingCycled,
-      });
-      srcAbsolute = path.join( srcAbsolute, srcPath );
+
+      debugger;
+      if( resolvingSrcSoftLink || resolvingSrcTextLink )
+      {
+
+        let resolved = src.pathResolveLinkFull
+        ({
+          filePath : srcAbsolute,
+          resolvingSoftLink : resolvingSrcSoftLink ? 1 : 0,
+          resolvingTextLink : resolvingSrcTextLink ? 1 : 0,
+          preservingRelative : 1,
+          relativeOriginalFile : 1,
+          throwing : o.throwing,
+          allowingMissed : o.allowingMissed,
+          allowingCycled : o.allowingCycled,
+        });
+        if( !resolved )
+        {
+          debugger;
+          return false;
+        }
+        srcAbsolute = resolved.absolutePath;
+        srcPath = resolved.filePath;
+
+      }
+
+      if( ( !resolvingSrcSoftLink && self.usingSoftLink ) || ( !resolvingSrcTextLink && self.usingTextLink ) )
+      {
+        srcPath = src.pathResolveLinkStep
+        ({
+          filePath : srcAbsolute,
+          resolvingSoftLink : 1,
+          resolvingTextLink : 1,
+          throwing : o.throwing,
+          allowingMissed : o.allowingMissed,
+          allowingCycled : o.allowingCycled,
+        });
+        srcAbsolute = path.join( srcAbsolute, srcPath );
+      }
+
     }
     else _.assert( 0 );
 
@@ -3899,13 +3982,25 @@ function filesReflectSingle_body( o )
     if( !o.visitedMap[ srcAbsolute ] )
     return false
 
+    if( path.isAbsolute( srcPath ) )
+    debugger;
+
     let srcRecord = o.visitedMap[ srcAbsolute ];
     let dstRecord = srcToDst( srcRecord );
     if( record.src === dstRecord )
     debugger;
     if( record.src === dstRecord )
     return false;
-    record.src = dstRecord;
+    // record.src = dstRecord;
+
+    record.src = record.src.factory.record( srcAbsolute );
+
+    // xxx yyy
+    if( path.isAbsolute( srcPath ) )
+    {
+      debugger;
+      path.join( dstRecord.absolute, path.relative( srcRecord.absolute, srcAbsolute ) );
+    }
 
     let action = isSoftLink ? 'softLink' : 'textLink';
 

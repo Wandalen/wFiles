@@ -39,6 +39,7 @@ function onSuiteBegin( test )
 
   context.testSuitePath = path.dirTempOpen( 'FileProviderGit' );
   context.testSuitePath = context.providerDst.pathResolveLinkFull({ filePath : context.testSuitePath, resolvingSoftLink : 1 });
+  context.testSuitePath = context.testSuitePath.absolutePath;
 }
 
 function onSuiteEnd( test )
@@ -82,13 +83,12 @@ function filesReflectTrivial( test )
       includingTerminals : 1,
       includingDirs : 1,
       outputFormat : 'relative',
-      recursive : 2
+      filter : { recursive : 2 }
     });
 
     let expected =
     [
       '.',
-      './appveyor.yml',
       './LICENSE',
       './package.json',
       './README.md',
@@ -98,7 +98,7 @@ function filesReflectTrivial( test )
       './proto',
       './sample'
     ]
-
+    
     test.is( _.arraySetContainAll( files, expected ) )
     return got;
   })
@@ -120,13 +120,12 @@ function filesReflectTrivial( test )
       includingTerminals : 1,
       includingDirs : 1,
       outputFormat : 'relative',
-      recursive : 2
+      filter : { recursive : 2 }
     });
 
     let expected =
     [
       '.',
-      './appveyor.yml',
       './LICENSE',
       './package.json',
       './README.md',
@@ -158,13 +157,12 @@ function filesReflectTrivial( test )
       includingTerminals : 1,
       includingDirs : 1,
       outputFormat : 'relative',
-      recursive : 2
+      filter : { recursive : 2 }
     });
 
     let expected =
     [
       '.',
-      './appveyor.yml',
       './LICENSE',
       './package.json',
       './README.md',
@@ -197,7 +195,7 @@ function filesReflectTrivial( test )
       includingTerminals : 1,
       includingDirs : 1,
       outputFormat : 'relative',
-      recursive : 2
+      filter : { recursive : 2 }
     });
 
     test.identical( files, [ '.' ] );
@@ -227,13 +225,12 @@ function filesReflectTrivial( test )
       includingTerminals : 1,
       includingDirs : 1,
       outputFormat : 'relative',
-      recursive : 2
+      filter : { recursive : 2 }
     });
 
     let expected =
     [
       '.',
-      './appveyor.yml',
       './LICENSE',
       './package.json',
       './README.md',
@@ -275,13 +272,12 @@ function filesReflectTrivial( test )
       includingTerminals : 1,
       includingDirs : 1,
       outputFormat : 'relative',
-      recursive : 2
+      filter : { recursive : 2 }
     });
 
     let expected =
     [
       '.',
-      './appveyor.yml',
       './LICENSE',
       './package.json',
       './README.md',
@@ -313,23 +309,22 @@ function filesReflectTrivial( test )
       includingTerminals : 1,
       includingDirs : 1,
       outputFormat : 'relative',
-      recursive : 2
+      filter : { recursive : 2 }
     });
 
     let expected =
     [
       '.',
-      './appveyor.yml',
       './LICENSE',
       './package.json',
       './README.md',
       './out',
-      './out/wPathBasic.out.will.yml',
+      './out/wPathFundamentals.out.will.yml',
       './out/debug',
       './proto',
       './sample'
     ]
-
+    
     test.is( _.arraySetContainAll( files, expected ) )
     let packagePath = providerDst.path.join( localPath, 'package.json' );
     let packageRead = providerDst.fileRead
@@ -355,7 +350,7 @@ function filesReflectTrivial( test )
     ({
       execPath : 'git reset --hard HEAD~1',
       currentPath : localPath,
-      ready : ready
+      ready
     })
 
     ready.then( () => system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 }) );
@@ -364,7 +359,7 @@ function filesReflectTrivial( test )
     ({
       execPath : 'git status',
       currentPath : localPath,
-      ready : ready,
+      ready,
       outputCollecting : 1
     })
 
@@ -392,7 +387,7 @@ function filesReflectTrivial( test )
     ({
       execPath : 'git commit --allow-empty -m emptycommit',
       currentPath : localPath,
-      ready : ready
+      ready
     })
 
     ready.then( () => system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 }) );
@@ -401,7 +396,7 @@ function filesReflectTrivial( test )
     ({
       execPath : 'git status',
       currentPath : localPath,
-      ready : ready,
+      ready,
       outputCollecting : 1
     })
 
@@ -416,7 +411,7 @@ function filesReflectTrivial( test )
     ({
       execPath : 'git log -n 2',
       currentPath : localPath,
-      ready : ready,
+      ready,
       outputCollecting : 1
     })
 
@@ -445,14 +440,14 @@ function filesReflectTrivial( test )
     ({
       execPath : 'git reset --hard HEAD~1',
       currentPath : localPath,
-      ready : ready
+      ready
     })
 
     _.shell
     ({
       execPath : 'git commit --allow-empty -m emptycommit',
       currentPath : localPath,
-      ready : ready
+      ready
     })
 
     ready.then( () => system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 }) );
@@ -461,7 +456,7 @@ function filesReflectTrivial( test )
     ({
       execPath : 'git status',
       currentPath : localPath,
-      ready : ready,
+      ready,
       outputCollecting : 1
     })
 
@@ -476,7 +471,7 @@ function filesReflectTrivial( test )
     ({
       execPath : 'git log -n 2',
       currentPath : localPath,
-      ready : ready,
+      ready,
       outputCollecting : 1
     })
 
@@ -506,7 +501,7 @@ function filesReflectTrivial( test )
     ({
       execPath : 'git commit --allow-empty -m emptycommit',
       currentPath : localPath,
-      ready : ready
+      ready
     })
 
     ready.then( () => system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 }) );
@@ -515,7 +510,7 @@ function filesReflectTrivial( test )
     ({
       execPath : 'git status',
       currentPath : localPath,
-      ready : ready,
+      ready,
       outputCollecting : 1
     })
 
@@ -546,7 +541,7 @@ function filesReflectTrivial( test )
     ({
       execPath : 'git status',
       currentPath : localPath,
-      ready : ready,
+      ready,
       outputCollecting : 1
     })
 
@@ -581,7 +576,7 @@ function filesReflectTrivial( test )
     ({
       execPath : 'git status',
       currentPath : localPath,
-      ready : ready,
+      ready,
       outputCollecting : 1
     })
 
@@ -602,7 +597,7 @@ function filesReflectTrivial( test )
     ({
       execPath : 'git status',
       currentPath : localPath,
-      ready : ready,
+      ready,
       outputCollecting : 1
     })
 
@@ -631,7 +626,7 @@ function filesReflectTrivial( test )
     ({
       execPath : 'git status',
       currentPath : localPath,
-      ready : ready,
+      ready,
       outputCollecting : 1
     })
 
@@ -652,7 +647,7 @@ function filesReflectTrivial( test )
     ({
       execPath : 'git status',
       currentPath : localPath,
-      ready : ready,
+      ready,
       outputCollecting : 1
     })
 
@@ -699,7 +694,7 @@ function isUpToDate( test )
   {
     test.case = 'remote master';
     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git';
-    return providerSrc.isUpToDate({ localPath : localPath, remotePath : remotePath })
+    return providerSrc.isUpToDate({ localPath, remotePath })
     .then( ( got ) =>
     {
       test.identical( got, true );
@@ -711,7 +706,7 @@ function isUpToDate( test )
   {
     test.case = 'remote has different branch';
     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git#other';
-    return providerSrc.isUpToDate({ localPath : localPath, remotePath : remotePath })
+    return providerSrc.isUpToDate({ localPath, remotePath })
     .then( ( got ) =>
     {
       test.identical( got, false );
@@ -723,7 +718,7 @@ function isUpToDate( test )
   {
     test.case = 'remote has fixed version';
     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git#c94e0130358ba54fc47237e15bac1ab18024c0a9';
-    return providerSrc.isUpToDate({ localPath : localPath, remotePath : remotePath })
+    return providerSrc.isUpToDate({ localPath, remotePath })
     .then( ( got ) =>
     {
       test.identical( got, false );
@@ -752,7 +747,7 @@ function isUpToDate( test )
   {
     test.case = 'remote has same fixed version';
     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git#c94e0130358ba54fc47237e15bac1ab18024c0a9';
-    return providerSrc.isUpToDate({ localPath : localPath, remotePath : remotePath })
+    return providerSrc.isUpToDate({ localPath, remotePath })
     .then( ( got ) =>
     {
       test.identical( got, true );
@@ -764,7 +759,7 @@ function isUpToDate( test )
   {
     test.case = 'remote has other fixed version';
     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git#469a6497f616cf18639b2aa68957f4dab78b7965';
-    return providerSrc.isUpToDate({ localPath : localPath, remotePath : remotePath })
+    return providerSrc.isUpToDate({ localPath, remotePath })
     .then( ( got ) =>
     {
       test.identical( got, false );
@@ -776,7 +771,7 @@ function isUpToDate( test )
   {
     test.case = 'remote has other branch';
     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git#other';
-    return providerSrc.isUpToDate({ localPath : localPath, remotePath : remotePath })
+    return providerSrc.isUpToDate({ localPath, remotePath })
     .then( ( got ) =>
     {
       test.identical( got, false );
@@ -804,11 +799,11 @@ function isUpToDate( test )
     ({
       execPath : 'git reset --hard HEAD~1',
       currentPath : localPath,
-      ready : ready
+      ready
     })
 
     ready
-    .then( () => providerSrc.isUpToDate({ localPath : localPath, remotePath : remotePath }) )
+    .then( () => providerSrc.isUpToDate({ localPath, remotePath }) )
     .then( ( got ) =>
     {
       test.identical( got, false );
@@ -830,11 +825,11 @@ function isUpToDate( test )
     ({
       execPath : 'git commit --allow-empty -m emptycommit',
       currentPath : localPath,
-      ready : ready
+      ready
     })
 
     ready
-    .then( () => providerSrc.isUpToDate({ localPath : localPath, remotePath : remotePath }) )
+    .then( () => providerSrc.isUpToDate({ localPath, remotePath }) )
     .then( ( got ) =>
     {
       test.identical( got, true );
@@ -856,18 +851,18 @@ function isUpToDate( test )
     ({
       execPath : 'git reset --hard HEAD~1',
       currentPath : localPath,
-      ready : ready
+      ready
     })
 
     _.shell
     ({
       execPath : 'git commit --allow-empty -m emptycommit',
       currentPath : localPath,
-      ready : ready
+      ready
     })
 
     ready
-    .then( () => providerSrc.isUpToDate({ localPath : localPath, remotePath : remotePath }) )
+    .then( () => providerSrc.isUpToDate({ localPath, remotePath }) )
     .then( ( got ) =>
     {
       test.identical( got, false );
@@ -890,11 +885,11 @@ function isUpToDate( test )
     ({
       execPath : 'git commit --allow-empty -m emptycommit',
       currentPath : localPath,
-      ready : ready
+      ready
     })
 
     ready
-    .then( () => providerSrc.isUpToDate({ localPath : localPath, remotePath : remotePath }) )
+    .then( () => providerSrc.isUpToDate({ localPath, remotePath }) )
     .then( ( got ) =>
     {
       test.identical( got, false );
@@ -935,8 +930,8 @@ var Proto =
 
   tests :
   {
-    filesReflectTrivial : filesReflectTrivial,
-    isUpToDate : isUpToDate,
+    filesReflectTrivial,
+    isUpToDate,
   },
 
 }

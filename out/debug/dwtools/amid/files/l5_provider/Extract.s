@@ -868,6 +868,10 @@ function _fileTimeSetAct( o )
 {
   let self = this;
 
+/* qqq xxx : implement for hardlinks
+
+*/
+
   if( !self.usingExtraStat )
   return;
 
@@ -1602,6 +1606,42 @@ _.routineExtend( filesAreHardLinkedAct, Parent.prototype.filesAreHardLinkedAct )
 // --
 // etc
 // --
+
+function filesTreeSet( src )
+{
+  let self = this;
+
+  if( self[ filesTreeSymbol ] === src )
+  return src;
+
+  _.mapDelete( self.extraStats );
+
+  self[ filesTreeSymbol ] = src;
+
+  if( src && _.mapKeys( src ).length && self.usingExtraStat )
+  self.statsAdopt();
+
+  return src;
+}
+
+//
+
+function statsAdopt()
+{
+  let self = this;
+
+  _.assert( arguments.length === 0 );
+
+  self.filesFindNominal( '/', ( r ) =>
+  {
+    self._fileTimeSetAct({ filePath : r.absolute, atime : r.stat.atime || _.timeNow() });
+    return r;
+  });
+
+  return self;
+}
+
+//
 
 function linksRebase( o )
 {
@@ -2396,6 +2436,11 @@ let Restricts =
   extraStats : _.define.own( {} ),
 }
 
+let Accessors =
+{
+  filesTree : { setter : filesTreeSet },
+}
+
 let Statics =
 {
 
@@ -2417,6 +2462,8 @@ let Statics =
   InoCounter : 0,
 
 }
+
+let filesTreeSymbol = Symbol.for( 'filesTree' );
 
 // --
 // declare
@@ -2464,6 +2511,8 @@ let Proto =
 
   // etc
 
+  filesTreeSet,
+  statsAdopt,
   linksRebase,
   // filesTreeRead,
   // rewriteFromProvider,
@@ -2509,6 +2558,7 @@ let Proto =
   Aggregates,
   Associates,
   Restricts,
+  Accessors,
   Statics,
 
 }

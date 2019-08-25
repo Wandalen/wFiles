@@ -92,7 +92,7 @@ function fileCopyToHardDrive( test )
     var o =
     {
       url : 'abc',
-      filePath : filePath,
+      filePath,
     }
     var got = this.provider.fileCopyToHardDrive( o );
     return test.shouldThrowError( got );
@@ -106,7 +106,7 @@ function fileCopyToHardDrive( test )
     var o =
     {
       url : this.testFile,
-      filePath : filePath,
+      filePath,
     }
     return this.provider.fileCopyToHardDrive( o )
     .finally( ( err, got ) =>
@@ -140,8 +140,8 @@ var Proto =
   abstract : 0,
   enabled : 0, // !!! experimental
 
-  onSuiteBegin : onSuiteBegin,
-  onSuiteEnd : onSuiteEnd,
+  onSuiteBegin,
+  onSuiteEnd,
 
   context :
   {
@@ -151,8 +151,8 @@ var Proto =
 
   tests :
   {
-    fileRead : fileRead,
-    fileCopyToHardDrive : fileCopyToHardDrive
+    fileRead,
+    fileCopyToHardDrive
   },
 
 }

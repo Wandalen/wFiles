@@ -87,9 +87,9 @@ var Proto =
 
   context :
   {
-    filesTree : filesTree,
-    // provider : _.FileProvider.Extract({ filesTree : filesTree, usingExtraStat : 1, protocol : 'current' }),
-    pathFor : pathFor,
+    filesTree,
+    // provider : _.FileProvider.Extract({ filesTree, usingExtraStat : 1, protocol : 'current' }),
+    pathFor,
     testFile : '/file1',
   },
 

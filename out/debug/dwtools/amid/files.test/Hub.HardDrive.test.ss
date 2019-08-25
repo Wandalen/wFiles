@@ -81,7 +81,7 @@ var Proto =
     providerEffective : _.FileProvider.HardDrive(),
     testSuitePath : null,
 
-    pathFor : pathFor,
+    pathFor,
     globalFromPreferred : null
     // testFile : null,
     // testSuitePath : __dirname + '/../../../../tmp.tmp/hard-drive',

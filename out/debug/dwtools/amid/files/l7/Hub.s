@@ -648,6 +648,8 @@ function fileRead_body( o )
     resolvingSoftLink : o.resolvingSoftLink,
     resolvingTextLink : o.resolvingTextLink,
   });
+  
+  o.filePath = o.filePath.absolutePath;
 
   let r = self._pathLocalize( o.filePath );
   let o2 = _.mapExtend( null, o );

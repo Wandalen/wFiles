@@ -73,7 +73,7 @@ var Proto =
   context :
   {
     provider : _.FileProvider.HardDrive(),
-    // onSuiteBegin : onSuiteBegin,
+    // onSuiteBegin,
     testSuitePath : null,
     globalFromPreferred : null
   },

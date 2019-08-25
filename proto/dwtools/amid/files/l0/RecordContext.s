@@ -1,0 +1,295 @@
+( function _RecordFactoryAbstract_s_() {
+
+'use strict';
+
+if( typeof module !== 'undefined' )
+{
+
+  require( '../UseBase.s' );
+
+}
+
+//
+
+/**
+ * @class wFileRecordContext
+ * @memberof module:Tools/mid/Files
+*/
+
+let _global = _global_;
+let _ = _global_.wTools;
+let Parent = null;
+let Self = function wFileRecordContext( o )
+{
+  return _.workpiece.construct( Self, this, arguments );
+  // if( !( this instanceof Self ) )
+  // if( o instanceof Self && arguments.length === 1 )
+  // {
+  //   _.assert( arguments.length === 1, 'Expects single argument' );
+  //   return o;
+  // }
+  // else
+  // {
+  //   return new( _.constructorJoin( Self, arguments ) );
+  // }
+  // return Self.prototype.init.apply( this,arguments );
+}
+
+Self.shortName = 'FileRecordContext';
+
+_.assert( !_.FileRecordContext );
+
+// --
+// routine
+// --
+
+/**
+ * @summary Creates factory instance ignoring unknown options.
+ * @param {Object} o Options map.
+ * @function TolerantFrom
+ * @memberof module:Tools/mid/Files.wFileRecordContext
+*/
+
+function TolerantFrom( o )
+{
+  let Cls = _.constructorOf( this );
+  _.assert( arguments.length >= 1, 'Expects at least one argument' );
+  _.assert( _.objectIs( Cls.prototype.Composes ) );
+  o = _.mapsExtend( null, arguments );
+  return new Cls( _.mapOnly( o, Cls.prototype.fieldsOfCopyableGroups ) );
+}
+
+//
+
+function init( o )
+{
+  let factory = this;
+
+  _.workpiece.initFields( factory );
+  Object.preventExtensions( factory );
+
+  return factory;
+}
+
+//
+
+function _formAssociations()
+{
+  let factory = this;
+
+  /* find file system */
+
+  if( !factory.system )
+  if( factory.effectiveProvider && factory.effectiveProvider instanceof _.FileProvider.System )
+  {
+    factory.system = factory.effectiveProvider;
+    factory.effectiveProvider = null;
+  }
+
+  if( !factory.system )
+  if( factory.effectiveProvider && factory.effectiveProvider.system && factory.effectiveProvider.system instanceof _.FileProvider.System )
+  {
+    factory.system = factory.effectiveProvider.system;
+  }
+
+  if( !factory.system )
+  if( factory.defaultProvider && factory.defaultProvider instanceof _.FileProvider.System )
+  {
+    factory.system = factory.defaultProvider;
+  }
+
+  if( !factory.system )
+  if( factory.defaultProvider && factory.defaultProvider.system && factory.defaultProvider.system instanceof _.FileProvider.System )
+  {
+    factory.system = factory.defaultProvider.system;
+  }
+
+  if( factory.system )
+  if( factory.system.system && factory.system.system !== factory.system )
+  {
+    _.assert( !( factory.system instanceof _.FileProvider.System ) );
+    if( !factory.effectiveProvider )
+    factory.effectiveProvider = factory.system;
+    factory.system = factory.system.system;
+  }
+
+  /* find effective provider */
+
+  if( factory.effectiveProvider && factory.effectiveProvider instanceof _.FileProvider.System )
+  {
+    _.assert( factory.system === null || factory.system === factory.effectiveProvider );
+    factory.system = factory.effectiveProvider;
+    factory.effectiveProvider = null;
+  }
+
+  /* reset system */
+
+  if( factory.effectiveProvider && factory.effectiveProvider.system )
+  {
+    _.assert( factory.system === null || factory.system === factory.effectiveProvider.system );
+    factory.system = factory.effectiveProvider.system;
+  }
+
+  /* find default provider */
+
+  if( !factory.defaultProvider )
+  {
+    factory.defaultProvider = factory.defaultProvider || factory.effectiveProvider || factory.system;
+  }
+
+  /* reset system */
+
+  if( factory.system && !( factory.system instanceof _.FileProvider.System ) )
+  {
+    _.assert( factory.system === factory.defaultProvider || factory.system === factory.effectiveProvider )
+    factory.system = null;
+  }
+
+  // if( factory.system )
+  // {
+  //   if( factory.system.system && factory.system.system !== factory.system )
+  //   {
+  //     _.assert( factory.effectiveProvider === null || factory.effectiveProvider === factory.system );
+  //     factory.effectiveProvider = factory.system;
+  //     factory.system = factory.system.system;
+  //   }
+  // }
+  //
+  // if( factory.effectiveProvider )
+  // {
+  //   if( factory.effectiveProvider instanceof _.FileProvider.System )
+  //   {
+  //     _.assert( factory.system === null || factory.system === factory.effectiveProvider );
+  //     factory.system = factory.effectiveProvider;
+  //     factory.effectiveProvider = null;
+  //   }
+  // }
+  //
+  // if( factory.effectiveProvider && factory.effectiveProvider.system )
+  // {
+  //   _.assert( factory.system === null || factory.system === factory.effectiveProvider.system );
+  //   factory.system = factory.effectiveProvider.system;
+  // }
+  //
+  // if( !factory.defaultProvider )
+  // {
+  //   factory.defaultProvider = factory.defaultProvider || factory.effectiveProvider || factory.system;
+  // }
+
+  /* */
+
+  _.assert( !factory.system || factory.system instanceof _.FileProvider.Abstract, 'Expects {- factory.system -}' );
+  _.assert( factory.defaultProvider instanceof _.FileProvider.Abstract );
+  _.assert( !factory.effectiveProvider || !( factory.effectiveProvider instanceof _.FileProvider.System ) );
+
+  /* */
+
+  _.assert
+  (
+    !factory.system || factory.system instanceof _.FileProvider.System,
+    () => '{- factory.system -} should be instance of {- _.FileProvider.System -}, but it is ' + _.toStrShort( factory.system )
+  );
+  _.assert
+  (
+    !factory.effectiveProvider || !( factory.effectiveProvider instanceof _.FileProvider.System ),
+    () => '{- factory.effectiveProvider -} cant be instance of {- _.FileProvider.System -}, but it is'
+  );
+  _.assert
+  (
+    factory.defaultProvider instanceof _.FileProvider.Abstract,
+    () => '{- factory.system -} should be instance of {- _.FileProvider.Abstract -}, but it is ' + _.toStrShort( factory.defaultProvider )
+  );
+
+}
+
+// --
+// relation
+// --
+
+/**
+ * @typedef {Object} Fields
+ * @memberof module:Tools/mid/Files.wFileRecordContext
+*/
+
+let Composes =
+{
+}
+
+let Aggregates =
+{
+}
+
+let Associates =
+{
+  system : null,
+  effectiveProvider : null,
+  defaultProvider : null,
+}
+
+let Medials =
+{
+}
+
+let Restricts =
+{
+}
+
+let Statics =
+{
+  TolerantFrom,
+}
+
+let Forbids =
+{
+}
+
+let Accessors =
+{
+}
+
+// --
+// declare
+// --
+
+let Extend =
+{
+
+  TolerantFrom,
+  init,
+  _formAssociations,
+
+  /* */
+
+  Composes,
+  Aggregates,
+  Associates,
+  Restricts,
+  Statics,
+  Forbids,
+  Accessors,
+
+}
+
+//
+
+_.classDeclare
+({
+  cls : Self,
+  parent : Parent,
+  extend : Extend,
+});
+
+_.Copyable.mixin( Self );
+
+//
+
+_[ Self.shortName ] = Self;
+
+// --
+// export
+// --
+
+if( typeof module !== 'undefined' && module !== null )
+module[ 'exports' ] = Self;
+
+})();

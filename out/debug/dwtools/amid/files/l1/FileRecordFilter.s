@@ -1520,7 +1520,7 @@ function prefixesApply( o )
       else
       {
         filter.basePath = basePath2;
-        filter.basePathSimplify();
+        filter.basePath = filter.basePathSimplest();
       }
     }
 
@@ -2267,22 +2267,28 @@ function basePathNormalize( filePath, basePath )
 
 //
 
-function basePathSimplify()
+function basePathSimplest( basePath )
 {
   let filter = this;
   let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
-  if( !filter.basePath || _.strIs( filter.basePath ) )
-  return;
+  _.assert( arguments.length === 0 || arguments.length === 1 );
 
-  let basePath = _.arrayAppendArrayOnce( [], _.mapVals( filter.basePath ) );
+  if( basePath === undefined )
+  basePath = filter.basePath;
+
+  if( !basePath || _.strIs( basePath ) )
+  return basePath;
+
+  basePath = _.arrayAppendArrayOnce( [], _.mapVals( basePath ) );
 
   if( basePath.length !== 1 )
-  return;
+  return basePath;
 
-  filter.basePath = basePath[ 0 ];
+  basePath = basePath[ 0 ];
 
+  return basePath;
 }
 
 // xxx : remove maybe?
@@ -4965,7 +4971,7 @@ let Extend =
   basePathMapLocalize,
   basePathFromDecoratedFilePath,
   basePathNormalize,
-  basePathSimplify,
+  basePathSimplest,
   basePathDotUnwrap,
   basePathEach, /* qqq : cover routine basePathEach */
   basePathUse,

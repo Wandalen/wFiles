@@ -86,8 +86,8 @@ function form()
 
   _.assert( Object.isFrozen( record.factory ) );
   _.assert( !!record.factory.formed, 'Record factory is not formed' );
-  _.assert( record.factory.hubFileProvider instanceof _.FileProvider.Abstract );
-  _.assert( record.factory.effectiveFileProvider instanceof _.FileProvider.Abstract );
+  _.assert( record.factory.system instanceof _.FileProvider.Abstract );
+  _.assert( record.factory.effectiveProvider instanceof _.FileProvider.Abstract );
   _.assert( _.strIs( record.input ), '{ record.input } must be a string' );
   _.assert( record.factory instanceof _.FileRecordFactory, 'Expects instance of { FileRecordFactory }' );
 
@@ -219,7 +219,7 @@ function _pathsForm()
 {
   let record = this;
   let f = record.factory;
-  let fileProvider = f.effectiveFileProvider;
+  let fileProvider = f.effectiveProvider;
   let path = record.path
   let inputPath = record.input;
 
@@ -258,7 +258,7 @@ function _pathsForm()
 
   /* */
 
-  f.hubFileProvider._recordFormBegin( record );
+  f.system._recordFormBegin( record );
 
   return record;
 }
@@ -330,7 +330,7 @@ function _statRead()
 
     let o2 =
     {
-      hub : f.hubFileProvider,
+      system : f.system,
       filePath : record.absolute,
       resolvingSoftLink : f.resolvingSoftLink,
       resolvingTextLink : f.resolvingTextLink,
@@ -341,7 +341,7 @@ function _statRead()
       throwing : 1,
     }
 
-    record[ realSymbol ] = f.effectiveFileProvider.pathResolveLinkFull( o2 ).filePath;
+    record[ realSymbol ] = f.effectiveProvider.pathResolveLinkFull( o2 ).filePath;
 
     stat = o2.stat;
 
@@ -353,7 +353,7 @@ function _statRead()
   {
 
     if( stat === undefined )
-    stat = f.effectiveFileProvider.statReadAct
+    stat = f.effectiveProvider.statReadAct
     ({
       filePath : record.real,
       throwing : 0,
@@ -376,7 +376,7 @@ function _statAnalyze()
 {
   let record = this;
   let f = record.factory;
-  let fileProvider = f.effectiveFileProvider;
+  let fileProvider = f.effectiveProvider;
   let path = record.path;
   let logger = fileProvider.logger || _global.logger;
 
@@ -390,7 +390,7 @@ function _statAnalyze()
     record._safeCheck();
   }
 
-  f.hubFileProvider._recordFormEnd( record );
+  f.system._recordFormEnd( record );
 
 }
 
@@ -452,7 +452,7 @@ function hashRead()
   if( record.hash !== null )
   return record.hash;
 
-  record.hash = f.effectiveFileProvider.hashRead
+  record.hash = f.effectiveProvider.hashRead
   ({
     filePath : record.absolute,
     verbosity : 0,
@@ -677,7 +677,7 @@ function _pathGet()
   let record = this;
   let f = record.factory;
   _.assert( !!f );
-  let fileProvider = f.hubFileProvider;
+  let fileProvider = f.system;
   return fileProvider.path;
 }
 
@@ -714,7 +714,7 @@ function _absoluteGlobalGet()
 {
   let record = this;
   let f = record.factory;
-  let fileProvider = f.effectiveFileProvider;
+  let fileProvider = f.effectiveProvider;
   return fileProvider.path.globalFromPreferred( record.absolute );
 }
 
@@ -724,7 +724,7 @@ function _realGlobalGet()
 {
   let record = this;
   let f = record.factory;
-  let fileProvider = f.effectiveFileProvider;
+  let fileProvider = f.effectiveProvider;
   return fileProvider.path.globalFromPreferred( record.real );
 }
 
@@ -734,7 +734,7 @@ function _absolutePreferredGet()
 {
   let record = this;
   let f = record.factory;
-  let fileProvider = f.hubFileProvider;
+  let fileProvider = f.system;
   return fileProvider._recordAbsoluteGlobalMaybeGet( record );
 }
 
@@ -744,7 +744,7 @@ function _realPreferredGet()
 {
   let record = this;
   let f = record.factory;
-  let fileProvider = f.hubFileProvider;
+  let fileProvider = f.system;
   return fileProvider._recordRealGlobalMaybeGet( record );
 }
 
@@ -863,6 +863,7 @@ let Composes =
   relative : null,
   input : null,
   hash : null,
+  included : null,
 
 }
 
@@ -908,7 +909,7 @@ let Forbids =
   stating : 'stating',
   effective : 'effective',
   fileProvider : 'fileProvider',
-  effectiveFileProvider : 'effectiveFileProvider',
+  effectiveProvider : 'effectiveProvider',
   originPath : 'originPath',
   base : 'base',
   full : 'full',

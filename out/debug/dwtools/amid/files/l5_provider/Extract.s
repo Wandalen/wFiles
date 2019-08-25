@@ -316,10 +316,10 @@ function fileReadAct( o )
     resolvingTextLink : o.resolvingTextLink,
   }).absolutePath;
 
-  if( self.hub && _.path.isGlobal( o.filePath ) )
+  if( self.system && _.path.isGlobal( o.filePath ) )
   {
-    _.assert( self.hub !== self );
-    return self.hub.fileReadAct( o );
+    _.assert( self.system !== self );
+    return self.system.fileReadAct( o );
   }
 
   result = self._descriptorRead( o.filePath );
@@ -350,7 +350,7 @@ function fileReadAct( o )
   }
 
   if( self._descriptorIsDir( result ) )
-  return handleError( _.err( 'Can`t read from dir : ' + _.strQuote( o.filePath ) + ' method expects file' ) );
+  return handleError( _.err( 'Can`t read from dir : ' + _.strQuote( o.filePath ) + ' method expects terminal file' ) );
   else if( self._descriptorIsLink( result ) )
   return handleError( _.err( 'Can`t read from link : ' + _.strQuote( o.filePath ) + ', without link resolving enabled' ) );
   else if( !self._descriptorIsTerminal( result ) )
@@ -1201,7 +1201,7 @@ function fileCopyAct( o )
     let dstStat;
     let data;
 
-    con.thenKeep( () =>
+    con.then( () =>
     {
       _copyPre();
       return self.statReadAct
@@ -1212,7 +1212,7 @@ function fileCopyAct( o )
         throwing : 0,
       })
     })
-    .thenKeep( ( got ) =>
+    .then( ( got ) =>
     {
       dstStat = got;
 
@@ -1221,7 +1221,7 @@ function fileCopyAct( o )
       return self.hardLinkBreak({ filePath : o.dstPath, sync : 0 });
       return true;
     })
-    .thenKeep( () =>
+    .then( () =>
     {
       return self.fileRead
       ({
@@ -1231,7 +1231,7 @@ function fileCopyAct( o )
         resolvingTextLink : 0
       })
     })
-    .thenKeep( ( got ) =>
+    .then( ( got ) =>
     {
       data = got;
 
@@ -1250,7 +1250,7 @@ function fileCopyAct( o )
         sync : 0,
         throwing : 1
       })
-      .thenKeep( ( resolved ) =>
+      .then( ( resolved ) =>
       {
         o.dstPath = resolved.absolutePath;
         return true;
@@ -1258,7 +1258,7 @@ function fileCopyAct( o )
 
       return true;
     })
-    .thenKeep( () =>
+    .then( () =>
     {
       self._descriptorWrite( o.dstPath, data );
       return true;
@@ -1451,13 +1451,13 @@ function hardLinkAct( o )
 
     let dstExists;
 
-    con.thenKeep( () => self.fileExists( o.dstPath ) );
-    con.thenKeep( ( got ) =>
+    con.then( () => self.fileExists( o.dstPath ) );
+    con.then( ( got ) =>
     {
       dstExists = got;
       return self.statRead({ filePath : o.srcPath, sync : 0 })
     });
-    con.thenKeep( ( srcStat ) =>
+    con.then( ( srcStat ) =>
     {
       if( !srcStat )
       {

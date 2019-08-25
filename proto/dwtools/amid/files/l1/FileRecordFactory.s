@@ -103,65 +103,65 @@ function _formAssociations()
 
   if( factory.filter )
   {
-    factory.hubFileProvider = factory.hubFileProvider || factory.filter.hubFileProvider;
-    factory.effectiveFileProvider = factory.effectiveFileProvider || factory.filter.effectiveFileProvider;
-    factory.defaultFileProvider = factory.defaultFileProvider || factory.filter.defaultFileProvider;
+    factory.system = factory.system || factory.filter.system;
+    factory.effectiveProvider = factory.effectiveProvider || factory.filter.effectiveProvider;
+    factory.defaultProvider = factory.defaultProvider || factory.filter.defaultProvider;
   }
 
   /* */
 
-  if( factory.hubFileProvider )
+  if( factory.system )
   {
-    if( factory.hubFileProvider.hub && factory.hubFileProvider.hub !== factory.hubFileProvider )
+    if( factory.system.system && factory.system.system !== factory.system )
     {
-      _.assert( factory.effectiveFileProvider === null || factory.effectiveFileProvider === factory.hubFileProvider );
-      factory.effectiveFileProvider = factory.hubFileProvider;
-      factory.hubFileProvider = factory.hubFileProvider.hub;
+      _.assert( factory.effectiveProvider === null || factory.effectiveProvider === factory.system );
+      factory.effectiveProvider = factory.system;
+      factory.system = factory.system.system;
     }
   }
 
-  // if( factory.defaultFileProvider )
+  // if( factory.defaultProvider )
   // {
-  //   if( factory.defaultFileProvider instanceof _.FileProvider.Hub )
+  //   if( factory.defaultProvider instanceof _.FileProvider.System )
   //   {
-  //     _.assert( factory.hubFileProvider === null || factory.hubFileProvider === factory.defaultFileProvider );
-  //     factory.hubFileProvider = factory.defaultFileProvider;
-  //     factory.defaultFileProvider = null;
+  //     _.assert( factory.system === null || factory.system === factory.defaultProvider );
+  //     factory.system = factory.defaultProvider;
+  //     factory.defaultProvider = null;
   //   }
   // }
   //
-  // if( factory.defaultFileProvider && factory.defaultFileProvider.hub )
+  // if( factory.defaultProvider && factory.defaultProvider.system )
   // {
-  //   _.assert( factory.hubFileProvider === null || factory.hubFileProvider === factory.defaultFileProvider.hub );
-  //   factory.hubFileProvider = factory.defaultFileProvider.hub;
+  //   _.assert( factory.system === null || factory.system === factory.defaultProvider.system );
+  //   factory.system = factory.defaultProvider.system;
   // }
 
-  if( factory.effectiveFileProvider )
+  if( factory.effectiveProvider )
   {
-    if( factory.effectiveFileProvider instanceof _.FileProvider.Hub )
+    if( factory.effectiveProvider instanceof _.FileProvider.System )
     {
-      _.assert( factory.hubFileProvider === null || factory.hubFileProvider === factory.effectiveFileProvider );
-      factory.hubFileProvider = factory.effectiveFileProvider;
-      factory.effectiveFileProvider = null;
+      _.assert( factory.system === null || factory.system === factory.effectiveProvider );
+      factory.system = factory.effectiveProvider;
+      factory.effectiveProvider = null;
     }
   }
 
-  if( factory.effectiveFileProvider && factory.effectiveFileProvider.hub )
+  if( factory.effectiveProvider && factory.effectiveProvider.system )
   {
-    _.assert( factory.hubFileProvider === null || factory.hubFileProvider === factory.effectiveFileProvider.hub );
-    factory.hubFileProvider = factory.effectiveFileProvider.hub;
+    _.assert( factory.system === null || factory.system === factory.effectiveProvider.system );
+    factory.system = factory.effectiveProvider.system;
   }
 
-  if( !factory.defaultFileProvider )
+  if( !factory.defaultProvider )
   {
-    factory.defaultFileProvider = factory.defaultFileProvider || factory.effectiveFileProvider || factory.hubFileProvider;
+    factory.defaultProvider = factory.defaultProvider || factory.effectiveProvider || factory.system;
   }
 
   /* */
 
-  _.assert( !factory.hubFileProvider || factory.hubFileProvider instanceof _.FileProvider.Abstract, 'Expects {- factory.hubFileProvider -}' );
-  _.assert( factory.defaultFileProvider instanceof _.FileProvider.Abstract );
-  _.assert( !factory.effectiveFileProvider || !( factory.effectiveFileProvider instanceof _.FileProvider.Hub ) );
+  _.assert( !factory.system || factory.system instanceof _.FileProvider.Abstract, 'Expects {- factory.system -}' );
+  _.assert( factory.defaultProvider instanceof _.FileProvider.Abstract );
+  _.assert( !factory.effectiveProvider || !( factory.effectiveProvider instanceof _.FileProvider.System ) );
 
 }
 
@@ -180,8 +180,8 @@ function form()
 
   factory._formAssociations();
 
-  let hubFileProvider = factory.hubFileProvider || factory.effectiveFileProvider || factory.defaultFileProvider;
-  let path = hubFileProvider.path;
+  let system = factory.system || factory.effectiveProvider || factory.defaultProvider;
+  let path = system.path;
 
   /* */
 
@@ -193,8 +193,8 @@ function form()
     factory.basePath = path.from( factory.basePath );
     factory.basePath = path.normalize( factory.basePath );
 
-    if( !factory.effectiveFileProvider )
-    factory.effectiveFileProvider = hubFileProvider.providerForPath( factory.basePath );
+    if( !factory.effectiveProvider )
+    factory.effectiveProvider = system.providerForPath( factory.basePath );
 
     if( Config.debug )
     if( _.path.isGlobal( factory.basePath ) )
@@ -244,22 +244,22 @@ function form()
 
   /* */
 
-  if( !factory.hubFileProvider )
-  factory.hubFileProvider = factory.defaultFileProvider;
+  if( !factory.system )
+  factory.system = factory.defaultProvider;
 
-  if( !factory.effectiveFileProvider )
-  factory.effectiveFileProvider = factory.defaultFileProvider;
+  if( !factory.effectiveProvider )
+  factory.effectiveProvider = factory.defaultProvider;
 
-  _.assert( !!factory.hubFileProvider );
+  _.assert( !!factory.system );
 
-  factory.hubFileProvider._recordFactoryFormEnd( factory );
+  factory.system._recordFactoryFormEnd( factory );
 
   /* */
 
   if( Config.debug )
   {
 
-    _.assert( factory.hubFileProvider instanceof _.FileProvider.Abstract );
+    _.assert( factory.system instanceof _.FileProvider.Abstract );
     _.assert( path.isAbsolute( factory.basePath ) );
     _.assert( factory.dirPath === null || path.is( factory.dirPath ) );
     _.assert( path.isAbsolute( factory.stemPath ) );
@@ -277,9 +277,9 @@ function form()
       _.assert( factory.filter.formed === 5 );
       _.assert( !!factory.filter.formedBasePath );
       _.assert( !!factory.filter.src || factory.filter.formedBasePath[ factory.stemPath ] === factory.basePath ); // yyy
-      _.assert( factory.filter.effectiveFileProvider === factory.effectiveFileProvider );
-      _.assert( factory.filter.hubFileProvider === factory.hubFileProvider || factory.filter.hubFileProvider === null );
-      _.assert( factory.filter.defaultFileProvider === factory.defaultFileProvider );
+      _.assert( factory.filter.effectiveProvider === factory.effectiveProvider );
+      _.assert( factory.filter.system === factory.system || factory.filter.system === null );
+      _.assert( factory.filter.defaultProvider === factory.defaultProvider );
     }
 
   }
@@ -365,10 +365,10 @@ function _usingSoftLinkGet()
   if( factory[ usingSoftLinkSymbol ] !== null )
   return factory[ usingSoftLinkSymbol ];
 
-  if( factory.effectiveFileProvider )
-  return factory.effectiveFileProvider.usingSoftLink;
-  else if( factory.hubFileProvider )
-  return factory.hubFileProvider.usingSoftLink;
+  if( factory.effectiveProvider )
+  return factory.effectiveProvider.usingSoftLink;
+  else if( factory.system )
+  return factory.system.usingSoftLink;
 
   return factory[ usingSoftLinkSymbol ];
 }
@@ -393,10 +393,10 @@ function _resolvingSoftLinkGet()
   if( factory[ resolvingSoftLinkSymbol ] !== null )
   return factory[ resolvingSoftLinkSymbol ];
 
-  if( factory.effectiveFileProvider )
-  return factory.effectiveFileProvider.resolvingSoftLink;
-  else if( factory.hubFileProvider )
-  return factory.hubFileProvider.resolvingSoftLink;
+  if( factory.effectiveProvider )
+  return factory.effectiveProvider.resolvingSoftLink;
+  else if( factory.system )
+  return factory.system.resolvingSoftLink;
 
   return factory[ resolvingSoftLinkSymbol ];
 }
@@ -414,10 +414,10 @@ function _usingTextLinkGet()
   if( factory[ usingTextLinkSymbol ] !== null )
   return factory[ usingTextLinkSymbol ];
 
-  if( factory.effectiveFileProvider )
-  return factory.effectiveFileProvider.usingTextLink;
-  else if( factory.hubFileProvider )
-  return factory.hubFileProvider.usingTextLink;
+  if( factory.effectiveProvider )
+  return factory.effectiveProvider.usingTextLink;
+  else if( factory.system )
+  return factory.system.usingTextLink;
 
   return factory[ usingTextLinkSymbol ];
 }
@@ -434,10 +434,10 @@ function _resolvingTextLinkGet()
   if( factory[ resolvingTextLinkSymbol ] !== null )
   return factory[ resolvingTextLinkSymbol ];
 
-  if( factory.effectiveFileProvider )
-  return factory.effectiveFileProvider.resolvingTextLink;
-  else if( factory.hubFileProvider )
-  return factory.hubFileProvider.resolvingTextLink;
+  if( factory.effectiveProvider )
+  return factory.effectiveProvider.resolvingTextLink;
+  else if( factory.system )
+  return factory.system.resolvingTextLink;
 
   return factory[ resolvingTextLinkSymbol ];
 }
@@ -451,10 +451,10 @@ function _statingGet()
   if( factory[ statingSymbol ] !== null )
   return factory[ statingSymbol ];
 
-  if( factory.effectiveFileProvider )
-  return factory.effectiveFileProvider.stating;
-  else if( factory.hubFileProvider )
-  return factory.hubFileProvider.stating;
+  if( factory.effectiveProvider )
+  return factory.effectiveProvider.stating;
+  else if( factory.system )
+  return factory.system.stating;
 
   return factory[ statingSymbol ];
 }
@@ -468,10 +468,10 @@ function _safeGet()
   if( factory[ safeSymbol ] !== null )
   return factory[ safeSymbol ];
 
-  if( factory.effectiveFileProvider )
-  return factory.effectiveFileProvider.safe;
-  else if( factory.hubFileProvider )
-  return factory.hubFileProvider.safe;
+  if( factory.effectiveProvider )
+  return factory.effectiveProvider.safe;
+  else if( factory.system )
+  return factory.system.safe;
 
   return factory[ safeSymbol ];
 }
@@ -529,9 +529,9 @@ let Aggregates =
 
 let Associates =
 {
-  hubFileProvider : null,
-  effectiveFileProvider : null,
-  defaultFileProvider : null,
+  system : null,
+  effectiveProvider : null,
+  defaultProvider : null,
   filter : null,
 }
 
@@ -569,6 +569,9 @@ let Forbids =
   onRecord : 'onRecord',
   fileProviderEffective : 'fileProviderEffective',
   fileProvider : 'fileProvider',
+  hubFileProvider : 'hubFileProvider',
+  effectiveFileProvider : 'effectiveFileProvider',
+  defaultFileProvider : 'defaultFileProvider',
 
 }
 

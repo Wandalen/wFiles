@@ -41,12 +41,13 @@ function onSuiteBegin( test )
 {
   let context = this;
 
-  context.provider = _.FileProvider.HardDrive({ protocol : 'current' });
-  context.hub = _.FileProvider.Hub({ providers : [ context.provider ] });
+  context.provider = _.FileProvider.HardDrive({ /* protocol : 'current', */ protocols : [ 'current', 'second' ] });
+  context.system = _.FileProvider.System({ providers : [ context.provider ] });
 
   let path = context.provider.path;
   context.testSuitePath = path.dirTempOpen( 'HardDrive' );
   context.testSuitePath = context.provider.pathResolveLinkFull({ filePath : context.testSuitePath, resolvingSoftLink : 1 });
+  context.testSuitePath = context.testSuitePath.absolutePath;
   context.globalFromPreferred = function globalFromPreferred( path ){ return path };
   // let path = this.provider.path;
   // this.testSuitePath = path.dirTempOpen( path.join( __dirname, '../..'  ), 'Provider/HardDrive' );

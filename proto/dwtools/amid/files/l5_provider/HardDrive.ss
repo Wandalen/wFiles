@@ -1433,7 +1433,7 @@ function softLinkAct( o )
   let self = this;
   // let srcIsAbsolute = self.path.isAbsolute( o.originalSrcPath );
   let srcIsAbsolute = self.path.isAbsolute( o.relativeSrcPath );
-  let srcPath = o.relativeSrcPath;
+  let srcPath = o.srcPath;
 
   _.assertRoutineOptions( softLinkAct, arguments );
   _.assert( self.path.isAbsolute( o.dstPath ) );
@@ -1442,7 +1442,8 @@ function softLinkAct( o )
   _.assert( o.type === null || o.type === 'dir' ||  o.type === 'file' );
 
   if( !srcIsAbsolute )
-  {
+  { 
+    srcPath = o.relativeSrcPath;
     if( _.strBegins( srcPath, './' ) )
     srcPath = _.strIsolateLeftOrNone( srcPath, './' )[ 2 ];
     if( _.strBegins( srcPath, '..' ) )
@@ -1453,14 +1454,16 @@ function softLinkAct( o )
   {
 
     if( o.type === null )
-    {
+    { 
+      let srcPathResolved = srcPath;
+      
       /* not dir */
       if( !srcIsAbsolute )
-      srcPath = self.path.resolve( self.path.dir( o.dstPath ), srcPath );
+      srcPathResolved = self.path.resolve( self.path.dir( o.dstPath ), srcPath );
 
       let srcStat = self.statReadAct
       ({
-        filePath : srcPath,
+        filePath : srcPathResolved,
         resolvingSoftLink : 1,
         sync : 1,
         throwing : 0,

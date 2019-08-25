@@ -1,6 +1,6 @@
-( function _FileProvider_Hub_Extract_test_s_( ) {
+( function _System_Extract_test_s_( ) {
 
-'use strict';  
+'use strict';
 
 if( typeof module !== 'undefined' )
 {
@@ -69,7 +69,7 @@ function onSuiteBegin()
 }
 
 function onSuiteEnd()
-{ 
+{
   let self = this;
   self.providerEffective.finit();
   self.provider.finit();
@@ -82,7 +82,7 @@ function onSuiteEnd()
 var Proto =
 {
 
-  name : 'Tools/mid/files/fileProvider/Hub/withExtract',
+  name : 'Tools/mid/files/fileProvider/System/Extract',
   abstract : 0,
   silencing : 1,
   enabled : 1,
@@ -92,7 +92,7 @@ var Proto =
 
   context :
   {
-    provider : _.FileProvider.Hub({ empty : 1 }),
+    provider : _.FileProvider.System({ empty : 1 }),
     providerEffective : null,
     filesTree : filesTree,
     pathFor : pathFor,

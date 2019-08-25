@@ -23,12 +23,13 @@ function onSuiteBegin( test )
 
   context.providerSrc = _.FileProvider.Npm();
   context.providerDst = _.FileProvider.HardDrive();
-  context.hub = _.FileProvider.Hub({ providers : [ context.providerSrc, context.providerDst ] });
+  context.system = _.FileProvider.System({ providers : [ context.providerSrc, context.providerDst ] });
 
   let path = context.providerDst.path;
 
   context.testSuitePath = path.dirTempOpen( 'FileProviderNpm' );
   context.testSuitePath = context.providerDst.pathResolveLinkFull({ filePath : context.testSuitePath, resolvingSoftLink : 1 });
+  context.testSuitePath = context.testSuitePath.absolutePath;
 }
 
 function onSuiteEnd( test )
@@ -48,7 +49,7 @@ function filesReflectTrivial( test )
   let context = this;
   let providerSrc = context.providerSrc;
   let providerDst = context.providerDst;
-  let hub = context.hub;
+  let system = context.system;
   let path = context.providerDst.path;
   let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
   let installPath = path.join( routinePath, 'wPathBasic' );
@@ -56,14 +57,14 @@ function filesReflectTrivial( test )
 
   let con = new _.Consequence().take( null )
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'no hash, no trailing /';
     providerDst.filesDelete( installPath );
     let remotePath = 'npm:///wpathbasic';
-    return hub.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
+    return system.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
   })
-  .thenKeep( ( got ) =>
+  .then( ( got ) =>
   {
     let files = providerDst.dirRead( installPath );
     let expected =
@@ -71,7 +72,6 @@ function filesReflectTrivial( test )
       'LICENSE',
       'package.json',
       'README.md',
-      'out',
       'proto',
       'node_modules',
     ]
@@ -81,14 +81,14 @@ function filesReflectTrivial( test )
 
   /*  */
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'no hash, with trailing /';
     providerDst.filesDelete( installPath );
     let remotePath = 'npm:///wpathbasic/'
-    return hub.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
+    return system.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
   })
-  .thenKeep( ( got ) =>
+  .then( ( got ) =>
   {
     let files = providerDst.dirRead( installPath );
     let expected =
@@ -96,7 +96,6 @@ function filesReflectTrivial( test )
       'LICENSE',
       'package.json',
       'README.md',
-      'out',
       'proto',
       'node_modules',
     ]
@@ -106,16 +105,16 @@ function filesReflectTrivial( test )
 
   /*  */
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'already exists';
     providerDst.filesDelete( installPath );
     let remotePath = 'npm:///wpathbasic';
     let o = { reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 };
-    hub.filesReflect( _.cloneJust( o ) )
-    return hub.filesReflect( _.cloneJust( o ) );
+    system.filesReflect( _.cloneJust( o ) )
+    return system.filesReflect( _.cloneJust( o ) );
   })
-  .thenKeep( ( got ) =>
+  .then( ( got ) =>
   {
     let files = providerDst.dirRead( installPath );
     let expected =
@@ -123,7 +122,6 @@ function filesReflectTrivial( test )
       'LICENSE',
       'package.json',
       'README.md',
-      'out',
       'proto',
       'node_modules',
     ]
@@ -133,14 +131,14 @@ function filesReflectTrivial( test )
 
   /*  */
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'specific version';
     providerDst.filesDelete( installPath );
-    let remotePath = 'npm:///wpathbasic#0.6.154'
-    return hub.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
+    let remotePath = 'npm:///wpathfundamentals#0.6.154'
+    return system.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
   })
-  .thenKeep( ( got ) =>
+  .then( ( got ) =>
   {
     let files = providerDst.dirRead( installPath );
     let expected =
@@ -161,14 +159,14 @@ function filesReflectTrivial( test )
 
   /*  */
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'specific tag';
     providerDst.filesDelete( installPath );
     let remotePath = 'npm:///wpathbasic#latest'
-    return hub.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
+    return system.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
   })
-  .thenKeep( ( got ) =>
+  .then( ( got ) =>
   {
     let files = providerDst.dirRead( installPath );
     let expected =
@@ -176,7 +174,6 @@ function filesReflectTrivial( test )
       'LICENSE',
       'package.json',
       'README.md',
-      'out',
       'proto',
       'node_modules',
     ]
@@ -189,15 +186,15 @@ function filesReflectTrivial( test )
 
   /*  */
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'path is occupied';
     providerDst.filesDelete( installPath );
     providerDst.fileWrite( installPath, installPath );
     let remotePath = 'npm:///wpathbasic';
-    return test.shouldThrowErrorSync( () => hub.filesReflect( { reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 } ));
+    return test.shouldThrowErrorSync( () => system.filesReflect( { reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 } ));
   })
-  .thenKeep( () =>
+  .then( () =>
   {
     test.is( providerDst.isTerminal( installPath ) );
     return null;
@@ -205,14 +202,14 @@ function filesReflectTrivial( test )
 
   /*  */
 
-  .thenKeep( () =>
+  .then( () =>
   {
     test.case = 'wrong package name';
     providerDst.filesDelete( installPath );
     let remotePath = 'npm:///wpathFundamentals';
-    return test.shouldThrowErrorSync( () => hub.filesReflect( { reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 } ) );
+    return test.shouldThrowErrorSync( () => system.filesReflect( { reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 } ) );
   })
-  .thenKeep( () =>
+  .then( () =>
   {
     test.is( !providerDst.fileExists( installPath ) );
     return null;
@@ -238,7 +235,7 @@ filesReflectTrivial.timeOut = 120000;
 
 //   let con = new _.Consequence().take( null )
 
-//   .thenKeep( () =>
+//   .then( () =>
 //   {
 //     test.case = 'localPath';
 //     providerDst.filesDelete( installPath );
@@ -246,11 +243,11 @@ filesReflectTrivial.timeOut = 120000;
 //     return providerSrc.filesReflect
 //     ({
 //       reflectMap : { [ remotePath ] : installPath },
-//       dst : { effectiveFileProvider : providerDst },
+//       dst : { effectiveProvider : providerDst },
 //       verbosity : 3
 //     });
 //   })
-//   .thenKeep( ( got ) =>
+//   .then( ( got ) =>
 //   {
 //     let files = providerDst.dirRead( installPath );
 //     let expected =
@@ -268,7 +265,7 @@ filesReflectTrivial.timeOut = 120000;
 
 //   /*  */
 
-//   .thenKeep( () =>
+//   .then( () =>
 //   {
 //     test.case = 'localPath with hash';
 //     providerDst.filesDelete( installPath );
@@ -276,11 +273,11 @@ filesReflectTrivial.timeOut = 120000;
 //     return providerSrc.filesReflect
 //     ({
 //       reflectMap : { [ remotePath ] : installPath },
-//       dst : { effectiveFileProvider : providerDst },
+//       dst : { effectiveProvider : providerDst },
 //       verbosity : 3
 //     });
 //   })
-//   .thenKeep( ( got ) =>
+//   .then( ( got ) =>
 //   {
 //     let files = providerDst.dirRead( installPath );
 //     let expected =
@@ -301,7 +298,7 @@ filesReflectTrivial.timeOut = 120000;
 
 //   /*  */
 
-//   .thenKeep( () =>
+//   .then( () =>
 //   {
 //     test.case = 'localPath with trailing slash and hash';
 //     providerDst.filesDelete( installPath );
@@ -309,11 +306,11 @@ filesReflectTrivial.timeOut = 120000;
 //     return providerSrc.filesReflect
 //     ({
 //       reflectMap : { [ remotePath ] : installPath },
-//       dst : { effectiveFileProvider : providerDst },
+//       dst : { effectiveProvider : providerDst },
 //       verbosity : 3
 //     });
 //   })
-//   .thenKeep( ( got ) =>
+//   .then( ( got ) =>
 //   {
 //     let files = providerDst.dirRead( installPath );
 //     let expected =
@@ -331,7 +328,7 @@ filesReflectTrivial.timeOut = 120000;
 
 //   /*  */
 
-//   .thenKeep( () =>
+//   .then( () =>
 //   {
 //     test.case = 'rewrite existing';
 //     providerDst.filesDelete( installPath );
@@ -339,14 +336,14 @@ filesReflectTrivial.timeOut = 120000;
 //     let o =
 //     {
 //       reflectMap : { [ remotePath ] : installPath },
-//       dst : { effectiveFileProvider : providerDst },
+//       dst : { effectiveProvider : providerDst },
 //       verbosity : 3
 //     }
 //     let con = providerSrc.filesReflect( _.mapExtend( null, o ) );
-//     con.thenKeep( () => providerSrc.filesReflect( _.mapExtend( null, o ) ) );
+//     con.then( () => providerSrc.filesReflect( _.mapExtend( null, o ) ) );
 //     return con;
 //   })
-//   .thenKeep( ( got ) =>
+//   .then( ( got ) =>
 //   {
 //     let files = providerDst.dirRead( installPath );
 //     let expected =
@@ -364,7 +361,7 @@ filesReflectTrivial.timeOut = 120000;
 
 //   /*  */
 
-//   .thenKeep( () =>
+//   .then( () =>
 //   {
 //     test.case = 'githubname/reponame';
 //     providerDst.filesDelete( installPath );
@@ -372,11 +369,11 @@ filesReflectTrivial.timeOut = 120000;
 //     return providerSrc.filesReflect
 //     ({
 //       reflectMap : { [ remotePath ] : installPath },
-//       dst : { effectiveFileProvider : providerDst },
+//       dst : { effectiveProvider : providerDst },
 //       verbosity : 3
 //     });
 //   })
-//   .thenKeep( ( got ) =>
+//   .then( ( got ) =>
 //   {
 //     let files = providerDst.dirRead( installPath );
 //     let expected =
@@ -397,7 +394,7 @@ filesReflectTrivial.timeOut = 120000;
 
 //   /*  */
 
-//   .thenKeep( () =>
+//   .then( () =>
 //   {
 //     test.case = 'path is occupied by terminal';
 //     providerDst.filesDelete( installPath );
@@ -406,13 +403,13 @@ filesReflectTrivial.timeOut = 120000;
 //     let o =
 //     {
 //       reflectMap : { [ remotePath ] : installPath },
-//       dst : { effectiveFileProvider : providerDst },
+//       dst : { effectiveProvider : providerDst },
 //       verbosity : 3
 //     }
 //     let con = providerSrc.filesReflect( o );
 //     return test.shouldThrowErrorAsync( con );
 //   })
-//   .thenKeep( ( got ) =>
+//   .then( ( got ) =>
 //   {
 //     test.is( providerDst.isTerminal( installPath ) );
 //     return got;
@@ -446,7 +443,7 @@ var Proto =
     testSuitePath : null,
     providerSrc : null,
     providerDst : null,
-    hub : null
+    system : null
   },
 
   tests :

@@ -1,6 +1,6 @@
-( function _FileProvider_Hub_Extract_test_s_( ) {
+( function _System_Extract_test_s_( ) {
 
-'use strict';  
+'use strict';
 
 if( typeof module !== 'undefined' )
 {
@@ -56,7 +56,7 @@ function onSuiteBegin()
   self.providerEffective = _.FileProvider.Extract
   ({
     filesTree : filesTree,
-    protocols : [ 'current' ],
+    protocols : [ 'current', 'second' ],
     usingExtraStat : 1
   });
   self.provider.providerRegister( self.providerEffective );
@@ -68,8 +68,15 @@ function onSuiteBegin()
   // self.provider.defaultProtocol = self.providerEffective.protocol;
 }
 
+function onRoutineEnd( test )
+{
+  let context = this;
+  let provider = context.provider;
+  _.sure( _.arraySetIdentical( _.mapKeys( provider.providersWithProtocolMap ), [ 'second', 'current' ] ), test.name, 'has not restored system!' );
+}
+
 function onSuiteEnd()
-{ 
+{
   let self = this;
   self.providerEffective.finit();
   self.provider.finit();
@@ -82,17 +89,18 @@ function onSuiteEnd()
 var Proto =
 {
 
-  name : 'Tools/mid/files/fileProvider/Hub/withExtract',
+  name : 'Tools/mid/files/fileProvider/System/Extract',
   abstract : 0,
   silencing : 1,
   enabled : 1,
 
   onSuiteBegin,
   onSuiteEnd,
+  onRoutineEnd,
 
   context :
   {
-    provider : _.FileProvider.Hub({ empty : 1 }),
+    provider : _.FileProvider.System({ empty : 1 }),
     providerEffective : null,
     filesTree : filesTree,
     pathFor : pathFor,

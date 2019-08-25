@@ -1,8 +1,8 @@
-( function _FileProvider_Hub_copy_test_ss_( ) {
+( function _System_copy_test_ss_( ) {
 
 'use strict';
 
-// !!! disabled because Provider.Hub is in implementation phase
+// !!! disabled because Provider.System is in implementation phase
 
 if( typeof module !== 'undefined' )
 {
@@ -42,8 +42,8 @@ function copy( test )
   var hardDrive = _.FileProvider.HardDrive();
   var simpleStructure = _.FileProvider.Extract({ filesTree : Object.create( null ) });
 
-  self.hub.providerRegister( hardDrive );
-  self.hub.providerRegister( simpleStructure );
+  self.system.providerRegister( hardDrive );
+  self.system.providerRegister( simpleStructure );
 
   var hdUrl = hardDrive.path.globalFromPreferred( _.path.normalize( __dirname ) );
   var hdUrlDst = hardDrive.path.globalFromPreferred( _.path.join( self.testSuitePath, test.name + '_copy' ) );
@@ -54,13 +54,13 @@ function copy( test )
 
   test.case = 'copy files hd -> hd';
   _.assert( _.strHas( hdUrlDst, 'tmp.tmp' ) );
-  self.hub.filesDelete( hdUrlDst );
-  self.hub.filesCopyOld
+  self.system.filesDelete( hdUrlDst );
+  self.system.filesCopyOld
   ({
     src : hdUrl,
     dst : hdUrlDst
   });
-  var expected = self.hub.filesFind
+  var expected = self.system.filesFind
   ({
     filePath : hdUrl,
     outputFormat : 'relative',
@@ -70,7 +70,7 @@ function copy( test )
     includingTerminals : 1,
     includingStem : 0
   });
-  var got = self.hub.filesFind
+  var got = self.system.filesFind
   ({
     filePath : hdUrlDst,
     outputFormat : 'relative',
@@ -87,13 +87,13 @@ function copy( test )
 
   test.case = 'copy files hardDrive -> simpleStructure';
   _.assert( _.strHas( hdUrlDst, 'tmp.tmp' ) );
-  self.hub.filesDelete( hdUrlDst );
-  self.hub.filesCopyOld
+  self.system.filesDelete( hdUrlDst );
+  self.system.filesCopyOld
   ({
     src : hdUrl,
     dst : ssUrl
   });
-  var expected = self.hub.filesFind
+  var expected = self.system.filesFind
   ({
     filePath : hdUrl,
     outputFormat : 'relative',
@@ -103,7 +103,7 @@ function copy( test )
     includingTerminals : 1,
     includingStem : 0
   });
-  var got = self.hub.filesFind
+  var got = self.system.filesFind
   ({
     filePath : ssUrl,
     outputFormat : 'relative',
@@ -118,12 +118,12 @@ function copy( test )
   //
 
   test.case = 'copy files simpleStructure -> simpleStructure';
-  self.hub.filesCopyOld
+  self.system.filesCopyOld
   ({
     src : ssUrl,
     dst : ssUrlDst
   });
-  var expected = self.hub.filesFind
+  var expected = self.system.filesFind
   ({
     filePath : ssUrl,
     outputFormat : 'relative',
@@ -133,7 +133,7 @@ function copy( test )
     includingTerminals : 1,
     includingStem : 0
   });
-  var got = self.hub.filesFind
+  var got = self.system.filesFind
   ({
     filePath : ssUrlDst,
     outputFormat : 'relative',
@@ -149,14 +149,14 @@ function copy( test )
 
   test.case = 'copy files simpleStructure -> hardDrive';
   _.assert( _.strHas( hdUrlDst, 'tmp.tmp' ) );
-  self.hub.filesDelete( hdUrlDst );
+  self.system.filesDelete( hdUrlDst );
 
-  self.hub.filesCopyOld
+  self.system.filesCopyOld
   ({
     src : ssUrlDst,
     dst : hdUrlDst
   });
-  var expected = self.hub.filesFind
+  var expected = self.system.filesFind
   ({
     filePath : ssUrl,
     outputFormat : 'relative',
@@ -166,7 +166,7 @@ function copy( test )
     includingTerminals : 1,
     includingStem : 0
   });
-  var got = self.hub.filesFind
+  var got = self.system.filesFind
   ({
     filePath : hdUrlDst,
     outputFormat : 'relative',
@@ -187,7 +187,7 @@ function copy( test )
 var Proto =
 {
 
-  name : 'Tools/mid/files/fileProvider/Hub/copy',
+  name : 'Tools/mid/files/fileProvider/System/copy',
   abstract : 0,
   silencing : 1,
   enabled : 0,
@@ -197,7 +197,7 @@ var Proto =
 
   context :
   {
-    hub : _.FileProvider.Hub({ empty : 1 }),
+    system : _.FileProvider.System({ empty : 1 }),
     testSuitePath : null,
   },
 

@@ -1,4 +1,4 @@
-( function _Hub_s_() {
+( function _System_s_() {
 
 'use strict';
 
@@ -14,7 +14,7 @@ if( typeof module !== 'undefined' )
 
 /**
  @classdesc Class that allows file manipulations between different file providers using global paths.
- @class wFileProviderHub
+ @class wFileSystem
  @memberof module:Tools/mid/Files.wTools.FileProvider
 */
 
@@ -23,12 +23,12 @@ let _ = _global_.wTools;
 let Routines = Object.create( null );
 let FileRecord = _.FileRecord;
 let Parent = _.FileProvider.Partial;
-let Self = function wFileProviderHub( o )
+let Self = function wFileSystem( o )
 {
   return _.workpiece.construct( Self, this, arguments );
 }
 
-Self.shortName = 'Hub';
+Self.shortName = 'System';
 
 _.assert( _.routineIs( _.uri.join ) );
 _.assert( _.routineIs( _.uri.normalize ) );
@@ -75,7 +75,7 @@ function init( o )
  @description Sets default provider to `null` if no argument provided.
  @param {Object} [provider] Provider to set as default.
  @function providerDefaultSet
- @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHub#
+ @memberof module:Tools/mid/Files.wTools.FileProvider.wFileSystem#
 */
 
 function providerDefaultSet( provider )
@@ -108,10 +108,10 @@ function providerDefaultSet( provider )
 }
 
 /**
- @summary Short-cut for {@link module:Tools/mid/Files.wTools.FileProvider.wFileProviderHub.providerRegister}. Registers several file providers.
+ @summary Short-cut for {@link module:Tools/mid/Files.wTools.FileProvider.wFileSystem.providerRegister}. Registers several file providers.
  @param {Object|Object[]} fileProvider Provider(s) to register.
  @function providerRegister
- @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHub#
+ @memberof module:Tools/mid/Files.wTools.FileProvider.wFileSystem#
 */
 
 //
@@ -139,7 +139,7 @@ function providersRegister( src )
  @description Provider should have protocol and origin path defined.
  @param {Object} fileProvider Provider to register.
  @function providerRegister
- @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHub#
+ @memberof module:Tools/mid/Files.wTools.FileProvider.wFileSystem#
 */
 
 function providerRegister( fileProvider ) // xxx
@@ -166,8 +166,8 @@ function providerRegister( fileProvider ) // xxx
     protocolMap[ protocol ] = fileProvider;
   }
 
-  _.assert( !fileProvider.hub || fileProvider.hub === self, () => 'File provider ' + fileProvider.nickName + ' already has a hub ' + fileProvider.hub.nickName );
-  fileProvider.hub = self;
+  _.assert( !fileProvider.system || fileProvider.system === self, () => 'File provider ' + fileProvider.nickName + ' already has a system ' + fileProvider.system.nickName );
+  fileProvider.system = self;
 
   return self;
 }
@@ -176,10 +176,10 @@ function providerRegister( fileProvider ) // xxx
 
 /**
  @summary Removes provider from the inner registry.
- @description Provider must be registered in current hub.
+ @description Provider must be registered in current system.
  @param {Object} fileProvider Provider to unregister.
  @function providerUnregister
- @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHub#
+ @memberof module:Tools/mid/Files.wTools.FileProvider.wFileSystem#
 */
 
 function providerUnregister( fileProvider )
@@ -189,10 +189,10 @@ function providerUnregister( fileProvider )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( fileProvider instanceof _.FileProvider.Abstract );
   _.assert( self.providersWithProtocolMap[ fileProvider.protocol ] === fileProvider );
-  _.assert( fileProvider.hub === self );
+  _.assert( fileProvider.system === self );
 
   delete self.providersWithProtocolMap[ fileProvider.protocol ];
-  fileProvider.hub = null;
+  fileProvider.system = null;
 
   return self;
 }
@@ -201,10 +201,10 @@ function providerUnregister( fileProvider )
 
 /**
  @summary Selects file provider for specified global path.
- @description Returns default file provider if hub doesn't have provider for specified path.
+ @description Returns default file provider if system doesn't have provider for specified path.
  @param {String} url Source url.
  @function providerForPath
- @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHub#
+ @memberof module:Tools/mid/Files.wTools.FileProvider.wFileSystem#
 */
 
 function providerForPath( url )
@@ -265,10 +265,10 @@ function protocolNameGenerate( skip )
 //
 
 /**
- @summary Returns true if current hub has specified file `provider` in the registry.
+ @summary Returns true if current system has specified file `provider` in the registry.
  @param {Object} provider File provider to check.
  @function hasProvider
- @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHub#
+ @memberof module:Tools/mid/Files.wTools.FileProvider.wFileSystem#
 */
 
 function hasProvider( provider )
@@ -288,7 +288,7 @@ function _recordFactoryFormEnd( recordFactory )
 
   _.assert( recordFactory instanceof _.FileRecordFactory );
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( recordFactory.effectiveFileProvider instanceof _.FileProvider.Abstract, 'No provider for base path', recordFactory.basePath, 'found' );
+  _.assert( recordFactory.effectiveProvider instanceof _.FileProvider.Abstract, 'No provider for base path', recordFactory.basePath, 'found' );
   // _.assert( !_.path.isGlobal( recordFactory.basePath ) );
   // _.assert( recordFactory.stemPath === null || !_.path.isGlobal( recordFactory.stemPath ) );
 
@@ -391,7 +391,7 @@ function fieldPop()
  @summary Converts global path `filePath` to local.
  @param {String} filePath Global path.
  @function preferredFromGlobalAct
- @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHub#
+ @memberof module:Tools/mid/Files.wTools.FileProvider.wFileSystem#
 */
 
 function preferredFromGlobalAct( filePath )
@@ -412,33 +412,6 @@ function _pathLocalize( filePath )
   _.sure( _.objectIs( r.provider ), () => 'No provider for path ' + _.strQuote( filePath ) );
 
   return r;
-
-  // let self = this;
-  // let path = self.path;
-  // let r = Object.create( null );
-  // r.originalPath = filePath;
-  // r.provider = self;
-  //
-  // _.assert( _.strIs( filePath ), 'Expects string' );
-  // _.assert( arguments.length === 1 );
-  //
-  // r.parsedPath = r.originalPath;
-  // if( _.strIs( filePath ) )
-  // r.parsedPath = path.parse( path.normalize( r.parsedPath ) );
-  //
-  // if( !r.provider )
-  // {
-  //   _.assert( _.arrayIs( r.parsedPath.protocols ) );
-  //   r.provider = self.providerForPath( r.parsedPath );
-  // }
-  //
-  // _.assert( _.objectIs( r.provider ), () => 'No provider for path ' + _.strQuote( filePath ) );
-  //
-  // r.localPath = r.provider.path.preferredFromGlobal( r.parsedPath );
-  //
-  // _.assert( _.strIs( r.localPath ) );
-  //
-  // return r;
 }
 
 //
@@ -449,22 +422,35 @@ function _pathLocalizeMaybe( filePath )
   let path = self.path;
   let r = Object.create( null );
   r.originalPath = filePath;
-  // r.provider = self;
+  r.parsedPath = r.originalPath;
 
   _.assert( _.strIs( filePath ), 'Expects string' );
   _.assert( arguments.length === 1 );
 
-  r.parsedPath = r.originalPath;
-  if( _.strIs( filePath ) )
+  self._pathRelocalize( r, null );
+
+  return r;
+}
+
+//
+
+function _pathRelocalize( r, provider )
+{
+  let self = this;
+  let path = self.path;
+
+  _.assert( _.strIs( r.originalPath ), 'Expects string' );
+  _.assert( _.strIs( r.parsedPath ) || _.mapIs( r.parsedPath ), 'Expects map or string parsedPath' );
+  _.assert( arguments.length === 2 );
+
+  if( _.strIs( r.parsedPath ) )
   r.parsedPath = path.parse( path.normalize( r.parsedPath ) );
 
   if( !r.provider )
-  {
-    _.assert( _.arrayIs( r.parsedPath.protocols ) );
-    r.provider = self.providerForPath( r.parsedPath );
-  }
-
-  // _.assert( _.objectIs( r.provider ), () => 'No provider for path ' + _.strQuote( filePath ) );
+  if( provider )
+  r.provider = provider;
+  if( !r.provider )
+  r.provider = self.providerForPath( r.parsedPath );
 
   if( r.provider )
   r.localPath = r.provider.path.preferredFromGlobal( r.parsedPath );
@@ -494,7 +480,7 @@ function pathNativizeAct( filePath )
  @summary Returns current working directory of default provider.
  @description Changes current working directory if new path is provided.
  @function pathCurrentAct
- @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHub#
+ @memberof module:Tools/mid/Files.wTools.FileProvider.wFileSystem#
 */
 
 function pathCurrentAct()
@@ -504,7 +490,7 @@ function pathCurrentAct()
   if( self.defaultProvider )
   return self.defaultProvider.path.current.apply( self.defaultProvider.path, arguments );
 
-  _.assert( 0, 'Default provider is not set for the Hub', self.nickName );
+  _.assert( 0, 'Default provider is not set for the System', self.nickName );
 }
 
 //
@@ -750,22 +736,32 @@ function _link_functor( fop )
 
     /* */
 
-    op.relativeDst = self._pathLocalize( op.options.relativeDstPath );
-    if( allowingMissedSrc )
+    // op.relativeDst = self._pathLocalize( op.options.relativeDstPath );
+    // if( allowingMissedSrc )
+    // op.relativeSrc = self._pathLocalizeMaybe( op.options.relativeSrcPath );
+    // else
+    // op.relativeSrc = self._pathLocalize( op.options.relativeSrcPath );
+
+    op.relativeDst = self._pathLocalizeMaybe( op.options.relativeDstPath );
     op.relativeSrc = self._pathLocalizeMaybe( op.options.relativeSrcPath );
-    else
-    op.relativeSrc = self._pathLocalize( op.options.relativeSrcPath );
+
+    if( !op.relativeSrc.provider && op.relativeDst.provider )
+    self._pathRelocalize( op.relativeSrc, op.relativeDst.provider );
+    if( op.relativeSrc.provider && !op.relativeDst.provider )
+    self._pathRelocalize( op.relativeDst, op.relativeSrc.provider );
 
     _.assert( !!op.relativeDst.provider, 'No provider for path', op.options.relativeDstPath );
     _.assert( allowingMissedSrc || !!op.relativeSrc.provider, 'No provider for path', op.options.relativeSrcPath );
 
     /* */
 
-    op.dst = self._pathLocalize( op.options.dstPath );
-    if( allowingMissedSrc )
+    op.dst = self._pathLocalizeMaybe( op.options.dstPath );
     op.src = self._pathLocalizeMaybe( op.options.srcPath );
-    else
-    op.src = self._pathLocalize( op.options.srcPath );
+
+    if( !op.src.provider && op.dst.provider )
+    self._pathRelocalize( op.src, op.dst.provider );
+    if( op.src.provider && !op.dst.provider )
+    self._pathRelocalize( op.dst, op.src.provider );
 
     _.assert( !!op.dst.provider, 'No provider for path', op.options.dstPath );
     _.assert( allowingMissedSrc || !!op.src.provider, 'No provider for path', op.options.srcPath );
@@ -773,9 +769,13 @@ function _link_functor( fop )
     /* */
 
     op.options.dstPath = op.dst.localPath;
+    op.options.relativeDstPath = op.relativeDst.localPath;
 
     if( op.dst.provider !== op.src.provider )
     {
+      op.options.relativeDstPath = op.options.dstPath;
+      op.options.relativeSrcPath = op.options.srcPath;
+
       if( onDifferentProviders )
       {
         onDifferentProviders.call( self, op );
@@ -790,6 +790,7 @@ function _link_functor( fop )
     else
     {
       op.options.srcPath = op.src.localPath;
+      op.options.relativeSrcPath = op.relativeSrc.localPath;
     }
 
     op.result = op.dst.provider[ routineName ]( op.options );
@@ -831,25 +832,36 @@ function _fileCopyActDifferent( op )
   let path = self.path;
   let o = op.options;
 
+  if( op.src.provider.isTextLink( op.src.localPath ) )
+  {
+    _.assert( 0, 'Expects terminal file, not text link' );
+  }
+
   if( op.src.provider.isSoftLink( op.src.localPath ) )
   {
-    let resolvedPath = op.src.provider.pathResolveSoftLink( op.src.localPath );
-    debugger;
-    c.result = op.dst.provider.softLink
-    ({
-      dstPath : op.dst.localPath,
-      srcPath : path.join( op.src.parsedPath.origin, resolvedPath ),
-      sync : o.sync,
-      allowingMissed : 1,
-    });
-    return op.end();
+    _.assert( 0, 'Expects terminal file, not soft link' );
+    // let resolvedPath = op.src.provider.pathResolveSoftLink( op.src.localPath );
+    // debugger;
+    // c.result = op.dst.provider.softLink
+    // ({
+    //   dstPath : op.dst.localPath,
+    //   srcPath : path.join( op.src.parsedPath.origin, resolvedPath ),
+    //   sync : o.sync,
+    //   allowingMissed : 1,
+    // });
+    // return op.end();
   }
+
+  /*
+    for extract resolving should be on
+    otherwise extract does not resolve intermediate directories
+  */
 
   let read = op.src.provider.fileRead
   ({
     filePath : op.src.localPath,
-    resolvingTextLink : 0,
-    resolvingSoftLink : 0,
+    resolvingTextLink : 1,
+    resolvingSoftLink : 1,
     encoding : 'original.type',
     sync : o.sync,
   });
@@ -862,7 +874,7 @@ function _fileCopyActDifferent( op )
     encoding : 'original.type',
   });
   else
-  op.result = read.thenKeep( ( read ) =>
+  op.result = read.then( ( read ) =>
   {
     return op.dst.provider.fileWrite
     ({
@@ -1139,7 +1151,7 @@ function routinesGenerate()
 
     let _routine =
     {
-      [ r + 'Hub' ] : function( o )
+      [ r + 'System' ] : function( o )
       {
         let self = this;
 
@@ -1175,7 +1187,7 @@ function routinesGenerate()
       }
     }
 
-    let wrap = Routines[ r ] = _routine[ r + 'Hub' ];
+    let wrap = Routines[ r ] = _routine[ r + 'System' ];
     _.routineExtend( wrap, original );
 
   })();
@@ -1241,7 +1253,7 @@ let defaultOriginSymbol = Symbol.for( 'defaultOrigin' );
  * @property {Object} providersWithProtocolMap={}
  * @property {Object} defaultProvider
  * @property {Boolean} safe=0
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHub
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileSystem
 */
 
 /**
@@ -1249,7 +1261,7 @@ let defaultOriginSymbol = Symbol.for( 'defaultOrigin' );
  * @property {Boolean} empty=0
  * @property {Object[]} providers
  * @property {String} defaultOrigin
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHub
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileSystem
 */
 
 let Composes =
@@ -1336,6 +1348,7 @@ let Proto =
   preferredFromGlobalAct,
   _pathLocalize,
   _pathLocalizeMaybe,
+  _pathRelocalize,
 
   pathCurrentAct,
 

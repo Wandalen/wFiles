@@ -4522,7 +4522,9 @@ function masksGenerate()
   _.assert( filter.formedFilterMap === null );
   filter.formedFilterMap = Object.create( null );
 
+  debugger;
   let _processed = path.pathMapToRegexps( filePath2, basePath2  );
+  debugger;
 
   // filter.formedBasePath = _processed.unglobedBasePath;
   // filter.formedFilePath = _processed.unglobedFilePath;

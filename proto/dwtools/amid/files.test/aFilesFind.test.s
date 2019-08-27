@@ -10008,6 +10008,19 @@ function filesFindGlobComplex( test )
 
   test.close( '/ after **' );
 
+/*
+xxx : add
+
+filter.toStr()
+"Filter
+  filePath :
+{ "/dir/with space" : ``, "/**(.im|.ex|).will.*" : true }
+  basePath :
+{
+  "/dir/with space" : `/dir/with space`
+}"
+*/
+
 } /* end of filesFindGlobComplex */
 
 //

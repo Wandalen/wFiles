@@ -265,7 +265,7 @@ function _formPaths()
 {
   let filter = this;
 
-  if( filter.formed === 3 )
+  if( filter.formed > 2 )
   return;
   if( filter.formed < 2 )
   filter._formPre();
@@ -406,6 +406,9 @@ function _formFinal()
   }
 
   /* - */
+
+  if( filter.recursive === null )
+  filter.recursive = 2;
 
   filter.applyTo = filter._applyToRecordNothing;
 
@@ -1952,6 +1955,12 @@ function basePathSet( src )
   let filter = this;
   let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
 
+  _.assert
+  (
+    src === null || _.strIs( src ) || _.mapIs( src ),
+    () => 'Base path can be null, string or map, but not ' + _.strType( src )
+  )
+
   if( 0 )
   if( Config.debug )
   if( src && fileProvider )
@@ -2281,12 +2290,14 @@ function basePathSimplest( basePath )
   if( !basePath || _.strIs( basePath ) )
   return basePath;
 
-  basePath = _.arrayAppendArrayOnce( [], _.mapVals( basePath ) );
+  let vals = _.arrayAppendArrayOnce( [], _.mapVals( basePath ) );
 
-  if( basePath.length !== 1 )
+  if( vals.length !== 1 )
   return basePath;
+  else if( vals.length === 0 )
+  return null;
 
-  basePath = basePath[ 0 ];
+  basePath = vals[ 0 ];
 
   return basePath;
 }
@@ -4655,8 +4666,8 @@ function _applyToRecordMasks( record )
   _.assert( !!masks, 'Cant resolve filter map for stem path', () => _.strQuote( f.stemPath ) );
   _.assert( !!f.formed, 'Record factor was not formed!' );
 
-  if( _.strEnds( record.absolute, 'ter' ) )
-  debugger;
+  // if( _.strEnds( record.absolute, 'ter' ) )
+  // debugger;
   // if( _.strEnds( record.absolute, 'proto' ) )
   // debugger;
   // if( _.strEnds( record.absolute, 'proto/f.js' ) )
@@ -4971,7 +4982,7 @@ let Extend =
   basePathMapLocalize,
   basePathFromDecoratedFilePath,
   basePathNormalize,
-  basePathSimplest,
+  basePathSimplest, /* qqq : cover routine basePathSimplest */
   basePathDotUnwrap,
   basePathEach, /* qqq : cover routine basePathEach */
   basePathUse,

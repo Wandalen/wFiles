@@ -399,7 +399,7 @@ function readWriteSync( test )
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   {
     test.is( _.bufferBytesIs( got ) )
-    test.identical( got, _.bufferBytesFrom( Buffer.from( testData ) ) );
+    test.identical( got, _.bufferBytesFrom( BufferNode.from( testData ) ) );
   }
   else
   {
@@ -1158,7 +1158,7 @@ function readWriteSync( test )
     test.case = 'fileWrite, data is raw buffer';
     provider.filesDelete( routinePath );
     testData = 'Lorem ipsum dolor sit amet';
-    var buffer = _.bufferRawFrom( Buffer.from( testData ) );
+    var buffer = _.bufferRawFrom( BufferNode.from( testData ) );
     filePath = test.context.pathFor( 'written/readWriteSync/file' );
 
     /**/
@@ -1176,7 +1176,7 @@ function readWriteSync( test )
     if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
     {
       test.case = 'typed buffer'
-      buffer = new Uint16Array( buffer );
+      buffer = new U16x( buffer );
       provider.fileWrite( filePath,buffer );
       got = provider.fileRead
       ({
@@ -1186,7 +1186,7 @@ function readWriteSync( test )
       test.identical( got, testData );
 
       test.case = 'node buffer'
-      buffer = Buffer.from( testData );
+      buffer = BufferNode.from( testData );
       provider.fileWrite( filePath,buffer );
       got = provider.fileRead
       ({
@@ -1207,7 +1207,7 @@ function readWriteSync( test )
         ({
            filePath : linkPath,
            writeMode : 'prepend',
-           data : Buffer.from( data )
+           data : BufferNode.from( data )
         });
         var got = provider.fileRead( filePath );
         test.identical( got, data );
@@ -1225,7 +1225,7 @@ function readWriteSync( test )
         ({
            filePath : linkPath,
            writeMode : 'prepend',
-           data : Buffer.from( data ),
+           data : BufferNode.from( data ),
            encoding : 'original.type'
         });
         var got = provider.fileRead( filePath );
@@ -1706,7 +1706,7 @@ function readWriteAsync( test )
       if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
       {
         test.is( _.bufferBytesIs( got ) )
-        test.identical( got, _.bufferBytesFrom( Buffer.from( testData ) ) );
+        test.identical( got, _.bufferBytesFrom( BufferNode.from( testData ) ) );
       }
       else
       {
@@ -2606,7 +2606,7 @@ function readWriteAsync( test )
       test.case = 'fileWrite, data is raw buffer';
       provider.filesDelete( routinePath );
       testData = 'Lorem ipsum dolor sit amet';
-      buffer = _.bufferRawFrom( Buffer.from( testData ) );
+      buffer = _.bufferRawFrom( BufferNode.from( testData ) );
       filePath = test.context.pathFor( 'written/readWriteAsync/file' );
       return null;
     })
@@ -2701,9 +2701,9 @@ function fileReadJson( test )
   var bufferData1;
 
   if( Config.platform === 'browser' || self.providerIsInstanceOf( _.FileProvider.Extract ))
-  bufferData1 = new ArrayBuffer( 4 );
+  bufferData1 = new BufferRaw( 4 );
   else
-  bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] );
+  bufferData1 = BufferNode.from( [ 0x01, 0x02, 0x03, 0x04 ] );
 
 
   var dataToJSON1 = [ 1, 'a', { b : 34 } ];
@@ -2910,7 +2910,7 @@ function fileReadWithEncoding( test )
     number : 1,
     array : [ 1, 'string' ],
     date : new Date( Date.UTC( 2018,1,1 ) ),
-    buffer : new Uint16Array([ 1,2,3 ]),
+    buffer : new U16x([ 1,2,3 ]),
     map : { string : 'string', number : 1, array : [ 'string', 1 ] }
   }`;
   var expected =
@@ -2919,7 +2919,7 @@ function fileReadWithEncoding( test )
     number : 1,
     array : [ 1, 'string' ],
     date : new Date( Date.UTC( 2018,1,1 ) ),
-    buffer : new Uint16Array([ 1,2,3 ]),
+    buffer : new U16x([ 1,2,3 ]),
     map : { string : 'string', number : 1, array : [ 'string', 1 ] }
   }
   provider.filesDelete( filePath );
@@ -3034,7 +3034,7 @@ function fileWriteWithEncoding( test )
     number : 1,
     array : [ 1, 'string' ],
     date : new Date(),
-    buffer : new Uint16Array([ 1,2,3 ]),
+    buffer : new U16x([ 1,2,3 ]),
     map : { string : 'string', number : 1, array : [ 'string', 1 ] }
   }
   provider.filesDelete( filePath );
@@ -3080,7 +3080,7 @@ function fileWriteWithEncoding( test )
     number : 1,
     array : [ 1, 'string' ],
     date : new Date( Date.UTC( 2018,1,1 ) ),
-    buffer : new Uint16Array([ 1,2,3 ]),
+    buffer : new U16x([ 1,2,3 ]),
     map : { string : 'string', number : 1, array : [ 'string', 1 ] }
   }
   var expected  =
@@ -3105,7 +3105,7 @@ function fileWriteWithEncoding( test )
   var got = provider.fileRead( filePath );
   test.identical( got, src );
 
-  var src = new Uint8Array([ 99,100,101 ]);
+  var src = new U8x([ 99,100,101 ]);
   provider.filesDelete( filePath );
   provider.fileWrite({ filePath, data : src, encoding : 'original.type' })
   var got = provider.fileRead({ filePath, encoding : 'buffer.bytes' });
@@ -3120,7 +3120,7 @@ function fileWriteWithEncoding( test )
     test.identical( got, src );
   }
 
-  var src = new ArrayBuffer( 3 );
+  var src = new BufferRaw( 3 );
   provider.filesDelete( filePath );
   provider.fileWrite({ filePath, data : src, encoding : 'original.type' })
   var got = provider.fileRead({ filePath, encoding : 'buffer.raw' });
@@ -3135,7 +3135,7 @@ function fileWriteWithEncoding( test )
   var got = provider.fileRead( filePath );
   test.identical( got, src + src );
 
-  var src = new Uint8Array([ 99,100,101 ]);
+  var src = new U8x([ 99,100,101 ]);
   provider.filesDelete( filePath );
   provider.fileWrite({ filePath, data : src });
   provider.fileWrite({ filePath, data : src, writeMode : 'append', encoding : 'original.type' })
@@ -3152,7 +3152,7 @@ function fileWriteWithEncoding( test )
     test.identical( got, _.bufferJoin( src,src ) );
   }
 
-  var src = new ArrayBuffer( 3 );
+  var src = new BufferRaw( 3 );
   provider.filesDelete( filePath );
   provider.fileWrite({ filePath, data : src });
   provider.fileWrite({ filePath, data : src, writeMode : 'append', encoding : 'original.type' })
@@ -3168,7 +3168,7 @@ function fileWriteWithEncoding( test )
   var got = provider.fileRead( filePath );
   test.identical( got, src + src );
 
-  var src = new Uint8Array([ 99,100,101 ]);
+  var src = new U8x([ 99,100,101 ]);
   provider.filesDelete( filePath );
   provider.fileWrite({ filePath, data : src });
   provider.fileWrite({ filePath, data : src, writeMode : 'prepend', encoding : 'original.type' })
@@ -3185,7 +3185,7 @@ function fileWriteWithEncoding( test )
     test.identical( got, _.bufferJoin( src,src ) );
   }
 
-  var src = new ArrayBuffer( 3 );
+  var src = new BufferRaw( 3 );
   provider.filesDelete( filePath );
   provider.fileWrite({ filePath, data : src });
   provider.fileWrite({ filePath, data : src, writeMode : 'prepend', encoding : 'original.type' })
@@ -14450,7 +14450,7 @@ function fileDeleteLocked( test )
   provider.fileDelete( routinePath );
   test.is( !provider.fileExists( routinePath ) );
   test.will = 'file is still available through fd';
-  var buffer = Buffer.alloc( 50 );
+  var buffer = BufferNode.alloc( 50 );
   fs.readSync( fd, buffer, 0, buffer.byteLength );
   var got =  buffer.toString();
   test.is( got.length )
@@ -17576,7 +17576,7 @@ function fileWriteSync( test )
   test.identical( got, expected );
 
   test.case = 'encoding : original.type, data: bytes buffer';
-  data = new Uint8Array( [ 97,98,99 ] );
+  data = new U8x( [ 97,98,99 ] );
   provider.fileWrite
   ({
     filePath : test.context.pathFor( 'write_test/dst.txt' ),
@@ -17596,7 +17596,7 @@ function fileWriteSync( test )
   test.identical( got, expected );
 
   test.case = 'encoding : original.type, data: array buffer';
-  data = new Uint8Array( [ 97,98,99 ] ).buffer;
+  data = new U8x( [ 97,98,99 ] ).buffer;
   provider.fileWrite
   ({
     filePath : test.context.pathFor( 'write_test/dst.txt' ),
@@ -17618,7 +17618,7 @@ function fileWriteSync( test )
   if( isHd )
   {
     test.case = 'encoding : original.type, data: node buffer';
-    data = Buffer.from( [ 97,98,99 ] );
+    data = BufferNode.from( [ 97,98,99 ] );
     provider.fileWrite
     ({
       filePath : test.context.pathFor( 'write_test/dst.txt' ),
@@ -21438,12 +21438,12 @@ function fileReadAsync( test )
 
   function encode( src, encoding )
   {
-    return Buffer.from( src ).toString( encoding );
+    return BufferNode.from( src ).toString( encoding );
   }
 
   function decode( src, encoding )
   {
-    return Buffer.from( src, encoding ).toString( 'utf8' );
+    return BufferNode.from( src, encoding ).toString( 'utf8' );
   }
 
   var src = 'Excepteur sint occaecat cupidatat non proident';
@@ -21563,7 +21563,7 @@ function fileReadAsync( test )
   .ifNoErrorThen( function( data )
   {
     var expected = [ true, src ];
-    var result  = Buffer.from( data ).toString().slice( 0, src.length );
+    var result  = BufferNode.from( data ).toString().slice( 0, src.length );
     var got = [ _.bufferRawIs( data ), result ];
     test.identical( got , expected );
     return null;
@@ -21583,7 +21583,7 @@ function fileReadAsync( test )
   .ifNoErrorThen( function( data )
   {
     var expected = [ true, src ];
-    var result  = Buffer.from( data ).toString().slice( 0, src.length );
+    var result  = BufferNode.from( data ).toString().slice( 0, src.length );
     var got = [ _.bufferNodeIs( data ), result ];
     test.identical( got , expected );
     return null;
@@ -35839,9 +35839,9 @@ function filesAreHardLinked( test )
   }
 
   if( Config.platform === 'browser' || test.context.providerIsInstanceOf( _.FileProvider.Extract ) )
-  var bufferData = new ArrayBuffer( 4 );
+  var bufferData = new BufferRaw( 4 );
   else
-  var bufferData = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] );
+  var bufferData = BufferNode.from( [ 0x01, 0x02, 0x03, 0x04 ] );
 
   let hardLinked = true;
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) && !provider.UsingBigIntForStat )
@@ -36249,13 +36249,13 @@ function filesAreSame( test )
 
   if( Config.platform === 'browser' || test.context.providerIsInstanceOf( _.FileProvider.Extract ) )
   {
-    bufferData1 = new ArrayBuffer( 4 );
-    bufferData2 = new ArrayBuffer( 5 );
+    bufferData1 = new BufferRaw( 4 );
+    bufferData2 = new BufferRaw( 5 );
   }
   else
   {
-    bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] );
-    bufferData2 =  Buffer.from( [ 0x07, 0x06, 0x05 ] );
+    bufferData1 = BufferNode.from( [ 0x01, 0x02, 0x03, 0x04 ] );
+    bufferData2 =  BufferNode.from( [ 0x07, 0x06, 0x05 ] );
   }
 
 
@@ -36595,13 +36595,13 @@ function filesSize( test )
 
   if( Config.platform === 'browser' || test.context.providerIsInstanceOf( _.FileProvider.Extract ) )
   {
-    bufferData1 = new ArrayBuffer( 4 );
-    bufferData2 = new ArrayBuffer( 5 );
+    bufferData1 = new BufferRaw( 4 );
+    bufferData2 = new BufferRaw( 5 );
   }
   else
   {
-    bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] );
-    bufferData2 =  Buffer.from( [ 0x07, 0x06, 0x05 ] );
+    bufferData1 = BufferNode.from( [ 0x01, 0x02, 0x03, 0x04 ] );
+    bufferData2 =  BufferNode.from( [ 0x07, 0x06, 0x05 ] );
   }
 
   var  testChecks =
@@ -36716,13 +36716,13 @@ function fileSize( test )
 
   if( Config.platform === 'browser' || test.context.providerIsInstanceOf( _.FileProvider.Extract ) )
   {
-    bufferData1 = new ArrayBuffer( 4 );
-    bufferData2 = new ArrayBuffer( 5 );
+    bufferData1 = new BufferRaw( 4 );
+    bufferData2 = new BufferRaw( 5 );
   }
   else
   {
-    bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] );
-    bufferData2 =  Buffer.from( [ 0x07, 0x06, 0x05 ] );
+    bufferData1 = BufferNode.from( [ 0x01, 0x02, 0x03, 0x04 ] );
+    bufferData2 =  BufferNode.from( [ 0x07, 0x06, 0x05 ] );
   }
   var  testChecks =
   [

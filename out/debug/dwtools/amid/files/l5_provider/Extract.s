@@ -679,7 +679,7 @@ function fileWriteAct( o )
 
   let encoder = fileWriteAct.encoders[ o.encoding ];
 
-  _.assert( self._descriptorIsTerminal( o.data ), 'Expects string or Buffer, but got', _.strType( o.data ) );
+  _.assert( self._descriptorIsTerminal( o.data ), 'Expects string or BufferNode, but got', _.strType( o.data ) );
 
   /* */
 
@@ -2360,7 +2360,7 @@ readEncoders[ 'buffer.node' ] =
   onEnd : function( e )
   {
     e.data = _.bufferNodeFrom( e.data );
-    // let result = Buffer.from( e.data );
+    // let result = BufferNode.from( e.data );
     // _.assert( _.strIs( e.data ) );
     _.assert( _.bufferNodeIs( e.data ) );
     _.assert( !_.bufferRawIs( e.data ) );

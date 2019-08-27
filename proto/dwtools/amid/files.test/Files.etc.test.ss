@@ -650,8 +650,8 @@ function filesSpectre( test )
 // {
 //   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 //     textData2 = ' Aenean non feugiat mauris',
-//     bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] ),
-//     bufferData2 = Buffer.from( [ 0x07, 0x06, 0x05 ] ),
+//     bufferData1 = BufferNode.from( [ 0x01, 0x02, 0x03, 0x04 ] ),
+//     bufferData2 = BufferNode.from( [ 0x07, 0x06, 0x05 ] ),
 //
 //     testChecks = [
 //
@@ -761,8 +761,8 @@ function filesSimilarity( test )
 {
   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     textData2 = ' Aenean non feugiat mauris',
-    bufferData1 = new Uint8Array( [ 0x01, 0x02, 0x03, 0x04 ] ),
-    bufferData2 = new Uint8Array( [ 0x07, 0x06, 0x05 ] ),
+    bufferData1 = new U8x( [ 0x01, 0x02, 0x03, 0x04 ] ),
+    bufferData2 = new U8x( [ 0x07, 0x06, 0x05 ] ),
 
     testChecks = [
 
@@ -873,8 +873,8 @@ function filesSimilarity( test )
 // {
 //   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 //     textData2 = ' Aenean non feugiat mauris',
-//     bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] ),
-//     bufferData2 = Buffer.from( [ 0x07, 0x06, 0x05 ] ),
+//     bufferData1 = BufferNode.from( [ 0x01, 0x02, 0x03, 0x04 ] ),
+//     bufferData2 = BufferNode.from( [ 0x07, 0x06, 0x05 ] ),
 //     testChecks =
 //     [
 //       {
@@ -980,9 +980,9 @@ function filesSimilarity( test )
 //     // let got = _.fileProvider.fileReadSync( path, testCheck.readOptions );
 //     let got = _.fileProvider.fileReadSync( o );
 //
-//     if( got instanceof ArrayBuffer )
+//     if( got instanceof BufferRaw )
 //     {
-//       //got = Buffer.from( got );
+//       //got = BufferNode.from( got );
 //     //   got = toBuffer( got );
 //       got = _.bufferNodeFrom( got );
 //     }
@@ -1194,8 +1194,8 @@ function fileSize( test )
 //     },
 //     textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 //     textData2 = ' Aenean non feugiat mauris',
-//     bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] ),
-//     bufferData2 = Buffer.from( [ 0x07, 0x06, 0x05 ] );
+//     bufferData1 = BufferNode.from( [ 0x01, 0x02, 0x03, 0x04 ] ),
+//     bufferData2 = BufferNode.from( [ 0x07, 0x06, 0x05 ] );
 //
 //
 //   // regular tests
@@ -1357,7 +1357,7 @@ function fileSize( test )
 //         expected :
 //         {
 //           instance : false,
-//           content : Buffer.concat( [ bufferData1, bufferData2 ] ),
+//           content : BufferNode.concat( [ bufferData1, bufferData2 ] ),
 //           exist : true
 //         },
 //         readOptions : void 0
@@ -1380,7 +1380,7 @@ function fileSize( test )
 //         expected :
 //         {
 //           instance : true,
-//           content : Buffer.concat( [ bufferData2, bufferData1 ] ),
+//           content : BufferNode.concat( [ bufferData2, bufferData1 ] ),
 //           exist : true
 //         },
 //         readOptions : void 0
@@ -1626,8 +1626,8 @@ function fileSize( test )
 
 //     textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 //     textData2 = ' Aenean non feugiat mauris',
-//     bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] ),
-//     bufferData2 = Buffer.from( [ 0x07, 0x06, 0x05 ] ),
+//     bufferData1 = BufferNode.from( [ 0x01, 0x02, 0x03, 0x04 ] ),
+//     bufferData2 = BufferNode.from( [ 0x07, 0x06, 0x05 ] ),
 //     dataToJSON1 = [ 1, 'a', { b : 34 } ],
 //     dataToJSON2 = { a : 1, b : 's', c : [ 1, 3, 4 ] };
 
@@ -1755,10 +1755,10 @@ function fileSize( test )
 
 //         // check content of read file.
 //         // +++ have a look om _.bufferTypedIs _.bufferRawIs _.bufferNodeIs
-//         if( fileContent instanceof ArrayBuffer )
+//         if( fileContent instanceof BufferRaw )
 //         {
 //           debugger;
-//           //fileContent = Buffer.from( fileContent );
+//           //fileContent = BufferNode.from( fileContent );
 //           fileContent = toBuffer( fileContent );
 //         }
 //         got.content = fileContent;
@@ -1913,8 +1913,8 @@ function fileSize( test )
 
 //     textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 //     textData2 = ' Aenean non feugiat mauris',
-//     bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] ),
-//     bufferData2 = Buffer.from( [ 0x07, 0x06, 0x05 ] ),
+//     bufferData1 = BufferNode.from( [ 0x01, 0x02, 0x03, 0x04 ] ),
+//     bufferData2 = BufferNode.from( [ 0x07, 0x06, 0x05 ] ),
 //     dataToJSON1 = [ 1, 'a', { b : 34 } ],
 //     dataToJSON2 = { a : 1, b : 's', c : [ 1, 3, 4 ] };
 //
@@ -2023,9 +2023,9 @@ function fileSize( test )
 //
 //     let got = _.fileProvider.fileReadSync( path, testCheck.readOptions );
 //
-//     if( got instanceof ArrayBuffer )
+//     if( got instanceof BufferRaw )
 //     {
-//       //got = Buffer.from( got );
+//       //got = BufferNode.from( got );
 //       got = toBuffer( got );
 //     }
 //
@@ -2062,7 +2062,7 @@ function fileSize( test )
 // function fileReadJson( test )
 // {
 //   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-//     bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] ),
+//     bufferData1 = BufferNode.from( [ 0x01, 0x02, 0x03, 0x04 ] ),
 //     dataToJSON1 = [ 1, 'a', { b : 34 } ],
 //     dataToJSON2 = { a : 1, b : 's', c : [ 1, 3, 4 ] };
 //
@@ -2183,8 +2183,8 @@ function fileSize( test )
 // {
 //   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 //     textData2 = ' Aenean non feugiat mauris',
-//     bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] ),
-//     bufferData2 = Buffer.from( [ 0x07, 0x06, 0x05 ] ),
+//     bufferData1 = BufferNode.from( [ 0x01, 0x02, 0x03, 0x04 ] ),
+//     bufferData2 = BufferNode.from( [ 0x07, 0x06, 0x05 ] ),
 //
 //   testChecks = [
 //
@@ -2382,7 +2382,7 @@ function fileSize( test )
 // function filesLinked( test )
 // {
 //   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-//     bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] ),
+//     bufferData1 = BufferNode.from( [ 0x01, 0x02, 0x03, 0x04 ] ),
 //
 //     testChecks = [
 //       {
@@ -2490,8 +2490,8 @@ function fileSize( test )
 
 //     textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 //     textData2 = ' Aenean non feugiat mauris',
-//     bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] ),
-//     bufferData2 = Buffer.from( [ 0x07, 0x06, 0x05 ] );
+//     bufferData1 = BufferNode.from( [ 0x01, 0x02, 0x03, 0x04 ] ),
+//     bufferData2 = BufferNode.from( [ 0x07, 0x06, 0x05 ] );
 //
 //
 //   // regular tests
@@ -2717,7 +2717,7 @@ function fileSize( test )
 // {
 //   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 //     textData2 = ' Aenean non feugiat mauris',
-//     bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] ),
+//     bufferData1 = BufferNode.from( [ 0x01, 0x02, 0x03, 0x04 ] ),
 //
 //     testChecks = [
 //       {
@@ -2858,9 +2858,9 @@ function filesLink( test )
 {
   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     textData2 = ' Aenean non feugiat mauris',
-    bufferData1 = new Uint8Array( [ 0x01, 0x02, 0x03, 0x04 ] ),
+    bufferData1 = new U8x( [ 0x01, 0x02, 0x03, 0x04 ] ),
     // To new NodeJS it is not correct syntax
-    //bufferData1 = new Uint8Array( [ 0x01, 0x02, 0x03, 0x04 ] ),
+    //bufferData1 = new U8x( [ 0x01, 0x02, 0x03, 0x04 ] ),
 
     testChecks = [
       {
@@ -3100,8 +3100,8 @@ function filesAreUpToDate2( test )
 
 //   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 //     textData2 = ' Aenean non feugiat mauris',
-//     bufferData1 = new Buffer( [ 0x01, 0x02, 0x03, 0x04 ] ),
-//     bufferData2 = new Buffer( [ 0x07, 0x06, 0x05 ] );
+//     bufferData1 = new BufferNode( [ 0x01, 0x02, 0x03, 0x04 ] ),
+//     bufferData2 = new BufferNode( [ 0x07, 0x06, 0x05 ] );
 //
 //   // regular tests
 //   var testChecks =
@@ -3216,8 +3216,8 @@ function filesAreUpToDate2( test )
 // {
 //   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 //     textData2 = ' Aenean non feugiat mauris',
-//     bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] ),
-//     bufferData2 = Buffer.from( [ 0x07, 0x06, 0x05 ] );
+//     bufferData1 = BufferNode.from( [ 0x01, 0x02, 0x03, 0x04 ] ),
+//     bufferData2 = BufferNode.from( [ 0x07, 0x06, 0x05 ] );
 //
 //
 //   // regular tests

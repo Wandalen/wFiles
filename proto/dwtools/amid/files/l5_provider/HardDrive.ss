@@ -163,7 +163,7 @@ let buffer;
 //   _.assert( _.arrayIs( o.visited ) );
 
 //   if( !buffer )
-//   buffer = Buffer.alloc( 512 );
+//   buffer = BufferNode.alloc( 512 );
 
 //   if( o.visited.indexOf( o.filePath ) !== -1 )
 //   throw _.err( 'Cyclic text link :', o.filePath );
@@ -212,7 +212,7 @@ let buffer;
 //         readSize *= _.bigIntIs( size ) ? BigInt( 2 ) : 2;
 //         readSize = readSize < size ? readSize : size;
 //         if( buffer.length < readSize )
-//         buffer = Buffer.alloc( readSize );
+//         buffer = BufferNode.alloc( readSize );
 //         File.readSync( f, buffer, 0, readSize, 0 );
 //         let read = buffer.toString( 'utf8', 0, readSize );
 //         m = read.match( regexp );
@@ -284,7 +284,7 @@ function pathResolveTextLinkAct( o )
   let result;
 
   if( !buffer )
-  buffer = Buffer.alloc( 512 );
+  buffer = BufferNode.alloc( 512 );
 
   if( o.resolvingIntermediateDirectories )
   return resolveIntermediateDirectories();
@@ -311,7 +311,7 @@ function pathResolveTextLinkAct( o )
   readSize *= _.bigIntIs( size ) ? BigInt( 2 ) : 2;
   readSize = readSize < size ? readSize : size;
   if( buffer.length < readSize )
-  buffer = Buffer.alloc( readSize );
+  buffer = BufferNode.alloc( readSize );
   File.readSync( f, buffer, 0, readSize, 0 );
   File.closeSync( f );
   let read = buffer.toString( 'utf8', 0, readSize );
@@ -914,7 +914,7 @@ _.routineExtend( fileExistsAct, Parent.prototype.fileExistsAct );
     });
  * @param {Object} options write options
  * @param {string} options.filePath path to file is written.
- * @param {string|Buffer} [options.data=''] data to write
+ * @param {string|BufferNode} [options.data=''] data to write
  * @param {boolean} [options.append=false] if this options sets to true, method appends passed data to existing data
     in a file
  * @param {boolean} [options.sync=true] if this parameter sets to false, method writes file asynchronously.
@@ -928,7 +928,7 @@ _.routineExtend( fileExistsAct, Parent.prototype.fileExistsAct );
  * @throws {Error} If arguments are missed
  * @throws {Error} If passed more then 2 arguments.
  * @throws {Error} If `filePath` argument or options.PathFile is not string.
- * @throws {Error} If `data` argument or options.data is not string or Buffer,
+ * @throws {Error} If `data` argument or options.data is not string or BufferNode,
  * @throws {Error} If options has unexpected property.
  * @function fileWriteAct
  * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHardDrive#

@@ -27,19 +27,19 @@ if( typeof module !== 'undefined' )
 
   require( './l5_provider/Extract.s' );
 
-  if( Config.platform === 'nodejs' )
+  if( Config.interpreter === 'njs' )
   require( './l5_provider/HardDrive.ss' );
-  if( Config.platform === 'nodejs' )
+  if( Config.interpreter === 'njs' )
   require( './l5_provider/Http.ss' );
 
-  if( Config.platform === 'nodejs' )
+  if( Config.interpreter === 'njs' )
   require( './l5_provider/Git.ss' );
-  if( Config.platform === 'nodejs' )
+  if( Config.interpreter === 'njs' )
   require( './l5_provider/Npm.ss' );
 
-  if( Config.platform === 'browser' )
+  if( Config.interpreter === 'browser' )
   require( './l5_provider/Http.js' );
-  if( Config.platform === 'browser' )
+  if( Config.interpreter === 'browser' )
   require( './l5_provider/HtmlDocument.js' );
 
   /* l7 */

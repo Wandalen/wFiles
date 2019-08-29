@@ -2348,7 +2348,7 @@ readEncoders[ 'original.type' ] =
 
 //
 
-if( Config.platform === 'nodejs' )
+if( Config.interpreter === 'njs' )
 readEncoders[ 'buffer.node' ] =
 {
 

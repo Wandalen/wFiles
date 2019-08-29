@@ -589,7 +589,7 @@ _.FileProvider.Secondary.mixin( Self );
 
 //
 
-if( Config.platform === 'browser' )
+if( Config.interpreter === 'browser' )
 if( !_.FileProvider.Default )
 {
   _.FileProvider.Default = Self;

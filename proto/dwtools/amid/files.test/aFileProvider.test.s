@@ -94,7 +94,7 @@ function softLinkIsSupported()
   let provider = self.provider;
   let path = provider.path;
 
-  if( Config.platform === 'nodejs' && typeof process !== undefined )
+  if( Config.interpreter === 'njs' && typeof process !== undefined )
   if( process.platform === 'win32' )
   {
     var allowed = false;
@@ -452,7 +452,7 @@ function readWriteSync( test )
 
   //
 
-  if( Config.platform === 'nodejs' )
+  if( Config.interpreter === 'njs' )
   {
     test.case = 'other encodings';
     provider.filesDelete( routinePath );
@@ -1153,7 +1153,7 @@ function readWriteSync( test )
 
   //
 
-  if( Config.platform === 'nodejs' )
+  if( Config.interpreter === 'njs' )
   {
     test.case = 'fileWrite, data is raw buffer';
     provider.filesDelete( routinePath );
@@ -2599,7 +2599,7 @@ function readWriteAsync( test )
 
   //
 
-  if( Config.platform === 'nodejs' )
+  if( Config.interpreter === 'njs' )
   {
     consequence.ifNoErrorThen( function( arg )
     {
@@ -2700,7 +2700,7 @@ function fileReadJson( test )
   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
   var bufferData1;
 
-  if( Config.platform === 'browser' || self.providerIsInstanceOf( _.FileProvider.Extract ))
+  if( Config.interpreter === 'browser' || self.providerIsInstanceOf( _.FileProvider.Extract ))
   bufferData1 = new BufferRaw( 4 );
   else
   bufferData1 = BufferNode.from( [ 0x01, 0x02, 0x03, 0x04 ] );
@@ -15998,7 +15998,7 @@ function dirMakeSync( test )
     return;
   }
 
-  if( Config.platform === 'browser' )
+  if( Config.interpreter === 'browser' )
   if( provider.filesTree )
   provider.filesTree = {};
 
@@ -16467,7 +16467,7 @@ function dirMakeAsync( test )
     return;
   }
 
-  if( Config.platform === 'browser' )
+  if( Config.interpreter === 'browser' )
   if( provider.filesTree )
   provider.filesTree = {};
 
@@ -16860,7 +16860,7 @@ function hashReadSync( test )
     return;
   }
 
-  if( Config.platform === 'browser' )
+  if( Config.interpreter === 'browser' )
   return;
 
   var routinePath = test.context.pathFor( 'read/hashRead' );
@@ -16973,7 +16973,7 @@ function hashReadAsync( test )
   if( !provider.statResolvedRead( routinePath ) )
   provider.dirMake( routinePath );
 
-  if( Config.platform === 'browser' )
+  if( Config.interpreter === 'browser' )
   return;
 
   var consequence = new _.Consequence().take( null );
@@ -18324,7 +18324,7 @@ function fileWriteAsync( test )
       sync : 0
     });
 
-    return test.shouldMessageOnlyOnce( con );
+    return test.returnsSingleResource( con );
   })
   .finally( function( err, got )
   {
@@ -18348,7 +18348,7 @@ function fileWriteAsync( test )
       sync : 0
     });
 
-    return test.shouldMessageOnlyOnce( con );
+    return test.returnsSingleResource( con );
   })
   .finally( function( err, got )
   {
@@ -18391,7 +18391,7 @@ function fileWriteAsync( test )
       sync : 0
     });
 
-    return test.shouldMessageOnlyOnce( con );
+    return test.returnsSingleResource( con );
   })
   .finally( function( err, got )
   {
@@ -18415,7 +18415,7 @@ function fileWriteAsync( test )
       sync : 0
     });
 
-    return test.shouldMessageOnlyOnce( con );
+    return test.returnsSingleResource( con );
   })
   .finally( function( err, got )
   {
@@ -18459,7 +18459,7 @@ function fileWriteAsync( test )
       sync : 0
     });
 
-    return test.shouldMessageOnlyOnce( con );
+    return test.returnsSingleResource( con );
   })
   .finally( function( err, got )
   {
@@ -18484,7 +18484,7 @@ function fileWriteAsync( test )
       sync : 0
     });
 
-    return test.shouldMessageOnlyOnce( con );
+    return test.returnsSingleResource( con );
   })
   .finally( function( err, got )
   {
@@ -21430,7 +21430,7 @@ function fileReadAsync( test )
 
   var consequence = new _.Consequence().take( null );
 
-  if( Config.platform === 'browser' )
+  if( Config.interpreter === 'browser' )
   {
     test.identical( 1,1 );
     return;
@@ -21460,7 +21460,7 @@ function fileReadAsync( test )
       filePath : self.testFile,
       sync : 0,
     });
-    return test.shouldMessageOnlyOnce( con );
+    return test.returnsSingleResource( con );
   })
   .ifNoErrorThen( function( data )
   {
@@ -21481,7 +21481,7 @@ function fileReadAsync( test )
       encoding : 'ascii'
     });
 
-    return test.shouldMessageOnlyOnce( con );
+    return test.returnsSingleResource( con );
   })
   .ifNoErrorThen( function( data )
   {
@@ -21500,7 +21500,7 @@ function fileReadAsync( test )
       encoding : 'utf16le'
     });
 
-    return test.shouldMessageOnlyOnce( con );
+    return test.returnsSingleResource( con );
   })
   .ifNoErrorThen( function( data )
   {
@@ -21519,7 +21519,7 @@ function fileReadAsync( test )
       encoding : 'ucs2'
     });
 
-    return test.shouldMessageOnlyOnce( con );
+    return test.returnsSingleResource( con );
   })
   .ifNoErrorThen( function( data )
   {
@@ -21538,7 +21538,7 @@ function fileReadAsync( test )
       encoding : 'base64'
     });
 
-    return test.shouldMessageOnlyOnce( con );
+    return test.returnsSingleResource( con );
   })
   .ifNoErrorThen( function( data )
   {
@@ -21558,7 +21558,7 @@ function fileReadAsync( test )
       encoding : 'buffer.raw'
     });
 
-    return test.shouldMessageOnlyOnce( con );
+    return test.returnsSingleResource( con );
   })
   .ifNoErrorThen( function( data )
   {
@@ -21578,7 +21578,7 @@ function fileReadAsync( test )
       encoding : 'buffer.node'
     });
 
-    return test.shouldMessageOnlyOnce( con );
+    return test.returnsSingleResource( con );
   })
   .ifNoErrorThen( function( data )
   {
@@ -35838,7 +35838,7 @@ function filesAreHardLinked( test )
     return;
   }
 
-  if( Config.platform === 'browser' || test.context.providerIsInstanceOf( _.FileProvider.Extract ) )
+  if( Config.interpreter === 'browser' || test.context.providerIsInstanceOf( _.FileProvider.Extract ) )
   var bufferData = new BufferRaw( 4 );
   else
   var bufferData = BufferNode.from( [ 0x01, 0x02, 0x03, 0x04 ] );
@@ -36247,7 +36247,7 @@ function filesAreSame( test )
   var bufferData1;
   var bufferData2;
 
-  if( Config.platform === 'browser' || test.context.providerIsInstanceOf( _.FileProvider.Extract ) )
+  if( Config.interpreter === 'browser' || test.context.providerIsInstanceOf( _.FileProvider.Extract ) )
   {
     bufferData1 = new BufferRaw( 4 );
     bufferData2 = new BufferRaw( 5 );
@@ -36593,7 +36593,7 @@ function filesSize( test )
   var bufferData1;
   var bufferData2;
 
-  if( Config.platform === 'browser' || test.context.providerIsInstanceOf( _.FileProvider.Extract ) )
+  if( Config.interpreter === 'browser' || test.context.providerIsInstanceOf( _.FileProvider.Extract ) )
   {
     bufferData1 = new BufferRaw( 4 );
     bufferData2 = new BufferRaw( 5 );
@@ -36714,7 +36714,7 @@ function fileSize( test )
   var bufferData1;
   var bufferData2;
 
-  if( Config.platform === 'browser' || test.context.providerIsInstanceOf( _.FileProvider.Extract ) )
+  if( Config.interpreter === 'browser' || test.context.providerIsInstanceOf( _.FileProvider.Extract ) )
   {
     bufferData1 = new BufferRaw( 4 );
     bufferData2 = new BufferRaw( 5 );
@@ -40858,7 +40858,7 @@ function pathNativize( t )
     return;
   }
 
-  if( Config.platform === 'nodejs' && process.platform === 'win32' )
+  if( Config.interpreter === 'njs' && process.platform === 'win32' )
   {
     t.description = 'path in win32 style ';
 

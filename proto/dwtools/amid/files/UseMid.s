@@ -31,7 +31,7 @@ if( typeof module !== 'undefined' )
   require( './l1/Routines.s' );
 
   require( './l1/Path.s' );
-  if( Config.platform === 'nodejs' )
+  if( Config.interpreter === 'njs' )
   require( './l1/Path.ss' );
 
   /* */

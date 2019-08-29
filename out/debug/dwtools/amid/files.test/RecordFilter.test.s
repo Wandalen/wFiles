@@ -46,7 +46,7 @@ var testSuitePath;
 
 function onSuiteBegin()
 {
-  if( Config.platform === 'nodejs' )
+  if( Config.interpreter === 'njs' )
   testSuitePath = _.path.dirTempOpen( _.path.join( __dirname, '../..' ), 'FileRecordFilter' );
   else
   testSuitePath = _.path.current();
@@ -56,7 +56,7 @@ function onSuiteBegin()
 
 function onSuiteEnd()
 {
-  if( Config.platform === 'nodejs' )
+  if( Config.interpreter === 'njs' )
   {
     _.assert( _.strHas( testSuitePath, 'FileRecordFilter' ) );
     _.path.dirTempClose( testSuitePath );

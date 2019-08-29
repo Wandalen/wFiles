@@ -1925,7 +1925,7 @@ _.assert( _.routineIs( Self.Path.current ) );
 
 //
 
-if( Config.platform === 'nodejs' )
+if( Config.interpreter === 'njs' )
 if( !_.FileProvider.Default )
 {
   _.FileProvider.Default = Self;

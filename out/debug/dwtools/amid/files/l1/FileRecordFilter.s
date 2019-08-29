@@ -3025,6 +3025,9 @@ function filePathIsComplex( filePath )
   if( filePath === undefined )
   filePath = filter.filePath;
 
+  if( filePath === '' || filePath === null )
+  return false;
+
   let globFound = true;
   if( _.none( path.s.areGlob( filePath ) ) )
   if( !filter.filePathDstArrayGet( filePath ).filter( ( e ) => _.boolLike( e ) ).length )
@@ -3051,6 +3054,9 @@ function filePathHasGlob( filePath )
     if( filePath === null )
     filePath = filter.prefixPath;
   }
+
+  if( filePath === '' || filePath === null )
+  return false;
 
   let globFound = true;
   if( _.none( path.s.areGlob( filePath ) ) )
@@ -4522,9 +4528,9 @@ function masksGenerate()
   _.assert( filter.formedFilterMap === null );
   filter.formedFilterMap = Object.create( null );
 
-  debugger;
+  // debugger;
   let _processed = path.pathMapToRegexps( filePath2, basePath2  );
-  debugger;
+  // debugger;
 
   // filter.formedBasePath = _processed.unglobedBasePath;
   // filter.formedFilePath = _processed.unglobedFilePath;
@@ -4668,8 +4674,9 @@ function _applyToRecordMasks( record )
   _.assert( !!masks, 'Cant resolve filter map for stem path', () => _.strQuote( f.stemPath ) );
   _.assert( !!f.formed, 'Record factor was not formed!' );
 
-  // if( _.strEnds( record.absolute, 'ter' ) )
   // debugger;
+  if( _.strEnds( record.absolute, '-ile' ) )
+  debugger;
   // if( _.strEnds( record.absolute, 'proto' ) )
   // debugger;
   // if( _.strEnds( record.absolute, 'proto/f.js' ) )
@@ -5005,7 +5012,7 @@ let Extend =
   filePathFromFixes,
   filePathSimplest,
   filePathNullizeMaybe,
-  filePathIsComplex, /* qqq : simple coverage needed */
+  filePathIsComplex, /* qqq : good coverage needed */
   filePathHasGlob, /* qqq : simple coverage needed */
 
   filePathDstHasAllBools,

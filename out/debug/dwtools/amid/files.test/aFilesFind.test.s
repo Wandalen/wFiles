@@ -60,7 +60,7 @@ function softLinkIsSupported()
   let context = this;
   let path = context.provider.path;
 
-  if( Config.platform === 'nodejs' && typeof process !== undefined )
+  if( Config.interpreter === 'njs' && typeof process !== undefined )
   if( process.platform === 'win32' )
   {
     var allow = false;
@@ -341,7 +341,7 @@ function filesFindTrivial( test )
   test.case = 'find single terminal file . includingTransient : 1';
   clean();
   var o1 = { filePath : path.join( routinePath ), outputFormat : 'relative', onUp, onDown }
-  var o2 = { filter : { recursive/**/ : 2 }, includingStem : 1, includingTransient : 1, includingTerminals : 1, includingDirs : 1 }
+  var o2 = { filter : { recursive : 2 }, includingStem : 1, includingTransient : 1, includingTerminals : 1, includingDirs : 1 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [ '.' ];
   test.identical( got, expected );
@@ -351,7 +351,7 @@ function filesFindTrivial( test )
   test.case = 'find single terminal file . includingTransient : 0';
   clean();
   var o1 = { filePath : path.join( routinePath ), outputFormat : 'relative', onUp, onDown }
-  var o2 = { filter : { recursive/**/ : 2 }, includingStem : 1, includingTransient : 0, includingTerminals : 1 }
+  var o2 = { filter : { recursive : 2 }, includingStem : 1, includingTransient : 0, includingTerminals : 1 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [];
   test.identical( got, expected );
@@ -365,7 +365,7 @@ function filesFindTrivial( test )
   test.case = 'find single terminal file . includingStem : 0';
   clean();
   var o1 = { filePath : path.join( routinePath ), outputFormat : 'relative', onUp, onDown }
-  var o2 = { filter : { recursive/**/ : 2 }, includingStem : 0, includingTransient : 1, includingTerminals : 1 }
+  var o2 = { filter : { recursive : 2 }, includingStem : 0, includingTransient : 1, includingTerminals : 1 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [];
   test.identical( got, expected );
@@ -379,7 +379,7 @@ function filesFindTrivial( test )
   test.case = 'find single terminal file . includingStem : 0';
   clean();
   var o1 = { filePath : path.join( routinePath ), outputFormat : 'relative', onUp, onDown }
-  var o2 = { filter : { recursive/**/ : 2 }, includingStem : 0, includingTransient : 0, includingTerminals : 1 }
+  var o2 = { filter : { recursive : 2 }, includingStem : 0, includingTransient : 0, includingTerminals : 1 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [];
   test.identical( got, expected );
@@ -403,7 +403,7 @@ function filesFindTrivial( test )
   provider.filesDelete( routinePath );
   extract1.filesReflectTo( provider, routinePath );
   var gotTree = provider.filesExtract( routinePath );
-  gotTree.filesFind({ filePath : '/', filter : { recursive/**/ : 2 }, onDown : function onDown( r, o )
+  gotTree.filesFind({ filePath : '/', filter : { recursive : 2 }, onDown : function onDown( r, o )
   {
     if( r.isTerminal )
     gotTree.fileWrite( r.absolute, gotTree.fileRead( r.absolute ) );
@@ -417,7 +417,7 @@ function filesFindTrivial( test )
   test.case = 'find single terminal file . includingTerminals : 1';
   clean();
   var o1 = { filePath : path.join( routinePath, 'f' ), outputFormat : 'relative', onUp, onDown }
-  var o2 = { filter : { recursive/**/ : 2 }, includingStem : 1, includingTransient : 1, includingTerminals : 1 }
+  var o2 = { filter : { recursive : 2 }, includingStem : 1, includingTransient : 1, includingTerminals : 1 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [ '.' ];
   test.identical( got, expected );
@@ -431,7 +431,7 @@ function filesFindTrivial( test )
   test.case = 'find single terminal file . includingTerminals : 0';
   clean();
   var o1 = { filePath : path.join( routinePath, 'f' ), outputFormat : 'relative', onUp, onDown }
-  var o2 = { filter : { recursive/**/ : 2 }, includingStem : 1, includingTransient : 1, includingTerminals : 0 }
+  var o2 = { filter : { recursive : 2 }, includingStem : 1, includingTransient : 1, includingTerminals : 0 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [];
   test.identical( got, expected );
@@ -445,7 +445,7 @@ function filesFindTrivial( test )
   test.case = 'find single terminal file . includingStem : 0';
   clean();
   var o1 = { filePath : path.join( routinePath, 'f' ), outputFormat : 'relative', onUp, onDown }
-  var o2 = { filter : { recursive/**/ : 2 }, includingStem : 0, includingTransient : 1, includingTerminals : 1 }
+  var o2 = { filter : { recursive : 2 }, includingStem : 0, includingTransient : 1, includingTerminals : 1 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [];
   test.identical( got, expected );
@@ -470,7 +470,7 @@ function filesFindTrivial( test )
   provider.filesDelete( routinePath );
   extract1.filesReflectTo({ dstProvider : provider, dst : routinePath });
   var gotTree = provider.filesExtract( routinePath );
-  gotTree.filesFind({ filePath : '/', filter : { recursive/**/ : 2 }, onDown : function onDown( r, o )
+  gotTree.filesFind({ filePath : '/', filter : { recursive : 2 }, onDown : function onDown( r, o )
   {
     if( r.isTerminal )
     gotTree.fileWrite( r.absolute, gotTree.fileRead( r.absolute ) );
@@ -483,7 +483,7 @@ function filesFindTrivial( test )
   test.case = 'find includingStem : 1';
   clean();
   var o1 = { filePath : path.join( routinePath ), outputFormat : 'relative', onUp, onDown }
-  var o2 = { filter : { recursive/**/ : 2 }, includingStem : 1, includingTransient : 1, includingTerminals : 1, includingDirs : 1 }
+  var o2 = { filter : { recursive : 2 }, includingStem : 1, includingTransient : 1, includingTerminals : 1, includingDirs : 1 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected =
   [
@@ -527,7 +527,7 @@ function filesFindTrivial( test )
   test.case = 'find includingStem:0';
   clean();
   var o1 = { filePath : path.join( routinePath ), outputFormat : 'relative', onUp, onDown }
-  var o2 = { filter : { recursive/**/ : 2 }, includingStem : 0, includingTransient : 1, includingTerminals : 1, includingDirs : 1 }
+  var o2 = { filter : { recursive : 2 }, includingStem : 0, includingTransient : 1, includingTerminals : 1, includingDirs : 1 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected =
   [
@@ -570,7 +570,7 @@ function filesFindTrivial( test )
   test.case = 'find includingTransient:0';
   clean();
   var o1 = { filePath : path.join( routinePath ), outputFormat : 'relative', onUp, onDown }
-  var o2 = { filter : { recursive/**/ : 2 }, includingStem : 1, includingTransient : 1, includingTerminals : 1, includingDirs : 0 }
+  var o2 = { filter : { recursive : 2 }, includingStem : 1, includingTransient : 1, includingTerminals : 1, includingDirs : 0 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected =
   [
@@ -610,7 +610,7 @@ function filesFindTrivial( test )
   test.case = 'find includingTerminals:0';
   clean();
   var o1 = { filePath : path.join( routinePath ), outputFormat : 'relative', onUp, onDown }
-  var o2 = { filter : { recursive/**/ : 2 }, includingStem : 1, includingTransient : 1, includingTerminals : 0, includingDirs : 1 }
+  var o2 = { filter : { recursive : 2 }, includingStem : 1, includingTransient : 1, includingTerminals : 0, includingDirs : 1 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [ '.', './dir1', './dir1/dir11', './dir2' ];
   test.identical( got, expected );
@@ -676,7 +676,7 @@ function filesFindTrivial( test )
   test.case = 'find with excluding file path';
   clean();
   var filePath = { 'dir1' : true, '**b**' : 0 };
-  var filter = { prefixPath : path.join( routinePath ), filePath, recursive/**/ : 2 }
+  var filter = { prefixPath : path.join( routinePath ), filePath, recursive : 2 }
   var o1 = { filter, outputFormat : 'relative', onUp, onDown }
   var o2 = { includingStem : 1, includingTransient : 1, includingTerminals : 1, includingDirs : 1 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
@@ -692,7 +692,7 @@ function filesFindTrivial( test )
   test.case = 'find with excluding file path';
   clean();
   var filePath = { 'dir1' : null, '**b**' : 0, '**a**' : 1 };
-  var filter = { prefixPath : path.join( routinePath ), filePath, recursive/**/ : 2 }
+  var filter = { prefixPath : path.join( routinePath ), filePath, recursive : 2 }
   var o1 = { filter, outputFormat : 'relative', onUp, onDown }
   var o2 = { includingStem : 1, includingTransient : 1, includingTerminals : 1, includingDirs : 1 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
@@ -867,7 +867,7 @@ function filesFindTrivialAsync( test )
   provider.filesDelete( routinePath );
   extract1.filesReflectTo({ dstProvider : provider, dst : context.testSuitePath });
   var gotTree = provider.filesExtract( context.testSuitePath );
-  gotTree.filesFind({ filePath : '/', filter : { recursive/**/ : 2 }, onDown : function onDown( r, o )
+  gotTree.filesFind({ filePath : '/', filter : { recursive : 2 }, onDown : function onDown( r, o )
   {
     if( r.isTerminal )
     gotTree.fileWrite( r.absolute, gotTree.fileRead( r.absolute ) );
@@ -886,7 +886,7 @@ function filesFindTrivialAsync( test )
       filePath : path.join( context.testSuitePath ),
       outputFormat : 'relative',
       sync : 0,
-      filter : { recursive/**/ : 2 },
+      filter : { recursive : 2 },
       includingTerminals : 1,
       includingDirs : 1
     }
@@ -931,7 +931,7 @@ function filesFindMaskTerminal( test )
   test.case = 'relative to current dir';
 
   var filter =  { maskTerminal : './package.json' }
-  var got = provider.filesFind({ filePath : routinePath, filter, filter : { recursive/**/ : 1 } });
+  var got = provider.filesFind({ filePath : routinePath, filter, filter : { recursive : 1 } });
   test.identical( got.length, 1 );
 
   /* */
@@ -1030,7 +1030,7 @@ function filesFindCriticalCases( test )
   ({
     basePath : '.',
     prefixPath : '/',
-    recursive/**/ : 2,
+    recursive : 2,
   });
 
   filter.filePath = [ '/dir1', '/dir2' ];
@@ -1175,35 +1175,95 @@ function filesFindCriticalCases( test )
   var expected = [ './dir2/File.js', './dir2/File.test.js', './dir2/File1.debug.js', './dir2/File1.release.js', './dir2/File2.debug.js', './dir2/File2.release.js', './dir3/File.js', './dir3/File.test.js' ];
   test.identical( got, expected );
 
-  // /* */
-  //
-  // if( Config.debug )
-  // {
-  //
-  //   var filter = extract.recordFilter
-  //   ({
-  //     basePath : '.',
-  //     prefixPath : '/',
-  //   });
-  //
-  //   filter.filePath = [ '/dir1', '/dir2' ];
-  //   filter._formPaths();
-  //
-  //   test.shouldThrowErrorSync( () =>
-  //   {
-  //
-  //     var found = extract.filesFind
-  //     ({
-  //       mandatory : 0,
-  //       filePath : '/',
-  //       filter,
-  //     });
-  //
-  //   });
-  //
-  // }
+  /* */
 
-}
+  test.case = 'with filter as an argument';
+
+  var extract = _.FileProvider.Extract
+  ({
+    filesTree : { dir1 : { a : 1, b : 2 }, dir2 : { c : 3 }, dir3 : { d : 4 }, e : 5 },
+  });
+
+  var filter = extract.recordFilter({ filePath : '/dir1', basePath : '/dir2' });
+  var got = extract.filesFind( filter );
+  var expected = [ '../dir1/a', '../dir1/b' ];
+  test.identical( _.select( got, '*/relative' ), expected );
+
+  /* */
+
+  test.case = 'no file path, mandatory : 0';
+
+  var extract = _.FileProvider.Extract
+  ({
+    filesTree : { dir1 : { a : 1, b : 2 }, dir2 : { c : 3 }, dir3 : { d : 4 }, e : 5 },
+  });
+
+  var got = extract.filesFind({ mandatory : 0 });
+  var expected = [];
+  test.identical( got, expected );
+
+  var got = extract.filesFind({ mandatory : 0, filePath : null });
+  var expected = [];
+  test.identical( got, expected );
+
+  var got = extract.filesFind({ mandatory : 0, filePath : '' });
+  var expected = [];
+  test.identical( got, expected );
+
+  var got = extract.filesFind({ mandatory : 0, filter : {} });
+  var expected = [];
+  test.identical( got, expected );
+
+  var got = extract.filesFind({ mandatory : 0, filter : { filePath : '' } });
+  var expected = [];
+  test.identical( got, expected );
+
+  var got = extract.filesFind({ mandatory : 0, filter : { filePath : null } });
+  var expected = [];
+  test.identical( got, expected );
+
+  /* */
+
+  if( !Config.debug )
+  return;
+
+  test.case = 'no arguments';
+  test.shouldThrowErrorSync( () =>
+  {
+    extract.filesFind();
+  });
+
+  test.case = 'no file path';
+  test.shouldThrowErrorSync( () =>
+  {
+    extract.filesFind({ mandatory : 1 })
+  });
+
+  test.case = 'file path : null';
+  test.shouldThrowErrorSync( () =>
+  {
+    extract.filesFind({ mandatory : 1, filePath : null });
+  });
+
+  test.case = 'file path : empty str';
+  test.shouldThrowErrorSync( () =>
+  {
+    extract.filesFind({ mandatory : 1, filePath : '' });
+  });
+
+  test.case = 'file path : null in filter';
+  test.shouldThrowErrorSync( () =>
+  {
+    extract.filesFind({ mandatory : 1, filter : { filePath : null } });
+  });
+
+  test.case = 'file path : empty str in filter';
+  test.shouldThrowErrorSync( () =>
+  {
+    extract.filesFind({ mandatory : 1, filter : { filePath : '' } });
+  });
+
+} /* end of filesFindCriticalCases */
 
 //
 
@@ -1221,7 +1281,7 @@ function filesFindPreset( test )
   ({
     filePath : '/.system',
     outputFormat : 'relative',
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     filter :
     {
       basePath : '/some/path',
@@ -1244,7 +1304,7 @@ function filesFindPreset( test )
   {
     filePath : '/.system',
     outputFormat : 'relative',
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     filter :
     {
       basePath : '/some/path',
@@ -1275,7 +1335,7 @@ function filesFindPreset( test )
     filter :
     {
       basePath : '/some/path',
-      recursive/**/ : 2,
+      recursive : 2,
     },
   });
 
@@ -1308,7 +1368,7 @@ function filesFindPreset( test )
     filePath : '/',
     outputFormat : 'relative',
     includingDirs : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
   }
   var found = extract.filesFind( o );
   var expected = [ '.', './root', './root/.d', './root/c' ];
@@ -1319,7 +1379,7 @@ function filesFindPreset( test )
     filePath : '/',
     outputFormat : 'relative',
     includingDirs : 0,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
   }
   var found = extract.filesFind( o );
   var expected = [ './root/.d', './root/c' ];
@@ -1391,7 +1451,7 @@ function filesFind( test )
     outputFormat : 'absolute',
     onUp,
     onDown,
-    filter : { recursive/**/ : 2 }
+    filter : { recursive : 2 }
   });
 
   test.is( got.length > 0 );
@@ -1563,7 +1623,7 @@ function filesFind( test )
       {
         basePath : routinePath,
         prefixPath : routinePath,
-        recursive/**/ : 2,
+        recursive : 2,
       }
     };
 
@@ -2170,7 +2230,7 @@ function filesFind2( test )
     {
       basePath : path.dir( terminalPath ),
       maskDirectory : 'dir',
-      recursive/**/ : 2,
+      recursive : 2,
     },
     outputFormat : 'relative',
     includingStem : 1,
@@ -2206,7 +2266,7 @@ function filesFind2( test )
     filePath : routinePath,
     orderingExclusion,
     includingDirs : 1,
-    filter : { recursive/**/ : 1 },
+    filter : { recursive : 1 },
     outputFormat : 'record'
   });
   got = got.map( ( r ) => r.relative );
@@ -2225,7 +2285,7 @@ function filesFind2( test )
   got = provider.filesFind
   ({
     filePath : path.join( routinePath, 'src/dir' ),
-    filter : { basePath : relative, recursive/**/ : 1 },
+    filter : { basePath : relative, recursive : 1 },
   });
   got = got[ 0 ].relative;
   var begins = './' + path.relative( relative, path.join( routinePath, 'src/dir' ) );
@@ -2240,7 +2300,7 @@ function filesFind2( test )
     {
       basePath : '/x/a/b',
     },
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     maskPreset : 0,
   });
 
@@ -2309,7 +2369,7 @@ function filesFindRecursive( test )
     includingTerminals : 1,
     includingTransient : 1,
     outputFormat : 'relative',
-    filter : { recursive/**/ : 0 },
+    filter : { recursive : 0 },
   })
   test.identical( got, [ '.' ] )
 
@@ -2320,7 +2380,7 @@ function filesFindRecursive( test )
     includingTerminals : 1,
     includingTransient : 1,
     outputFormat : 'relative',
-    filter : { recursive/**/ : 1 },
+    filter : { recursive : 1 },
   })
   var expected = [ '.', './src', './src2' ]
   test.identical( got, expected );
@@ -2332,7 +2392,7 @@ function filesFindRecursive( test )
     includingTerminals : 1,
     includingTransient : 1,
     outputFormat : 'relative',
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
   })
   var expected = [ '.', './src', './src/a1', './src/dir', './src/dir/a1', './src2', './src2/ax2', './src2/dirx', './src2/dirx/a' ]
   test.identical( got, expected );
@@ -2351,14 +2411,14 @@ function filesFindRecursive( test )
     includingTransient : 1,
     outputFormat : 'relative',
     filter : { basePath : path.join( routinePath, './src' ) },
-    filter : { recursive/**/ : 0 },
+    filter : { recursive : 0 },
   })
   var expected = [ './a1' ]
 
   var got = provider.filesFind
   ({
     filePath : abs( './src/a1' ),
-    filter : { basePath : abs( './src' ), recursive/**/ : 1 },
+    filter : { basePath : abs( './src' ), recursive : 1 },
     includingDirs : 1,
     includingTerminals : 1,
     includingTransient : 1,
@@ -2376,7 +2436,7 @@ function filesFindRecursive( test )
     includingTerminals : 1,
     includingTransient : 1,
     outputFormat : 'relative',
-    filter : { basePath : path.join( routinePath, './src' ), recursive/**/ : 2 },
+    filter : { basePath : path.join( routinePath, './src' ), recursive : 2 },
   })
   var expected = [ './a1' ]
   test.identical( got, expected );
@@ -2530,7 +2590,7 @@ function filesFindLinked( test )
     includingTransient : 1,
     includingTerminals : 1,
     includingDirs : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     includingStem : 1,
   })
   test.identical( select( got, '*/absolute' ), [ '/', '/normal', '/terminal' ] );
@@ -2544,7 +2604,7 @@ function filesFindLinked( test )
     includingTransient : 1,
     includingTerminals : 1,
     includingDirs : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     includingStem : 1,
     revisiting : 2,
   })
@@ -2579,7 +2639,7 @@ function filesFindLinked( test )
     includingTransient : 1,
     includingTerminals : 1,
     includingDirs : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     includingStem : 1,
     revisiting : 2,
   })
@@ -2594,7 +2654,7 @@ function filesFindLinked( test )
     includingTransient : 1,
     includingTerminals : 1,
     includingDirs : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     includingStem : 1,
     revisiting : 2,
   })
@@ -2629,7 +2689,7 @@ function filesFindLinked( test )
     includingTerminals : 1,
     includingDirs : 1,
     includingStem : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     resolvingSoftLink : 0,
     allowingMissed : 0,
     allowingCycled : 0,
@@ -2650,7 +2710,7 @@ function filesFindLinked( test )
     includingDirs : 1,
     includingStem : 1,
     includingDefunct : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     resolvingSoftLink : 1,
     allowingMissed : 1,
     allowingCycled : 0,
@@ -2672,7 +2732,7 @@ function filesFindLinked( test )
       includingTerminals : 1,
       includingDirs : 1,
       includingStem : 1,
-      filter : { recursive/**/ : 2 },
+      filter : { recursive : 2 },
       resolvingSoftLink : 1,
       allowingMissed : 0,
       allowingCycled : 1,
@@ -2710,7 +2770,7 @@ function filesFindLinked( test )
     includingTerminals : 1,
     includingDirs : 1,
     includingStem : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     resolvingSoftLink : 0,
     allowingMissed : 0,
     allowingCycled : 0,
@@ -2732,7 +2792,7 @@ function filesFindLinked( test )
     includingTerminals : 1,
     includingDirs : 1,
     includingStem : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     resolvingSoftLink : 1,
     allowingMissed : 0,
     allowingCycled : 1,
@@ -2756,7 +2816,7 @@ function filesFindLinked( test )
       includingTerminals : 1,
       includingDirs : 1,
       includingStem : 1,
-      filter : { recursive/**/ : 2 },
+      filter : { recursive : 2 },
       resolvingSoftLink : 1,
       allowingMissed : 1,
       allowingCycled : 0,
@@ -2791,7 +2851,7 @@ function filesFindLinked( test )
     includingTerminals : 1,
     allowingMissed : 0,
     includingDirs : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     includingStem : 1,
     revisiting : 2,
   })
@@ -2809,7 +2869,7 @@ function filesFindLinked( test )
       includingTerminals : 1,
       allowingMissed : 0,
       includingDirs : 1,
-      filter : { recursive/**/ : 2 },
+      filter : { recursive : 2 },
       includingStem : 1,
       revisiting : 2,
     })
@@ -2824,7 +2884,7 @@ function filesFindLinked( test )
     includingTerminals : 1,
     allowingMissed : 1,
     includingDirs : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     includingStem : 1,
     revisiting : 2,
   })
@@ -2857,7 +2917,7 @@ function filesFindLinked( test )
     includingTransient : 1,
     includingTerminals : 1,
     includingDirs : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     includingStem : 1,
     revisiting : 2,
   })
@@ -2872,7 +2932,7 @@ function filesFindLinked( test )
     includingTransient : 1,
     includingTerminals : 1,
     includingDirs : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     includingStem : 1,
     revisiting : 2,
   })
@@ -2908,7 +2968,7 @@ function filesFindLinked( test )
     includingTransient : 1,
     includingTerminals : 1,
     includingDirs : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     includingStem : 1,
     revisiting : 2,
   })
@@ -2925,7 +2985,7 @@ function filesFindLinked( test )
     includingTerminals : 1,
     includingDirs : 1,
     includingStem : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     revisiting : 2,
   })
 
@@ -2961,7 +3021,7 @@ function filesFindLinked( test )
     includingTransient : 1,
     includingTerminals : 1,
     includingDirs : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     includingStem : 1,
     revisiting : 2,
   })
@@ -2977,7 +3037,7 @@ function filesFindLinked( test )
     includingTransient : 1,
     includingTerminals : 1,
     includingDirs : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     includingStem : 1,
     revisiting : 2,
   })
@@ -3072,7 +3132,7 @@ function filesFindSoftLinksExtract( test )
   ({
     filePath : '/src/proto',
     includingDirs : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
   });
 
   /* */
@@ -3225,7 +3285,7 @@ function filesFindSoftLinksExtract( test )
   ({
     filePath : '/src/proto',
     includingDirs : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
   });
 
   /* */
@@ -3385,7 +3445,7 @@ function filesFindSoftLinksExtract( test )
   ({
     filePath : '/src/proto',
     includingDirs : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
   });
 
   /* */
@@ -3572,7 +3632,7 @@ function filesFindSoftLinksExtract( test )
   ({
     filePath : '/src/proto',
     includingDirs : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
   });
 
   /* */
@@ -3808,7 +3868,7 @@ function filesFindSoftLinksLoopsExtract( test )
   ({
     filePath : '/src/proto',
     includingDirs : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
   });
 
   /* */
@@ -4523,7 +4583,7 @@ function filesFindSoftLinks( test )
   ({
     filePath : abs( 'src/proto' ),
     includingDirs : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
   });
 
   /* */
@@ -4616,7 +4676,7 @@ function filesFindResolving( test )
     includingTerminals : 1,
     includingTransient : 1,
     includingDirs : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     revisiting : 2,
   }
 
@@ -5667,7 +5727,7 @@ function filesFindResolvingExperiment( test )
     includingTerminals : 1,
     includingTransient : 1,
     includingDirs : 1,
-    filter : { recursive/**/ : 2 }
+    filter : { recursive : 2 }
   }
 
   var files = provider.filesFind( o );
@@ -5713,7 +5773,7 @@ function filesFindGlob( test )
     includingDirs : 0,
     includingTransient : 0,
     allowingMissed : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     filter : { basePath : routinePath },
   });
 
@@ -5723,7 +5783,7 @@ function filesFindGlob( test )
     includingDirs : 1,
     includingTransient : 1,
     allowingMissed : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     filter : { basePath : routinePath },
   });
 
@@ -5733,7 +5793,7 @@ function filesFindGlob( test )
     includingDirs : 0,
     includingTransient : 0,
     allowingMissed : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     filter : { prefixPath : routinePath },
   });
 
@@ -5743,7 +5803,7 @@ function filesFindGlob( test )
     includingDirs : 1,
     includingTransient : 1,
     allowingMissed : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     filter : { prefixPath : routinePath },
   });
 
@@ -7280,7 +7340,7 @@ function filesFindOn( test )
     includingDirs : 0,
     includingTransient : 0,
     allowingMissed : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     filter : { basePath : routinePath },
   });
 
@@ -7292,7 +7352,7 @@ function filesFindOn( test )
     includingDirs : 1,
     includingTransient : 1,
     allowingMissed : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     filter : { basePath : routinePath },
   });
 
@@ -7304,7 +7364,7 @@ function filesFindOn( test )
     includingDirs : 0,
     includingTransient : 0,
     allowingMissed : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     filter : { prefixPath : routinePath },
   });
 
@@ -7316,7 +7376,7 @@ function filesFindOn( test )
     includingDirs : 1,
     includingTransient : 1,
     allowingMissed : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     filter : { prefixPath : routinePath },
   });
 
@@ -7476,7 +7536,7 @@ function filesFindBaseFromGlob( test )
     includingDirs : 0,
     includingTransient : 0,
     allowingMissed : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     filter : { basePath : routinePath },
   });
 
@@ -7486,7 +7546,7 @@ function filesFindBaseFromGlob( test )
     includingDirs : 1,
     includingTransient : 1,
     allowingMissed : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     filter : { basePath : routinePath },
   });
 
@@ -7496,7 +7556,7 @@ function filesFindBaseFromGlob( test )
     includingDirs : 0,
     includingTransient : 0,
     allowingMissed : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     filter : { prefixPath : routinePath },
   });
 
@@ -7506,7 +7566,7 @@ function filesFindBaseFromGlob( test )
     includingDirs : 1,
     includingTransient : 1,
     allowingMissed : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     filter : { prefixPath : routinePath },
   });
 
@@ -8731,7 +8791,7 @@ function filesFindMandatoryString( test )
   {
     filePath : routinePath + '/module2/amid',
     mandatory : 0,
-    filter : { recursive/**/ : 0 },
+    filter : { recursive : 0 },
     outputFormat : 'absolute',
   }
 
@@ -8745,7 +8805,7 @@ function filesFindMandatoryString( test )
 
   /**/
 
-  test.case = 'includingDefunct : 0, mandatory : 0, filter : { recursive/**/ : 0 }';
+  test.case = 'includingDefunct : 0, mandatory : 0, filter : { recursive : 0 }';
   var o2 = _.mapExtend( null, o1 );
   o2.filter = _.mapExtend( null, o2.filter );
   o2.includingDefunct = 0;
@@ -8757,7 +8817,7 @@ function filesFindMandatoryString( test )
 
   /**/
 
-  test.case = 'includingDefunct : 0, mandatory : 0, filter : { recursive/**/ : 1 }';
+  test.case = 'includingDefunct : 0, mandatory : 0, filter : { recursive : 1 }';
   var o2 = _.mapExtend( null, o1 );
   o2.filter = _.mapExtend( null, o2.filter );
   o2.includingDefunct = 0;
@@ -8769,7 +8829,7 @@ function filesFindMandatoryString( test )
 
   /**/
 
-  test.case = 'includingDefunct : 0, mandatory : 1, filter : { recursive/**/ : 0 }';
+  test.case = 'includingDefunct : 0, mandatory : 1, filter : { recursive : 0 }';
   var o2 = _.mapExtend( null, o1 );
   o2.filter = _.mapExtend( null, o2.filter );
   o2.includingDefunct = 0;
@@ -8784,7 +8844,7 @@ function filesFindMandatoryString( test )
 
   /**/
 
-  test.case = 'includingDefunct : 0, mandatory : 1, filter : { recursive/**/ : 1 }';
+  test.case = 'includingDefunct : 0, mandatory : 1, filter : { recursive : 1 }';
   var o2 = _.mapExtend( null, o1 );
   o2.filter = _.mapExtend( null, o2.filter );
   o2.includingDefunct = 0;
@@ -8799,7 +8859,7 @@ function filesFindMandatoryString( test )
 
   /**/
 
-  test.case = 'includingDefunct : 1, mandatory : 0, filter : { recursive/**/ : 0 }';
+  test.case = 'includingDefunct : 1, mandatory : 0, filter : { recursive : 0 }';
   var o2 = _.mapExtend( null, o1 );
   o2.filter = _.mapExtend( null, o2.filter );
   o2.includingDefunct = 1;
@@ -8811,7 +8871,7 @@ function filesFindMandatoryString( test )
 
   /**/
 
-  test.case = 'includingDefunct : 1, mandatory : 0, filter : { recursive/**/ : 1 }';
+  test.case = 'includingDefunct : 1, mandatory : 0, filter : { recursive : 1 }';
   var o2 = _.mapExtend( null, o1 );
   o2.filter = _.mapExtend( null, o2.filter );
   o2.includingDefunct = 1;
@@ -8823,7 +8883,7 @@ function filesFindMandatoryString( test )
 
   /**/
 
-  test.case = 'includingDefunct : 1, mandatory : 1, filter : { recursive/**/ : 0 }';
+  test.case = 'includingDefunct : 1, mandatory : 1, filter : { recursive : 0 }';
   var o2 = _.mapExtend( null, o1 );
   o2.filter = _.mapExtend( null, o2.filter );
   o2.includingDefunct = 1;
@@ -8838,7 +8898,7 @@ function filesFindMandatoryString( test )
 
   /**/
 
-  test.case = 'includingDefunct : 1, mandatory : 1, filter : { recursive/**/ : 1 }';
+  test.case = 'includingDefunct : 1, mandatory : 1, filter : { recursive : 1 }';
   var o2 = _.mapExtend( null, o1 );
   o2.filter = _.mapExtend( null, o2.filter );
   o2.includingDefunct = 1;
@@ -9282,7 +9342,7 @@ function filesFindExcluding( test )
     filter :
     {
       filePath : { 'node_modules' : 0, 'package.json' : 0 },
-      recursive/**/ : 2,
+      recursive : 2,
     }
   });
 
@@ -9296,7 +9356,7 @@ function filesFindExcluding( test )
 
   var find = provider.filesFinder
   ({
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     allowingMissed : 1,
     maskPreset : 0,
     outputFormat : 'relative',
@@ -9316,7 +9376,7 @@ function filesFindExcluding( test )
 
   var find = provider.filesFinder
   ({
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     includingTerminals : 1,
     includingDirs : 1,
     includingTransient : 1,
@@ -9385,7 +9445,7 @@ function filesFindExcluding( test )
 
   var find = provider.filesFinder
   ({
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     maskPreset : 0,
     outputFormat : 'relative',
   });
@@ -9547,7 +9607,7 @@ function filesFindGlobLogic( test )
     includingTerminals : 1,
     includingDirs : 1,
     includingTransient : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     filter :
     {
       prefixPath : routinePath,
@@ -9808,7 +9868,7 @@ function filesFindGlobComplex( test )
     includingTerminals : 1,
     includingDirs : 1,
     includingTransient : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     filter :
     {
       prefixPath : routinePath,
@@ -10008,6 +10068,42 @@ function filesFindGlobComplex( test )
 
   test.close( '/ after **' );
 
+  test.open( 'check escaping' );
+
+  /* - */
+
+  test.case = 'src/proto/?(..cc)';
+  var expectedRelative = [ '.' ];
+  var records = find( abs( 'src/proto/?(..cc)' ) );
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* - */
+
+  test.case = 'src/proto/*?(f)?ile';
+  var expectedRelative = [ '.', './-ile', './file' ];
+  var records = find({ filePath : abs( 'src/proto/*?(f)?ile' ), maskPreset : 0 });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* - */
+
+  test.case = 'src/proto/*?(f)ile';
+  var expectedRelative = [ '.', './-ile', './file' ];
+  var records = find({ filePath : abs( 'src/proto/*?(f)ile' ), maskPreset : 0 });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* - */
+
+  test.close( 'check escaping' );
+
+/*
+
+/dir/v1.(im|ex|)?(.out).will.*"
+
+*/
+
 /*
 xxx : add
 
@@ -10109,7 +10205,7 @@ function filesFindAnyPositive( test )
     includingTerminals : 1,
     includingDirs : 1,
     includingTransient : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     filter :
     {
       prefixPath : routinePath,
@@ -10988,7 +11084,7 @@ function filesFindTotalPositive( test )
     includingTerminals : 1,
     includingDirs : 1,
     includingTransient : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     filter :
     {
       prefixPath : routinePath,
@@ -11864,7 +11960,7 @@ function filesFindSeveralTotalPositive( test )
     includingTerminals : 1,
     includingDirs : 1,
     includingTransient : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     filter :
     {
       prefixPath : routinePath,
@@ -12320,7 +12416,7 @@ function filesFindTotalNegative( test )
     includingTerminals : 1,
     includingDirs : 1,
     includingTransient : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     filter :
     {
       prefixPath : routinePath,
@@ -13281,7 +13377,7 @@ function filesFindGroups( test )
 
   /* */
 
-  test.case = 'filter : { recursive/**/ : 1 }, mandatory : 0';
+  test.case = 'filter : { recursive : 1 }, mandatory : 0';
   var expected =
   {
     'pathsGrouped' :
@@ -13324,7 +13420,7 @@ function filesFindGroups( test )
 
   /* */
 
-  test.case = 'filter : { recursive/**/ : 0 }';
+  test.case = 'filter : { recursive : 0 }';
   var expected =
   {
     'pathsGrouped' :
@@ -13362,7 +13458,7 @@ function filesFindGroups( test )
 
   if( Config.debug )
   {
-    test.case = 'filter : { recursive/**/ : 0 }, mandatory : 1';
+    test.case = 'filter : { recursive : 0 }, mandatory : 1';
     test.shouldThrowErrorSync( () =>
     {
       var src2 = _.mapExtend( null, src );
@@ -13448,7 +13544,7 @@ function filesReflectEvaluate( test )
   test.identical( preserve, expectedPreserve );
 
   var extract2 = provider.filesExtract( routinePath );
-  extract2.filesFind({ filePath : '/', filter : { recursive/**/ : 2 }, onDown : function onDown( r, o )
+  extract2.filesFind({ filePath : '/', filter : { recursive : 2 }, onDown : function onDown( r, o )
   {
     if( r.isTerminal )
     extract2.fileWrite( r.absolute, extract2.fileRead( r.absolute ) );
@@ -14119,7 +14215,7 @@ function filesReflectTrivial( test )
     includingDst : 1,
     includingTerminals : 1,
     includingDirs : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     writing : 1,
     dstRewriting : 1,
     dstDeleting : 0,
@@ -14207,7 +14303,7 @@ function filesReflectTrivial( test )
     includingDst : 1,
     includingTerminals : 1,
     includingDirs : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     writing : 1,
     dstRewriting : 1,
     dstDeleting : 0,
@@ -14310,7 +14406,7 @@ function filesReflectTrivial( test )
     includingDst : 0,
     includingTerminals : 1,
     includingDirs : 0,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     writing : 1,
     srcDeleting : 0,
     // linking : 'nop'
@@ -14349,7 +14445,7 @@ function filesReflectTrivial( test )
     reflectMap : { '/src' : '/dst' },
     onWriteDstUp : onWriteDstUp1,
     src : { maskTerminal : { includeAny : 'a' } },
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     writing : 1,
     dstDeleting : 0,
     dstRewriting : 1,
@@ -14404,7 +14500,7 @@ function filesReflectTrivial( test )
     reflectMap : { '/src' : '/dst' },
     onWriteDstUp : onWriteDstUp2,
     src : { maskTerminal : { includeAny : 'a' } },
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     writing : 1,
     dstDeleting : 0,
     dstRewriting : 1,
@@ -14445,7 +14541,7 @@ function filesReflectRecursive( test )
   var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
   var o =
   {
-    src : { recursive/**/ : 0 },
+    src : { recursive : 0 },
     reflectMap : { '/src' : '/dst' },
     writing : 1,
     dstDeleting : 0,
@@ -14469,7 +14565,7 @@ function filesReflectRecursive( test )
   var o =
   {
     reflectMap : { '/src' : '/dst' },
-    filter : { recursive/**/ : 0 },
+    filter : { recursive : 0 },
     writing : 1,
     dstDeleting : 0,
     dstRewriting : 0,
@@ -14492,7 +14588,7 @@ function filesReflectRecursive( test )
   var o =
   {
     reflectMap : { '/src' : '/dst' },
-    filter : { recursive/**/ : 1 },
+    filter : { recursive : 1 },
     writing : 1,
     dstDeleting : 0,
     dstRewriting : 0,
@@ -14515,7 +14611,7 @@ function filesReflectRecursive( test )
   var o =
   {
     reflectMap : { '/src' : '/dst' },
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     writing : 1,
     dstDeleting : 0,
     dstRewriting : 0,
@@ -14538,7 +14634,7 @@ function filesReflectRecursive( test )
   var o =
   {
     reflectMap : { '/src/a1' : '/dst' },
-    filter : { recursive/**/ : 0 },
+    filter : { recursive : 0 },
     writing : 1,
     dstDeleting : 0,
     dstRewriting : 0,
@@ -14561,7 +14657,7 @@ function filesReflectRecursive( test )
   var o =
   {
     reflectMap : { '/src/a1' : '/dst' },
-    filter : { recursive/**/ : 1 },
+    filter : { recursive : 1 },
     writing : 1,
     dstDeleting : 0,
     dstRewriting : 0,
@@ -14584,7 +14680,7 @@ function filesReflectRecursive( test )
   var o =
   {
     reflectMap : { '/src/a1' : '/dst' },
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     writing : 1,
     dstDeleting : 0,
     dstRewriting : 0,
@@ -17742,7 +17838,7 @@ function filesReflectOverlap( test )
     }
   }
   var extract2 = provider.filesExtract( routinePath );
-  extract2.filesFind({ filePath : '/', filter : { recursive/**/ : 2 }, onDown : function onDown( r, o )
+  extract2.filesFind({ filePath : '/', filter : { recursive : 2 }, onDown : function onDown( r, o )
   {
     if( r.isTerminal )
     extract2.fileWrite( r.absolute, extract2.fileRead( r.absolute ) );
@@ -18741,7 +18837,7 @@ function filesReflectorBasic( test )
   reflect( '/alt/a' );
 
   var extract = provider.filesExtract( routinePath );
-  extract.filesFind({ filePath : '/', filter : { recursive/**/ : 2 }, onDown : function onDown( r, o )
+  extract.filesFind({ filePath : '/', filter : { recursive : 2 }, onDown : function onDown( r, o )
   {
     if( r.isTerminal )
     extract.fileWrite( r.absolute, extract.fileRead( r.absolute ) );
@@ -18835,12 +18931,12 @@ function filesReflectWithSystem( test )
   test.is( records.length >= 0 );
 
   var extract2 = dstProvider.filesExtract( dstPath );
-  extract2.filesFind({ filePath : '/', filter : { recursive/**/ : 2 }, onDown : function onDown( r, o )
+  extract2.filesFind({ filePath : '/', filter : { recursive : 2 }, onDown : function onDown( r, o )
   {
     if( r.isTerminal )
     extract2.fileWrite( r.absolute, extract2.fileRead( r.absolute ) );
   }})
-  test.identical( extract2.filesTree, /*context.select*/_.select( filesTree, srcPath ) )
+  test.identical( extract2.filesTree, _.select( filesTree, srcPath ) )
 
   /* */
 
@@ -18862,12 +18958,12 @@ function filesReflectWithSystem( test )
   test.is( records.length >= 0 );
 
   var extract2 = dstProvider.filesExtract( dstPath );
-  extract2.filesFind({ filePath : '/', filter : { recursive/**/ : 2 }, onDown : function onDown( r, o )
+  extract2.filesFind({ filePath : '/', filter : { recursive : 2 }, onDown : function onDown( r, o )
   {
     if( r.isTerminal )
     extract2.fileWrite( r.absolute, extract2.fileRead( r.absolute ) );
   }})
-  test.identical( extract2.filesTree, /*context.select*/_.select( filesTree, '/src' ) );
+  test.identical( extract2.filesTree, _.select( filesTree, '/src' ) );
 
   dstProvider.filesDelete( dstPath );
   srcProvider.finit();
@@ -19775,7 +19871,7 @@ function filesReflectDeducing( test )
 
 //
 
-function filesReflectDstPreserving( test )
+function filesReflectOnlyPreserving( test )
 {
   let context = this;
   let provider = context.provider;
@@ -19809,7 +19905,7 @@ function filesReflectDstPreserving( test )
 
   /* */
 
-  test.case = 'terminal - terminal, same content, dstRewritingPreserving : 0';
+  test.case = 'terminal - terminal, same content, dstRewritingOnlyPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -19817,15 +19913,15 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 0
+    dstRewritingOnlyPreserving : 0
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   var src = extract.fileRead( '/src/file' );
   var dst = extract.fileRead( '/dst/file' );
   test.identical( src, dst );
-  test.identical( src, /*context.select*/_.select( filesTree, '/src/file' ) );
+  test.identical( src, _.select( filesTree, '/src/file' ) );
 
-  test.case = 'terminal - terminal, same content, dstRewritingPreserving : 0';
+  test.case = 'terminal - terminal, same content, dstRewritingOnlyPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -19833,15 +19929,15 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 1
+    dstRewritingOnlyPreserving : 1
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   var src = extract.fileRead( '/src/file' );
   var dst = extract.fileRead( '/dst/file' );
   test.identical( src, dst );
-  test.identical( src, /*context.select*/_.select( filesTree, '/src/file' ) );
+  test.identical( src, _.select( filesTree, '/src/file' ) );
 
-  test.case = 'terminal - terminal, diff content, dstRewritingPreserving : 0';
+  test.case = 'terminal - terminal, diff content, dstRewritingOnlyPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -19849,15 +19945,15 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 0
+    dstRewritingOnlyPreserving : 0
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   var src = extract.fileRead( '/src/file-d' );
   var dst = extract.fileRead( '/dst/file' );
   test.identical( src, dst );
-  test.identical( src, /*context.select*/_.select( filesTree, '/src/file-d' ) );
+  test.identical( src, _.select( filesTree, '/src/file-d' ) );
 
-  test.case = 'terminal - terminal, diff content, dstRewritingPreserving : 1';
+  test.case = 'terminal - terminal, diff content, dstRewritingOnlyPreserving : 1';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -19865,7 +19961,7 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 1
+    dstRewritingOnlyPreserving : 1
   }
   test.shouldThrowError( () => extract.filesReflect( o ) );
   var src = extract.fileRead( '/src/file-d' );
@@ -19874,7 +19970,7 @@ function filesReflectDstPreserving( test )
 
   /* */
 
-  test.case = 'terminal - empty dir, dstRewritingPreserving : 0';
+  test.case = 'terminal - empty dir, dstRewritingOnlyPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -19882,15 +19978,15 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 0
+    dstRewritingOnlyPreserving : 0
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   var src = extract.fileRead( '/src/file' );
   var dst = extract.fileRead( '/dst/dir-e/dir-e' );
   test.identical( src, dst );
-  test.identical( src, /*context.select*/_.select( filesTree, '/src/file' ) );
+  test.identical( src, _.select( filesTree, '/src/file' ) );
 
-  test.case = 'terminal - dir without terminals, dstRewritingPreserving : 0';
+  test.case = 'terminal - dir without terminals, dstRewritingOnlyPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -19898,15 +19994,15 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 0
+    dstRewritingOnlyPreserving : 0
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   var src = extract.fileRead( '/src/file' );
   var dst = extract.fileRead( '/dst/dir-e' );
   test.identical( src, dst );
-  test.identical( src, /*context.select*/_.select( filesTree, '/src/file' ) );
+  test.identical( src, _.select( filesTree, '/src/file' ) );
 
-  test.case = 'terminal - empty dir, dstRewritingPreserving : 1';
+  test.case = 'terminal - empty dir, dstRewritingOnlyPreserving : 1';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -19914,15 +20010,15 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 1
+    dstRewritingOnlyPreserving : 1
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   var src = extract.fileRead( '/src/file' );
   var dst = extract.fileRead( '/dst/dir-e/dir-e' );
   test.identical( src, dst );
-  test.identical( src, /*context.select*/_.select( filesTree, '/src/file' ) );
+  test.identical( src, _.select( filesTree, '/src/file' ) );
 
-  test.case = 'terminal - dir without terminals, dstRewritingPreserving : 1';
+  test.case = 'terminal - dir without terminals, dstRewritingOnlyPreserving : 1';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -19930,15 +20026,15 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 1
+    dstRewritingOnlyPreserving : 1
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   var src = extract.fileRead( '/src/file' );
   var dst = extract.fileRead( '/dst/dir-e' );
   test.identical( src, dst );
-  test.identical( src, /*context.select*/_.select( filesTree, '/src/file' ) );
+  test.identical( src, _.select( filesTree, '/src/file' ) );
 
-  test.case = 'terminal - dir with terminals, dstRewritingPreserving : 0';
+  test.case = 'terminal - dir with terminals, dstRewritingOnlyPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -19946,15 +20042,15 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 0
+    dstRewritingOnlyPreserving : 0
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   var src = extract.fileRead( '/src/file' );
   var dst = extract.fileRead( '/dst/dir-test' );
   test.identical( src, dst );
-  test.identical( src, /*context.select*/_.select( filesTree, '/src/file' ) );
+  test.identical( src, _.select( filesTree, '/src/file' ) );
 
-  test.case = 'terminal - dir with terminals inner level, dstRewritingPreserving : 0';
+  test.case = 'terminal - dir with terminals inner level, dstRewritingOnlyPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -19962,15 +20058,15 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 0
+    dstRewritingOnlyPreserving : 0
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   var src = extract.fileRead( '/src/file' );
   var dst = extract.fileRead( '/dst/dir-test-inner' );
   test.identical( src, dst );
-  test.identical( src, /*context.select*/_.select( filesTree, '/src/file' ) );
+  test.identical( src, _.select( filesTree, '/src/file' ) );
 
-  test.case = 'terminal - dir with terminals, dstRewritingPreserving : 1';
+  test.case = 'terminal - dir with terminals, dstRewritingOnlyPreserving : 1';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -19978,15 +20074,15 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 1
+    dstRewritingOnlyPreserving : 1
   }
   test.shouldThrowError( () => extract.filesReflect( o ) );
   test.is( extract.isTerminal( '/src/file' ) );
   test.is( extract.isDir( '/dst/dir-test' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/file' ), /*context.select*/_.select( filesTree, '/src/file' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/dst/dir-test' ), /*context.select*/_.select( filesTree, '/dst/dir-test' ) );
+  test.identical( _.select( extract.filesTree, '/src/file' ), _.select( filesTree, '/src/file' ) );
+  test.identical( _.select( extract.filesTree, '/dst/dir-test' ), _.select( filesTree, '/dst/dir-test' ) );
 
-  test.case = 'terminal - dir with terminals inner level, dstRewritingPreserving : 1';
+  test.case = 'terminal - dir with terminals inner level, dstRewritingOnlyPreserving : 1';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -19994,17 +20090,17 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 1
+    dstRewritingOnlyPreserving : 1
   }
   test.shouldThrowError( () => extract.filesReflect( o ) );
   test.is( extract.isTerminal( '/src/file' ) );
   test.is( extract.isDir( '/dst/dir-test-inner' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/file' ), /*context.select*/_.select( filesTree, '/src/file' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/dst/dir-test-inner' ), /*context.select*/_.select( filesTree, '/dst/dir-test-inner' ) );
+  test.identical( _.select( extract.filesTree, '/src/file' ), _.select( filesTree, '/src/file' ) );
+  test.identical( _.select( extract.filesTree, '/dst/dir-test-inner' ), _.select( filesTree, '/dst/dir-test-inner' ) );
 
   /* */
 
-  test.case = 'dir empty - terminal, dstRewritingPreserving : 0';
+  test.case = 'dir empty - terminal, dstRewritingOnlyPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -20012,15 +20108,15 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 0
+    dstRewritingOnlyPreserving : 0
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   test.is( extract.isDir( '/src/dir-e/dir-e' ) );
   test.is( extract.isDir( '/dst/file' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/dir-e/dir-e' ), /*context.select*/_.select( filesTree, '/src/dir-e/dir-e' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/dir-e/dir-e' ), /*context.select*/_.select( extract.filesTree, '/dst/file' ) );
+  test.identical( _.select( extract.filesTree, '/src/dir-e/dir-e' ), _.select( filesTree, '/src/dir-e/dir-e' ) );
+  test.identical( _.select( extract.filesTree, '/src/dir-e/dir-e' ), _.select( extract.filesTree, '/dst/file' ) );
 
-  test.case = 'dir empty - terminal, dstRewritingPreserving : 1';
+  test.case = 'dir empty - terminal, dstRewritingOnlyPreserving : 1';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -20028,15 +20124,15 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 1
+    dstRewritingOnlyPreserving : 1
   }
   test.shouldThrowError( () => extract.filesReflect( o ) );
   test.is( extract.isDir( '/src/dir-e/dir-e' ) );
   test.is( extract.isTerminal( '/dst/file' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/dir-e/dir-e' ), /*context.select*/_.select( filesTree, '/src/dir-e/dir-e' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/dst/file' ), /*context.select*/_.select( filesTree, '/dst/file' ) );
+  test.identical( _.select( extract.filesTree, '/src/dir-e/dir-e' ), _.select( filesTree, '/src/dir-e/dir-e' ) );
+  test.identical( _.select( extract.filesTree, '/dst/file' ), _.select( filesTree, '/dst/file' ) );
 
-  test.case = 'dir without terminal - terminal, dstRewritingPreserving : 0';
+  test.case = 'dir without terminal - terminal, dstRewritingOnlyPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -20044,15 +20140,15 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 0
+    dstRewritingOnlyPreserving : 0
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   test.is( extract.isDir( '/src/dir-e' ) );
   test.is( extract.isDir( '/dst/file' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/dir-e' ), /*context.select*/_.select( filesTree, '/src/dir-e' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/dir-e' ), /*context.select*/_.select( extract.filesTree, '/dst/file' ) );
+  test.identical( _.select( extract.filesTree, '/src/dir-e' ), _.select( filesTree, '/src/dir-e' ) );
+  test.identical( _.select( extract.filesTree, '/src/dir-e' ), _.select( extract.filesTree, '/dst/file' ) );
 
-  test.case = 'dir without terminal - terminal, dstRewritingPreserving : 0';
+  test.case = 'dir without terminal - terminal, dstRewritingOnlyPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -20060,15 +20156,15 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 1
+    dstRewritingOnlyPreserving : 1
   }
   test.shouldThrowError( () => extract.filesReflect( o ) );
   test.is( extract.isDir( '/src/dir-e' ) );
   test.is( extract.isTerminal( '/dst/file' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/dir-e' ), /*context.select*/_.select( filesTree, '/src/dir-e' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/dst/file' ), /*context.select*/_.select( filesTree, '/dst/file' ) );
+  test.identical( _.select( extract.filesTree, '/src/dir-e' ), _.select( filesTree, '/src/dir-e' ) );
+  test.identical( _.select( extract.filesTree, '/dst/file' ), _.select( filesTree, '/dst/file' ) );
 
-  test.case = 'dir with files - terminal, dstRewritingPreserving : 0';
+  test.case = 'dir with files - terminal, dstRewritingOnlyPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -20076,15 +20172,15 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 0
+    dstRewritingOnlyPreserving : 0
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   test.is( extract.isDir( '/src/dir-test' ) );
   test.is( extract.isDir( '/dst/file' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/dir-test' ), /*context.select*/_.select( filesTree, '/src/dir-test' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/dst/file' ), /*context.select*/_.select( extract.filesTree, '/src/dir-test' ) );
+  test.identical( _.select( extract.filesTree, '/src/dir-test' ), _.select( filesTree, '/src/dir-test' ) );
+  test.identical( _.select( extract.filesTree, '/dst/file' ), _.select( extract.filesTree, '/src/dir-test' ) );
 
-  test.case = 'dir with files - terminal, dstRewritingPreserving : 1';
+  test.case = 'dir with files - terminal, dstRewritingOnlyPreserving : 1';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -20092,17 +20188,17 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 1
+    dstRewritingOnlyPreserving : 1
   }
   test.shouldThrowError( () => extract.filesReflect( o ) );
   test.is( extract.isDir( '/src/dir-test' ) );
   test.is( extract.isTerminal( '/dst/file' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/dir-test' ), /*context.select*/_.select( filesTree, '/src/dir-test' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/dst/file' ), /*context.select*/_.select( filesTree, '/dst/file' ) );
+  test.identical( _.select( extract.filesTree, '/src/dir-test' ), _.select( filesTree, '/src/dir-test' ) );
+  test.identical( _.select( extract.filesTree, '/dst/file' ), _.select( filesTree, '/dst/file' ) );
 
   /**/
 
-  test.case = 'reflect dir - dir, both with same terminal, dstRewritingPreserving : 0';
+  test.case = 'reflect dir - dir, both with same terminal, dstRewritingOnlyPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -20110,14 +20206,14 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 0
+    dstRewritingOnlyPreserving : 0
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   test.is( extract.isTerminal( '/src/dir-s/file' ) );
   test.is( extract.isTerminal( '/dst/dir-s/file' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/dir-s' ), /*context.select*/_.select( extract.filesTree, '/dst/dir-s' ) );
+  test.identical( _.select( extract.filesTree, '/src/dir-s' ), _.select( extract.filesTree, '/dst/dir-s' ) );
 
-  test.case = 'reflect dir - dir, both with same terminal, dstRewritingPreserving : 1';
+  test.case = 'reflect dir - dir, both with same terminal, dstRewritingOnlyPreserving : 1';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -20125,14 +20221,14 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 1
+    dstRewritingOnlyPreserving : 1
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   test.is( extract.isTerminal( '/src/dir-s/file' ) );
   test.is( extract.isTerminal( '/dst/dir-s/file' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/dir-s' ), /*context.select*/_.select( extract.filesTree, '/dst/dir-s' ) );
+  test.identical( _.select( extract.filesTree, '/src/dir-s' ), _.select( extract.filesTree, '/dst/dir-s' ) );
 
-  test.case = 'reflect dir - dir, both have terminal with diff content, dstRewritingPreserving : 0';
+  test.case = 'reflect dir - dir, both have terminal with diff content, dstRewritingOnlyPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -20140,14 +20236,14 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 0
+    dstRewritingOnlyPreserving : 0
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   test.is( extract.isTerminal( '/src/dir-s/file' ) );
   test.is( extract.isTerminal( '/dst/dir-s/file' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/dir-s' ), /*context.select*/_.select( extract.filesTree, '/dst/dir-s' ) );
+  test.identical( _.select( extract.filesTree, '/src/dir-s' ), _.select( extract.filesTree, '/dst/dir-s' ) );
 
-  test.case = 'reflect dir - dir, both have terminal with diff content, dstRewritingPreserving : 1';
+  test.case = 'reflect dir - dir, both have terminal with diff content, dstRewritingOnlyPreserving : 1';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -20155,13 +20251,13 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 1
+    dstRewritingOnlyPreserving : 1
   }
   test.shouldThrowError( () => extract.filesReflect( o ) );
   test.is( extract.isTerminal( '/src/dir-s/file' ) );
   test.is( extract.isTerminal( '/dst/dir-s/file' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/dir-d/file-d' ), /*context.select*/_.select( filesTree, '/src/dir-d/file-d' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/dst/dir-d/file-d' ), /*context.select*/_.select( filesTree, '/dst/dir-d/file-d' ) );
+  test.identical( _.select( extract.filesTree, '/src/dir-d/file-d' ), _.select( filesTree, '/src/dir-d/file-d' ) );
+  test.identical( _.select( extract.filesTree, '/dst/dir-d/file-d' ), _.select( filesTree, '/dst/dir-d/file-d' ) );
 
   /*  */
 
@@ -20177,7 +20273,7 @@ function filesReflectDstPreserving( test )
     }
   }
 
-  test.case = 'reflect two terminals to same dst path, src termianls have different content, dstRewritingPreserving : 0';
+  test.case = 'reflect two terminals to same dst path, src termianls have different content, dstRewritingOnlyPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -20189,15 +20285,15 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 0
+    dstRewritingOnlyPreserving : 0
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   test.is( extract.isTerminal( '/dst/file' )  );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/file2' ), /*context.select*/_.select( extract.filesTree, '/dst/file' ) );
+  test.identical( _.select( extract.filesTree, '/src/file2' ), _.select( extract.filesTree, '/dst/file' ) );
 
-  //
+  /* */
 
-  test.case = 'reflect two terminals to same dst path, src termianls have different content, dstRewritingPreserving : 1';
+  test.case = 'reflect two terminals to same dst path, src termianls have different content, dstRewritingOnlyPreserving : 1';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -20209,13 +20305,13 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 1
+    dstRewritingOnlyPreserving : 1
   }
   test.shouldThrowErrorSync( () => extract.filesReflect( o ) );
   test.is( !extract.fileExists( '/dst/file' )  );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/file1' ), 'file1' );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/file2' ), 'file2' );
-  test.is( !/*context.select*/_.select( extract.filesTree, '/dst/file' ) );
+  test.identical( _.select( extract.filesTree, '/src/file1' ), 'file1' );
+  test.identical( _.select( extract.filesTree, '/src/file2' ), 'file2' );
+  test.is( !_.select( extract.filesTree, '/dst/file' ) );
 
   /*  */
 
@@ -20232,7 +20328,7 @@ function filesReflectDstPreserving( test )
     }
   }
 
-  test.case = 'reflect two terminals to same dst path, src termianls have same content, dstRewritingPreserving : 1';
+  test.case = 'reflect two terminals to same dst path, src termianls have same content, dstRewritingOnlyPreserving : 1';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -20244,16 +20340,16 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 1
+    dstRewritingOnlyPreserving : 1
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   test.is( extract.isTerminal( '/dst/file' )  );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/file1' ), /*context.select*/_.select( extract.filesTree, '/dst/file' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/file2' ), /*context.select*/_.select( extract.filesTree, '/dst/file' ) );
+  test.identical( _.select( extract.filesTree, '/src/file1' ), _.select( extract.filesTree, '/dst/file' ) );
+  test.identical( _.select( extract.filesTree, '/src/file2' ), _.select( extract.filesTree, '/dst/file' ) );
 
-  //
+  /* */
 
-  test.case = 'reflect two terminals to same dst path, src termianls have same content, dstRewritingPreserving : 0';
+  test.case = 'reflect two terminals to same dst path, src termianls have same content, dstRewritingOnlyPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -20265,16 +20361,16 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 0
+    dstRewritingOnlyPreserving : 0
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   test.is( extract.isTerminal( '/dst/file' )  );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/file1' ), /*context.select*/_.select( extract.filesTree, '/dst/file' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/file2' ), /*context.select*/_.select( extract.filesTree, '/dst/file' ) );
+  test.identical( _.select( extract.filesTree, '/src/file1' ), _.select( extract.filesTree, '/dst/file' ) );
+  test.identical( _.select( extract.filesTree, '/src/file2' ), _.select( extract.filesTree, '/dst/file' ) );
 
-  //
+  /* */
 
-  test.case = 'reflect three terminals to same dst path, one of src termianls has diff content, dstRewritingPreserving : 0';
+  test.case = 'reflect three terminals to same dst path, one of src termianls has diff content, dstRewritingOnlyPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -20287,17 +20383,17 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 0
+    dstRewritingOnlyPreserving : 0
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   test.is( extract.isTerminal( '/dst/file' )  );
-  test.notIdentical( /*context.select*/_.select( extract.filesTree, '/src/file1' ), /*context.select*/_.select( extract.filesTree, '/dst/file' ) );
-  test.notIdentical( /*context.select*/_.select( extract.filesTree, '/src/file2' ), /*context.select*/_.select( extract.filesTree, '/dst/file' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/file3' ), /*context.select*/_.select( extract.filesTree, '/dst/file' ) );
+  test.notIdentical( _.select( extract.filesTree, '/src/file1' ), _.select( extract.filesTree, '/dst/file' ) );
+  test.notIdentical( _.select( extract.filesTree, '/src/file2' ), _.select( extract.filesTree, '/dst/file' ) );
+  test.identical( _.select( extract.filesTree, '/src/file3' ), _.select( extract.filesTree, '/dst/file' ) );
 
-  //
+  /* */
 
-  test.case = 'reflect three terminals to same dst path, one of src termianls has diff content, dstRewritingPreserving : 1';
+  test.case = 'reflect three terminals to same dst path, one of src termianls has diff content, dstRewritingOnlyPreserving : 1';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -20310,13 +20406,13 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 1
+    dstRewritingOnlyPreserving : 1
   }
   test.shouldThrowErrorSync( () => extract.filesReflect( o ) );
   test.is( !extract.fileExists( '/dst/file' )  );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/file1' ), 'file' );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/file2' ), 'file' );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/file3' ), 'file3' );
+  test.identical( _.select( extract.filesTree, '/src/file1' ), 'file' );
+  test.identical( _.select( extract.filesTree, '/src/file2' ), 'file' );
+  test.identical( _.select( extract.filesTree, '/src/file3' ), 'file3' );
 
   /*  */
 
@@ -20335,9 +20431,9 @@ function filesReflectDstPreserving( test )
 
   }
 
-  //
+  /* */
 
-  test.case = 'reflect three terminals to same dst path, one of src termianls is a softLink, dstRewritingPreserving : 0';
+  test.case = 'reflect three terminals to same dst path, one of src termianls is a softLink, dstRewritingOnlyPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -20350,17 +20446,17 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 0
+    dstRewritingOnlyPreserving : 0
   }
 
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   test.is( extract.isTerminal( '/dst/file' )  );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/file3' ), /*context.select*/_.select( extract.filesTree, '/dst/file' ) );
-  test.notIdentical( /*context.select*/_.select( extract.filesTree, '/src/file4' ), /*context.select*/_.select( extract.filesTree, '/dst/file' ) );
+  test.identical( _.select( extract.filesTree, '/src/file3' ), _.select( extract.filesTree, '/dst/file' ) );
+  test.notIdentical( _.select( extract.filesTree, '/src/file4' ), _.select( extract.filesTree, '/dst/file' ) );
 
-  //
+  /* */
 
-  test.case = 'reflect three terminals to same dst path, one of src termianls is a softLink, dstRewritingPreserving : 1';
+  test.case = 'reflect three terminals to same dst path, one of src termianls is a softLink, dstRewritingOnlyPreserving : 1';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -20373,17 +20469,17 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 1
+    dstRewritingOnlyPreserving : 1
   }
 
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   test.is( extract.isTerminal( '/dst/file' )  );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/file3' ), /*context.select*/_.select( extract.filesTree, '/dst/file' ) );
-  test.notIdentical( /*context.select*/_.select( extract.filesTree, '/src/file4' ), /*context.select*/_.select( extract.filesTree, '/dst/file' ) );
+  test.identical( _.select( extract.filesTree, '/src/file3' ), _.select( extract.filesTree, '/dst/file' ) );
+  test.notIdentical( _.select( extract.filesTree, '/src/file4' ), _.select( extract.filesTree, '/dst/file' ) );
 
   /*  */
 
-  test.case = 'mixed file path, multiple src, dstRewritingPreserving : 0';
+  test.case = 'mixed file path, multiple src, dstRewritingOnlyPreserving : 0';
 
   var tree =
   {
@@ -20398,7 +20494,7 @@ function filesReflectDstPreserving( test )
       prefixPath : '/src',
       filePath : { 'c' : '/dst/c2', 'd' : '/dst' },
     },
-    dstRewritingPreserving : 0
+    dstRewritingOnlyPreserving : 0
   }
 
   var extract = new _.FileProvider.Extract({ filesTree : tree, protocol : 'extract' });
@@ -20421,9 +20517,9 @@ function filesReflectDstPreserving( test )
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
 
-  //
+  /* */
 
-  test.case = 'mixed file path, multiple src, dstRewritingPreserving : 1';
+  test.case = 'mixed file path, multiple src, dstRewritingOnlyPreserving : 1';
 
   var tree =
   {
@@ -20438,7 +20534,7 @@ function filesReflectDstPreserving( test )
       prefixPath : '/src',
       filePath : { 'c' : '/dst/c2', 'd' : '/dst' },
     },
-    dstRewritingPreserving : 1
+    dstRewritingOnlyPreserving : 1
   }
 
   var extract = new _.FileProvider.Extract({ filesTree : _.cloneJust( tree ), protocol : 'extract' });
@@ -20451,7 +20547,7 @@ function filesReflectDstPreserving( test )
   }
 
   test.identical( extract.filesTree, expectedTree );
-}
+} /* end of filesReflectOnlyPreserving */
 
 //
 
@@ -28951,7 +29047,7 @@ function filesReflectDstIgnoring( test )
         '/src2/proto/amid' : '/src2',
       },
     },
-    filter : { recursive/**/ : 0 },
+    filter : { recursive : 0 },
     mandatory : 0,
   }
 
@@ -29045,7 +29141,7 @@ function filesReflectDstIgnoring( test )
         '/src2/proto/amid' : '/src2',
       },
     },
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     mandatory : 0,
   }
 
@@ -29121,7 +29217,7 @@ function filesReflectDstIgnoring( test )
       basePath : '.',
       prefixPath : '/dst'
     },
-    filter : { recursive/**/ : 0 },
+    filter : { recursive : 0 },
     mandatory : 0,
   }
 
@@ -29152,13 +29248,36 @@ function filesDeleteTrivial( test )
 
   var find = provider.filesFinder
   ({
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     includingTerminals : 1,
     includingDirs : 1,
     includingTransient : 1,
     allowingMissed : 1,
     outputFormat : 'relative',
   });
+
+  /* */
+
+  test.case = 'no file';
+
+  var expected =
+  {
+    f : 'f',
+    dir : { df : 'df' },
+  }
+  var extract1 = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      f : 'f',
+      dir : { df : 'df' },
+    },
+  });
+
+  debugger;
+  extract1.filesDelete({});
+  debugger;
+  test.identical( extract1.filesTree, expected );
 
   /* */
 
@@ -29600,7 +29719,7 @@ function filesDelete( test )
   {
     maskDirectory : /dir1$/g
   }
-  var got = provider.filesDelete({ filePath : routinePath, filter : { recursive/**/ : 2 }, throwing : 1, filter });
+  var got = provider.filesDelete({ filePath : routinePath, filter : { recursive : 2 }, throwing : 1, filter });
   var deleted = _.select( got, '*/relative' );
   var expected =
   [
@@ -29619,7 +29738,7 @@ function filesDelete( test )
   test.identical( files, expected );
   tree2.finit();
 
-  //
+  /* */
 
   test.case = 'mask single terminal';
   var tree2 = _.FileProvider.Extract
@@ -29641,7 +29760,7 @@ function filesDelete( test )
   {
     maskTerminal : /file1$/g
   }
-  var got = provider.filesDelete({ filePath : routinePath, filter : { recursive/**/ : 2 }, throwing : 1, filter });
+  var got = provider.filesDelete({ filePath : routinePath, filter : { recursive : 2 }, throwing : 1, filter });
   var deleted = _.select( got, '*/relative' );
   var expected =
   [
@@ -29659,14 +29778,14 @@ function filesDelete( test )
   test.identical( files, expected );
   tree2.finit();
 
-  //
+  /* */
 
   test.open( 'recursive' );
 
-  test.case = 'filter : { recursive/**/ : 0 }';
+  test.case = 'filter : { recursive : 0 }';
   provider.filesDelete( routinePath );
   system.filesReflect({ reflectMap : { 'src:///' : 'current://' + routinePath } });
-  test.shouldThrowErrorSync( () => provider.filesDelete({ filePath : routinePath, filter : { recursive/**/ : 0 } }) );
+  test.shouldThrowErrorSync( () => provider.filesDelete({ filePath : routinePath, filter : { recursive : 0 } }) );
   var files = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative' });
   test.will = 'nothing deleted';
   var expected =
@@ -29683,10 +29802,10 @@ function filesDelete( test )
   ]
   test.identical( files, expected );
 
-  test.case = 'filter : { recursive/**/ : 1 }';
+  test.case = 'filter : { recursive : 1 }';
   provider.filesDelete( routinePath );
   system.filesReflect({ reflectMap : { 'src:///' : 'current://' + routinePath } });
-  var got = provider.filesDelete({ filePath : routinePath, filter : { recursive/**/ : 1 } });
+  var got = provider.filesDelete({ filePath : routinePath, filter : { recursive : 1 } });
   var deleted = _.select( got, '*/relative' );
   test.will = 'only terminals from root and empty dirs'
   var expected =
@@ -29708,10 +29827,10 @@ function filesDelete( test )
   ];
   test.identical( files, expected );
 
-  test.case = 'filter : { recursive/**/ : 2 }';
+  test.case = 'filter : { recursive : 2 }';
   provider.filesDelete( routinePath );
   system.filesReflect({ reflectMap : { 'src:///' : 'current://' + routinePath } });
-  var got = provider.filesDelete({ filePath : routinePath, filter : { recursive/**/ : 2 } });
+  var got = provider.filesDelete({ filePath : routinePath, filter : { recursive : 2 } });
   var deleted = _.select( got, '*/relative' );
   var expected =
   [
@@ -29970,7 +30089,7 @@ function filesDelete( test )
 
   tree.finit();
 
-}
+} /* end of filesDelete */
 
 //
 
@@ -30348,9 +30467,7 @@ function filesDeleteAsync( test )
   /* */
 
   return con;
-}
-
-filesDeleteAsync.timeOut = 20000;
+} /* end of filesDeleteAsync */
 
 //
 
@@ -30544,9 +30661,7 @@ function filesDeleteDeletingEmptyDirs( test )
   test.will = 'only terminals and empty* dirs should be deleted';
   test.identical( deleted, expected );
 
-}
-
-filesDeleteDeletingEmptyDirs.timeOut = 20000;
+} /* end of filesDeleteDeletingEmptyDirs */
 
 //
 
@@ -30599,7 +30714,7 @@ function filesDeleteEmptyDirs( test )
   test.case = 'not recursive'
   provider.filesDelete( routinePath );
   tree.filesReflectTo( provider, routinePath );
-  provider.filesDeleteEmptyDirs({ filePath : routinePath, filter : { recursive/**/ : 1 } });
+  provider.filesDeleteEmptyDirs({ filePath : routinePath, filter : { recursive : 1 } });
   /*
   {
     file : 'file',
@@ -30949,7 +31064,7 @@ function filesDeleteTerminals( test )
   test.case = 'recursion off'
   provider.filesDelete( routinePath );
   tree.filesReflectTo( provider, routinePath );
-  provider.filesDeleteTerminals({ filePath : routinePath, filter : { recursive/**/ : 0 } });
+  provider.filesDeleteTerminals({ filePath : routinePath, filter : { recursive : 0 } });
   var expected =
   [
     './terminal0',
@@ -30967,7 +31082,7 @@ function filesDeleteTerminals( test )
   test.case = 'recursion only first level'
   provider.filesDelete( routinePath );
   tree.filesReflectTo( provider, routinePath );
-  provider.filesDeleteTerminals({ filePath : routinePath, filter : { recursive/**/ : 1 } });
+  provider.filesDeleteTerminals({ filePath : routinePath, filter : { recursive : 1 } });
   var expected =
   [
     './dir1',
@@ -31811,7 +31926,7 @@ function filesFindDifference( test )
       dst : path.join( dir, 'initial/dst' ),
       includingTerminals : 1,
       includingDirs : 1,
-      filter : { recursive/**/ : 2 },
+      filter : { recursive : 2 },
       onDown : function( record ){ test.identical( _.objectIs( record ), true ); },
       onUp : function( record ){ test.identical( _.objectIs( record ), true ); },
       src : { ends : sample.ends }
@@ -31835,12 +31950,12 @@ function filesFindDifference( test )
 
       // logger.log( 'got :\n' + _.toStr( got, { levels : 2 } ) );
 
-      logger.log( 'relative :\n' + _.toStr( /*context.select*/_.select( got, '*.src.relative' ), { levels : 2 } ) );
-      logger.log( 'same :\n' + _.toStr( /*context.select*/_.select( got, '*.same' ), { levels : 2 } ) );
-      logger.log( 'del :\n' + _.toStr( /*context.select*/_.select( got, '*.del' ), { levels : 2 } ) );
+      logger.log( 'relative :\n' + _.toStr( _.select( got, '*.src.relative' ), { levels : 2 } ) );
+      logger.log( 'same :\n' + _.toStr( _.select( got, '*.same' ), { levels : 2 } ) );
+      logger.log( 'del :\n' + _.toStr( _.select( got, '*.del' ), { levels : 2 } ) );
 
-      logger.log( 'newer :\n' + _.toStr( /*context.select*/_.select( got, '*.newer.side' ), { levels : 1 } ) );
-      logger.log( 'older :\n' + _.toStr( /*context.select*/_.select( got, '*.older' ), { levels : 1 } ) );
+      logger.log( 'newer :\n' + _.toStr( _.select( got, '*.newer.side' ), { levels : 1 } ) );
+      logger.log( 'older :\n' + _.toStr( _.select( got, '*.older' ), { levels : 1 } ) );
 
     }
 
@@ -33447,7 +33562,7 @@ function filesCopyWithAdapter( test )
       investigateDestination : 1,
       includingTerminals : 1,
       includingDirs : 1,
-      filter : { recursive/**/ : 2 },
+      filter : { recursive : 2 },
       allowWrite : 1,
       allowRewrite : 1,
       allowDelete : 0,
@@ -33473,12 +33588,12 @@ function filesCopyWithAdapter( test )
       // logger.log( 'got :\n' + _.toStr( treeGot.initial, { levels : 99 } ) );
       // logger.log( 'expected :\n' + _.toStr( sample.filesTree.got, { levels : 99 } ) );
 
-      logger.log( 'relative :\n' + _.toStr( /*context.select*/_.select( got, '*.relative' ), { levels : 2 } ) );
-      logger.log( 'action :\n' + _.toStr( /*context.select*/_.select( got, '*.action' ), { levels : 2 } ) );
+      logger.log( 'relative :\n' + _.toStr( _.select( got, '*.relative' ), { levels : 2 } ) );
+      logger.log( 'action :\n' + _.toStr( _.select( got, '*.action' ), { levels : 2 } ) );
       // logger.log( 'length :\n' + got.length + ' / ' + sample.expected.length );
 
-      //logger.log( 'same :\n' + _.toStr( /*context.select*/_.select( got, '*.same' ), { levels : 2 } ) );
-      //logger.log( 'del :\n' + _.toStr( /*context.select*/_.select( got, '*.del' ), { levels : 2 } ) );
+      //logger.log( 'same :\n' + _.toStr( _.select( got, '*.same' ), { levels : 2 } ) );
+      //logger.log( 'del :\n' + _.toStr( _.select( got, '*.del' ), { levels : 2 } ) );
 
     }
 
@@ -33510,7 +33625,7 @@ function experiment( test )
   var files = _.fileProvider.filesFind( dst );
   console.log( _.toStr( files, { levels : 99 } ) );
 
-  // var got2 = _.fileProvider.filesFind( { filePath : __dirname, filter : { recursive/**/ : 2 } } );
+  // var got2 = _.fileProvider.filesFind( { filePath : __dirname, filter : { recursive : 2 } } );
   // console.log( got2[ 0 ] );
 
 }
@@ -33551,7 +33666,7 @@ function filesFindExperiment2( test )
   var got = provider.filesFind
   ({
     filePath : routinePath,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     includingTransient : 1,
     includingDirs : 1,
     includingTerminals : 1,
@@ -33707,7 +33822,7 @@ var Self =
     filesReflectWithSystem,
     filesReflectLinkWithSystem,
     filesReflectDeducing,
-    filesReflectDstPreserving,
+    filesReflectOnlyPreserving,
     filesReflectDstDeletingDirs,
     filesReflectLinked,
     filesReflectTo,

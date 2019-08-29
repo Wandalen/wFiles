@@ -577,7 +577,7 @@ function isUpToDate( o )
       result = !_.strHasAny( arg[ 0 ].output, [ 'Your branch is behind', 'have diverged' ] );
     }
 
-    if( o.verbosity )
+    if( o.verbosity >= 1 )
     self.logger.log( o.remotePath, result ? 'is up to date' : 'is not up to date' );
 
     return result;
@@ -942,7 +942,7 @@ function filesReflectSingle_body( o )
   {
     if( gitMergeFailed )
     {
-      if( o.verbosity )
+      if( o.verbosity >= 1 )
       self.logger.log( 'Can\'t pop stashed changes due merge conflict at ' + _.strQuote( dstPath ) );
       return null;
     }
@@ -977,7 +977,7 @@ function filesReflectSingle_body( o )
   {
     if( self.throwingGitErrors )
     throw _.errBriefly( err );
-    else if( o.verbosity )
+    else if( o.verbosity >= 1 )
     self.logger.log( err );
   }
 

@@ -8745,7 +8745,558 @@ function filesFindSimplifyGlob( test )
   test.identical( o.filter.prefixPath, null );
   test.identical( o.filter.postfixPath, null );
 
-}
+} /* end of filesFindSimplifyGlob */
+
+//
+
+function filesFindOptimalFilePath( test )
+{
+  let context = this;
+  let provider = context.provider;
+  let system = context.system;
+  let path = context.provider.path;
+  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+
+  function abs()
+  {
+    let args = _.longSlice( arguments );
+    args.unshift( routinePath );
+    return path.s.join.apply( path.s, args );
+  }
+
+  /* - */
+
+  test.case = 'setup';
+
+  var tree =
+  {
+    src :
+    {
+      proto :
+      {
+        '-ile' : 'src/proto/-ile',
+        'file' : 'src/proto/file',
+        'f.cc' : 'src/proto/f.cc',
+        'f.js' : 'src/proto/f.js',
+        'f.ss' : 'src/proto/f.ss',
+        'f.test.js' : 'src/proto/f.test.js',
+        'f.test.ss' : 'src/proto/f.test.ss',
+        dir1 :
+        {
+          dir2 :
+          {
+            '-ile' : 'dir1/dir2/src/proto/-ile',
+            'file' : 'dir1/dir2/src/proto/file',
+            'f.cc' : 'dir1/dir2/src/proto/f.cc',
+            'f.js' : 'dir1/dir2/src/proto/f.js',
+            'f.ss' : 'dir1/dir2/src/proto/f.ss',
+            'f.test.js' : 'dir1/dir2/src/proto/f.test.js',
+            'f.test.ss' : 'dir1/dir2/src/proto/f.test.ss',
+          }
+        }
+      },
+      proto2 :
+      {
+        '-ile' : 'src/proto2/-ile',
+        'file' : 'src/proto2/file',
+        'f.cc' : 'src/proto2/f.cc',
+        'f.js' : 'src/proto2/f.js',
+        'f.ss' : 'src/proto2/f.ss',
+        'f.test.js' : 'src/proto2/f.test.js',
+        'f.test.ss' : 'src/proto2/f.test.ss',
+        dir1 :
+        {
+          dir2 :
+          {
+            '-ile' : 'dir1/dir2/src/proto2/-ile',
+            'file' : 'dir1/dir2/src/proto2/file',
+            'f.cc' : 'dir1/dir2/src/proto2/f.cc',
+            'f.js' : 'dir1/dir2/src/proto2/f.js',
+            'f.ss' : 'dir1/dir2/src/proto2/f.ss',
+            'f.test.js' : 'dir1/dir2/src/proto2/f.test.js',
+            'f.test.ss' : 'dir1/dir2/src/proto2/f.test.ss',
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+  var extract = new _.FileProvider.Extract({ filesTree : tree });
+
+  extract.filesReflectTo( provider, routinePath );
+
+  /* - */
+
+  test.case = 'defined relative base path';
+
+  var filter =
+  {
+    filePath :
+    {
+      [ abs( 'src/proto/dir1' ) ] : '',
+      [ abs( 'src/proto' ) ] : '',
+    },
+    basePath : '..',
+    recursive : 2,
+  }
+
+  var o =
+  {
+    includingDirs : 1,
+    includingTerminals : 1,
+    includingStem : 1,
+    maskPreset : 0,
+    filter,
+  }
+
+  debugger;
+  var got = provider.filesFind( o );
+  debugger;
+
+  var exp = abs
+  ([
+    './src/proto',
+    './src/proto/-ile',
+    './src/proto/f.cc',
+    './src/proto/f.js',
+    './src/proto/f.ss',
+    './src/proto/f.test.js',
+    './src/proto/f.test.ss',
+    './src/proto/file',
+    './src/proto/dir1',
+    './src/proto/dir1/dir2',
+    './src/proto/dir1/dir2/-ile',
+    './src/proto/dir1/dir2/f.cc',
+    './src/proto/dir1/dir2/f.js',
+    './src/proto/dir1/dir2/f.ss',
+    './src/proto/dir1/dir2/f.test.js',
+    './src/proto/dir1/dir2/f.test.ss',
+    './src/proto/dir1/dir2/file',
+    './src/proto/dir1',
+    './src/proto/dir1/dir2',
+    './src/proto/dir1/dir2/-ile',
+    './src/proto/dir1/dir2/f.cc',
+    './src/proto/dir1/dir2/f.js',
+    './src/proto/dir1/dir2/f.ss',
+    './src/proto/dir1/dir2/f.test.js',
+    './src/proto/dir1/dir2/f.test.ss',
+    './src/proto/dir1/dir2/file',
+  ]);
+  test.identical( _.select( got, '*/absolute' ), exp );
+
+  var exp =
+  [
+    './proto',
+    './proto/-ile',
+    './proto/f.cc',
+    './proto/f.js',
+    './proto/f.ss',
+    './proto/f.test.js',
+    './proto/f.test.ss',
+    './proto/file',
+    './proto/dir1',
+    './proto/dir1/dir2',
+    './proto/dir1/dir2/-ile',
+    './proto/dir1/dir2/f.cc',
+    './proto/dir1/dir2/f.js',
+    './proto/dir1/dir2/f.ss',
+    './proto/dir1/dir2/f.test.js',
+    './proto/dir1/dir2/f.test.ss',
+    './proto/dir1/dir2/file',
+    './dir1',
+    './dir1/dir2',
+    './dir1/dir2/-ile',
+    './dir1/dir2/f.cc',
+    './dir1/dir2/f.js',
+    './dir1/dir2/f.ss',
+    './dir1/dir2/f.test.js',
+    './dir1/dir2/f.test.ss',
+    './dir1/dir2/file',
+  ];
+  test.identical( _.select( got, '*/relative' ), exp );
+
+  /* */
+
+  test.case = 'defined absolute base path';
+
+  var filter =
+  {
+    filePath :
+    {
+      [ abs( 'src/proto/dir1' ) ] : '',
+      [ abs( 'src/proto' ) ] : '',
+    },
+    basePath : abs( 'src' ),
+    recursive : 2,
+  }
+
+  var o =
+  {
+    includingDirs : 1,
+    includingTerminals : 1,
+    includingStem : 1,
+    maskPreset : 0,
+    filter,
+  }
+
+  var got = provider.filesFind( o );
+
+  var exp = abs
+  ([
+    './src/proto',
+    './src/proto/-ile',
+    './src/proto/f.cc',
+    './src/proto/f.js',
+    './src/proto/f.ss',
+    './src/proto/f.test.js',
+    './src/proto/f.test.ss',
+    './src/proto/file',
+    './src/proto/dir1',
+    './src/proto/dir1/dir2',
+    './src/proto/dir1/dir2/-ile',
+    './src/proto/dir1/dir2/f.cc',
+    './src/proto/dir1/dir2/f.js',
+    './src/proto/dir1/dir2/f.ss',
+    './src/proto/dir1/dir2/f.test.js',
+    './src/proto/dir1/dir2/f.test.ss',
+    './src/proto/dir1/dir2/file',
+  ]);
+  test.identical( _.select( got, '*/absolute' ), exp );
+
+  var exp =
+  [
+    './proto',
+    './proto/-ile',
+    './proto/f.cc',
+    './proto/f.js',
+    './proto/f.ss',
+    './proto/f.test.js',
+    './proto/f.test.ss',
+    './proto/file',
+    './proto/dir1',
+    './proto/dir1/dir2',
+    './proto/dir1/dir2/-ile',
+    './proto/dir1/dir2/f.cc',
+    './proto/dir1/dir2/f.js',
+    './proto/dir1/dir2/f.ss',
+    './proto/dir1/dir2/f.test.js',
+    './proto/dir1/dir2/f.test.ss',
+    './proto/dir1/dir2/file',
+  ];
+  test.identical( _.select( got, '*/relative' ), exp );
+
+  /* */
+
+  test.case = 'no base path';
+
+  var filter =
+  {
+    filePath :
+    {
+      [ abs( 'src/proto/dir1' ) ] : '',
+      [ abs( 'src/proto' ) ] : '',
+    },
+    recursive : 2,
+  }
+
+  var o =
+  {
+    includingDirs : 1,
+    includingTerminals : 1,
+    includingStem : 1,
+    maskPreset : 0,
+    filter,
+  }
+
+  debugger;
+  var got = provider.filesFind( o );
+
+  var exp = abs
+  ([
+    './src/proto',
+    './src/proto/-ile',
+    './src/proto/f.cc',
+    './src/proto/f.js',
+    './src/proto/f.ss',
+    './src/proto/f.test.js',
+    './src/proto/f.test.ss',
+    './src/proto/file',
+    './src/proto/dir1',
+    './src/proto/dir1/dir2',
+    './src/proto/dir1/dir2/-ile',
+    './src/proto/dir1/dir2/f.cc',
+    './src/proto/dir1/dir2/f.js',
+    './src/proto/dir1/dir2/f.ss',
+    './src/proto/dir1/dir2/f.test.js',
+    './src/proto/dir1/dir2/f.test.ss',
+    './src/proto/dir1/dir2/file',
+  ]);
+  test.identical( _.select( got, '*/absolute' ), exp );
+
+  /* - */
+
+  debugger; return; xxx
+} /* end of filesFindOptimalFilePath */
+
+//
+
+function filesFindIncludingCertain( test )
+{
+  let context = this;
+  let provider = context.provider;
+  let system = context.system;
+  let path = context.provider.path;
+  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+
+  function abs()
+  {
+    let args = _.longSlice( arguments );
+    args.unshift( routinePath );
+    return path.s.join.apply( path.s, args );
+  }
+
+  /* - */
+
+  test.case = 'setup';
+
+  var tree =
+  {
+    src :
+    {
+      proto :
+      {
+        '-ile' : 'src/proto/-ile',
+        'file' : 'src/proto/file',
+        'f.cc' : 'src/proto/f.cc',
+        'f.js' : 'src/proto/f.js',
+        'f.ss' : 'src/proto/f.ss',
+        'f.test.js' : 'src/proto/f.test.js',
+        'f.test.ss' : 'src/proto/f.test.ss',
+        dir1 :
+        {
+          dir2 :
+          {
+            '-ile' : 'dir1/dir2/src/proto/-ile',
+            'file' : 'dir1/dir2/src/proto/file',
+            'f.cc' : 'dir1/dir2/src/proto/f.cc',
+            'f.js' : 'dir1/dir2/src/proto/f.js',
+            'f.ss' : 'dir1/dir2/src/proto/f.ss',
+            'f.test.js' : 'dir1/dir2/src/proto/f.test.js',
+            'f.test.ss' : 'dir1/dir2/src/proto/f.test.ss',
+          }
+        }
+      },
+      proto2 :
+      {
+        '-ile' : 'src/proto2/-ile',
+        'file' : 'src/proto2/file',
+        'f.cc' : 'src/proto2/f.cc',
+        'f.js' : 'src/proto2/f.js',
+        'f.ss' : 'src/proto2/f.ss',
+        'f.test.js' : 'src/proto2/f.test.js',
+        'f.test.ss' : 'src/proto2/f.test.ss',
+        dir1 :
+        {
+          dir2 :
+          {
+            '-ile' : 'dir1/dir2/src/proto2/-ile',
+            'file' : 'dir1/dir2/src/proto2/file',
+            'f.cc' : 'dir1/dir2/src/proto2/f.cc',
+            'f.js' : 'dir1/dir2/src/proto2/f.js',
+            'f.ss' : 'dir1/dir2/src/proto2/f.ss',
+            'f.test.js' : 'dir1/dir2/src/proto2/f.test.js',
+            'f.test.ss' : 'dir1/dir2/src/proto2/f.test.ss',
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+  var extract = new _.FileProvider.Extract({ filesTree : tree });
+
+  extract.filesReflectTo( provider, routinePath );
+
+  /* - */
+
+  // test.case = 'dir, with preset';
+  //
+  // var filter =
+  // {
+  //   filePath : abs( 'src/proto' ),
+  //   recursive : 2,
+  // }
+  //
+  // var o =
+  // {
+  //   outputFormat : 'absolute',
+  //   visitingCertain : 0,
+  //   includingDirs : 1,
+  //   includingTerminals : 1,
+  //   includingStem : 1,
+  //   filter,
+  // }
+  //
+  // var got = provider.filesFind( o );
+  // var exp = abs
+  // ([
+  //   './src/proto',
+  //   './src/proto/f.cc',
+  //   './src/proto/f.js',
+  //   './src/proto/f.ss',
+  //   './src/proto/f.test.js',
+  //   './src/proto/f.test.ss',
+  //   './src/proto/file',
+  //   './src/proto/dir1',
+  //   './src/proto/dir1/dir2',
+  //   './src/proto/dir1/dir2/f.cc',
+  //   './src/proto/dir1/dir2/f.js',
+  //   './src/proto/dir1/dir2/f.ss',
+  //   './src/proto/dir1/dir2/f.test.js',
+  //   './src/proto/dir1/dir2/f.test.ss',
+  //   './src/proto/dir1/dir2/file'
+  // ]);
+  // test.identical( got, exp );
+  //
+  // /* */
+  //
+  // test.case = 'terminal, with preset';
+  //
+  // var filter =
+  // {
+  //   filePath : abs( 'src/proto/file' ),
+  //   recursive : 2,
+  // }
+  //
+  // var o =
+  // {
+  //   outputFormat : 'absolute',
+  //   visitingCertain : 0,
+  //   includingDirs : 1,
+  //   includingTerminals : 1,
+  //   includingStem : 1,
+  //   filter,
+  // }
+  //
+  // var exp = abs([ 'src/proto/file' ]);
+  // var got = provider.filesFind( o );
+  // test.identical( got, exp );
+  //
+  // /* */
+  //
+  // test.case = 'dir, without preset';
+  //
+  // var filter =
+  // {
+  //   filePath : abs( 'src/proto' ),
+  //   recursive : 2,
+  // }
+  //
+  // var o =
+  // {
+  //   outputFormat : 'absolute',
+  //   visitingCertain : 0,
+  //   includingDirs : 1,
+  //   includingTerminals : 1,
+  //   includingStem : 1,
+  //   maskPreset : 0,
+  //   filter,
+  // }
+  //
+  // var exp = abs([ 'src/proto' ]);
+  // var got = provider.filesFind( o );
+  // test.identical( got, exp );
+  //
+  // /* */
+  //
+  // test.case = 'terminal, without preset';
+  //
+  // var filter =
+  // {
+  //   filePath : abs( 'src/proto/file' ),
+  //   recursive : 2,
+  // }
+  //
+  // var o =
+  // {
+  //   outputFormat : 'absolute',
+  //   visitingCertain : 0,
+  //   includingDirs : 1,
+  //   includingTerminals : 1,
+  //   includingStem : 1,
+  //   maskPreset : 0,
+  //   filter,
+  // }
+  //
+  // var exp = abs([ 'src/proto/file' ]);
+  // var got = provider.filesFind( o );
+  // test.identical( got, exp );
+  //
+  // /* */
+  //
+  // test.case = 'dir, without preset, glob';
+  //
+  // var filter =
+  // {
+  //   filePath : abs( 'src/proto/**' ),
+  //   recursive : 2,
+  // }
+  //
+  // var o =
+  // {
+  //   outputFormat : 'absolute',
+  //   visitingCertain : 0,
+  //   includingDirs : 1,
+  //   includingTerminals : 1,
+  //   includingStem : 1,
+  //   maskPreset : 0,
+  //   filter,
+  // }
+  //
+  // var exp = abs([ 'src/proto' ]);
+  // var got = provider.filesFind( o );
+  // test.identical( got, exp );
+
+  /* */
+
+  test.case = 'dir in dir, without preset, glob';
+
+  var filter =
+  {
+    filePath :
+    {
+      [ abs( 'src/proto/**' ) ] : '',
+      [ abs( 'src' ) ] : '',
+    },
+    recursive : 2,
+  }
+
+  var o =
+  {
+    outputFormat : 'absolute',
+    visitingCertain : 0,
+    includingDirs : 1,
+    includingTerminals : 1,
+    includingStem : 1,
+    maskPreset : 0,
+    filter,
+  }
+
+  var exp = abs([ 'src' ]);
+  var got = provider.filesFind( o );
+  test.identical( got, exp );
+
+  /* - */
+
+  debugger; return; xxx
+} /* end of filesFindIncludingCertain */
 
 //
 
@@ -10097,25 +10648,6 @@ function filesFindGlobComplex( test )
   /* - */
 
   test.close( 'check escaping' );
-
-/*
-
-/dir/v1.(im|ex|)?(.out).will.*"
-
-*/
-
-/*
-xxx : add
-
-filter.toStr()
-"Filter
-  filePath :
-{ "/dir/with space" : ``, "/**(.im|.ex|).will.*" : true }
-  basePath :
-{
-  "/dir/with space" : `/dir/with space`
-}"
-*/
 
 } /* end of filesFindGlobComplex */
 
@@ -33794,6 +34326,8 @@ var Self =
     filesGlob,
     filesFindDistinct,
     filesFindSimplifyGlob,
+    filesFindOptimalFilePath,
+    filesFindIncludingCertain,
     filesFindMandatoryString,
     filesFindMandatoryMap,
     filesFindExcluding,

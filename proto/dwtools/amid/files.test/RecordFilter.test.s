@@ -199,46 +199,46 @@ function form( test )
 {
   let provider = _.fileProvider;
 
-  // /* */
-  //
-  // test.case = 'base path is relative';
-  // var filter = provider.recordFilter();
-  // filter.filePath = [ '/a/b/*', '/a/c/*' ];
-  // filter.basePath = '..';
-  // filter.form();
-  // test.identical( filter.formed, 5 );
-  // test.identical( filter.formedFilePath, { '/a/b' : '', '/a/c' : '' } );
-  // test.identical( filter.formedBasePath, { '/a/b' : '/a', '/a/c' : '/a' } );
-  // test.identical( filter.filePath, { '/a/b/*' : '', '/a/c/*' : '' } );
-  // test.identical( filter.basePath, { '/a/b/*' : '/a', '/a/c/*' : '/a' } );
-  // test.identical( filter.prefixPath, null );
-  // test.identical( filter.postfixPath, null );
-  //
-  // /* */
-  //
-  // test.case = 'base path and file path are relative, without glob';
-  // var filter = provider.recordFilter();
-  // filter.prefixPath = '/src';
-  // filter.basePath = '.';
-  // filter.filePath = { 'd' : true };
-  //
-  // filter._formPaths();
-  // test.identical( filter.formed, 3 );
-  // test.identical( filter.formedFilePath, null );
-  // test.identical( filter.formedBasePath, null );
-  // test.identical( filter.filePath, { '/src/d' : '' } );
-  // test.identical( filter.basePath, { '/src/d' : '/src' } );
-  // test.identical( filter.prefixPath, null );
-  // test.identical( filter.postfixPath, null );
-  //
-  // filter.form();
-  // test.identical( filter.formed, 5 );
-  // test.identical( filter.formedFilePath, { '/src/d' : '' } );
-  // test.identical( filter.formedBasePath, { '/src/d' : '/src' } );
-  // test.identical( filter.filePath, { '/src/d' : '' } );
-  // test.identical( filter.basePath, { '/src/d' : '/src' } );
-  // test.identical( filter.prefixPath, null );
-  // test.identical( filter.postfixPath, null );
+  /* */
+
+  test.case = 'base path is relative';
+  var filter = provider.recordFilter();
+  filter.filePath = [ '/a/b/*', '/a/c/*' ];
+  filter.basePath = '..';
+  filter.form();
+  test.identical( filter.formed, 5 );
+  test.identical( filter.formedFilePath, { '/a/b' : '', '/a/c' : '' } );
+  test.identical( filter.formedBasePath, { '/a/b' : '/a', '/a/c' : '/a' } );
+  test.identical( filter.filePath, { '/a/b/*' : '', '/a/c/*' : '' } );
+  test.identical( filter.basePath, { '/a/b/*' : '/a', '/a/c/*' : '/a' } );
+  test.identical( filter.prefixPath, null );
+  test.identical( filter.postfixPath, null );
+
+  /* */
+
+  test.case = 'base path and file path are relative, without glob';
+  var filter = provider.recordFilter();
+  filter.prefixPath = '/src';
+  filter.basePath = '.';
+  filter.filePath = { 'd' : true };
+
+  filter._formPaths();
+  test.identical( filter.formed, 3 );
+  test.identical( filter.formedFilePath, null );
+  test.identical( filter.formedBasePath, null );
+  test.identical( filter.filePath, { '/src/d' : '' } );
+  test.identical( filter.basePath, { '/src/d' : '/src' } );
+  test.identical( filter.prefixPath, null );
+  test.identical( filter.postfixPath, null );
+
+  filter.form();
+  test.identical( filter.formed, 5 );
+  test.identical( filter.formedFilePath, { '/src/d' : '' } );
+  test.identical( filter.formedBasePath, { '/src/d' : '/src' } );
+  test.identical( filter.filePath, { '/src/d' : '' } );
+  test.identical( filter.basePath, { '/src/d' : '/src' } );
+  test.identical( filter.prefixPath, null );
+  test.identical( filter.postfixPath, null );
 
   /* */
 
@@ -251,7 +251,6 @@ function form( test )
   }
   filter.filePath = { "/dir1/dir2/d1/**" : ``, "/dir1/dir2/d2/**" : ``, "../../**b**" : false };
 
-  debugger;
   filter.form();
   test.identical( filter.formed, 5 );
   test.identical( filter.formedFilePath, { '/dir1/dir2/d1' : '', '/dir1/dir2/d2' : '' } );
@@ -260,8 +259,6 @@ function form( test )
   test.identical( filter.basePath, { '/dir1/dir2/d1/**' : '/dir1/dir2/d1/d11', '/dir1/dir2/d2/**' : '/dir1/dir2/d1/d11' } );
   test.identical( filter.prefixPath, null );
   test.identical( filter.postfixPath, null );
-
-  debugger; return; xxx
 
   /* */
 
@@ -565,6 +562,154 @@ function form( test )
     '/a1/b/c/',
   ];
   filter.basePath = '/base';
+  filter.form();
+  test.identical( filter.formed, 5 );
+  test.identical( filter.formedFilePath, expectedFormedFilePath );
+  test.identical( filter.formedBasePath, expectedFormedBasePath );
+  test.identical( filter.filePath, expectedFilePath );
+  test.identical( filter.basePath, expectedBasePath );
+  test.identical( filter.prefixPath, null );
+  test.identical( filter.postfixPath, null );
+
+  /* */
+
+  test.case = 'file is array with one path having another, recursive : default';
+  var expectedFormedFilePath =
+  {
+    '/src/proto' : '',
+  }
+  var expectedFormedBasePath =
+  {
+    '/src/proto' : '/src/proto'
+  }
+  var expectedFilePath =
+  {
+    '/src/proto/dir1' : '',
+    '/src/proto' : '',
+  }
+  var expectedBasePath =
+  {
+    '/src/proto/dir1' : '/src/proto',
+    '/src/proto' : '/src/proto',
+  }
+  var filter = provider.recordFilter();
+  filter.filePath =
+  [
+    '/src/proto/dir1',
+    '/src/proto',
+  ];
+  filter.form();
+  test.identical( filter.formed, 5 );
+  test.identical( filter.formedFilePath, expectedFormedFilePath );
+  test.identical( filter.formedBasePath, expectedFormedBasePath );
+  test.identical( filter.filePath, expectedFilePath );
+  test.identical( filter.basePath, expectedBasePath );
+  test.identical( filter.prefixPath, null );
+  test.identical( filter.postfixPath, null );
+
+  /* */
+
+  test.case = 'file is array with one path having another, recursive : 2';
+  var expectedFormedFilePath =
+  {
+    '/src/proto' : '',
+  }
+  var expectedFormedBasePath =
+  {
+    '/src/proto' : '/src/proto'
+  }
+  var expectedFilePath =
+  {
+    '/src/proto/dir1' : '',
+    '/src/proto' : '',
+  }
+  var expectedBasePath =
+  {
+    '/src/proto/dir1' : '/src/proto',
+    '/src/proto' : '/src/proto',
+  }
+  var filter = provider.recordFilter();
+  filter.recursive = 2;
+  filter.filePath =
+  [
+    '/src/proto/dir1',
+    '/src/proto',
+  ];
+  filter.form();
+  test.identical( filter.formed, 5 );
+  test.identical( filter.formedFilePath, expectedFormedFilePath );
+  test.identical( filter.formedBasePath, expectedFormedBasePath );
+  test.identical( filter.filePath, expectedFilePath );
+  test.identical( filter.basePath, expectedBasePath );
+  test.identical( filter.prefixPath, null );
+  test.identical( filter.postfixPath, null );
+
+  /* */
+
+  test.case = 'file is array with one path having another, recursive : 1';
+  var expectedFormedFilePath =
+  {
+    '/src/proto/dir1' : '',
+    '/src/proto' : '',
+  }
+  var expectedFormedBasePath =
+  {
+    '/src/proto/dir1' : '/src/proto',
+    '/src/proto' : '/src/proto',
+  }
+  var expectedFilePath =
+  {
+    '/src/proto/dir1' : '',
+    '/src/proto' : '',
+  }
+  var expectedBasePath =
+  {
+    '/src/proto/dir1' : '/src/proto',
+    '/src/proto' : '/src/proto',
+  }
+  var filter = provider.recordFilter();
+  filter.recursive = 1;
+  filter.filePath =
+  [
+    '/src/proto/dir1',
+    '/src/proto',
+  ];
+  filter.form();
+  test.identical( filter.formed, 5 );
+  test.identical( filter.formedFilePath, expectedFormedFilePath );
+  test.identical( filter.formedBasePath, expectedFormedBasePath );
+  test.identical( filter.filePath, expectedFilePath );
+  test.identical( filter.basePath, expectedBasePath );
+  test.identical( filter.prefixPath, null );
+  test.identical( filter.postfixPath, null );
+
+  /* */
+
+  test.case = 'file is array with one glob having another';
+  var expectedFormedFilePath =
+  {
+    '/src/proto' : '',
+  }
+  var expectedFormedBasePath =
+  {
+    '/src/proto' : '/src/proto',
+  }
+  var expectedFilePath =
+  {
+    '/src/proto/dir1/????/**' : '',
+    '/src/proto/????/**' : '',
+  }
+  var expectedBasePath =
+  {
+    '/src/proto/dir1/????/**' : '/src/proto',
+    '/src/proto/????/**' : '/src/proto',
+  }
+  var filter = provider.recordFilter();
+  filter.filePath =
+  [
+    '/src/proto/dir1/????/**',
+    '/src/proto/????/**',
+  ];
   filter.form();
   test.identical( filter.formed, 5 );
   test.identical( filter.formedFilePath, expectedFormedFilePath );
@@ -918,7 +1063,7 @@ function form( test )
   test.identical( dst.formedBasePath, {} );
   test.identical( dst.formed, 4 );
 
-}
+} /* end of function form */
 
 //
 
@@ -988,6 +1133,7 @@ function formBaseDeducingFromFile( test )
     '/a6()/b/c',
     '/()a7/b/c',
   ];
+  debugger;
   filter.form();
   test.identical( filter.formed, 5 );
   test.identical( filter.formedFilePath, expectedFormedFilePath );

@@ -578,6 +578,7 @@ function filesFindSingle_body( o )
   delete o2.includingTransient;
   delete o2.includingStem;
   delete o2.includingDefunct;
+  delete o2.visitingCertain;
 
   o2.onUp = handleUp;
   o2.onDown = handleDown;
@@ -589,6 +590,16 @@ function filesFindSingle_body( o )
 
   function handleUp( record, op )
   {
+
+    if( !o.visitingCertain )
+    debugger;
+
+    if( !o.visitingCertain && !record.isStem )
+    {
+      let hasMask = o.filter.hasMask();
+      if( !hasMask )
+      return _.dont;
+    }
 
     let includingFile = record.isDir ? o.includingDirs : o.includingTerminals;
     let includingTransient = ( o.includingTransient && record.isTransient );
@@ -628,6 +639,7 @@ defaults.includingActual = 1;
 defaults.includingTransient = 0;
 defaults.includingStem = 1;
 defaults.includingDefunct = null;
+defaults.visitingCertain = 1;
 
 let filesFindSingle = _.routineFromPreAndBody( filesFindSingle_pre, filesFindSingle_body );
 

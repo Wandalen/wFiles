@@ -21617,7 +21617,7 @@ function softLinkChain( test )
     return
   }
 
-  // var routinePath = path.dirTempOpen();
+  // var routinePath = path.pathDirTempOpen();
   var routinePath = test.context.pathFor( 'written/softLinkChain' );
 
   debugger;
@@ -25384,7 +25384,7 @@ function hardLinkMultipleSync( test )
   function makeHardLinksToPath( filePath, amount )
   {
     _.assert( _.strHas( filePath, 'tmp.tmp' ) );
-    var routinePath = path.dirTempOpen( self.provider.path.dir( filePath ), path.name( filePath ) );
+    var routinePath = path.pathDirTempOpen( self.provider.path.dir( filePath ), path.name( filePath ) );
     for( var i = 0; i < amount; i++ )
     provider.hardLink( path.join( routinePath, 'file' + i ), filePath );
   }
@@ -26111,7 +26111,7 @@ function hardLinkExperiment( test )
   function makeHardLinksToPath( filePath, amount )
   {
     _.assert( _.strHas( filePath, 'tmp.tmp' ) );
-    var routinePath = path.dirTempOpen( self.provider.path.dir( filePath ), path.name( filePath ) );
+    var routinePath = path.pathDirTempOpen( self.provider.path.dir( filePath ), path.name( filePath ) );
     for( var i = 0; i < amount; i++ )
     provider.hardLink( path.join( routinePath, 'file' + i ), filePath );
   }
@@ -26826,7 +26826,7 @@ function hardLinkAsync( test )
   function makeHardLinksToPath( filePath, amount )
   {
     _.assert( _.strHas( filePath, 'tmp.tmp' ) );
-    var routinePath = path.dirTempOpen( self.provider.path.dir( filePath ), path.name( filePath ) );
+    var routinePath = path.pathDirTempOpen( self.provider.path.dir( filePath ), path.name( filePath ) );
     for( var i = 0; i < amount; i++ )
     provider.hardLink( path.join( routinePath, 'file' + i ), filePath );
   }

@@ -21,7 +21,7 @@ _.assert( !!Parent );
 // function onSuiteBegin( test )
 // {
 //   let path = this.provider.path;
-//   this.testSuitePath = path.dirTempOpen( path.join( __dirname, '../..'  ), 'Provider/HardDrive' );
+//   this.testSuitePath = path.pathDirTempOpen( path.join( __dirname, '../..'  ), 'Provider/HardDrive' );
 // }
 //
 // //
@@ -45,12 +45,12 @@ function onSuiteBegin( test )
   context.system = _.FileProvider.System({ providers : [ context.provider ] });
 
   let path = context.provider.path;
-  context.testSuitePath = path.dirTempOpen( 'HardDrive' );
+  context.testSuitePath = path.pathDirTempOpen( 'HardDrive' );
   context.testSuitePath = context.provider.pathResolveLinkFull({ filePath : context.testSuitePath, resolvingSoftLink : 1 });
   context.testSuitePath = context.testSuitePath.absolutePath;
   context.globalFromPreferred = function globalFromPreferred( path ){ return path };
   // let path = this.provider.path;
-  // this.testSuitePath = path.dirTempOpen( path.join( __dirname, '../..'  ), 'Provider/HardDrive' );
+  // this.testSuitePath = path.pathDirTempOpen( path.join( __dirname, '../..'  ), 'Provider/HardDrive' );
 }
 
 // --

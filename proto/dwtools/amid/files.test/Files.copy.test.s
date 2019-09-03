@@ -24,12 +24,12 @@ var Parent = wTester;
 function onSuiteBegin()
 {
 
-  _.assert( _.path.dirTempOpen );
+  _.assert( _.path.pathDirTempOpen );
 
   this.isBrowser = typeof module === 'undefined';
 
   if( !this.isBrowser )
-  this.testSuitePath = _.path.dirTempOpen( _.path.join( __dirname, '../..'  ), 'FilesCopy' );
+  this.testSuitePath = _.path.pathDirTempOpen( _.path.join( __dirname, '../..'  ), 'FilesCopy' );
   else
   this.testSuitePath = _.path.current();
 

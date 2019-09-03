@@ -28,7 +28,7 @@ function onSuiteBegin()
   this.isBrowser = typeof module === 'undefined';
 
   if( !this.isBrowser )
-  this.testSuitePath = _.path.dirTempOpen( _.path.join( __dirname, '../..' ), 'Path' );
+  this.testSuitePath = _.path.pathDirTempOpen( _.path.join( __dirname, '../..' ), 'Path' );
   else
   this.testSuitePath = _.path.current();
 }
@@ -945,28 +945,28 @@ function relative( test )
 function dirTemp( test )
 {
   test.case = 'no args';
-  var got = _.path.dirTempOpen();
+  var got = _.path.pathDirTempOpen();
   test.is( _.strHas( got, '/tmp.tmp/' ) );
   test.is( _.fileProvider.isDir( got ) );
   _.path.dirTempClose( got );
   test.is( !_.fileProvider.fileExists( got ) );
 
   test.case = 'single arg';
-  var got = _.path.dirTempOpen( 'packageName' );
+  var got = _.path.pathDirTempOpen( 'packageName' );
   test.is( _.strHas( got, '/tmp.tmp/packageName' ) );
   test.is( _.fileProvider.isDir( got ) );
   _.path.dirTempClose( got );
   test.is( !_.fileProvider.fileExists( got ) );
 
   test.case = 'single arg';
-  var got = _.path.dirTempOpen( 'someDir/packageName' );
+  var got = _.path.pathDirTempOpen( 'someDir/packageName' );
   test.is( _.strHas( got, '/tmp.tmp/someDir/packageName' ) );
   test.is( _.fileProvider.isDir( got ) );
   _.path.dirTempClose( got );
   test.is( !_.fileProvider.fileExists( got ) );
 
   test.case = 'two args';
-  var got = _.path.dirTempOpen( _.path.resolve( __dirname, '../..'), 'packageName' );
+  var got = _.path.pathDirTempOpen( _.path.resolve( __dirname, '../..'), 'packageName' );
   test.is( _.strHas( got, 'dwtools/tmp.tmp/packageName' ) );
   test.is( _.fileProvider.isDir( got ) );
   _.path.dirTempClose( got );
@@ -975,8 +975,8 @@ function dirTemp( test )
   if( !Config.debug )
   return;
 
-  test.shouldThrowErrorSync( () => _.path.dirTempOpen( '/absolute/path' ) );
-  test.shouldThrowErrorSync( () => _.path.dirTempOpen( _.path.resolve( __dirname, '../..'), '/absolute/path' ) );
+  test.shouldThrowErrorSync( () => _.path.pathDirTempOpen( '/absolute/path' ) );
+  test.shouldThrowErrorSync( () => _.path.pathDirTempOpen( _.path.resolve( __dirname, '../..'), '/absolute/path' ) );
 }
 
 //

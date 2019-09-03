@@ -27,7 +27,7 @@ function onSuiteBegin( test )
 
   let path = context.providerDst.path;
 
-  context.testSuitePath = path.dirTempOpen( 'FileProviderNpm' );
+  context.testSuitePath = path.pathDirTempOpen( 'FileProviderNpm' );
   context.testSuitePath = context.providerDst.pathResolveLinkFull({ filePath : context.testSuitePath, resolvingSoftLink : 1 });
   context.testSuitePath = context.testSuitePath.absolutePath;
 }

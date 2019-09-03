@@ -490,7 +490,19 @@ function pathCurrentAct()
   if( self.defaultProvider )
   return self.defaultProvider.path.current.apply( self.defaultProvider.path, arguments );
 
-  _.assert( 0, 'Default provider is not set for the System', self.nickName );
+  _.assert( 0, 'Default provider is not set for the ', self.nickName );
+}
+
+//
+
+function pathDirTempAct()
+{
+  let self = this;
+
+  if( self.defaultProvider )
+  return self.defaultProvider.path.dirTemp.apply( self.defaultProvider.path, arguments );
+
+  _.assert( 0, 'Default provider is not set for the ', self.nickName );
 }
 
 //
@@ -648,7 +660,7 @@ function fileRead_body( o )
     resolvingSoftLink : o.resolvingSoftLink,
     resolvingTextLink : o.resolvingTextLink,
   });
-  
+
   o.filePath = o.filePath.absolutePath;
 
   let r = self._pathLocalize( o.filePath );
@@ -1353,6 +1365,7 @@ let Proto =
   _pathRelocalize,
 
   pathCurrentAct,
+  pathDirTempAct,
 
   pathResolveLinkFull,
   pathResolveLinkTail,

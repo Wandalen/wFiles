@@ -591,9 +591,6 @@ function filesFindSingle_body( o )
   function handleUp( record, op )
   {
 
-    if( !o.visitingCertain )
-    debugger;
-
     if( !o.visitingCertain && !record.isStem )
     {
       let hasMask = o.filter.hasMask();
@@ -796,6 +793,19 @@ function filesFind_body( o )
 
   _.assert( _.strsAreAll( o.filePath ) );
   _.assert( !o.orderingExclusion.length || o.orderingExclusion.length === 0 || o.outputFormat === 'record' );
+
+  if( o.mandatory )
+  if( _.entityLength( o.filePath ) !== _.entityLength( o.filter.filePath ) )
+  {
+    for( let stemPath in o.filter.filePath )
+    {
+      if( _.boolLike( o.filter.filePath[ stemPath ] ) )
+      continue;
+      stemPath = path.fromGlob( stemPath );
+      if( !self.fileExists( stemPath ) )
+      throw _.err( 'Stem not found : ' + stemPath );
+    }
+  }
 
   forStems( o.filePath, o );
 
@@ -4722,6 +4732,9 @@ function filesDelete_body( o )
   if( !o.sync )
   con = new _.Consequence().take( null );
 
+  if( o.late )
+  o.visitingCertain = 0;
+
   _.assert( !o.includingTransient, 'Transient files should not be included' );
   _.assert( o.resolvingTextLink === 0 || o.resolvingTextLink === false );
   _.assert( o.resolvingSoftLink === 0 || o.resolvingSoftLink === false );
@@ -4771,14 +4784,6 @@ function filesDelete_body( o )
 
   /* */
 
-  /* qqq : refactor please this brute-hack ( filesDelete_body )
-    does it work at all??
-    result array should not depend on option writing!
-    deletingEmptyDirs should not delete files, but only change result array.
-    handleWriting should be only deleting subroutine
-    deletingEmptyDirs should goes between handleResult and handleWriting
-  */
-
   if( o.sync )
   {
     provider.filesFind.body.call( provider, o2 )
@@ -4786,7 +4791,12 @@ function filesDelete_body( o )
     if( o.deletingEmptyDirs )
     deleteEmptyDirs();
     if( o.writing )
-    handleWriting();
+    {
+      if( o.late )
+      handleLateWriting();
+      else
+      handleWriting();
+    }
     return end();
   }
   else
@@ -4796,9 +4806,60 @@ function filesDelete_body( o )
     if( o.deletingEmptyDirs )
     con.then( () => deleteEmptyDirs() );
     if( o.writing )
-    con.then( () => handleWriting() );
+    {
+      if( o.late )
+      con.then( () => handleLateWriting() );
+      else
+      con.then( () => handleWriting() );
+    }
     con.then( () => end() );
     return con;
+  }
+
+  /* - */
+
+  function handleLateWriting()
+  {
+    let opened = false;
+    if( o.tempPath === null )
+    {
+      debugger;
+      o.tempPath = path.pathDirTempOpen( o.result[ 0 ].absolute );
+      opened = true;
+    }
+
+    let late = [];
+    for( let f = o.result.length-1 ; f >= 0 ; f-- )
+    {
+      let record = o.result[ f ];
+      if( !record.included || !record.isActual )
+      continue;
+      if( record.absolute === '/' )
+      continue;
+
+      let dstPath = path.join( o.tempPath, 'delete', record.relative );
+      late.push( dstPath );
+
+      debugger;
+      self.fileRename
+      ({
+        srcPath : record.absolute,
+        dstPath : dstPath,
+      })
+
+    }
+
+    _.timeOut( 100, () =>
+    {
+      debugger;
+      if( opened )
+      path.pathDirTempClose( o.tempPath );
+      else
+      late.forEach( ( dstPath ) => self.filesDelete( dstPath ) );
+      debugger;
+    });
+
+    return true;
   }
 
   /* - */
@@ -4807,10 +4868,10 @@ function filesDelete_body( o )
   {
     for( let f = o.result.length-1 ; f >= 0 ; f-- )
     {
-      let file = o.result[ f ];
-      if( file.included && file.isActual )
-      if( file.absolute !== '/' )
-      fileDelete( file );
+      let record = o.result[ f ];
+      if( record.included && record.isActual )
+      if( record.absolute !== '/' )
+      fileDelete( record );
     }
     return true;
   }
@@ -4823,10 +4884,8 @@ function filesDelete_body( o )
     {
       let file1 = o.result[ f1 ];
 
-      if( file1.isActual /* && ( file1.isTransient || file1.isTerminal ) */ )
+      if( file1.isActual )
       {
-        // if( file1.isTerminal )
-        // continue;
 
         if( !file1.isDir )
         continue;
@@ -4855,7 +4914,7 @@ function filesDelete_body( o )
       for( let f2 = f1 ; f2 >= 0 ; f2-- )
       {
         let file2 = o.result[ f2 ];
-        // if( file2.relative === '.' ) /* ? */
+        // if( file2.relative === '.' ) /* qqq : ? */
         if( _.strBegins( file1.absolute, file2.absolute ) )
         {
           o.result.splice( f2, 1 );
@@ -4915,7 +4974,6 @@ function filesDelete_body( o )
     {
       filePath : file.absolute,
       throwing : o.throwing,
-      // verbosity : o.verbosity-1,
       verbosity : 0,
       safe : o.safe,
       sync : o.sync,
@@ -4980,7 +5038,6 @@ _.routineExtend( filesDelete_body, filesFind );
 var defaults = filesDelete_body.defaults;
 defaults.outputFormat = 'record';
 defaults.sync = 1;
-// defaults.recursive = 2;
 defaults.includingTransient = 0;
 defaults.includingDirs = 1;
 defaults.includingTerminals = 1;
@@ -4993,7 +5050,13 @@ defaults.maskPreset = 0;
 defaults.throwing = null;
 defaults.safe = null;
 defaults.writing = 1;
+defaults.late = 0;
+defaults.tempPath = null;
 defaults.deletingEmptyDirs = 0;
+
+/*
+xxx qqq : implement and cover option late for method filesDelete.
+*/
 
 //
 
@@ -5057,7 +5120,6 @@ _.routineExtend( filesDeleteTerminals_body, filesDelete.body );
 
 var defaults = filesDeleteTerminals_body.defaults;
 
-// defaults.recursive = 2;
 defaults.includingTerminals = 1;
 defaults.includingDirs = 0;
 defaults.includingTransient = 0;
@@ -5065,10 +5127,6 @@ defaults.includingTransient = 0;
 let filesDeleteTerminals = _.routineFromPreAndBody( filesFindRecursive.pre, filesDeleteTerminals_body );
 
 //
-
-/*
-qqq : add test coverage, extract pre and body, please
-*/
 
 function filesDeleteEmptyDirs_body( o )
 {
@@ -5080,7 +5138,6 @@ function filesDeleteEmptyDirs_body( o )
   _.assert( !o.includingTerminals );
   _.assert( o.includingDirs );
   _.assert( !o.includingTransient );
-  // _.assert( o.recursive !== undefined && o.recursive !== null );
 
   /* */
 
@@ -5132,7 +5189,6 @@ defaults.outputFormat = 'absolute';
 defaults.includingTerminals = 0;
 defaults.includingDirs = 1;
 defaults.includingTransient = 0;
-// defaults.recursive = 2;
 
 let filesDeleteEmptyDirs = _.routineFromPreAndBody( filesFindRecursive.pre, filesDeleteEmptyDirs_body );
 
@@ -5375,8 +5431,6 @@ let Supplement =
 
   // reflect
 
-  // filesCopyWithAdapter,
-
   _filesFiltersPrepare,
   _filesReflectPrepare,
 
@@ -5397,7 +5451,6 @@ let Supplement =
   // delete
 
   filesDelete,
-
   filesDeleteTerminals,
   filesDeleteEmptyDirs,
 

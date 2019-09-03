@@ -26,7 +26,7 @@ function onSuiteBegin()
   this.isBrowser = typeof module === 'undefined';
 
   if( !this.isBrowser )
-  this.testSuitePath = _.path.dirTempOpen( _.path.join( __dirname, '../..' ), 'FilesRead' );
+  this.testSuitePath = _.path.pathDirTempOpen( _.path.join( __dirname, '../..' ), 'FilesRead' );
   else
   this.testSuitePath = _.path.current();
 }

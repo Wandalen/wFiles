@@ -37,7 +37,7 @@ function onSuiteBegin( test )
 
   let path = context.providerDst.path;
 
-  context.testSuitePath = path.dirTempOpen( 'FileProviderGit' );
+  context.testSuitePath = path.pathDirTempOpen( 'FileProviderGit' );
   context.testSuitePath = context.providerDst.pathResolveLinkFull({ filePath : context.testSuitePath, resolvingSoftLink : 1 });
   context.testSuitePath = context.testSuitePath.absolutePath;
 }

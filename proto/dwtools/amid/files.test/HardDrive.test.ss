@@ -32,7 +32,7 @@ _.assert( !!Parent );
 //   // qqq : error here
 //   // aaa : format of temp path was changed and has unique id at the end
 //   _.assert( _.strHas( this.testSuitePath, 'Provider/HardDrive' ) );
-//   path.dirTempClose( this.testSuitePath );
+//   path.pathDirTempClose( this.testSuitePath );
 // }
 
 //

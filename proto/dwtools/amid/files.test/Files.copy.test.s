@@ -49,7 +49,7 @@ function onSuiteEnd()
   if( !this.isBrowser )
   {
     _.assert( _.strEnds( this.testSuitePath, 'FilesCopy' ) );
-    _.path.dirTempClose( this.testSuitePath );
+    _.path.pathDirTempClose( this.testSuitePath );
   }
 }
 
@@ -589,10 +589,10 @@ function drawInfo( info )
 //     var files = _.fileProvider.filesFind
 //     ({
 //       filePath,
-//       includingStem : 0,
-//       includingTransient : 1,
-//       includingDirs : 1,
-//       includingTerminals : 1,
+//       withTransient/*maybe withStem*//*maybe withStem*/ : 0,
+//       withTransient/*maybe withStem*//*maybe withStem*/ : 1,
+//       withDirs : 1,
+//       withTerminals : 1,
 //       recursive : 2
 //     });
 

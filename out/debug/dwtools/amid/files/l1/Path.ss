@@ -268,6 +268,7 @@ function pathDirTempOpen( o )
   if( !self.pathDirTempForMap )
   self.pathDirTempForMap = Object.create( null );
 
+  /* qqq : hacks */
   let devicePath = devicePathGet( o.filePath );
 
   if( self.pathDirTempForMap[ devicePath ] )
@@ -281,9 +282,11 @@ function pathDirTempOpen( o )
 
   /* */
 
+  /* qqq : please re */
   function devicePathGet( path )
   {
-    return path.substring( 0, path.indexOf( '/', 1 ) )
+    return '/';
+    // return path.substring( 0, path.indexOf( '/', 1 ) )
   }
 
 }
@@ -306,7 +309,7 @@ function pathDirTempMake( o )
   _.assert( self.isAbsolute( o.filePath ) );
   _.assert( self.isNormalized( o.filePath ) );
 
-  // debugger;
+  debugger;
   let filePath2;
   var osTempDir = self.dirTemp();
 
@@ -351,9 +354,16 @@ function pathDirTempMake( o )
 
   /* */
 
-  function devicePathGet( filePath )
+  // function devicePathGet( filePath )
+  // {
+  //   return filePath.substring( 0, filePath.indexOf( '/', 1 ) )
+  // }
+
+  /* qqq : please redo properly */
+  function devicePathGet( path )
   {
-    return filePath.substring( 0, filePath.indexOf( '/', 1 ) )
+    return '/';
+    // return path.substring( 0, path.indexOf( '/', 1 ) )
   }
 
   /* */
@@ -365,8 +375,7 @@ function pathDirTempMake( o )
       debugger;
       self.pathDirTempClose()
     });
-    debugger;
-    logger.log( 'Open temp directory ' + filePath2 );
+    logger.log( ' . Open temp directory ' + filePath2 );
     return filePath2;
   }
 
@@ -387,6 +396,8 @@ function pathDirTempClose( tempDirPath )
   _.assert( arguments.length <= 1 );
   _.assert( !!self.fileProvider );
 
+  debugger;
+
   if( !self.pathDirTempForMap )
   return;
 
@@ -402,8 +413,9 @@ function pathDirTempClose( tempDirPath )
     _.assert( self.isAbsolute( tempDirPath ) );
     _.assert( self.isNormalized( tempDirPath ) );
 
-    let devicePath = tempDirPath.substring( 0, tempDirPath.indexOf( '/', 1 ) );
+    let devicePath = devicePathGet( tempDirPath );
 
+    debugger;
     if( !self.pathDirTempForMap[ devicePath ] )
     throw _.err( 'Not found temp dir for device ' + devicePath );
 
@@ -433,8 +445,16 @@ function pathDirTempClose( tempDirPath )
     });
     delete self.pathDirTempForMap[ keyPath ];
     _.assert( !self.fileProvider.fileExists( tempPath ) );
+    logger.log( ' . Close temp directory ' + tempPath );
     debugger;
-    logger.log( 'Close temp directory ' + tempPath );
+    return tempPath;
+  }
+
+  /* qqq : please redo properly */
+  function devicePathGet( path )
+  {
+    return '/';
+    // return path.substring( 0, path.indexOf( '/', 1 ) )
   }
 
 }

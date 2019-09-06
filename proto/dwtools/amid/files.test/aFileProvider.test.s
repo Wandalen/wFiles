@@ -9,7 +9,6 @@ if( typeof module !== 'undefined' )
 
   _.include( 'wTesting' );
 
-  // if( !_global_.wTools.FileProvider )
   require( '../files/UseTop.s' );
 
   var crypto = require( 'crypto' );
@@ -37,8 +36,8 @@ function onSuiteBegin( test )
 function onSuiteEnd()
 {
   let path = this.provider.path;
-  _.assert( _.strHas( this.testSuitePath, 'tmp.tmp' ) );
-  path.dirTempClose( this.testSuitePath );
+  _.assert( _.strHas( this.testSuitePath, '/tmp-' ) );
+  path.pathDirTempClose( this.testSuitePath );
   this.provider.finit();
   this.system.finit();
 }

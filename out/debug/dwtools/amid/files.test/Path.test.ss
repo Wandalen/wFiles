@@ -40,7 +40,7 @@ function onSuiteEnd()
   if( !this.isBrowser )
   {
     _.assert( _.strHas( this.testSuitePath, 'Path' ) );
-    _.path.dirTempClose( this.testSuitePath );
+    _.path.pathDirTempClose( this.testSuitePath );
   }
 }
 
@@ -948,28 +948,28 @@ function dirTemp( test )
   var got = _.path.pathDirTempOpen();
   test.is( _.strHas( got, '/tmp.tmp/' ) );
   test.is( _.fileProvider.isDir( got ) );
-  _.path.dirTempClose( got );
+  _.path.pathDirTempClose( got );
   test.is( !_.fileProvider.fileExists( got ) );
 
   test.case = 'single arg';
   var got = _.path.pathDirTempOpen( 'packageName' );
   test.is( _.strHas( got, '/tmp.tmp/packageName' ) );
   test.is( _.fileProvider.isDir( got ) );
-  _.path.dirTempClose( got );
+  _.path.pathDirTempClose( got );
   test.is( !_.fileProvider.fileExists( got ) );
 
   test.case = 'single arg';
   var got = _.path.pathDirTempOpen( 'someDir/packageName' );
   test.is( _.strHas( got, '/tmp.tmp/someDir/packageName' ) );
   test.is( _.fileProvider.isDir( got ) );
-  _.path.dirTempClose( got );
+  _.path.pathDirTempClose( got );
   test.is( !_.fileProvider.fileExists( got ) );
 
   test.case = 'two args';
   var got = _.path.pathDirTempOpen( _.path.resolve( __dirname, '../..'), 'packageName' );
   test.is( _.strHas( got, 'dwtools/tmp.tmp/packageName' ) );
   test.is( _.fileProvider.isDir( got ) );
-  _.path.dirTempClose( got );
+  _.path.pathDirTempClose( got );
   test.is( !_.fileProvider.fileExists( got ) );
 
   if( !Config.debug )

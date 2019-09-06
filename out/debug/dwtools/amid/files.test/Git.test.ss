@@ -47,7 +47,7 @@ function onSuiteEnd( test )
   let context = this;
   let path = context.providerDst.path;
   _.assert( _.strHas( context.testSuitePath, 'FileProviderGit' ) );
-  path.dirTempClose( context.testSuitePath );
+  path.pathDirTempClose( context.testSuitePath );
 }
 
 // --
@@ -80,8 +80,8 @@ function filesReflectTrivial( test )
     let files = providerDst.filesFind
     ({
       filePath : localPath,
-      includingTerminals : 1,
-      includingDirs : 1,
+      withTerminals : 1,
+      withDirs : 1,
       outputFormat : 'relative',
       filter : { recursive : 2 }
     });
@@ -117,8 +117,8 @@ function filesReflectTrivial( test )
     let files = providerDst.filesFind
     ({
       filePath : localPath,
-      includingTerminals : 1,
-      includingDirs : 1,
+      withTerminals : 1,
+      withDirs : 1,
       outputFormat : 'relative',
       filter : { recursive : 2 }
     });
@@ -154,8 +154,8 @@ function filesReflectTrivial( test )
     let files = providerDst.filesFind
     ({
       filePath : localPath,
-      includingTerminals : 1,
-      includingDirs : 1,
+      withTerminals : 1,
+      withDirs : 1,
       outputFormat : 'relative',
       filter : { recursive : 2 }
     });
@@ -192,8 +192,8 @@ function filesReflectTrivial( test )
     let files = providerDst.filesFind
     ({
       filePath : localPath,
-      includingTerminals : 1,
-      includingDirs : 1,
+      withTerminals : 1,
+      withDirs : 1,
       outputFormat : 'relative',
       filter : { recursive : 2 }
     });
@@ -222,8 +222,8 @@ function filesReflectTrivial( test )
     let files = providerDst.filesFind
     ({
       filePath : localPath,
-      includingTerminals : 1,
-      includingDirs : 1,
+      withTerminals : 1,
+      withDirs : 1,
       outputFormat : 'relative',
       filter : { recursive : 2 }
     });
@@ -269,8 +269,8 @@ function filesReflectTrivial( test )
     let files = providerDst.filesFind
     ({
       filePath : localPath,
-      includingTerminals : 1,
-      includingDirs : 1,
+      withTerminals : 1,
+      withDirs : 1,
       outputFormat : 'relative',
       filter : { recursive : 2 }
     });
@@ -306,8 +306,8 @@ function filesReflectTrivial( test )
     let files = providerDst.filesFind
     ({
       filePath : localPath,
-      includingTerminals : 1,
-      includingDirs : 1,
+      withTerminals : 1,
+      withDirs : 1,
       outputFormat : 'relative',
       filter : { recursive : 2 }
     });

@@ -36,7 +36,7 @@ function onSuiteBegin( test )
 // {
 //   let path = this.provider.path;
 //   _.assert( _.strHas( this.testSuitePath, 'Provider/HardDrive' ) );
-//   path.dirTempClose( this.testSuitePath );
+//   path.pathDirTempClose( this.testSuitePath );
 // }
 
 // --

@@ -37,7 +37,7 @@ function onSuiteEnd( test )
   let context = this;
   let path = context.providerDst.path;
   _.assert( _.strHas( context.testSuitePath, 'FileProviderNpm' ) );
-  path.dirTempClose( context.testSuitePath );
+  path.pathDirTempClose( context.testSuitePath );
 }
 
 // --

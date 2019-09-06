@@ -48,7 +48,7 @@ function onSuiteEnd()
 {
   _.assert( _.strHas( this.testSuitePath, 'System/HardDrive' ) );
   // this.providerEffective.filesDelete({ filePath : this.testSuitePath });
-  _.path.dirTempClose( this.testSuitePath );
+  _.path.pathDirTempClose( this.testSuitePath );
 }
 
 function onRoutineEnd( test )

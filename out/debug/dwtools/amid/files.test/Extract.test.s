@@ -50,7 +50,7 @@ function onSuiteBegin( test )
   context.provider = _.FileProvider.Extract({ usingExtraStat : 1, protocols : [ 'current', 'second' ] });
   context.system = _.FileProvider.System({ providers : [ context.provider ] });
   let path = context.provider.path;
-  context.testSuitePath = path.dirTempOpen( 'FilesFind' );
+  context.testSuitePath = path.pathDirTempOpen( 'FilesFind' );
   context.globalFromPreferred = function globalFromPreferred( path ){ return path };
 }
 

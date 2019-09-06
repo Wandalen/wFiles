@@ -305,16 +305,7 @@ function _formMasks()
     if( filter.basePath )
     filter.assertBasePath();
 
-    // _.assert // yyy
-    // (
-    //      ( _.arrayIs( filter.filePath ) && filter.filePath.length === 0 )
-    //   || ( _.mapIs( filter.filePath ) && _.mapKeys( filter.filePath ).length === 0 )
-    //   || ( _.mapIs( filter.basePath ) && _.mapKeys( filter.basePath ).length > 0 )
-    //   || _.strIs( filter.basePath )
-    //   , 'Cant deduce base path'
-    // );
-
-    _.assert( _.mapIs( filter.basePath ) || !!filter.src ); // xxx
+    _.assert( _.mapIs( filter.basePath ) || !!filter.src );
     _.assert( _.mapIs( filter.filePath ), 'filePath of file record filter is not defined' );
 
     if( filter.basePath )
@@ -494,7 +485,7 @@ function and( src )
   _.assert( !filter.formed || filter.formed <= 1 );
   _.assert( !src.formed || src.formed <= 1 );
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( filter.formedFilterMap === null );
+  _.assert( filter.formedMasksMap === null );
   _.assert( filter.applyTo === null );
   _.assert( !filter.effectiveProvider || !src.effectiveProvider || filter.effectiveProvider === src.effectiveProvider );
   _.assert( !filter.system || !src.system || filter.system === src.system );
@@ -587,7 +578,7 @@ function _pathsAmmend( o )
   _.assert( !filter.formed || filter.formed <= 1 );
   _.assert( !o.src.formed || o.src.formed <= 1 );
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( filter.formedFilterMap === null );
+  _.assert( filter.formedMasksMap === null );
   _.assert( filter.applyTo === null );
   _.assert( !filter.system || !o.src.system || filter.system === o.src.system );
   _.assert( o.src !== filter );
@@ -1121,7 +1112,7 @@ function prefixesApply( o )
       {
         if( o.applyingToTrue && _.boolLike( it.value ) && it.value )
         {
-          debugger;
+          // debugger;
           return '';
         }
         return it.value;
@@ -1707,25 +1698,26 @@ function basePathMapFromString( o )
       else
       return +1;
     });
-    if( o.filePath.length > 1 )
-    debugger;
+    // if( o.filePath.length > 1 )
+    // debugger;
     for( let s1 = 0 ; s1 < pairs.length ; s1++ )
     {
       let fileGlob1 = pairs[ s1 ][ 2 ];
       let filePath1 = pairs[ s1 ][ 1 ];
       basePath2[ fileGlob1 ] = pairs[ s1 ][ 0 ];
-      for( let s2 = s1+1 ; s2 < o.filePath.length ; s2++ )
+      for( let s2 = s1+1 ; s2 < pairs.length ; s2++ )
       {
         let fileGlob2 = pairs[ s2 ][ 2 ];
         let filePath2 = pairs[ s2 ][ 1 ];
         if( !path.begins( filePath2, filePath1 ) )
-        continue;
+        break;
         basePath2[ fileGlob2 ] = pairs[ s1 ][ 0 ];
-        s1 += 1;
+        pairs.splice( s2, 1 );
+        s2 -= 1;
       }
     }
-    if( o.filePath.length > 1 )
-    debugger;
+    // if( o.filePath.length > 1 )
+    // debugger;
   }
 
   if( !o.basePath || _.mapKeys( basePath2 ).length )
@@ -3846,7 +3838,7 @@ function hasMask()
 {
   let filter = this;
 
-  if( filter.formedFilterMap )
+  if( filter.formedMasksMap )
   return true;
 
   let hasMask = false;
@@ -4042,6 +4034,7 @@ function masksGenerate()
   let path = fileProvider.path;
 
   _.assert( arguments.length === 0 );
+  _.assert( filter.formed === 3 );
   _.assert( filter.recursive === 0 || filter.recursive === 1 || filter.recursive === 2 )
 
   if( filter.src )
@@ -4050,7 +4043,6 @@ function masksGenerate()
     return end();
   }
 
-  debugger;
   let filePath = filter.filePath;
   let basePath = filter.basePath;
   let globFound = filter.filePathIsComplex( filePath );
@@ -4065,7 +4057,7 @@ function masksGenerate()
   _.assert( !filter.src );
   let filePath2 = _.mapExtend( null, filePath );
   let basePath2 = _.mapExtend( null, basePath );
-  filter.filePathGlobSimplify( filePath2, basePath2 );
+  // filter.filePathGlobSimplify( filePath2, basePath2 );
   if( !_.entityIdentical( filePath2, filePath ) )
   {
     globFound = filter.filePathIsComplex( filePath2 );
@@ -4077,13 +4069,8 @@ function masksGenerate()
     return end();
   }
 
-  _.assert( !filter.src );
-  _.assert( filter.formedFilterMap === null );
-  filter.formedFilterMap = Object.create( null );
-
   let _processed = path.pathMapToRegexps( filePath2, basePath2  );
 
-  debugger;
   if( filter.recursive === 2 )
   {
     filter.formedBasePath = _processed.optimizedUnglobedBasePath;
@@ -4097,21 +4084,30 @@ function masksGenerate()
 
   filter.assertBasePath( filter.formedFilePath, filter.formedBasePath );
 
+  _.assert( !filter.src );
+  _.assert( filter.formedMasksMap === null );
+  filter.formedMasksMap = Object.create( null );
+
   let regexpsMap = filter.recursive === 2 ? _processed.optimalRegexpsMap : _processed.regexpsMap;
   for( let stemPath in regexpsMap )
-  masksSet( stemPath, regexpsMap[ stemPath ], filter.formedFilterMap );
+  masksSet( stemPath, regexpsMap[ stemPath ], filter.formedMasksMap );
 
   end();
 
   /* */
 
-  function masksSet( stemPath, regexps, dstMap )
+  function masksSet( stemPath, regexps, masksMap )
   {
+
+    _.assert( _.mapIs( _processed.groupsMap[ stemPath ] ) );
+
+    if( _.mapKeys( _processed.groupsMap[ stemPath ] ).length === 0 )
+    return;
 
     let basePath = filter.formedBasePath[ stemPath ];
     _.assert( _.strDefined( basePath ), 'No base path for', stemPath );
-    _.assert( !dstMap[ stemPath ] );
-    let subfilter = dstMap[ stemPath ] = Object.create( null );
+    _.assert( !masksMap[ stemPath ] );
+    let subfilter = masksMap[ stemPath ] = Object.create( null );
 
     subfilter.maskAll = filter.maskAll.clone().extend
     ({
@@ -4172,6 +4168,8 @@ function masksGenerate()
     filter.src.formedFilePath = filter.formedFilePath;
     if( filter.dst && filter.dst.formed < 5 && filter.dst.formedFilePath )
     filter.dst.formedFilePath = filter.formedFilePath;
+    if( filter.formedMasksMap && _.mapKeys( filter.formedMasksMap ).length === 0 )
+    filter.formedMasksMap = null;
   }
 
 }
@@ -4195,14 +4193,15 @@ function _applyToRecordMasks( record )
   let f = record.factory;
   let path = record.path;
   let masks = filter;
-  masks = filter.formedFilterMap ? filter.formedFilterMap[ f.stemPath ] : filter;
+  masks = filter;
+  if( filter.formedMasksMap && filter.formedMasksMap[ f.stemPath ] )
+  masks = filter.formedMasksMap[ f.stemPath ];
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( !!masks, 'Cant resolve filter map for stem path', () => _.strQuote( f.stemPath ) );
   _.assert( !!f.formed, 'Record factor was not formed!' );
 
-  // debugger;
-  // if( _.strEnds( record.absolute, '-ile' ) )
+  // if( _.strEnds( record.absolute, 'supermodule.out.will.yml' ) )
   // debugger;
   // if( _.strEnds( record.absolute, 'proto' ) )
   // debugger;
@@ -4401,7 +4400,7 @@ let Restricts =
 
   formedFilePath : null,
   formedBasePath : null,
-  formedFilterMap : null,
+  formedMasksMap : null,
 
   applyTo : null,
   formed : 0,

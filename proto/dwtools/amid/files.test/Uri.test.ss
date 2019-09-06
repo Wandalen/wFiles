@@ -31,7 +31,7 @@ function onSuiteEnd()
 {
   var self = this;
   _.assert( _.strEnds( self.testSuitePath, 'Provider/Url' ) );
-  _.path.dirTempClose( this.testSuitePath );
+  _.path.pathDirTempClose( this.testSuitePath );
 }
 
 //

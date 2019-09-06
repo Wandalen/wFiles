@@ -27,7 +27,7 @@ function onSuiteBegin( test )
 
   let path = context.providerDst.path;
 
-  context.testSuitePath = path.dirTempOpen( 'FileProviderNpm' );
+  context.testSuitePath = path.pathDirTempOpen( 'FileProviderNpm' );
   context.testSuitePath = context.providerDst.pathResolveLinkFull({ filePath : context.testSuitePath, resolvingSoftLink : 1 });
   context.testSuitePath = context.testSuitePath.absolutePath;
 }
@@ -37,7 +37,7 @@ function onSuiteEnd( test )
   let context = this;
   let path = context.providerDst.path;
   _.assert( _.strHas( context.testSuitePath, 'FileProviderNpm' ) );
-  path.dirTempClose( context.testSuitePath );
+  path.pathDirTempClose( context.testSuitePath );
 }
 
 // --

@@ -39,7 +39,7 @@ function onSuiteEnd()
   if( Config.interpreter === 'njs' )
   {
     _.assert( _.strHas( testSuitePath, 'FileRecord' ) );
-    _.path.dirTempClose( testSuitePath );
+    _.path.pathDirTempClose( testSuitePath );
   }
 }
 

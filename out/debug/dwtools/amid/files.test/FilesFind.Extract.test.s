@@ -57,7 +57,7 @@ function onSuiteBegin( test )
   context.provider = _.FileProvider.Extract({ usingExtraStat : 1, protocol : 'current' });
   context.system = _.FileProvider.System({ providers : [ context.provider ] });
   let path = context.provider.path;
-  context.testSuitePath = path.dirTempOpen( 'suite-' + 'FilesFind' );
+  context.testSuitePath = path.pathDirTempOpen( 'suite-' + 'FilesFind' );
 }
 
 //

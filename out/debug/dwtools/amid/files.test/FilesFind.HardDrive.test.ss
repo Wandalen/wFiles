@@ -24,7 +24,7 @@ function onSuiteBegin( test )
   context.provider = _.FileProvider.HardDrive({ protocol : 'current' });
   context.system = _.FileProvider.System({ providers : [ context.provider ], defaultProvider : context.provider });
   let path = context.provider.path;
-  context.testSuitePath = path.dirTempOpen( 'suite-' + 'FilesFind' );
+  context.testSuitePath = path.pathDirTempOpen( 'suite-' + 'FilesFind' );
   context.testSuitePath = context.provider.pathResolveLinkFull({ filePath : context.testSuitePath, resolvingSoftLink : 1 });
   context.testSuitePath = context.testSuitePath.absolutePath;
 }
@@ -36,7 +36,7 @@ function onSuiteBegin( test )
 // {
 //   let path = this.provider.path;
 //   _.assert( _.strHas( this.testSuitePath, 'Provider/HardDrive' ) );
-//   path.dirTempClose( this.testSuitePath );
+//   path.pathDirTempClose( this.testSuitePath );
 // }
 
 // --

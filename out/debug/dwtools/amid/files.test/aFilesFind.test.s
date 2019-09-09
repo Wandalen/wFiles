@@ -35,9 +35,9 @@ function onSuiteBegin( test )
 function onSuiteEnd()
 {
   let path = this.provider.path;
-  _.assert( Object.keys( this.system.providersWithProtocolMap ).length === 1, 'System should have single registered provider at the end of testing' );
-  _.assert( _.strHas( this.testSuitePath, 'tmp.tmp' ) );
-  path.dirTempClose( this.testSuitePath );
+  _.assert( Object.keys( this.system.providersWithProtocolMap ).length === 1, 'System should have single registered provider at the end of function testing' );
+  _.assert( _.strHas( this.testSuitePath, '/tmp-' ) );
+  path.pathDirTempClose( this.testSuitePath );
   this.provider.finit();
   this.system.finit();
 }
@@ -60,7 +60,7 @@ function softLinkIsSupported()
   let context = this;
   let path = context.provider.path;
 
-  if( Config.platform === 'nodejs' && typeof process !== undefined )
+  if( Config.interpreter === 'njs' && typeof process !== undefined )
   if( process.platform === 'win32' )
   {
     var allow = false;
@@ -73,7 +73,7 @@ function softLinkIsSupported()
 
     try
     {
-      _.fileProvider.softLink({ dstPath : dstPath, srcPath : srcPath, throwing : 1, sync : 1 });
+      _.fileProvider.softLink({ dstPath, srcPath, throwing : 1, sync : 1 });
       allow = _.fileProvider.isSoftLink( dstPath );
     }
     catch( err )
@@ -338,34 +338,20 @@ function filesFindTrivial( test )
 
   /* */
 
-  test.case = 'find single terminal file . includingTransient : 1';
+  test.case = 'find single terminal file . withTransient/*maybe withStem*/ : 1';
   clean();
   var o1 = { filePath : path.join( routinePath ), outputFormat : 'relative', onUp, onDown }
-  var o2 = { filter : { recursive/**/ : 2 }, includingStem : 1, includingTransient : 1, includingTerminals : 1, includingDirs : 1 }
+  var o2 = { filter : { recursive : 2 }, withTransient/*maybe withStem*/ : 1, withTransient/*maybe withStem*/ : 1, withTerminals : 1, withDirs : 1 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [ '.' ];
   test.identical( got, expected );
 
   /* */
 
-  test.case = 'find single terminal file . includingTransient : 0';
+  test.case = 'find single terminal file . withStem/*maybe withTransient*/ : 0';
   clean();
   var o1 = { filePath : path.join( routinePath ), outputFormat : 'relative', onUp, onDown }
-  var o2 = { filter : { recursive/**/ : 2 }, includingStem : 1, includingTransient : 0, includingTerminals : 1 }
-  var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
-  var expected = [];
-  test.identical( got, expected );
-  var expected = [ '.' ];
-  test.identical( _.select( ups, '*/relative' ), expected );
-  var expected = [ '.' ];
-  test.identical( _.select( downs, '*/relative' ), expected );
-
-  /* */
-
-  test.case = 'find single terminal file . includingStem : 0';
-  clean();
-  var o1 = { filePath : path.join( routinePath ), outputFormat : 'relative', onUp, onDown }
-  var o2 = { filter : { recursive/**/ : 2 }, includingStem : 0, includingTransient : 1, includingTerminals : 1 }
+  var o2 = { filter : { recursive : 2 }, withTransient/*maybe withStem*/ : 1, withStem/*maybe withTransient*/ : 0, withTerminals : 1 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [];
   test.identical( got, expected );
@@ -376,10 +362,24 @@ function filesFindTrivial( test )
 
   /* */
 
-  test.case = 'find single terminal file . includingStem : 0';
+  test.case = 'find single terminal file . withStem/*maybe withTransient*/ : 0';
   clean();
   var o1 = { filePath : path.join( routinePath ), outputFormat : 'relative', onUp, onDown }
-  var o2 = { filter : { recursive/**/ : 2 }, includingStem : 0, includingTransient : 0, includingTerminals : 1 }
+  var o2 = { filter : { recursive : 2 }, withStem/*maybe withTransient*/ : 0, withTransient/*maybe withStem*/ : 1, withTerminals : 1 }
+  var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
+  var expected = [];
+  test.identical( got, expected );
+  var expected = [ '.' ];
+  test.identical( _.select( ups, '*/relative' ), expected );
+  var expected = [ '.' ];
+  test.identical( _.select( downs, '*/relative' ), expected );
+
+  /* */
+
+  test.case = 'find single terminal file . withStem/*maybe withTransient*/ : 0';
+  clean();
+  var o1 = { filePath : path.join( routinePath ), outputFormat : 'relative', onUp, onDown }
+  var o2 = { filter : { recursive : 2 }, withStem/*maybe withTransient*/ : 0, withStem/*maybe withTransient*/ : 0, withTerminals : 1 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [];
   test.identical( got, expected );
@@ -403,7 +403,7 @@ function filesFindTrivial( test )
   provider.filesDelete( routinePath );
   extract1.filesReflectTo( provider, routinePath );
   var gotTree = provider.filesExtract( routinePath );
-  gotTree.filesFind({ filePath : '/', filter : { recursive/**/ : 2 }, onDown : function onDown( r, o )
+  gotTree.filesFind({ filePath : '/', filter : { recursive : 2 }, onDown : function onDown( r, o )
   {
     if( r.isTerminal )
     gotTree.fileWrite( r.absolute, gotTree.fileRead( r.absolute ) );
@@ -414,10 +414,10 @@ function filesFindTrivial( test )
 
   /* */
 
-  test.case = 'find single terminal file . includingTerminals : 1';
+  test.case = 'find single terminal file . withTerminals : 1';
   clean();
   var o1 = { filePath : path.join( routinePath, 'f' ), outputFormat : 'relative', onUp, onDown }
-  var o2 = { filter : { recursive/**/ : 2 }, includingStem : 1, includingTransient : 1, includingTerminals : 1 }
+  var o2 = { filter : { recursive : 2 }, withTransient/*maybe withStem*/ : 1, withTransient/*maybe withStem*/ : 1, withTerminals : 1 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [ '.' ];
   test.identical( got, expected );
@@ -428,10 +428,10 @@ function filesFindTrivial( test )
 
   /* */
 
-  test.case = 'find single terminal file . includingTerminals : 0';
+  test.case = 'find single terminal file . withTerminals : 0';
   clean();
   var o1 = { filePath : path.join( routinePath, 'f' ), outputFormat : 'relative', onUp, onDown }
-  var o2 = { filter : { recursive/**/ : 2 }, includingStem : 1, includingTransient : 1, includingTerminals : 0 }
+  var o2 = { filter : { recursive : 2 }, withTransient/*maybe withStem*/ : 1, withTransient/*maybe withStem*/ : 1, withTerminals : 0 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [];
   test.identical( got, expected );
@@ -442,10 +442,10 @@ function filesFindTrivial( test )
 
   /* */
 
-  test.case = 'find single terminal file . includingStem : 0';
+  test.case = 'find single terminal file . withStem/*maybe withTransient*/ : 0';
   clean();
   var o1 = { filePath : path.join( routinePath, 'f' ), outputFormat : 'relative', onUp, onDown }
-  var o2 = { filter : { recursive/**/ : 2 }, includingStem : 0, includingTransient : 1, includingTerminals : 1 }
+  var o2 = { filter : { recursive : 2 }, withStem : 0, withTransient/*maybe withStem*/ : 1, withTerminals : 1 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [];
   test.identical( got, expected );
@@ -470,7 +470,7 @@ function filesFindTrivial( test )
   provider.filesDelete( routinePath );
   extract1.filesReflectTo({ dstProvider : provider, dst : routinePath });
   var gotTree = provider.filesExtract( routinePath );
-  gotTree.filesFind({ filePath : '/', filter : { recursive/**/ : 2 }, onDown : function onDown( r, o )
+  gotTree.filesFind({ filePath : '/', filter : { recursive : 2 }, onDown : function onDown( r, o )
   {
     if( r.isTerminal )
     gotTree.fileWrite( r.absolute, gotTree.fileRead( r.absolute ) );
@@ -480,10 +480,10 @@ function filesFindTrivial( test )
 
   /* */
 
-  test.case = 'find includingStem : 1';
+  test.case = 'find withTransient/*maybe withStem*/ : 1';
   clean();
   var o1 = { filePath : path.join( routinePath ), outputFormat : 'relative', onUp, onDown }
-  var o2 = { filter : { recursive/**/ : 2 }, includingStem : 1, includingTransient : 1, includingTerminals : 1, includingDirs : 1 }
+  var o2 = { filter : { recursive : 2 }, withTransient/*maybe withStem*/ : 1, withTransient/*maybe withStem*/ : 1, withTerminals : 1, withDirs : 1 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected =
   [
@@ -524,10 +524,10 @@ function filesFindTrivial( test )
 
   /* */
 
-  test.case = 'find includingStem:0';
+  test.case = 'find withTransient/*maybe withStem*/:0';
   clean();
   var o1 = { filePath : path.join( routinePath ), outputFormat : 'relative', onUp, onDown }
-  var o2 = { filter : { recursive/**/ : 2 }, includingStem : 0, includingTransient : 1, includingTerminals : 1, includingDirs : 1 }
+  var o2 = { filter : { recursive : 2 }, withStem : 0, withTransient : 1, withTerminals : 1, withDirs : 1 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected =
   [
@@ -567,10 +567,10 @@ function filesFindTrivial( test )
 
   /* */
 
-  test.case = 'find includingTransient:0';
+  test.case = 'find withTransient/*maybe withStem*/:0';
   clean();
   var o1 = { filePath : path.join( routinePath ), outputFormat : 'relative', onUp, onDown }
-  var o2 = { filter : { recursive/**/ : 2 }, includingStem : 1, includingTransient : 1, includingTerminals : 1, includingDirs : 0 }
+  var o2 = { filter : { recursive : 2 }, withTransient/*maybe withStem*/ : 1, withTransient/*maybe withStem*/ : 1, withTerminals : 1, withDirs : 0 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected =
   [
@@ -607,10 +607,10 @@ function filesFindTrivial( test )
 
   /* */
 
-  test.case = 'find includingTerminals:0';
+  test.case = 'find withTerminals:0';
   clean();
   var o1 = { filePath : path.join( routinePath ), outputFormat : 'relative', onUp, onDown }
-  var o2 = { filter : { recursive/**/ : 2 }, includingStem : 1, includingTransient : 1, includingTerminals : 0, includingDirs : 1 }
+  var o2 = { filter : { recursive : 2 }, withTransient/*maybe withStem*/ : 1, withTransient/*maybe withStem*/ : 1, withTerminals : 0, withDirs : 1 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [ '.', './dir1', './dir1/dir11', './dir2' ];
   test.identical( got, expected );
@@ -644,9 +644,9 @@ function filesFindTrivial( test )
   test.case = 'find with excluding file path';
   clean();
   var filePath = { 'dir1' : null, '**b**' : 0 };
-  var filter = { prefixPath : path.join( routinePath ), filePath : filePath, recursive : 2 }
-  var o1 = { filter : filter, outputFormat : 'relative', onUp, onDown }
-  var o2 = { includingStem : 1, includingTransient : 1, includingTerminals : 1, includingDirs : 1 }
+  var filter = { prefixPath : path.join( routinePath ), filePath, recursive : 2 }
+  var o1 = { filter, outputFormat : 'relative', onUp, onDown }
+  var o2 = { withTransient/*maybe withStem*/ : 1, withTransient/*maybe withStem*/ : 1, withTerminals : 1, withDirs : 1 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [ '.', './a', './dir11' ];
   test.identical( got, expected );
@@ -660,9 +660,9 @@ function filesFindTrivial( test )
   test.case = 'find with excluding file path';
   clean();
   var filePath = { 'dir1' : '', '**b**' : 0 };
-  var filter = { prefixPath : path.join( routinePath ), filePath : filePath, recursive : 2 }
-  var o1 = { filter : filter, outputFormat : 'relative', onUp, onDown }
-  var o2 = { includingStem : 1, includingTransient : 1, includingTerminals : 1, includingDirs : 1 }
+  var filter = { prefixPath : path.join( routinePath ), filePath, recursive : 2 }
+  var o1 = { filter, outputFormat : 'relative', onUp, onDown }
+  var o2 = { withTransient/*maybe withStem*/ : 1, withTransient/*maybe withStem*/ : 1, withTerminals : 1, withDirs : 1 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [ '.', './a', './dir11' ];
   test.identical( got, expected );
@@ -676,9 +676,9 @@ function filesFindTrivial( test )
   test.case = 'find with excluding file path';
   clean();
   var filePath = { 'dir1' : true, '**b**' : 0 };
-  var filter = { prefixPath : path.join( routinePath ), filePath : filePath, recursive/**/ : 2 }
-  var o1 = { filter : filter, outputFormat : 'relative', onUp, onDown }
-  var o2 = { includingStem : 1, includingTransient : 1, includingTerminals : 1, includingDirs : 1 }
+  var filter = { prefixPath : path.join( routinePath ), filePath, recursive : 2 }
+  var o1 = { filter, outputFormat : 'relative', onUp, onDown }
+  var o2 = { withTransient/*maybe withStem*/ : 1, withTransient/*maybe withStem*/ : 1, withTerminals : 1, withDirs : 1 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [ '.', './a', './dir11' ]
   test.identical( got, expected );
@@ -692,9 +692,9 @@ function filesFindTrivial( test )
   test.case = 'find with excluding file path';
   clean();
   var filePath = { 'dir1' : null, '**b**' : 0, '**a**' : 1 };
-  var filter = { prefixPath : path.join( routinePath ), filePath : filePath, recursive/**/ : 2 }
-  var o1 = { filter : filter, outputFormat : 'relative', onUp, onDown }
-  var o2 = { includingStem : 1, includingTransient : 1, includingTerminals : 1, includingDirs : 1 }
+  var filter = { prefixPath : path.join( routinePath ), filePath, recursive : 2 }
+  var o1 = { filter, outputFormat : 'relative', onUp, onDown }
+  var o2 = { withTransient/*maybe withStem*/ : 1, withTransient/*maybe withStem*/ : 1, withTerminals : 1, withDirs : 1 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [ '.', './a', './dir11' ];
   test.identical( got, expected );
@@ -722,9 +722,9 @@ function filesFindTrivial( test )
   test.case = 'several nulls';
   clean();
   var filePath = { [ abs( 'dir1/' + '**a**' ) ] : null, [ abs( 'dir1/' + '**b**' ) ] : null };
-  var filter = { filePath : filePath, recursive : 2 }
-  var o1 = { filter : filter, outputFormat : 'relative', onUp, onDown }
-  var o2 = { includingStem : 1, includingTransient : 0, includingTerminals : 1, includingDirs : 1 }
+  var filter = { filePath, recursive : 2 }
+  var o1 = { filter, outputFormat : 'relative', onUp, onDown }
+  var o2 = { withTransient : 0, withStem : 1, withTerminals : 1, withDirs : 1 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [ './a', './b', './dir11/a', './dir11/b', './dira', './dirb' ];
   test.identical( got, expected );
@@ -753,32 +753,26 @@ function filesFindTrivial( test )
   ]
   test.identical( _.select( downs, '*/relative' ), expected );
 
-  test.case = 'several nulls : { dir1/**a** : null, dir2**b** : null }, includingDirs : 1';
+  test.case = 'several nulls : { dir1/**a** : null, dir2**b** : null }, withDirs : 1';
   clean();
   var filePath = { [ abs( 'dir1/' + '**a**' ) ] : null, [ abs( 'dir2' + '**b**' ) ] : null };
-  var filter = { filePath : filePath, recursive : 2 }
-  var o1 = { filter : filter, outputFormat : 'relative', onUp, onDown }
-  var o2 = { includingStem : 1, includingTransient : 0, includingTerminals : 1, includingDirs : 1 }
+  var filter = { filePath, recursive : 2 }
+  var o1 = { filter, outputFormat : 'relative', onUp, onDown }
+  var o2 = { withTransient : 0, withStem : 1, withTerminals : 1, withDirs : 1 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
-  var expected =
-  [
-    './dir2/b',
-    './a',
-    './dir11/a',
-    './dira',
-  ]
+  var expected = [ './dir2/b', './dir1/a', './dir1/dir11/a', './dir1/dira' ];
   test.identical( got, expected );
   var expected =
   [
     '.',
     './dir2',
     './dir2/b',
-    '.',
-    './a',
-    './dir11',
-    './dir11/a',
-    './dira',
-    './dirb'
+    './dir1',
+    './dir1/a',
+    './dir1/dir11',
+    './dir1/dir11/a',
+    './dir1/dira',
+    './dir1/dirb'
   ]
   test.identical( _.select( ups, '*/relative' ), expected );
   var expected =
@@ -786,40 +780,35 @@ function filesFindTrivial( test )
     './dir2/b',
     './dir2',
     '.',
-    './a',
-    './dir11/a',
-    './dir11',
-    './dira',
-    './dirb',
-    '.'
+    './dir1/a',
+    './dir1/dir11/a',
+    './dir1/dir11',
+    './dir1/dira',
+    './dir1/dirb',
+    './dir1'
   ]
   test.identical( _.select( downs, '*/relative' ), expected );
 
-  test.case = 'several nulls : { dir1/**a** : null, dir2**b** : null }, includingDirs : 0';
+  test.case = 'several nulls : { dir1/**a** : null, dir2**b** : null }, withDirs : 0';
   clean();
   var filePath = { [ abs( 'dir1/' + '**a**' ) ] : null, [ abs( 'dir2' + '**b**' ) ] : null };
-  var filter = { filePath : filePath, recursive : 2 }
-  var o1 = { filter : filter, outputFormat : 'relative', onUp, onDown }
-  var o2 = { includingStem : 1, includingTransient : 0, includingTerminals : 1, includingDirs : 0 }
+  var filter = { filePath, recursive : 2 }
+  var o1 = { filter, outputFormat : 'relative', onUp, onDown }
+  var o2 = { withTransient/*maybe withStem*/ : 1, withStem/*maybe withTransient*/ : 0, withTerminals : 1, withDirs : 0 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
-  var expected =
-  [
-    './dir2/b',
-    './a',
-    './dir11/a',
-  ]
+  var expected = [ './dir2/b', './dir1/a', './dir1/dir11/a' ]
   test.identical( got, expected );
   var expected =
   [
     '.',
     './dir2',
     './dir2/b',
-    '.',
-    './a',
-    './dir11',
-    './dir11/a',
-    './dira',
-    './dirb'
+    './dir1',
+    './dir1/a',
+    './dir1/dir11',
+    './dir1/dir11/a',
+    './dir1/dira',
+    './dir1/dirb'
   ]
   test.identical( _.select( ups, '*/relative' ), expected );
   var expected =
@@ -827,12 +816,12 @@ function filesFindTrivial( test )
     './dir2/b',
     './dir2',
     '.',
-    './a',
-    './dir11/a',
-    './dir11',
-    './dira',
-    './dirb',
-    '.'
+    './dir1/a',
+    './dir1/dir11/a',
+    './dir1/dir11',
+    './dir1/dira',
+    './dir1/dirb',
+    './dir1'
   ]
   test.identical( _.select( downs, '*/relative' ), expected );
 
@@ -867,7 +856,7 @@ function filesFindTrivialAsync( test )
   provider.filesDelete( routinePath );
   extract1.filesReflectTo({ dstProvider : provider, dst : context.testSuitePath });
   var gotTree = provider.filesExtract( context.testSuitePath );
-  gotTree.filesFind({ filePath : '/', filter : { recursive/**/ : 2 }, onDown : function onDown( r, o )
+  gotTree.filesFind({ filePath : '/', filter : { recursive : 2 }, onDown : function onDown( r, o )
   {
     if( r.isTerminal )
     gotTree.fileWrite( r.absolute, gotTree.fileRead( r.absolute ) );
@@ -886,9 +875,9 @@ function filesFindTrivialAsync( test )
       filePath : path.join( context.testSuitePath ),
       outputFormat : 'relative',
       sync : 0,
-      filter : { recursive/**/ : 2 },
-      includingTerminals : 1,
-      includingDirs : 1
+      filter : { recursive : 2 },
+      withTerminals : 1,
+      withDirs : 1
     }
 
     return provider.filesFind( _.mapExtend( null, o ) )
@@ -931,7 +920,7 @@ function filesFindMaskTerminal( test )
   test.case = 'relative to current dir';
 
   var filter =  { maskTerminal : './package.json' }
-  var got = provider.filesFind({ filePath : routinePath, filter : filter, filter : { recursive/**/ : 1 } });
+  var got = provider.filesFind({ filePath : routinePath, filter, filter : { recursive : 1 } });
   test.identical( got.length, 1 );
 
   /* */
@@ -939,7 +928,7 @@ function filesFindMaskTerminal( test )
   test.case = 'relative to parent dir';
 
   var filter =  { maskTerminal : './filesFindMaskTerminal/package.json' }
-  var got = provider.filesFind({ filePath : routinePath, filter : filter });
+  var got = provider.filesFind({ filePath : routinePath, filter });
   test.identical( got.length, 0 );
 
 }
@@ -1030,18 +1019,18 @@ function filesFindCriticalCases( test )
   ({
     basePath : '.',
     prefixPath : '/',
-    recursive/**/ : 2,
+    recursive : 2,
   });
 
   filter.filePath = [ '/dir1', '/dir2' ];
   filter._formPaths();
   var found = extract.filesFind
   ({
-    includingDirs : 1,
-    includingTerminals : 1,
+    withDirs : 1,
+    withTerminals : 1,
     mandatory : 0,
     outputFormat : 'relative',
-    filter : filter,
+    filter,
   });
 
   var expected = [ './dir1', './dir1/a', './dir1/b', './dir2', './dir2/c' ];
@@ -1105,7 +1094,7 @@ function filesFindCriticalCases( test )
       },
     }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
 
   var filter =
   {
@@ -1114,7 +1103,7 @@ function filesFindCriticalCases( test )
     maskAll : { excludeAny : [ /(^|\/)-/, /\.release($|\.|\/)/i ] },
   }
 
-  var got = extract.filesFind({ filter : filter, outputFormat : 'relative' });
+  var got = extract.filesFind({ filter, outputFormat : 'relative' });
   var expected = [ './dir2/File.test.js', './dir3/File.test.js' ];
   test.identical( got, expected );
 
@@ -1125,7 +1114,7 @@ function filesFindCriticalCases( test )
     maskAll : { excludeAny : [ /(^|\/)-/, /\.release($|\.|\/)/i ] },
   }
 
-  var got = extract.filesFind({ filter : filter, outputFormat : 'relative' });
+  var got = extract.filesFind({ filter, outputFormat : 'relative' });
   var expected = [ './dir2/File.js', './dir2/File1.debug.js', './dir2/File2.debug.js', './dir3/File.js' ];
   test.identical( got, expected );
 
@@ -1155,7 +1144,7 @@ function filesFindCriticalCases( test )
       },
     }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
 
   var filter = extract.recordFilter
   ({
@@ -1169,41 +1158,101 @@ function filesFindCriticalCases( test )
   ({
     filePath : 'dir3',
     outputFormat : 'relative',
-    filter : filter,
+    filter,
   });
 
   var expected = [ './dir2/File.js', './dir2/File.test.js', './dir2/File1.debug.js', './dir2/File1.release.js', './dir2/File2.debug.js', './dir2/File2.release.js', './dir3/File.js', './dir3/File.test.js' ];
   test.identical( got, expected );
 
-  // /* */
-  //
-  // if( Config.debug )
-  // {
-  //
-  //   var filter = extract.recordFilter
-  //   ({
-  //     basePath : '.',
-  //     prefixPath : '/',
-  //   });
-  //
-  //   filter.filePath = [ '/dir1', '/dir2' ];
-  //   filter._formPaths();
-  //
-  //   test.shouldThrowErrorSync( () =>
-  //   {
-  //
-  //     var found = extract.filesFind
-  //     ({
-  //       mandatory : 0,
-  //       filePath : '/',
-  //       filter : filter,
-  //     });
-  //
-  //   });
-  //
-  // }
+  /* */
 
-}
+  test.case = 'with filter as an argument';
+
+  var extract = _.FileProvider.Extract
+  ({
+    filesTree : { dir1 : { a : 1, b : 2 }, dir2 : { c : 3 }, dir3 : { d : 4 }, e : 5 },
+  });
+
+  var filter = extract.recordFilter({ filePath : '/dir1', basePath : '/dir2' });
+  var got = extract.filesFind( filter );
+  var expected = [ '../dir1/a', '../dir1/b' ];
+  test.identical( _.select( got, '*/relative' ), expected );
+
+  /* */
+
+  test.case = 'no file path, mandatory : 0';
+
+  var extract = _.FileProvider.Extract
+  ({
+    filesTree : { dir1 : { a : 1, b : 2 }, dir2 : { c : 3 }, dir3 : { d : 4 }, e : 5 },
+  });
+
+  var got = extract.filesFind({ mandatory : 0 });
+  var expected = [];
+  test.identical( got, expected );
+
+  var got = extract.filesFind({ mandatory : 0, filePath : null });
+  var expected = [];
+  test.identical( got, expected );
+
+  var got = extract.filesFind({ mandatory : 0, filePath : '' });
+  var expected = [];
+  test.identical( got, expected );
+
+  var got = extract.filesFind({ mandatory : 0, filter : {} });
+  var expected = [];
+  test.identical( got, expected );
+
+  var got = extract.filesFind({ mandatory : 0, filter : { filePath : '' } });
+  var expected = [];
+  test.identical( got, expected );
+
+  var got = extract.filesFind({ mandatory : 0, filter : { filePath : null } });
+  var expected = [];
+  test.identical( got, expected );
+
+  /* */
+
+  if( !Config.debug )
+  return;
+
+  test.case = 'no arguments';
+  test.shouldThrowErrorSync( () =>
+  {
+    extract.filesFind();
+  });
+
+  test.case = 'no file path';
+  test.shouldThrowErrorSync( () =>
+  {
+    extract.filesFind({ mandatory : 1 })
+  });
+
+  test.case = 'file path : null';
+  test.shouldThrowErrorSync( () =>
+  {
+    extract.filesFind({ mandatory : 1, filePath : null });
+  });
+
+  test.case = 'file path : empty str';
+  test.shouldThrowErrorSync( () =>
+  {
+    extract.filesFind({ mandatory : 1, filePath : '' });
+  });
+
+  test.case = 'file path : null in filter';
+  test.shouldThrowErrorSync( () =>
+  {
+    extract.filesFind({ mandatory : 1, filter : { filePath : null } });
+  });
+
+  test.case = 'file path : empty str in filter';
+  test.shouldThrowErrorSync( () =>
+  {
+    extract.filesFind({ mandatory : 1, filter : { filePath : '' } });
+  });
+
+} /* end of function filesFindCriticalCases */
 
 //
 
@@ -1221,7 +1270,7 @@ function filesFindPreset( test )
   ({
     filePath : '/.system',
     outputFormat : 'relative',
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     filter :
     {
       basePath : '/some/path',
@@ -1244,7 +1293,7 @@ function filesFindPreset( test )
   {
     filePath : '/.system',
     outputFormat : 'relative',
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     filter :
     {
       basePath : '/some/path',
@@ -1275,7 +1324,7 @@ function filesFindPreset( test )
     filter :
     {
       basePath : '/some/path',
-      recursive/**/ : 2,
+      recursive : 2,
     },
   });
 
@@ -1307,8 +1356,8 @@ function filesFindPreset( test )
   {
     filePath : '/',
     outputFormat : 'relative',
-    includingDirs : 1,
-    filter : { recursive/**/ : 2 },
+    withDirs : 1,
+    filter : { recursive : 2 },
   }
   var found = extract.filesFind( o );
   var expected = [ '.', './root', './root/.d', './root/c' ];
@@ -1318,8 +1367,8 @@ function filesFindPreset( test )
   {
     filePath : '/',
     outputFormat : 'relative',
-    includingDirs : 0,
-    filter : { recursive/**/ : 2 },
+    withDirs : 0,
+    filter : { recursive : 2 },
   }
   var found = extract.filesFind( o );
   var expected = [ './root/.d', './root/c' ];
@@ -1343,7 +1392,7 @@ function filesFind( test )
   var fixedOptions =
   {
     allowingMissed : 1,
-    includingStem : 1,
+    withTransient/*maybe withStem*/ : 1,
     result : [],
     orderingExclusion : [],
     sortingWithArray : null,
@@ -1355,8 +1404,8 @@ function filesFind( test )
   var got = provider.filesFind
   ({
     filePath : __filename,
-    includingTerminals : 1,
-    includingTransient : 0,
+    withTerminals : 1,
+    withStem/*maybe withTransient*/ : 0,
     outputFormat : 'absolute'
   });
   var expected = [ path.normalize( __filename ) ];
@@ -1386,12 +1435,12 @@ function filesFind( test )
   var got = provider.filesFind
   ({
     filePath : __dirname,
-    includingTerminals : 1,
-    includingTransient : 1,
+    withTerminals : 1,
+    withTransient/*maybe withStem*/ : 1,
     outputFormat : 'absolute',
-    onUp : onUp,
-    onDown : onDown,
-    filter : { recursive/**/ : 2 }
+    onUp,
+    onDown,
+    filter : { recursive : 2 }
   });
 
   test.is( got.length > 0 );
@@ -1415,8 +1464,8 @@ function filesFind( test )
 
   var outputFormat = [ 'absolute', 'relative', 'record', 'nothing' ];
   var recursive = [ 0, 1, 2 ];
-  var includingTerminals = [ 0, 1 ];
-  var includingTransient = [ 0, 1 ];
+  var withTerminals = [ 0, 1 ];
+  var withTransient/*maybe withStem*/ = [ 0, 1 ];
   var terminalPaths = [ routinePath ];
 
   var globs =
@@ -1441,17 +1490,17 @@ function filesFind( test )
     {
       recursive.forEach( ( _recursive ) =>
       {
-        includingTerminals.forEach( ( _includingTerminals ) =>
+        withTerminals.forEach( ( _includingTerminals ) =>
         {
-          includingTransient.forEach( ( _includingTransients ) =>
+          withTransient/*maybe withStem*/.forEach( ( _includingTransients ) =>
           {
             globs.forEach( ( glob ) =>
             {
               var o =
               {
                 outputFormat : _outputFormat,
-                includingTerminals : _includingTerminals,
-                includingTransient : _includingTransients,
+                withTerminals : _includingTerminals,
+                withTransient/*maybe withStem*/ : _includingTransients,
                 filePath : terminalPath,
               };
               o.filter =
@@ -1556,14 +1605,14 @@ function filesFind( test )
     var o =
     {
       outputFormat : 'absolute',
-      includingTerminals : 1,
-      includingTransient : 0,
+      withTerminals : 1,
+      withStem/*maybe withTransient*/ : 0,
       filePath : path.join( routinePath, glob ),
       filter :
       {
         basePath : routinePath,
         prefixPath : routinePath,
-        recursive/**/ : 2,
+        recursive : 2,
       }
     };
 
@@ -1609,8 +1658,8 @@ function filesFind( test )
         i.level,
         i.outputFormat,
         !!i.recursive,
-        !!i.includingTerminals,
-        !!i.includingTransient,
+        !!i.withTerminals,
+        !!i.withTransient/*maybe withStem*/,
         i.glob || '-',
         !!i.passed
       ])
@@ -1663,7 +1712,7 @@ function filesFind( test )
     var dirPath = routinePath;
     var isDir = provider.isDir( o.filePath );
 
-    if( isDir && o._includingDirs && o.includingStem )
+    if( isDir && o._includingDirs && o.withTransient/*maybe withStem*/ )
     {
       if( o.outputFormat === 'absolute' ||  o.outputFormat === 'record' )
       _.arrayPrependOnce( expected, o.filePath );
@@ -1674,7 +1723,7 @@ function filesFind( test )
 
     if( !isDir )
     {
-      if( o.includingTerminals )
+      if( o.withTerminals )
       {
         var relative = path.dot( path.relative( o.basePath || o.filePath, o.filePath ) );
         var passed = true;
@@ -1713,7 +1762,7 @@ function filesFind( test )
       if( l > 0 )
       {
         dirPath = path.join( dirPath, '' + l );
-        if( o.includingDirs && o.includingTransient )
+        if( o.withDirs && o.withTransient/*maybe withStem*/ )
         {
           var relative = path.dot( path.relative( o.basePath || routinePath, dirPath ) );
 
@@ -1733,7 +1782,7 @@ function filesFind( test )
       if( !o.filter.recursive )
       break;
 
-      if( o.includingTerminals )
+      if( o.withTerminals )
       {
 
         filesNames.forEach( ( name ) =>
@@ -1909,7 +1958,7 @@ function filesFind2( test )
 
   /*terminalPath - directory*/
 
-  got = provider.filesFind( routinePath );
+  got = provider.filesFind({ filePath : routinePath, filter : { recursive : 1 } });
   expected = provider.dirRead( routinePath );
   test.identical( check( got, expected ), true );
 
@@ -1917,7 +1966,7 @@ function filesFind2( test )
 
   terminalPath = path.join( routinePath, 'terminal' );
   provider.fileWrite( terminalPath, 'terminal' );
-  got = provider.filesFind( terminalPath );
+  got = provider.filesFind({ filePath : terminalPath, filter : { recursive : 1 } });
   expected = provider.dirRead( terminalPath );
   test.identical( check( got, expected ), true );
 
@@ -2020,55 +2069,55 @@ function filesFind2( test )
 
   /* */
 
-  test.description = 'includingTerminals, includingTransient options';
+  test.description = 'withTerminals, withTransient/*maybe withStem*/ options';
 
-  /*terminalPath - empty dir, includingTerminals, includingTransient on*/
-
-  provider.dirMake( path.join( context.testSuitePath, 'empty' ) )
-  got = provider.filesFind({ filePath : path.join( routinePath, 'empty' ), includingTerminals : 1, includingTransient : 1, allowingMissed : 1 });
-  test.identical( got, [] );
-
-  /*terminalPath - empty dir, includingTerminals, includingTransient on, includingStem off*/
+  /*terminalPath - empty dir, withTerminals, withTransient on*/
 
   provider.dirMake( path.join( context.testSuitePath, 'empty' ) )
-  got = provider.filesFind({ filePath : path.join( routinePath, 'empty' ), includingTerminals : 1, includingTransient : 1, includingStem : 0, allowingMissed : 1 });
+  got = provider.filesFind({ filePath : path.join( routinePath, 'empty' ), withTerminals : 1, withTransient/*maybe withStem*/ : 1, allowingMissed : 1 });
   test.identical( got, [] );
 
-  /*terminalPath - empty dir, includingTerminals, includingTransient off*/
+  /*terminalPath - empty dir, withTerminals, withTransient on, withTransient off*/
 
   provider.dirMake( path.join( context.testSuitePath, 'empty' ) )
-  got = provider.filesFind({ filePath : path.join( routinePath, 'empty' ), includingTerminals : 0, includingTransient : 0, allowingMissed : 1 });
+  got = provider.filesFind({ filePath : path.join( routinePath, 'empty' ), withTerminals : 1, withTransient/*maybe withStem*/ : 1, withStem : 0, allowingMissed : 1 });
   test.identical( got, [] );
 
-  /*terminalPath - directory, includingTerminals, includingTransient on*/
+  /*terminalPath - empty dir, withTerminals, withTransient off*/
 
-  got = provider.filesFind({ filePath : routinePath, includingTerminals : 1, includingTransient : 1, includingStem : 0 });
+  provider.dirMake( path.join( context.testSuitePath, 'empty' ) )
+  got = provider.filesFind({ filePath : path.join( routinePath, 'empty' ), withTerminals : 0, withStem/*maybe withTransient*/ : 0, allowingMissed : 1 });
+  test.identical( got, [] );
+
+  /*terminalPath - directory, withTerminals, withTransient on*/
+
+  got = provider.filesFind({ filePath : routinePath, withTerminals : 1, withTransient/*maybe withStem*/ : 1, withStem : 0, filter : { recursive : 1 } });
   expected = provider.dirRead( routinePath );
   test.identical( check( got, expected ), true );
 
-  /*terminalPath - directory, includingTerminals, includingTransient off*/
+  /*terminalPath - directory, withTerminals, withTransient off*/
 
-  got = provider.filesFind({ filePath : routinePath, includingTerminals : 0, includingTransient : 0 });
+  got = provider.filesFind({ filePath : routinePath, withTerminals : 0, withStem/*maybe withTransient*/ : 0 });
   expected = provider.dirRead( routinePath );
   test.identical( got, [] );
 
-  /*terminalPath - directory, includingTerminals off, includingTransient on*/
+  /*terminalPath - directory, withTerminals off, withTransient on*/
 
-  got = provider.filesFind({ filePath : routinePath, includingTerminals : 0, includingTransient : 1, includingStem : 0 });
+  got = provider.filesFind({ filePath : routinePath, withTerminals : 0, withTransient/*maybe withStem*/ : 1, withStem : 0 });
   expected = provider.dirRead( routinePath );
   test.identical( check( got, expected ), true  );
 
-  /*terminalPath - terminal file, includingTerminals, includingTransient off*/
+  /*terminalPath - terminal file, withTerminals, withTransient off*/
 
   terminalPath = path.join( routinePath, 'terminal' );
-  got = provider.filesFind({ filePath : terminalPath, includingTerminals : 0, includingTransient : 0 });
+  got = provider.filesFind({ filePath : terminalPath, withTerminals : 0, withStem/*maybe withTransient*/ : 0 });
   expected = provider.dirRead( routinePath );
   test.identical( got, [] );
 
-  /*terminalPath - terminal file, includingTerminals off, includingTransient on*/
+  /*terminalPath - terminal file, withTerminals off, withTransient on*/
 
   terminalPath = path.join( routinePath, 'terminal' );
-  got = provider.filesFind({ filePath : terminalPath, includingTerminals : 0, includingTransient : 1 });
+  got = provider.filesFind({ filePath : terminalPath, withTerminals : 0, withTransient/*maybe withStem*/ : 1 });
   test.identical( got, [] );
 
   //
@@ -2091,7 +2140,7 @@ function filesFind2( test )
 
   /*terminalPath - directory, outputFormat relative */
 
-  got = provider.filesFind({ filePath : routinePath, outputFormat : 'relative' });
+  got = provider.filesFind({ filePath : routinePath, outputFormat : 'relative', filter : { recursive : 1 } });
   expected = provider.dirRead( routinePath );
   for( var i = 0; i < expected.length; ++i )
   expected[ i ] = path.join( './', expected[ i ] );
@@ -2122,7 +2171,7 @@ function filesFind2( test )
   /*terminalPath - directory, result empty array*/
 
   got = [];
-  provider.filesFind({ filePath : routinePath, result : got });
+  provider.filesFind({ filePath : routinePath, result : got, filter : { recursive : 1 } });
   expected = provider.dirRead( routinePath );
   test.identical( check( got, expected ), true );
 
@@ -2158,7 +2207,7 @@ function filesFind2( test )
   expected[ i ] = './' + expected[ i ];
   test.identical( got, expected );
 
-  /* terminalPath - directory, maskDirectory, includingTransient */
+  /* terminalPath - directory, maskDirectory, withTransient */
 
   terminalPath = path.join( context.testSuitePath, 'tmp/dir' );
   provider.dirMake( terminalPath );
@@ -2170,12 +2219,12 @@ function filesFind2( test )
     {
       basePath : path.dir( terminalPath ),
       maskDirectory : 'dir',
-      recursive/**/ : 2,
+      recursive : 2,
     },
     outputFormat : 'relative',
-    includingStem : 1,
-    includingTerminals : 1,
-    includingDirs : 1,
+    withTransient/*maybe withStem*/ : 1,
+    withTerminals : 1,
+    withDirs : 1,
   });
   expected = provider.dirRead( path.dir( terminalPath ) );
   expected = expected.filter( function( element )
@@ -2204,9 +2253,9 @@ function filesFind2( test )
   got = provider.filesFind
   ({
     filePath : routinePath,
-    orderingExclusion : orderingExclusion,
-    includingDirs : 1,
-    filter : { recursive/**/ : 1 },
+    orderingExclusion,
+    withDirs : 1,
+    filter : { recursive : 1 },
     outputFormat : 'record'
   });
   got = got.map( ( r ) => r.relative );
@@ -2225,7 +2274,7 @@ function filesFind2( test )
   got = provider.filesFind
   ({
     filePath : path.join( routinePath, 'src/dir' ),
-    filter : { basePath : relative, recursive/**/ : 1 },
+    filter : { basePath : relative, recursive : 1 },
   });
   got = got[ 0 ].relative;
   var begins = './' + path.relative( relative, path.join( routinePath, 'src/dir' ) );
@@ -2240,7 +2289,7 @@ function filesFind2( test )
     {
       basePath : '/x/a/b',
     },
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     maskPreset : 0,
   });
 
@@ -2305,22 +2354,22 @@ function filesFindRecursive( test )
   var got = provider.filesFind
   ({
     filePath : routinePath,
-    includingDirs : 1,
-    includingTerminals : 1,
-    includingTransient : 1,
+    withDirs : 1,
+    withTerminals : 1,
+    withTransient/*maybe withStem*/ : 1,
     outputFormat : 'relative',
-    filter : { recursive/**/ : 0 },
+    filter : { recursive : 0 },
   })
   test.identical( got, [ '.' ] )
 
   var got = provider.filesFind
   ({
     filePath : routinePath,
-    includingDirs : 1,
-    includingTerminals : 1,
-    includingTransient : 1,
+    withDirs : 1,
+    withTerminals : 1,
+    withTransient/*maybe withStem*/ : 1,
     outputFormat : 'relative',
-    filter : { recursive/**/ : 1 },
+    filter : { recursive : 1 },
   })
   var expected = [ '.', './src', './src2' ]
   test.identical( got, expected );
@@ -2328,11 +2377,11 @@ function filesFindRecursive( test )
   var got = provider.filesFind
   ({
     filePath : routinePath,
-    includingDirs : 1,
-    includingTerminals : 1,
-    includingTransient : 1,
+    withDirs : 1,
+    withTerminals : 1,
+    withTransient/*maybe withStem*/ : 1,
     outputFormat : 'relative',
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
   })
   var expected = [ '.', './src', './src/a1', './src/dir', './src/dir/a1', './src2', './src2/ax2', './src2/dirx', './src2/dirx/a' ]
   test.identical( got, expected );
@@ -2346,22 +2395,22 @@ function filesFindRecursive( test )
   var got = provider.filesFind
   ({
     filePath : path.join( routinePath, './src/a1' ),
-    includingDirs : 1,
-    includingTerminals : 1,
-    includingTransient : 1,
+    withDirs : 1,
+    withTerminals : 1,
+    withTransient/*maybe withStem*/ : 1,
     outputFormat : 'relative',
     filter : { basePath : path.join( routinePath, './src' ) },
-    filter : { recursive/**/ : 0 },
+    filter : { recursive : 0 },
   })
   var expected = [ './a1' ]
 
   var got = provider.filesFind
   ({
     filePath : abs( './src/a1' ),
-    filter : { basePath : abs( './src' ), recursive/**/ : 1 },
-    includingDirs : 1,
-    includingTerminals : 1,
-    includingTransient : 1,
+    filter : { basePath : abs( './src' ), recursive : 1 },
+    withDirs : 1,
+    withTerminals : 1,
+    withTransient/*maybe withStem*/ : 1,
     outputFormat : 'relative',
   })
   var expected = [ './a1' ]
@@ -2372,11 +2421,11 @@ function filesFindRecursive( test )
   var got = provider.filesFind
   ({
     filePath : path.join( routinePath, './src/a1' ),
-    includingDirs : 1,
-    includingTerminals : 1,
-    includingTransient : 1,
+    withDirs : 1,
+    withTerminals : 1,
+    withTransient/*maybe withStem*/ : 1,
     outputFormat : 'relative',
-    filter : { basePath : path.join( routinePath, './src' ), recursive/**/ : 2 },
+    filter : { basePath : path.join( routinePath, './src' ), recursive : 2 },
   })
   var expected = [ './a1' ]
   test.identical( got, expected );
@@ -2393,9 +2442,9 @@ function filesFindRecursive( test )
     provider.filesFind
     ({
       filePath : path.join( routinePath ),
-      includingDirs : 1,
-      includingTerminals : 1,
-      includingTransient : 1,
+      withDirs : 1,
+      withTerminals : 1,
+      withTransient/*maybe withStem*/ : 1,
       outputFormat : 'relative',
       recursive : '0',
     })
@@ -2406,9 +2455,9 @@ function filesFindRecursive( test )
     provider.filesFind
     ({
       filePath : path.join( routinePath ),
-      includingDirs : 1,
-      includingTerminals : 1,
-      includingTransient : 1,
+      withDirs : 1,
+      withTerminals : 1,
+      withTransient/*maybe withStem*/ : 1,
       outputFormat : 'relative',
       recursive : '1',
     })
@@ -2419,9 +2468,9 @@ function filesFindRecursive( test )
     provider.filesFind
     ({
       filePath : path.join( routinePath ),
-      includingDirs : 1,
-      includingTerminals : 1,
-      includingTransient : 1,
+      withDirs : 1,
+      withTerminals : 1,
+      withTransient/*maybe withStem*/ : 1,
       outputFormat : 'relative',
       recursive : '2',
     })
@@ -2432,9 +2481,9 @@ function filesFindRecursive( test )
     provider.filesFind
     ({
       filePath : path.join( routinePath ),
-      includingDirs : 1,
-      includingTerminals : 1,
-      includingTransient : 1,
+      withDirs : 1,
+      withTerminals : 1,
+      withTransient/*maybe withStem*/ : 1,
       outputFormat : 'relative',
       recursive : true,
     })
@@ -2445,9 +2494,9 @@ function filesFindRecursive( test )
     provider.filesFind
     ({
       filePath : path.join( routinePath ),
-      includingDirs : 1,
-      includingTerminals : 1,
-      includingTransient : 1,
+      withDirs : 1,
+      withTerminals : 1,
+      withTransient/*maybe withStem*/ : 1,
       outputFormat : 'relative',
       recursive : false,
     })
@@ -2458,9 +2507,9 @@ function filesFindRecursive( test )
     provider.filesFind
     ({
       filePath : path.join( routinePath ),
-      includingDirs : 1,
-      includingTerminals : 1,
-      includingTransient : 1,
+      withDirs : 1,
+      withTerminals : 1,
+      withTransient/*maybe withStem*/ : 1,
       outputFormat : 'relative',
       recursive : '0',
     })
@@ -2527,11 +2576,11 @@ function filesFindLinked( test )
     filePath : routinePath,
     resolvingSoftLink : 0,
     outputFormat : 'record',
-    includingTransient : 1,
-    includingTerminals : 1,
-    includingDirs : 1,
-    filter : { recursive/**/ : 2 },
-    includingStem : 1,
+    withTransient/*maybe withStem*/ : 1,
+    withTerminals : 1,
+    withDirs : 1,
+    filter : { recursive : 2 },
+    withTransient/*maybe withStem*/ : 1,
   })
   test.identical( select( got, '*/absolute' ), [ '/', '/normal', '/terminal' ] );
   test.identical( select( got, '*/real' ), [ '/', '/normal', '/terminal' ] );
@@ -2541,11 +2590,11 @@ function filesFindLinked( test )
     filePath : routinePath,
     resolvingSoftLink : 1,
     outputFormat : 'record',
-    includingTransient : 1,
-    includingTerminals : 1,
-    includingDirs : 1,
-    filter : { recursive/**/ : 2 },
-    includingStem : 1,
+    withTransient/*maybe withStem*/ : 1,
+    withTerminals : 1,
+    withDirs : 1,
+    filter : { recursive : 2 },
+    withTransient/*maybe withStem*/ : 1,
     revisiting : 2,
   })
   console.log( got[ 1 ].real );
@@ -2576,11 +2625,11 @@ function filesFindLinked( test )
     filePath : routinePath,
     resolvingSoftLink : 0,
     outputFormat : 'record',
-    includingTransient : 1,
-    includingTerminals : 1,
-    includingDirs : 1,
-    filter : { recursive/**/ : 2 },
-    includingStem : 1,
+    withTransient/*maybe withStem*/ : 1,
+    withTerminals : 1,
+    withDirs : 1,
+    filter : { recursive : 2 },
+    withTransient/*maybe withStem*/ : 1,
     revisiting : 2,
   })
   test.identical( select( got, '*/absolute' ), [ '/', '/double', '/normal', '/terminal' ] );
@@ -2591,11 +2640,11 @@ function filesFindLinked( test )
     filePath : routinePath,
     resolvingSoftLink : 1,
     outputFormat : 'record',
-    includingTransient : 1,
-    includingTerminals : 1,
-    includingDirs : 1,
-    filter : { recursive/**/ : 2 },
-    includingStem : 1,
+    withTransient/*maybe withStem*/ : 1,
+    withTerminals : 1,
+    withDirs : 1,
+    filter : { recursive : 2 },
+    withTransient/*maybe withStem*/ : 1,
     revisiting : 2,
   })
   test.identical( select( got, '*/absolute' ), [ '/', '/double', '/normal', '/terminal' ] );
@@ -2625,11 +2674,11 @@ function filesFindLinked( test )
   ({
     filePath : routinePath,
     outputFormat : 'record',
-    includingTransient : 1,
-    includingTerminals : 1,
-    includingDirs : 1,
-    includingStem : 1,
-    filter : { recursive/**/ : 2 },
+    withTransient/*maybe withStem*/ : 1,
+    withTerminals : 1,
+    withDirs : 1,
+    withTransient/*maybe withStem*/ : 1,
+    filter : { recursive : 2 },
     resolvingSoftLink : 0,
     allowingMissed : 0,
     allowingCycled : 0,
@@ -2645,12 +2694,12 @@ function filesFindLinked( test )
   ({
     filePath : routinePath,
     outputFormat : 'record',
-    includingTransient : 1,
-    includingTerminals : 1,
-    includingDirs : 1,
-    includingStem : 1,
-    includingDefunct : 1,
-    filter : { recursive/**/ : 2 },
+    withTransient/*maybe withStem*/ : 1,
+    withTerminals : 1,
+    withDirs : 1,
+    withTransient/*maybe withStem*/ : 1,
+    withDefunct : 1,
+    filter : { recursive : 2 },
     resolvingSoftLink : 1,
     allowingMissed : 1,
     allowingCycled : 0,
@@ -2668,11 +2717,11 @@ function filesFindLinked( test )
     ({
       filePath : routinePath,
       outputFormat : 'record',
-      includingTransient : 1,
-      includingTerminals : 1,
-      includingDirs : 1,
-      includingStem : 1,
-      filter : { recursive/**/ : 2 },
+      withTransient/*maybe withStem*/ : 1,
+      withTerminals : 1,
+      withDirs : 1,
+      withTransient/*maybe withStem*/ : 1,
+      filter : { recursive : 2 },
       resolvingSoftLink : 1,
       allowingMissed : 0,
       allowingCycled : 1,
@@ -2706,11 +2755,11 @@ function filesFindLinked( test )
   ({
     filePath : routinePath,
     outputFormat : 'record',
-    includingTransient : 1,
-    includingTerminals : 1,
-    includingDirs : 1,
-    includingStem : 1,
-    filter : { recursive/**/ : 2 },
+    withTransient/*maybe withStem*/ : 1,
+    withTerminals : 1,
+    withDirs : 1,
+    withTransient/*maybe withStem*/ : 1,
+    filter : { recursive : 2 },
     resolvingSoftLink : 0,
     allowingMissed : 0,
     allowingCycled : 0,
@@ -2728,11 +2777,11 @@ function filesFindLinked( test )
   ({
     filePath : routinePath,
     outputFormat : 'record',
-    includingTransient : 1,
-    includingTerminals : 1,
-    includingDirs : 1,
-    includingStem : 1,
-    filter : { recursive/**/ : 2 },
+    withTransient/*maybe withStem*/ : 1,
+    withTerminals : 1,
+    withDirs : 1,
+    withTransient/*maybe withStem*/ : 1,
+    filter : { recursive : 2 },
     resolvingSoftLink : 1,
     allowingMissed : 0,
     allowingCycled : 1,
@@ -2752,11 +2801,11 @@ function filesFindLinked( test )
     ({
       filePath : routinePath,
       outputFormat : 'record',
-      includingTransient : 1,
-      includingTerminals : 1,
-      includingDirs : 1,
-      includingStem : 1,
-      filter : { recursive/**/ : 2 },
+      withTransient/*maybe withStem*/ : 1,
+      withTerminals : 1,
+      withDirs : 1,
+      withTransient/*maybe withStem*/ : 1,
+      filter : { recursive : 2 },
       resolvingSoftLink : 1,
       allowingMissed : 1,
       allowingCycled : 0,
@@ -2787,12 +2836,12 @@ function filesFindLinked( test )
     filePath : routinePath,
     resolvingSoftLink : 0,
     outputFormat : 'record',
-    includingTransient : 1,
-    includingTerminals : 1,
+    withTransient/*maybe withStem*/ : 1,
+    withTerminals : 1,
     allowingMissed : 0,
-    includingDirs : 1,
-    filter : { recursive/**/ : 2 },
-    includingStem : 1,
+    withDirs : 1,
+    filter : { recursive : 2 },
+    withTransient/*maybe withStem*/ : 1,
     revisiting : 2,
   })
   test.identical( select( got, '*/absolute' ), [ '/', '/one', '/terminal', '/two' ] );
@@ -2805,12 +2854,12 @@ function filesFindLinked( test )
       filePath : routinePath,
       resolvingSoftLink : 1,
       outputFormat : 'record',
-      includingTransient : 1,
-      includingTerminals : 1,
+      withTransient/*maybe withStem*/ : 1,
+      withTerminals : 1,
       allowingMissed : 0,
-      includingDirs : 1,
-      filter : { recursive/**/ : 2 },
-      includingStem : 1,
+      withDirs : 1,
+      filter : { recursive : 2 },
+      withTransient/*maybe withStem*/ : 1,
       revisiting : 2,
     })
   })
@@ -2820,12 +2869,12 @@ function filesFindLinked( test )
     filePath : routinePath,
     resolvingSoftLink : 0,
     outputFormat : 'record',
-    includingTransient : 1,
-    includingTerminals : 1,
+    withTransient/*maybe withStem*/ : 1,
+    withTerminals : 1,
     allowingMissed : 1,
-    includingDirs : 1,
-    filter : { recursive/**/ : 2 },
-    includingStem : 1,
+    withDirs : 1,
+    filter : { recursive : 2 },
+    withTransient/*maybe withStem*/ : 1,
     revisiting : 2,
   })
   test.identical( select( got, '*/absolute' ), [ '/', '/one', '/terminal', '/two' ] );
@@ -2854,11 +2903,11 @@ function filesFindLinked( test )
     filePath : routinePath,
     resolvingSoftLink : 0,
     outputFormat : 'record',
-    includingTransient : 1,
-    includingTerminals : 1,
-    includingDirs : 1,
-    filter : { recursive/**/ : 2 },
-    includingStem : 1,
+    withTransient/*maybe withStem*/ : 1,
+    withTerminals : 1,
+    withDirs : 1,
+    filter : { recursive : 2 },
+    withTransient/*maybe withStem*/ : 1,
     revisiting : 2,
   })
   test.identical( select( got, '*/absolute' ), [ '/', '/normala', '/normalb', '/terminal' ] );
@@ -2869,11 +2918,11 @@ function filesFindLinked( test )
     filePath : routinePath,
     resolvingSoftLink : 1,
     outputFormat : 'record',
-    includingTransient : 1,
-    includingTerminals : 1,
-    includingDirs : 1,
-    filter : { recursive/**/ : 2 },
-    includingStem : 1,
+    withTransient/*maybe withStem*/ : 1,
+    withTerminals : 1,
+    withDirs : 1,
+    filter : { recursive : 2 },
+    withTransient/*maybe withStem*/ : 1,
     revisiting : 2,
   })
   test.identical( select( got, '*/absolute' ), [ '/', '/normala', '/normalb', '/terminal' ] );
@@ -2905,11 +2954,11 @@ function filesFindLinked( test )
     filePath : toDirPath,
     resolvingSoftLink : 0,
     outputFormat : 'record',
-    includingTransient : 1,
-    includingTerminals : 1,
-    includingDirs : 1,
-    filter : { recursive/**/ : 2 },
-    includingStem : 1,
+    withTransient/*maybe withStem*/ : 1,
+    withTerminals : 1,
+    withDirs : 1,
+    filter : { recursive : 2 },
+    withTransient/*maybe withStem*/ : 1,
     revisiting : 2,
   })
 
@@ -2921,11 +2970,11 @@ function filesFindLinked( test )
     filePath : toDirPath,
     outputFormat : 'record',
     resolvingSoftLink : 1,
-    includingTransient : 1,
-    includingTerminals : 1,
-    includingDirs : 1,
-    includingStem : 1,
-    filter : { recursive/**/ : 2 },
+    withTransient/*maybe withStem*/ : 1,
+    withTerminals : 1,
+    withDirs : 1,
+    withTransient/*maybe withStem*/ : 1,
+    filter : { recursive : 2 },
     revisiting : 2,
   })
 
@@ -2958,11 +3007,11 @@ function filesFindLinked( test )
     filePath : routinePath,
     resolvingSoftLink : 0,
     outputFormat : 'record',
-    includingTransient : 1,
-    includingTerminals : 1,
-    includingDirs : 1,
-    filter : { recursive/**/ : 2 },
-    includingStem : 1,
+    withTransient/*maybe withStem*/ : 1,
+    withTerminals : 1,
+    withDirs : 1,
+    filter : { recursive : 2 },
+    withTransient/*maybe withStem*/ : 1,
     revisiting : 2,
   })
 
@@ -2974,11 +3023,11 @@ function filesFindLinked( test )
     filePath : routinePath,
     resolvingSoftLink : 1,
     outputFormat : 'record',
-    includingTransient : 1,
-    includingTerminals : 1,
-    includingDirs : 1,
-    filter : { recursive/**/ : 2 },
-    includingStem : 1,
+    withTransient/*maybe withStem*/ : 1,
+    withTerminals : 1,
+    withDirs : 1,
+    filter : { recursive : 2 },
+    withTransient/*maybe withStem*/ : 1,
     revisiting : 2,
   })
   test.identical( select( got, '*/absolute' ), [ '/', '/directory', '/directory/terminal', '/toDir', '/toDir/terminal'  ] );
@@ -2986,7 +3035,7 @@ function filesFindLinked( test )
 
   test.close( 'link to processed directory' );
 
-} /* end of filesFindLinked */
+} /* end of function filesFindLinked */
 
 //
 
@@ -3071,8 +3120,8 @@ function filesFindSoftLinksExtract( test )
   var find = extract.filesFinder
   ({
     filePath : '/src/proto',
-    includingDirs : 1,
-    filter : { recursive/**/ : 2 },
+    withDirs : 1,
+    filter : { recursive : 2 },
   });
 
   /* */
@@ -3224,8 +3273,8 @@ function filesFindSoftLinksExtract( test )
   var find = extract.filesFinder
   ({
     filePath : '/src/proto',
-    includingDirs : 1,
-    filter : { recursive/**/ : 2 },
+    withDirs : 1,
+    filter : { recursive : 2 },
   });
 
   /* */
@@ -3384,8 +3433,8 @@ function filesFindSoftLinksExtract( test )
   var find = extract.filesFinder
   ({
     filePath : '/src/proto',
-    includingDirs : 1,
-    filter : { recursive/**/ : 2 },
+    withDirs : 1,
+    filter : { recursive : 2 },
   });
 
   /* */
@@ -3571,8 +3620,8 @@ function filesFindSoftLinksExtract( test )
   var find = extract.filesFinder
   ({
     filePath : '/src/proto',
-    includingDirs : 1,
-    filter : { recursive/**/ : 2 },
+    withDirs : 1,
+    filter : { recursive : 2 },
   });
 
   /* */
@@ -3696,7 +3745,7 @@ function filesFindSoftLinksExtract( test )
 
   /* - */
 
-} /* end of filesFindSoftLinksExtract */
+} /* end of function filesFindSoftLinksExtract */
 
 //
 
@@ -3807,8 +3856,8 @@ function filesFindSoftLinksLoopsExtract( test )
   var find = extract.filesFinder
   ({
     filePath : '/src/proto',
-    includingDirs : 1,
-    filter : { recursive/**/ : 2 },
+    withDirs : 1,
+    filter : { recursive : 2 },
   });
 
   /* */
@@ -4424,7 +4473,7 @@ function filesFindSoftLinksLoopsExtract( test )
 
   /* - */
 
-} /* end of filesFindSoftLinksLoopsExtract */
+} /* end of function filesFindSoftLinksLoopsExtract */
 
 //
 
@@ -4522,8 +4571,8 @@ function filesFindSoftLinks( test )
   var find = provider.filesFinder
   ({
     filePath : abs( 'src/proto' ),
-    includingDirs : 1,
-    filter : { recursive/**/ : 2 },
+    withDirs : 1,
+    filter : { recursive : 2 },
   });
 
   /* */
@@ -4592,7 +4641,7 @@ function filesFindSoftLinks( test )
   /* - */
 
   debugger; return; xxx
-} /* end of filesFindSoftLinks */
+} /* end of function filesFindSoftLinks */
 
 //
 
@@ -4612,11 +4661,11 @@ function filesFindResolving( test )
     orderingExclusion : [],
     sortingWithArray : null,
     outputFormat : 'record',
-    includingStem : 1,
-    includingTerminals : 1,
-    includingTransient : 1,
-    includingDirs : 1,
-    filter : { recursive/**/ : 2 },
+    withTransient/*maybe withStem*/ : 1,
+    withTerminals : 1,
+    withTransient/*maybe withStem*/ : 1,
+    withDirs : 1,
+    filter : { recursive : 2 },
     revisiting : 2,
   }
 
@@ -5196,7 +5245,7 @@ function filesFindResolving( test )
     filePath : routinePath,
     resolvingSoftLink : 1,
     resolvingTextLink : 0,
-    includingStem : 0
+    withTransient : 0
   }
   var options = _.mapExtend( o, fixedOptions );
   provider.softLink( softLink, srcDirPath );
@@ -5663,11 +5712,11 @@ function filesFindResolvingExperiment( test )
   {
     filePath : textLinkPath,
     resolvingTextLink : 1,
-    includingStem : 1,
-    includingTerminals : 1,
-    includingTransient : 1,
-    includingDirs : 1,
-    filter : { recursive/**/ : 2 }
+    withTransient/*maybe withStem*/ : 1,
+    withTerminals : 1,
+    withTransient/*maybe withStem*/ : 1,
+    withDirs : 1,
+    filter : { recursive : 2 }
   }
 
   var files = provider.filesFind( o );
@@ -5709,41 +5758,41 @@ function filesFindGlob( test )
 
   var globTerminals = provider.filesGlober
   ({
-    includingTerminals : 1,
-    includingDirs : 0,
-    includingTransient : 0,
+    withTerminals : 1,
+    withDirs : 0,
+    withTransient : 0,
     allowingMissed : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     filter : { basePath : routinePath },
   });
 
   var globAll = provider.filesGlober
   ({
-    includingTerminals : 1,
-    includingDirs : 1,
-    includingTransient : 1,
+    withTerminals : 1,
+    withDirs : 1,
+    withTransient/*maybe withStem*/ : 1,
     allowingMissed : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     filter : { basePath : routinePath },
   });
 
   var globTerminalsWithPrefix = provider.filesGlober
   ({
-    includingTerminals : 1,
-    includingDirs : 0,
-    includingTransient : 0,
+    withTerminals : 1,
+    withDirs : 0,
+    withTransient : 0,
     allowingMissed : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     filter : { prefixPath : routinePath },
   });
 
   var globAllWithPrefix = provider.filesGlober
   ({
-    includingTerminals : 1,
-    includingDirs : 1,
-    includingTransient : 1,
+    withTerminals : 1,
+    withDirs : 1,
+    withTransient/*maybe withStem*/ : 1,
     allowingMissed : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     filter : { prefixPath : routinePath },
   });
 
@@ -5752,14 +5801,14 @@ function filesFindGlob( test )
   test.case = 'globTerminals map with bools';
   var expectedRelative = [ './doubledir/a', './doubledir/d1/a', './doubledir/d1/d11/b', './doubledir/d1/d11/c' ];
   var filePath = abs({ '**/d2/**' : 0, 'doubledir' : '' });
-  var records = globTerminals({ filePath : filePath });
+  var records = globTerminals({ filePath });
   var gotRelative = _.select( records, '*/relative' );
   test.identical( gotRelative, expectedRelative );
 
   test.case = 'globAll map with bools';
   var expectedRelative = [ './doubledir', './doubledir/a', './doubledir/d1', './doubledir/d1/a', './doubledir/d1/d11', './doubledir/d1/d11/b', './doubledir/d1/d11/c' ];
   var filePath = abs({ '**/d2/**' : 0, 'doubledir' : '' });
-  var records = globAll({ filePath : filePath });
+  var records = globAll({ filePath });
   var gotRelative = _.select( records, '*/relative' );
   test.identical( gotRelative, expectedRelative );
 
@@ -7170,7 +7219,7 @@ function filesFindGlob( test )
 
   test.case = 'globAll filePath : { /ctrl2/** : null, /alt2** : null }';
   var expectedAbsolute = abs([ '.', './alt2', './alt2/a', './alt2/d', './alt2/d/a', './ctrl2', './ctrl2/a', './ctrl2/d', './ctrl2/d/a' ]);
-  var expectedRelative = [ '.', './alt2', './alt2/a', './alt2/d', './alt2/d/a', '.', './a', './d', './d/a' ];
+  var expectedRelative = [ '.', './alt2', './alt2/a', './alt2/d', './alt2/d/a', './ctrl2', './ctrl2/a', './ctrl2/d', './ctrl2/d/a' ];
   var records = globAll({ filePath : abs({ './ctrl2/**' : null, './alt2**' : null }), filter : { prefixPath : '', basePath : '' } } );
   var gotAbsolute = _.select( records, '*/absolute' );
   var gotRelative = _.select( records, '*/relative' );
@@ -7179,7 +7228,7 @@ function filesFindGlob( test )
 
   test.case = 'globAll filePath : { /ctrl2/** : null, /alt2** : null }';
   var expectedAbsolute = abs([ '.', './alt2', './alt2/a', './alt2/d', './alt2/d/a', './ctrl2', './ctrl2/a', './ctrl2/d', './ctrl2/d/a' ]);
-  var expectedRelative = [ '.', './alt2', './alt2/a', './alt2/d', './alt2/d/a', '.', './a', './d', './d/a' ];
+  var expectedRelative = [ '.', './alt2', './alt2/a', './alt2/d', './alt2/d/a', './ctrl2', './ctrl2/a', './ctrl2/d', './ctrl2/d/a' ];
   var records = globAll({ filePath : abs({ './alt2**' : null, './ctrl2/**' : null }), filter : { prefixPath : '', basePath : '' } } );
   var gotAbsolute = _.select( records, '*/absolute' );
   var gotRelative = _.select( records, '*/relative' );
@@ -7188,7 +7237,7 @@ function filesFindGlob( test )
 
   test.case = 'globAll filePath : { /ctrl2/** : 1, /alt2** : 1 }';
   var expectedAbsolute = abs([ '.', './alt2', './alt2/a', './alt2/d', './alt2/d/a', './ctrl2', './ctrl2/a', './ctrl2/d', './ctrl2/d/a' ]);
-  var expectedRelative = [ '.', './alt2', './alt2/a', './alt2/d', './alt2/d/a', '.', './a', './d', './d/a' ];
+  var expectedRelative = [ '.', './alt2', './alt2/a', './alt2/d', './alt2/d/a', './ctrl2', './ctrl2/a', './ctrl2/d', './ctrl2/d/a' ];
   var records = globAll({ filePath : abs({ './ctrl2/**' : 1, './alt2**' : 1 }), filter : { prefixPath : '', basePath : '' } } );
   var gotAbsolute = _.select( records, '*/absolute' );
   var gotRelative = _.select( records, '*/relative' );
@@ -7197,7 +7246,7 @@ function filesFindGlob( test )
 
   test.case = 'globAll filePath : { /ctrl2/** : 1, /alt2** : 1 }';
   var expectedAbsolute = abs([ '.', './alt2', './alt2/a', './alt2/d', './alt2/d/a', './ctrl2', './ctrl2/a', './ctrl2/d', './ctrl2/d/a' ]);
-  var expectedRelative = [ '.', './alt2', './alt2/a', './alt2/d', './alt2/d/a', '.', './a', './d', './d/a' ];
+  var expectedRelative = [ '.', './alt2', './alt2/a', './alt2/d', './alt2/d/a', './ctrl2', './ctrl2/a', './ctrl2/d', './ctrl2/d/a' ];
   var records = globAll({ filePath : abs({ './alt2**' : 1, './ctrl2/**' : 1 }), filter : { prefixPath : '', basePath : '' } } );
   var gotAbsolute = _.select( records, '*/absolute' );
   var gotRelative = _.select( records, '*/relative' );
@@ -7208,7 +7257,7 @@ function filesFindGlob( test )
 
   /* - */
 
-}
+} /* end of function filesFindGlob */
 
 filesFindGlob.timeOut = 300000;
 
@@ -7274,49 +7323,49 @@ function filesFindOn( test )
 
   var globTerminals = provider.filesGlober
   ({
-    onUp : onUp,
-    onDown : onDown,
-    includingTerminals : 1,
-    includingDirs : 0,
-    includingTransient : 0,
+    onUp,
+    onDown,
+    withTerminals : 1,
+    withDirs : 0,
+    withStem/*maybe withTransient*/ : 0,
     allowingMissed : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     filter : { basePath : routinePath },
   });
 
   var globAll = provider.filesGlober
   ({
-    onUp : onUp,
-    onDown : onDown,
-    includingTerminals : 1,
-    includingDirs : 1,
-    includingTransient : 1,
+    onUp,
+    onDown,
+    withTerminals : 1,
+    withDirs : 1,
+    withTransient/*maybe withStem*/ : 1,
     allowingMissed : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     filter : { basePath : routinePath },
   });
 
   var globTerminalsWithPrefix = provider.filesGlober
   ({
-    onUp : onUp,
-    onDown : onDown,
-    includingTerminals : 1,
-    includingDirs : 0,
-    includingTransient : 0,
+    onUp,
+    onDown,
+    withTerminals : 1,
+    withDirs : 0,
+    withStem/*maybe withTransient*/ : 0,
     allowingMissed : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     filter : { prefixPath : routinePath },
   });
 
   var globAllWithPrefix = provider.filesGlober
   ({
-    onUp : onUp,
-    onDown : onDown,
-    includingTerminals : 1,
-    includingDirs : 1,
-    includingTransient : 1,
+    onUp,
+    onDown,
+    withTerminals : 1,
+    withDirs : 1,
+    withTransient/*maybe withStem*/ : 1,
     allowingMissed : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     filter : { prefixPath : routinePath },
   });
 
@@ -7472,41 +7521,41 @@ function filesFindBaseFromGlob( test )
 
   var globTerminals = provider.filesGlober
   ({
-    includingTerminals : 1,
-    includingDirs : 0,
-    includingTransient : 0,
+    withTerminals : 1,
+    withDirs : 0,
+    withStem/*maybe withTransient*/ : 0,
     allowingMissed : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     filter : { basePath : routinePath },
   });
 
   var globAll = provider.filesGlober
   ({
-    includingTerminals : 1,
-    includingDirs : 1,
-    includingTransient : 1,
+    withTerminals : 1,
+    withDirs : 1,
+    withTransient/*maybe withStem*/ : 1,
     allowingMissed : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     filter : { basePath : routinePath },
   });
 
   var globTerminalsWithPrefix = provider.filesGlober
   ({
-    includingTerminals : 1,
-    includingDirs : 0,
-    includingTransient : 0,
+    withTerminals : 1,
+    withDirs : 0,
+    withStem/*maybe withTransient*/ : 0,
     allowingMissed : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     filter : { prefixPath : routinePath },
   });
 
   var globAllWithPrefix = provider.filesGlober
   ({
-    includingTerminals : 1,
-    includingDirs : 1,
-    includingTransient : 1,
+    withTerminals : 1,
+    withDirs : 1,
+    withTransient/*maybe withStem*/ : 1,
     allowingMissed : 1,
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     filter : { prefixPath : routinePath },
   });
 
@@ -7941,7 +7990,7 @@ function filesGlob( test )
     'a.txt' : '',
   }
 
-  var extract1 = new _.FileProvider.Extract({ filesTree : filesTree });
+  var extract1 = new _.FileProvider.Extract({ filesTree });
   extract1.filesReflectTo( provider, routinePath );
 
   var commonOptions  =
@@ -8247,7 +8296,7 @@ function filesFindDistinct( test )
 
   /* */
 
-  test.case = 'exist, includingDirs : 0';
+  test.case = 'exist, withDirs : 0';
 
   var filter =
   {
@@ -8257,7 +8306,7 @@ function filesFindDistinct( test )
   var o1 =
   {
     outputFormat : 'absolute',
-    includingDirs : 0,
+    withDirs : 0,
     mode : 'distinct',
     filter,
   }
@@ -8288,7 +8337,7 @@ function filesFindDistinct( test )
 
   /* */
 
-  test.case = 'exist, glob, includingDirs : 0';
+  test.case = 'exist, glob, withDirs : 0';
 
   var filter =
   {
@@ -8298,7 +8347,7 @@ function filesFindDistinct( test )
   var o1 =
   {
     outputFormat : 'absolute',
-    includingDirs : 0,
+    withDirs : 0,
     mode : 'distinct',
     filter,
   }
@@ -8309,7 +8358,7 @@ function filesFindDistinct( test )
 
   /* */
 
-  test.case = 'exist, glob, includingDirs : 1';
+  test.case = 'exist, glob, withDirs : 1';
 
   var filter =
   {
@@ -8319,7 +8368,7 @@ function filesFindDistinct( test )
   var o1 =
   {
     outputFormat : 'absolute',
-    includingDirs : 1,
+    withDirs : 1,
     mode : 'distinct',
     filter,
   }
@@ -8341,7 +8390,7 @@ function filesFindDistinct( test )
   {
     outputFormat : 'absolute',
     mode : 'distinct',
-    includingStem : 0,
+    withStem : 0,
     filter,
   }
 
@@ -8457,7 +8506,7 @@ function filesFindDistinct( test )
 
   /* */
 
-  test.case = 'does not exist, glob, mandatory : 0, includingDirs : 1, includingStem : 1';
+  test.case = 'does not exist, glob, mandatory : 0, withDirs : 1, withTransient/*maybe withStem*/ : 1';
 
   var filter =
   {
@@ -8468,8 +8517,8 @@ function filesFindDistinct( test )
   {
     outputFormat : 'absolute',
     mandatory : 0,
-    includingDirs : 1,
-    includingStem : 1,
+    withDirs : 1,
+    withStem : 1,
     mode : 'distinct',
     filter,
   }
@@ -8596,13 +8645,13 @@ function filesFindSimplifyGlob( test )
   test.identical( got, expected );
   test.identical( o.mandatory, false )
   test.identical( o.filter.recursive, 2 )
-  test.identical( o.includingTerminals, true );
-  test.identical( o.includingDirs, false );
-  test.identical( o.includingStem, true );
-  test.identical( o.includingActual, 1 );
-  test.identical( o.includingTransient, 0 );
+  test.identical( o.withTerminals, true );
+  test.identical( o.withDirs, false );
+  test.identical( o.withStem, true );
+  test.identical( o.withActual, true );
+  test.identical( o.withTransient, false );
 
-  test.identical( o.filter.formedFilterMap, null );
+  test.identical( o.filter.formedMasksMap, null );
   test.identical( o.filter.formed, 5 );
   test.identical( o.filter.formedFilePath, { [ abs( 'dir1' ) ] : '' } );
   test.identical( o.filter.formedBasePath, { [ abs( 'dir1' ) ] : abs( 'dir1' ) } );
@@ -8632,13 +8681,13 @@ function filesFindSimplifyGlob( test )
   test.identical( got, expected );
   test.identical( o.mandatory, true )
   test.identical( o.filter.recursive, 2 )
-  test.identical( o.includingTerminals, true );
-  test.identical( o.includingDirs, false );
-  test.identical( o.includingStem, true );
-  test.identical( o.includingActual, 1 );
-  test.identical( o.includingTransient, 0 );
+  test.identical( o.withTerminals, true );
+  test.identical( o.withDirs, false );
+  test.identical( o.withStem, true );
+  test.identical( o.withActual, true );
+  test.identical( o.withTransient, false );
 
-  test.identical( o.filter.formedFilterMap, null );
+  test.identical( o.filter.formedMasksMap, null );
   test.identical( o.filter.formed, 5 );
   test.identical( o.filter.formedFilePath, { [ abs( 'dir1' ) ] : '' } );
   test.identical( o.filter.formedBasePath, { [ abs( 'dir1' ) ] : abs( 'dir1' ) } );
@@ -8668,15 +8717,15 @@ function filesFindSimplifyGlob( test )
   test.identical( got, expected );
   test.identical( o.mandatory, false )
   test.identical( o.filter.recursive, 2 )
-  test.identical( o.includingTerminals, true );
-  test.identical( o.includingDirs, false );
-  test.identical( o.includingStem, true );
-  test.identical( o.includingActual, 1 );
-  test.identical( o.includingTransient, 0 );
+  test.identical( o.withTerminals, true );
+  test.identical( o.withDirs, false );
+  test.identical( o.withStem, true );
+  test.identical( o.withActual, true );
+  test.identical( o.withTransient, false );
 
-  test.setsAreIdentical( _.mapKeys( o.filter.formedFilterMap ), [ abs( 'dir1' ) ] );
-  test.identical( o.filter.formedFilterMap[ abs( 'dir1' ) ].maskAll.includeAll.length, 0 );
-  test.identical( o.filter.formedFilterMap[ abs( 'dir1' ) ].maskAll.includeAny.length, 1 );
+  test.setsAreIdentical( _.mapKeys( o.filter.formedMasksMap ), [ abs( 'dir1' ) ] );
+  test.identical( o.filter.formedMasksMap[ abs( 'dir1' ) ].maskAll.includeAll.length, 0 );
+  test.identical( o.filter.formedMasksMap[ abs( 'dir1' ) ].maskAll.includeAny.length, 1 );
   test.identical( o.filter.formed, 5 );
   test.identical( o.filter.formedFilePath, { [ abs( 'dir1' ) ] : '' } );
   test.identical( o.filter.formedBasePath, { [ abs( 'dir1' ) ] : abs( 'dir1' ) } );
@@ -8685,7 +8734,940 @@ function filesFindSimplifyGlob( test )
   test.identical( o.filter.prefixPath, null );
   test.identical( o.filter.postfixPath, null );
 
-}
+} /* end of function filesFindSimplifyGlob */
+
+//
+
+function filesFindOptimalFilePath( test )
+{
+  let context = this;
+  let provider = context.provider;
+  let system = context.system;
+  let path = context.provider.path;
+  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+
+  function abs()
+  {
+    let args = _.longSlice( arguments );
+    args.unshift( routinePath );
+    return path.s.join.apply( path.s, args );
+  }
+
+  /* - */
+
+  test.case = 'setup';
+
+  var tree =
+  {
+    src :
+    {
+      proto :
+      {
+        '-ile' : 'src/proto/-ile',
+        'file' : 'src/proto/file',
+        'f.cc' : 'src/proto/f.cc',
+        'f.js' : 'src/proto/f.js',
+        'f.ss' : 'src/proto/f.ss',
+        'f.test.js' : 'src/proto/f.test.js',
+        'f.test.ss' : 'src/proto/f.test.ss',
+        dir1 :
+        {
+          dir2 :
+          {
+            '-ile' : 'dir1/dir2/src/proto/-ile',
+            'file' : 'dir1/dir2/src/proto/file',
+            'f.cc' : 'dir1/dir2/src/proto/f.cc',
+            'f.js' : 'dir1/dir2/src/proto/f.js',
+            'f.ss' : 'dir1/dir2/src/proto/f.ss',
+            'f.test.js' : 'dir1/dir2/src/proto/f.test.js',
+            'f.test.ss' : 'dir1/dir2/src/proto/f.test.ss',
+          }
+        }
+      },
+      proto2 :
+      {
+        '-ile' : 'src/proto2/-ile',
+        'file' : 'src/proto2/file',
+        'f.cc' : 'src/proto2/f.cc',
+        'f.js' : 'src/proto2/f.js',
+        'f.ss' : 'src/proto2/f.ss',
+        'f.test.js' : 'src/proto2/f.test.js',
+        'f.test.ss' : 'src/proto2/f.test.ss',
+        dir1 :
+        {
+          dir2 :
+          {
+            '-ile' : 'dir1/dir2/src/proto2/-ile',
+            'file' : 'dir1/dir2/src/proto2/file',
+            'f.cc' : 'dir1/dir2/src/proto2/f.cc',
+            'f.js' : 'dir1/dir2/src/proto2/f.js',
+            'f.ss' : 'dir1/dir2/src/proto2/f.ss',
+            'f.test.js' : 'dir1/dir2/src/proto2/f.test.js',
+            'f.test.ss' : 'dir1/dir2/src/proto2/f.test.ss',
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+  var extract = new _.FileProvider.Extract({ filesTree : tree });
+
+  extract.filesReflectTo( provider, routinePath );
+
+  /* - */
+
+  test.case = 'defined relative base path';
+
+  var filter =
+  {
+    filePath :
+    {
+      [ abs( 'src/proto/dir1' ) ] : '',
+      [ abs( 'src/proto' ) ] : '',
+    },
+    basePath : '..',
+    recursive : 2,
+  }
+
+  var o =
+  {
+    withDirs : 1,
+    withTerminals : 1,
+    withTransient : 1,
+    withStem : 1,
+    maskPreset : 0,
+    filter,
+  }
+
+  var got = provider.filesFind( o );
+
+  var exp = abs
+  ([
+    './src/proto',
+    './src/proto/-ile',
+    './src/proto/f.cc',
+    './src/proto/f.js',
+    './src/proto/f.ss',
+    './src/proto/f.test.js',
+    './src/proto/f.test.ss',
+    './src/proto/file',
+    './src/proto/dir1',
+    './src/proto/dir1/dir2',
+    './src/proto/dir1/dir2/-ile',
+    './src/proto/dir1/dir2/f.cc',
+    './src/proto/dir1/dir2/f.js',
+    './src/proto/dir1/dir2/f.ss',
+    './src/proto/dir1/dir2/f.test.js',
+    './src/proto/dir1/dir2/f.test.ss',
+    './src/proto/dir1/dir2/file',
+    './src/proto/dir1',
+    './src/proto/dir1/dir2',
+    './src/proto/dir1/dir2/-ile',
+    './src/proto/dir1/dir2/f.cc',
+    './src/proto/dir1/dir2/f.js',
+    './src/proto/dir1/dir2/f.ss',
+    './src/proto/dir1/dir2/f.test.js',
+    './src/proto/dir1/dir2/f.test.ss',
+    './src/proto/dir1/dir2/file',
+  ]);
+  test.identical( _.select( got, '*/absolute' ), exp );
+
+  var exp =
+  [
+    './proto',
+    './proto/-ile',
+    './proto/f.cc',
+    './proto/f.js',
+    './proto/f.ss',
+    './proto/f.test.js',
+    './proto/f.test.ss',
+    './proto/file',
+    './proto/dir1',
+    './proto/dir1/dir2',
+    './proto/dir1/dir2/-ile',
+    './proto/dir1/dir2/f.cc',
+    './proto/dir1/dir2/f.js',
+    './proto/dir1/dir2/f.ss',
+    './proto/dir1/dir2/f.test.js',
+    './proto/dir1/dir2/f.test.ss',
+    './proto/dir1/dir2/file',
+    './dir1',
+    './dir1/dir2',
+    './dir1/dir2/-ile',
+    './dir1/dir2/f.cc',
+    './dir1/dir2/f.js',
+    './dir1/dir2/f.ss',
+    './dir1/dir2/f.test.js',
+    './dir1/dir2/f.test.ss',
+    './dir1/dir2/file',
+  ];
+  test.identical( _.select( got, '*/relative' ), exp );
+
+  /* */
+
+  test.case = 'defined absolute base path';
+
+  var filter =
+  {
+    filePath :
+    {
+      [ abs( 'src/proto/dir1' ) ] : '',
+      [ abs( 'src/proto' ) ] : '',
+    },
+    basePath : abs( 'src' ),
+    recursive : 2,
+  }
+
+  var o =
+  {
+    withDirs : 1,
+    withTerminals : 1,
+    withTransient : 1,
+    withStem : 1,
+    maskPreset : 0,
+    filter,
+  }
+
+  var got = provider.filesFind( o );
+
+  var exp = abs
+  ([
+    './src/proto',
+    './src/proto/-ile',
+    './src/proto/f.cc',
+    './src/proto/f.js',
+    './src/proto/f.ss',
+    './src/proto/f.test.js',
+    './src/proto/f.test.ss',
+    './src/proto/file',
+    './src/proto/dir1',
+    './src/proto/dir1/dir2',
+    './src/proto/dir1/dir2/-ile',
+    './src/proto/dir1/dir2/f.cc',
+    './src/proto/dir1/dir2/f.js',
+    './src/proto/dir1/dir2/f.ss',
+    './src/proto/dir1/dir2/f.test.js',
+    './src/proto/dir1/dir2/f.test.ss',
+    './src/proto/dir1/dir2/file',
+  ]);
+  test.identical( _.select( got, '*/absolute' ), exp );
+
+  var exp =
+  [
+    './proto',
+    './proto/-ile',
+    './proto/f.cc',
+    './proto/f.js',
+    './proto/f.ss',
+    './proto/f.test.js',
+    './proto/f.test.ss',
+    './proto/file',
+    './proto/dir1',
+    './proto/dir1/dir2',
+    './proto/dir1/dir2/-ile',
+    './proto/dir1/dir2/f.cc',
+    './proto/dir1/dir2/f.js',
+    './proto/dir1/dir2/f.ss',
+    './proto/dir1/dir2/f.test.js',
+    './proto/dir1/dir2/f.test.ss',
+    './proto/dir1/dir2/file',
+  ];
+  test.identical( _.select( got, '*/relative' ), exp );
+
+  /* */
+
+  test.case = 'no base path';
+
+  var filter =
+  {
+    filePath :
+    {
+      [ abs( 'src/proto/dir1' ) ] : '',
+      [ abs( 'src/proto' ) ] : '',
+    },
+    recursive : 2,
+  }
+
+  var o =
+  {
+    withDirs : 1,
+    withTerminals : 1,
+    withTransient : 1,
+    withStem : 1,
+    maskPreset : 0,
+    filter,
+  }
+
+  var got = provider.filesFind( o );
+
+  var exp = abs
+  ([
+    './src/proto',
+    './src/proto/-ile',
+    './src/proto/f.cc',
+    './src/proto/f.js',
+    './src/proto/f.ss',
+    './src/proto/f.test.js',
+    './src/proto/f.test.ss',
+    './src/proto/file',
+    './src/proto/dir1',
+    './src/proto/dir1/dir2',
+    './src/proto/dir1/dir2/-ile',
+    './src/proto/dir1/dir2/f.cc',
+    './src/proto/dir1/dir2/f.js',
+    './src/proto/dir1/dir2/f.ss',
+    './src/proto/dir1/dir2/f.test.js',
+    './src/proto/dir1/dir2/f.test.ss',
+    './src/proto/dir1/dir2/file',
+  ]);
+  test.identical( _.select( got, '*/absolute' ), exp );
+
+  /* */
+
+  test.case = 'glob, control';
+
+  var filter =
+  {
+    filePath :
+    {
+      [ abs( 'src/proto/**' ) ] : '',
+    },
+  }
+
+  var o =
+  {
+    withDirs : 1,
+    withTerminals : 1,
+    withTransient : 1,
+    withStem : 1,
+    maskPreset : 0,
+    filter,
+  }
+
+  var got = provider.filesFind( o );
+
+  var exp = abs
+  ([
+    './src/proto',
+    './src/proto/-ile',
+    './src/proto/f.cc',
+    './src/proto/f.js',
+    './src/proto/f.ss',
+    './src/proto/f.test.js',
+    './src/proto/f.test.ss',
+    './src/proto/file',
+    './src/proto/dir1',
+    './src/proto/dir1/dir2',
+    './src/proto/dir1/dir2/-ile',
+    './src/proto/dir1/dir2/f.cc',
+    './src/proto/dir1/dir2/f.js',
+    './src/proto/dir1/dir2/f.ss',
+    './src/proto/dir1/dir2/f.test.js',
+    './src/proto/dir1/dir2/f.test.ss',
+    './src/proto/dir1/dir2/file',
+  ]);
+  test.identical( _.select( got, '*/absolute' ), exp );
+
+  /* */
+
+  test.case = 'glob, src/proto/???/** and src/proto/**';
+
+  var filter =
+  {
+    filePath :
+    {
+      [ abs( 'src/proto/???/**' ) ] : '',
+      [ abs( 'src/proto/**' ) ] : '',
+    },
+  }
+
+  var o =
+  {
+    withDirs : 1,
+    withTerminals : 1,
+    withTransient : 1,
+    withStem : 1,
+    maskPreset : 0,
+    filter,
+  }
+
+  var got = provider.filesFind( o );
+
+  var exp = abs
+  ([
+    './src/proto',
+    './src/proto/-ile',
+    './src/proto/f.cc',
+    './src/proto/f.js',
+    './src/proto/f.ss',
+    './src/proto/f.test.js',
+    './src/proto/f.test.ss',
+    './src/proto/file',
+    './src/proto/dir1',
+    './src/proto/dir1/dir2',
+    './src/proto/dir1/dir2/-ile',
+    './src/proto/dir1/dir2/f.cc',
+    './src/proto/dir1/dir2/f.js',
+    './src/proto/dir1/dir2/f.ss',
+    './src/proto/dir1/dir2/f.test.js',
+    './src/proto/dir1/dir2/f.test.ss',
+    './src/proto/dir1/dir2/file',
+  ]);
+  test.identical( _.select( got, '*/absolute' ), exp );
+
+  /* */
+
+  test.case = 'glob, src/proto/????/** and src/proto/**';
+
+  var filter =
+  {
+    filePath :
+    {
+      [ abs( 'src/proto/????/**' ) ] : '',
+      [ abs( 'src/proto/**' ) ] : '',
+    },
+  }
+
+  var o =
+  {
+    withDirs : 1,
+    withTerminals : 1,
+    withTransient : 1,
+    withStem : 1,
+    maskPreset : 0,
+    filter,
+  }
+
+  var got = provider.filesFind( o );
+
+  var exp = abs
+  ([
+    './src/proto',
+    './src/proto/-ile',
+    './src/proto/f.cc',
+    './src/proto/f.js',
+    './src/proto/f.ss',
+    './src/proto/f.test.js',
+    './src/proto/f.test.ss',
+    './src/proto/file',
+    './src/proto/dir1',
+    './src/proto/dir1/dir2',
+    './src/proto/dir1/dir2/-ile',
+    './src/proto/dir1/dir2/f.cc',
+    './src/proto/dir1/dir2/f.js',
+    './src/proto/dir1/dir2/f.ss',
+    './src/proto/dir1/dir2/f.test.js',
+    './src/proto/dir1/dir2/f.test.ss',
+    './src/proto/dir1/dir2/file',
+  ]);
+  test.identical( _.select( got, '*/absolute' ), exp );
+
+  /* */
+
+  test.case = 'glob, src/proto/????/** and src/proto';
+
+  var filter =
+  {
+    filePath :
+    {
+      [ abs( 'src/proto/????/**' ) ] : '',
+      [ abs( 'src/proto' ) ] : '',
+    },
+  }
+
+  var o =
+  {
+    withDirs : 1,
+    withTerminals : 1,
+    withTransient : 1,
+    withStem : 1,
+    maskPreset : 0,
+    filter,
+  }
+
+  var got = provider.filesFind( o );
+
+  var exp = abs
+  ([
+    './src/proto',
+    './src/proto/-ile',
+    './src/proto/f.cc',
+    './src/proto/f.js',
+    './src/proto/f.ss',
+    './src/proto/f.test.js',
+    './src/proto/f.test.ss',
+    './src/proto/file',
+    './src/proto/dir1',
+    './src/proto/dir1/dir2',
+    './src/proto/dir1/dir2/-ile',
+    './src/proto/dir1/dir2/f.cc',
+    './src/proto/dir1/dir2/f.js',
+    './src/proto/dir1/dir2/f.ss',
+    './src/proto/dir1/dir2/f.test.js',
+    './src/proto/dir1/dir2/f.test.ss',
+    './src/proto/dir1/dir2/file',
+  ]);
+  test.identical( _.select( got, '*/absolute' ), exp );
+
+  /* */
+
+  test.case = 'glob, src/proto/????/** and src/prot**';
+
+  var filter =
+  {
+    filePath :
+    {
+      [ abs( 'src/proto/????/**' ) ] : '',
+      [ abs( 'src/prot**' ) ] : '',
+    },
+  }
+
+  var o =
+  {
+    withDirs : 1,
+    withTerminals : 1,
+    withTransient : 1,
+    withStem : 1,
+    maskPreset : 0,
+    filter,
+  }
+
+  var got = provider.filesFind( o );
+
+  var exp = abs
+  ([
+    './src',
+    './src/proto',
+    './src/proto/-ile',
+    './src/proto/f.cc',
+    './src/proto/f.js',
+    './src/proto/f.ss',
+    './src/proto/f.test.js',
+    './src/proto/f.test.ss',
+    './src/proto/file',
+    './src/proto/dir1',
+    './src/proto/dir1/dir2',
+    './src/proto/dir1/dir2/-ile',
+    './src/proto/dir1/dir2/f.cc',
+    './src/proto/dir1/dir2/f.js',
+    './src/proto/dir1/dir2/f.ss',
+    './src/proto/dir1/dir2/f.test.js',
+    './src/proto/dir1/dir2/f.test.ss',
+    './src/proto/dir1/dir2/file',
+    './src/proto2',
+    './src/proto2/-ile',
+    './src/proto2/f.cc',
+    './src/proto2/f.js',
+    './src/proto2/f.ss',
+    './src/proto2/f.test.js',
+    './src/proto2/f.test.ss',
+    './src/proto2/file',
+    './src/proto2/dir1',
+    './src/proto2/dir1/dir2',
+    './src/proto2/dir1/dir2/-ile',
+    './src/proto2/dir1/dir2/f.cc',
+    './src/proto2/dir1/dir2/f.js',
+    './src/proto2/dir1/dir2/f.ss',
+    './src/proto2/dir1/dir2/f.test.js',
+    './src/proto2/dir1/dir2/f.test.ss',
+    './src/proto2/dir1/dir2/file'
+  ]);
+  test.identical( _.select( got, '*/absolute' ), exp );
+
+  /* */
+
+  test.case = 'glob, src/proto/????/** and src/p?ot**';
+
+  var filter =
+  {
+    filePath :
+    {
+      [ abs( 'src/proto/????/**' ) ] : '',
+      [ abs( 'src/p?ot**' ) ] : '',
+    },
+  }
+
+  var o =
+  {
+    withDirs : 1,
+    withTerminals : 1,
+    withTransient : 1,
+    withStem : 1,
+    maskPreset : 0,
+    filter,
+  }
+
+  var got = provider.filesFind( o );
+
+  var exp = abs
+  ([
+    './src',
+    './src/proto',
+    './src/proto/-ile',
+    './src/proto/f.cc',
+    './src/proto/f.js',
+    './src/proto/f.ss',
+    './src/proto/f.test.js',
+    './src/proto/f.test.ss',
+    './src/proto/file',
+    './src/proto/dir1',
+    './src/proto/dir1/dir2',
+    './src/proto/dir1/dir2/-ile',
+    './src/proto/dir1/dir2/f.cc',
+    './src/proto/dir1/dir2/f.js',
+    './src/proto/dir1/dir2/f.ss',
+    './src/proto/dir1/dir2/f.test.js',
+    './src/proto/dir1/dir2/f.test.ss',
+    './src/proto/dir1/dir2/file',
+    './src/proto2',
+    './src/proto2/-ile',
+    './src/proto2/f.cc',
+    './src/proto2/f.js',
+    './src/proto2/f.ss',
+    './src/proto2/f.test.js',
+    './src/proto2/f.test.ss',
+    './src/proto2/file',
+    './src/proto2/dir1',
+    './src/proto2/dir1/dir2',
+    './src/proto2/dir1/dir2/-ile',
+    './src/proto2/dir1/dir2/f.cc',
+    './src/proto2/dir1/dir2/f.js',
+    './src/proto2/dir1/dir2/f.ss',
+    './src/proto2/dir1/dir2/f.test.js',
+    './src/proto2/dir1/dir2/f.test.ss',
+    './src/proto2/dir1/dir2/file'
+  ]);
+  test.identical( _.select( got, '*/absolute' ), exp );
+
+  /* */
+
+  test.case = 'dir in dir, without preset, glob';
+
+  var filter =
+  {
+    filePath :
+    {
+      [ abs( 'src/proto/**' ) ] : '',
+      [ abs( 'src' ) ] : '',
+    },
+    recursive : 2,
+  }
+
+  var o =
+  {
+    withDirs : 1,
+    withTerminals : 1,
+    withTransient : 1,
+    withStem : 1,
+    maskPreset : 0,
+    filter,
+  }
+
+  var got = provider.filesFind( o );
+
+  var exp = abs
+  ([
+    './src',
+    './src/proto',
+    './src/proto/-ile',
+    './src/proto/f.cc',
+    './src/proto/f.js',
+    './src/proto/f.ss',
+    './src/proto/f.test.js',
+    './src/proto/f.test.ss',
+    './src/proto/file',
+    './src/proto/dir1',
+    './src/proto/dir1/dir2',
+    './src/proto/dir1/dir2/-ile',
+    './src/proto/dir1/dir2/f.cc',
+    './src/proto/dir1/dir2/f.js',
+    './src/proto/dir1/dir2/f.ss',
+    './src/proto/dir1/dir2/f.test.js',
+    './src/proto/dir1/dir2/f.test.ss',
+    './src/proto/dir1/dir2/file',
+    './src/proto2',
+    './src/proto2/-ile',
+    './src/proto2/f.cc',
+    './src/proto2/f.js',
+    './src/proto2/f.ss',
+    './src/proto2/f.test.js',
+    './src/proto2/f.test.ss',
+    './src/proto2/file',
+    './src/proto2/dir1',
+    './src/proto2/dir1/dir2',
+    './src/proto2/dir1/dir2/-ile',
+    './src/proto2/dir1/dir2/f.cc',
+    './src/proto2/dir1/dir2/f.js',
+    './src/proto2/dir1/dir2/f.ss',
+    './src/proto2/dir1/dir2/f.test.js',
+    './src/proto2/dir1/dir2/f.test.ss',
+    './src/proto2/dir1/dir2/file'
+  ]);
+  test.identical( _.select( got, '*/absolute' ), exp );
+
+  /* - */
+
+} /* end of function filesFindOptimalFilePath */
+
+//
+
+function filesFindVisitingCertain( test )
+{
+  let context = this;
+  let provider = context.provider;
+  let system = context.system;
+  let path = context.provider.path;
+  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+
+  function abs()
+  {
+    let args = _.longSlice( arguments );
+    args.unshift( routinePath );
+    return path.s.join.apply( path.s, args );
+  }
+
+  /* - */
+
+  test.case = 'setup';
+
+  var tree =
+  {
+    src :
+    {
+      proto :
+      {
+        '-ile' : 'src/proto/-ile',
+        'file' : 'src/proto/file',
+        'f.cc' : 'src/proto/f.cc',
+        'f.js' : 'src/proto/f.js',
+        'f.ss' : 'src/proto/f.ss',
+        'f.test.js' : 'src/proto/f.test.js',
+        'f.test.ss' : 'src/proto/f.test.ss',
+        dir1 :
+        {
+          dir2 :
+          {
+            '-ile' : 'dir1/dir2/src/proto/-ile',
+            'file' : 'dir1/dir2/src/proto/file',
+            'f.cc' : 'dir1/dir2/src/proto/f.cc',
+            'f.js' : 'dir1/dir2/src/proto/f.js',
+            'f.ss' : 'dir1/dir2/src/proto/f.ss',
+            'f.test.js' : 'dir1/dir2/src/proto/f.test.js',
+            'f.test.ss' : 'dir1/dir2/src/proto/f.test.ss',
+          }
+        }
+      },
+      proto2 :
+      {
+        '-ile' : 'src/proto2/-ile',
+        'file' : 'src/proto2/file',
+        'f.cc' : 'src/proto2/f.cc',
+        'f.js' : 'src/proto2/f.js',
+        'f.ss' : 'src/proto2/f.ss',
+        'f.test.js' : 'src/proto2/f.test.js',
+        'f.test.ss' : 'src/proto2/f.test.ss',
+        dir1 :
+        {
+          dir2 :
+          {
+            '-ile' : 'dir1/dir2/src/proto2/-ile',
+            'file' : 'dir1/dir2/src/proto2/file',
+            'f.cc' : 'dir1/dir2/src/proto2/f.cc',
+            'f.js' : 'dir1/dir2/src/proto2/f.js',
+            'f.ss' : 'dir1/dir2/src/proto2/f.ss',
+            'f.test.js' : 'dir1/dir2/src/proto2/f.test.js',
+            'f.test.ss' : 'dir1/dir2/src/proto2/f.test.ss',
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+  var extract = new _.FileProvider.Extract({ filesTree : tree });
+
+  extract.filesReflectTo( provider, routinePath );
+
+  /* - */
+
+  test.case = 'dir, with preset';
+
+  var filter =
+  {
+    filePath : abs( 'src/proto' ),
+    recursive : 2,
+  }
+
+  var o =
+  {
+    outputFormat : 'absolute',
+    visitingCertain : 0,
+    withDirs : 1,
+    withTerminals : 1,
+    withTransient/*maybe withStem*/ : 1,
+    filter,
+  }
+
+  var got = provider.filesFind( o );
+  var exp = abs
+  ([
+    './src/proto',
+    './src/proto/f.cc',
+    './src/proto/f.js',
+    './src/proto/f.ss',
+    './src/proto/f.test.js',
+    './src/proto/f.test.ss',
+    './src/proto/file',
+    './src/proto/dir1',
+    './src/proto/dir1/dir2',
+    './src/proto/dir1/dir2/f.cc',
+    './src/proto/dir1/dir2/f.js',
+    './src/proto/dir1/dir2/f.ss',
+    './src/proto/dir1/dir2/f.test.js',
+    './src/proto/dir1/dir2/f.test.ss',
+    './src/proto/dir1/dir2/file'
+  ]);
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'terminal, with preset';
+
+  var filter =
+  {
+    filePath : abs( 'src/proto/file' ),
+    recursive : 2,
+  }
+
+  var o =
+  {
+    outputFormat : 'absolute',
+    visitingCertain : 0,
+    withDirs : 1,
+    withTerminals : 1,
+    withTransient/*maybe withStem*/ : 1,
+    filter,
+  }
+
+  var exp = abs([ 'src/proto/file' ]);
+  var got = provider.filesFind( o );
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'dir, without preset';
+
+  var filter =
+  {
+    filePath : abs( 'src/proto' ),
+    recursive : 2,
+  }
+
+  var o =
+  {
+    outputFormat : 'absolute',
+    visitingCertain : 0,
+    withDirs : 1,
+    withTerminals : 1,
+    withTransient/*maybe withStem*/ : 1,
+    maskPreset : 0,
+    filter,
+  }
+
+  var exp = abs([ 'src/proto' ]);
+  var got = provider.filesFind( o );
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'terminal, without preset';
+
+  var filter =
+  {
+    filePath : abs( 'src/proto/file' ),
+    recursive : 2,
+  }
+
+  var o =
+  {
+    outputFormat : 'absolute',
+    visitingCertain : 0,
+    withDirs : 1,
+    withTerminals : 1,
+    withTransient/*maybe withStem*/ : 1,
+    maskPreset : 0,
+    filter,
+  }
+
+  var exp = abs([ 'src/proto/file' ]);
+  var got = provider.filesFind( o );
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'dir, without preset, glob';
+
+  var filter =
+  {
+    filePath : abs( 'src/proto/**' ),
+    recursive : 2,
+  }
+
+  var o =
+  {
+    outputFormat : 'absolute',
+    visitingCertain : 0,
+    withDirs : 1,
+    withTerminals : 1,
+    withTransient/*maybe withStem*/ : 1,
+    maskPreset : 0,
+    filter,
+  }
+
+  var exp = abs([ 'src/proto' ]);
+  var got = provider.filesFind( o );
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'dir in dir, without preset, glob';
+
+  var filter =
+  {
+    filePath :
+    {
+      [ abs( 'src/proto/**' ) ] : '',
+      [ abs( 'src' ) ] : '',
+    },
+    recursive : 2,
+  }
+
+  var o =
+  {
+    outputFormat : 'absolute',
+    visitingCertain : 0,
+    withDirs : 1,
+    withTerminals : 1,
+    withTransient/*maybe withStem*/ : 1,
+    maskPreset : 0,
+    filter,
+  }
+
+  var exp = abs([ 'src' ]);
+  var got = provider.filesFind( o );
+  test.identical( got, exp );
+
+  /* - */
+
+  debugger; return; xxx
+} /* end of function filesFindVisitingCertain */
 
 //
 
@@ -8731,7 +9713,7 @@ function filesFindMandatoryString( test )
   {
     filePath : routinePath + '/module2/amid',
     mandatory : 0,
-    filter : { recursive/**/ : 0 },
+    filter : { recursive : 0 },
     outputFormat : 'absolute',
   }
 
@@ -8745,10 +9727,10 @@ function filesFindMandatoryString( test )
 
   /**/
 
-  test.case = 'includingDefunct : 0, mandatory : 0, filter : { recursive/**/ : 0 }';
+  test.case = 'withDefunct : 0, mandatory : 0, filter : { recursive : 0 }';
   var o2 = _.mapExtend( null, o1 );
   o2.filter = _.mapExtend( null, o2.filter );
-  o2.includingDefunct = 0;
+  o2.withDefunct = 0;
   o2.mandatory = 0;
   o2.filter.recursive = 0;
   var found = provider.filesFind( o2 );
@@ -8757,10 +9739,10 @@ function filesFindMandatoryString( test )
 
   /**/
 
-  test.case = 'includingDefunct : 0, mandatory : 0, filter : { recursive/**/ : 1 }';
+  test.case = 'withDefunct : 0, mandatory : 0, filter : { recursive : 1 }';
   var o2 = _.mapExtend( null, o1 );
   o2.filter = _.mapExtend( null, o2.filter );
-  o2.includingDefunct = 0;
+  o2.withDefunct = 0;
   o2.mandatory = 0;
   o2.filter.recursive = 1;
   var found = provider.filesFind( o2 );
@@ -8769,10 +9751,10 @@ function filesFindMandatoryString( test )
 
   /**/
 
-  test.case = 'includingDefunct : 0, mandatory : 1, filter : { recursive/**/ : 0 }';
+  test.case = 'withDefunct : 0, mandatory : 1, filter : { recursive : 0 }';
   var o2 = _.mapExtend( null, o1 );
   o2.filter = _.mapExtend( null, o2.filter );
-  o2.includingDefunct = 0;
+  o2.withDefunct = 0;
   o2.mandatory = 1;
   o2.filter.recursive = 0;
   test.shouldThrowErrorSync( () =>
@@ -8784,10 +9766,10 @@ function filesFindMandatoryString( test )
 
   /**/
 
-  test.case = 'includingDefunct : 0, mandatory : 1, filter : { recursive/**/ : 1 }';
+  test.case = 'withDefunct : 0, mandatory : 1, filter : { recursive : 1 }';
   var o2 = _.mapExtend( null, o1 );
   o2.filter = _.mapExtend( null, o2.filter );
-  o2.includingDefunct = 0;
+  o2.withDefunct = 0;
   o2.mandatory = 1;
   o2.filter.recursive = 1;
   test.shouldThrowErrorSync( () =>
@@ -8799,10 +9781,10 @@ function filesFindMandatoryString( test )
 
   /**/
 
-  test.case = 'includingDefunct : 1, mandatory : 0, filter : { recursive/**/ : 0 }';
+  test.case = 'withDefunct : 1, mandatory : 0, filter : { recursive : 0 }';
   var o2 = _.mapExtend( null, o1 );
   o2.filter = _.mapExtend( null, o2.filter );
-  o2.includingDefunct = 1;
+  o2.withDefunct = 1;
   o2.mandatory = 0;
   o2.filter.recursive = 0;
   var found = provider.filesFind( o2 );
@@ -8811,10 +9793,10 @@ function filesFindMandatoryString( test )
 
   /**/
 
-  test.case = 'includingDefunct : 1, mandatory : 0, filter : { recursive/**/ : 1 }';
+  test.case = 'withDefunct : 1, mandatory : 0, filter : { recursive : 1 }';
   var o2 = _.mapExtend( null, o1 );
   o2.filter = _.mapExtend( null, o2.filter );
-  o2.includingDefunct = 1;
+  o2.withDefunct = 1;
   o2.mandatory = 0;
   o2.filter.recursive = 1;
   var found = provider.filesFind( o2 );
@@ -8823,10 +9805,10 @@ function filesFindMandatoryString( test )
 
   /**/
 
-  test.case = 'includingDefunct : 1, mandatory : 1, filter : { recursive/**/ : 0 }';
+  test.case = 'withDefunct : 1, mandatory : 1, filter : { recursive : 0 }';
   var o2 = _.mapExtend( null, o1 );
   o2.filter = _.mapExtend( null, o2.filter );
-  o2.includingDefunct = 1;
+  o2.withDefunct = 1;
   o2.mandatory = 1;
   o2.filter.recursive = 0;
   test.shouldThrowErrorSync( () =>
@@ -8838,10 +9820,10 @@ function filesFindMandatoryString( test )
 
   /**/
 
-  test.case = 'includingDefunct : 1, mandatory : 1, filter : { recursive/**/ : 1 }';
+  test.case = 'withDefunct : 1, mandatory : 1, filter : { recursive : 1 }';
   var o2 = _.mapExtend( null, o1 );
   o2.filter = _.mapExtend( null, o2.filter );
-  o2.includingDefunct = 1;
+  o2.withDefunct = 1;
   o2.mandatory = 1;
   o2.filter.recursive = 1;
   test.shouldThrowErrorSync( () =>
@@ -8920,8 +9902,6 @@ function filesFindMandatoryMap( test )
     "module2/amid" : `module2`,
   }
 
-  /**/
-
   var o1 =
   {
     filter :
@@ -8929,13 +9909,14 @@ function filesFindMandatoryMap( test )
       prefixPath,
       filePath,
       basePath,
+      recursive : 1,
     },
-    includingDirs : 1,
-    includingTerminals : 1,
+    withDirs : 1,
+    withTerminals : 1,
     outputFormat : 'absolute',
   }
 
-  /**/
+  /* - */
 
   test.case = 'default';
   var o2 = _.mapExtend( null, o1 );
@@ -8956,12 +9937,12 @@ function filesFindMandatoryMap( test )
 
   /**/
 
-  test.case = 'recursive:0 mandatory:0 includingDefunct:0';
+  test.case = 'recursive:0 mandatory:0 withDefunct:0';
   var o2 = _.mapExtend( null, o1 );
   o2.filter = _.mapExtend( null, o2.filter );
   o2.filter.recursive = 0;
   o2.mandatory = 0;
-  o2.includingDefunct = 0;
+  o2.withDefunct = 0;
   var found = provider.filesFind( o2 );
   var expected = abs
   ([
@@ -8975,12 +9956,12 @@ function filesFindMandatoryMap( test )
 
   /**/
 
-  test.case = 'recursive:0 mandatory:0 includingDefunct:1';
+  test.case = 'recursive:0 mandatory:0 withDefunct:1';
   var o2 = _.mapExtend( null, o1 );
   o2.filter = _.mapExtend( null, o2.filter );
   o2.filter.recursive = 0;
   o2.mandatory = 0;
-  o2.includingDefunct = 1;
+  o2.withDefunct = 1;
   var found = provider.filesFind( o2 );
   var expected = abs
   ([
@@ -8995,12 +9976,12 @@ function filesFindMandatoryMap( test )
 
   /**/
 
-  test.case = 'recursive:0 mandatory:1 includingDefunct:0';
+  test.case = 'recursive:0 mandatory:1 withDefunct:0';
   var o2 = _.mapExtend( null, o1 );
   o2.filter = _.mapExtend( null, o2.filter );
   o2.filter.recursive = 0;
   o2.mandatory = 1;
-  o2.includingDefunct = 0;
+  o2.withDefunct = 0;
   test.shouldThrowErrorSync( () =>
   {
     var found = provider.filesFind( o2 );
@@ -9017,12 +9998,12 @@ function filesFindMandatoryMap( test )
 
   /**/
 
-  test.case = 'recursive:0 mandatory:1 includingDefunct:1';
+  test.case = 'recursive:0 mandatory:1 withDefunct:1';
   var o2 = _.mapExtend( null, o1 );
   o2.filter = _.mapExtend( null, o2.filter );
   o2.filter.recursive = 0;
   o2.mandatory = 1;
-  o2.includingDefunct = 1;
+  o2.withDefunct = 1;
   test.shouldThrowErrorSync( () =>
   {
     var found = provider.filesFind( o2 );
@@ -9040,12 +10021,12 @@ function filesFindMandatoryMap( test )
 
   /**/
 
-  test.case = 'recursive:1 mandatory:0 includingDefunct:0';
+  test.case = 'recursive:1 mandatory:0 withDefunct:0';
   var o2 = _.mapExtend( null, o1 );
   o2.filter = _.mapExtend( null, o2.filter );
   o2.filter.recursive = 1;
   o2.mandatory = 0;
-  o2.includingDefunct = 0;
+  o2.withDefunct = 0;
   var found = provider.filesFind( o2 );
   var expected = abs
   ([
@@ -9062,12 +10043,12 @@ function filesFindMandatoryMap( test )
 
   /**/
 
-  test.case = 'recursive:1 mandatory:0 includingDefunct:1';
+  test.case = 'recursive:1 mandatory:0 withDefunct:1';
   var o2 = _.mapExtend( null, o1 );
   o2.filter = _.mapExtend( null, o2.filter );
   o2.filter.recursive = 1;
   o2.mandatory = 0;
-  o2.includingDefunct = 1;
+  o2.withDefunct = 1;
   var found = provider.filesFind( o2 );
   var expected = abs
   ([
@@ -9085,12 +10066,12 @@ function filesFindMandatoryMap( test )
 
   /**/
 
-  test.case = 'recursive:1 mandatory:1 includingDefunct:0';
+  test.case = 'recursive:1 mandatory:1 withDefunct:0';
   var o2 = _.mapExtend( null, o1 );
   o2.filter = _.mapExtend( null, o2.filter );
   o2.filter.recursive = 1;
   o2.mandatory = 1;
-  o2.includingDefunct = 0;
+  o2.withDefunct = 0;
   test.shouldThrowErrorSync( () =>
   {
     var found = provider.filesFind( o2 );
@@ -9110,12 +10091,12 @@ function filesFindMandatoryMap( test )
 
   /**/
 
-  test.case = 'recursive:1 mandatory:1 includingDefunct:1';
+  test.case = 'recursive:1 mandatory:1 withDefunct:1';
   var o2 = _.mapExtend( null, o1 );
   o2.filter = _.mapExtend( null, o2.filter );
   o2.filter.recursive = 1;
   o2.mandatory = 1;
-  o2.includingDefunct = 1;
+  o2.withDefunct = 1;
   test.shouldThrowErrorSync( () =>
   {
     var found = provider.filesFind( o2 );
@@ -9135,76 +10116,65 @@ function filesFindMandatoryMap( test )
 
   /**/
 
-  test.case = 'recursive:2 mandatory:0 includingDefunct:0';
+  test.case = 'recursive:2 mandatory:0 withDefunct:0';
   var o2 = _.mapExtend( null, o1 );
   o2.filter = _.mapExtend( null, o2.filter );
   o2.filter.recursive = 2;
   o2.mandatory = 0;
-  o2.includingDefunct = 0;
+  o2.withDefunct = 0;
   var found = provider.filesFind( o2 );
   var expected = abs
   ([
-    'src/module1',
-    'src/module1/amid',
-    'src/module1/amid/dir',
-    'src/module1/amid/dir/terminal',
-    'src/module1/amid',
-    'src/module1/amid/dir',
-    'src/module1/amid/dir/terminal',
-    'src/module1/amid/dir',
-    'src/module1/amid/dir/terminal',
-    'src/module1/amid/dir/terminal',
-    'src/module2',
+    './src/module1',
+    './src/module1/amid',
+    './src/module1/amid/dir',
+    './src/module1/amid/dir/terminal',
+    './src/module2'
   ]);
   test.identical( found, expected );
 
   /**/
 
-  test.case = 'recursive:2 mandatory:0 includingDefunct:1';
+  test.case = 'recursive:2 mandatory:0 withDefunct:1';
   var o2 = _.mapExtend( null, o1 );
   o2.filter = _.mapExtend( null, o2.filter );
   o2.filter.recursive = 2;
   o2.mandatory = 0;
-  o2.includingDefunct = 1;
+  o2.withDefunct = 1;
   var found = provider.filesFind( o2 );
   var expected = abs
   ([
-    'src/module1',
-    'src/module1/amid',
-    'src/module1/amid/dir',
-    'src/module1/amid/dir/terminal',
-    'src/module1/amid',
-    'src/module1/amid/dir',
-    'src/module1/amid/dir/terminal',
-    'src/module1/amid/dir',
-    'src/module1/amid/dir/terminal',
-    'src/module1/amid/dir/terminal',
-    'src/module2',
-    'src/module2/amid',
+    './src/module1',
+    './src/module1/amid',
+    './src/module1/amid/dir',
+    './src/module1/amid/dir/terminal',
+    './src/module2'
   ]);
   test.identical( found, expected );
 
   /**/
 
-  test.case = 'recursive:2 mandatory:1 includingDefunct:0';
+  test.case = 'recursive:2 mandatory:1 withDefunct:0';
   var o2 = _.mapExtend( null, o1 );
   o2.filter = _.mapExtend( null, o2.filter );
   o2.filter.recursive = 2;
   o2.mandatory = 1;
-  o2.includingDefunct = 0;
+  o2.withDefunct = 0;
   test.shouldThrowErrorSync( () =>
   {
+    debugger;
     var found = provider.filesFind( o2 );
+    debugger;
   });
 
   /**/
 
-  test.case = 'recursive:2 mandatory:1 includingDefunct:1';
+  test.case = 'recursive:2 mandatory:1 withDefunct:1';
   var o2 = _.mapExtend( null, o1 );
   o2.filter = _.mapExtend( null, o2.filter );
   o2.filter.recursive = 2;
   o2.mandatory = 1;
-  o2.includingDefunct = 1;
+  o2.withDefunct = 1;
   test.shouldThrowErrorSync( () =>
   {
     var found = provider.filesFind( o2 );
@@ -9212,7 +10182,7 @@ function filesFindMandatoryMap( test )
 
   /* - */
 
-} /* end of filesFindMandatoryMap */
+} /* end of function filesFindMandatoryMap */
 
 //
 
@@ -9281,7 +10251,7 @@ function filesFindExcluding( test )
     filter :
     {
       filePath : { 'node_modules' : 0, 'package.json' : 0 },
-      recursive/**/ : 2,
+      recursive : 2,
     }
   });
 
@@ -9295,7 +10265,7 @@ function filesFindExcluding( test )
 
   var find = provider.filesFinder
   ({
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     allowingMissed : 1,
     maskPreset : 0,
     outputFormat : 'relative',
@@ -9315,10 +10285,10 @@ function filesFindExcluding( test )
 
   var find = provider.filesFinder
   ({
-    filter : { recursive/**/ : 2 },
-    includingTerminals : 1,
-    includingDirs : 1,
-    includingTransient : 1,
+    filter : { recursive : 2 },
+    withTerminals : 1,
+    withDirs : 1,
+    withTransient/*maybe withStem*/ : 1,
     allowingMissed : 1,
     maskPreset : 0,
     outputFormat : 'relative',
@@ -9384,7 +10354,7 @@ function filesFindExcluding( test )
 
   var find = provider.filesFinder
   ({
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     maskPreset : 0,
     outputFormat : 'relative',
   });
@@ -9460,7 +10430,7 @@ function filesFindExcluding( test )
 
   test.close( '+*' );
 
-} /* end of filesFindExcluding */
+} /* end of function filesFindExcluding */
 
 //
 
@@ -9543,10 +10513,10 @@ function filesFindGlobLogic( test )
 
   var find = provider.filesFinder
   ({
-    includingTerminals : 1,
-    includingDirs : 1,
-    includingTransient : 1,
-    filter : { recursive/**/ : 2 },
+    withTerminals : 1,
+    withDirs : 1,
+    withTransient/*maybe withStem*/ : 1,
+    filter : { recursive : 2 },
     filter :
     {
       prefixPath : routinePath,
@@ -9804,10 +10774,10 @@ function filesFindGlobComplex( test )
 
   var find = provider.filesFinder
   ({
-    includingTerminals : 1,
-    includingDirs : 1,
-    includingTransient : 1,
-    filter : { recursive/**/ : 2 },
+    withTerminals : 1,
+    withDirs : 1,
+    withTransient/*maybe withStem*/ : 1,
+    filter : { recursive : 2 },
     filter :
     {
       prefixPath : routinePath,
@@ -10007,7 +10977,37 @@ function filesFindGlobComplex( test )
 
   test.close( '/ after **' );
 
-} /* end of filesFindGlobComplex */
+  test.open( 'check escaping' );
+
+  /* - */
+
+  test.case = 'src/proto/?(..cc)';
+  var expectedRelative = [ '.' ];
+  var records = find( abs( 'src/proto/?(..cc)' ) );
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* - */
+
+  test.case = 'src/proto/*?(f)?ile';
+  var expectedRelative = [ '.', './-ile', './file' ];
+  var records = find({ filePath : abs( 'src/proto/*?(f)?ile' ), maskPreset : 0 });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* - */
+
+  test.case = 'src/proto/*?(f)ile';
+  var expectedRelative = [ '.', './-ile', './file' ];
+  var records = find({ filePath : abs( 'src/proto/*?(f)ile' ), maskPreset : 0 });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* - */
+
+  test.close( 'check escaping' );
+
+} /* end of function filesFindGlobComplex */
 
 //
 
@@ -10092,10 +11092,10 @@ function filesFindAnyPositive( test )
 
   var find = provider.filesFinder
   ({
-    includingTerminals : 1,
-    includingDirs : 1,
-    includingTransient : 1,
-    filter : { recursive/**/ : 2 },
+    withTerminals : 1,
+    withDirs : 1,
+    withTransient/*maybe withStem*/ : 1,
+    filter : { recursive : 2 },
     filter :
     {
       prefixPath : routinePath,
@@ -10886,7 +11886,7 @@ function filesFindAnyPositive( test )
 
   /* - */
 
-} /* end of filesFindAnyPositive */
+} /* end of function filesFindAnyPositive */
 
 //
 
@@ -10971,10 +11971,10 @@ function filesFindTotalPositive( test )
 
   var find = provider.filesFinder
   ({
-    includingTerminals : 1,
-    includingDirs : 1,
-    includingTransient : 1,
-    filter : { recursive/**/ : 2 },
+    withTerminals : 1,
+    withDirs : 1,
+    withTransient/*maybe withStem*/ : 1,
+    filter : { recursive : 2 },
     filter :
     {
       prefixPath : routinePath,
@@ -11762,7 +12762,7 @@ function filesFindTotalPositive( test )
 
   /* - */
 
-} /* end of filesFindTotalPositive */
+} /* end of function filesFindTotalPositive */
 
 //
 
@@ -11847,10 +12847,10 @@ function filesFindSeveralTotalPositive( test )
 
   var find = provider.filesFinder
   ({
-    includingTerminals : 1,
-    includingDirs : 1,
-    includingTransient : 1,
-    filter : { recursive/**/ : 2 },
+    withTerminals : 1,
+    withDirs : 1,
+    withTransient/*maybe withStem*/ : 1,
+    filter : { recursive : 2 },
     filter :
     {
       prefixPath : routinePath,
@@ -12218,7 +13218,7 @@ function filesFindSeveralTotalPositive( test )
 
   /* - */
 
-} /* end of filesFindSeveralTotalPositive */
+} /* end of function filesFindSeveralTotalPositive */
 
 //
 
@@ -12303,10 +13303,10 @@ function filesFindTotalNegative( test )
 
   var find = provider.filesFinder
   ({
-    includingTerminals : 1,
-    includingDirs : 1,
-    includingTransient : 1,
-    filter : { recursive/**/ : 2 },
+    withTerminals : 1,
+    withDirs : 1,
+    withTransient/*maybe withStem*/ : 1,
+    filter : { recursive : 2 },
     filter :
     {
       prefixPath : routinePath,
@@ -13110,7 +14110,7 @@ function filesFindTotalNegative( test )
 
   /* - */
 
-} /* end of filesFindTotalNegative */
+} /* end of function filesFindTotalNegative */
 
 //
 
@@ -13149,7 +14149,7 @@ function filesFindGroups( test )
     }
   }
 
-  var extract1 = new _.FileProvider.Extract({ filesTree : filesTree });
+  var extract1 = new _.FileProvider.Extract({ filesTree });
   extract1.filesReflectTo( provider, routinePath );
 
   var expected =
@@ -13192,7 +14192,7 @@ function filesFindGroups( test )
   }
   var src =
   {
-    filePath : filePath,
+    filePath,
     prefixPath : routinePath,
   }
   var dst =
@@ -13267,7 +14267,7 @@ function filesFindGroups( test )
 
   /* */
 
-  test.case = 'filter : { recursive/**/ : 1 }, mandatory : 0';
+  test.case = 'filter : { recursive : 1 }, mandatory : 0';
   var expected =
   {
     'pathsGrouped' :
@@ -13310,7 +14310,7 @@ function filesFindGroups( test )
 
   /* */
 
-  test.case = 'filter : { recursive/**/ : 0 }';
+  test.case = 'filter : { recursive : 0 }';
   var expected =
   {
     'pathsGrouped' :
@@ -13348,7 +14348,7 @@ function filesFindGroups( test )
 
   if( Config.debug )
   {
-    test.case = 'filter : { recursive/**/ : 0 }, mandatory : 1';
+    test.case = 'filter : { recursive : 0 }, mandatory : 1';
     test.shouldThrowErrorSync( () =>
     {
       var src2 = _.mapExtend( null, src );
@@ -13434,7 +14434,7 @@ function filesReflectEvaluate( test )
   test.identical( preserve, expectedPreserve );
 
   var extract2 = provider.filesExtract( routinePath );
-  extract2.filesFind({ filePath : '/', filter : { recursive/**/ : 2 }, onDown : function onDown( r, o )
+  extract2.filesFind({ filePath : '/', filter : { recursive : 2 }, onDown : function onDown( r, o )
   {
     if( r.isTerminal )
     extract2.fileWrite( r.absolute, extract2.fileRead( r.absolute ) );
@@ -13957,7 +14957,7 @@ function filesReflectTrivial( test )
       '/src' : '/dst'
     },
     writing : 1,
-    includingDirs : 1,
+    withDirs : 1,
     dstRewriting : 1,
     src : { ends : '.a' },
     srcDeleting : 1,
@@ -14103,9 +15103,9 @@ function filesReflectTrivial( test )
     reflectMap : { '/src' : '/dst' },
     src : { ends : '.b' },
     includingDst : 1,
-    includingTerminals : 1,
-    includingDirs : 1,
-    filter : { recursive/**/ : 2 },
+    withTerminals : 1,
+    withDirs : 1,
+    filter : { recursive : 2 },
     writing : 1,
     dstRewriting : 1,
     dstDeleting : 0,
@@ -14191,9 +15191,9 @@ function filesReflectTrivial( test )
     reflectMap : { '/src' : '/dst' },
     src : { ends : '.b' },
     includingDst : 1,
-    includingTerminals : 1,
-    includingDirs : 1,
-    filter : { recursive/**/ : 2 },
+    withTerminals : 1,
+    withDirs : 1,
+    filter : { recursive : 2 },
     writing : 1,
     dstRewriting : 1,
     dstDeleting : 0,
@@ -14294,9 +15294,9 @@ function filesReflectTrivial( test )
     reflectMap : { '/src' : '/dst' },
     onUp : onUp2,
     includingDst : 0,
-    includingTerminals : 1,
-    includingDirs : 0,
-    filter : { recursive/**/ : 2 },
+    withTerminals : 1,
+    withDirs : 0,
+    filter : { recursive : 2 },
     writing : 1,
     srcDeleting : 0,
     // linking : 'nop'
@@ -14335,7 +15335,7 @@ function filesReflectTrivial( test )
     reflectMap : { '/src' : '/dst' },
     onWriteDstUp : onWriteDstUp1,
     src : { maskTerminal : { includeAny : 'a' } },
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     writing : 1,
     dstDeleting : 0,
     dstRewriting : 1,
@@ -14390,7 +15390,7 @@ function filesReflectTrivial( test )
     reflectMap : { '/src' : '/dst' },
     onWriteDstUp : onWriteDstUp2,
     src : { maskTerminal : { includeAny : 'a' } },
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     writing : 1,
     dstDeleting : 0,
     dstRewriting : 1,
@@ -14415,7 +15415,7 @@ function filesReflectTrivial( test )
 
   test.identical( extract.filesTree, expectedTree );
 
-}  /* end of filesReflectTrivial */
+}  /* end of function filesReflectTrivial */
 
 //
 
@@ -14431,14 +15431,14 @@ function filesReflectRecursive( test )
   var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
   var o =
   {
-    src : { recursive/**/ : 0 },
+    src : { recursive : 0 },
     reflectMap : { '/src' : '/dst' },
     writing : 1,
     dstDeleting : 0,
     dstRewriting : 0,
     srcDeleting : 0,
-    includingDirs : 1,
-    includingTerminals : 1,
+    withDirs : 1,
+    withTerminals : 1,
     linking : 'fileCopy'
   }
   provider.filesReflect( o );
@@ -14455,13 +15455,13 @@ function filesReflectRecursive( test )
   var o =
   {
     reflectMap : { '/src' : '/dst' },
-    filter : { recursive/**/ : 0 },
+    filter : { recursive : 0 },
     writing : 1,
     dstDeleting : 0,
     dstRewriting : 0,
     srcDeleting : 0,
-    includingDirs : 1,
-    includingTerminals : 1,
+    withDirs : 1,
+    withTerminals : 1,
     linking : 'fileCopy'
   }
   provider.filesReflect( o );
@@ -14478,13 +15478,13 @@ function filesReflectRecursive( test )
   var o =
   {
     reflectMap : { '/src' : '/dst' },
-    filter : { recursive/**/ : 1 },
+    filter : { recursive : 1 },
     writing : 1,
     dstDeleting : 0,
     dstRewriting : 0,
     srcDeleting : 0,
-    includingDirs : 1,
-    includingTerminals : 1,
+    withDirs : 1,
+    withTerminals : 1,
     linking : 'fileCopy'
   }
   provider.filesReflect( o );
@@ -14501,13 +15501,13 @@ function filesReflectRecursive( test )
   var o =
   {
     reflectMap : { '/src' : '/dst' },
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     writing : 1,
     dstDeleting : 0,
     dstRewriting : 0,
     srcDeleting : 0,
-    includingDirs : 1,
-    includingTerminals : 1,
+    withDirs : 1,
+    withTerminals : 1,
     linking : 'fileCopy'
   }
   provider.filesReflect( o );
@@ -14524,13 +15524,13 @@ function filesReflectRecursive( test )
   var o =
   {
     reflectMap : { '/src/a1' : '/dst' },
-    filter : { recursive/**/ : 0 },
+    filter : { recursive : 0 },
     writing : 1,
     dstDeleting : 0,
     dstRewriting : 0,
     srcDeleting : 0,
-    includingDirs : 1,
-    includingTerminals : 1,
+    withDirs : 1,
+    withTerminals : 1,
     linking : 'fileCopy'
   }
   provider.filesReflect( o );
@@ -14547,13 +15547,13 @@ function filesReflectRecursive( test )
   var o =
   {
     reflectMap : { '/src/a1' : '/dst' },
-    filter : { recursive/**/ : 1 },
+    filter : { recursive : 1 },
     writing : 1,
     dstDeleting : 0,
     dstRewriting : 0,
     srcDeleting : 0,
-    includingDirs : 1,
-    includingTerminals : 1,
+    withDirs : 1,
+    withTerminals : 1,
     linking : 'fileCopy'
   }
   provider.filesReflect( o );
@@ -14570,13 +15570,13 @@ function filesReflectRecursive( test )
   var o =
   {
     reflectMap : { '/src/a1' : '/dst' },
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     writing : 1,
     dstDeleting : 0,
     dstRewriting : 0,
     srcDeleting : 0,
-    includingDirs : 1,
-    includingTerminals : 1,
+    withDirs : 1,
+    withTerminals : 1,
     linking : 'fileCopy'
   }
   provider.filesReflect( o );
@@ -14891,30 +15891,8 @@ function filesReflectMandatory( test )
 
   /* */
 
-/*
-"Filter
-  prefixPath :
-`/C/pro/web/Dave/git/trunk/builder/include/dwtools/tmp.tmp/Will-154626-16-4c02/relfectSubmodulesWithNotExistingFile/module`
-  filePath :
-{
-  "module1" : `.`,
-  "module1/amid" : `.`,
-  "module1/amid/terminal" : `.`,
-  "module2" : `.`,
-  "module2/amid" : `.`
-}
-  basePath :
-{
-  "module1" : `module1`,
-  "module1/amid" : `module1`,
-  "module1/amid/terminal" : `module1`,
-  "module2" : `module2`,
-  "module2/amid" : `module2`
-}"
-*/
-
   debugger; return; xxx
-}
+} /* end of function filesReflectMandatory */
 
 //
 
@@ -14944,9 +15922,9 @@ function filesReflectMutuallyExcluding( test )
     extract.filesFindRecursive
     ({
       filePath : '/',
-      includingTerminals : 1,
-      includingDirs : 0,
-      includingStem : 0,
+      withTerminals : 1,
+      withDirs : 0,
+      withStem/*maybe withTransient*/ : 0,
       onDown : handleDown
     })
 
@@ -15763,7 +16741,7 @@ function filesReflectWithFilter( test )
     dst.originPath = 'extract+dst://';
     system.providerRegister( src );
     system.providerRegister( dst );
-    return { src : src, dst : dst, system : system };
+    return { src, dst, system };
   }
 
   /* */
@@ -16242,7 +17220,7 @@ function filesReflect( test )
     dst.originPath = 'extract+dst://';
     system.providerRegister( src );
     system.providerRegister( dst );
-    return { src : src, dst : dst, system : system };
+    return { src, dst, system };
   }
 
   /* */
@@ -17750,7 +18728,7 @@ function filesReflectOverlap( test )
     }
   }
   var extract2 = provider.filesExtract( routinePath );
-  extract2.filesFind({ filePath : '/', filter : { recursive/**/ : 2 }, onDown : function onDown( r, o )
+  extract2.filesFind({ filePath : '/', filter : { recursive : 2 }, onDown : function onDown( r, o )
   {
     if( r.isTerminal )
     extract2.fileWrite( r.absolute, extract2.fileRead( r.absolute ) );
@@ -18633,7 +19611,7 @@ function filesReflectorBasic( test )
   var extract = provider.filesExtract( routinePath );
   if( provider instanceof _.FileProvider.HardDrive )
   {
-    var files = extract.filesFindRecursive({ filePath : '/', includingTerminals : 1, includingDirs : 0, includingStem : 0 })
+    var files = extract.filesFindRecursive({ filePath : '/', withTerminals : 1, withDirs : 0, withStem/*maybe withTransient*/ : 0 })
     _.each( files, ( f ) => extract.fileWrite( f.absolute, extract.fileRead( f.absolute ) ) )
   }
   test.identical( extract.filesTree, src.filesTree );
@@ -18655,7 +19633,7 @@ function filesReflectorBasic( test )
   var extract = provider.filesExtract( routinePath );
   if( provider instanceof _.FileProvider.HardDrive )
   {
-    var files = extract.filesFindRecursive({ filePath : '/', includingTerminals : 1, includingDirs : 0, includingStem : 0 })
+    var files = extract.filesFindRecursive({ filePath : '/', withTerminals : 1, withDirs : 0, withStem/*maybe withTransient*/ : 0 })
     _.each( files, ( f ) => extract.fileWrite( f.absolute, extract.fileRead( f.absolute ) ) )
   }
   test.identical( extract.filesTree, { alt : { a : '/alt/a' } } );
@@ -18703,7 +19681,7 @@ function filesReflectorBasic( test )
   var extract = provider.filesExtract( routinePath );
   if( provider instanceof _.FileProvider.HardDrive )
   {
-    var files = extract.filesFindRecursive({ filePath : '/', includingTerminals : 1, includingDirs : 0, includingStem : 0 })
+    var files = extract.filesFindRecursive({ filePath : '/', withTerminals : 1, withDirs : 0, withStem/*maybe withTransient*/ : 0 })
     _.each( files, ( f ) => extract.fileWrite( f.absolute, extract.fileRead( f.absolute ) ) )
   }
   test.identical( extract.filesTree, expected );
@@ -18725,7 +19703,7 @@ function filesReflectorBasic( test )
   var extract = provider.filesExtract( routinePath );
   if( provider instanceof _.FileProvider.HardDrive )
   {
-    var files = extract.filesFindRecursive({ filePath : '/', includingTerminals : 1, includingDirs : 0, includingStem : 0 })
+    var files = extract.filesFindRecursive({ filePath : '/', withTerminals : 1, withDirs : 0, withStem/*maybe withTransient*/ : 0 })
     _.each( files, ( f ) => extract.fileWrite( f.absolute, extract.fileRead( f.absolute ) ) )
   }
   test.identical( extract.filesTree, { alt : { a : '/alt/a' } } );
@@ -18749,7 +19727,7 @@ function filesReflectorBasic( test )
   reflect( '/alt/a' );
 
   var extract = provider.filesExtract( routinePath );
-  extract.filesFind({ filePath : '/', filter : { recursive/**/ : 2 }, onDown : function onDown( r, o )
+  extract.filesFind({ filePath : '/', filter : { recursive : 2 }, onDown : function onDown( r, o )
   {
     if( r.isTerminal )
     extract.fileWrite( r.absolute, extract.fileRead( r.absolute ) );
@@ -18791,7 +19769,7 @@ function filesReflectorBasic( test )
 
   test.close( 'reflect current dir' );
 
-} /* end of filesReflectorBasic */
+} /* end of function filesReflectorBasic */
 
 //
 
@@ -18810,7 +19788,7 @@ function filesReflectWithSystem( test )
     src : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
   }
 
-  var srcProvider = _.FileProvider.Extract({ filesTree : filesTree, protocols : [ 'extract' ] });
+  var srcProvider = _.FileProvider.Extract({ filesTree, protocols : [ 'extract' ] });
   srcProvider.providerRegisterTo( system );
   // var dstProvider = new _.FileProvider.HardDrive();
   var srcPath = '/src';
@@ -18843,12 +19821,12 @@ function filesReflectWithSystem( test )
   test.is( records.length >= 0 );
 
   var extract2 = dstProvider.filesExtract( dstPath );
-  extract2.filesFind({ filePath : '/', filter : { recursive/**/ : 2 }, onDown : function onDown( r, o )
+  extract2.filesFind({ filePath : '/', filter : { recursive : 2 }, onDown : function onDown( r, o )
   {
     if( r.isTerminal )
     extract2.fileWrite( r.absolute, extract2.fileRead( r.absolute ) );
   }})
-  test.identical( extract2.filesTree, /*context.select*/_.select( filesTree, srcPath ) )
+  test.identical( extract2.filesTree, _.select( filesTree, srcPath ) )
 
   /* */
 
@@ -18870,12 +19848,12 @@ function filesReflectWithSystem( test )
   test.is( records.length >= 0 );
 
   var extract2 = dstProvider.filesExtract( dstPath );
-  extract2.filesFind({ filePath : '/', filter : { recursive/**/ : 2 }, onDown : function onDown( r, o )
+  extract2.filesFind({ filePath : '/', filter : { recursive : 2 }, onDown : function onDown( r, o )
   {
     if( r.isTerminal )
     extract2.fileWrite( r.absolute, extract2.fileRead( r.absolute ) );
   }})
-  test.identical( extract2.filesTree, /*context.select*/_.select( filesTree, '/src' ) );
+  test.identical( extract2.filesTree, _.select( filesTree, '/src' ) );
 
   dstProvider.filesDelete( dstPath );
   srcProvider.finit();
@@ -18898,7 +19876,7 @@ function filesReflectLinkWithSystem( test )
     'terminal' : 'terminal',
     'link' : [{ softLink : '/terminal' }]
   }
-  var src = new _.FileProvider.Extract({ protocol : 'src', filesTree : filesTree });
+  var src = new _.FileProvider.Extract({ protocol : 'src', filesTree });
 
   src.providerRegisterTo( system );
 
@@ -19783,7 +20761,7 @@ function filesReflectDeducing( test )
 
 //
 
-function filesReflectDstPreserving( test )
+function filesReflectOnlyPreserving( test )
 {
   let context = this;
   let provider = context.provider;
@@ -19817,7 +20795,7 @@ function filesReflectDstPreserving( test )
 
   /* */
 
-  test.case = 'terminal - terminal, same content, dstRewritingPreserving : 0';
+  test.case = 'terminal - terminal, same content, dstRewritingOnlyPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -19825,15 +20803,15 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 0
+    dstRewritingOnlyPreserving : 0
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   var src = extract.fileRead( '/src/file' );
   var dst = extract.fileRead( '/dst/file' );
   test.identical( src, dst );
-  test.identical( src, /*context.select*/_.select( filesTree, '/src/file' ) );
+  test.identical( src, _.select( filesTree, '/src/file' ) );
 
-  test.case = 'terminal - terminal, same content, dstRewritingPreserving : 0';
+  test.case = 'terminal - terminal, same content, dstRewritingOnlyPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -19841,15 +20819,15 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 1
+    dstRewritingOnlyPreserving : 1
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   var src = extract.fileRead( '/src/file' );
   var dst = extract.fileRead( '/dst/file' );
   test.identical( src, dst );
-  test.identical( src, /*context.select*/_.select( filesTree, '/src/file' ) );
+  test.identical( src, _.select( filesTree, '/src/file' ) );
 
-  test.case = 'terminal - terminal, diff content, dstRewritingPreserving : 0';
+  test.case = 'terminal - terminal, diff content, dstRewritingOnlyPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -19857,15 +20835,15 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 0
+    dstRewritingOnlyPreserving : 0
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   var src = extract.fileRead( '/src/file-d' );
   var dst = extract.fileRead( '/dst/file' );
   test.identical( src, dst );
-  test.identical( src, /*context.select*/_.select( filesTree, '/src/file-d' ) );
+  test.identical( src, _.select( filesTree, '/src/file-d' ) );
 
-  test.case = 'terminal - terminal, diff content, dstRewritingPreserving : 1';
+  test.case = 'terminal - terminal, diff content, dstRewritingOnlyPreserving : 1';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -19873,7 +20851,7 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 1
+    dstRewritingOnlyPreserving : 1
   }
   test.shouldThrowError( () => extract.filesReflect( o ) );
   var src = extract.fileRead( '/src/file-d' );
@@ -19882,7 +20860,7 @@ function filesReflectDstPreserving( test )
 
   /* */
 
-  test.case = 'terminal - empty dir, dstRewritingPreserving : 0';
+  test.case = 'terminal - empty dir, dstRewritingOnlyPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -19890,15 +20868,15 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 0
+    dstRewritingOnlyPreserving : 0
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   var src = extract.fileRead( '/src/file' );
   var dst = extract.fileRead( '/dst/dir-e/dir-e' );
   test.identical( src, dst );
-  test.identical( src, /*context.select*/_.select( filesTree, '/src/file' ) );
+  test.identical( src, _.select( filesTree, '/src/file' ) );
 
-  test.case = 'terminal - dir without terminals, dstRewritingPreserving : 0';
+  test.case = 'terminal - dir without terminals, dstRewritingOnlyPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -19906,15 +20884,15 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 0
+    dstRewritingOnlyPreserving : 0
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   var src = extract.fileRead( '/src/file' );
   var dst = extract.fileRead( '/dst/dir-e' );
   test.identical( src, dst );
-  test.identical( src, /*context.select*/_.select( filesTree, '/src/file' ) );
+  test.identical( src, _.select( filesTree, '/src/file' ) );
 
-  test.case = 'terminal - empty dir, dstRewritingPreserving : 1';
+  test.case = 'terminal - empty dir, dstRewritingOnlyPreserving : 1';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -19922,15 +20900,15 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 1
+    dstRewritingOnlyPreserving : 1
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   var src = extract.fileRead( '/src/file' );
   var dst = extract.fileRead( '/dst/dir-e/dir-e' );
   test.identical( src, dst );
-  test.identical( src, /*context.select*/_.select( filesTree, '/src/file' ) );
+  test.identical( src, _.select( filesTree, '/src/file' ) );
 
-  test.case = 'terminal - dir without terminals, dstRewritingPreserving : 1';
+  test.case = 'terminal - dir without terminals, dstRewritingOnlyPreserving : 1';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -19938,15 +20916,15 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 1
+    dstRewritingOnlyPreserving : 1
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   var src = extract.fileRead( '/src/file' );
   var dst = extract.fileRead( '/dst/dir-e' );
   test.identical( src, dst );
-  test.identical( src, /*context.select*/_.select( filesTree, '/src/file' ) );
+  test.identical( src, _.select( filesTree, '/src/file' ) );
 
-  test.case = 'terminal - dir with terminals, dstRewritingPreserving : 0';
+  test.case = 'terminal - dir with terminals, dstRewritingOnlyPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -19954,15 +20932,15 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 0
+    dstRewritingOnlyPreserving : 0
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   var src = extract.fileRead( '/src/file' );
   var dst = extract.fileRead( '/dst/dir-test' );
   test.identical( src, dst );
-  test.identical( src, /*context.select*/_.select( filesTree, '/src/file' ) );
+  test.identical( src, _.select( filesTree, '/src/file' ) );
 
-  test.case = 'terminal - dir with terminals inner level, dstRewritingPreserving : 0';
+  test.case = 'terminal - dir with terminals inner level, dstRewritingOnlyPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -19970,15 +20948,15 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 0
+    dstRewritingOnlyPreserving : 0
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   var src = extract.fileRead( '/src/file' );
   var dst = extract.fileRead( '/dst/dir-test-inner' );
   test.identical( src, dst );
-  test.identical( src, /*context.select*/_.select( filesTree, '/src/file' ) );
+  test.identical( src, _.select( filesTree, '/src/file' ) );
 
-  test.case = 'terminal - dir with terminals, dstRewritingPreserving : 1';
+  test.case = 'terminal - dir with terminals, dstRewritingOnlyPreserving : 1';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -19986,15 +20964,15 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 1
+    dstRewritingOnlyPreserving : 1
   }
   test.shouldThrowError( () => extract.filesReflect( o ) );
   test.is( extract.isTerminal( '/src/file' ) );
   test.is( extract.isDir( '/dst/dir-test' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/file' ), /*context.select*/_.select( filesTree, '/src/file' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/dst/dir-test' ), /*context.select*/_.select( filesTree, '/dst/dir-test' ) );
+  test.identical( _.select( extract.filesTree, '/src/file' ), _.select( filesTree, '/src/file' ) );
+  test.identical( _.select( extract.filesTree, '/dst/dir-test' ), _.select( filesTree, '/dst/dir-test' ) );
 
-  test.case = 'terminal - dir with terminals inner level, dstRewritingPreserving : 1';
+  test.case = 'terminal - dir with terminals inner level, dstRewritingOnlyPreserving : 1';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -20002,17 +20980,17 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 1
+    dstRewritingOnlyPreserving : 1
   }
   test.shouldThrowError( () => extract.filesReflect( o ) );
   test.is( extract.isTerminal( '/src/file' ) );
   test.is( extract.isDir( '/dst/dir-test-inner' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/file' ), /*context.select*/_.select( filesTree, '/src/file' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/dst/dir-test-inner' ), /*context.select*/_.select( filesTree, '/dst/dir-test-inner' ) );
+  test.identical( _.select( extract.filesTree, '/src/file' ), _.select( filesTree, '/src/file' ) );
+  test.identical( _.select( extract.filesTree, '/dst/dir-test-inner' ), _.select( filesTree, '/dst/dir-test-inner' ) );
 
   /* */
 
-  test.case = 'dir empty - terminal, dstRewritingPreserving : 0';
+  test.case = 'dir empty - terminal, dstRewritingOnlyPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -20020,15 +20998,15 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 0
+    dstRewritingOnlyPreserving : 0
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   test.is( extract.isDir( '/src/dir-e/dir-e' ) );
   test.is( extract.isDir( '/dst/file' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/dir-e/dir-e' ), /*context.select*/_.select( filesTree, '/src/dir-e/dir-e' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/dir-e/dir-e' ), /*context.select*/_.select( extract.filesTree, '/dst/file' ) );
+  test.identical( _.select( extract.filesTree, '/src/dir-e/dir-e' ), _.select( filesTree, '/src/dir-e/dir-e' ) );
+  test.identical( _.select( extract.filesTree, '/src/dir-e/dir-e' ), _.select( extract.filesTree, '/dst/file' ) );
 
-  test.case = 'dir empty - terminal, dstRewritingPreserving : 1';
+  test.case = 'dir empty - terminal, dstRewritingOnlyPreserving : 1';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -20036,15 +21014,15 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 1
+    dstRewritingOnlyPreserving : 1
   }
   test.shouldThrowError( () => extract.filesReflect( o ) );
   test.is( extract.isDir( '/src/dir-e/dir-e' ) );
   test.is( extract.isTerminal( '/dst/file' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/dir-e/dir-e' ), /*context.select*/_.select( filesTree, '/src/dir-e/dir-e' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/dst/file' ), /*context.select*/_.select( filesTree, '/dst/file' ) );
+  test.identical( _.select( extract.filesTree, '/src/dir-e/dir-e' ), _.select( filesTree, '/src/dir-e/dir-e' ) );
+  test.identical( _.select( extract.filesTree, '/dst/file' ), _.select( filesTree, '/dst/file' ) );
 
-  test.case = 'dir without terminal - terminal, dstRewritingPreserving : 0';
+  test.case = 'dir without terminal - terminal, dstRewritingOnlyPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -20052,15 +21030,15 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 0
+    dstRewritingOnlyPreserving : 0
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   test.is( extract.isDir( '/src/dir-e' ) );
   test.is( extract.isDir( '/dst/file' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/dir-e' ), /*context.select*/_.select( filesTree, '/src/dir-e' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/dir-e' ), /*context.select*/_.select( extract.filesTree, '/dst/file' ) );
+  test.identical( _.select( extract.filesTree, '/src/dir-e' ), _.select( filesTree, '/src/dir-e' ) );
+  test.identical( _.select( extract.filesTree, '/src/dir-e' ), _.select( extract.filesTree, '/dst/file' ) );
 
-  test.case = 'dir without terminal - terminal, dstRewritingPreserving : 0';
+  test.case = 'dir without terminal - terminal, dstRewritingOnlyPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -20068,15 +21046,15 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 1
+    dstRewritingOnlyPreserving : 1
   }
   test.shouldThrowError( () => extract.filesReflect( o ) );
   test.is( extract.isDir( '/src/dir-e' ) );
   test.is( extract.isTerminal( '/dst/file' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/dir-e' ), /*context.select*/_.select( filesTree, '/src/dir-e' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/dst/file' ), /*context.select*/_.select( filesTree, '/dst/file' ) );
+  test.identical( _.select( extract.filesTree, '/src/dir-e' ), _.select( filesTree, '/src/dir-e' ) );
+  test.identical( _.select( extract.filesTree, '/dst/file' ), _.select( filesTree, '/dst/file' ) );
 
-  test.case = 'dir with files - terminal, dstRewritingPreserving : 0';
+  test.case = 'dir with files - terminal, dstRewritingOnlyPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -20084,15 +21062,15 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 0
+    dstRewritingOnlyPreserving : 0
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   test.is( extract.isDir( '/src/dir-test' ) );
   test.is( extract.isDir( '/dst/file' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/dir-test' ), /*context.select*/_.select( filesTree, '/src/dir-test' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/dst/file' ), /*context.select*/_.select( extract.filesTree, '/src/dir-test' ) );
+  test.identical( _.select( extract.filesTree, '/src/dir-test' ), _.select( filesTree, '/src/dir-test' ) );
+  test.identical( _.select( extract.filesTree, '/dst/file' ), _.select( extract.filesTree, '/src/dir-test' ) );
 
-  test.case = 'dir with files - terminal, dstRewritingPreserving : 1';
+  test.case = 'dir with files - terminal, dstRewritingOnlyPreserving : 1';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -20100,17 +21078,17 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 1
+    dstRewritingOnlyPreserving : 1
   }
   test.shouldThrowError( () => extract.filesReflect( o ) );
   test.is( extract.isDir( '/src/dir-test' ) );
   test.is( extract.isTerminal( '/dst/file' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/dir-test' ), /*context.select*/_.select( filesTree, '/src/dir-test' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/dst/file' ), /*context.select*/_.select( filesTree, '/dst/file' ) );
+  test.identical( _.select( extract.filesTree, '/src/dir-test' ), _.select( filesTree, '/src/dir-test' ) );
+  test.identical( _.select( extract.filesTree, '/dst/file' ), _.select( filesTree, '/dst/file' ) );
 
   /**/
 
-  test.case = 'reflect dir - dir, both with same terminal, dstRewritingPreserving : 0';
+  test.case = 'reflect dir - dir, both with same terminal, dstRewritingOnlyPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -20118,14 +21096,14 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 0
+    dstRewritingOnlyPreserving : 0
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   test.is( extract.isTerminal( '/src/dir-s/file' ) );
   test.is( extract.isTerminal( '/dst/dir-s/file' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/dir-s' ), /*context.select*/_.select( extract.filesTree, '/dst/dir-s' ) );
+  test.identical( _.select( extract.filesTree, '/src/dir-s' ), _.select( extract.filesTree, '/dst/dir-s' ) );
 
-  test.case = 'reflect dir - dir, both with same terminal, dstRewritingPreserving : 1';
+  test.case = 'reflect dir - dir, both with same terminal, dstRewritingOnlyPreserving : 1';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -20133,14 +21111,14 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 1
+    dstRewritingOnlyPreserving : 1
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   test.is( extract.isTerminal( '/src/dir-s/file' ) );
   test.is( extract.isTerminal( '/dst/dir-s/file' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/dir-s' ), /*context.select*/_.select( extract.filesTree, '/dst/dir-s' ) );
+  test.identical( _.select( extract.filesTree, '/src/dir-s' ), _.select( extract.filesTree, '/dst/dir-s' ) );
 
-  test.case = 'reflect dir - dir, both have terminal with diff content, dstRewritingPreserving : 0';
+  test.case = 'reflect dir - dir, both have terminal with diff content, dstRewritingOnlyPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -20148,14 +21126,14 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 0
+    dstRewritingOnlyPreserving : 0
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   test.is( extract.isTerminal( '/src/dir-s/file' ) );
   test.is( extract.isTerminal( '/dst/dir-s/file' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/dir-s' ), /*context.select*/_.select( extract.filesTree, '/dst/dir-s' ) );
+  test.identical( _.select( extract.filesTree, '/src/dir-s' ), _.select( extract.filesTree, '/dst/dir-s' ) );
 
-  test.case = 'reflect dir - dir, both have terminal with diff content, dstRewritingPreserving : 1';
+  test.case = 'reflect dir - dir, both have terminal with diff content, dstRewritingOnlyPreserving : 1';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -20163,13 +21141,13 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 1
+    dstRewritingOnlyPreserving : 1
   }
   test.shouldThrowError( () => extract.filesReflect( o ) );
   test.is( extract.isTerminal( '/src/dir-s/file' ) );
   test.is( extract.isTerminal( '/dst/dir-s/file' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/dir-d/file-d' ), /*context.select*/_.select( filesTree, '/src/dir-d/file-d' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/dst/dir-d/file-d' ), /*context.select*/_.select( filesTree, '/dst/dir-d/file-d' ) );
+  test.identical( _.select( extract.filesTree, '/src/dir-d/file-d' ), _.select( filesTree, '/src/dir-d/file-d' ) );
+  test.identical( _.select( extract.filesTree, '/dst/dir-d/file-d' ), _.select( filesTree, '/dst/dir-d/file-d' ) );
 
   /*  */
 
@@ -20185,7 +21163,7 @@ function filesReflectDstPreserving( test )
     }
   }
 
-  test.case = 'reflect two terminals to same dst path, src termianls have different content, dstRewritingPreserving : 0';
+  test.case = 'reflect two terminals to same dst path, src termianls have different content, dstRewritingOnlyPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -20197,15 +21175,15 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 0
+    dstRewritingOnlyPreserving : 0
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   test.is( extract.isTerminal( '/dst/file' )  );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/file2' ), /*context.select*/_.select( extract.filesTree, '/dst/file' ) );
+  test.identical( _.select( extract.filesTree, '/src/file2' ), _.select( extract.filesTree, '/dst/file' ) );
 
-  //
+  /* */
 
-  test.case = 'reflect two terminals to same dst path, src termianls have different content, dstRewritingPreserving : 1';
+  test.case = 'reflect two terminals to same dst path, src termianls have different content, dstRewritingOnlyPreserving : 1';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -20217,13 +21195,13 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 1
+    dstRewritingOnlyPreserving : 1
   }
   test.shouldThrowErrorSync( () => extract.filesReflect( o ) );
   test.is( !extract.fileExists( '/dst/file' )  );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/file1' ), 'file1' );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/file2' ), 'file2' );
-  test.is( !/*context.select*/_.select( extract.filesTree, '/dst/file' ) );
+  test.identical( _.select( extract.filesTree, '/src/file1' ), 'file1' );
+  test.identical( _.select( extract.filesTree, '/src/file2' ), 'file2' );
+  test.is( !_.select( extract.filesTree, '/dst/file' ) );
 
   /*  */
 
@@ -20240,7 +21218,7 @@ function filesReflectDstPreserving( test )
     }
   }
 
-  test.case = 'reflect two terminals to same dst path, src termianls have same content, dstRewritingPreserving : 1';
+  test.case = 'reflect two terminals to same dst path, src termianls have same content, dstRewritingOnlyPreserving : 1';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -20252,16 +21230,16 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 1
+    dstRewritingOnlyPreserving : 1
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   test.is( extract.isTerminal( '/dst/file' )  );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/file1' ), /*context.select*/_.select( extract.filesTree, '/dst/file' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/file2' ), /*context.select*/_.select( extract.filesTree, '/dst/file' ) );
+  test.identical( _.select( extract.filesTree, '/src/file1' ), _.select( extract.filesTree, '/dst/file' ) );
+  test.identical( _.select( extract.filesTree, '/src/file2' ), _.select( extract.filesTree, '/dst/file' ) );
 
-  //
+  /* */
 
-  test.case = 'reflect two terminals to same dst path, src termianls have same content, dstRewritingPreserving : 0';
+  test.case = 'reflect two terminals to same dst path, src termianls have same content, dstRewritingOnlyPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -20273,16 +21251,16 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 0
+    dstRewritingOnlyPreserving : 0
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   test.is( extract.isTerminal( '/dst/file' )  );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/file1' ), /*context.select*/_.select( extract.filesTree, '/dst/file' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/file2' ), /*context.select*/_.select( extract.filesTree, '/dst/file' ) );
+  test.identical( _.select( extract.filesTree, '/src/file1' ), _.select( extract.filesTree, '/dst/file' ) );
+  test.identical( _.select( extract.filesTree, '/src/file2' ), _.select( extract.filesTree, '/dst/file' ) );
 
-  //
+  /* */
 
-  test.case = 'reflect three terminals to same dst path, one of src termianls has diff content, dstRewritingPreserving : 0';
+  test.case = 'reflect three terminals to same dst path, one of src termianls has diff content, dstRewritingOnlyPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -20295,17 +21273,17 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 0
+    dstRewritingOnlyPreserving : 0
   }
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   test.is( extract.isTerminal( '/dst/file' )  );
-  test.notIdentical( /*context.select*/_.select( extract.filesTree, '/src/file1' ), /*context.select*/_.select( extract.filesTree, '/dst/file' ) );
-  test.notIdentical( /*context.select*/_.select( extract.filesTree, '/src/file2' ), /*context.select*/_.select( extract.filesTree, '/dst/file' ) );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/file3' ), /*context.select*/_.select( extract.filesTree, '/dst/file' ) );
+  test.notIdentical( _.select( extract.filesTree, '/src/file1' ), _.select( extract.filesTree, '/dst/file' ) );
+  test.notIdentical( _.select( extract.filesTree, '/src/file2' ), _.select( extract.filesTree, '/dst/file' ) );
+  test.identical( _.select( extract.filesTree, '/src/file3' ), _.select( extract.filesTree, '/dst/file' ) );
 
-  //
+  /* */
 
-  test.case = 'reflect three terminals to same dst path, one of src termianls has diff content, dstRewritingPreserving : 1';
+  test.case = 'reflect three terminals to same dst path, one of src termianls has diff content, dstRewritingOnlyPreserving : 1';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -20318,13 +21296,13 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 1
+    dstRewritingOnlyPreserving : 1
   }
   test.shouldThrowErrorSync( () => extract.filesReflect( o ) );
   test.is( !extract.fileExists( '/dst/file' )  );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/file1' ), 'file' );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/file2' ), 'file' );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/file3' ), 'file3' );
+  test.identical( _.select( extract.filesTree, '/src/file1' ), 'file' );
+  test.identical( _.select( extract.filesTree, '/src/file2' ), 'file' );
+  test.identical( _.select( extract.filesTree, '/src/file3' ), 'file3' );
 
   /*  */
 
@@ -20343,9 +21321,9 @@ function filesReflectDstPreserving( test )
 
   }
 
-  //
+  /* */
 
-  test.case = 'reflect three terminals to same dst path, one of src termianls is a softLink, dstRewritingPreserving : 0';
+  test.case = 'reflect three terminals to same dst path, one of src termianls is a softLink, dstRewritingOnlyPreserving : 0';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -20358,17 +21336,17 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 0
+    dstRewritingOnlyPreserving : 0
   }
 
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   test.is( extract.isTerminal( '/dst/file' )  );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/file3' ), /*context.select*/_.select( extract.filesTree, '/dst/file' ) );
-  test.notIdentical( /*context.select*/_.select( extract.filesTree, '/src/file4' ), /*context.select*/_.select( extract.filesTree, '/dst/file' ) );
+  test.identical( _.select( extract.filesTree, '/src/file3' ), _.select( extract.filesTree, '/dst/file' ) );
+  test.notIdentical( _.select( extract.filesTree, '/src/file4' ), _.select( extract.filesTree, '/dst/file' ) );
 
-  //
+  /* */
 
-  test.case = 'reflect three terminals to same dst path, one of src termianls is a softLink, dstRewritingPreserving : 1';
+  test.case = 'reflect three terminals to same dst path, one of src termianls is a softLink, dstRewritingOnlyPreserving : 1';
   var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
   var o =
   {
@@ -20381,17 +21359,17 @@ function filesReflectDstPreserving( test )
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
-    dstRewritingPreserving : 1
+    dstRewritingOnlyPreserving : 1
   }
 
   test.mustNotThrowError( () => extract.filesReflect( o ) );
   test.is( extract.isTerminal( '/dst/file' )  );
-  test.identical( /*context.select*/_.select( extract.filesTree, '/src/file3' ), /*context.select*/_.select( extract.filesTree, '/dst/file' ) );
-  test.notIdentical( /*context.select*/_.select( extract.filesTree, '/src/file4' ), /*context.select*/_.select( extract.filesTree, '/dst/file' ) );
+  test.identical( _.select( extract.filesTree, '/src/file3' ), _.select( extract.filesTree, '/dst/file' ) );
+  test.notIdentical( _.select( extract.filesTree, '/src/file4' ), _.select( extract.filesTree, '/dst/file' ) );
 
   /*  */
 
-  test.case = 'mixed file path, multiple src, dstRewritingPreserving : 0';
+  test.case = 'mixed file path, multiple src, dstRewritingOnlyPreserving : 0';
 
   var tree =
   {
@@ -20406,7 +21384,7 @@ function filesReflectDstPreserving( test )
       prefixPath : '/src',
       filePath : { 'c' : '/dst/c2', 'd' : '/dst' },
     },
-    dstRewritingPreserving : 0
+    dstRewritingOnlyPreserving : 0
   }
 
   var extract = new _.FileProvider.Extract({ filesTree : tree, protocol : 'extract' });
@@ -20429,9 +21407,9 @@ function filesReflectDstPreserving( test )
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
 
-  //
+  /* */
 
-  test.case = 'mixed file path, multiple src, dstRewritingPreserving : 1';
+  test.case = 'mixed file path, multiple src, dstRewritingOnlyPreserving : 1';
 
   var tree =
   {
@@ -20446,7 +21424,7 @@ function filesReflectDstPreserving( test )
       prefixPath : '/src',
       filePath : { 'c' : '/dst/c2', 'd' : '/dst' },
     },
-    dstRewritingPreserving : 1
+    dstRewritingOnlyPreserving : 1
   }
 
   var extract = new _.FileProvider.Extract({ filesTree : _.cloneJust( tree ), protocol : 'extract' });
@@ -20459,7 +21437,7 @@ function filesReflectDstPreserving( test )
   }
 
   test.identical( extract.filesTree, expectedTree );
-}
+} /* end of function filesReflectOnlyPreserving */
 
 //
 
@@ -20479,7 +21457,7 @@ function filesReflectDstDeletingDirs( test )
     src : {},
     dst : { dir : {} }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
   var o =
   {
     reflectMap : { '/src' : '/dst' },
@@ -20503,7 +21481,7 @@ function filesReflectDstDeletingDirs( test )
     src : {},
     dst : { dir : {} }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
   var o =
   {
     reflectMap : { '/src' : '/dst' },
@@ -20527,7 +21505,7 @@ function filesReflectDstDeletingDirs( test )
     src : {},
     dst : { dir : {} }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
   var o =
   {
     reflectMap : { '/src' : '/dst' },
@@ -20552,7 +21530,7 @@ function filesReflectDstDeletingDirs( test )
     src : {},
     dst : { dir : {} }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
   var o =
   {
     reflectMap : { '/src' : '/dst' },
@@ -20577,7 +21555,7 @@ function filesReflectDstDeletingDirs( test )
     src : {},
     dst : { dir : { file : 'file' } }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
   var o =
   {
     reflectMap : { '/src' : '/dst' },
@@ -20602,7 +21580,7 @@ function filesReflectDstDeletingDirs( test )
     src : {},
     dst : { dir : { file : 'file' } }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
   var o =
   {
     reflectMap : { '/src' : '/dst' },
@@ -20627,7 +21605,7 @@ function filesReflectDstDeletingDirs( test )
     src : {},
     dst : { dir : { file : 'file' } }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
   var o =
   {
     reflectMap : { '/src' : '/dst' },
@@ -20652,7 +21630,7 @@ function filesReflectDstDeletingDirs( test )
     src : {},
     dst : { dir : { file : 'file' } }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
   var o =
   {
     reflectMap : { '/src' : '/dst' },
@@ -20677,7 +21655,7 @@ function filesReflectDstDeletingDirs( test )
     src : {},
     dst : { dir : { file : 'file' } }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
   var o =
   {
     reflectMap : { '/src' : '/dst' },
@@ -20702,7 +21680,7 @@ function filesReflectDstDeletingDirs( test )
     src : {},
     dst : { dir : { file : 'file' } }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
   var o =
   {
     reflectMap : { '/src' : '/dst' },
@@ -20727,7 +21705,7 @@ function filesReflectDstDeletingDirs( test )
     src : {},
     dst : { dir : { file1 : 'file1', file2 : 'file2' } }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
   var o =
   {
     reflectMap : { '/src' : '/dst' },
@@ -20750,7 +21728,7 @@ function filesReflectDstDeletingDirs( test )
     src : {},
     dst : { dir : { file1 : 'file1', file2 : 'file2' } }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
   var o =
   {
     reflectMap : { '/src' : '/dst' },
@@ -20773,7 +21751,7 @@ function filesReflectDstDeletingDirs( test )
     src : {},
     dst : { dir : { file1 : 'file1', file2 : 'file2' } }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
   var o =
   {
     reflectMap : { '/src' : '/dst' },
@@ -20796,7 +21774,7 @@ function filesReflectDstDeletingDirs( test )
     src : {},
     dst : { dir : { file1 : 'file1', file2 : 'file2' } }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
   var o =
   {
     reflectMap : { '/src' : '/dst' },
@@ -20819,7 +21797,7 @@ function filesReflectDstDeletingDirs( test )
     src : { dir : {} },
     dst : { dir : { file1 : 'file1', file2 : 'file2' } }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
   var o =
   {
     reflectMap : { '/src' : '/dst' },
@@ -20842,7 +21820,7 @@ function filesReflectDstDeletingDirs( test )
     src : { dir : {} },
     dst : { dir : { file1 : 'file1', file2 : 'file2' } }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
   var o =
   {
     reflectMap : { '/src' : '/dst' },
@@ -20865,7 +21843,7 @@ function filesReflectDstDeletingDirs( test )
     src : { dir : {} },
     dst : { dir : { file1 : 'file1', file2 : 'file2' } }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
   var o =
   {
     reflectMap : { '/src' : '/dst' },
@@ -20887,7 +21865,7 @@ function filesReflectDstDeletingDirs( test )
     src : { dir : {} },
     dst : { dir : { file1 : 'file1', file2 : 'file2' } }
   }
-  var extract = _.FileProvider.Extract({ filesTree : filesTree });
+  var extract = _.FileProvider.Extract({ filesTree });
   var o =
   {
     reflectMap : { '/src' : '/dst' },
@@ -21324,7 +22302,7 @@ function filesReflectTo( test )
   test.identical( found, expected );
   provider.filesDelete( routinePath );
 
-} /* end of filesReflectTo */
+} /* end of function filesReflectTo */
 
 //
 
@@ -21895,8 +22873,7 @@ function filesReflectToWithSoftLinks( test )
 
   test.close( 'absolute links, to extract, resolvingSrcSoftLink : 1' );
 
-  debugger; return; xxx
-} /* end of filesReflectToWithSoftLinks */
+} /* end of function filesReflectToWithSoftLinks */
 
 //
 
@@ -21924,1354 +22901,1354 @@ function filesReflectToWithSoftLinksRebasing( test )
 
   /* - */
 
-  // test.open( 'absolute links, rebasingLink : 0, resolvingSrcSoftLink : 0' );
-  //
-  // /* - */
-  //
-  // var filesTree =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : [{ softLink : '/src/proto/file1' }],
-  //       'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
-  //       'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
-  //       'dirLink1' : [{ softLink : '/src/proto' }],
-  //       'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
-  //       'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
-  //
-  //       'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
-  //       'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
-  //       'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
-  //       'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
-  //       'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
-  //       'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : [{ softLink : '/src/proto2/file1' }],
-  //           'dirLink' : [{ softLink : '/src/proto/dir1' }],
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  // var extract = new _.FileProvider.Extract({ filesTree });
-  // var extract2 = new _.FileProvider.Extract();
-  // extract.filesReflectTo
-  // ({
-  //   dstProvider : extract2,
-  //   resolvingDstSoftLink : 0,
-  //   resolvingDstTextLink : 0,
-  //   resolvingSrcSoftLink : 0,
-  //   resolvingSrcTextLink : 0,
-  //   allowingMissed : 0,
-  //   rebasingLink : 0,
-  //   resolvingSoftLink : 0,
-  // });
-  //
-  // var expected =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/terLink1' }],
-  //       'terLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/terLink2' }],
-  //       'terLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto/terLink3' }],
-  //       'dirLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/dirLink1' }],
-  //       'dirLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dirLink2' }],
-  //       'dirLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto/dirLink3' }],
-  //
-  //       'dualTerLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualTerLink1' }],
-  //       'dualTerLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualTerLink2' }],
-  //       'dualDirLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualDirLink1' }],
-  //       'dualDirLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualDirLink2' }],
-  //       'dualDirLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualDirLink3' }],
-  //       'dualDirLink4' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualDirLink4' }],
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3/dir4/terLink' }],
-  //           'dirLink' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3/dir4/dirLink' }],
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  // test.identical( extract2.filesTree, expected );
-  //
-  // /* - */
-  //
-  // test.close( 'absolute links, rebasingLink : 0, resolvingSrcSoftLink : 0' );
-  // test.open( 'absolute links, rebasingLink : 0, resolvingSrcSoftLink : 1' );
-  //
-  // /* - */
-  //
-  // var filesTree =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : [{ softLink : '/src/proto/file1' }],
-  //       'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
-  //       'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
-  //       'dirLink1' : [{ softLink : '/src/proto' }],
-  //       'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
-  //       'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
-  //
-  //       'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
-  //       'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
-  //       'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
-  //       'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
-  //       'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
-  //       'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : [{ softLink : '/src/proto2/file1' }],
-  //           'dirLink' : [{ softLink : '/src/proto/dir1' }],
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  // var extract = new _.FileProvider.Extract({ filesTree });
-  // var extract2 = new _.FileProvider.Extract();
-  // extract.filesReflectTo
-  // ({
-  //   dstProvider : extract2,
-  //   resolvingDstSoftLink : 0,
-  //   resolvingDstTextLink : 0,
-  //   resolvingSrcSoftLink : 1,
-  //   resolvingSrcTextLink : 0,
-  //   allowingMissed : 0,
-  //   rebasingLink : 0,
-  //   resolvingSoftLink : 0,
-  // });
-  //
-  // var expected =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/file1' }],
-  //       'terLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dir1/dir2/file1' }],
-  //       'terLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3/dir4/file1' }],
-  //       'dirLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto' }],
-  //       'dirLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dir1/dir2' }],
-  //       'dirLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3' }],
-  //
-  //       'dualTerLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/file1' }],
-  //       'dualTerLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto2/file1' }],
-  //       'dualDirLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto' }],
-  //       'dualDirLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dir1/dir2' }],
-  //       'dualDirLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3' }],
-  //       'dualDirLink4' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3/dir4' }],
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : [{ softLink : 'extract' + extract.id + ':///src/proto2/file1' }],
-  //           'dirLink' : [{ softLink : 'extract' + extract.id + ':///src/proto/dir1' }],
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  // test.identical( extract2.filesTree, expected );
-  //
-  // /* - */
-  //
-  // test.close( 'absolute links, rebasingLink : 0, resolvingSrcSoftLink : 1' );
-  // test.open( 'absolute links, rebasingLink : 0, resolvingSrcSoftLink : 2' );
-  //
-  // /* - */
-  //
-  // var filesTree =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : [{ softLink : '/src/proto/file1' }],
-  //       'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
-  //       'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
-  //       'dirLink1' : [{ softLink : '/src/proto' }],
-  //       'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
-  //       'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
-  //
-  //       'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
-  //       'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
-  //       'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
-  //       'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
-  //       'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
-  //       'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : [{ softLink : '/src/proto2/file1' }],
-  //           'dirLink' : [{ softLink : '/src/proto/dir1' }],
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  // var extract = new _.FileProvider.Extract({ filesTree });
-  // var extract2 = new _.FileProvider.Extract();
-  // extract.filesReflectTo
-  // ({
-  //   dstProvider : extract2,
-  //   resolvingDstSoftLink : 0,
-  //   resolvingDstTextLink : 0,
-  //   resolvingSrcSoftLink : 2,
-  //   resolvingSrcTextLink : 0,
-  //   allowingMissed : 0,
-  //   rebasingLink : 0,
-  //   resolvingSoftLink : 0,
-  // });
-  //
-  // var expected =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : 'src/proto/file1',
-  //       'terLink2' : 'src/proto/dir1/dir2/file1',
-  //       'terLink3' : 'src/proto2/dir3/dir4/file1',
-  //       'dirLink1' : {},
-  //       'dirLink2' : {},
-  //       'dirLink3' : {},
-  //
-  //       'dualTerLink1' : 'src/proto/file1',
-  //       'dualTerLink2' : 'src/proto2/file1',
-  //       'dualDirLink1' : {},
-  //       'dualDirLink2' : {},
-  //       'dualDirLink3' : {},
-  //       'dualDirLink4' : {},
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : 'src/proto2/file1',
-  //           'dirLink' : {},
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  // test.identical( extract2.filesTree, expected );
-  //
-  // /* - */
-  //
-  // test.close( 'absolute links, rebasingLink : 0, resolvingSrcSoftLink : 2' );
-  // test.open( 'relative links, rebasingLink : 0, resolvingSrcSoftLink : 0' );
-  //
-  // /* - */
-  //
-  // var filesTree =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : [{ softLink : '../file1' }],
-  //       'terLink2' : [{ softLink : '../dir1/dir2/file1' }],
-  //       'terLink3' : [{ softLink : '../../proto2/dir3/dir4/file1' }],
-  //       'dirLink1' : [{ softLink : '..' }],
-  //       'dirLink2' : [{ softLink : '../dir1/dir2' }],
-  //       'dirLink3' : [{ softLink : '../../proto2/dir3' }],
-  //
-  //       'dualTerLink1' : [{ softLink : '../terLink1' }],
-  //       'dualTerLink2' : [{ softLink : '../../proto2/dir3/dir4/terLink' }],
-  //       'dualDirLink1' : [{ softLink : '../dirLink1' }],
-  //       'dualDirLink2' : [{ softLink : '../dirLink2' }],
-  //       'dualDirLink3' : [{ softLink : '../dirLink3' }],
-  //       'dualDirLink4' : [{ softLink : '../../proto2/dir3/dir4' }],
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : [{ softLink : '../../../file1' }],
-  //           'dirLink' : [{ softLink : '../../../../proto/dir1' }],
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  // var extract = new _.FileProvider.Extract({ filesTree });
-  // var extract2 = new _.FileProvider.Extract();
-  // extract.filesReflectTo
-  // ({
-  //   dstProvider : extract2,
-  //   resolvingDstSoftLink : 0,
-  //   resolvingDstTextLink : 0,
-  //   resolvingSrcSoftLink : 0,
-  //   resolvingSrcTextLink : 0,
-  //   allowingMissed : 0,
-  //   rebasingLink : 0,
-  //   resolvingSoftLink : 0,
-  // });
-  //
-  // var expected =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/terLink1' }],
-  //       'terLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/terLink2' }],
-  //       'terLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto/terLink3' }],
-  //       'dirLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/dirLink1' }],
-  //       'dirLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dirLink2' }],
-  //       'dirLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto/dirLink3' }],
-  //
-  //       'dualTerLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualTerLink1' }],
-  //       'dualTerLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualTerLink2' }],
-  //       'dualDirLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualDirLink1' }],
-  //       'dualDirLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualDirLink2' }],
-  //       'dualDirLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualDirLink3' }],
-  //       'dualDirLink4' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualDirLink4' }],
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3/dir4/terLink' }],
-  //           'dirLink' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3/dir4/dirLink' }],
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  // test.identical( extract2.filesTree, expected );
-  //
-  // /* - */
-  //
-  // test.close( 'relative links, rebasingLink : 0, resolvingSrcSoftLink : 0' );
-  // test.open( 'relative links, rebasingLink : 0, resolvingSrcSoftLink : 1' );
-  //
-  // /* - */
-  //
-  // var filesTree =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : [{ softLink : '../file1' }],
-  //       'terLink2' : [{ softLink : '../dir1/dir2/file1' }],
-  //       'terLink3' : [{ softLink : '../../proto2/dir3/dir4/file1' }],
-  //       'dirLink1' : [{ softLink : '..' }],
-  //       'dirLink2' : [{ softLink : '../dir1/dir2' }],
-  //       'dirLink3' : [{ softLink : '../../proto2/dir3' }],
-  //
-  //       'dualTerLink1' : [{ softLink : '../terLink1' }],
-  //       'dualTerLink2' : [{ softLink : '../../proto2/dir3/dir4/terLink' }],
-  //       'dualDirLink1' : [{ softLink : '../dirLink1' }],
-  //       'dualDirLink2' : [{ softLink : '../dirLink2' }],
-  //       'dualDirLink3' : [{ softLink : '../dirLink3' }],
-  //       'dualDirLink4' : [{ softLink : '../../proto2/dir3/dir4' }],
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : [{ softLink : '../../../file1' }],
-  //           'dirLink' : [{ softLink : '../../../../proto/dir1' }],
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  // var extract = new _.FileProvider.Extract({ filesTree });
-  // var extract2 = new _.FileProvider.Extract();
-  // extract.filesReflectTo
-  // ({
-  //   dstProvider : extract2,
-  //   resolvingDstSoftLink : 0,
-  //   resolvingDstTextLink : 0,
-  //   resolvingSrcSoftLink : 1,
-  //   resolvingSrcTextLink : 0,
-  //   allowingMissed : 0,
-  //   rebasingLink : 0,
-  //   resolvingSoftLink : 0,
-  // });
-  //
-  // var expected =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/file1' }],
-  //       'terLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dir1/dir2/file1' }],
-  //       'terLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3/dir4/file1' }],
-  //       'dirLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto' }],
-  //       'dirLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dir1/dir2' }],
-  //       'dirLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3' }],
-  //
-  //       'dualTerLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/file1' }],
-  //       'dualTerLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto2/file1' }],
-  //       'dualDirLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto' }],
-  //       'dualDirLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dir1/dir2' }],
-  //       'dualDirLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3' }],
-  //       'dualDirLink4' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3/dir4' }],
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : [{ softLink : 'extract' + extract.id + ':///src/proto2/file1' }],
-  //           'dirLink' : [{ softLink : 'extract' + extract.id + ':///src/proto/dir1' }],
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  // test.identical( extract2.filesTree, expected );
-  //
-  // /* - */
-  //
-  // test.close( 'relative links, rebasingLink : 0, resolvingSrcSoftLink : 1' );
-  // test.open( 'relative links, rebasingLink : 0, resolvingSrcSoftLink : 2' );
-  //
-  // /* - */
-  //
-  // var filesTree =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : [{ softLink : '../file1' }],
-  //       'terLink2' : [{ softLink : '../dir1/dir2/file1' }],
-  //       'terLink3' : [{ softLink : '../../proto2/dir3/dir4/file1' }],
-  //       'dirLink1' : [{ softLink : '..' }],
-  //       'dirLink2' : [{ softLink : '../dir1/dir2' }],
-  //       'dirLink3' : [{ softLink : '../../proto2/dir3' }],
-  //
-  //       'dualTerLink1' : [{ softLink : '../terLink1' }],
-  //       'dualTerLink2' : [{ softLink : '../../proto2/dir3/dir4/terLink' }],
-  //       'dualDirLink1' : [{ softLink : '../dirLink1' }],
-  //       'dualDirLink2' : [{ softLink : '../dirLink2' }],
-  //       'dualDirLink3' : [{ softLink : '../dirLink3' }],
-  //       'dualDirLink4' : [{ softLink : '../../proto2/dir3/dir4' }],
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : [{ softLink : '../../../file1' }],
-  //           'dirLink' : [{ softLink : '../../../../proto/dir1' }],
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  // var extract = new _.FileProvider.Extract({ filesTree });
-  // var extract2 = new _.FileProvider.Extract();
-  // extract.filesReflectTo
-  // ({
-  //   dstProvider : extract2,
-  //   resolvingDstSoftLink : 0,
-  //   resolvingDstTextLink : 0,
-  //   resolvingSrcSoftLink : 2,
-  //   resolvingSrcTextLink : 0,
-  //   allowingMissed : 0,
-  //   rebasingLink : 0,
-  //   resolvingSoftLink : 0,
-  // });
-  //
-  // var expected =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : 'src/proto/file1',
-  //       'terLink2' : 'src/proto/dir1/dir2/file1',
-  //       'terLink3' : 'src/proto2/dir3/dir4/file1',
-  //       'dirLink1' : {},
-  //       'dirLink2' : {},
-  //       'dirLink3' : {},
-  //
-  //       'dualTerLink1' : 'src/proto/file1',
-  //       'dualTerLink2' : 'src/proto2/file1',
-  //       'dualDirLink1' : {},
-  //       'dualDirLink2' : {},
-  //       'dualDirLink3' : {},
-  //       'dualDirLink4' : {},
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : 'src/proto2/file1',
-  //           'dirLink' : {},
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  // test.identical( extract2.filesTree, expected );
-  //
-  // /* - */
-  //
-  // test.close( 'relative links, rebasingLink : 0, resolvingSrcSoftLink : 2' );
-  //
-  // test.open( 'absolute links, rebasingLink : 1, resolvingSrcSoftLink : 0' );
-  //
-  // /* - */
-  //
-  // var filesTree =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : [{ softLink : '/src/proto/file1' }],
-  //       'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
-  //       'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
-  //       'dirLink1' : [{ softLink : '/src/proto' }],
-  //       'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
-  //       'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
-  //
-  //       'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
-  //       'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
-  //       'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
-  //       'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
-  //       'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
-  //       'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : [{ softLink : '/src/proto2/file1' }],
-  //           'dirLink' : [{ softLink : '/src/proto/dir1' }],
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  // var extract = new _.FileProvider.Extract({ filesTree });
-  // var extract2 = new _.FileProvider.Extract();
-  // extract.filesReflectTo
-  // ({
-  //   dstProvider : extract2,
-  //   resolvingDstSoftLink : 0,
-  //   resolvingDstTextLink : 0,
-  //   resolvingSrcSoftLink : 0,
-  //   resolvingSrcTextLink : 0,
-  //   allowingMissed : 0,
-  //   rebasingLink : 1,
-  // });
-  //
-  // var expected =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : [{ softLink : '/src/proto/file1' }],
-  //       'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
-  //       'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
-  //       'dirLink1' : [{ softLink : '/src/proto' }],
-  //       'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
-  //       'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
-  //
-  //       'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
-  //       'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
-  //       'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
-  //       'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
-  //       'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
-  //       'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : [{ softLink : '/src/proto2/file1' }],
-  //           'dirLink' : [{ softLink : '/src/proto/dir1' }],
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  // test.identical( extract2.filesTree, expected );
-  //
-  // /* - */
-  //
-  // test.close( 'absolute links, rebasingLink : 1, resolvingSrcSoftLink : 0' );
-  // test.open( 'absolute links, rebasingLink : 1, resolvingSrcSoftLink : 1' );
-  //
-  // /* - */
-  //
-  // var filesTree =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : [{ softLink : '/src/proto/file1' }],
-  //       'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
-  //       'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
-  //       'dirLink1' : [{ softLink : '/src/proto' }],
-  //       'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
-  //       'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
-  //
-  //       'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
-  //       'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
-  //       'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
-  //       'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
-  //       'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
-  //       'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : [{ softLink : '/src/proto2/file1' }],
-  //           'dirLink' : [{ softLink : '/src/proto/dir1' }],
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  //
-  // var extract = new _.FileProvider.Extract({ filesTree });
-  // var extract2 = new _.FileProvider.Extract();
-  // extract.filesReflectTo
-  // ({
-  //   dstProvider : extract2,
-  //   resolvingDstSoftLink : 0,
-  //   resolvingDstTextLink : 0,
-  //   resolvingSrcSoftLink : 1,
-  //   resolvingSrcTextLink : 0,
-  //   allowingMissed : 1,
-  //   rebasingLink : 1,
-  // });
-  //
-  // var expected =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : [{ softLink : '/src/proto/file1' }],
-  //       'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
-  //       'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
-  //       'dirLink1' : [{ softLink : '/src/proto' }],
-  //       'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
-  //       'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
-  //
-  //       'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
-  //       'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
-  //       'dualDirLink1' : [{ softLink : '/src/proto' }],
-  //       'dualDirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
-  //       'dualDirLink3' : [{ softLink : '/src/proto2/dir3' }],
-  //       'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : [{ softLink : '/src/proto2/file1' }],
-  //           'dirLink' : [{ softLink : '/src/proto/dir1' }],
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  // test.identical( extract2.filesTree, expected );
-  //
-  // /* - */
-  //
-  // test.close( 'absolute links, rebasingLink : 1, resolvingSrcSoftLink : 1' );
-  // test.open( 'absolute links, rebasingLink : 1, resolvingSrcSoftLink : 2' );
-  //
-  // /* - */
-  //
-  // var filesTree =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : [{ softLink : '/src/proto/file1' }],
-  //       'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
-  //       'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
-  //       'dirLink1' : [{ softLink : '/src/proto' }],
-  //       'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
-  //       'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
-  //
-  //       'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
-  //       'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
-  //       'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
-  //       'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
-  //       'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
-  //       'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : [{ softLink : '/src/proto2/file1' }],
-  //           'dirLink' : [{ softLink : '/src/proto/dir1' }],
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  // var extract = new _.FileProvider.Extract({ filesTree });
-  // var extract2 = new _.FileProvider.Extract();
-  // extract.filesReflectTo
-  // ({
-  //   dstProvider : extract2,
-  //   resolvingDstSoftLink : 0,
-  //   resolvingDstTextLink : 0,
-  //   resolvingSrcSoftLink : 2,
-  //   resolvingSrcTextLink : 0,
-  //   allowingMissed : 0,
-  //   rebasingLink : 1,
-  // });
-  //
-  // var expected =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : 'src/proto/file1',
-  //       'terLink2' : 'src/proto/dir1/dir2/file1',
-  //       'terLink3' : 'src/proto2/dir3/dir4/file1',
-  //       'dirLink1' : {},
-  //       'dirLink2' : {},
-  //       'dirLink3' : {},
-  //
-  //       'dualTerLink1' : 'src/proto/file1',
-  //       'dualTerLink2' : 'src/proto2/file1',
-  //       'dualDirLink1' : {},
-  //       'dualDirLink2' : {},
-  //       'dualDirLink3' : {},
-  //       'dualDirLink4' : {},
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : 'src/proto2/file1',
-  //           'dirLink' : {},
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  // test.identical( extract2.filesTree, expected );
-  //
-  // /* - */
-  //
-  // test.close( 'absolute links, rebasingLink : 1, resolvingSrcSoftLink : 2' );
-  // test.open( 'relative links, rebasingLink : 1, resolvingSrcSoftLink : 0' );
-  //
-  // /* - */
-  //
-  // var filesTree =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : [{ softLink : '../file1' }],
-  //       'terLink2' : [{ softLink : '../dir1/dir2/file1' }],
-  //       'terLink3' : [{ softLink : '../../proto2/dir3/dir4/file1' }],
-  //       'dirLink1' : [{ softLink : '..' }],
-  //       'dirLink2' : [{ softLink : '../dir1/dir2' }],
-  //       'dirLink3' : [{ softLink : '../../proto2/dir3' }],
-  //
-  //       'dualTerLink1' : [{ softLink : '../terLink1' }],
-  //       'dualTerLink2' : [{ softLink : '../../proto2/dir3/dir4/terLink' }],
-  //       'dualDirLink1' : [{ softLink : '../dirLink1' }],
-  //       'dualDirLink2' : [{ softLink : '../dirLink2' }],
-  //       'dualDirLink3' : [{ softLink : '../dirLink3' }],
-  //       'dualDirLink4' : [{ softLink : '../../proto2/dir3/dir4' }],
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : [{ softLink : '../../../file1' }],
-  //           'dirLink' : [{ softLink : '../../../../proto/dir1' }],
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  // var extract = new _.FileProvider.Extract({ filesTree });
-  // var extract2 = new _.FileProvider.Extract();
-  // extract.filesReflectTo
-  // ({
-  //   dstProvider : extract2,
-  //   resolvingDstSoftLink : 0,
-  //   resolvingDstTextLink : 0,
-  //   resolvingSrcSoftLink : 0,
-  //   resolvingSrcTextLink : 0,
-  //   allowingMissed : 1,
-  //   rebasingLink : 1,
-  // });
-  //
-  // var expected =
-  // {
-  //   src :
-  //   {
-  //     proto :
-  //     {
-  //       'file1' : 'src/proto/file1',
-  //       'file2' : 'src/proto/file2',
-  //
-  //       'terLink1' : [{ softLink : '../file1' }],
-  //       'terLink2' : [{ softLink : '../dir1/dir2/file1' }],
-  //       'terLink3' : [{ softLink : '../../proto2/dir3/dir4/file1' }],
-  //       'dirLink1' : [{ softLink : '..' }],
-  //       'dirLink2' : [{ softLink : '../dir1/dir2' }],
-  //       'dirLink3' : [{ softLink : '../../proto2/dir3' }],
-  //
-  //       'dualTerLink1' : [{ softLink : '../terLink1' }],
-  //       'dualTerLink2' : [{ softLink : '../../proto2/dir3/dir4/terLink' }],
-  //       'dualDirLink1' : [{ softLink : '../dirLink1' }],
-  //       'dualDirLink2' : [{ softLink : '../dirLink2' }],
-  //       'dualDirLink3' : [{ softLink : '../dirLink3' }],
-  //       'dualDirLink4' : [{ softLink : '../../proto2/dir3/dir4' }],
-  //
-  //       dir1 :
-  //       {
-  //         dir2 :
-  //         {
-  //           'file1' : 'src/proto/dir1/dir2/file1',
-  //           'file2' : 'src/proto/dir1/dir2/file1',
-  //         }
-  //       },
-  //
-  //     },
-  //     proto2 :
-  //     {
-  //       'file1' : 'src/proto2/file1',
-  //       'file2' : 'src/proto2/file2',
-  //       dir3 :
-  //       {
-  //         dir4 :
-  //         {
-  //           'file1' : 'src/proto2/dir3/dir4/file1',
-  //           'file2' : 'src/proto2/dir3/dir4/file2',
-  //           'terLink' : [{ softLink : '../../../file1' }],
-  //           'dirLink' : [{ softLink : '../../../../proto/dir1' }],
-  //         }
-  //       }
-  //     }
-  //   },
-  //   'f' : 'f',
-  //   dst :
-  //   {
-  //     'f' : 'dst/f',
-  //   },
-  // }
-  //
-  // test.identical( extract2.filesTree, expected );
-  //
-  // /* - */
-  //
-  // test.close( 'relative links, rebasingLink : 1, resolvingSrcSoftLink : 0' );
+  test.open( 'absolute links, rebasingLink : 0, resolvingSrcSoftLink : 0' );
+
+  /* - */
+
+  var filesTree =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '/src/proto' }],
+        'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
+        'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
+        'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
+        'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
+        'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
+        'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : [{ softLink : '/src/proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 0,
+    resolvingSrcTextLink : 0,
+    allowingMissed : 0,
+    rebasingLink : 0,
+    resolvingSoftLink : 0,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/terLink1' }],
+        'terLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/terLink2' }],
+        'terLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto/terLink3' }],
+        'dirLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/dirLink1' }],
+        'dirLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dirLink2' }],
+        'dirLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto/dirLink3' }],
+
+        'dualTerLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualTerLink1' }],
+        'dualTerLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualTerLink2' }],
+        'dualDirLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualDirLink1' }],
+        'dualDirLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualDirLink2' }],
+        'dualDirLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualDirLink3' }],
+        'dualDirLink4' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualDirLink4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3/dir4/terLink' }],
+            'dirLink' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3/dir4/dirLink' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.identical( extract2.filesTree, expected );
+
+  /* - */
+
+  test.close( 'absolute links, rebasingLink : 0, resolvingSrcSoftLink : 0' );
+  test.open( 'absolute links, rebasingLink : 0, resolvingSrcSoftLink : 1' );
+
+  /* - */
+
+  var filesTree =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '/src/proto' }],
+        'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
+        'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
+        'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
+        'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
+        'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
+        'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : [{ softLink : '/src/proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 1,
+    resolvingSrcTextLink : 0,
+    allowingMissed : 0,
+    rebasingLink : 0,
+    resolvingSoftLink : 0,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/file1' }],
+        'terLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto' }],
+        'dirLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dir1/dir2' }],
+        'dirLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/file1' }],
+        'dualTerLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto2/file1' }],
+        'dualDirLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto' }],
+        'dualDirLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dir1/dir2' }],
+        'dualDirLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3' }],
+        'dualDirLink4' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : 'extract' + extract.id + ':///src/proto2/file1' }],
+            'dirLink' : [{ softLink : 'extract' + extract.id + ':///src/proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.identical( extract2.filesTree, expected );
+
+  /* - */
+
+  test.close( 'absolute links, rebasingLink : 0, resolvingSrcSoftLink : 1' );
+  test.open( 'absolute links, rebasingLink : 0, resolvingSrcSoftLink : 2' );
+
+  /* - */
+
+  var filesTree =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '/src/proto' }],
+        'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
+        'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
+        'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
+        'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
+        'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
+        'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : [{ softLink : '/src/proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 2,
+    resolvingSrcTextLink : 0,
+    allowingMissed : 0,
+    rebasingLink : 0,
+    resolvingSoftLink : 0,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : 'src/proto/file1',
+        'terLink2' : 'src/proto/dir1/dir2/file1',
+        'terLink3' : 'src/proto2/dir3/dir4/file1',
+        'dirLink1' : {},
+        'dirLink2' : {},
+        'dirLink3' : {},
+
+        'dualTerLink1' : 'src/proto/file1',
+        'dualTerLink2' : 'src/proto2/file1',
+        'dualDirLink1' : {},
+        'dualDirLink2' : {},
+        'dualDirLink3' : {},
+        'dualDirLink4' : {},
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : 'src/proto2/file1',
+            'dirLink' : {},
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.identical( extract2.filesTree, expected );
+
+  /* - */
+
+  test.close( 'absolute links, rebasingLink : 0, resolvingSrcSoftLink : 2' );
+  test.open( 'relative links, rebasingLink : 0, resolvingSrcSoftLink : 0' );
+
+  /* - */
+
+  var filesTree =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '../file1' }],
+        'terLink2' : [{ softLink : '../dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '../../proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '..' }],
+        'dirLink2' : [{ softLink : '../dir1/dir2' }],
+        'dirLink3' : [{ softLink : '../../proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '../terLink1' }],
+        'dualTerLink2' : [{ softLink : '../../proto2/dir3/dir4/terLink' }],
+        'dualDirLink1' : [{ softLink : '../dirLink1' }],
+        'dualDirLink2' : [{ softLink : '../dirLink2' }],
+        'dualDirLink3' : [{ softLink : '../dirLink3' }],
+        'dualDirLink4' : [{ softLink : '../../proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '../../../file1' }],
+            'dirLink' : [{ softLink : '../../../../proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 0,
+    resolvingSrcTextLink : 0,
+    allowingMissed : 0,
+    rebasingLink : 0,
+    resolvingSoftLink : 0,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/terLink1' }],
+        'terLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/terLink2' }],
+        'terLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto/terLink3' }],
+        'dirLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/dirLink1' }],
+        'dirLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dirLink2' }],
+        'dirLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto/dirLink3' }],
+
+        'dualTerLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualTerLink1' }],
+        'dualTerLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualTerLink2' }],
+        'dualDirLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualDirLink1' }],
+        'dualDirLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualDirLink2' }],
+        'dualDirLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualDirLink3' }],
+        'dualDirLink4' : [{ softLink : 'extract' + extract.id + ':///src/proto/dualDirLink4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3/dir4/terLink' }],
+            'dirLink' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3/dir4/dirLink' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.identical( extract2.filesTree, expected );
+
+  /* - */
+
+  test.close( 'relative links, rebasingLink : 0, resolvingSrcSoftLink : 0' );
+  test.open( 'relative links, rebasingLink : 0, resolvingSrcSoftLink : 1' );
+
+  /* - */
+
+  var filesTree =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '../file1' }],
+        'terLink2' : [{ softLink : '../dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '../../proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '..' }],
+        'dirLink2' : [{ softLink : '../dir1/dir2' }],
+        'dirLink3' : [{ softLink : '../../proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '../terLink1' }],
+        'dualTerLink2' : [{ softLink : '../../proto2/dir3/dir4/terLink' }],
+        'dualDirLink1' : [{ softLink : '../dirLink1' }],
+        'dualDirLink2' : [{ softLink : '../dirLink2' }],
+        'dualDirLink3' : [{ softLink : '../dirLink3' }],
+        'dualDirLink4' : [{ softLink : '../../proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '../../../file1' }],
+            'dirLink' : [{ softLink : '../../../../proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 1,
+    resolvingSrcTextLink : 0,
+    allowingMissed : 0,
+    rebasingLink : 0,
+    resolvingSoftLink : 0,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/file1' }],
+        'terLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto' }],
+        'dirLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dir1/dir2' }],
+        'dirLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto/file1' }],
+        'dualTerLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto2/file1' }],
+        'dualDirLink1' : [{ softLink : 'extract' + extract.id + ':///src/proto' }],
+        'dualDirLink2' : [{ softLink : 'extract' + extract.id + ':///src/proto/dir1/dir2' }],
+        'dualDirLink3' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3' }],
+        'dualDirLink4' : [{ softLink : 'extract' + extract.id + ':///src/proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : 'extract' + extract.id + ':///src/proto2/file1' }],
+            'dirLink' : [{ softLink : 'extract' + extract.id + ':///src/proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.identical( extract2.filesTree, expected );
+
+  /* - */
+
+  test.close( 'relative links, rebasingLink : 0, resolvingSrcSoftLink : 1' );
+  test.open( 'relative links, rebasingLink : 0, resolvingSrcSoftLink : 2' );
+
+  /* - */
+
+  var filesTree =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '../file1' }],
+        'terLink2' : [{ softLink : '../dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '../../proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '..' }],
+        'dirLink2' : [{ softLink : '../dir1/dir2' }],
+        'dirLink3' : [{ softLink : '../../proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '../terLink1' }],
+        'dualTerLink2' : [{ softLink : '../../proto2/dir3/dir4/terLink' }],
+        'dualDirLink1' : [{ softLink : '../dirLink1' }],
+        'dualDirLink2' : [{ softLink : '../dirLink2' }],
+        'dualDirLink3' : [{ softLink : '../dirLink3' }],
+        'dualDirLink4' : [{ softLink : '../../proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '../../../file1' }],
+            'dirLink' : [{ softLink : '../../../../proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 2,
+    resolvingSrcTextLink : 0,
+    allowingMissed : 0,
+    rebasingLink : 0,
+    resolvingSoftLink : 0,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : 'src/proto/file1',
+        'terLink2' : 'src/proto/dir1/dir2/file1',
+        'terLink3' : 'src/proto2/dir3/dir4/file1',
+        'dirLink1' : {},
+        'dirLink2' : {},
+        'dirLink3' : {},
+
+        'dualTerLink1' : 'src/proto/file1',
+        'dualTerLink2' : 'src/proto2/file1',
+        'dualDirLink1' : {},
+        'dualDirLink2' : {},
+        'dualDirLink3' : {},
+        'dualDirLink4' : {},
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : 'src/proto2/file1',
+            'dirLink' : {},
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.identical( extract2.filesTree, expected );
+
+  /* - */
+
+  test.close( 'relative links, rebasingLink : 0, resolvingSrcSoftLink : 2' );
+
+  test.open( 'absolute links, rebasingLink : 1, resolvingSrcSoftLink : 0' );
+
+  /* - */
+
+  var filesTree =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '/src/proto' }],
+        'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
+        'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
+        'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
+        'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
+        'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
+        'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : [{ softLink : '/src/proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 0,
+    resolvingSrcTextLink : 0,
+    allowingMissed : 0,
+    rebasingLink : 1,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '/src/proto' }],
+        'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
+        'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
+        'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
+        'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
+        'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
+        'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : [{ softLink : '/src/proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.identical( extract2.filesTree, expected );
+
+  /* - */
+
+  test.close( 'absolute links, rebasingLink : 1, resolvingSrcSoftLink : 0' );
+  test.open( 'absolute links, rebasingLink : 1, resolvingSrcSoftLink : 1' );
+
+  /* - */
+
+  var filesTree =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '/src/proto' }],
+        'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
+        'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
+        'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
+        'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
+        'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
+        'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : [{ softLink : '/src/proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 1,
+    resolvingSrcTextLink : 0,
+    allowingMissed : 1,
+    rebasingLink : 1,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '/src/proto' }],
+        'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
+        'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '/src/proto/file1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/file1' }],
+        'dualDirLink1' : [{ softLink : '/src/proto' }],
+        'dualDirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
+        'dualDirLink3' : [{ softLink : '/src/proto2/dir3' }],
+        'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : [{ softLink : '/src/proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.identical( extract2.filesTree, expected );
+
+  /* - */
+
+  test.close( 'absolute links, rebasingLink : 1, resolvingSrcSoftLink : 1' );
+  test.open( 'absolute links, rebasingLink : 1, resolvingSrcSoftLink : 2' );
+
+  /* - */
+
+  var filesTree =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '/src/proto' }],
+        'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
+        'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
+        'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
+        'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
+        'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
+        'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : [{ softLink : '/src/proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 2,
+    resolvingSrcTextLink : 0,
+    allowingMissed : 0,
+    rebasingLink : 1,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : 'src/proto/file1',
+        'terLink2' : 'src/proto/dir1/dir2/file1',
+        'terLink3' : 'src/proto2/dir3/dir4/file1',
+        'dirLink1' : {},
+        'dirLink2' : {},
+        'dirLink3' : {},
+
+        'dualTerLink1' : 'src/proto/file1',
+        'dualTerLink2' : 'src/proto2/file1',
+        'dualDirLink1' : {},
+        'dualDirLink2' : {},
+        'dualDirLink3' : {},
+        'dualDirLink4' : {},
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : 'src/proto2/file1',
+            'dirLink' : {},
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.identical( extract2.filesTree, expected );
+
+  /* - */
+
+  test.close( 'absolute links, rebasingLink : 1, resolvingSrcSoftLink : 2' );
+  test.open( 'relative links, rebasingLink : 1, resolvingSrcSoftLink : 0' );
+
+  /* - */
+
+  var filesTree =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '../file1' }],
+        'terLink2' : [{ softLink : '../dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '../../proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '..' }],
+        'dirLink2' : [{ softLink : '../dir1/dir2' }],
+        'dirLink3' : [{ softLink : '../../proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '../terLink1' }],
+        'dualTerLink2' : [{ softLink : '../../proto2/dir3/dir4/terLink' }],
+        'dualDirLink1' : [{ softLink : '../dirLink1' }],
+        'dualDirLink2' : [{ softLink : '../dirLink2' }],
+        'dualDirLink3' : [{ softLink : '../dirLink3' }],
+        'dualDirLink4' : [{ softLink : '../../proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '../../../file1' }],
+            'dirLink' : [{ softLink : '../../../../proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 0,
+    resolvingSrcTextLink : 0,
+    allowingMissed : 1,
+    rebasingLink : 1,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '../file1' }],
+        'terLink2' : [{ softLink : '../dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '../../proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '..' }],
+        'dirLink2' : [{ softLink : '../dir1/dir2' }],
+        'dirLink3' : [{ softLink : '../../proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '../terLink1' }],
+        'dualTerLink2' : [{ softLink : '../../proto2/dir3/dir4/terLink' }],
+        'dualDirLink1' : [{ softLink : '../dirLink1' }],
+        'dualDirLink2' : [{ softLink : '../dirLink2' }],
+        'dualDirLink3' : [{ softLink : '../dirLink3' }],
+        'dualDirLink4' : [{ softLink : '../../proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '../../../file1' }],
+            'dirLink' : [{ softLink : '../../../../proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.identical( extract2.filesTree, expected );
+
+  /* - */
+
+  test.close( 'relative links, rebasingLink : 1, resolvingSrcSoftLink : 0' );
 
   test.open( 'relative links, rebasingLink : 1, resolvingSrcSoftLink : 1' );
 
@@ -23363,11 +24340,11 @@ function filesReflectToWithSoftLinksRebasing( test )
         'dirLink2' : [{ softLink : '../dir1/dir2' }],
         'dirLink3' : [{ softLink : '../../proto2/dir3' }],
 
-        'dualTerLink1' : [{ softLink : '../terLink1' }],
-        'dualTerLink2' : [{ softLink : '../../proto2/dir3/dir4/terLink' }],
-        'dualDirLink1' : [{ softLink : '../dirLink1' }],
-        'dualDirLink2' : [{ softLink : '../dirLink2' }],
-        'dualDirLink3' : [{ softLink : '../dirLink3' }],
+        'dualTerLink1' : [{ softLink : '../file1' }],
+        'dualTerLink2' : [{ softLink : '../../proto2/file1' }],
+        'dualDirLink1' : [{ softLink : '..' }],
+        'dualDirLink2' : [{ softLink : '../dir1/dir2' }],
+        'dualDirLink3' : [{ softLink : '../../proto2/dir3' }],
         'dualDirLink4' : [{ softLink : '../../proto2/dir3/dir4' }],
 
         dir1 :
@@ -23408,8 +24385,6 @@ function filesReflectToWithSoftLinksRebasing( test )
   /* - */
 
   test.close( 'relative links, rebasingLink : 1, resolvingSrcSoftLink : 1' );
-
-  debugger; return; xxx
 
   test.open( 'relative links, rebasingLink : 1, resolvingSrcSoftLink : 2' );
 
@@ -24352,8 +25327,9 @@ function filesReflectToWithSoftLinksRebasing( test )
 
   /* - */
 
-  debugger; return; xxx
-} /* end of filesReflectToWithSoftLinksRebasing */
+} /* end of function filesReflectToWithSoftLinksRebasing */
+
+filesReflectToWithSoftLinksRebasing.timeOut = 300000;
 
 //
 
@@ -24381,7 +25357,7 @@ function filesReflectToWithSoftLinksResolving( test )
 
   /* - */
 
-  test.open( 'absolute links' );
+  test.open( 'absolute links, rebasingLink : 0' );
 
   /* - */
 
@@ -24443,7 +25419,7 @@ function filesReflectToWithSoftLinksResolving( test )
 
   /* */
 
-  test.case = 'rebasingLink : 0, resolvingSrcSoftLink : 0, revisiting : 0';
+  test.case = 'resolvingSrcSoftLink : 0, revisiting : 0';
   var extract = new _.FileProvider.Extract({ filesTree });
   var extract2 = new _.FileProvider.Extract();
   var got = extract.filesReflectTo
@@ -24537,7 +25513,7 @@ function filesReflectToWithSoftLinksResolving( test )
 
   /* */
 
-  test.case = 'rebasingLink : 0, resolvingSrcSoftLink : 0, revisiting : 1';
+  test.case = 'resolvingSrcSoftLink : 0, revisiting : 1';
   var extract = new _.FileProvider.Extract({ filesTree });
   var extract2 = new _.FileProvider.Extract();
   var got = extract.filesReflectTo
@@ -24707,7 +25683,7 @@ function filesReflectToWithSoftLinksResolving( test )
 
   /* */
 
-  test.case = 'rebasingLink : 0, resolvingSrcSoftLink : 0, revisiting : 2';
+  test.case = 'resolvingSrcSoftLink : 0, revisiting : 2';
   var extract = new _.FileProvider.Extract({ filesTree });
   var extract2 = new _.FileProvider.Extract();
   var got = extract.filesReflectTo
@@ -24940,7 +25916,7 @@ function filesReflectToWithSoftLinksResolving( test )
 
   /* */
 
-  test.case = 'rebasingLink : 0, resolvingSrcSoftLink : 1, revisiting : 0';
+  test.case = 'resolvingSrcSoftLink : 1, revisiting : 0';
   var extract = new _.FileProvider.Extract({ filesTree });
   var extract2 = new _.FileProvider.Extract();
   var got = extract.filesReflectTo
@@ -25034,7 +26010,7 @@ function filesReflectToWithSoftLinksResolving( test )
 
   /* */
 
-  test.case = 'rebasingLink : 0, resolvingSrcSoftLink : 1, revisiting : 1';
+  test.case = 'resolvingSrcSoftLink : 1, revisiting : 1';
   var extract = new _.FileProvider.Extract({ filesTree });
   var extract2 = new _.FileProvider.Extract();
   var got = extract.filesReflectTo
@@ -25204,7 +26180,7 @@ function filesReflectToWithSoftLinksResolving( test )
 
   /* */
 
-  test.case = 'rebasingLink : 0, resolvingSrcSoftLink : 1, revisiting : 2';
+  test.case = 'resolvingSrcSoftLink : 1, revisiting : 2';
   var extract = new _.FileProvider.Extract({ filesTree });
   var extract2 = new _.FileProvider.Extract();
   var got = extract.filesReflectTo
@@ -25437,7 +26413,7 @@ function filesReflectToWithSoftLinksResolving( test )
 
   /* */
 
-  test.case = 'rebasingLink : 0, resolvingSrcSoftLink : 2, revisiting : 0';
+  test.case = 'resolvingSrcSoftLink : 2, revisiting : 0';
   var extract = new _.FileProvider.Extract({ filesTree });
   var extract2 = new _.FileProvider.Extract();
   var got = extract.filesReflectTo
@@ -25532,7 +26508,7 @@ function filesReflectToWithSoftLinksResolving( test )
 
   /* */
 
-  test.case = 'rebasingLink : 0, resolvingSrcSoftLink : 2, revisiting : 1';
+  test.case = 'resolvingSrcSoftLink : 2, revisiting : 1';
   var extract = new _.FileProvider.Extract({ filesTree });
   var extract2 = new _.FileProvider.Extract();
   var got = extract.filesReflectTo
@@ -25704,7 +26680,7 @@ function filesReflectToWithSoftLinksResolving( test )
 
   /* */
 
-  test.case = 'rebasingLink : 0, resolvingSrcSoftLink : 2, revisiting : 2';
+  test.case = 'resolvingSrcSoftLink : 2, revisiting : 2';
   var extract = new _.FileProvider.Extract({ filesTree });
   var extract2 = new _.FileProvider.Extract();
   var got = extract.filesReflectTo
@@ -25881,12 +26857,3019 @@ function filesReflectToWithSoftLinksResolving( test )
 
   /* - */
 
-  test.close( 'absolute links' );
+  test.close( 'absolute links, rebasingLink : 0' );
+  test.open( 'absolute links, rebasingLink : 1' );
 
   /* - */
 
-  debugger; return; xxx
-} /* end of filesReflectToWithSoftLinksResolving */
+  var filesTree =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '/src/proto' }],
+        'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
+        'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
+        'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
+        'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
+        'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
+        'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : [{ softLink : '/src/proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 0, revisiting : 0';
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  var got = extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 0,
+    resolvingSrcTextLink : 0,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    rebasingLink : 1,
+    revisiting : 0,
+    allowingMissed : 0,
+    allowingCycled : 0,
+  });
+
+  var expected =
+  [
+    '/',
+    '/f',
+    '/dst',
+    '/dst/f',
+    '/src',
+    '/src/proto',
+    '/src/proto/file1',
+    '/src/proto2/file1',
+    '/src/proto/file2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2',
+    '/src/proto2/file2'
+  ]
+  test.description = 'src/real';
+  var real = _.select( got, '*/src/real' );
+  test.identical( real, expected );
+  test.description = 'unique src/real';
+  var unique = _.arrayAppendArrayOnce( null, real );
+  test.identical( unique, real );
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file2' : 'src/proto/file2',
+
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink3' :
+        {
+          'dir4' :
+          {
+            'file2' : 'src/proto2/dir3/dir4/file2',
+          }
+        },
+
+        'dualTerLink1' : [{ softLink : '/src/proto/file1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/file1' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file2' : 'src/proto2/file2',
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.description = 'tree';
+  test.identical( extract2.filesTree, expected );
+
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 0, revisiting : 1';
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  var got = extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 0,
+    resolvingSrcTextLink : 0,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    rebasingLink : 1,
+    revisiting : 1,
+    allowingMissed : 0,
+    allowingCycled : 0,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+
+        'dualTerLink1' : [{ softLink : '/src/proto/file1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/file1' }],
+        'dualDirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dualDirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+        'dualDirLink4' :
+        {
+          'file1' : 'src/proto2/dir3/dir4/file1',
+          'file2' : 'src/proto2/dir3/dir4/file2',
+          'terLink' : [{ softLink : '/src/proto2/file1' }],
+          'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+        },
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' :
+            {
+              'dir2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' }
+            }
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.description = 'tree';
+  test.identical( extract2.filesTree, expected );
+
+  var expected =
+  [
+    '/',
+    '/f',
+    '/dst',
+    '/dst/f',
+    '/src',
+    '/src/proto',
+    '/src/proto/file1',
+    '/src/proto2/file1',
+    '/src/proto/file1',
+    '/src/proto/file2',
+    '/src/proto/file1',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2',
+    '/src/proto2/file1',
+    '/src/proto2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2'
+  ]
+  test.description = 'src/real';
+  test.identical( _.select( got, '*/src/real' ), expected );
+
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 0, revisiting : 2';
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  var got = extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 0,
+    resolvingSrcTextLink : 0,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    rebasingLink : 1,
+    revisiting : 2,
+    allowingMissed : 0,
+    allowingCycled : 0,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : {},
+        'dirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+
+        'dualTerLink1' : [{ softLink : '/src/proto/file1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/file1' }],
+        'dualDirLink1' : {},
+        'dualDirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dualDirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+        'dualDirLink4' :
+        {
+          'file1' : 'src/proto2/dir3/dir4/file1',
+          'file2' : 'src/proto2/dir3/dir4/file2',
+          'terLink' : [{ softLink : '/src/proto2/file1' }],
+          'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+        },
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' :
+            {
+              'dir2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' }
+            }
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.description = 'tree';
+  test.identical( extract2.filesTree, expected );
+  var expected =
+  [
+    '/',
+    '/f',
+    '/dst',
+    '/dst/f',
+    '/src',
+    '/src/proto',
+    '/src/proto/file1',
+    '/src/proto2/file1',
+    '/src/proto/file1',
+    '/src/proto/file2',
+    '/src/proto/file1',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2',
+    '/src/proto2/file1',
+    '/src/proto2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2'
+  ]
+  test.description = 'src/real';
+  var real = _.select( got, '*/src/real' );
+  test.identical( real, expected );
+
+  /* */
+
+  var filesTree =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '/src/proto' }],
+        'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
+        'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
+        'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
+        'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
+        'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
+        'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : [{ softLink : '/src/proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 1, revisiting : 0';
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  var got = extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 1,
+    resolvingSrcTextLink : 1,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    rebasingLink : 1,
+    revisiting : 0,
+    allowingMissed : 0,
+    allowingCycled : 0,
+  });
+
+  var expected =
+  [
+    '/',
+    '/f',
+    '/dst',
+    '/dst/f',
+    '/src',
+    '/src/proto',
+    '/src/proto/file1',
+    '/src/proto2/file1',
+    '/src/proto/file2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2',
+    '/src/proto2/file2'
+  ]
+  test.description = 'src/real';
+  var real = _.select( got, '*/src/real' );
+  test.identical( real, expected );
+  test.description = 'unique src/real';
+  var unique = _.arrayAppendArrayOnce( null, real );
+  test.identical( unique, real );
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file2' : 'src/proto/file2',
+
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink3' :
+        {
+          'dir4' :
+          {
+            'file2' : 'src/proto2/dir3/dir4/file2',
+          }
+        },
+
+        'dualTerLink1' : [{ softLink : '/src/proto/file1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/file1' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file2' : 'src/proto2/file2',
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.description = 'tree';
+  test.identical( extract2.filesTree, expected );
+
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 1, revisiting : 1';
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  var got = extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 1,
+    resolvingSrcTextLink : 1,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    rebasingLink : 1,
+    revisiting : 1,
+    allowingMissed : 0,
+    allowingCycled : 0,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+
+        'dualTerLink1' : [{ softLink : '/src/proto/file1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/file1' }],
+        'dualDirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dualDirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+        'dualDirLink4' :
+        {
+          'file1' : 'src/proto2/dir3/dir4/file1',
+          'file2' : 'src/proto2/dir3/dir4/file2',
+          'terLink' : [{ softLink : '/src/proto2/file1' }],
+          'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+        },
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' :
+            {
+              'dir2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' }
+            }
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.description = 'tree';
+  test.identical( extract2.filesTree, expected );
+  var expected =
+  [
+    '/',
+    '/f',
+    '/dst',
+    '/dst/f',
+    '/src',
+    '/src/proto',
+    '/src/proto/file1',
+    '/src/proto2/file1',
+    '/src/proto/file1',
+    '/src/proto/file2',
+    '/src/proto/file1',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2',
+    '/src/proto2/file1',
+    '/src/proto2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2'
+  ]
+  test.description = 'src/real';
+  test.identical( _.select( got, '*/src/real' ), expected );
+
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 1, revisiting : 2';
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  var got = extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 1,
+    resolvingSrcTextLink : 1,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    rebasingLink : 1,
+    revisiting : 2,
+    allowingMissed : 0,
+    allowingCycled : 0,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : {},
+        'dirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+
+        'dualTerLink1' : [{ softLink : '/src/proto/file1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/file1' }],
+        'dualDirLink1' : {},
+        'dualDirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dualDirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+        'dualDirLink4' :
+        {
+          'file1' : 'src/proto2/dir3/dir4/file1',
+          'file2' : 'src/proto2/dir3/dir4/file2',
+          'terLink' : [{ softLink : '/src/proto2/file1' }],
+          'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+        },
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' :
+            {
+              'dir2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' }
+            }
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.description = 'tree';
+  test.identical( extract2.filesTree, expected );
+  var expected =
+  [
+    '/',
+    '/f',
+    '/dst',
+    '/dst/f',
+    '/src',
+    '/src/proto',
+    '/src/proto/file1',
+    '/src/proto2/file1',
+    '/src/proto/file1',
+    '/src/proto/file2',
+    '/src/proto/file1',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2',
+    '/src/proto2/file1',
+    '/src/proto2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2'
+  ]
+  test.description = 'src/real';
+  var real = _.select( got, '*/src/real' );
+  test.identical( real, expected );
+
+  /* */
+
+  var filesTree =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '/src/proto' }],
+        'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
+        'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
+        'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
+        'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
+        'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
+        'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : [{ softLink : '/src/proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 2, revisiting : 0';
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  var got = extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 2,
+    resolvingSrcTextLink : 2,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    rebasingLink : 1,
+    revisiting : 0,
+    allowingMissed : 0,
+    allowingCycled : 0,
+  });
+
+  var expected =
+  [
+    '/',
+    '/f',
+    '/dst',
+    '/dst/f',
+    '/src',
+    '/src/proto',
+    '/src/proto/file1',
+    '/src/proto2/file1',
+    '/src/proto/file2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2',
+    '/src/proto2/file2'
+  ]
+  test.description = 'src/real';
+  var real = _.select( got, '*/src/real' );
+  test.identical( real, expected );
+  test.description = 'unique src/real';
+  var unique = _.arrayAppendArrayOnce( null, real );
+  test.identical( unique, real );
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file2' : 'src/proto/file2',
+
+        'terLink2' : 'src/proto/dir1/dir2/file1',
+        'terLink3' : 'src/proto2/dir3/dir4/file1',
+
+        'dirLink3' :
+        {
+          'dir4' :
+          {
+            'file2' : 'src/proto2/dir3/dir4/file2',
+          }
+        },
+
+        'dualTerLink1' : 'src/proto/file1',
+        'dualTerLink2' : 'src/proto2/file1',
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file2' : 'src/proto2/file2',
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.description = 'tree';
+  test.identical( extract2.filesTree, expected );
+
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 2, revisiting : 1';
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  var got = extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 2,
+    resolvingSrcTextLink : 2,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    rebasingLink : 1,
+    revisiting : 1,
+    allowingMissed : 0,
+    allowingCycled : 0,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : 'src/proto/file1',
+        'terLink2' : 'src/proto/dir1/dir2/file1',
+        'terLink3' : 'src/proto2/dir3/dir4/file1',
+
+        'dirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : 'src/proto2/file1',
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+
+        'dualTerLink1' : 'src/proto/file1',
+        'dualTerLink2' : 'src/proto2/file1',
+
+        'dualDirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dualDirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : 'src/proto2/file1',
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+        'dualDirLink4' :
+        {
+          'file1' : 'src/proto2/dir3/dir4/file1',
+          'file2' : 'src/proto2/dir3/dir4/file2',
+          'terLink' : 'src/proto2/file1',
+          'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+        },
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : 'src/proto2/file1',
+            'dirLink' :
+            {
+              'dir2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' }
+            }
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.description = 'tree';
+  test.identical( extract2.filesTree, expected );
+  var expected =
+  [
+    '/',
+    '/f',
+    '/dst',
+    '/dst/f',
+    '/src',
+    '/src/proto',
+    '/src/proto/file1',
+    '/src/proto2/file1',
+    '/src/proto/file1',
+    '/src/proto/file2',
+    '/src/proto/file1',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2',
+    '/src/proto2/file1',
+    '/src/proto2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2'
+  ]
+  test.description = 'src/real';
+  test.identical( _.select( got, '*/src/real' ), expected );
+
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 2, revisiting : 2';
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  var got = extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 2,
+    resolvingSrcTextLink : 2,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    rebasingLink : 1,
+    revisiting : 2,
+    allowingMissed : 0,
+    allowingCycled : 0,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : 'src/proto/file1',
+        'terLink2' : 'src/proto/dir1/dir2/file1',
+        'terLink3' : 'src/proto2/dir3/dir4/file1',
+
+        'dirLink1' : {},
+        'dirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : 'src/proto2/file1',
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+
+        'dualTerLink1' : 'src/proto/file1',
+        'dualTerLink2' : 'src/proto2/file1',
+
+        'dualDirLink1' : {},
+        'dualDirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dualDirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : 'src/proto2/file1',
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+        'dualDirLink4' :
+        {
+          'file1' : 'src/proto2/dir3/dir4/file1',
+          'file2' : 'src/proto2/dir3/dir4/file2',
+          'terLink' : 'src/proto2/file1',
+          'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+        },
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : 'src/proto2/file1',
+            'dirLink' :
+            {
+              'dir2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' }
+            }
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.description = 'tree';
+  test.identical( extract2.filesTree, expected );
+  var expected =
+  [
+    '/',
+    '/f',
+    '/dst',
+    '/dst/f',
+    '/src',
+    '/src/proto',
+    '/src/proto/file1',
+    '/src/proto2/file1',
+    '/src/proto/file1',
+    '/src/proto/file2',
+    '/src/proto/file1',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2',
+    '/src/proto2/file1',
+    '/src/proto2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2'
+  ]
+  test.description = 'src/real';
+  var real = _.select( got, '*/src/real' );
+  test.identical( real, expected );
+
+  /* - */
+
+  test.close( 'absolute links, rebasingLink : 1' );
+  test.open( 'absolute links, rebasingLink : 2' );
+
+  /* - */
+
+  var filesTree =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '/src/proto' }],
+        'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
+        'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
+        'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
+        'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
+        'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
+        'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : [{ softLink : '/src/proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 0, revisiting : 0';
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  var got = extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 0,
+    resolvingSrcTextLink : 0,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    rebasingLink : 2,
+    revisiting : 0,
+    allowingMissed : 0,
+    allowingCycled : 0,
+  });
+
+  var expected =
+  [
+    '/',
+    '/f',
+    '/dst',
+    '/dst/f',
+    '/src',
+    '/src/proto',
+    '/src/proto/file1',
+    '/src/proto2/file1',
+    '/src/proto/file2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2',
+    '/src/proto2/file2'
+  ]
+  test.description = 'src/real';
+  var real = _.select( got, '*/src/real' );
+  test.identical( real, expected );
+  test.description = 'unique src/real';
+  var unique = _.arrayAppendArrayOnce( null, real );
+  test.identical( unique, real );
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file2' : 'src/proto/file2',
+
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink3' :
+        {
+          'dir4' :
+          {
+            'file2' : 'src/proto2/dir3/dir4/file2',
+          }
+        },
+
+        'dualTerLink1' : [{ softLink : '/src/proto/file1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/file1' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file2' : 'src/proto2/file2',
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.description = 'tree';
+  test.identical( extract2.filesTree, expected );
+
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 0, revisiting : 1';
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  var got = extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 0,
+    resolvingSrcTextLink : 0,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    rebasingLink : 2,
+    revisiting : 1,
+    allowingMissed : 0,
+    allowingCycled : 0,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+
+        'dualTerLink1' : [{ softLink : '/src/proto/file1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/file1' }],
+        'dualDirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dualDirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+        'dualDirLink4' :
+        {
+          'file1' : 'src/proto2/dir3/dir4/file1',
+          'file2' : 'src/proto2/dir3/dir4/file2',
+          'terLink' : [{ softLink : '/src/proto2/file1' }],
+          'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+        },
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' :
+            {
+              'dir2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' }
+            }
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.description = 'tree';
+  test.identical( extract2.filesTree, expected );
+
+  var expected =
+  [
+    '/',
+    '/f',
+    '/dst',
+    '/dst/f',
+    '/src',
+    '/src/proto',
+    '/src/proto/file1',
+    '/src/proto2/file1',
+    '/src/proto/file1',
+    '/src/proto/file2',
+    '/src/proto/file1',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2',
+    '/src/proto2/file1',
+    '/src/proto2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2'
+  ]
+  test.description = 'src/real';
+  test.identical( _.select( got, '*/src/real' ), expected );
+
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 0, revisiting : 2';
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  var got = extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 0,
+    resolvingSrcTextLink : 0,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    rebasingLink : 2,
+    revisiting : 2,
+    allowingMissed : 0,
+    allowingCycled : 0,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : {},
+        'dirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+
+        'dualTerLink1' : [{ softLink : '/src/proto/file1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/file1' }],
+        'dualDirLink1' : {},
+        'dualDirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dualDirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+        'dualDirLink4' :
+        {
+          'file1' : 'src/proto2/dir3/dir4/file1',
+          'file2' : 'src/proto2/dir3/dir4/file2',
+          'terLink' : [{ softLink : '/src/proto2/file1' }],
+          'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+        },
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' :
+            {
+              'dir2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' }
+            }
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.description = 'tree';
+  test.identical( extract2.filesTree, expected );
+  var expected =
+  [
+    '/',
+    '/f',
+    '/dst',
+    '/dst/f',
+    '/src',
+    '/src/proto',
+    '/src/proto/file1',
+    '/src/proto2/file1',
+    '/src/proto/file1',
+    '/src/proto/file2',
+    '/src/proto/file1',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2',
+    '/src/proto2/file1',
+    '/src/proto2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2'
+  ]
+  test.description = 'src/real';
+  var real = _.select( got, '*/src/real' );
+  test.identical( real, expected );
+
+  /* */
+
+  var filesTree =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '/src/proto' }],
+        'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
+        'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
+        'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
+        'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
+        'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
+        'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : [{ softLink : '/src/proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 1, revisiting : 0';
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  var got = extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 1,
+    resolvingSrcTextLink : 1,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    rebasingLink : 2,
+    revisiting : 0,
+    allowingMissed : 0,
+    allowingCycled : 0,
+  });
+
+  var expected =
+  [
+    '/',
+    '/f',
+    '/dst',
+    '/dst/f',
+    '/src',
+    '/src/proto',
+    '/src/proto/file1',
+    '/src/proto2/file1',
+    '/src/proto/file2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2',
+    '/src/proto2/file2'
+  ]
+  test.description = 'src/real';
+  var real = _.select( got, '*/src/real' );
+  test.identical( real, expected );
+  test.description = 'unique src/real';
+  var unique = _.arrayAppendArrayOnce( null, real );
+  test.identical( unique, real );
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file2' : 'src/proto/file2',
+
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink3' :
+        {
+          'dir4' :
+          {
+            'file2' : 'src/proto2/dir3/dir4/file2',
+          }
+        },
+
+        'dualTerLink1' : [{ softLink : '/src/proto/file1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/file1' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file2' : 'src/proto2/file2',
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.description = 'tree';
+  test.identical( extract2.filesTree, expected );
+
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 1, revisiting : 1';
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  var got = extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 1,
+    resolvingSrcTextLink : 1,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    rebasingLink : 2,
+    revisiting : 1,
+    allowingMissed : 0,
+    allowingCycled : 0,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+
+        'dualTerLink1' : [{ softLink : '/src/proto/file1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/file1' }],
+        'dualDirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dualDirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+        'dualDirLink4' :
+        {
+          'file1' : 'src/proto2/dir3/dir4/file1',
+          'file2' : 'src/proto2/dir3/dir4/file2',
+          'terLink' : [{ softLink : '/src/proto2/file1' }],
+          'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+        },
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' :
+            {
+              'dir2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' }
+            }
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.description = 'tree';
+  test.identical( extract2.filesTree, expected );
+  var expected =
+  [
+    '/',
+    '/f',
+    '/dst',
+    '/dst/f',
+    '/src',
+    '/src/proto',
+    '/src/proto/file1',
+    '/src/proto2/file1',
+    '/src/proto/file1',
+    '/src/proto/file2',
+    '/src/proto/file1',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2',
+    '/src/proto2/file1',
+    '/src/proto2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2'
+  ]
+  test.description = 'src/real';
+  test.identical( _.select( got, '*/src/real' ), expected );
+
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 1, revisiting : 2';
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  var got = extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 1,
+    resolvingSrcTextLink : 1,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    rebasingLink : 2,
+    revisiting : 2,
+    allowingMissed : 0,
+    allowingCycled : 0,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : {},
+        'dirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+
+        'dualTerLink1' : [{ softLink : '/src/proto/file1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/file1' }],
+        'dualDirLink1' : {},
+        'dualDirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dualDirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+        'dualDirLink4' :
+        {
+          'file1' : 'src/proto2/dir3/dir4/file1',
+          'file2' : 'src/proto2/dir3/dir4/file2',
+          'terLink' : [{ softLink : '/src/proto2/file1' }],
+          'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+        },
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' :
+            {
+              'dir2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' }
+            }
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.description = 'tree';
+  test.identical( extract2.filesTree, expected );
+  var expected =
+  [
+    '/',
+    '/f',
+    '/dst',
+    '/dst/f',
+    '/src',
+    '/src/proto',
+    '/src/proto/file1',
+    '/src/proto2/file1',
+    '/src/proto/file1',
+    '/src/proto/file2',
+    '/src/proto/file1',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2',
+    '/src/proto2/file1',
+    '/src/proto2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2'
+  ]
+  test.description = 'src/real';
+  var real = _.select( got, '*/src/real' );
+  test.identical( real, expected );
+
+  /* */
+
+  var filesTree =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : [{ softLink : '/src/proto/file1' }],
+        'terLink2' : [{ softLink : '/src/proto/dir1/dir2/file1' }],
+        'terLink3' : [{ softLink : '/src/proto2/dir3/dir4/file1' }],
+        'dirLink1' : [{ softLink : '/src/proto' }],
+        'dirLink2' : [{ softLink : '/src/proto/dir1/dir2' }],
+        'dirLink3' : [{ softLink : '/src/proto2/dir3' }],
+
+        'dualTerLink1' : [{ softLink : '/src/proto/terLink1' }],
+        'dualTerLink2' : [{ softLink : '/src/proto2/dir3/dir4/terLink' }],
+        'dualDirLink1' : [{ softLink : '/src/proto/dirLink1' }],
+        'dualDirLink2' : [{ softLink : '/src/proto/dirLink2' }],
+        'dualDirLink3' : [{ softLink : '/src/proto/dirLink3' }],
+        'dualDirLink4' : [{ softLink : '/src/proto2/dir3/dir4' }],
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : [{ softLink : '/src/proto2/file1' }],
+            'dirLink' : [{ softLink : '/src/proto/dir1' }],
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 2, revisiting : 0';
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  var got = extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 2,
+    resolvingSrcTextLink : 2,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    rebasingLink : 2,
+    revisiting : 0,
+    allowingMissed : 0,
+    allowingCycled : 0,
+  });
+
+  var expected =
+  [
+    '/',
+    '/f',
+    '/dst',
+    '/dst/f',
+    '/src',
+    '/src/proto',
+    '/src/proto/file1',
+    '/src/proto2/file1',
+    '/src/proto/file2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2',
+    '/src/proto2/file2'
+  ]
+  test.description = 'src/real';
+  var real = _.select( got, '*/src/real' );
+  test.identical( real, expected );
+  test.description = 'unique src/real';
+  var unique = _.arrayAppendArrayOnce( null, real );
+  test.identical( unique, real );
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file2' : 'src/proto/file2',
+
+        'terLink2' : 'src/proto/dir1/dir2/file1',
+        'terLink3' : 'src/proto2/dir3/dir4/file1',
+
+        'dirLink3' :
+        {
+          'dir4' :
+          {
+            'file2' : 'src/proto2/dir3/dir4/file2',
+          }
+        },
+
+        'dualTerLink1' : 'src/proto/file1',
+        'dualTerLink2' : 'src/proto2/file1',
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file2' : 'src/proto2/file2',
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.description = 'tree';
+  test.identical( extract2.filesTree, expected );
+
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 2, revisiting : 1';
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  var got = extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 2,
+    resolvingSrcTextLink : 2,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    rebasingLink : 2,
+    revisiting : 1,
+    allowingMissed : 0,
+    allowingCycled : 0,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : 'src/proto/file1',
+        'terLink2' : 'src/proto/dir1/dir2/file1',
+        'terLink3' : 'src/proto2/dir3/dir4/file1',
+
+        'dirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : 'src/proto2/file1',
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+
+        'dualTerLink1' : 'src/proto/file1',
+        'dualTerLink2' : 'src/proto2/file1',
+
+        'dualDirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dualDirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : 'src/proto2/file1',
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+        'dualDirLink4' :
+        {
+          'file1' : 'src/proto2/dir3/dir4/file1',
+          'file2' : 'src/proto2/dir3/dir4/file2',
+          'terLink' : 'src/proto2/file1',
+          'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+        },
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : 'src/proto2/file1',
+            'dirLink' :
+            {
+              'dir2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' }
+            }
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.description = 'tree';
+  test.identical( extract2.filesTree, expected );
+  var expected =
+  [
+    '/',
+    '/f',
+    '/dst',
+    '/dst/f',
+    '/src',
+    '/src/proto',
+    '/src/proto/file1',
+    '/src/proto2/file1',
+    '/src/proto/file1',
+    '/src/proto/file2',
+    '/src/proto/file1',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2',
+    '/src/proto2/file1',
+    '/src/proto2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2'
+  ]
+  test.description = 'src/real';
+  test.identical( _.select( got, '*/src/real' ), expected );
+
+  /* */
+
+  test.case = 'resolvingSrcSoftLink : 2, revisiting : 2';
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var extract2 = new _.FileProvider.Extract();
+  var got = extract.filesReflectTo
+  ({
+    dstProvider : extract2,
+    resolvingDstSoftLink : 0,
+    resolvingDstTextLink : 0,
+    resolvingSrcSoftLink : 2,
+    resolvingSrcTextLink : 2,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    rebasingLink : 2,
+    revisiting : 2,
+    allowingMissed : 0,
+    allowingCycled : 0,
+  });
+
+  var expected =
+  {
+    src :
+    {
+      proto :
+      {
+        'file1' : 'src/proto/file1',
+        'file2' : 'src/proto/file2',
+
+        'terLink1' : 'src/proto/file1',
+        'terLink2' : 'src/proto/dir1/dir2/file1',
+        'terLink3' : 'src/proto2/dir3/dir4/file1',
+
+        'dirLink1' : {},
+        'dirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : 'src/proto2/file1',
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+
+        'dualTerLink1' : 'src/proto/file1',
+        'dualTerLink2' : 'src/proto2/file1',
+
+        'dualDirLink1' : {},
+        'dualDirLink2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' },
+        'dualDirLink3' :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : 'src/proto2/file1',
+            'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+          }
+        },
+        'dualDirLink4' :
+        {
+          'file1' : 'src/proto2/dir3/dir4/file1',
+          'file2' : 'src/proto2/dir3/dir4/file2',
+          'terLink' : 'src/proto2/file1',
+          'dirLink' : { dir2 : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' } },
+        },
+
+        dir1 :
+        {
+          dir2 :
+          {
+            'file1' : 'src/proto/dir1/dir2/file1',
+            'file2' : 'src/proto/dir1/dir2/file1',
+          }
+        },
+
+      },
+      proto2 :
+      {
+        'file1' : 'src/proto2/file1',
+        'file2' : 'src/proto2/file2',
+        dir3 :
+        {
+          dir4 :
+          {
+            'file1' : 'src/proto2/dir3/dir4/file1',
+            'file2' : 'src/proto2/dir3/dir4/file2',
+            'terLink' : 'src/proto2/file1',
+            'dirLink' :
+            {
+              'dir2' : { 'file1' : 'src/proto/dir1/dir2/file1', 'file2' : 'src/proto/dir1/dir2/file1' }
+            }
+          }
+        }
+      }
+    },
+    'f' : 'f',
+    dst :
+    {
+      'f' : 'dst/f',
+    },
+  }
+
+  test.description = 'tree';
+  test.identical( extract2.filesTree, expected );
+  var expected =
+  [
+    '/',
+    '/f',
+    '/dst',
+    '/dst/f',
+    '/src',
+    '/src/proto',
+    '/src/proto/file1',
+    '/src/proto2/file1',
+    '/src/proto/file1',
+    '/src/proto/file2',
+    '/src/proto/file1',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2',
+    '/src/proto2',
+    '/src/proto2/file1',
+    '/src/proto2/file2',
+    '/src/proto2/dir3',
+    '/src/proto2/dir3/dir4',
+    '/src/proto2/dir3/dir4/file1',
+    '/src/proto2/dir3/dir4/file2',
+    '/src/proto2/file1',
+    '/src/proto/dir1',
+    '/src/proto/dir1/dir2',
+    '/src/proto/dir1/dir2/file1',
+    '/src/proto/dir1/dir2/file2'
+  ]
+  test.description = 'src/real';
+  var real = _.select( got, '*/src/real' );
+  test.identical( real, expected );
+
+  /* - */
+
+  test.close( 'absolute links, rebasingLink : 2' );
+
+  /* - */
+
+  /* qqq : implement relative links cases */
+
+} /* end of function filesReflectToWithSoftLinksResolving */
+
+filesReflectToWithSoftLinksResolving.timeOut = 500000;
 
 //
 
@@ -25954,7 +29937,7 @@ function filesReflectDstIgnoring( test )
         '/src2/proto/amid' : '/src2',
       },
     },
-    filter : { recursive/**/ : 0 },
+    filter : { recursive : 0 },
     mandatory : 0,
   }
 
@@ -26048,7 +30031,7 @@ function filesReflectDstIgnoring( test )
         '/src2/proto/amid' : '/src2',
       },
     },
-    filter : { recursive/**/ : 2 },
+    filter : { recursive : 2 },
     mandatory : 0,
   }
 
@@ -26124,7 +30107,7 @@ function filesReflectDstIgnoring( test )
       basePath : '.',
       prefixPath : '/dst'
     },
-    filter : { recursive/**/ : 0 },
+    filter : { recursive : 0 },
     mandatory : 0,
   }
 
@@ -26155,13 +30138,36 @@ function filesDeleteTrivial( test )
 
   var find = provider.filesFinder
   ({
-    filter : { recursive/**/ : 2 },
-    includingTerminals : 1,
-    includingDirs : 1,
-    includingTransient : 1,
+    filter : { recursive : 2 },
+    withTerminals : 1,
+    withDirs : 1,
+    withTransient/*maybe withStem*/ : 1,
     allowingMissed : 1,
     outputFormat : 'relative',
   });
+
+  /* */
+
+  test.case = 'no file';
+
+  var expected =
+  {
+    f : 'f',
+    dir : { df : 'df' },
+  }
+  var extract1 = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      f : 'f',
+      dir : { df : 'df' },
+    },
+  });
+
+  debugger;
+  extract1.filesDelete({});
+  debugger;
+  test.identical( extract1.filesTree, expected );
 
   /* */
 
@@ -26603,7 +30609,7 @@ function filesDelete( test )
   {
     maskDirectory : /dir1$/g
   }
-  var got = provider.filesDelete({ filePath : routinePath, filter : { recursive/**/ : 2 }, throwing : 1, filter : filter });
+  var got = provider.filesDelete({ filePath : routinePath, filter : { recursive : 2 }, throwing : 1, filter });
   var deleted = _.select( got, '*/relative' );
   var expected =
   [
@@ -26622,7 +30628,7 @@ function filesDelete( test )
   test.identical( files, expected );
   tree2.finit();
 
-  //
+  /* */
 
   test.case = 'mask single terminal';
   var tree2 = _.FileProvider.Extract
@@ -26644,7 +30650,7 @@ function filesDelete( test )
   {
     maskTerminal : /file1$/g
   }
-  var got = provider.filesDelete({ filePath : routinePath, filter : { recursive/**/ : 2 }, throwing : 1, filter : filter });
+  var got = provider.filesDelete({ filePath : routinePath, filter : { recursive : 2 }, throwing : 1, filter });
   var deleted = _.select( got, '*/relative' );
   var expected =
   [
@@ -26662,14 +30668,14 @@ function filesDelete( test )
   test.identical( files, expected );
   tree2.finit();
 
-  //
+  /* */
 
   test.open( 'recursive' );
 
-  test.case = 'filter : { recursive/**/ : 0 }';
+  test.case = 'filter : { recursive : 0 }';
   provider.filesDelete( routinePath );
   system.filesReflect({ reflectMap : { 'src:///' : 'current://' + routinePath } });
-  test.shouldThrowErrorSync( () => provider.filesDelete({ filePath : routinePath, filter : { recursive/**/ : 0 } }) );
+  test.shouldThrowErrorSync( () => provider.filesDelete({ filePath : routinePath, filter : { recursive : 0 } }) );
   var files = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative' });
   test.will = 'nothing deleted';
   var expected =
@@ -26686,10 +30692,10 @@ function filesDelete( test )
   ]
   test.identical( files, expected );
 
-  test.case = 'filter : { recursive/**/ : 1 }';
+  test.case = 'filter : { recursive : 1 }';
   provider.filesDelete( routinePath );
   system.filesReflect({ reflectMap : { 'src:///' : 'current://' + routinePath } });
-  var got = provider.filesDelete({ filePath : routinePath, filter : { recursive/**/ : 1 } });
+  var got = provider.filesDelete({ filePath : routinePath, filter : { recursive : 1 } });
   var deleted = _.select( got, '*/relative' );
   test.will = 'only terminals from root and empty dirs'
   var expected =
@@ -26711,10 +30717,10 @@ function filesDelete( test )
   ];
   test.identical( files, expected );
 
-  test.case = 'filter : { recursive/**/ : 2 }';
+  test.case = 'filter : { recursive : 2 }';
   provider.filesDelete( routinePath );
   system.filesReflect({ reflectMap : { 'src:///' : 'current://' + routinePath } });
-  var got = provider.filesDelete({ filePath : routinePath, filter : { recursive/**/ : 2 } });
+  var got = provider.filesDelete({ filePath : routinePath, filter : { recursive : 2 } });
   var deleted = _.select( got, '*/relative' );
   var expected =
   [
@@ -26732,12 +30738,12 @@ function filesDelete( test )
 
   test.close( 'recursive' );
 
-  test.open( 'includingTerminals' );
+  test.open( 'withTerminals' );
 
-  test.case = 'includingTerminals off';
+  test.case = 'withTerminals off';
   provider.filesDelete( routinePath );
   system.filesReflect({ reflectMap : { 'src:///' : 'current://' + routinePath } });
-  var got = provider.filesDelete({ filePath : routinePath, includingTerminals : 0 });
+  var got = provider.filesDelete({ filePath : routinePath, withTerminals : 0 });
   var deleted = _.select( got, '*/relative' );
   var expected =
   [
@@ -26758,10 +30764,10 @@ function filesDelete( test )
   ]
   test.identical( files, expected );
 
-  test.case = 'includingTerminals off';
+  test.case = 'withTerminals off';
   provider.filesDelete( routinePath );
   system.filesReflect({ reflectMap : { 'src:///' : 'current://' + routinePath } });
-  var got = provider.filesDelete({ filePath : routinePath, includingTerminals : 0, throwing : 1 });
+  var got = provider.filesDelete({ filePath : routinePath, withTerminals : 0, throwing : 1 });
   var deleted = _.select( got, '*/relative' );
   var expected =
   [
@@ -26784,10 +30790,10 @@ function filesDelete( test )
   test.identical( files, expected );
 
 
-  test.case = 'includingTerminals off';
+  test.case = 'withTerminals off';
   provider.filesDelete( routinePath );
   system.filesReflect({ reflectMap : { 'src:///' : 'current://' + routinePath } });
-  var got = provider.filesDelete({ filePath : routinePath, includingTerminals : 1 });
+  var got = provider.filesDelete({ filePath : routinePath, withTerminals : 1 });
   var deleted = _.select( got, '*/relative' );
   var expected =
   [
@@ -26803,7 +30809,7 @@ function filesDelete( test )
   ];
   test.identical( deleted, expected );
 
-  test.close( 'includingTerminals' );
+  test.close( 'withTerminals' );
 
   test.open( 'resolvingSoftLink' );
 
@@ -26973,7 +30979,7 @@ function filesDelete( test )
 
   tree.finit();
 
-}
+} /* end of function filesDelete */
 
 //
 
@@ -27351,9 +31357,7 @@ function filesDeleteAsync( test )
   /* */
 
   return con;
-}
-
-filesDeleteAsync.timeOut = 20000;
+} /* end of function filesDeleteAsync */
 
 //
 
@@ -27391,7 +31395,7 @@ function filesDeleteDeletingEmptyDirs( test )
   provider.filesDelete( routinePath );
   tree.filesReflectTo( provider, routinePath );
   var filter = { maskDirectory : /dir.$/g }
-  var got = provider.filesDelete({ filePath : routinePath, filter : filter, deletingEmptyDirs : 0 });
+  var got = provider.filesDelete({ filePath : routinePath, filter, deletingEmptyDirs : 0 });
   var deleted = _.select( got, '*/relative');
   var expected =
   [
@@ -27406,7 +31410,7 @@ function filesDeleteDeletingEmptyDirs( test )
   provider.filesDelete( routinePath );
   tree.filesReflectTo( provider, routinePath );
   var filter = { maskDirectory : /dir.$/g }
-  var got = provider.filesDelete({ filePath : routinePath, filter : filter, deletingEmptyDirs : 1 });
+  var got = provider.filesDelete({ filePath : routinePath, filter, deletingEmptyDirs : 1 });
   var deleted = _.select( got, '*/relative');
   var expected =
   [
@@ -27436,7 +31440,7 @@ function filesDeleteDeletingEmptyDirs( test )
   ]
   test.will = 'all files should be deleted';
   test.identical( deleted, expected );
-  var files = provider.filesFindRecursive({ filePath : routinePath, includingTerminals : 1, includingDirs : 1, outputFormat : 'relative' })
+  var files = provider.filesFindRecursive({ filePath : routinePath, withTerminals : 1, withDirs : 1, outputFormat : 'relative' })
   var expected = [];
   test.identical( files, expected )
 
@@ -27464,7 +31468,7 @@ function filesDeleteDeletingEmptyDirs( test )
   provider.filesDelete( routinePath );
   tree.filesReflectTo( provider, routinePath );
   var filter = { maskDirectory : { excludeAny : 'empty'} }
-  var got = provider.filesDelete({ filePath : routinePath, filter : filter, deletingEmptyDirs : 0 });
+  var got = provider.filesDelete({ filePath : routinePath, filter, deletingEmptyDirs : 0 });
   var deleted = _.select( got, '*/relative');
   var expected =
   [
@@ -27479,7 +31483,7 @@ function filesDeleteDeletingEmptyDirs( test )
   provider.filesDelete( routinePath );
   tree.filesReflectTo( provider, routinePath );
   var filter = { maskDirectory : { excludeAny : 'empty'} }
-  var got = provider.filesDelete({ filePath : routinePath, filter : filter, deletingEmptyDirs : 1 });
+  var got = provider.filesDelete({ filePath : routinePath, filter, deletingEmptyDirs : 1 });
   var deleted = _.select( got, '*/relative');
   var expected =
   [
@@ -27489,7 +31493,7 @@ function filesDeleteDeletingEmptyDirs( test )
   ]
   test.will = 'only terminals should be deleted';
   test.identical( deleted, expected );
-  var files = provider.filesFindRecursive({ filePath : routinePath, includingTerminals : 1, includingDirs : 1, outputFormat : 'relative' })
+  var files = provider.filesFindRecursive({ filePath : routinePath, withTerminals : 1, withDirs : 1, outputFormat : 'relative' })
   var expected =
   [
     '.',
@@ -27506,7 +31510,7 @@ function filesDeleteDeletingEmptyDirs( test )
   provider.filesDelete( routinePath );
   tree.filesReflectTo( provider, routinePath );
   var filter = { maskDirectory : { excludeAny : /dir.$/g } }
-  var got = provider.filesDelete({ filePath : routinePath, filter : filter, deletingEmptyDirs : 1 });
+  var got = provider.filesDelete({ filePath : routinePath, filter, deletingEmptyDirs : 1 });
   var deleted = _.select( got, '*/relative');
   var expected =
   [
@@ -27519,7 +31523,7 @@ function filesDeleteDeletingEmptyDirs( test )
   ]
   test.will = 'only empty dirs and terminals should be deleted';
   test.identical( deleted, expected );
-  var files = provider.filesFindRecursive({ filePath : routinePath, includingTerminals : 1, includingDirs : 1, outputFormat : 'relative' })
+  var files = provider.filesFindRecursive({ filePath : routinePath, withTerminals : 1, withDirs : 1, outputFormat : 'relative' })
   var expected =
   [
     '.',
@@ -27533,7 +31537,7 @@ function filesDeleteDeletingEmptyDirs( test )
   provider.filesDelete( routinePath );
   tree.filesReflectTo( provider, routinePath );
   var filter = { maskDirectory : { excludeAny : /dir.$/g } }
-  var got = provider.filesDelete({ filePath : routinePath, filter : filter, deletingEmptyDirs : 0 });
+  var got = provider.filesDelete({ filePath : routinePath, filter, deletingEmptyDirs : 0 });
   var deleted = _.select( got, '*/relative');
   var expected =
   [
@@ -27547,9 +31551,7 @@ function filesDeleteDeletingEmptyDirs( test )
   test.will = 'only terminals and empty* dirs should be deleted';
   test.identical( deleted, expected );
 
-}
-
-filesDeleteDeletingEmptyDirs.timeOut = 20000;
+} /* end of function filesDeleteDeletingEmptyDirs */
 
 //
 
@@ -27594,7 +31596,7 @@ function filesDeleteEmptyDirs( test )
     './dir1/dir2',
     './dir1/dir2/file'
   ]
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', includingStem : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
   test.identical( expected, got );
 
   /* */
@@ -27602,7 +31604,7 @@ function filesDeleteEmptyDirs( test )
   test.case = 'not recursive'
   provider.filesDelete( routinePath );
   tree.filesReflectTo( provider, routinePath );
-  provider.filesDeleteEmptyDirs({ filePath : routinePath, filter : { recursive/**/ : 1 } });
+  provider.filesDeleteEmptyDirs({ filePath : routinePath, filter : { recursive : 1 } });
   /*
   {
     file : 'file',
@@ -27627,7 +31629,7 @@ function filesDeleteEmptyDirs( test )
     './dir1/dir2/empty3',
     './dir1/empty2'
   ]
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', includingStem : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
   test.identical( got, expected );
 
   //
@@ -27636,7 +31638,7 @@ function filesDeleteEmptyDirs( test )
   provider.filesDelete( routinePath );
   tree.filesReflectTo( provider, routinePath );
   var filter = { maskDirectory : /empty2$/ };
-  provider.filesDeleteEmptyDirs({ filePath : routinePath, filter : filter  });
+  provider.filesDeleteEmptyDirs({ filePath : routinePath, filter  });
   /*
   {
     file : 'file',
@@ -27661,7 +31663,7 @@ function filesDeleteEmptyDirs( test )
     './dir1/dir2/empty3',
     './empty1'
   ]
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', includingStem : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
   test.identical( got, expected );
 
   //
@@ -27670,7 +31672,7 @@ function filesDeleteEmptyDirs( test )
   provider.filesDelete( routinePath );
   tree.filesReflectTo( provider, routinePath );
   var filter = { maskDirectory : 'emptyDir' };
-  provider.filesDeleteEmptyDirs({ filePath : routinePath, filter : filter });
+  provider.filesDeleteEmptyDirs({ filePath : routinePath, filter });
   /*
   {
     file : 'file',
@@ -27697,7 +31699,7 @@ function filesDeleteEmptyDirs( test )
     './dir1/empty2',
     './empty1'
   ]
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', includingStem : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
   test.identical( got, expected );
 
   //
@@ -27706,7 +31708,7 @@ function filesDeleteEmptyDirs( test )
   provider.filesDelete( routinePath );
   tree.filesReflectTo( provider, routinePath );
   var filter = { maskTerminal : 'file' };
-  provider.filesDeleteEmptyDirs({ filePath : routinePath, filter : filter });
+  provider.filesDeleteEmptyDirs({ filePath : routinePath, filter });
   /*
   {
     file : 'file',
@@ -27727,7 +31729,7 @@ function filesDeleteEmptyDirs( test )
     './dir1/dir2',
     './dir1/dir2/file'
   ]
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', includingStem : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
   test.identical( got, expected );
 
   //
@@ -27760,7 +31762,7 @@ function filesDeleteEmptyDirs( test )
     './dir1/empty2',
     './empty1'
   ]
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', includingStem : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
   test.identical( got, expected );
 
   //
@@ -27794,7 +31796,7 @@ function filesDeleteEmptyDirs( test )
     './dir1/empty2',
     './empty1'
   ]
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', includingStem : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
   test.identical( got, expected );
 
   //
@@ -27828,7 +31830,7 @@ function filesDeleteEmptyDirs( test )
     './dir1/empty2',
     './empty1'
   ]
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', includingStem : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
   test.identical( got, expected );
 
   //
@@ -27849,7 +31851,7 @@ function filesDeleteEmptyDirs( test )
     './dir1/dir2/file',
     './empty1'
   ]
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', includingStem : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
   test.identical( got, expected );
 
   test.case = 'resolvingSoftLink : 0'
@@ -27886,7 +31888,7 @@ function filesDeleteEmptyDirs( test )
     './dir1/empty2',
     './empty1'
   ]
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', includingStem : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
   test.identical( got, expected );
 
   //
@@ -27894,10 +31896,10 @@ function filesDeleteEmptyDirs( test )
   if( !Config.debug )
   {
     test.case = 'including of terminals is not allow';
-    test.shouldThrowError( () => provider.filesDeleteEmptyDirs({ filePath : routinePath, includingTerminals : 1 }) )
+    test.shouldThrowError( () => provider.filesDeleteEmptyDirs({ filePath : routinePath, withTerminals : 1 }) )
 
     test.case = 'including of transients is not allow';
-    test.shouldThrowError( () => provider.filesDeleteEmptyDirs({ filePath : routinePath, includingTransient : 1 }) )
+    test.shouldThrowError( () => provider.filesDeleteEmptyDirs({ filePath : routinePath, withTransient/*maybe withStem*/ : 1 }) )
   }
 }
 
@@ -27944,7 +31946,7 @@ function filesDeleteTerminals( test )
     './dir1/emptyDir1',
     './emptyDir0'
   ]
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', includingStem : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
   test.identical( got, expected );
 
   /* */
@@ -27952,7 +31954,7 @@ function filesDeleteTerminals( test )
   test.case = 'recursion off'
   provider.filesDelete( routinePath );
   tree.filesReflectTo( provider, routinePath );
-  provider.filesDeleteTerminals({ filePath : routinePath, filter : { recursive/**/ : 0 } });
+  provider.filesDeleteTerminals({ filePath : routinePath, filter : { recursive : 0 } });
   var expected =
   [
     './terminal0',
@@ -27964,13 +31966,13 @@ function filesDeleteTerminals( test )
     './dir1/emptyDir1',
     './emptyDir0'
   ]
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', includingStem : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
   test.identical( got, expected );
 
   test.case = 'recursion only first level'
   provider.filesDelete( routinePath );
   tree.filesReflectTo( provider, routinePath );
-  provider.filesDeleteTerminals({ filePath : routinePath, filter : { recursive/**/ : 1 } });
+  provider.filesDeleteTerminals({ filePath : routinePath, filter : { recursive : 1 } });
   var expected =
   [
     './dir1',
@@ -27981,14 +31983,14 @@ function filesDeleteTerminals( test )
     './dir1/emptyDir1',
     './emptyDir0'
   ]
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', includingStem : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
   test.identical( got, expected );
 
   test.case = 'mask terminals'
   provider.filesDelete( routinePath );
   tree.filesReflectTo( provider, routinePath );
   var filter = { maskTerminal : /terminal[01]$/ }
-  provider.filesDeleteTerminals({ filePath : routinePath, filter : filter });
+  provider.filesDeleteTerminals({ filePath : routinePath, filter });
   var expected =
   [
     './dir1',
@@ -27998,14 +32000,14 @@ function filesDeleteTerminals( test )
     './dir1/emptyDir1',
     './emptyDir0'
   ]
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', includingStem : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
   test.identical( got, expected );
 
   test.case = 'mask dirs'
   provider.filesDelete( routinePath );
   tree.filesReflectTo( provider, routinePath );
   var filter = { maskDirectory : /dir2/ }
-  provider.filesDeleteTerminals({ filePath : routinePath, filter : filter });
+  provider.filesDeleteTerminals({ filePath : routinePath, filter });
   var expected =
   [
     './dir1',
@@ -28014,14 +32016,14 @@ function filesDeleteTerminals( test )
     './dir1/emptyDir1',
     './emptyDir0'
   ]
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', includingStem : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
   test.identical( got, expected );
 
   test.case = 'mask not existing terminal'
   provider.filesDelete( routinePath );
   tree.filesReflectTo( provider, routinePath );
   var filter = { maskTerminal : /missing/ }
-  provider.filesDeleteTerminals({ filePath : routinePath, filter : filter });
+  provider.filesDeleteTerminals({ filePath : routinePath, filter });
   var expected =
   [
     './terminal0',
@@ -28033,7 +32035,7 @@ function filesDeleteTerminals( test )
     './dir1/emptyDir1',
     './emptyDir0'
   ]
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', includingStem : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
   test.identical( got, expected );
 
   test.case = 'glob for terminals'
@@ -28048,7 +32050,7 @@ function filesDeleteTerminals( test )
     './dir1/emptyDir1',
     './emptyDir0'
   ]
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', includingStem : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
   test.identical( got, expected );
 
   //
@@ -28069,7 +32071,7 @@ function filesDeleteTerminals( test )
     './dir1/emptyDir1',
     './emptyDir0'
   ]
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', includingStem : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
   test.identical( got, expected );
 
   // qqq ?
@@ -28086,7 +32088,7 @@ function filesDeleteTerminals( test )
   //   './dir1/emptyDir1',
   //   './emptyDir0'
   // ]
-  // var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', includingStem : 0 });
+  // var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
   // test.identical( got, expected );
 
   //
@@ -28106,7 +32108,7 @@ function filesDeleteTerminals( test )
     './dir1/emptyDir1',
     './emptyDir0'
   ]
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', includingStem : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
   test.identical( got, expected );
 
   //
@@ -28126,19 +32128,19 @@ function filesDeleteTerminals( test )
     './emptyDir0'
   ]
   provider.filesDeleteTerminals({ filePath : routinePath, allowingMissed : 1 });
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', includingStem : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
   test.identical( got, expected );
   provider.filesDeleteTerminals({ filePath : routinePath, allowingMissed : 0 });
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', includingStem : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
   test.identical( got, expected );
 
   //
 
   if( Config.debug )
   {
-    test.shouldThrowErrorSync( () => provider.filesDeleteTerminals({ filePath : routinePath, includingDirs : 1 }) )
-    test.shouldThrowErrorSync( () => provider.filesDeleteTerminals({ filePath : routinePath, includingTransient : 1 }) )
-    test.shouldThrowErrorSync( () => provider.filesDeleteTerminals({ filePath : routinePath, includingTerminals : 0 }) )
+    test.shouldThrowErrorSync( () => provider.filesDeleteTerminals({ filePath : routinePath, withDirs : 1 }) )
+    test.shouldThrowErrorSync( () => provider.filesDeleteTerminals({ filePath : routinePath, withTransient/*maybe withStem*/ : 1 }) )
+    test.shouldThrowErrorSync( () => provider.filesDeleteTerminals({ filePath : routinePath, withTerminals : 0 }) )
     test.shouldThrowErrorSync( () => provider.filesDeleteTerminals({ filePath : routinePath, resolvingSoftLink : 1 }) )
     test.shouldThrowErrorSync( () => provider.filesDeleteTerminals({ filePath : routinePath, resolvingTextLink : 1 }) )
   }
@@ -28812,9 +32814,9 @@ function filesFindDifference( test )
     {
       src : path.join( dir, 'initial/src' ),
       dst : path.join( dir, 'initial/dst' ),
-      includingTerminals : 1,
-      includingDirs : 1,
-      filter : { recursive/**/ : 2 },
+      withTerminals : 1,
+      withDirs : 1,
+      filter : { recursive : 2 },
       onDown : function( record ){ test.identical( _.objectIs( record ), true ); },
       onUp : function( record ){ test.identical( _.objectIs( record ), true ); },
       src : { ends : sample.ends }
@@ -28838,12 +32840,12 @@ function filesFindDifference( test )
 
       // logger.log( 'got :\n' + _.toStr( got, { levels : 2 } ) );
 
-      logger.log( 'relative :\n' + _.toStr( /*context.select*/_.select( got, '*.src.relative' ), { levels : 2 } ) );
-      logger.log( 'same :\n' + _.toStr( /*context.select*/_.select( got, '*.same' ), { levels : 2 } ) );
-      logger.log( 'del :\n' + _.toStr( /*context.select*/_.select( got, '*.del' ), { levels : 2 } ) );
+      logger.log( 'relative :\n' + _.toStr( _.select( got, '*.src.relative' ), { levels : 2 } ) );
+      logger.log( 'same :\n' + _.toStr( _.select( got, '*.same' ), { levels : 2 } ) );
+      logger.log( 'del :\n' + _.toStr( _.select( got, '*.del' ), { levels : 2 } ) );
 
-      logger.log( 'newer :\n' + _.toStr( /*context.select*/_.select( got, '*.newer.side' ), { levels : 1 } ) );
-      logger.log( 'older :\n' + _.toStr( /*context.select*/_.select( got, '*.older' ), { levels : 1 } ) );
+      logger.log( 'newer :\n' + _.toStr( _.select( got, '*.newer.side' ), { levels : 1 } ) );
+      logger.log( 'older :\n' + _.toStr( _.select( got, '*.older' ), { levels : 1 } ) );
 
     }
 
@@ -28977,7 +32979,7 @@ function filesCopyWithAdapter( test )
 
     {
       name : 'remove-source-files-1',
-      options : { includingDirs : 0, removingSourceTerminals : 1, allowWrite : 1, allowRewrite : 1,  allowDelete : 0, filter : { ends : '.b' } },
+      options : { withDirs : 0, removingSourceTerminals : 1, allowWrite : 1, allowRewrite : 1,  allowDelete : 0, filter : { ends : '.b' } },
       filesTree :
       {
         initial :
@@ -29029,7 +33031,7 @@ function filesCopyWithAdapter( test )
     {
 
       name : 'remove-sorce-files-2',
-      options : { includingDirs : 0, removingSourceTerminals : 1, allowWrite : 1, allowRewrite : 1, allowDelete : 0, filter : { ends : '.b' } },
+      options : { withDirs : 0, removingSourceTerminals : 1, allowWrite : 1, allowRewrite : 1, allowDelete : 0, filter : { ends : '.b' } },
 
       expected :
       [
@@ -30448,9 +34450,9 @@ function filesCopyWithAdapter( test )
       src : path.join( dir, 'initial/src' ),
       dst : path.join( dir, 'initial/dst' ),
       investigateDestination : 1,
-      includingTerminals : 1,
-      includingDirs : 1,
-      filter : { recursive/**/ : 2 },
+      withTerminals : 1,
+      withDirs : 1,
+      filter : { recursive : 2 },
       allowWrite : 1,
       allowRewrite : 1,
       allowDelete : 0,
@@ -30476,12 +34478,12 @@ function filesCopyWithAdapter( test )
       // logger.log( 'got :\n' + _.toStr( treeGot.initial, { levels : 99 } ) );
       // logger.log( 'expected :\n' + _.toStr( sample.filesTree.got, { levels : 99 } ) );
 
-      logger.log( 'relative :\n' + _.toStr( /*context.select*/_.select( got, '*.relative' ), { levels : 2 } ) );
-      logger.log( 'action :\n' + _.toStr( /*context.select*/_.select( got, '*.action' ), { levels : 2 } ) );
+      logger.log( 'relative :\n' + _.toStr( _.select( got, '*.relative' ), { levels : 2 } ) );
+      logger.log( 'action :\n' + _.toStr( _.select( got, '*.action' ), { levels : 2 } ) );
       // logger.log( 'length :\n' + got.length + ' / ' + sample.expected.length );
 
-      //logger.log( 'same :\n' + _.toStr( /*context.select*/_.select( got, '*.same' ), { levels : 2 } ) );
-      //logger.log( 'del :\n' + _.toStr( /*context.select*/_.select( got, '*.del' ), { levels : 2 } ) );
+      //logger.log( 'same :\n' + _.toStr( _.select( got, '*.same' ), { levels : 2 } ) );
+      //logger.log( 'del :\n' + _.toStr( _.select( got, '*.del' ), { levels : 2 } ) );
 
     }
 
@@ -30513,7 +34515,7 @@ function experiment( test )
   var files = _.fileProvider.filesFind( dst );
   console.log( _.toStr( files, { levels : 99 } ) );
 
-  // var got2 = _.fileProvider.filesFind( { filePath : __dirname, filter : { recursive/**/ : 2 } } );
+  // var got2 = _.fileProvider.filesFind( { filePath : __dirname, filter : { recursive : 2 } } );
   // console.log( got2[ 0 ] );
 
 }
@@ -30542,7 +34544,7 @@ function filesFindExperiment2( test )
 
   provider.filesDelete( routinePath );
 
-  _.FileProvider.Extract({ filesTree : filesTree }).filesReflectTo
+  _.FileProvider.Extract({ filesTree }).filesReflectTo
   ({
     dst : routinePath,
     dstProvider : provider,
@@ -30554,10 +34556,10 @@ function filesFindExperiment2( test )
   var got = provider.filesFind
   ({
     filePath : routinePath,
-    filter : { recursive/**/ : 2 },
-    includingTransient : 1,
-    includingDirs : 1,
-    includingTerminals : 1,
+    filter : { recursive : 2 },
+    withTransient/*maybe withStem*/ : 1,
+    withDirs : 1,
+    withTerminals : 1,
     outputFormat : 'relative'
   })
 
@@ -30598,7 +34600,7 @@ function filesReflectExperiment( test )
     'dst' : {},
   }
 
-  _.FileProvider.Extract({ filesTree : filesTree }).filesReflectTo
+  _.FileProvider.Extract({ filesTree }).filesReflectTo
   ({
     dst : routinePath,
     dstProvider : provider,
@@ -30612,9 +34614,9 @@ function filesReflectExperiment( test )
     dstDeleting: 0,
     dstRewriting: 1,
     dstRewritingByDistinct: true,
-    includingDirs: 0,
+    withDirs: 0,
     includingDst: 1,
-    includingTerminals: 1,
+    withTerminals: 1,
     recursive: 2,
     srcDeleting: 1
   }
@@ -30670,9 +34672,11 @@ var Self =
     filesFind2,
     filesFindRecursive,
     filesFindLinked,
-    filesFindSoftLinksExtract, /* qqq : implement filesFindTextLinksExtract */
-    filesFindSoftLinksLoopsExtract, /* qqq : implement filesFindTextLinksLoopsExtract */
+    filesFindSoftLinksExtract,
+    filesFindSoftLinksLoopsExtract,
     // filesFindSoftLinks, // xxx : implement rebasingLink of filesReflect first
+    /* qqq : implement filesFindTextLinksExtract */
+    /* qqq : implement filesFindTextLinksLoopsExtract */
     filesFindResolving,
     filesFindGlob,
     filesFindOn,
@@ -30680,6 +34684,8 @@ var Self =
     filesGlob,
     filesFindDistinct,
     filesFindSimplifyGlob,
+    filesFindOptimalFilePath,
+    filesFindVisitingCertain,
     filesFindMandatoryString,
     filesFindMandatoryMap,
     filesFindExcluding,
@@ -30708,7 +34714,7 @@ var Self =
     filesReflectWithSystem,
     filesReflectLinkWithSystem,
     filesReflectDeducing,
-    filesReflectDstPreserving,
+    filesReflectOnlyPreserving,
     filesReflectDstDeletingDirs,
     filesReflectLinked,
     filesReflectTo,

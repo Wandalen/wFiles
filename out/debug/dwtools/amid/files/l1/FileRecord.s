@@ -1,4 +1,4 @@
-( function _FileRecord_s_() {
+( function _Record_s_() {
 
 'use strict';
 
@@ -1050,8 +1050,8 @@ _.assert( !_global_.wFileRecord && !_.FileRecord, 'wFileRecord already defined' 
 
 //
 
-if( typeof module !== 'undefined' )
-require( './FileRecordFactory.s' );
+// if( typeof module !== 'undefined' )
+// require( './FileRecordFactory.s' );
 
 // --
 // export

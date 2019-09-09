@@ -476,7 +476,7 @@ function filesReflectSingle_body( o )
 
   defaults.dstRewriting = 1;
   defaults.dstRewritingByDistinct = 1;
-  defaults.dstRewritingPreserving = 0;
+  defaults.dstRewritingOnlyPreserving = 0;
 
   /* */
 

@@ -18,20 +18,21 @@ if( typeof module !== 'undefined' )
 
 let _global = _global_;
 let _ = _global_.wTools;
-let Parent = null;
+let Parent = _.FileRecordContext;
 let Self = function wFileRecordFactory( o )
 {
-  if( !( this instanceof Self ) )
-  if( o instanceof Self && arguments.length === 1 )
-  {
-    _.assert( arguments.length === 1, 'Expects single argument' );
-    return o;
-  }
-  else
-  {
-    return new( _.constructorJoin( Self, arguments ) );
-  }
-  return Self.prototype.init.apply( this,arguments );
+  return _.workpiece.construct( Self, this, arguments );
+  // if( !( this instanceof Self ) )
+  // if( o instanceof Self && arguments.length === 1 )
+  // {
+  //   _.assert( arguments.length === 1, 'Expects single argument' );
+  //   return o;
+  // }
+  // else
+  // {
+  //   return new( _.constructorJoin( Self, arguments ) );
+  // }
+  // return Self.prototype.init.apply( this,arguments );
 }
 
 Self.shortName = 'FileRecordFactory';
@@ -69,27 +70,25 @@ function init( o )
     Object.assign( factory, _.mapOnly( src, Self.prototype.fieldsOfCopyableGroups ) );
   }
 
-  // factory._formAssociations();
-
   return factory;
 }
 
+// //
 //
-
-/**
- * @summary Creates factory instance ignoring unknown options.
- * @param {Object} o Options map.
- * @function TollerantFrom
- * @memberof module:Tools/mid/Files.wFileRecordFactory
-*/
-
-function TollerantFrom( o )
-{
-  _.assert( arguments.length >= 1, 'Expects at least one argument' );
-  _.assert( _.objectIs( Self.prototype.Composes ) );
-  o = _.mapsExtend( null, arguments );
-  return new Self( _.mapOnly( o, Self.prototype.fieldsOfCopyableGroups ) );
-}
+// /**
+//  * @summary Creates factory instance ignoring unknown options.
+//  * @param {Object} o Options map.
+//  * @function TolerantFrom
+//  * @memberof module:Tools/mid/Files.wFileRecordFactory
+// */
+//
+// function TolerantFrom( o )
+// {
+//   _.assert( arguments.length >= 1, 'Expects at least one argument' );
+//   _.assert( _.objectIs( Self.prototype.Composes ) );
+//   o = _.mapsExtend( null, arguments );
+//   return new Self( _.mapOnly( o, Self.prototype.fieldsOfCopyableGroups ) );
+// }
 
 //
 
@@ -110,59 +109,112 @@ function _formAssociations()
 
   /* */
 
-  if( factory.system )
-  {
-    if( factory.system.system && factory.system.system !== factory.system )
-    {
-      _.assert( factory.effectiveProvider === null || factory.effectiveProvider === factory.system );
-      factory.effectiveProvider = factory.system;
-      factory.system = factory.system.system;
-    }
-  }
-
-  // if( factory.defaultProvider )
+  // /* find file system */
+  //
+  // if( !factory.system )
+  // if( factory.effectiveProvider && factory.effectiveProvider instanceof _.FileProvider.System )
   // {
-  //   if( factory.defaultProvider instanceof _.FileProvider.System )
+  //   factory.system = factory.effectiveProvider;
+  //   factory.effectiveProvider = null;
+  // }
+  //
+  // if( !factory.system )
+  // if( factory.effectiveProvider && factory.effectiveProvider.system && factory.effectiveProvider.system instanceof _.FileProvider.System )
+  // {
+  //   factory.system = factory.effectiveProvider.system;
+  // }
+  //
+  // if( !factory.system )
+  // if( factory.defaultProvider && factory.defaultProvider instanceof _.FileProvider.System )
+  // {
+  //   factory.system = factory.defaultProvider;
+  // }
+  //
+  // if( !factory.system )
+  // if( factory.defaultProvider && factory.defaultProvider.system && factory.defaultProvider.system instanceof _.FileProvider.System )
+  // {
+  //   factory.system = factory.defaultProvider.system;
+  // }
+  //
+  // if( factory.system )
+  // if( factory.system.system && factory.system.system !== factory.system )
+  // {
+  //   _.assert( !( factory.system instanceof _.FileProvider.System ) );
+  //   if( !factory.effectiveProvider )
+  //   factory.effectiveProvider = factory.system;
+  //   factory.system = factory.system.system;
+  // }
+  //
+  // /* find effective provider */
+  //
+  // if( factory.effectiveProvider && factory.effectiveProvider instanceof _.FileProvider.System )
+  // {
+  //   _.assert( factory.system === null || factory.system === factory.effectiveProvider );
+  //   factory.system = factory.effectiveProvider;
+  //   factory.effectiveProvider = null;
+  // }
+  //
+  // /* reset system */
+  //
+  // if( factory.effectiveProvider && factory.effectiveProvider.system )
+  // {
+  //   _.assert( factory.system === null || factory.system === factory.effectiveProvider.system );
+  //   factory.system = factory.effectiveProvider.system;
+  // }
+  //
+  // /* find default provider */
+  //
+  // if( !factory.defaultProvider )
+  // {
+  //   factory.defaultProvider = factory.defaultProvider || factory.effectiveProvider || factory.system;
+  // }
+  //
+  // /* reset system */
+  //
+  // if( factory.system && !( factory.system instanceof _.FileProvider.System ) )
+  // {
+  //   _.assert( factory.system === factory.defaultProvider || factory.system === factory.effectiveProvider )
+  //   factory.system = null;
+  // }
+
+  // if( factory.system )
+  // {
+  //   if( factory.system.system && factory.system.system !== factory.system )
   //   {
-  //     _.assert( factory.system === null || factory.system === factory.defaultProvider );
-  //     factory.system = factory.defaultProvider;
-  //     factory.defaultProvider = null;
+  //     _.assert( factory.effectiveProvider === null || factory.effectiveProvider === factory.system );
+  //     factory.effectiveProvider = factory.system;
+  //     factory.system = factory.system.system;
   //   }
   // }
   //
-  // if( factory.defaultProvider && factory.defaultProvider.system )
+  // if( factory.effectiveProvider )
   // {
-  //   _.assert( factory.system === null || factory.system === factory.defaultProvider.system );
-  //   factory.system = factory.defaultProvider.system;
+  //   if( factory.effectiveProvider instanceof _.FileProvider.System )
+  //   {
+  //     _.assert( factory.system === null || factory.system === factory.effectiveProvider );
+  //     factory.system = factory.effectiveProvider;
+  //     factory.effectiveProvider = null;
+  //   }
   // }
-
-  if( factory.effectiveProvider )
-  {
-    if( factory.effectiveProvider instanceof _.FileProvider.System )
-    {
-      _.assert( factory.system === null || factory.system === factory.effectiveProvider );
-      factory.system = factory.effectiveProvider;
-      factory.effectiveProvider = null;
-    }
-  }
-
-  if( factory.effectiveProvider && factory.effectiveProvider.system )
-  {
-    _.assert( factory.system === null || factory.system === factory.effectiveProvider.system );
-    factory.system = factory.effectiveProvider.system;
-  }
-
-  if( !factory.defaultProvider )
-  {
-    factory.defaultProvider = factory.defaultProvider || factory.effectiveProvider || factory.system;
-  }
+  //
+  // if( factory.effectiveProvider && factory.effectiveProvider.system )
+  // {
+  //   _.assert( factory.system === null || factory.system === factory.effectiveProvider.system );
+  //   factory.system = factory.effectiveProvider.system;
+  // }
+  //
+  // if( !factory.defaultProvider )
+  // {
+  //   factory.defaultProvider = factory.defaultProvider || factory.effectiveProvider || factory.system;
+  // }
 
   /* */
 
-  _.assert( !factory.system || factory.system instanceof _.FileProvider.Abstract, 'Expects {- factory.system -}' );
-  _.assert( factory.defaultProvider instanceof _.FileProvider.Abstract );
-  _.assert( !factory.effectiveProvider || !( factory.effectiveProvider instanceof _.FileProvider.System ) );
+  // _.assert( !factory.system || factory.system instanceof _.FileProvider.Abstract, 'Expects {- factory.system -}' );
+  // _.assert( factory.defaultProvider instanceof _.FileProvider.Abstract );
+  // _.assert( !factory.effectiveProvider || !( factory.effectiveProvider instanceof _.FileProvider.System ) );
 
+  return Parent.prototype._formAssociations.apply( factory, arguments );
 }
 
 //
@@ -173,8 +225,6 @@ function form()
 
   _.assert( arguments.length === 0 );
   _.assert( !factory.formed );
-
-  factory._formAssociations();
 
   /* */
 
@@ -191,7 +241,7 @@ function form()
     _.assert( !!path );
 
     factory.basePath = path.from( factory.basePath );
-    factory.basePath = path.normalize( factory.basePath );
+    factory.basePath = path.canonize( factory.basePath );
 
     if( !factory.effectiveProvider )
     factory.effectiveProvider = system.providerForPath( factory.basePath );
@@ -209,7 +259,7 @@ function form()
   if( factory.dirPath )
   {
     factory.dirPath = path.from( factory.dirPath );
-    factory.dirPath = path.normalize( factory.dirPath );
+    factory.dirPath = path.canonize( factory.dirPath );
 
     if( factory.basePath )
     factory.dirPath = path.join( factory.basePath, factory.dirPath );
@@ -223,11 +273,11 @@ function form()
 
   if( !factory.stemPath )
   {
-    factory.stemPath = path.normalize( path.join( factory.basePath, factory.dirPath || '' ) );
+    factory.stemPath = path.canonize( path.join( factory.basePath, factory.dirPath || '' ) );
   }
   else if( factory.stemPath )
   {
-    factory.stemPath = path.normalize( path.join( factory.basePath, factory.dirPath || '', factory.stemPath ) );
+    factory.stemPath = path.canonize( path.join( factory.basePath, factory.dirPath || '', factory.stemPath ) );
   }
 
   if( !factory.basePath )
@@ -516,6 +566,7 @@ let Composes =
   allowingCycled : 0,
   resolvingSoftLink : null,
   resolvingTextLink : null,
+  usingSoftLink : null,
   usingTextLink : null,
   stating : null,
   resolving : 1,
@@ -546,7 +597,7 @@ let Restricts =
 
 let Statics =
 {
-  TollerantFrom : TollerantFrom,
+  // TolerantFrom : TolerantFrom,
 }
 
 let Forbids =
@@ -597,7 +648,7 @@ let Proto =
 {
 
   init,
-  TollerantFrom,
+  // TolerantFrom,
 
   _formAssociations,
   form,
@@ -637,16 +688,7 @@ _.classDeclare
   extend : Proto,
 });
 
-_.Copyable.mixin( Self );
-
-//
-
-if( typeof module !== 'undefined' )
-{
-
-  require( './FileRecord.s' );
-
-}
+// _.Copyable.mixin( Self );
 
 //
 
@@ -655,10 +697,6 @@ _[ Self.shortName ] = Self;
 // --
 // export
 // --
-
-// if( typeof module !== 'undefined' )
-// if( _global_.WTOOLS_PRIVATE )
-// { /* delete require.cache[ module.id ]; */ }
 
 if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = Self;

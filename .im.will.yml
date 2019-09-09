@@ -113,7 +113,7 @@ path :
       content : prime
 
   entry.proto.no.tests :
-    path : proto/dwtools/amid/files/UseTop.s
+    path : proto/dwtools/abase/l5/PathTools.s
     criterion :
       tests : 'no.tests'
   entry.proto.only.tests :
@@ -125,7 +125,7 @@ path :
   # npm.files : proto
 
   entry.out.raw.debug :
-    path : '{path::out.*=1}/source/dwtools/amid/files/UseTop.s'
+    path : '{path::out.*=1}/source/dwtools/abase/l5/PathTools.s'
     criterion :
       debug : [ debug, release ]
       raw : raw

@@ -56,7 +56,7 @@
 //   if( !Svn )
 //   Svn = require( 'node-svn-ultimate' );
 //
-//   self.tempPath = self.path.dirTempOpen();
+//   self.tempPath = self.path.dirTempAtOpen();
 //
 //   if( !self.hardDrive )
 //   self.hardDrive = new _.FileProvider.HardDrive();

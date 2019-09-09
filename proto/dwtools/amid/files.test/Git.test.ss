@@ -37,7 +37,7 @@ function onSuiteBegin( test )
 
   let path = context.providerDst.path;
 
-  context.testSuitePath = path.dirTempOpen( 'FileProviderGit' );
+  context.testSuitePath = path.pathDirTempOpen( 'FileProviderGit' );
   context.testSuitePath = context.providerDst.pathResolveLinkFull({ filePath : context.testSuitePath, resolvingSoftLink : 1 });
   context.testSuitePath = context.testSuitePath.absolutePath;
 }
@@ -47,7 +47,7 @@ function onSuiteEnd( test )
   let context = this;
   let path = context.providerDst.path;
   _.assert( _.strHas( context.testSuitePath, 'FileProviderGit' ) );
-  path.dirTempClose( context.testSuitePath );
+  path.pathDirTempClose( context.testSuitePath );
 }
 
 // --
@@ -80,8 +80,8 @@ function filesReflectTrivial( test )
     let files = providerDst.filesFind
     ({
       filePath : localPath,
-      includingTerminals : 1,
-      includingDirs : 1,
+      withTerminals : 1,
+      withDirs : 1,
       outputFormat : 'relative',
       filter : { recursive : 2 }
     });
@@ -117,8 +117,8 @@ function filesReflectTrivial( test )
     let files = providerDst.filesFind
     ({
       filePath : localPath,
-      includingTerminals : 1,
-      includingDirs : 1,
+      withTerminals : 1,
+      withDirs : 1,
       outputFormat : 'relative',
       filter : { recursive : 2 }
     });
@@ -154,8 +154,8 @@ function filesReflectTrivial( test )
     let files = providerDst.filesFind
     ({
       filePath : localPath,
-      includingTerminals : 1,
-      includingDirs : 1,
+      withTerminals : 1,
+      withDirs : 1,
       outputFormat : 'relative',
       filter : { recursive : 2 }
     });
@@ -192,8 +192,8 @@ function filesReflectTrivial( test )
     let files = providerDst.filesFind
     ({
       filePath : localPath,
-      includingTerminals : 1,
-      includingDirs : 1,
+      withTerminals : 1,
+      withDirs : 1,
       outputFormat : 'relative',
       filter : { recursive : 2 }
     });
@@ -222,8 +222,8 @@ function filesReflectTrivial( test )
     let files = providerDst.filesFind
     ({
       filePath : localPath,
-      includingTerminals : 1,
-      includingDirs : 1,
+      withTerminals : 1,
+      withDirs : 1,
       outputFormat : 'relative',
       filter : { recursive : 2 }
     });
@@ -269,8 +269,8 @@ function filesReflectTrivial( test )
     let files = providerDst.filesFind
     ({
       filePath : localPath,
-      includingTerminals : 1,
-      includingDirs : 1,
+      withTerminals : 1,
+      withDirs : 1,
       outputFormat : 'relative',
       filter : { recursive : 2 }
     });
@@ -306,8 +306,8 @@ function filesReflectTrivial( test )
     let files = providerDst.filesFind
     ({
       filePath : localPath,
-      includingTerminals : 1,
-      includingDirs : 1,
+      withTerminals : 1,
+      withDirs : 1,
       outputFormat : 'relative',
       filter : { recursive : 2 }
     });
@@ -350,7 +350,7 @@ function filesReflectTrivial( test )
     ({
       execPath : 'git reset --hard HEAD~1',
       currentPath : localPath,
-      ready : ready
+      ready
     })
 
     ready.then( () => system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 }) );
@@ -359,7 +359,7 @@ function filesReflectTrivial( test )
     ({
       execPath : 'git status',
       currentPath : localPath,
-      ready : ready,
+      ready,
       outputCollecting : 1
     })
 
@@ -387,7 +387,7 @@ function filesReflectTrivial( test )
     ({
       execPath : 'git commit --allow-empty -m emptycommit',
       currentPath : localPath,
-      ready : ready
+      ready
     })
 
     ready.then( () => system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 }) );
@@ -396,7 +396,7 @@ function filesReflectTrivial( test )
     ({
       execPath : 'git status',
       currentPath : localPath,
-      ready : ready,
+      ready,
       outputCollecting : 1
     })
 
@@ -411,7 +411,7 @@ function filesReflectTrivial( test )
     ({
       execPath : 'git log -n 2',
       currentPath : localPath,
-      ready : ready,
+      ready,
       outputCollecting : 1
     })
 
@@ -440,14 +440,14 @@ function filesReflectTrivial( test )
     ({
       execPath : 'git reset --hard HEAD~1',
       currentPath : localPath,
-      ready : ready
+      ready
     })
 
     _.shell
     ({
       execPath : 'git commit --allow-empty -m emptycommit',
       currentPath : localPath,
-      ready : ready
+      ready
     })
 
     ready.then( () => system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 }) );
@@ -456,7 +456,7 @@ function filesReflectTrivial( test )
     ({
       execPath : 'git status',
       currentPath : localPath,
-      ready : ready,
+      ready,
       outputCollecting : 1
     })
 
@@ -471,7 +471,7 @@ function filesReflectTrivial( test )
     ({
       execPath : 'git log -n 2',
       currentPath : localPath,
-      ready : ready,
+      ready,
       outputCollecting : 1
     })
 
@@ -501,7 +501,7 @@ function filesReflectTrivial( test )
     ({
       execPath : 'git commit --allow-empty -m emptycommit',
       currentPath : localPath,
-      ready : ready
+      ready
     })
 
     ready.then( () => system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 }) );
@@ -510,7 +510,7 @@ function filesReflectTrivial( test )
     ({
       execPath : 'git status',
       currentPath : localPath,
-      ready : ready,
+      ready,
       outputCollecting : 1
     })
 
@@ -541,7 +541,7 @@ function filesReflectTrivial( test )
     ({
       execPath : 'git status',
       currentPath : localPath,
-      ready : ready,
+      ready,
       outputCollecting : 1
     })
 
@@ -576,7 +576,7 @@ function filesReflectTrivial( test )
     ({
       execPath : 'git status',
       currentPath : localPath,
-      ready : ready,
+      ready,
       outputCollecting : 1
     })
 
@@ -597,7 +597,7 @@ function filesReflectTrivial( test )
     ({
       execPath : 'git status',
       currentPath : localPath,
-      ready : ready,
+      ready,
       outputCollecting : 1
     })
 
@@ -626,7 +626,7 @@ function filesReflectTrivial( test )
     ({
       execPath : 'git status',
       currentPath : localPath,
-      ready : ready,
+      ready,
       outputCollecting : 1
     })
 
@@ -647,7 +647,7 @@ function filesReflectTrivial( test )
     ({
       execPath : 'git status',
       currentPath : localPath,
-      ready : ready,
+      ready,
       outputCollecting : 1
     })
 
@@ -694,7 +694,7 @@ function isUpToDate( test )
   {
     test.case = 'remote master';
     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git';
-    return providerSrc.isUpToDate({ localPath : localPath, remotePath : remotePath })
+    return providerSrc.isUpToDate({ localPath, remotePath })
     .then( ( got ) =>
     {
       test.identical( got, true );
@@ -706,7 +706,7 @@ function isUpToDate( test )
   {
     test.case = 'remote has different branch';
     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git#other';
-    return providerSrc.isUpToDate({ localPath : localPath, remotePath : remotePath })
+    return providerSrc.isUpToDate({ localPath, remotePath })
     .then( ( got ) =>
     {
       test.identical( got, false );
@@ -718,7 +718,7 @@ function isUpToDate( test )
   {
     test.case = 'remote has fixed version';
     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git#c94e0130358ba54fc47237e15bac1ab18024c0a9';
-    return providerSrc.isUpToDate({ localPath : localPath, remotePath : remotePath })
+    return providerSrc.isUpToDate({ localPath, remotePath })
     .then( ( got ) =>
     {
       test.identical( got, false );
@@ -747,7 +747,7 @@ function isUpToDate( test )
   {
     test.case = 'remote has same fixed version';
     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git#c94e0130358ba54fc47237e15bac1ab18024c0a9';
-    return providerSrc.isUpToDate({ localPath : localPath, remotePath : remotePath })
+    return providerSrc.isUpToDate({ localPath, remotePath })
     .then( ( got ) =>
     {
       test.identical( got, true );
@@ -759,7 +759,7 @@ function isUpToDate( test )
   {
     test.case = 'remote has other fixed version';
     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git#469a6497f616cf18639b2aa68957f4dab78b7965';
-    return providerSrc.isUpToDate({ localPath : localPath, remotePath : remotePath })
+    return providerSrc.isUpToDate({ localPath, remotePath })
     .then( ( got ) =>
     {
       test.identical( got, false );
@@ -771,7 +771,7 @@ function isUpToDate( test )
   {
     test.case = 'remote has other branch';
     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git#other';
-    return providerSrc.isUpToDate({ localPath : localPath, remotePath : remotePath })
+    return providerSrc.isUpToDate({ localPath, remotePath })
     .then( ( got ) =>
     {
       test.identical( got, false );
@@ -799,11 +799,11 @@ function isUpToDate( test )
     ({
       execPath : 'git reset --hard HEAD~1',
       currentPath : localPath,
-      ready : ready
+      ready
     })
 
     ready
-    .then( () => providerSrc.isUpToDate({ localPath : localPath, remotePath : remotePath }) )
+    .then( () => providerSrc.isUpToDate({ localPath, remotePath }) )
     .then( ( got ) =>
     {
       test.identical( got, false );
@@ -825,11 +825,11 @@ function isUpToDate( test )
     ({
       execPath : 'git commit --allow-empty -m emptycommit',
       currentPath : localPath,
-      ready : ready
+      ready
     })
 
     ready
-    .then( () => providerSrc.isUpToDate({ localPath : localPath, remotePath : remotePath }) )
+    .then( () => providerSrc.isUpToDate({ localPath, remotePath }) )
     .then( ( got ) =>
     {
       test.identical( got, true );
@@ -851,18 +851,18 @@ function isUpToDate( test )
     ({
       execPath : 'git reset --hard HEAD~1',
       currentPath : localPath,
-      ready : ready
+      ready
     })
 
     _.shell
     ({
       execPath : 'git commit --allow-empty -m emptycommit',
       currentPath : localPath,
-      ready : ready
+      ready
     })
 
     ready
-    .then( () => providerSrc.isUpToDate({ localPath : localPath, remotePath : remotePath }) )
+    .then( () => providerSrc.isUpToDate({ localPath, remotePath }) )
     .then( ( got ) =>
     {
       test.identical( got, false );
@@ -885,11 +885,11 @@ function isUpToDate( test )
     ({
       execPath : 'git commit --allow-empty -m emptycommit',
       currentPath : localPath,
-      ready : ready
+      ready
     })
 
     ready
-    .then( () => providerSrc.isUpToDate({ localPath : localPath, remotePath : remotePath }) )
+    .then( () => providerSrc.isUpToDate({ localPath, remotePath }) )
     .then( ( got ) =>
     {
       test.identical( got, false );
@@ -930,8 +930,8 @@ var Proto =
 
   tests :
   {
-    filesReflectTrivial : filesReflectTrivial,
-    isUpToDate : isUpToDate,
+    filesReflectTrivial,
+    isUpToDate,
   },
 
 }

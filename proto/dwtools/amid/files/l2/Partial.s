@@ -180,6 +180,11 @@ function init( o )
   if( self.Self === Self )
   Object.preventExtensions( self );
 
+  if( o && o.path )
+  self.path = o.path;
+  if( self.path === null )
+  self.path = self.Path.CloneExtending({ fileProvider : self });
+
   if( o )
   {
     if( o.logger )
@@ -196,9 +201,6 @@ function init( o )
   Self.Counter += 1;
   self.id = Self.Counter;
 
-  if( self.path === null )
-  self.path = self.Path.CloneExtending({ fileProvider : self });
-
   if( self.logger === null )
   self.logger = new _.Logger({ output : _global.logger });
 
@@ -214,11 +216,11 @@ function init( o )
   if( self.verbosity >= 2 )
   self.logger.log( 'new', _.strType( self ) );
 
-  _.appExitHandlerOnce( () =>
-  {
-    debugger;
-    self.path.pathDirTempForClose()
-  });
+  // _.appExitHandlerOnce( () =>
+  // {
+  //   debugger;
+  //   self.path.pathDirTempClose()
+  // });
 
 }
 
@@ -394,7 +396,10 @@ function _preFileFilterWithoutProviderDefaults( routine, args )
     o.dst = self.recordFilter( o.dst );
     o.src.pairWithDst( o.dst );
     if( o.dst.recursive === null )
-    o.dst.recursive = 2;
+    {
+      _.assert( o.dst.formed < 5 );
+      o.dst.recursive = 2;
+    }
   }
 
   if( o.src.recursive === null && o.recursive !== null && o.recursive !== undefined )
@@ -2421,8 +2426,8 @@ let filesSize = _.routineFromPreAndBody( filesSize_pre, filesSize_body );
  *
  * @example
  * let path = 'tmp/fileSize/data4',
- * bufferData1 = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] ), // size 4
- * bufferData2 = Buffer.from( [ 0x07, 0x06, 0x05 ] ); // size 3
+ * bufferData1 = BufferNode.from( [ 0x01, 0x02, 0x03, 0x04 ] ), // size 4
+ * bufferData2 = BufferNode.from( [ 0x07, 0x06, 0x05 ] ); // size 3
  *
  * wTools.fileWrite( { filePath : path, data : bufferData1 } );
  *
@@ -2924,12 +2929,12 @@ _.assert( _.objectIs( fileRead_body.encoders ) );
  * @param {String} [o.encoding='utf8'] Determines encoding processor. The possible values are :
  *    'utf8' : default value, file content will be read as string.
  *    'json' : file content will be parsed as JSON.
- *    'arrayBuffer' : the file content will be return as raw ArrayBuffer.
+ *    'arrayBuffer' : the file content will be return as raw BufferRaw.
  * @param {fileRead~onBegin} [o.onBegin=null] @see [@link fileRead~onBegin]
  * @param {Function} [o.onEnd=null] @see [@link fileRead~onEnd]
  * @param {Function} [o.onError=null] @see [@link fileRead~onError]
  * @param {*} [o.advanced=null]
- * @returns {wConsequence|ArrayBuffer|string|Array|Object}
+ * @returns {wConsequence|BufferRaw|string|Array|Object}
  * @throws {Error} If missed arguments.
  * @throws {Error} If ( o ) has extra parameters.
  * @method fileRead
@@ -2951,7 +2956,7 @@ _.assert( _.objectIs( fileRead_body.encoders ) );
     options.encoding value), string by default ('utf8' encoding).
  * @callback fileRead~onEnd
  * @param {Error} err Error occurred during file read. If read success it's sets to null.
- * @param {ArrayBuffer|Object|Array|String} result Encoded content of read file.
+ * @param {BufferRaw|Object|Array|String} result Encoded content of read file.
  */
 
 /**
@@ -2998,12 +3003,12 @@ fileRead.having.hubResolving = 1;
  * @param {string} [o.encoding='utf8'] Determines encoding processor. The possible values are :
  *    'utf8' : default value, file content will be read as string.
  *    'json' : file content will be parsed as JSON.
- *    'arrayBuffer' : the file content will be return as raw ArrayBuffer.
+ *    'arrayBuffer' : the file content will be return as raw BufferRaw.
  * @param {fileRead~onBegin} [o.onBegin=null] @see [@link fileRead~onBegin]
  * @param {Function} [o.onEnd=null] @see [@link fileRead~onEnd]
  * @param {Function} [o.onError=null] @see [@link fileRead~onError]
  * @param {*} [o.advanced=null]
- * @returns {wConsequence|ArrayBuffer|string|Array|Object}
+ * @returns {wConsequence|BufferRaw|string|Array|Object}
  * @throws {Error} if missed arguments
  * @throws {Error} if `o` has extra parameters
  * @method fileReadSync
@@ -3711,7 +3716,7 @@ having.driving = 0;
  * let path1 = 'tmp/sample/file1',
      path2 = 'tmp/sample/file2',
      usingExtraStat = true,
-     buffer = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] );
+     buffer = BufferNode.from( [ 0x01, 0x02, 0x03, 0x04 ] );
 
    wTools.fileWrite( { filePath : path1, data : buffer } );
    setTimeout( function()
@@ -4564,7 +4569,7 @@ _.assert( _.objectIs( fileWrite_body.encoders ) );
     });
  * @param {Object} options write options
  * @param {string} options.filePath path to file is written.
- * @param {string|Buffer} [options.data=''] data to write
+ * @param {string|BufferNode} [options.data=''] data to write
  * @param {boolean} [options.append=false] if this options sets to true, method appends passed data to existing data
     in a file
  * @param {boolean} [options.sync=true] if this parameter sets to false, method writes file asynchronously.
@@ -4578,7 +4583,7 @@ _.assert( _.objectIs( fileWrite_body.encoders ) );
  * @throws {Error} If arguments are missed
  * @throws {Error} If passed more then 2 arguments.
  * @throws {Error} If `filePath` argument or options.PathFile is not string.
- * @throws {Error} If `data` argument or options.data is not string or Buffer,
+ * @throws {Error} If `data` argument or options.data is not string or BufferNode,
  * @throws {Error} If options has unexpected property.
  * @method fileWrite
  * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial#
@@ -4707,7 +4712,7 @@ _.assert( _.boolLike( _.toJson.defaults.cloning ) );
 
  * @param {Object} o write options
  * @param {string} o.filePath path to file is written.
- * @param {string|Buffer} [o.data=''] data to write
+ * @param {string|BufferNode} [o.data=''] data to write
  * @param {boolean} [o.append=false] if this options sets to true, method appends passed data to existing data
  in a file
  * @param {boolean} [o.sync=true] if this parameter sets to false, method writes file asynchronously.
@@ -6628,7 +6633,7 @@ function _fileRenameAct( c )
 
   if( c.srcStat === null )
   return null;
-  
+
   if( c.srcStat.isSoftLink() )
   {
     let chain;
@@ -6670,12 +6675,12 @@ function _fileRenameAct( c )
 
     o.srcPath = chain.found.pop();
     o.relativeSrcPath = chain.result.pop()
-    
-    let con = _.Consequence.Try( () => 
-    { 
+
+    let con = _.Consequence.Try( () =>
+    {
       let result;
       if( o.resolvingSrcSoftLink === 2 )
-      { 
+      {
         c.options2.srcPath = o.srcPath;
         c.options2.relativeSrcPath = o.relativeSrcPath;
         result = self.fileRenameAct( c.options2 );
@@ -6699,7 +6704,7 @@ function _fileRenameAct( c )
       _.each( chain.found, ( path ) => self.fileDelete( path ) )
       return true;
     })
-    
+
     return con.syncMaybe();
   }
   else if( c.srcStat.isTextLink() )
@@ -6743,12 +6748,12 @@ function _fileRenameAct( c )
 
     o.srcPath = chain.found.pop();
     o.relativeSrcPath = chain.result.pop()
-    
-    let con = _.Consequence.Try( () => 
-    { 
+
+    let con = _.Consequence.Try( () =>
+    {
       let result;
       if( o.resolvingSrcTextLink === 2 )
-      { 
+      {
         c.options2.srcPath = o.srcPath;
         c.options2.relativeSrcPath = o.relativeSrcPath;
         result = self.fileRenameAct( c.options2 );
@@ -6772,7 +6777,7 @@ function _fileRenameAct( c )
       _.each( chain.found, ( path ) => self.fileDelete( path ) )
       return true;
     })
-    
+
     return con.syncMaybe();
   }
   else
@@ -7951,7 +7956,7 @@ operates.filePath = { pathToRead : 1, vector : [ 2, 2 ] }
 
    let path1 = '/home/tmp/sample/file1',
    path2 = '/home/tmp/sample/file2',
-   buffer = Buffer.from( [ 0x01, 0x02, 0x03, 0x04 ] );
+   buffer = BufferNode.from( [ 0x01, 0x02, 0x03, 0x04 ] );
 
    wTools.fileWrite( { filePath : path1, data : buffer } );
    fs.symlinkSync( path1, path2 );

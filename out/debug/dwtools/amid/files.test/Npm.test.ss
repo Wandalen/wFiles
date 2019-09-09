@@ -27,8 +27,9 @@ function onSuiteBegin( test )
 
   let path = context.providerDst.path;
 
-  context.testSuitePath = path.dirTempOpen( 'FileProviderNpm' );
+  context.testSuitePath = path.pathDirTempOpen( 'FileProviderNpm' );
   context.testSuitePath = context.providerDst.pathResolveLinkFull({ filePath : context.testSuitePath, resolvingSoftLink : 1 });
+  context.testSuitePath = context.testSuitePath.absolutePath;
 }
 
 function onSuiteEnd( test )
@@ -36,7 +37,7 @@ function onSuiteEnd( test )
   let context = this;
   let path = context.providerDst.path;
   _.assert( _.strHas( context.testSuitePath, 'FileProviderNpm' ) );
-  path.dirTempClose( context.testSuitePath );
+  path.pathDirTempClose( context.testSuitePath );
 }
 
 // --
@@ -71,7 +72,6 @@ function filesReflectTrivial( test )
       'LICENSE',
       'package.json',
       'README.md',
-      'out',
       'proto',
       'node_modules',
     ]
@@ -96,7 +96,6 @@ function filesReflectTrivial( test )
       'LICENSE',
       'package.json',
       'README.md',
-      'out',
       'proto',
       'node_modules',
     ]
@@ -123,7 +122,6 @@ function filesReflectTrivial( test )
       'LICENSE',
       'package.json',
       'README.md',
-      'out',
       'proto',
       'node_modules',
     ]
@@ -137,7 +135,7 @@ function filesReflectTrivial( test )
   {
     test.case = 'specific version';
     providerDst.filesDelete( installPath );
-    let remotePath = 'npm:///wpathbasic#0.6.154'
+    let remotePath = 'npm:///wpathfundamentals#0.6.154'
     return system.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
   })
   .then( ( got ) =>
@@ -176,7 +174,6 @@ function filesReflectTrivial( test )
       'LICENSE',
       'package.json',
       'README.md',
-      'out',
       'proto',
       'node_modules',
     ]
@@ -451,8 +448,8 @@ var Proto =
 
   tests :
   {
-    filesReflectTrivial : filesReflectTrivial,
-    // filesReflectLocalPath : filesReflectLocalPath,
+    filesReflectTrivial,
+    // filesReflectLocalPath,
   },
 
 }

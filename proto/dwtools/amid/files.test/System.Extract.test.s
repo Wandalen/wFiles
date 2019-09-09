@@ -55,7 +55,7 @@ function onSuiteBegin()
   var self = this;
   self.providerEffective = _.FileProvider.Extract
   ({
-    filesTree : filesTree,
+    filesTree,
     protocols : [ 'current', 'second' ],
     usingExtraStat : 1
   });
@@ -102,8 +102,8 @@ var Proto =
   {
     provider : _.FileProvider.System({ empty : 1 }),
     providerEffective : null,
-    filesTree : filesTree,
-    pathFor : pathFor,
+    filesTree,
+    pathFor,
     globalFromPreferred : null
     // testFile : 'file1'
   },

@@ -77,32 +77,47 @@ function recordsOrder( records, orderingExclusion )
 // files find
 // --
 
-function _filesFindPrepare0( routine, args )
+function _filesFindPrepare0( routine, args ) /* qqq : cover each case */
 {
   let o;
 
   _.assert( arguments.length === 2 );
-  _.assert( args.length === 1 );
+  _.assert( args.length === 1 || args.length === 2, 'Expects one or two arguments' );
 
-  if( args.length === 1 && _.routineIs( args[ 0 ] ) )
+  if( args[ 0 ] && args[ 0 ] instanceof _.FileRecordFilter )
   {
-
+    o = o || Object.create( null );
+    o.filter = args[ 0 ];
+  }
+  else if( _.routineIs( args[ 0 ] ) )
+  {
     o = o || Object.create( null );
     o.onUp = args[ 0 ];
-
+  }
+  else if( _.objectIs( args[ 0 ] ) )
+  {
+    o = args[ 0 ];
   }
   else
   {
+    o = Object.create( null );
+    if( args[ 0 ] !== undefined )
+    o.filePath = args[ 0 ];
+  }
 
-    if( _.objectIs( args[ 0 ] ) )
+  if( args.length === 2 )
+  {
+    if( args[ 1 ] && args[ 1 ] instanceof _.FileRecordFilter )
     {
-      o = args[ 0 ];
+      _.assert( !o.filter )
+      o.filter = args[ 1 ];
     }
-    else
+    else if( _.routineIs( args[ 1 ] ) )
     {
-      o = { filePath : args[ 0 ] };
+      _.assert( !o.onUp );
+      o.onUp = args[ 1 ];
     }
-
+    else _.assert( 0, 'Expects filer or callback onUp as the second argument' );
   }
 
   _.routineOptions( routine, o );
@@ -111,23 +126,12 @@ function _filesFindPrepare0( routine, args )
 
   if( Config.debug )
   {
-
-    // _.assert( _.arrayHas( [ 'legacy', 'distinct' ], o.mode ), () => 'Unknown mode ' + _.strQuote( o.mode ) );
     _.assert( arguments.length === 2 );
     _.assert( 1 <= args.length && args.length <= 3 );
     _.assert( o.basePath === undefined );
     _.assert( o.prefixPath === undefined );
     _.assert( o.postfixPath === undefined );
     _.assert( _.objectIs( o.filter ) );
-
-    // let knownFormats = [ 'absolute', 'relative', 'real', 'record', 'nothing' ];
-    // _.assert
-    // (
-    //   _.arrayHas( knownFormats, o.outputFormat ),
-    //     'Unknown output format ' + _.toStrShort( o.outputFormat )
-    //   + '\nKnown output formats ' + _.toStr( knownFormats )
-    // );
-
   }
 
   return o;
@@ -170,7 +174,7 @@ function _filesFindPrepare1( routine, args )
   if( o.filter.formed < 5 )
   o.filter._formAssociations();
 
-  _.assert( !path.isEmpty( o.filter.filePath ) || !path.isEmpty( o.filter.prefixPath ), 'Please, define filePath for file filter' );
+  // _.assert( !path.isEmpty( o.filter.filePath ) || !path.isEmpty( o.filter.prefixPath ), 'Please, define filePath for file filter' );
   let hasGlob = o.filter.filePathHasGlob();
 
   if( o.filter.recursive === null )
@@ -178,30 +182,14 @@ function _filesFindPrepare1( routine, args )
     if( o.mode === 'distinct' )
     o.filter.recursive = hasGlob ? 2 : 0;
     else
-    o.filter.recursive = hasGlob ? 2 : 1;
+    o.filter.recursive = hasGlob ? 2 : 2;
   }
-
-  // if( !o.filter.formed || o.filter.formed < 5 )
-  // o.filter.form();
-  // _.assert( !!o.filter.effectiveProvider );
-
-  // o.filter.effectiveProvider._providerDefaultsApply( o );
-  //
-  // if( Config.debug )
-  // {
-  //   _.assert( o.recursive === 0 || o.recursive === 1 || o.recursive === 2, () => 'Incorrect value of recursive option', _.strQuote( o.recursive ), ', should be 0, 1 or 2' );
-  //   _.assert( !self.system || o.filter.system === self.system );
-  //   _.assert( !!o.filter.effectiveProvider );
-  //   _.assert( path.s.allAreNormalized( o.filter.filePath ) );
-  //   _.assert( o.filter.recursive === o.recursive );
-  // }
 
   if( Config.debug )
   {
     _.assert( o.recursive === undefined );
     _.assert( !self.system || o.filter.system === self.system );
-    // _.assert( !!o.filter.effectiveProvider );debugger;
-    _.assert( path.s.allAreNormalized( o.filter.filePath ) );
+    _.assert( o.filter.filePath === null || path.s.allAreNormalized( o.filter.filePath ) );
   }
 
   return o;
@@ -220,72 +208,28 @@ function _filesFindPrepare2( routine, args )
 
   /* */
 
-  // if( o.onUp === null )
-  // o.onUp = [];
-  // if( _.arrayIs( o.onUp ) )
-  // if( o.onUp.length === 0 )
-  // o.onUp = function( record, op ){ return record };
-  // else
-  // o.onUp = _.routinesComposeAllReturningLast( o.onUp );
-  // _.assert( _.routineIs( o.onUp ) );
-  //
-  // if( o.onDown === null )
-  // o.onDown = [];
-  // if( _.arrayIs( o.onDown ) )
-  // if( o.onDown.length === 0 )
-  // o.onDown = function( record, op ){};
-  // else
-  // o.onDown = _.routinesComposeReturningLast( o.onDown );
-  // _.assert( _.routineIs( o.onDown ) );
-
-  /* */
-
-  _.assert( !path.isEmpty( o.filter.filePath ) || !path.isEmpty( o.filter.prefixPath ), 'Please, define filePath for file filter' );
+  // _.assert( !path.isEmpty( o.filter.filePath ) || !path.isEmpty( o.filter.prefixPath ), 'Please, define filePath for file filter' );
   let hasGlob = o.filter.filePathHasGlob();
 
-  // if( o.recursive === null )
-  // {
-  //   if( o.mode === 'distinct' )
-  //   o.recursive = hasGlob ? 2 : 0;
-  //   else
-  //   o.recursive = hasGlob ? 2 : 1;
-  // }
-  // if( o.filter.recursive === null )
-  // o.filter.recursive = o.recursive;
-
-  if( o.includingDefunct === null )
+  if( o.withDefunct === null )
   {
     if( o.mode === 'distinct' )
-    o.includingDefunct = !hasGlob;
+    o.withDefunct = !hasGlob;
     else
-    o.includingDefunct = false;
+    o.withDefunct = false;
   }
 
-  o.includingTerminals = !!o.includingTerminals;
+  o.withTerminals = !!o.withTerminals;
 
-  if( o.mode === 'distinct' && o.includingDirs === null )
+  if( o.mode === 'distinct' && o.withDirs === null )
   {
-    o.includingDirs = !hasGlob;
+    o.withDirs = !hasGlob;
   }
-  o.includingDirs = !!o.includingDirs;
+  o.withDirs = !!o.withDirs;
 
-  if( o.includingStem === null )
-  o.includingStem = 1;
-  o.includingStem = !!o.includingStem;
-
-  // if( !o.filter.formed || o.filter.formed < 5 )
-  // o.filter.form();
-
-  // o.filter.effectiveProvider._providerDefaultsApply( o );
-  //
-  // if( Config.debug )
-  // {
-  //   _.assert( o.recursive === 0 || o.recursive === 1 || o.recursive === 2, () => 'Incorrect value of recursive option', _.strQuote( o.recursive ), ', should be 0, 1 or 2' );
-  //   _.assert( !self.system || o.filter.system === self.system );
-  //   _.assert( !!o.filter.effectiveProvider );
-  //   _.assert( path.s.allAreNormalized( o.filter.filePath ) );
-  //   _.assert( o.filter.recursive === o.recursive );
-  // }
+  if( o.withStem === null )
+  o.withStem = true;
+  o.withStem = !!o.withStem;
 
   if( Config.debug )
   {
@@ -313,6 +257,7 @@ function _filesFindFilterAbsorb( routine, args )
 
   o.filter = self.recordFilter( o.filter || {} );
 
+  if( o.filter.formed < 5 )
   if( o.filePath )
   {
     if( o.filePath instanceof _.FileRecordFilter )
@@ -327,14 +272,8 @@ function _filesFindFilterAbsorb( routine, args )
     o.filePath = null;
   }
 
-  // // if( o.filter.recursive === null )
-  // // {
-  // //   _.assert( !o.filter.formed || o.filter.formed < 5, 'o.filter.recursive should have the same value o.recursive' );
-  // //   o.filter.recursive = o.recursive;
-  // // }
-  //
-  // if( o.filter.formed < 5 )
-  // o.filter._formAssociations();
+  /* in case of '' */
+  o.filePath = null;
 
   return o;
 }
@@ -347,13 +286,30 @@ function filesFindNominal_pre( routine, args )
   let path = self.path;
 
   let o = self._filesFindPrepare0( routine, args );
-  // self._filesFindFilterAbsorb( routine, [ o ] );
+  self._filesFindFilterAbsorb( routine, [ o ] );
   self._filesFindPrepare1( routine, [ o ] );
 
   if( !o.filter.formed || o.filter.formed < 5 )
   o.filter.form();
   _.assert( !!o.filter.effectiveProvider );
   o.filter.effectiveProvider._providerDefaultsApply( o );
+
+  if( !o.filePath )
+  o.filePath = o.filter.filePathSimplest();
+
+  _.assert( o.filePath && path.isNormalized( o.filePath ), 'Expects normalized path {-o.filePath-}' );
+  _.assert( o.filePath && path.isAbsolute( o.filePath ), 'Expects absolute path {-o.filePath-}' );
+
+  if( !o.factory )
+  {
+    let o2 =
+    {
+      stemPath : o.filePath,
+      basePath : o.filter.formedBasePath[ o.filePath ],
+    };
+    _.assert( _.strDefined( o2.basePath ), 'No base path for', o.filePath );
+    o.factory = _.FileRecordFactory.TolerantFrom( o, o2 ).form();
+  }
 
   if( Config.debug )
   {
@@ -366,23 +322,16 @@ function filesFindNominal_pre( routine, args )
     );
     _.assert( !self.system || o.filter.system === self.system );
     _.assert( !!o.filter.effectiveProvider );
-    _.assert( path.s.allAreNormalized( o.filter.filePath ) );
-    // _.assert( o.filter.recursive === o.recursive );
     _.assert( _.routineIs( o.onUp ) );
     _.assert( _.routineIs( o.onDown ) );
-    _.assert( path.isNormalized( o.filePath ), 'Expects normalized path {-o.filePath-}' );
-    _.assert( path.isAbsolute( o.filePath ), 'Expects absolute path {-o.filePath-}' );
-    // _.assert( 0 <= o.recursive && o.recursive <= 2 );
     _.assert( o.filter.formed === 5, 'Expects formed filter' );
     _.assert( _.objectIs( o.filter.effectiveProvider ) );
     _.assert( _.mapIs( o.filter.formedBasePath ), 'Expects base path' );
     _.assert( o.filter.effectiveProvider instanceof _.FileProvider.Abstract );
     _.assert( o.filter.defaultProvider instanceof _.FileProvider.Abstract );
-    // _.assert( !!o.filter.effectiveProvider );
-    // _.assert( o.filter.recursive === o.recursive );
-    _.assert( o.includingTerminals === undefined );
-    _.assert( o.includingDirs === undefined );
-    _.assert( o.includingStem === undefined );
+    _.assert( o.withTerminals === undefined );
+    _.assert( o.withDirs === undefined );
+    _.assert( o.withStem === undefined );
     _.assert( o.mandatory === undefined );
     _.assert( o.orderingExclusion === undefined );
     _.assert( o.outputFormat === undefined );
@@ -391,6 +340,11 @@ function filesFindNominal_pre( routine, args )
     _.assert( o.mode === undefined );
     _.assert( o.result === undefined );
     _.assert( !!o.factory );
+    _.assert( o.factory.basePath === o.filter.formedBasePath[ o.filePath ] );
+    _.assert( o.factory.dirPath === null );
+    _.assert( o.factory.effectiveProvider === o.filter.effectiveProvider );
+    _.assert( o.factory.system === o.filter.system || o.filter.system === null );
+    _.assert( o.factory.defaultProvider === o.filter.defaultProvider );
 
   }
 
@@ -422,22 +376,6 @@ function filesFindNominal_body( o )
   _.assert( o.factory.system === o.filter.system || o.filter.system === null );
   _.assert( o.factory.defaultProvider === o.filter.defaultProvider );
 
-  // if( !stemRecord.stat )
-  // {
-  //   // if( o.includingDefunct && o.includingStem )
-  //   // {
-  //   //   stemRecord.included = true;
-  //     if( handleUp( stemRecord, o ) === _.dont )
-  //     return o;
-  //     handleDown( stemRecord, o );
-  //   // }
-  //   // else
-  //   // {
-  //   //   stemRecord.included = false;
-  //   // }
-  //   // return o;
-  // }
-
   forStem( stemRecord, o );
 
   return o;
@@ -459,13 +397,6 @@ function filesFindNominal_body( o )
     return;
     if( !r.isTransient && !r.isActual )
     return;
-
-    // let includingTransient = ( op.includingTransient && r.isTransient && op.includingDirs );
-    // let includingActual = ( op.includingActual && r.isActual && op.includingDirs );
-    // r.included = true;
-    // r.included = r.included && ( includingTransient || includingActual );
-    // r.included = r.included && ( op.includingStem || !r.isStem );
-    // r.included = r.included && ( op.includingDefunct || !!r.stat );
 
     /* up */
 
@@ -490,7 +421,6 @@ function filesFindNominal_body( o )
 
       if( files === null )
       {
-        // if( op.allowingMissed )
         if( o.factory.allowingMissed )
         {
           debugger;
@@ -508,7 +438,6 @@ function filesFindNominal_body( o )
 
       /* terminals */
 
-      // if( op.includingTerminals )
       for( let f = 0 ; f < files.length ; f++ )
       {
         let file = files[ f ];
@@ -541,13 +470,6 @@ function filesFindNominal_body( o )
     if( !r.isTransient && !r.isActual )
     return;
 
-    // let includingTransient = ( op.includingTransient && r.isTransient && op.includingTerminals );
-    // let includingActual = ( op.includingActual && r.isActual && op.includingTerminals );
-    // r.included = true;
-    // r.included = r.included && ( includingTransient || includingActual );
-    // r.included = r.included && ( op.includingStem || !r.isStem );
-    // r.included = r.included && ( op.includingDefunct || !!r.stat );
-
     handleUp( r, op );
     handleDown( r, op );
 
@@ -574,19 +496,17 @@ function filesFindNominal_body( o )
 
 }
 
-filesFindNominal_body.defaults =
-{
+var defaults = filesFindNominal_body.defaults = Object.create( null );
 
-  sync : 1,
-  filePath : null,
-  filter : null,
-  factory : null,
-  onUp : null,
-  onDown : null,
-
-}
+defaults.sync = 1;
+defaults.filePath = null;
+defaults.filter = null;
+defaults.factory = null;
+defaults.onUp = null;
+defaults.onDown = null;
 
 var having = filesFindNominal_body.having = Object.create( null );
+
 having.writing = 0;
 having.reading = 1;
 having.driving = 0;
@@ -601,7 +521,7 @@ function filesFindSingle_pre( routine, args )
   let path = self.path;
 
   let o = self._filesFindPrepare0( routine, args );
-  // self._filesFindFilterAbsorb( routine, [ o ] );
+  self._filesFindFilterAbsorb( routine, [ o ] ); // yyy
   self._filesFindPrepare1( routine, [ o ] );
   self._filesFindPrepare2( routine, [ o ] );
 
@@ -613,26 +533,21 @@ function filesFindSingle_pre( routine, args )
   if( Config.debug )
   {
     _.assertRoutineOptions( filesFindSingle_body, o );
-    // _.assert( o.recursive === 0 || o.recursive === 1 || o.recursive === 2, () => 'Incorrect value of recursive option', _.strQuote( o.recursive ), ', should be 0, 1 or 2' );
     _.assert( !self.system || o.filter.system === self.system );
     _.assert( !!o.filter.effectiveProvider );
-    _.assert( path.s.allAreNormalized( o.filter.filePath ) );
-    // _.assert( o.filter.recursive === o.recursive );
     _.assert( _.routineIs( o.onUp ) );
     _.assert( _.routineIs( o.onDown ) );
     _.assert( path.isNormalized( o.filePath ), 'Expects normalized path {-o.filePath-}' );
     _.assert( path.isAbsolute( o.filePath ), 'Expects absolute path {-o.filePath-}' );
-    // _.assert( 0 <= o.recursive && o.recursive <= 2 );
     _.assert( o.filter.formed === 5, 'Expects formed filter' );
     _.assert( _.objectIs( o.filter.effectiveProvider ) );
     _.assert( _.mapIs( o.filter.formedBasePath ), 'Expects base path' );
-    _.assert( _.boolLike( o.includingTerminals ) );
-    _.assert( _.boolLike( o.includingDirs ) );
-    _.assert( _.boolLike( o.includingStem ) );
+    _.assert( _.boolLike( o.withTerminals ) );
+    _.assert( _.boolLike( o.withDirs ) );
+    _.assert( _.boolLike( o.withStem ) );
     _.assert( !!o.filter.effectiveProvider );
     _.assert( o.filter.effectiveProvider instanceof _.FileProvider.Abstract );
     _.assert( o.filter.defaultProvider instanceof _.FileProvider.Abstract );
-    // _.assert( o.filter.recursive === o.recursive );
     _.assert( o.mandatory === undefined );
     _.assert( o.orderingExclusion === undefined );
     _.assert( o.outputFormat === undefined );
@@ -657,17 +572,18 @@ function filesFindSingle_body( o )
   _.assertRoutineOptions( filesFindSingle_body, arguments );
 
   let o2 = _.mapExtend( null, o );
-  delete o2.includingTerminals;
-  delete o2.includingDirs;
-  delete o2.includingActual;
-  delete o2.includingTransient;
-  delete o2.includingStem;
-  delete o2.includingDefunct;
+  delete o2.withTerminals;
+  delete o2.withDirs;
+  delete o2.withActual;
+  delete o2.withTransient;
+  delete o2.withStem;
+  delete o2.withDefunct;
+  delete o2.visitingCertain;
 
   o2.onUp = handleUp;
   o2.onDown = handleDown;
 
-  let result = self.filesFindNominal( o2 );
+  let result = self.filesFindNominal.body.call( self, o2 );
   return result;
 
   /* - */
@@ -675,14 +591,21 @@ function filesFindSingle_body( o )
   function handleUp( record, op )
   {
 
-    let includingFile = record.isDir ? o.includingDirs : o.includingTerminals;
-    let includingTransient = ( o.includingTransient && record.isTransient );
-    let includingActual = ( o.includingActual && record.isActual );
+    if( !o.visitingCertain && !record.isStem )
+    {
+      let hasMask = o.filter.hasMask();
+      if( !hasMask )
+      return _.dont;
+    }
+
+    let includingFile = record.isDir ? o.withDirs : o.withTerminals;
+    let withTransient = ( o.withTransient && record.isTransient );
+    let withActual = ( o.withActual && record.isActual );
     let included = true;
-    included = included && ( includingTransient || includingActual );
+    included = included && ( withTransient || withActual );
     included = included && ( includingFile );
-    included = included && ( o.includingStem || !record.isStem );
-    included = included && ( o.includingDefunct || !!record.stat );
+    included = included && ( o.withStem || !record.isStem );
+    included = included && ( o.withDefunct || !!record.stat );
     record.included = included;
 
     _.assert( arguments.length === 2 );
@@ -703,236 +626,19 @@ function filesFindSingle_body( o )
 
 }
 
-var defaults = filesFindSingle_body.defaults = _.mapExtend( null, filesFindNominal.defaults );
+_.routineExtend( filesFindSingle_body, filesFindNominal );
 
-defaults.includingTerminals = 1;
-defaults.includingDirs = null;
-defaults.includingActual = 1;
-defaults.includingTransient = 0;
-defaults.includingStem = 1;
-defaults.includingDefunct = null;
+var defaults = filesFindSingle_body.defaults = _.mapExtend( null, filesFindSingle_body.defaults );
 
-var having = filesFindSingle_body.having = Object.create( null );
-
-having.writing = 0;
-having.reading = 1;
-having.driving = 0;
+defaults.withTerminals = true;
+defaults.withDirs = null;
+defaults.withActual = true;
+defaults.withTransient = false;
+defaults.withStem = true;
+defaults.withDefunct = null;
+defaults.visitingCertain = true;
 
 let filesFindSingle = _.routineFromPreAndBody( filesFindSingle_pre, filesFindSingle_body );
-
-// //
-//
-// function filesFindSingle_body( o )
-// {
-//   let self = this;
-//   let path = self.path;
-//
-//   o.filter.effectiveProvider.assertProviderDefaults( o );
-//   _.assertRoutineOptions( filesFindSingle_body, arguments );
-//   _.assert( o.filter.recursive === o.recursive );
-//   _.assert( !!o.factory );
-//   _.assert( _.routineIs( o.onUp ) );
-//   _.assert( _.routineIs( o.onDown ) );
-//
-//   /* */
-//
-//   Object.freeze( o );
-//
-//   let stemRecord = o.factory.record( o.filePath );
-//   _.assert( stemRecord.isStem === true );
-//
-//   _.assert( o.factory.basePath === o.filter.formedBasePath[ o.filePath ] );
-//   _.assert( o.factory.dirPath === null );
-//   _.assert( o.factory.effectiveProvider === o.filter.effectiveProvider );
-//   _.assert( o.factory.system === o.filter.system || o.filter.system === null );
-//   _.assert( o.factory.defaultProvider === o.filter.defaultProvider );
-//
-//   if( !stemRecord.stat )
-//   {
-//     if( o.includingDefunct && o.includingStem )
-//     {
-//       stemRecord.included = true;
-//       if( handleUp( stemRecord, o ) === _.dont )
-//       return o;
-//       handleDown( stemRecord, o );
-//     }
-//     else
-//     {
-//       stemRecord.included = false;
-//     }
-//     return o;
-//   }
-//
-//   forStem( stemRecord, o );
-//
-//   return o;
-//
-//   /* */
-//
-//   function forStem( r, op )
-//   {
-//     forDirectory( r, op )
-//     forTerminal( r, op )
-//   }
-//
-//   /* */
-//
-//   function forDirectory( r, op )
-//   {
-//
-//     if( !r.isDir )
-//     return;
-//     if( !r.isTransient && !r.isActual )
-//     return;
-//
-//     let includingTransient = ( op.includingTransient && r.isTransient && op.includingDirs );
-//     let includingActual = ( op.includingActual && r.isActual && op.includingDirs );
-//     r.included = true;
-//     r.included = r.included && ( includingTransient || includingActual );
-//     r.included = r.included && ( op.includingStem || !r.isStem );
-//     r.included = r.included && ( op.includingDefunct || !!r.stat );
-//
-//     /* up */
-//
-//     if( handleUp( r, op ) === _.dont )
-//     {
-//       handleDown( r, op );
-//       return false;
-//     }
-//
-//     /* read */
-//
-//     if( r.isTransient && op.recursive )
-//     if( op.recursive === 2 || r.isStem )
-//     {
-//       /* Vova : real path should be used for soft/text link to a dir for two reasons:
-//       - files from linked directory should be taken into account
-//       - usage of r.absolute path for a link will lead to recursion on next forDirectory( file, op ), because dirRead will return same path( r.absolute )
-//       outputFormat : relative is used because absolute path should contain path to a link in head
-//       */
-//       // let files = op.filter.effectiveProvider.dirRead({ filePath : r.absolute, outputFormat : 'absolute' });
-//       let files = op.filter.effectiveProvider.dirRead({ filePath : r.real, outputFormat : 'relative' });
-//
-//       debugger;
-//       if( files === null )
-//       {
-//         // if( op.allowingMissed )
-//         if( o.factory.allowingMissed )
-//         {
-//           debugger;
-//           files = [];
-//         }
-//         else
-//         {
-//           debugger;
-//           throw _.err( 'Failed to read directory', _.strQuote( r.absolute ) );
-//         }
-//       }
-//
-//       files = self.path.s.join( r.absolute, files );
-//       files = r.factory.records( files );
-//
-//       /* terminals */
-//
-//       if( op.includingTerminals )
-//       for( let f = 0 ; f < files.length ; f++ )
-//       {
-//         let file = files[ f ];
-//         forTerminal( file, op );
-//       }
-//
-//       /* dirs */
-//
-//       for( let f = 0 ; f < files.length ; f++ )
-//       {
-//         let file = files[ f ];
-//         forDirectory( file, op );
-//       }
-//
-//     }
-//
-//     /* down */
-//
-//     handleDown( r, op );
-//
-//   }
-//
-//   /* */
-//
-//   function forTerminal( r, op )
-//   {
-//
-//     if( r.isDir )
-//     return;
-//     if( !r.isTransient && !r.isActual )
-//     return;
-//
-//     let includingTransient = ( op.includingTransient && r.isTransient && op.includingTerminals );
-//     let includingActual = ( op.includingActual && r.isActual && op.includingTerminals );
-//     r.included = true;
-//     r.included = r.included && ( includingTransient || includingActual );
-//     r.included = r.included && ( op.includingStem || !r.isStem );
-//     r.included = r.included && ( op.includingDefunct || !!r.stat );
-//
-//     handleUp( r, op );
-//     handleDown( r, op );
-//
-//   }
-//
-//   /* - */
-//
-//   function handleUp( record, op )
-//   {
-//     _.assert( arguments.length === 2 );
-//     let r = op.onUp.call( self, record, op );
-//     _.assert( r === _.dont || r === record, 'onUp should return original record or false, but returned', _.toStrShort( r ) );
-//     return r;
-//   }
-//
-//   /* - */
-//
-//   function handleDown( record, op )
-//   {
-//     _.assert( arguments.length === 2 );
-//     let r = op.onDown.call( self, record, op );
-//     _.assert( r === undefined, 'onDown should return nothing( undefined ), but returned', _.toStrShort( r ) );
-//   }
-//
-// }
-//
-// filesFindSingle_body.defaults =
-// {
-//
-//   filePath : null,
-//   filter : null,
-//   factory : null,
-//
-//   includingTerminals : 1,
-//   includingDirs : null,
-//   includingStem : 1,
-//   includingActual : 1,
-//   includingTransient : 0,
-//   includingDefunct : null,
-//
-//   // resolvingSoftLink : 0,
-//   // resolvingTextLink : 0,
-//   // allowingMissed : 0,
-//   // allowingCycled : 0,
-//   // recursive : null,
-//
-//   sync : 1,
-//
-//   onUp : null,
-//   onDown : null,
-//
-// }
-//
-// var having = filesFindSingle_body.having = Object.create( null );
-// having.writing = 0;
-// having.reading = 1;
-// having.driving = 0;
-//
-// let filesFindSingle = _.routineFromPreAndBody( filesFindSingle_pre, filesFindSingle_body );
 
 //
 
@@ -943,11 +649,11 @@ let filesFindSingle = _.routineFromPreAndBody( filesFindSingle_pre, filesFindSin
  *
  * @param {} o.filePath
  * @param {} o.filter
- * @param {} o.includingTerminals=1
- * @param {} o.includingDirs=0
- * @param {} o.includingStem=1
- * @param {} o.includingActual=1
- * @param {} o.includingTransient=0
+ * @param {} o.withTerminals=1
+ * @param {} o.withDirs=0
+ * @param {} o.withStem=1
+ * @param {} o.withActual=1
+ * @param {} o.withTransient=0
  * @param {} o.allowingMissed=0
  * @param {} o.allowingCycled=0
  * @param {} o.resolvingSoftLink=0
@@ -992,7 +698,7 @@ function filesFind_pre( routine, args )
 
   }
 
-  _.assert( !path.isEmpty( o.filter.filePath ) || !path.isEmpty( o.filter.prefixPath ), 'Please, define filePath for file filter' );
+  // _.assert( !path.isEmpty( o.filter.filePath ) || !path.isEmpty( o.filter.prefixPath ), 'Please, define filePath for file filter' );
   let hasGlob = o.filter.filePathHasGlob();
 
   if( o.mandatory === null )
@@ -1046,7 +752,6 @@ function filesFind_pre( routine, args )
   {
     _.assert( !self.system || o.filter.system === self.system );
     _.assert( !!o.filter.effectiveProvider );
-    _.assert( path.s.allAreNormalized( o.filter.filePath ) );
   }
 
   return o;
@@ -1088,6 +793,19 @@ function filesFind_body( o )
 
   _.assert( _.strsAreAll( o.filePath ) );
   _.assert( !o.orderingExclusion.length || o.orderingExclusion.length === 0 || o.outputFormat === 'record' );
+
+  if( o.mandatory )
+  if( _.entityLength( o.filePath ) !== _.entityLength( o.filter.filePath ) )
+  {
+    for( let stemPath in o.filter.filePath )
+    {
+      if( _.boolLike( o.filter.filePath[ stemPath ] ) )
+      continue;
+      stemPath = path.fromGlob( stemPath );
+      if( !self.fileExists( stemPath ) )
+      throw _.err( 'Stem not found : ' + stemPath );
+    }
+  }
 
   forStems( o.filePath, o );
 
@@ -1155,7 +873,7 @@ function filesFind_body( o )
       allowingCycled : o.allowingCycled,
     };
     _.assert( _.strDefined( o4.basePath ), 'No base path for', stemPath );
-    o3.factory = _.FileRecordFactory.TollerantFrom( o3, o4 ).form();
+    o3.factory = _.FileRecordFactory.TolerantFrom( o3, o4 ).form();
 
     _.assert( o3.factory.basePath === o3.filter.formedBasePath[ stemPath ] );
     _.assert( o3.factory.dirPath === null );
@@ -1177,16 +895,34 @@ function filesFind_body( o )
       if( !o.mandatory )
       return op;
 
-      if( counterWas === counter )
+      if( o.result.length === 0 )
       {
         debugger;
         throw _.err( 'No file found at ' + stemPath );
       }
-      else if( counterWas === counter-1 )
+      else if( counterWas === counter )
       {
         if( !o.allowingMissed )
-        throw _.err( 'Stem does not exist ' + stemPath );
+        {
+          debugger;
+          throw _.err( 'Stem does not exist ' + stemPath );
+        }
       }
+
+      // if( counterWas === counter )
+      // {
+      //   debugger;
+      //   throw _.err( 'No file found at ' + stemPath );
+      // }
+      // else if( counterWas === counter-1 )
+      // {
+      //   if( !o.allowingMissed )
+      //   {
+      //     debugger;
+      //     throw _.err( 'Stem does not exist ' + stemPath );
+      //   }
+      // }
+
       return op;
     })
     .catch( ( err ) =>
@@ -1203,6 +939,8 @@ function filesFind_body( o )
   {
 
     _.assert( arguments.length === 2, 'Expects single argument' );
+
+    if( record.stat )
     counter += 1;
 
     let visited = false;
@@ -1419,7 +1157,9 @@ function filesFind_body( o )
 
 _.routineExtend( filesFind_body, filesFindSingle.body );
 
-var defaults = filesFind_body.defaults;
+var defaults = filesFind_body.defaults = _.mapExtend( null, filesFind_body.defaults );
+
+delete defaults.factory;
 
 defaults.sync = 1;
 defaults.orderingExclusion = null;
@@ -1435,7 +1175,6 @@ defaults.revisiting = null;
 defaults.revisitingHardLinked = 1;
 defaults.visitedMap = null;
 defaults.visitedStack = null;
-
 defaults.resolvingSoftLink = 0;
 defaults.resolvingTextLink = 0;
 defaults.allowingMissed = 0;
@@ -1458,11 +1197,11 @@ filesFind.having.aspect = 'entry';
  *
  * @param {} o.filePath
  * @param {} o.filter
- * @param {} o.includingTerminals=1
- * @param {} o.includingDirs=1
- * @param {} o.includingStem=1
- * @param {} o.includingActual=1
- * @param {} o.includingTransient=1
+ * @param {} o.withTerminals=1
+ * @param {} o.withDirs=1
+ * @param {} o.withStem=1
+ * @param {} o.withActual=1
+ * @param {} o.withTransient=1
  * @param {} o.allowingMissed=1
  * @param {} o.allowingCycled=1
  * @param {} o.resolvingSoftLink=0
@@ -1498,9 +1237,9 @@ let filesFindRecursive = _.routineFromPreAndBody( filesFindRecursive_pre, filesF
 var defaults = filesFindRecursive.defaults;
 defaults.filePath = null;
 // defaults.recursive = 2;
-defaults.includingTransient = 0;
-defaults.includingDirs = 1;
-defaults.includingTerminals = 1;
+defaults.withTransient = 0;
+defaults.withDirs = 1;
+defaults.withTerminals = 1;
 defaults.allowingMissed = 1;
 defaults.allowingCycled = 1;
 
@@ -1514,11 +1253,11 @@ defaults.allowingCycled = 1;
  *
  * @param {} o.filePath
  * @param {} o.filter
- * @param {} o.includingTerminals=1
- * @param {} o.includingDirs=1
- * @param {} o.includingStem=1
- * @param {} o.includingActual=1
- * @param {} o.includingTransient=0
+ * @param {} o.withTerminals=1
+ * @param {} o.withDirs=1
+ * @param {} o.withStem=1
+ * @param {} o.withActual=1
+ * @param {} o.withTransient=0
  * @param {} o.allowingMissed=0
  * @param {} o.allowingCycled=0
  * @param {} o.resolvingSoftLink=0
@@ -1574,9 +1313,9 @@ var defaults = filesGlob.defaults;
 
 // defaults.outputFormat = 'absolute';
 // defaults.recursive = 2;
-defaults.includingTerminals = 1;
-defaults.includingDirs = 1;
-defaults.includingTransient = 0;
+defaults.withTerminals = 1;
+defaults.withDirs = 1;
+defaults.withTransient = 0;
 
 //
 
@@ -2056,8 +1795,8 @@ let filesRead = _.routineFromPreAndBody( filesFindGroups.pre, filesRead_body );
 //   usingExtraStat : 1,
 //   recursive : 0,
 
-//   includingTerminals : 1,
-//   includingDirs : 1,
+//   withTerminals : 1,
+//   withDirs : 1,
 
 //   resolvingSoftLink : 0,
 //   resolvingTextLink : 0,
@@ -2259,8 +1998,10 @@ function filesReflectEvaluate_body( o )
 
   /* find */
 
+  // debugger;
   let found = self.filesFind( srcOptions );
   o.visitedMap = srcOptions.visitedMap;
+  // debugger;
 
   return o.result;
 
@@ -2280,9 +2021,9 @@ function filesReflectEvaluate_body( o )
     _.assert( o.dstPath === undefined );
 
     let srcOptions = _.mapOnly( o, self.filesFind.defaults );
-    srcOptions.includingStem = 1;
-    srcOptions.includingTransient = 1;
-    srcOptions.includingDefunct = 1;
+    srcOptions.withStem = 1;
+    srcOptions.withTransient = 1;
+    srcOptions.withDefunct = 1;
     srcOptions.allowingMissed = 1;
     srcOptions.allowingCycled = 1;
     srcOptions.verbosity = 0;
@@ -2317,7 +2058,7 @@ function filesReflectEvaluate_body( o )
     let dstOptions = _.mapExtend( null, srcOptions );
     dstOptions.filter = o.dst;
     dstOptions.filePath = o.dst.filePathSimplest( o.dst.filePathNormalizedGet() );
-    dstOptions.includingStem = 1;
+    dstOptions.withStem = 1;
     // dstOptions.recursive = 2;
     dstOptions.revisiting = 3;
     dstOptions.resolvingSoftLink = 0;
@@ -2352,7 +2093,7 @@ function filesReflectEvaluate_body( o )
     dstOp.stemPath = dstOp.stemPath[ 0 ];
 
     _.assert( !!dstOp.basePath, () => 'No base path for ' + _.strQuote( dstPath ) );
-    let dstRecordFactory = _.FileRecordFactory.TollerantFrom( o, dstOp ).form();
+    let dstRecordFactory = _.FileRecordFactory.TolerantFrom( o, dstOp ).form();
 
     _.assert( _.strIs( dstOp.basePath ) );
     _.assert( dstRecordFactory.basePath === _.uri.parse( dstPath ).longPath || dstRecordFactory.basePath === _.uri.parse( o.dst.formedBasePath[ dstPath ] ).longPath );
@@ -2449,10 +2190,10 @@ function filesReflectEvaluate_body( o )
     if( !o.includingDst && record.reason === 'dstDeleting' )
     return end( record );
 
-    if( !o.includingDirs && record.effective.isDir )
+    if( !o.withDirs && record.effective.isDir )
     return end( record );
 
-    if( !o.includingTerminals && !record.effective.isDir )
+    if( !o.withTerminals && !record.effective.isDir )
     return end( record );
 
     _.assert( _.routineIs( o.onUp ) );
@@ -2594,7 +2335,7 @@ function filesReflectEvaluate_body( o )
 
         /* checks if terminals with equal dst path are same before link */
         if( record.src.isTerminal )
-        if( o.writing && o.dstRewriting && o.dstRewritingPreserving && a )
+        if( o.writing && o.dstRewriting && o.dstRewritingOnlyPreserving && a )
         checkSrcTerminalsSameDst( record, op );
 
         link( record );
@@ -2680,10 +2421,10 @@ function filesReflectEvaluate_body( o )
     if( !o.includingDst && record.reason === 'dstDeleting' )
     return end( record );
 
-    if( !o.includingDirs && record.effective.isDir )
+    if( !o.withDirs && record.effective.isDir )
     return end( record );
 
-    if( !o.includingTerminals && !record.effective.isDir )
+    if( !o.withTerminals && !record.effective.isDir )
     return end( record );
 
     handleDown2.call( self, record, o );
@@ -2728,6 +2469,8 @@ function filesReflectEvaluate_body( o )
 
     // if( _.strEnds( record.dst.absolute, debugPath ) )
     // debugger;
+    if( _.strEnds( record.dst.absolute, 'Typing.test.s' ) )
+    debugger;
 
     _.assert( arguments.length === 2 );
     _.assert( !!record.touch === !!touchMap[ record.dst.absolute ] );
@@ -2852,11 +2595,11 @@ function filesReflectEvaluate_body( o )
       {
         /* src is dir, dst is terminal */
 
-        if( o.dstRewritingPreserving )
+        if( o.dstRewritingOnlyPreserving )
         if( o.writing && o.dstRewriting && o.dstRewritingByDistinct )
         {
           debugger;
-          throw _.err( 'Can\'t rewrite terminal file ' + record.dst.absolute + ' by directory ' + record.src.absolute + ', dstRewritingPreserving is enabled' );
+          throw _.err( 'Can\'t rewrite terminal file ' + record.dst.absolute + ' by directory ' + record.src.absolute + ', dstRewritingOnlyPreserving is enabled' );
         }
 
         if( !record.src.isActual && record.dst.isActual )
@@ -2891,7 +2634,7 @@ function filesReflectEvaluate_body( o )
         {
           forbid( record );
         }
-        else if( o.dstRewritingPreserving )
+        else if( o.dstRewritingOnlyPreserving )
         {
           if( record.dst.factory.effectiveProvider.filesHasTerminal( record.dst.absolute ) )
           {
@@ -2935,7 +2678,7 @@ function filesReflectEvaluate_body( o )
       {
         /* both src and dst are terminals */
 
-        if( o.writing && o.dstRewriting && o.dstRewritingPreserving )
+        if( o.writing && o.dstRewriting && o.dstRewritingOnlyPreserving )
         if( !self.filesAreSame( record.src, record.dst, true ) )
         if( record.src.stat.size !== 0 || record.dst.stat.size !== 0 )
         {
@@ -3061,9 +2804,9 @@ function filesReflectEvaluate_body( o )
       dstOptions2.filePath = record.dst.absolute;
       dstOptions2.filter = filter2;
       dstOptions2.filter.filePath = null;
-      dstOptions2.includingStem = 0;
+      dstOptions2.withStem = 0;
       dstOptions2.mandatory = 0;
-      dstOptions2.includingDefunct = 0;
+      dstOptions2.withDefunct = 0;
       dstOptions2.onUp = [ _.routineJoin( undefined, handleDstUp, [ srcRecord.factory, 'dstRewriting', filter2 ] ) ];
 
       let found = self.filesFind( dstOptions2 );
@@ -3157,7 +2900,7 @@ function filesReflectEvaluate_body( o )
       dstOptions2.filter.basePath = record.dst.factory.basePath;
       dstOptions2.filter.recursive = 2;
       dstOptions2.mandatory = 0;
-      dstOptions2.includingDefunct = 0;
+      dstOptions2.withDefunct = 0;
       dstOptions2.onUp = [ _.routineJoin( null, handleDstUp, [ record.src.factory, 'dstDeleting', null ] ) ];
 
       let found = self.filesFind( dstOptions2 );
@@ -3495,7 +3238,7 @@ function filesReflectEvaluate_body( o )
             (
               'Source terminal files: \n' + _.strQuote( result.src.absolute ) + ' and ' + _.strQuote( record.src.absolute ) + '\n' +
               'have same destination path: ' + _.strQuote( record.dst.absolute ) +', but different content.' + '\n' +
-              'Can\'t perform rewrite operation when option dstRewritingPreserving is enabled.'
+              'Can\'t perform rewrite operation when option dstRewritingOnlyPreserving is enabled.'
             );
           }
         }
@@ -3517,8 +3260,8 @@ defaults.verbosity = 0;
 defaults.mandatory = 1;
 defaults.allowingMissed = 0;
 defaults.allowingCycled = 0;
-defaults.includingTerminals = 1;
-defaults.includingDirs = 1;
+defaults.withTerminals = 1;
+defaults.withDirs = 1;
 defaults.includingNonAllowed = 1;
 defaults.includingDst = null;
 // defaults.recursive = 2;
@@ -3532,7 +3275,7 @@ defaults.dstDeleting = 0;
 defaults.dstDeletingCleanedDirs = 1;
 defaults.dstRewriting = 1;
 defaults.dstRewritingByDistinct = 1;
-defaults.dstRewritingPreserving = 0;
+defaults.dstRewritingOnlyPreserving = 0;
 defaults.preservingTime = 0;
 defaults.preservingSame = 0;
 
@@ -3842,6 +3585,20 @@ function filesReflectSingle_body( o )
     let isSoftLink = record.src.isSoftLink;
     let isTextLink = record.src.isTextLink;
 
+    if( !isSoftLink && !isTextLink )
+    if( ( o.resolvingSoftLink && self.usingSoftLink ) || ( o.resolvingTextLink && self.usingTextLink ) )
+    {
+      debugger;
+      let stat = record.src.factory.effectiveProvider.statRead
+      ({
+        filePath : record.src.absolute,
+        resolvingSoftLink : 0,
+        resolvingTextLink : 0,
+      });
+      isSoftLink = stat.isSoftLink();
+      isTextLink = stat.isTextLink();
+    }
+
     if( isSoftLink && o.resolvingSrcSoftLink === 2 )
     return false;
 
@@ -3855,10 +3612,14 @@ function filesReflectSingle_body( o )
     let srcAbsolute = record.src.real;
     /* xxx qqq : use ( resolvingMultiple / recursive ) option instead of if-else */
 
+    debugger;
     if( _.strHas( srcAbsolute, 'terLink' ) )
     debugger;
 
-    if( o.rebasingLink === 2 || o.resolvingSrcSoftLink === 2 )
+    let resolvingSrcSoftLink = self.usingSoftLink ? o.resolvingSrcSoftLink : 0;
+    let resolvingSrcTextLink = self.usingTextLink ? o.resolvingSrcTextLink : 0;
+
+    if( o.rebasingLink === 2 )
     {
       let resolved = src.pathResolveLinkFull
       ({
@@ -3881,16 +3642,46 @@ function filesReflectSingle_body( o )
     }
     else if( o.rebasingLink === 1 )
     {
-      srcPath = src.pathResolveLinkStep
-      ({
-        filePath : srcAbsolute,
-        resolvingSoftLink : 1,
-        resolvingTextLink : 1,
-        throwing : o.throwing,
-        allowingMissed : o.allowingMissed,
-        allowingCycled : o.allowingCycled,
-      });
-      srcAbsolute = path.join( srcAbsolute, srcPath );
+
+      debugger;
+      if( resolvingSrcSoftLink || resolvingSrcTextLink )
+      {
+
+        let resolved = src.pathResolveLinkFull
+        ({
+          filePath : srcAbsolute,
+          resolvingSoftLink : resolvingSrcSoftLink ? 1 : 0,
+          resolvingTextLink : resolvingSrcTextLink ? 1 : 0,
+          preservingRelative : 1,
+          relativeOriginalFile : 1,
+          throwing : o.throwing,
+          allowingMissed : o.allowingMissed,
+          allowingCycled : o.allowingCycled,
+        });
+        if( !resolved )
+        {
+          debugger;
+          return false;
+        }
+        srcAbsolute = resolved.absolutePath;
+        srcPath = resolved.filePath;
+
+      }
+
+      if( ( !resolvingSrcSoftLink && self.usingSoftLink ) || ( !resolvingSrcTextLink && self.usingTextLink ) )
+      {
+        srcPath = src.pathResolveLinkStep
+        ({
+          filePath : srcAbsolute,
+          resolvingSoftLink : 1,
+          resolvingTextLink : 1,
+          throwing : o.throwing,
+          allowingMissed : o.allowingMissed,
+          allowingCycled : o.allowingCycled,
+        });
+        srcAbsolute = path.join( srcAbsolute, srcPath );
+      }
+
     }
     else _.assert( 0 );
 
@@ -3899,13 +3690,25 @@ function filesReflectSingle_body( o )
     if( !o.visitedMap[ srcAbsolute ] )
     return false
 
+    if( path.isAbsolute( srcPath ) )
+    debugger;
+
     let srcRecord = o.visitedMap[ srcAbsolute ];
     let dstRecord = srcToDst( srcRecord );
     if( record.src === dstRecord )
     debugger;
     if( record.src === dstRecord )
     return false;
-    record.src = dstRecord;
+    // record.src = dstRecord;
+
+    record.src = record.src.factory.record( srcAbsolute );
+
+    // xxx yyy
+    if( path.isAbsolute( srcPath ) )
+    {
+      debugger;
+      path.join( dstRecord.absolute, path.relative( srcRecord.absolute, srcAbsolute ) );
+    }
 
     let action = isSoftLink ? 'softLink' : 'textLink';
 
@@ -4191,8 +3994,8 @@ function filesReflect_pre( routine, args )
  * @param {Number} o.verbosity=0
  * @param {Boolean} o.allowingMissed=0
  * @param {Boolean} o.allowingCycled=0
- * @param {Boolean} o.includingTerminals=1
- * @param {Boolean} o.includingDirs=1
+ * @param {Boolean} o.withTerminals=1
+ * @param {Boolean} o.withDirs=1
  * @param {Boolean} o.includingNonAllowed=1
  * @param {Boolean} o.includingDst
  * @param {String} o.linking='fileCopy'
@@ -4202,7 +4005,7 @@ function filesReflect_pre( routine, args )
  * @param {Boolean} o.dstDeletingCleanedDirs=1
  * @param {Boolean} o.dstRewriting=1
  * @param {Boolean} o.dstRewritingByDistinct=1
- * @param {Boolean} o.dstRewritingPreserving=0
+ * @param {Boolean} o.dstRewritingOnlyPreserving=0
  * @param {Boolean} o.preservingTime=0
  * @param {Boolean} o.preservingSame=0
  * @param {} o.extral
@@ -4929,7 +4732,10 @@ function filesDelete_body( o )
   if( !o.sync )
   con = new _.Consequence().take( null );
 
-  _.assert( !o.includingTransient, 'Transient files should not be included' );
+  if( o.late )
+  o.visitingCertain = 0;
+
+  _.assert( !o.withTransient, 'Transient files should not be included' );
   _.assert( o.resolvingTextLink === 0 || o.resolvingTextLink === false );
   _.assert( o.resolvingSoftLink === 0 || o.resolvingSoftLink === false );
   _.assert( _.numberIs( o.safe ) );
@@ -4970,21 +4776,13 @@ function filesDelete_body( o )
   let o2 = _.mapOnly( o, provider.filesFind.defaults );
   o2.verbosity = 0;
   o2.outputFormat = 'record';
-  o2.includingTransient = 1;
-  _.assert( !!o.includingDirs );
-  _.assert( !!o.includingActual );
-  _.assert( !o.includingTransient );
+  o2.withTransient = 1;
+  _.assert( !!o.withDirs );
+  _.assert( !!o.withActual );
+  _.assert( !o.withTransient );
   _.assert( o.result === o2.result );
 
   /* */
-
-  /* qqq : refactor please this brute-hack ( filesDelete_body )
-    does it work at all??
-    result array should not depend on option writing!
-    deletingEmptyDirs should not delete files, but only change result array.
-    handleWriting should be only deleting subroutine
-    deletingEmptyDirs should goes between handleResult and handleWriting
-  */
 
   if( o.sync )
   {
@@ -4993,7 +4791,12 @@ function filesDelete_body( o )
     if( o.deletingEmptyDirs )
     deleteEmptyDirs();
     if( o.writing )
-    handleWriting();
+    {
+      if( o.late )
+      handleLateWriting();
+      else
+      handleWriting();
+    }
     return end();
   }
   else
@@ -5003,9 +4806,60 @@ function filesDelete_body( o )
     if( o.deletingEmptyDirs )
     con.then( () => deleteEmptyDirs() );
     if( o.writing )
-    con.then( () => handleWriting() );
+    {
+      if( o.late )
+      con.then( () => handleLateWriting() );
+      else
+      con.then( () => handleWriting() );
+    }
     con.then( () => end() );
     return con;
+  }
+
+  /* - */
+
+  function handleLateWriting()
+  {
+    let opened = false;
+    if( o.tempPath === null )
+    {
+      debugger;
+      o.tempPath = path.pathDirTempOpen( o.result[ 0 ].absolute );
+      opened = true;
+    }
+
+    let late = [];
+    for( let f = o.result.length-1 ; f >= 0 ; f-- )
+    {
+      let record = o.result[ f ];
+      if( !record.included || !record.isActual )
+      continue;
+      if( record.absolute === '/' )
+      continue;
+
+      let dstPath = path.join( o.tempPath, 'delete', record.relative );
+      late.push( dstPath );
+
+      debugger;
+      self.fileRename
+      ({
+        srcPath : record.absolute,
+        dstPath : dstPath,
+      })
+
+    }
+
+    _.timeOut( 100, () =>
+    {
+      debugger;
+      if( opened )
+      path.pathDirTempClose( o.tempPath );
+      else
+      late.forEach( ( dstPath ) => self.filesDelete( dstPath ) );
+      debugger;
+    });
+
+    return true;
   }
 
   /* - */
@@ -5014,10 +4868,10 @@ function filesDelete_body( o )
   {
     for( let f = o.result.length-1 ; f >= 0 ; f-- )
     {
-      let file = o.result[ f ];
-      if( file.included && file.isActual )
-      if( file.absolute !== '/' )
-      fileDelete( file );
+      let record = o.result[ f ];
+      if( record.included && record.isActual )
+      if( record.absolute !== '/' )
+      fileDelete( record );
     }
     return true;
   }
@@ -5030,10 +4884,8 @@ function filesDelete_body( o )
     {
       let file1 = o.result[ f1 ];
 
-      if( file1.isActual /* && ( file1.isTransient || file1.isTerminal ) */ )
+      if( file1.isActual )
       {
-        // if( file1.isTerminal )
-        // continue;
 
         if( !file1.isDir )
         continue;
@@ -5048,7 +4900,7 @@ function filesDelete_body( o )
 
           if( !o.filter.recursive )
           continue;
-          if( o.filter.recursive === 2 && o.includingTerminals )
+          if( o.filter.recursive === 2 && o.withTerminals )
           continue;
           if( provider.dirIsEmpty( file1.absolute ) )
           continue;
@@ -5062,7 +4914,7 @@ function filesDelete_body( o )
       for( let f2 = f1 ; f2 >= 0 ; f2-- )
       {
         let file2 = o.result[ f2 ];
-        // if( file2.relative === '.' ) /* ? */
+        // if( file2.relative === '.' ) /* qqq : ? */
         if( _.strBegins( file1.absolute, file2.absolute ) )
         {
           o.result.splice( f2, 1 );
@@ -5122,7 +4974,6 @@ function filesDelete_body( o )
     {
       filePath : file.absolute,
       throwing : o.throwing,
-      // verbosity : o.verbosity-1,
       verbosity : 0,
       safe : o.safe,
       sync : o.sync,
@@ -5140,7 +4991,6 @@ function filesDelete_body( o )
   function deleteEmptyDirs()
   {
 
-    debugger;
     if( !o.result.length )
     return true;
 
@@ -5188,10 +5038,9 @@ _.routineExtend( filesDelete_body, filesFind );
 var defaults = filesDelete_body.defaults;
 defaults.outputFormat = 'record';
 defaults.sync = 1;
-// defaults.recursive = 2;
-defaults.includingTransient = 0;
-defaults.includingDirs = 1;
-defaults.includingTerminals = 1;
+defaults.withTransient = 0;
+defaults.withDirs = 1;
+defaults.withTerminals = 1;
 defaults.resolvingSoftLink = 0;
 defaults.resolvingTextLink = 0;
 defaults.allowingMissed = 1;
@@ -5201,7 +5050,13 @@ defaults.maskPreset = 0;
 defaults.throwing = null;
 defaults.safe = null;
 defaults.writing = 1;
+defaults.late = 0;
+defaults.tempPath = null;
 defaults.deletingEmptyDirs = 0;
+
+/*
+xxx qqq : implement and cover option late for method filesDelete.
+*/
 
 //
 
@@ -5213,7 +5068,7 @@ var having = filesDelete.having;
 
 _.assert( !!defaults );
 _.assert( !!having );
-_.assert( !!filesDelete.defaults.includingDirs );
+_.assert( !!filesDelete.defaults.withDirs );
 
 //
 
@@ -5222,9 +5077,9 @@ function filesDeleteTerminals_body( o )
   let self = this;
 
   _.assertRoutineOptions( filesDeleteTerminals_body, arguments );
-  _.assert( o.includingTerminals );
-  _.assert( !o.includingDirs );
-  _.assert( !o.includingTransient, 'Transient files should not be included' );
+  _.assert( o.withTerminals );
+  _.assert( !o.withDirs );
+  _.assert( !o.withTransient, 'Transient files should not be included' );
   _.assert( o.resolvingTextLink === 0 || o.resolvingTextLink === false );
   _.assert( o.resolvingSoftLink === 0 || o.resolvingSoftLink === false );
   _.assert( _.numberIs( o.safe ) );
@@ -5265,18 +5120,13 @@ _.routineExtend( filesDeleteTerminals_body, filesDelete.body );
 
 var defaults = filesDeleteTerminals_body.defaults;
 
-// defaults.recursive = 2;
-defaults.includingTerminals = 1;
-defaults.includingDirs = 0;
-defaults.includingTransient = 0;
+defaults.withTerminals = 1;
+defaults.withDirs = 0;
+defaults.withTransient = 0;
 
 let filesDeleteTerminals = _.routineFromPreAndBody( filesFindRecursive.pre, filesDeleteTerminals_body );
 
 //
-
-/*
-qqq : add test coverage, extract pre and body, please
-*/
 
 function filesDeleteEmptyDirs_body( o )
 {
@@ -5285,10 +5135,9 @@ function filesDeleteEmptyDirs_body( o )
   /* */
 
   _.assertRoutineOptions( filesDeleteEmptyDirs_body, arguments );
-  _.assert( !o.includingTerminals );
-  _.assert( o.includingDirs );
-  _.assert( !o.includingTransient );
-  // _.assert( o.recursive !== undefined && o.recursive !== null );
+  _.assert( !o.withTerminals );
+  _.assert( o.withDirs );
+  _.assert( !o.withTransient );
 
   /* */
 
@@ -5337,10 +5186,9 @@ var defaults = filesDeleteEmptyDirs_body.defaults;
 defaults.throwing = false;
 defaults.verbosity = null;
 defaults.outputFormat = 'absolute';
-defaults.includingTerminals = 0;
-defaults.includingDirs = 1;
-defaults.includingTransient = 0;
-// defaults.recursive = 2;
+defaults.withTerminals = 0;
+defaults.withDirs = 1;
+defaults.withTransient = 0;
 
 let filesDeleteEmptyDirs = _.routineFromPreAndBody( filesFindRecursive.pre, filesDeleteEmptyDirs_body );
 
@@ -5466,9 +5314,9 @@ function filesHasTerminal( filePath )
   self.filesFindRecursive
   ({
     filePath : filePath,
-    includingStem : 1,
-    includingDirs : 1,
-    includingTerminals : 1,
+    withStem : 1,
+    withDirs : 1,
+    withTerminals : 1,
     onUp : onUp,
     resolvingSoftLink : 0,
     resolvingTextLink : 0,
@@ -5583,8 +5431,6 @@ let Supplement =
 
   // reflect
 
-  // filesCopyWithAdapter,
-
   _filesFiltersPrepare,
   _filesReflectPrepare,
 
@@ -5605,7 +5451,6 @@ let Supplement =
   // delete
 
   filesDelete,
-
   filesDeleteTerminals,
   filesDeleteEmptyDirs,
 
@@ -5641,7 +5486,7 @@ _.classDeclare
 _.FileProvider = _.FileProvider || Object.create( null );
 _.FileProvider[ Self.shortName ] = Self;
 
-_.assert( !!_.FileProvider.Find.prototype.filesDelete.defaults.includingDirs );
+_.assert( !!_.FileProvider.Find.prototype.filesDelete.defaults.withDirs );
 
 // --
 // export

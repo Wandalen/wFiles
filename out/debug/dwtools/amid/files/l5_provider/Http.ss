@@ -208,7 +208,7 @@ function fileReadAct( o )
     if( o.encoding === null )
     {
       totalSize = response.headers[ 'content-length' ];
-      result = new ArrayBuffer( totalSize );
+      result = new BufferRaw( totalSize );
     }
     else
     {

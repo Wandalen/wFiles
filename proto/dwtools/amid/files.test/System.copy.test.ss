@@ -66,9 +66,9 @@ function copy( test )
     outputFormat : 'relative',
     basePath : hdUrl,
     recursive : 1,
-    includingTransient : 1,
+    withTransient/*maybe withStem*/ : 1,
     includingTerminals : 1,
-    includingStem : 0
+    withTransient/*maybe withStem*/ : 0
   });
   var got = self.system.filesFind
   ({
@@ -76,9 +76,9 @@ function copy( test )
     outputFormat : 'relative',
     basePath : hdUrlDst,
     recursive : 1,
-    includingTransient : 1,
+    withTransient/*maybe withStem*/ : 1,
     includingTerminals : 1,
-    includingStem : 0
+    withTransient/*maybe withStem*/ : 0
   });
 
   test.identical( got,expected );
@@ -99,9 +99,9 @@ function copy( test )
     outputFormat : 'relative',
     basePath : hdUrl,
     recursive : 1,
-    includingTransient : 1,
+    withTransient/*maybe withStem*/ : 1,
     includingTerminals : 1,
-    includingStem : 0
+    withTransient/*maybe withStem*/ : 0
   });
   var got = self.system.filesFind
   ({
@@ -109,9 +109,9 @@ function copy( test )
     outputFormat : 'relative',
     basePath : ssUrl,
     recursive : 1,
-    includingTransient : 1,
+    withTransient/*maybe withStem*/ : 1,
     includingTerminals : 1,
-    includingStem : 0
+    withTransient/*maybe withStem*/ : 0
   });
   test.identical( got,expected );
 
@@ -129,9 +129,9 @@ function copy( test )
     outputFormat : 'relative',
     basePath : ssUrl,
     recursive : 1,
-    includingTransient : 1,
+    withTransient/*maybe withStem*/ : 1,
     includingTerminals : 1,
-    includingStem : 0
+    withTransient/*maybe withStem*/ : 0
   });
   var got = self.system.filesFind
   ({
@@ -139,9 +139,9 @@ function copy( test )
     outputFormat : 'relative',
     basePath : ssUrlDst,
     recursive : 1,
-    includingTransient : 1,
+    withTransient/*maybe withStem*/ : 1,
     includingTerminals : 1,
-    includingStem : 0
+    withTransient/*maybe withStem*/ : 0
   });
   test.identical( got,expected );
 
@@ -162,9 +162,9 @@ function copy( test )
     outputFormat : 'relative',
     basePath : ssUrl,
     recursive : 1,
-    includingTransient : 1,
+    withTransient/*maybe withStem*/ : 1,
     includingTerminals : 1,
-    includingStem : 0
+    withTransient/*maybe withStem*/ : 0
   });
   var got = self.system.filesFind
   ({
@@ -172,9 +172,9 @@ function copy( test )
     outputFormat : 'relative',
     basePath : hdUrlDst,
     recursive : 1,
-    includingTransient : 1,
+    withTransient/*maybe withStem*/ : 1,
     includingTerminals : 1,
-    includingStem : 0
+    withTransient/*maybe withStem*/ : 0
   });
   test.identical( got,expected );
 
@@ -192,8 +192,8 @@ var Proto =
   silencing : 1,
   enabled : 0,
 
-  onSuiteBegin : onSuiteBegin,
-  onSuiteEnd : onSuiteEnd,
+  onSuiteBegin,
+  onSuiteEnd,
 
   context :
   {
@@ -203,7 +203,7 @@ var Proto =
 
   tests :
   {
-    copy : copy
+    copy
   },
 
 }

@@ -16,42 +16,41 @@ _.assert( !!Parent );
 
 //
 
-var filesTree =
-{
-  'folder.abc' :
-  {
-    'test1.js' : "test\n.gitignore\n.travis.yml\nMakefile\nexample.js\n",
-    'test2' : "var concatMap = require('concat-map');\nvar balanced = require('balanced-match');",
-    'folder2.x' :
-    {
-      'test1.txt' : "var concatMap = require('concat-map');\nvar balanced = require('balanced-match');",
-    }
-  },
-  'test_dir' :
-  {
-    'test3.js' : 'test\n.gitignore\n.travis.yml\nMakefile\nexample.js\n',
-  },
-  'file1' : 'Excepteur sint occaecat cupidatat non proident',
-  'file' : 'abc',
-  'linkToFile' : [{ hardLink : '/file' }],
-  'linkToUnknown' : [{ hardLink : '/unknown' }],
-  'linkToDir' : [{ hardLink : '/test_dir' }],
-  'softLinkToFile' : [{ softLink : '/file' }],
-  'softLinkToUnknown' : [{ softLink : '/unknown' }],
-  'softLinkToDir' : [{ softLink : '/test_dir' }],
-}
+// var filesTree =
+// {
+//   'folder.abc' :
+//   {
+//     'test1.js' : "test\n.gitignore\n.travis.yml\nMakefile\nexample.js\n",
+//     'test2' : "var concatMap = require('concat-map');\nvar balanced = require('balanced-match');",
+//     'folder2.x' :
+//     {
+//       'test1.txt' : "var concatMap = require('concat-map');\nvar balanced = require('balanced-match');",
+//     }
+//   },
+//   'test_dir' :
+//   {
+//     'test3.js' : 'test\n.gitignore\n.travis.yml\nMakefile\nexample.js\n',
+//   },
+//   'file1' : 'Excepteur sint occaecat cupidatat non proident',
+//   'file' : 'abc',
+//   // 'linkToFile' : [{ hardLink : '/file' }],
+//   // 'linkToUnknown' : [{ hardLink : '/unknown' }],
+//   // 'linkToDir' : [{ hardLink : '/test_dir' }],
+//   'softLinkToFile' : [{ softLink : '/file' }],
+//   'softLinkToUnknown' : [{ softLink : '/unknown' }],
+//   'softLinkToDir' : [{ softLink : '/test_dir' }],
+// }
 
 //
 
 function onSuiteBegin( test )
 {
   let context = this;
-  // debugger;
   Parent.onSuiteBegin.apply( this, arguments );
-  context.provider = _.FileProvider.Extract({ filesTree : filesTree, usingExtraStat : 1, /* protocol : 'current', */ protocols : [ 'current', 'second' ] });
+  context.provider = _.FileProvider.Extract({ usingExtraStat : 1, protocols : [ 'current', 'second' ] });
   context.system = _.FileProvider.System({ providers : [ context.provider ] });
   let path = context.provider.path;
-  context.testSuitePath = path.dirTempOpen( 'FilesFind' );
+  context.testSuitePath = path.pathDirTempOpen( 'FilesFind' );
   context.globalFromPreferred = function globalFromPreferred( path ){ return path };
 }
 
@@ -151,17 +150,17 @@ var Proto =
 
   context :
   {
-    filesTree : filesTree,
-    provider : _.FileProvider.Extract( { filesTree : filesTree, usingExtraStat : 1 } ),
+    // filesTree,
+    provider : _.FileProvider.Extract( { usingExtraStat : 1 } ),
     globalFromPreferred : null,
-    pathFor : pathFor,
+    pathFor,
     testFile : '/file1'
   },
 
   tests :
   {
 
-    copy : copy,
+    copy,
 
   },
 

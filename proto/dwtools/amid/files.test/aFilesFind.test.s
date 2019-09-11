@@ -1543,7 +1543,7 @@ function filesFind( test )
       }
 
       if( options.filePath === null )
-      return test.shouldThrowError( () => provider.filesFind( options ) );
+      return test.shouldThrowErrorOfAnyKind( () => provider.filesFind( options ) );
 
       var files = provider.filesFind( options );
 
@@ -2437,7 +2437,7 @@ function filesFindRecursive( test )
   if( !Config.debug )
   return;
 
-  test.shouldThrowError( () =>
+  test.shouldThrowErrorOfAnyKind( () =>
   {
     provider.filesFind
     ({
@@ -2450,7 +2450,7 @@ function filesFindRecursive( test )
     })
   })
 
-  test.shouldThrowError( () =>
+  test.shouldThrowErrorOfAnyKind( () =>
   {
     provider.filesFind
     ({
@@ -2463,7 +2463,7 @@ function filesFindRecursive( test )
     })
   })
 
-  test.shouldThrowError( () =>
+  test.shouldThrowErrorOfAnyKind( () =>
   {
     provider.filesFind
     ({
@@ -2476,7 +2476,7 @@ function filesFindRecursive( test )
     })
   })
 
-  test.shouldThrowError( () =>
+  test.shouldThrowErrorOfAnyKind( () =>
   {
     provider.filesFind
     ({
@@ -2489,7 +2489,7 @@ function filesFindRecursive( test )
     })
   })
 
-  test.shouldThrowError( () =>
+  test.shouldThrowErrorOfAnyKind( () =>
   {
     provider.filesFind
     ({
@@ -2502,7 +2502,7 @@ function filesFindRecursive( test )
     })
   })
 
-  test.shouldThrowError( () =>
+  test.shouldThrowErrorOfAnyKind( () =>
   {
     provider.filesFind
     ({
@@ -2847,7 +2847,7 @@ function filesFindLinked( test )
   test.identical( select( got, '*/absolute' ), [ '/', '/one', '/terminal', '/two' ] );
   test.identical( select( got, '*/real' ), [ '/', '/one', '/terminal', '/two' ] );
 
-  test.shouldThrowError( () =>
+  test.shouldThrowErrorOfAnyKind( () =>
   {
     provider.filesFind
     ({
@@ -10525,7 +10525,92 @@ function filesFindGlobLogic( test )
 
   /* - */
 
-  test.open( 'logic' );
+  test.case = './src/proto/**, control';
+  var fullList =
+  [
+    '.',
+    './-ile',
+    './f.cc',
+    './f.js',
+    './f.ss',
+    './f.test.js',
+    './f.test.ss',
+    './file',
+    './dir1',
+    './dir1/dir2',
+    './dir1/dir2/-ile',
+    './dir1/dir2/f.cc',
+    './dir1/dir2/f.js',
+    './dir1/dir2/f.ss',
+    './dir1/dir2/f.test.js',
+    './dir1/dir2/f.test.ss',
+    './dir1/dir2/file'
+  ]
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src/proto/**' : '',
+  });
+  var records = find({ filter : { filePath, basePath }, maskPreset : 0 });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, fullList );
+
+  test.case = './src/proto/** - **/f*';
+  var expectedRelative = [ '.', './-ile', './dir1', './dir1/dir2', './dir1/dir2/-ile' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src/proto/**' : '',
+    '**/f*' : 0,
+  });
+  var records = find({ filter : { filePath, basePath }, maskPreset : 0 });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  test.case = './src/proto - **/f*';
+  var expectedRelative = [ '.', './-ile', './dir1', './dir1/dir2', './dir1/dir2/-ile' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src/proto' : '',
+    '**/f*' : 0,
+  });
+  var records = find({ filter : { filePath, basePath }, maskPreset : 0 });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  test.case = './src/proto - **/d*';
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src/proto' : '',
+    '**/d*' : 0,
+  });
+  var records = find({ filter : { filePath, basePath }, maskPreset : 0 });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, fullList );
+
+  test.case = './src/proto - **/d*';
+  var expectedRelative =
+  [
+    '.',
+    './-ile',
+    './f.cc',
+    './f.js',
+    './f.ss',
+    './f.test.js',
+    './f.test.ss',
+    './file'
+  ]
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src/proto' : '',
+    '**/d**' : 0,
+  });
+  var records = find({ filter : { filePath, basePath }, maskPreset : 0 });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
 
   /* - */
 
@@ -10553,7 +10638,6 @@ function filesFindGlobLogic( test )
   test.identical( gotRelative, expectedRelative );
 
   test.case = 'mixed, several stems';
-  // var expectedRelative = [ '..', '.', './f.js', './f.test.js', './dir1', './dir1/dir2', './dir1/dir2/f.js', './dir1/dir2/f.test.js', '../proto2', '../proto2/f.ss', '../proto2/f.test.ss', '../proto2/dir1', '../proto2/dir1/dir2', '../proto2/dir1/dir2/f.ss', '../proto2/dir1/dir2/f.test.ss' ];
   var expectedRelative = [ '.', './proto', './proto/f.ss', './proto/f.test.ss', './proto/dir1', './proto/dir1/dir2', './proto/dir1/dir2/f.ss', './proto/dir1/dir2/f.test.ss', './proto2', './proto2/f.ss', './proto2/f.test.ss', './proto2/dir1', './proto2/dir1/dir2', './proto2/dir1/dir2/f.ss', './proto2/dir1/dir2/f.test.ss', './src/proto', './src/proto/f.js', './src/proto/f.test.js', './src/proto/dir1', './src/proto/dir1/dir2', './src/proto/dir1/dir2/f.js', './src/proto/dir1/dir2/f.test.js' ]
   var basePath = abs
   ({
@@ -10688,8 +10772,6 @@ function filesFindGlobLogic( test )
   test.identical( gotRelative, expectedRelative );
 
   /* - */
-
-  test.close( 'logic' );
 
 }
 
@@ -15593,11 +15675,11 @@ function filesReflectRecursive( test )
   {
     var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
 
-    test.shouldThrowError( () => provider.filesReflect({ reflectMap : { '/src' : '/dst' }, recursive : '0' }) );
-    test.shouldThrowError( () => provider.filesReflect({ reflectMap : { '/src' : '/dst' }, recursive : '1' }) );
-    test.shouldThrowError( () => provider.filesReflect({ reflectMap : { '/src' : '/dst' }, recursive : '2' }) );
-    test.shouldThrowError( () => provider.filesReflect({ reflectMap : { '/src' : '/dst' }, recursive : false }) );
-    test.shouldThrowError( () => provider.filesReflect({ reflectMap : { '/src' : '/dst' }, recursive : true }) );
+    test.shouldThrowErrorOfAnyKind( () => provider.filesReflect({ reflectMap : { '/src' : '/dst' }, recursive : '0' }) );
+    test.shouldThrowErrorOfAnyKind( () => provider.filesReflect({ reflectMap : { '/src' : '/dst' }, recursive : '1' }) );
+    test.shouldThrowErrorOfAnyKind( () => provider.filesReflect({ reflectMap : { '/src' : '/dst' }, recursive : '2' }) );
+    test.shouldThrowErrorOfAnyKind( () => provider.filesReflect({ reflectMap : { '/src' : '/dst' }, recursive : false }) );
+    test.shouldThrowErrorOfAnyKind( () => provider.filesReflect({ reflectMap : { '/src' : '/dst' }, recursive : true }) );
   }
 }
 
@@ -19550,7 +19632,7 @@ function filesReflectorBasic( test )
     src : {},
     dst : {},
   });
-  test.shouldThrowError( () => reflect( '/' ) );
+  test.shouldThrowErrorOfAnyKind( () => reflect( '/' ) );
   var found = dst.filesFind({ filePath : routinePath, allowingMissed : 1 });
   test.identical( found.length, 0 );
 
@@ -19590,7 +19672,7 @@ function filesReflectorBasic( test )
       src : { basePath : 'src:///' },
       dst : { basePath : 'current:///' },
     });
-    test.shouldThrowError( () => reflect( '/' ) );
+    test.shouldThrowErrorOfAnyKind( () => reflect( '/' ) );
 
     dst.filesDelete( routinePath );
     src.finit();
@@ -20853,7 +20935,7 @@ function filesReflectOnlyPreserving( test )
     dstRewritingByDistinct : 1,
     dstRewritingOnlyPreserving : 1
   }
-  test.shouldThrowError( () => extract.filesReflect( o ) );
+  test.shouldThrowErrorOfAnyKind( () => extract.filesReflect( o ) );
   var src = extract.fileRead( '/src/file-d' );
   var dst = extract.fileRead( '/dst/file' );
   test.notIdentical( src, dst );
@@ -20966,7 +21048,7 @@ function filesReflectOnlyPreserving( test )
     dstRewritingByDistinct : 1,
     dstRewritingOnlyPreserving : 1
   }
-  test.shouldThrowError( () => extract.filesReflect( o ) );
+  test.shouldThrowErrorOfAnyKind( () => extract.filesReflect( o ) );
   test.is( extract.isTerminal( '/src/file' ) );
   test.is( extract.isDir( '/dst/dir-test' ) );
   test.identical( _.select( extract.filesTree, '/src/file' ), _.select( filesTree, '/src/file' ) );
@@ -20982,7 +21064,7 @@ function filesReflectOnlyPreserving( test )
     dstRewritingByDistinct : 1,
     dstRewritingOnlyPreserving : 1
   }
-  test.shouldThrowError( () => extract.filesReflect( o ) );
+  test.shouldThrowErrorOfAnyKind( () => extract.filesReflect( o ) );
   test.is( extract.isTerminal( '/src/file' ) );
   test.is( extract.isDir( '/dst/dir-test-inner' ) );
   test.identical( _.select( extract.filesTree, '/src/file' ), _.select( filesTree, '/src/file' ) );
@@ -21016,7 +21098,7 @@ function filesReflectOnlyPreserving( test )
     dstRewritingByDistinct : 1,
     dstRewritingOnlyPreserving : 1
   }
-  test.shouldThrowError( () => extract.filesReflect( o ) );
+  test.shouldThrowErrorOfAnyKind( () => extract.filesReflect( o ) );
   test.is( extract.isDir( '/src/dir-e/dir-e' ) );
   test.is( extract.isTerminal( '/dst/file' ) );
   test.identical( _.select( extract.filesTree, '/src/dir-e/dir-e' ), _.select( filesTree, '/src/dir-e/dir-e' ) );
@@ -21048,7 +21130,7 @@ function filesReflectOnlyPreserving( test )
     dstRewritingByDistinct : 1,
     dstRewritingOnlyPreserving : 1
   }
-  test.shouldThrowError( () => extract.filesReflect( o ) );
+  test.shouldThrowErrorOfAnyKind( () => extract.filesReflect( o ) );
   test.is( extract.isDir( '/src/dir-e' ) );
   test.is( extract.isTerminal( '/dst/file' ) );
   test.identical( _.select( extract.filesTree, '/src/dir-e' ), _.select( filesTree, '/src/dir-e' ) );
@@ -21080,7 +21162,7 @@ function filesReflectOnlyPreserving( test )
     dstRewritingByDistinct : 1,
     dstRewritingOnlyPreserving : 1
   }
-  test.shouldThrowError( () => extract.filesReflect( o ) );
+  test.shouldThrowErrorOfAnyKind( () => extract.filesReflect( o ) );
   test.is( extract.isDir( '/src/dir-test' ) );
   test.is( extract.isTerminal( '/dst/file' ) );
   test.identical( _.select( extract.filesTree, '/src/dir-test' ), _.select( filesTree, '/src/dir-test' ) );
@@ -21143,7 +21225,7 @@ function filesReflectOnlyPreserving( test )
     dstRewritingByDistinct : 1,
     dstRewritingOnlyPreserving : 1
   }
-  test.shouldThrowError( () => extract.filesReflect( o ) );
+  test.shouldThrowErrorOfAnyKind( () => extract.filesReflect( o ) );
   test.is( extract.isTerminal( '/src/dir-s/file' ) );
   test.is( extract.isTerminal( '/dst/dir-s/file' ) );
   test.identical( _.select( extract.filesTree, '/src/dir-d/file-d' ), _.select( filesTree, '/src/dir-d/file-d' ) );
@@ -30859,7 +30941,7 @@ function filesDelete( test )
   provider.filesDelete( routinePath );
   system.filesReflect({ reflectMap : { 'src:///' : 'current://' + routinePath } });
   provider.softLink( path.join( routinePath, 'softLink' ), path.join( routinePath, 'dir1/dir2/file' )  )
-  test.shouldThrowError( () => provider.filesDelete({ filePath : routinePath, resolvingSoftLink : 1 }) );
+  test.shouldThrowErrorOfAnyKind( () => provider.filesDelete({ filePath : routinePath, resolvingSoftLink : 1 }) );
 
   test.close( 'resolvingSoftLink' );
 
@@ -30911,7 +30993,7 @@ function filesDelete( test )
   provider.filesDelete( routinePath );
   system.filesReflect({ reflectMap : { 'src:///' : 'current://' + routinePath } });
   provider.textLink( path.join( routinePath, 'textLink' ), path.join( routinePath, 'dir1/dir2/file' )  )
-  test.shouldThrowError( () => provider.filesDelete({ filePath : routinePath, resolvingTextLink : 1 }) );
+  test.shouldThrowErrorOfAnyKind( () => provider.filesDelete({ filePath : routinePath, resolvingTextLink : 1 }) );
 
   test.close( 'resolvingTextLink' );
 
@@ -31896,10 +31978,10 @@ function filesDeleteEmptyDirs( test )
   if( !Config.debug )
   {
     test.case = 'including of terminals is not allow';
-    test.shouldThrowError( () => provider.filesDeleteEmptyDirs({ filePath : routinePath, withTerminals : 1 }) )
+    test.shouldThrowErrorOfAnyKind( () => provider.filesDeleteEmptyDirs({ filePath : routinePath, withTerminals : 1 }) )
 
     test.case = 'including of transients is not allow';
-    test.shouldThrowError( () => provider.filesDeleteEmptyDirs({ filePath : routinePath, withTransient/*maybe withStem*/ : 1 }) )
+    test.shouldThrowErrorOfAnyKind( () => provider.filesDeleteEmptyDirs({ filePath : routinePath, withTransient/*maybe withStem*/ : 1 }) )
   }
 }
 
@@ -32170,7 +32252,7 @@ function filesDeleteAndAsyncWrite( test )
 
   _.timeOut( 2, () =>
   {
-    test.shouldThrowError( () =>
+    test.shouldThrowErrorOfAnyKind( () =>
     {
       _.fileProvider.filesDelete( routinePath );
     });

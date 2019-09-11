@@ -3195,9 +3195,7 @@ let hashReadAct = ( function hashReadAct()
       }
       catch( err )
       {
-        // if( o.throwing )
         throw err;
-        // result = NaN;
       }
 
       return result;

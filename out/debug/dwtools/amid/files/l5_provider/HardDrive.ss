@@ -1442,7 +1442,7 @@ function softLinkAct( o )
   _.assert( o.type === null || o.type === 'dir' ||  o.type === 'file' );
 
   if( !srcIsAbsolute )
-  { 
+  {
     srcPath = o.relativeSrcPath;
     if( _.strBegins( srcPath, './' ) )
     srcPath = _.strIsolateLeftOrNone( srcPath, './' )[ 2 ];
@@ -1454,9 +1454,9 @@ function softLinkAct( o )
   {
 
     if( o.type === null )
-    { 
+    {
       let srcPathResolved = srcPath;
-      
+
       /* not dir */
       if( !srcIsAbsolute )
       srcPathResolved = self.path.resolve( self.path.dir( o.dstPath ), srcPath );
@@ -1709,19 +1709,13 @@ encoders[ 'buffer.raw' ] =
 
   onBegin : function( e )
   {
-    debugger;
     _.assert( e.transaction.encoding === 'buffer.raw' );
     e.transaction.encoding = 'buffer.node';
   },
 
   onEnd : function( e )
   {
-    debugger;
     _.assert( _.bufferNodeIs( e.data ) || _.bufferTypedIs( e.data ) || _.bufferRawIs( e.data ) );
-
-    // _.assert( _.bufferNodeIs( e.data ) );
-    // _.assert( !_.bufferTypedIs( e.data ) );
-    // _.assert( !_.bufferRawIs( e.data ) );
 
     let result = _.bufferRawFrom( e.data );
 

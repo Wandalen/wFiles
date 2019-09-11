@@ -4801,7 +4801,7 @@ function filesDelete_body( o )
   }
   else
   {
-    con.then( provider.filesFind.body.call( provider, o2 ) );
+    con.then( () => provider.filesFind.body.call( provider, o2 ) );
     con.then( () => handleResult() );
     if( o.deletingEmptyDirs )
     con.then( () => deleteEmptyDirs() );

@@ -341,7 +341,6 @@ function pathDirTempMake( o )
   _.assert( self.isAbsolute( o.filePath ) );
   _.assert( self.isNormalized( o.filePath ) );
 
-  debugger;
   let filePath2;
   var osTempDir = self.dirTemp();
 

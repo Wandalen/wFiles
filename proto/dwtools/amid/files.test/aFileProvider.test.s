@@ -1320,6 +1320,8 @@ function readWriteSync( test )
     test.case = 'update file using softLink, then read';
     var linkPath = '/softLinkToFile';
     var filePath = '/file';
+    provider.fileWrite( filePath, '' );
+    provider.softLink( linkPath, filePath )
     provider.fileWrite( linkPath, data );
     var got = provider.fileRead( filePath );
     test.identical( got, data );
@@ -1332,7 +1334,10 @@ function readWriteSync( test )
     test.identical( got, data + data );
 
     test.case = 'softLink to directory, read+write';
+    var filePath = '/dir';
     var linkPath = '/softLinkToDir';
+    provider.dirMake( filePath );
+    provider.softLink( linkPath, filePath );
     test.shouldThrowErrorOfAnyKind( () => provider.fileRead( linkPath ) );
     test.shouldThrowErrorOfAnyKind( () => provider.fileWrite( linkPath, data ) );
 
@@ -1340,6 +1345,8 @@ function readWriteSync( test )
     var linkPath = '/softLinkToFile';
     var filePath = '/file';
     var filePathNew = '/file_new';
+    provider.fileWrite( filePath, filePath );
+    provider.softLink( linkPath, filePath );
     provider.fileRename( filePathNew, filePath );
     test.shouldThrowErrorOfAnyKind( () => provider.fileRead( linkPath ) );
     // test.shouldThrowErrorOfAnyKind( () => provider.fileWrite( linkPath, data ) );

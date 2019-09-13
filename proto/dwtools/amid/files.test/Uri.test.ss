@@ -46,7 +46,7 @@ function fileRead( test )
 
     var o = { filePath : this.testFile + 'xxx', sync : 0 };
     var got = this.provider.fileRead( o );
-    return test.shouldThrowError( got );
+    return test.shouldThrowErrorOfAnyKind( got );
   })
 
   .finally( () =>
@@ -95,7 +95,7 @@ function fileCopyToHardDrive( test )
       filePath,
     }
     var got = this.provider.fileCopyToHardDrive( o );
-    return test.shouldThrowError( got );
+    return test.shouldThrowErrorOfAnyKind( got );
   })
 
   //

@@ -188,8 +188,8 @@ function make( test )
 
   test.description = 'bad options';
 
-  test.shouldThrowError( () => provider.recordFilter({ '/xx' : '/src' }) );
-  test.shouldThrowError( () => provider.recordFilter( 1 ) );
+  test.shouldThrowErrorOfAnyKind( () => provider.recordFilter({ '/xx' : '/src' }) );
+  test.shouldThrowErrorOfAnyKind( () => provider.recordFilter( 1 ) );
 
 }
 
@@ -1941,7 +1941,7 @@ function reflect( test )
 
   test.description = 'cant deduce base path';
 
-  test.shouldThrowError( () =>
+  test.shouldThrowErrorOfAnyKind( () =>
   {
     provider.filesReflect
     ({
@@ -1949,7 +1949,7 @@ function reflect( test )
     });
   });
 
-  test.shouldThrowError( () =>
+  test.shouldThrowErrorOfAnyKind( () =>
   {
     provider.filesReflect
     ({
@@ -1958,7 +1958,7 @@ function reflect( test )
     });
   });
 
-  test.shouldThrowError( () =>
+  test.shouldThrowErrorOfAnyKind( () =>
   {
     provider.filesReflect
     ({

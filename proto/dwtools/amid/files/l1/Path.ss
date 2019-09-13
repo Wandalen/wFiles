@@ -268,6 +268,20 @@ function pathDirTempOpen( o )
   if( !self.pathDirTempForMap )
   self.pathDirTempForMap = Object.create( null );
 
+/*
+filePath : /dir1/dir2/dir3
+
+/dir1/dir2/dir3
+/dir1/dir2
+/dir1
+/
+
+Unix
+/dir1 - device1
+/dir1/dir2 - device2
+
+*/
+
   /* qqq : hacks */
   let devicePath = devicePathGet( o.filePath );
 
@@ -299,6 +313,24 @@ pathDirTempOpen.defaults =
 
 //
 
+/*
+
+filePath : /dir1/dir2/dir3
+
+- dirMake
+/Temp
+/dir1/Temp
+/dir1/dir2/Temp
+/dir1/dir2/dir3/Temp
+
+- fileRename
+/Temp/x
+/dir1/Temp/x
+/dir1/dir2/Temp/x
+/dir1/dir2/dir3/Temp/x
+
+*/
+
 function pathDirTempMake( o )
 {
   let self = this;
@@ -309,9 +341,72 @@ function pathDirTempMake( o )
   _.assert( self.isAbsolute( o.filePath ) );
   _.assert( self.isNormalized( o.filePath ) );
 
-  debugger;
   let filePath2;
   var osTempDir = self.dirTemp();
+
+/*
+
+= /dir1 - device1, /dir1/dir2 - device2
+
+open /dir1
+  pathDirTempMake /dir1
+  search from root
+  cache
+  /dir1 : /dir1/temp
+
+open /dir1/dir2
+  pathDirTempMake /dir1/dir2
+  search and check cache
+  search from root
+  cache
+    /dir1 : /dir1/temp
+    /dir1/dir2 : /dir1/dir2/temp
+
+close /dir1/dir2
+  ceck cache
+  cache
+    /dir1 : /dir1/temp
+  ceck cache 2nd time
+  delete /dir1/dir2/Temp
+
+close /dir1
+  ceck cache
+  cache
+  ceck cache 2nd time
+  delete /dir1/temp
+
+*/
+
+/*
+
+= /dir1 - device1, /dir1/dir2 - device1
+
+open /dir1
+  pathDirTempMake /dir1
+  search from root
+  cache
+  /dir1 : /dir1/temp
+
+open /dir1/dir2
+  pathDirTempMake /dir1/dir2
+  search and check cache
+  cache
+    /dir1 : /dir1/temp
+    /dir1/dir2 : /dir1/temp
+
+close /dir1/dir2
+  ceck cache
+  cache
+    /dir1 : /dir1/temp
+  ceck cache 2nd time
+
+close /dir1
+  ceck cache
+  cache
+  ceck cache 2nd time
+  delete /dir1/temp
+
+*/
 
   if( !o.name )
   o.name = 'tmp';

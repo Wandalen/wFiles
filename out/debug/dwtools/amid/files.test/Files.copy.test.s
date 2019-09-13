@@ -439,7 +439,7 @@ function drawInfo( info )
 
 //   //   var statsDstBefore = statResolvedReads( o.dst );
 
-//   //   test.shouldThrowError( () => _.fileProvider.filesCopyOld( options ) )
+//   //   test.shouldThrowErrorOfAnyKind( () => _.fileProvider.filesCopyOld( options ) )
 
 //   //   var statsSrc = statResolvedReads( o.src );
 //   //   var statsDst = statResolvedReads( o.dst );
@@ -488,7 +488,7 @@ function drawInfo( info )
 //   //   o.dst = prepareFile( o.dst, null, null, level );
 
 //   //   var options = _.mapSupplement( o, fixedOptions );
-//   //   test.shouldThrowError( () => _.fileProvider.filesCopyOld( options ) );
+//   //   test.shouldThrowErrorOfAnyKind( () => _.fileProvider.filesCopyOld( options ) );
 
 //   //   info.checks.push( test.is( !statResolvedReads( o.src ) ) );
 //   //   info.checks.push( test.is( !statResolvedReads( o.dst ) ) );

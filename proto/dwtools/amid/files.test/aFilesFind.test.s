@@ -1408,7 +1408,7 @@ function filesFind( test )
     withStem/*maybe withTransient*/ : 0,
     outputFormat : 'absolute'
   });
-  var expected = [ path.normalize( __filename ) ];
+  var expected = [ /* path.normalize( __filename ) */ ];
   test.identical( got, expected );
 
   /* */
@@ -1536,13 +1536,14 @@ function filesFind( test )
       var checks = [];
       var options = _.cloneJust( c );
 
-      if( options.glob !== undefined )
+      if( options.glob )
       {
         options.filePath = path.join( options.filePath, options.glob );
-        delete options.glob;
       }
 
-      if( options.filePath === null )
+      delete options.glob;
+
+      if( options.filePath === null && options.mandatory )
       return test.shouldThrowErrorOfAnyKind( () => provider.filesFind( options ) );
 
       var files = provider.filesFind( options );

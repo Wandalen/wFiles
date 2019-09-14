@@ -305,6 +305,69 @@ Unix
 
 }
 
+function pathDirTempOpen( o )
+{
+  let self = this;
+
+  if( !_.mapIs( arguments[ 0 ] ) )
+  o = { filePath : arguments[ 0 ] }
+  if( arguments[ 1 ] !== undefined )
+  o.name = arguments[ 1 ];
+  o.filePath = self.resolve( o.filePath );
+
+  _.routineOptions( pathDirTempOpen, o );
+  _.assert( arguments.length === 1 || arguments.length === 2 );
+  _.assert( !!self.fileProvider );
+  _.assert( self.isAbsolute( o.filePath ) );
+  _.assert( self.isNormalized( o.filePath ) );
+
+  if( !self.pathDirTempForMap )
+  self.pathDirTempForMap = Object.create( null );
+
+  /* search in cache */
+
+  if( self.pathDirTempForMap[ o.filePath ] )
+  return self.pathDirTempForMap[ o.filePath ];
+
+  let trace = self.traceToRoot( o.filePath );
+
+  for( let i = trace.length - 1; i >= 0; i-- )
+  if( self.pathDirTempForMap[ trace[ i ] ] )
+  {
+    if( i !== trace.length - 1 )
+    if( self.fileProvider.fileExists( trace[ i + 1 ] ) )
+    {
+      let currentStat = self.fileProvider.statReadAct
+      ({
+        filePath : trace[ i ],
+        throwing : 1,
+        sync : 1,
+        resolvingSoftLink : 0,
+      });
+      let nextStat = self.fileProvider.statReadAct
+      ({
+        filePath : trace[ i + 1 ],
+        throwing : 0,
+        sync : 1,
+        resolvingSoftLink : 0,
+      });
+
+      if( nextStat.dev != currentStat.dev )
+      break;
+    }
+
+    let result = self.pathDirTempForMap[ trace[ i ] ];
+    _.assert( self.pathDirTempForMap[ o.filePath ] === undefined );
+    self.pathDirTempForMap[ o.filePath ] = result
+    return result;
+  }
+
+  let result = self.pathDirTempMake({ filePath : o.filePath,name : o.name,trace : trace });
+  self.pathDirTempForMap[ o.filePath ] = result;
+
+  return result;
+}
+
 pathDirTempOpen.defaults =
 {
   filePath : null,
@@ -476,10 +539,119 @@ close /dir1
 
 }
 
+function pathDirTempMake( o )
+{
+  let self = this;
+
+  _.routineOptions( pathDirTempMake, arguments );
+  _.assert( arguments.length === 1 );
+  _.assert( !!self.fileProvider );
+  _.assert( self.isAbsolute( o.filePath ) );
+  _.assert( self.isNormalized( o.filePath ) );
+  _.assert( _.arrayIs( o.trace ) || o.trace === null );
+
+  let filePath = o.filePath;
+  let trace = o.trace;
+  let err;
+
+  if( !trace )
+  trace = self.traceToRoot( o.filePath );
+
+  if( !o.name )
+  o.name = 'tmp';
+  o.name = o.name + '-' + _.idWithDate() + '.tmp';
+
+  let osTempDir = self.dirTemp();
+
+  let common = self.common( osTempDir, trace[ 0 ] )
+
+  if( common === trace[ 0 ] )
+  {
+    filePath = self.join( osTempDir, o.name );
+    self.fileProvider.dirMake( filePath );
+    return end();
+  }
+
+  for( let i = 0; i < trace.length; i++ )
+  {
+    filePath = self.join( trace[ i ], 'Temp', o.name );
+    if( self.fileProvider.fileExists( filePath ) )
+    return end();
+
+    try
+    {
+      self.fileProvider.dirMake( filePath );
+      if( i !== trace.length - 1 )
+      if( self.fileProvider.fileExists( trace[ i + 1 ] ) )
+      {
+        let currentStat = self.fileProvider.statReadAct
+        ({
+          filePath : filePath,
+          throwing : 1,
+          sync : 1,
+          resolvingSoftLink : 0,
+        });
+        let nextStat = self.fileProvider.statReadAct
+        ({
+          filePath : trace[ i + 1 ],
+          throwing : 0,
+          sync : 1,
+          resolvingSoftLink : 0,
+        });
+
+        if( nextStat.dev != currentStat.dev )
+        {
+          self.fileProvider.fileDelete( filePath );
+          continue;
+        }
+      }
+      // {
+      //   let fileName = _.idWithDate();
+      //   let srcPath = self.join( trace[ i + 1 ], fileName );
+      //   self.fileProvider.fileWrite( srcPath, srcPath );
+      //   let dstPath = self.join( filePath, 'testFile' );
+      //   let result = self.fileProvider.fileRename({ dstPath, srcPath, onlyMoving : 1, throwing : 0 });
+      //   if( result === null )
+      //   {
+      //     self.fileProvdier.fileDelete( srcPath )
+      //     self.fileProvdier.fileDelete( filePath )
+      //   }
+      //   self.fileProvdier.fileDelete( dstPath )
+      // }
+
+      return end();
+    }
+    catch( e )
+    {
+      err = e;
+    }
+  }
+
+  if( err )
+  filePath = osTempDir;
+
+  return end();
+
+  /* */
+
+  function end()
+  {
+    _.appExitHandlerOnce( () =>
+    {
+      debugger;
+      self.pathDirTempClose()
+    });
+
+    logger.log( ' . Open temp directory ' + filePath );
+    return filePath;
+  }
+}
+
 pathDirTempMake.defaults =
 {
   filePath : null,
   name : null,
+  trace : null
 }
 
 //
@@ -552,6 +724,76 @@ function pathDirTempClose( tempDirPath )
     // return path.substring( 0, path.indexOf( '/', 1 ) )
   }
 
+}
+
+//
+
+function pathDirTempClose( filePath )
+{
+  let self = this;
+
+  _.assert( arguments.length <= 1 );
+  _.assert( !!self.fileProvider );
+
+  if( !self.pathDirTempForMap )
+  return;
+
+  if( !arguments.length )
+  {
+    for( let path in self.pathDirTempForMap )
+    close( path );
+  }
+  else
+  {
+    _.assert( self.isAbsolute( filePath ) );
+    _.assert( self.isNormalized( filePath ) );
+
+    let currentTempPath = self.pathDirTempForMap[ filePath ];
+
+    if( !currentTempPath )
+    {
+      for( let path in self.pathDirTempForMap )
+      if( self.pathDirTempForMap[ path ] === filePath )
+      {
+        currentTempPath = filePath;
+        filePath = path;
+        break;
+      }
+
+      if( !currentTempPath )
+      throw _.err( 'Not found temp dir for path: ' + filePath );
+    }
+
+    for( let path in self.pathDirTempForMap )
+    if( self.pathDirTempForMap[ path ] === currentTempPath )
+    if( path !== filePath )
+    {
+      delete self.pathDirTempForMap[ filePath ];
+      return;
+    }
+
+    close( filePath );
+  }
+
+  /*  */
+
+  function close( filePath )
+  {
+    let tempPath = self.pathDirTempForMap[ filePath ];
+    self.fileProvider.fieldPush( 'safe', 0 );
+    self.fileProvider.filesDelete
+    ({
+      filePath : tempPath,
+      safe : 0,
+      throwing : 0,
+    });
+    self.fileProvider.fieldPop( 'safe', 0 );
+    delete self.pathDirTempForMap[ filePath ];
+    _.assert( !self.fileProvider.fileExists( tempPath ) );
+    logger.log( ' . Close temp directory ' + tempPath );
+    debugger;
+    return tempPath;
+  }
 }
 
 

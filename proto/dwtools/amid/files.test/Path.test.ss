@@ -1102,6 +1102,95 @@ function pathDirTempForTrivial( test )
   }
 }
 
+//
+
+function pathDirTemp( test )
+{
+  let filesTree = Object.create( null );
+  let extract = new _.FileProvider.Extract({ filesTree })
+  var name = 'pathDirTempOpenTest';
+
+  test.open( 'same drive' );
+
+  var filePath1 = '/dir1'
+  var got1 = extract.path.pathDirTempOpen({ filePath : filePath1, name });
+  test.identical( extract.path.pathDirTempForMap[ filePath1 ], got1 );
+  test.is( _.strHas( got1, name ) );
+  test.is( extract.isDir( got1 ) );
+
+  var filePath2 = '/dir1/dir2'
+  var got2 = extract.path.pathDirTempOpen({ filePath : filePath2, name });
+  test.identical( extract.path.pathDirTempForMap[ filePath2 ], got1 );
+  test.is( _.strHas( got2, name ) );
+  test.identical( got2, got1 );
+  test.is( extract.isDir( got2 ) );
+
+  var got1 = extract.path.pathDirTempOpen({ filePath : filePath1, name });
+  var got2 = extract.path.pathDirTempOpen({ filePath : filePath2, name });
+  test.identical( got2, got1 );
+  test.is( extract.isDir( got1 ) );
+  test.identical( extract.path.pathDirTempForMap[ filePath1 ], got1 );
+  test.identical( extract.path.pathDirTempForMap[ filePath2 ], got2 );
+
+  extract.path.pathDirTempClose( filePath1 );
+  test.identical( extract.path.pathDirTempForMap[ filePath1 ], undefined );
+  test.identical( extract.path.pathDirTempForMap[ filePath2 ], got2 );
+  test.is( extract.isDir( got2 ) );
+  extract.path.pathDirTempClose( filePath2 );
+  test.identical( extract.path.pathDirTempForMap[ filePath1 ], undefined );
+  test.identical( extract.path.pathDirTempForMap[ filePath2 ], undefined );
+  test.is( !extract.isDir( got2 ) );
+
+  var got1 = extract.path.pathDirTempOpen({ filePath : filePath1, name });
+  var got2 = extract.path.pathDirTempOpen({ filePath : filePath2, name });
+  test.identical( got2, got1 );
+  test.is( extract.isDir( got1 ) );
+  test.identical( extract.path.pathDirTempForMap[ filePath1 ], got1 );
+  test.identical( extract.path.pathDirTempForMap[ filePath2 ], got2 );
+  extract.path.pathDirTempClose();
+  test.identical( extract.path.pathDirTempForMap[ filePath1 ], undefined );
+  test.identical( extract.path.pathDirTempForMap[ filePath2 ], undefined );
+  test.is( !extract.isDir( got1 ) );
+  test.is( !extract.isDir( got2 ) );
+
+  test.close( 'same drive' );
+
+  /* */
+
+  test.open( 'different drive' );
+
+  var filePath1 = '/dir1'
+  var filePath2 = '/dir1/dir2'
+
+  extract.dirMake( filePath1 );
+  extract.dirMake( filePath2 );
+
+  extract.extraStats[ filePath1 ] = { dev : 1 }
+  extract.extraStats[ filePath2 ] = { dev : 2 }
+
+  var got1 = extract.path.pathDirTempOpen({ filePath : filePath1, name });
+  var got2 = extract.path.pathDirTempOpen({ filePath : filePath2, name });
+  test.notIdentical( got1, got2 );
+  test.identical( extract.path.common( got2, filePath2 ), filePath2 )
+  test.is( extract.isDir( got1 ) );
+  test.is( extract.isDir( got2 ) );
+  test.identical( extract.path.pathDirTempForMap[ filePath1 ], got1 );
+  test.identical( extract.path.pathDirTempForMap[ filePath2 ], got2 );
+
+  extract.path.pathDirTempClose( filePath1 );
+  test.identical( extract.path.pathDirTempForMap[ filePath1 ], undefined );
+  test.identical( extract.path.pathDirTempForMap[ filePath2 ], got2 );
+  test.is( extract.isDir( got2 ) );
+  extract.path.pathDirTempClose( filePath2 );
+  test.identical( extract.path.pathDirTempForMap[ filePath1 ], undefined );
+  test.identical( extract.path.pathDirTempForMap[ filePath2 ], undefined );
+  test.is( !extract.isDir( got2 ) );
+
+  test.close( 'different drive' );
+
+
+}
+
 
 // --
 // declare
@@ -1151,7 +1240,9 @@ var Self =
 
     dirTemp,
 
-    pathDirTempForTrivial,
+    // pathDirTempForTrivial,
+
+    pathDirTemp
 
   },
 

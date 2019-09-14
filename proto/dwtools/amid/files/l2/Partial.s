@@ -6632,6 +6632,9 @@ function _fileRenameAct( c )
   if( c.srcStat === null )
   return null;
 
+  if( o.onlyMoving )
+  return self.fileRenameAct( c.options2 );
+
   if( c.srcStat.isSoftLink() )
   {
     let chain;
@@ -6803,6 +6806,7 @@ defaults.allowingMissed = 0;
 defaults.allowingCycled = 0;
 defaults.throwing = null;
 defaults.verbosity = null;
+defaults.onlyMoving = 0;
 
 defaults.resolvingSrcSoftLink = 1;
 defaults.resolvingSrcTextLink = 0;

@@ -521,6 +521,12 @@ function pathDirTempMake( o )
 
   let trace = self.traceToRoot( o.filePath );
 
+  if( !trace.length )
+  {
+    _.assert( o.filePath === '/' );
+    trace = [ o.filePath ];
+  }
+
   if( !o.name )
   o.name = 'tmp';
   o.name = o.name + '-' + _.idWithDate() + '.tmp';

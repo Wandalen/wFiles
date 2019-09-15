@@ -1188,7 +1188,22 @@ function pathDirTemp( test )
 
   test.close( 'different drive' );
 
+  test.open( 'os path' )
 
+  var filePath1 = extract.path.dir( extract.path.dirTemp() );
+  var got1 = extract.path.pathDirTempOpen({ filePath: filePath1, name });
+  test.is( extract.isDir( got1 ) );
+  test.is( _.strBegins( got1, '/temp' ) )
+  test.identical( extract.path.pathDirTempForMap[ filePath1 ], got1 );
+
+  var filePath2 = '/'
+  var got2 = extract.path.pathDirTempOpen({ filePath : filePath2, name });
+  test.is( extract.isDir( got2 ) );
+  test.identical( got1,got2 );
+  test.is( _.strBegins( got2, '/temp' ) );
+  test.identical( extract.path.pathDirTempForMap[ filePath2 ], got2 );
+
+  test.close( 'os path' )
 }
 
 

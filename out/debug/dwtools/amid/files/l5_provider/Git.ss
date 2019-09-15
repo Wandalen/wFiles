@@ -976,7 +976,7 @@ function filesReflectSingle_body( o )
   function handleGitError( err )
   {
     if( self.throwingGitErrors )
-    throw _.errBriefly( err );
+    throw _.errBrief( err );
     else if( o.verbosity )
     self.logger.log( err );
   }

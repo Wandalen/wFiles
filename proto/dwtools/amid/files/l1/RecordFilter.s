@@ -1631,7 +1631,7 @@ function basePathsGet()
   _.assert( filter.basePath === null || _.strIs( filter.basePath ) || _.mapIs( filter.basePath ) );
 
   if( _.objectIs( filter.basePath ) )
-  return _.longUnduplicate( null, _.mapVals( filter.basePath ) )
+  return _./*longOnce*/arrayAppendArrayOnce( null, _.mapVals( filter.basePath ) )
   else if( _.strIs( filter.basePath ) )
   return [ filter.basePath ];
   else
@@ -2885,7 +2885,7 @@ function filePathSrcArrayNonBoolGet( filePath, booleanFallingBack )
   }
 
   _.assert( _.arrayIs( filePath ) );
-  _.longUnduplicate( filePath );
+  _.longOnce( filePath );
 
   return filePath;
 }
@@ -2936,7 +2936,7 @@ function filePathDstArrayBoolGet( filePath )
   }
 
   let filePath2 = _.filter( filePath, ( e ) => _.boolLike( e ) ? !!e : undefined );
-  filePath = _.longUnduplicate( null, filePath2 );
+  filePath = _./*longOnce*/arrayAppendArrayOnce( null, filePath2 );
 
   _.assert( _.arrayIs( filePath ) );
 

@@ -329,40 +329,7 @@ function pathDirTempOpen( o )
   if( self.pathDirTempForMap[ o.filePath ] )
   return self.pathDirTempForMap[ o.filePath ];
 
-  let trace = self.traceToRoot( o.filePath );
-
-  for( let i = trace.length - 1; i >= 0; i-- )
-  if( self.pathDirTempForMap[ trace[ i ] ] )
-  {
-    if( i !== trace.length - 1 )
-    if( self.fileProvider.fileExists( trace[ i + 1 ] ) )
-    {
-      let currentStat = self.fileProvider.statReadAct
-      ({
-        filePath : trace[ i ],
-        throwing : 1,
-        sync : 1,
-        resolvingSoftLink : 0,
-      });
-      let nextStat = self.fileProvider.statReadAct
-      ({
-        filePath : trace[ i + 1 ],
-        throwing : 0,
-        sync : 1,
-        resolvingSoftLink : 0,
-      });
-
-      if( nextStat.dev != currentStat.dev )
-      break;
-    }
-
-    let result = self.pathDirTempForMap[ trace[ i ] ];
-    _.assert( self.pathDirTempForMap[ o.filePath ] === undefined );
-    self.pathDirTempForMap[ o.filePath ] = result
-    return result;
-  }
-
-  let result = self.pathDirTempMake({ filePath : o.filePath,name : o.name,trace : trace });
+  let result = self.pathDirTempMake({ filePath : o.filePath, name : o.name });
   self.pathDirTempForMap[ o.filePath ] = result;
 
   return result;
@@ -548,14 +515,11 @@ function pathDirTempMake( o )
   _.assert( !!self.fileProvider );
   _.assert( self.isAbsolute( o.filePath ) );
   _.assert( self.isNormalized( o.filePath ) );
-  _.assert( _.arrayIs( o.trace ) || o.trace === null );
 
   let filePath = o.filePath;
-  let trace = o.trace;
   let err;
 
-  if( !trace )
-  trace = self.traceToRoot( o.filePath );
+  let trace = self.traceToRoot( o.filePath );
 
   if( !o.name )
   o.name = 'tmp';
@@ -574,13 +538,20 @@ function pathDirTempMake( o )
 
   for( let i = 0; i < trace.length; i++ )
   {
-    filePath = self.join( trace[ i ], 'Temp', o.name );
-    if( self.fileProvider.fileExists( filePath ) )
-    return end();
-
     try
     {
-      self.fileProvider.dirMake( filePath );
+      if( self.pathDirTempForMap[ trace[ i ] ] )
+      {
+        filePath = self.pathDirTempForMap[ trace[ i ] ];
+      }
+      else
+      {
+        filePath = self.join( trace[ i ], 'Temp', o.name );
+        if( self.fileProvider.fileExists( filePath ) )
+        return end();
+        self.fileProvider.dirMake( filePath );
+      }
+
       if( i !== trace.length - 1 )
       if( self.fileProvider.fileExists( trace[ i + 1 ] ) )
       {
@@ -601,6 +572,7 @@ function pathDirTempMake( o )
 
         if( nextStat.dev != currentStat.dev )
         {
+          if( !self.pathDirTempForMap[ trace[ i ] ] )
           self.fileProvider.fileDelete( filePath );
           continue;
         }
@@ -650,8 +622,7 @@ function pathDirTempMake( o )
 pathDirTempMake.defaults =
 {
   filePath : null,
-  name : null,
-  trace : null
+  name : null
 }
 
 //

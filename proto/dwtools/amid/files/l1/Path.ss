@@ -335,6 +335,42 @@ function pathDirTempOpen( o )
   if( cache[ o.filePath ] )
   return cache[ o.filePath ];
 
+  let trace = self.traceToRoot( o.filePath );
+
+  for( let i = trace.length - 1; i >= 0; i-- )
+  {
+    if( !cache[ trace[ i ] ] )
+    continue;
+
+    if( i !== trace.length - 1 )
+    if( self.fileProvider.fileExists( trace[ i + 1 ] ) )
+    {
+      let currentStat = self.fileProvider.statReadAct
+      ({
+        filePath : trace[ i ],
+        throwing : 1,
+        sync : 1,
+        resolvingSoftLink : 0,
+      });
+      let nextStat = self.fileProvider.statReadAct
+      ({
+        filePath : trace[ i + 1 ],
+        throwing : 0,
+        sync : 1,
+        resolvingSoftLink : 0,
+      });
+
+      if( nextStat.dev !== currentStat.dev )
+      break;
+    }
+
+    cache[ o.filePath ] = cache[ trace[ i ] ];
+
+    return cache[ o.filePath ];
+  }
+
+  /* make */
+
   let result = self.pathDirTempMake({ filePath : o.filePath, name : o.name });
   cache[ o.filePath ] = result;
 
@@ -596,19 +632,6 @@ function pathDirTempMake( o )
           continue;
         }
       }
-      // {
-      //   let fileName = _.idWithDate();
-      //   let srcPath = self.join( trace[ i + 1 ], fileName );
-      //   self.fileProvider.fileWrite( srcPath, srcPath );
-      //   let dstPath = self.join( filePath, 'testFile' );
-      //   let result = self.fileProvider.fileRename({ dstPath, srcPath, onlyMoving : 1, throwing : 0 });
-      //   if( result === null )
-      //   {
-      //     self.fileProvdier.fileDelete( srcPath )
-      //     self.fileProvdier.fileDelete( filePath )
-      //   }
-      //   self.fileProvdier.fileDelete( dstPath )
-      // }
 
       return end();
     }

@@ -248,26 +248,6 @@ dirTempAt.defaults =
 
 //
 
-function pathDirTempOpen( o )
-{
-  let self = this;
-
-  if( !_.mapIs( arguments[ 0 ] ) )
-  o = { filePath : arguments[ 0 ] }
-  if( arguments[ 1 ] !== undefined )
-  o.name = arguments[ 1 ];
-  o.filePath = self.resolve( o.filePath );
-
-  _.routineOptions( pathDirTempOpen, o );
-  _.assert( arguments.length === 1 || arguments.length === 2 );
-  _.assert( !!self.fileProvider );
-  _.assert( self.isAbsolute( o.filePath ) );
-
-  // o.filePath = self.normalize( o.filePath );
-
-  if( !self.pathDirTempForMap )
-  self.pathDirTempForMap = Object.create( null );
-
 /*
 filePath : /dir1/dir2/dir3
 
@@ -282,28 +262,50 @@ Unix
 
 */
 
-  /* qqq : hacks */
-  let devicePath = devicePathGet( o.filePath );
+// function pathDirTempOpen( o )
+// {
+//   let self = this;
 
-  if( self.pathDirTempForMap[ devicePath ] )
-  return self.pathDirTempForMap[ devicePath ];
+//   if( !_.mapIs( arguments[ 0 ] ) )
+//   o = { filePath : arguments[ 0 ] }
+//   if( arguments[ 1 ] !== undefined )
+//   o.name = arguments[ 1 ];
+//   o.filePath = self.resolve( o.filePath );
 
-  let result = self.pathDirTempMake( o );
+//   _.routineOptions( pathDirTempOpen, o );
+//   _.assert( arguments.length === 1 || arguments.length === 2 );
+//   _.assert( !!self.fileProvider );
+//   _.assert( self.isAbsolute( o.filePath ) );
 
-  self.pathDirTempForMap[ devicePath ] = result;
+//   // o.filePath = self.normalize( o.filePath );
 
-  return result;
+//   if( !self.pathDirTempForMap )
+//   self.pathDirTempForMap = Object.create( null );
 
-  /* */
+//   /* qqq : hacks */
+//   let devicePath = devicePathGet( o.filePath );
 
-  /* qqq : please re */
-  function devicePathGet( path )
-  {
-    return '/';
-    // return path.substring( 0, path.indexOf( '/', 1 ) )
-  }
+//   if( self.pathDirTempForMap[ devicePath ] )
+//   return self.pathDirTempForMap[ devicePath ];
 
-}
+//   let result = self.pathDirTempMake( o );
+
+//   self.pathDirTempForMap[ devicePath ] = result;
+
+//   return result;
+
+//   /* */
+
+//   /* qqq : please re */
+//   function devicePathGet( path )
+//   {
+//     return '/';
+//     // return path.substring( 0, path.indexOf( '/', 1 ) )
+//   }
+
+// }
+
+let PathDirTempForMap = Object.create( null );
 
 function pathDirTempOpen( o )
 {
@@ -321,16 +323,20 @@ function pathDirTempOpen( o )
   _.assert( self.isAbsolute( o.filePath ) );
   _.assert( self.isNormalized( o.filePath ) );
 
-  if( !self.pathDirTempForMap )
-  self.pathDirTempForMap = Object.create( null );
+  let id = self.fileProvider.id;
+
+  if( !PathDirTempForMap[ id ] )
+  PathDirTempForMap[ id ] = Object.create( null );
 
   /* search in cache */
 
-  if( self.pathDirTempForMap[ o.filePath ] )
-  return self.pathDirTempForMap[ o.filePath ];
+  let cache = PathDirTempForMap[ id ];
+
+  if( cache[ o.filePath ] )
+  return cache[ o.filePath ];
 
   let result = self.pathDirTempMake({ filePath : o.filePath, name : o.name });
-  self.pathDirTempForMap[ o.filePath ] = result;
+  cache[ o.filePath ] = result;
 
   return result;
 }
@@ -360,19 +366,6 @@ filePath : /dir1/dir2/dir3
 /dir1/dir2/dir3/Temp/x
 
 */
-
-function pathDirTempMake( o )
-{
-  let self = this;
-
-  _.routineOptions( pathDirTempMake, arguments );
-  _.assert( arguments.length === 1 );
-  _.assert( !!self.fileProvider );
-  _.assert( self.isAbsolute( o.filePath ) );
-  _.assert( self.isNormalized( o.filePath ) );
-
-  let filePath2;
-  var osTempDir = self.dirTemp();
 
 /*
 
@@ -438,73 +431,86 @@ close /dir1
 
 */
 
-  if( !o.name )
-  o.name = 'tmp';
-  o.name = o.name + '-' + _.idWithDate() + '.tmp';
+// function pathDirTempMake( o )
+// {
+//   let self = this;
 
-  if( devicePathGet( osTempDir ) === devicePathGet( o.filePath ) )
-  {
-    filePath2 = self.join( osTempDir, o.name );
-    self.fileProvider.dirMake({ filePath : filePath2, sync : 1 });
-    return end();
-  }
+//   _.routineOptions( pathDirTempMake, arguments );
+//   _.assert( arguments.length === 1 );
+//   _.assert( !!self.fileProvider );
+//   _.assert( self.isAbsolute( o.filePath ) );
+//   _.assert( self.isNormalized( o.filePath ) );
 
-  let dirsPath = self.traceToRoot( o.filePath );
-  let err;
-  let tempPath = 'temp/' + o.name;
+//   let filePath2;
+//   var osTempDir = self.dirTemp();
 
-  for( let i = 0, l = dirsPath.length - 1 || dirsPath.length ; i < l ; i++ )
-  {
-    filePath2 = dirsPath[ i ] + '/' + tempPath;
+//   if( !o.name )
+//   o.name = 'tmp';
+//   o.name = o.name + '-' + _.idWithDate() + '.tmp';
 
-    if( self.fileProvider.fileExists( filePath2 ) )
-    return end();
+//   if( devicePathGet( osTempDir ) === devicePathGet( o.filePath ) )
+//   {
+//     filePath2 = self.join( osTempDir, o.name );
+//     self.fileProvider.dirMake({ filePath : filePath2, sync : 1 });
+//     return end();
+//   }
 
-    try
-    {
-      self.fileProvider.dirMake( filePath2 );
-      return end();
-    }
-    catch( e )
-    {
-      err = e;
-      // self.fileProvider.logger.log( 'Can`t create temp directory at :', filePath2 );
-    }
-  }
+//   let dirsPath = self.traceToRoot( o.filePath );
+//   let err;
+//   let tempPath = 'temp/' + o.name;
 
-  if( err )
-  throw _.err( 'Can`t create temp directory for:', o.filePath, '\n', err )
+//   for( let i = 0, l = dirsPath.length - 1 || dirsPath.length ; i < l ; i++ )
+//   {
+//     filePath2 = dirsPath[ i ] + '/' + tempPath;
 
-  return end();
+//     if( self.fileProvider.fileExists( filePath2 ) )
+//     return end();
 
-  /* */
+//     try
+//     {
+//       self.fileProvider.dirMake( filePath2 );
+//       return end();
+//     }
+//     catch( e )
+//     {
+//       err = e;
+//       // self.fileProvider.logger.log( 'Can`t create temp directory at :', filePath2 );
+//     }
+//   }
 
-  // function devicePathGet( filePath )
-  // {
-  //   return filePath.substring( 0, filePath.indexOf( '/', 1 ) )
-  // }
+//   if( err )
+//   throw _.err( 'Can`t create temp directory for:', o.filePath, '\n', err )
 
-  /* qqq : please redo properly */
-  function devicePathGet( path )
-  {
-    return '/';
-    // return path.substring( 0, path.indexOf( '/', 1 ) )
-  }
+//   return end();
 
-  /* */
+//   /* */
 
-  function end()
-  {
-    _.appExitHandlerOnce( () =>
-    {
-      debugger;
-      self.pathDirTempClose()
-    });
-    logger.log( ' . Open temp directory ' + filePath2 );
-    return filePath2;
-  }
+//   // function devicePathGet( filePath )
+//   // {
+//   //   return filePath.substring( 0, filePath.indexOf( '/', 1 ) )
+//   // }
 
-}
+//   /* qqq : please redo properly */
+//   function devicePathGet( path )
+//   {
+//     return '/';
+//     // return path.substring( 0, path.indexOf( '/', 1 ) )
+//   }
+
+//   /* */
+
+//   function end()
+//   {
+//     _.appExitHandlerOnce( () =>
+//     {
+//       debugger;
+//       self.pathDirTempClose()
+//     });
+//     logger.log( ' . Open temp directory ' + filePath2 );
+//     return filePath2;
+//   }
+
+// }
 
 function pathDirTempMake( o )
 {
@@ -542,13 +548,20 @@ function pathDirTempMake( o )
     return end();
   }
 
+  let id = self.fileProvider.id;
+
+  if( !PathDirTempForMap[ id ] )
+  PathDirTempForMap[ id ] = Object.create( null );
+
+  let cache = PathDirTempForMap[ id ];
+
   for( let i = 0; i < trace.length; i++ )
   {
     try
     {
-      if( self.pathDirTempForMap[ trace[ i ] ] )
+      if( cache[ trace[ i ] ] )
       {
-        filePath = self.pathDirTempForMap[ trace[ i ] ];
+        filePath = cache[ trace[ i ] ];
       }
       else
       {
@@ -578,7 +591,7 @@ function pathDirTempMake( o )
 
         if( nextStat.dev != currentStat.dev )
         {
-          if( !self.pathDirTempForMap[ trace[ i ] ] )
+          if( !cache[ trace[ i ] ] )
           self.fileProvider.fileDelete( filePath );
           continue;
         }
@@ -633,75 +646,75 @@ pathDirTempMake.defaults =
 
 //
 
-function pathDirTempClose( tempDirPath )
-{
-  let self = this;
+// function pathDirTempClose( tempDirPath )
+// {
+//   let self = this;
 
-  _.assert( arguments.length <= 1 );
-  _.assert( !!self.fileProvider );
+//   _.assert( arguments.length <= 1 );
+//   _.assert( !!self.fileProvider );
 
-  debugger;
+//   debugger;
 
-  if( !self.pathDirTempForMap )
-  return;
+//   if( !self.pathDirTempForMap )
+//   return;
 
-  if( !arguments.length )
-  {
-    for( let d in self.pathDirTempForMap )
-    {
-      close( d );
-    }
-  }
-  else
-  {
-    _.assert( self.isAbsolute( tempDirPath ) );
-    _.assert( self.isNormalized( tempDirPath ) );
+//   if( !arguments.length )
+//   {
+//     for( let d in self.pathDirTempForMap )
+//     {
+//       close( d );
+//     }
+//   }
+//   else
+//   {
+//     _.assert( self.isAbsolute( tempDirPath ) );
+//     _.assert( self.isNormalized( tempDirPath ) );
 
-    let devicePath = devicePathGet( tempDirPath );
+//     let devicePath = devicePathGet( tempDirPath );
 
-    debugger;
-    if( !self.pathDirTempForMap[ devicePath ] )
-    throw _.err( 'Not found temp dir for device ' + devicePath );
+//     debugger;
+//     if( !self.pathDirTempForMap[ devicePath ] )
+//     throw _.err( 'Not found temp dir for device ' + devicePath );
 
-    if( self.pathDirTempForMap[ devicePath ] !== tempDirPath )
-    throw _.err
-    (
-        'Registered temp directory', self.pathDirTempForMap[ devicePath ]
-      , '\nAttempt to unregister temp directory', tempDirPath
-    );
+//     if( self.pathDirTempForMap[ devicePath ] !== tempDirPath )
+//     throw _.err
+//     (
+//         'Registered temp directory', self.pathDirTempForMap[ devicePath ]
+//       , '\nAttempt to unregister temp directory', tempDirPath
+//     );
 
-    close( devicePath );
+//     close( devicePath );
 
-    // self.fileProvider.filesDelete({ filePath : tempDirPath, safe : 0, throwing : 1 });
-    // _.assert( !self.fileProvider.fileExists( tempDirPath ) );
-    // delete self.pathDirTempForMap[ devicePath ];
+//     // self.fileProvider.filesDelete({ filePath : tempDirPath, safe : 0, throwing : 1 });
+//     // _.assert( !self.fileProvider.fileExists( tempDirPath ) );
+//     // delete self.pathDirTempForMap[ devicePath ];
 
-  }
+//   }
 
-  function close( keyPath )
-  {
-    let tempPath = self.pathDirTempForMap[ keyPath ];
-    self.fileProvider.filesDelete
-    ({
-      filePath : tempPath,
-      safe : 0,
-      throwing : 0,
-    });
-    delete self.pathDirTempForMap[ keyPath ];
-    _.assert( !self.fileProvider.fileExists( tempPath ) );
-    logger.log( ' . Close temp directory ' + tempPath );
-    debugger;
-    return tempPath;
-  }
+//   function close( keyPath )
+//   {
+//     let tempPath = self.pathDirTempForMap[ keyPath ];
+//     self.fileProvider.filesDelete
+//     ({
+//       filePath : tempPath,
+//       safe : 0,
+//       throwing : 0,
+//     });
+//     delete self.pathDirTempForMap[ keyPath ];
+//     _.assert( !self.fileProvider.fileExists( tempPath ) );
+//     logger.log( ' . Close temp directory ' + tempPath );
+//     debugger;
+//     return tempPath;
+//   }
 
-  /* qqq : please redo properly */
-  function devicePathGet( path )
-  {
-    return '/';
-    // return path.substring( 0, path.indexOf( '/', 1 ) )
-  }
+//   /* qqq : please redo properly */
+//   function devicePathGet( path )
+//   {
+//     return '/';
+//     // return path.substring( 0, path.indexOf( '/', 1 ) )
+//   }
 
-}
+// }
 
 //
 
@@ -712,12 +725,16 @@ function pathDirTempClose( filePath )
   _.assert( arguments.length <= 1 );
   _.assert( !!self.fileProvider );
 
-  if( !self.pathDirTempForMap )
+  let id = self.fileProvider.id;
+
+  if( !PathDirTempForMap[ id ] )
   return;
+
+  let cache = PathDirTempForMap[ id ];
 
   if( !arguments.length )
   {
-    for( let path in self.pathDirTempForMap )
+    for( let path in cache )
     close( path );
   }
   else
@@ -725,12 +742,12 @@ function pathDirTempClose( filePath )
     _.assert( self.isAbsolute( filePath ) );
     _.assert( self.isNormalized( filePath ) );
 
-    let currentTempPath = self.pathDirTempForMap[ filePath ];
+    let currentTempPath = cache[ filePath ];
 
     if( !currentTempPath )
     {
-      for( let path in self.pathDirTempForMap )
-      if( self.pathDirTempForMap[ path ] === filePath )
+      for( let path in cache )
+      if( cache[ path ] === filePath )
       {
         currentTempPath = filePath;
         filePath = path;
@@ -741,11 +758,11 @@ function pathDirTempClose( filePath )
       throw _.err( 'Not found temp dir for path: ' + filePath );
     }
 
-    for( let path in self.pathDirTempForMap )
-    if( self.pathDirTempForMap[ path ] === currentTempPath )
+    for( let path in cache )
+    if( cache[ path ] === currentTempPath )
     if( path !== filePath )
     {
-      delete self.pathDirTempForMap[ filePath ];
+      delete cache[ filePath ];
       return;
     }
 
@@ -756,7 +773,7 @@ function pathDirTempClose( filePath )
 
   function close( filePath )
   {
-    let tempPath = self.pathDirTempForMap[ filePath ];
+    let tempPath = cache[ filePath ];
     self.fileProvider.fieldPush( 'safe', 0 );
     self.fileProvider.filesDelete
     ({
@@ -765,7 +782,7 @@ function pathDirTempClose( filePath )
       throwing : 0,
     });
     self.fileProvider.fieldPop( 'safe', 0 );
-    delete self.pathDirTempForMap[ filePath ];
+    delete cache[ filePath ];
     _.assert( !self.fileProvider.fileExists( tempPath ) );
     logger.log( ' . Close temp directory ' + tempPath );
     debugger;
@@ -930,6 +947,11 @@ firstAvailable.having.aspect = 'entry';
 // declare
 // --
 
+let Fields =
+{
+  PathDirTempForMap : PathDirTempForMap
+}
+
 let Proto =
 {
 
@@ -961,6 +983,7 @@ let Proto =
 }
 
 _.mapExtend( Self, Proto );
+_.mapExtend( Self, Fields );
 
 // --
 // export

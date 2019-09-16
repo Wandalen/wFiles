@@ -1110,17 +1110,21 @@ function pathDirTemp( test )
   let extract = new _.FileProvider.Extract({ filesTree })
   var name = 'pathDirTempOpenTest';
 
+  let cache = extract.path.PathDirTempForMap[ extract.id ] = Object.create( null );
+
+  //
+
   test.open( 'same drive' );
 
   var filePath1 = '/dir1'
   var got1 = extract.path.pathDirTempOpen({ filePath : filePath1, name });
-  test.identical( extract.path.pathDirTempForMap[ filePath1 ], got1 );
+  test.identical( cache[ filePath1 ], got1 );
   test.is( _.strHas( got1, name ) );
   test.is( extract.isDir( got1 ) );
 
   var filePath2 = '/dir1/dir2'
   var got2 = extract.path.pathDirTempOpen({ filePath : filePath2, name });
-  test.identical( extract.path.pathDirTempForMap[ filePath2 ], got1 );
+  test.identical( cache[ filePath2 ], got1 );
   test.is( _.strHas( got2, name ) );
   test.identical( got2, got1 );
   test.is( extract.isDir( got2 ) );
@@ -1129,27 +1133,28 @@ function pathDirTemp( test )
   var got2 = extract.path.pathDirTempOpen({ filePath : filePath2, name });
   test.identical( got2, got1 );
   test.is( extract.isDir( got1 ) );
-  test.identical( extract.path.pathDirTempForMap[ filePath1 ], got1 );
-  test.identical( extract.path.pathDirTempForMap[ filePath2 ], got2 );
+  test.identical( cache[ filePath1 ], got1 );
+  test.identical( cache[ filePath2 ], got2 );
 
   extract.path.pathDirTempClose( filePath1 );
-  test.identical( extract.path.pathDirTempForMap[ filePath1 ], undefined );
-  test.identical( extract.path.pathDirTempForMap[ filePath2 ], got2 );
+  test.identical( cache[ filePath1 ], undefined );
+  test.identical( cache[ filePath2 ], got2 );
   test.is( extract.isDir( got2 ) );
   extract.path.pathDirTempClose( filePath2 );
-  test.identical( extract.path.pathDirTempForMap[ filePath1 ], undefined );
-  test.identical( extract.path.pathDirTempForMap[ filePath2 ], undefined );
+  test.identical( cache[ filePath1 ], undefined );
+  test.identical( cache[ filePath2 ], undefined );
   test.is( !extract.isDir( got2 ) );
 
   var got1 = extract.path.pathDirTempOpen({ filePath : filePath1, name });
   var got2 = extract.path.pathDirTempOpen({ filePath : filePath2, name });
   test.identical( got2, got1 );
   test.is( extract.isDir( got1 ) );
-  test.identical( extract.path.pathDirTempForMap[ filePath1 ], got1 );
-  test.identical( extract.path.pathDirTempForMap[ filePath2 ], got2 );
+  test.identical( cache[ filePath1 ], got1 );
+  test.identical( cache[ filePath2 ], got2 );
+  debugger
   extract.path.pathDirTempClose();
-  test.identical( extract.path.pathDirTempForMap[ filePath1 ], undefined );
-  test.identical( extract.path.pathDirTempForMap[ filePath2 ], undefined );
+  test.identical( cache[ filePath1 ], undefined );
+  test.identical( cache[ filePath2 ], undefined );
   test.is( !extract.isDir( got1 ) );
   test.is( !extract.isDir( got2 ) );
 
@@ -1174,19 +1179,21 @@ function pathDirTemp( test )
   test.identical( extract.path.common( got2, filePath2 ), filePath2 )
   test.is( extract.isDir( got1 ) );
   test.is( extract.isDir( got2 ) );
-  test.identical( extract.path.pathDirTempForMap[ filePath1 ], got1 );
-  test.identical( extract.path.pathDirTempForMap[ filePath2 ], got2 );
+  test.identical( cache[ filePath1 ], got1 );
+  test.identical( cache[ filePath2 ], got2 );
 
   extract.path.pathDirTempClose( filePath1 );
-  test.identical( extract.path.pathDirTempForMap[ filePath1 ], undefined );
-  test.identical( extract.path.pathDirTempForMap[ filePath2 ], got2 );
+  test.identical( cache[ filePath1 ], undefined );
+  test.identical( cache[ filePath2 ], got2 );
   test.is( extract.isDir( got2 ) );
   extract.path.pathDirTempClose( filePath2 );
-  test.identical( extract.path.pathDirTempForMap[ filePath1 ], undefined );
-  test.identical( extract.path.pathDirTempForMap[ filePath2 ], undefined );
+  test.identical( cache[ filePath1 ], undefined );
+  test.identical( cache[ filePath2 ], undefined );
   test.is( !extract.isDir( got2 ) );
 
   test.close( 'different drive' );
+
+  //
 
   test.open( 'os path' )
 
@@ -1194,16 +1201,21 @@ function pathDirTemp( test )
   var got1 = extract.path.pathDirTempOpen({ filePath: filePath1, name });
   test.is( extract.isDir( got1 ) );
   test.is( _.strBegins( got1, '/temp' ) )
-  test.identical( extract.path.pathDirTempForMap[ filePath1 ], got1 );
+  test.identical( cache[ filePath1 ], got1 );
 
   var filePath2 = '/'
   var got2 = extract.path.pathDirTempOpen({ filePath : filePath2, name });
   test.is( extract.isDir( got2 ) );
   test.identical( got1,got2 );
   test.is( _.strBegins( got2, '/temp' ) );
-  test.identical( extract.path.pathDirTempForMap[ filePath2 ], got2 );
+  test.identical( cache[ filePath2 ], got2 );
 
   test.close( 'os path' )
+
+  //
+
+  var filePath1 = '/dir1/dir3'
+  test.shouldThrowErrorSync( () => extract.path.pathDirTempClose( filePath1 ) )
 }
 
 

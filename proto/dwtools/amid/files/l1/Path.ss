@@ -590,11 +590,36 @@ function pathDirTempMake( o )
   PathDirTempForMap[ id ] = Object.create( null );
 
   let cache = PathDirTempForMap[ id ];
+  
+  let fileStat;
 
   for( let i = 0; i < trace.length; i++ )
   {
     try
     {
+      if( i !== trace.length - 1 )
+      {
+        let currentStat = self.fileProvider.statReadAct
+        ({
+          filePath : trace[ i ],
+          throwing : 1,
+          sync : 1,
+          resolvingSoftLink : 0,
+        });
+        
+        if( fileStat === undefined )
+        fileStat = self.fileProvider.statReadAct
+        ({
+          filePath : o.filePath,
+          throwing : 0,
+          sync : 1,
+          resolvingSoftLink : 0,
+        });
+
+        if( fileStat.dev != currentStat.dev )
+        continue;
+      }
+      
       if( cache[ trace[ i ] ] )
       {
         filePath = cache[ trace[ i ] ];
@@ -602,35 +627,8 @@ function pathDirTempMake( o )
       else
       {
         filePath = self.join( trace[ i ], 'Temp', o.name );
-        if( self.fileProvider.fileExists( filePath ) )
-        return end();
+        if( !self.fileProvider.fileExists( filePath ) )
         self.fileProvider.dirMake( filePath );
-      }
-
-      if( i !== trace.length - 1 )
-      if( self.fileProvider.fileExists( trace[ i + 1 ] ) )
-      {
-        let currentStat = self.fileProvider.statReadAct
-        ({
-          filePath : filePath,
-          throwing : 1,
-          sync : 1,
-          resolvingSoftLink : 0,
-        });
-        let nextStat = self.fileProvider.statReadAct
-        ({
-          filePath : trace[ i + 1 ],
-          throwing : 0,
-          sync : 1,
-          resolvingSoftLink : 0,
-        });
-
-        if( nextStat.dev != currentStat.dev )
-        {
-          if( !cache[ trace[ i ] ] )
-          self.fileProvider.fileDelete( filePath );
-          continue;
-        }
       }
 
       return end();

@@ -38,7 +38,7 @@ if( typeof module !== 'undefined' )
 
 var _ = _global_.wTools;
 var Parent = wTester;
-var testSuitePath;
+var suitePath;
 
 // --
 // context
@@ -47,9 +47,9 @@ var testSuitePath;
 function onSuiteBegin()
 {
   if( Config.interpreter === 'njs' )
-  testSuitePath = _.path.dirTempOpen( _.path.join( __dirname, '../..' ), 'FileRecordFilter' );
+  suitePath = _.path.dirTempOpen( _.path.join( __dirname, '../..' ), 'FileRecordFilter' );
   else
-  testSuitePath = _.path.current();
+  suitePath = _.path.current();
 }
 
 //
@@ -58,8 +58,8 @@ function onSuiteEnd()
 {
   if( Config.interpreter === 'njs' )
   {
-    _.assert( _.strHas( testSuitePath, 'FileRecordFilter' ) );
-    _.path.pathDirTempClose( testSuitePath );
+    _.assert( _.strHas( suitePath, 'FileRecordFilter' ) );
+    _.path.pathDirTempClose( suitePath );
   }
 }
 
@@ -7700,7 +7700,7 @@ function pathsSupplementJoiningLogical( test )
 var Self =
 {
 
-  name : 'Tools/mid/files/RecordFilter',
+  name : 'Tools.mid.files.RecordFilter',
   silencing : 1,
 
   onSuiteBegin,

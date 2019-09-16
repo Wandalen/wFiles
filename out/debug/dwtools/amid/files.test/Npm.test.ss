@@ -27,17 +27,17 @@ function onSuiteBegin( test )
 
   let path = context.providerDst.path;
 
-  context.testSuitePath = path.pathDirTempOpen( 'FileProviderNpm' );
-  context.testSuitePath = context.providerDst.pathResolveLinkFull({ filePath : context.testSuitePath, resolvingSoftLink : 1 });
-  context.testSuitePath = context.testSuitePath.absolutePath;
+  context.suitePath = path.pathDirTempOpen( 'FileProviderNpm' );
+  context.suitePath = context.providerDst.pathResolveLinkFull({ filePath : context.suitePath, resolvingSoftLink : 1 });
+  context.suitePath = context.suitePath.absolutePath;
 }
 
 function onSuiteEnd( test )
 {
   let context = this;
   let path = context.providerDst.path;
-  _.assert( _.strHas( context.testSuitePath, 'FileProviderNpm' ) );
-  path.pathDirTempClose( context.testSuitePath );
+  _.assert( _.strHas( context.suitePath, 'FileProviderNpm' ) );
+  path.pathDirTempClose( context.suitePath );
 }
 
 // --
@@ -51,7 +51,7 @@ function filesReflectTrivial( test )
   let providerDst = context.providerDst;
   let system = context.system;
   let path = context.providerDst.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
   let installPath = path.join( routinePath, 'wPathBasic' );
   let installPathGlobal = providerDst.path.globalFromPreferred( installPath );
 
@@ -230,7 +230,7 @@ filesReflectTrivial.timeOut = 120000;
 //   let providerSrc = context.providerSrc;
 //   let providerDst = context.providerDst;
 //   let path = context.providerDst.path;
-//   let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+//   let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 //   let installPath = path.join( routinePath, 'wPathBasic' );
 
 //   let con = new _.Consequence().take( null )
@@ -429,7 +429,7 @@ filesReflectTrivial.timeOut = 120000;
 var Proto =
 {
 
-  name : 'Tools/mid/files/fileProvider/Npm',
+  name : 'Tools.mid.files.fileProvider.Npm',
   abstract : 0,
   silencing : 1,
   enabled : 1,
@@ -440,7 +440,7 @@ var Proto =
 
   context :
   {
-    testSuitePath : null,
+    suitePath : null,
     providerSrc : null,
     providerDst : null,
     system : null

@@ -89,7 +89,7 @@ function onSuiteEnd()
 var Proto =
 {
 
-  name : 'Tools/mid/files/fileProvider/System/Extract',
+  name : 'Tools.mid.files.fileProvider.System.Extract',
   abstract : 0,
   silencing : 1,
   enabled : 1,

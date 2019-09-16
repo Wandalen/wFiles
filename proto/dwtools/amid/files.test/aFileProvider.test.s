@@ -36,8 +36,8 @@ function onSuiteBegin( test )
 function onSuiteEnd()
 {
   let path = this.provider.path;
-  _.assert( _.strHas( this.testSuitePath, '/tmp-' ) );
-  path.pathDirTempClose( this.testSuitePath );
+  _.assert( _.strHas( this.suitePath, '/tmp-' ) );
+  path.pathDirTempClose( this.suitePath );
   this.provider.finit();
   this.system.finit();
 }
@@ -59,7 +59,7 @@ function onRoutineEnd( test )
 function pathFor( filePath )
 {
   let path = this.provider.path;
-  filePath =  path.join( this.testSuitePath, filePath );
+  filePath =  path.join( this.suitePath, filePath );
   return path.normalize( filePath );
 }
 
@@ -41419,7 +41419,7 @@ function EncodersGenerate( test )
 var Self =
 {
 
-  name : 'Tools/mid/files/fileProvider/Abstract',
+  name : 'Tools.mid.files.fileProvider.Abstract',
   abstract : 1,
   silencing : 1,
   // verbosity : 7,
@@ -41433,7 +41433,7 @@ var Self =
     pathFor,
     providerIsInstanceOf,
     softLinkIsSupported,
-    testSuitePath : null,
+    suitePath : null,
     // shouldWriteOnlyOnce
   },
 

@@ -168,7 +168,7 @@ function dirUserHome()
 function dirTemp()
 {
   _.assert( arguments.length === 0 );
-  _.assert( _.routineIs( this.fileProvider.pathDirTempAct ), () => 'Provider ' + this.fileProvider.nickName + ' does not support temp files' );
+  _.assert( _.routineIs( this.fileProvider.pathDirTempAct ), () => 'Provider ' + this.fileProvider.qualifiedName + ' does not support temp files' );
   if( this.tempPath )
   return this.tempPath;
   return this.fileProvider.pathDirTempAct();
@@ -465,7 +465,7 @@ close /dir1
 
   function end()
   {
-    _.appExitHandlerOnce( () =>
+    _.process.exitHandlerOnce( () =>
     {
       debugger;
       self.pathDirTempClose()

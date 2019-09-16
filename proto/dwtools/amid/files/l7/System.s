@@ -149,9 +149,9 @@ function providerRegister( fileProvider ) // xxx
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( fileProvider instanceof _.FileProvider.Abstract, () => 'Expects file providers, but got ' + _.strTypeOf( fileProvider ) );
   _.assert( _.arrayIs( fileProvider.protocols ) );
-  _.assert( _.strDefined( fileProvider.protocol ), 'Cant register file provider without {-protocol-} defined', _.strQuote( fileProvider.nickName ) );
+  _.assert( _.strDefined( fileProvider.protocol ), 'Cant register file provider without {-protocol-} defined', _.strQuote( fileProvider.qualifiedName ) );
   _.assert( _.strDefined( fileProvider.originPath ) );
-  _.assert( fileProvider.protocols && fileProvider.protocols.length, 'Cant register file provider without protocols', _.strQuote( fileProvider.nickName ) );
+  _.assert( fileProvider.protocols && fileProvider.protocols.length, 'Cant register file provider without protocols', _.strQuote( fileProvider.qualifiedName ) );
 
   let protocolMap = self.providersWithProtocolMap;
   for( let p = 0 ; p < fileProvider.protocols.length ; p++ )
@@ -161,12 +161,12 @@ function providerRegister( fileProvider ) // xxx
     _.assert
     (
       !protocolMap[ protocol ] || protocolMap[ protocol ] === fileProvider,
-      () => _.strQuote( fileProvider.nickName ) + ' is trying to reserve protocol ' + _.strQuote( protocol ) + ', which is reserved by ' + _.strQuote( protocolMap[ protocol ].nickName )
+      () => _.strQuote( fileProvider.qualifiedName ) + ' is trying to reserve protocol ' + _.strQuote( protocol ) + ', which is reserved by ' + _.strQuote( protocolMap[ protocol ].qualifiedName )
     );
     protocolMap[ protocol ] = fileProvider;
   }
 
-  _.assert( !fileProvider.system || fileProvider.system === self, () => 'File provider ' + fileProvider.nickName + ' already has a system ' + fileProvider.system.nickName );
+  _.assert( !fileProvider.system || fileProvider.system === self, () => 'File provider ' + fileProvider.qualifiedName + ' already has a system ' + fileProvider.system.qualifiedName );
   fileProvider.system = self;
 
   return self;
@@ -490,7 +490,7 @@ function pathCurrentAct()
   if( self.defaultProvider )
   return self.defaultProvider.path.current.apply( self.defaultProvider.path, arguments );
 
-  _.assert( 0, 'Default provider is not set for the ', self.nickName );
+  _.assert( 0, 'Default provider is not set for the ', self.qualifiedName );
 }
 
 //
@@ -502,7 +502,7 @@ function pathDirTempAct()
   if( self.defaultProvider )
   return self.defaultProvider.path.dirTemp.apply( self.defaultProvider.path, arguments );
 
-  _.assert( 0, 'Default provider is not set for the ', self.nickName );
+  _.assert( 0, 'Default provider is not set for the ', self.qualifiedName );
 }
 
 //

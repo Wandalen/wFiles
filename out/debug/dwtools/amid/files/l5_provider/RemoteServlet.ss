@@ -137,7 +137,7 @@
 //   _.assert( !_.instanceIs( this ) );
 //
 //   let self = new _.constructorOf( this )();
-//   let args = _.appArgs();
+//   let args = _.process.args();
 //
 //   if( args.subject )
 //   self.path = self.path.join( self.path.current(), args.subject );

@@ -29,12 +29,12 @@ function onSuiteBegin()
   this.isBrowser = typeof module === 'undefined';
 
   if( !this.isBrowser )
-  this.testSuitePath = _.path.pathDirTempOpen( _.path.join( __dirname, '../..'  ), 'FilesCopy' );
+  this.suitePath = _.path.pathDirTempOpen( _.path.join( __dirname, '../..'  ), 'FilesCopy' );
   else
-  this.testSuitePath = _.path.current();
+  this.suitePath = _.path.current();
 
-  this.dstPath = _.path.join( this.testSuitePath, 'dst' );
-  this.srcPath = _.path.join( this.testSuitePath, 'src' );
+  this.dstPath = _.path.join( this.suitePath, 'dst' );
+  this.srcPath = _.path.join( this.suitePath, 'src' );
 
   this.filePathSrc = _.path.join( this.srcPath, 'file.src' );
   this.filePathDst = _.path.join( this.dstPath, 'file.dst' );
@@ -48,8 +48,8 @@ function onSuiteEnd()
 {
   if( !this.isBrowser )
   {
-    _.assert( _.strEnds( this.testSuitePath, 'FilesCopy' ) );
-    _.path.pathDirTempClose( this.testSuitePath );
+    _.assert( _.strEnds( this.suitePath, 'FilesCopy' ) );
+    _.path.pathDirTempClose( this.suitePath );
   }
 }
 
@@ -219,7 +219,7 @@ function drawInfo( info )
 
 //   // combinations.forEach( ( src ) =>
 //   // {
-//   //   _.fileProvider.filesDelete( test.context.testSuitePath );
+//   //   _.fileProvider.filesDelete( test.context.suitePath );
 
 //   //   var info =
 //   //   {
@@ -295,7 +295,7 @@ function drawInfo( info )
 //       // if( n !== 29 )
 //       // return;
 
-//       _.fileProvider.filesDelete( test.context.testSuitePath );
+//       _.fileProvider.filesDelete( test.context.suitePath );
 
 //       if( src.level !== dst.level )
 //       return;
@@ -408,7 +408,7 @@ function drawInfo( info )
 
 //   // combinations.forEach( ( dst ) =>
 //   // {
-//   //   _.fileProvider.filesDelete( test.context.testSuitePath );
+//   //   _.fileProvider.filesDelete( test.context.suitePath );
 
 //   //   var info =
 //   //   {
@@ -479,7 +479,7 @@ function drawInfo( info )
 //   //     checks : []
 //   //   };
 
-//   //   _.fileProvider.filesDelete( test.context.testSuitePath );
+//   //   _.fileProvider.filesDelete( test.context.suitePath );
 
 //   //   o.src = srcPath;
 //   //   o.dst = dstPath;
@@ -670,7 +670,7 @@ function drawInfo( info )
 var Self =
 {
 
-  name : 'Tools/mid/files/FilesCopy',
+  name : 'Tools.mid.files.FilesCopy',
   // verbosity : 0,
   silencing : 1,
   
@@ -682,7 +682,7 @@ var Self =
   context :
   {
     isBrowser : null,
-    testSuitePath : null,
+    suitePath : null,
     dstPath : null,
     srcPath : null,
     filePathSrc : null,

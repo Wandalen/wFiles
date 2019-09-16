@@ -18,7 +18,7 @@ if( typeof module !== 'undefined' )
 
 var _ = _global_.wTools;
 var Parent = wTester;
-var testSuitePath;
+var suitePath;
 
 // --
 // context
@@ -27,9 +27,9 @@ var testSuitePath;
 function onSuiteBegin()
 {
   if( Config.interpreter === 'njs' )
-  testSuitePath = _.path.dirTempOpen( _.path.join( __dirname, '../..' ), 'FileRecord' );
+  suitePath = _.path.dirTempOpen( _.path.join( __dirname, '../..' ), 'FileRecord' );
   else
-  testSuitePath = _.path.current();
+  suitePath = _.path.current();
 }
 
 //
@@ -38,8 +38,8 @@ function onSuiteEnd()
 {
   if( Config.interpreter === 'njs' )
   {
-    _.assert( _.strHas( testSuitePath, 'FileRecord' ) );
-    _.path.pathDirTempClose( testSuitePath );
+    _.assert( _.strHas( suitePath, 'FileRecord' ) );
+    _.path.pathDirTempClose( suitePath );
   }
 }
 
@@ -435,8 +435,8 @@ function recordFields( test )
   /* softlink, resolvingSoftLink  1 */
 
   // _.fileProvider.fieldPush( 'resolvingSoftLink', 1 );
-  // var src = _.path.join( testSuitePath, 'src' );
-  // var dst = _.path.join( testSuitePath, 'dst' );
+  // var src = _.path.join( suitePath, 'src' );
+  // var dst = _.path.join( suitePath, 'dst' );
   // _.fileProvider.fileWrite( src, 'src' );
   // _.fileProvider.softLink( dst, src );
   // var got = _.fileProvider.recordFactory().record( dst );
@@ -447,8 +447,8 @@ function recordFields( test )
   /* softlink, resolvingSoftLink  0 */
 
   _.fileProvider.fieldPush( 'resolvingSoftLink', 0 );
-  var src = _.path.join( testSuitePath, 'src' );
-  var dst = _.path.join( testSuitePath, 'dst' );
+  var src = _.path.join( suitePath, 'src' );
+  var dst = _.path.join( suitePath, 'dst' );
   _.fileProvider.fileWrite( src, 'src' );
   _.fileProvider.softLink( dst, src );
   var got = _.fileProvider.recordFactory().record( dst );
@@ -737,7 +737,7 @@ function recordForLink( test )
 {
   let self = this;
 
-  let dir = _.path.join( testSuitePath, test.name );
+  let dir = _.path.join( suitePath, test.name );
   let o =
   {
     defaultProvider : _.fileProvider,
@@ -971,7 +971,7 @@ function recordForRelativeLink( test )
 {
   let self = this;
 
-  let dir = _.path.join( testSuitePath, test.name );
+  let dir = _.path.join( suitePath, test.name );
   let o =
   {
     defaultProvider : _.fileProvider,
@@ -1469,7 +1469,7 @@ recordSystemExperiment.experimental = 1;
 var Self =
 {
 
-  name : 'Tools/mid/files/Record',
+  name : 'Tools.mid.files.Record',
   silencing : 1,
 
   onSuiteBegin,

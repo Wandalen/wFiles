@@ -289,7 +289,7 @@ function versionRemoteLatestRetrive( o )
   _.assert( !!self.system );
 
   let parsed = self.pathParse( o.remotePath );
-  let shell = _.sheller
+  let shell = _.process.starter
   ({
     verbosity : o.verbosity - 1,
     outputCollecting : 1,
@@ -505,7 +505,7 @@ function filesReflectSingle_body( o )
   /* */
 
   let result = [];
-  let shell = _.sheller
+  let shell = _.process.starter
   ({
     verbosity : o.verbosity - 1,
     sync : 1,

@@ -790,7 +790,7 @@ function _extWithDotGet()
 
 //
 
-function _nickNameGet()
+function _qualifiedNameGet()
 {
   let record = this;
   let f = record.factory;
@@ -943,7 +943,7 @@ let Accessors =
   exts : { readOnly : 1 },
   ext : { readOnly : 1 },
   extWithDot : { readOnly : 1 },
-  nickName : { readOnly : 1 },
+  qualifiedName : { readOnly : 1 },
   name : { readOnly : 1 },
   fullName : { readOnly : 1 },
 
@@ -1018,7 +1018,7 @@ let Proto =
   _extsGet,
   _extGet,
   _extWithDotGet,
-  _nickNameGet,
+  _qualifiedNameGet,
   _nameGet,
   _fullNameGet,
 

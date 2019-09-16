@@ -216,7 +216,7 @@ function init( o )
   if( self.verbosity >= 2 )
   self.logger.log( 'new', _.strType( self ) );
 
-  // _.appExitHandlerOnce( () =>
+  // _.process.exitHandlerOnce( () =>
   // {
   //   debugger;
   //   self.path.pathDirTempClose()
@@ -708,7 +708,7 @@ function preferredFromGlobalAct( globalPath )
   _.assert
   (
     !self.protocols || !globalPath.protocol || _.arrayHas( self.protocols, globalPath.protocol ),
-    () => 'File provider ' + self.nickName + ' does not support protocol ' + _.strQuote( globalPath.protocol )
+    () => 'File provider ' + self.qualifiedName + ' does not support protocol ' + _.strQuote( globalPath.protocol )
   );
 
   if( self.usingGlobalPath )
@@ -5892,7 +5892,7 @@ function _link_functor( fop )
       {
         let dstParsed = _.uri.parse( o.dstPath );
         if( dstParsed.protocol && !_.arrayHas( self.protocols, dstParsed.protocol ) )
-        c.error( 'File provider ' + self.nickName + ' does not support protocol ' + _.strQuote( globalPath.protocol ) );
+        c.error( 'File provider ' + self.qualifiedName + ' does not support protocol ' + _.strQuote( globalPath.protocol ) );
         o.dstPath = dstParsed.longPath;
       }
 

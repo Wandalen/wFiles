@@ -57,7 +57,7 @@ function onSuiteBegin( test )
   context.provider = _.FileProvider.Extract({ usingExtraStat : 1, protocol : 'current' });
   context.system = _.FileProvider.System({ providers : [ context.provider ] });
   let path = context.provider.path;
-  context.testSuitePath = path.pathDirTempOpen( 'suite-' + 'FilesFind' );
+  context.suitePath = path.pathDirTempOpen( 'suite-' + 'FilesFind' );
 }
 
 //
@@ -77,7 +77,7 @@ function onSuiteEnd()
 var Proto =
 {
 
-  name : 'Tools/mid/files/FilesFind/Extract',
+  name : 'Tools.mid.files.FilesFind.Extract',
   silencing : 1,
   abstract : 0,
   enabled : 1,

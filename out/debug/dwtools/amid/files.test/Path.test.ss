@@ -28,9 +28,9 @@ function onSuiteBegin()
   this.isBrowser = typeof module === 'undefined';
 
   if( !this.isBrowser )
-  this.testSuitePath = _.path.pathDirTempOpen( _.path.join( __dirname, '../..' ), 'Path' );
+  this.suitePath = _.path.pathDirTempOpen( _.path.join( __dirname, '../..' ), 'Path' );
   else
-  this.testSuitePath = _.path.current();
+  this.suitePath = _.path.current();
 }
 
 //
@@ -39,8 +39,8 @@ function onSuiteEnd()
 {
   if( !this.isBrowser )
   {
-    _.assert( _.strHas( this.testSuitePath, 'Path' ) );
-    _.path.pathDirTempClose( this.testSuitePath );
+    _.assert( _.strHas( this.suitePath, 'Path' ) );
+    _.path.pathDirTempClose( this.suitePath );
   }
 }
 
@@ -59,7 +59,7 @@ function createTestsDirectory( path, rmIfExists )
 
 function createInTD( path )
 {
-  return this.createTestsDirectory( _.path.join( this.testSuitePath, path ) );
+  return this.createTestsDirectory( _.path.join( this.suitePath, path ) );
 }
 
 //
@@ -70,7 +70,7 @@ function createTestFile( path, data, decoding )
   data = path;
 
   var dataToWrite = ( decoding === 'json' ) ? JSON.stringify( data ) : data;
-  _.fileProvider.fileWrite({ filePath : _.path.join( this.testSuitePath, path ), data : dataToWrite })
+  _.fileProvider.fileWrite({ filePath : _.path.join( this.suitePath, path ), data : dataToWrite })
 }
 
 //
@@ -105,8 +105,8 @@ function createTestSymLink( path, target, type, data )
   }
   else throw new Error( 'unexpected type' );
 
-  path = _.path.join( this.testSuitePath, path );
-  origin = _.path.resolve( _.path.join( this.testSuitePath, origin ) );
+  path = _.path.join( this.suitePath, path );
+  origin = _.path.resolve( _.path.join( this.suitePath, origin ) );
 
   if( _.fileProvider.statResolvedRead( path ) )
   _.fileProvider.filesDelete( path );
@@ -184,12 +184,12 @@ function from( test )
   var str1 = '/foo/bar/baz',
       str2 = 'tmp/get/test.txt',
     expected = str1,
-    expected2 = _.path.resolve( _.path.join( test.context.testSuitePath,str2 ) ),
+    expected2 = _.path.resolve( _.path.join( test.context.suitePath,str2 ) ),
     got,
     fileRecord;
 
   test.context.createTestFile( str2 );
-  fileRecord = _.fileProvider.recordFactory().record( _.path.resolve( _.path.join( test.context.testSuitePath,str2 ) ) );
+  fileRecord = _.fileProvider.recordFactory().record( _.path.resolve( _.path.join( test.context.suitePath,str2 ) ) );
 
   test.case = 'string argument';
   got = _.path.from( str1 );
@@ -232,9 +232,9 @@ function forCopy( test )
       srcPath : null
     },
     path1 = 'tmp/forCopy/test_original.txt',
-    expected1 = { path :  _.path.resolve( _.path.join( test.context.testSuitePath,'tmp/forCopy/test_original-copy.txt' ) ), error : false },
+    expected1 = { path :  _.path.resolve( _.path.join( test.context.suitePath,'tmp/forCopy/test_original-copy.txt' ) ), error : false },
     path2 = 'tmp/forCopy/test_original2',
-    expected2 = { path : _.path.resolve( _.path.join( test.context.testSuitePath,'tmp/forCopy/test_original2-backup-2' ) ), error : false },
+    expected2 = { path : _.path.resolve( _.path.join( test.context.suitePath,'tmp/forCopy/test_original2-backup-2' ) ), error : false },
     got = { path : void 0, error : void 0 };
 
   test.context.createTestFile( path1 );
@@ -243,7 +243,7 @@ function forCopy( test )
   test.case = 'simple existing file path';
   try
   {
-    got.path = _.path.forCopy( { filePath : _.path.resolve( _.path.join( test.context.testSuitePath,path1 ) ) } );
+    got.path = _.path.forCopy( { filePath : _.path.resolve( _.path.join( test.context.suitePath,path1 ) ) } );
   }
   catch( err )
   {
@@ -256,7 +256,7 @@ function forCopy( test )
   test.case = 'generate names for several copies';
   try
   {
-    var path_tmp = _.path.forCopy( { filePath : _.path.resolve( _.path.join( test.context.testSuitePath,path2 ) ), postfix : 'backup' } );
+    var path_tmp = _.path.forCopy( { filePath : _.path.resolve( _.path.join( test.context.suitePath,path2 ) ), postfix : 'backup' } );
     test.context.createTestFile( path_tmp );
     path_tmp = _.path.forCopy( { filePath : path_tmp, postfix : 'backup' } );
     test.context.createTestFile( path_tmp );
@@ -282,7 +282,7 @@ function forCopy( test )
     test.case = 'extra arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.path.forCopy( { srcPath : _.path.join( test.context.testSuitePath,path1 ) }, { srcPath : _.path.join( test.context.testSuitePath,path2 ) } );
+      _.path.forCopy( { srcPath : _.path.join( test.context.suitePath,path1 ) }, { srcPath : _.path.join( test.context.suitePath,path2 ) } );
     } );
 
     test.case = 'unexisting file';
@@ -748,7 +748,7 @@ function pathCurrent( test )
 {
   var path1 = 'tmp/pathCurrent/foo',
     expected = Process.cwd( ),
-    expected1 = _.fileProvider.path.nativize( _.path.resolve( _.path.join( test.context.testSuitePath,path1 ) ) );
+    expected1 = _.fileProvider.path.nativize( _.path.resolve( _.path.join( test.context.suitePath,path1 ) ) );
 
   test.case = 'get pathCurrent working directory';
   var got = _.fileProvider.path.nativize( _.path.current( ) );
@@ -757,7 +757,7 @@ function pathCurrent( test )
   test.case = 'set new pathCurrent working directory';
   test.context.createInTD( path1 );
   var before = _.path.current();
-  _.path.current( _.path.normalize( _.path.join( test.context.testSuitePath,path1 ) ) );
+  _.path.current( _.path.normalize( _.path.join( test.context.suitePath,path1 ) ) );
   var got = Process.cwd( );
   _.path.current( before );
   test.identical( got, expected1 );
@@ -774,7 +774,7 @@ function pathCurrent( test )
   test.case = 'unexist directory';
   test.shouldThrowErrorSync( function( )
   {
-    _.path.current( _.path.join( test.context.testSuitePath, 'tmp/pathCurrent/bar' ) );
+    _.path.current( _.path.join( test.context.suitePath, 'tmp/pathCurrent/bar' ) );
   });
 
 }
@@ -1109,7 +1109,7 @@ function pathDirTempForTrivial( test )
 var Self =
 {
 
-  name : 'Tools/mid/files/Paths',
+  name : 'Tools.mid.files.Paths',
   silencing : 1,
 
   onSuiteBegin,
@@ -1117,7 +1117,7 @@ var Self =
 
   context :
   {
-    testSuitePath : null,
+    suitePath : null,
     isBrowser : null,
 
     createTestsDirectory,

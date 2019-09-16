@@ -818,7 +818,7 @@ function filesFind_body( o )
 
     if( _.strIs( stemPaths ) )
     stemPaths = [ stemPaths ];
-    stemPaths = _.longUnduplicate( stemPaths );
+    stemPaths = _.longOnce( stemPaths );
     _.strsSort( stemPaths );
     _.assert( _.arrayIs( stemPaths ), 'Expects path or array of paths' );
 

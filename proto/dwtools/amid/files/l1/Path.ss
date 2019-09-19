@@ -381,6 +381,7 @@ pathDirTempOpen.defaults =
 {
   filePath : null,
   name : null,
+  auto : 1
 }
 
 //
@@ -590,7 +591,7 @@ function pathDirTempMake( o )
   PathDirTempForMap[ id ] = Object.create( null );
 
   let cache = PathDirTempForMap[ id ];
-  
+
   let fileStat;
 
   for( let i = 0; i < trace.length; i++ )
@@ -606,7 +607,7 @@ function pathDirTempMake( o )
           sync : 1,
           resolvingSoftLink : 0,
         });
-        
+
         if( fileStat === undefined )
         fileStat = self.fileProvider.statReadAct
         ({
@@ -619,7 +620,7 @@ function pathDirTempMake( o )
         if( fileStat.dev != currentStat.dev )
         continue;
       }
-      
+
       if( cache[ trace[ i ] ] )
       {
         filePath = cache[ trace[ i ] ];
@@ -648,6 +649,7 @@ function pathDirTempMake( o )
 
   function end()
   {
+    if( o.auto )
     _.process.exitHandlerOnce( () =>
     {
       debugger;
@@ -659,11 +661,7 @@ function pathDirTempMake( o )
   }
 }
 
-pathDirTempMake.defaults =
-{
-  filePath : null,
-  name : null
-}
+pathDirTempMake.defaults = Object.create( pathDirTempOpen.defaults );
 
 //
 

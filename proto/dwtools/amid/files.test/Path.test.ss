@@ -1112,6 +1112,8 @@ function pathDirTemp( test )
 
   let cache = extract.path.PathDirTempForMap[ extract.id ] = Object.create( null );
 
+  test.notIdentical( extract.id, _.fileProvider.id );
+
   //
 
   test.open( 'same drive' );
@@ -1216,6 +1218,17 @@ function pathDirTemp( test )
 
   var filePath1 = '/dir1/dir3'
   test.shouldThrowErrorSync( () => extract.path.pathDirTempClose( filePath1 ) )
+
+  //
+
+  test.case = 'several runs of pathDirTempClose'
+  test.mustNotThrowError( () =>
+  {
+    extract.path.pathDirTempClose();
+    extract.path.pathDirTempClose();
+  })
+  test.identical( _.mapKeys( cache ).length, 0 );
+
 }
 
 

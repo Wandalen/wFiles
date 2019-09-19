@@ -21328,7 +21328,7 @@ function filesReflectOnlyPreserving( test )
     {
     }
   }
-  
+
   var extract = new _.FileProvider.Extract({ filesTree });
 
   test.case = 'reflect two terminals to same dst path, src termianls have different content, dstRewritingOnlyPreserving : 0';
@@ -21395,7 +21395,7 @@ function filesReflectOnlyPreserving( test )
     {
     }
   }
-  
+
   var extract = new _.FileProvider.Extract({ filesTree });
 
   test.case = 'reflect two terminals to same dst path, src termianls have same content, dstRewritingOnlyPreserving : 1';
@@ -21522,7 +21522,7 @@ function filesReflectOnlyPreserving( test )
     }
 
   }
-  
+
   var extract = new _.FileProvider.Extract({ filesTree });
 
   /* */
@@ -21553,7 +21553,7 @@ function filesReflectOnlyPreserving( test )
   var gotTree = provider.filesExtract( routinePath );
   test.identical( _.select( gotTree.filesTree, '/src/file3' ), _.select( gotTree.filesTree, '/dst/file' ) );
   test.notIdentical( _.select( gotTree.filesTree, '/src/file4' ), _.select( gotTree.filesTree, '/dst/file' ) );
-  
+
   /* */
 
   test.case = 'reflect three terminals to same dst path, one of src termianls is a softLink, dstRewritingOnlyPreserving : 1';
@@ -21582,7 +21582,7 @@ function filesReflectOnlyPreserving( test )
   var gotTree = provider.filesExtract( routinePath );
   test.identical( _.select( gotTree.filesTree, '/src/file3' ), _.select( gotTree.filesTree, '/dst/file' ) );
   test.notIdentical( _.select( gotTree.filesTree, '/src/file4' ), _.select( gotTree.filesTree, '/dst/file' ) );
-  
+
   /*  */
 
   test.case = 'mixed file path, multiple src, dstRewritingOnlyPreserving : 0';
@@ -21592,7 +21592,7 @@ function filesReflectOnlyPreserving( test )
     src : { srcDir : { a : 'src/a', b : 'src/b' }, srcDir2 : { e : 'src/e' }, c : 'src/c', d : 'src/d' },
     dst : { dstDir : { a : 'dst/a', c : 'dst/c' }, c : 'dst/c', d : 'dst/d' },
   }
-  
+
   var extract = new _.FileProvider.Extract({ filesTree });
   provider.filesDelete( routinePath );
   extract.filesReflectTo( provider, routinePath );
@@ -21634,7 +21634,7 @@ function filesReflectOnlyPreserving( test )
     src : { srcDir : { a : 'src/a', b : 'src/b' }, srcDir2 : { e : 'src/e' }, c : 'src/c', d : 'src/d' },
     dst : { dstDir : { a : 'dst/a', c : 'dst/c' }, c : 'dst/c', d : 'dst/d' },
   }
-  
+
   var extract = new _.FileProvider.Extract({ filesTree });
   provider.filesDelete( routinePath );
   extract.filesReflectTo( provider, routinePath );
@@ -21660,6 +21660,217 @@ function filesReflectOnlyPreserving( test )
   }
   var gotTree = provider.filesExtract( routinePath );
   test.identical( gotTree.filesTree, expectedTree );
+
+  /* rewriting of empty files with same time */
+
+  test.open( 'rewriting of empty files, src and dst are same' );
+
+  var filesTree =
+  {
+    src : { 'file' : '' },
+    dst : { 'file' : '' },
+  }
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var srcPath = provider.path.join( routinePath, 'src' );
+  var srcFilePath = provider.path.join( routinePath, 'src/file' );
+  var dstPath = provider.path.join( routinePath, 'dst' );
+  var dstFilePath = provider.path.join( routinePath, 'dst/file' );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 0,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 1
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.identical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 0,
+    dstRewritingOnlyPreserving : 0
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.identical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 0
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.identical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 0,
+    dstRewritingOnlyPreserving : 1
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.identical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 1
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.identical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+
+  test.close( 'rewriting of empty files, src and dst are same' );
+
+  /*  */
+
+  test.open( 'rewriting of empty files, src and dst are diffent' );
+
+  var filesTree =
+  {
+    src : { 'file' : 'file' },
+    dst : { 'file' : '' },
+  }
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var srcPath = provider.path.join( routinePath, 'src' );
+  var srcFilePath = provider.path.join( routinePath, 'src/file' );
+  var dstPath = provider.path.join( routinePath, 'dst' );
+  var dstFilePath = provider.path.join( routinePath, 'dst/file' );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 0,
+    dstRewritingByDistinct : 0,
+    dstRewritingOnlyPreserving : 0
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.notIdentical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 0,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 1
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.notIdentical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 0,
+    dstRewritingOnlyPreserving : 0
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.identical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 0
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.identical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 0,
+    dstRewritingOnlyPreserving : 1
+  }
+  test.shouldThrowErrorOfAnyKind( () => provider.filesReflect( o ) );
+  test.notIdentical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 1
+  }
+  test.shouldThrowErrorOfAnyKind( () => provider.filesReflect( o ) );
+  test.notIdentical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+
+  test.close( 'rewriting of empty files, src and dst are diffent' );
+
 } /* end of function filesReflectOnlyPreserving */
 
 //

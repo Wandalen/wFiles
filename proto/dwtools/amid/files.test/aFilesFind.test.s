@@ -21875,6 +21875,458 @@ function filesReflectOnlyPreserving( test )
 
 //
 
+function filesReflectOnlyPreservingEmpty( test )
+{
+  let context = this;
+  let provider = context.provider;
+  let system = context.system;
+  let path = context.provider.path;
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+
+  test.open( 'rewriting of linked empty files, src and dst are same' );
+
+  var filesTree =
+  {
+    src : { 'file' : '' },
+    dst : { 'file2' : '' },
+  }
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var srcPath = provider.path.join( routinePath, 'src' );
+  var srcFilePath = provider.path.join( routinePath, 'src/file' );
+  var dstPath = provider.path.join( routinePath, 'dst' );
+  var dstFilePath = provider.path.join( routinePath, 'dst/file' );
+  var dstFilePath2 = provider.path.join( routinePath, 'dst/file2' );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstFilePath, '../file2' )
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    resolvingSoftLink : 0,
+    resolvingDstSoftLink : 0,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 0
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isTerminal( dstFilePath ) )
+  test.identical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstFilePath, '../file2' )
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    resolvingSoftLink : 0,
+    resolvingDstSoftLink : 0,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 1
+  }
+  test.shouldThrowErrorSync( () => provider.filesReflect( o ) );
+  test.is( provider.isSoftLink( dstFilePath ) )
+  test.identical( provider.pathResolveSoftLink( dstFilePath ), '../file2' )
+  test.identical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstFilePath, '../file2' )
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    resolvingSoftLink : 1,
+    resolvingDstSoftLink : 0,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 0
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isTerminal( dstFilePath ) )
+  test.identical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstFilePath, '../file2' )
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    resolvingSoftLink : 1,
+    resolvingDstSoftLink : 0,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 1
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isTerminal( dstFilePath ) )
+  test.identical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstFilePath, '../file2' )
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    resolvingSoftLink : 0,
+    resolvingDstSoftLink : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 0
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isSoftLink( dstFilePath ) )
+  test.identical( provider.pathResolveSoftLink( dstFilePath ), '../file2' )
+  test.identical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstFilePath, '../file2' )
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    resolvingSoftLink : 0,
+    resolvingDstSoftLink : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 1
+  }
+  test.shouldThrowErrorSync( () => provider.filesReflect( o ) );
+  test.is( provider.isSoftLink( dstFilePath ) )
+  test.identical( provider.pathResolveSoftLink( dstFilePath ), '../file2' )
+  test.identical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstFilePath, '../file2' )
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    resolvingSoftLink : 1,
+    resolvingDstSoftLink : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 0
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isSoftLink( dstFilePath ) )
+  test.identical( provider.pathResolveSoftLink( dstFilePath ), '../file2'  )
+  test.identical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath2 ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstFilePath, '../file2' )
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    resolvingSoftLink : 1,
+    resolvingDstSoftLink : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 1
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isSoftLink( dstFilePath ) )
+  test.identical( provider.pathResolveSoftLink( dstFilePath ), '../file2'  )
+  test.identical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath2 ) );
+
+  test.close( 'rewriting of linked empty files, src and dst are same' );
+
+  //
+
+  test.open( 'rewriting of linked empty files, src and dst are different' );
+
+  var filesTree =
+  {
+    src : { 'file' : 'file' },
+    dst : { 'file2' : '' },
+  }
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var srcPath = provider.path.join( routinePath, 'src' );
+  var srcFilePath = provider.path.join( routinePath, 'src/file' );
+  var dstPath = provider.path.join( routinePath, 'dst' );
+  var dstFilePath = provider.path.join( routinePath, 'dst/file' );
+  var dstFilePath2 = provider.path.join( routinePath, 'dst/file2' );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstFilePath, '../file2' )
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    resolvingSoftLink : 0,
+    resolvingDstSoftLink : 0,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 0
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isTerminal( dstFilePath ) )
+  test.identical( provider.fileRead( dstFilePath ), provider.fileRead( srcFilePath ) );
+  test.identical( provider.fileRead( dstFilePath2 ), '' );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstFilePath, '../file2' )
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    resolvingSoftLink : 0,
+    resolvingDstSoftLink : 0,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 1
+  }
+  test.shouldThrowErrorSync( () => provider.filesReflect( o ) );
+  test.is( provider.isSoftLink( dstFilePath ) )
+  test.identical( provider.pathResolveSoftLink( dstFilePath ), '../file2' )
+  test.notIdentical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+  test.identical( provider.fileRead( dstFilePath ), provider.fileRead( dstFilePath2 ) );
+  test.identical( provider.fileRead( dstFilePath2 ), '' );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstFilePath, '../file2' )
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    resolvingSoftLink : 1,
+    resolvingDstSoftLink : 0,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 0
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isTerminal( dstFilePath ) )
+  test.identical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+  test.notIdentical( provider.fileRead( dstFilePath ), provider.fileRead( dstFilePath2 ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstFilePath, '../file2' )
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    resolvingSoftLink : 1,
+    resolvingDstSoftLink : 0,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 1
+  }
+  test.shouldThrowErrorSync( () => provider.filesReflect( o ) );
+  test.is( provider.isSoftLink( dstFilePath ) )
+  test.notIdentical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+  test.identical( provider.fileRead( dstFilePath ), provider.fileRead( dstFilePath2 ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstFilePath, '../file2' )
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    resolvingSoftLink : 0,
+    resolvingDstSoftLink : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 0
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isSoftLink( dstFilePath ) )
+  test.identical( provider.pathResolveSoftLink( dstFilePath ), '../file2' )
+  test.identical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+  test.identical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath2 ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstFilePath, '../file2' )
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    resolvingSoftLink : 0,
+    resolvingDstSoftLink : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 1
+  }
+  test.shouldThrowErrorSync( () => provider.filesReflect( o ) );
+  test.is( provider.isSoftLink( dstFilePath ) )
+  test.identical( provider.pathResolveSoftLink( dstFilePath ), '../file2' )
+  test.notIdentical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+  test.identical( provider.fileRead( dstFilePath ), provider.fileRead( dstFilePath2 ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstFilePath, '../file2' )
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    resolvingSoftLink : 1,
+    resolvingDstSoftLink : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 0
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isSoftLink( dstFilePath ) )
+  test.identical( provider.pathResolveSoftLink( dstFilePath ), '../file2'  )
+  test.identical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath2 ) );
+  test.identical( provider.fileRead( dstFilePath ), provider.fileRead( dstFilePath2 ) );
+  test.identical( provider.fileRead( dstFilePath2 ), provider.fileRead( srcFilePath ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstFilePath, '../file2' )
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    resolvingSoftLink : 1,
+    resolvingDstSoftLink : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 1
+  }
+  test.shouldThrowErrorSync( () => provider.filesReflect( o ) );
+  test.is( provider.isSoftLink( dstFilePath ) )
+  test.identical( provider.pathResolveSoftLink( dstFilePath ), '../file2'  )
+  test.notIdentical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+  test.notIdentical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath2 ) );
+  test.identical( provider.fileRead( dstFilePath ), provider.fileRead( dstFilePath2 ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstFilePath, '../file2' )
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 0,
+    dstRewriting : 0,
+    resolvingSoftLink : 1,
+    resolvingDstSoftLink : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 1
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isSoftLink( dstFilePath ) )
+  test.notIdentical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+  test.identical( provider.fileRead( dstFilePath ), provider.fileRead( dstFilePath2 ) );
+  test.identical( provider.fileRead( dstFilePath2 ), '' );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstFilePath, '../file2' )
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 0,
+    resolvingSoftLink : 1,
+    resolvingDstSoftLink : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 1
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isSoftLink( dstFilePath ) )
+  test.notIdentical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+  test.identical( provider.fileRead( dstFilePath ), provider.fileRead( dstFilePath2 ) );
+  test.identical( provider.fileRead( dstFilePath2 ), '' );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstFilePath, '../file2' )
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 0,
+    dstRewriting : 1,
+    resolvingSoftLink : 1,
+    resolvingDstSoftLink : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 1
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isSoftLink( dstFilePath ) )
+  test.notIdentical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+  test.identical( provider.fileRead( dstFilePath ), provider.fileRead( dstFilePath2 ) );
+  test.identical( provider.fileRead( dstFilePath2 ), '' );
+
+  test.close( 'rewriting of linked empty files, src and dst are different' );
+}
+
+//
+
 function filesReflectDstDeletingDirs( test )
 {
   let context = this;
@@ -35149,6 +35601,7 @@ var Self =
     filesReflectLinkWithSystem,
     filesReflectDeducing,
     filesReflectOnlyPreserving,
+    filesReflectOnlyPreservingEmpty,
     filesReflectDstDeletingDirs,
     filesReflectLinked,
     filesReflectTo,

@@ -1212,6 +1212,21 @@ function pathDirTemp( test )
   test.is( _.strBegins( got2, '/temp' ) );
   test.identical( cache[ filePath2 ], got2 );
 
+  test.case = 'should return os temp path in case of error'
+
+  var filePath3 = '/dir3'
+  let originalDirMakeAct = extract.dirMakeAct;
+  extract.dirMakeAct = function dirMakeAct( o ){ throw _.err( 'Test error', o.filePath )};
+  var got2;
+  test.mustNotThrowError( () =>
+  {
+    got2 = extract.path.pathDirTempOpen({ filePath : filePath3, name });
+  })
+  extract.dirMakeAct = _.routineJoin( extract, originalDirMakeAct );
+  test.is( extract.isDir( got2 ) );
+  test.is( _.strBegins( got2, extract.path.dirTemp() ) );
+  test.identical( cache[ filePath3 ], got2 );
+
   test.close( 'os path' )
 
   //

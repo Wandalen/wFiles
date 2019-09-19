@@ -35,6 +35,41 @@ _.assert( _.routineIs( _.path.join ) );
 
 */
 
+/*
+
+qqq : implement routines fileLockAct, fileUnlockAct, fileIsLockedAct and corresponding fileLock, fileUnlock, fileIsLocked.
+qqq : cover it and add jsdoc
+
+fileLockAct.defaults =
+{
+  filePath : null,
+  sync : 1,
+  waiting : 0,
+  throwing : 1,
+  timeOut : 5000,
+  id : null,
+}
+
+fileUnlockAct.defaults =
+{
+  filePath : null,
+  sync : 1,
+  throwing : 1,
+  timeOut : 5000,
+  id : null,
+}
+
+fileIsLockedAct.defaults =
+{
+  filePath : null,
+  sync : 1,
+  timeOut : 5000,
+  throwing : 1,
+  id : null,
+}
+
+*/
+
 //
 
 /**

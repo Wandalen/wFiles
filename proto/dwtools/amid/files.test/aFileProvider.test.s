@@ -36253,7 +36253,7 @@ function filesAreSame( test )
   var bufferData1;
   var bufferData2;
 
-  if( Config.interpreter === 'browser' || test.context.providerIsInstanceOf( _.FileProvider.Extract ) )
+  if( Config.interpreter === 'browser' || self.providerIsInstanceOf( _.FileProvider.Extract ) )
   {
     bufferData1 = new BufferRaw( 4 );
     bufferData2 = new BufferRaw( 5 );
@@ -36281,7 +36281,7 @@ function filesAreSame( test )
   provider.fileWrite( filePath, '' );
   provider.fileWrite( filePath2, '' );
   var got = provider.filesAreSame( filePath, filePath2 );
-  test.identical( got, false );
+  test.identical( got, true );
 
   //
 

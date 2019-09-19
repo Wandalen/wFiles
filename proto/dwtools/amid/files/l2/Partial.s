@@ -3841,6 +3841,9 @@ function filesAreSame_body( o )
 
   /* false for empty files */
 
+  if( !o.ins1.stat.size && !o.ins2.stat.size )
+  return true;
+
   if( !o.ins1.stat.size || !o.ins2.stat.size )
   return false;
 

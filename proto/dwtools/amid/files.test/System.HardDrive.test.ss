@@ -33,7 +33,7 @@ function onSuiteBegin()
 {
   var self = this;
 
-  self.suitePath = _.path.dirTempOpen( _.path.join( __dirname, '../..'  ), 'System/HardDrive' );
+  self.suitePath = _.path.pathDirTempOpen( _.path.join( __dirname, '../..'  ), 'System/HardDrive' );
 
   self.provider.providerRegister( self.providerEffective );
   self.provider.defaultProvider = self.providerEffective;

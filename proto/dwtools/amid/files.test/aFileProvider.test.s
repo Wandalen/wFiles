@@ -7786,6 +7786,8 @@ function fileCopySoftLinkResolving( test )
   test.close( 'links to same file' );
 }
 
+fileCopySoftLinkResolving.timeOut = 30000;
+
 //
 
 function fileCopyLinks( test )
@@ -9184,7 +9186,7 @@ test.identical( provider.pathResolveSoftLink( dstPath ),  test.context.globalFro
   test.case = 'src1 -> ../src2, softLink dst src1, resolvingSrcSoftLink : 0, allowingMissed : 0'
   provider.filesDelete( routinePath );
   provider.softLink({ dstPath : src1Path, srcPath : '../src2', allowingMissed : 1, makingDirectory : 1 });
-  provider.fileCopy({ srcPath : '../src1', dstPath, resolvingSrcSoftLink : 0, resolvingSrcTextLink : 0, allowingMissed : 0 });
+  provider.fileCopy({ srcPath : test.context.globalFromPreferred( '../src1' ), dstPath, resolvingSrcSoftLink : 0, resolvingSrcTextLink : 0, allowingMissed : 0 });
   test.is( provider.isSoftLink( src1Path ) );
   test.is( provider.isSoftLink( dstPath ) );
   test.identical( provider.pathResolveSoftLink( dstPath ), test.context.globalFromPreferred( '../src1' ) );
@@ -9333,6 +9335,12 @@ function fileCopyGlobal( test )
   let self = this;
   let provider = self.provider;
   let path = provider.path;
+
+  if( provider instanceof _.FileProvider.System )
+  {
+    test.identical( 1,1 )
+    return;
+  }
 
   let routinePath = test.context.pathFor( 'written/fileCopyGlobal' );
   let srcPath = test.context.pathFor( 'written/fileCopyGlobal/src' );
@@ -11311,6 +11319,8 @@ function fileRenameRelativePath( test )
 
 }
 
+fileRenameRelativePath.timeOut = 30000;
+
 //
 
 function fileRenameAsync( test )
@@ -13061,6 +13071,12 @@ function fileRenameGlobal( test )
   let self = this;
   let provider = self.provider;
   let path = provider.path;
+
+  if( provider instanceof _.FileProvider.System )
+  {
+    test.identical( 1,1 )
+    return;
+  }
 
   let routinePath = test.context.pathFor( 'written/fileRenameGlobal' );
   let srcPath = test.context.pathFor( 'written/fileRenameGlobal/src' );
@@ -21414,6 +21430,8 @@ function softLinkRelativePath( test )
   test.close( 'allowingMissed off, same path' );
 }
 
+softLinkRelativePath.timeOut = 30000;
+
 //
 
 function fileReadAsync( test )
@@ -23381,6 +23399,12 @@ function softLinkGlobal( test )
   let provider = self.provider;
   let path = provider.path;
 
+  if( provider instanceof _.FileProvider.System )
+  {
+    test.identical( 1,1 )
+    return;
+  }
+
   let routinePath = test.context.pathFor( 'written/softLinkGlobal' );
   let srcPath = test.context.pathFor( 'written/softLinkGlobal/src' );
   let dstPath = test.context.pathFor( 'written/softLinkGlobal/dst' );
@@ -24469,6 +24493,12 @@ function textLinkGlobal( test )
   let self = this;
   let provider = self.provider;
   let path = provider.path;
+
+  if( provider instanceof _.FileProvider.System )
+  {
+    test.identical( 1,1 )
+    return;
+  }
 
   let routinePath = test.context.pathFor( 'written/textLinkGlobal' );
   let srcPath = test.context.pathFor( 'written/textLinkGlobal/src' );
@@ -30040,6 +30070,12 @@ function hardLinkGlobal( test )
   let self = this;
   let provider = self.provider;
   let path = provider.path;
+
+  if( provider instanceof _.FileProvider.System )
+  {
+    test.identical( 1,1 )
+    return;
+  }
 
   let routinePath = test.context.pathFor( 'written/hardLinkGlobal' );
   let srcPath = test.context.pathFor( 'written/hardLinkGlobal/src' );

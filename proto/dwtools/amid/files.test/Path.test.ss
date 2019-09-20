@@ -1072,6 +1072,7 @@ function pathDirTemp( test )
   var name = 'pathDirTempOpenTest';
 
   let cache = extract.path.PathDirTempForMap[ extract.id ] = Object.create( null );
+  let count = extract.path.PathDirTempCountMap[ extract.id ] = Object.create( null );
 
   test.notIdentical( extract.id, _.fileProvider.id );
 
@@ -1100,13 +1101,25 @@ function pathDirTemp( test )
   test.identical( cache[ filePath2 ], got2 );
 
   extract.path.pathDirTempClose( filePath1 );
+  extract.path.pathDirTempClose( filePath2 );
+  test.identical( cache[ filePath1 ], got1 );
+  test.identical( cache[ filePath2 ], got2 );
+  test.is( extract.isDir( got1 ) );
+  test.is( extract.isDir( got2 ) );
+
+  extract.path.pathDirTempClose( filePath1 );
   test.identical( cache[ filePath1 ], undefined );
   test.identical( cache[ filePath2 ], got2 );
+  test.is( extract.isDir( got1 ) );
   test.is( extract.isDir( got2 ) );
   extract.path.pathDirTempClose( filePath2 );
   test.identical( cache[ filePath1 ], undefined );
   test.identical( cache[ filePath2 ], undefined );
+  test.is( !extract.isDir( got1 ) );
   test.is( !extract.isDir( got2 ) );
+
+  test.identical( count[ got1 ], undefined );
+  test.identical( count[ got2 ], undefined );
 
   var got1 = extract.path.pathDirTempOpen({ filePath : filePath1, name });
   var got2 = extract.path.pathDirTempOpen({ filePath : filePath2, name });
@@ -1120,6 +1133,9 @@ function pathDirTemp( test )
   test.identical( cache[ filePath2 ], undefined );
   test.is( !extract.isDir( got1 ) );
   test.is( !extract.isDir( got2 ) );
+
+  test.identical( count[ got1 ], undefined );
+  test.identical( count[ got2 ], undefined );
 
   test.close( 'same drive' );
 

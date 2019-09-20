@@ -306,6 +306,7 @@ Unix
 // }
 
 let PathDirTempForMap = Object.create( null );
+let PathDirTempCountMap = Object.create( null );
 
 function pathDirTempOpen( o )
 {
@@ -330,13 +331,19 @@ function pathDirTempOpen( o )
 
   if( !PathDirTempForMap[ id ] )
   PathDirTempForMap[ id ] = Object.create( null );
+  if( !PathDirTempCountMap[ id ] )
+  PathDirTempCountMap[ id ] = Object.create( null );
+
 
   /* search in cache */
 
   let cache = PathDirTempForMap[ id ];
+  let count = PathDirTempCountMap[ id ];
 
-  if( cache[ o.filePath ] )
-  return cache[ o.filePath ];
+  let result = cache[ o.filePath ];
+
+  if( result )
+  return end();
 
   let trace = self.traceToRoot( o.filePath );
 
@@ -367,17 +374,29 @@ function pathDirTempOpen( o )
       break;
     }
 
-    cache[ o.filePath ] = cache[ trace[ i ] ];
+    result = cache[ trace[ i ] ];
 
-    return cache[ o.filePath ];
+    return end();
   }
 
   /* make */
 
-  let result = self.pathDirTempMake({ filePath : o.filePath, name : o.name });
-  cache[ o.filePath ] = result;
+  result = self.pathDirTempMake({ filePath : o.filePath, name : o.name });
+  return end();
 
-  return result;
+  /*  */
+
+  function end()
+  {
+    if( count[ result ] === undefined )
+    count[ result ] = [];
+
+    count[ result ].push( o.filePath );
+
+    cache[ o.filePath ] = result;
+
+    return result;
+  }
 }
 
 pathDirTempOpen.defaults =
@@ -758,11 +777,15 @@ function pathDirTempClose( filePath )
   return;
 
   let cache = PathDirTempForMap[ id ];
+  let count = PathDirTempCountMap[ id ];
 
   if( !arguments.length )
   {
     for( let path in cache )
-    close( path );
+    {
+      delete count[ cache[ path ] ];
+      close( path );
+    }
   }
   else
   {
@@ -771,27 +794,32 @@ function pathDirTempClose( filePath )
 
     let currentTempPath = cache[ filePath ];
 
+    /* reverse search for case when filePath is a temp path */
     if( !currentTempPath )
+    for( let path in cache )
+    if( cache[ path ] === filePath )
     {
-      for( let path in cache )
-      if( cache[ path ] === filePath )
-      {
-        currentTempPath = filePath;
-        filePath = path;
-        break;
-      }
-
-      if( !currentTempPath )
-      throw _.err( 'Not found temp dir for path: ' + filePath );
+      currentTempPath = filePath;
+      filePath = path;
+      break;
     }
 
-    for( let path in cache )
-    if( cache[ path ] === currentTempPath )
-    if( path !== filePath )
+    if( !currentTempPath )
+    throw _.err( 'Not found temp dir for path: ' + filePath );
+
+    _.arrayRemoveElementOnce( count[ currentTempPath ], filePath );
+
+    /* if temp path is still in use */
+    if( count[ currentTempPath ].length )
     {
+      if( !_.arrayHas( count[ currentTempPath ], filePath ) )
       delete cache[ filePath ];
       return;
     }
+
+    _.assert( !count[ currentTempPath ].length );
+
+    delete count[ currentTempPath ];
 
     close( filePath );
   }
@@ -974,7 +1002,8 @@ firstAvailable.having.aspect = 'entry';
 
 let Fields =
 {
-  PathDirTempForMap : PathDirTempForMap
+  PathDirTempForMap,
+  PathDirTempCountMap
 }
 
 let Proto =

@@ -27,7 +27,7 @@ var suitePath;
 function onSuiteBegin()
 {
   if( Config.interpreter === 'njs' )
-  suitePath = _.path.dirTempOpen( _.path.join( __dirname, '../..' ), 'FileRecord' );
+  suitePath = _.path.pathDirTempOpen( _.path.join( __dirname, '../..' ), 'FileRecord' );
   else
   suitePath = _.path.current();
 }

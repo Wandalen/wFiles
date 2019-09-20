@@ -35,6 +35,41 @@ _.assert( _.routineIs( _.path.join ) );
 
 */
 
+/*
+
+qqq : implement routines fileLockAct, fileUnlockAct, fileIsLockedAct and corresponding fileLock, fileUnlock, fileIsLocked.
+qqq : cover it and add jsdoc
+
+fileLockAct.defaults =
+{
+  filePath : null,
+  sync : 1,
+  waiting : 0,
+  throwing : 1,
+  timeOut : 5000,
+  id : null,
+}
+
+fileUnlockAct.defaults =
+{
+  filePath : null,
+  sync : 1,
+  throwing : 1,
+  timeOut : 5000,
+  id : null,
+}
+
+fileIsLockedAct.defaults =
+{
+  filePath : null,
+  sync : 1,
+  timeOut : 5000,
+  throwing : 1,
+  id : null,
+}
+
+*/
+
 //
 
 /**
@@ -1036,6 +1071,7 @@ function pathResolveLinkStep_body( o )
     /* qqq */
     return o2;
   }
+
 }
 
 _.routineExtend( pathResolveLinkStep_body, _pathResolveLink );
@@ -1514,6 +1550,7 @@ defaults.resolvingHeadDirect = 1;
 defaults.resolvingHeadReverse = 1;
 defaults.preservingRelative = 0;
 defaults.relativeOriginalFile = 0;
+// defaults.recursive = 3; /* 0, 1, 2, 3 */
 
 /*
 qqq : cover option relativeOriginalFile

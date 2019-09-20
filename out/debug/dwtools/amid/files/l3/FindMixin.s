@@ -2469,8 +2469,8 @@ function filesReflectEvaluate_body( o )
 
     // if( _.strEnds( record.dst.absolute, debugPath ) )
     // debugger;
-    if( _.strEnds( record.dst.absolute, 'Typing.test.s' ) )
-    debugger;
+    // if( _.strEnds( record.dst.absolute, 'Typing.test.s' ) )
+    // debugger;
 
     _.assert( arguments.length === 2 );
     _.assert( !!record.touch === !!touchMap[ record.dst.absolute ] );
@@ -4821,6 +4821,7 @@ function filesDelete_body( o )
   function handleLateWriting()
   {
     let opened = false;
+
     if( o.tempPath === null )
     {
       debugger;

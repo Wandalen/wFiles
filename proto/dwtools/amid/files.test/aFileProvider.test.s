@@ -41441,6 +41441,7 @@ var Self =
     providerIsInstanceOf,
     softLinkIsSupported,
     suitePath : null,
+    system : null,
     // shouldWriteOnlyOnce
   },
 

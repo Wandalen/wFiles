@@ -602,6 +602,7 @@ function pathDirTempMake( o )
     try
     {
       if( i !== trace.length - 1 )
+      if( self.fileProvider.fileExists( trace[ i ] ) )
       {
         let currentStat = self.fileProvider.statReadAct
         ({
@@ -620,6 +621,7 @@ function pathDirTempMake( o )
           resolvingSoftLink : 0,
         });
 
+        if( fileStat )
         if( fileStat.dev != currentStat.dev )
         continue;
       }
@@ -644,7 +646,10 @@ function pathDirTempMake( o )
   }
 
   if( err )
-  filePath = osTempDir;
+  {
+    filePath = _.path.join( osTempDir, o.name );
+    self.fileProvider.dirMake( filePath );
+  }
 
   return end();
 

@@ -1176,14 +1176,19 @@ function pathDirTemp( test )
   test.case = 'should return os temp path in case of error'
 
   var filePath3 = '/dir3'
-  let originalDirMakeAct = extract.dirMakeAct;
-  extract.dirMakeAct = function dirMakeAct( o ){ throw _.err( 'Test error', o.filePath )};
+  let originalDirMake = extract.dirMake;
+  extract.dirMake = function dirMake( filePath )
+  {
+    if( _.strHas( filePath,'/dir3' ) )
+    throw _.err( 'Test err');
+    return originalDirMake.apply( extract, arguments );
+  }
   var got2;
   test.mustNotThrowError( () =>
   {
     got2 = extract.path.pathDirTempOpen({ filePath : filePath3, name });
   })
-  extract.dirMakeAct = _.routineJoin( extract, originalDirMakeAct );
+  extract.dirMake = _.routineJoin( extract, originalDirMake )
   test.is( extract.isDir( got2 ) );
   test.is( _.strBegins( got2, extract.path.dirTemp() ) );
   test.identical( cache[ filePath3 ], got2 );
@@ -1221,7 +1226,7 @@ function pathDirTemp( test )
 
   test.case = 'single arg';
   var got = extract.path.pathDirTempOpen( 'someDir/packageName' );
-  test.is( _.strHas( got, '/someDir/packageName' ) );
+  test.is( _.strHas( got, '/someDir/Temp' ) );
   test.is( extract.isDir( got ) );
   extract.path.pathDirTempClose( got );
   test.is( !extract.fileExists( got ) );

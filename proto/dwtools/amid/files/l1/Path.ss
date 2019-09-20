@@ -793,14 +793,12 @@ function pathDirTempClose( filePath )
   function close( filePath )
   {
     let tempPath = cache[ filePath ];
-    self.fileProvider.fieldPush( 'safe', 0 );
     self.fileProvider.filesDelete
     ({
       filePath : tempPath,
       safe : 0,
       throwing : 0,
     });
-    self.fileProvider.fieldPop( 'safe', 0 );
     delete cache[ filePath ];
     _.assert( !self.fileProvider.fileExists( tempPath ) );
     logger.log( ' . Close temp directory ' + tempPath );

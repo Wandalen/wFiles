@@ -21454,8 +21454,8 @@ function fileReadAsync( test )
 
   var src = 'Excepteur sint occaecat cupidatat non proident';
 
-  self.testFile = test.context.pathFor( 'written/fileReadAsync/file' );
-  provider.fileWrite( self.testFile, src );
+  let testFile = test.context.pathFor( 'written/fileReadAsync/file' );
+  provider.fileWrite( testFile, src );
 
   consequence
   .ifNoErrorThen( function( arg )
@@ -21463,7 +21463,7 @@ function fileReadAsync( test )
     test.case ='read from file';
     var con = provider.fileRead
     ({
-      filePath : self.testFile,
+      filePath : testFile,
       sync : 0,
     });
     return test.returnsSingleResource( con );
@@ -21482,7 +21482,7 @@ function fileReadAsync( test )
     test.case ='read from file, encoding : ascii';
     var con = provider.fileRead
     ({
-      filePath : self.testFile,
+      filePath : testFile,
       sync : 0,
       encoding : 'ascii'
     });
@@ -21501,7 +21501,7 @@ function fileReadAsync( test )
     test.case ='read from file, encoding : utf16le';
     var con = provider.fileRead
     ({
-      filePath : self.testFile,
+      filePath : testFile,
       sync : 0,
       encoding : 'utf16le'
     });
@@ -21520,7 +21520,7 @@ function fileReadAsync( test )
     test.case ='read from file, encoding : ucs2';
     var con = provider.fileRead
     ({
-      filePath : self.testFile,
+      filePath : testFile,
       sync : 0,
       encoding : 'ucs2'
     });
@@ -21539,7 +21539,7 @@ function fileReadAsync( test )
     test.case ='read from file, encoding : base64';
     var con = provider.fileRead
     ({
-      filePath : self.testFile,
+      filePath : testFile,
       sync : 0,
       encoding : 'base64'
     });
@@ -21559,7 +21559,7 @@ function fileReadAsync( test )
     test.case ='read from file, encoding : arraybuffer';
     var con = provider.fileRead
     ({
-      filePath : self.testFile,
+      filePath : testFile,
       sync : 0,
       encoding : 'buffer.raw'
     });
@@ -21579,7 +21579,7 @@ function fileReadAsync( test )
     test.case ='read from file, encoding : buffer';
     var con = provider.fileRead
     ({
-      filePath : self.testFile,
+      filePath : testFile,
       sync : 0,
       encoding : 'buffer.node'
     });
@@ -25389,8 +25389,8 @@ function hardLinkMultipleSync( test )
 
   function makeHardLinksToPath( filePath, amount )
   {
-    _.assert( _.strHas( filePath, 'tmp.tmp' ) );
-    var routinePath = path.pathDirTempOpen( self.provider.path.dir( filePath ), path.name( filePath ) );
+    let routinePath = path.join( self.provider.path.dir( filePath ), _.idWithDate() );
+    provider.dirMake( routinePath )
     for( var i = 0; i < amount; i++ )
     provider.hardLink( path.join( routinePath, 'file' + i ), filePath );
   }
@@ -26116,8 +26116,8 @@ function hardLinkExperiment( test )
 
   function makeHardLinksToPath( filePath, amount )
   {
-    _.assert( _.strHas( filePath, 'tmp.tmp' ) );
-    var routinePath = path.pathDirTempOpen( self.provider.path.dir( filePath ), path.name( filePath ) );
+    let routinePath = path.join( self.provider.path.dir( filePath ), _.idWithDate() );
+    provider.dirMake( routinePath )
     for( var i = 0; i < amount; i++ )
     provider.hardLink( path.join( routinePath, 'file' + i ), filePath );
   }
@@ -26831,8 +26831,8 @@ function hardLinkAsync( test )
 
   function makeHardLinksToPath( filePath, amount )
   {
-    _.assert( _.strHas( filePath, 'tmp.tmp' ) );
-    var routinePath = path.pathDirTempOpen( self.provider.path.dir( filePath ), path.name( filePath ) );
+    let routinePath = path.join( self.provider.path.dir( filePath ), _.idWithDate() );
+    provider.dirMake( routinePath )
     for( var i = 0; i < amount; i++ )
     provider.hardLink( path.join( routinePath, 'file' + i ), filePath );
   }

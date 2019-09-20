@@ -647,7 +647,8 @@ function systemBitrateTimeGet()
     }
     finally
     {
-      self.filesDelete( testDir );
+      // self.filesDelete( testDir );
+      self.path.pathDirTempClose( testDir );
       let statDir = self.statResolvedRead( testDir );
       _.assert( !statDir );
     }

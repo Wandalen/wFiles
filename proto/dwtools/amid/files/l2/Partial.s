@@ -3850,10 +3850,10 @@ function filesAreSame_body( o )
 
   /* soft link */
 
-  if( o.ins1.isSoftLink )
+  if( o.ins1.isSoftLink || o.ins2.isSoftLink )
   {
     debugger;
-    if( !o.ins2.isSoftLink )
+    if( !o.ins1.isSoftLink || !o.ins2.isSoftLink )
     return false;
     return self.pathResolveSoftLink( o.ins1 ) === self.pathResolveSoftLink( o.ins2 );
   }
@@ -3861,10 +3861,10 @@ function filesAreSame_body( o )
   /* text link */
 
   if( self.usingTextLink )
-  if( o.ins1.isTextLink )
+  if( o.ins1.isTextLink || o.ins2.isTextLink )
   {
     debugger;
-    if( !o.ins2.isTextLink )
+    if( !o.ins1.isTextLink || !o.ins2.isTextLink )
     return false;
     return self.pathResolveTextLink( o.ins1 ) === self.pathResolveTextLink( o.ins2 );
   }

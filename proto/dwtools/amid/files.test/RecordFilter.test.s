@@ -58,7 +58,7 @@ function onSuiteEnd()
 {
   if( Config.interpreter === 'njs' )
   {
-    _.assert( _.strHas( this.suitePath, '.tmp' ), this.suitePath );
+    _.assert( _.strHas( suitePath, '.tmp' ), suitePath );
     _.path.pathDirTempClose( suitePath );
   }
 }

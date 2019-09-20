@@ -10,7 +10,7 @@ if( typeof module !== 'undefined' )
 //
 
 var _ = _global_.wTools;
-var Parent = wTests[ 'Tools/mid/files/FilesFind/Abstract' ];
+var Parent = wTests[ 'Tools.mid.files.FilesFind.Abstract' ];
 
 _.assert( !!Parent );
 

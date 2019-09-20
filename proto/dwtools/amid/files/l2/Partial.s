@@ -1071,6 +1071,7 @@ function pathResolveLinkStep_body( o )
     /* qqq */
     return o2;
   }
+
 }
 
 _.routineExtend( pathResolveLinkStep_body, _pathResolveLink );
@@ -1549,6 +1550,7 @@ defaults.resolvingHeadDirect = 1;
 defaults.resolvingHeadReverse = 1;
 defaults.preservingRelative = 0;
 defaults.relativeOriginalFile = 0;
+// defaults.recursive = 3; /* 0, 1, 2, 3 */
 
 /*
 qqq : cover option relativeOriginalFile

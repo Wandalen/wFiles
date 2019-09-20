@@ -12,7 +12,7 @@ if( typeof module !== 'undefined' )
 //
 
 var _ = _global_.wTools;
-var Parent = wTests[ 'Tools/mid/files/FilesFind/Abstract' ];
+var Parent = wTests[ 'Tools.mid.files.FilesFind.Abstract' ];
 
 _.assert( !!Parent );
 
@@ -24,9 +24,9 @@ function onSuiteBegin( test )
   context.provider = _.FileProvider.HardDrive({ protocol : 'current' });
   context.system = _.FileProvider.System({ providers : [ context.provider ], defaultProvider : context.provider });
   let path = context.provider.path;
-  context.testSuitePath = path.pathDirTempOpen( 'suite-' + 'FilesFind' );
-  context.testSuitePath = context.provider.pathResolveLinkFull({ filePath : context.testSuitePath, resolvingSoftLink : 1 });
-  context.testSuitePath = context.testSuitePath.absolutePath;
+  context.suitePath = path.pathDirTempOpen( 'suite-' + 'FilesFind' );
+  context.suitePath = context.provider.pathResolveLinkFull({ filePath : context.suitePath, resolvingSoftLink : 1 });
+  context.suitePath = context.suitePath.absolutePath;
 }
 
 //
@@ -35,8 +35,8 @@ function onSuiteBegin( test )
 // function onSuiteEnd()
 // {
 //   let path = this.provider.path;
-//   _.assert( _.strHas( this.testSuitePath, 'Provider/HardDrive' ) );
-//   path.pathDirTempClose( this.testSuitePath );
+//   _.assert( _.strHas( this.suitePath, 'Provider/HardDrive' ) );
+//   path.pathDirTempClose( this.suitePath );
 // }
 
 // --
@@ -46,7 +46,7 @@ function onSuiteBegin( test )
 var Proto =
 {
 
-  name : 'Tools.mid.files.FilesFind.Abstract',
+  name : 'Tools.mid.files.FilesFind.HardDrive',
   abstract : 0,
   silencing : 1,
   enabled : 1,
@@ -59,9 +59,6 @@ var Proto =
 
   context :
   {
-    // provider : null,
-    // onSuiteBegin,
-    testSuitePath : null,
   },
 
   tests :

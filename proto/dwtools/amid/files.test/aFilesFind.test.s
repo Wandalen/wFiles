@@ -21089,6 +21089,7 @@ function filesReflectOnlyPreserving( test )
   test.is( provider.isDir( dstPath ) );
   var src = provider.fileRead( srcPath );
   var dst = provider.filesExtract( dstPath );
+  dstTreeTransform();
   test.identical( src, _.select( extract.filesTree, '/src/file' ) );
   test.identical( dst.filesTree, _.select( extract.filesTree, '/dst/dir-test' ) );
 
@@ -21110,6 +21111,7 @@ function filesReflectOnlyPreserving( test )
   test.is( provider.isDir( dstPath ) );
   var src = provider.fileRead( srcPath );
   var dst = provider.filesExtract( dstPath );
+  dstTreeTransform();
   test.identical( src, _.select( extract.filesTree, '/src/file' ) );
   test.identical( dst.filesTree, _.select( extract.filesTree, '/dst/dir-test-inner' ) );
 
@@ -21152,9 +21154,10 @@ function filesReflectOnlyPreserving( test )
   test.shouldThrowErrorOfAnyKind( () => provider.filesReflect( o ) );
   test.is( provider.isDir( srcPath ) );
   test.is( provider.isTerminal( dstPath ) );
-  var gotTree = provider.filesExtract( routinePath );
-  test.identical( _.select( gotTree.filesTree, '/src/dir-e/dir-e' ), _.select( extract.filesTree, '/src/dir-e/dir-e' ) );
-  test.identical( _.select( gotTree.filesTree, '/dst/file' ), _.select( extract.filesTree, '/dst/file' ) );
+  var dst = provider.filesExtract( routinePath );
+  dstTreeTransform();
+  test.identical( _.select( dst.filesTree, '/src/dir-e/dir-e' ), _.select( extract.filesTree, '/src/dir-e/dir-e' ) );
+  test.identical( _.select( dst.filesTree, '/dst/file' ), _.select( extract.filesTree, '/dst/file' ) );
 
   test.case = 'dir without terminal - terminal, dstRewritingOnlyPreserving : 0';
   provider.filesDelete( routinePath );
@@ -21172,9 +21175,10 @@ function filesReflectOnlyPreserving( test )
   test.mustNotThrowError( () => provider.filesReflect( o ) );
   test.is( provider.isDir( srcPath ) );
   test.is( provider.isDir( dstPath ) );
-  var gotTree = provider.filesExtract( routinePath );
-  test.identical( _.select( gotTree.filesTree, '/src/dir-e' ), _.select( extract.filesTree, '/src/dir-e' ) );
-  test.identical( _.select( gotTree.filesTree, '/src/dir-e' ), _.select( gotTree.filesTree, '/dst/file' ) );
+  var dst = provider.filesExtract( routinePath );
+  dstTreeTransform();
+  test.identical( _.select( dst.filesTree, '/src/dir-e' ), _.select( extract.filesTree, '/src/dir-e' ) );
+  test.identical( _.select( dst.filesTree, '/src/dir-e' ), _.select( dst.filesTree, '/dst/file' ) );
 
   test.case = 'dir without terminal - terminal, dstRewritingOnlyPreserving : 0';
   provider.filesDelete( routinePath );
@@ -21192,9 +21196,10 @@ function filesReflectOnlyPreserving( test )
   test.shouldThrowErrorOfAnyKind( () => provider.filesReflect( o ) );
   test.is( provider.isDir( srcPath ) );
   test.is( provider.isTerminal( dstPath ) );
-  var gotTree = provider.filesExtract( routinePath );
-  test.identical( _.select( gotTree.filesTree, '/src/dir-e' ), _.select( extract.filesTree, '/src/dir-e' ) );
-  test.identical( _.select( gotTree.filesTree, '/dst/file' ), _.select( extract.filesTree, '/dst/file' ) );
+  var dst = provider.filesExtract( routinePath );
+  dstTreeTransform();
+  test.identical( _.select( dst.filesTree, '/src/dir-e' ), _.select( extract.filesTree, '/src/dir-e' ) );
+  test.identical( _.select( dst.filesTree, '/dst/file' ), _.select( extract.filesTree, '/dst/file' ) );
 
   test.case = 'dir with files - terminal, dstRewritingOnlyPreserving : 0';
   provider.filesDelete( routinePath );
@@ -21212,9 +21217,10 @@ function filesReflectOnlyPreserving( test )
   test.mustNotThrowError( () => provider.filesReflect( o ) );
   test.is( provider.isDir( srcPath ) );
   test.is( provider.isDir( dstPath ) );
-  var gotTree = provider.filesExtract( routinePath );
-  test.identical( _.select( gotTree.filesTree, '/src/dir-test' ), _.select( extract.filesTree, '/src/dir-test' ) );
-  test.identical( _.select( gotTree.filesTree, '/dst/file' ), _.select( gotTree.filesTree, '/src/dir-test' ) );
+  var dst = provider.filesExtract( routinePath );
+  dstTreeTransform();
+  test.identical( _.select( dst.filesTree, '/src/dir-test' ), _.select( extract.filesTree, '/src/dir-test' ) );
+  test.identical( _.select( dst.filesTree, '/dst/file' ), _.select( dst.filesTree, '/src/dir-test' ) );
 
   test.case = 'dir with files - terminal, dstRewritingOnlyPreserving : 1';
   provider.filesDelete( routinePath );
@@ -21232,9 +21238,10 @@ function filesReflectOnlyPreserving( test )
   test.shouldThrowErrorOfAnyKind( () => provider.filesReflect( o ) );
   test.is( provider.isDir( srcPath ) );
   test.is( provider.isTerminal( dstPath ) );
-  var gotTree = provider.filesExtract( routinePath );
-  test.identical( _.select( gotTree.filesTree, '/src/dir-test' ), _.select( extract.filesTree, '/src/dir-test' ) );
-  test.identical( _.select( gotTree.filesTree, '/dst/file' ), _.select( extract.filesTree, '/dst/file' ) );
+  var dst = provider.filesExtract( routinePath );
+  dstTreeTransform();
+  test.identical( _.select( dst.filesTree, '/src/dir-test' ), _.select( extract.filesTree, '/src/dir-test' ) );
+  test.identical( _.select( dst.filesTree, '/dst/file' ), _.select( extract.filesTree, '/dst/file' ) );
 
   /**/
 
@@ -21254,8 +21261,8 @@ function filesReflectOnlyPreserving( test )
   test.mustNotThrowError( () => provider.filesReflect( o ) );
   test.is( provider.isTerminal( provider.path.join( routinePath, 'src/dir-s/file' ) ) );
   test.is( provider.isTerminal( provider.path.join( routinePath, 'dst/dir-s/file' ) ) );
-  var gotTree = provider.filesExtract( routinePath );
-  test.identical( _.select( gotTree.filesTree, '/src/dir-s' ), _.select( gotTree.filesTree, '/dst/dir-s' ) );
+  var dst = provider.filesExtract( routinePath );
+  test.identical( _.select( dst.filesTree, '/src/dir-s' ), _.select( dst.filesTree, '/dst/dir-s' ) );
 
   test.case = 'reflect dir - dir, both with same terminal, dstRewritingOnlyPreserving : 1';
   provider.filesDelete( routinePath );
@@ -21273,8 +21280,8 @@ function filesReflectOnlyPreserving( test )
   test.mustNotThrowError( () => provider.filesReflect( o ) );
   test.is( provider.isDir( srcPath ) );
   test.is( provider.isDir( dstPath ) );
-  var gotTree = provider.filesExtract( routinePath );
-  test.identical( _.select( gotTree.filesTree, '/src/dir-s' ), _.select( gotTree.filesTree, '/dst/dir-s' ) );
+  var dst = provider.filesExtract( routinePath );
+  test.identical( _.select( dst.filesTree, '/src/dir-s' ), _.select( dst.filesTree, '/dst/dir-s' ) );
 
   test.case = 'reflect dir - dir, both have terminal with diff content, dstRewritingOnlyPreserving : 0';
   provider.filesDelete( routinePath );
@@ -21290,10 +21297,10 @@ function filesReflectOnlyPreserving( test )
     dstRewritingOnlyPreserving : 0
   }
   test.mustNotThrowError( () => provider.filesReflect( o ) );
-  test.is( provider.isTerminal( provider.path.join( routinePath, 'src/dir-d/file' ) ) );
-  test.is( provider.isTerminal( provider.path.join( routinePath, 'dst/dir-d/file' ) ) );
-  var gotTree = provider.filesExtract( routinePath );
-  test.identical( _.select( gotTree.filesTree, '/src/dir-d' ), _.select( gotTree.filesTree, '/dst/dir-d' ) );
+  test.is( provider.isTerminal( provider.path.join( routinePath, 'src/dir-d/file-d' ) ) );
+  test.is( provider.isTerminal( provider.path.join( routinePath, 'dst/dir-d/file-d' ) ) );
+  var dst = provider.filesExtract( routinePath );
+  test.identical( _.select( dst.filesTree, '/src/dir-d' ), _.select( dst.filesTree, '/dst/dir-d' ) );
 
   test.case = 'reflect dir - dir, both have terminal with diff content, dstRewritingOnlyPreserving : 1';
   provider.filesDelete( routinePath );
@@ -21311,9 +21318,10 @@ function filesReflectOnlyPreserving( test )
   test.shouldThrowErrorOfAnyKind( () => provider.filesReflect( o ) );
   test.is( provider.isTerminal( srcPath ) );
   test.is( provider.isTerminal( dstPath ) );
-  var gotTree = provider.filesExtract( routinePath );
-  test.identical( _.select( gotTree.filesTree, '/src/dir-d/file-d' ), _.select( extract.filesTree, '/src/dir-d/file-d' ) );
-  test.identical( _.select( gotTree.filesTree, '/dst/dir-d/file-d' ), _.select( extract.filesTree, '/dst/dir-d/file-d' ) );
+  var dst = provider.filesExtract( routinePath );
+  dstTreeTransform();
+  test.identical( _.select( dst.filesTree, '/src/dir-d/file-d' ), _.select( extract.filesTree, '/src/dir-d/file-d' ) );
+  test.identical( _.select( dst.filesTree, '/dst/dir-d/file-d' ), _.select( extract.filesTree, '/dst/dir-d/file-d' ) );
 
   /*  */
 
@@ -21351,8 +21359,8 @@ function filesReflectOnlyPreserving( test )
   }
   test.mustNotThrowError( () => provider.filesReflect( o ) );
   test.is( provider.isTerminal( dstPath ) );
-  var gotTree = provider.filesExtract( routinePath );
-  test.identical( _.select( gotTree.filesTree, '/src/file2' ), _.select( gotTree.filesTree, '/dst/file' ) );
+  var dst = provider.filesExtract( routinePath );
+  test.identical( _.select( dst.filesTree, '/src/file2' ), _.select( dst.filesTree, '/dst/file' ) );
 
   /* */
 
@@ -21376,10 +21384,11 @@ function filesReflectOnlyPreserving( test )
   }
   test.shouldThrowErrorSync( () => provider.filesReflect( o ) );
   test.is( !provider.fileExists( dstPath )  );
-  var gotTree = provider.filesExtract( routinePath );
-  test.identical( _.select( gotTree.filesTree, '/src/file1' ), 'file1' );
-  test.identical( _.select( gotTree.filesTree, '/src/file2' ), 'file2' );
-  test.is( !_.select( gotTree.filesTree, '/dst/file' ) );
+  var dst = provider.filesExtract( routinePath );
+  dstTreeTransform();
+  test.identical( _.select( dst.filesTree, '/src/file1' ), 'file1' );
+  test.identical( _.select( dst.filesTree, '/src/file2' ), 'file2' );
+  test.is( !_.select( dst.filesTree, '/dst/file' ) );
 
   /*  */
 
@@ -21418,9 +21427,9 @@ function filesReflectOnlyPreserving( test )
   }
   test.mustNotThrowError( () => provider.filesReflect( o ) );
   test.is( provider.isTerminal( dstPath )  );
-  var gotTree = provider.filesExtract( routinePath );
-  test.identical( _.select( gotTree.filesTree, '/src/file1' ), _.select( gotTree.filesTree, '/dst/file' ) );
-  test.identical( _.select( gotTree.filesTree, '/src/file2' ), _.select( gotTree.filesTree, '/dst/file' ) );
+  var dst = provider.filesExtract( routinePath );
+  test.identical( _.select( dst.filesTree, '/src/file1' ), _.select( dst.filesTree, '/dst/file' ) );
+  test.identical( _.select( dst.filesTree, '/src/file2' ), _.select( dst.filesTree, '/dst/file' ) );
 
   /* */
 
@@ -21444,9 +21453,9 @@ function filesReflectOnlyPreserving( test )
   }
   test.mustNotThrowError( () => provider.filesReflect( o ) );
   test.is( provider.isTerminal( dstPath )  );
-  var gotTree = provider.filesExtract( routinePath );
-  test.identical( _.select( gotTree.filesTree, '/src/file1' ), _.select( gotTree.filesTree, '/dst/file' ) );
-  test.identical( _.select( gotTree.filesTree, '/src/file2' ), _.select( gotTree.filesTree, '/dst/file' ) );
+  var dst = provider.filesExtract( routinePath );
+  test.identical( _.select( dst.filesTree, '/src/file1' ), _.select( dst.filesTree, '/dst/file' ) );
+  test.identical( _.select( dst.filesTree, '/src/file2' ), _.select( dst.filesTree, '/dst/file' ) );
 
   /* */
 
@@ -21472,10 +21481,10 @@ function filesReflectOnlyPreserving( test )
   }
   test.mustNotThrowError( () => provider.filesReflect( o ) );
   test.is( provider.isTerminal( dstPath )  );
-  var gotTree = provider.filesExtract( routinePath );
-  test.notIdentical( _.select( gotTree.filesTree, '/src/file1' ), _.select( gotTree.filesTree, '/dst/file' ) );
-  test.notIdentical( _.select( gotTree.filesTree, '/src/file2' ), _.select( gotTree.filesTree, '/dst/file' ) );
-  test.identical( _.select( gotTree.filesTree, '/src/file3' ), _.select( gotTree.filesTree, '/dst/file' ) );
+  var dst = provider.filesExtract( routinePath );
+  test.notIdentical( _.select( dst.filesTree, '/src/file1' ), _.select( dst.filesTree, '/dst/file' ) );
+  test.notIdentical( _.select( dst.filesTree, '/src/file2' ), _.select( dst.filesTree, '/dst/file' ) );
+  test.identical( _.select( dst.filesTree, '/src/file3' ), _.select( dst.filesTree, '/dst/file' ) );
 
   /* */
 
@@ -21501,10 +21510,11 @@ function filesReflectOnlyPreserving( test )
   }
   test.shouldThrowErrorSync( () => provider.filesReflect( o ) );
   test.is( !provider.fileExists( dstPath )  );
-  var gotTree = provider.filesExtract( routinePath );
-  test.identical( _.select( gotTree.filesTree, '/src/file1' ), 'file' );
-  test.identical( _.select( gotTree.filesTree, '/src/file2' ), 'file' );
-  test.identical( _.select( gotTree.filesTree, '/src/file3' ), 'file3' );
+  var dst = provider.filesExtract( routinePath );
+  dstTreeTransform();
+  test.identical( _.select( dst.filesTree, '/src/file1' ), 'file' );
+  test.identical( _.select( dst.filesTree, '/src/file2' ), 'file' );
+  test.identical( _.select( dst.filesTree, '/src/file3' ), 'file3' );
 
   /*  */
 
@@ -21550,9 +21560,9 @@ function filesReflectOnlyPreserving( test )
 
   test.mustNotThrowError( () => provider.filesReflect( o ) );
   test.is( provider.isTerminal( dstPath )  );
-  var gotTree = provider.filesExtract( routinePath );
-  test.identical( _.select( gotTree.filesTree, '/src/file3' ), _.select( gotTree.filesTree, '/dst/file' ) );
-  test.notIdentical( _.select( gotTree.filesTree, '/src/file4' ), _.select( gotTree.filesTree, '/dst/file' ) );
+  var dst = provider.filesExtract( routinePath );
+  test.identical( _.select( dst.filesTree, '/src/file3' ), _.select( dst.filesTree, '/dst/file' ) );
+  test.notIdentical( _.select( dst.filesTree, '/src/file4' ), _.select( dst.filesTree, '/dst/file' ) );
 
   /* */
 
@@ -21579,9 +21589,9 @@ function filesReflectOnlyPreserving( test )
 
   test.mustNotThrowError( () => provider.filesReflect( o ) );
   test.is( provider.isTerminal( dstPath )  );
-  var gotTree = provider.filesExtract( routinePath );
-  test.identical( _.select( gotTree.filesTree, '/src/file3' ), _.select( gotTree.filesTree, '/dst/file' ) );
-  test.notIdentical( _.select( gotTree.filesTree, '/src/file4' ), _.select( gotTree.filesTree, '/dst/file' ) );
+  var dst = provider.filesExtract( routinePath );
+  test.identical( _.select( dst.filesTree, '/src/file3' ), _.select( dst.filesTree, '/dst/file' ) );
+  test.notIdentical( _.select( dst.filesTree, '/src/file4' ), _.select( dst.filesTree, '/dst/file' ) );
 
   /*  */
 
@@ -21614,8 +21624,9 @@ function filesReflectOnlyPreserving( test )
     src : { srcDir : { a : 'src/a', b : 'src/b' }, srcDir2 : { e : 'src/e' }, c : 'src/c', d : 'src/d' },
     dst : 'src/d',
   }
-  var gotTree = provider.filesExtract( routinePath );
-  test.identical( gotTree.filesTree, expectedTree );
+  var dst = provider.filesExtract( routinePath );
+  dstTreeTransform();
+  test.identical( dst.filesTree, expectedTree );
   var expectedDstAbsolute = [ '/dst/c2', '/dst', '/dst/c', '/dst/c2', '/dst/d', '/dst/dstDir', '/dst/dstDir/a', '/dst/dstDir/c' ];
   var expectedSrcAbsolute = [ '/src/c', '/src/d', '/src/d/c', '/src/d/c2', '/src/d/d', '/src/d/dstDir', '/src/d/dstDir/a', '/src/d/dstDir/c' ];
   expectedDstAbsolute = provider.path.s.reroot( routinePath, expectedDstAbsolute )
@@ -21658,8 +21669,9 @@ function filesReflectOnlyPreserving( test )
     src : { srcDir : { a : 'src/a', b : 'src/b' }, srcDir2 : { e : 'src/e' }, c : 'src/c', d : 'src/d' },
     dst : { dstDir : { a : 'dst/a', c : 'dst/c' }, c : 'dst/c', c2 : 'src/c', d : 'dst/d' },
   }
-  var gotTree = provider.filesExtract( routinePath );
-  test.identical( gotTree.filesTree, expectedTree );
+  var dst = provider.filesExtract( routinePath );
+  dstTreeTransform();
+  test.identical( dst.filesTree, expectedTree );
 
   /* rewriting of empty files with same time */
 
@@ -21870,6 +21882,17 @@ function filesReflectOnlyPreserving( test )
   test.notIdentical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
 
   test.close( 'rewriting of empty files, src and dst are diffent' );
+
+  /*  */
+
+  function dstTreeTransform()
+  {
+    dst.filesFind({ filePath : '/', filter : { recursive : 2 }, onDown : function onDown( r, o )
+    {
+      if( r.isTerminal )
+      dst.fileWrite( r.absolute, dst.fileRead( r.absolute ) );
+    }})
+  }
 
 } /* end of function filesReflectOnlyPreserving */
 

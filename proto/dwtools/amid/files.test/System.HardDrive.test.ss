@@ -46,7 +46,7 @@ function onSuiteBegin()
 
 function onSuiteEnd()
 {
-  _.assert( _.strHas( this.suitePath, 'System/HardDrive' ) );
+  _.assert( _.strHas( this.suitePath, '.tmp' ), this.suitePath );
   // this.providerEffective.filesDelete({ filePath : this.suitePath });
   _.path.pathDirTempClose( this.suitePath );
 }

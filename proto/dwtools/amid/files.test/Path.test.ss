@@ -39,7 +39,7 @@ function onSuiteEnd()
 {
   if( !this.isBrowser )
   {
-    _.assert( _.strHas( this.suitePath, 'Path' ), this.suitePath );
+    _.assert( _.strHas( this.suitePath, '.tmp' ), this.suitePath );
     _.path.pathDirTempClose( this.suitePath );
   }
 }

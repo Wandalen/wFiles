@@ -58,7 +58,7 @@ function onSuiteEnd()
 {
   if( Config.interpreter === 'njs' )
   {
-    _.assert( _.strHas( suitePath, 'FileRecordFilter' ) );
+    _.assert( _.strHas( this.suitePath, '.tmp' ), this.suitePath );
     _.path.pathDirTempClose( suitePath );
   }
 }

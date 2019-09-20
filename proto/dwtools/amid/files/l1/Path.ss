@@ -315,10 +315,13 @@ function pathDirTempOpen( o )
   o = { filePath : arguments[ 0 ] }
   if( arguments[ 1 ] !== undefined )
   o.name = arguments[ 1 ];
+  if( o.filePath === undefined )
+  o.filePath = self.current();
+  else
   o.filePath = self.resolve( o.filePath );
 
   _.routineOptions( pathDirTempOpen, o );
-  _.assert( arguments.length === 1 || arguments.length === 2 );
+  _.assert( arguments.length <= 2 );
   _.assert( !!self.fileProvider );
   _.assert( self.isAbsolute( o.filePath ) );
   _.assert( self.isNormalized( o.filePath ) );
@@ -656,7 +659,7 @@ function pathDirTempMake( o )
       self.pathDirTempClose()
     });
 
-    logger.log( ' . Open temp directory ' + filePath );
+    // logger.log( ' . Open temp directory ' + filePath );
     return filePath;
   }
 }
@@ -801,7 +804,7 @@ function pathDirTempClose( filePath )
     });
     delete cache[ filePath ];
     _.assert( !self.fileProvider.fileExists( tempPath ) );
-    logger.log( ' . Close temp directory ' + tempPath );
+    // logger.log( ' . Close temp directory ' + tempPath );
     debugger;
     return tempPath;
   }

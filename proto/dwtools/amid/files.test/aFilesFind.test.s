@@ -36,7 +36,7 @@ function onSuiteEnd()
 {
   let path = this.provider.path;
   _.assert( Object.keys( this.system.providersWithProtocolMap ).length === 1, 'System should have single registered provider at the end of function testing' );
-  _.assert( _.strHas( this.suitePath, '/tmp-' ) );
+  _.assert( _.strHas( this.suitePath, '.tmp' ) );
   path.pathDirTempClose( this.suitePath );
   this.provider.finit();
   this.system.finit();

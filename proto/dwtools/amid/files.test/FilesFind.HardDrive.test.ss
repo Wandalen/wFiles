@@ -24,7 +24,7 @@ function onSuiteBegin( test )
   context.provider = _.FileProvider.HardDrive({ protocol : 'current' });
   context.system = _.FileProvider.System({ providers : [ context.provider ], defaultProvider : context.provider });
   let path = context.provider.path;
-  context.suitePath = path.pathDirTempOpen( 'suite-' + 'FilesFind' );
+  context.suitePath = path.pathDirTempOpen( path.join( __dirname, '../..'  ), 'suite-' + 'FilesFind' );
   context.suitePath = context.provider.pathResolveLinkFull({ filePath : context.suitePath, resolvingSoftLink : 1 });
   context.suitePath = context.suitePath.absolutePath;
 }

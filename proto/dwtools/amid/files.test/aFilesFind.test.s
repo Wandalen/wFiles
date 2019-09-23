@@ -21340,6 +21340,261 @@ function filesReflectOnlyPreserving( test )
 
 //
 
+function filesReflectOnlyPreservingLinks( test )
+{
+  let context = this;
+  let provider = context.provider;
+  let system = context.system;
+  let path = context.provider.path;
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+
+  var filesTree =
+  {
+    src : { terminal : 'terminal' },
+    dst : { terminal : 'terminal' },
+  }
+
+  var extract = new _.FileProvider.Extract({ filesTree });
+
+  var srcPath = provider.path.join( routinePath, 'src' );
+  var srcTerminalPath = provider.path.join( routinePath, 'src/terminal' );
+  var srcLinkPath = provider.path.join( routinePath, 'src/link' );
+  var dstPath = provider.path.join( routinePath, 'dst' );
+  var dstTerminalPath = provider.path.join( routinePath, 'dst/terminal' );
+  var dstLinkPath = provider.path.join( routinePath, 'dst/link' );
+
+  /* */
+
+  test.open( 'terminal -> softlink to terminal, same content' )
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstLinkPath, dstTerminalPath );
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcTerminalPath ] : dstLinkPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 1,
+
+    resolvingSoftLink : 0,
+    resolvingDstSoftLink : 0,
+  }
+  test.shouldThrowErrorSync( () => provider.filesReflect( o ) );
+  test.is( provider.isTerminal( srcTerminalPath ) );
+  test.is( provider.isTerminal( dstTerminalPath ) );
+  test.is( provider.isSoftLink( dstLinkPath ) );
+  test.identical( provider.pathResolveSoftLink( dstLinkPath ), dstTerminalPath );
+  test.identical( provider.fileRead( srcTerminalPath ), _.select( extract.filesTree, '/src/terminal' ) )
+  test.identical( provider.fileRead( dstTerminalPath ), _.select( extract.filesTree, '/dst/terminal' ) )
+  test.identical( provider.fileRead( dstLinkPath ), _.select( extract.filesTree, '/dst/terminal' ) )
+
+  //
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstLinkPath, dstTerminalPath );
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcTerminalPath ] : dstLinkPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 0,
+
+    resolvingSoftLink : 0,
+    resolvingDstSoftLink : 0,
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isTerminal( srcTerminalPath ) );
+  test.is( provider.isTerminal( dstTerminalPath ) );
+  test.is( provider.isTerminal( dstLinkPath ) );
+  test.identical( provider.pathResolveSoftLink( dstLinkPath ), dstLinkPath );
+  test.identical( provider.fileRead( srcTerminalPath ), _.select( extract.filesTree, '/src/terminal' ) )
+  test.identical( provider.fileRead( dstTerminalPath ), _.select( extract.filesTree, '/dst/terminal' ) )
+  test.identical( provider.fileRead( dstLinkPath ), _.select( extract.filesTree, '/src/terminal' ) )
+
+  //
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstLinkPath, dstTerminalPath );
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcTerminalPath ] : dstLinkPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 1,
+
+    resolvingSoftLink : 1,
+    resolvingDstSoftLink : 0,
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isTerminal( srcTerminalPath ) );
+  test.is( provider.isTerminal( dstTerminalPath ) );
+  test.is( provider.isTerminal( dstLinkPath ) );
+  test.identical( provider.pathResolveSoftLink( dstLinkPath ), dstLinkPath );
+  test.identical( provider.fileRead( srcTerminalPath ), _.select( extract.filesTree, '/src/terminal' ) )
+  test.identical( provider.fileRead( dstTerminalPath ), _.select( extract.filesTree, '/dst/terminal' ) )
+  test.identical( provider.fileRead( dstLinkPath ), _.select( extract.filesTree, '/dst/terminal' ) )
+
+  //
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstLinkPath, dstTerminalPath );
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcTerminalPath ] : dstLinkPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 0,
+
+    resolvingSoftLink : 1,
+    resolvingDstSoftLink : 0,
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isTerminal( srcTerminalPath ) );
+  test.is( provider.isTerminal( dstTerminalPath ) );
+  test.is( provider.isTerminal( dstLinkPath ) );
+  test.identical( provider.pathResolveSoftLink( dstLinkPath ), dstLinkPath );
+  test.identical( provider.fileRead( srcTerminalPath ), _.select( extract.filesTree, '/src/terminal' ) )
+  test.identical( provider.fileRead( dstTerminalPath ), _.select( extract.filesTree, '/dst/terminal' ) )
+  test.identical( provider.fileRead( dstLinkPath ), _.select( extract.filesTree, '/dst/terminal' ) )
+
+  //
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstLinkPath, dstTerminalPath );
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcTerminalPath ] : dstLinkPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 1,
+
+    resolvingSoftLink : 0,
+    resolvingDstSoftLink : 1,
+  }
+  test.shouldThrowErrorSync( () => provider.filesReflect( o ) );
+  test.is( provider.isTerminal( srcTerminalPath ) );
+  test.is( provider.isTerminal( dstTerminalPath ) );
+  test.is( provider.isSoftLink( dstLinkPath ) );
+  test.identical( provider.pathResolveSoftLink( dstLinkPath ), dstTerminalPath );
+  test.identical( provider.fileRead( srcTerminalPath ), _.select( extract.filesTree, '/src/terminal' ) )
+  test.identical( provider.fileRead( dstTerminalPath ), _.select( extract.filesTree, '/dst/terminal' ) )
+  test.identical( provider.fileRead( dstLinkPath ), _.select( extract.filesTree, '/dst/terminal' ) )
+
+  //
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstLinkPath, dstTerminalPath );
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcTerminalPath ] : dstLinkPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 0,
+
+    resolvingSoftLink : 0,
+    resolvingDstSoftLink : 1,
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isTerminal( srcTerminalPath ) );
+  test.is( provider.isTerminal( dstTerminalPath ) );
+  test.is( provider.isSoftLink( dstLinkPath ) );
+  test.identical( provider.pathResolveSoftLink( dstLinkPath ), dstTerminalPath );
+  test.identical( provider.fileRead( srcTerminalPath ), _.select( extract.filesTree, '/src/terminal' ) )
+  test.identical( provider.fileRead( dstTerminalPath ), _.select( extract.filesTree, '/src/terminal' ) )
+  test.identical( provider.fileRead( dstLinkPath ), _.select( extract.filesTree, '/dst/terminal' ) )
+
+  //
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstLinkPath, dstTerminalPath );
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcTerminalPath ] : dstLinkPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 1,
+
+    resolvingSoftLink : 1,
+    resolvingDstSoftLink : 1,
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isTerminal( srcTerminalPath ) );
+  test.is( provider.isTerminal( dstTerminalPath ) );
+  test.is( provider.isSoftLink( dstLinkPath ) );
+  test.identical( provider.pathResolveSoftLink( dstLinkPath ), dstTerminalPath );
+  test.identical( provider.fileRead( srcTerminalPath ), _.select( extract.filesTree, '/src/terminal' ) )
+  test.identical( provider.fileRead( dstTerminalPath ), _.select( extract.filesTree, '/dst/terminal' ) )
+  test.identical( provider.fileRead( dstLinkPath ), _.select( extract.filesTree, '/dst/terminal' ) )
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstLinkPath, dstTerminalPath );
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcTerminalPath ] : dstLinkPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 0,
+
+    resolvingSoftLink : 1,
+    resolvingDstSoftLink : 1,
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isTerminal( srcTerminalPath ) );
+  test.is( provider.isTerminal( dstTerminalPath ) );
+  test.is( provider.isSoftLink( dstLinkPath ) );
+  test.identical( provider.pathResolveSoftLink( dstLinkPath ), dstTerminalPath );
+  test.identical( provider.fileRead( srcTerminalPath ), _.select( extract.filesTree, '/src/terminal' ) )
+  test.identical( provider.fileRead( dstTerminalPath ), _.select( extract.filesTree, '/src/terminal' ) )
+  test.identical( provider.fileRead( dstLinkPath ), _.select( extract.filesTree, '/dst/terminal' ) )
+
+  test.close( 'terminal -> softlink to terminal, same content' )
+
+
+  /* */
+}
+
+//
+
 function filesReflectOnlyPreservingMultipleSrc( test )
 {
   let context = this;
@@ -35650,6 +35905,7 @@ var Self =
     filesReflectLinkWithSystem,
     filesReflectDeducing,
     filesReflectOnlyPreserving,
+    filesReflectOnlyPreservingLinks,
     filesReflectOnlyPreservingMultipleSrc,
     filesReflectOnlyPreservingEmpty,
     filesReflectDstDeletingDirs,

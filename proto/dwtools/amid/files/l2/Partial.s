@@ -1297,9 +1297,9 @@ function pathResolveLinkStep_body( o )
     delete o2.resolvingTextLink;
     delete o2.resolvingSoftLink;
     /* qqq : enable options "throwing", "allowingMissed", "allowingCycled" */
-    delete o2.throwing;
-    delete o2.allowingMissed;
-    delete o2.allowingCycled;
+    // delete o2.throwing;
+    // delete o2.allowingMissed;
+    // delete o2.allowingCycled;
     /* qqq */
     return o2;
   }

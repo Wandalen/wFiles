@@ -1280,16 +1280,16 @@ function pathResolveLinkStep_body( o )
       result = self.pathResolveTextLink( o2 );
     }
 
-    return result;
+    return handleResult( result );
   }
   else if( o.resolvingTextLink )
   {
     let o2 = o2From( o );
     result = self.pathResolveTextLink( o2 );
-    return result;
+    return handleResult( result );
   }
 
-  return o.filePath;
+  return handleResult( o.filePath );
 
   function o2From( o )
   {
@@ -1302,6 +1302,21 @@ function pathResolveLinkStep_body( o )
     // delete o2.allowingCycled;
     /* qqq */
     return o2;
+  }
+
+  function handleResult( result )
+  {
+    result =
+    {
+      filePath : result,
+      relativePath : result,
+      absolutePath : result
+    }
+
+    if( self.path.isRelative( result ) )
+    absolutePath = self.path.join( o2.filePath, result )
+
+    return result;
   }
 
 }

@@ -39862,7 +39862,7 @@ function pathResolveSoftLink( test )
   provider.fileWrite( filePath, testData );
   provider.softLink( linkPath2, filePath );
   provider.softLink( linkPath, linkPath2 );
-  var o = _.mapExtend( null, o1, { filePath : linkPath, resolvingMultiple : 1 } );
+  var o = _.mapExtend( null, o1, { filePath : linkPath, resolvingMultiple : 3 } );
   var got = provider.pathResolveSoftLink( o );
   test.identical( got, filePath );
 
@@ -39871,37 +39871,37 @@ function pathResolveSoftLink( test )
   provider.textLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath2, srcPath : linkPath });
   provider.softLink({ dstPath : linkPath3, srcPath : linkPath2 });
-  var got = provider.pathResolveSoftLink( { filePath : linkPath3, resolvingMultiple : 1 } );
+  var got = provider.pathResolveSoftLink( { filePath : linkPath3, resolvingMultiple : 3 } );
   test.identical( got, linkPath );
 
   test.case = 'Chain with two softlink, last link is broken';
   provider.filesDelete( routinePath );
   provider.softLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath2, srcPath : linkPath });
-  var got = provider.pathResolveSoftLink( { filePath : linkPath2, resolvingMultiple : 1 } );
+  var got = provider.pathResolveSoftLink( { filePath : linkPath2, resolvingMultiple : 3 } );
   test.identical( got, filePath );
 
   test.case = 'Chain with two textlinks';
   provider.filesDelete( routinePath );
   provider.textLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.textLink({ dstPath : linkPath2, srcPath : linkPath });
-  var got = provider.pathResolveSoftLink( { filePath : linkPath2, resolvingMultiple : 1 } );
+  var got = provider.pathResolveSoftLink( { filePath : linkPath2, resolvingMultiple : 3 } );
   test.identical( got, linkPath2 );
 
   test.case = 'Chain with two relative softLinks';
   provider.filesDelete( routinePath );
   provider.softLink({ dstPath : linkPath, srcPath : '../file', allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath2, srcPath : '../link' });
-  var got = provider.pathResolveSoftLink( { filePath : linkPath2, resolvingMultiple : 1 } );
-  test.identical( got, filePath );
+  var got = provider.pathResolveSoftLink( { filePath : linkPath2, resolvingMultiple : 3 } );
+  test.identical( got, '../file' );
 
   test.case = 'Chain with relative and absolute softLinks';
   provider.filesDelete( routinePath );
   provider.softLink({ dstPath : linkPath, srcPath : '../file', allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath2, srcPath : linkPath });
   provider.softLink({ dstPath : linkPath3, srcPath : '../link2' });
-  var got = provider.pathResolveSoftLink( { filePath : linkPath3, resolvingMultiple : 1 } );
-  test.identical( got, filePath );
+  var got = provider.pathResolveSoftLink( { filePath : linkPath3, resolvingMultiple : 3 } );
+  test.identical( got, '../file' );
 
   /* resolvingIntermediateDirectories */
 
@@ -39911,18 +39911,9 @@ function pathResolveSoftLink( test )
   provider.softLink( linkPath, '..' );
   provider.softLink( linkPath2, test.context.globalFromPreferred( '../file' ) );
   var pathToResolve = provider.path.join( routinePath, 'link/link2' )
-  var o = _.mapExtend( null, o1, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 0 } );
+  var o = _.mapExtend( null, o1, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 1 } );
   var got = provider.pathResolveSoftLink( o );
   test.identical( got, filePath );
-
-  test.case = 'intermediate absolute soft link to other directory';
-  provider.filesDelete( routinePath );
-  provider.fileWrite( terminalInDirPath, terminalInDirPath );
-  provider.softLink( linkPath, dirPath );
-  var pathToResolve = provider.path.join( linkPath, 'terminal' );
-  var o = _.mapExtend( null, o1, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 0 } );
-  var got = provider.pathResolveSoftLink( o );
-  test.identical( got, terminalInDirPath );
 
   test.case = 'intermediate absolute soft link to other directory';
   provider.filesDelete( routinePath );
@@ -39933,13 +39924,22 @@ function pathResolveSoftLink( test )
   var got = provider.pathResolveSoftLink( o );
   test.identical( got, terminalInDirPath );
 
+  test.case = 'intermediate absolute soft link to other directory';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( terminalInDirPath, terminalInDirPath );
+  provider.softLink( linkPath, dirPath );
+  var pathToResolve = provider.path.join( linkPath, 'terminal' );
+  var o = _.mapExtend( null, o1, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 3 } );
+  var got = provider.pathResolveSoftLink( o );
+  test.identical( got, terminalInDirPath );
+
   test.case = 'intermediate chain of soft links to other directory, resolvingMultiple off';
   provider.filesDelete( routinePath );
   provider.fileWrite( terminalInDirPath, terminalInDirPath );
   provider.softLink( linkPath2, dirPath );
   provider.softLink( linkPath, linkPath2 );
   var pathToResolve = provider.path.join( linkPath, 'terminal' );
-  var o = _.mapExtend( null, o1, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 0 } );
+  var o = _.mapExtend( null, o1, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 1 } );
   var got = provider.pathResolveSoftLink( o );
   var expected = provider.path.join( linkPath2, 'terminal' );
   test.identical( got, expected );
@@ -39950,7 +39950,7 @@ function pathResolveSoftLink( test )
   provider.softLink( linkPath2, dirPath );
   provider.softLink( linkPath, linkPath2 );
   var pathToResolve = provider.path.join( linkPath, 'terminal' );
-  var o = _.mapExtend( null, o1, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 1 } );
+  var o = _.mapExtend( null, o1, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 3 } );
   var got = provider.pathResolveSoftLink( o );
   test.identical( got, terminalInDirPath );
 
@@ -39960,7 +39960,7 @@ function pathResolveSoftLink( test )
   provider.softLink( linkPath2, '../dir' );
   provider.softLink( linkPath, '../link2' );
   var pathToResolve = provider.path.join( linkPath, 'terminal' );
-  var o = _.mapExtend( null, o1, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 0 } );
+  var o = _.mapExtend( null, o1, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 1 } );
   var got = provider.pathResolveSoftLink( o );
   var expected = provider.path.join( linkPath2, 'terminal' );
   test.identical( got, expected );
@@ -39971,7 +39971,7 @@ function pathResolveSoftLink( test )
   provider.softLink( linkPath2, '../dir' );
   provider.softLink( linkPath, '../link2' );
   var pathToResolve = provider.path.join( linkPath, 'terminal' );
-  var o = _.mapExtend( null, o1, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 1 } );
+  var o = _.mapExtend( null, o1, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 3 } );
   var got = provider.pathResolveSoftLink( o );
   test.identical( got, terminalInDirPath );
 
@@ -39994,9 +39994,6 @@ function pathResolveSoftLink( test )
 
   test.case = 'No filePath option';
   test.shouldThrowErrorOfAnyKind( () => provider.pathResolveSoftLink( { otherPath : linkPath } ) );
-
-  test.case = 'Redundant option';
-  test.shouldThrowErrorOfAnyKind( () => provider.pathResolveSoftLink( { filePath : linkPath, allowingMissed : 1 } ) );
 
   test.case = 'Wrong filePath options - undefined';
   test.shouldThrowErrorOfAnyKind( () => provider.pathResolveSoftLink( { filePath : undefined } ) );
@@ -41167,7 +41164,7 @@ function pathResolveTextLink( test )
   provider.fileWrite( filePath, testData );
   provider.textLink( linkPath2, filePath );
   provider.textLink( linkPath, linkPath2 );
-  var got = provider.pathResolveTextLink({ filePath : linkPath, resolvingMultiple : 1 });
+  var got = provider.pathResolveTextLink({ filePath : linkPath, resolvingMultiple : 3 });
   test.identical( got, filePath );
 
   test.case = 'Chain with two textlinks and soft link to missing file';
@@ -41175,37 +41172,37 @@ function pathResolveTextLink( test )
   provider.softLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.textLink({ dstPath : linkPath2, srcPath : linkPath });
   provider.textLink({ dstPath : linkPath3, srcPath : linkPath2 });
-  var got = provider.pathResolveTextLink( { filePath : linkPath3, resolvingMultiple : 1 } );
+  var got = provider.pathResolveTextLink( { filePath : linkPath3, resolvingMultiple : 3 } );
   test.identical( got, linkPath );
 
   test.case = 'Chain with two textlinks, last link is broken';
   provider.filesDelete( routinePath );
   provider.textLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.textLink({ dstPath : linkPath2, srcPath : linkPath });
-  var got = provider.pathResolveTextLink( { filePath : linkPath2, resolvingMultiple : 1 } );
+  var got = provider.pathResolveTextLink( { filePath : linkPath2, resolvingMultiple : 3 } );
   test.identical( got, filePath );
 
   test.case = 'Chain with two softlinks';
   provider.filesDelete( routinePath );
   provider.softLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath2, srcPath : linkPath });
-  var got = provider.pathResolveTextLink( { filePath : linkPath2, resolvingMultiple : 1 } );
+  var got = provider.pathResolveTextLink( { filePath : linkPath2, resolvingMultiple : 3 } );
   test.identical( got, linkPath2 );
 
   test.case = 'Chain with two relative textlinks';
   provider.filesDelete( routinePath );
   provider.textLink({ dstPath : linkPath, srcPath : '../file', allowingMissed : 1, makingDirectory : 1 });
   provider.textLink({ dstPath : linkPath2, srcPath : '../link' });
-  var got = provider.pathResolveTextLink( { filePath : linkPath2, resolvingMultiple : 1 } );
-  test.identical( got, filePath );
+  var got = provider.pathResolveTextLink( { filePath : linkPath2, resolvingMultiple : 3 } );
+  test.identical( got, '../file' );
 
   test.case = 'Chain with relative and absolute textlinks';
   provider.filesDelete( routinePath );
   provider.textLink({ dstPath : linkPath, srcPath : '../file', allowingMissed : 1, makingDirectory : 1 });
   provider.textLink({ dstPath : linkPath2, srcPath : linkPath });
   provider.textLink({ dstPath : linkPath3, srcPath : '../link2' });
-  var got = provider.pathResolveTextLink( { filePath : linkPath3, resolvingMultiple : 1 } );
-  test.identical( got, filePath );
+  var got = provider.pathResolveTextLink( { filePath : linkPath3, resolvingMultiple : 3 } );
+  test.identical( got, '../file' );
 
   /* resolvingIntermediateDirectories */
 
@@ -41215,8 +41212,7 @@ function pathResolveTextLink( test )
   provider.textLink( linkPath, test.context.globalFromPreferred( '..' ) );
   provider.textLink( linkPath2, '../file' );
   var pathToResolve = provider.path.join( routinePath, 'link/link2' )
-  var o = _.mapExtend( null, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 0 } );
-  debugger
+  var o = _.mapExtend( null, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 1 } );
   var got = provider.pathResolveTextLink( o );
   test.identical( got, filePath );
 
@@ -41225,7 +41221,7 @@ function pathResolveTextLink( test )
   provider.fileWrite( terminalInDirPath, terminalInDirPath );
   provider.textLink( linkPath, dirPath );
   var pathToResolve = provider.path.join( linkPath, 'terminal' );
-  var o = _.mapExtend( null, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 0 } );
+  var o = _.mapExtend( null, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 1 } );
   var got = provider.pathResolveTextLink( o );
   test.identical( got, terminalInDirPath );
 
@@ -41234,7 +41230,7 @@ function pathResolveTextLink( test )
   provider.fileWrite( terminalInDirPath, terminalInDirPath );
   provider.softLink( linkPath, dirPath );
   var pathToResolve = provider.path.join( linkPath, 'terminal' );
-  var o = _.mapExtend( null, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 1 } );
+  var o = _.mapExtend( null, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 3 } );
   var got = provider.pathResolveTextLink( o );
   test.identical( got, pathToResolve );
 
@@ -41244,7 +41240,7 @@ function pathResolveTextLink( test )
   provider.textLink( linkPath2, dirPath );
   provider.textLink( linkPath, linkPath2 );
   var pathToResolve = provider.path.join( linkPath, 'terminal' );
-  var o = _.mapExtend( null, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 0 } );
+  var o = _.mapExtend( null, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 1 } );
   var got = provider.pathResolveTextLink( o );
   var expected = provider.path.join( linkPath2, 'terminal' );
   test.identical( got, expected );
@@ -41255,7 +41251,7 @@ function pathResolveTextLink( test )
   provider.textLink( linkPath2, dirPath );
   provider.textLink( linkPath, linkPath2 );
   var pathToResolve = provider.path.join( linkPath, 'terminal' );
-  var o = _.mapExtend( null, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 1 } );
+  var o = _.mapExtend( null, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 3 } );
   var got = provider.pathResolveTextLink( o );
   test.identical( got, terminalInDirPath );
 
@@ -41265,7 +41261,7 @@ function pathResolveTextLink( test )
   provider.textLink( linkPath2, '../dir' );
   provider.textLink( linkPath, '../link2' );
   var pathToResolve = provider.path.join( linkPath, 'terminal' );
-  var o = _.mapExtend( null, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 0 } );
+  var o = _.mapExtend( null, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 1 } );
   var got = provider.pathResolveTextLink( o );
   var expected = provider.path.join( linkPath2, 'terminal' );
   test.identical( got, expected );
@@ -41276,7 +41272,7 @@ function pathResolveTextLink( test )
   provider.textLink( linkPath2, '../dir' );
   provider.textLink( linkPath, '../link2' );
   var pathToResolve = provider.path.join( linkPath, 'terminal' );
-  var o = _.mapExtend( null, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 1 } );
+  var o = _.mapExtend( null, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 3 } );
   var got = provider.pathResolveTextLink( o );
   test.identical( got, terminalInDirPath );
 
@@ -41301,9 +41297,6 @@ function pathResolveTextLink( test )
 
   test.case = 'No filePath option';
   test.shouldThrowErrorOfAnyKind( () => provider.pathResolveTextLink( { otherPath : linkPath } ) );
-
-  test.case = 'Only one allowingMissed option';
-  test.shouldThrowErrorOfAnyKind( () => provider.pathResolveTextLink( { filePath : linkPath, allowingMissed : 1 } ) );
 
   test.case = 'Wrong filePath options - undefined';
   test.shouldThrowErrorOfAnyKind( () => provider.pathResolveTextLink( { filePath : undefined } ) );

@@ -21325,6 +21325,29 @@ function filesReflectOnlyPreserving( test )
 
   /*  */
 
+  function dstTreeTransform()
+  {
+    dst.filesFind({ filePath : '/', filter : { recursive : 2 }, onDown : function onDown( r, o )
+    {
+      if( r.isTerminal )
+      dst.fileWrite( r.absolute, dst.fileRead( r.absolute ) );
+    }})
+  }
+
+} /* end of function filesReflectOnlyPreserving */
+
+//
+
+function filesReflectOnlyPreservingMultipleSrc( test )
+{
+  let context = this;
+  let provider = context.provider;
+  let system = context.system;
+  let path = context.provider.path;
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+
+  /*  */
+
   var filesTree =
   {
     src :
@@ -21683,8 +21706,7 @@ function filesReflectOnlyPreserving( test )
       dst.fileWrite( r.absolute, dst.fileRead( r.absolute ) );
     }})
   }
-
-} /* end of function filesReflectOnlyPreserving */
+}
 
 //
 
@@ -35626,6 +35648,7 @@ var Self =
     filesReflectLinkWithSystem,
     filesReflectDeducing,
     filesReflectOnlyPreserving,
+    filesReflectOnlyPreservingMultipleSrc,
     filesReflectOnlyPreservingEmpty,
     filesReflectDstDeletingDirs,
     filesReflectLinked,

@@ -21673,6 +21673,29 @@ function filesReflectOnlyPreserving( test )
   dstTreeTransform();
   test.identical( dst.filesTree, expectedTree );
 
+  /*  */
+
+  function dstTreeTransform()
+  {
+    dst.filesFind({ filePath : '/', filter : { recursive : 2 }, onDown : function onDown( r, o )
+    {
+      if( r.isTerminal )
+      dst.fileWrite( r.absolute, dst.fileRead( r.absolute ) );
+    }})
+  }
+
+} /* end of function filesReflectOnlyPreserving */
+
+//
+
+function filesReflectOnlyPreservingEmpty( test )
+{
+  let context = this;
+  let provider = context.provider;
+  let system = context.system;
+  let path = context.provider.path;
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+
   /* rewriting of empty files with same time */
 
   test.open( 'rewriting of empty files, src and dst are same' );
@@ -21883,28 +21906,7 @@ function filesReflectOnlyPreserving( test )
 
   test.close( 'rewriting of empty files, src and dst are diffent' );
 
-  /*  */
-
-  function dstTreeTransform()
-  {
-    dst.filesFind({ filePath : '/', filter : { recursive : 2 }, onDown : function onDown( r, o )
-    {
-      if( r.isTerminal )
-      dst.fileWrite( r.absolute, dst.fileRead( r.absolute ) );
-    }})
-  }
-
-} /* end of function filesReflectOnlyPreserving */
-
-//
-
-function filesReflectOnlyPreservingEmpty( test )
-{
-  let context = this;
-  let provider = context.provider;
-  let system = context.system;
-  let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  /* */
 
   test.open( 'rewriting of linked empty files, src and dst are same' );
 

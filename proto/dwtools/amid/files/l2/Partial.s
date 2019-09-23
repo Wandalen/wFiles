@@ -890,7 +890,7 @@ var defaults = pathResolveSoftLinkAct.defaults = Object.create( null );
 defaults.filePath = null;
 // defaults.resolvingMultiple = 0;
 /* qqq : rename option resolvingMultiple to recursive and teach all routines to accept 3 values 0, 1, 2 */
-defaults.resolvingIntermediateDirectories = 0;
+// defaults.resolvingIntermediateDirectories = 0;
 
 var having = pathResolveSoftLinkAct.having = Object.create( null );
 having.writing = 0;
@@ -909,6 +909,9 @@ function pathResolveSoftLink_body( o )
   _.assert( _.routineIs( self.pathResolveSoftLinkAct ) );
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( !!o.filePath );
+
+  if( o.resolvingIntermediateDirectories )
+  return resolvingIntermediateDirectories();
 
   if( !self.fileExists( o.filePath ) )
   {
@@ -931,6 +934,7 @@ function pathResolveSoftLink_body( o )
   let result = self.pathResolveSoftLinkAct( actOptions );
   result = self.path.normalize( result );
   o.found.push( result );
+
   result = self.path.join( o.filePath, result );
 
   if( !self.fileExists( result ) )
@@ -980,8 +984,33 @@ function pathResolveSoftLink_body( o )
   {
     let found = o.found[ o.found.length - 2 ];
     if( self.path.isRelative( found ) )
-    return self.path.relative( o.results[ 0 ], o.filePath );
-    return o.results[ o.results.length - 1 ];
+    {
+      result = found;
+      if( o.results[ 0 ] !== o.filePath )
+      result = self.path.relative( o.results[ 0 ], o.filePath );
+    }
+    else
+    {
+      result = o.results[ o.results.length - 1 ];
+    }
+    return result;
+  }
+
+  function resolvingIntermediateDirectories()
+  {
+    let splits = self.path.split( o.filePath );
+    let o2 = _.mapExtend( null, o );
+
+    o2.resolvingIntermediateDirectories = 0;
+    o2.filePath = '/';
+
+    for( let i = 1 ; i < splits.length ; i++ )
+    {
+      o2.filePath = self.path.join( o2.filePath, splits[ i ] );
+      let result = pathResolveSoftLink_body.call( self, _.mapOnly( o2, pathResolveSoftLink_body.defaults ) );
+      o2.filePath = self.path.join( o2.filePath, result );
+    }
+    return o2.filePath;
   }
 
   function handleError()
@@ -998,6 +1027,7 @@ var defaults = pathResolveSoftLink_body.defaults;
 
 defaults.allowingMissed = 1;
 defaults.allowingCycled = 1;
+defaults.resolvingIntermediateDirectories = 0;
 defaults.resolvingMultiple = 1;
 defaults.throwing = 0;
 
@@ -1020,7 +1050,7 @@ pathResolveTextLinkAct.name = 'pathResolveTextLinkAct';
 var defaults = pathResolveTextLinkAct.defaults = Object.create( null );
 defaults.filePath = null;
 // defaults.resolvingMultiple = 0;
-defaults.resolvingIntermediateDirectories = 0;
+// defaults.resolvingIntermediateDirectories = 0;
 
 var having = pathResolveTextLinkAct.having = Object.create( null );
 having.writing = 0;
@@ -1052,27 +1082,6 @@ function pathResolveTextLink_pre( routine, args )
 
 //
 
-// function pathResolveTextLink_body( o )
-// {
-//   let self = this;
-
-//   if( !self.usingTextLink )
-//   return o.filePath;
-
-//   _.assertRoutineOptions( pathResolveTextLink_body, arguments );
-//   _.assert( _.strIs( o.filePath ), 'Expects string' );
-//   _.assert( arguments.length === 1, 'Expects exactly one argument' );
-
-//   let result = self.pathResolveTextLinkAct( o );
-
-//   if( !result )
-//   return o.filePath;
-
-//   // self.logger.log( 'pathResolveTextLink :', o.filePath, '->', result );
-
-//   return result;
-// }
-
 function pathResolveTextLink_body( o )
 {
   let self = this;
@@ -1083,6 +1092,9 @@ function pathResolveTextLink_body( o )
 
   if( !self.usingTextLink )
   return o.filePath;
+
+  if( o.resolvingIntermediateDirectories )
+  return resolvingIntermediateDirectories();
 
   if( !self.fileExists( o.filePath ) )
   {
@@ -1109,6 +1121,7 @@ function pathResolveTextLink_body( o )
 
   result = self.path.normalize( result );
   o.found.push( result );
+
   result = self.path.join( o.filePath, result );
 
   if( !self.fileExists( result ) )
@@ -1158,8 +1171,33 @@ function pathResolveTextLink_body( o )
   {
     let found = o.found[ o.found.length - 2 ];
     if( self.path.isRelative( found ) )
-    return self.path.relative( o.results[ 0 ], o.filePath );
-    return o.results[ o.results.length - 1 ];
+    {
+      result = found;
+      if( o.results[ 0 ] !== o.filePath )
+      result = self.path.relative( o.results[ 0 ], o.filePath );
+    }
+    else
+    {
+      result = o.results[ o.results.length - 1 ];
+    }
+    return result;
+  }
+
+  function resolvingIntermediateDirectories()
+  {
+    let splits = self.path.split( o.filePath );
+    let o2 = _.mapExtend( null, o );
+
+    o2.resolvingIntermediateDirectories = 0;
+    o2.filePath = '/';
+
+    for( let i = 1 ; i < splits.length ; i++ )
+    {
+      o2.filePath = self.path.join( o2.filePath, splits[ i ] );
+      let result = pathResolveTextLink_body.call( self, _.mapOnly( o2, pathResolveTextLink_body.defaults ) );
+      o2.filePath = self.path.join( o2.filePath, result );
+    }
+    return o2.filePath;
   }
 
   function handleError()
@@ -1177,6 +1215,7 @@ var defaults = pathResolveTextLink_body.defaults;
 defaults.allowingMissed = 1;
 defaults.allowingCycled = 1;
 defaults.resolvingMultiple = 1;
+defaults.resolvingIntermediateDirectories = 0;
 defaults.throwing = 0;
 
 var having = pathResolveTextLink_body.having;

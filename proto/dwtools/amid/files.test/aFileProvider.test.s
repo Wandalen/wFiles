@@ -40017,6 +40017,763 @@ function pathResolveSoftLink( test )
 
 //
 
+function pathResolveSoftLinkExtended( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let path = provider.path;
+
+  let routinePath = test.context.pathFor( 'written/pathResolveSoftLink' );
+  let filePath = test.context.pathFor( 'written/pathResolveSoftLink/file' );
+  let linkPath = test.context.pathFor( 'written/pathResolveSoftLink/link' );
+  let linkPath2 = test.context.pathFor( 'written/pathResolveSoftLink/link2' );
+  let linkPath3 = test.context.pathFor( 'written/pathResolveSoftLink/link3' );
+  let dirPath = test.context.pathFor( 'written/pathResolveSoftLink/dir' );
+  let terminalInDirPath = test.context.pathFor( 'written/pathResolveSoftLink/dir/terminal' );
+  let testData = 'pathResolveSoftLink';
+
+  /* implement options "throwing", "allowingMissed", "allowingCycled" for pathResolveSoftLink and pathResolveTextLink( not in Act ) */
+  /* rename option resolvingMultiple to recursive and teach all routines to accept 3 values 0, 1, 2 */
+
+  test.open( 'file path does not exist' );
+  provider.filesDelete( routinePath );
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath,
+    allowingMissed : 0,
+    allowingCycled : 1,
+    resolvingMultiple : 1,
+    throwing : 0
+  });
+  test.identical( got, null )
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath,
+    allowingMissed : 0,
+    allowingCycled : 1,
+    resolvingMultiple : 2,
+    throwing : 0
+  });
+  test.identical( got, null )
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath,
+    allowingMissed : 0,
+    allowingCycled : 1,
+    resolvingMultiple : 3,
+    throwing : 0
+  });
+  test.identical( got, null )
+
+  //
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    resolvingMultiple : 1,
+    throwing : 0
+  });
+  test.identical( got, filePath )
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    resolvingMultiple : 2,
+    throwing : 0
+  });
+  test.identical( got, filePath )
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    resolvingMultiple : 3,
+    throwing : 0
+  });
+  test.identical( got, filePath )
+
+  //
+
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.pathResolveSoftLink
+    ({
+      filePath,
+      allowingMissed : 0,
+      allowingCycled : 1,
+      resolvingMultiple : 1,
+      throwing : 1
+    });
+  })
+
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.pathResolveSoftLink
+    ({
+      filePath,
+      allowingMissed : 0,
+      allowingCycled : 1,
+      resolvingMultiple : 2,
+      throwing : 1
+    });
+  })
+
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.pathResolveSoftLink
+    ({
+      filePath,
+      allowingMissed : 0,
+      allowingCycled : 1,
+      resolvingMultiple : 3,
+      throwing : 1
+    });
+  })
+
+  //
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    resolvingMultiple : 1,
+    throwing : 1
+  });
+  test.identical( got, filePath );
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    resolvingMultiple : 2,
+    throwing : 1
+  });
+  test.identical( got, filePath );
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    resolvingMultiple : 3,
+    throwing : 1
+  });
+  test.identical( got, filePath );
+
+  test.close( 'file path does not exist' );
+
+  /* */
+
+  test.open( 'soft link to missing' );
+
+  provider.filesDelete( routinePath );
+  provider.dirMake( routinePath );
+  provider.softLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1 })
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath,
+    allowingMissed : 0,
+    allowingCycled : 1,
+    resolvingMultiple : 1,
+    throwing : 0
+  });
+  test.identical( got, null )
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath,
+    allowingMissed : 0,
+    allowingCycled : 1,
+    resolvingMultiple : 2,
+    throwing : 0
+  });
+  test.identical( got, null )
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath,
+    allowingMissed : 0,
+    allowingCycled : 1,
+    resolvingMultiple : 3,
+    throwing : 0
+  });
+  test.identical( got, null )
+
+  //
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    resolvingMultiple : 1,
+    throwing : 0
+  });
+  test.identical( got, filePath )
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    resolvingMultiple : 2,
+    throwing : 0
+  });
+  test.identical( got, filePath )
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    resolvingMultiple : 3,
+    throwing : 0
+  });
+  test.identical( got, filePath )
+
+  //
+
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.pathResolveSoftLink
+    ({
+      filePath : linkPath,
+      allowingMissed : 0,
+      allowingCycled : 1,
+      resolvingMultiple : 1,
+      throwing : 1
+    });
+  })
+
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.pathResolveSoftLink
+    ({
+      filePath : linkPath,
+      allowingMissed : 0,
+      allowingCycled : 1,
+      resolvingMultiple : 2,
+      throwing : 1
+    });
+  })
+
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.pathResolveSoftLink
+    ({
+      filePath : linkPath,
+      allowingMissed : 0,
+      allowingCycled : 1,
+      resolvingMultiple : 3,
+      throwing : 1
+    });
+  })
+
+  //
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    resolvingMultiple : 1,
+    throwing : 1
+  });
+  test.identical( got, filePath )
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    resolvingMultiple : 2,
+    throwing : 1
+  });
+  test.identical( got, filePath )
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    resolvingMultiple : 3,
+    throwing : 1
+  });
+  test.identical( got, filePath )
+
+  test.close( 'soft link to missing' );
+
+  /*  */
+
+  test.open( 'self cycled link' );
+
+  provider.filesDelete( routinePath );
+  provider.dirMake( routinePath );
+  provider.softLink({ dstPath : linkPath, srcPath : '../link', allowingMissed : 1 })
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath,
+    allowingMissed : 1,
+    allowingCycled : 0,
+    resolvingMultiple : 1,
+    throwing : 0
+  });
+  test.identical( got, null )
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath,
+    allowingMissed : 1,
+    allowingCycled : 0,
+    resolvingMultiple : 2,
+    throwing : 0
+  });
+  test.identical( got, null )
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath,
+    allowingMissed : 1,
+    allowingCycled : 0,
+    resolvingMultiple : 3,
+    throwing : 0
+  });
+  test.identical( got, null )
+
+  //
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    resolvingMultiple : 1,
+    throwing : 0
+  });
+  test.identical( got, linkPath )
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    resolvingMultiple : 2,
+    throwing : 0
+  });
+  test.identical( got, linkPath )
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    resolvingMultiple : 3,
+    throwing : 0
+  });
+  test.identical( got, linkPath )
+
+  //
+
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.pathResolveSoftLink
+    ({
+      filePath : linkPath,
+      allowingMissed : 1,
+      allowingCycled : 0,
+      resolvingMultiple : 1,
+      throwing : 1
+    });
+  })
+
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.pathResolveSoftLink
+    ({
+      filePath : linkPath,
+      allowingMissed : 1,
+      allowingCycled : 0,
+      resolvingMultiple : 2,
+      throwing : 1
+    });
+  })
+
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.pathResolveSoftLink
+    ({
+      filePath : linkPath,
+      allowingMissed : 1,
+      allowingCycled : 0,
+      resolvingMultiple : 3,
+      throwing : 1
+    });
+  })
+
+  //
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    resolvingMultiple : 1,
+    throwing : 1
+  });
+  test.identical( got, linkPath )
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    resolvingMultiple : 2,
+    throwing : 1
+  });
+  test.identical( got, linkPath )
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    resolvingMultiple : 3,
+    throwing : 1
+  });
+  test.identical( got, linkPath )
+
+  test.close( 'self cycled link' );
+
+  /*  */
+
+  test.open( 'option recursive' );
+
+  provider.filesDelete( routinePath );
+  provider.fileWrite( filePath, filePath );
+  provider.softLink({ dstPath : linkPath, srcPath : filePath })
+  provider.softLink({ dstPath : linkPath2, srcPath : linkPath })
+  provider.softLink({ dstPath : linkPath3, srcPath : linkPath2 })
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath3,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    resolvingMultiple : 0,
+    throwing : 1
+  });
+  test.identical( got, linkPath3 )
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath3,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    resolvingMultiple : 1,
+    throwing : 1
+  });
+  test.identical( got, linkPath2 )
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath3,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    resolvingMultiple : 2,
+    throwing : 1
+  });
+  test.identical( got, linkPath )
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath3,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    resolvingMultiple : 3,
+    throwing : 1
+  });
+  test.identical( got, filePath )
+
+  test.close( 'option recursive' );
+
+  /* */
+
+  test.open( 'cycled links' );
+
+  provider.filesDelete( routinePath );
+  provider.fileWrite( filePath, filePath );
+  provider.softLink({ dstPath : linkPath2, srcPath : '../link3', allowingMissed : 1, allowingCycled : 1 })
+  provider.softLink({ dstPath : linkPath3, srcPath : '../link2', allowingMissed : 1, allowingCycled : 1 })
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath3,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    resolvingMultiple : 0,
+    throwing : 1
+  });
+  test.identical( got, linkPath3 )
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath3,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    resolvingMultiple : 1,
+    throwing : 1
+  });
+  test.identical( got, '../link2' )
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath3,
+    allowingMissed : 1,
+    allowingCycled : 0,
+    resolvingMultiple : 1,
+    throwing : 1
+  });
+  test.identical( got, '../link2' )
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath3,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    resolvingMultiple : 2,
+    throwing : 1
+  });
+  test.identical( got, '../link2' )
+
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.pathResolveSoftLink
+    ({
+      filePath : linkPath3,
+      allowingMissed : 1,
+      allowingCycled : 0,
+      resolvingMultiple : 2,
+      throwing : 1
+    });
+  })
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath3,
+    allowingMissed : 1,
+    allowingCycled : 0,
+    resolvingMultiple : 2,
+    throwing : 0
+  });
+  test.identical( got, null )
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath3,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    resolvingMultiple : 3,
+    throwing : 1
+  });
+  test.identical( got, '../link2' )
+
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.pathResolveSoftLink
+    ({
+      filePath : linkPath3,
+      allowingMissed : 1,
+      allowingCycled : 0,
+      resolvingMultiple : 3,
+      throwing : 1
+    });
+  })
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath3,
+    allowingMissed : 1,
+    allowingCycled : 0,
+    resolvingMultiple : 3,
+    throwing : 0
+  });
+  test.identical( got, null )
+
+  test.close( 'cycled links' );
+
+  /* */
+
+  test.open( 'relative links, option recursive' );
+
+  provider.filesDelete( routinePath );
+  provider.fileWrite( filePath, filePath );
+  provider.softLink({ dstPath : linkPath, srcPath : '../file' })
+  provider.softLink({ dstPath : linkPath2, srcPath : '../link' })
+  provider.softLink({ dstPath : linkPath3, srcPath : '../link2' })
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath3,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    resolvingMultiple : 0,
+    throwing : 1
+  });
+  test.identical( got, linkPath3 )
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath3,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    resolvingMultiple : 1,
+    throwing : 1
+  });
+  test.identical( got, '../link2' )
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath3,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    resolvingMultiple : 2,
+    throwing : 1
+  });
+  test.identical( got, '../link' )
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath3,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    resolvingMultiple : 3,
+    throwing : 1
+  });
+  test.identical( got, '../file' )
+
+  test.close( 'relative links, option recursive' );
+
+  /*  */
+
+  test.open( 'chain of relative links to missing' );
+
+  provider.filesDelete( routinePath );
+  provider.dirMake( routinePath );
+  provider.softLink({ dstPath : linkPath, srcPath : '../file', allowingMissed : 1 })
+  provider.softLink({ dstPath : linkPath2, srcPath : '../link' })
+  provider.softLink({ dstPath : linkPath3, srcPath : '../link2' })
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath3,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    resolvingMultiple : 0,
+    throwing : 1
+  });
+  test.identical( got, linkPath3 )
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath3,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    resolvingMultiple : 1,
+    throwing : 1
+  });
+  test.identical( got, '../link2' )
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath3,
+    allowingMissed : 0,
+    allowingCycled : 1,
+    resolvingMultiple : 1,
+    throwing : 1
+  });
+  test.identical( got, '../link2' )
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath3,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    resolvingMultiple : 2,
+    throwing : 1
+  });
+  test.identical( got, '../file' )
+
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.pathResolveSoftLink
+    ({
+      filePath : linkPath3,
+      allowingMissed : 0,
+      allowingCycled : 1,
+      resolvingMultiple : 2,
+      throwing : 1
+    });
+  })
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath3,
+    allowingMissed : 0,
+    allowingCycled : 1,
+    resolvingMultiple : 2,
+    throwing : 0
+  });
+  test.identical( got, null )
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath3,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    resolvingMultiple : 3,
+    throwing : 1
+  });
+  test.identical( got, '../file' )
+
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.pathResolveSoftLink
+    ({
+      filePath : linkPath3,
+      allowingMissed : 0,
+      allowingCycled : 1,
+      resolvingMultiple : 3,
+      throwing : 1
+    });
+  })
+
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath3,
+    allowingMissed : 0,
+    allowingCycled : 1,
+    resolvingMultiple : 3,
+    throwing : 0
+  });
+  test.identical( got, null )
+
+  test.close( 'chain of relative links to missing' );
+}
+
+//
+
 function pathResolveTextLink( test )
 {
   let self = this;
@@ -41634,6 +42391,7 @@ var Self =
     pathResolveLinkTailChain,
     pathResolveLinkFull,
     pathResolveSoftLink,
+    pathResolveSoftLinkExtended,
     pathResolveTextLink,
     pathResolveLinkFullSpecial,
     pathResolveLinkFullResult,

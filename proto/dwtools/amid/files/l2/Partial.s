@@ -888,7 +888,7 @@ pathResolveSoftLinkAct.name = 'pathResolveSoftLinkAct';
 
 var defaults = pathResolveSoftLinkAct.defaults = Object.create( null );
 defaults.filePath = null;
-defaults.resolvingMultiple = 0;
+// defaults.resolvingMultiple = 0;
 /* qqq : rename option resolvingMultiple to recursive and teach all routines to accept 3 values 0, 1, 2 */
 defaults.resolvingIntermediateDirectories = 0;
 
@@ -910,16 +910,96 @@ function pathResolveSoftLink_body( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( !!o.filePath );
 
-  /* should not have redundant conditions */
+  if( !self.fileExists( o.filePath ) )
+  {
+    if( o.allowingMissed )
+    return o.filePath;
+    else
+    return handleError( 'o.filePath:', o.filePath, 'doesn\`t exist.' );
+  }
 
-  let result = self.pathResolveSoftLinkAct( o );
+  if( !o.resolvingMultiple )
+  return o.filePath;
 
+  if( !o.results )
+  o.results = [ o.filePath ];
+  if( !o.found )
+  o.found = [ o.filePath ];
+
+  let actOptions = _.mapOnly( o, pathResolveSoftLinkAct.defaults );
+
+  let result = self.pathResolveSoftLinkAct( actOptions );
   result = self.path.normalize( result );
+  o.found.push( result );
+  result = self.path.join( o.filePath, result );
 
-  return result;
+  if( !self.fileExists( result ) )
+  {
+    if( o.allowingMissed )
+    return end();
+    else
+    return handleError( 'FilePath:', result, 'doesn\`t exist.' );
+  }
+
+  if( !self.isSoftLink( result ) )
+  {
+    if( o.resolvingMultiple === 2 )
+    return end2();
+    return end();
+  }
+
+  if( o.results.length )
+  {
+    if( _.arrayHas( o.results, result ) )
+    if( o.allowingCycled )
+    return end2();
+    else
+    return handleError( 'Cycle at:', o.results[ o.results.length - 1 ], 'doesn\`t exist.' );
+  }
+
+  if( o.resolvingMultiple === 1 )
+  return end();
+
+  o.results.push( result );
+
+  o.filePath = result;
+
+  return pathResolveSoftLink_body.call( self, o );
+
+  /* */
+
+  function end()
+  {
+    let found = o.found[ o.found.length - 1 ];
+    if( self.path.isRelative( found ) )
+    result = self.path.relative( o.results[ 0 ], result );
+    return result;
+  }
+
+  function end2()
+  {
+    let found = o.found[ o.found.length - 2 ];
+    if( self.path.isRelative( found ) )
+    return self.path.relative( o.results[ 0 ], o.filePath );
+    return o.results[ o.results.length - 1 ];
+  }
+
+  function handleError()
+  {
+    if( o.throwing )
+    throw _.err.apply( _, arguments );
+    return null;
+  }
 }
 
 _.routineExtend( pathResolveSoftLink_body, pathResolveSoftLinkAct );
+
+var defaults = pathResolveSoftLink_body.defaults;
+
+defaults.allowingMissed = 1;
+defaults.allowingCycled = 1;
+defaults.resolvingMultiple = 1;
+defaults.throwing = 0;
 
 var having = pathResolveSoftLink_body.having;
 having.driving = 0;

@@ -1200,8 +1200,11 @@ function pathResolveTextLink_body( o )
     for( let i = 1 ; i < splits.length ; i++ )
     {
       o2.filePath = self.path.join( o2.filePath, splits[ i ] );
-      let result = pathResolveTextLink_body.call( self, _.mapOnly( o2, pathResolveTextLink_body.defaults ) );
-      o2.filePath = self.path.join( o2.filePath, result );
+      if( self.isTextLink( o2.filePath ) )
+      {
+        let result = pathResolveTextLink_body.call( self, _.mapOnly( o2, pathResolveTextLink_body.defaults ) );
+        o2.filePath = self.path.join( o2.filePath, result );
+      }
     }
     return o2.filePath;
   }

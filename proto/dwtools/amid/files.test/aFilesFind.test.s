@@ -20899,7 +20899,7 @@ function filesReflectOnlyPreserving( test )
   test.identical( src, dst );
   test.identical( src, _.select( extract.filesTree, '/src/file' ) );
 
-  test.case = 'terminal - terminal, same content, dstRewritingOnlyPreserving : 0';
+  test.case = 'terminal - terminal, same content, dstRewritingOnlyPreserving : 1';
   provider.filesDelete( routinePath );
   extract.filesReflectTo( provider, routinePath );
   var srcPath = provider.path.join( routinePath, 'src/file' );
@@ -20976,25 +20976,6 @@ function filesReflectOnlyPreserving( test )
   test.identical( src, dst );
   test.identical( src, _.select( extract.filesTree, '/src/file' ) );
 
-  test.case = 'terminal - dir without terminals, dstRewritingOnlyPreserving : 0';
-  provider.filesDelete( routinePath );
-  extract.filesReflectTo( provider, routinePath );
-  var srcPath = provider.path.join( routinePath, 'src/file' );
-  var dstPath = provider.path.join( routinePath, 'dst/dir-e/dir-e' );
-  var o =
-  {
-    reflectMap : { [ srcPath ] : dstPath },
-    writing : 1,
-    dstRewriting : 1,
-    dstRewritingByDistinct : 1,
-    dstRewritingOnlyPreserving : 0
-  }
-  test.mustNotThrowError( () => provider.filesReflect( o ) );
-  var src = provider.fileRead( srcPath );
-  var dst = provider.fileRead( dstPath );
-  test.identical( src, dst );
-  test.identical( src, _.select( extract.filesTree, '/src/file' ) );
-
   test.case = 'terminal - empty dir, dstRewritingOnlyPreserving : 1';
   provider.filesDelete( routinePath );
   extract.filesReflectTo( provider, routinePath );
@@ -21007,6 +20988,27 @@ function filesReflectOnlyPreserving( test )
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
     dstRewritingOnlyPreserving : 1
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  var src = provider.fileRead( srcPath );
+  var dst = provider.fileRead( dstPath );
+  test.identical( src, dst );
+  test.identical( src, _.select( extract.filesTree, '/src/file' ) );
+
+  /* */
+
+  test.case = 'terminal - dir without terminals, dstRewritingOnlyPreserving : 0';
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var srcPath = provider.path.join( routinePath, 'src/file' );
+  var dstPath = provider.path.join( routinePath, 'dst/dir-e/dir-e' );
+  var o =
+  {
+    reflectMap : { [ srcPath ] : dstPath },
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 0
   }
   test.mustNotThrowError( () => provider.filesReflect( o ) );
   var src = provider.fileRead( srcPath );

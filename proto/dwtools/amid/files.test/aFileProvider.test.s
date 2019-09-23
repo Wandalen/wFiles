@@ -40235,7 +40235,7 @@ function pathResolveSoftLinkExtended( test )
     resolvingMultiple : 1,
     throwing : 0
   });
-  test.identical( got, null )
+  test.identical( got, filePath )
 
   var got = provider.pathResolveSoftLink
   ({
@@ -40291,17 +40291,15 @@ function pathResolveSoftLinkExtended( test )
 
   //
 
-  test.shouldThrowErrorSync( () =>
-  {
-    provider.pathResolveSoftLink
-    ({
-      filePath : linkPath,
-      allowingMissed : 0,
-      allowingCycled : 1,
-      resolvingMultiple : 1,
-      throwing : 1
-    });
-  })
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath,
+    allowingMissed : 0,
+    allowingCycled : 1,
+    resolvingMultiple : 1,
+    throwing : 1
+  });
+  test.identical( got, filePath )
 
   test.shouldThrowErrorSync( () =>
   {
@@ -40377,7 +40375,7 @@ function pathResolveSoftLinkExtended( test )
     resolvingMultiple : 1,
     throwing : 0
   });
-  test.identical( got, null )
+  test.identical( got, '../link' )
 
   var got = provider.pathResolveSoftLink
   ({
@@ -40409,7 +40407,7 @@ function pathResolveSoftLinkExtended( test )
     resolvingMultiple : 1,
     throwing : 0
   });
-  test.identical( got, linkPath )
+  test.identical( got, '../link' )
 
   var got = provider.pathResolveSoftLink
   ({
@@ -40433,17 +40431,15 @@ function pathResolveSoftLinkExtended( test )
 
   //
 
-  test.shouldThrowErrorSync( () =>
-  {
-    provider.pathResolveSoftLink
-    ({
-      filePath : linkPath,
-      allowingMissed : 1,
-      allowingCycled : 0,
-      resolvingMultiple : 1,
-      throwing : 1
-    });
-  })
+  var got = provider.pathResolveSoftLink
+  ({
+    filePath : linkPath,
+    allowingMissed : 1,
+    allowingCycled : 0,
+    resolvingMultiple : 1,
+    throwing : 1
+  });
+  test.identical( got, '../link' )
 
   test.shouldThrowErrorSync( () =>
   {
@@ -40479,7 +40475,7 @@ function pathResolveSoftLinkExtended( test )
     resolvingMultiple : 1,
     throwing : 1
   });
-  test.identical( got, linkPath )
+  test.identical( got, '../link' )
 
   var got = provider.pathResolveSoftLink
   ({
@@ -41538,7 +41534,7 @@ function pathResolveTextLinkExtended( test )
     resolvingMultiple : 1,
     throwing : 0
   });
-  test.identical( got, null )
+  test.identical( got, filePath )
 
   var got = provider.pathResolveTextLink
   ({
@@ -41594,17 +41590,15 @@ function pathResolveTextLinkExtended( test )
 
   //
 
-  test.shouldThrowErrorSync( () =>
-  {
-    provider.pathResolveTextLink
-    ({
-      filePath : linkPath,
-      allowingMissed : 0,
-      allowingCycled : 1,
-      resolvingMultiple : 1,
-      throwing : 1
-    });
-  })
+  var got = provider.pathResolveTextLink
+  ({
+    filePath : linkPath,
+    allowingMissed : 0,
+    allowingCycled : 1,
+    resolvingMultiple : 1,
+    throwing : 1
+  });
+  test.identical( got, filePath );
 
   test.shouldThrowErrorSync( () =>
   {
@@ -41680,7 +41674,7 @@ function pathResolveTextLinkExtended( test )
     resolvingMultiple : 1,
     throwing : 0
   });
-  test.identical( got, null )
+  test.identical( got, '../link' )
 
   var got = provider.pathResolveTextLink
   ({
@@ -41712,7 +41706,7 @@ function pathResolveTextLinkExtended( test )
     resolvingMultiple : 1,
     throwing : 0
   });
-  test.identical( got, linkPath )
+  test.identical( got, '../link' )
 
   var got = provider.pathResolveTextLink
   ({
@@ -41736,17 +41730,15 @@ function pathResolveTextLinkExtended( test )
 
   //
 
-  test.shouldThrowErrorSync( () =>
-  {
-    provider.pathResolveTextLink
-    ({
-      filePath : linkPath,
-      allowingMissed : 1,
-      allowingCycled : 0,
-      resolvingMultiple : 1,
-      throwing : 1
-    });
-  })
+  var got = provider.pathResolveTextLink
+  ({
+    filePath : linkPath,
+    allowingMissed : 1,
+    allowingCycled : 0,
+    resolvingMultiple : 1,
+    throwing : 1
+  });
+  test.identical( got, '../link' )
 
   test.shouldThrowErrorSync( () =>
   {
@@ -41782,7 +41774,7 @@ function pathResolveTextLinkExtended( test )
     resolvingMultiple : 1,
     throwing : 1
   });
-  test.identical( got, linkPath )
+  test.identical( got, '../link' )
 
   var got = provider.pathResolveTextLink
   ({

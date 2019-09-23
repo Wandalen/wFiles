@@ -933,6 +933,10 @@ function pathResolveSoftLink_body( o )
 
   let result = self.pathResolveSoftLinkAct( actOptions );
   result = self.path.normalize( result );
+
+  if( o.resolvingMultiple === 1 )
+  return end();
+
   o.found.push( result );
 
   result = self.path.join( o.filePath, result );
@@ -961,8 +965,7 @@ function pathResolveSoftLink_body( o )
     return handleError( 'Cycle at:', o.results[ o.results.length - 1 ], 'doesn\`t exist.' );
   }
 
-  if( o.resolvingMultiple === 1 )
-  return end();
+
 
   o.results.push( result );
 
@@ -1120,6 +1123,10 @@ function pathResolveTextLink_body( o )
   result = o.filePath;
 
   result = self.path.normalize( result );
+
+  if( o.resolvingMultiple === 1 )
+  return end();
+
   o.found.push( result );
 
   result = self.path.join( o.filePath, result );
@@ -1148,8 +1155,7 @@ function pathResolveTextLink_body( o )
     return handleError( 'Cycle at:', o.results[ o.results.length - 1 ], 'doesn\`t exist.' );
   }
 
-  if( o.resolvingMultiple === 1 )
-  return end();
+
 
   o.results.push( result );
 

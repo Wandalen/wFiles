@@ -1285,7 +1285,7 @@ function pathResolveLinkStep_body( o )
   else if( o.resolvingTextLink )
   {
     let o2 = o2From( o );
-    result = self.pathResolveTextLink( o2 );
+    let result = self.pathResolveTextLink( o2 );
     return handleResult( result );
   }
 
@@ -1296,6 +1296,8 @@ function pathResolveLinkStep_body( o )
     let o2 = _.mapExtend( null, o );
     delete o2.resolvingTextLink;
     delete o2.resolvingSoftLink;
+    delete o2.relativeOriginalFile;
+    delete o2.preservingRelative;
     /* qqq : enable options "throwing", "allowingMissed", "allowingCycled" */
     // delete o2.throwing;
     // delete o2.allowingMissed;
@@ -1313,8 +1315,15 @@ function pathResolveLinkStep_body( o )
       absolutePath : result
     }
 
-    if( self.path.isRelative( result ) )
-    absolutePath = self.path.join( o2.filePath, result )
+    if( result.relativePath )
+    if( self.path.isRelative( result.relativePath ) )
+    {
+      result.absolutePath = self.path.join( o.filePath, result.relativePath )
+      if( o.relativeOriginalFile )
+      result.filePath = result.relativePath = self.path.relative( o.filePath, result.absolutePath );
+      if( !o.preservingRelative )
+      result.filePath = result.relativePath = result.absolutePath;
+    }
 
     return result;
   }
@@ -1322,6 +1331,11 @@ function pathResolveLinkStep_body( o )
 }
 
 _.routineExtend( pathResolveLinkStep_body, _pathResolveLink );
+
+var defaults = pathResolveLinkStep_body.defaults;
+
+defaults.relativeOriginalFile = 0;
+defaults.preservingRelative = 0;
 
 let pathResolveLinkStep = _.routineFromPreAndBody( pathResolveLinkStep_pre, pathResolveLinkStep_body );
 pathResolveLinkStep.having.aspect = 'entry';

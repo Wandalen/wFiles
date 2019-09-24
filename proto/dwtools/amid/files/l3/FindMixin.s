@@ -656,6 +656,12 @@ let filesFindSingle = _.routineFromPreAndBody( filesFindSingle_pre, filesFindSin
  * @param {} o.withTransient=0
  * @param {} o.allowingMissed=0
  * @param {} o.allowingCycled=0
+ * @param {Boolean} o.revisiting=null Controls how visited files are processed. Possible values:
+ *  0 - visit and include each file once
+ *	1 - visit and include each file once, break from loop on first links cycle and continue search ignoring file at which cycle begins
+ *	2 - visit and include each file once, break from loop on first links cycle and continue search visiting file at which cycle begins
+ *	3 - don't keep records of visited files
+ *  Defaults: option o.revisiting in set to "1" if links resolving is enabled, otherwise default is "3".
  * @param {} o.resolvingSoftLink=0
  * @param {} o.resolvingTextLink=0
  * @param {} o.maskPreset='default.exclude'
@@ -4009,10 +4015,19 @@ function filesReflect_pre( routine, args )
  * @param {Boolean} o.preservingTime=0
  * @param {Boolean} o.preservingSame=0
  * @param {} o.extral
+ * @param {Boolean} o.revisiting=null Controls how visited files are processed. Possible values:
+ *  0 - visit and include each file once
+ *	1 - visit and include each file once, break from loop on first links cycle and continue search ignoring file at which cycle begins
+ *	2 - visit and include each file once, break from loop on first links cycle and continue search visiting file at which cycle begins
+ *	3 - don't keep records of visited files
+ *  Defaults: option o.revisiting in set to "1" if links resolving is enabled, otherwise default is "3".
  * @param {Function} o.onUp
  * @param {Function} o.onDown
  * @param {Function} o.onDstName
- *
+ * @param {Boolean} o.rebasingLink=0 Controls link rebasing during copy. Possible values:
+ * 	0 - keep link as is, destination path will lead to source file
+ *	1 - rebase link, try to make destination file lead to other destination file if last was handled in same call of filesReflect
+ *	2 - rebase and resolve link, try to create copy of a file referenced by a link
  * @function filesReflect
  * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderFind#
  */

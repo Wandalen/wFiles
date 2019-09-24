@@ -22686,6 +22686,8 @@ function softLinkSoftLinkResolving( test )
   test.close( 'links to same file' );
 }
 
+softLinkSoftLinkResolving.timeOut = 30000;
+
 //
 
 function softLinkRelativeLinkResolving( test )
@@ -29724,6 +29726,8 @@ function hardLinkSoftLinkResolving( test )
 
   test.close( 'links to same file' );
 }
+
+hardLinkSoftLinkResolving.timeOut = 30000;
 
 //
 
@@ -38180,7 +38184,7 @@ function pathResolveLinkTailChain( test )
   provider.fileWrite( filePath, filePath );
   provider.softLink( linkPath3, filePath );
   provider.softLink( linkPath2, '../link3' );
-  provider.softLink( linkPath, '../link2' );
+  provider.softLink( linkPath, test.context.globalFromPreferred( '../link2' ) );
   var o = _.mapExtend( null, o1, { filePath : linkPath, preservingRelative : 1 } );
   provider.pathResolveLinkTailChain( o );
   var expectedFound =
@@ -39893,7 +39897,7 @@ function pathResolveSoftLink( test )
   provider.softLink({ dstPath : linkPath, srcPath : '../file', allowingMissed : 1, makingDirectory : 1 });
   provider.softLink({ dstPath : linkPath2, srcPath : '../link' });
   var got = provider.pathResolveSoftLink( { filePath : linkPath2, resolvingMultiple : 3 } );
-  test.identical( got, '../file' );
+  test.identical( got, test.context.globalFromPreferred( '../file' ) );
 
   test.case = 'Chain with relative and absolute softLinks';
   provider.filesDelete( routinePath );
@@ -39901,7 +39905,7 @@ function pathResolveSoftLink( test )
   provider.softLink({ dstPath : linkPath2, srcPath : linkPath });
   provider.softLink({ dstPath : linkPath3, srcPath : '../link2' });
   var got = provider.pathResolveSoftLink( { filePath : linkPath3, resolvingMultiple : 3 } );
-  test.identical( got, '../file' );
+  test.identical( got, test.context.globalFromPreferred( '../file' ) );
 
   /* resolvingIntermediateDirectories */
 
@@ -39958,7 +39962,7 @@ function pathResolveSoftLink( test )
   provider.filesDelete( routinePath );
   provider.fileWrite( terminalInDirPath, terminalInDirPath );
   provider.softLink( linkPath2, '../dir' );
-  provider.softLink( linkPath, '../link2' );
+  provider.softLink( linkPath, test.context.globalFromPreferred( '../link2' ) );
   var pathToResolve = provider.path.join( linkPath, 'terminal' );
   var o = _.mapExtend( null, o1, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 1 } );
   var got = provider.pathResolveSoftLink( o );
@@ -39969,7 +39973,7 @@ function pathResolveSoftLink( test )
   provider.filesDelete( routinePath );
   provider.fileWrite( terminalInDirPath, terminalInDirPath );
   provider.softLink( linkPath2, '../dir' );
-  provider.softLink( linkPath, '../link2' );
+  provider.softLink( linkPath, test.context.globalFromPreferred( '../link2' ) );
   var pathToResolve = provider.path.join( linkPath, 'terminal' );
   var o = _.mapExtend( null, o1, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 3 } );
   var got = provider.pathResolveSoftLink( o );
@@ -40409,7 +40413,7 @@ function pathResolveSoftLinkExtended( test )
     resolvingMultiple : 1,
     throwing : 0
   });
-  test.identical( got, '../link' )
+  test.identical( got, test.context.globalFromPreferred( '../link' ) )
 
   var got = provider.pathResolveSoftLink
   ({
@@ -40479,7 +40483,7 @@ function pathResolveSoftLinkExtended( test )
     resolvingMultiple : 1,
     throwing : 1
   });
-  test.identical( got, '../link' )
+  test.identical( got, test.context.globalFromPreferred( '../link' ) )
 
   var got = provider.pathResolveSoftLink
   ({
@@ -40582,7 +40586,7 @@ function pathResolveSoftLinkExtended( test )
     resolvingMultiple : 1,
     throwing : 1
   });
-  test.identical( got, '../link2' )
+  test.identical( got, test.context.globalFromPreferred( '../link2' ) )
 
   var got = provider.pathResolveSoftLink
   ({
@@ -40592,7 +40596,7 @@ function pathResolveSoftLinkExtended( test )
     resolvingMultiple : 1,
     throwing : 1
   });
-  test.identical( got, '../link2' )
+  test.identical( got, test.context.globalFromPreferred( '../link2' ) )
 
   var got = provider.pathResolveSoftLink
   ({
@@ -40602,7 +40606,7 @@ function pathResolveSoftLinkExtended( test )
     resolvingMultiple : 2,
     throwing : 1
   });
-  test.identical( got, '../link2' )
+  test.identical( got, test.context.globalFromPreferred( '../link2' ) )
 
   test.shouldThrowErrorSync( () =>
   {
@@ -40634,7 +40638,7 @@ function pathResolveSoftLinkExtended( test )
     resolvingMultiple : 3,
     throwing : 1
   });
-  test.identical( got, '../link2' )
+  test.identical( got, test.context.globalFromPreferred( '../link2' ) )
 
   test.shouldThrowErrorSync( () =>
   {
@@ -40688,7 +40692,7 @@ function pathResolveSoftLinkExtended( test )
     resolvingMultiple : 1,
     throwing : 1
   });
-  test.identical( got, '../link2' )
+  test.identical( got, test.context.globalFromPreferred( '../link2' ) )
 
   var got = provider.pathResolveSoftLink
   ({
@@ -40698,7 +40702,7 @@ function pathResolveSoftLinkExtended( test )
     resolvingMultiple : 2,
     throwing : 1
   });
-  test.identical( got, '../link' )
+  test.identical( got, test.context.globalFromPreferred( '../link' ) )
 
   var got = provider.pathResolveSoftLink
   ({
@@ -40708,7 +40712,7 @@ function pathResolveSoftLinkExtended( test )
     resolvingMultiple : 3,
     throwing : 1
   });
-  test.identical( got, '../file' )
+  test.identical( got, test.context.globalFromPreferred( '../file' ) )
 
   test.close( 'relative links, option recursive' );
 
@@ -40740,7 +40744,7 @@ function pathResolveSoftLinkExtended( test )
     resolvingMultiple : 1,
     throwing : 1
   });
-  test.identical( got, '../link2' )
+  test.identical( got, test.context.globalFromPreferred( '../link2' ) )
 
   var got = provider.pathResolveSoftLink
   ({
@@ -40750,7 +40754,7 @@ function pathResolveSoftLinkExtended( test )
     resolvingMultiple : 1,
     throwing : 1
   });
-  test.identical( got, '../link2' )
+  test.identical( got, test.context.globalFromPreferred( '../link2' ) )
 
   var got = provider.pathResolveSoftLink
   ({
@@ -40760,7 +40764,7 @@ function pathResolveSoftLinkExtended( test )
     resolvingMultiple : 2,
     throwing : 1
   });
-  test.identical( got, '../file' )
+  test.identical( got, test.context.globalFromPreferred( '../file' ) )
 
   test.shouldThrowErrorSync( () =>
   {
@@ -40792,7 +40796,7 @@ function pathResolveSoftLinkExtended( test )
     resolvingMultiple : 3,
     throwing : 1
   });
-  test.identical( got, '../file' )
+  test.identical( got, test.context.globalFromPreferred( '../file' ) )
 
   test.shouldThrowErrorSync( () =>
   {
@@ -41259,7 +41263,7 @@ function pathResolveTextLink( test )
   provider.filesDelete( routinePath );
   provider.fileWrite( terminalInDirPath, terminalInDirPath );
   provider.textLink( linkPath2, '../dir' );
-  provider.textLink( linkPath, '../link2' );
+  provider.textLink( linkPath, test.context.globalFromPreferred( '../link2' ) );
   var pathToResolve = provider.path.join( linkPath, 'terminal' );
   var o = _.mapExtend( null, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 1 } );
   var got = provider.pathResolveTextLink( o );
@@ -41270,7 +41274,7 @@ function pathResolveTextLink( test )
   provider.filesDelete( routinePath );
   provider.fileWrite( terminalInDirPath, terminalInDirPath );
   provider.textLink( linkPath2, '../dir' );
-  provider.textLink( linkPath, '../link2' );
+  provider.textLink( linkPath, test.context.globalFromPreferred( '../link2' ) );
   var pathToResolve = provider.path.join( linkPath, 'terminal' );
   var o = _.mapExtend( null, { filePath : pathToResolve, resolvingIntermediateDirectories : 1, resolvingMultiple : 3 } );
   var got = provider.pathResolveTextLink( o );
@@ -41712,7 +41716,7 @@ function pathResolveTextLinkExtended( test )
     resolvingMultiple : 1,
     throwing : 0
   });
-  test.identical( got, '../link' )
+  test.identical( got, test.context.globalFromPreferred( '../link' ) )
 
   var got = provider.pathResolveTextLink
   ({
@@ -41782,7 +41786,7 @@ function pathResolveTextLinkExtended( test )
     resolvingMultiple : 1,
     throwing : 1
   });
-  test.identical( got, '../link' )
+  test.identical( got, test.context.globalFromPreferred( '../link' ) )
 
   var got = provider.pathResolveTextLink
   ({
@@ -41885,7 +41889,7 @@ function pathResolveTextLinkExtended( test )
     resolvingMultiple : 1,
     throwing : 1
   });
-  test.identical( got, '../link2' )
+  test.identical( got, test.context.globalFromPreferred( '../link2' ) )
 
   var got = provider.pathResolveTextLink
   ({
@@ -41895,7 +41899,7 @@ function pathResolveTextLinkExtended( test )
     resolvingMultiple : 1,
     throwing : 1
   });
-  test.identical( got, '../link2' )
+  test.identical( got, test.context.globalFromPreferred( '../link2' ) )
 
   var got = provider.pathResolveTextLink
   ({
@@ -41905,7 +41909,7 @@ function pathResolveTextLinkExtended( test )
     resolvingMultiple : 2,
     throwing : 1
   });
-  test.identical( got, '../link2' )
+  test.identical( got, test.context.globalFromPreferred( '../link2' ) )
 
   test.shouldThrowErrorSync( () =>
   {
@@ -41937,7 +41941,7 @@ function pathResolveTextLinkExtended( test )
     resolvingMultiple : 3,
     throwing : 1
   });
-  test.identical( got, '../link2' )
+  test.identical( got, test.context.globalFromPreferred( '../link2' ) )
 
   test.shouldThrowErrorSync( () =>
   {
@@ -41991,7 +41995,7 @@ function pathResolveTextLinkExtended( test )
     resolvingMultiple : 1,
     throwing : 1
   });
-  test.identical( got, '../link2' )
+  test.identical( got, test.context.globalFromPreferred( '../link2' ) )
 
   var got = provider.pathResolveTextLink
   ({
@@ -42001,7 +42005,7 @@ function pathResolveTextLinkExtended( test )
     resolvingMultiple : 2,
     throwing : 1
   });
-  test.identical( got, '../link' )
+  test.identical( got, test.context.globalFromPreferred( '../link' ) )
 
   var got = provider.pathResolveTextLink
   ({
@@ -42011,7 +42015,7 @@ function pathResolveTextLinkExtended( test )
     resolvingMultiple : 3,
     throwing : 1
   });
-  test.identical( got, '../file' )
+  test.identical( got, test.context.globalFromPreferred( '../file' ) )
 
   test.close( 'relative links, option recursive' );
 
@@ -42043,7 +42047,7 @@ function pathResolveTextLinkExtended( test )
     resolvingMultiple : 1,
     throwing : 1
   });
-  test.identical( got, '../link2' )
+  test.identical( got, test.context.globalFromPreferred( '../link2' ) )
 
   var got = provider.pathResolveTextLink
   ({
@@ -42053,7 +42057,7 @@ function pathResolveTextLinkExtended( test )
     resolvingMultiple : 1,
     throwing : 1
   });
-  test.identical( got, '../link2' )
+  test.identical( got, test.context.globalFromPreferred( '../link2' ) )
 
   var got = provider.pathResolveTextLink
   ({
@@ -42063,7 +42067,7 @@ function pathResolveTextLinkExtended( test )
     resolvingMultiple : 2,
     throwing : 1
   });
-  test.identical( got, '../file' )
+  test.identical( got, test.context.globalFromPreferred( '../file' ) )
 
   test.shouldThrowErrorSync( () =>
   {
@@ -42095,7 +42099,7 @@ function pathResolveTextLinkExtended( test )
     resolvingMultiple : 3,
     throwing : 1
   });
-  test.identical( got, '../file' )
+  test.identical( got, test.context.globalFromPreferred( '../file' ) )
 
   test.shouldThrowErrorSync( () =>
   {
@@ -42690,8 +42694,8 @@ function pathResolveLinkStep( test )
     relativeOriginalFile : 0,
     preservingRelative : 1
   })
-  test.identical( got.filePath, '../link2' );
-  test.identical( got.relativePath, '../link2' );
+  test.identical( got.filePath, test.context.globalFromPreferred( '../link2' ) );
+  test.identical( got.relativePath, test.context.globalFromPreferred( '../link2' ) );
   test.identical( got.absolutePath, link2Path );
 
   var got = provider.pathResolveLinkStep
@@ -42720,8 +42724,8 @@ function pathResolveLinkStep( test )
     relativeOriginalFile : 1,
     preservingRelative : 1
   })
-  test.identical( got.filePath, '../link2' );
-  test.identical( got.relativePath, '../link2' );
+  test.identical( got.filePath, test.context.globalFromPreferred( '../link2' ) );
+  test.identical( got.relativePath, test.context.globalFromPreferred( '../link2' ) );
   test.identical( got.absolutePath, link2Path );
 
   test.close( 'relative soft links' );
@@ -42763,8 +42767,8 @@ function pathResolveLinkStep( test )
     relativeOriginalFile : 0,
     preservingRelative : 1
   })
-  test.identical( got.filePath, '../link2' );
-  test.identical( got.relativePath, '../link2' );
+  test.identical( got.filePath, test.context.globalFromPreferred( '../link2' ) );
+  test.identical( got.relativePath, test.context.globalFromPreferred( '../link2' ) );
   test.identical( got.absolutePath, link2Path );
 
   var got = provider.pathResolveLinkStep
@@ -42793,8 +42797,8 @@ function pathResolveLinkStep( test )
     relativeOriginalFile : 1,
     preservingRelative : 1
   })
-  test.identical( got.filePath, '../link2' );
-  test.identical( got.relativePath, '../link2' );
+  test.identical( got.filePath, test.context.globalFromPreferred( '../link2' ) );
+  test.identical( got.relativePath, test.context.globalFromPreferred( '../link2' ) );
   test.identical( got.absolutePath, link2Path );
 
   provider.fieldPop( 'usingTextLink', 1 );
@@ -43408,8 +43412,8 @@ function pathResolveLinkStep( test )
     relativeOriginalFile : 0,
     preservingRelative : 1
   })
-  test.identical( got.filePath, '../link' );
-  test.identical( got.relativePath, '../link' );
+  test.identical( got.filePath, test.context.globalFromPreferred( '../link' ) );
+  test.identical( got.relativePath, test.context.globalFromPreferred( '../link' ) );
   test.identical( got.absolutePath, linkPath );
 
   var got = provider.pathResolveLinkStep
@@ -43423,8 +43427,8 @@ function pathResolveLinkStep( test )
     relativeOriginalFile : 1,
     preservingRelative : 1
   })
-  test.identical( got.filePath, '../link' );
-  test.identical( got.relativePath, '../link' );
+  test.identical( got.filePath, test.context.globalFromPreferred( '../link' ) );
+  test.identical( got.relativePath, test.context.globalFromPreferred( '../link' ) );
   test.identical( got.absolutePath, linkPath );
 
   var got = provider.pathResolveLinkStep
@@ -43540,8 +43544,8 @@ function pathResolveLinkStep( test )
     relativeOriginalFile : 0,
     preservingRelative : 1
   })
-  test.identical( got.filePath, '../link' );
-  test.identical( got.relativePath, '../link' );
+  test.identical( got.filePath, test.context.globalFromPreferred( '../link' ) );
+  test.identical( got.relativePath, test.context.globalFromPreferred( '../link' ) );
   test.identical( got.absolutePath, linkPath );
 
   var got = provider.pathResolveLinkStep
@@ -43555,8 +43559,8 @@ function pathResolveLinkStep( test )
     relativeOriginalFile : 1,
     preservingRelative : 1
   })
-  test.identical( got.filePath, '../link' );
-  test.identical( got.relativePath, '../link' );
+  test.identical( got.filePath, test.context.globalFromPreferred( '../link' ) );
+  test.identical( got.relativePath, test.context.globalFromPreferred( '../link' ) );
   test.identical( got.absolutePath, linkPath );
 
   var got = provider.pathResolveLinkStep
@@ -43673,8 +43677,8 @@ function pathResolveLinkStep( test )
     relativeOriginalFile : 0,
     preservingRelative : 1
   })
-  test.identical( got.filePath, '../link2' );
-  test.identical( got.relativePath, '../link2' );
+  test.identical( got.filePath, test.context.globalFromPreferred( '../link2' ) );
+  test.identical( got.relativePath, test.context.globalFromPreferred( '../link2' ) );
   test.identical( got.absolutePath, link2Path );
 
   var got = provider.pathResolveLinkStep
@@ -43688,8 +43692,8 @@ function pathResolveLinkStep( test )
     relativeOriginalFile : 1,
     preservingRelative : 1
   })
-  test.identical( got.filePath, '../link2' );
-  test.identical( got.relativePath, '../link2' );
+  test.identical( got.filePath, test.context.globalFromPreferred( '../link2' ) );
+  test.identical( got.relativePath, test.context.globalFromPreferred( '../link2' ) );
   test.identical( got.absolutePath, link2Path );
 
   var got = provider.pathResolveLinkStep

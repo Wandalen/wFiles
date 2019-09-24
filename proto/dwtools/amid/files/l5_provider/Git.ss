@@ -897,14 +897,25 @@ function filesReflectSingle_body( o )
   ready.ifNoErrorThen( ( arg ) =>
   {
     if( localChanges )
+    if( o.extra.stashing )
     shell( 'git stash' );
 
     ready.then( () => gitCheckout() )
 
     if( mergeIsNeeded && hashIsBranchName )
-    ready.then( () => gitMerge() )
+    {
+      if( localChanges && !o.extra.stashing )
+      {
+        let err = _.err( 'Failed to merge remote-tracking branch in repository at', _.strQuote( dstPath ), ', repository has local changes and stashing is disabled.' );
+        con.error( err );
+        throw err;
+      }
+
+      ready.then( () => gitMerge() )
+    }
 
     if( localChanges )
+    if( o.extra.stashing )
     ready.then( () => gitStashPop() )
 
     ready.finally( con );
@@ -941,20 +952,21 @@ function filesReflectSingle_body( o )
 
   function gitCheckout()
   {
-    let o =
+    let shellOptions =
     {
       execPath : 'git checkout ' + parsed.hash,
       outputCollecting : 1,
       ready : null
     }
 
-    let con = shell( o );
+    let con = shell( shellOptions );
 
     con.finally( ( err, got ) =>
     {
       if( err )
       {
         if( localChanges )
+        if( o.extra.stashing )
         shell
         ({
           execPath : 'git stash pop',
@@ -964,7 +976,7 @@ function filesReflectSingle_body( o )
           ready : null
         })
 
-        if( !_.strHasAny( o.output, [ 'fatal: reference', 'error: pathspec' ] ) )
+        if( !_.strHasAny( shellOptions.output, [ 'fatal: reference', 'error: pathspec' ] ) )
         throw _.err( err );
         _.errAttend( err );
         handleGitError( 'Failed to checkout, branch/commit: ' + _.strQuote( parsed.hash ) + ' doesn\'t exist in repository at ' + _.strQuote( dstPath ) );
@@ -1063,6 +1075,7 @@ _.routineExtend( filesReflectSingle_body, _.FileProvider.Find.prototype.filesRef
 
 var extra = filesReflectSingle_body.extra = Object.create( null );
 extra.fetching = 1;
+extra.stashing = 1;
 
 var defaults = filesReflectSingle_body.defaults;
 let filesReflectSingle = _.routineFromPreAndBody( _.FileProvider.Find.prototype.filesReflectSingle.pre, filesReflectSingle_body );

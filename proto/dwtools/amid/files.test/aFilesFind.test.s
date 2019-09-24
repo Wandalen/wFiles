@@ -23833,94 +23833,100 @@ function filesReflectLinked( test )
   /* - */
 
   test.case = 'first';
-
-  logger.log( 'routinePath', routinePath );
-
   provider.filesDelete( routinePath );
-
   provider.dirMake( srcPath );
-
   provider.fileWrite( path.join( srcPath, 'file' ), 'file' );
-
   provider.softLink
   ({
     srcPath : path.join( srcPath, 'fileNotExists' ),
     dstPath : srcLinkPath,
     allowingMissed : 1,
   })
-
   provider.filesReflect
   ({
     reflectMap : { [ srcPath ] : dstPath },
     allowingMissed : 1,
   });
   provider.pathResolveSoftLink( dstLinkPath );
-
   test.is( provider.fileExists( path.join( dstPath, 'file' ) ) );
   test.is( provider.isSoftLink( dstLinkPath ) );
   test.identical( provider.pathResolveSoftLink( dstLinkPath ), path.join( srcPath, 'fileNotExists' ) )
 
   /**/
 
-  provider.filesDelete( routinePath );
+  test.open( 'src - terminal, dst - link to missing file' );
 
+  test.case = 'resolvingSrcSoftLink - 0';
+  provider.filesDelete( routinePath );
   provider.dirMake( srcPath );
   provider.dirMake( dstPath );
-
   provider.fileWrite( srcLinkPath, 'file' );
-
   provider.softLink
   ({
     srcPath : path.join( dstPath, 'fileNotExists' ),
     dstPath : dstLinkPath,
     allowingMissed : 1
   });
-
   provider.filesReflect
   ({
     reflectMap : { [ srcPath ] : dstPath },
     allowingMissed : 1,
+    resolvingSrcSoftLink : 0
   });
-
-  test.is( !provider.isSoftLink( dstLinkPath ) );
+  test.is( provider.isTerminal( dstLinkPath ) );
   test.identical( provider.fileRead( dstLinkPath ), 'file' );
 
-  /* */
+  //
 
-  test.case = 'src - link to missing, dst - link to missing';
+  test.case = 'resolvingSrcSoftLink - 1';
   provider.filesDelete( routinePath );
-  provider.softLink
-  ({
-    srcPath : path.join( srcPath, 'fileNotExists' ),
-    dstPath : srcLinkPath,
-    allowingMissed : 1,
-    makingDirectory : 1,
-  })
+  provider.dirMake( srcPath );
+  provider.dirMake( dstPath );
+  provider.fileWrite( srcLinkPath, 'file' );
   provider.softLink
   ({
     srcPath : path.join( dstPath, 'fileNotExists' ),
     dstPath : dstLinkPath,
-    allowingMissed : 1,
-    makingDirectory : 1,
-  })
-
-  test.is( provider.isSoftLink( dstLinkPath ) );
-
+    allowingMissed : 1
+  });
   provider.filesReflect
   ({
     reflectMap : { [ srcPath ] : dstPath },
     allowingMissed : 1,
-    resolvingSrcSoftLink : 1,
-  })
+    resolvingSrcSoftLink : 1
+  });
+  test.is( provider.isTerminal( dstLinkPath ) );
+  test.identical( provider.fileRead( dstLinkPath ), 'file' );
 
-  test.will = 'dstPath/link should be rewritten by srcPath/link';
-  test.is( provider.isSoftLink( dstLinkPath ) );
-  test.identical( provider.pathResolveSoftLink( dstLinkPath ), path.join( srcPath, 'fileNotExists' ) )
+  //
 
+  test.case = 'resolvingSrcSoftLink - 2';
+  provider.filesDelete( routinePath );
+  provider.dirMake( srcPath );
+  provider.dirMake( dstPath );
+  provider.fileWrite( srcLinkPath, 'file' );
+  provider.softLink
+  ({
+    srcPath : path.join( dstPath, 'fileNotExists' ),
+    dstPath : dstLinkPath,
+    allowingMissed : 1
+  });
+  provider.filesReflect
+  ({
+    reflectMap : { [ srcPath ] : dstPath },
+    allowingMissed : 1,
+    resolvingSrcSoftLink : 2
+  });
+  test.is( provider.isTerminal( dstLinkPath ) );
+  test.identical( provider.fileRead( dstLinkPath ), 'file' );
+
+  test.close( 'src - terminal, dst - link to missing file' );
 
   /* */
 
-  test.case = 'src - link to missing, dst - link to missing, resolvingSrcSoftLink - 0';
+  test.open( 'src - link to missing, dst - link to missing' );
+
+  test.case = 'resolvingSrcSoftLink - 0';
   provider.filesDelete( routinePath );
   provider.softLink
   ({
@@ -23942,15 +23948,14 @@ function filesReflectLinked( test )
     allowingMissed : 1,
     resolvingSrcSoftLink : 0,
   })
-
   test.will = 'dstPath/link should not be rewritten by srcPath/link';
   test.is( provider.isSoftLink( dstLinkPath ) );
   var dstLink1 = provider.pathResolveSoftLink( dstLinkPath );
   test.identical( dstLink1, path.join( srcPath, 'link' ) );
 
-  /* */
+  //
 
-  test.case = 'src - link to missing, dst - link to missing, resolvingSrcSoftLink - 1';
+  test.case = 'resolvingSrcSoftLink - 1';
   provider.filesDelete( routinePath );
   provider.softLink
   ({
@@ -23972,15 +23977,46 @@ function filesReflectLinked( test )
     allowingMissed : 1,
     resolvingSrcSoftLink : 1,
   })
-
   test.will = 'dstPath/link should be rewritten by srcPath/link';
   test.is( provider.isSoftLink( dstLinkPath ) );
   var dstLink1 = provider.pathResolveSoftLink( dstLinkPath );
   test.identical( dstLink1, path.join( srcPath, 'fileNotExists' ) );
 
+  //
+
+  test.case = 'resolvingSrcSoftLink - 2';
+  provider.filesDelete( routinePath );
+  provider.softLink
+  ({
+    srcPath : path.join( srcPath, 'fileNotExists' ),
+    dstPath : srcLinkPath,
+    allowingMissed : 1,
+    makingDirectory : 1,
+  })
+  provider.softLink
+  ({
+    srcPath : path.join( dstPath, 'fileNotExists' ),
+    dstPath : dstLinkPath,
+    allowingMissed : 1,
+    makingDirectory : 1,
+  })
+  provider.filesReflect
+  ({
+    reflectMap : { [ srcPath ] : dstPath },
+    allowingMissed : 1,
+    resolvingSrcSoftLink : 2,
+  })
+  test.will = 'dstPath/link should be removed';
+  test.is( !provider.fileExists( dstLinkPath ) );
+  test.is( !provider.fileExists( path.join( dstPath, 'fileNotExists' ) ) );
+
+  test.close( 'src - link to missing, dst - link to missing' );
+
   /* */
 
-  test.case = 'src link is broken, src resolving is on'
+  test.open( 'src link to missing, dst link to terminal' )
+
+  test.case = 'resolvingSrcSoftLink : 0';
   provider.filesDelete( routinePath );
   provider.softLink
   ({
@@ -23996,52 +24032,76 @@ function filesReflectLinked( test )
     dstPath : dstLinkPath,
     makingDirectory : 1
   })
+  var records = provider.filesReflect
+  ({
+    reflectMap : { [ srcPath ] : dstPath },
+    allowingMissed : 1,
+    resolvingSrcSoftLink : 0,
+  });
+  test.is( provider.isSoftLink( dstLinkPath ) );
+  test.identical( provider.pathResolveSoftLink( dstLinkPath ), srcLinkPath );
 
+  //
+
+  test.case = 'resolvingSrcSoftLink : 1';
+  provider.filesDelete( routinePath );
+  provider.softLink
+  ({
+    srcPath : path.join( srcPath, 'fileNotExists' ),
+    dstPath : srcLinkPath,
+    allowingMissed : 1,
+    makingDirectory : 1
+  })
+  provider.fileWrite( path.join( dstPath, 'file' ), 'file' );
+  provider.softLink
+  ({
+    srcPath : path.join( dstPath, 'file' ),
+    dstPath : dstLinkPath,
+    makingDirectory : 1
+  })
+  var records = provider.filesReflect
+  ({
+    reflectMap : { [ srcPath ] : dstPath },
+    allowingMissed : 1,
+    resolvingSrcSoftLink : 1,
+  });
+  test.is( provider.isSoftLink( dstLinkPath ) );
+  test.identical( provider.pathResolveSoftLink( dstLinkPath ), path.join( srcPath, 'fileNotExists' ) );
+
+  //
+
+  test.case = 'resolvingSrcSoftLink : 2';
+  provider.filesDelete( routinePath );
+  provider.softLink
+  ({
+    srcPath : path.join( srcPath, 'fileNotExists' ),
+    dstPath : srcLinkPath,
+    allowingMissed : 1,
+    makingDirectory : 1
+  })
+  provider.fileWrite( path.join( dstPath, 'file' ), 'file' );
+  provider.softLink
+  ({
+    srcPath : path.join( dstPath, 'file' ),
+    dstPath : dstLinkPath,
+    makingDirectory : 1
+  })
   var records = provider.filesReflect
   ({
     reflectMap : { [ srcPath ] : dstPath },
     allowingMissed : 1,
     resolvingSrcSoftLink : 2,
   });
-
   test.will = 'delete dst link file';
   test.is( !provider.fileExists( dstLinkPath ) );
 
-  /* */
-
-  test.case = 'replace dst link by broken link'
-  provider.filesDelete( routinePath );
-  provider.softLink
-  ({
-    srcPath : path.join( srcPath, 'fileNotExists' ),
-    dstPath : srcLinkPath,
-    allowingMissed : 1,
-    makingDirectory : 1
-  })
-  provider.fileWrite( path.join( dstPath, 'file' ), 'file' );
-  provider.softLink
-  ({
-    srcPath : path.join( dstPath, 'file' ),
-    dstPath : dstLinkPath,
-    makingDirectory : 1
-  })
-
-  var records = provider.filesReflect
-  ({
-    reflectMap : { [ srcPath ] : dstPath },
-    allowingMissed : 1,
-    resolvingSrcSoftLink : 0,
-  })
-
-  test.will = 'dstPath/link should not be rewritten by srcPath/link';
-  test.is( provider.fileExists( dstLinkPath ) );
-  test.is( provider.isSoftLink( dstLinkPath ) );
-  var dstLink1 = provider.pathResolveSoftLink({ filePath : dstLinkPath });
-  test.identical( dstLink1, srcLinkPath );
+  test.close( 'src link to missing, dst link to terminal' )
 
   /* */
 
-  test.case = 'src - link to terminal, dst - link to missing'
+  test.open( 'src - link to terminal, dst - link to missing' );
+
+  test.case = 'resolvingSrcSoftLink:0'
   provider.filesDelete( routinePath );
   provider.fileWrite( path.join( srcPath, 'file' ), 'file' );
   provider.softLink
@@ -24057,20 +24117,73 @@ function filesReflectLinked( test )
     allowingMissed : 1,
     makingDirectory : 1
   })
-
   provider.filesReflect
   ({
     reflectMap : { [ srcPath ] : dstPath },
     allowingMissed : 1,
+    resolvingSrcSoftLink : 0
   })
+  test.is( provider.isSoftLink( dstLinkPath ) );
+  test.identical( provider.pathResolveSoftLink({ filePath : dstLinkPath }), srcLinkPath )
 
-  test.will = 'dstPath/link should be rewritten by srcPath/link'
+  test.case = 'resolvingSrcSoftLink:1'
+  provider.filesDelete( routinePath );
+  provider.fileWrite( path.join( srcPath, 'file' ), 'file' );
+  provider.softLink
+  ({
+    srcPath : path.join( srcPath, 'file' ),
+    dstPath : srcLinkPath,
+    makingDirectory : 1
+  })
+  provider.softLink
+  ({
+    srcPath : path.join( dstPath, 'fileNotExists' ),
+    dstPath : dstLinkPath,
+    allowingMissed : 1,
+    makingDirectory : 1
+  })
+  provider.filesReflect
+  ({
+    reflectMap : { [ srcPath ] : dstPath },
+    allowingMissed : 1,
+    resolvingSrcSoftLink : 1
+  })
   test.is( provider.isSoftLink( dstLinkPath ) );
   test.identical( provider.pathResolveSoftLink({ filePath : dstLinkPath }), path.join( srcPath, 'file' ) )
 
+  test.case = 'resolvingSrcSoftLink:2'
+  provider.filesDelete( routinePath );
+  provider.fileWrite( path.join( srcPath, 'file' ), 'file' );
+  provider.softLink
+  ({
+    srcPath : path.join( srcPath, 'file' ),
+    dstPath : srcLinkPath,
+    makingDirectory : 1
+  })
+  provider.softLink
+  ({
+    srcPath : path.join( dstPath, 'fileNotExists' ),
+    dstPath : dstLinkPath,
+    allowingMissed : 1,
+    makingDirectory : 1
+  })
+  provider.filesReflect
+  ({
+    reflectMap : { [ srcPath ] : dstPath },
+    allowingMissed : 1,
+    resolvingSrcSoftLink : 2
+  })
+  test.will = 'dst link will should be removed'
+  test.is( provider.isTerminal( dstLinkPath ) );
+  test.identical( provider.fileRead( dstLinkPath ), 'file' );
+
+  test.close( 'src - link to terminal, dst - link to missing' );
+
   /* */
 
-  test.case = 'src - no files, dst - link to missing'
+  test.open( 'src - no files, dst - link to missing' )
+
+  test.case = 'resolvingSrcSoftLink:0'
   provider.filesDelete( routinePath );
   provider.softLink
   ({
@@ -24079,19 +24192,61 @@ function filesReflectLinked( test )
     allowingMissed : 1,
     makingDirectory : 1
   })
-
   provider.filesReflect
   ({
     reflectMap : { [ srcPath ] : dstPath },
     allowingMissed : 1,
+    resolvingSrcSoftLink : 0,
     mandatory : 0,
   })
-
   test.will = 'dstPath/link should not be rewritten by srcPath/link'
   test.is( provider.isSoftLink( dstLinkPath ) );
   var dstLink4 = provider.pathResolveSoftLink({ filePath : dstLinkPath });
   test.identical( dstLink4, path.join( dstPath, 'fileNotExists' ) );
 
+  test.case = 'resolvingSrcSoftLink:1'
+  provider.filesDelete( routinePath );
+  provider.softLink
+  ({
+    srcPath : path.join( dstPath, 'fileNotExists' ),
+    dstPath : dstLinkPath,
+    allowingMissed : 1,
+    makingDirectory : 1
+  })
+  provider.filesReflect
+  ({
+    reflectMap : { [ srcPath ] : dstPath },
+    allowingMissed : 1,
+    resolvingSrcSoftLink : 1,
+    mandatory : 0,
+  })
+  test.will = 'dstPath/link should not be rewritten by srcPath/link'
+  test.is( provider.isSoftLink( dstLinkPath ) );
+  var dstLink4 = provider.pathResolveSoftLink({ filePath : dstLinkPath });
+  test.identical( dstLink4, path.join( dstPath, 'fileNotExists' ) );
+
+  test.case = 'resolvingSrcSoftLink:2'
+  provider.filesDelete( routinePath );
+  provider.softLink
+  ({
+    srcPath : path.join( dstPath, 'fileNotExists' ),
+    dstPath : dstLinkPath,
+    allowingMissed : 1,
+    makingDirectory : 1
+  })
+  provider.filesReflect
+  ({
+    reflectMap : { [ srcPath ] : dstPath },
+    allowingMissed : 1,
+    resolvingSrcSoftLink : 2,
+    mandatory : 0,
+  })
+  test.will = 'dstPath/link should not be rewritten by srcPath/link'
+  test.is( provider.isSoftLink( dstLinkPath ) );
+  var dstLink4 = provider.pathResolveSoftLink({ filePath : dstLinkPath });
+  test.identical( dstLink4, path.join( dstPath, 'fileNotExists' ) );
+
+  test.close( 'src - no files, dst - link to missing' )
 }
 
 //

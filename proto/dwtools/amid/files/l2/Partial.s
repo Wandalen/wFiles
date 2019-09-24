@@ -956,10 +956,13 @@ function pathResolveSoftLink_body( o )
   if( o.results.length )
   {
     if( _.arrayHas( o.results, result ) )
-    if( o.allowingCycled )
-    return end2();
-    else
-    return handleError( 'Cycle at:', o.results[ o.results.length - 1 ], 'doesn\`t exist.' );
+    {
+      if( !o.allowingCycled )
+      return handleError( 'Cycle at:', o.results[ o.results.length - 1 ], 'doesn\`t exist.' );
+      if( o.resolvingMultiple === 1 )
+      return end();
+      return end2();
+    }
   }
 
   if( o.resolvingMultiple === 1 )
@@ -977,7 +980,12 @@ function pathResolveSoftLink_body( o )
   {
     let found = o.found[ o.found.length - 1 ];
     if( self.path.isRelative( found ) )
-    result = self.path.relative( o.results[ 0 ], result );
+    {
+      if( o.results[ 0 ] !== result )
+      result = self.path.relative( o.results[ 0 ], result );
+      else
+      result = found;
+    }
     return result;
   }
 
@@ -1144,10 +1152,13 @@ function pathResolveTextLink_body( o )
   if( o.results.length )
   {
     if( _.arrayHas( o.results, result ) )
-    if( o.allowingCycled )
-    return end2();
-    else
-    return handleError( 'Cycle at:', o.results[ o.results.length - 1 ], 'doesn\`t exist.' );
+    {
+      if( !o.allowingCycled )
+      return handleError( 'Cycle at:', o.results[ o.results.length - 1 ], 'doesn\`t exist.' );
+      if( o.resolvingMultiple === 1 )
+      return end();
+      return end2();
+    }
   }
 
   if( o.resolvingMultiple === 1 )
@@ -1165,7 +1176,12 @@ function pathResolveTextLink_body( o )
   {
     let found = o.found[ o.found.length - 1 ];
     if( self.path.isRelative( found ) )
-    result = self.path.relative( o.results[ 0 ], result );
+    {
+      if( o.results[ 0 ] !== result )
+      result = self.path.relative( o.results[ 0 ], result );
+      else
+      result = found;
+    }
     return result;
   }
 

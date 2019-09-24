@@ -40235,7 +40235,7 @@ function pathResolveSoftLinkExtended( test )
     resolvingMultiple : 1,
     throwing : 0
   });
-  test.identical( got, filePath )
+  test.identical( got, null )
 
   var got = provider.pathResolveSoftLink
   ({
@@ -40291,15 +40291,17 @@ function pathResolveSoftLinkExtended( test )
 
   //
 
-  var got = provider.pathResolveSoftLink
-  ({
-    filePath : linkPath,
-    allowingMissed : 0,
-    allowingCycled : 1,
-    resolvingMultiple : 1,
-    throwing : 1
-  });
-  test.identical( got, filePath )
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.pathResolveSoftLink
+    ({
+      filePath : linkPath,
+      allowingMissed : 0,
+      allowingCycled : 1,
+      resolvingMultiple : 1,
+      throwing : 1
+    });
+  })
 
   test.shouldThrowErrorSync( () =>
   {
@@ -40375,7 +40377,7 @@ function pathResolveSoftLinkExtended( test )
     resolvingMultiple : 1,
     throwing : 0
   });
-  test.identical( got, '../link' )
+  test.identical( got, null )
 
   var got = provider.pathResolveSoftLink
   ({
@@ -40431,15 +40433,17 @@ function pathResolveSoftLinkExtended( test )
 
   //
 
-  var got = provider.pathResolveSoftLink
-  ({
-    filePath : linkPath,
-    allowingMissed : 1,
-    allowingCycled : 0,
-    resolvingMultiple : 1,
-    throwing : 1
-  });
-  test.identical( got, '../link' )
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.pathResolveSoftLink
+    ({
+      filePath : linkPath,
+      allowingMissed : 1,
+      allowingCycled : 0,
+      resolvingMultiple : 1,
+      throwing : 1
+    });
+  })
 
   test.shouldThrowErrorSync( () =>
   {
@@ -41534,7 +41538,7 @@ function pathResolveTextLinkExtended( test )
     resolvingMultiple : 1,
     throwing : 0
   });
-  test.identical( got, filePath )
+  test.identical( got, null )
 
   var got = provider.pathResolveTextLink
   ({
@@ -41590,15 +41594,17 @@ function pathResolveTextLinkExtended( test )
 
   //
 
-  var got = provider.pathResolveTextLink
-  ({
-    filePath : linkPath,
-    allowingMissed : 0,
-    allowingCycled : 1,
-    resolvingMultiple : 1,
-    throwing : 1
-  });
-  test.identical( got, filePath );
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.pathResolveTextLink
+    ({
+      filePath : linkPath,
+      allowingMissed : 0,
+      allowingCycled : 1,
+      resolvingMultiple : 1,
+      throwing : 1
+    });
+  })
 
   test.shouldThrowErrorSync( () =>
   {
@@ -41674,7 +41680,7 @@ function pathResolveTextLinkExtended( test )
     resolvingMultiple : 1,
     throwing : 0
   });
-  test.identical( got, '../link' )
+  test.identical( got, null )
 
   var got = provider.pathResolveTextLink
   ({
@@ -41730,15 +41736,17 @@ function pathResolveTextLinkExtended( test )
 
   //
 
-  var got = provider.pathResolveTextLink
-  ({
-    filePath : linkPath,
-    allowingMissed : 1,
-    allowingCycled : 0,
-    resolvingMultiple : 1,
-    throwing : 1
-  });
-  test.identical( got, '../link' )
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.pathResolveTextLink
+    ({
+      filePath : linkPath,
+      allowingMissed : 1,
+      allowingCycled : 0,
+      resolvingMultiple : 1,
+      throwing : 1
+    });
+  })
 
   test.shouldThrowErrorSync( () =>
   {
@@ -43400,8 +43408,8 @@ function pathResolveLinkStep( test )
     relativeOriginalFile : 0,
     preservingRelative : 1
   })
-  test.identical( got.filePath, linkPath );
-  test.identical( got.relativePath, linkPath );
+  test.identical( got.filePath, '../link' );
+  test.identical( got.relativePath, '../link' );
   test.identical( got.absolutePath, linkPath );
 
   var got = provider.pathResolveLinkStep
@@ -43415,8 +43423,8 @@ function pathResolveLinkStep( test )
     relativeOriginalFile : 1,
     preservingRelative : 1
   })
-  test.identical( got.filePath, linkPath );
-  test.identical( got.relativePath, linkPath );
+  test.identical( got.filePath, '../link' );
+  test.identical( got.relativePath, '../link' );
   test.identical( got.absolutePath, linkPath );
 
   var got = provider.pathResolveLinkStep
@@ -43532,8 +43540,8 @@ function pathResolveLinkStep( test )
     relativeOriginalFile : 0,
     preservingRelative : 1
   })
-  test.identical( got.filePath, linkPath );
-  test.identical( got.relativePath, linkPath );
+  test.identical( got.filePath, '../link' );
+  test.identical( got.relativePath, '../link' );
   test.identical( got.absolutePath, linkPath );
 
   var got = provider.pathResolveLinkStep
@@ -43547,8 +43555,8 @@ function pathResolveLinkStep( test )
     relativeOriginalFile : 1,
     preservingRelative : 1
   })
-  test.identical( got.filePath, linkPath );
-  test.identical( got.relativePath, linkPath );
+  test.identical( got.filePath, '../link' );
+  test.identical( got.relativePath, '../link' );
   test.identical( got.absolutePath, linkPath );
 
   var got = provider.pathResolveLinkStep

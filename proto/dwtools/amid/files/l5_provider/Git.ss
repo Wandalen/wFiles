@@ -469,6 +469,82 @@ defaults.verbosity = 0;
 
 //
 
+function versionsRemoteRetrive( o )
+{
+  let self = this;
+  let path = self.path;
+
+  _.routineOptions( versionsRemoteRetrive, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( _.strIs( o.localPath ) );
+  _.assert( !!self.system );
+
+  let ready = _.process.start
+  ({
+    execPath : 'git',
+    mode : 'spawn',
+    currentPath : o.localPath,
+    args :
+    [
+      'branch',
+        '-r',
+        '--no-abbrev',
+        '--format=%(refname:lstrip=3)'
+    ],
+    inputMirroring : 0,
+    outputPiping : 0,
+    outputCollecting : 1,
+  })
+
+  ready.finally( ( err, got ) =>
+  {
+    if( err )
+    throw _.err( 'Can\'t retrive remote versions. Reason:', err );
+
+    let result = _.strSplitNonPreserving({ src : got.output, delimeter : '\n' });
+    return result.slice( 1 );
+  })
+
+  return ready;
+}
+
+var defaults = versionsRemoteRetrive.defaults = Object.create( null );
+defaults.localPath = null;
+
+//
+
+function versionsPull( o )
+{
+  let self = this;
+  let path = self.path;
+
+  _.routineOptions( versionsPull, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( !!self.system );
+
+  return self.versionsRemoteRetrive({ localPath : o.localPath })
+  .then( ( versions ) =>
+  {
+    _.assert( _.arrayIs( versions ) && versions.length );
+
+    let ready = new _.Consequence().take( null );
+    let start = _.process.starter
+    ({
+      mode : 'spawn',
+      currentPath : o.localPath,
+      ready : ready
+    });
+    _.each( versions, ( version ) => start( `git checkout ${version} && git pull` ) );
+
+    return ready;
+  })
+}
+
+var defaults = versionsPull.defaults = Object.create( null );
+defaults.localPath = null;
+
+//
+
 /**
  * @summary Returns true if local copy of repository `o.localPath` is up to date with remote repository `o.remotePath`.
  * @param {Object} o Options map.
@@ -1068,6 +1144,9 @@ let Proto =
   versionLocalRetrive,
   versionRemoteLatestRetrive,
   versionRemoteCurrentRetrive,
+  versionsRemoteRetrive,
+
+  versionsPull,
 
   isUpToDate,
   isDownloaded,

@@ -3676,15 +3676,19 @@ function filesReflectSingle_body( o )
 
       if( ( !resolvingSrcSoftLink && self.usingSoftLink ) || ( !resolvingSrcTextLink && self.usingTextLink ) )
       {
-        srcPath = src.pathResolveLinkStep
+        let resolved = src.pathResolveLinkStep
         ({
           filePath : srcAbsolute,
           resolvingSoftLink : 1,
           resolvingTextLink : 1,
+          preservingRelative : 1,
+          relativeOriginalFile : 1,
           throwing : o.throwing,
           allowingMissed : o.allowingMissed,
           allowingCycled : o.allowingCycled,
         });
+
+        srcPath = resolved.filePath;
         srcAbsolute = path.join( srcAbsolute, srcPath );
       }
 

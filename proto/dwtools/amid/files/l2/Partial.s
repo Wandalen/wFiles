@@ -5844,8 +5844,7 @@ function _link_functor( fop )
 
     if( !o.sync )
     {
-      c.con1 = new _.Consequence().take( null );
-      c.con2 = new _.Consequence();
+      c.con = new _.Consequence().take( null );
       // zzz : why two?
       /* aaa : to split execution into veryfication and linking:
       linking stage needs own exception handler,
@@ -5930,50 +5929,11 @@ function _link_functor( fop )
     else /* async */
     {
 
-      /* main part */
-
-      c.con2.then( () => self.fileExists( o2.dstPath ) );
-      c.con2.then( ( dstExists ) =>
-      {
-        if( dstExists )
-        {
-          return c.verifyDst().then( () => tempRenameAsync() )
-        }
-        else if( o.makingDirectory )
-        {
-          return self.dirMakeForFile({ filePath : o2.dstPath, sync : 0 });
-        }
-        return dstExists;
-      });
-
-      c.con2.then( _.routineSeal( self, c.linkAct, [ c ] ) );
-
-      c.con2.then( ( got ) =>
-      {
-        log();
-        return c.tempDelete();
-      });
-      c.con2.then( () =>
-      {
-        c.tempPath = null;
-        validateSize();
-        return true;
-      });
-
-      c.con2.catch( ( err ) =>
-      {
-        return c.tempRenameRevert()
-        .finally( () =>
-        {
-          return error( _.err( 'Cant', entryMethodName, o.dstPath, '<-', o.srcPath, '\n', err ) );
-        })
-      })
-
       /* launcher */
 
       c.verify1( arguments );
 
-      c.con1.then( () =>
+      c.con.then( () =>
       {
         if( _.longIs( o.dstPath ) && c.linkAct.having.hardLinking )
         {
@@ -5990,17 +5950,63 @@ function _link_functor( fop )
         return true;
       })
 
-      c.con1.then( () =>
+      c.con.then( () =>
       {
         if( c.result !== undefined ) //return result if ended earlier
         return c.result;
         //prepare options map and launch main part
         o2 = c.options2 = _.mapOnly( o, c.linkAct.defaults );
-        c.con2.take( null );
-        return c.con2;
+        /* main part */
+        return mainPartAsync();
       })
 
-      return c.con1;
+      return c.con;
+    }
+
+    /* - */
+
+    function mainPartAsync()
+    {
+      let con = new _.Consequence().take( null );
+
+      con.then( () => self.fileExists( o2.dstPath ) );
+      con.then( ( dstExists ) =>
+      {
+        if( dstExists )
+        {
+          return c.verifyDst().then( () => tempRenameAsync() )
+        }
+        else if( o.makingDirectory )
+        {
+          return self.dirMakeForFile({ filePath : o2.dstPath, sync : 0 });
+        }
+        return dstExists;
+      });
+
+      con.then( _.routineSeal( self, c.linkAct, [ c ] ) );
+
+      con.then( ( got ) =>
+      {
+        log();
+        return c.tempDelete();
+      });
+      con.then( () =>
+      {
+        c.tempPath = null;
+        validateSize();
+        return true;
+      });
+
+      con.catch( ( err ) =>
+      {
+        return c.tempRenameRevert()
+        .finally( () =>
+        {
+          return error( _.err( 'Cant', entryMethodName, o.dstPath, '<-', o.srcPath, '\n', err ) );
+        })
+      })
+
+      return con;
     }
 
     /* - */
@@ -6063,7 +6069,7 @@ function _link_functor( fop )
 
     function verify1Async( args )
     {
-      c.con1.then( () =>
+      c.con.then( () =>
       {
         verify1( args );
         return true;
@@ -6146,7 +6152,7 @@ function _link_functor( fop )
 
     function verify2Async()
     {
-      c.con1.then( () =>
+      c.con.then( () =>
       {
         return verify2()
       });
@@ -6222,7 +6228,7 @@ function _link_functor( fop )
 
     function pathsLocalizeAsync()
     {
-      c.con1.then( () =>
+      c.con.then( () =>
       {
         pathsLocalizeSync();
         return null;
@@ -6278,7 +6284,7 @@ function _link_functor( fop )
 
     function pathResolveAsync()
     {
-      c.con1.then( () =>
+      c.con.then( () =>
       {
         pathResolve();
         return true;
@@ -6383,7 +6389,7 @@ function _link_functor( fop )
     function linksResolveAsync()
     {
 
-      c.con1.then( () =>
+      c.con.then( () =>
       {
         _.assert( path.isAbsolute( o.srcPath ) );
         _.assert( path.isAbsolute( o.dstPath ) );
@@ -6414,7 +6420,7 @@ function _link_functor( fop )
 
       /* */
 
-      c.con1.then( () =>
+      c.con.then( () =>
       {
         if( o.resolvingSrcSoftLink || ( o.resolvingSrcTextLink && self.usingTextLink ) )
         {

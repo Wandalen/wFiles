@@ -1332,6 +1332,7 @@ function pathResolveLinkStep_body( o )
     {
       result.absolutePath = self.path.join( o.filePath, result.relativePath )
       if( o.relativeOriginalFile )
+      if( o.filePath !== result.absolutePath )
       result.filePath = result.relativePath = self.path.relative( o.filePath, result.absolutePath );
       if( !o.preservingRelative )
       result.filePath = result.relativePath = result.absolutePath;

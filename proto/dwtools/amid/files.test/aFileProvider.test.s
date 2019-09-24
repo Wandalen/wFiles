@@ -42489,6 +42489,1237 @@ function pathResolveLinkFullResult( test )
 
 //
 
+function pathResolveLinkStep( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let path = provider.path;
+
+  let routinePath = test.context.pathFor( 'written/pathResolveLinkStep' );
+  let terminalPath = test.context.pathFor( 'written/pathResolveLinkStep/terminal' );
+  let linkPath = test.context.pathFor( 'written/pathResolveLinkStep/link' );
+  let link2Path = test.context.pathFor( 'written/pathResolveLinkStep/link2' );
+  let link3Path = test.context.pathFor( 'written/pathResolveLinkStep/link3' );
+
+  /* */
+
+  test.open( 'absolute soft links' );
+
+  provider.filesDelete( routinePath );
+  provider.fileWrite( terminalPath,terminalPath );
+  provider.softLink( link2Path, terminalPath );
+  provider.softLink( linkPath, link2Path );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    relativeOriginalFile : 0,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, link2Path );
+  test.identical( got.relativePath, link2Path );
+  test.identical( got.absolutePath, link2Path );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    relativeOriginalFile : 1,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, link2Path );
+  test.identical( got.relativePath, link2Path );
+  test.identical( got.absolutePath, link2Path );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    relativeOriginalFile : 0,
+    preservingRelative : 1
+  })
+  test.identical( got.filePath, link2Path );
+  test.identical( got.relativePath, link2Path );
+  test.identical( got.absolutePath, link2Path );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    relativeOriginalFile : 1,
+    preservingRelative : 1
+  })
+  test.identical( got.filePath, link2Path );
+  test.identical( got.relativePath, link2Path );
+  test.identical( got.absolutePath, link2Path );
+
+  test.close( 'absolute soft links' );
+
+  /* */
+
+  test.open( 'absolute text links' );
+
+  provider.fieldPush( 'usingTextLink', 1 );
+
+  provider.filesDelete( routinePath );
+  provider.fileWrite( terminalPath,terminalPath );
+  provider.textLink( link2Path, terminalPath );
+  provider.textLink( linkPath, link2Path );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    relativeOriginalFile : 0,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, link2Path );
+  test.identical( got.relativePath, link2Path );
+  test.identical( got.absolutePath, link2Path );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    relativeOriginalFile : 1,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, link2Path );
+  test.identical( got.relativePath, link2Path );
+  test.identical( got.absolutePath, link2Path );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    relativeOriginalFile : 0,
+    preservingRelative : 1
+  })
+  test.identical( got.filePath, link2Path );
+  test.identical( got.relativePath, link2Path );
+  test.identical( got.absolutePath, link2Path );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    relativeOriginalFile : 1,
+    preservingRelative : 1
+  })
+  test.identical( got.filePath, link2Path );
+  test.identical( got.relativePath, link2Path );
+  test.identical( got.absolutePath, link2Path );
+
+  provider.fieldPop( 'usingTextLink', 1 );
+
+  test.close( 'absolute text links' );
+
+  /* */
+
+  test.open( 'relative soft links' );
+
+  provider.filesDelete( routinePath );
+  provider.fileWrite( terminalPath,terminalPath );
+  provider.softLink( link2Path, '../terminal' );
+  provider.softLink( linkPath, '../link2' );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    relativeOriginalFile : 0,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, link2Path );
+  test.identical( got.relativePath, link2Path );
+  test.identical( got.absolutePath, link2Path );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    relativeOriginalFile : 0,
+    preservingRelative : 1
+  })
+  test.identical( got.filePath, '../link2' );
+  test.identical( got.relativePath, '../link2' );
+  test.identical( got.absolutePath, link2Path );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    relativeOriginalFile : 1,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, link2Path );
+  test.identical( got.relativePath, link2Path );
+  test.identical( got.absolutePath, link2Path );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    relativeOriginalFile : 1,
+    preservingRelative : 1
+  })
+  test.identical( got.filePath, '../link2' );
+  test.identical( got.relativePath, '../link2' );
+  test.identical( got.absolutePath, link2Path );
+
+  test.close( 'relative soft links' );
+
+  /* */
+
+  test.open( 'relative text links' );
+
+  provider.fieldPush( 'usingTextLink', 1 );
+
+  provider.filesDelete( routinePath );
+  provider.fileWrite( terminalPath,terminalPath );
+  provider.textLink( link2Path, '../terminal' );
+  provider.textLink( linkPath, '../link2' );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    relativeOriginalFile : 0,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, link2Path );
+  test.identical( got.relativePath, link2Path );
+  test.identical( got.absolutePath, link2Path );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    relativeOriginalFile : 0,
+    preservingRelative : 1
+  })
+  test.identical( got.filePath, '../link2' );
+  test.identical( got.relativePath, '../link2' );
+  test.identical( got.absolutePath, link2Path );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    relativeOriginalFile : 1,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, link2Path );
+  test.identical( got.relativePath, link2Path );
+  test.identical( got.absolutePath, link2Path );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    relativeOriginalFile : 1,
+    preservingRelative : 1
+  })
+  test.identical( got.filePath, '../link2' );
+  test.identical( got.relativePath, '../link2' );
+  test.identical( got.absolutePath, link2Path );
+
+  provider.fieldPop( 'usingTextLink', 1 );
+
+  test.close( 'relative text links' );
+
+  /* */
+
+  test.open( 'absolute soft link to missing' );
+
+  provider.filesDelete( routinePath );
+  provider.dirMake( routinePath );
+  provider.softLink({ dstPath : linkPath, srcPath : terminalPath, allowingMissed : 1 });
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 0,
+    allowingMissed : 0,
+    allowingCycled : 0,
+    relativeOriginalFile : 0,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, null );
+  test.identical( got.relativePath, null );
+  test.identical( got.absolutePath, null );
+
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.pathResolveLinkStep
+    ({
+      filePath : linkPath,
+      resolvingSoftLink : 1,
+      resolvingTextLink : 1,
+      throwing : 1,
+      allowingMissed : 0,
+      allowingCycled : 0,
+      relativeOriginalFile : 0,
+      preservingRelative : 0
+    })
+  })
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 0,
+    allowingMissed : 1,
+    allowingCycled : 0,
+    relativeOriginalFile : 0,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, terminalPath );
+  test.identical( got.relativePath, terminalPath );
+  test.identical( got.absolutePath, terminalPath );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 0,
+    relativeOriginalFile : 0,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, terminalPath );
+  test.identical( got.relativePath, terminalPath );
+  test.identical( got.absolutePath, terminalPath );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 0,
+    relativeOriginalFile : 0,
+    preservingRelative : 1
+  })
+  test.identical( got.filePath, terminalPath );
+  test.identical( got.relativePath, terminalPath );
+  test.identical( got.absolutePath, terminalPath );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 0,
+    relativeOriginalFile : 1,
+    preservingRelative : 1
+  })
+  test.identical( got.filePath, terminalPath );
+  test.identical( got.relativePath, terminalPath );
+  test.identical( got.absolutePath, terminalPath );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 0,
+    relativeOriginalFile : 1,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, terminalPath );
+  test.identical( got.relativePath, terminalPath );
+  test.identical( got.absolutePath, terminalPath );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 0,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 0,
+    allowingCycled : 0,
+    relativeOriginalFile : 0,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, linkPath );
+  test.identical( got.relativePath, linkPath );
+  test.identical( got.absolutePath, linkPath );
+
+  test.close( 'absolute soft link to missing' );
+
+  /* */
+
+  test.open( 'absolute text link to missing' );
+
+  provider.filesDelete( routinePath );
+  provider.dirMake( routinePath );
+  provider.textLink({ dstPath : linkPath, srcPath : terminalPath, allowingMissed : 1 });
+
+  provider.fieldPush( 'usingTextLink', 1 );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 0,
+    allowingMissed : 0,
+    allowingCycled : 0,
+    relativeOriginalFile : 0,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, null );
+  test.identical( got.relativePath, null );
+  test.identical( got.absolutePath, null );
+
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.pathResolveLinkStep
+    ({
+      filePath : linkPath,
+      resolvingSoftLink : 1,
+      resolvingTextLink : 1,
+      throwing : 1,
+      allowingMissed : 0,
+      allowingCycled : 0,
+      relativeOriginalFile : 0,
+      preservingRelative : 0
+    })
+  })
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 0,
+    allowingMissed : 1,
+    allowingCycled : 0,
+    relativeOriginalFile : 0,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, terminalPath );
+  test.identical( got.relativePath, terminalPath );
+  test.identical( got.absolutePath, terminalPath );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 0,
+    relativeOriginalFile : 0,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, terminalPath );
+  test.identical( got.relativePath, terminalPath );
+  test.identical( got.absolutePath, terminalPath );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 0,
+    relativeOriginalFile : 0,
+    preservingRelative : 1
+  })
+  test.identical( got.filePath, terminalPath );
+  test.identical( got.relativePath, terminalPath );
+  test.identical( got.absolutePath, terminalPath );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 0,
+    relativeOriginalFile : 1,
+    preservingRelative : 1
+  })
+  test.identical( got.filePath, terminalPath );
+  test.identical( got.relativePath, terminalPath );
+  test.identical( got.absolutePath, terminalPath );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 0,
+    relativeOriginalFile : 1,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, terminalPath );
+  test.identical( got.relativePath, terminalPath );
+  test.identical( got.absolutePath, terminalPath );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 0,
+    throwing : 1,
+    allowingMissed : 0,
+    allowingCycled : 0,
+    relativeOriginalFile : 0,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, linkPath );
+  test.identical( got.relativePath, linkPath );
+  test.identical( got.absolutePath, linkPath );
+
+  provider.fieldPop( 'usingTextLink', 1 );
+
+  test.close( 'absolute text link to missing' );
+
+  /* */
+
+  test.open( 'relative soft link to missing' );
+
+  provider.filesDelete( routinePath );
+  provider.dirMake( routinePath );
+  provider.softLink({ dstPath : linkPath, srcPath : '../terminal', allowingMissed : 1 });
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 0,
+    allowingMissed : 0,
+    allowingCycled : 0,
+    relativeOriginalFile : 0,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, null );
+  test.identical( got.relativePath, null );
+  test.identical( got.absolutePath, null );
+
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.pathResolveLinkStep
+    ({
+      filePath : linkPath,
+      resolvingSoftLink : 1,
+      resolvingTextLink : 1,
+      throwing : 1,
+      allowingMissed : 0,
+      allowingCycled : 0,
+      relativeOriginalFile : 0,
+      preservingRelative : 0
+    })
+  })
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 0,
+    allowingMissed : 1,
+    allowingCycled : 0,
+    relativeOriginalFile : 0,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, terminalPath );
+  test.identical( got.relativePath, terminalPath );
+  test.identical( got.absolutePath, terminalPath );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 0,
+    relativeOriginalFile : 0,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, terminalPath );
+  test.identical( got.relativePath, terminalPath );
+  test.identical( got.absolutePath, terminalPath );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 0,
+    relativeOriginalFile : 0,
+    preservingRelative : 1
+  })
+  test.identical( got.filePath, '../terminal' );
+  test.identical( got.relativePath, '../terminal' );
+  test.identical( got.absolutePath, terminalPath );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 0,
+    relativeOriginalFile : 1,
+    preservingRelative : 1
+  })
+  test.identical( got.filePath, '../terminal' );
+  test.identical( got.relativePath, '../terminal' );
+  test.identical( got.absolutePath, terminalPath );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 0,
+    relativeOriginalFile : 1,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, terminalPath );
+  test.identical( got.relativePath, terminalPath );
+  test.identical( got.absolutePath, terminalPath );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 0,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 0,
+    allowingCycled : 0,
+    relativeOriginalFile : 0,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, linkPath );
+  test.identical( got.relativePath, linkPath );
+  test.identical( got.absolutePath, linkPath );
+
+  test.close( 'relative soft link to missing' );
+
+  /* */
+
+  test.open( 'relative text link to missing' );
+
+  provider.filesDelete( routinePath );
+  provider.dirMake( routinePath );
+  provider.textLink({ dstPath : linkPath, srcPath : '../terminal', allowingMissed : 1 });
+
+  provider.fieldPush( 'usingTextLink', 1 )
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 0,
+    allowingMissed : 0,
+    allowingCycled : 0,
+    relativeOriginalFile : 0,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, null );
+  test.identical( got.relativePath, null );
+  test.identical( got.absolutePath, null );
+
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.pathResolveLinkStep
+    ({
+      filePath : linkPath,
+      resolvingSoftLink : 1,
+      resolvingTextLink : 1,
+      throwing : 1,
+      allowingMissed : 0,
+      allowingCycled : 0,
+      relativeOriginalFile : 0,
+      preservingRelative : 0
+    })
+  })
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 0,
+    allowingMissed : 1,
+    allowingCycled : 0,
+    relativeOriginalFile : 0,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, terminalPath );
+  test.identical( got.relativePath, terminalPath );
+  test.identical( got.absolutePath, terminalPath );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 0,
+    relativeOriginalFile : 0,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, terminalPath );
+  test.identical( got.relativePath, terminalPath );
+  test.identical( got.absolutePath, terminalPath );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 0,
+    relativeOriginalFile : 0,
+    preservingRelative : 1
+  })
+  test.identical( got.filePath, '../terminal' );
+  test.identical( got.relativePath, '../terminal' );
+  test.identical( got.absolutePath, terminalPath );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 0,
+    relativeOriginalFile : 1,
+    preservingRelative : 1
+  })
+  test.identical( got.filePath, '../terminal' );
+  test.identical( got.relativePath, '../terminal' );
+  test.identical( got.absolutePath, terminalPath );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 0,
+    relativeOriginalFile : 1,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, terminalPath );
+  test.identical( got.relativePath, terminalPath );
+  test.identical( got.absolutePath, terminalPath );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 0,
+    throwing : 1,
+    allowingMissed : 0,
+    allowingCycled : 0,
+    relativeOriginalFile : 0,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, linkPath );
+  test.identical( got.relativePath, linkPath );
+  test.identical( got.absolutePath, linkPath );
+
+  provider.fieldPop( 'usingTextLink', 1 )
+
+  test.close( 'relative text link to missing' );
+
+  /* */
+
+  test.open( 'self cycled soft link' );
+
+  provider.filesDelete( routinePath );
+  provider.dirMake( routinePath );
+  provider.softLink({ dstPath : linkPath, srcPath : '../link', allowingMissed : 1, allowingCycled : 1 });
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 0,
+    allowingMissed : 0,
+    allowingCycled : 0,
+    relativeOriginalFile : 0,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, null );
+  test.identical( got.relativePath, null );
+  test.identical( got.absolutePath, null );
+
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.pathResolveLinkStep
+    ({
+      filePath : linkPath,
+      resolvingSoftLink : 1,
+      resolvingTextLink : 1,
+      throwing : 1,
+      allowingMissed : 0,
+      allowingCycled : 0,
+      relativeOriginalFile : 0,
+      preservingRelative : 0
+    })
+  })
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 0,
+    allowingMissed : 0,
+    allowingCycled : 1,
+    relativeOriginalFile : 0,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, linkPath );
+  test.identical( got.relativePath, linkPath );
+  test.identical( got.absolutePath, linkPath );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 0,
+    allowingCycled : 1,
+    relativeOriginalFile : 0,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, linkPath );
+  test.identical( got.relativePath, linkPath );
+  test.identical( got.absolutePath, linkPath );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 0,
+    allowingCycled : 1,
+    relativeOriginalFile : 0,
+    preservingRelative : 1
+  })
+  test.identical( got.filePath, linkPath );
+  test.identical( got.relativePath, linkPath );
+  test.identical( got.absolutePath, linkPath );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 0,
+    allowingCycled : 1,
+    relativeOriginalFile : 1,
+    preservingRelative : 1
+  })
+  test.identical( got.filePath, linkPath );
+  test.identical( got.relativePath, linkPath );
+  test.identical( got.absolutePath, linkPath );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 0,
+    allowingCycled : 1,
+    relativeOriginalFile : 1,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, linkPath );
+  test.identical( got.relativePath, linkPath );
+  test.identical( got.absolutePath, linkPath );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 0,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 0,
+    allowingCycled : 0,
+    relativeOriginalFile : 0,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, linkPath );
+  test.identical( got.relativePath, linkPath );
+  test.identical( got.absolutePath, linkPath );
+
+  test.close( 'self cycled soft link' );
+
+  /* */
+
+  test.open( 'self cycled text link' );
+
+  provider.filesDelete( routinePath );
+  provider.dirMake( routinePath );
+  provider.textLink({ dstPath : linkPath, srcPath : '../link', allowingMissed : 1, allowingCycled : 1 });
+
+  provider.fieldPush( 'usingTextLink', 1 );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 0,
+    allowingMissed : 0,
+    allowingCycled : 0,
+    relativeOriginalFile : 0,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, null );
+  test.identical( got.relativePath, null );
+  test.identical( got.absolutePath, null );
+
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.pathResolveLinkStep
+    ({
+      filePath : linkPath,
+      resolvingSoftLink : 1,
+      resolvingTextLink : 1,
+      throwing : 1,
+      allowingMissed : 0,
+      allowingCycled : 0,
+      relativeOriginalFile : 0,
+      preservingRelative : 0
+    })
+  })
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 0,
+    allowingMissed : 0,
+    allowingCycled : 1,
+    relativeOriginalFile : 0,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, linkPath );
+  test.identical( got.relativePath, linkPath );
+  test.identical( got.absolutePath, linkPath );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 0,
+    allowingCycled : 1,
+    relativeOriginalFile : 0,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, linkPath );
+  test.identical( got.relativePath, linkPath );
+  test.identical( got.absolutePath, linkPath );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 0,
+    allowingCycled : 1,
+    relativeOriginalFile : 0,
+    preservingRelative : 1
+  })
+  test.identical( got.filePath, linkPath );
+  test.identical( got.relativePath, linkPath );
+  test.identical( got.absolutePath, linkPath );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 0,
+    allowingCycled : 1,
+    relativeOriginalFile : 1,
+    preservingRelative : 1
+  })
+  test.identical( got.filePath, linkPath );
+  test.identical( got.relativePath, linkPath );
+  test.identical( got.absolutePath, linkPath );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 0,
+    allowingCycled : 1,
+    relativeOriginalFile : 1,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, linkPath );
+  test.identical( got.relativePath, linkPath );
+  test.identical( got.absolutePath, linkPath );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 0,
+    throwing : 1,
+    allowingMissed : 0,
+    allowingCycled : 0,
+    relativeOriginalFile : 0,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, linkPath );
+  test.identical( got.relativePath, linkPath );
+  test.identical( got.absolutePath, linkPath );
+
+  provider.fieldPop( 'usingTextLink', 1 );
+
+  test.close( 'self cycled text link' );
+
+  /* */
+
+  test.open( 'cycled in chain of soft links' );
+
+  provider.filesDelete( routinePath );
+  provider.dirMake( routinePath );
+  provider.softLink({ dstPath : linkPath, srcPath : '../link2', allowingMissed : 1 });
+  provider.softLink({ dstPath : link2Path, srcPath : '../link', allowingMissed : 1, allowingCycled : 1 });
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 0,
+    allowingMissed : 0,
+    allowingCycled : 0,
+    relativeOriginalFile : 0,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, link2Path );
+  test.identical( got.relativePath, link2Path );
+  test.identical( got.absolutePath, link2Path );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 0,
+    allowingCycled : 0,
+    relativeOriginalFile : 0,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, link2Path );
+  test.identical( got.relativePath, link2Path );
+  test.identical( got.absolutePath, link2Path );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 0,
+    allowingMissed : 0,
+    allowingCycled : 1,
+    relativeOriginalFile : 0,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, link2Path );
+  test.identical( got.relativePath, link2Path );
+  test.identical( got.absolutePath, link2Path );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 0,
+    allowingCycled : 1,
+    relativeOriginalFile : 0,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, link2Path );
+  test.identical( got.relativePath, link2Path );
+  test.identical( got.absolutePath, link2Path );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 0,
+    allowingCycled : 1,
+    relativeOriginalFile : 0,
+    preservingRelative : 1
+  })
+  test.identical( got.filePath, '../link2' );
+  test.identical( got.relativePath, '../link2' );
+  test.identical( got.absolutePath, link2Path );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 0,
+    allowingCycled : 1,
+    relativeOriginalFile : 1,
+    preservingRelative : 1
+  })
+  test.identical( got.filePath, '../link2' );
+  test.identical( got.relativePath, '../link2' );
+  test.identical( got.absolutePath, link2Path );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 0,
+    allowingCycled : 1,
+    relativeOriginalFile : 1,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, link2Path );
+  test.identical( got.relativePath, link2Path );
+  test.identical( got.absolutePath, link2Path );
+
+  var got = provider.pathResolveLinkStep
+  ({
+    filePath : linkPath,
+    resolvingSoftLink : 0,
+    resolvingTextLink : 1,
+    throwing : 1,
+    allowingMissed : 0,
+    allowingCycled : 0,
+    relativeOriginalFile : 0,
+    preservingRelative : 0
+  })
+  test.identical( got.filePath, linkPath );
+  test.identical( got.relativePath, linkPath );
+  test.identical( got.absolutePath, linkPath );
+
+  test.close( 'cycled in chain of soft links' );
+
+}
+
+//
+
 function pathNativize( t )
 {
   let self = this;
@@ -43243,6 +44474,7 @@ var Self =
     pathResolveTextLinkExtended,
     pathResolveLinkFullSpecial,
     pathResolveLinkFullResult,
+    pathResolveLinkStep,
 
     pathNativize,
 

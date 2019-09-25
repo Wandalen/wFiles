@@ -1288,7 +1288,6 @@ _.routineExtend( dirMakeAct, Parent.prototype.dirMakeAct );
 //
 
 let lockFileCounterMap = Object.create( null );
-// let lockFileFdMap = Object.create( null );
 
 function fileLockAct( o )
 {
@@ -1304,8 +1303,6 @@ function fileLockAct( o )
   {
     if( lockFileCounterMap[ o.filePath ] )
     {
-      // _.assert( lockFileFdMap[ o.filePath ] );
-
       if( !o.sharing )
       throw _.err( 'File', fileNativePath, 'is already locked by current process' );
 
@@ -1328,40 +1325,11 @@ function fileLockAct( o )
 
     if( o.sync )
     {
-      // let fd = File.openSync( fileNativePath, 'r');
-      // try
-      // {
-      //   FsExt.flockSync( fd, 'sh' );
-      //   return fd;
-      // }
-      // catch( err )
-      // {
-      //   File.closeSync( fd );
-      //   throw err;
-      // }
-
       LockFile.lockSync( fileNativePath,lockOptions );
       return true;
     }
     else
     {
-      // let locked = new _.Consequence();
-      // File.open( fileNativePath, 'r', locked.tolerantCallback() );
-
-      // locked.thenGive( ( fd ) => FsExt.flock( fd, 'ex', ( err ) =>
-      // {
-      //   if( err )
-      //   {
-      //     File.close( fd );
-      //     locked.error( err );
-      //   }
-      //   else
-      //   {
-      //     locked.take( fd )
-      //   }
-      // }))
-
-      // return locked;
       return _.Consequence.From( LockFile.lock( fileNativePath, lockOptions ) )
     }
   })
@@ -1372,9 +1340,6 @@ function fileLockAct( o )
     lockFileCounterMap[ o.filePath ] = 0;
 
     lockFileCounterMap[ o.filePath ] += 1;
-
-    // if( lockFileFdMap[ o.filePath ] === undefined )
-    // lockFileFdMap[ o.filePath ] = fd;
 
     return true;
   })
@@ -1413,35 +1378,13 @@ function fileUnlockAct( o )
       return true;
     }
 
-    // let fd = lockFileFdMap[ o.filePath ];
-
     if( o.sync )
     {
-      // FsExt.flockSync( fd, 'un' );
-      // File.closeSync( fd );
       LockFile.unlockSync( fileNativePath );
       return true;
     }
     else
     {
-      // let unlocked = new _.Consequence();
-
-      // FsExt.flock( fd, 'un', ( err ) =>
-      // {
-      //   if( err )
-      //   return unlocked.error( err );
-
-      //   File.close( fd, ( closeErr ) =>
-      //   {
-      //     if( closeErr )
-      //     unlocked.error( closeErr );
-      //     else
-      //     unlocked.take( true );
-      //   });
-      // })
-
-      // return unlocked;
-
       return _.Consequence.From( LockFile.unlock( fileNativePath ) )
     }
 
@@ -1452,7 +1395,6 @@ function fileUnlockAct( o )
     if( lockFileCounterMap[ o.filePath ] === 0 )
     {
       delete lockFileCounterMap[ o.filePath ];
-      // delete lockFileFdMap[ o.filePath ];
     }
 
     return true;
@@ -1478,69 +1420,12 @@ function fileIsLockedAct( o )
 
   let con = _.Consequence.Try( () =>
   {
-    // if( lockFileFdMap[ o.filePath ] !== undefined )
-    // return true;
-
     if( o.sync )
     {
-      // let fd = File.openSync( fileNativePath, 'r' );
-      // try
-      // {
-      //   FsExt.flockSync( fd, 'exnb' );
-      //   FsExt.flockSync( fd, 'un' );
-      //   return false;
-      // }
-      // catch( err )
-      // {
-      //   return true;
-      // }
-      // finally
-      // {
-      //   File.closeSync( fd );
-      // }
-
       return LockFile.checkSync( fileNativePath );
     }
     else
     {
-      // let isLocked = new _.Consequence();
-      // let fd;
-
-      // File.open( fileNativePath, 'r', isLocked.tolerantCallback() );
-
-      // isLocked.thenGive( ( got ) =>
-      // {
-      //   fd = got;
-      //   FsExt.flock( fd, 'exnb', ( err ) =>
-      //   {
-      //     if( err )
-      //     return isLocked.take( true );
-
-      //     FsExt.flock( fd, 'un', ( err ) =>
-      //     {
-      //       if( err )
-      //       return isLocked.error( err );
-      //       else
-      //       isLocked.take( false );
-      //     })
-      //   })
-      // })
-
-      // isLocked.finallyGive( ( err, got ) =>
-      // {
-      //   if( fd === undefined )
-      //   return isLocked.take( err, got );
-
-      //   File.close( fd, ( closeErr ) =>
-      //   {
-      //     if( closeErr )
-      //     isLocked.error( closeErr );
-      //     else
-      //     isLocked.take( err, got );
-      //   })
-      // })
-
-      // return isLocked;
       return _.Consequence.From( LockFile.check( fileNativePath ) )
     }
   })

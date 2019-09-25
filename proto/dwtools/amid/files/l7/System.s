@@ -1237,6 +1237,12 @@ let FilteredRoutines =
   fileDeleteAct : Routines.fileDeleteAct,
   dirMakeAct : Routines.dirMakeAct,
 
+  // lock
+
+  fileLockAct : Routines.fileLockAct,
+  fileUnlockAct : Routines.fileUnlockAct,
+  fileIsLockedAct : Routines.fileIsLockedAct,
+
   // link
 
   hardLinkBreakAct : Routines.hardLinkBreakAct,

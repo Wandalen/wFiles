@@ -5576,6 +5576,156 @@ let dirMakeForFile = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefa
 dirMakeForFile.having.aspect = 'entry';
 
 // --
+// locking
+// --
+
+let fileLockDefaults = Object.create( null );
+fileLockDefaults.filePath = null
+fileLockDefaults.sync = 1
+fileLockDefaults.throwing = 1
+fileLockDefaults.timeOut = 5000
+fileLockDefaults.id = null
+
+//
+
+let fileLockAct = Object.create( null );
+fileLockAct.name = 'fileLockAct';
+
+var defaults = fileLockAct.defaults = Object.create( fileLockDefaults );
+defaults.locking = 0;
+defaults.sharing = 'process' // 0, 'process', 'group'
+defaults.waiting = 0;
+
+var having = fileLockAct.having = Object.create( null );
+having.writing = 1;
+having.reading = 0;
+having.driving = 1;
+
+var operates = fileLockAct.operates = Object.create( null );
+operates.filePath = { pathToWrite : 1 }
+
+//
+
+function fileLock_body( o )
+{
+  let self = this;
+
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( _.numberIs( o.timeOut ) );
+
+  // let timer = _.timeOutError( o.timeOut );
+  let con = self.fileLockAct( o );
+
+  // con.orKeepingSplit( timer );
+
+  return con;
+}
+
+_.routineExtend( fileLock_body, fileLockAct );
+
+var having = fileLock_body.having;
+having.driving = 0;
+having.aspect = 'body';
+
+//
+
+let fileLock = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, fileLock_body );
+dirMakeForFile.having.aspect = 'entry';
+
+//
+
+let fileUnlockAct = Object.create( null );
+fileUnlockAct.name = 'fileUnlockAct';
+
+var defaults = fileUnlockAct.defaults = Object.create( fileLockDefaults );
+
+var having = fileUnlockAct.having = Object.create( null );
+having.writing = 1;
+having.reading = 0;
+having.driving = 1;
+
+var operates = fileUnlockAct.operates = Object.create( null );
+operates.filePath = { pathToWrite : 1 }
+
+//
+
+function fileUnlock_body( o )
+{
+  let self = this;
+
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( _.numberIs( o.timeOut ) );
+
+  debugger
+
+  if( !self.fileExists( o.filePath ) )
+  throw _.err( '{ o.filePath } ', o.srcPath, ' doesn\'t exist.' );
+
+  // let timer = _.timeOutError( o.timeOut );
+  let con = self.fileUnlockAct( o );
+
+  // con.orKeepingSplit( timer );
+
+  return con;
+}
+
+_.routineExtend( fileUnlock_body, fileUnlockAct );
+
+var having = fileUnlock_body.having;
+having.driving = 0;
+having.aspect = 'body';
+
+//
+
+let fileUnlock = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, fileUnlock_body );
+dirMakeForFile.having.aspect = 'entry';
+
+//
+
+let fileIsLockedAct = Object.create( null );
+fileUnlockAct.name = 'fileUnlockAct';
+
+var defaults = fileIsLockedAct.defaults = Object.create( fileLockDefaults );
+
+var having = fileIsLockedAct.having = Object.create( null );
+having.writing = 1;
+having.reading = 0;
+having.driving = 1;
+
+var operates = fileIsLockedAct.operates = Object.create( null );
+operates.filePath = { pathToWrite : 1 }
+
+//
+
+function fileIsLocked_body( o )
+{
+  let self = this;
+
+  _.assert( arguments.length === 1, 'Expects single argument' );
+
+  if( !self.fileExists( o.filePath ) )
+  throw _.err( '{ o.filePath } ', o.srcPath, ' doesn\'t exist.' );
+
+  // let timer = _.timeOutError( o.timeOut );
+  let con = self.fileIsLockedAct( o );
+
+  // con.orKeepingSplit( timer );
+
+  return con;
+}
+
+_.routineExtend( fileIsLocked_body, fileIsLockedAct );
+
+var having = fileIsLocked_body.having;
+having.driving = 0;
+having.aspect = 'body';
+
+//
+
+let fileIsLocked = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, fileIsLocked_body );
+dirMakeForFile.having.aspect = 'entry';
+
+// --
 // linking
 // --
 
@@ -8930,6 +9080,15 @@ let Proto =
   dirMakeAct,
   dirMake,
   dirMakeForFile,
+
+  fileLockAct,
+  fileLock,
+
+  fileUnlockAct,
+  fileUnlock,
+
+  fileIsLockedAct,
+  fileIsLocked,
 
   // linking
 

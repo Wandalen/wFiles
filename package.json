@@ -59,7 +59,8 @@
     "wLogger": "",
     "ini": "",
     "tar": "",
-    "gitconfiglocal" : ""
+    "gitconfiglocal" : "",
+    "fs-ext" : ""
   },
   "devDependencies": {
     "wait-sync": "",

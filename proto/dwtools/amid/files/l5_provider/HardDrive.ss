@@ -2,7 +2,7 @@
 
 'use strict';
 
-let File, StandardFile, Os;
+let File, StandardFile, Os, FsExt;
 
 if( typeof module !== 'undefined' )
 {
@@ -15,6 +15,8 @@ if( typeof module !== 'undefined' )
   File = require( 'fs' );
   StandardFile = require( 'fs' );
   Os = require( 'os' );
+
+  FsExt = require( 'fs-ext' )
 
 }
 
@@ -1285,6 +1287,263 @@ _.routineExtend( dirMakeAct, Parent.prototype.dirMakeAct );
 
 //
 
+let lockFileCounterMap = Object.create( null );
+let lockFileFdMap = Object.create( null );
+
+function fileLockAct( o )
+{
+  let self = this;
+  let fileNativePath = self.path.nativize( o.filePath );
+
+  _.assert( !o.locking, 'not implemented' );
+  _.assert( !o.sharing || o.sharing === 'process', 'not implemented' );
+  _.assert( self.path.isNormalized( o.filePath ) );
+  _.assertRoutineOptions( fileLockAct, arguments );
+
+  let con = _.Consequence.Try( () =>
+  {
+    if( lockFileCounterMap[ o.filePath ] )
+    {
+      _.assert( lockFileFdMap[ o.filePath ] );
+
+      if( !o.sharing )
+      throw _.err( 'File', fileNativePath, 'is already locked by current process' );
+
+      if( !o.waiting )
+      {
+        lockFileCounterMap[ o.filePath ] += 1;
+        return true;
+      }
+      else if( o.sync )
+      {
+        throw _.err
+        ( 'File', fileNativePath, 'is already locked by current process.',
+          'With option {-o.waiting-} enabled, lock will be waiting for itself.',
+          'Please use existing lock or execute method with {-o.sync-} set to 0.'
+        )
+      }
+    }
+
+    if( o.sync )
+    {
+      let fd = File.openSync( fileNativePath, 'r' );
+      try
+      {
+        FsExt.flockSync( fd, 'ex' );
+        return fd;
+      }
+      catch( err )
+      {
+        File.closeSync( fd );
+        throw err;
+      }
+    }
+    else
+    {
+      let locked = new _.Consequence();
+      File.open( fileNativePath, 'r', locked.tolerantCallback() );
+
+      locked.thenGive( ( fd ) => FsExt.flock( fd, 'ex', ( err ) =>
+      {
+        if( err )
+        {
+          File.close( fd );
+          locked.error( err );
+        }
+        else
+        {
+          locked.take( fd )
+        }
+      }))
+
+      return locked;
+    }
+  })
+
+  con.then( ( fd ) =>
+  {
+    if( lockFileCounterMap[ o.filePath ] === undefined )
+    lockFileCounterMap[ o.filePath ] = 0;
+
+    lockFileCounterMap[ o.filePath ] += 1;
+
+    if( lockFileFdMap[ o.filePath ] === undefined )
+    lockFileFdMap[ o.filePath ] = fd;
+
+    return true;
+  })
+
+  if( o.sync )
+  return con.syncMaybe();
+
+  return con;
+}
+
+_.routineExtend( fileLockAct, Parent.prototype.fileLockAct );
+
+//
+
+function fileUnlockAct( o )
+{
+  let self = this;
+
+  _.assert( self.path.isNormalized( o.filePath ) );
+  _.assertRoutineOptions( fileUnlockAct, arguments );
+
+  let con = _.Consequence.Try( () =>
+  {
+    if( lockFileFdMap[ o.filePath ] === undefined )
+    {
+      _.assert( !lockFileCounterMap[ o.filePath ] );
+      return true;
+    }
+    else
+    {
+      _.assert( lockFileCounterMap[ o.filePath ] > 0 );
+
+      lockFileCounterMap[ o.filePath ] -= 1;
+
+      if( lockFileCounterMap[ o.filePath ] > 0 )
+      return true;
+    }
+
+    let fd = lockFileFdMap[ o.filePath ];
+
+    if( o.sync )
+    {
+      FsExt.flockSync( fd, 'un' );
+      File.closeSync( fd );
+      return true;
+    }
+    else
+    {
+      let unlocked = new _.Consequence();
+
+      FsExt.flock( fd, 'un', ( err ) =>
+      {
+        if( err )
+        return unlocked.error( err );
+
+        File.close( fd, ( closeErr ) =>
+        {
+          if( closeErr )
+          unlocked.error( closeErr );
+          else
+          unlocked.take( true );
+        });
+      })
+
+      return unlocked;
+    }
+
+  })
+
+  con.then( ( got ) =>
+  {
+    if( lockFileCounterMap[ o.filePath ] === 0 )
+    {
+      delete lockFileCounterMap[ o.filePath ];
+      delete lockFileFdMap[ o.filePath ];
+    }
+
+    return got;
+  })
+
+  if( o.sync )
+  return con.syncMaybe();
+
+  return con;
+}
+
+_.routineExtend( fileUnlockAct, Parent.prototype.fileUnlockAct );
+
+//
+
+function fileIsLockedAct( o )
+{
+  let self = this;
+  let fileNativePath = self.path.nativize( o.filePath );
+
+  _.assertRoutineOptions( fileIsLockedAct, arguments );
+  _.assert( self.path.isNormalized( o.filePath ) );
+
+  let con = _.Consequence.Try( () =>
+  {
+    if( lockFileFdMap[ o.filePath ] !== undefined )
+    return true;
+
+    if( o.sync )
+    {
+      let fd = File.openSync( fileNativePath, 'r' );
+      try
+      {
+        FsExt.flockSync( fd, 'exnb' );
+        FsExt.flockSync( fd, 'un' );
+        return false;
+      }
+      catch( err )
+      {
+        return true;
+      }
+      finally
+      {
+        File.closeSync( fd );
+      }
+    }
+    else
+    {
+      let isLocked = new _.Consequence();
+      let fd;
+
+      File.open( fileNativePath, 'r', isLocked.tolerantCallback() );
+
+      isLocked.thenGive( ( got ) =>
+      {
+        fd = got;
+        FsExt.flock( fd, 'exnb', ( err ) =>
+        {
+          if( err )
+          return isLocked.take( true );
+
+          FsExt.flock( fd, 'un', ( err ) =>
+          {
+            if( err )
+            return isLocked.error( err );
+            else
+            isLocked.take( false );
+          })
+        })
+      })
+
+      isLocked.finallyGive( ( err, got ) =>
+      {
+        if( fd === undefined )
+        return isLocked.take( err, got );
+
+        File.close( fd, ( closeErr ) =>
+        {
+          if( closeErr )
+          isLocked.error( closeErr );
+          else
+          isLocked.take( err, got );
+        })
+      })
+
+      return isLocked;
+    }
+  })
+
+  if( o.sync )
+  return con.syncMaybe();
+
+  return con;
+}
+
+_.routineExtend( fileIsLockedAct, Parent.prototype.fileIsLockedAct );
+
+
+//
+
 function fileRenameAct( o )
 {
   let self = this;
@@ -1884,6 +2143,12 @@ let Extend =
   fileTimeSetAct,
   fileDeleteAct,
   dirMakeAct,
+
+  // locking
+
+  fileLockAct,
+  fileUnlockAct,
+  fileIsLockedAct,
 
   // linking
 

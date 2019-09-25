@@ -5613,12 +5613,7 @@ function fileLock_body( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.numberIs( o.timeOut ) );
 
-  // let timer = _.timeOutError( o.timeOut );
-  let con = self.fileLockAct( o );
-
-  // con.orKeepingSplit( timer );
-
-  return con;
+  return self.fileLockAct( o );
 }
 
 _.routineExtend( fileLock_body, fileLockAct );
@@ -5656,17 +5651,7 @@ function fileUnlock_body( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.numberIs( o.timeOut ) );
 
-  debugger
-
-  if( !self.fileExists( o.filePath ) )
-  throw _.err( '{ o.filePath } ', o.srcPath, ' doesn\'t exist.' );
-
-  // let timer = _.timeOutError( o.timeOut );
-  let con = self.fileUnlockAct( o );
-
-  // con.orKeepingSplit( timer );
-
-  return con;
+  return self.fileUnlockAct( o );
 }
 
 _.routineExtend( fileUnlock_body, fileUnlockAct );
@@ -5703,14 +5688,7 @@ function fileIsLocked_body( o )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  if( !self.fileExists( o.filePath ) )
-  throw _.err( '{ o.filePath } ', o.srcPath, ' doesn\'t exist.' );
-
-  // let timer = _.timeOutError( o.timeOut );
   let con = self.fileIsLockedAct( o );
-
-  // con.orKeepingSplit( timer );
-
   return con;
 }
 

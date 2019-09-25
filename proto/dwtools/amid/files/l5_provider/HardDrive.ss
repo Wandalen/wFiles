@@ -1297,6 +1297,7 @@ function fileLockAct( o )
   _.assert( !o.locking, 'not implemented' );
   _.assert( !o.sharing || o.sharing === 'process', 'not implemented' );
   _.assert( self.path.isNormalized( o.filePath ) );
+  _.assert( !o.waiting || o.timeOut >= 1000 );
   _.assertRoutineOptions( fileLockAct, arguments );
 
   let con = _.Consequence.Try( () =>
@@ -1321,27 +1322,34 @@ function fileLockAct( o )
       }
     }
 
-    let lockOptions = {};
+    let lockOptions = Object.create( null );
 
     if( o.sync )
     {
-      LockFile.lockSync( fileNativePath,lockOptions );
+      LockFile.lockSync( fileNativePath, lockOptions );
       return true;
     }
     else
     {
+      if( o.waiting )
+      lockOptions.retries =
+      {
+        retries : o.timeOut / 1000,
+        minTimeout : 1000,
+        maxRetryTime : o.timeOut
+      }
       return _.Consequence.From( LockFile.lock( fileNativePath, lockOptions ) )
     }
   })
 
-  con.then( ( fd ) =>
+  con.then( ( got ) =>
   {
     if( lockFileCounterMap[ o.filePath ] === undefined )
     lockFileCounterMap[ o.filePath ] = 0;
 
     lockFileCounterMap[ o.filePath ] += 1;
 
-    return true;
+    return got;
   })
 
   if( o.sync )

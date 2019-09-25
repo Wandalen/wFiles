@@ -60,7 +60,7 @@
     "ini": "",
     "tar": "",
     "gitconfiglocal" : "",
-    "fs-ext" : ""
+    "proper-lockfile" : ""
   },
   "devDependencies": {
     "wait-sync": "",

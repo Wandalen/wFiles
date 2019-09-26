@@ -5613,7 +5613,22 @@ function fileLock_body( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.numberIs( o.timeOut ) );
 
-  return self.fileLockAct( o );
+  let con = _.Consequence().Try( () => self.fileLockAct( o ) );
+
+  con.finally( ( err, got ) =>
+  {
+    if( !err )
+    return got;
+
+    if( o.throwing )
+    throw err;
+    return null;
+  })
+
+  if( o.sync )
+  return con.syncMaybe();
+
+  return con;
 }
 
 _.routineExtend( fileLock_body, fileLockAct );
@@ -5651,7 +5666,22 @@ function fileUnlock_body( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.numberIs( o.timeOut ) );
 
-  return self.fileUnlockAct( o );
+  let con = _.Consequence().Try( () => self.fileUnlockAct( o ) );
+
+  con.finally( ( err, got ) =>
+  {
+    if( !err )
+    return got;
+
+    if( o.throwing )
+    throw err;
+    return null;
+  })
+
+  if( o.sync )
+  return con.syncMaybe();
+
+  return con;
 }
 
 _.routineExtend( fileUnlock_body, fileUnlockAct );
@@ -5688,7 +5718,21 @@ function fileIsLocked_body( o )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  let con = self.fileIsLockedAct( o );
+  let con = _.Consequence().Try( () => self.fileIsLocked( o ) );
+
+  con.finally( ( err, got ) =>
+  {
+    if( !err )
+    return got;
+
+    if( o.throwing )
+    throw err;
+    return null;
+  })
+
+  if( o.sync )
+  return con.syncMaybe();
+
   return con;
 }
 

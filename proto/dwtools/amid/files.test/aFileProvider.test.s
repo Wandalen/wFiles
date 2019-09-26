@@ -14625,6 +14625,1421 @@ function statResolvedReadSync( test )
   });
 }
 
+function fileLockWaitingSharingSync( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let path = provider.path;
+
+  if( !_.routineIs( provider.fileLockAct ) )
+  {
+    test.identical( 1,1 );
+    return;
+  }
+
+  let routinePath = test.context.pathFor( 'written/fileLockWaitingSharingSync' );
+  let filePath = path.join( routinePath, 'terminal' );
+
+  /* */
+
+  test.case = 'trivial'
+  provider.filesDelete( routinePath )
+  provider.fileWrite( filePath, filePath )
+  var got = provider.fileLock
+  ({
+    filePath,
+    sync : 1,
+    throwing : 1,
+    timeOut : 5000,
+    sharing : 'process',
+    waiting : 1
+  });
+  test.identical( got, true );
+  test.is( provider.fileIsLocked( filePath ) );
+  provider.fileUnlock( filePath );
+  test.is( !provider.fileIsLocked( filePath ) );
+
+  //
+
+  test.case = 'fileFile is missing'
+  provider.filesDelete( routinePath );
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.fileLock
+    ({
+      filePath,
+      sync : 1,
+      throwing : 1,
+      timeOut : 5000,
+      sharing : 'process',
+      waiting : 1
+    });
+  });
+
+  //
+
+  test.case = 'fileFile is missing, throwing off'
+  provider.filesDelete( routinePath );
+  var got = provider.fileLock
+  ({
+    filePath,
+    sync : 1,
+    throwing : 0,
+    timeOut : 5000,
+    sharing : 'process',
+    waiting : 1
+  });
+  test.identical( got, null );
+
+  //
+
+  test.case = 'try to lock file for second time';
+  provider.filesDelete( routinePath )
+  provider.fileWrite( filePath, filePath )
+  var got = provider.fileLock
+  ({
+    filePath,
+    sync : 1,
+    throwing : 1,
+    timeOut : 5000,
+    sharing : 'process',
+    waiting : 1
+  });
+  test.identical( got, true );
+  test.is( provider.fileIsLocked( filePath ) );
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.fileLock
+    ({
+      filePath,
+      sync : 1,
+      throwing : 1,
+      timeOut : 5000,
+      sharing : 'process',
+      waiting : 1
+    });
+  })
+  test.is( provider.fileIsLocked( filePath ) );
+  provider.fileUnlock( filePath );
+  test.is( !provider.fileIsLocked( filePath ) );
+
+
+  //
+
+  test.case = 'try to lock file for second time, throwing off';
+  provider.filesDelete( routinePath )
+  provider.fileWrite( filePath, filePath )
+  var got = provider.fileLock
+  ({
+    filePath,
+    sync : 1,
+    throwing : 0,
+    timeOut : 5000,
+    sharing : 'process',
+    waiting : 1
+  });
+  test.identical( got, true );
+  test.is( provider.fileIsLocked( filePath ) );
+  var got = provider.fileLock
+  ({
+    filePath,
+    sync : 1,
+    throwing : 0,
+    timeOut : 5000,
+    sharing : 'process',
+    waiting : 1
+  });
+  test.identical( got, null );
+  test.is( provider.fileIsLocked( filePath ) );
+  provider.fileUnlock( filePath );
+  test.is( !provider.fileIsLocked( filePath ) );
+}
+
+//
+
+function fileLockWaitingNotSharingSync( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let path = provider.path;
+
+  if( !_.routineIs( provider.fileLockAct ) )
+  {
+    test.identical( 1,1 );
+    return;
+  }
+
+  let routinePath = test.context.pathFor( 'written/fileLockWaitingNotSharingSync' );
+  let filePath = path.join( routinePath, 'terminal' );
+
+  /* */
+
+  test.case = 'trivial'
+  provider.filesDelete( routinePath )
+  provider.fileWrite( filePath, filePath )
+  var got = provider.fileLock
+  ({
+    filePath,
+    sync : 1,
+    throwing : 1,
+    timeOut : 5000,
+    sharing : 0,
+    waiting : 1
+  });
+  test.identical( got, true );
+  test.is( provider.fileIsLocked( filePath ) );
+  provider.fileUnlock( filePath );
+  test.is( !provider.fileIsLocked( filePath ) );
+
+  //
+
+  test.case = 'fileFile is missing'
+  provider.filesDelete( routinePath );
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.fileLock
+    ({
+      filePath,
+      sync : 1,
+      throwing : 1,
+      timeOut : 5000,
+      sharing : 0,
+      waiting : 1
+    });
+  });
+
+  //
+
+  test.case = 'fileFile is missing, throwing off'
+  provider.filesDelete( routinePath );
+  var got = provider.fileLock
+  ({
+    filePath,
+    sync : 1,
+    throwing : 0,
+    timeOut : 5000,
+    sharing : 0,
+    waiting : 1
+  });
+  test.identical( got, null );
+
+  //
+
+  test.case = 'try to lock file for second time';
+  provider.filesDelete( routinePath )
+  provider.fileWrite( filePath, filePath )
+  var got = provider.fileLock
+  ({
+    filePath,
+    sync : 1,
+    throwing : 1,
+    timeOut : 5000,
+    sharing : 0,
+    waiting : 1
+  });
+  test.identical( got, true );
+  test.is( provider.fileIsLocked( filePath ) );
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.fileLock
+    ({
+      filePath,
+      sync : 1,
+      throwing : 1,
+      timeOut : 5000,
+      sharing : 0,
+      waiting : 1
+    });
+  })
+  test.is( provider.fileIsLocked( filePath ) );
+  provider.fileUnlock( filePath );
+  test.is( !provider.fileIsLocked( filePath ) );
+
+
+  //
+
+  test.case = 'try to lock file for second time, throwing off';
+  provider.filesDelete( routinePath )
+  provider.fileWrite( filePath, filePath )
+  var got = provider.fileLock
+  ({
+    filePath,
+    sync : 1,
+    throwing : 0,
+    timeOut : 5000,
+    sharing : 0,
+    waiting : 1
+  });
+  test.identical( got, true );
+  test.is( provider.fileIsLocked( filePath ) );
+  var got = provider.fileLock
+  ({
+    filePath,
+    sync : 1,
+    throwing : 0,
+    timeOut : 5000,
+    sharing : 0,
+    waiting : 1
+  });
+  test.identical( got, null );
+  test.is( provider.fileIsLocked( filePath ) );
+  provider.fileUnlock( filePath );
+  test.is( !provider.fileIsLocked( filePath ) );
+}
+
+//
+
+function fileLockWaitingNotSharingAsync( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let path = provider.path;
+
+  if( !_.routineIs( provider.fileLockAct ) )
+  {
+    test.identical( 1,1 );
+    return;
+  }
+
+  let routinePath = test.context.pathFor( 'written/fileLockWaitingNotSharingAsync' );
+  let filePath = path.join( routinePath, 'terminal' );
+
+  let t1;
+  let ready = new _.Consequence().take( null )
+
+  /* */
+
+  .then( () =>
+  {
+    test.case = 'trivial'
+    provider.filesDelete( routinePath )
+    provider.fileWrite( filePath, filePath )
+    return provider.fileLock
+    ({
+      filePath,
+      sync : 0,
+      throwing : 1,
+      timeOut : 5000,
+      sharing : 0,
+      waiting : 1
+    })
+    .then( ( got ) =>
+    {
+      test.identical( got, true );
+      test.is( provider.fileIsLocked( filePath ) );
+      provider.fileUnlock( filePath );
+      test.is( !provider.fileIsLocked( filePath ) );
+      return null;
+    })
+  })
+
+  //
+
+  .then( () =>
+  {
+    test.case = 'fileFile is missing'
+    provider.filesDelete( routinePath );
+    let con = provider.fileLock
+    ({
+      filePath,
+      sync : 0,
+      throwing : 1,
+      timeOut : 5000,
+      sharing : 0,
+      waiting : 1
+    });
+
+    return test.shouldThrowErrorAsync( con )
+    .then( () =>
+    {
+      test.is( !provider.fileExists( filePath ) );
+      return null;
+    })
+  })
+
+  //
+
+  .then( () =>
+  {
+    test.case = 'fileFile is missing, throwing off'
+    provider.filesDelete( routinePath );
+    return provider.fileLock
+    ({
+      filePath,
+      sync : 0,
+      throwing : 0,
+      timeOut : 5000,
+      sharing : 0,
+      waiting : 1
+    })
+    .then( ( got ) =>
+    {
+      test.identical( got, null )
+      test.is( !provider.fileExists( filePath ) );
+      return null;
+    })
+  })
+
+  //
+
+  .then( () =>
+  {
+    test.case = 'try to lock file for second time';
+    provider.filesDelete( routinePath )
+    provider.fileWrite( filePath, filePath )
+    var con = provider.fileLock
+    ({
+      filePath,
+      sync : 0,
+      throwing : 1,
+      timeOut : 5000,
+      sharing : 0,
+      waiting : 1
+    });
+
+    con.then( ( got ) =>
+    {
+      test.identical( got, true );
+      test.is( provider.fileIsLocked( filePath ) );
+      return null;
+    })
+
+    con.then( () =>
+    {
+      t1 = _.timeNow();
+      let con2 = provider.fileLock
+      ({
+        filePath,
+        sync : 0,
+        throwing : 1,
+        timeOut : 5000,
+        sharing : 0,
+        waiting : 1
+      });
+      return test.shouldThrowErrorAsync( con2 )
+    })
+
+    con.finally( ( err, got ) =>
+    {
+      let t2 = _.timeNow();
+      test.le( t2 - t1, 1000 );
+
+      test.is( provider.fileIsLocked( filePath ) );
+      provider.fileUnlock( filePath );
+      test.is( !provider.fileIsLocked( filePath ) );
+      return null;
+    })
+
+    return con;
+  })
+
+  //
+
+  .then( () =>
+  {
+    test.case = 'try to lock file for second time, throwing off';
+    provider.filesDelete( routinePath )
+    provider.fileWrite( filePath, filePath )
+    var con = provider.fileLock
+    ({
+      filePath,
+      sync : 0,
+      throwing : 0,
+      timeOut : 5000,
+      sharing : 0,
+      waiting : 1
+    });
+
+    con.then( ( got ) =>
+    {
+      test.identical( got, true );
+      test.is( provider.fileIsLocked( filePath ) );
+      return null;
+    })
+
+    con.then( () =>
+    {
+      t1 = _.timeNow();
+      let con2 = provider.fileLock
+      ({
+        filePath,
+        sync : 0,
+        throwing : 0,
+        timeOut : 5000,
+        sharing : 0,
+        waiting : 1
+      });
+      return test.mustNotThrowError( con2 )
+    })
+
+    con.finally( ( err, got ) =>
+    {
+      let t2 = _.timeNow();
+      test.identical( got, null );
+      test.le( t2 - t1, 1000 );
+
+      test.is( provider.fileIsLocked( filePath ) );
+      provider.fileUnlock( filePath );
+      test.is( !provider.fileIsLocked( filePath ) );
+      return null;
+    })
+
+    return con;
+  })
+
+  //
+
+  return ready;
+}
+
+fileLockWaitingNotSharingAsync.timeOut = 30000;
+
+//
+
+function fileLockWaitingSharingAsync( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let path = provider.path;
+
+  if( !_.routineIs( provider.fileLockAct ) )
+  {
+    test.identical( 1,1 );
+    return;
+  }
+
+  let routinePath = test.context.pathFor( 'written/fileLockWaitingSharingAsync' );
+  let filePath = path.join( routinePath, 'terminal' );
+
+  let t1;
+  let ready = new _.Consequence().take( null )
+
+  /* */
+
+  .then( () =>
+  {
+    test.case = 'trivial'
+    provider.filesDelete( routinePath )
+    provider.fileWrite( filePath, filePath )
+    return provider.fileLock
+    ({
+      filePath,
+      sync : 0,
+      throwing : 1,
+      timeOut : 5000,
+      sharing : 'process',
+      waiting : 1
+    })
+    .then( ( got ) =>
+    {
+      test.identical( got, true );
+      test.is( provider.fileIsLocked( filePath ) );
+      provider.fileUnlock( filePath );
+      test.is( !provider.fileIsLocked( filePath ) );
+      return null;
+    })
+  })
+
+  //
+
+  .then( () =>
+  {
+    test.case = 'fileFile is missing'
+    provider.filesDelete( routinePath );
+    let con = provider.fileLock
+    ({
+      filePath,
+      sync : 0,
+      throwing : 1,
+      timeOut : 5000,
+      sharing : 'process',
+      waiting : 1
+    });
+
+    return test.shouldThrowErrorAsync( con )
+    .then( () =>
+    {
+      test.is( !provider.fileExists( filePath ) );
+      return null;
+    })
+  })
+
+  //
+
+  .then( () =>
+  {
+    test.case = 'fileFile is missing, throwing off'
+    provider.filesDelete( routinePath );
+    return provider.fileLock
+    ({
+      filePath,
+      sync : 0,
+      throwing : 0,
+      timeOut : 5000,
+      sharing : 'process',
+      waiting : 1
+    })
+    .then( ( got ) =>
+    {
+      test.identical( got, null )
+      test.is( !provider.fileExists( filePath ) );
+      return null;
+    })
+  })
+
+  //
+
+  .then( () =>
+  {
+    test.case = 'try to lock file for second time';
+    provider.filesDelete( routinePath )
+    provider.fileWrite( filePath, filePath )
+    var con = provider.fileLock
+    ({
+      filePath,
+      sync : 0,
+      throwing : 1,
+      timeOut : 5000,
+      sharing : 'process',
+      waiting : 1
+    });
+
+    con.then( ( got ) =>
+    {
+      test.identical( got, true );
+      test.is( provider.fileIsLocked( filePath ) );
+      return null;
+    })
+
+    con.then( () =>
+    {
+      t1 = _.timeNow();
+      let con2 = provider.fileLock
+      ({
+        filePath,
+        sync : 0,
+        throwing : 1,
+        timeOut : 5000,
+        sharing : 'process',
+        waiting : 1
+      });
+      return test.shouldThrowErrorAsync( con2 )
+    })
+
+    con.finally( ( err, got ) =>
+    {
+      let t2 = _.timeNow();
+      test.ge( t2 - t1, 5000 );
+
+      test.is( provider.fileIsLocked( filePath ) );
+      provider.fileUnlock( filePath );
+      test.is( !provider.fileIsLocked( filePath ) );
+      return null;
+    })
+
+    return con;
+  })
+
+  //
+
+  .then( () =>
+  {
+    test.case = 'try to lock file for second time, throwing off';
+    provider.filesDelete( routinePath )
+    provider.fileWrite( filePath, filePath )
+    var con = provider.fileLock
+    ({
+      filePath,
+      sync : 0,
+      throwing : 0,
+      timeOut : 5000,
+      sharing : 'process',
+      waiting : 1
+    });
+
+    con.then( ( got ) =>
+    {
+      test.identical( got, true );
+      test.is( provider.fileIsLocked( filePath ) );
+      return null;
+    })
+
+    con.then( () =>
+    {
+      t1 = _.timeNow();
+      let con2 = provider.fileLock
+      ({
+        filePath,
+        sync : 0,
+        throwing : 0,
+        timeOut : 5000,
+        sharing : 'process',
+        waiting : 1
+      });
+      return test.mustNotThrowError( con2 )
+    })
+
+    con.finally( ( err, got ) =>
+    {
+      let t2 = _.timeNow();
+      test.identical( got, null );
+      test.ge( t2 - t1, 5000 );
+
+      test.is( provider.fileIsLocked( filePath ) );
+      provider.fileUnlock( filePath );
+      test.is( !provider.fileIsLocked( filePath ) );
+      return null;
+    })
+
+    return con;
+  })
+
+  //
+
+  .then( () =>
+  {
+    test.case = 'try to lock file for second time, first lock is released after short timeout';
+    provider.filesDelete( routinePath )
+    provider.fileWrite( filePath, filePath )
+    var con = provider.fileLock
+    ({
+      filePath,
+      sync : 0,
+      throwing : 0,
+      timeOut : 5000,
+      sharing : 'process',
+      waiting : 1
+    });
+
+    con.then( ( got ) =>
+    {
+      test.identical( got, true );
+      test.is( provider.fileIsLocked( filePath ) );
+      return null;
+    })
+
+    con.then( () =>
+    {
+      t1 = _.timeNow();
+      let con2 = provider.fileLock
+      ({
+        filePath,
+        sync : 0,
+        throwing : 1,
+        timeOut : 5000,
+        sharing : 'process',
+        waiting : 1
+      });
+
+      _.timeOut( 2000, () =>
+      {
+        provider.fileUnlock( filePath );
+        return null;
+      });
+
+      return test.mustNotThrowError( con2 )
+    })
+
+    con.finally( ( err, got ) =>
+    {
+      let t2 = _.timeNow();
+
+      test.ge( t2 - t1, 2000 );
+      test.lt( t2 - t1, 5000 );
+
+      test.is( provider.fileIsLocked( filePath ) );
+      provider.fileUnlock( filePath );
+      test.is( !provider.fileIsLocked( filePath ) );
+      return null;
+    })
+
+    return con;
+  })
+
+  return ready;
+}
+
+fileLockWaitingSharingAsync.timeOut = 30000;
+
+//
+
+function fileLockNotWaitingSharingSync( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let path = provider.path;
+
+  if( !_.routineIs( provider.fileLockAct ) )
+  {
+    test.identical( 1,1 );
+    return;
+  }
+
+  let routinePath = test.context.pathFor( 'written/fileLockNotWaitingSharingSync' );
+  let filePath = path.join( routinePath, 'terminal' );
+
+  /* */
+
+  test.case = 'trivial'
+  provider.filesDelete( routinePath )
+  provider.fileWrite( filePath, filePath )
+  var got = provider.fileLock
+  ({
+    filePath,
+    sync : 1,
+    throwing : 1,
+    timeOut : 5000,
+    sharing : 'process',
+    waiting : 0
+  });
+  test.identical( got, true );
+  test.is( provider.fileIsLocked( filePath ) );
+  provider.fileUnlock( filePath );
+  test.is( !provider.fileIsLocked( filePath ) );
+
+  //
+
+  test.case = 'fileFile is missing'
+  provider.filesDelete( routinePath );
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.fileLock
+    ({
+      filePath,
+      sync : 1,
+      throwing : 1,
+      timeOut : 5000,
+      sharing : 'process',
+      waiting : 0
+    });
+  });
+
+  //
+
+  test.case = 'fileFile is missing, throwing off'
+  provider.filesDelete( routinePath );
+  var got = provider.fileLock
+  ({
+    filePath,
+    sync : 1,
+    throwing : 0,
+    timeOut : 5000,
+    sharing : 'process',
+    waiting : 0
+  });
+  test.identical( got, null );
+
+  //
+
+  test.case = 'try to lock file for second time';
+  provider.filesDelete( routinePath )
+  provider.fileWrite( filePath, filePath )
+  var got = provider.fileLock
+  ({
+    filePath,
+    sync : 1,
+    throwing : 1,
+    timeOut : 5000,
+    sharing : 'process',
+    waiting : 0
+  });
+  test.identical( got, true );
+  test.is( provider.fileIsLocked( filePath ) );
+  var got = provider.fileLock
+  ({
+    filePath,
+    sync : 1,
+    throwing : 1,
+    timeOut : 5000,
+    sharing : 'process',
+    waiting : 0
+  });
+  test.identical( got, true );
+  test.is( provider.fileIsLocked( filePath ) );
+  provider.fileUnlock( filePath );
+  test.is( provider.fileIsLocked( filePath ) );
+  provider.fileUnlock( filePath );
+  test.is( !provider.fileIsLocked( filePath ) );
+
+  //
+
+  test.case = 'try to lock file for second time, throwing off';
+  provider.filesDelete( routinePath )
+  provider.fileWrite( filePath, filePath )
+  var got = provider.fileLock
+  ({
+    filePath,
+    sync : 1,
+    throwing : 0,
+    timeOut : 5000,
+    sharing : 'process',
+    waiting : 0
+  });
+  test.identical( got, true );
+  test.is( provider.fileIsLocked( filePath ) );
+  var got = provider.fileLock
+  ({
+    filePath,
+    sync : 1,
+    throwing : 0,
+    timeOut : 5000,
+    sharing : 'process',
+    waiting : 0
+  });
+  test.identical( got, true );
+  test.is( provider.fileIsLocked( filePath ) );
+  provider.fileUnlock( filePath );
+  test.is( provider.fileIsLocked( filePath ) );
+  provider.fileUnlock( filePath );
+  test.is( !provider.fileIsLocked( filePath ) );
+}
+
+//
+
+function fileLockNotWaitingSharingAsync( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let path = provider.path;
+
+  if( !_.routineIs( provider.fileLockAct ) )
+  {
+    test.identical( 1,1 );
+    return;
+  }
+
+  let routinePath = test.context.pathFor( 'written/fileLockNotWaitingSharingAsync' );
+  let filePath = path.join( routinePath, 'terminal' );
+
+  let t1;
+  let ready = new _.Consequence().take( null )
+
+  /* */
+
+  .then( () =>
+  {
+    test.case = 'trivial'
+    provider.filesDelete( routinePath )
+    provider.fileWrite( filePath, filePath )
+    return provider.fileLock
+    ({
+      filePath,
+      sync : 0,
+      throwing : 1,
+      timeOut : 5000,
+      sharing : 'process',
+      waiting : 0
+    })
+    .then( ( got ) =>
+    {
+      test.identical( got, true );
+      test.is( provider.fileIsLocked( filePath ) );
+      provider.fileUnlock( filePath );
+      test.is( !provider.fileIsLocked( filePath ) );
+      return null;
+    })
+  })
+
+  //
+
+  .then( () =>
+  {
+    test.case = 'fileFile is missing'
+    provider.filesDelete( routinePath );
+    let con = provider.fileLock
+    ({
+      filePath,
+      sync : 0,
+      throwing : 1,
+      timeOut : 5000,
+      sharing : 'process',
+      waiting : 0
+    });
+
+    return test.shouldThrowErrorAsync( con )
+    .then( () =>
+    {
+      test.is( !provider.fileExists( filePath ) );
+      return null;
+    })
+  })
+
+  //
+
+  .then( () =>
+  {
+    test.case = 'fileFile is missing, throwing off'
+    provider.filesDelete( routinePath );
+    return provider.fileLock
+    ({
+      filePath,
+      sync : 0,
+      throwing : 0,
+      timeOut : 5000,
+      sharing : 'process',
+      waiting : 0
+    })
+    .then( ( got ) =>
+    {
+      test.identical( got, null )
+      test.is( !provider.fileExists( filePath ) );
+      return null;
+    })
+  })
+
+  //
+
+  .then( () =>
+  {
+    test.case = 'try to lock file for second time';
+    provider.filesDelete( routinePath )
+    provider.fileWrite( filePath, filePath )
+    var con = provider.fileLock
+    ({
+      filePath,
+      sync : 0,
+      throwing : 1,
+      timeOut : 5000,
+      sharing : 'process',
+      waiting : 0
+    });
+
+    con.then( ( got ) =>
+    {
+      test.identical( got, true );
+      test.is( provider.fileIsLocked( filePath ) );
+      return null;
+    })
+
+    con.then( () =>
+    {
+      t1 = _.timeNow();
+      let con2 = provider.fileLock
+      ({
+        filePath,
+        sync : 0,
+        throwing : 1,
+        timeOut : 5000,
+        sharing : 'process',
+        waiting : 0
+      });
+      return test.mustNotThrowError( con2 )
+    })
+
+    con.finally( ( err, got ) =>
+    {
+      let t2 = _.timeNow();
+      test.le( t2 - t1, 1000 );
+
+      test.is( provider.fileIsLocked( filePath ) );
+      provider.fileUnlock( filePath );
+      test.is( provider.fileIsLocked( filePath ) );
+      provider.fileUnlock( filePath );
+      test.is( !provider.fileIsLocked( filePath ) );
+      return null;
+    })
+
+    return con;
+  })
+
+  //
+
+  .then( () =>
+  {
+    test.case = 'try to lock file for second time, throwing off';
+    provider.filesDelete( routinePath )
+    provider.fileWrite( filePath, filePath )
+    var con = provider.fileLock
+    ({
+      filePath,
+      sync : 0,
+      throwing : 0,
+      timeOut : 5000,
+      sharing : 'process',
+      waiting : 0
+    });
+
+    con.then( ( got ) =>
+    {
+      test.identical( got, true );
+      test.is( provider.fileIsLocked( filePath ) );
+      return null;
+    })
+
+    con.then( () =>
+    {
+      t1 = _.timeNow();
+      let con2 = provider.fileLock
+      ({
+        filePath,
+        sync : 0,
+        throwing : 0,
+        timeOut : 5000,
+        sharing : 'process',
+        waiting : 0
+      });
+      return test.mustNotThrowError( con2 )
+    })
+
+    con.finally( ( err, got ) =>
+    {
+      let t2 = _.timeNow();
+      test.identical( got, true );
+      test.le( t2 - t1, 100 );
+
+      test.is( provider.fileIsLocked( filePath ) );
+      provider.fileUnlock( filePath );
+      test.is( provider.fileIsLocked( filePath ) );
+      provider.fileUnlock( filePath );
+      test.is( !provider.fileIsLocked( filePath ) );
+      return null;
+    })
+
+    return con;
+  })
+
+  return ready;
+}
+
+fileLockNotWaitingSharingAsync.timeOut = 30000;
+
+//
+
+function fileLockNotWaitingNotSharingSync( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let path = provider.path;
+
+  if( !_.routineIs( provider.fileLockAct ) )
+  {
+    test.identical( 1,1 );
+    return;
+  }
+
+  let routinePath = test.context.pathFor( 'written/fileLockNotWaitingNotSharingSync' );
+  let filePath = path.join( routinePath, 'terminal' );
+
+  /* */
+
+  test.case = 'trivial'
+  provider.filesDelete( routinePath )
+  provider.fileWrite( filePath, filePath )
+  var got = provider.fileLock
+  ({
+    filePath,
+    sync : 1,
+    throwing : 1,
+    timeOut : 5000,
+    sharing : 0,
+    waiting : 0
+  });
+  test.identical( got, true );
+  test.is( provider.fileIsLocked( filePath ) );
+  provider.fileUnlock( filePath );
+  test.is( !provider.fileIsLocked( filePath ) );
+
+  //
+
+  test.case = 'fileFile is missing'
+  provider.filesDelete( routinePath );
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.fileLock
+    ({
+      filePath,
+      sync : 1,
+      throwing : 1,
+      timeOut : 5000,
+      sharing : 0,
+      waiting : 0
+    });
+  });
+
+  //
+
+  test.case = 'fileFile is missing, throwing off'
+  provider.filesDelete( routinePath );
+  var got = provider.fileLock
+  ({
+    filePath,
+    sync : 1,
+    throwing : 0,
+    timeOut : 5000,
+    sharing : 0,
+    waiting : 0
+  });
+  test.identical( got, null );
+
+  //
+
+  test.case = 'try to lock file for second time';
+  provider.filesDelete( routinePath )
+  provider.fileWrite( filePath, filePath )
+  var got = provider.fileLock
+  ({
+    filePath,
+    sync : 1,
+    throwing : 1,
+    timeOut : 5000,
+    sharing : 0,
+    waiting : 0
+  });
+  test.identical( got, true );
+  test.is( provider.fileIsLocked( filePath ) );
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.fileLock
+    ({
+      filePath,
+      sync : 1,
+      throwing : 1,
+      timeOut : 5000,
+      sharing : 0,
+      waiting : 0
+    });
+  });
+  test.is( provider.fileIsLocked( filePath ) );
+  provider.fileUnlock( filePath );
+  test.is( !provider.fileIsLocked( filePath ) );
+
+  //
+
+  test.case = 'try to lock file for second time, throwing off';
+  provider.filesDelete( routinePath )
+  provider.fileWrite( filePath, filePath )
+  var got = provider.fileLock
+  ({
+    filePath,
+    sync : 1,
+    throwing : 0,
+    timeOut : 5000,
+    sharing : 0,
+    waiting : 0
+  });
+  test.identical( got, true );
+  test.is( provider.fileIsLocked( filePath ) );
+  var got = provider.fileLock
+  ({
+    filePath,
+    sync : 1,
+    throwing : 0,
+    timeOut : 5000,
+    sharing : 0,
+    waiting : 0
+  });
+  test.identical( got, null );
+  test.is( provider.fileIsLocked( filePath ) );
+  provider.fileUnlock( filePath );
+  test.is( !provider.fileIsLocked( filePath ) );
+}
+
+//
+
+function fileLockNotWaitingNotSharingAsync( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let path = provider.path;
+
+  if( !_.routineIs( provider.fileLockAct ) )
+  {
+    test.identical( 1,1 );
+    return;
+  }
+
+  let routinePath = test.context.pathFor( 'written/fileLockNotWaitingNotSharingAsync' );
+  let filePath = path.join( routinePath, 'terminal' );
+
+  let t1;
+  let ready = new _.Consequence().take( null )
+
+  /* */
+
+  .then( () =>
+  {
+    test.case = 'trivial'
+    provider.filesDelete( routinePath )
+    provider.fileWrite( filePath, filePath )
+    return provider.fileLock
+    ({
+      filePath,
+      sync : 0,
+      throwing : 1,
+      timeOut : 5000,
+      sharing : 0,
+      waiting : 0
+    })
+    .then( ( got ) =>
+    {
+      test.identical( got, true );
+      test.is( provider.fileIsLocked( filePath ) );
+      provider.fileUnlock( filePath );
+      test.is( !provider.fileIsLocked( filePath ) );
+      return null;
+    })
+  })
+
+  //
+
+  .then( () =>
+  {
+    test.case = 'fileFile is missing'
+    provider.filesDelete( routinePath );
+    let con = provider.fileLock
+    ({
+      filePath,
+      sync : 0,
+      throwing : 1,
+      timeOut : 5000,
+      sharing : 0,
+      waiting : 0
+    });
+
+    return test.shouldThrowErrorAsync( con )
+    .then( () =>
+    {
+      test.is( !provider.fileExists( filePath ) );
+      return null;
+    })
+  })
+
+  //
+
+  .then( () =>
+  {
+    test.case = 'fileFile is missing, throwing off'
+    provider.filesDelete( routinePath );
+    return provider.fileLock
+    ({
+      filePath,
+      sync : 0,
+      throwing : 0,
+      timeOut : 5000,
+      sharing : 0,
+      waiting : 0
+    })
+    .then( ( got ) =>
+    {
+      test.identical( got, null )
+      test.is( !provider.fileExists( filePath ) );
+      return null;
+    })
+  })
+
+  //
+
+  .then( () =>
+  {
+    test.case = 'try to lock file for second time';
+    provider.filesDelete( routinePath )
+    provider.fileWrite( filePath, filePath )
+    var con = provider.fileLock
+    ({
+      filePath,
+      sync : 0,
+      throwing : 1,
+      timeOut : 5000,
+      sharing : 0,
+      waiting : 0
+    });
+
+    con.then( ( got ) =>
+    {
+      test.identical( got, true );
+      test.is( provider.fileIsLocked( filePath ) );
+      return null;
+    })
+
+    con.then( () =>
+    {
+      t1 = _.timeNow();
+      let con2 = provider.fileLock
+      ({
+        filePath,
+        sync : 0,
+        throwing : 1,
+        timeOut : 5000,
+        sharing : 0,
+        waiting : 0
+      });
+      return test.shouldThrowErrorAsync( con2 )
+    })
+
+    con.finally( ( err, got ) =>
+    {
+      let t2 = _.timeNow();
+      test.le( t2 - t1, 1000 );
+
+      test.is( provider.fileIsLocked( filePath ) );
+      provider.fileUnlock( filePath );
+      test.is( !provider.fileIsLocked( filePath ) );
+      return null;
+    })
+
+    return con;
+  })
+
+  //
+
+  .then( () =>
+  {
+    test.case = 'try to lock file for second time, throwing off';
+    provider.filesDelete( routinePath )
+    provider.fileWrite( filePath, filePath )
+    var con = provider.fileLock
+    ({
+      filePath,
+      sync : 0,
+      throwing : 0,
+      timeOut : 5000,
+      sharing : 0,
+      waiting : 0
+    });
+
+    con.then( ( got ) =>
+    {
+      test.identical( got, true );
+      test.is( provider.fileIsLocked( filePath ) );
+      return null;
+    })
+
+    con.then( () =>
+    {
+      t1 = _.timeNow();
+      let con2 = provider.fileLock
+      ({
+        filePath,
+        sync : 0,
+        throwing : 0,
+        timeOut : 5000,
+        sharing : 0,
+        waiting : 0
+      });
+      return test.mustNotThrowError( con2 )
+    })
+
+    con.finally( ( err, got ) =>
+    {
+      test.identical( got, null );
+
+      let t2 = _.timeNow();
+      test.le( t2 - t1, 1000 );
+
+      test.is( provider.fileIsLocked( filePath ) );
+      provider.fileUnlock( filePath );
+      test.is( !provider.fileIsLocked( filePath ) );
+      return null;
+    })
+
+    return con;
+  })
+
+  return ready;
+}
+
+fileLockNotWaitingNotSharingAsync.timeOut = 30000;
+
 //
 
 function statReadActSync( test )
@@ -44380,6 +45795,15 @@ var Self =
     fileDeleteAsync,
     fileDeleteLocked,
     fileDeletePerfomance,
+
+    fileLockWaitingSharingSync,
+    fileLockWaitingSharingAsync,
+    fileLockWaitingNotSharingSync,
+    fileLockWaitingNotSharingAsync,
+    fileLockNotWaitingSharingSync,
+    fileLockNotWaitingSharingAsync,
+    fileLockNotWaitingNotSharingSync,
+    fileLockNotWaitingNotSharingAsync,
 
     statResolvedReadSync,
     statReadActSync,

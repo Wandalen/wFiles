@@ -1309,7 +1309,6 @@ function fileLockAct( o )
 
       if( !o.waiting )
       {
-        lockFileCounterMap[ o.filePath ] += 1;
         return true;
       }
       else if( o.sync )
@@ -1349,7 +1348,7 @@ function fileLockAct( o )
 
     lockFileCounterMap[ o.filePath ] += 1;
 
-    return got;
+    return true;
   })
 
   if( o.sync )

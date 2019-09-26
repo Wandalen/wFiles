@@ -5613,7 +5613,7 @@ function fileLock_body( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.numberIs( o.timeOut ) );
 
-  let con = _.Consequence().Try( () => self.fileLockAct( o ) );
+  let con = _.Consequence.Try( () => self.fileLockAct( o ) );
 
   con.finally( ( err, got ) =>
   {
@@ -5666,7 +5666,7 @@ function fileUnlock_body( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.numberIs( o.timeOut ) );
 
-  let con = _.Consequence().Try( () => self.fileUnlockAct( o ) );
+  let con = _.Consequence.Try( () => self.fileUnlockAct( o ) );
 
   con.finally( ( err, got ) =>
   {
@@ -5718,7 +5718,7 @@ function fileIsLocked_body( o )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  let con = _.Consequence().Try( () => self.fileIsLocked( o ) );
+  let con = _.Consequence.Try( () => self.fileIsLockedAct( o ) );
 
   con.finally( ( err, got ) =>
   {

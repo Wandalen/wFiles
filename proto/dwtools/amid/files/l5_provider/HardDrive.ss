@@ -1302,7 +1302,11 @@ function fileLockAct( o )
 
   let con = _.Consequence.Try( () =>
   {
+    if( !self.fileExistsAct({ filePath : o.filePath }) )
+    throw _.error( 'File:', o.filePath, 'doesn\'t exist.' );
+
     if( lockFileCounterMap[ o.filePath ] )
+    if( self.fileExistsAct({ filePath : o.filePath + '.lock' } ) )
     {
       if( !o.sharing )
       throw _.err( 'File', fileNativePath, 'is already locked by current process' );
@@ -1337,7 +1341,7 @@ function fileLockAct( o )
         minTimeout : 1000,
         maxRetryTime : o.timeOut
       }
-      return _.Consequence.From( LockFile.lock( fileNativePath, lockOptions ) )
+      return _.Consequence.From( LockFile.lock( fileNativePath, lockOptions ) );
     }
   })
 
@@ -1371,11 +1375,10 @@ function fileUnlockAct( o )
 
   let con = _.Consequence.Try( () =>
   {
-    if( lockFileCounterMap[ o.filePath ] === undefined )
-    {
-      return true;
-    }
-    else
+    if( !self.fileExistsAct({ filePath : o.filePath }) )
+    throw _.error( 'File:', o.filePath, 'doesn\'t exist.' );
+
+    if( lockFileCounterMap[ o.filePath ] !== undefined )
     {
       _.assert( lockFileCounterMap[ o.filePath ] > 0 );
 
@@ -1392,7 +1395,7 @@ function fileUnlockAct( o )
     }
     else
     {
-      return _.Consequence.From( LockFile.unlock( fileNativePath ) )
+      return _.Consequence.From( LockFile.unlock( fileNativePath ) );
     }
 
   })
@@ -1427,13 +1430,14 @@ function fileIsLockedAct( o )
 
   let con = _.Consequence.Try( () =>
   {
+    debugger
     if( o.sync )
     {
       return LockFile.checkSync( fileNativePath );
     }
     else
     {
-      return _.Consequence.From( LockFile.check( fileNativePath ) )
+      return _.Consequence.From( LockFile.check( fileNativePath ) );
     }
   })
 

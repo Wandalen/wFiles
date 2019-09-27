@@ -1107,9 +1107,9 @@ function fileLockAct( o )
       let tries = o.timeOut / 1000;
       let con = new _.Consequence();
 
-      tryAgain();
+      lockTry();
 
-      function tryAgain()
+      function lockTry()
       {
         tries -= 1;
         try
@@ -1124,7 +1124,7 @@ function fileLockAct( o )
 
           _.timeOut( 1000, () =>
           {
-            tryAgain();
+            lockTry();
             return null;
           })
         }

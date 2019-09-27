@@ -16042,6 +16042,272 @@ fileLockNotWaitingNotSharingAsync.timeOut = 30000;
 
 //
 
+function fileUnlockSync( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let path = provider.path;
+
+  if( !_.routineIs( provider.fileLockAct ) )
+  {
+    test.identical( 1,1 );
+    return;
+  }
+
+  let routinePath = test.context.pathFor( 'written/fileUnlockSync' );
+  let filePath = path.join( routinePath, 'terminal' );
+
+  /* */
+
+  test.case = 'filePath is missing'
+  provider.filesDelete( routinePath )
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.fileUnlock
+    ({
+      filePath,
+      sync : 1,
+      throwing : 1,
+    });
+  })
+
+  test.case = 'filePath is missing'
+  provider.filesDelete( routinePath )
+  var got = provider.fileUnlock
+  ({
+    filePath,
+    sync : 1,
+    throwing : 0,
+  });
+  test.identical( got, null )
+
+  test.case = 'nothing locked, try to unlock'
+  provider.filesDelete( routinePath )
+  provider.fileWrite( filePath, filePath )
+  test.is( !provider.fileIsLocked( filePath ) );
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.fileUnlock
+    ({
+      filePath,
+      sync : 1,
+      throwing : 1,
+    });
+  })
+  test.is( !provider.fileIsLocked( filePath ) );
+
+  test.case = 'nothing locked, try to unlock'
+  provider.filesDelete( routinePath )
+  provider.fileWrite( filePath, filePath )
+  test.is( !provider.fileIsLocked( filePath ) );
+  var got = provider.fileUnlock
+  ({
+    filePath,
+    sync : 1,
+    throwing : 0,
+  });
+  test.identical( got, null )
+  test.is( !provider.fileIsLocked( filePath ) );
+
+  test.case = 'single lock + unlock'
+  provider.filesDelete( routinePath )
+  provider.fileWrite( filePath, filePath )
+  provider.fileLock
+  ({
+    filePath,
+    sync : 1,
+    throwing : 1,
+    timeOut : 5000,
+    sharing : 'process',
+    waiting : 0
+  });
+  test.is( provider.fileIsLocked( filePath ) );
+  provider.fileUnlock
+  ({
+    filePath,
+    sync : 1,
+    throwing : 1,
+  });
+  test.is( !provider.fileIsLocked( filePath ) );
+
+  test.case = 'two locks + two unlock'
+  provider.filesDelete( routinePath )
+  provider.fileWrite( filePath, filePath )
+  provider.fileLock
+  ({
+    filePath,
+    sync : 1,
+    throwing : 1,
+    timeOut : 5000,
+    sharing : 'process',
+    waiting : 0
+  });
+  provider.fileLock
+  ({
+    filePath,
+    sync : 1,
+    throwing : 1,
+    timeOut : 5000,
+    sharing : 'process',
+    waiting : 0
+  });
+  test.is( provider.fileIsLocked( filePath ) );
+  provider.fileUnlock
+  ({
+    filePath,
+    sync : 1,
+    throwing : 1,
+  });
+  test.is( provider.fileIsLocked( filePath ) );
+  provider.fileUnlock
+  ({
+    filePath,
+    sync : 1,
+    throwing : 1,
+  });
+  test.is( !provider.fileIsLocked( filePath ) );
+
+  test.case = 'lock exists, but file is not locked by provider, try to unlock'
+  provider.filesDelete( routinePath )
+  provider.fileWrite( filePath, filePath )
+  provider.fileWrite( filePath + '.lock', filePath )
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.fileUnlock
+    ({
+      filePath,
+      sync : 1,
+      throwing : 1,
+    });
+  })
+  test.is( provider.fileIsLocked( filePath ) );
+  provider.fileDelete( filePath + '.lock' );
+  test.is( !provider.fileIsLocked( filePath ) );
+
+  test.case = 'lock exists, but file is not locked by provider, try to unlock'
+  provider.filesDelete( routinePath )
+  provider.fileWrite( filePath, filePath )
+  provider.fileWrite( filePath + '.lock', filePath )
+  var got = provider.fileUnlock
+  ({
+    filePath,
+    sync : 1,
+    throwing : 0,
+  });
+  test.identical( got, null );
+  test.is( provider.fileIsLocked( filePath ) );
+  provider.fileDelete( filePath + '.lock' );
+  test.is( !provider.fileIsLocked( filePath ) );
+
+  test.case = 'single lock + unlock'
+  provider.filesDelete( routinePath )
+  provider.fileWrite( filePath, filePath )
+  provider.fileLock
+  ({
+    filePath,
+    sync : 1,
+    throwing : 1,
+    timeOut : 5000,
+    sharing : 'process',
+    waiting : 0
+  });
+  var got = provider.fileUnlock
+  ({
+    filePath,
+    sync : 1,
+    throwing : 1,
+  });
+  test.identical( got, true );
+  provider.fileUnlock
+  ({
+    filePath,
+    sync : 1,
+    throwing : 1,
+  });
+  var got = provider.fileUnlock
+  ({
+    filePath,
+    sync : 1,
+    throwing : 1,
+  });
+  test.identical( got, false );
+}
+
+//
+
+function fileIsLockedSync( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let path = provider.path;
+
+  if( !_.routineIs( provider.fileLockAct ) )
+  {
+    test.identical( 1,1 );
+    return;
+  }
+
+  let routinePath = test.context.pathFor( 'written/fileIsLockedSync' );
+  let filePath = path.join( routinePath, 'terminal' );
+
+  test.case = 'filePath is missing'
+  provider.filesDelete( routinePath )
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.fileIsLocked
+    ({
+      filePath,
+      sync : 1,
+      throwing : 1,
+    });
+  })
+
+  test.case = 'filePath is missing, throwing off'
+  provider.filesDelete( routinePath )
+  var got = provider.fileIsLocked
+  ({
+    filePath,
+    sync : 1,
+    throwing : 0,
+  });
+  test.identical( got, null )
+
+  test.case = 'nothing locked, check lock'
+  provider.filesDelete( routinePath )
+  provider.fileWrite( filePath, filePath )
+  var got = provider.fileIsLocked
+  ({
+    filePath,
+    sync : 1,
+    throwing : 1,
+  });
+  test.identical( got, false );
+
+  test.case = 'locked by other process, check lock'
+  provider.filesDelete( routinePath )
+  provider.fileWrite( filePath, filePath )
+  provider.fileWrite( filePath + '.lock', filePath )
+  var got = provider.fileIsLocked
+  ({
+    filePath,
+    sync : 1,
+    throwing : 1,
+  });
+  test.identical( got, true );
+  provider.fileDelete( filePath + '.lock' );
+  var got = provider.fileIsLocked
+  ({
+    filePath,
+    sync : 1,
+    throwing : 1,
+  });
+  test.identical( got, false );
+
+}
+
+
+//
+
 function statReadActSync( test )
 {
   let self = this;
@@ -45804,6 +46070,9 @@ var Self =
     fileLockNotWaitingSharingAsync,
     fileLockNotWaitingNotSharingSync,
     fileLockNotWaitingNotSharingAsync,
+
+    fileUnlockSync,
+    fileIsLockedSync,
 
     statResolvedReadSync,
     statReadActSync,

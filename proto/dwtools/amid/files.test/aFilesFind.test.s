@@ -34237,6 +34237,100 @@ function filesDeleteTerminals( test )
 
 //
 
+function filesDeleteLate( test )
+{
+  let context = this;
+  let path = context.provider.path;
+  let provider = context.provider;
+
+  let routinePath = path.join( context.suitePath, test.name );
+
+  var tree = context.makeStandardExtract();
+
+  /* */
+
+  test.case = 'files don\'t exist after call'
+  provider.filesDelete( routinePath );
+  tree.filesReflectTo( provider, routinePath );
+  let files = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative' });
+  test.is( files.length );
+  var o =
+  {
+    filePath : routinePath,
+    sync : 1,
+    late : 1
+  }
+  var got = provider.filesDelete( o )
+  var got = provider.dirRead( routinePath );
+  test.identical( got, null );
+}
+
+//
+
+function filesDeleteLatePerformance( test )
+{
+  let context = this;
+  let path = context.provider.path;
+  let provider = context.provider;
+
+  let routinePath = path.join( context.suitePath, test.name );
+
+  /* */
+
+  test.case = 'late version is faster than regular'
+  provider.filesDelete( routinePath );
+  var files = 10000;
+
+  try
+  {
+    for( var i = 0; i < files; i++ )
+    {
+      let filePath = path.join( routinePath, 'file-' + i );
+      provider.fileWrite( filePath,filePath )
+    }
+
+    var t1 = _.timeNow();
+    provider.filesDelete
+    ({
+      filePath : routinePath,
+      sync : 1,
+      late : 1
+    })
+    var lateTime = _.timeNow() - t1;
+
+    for( var i = 0; i < files; i++ )
+    {
+      let filePath = path.join( routinePath, 'file-' + i );
+      provider.fileWrite( filePath,filePath )
+    }
+
+    var t1 = _.timeNow();
+    provider.filesDelete
+    ({
+      filePath : routinePath,
+      sync : 1,
+      late : 0
+    })
+    var normalTime = _.timeNow() - t1;
+
+    test.lt( lateTime, normalTime );
+    test.ge( normalTime / lateTime, 2 );
+
+    console.log( 'Normal delete time:', normalTime )
+    console.log( 'Late delete time:', lateTime )
+
+  }
+  catch( err )
+  {
+    provider.filesDelete( routinePath );
+  }
+
+}
+
+filesDeleteLatePerformance.experimental = 1;
+
+//
+
 function filesDeleteAndAsyncWrite( test )
 {
   let context = this;
@@ -36820,6 +36914,8 @@ var Self =
     filesDeleteDeletingEmptyDirs,
     filesDeleteEmptyDirs,
     filesDeleteTerminals,
+    filesDeleteLate,
+    filesDeleteLatePerformance,
 
     // filesDeleteAndAsyncWrite,
     // filesFindDifference,

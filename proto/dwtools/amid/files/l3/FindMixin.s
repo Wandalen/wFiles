@@ -4849,6 +4849,7 @@ function filesDelete_body( o )
     }
 
     let late = [];
+    let deleteDirName = 'delete' + '-' + _.idWithDate();
     for( let f = o.result.length-1 ; f >= 0 ; f-- )
     {
       let record = o.result[ f ];
@@ -4857,7 +4858,7 @@ function filesDelete_body( o )
       if( record.absolute === '/' )
       continue;
 
-      let dstPath = path.join( o.tempPath, 'delete', record.relative );
+      let dstPath = path.join( o.tempPath, deleteDirName, record.relative );
       late.push( dstPath );
 
       debugger;

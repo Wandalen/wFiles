@@ -730,11 +730,11 @@ defaults.verbosity = 0;
  * @param {String} o.localPath Local path to package.
  * @param {String} o.remotePath Remote path to package.
  * @param {Number} o.verbosity=0 Level of verbosity.
- * @function isDownloadedFrom
+ * @function isDownloadedFromRemote
  * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderGit#
  */
 
-function isDownloadedFrom( o )
+function isDownloadedFromRemote( o )
 {
   let self = this;
   let path = self.path;
@@ -748,13 +748,23 @@ function isDownloadedFrom( o )
   let localProvider = self.system.providerForPath( o.localPath );
   _.assert( localProvider instanceof _.FileProvider.HardDrive || localProvider.originalFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
 
+  let result = Object.create( null );
+  result.downloaded = true;
+  result.downloadedFromRemote = false;
+
   if( !localProvider.fileExists( o.localPath ) )
-  return false;
+  {
+    result.downloaded = false;
+    return result;
+  }
 
   let gitConfigExists = localProvider.fileExists( path.join( o.localPath, '.git' ) );
 
   if( !gitConfigExists )
-  return false;
+  {
+    result.downloaded = false;
+    return result;
+  }
 
   let con = new _.Consequence();
   GitConfig( localProvider.path.nativize( o.localPath ), con.tolerantCallback() )
@@ -763,13 +773,17 @@ function isDownloadedFrom( o )
     if( err )
     throw _.err( err );
 
-    let remoteUrl = self.pathParse( o.remotePath ).remoteVcsPath;
-    let originUrl = config.remote.origin.url;
+    let remoteVcsPath = self.pathParse( o.remotePath ).remoteVcsPath;
+    let originVcsPath = config.remote.origin.url;
 
-    _.sure( _.strDefined( remoteUrl ) );
-    _.sure( _.strDefined( originUrl ) );
+    _.sure( _.strDefined( remoteVcsPath ) );
+    _.sure( _.strDefined( originVcsPath ) );
 
-    return remoteUrl === originUrl;
+    result.remoteVcsPath = remoteVcsPath;
+    result.originVcsPath = originVcsPath;
+    result.downloadedFromRemote = originVcsPath === remoteVcsPath;
+
+    return result;
   })
   return con.deasync();
 }
@@ -1220,7 +1234,7 @@ let Proto =
 
   isUpToDate,
   isDownloaded,
-  isDownloadedFrom,
+  isDownloadedFromRemote,
 
   // etc
 

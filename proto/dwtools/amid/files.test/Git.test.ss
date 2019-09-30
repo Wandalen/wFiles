@@ -980,7 +980,7 @@ isUpToDate.timeOut = 30000;
 
 //
 
-function isDownloadedFrom( test )
+function isDownloadedFromRemote( test )
 {
   let context = this;
   let providerSrc = context.providerSrc;
@@ -998,8 +998,9 @@ function isDownloadedFrom( test )
 
   .then( () =>
   {
-    let got = providerSrc.isDownloadedFrom({ localPath, remotePath : remotePath });
-    test.identical( got, false )
+    let got = providerSrc.isDownloadedFromRemote({ localPath, remotePath : remotePath });
+    test.identical( got.downloaded, false )
+    test.identical( got.downloadedFromRemote, false )
     return null;
   })
 
@@ -1012,15 +1013,17 @@ function isDownloadedFrom( test )
 
   .then( () =>
   {
-    let got = providerSrc.isDownloadedFrom({ localPath, remotePath });
-    test.identical( got, true )
+    let got = providerSrc.isDownloadedFromRemote({ localPath, remotePath });
+    test.identical( got.downloaded, true )
+    test.identical( got.downloadedFromRemote, true )
     return null;
   })
 
   .then( () =>
   {
-    let got = providerSrc.isDownloadedFrom({ localPath, remotePath : remotePath2 });
-    test.identical( got, false )
+    let got = providerSrc.isDownloadedFromRemote({ localPath, remotePath : remotePath2 });
+    test.identical( got.downloaded, true )
+    test.identical( got.downloadedFromRemote, false )
     return null;
   })
 
@@ -1056,7 +1059,7 @@ var Proto =
     filesReflectTrivial,
     filesReflectNoStashing,
     isUpToDate,
-    isDownloadedFrom
+    isDownloadedFromRemote
   },
 
 }

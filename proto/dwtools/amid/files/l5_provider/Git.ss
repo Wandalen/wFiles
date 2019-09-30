@@ -722,6 +722,63 @@ var defaults = isDownloaded.defaults = Object.create( null );
 defaults.localPath = null;
 defaults.verbosity = 0;
 
+//
+
+/**
+ * @summary Returns true if path `o.localPath` contains a git repository that was cloned from remote `o.remotePath`.
+ * @param {Object} o Options map.
+ * @param {String} o.localPath Local path to package.
+ * @param {String} o.remotePath Remote path to package.
+ * @param {Number} o.verbosity=0 Level of verbosity.
+ * @function isDownloadedFrom
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderGit#
+ */
+
+function isDownloadedFrom( o )
+{
+  let self = this;
+  let path = self.path;
+
+  _.routineOptions( isDownloaded, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( !!self.system );
+  _.assert( _.strDefined( o.localPath ) );
+  _.assert( _.strDefined( o.remotePath ) );
+
+  let localProvider = self.system.providerForPath( o.localPath );
+  _.assert( localProvider instanceof _.FileProvider.HardDrive || localProvider.originalFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
+
+  if( !localProvider.fileExists( o.localPath ) )
+  return false;
+
+  let gitConfigExists = localProvider.fileExists( path.join( o.localPath, '.git' ) );
+
+  if( !gitConfigExists )
+  return false;
+
+  let con = new _.Consequence();
+  GitConfig( localProvider.path.nativize( o.localPath ), con.tolerantCallback() )
+  con.finally( ( err, config ) =>
+  {
+    if( err )
+    throw _.err( err );
+
+    let remoteUrl = self.pathParse( o.remotePath ).remoteVcsPath;
+    let originUrl = config.remote.origin.url;
+
+    _.sure( _.strDefined( remoteUrl ) );
+    _.sure( _.strDefined( originUrl ) );
+
+    return remoteUrl === originUrl;
+  })
+  return con.deasync();
+}
+
+var defaults = isDownloaded.defaults = Object.create( null );
+defaults.localPath = null;
+defaults.remotePath = null;
+defaults.verbosity = 0;
+
 // --
 // etc
 // --
@@ -1163,6 +1220,7 @@ let Proto =
 
   isUpToDate,
   isDownloaded,
+  isDownloadedFrom,
 
   // etc
 

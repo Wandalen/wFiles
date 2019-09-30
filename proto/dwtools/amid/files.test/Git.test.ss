@@ -978,6 +978,55 @@ function isUpToDate( test )
 
 isUpToDate.timeOut = 30000;
 
+//
+
+function isDownloadedFrom( test )
+{
+  let context = this;
+  let providerSrc = context.providerSrc;
+  let providerDst = context.providerDst;
+  let system = context.system;
+  let path = context.providerDst.path;
+  let testPath = path.join( context.suitePath, 'routine-' + test.name );
+  let localPath = path.join( testPath, 'wPathBasic' );
+  let clonePathGlobal = providerDst.path.globalFromPreferred( localPath );
+  let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git';
+  let remotePath2 = 'git+https:///github.com/Wandalen/wTools.git';
+
+  let con = new _.Consequence().take( null )
+
+
+  .then( () =>
+  {
+    let got = providerSrc.isDownloadedFrom({ localPath, remotePath : remotePath });
+    test.identical( got, false )
+    return null;
+  })
+
+  .then( () =>
+  {
+    test.case = 'setup';
+    providerDst.filesDelete( localPath );
+    return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }});
+  })
+
+  .then( () =>
+  {
+    let got = providerSrc.isDownloadedFrom({ localPath, remotePath });
+    test.identical( got, true )
+    return null;
+  })
+
+  .then( () =>
+  {
+    let got = providerSrc.isDownloadedFrom({ localPath, remotePath : remotePath2 });
+    test.identical( got, false )
+    return null;
+  })
+
+  return con;
+}
+
 // --
 // declare
 // --
@@ -1007,6 +1056,7 @@ var Proto =
     filesReflectTrivial,
     filesReflectNoStashing,
     isUpToDate,
+    isDownloadedFrom
   },
 
 }

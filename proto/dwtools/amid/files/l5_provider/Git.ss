@@ -793,6 +793,57 @@ defaults.localPath = null;
 defaults.remotePath = null;
 defaults.verbosity = 0;
 
+//
+
+function hasLocalChanges( o )
+{
+  let self = this;
+
+  if( !_.mapIs( o ) )
+  o = { localPath : o }
+
+  _.routineOptions( hasLocalChanges, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( !!self.system );
+  _.assert( _.strDefined( o.localPath ) );
+
+  let ready = _.Consequence.Try( () =>
+  {
+    if( !self.isDownloaded( o ) )
+    throw _.err( 'Found no GIT repository at:', o.localPath );
+
+    return _.process.start
+    ({
+      execPath : 'git status',
+      currentPath : o.localPath,
+      mode : 'spawn',
+      sync : o.sync,
+      deasync : 0,
+      throwingExitCode : 0,
+      outputCollecting : 1,
+      verbosity : o.verbosity - 1,
+    });
+  })
+
+  ready.finally( ( err, got ) =>
+  {
+    if( err )
+    throw _.err( err, '\nFailed to check if repository has local changes' );
+    let localChanges = _.strHasAny( got.output, [ 'Changes to be committed', 'Changes not staged for commit' ] );
+    return localChanges;
+  })
+
+  if( o.sync )
+  return ready.syncMaybe();
+
+  return ready;
+}
+
+var defaults = hasLocalChanges.defaults = Object.create( null );
+defaults.localPath = null;
+defaults.verbosity = 0;
+defaults.sync = 1;
+
 // --
 // etc
 // --
@@ -1235,6 +1286,8 @@ let Proto =
   isUpToDate,
   isDownloaded,
   isDownloadedFromRemote,
+
+  hasLocalChanges,
 
   // etc
 

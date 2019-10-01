@@ -795,21 +795,21 @@ defaults.verbosity = 0;
 
 //
 
-function hasLocalChanges( o )
+function hasChanges( o )
 {
   let self = this;
 
   if( !_.mapIs( o ) )
   o = { localPath : o }
 
-  _.routineOptions( hasLocalChanges, o );
+  _.routineOptions( hasChanges, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( !!self.system );
   _.assert( _.strDefined( o.localPath ) );
 
   let ready = _.Consequence.Try( () =>
   {
-    if( !self.isDownloaded( o ) )
+    if( !self.isDownloaded({ localPath : o.localPath }) )
     throw _.err( 'Found no GIT repository at:', o.localPath );
 
     return _.process.start
@@ -830,7 +830,8 @@ function hasLocalChanges( o )
     if( err )
     throw _.err( err, '\nFailed to check if repository has local changes' );
     let localChanges = _.strHasAny( got.output, [ 'Changes to be committed', 'Changes not staged for commit' ] );
-    return localChanges;
+    let localCommits = !_.strHas( got.output, 'Your branch is up to date' );
+    return localChanges || localCommits;
   })
 
   if( o.sync )
@@ -839,7 +840,7 @@ function hasLocalChanges( o )
   return ready;
 }
 
-var defaults = hasLocalChanges.defaults = Object.create( null );
+var defaults = hasChanges.defaults = Object.create( null );
 defaults.localPath = null;
 defaults.verbosity = 0;
 defaults.sync = 1;
@@ -1287,7 +1288,7 @@ let Proto =
   isDownloaded,
   isDownloadedFromRemote,
 
-  hasLocalChanges,
+  hasChanges,
 
   // etc
 

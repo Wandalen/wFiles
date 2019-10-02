@@ -25002,7 +25002,7 @@ function softLinkMakeAndResolve( test )
 
 //
 
-function softLinkSoftLinkBasic( test )
+function softLinkResolvingBasic( test )
 {
   let self = this;
   let provider = self.provider;
@@ -25014,11 +25014,11 @@ function softLinkSoftLinkBasic( test )
     return;
   }
 
-  let routinePath = test.context.pathFor( 'written/softLinkSoftLinkBasic' );
-  let src1Path = test.context.pathFor( 'written/softLinkSoftLinkBasic/src1' );
-  let src2Path = test.context.pathFor( 'written/softLinkSoftLinkBasic/src2' );
-  let src3Path = test.context.pathFor( 'written/softLinkSoftLinkBasic/src3' );
-  let dstPath = test.context.pathFor( 'written/softLinkSoftLinkBasic/dst' );
+  let routinePath = test.context.pathFor( 'written/softLinkResolvingBasic' );
+  let src1Path = test.context.pathFor( 'written/softLinkResolvingBasic/src1' );
+  let src2Path = test.context.pathFor( 'written/softLinkResolvingBasic/src2' );
+  let src3Path = test.context.pathFor( 'written/softLinkResolvingBasic/src3' );
+  let dstPath = test.context.pathFor( 'written/softLinkResolvingBasic/dst' );
 
   /*
       src1 -> src2 -> src3
@@ -25072,6 +25072,48 @@ function softLinkSoftLinkBasic( test )
   test.is( provider.isTerminal( src3Path ) );
   test.is( provider.isSoftLink( dstPath ) );
   test.identical( provider.pathResolveSoftLink( dstPath ), src3Path );
+
+  /* textLink */
+
+  provider.fieldPush( 'usingTextLink', 1 );
+
+  test.case = 'resolvingSrcTextLink : 0'
+  provider.filesDelete( routinePath );
+  provider.fileWrite( src3Path, src3Path );
+  provider.textLink( src2Path, src3Path );
+  provider.textLink( src1Path, src2Path );
+  provider.textLink({ srcPath : src1Path, dstPath, resolvingSrcSoftLink : 0, resolvingSrcTextLink : 0 });
+  test.is( provider.isTextLink( src1Path ) );
+  test.is( provider.isTextLink( src2Path ) );
+  test.is( provider.isTerminal( src3Path ) );
+  test.is( provider.isTextLink( dstPath ) );
+  test.identical( provider.pathResolveTextLink( dstPath ), src1Path );
+
+  test.case = 'resolvingSrcTextLink : 1'
+  provider.filesDelete( routinePath );
+  provider.fileWrite( src3Path, src3Path );
+  provider.textLink( src2Path, src3Path );
+  provider.textLink( src1Path, src2Path );
+  provider.textLink({ srcPath : src1Path, dstPath, resolvingSrcSoftLink : 0, resolvingSrcTextLink : 1 });
+  test.is( provider.isTextLink( src1Path ) );
+  test.is( provider.isTextLink( src2Path ) );
+  test.is( provider.isTerminal( src3Path ) );
+  test.is( provider.isTextLink( dstPath ) );
+  test.identical( provider.pathResolveTextLink( dstPath ), src3Path );
+
+  test.case = 'resolvingSrcTextLink : 2'
+  provider.filesDelete( routinePath );
+  provider.fileWrite( src3Path, src3Path );
+  provider.textLink( src2Path, src3Path );
+  provider.textLink( src1Path, src2Path );
+  provider.textLink({ srcPath : src1Path, dstPath, resolvingSrcSoftLink : 0, resolvingSrcTextLink : 2 });
+  test.is( provider.isTextLink( src1Path ) );
+  test.is( provider.isTextLink( src2Path ) );
+  test.is( provider.isTerminal( src3Path ) );
+  test.is( provider.isTextLink( dstPath ) );
+  test.identical( provider.pathResolveTextLink( dstPath ), src3Path );
+
+  provider.fieldPop( 'usingTextLink', 1 );
 }
 
 //
@@ -46475,7 +46517,7 @@ var Self =
     softLinkSoftLinkResolving,
     softLinkRelativeLinkResolving,
     softLinkMakeAndResolve,
-    softLinkSoftLinkBasic,//qqq: extend test routine for resolvingSrcTextLink:0-2
+    softLinkResolvingBasic,
     softLinkGlobal,
     softLinkRelativeLinking,//qqq: extend test routine for resolvingSrcTextLink:0-2
 

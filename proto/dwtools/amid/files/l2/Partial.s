@@ -7297,7 +7297,6 @@ function _fileRenameAct( c )
           relativeDstPath : o.relativeDstPath,
           relativeSrcPath : o.relativeSrcPath,
           sync : o.sync,
-          type : null,
         });
       }
       return o.sync ? true : result;

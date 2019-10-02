@@ -13028,7 +13028,7 @@ function fileRenameSoftLinkResolving( test )
 
 //
 
-function fileRenameSoftLinkBasic( test )
+function fileRenameResolvingBasic( test )
 {
   let self = this;
   let provider = self.provider;
@@ -13040,11 +13040,11 @@ function fileRenameSoftLinkBasic( test )
     return;
   }
 
-  let routinePath = test.context.pathFor( 'written/fileRenameSoftLinkBasic' );
-  let src1Path = test.context.pathFor( 'written/fileRenameSoftLinkBasic/src1' );
-  let src2Path = test.context.pathFor( 'written/fileRenameSoftLinkBasic/src2' );
-  let src3Path = test.context.pathFor( 'written/fileRenameSoftLinkBasic/src3' );
-  let dstPath = test.context.pathFor( 'written/fileRenameSoftLinkBasic/dst' );
+  let routinePath = test.context.pathFor( 'written/fileRenameResolvingBasic' );
+  let src1Path = test.context.pathFor( 'written/fileRenameResolvingBasic/src1' );
+  let src2Path = test.context.pathFor( 'written/fileRenameResolvingBasic/src2' );
+  let src3Path = test.context.pathFor( 'written/fileRenameResolvingBasic/src3' );
+  let dstPath = test.context.pathFor( 'written/fileRenameResolvingBasic/dst' );
 
   /*
       src1 -> src2 -> src3
@@ -13104,6 +13104,48 @@ function fileRenameSoftLinkBasic( test )
   test.is( !provider.fileExists( src3Path ) );
   test.is( provider.isTerminal( dstPath ) );
   test.identical( provider.fileRead( dstPath ), src3Path );
+
+  /*  */
+
+  provider.fieldPush( 'usingTextLink', 1 );
+
+  test.case = 'resolvingSrcTextLink : 0'
+  provider.filesDelete( routinePath );
+  provider.fileWrite( src3Path, src3Path );
+  provider.textLink( src2Path, src3Path );
+  provider.textLink( src1Path, src2Path );
+  provider.fileRename({ srcPath : src1Path, dstPath, resolvingSrcSoftLink : 0, resolvingSrcTextLink : 0 });
+  test.is( !provider.fileExists( src1Path ) );
+  test.is( provider.isTextLink( src2Path ) );
+  test.is( provider.isTerminal( src3Path ) );
+  test.is( provider.isTextLink( dstPath ) );
+  test.identical( provider.pathResolveTextLink( dstPath ), src2Path );
+
+  test.case = 'resolvingSrcTextLink : 1'
+  provider.filesDelete( routinePath );
+  provider.fileWrite( src3Path, src3Path );
+  provider.textLink( src2Path, src3Path );
+  provider.textLink( src1Path, src2Path );
+  provider.fileRename({ srcPath : src1Path, dstPath, resolvingSrcSoftLink : 0, resolvingSrcTextLink : 1 });
+  test.is( !provider.fileExists( src1Path ) );
+  test.is( !provider.fileExists( src2Path ) );
+  test.is( provider.isTerminal( src3Path ) );
+  test.is( provider.isTextLink( dstPath ) );
+  test.identical( provider.pathResolveTextLink( dstPath ), src3Path );
+
+  test.case = 'resolvingSrcTextLink : 2'
+  provider.filesDelete( routinePath );
+  provider.fileWrite( src3Path, src3Path );
+  provider.textLink( src2Path, src3Path );
+  provider.textLink( src1Path, src2Path );
+  provider.fileRename({ srcPath : src1Path, dstPath, resolvingSrcSoftLink : 0, resolvingSrcTextLink : 2 });
+  test.is( !provider.fileExists( src1Path ) );
+  test.is( !provider.fileExists( src2Path ) );
+  test.is( !provider.fileExists( src3Path ) );
+  test.is( provider.isTerminal( dstPath ) );
+  test.identical( provider.fileRead( dstPath ), src3Path );
+
+  provider.fieldPop( 'usingTextLink', 1 );
 }
 
 //
@@ -46506,7 +46548,7 @@ var Self =
     fileRenameActSync,
     fileRenameSync2,
     fileRenameSoftLinkResolving,
-    fileRenameSoftLinkBasic, //qqq: extend test routine for resolvingSrcTextLink:0-2
+    fileRenameResolvingBasic, //qqq: extend test routine for resolvingSrcTextLink:0-2
     fileRenameGlobal,
     fileRenameRelativeLinking,//qqq: extend test routine for resolvingSrcTextLink:0-2
 

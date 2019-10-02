@@ -8898,17 +8898,17 @@ function fileCopySoftLinkExtended( test )
 
 //
 
-function fileCopySoftLinkBasic( test )
+function fileCopyResolvingBasic( test )
 {
   let self = this;
   let provider = self.provider;
   let path = provider.path;
 
-  let routinePath = test.context.pathFor( 'written/fileCopySoftLinkBasic' );
-  let src1Path = test.context.pathFor( 'written/fileCopySoftLinkBasic/src1' );
-  let src2Path = test.context.pathFor( 'written/fileCopySoftLinkBasic/src2' );
-  let src3Path = test.context.pathFor( 'written/fileCopySoftLinkBasic/src3' );
-  let dstPath = test.context.pathFor( 'written/fileCopySoftLinkBasic/dst' );
+  let routinePath = test.context.pathFor( 'written/fileCopyResolvingBasic' );
+  let src1Path = test.context.pathFor( 'written/fileCopyResolvingBasic/src1' );
+  let src2Path = test.context.pathFor( 'written/fileCopyResolvingBasic/src2' );
+  let src3Path = test.context.pathFor( 'written/fileCopyResolvingBasic/src3' );
+  let dstPath = test.context.pathFor( 'written/fileCopyResolvingBasic/dst' );
 
   /*
       src1 -> src2 -> src3
@@ -8962,6 +8962,48 @@ function fileCopySoftLinkBasic( test )
   test.is( provider.isTerminal( src3Path ) );
   test.is( provider.isTerminal( dstPath ) );
   test.identical( provider.fileRead( dstPath ), src3Path );
+
+  /* text link */
+
+  provider.fieldPush( 'usingTextLink', 1 )
+
+  test.case = 'resolvingSrcTextLink : 0'
+  provider.filesDelete( routinePath );
+  provider.fileWrite( src3Path, src3Path );
+  provider.textLink( src2Path, src3Path );
+  provider.textLink( src1Path, src2Path );
+  provider.fileCopy({ srcPath : src1Path, dstPath, resolvingSrcSoftLink : 0, resolvingSrcTextLink : 0 });
+  test.is( provider.isTextLink( src1Path ) );
+  test.is( provider.isTextLink( src2Path ) );
+  test.is( provider.isTerminal( src3Path ) );
+  test.is( provider.isTextLink( dstPath ) );
+  test.identical( provider.pathResolveTextLink( dstPath ), src1Path );
+
+  test.case = 'resolvingSrcTextLink : 1'
+  provider.filesDelete( routinePath );
+  provider.fileWrite( src3Path, src3Path );
+  provider.textLink( src2Path, src3Path );
+  provider.textLink( src1Path, src2Path );
+  provider.fileCopy({ srcPath : src1Path, dstPath, resolvingSrcSoftLink : 0, resolvingSrcTextLink : 1 });
+  test.is( provider.isTextLink( src1Path ) );
+  test.is( provider.isTextLink( src2Path ) );
+  test.is( provider.isTerminal( src3Path ) );
+  test.is( provider.isTextLink( dstPath ) );
+  test.identical( provider.pathResolveTextLink( dstPath ), src3Path );
+
+  test.case = 'resolvingSrcTextLink : 2'
+  provider.filesDelete( routinePath );
+  provider.fileWrite( src3Path, src3Path );
+  provider.textLink( src2Path, src3Path );
+  provider.textLink( src1Path, src2Path );
+  provider.fileCopy({ srcPath : src1Path, dstPath, resolvingSrcSoftLink : 0, resolvingSrcTextLink : 2 });
+  test.is( provider.isTextLink( src1Path ) );
+  test.is( provider.isTextLink( src2Path ) );
+  test.is( provider.isTerminal( src3Path ) );
+  test.is( provider.isTerminal( dstPath ) );
+  test.identical( provider.fileRead( dstPath ), src3Path );
+
+  provider.fieldPop( 'usingTextLink', 1 )
 }
 
 //
@@ -46454,9 +46496,9 @@ var Self =
     fileCopyLinks,
     fileCopyError,
     fileCopySoftLinkExtended,
-    fileCopySoftLinkBasic, //qqq: extend test routine for resolvingSrcTextLink:0-2
+    fileCopyResolvingBasic,
     fileCopyGlobal,
-    fileCopyRelativeLinking,//qqq: extend test routine for resolvingSrcTextLink:0-2
+    fileCopyRelativeLinking,
 
     fileRenameSync,
     fileRenameRelativePath,

@@ -1426,6 +1426,7 @@ function pathResolveLinkFull_body( o )
           allowingMissed : o.allowingMissed,
           allowingCycled: o.allowingCycled,
           throwing : o.throwing,
+          recursive : o.recursive,
           stat : null,
         }
 
@@ -1446,6 +1447,7 @@ function pathResolveLinkFull_body( o )
           preservingRelative : true,
           allowingMissed : o.allowingMissed,
           allowingCycled : o.allowingCycled,
+          recursive : o.recursive,
           throwing : o.throwing,
         }
 
@@ -1491,6 +1493,7 @@ function pathResolveLinkFull_body( o )
           resolvingTextLink : o.resolvingTextLink,
           allowingMissed : o.allowingMissed,
           allowingCycled: o.allowingCycled,
+          recursive : o.recursive,
           throwing : o.throwing,
         }
 
@@ -1824,7 +1827,7 @@ defaults.resolvingHeadDirect = 1;
 defaults.resolvingHeadReverse = 1;
 defaults.preservingRelative = 0;
 defaults.relativeOriginalFile = 0;
-// defaults.recursive = 3; /* 0, 1, 2, 3 */
+defaults.recursive = 3; /* 0, 1, 2, 3 */
 
 /*
 qqq : cover option relativeOriginalFile
@@ -1906,6 +1909,7 @@ var defaults = pathResolveLinkTail_body.defaults;
 defaults.system = null;
 defaults.stat = null;
 defaults.preservingRelative = 0;
+defaults.recursive = 3;
 
 //
 
@@ -2006,6 +2010,22 @@ function pathResolveLinkTailChain_body( o )
     sync : 1,
   });
 
+  /*  */
+
+  if( o.recursive === 2 )
+  if( o.result.length > 1 )
+  {
+    let returnLastLink = o.stat ? !o.stat.isLink() : true;
+    if( returnLastLink )
+    {
+      o.result.pop();
+      o.found.pop();
+      return o.result;
+    }
+  }
+
+  /*  */
+
   if( !o.stat )
   {
     o.result.push( null );
@@ -2020,6 +2040,17 @@ function pathResolveLinkTailChain_body( o )
 
     return o.result;
   }
+
+  /* */
+
+  if( !o.recursive )
+  return o.result;
+
+  /* */
+
+  if( o.recursive === 1 )
+  if( o.result.length > 1 )
+  return o.result;
 
   /* */
 
@@ -2157,6 +2188,7 @@ var defaults = pathResolveLinkHeadDirect_body.defaults;
 
 defaults.system = null;
 defaults.stat = null;
+defaults.recursive = 3;
 
 //
 
@@ -2192,7 +2224,8 @@ function pathResolveLinkHeadReverse_body( o )
   if( system && system !== self && path.isGlobal( o.filePath ) )
   return system.pathResolveLinkHeadReverse.body.call( system, o );
 
-  let prefixPath = o.filePath;
+  /* Vova: qqq: should not resolve last part of the filePath? */
+  let prefixPath = path.dir( o.filePath );
   let postfixPath = '';
 
   while( !path.isRoot( prefixPath ) )
@@ -2208,6 +2241,9 @@ function pathResolveLinkHeadReverse_body( o )
 
   let result = '/' + postfixPath;
 
+  if( postfixPath.length )
+  result = path.join( result, path.fullName( o.filePath ) );
+
   if( path.parse )
   result = ( path.parse( prefixPath ).origin || '' ) + result;
 
@@ -2219,6 +2255,7 @@ _.routineExtend( pathResolveLinkHeadReverse_body, _pathResolveLink );
 var defaults = pathResolveLinkHeadReverse_body.defaults;
 
 defaults.system = null;
+defaults.recursive = 3;
 
 //
 

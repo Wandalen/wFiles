@@ -41337,6 +41337,376 @@ pathResolveLinkFull.timeOut = 30000;
 
 //
 
+function pathResolveLinkFullRecursive( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let path = provider.path;
+
+  let routinePath = test.context.pathFor( 'written/pathResolveLinkFullRecursive' );
+  let filePath = test.context.pathFor( 'written/pathResolveLinkFullRecursive/file' );
+  let linkPath = test.context.pathFor( 'written/pathResolveLinkFullRecursive/link1' );
+  let linkPath2 = test.context.pathFor( 'written/pathResolveLinkFullRecursive/link2' );
+  let linkPath3 = test.context.pathFor( 'written/pathResolveLinkFullRecursive/link3' );
+
+  /*
+    - missing
+    - terminal
+    - link to missing file
+    - link to existing file
+    - chain of three links to missing
+    - chain of three links to file
+    - cycled links
+  */
+
+  test.open( 'missing' );
+  provider.filesDelete( routinePath );
+
+  var got = provider.pathResolveLinkFull
+  ({
+    filePath,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    recursive : 0
+  })
+  test.identical( got.absolutePath, filePath );
+
+  var got = provider.pathResolveLinkFull
+  ({
+    filePath,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    recursive : 1
+  })
+  test.identical( got.absolutePath, filePath );
+
+  var got = provider.pathResolveLinkFull
+  ({
+    filePath,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    recursive : 2
+  })
+  test.identical( got.absolutePath, filePath );
+
+  var got = provider.pathResolveLinkFull
+  ({
+    filePath,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    recursive : 3
+  })
+  test.identical( got.absolutePath, filePath );
+
+  test.close( 'missing' );
+
+  /* - */
+
+  test.open( 'terminal' )
+  provider.filesDelete( routinePath );
+  provider.fileWrite( filePath, filePath );
+
+  var got = provider.pathResolveLinkFull
+  ({
+    filePath,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    recursive : 0
+  })
+  test.identical( got.absolutePath, filePath );
+
+  var got = provider.pathResolveLinkFull
+  ({
+    filePath,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    recursive : 1
+  })
+  test.identical( got.absolutePath, filePath );
+
+  var got = provider.pathResolveLinkFull
+  ({
+    filePath,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    recursive : 2
+  })
+  test.identical( got.absolutePath, filePath );
+
+  var got = provider.pathResolveLinkFull
+  ({
+    filePath,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    recursive : 3
+  })
+  test.identical( got.absolutePath, filePath );
+
+  test.close( 'terminal' )
+
+  /*  */
+
+  test.open( 'link to missing' )
+  provider.filesDelete( routinePath );
+  provider.dirMake( routinePath )
+  provider.softLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1 });
+
+  var got = provider.pathResolveLinkFull
+  ({
+    filePath : linkPath,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    recursive : 0
+  })
+  test.identical( got.absolutePath, linkPath );
+
+  var got = provider.pathResolveLinkFull
+  ({
+    filePath : linkPath,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    recursive : 1
+  })
+  test.identical( got.absolutePath, filePath );
+
+  var got = provider.pathResolveLinkFull
+  ({
+    filePath : linkPath,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    recursive : 2
+  })
+  test.identical( got.absolutePath, linkPath );
+
+  var got = provider.pathResolveLinkFull
+  ({
+    filePath : linkPath,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    recursive : 3
+  })
+  test.identical( got.absolutePath, filePath );
+
+  test.close( 'link to missing' )
+
+  /* - */
+
+  test.open( 'link to terminal' )
+  provider.filesDelete( routinePath );
+  provider.fileWrite( filePath, filePath );
+  provider.softLink( linkPath, filePath );
+
+  var got = provider.pathResolveLinkFull
+  ({
+    filePath : linkPath,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    recursive : 0
+  })
+  test.identical( got.absolutePath, linkPath );
+
+  var got = provider.pathResolveLinkFull
+  ({
+    filePath : linkPath,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    recursive : 1
+  })
+  test.identical( got.absolutePath, filePath );
+
+  var got = provider.pathResolveLinkFull
+  ({
+    filePath : linkPath,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    recursive : 2
+  })
+  test.identical( got.absolutePath, linkPath );
+
+  var got = provider.pathResolveLinkFull
+  ({
+    filePath : linkPath,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    recursive : 3
+  })
+  test.identical( got.absolutePath, filePath );
+
+  test.close( 'link to terminal' )
+
+  /* - */
+
+  test.open( 'chain of three links to missing' );
+  provider.filesDelete( routinePath );
+  provider.dirMake( routinePath );
+  provider.softLink({ dstPath : linkPath3, srcPath : filePath, allowingMissed : 1 });
+  provider.softLink( linkPath2, linkPath3 );
+  provider.softLink( linkPath, linkPath2 );
+
+  var got = provider.pathResolveLinkFull
+  ({
+    filePath : linkPath,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    recursive : 0
+  })
+  test.identical( got.absolutePath, linkPath );
+
+  debugger
+  var got = provider.pathResolveLinkFull
+  ({
+    filePath : linkPath,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    recursive : 1
+  })
+  test.identical( got.absolutePath, linkPath2 );
+
+  var got = provider.pathResolveLinkFull
+  ({
+    filePath : linkPath,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    recursive : 2
+  })
+  test.identical( got.absolutePath, linkPath3 );
+
+  var got = provider.pathResolveLinkFull
+  ({
+    filePath : linkPath,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    recursive : 3
+  })
+  test.identical( got.absolutePath, filePath );
+
+  test.close( 'chain of three links to missing' );
+
+  /* - */
+
+  test.open( 'chain of three links to terminal' );
+  provider.filesDelete( routinePath );
+  provider.fileWrite( filePath, filePath );
+  provider.softLink( linkPath3, filePath );
+  provider.softLink( linkPath2, linkPath3 );
+  provider.softLink( linkPath, linkPath2 );
+
+  var got = provider.pathResolveLinkFull
+  ({
+    filePath : linkPath,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    recursive : 0
+  })
+  test.identical( got.absolutePath, linkPath );
+
+  var got = provider.pathResolveLinkFull
+  ({
+    filePath : linkPath,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    recursive : 1
+  })
+  test.identical( got.absolutePath, linkPath2 );
+
+  var got = provider.pathResolveLinkFull
+  ({
+    filePath : linkPath,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    recursive : 2
+  })
+  test.identical( got.absolutePath, linkPath3 );
+
+  var got = provider.pathResolveLinkFull
+  ({
+    filePath : linkPath,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    recursive : 3
+  })
+  test.identical( got.absolutePath, filePath );
+
+  test.close( 'chain of three links to terminal' );
+
+  /* - */
+
+  test.open( 'cycled links' );
+  provider.filesDelete( routinePath );
+  provider.dirMake( routinePath );
+  provider.softLink({ dstPath : linkPath3, srcPath : linkPath, allowingMissed : 1 });
+  provider.softLink( linkPath2, linkPath3 );
+  provider.softLink( linkPath, linkPath2 );
+
+  var got = provider.pathResolveLinkFull
+  ({
+    filePath : linkPath,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    recursive : 0
+  })
+  test.identical( got.absolutePath, linkPath );
+
+  var got = provider.pathResolveLinkFull
+  ({
+    filePath : linkPath,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    recursive : 1
+  })
+  test.identical( got.absolutePath, linkPath2 );
+
+  var got = provider.pathResolveLinkFull
+  ({
+    filePath : linkPath,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    recursive : 2
+  })
+  test.identical( got.absolutePath, linkPath );
+
+  var got = provider.pathResolveLinkFull
+  ({
+    filePath : linkPath,
+    throwing : 1,
+    allowingMissed : 1,
+    allowingCycled : 1,
+    recursive : 3
+  })
+  test.identical( got.absolutePath, linkPath );
+
+  test.close( 'cycled links' );
+}
+
+//
+
 function pathResolveSoftLink( test )
 {
   let self = this;
@@ -46173,6 +46543,7 @@ var Self =
     linkingCriticalCases,
     pathResolveLinkTailChain,
     pathResolveLinkFull,
+    pathResolveLinkFullRecursive,
     pathResolveSoftLink,
     pathResolveSoftLinkExtended,
     pathResolveTextLink,

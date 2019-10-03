@@ -4115,7 +4115,7 @@ function filesAreSame_pre( routine, args )
 
 //
 
-function filesAreSame_body( o )
+function filesAreSameCommon_body( o )
 {
   let self = this;
 
@@ -4205,42 +4205,82 @@ function filesAreSame_body( o )
   if( o.ins1.stat.size !== o.ins2.stat.size )
   return false;
 
-  /* hash */
-
-  try
-  {
-    let h1 = o.ins1.hashRead();
-    let h2 = o.ins2.hashRead();
-
-    _.assert( _.strIs( h1 ) && _.strIs( h2 ) );
-
-    return h1 === h2;
-  }
-  catch( err )
-  {
-    return o.default;
-  }
+  return true;
 }
 
-var defaults = filesAreSame_body.defaults = Object.create( null );
+var defaults = filesAreSameCommon_body.defaults = Object.create( null );
 defaults.ins1 = null;
 defaults.ins2 = null;
 defaults.default = NaN;
 
-var having = filesAreSame_body.having = Object.create( null );
+var having = filesAreSameCommon_body.having = Object.create( null );
 having.writing = 0;
 having.reading = 1;
 having.driving = 1;
 having.aspect = 'body';
 
-var operates = filesAreSame_body.operates = Object.create( null );
+var operates = filesAreSameCommon_body.operates = Object.create( null );
 operates.ins1 = { pathToRead : 1 };
 operates.ins2 = { pathToRead : 1 };
 
 //
 
+function filesAreSame_body( o )
+{
+  let self = this;
+  let result = filesAreSameCommon_body.call( self, o );
+
+  if( result )
+  {
+    /* hash */
+
+    try
+    {
+      let h1 = o.ins1.hashRead();
+      let h2 = o.ins2.hashRead();
+
+      _.assert( _.strIs( h1 ) && _.strIs( h2 ) );
+
+      result = h1 === h2;
+    }
+    catch( err )
+    {
+      result = o.default;
+    }
+  }
+
+  return result;
+}
+
+_.routineExtend( filesAreSame_body, filesAreSameCommon_body );
+
 let filesAreSame = _.routineFromPreAndBody( filesAreSame_pre, filesAreSame_body );
 filesAreSame.having.aspect = 'entry';
+
+//
+
+function filesAreSameForSure_body( o )
+{
+  let self = this;
+  let result = filesAreSameCommon_body.call( self, o );
+
+  if( !result )
+  return false;
+
+  if( !o.ins1.stat.size && !o.ins2.stat.size )
+  return false;
+
+  let file1 = o.ins1.factory.effectiveProvider.fileRead({ filePath : o.ins1.absolute, encoding : 'buffer.bytes' });
+  let file2 = o.ins2.factory.effectiveProvider.fileRead({ filePath : o.ins2.absolute, encoding : 'buffer.bytes' });
+  return _.entityIdentical( file1, file2 );
+}
+
+_.routineExtend( filesAreSameForSure_body, filesAreSameCommon_body );
+
+//
+
+let filesAreSameForSure = _.routineFromPreAndBody( filesAreSame_pre, filesAreSameForSure_body );
+filesAreSameForSure.having.aspect = 'entry';
 
 //
 
@@ -9120,6 +9160,7 @@ let Proto =
 
   filesFingerprints,
   filesAreSame,
+  filesAreSameForSure,
 
   // write
 

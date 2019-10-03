@@ -58,6 +58,12 @@ submodule :
   tar :
     path : npm:///tar
     enabled : 0 # submodule
+  gitconfiglocal :
+    path : npm:///gitconfiglocal
+    enabled : 0 # submodule
+  proper-lockfile :
+    path : npm:///proper-lockfile
+    enabled : 0 # submodule
   wFiles :
     path : hd://.
     enabled : 0 # submodule

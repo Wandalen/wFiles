@@ -59,7 +59,8 @@
     "wLogger": "",
     "ini": "",
     "tar": "",
-    "gitconfiglocal" : ""
+    "gitconfiglocal" : "",
+    "proper-lockfile" : ""
   },
   "devDependencies": {
     "wait-sync": "",

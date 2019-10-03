@@ -33,7 +33,7 @@ function onSuiteBegin()
 {
   var self = this;
 
-  self.suitePath = _.path.dirTempOpen( _.path.join( __dirname, '../..'  ), 'System/HardDrive' );
+  self.suitePath = _.path.pathDirTempOpen( _.path.join( __dirname, '../..'  ), 'System/HardDrive' );
 
   self.provider.providerRegister( self.providerEffective );
   self.provider.defaultProvider = self.providerEffective;
@@ -46,7 +46,7 @@ function onSuiteBegin()
 
 function onSuiteEnd()
 {
-  _.assert( _.strHas( this.suitePath, 'System/HardDrive' ) );
+  _.assert( _.strHas( this.suitePath, '.tmp' ), this.suitePath );
   // this.providerEffective.filesDelete({ filePath : this.suitePath });
   _.path.pathDirTempClose( this.suitePath );
 }

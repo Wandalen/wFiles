@@ -11090,7 +11090,155 @@ function filesFindGlobComplex( test )
 
   test.close( 'check escaping' );
 
+  test.open( 'check ?(-)?(test.)?(.cc|.js)' );
+
+  /* - */
+
+  test.case = 'src/proto/?(-)ile';
+  var expectedRelative = [ '.', './-ile' ];
+  var records = find({ filePath : abs( 'src/proto/?(-)ile' ), maskPreset : 0 });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* */
+
+  test.case = 'src/proto/?(-)?(ile)';
+  var expectedRelative = [ '.', './-ile' ];
+  var records = find({ filePath : abs( 'src/proto/?(-)?(ile)' ), maskPreset : 0 });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* */
+
+  test.case = 'src/proto/?(-)?(ile)?(test.)?(.cc|.js)';
+  var expectedRelative = [ '.', './-ile' ];
+  var records = find({ filePath : abs( 'src/proto/?(-)?(ile)?(test.)?(.cc|.js)' ), maskPreset : 0 });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* */
+
+  // test.case = 'src/proto/?(-)?(?(i)le)'; /* zzz : make it working */
+  // var expectedRelative = [ '.', './-ile' ];
+  // var records = find({ filePath : abs( 'src/proto/?(-)?(?(i)le)' ), maskPreset : 0 });
+  // var gotRelative = _.select( records, '*/relative' );
+  // test.identical( gotRelative, expectedRelative );
+
+  /* - */
+
+  test.close( 'check ?(-)?(test.)?(.cc|.js)' );
+
+/*
+  '-ile' : 'src/proto/-ile',
+  'file' : 'src/proto/file',
+  'f.cc' : 'src/proto/f.cc',
+  'f.js' : 'src/proto/f.js',
+  'f.ss' : 'src/proto/f.ss',
+  'f.test.js' : 'src/proto/f.test.js',
+  'f.test.ss' : 'src/proto/f.test.ss',
+*/
+
 } /* end of function filesFindGlobComplex */
+
+//
+
+function filesFindGlobWillfiles( test )
+{
+  let context = this;
+  let provider = context.provider;
+  let system = context.system;
+  let path = context.provider.path;
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+
+  function abs()
+  {
+    let args = _.longSlice( arguments );
+    args.unshift( routinePath );
+    return path.s.join.apply( path.s, args );
+  }
+
+  var tree =
+  {
+    src :
+    {
+      proto :
+      {
+        'will.yml' : 'src/proto/will.yml',
+        'im.will.yml' : 'src/proto/im.will.yml',
+        'ex.will.yml' : 'src/proto/ex.will.yml',
+        '.will.yml' : 'src/proto/.will.yml',
+        '.im.will.yml' : 'src/proto/.im.will.yml',
+        '.ex.will.yml' : 'src/proto/.ex.will.yml',
+        'a.will.yml' : 'src/proto/a.will.yml',
+        'a.im.will.yml' : 'src/proto/a.im.will.yml',
+        'a.ex.will.yml' : 'src/proto/a.ex.will.yml',
+        '.a.will.yml' : 'src/proto/.a.will.yml',
+        '.a.im.will.yml' : 'src/proto/.a.im.will.yml',
+        '.a.ex.will.yml' : 'src/proto/.a.ex.will.yml',
+
+        'f' : 'src/proto/f',
+        'f.yml' : 'src/proto/f.yml',
+        'f.test.yml' : 'src/proto/f.test.yml',
+      },
+    },
+  }
+  var extract = new _.FileProvider.Extract({ filesTree : tree });
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+
+  var find = provider.filesFinder
+  ({
+    withTerminals : 1,
+    withDirs : 1,
+    withTransient : 1,
+    filter : { recursive : 2 },
+    filter :
+    {
+      prefixPath : routinePath,
+    }
+  });
+
+  /* - */
+
+  test.open( 'first' );
+
+  /* - */
+
+  test.case = 'src/proto/?(.)?(im.|ex.)?(out.)will.*';
+  var expectedRelative = [ '.', './.ex.will.yml', './.im.will.yml', './.will.yml', './ex.will.yml', './im.will.yml', './will.yml' ];
+  var records = find({ filePath : abs( 'src/proto/?(.)?(im.|ex.)?(out.)will.*' ), maskPreset : 0 });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  test.case = 'src/proto/*?(.)?(im.|ex.)?(out.)will.*';
+  var expectedRelative =
+  [
+    '.',
+    './.a.ex.will.yml',
+    './.a.im.will.yml',
+    './.a.will.yml',
+    './.ex.will.yml',
+    './.im.will.yml',
+    './.will.yml',
+    './a.ex.will.yml',
+    './a.im.will.yml',
+    './a.will.yml',
+    './ex.will.yml',
+    './im.will.yml',
+    './will.yml'
+  ]
+  var records = find({ filePath : abs( 'src/proto/*?(.)?(im.|ex.)?(out.)will.*' ), maskPreset : 0 });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  // ?(.)?(im.|ex.)?(out.)will.*
+
+  /* - */
+
+  test.close( 'first' );
+
+} /* end of function filesFindGlobWillfiles */
 
 //
 
@@ -35600,6 +35748,7 @@ var Self =
     filesFindExcluding,
     filesFindGlobLogic,
     filesFindGlobComplex,
+    filesFindGlobWillfiles,
     filesFindAnyPositive,
     filesFindTotalPositive,
     filesFindSeveralTotalPositive,

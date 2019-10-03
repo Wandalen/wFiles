@@ -1283,10 +1283,11 @@ function pathResolveLinkStep_body( o )
   if( o.resolvingSoftLink )
   {
     let o2 = o2From( o );
+    let filePath = o2.filePath;
     let result = self.pathResolveSoftLink( o2 );
 
     if( o.resolvingTextLink )
-    if( result === o2.filePath )
+    if( result === filePath )
     {
       let o2 = o2From( o );
       result = self.pathResolveTextLink( o2 );

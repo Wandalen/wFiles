@@ -25379,6 +25379,8 @@ function softLinkRelativeLinkResolving( test )
   test.close( 'links to same file' );
 }
 
+softLinkRelativeLinkResolving.timeOut = 10000;
+
 //
 
 function softLinkMakeAndResolve( test )
@@ -44991,7 +44993,7 @@ function pathResolveTextLink( test )
   provider.textLink({ dstPath : linkPath, srcPath : '../file', allowingMissed : 1, makingDirectory : 1 });
   provider.textLink({ dstPath : linkPath2, srcPath : '../link' });
   var got = provider.pathResolveTextLink( { filePath : linkPath2, resolvingMultiple : 3 } );
-  test.identical( got, '../file' );
+  test.identical( got, self.globalFromPreferred( '../file' ) );
 
   test.case = 'Chain with relative and absolute textlinks';
   provider.filesDelete( routinePath );
@@ -44999,7 +45001,7 @@ function pathResolveTextLink( test )
   provider.textLink({ dstPath : linkPath2, srcPath : linkPath });
   provider.textLink({ dstPath : linkPath3, srcPath : '../link2' });
   var got = provider.pathResolveTextLink( { filePath : linkPath3, resolvingMultiple : 3 } );
-  test.identical( got, '../file' );
+  test.identical( got, self.globalFromPreferred( '../file' ) );
 
   /* resolvingIntermediateDirectories */
 
@@ -46941,8 +46943,8 @@ function pathResolveLinkStep( test )
     relativeOriginalFile : 0,
     preservingRelative : 1
   })
-  test.identical( got.filePath, '../terminal' );
-  test.identical( got.relativePath, '../terminal' );
+  test.identical( got.filePath, self.globalFromPreferred( '../terminal' ) );
+  test.identical( got.relativePath, self.globalFromPreferred( '../terminal' ) );
   test.identical( got.absolutePath, terminalPath );
 
   var got = provider.pathResolveLinkStep
@@ -46956,8 +46958,8 @@ function pathResolveLinkStep( test )
     relativeOriginalFile : 1,
     preservingRelative : 1
   })
-  test.identical( got.filePath, '../terminal' );
-  test.identical( got.relativePath, '../terminal' );
+  test.identical( got.filePath, self.globalFromPreferred( '../terminal' ) );
+  test.identical( got.relativePath, self.globalFromPreferred( '../terminal' ) );
   test.identical( got.absolutePath, terminalPath );
 
   var got = provider.pathResolveLinkStep
@@ -47073,8 +47075,8 @@ function pathResolveLinkStep( test )
     relativeOriginalFile : 0,
     preservingRelative : 1
   })
-  test.identical( got.filePath, '../terminal' );
-  test.identical( got.relativePath, '../terminal' );
+  test.identical( got.filePath, self.globalFromPreferred( '../terminal' ) );
+  test.identical( got.relativePath, self.globalFromPreferred( '../terminal' ) );
   test.identical( got.absolutePath, terminalPath );
 
   var got = provider.pathResolveLinkStep
@@ -47088,8 +47090,8 @@ function pathResolveLinkStep( test )
     relativeOriginalFile : 1,
     preservingRelative : 1
   })
-  test.identical( got.filePath, '../terminal' );
-  test.identical( got.relativePath, '../terminal' );
+  test.identical( got.filePath, self.globalFromPreferred( '../terminal' ) );
+  test.identical( got.relativePath, self.globalFromPreferred( '../terminal' ) );
   test.identical( got.absolutePath, terminalPath );
 
   var got = provider.pathResolveLinkStep

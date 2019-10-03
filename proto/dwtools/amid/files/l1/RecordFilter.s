@@ -1996,7 +1996,7 @@ function filePathCopy( o )
 
   if( o.srcInstance && o.dstInstance )
   {
-    o.value = _.entityShallowClone( o.value );
+    o.value = _.entityMake( o.value );
   }
 
   /* set */
@@ -3648,7 +3648,7 @@ function sureBasePath( filePath, basePath )
   basePath = path.s.fromGlob( basePath );
 
   // let filePathWithFallback = filter.filePathArrayNonBoolGet( filePath, 1 );
-  let originalFilePath = _.entityShallowClone( filePath );
+  let originalFilePath = _.entityMake( filePath );
   filePath = filter.filePathArrayNonBoolGet( filePath, 0 );
   filePath = filePath.filter( ( e ) => _.strIs( e ) && e );
   filePath = path.s.join( filter.prefixPath || '', filePath );
@@ -4153,10 +4153,10 @@ function masksGenerate()
 
     /* if base path is redundant then return empty map */
     if( _.mapIs( basePath ) )
-    filter.formedBasePath = _.entityShallowClone( basePath );
+    filter.formedBasePath = _.entityMake( basePath );
     else
     filter.formedBasePath = Object.create( null );
-    filter.formedFilePath = _.entityShallowClone( filePath );
+    filter.formedFilePath = _.entityMake( filePath );
 
   }
 
@@ -4201,7 +4201,7 @@ function _applyToRecordMasks( record )
   _.assert( !!masks, 'Cant resolve filter map for stem path', () => _.strQuote( f.stemPath ) );
   _.assert( !!f.formed, 'Record factor was not formed!' );
 
-  // if( _.strEnds( record.absolute, '+sub.out/debug/File.debug.js' ) )
+  // if( _.strEnds( record.absolute, '/will.yml' ) )
   // debugger;
   // if( _.strHas( record.absolute, 'dir2' ) )
   // debugger;

@@ -818,7 +818,7 @@ function filesFind_body( o )
 
     if( _.strIs( stemPaths ) )
     stemPaths = [ stemPaths ];
-    stemPaths = _.longUnduplicate( stemPaths );
+    stemPaths = _.longOnce( stemPaths );
     _.strsSort( stemPaths );
     _.assert( _.arrayIs( stemPaths ), 'Expects path or array of paths' );
 
@@ -2469,8 +2469,8 @@ function filesReflectEvaluate_body( o )
 
     // if( _.strEnds( record.dst.absolute, debugPath ) )
     // debugger;
-    if( _.strEnds( record.dst.absolute, 'Typing.test.s' ) )
-    debugger;
+    // if( _.strEnds( record.dst.absolute, 'Typing.test.s' ) )
+    // debugger;
 
     _.assert( arguments.length === 2 );
     _.assert( !!record.touch === !!touchMap[ record.dst.absolute ] );
@@ -4801,7 +4801,7 @@ function filesDelete_body( o )
   }
   else
   {
-    con.then( provider.filesFind.body.call( provider, o2 ) );
+    con.then( () => provider.filesFind.body.call( provider, o2 ) );
     con.then( () => handleResult() );
     if( o.deletingEmptyDirs )
     con.then( () => deleteEmptyDirs() );
@@ -4821,6 +4821,7 @@ function filesDelete_body( o )
   function handleLateWriting()
   {
     let opened = false;
+
     if( o.tempPath === null )
     {
       debugger;

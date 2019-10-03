@@ -38,7 +38,7 @@ if( typeof module !== 'undefined' )
 
 var _ = _global_.wTools;
 var Parent = wTester;
-var testSuitePath;
+var suitePath;
 
 // --
 // context
@@ -47,9 +47,9 @@ var testSuitePath;
 function onSuiteBegin()
 {
   if( Config.interpreter === 'njs' )
-  testSuitePath = _.path.dirTempOpen( _.path.join( __dirname, '../..' ), 'FileRecordFilter' );
+  suitePath = _.path.pathDirTempOpen( _.path.join( __dirname, '../..' ), 'FileRecordFilter' );
   else
-  testSuitePath = _.path.current();
+  suitePath = _.path.current();
 }
 
 //
@@ -58,8 +58,8 @@ function onSuiteEnd()
 {
   if( Config.interpreter === 'njs' )
   {
-    _.assert( _.strHas( testSuitePath, 'FileRecordFilter' ) );
-    _.path.pathDirTempClose( testSuitePath );
+    _.assert( _.strHas( suitePath, '.tmp' ), suitePath );
+    _.path.pathDirTempClose( suitePath );
   }
 }
 
@@ -185,8 +185,10 @@ function make( test )
   return;
 
   test.description = 'bad options';
-  test.shouldThrowError( () => provider.recordFilter({ '/xx' : '/src' }) );
-  test.shouldThrowError( () => provider.recordFilter( 1 ) );
+
+  test.shouldThrowErrorOfAnyKind( () => provider.recordFilter({ '/xx' : '/src' }) );
+  test.shouldThrowErrorOfAnyKind( () => provider.recordFilter( 1 ) );
+
 
 }
 
@@ -1930,7 +1932,7 @@ function reflect( test )
 
   test.description = 'cant deduce base path';
 
-  test.shouldThrowError( () =>
+  test.shouldThrowErrorOfAnyKind( () =>
   {
     provider.filesReflect
     ({
@@ -1938,7 +1940,7 @@ function reflect( test )
     });
   });
 
-  test.shouldThrowError( () =>
+  test.shouldThrowErrorOfAnyKind( () =>
   {
     provider.filesReflect
     ({
@@ -1947,7 +1949,7 @@ function reflect( test )
     });
   });
 
-  test.shouldThrowError( () =>
+  test.shouldThrowErrorOfAnyKind( () =>
   {
     provider.filesReflect
     ({
@@ -7313,7 +7315,7 @@ function pathsSupplementJoiningLogical( test )
 var Self =
 {
 
-  name : 'Tools/mid/files/RecordFilter',
+  name : 'Tools.mid.files.RecordFilter',
   silencing : 1,
 
   onSuiteBegin,

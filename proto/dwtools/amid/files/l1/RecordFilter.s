@@ -1631,7 +1631,7 @@ function basePathsGet()
   _.assert( filter.basePath === null || _.strIs( filter.basePath ) || _.mapIs( filter.basePath ) );
 
   if( _.objectIs( filter.basePath ) )
-  return _.longUnduplicate( null, _.mapVals( filter.basePath ) )
+  return _./*longOnce*/arrayAppendArrayOnce( null, _.mapVals( filter.basePath ) )
   else if( _.strIs( filter.basePath ) )
   return [ filter.basePath ];
   else
@@ -1996,7 +1996,7 @@ function filePathCopy( o )
 
   if( o.srcInstance && o.dstInstance )
   {
-    o.value = _.entityShallowClone( o.value );
+    o.value = _.entityMake( o.value );
   }
 
   /* set */
@@ -2885,7 +2885,7 @@ function filePathSrcArrayNonBoolGet( filePath, booleanFallingBack )
   }
 
   _.assert( _.arrayIs( filePath ) );
-  _.longUnduplicate( filePath );
+  _.longOnce( filePath );
 
   return filePath;
 }
@@ -2936,7 +2936,7 @@ function filePathDstArrayBoolGet( filePath )
   }
 
   let filePath2 = _.filter( filePath, ( e ) => _.boolLike( e ) ? !!e : undefined );
-  filePath = _.longUnduplicate( null, filePath2 );
+  filePath = _./*longOnce*/arrayAppendArrayOnce( null, filePath2 );
 
   _.assert( _.arrayIs( filePath ) );
 
@@ -3648,7 +3648,7 @@ function sureBasePath( filePath, basePath )
   basePath = path.s.fromGlob( basePath );
 
   // let filePathWithFallback = filter.filePathArrayNonBoolGet( filePath, 1 );
-  let originalFilePath = _.entityShallowClone( filePath );
+  let originalFilePath = _.entityMake( filePath );
   filePath = filter.filePathArrayNonBoolGet( filePath, 0 );
   filePath = filePath.filter( ( e ) => _.strIs( e ) && e );
   filePath = path.s.join( filter.prefixPath || '', filePath );
@@ -4153,10 +4153,10 @@ function masksGenerate()
 
     /* if base path is redundant then return empty map */
     if( _.mapIs( basePath ) )
-    filter.formedBasePath = _.entityShallowClone( basePath );
+    filter.formedBasePath = _.entityMake( basePath );
     else
     filter.formedBasePath = Object.create( null );
-    filter.formedFilePath = _.entityShallowClone( filePath );
+    filter.formedFilePath = _.entityMake( filePath );
 
   }
 
@@ -4201,11 +4201,7 @@ function _applyToRecordMasks( record )
   _.assert( !!masks, 'Cant resolve filter map for stem path', () => _.strQuote( f.stemPath ) );
   _.assert( !!f.formed, 'Record factor was not formed!' );
 
-  // if( _.strEnds( record.absolute, 'supermodule.out.will.yml' ) )
-  // debugger;
-  // if( _.strEnds( record.absolute, 'proto' ) )
-  // debugger;
-  // if( _.strEnds( record.absolute, 'proto/f.js' ) )
+  // if( _.strEnds( record.absolute, '/will.yml' ) )
   // debugger;
   // if( _.strHas( record.absolute, 'dir2' ) )
   // debugger;

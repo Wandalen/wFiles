@@ -488,7 +488,7 @@ function fileReadAct( o )
 {
   let self = this;
   let con;
-  let stack = '';
+  let stack = null;
   let result = null;
 
   _.assertRoutineOptions( fileReadAct, arguments );
@@ -496,9 +496,13 @@ function fileReadAct( o )
 
   let filePath = self.path.nativize( o.filePath );
 
-  if( 1 )
+  // if( Config.debug )
+  // if( !o.sync )
+  // stack = _._err({ usingSourceCode : 0, args : [] });
+
   if( Config.debug )
-  stack = _._err({ usingSourceCode : 0, args : [] });
+  if( !o.sync )
+  stack = _.diagnosticStack([ 2, Infinity ]);
 
   let encoder = fileReadAct.encoders[ o.encoding ];
 
@@ -534,18 +538,22 @@ function fileReadAct( o )
     if( encoder && encoder.onError )
     try
     {
+      debugger;
       err = _._err
       ({
-        args : [ stack, '\nfileReadAct( ', o.filePath, ' )\n', err ],
+        args : [ '\nfileReadAct( ', o.filePath, ' )\n', err ],
         usingSourceCode : 0,
         level : 0,
+        stack : stack,
       });
       err = encoder.onError.call( self, { error : err, transaction : o, encoder : encoder })
     }
     catch( err2 )
     {
-      console.error( err2 );
-      console.error( err.toString() + '\n' + err.stack );
+      console.error( err2.message );
+      console.error( err2.stack );
+      console.error( err.message );
+      console.error( err.stack );
     }
 
     if( o.sync )
@@ -1442,7 +1450,7 @@ function softLinkAct( o )
   _.assert( o.type === null || o.type === 'dir' ||  o.type === 'file' );
 
   if( !srcIsAbsolute )
-  { 
+  {
     srcPath = o.relativeSrcPath;
     if( _.strBegins( srcPath, './' ) )
     srcPath = _.strIsolateLeftOrNone( srcPath, './' )[ 2 ];
@@ -1454,9 +1462,9 @@ function softLinkAct( o )
   {
 
     if( o.type === null )
-    { 
+    {
       let srcPathResolved = srcPath;
-      
+
       /* not dir */
       if( !srcIsAbsolute )
       srcPathResolved = self.path.resolve( self.path.dir( o.dstPath ), srcPath );
@@ -1709,19 +1717,13 @@ encoders[ 'buffer.raw' ] =
 
   onBegin : function( e )
   {
-    debugger;
     _.assert( e.transaction.encoding === 'buffer.raw' );
     e.transaction.encoding = 'buffer.node';
   },
 
   onEnd : function( e )
   {
-    debugger;
     _.assert( _.bufferNodeIs( e.data ) || _.bufferTypedIs( e.data ) || _.bufferRawIs( e.data ) );
-
-    // _.assert( _.bufferNodeIs( e.data ) );
-    // _.assert( !_.bufferTypedIs( e.data ) );
-    // _.assert( !_.bufferRawIs( e.data ) );
 
     let result = _.bufferRawFrom( e.data );
 

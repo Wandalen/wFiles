@@ -37,17 +37,18 @@ function onSuiteBegin( test )
 
   let path = context.providerDst.path;
 
-  context.testSuitePath = path.pathDirTempOpen( 'FileProviderGit' );
-  context.testSuitePath = context.providerDst.pathResolveLinkFull({ filePath : context.testSuitePath, resolvingSoftLink : 1 });
-  context.testSuitePath = context.testSuitePath.absolutePath;
+  context.suitePath = path.pathDirTempOpen( path.join( __dirname, '../..'  ),'FileProviderGit' );
+  context.suitePath = context.providerDst.pathResolveLinkFull({ filePath : context.suitePath, resolvingSoftLink : 1 });
+  context.suitePath = context.suitePath.absolutePath;
+
 }
 
 function onSuiteEnd( test )
 {
   let context = this;
   let path = context.providerDst.path;
-  _.assert( _.strHas( context.testSuitePath, 'FileProviderGit' ) );
-  path.pathDirTempClose( context.testSuitePath );
+  _.assert( _.strHas( context.suitePath, 'FileProviderGit' ), context.suitePath );
+  path.pathDirTempClose( context.suitePath );
 }
 
 // --
@@ -61,7 +62,7 @@ function filesReflectTrivial( test )
   let providerDst = context.providerDst;
   let system = context.system;
   let path = context.providerDst.path;
-  let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let testPath = path.join( context.suitePath, 'routine-' + test.name );
   let localPath = path.join( testPath, 'wPathBasic' );
   debugger;
   let clonePathGlobal = providerDst.path.globalFromPreferred( localPath );
@@ -98,7 +99,7 @@ function filesReflectTrivial( test )
       './proto',
       './sample'
     ]
-    
+
     test.is( _.arraySetContainAll( files, expected ) )
     return got;
   })
@@ -324,7 +325,7 @@ function filesReflectTrivial( test )
       './proto',
       './sample'
     ]
-    
+
     test.is( _.arraySetContainAll( files, expected ) )
     let packagePath = providerDst.path.join( localPath, 'package.json' );
     let packageRead = providerDst.fileRead
@@ -346,7 +347,7 @@ function filesReflectTrivial( test )
 
     let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
 
-    _.shell
+    _.process.start
     ({
       execPath : 'git reset --hard HEAD~1',
       currentPath : localPath,
@@ -355,7 +356,7 @@ function filesReflectTrivial( test )
 
     ready.then( () => system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 }) );
 
-    _.shell
+    _.process.start
     ({
       execPath : 'git status',
       currentPath : localPath,
@@ -383,7 +384,7 @@ function filesReflectTrivial( test )
 
     let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
 
-    _.shell
+    _.process.start
     ({
       execPath : 'git commit --allow-empty -m emptycommit',
       currentPath : localPath,
@@ -392,7 +393,7 @@ function filesReflectTrivial( test )
 
     ready.then( () => system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 }) );
 
-    _.shell
+    _.process.start
     ({
       execPath : 'git status',
       currentPath : localPath,
@@ -407,7 +408,7 @@ function filesReflectTrivial( test )
       return null;
     })
 
-    _.shell
+    _.process.start
     ({
       execPath : 'git log -n 2',
       currentPath : localPath,
@@ -436,14 +437,14 @@ function filesReflectTrivial( test )
 
     let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
 
-    _.shell
+    _.process.start
     ({
       execPath : 'git reset --hard HEAD~1',
       currentPath : localPath,
       ready
     })
 
-    _.shell
+    _.process.start
     ({
       execPath : 'git commit --allow-empty -m emptycommit',
       currentPath : localPath,
@@ -452,7 +453,7 @@ function filesReflectTrivial( test )
 
     ready.then( () => system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 }) );
 
-    _.shell
+    _.process.start
     ({
       execPath : 'git status',
       currentPath : localPath,
@@ -467,7 +468,7 @@ function filesReflectTrivial( test )
       return null;
     })
 
-    _.shell
+    _.process.start
     ({
       execPath : 'git log -n 2',
       currentPath : localPath,
@@ -497,7 +498,7 @@ function filesReflectTrivial( test )
 
     let ready = system.filesReflect({ reflectMap : { [ remotePathFixate ] : clonePathGlobal }, verbosity : 5 });
 
-    _.shell
+    _.process.start
     ({
       execPath : 'git commit --allow-empty -m emptycommit',
       currentPath : localPath,
@@ -506,7 +507,7 @@ function filesReflectTrivial( test )
 
     ready.then( () => system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 }) );
 
-    _.shell
+    _.process.start
     ({
       execPath : 'git status',
       currentPath : localPath,
@@ -537,7 +538,7 @@ function filesReflectTrivial( test )
 
     ready.then( () => system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 }) );
 
-    _.shell
+    _.process.start
     ({
       execPath : 'git status',
       currentPath : localPath,
@@ -572,7 +573,7 @@ function filesReflectTrivial( test )
       return null;
     })
 
-    _.shell
+    _.process.start
     ({
       execPath : 'git status',
       currentPath : localPath,
@@ -593,7 +594,7 @@ function filesReflectTrivial( test )
       return test.shouldThrowErrorAsync( con );
     })
 
-    _.shell
+    _.process.start
     ({
       execPath : 'git status',
       currentPath : localPath,
@@ -622,7 +623,7 @@ function filesReflectTrivial( test )
 
     let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
 
-    _.shell
+    _.process.start
     ({
       execPath : 'git status',
       currentPath : localPath,
@@ -643,7 +644,7 @@ function filesReflectTrivial( test )
       return test.shouldThrowErrorAsync( con );
     })
 
-    _.shell
+    _.process.start
     ({
       execPath : 'git status',
       currentPath : localPath,
@@ -675,7 +676,7 @@ function isUpToDate( test )
   let providerDst = context.providerDst;
   let system = context.system;
   let path = context.providerDst.path;
-  let testPath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let testPath = path.join( context.suitePath, 'routine-' + test.name );
   let localPath = path.join( testPath, 'wPathBasic' );
   let clonePathGlobal = providerDst.path.globalFromPreferred( localPath );
 
@@ -795,7 +796,7 @@ function isUpToDate( test )
 
     let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
 
-    _.shell
+    _.process.start
     ({
       execPath : 'git reset --hard HEAD~1',
       currentPath : localPath,
@@ -821,7 +822,7 @@ function isUpToDate( test )
 
     let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
 
-    _.shell
+    _.process.start
     ({
       execPath : 'git commit --allow-empty -m emptycommit',
       currentPath : localPath,
@@ -847,14 +848,14 @@ function isUpToDate( test )
 
     let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
 
-    _.shell
+    _.process.start
     ({
       execPath : 'git reset --hard HEAD~1',
       currentPath : localPath,
       ready
     })
 
-    _.shell
+    _.process.start
     ({
       execPath : 'git commit --allow-empty -m emptycommit',
       currentPath : localPath,
@@ -881,7 +882,7 @@ function isUpToDate( test )
 
     let ready = system.filesReflect({ reflectMap : { [ remotePathFixate ] : clonePathGlobal }, verbosity : 5 });
 
-    _.shell
+    _.process.start
     ({
       execPath : 'git commit --allow-empty -m emptycommit',
       currentPath : localPath,
@@ -911,7 +912,7 @@ isUpToDate.timeOut = 30000;
 var Proto =
 {
 
-  name : 'Tools/mid/files/fileProvider/Git',
+  name : 'Tools.mid.files.fileProvider.Git',
   abstract : 0,
   silencing : 1,
   enabled : 1,
@@ -922,7 +923,7 @@ var Proto =
 
   context :
   {
-    testSuitePath : null,
+    suitePath : null,
     providerSrc : null,
     providerDst : null,
     system : null

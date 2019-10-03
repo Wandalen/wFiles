@@ -622,7 +622,8 @@ function systemBitrateTimeGet()
   if( _.FileProvider.HardDrive && self instanceof _.FileProvider.HardDrive )
   {
     // let testDir = self.path.dirTempAtOpen( self.path.join( __dirname, '../../..'  ), 'SecondaryMixin' );
-    let testDir = self.path.pathDirTempOpen( self.path.join( __dirname, '../../..'  ), 'SecondaryMixin' );
+    debugger
+    let testDir = self.path.pathDirTempOpen({ filePath : self.path.join( __dirname, '../../..'  ), name :'SecondaryMixin' });
     let tempFile = self.path.join( testDir, 'systemBitrateTimeGet' );
     self.fileWrite( tempFile, tempFile );
     let ostat = self.statResolvedRead( tempFile );
@@ -647,9 +648,10 @@ function systemBitrateTimeGet()
     }
     finally
     {
-      self.filesDelete( testDir );
-      let statDir = self.statResolvedRead( testDir );
-      _.assert( !statDir );
+      // self.filesDelete( testDir );
+      self.path.pathDirTempClose( testDir );
+      // let statDir = self.statResolvedRead( testDir );
+      // _.assert( !statDir );
     }
   }
 
@@ -864,11 +866,15 @@ _fileConfigRead2.defaults = fileConfigRead2.defaults;
  * @param {Object} o Options map.
  * @param {Array|String} o.filePath Source paths.
  * @param {String} o.outputFormat='array', Possible formats: array, map.
- * @function fileConfigPathGet
+ * @function fileConfigFind
  * @memberof module:Tools/mid/Files.wFileProviderSecondary#
  */
 
-function fileConfigPathGet_body( o )
+/*
+qqq : cover fileConfigFind
+*/
+
+function fileConfigFind_body( o )
 {
   let self = this;
   let path = self.path;
@@ -901,17 +907,25 @@ function fileConfigPathGet_body( o )
     {
       _.assert( _.strIs( ext ) );
       _.assert( _.strIs( filePath ) );
-      // let filePath2 = filePath + '.' + ext;
       let filePath2 = _.strAppendOnce( filePath, '.' + ext );
       if( self.statRead( filePath2 ) )
-      if( o.outputFormat === 'array' )
       {
-        result.push({ particularPath : filePath2, abstractPath : filePath, encoding : exts[ ext ]/*, ext : ext*/ });
-      }
-      else
-      {
-        _.sure( result[ filePath ] === undefined, () => 'Several configs exists for ' + _.strQuote( filePath ) );
-        result[ filePath ] = { particularPath : filePath2, abstractPath : filePath, encoding : exts[ ext ]/*, ext : ext*/ };
+        let element =
+        {
+          particularPath : filePath2,
+          abstractPath : filePath,
+          encoding : exts[ ext ],
+          ext : ext,
+        }
+        if( o.outputFormat === 'array' )
+        {
+          result.push( element );
+        }
+        else
+        {
+          _.sure( result[ filePath ] === undefined, () => 'Several configs exists for ' + _.strQuote( filePath ) );
+          result[ filePath ] = element;
+        }
       }
     });
   });
@@ -921,12 +935,12 @@ function fileConfigPathGet_body( o )
   return result;
 }
 
-var defaults = fileConfigPathGet_body.defaults = Object.create( null );
+var defaults = fileConfigFind_body.defaults = Object.create( null );
 defaults.filePath = null;
 defaults.outputFormat = 'array';
 // defaults.recursive = 1;
 
-let fileConfigPathGet = _.routineFromPreAndBody( Partial.prototype._preFilePathVectorWithProviderDefaults, fileConfigPathGet_body );
+let fileConfigFind = _.routineFromPreAndBody( Partial.prototype._preFilePathVectorWithProviderDefaults, fileConfigFind_body );
 
 //
 
@@ -960,10 +974,6 @@ let fileConfigPathGet = _.routineFromPreAndBody( Partial.prototype._preFilePathV
 
 /*
 qqq : add test
-take into account case when filePath have extension and case when does not
-filePath : fullPath.json
-filePath : fullPath
-both should work fine
 */
 
 /**
@@ -986,7 +996,7 @@ function fileConfigRead_body( o )
   _.assert( _.arrayHas( [ 'all', 'any' ], o.many ) );
 
   if( !o.found )
-  o.found = self.fileConfigPathGet({ filePath : o.filePath });
+  o.found = self.fileConfigFind({ filePath : o.filePath });
 
   /* */
 
@@ -1201,7 +1211,7 @@ let Supplement =
   fileConfigRead2,
   _fileConfigRead2,
 
-  fileConfigPathGet,
+  fileConfigFind,
   fileConfigRead,
 
   fileCodeRead,

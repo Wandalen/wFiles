@@ -35,6 +35,41 @@ _.assert( _.routineIs( _.path.join ) );
 
 */
 
+/*
+
+qqq : implement routines fileLockAct, fileUnlockAct, fileIsLockedAct and corresponding fileLock, fileUnlock, fileIsLocked.
+qqq : cover it and add jsdoc
+
+fileLockAct.defaults =
+{
+  filePath : null,
+  sync : 1,
+  waiting : 0,
+  throwing : 1,
+  timeOut : 5000,
+  id : null,
+}
+
+fileUnlockAct.defaults =
+{
+  filePath : null,
+  sync : 1,
+  throwing : 1,
+  timeOut : 5000,
+  id : null,
+}
+
+fileIsLockedAct.defaults =
+{
+  filePath : null,
+  sync : 1,
+  timeOut : 5000,
+  throwing : 1,
+  id : null,
+}
+
+*/
+
 //
 
 /**
@@ -216,7 +251,7 @@ function init( o )
   if( self.verbosity >= 2 )
   self.logger.log( 'new', _.strType( self ) );
 
-  // _.appExitHandlerOnce( () =>
+  // _.process.exitHandlerOnce( () =>
   // {
   //   debugger;
   //   self.path.pathDirTempClose()
@@ -708,7 +743,7 @@ function preferredFromGlobalAct( globalPath )
   _.assert
   (
     !self.protocols || !globalPath.protocol || _.arrayHas( self.protocols, globalPath.protocol ),
-    () => 'File provider ' + self.nickName + ' does not support protocol ' + _.strQuote( globalPath.protocol )
+    () => 'File provider ' + self.qualifiedName + ' does not support protocol ' + _.strQuote( globalPath.protocol )
   );
 
   if( self.usingGlobalPath )
@@ -1036,6 +1071,7 @@ function pathResolveLinkStep_body( o )
     /* qqq */
     return o2;
   }
+
 }
 
 _.routineExtend( pathResolveLinkStep_body, _pathResolveLink );
@@ -1514,6 +1550,7 @@ defaults.resolvingHeadDirect = 1;
 defaults.resolvingHeadReverse = 1;
 defaults.preservingRelative = 0;
 defaults.relativeOriginalFile = 0;
+// defaults.recursive = 3; /* 0, 1, 2, 3 */
 
 /*
 qqq : cover option relativeOriginalFile
@@ -3195,9 +3232,7 @@ let hashReadAct = ( function hashReadAct()
       }
       catch( err )
       {
-        // if( o.throwing )
         throw err;
-        // result = NaN;
       }
 
       return result;
@@ -3815,10 +3850,10 @@ function filesAreSame_body( o )
 
   /* soft link */
 
-  if( o.ins1.isSoftLink )
+  if( o.ins1.isSoftLink || o.ins2.isSoftLink )
   {
     debugger;
-    if( !o.ins2.isSoftLink )
+    if( !o.ins1.isSoftLink || !o.ins2.isSoftLink )
     return false;
     return self.pathResolveSoftLink( o.ins1 ) === self.pathResolveSoftLink( o.ins2 );
   }
@@ -3826,10 +3861,10 @@ function filesAreSame_body( o )
   /* text link */
 
   if( self.usingTextLink )
-  if( o.ins1.isTextLink )
+  if( o.ins1.isTextLink || o.ins2.isTextLink )
   {
     debugger;
-    if( !o.ins2.isTextLink )
+    if( !o.ins1.isTextLink || !o.ins2.isTextLink )
     return false;
     return self.pathResolveTextLink( o.ins1 ) === self.pathResolveTextLink( o.ins2 );
   }
@@ -3842,6 +3877,9 @@ function filesAreSame_body( o )
   return true;
 
   /* false for empty files */
+
+  if( !o.ins1.stat.size && !o.ins2.stat.size )
+  return true;
 
   if( !o.ins1.stat.size || !o.ins2.stat.size )
   return false;
@@ -5894,7 +5932,7 @@ function _link_functor( fop )
       {
         let dstParsed = _.uri.parse( o.dstPath );
         if( dstParsed.protocol && !_.arrayHas( self.protocols, dstParsed.protocol ) )
-        c.error( 'File provider ' + self.nickName + ' does not support protocol ' + _.strQuote( globalPath.protocol ) );
+        c.error( 'File provider ' + self.qualifiedName + ' does not support protocol ' + _.strQuote( globalPath.protocol ) );
         o.dstPath = dstParsed.longPath;
       }
 
@@ -6634,6 +6672,9 @@ function _fileRenameAct( c )
   if( c.srcStat === null )
   return null;
 
+  if( o.onlyMoving )
+  return self.fileRenameAct( c.options2 );
+
   if( c.srcStat.isSoftLink() )
   {
     let chain;
@@ -6805,6 +6846,7 @@ defaults.allowingMissed = 0;
 defaults.allowingCycled = 0;
 defaults.throwing = null;
 defaults.verbosity = null;
+defaults.onlyMoving = 0;
 
 defaults.resolvingSrcSoftLink = 1;
 defaults.resolvingSrcTextLink = 0;

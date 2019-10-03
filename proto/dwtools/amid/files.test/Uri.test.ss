@@ -12,7 +12,7 @@ if( typeof module !== 'undefined' )
 //
 
 var _ = _global_.wTools;
-var Parent = wTests[ 'Tools/mid/files/fileProvider/Abstract' ];
+var Parent = wTests[ 'Tools.mid.files.fileProvider.Abstract' ];
 var HardDrive = _.FileProvider.HardDrive();
 
 _.assert( !!Parent );
@@ -22,7 +22,7 @@ _.assert( !!Parent );
 function onSuiteBegin( test )
 {
   var self = this;
-  self.testSuitePath = _.path.dirTempOpen( _.path.join( __dirname, '../..'  ), 'Provider/Url' );
+  self.suitePath = _.path.dirTempOpen( _.path.join( __dirname, '../..'  ), 'Provider/Url' );
 }
 
 //
@@ -30,8 +30,8 @@ function onSuiteBegin( test )
 function onSuiteEnd()
 {
   var self = this;
-  _.assert( _.strEnds( self.testSuitePath, 'Provider/Url' ) );
-  _.path.pathDirTempClose( this.testSuitePath );
+  _.assert( _.strEnds( self.suitePath, 'Provider/Url' ) );
+  _.path.pathDirTempClose( this.suitePath );
 }
 
 //
@@ -46,7 +46,7 @@ function fileRead( test )
 
     var o = { filePath : this.testFile + 'xxx', sync : 0 };
     var got = this.provider.fileRead( o );
-    return test.shouldThrowError( got );
+    return test.shouldThrowErrorOfAnyKind( got );
   })
 
   .finally( () =>
@@ -81,7 +81,7 @@ function fileRead( test )
 
 function fileCopyToHardDrive( test )
 {
-  var filePath = _.path.join( this.testSuitePath, test.name, _.path.name( this.testFile ) );
+  var filePath = _.path.join( this.suitePath, test.name, _.path.name( this.testFile ) );
   var con = new _.Consequence().take( null )
 
   //
@@ -95,7 +95,7 @@ function fileCopyToHardDrive( test )
       filePath,
     }
     var got = this.provider.fileCopyToHardDrive( o );
-    return test.shouldThrowError( got );
+    return test.shouldThrowErrorOfAnyKind( got );
   })
 
   //
@@ -135,7 +135,7 @@ function fileCopyToHardDrive( test )
 var Proto =
 {
 
-  name : 'Tools/mid/files/fileProvider/UrlServer',
+  name : 'Tools.mid.files.fileProvider.UrlServer',
   silencing : 1,
   abstract : 0,
   enabled : 0, // !!! experimental

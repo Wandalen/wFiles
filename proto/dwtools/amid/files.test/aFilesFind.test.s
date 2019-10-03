@@ -36,8 +36,8 @@ function onSuiteEnd()
 {
   let path = this.provider.path;
   _.assert( Object.keys( this.system.providersWithProtocolMap ).length === 1, 'System should have single registered provider at the end of function testing' );
-  _.assert( _.strHas( this.testSuitePath, '/tmp-' ) );
-  path.pathDirTempClose( this.testSuitePath );
+  _.assert( _.strHas( this.suitePath, '.tmp' ) );
+  path.pathDirTempClose( this.suitePath );
   this.provider.finit();
   this.system.finit();
 }
@@ -64,7 +64,7 @@ function softLinkIsSupported()
   if( process.platform === 'win32' )
   {
     var allow = false;
-    var dir = path.join( context.testSuitePath, 'softLinkIsSupported' );
+    var dir = path.join( context.suitePath, 'softLinkIsSupported' );
     var srcPath = path.join( dir, 'src' );
     var dstPath = path.join( dir, 'dst' );
 
@@ -295,7 +295,7 @@ function filesFindTrivial( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   function abs()
   {
@@ -836,7 +836,7 @@ function filesFindTrivialAsync( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
   let con = new _.Consequence().take( null );
 
   /* */
@@ -854,8 +854,8 @@ function filesFindTrivialAsync( test )
   test.case = 'setup trivial';
 
   provider.filesDelete( routinePath );
-  extract1.filesReflectTo({ dstProvider : provider, dst : context.testSuitePath });
-  var gotTree = provider.filesExtract( context.testSuitePath );
+  extract1.filesReflectTo({ dstProvider : provider, dst : context.suitePath });
+  var gotTree = provider.filesExtract( context.suitePath );
   gotTree.filesFind({ filePath : '/', filter : { recursive : 2 }, onDown : function onDown( r, o )
   {
     if( r.isTerminal )
@@ -863,7 +863,7 @@ function filesFindTrivialAsync( test )
   }})
   test.identical( gotTree.filesTree, extract1.filesTree );
 
-  extract1.filesReflectTo( provider, context.testSuitePath );
+  extract1.filesReflectTo( provider, context.suitePath );
 
   //
 
@@ -872,7 +872,7 @@ function filesFindTrivialAsync( test )
     test.case = 'trivial async';
     var o =
     {
-      filePath : path.join( context.testSuitePath ),
+      filePath : path.join( context.suitePath ),
       outputFormat : 'relative',
       sync : 0,
       filter : { recursive : 2 },
@@ -911,7 +911,7 @@ function filesFindMaskTerminal( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
   var terminalPath = path.join( routinePath, 'package.json' );
 
   provider.filesDelete( routinePath );
@@ -939,7 +939,7 @@ function filesFindCriticalCases( test )
 {
   let context = this
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
   let provider = context.provider;
   let system = context.system;
 
@@ -1384,7 +1384,7 @@ function filesFind( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   if( provider instanceof _.FileProvider.Extract )
   return test.is( true );
@@ -1408,7 +1408,7 @@ function filesFind( test )
     withStem/*maybe withTransient*/ : 0,
     outputFormat : 'absolute'
   });
-  var expected = [ path.normalize( __filename ) ];
+  var expected = [ /* path.normalize( __filename ) */ ];
   test.identical( got, expected );
 
   /* */
@@ -1536,14 +1536,15 @@ function filesFind( test )
       var checks = [];
       var options = _.cloneJust( c );
 
-      if( options.glob !== undefined )
+      if( options.glob )
       {
         options.filePath = path.join( options.filePath, options.glob );
-        delete options.glob;
       }
 
-      if( options.filePath === null )
-      return test.shouldThrowError( () => provider.filesFind( options ) );
+      delete options.glob;
+
+      if( options.filePath === null && options.mandatory )
+      return test.shouldThrowErrorOfAnyKind( () => provider.filesFind( options ) );
 
       var files = provider.filesFind( options );
 
@@ -1897,7 +1898,7 @@ function filesFind2( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
   var terminalPath, got, expected;
 
   var filesTree =
@@ -1972,7 +1973,7 @@ function filesFind2( test )
 
   /*terminalPath - empty dir*/
 
-  terminalPath = path.join( context.testSuitePath, 'tmp/empty' );
+  terminalPath = path.join( context.suitePath, 'tmp/empty' );
   provider.dirMake( terminalPath )
   got = provider.filesFind( terminalPath );
   test.identical( got, [] );
@@ -2073,19 +2074,19 @@ function filesFind2( test )
 
   /*terminalPath - empty dir, withTerminals, withTransient on*/
 
-  provider.dirMake( path.join( context.testSuitePath, 'empty' ) )
+  provider.dirMake( path.join( context.suitePath, 'empty' ) )
   got = provider.filesFind({ filePath : path.join( routinePath, 'empty' ), withTerminals : 1, withTransient/*maybe withStem*/ : 1, allowingMissed : 1 });
   test.identical( got, [] );
 
   /*terminalPath - empty dir, withTerminals, withTransient on, withTransient off*/
 
-  provider.dirMake( path.join( context.testSuitePath, 'empty' ) )
+  provider.dirMake( path.join( context.suitePath, 'empty' ) )
   got = provider.filesFind({ filePath : path.join( routinePath, 'empty' ), withTerminals : 1, withTransient/*maybe withStem*/ : 1, withStem : 0, allowingMissed : 1 });
   test.identical( got, [] );
 
   /*terminalPath - empty dir, withTerminals, withTransient off*/
 
-  provider.dirMake( path.join( context.testSuitePath, 'empty' ) )
+  provider.dirMake( path.join( context.suitePath, 'empty' ) )
   got = provider.filesFind({ filePath : path.join( routinePath, 'empty' ), withTerminals : 0, withStem/*maybe withTransient*/ : 0, allowingMissed : 1 });
   test.identical( got, [] );
 
@@ -2209,7 +2210,7 @@ function filesFind2( test )
 
   /* terminalPath - directory, maskDirectory, withTransient */
 
-  terminalPath = path.join( context.testSuitePath, 'tmp/dir' );
+  terminalPath = path.join( context.suitePath, 'tmp/dir' );
   provider.dirMake( terminalPath );
 
   got = provider.filesFind
@@ -2327,7 +2328,7 @@ function filesFindRecursive( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   function abs()
   {
@@ -2437,7 +2438,7 @@ function filesFindRecursive( test )
   if( !Config.debug )
   return;
 
-  test.shouldThrowError( () =>
+  test.shouldThrowErrorOfAnyKind( () =>
   {
     provider.filesFind
     ({
@@ -2450,7 +2451,7 @@ function filesFindRecursive( test )
     })
   })
 
-  test.shouldThrowError( () =>
+  test.shouldThrowErrorOfAnyKind( () =>
   {
     provider.filesFind
     ({
@@ -2463,7 +2464,7 @@ function filesFindRecursive( test )
     })
   })
 
-  test.shouldThrowError( () =>
+  test.shouldThrowErrorOfAnyKind( () =>
   {
     provider.filesFind
     ({
@@ -2476,7 +2477,7 @@ function filesFindRecursive( test )
     })
   })
 
-  test.shouldThrowError( () =>
+  test.shouldThrowErrorOfAnyKind( () =>
   {
     provider.filesFind
     ({
@@ -2489,7 +2490,7 @@ function filesFindRecursive( test )
     })
   })
 
-  test.shouldThrowError( () =>
+  test.shouldThrowErrorOfAnyKind( () =>
   {
     provider.filesFind
     ({
@@ -2502,7 +2503,7 @@ function filesFindRecursive( test )
     })
   })
 
-  test.shouldThrowError( () =>
+  test.shouldThrowErrorOfAnyKind( () =>
   {
     provider.filesFind
     ({
@@ -2526,7 +2527,7 @@ function filesFindLinked( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   /*
     link : [ normal, double, broken, context cycled, cycled, dst and src resolving to the same file ]
@@ -2847,7 +2848,7 @@ function filesFindLinked( test )
   test.identical( select( got, '*/absolute' ), [ '/', '/one', '/terminal', '/two' ] );
   test.identical( select( got, '*/real' ), [ '/', '/one', '/terminal', '/two' ] );
 
-  test.shouldThrowError( () =>
+  test.shouldThrowErrorOfAnyKind( () =>
   {
     provider.filesFind
     ({
@@ -3045,7 +3046,7 @@ function filesFindSoftLinksExtract( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   function abs()
   {
@@ -3755,7 +3756,7 @@ function filesFindSoftLinksLoopsExtract( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   function abs()
   {
@@ -4483,7 +4484,7 @@ function filesFindSoftLinks( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   function abs()
   {
@@ -4651,7 +4652,7 @@ function filesFindResolving( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
   let terminalPath = path.join( routinePath, 'terminal' );
   let softLinkIsSupported = context.softLinkIsSupported();
 
@@ -5696,7 +5697,7 @@ function filesFindResolvingExperiment( test )
   let context = this;
   let provider = context.provider;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   test.case = 'textLink->dir, resolvingTextLink : 1, usingTextLink : 1';
   let srcDirPath = path.join( routinePath, 'dir' );
@@ -5734,7 +5735,7 @@ function filesFindGlob( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   var src = context.makeStandardExtract();
   src.filesReflectTo( provider, routinePath );
@@ -7269,7 +7270,7 @@ function filesFindOn( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   var src = context.makeStandardExtract();
   src.filesReflectTo( provider, routinePath );
@@ -7497,7 +7498,7 @@ function filesFindBaseFromGlob( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   var src = context.makeStandardExtract();
   src.filesReflectTo( provider, routinePath );
@@ -7949,7 +7950,7 @@ function filesGlob( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   var filesTree =
   {
@@ -8242,7 +8243,7 @@ function filesFindDistinct( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   function abs()
   {
@@ -8592,7 +8593,7 @@ function filesFindSimplifyGlob( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   function abs()
   {
@@ -8744,7 +8745,7 @@ function filesFindOptimalFilePath( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   function abs()
   {
@@ -9421,7 +9422,7 @@ function filesFindVisitingCertain( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   function abs()
   {
@@ -9677,7 +9678,7 @@ function filesFindMandatoryString( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   function abs()
   {
@@ -9844,7 +9845,7 @@ function filesFindMandatoryMap( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   function abs()
   {
@@ -10192,7 +10193,7 @@ function filesFindExcluding( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   function abs()
   {
@@ -10440,7 +10441,7 @@ function filesFindGlobLogic( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   function abs()
   {
@@ -10525,7 +10526,92 @@ function filesFindGlobLogic( test )
 
   /* - */
 
-  test.open( 'logic' );
+  test.case = './src/proto/**, control';
+  var fullList =
+  [
+    '.',
+    './-ile',
+    './f.cc',
+    './f.js',
+    './f.ss',
+    './f.test.js',
+    './f.test.ss',
+    './file',
+    './dir1',
+    './dir1/dir2',
+    './dir1/dir2/-ile',
+    './dir1/dir2/f.cc',
+    './dir1/dir2/f.js',
+    './dir1/dir2/f.ss',
+    './dir1/dir2/f.test.js',
+    './dir1/dir2/f.test.ss',
+    './dir1/dir2/file'
+  ]
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src/proto/**' : '',
+  });
+  var records = find({ filter : { filePath, basePath }, maskPreset : 0 });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, fullList );
+
+  test.case = './src/proto/** - **/f*';
+  var expectedRelative = [ '.', './-ile', './dir1', './dir1/dir2', './dir1/dir2/-ile' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src/proto/**' : '',
+    '**/f*' : 0,
+  });
+  var records = find({ filter : { filePath, basePath }, maskPreset : 0 });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  test.case = './src/proto - **/f*';
+  var expectedRelative = [ '.', './-ile', './dir1', './dir1/dir2', './dir1/dir2/-ile' ];
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src/proto' : '',
+    '**/f*' : 0,
+  });
+  var records = find({ filter : { filePath, basePath }, maskPreset : 0 });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  test.case = './src/proto - **/d*';
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src/proto' : '',
+    '**/d*' : 0,
+  });
+  var records = find({ filter : { filePath, basePath }, maskPreset : 0 });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, fullList );
+
+  test.case = './src/proto - **/d*';
+  var expectedRelative =
+  [
+    '.',
+    './-ile',
+    './f.cc',
+    './f.js',
+    './f.ss',
+    './f.test.js',
+    './f.test.ss',
+    './file'
+  ]
+  var basePath = abs( 'src/proto' );
+  var filePath = abs
+  ({
+    './src/proto' : '',
+    '**/d**' : 0,
+  });
+  var records = find({ filter : { filePath, basePath }, maskPreset : 0 });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
 
   /* - */
 
@@ -10553,7 +10639,6 @@ function filesFindGlobLogic( test )
   test.identical( gotRelative, expectedRelative );
 
   test.case = 'mixed, several stems';
-  // var expectedRelative = [ '..', '.', './f.js', './f.test.js', './dir1', './dir1/dir2', './dir1/dir2/f.js', './dir1/dir2/f.test.js', '../proto2', '../proto2/f.ss', '../proto2/f.test.ss', '../proto2/dir1', '../proto2/dir1/dir2', '../proto2/dir1/dir2/f.ss', '../proto2/dir1/dir2/f.test.ss' ];
   var expectedRelative = [ '.', './proto', './proto/f.ss', './proto/f.test.ss', './proto/dir1', './proto/dir1/dir2', './proto/dir1/dir2/f.ss', './proto/dir1/dir2/f.test.ss', './proto2', './proto2/f.ss', './proto2/f.test.ss', './proto2/dir1', './proto2/dir1/dir2', './proto2/dir1/dir2/f.ss', './proto2/dir1/dir2/f.test.ss', './src/proto', './src/proto/f.js', './src/proto/f.test.js', './src/proto/dir1', './src/proto/dir1/dir2', './src/proto/dir1/dir2/f.js', './src/proto/dir1/dir2/f.test.js' ]
   var basePath = abs
   ({
@@ -10689,8 +10774,6 @@ function filesFindGlobLogic( test )
 
   /* - */
 
-  test.close( 'logic' );
-
 }
 
 //
@@ -10701,7 +10784,7 @@ function filesFindGlobComplex( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   function abs()
   {
@@ -11007,7 +11090,155 @@ function filesFindGlobComplex( test )
 
   test.close( 'check escaping' );
 
+  test.open( 'check ?(-)?(test.)?(.cc|.js)' );
+
+  /* - */
+
+  test.case = 'src/proto/?(-)ile';
+  var expectedRelative = [ '.', './-ile' ];
+  var records = find({ filePath : abs( 'src/proto/?(-)ile' ), maskPreset : 0 });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* */
+
+  test.case = 'src/proto/?(-)?(ile)';
+  var expectedRelative = [ '.', './-ile' ];
+  var records = find({ filePath : abs( 'src/proto/?(-)?(ile)' ), maskPreset : 0 });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* */
+
+  test.case = 'src/proto/?(-)?(ile)?(test.)?(.cc|.js)';
+  var expectedRelative = [ '.', './-ile' ];
+  var records = find({ filePath : abs( 'src/proto/?(-)?(ile)?(test.)?(.cc|.js)' ), maskPreset : 0 });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  /* */
+
+  // test.case = 'src/proto/?(-)?(?(i)le)'; /* zzz : make it working */
+  // var expectedRelative = [ '.', './-ile' ];
+  // var records = find({ filePath : abs( 'src/proto/?(-)?(?(i)le)' ), maskPreset : 0 });
+  // var gotRelative = _.select( records, '*/relative' );
+  // test.identical( gotRelative, expectedRelative );
+
+  /* - */
+
+  test.close( 'check ?(-)?(test.)?(.cc|.js)' );
+
+/*
+  '-ile' : 'src/proto/-ile',
+  'file' : 'src/proto/file',
+  'f.cc' : 'src/proto/f.cc',
+  'f.js' : 'src/proto/f.js',
+  'f.ss' : 'src/proto/f.ss',
+  'f.test.js' : 'src/proto/f.test.js',
+  'f.test.ss' : 'src/proto/f.test.ss',
+*/
+
 } /* end of function filesFindGlobComplex */
+
+//
+
+function filesFindGlobWillfiles( test )
+{
+  let context = this;
+  let provider = context.provider;
+  let system = context.system;
+  let path = context.provider.path;
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+
+  function abs()
+  {
+    let args = _.longSlice( arguments );
+    args.unshift( routinePath );
+    return path.s.join.apply( path.s, args );
+  }
+
+  var tree =
+  {
+    src :
+    {
+      proto :
+      {
+        'will.yml' : 'src/proto/will.yml',
+        'im.will.yml' : 'src/proto/im.will.yml',
+        'ex.will.yml' : 'src/proto/ex.will.yml',
+        '.will.yml' : 'src/proto/.will.yml',
+        '.im.will.yml' : 'src/proto/.im.will.yml',
+        '.ex.will.yml' : 'src/proto/.ex.will.yml',
+        'a.will.yml' : 'src/proto/a.will.yml',
+        'a.im.will.yml' : 'src/proto/a.im.will.yml',
+        'a.ex.will.yml' : 'src/proto/a.ex.will.yml',
+        '.a.will.yml' : 'src/proto/.a.will.yml',
+        '.a.im.will.yml' : 'src/proto/.a.im.will.yml',
+        '.a.ex.will.yml' : 'src/proto/.a.ex.will.yml',
+
+        'f' : 'src/proto/f',
+        'f.yml' : 'src/proto/f.yml',
+        'f.test.yml' : 'src/proto/f.test.yml',
+      },
+    },
+  }
+  var extract = new _.FileProvider.Extract({ filesTree : tree });
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+
+  var find = provider.filesFinder
+  ({
+    withTerminals : 1,
+    withDirs : 1,
+    withTransient : 1,
+    filter : { recursive : 2 },
+    filter :
+    {
+      prefixPath : routinePath,
+    }
+  });
+
+  /* - */
+
+  test.open( 'first' );
+
+  /* - */
+
+  test.case = 'src/proto/?(.)?(im.|ex.)?(out.)will.*';
+  var expectedRelative = [ '.', './.ex.will.yml', './.im.will.yml', './.will.yml', './ex.will.yml', './im.will.yml', './will.yml' ];
+  var records = find({ filePath : abs( 'src/proto/?(.)?(im.|ex.)?(out.)will.*' ), maskPreset : 0 });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  test.case = 'src/proto/*?(.)?(im.|ex.)?(out.)will.*';
+  var expectedRelative =
+  [
+    '.',
+    './.a.ex.will.yml',
+    './.a.im.will.yml',
+    './.a.will.yml',
+    './.ex.will.yml',
+    './.im.will.yml',
+    './.will.yml',
+    './a.ex.will.yml',
+    './a.im.will.yml',
+    './a.will.yml',
+    './ex.will.yml',
+    './im.will.yml',
+    './will.yml'
+  ]
+  var records = find({ filePath : abs( 'src/proto/*?(.)?(im.|ex.)?(out.)will.*' ), maskPreset : 0 });
+  var gotRelative = _.select( records, '*/relative' );
+  test.identical( gotRelative, expectedRelative );
+
+  // ?(.)?(im.|ex.)?(out.)will.*
+
+  /* - */
+
+  test.close( 'first' );
+
+} /* end of function filesFindGlobWillfiles */
 
 //
 
@@ -11017,7 +11248,7 @@ function filesFindAnyPositive( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   function abs()
   {
@@ -11896,7 +12127,7 @@ function filesFindTotalPositive( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   function abs()
   {
@@ -12772,7 +13003,7 @@ function filesFindSeveralTotalPositive( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   function abs()
   {
@@ -13228,7 +13459,7 @@ function filesFindTotalNegative( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   function abs()
   {
@@ -14125,7 +14356,7 @@ function filesFindGroups( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   function abs()
   {
@@ -14376,7 +14607,7 @@ function filesReflectEvaluate( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   function abs()
   {
@@ -14451,7 +14682,7 @@ function filesReflectTrivial( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   /* */
 
@@ -15593,11 +15824,11 @@ function filesReflectRecursive( test )
   {
     var provider = _.FileProvider.Extract({ filesTree : _.cloneJust( tree ) });
 
-    test.shouldThrowError( () => provider.filesReflect({ reflectMap : { '/src' : '/dst' }, recursive : '0' }) );
-    test.shouldThrowError( () => provider.filesReflect({ reflectMap : { '/src' : '/dst' }, recursive : '1' }) );
-    test.shouldThrowError( () => provider.filesReflect({ reflectMap : { '/src' : '/dst' }, recursive : '2' }) );
-    test.shouldThrowError( () => provider.filesReflect({ reflectMap : { '/src' : '/dst' }, recursive : false }) );
-    test.shouldThrowError( () => provider.filesReflect({ reflectMap : { '/src' : '/dst' }, recursive : true }) );
+    test.shouldThrowErrorOfAnyKind( () => provider.filesReflect({ reflectMap : { '/src' : '/dst' }, recursive : '0' }) );
+    test.shouldThrowErrorOfAnyKind( () => provider.filesReflect({ reflectMap : { '/src' : '/dst' }, recursive : '1' }) );
+    test.shouldThrowErrorOfAnyKind( () => provider.filesReflect({ reflectMap : { '/src' : '/dst' }, recursive : '2' }) );
+    test.shouldThrowErrorOfAnyKind( () => provider.filesReflect({ reflectMap : { '/src' : '/dst' }, recursive : false }) );
+    test.shouldThrowErrorOfAnyKind( () => provider.filesReflect({ reflectMap : { '/src' : '/dst' }, recursive : true }) );
   }
 }
 
@@ -15617,7 +15848,7 @@ function filesReflectOutputFormat( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   function abs()
   {
@@ -15809,7 +16040,7 @@ function filesReflectMandatory( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   function abs()
   {
@@ -15902,7 +16133,7 @@ function filesReflectMutuallyExcluding( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
   var precise = true;
 
   function abs()
@@ -16710,7 +16941,7 @@ function filesReflectWithFilter( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   function prepareSingle()
   {
@@ -16773,7 +17004,7 @@ function _filesReflectWithFilter( test, o )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   function makeOptions()
   {
@@ -17174,7 +17405,7 @@ function filesReflect( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   function prepareSingle()
   {
@@ -17253,7 +17484,7 @@ function _filesReflect( test, o )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   function optionsMake()
   {
@@ -18655,7 +18886,7 @@ function filesReflectOverlap( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   function abs()
   {
@@ -18829,7 +19060,7 @@ function filesReflectGrab( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   /* */
 
@@ -19439,7 +19670,7 @@ function filesReflectorBasic( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
   let dst = provider;
 
   function abs()
@@ -19550,7 +19781,7 @@ function filesReflectorBasic( test )
     src : {},
     dst : {},
   });
-  test.shouldThrowError( () => reflect( '/' ) );
+  test.shouldThrowErrorOfAnyKind( () => reflect( '/' ) );
   var found = dst.filesFind({ filePath : routinePath, allowingMissed : 1 });
   test.identical( found.length, 0 );
 
@@ -19590,7 +19821,7 @@ function filesReflectorBasic( test )
       src : { basePath : 'src:///' },
       dst : { basePath : 'current:///' },
     });
-    test.shouldThrowError( () => reflect( '/' ) );
+    test.shouldThrowErrorOfAnyKind( () => reflect( '/' ) );
 
     dst.filesDelete( routinePath );
     src.finit();
@@ -19779,7 +20010,7 @@ function filesReflectWithSystem( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
   let dstProvider = provider;
   let dstPath = routinePath;
 
@@ -19793,7 +20024,7 @@ function filesReflectWithSystem( test )
   // var dstProvider = new _.FileProvider.HardDrive();
   var srcPath = '/src';
 
-  // var dstPath = path.join( context.testSuitePath, test.name, 'dst' );
+  // var dstPath = path.join( context.suitePath, test.name, 'dst' );
   // var system = new _.FileProvider.System({ empty : 1 });
   // system.providerRegister( srcProvider );
   // system.providerRegister( dstProvider );
@@ -19867,7 +20098,7 @@ function filesReflectLinkWithSystem( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
   let dstPath = routinePath;
   let dst = provider;
 
@@ -20767,7 +20998,7 @@ function filesReflectOnlyPreserving( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   var filesTree =
   {
@@ -20793,361 +21024,452 @@ function filesReflectOnlyPreserving( test )
     }
   }
 
+  var extract = new _.FileProvider.Extract({ filesTree });
+
   /* */
 
   test.case = 'terminal - terminal, same content, dstRewritingOnlyPreserving : 0';
-  var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var srcPath = provider.path.join( routinePath, 'src/file' );
+  var dstPath = provider.path.join( routinePath, 'dst/file' );
   var o =
   {
-    reflectMap : { '/src/file' : '/dst/file' },
+    reflectMap : { [ srcPath ]: dstPath },
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
     dstRewritingOnlyPreserving : 0
   }
-  test.mustNotThrowError( () => extract.filesReflect( o ) );
-  var src = extract.fileRead( '/src/file' );
-  var dst = extract.fileRead( '/dst/file' );
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  var src = provider.fileRead( srcPath );
+  var dst = provider.fileRead( dstPath );
   test.identical( src, dst );
-  test.identical( src, _.select( filesTree, '/src/file' ) );
+  test.identical( src, _.select( extract.filesTree, '/src/file' ) );
 
   test.case = 'terminal - terminal, same content, dstRewritingOnlyPreserving : 0';
-  var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var srcPath = provider.path.join( routinePath, 'src/file' );
+  var dstPath = provider.path.join( routinePath, 'dst/file' );
   var o =
   {
-    reflectMap : { '/src/file' : '/dst/file' },
+    reflectMap : { [ srcPath ] : dstPath },
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
     dstRewritingOnlyPreserving : 1
   }
-  test.mustNotThrowError( () => extract.filesReflect( o ) );
-  var src = extract.fileRead( '/src/file' );
-  var dst = extract.fileRead( '/dst/file' );
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  var src = provider.fileRead( srcPath );
+  var dst = provider.fileRead( dstPath );
   test.identical( src, dst );
-  test.identical( src, _.select( filesTree, '/src/file' ) );
+  test.identical( src, _.select( extract.filesTree, '/src/file' ) );
 
   test.case = 'terminal - terminal, diff content, dstRewritingOnlyPreserving : 0';
-  var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var srcPath = provider.path.join( routinePath, 'src/file-d' );
+  var dstPath = provider.path.join( routinePath, 'dst/file' );
   var o =
   {
-    reflectMap : { '/src/file-d' : '/dst/file' },
+    reflectMap : { [ srcPath ] : dstPath },
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
     dstRewritingOnlyPreserving : 0
   }
-  test.mustNotThrowError( () => extract.filesReflect( o ) );
-  var src = extract.fileRead( '/src/file-d' );
-  var dst = extract.fileRead( '/dst/file' );
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  var src = provider.fileRead( srcPath );
+  var dst = provider.fileRead( dstPath );
   test.identical( src, dst );
   test.identical( src, _.select( filesTree, '/src/file-d' ) );
 
   test.case = 'terminal - terminal, diff content, dstRewritingOnlyPreserving : 1';
-  var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var srcPath = provider.path.join( routinePath, 'src/file-d' );
+  var dstPath = provider.path.join( routinePath, 'dst/file' );
   var o =
   {
-    reflectMap : { '/src/file-d' : '/dst/file' },
+    reflectMap : { [ srcPath ] : dstPath },
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
     dstRewritingOnlyPreserving : 1
   }
-  test.shouldThrowError( () => extract.filesReflect( o ) );
-  var src = extract.fileRead( '/src/file-d' );
-  var dst = extract.fileRead( '/dst/file' );
+  test.shouldThrowErrorOfAnyKind( () => provider.filesReflect( o ) );
+  var src = provider.fileRead( srcPath );
+  var dst = provider.fileRead( dstPath );
   test.notIdentical( src, dst );
 
   /* */
 
   test.case = 'terminal - empty dir, dstRewritingOnlyPreserving : 0';
-  var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var srcPath = provider.path.join( routinePath, 'src/file' );
+  var dstPath = provider.path.join( routinePath, 'dst/dir-e/dir-e' );
   var o =
   {
-    reflectMap : { '/src/file' : '/dst/dir-e/dir-e' },
+    reflectMap : { [ srcPath ] : dstPath },
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
     dstRewritingOnlyPreserving : 0
   }
-  test.mustNotThrowError( () => extract.filesReflect( o ) );
-  var src = extract.fileRead( '/src/file' );
-  var dst = extract.fileRead( '/dst/dir-e/dir-e' );
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  var src = provider.fileRead( srcPath );
+  var dst = provider.fileRead( dstPath );
   test.identical( src, dst );
-  test.identical( src, _.select( filesTree, '/src/file' ) );
+  test.identical( src, _.select( extract.filesTree, '/src/file' ) );
 
   test.case = 'terminal - dir without terminals, dstRewritingOnlyPreserving : 0';
-  var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var srcPath = provider.path.join( routinePath, 'src/file' );
+  var dstPath = provider.path.join( routinePath, 'dst/dir-e/dir-e' );
   var o =
   {
-    reflectMap : { '/src/file' : '/dst/dir-e' },
+    reflectMap : { [ srcPath ] : dstPath },
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
     dstRewritingOnlyPreserving : 0
   }
-  test.mustNotThrowError( () => extract.filesReflect( o ) );
-  var src = extract.fileRead( '/src/file' );
-  var dst = extract.fileRead( '/dst/dir-e' );
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  var src = provider.fileRead( srcPath );
+  var dst = provider.fileRead( dstPath );
   test.identical( src, dst );
-  test.identical( src, _.select( filesTree, '/src/file' ) );
+  test.identical( src, _.select( extract.filesTree, '/src/file' ) );
 
   test.case = 'terminal - empty dir, dstRewritingOnlyPreserving : 1';
-  var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var srcPath = provider.path.join( routinePath, 'src/file' );
+  var dstPath = provider.path.join( routinePath, 'dst/dir-e/dir-e' );
   var o =
   {
-    reflectMap : { '/src/file' : '/dst/dir-e/dir-e' },
+    reflectMap : { [ srcPath ] : dstPath },
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
     dstRewritingOnlyPreserving : 1
   }
-  test.mustNotThrowError( () => extract.filesReflect( o ) );
-  var src = extract.fileRead( '/src/file' );
-  var dst = extract.fileRead( '/dst/dir-e/dir-e' );
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  var src = provider.fileRead( srcPath );
+  var dst = provider.fileRead( dstPath );
   test.identical( src, dst );
-  test.identical( src, _.select( filesTree, '/src/file' ) );
+  test.identical( src, _.select( extract.filesTree, '/src/file' ) );
 
   test.case = 'terminal - dir without terminals, dstRewritingOnlyPreserving : 1';
-  var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var srcPath = provider.path.join( routinePath, 'src/file' );
+  var dstPath = provider.path.join( routinePath, 'dst/dir-e/dir-e' );
   var o =
   {
-    reflectMap : { '/src/file' : '/dst/dir-e' },
+    reflectMap : { [ srcPath ] : dstPath },
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
     dstRewritingOnlyPreserving : 1
   }
-  test.mustNotThrowError( () => extract.filesReflect( o ) );
-  var src = extract.fileRead( '/src/file' );
-  var dst = extract.fileRead( '/dst/dir-e' );
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  var src = provider.fileRead( srcPath );
+  var dst = provider.fileRead( dstPath );
   test.identical( src, dst );
-  test.identical( src, _.select( filesTree, '/src/file' ) );
+  test.identical( src, _.select( extract.filesTree, '/src/file' ) );
 
   test.case = 'terminal - dir with terminals, dstRewritingOnlyPreserving : 0';
-  var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var srcPath = provider.path.join( routinePath, 'src/file' );
+  var dstPath = provider.path.join( routinePath, 'dst/dir-test' );
   var o =
   {
-    reflectMap : { '/src/file' : '/dst/dir-test' },
+    reflectMap : { [ srcPath ] : dstPath },
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
     dstRewritingOnlyPreserving : 0
   }
-  test.mustNotThrowError( () => extract.filesReflect( o ) );
-  var src = extract.fileRead( '/src/file' );
-  var dst = extract.fileRead( '/dst/dir-test' );
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  var src = provider.fileRead( srcPath );
+  var dst = provider.fileRead( dstPath );
   test.identical( src, dst );
-  test.identical( src, _.select( filesTree, '/src/file' ) );
+  test.identical( src, _.select( extract.filesTree, '/src/file' ) );
 
   test.case = 'terminal - dir with terminals inner level, dstRewritingOnlyPreserving : 0';
-  var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var srcPath = provider.path.join( routinePath, 'src/file' );
+  var dstPath = provider.path.join( routinePath, 'dst/dir-test-inner' );
   var o =
   {
-    reflectMap : { '/src/file' : '/dst/dir-test-inner' },
+    reflectMap : { [ srcPath ] : dstPath },
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
     dstRewritingOnlyPreserving : 0
   }
-  test.mustNotThrowError( () => extract.filesReflect( o ) );
-  var src = extract.fileRead( '/src/file' );
-  var dst = extract.fileRead( '/dst/dir-test-inner' );
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  var src = provider.fileRead( srcPath );
+  var dst = provider.fileRead( dstPath );
   test.identical( src, dst );
-  test.identical( src, _.select( filesTree, '/src/file' ) );
+  test.identical( src, _.select( extract.filesTree, '/src/file' ) );
 
   test.case = 'terminal - dir with terminals, dstRewritingOnlyPreserving : 1';
-  var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var srcPath = provider.path.join( routinePath, 'src/file' );
+  var dstPath = provider.path.join( routinePath, 'dst/dir-test' );
   var o =
   {
-    reflectMap : { '/src/file' : '/dst/dir-test' },
+    reflectMap : { [ srcPath ] : dstPath },
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
     dstRewritingOnlyPreserving : 1
   }
-  test.shouldThrowError( () => extract.filesReflect( o ) );
-  test.is( extract.isTerminal( '/src/file' ) );
-  test.is( extract.isDir( '/dst/dir-test' ) );
-  test.identical( _.select( extract.filesTree, '/src/file' ), _.select( filesTree, '/src/file' ) );
-  test.identical( _.select( extract.filesTree, '/dst/dir-test' ), _.select( filesTree, '/dst/dir-test' ) );
+  test.shouldThrowErrorOfAnyKind( () => provider.filesReflect( o ) );
+  test.is( provider.isTerminal( srcPath ) );
+  test.is( provider.isDir( dstPath ) );
+  var src = provider.fileRead( srcPath );
+  var dst = provider.filesExtract( dstPath );
+  dstTreeTransform();
+  test.identical( src, _.select( extract.filesTree, '/src/file' ) );
+  test.identical( dst.filesTree, _.select( extract.filesTree, '/dst/dir-test' ) );
 
   test.case = 'terminal - dir with terminals inner level, dstRewritingOnlyPreserving : 1';
-  var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var srcPath = provider.path.join( routinePath, 'src/file' );
+  var dstPath = provider.path.join( routinePath, 'dst/dir-test-inner' );
   var o =
   {
-    reflectMap : { '/src/file' : '/dst/dir-test-inner' },
+    reflectMap : { [ srcPath ] : dstPath },
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
     dstRewritingOnlyPreserving : 1
   }
-  test.shouldThrowError( () => extract.filesReflect( o ) );
-  test.is( extract.isTerminal( '/src/file' ) );
-  test.is( extract.isDir( '/dst/dir-test-inner' ) );
-  test.identical( _.select( extract.filesTree, '/src/file' ), _.select( filesTree, '/src/file' ) );
-  test.identical( _.select( extract.filesTree, '/dst/dir-test-inner' ), _.select( filesTree, '/dst/dir-test-inner' ) );
+  test.shouldThrowErrorOfAnyKind( () => provider.filesReflect( o ) );
+  test.is( provider.isTerminal( srcPath ) );
+  test.is( provider.isDir( dstPath ) );
+  var src = provider.fileRead( srcPath );
+  var dst = provider.filesExtract( dstPath );
+  dstTreeTransform();
+  test.identical( src, _.select( extract.filesTree, '/src/file' ) );
+  test.identical( dst.filesTree, _.select( extract.filesTree, '/dst/dir-test-inner' ) );
 
   /* */
 
   test.case = 'dir empty - terminal, dstRewritingOnlyPreserving : 0';
-  var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var srcPath = provider.path.join( routinePath, 'src/dir-e/dir-e' );
+  var dstPath = provider.path.join( routinePath, 'dst/file' );
   var o =
   {
-    reflectMap : { '/src/dir-e/dir-e' : '/dst/file' },
+    reflectMap : { [ srcPath ] : dstPath },
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
     dstRewritingOnlyPreserving : 0
   }
-  test.mustNotThrowError( () => extract.filesReflect( o ) );
-  test.is( extract.isDir( '/src/dir-e/dir-e' ) );
-  test.is( extract.isDir( '/dst/file' ) );
-  test.identical( _.select( extract.filesTree, '/src/dir-e/dir-e' ), _.select( filesTree, '/src/dir-e/dir-e' ) );
-  test.identical( _.select( extract.filesTree, '/src/dir-e/dir-e' ), _.select( extract.filesTree, '/dst/file' ) );
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isDir( srcPath ) );
+  test.is( provider.isDir( dstPath ) );
+  var src = provider.filesExtract( srcPath );
+  var dst = provider.filesExtract( dstPath );
+  test.identical( src.filesTree, _.select( extract.filesTree, '/src/dir-e/dir-e' ) );
+  test.identical( src.filesTree, dst.filesTree );
 
   test.case = 'dir empty - terminal, dstRewritingOnlyPreserving : 1';
-  var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var srcPath = provider.path.join( routinePath, 'src/dir-e/dir-e' );
+  var dstPath = provider.path.join( routinePath, 'dst/file' );
   var o =
   {
-    reflectMap : { '/src/dir-e/dir-e' : '/dst/file' },
+    reflectMap : { [ srcPath ] : dstPath },
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
     dstRewritingOnlyPreserving : 1
   }
-  test.shouldThrowError( () => extract.filesReflect( o ) );
-  test.is( extract.isDir( '/src/dir-e/dir-e' ) );
-  test.is( extract.isTerminal( '/dst/file' ) );
-  test.identical( _.select( extract.filesTree, '/src/dir-e/dir-e' ), _.select( filesTree, '/src/dir-e/dir-e' ) );
-  test.identical( _.select( extract.filesTree, '/dst/file' ), _.select( filesTree, '/dst/file' ) );
+  test.shouldThrowErrorOfAnyKind( () => provider.filesReflect( o ) );
+  test.is( provider.isDir( srcPath ) );
+  test.is( provider.isTerminal( dstPath ) );
+  var dst = provider.filesExtract( routinePath );
+  dstTreeTransform();
+  test.identical( _.select( dst.filesTree, '/src/dir-e/dir-e' ), _.select( extract.filesTree, '/src/dir-e/dir-e' ) );
+  test.identical( _.select( dst.filesTree, '/dst/file' ), _.select( extract.filesTree, '/dst/file' ) );
 
   test.case = 'dir without terminal - terminal, dstRewritingOnlyPreserving : 0';
-  var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var srcPath = provider.path.join( routinePath, 'src/dir-e' );
+  var dstPath = provider.path.join( routinePath, 'dst/file' );
   var o =
   {
-    reflectMap : { '/src/dir-e' : '/dst/file' },
+    reflectMap : { [ srcPath ] : dstPath },
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
     dstRewritingOnlyPreserving : 0
   }
-  test.mustNotThrowError( () => extract.filesReflect( o ) );
-  test.is( extract.isDir( '/src/dir-e' ) );
-  test.is( extract.isDir( '/dst/file' ) );
-  test.identical( _.select( extract.filesTree, '/src/dir-e' ), _.select( filesTree, '/src/dir-e' ) );
-  test.identical( _.select( extract.filesTree, '/src/dir-e' ), _.select( extract.filesTree, '/dst/file' ) );
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isDir( srcPath ) );
+  test.is( provider.isDir( dstPath ) );
+  var dst = provider.filesExtract( routinePath );
+  dstTreeTransform();
+  test.identical( _.select( dst.filesTree, '/src/dir-e' ), _.select( extract.filesTree, '/src/dir-e' ) );
+  test.identical( _.select( dst.filesTree, '/src/dir-e' ), _.select( dst.filesTree, '/dst/file' ) );
 
   test.case = 'dir without terminal - terminal, dstRewritingOnlyPreserving : 0';
-  var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var srcPath = provider.path.join( routinePath, 'src/dir-e' );
+  var dstPath = provider.path.join( routinePath, 'dst/file' );
   var o =
   {
-    reflectMap : { '/src/dir-e' : '/dst/file' },
+    reflectMap : { [ srcPath ] : dstPath },
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
     dstRewritingOnlyPreserving : 1
   }
-  test.shouldThrowError( () => extract.filesReflect( o ) );
-  test.is( extract.isDir( '/src/dir-e' ) );
-  test.is( extract.isTerminal( '/dst/file' ) );
-  test.identical( _.select( extract.filesTree, '/src/dir-e' ), _.select( filesTree, '/src/dir-e' ) );
-  test.identical( _.select( extract.filesTree, '/dst/file' ), _.select( filesTree, '/dst/file' ) );
+  test.shouldThrowErrorOfAnyKind( () => provider.filesReflect( o ) );
+  test.is( provider.isDir( srcPath ) );
+  test.is( provider.isTerminal( dstPath ) );
+  var dst = provider.filesExtract( routinePath );
+  dstTreeTransform();
+  test.identical( _.select( dst.filesTree, '/src/dir-e' ), _.select( extract.filesTree, '/src/dir-e' ) );
+  test.identical( _.select( dst.filesTree, '/dst/file' ), _.select( extract.filesTree, '/dst/file' ) );
 
   test.case = 'dir with files - terminal, dstRewritingOnlyPreserving : 0';
-  var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var srcPath = provider.path.join( routinePath, 'src/dir-test' );
+  var dstPath = provider.path.join( routinePath, 'dst/file' );
   var o =
   {
-    reflectMap : { '/src/dir-test' : '/dst/file' },
+    reflectMap : { [ srcPath ] : dstPath },
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
     dstRewritingOnlyPreserving : 0
   }
-  test.mustNotThrowError( () => extract.filesReflect( o ) );
-  test.is( extract.isDir( '/src/dir-test' ) );
-  test.is( extract.isDir( '/dst/file' ) );
-  test.identical( _.select( extract.filesTree, '/src/dir-test' ), _.select( filesTree, '/src/dir-test' ) );
-  test.identical( _.select( extract.filesTree, '/dst/file' ), _.select( extract.filesTree, '/src/dir-test' ) );
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isDir( srcPath ) );
+  test.is( provider.isDir( dstPath ) );
+  var dst = provider.filesExtract( routinePath );
+  dstTreeTransform();
+  test.identical( _.select( dst.filesTree, '/src/dir-test' ), _.select( extract.filesTree, '/src/dir-test' ) );
+  test.identical( _.select( dst.filesTree, '/dst/file' ), _.select( dst.filesTree, '/src/dir-test' ) );
 
   test.case = 'dir with files - terminal, dstRewritingOnlyPreserving : 1';
-  var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var srcPath = provider.path.join( routinePath, 'src/dir-test' );
+  var dstPath = provider.path.join( routinePath, 'dst/file' );
   var o =
   {
-    reflectMap : { '/src/dir-test' : '/dst/file' },
+    reflectMap : { [ srcPath ] : dstPath },
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
     dstRewritingOnlyPreserving : 1
   }
-  test.shouldThrowError( () => extract.filesReflect( o ) );
-  test.is( extract.isDir( '/src/dir-test' ) );
-  test.is( extract.isTerminal( '/dst/file' ) );
-  test.identical( _.select( extract.filesTree, '/src/dir-test' ), _.select( filesTree, '/src/dir-test' ) );
-  test.identical( _.select( extract.filesTree, '/dst/file' ), _.select( filesTree, '/dst/file' ) );
+  test.shouldThrowErrorOfAnyKind( () => provider.filesReflect( o ) );
+  test.is( provider.isDir( srcPath ) );
+  test.is( provider.isTerminal( dstPath ) );
+  var dst = provider.filesExtract( routinePath );
+  dstTreeTransform();
+  test.identical( _.select( dst.filesTree, '/src/dir-test' ), _.select( extract.filesTree, '/src/dir-test' ) );
+  test.identical( _.select( dst.filesTree, '/dst/file' ), _.select( extract.filesTree, '/dst/file' ) );
 
   /**/
 
   test.case = 'reflect dir - dir, both with same terminal, dstRewritingOnlyPreserving : 0';
-  var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var srcPath = provider.path.join( routinePath, 'src/dir-s' );
+  var dstPath = provider.path.join( routinePath, 'dst/dir-s' );
   var o =
   {
-    reflectMap : { '/src/dir-s' : '/dst/dir-s' },
+    reflectMap : { [ srcPath ] : dstPath },
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
     dstRewritingOnlyPreserving : 0
   }
-  test.mustNotThrowError( () => extract.filesReflect( o ) );
-  test.is( extract.isTerminal( '/src/dir-s/file' ) );
-  test.is( extract.isTerminal( '/dst/dir-s/file' ) );
-  test.identical( _.select( extract.filesTree, '/src/dir-s' ), _.select( extract.filesTree, '/dst/dir-s' ) );
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isTerminal( provider.path.join( routinePath, 'src/dir-s/file' ) ) );
+  test.is( provider.isTerminal( provider.path.join( routinePath, 'dst/dir-s/file' ) ) );
+  var dst = provider.filesExtract( routinePath );
+  test.identical( _.select( dst.filesTree, '/src/dir-s' ), _.select( dst.filesTree, '/dst/dir-s' ) );
 
   test.case = 'reflect dir - dir, both with same terminal, dstRewritingOnlyPreserving : 1';
-  var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var srcPath = provider.path.join( routinePath, 'src/dir-s' );
+  var dstPath = provider.path.join( routinePath, 'dst/dir-s' );
   var o =
   {
-    reflectMap : { '/src/dir-s' : '/dst/dir-s' },
+    reflectMap : { [ srcPath ] : dstPath },
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
     dstRewritingOnlyPreserving : 1
   }
-  test.mustNotThrowError( () => extract.filesReflect( o ) );
-  test.is( extract.isTerminal( '/src/dir-s/file' ) );
-  test.is( extract.isTerminal( '/dst/dir-s/file' ) );
-  test.identical( _.select( extract.filesTree, '/src/dir-s' ), _.select( extract.filesTree, '/dst/dir-s' ) );
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isDir( srcPath ) );
+  test.is( provider.isDir( dstPath ) );
+  var dst = provider.filesExtract( routinePath );
+  test.identical( _.select( dst.filesTree, '/src/dir-s' ), _.select( dst.filesTree, '/dst/dir-s' ) );
 
   test.case = 'reflect dir - dir, both have terminal with diff content, dstRewritingOnlyPreserving : 0';
-  var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var srcPath = provider.path.join( routinePath, 'src/dir-d' );
+  var dstPath = provider.path.join( routinePath, 'dst/dir-d' );
   var o =
   {
-    reflectMap : { '/src/dir-d' : '/dst/dir-d' },
+    reflectMap : { [ srcPath ] : dstPath },
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
     dstRewritingOnlyPreserving : 0
   }
-  test.mustNotThrowError( () => extract.filesReflect( o ) );
-  test.is( extract.isTerminal( '/src/dir-s/file' ) );
-  test.is( extract.isTerminal( '/dst/dir-s/file' ) );
-  test.identical( _.select( extract.filesTree, '/src/dir-s' ), _.select( extract.filesTree, '/dst/dir-s' ) );
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isTerminal( provider.path.join( routinePath, 'src/dir-d/file-d' ) ) );
+  test.is( provider.isTerminal( provider.path.join( routinePath, 'dst/dir-d/file-d' ) ) );
+  var dst = provider.filesExtract( routinePath );
+  test.identical( _.select( dst.filesTree, '/src/dir-d' ), _.select( dst.filesTree, '/dst/dir-d' ) );
 
   test.case = 'reflect dir - dir, both have terminal with diff content, dstRewritingOnlyPreserving : 1';
-  var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var srcPath = provider.path.join( routinePath, 'src/dir-d/file-d' );
+  var dstPath = provider.path.join( routinePath, 'dst/dir-d/file-d' );
   var o =
   {
-    reflectMap : { '/src/dir-d' : '/dst/dir-d' },
+    reflectMap : { [ srcPath ] : dstPath },
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
     dstRewritingOnlyPreserving : 1
   }
-  test.shouldThrowError( () => extract.filesReflect( o ) );
-  test.is( extract.isTerminal( '/src/dir-s/file' ) );
-  test.is( extract.isTerminal( '/dst/dir-s/file' ) );
-  test.identical( _.select( extract.filesTree, '/src/dir-d/file-d' ), _.select( filesTree, '/src/dir-d/file-d' ) );
-  test.identical( _.select( extract.filesTree, '/dst/dir-d/file-d' ), _.select( filesTree, '/dst/dir-d/file-d' ) );
+  test.shouldThrowErrorOfAnyKind( () => provider.filesReflect( o ) );
+  test.is( provider.isTerminal( srcPath ) );
+  test.is( provider.isTerminal( dstPath ) );
+  var dst = provider.filesExtract( routinePath );
+  dstTreeTransform();
+  test.identical( _.select( dst.filesTree, '/src/dir-d/file-d' ), _.select( extract.filesTree, '/src/dir-d/file-d' ) );
+  test.identical( _.select( dst.filesTree, '/dst/dir-d/file-d' ), _.select( extract.filesTree, '/dst/dir-d/file-d' ) );
 
   /*  */
 
@@ -21163,45 +21485,58 @@ function filesReflectOnlyPreserving( test )
     }
   }
 
+  var extract = new _.FileProvider.Extract({ filesTree });
+
   test.case = 'reflect two terminals to same dst path, src termianls have different content, dstRewritingOnlyPreserving : 0';
-  var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var srcPath1 = provider.path.join( routinePath, 'src/file1' );
+  var srcPath2 = provider.path.join( routinePath, 'src/file2' );
+  var dstPath = provider.path.join( routinePath, 'dst/file' );
   var o =
   {
     reflectMap :
     {
-      '/src/file1' : '/dst/file',
-      '/src/file2' : '/dst/file'
+      [ srcPath1 ] : dstPath,
+      [ srcPath2 ] : dstPath,
     },
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
     dstRewritingOnlyPreserving : 0
   }
-  test.mustNotThrowError( () => extract.filesReflect( o ) );
-  test.is( extract.isTerminal( '/dst/file' )  );
-  test.identical( _.select( extract.filesTree, '/src/file2' ), _.select( extract.filesTree, '/dst/file' ) );
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isTerminal( dstPath ) );
+  var dst = provider.filesExtract( routinePath );
+  test.identical( _.select( dst.filesTree, '/src/file2' ), _.select( dst.filesTree, '/dst/file' ) );
 
   /* */
 
   test.case = 'reflect two terminals to same dst path, src termianls have different content, dstRewritingOnlyPreserving : 1';
-  var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var srcPath1 = provider.path.join( routinePath, 'src/file1' );
+  var srcPath2 = provider.path.join( routinePath, 'src/file2' );
+  var dstPath = provider.path.join( routinePath, 'dst/dst-file' );
   var o =
   {
     reflectMap :
     {
-      '/src/file1' : '/dst/file',
-      '/src/file2' : '/dst/file'
+      [ srcPath1 ] : dstPath,
+      [ srcPath2 ] : dstPath,
     },
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
     dstRewritingOnlyPreserving : 1
   }
-  test.shouldThrowErrorSync( () => extract.filesReflect( o ) );
-  test.is( !extract.fileExists( '/dst/file' )  );
-  test.identical( _.select( extract.filesTree, '/src/file1' ), 'file1' );
-  test.identical( _.select( extract.filesTree, '/src/file2' ), 'file2' );
-  test.is( !_.select( extract.filesTree, '/dst/file' ) );
+  test.shouldThrowErrorSync( () => provider.filesReflect( o ) );
+  test.is( !provider.fileExists( dstPath )  );
+  var dst = provider.filesExtract( routinePath );
+  dstTreeTransform();
+  test.identical( _.select( dst.filesTree, '/src/file1' ), 'file1' );
+  test.identical( _.select( dst.filesTree, '/src/file2' ), 'file2' );
+  test.is( !_.select( dst.filesTree, '/dst/file' ) );
 
   /*  */
 
@@ -21218,91 +21553,116 @@ function filesReflectOnlyPreserving( test )
     }
   }
 
+  var extract = new _.FileProvider.Extract({ filesTree });
+
   test.case = 'reflect two terminals to same dst path, src termianls have same content, dstRewritingOnlyPreserving : 1';
-  var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var srcPath1 = provider.path.join( routinePath, 'src/file1' );
+  var srcPath2 = provider.path.join( routinePath, 'src/file2' );
+  var dstPath = provider.path.join( routinePath, 'dst/file' );
   var o =
   {
     reflectMap :
     {
-      '/src/file1' : '/dst/file',
-      '/src/file2' : '/dst/file'
+      [ srcPath1 ] : dstPath,
+      [ srcPath2 ] : dstPath,
     },
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
     dstRewritingOnlyPreserving : 1
   }
-  test.mustNotThrowError( () => extract.filesReflect( o ) );
-  test.is( extract.isTerminal( '/dst/file' )  );
-  test.identical( _.select( extract.filesTree, '/src/file1' ), _.select( extract.filesTree, '/dst/file' ) );
-  test.identical( _.select( extract.filesTree, '/src/file2' ), _.select( extract.filesTree, '/dst/file' ) );
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isTerminal( dstPath )  );
+  var dst = provider.filesExtract( routinePath );
+  test.identical( _.select( dst.filesTree, '/src/file1' ), _.select( dst.filesTree, '/dst/file' ) );
+  test.identical( _.select( dst.filesTree, '/src/file2' ), _.select( dst.filesTree, '/dst/file' ) );
 
   /* */
 
   test.case = 'reflect two terminals to same dst path, src termianls have same content, dstRewritingOnlyPreserving : 0';
-  var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var srcPath1 = provider.path.join( routinePath, 'src/file1' );
+  var srcPath2 = provider.path.join( routinePath, 'src/file2' );
+  var dstPath = provider.path.join( routinePath, 'dst/file' );
   var o =
   {
     reflectMap :
     {
-      '/src/file1' : '/dst/file',
-      '/src/file2' : '/dst/file'
+      [ srcPath1 ] : dstPath,
+      [ srcPath2 ] : dstPath,
     },
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
     dstRewritingOnlyPreserving : 0
   }
-  test.mustNotThrowError( () => extract.filesReflect( o ) );
-  test.is( extract.isTerminal( '/dst/file' )  );
-  test.identical( _.select( extract.filesTree, '/src/file1' ), _.select( extract.filesTree, '/dst/file' ) );
-  test.identical( _.select( extract.filesTree, '/src/file2' ), _.select( extract.filesTree, '/dst/file' ) );
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isTerminal( dstPath )  );
+  var dst = provider.filesExtract( routinePath );
+  test.identical( _.select( dst.filesTree, '/src/file1' ), _.select( dst.filesTree, '/dst/file' ) );
+  test.identical( _.select( dst.filesTree, '/src/file2' ), _.select( dst.filesTree, '/dst/file' ) );
 
   /* */
 
   test.case = 'reflect three terminals to same dst path, one of src termianls has diff content, dstRewritingOnlyPreserving : 0';
-  var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var srcPath1 = provider.path.join( routinePath, 'src/file1' );
+  var srcPath2 = provider.path.join( routinePath, 'src/file2' );
+  var srcPath3 = provider.path.join( routinePath, 'src/file3' );
+  var dstPath = provider.path.join( routinePath, 'dst/file' );
   var o =
   {
     reflectMap :
     {
-      '/src/file1' : '/dst/file',
-      '/src/file2' : '/dst/file',
-      '/src/file3' : '/dst/file'
+      [ srcPath1 ] : dstPath,
+      [ srcPath2 ] : dstPath,
+      [ srcPath3 ] : dstPath,
     },
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
     dstRewritingOnlyPreserving : 0
   }
-  test.mustNotThrowError( () => extract.filesReflect( o ) );
-  test.is( extract.isTerminal( '/dst/file' )  );
-  test.notIdentical( _.select( extract.filesTree, '/src/file1' ), _.select( extract.filesTree, '/dst/file' ) );
-  test.notIdentical( _.select( extract.filesTree, '/src/file2' ), _.select( extract.filesTree, '/dst/file' ) );
-  test.identical( _.select( extract.filesTree, '/src/file3' ), _.select( extract.filesTree, '/dst/file' ) );
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isTerminal( dstPath )  );
+  var dst = provider.filesExtract( routinePath );
+  test.notIdentical( _.select( dst.filesTree, '/src/file1' ), _.select( dst.filesTree, '/dst/file' ) );
+  test.notIdentical( _.select( dst.filesTree, '/src/file2' ), _.select( dst.filesTree, '/dst/file' ) );
+  test.identical( _.select( dst.filesTree, '/src/file3' ), _.select( dst.filesTree, '/dst/file' ) );
 
   /* */
 
   test.case = 'reflect three terminals to same dst path, one of src termianls has diff content, dstRewritingOnlyPreserving : 1';
-  var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var srcPath1 = provider.path.join( routinePath, 'src/file1' );
+  var srcPath2 = provider.path.join( routinePath, 'src/file2' );
+  var srcPath3 = provider.path.join( routinePath, 'src/file3' );
+  var dstPath = provider.path.join( routinePath, 'dst/file' );
   var o =
   {
     reflectMap :
     {
-      '/src/file1' : '/dst/file',
-      '/src/file2' : '/dst/file',
-      '/src/file3' : '/dst/file'
+      [ srcPath1 ] : dstPath,
+      [ srcPath2 ] : dstPath,
+      [ srcPath3 ] : dstPath,
     },
     writing : 1,
     dstRewriting : 1,
     dstRewritingByDistinct : 1,
     dstRewritingOnlyPreserving : 1
   }
-  test.shouldThrowErrorSync( () => extract.filesReflect( o ) );
-  test.is( !extract.fileExists( '/dst/file' )  );
-  test.identical( _.select( extract.filesTree, '/src/file1' ), 'file' );
-  test.identical( _.select( extract.filesTree, '/src/file2' ), 'file' );
-  test.identical( _.select( extract.filesTree, '/src/file3' ), 'file3' );
+  test.shouldThrowErrorSync( () => provider.filesReflect( o ) );
+  test.is( !provider.fileExists( dstPath )  );
+  var dst = provider.filesExtract( routinePath );
+  dstTreeTransform();
+  test.identical( _.select( dst.filesTree, '/src/file1' ), 'file' );
+  test.identical( _.select( dst.filesTree, '/src/file2' ), 'file' );
+  test.identical( _.select( dst.filesTree, '/src/file3' ), 'file3' );
 
   /*  */
 
@@ -21311,7 +21671,7 @@ function filesReflectOnlyPreserving( test )
     src :
     {
       file1 : 'file',
-      file2 : [{ softLink : '/src/file4' }],
+      file2 : [{ softLink : '../file4' }],
       file3 : 'file',
       file4 : 'file3',
     },
@@ -21321,17 +21681,24 @@ function filesReflectOnlyPreserving( test )
 
   }
 
+  var extract = new _.FileProvider.Extract({ filesTree });
+
   /* */
 
   test.case = 'reflect three terminals to same dst path, one of src termianls is a softLink, dstRewritingOnlyPreserving : 0';
-  var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo({ dstProvider : provider, dst : routinePath, rebasingLink : true });
+  var srcPath1 = provider.path.join( routinePath, 'src/file1' );
+  var srcPath2 = provider.path.join( routinePath, 'src/file2' );
+  var srcPath3 = provider.path.join( routinePath, 'src/file3' );
+  var dstPath = provider.path.join( routinePath, 'dst/file' );
   var o =
   {
     reflectMap :
     {
-      '/src/file1' : '/dst/file',
-      '/src/file2' : '/dst/file',
-      '/src/file3' : '/dst/file'
+      [ srcPath1 ] : dstPath,
+      [ srcPath2 ] : dstPath,
+      [ srcPath3 ] : dstPath,
     },
     writing : 1,
     dstRewriting : 1,
@@ -21339,22 +21706,28 @@ function filesReflectOnlyPreserving( test )
     dstRewritingOnlyPreserving : 0
   }
 
-  test.mustNotThrowError( () => extract.filesReflect( o ) );
-  test.is( extract.isTerminal( '/dst/file' )  );
-  test.identical( _.select( extract.filesTree, '/src/file3' ), _.select( extract.filesTree, '/dst/file' ) );
-  test.notIdentical( _.select( extract.filesTree, '/src/file4' ), _.select( extract.filesTree, '/dst/file' ) );
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isTerminal( dstPath )  );
+  var dst = provider.filesExtract( routinePath );
+  test.identical( _.select( dst.filesTree, '/src/file3' ), _.select( dst.filesTree, '/dst/file' ) );
+  test.notIdentical( _.select( dst.filesTree, '/src/file4' ), _.select( dst.filesTree, '/dst/file' ) );
 
   /* */
 
   test.case = 'reflect three terminals to same dst path, one of src termianls is a softLink, dstRewritingOnlyPreserving : 1';
-  var extract = _.FileProvider.Extract({ filesTree : _.cloneJust( filesTree )  });
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo({ dstProvider : provider, dst : routinePath, rebasingLink : true });
+  var srcPath1 = provider.path.join( routinePath, 'src/file1' );
+  var srcPath2 = provider.path.join( routinePath, 'src/file2' );
+  var srcPath3 = provider.path.join( routinePath, 'src/file3' );
+  var dstPath = provider.path.join( routinePath, 'dst/file' );
   var o =
   {
     reflectMap :
     {
-      '/src/file1' : '/dst/file',
-      '/src/file2' : '/dst/file',
-      '/src/file3' : '/dst/file'
+      [ srcPath1 ] : dstPath,
+      [ srcPath2 ] : dstPath,
+      [ srcPath3 ] : dstPath,
     },
     writing : 1,
     dstRewriting : 1,
@@ -21362,48 +21735,52 @@ function filesReflectOnlyPreserving( test )
     dstRewritingOnlyPreserving : 1
   }
 
-  test.mustNotThrowError( () => extract.filesReflect( o ) );
-  test.is( extract.isTerminal( '/dst/file' )  );
-  test.identical( _.select( extract.filesTree, '/src/file3' ), _.select( extract.filesTree, '/dst/file' ) );
-  test.notIdentical( _.select( extract.filesTree, '/src/file4' ), _.select( extract.filesTree, '/dst/file' ) );
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isTerminal( dstPath )  );
+  var dst = provider.filesExtract( routinePath );
+  test.identical( _.select( dst.filesTree, '/src/file3' ), _.select( dst.filesTree, '/dst/file' ) );
+  test.notIdentical( _.select( dst.filesTree, '/src/file4' ), _.select( dst.filesTree, '/dst/file' ) );
 
   /*  */
 
   test.case = 'mixed file path, multiple src, dstRewritingOnlyPreserving : 0';
 
-  var tree =
+  var filesTree =
   {
     src : { srcDir : { a : 'src/a', b : 'src/b' }, srcDir2 : { e : 'src/e' }, c : 'src/c', d : 'src/d' },
     dst : { dstDir : { a : 'dst/a', c : 'dst/c' }, c : 'dst/c', d : 'dst/d' },
   }
 
+  var extract = new _.FileProvider.Extract({ filesTree });
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var srcPath = provider.path.join( routinePath, 'src' );
+  var dstPath = provider.path.join( routinePath, 'dst' );
+  var dstPath2 = provider.path.join( routinePath, 'dst/c2' );
   var o =
   {
     src :
     {
-      prefixPath : '/src',
-      filePath : { 'c' : '/dst/c2', 'd' : '/dst' },
+      prefixPath : srcPath,
+      filePath : { 'c' : dstPath2, 'd' : dstPath },
     },
     dstRewritingOnlyPreserving : 0
   }
-
-  var extract = new _.FileProvider.Extract({ filesTree : tree, protocol : 'extract' });
-  var records = extract.filesReflect( o );
-
+  var records = provider.filesReflect( o );
   var expectedTree =
   {
     src : { srcDir : { a : 'src/a', b : 'src/b' }, srcDir2 : { e : 'src/e' }, c : 'src/c', d : 'src/d' },
     dst : 'src/d',
   }
-
-  test.identical( extract.filesTree, expectedTree );
-
+  var dst = provider.filesExtract( routinePath );
+  dstTreeTransform();
+  test.identical( dst.filesTree, expectedTree );
   var expectedDstAbsolute = [ '/dst/c2', '/dst', '/dst/c', '/dst/c2', '/dst/d', '/dst/dstDir', '/dst/dstDir/a', '/dst/dstDir/c' ];
   var expectedSrcAbsolute = [ '/src/c', '/src/d', '/src/d/c', '/src/d/c2', '/src/d/d', '/src/d/dstDir', '/src/d/dstDir/a', '/src/d/dstDir/c' ];
-
+  expectedDstAbsolute = provider.path.s.reroot( routinePath, expectedDstAbsolute )
+  expectedSrcAbsolute = provider.path.s.reroot( routinePath, expectedSrcAbsolute )
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
-
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
 
@@ -21411,33 +21788,713 @@ function filesReflectOnlyPreserving( test )
 
   test.case = 'mixed file path, multiple src, dstRewritingOnlyPreserving : 1';
 
-  var tree =
+  var filesTree =
   {
     src : { srcDir : { a : 'src/a', b : 'src/b' }, srcDir2 : { e : 'src/e' }, c : 'src/c', d : 'src/d' },
     dst : { dstDir : { a : 'dst/a', c : 'dst/c' }, c : 'dst/c', d : 'dst/d' },
   }
 
+  var extract = new _.FileProvider.Extract({ filesTree });
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var srcPath = provider.path.join( routinePath, 'src' );
+  var dstPath = provider.path.join( routinePath, 'dst' );
+  var dstPath2 = provider.path.join( routinePath, 'dst/c2' );
   var o =
   {
     src :
     {
-      prefixPath : '/src',
-      filePath : { 'c' : '/dst/c2', 'd' : '/dst' },
+      prefixPath : srcPath,
+      filePath : { 'c' : dstPath2, 'd' : dstPath },
     },
     dstRewritingOnlyPreserving : 1
   }
 
-  var extract = new _.FileProvider.Extract({ filesTree : _.cloneJust( tree ), protocol : 'extract' });
-  test.shouldThrowErrorSync( () => extract.filesReflect( o ) );
+  test.shouldThrowErrorSync( () => provider.filesReflect( o ) );
 
   var expectedTree =
   {
     src : { srcDir : { a : 'src/a', b : 'src/b' }, srcDir2 : { e : 'src/e' }, c : 'src/c', d : 'src/d' },
     dst : { dstDir : { a : 'dst/a', c : 'dst/c' }, c : 'dst/c', c2 : 'src/c', d : 'dst/d' },
   }
+  var dst = provider.filesExtract( routinePath );
+  dstTreeTransform();
+  test.identical( dst.filesTree, expectedTree );
 
-  test.identical( extract.filesTree, expectedTree );
+  /* rewriting of empty files with same time */
+
+  test.open( 'rewriting of empty files, src and dst are same' );
+
+  var filesTree =
+  {
+    src : { 'file' : '' },
+    dst : { 'file' : '' },
+  }
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var srcPath = provider.path.join( routinePath, 'src' );
+  var srcFilePath = provider.path.join( routinePath, 'src/file' );
+  var dstPath = provider.path.join( routinePath, 'dst' );
+  var dstFilePath = provider.path.join( routinePath, 'dst/file' );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 0,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 1
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.identical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 0,
+    dstRewritingOnlyPreserving : 0
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.identical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 0
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.identical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 0,
+    dstRewritingOnlyPreserving : 1
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.identical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 1
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.identical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+
+  test.close( 'rewriting of empty files, src and dst are same' );
+
+  /*  */
+
+  test.open( 'rewriting of empty files, src and dst are diffent' );
+
+  var filesTree =
+  {
+    src : { 'file' : 'file' },
+    dst : { 'file' : '' },
+  }
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var srcPath = provider.path.join( routinePath, 'src' );
+  var srcFilePath = provider.path.join( routinePath, 'src/file' );
+  var dstPath = provider.path.join( routinePath, 'dst' );
+  var dstFilePath = provider.path.join( routinePath, 'dst/file' );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 0,
+    dstRewritingByDistinct : 0,
+    dstRewritingOnlyPreserving : 0
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.notIdentical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 0,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 1
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.notIdentical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 0,
+    dstRewritingOnlyPreserving : 0
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.identical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 0
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.identical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 0,
+    dstRewritingOnlyPreserving : 1
+  }
+  test.shouldThrowErrorOfAnyKind( () => provider.filesReflect( o ) );
+  test.notIdentical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 1
+  }
+  test.shouldThrowErrorOfAnyKind( () => provider.filesReflect( o ) );
+  test.notIdentical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+
+  test.close( 'rewriting of empty files, src and dst are diffent' );
+
+  /*  */
+
+  function dstTreeTransform()
+  {
+    dst.filesFind({ filePath : '/', filter : { recursive : 2 }, onDown : function onDown( r, o )
+    {
+      if( r.isTerminal )
+      dst.fileWrite( r.absolute, dst.fileRead( r.absolute ) );
+    }})
+  }
+
 } /* end of function filesReflectOnlyPreserving */
+
+//
+
+function filesReflectOnlyPreservingEmpty( test )
+{
+  let context = this;
+  let provider = context.provider;
+  let system = context.system;
+  let path = context.provider.path;
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+
+  test.open( 'rewriting of linked empty files, src and dst are same' );
+
+  var filesTree =
+  {
+    src : { 'file' : '' },
+    dst : { 'file2' : '' },
+  }
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var srcPath = provider.path.join( routinePath, 'src' );
+  var srcFilePath = provider.path.join( routinePath, 'src/file' );
+  var dstPath = provider.path.join( routinePath, 'dst' );
+  var dstFilePath = provider.path.join( routinePath, 'dst/file' );
+  var dstFilePath2 = provider.path.join( routinePath, 'dst/file2' );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstFilePath, '../file2' )
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    resolvingSoftLink : 0,
+    resolvingDstSoftLink : 0,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 0
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isTerminal( dstFilePath ) )
+  test.identical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstFilePath, '../file2' )
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    resolvingSoftLink : 0,
+    resolvingDstSoftLink : 0,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 1
+  }
+  test.shouldThrowErrorSync( () => provider.filesReflect( o ) );
+  test.is( provider.isSoftLink( dstFilePath ) )
+  test.identical( provider.pathResolveSoftLink( dstFilePath ), '../file2' )
+  test.identical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstFilePath, '../file2' )
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    resolvingSoftLink : 1,
+    resolvingDstSoftLink : 0,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 0
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isTerminal( dstFilePath ) )
+  test.identical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstFilePath, '../file2' )
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    resolvingSoftLink : 1,
+    resolvingDstSoftLink : 0,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 1
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isTerminal( dstFilePath ) )
+  test.identical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstFilePath, '../file2' )
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    resolvingSoftLink : 0,
+    resolvingDstSoftLink : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 0
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isSoftLink( dstFilePath ) )
+  test.identical( provider.pathResolveSoftLink( dstFilePath ), '../file2' )
+  test.identical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstFilePath, '../file2' )
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    resolvingSoftLink : 0,
+    resolvingDstSoftLink : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 1
+  }
+  test.shouldThrowErrorSync( () => provider.filesReflect( o ) );
+  test.is( provider.isSoftLink( dstFilePath ) )
+  test.identical( provider.pathResolveSoftLink( dstFilePath ), '../file2' )
+  test.identical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstFilePath, '../file2' )
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    resolvingSoftLink : 1,
+    resolvingDstSoftLink : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 0
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isSoftLink( dstFilePath ) )
+  test.identical( provider.pathResolveSoftLink( dstFilePath ), '../file2'  )
+  test.identical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath2 ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstFilePath, '../file2' )
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    resolvingSoftLink : 1,
+    resolvingDstSoftLink : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 1
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isSoftLink( dstFilePath ) )
+  test.identical( provider.pathResolveSoftLink( dstFilePath ), '../file2'  )
+  test.identical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath2 ) );
+
+  test.close( 'rewriting of linked empty files, src and dst are same' );
+
+  //
+
+  test.open( 'rewriting of linked empty files, src and dst are different' );
+
+  var filesTree =
+  {
+    src : { 'file' : 'file' },
+    dst : { 'file2' : '' },
+  }
+  var extract = new _.FileProvider.Extract({ filesTree });
+  var srcPath = provider.path.join( routinePath, 'src' );
+  var srcFilePath = provider.path.join( routinePath, 'src/file' );
+  var dstPath = provider.path.join( routinePath, 'dst' );
+  var dstFilePath = provider.path.join( routinePath, 'dst/file' );
+  var dstFilePath2 = provider.path.join( routinePath, 'dst/file2' );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstFilePath, '../file2' )
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    resolvingSoftLink : 0,
+    resolvingDstSoftLink : 0,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 0
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isTerminal( dstFilePath ) )
+  test.identical( provider.fileRead( dstFilePath ), provider.fileRead( srcFilePath ) );
+  test.identical( provider.fileRead( dstFilePath2 ), '' );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstFilePath, '../file2' )
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    resolvingSoftLink : 0,
+    resolvingDstSoftLink : 0,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 1
+  }
+  test.shouldThrowErrorSync( () => provider.filesReflect( o ) );
+  test.is( provider.isSoftLink( dstFilePath ) )
+  test.identical( provider.pathResolveSoftLink( dstFilePath ), '../file2' )
+  test.notIdentical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+  test.identical( provider.fileRead( dstFilePath ), provider.fileRead( dstFilePath2 ) );
+  test.identical( provider.fileRead( dstFilePath2 ), '' );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstFilePath, '../file2' )
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    resolvingSoftLink : 1,
+    resolvingDstSoftLink : 0,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 0
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isTerminal( dstFilePath ) )
+  test.identical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+  test.notIdentical( provider.fileRead( dstFilePath ), provider.fileRead( dstFilePath2 ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstFilePath, '../file2' )
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    resolvingSoftLink : 1,
+    resolvingDstSoftLink : 0,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 1
+  }
+  test.shouldThrowErrorSync( () => provider.filesReflect( o ) );
+  test.is( provider.isSoftLink( dstFilePath ) )
+  test.notIdentical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+  test.identical( provider.fileRead( dstFilePath ), provider.fileRead( dstFilePath2 ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstFilePath, '../file2' )
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    resolvingSoftLink : 0,
+    resolvingDstSoftLink : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 0
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isSoftLink( dstFilePath ) )
+  test.identical( provider.pathResolveSoftLink( dstFilePath ), '../file2' )
+  test.identical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+  test.identical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath2 ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstFilePath, '../file2' )
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    resolvingSoftLink : 0,
+    resolvingDstSoftLink : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 1
+  }
+  test.shouldThrowErrorSync( () => provider.filesReflect( o ) );
+  test.is( provider.isSoftLink( dstFilePath ) )
+  test.identical( provider.pathResolveSoftLink( dstFilePath ), '../file2' )
+  test.notIdentical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+  test.identical( provider.fileRead( dstFilePath ), provider.fileRead( dstFilePath2 ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstFilePath, '../file2' )
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    resolvingSoftLink : 1,
+    resolvingDstSoftLink : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 0
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isSoftLink( dstFilePath ) )
+  test.identical( provider.pathResolveSoftLink( dstFilePath ), '../file2'  )
+  test.identical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath2 ) );
+  test.identical( provider.fileRead( dstFilePath ), provider.fileRead( dstFilePath2 ) );
+  test.identical( provider.fileRead( dstFilePath2 ), provider.fileRead( srcFilePath ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstFilePath, '../file2' )
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 1,
+    resolvingSoftLink : 1,
+    resolvingDstSoftLink : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 1
+  }
+  test.shouldThrowErrorSync( () => provider.filesReflect( o ) );
+  test.is( provider.isSoftLink( dstFilePath ) )
+  test.identical( provider.pathResolveSoftLink( dstFilePath ), '../file2'  )
+  test.notIdentical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+  test.notIdentical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath2 ) );
+  test.identical( provider.fileRead( dstFilePath ), provider.fileRead( dstFilePath2 ) );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstFilePath, '../file2' )
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 0,
+    dstRewriting : 0,
+    resolvingSoftLink : 1,
+    resolvingDstSoftLink : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 1
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isSoftLink( dstFilePath ) )
+  test.notIdentical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+  test.identical( provider.fileRead( dstFilePath ), provider.fileRead( dstFilePath2 ) );
+  test.identical( provider.fileRead( dstFilePath2 ), '' );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstFilePath, '../file2' )
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 1,
+    dstRewriting : 0,
+    resolvingSoftLink : 1,
+    resolvingDstSoftLink : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 1
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isSoftLink( dstFilePath ) )
+  test.notIdentical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+  test.identical( provider.fileRead( dstFilePath ), provider.fileRead( dstFilePath2 ) );
+  test.identical( provider.fileRead( dstFilePath2 ), '' );
+
+  provider.filesDelete( routinePath );
+  extract.filesReflectTo( provider, routinePath );
+  provider.softLink( dstFilePath, '../file2' )
+  var o =
+  {
+    reflectMap :
+    {
+      [ srcPath ] : dstPath,
+    },
+    writing : 0,
+    dstRewriting : 1,
+    resolvingSoftLink : 1,
+    resolvingDstSoftLink : 1,
+    dstRewritingByDistinct : 1,
+    dstRewritingOnlyPreserving : 1
+  }
+  test.mustNotThrowError( () => provider.filesReflect( o ) );
+  test.is( provider.isSoftLink( dstFilePath ) )
+  test.notIdentical( provider.fileRead( srcFilePath ), provider.fileRead( dstFilePath ) );
+  test.identical( provider.fileRead( dstFilePath ), provider.fileRead( dstFilePath2 ) );
+  test.identical( provider.fileRead( dstFilePath2 ), '' );
+
+  test.close( 'rewriting of linked empty files, src and dst are different' );
+}
 
 //
 
@@ -21447,7 +22504,7 @@ function filesReflectDstDeletingDirs( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   /* */
 
@@ -21891,7 +22948,7 @@ function filesReflectLinked( test )
   let system = context.system;
   let path = context.provider.path;
 
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
   var srcPath = path.join( routinePath, 'src' );
   var dstPath = path.join( routinePath, 'dst' );
   var dstLinkPath = path.join( dstPath, 'link' );
@@ -22170,7 +23227,7 @@ function filesReflectLinkedExperiment( test )
   let system = context.system;
   let path = context.provider.path;
 
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
   var srcPath = path.join( routinePath, 'src' );
   var dstPath = path.join( routinePath, 'dst' );
   var dstLinkPath = path.join( dstPath, 'link' );
@@ -22207,7 +23264,7 @@ function filesReflectTo( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   /* */
 
@@ -22312,7 +23369,7 @@ function filesReflectToWithSoftLinks( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   function abs()
   {
@@ -22883,7 +23940,7 @@ function filesReflectToWithSoftLinksRebasing( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   function abs()
   {
@@ -25339,7 +26396,7 @@ function filesReflectToWithSoftLinksResolving( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   function abs()
   {
@@ -29883,7 +30940,7 @@ function filesReflectDstIgnoring( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   /* */
 
@@ -30130,7 +31187,7 @@ function filesDeleteTrivial( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
   let softLinkIsSupported = context.softLinkIsSupported();
 
   var terminalPath = path.join( routinePath, 'terminal' );
@@ -30564,7 +31621,7 @@ function filesDelete( test )
   let provider = context.provider;
   let system = context.system;
 
-  var routinePath = path.join( context.testSuitePath, test.name );
+  var routinePath = path.join( context.suitePath, test.name );
 
   var tree = _.FileProvider.Extract
   ({
@@ -30859,7 +31916,7 @@ function filesDelete( test )
   provider.filesDelete( routinePath );
   system.filesReflect({ reflectMap : { 'src:///' : 'current://' + routinePath } });
   provider.softLink( path.join( routinePath, 'softLink' ), path.join( routinePath, 'dir1/dir2/file' )  )
-  test.shouldThrowError( () => provider.filesDelete({ filePath : routinePath, resolvingSoftLink : 1 }) );
+  test.shouldThrowErrorOfAnyKind( () => provider.filesDelete({ filePath : routinePath, resolvingSoftLink : 1 }) );
 
   test.close( 'resolvingSoftLink' );
 
@@ -30911,7 +31968,7 @@ function filesDelete( test )
   provider.filesDelete( routinePath );
   system.filesReflect({ reflectMap : { 'src:///' : 'current://' + routinePath } });
   provider.textLink( path.join( routinePath, 'textLink' ), path.join( routinePath, 'dir1/dir2/file' )  )
-  test.shouldThrowError( () => provider.filesDelete({ filePath : routinePath, resolvingTextLink : 1 }) );
+  test.shouldThrowErrorOfAnyKind( () => provider.filesDelete({ filePath : routinePath, resolvingTextLink : 1 }) );
 
   test.close( 'resolvingTextLink' );
 
@@ -30991,7 +32048,7 @@ function filesDeleteAsync( test )
   let system = context.system;
   let softLinkIsSupported = context.softLinkIsSupported();
 
-  var routinePath = path.join( context.testSuitePath, test.name );
+  var routinePath = path.join( context.suitePath, test.name );
   var terminalPath = path.join( routinePath, 'terminal' );
   var dirPath = path.join( routinePath, 'dir' );
   var con = new _.Consequence().take( null )
@@ -31368,7 +32425,7 @@ function filesDeleteDeletingEmptyDirs( test )
   let provider = context.provider;
   let system = context.system;
 
-  var routinePath = path.join( context.testSuitePath, test.name );
+  var routinePath = path.join( context.suitePath, test.name );
 
   var tree = _.FileProvider.Extract
   ({
@@ -31561,7 +32618,7 @@ function filesDeleteEmptyDirs( test )
   let path = context.provider.path;
   let provider = context.provider;
 
-  var routinePath = path.join( context.testSuitePath, test.name );
+  var routinePath = path.join( context.suitePath, test.name );
 
   var tree = _.FileProvider.Extract
   ({
@@ -31896,10 +32953,10 @@ function filesDeleteEmptyDirs( test )
   if( !Config.debug )
   {
     test.case = 'including of terminals is not allow';
-    test.shouldThrowError( () => provider.filesDeleteEmptyDirs({ filePath : routinePath, withTerminals : 1 }) )
+    test.shouldThrowErrorOfAnyKind( () => provider.filesDeleteEmptyDirs({ filePath : routinePath, withTerminals : 1 }) )
 
     test.case = 'including of transients is not allow';
-    test.shouldThrowError( () => provider.filesDeleteEmptyDirs({ filePath : routinePath, withTransient/*maybe withStem*/ : 1 }) )
+    test.shouldThrowErrorOfAnyKind( () => provider.filesDeleteEmptyDirs({ filePath : routinePath, withTransient/*maybe withStem*/ : 1 }) )
   }
 }
 
@@ -31911,7 +32968,7 @@ function filesDeleteTerminals( test )
   let path = context.provider.path;
   let provider = context.provider;
 
-  let routinePath = path.join( context.testSuitePath, test.name );
+  let routinePath = path.join( context.suitePath, test.name );
 
   var tree = _.FileProvider.Extract
   ({
@@ -32155,7 +33212,7 @@ function filesDeleteAndAsyncWrite( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  // let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  // let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   test.case = 'try to delete dir before async write will be completed';
 
@@ -32170,7 +33227,7 @@ function filesDeleteAndAsyncWrite( test )
 
   _.timeOut( 2, () =>
   {
-    test.shouldThrowError( () =>
+    test.shouldThrowErrorOfAnyKind( () =>
     {
       _.fileProvider.filesDelete( routinePath );
     });
@@ -32199,13 +33256,13 @@ function filesFindDifference( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   /* zzz Needs repair. Files tree is written with "sameTime" option enabled, but files are not having same timestamps anyway,
      probably problem is in method used by HardDrive.fileTimeSetAct
   */
 
-  var testRoutineDir = path.join( context.testSuitePath, test.name );
+  var testRoutineDir = path.join( context.suitePath, test.name );
 
   var samples =
   [
@@ -32863,9 +33920,9 @@ function filesCopyWithAdapter( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
-  var testRoutineDir = path.join( context.testSuitePath, test.name );
+  var testRoutineDir = path.join( context.suitePath, test.name );
 
   var samples =
   [
@@ -34504,7 +35561,7 @@ function experiment( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   var src = path.join( routinePath, 'src' );
   var dst = path.join( routinePath, 'dst' );
@@ -34529,7 +35586,7 @@ function filesFindExperiment2( test )
   let context = this;
   let provider = context.provider;
   let path = context.provider.path;
-  let routinePath = path.join( context.testSuitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
 
   var filesTree =
   {
@@ -34589,7 +35646,7 @@ function filesReflectExperiment( test )
   let path = context.provider.path;
   let provider = context.provider;
 
-  var routinePath = path.join( context.testSuitePath, test.name );
+  var routinePath = path.join( context.suitePath, test.name );
 
   var srcPath = path.join( routinePath, 'src' );
   var dstPath = path.join( routinePath, 'dst' );
@@ -34640,7 +35697,7 @@ filesReflectExperiment.experimental = 1;
 var Self =
 {
 
-  name : 'Tools/mid/files/FilesFind/Abstract',
+  name : 'Tools.mid.files.FilesFind.Abstract',
   abstract : 1,
   silencing : 1,
   routineTimeOut : 150000,
@@ -34653,7 +35710,7 @@ var Self =
   {
     provider : null,
     system : null,
-    testSuitePath : null,
+    suitePath : null,
 
     softLinkIsSupported,
     makeStandardExtract,
@@ -34691,6 +35748,7 @@ var Self =
     filesFindExcluding,
     filesFindGlobLogic,
     filesFindGlobComplex,
+    filesFindGlobWillfiles,
     filesFindAnyPositive,
     filesFindTotalPositive,
     filesFindSeveralTotalPositive,
@@ -34715,6 +35773,7 @@ var Self =
     filesReflectLinkWithSystem,
     filesReflectDeducing,
     filesReflectOnlyPreserving,
+    filesReflectOnlyPreservingEmpty,
     filesReflectDstDeletingDirs,
     filesReflectLinked,
     filesReflectTo,

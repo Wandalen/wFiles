@@ -314,7 +314,7 @@ function versionLocalChange( o )
   if( localVersion === o.version )
   return true;
 
-  let shell = _.sheller
+  let shell = _.process.starter
   ({
     verbosity : self.verbosity - 1,
     sync : 1,
@@ -410,7 +410,7 @@ function versionRemoteLatestRetrive( o )
   _.assert( !!self.system );
 
   let parsed = self.pathParse( o.remotePath );
-  let shell = _.sheller
+  let shell = _.process.starter
   ({
     verbosity : self.verbosity - 1,
     sync : 1,
@@ -493,14 +493,14 @@ function isUpToDate( o )
   let parsed = self.pathParse( o.remotePath );
   let ready = _.Consequence().take( null );
 
-  let shell = _.sheller
+  let shell = _.process.starter
   ({
     verbosity : o.verbosity - 1,
     ready : ready,
     currentPath : o.localPath,
   });
 
-  let shellAll = _.sheller
+  let shellAll = _.process.starter
   ({
     verbosity : o.verbosity - 1,
     ready : ready,
@@ -577,7 +577,7 @@ function isUpToDate( o )
       result = !_.strHasAny( arg[ 0 ].output, [ 'Your branch is behind', 'have diverged' ] );
     }
 
-    if( o.verbosity )
+    if( o.verbosity >= 1 )
     self.logger.log( o.remotePath, result ? 'is up to date' : 'is not up to date' );
 
     return result;
@@ -712,14 +712,14 @@ function filesReflectSingle_body( o )
   /* */
 
   let ready = _.Consequence().take( null );
-  let shell = _.sheller
+  let shell = _.process.starter
   ({
     verbosity : o.verbosity - 1,
     ready : ready,
     currentPath : dstPath,
   });
 
-  let shellAll = _.sheller
+  let shellAll = _.process.starter
   ({
     verbosity : o.verbosity - 1,
     ready : ready,
@@ -942,7 +942,7 @@ function filesReflectSingle_body( o )
   {
     if( gitMergeFailed )
     {
-      if( o.verbosity )
+      if( o.verbosity >= 1 )
       self.logger.log( 'Can\'t pop stashed changes due merge conflict at ' + _.strQuote( dstPath ) );
       return null;
     }
@@ -976,7 +976,7 @@ function filesReflectSingle_body( o )
   function handleGitError( err )
   {
     if( self.throwingGitErrors )
-    throw _.errBriefly( err );
+    throw _.errBrief( err );
     else if( o.verbosity )
     self.logger.log( err );
   }
@@ -1068,6 +1068,7 @@ let Proto =
   versionLocalRetrive,
   versionRemoteLatestRetrive,
   versionRemoteCurrentRetrive,
+
   isUpToDate,
   isDownloaded,
 

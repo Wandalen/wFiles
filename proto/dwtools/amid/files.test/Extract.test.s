@@ -10,7 +10,7 @@ if( typeof module !== 'undefined' )
 //
 
 var _ = _global_.wTools;
-var Parent = wTests[ 'Tools/mid/files/fileProvider/Abstract' ];
+var Parent = wTests[ 'Tools.mid.files.fileProvider.Abstract' ];
 
 _.assert( !!Parent );
 
@@ -50,7 +50,7 @@ function onSuiteBegin( test )
   context.provider = _.FileProvider.Extract({ usingExtraStat : 1, protocols : [ 'current', 'second' ] });
   context.system = _.FileProvider.System({ providers : [ context.provider ] });
   let path = context.provider.path;
-  context.testSuitePath = path.pathDirTempOpen( 'FilesFind' );
+  context.suitePath = path.pathDirTempOpen( 'FilesFind' );
   context.globalFromPreferred = function globalFromPreferred( path ){ return path };
 }
 
@@ -139,7 +139,7 @@ function copy( test )
 var Proto =
 {
 
-  name : 'Tools/mid/files/fileProvider/Extract',
+  name : 'Tools.mid.files.fileProvider.Extract',
   silencing : 1,
   abstract : 0,
   enabled : 1,

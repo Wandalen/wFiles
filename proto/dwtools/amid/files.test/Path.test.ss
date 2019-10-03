@@ -28,9 +28,9 @@ function onSuiteBegin()
   this.isBrowser = typeof module === 'undefined';
 
   if( !this.isBrowser )
-  this.testSuitePath = _.path.pathDirTempOpen( _.path.join( __dirname, '../..' ), 'Path' );
+  this.suitePath = _.path.pathDirTempOpen( _.path.join( __dirname, '../..' ), 'Path' );
   else
-  this.testSuitePath = _.path.current();
+  this.suitePath = _.path.current();
 }
 
 //
@@ -39,8 +39,8 @@ function onSuiteEnd()
 {
   if( !this.isBrowser )
   {
-    _.assert( _.strHas( this.testSuitePath, 'Path' ) );
-    _.path.pathDirTempClose( this.testSuitePath );
+    _.assert( _.strHas( this.suitePath, '.tmp' ), this.suitePath );
+    _.path.pathDirTempClose( this.suitePath );
   }
 }
 
@@ -59,7 +59,7 @@ function createTestsDirectory( path, rmIfExists )
 
 function createInTD( path )
 {
-  return this.createTestsDirectory( _.path.join( this.testSuitePath, path ) );
+  return this.createTestsDirectory( _.path.join( this.suitePath, path ) );
 }
 
 //
@@ -70,7 +70,7 @@ function createTestFile( path, data, decoding )
   data = path;
 
   var dataToWrite = ( decoding === 'json' ) ? JSON.stringify( data ) : data;
-  _.fileProvider.fileWrite({ filePath : _.path.join( this.testSuitePath, path ), data : dataToWrite })
+  _.fileProvider.fileWrite({ filePath : _.path.join( this.suitePath, path ), data : dataToWrite })
 }
 
 //
@@ -105,8 +105,8 @@ function createTestSymLink( path, target, type, data )
   }
   else throw new Error( 'unexpected type' );
 
-  path = _.path.join( this.testSuitePath, path );
-  origin = _.path.resolve( _.path.join( this.testSuitePath, origin ) );
+  path = _.path.join( this.suitePath, path );
+  origin = _.path.resolve( _.path.join( this.suitePath, origin ) );
 
   if( _.fileProvider.statResolvedRead( path ) )
   _.fileProvider.filesDelete( path );
@@ -184,12 +184,12 @@ function from( test )
   var str1 = '/foo/bar/baz',
       str2 = 'tmp/get/test.txt',
     expected = str1,
-    expected2 = _.path.resolve( _.path.join( test.context.testSuitePath,str2 ) ),
+    expected2 = _.path.resolve( _.path.join( test.context.suitePath,str2 ) ),
     got,
     fileRecord;
 
   test.context.createTestFile( str2 );
-  fileRecord = _.fileProvider.recordFactory().record( _.path.resolve( _.path.join( test.context.testSuitePath,str2 ) ) );
+  fileRecord = _.fileProvider.recordFactory().record( _.path.resolve( _.path.join( test.context.suitePath,str2 ) ) );
 
   test.case = 'string argument';
   got = _.path.from( str1 );
@@ -232,9 +232,9 @@ function forCopy( test )
       srcPath : null
     },
     path1 = 'tmp/forCopy/test_original.txt',
-    expected1 = { path :  _.path.resolve( _.path.join( test.context.testSuitePath,'tmp/forCopy/test_original-copy.txt' ) ), error : false },
+    expected1 = { path :  _.path.resolve( _.path.join( test.context.suitePath,'tmp/forCopy/test_original-copy.txt' ) ), error : false },
     path2 = 'tmp/forCopy/test_original2',
-    expected2 = { path : _.path.resolve( _.path.join( test.context.testSuitePath,'tmp/forCopy/test_original2-backup-2' ) ), error : false },
+    expected2 = { path : _.path.resolve( _.path.join( test.context.suitePath,'tmp/forCopy/test_original2-backup-2' ) ), error : false },
     got = { path : void 0, error : void 0 };
 
   test.context.createTestFile( path1 );
@@ -243,7 +243,7 @@ function forCopy( test )
   test.case = 'simple existing file path';
   try
   {
-    got.path = _.path.forCopy( { filePath : _.path.resolve( _.path.join( test.context.testSuitePath,path1 ) ) } );
+    got.path = _.path.forCopy( { filePath : _.path.resolve( _.path.join( test.context.suitePath,path1 ) ) } );
   }
   catch( err )
   {
@@ -256,7 +256,7 @@ function forCopy( test )
   test.case = 'generate names for several copies';
   try
   {
-    var path_tmp = _.path.forCopy( { filePath : _.path.resolve( _.path.join( test.context.testSuitePath,path2 ) ), postfix : 'backup' } );
+    var path_tmp = _.path.forCopy( { filePath : _.path.resolve( _.path.join( test.context.suitePath,path2 ) ), postfix : 'backup' } );
     test.context.createTestFile( path_tmp );
     path_tmp = _.path.forCopy( { filePath : path_tmp, postfix : 'backup' } );
     test.context.createTestFile( path_tmp );
@@ -282,7 +282,7 @@ function forCopy( test )
     test.case = 'extra arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.path.forCopy( { srcPath : _.path.join( test.context.testSuitePath,path1 ) }, { srcPath : _.path.join( test.context.testSuitePath,path2 ) } );
+      _.path.forCopy( { srcPath : _.path.join( test.context.suitePath,path1 ) }, { srcPath : _.path.join( test.context.suitePath,path2 ) } );
     } );
 
     test.case = 'unexisting file';
@@ -508,11 +508,6 @@ function pathsResolve( test )
   ];
   test.identical( got, expected );
 
-  test.case = 'no arguments'
-  var expected = [];
-  var got = provider.path.s.resolve();
-  test.identical( got, expected );
-
   /* - */
 
   if( !Config.debug )
@@ -522,6 +517,12 @@ function pathsResolve( test )
   test.shouldThrowErrorSync( function()
   {
     rovider.path.s.resolve( '' )
+  });
+
+  test.case = 'no arguments'
+  test.shouldThrowErrorSync( function()
+  {
+    rovider.path.s.resolve()
   });
 
   // test.case = 'without arguments';
@@ -748,7 +749,7 @@ function pathCurrent( test )
 {
   var path1 = 'tmp/pathCurrent/foo',
     expected = Process.cwd( ),
-    expected1 = _.fileProvider.path.nativize( _.path.resolve( _.path.join( test.context.testSuitePath,path1 ) ) );
+    expected1 = _.fileProvider.path.nativize( _.path.resolve( _.path.join( test.context.suitePath,path1 ) ) );
 
   test.case = 'get pathCurrent working directory';
   var got = _.fileProvider.path.nativize( _.path.current( ) );
@@ -757,7 +758,7 @@ function pathCurrent( test )
   test.case = 'set new pathCurrent working directory';
   test.context.createInTD( path1 );
   var before = _.path.current();
-  _.path.current( _.path.normalize( _.path.join( test.context.testSuitePath,path1 ) ) );
+  _.path.current( _.path.normalize( _.path.join( test.context.suitePath,path1 ) ) );
   var got = Process.cwd( );
   _.path.current( before );
   test.identical( got, expected1 );
@@ -774,7 +775,7 @@ function pathCurrent( test )
   test.case = 'unexist directory';
   test.shouldThrowErrorSync( function( )
   {
-    _.path.current( _.path.join( test.context.testSuitePath, 'tmp/pathCurrent/bar' ) );
+    _.path.current( _.path.join( test.context.suitePath, 'tmp/pathCurrent/bar' ) );
   });
 
 }
@@ -942,163 +943,318 @@ function relative( test )
 
 //
 
-function dirTemp( test )
-{
-  test.case = 'no args';
-  var got = _.path.pathDirTempOpen();
-  test.is( _.strHas( got, '/tmp.tmp/' ) );
-  test.is( _.fileProvider.isDir( got ) );
-  _.path.pathDirTempClose( got );
-  test.is( !_.fileProvider.fileExists( got ) );
+// function pathDirTempForTrivial( test )
+// {
+//   test.case = 'file is on same device with os temp';
+//   var filePath = _.path.join( _.path.dirTemp(), 'file' );
+//   var tempPath = _.path.pathDirTempOpen( filePath );
+//   test.identical( pathDeviceGet( tempPath ), pathDeviceGet( filePath ) )
+//   test.is( _.path.fileProvider.isDir( tempPath ) );
+//   test.will = 'second call should return same temp dir path';
+//   var tempPath2 = _.path.pathDirTempOpen( filePath );
+//   test.identical( pathDeviceGet( tempPath2 ), pathDeviceGet( filePath ) )
+//   test.identical( tempPath, tempPath2 );
+//   _.path.pathDirTempClose( tempPath );
+//   test.is( !_.path.fileProvider.fileExists( tempPath ) );
+//   test.shouldThrowErrorSync( () => _.path.pathDirTempClose( filePath ) )
 
-  test.case = 'single arg';
-  var got = _.path.pathDirTempOpen( 'packageName' );
-  test.is( _.strHas( got, '/tmp.tmp/packageName' ) );
-  test.is( _.fileProvider.isDir( got ) );
-  _.path.pathDirTempClose( got );
-  test.is( !_.fileProvider.fileExists( got ) );
+//   test.case = 'file is on different device';
+//   var filePath = _.path.normalize( __filename );
+//   var tempPath = _.path.pathDirTempOpen( filePath );
+//   test.identical( pathDeviceGet( tempPath ), pathDeviceGet( filePath ) )
+//   test.is( _.path.fileProvider.isDir( tempPath ) );
+//   _.path.pathDirTempClose( tempPath );
+//   test.is( !_.path.fileProvider.fileExists( tempPath ) );
 
-  test.case = 'single arg';
-  var got = _.path.pathDirTempOpen( 'someDir/packageName' );
-  test.is( _.strHas( got, '/tmp.tmp/someDir/packageName' ) );
-  test.is( _.fileProvider.isDir( got ) );
-  _.path.pathDirTempClose( got );
-  test.is( !_.fileProvider.fileExists( got ) );
+//   test.case = 'same temp path each call'
+//   var filePath = _.path.normalize( __filename );
+//   var tempPath = _.path.pathDirTempOpen( filePath );
+//   var tempPath2 = _.path.pathDirTempOpen( filePath );
+//   test.identical( pathDeviceGet( tempPath ), pathDeviceGet( tempPath2 ) )
+//   test.identical( tempPath,tempPath2 );
+//   test.is( _.path.fileProvider.isDir( tempPath ) );
+//   _.path.fileProvider.fileDelete({ filePath : tempPath, safe : 0 });
+//   _.path.fileProvider.filesDelete({ filePath : tempPath2, safe : 0 });
 
-  test.case = 'two args';
-  var got = _.path.pathDirTempOpen( _.path.resolve( __dirname, '../..'), 'packageName' );
-  test.is( _.strHas( got, 'dwtools/tmp.tmp/packageName' ) );
-  test.is( _.fileProvider.isDir( got ) );
-  _.path.pathDirTempClose( got );
-  test.is( !_.fileProvider.fileExists( got ) );
+//   test.case = 'new temp path each call'
+//   var filePath = _.path.normalize( __filename );
+//   var tempPath = _.path.pathDirTempMake( filePath );
+//   var tempPath2 = _.path.pathDirTempMake( filePath );
+//   test.is( _.path.fileProvider.isDir( tempPath ) );
+//   test.is( _.path.fileProvider.isDir( tempPath2 ) );
+//   test.notIdentical( tempPath,tempPath2 );
+//   _.path.fileProvider.fileDelete({ filePath : tempPath, safe : 0 });
+//   _.path.fileProvider.fileDelete({ filePath : tempPath2, safe : 0 });
 
-  if( !Config.debug )
-  return;
+//   test.case = 'path to root of device';
+//   var filePath = pathDeviceGet( _.path.normalize( __filename ) );
+//   var possiblePath = _.path.join( filePath, 'tmp-' + _.idWithGuid() + '.tmp' );
+//   var shouldThrowErrorSync = false;
+//   try
+//   {
+//     _.path.fileProvider.dirMake( possiblePath );
+//     _.path.fileProvider.fileDelete({ filePath : possiblePath, safe : 0 });
+//   }
+//   catch( err )
+//   {
+//     shouldThrowErrorSync = true;
+//   }
+//   if( shouldThrowErrorSync )
+//   {
+//     test.shouldThrowErrorSync( () =>
+//     {
+//       _.path.pathDirTempMake( possiblePath );
+//       // routine pathDirTempMake make correct filePath
+//       // _.path.pathDirTempMake( filePath );
+//     })
+//   }
+//   else
+//   {
+//     var tempPath = _.path.pathDirTempMake( filePath );
+//     test.is( _.path.fileProvider.isDir( tempPath ) );
+//     _.path.fileProvider.fileDelete({ filePath : tempPath, safe : 0 });
+//   }
 
-  test.shouldThrowErrorSync( () => _.path.pathDirTempOpen( '/absolute/path' ) );
-  test.shouldThrowErrorSync( () => _.path.pathDirTempOpen( _.path.resolve( __dirname, '../..'), '/absolute/path' ) );
-}
+
+//   test.case = 'close removes only temp dirs made by open';
+//   var filePath = _.path.normalize( __filename );
+//   var tempPath = _.path.pathDirTempOpen( filePath );
+//   _.path.pathDirTempClose( tempPath );
+//   test.is( !_.path.fileProvider.fileExists( tempPath ) );
+//   test.will = 'repeat close call on same temp dir path, should throw error'
+//   test.shouldThrowErrorSync( () => _.path.pathDirTempClose( tempPath ) );
+//   test.will = 'try to close other dir, should throw error'
+//   test.shouldThrowErrorSync( () => _.path.pathDirTempClose( _.path.dir( filePath ) ) );
+
+//   //
+
+//   // var filePath = _.path.join( _.path.dirTemp(), 'file' );
+//   // var t1 = _.timeNow();
+//   // var tempPath;
+//   // for( var i = 0; i < 100; i++ )
+//   // {
+//   //   tempPath = _.path.pathDirTempOpen( filePath );
+//   // }
+//   // var t2 = _.timeNow();
+//   // logger.log( 'pathDirTempOpen:', t2 - t1 )
+//   // _.path.pathDirTempClose( tempPath );
+
+//   //
+
+//   // var filePath = _.path.join( _.path.dirTemp(), 'file' );
+//   // var t1 = _.timeNow();
+//   // var paths = [];
+//   // for( var i = 0; i < 100; i++ )
+//   // {
+//   //   paths.push( _.path.pathDirTempMake( filePath ) );
+//   // }
+//   // var t2 = _.timeNow();
+//   // logger.log( 'pathDirTempMake:', t2 - t1 )
+//   // _.each( paths, ( p ) =>
+//   // {
+//   //   _.path.fileProvider.fileDelete( p );
+//   // })
+
+//   /* */
+
+//   function pathDeviceGet( filePath )
+//   {
+//     return filePath.substring( 0, filePath.indexOf( '/', 1 ) );
+//   }
+// }
 
 //
 
-function pathDirTempForTrivial( test )
+function pathDirTemp( test )
 {
-  test.case = 'file is on same device with os temp';
-  var filePath = _.path.join( _.path.dirTemp(), 'file' );
-  var tempPath = _.path.pathDirTempForOpen( filePath );
-  test.identical( pathDeviceGet( tempPath ), pathDeviceGet( filePath ) )
-  test.is( _.path.fileProvider.isDir( tempPath ) );
-  test.will = 'second call should return same temp dir path';
-  var tempPath2 = _.path.pathDirTempForOpen( filePath );
-  test.identical( pathDeviceGet( tempPath2 ), pathDeviceGet( filePath ) )
-  test.identical( tempPath, tempPath2 );
-  _.path.pathDirTempForClose( tempPath );
-  test.is( !_.path.fileProvider.fileExists( tempPath ) );
-  test.shouldThrowErrorSync( () => _.path.pathDirTempForClose( filePath ) )
+  let filesTree = Object.create( null );
+  let extract = new _.FileProvider.Extract({ filesTree })
+  var name = 'pathDirTempOpenTest';
 
-  test.case = 'file is on different device';
-  var filePath = _.path.normalize( __filename );
-  var tempPath = _.path.pathDirTempForOpen( filePath );
-  test.identical( pathDeviceGet( tempPath ), pathDeviceGet( filePath ) )
-  test.is( _.path.fileProvider.isDir( tempPath ) );
-  _.path.pathDirTempForClose( tempPath );
-  test.is( !_.path.fileProvider.fileExists( tempPath ) );
+  let cache = extract.path.PathDirTempForMap[ extract.id ] = Object.create( null );
+  let count = extract.path.PathDirTempCountMap[ extract.id ] = Object.create( null );
 
-  test.case = 'same temp path each call'
-  var filePath = _.path.normalize( __filename );
-  var tempPath = _.path.pathDirTempForOpen( filePath );
-  var tempPath2 = _.path.pathDirTempForOpen( filePath );
-  test.identical( pathDeviceGet( tempPath ), pathDeviceGet( tempPath2 ) )
-  test.identical( tempPath,tempPath2 );
-  test.is( _.path.fileProvider.isDir( tempPath ) );
-  _.path.fileProvider.fileDelete({ filePath : tempPath, safe : 0 });
-  _.path.fileProvider.filesDelete({ filePath : tempPath2, safe : 0 });
-
-  test.case = 'new temp path each call'
-  var filePath = _.path.normalize( __filename );
-  var tempPath = _.path.pathDirTempForAnother( filePath );
-  var tempPath2 = _.path.pathDirTempForAnother( filePath );
-  test.is( _.path.fileProvider.isDir( tempPath ) );
-  test.is( _.path.fileProvider.isDir( tempPath2 ) );
-  test.notIdentical( tempPath,tempPath2 );
-  _.path.fileProvider.fileDelete({ filePath : tempPath, safe : 0 });
-  _.path.fileProvider.fileDelete({ filePath : tempPath2, safe : 0 });
-
-  test.case = 'path to root of device';
-  var filePath = pathDeviceGet( _.path.normalize( __filename ) );
-  var possiblePath = _.path.join( filePath, 'tmp-' + _.idWithGuid() + '.tmp' );
-  var shouldThrowErrorSync = false;
-  try
-  {
-    _.path.fileProvider.dirMake( possiblePath );
-    _.path.fileProvider.fileDelete({ filePath : possiblePath, safe : 0 });
-  }
-  catch( err )
-  {
-    shouldThrowErrorSync = true;
-  }
-  if( shouldThrowErrorSync )
-  {
-    test.shouldThrowErrorSync( () =>
-    {
-      _.path.pathDirTempForAnother( possiblePath );
-      // routine pathDirTempForAnother make correct filePath
-      // _.path.pathDirTempForAnother( filePath );
-    })
-  }
-  else
-  {
-    var tempPath = _.path.pathDirTempForAnother( filePath );
-    test.is( _.path.fileProvider.isDir( tempPath ) );
-    _.path.fileProvider.fileDelete({ filePath : tempPath, safe : 0 });
-  }
-
-
-  test.case = 'close removes only temp dirs made by open';
-  var filePath = _.path.normalize( __filename );
-  var tempPath = _.path.pathDirTempForOpen( filePath );
-  _.path.pathDirTempForClose( tempPath );
-  test.is( !_.path.fileProvider.fileExists( tempPath ) );
-  test.will = 'repeat close call on same temp dir path, should throw error'
-  test.shouldThrowErrorSync( () => _.path.pathDirTempForClose( tempPath ) );
-  test.will = 'try to close other dir, should throw error'
-  test.shouldThrowErrorSync( () => _.path.pathDirTempForClose( _.path.dir( filePath ) ) );
+  test.notIdentical( extract.id, _.fileProvider.id );
 
   //
 
-  // var filePath = _.path.join( _.path.dirTemp(), 'file' );
-  // var t1 = _.timeNow();
-  // var tempPath;
-  // for( var i = 0; i < 100; i++ )
-  // {
-  //   tempPath = _.path.pathDirTempForOpen( filePath );
-  // }
-  // var t2 = _.timeNow();
-  // logger.log( 'pathDirTempForOpen:', t2 - t1 )
-  // _.path.pathDirTempForClose( tempPath );
+  test.open( 'same drive' );
 
-  //
+  var filePath1 = '/dir1'
+  var got1 = extract.path.pathDirTempOpen({ filePath : filePath1, name });
+  test.identical( cache[ filePath1 ], got1 );
+  test.is( _.strHas( got1, name ) );
+  test.is( extract.isDir( got1 ) );
 
-  // var filePath = _.path.join( _.path.dirTemp(), 'file' );
-  // var t1 = _.timeNow();
-  // var paths = [];
-  // for( var i = 0; i < 100; i++ )
-  // {
-  //   paths.push( _.path.pathDirTempForAnother( filePath ) );
-  // }
-  // var t2 = _.timeNow();
-  // logger.log( 'pathDirTempForAnother:', t2 - t1 )
-  // _.each( paths, ( p ) =>
-  // {
-  //   _.path.fileProvider.fileDelete( p );
-  // })
+  var filePath2 = '/dir1/dir2'
+  var got2 = extract.path.pathDirTempOpen({ filePath : filePath2, name });
+  test.identical( cache[ filePath2 ], got1 );
+  test.is( _.strHas( got2, name ) );
+  test.identical( got2, got1 );
+  test.is( extract.isDir( got2 ) );
+
+  var got1 = extract.path.pathDirTempOpen({ filePath : filePath1, name });
+  var got2 = extract.path.pathDirTempOpen({ filePath : filePath2, name });
+  test.identical( got2, got1 );
+  test.is( extract.isDir( got1 ) );
+  test.identical( cache[ filePath1 ], got1 );
+  test.identical( cache[ filePath2 ], got2 );
+
+  extract.path.pathDirTempClose( filePath1 );
+  extract.path.pathDirTempClose( filePath2 );
+  test.identical( cache[ filePath1 ], got1 );
+  test.identical( cache[ filePath2 ], got2 );
+  test.is( extract.isDir( got1 ) );
+  test.is( extract.isDir( got2 ) );
+
+  extract.path.pathDirTempClose( filePath1 );
+  test.identical( cache[ filePath1 ], undefined );
+  test.identical( cache[ filePath2 ], got2 );
+  test.is( extract.isDir( got1 ) );
+  test.is( extract.isDir( got2 ) );
+  extract.path.pathDirTempClose( filePath2 );
+  test.identical( cache[ filePath1 ], undefined );
+  test.identical( cache[ filePath2 ], undefined );
+  test.is( !extract.isDir( got1 ) );
+  test.is( !extract.isDir( got2 ) );
+
+  test.identical( count[ got1 ], undefined );
+  test.identical( count[ got2 ], undefined );
+
+  var got1 = extract.path.pathDirTempOpen({ filePath : filePath1, name });
+  var got2 = extract.path.pathDirTempOpen({ filePath : filePath2, name });
+  test.identical( got2, got1 );
+  test.is( extract.isDir( got1 ) );
+  test.identical( cache[ filePath1 ], got1 );
+  test.identical( cache[ filePath2 ], got2 );
+  debugger
+  extract.path.pathDirTempClose();
+  test.identical( cache[ filePath1 ], undefined );
+  test.identical( cache[ filePath2 ], undefined );
+  test.is( !extract.isDir( got1 ) );
+  test.is( !extract.isDir( got2 ) );
+
+  test.identical( count[ got1 ], undefined );
+  test.identical( count[ got2 ], undefined );
+
+  test.close( 'same drive' );
 
   /* */
 
-  function pathDeviceGet( filePath )
+  test.open( 'different drive' );
+
+  var filePath1 = '/dir1'
+  var filePath2 = '/dir1/dir2'
+
+  extract.dirMake( filePath1 );
+  extract.dirMake( filePath2 );
+
+  extract.extraStats[ filePath1 ] = { dev : 1 }
+  extract.extraStats[ filePath2 ] = { dev : 2 }
+
+  var got1 = extract.path.pathDirTempOpen({ filePath : filePath1, name });
+  var got2 = extract.path.pathDirTempOpen({ filePath : filePath2, name });
+  test.notIdentical( got1, got2 );
+  test.identical( extract.path.common( got2, filePath2 ), filePath2 )
+  test.is( extract.isDir( got1 ) );
+  test.is( extract.isDir( got2 ) );
+  test.identical( cache[ filePath1 ], got1 );
+  test.identical( cache[ filePath2 ], got2 );
+
+  extract.path.pathDirTempClose( filePath1 );
+  test.identical( cache[ filePath1 ], undefined );
+  test.identical( cache[ filePath2 ], got2 );
+  test.is( extract.isDir( got2 ) );
+  extract.path.pathDirTempClose( filePath2 );
+  test.identical( cache[ filePath1 ], undefined );
+  test.identical( cache[ filePath2 ], undefined );
+  test.is( !extract.isDir( got2 ) );
+
+  test.close( 'different drive' );
+
+  //
+
+  test.open( 'os path' )
+
+  var filePath1 = extract.path.dir( extract.path.dirTemp() );
+  var got1 = extract.path.pathDirTempOpen({ filePath: filePath1, name });
+  test.is( extract.isDir( got1 ) );
+  test.is( _.strBegins( got1, '/temp' ) )
+  test.identical( cache[ filePath1 ], got1 );
+
+  var filePath2 = '/'
+  var got2 = extract.path.pathDirTempOpen({ filePath : filePath2, name });
+  test.is( extract.isDir( got2 ) );
+  test.identical( got1,got2 );
+  test.is( _.strBegins( got2, '/temp' ) );
+  test.identical( cache[ filePath2 ], got2 );
+
+  test.case = 'should return os temp path in case of error'
+
+  var filePath3 = '/dir3'
+  let originalDirMake = extract.dirMake;
+  extract.dirMake = function dirMake( filePath )
   {
-    return filePath.substring( 0, filePath.indexOf( '/', 1 ) );
+    if( _.strHas( filePath,'/dir3' ) )
+    throw _.err( 'Test err');
+    return originalDirMake.apply( extract, arguments );
   }
+  var got2;
+  test.mustNotThrowError( () =>
+  {
+    got2 = extract.path.pathDirTempOpen({ filePath : filePath3, name });
+  })
+  extract.dirMake = _.routineJoin( extract, originalDirMake )
+  test.is( extract.isDir( got2 ) );
+  test.is( _.strBegins( got2, extract.path.dirTemp() ) );
+  test.identical( cache[ filePath3 ], got2 );
+
+  test.close( 'os path' )
+
+  //
+
+  var filePath1 = '/dir1/dir3'
+  test.shouldThrowErrorSync( () => extract.path.pathDirTempClose( filePath1 ) )
+
+  //
+
+  test.case = 'several runs of pathDirTempClose'
+  test.mustNotThrowError( () =>
+  {
+    extract.path.pathDirTempClose();
+    extract.path.pathDirTempClose();
+  })
+  test.identical( _.mapKeys( cache ).length, 0 );
+
+  test.case = 'no args';
+  var got = extract.path.pathDirTempOpen();
+  test.is( _.strHas( got, '/tmp-' ) );
+  test.is( extract.isDir( got ) );
+  extract.path.pathDirTempClose( got );
+  test.is( !extract.fileExists( got ) );
+
+  test.case = 'single arg';
+  var got = extract.path.pathDirTempOpen( 'packageName' );
+  test.is( _.strHas( got, 'packageName' ) );
+  test.is( extract.isDir( got ) );
+  extract.path.pathDirTempClose( got );
+  test.is( !extract.fileExists( got ) );
+
+  test.case = 'single arg';
+  var got = extract.path.pathDirTempOpen( 'someDir/packageName' );
+  test.is( _.strHas( got, '/someDir/Temp' ) );
+  test.is( extract.isDir( got ) );
+  extract.path.pathDirTempClose( got );
+  test.is( !extract.fileExists( got ) );
+
+  test.case = 'two args';
+  var got = extract.path.pathDirTempOpen( '/dir', 'packageName' );
+  test.is( _.strHas( got, '/dir/Temp' ) );
+  test.is( _.strHas( got, 'packageName' ) );
+  test.is( extract.isDir( got ) );
+  extract.path.pathDirTempClose( got );
+  test.is( !extract.fileExists( got ) );
+
 }
 
 
@@ -1109,7 +1265,7 @@ function pathDirTempForTrivial( test )
 var Self =
 {
 
-  name : 'Tools/mid/files/Paths',
+  name : 'Tools.mid.files.Paths',
   silencing : 1,
 
   onSuiteBegin,
@@ -1117,7 +1273,7 @@ var Self =
 
   context :
   {
-    testSuitePath : null,
+    suitePath : null,
     isBrowser : null,
 
     createTestsDirectory,
@@ -1148,9 +1304,9 @@ var Self =
 
     relative,
 
-    dirTemp,
+    // pathDirTempForTrivial,
 
-    pathDirTempForTrivial,
+    pathDirTemp
 
   },
 

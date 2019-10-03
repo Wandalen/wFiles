@@ -12,7 +12,7 @@ if( typeof module !== 'undefined' )
 //
 
 var _ = _global_.wTools;
-var Parent = wTests[ 'Tools/mid/files/fileProvider/Abstract' ];
+var Parent = wTests[ 'Tools.mid.files.fileProvider.Abstract' ];
 
 _.assert( !!Parent );
 
@@ -21,7 +21,7 @@ _.assert( !!Parent );
 // function onSuiteBegin( test )
 // {
 //   let path = this.provider.path;
-//   this.testSuitePath = path.pathDirTempOpen( path.join( __dirname, '../..'  ), 'Provider/HardDrive' );
+//   this.suitePath = path.pathDirTempOpen( path.join( __dirname, '../..'  ), 'Provider/HardDrive' );
 // }
 //
 // //
@@ -31,8 +31,8 @@ _.assert( !!Parent );
 //   let path = this.provider.path;
 //   // qqq : error here
 //   // aaa : format of temp path was changed and has unique id at the end
-//   _.assert( _.strHas( this.testSuitePath, 'Provider/HardDrive' ) );
-//   path.pathDirTempClose( this.testSuitePath );
+//   _.assert( _.strHas( this.suitePath, 'Provider/HardDrive' ) );
+//   path.pathDirTempClose( this.suitePath );
 // }
 
 //
@@ -45,12 +45,12 @@ function onSuiteBegin( test )
   context.system = _.FileProvider.System({ providers : [ context.provider ] });
 
   let path = context.provider.path;
-  context.testSuitePath = path.pathDirTempOpen( 'HardDrive' );
-  context.testSuitePath = context.provider.pathResolveLinkFull({ filePath : context.testSuitePath, resolvingSoftLink : 1 });
-  context.testSuitePath = context.testSuitePath.absolutePath;
+  context.suitePath = path.pathDirTempOpen( path.join( __dirname, '../..'  ),'HardDrive' );
+  context.suitePath = context.provider.pathResolveLinkFull({ filePath : context.suitePath, resolvingSoftLink : 1 });
+  context.suitePath = context.suitePath.absolutePath;
   context.globalFromPreferred = function globalFromPreferred( path ){ return path };
   // let path = this.provider.path;
-  // this.testSuitePath = path.pathDirTempOpen( path.join( __dirname, '../..'  ), 'Provider/HardDrive' );
+  // this.suitePath = path.pathDirTempOpen( path.join( __dirname, '../..'  ), 'Provider/HardDrive' );
 }
 
 // --
@@ -60,7 +60,7 @@ function onSuiteBegin( test )
 var Proto =
 {
 
-  name : 'Tools/mid/files/fileProvider/HardDrive',
+  name : 'Tools.mid.files.fileProvider.HardDrive',
   abstract : 0,
   silencing : 1,
   enabled : 1,
@@ -74,7 +74,7 @@ var Proto =
   {
     provider : _.FileProvider.HardDrive(),
     // onSuiteBegin,
-    testSuitePath : null,
+    suitePath : null,
     globalFromPreferred : null
   },
 

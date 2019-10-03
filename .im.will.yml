@@ -3,18 +3,68 @@ submodule :
 
   wTools :
     path : npm:///wTools
-    enabled : 0 # submodule
-  wPathBasic :
+    enabled : 0
+  wstringer :
+    path : npm:///wstringer
+    enabled : 0
+  wstringsextra :
+    path : npm:///wstringsextra
+    enabled : 0
+  wConsequence :
+    path : npm:///wConsequence
+    enabled : 0
+  wCopyable :
+    path : npm:///wCopyable
+    enabled : 0
+  wgdfstrategy :
+    path : npm:///wgdfstrategy
+    enabled : 0
+  wroutinebasic :
+    path : npm:///wroutinebasic
+    enabled : 0
+  wpathbasic :
     path : npm:///wpathbasic
-    enabled : 0 # submodule
-  wArraySorted :
-    path : npm:///warraysorted
-    enabled : 0 # submodule
-  wPathTools :
-    path : hd://.
-    enabled : 0 # submodule
-    criterion :
-      development : 1
+    enabled : 0
+  wpathtools :
+    path : npm:///wpathtools
+    enabled : 0
+  wuribasic :
+    path : npm:///wuribasic
+    enabled : 0
+  wweburibasic :
+    path : npm:///wweburibasic
+    enabled : 0
+  wappbasic :
+    path : npm:///wappbasic
+    enabled : 0
+  wfieldsstack :
+    path : npm:///wfieldsstack
+    enabled : 0
+  wRegexpObject :
+    path : npm:///wRegexpObject
+    enabled : 0
+  wselector :
+    path : npm:///wselector
+    enabled : 0
+  wverbal :
+    path : npm:///wverbal
+    enabled : 0
+  wLogger :
+    path : npm:///wLogger
+    enabled : 0
+  ini :
+    path : npm:///ini
+    enabled : 0
+  tar :
+    path : npm:///tar
+    enabled : 0
+  gitconfiglocal :
+    path : npm:///gitconfiglocal
+    enabled : 0
+  proper-lockfile :
+    path : npm:///proper-lockfile
+    enabled : 0
+
   wFiles :
     path : npm:///wFiles
     enabled : 0 # submodule
@@ -22,6 +72,16 @@ submodule :
       development : 1
   wTesting :
     path : npm:///wTesting
+    enabled : 0 # submodule
+    criterion :
+      development : 1
+  wait-sync :
+    path : npm:///wait-sync
+    enabled : 0 # submodule
+    criterion :
+      development : 1
+  cli-table2 :
+    path : npm:///cli-table2#0.2.0
     enabled : 0 # submodule
     criterion :
       development : 1

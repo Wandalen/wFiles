@@ -2225,6 +2225,10 @@ function pathResolveLinkHeadReverse_body( o )
   return system.pathResolveLinkHeadReverse.body.call( system, o );
 
   /* Vova: qqq: should not resolve last part of the filePath? */
+
+  if( path.isRoot( o.filePath ) )
+  return o.filePath;
+
   let prefixPath = path.dir( o.filePath );
   let postfixPath = '';
 
@@ -2239,10 +2243,10 @@ function pathResolveLinkHeadReverse_body( o )
     _.assert( !_.strBegins( prefixPath, '/..' ) && !_.strHas( prefixPath, '///..' ) )
   }
 
-  let result = '/' + postfixPath;
+  if( !postfixPath )
+  return o.filePath;
 
-  if( postfixPath.length )
-  result = path.join( result, path.fullName( o.filePath ) );
+  let result = '/' + postfixPath + '/' + path.fullName( o.filePath );
 
   if( path.parse )
   result = ( path.parse( prefixPath ).origin || '' ) + result;
@@ -6948,7 +6952,7 @@ function _link_functor( fop )
       }
 
       //qqq: find better solution to check text links
-      if( srcStat.isTextLink() && c.dstStat.isTextLink() )
+      if( /* srcStat.isTextLink() && */ c.dstStat.isTextLink() )
       if( self.filesAreTextLinked([ c.dstStat.filePath, srcStat.filePath ]) )
       return;
 

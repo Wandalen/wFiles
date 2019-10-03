@@ -48144,7 +48144,7 @@ var Self =
 
     writeAsyncThrowingError,
 
-    //qqq: extend linking routines with cases using resolvingSrcSoftLink:2 and resolvingSrcTextLink:0-2
+    //zzz: extend linking routines with cases using resolvingSrcSoftLink:2 and resolvingSrcTextLink:0-2
 
     fileCopyActSync,
     fileCopySync,
@@ -48244,7 +48244,7 @@ var Self =
     hardLinkHardLinkBreaking,
     hardLinkResolvingBasic,
     hardLinkGlobal,
-    hardLinkRelativeSoftLinking,//qqq: extend test routine for resolvingSrcTextLink:0-2
+    hardLinkRelativeSoftLinking,
     hardLinkRelativeTextLinking,
 
     fileExchangeSync,

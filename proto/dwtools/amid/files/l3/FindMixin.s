@@ -2685,11 +2685,11 @@ function filesReflectEvaluate_body( o )
         /* both src and dst are terminals */
 
         if( o.writing && o.dstRewriting && o.dstRewritingOnlyPreserving )
-        if( !self.filesAreSame( record.src, record.dst, true ) )
+        if( !self.filesCanBeSame( record.src, record.dst, true ) )
         if( record.src.stat.size !== 0 || record.dst.stat.size !== 0 )
         {
           debugger;
-          let same = self.filesAreSame( record.src, record.dst, true );
+          let same = self.filesCanBeSame( record.src, record.dst, true );
           throw _.err
           (
             'Can\'t rewrite' + ' ' + 'terminal file ' + _.strQuote( record.dst.absolute ) + '\n' +
@@ -3040,7 +3040,7 @@ function filesReflectEvaluate_body( o )
 
     if( o.linking === 'fileCopy' )
     {
-      if( self.filesAreSame( record.dst, record.src, true ) )
+      if( self.filesCanBeSame( record.dst, record.src, true ) )
       return true;
     }
 
@@ -3236,7 +3236,7 @@ function filesReflectEvaluate_body( o )
       {
         if( result.src.isTerminal )
         {
-          if( !self.filesAreSame( result.src, record.src, true ) )
+          if( !self.filesCanBeSame( result.src, record.src, true ) )
           if( result.src.stat.size !== 0 || record.src.stat.size !== 0 )
           {
             debugger

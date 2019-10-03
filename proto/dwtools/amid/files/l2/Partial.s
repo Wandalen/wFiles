@@ -4074,16 +4074,16 @@ having.driving = 0;
    {
      wTools.fileWrite( { filePath : path2, data : buffer } );
 
-     let sameWithoutTime = wTools.filesAreSame( path1, path2 ); // true
+     let sameWithoutTime = wTools.filesCanBeSame( path1, path2 ); // true
 
-     let sameWithTime = wTools.filesAreSame( path1, path2, usingExtraStat ); // false
+     let sameWithTime = wTools.filesCanBeSame( path1, path2, usingExtraStat ); // false
    }, 100);
  * @param {string|wFileRecord} ins1 first file to compare
  * @param {string|wFileRecord} ins2 second file to compare
  * @param {boolean} usingExtraStat if this argument sets to true method will additionally check modified time of files, and
     if they are different, method returns false.
  * @returns {boolean}
- * @method filesAreSame
+ * @method filesCanBeSame
  * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderPartial#
  */
 
@@ -4225,7 +4225,7 @@ operates.ins2 = { pathToRead : 1 };
 
 //
 
-function filesAreSame_body( o )
+function filesCanBeSame_body( o )
 {
   let self = this;
   let result = filesAreSameCommon_body.call( self, o );
@@ -4252,10 +4252,10 @@ function filesAreSame_body( o )
   return result;
 }
 
-_.routineExtend( filesAreSame_body, filesAreSameCommon_body );
+_.routineExtend( filesCanBeSame_body, filesAreSameCommon_body );
 
-let filesAreSame = _.routineFromPreAndBody( filesAreSame_pre, filesAreSame_body );
-filesAreSame.having.aspect = 'entry';
+let filesCanBeSame = _.routineFromPreAndBody( filesAreSame_pre, filesCanBeSame_body );
+filesCanBeSame.having.aspect = 'entry';
 
 //
 
@@ -9159,7 +9159,7 @@ let Proto =
   dirReadTerminals,
 
   filesFingerprints,
-  filesAreSame,
+  filesCanBeSame,
   filesAreSameForSure,
 
   // write

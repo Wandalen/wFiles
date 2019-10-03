@@ -5395,20 +5395,20 @@ function fileCopyRelativePath( test )
   var dstPath = test.context.pathFor( 'written/fileCopyRelativePath/dstFile' );
   provider.filesDelete( dstPath );
   provider.fileCopy( dstPath, srcPath );
-  test.is( provider.filesAreSame( pathToFile, dstPath ) );
+  test.is( provider.filesCanBeSame( pathToFile, dstPath ) );
 
   var srcPath = './../file';
   var dstPath = test.context.pathFor( 'written/fileCopyRelativePath/dstFile' );
   provider.filesDelete( dstPath );
   provider.fileCopy( dstPath, srcPath );
-  test.is( provider.filesAreSame( pathToFile, dstPath ) );
+  test.is( provider.filesCanBeSame( pathToFile, dstPath ) );
 
   var srcPath = '../../file';
   var dstPath = test.context.pathFor( 'written/fileCopyRelativePath/dstPath/dstFile' );
   provider.filesDelete( dstPath );
   provider.dirMakeForFile( dstPath )
   provider.fileCopy( dstPath, srcPath );
-  test.is( provider.filesAreSame( pathToFile, dstPath ) );
+  test.is( provider.filesCanBeSame( pathToFile, dstPath ) );
 
 
   var srcPath = './../../file';
@@ -5416,7 +5416,7 @@ function fileCopyRelativePath( test )
   provider.filesDelete( dstPath );
   provider.dirMakeForFile( dstPath )
   provider.fileCopy( dstPath, srcPath );
-  test.is( provider.filesAreSame( pathToFile, dstPath ) );
+  test.is( provider.filesCanBeSame( pathToFile, dstPath ) );
 
 
   var srcPath = './../../../file';
@@ -5426,7 +5426,7 @@ function fileCopyRelativePath( test )
   provider.filesDelete( dstPath );
   provider.dirMakeForFile( dstPath )
   provider.fileCopy( dstPath, srcPath );
-  test.is( provider.filesAreSame( pathToFile2, dstPath ) );
+  test.is( provider.filesCanBeSame( pathToFile2, dstPath ) );
 
   var srcPath = '../../../file';
   var pathToFile2 = test.context.pathFor( 'written/fileCopyRelativePath/a/file' );
@@ -5435,7 +5435,7 @@ function fileCopyRelativePath( test )
   provider.filesDelete( dstPath );
   provider.dirMakeForFile( dstPath )
   provider.fileCopy( dstPath, srcPath );
-  test.is( provider.filesAreSame( pathToFile2, dstPath ) );
+  test.is( provider.filesCanBeSame( pathToFile2, dstPath ) );
 
   test.close( 'src - relative path to a file' );
 
@@ -5451,28 +5451,28 @@ function fileCopyRelativePath( test )
   var dstPathResolved = provider.path.resolve( srcPath,dstPath );
   provider.filesDelete( dstPathResolved );
   provider.fileCopy( dstPath, srcPath );
-  test.is( provider.filesAreSame( srcPath, dstPathResolved ) );
+  test.is( provider.filesCanBeSame( srcPath, dstPathResolved ) );
 
   var srcPath = pathToFile;
   var dstPath = './../dstFile';
   var dstPathResolved = provider.path.resolve( srcPath,dstPath );
   provider.filesDelete( dstPathResolved );
   provider.fileCopy( dstPath, srcPath );
-  test.is( provider.filesAreSame( srcPath, dstPathResolved ) );
+  test.is( provider.filesCanBeSame( srcPath, dstPathResolved ) );
 
   var srcPath = pathToFile;
   var dstPath = '../../dstFile';
   var dstPathResolved = provider.path.resolve( srcPath,dstPath );
   provider.filesDelete( dstPathResolved );
   provider.fileCopy( dstPath, srcPath );
-  test.is( provider.filesAreSame( srcPath, dstPathResolved ) );
+  test.is( provider.filesCanBeSame( srcPath, dstPathResolved ) );
 
   var srcPath = pathToFile;
   var dstPath = './../../dstFile';
   var dstPathResolved = provider.path.resolve( srcPath,dstPath );
   provider.filesDelete( dstPathResolved );
   provider.fileCopy( dstPath, srcPath );
-  test.is( provider.filesAreSame( srcPath, dstPathResolved ) );
+  test.is( provider.filesCanBeSame( srcPath, dstPathResolved ) );
 
   var srcPath = pathToFile;
   var dstPath = './../a/b/dstFile';
@@ -5480,7 +5480,7 @@ function fileCopyRelativePath( test )
   provider.filesDelete( dstPathResolved );
   provider.dirMakeForFile( dstPathResolved );
   provider.fileCopy( dstPath, srcPath );
-  test.is( provider.filesAreSame( srcPath, dstPathResolved ) );
+  test.is( provider.filesCanBeSame( srcPath, dstPathResolved ) );
 
   test.close( 'dst - relative path to a file' );
 
@@ -39707,7 +39707,7 @@ function filesAreSoftLinked( test )
 
 //
 
-function filesAreSame( test )
+function filesCanBeSame( test )
 {
   let self = this;
   let provider = self.provider;
@@ -39733,154 +39733,154 @@ function filesAreSame( test )
   //
 
   test.case = 'same file with empty content';
-  var filePath = test.context.pathFor( 'written/filesAreSame/file' );
+  var filePath = test.context.pathFor( 'written/filesCanBeSame/file' );
   provider.fileWrite( filePath, '' );
-  var got = provider.filesAreSame( filePath, filePath );
+  var got = provider.filesCanBeSame( filePath, filePath );
   test.identical( got, true );
 
   //
 
   test.case = 'two different files with empty content';
-  var filePath = test.context.pathFor( 'written/filesAreSame/file' );
-  var filePath2 = test.context.pathFor( 'written/filesAreSame/file2' );
+  var filePath = test.context.pathFor( 'written/filesCanBeSame/file' );
+  var filePath2 = test.context.pathFor( 'written/filesCanBeSame/file2' );
   provider.fileWrite( filePath, '' );
   provider.fileWrite( filePath2, '' );
-  var got = provider.filesAreSame( filePath, filePath2 );
+  var got = provider.filesCanBeSame( filePath, filePath2 );
   test.identical( got, true );
 
   //
 
   test.case = 'files with identical binary content';
-  var filePath = test.context.pathFor( 'written/filesAreSame/file' );
-  var filePath2 = test.context.pathFor( 'written/filesAreSame/file2' );
+  var filePath = test.context.pathFor( 'written/filesCanBeSame/file' );
+  var filePath2 = test.context.pathFor( 'written/filesCanBeSame/file2' );
   provider.fileWrite( filePath, bufferData1 );
   provider.fileWrite( filePath2, bufferData1 );
-  var got = provider.filesAreSame( filePath, filePath2 );
+  var got = provider.filesCanBeSame( filePath, filePath2 );
   test.identical( got, true );
 
   //
 
   test.case = 'files with non identical text content';
-  var filePath = test.context.pathFor( 'written/filesAreSame/file' );
-  var filePath2 = test.context.pathFor( 'written/filesAreSame/file2' );
+  var filePath = test.context.pathFor( 'written/filesCanBeSame/file' );
+  var filePath2 = test.context.pathFor( 'written/filesCanBeSame/file2' );
   provider.fileWrite( filePath, textData1 );
   provider.fileWrite( filePath2, textData2 );
-  var got = provider.filesAreSame( filePath, filePath2 );
+  var got = provider.filesCanBeSame( filePath, filePath2 );
   test.identical( got, false );
 
   //
 
   test.case = 'files with non identical binart content';
-  var filePath = test.context.pathFor( 'written/filesAreSame/file' );
-  var filePath2 = test.context.pathFor( 'written/filesAreSame/file2' );
+  var filePath = test.context.pathFor( 'written/filesCanBeSame/file' );
+  var filePath2 = test.context.pathFor( 'written/filesCanBeSame/file2' );
   provider.fileWrite( filePath, bufferData1 );
   provider.fileWrite( filePath2, bufferData2 );
-  var got = provider.filesAreSame( filePath, filePath2 );
+  var got = provider.filesCanBeSame( filePath, filePath2 );
   test.identical( got, false );
 
   //
 
   test.case = 'file and symlink to file';
-  var filePath = test.context.pathFor( 'written/filesAreSame/file' );
-  var filePath2 = test.context.pathFor( 'written/filesAreSame/file2' );
+  var filePath = test.context.pathFor( 'written/filesCanBeSame/file' );
+  var filePath2 = test.context.pathFor( 'written/filesCanBeSame/file2' );
   provider.fileWrite( filePath, textData1 );
   provider.softLink( filePath2, filePath );
   /* resolvingSoftLink off */
   provider.fieldPush( 'resolvingSoftLink', 0 );
-  var got = provider.filesAreSame( filePath, filePath2 );
+  var got = provider.filesCanBeSame( filePath, filePath2 );
   provider.fieldPop( 'resolvingSoftLink', 0 );
   test.identical( got, false );
   /* resolvingSoftLink on */
   provider.fieldPush( 'resolvingSoftLink', 1 );
-  var got = provider.filesAreSame( filePath, filePath2 );
+  var got = provider.filesCanBeSame( filePath, filePath2 );
   provider.fieldPop( 'resolvingSoftLink', 1 );
   test.identical( got, false );
 
   //
 
   test.case = 'not existing path';
-  var filePath = test.context.pathFor( 'written/filesAreSame/file' );
-  var filePath2 = test.context.pathFor( 'written/filesAreSame/file2' );
+  var filePath = test.context.pathFor( 'written/filesCanBeSame/file' );
+  var filePath2 = test.context.pathFor( 'written/filesCanBeSame/file2' );
   provider.fileWrite( filePath, bufferData1 );
   provider.filesDelete( filePath );
-  var got = provider.filesAreSame( filePath, filePath2 );
+  var got = provider.filesCanBeSame( filePath, filePath2 );
   test.identical( got, false )
 
 
   //
 
   test.case = 'two file records asociated with two regular files';
-  var filePath = test.context.pathFor( 'written/filesAreSame/file' );
-  var filePath2 = test.context.pathFor( 'written/filesAreSame/file2' );
+  var filePath = test.context.pathFor( 'written/filesCanBeSame/file' );
+  var filePath2 = test.context.pathFor( 'written/filesCanBeSame/file2' );
   provider.fileWrite( filePath, textData1 );
   provider.fileWrite( filePath, textData1 );
-  var got = provider.filesAreSame( provider.recordFactory().record( filePath ), provider.recordFactory().record( filePath2 ) );
+  var got = provider.filesCanBeSame( provider.recordFactory().record( filePath ), provider.recordFactory().record( filePath2 ) );
   test.identical( got, true );
 
   //
 
   test.case = 'two file records asociated with two regular files, same content';
-  var filePath = test.context.pathFor( 'written/filesAreSame/file' );
-  var filePath2 = test.context.pathFor( 'written/filesAreSame/file2' );
+  var filePath = test.context.pathFor( 'written/filesCanBeSame/file' );
+  var filePath2 = test.context.pathFor( 'written/filesCanBeSame/file2' );
   provider.fileWrite( filePath, textData1 );
   provider.fileWrite( filePath2, textData1 );
-  var got = provider.filesAreSame( provider.recordFactory().record( filePath ), provider.recordFactory().record( filePath2 ) );
+  var got = provider.filesCanBeSame( provider.recordFactory().record( filePath ), provider.recordFactory().record( filePath2 ) );
   test.identical( got, true );
 
   //
 
   test.case = 'two file records asociated with two regular files, diff content';
-  var filePath = test.context.pathFor( 'written/filesAreSame/file' );
-  var filePath2 = test.context.pathFor( 'written/filesAreSame/file2' );
+  var filePath = test.context.pathFor( 'written/filesCanBeSame/file' );
+  var filePath2 = test.context.pathFor( 'written/filesCanBeSame/file2' );
   provider.fileWrite( filePath, textData1 );
   provider.filesDelete( filePath2 );
   provider.fileWrite( filePath2, textData2 );
-  var got = provider.filesAreSame( provider.recordFactory().record( filePath ), provider.recordFactory().record( filePath2 ) );
+  var got = provider.filesCanBeSame( provider.recordFactory().record( filePath ), provider.recordFactory().record( filePath2 ) );
   test.identical( got, false );
 
   //
 
   test.case = 'two file records asociated with two symlinks, same content';
-  var filePath = test.context.pathFor( 'written/filesAreSame/file' );
-  var filePath2 = test.context.pathFor( 'written/filesAreSame/file2' );
+  var filePath = test.context.pathFor( 'written/filesCanBeSame/file' );
+  var filePath2 = test.context.pathFor( 'written/filesCanBeSame/file2' );
   provider.fileWrite( filePath, textData1 );
   provider.filesDelete( filePath2 );
   provider.fileWrite( filePath2, textData1 );
-  var linkPath = test.context.pathFor( 'written/filesAreSame/link1' );
-  var linkPath2 = test.context.pathFor( 'written/filesAreSame/link2' );
+  var linkPath = test.context.pathFor( 'written/filesCanBeSame/link1' );
+  var linkPath2 = test.context.pathFor( 'written/filesCanBeSame/link2' );
   provider.softLink( linkPath, filePath );
   provider.softLink( linkPath2, filePath2 );
   /* resolvingSoftLink off */
   provider.fieldPush( 'resolvingSoftLink', 0 );
-  var got = provider.filesAreSame( provider.recordFactory().record( linkPath ), provider.recordFactory().record( linkPath2 ) );
+  var got = provider.filesCanBeSame( provider.recordFactory().record( linkPath ), provider.recordFactory().record( linkPath2 ) );
   provider.fieldPop( 'resolvingSoftLink', 0 );
   test.identical( got, false );
   /* resolvingSoftLink on */
   provider.fieldPush( 'resolvingSoftLink', 1 );
-  var got = provider.filesAreSame( provider.recordFactory().record( linkPath ), provider.recordFactory().record( linkPath2 ) );
+  var got = provider.filesCanBeSame( provider.recordFactory().record( linkPath ), provider.recordFactory().record( linkPath2 ) );
   provider.fieldPop( 'resolvingSoftLink', 1 );
   test.identical( got, true );
 
   //
 
   test.case = 'two file records asociated with two symlinks, diff content';
-  var filePath = test.context.pathFor( 'written/filesAreSame/file' );
-  var filePath2 = test.context.pathFor( 'written/filesAreSame/file2' );
+  var filePath = test.context.pathFor( 'written/filesCanBeSame/file' );
+  var filePath2 = test.context.pathFor( 'written/filesCanBeSame/file2' );
   provider.fileWrite( filePath, textData1 );
   provider.filesDelete( filePath2 );
   provider.fileWrite( filePath2, textData2 );
-  var linkPath = test.context.pathFor( 'written/filesAreSame/link1' );
-  var linkPath2 = test.context.pathFor( 'written/filesAreSame/link2' );
+  var linkPath = test.context.pathFor( 'written/filesCanBeSame/link1' );
+  var linkPath2 = test.context.pathFor( 'written/filesCanBeSame/link2' );
   provider.softLink( linkPath, filePath );
   provider.softLink( linkPath2, filePath2 );
   /* resolvingSoftLink off */
   provider.fieldPush( 'resolvingSoftLink', 0 );
-  var got = provider.filesAreSame( provider.recordFactory().record( linkPath ), provider.recordFactory().record( linkPath2 ) );
+  var got = provider.filesCanBeSame( provider.recordFactory().record( linkPath ), provider.recordFactory().record( linkPath2 ) );
   provider.fieldPop( 'resolvingSoftLink', 0 );
   test.identical( got, false );
   /* resolvingSoftLink on */
   provider.fieldPush( 'resolvingSoftLink', 1 );
-  var got = provider.filesAreSame( provider.recordFactory().record( linkPath ), provider.recordFactory().record( linkPath2 ) );
+  var got = provider.filesCanBeSame( provider.recordFactory().record( linkPath ), provider.recordFactory().record( linkPath2 ) );
   provider.fieldPop( 'resolvingSoftLink', 1 );
   test.identical( got, false );
 
@@ -48266,7 +48266,7 @@ var Self =
     filesAreHardLinked,
     filesAreTextLinked,
     filesAreSoftLinked,
-    filesAreSame,
+    filesCanBeSame,
 
     statsAreHardLinked,
 

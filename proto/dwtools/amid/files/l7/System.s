@@ -1248,7 +1248,7 @@ let FilteredRoutines =
   hardLinkBreakAct : Routines.hardLinkBreakAct,
   softLinkBreakAct : Routines.softLinkBreakAct,
 
-  filesAreSame : Routines.filesAreSame,
+  filesCanBeSame : Routines.filesCanBeSame,
   filesAreSameForSure : Routines.filesAreSameForSure
 
 }

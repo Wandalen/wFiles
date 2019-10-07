@@ -530,7 +530,7 @@ function versionsPull( o )
     let ready = new _.Consequence().take( null );
     let start = _.process.starter
     ({
-      mode : 'spawn',
+      mode : 'shell',
       currentPath : o.localPath,
       ready : ready
     });

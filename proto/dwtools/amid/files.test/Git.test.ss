@@ -1146,6 +1146,169 @@ function versionsRemoteRetrive( test )
 
 //
 
+function versionsPull( test )
+{
+  let context = this;
+  let providerSrc = context.providerSrc;
+  let providerDst = context.providerDst;
+  let system = context.system;
+  let path = context.providerDst.path;
+  let testPath = path.join( context.suitePath, 'routine-' + test.name );
+  let localPath = path.join( testPath, 'clone' );
+  let repoPath = path.join( testPath, 'repo' );
+  let clonePathGlobal = providerDst.path.globalFromPreferred( localPath );
+  let repoPathGlobal = providerDst.path.globalFromPreferred( repoPath );
+  let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git';
+  let remoteRepoPath = system.path.join( 'git+hd://', repoPath );
+
+  let con = new _.Consequence().take( null );
+
+  let shell = _.process.starter
+  ({
+    currentPath : localPath,
+    ready : con
+  })
+
+  let shell2 = _.process.starter
+  ({
+    currentPath : repoPath,
+    ready : con
+  })
+
+  /* */
+
+  con.then( () =>
+  {
+    test.case = 'not git repository';
+    return test.shouldThrowErrorAsync( providerSrc.versionsPull({ localPath }) );
+  })
+
+  .then( () =>
+  {
+    test.case = 'setup repo';
+    providerDst.filesDelete( localPath );
+    return system.filesReflect({ reflectMap : { [ remotePath ] : repoPathGlobal }})
+  })
+
+  /* */
+
+  .then( () =>
+  {
+    test.case = 'setup clone';
+    providerDst.filesDelete( localPath );
+    return system.filesReflect({ reflectMap : { [ remoteRepoPath ] : clonePathGlobal }});
+  })
+
+  /* */
+
+  con.then( () =>
+  {
+    test.case = 'no changes';
+    return providerSrc.versionsPull({ localPath });
+  })
+  .then( () => providerSrc.versionsRemoteRetrive({ localPath }) )
+  .then( ( got ) =>
+  {
+    test.identical( got, [ 'master' ] );
+    let execPath = got.map(( branch ) => `git checkout ${branch} && git status` )
+    return _.process.start
+    ({
+      execPath : execPath,
+      outputCollecting : 1,
+      throwingExitCode : 0,
+      mode : 'shell',
+      currentPath : localPath,
+    })
+  })
+  .then( ( got ) =>
+  {
+    test.identical( got.length, 1 );
+    _.each( got, ( result ) =>
+    {
+      test.identical( result.exitCode, 0 );
+      test.is( _.strHas( result.output, 'is up to date' ) );
+    })
+    return null;
+  })
+
+  /* */
+
+  con.then( () =>
+  {
+    test.case = 'new branch on remote';
+    return null;
+  })
+  shell2( 'git checkout -b feature' )
+  shell( 'git fetch' )
+  .then( () => providerSrc.versionsPull({ localPath }) )
+  .then( () => providerSrc.versionsRemoteRetrive({ localPath }) )
+  .then( ( got ) =>
+  {
+    test.identical( got, [ 'feature', 'master' ] );
+    let execPath = got.map(( branch ) => `git checkout ${branch} && git status` )
+    return _.process.start
+    ({
+      execPath : execPath,
+      outputCollecting : 1,
+      throwingExitCode : 0,
+      mode : 'shell',
+      currentPath : localPath,
+    })
+  })
+  .then( ( got ) =>
+  {
+    test.identical( got.length, 2 );
+    _.each( got, ( result ) =>
+    {
+      test.identical( result.exitCode, 0 );
+      test.is( _.strHas( result.output, 'is up to date' ) );
+    })
+    return null;
+  })
+
+  /* */
+
+  con.then( () =>
+  {
+    test.case = 'new commits on remote';
+    return null;
+  })
+  shell2( 'git checkout master' )
+  shell2( 'git commit --allow-empty -m test1' )
+  shell2( 'git checkout feature' )
+  shell2( 'git commit --allow-empty -m test2' )
+  shell( 'git fetch' )
+  .then( () => providerSrc.versionsPull({ localPath }) )
+  .then( () => providerSrc.versionsRemoteRetrive({ localPath }) )
+  .then( ( got ) =>
+  {
+    test.identical( got, [ 'feature', 'master' ] );
+    let execPath = got.map(( branch ) => `git checkout ${branch} && git status` )
+    return _.process.start
+    ({
+      execPath : execPath,
+      outputCollecting : 1,
+      throwingExitCode : 0,
+      mode : 'shell',
+      currentPath : localPath,
+    })
+  })
+  .then( ( got ) =>
+  {
+    test.identical( got.length, 2 );
+    _.each( got, ( result ) =>
+    {
+      test.identical( result.exitCode, 0 );
+      test.is( _.strHas( result.output, 'is up to date' ) );
+    })
+    return null;
+  })
+
+  return con;
+}
+
+//
+
 function hasLocalChanges( test )
 {
   let context = this;
@@ -1379,6 +1542,8 @@ var Proto =
     isDownloadedFromRemote,
 
     versionsRemoteRetrive,
+
+    versionsPull,
 
     hasLocalChanges
   },

@@ -795,14 +795,14 @@ defaults.verbosity = 0;
 
 //
 
-function hasChanges( o )
+function hasLocalChanges( o )
 {
   let self = this;
 
   if( !_.mapIs( o ) )
   o = { localPath : o }
 
-  _.routineOptions( hasChanges, o );
+  _.routineOptions( hasLocalChanges, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( !!self.system );
   _.assert( _.strDefined( o.localPath ) );
@@ -878,7 +878,7 @@ function hasChanges( o )
   }
 }
 
-var defaults = hasChanges.defaults = Object.create( null );
+var defaults = hasLocalChanges.defaults = Object.create( null );
 defaults.localPath = null;
 defaults.verbosity = 0;
 defaults.sync = 1;
@@ -1326,7 +1326,7 @@ let Proto =
   isDownloaded,
   isDownloadedFromRemote,
 
-  hasChanges,
+  hasLocalChanges,
 
   // etc
 

@@ -198,6 +198,7 @@ function pathParse( remotePath )
 
   function pathIsolateGlobalAndLocal()
   {
+    debugger;
     let splits = _.strIsolateLeftOrAll( parsed1.longPath, '.git/' );
     if( parsed1.query )
     {
@@ -206,7 +207,8 @@ function pathParse( remotePath )
       splits[ 2 ] = path.join( splits[ 2 ], query.out );
     }
     let globalPath = splits[ 0 ] + ( splits[ 1 ] || '' );
-    return [ globalPath, splits[ 2 ] ];
+    let localPath = splits[ 2 ] === '' ? './' : splits[ 2 ];
+    return [ globalPath, localPath ];
   }
 
 /*

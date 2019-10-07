@@ -487,9 +487,9 @@ function versionsRemoteRetrive( o )
     args :
     [
       'branch',
-        '-r',
-        '--no-abbrev',
-        '--format=%(refname:lstrip=3)'
+      '-r',
+      '--no-abbrev',
+      '--format=%(refname:lstrip=3)'
     ],
     inputMirroring : 0,
     outputPiping : 0,

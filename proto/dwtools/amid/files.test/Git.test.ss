@@ -1042,6 +1042,110 @@ function isDownloadedFromRemote( test )
 
 //
 
+function versionsRemoteRetrive( test )
+{
+  let context = this;
+  let providerSrc = context.providerSrc;
+  let providerDst = context.providerDst;
+  let system = context.system;
+  let path = context.providerDst.path;
+  let testPath = path.join( context.suitePath, 'routine-' + test.name );
+  let localPath = path.join( testPath, 'clone' );
+  let repoPath = path.join( testPath, 'repo' );
+  let clonePathGlobal = providerDst.path.globalFromPreferred( localPath );
+  let repoPathGlobal = providerDst.path.globalFromPreferred( repoPath );
+  let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git';
+  let remoteRepoPath = system.path.join( 'git+hd://', repoPath );
+
+  let con = new _.Consequence().take( null );
+
+  let shell = _.process.starter
+  ({
+    currentPath : localPath,
+    ready : con
+  })
+
+  let shell2 = _.process.starter
+  ({
+    currentPath : repoPath,
+    ready : con
+  })
+
+  /* */
+
+  con.then( () =>
+  {
+    test.case = 'not git repository';
+    return test.shouldThrowErrorAsync( providerSrc.versionsRemoteRetrive({ localPath }) );
+  })
+
+  .then( () =>
+  {
+    test.case = 'setup repo';
+    providerDst.filesDelete( localPath );
+    return system.filesReflect({ reflectMap : { [ remotePath ] : repoPathGlobal }})
+  })
+
+  /* */
+
+  .then( () =>
+  {
+    test.case = 'setup';
+    providerDst.filesDelete( localPath );
+    return system.filesReflect({ reflectMap : { [ remoteRepoPath ] : clonePathGlobal }});
+  })
+
+  /* */
+
+  .then( () => providerSrc.versionsRemoteRetrive({ localPath }) )
+  .then( ( got ) =>
+  {
+    test.identical( got, [ 'master'] );
+    return got;
+  })
+
+  /* */
+
+  shell2( 'git checkout -b feature' )
+  .then( () => providerSrc.versionsRemoteRetrive({ localPath }) )
+  .then( ( got ) =>
+  {
+    test.case = 'remote has new branch, clone is outdated'
+    test.identical( got, [ 'master' ] );
+    return got;
+  })
+
+  shell( 'git fetch' )
+  .then( () => providerSrc.versionsRemoteRetrive({ localPath }) )
+  .then( ( got ) =>
+  {
+    test.case = 'remote has new branch, clone is up-to-date'
+    test.identical( got, [ 'feature', 'master' ] );
+    return got;
+  })
+
+  shell2( 'git branch -d feature' )
+  .then( () => providerSrc.versionsRemoteRetrive({ localPath }) )
+  .then( ( got ) =>
+  {
+    test.case = 'remote removed new branch, clone is outdated'
+    test.identical( got, [ 'feature', 'master' ] );
+    return got;
+  })
+
+  shell( 'git fetch' )
+  .then( ( got ) =>
+  {
+    test.case = 'remote removed new branch, clone is up-to-date'
+    test.identical( got, [ 'master' ] );
+    return got;
+  })
+
+  return con;
+}
+
+//
+
 function hasLocalChanges( test )
 {
   let context = this;
@@ -1273,6 +1377,8 @@ var Proto =
     filesReflectNoStashing,
     isUpToDate,
     isDownloadedFromRemote,
+
+    versionsRemoteRetrive,
 
     hasLocalChanges
   },

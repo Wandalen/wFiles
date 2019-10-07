@@ -1040,6 +1040,209 @@ function isDownloadedFromRemote( test )
   return con;
 }
 
+//
+
+function hasLocalChanges( test )
+{
+  let context = this;
+  let providerSrc = context.providerSrc;
+  let providerDst = context.providerDst;
+  let system = context.system;
+  let path = context.providerDst.path;
+  let testPath = path.join( context.suitePath, 'routine-' + test.name );
+  let localPath = path.join( testPath, 'clone' );
+  let repoPath = path.join( testPath, 'repo' );
+  let clonePathGlobal = providerDst.path.globalFromPreferred( localPath );
+  let repoPathGlobal = providerDst.path.globalFromPreferred( repoPath );
+  let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git';
+  let remoteRepoPath = system.path.join( 'git+hd://', repoPath );
+  let filePath = path.join( localPath, 'newFile' );
+  let readmePath = path.join( localPath, 'README' );
+
+  let con = new _.Consequence().take( null );
+
+  let shell = _.process.starter
+  ({
+    currentPath : localPath,
+    ready : con
+  })
+
+  let shell2 = _.process.starter
+  ({
+    currentPath : repoPath,
+    ready : con
+  })
+
+  /* */
+
+  con.then( () =>
+  {
+    test.case = 'setup repo';
+    providerDst.filesDelete( localPath );
+    return system.filesReflect({ reflectMap : { [ remotePath ] : repoPathGlobal }})
+  })
+
+  /* */
+
+  .then( () =>
+  {
+    test.case = 'repository is not downloaded'
+    return test.shouldThrowErrorSync( () => providerSrc.hasLocalChanges({ localPath }) )
+  })
+
+  /* */
+
+  .then( () =>
+  {
+    test.case = 'clone repo';
+    providerDst.filesDelete( localPath );
+    return system.filesReflect({ reflectMap : { [ remoteRepoPath ] : clonePathGlobal }})
+  })
+  .then( () =>
+  {
+    test.case = 'check after fresh clone'
+    var got = providerSrc.hasLocalChanges({ localPath });
+    test.identical( got, false );
+    return null;
+  })
+
+  /* */
+
+  .then( () =>
+  {
+    test.case = 'clean clone';
+    providerDst.filesDelete( localPath );
+    return system.filesReflect({ reflectMap : { [ remoteRepoPath ] : clonePathGlobal }});
+  })
+  .then( () =>
+  {
+    test.case = 'new untraked file'
+    providerDst.fileWrite( filePath, filePath );
+    var got = providerSrc.hasLocalChanges({ localPath });
+    test.identical( got, true );
+    return null;
+  })
+  shell( 'git add newFile' )
+  .then( () =>
+  {
+    test.case = 'new staged file'
+    test.is( providerDst.fileExists( filePath ) );
+    var got = providerSrc.hasLocalChanges({ localPath });
+    test.identical( got, true );
+    return null;
+  })
+
+  /* */
+
+  .then( () =>
+  {
+    test.case = 'clean clone';
+    providerDst.filesDelete( localPath );
+    return system.filesReflect({ reflectMap : { [ remoteRepoPath ] : clonePathGlobal }});
+  })
+  .then( () =>
+  {
+    test.case = 'change in existing file'
+    providerDst.fileWrite( readmePath, readmePath );
+    var got = providerSrc.hasLocalChanges({ localPath });
+    test.identical( got, true );
+    return null;
+  })
+
+  /* */
+
+  .then( () =>
+  {
+    test.case = 'clean clone';
+    providerDst.filesDelete( localPath );
+    return system.filesReflect({ reflectMap : { [ remoteRepoPath ] : clonePathGlobal }});
+  })
+  shell2( 'git commit --allow-empty -m testcommit' )
+  .then( () =>
+  {
+    test.case = 'remote has new commit';
+    var got = providerSrc.hasLocalChanges({ localPath });
+    test.identical( got, false );
+    return null;
+  })
+
+  /* */
+
+  .then( () =>
+  {
+    test.case = 'clean clone';
+    providerDst.filesDelete( localPath );
+    return system.filesReflect({ reflectMap : { [ remoteRepoPath ] : clonePathGlobal }});
+  })
+  shell2( 'git commit --allow-empty -m testcommit' )
+  shell( 'git fetch' )
+  .then( () =>
+  {
+    test.case = 'remote has new commit, local executed fetch without merge';
+    var got = providerSrc.hasLocalChanges({ localPath });
+    test.identical( got, false );
+    return null;
+  })
+
+  /*  */
+
+  .then( () =>
+  {
+    test.case = 'clean clone';
+    providerDst.filesDelete( localPath );
+    return system.filesReflect({ reflectMap : { [ remoteRepoPath ] : clonePathGlobal }});
+  })
+  shell( 'git commit --allow-empty -m test' )
+  .then( () =>
+  {
+    test.case = 'new local commit'
+    var got = providerSrc.hasLocalChanges({ localPath });
+    test.identical( got, true );
+    return null;
+  })
+
+  /* */
+
+  .then( () =>
+  {
+    test.case = 'clean clone';
+    providerDst.filesDelete( localPath );
+    return system.filesReflect({ reflectMap : { [ remoteRepoPath ] : clonePathGlobal }});
+  })
+  shell( 'git commit --allow-empty -m test' )
+  shell2( 'git commit --allow-empty -m testcommit' )
+  .then( () =>
+  {
+    test.case = 'local and remote has has new commit';
+    var got = providerSrc.hasLocalChanges({ localPath });
+    test.identical( got, true );
+    return null;
+  })
+
+  /* */
+
+  .then( () =>
+  {
+    test.case = 'clean clone';
+    providerDst.filesDelete( localPath );
+    return system.filesReflect({ reflectMap : { [ remoteRepoPath ] : clonePathGlobal }});
+  })
+  shell( 'git commit --allow-empty -m test' )
+  shell2( 'git commit --allow-empty -m testcommit' )
+  shell( 'git fetch' )
+  .then( () =>
+  {
+    test.case = 'local and remote has has new commit, local executed fetch without merge';
+    var got = providerSrc.hasLocalChanges({ localPath });
+    test.identical( got, true );
+    return null;
+  })
+
+  return con;
+}
+
+hasLocalChanges.timeOut = 30000;
+
 // --
 // declare
 // --
@@ -1069,7 +1272,9 @@ var Proto =
     filesReflectTrivial,
     filesReflectNoStashing,
     isUpToDate,
-    isDownloadedFromRemote
+    isDownloadedFromRemote,
+
+    hasLocalChanges
   },
 
 }

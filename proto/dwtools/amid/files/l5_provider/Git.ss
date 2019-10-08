@@ -467,82 +467,6 @@ defaults.verbosity = 0;
 
 //
 
-function versionsRemoteRetrive( o )
-{
-  let self = this;
-  let path = self.path;
-
-  _.routineOptions( versionsRemoteRetrive, o );
-  _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.strIs( o.localPath ) );
-  _.assert( !!self.system );
-
-  let ready = _.process.start
-  ({
-    execPath : 'git',
-    mode : 'spawn',
-    currentPath : o.localPath,
-    args :
-    [
-      'branch',
-      '-r',
-      '--no-abbrev',
-      '--format=%(refname:lstrip=3)'
-    ],
-    inputMirroring : 0,
-    outputPiping : 0,
-    outputCollecting : 1,
-  })
-
-  ready.finally( ( err, got ) =>
-  {
-    if( err )
-    throw _.err( 'Can\'t retrive remote versions. Reason:', err );
-
-    let result = _.strSplitNonPreserving({ src : got.output, delimeter : '\n' });
-    return result.slice( 1 );
-  })
-
-  return ready;
-}
-
-var defaults = versionsRemoteRetrive.defaults = Object.create( null );
-defaults.localPath = null;
-
-//
-
-function versionsPull( o )
-{
-  let self = this;
-  let path = self.path;
-
-  _.routineOptions( versionsPull, o );
-  _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( !!self.system );
-
-  return self.versionsRemoteRetrive({ localPath : o.localPath })
-  .then( ( versions ) =>
-  {
-    _.assert( _.arrayIs( versions ) && versions.length );
-
-    let ready = new _.Consequence().take( null );
-    let start = _.process.starter
-    ({
-      mode : 'shell',
-      currentPath : o.localPath,
-      ready : ready
-    });
-    _.each( versions, ( version ) => start( `git checkout ${version} && git pull` ) );
-
-    return ready;
-  })
-}
-
-var defaults = versionsPull.defaults = Object.create( null );
-defaults.localPath = null;
-
-//
-
 /**
  * @summary Returns true if local copy of repository `o.localPath` is up to date with remote repository `o.remotePath`.
  * @param {Object} o Options map.
@@ -784,94 +708,6 @@ defaults.remotePath = null;
 defaults.verbosity = 0;
 
 //
-
-function hasLocalChanges( o )
-{
-  let self = this;
-
-  if( !_.mapIs( o ) )
-  o = { localPath : o }
-
-  _.routineOptions( hasLocalChanges, o );
-  _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( !!self.system );
-  _.assert( _.strDefined( o.localPath ) );
-
-  let ready = _.Consequence.Try( () =>
-  {
-    if( !self.isDownloaded({ localPath : o.localPath }) )
-    throw _.err( 'Found no GIT repository at:', o.localPath );
-
-    let commands =
-    [
-      'git diff HEAD --quiet',
-      'git rev-list origin..HEAD --count',
-      'git status -sz'
-    ]
-
-    return _.process.start
-    ({
-      execPath : commands,
-      currentPath : o.localPath,
-      mode : 'spawn',
-      sync : 0,
-      deasync : 0,
-      throwingExitCode : 0,
-      outputCollecting : 1,
-      verbosity : o.verbosity - 1,
-    });
-  })
-
-  ready.then( ( got ) =>
-  {
-    if( got[ 0 ].exitCode === 1 /* diff */ )
-    return true;
-    if( _.numberFrom( got[ 1 ].output ) /* commits ahead */ )
-    return true;
-    if( _.strHas( got[ 2 ].output, '?' ) /* untracked files */ )
-    return true;
-
-    if( got[ 1 ].exitCode )
-    throw _.err( infoGet( got[ 1 ] ) );
-    if( got[ 2 ].exitCode )
-    throw _.err( infoGet( got[ 2 ] ) );
-
-    return false;
-
-    // let localChanges = _.strHasAny( got.output, [ 'Changes to be committed', 'Changes not staged for commit' ] );
-    // if( !localChanges )
-    // localChanges = !_.strHasAny( got.output, [ 'nothing to commit', 'working tree clean' ] )
-    // let localCommits = _.strHasAny( got.output, [ 'branch is ahead', 'have diverged' ] );
-    // return localChanges || localCommits;
-  })
-
-  ready.catch( ( err ) =>
-  {
-    throw _.err( err, '\nFailed to check if repository has local changes' );
-  })
-
-  if( o.sync )
-  return ready.deasync();
-
-  return ready;
-
-  /* */
-
-  function infoGet( o )
-  {
-    let result = '';
-    result += 'Process returned exit code' + o.exitCode + '\n';
-    result += 'Launched as ' + _.strQuote( o.fullExecPath ) + '\n';
-    result += 'Launched at ' + _.strQuote( o.currentPath ) + '\n';
-    result += '\n -> Output' + '\n' + ' -  ' + _.strIndentation( stderrOutput, ' -  ' ) + '\n -< Output';
-    return result;
-  }
-}
-
-var defaults = hasLocalChanges.defaults = Object.create( null );
-defaults.localPath = null;
-defaults.verbosity = 0;
-defaults.sync = 1;
 
 // --
 // etc
@@ -1308,15 +1144,10 @@ let Proto =
   versionLocalRetrive,
   versionRemoteLatestRetrive,
   versionRemoteCurrentRetrive,
-  versionsRemoteRetrive,
-
-  versionsPull,
 
   isUpToDate,
   isDownloaded,
   isDownloadedFromRemote,
-
-  hasLocalChanges,
 
   // etc
 

@@ -767,26 +767,18 @@ function isDownloadedFromRemote( o )
     return result;
   }
 
-  let con = new _.Consequence();
-  GitConfig( localProvider.path.nativize( o.localPath ), con.tolerantCallback() )
-  con.finally( ( err, config ) =>
-  {
-    if( err )
-    throw _.err( err );
+  let config = _.git.gitConfigRead( o.localPath );
+  let remoteVcsPath = self.pathParse( o.remotePath ).remoteVcsPath;
+  let originVcsPath = config.remote.origin.url;
 
-    let remoteVcsPath = self.pathParse( o.remotePath ).remoteVcsPath;
-    let originVcsPath = config.remote.origin.url;
+  _.sure( _.strDefined( remoteVcsPath ) );
+  _.sure( _.strDefined( originVcsPath ) );
 
-    _.sure( _.strDefined( remoteVcsPath ) );
-    _.sure( _.strDefined( originVcsPath ) );
+  result.remoteVcsPath = remoteVcsPath;
+  result.originVcsPath = originVcsPath;
+  result.downloadedFromRemote = originVcsPath === remoteVcsPath;
 
-    result.remoteVcsPath = remoteVcsPath;
-    result.originVcsPath = originVcsPath;
-    result.downloadedFromRemote = originVcsPath === remoteVcsPath;
-
-    return result;
-  })
-  return con.deasync();
+  return result;
 }
 
 var defaults = isDownloadedFromRemote.defaults = Object.create( null );

@@ -740,7 +740,7 @@ function isDownloadedFromRemote( o )
   let self = this;
   let path = self.path;
 
-  _.routineOptions( isDownloaded, o );
+  _.routineOptions( isDownloadedFromRemote, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( !!self.system );
   _.assert( _.strDefined( o.localPath ) );
@@ -789,7 +789,7 @@ function isDownloadedFromRemote( o )
   return con.deasync();
 }
 
-var defaults = isDownloaded.defaults = Object.create( null );
+var defaults = isDownloadedFromRemote.defaults = Object.create( null );
 defaults.localPath = null;
 defaults.remotePath = null;
 defaults.verbosity = 0;

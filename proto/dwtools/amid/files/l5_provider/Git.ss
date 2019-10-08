@@ -198,7 +198,6 @@ function pathParse( remotePath )
 
   function pathIsolateGlobalAndLocal()
   {
-    debugger;
     let splits = _.strIsolateLeftOrAll( parsed1.longPath, '.git/' );
     if( parsed1.query )
     {

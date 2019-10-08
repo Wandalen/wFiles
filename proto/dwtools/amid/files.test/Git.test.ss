@@ -8,15 +8,6 @@ if( typeof module !== 'undefined' )
 
   _.include( 'wTesting' );
 
-  try
-  {
-    require( 'gitconfiglocal' )
-  }
-  catch( err )
-  {
-    return;
-  }
-
   require( '../files/UseTop.s' );
 }
 

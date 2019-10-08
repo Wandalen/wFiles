@@ -49,9 +49,6 @@ function init( o )
 {
   let self = this;
 
-  if( !GitConfig )
-  GitConfig = require( 'gitconfiglocal' );
-
   if( !Ini )
   Ini = require( 'ini' );
 

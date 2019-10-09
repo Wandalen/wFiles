@@ -4987,7 +4987,9 @@ let fileWrite = _.routineFromPreAndBody( fileWrite_pre, fileWrite_body );
 
 fileWrite.having.aspect = 'entry';
 
-_.assert( _.mapIs( fileWrite.encoders ) );
+// debugger;
+_.assert( _.mapLike( fileWrite.encoders ) );
+// debugger;
 
 //
 

@@ -8,15 +8,6 @@ if( typeof module !== 'undefined' )
 
   _.include( 'wTesting' );
 
-  try
-  {
-    require( 'gitconfiglocal' )
-  }
-  catch( err )
-  {
-    return;
-  }
-
   require( '../files/UseTop.s' );
 }
 
@@ -90,17 +81,19 @@ function filesReflectTrivial( test )
     let expected =
     [
       '.',
+      './.ex.will.yml',
+      './.im.will.yml',
       './LICENSE',
       './package.json',
       './README.md',
+      './doc',
       './out',
       './out/wPathBasic.out.will.yml',
-      './out/debug',
       './proto',
-      './sample'
+      './sample',
     ]
 
-    test.is( _.arraySetContainAll( files, expected ) )
+    test.is( _.arraySetContainAll( files,expected ) )
     return got;
   })
 
@@ -127,14 +120,16 @@ function filesReflectTrivial( test )
     let expected =
     [
       '.',
+      './.ex.will.yml',
+      './.im.will.yml',
       './LICENSE',
       './package.json',
       './README.md',
+      './doc',
       './out',
       './out/wPathBasic.out.will.yml',
-      './out/debug',
       './proto',
-      './sample'
+      './sample',
     ]
 
     test.is( _.arraySetContainAll( files, expected ) )
@@ -164,14 +159,16 @@ function filesReflectTrivial( test )
     let expected =
     [
       '.',
+      './.ex.will.yml',
+      './.im.will.yml',
       './LICENSE',
       './package.json',
       './README.md',
+      './doc',
       './out',
       './out/wPathBasic.out.will.yml',
-      './out/debug',
       './proto',
-      './sample'
+      './sample',
     ]
 
     test.is( _.arraySetContainAll( files, expected ) )
@@ -232,14 +229,16 @@ function filesReflectTrivial( test )
     let expected =
     [
       '.',
+      './.ex.will.yml',
+      './.im.will.yml',
       './LICENSE',
       './package.json',
       './README.md',
+      './doc',
       './out',
       './out/wPathBasic.out.will.yml',
-      './out/debug',
       './proto',
-      './sample'
+      './sample',
     ]
 
     test.is( _.arraySetContainAll( files, expected ) )
@@ -279,14 +278,16 @@ function filesReflectTrivial( test )
     let expected =
     [
       '.',
+      './.ex.will.yml',
+      './.im.will.yml',
       './LICENSE',
       './package.json',
       './README.md',
+      './doc',
       './out',
       './out/wPathBasic.out.will.yml',
-      './out/debug',
       './proto',
-      './sample'
+      './sample',
     ]
 
     test.is( _.arraySetContainAll( files, expected ) )

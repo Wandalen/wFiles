@@ -362,6 +362,7 @@ function versionLocalRetrive( o )
   _.routineOptions( versionLocalRetrive, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( !!self.system );
+  _.assert( _.strIs( o.localPath ), 'Expects local path' );
 
   if( !self.isDownloaded( o ) )
   return '';

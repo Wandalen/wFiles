@@ -433,11 +433,11 @@ function pathsResolve( test )
   test.identical( got, expected );
 
   var got = provider.path.s.resolve( '../a', [ 'b', '.c' ] );
-  var expected = [ _.path.dir( currentPath ) + 'a/b', _.path.dir( currentPath ) + 'a/.c' ]
+  var expected = [ _.path.dirFirst( currentPath ) + 'a/b', _.path.dirFirst( currentPath ) + 'a/.c' ]
   test.identical( got, expected );
 
   var got = provider.path.s.resolve( '../a', [ '/b', '.c' ], './d' );
-  var expected = [ '/b/d', _.path.dir( currentPath ) + 'a/.c/d' ];
+  var expected = [ '/b/d', _.path.dirFirst( currentPath ) + 'a/.c/d' ];
   test.identical( got, expected );
 
   var got = provider.path.s.resolve( [ '/a', '/a' ],[ 'b', 'c' ] );
@@ -453,7 +453,7 @@ function pathsResolve( test )
   test.identical( got, expected );
 
   var got = provider.path.s.resolve( '.', '../', './', [ 'a', 'b' ] );
-  var expected = [ _.path.dir( currentPath ) + 'a', _.path.dir( currentPath ) + 'b' ];
+  var expected = [ _.path.dirFirst( currentPath ) + 'a', _.path.dirFirst( currentPath ) + 'b' ];
   test.identical( got, expected );
 
   //
@@ -500,7 +500,7 @@ function pathsResolve( test )
     _.path.join( currentPath, 'b' ),
     _.path.join( _.path.dir( currentPath ), 'b' ),
 
-    _.path.normalize( _.path.dir( currentPath ) )
+    _.path.trail( _.path.normalize( _.path.dir( currentPath ) ) )
     //_.path.normalize( _.path.dir( currentPath ) ),
     // routine normalizeStrict does not exist now
     // _.path.normalizeStrict( _.path.dir( currentPath ) )
@@ -689,7 +689,7 @@ function realMainDir( test )
   test.case = 'absolute paths, from === to'; /* */
   var from = _.path.realMainDir();
   var to = _.path.realMainDir();
-  var expected = './';
+  var expected = '.';
   var got = _.path.relative( from, to );
   test.identical( got, expected );
 
@@ -874,7 +874,7 @@ function relative( test )
 
   var from = _.fileProvider.recordFactory().record( _.path.current() );
   var to = _.path.dir( _.path.current() );
-  var expected = '../';
+  var expected = '..';
   var got = _.path.relative( from, to );
   test.identical( got, expected );
 
@@ -892,7 +892,7 @@ function relative( test )
 
   var from = _.fileProvider.recordFactory().record( _.path.current() );
   var to = _.fileProvider.recordFactory().record( _.path.dir( _.path.current() ) );
-  var expected = '../';
+  var expected = '..';
   var got = _.path.relative( from, to );
   test.identical( got, expected );
 

@@ -688,9 +688,9 @@ function isDownloadedFromRemote( o )
     return result;
   }
 
-  let config = _.git.gitConfigRead( o.localPath );
+  let config = self._gitConfigRead( o.localPath );
   let remoteVcsPath = self.pathParse( o.remotePath ).remoteVcsPath;
-  let originVcsPath = config.remote.origin.url;
+  let originVcsPath = config[ 'remote "origin"' ].url;
 
   _.sure( _.strDefined( remoteVcsPath ) );
   _.sure( _.strDefined( originVcsPath ) );

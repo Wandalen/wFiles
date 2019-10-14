@@ -740,6 +740,171 @@ function filesReflectNoStashing( test )
 
 filesReflectNoStashing.timeOut = 60000;
 
+//
+
+function filesReflectDownloadErrors( test )
+{
+  let context = this;
+  let providerSrc = context.providerSrc;
+  let providerDst = context.providerDst;
+  let system = context.system;
+  let path = context.providerDst.path;
+  let testPath = path.join( context.suitePath, 'routine-' + test.name );
+  let localPath = path.join( testPath, 'wPathBasic' );
+  let clonePathGlobal = providerDst.path.globalFromPreferred( localPath );
+
+  let con = new _.Consequence().take( null )
+
+  .then( () =>
+  {
+    test.case = 'error on download, new directory should not be made';
+    providerDst.filesDelete( localPath );
+    let remotePath = 'git+https:///githu.com/Wandalen/wPathBasic.git';
+
+    let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
+    return test.shouldThrowErrorAsync( ready )
+    .then( ( got ) =>
+    {
+      test.is( !providerDst.fileExists( localPath ) )
+      return null;
+    })
+  })
+
+  .then( () =>
+  {
+    test.case = 'error on download, existing empty directory should be preserved';
+    providerDst.filesDelete( localPath );
+    providerDst.dirMake( localPath )
+    let remotePath = 'git+https:///githu.com/Wandalen/wPathBasic.git';
+
+    let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
+    return test.shouldThrowErrorAsync( ready )
+    .then( ( got ) =>
+    {
+      test.is( providerDst.fileExists( localPath ) );
+      test.identical( providerDst.dirRead( localPath ), [] );
+      return null;
+    })
+  })
+
+  .then( () =>
+  {
+    test.case = 'no error if dst path exists and its an empty dir';
+    providerDst.filesDelete( localPath );
+    providerDst.dirMake( localPath );
+    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git';
+
+    let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
+    return test.mustNotThrowError( ready )
+    .then( ( got ) =>
+    {
+      let files = providerDst.filesFind
+      ({
+        filePath : localPath,
+        withTerminals : 1,
+        withDirs : 1,
+        outputFormat : 'relative',
+        filter : { recursive : 2 }
+      });
+
+      let expected =
+      [
+        '.',
+        './.ex.will.yml',
+        './.im.will.yml',
+        './LICENSE',
+        './package.json',
+        './README.md',
+        './doc',
+        './out',
+        './out/wPathBasic.out.will.yml',
+        './proto',
+        './sample',
+      ]
+
+      test.is( _.arraySetContainAll( files,expected ) )
+      return got;
+    })
+  })
+
+  .then( () =>
+  {
+    test.case = 'error if dst path exists and its not a empty dir';
+    providerDst.filesDelete( localPath );
+    providerDst.dirMake( localPath );
+    let filePath = providerDst.path.join( localPath, 'file' );
+    providerDst.fileWrite( filePath, filePath );
+    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git';
+
+    let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
+    return test.shouldThrowErrorAsync( ready )
+    .then( ( got ) =>
+    {
+      test.is( providerDst.fileExists( localPath ) );
+      test.identical( providerDst.dirRead( localPath ), [ 'file' ] );
+      return null;
+    })
+  })
+
+  .then( () =>
+  {
+    test.case = 'error if dst path exists and its terminal';
+    providerDst.filesDelete( localPath );
+    providerDst.fileWrite( localPath, localPath );
+    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git';
+
+    let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
+    return test.shouldThrowErrorAsync( ready )
+    .then( ( got ) =>
+    {
+      test.is( providerDst.isTerminal( localPath ) );
+      return null;
+    })
+  })
+
+  .then( () =>
+  {
+    test.case = 'error if dst path exists and it has other git repo';
+    providerDst.filesDelete( localPath );
+    providerDst.dirMake( localPath );
+    return _.process.start({ execPath : 'git clone https://github.com/Wandalen/wTools.git .', currentPath : localPath, mode : 'spawn' })
+    .then( () =>
+    {
+      let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git';
+      let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
+      return test.shouldThrowErrorAsync( ready )
+      .then( ( got ) =>
+      {
+        test.is( providerDst.fileExists( localPath ) );
+        let expected =
+        [
+          '.ex.will.yml',
+          '.git',
+          '.gitattributes',
+          '.gitignore',
+          '.im.will.yml',
+          '.travis.yml',
+          'asset',
+          'doc',
+          'LICENSE',
+          'out',
+          'package-old.json',
+          'package.json',
+          'proto',
+          'README.md',
+          'sample'
+        ]
+        test.identical( providerDst.dirRead( localPath ), expected );
+        return null;
+      })
+    })
+  })
+
+  return con;
+}
+
+filesReflectDownloadErrors.timeOut = 60000;
+
 
 //
 
@@ -1059,6 +1224,7 @@ var Proto =
   {
     filesReflectTrivial,
     filesReflectNoStashing,
+    filesReflectDownloadErrors,
     isUpToDate,
     isDownloadedFromRemote
   },

@@ -352,6 +352,7 @@ function _statRead()
   if( f.stating )
   {
 
+    _.assert( _.routineIs( f.effectiveProvider.statReadAct ) );
     if( stat === undefined )
     stat = f.effectiveProvider.statReadAct
     ({

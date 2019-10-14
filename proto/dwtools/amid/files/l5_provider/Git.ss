@@ -362,6 +362,7 @@ function versionLocalRetrive( o )
   _.routineOptions( versionLocalRetrive, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( !!self.system );
+  _.assert( _.strIs( o.localPath ), 'Expects local path' );
 
   if( !self.isDownloaded( o ) )
   return '';
@@ -707,11 +708,28 @@ defaults.localPath = null;
 defaults.remotePath = null;
 defaults.verbosity = 0;
 
-//
-
 // --
 // etc
 // --
+
+/*
+qqq : investigate please, fix and cover
+  if error then new directory should no be made
+  if error and directory ( possibly empty ) existed then it should not be deleted
+qqq : make sure downloading works if empty directory exists
+
+ = Message
+    Process returned exit code 128
+    Launched as "git clone https://github.com/Wandalen/wPathBasic.git ."
+     -> Stderr
+     -  Cloning into '.'...
+     -  fatal: unable to access 'https://github.com/Wandalen/wPathBasic.git/': Could not resolve host: github.com
+     -
+     -< Stderr
+    Failed to download module::reflect-get-path / opener::PathBasic
+    Failed to download submodules
+
+*/
 
 function filesReflectSingle_body( o )
 {
@@ -848,7 +866,7 @@ function filesReflectSingle_body( o )
   }
   else
   {
-    if( o.extra.fetching )
+    if( o.extra.fetching ) /* qqq : what is it for? */
     shell( 'git fetch origin' );
   }
 
@@ -1062,7 +1080,7 @@ _.routineExtend( filesReflectSingle_body, _.FileProvider.Find.prototype.filesRef
 
 var extra = filesReflectSingle_body.extra = Object.create( null );
 extra.fetching = 1;
-extra.stashing = 1;
+extra.stashing = 0;
 
 var defaults = filesReflectSingle_body.defaults;
 let filesReflectSingle = _.routineFromPreAndBody( _.FileProvider.Find.prototype.filesReflectSingle.pre, filesReflectSingle_body );

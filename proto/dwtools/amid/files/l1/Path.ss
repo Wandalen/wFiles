@@ -838,7 +838,7 @@ function pathDirTempClose( filePath )
     delete cache[ filePath ];
     _.assert( !self.fileProvider.fileExists( tempPath ) );
     // logger.log( ' . Close temp directory ' + tempPath );
-    debugger;
+    // debugger;
     return tempPath;
   }
 }

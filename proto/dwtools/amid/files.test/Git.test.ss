@@ -796,33 +796,11 @@ function filesReflectDownloadErrors( test )
 
     let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
     return test.mustNotThrowError( ready )
-    .then( ( got ) =>
+    .then( () =>
     {
-      let files = providerDst.filesFind
-      ({
-        filePath : localPath,
-        withTerminals : 1,
-        withDirs : 1,
-        outputFormat : 'relative',
-        filter : { recursive : 2 }
-      });
-
-      let expected =
-      [
-        '.',
-        './.ex.will.yml',
-        './.im.will.yml',
-        './LICENSE',
-        './package.json',
-        './README.md',
-        './doc',
-        './out',
-        './out/wPathBasic.out.will.yml',
-        './proto',
-        './sample',
-      ]
-
-      test.is( _.arraySetContainAll( files,expected ) )
+      let got = providerSrc.isDownloadedFromRemote({ localPath, remotePath });
+      test.identical( got.downloaded, true )
+      test.identical( got.downloadedFromRemote, true )
       return got;
     })
   })
@@ -870,31 +848,23 @@ function filesReflectDownloadErrors( test )
     return _.process.start({ execPath : 'git clone https://github.com/Wandalen/wTools.git .', currentPath : localPath, mode : 'spawn' })
     .then( () =>
     {
+      let find = providerDst.filesFinder
+      ({
+        withTerminals : 1,
+        withDirs : 1,
+        outputFormat : 'relative',
+        filter : { recursive : 2 }
+      });
+
+      let filesBefore = find( localPath );
       let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git';
       let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
       return test.shouldThrowErrorAsync( ready )
-      .then( ( got ) =>
+      .then( () =>
       {
         test.is( providerDst.fileExists( localPath ) );
-        let expected =
-        [
-          '.ex.will.yml',
-          '.git',
-          '.gitattributes',
-          '.gitignore',
-          '.im.will.yml',
-          '.travis.yml',
-          'asset',
-          'doc',
-          'LICENSE',
-          'out',
-          'package-old.json',
-          'package.json',
-          'proto',
-          'README.md',
-          'sample'
-        ]
-        test.identical( providerDst.dirRead( localPath ), expected );
+        let filesAfter = find( localPath );
+        test.identical( filesAfter, filesBefore );
         return null;
       })
     })

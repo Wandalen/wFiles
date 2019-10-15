@@ -642,6 +642,32 @@ defaults.verbosity = 0;
 
 //
 
+function isGitRepository( o )
+{
+  let self = this;
+  let path = self.path;
+
+  _.routineOptions( isGitRepository, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( !!self.system );
+
+  let localProvider = self.system.providerForPath( o.localPath );
+
+  _.assert( localProvider instanceof _.FileProvider.HardDrive || localProvider.originalFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
+
+  let gitConfigPath = localProvider.path.join( o.localPath, '.git/config' );
+  if( localProvider.fileExists( gitConfigPath ) )
+  return true;
+
+  return false;
+}
+
+var defaults = isGitRepository.defaults = Object.create( null );
+defaults.localPath = null;
+defaults.verbosity = 0;
+
+//
+
 /**
  * @summary Returns true if path `o.localPath` contains a git repository that was cloned from remote `o.remotePath`.
  * @param {Object} o Options map.
@@ -1168,6 +1194,7 @@ let Proto =
 
   isUpToDate,
   isDownloaded,
+  isGitRepository,
   isDownloadedFromRemote,
 
   // etc

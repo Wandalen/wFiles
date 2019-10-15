@@ -689,9 +689,9 @@ function isDownloadedFromRemote( o )
     return result;
   }
 
-  let config = _.git.gitConfigRead( o.localPath );
+  let config = self._gitConfigRead( o.localPath );
   let remoteVcsPath = self.pathParse( o.remotePath ).remoteVcsPath;
-  let originVcsPath = config.remote.origin.url;
+  let originVcsPath = config[ 'remote "origin"' ].url;
 
   _.sure( _.strDefined( remoteVcsPath ) );
   _.sure( _.strDefined( originVcsPath ) );
@@ -809,8 +809,12 @@ function filesReflectSingle_body( o )
     outputCollecting : 1,
   });
 
+  let dstPathCreated = false;
   if( !localProvider.fileExists( dstPath ) )
-  localProvider.dirMake( dstPath );
+  {
+    localProvider.dirMake( dstPath );
+    dstPathCreated = true;
+  }
 
   let gitConfigExists = localProvider.fileExists( path.join( dstPath, '.git' ) );
   let gitMergeFailed = false;
@@ -934,7 +938,11 @@ function filesReflectSingle_body( o )
   .finally( function( err, arg )
   {
     if( err )
-    throw _.err( err );
+    {
+      if( dstPathCreated )
+      localProvider.filesDelete( dstPath );
+      throw _.err( err );
+    }
     return recordsMake();
   });
 

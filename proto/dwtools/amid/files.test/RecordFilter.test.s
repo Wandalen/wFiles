@@ -4190,7 +4190,7 @@ function moveTextualReport( test )
   var dst = provider.recordFilter();
   dst.filePath = '/common/dst';
   src.pairWithDst( dst )
-  var expected = '/common/ : dst <- src';
+  var expected = '/common/ : ./dst <- ./src';
   var got = src.moveTextualReport();
   test.identical( _.color.strStrip( got ), expected );
   var got = dst.moveTextualReport();
@@ -4206,7 +4206,7 @@ function moveTextualReport( test )
   dst.filePath = './dst';
   dst.prefixPath = '/common';
   src.pairWithDst( dst )
-  var expected = '/common/ : dst <- src';
+  var expected = '/common/ : ./dst <- ./src';
   var got = src.moveTextualReport();
   test.identical( _.color.strStrip( got ), expected );
   var got = dst.moveTextualReport();

@@ -627,18 +627,8 @@ function isDownloaded( o )
   if( !localProvider.fileExists( o.localPath ) )
   return false;
 
-  let gitConfigExists = localProvider.fileExists( path.join( o.localPath, '.git' ) );
-
-  if( !gitConfigExists )
-  return false;
-
-  if( gitConfigExists )
-  {
-    if( !localProvider.isTerminal( path.join( o.localPath, '.git/config' ) ) )
-    return false;
-  }
-
-  return true;
+  let files = localProvider.dirRead( o.localPath );
+  return files.length > 0;
 }
 
 var defaults = isDownloaded.defaults = Object.create( null );

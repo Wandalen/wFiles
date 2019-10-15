@@ -371,7 +371,12 @@ function versionLocalRetrive( o )
 
   _.assert( localProvider instanceof _.FileProvider.HardDrive || localProvider.originalFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
 
-  let currentVersion = localProvider.fileRead( path.join( o.localPath, '.git/HEAD' ) );
+  let gitPath = path.join( o.localPath, '.git' );
+
+  if( !localProvider.fileExists( gitPath ) )
+  return '';
+
+  let currentVersion = localProvider.fileRead( path.join( gitPath, 'HEAD' ) );
   let r = /^ref: refs\/heads\/(.+)\s*$/;
 
   let found = r.exec( currentVersion );

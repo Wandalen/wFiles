@@ -52,14 +52,11 @@ submodule :
   wLogger :
     path : npm:///wLogger
     enabled : 0 # submodule
-  ini :
-    path : npm:///ini
+  wGitTools :
+    path : npm:///wgittools
     enabled : 0 # submodule
   tar :
     path : npm:///tar
-    enabled : 0 # submodule
-  gitconfiglocal :
-    path : npm:///gitconfiglocal
     enabled : 0 # submodule
   proper-lockfile :
     path : npm:///proper-lockfile

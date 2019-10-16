@@ -9,11 +9,11 @@ if( typeof module !== 'undefined' )
   if( !_.FileProvider )
   require( '../UseMid.s' );
 
+  _.include( 'wGitTools' )
 }
 
 let _global = _global_;
 let _ = _global_.wTools;
-let Ini;
 
 //
 
@@ -49,35 +49,8 @@ function init( o )
 {
   let self = this;
 
-  if( !Ini )
-  Ini = require( 'ini' );
-
   Parent.prototype.init.call( self,o );
 
-}
-
-//
-
-function _gitConfigRead( filePath )
-{
-  let self = this;
-  let path = self.path;
-  let hd = self.system.providersWithProtocolMap.file;
-
-  // debugger;
-
-  _.assert( arguments.length === 1 );
-  _.assert( _.strIs( filePath ) );
-
-  let read = hd.fileRead( path.join( filePath, '.git/config' ) );
-  let config = Ini.parse( read );
-
-  // debugger;
-
-  //   let read = localProvider.fileRead( path.join( dstPath, '.git/config' ) );
-  //   let config = Ini.parse( read );
-
-  return config;
 }
 
 // --
@@ -105,120 +78,7 @@ function _gitConfigRead( filePath )
 function pathParse( remotePath )
 {
   let self = this;
-  let path = self.path;
-  let result = Object.create( null );
-
-  if( _.mapIs( remotePath ) )
-  return remotePath;
-
-  _.assert( arguments.length === 1 );
-  _.assert( _.strIs( remotePath ) );
-  _.assert( path.isGlobal( remotePath ) )
-
-  /* */
-
-  // debugger;
-  let parsed1 = path.parseConsecutive( remotePath );
-  parsed1.hash = parsed1.hash || 'master';
-  _.mapExtend( result, parsed1 );
-
-  let p = pathIsolateGlobalAndLocal();
-  result.localVcsPath = p[ 1 ];
-
-  /* */
-
-  let parsed2 = _.mapExtend( null, parsed1 );
-  parsed2.hash = null;
-  parsed2.protocols = parsed2.protocol ? parsed2.protocol.split( '+' ) : [];
-  delete parsed2.protocol;
-
-  // let isHardDrive = !_.arrayHasAny( parsed2.protocols, [ 'http', 'https', 'ssh' ] );
-  let isHardDrive = _.arrayHasAny( parsed2.protocols, [ 'hd' ] );
-  let isRelative = path.isRelative( parsed2.longPath );
-
-  if( parsed2.protocols.length > 0 && parsed2.protocols[ 0 ].toLowerCase() === 'git' )
-  {
-    parsed2.protocols.splice( 0,1 );
-  }
-
-  if( parsed2.protocols.length > 0 && parsed2.protocols[ 0 ].toLowerCase() === 'hd' )
-  {
-    parsed2.protocols.splice( 0,1 );
-  }
-
-  parsed2.longPath = p[ 0 ];
-  if( !isHardDrive )
-  parsed2.longPath = _.strRemoveBegin( parsed2.longPath, '/' );
-  parsed2.longPath = _.strRemoveEnd( parsed2.longPath, '/' );
-  delete parsed2.query;
-
-  result.remoteVcsPath = path.str( parsed2 );
-
-  if( isHardDrive )
-  result.remoteVcsPath = _.fileProvider.path.nativize( result.remoteVcsPath );
-
-  /* */
-
-  let parsed3 = _.mapExtend( null, parsed1 );
-  parsed3.longPath = parsed2.longPath;
-
-  parsed3.protocols = parsed2.protocols.slice();
-  parsed3.protocol = null;
-  parsed3.hash = null;
-  delete parsed3.query;
-  result.longerRemoteVcsPath = path.str( parsed3 );
-
-  if( isHardDrive )
-  result.longerRemoteVcsPath = _.fileProvider.path.nativize( result.longerRemoteVcsPath );
-
-  result.isFixated = self.pathIsFixated( result );
-
-  /* */
-
-  // debugger;
-  _.assert( !_.boolLike( result.hash ) );
-  return result
-
-/*
-
-  remotePath : 'git+https:///github.com/Wandalen/wTools.git/out/wTools#master'
-  protocol : 'git+https',
-  hash : 'master',
-  longPath : '/github.com/Wandalen/wTools.git/out/wTools',
-  localVcsPath : 'out/wTools',
-  remoteVcsPath : 'github.com/Wandalen/wTools.git',
-  longerRemoteVcsPath : 'https://github.com/Wandalen/wTools.git'
-
-*/
-
-  /* */
-
-  function pathIsolateGlobalAndLocal()
-  {
-    let splits = _.strIsolateLeftOrAll( parsed1.longPath, '.git/' );
-    if( parsed1.query )
-    {
-      let query = _.strStructureParse({ src : parsed1.query, keyValDelimeter : '=', entryDelimeter : '&' });
-      if( query.out )
-      splits[ 2 ] = path.join( splits[ 2 ], query.out );
-    }
-    let globalPath = splits[ 0 ] + ( splits[ 1 ] || '' );
-    let localPath = splits[ 2 ] === '' ? './' : splits[ 2 ];
-    return [ globalPath, localPath ];
-  }
-
-/*
-  function pathIsolateGlobalAndLocal( remotePath )
-  {
-    let parsed = path.parseConsecutive( remotePath );
-    let splits = _.strIsolateLeftOrAll( parsed.longPath, '.git/' );
-    parsed.longPath = splits[ 0 ] + ( splits[ 1 ] || '' );
-    let globalPath = path.str( parsed );
-    return [ globalPath, splits[ 2 ] ];
-  }
-
-*/
-
+  return _.git.pathParse( remotePath );
 }
 
 //
@@ -233,20 +93,10 @@ function pathParse( remotePath )
 function pathIsFixated( filePath )
 {
   let self = this;
-  let path = self.path;
-  let parsed = self.pathParse( filePath );
-
-  if( !parsed.hash )
-  return false;
-
-  if( parsed.hash.length < 7 )
-  return false;
-
-  if( !/[0-9a-f]+/.test( parsed.hash ) )
-  return false;
-
-  return true;
+  return _.git.pathIsFixated( filePath );
 }
+
+
 
 //
 
@@ -262,83 +112,16 @@ function pathIsFixated( filePath )
 function pathFixate( o )
 {
   let self = this;
-  let path = self.path;
-
-  if( !_.mapIs( o ) )
-  o = { remotePath : o }
-  _.routineOptions( pathFixate, o );
-  _.assert( arguments.length === 1, 'Expects single argument' );
-
-  let parsed = self.pathParse( o.remotePath );
-  let latestVersion = self.versionRemoteLatestRetrive
-  ({
-    remotePath : o.remotePath,
-    verbosity : o.verbosity,
-  });
-
-  let result = path.str
-  ({
-    protocol : parsed.protocol,
-    longPath : parsed.longPath,
-    hash : latestVersion,
-  });
-
-  return result;
+  return _.git.pathFixate( o );
 }
-
-var defaults = pathFixate.defaults = Object.create( null );
-defaults.remotePath = null;
-defaults.verbosity = 0;
 
 //
 
 function versionLocalChange( o )
 {
   let self = this;
-  let path = self.path;
-
-  if( !_.mapIs( o ) )
-  o = { localPath : o }
-
-  _.routineOptions( versionLocalChange, o );
-  _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( !!self.system );
-
-  let localVersion = self.versionLocalRetrive({ localPath : o.localPath, verbosity : o.verbosity });
-
-  if( !localVersion )
-  return false;
-
-  if( localVersion === o.version )
-  return true;
-
-  let shell = _.process.starter
-  ({
-    verbosity : self.verbosity - 1,
-    sync : 1,
-    deasync : 0,
-    outputCollecting : 1,
-    currentPath : o.localPath
-  });
-
-  let result = shell( 'git status' );
-  let localChanges = _.strHas( result.output, 'Changes to be committed' );
-
-  if( localChanges )
-  shell( 'git stash' )
-
-  shell( 'git checkout ' + o.version );
-
-  if( localChanges )
-  shell( 'git pop' )
-
-  return true;
+  return _.git.versionLocalChange( o );
 }
-
-var defaults = versionLocalChange.defaults = Object.create( null );
-defaults.localPath = null;
-defaults.version = null
-defaults.verbosity = 0;
 
 //
 
@@ -354,36 +137,8 @@ defaults.verbosity = 0;
 function versionLocalRetrive( o )
 {
   let self = this;
-  let path = self.path;
-
-  if( !_.mapIs( o ) )
-  o = { localPath : o }
-
-  _.routineOptions( versionLocalRetrive, o );
-  _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( !!self.system );
-  _.assert( _.strIs( o.localPath ), 'Expects local path' );
-
-  if( !self.isDownloaded( o ) )
-  return '';
-
-  let localProvider = self.system.providerForPath( o.localPath );
-
-  _.assert( localProvider instanceof _.FileProvider.HardDrive || localProvider.originalFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
-
-  let currentVersion = localProvider.fileRead( path.join( o.localPath, '.git/HEAD' ) );
-  let r = /^ref: refs\/heads\/(.+)\s*$/;
-
-  let found = r.exec( currentVersion );
-  if( found )
-  currentVersion = found[ 1 ];
-
-  return currentVersion.trim() || null;
+  return _.git.versionLocalRetrive( o );
 }
-
-var defaults = versionLocalRetrive.defaults = Object.create( null );
-defaults.localPath = null;
-defaults.verbosity = 0;
 
 //
 
@@ -399,37 +154,8 @@ defaults.verbosity = 0;
 function versionRemoteLatestRetrive( o )
 {
   let self = this;
-  let path = self.path;
-
-  if( !_.mapIs( o ) )
-  o = { remotePath : o }
-
-  _.routineOptions( versionRemoteLatestRetrive, o );
-  _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( !!self.system );
-
-  let parsed = self.pathParse( o.remotePath );
-  let shell = _.process.starter
-  ({
-    verbosity : self.verbosity - 1,
-    sync : 1,
-    deasync : 0,
-    outputCollecting : 1,
-  });
-
-  let got = shell( 'git ls-remote ' + parsed.longerRemoteVcsPath );
-  let latestVersion = /([0-9a-f]+)\s+HEAD/.exec( got.output );
-  if( !latestVersion || !latestVersion[ 1 ] )
-  return null;
-
-  latestVersion = latestVersion[ 1 ];
-
-  return latestVersion;
+  return _.git.versionRemoteLatestRetrive( o );
 }
-
-var defaults = versionRemoteLatestRetrive.defaults = Object.create( null );
-defaults.remotePath = null;
-defaults.verbosity = 0;
 
 //
 
@@ -446,25 +172,8 @@ defaults.verbosity = 0;
 function versionRemoteCurrentRetrive( o )
 {
   let self = this;
-  let path = self.path;
-
-  if( !_.mapIs( o ) )
-  o = { remotePath : o }
-
-  _.routineOptions( versionRemoteCurrentRetrive, o );
-  _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( !!self.system );
-
-  let parsed = self.pathParse( o.remotePath );
-  if( parsed.isFixated )
-  return parsed.hash;
-
-  return self.versionRemoteLatestRetrive( o );
+  return _.git.versionRemoteCurrentRetrive( o );
 }
-
-var defaults = versionRemoteCurrentRetrive.defaults = Object.create( null );
-defaults.remotePath = null;
-defaults.verbosity = 0;
 
 //
 
@@ -481,122 +190,8 @@ defaults.verbosity = 0;
 function isUpToDate( o )
 {
   let self = this;
-  let path = self.path;
-
-  _.routineOptions( isUpToDate, o );
-  _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( !!self.system );
-
-  let srcCurrentPath;
-  let localProvider = self.system.providerForPath( o.localPath );
-  let parsed = self.pathParse( o.remotePath );
-  let ready = _.Consequence().take( null );
-
-  let shell = _.process.starter
-  ({
-    verbosity : o.verbosity - 1,
-    ready : ready,
-    currentPath : o.localPath,
-  });
-
-  let shellAll = _.process.starter
-  ({
-    verbosity : o.verbosity - 1,
-    ready : ready,
-    currentPath : o.localPath,
-    throwingExitCode : 0,
-    outputCollecting : 1,
-  });
-
-  _.assert( localProvider instanceof _.FileProvider.HardDrive || localProvider.originalFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
-
-  if( !localProvider.fileExists( o.localPath ) )
-  return false;
-
-  let gitConfigExists = localProvider.fileExists( path.join( o.localPath, '.git' ) );
-
-  if( !gitConfigExists )
-  return false;
-
-  if( gitConfigExists )
-  ready
-  // .give( () => GitConfig( localProvider.path.nativize( o.localPath ), ready.tolerantCallback() ) )
-  .then( () => self._gitConfigRead( o.localPath ) )
-  .ifNoErrorThen( function( arg )
-  {
-
-    debugger;
-
-    if( !arg[ 'remote "origin"' ] || !arg[ 'remote "origin"' ] || !_.strIs( arg[ 'remote "origin"' ].url ) )
-    return false;
-
-    srcCurrentPath = arg[ 'remote "origin"' ].url;
-
-    if( !_.strEnds( srcCurrentPath, parsed.remoteVcsPath ) )
-    return false;
-
-    return true;
-  });
-
-  shell( 'git fetch origin' );
-
-  ready.finally( ( err, arg ) =>
-  {
-    if( err )
-    throw _.err( err );
-    return null;
-  });
-
-  shellAll
-  ([
-    // 'git diff origin/master --quiet --exit-code',
-    // 'git diff --quiet --exit-code',
-    // 'git branch -v',
-    'git status',
-  ]);
-
-  ready
-  .ifNoErrorThen( function( arg )
-  {
-    _.assert( arg.length === 1 );
-
-    let result = false;
-    let detachedRegexp = /HEAD detached at (\w+)/;
-    let detachedParsed = detachedRegexp.exec( arg[ 0 ].output );
-    let versionLocal = self.versionLocalRetrive({ localPath : o.localPath, verbosity : o.verbosity });
-
-    debugger;
-
-    if( detachedParsed )
-    {
-      result = _.strBegins( parsed.hash, detachedParsed[ 1 ] );
-    }
-    else if( _.strBegins( parsed.hash, versionLocal ) )
-    {
-      result = !_.strHasAny( arg[ 0 ].output, [ 'Your branch is behind', 'have diverged' ] );
-    }
-
-    if( o.verbosity >= 1 )
-    self.logger.log( o.remotePath, result ? 'is up to date' : 'is not up to date' );
-
-    return result;
-  })
-
-  ready
-  .finally( function( err, arg )
-  {
-    if( err )
-    throw _.err( err );
-    return arg;
-  });
-
-  return ready.split();
+  return _.git.isUpToDate( o );
 }
-
-var defaults = isUpToDate.defaults = Object.create( null );
-defaults.localPath = null;
-defaults.remotePath = null;
-defaults.verbosity = 0;
 
 //
 
@@ -612,101 +207,26 @@ defaults.verbosity = 0;
 function isDownloaded( o )
 {
   let self = this;
-  let path = self.path;
-
-  _.routineOptions( isDownloaded, o );
-  _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( !!self.system );
-
-  let srcCurrentPath;
-  let localProvider = self.system.providerForPath( o.localPath );
-  let result = false;
-
-  _.assert( localProvider instanceof _.FileProvider.HardDrive || localProvider.originalFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
-
-  if( !localProvider.fileExists( o.localPath ) )
-  return false;
-
-  let gitConfigExists = localProvider.fileExists( path.join( o.localPath, '.git' ) );
-
-  if( !gitConfigExists )
-  return false;
-
-  if( gitConfigExists )
-  {
-    if( !localProvider.isTerminal( path.join( o.localPath, '.git/config' ) ) )
-    return false;
-  }
-
-  return true;
+  return _.git.isDownloaded( o );
 }
-
-var defaults = isDownloaded.defaults = Object.create( null );
-defaults.localPath = null;
-defaults.verbosity = 0;
 
 //
 
-/**
- * @summary Returns true if path `o.localPath` contains a git repository that was cloned from remote `o.remotePath`.
- * @param {Object} o Options map.
- * @param {String} o.localPath Local path to package.
- * @param {String} o.remotePath Remote path to package.
- * @param {Number} o.verbosity=0 Level of verbosity.
- * @function isDownloadedFromRemote
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderGit#
- */
+function isGitRepository( o )
+{
+  let self = this;
+  return _.git.isRepository( o );
+}
+
+//
 
 function isDownloadedFromRemote( o )
 {
   let self = this;
-  let path = self.path;
-
-  _.routineOptions( isDownloadedFromRemote, o );
-  _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( !!self.system );
-  _.assert( _.strDefined( o.localPath ) );
-  _.assert( _.strDefined( o.remotePath ) );
-
-  let localProvider = self.system.providerForPath( o.localPath );
-  _.assert( localProvider instanceof _.FileProvider.HardDrive || localProvider.originalFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
-
-  let result = Object.create( null );
-  result.downloaded = true;
-  result.downloadedFromRemote = false;
-
-  if( !localProvider.fileExists( o.localPath ) )
-  {
-    result.downloaded = false;
-    return result;
-  }
-
-  let gitConfigExists = localProvider.fileExists( path.join( o.localPath, '.git' ) );
-
-  if( !gitConfigExists )
-  {
-    result.downloaded = false;
-    return result;
-  }
-
-  let config = self._gitConfigRead( o.localPath );
-  let remoteVcsPath = self.pathParse( o.remotePath ).remoteVcsPath;
-  let originVcsPath = config[ 'remote "origin"' ].url;
-
-  _.sure( _.strDefined( remoteVcsPath ) );
-  _.sure( _.strDefined( originVcsPath ) );
-
-  result.remoteVcsPath = remoteVcsPath;
-  result.originVcsPath = originVcsPath;
-  result.downloadedFromRemote = originVcsPath === remoteVcsPath;
-
-  return result;
+  return _.git.isDownloadedFromRemote( o );
 }
 
-var defaults = isDownloadedFromRemote.defaults = Object.create( null );
-defaults.localPath = null;
-defaults.remotePath = null;
-defaults.verbosity = 0;
+//
 
 // --
 // etc
@@ -836,7 +356,7 @@ function filesReflectSingle_body( o )
   if( gitConfigExists )
   ready
   // .give( () => GitConfig( localProvider.path.nativize( dstPath ), ready.tolerantCallback() ) )
-  .then( () => self._gitConfigRead( dstPath ) )
+  .then( () => _.git.gitConfigRead( dstPath ) )
   .ifNoErrorThen( function( arg )
   {
 
@@ -1161,11 +681,10 @@ let Proto =
 
   // vcs
 
-  _gitConfigRead,
-
   pathParse,
   pathIsFixated,
   pathFixate,
+
   versionLocalChange,
   versionLocalRetrive,
   versionRemoteLatestRetrive,
@@ -1173,6 +692,7 @@ let Proto =
 
   isUpToDate,
   isDownloaded,
+  isGitRepository,
   isDownloadedFromRemote,
 
   // etc

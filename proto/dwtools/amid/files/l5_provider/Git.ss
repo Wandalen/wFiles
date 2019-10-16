@@ -215,7 +215,7 @@ function isDownloaded( o )
 function isGitRepository( o )
 {
   let self = this;
-  return _.git.isGitRepository( o );
+  return _.git.isRepository( o );
 }
 
 //

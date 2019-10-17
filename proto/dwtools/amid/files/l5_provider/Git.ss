@@ -356,7 +356,7 @@ function filesReflectSingle_body( o )
   if( gitConfigExists )
   ready
   // .give( () => GitConfig( localProvider.path.nativize( dstPath ), ready.tolerantCallback() ) )
-  .then( () => _.git.gitConfigRead( dstPath ) )
+  .then( () => _.git.configRead( dstPath ) )
   .ifNoErrorThen( function( arg )
   {
 

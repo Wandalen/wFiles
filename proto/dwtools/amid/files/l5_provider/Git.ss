@@ -212,7 +212,7 @@ function isDownloaded( o )
 
 //
 
-function isGitRepository( o )
+function isRepository( o )
 {
   let self = this;
   return _.git.isRepository( o );
@@ -692,7 +692,7 @@ let Proto =
 
   isUpToDate,
   isDownloaded,
-  isGitRepository,
+  isRepository,
   isDownloadedFromRemote,
 
   // etc

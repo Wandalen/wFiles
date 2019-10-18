@@ -59,7 +59,8 @@
     "wLogger": "",
     "wgittools": "",
     "tar": "",
-    "proper-lockfile" : ""
+    "proper-lockfile" : "",
+    "yaml" : ""
   },
   "devDependencies": {
     "wait-sync": "",

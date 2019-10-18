@@ -71,6 +71,9 @@ function fileStatIs( src )
   return true;
   if( src instanceof _.FileStat )
   return true;
+  if( _.strType( src ) === 'BigIntStats' )
+  return true;
+  
   return false;
 }
 

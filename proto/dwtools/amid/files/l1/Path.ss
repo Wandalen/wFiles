@@ -836,7 +836,7 @@ function pathDirTempClose( filePath )
       throwing : 0,
     });
     delete cache[ filePath ];
-    _.assert( !self.fileProvider.fileExists( tempPath ) );
+    _.assert( !self.fileProvider.fileExists( tempPath ), 'Temp dir:', _.strQuote( tempPath ), 'was closed, but still exist in file system.' );
     // logger.log( ' . Close temp directory ' + tempPath );
     // debugger;
     return tempPath;

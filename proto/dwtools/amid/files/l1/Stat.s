@@ -65,8 +65,7 @@ function init( o )
  */
 
 function fileStatIs( src )
-{ 
-  debugger
+{
   if( File )
   if( src instanceof File.Stats )
   return true;
@@ -74,7 +73,7 @@ function fileStatIs( src )
   return true;
   if( src instanceof Object.getPrototypeOf( File.Stats ) )
   return true;
-  
+
   return false;
 }
 

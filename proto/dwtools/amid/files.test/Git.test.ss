@@ -742,7 +742,7 @@ filesReflectNoStashing.timeOut = 60000;
 
 //
 
-function filesReflectDownloadErrors( test )
+function filesReflectDownloadFailed( test )
 {
   let context = this;
   let providerSrc = context.providerSrc;
@@ -873,7 +873,7 @@ function filesReflectDownloadErrors( test )
   return con;
 }
 
-filesReflectDownloadErrors.timeOut = 60000;
+filesReflectDownloadFailed.timeOut = 60000;
 
 //
 
@@ -905,7 +905,7 @@ var Proto =
   {
     filesReflectTrivial,
     filesReflectNoStashing,
-    filesReflectDownloadErrors,
+    filesReflectDownloadFailed,
   },
 
 }

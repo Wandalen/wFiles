@@ -72,7 +72,7 @@ function fileStatIs( src )
   return true;
   if( src instanceof _.FileStat )
   return true;
-  if( src instanceof Object.getPrototypeOf( fs.Stats ) )
+  if( src instanceof Object.getPrototypeOf( File.Stats ) )
   return true;
   
   return false;

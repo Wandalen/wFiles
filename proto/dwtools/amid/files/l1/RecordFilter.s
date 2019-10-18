@@ -1680,7 +1680,6 @@ function basePathMapFromString( o )
   }
   else
   {
-    // o.filePath = o.filePath.slice();
     let pairs = o.filePath.map( ( fileGlob ) =>
     {
       let filePath = path.fromGlob( fileGlob );
@@ -1698,8 +1697,6 @@ function basePathMapFromString( o )
       else
       return +1;
     });
-    // if( o.filePath.length > 1 )
-    // debugger;
     for( let s1 = 0 ; s1 < pairs.length ; s1++ )
     {
       let fileGlob1 = pairs[ s1 ][ 2 ];
@@ -1716,8 +1713,6 @@ function basePathMapFromString( o )
         s2 -= 1;
       }
     }
-    // if( o.filePath.length > 1 )
-    // debugger;
   }
 
   if( !o.basePath || _.mapKeys( basePath2 ).length )
@@ -4203,7 +4198,7 @@ function _applyToRecordMasks( record )
 
   // if( _.strEnds( record.absolute, '/will.yml' ) )
   // debugger;
-  // if( _.strHas( record.absolute, 'dir2' ) )
+  // if( _.strHas( record.absolute, '.git' ) )
   // debugger;
 
   /* */

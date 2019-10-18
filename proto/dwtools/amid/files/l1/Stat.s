@@ -71,9 +71,9 @@ function fileStatIs( src )
   return true;
   if( src instanceof _.FileStat )
   return true;
-  if( _.strType( src ) === 'BigIntStats' )
+  if( src instanceof Object.getPrototypeOf( File.Stats ) )
   return true;
-  
+
   return false;
 }
 

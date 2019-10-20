@@ -1021,12 +1021,16 @@ function fileConfigRead_body( o )
     {
       let filePath1 = filePath[ f1 ];
       debugger;
+      if( !o.throwing && o.throwing !== null && o.throwing !== undefined )
+      return null;
       throw _.err( 'None config was found\n', _.strQuote( filePath1 ) );
     }
 
     for( let f2 = found.length-1 ; f2 >= 0 ; f2-- )
     {
       debugger;
+      if( !o.throwing && o.throwing !== null && o.throwing !== undefined )
+      return null;
       throw _.err( 'Some configs were loaded several times\n', _.strQuote( found[ f2 ].particularPath ) );
     }
 
@@ -1164,6 +1168,32 @@ var fileCodeRead = _.routineFromPreAndBody( fileRead.pre, fileCodeRead_body );
 
 fileCodeRead.having.aspect = 'entry';
 
+//
+
+function fileConfigUserRead( o )
+{
+  let self = this;
+  let path = self.path;
+
+  if( !_.mapIs( o ) )
+  o = { filePath : o }
+
+  let userPath = path.dirUserHome();
+  o.filePath = path.join( userPath, o.filePath || '.wenv.yml' );
+
+  return self.fileConfigRead
+  ({
+    filePath : o.filePath,
+    throwing : 0,
+  });
+
+}
+
+fileConfigUserRead.defaults =
+{
+  filePath : null,
+}
+
 // --
 // relationship
 // --
@@ -1215,6 +1245,8 @@ let Supplement =
   fileConfigRead,
 
   fileCodeRead,
+
+  fileConfigUserRead,
 
   //
 

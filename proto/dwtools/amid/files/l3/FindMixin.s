@@ -4952,18 +4952,17 @@ function filesDelete_body( o )
   function end()
   {
 
-    if( o.verbosity >= 1 )
+    if( o.verbosity > 1 || ( o.verbosity === 1 && o.result.length ) )
     {
       let spentTime = _.timeNow() - time;
       let groupsMap = path.group({ keys : o.filter.filePath, vals : o.result });
       let textualReport = path.groupTextualReport
       ({
-        explanation : ' - Deleted ',
+        explanation : o.writing ? ' - Deleted ' : ' - Will delete ',
         groupsMap : groupsMap,
         verbosity : o.verbosity,
         spentTime : spentTime,
       });
-
       if( textualReport )
       provider.logger.log( textualReport );
     }

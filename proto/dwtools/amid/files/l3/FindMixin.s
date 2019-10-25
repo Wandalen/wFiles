@@ -2004,10 +2004,8 @@ function filesReflectEvaluate_body( o )
 
   /* find */
 
-  // debugger;
   let found = self.filesFind( srcOptions );
   o.visitedMap = srcOptions.visitedMap;
-  // debugger;
 
   return o.result;
 
@@ -2019,7 +2017,6 @@ function filesReflectEvaluate_body( o )
     if( !o.src.formed || o.src.formed < 5 )
     {
       o.src.system = o.src.system || self;
-      // o.src.recursive = o.recursive;
       o.src.form();
     }
 

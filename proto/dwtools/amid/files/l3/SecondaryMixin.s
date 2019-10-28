@@ -17,7 +17,7 @@ let FileRecord = _.FileRecord;
 let Abstract = _.FileProvider.Abstract;
 let Partial = _.FileProvider.Partial;
 let Find = _.FileProvider.Find;
-let Yaml,YamlTypes;
+// let Yaml,YamlTypes;
 
 let fileRead = Partial.prototype.fileRead;
 
@@ -1171,84 +1171,84 @@ fileCodeRead.having.aspect = 'entry';
 
 //
 
-function configEdit( o )
-{
-  let self = this;
+// function configEdit( o )
+// {
+//   let self = this;
 
-  _.assert( arguments.length === 1 );
-  _.routineOptions( configEdit, o );
+//   _.assert( arguments.length === 1 );
+//   _.routineOptions( configEdit, o );
 
-  _.assert( _.strDefined( o.config ) );
-  _.assert( _.mapIs( o.setMap ) );
+//   _.assert( _.strDefined( o.config ) );
+//   _.assert( _.mapIs( o.setMap ) );
 
-  if( !Yaml )
-  {
-    Yaml = require( 'yaml' );
-    YamlTypes = require( 'yaml/types' );
-  }
+//   if( !Yaml )
+//   {
+//     Yaml = require( 'yaml' );
+//     YamlTypes = require( 'yaml/types' );
+//   }
 
-  let doc = Yaml.parseDocument( o.config );
+//   let doc = Yaml.parseDocument( o.config );
 
-  _.each( o.setMap, ( value, path ) => set( path, value ) );
+//   _.each( o.setMap, ( value, path ) => set( path, value ) );
 
-  if( o.asDocument )
-  return doc;
+//   if( o.asDocument )
+//   return doc;
 
-  return doc.toString();
+//   return doc.toString();
 
-  /*  */
+//   /*  */
 
-  function set( path, value )
-  {
-    let parts = path.split( '/' );
-    let target = parts.pop();
-    let result = doc;
+//   function set( path, value )
+//   {
+//     let parts = path.split( '/' );
+//     let target = parts.pop();
+//     let result = doc;
 
-    _.each( parts, ( selector ) =>
-    {
-      if( result.has( selector ) )
-      result = result.get( selector )
-      else
-      result.set( selector, new YamlTypes.YAMLMap() );
-    })
+//     _.each( parts, ( selector ) =>
+//     {
+//       if( result.has( selector ) )
+//       result = result.get( selector )
+//       else
+//       result.set( selector, new YamlTypes.YAMLMap() );
+//     })
 
-    let node = Yaml.createNode( value, false );
-    result.set( target, node );
+//     let node = Yaml.createNode( value, false );
+//     result.set( target, node );
 
-    if( parts.length === 0 )
-    if( node instanceof YamlTypes.YAMLMap )
-    node.spaceBefore = true;
-  }
-}
+//     if( parts.length === 0 )
+//     if( node instanceof YamlTypes.YAMLMap )
+//     node.spaceBefore = true;
+//   }
+// }
 
-var defaults = configEdit.defaults = Object.create( null );
-defaults.config = null;
-defaults.setMap = null;
-defaults.asDocument = false; //for testing
+// var defaults = configEdit.defaults = Object.create( null );
+// defaults.config = null;
+// defaults.setMap = null;
+// defaults.asDocument = false; //for testing
 
 //
 
-function configFileEdit( o )
-{
-  let self = this;
+// function configFileEdit( o )
+// {
+//   let self = this;
 
-  _.routineOptions( configFileEdit, o );
-  _.assert( _.strDefined( o.filePath ) );
+//   _.routineOptions( configFileEdit, o );
+//   _.assert( _.strDefined( o.filePath ) );
 
-  if( !self.isTerminal( o.filePath ) )
-  throw _.err( 'configFileEdit expects yaml file at path:', o.filePath );
+//   if( !self.isTerminal( o.filePath ) )
+//   throw _.err( 'configFileEdit expects yaml file at path:', o.filePath );
 
-  let o2 = _.mapOnly( o, configEdit.defaults );
-  o2.config = self.fileRead( o.filePath );
+//   let o2 = _.mapOnly( o, configEdit.defaults );
+//   o2.config = self.fileRead( o.filePath );
 
-  return self.configEdit( o2 );
-}
+//   return self.configEdit( o2 );
+// }
 
-_.routineExtend( configFileEdit, configEdit );
+// _.routineExtend( configFileEdit, configEdit );
 
-var defaults = configFileEdit.defaults;
-delete defaults.config;
-defaults.filePath = null;
+// var defaults = configFileEdit.defaults;
+// delete defaults.config;
+// defaults.filePath = null;
 
 //
 
@@ -1328,8 +1328,8 @@ let Supplement =
 
   fileCodeRead,
 
-  configEdit,
-  configFileEdit,
+  // configEdit,
+  // configFileEdit,
   fileConfigUserRead,
 
   //

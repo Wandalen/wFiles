@@ -2004,10 +2004,8 @@ function filesReflectEvaluate_body( o )
 
   /* find */
 
-  // debugger;
   let found = self.filesFind( srcOptions );
   o.visitedMap = srcOptions.visitedMap;
-  // debugger;
 
   return o.result;
 
@@ -2019,7 +2017,6 @@ function filesReflectEvaluate_body( o )
     if( !o.src.formed || o.src.formed < 5 )
     {
       o.src.system = o.src.system || self;
-      // o.src.recursive = o.recursive;
       o.src.form();
     }
 
@@ -4952,18 +4949,17 @@ function filesDelete_body( o )
   function end()
   {
 
-    if( o.verbosity >= 1 )
+    if( o.verbosity > 1 || ( o.verbosity === 1 && o.result.length ) )
     {
       let spentTime = _.timeNow() - time;
       let groupsMap = path.group({ keys : o.filter.filePath, vals : o.result });
       let textualReport = path.groupTextualReport
       ({
-        explanation : ' - Deleted ',
+        explanation : o.writing ? ' - Deleted ' : ' - Will delete ',
         groupsMap : groupsMap,
         verbosity : o.verbosity,
         spentTime : spentTime,
       });
-
       if( textualReport )
       provider.logger.log( textualReport );
     }

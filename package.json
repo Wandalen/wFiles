@@ -8,25 +8,25 @@
   "author" : "Kostiantyn Wandalen <wanalen@willbe.so>", 
   "contributors" : 
   [
-    { "name" : "Kostiantyn Wandalen", "email" : "wanalen@willbe.so" },
-    { "name" : "Volodymyr M.", "email" : "volodymyr.migdal@gmail.com" },
+    { "name" : "Kostiantyn Wandalen", "email" : "wanalen@willbe.so" }, 
+    { "name" : "Volodymyr M.", "email" : "volodymyr.migdal@gmail.com" }, 
     { "name" : "Ihor Ostash", "email" : "iostashvxi@gmail.com" }
-  ],
-  "main" : "proto/dwtools/amid/files/UseTop.s",
-  "files" : [ "proto/dwtools/amid/files", "proto/dwtools/Tools.s", "out" ],
-  "scripts" :
+  ], 
+  "main" : "proto/dwtools/amid/files/UseTop.s", 
+  "files" : [ "proto/dwtools/amid/files", "proto/dwtools/Tools.s", "out" ], 
+  "scripts" : 
   {
-    "test" : "wtest .run proto/**",
-    "test2" : "wtest .run proto/**/dwtools/amid/file.test/Provider.HardDrive.test.ss routine : linkHardSyncRunner",
-    "test3" : "wtest .run proto/**/dwtools/amid/file.test/Provider.HardDrive.test.ss routine : linkHardAsyncRunner",
+    "test" : "wtest .run proto/**", 
+    "test2" : "wtest .run proto/**/dwtools/amid/file.test/Provider.HardDrive.test.ss routine : linkHardSyncRunner", 
+    "test3" : "wtest .run proto/**/dwtools/amid/file.test/Provider.HardDrive.test.ss routine : linkHardAsyncRunner", 
     "docgen" : "wdocgen proto"
-  },
-  "repository" : { "type" : "git", "url" : "https://github.com/Wandalen/wFiles.git" },
-  "bugs" :
+  }, 
+  "repository" : { "type" : "git", "url" : "https://github.com/Wandalen/wFiles.git" }, 
+  "bugs" : 
   {
     "url" : "https://github.com/Wandalen/wFiles/issues"
-  },
-  "dependencies" :
+  }, 
+  "dependencies" : 
   {
     "wTools" : "beta", 
     "wstringer" : "beta", 

@@ -20459,6 +20459,40 @@ function filesReflectDeducing( test )
 
   /* */
 
+  test.case = 'only filter';
+
+  var tree =
+  {
+    src : { srcDir : { a : 'src/a', b : 'src/b' }, c : 'src/c', d : 'src/d' },
+    dst : { dstDir : { a : 'dst/a', c : 'dst/c' } },
+  }
+
+  var o =
+  {
+    filter : { filePath : { '/src/srcDir' : '/dst/dstDir2' } },
+  }
+
+  var provider = new _.FileProvider.Extract({ filesTree : tree });
+  var records = provider.filesReflect( o );
+
+  var expectedTree =
+  {
+    src : { srcDir : { a : 'src/a', b : 'src/b' }, c : 'src/c', d : 'src/d',  },
+    dst : { dstDir : { a : 'dst/a', c : 'dst/c' }, dstDir2 : { a : 'src/a', b : 'src/b' } },
+  }
+  test.identical( provider.filesTree, expectedTree );
+
+  var expectedDstAbsolute = [ '/dst/dstDir2', '/dst/dstDir2/a', '/dst/dstDir2/b' ];
+  var expectedSrcAbsolute = [ '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b' ];
+
+  var dstAbsolute = _.select( records, '*/dst/absolute' );
+  var srcAbsolute = _.select( records, '*/src/absolute' );
+
+  test.identical( dstAbsolute, expectedDstAbsolute );
+  test.identical( srcAbsolute, expectedSrcAbsolute );
+
+  /* */
+
   test.case = 'both prefixes defined, relative dst and src';
 
   var tree =
@@ -20496,14 +20530,11 @@ function filesReflectDeducing( test )
   var expectedDstAbsolute = [ '/dst/dstDir2', '/dst/dstDir2/a', '/dst/dstDir2/b' ];
   var expectedSrcAbsolute = [ '/src/srcDir', '/src/srcDir/a', '/src/srcDir/b' ];
 
-
   var dstAbsolute = _.select( records, '*/dst/absolute' );
   var srcAbsolute = _.select( records, '*/src/absolute' );
 
-
   test.identical( dstAbsolute, expectedDstAbsolute );
   test.identical( srcAbsolute, expectedSrcAbsolute );
-
 
   /* */
 

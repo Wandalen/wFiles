@@ -543,7 +543,11 @@ function and( src )
 
   for( let n in once )
   {
-    _.assert( !filter[ n ] || !src[ n ], 'Cant "and" filter with another filter, them both have field', n );
+    _.assert
+    (
+        !filter[ n ] || !src[ n ] || filter[ n ] === src[ n ]
+      , `Cant "and" filter with another filter, them both have field ${n}`
+    );
     if( filter[ n ] === null && src[ n ] !== null )
     filter[ n ] = src[ n ];
   }

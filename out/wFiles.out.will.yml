@@ -15,6 +15,7 @@ module:
   wFiles.out:
     about:
       name: wFiles
+      org: noorg
       description: >-
         Collection of classes to abstract files systems. Many interfaces provide
         files, but not called as file systems and treated differently. For
@@ -996,6 +997,7 @@ module:
   ../:
     about:
       name: wFiles
+      org: noorg
       description: >-
         Collection of classes to abstract files systems. Many interfaces provide
         files, but not called as file systems and treated differently. For
@@ -1084,12 +1086,8 @@ module:
       bugtracker:
         path: 'https:///github.com/Wandalen/wFiles/issues'
       in:
-        criterion:
-          predefined: 0
         path: .
       out:
-        criterion:
-          predefined: 0
         path: out
       temp:
         path: 'path::out'

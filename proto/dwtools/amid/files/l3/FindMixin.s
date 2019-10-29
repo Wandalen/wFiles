@@ -1858,17 +1858,14 @@ function _filesFiltersPrepare( routine, o )
 
   /* */
 
+  if( o.src === undefined || o.src === null )
+  o.src = o.filter;
+
   o.src = self.recordFilter( o.src );
   o.dst = self.recordFilter( o.dst );
 
   o.src.pairWithDst( o.dst );
   o.src.pairRefineLight();
-
-  // if( o.filter )
-  // {
-  //   o.src.and( o.filter ).pathsJoinWithoutNull( o.filter );
-  //   o.dst.and( o.filter ).pathsJoinWithoutNull( o.filter );
-  // }
 
   if( o.filter ) /* qqq : cover please */
   {
@@ -1878,29 +1875,20 @@ function _filesFiltersPrepare( routine, o )
 
   if( o.src.recursive === null )
   o.src.recursive = 2;
-  // if( o.src.recursive === null )
-  // o.src.recursive = o.recursive;
-  // if( o.dst.recursive === null )
   o.dst.recursive = 2;
 
   /* */
 
   _.assert( _.objectIs( o.src ) );
   _.assert( _.objectIs( o.dst ) );
-
   _.assert( o.src.formed <= 1 );
   _.assert( o.dst.formed <= 1 );
-
   _.assert( _.objectIs( o.src.defaultProvider ) );
   _.assert( _.objectIs( o.dst.defaultProvider ) );
-
   _.assert( !( o.src.effectiveProvider instanceof _.FileProvider.System ) );
   _.assert( !( o.dst.effectiveProvider instanceof _.FileProvider.System ) );
-
   _.assert( o.srcProvider === undefined );
   _.assert( o.dstProvider === undefined );
-
-  // _.assert( o.src.recursive === o.recursive );
   _.assert( o.dst.recursive === 2 );
 
 }
@@ -1922,7 +1910,6 @@ function _filesReflectPrepare( routine, args )
   self._providerDefaultsApply( o );
 
   o.onUp = _.routinesComposeAll( o.onUp );
-  // o.onDown = _.routinesCompose( o.onDown );
   o.onDown = _.routinesComposeReturningLast( o.onDown );
 
   if( o.result === null )
@@ -2663,7 +2650,6 @@ function filesReflectEvaluate_body( o )
             _.assert( record.deleteFirst === false );
             if( !o.dstDeleting )
             {
-              debugger;
               forbid( record );
             }
             if( !record.dst.isActual && record.touch !== 'destructive' )
@@ -3931,7 +3917,6 @@ function filesReflect_pre( routine, args )
   if( args.length === 2 )
   o = { reflectMap : { [ args[ 1 ] ] : args[ 0 ] } }
 
-  // self._filesReflectPrepare( routine, [ o ] );
   self.filesReflectSingle.pre.call( self, routine, args );
 
   if( Config.debug )
@@ -3939,10 +3924,16 @@ function filesReflect_pre( routine, args )
 
     let srcFilePath = o.src.filePathSimplest();
     let dstFilePath = o.dst.filePathSimplest();
+
     _.assert( o.reflectMap === null || srcFilePath === null || srcFilePath === '' );
     _.assert( o.reflectMap === null || dstFilePath === null || dstFilePath === '' );
-    _.assert( o.filter === null || o.src.filePath === '.' || o.filter.filePath === null || o.filter.filePath === undefined );
     _.assert( o.src.isPaired( o.dst ) );
+    _.assert
+    (
+      // o.src.filePath === '.' || o.filter === null || o.filter.filePath === null || o.filter.filePath === undefined
+      o.filter === null || o.filter.filePath === null || o.filter.filePath === undefined ||
+      _.entityIdentical( o.filter.filePath, o.src.filePath ),
+    );
 
     let knownFormats = [ 'src.absolute', 'src.relative', 'dst.absolute', 'dst.relative', 'record', 'nothing' ];
     _.assert
@@ -3975,7 +3966,6 @@ function filesReflect_pre( routine, args )
   _.assert( _.mapIs( o.src.filePath ), 'Cant deduce source filter' );
   _.assert( _.mapIs( o.dst.filePath ), 'Cant deduce destination filter' );
   _.assert( o.src.filePath === o.dst.filePath );
-  _.assert( o.filter === null || o.filter.filePath === null || o.filter.filePath === undefined );
   _.assert( o.reflectMap === null );
   _.assert( o.dstPath === undefined );
   _.assert( o.srcPath === undefined );
@@ -4154,18 +4144,6 @@ _.mapExtend( defaults, filesReflectAdvancedDefaults );
 defaults.filter = null;
 defaults.reflectMap = null;
 defaults.outputFormat = 'record';
-
-// defaults.onWriteDstUp = null;
-// defaults.onWriteDstDown = null;
-// defaults.onWriteSrcUp = null;
-// defaults.onWriteSrcDown = null;
-//
-// defaults.breakingSrcHardLink = null;
-// defaults.resolvingSrcSoftLink = null;
-// defaults.resolvingSrcTextLink = null;
-// defaults.breakingDstHardLink = null;
-// defaults.resolvingDstSoftLink = null;
-// defaults.resolvingDstTextLink = null;
 
 let filesReflect = _.routineFromPreAndBody( filesReflect_pre, filesReflect_body );
 

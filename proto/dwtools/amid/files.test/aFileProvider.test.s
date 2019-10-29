@@ -39295,6 +39295,61 @@ isLink.timeOut = 30000;
 
 //
 
+function fileStatIs( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let path = provider.path;
+
+  let filePath = test.context.pathFor( 'written/fileStatIs/file' );
+
+  if( !test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  {
+    test.identical( 1,1 );
+    return;
+  }
+
+  let originalValue = provider.UsingBigIntForStat;
+
+  try 
+  {
+    provider.fileWrite( filePath,filePath );
+
+    test.case = 'map'
+    test.is( !_.fileStatIs( {} ) );
+    test.case = 'string'
+    test.is( !_.fileStatIs( '' ) );
+    test.case = 'array'
+    test.is( !_.fileStatIs( [] ) );
+    test.case = 'provider'
+    test.is( !_.fileStatIs( provider ) );
+    test.case = 'null'
+    test.is( !_.fileStatIs( null ) );
+    test.case = 'instance of _.FileStat'
+    test.is( _.fileStatIs( new _.FileStat  ) );
+   
+    test.case = 'stats without bigint'
+    provider.UsingBigIntForStat = false;
+    var stat = provider.statResolvedRead( filePath );
+    test.is( _.fileStatIs( stat ) );
+  
+    test.case = 'stats with bigint'
+    provider.UsingBigIntForStat = true;
+    var stat = provider.statResolvedRead( filePath );
+    test.is( _.fileStatIs( stat ) );
+  } 
+  catch( err ) 
+  {
+    throw err;
+  }
+  finally
+  {
+    provider.UsingBigIntForStat = originalValue;
+  }
+}
+
+//
+
 function filesAreHardLinked( test )
 {
   let self = this;
@@ -48262,6 +48317,7 @@ var Self =
     isTextLink,
     isHardLink,
     isLink,
+    fileStatIs,
 
     filesAreHardLinked,
     filesAreTextLinked,

@@ -291,6 +291,8 @@ function filesReflectSingle_body( o )
 
   _.sure( _.strIs( srcPath ) );
   _.sure( _.strIs( dstPath ) );
+  _.sure( _.strDefined( parsed.hash ) || _.strDefined( parsed.tag ) );
+  _.sure( !parsed.tag || !parsed.hash, 'Does not expected both hash and tag in srcPath:', _.strQuote( srcPath ) );
   _.assert( localProvider instanceof _.FileProvider.HardDrive || localProvider.originalFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
   _.sure( !o.src || !o.src.hasFiltering(), 'Does not support filtering, but {o.src} is not empty' );
   _.sure( !o.dst || !o.dst.hasFiltering(), 'Does not support filtering, but {o.dst} is not empty' );
@@ -379,7 +381,8 @@ function filesReflectSingle_body( o )
 
     let providerHttp = _.FileProvider.Http();
     let tmpPackagePath = localProvider.path.join( tmpEssentialPath, 'package' );
-    let version = parsed.hash || 'latest';
+    // let version = parsed.hash || 'latest';
+    let version = parsed.hash || parsed.tag;
     let registryUrl = `https://registry.npmjs.org/${parsed.remoteVcsPath}/${version}`;
     let tarballDstPath;
 

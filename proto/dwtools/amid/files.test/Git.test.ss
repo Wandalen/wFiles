@@ -798,9 +798,9 @@ function filesReflectDownloadThrowing( test )
     return test.mustNotThrowError( ready )
     .then( () =>
     {
-      let got = _.git.isDownloadedFromRemote({ localPath, remotePath });
+      let got = _.git.hasRemote({ localPath, remotePath });
       test.identical( got.downloaded, true )
-      test.identical( got.downloadedFromRemote, true )
+      test.identical( got.remoteIsValid, true )
       return got;
     })
   })

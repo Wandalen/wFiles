@@ -199,11 +199,11 @@ function isUpToDate( o )
  * @param {Object} o Options map.
  * @param {String} o.localPath Local path to package.
  * @param {Number} o.verbosity=0 Level of verbosity.
- * @function isDownloaded
+ * @function isRepository
  * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm#
  */
 
-function isDownloaded( o )
+function isRepository( o )
 {
   let self = this;
   return _.npm.isDownloaded( o );
@@ -492,7 +492,7 @@ let Proto =
   versionRemoteLatestRetrive,
   versionRemoteCurrentRetrive,
   isUpToDate,
-  isDownloaded,
+  isRepository,
 
   // etc
 

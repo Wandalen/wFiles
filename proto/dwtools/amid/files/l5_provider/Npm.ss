@@ -195,6 +195,23 @@ function isUpToDate( o )
 //
 
 /**
+ * @summary Returns true if path `o.localPath` contains a npm package.
+ * @param {Object} o Options map.
+ * @param {String} o.localPath Local path to package.
+ * @param {Number} o.verbosity=0 Level of verbosity.
+ * @function hasFiles
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm#
+ */
+
+function hasFiles( o )
+{
+  let self = this;
+  return _.npm.hasFiles( o );
+}
+
+//
+
+/**
  * @summary Returns true if path `o.localPath` contains a package.
  * @param {Object} o Options map.
  * @param {String} o.localPath Local path to package.
@@ -206,7 +223,15 @@ function isUpToDate( o )
 function isRepository( o )
 {
   let self = this;
-  return _.npm.isDownloaded( o );
+  return _.npm.isRepository( o );
+}
+
+//
+
+function hasRemote( o )
+{
+  let self = this;
+  return _.npm.hasRemote( o );
 }
 
 // --
@@ -488,11 +513,15 @@ let Proto =
   pathParse,
   pathIsFixated,
   pathFixate,
+
   versionLocalRetrive,
   versionRemoteLatestRetrive,
   versionRemoteCurrentRetrive,
+
   isUpToDate,
+  hasFiles,
   isRepository,
+  hasRemote,
 
   // etc
 

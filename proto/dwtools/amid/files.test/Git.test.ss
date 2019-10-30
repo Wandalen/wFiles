@@ -757,6 +757,21 @@ function filesReflectDownloadThrowing( test )
 
   .then( () =>
   {
+    test.case = 'not existing hash';
+    providerDst.filesDelete( localPath );
+    let remotePath = 'git+https:///githu.com/Wandalen/wPathBasic.git/#63b39b105817e80e4a3810febd8b09ffe7cd6ad1';
+
+    let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
+    return test.shouldThrowErrorAsync( ready )
+    .then( ( got ) =>
+    {
+      test.is( !providerDst.fileExists( localPath ) )
+      return null;
+    })
+  })
+
+  .then( () =>
+  {
     test.case = 'error on download, new directory should not be made';
     providerDst.filesDelete( localPath );
     let remotePath = 'git+https:///githu.com/Wandalen/wPathBasic.git';

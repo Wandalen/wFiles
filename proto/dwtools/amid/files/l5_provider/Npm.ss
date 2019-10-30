@@ -239,7 +239,7 @@ function versionLocalRetrive( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( !!self.system );
 
-  if( !self.isDownloaded( o ) )
+  if( !self.isRepository( o ) )
   return '';
 
   let localProvider = self.system.providerForPath( o.localPath );
@@ -406,16 +406,16 @@ defaults.verbosity = 0;
  * @param {Object} o Options map.
  * @param {String} o.localPath Local path to package.
  * @param {Number} o.verbosity=0 Level of verbosity.
- * @function isDownloaded
+ * @function isRepository
  * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm#
  */
 
-function isDownloaded( o )
+function isRepository( o )
 {
   let self = this;
   let path = self.path;
 
-  _.routineOptions( isDownloaded, o );
+  _.routineOptions( isRepository, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( !!self.system );
 
@@ -436,7 +436,7 @@ function isDownloaded( o )
   return true;
 }
 
-var defaults = isDownloaded.defaults = Object.create( null );
+var defaults = isRepository.defaults = Object.create( null );
 defaults.localPath = null;
 defaults.verbosity = 0;
 
@@ -723,7 +723,7 @@ let Proto =
   versionRemoteLatestRetrive,
   versionRemoteCurrentRetrive,
   isUpToDate,
-  isDownloaded,
+  isRepository,
 
   // etc
 

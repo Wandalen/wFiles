@@ -200,14 +200,14 @@ function isUpToDate( o )
  * @param {Object} o Options map.
  * @param {String} o.localPath Local path to package.
  * @param {Number} o.verbosity=0 Level of verbosity.
- * @function isDownloaded
+ * @function hasFiles
  * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderGit#
  */
 
-function isDownloaded( o )
+function hasFiles( o )
 {
   let self = this;
-  return _.git.isDownloaded( o );
+  return _.git.hasFiles( o );
 }
 
 //
@@ -220,13 +220,11 @@ function isRepository( o )
 
 //
 
-function isDownloadedFromRemote( o )
+function hasRemote( o )
 {
   let self = this;
-  return _.git.isDownloadedFromRemote( o );
+  return _.git.hasRemote( o );
 }
-
-//
 
 // --
 // etc
@@ -691,9 +689,9 @@ let Proto =
   versionRemoteCurrentRetrive,
 
   isUpToDate,
-  isDownloaded,
+  hasFiles,
   isRepository,
-  isDownloadedFromRemote,
+  hasRemote,
 
   // etc
 

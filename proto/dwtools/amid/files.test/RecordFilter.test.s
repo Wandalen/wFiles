@@ -5291,8 +5291,6 @@ function pathsExtendFullForm( test )
   src.filePath = { '/dir/**b**' : '' }
   dst.pathsExtend( src );
 
-  test.case = 'drop prefix';
-
   var expectedDstFilePath = { '/dir/**b**' : '' };
   var expectedDstBasePath = { '/dir/**b**' : '/dir/d1/d11' };
 
@@ -5480,15 +5478,15 @@ function pathsExtendFullForm( test )
 
 //
 
-function pathsExtendJoining( test )
+function pathsExtendJoiningOnlyFilePath( test )
 {
   let context = this;
   let provider = new _.FileProvider.Extract();
   let path = provider.path;
 
-  /* - */
+  /* filePath */
 
-  test.case = 'src.filePath is relative path';
+  test.case = 'src.filePath is relative path ( string )';
   var dst = provider.recordFilter();
   var src = provider.recordFilter();
   src.filePath = 'b';
@@ -5501,7 +5499,9 @@ function pathsExtendJoining( test )
   test.identical( src.filePath, 'b' );
   test.identical( src.basePath, null );
 
-  test.case = 'src.filePath is relative path, dst.filePath is relative path';
+  /* */
+
+  test.case = 'src.filePath is relative path ( string ), dst.filePath is relative path ( string )';
   var dst = provider.recordFilter();
   dst.filePath = 'a';
   var src = provider.recordFilter();
@@ -5517,7 +5517,37 @@ function pathsExtendJoining( test )
 
   /* */
 
-  test.case = 'src.filePath is absolute path, dst.filePath is absolute path';
+  test.case = 'dst.prefix is abs str, src.file is simple map, src.prefix is empty str';
+  var dst = provider.recordFilter();
+  dst.prefixPath = '/dir';
+  var src = provider.recordFilter();
+  src.prefixPath = '';
+  src.filePath = { 'src1Terminal/**' : `` };
+  dst.pathsExtendJoining( src );
+
+  test.identical( dst.prefixPath, null );
+  test.identical( dst.filePath, 'src1Terminal/**' );
+  test.identical( dst.basePath, null );
+  test.identical( src.prefixPath, '' );
+  test.identical( src.filePath, { 'src1Terminal/**' : `` } );
+  test.identical( src.basePath, null );
+
+  /* */
+
+  test.case = 'src.filePath is absolute path ( string )';
+  var dst = provider.recordFilter();
+  var src = provider.recordFilter();
+  src.filePath = '/b';
+  dst.pathsExtendJoining( src );
+
+  test.identical( dst.prefixPath, null );
+  test.identical( dst.filePath, '/b' );
+  test.identical( dst.basePath, null );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, '/b' );
+  test.identical( src.basePath, null );
+
+  test.case = 'src.filePath is absolute path ( string ), dst.filePath is absolute path ( string )';
   var dst = provider.recordFilter();
   dst.filePath = '/a';
   var src = provider.recordFilter();
@@ -5533,18 +5563,18 @@ function pathsExtendJoining( test )
 
   /* */
 
-  test.case = 'src.filePath is relative path, dst.filePath is relative path ( map )';
+  test.case = 'src.filePath is absolute path ( string ), dst.filePath is absolute path ( map )';
   var dst = provider.recordFilter();
-  dst.filePath = { 'a' : '' };
+  dst.filePath = { '/a' : '' };
   var src = provider.recordFilter();
-  src.filePath = 'b';
+  src.filePath = '/b';
   dst.pathsExtendJoining( src );
 
   test.identical( dst.prefixPath, null );
-  test.identical( dst.filePath, 'a/b' );
+  test.identical( dst.filePath, '/b' );
   test.identical( dst.basePath, null );
   test.identical( src.prefixPath, null );
-  test.identical( src.filePath, 'b' );
+  test.identical( src.filePath, '/b' );
   test.identical( src.basePath, null );
 
   /* */
@@ -5562,7 +5592,7 @@ function pathsExtendJoining( test )
   test.identical( src.filePath, { '/b' : '' } );
   test.identical( src.basePath, null );
 
-  test.case = 'src.filePath is absolute path ( map ), dst.filePath is absolute path';
+  test.case = 'src.filePath is absolute path ( map ), dst.filePath is absolute path ( string )';
   var dst = provider.recordFilter();
   dst.filePath = '/a';
   var src = provider.recordFilter();
@@ -5578,7 +5608,7 @@ function pathsExtendJoining( test )
 
   /* */
 
-  test.case = 'src.filePath is relative path ( map ), dst.filePath has boolLike values ( map )';
+  test.case = 'src.filePath is relative path ( map ), dst.filePath is map with bools';
   var dst = provider.recordFilter();
   dst.filePath = { 'node_modules' : 0, 'package.json' : 0, '*.js' : 1 };
   var src = provider.recordFilter();
@@ -5594,31 +5624,168 @@ function pathsExtendJoining( test )
 
   /* */
 
-  test.case = 'src.filePath has boolLike values ( map ), dst.filePath is relative path ( map )';
+  test.case = 'src.filePath is map with bools';
+  var dst = provider.recordFilter();
+  var src = provider.recordFilter();
+  src.filePath = { 'node_modules' : false, 'package.json' : false, '*.js' : true };
+  dst.pathsExtendJoining( src );
+
+  test.identical( dst.prefixPath, null );
+  test.identical( dst.filePath, { 'node_modules' : false, 'package.json' : false, '*.js' : true } );
+  test.identical( dst.basePath, null );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, { 'node_modules' : false, 'package.json' : false, '*.js' : true } );
+  test.identical( src.basePath, null );
+
+  test.case = 'src.filePath is relative path ( string ), dst.filePath is relative path ( string )';
   var dst = provider.recordFilter();
   dst.filePath = { 'dir' : '' };
   var src = provider.recordFilter();
-  src.filePath = { 'node_modules' : 0, 'package.json' : 0, '*.js' : 1 };
+  src.filePath = { 'node_modules' : false, 'package.json' : false, '*.js' : true };
   dst.pathsExtendJoining( src );
 
   test.identical( dst.prefixPath, null );
   test.identical( dst.filePath, { 'dir' : '', 'node_modules' : false, 'package.json' : false, '*.js' : true } );
   test.identical( dst.basePath, null );
   test.identical( src.prefixPath, null );
-  test.identical( src.filePath, { 'node_modules' : 0, 'package.json' : 0, '*.js' : 1 } );
+  test.identical( src.filePath, { 'node_modules' : false, 'package.json' : false, '*.js' : true } );
   test.identical( src.basePath, null );
+}
+
+//
+
+function pathsExtendJoiningOnlyBasePath( test )
+{
+  let context = this;
+  let provider = new _.FileProvider.Extract();
+  let path = provider.path;
+
+  /* basePath */
+
+  test.case = 'src.basePath is string';
+  var dst = provider.recordFilter();
+  var src = provider.recordFilter();
+  src.basePath = 'src/base';
+  dst.pathsExtendJoining( src );
+
+  test.identical( dst.prefixPath, null );
+  test.identical( dst.filePath, null );
+  test.identical( dst.basePath, 'src/base' );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, null );
+  test.identical( src.basePath, 'src/base' );
+
+  test.case = 'src.basePath is string, dst.basePath is string';
+  var dst = provider.recordFilter();
+  dst.basePath = 'dst/base';
+  var src = provider.recordFilter();
+  src.basePath = 'src/base';
+  dst.pathsExtendJoining( src );
+
+  test.identical( dst.prefixPath, null );
+  test.identical( dst.filePath, null );
+  test.identical( dst.basePath, 'src/base' );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, null );
+  test.identical( src.basePath, 'src/base' );
 
   /* */
 
-  test.case = 'full src form, src.filePath has bools, full dst form, full.filePath has bools';
+  test.case = 'src.basePath is string, dst.basePath is map';
+  var dst = provider.recordFilter();
+  dst.basePath = { '.' : 'dst/base' };
+  var src = provider.recordFilter();
+  src.basePath = 'src/base';
+  dst.pathsExtendJoining( src );
+
+  test.identical( dst.prefixPath, null );
+  test.identical( dst.filePath, null );
+  test.identical( dst.basePath, 'src/base' );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, null );
+  test.identical( src.basePath, 'src/base' );
+
+  /* */
+
+  test.case = 'src.basePath is map';
+  var dst = provider.recordFilter();
+  var src = provider.recordFilter();
+  src.basePath = { '.' : 'src/base' };
+  dst.pathsExtendJoining( src );
+
+  test.identical( dst.prefixPath, null );
+  test.identical( dst.filePath, null );
+  test.identical( dst.basePath, { '.' : 'src/base' } );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, null );
+  test.identical( src.basePath, { '.' : 'src/base' } );
+
+  test.case = 'src.basePath is map, dst.basePath is string';
+  var dst = provider.recordFilter();
+  dst.basePath = 'dst/base';
+  var src = provider.recordFilter();
+  src.basePath = { '.' : 'src/base' };
+  dst.pathsExtendJoining( src );
+
+  test.identical( dst.prefixPath, null );
+  test.identical( dst.filePath, null );
+  test.identical( dst.basePath, { '.' : 'src/base' } );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, null );
+  test.identical( src.basePath, { '.' : 'src/base' } );
+
+  /* */
+
+  test.case = 'src.basePath is string, dst.basePath is map, collision';
+  var dst = provider.recordFilter();
+  dst.basePath = { '.' : 'dst/base' };
+  var src = provider.recordFilter();
+  src.basePath = { '.' : 'src/base' };
+  dst.pathsExtendJoining( src );
+
+  test.identical( dst.prefixPath, null );
+  test.identical( dst.filePath, null );
+  test.identical( dst.basePath, { '.' : 'src/base' } );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, null );
+  test.identical( src.basePath, { '.' : 'src/base' } );
+
+  /* */
+
+  test.case = 'src.basePath is string, dst.basePath is map, not collision';
+  var dst = provider.recordFilter();
+  dst.basePath = { 'dst' : 'dst/base' };
+  var src = provider.recordFilter();
+  src.basePath = { 'src' : 'src/base' };
+  dst.pathsExtendJoining( src );
+
+  test.identical( dst.prefixPath, null );
+  test.identical( dst.filePath, null );
+  test.identical( dst.basePath, { 'src' : 'src/base', 'dst' : 'dst/base' } );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, null );
+  test.identical( src.basePath, { 'src' : 'src/base' } );
+}
+
+//
+
+function pathsExtendJoiningFullForm( test )
+{
+  let context = this;
+  let provider = new _.FileProvider.Extract();
+  let path = provider.path;
+
+  /* full form */
+
+  test.case = 'full src form, src.filePath has only bools, full dst form, dst.filePath has only bools';
   var dst = provider.recordFilter();
   dst.prefixPath = '/commonDir/filter1';
   dst.basePath = './proto';
-  dst.filePath = { 'f' : true, 'd' : true, 'ex' : false, 'f1' : true, 'd1' : true, 'ex1' : false };
+  dst.filePath = { 'f' : true, 'd' : true, 'ex' : false, 'f1' : true, 'd1' : true, 'ex1' : false, 'ex3' : true };
   var src = provider.recordFilter();
   src.prefixPath = '/commonDir/filter2';
   src.basePath = './proto';
-  src.filePath = { 'f' : true, 'd' : true, 'ex' : false, 'f2' : true, 'ex3' : false, 'ex4' : true };
+  src.filePath = { 'f' : true, 'd' : true, 'ex' : false, 'f2' : true, 'd2' : true, 'ex2' : false, 'ex3' : false };
   dst.pathsExtendJoining( src );
 
   var expectedDstFilePath =
@@ -5629,26 +5796,31 @@ function pathsExtendJoining( test )
     '/commonDir/filter1/f1' : true,
     '/commonDir/filter1/d1' : true,
     '/commonDir/filter1/ex1' : false,
+    '/commonDir/filter1/ex3' : true,
     '/commonDir/filter2/f' : true,
     '/commonDir/filter2/d' : true,
     '/commonDir/filter2/ex' : false,
     '/commonDir/filter2/f2' : true,
+    '/commonDir/filter2/d2' : true,
+    '/commonDir/filter2/ex2' : false,
     '/commonDir/filter2/ex3' : false,
-    '/commonDir/filter2/ex4' : true,
     '/commonDir/filter2' : ''
   };
-  var expectedDstBasePath = { '/commonDir/filter2' : '/commonDir/filter2/proto' };
+  var expectedDstBasePath =
+  {
+    '/commonDir/filter2' : '/commonDir/filter2/proto'
+  };
   var expectedSrcFilePath =
   {
     '/commonDir/filter2/f' : true,
     '/commonDir/filter2/d' : true,
     '/commonDir/filter2/ex' : false,
     '/commonDir/filter2/f2' : true,
+    '/commonDir/filter2/d2' : true,
+    '/commonDir/filter2/ex2' : false,
     '/commonDir/filter2/ex3' : false,
-    '/commonDir/filter2/ex4' : true,
     '/commonDir/filter2' : ''
   };
-
 
   test.identical( dst.prefixPath, null );
   test.identical( dst.filePath, expectedDstFilePath );
@@ -5659,7 +5831,7 @@ function pathsExtendJoining( test )
 
   /* */
 
-  test.case = 'dst.basePath is absolute path, full src form, dst.prefixPath is array';
+  test.case = 'full src form, src.prefixPath is array, src.filePath has relative paths, only bools';
   var dst = provider.recordFilter();
   dst.basePath = '/dir';
   var src = provider.recordFilter();
@@ -5690,7 +5862,7 @@ function pathsExtendJoining( test )
 
   /* */
 
-  test.case = 'dst.basePath is absolute path, full src form, src.prefixPath is array';
+  test.case = 'full src form, src.prefixPath is array, src.filePath has absolute path with bool';
   var dst = provider.recordFilter();
   dst.basePath = '/dir';
   var src = provider.recordFilter();
@@ -5720,86 +5892,111 @@ function pathsExtendJoining( test )
 
   /* */
 
-  test.case = 'dst.basePath is absolute path, full src form, src.filePath has empty string';
+  test.case = 'full dst form, dst.prefixPath is array, dst.filePath has absolute path with empty string';
   var dst = provider.recordFilter();
   dst.basePath = '/dir';
   var src = provider.recordFilter();
   src.prefixPath = [ '/dir/d1/**', '/dir/d2/**' ];
   src.basePath = './d11';
-  src.filePath = { '/dir/**b**' : '' };
+  src.filePath = { '/dir/**b**' : '' }
   dst.pathsExtendJoining( src );
 
-  var expectedDstFilePath = '/dir/**b**';
+  var expectedDstFilePath = { '/dir/**b**' : '' };
   var expectedDstBasePath = { '/dir/**b**' : '/dir/d1/d11' };
 
   test.identical( dst.prefixPath, null );
-  test.identical( dst.filePath, expectedDstFilePath );
+  test.identical( dst.filePath, '/dir/**b**' );
   test.identical( dst.basePath, expectedDstBasePath );
   test.identical( src.prefixPath, null );
-  test.identical( src.filePath, { '/dir/**b**' : '' } );
+  test.identical( src.filePath, expectedDstFilePath );
   test.identical( src.basePath, '/dir/d1/d11' );
 
   /* */
 
-  test.case = 'dst.filePath and src.filePath has nulls';
+  test.case = 'src.filePath and dst.filePath has nulls';
   var dst = provider.recordFilter();
   dst.prefixPath = 'commonDir/filter1';
   dst.basePath = './proto';
-  dst.filePath = { 'd' : null, 'ex' : false, 'f1' : null, 'd1' : '', 'ex1' : false, 'ex3' : null };
+  dst.filePath = { 'f' : null, 'd' : null, 'ex' : false, 'f1' : null, 'd1' : '', 'ex1' : false, 'ex3' : null, 'ex4' : false };
   var src = provider.recordFilter();
   src.prefixPath = 'commonDir/filter2';
   src.basePath = './proto';
-  src.filePath = { 'd' : null, 'ex' : false, 'f2' : null, 'd2' : '', 'ex3' : false };
+  src.filePath = { 'f' : null, 'd' : null, 'ex' : false, 'f2' : null, 'd2' : '', 'ex2' : false, 'ex3' : false, 'ex4' : null };
   dst.pathsExtendJoining( src );
 
   var expectedDstFilePath =
   {
     'commonDir/filter1/ex' : false,
     'commonDir/filter1/ex1' : false,
+    'commonDir/filter1/ex4' : false,
     'commonDir/filter2/ex' : false,
+    'commonDir/filter2/ex2' : false,
     'commonDir/filter2/ex3' : false,
-
+    'commonDir/filter1/f/commonDir/filter2/f' : '',
+    'commonDir/filter1/f/commonDir/filter2/d' : '',
+    'commonDir/filter1/f/commonDir/filter2/f2' : '',
+    'commonDir/filter1/f/commonDir/filter2/d2' : '',
+    'commonDir/filter1/f/commonDir/filter2/ex4' : '',
+    'commonDir/filter1/d/commonDir/filter2/f' : '',
     'commonDir/filter1/d/commonDir/filter2/d' : '',
     'commonDir/filter1/d/commonDir/filter2/f2' : '',
     'commonDir/filter1/d/commonDir/filter2/d2' : '',
+    'commonDir/filter1/d/commonDir/filter2/ex4' : '',
+    'commonDir/filter1/f1/commonDir/filter2/f' : '',
     'commonDir/filter1/f1/commonDir/filter2/d' : '',
     'commonDir/filter1/f1/commonDir/filter2/f2' : '',
     'commonDir/filter1/f1/commonDir/filter2/d2' : '',
+    'commonDir/filter1/f1/commonDir/filter2/ex4' : '',
+    'commonDir/filter1/d1/commonDir/filter2/f' : '',
     'commonDir/filter1/d1/commonDir/filter2/d' : '',
     'commonDir/filter1/d1/commonDir/filter2/f2' : '',
     'commonDir/filter1/d1/commonDir/filter2/d2' : '',
+    'commonDir/filter1/d1/commonDir/filter2/ex4' : '',
+    'commonDir/filter1/ex3/commonDir/filter2/f' : '',
     'commonDir/filter1/ex3/commonDir/filter2/d' : '',
     'commonDir/filter1/ex3/commonDir/filter2/f2' : '',
     'commonDir/filter1/ex3/commonDir/filter2/d2' : '',
+    'commonDir/filter1/ex3/commonDir/filter2/ex4' : ''
+
   };
   var expectedDstBasePath =
   {
+    'commonDir/filter1/f/commonDir/filter2/f' : 'commonDir/filter1/proto/commonDir/filter2/proto',
+    'commonDir/filter1/f/commonDir/filter2/d' : 'commonDir/filter1/proto/commonDir/filter2/proto',
+    'commonDir/filter1/f/commonDir/filter2/f2' : 'commonDir/filter1/proto/commonDir/filter2/proto',
+    'commonDir/filter1/f/commonDir/filter2/d2' : 'commonDir/filter1/proto/commonDir/filter2/proto',
+    'commonDir/filter1/f/commonDir/filter2/ex4' : 'commonDir/filter1/proto/commonDir/filter2/proto',
+    'commonDir/filter1/d/commonDir/filter2/f' : 'commonDir/filter1/proto/commonDir/filter2/proto',
     'commonDir/filter1/d/commonDir/filter2/d' : 'commonDir/filter1/proto/commonDir/filter2/proto',
     'commonDir/filter1/d/commonDir/filter2/f2' : 'commonDir/filter1/proto/commonDir/filter2/proto',
     'commonDir/filter1/d/commonDir/filter2/d2' : 'commonDir/filter1/proto/commonDir/filter2/proto',
+    'commonDir/filter1/d/commonDir/filter2/ex4' : 'commonDir/filter1/proto/commonDir/filter2/proto',
+    'commonDir/filter1/f1/commonDir/filter2/f' : 'commonDir/filter1/proto/commonDir/filter2/proto',
     'commonDir/filter1/f1/commonDir/filter2/d' : 'commonDir/filter1/proto/commonDir/filter2/proto',
     'commonDir/filter1/f1/commonDir/filter2/f2' : 'commonDir/filter1/proto/commonDir/filter2/proto',
     'commonDir/filter1/f1/commonDir/filter2/d2' : 'commonDir/filter1/proto/commonDir/filter2/proto',
+    'commonDir/filter1/f1/commonDir/filter2/ex4' : 'commonDir/filter1/proto/commonDir/filter2/proto',
+    'commonDir/filter1/d1/commonDir/filter2/f' : 'commonDir/filter1/proto/commonDir/filter2/proto',
     'commonDir/filter1/d1/commonDir/filter2/d' : 'commonDir/filter1/proto/commonDir/filter2/proto',
     'commonDir/filter1/d1/commonDir/filter2/f2' : 'commonDir/filter1/proto/commonDir/filter2/proto',
     'commonDir/filter1/d1/commonDir/filter2/d2' : 'commonDir/filter1/proto/commonDir/filter2/proto',
+    'commonDir/filter1/d1/commonDir/filter2/ex4' : 'commonDir/filter1/proto/commonDir/filter2/proto',
+    'commonDir/filter1/ex3/commonDir/filter2/f' : 'commonDir/filter1/proto/commonDir/filter2/proto',
     'commonDir/filter1/ex3/commonDir/filter2/d' : 'commonDir/filter1/proto/commonDir/filter2/proto',
     'commonDir/filter1/ex3/commonDir/filter2/f2' : 'commonDir/filter1/proto/commonDir/filter2/proto',
     'commonDir/filter1/ex3/commonDir/filter2/d2' : 'commonDir/filter1/proto/commonDir/filter2/proto',
+    'commonDir/filter1/ex3/commonDir/filter2/ex4' : 'commonDir/filter1/proto/commonDir/filter2/proto'
   };
   var expectedSrcFilePath =
   {
-    'commonDir/filter2/ex' : false,
-    'commonDir/filter2/ex3' : false,
+    'commonDir/filter2/f' : '',
     'commonDir/filter2/d' : '',
+    'commonDir/filter2/ex' : false,
     'commonDir/filter2/f2' : '',
     'commonDir/filter2/d2' : '',
-  };
-  var expectedSrcBasePath =
-  {
-    'commonDir/filter2/d' : '',
-    'commonDir/filter2/f2' : '',
-    'commonDir/filter2/d2' : ''
+    'commonDir/filter2/ex2' : false,
+    'commonDir/filter2/ex3' : false,
+    'commonDir/filter2/ex4' : ''
   };
 
   test.identical( dst.prefixPath, null );
@@ -5809,12 +6006,13 @@ function pathsExtendJoining( test )
   test.identical( src.filePath, expectedSrcFilePath );
   test.identical( src.basePath, 'commonDir/filter2/proto' );
 
-  /* */
+  /* - */
 
-  test.case = 'dst extends src, prefixPath and filePath';
+  test.open ( 'multiple extends' );
+
   var dst = provider.recordFilter();
   dst.prefixPath = '/commonDir';
-  dst.filePath = { '*exclude*' : 0 };
+  dst.filePath = { '*exclude*' : false };
   var src = provider.recordFilter();
   src.prefixPath = '/commonDir';
   src.filePath = { 'filter1/f' : 'out/dir' };
@@ -5827,63 +6025,58 @@ function pathsExtendJoining( test )
   test.identical( src.basePath, null );
   test.identical( src.filePath, { '/commonDir/filter1/f' : 'out/dir' } );
 
-  /* - */
-
-  test.open( 'multiple extends' );
-
   var dst = provider.recordFilter();
   dst.prefixPath = null;
-  dst.filePath = { '/commonDir/*exclude*' : false, '/commonDir/filter1/f' : 'out/dir1' };
+  dst.filePath = { '/commonDir/*exclude*' : false, '/commonDir' : '', '/commonDir/filter1/f' : 'out/dir' };
+  dst.basePath = null;
   var src = provider.recordFilter();
   src.prefixPath = '/commonDir';
-  src.filePath = { 'filter1/f' : 'out/dir2' };
+  src.filePath = { 'filter1/f' : 'out/dir' };
   dst.pathsExtendJoining( src );
 
   test.identical( dst.prefixPath, null );
   test.identical( dst.basePath, null );
-  test.identical( dst.filePath, { '/commonDir/*exclude*' : false, '/commonDir/filter1/f' : 'out/dir1/out/dir2' } );
+  test.identical( dst.filePath, { '/commonDir/*exclude*' : false, '/commonDir/filter1/f' : [ 'out/dir', 'out/dir/out/dir' ] } );
   test.identical( src.prefixPath, null );
   test.identical( src.basePath, null );
-  test.identical( src.filePath, { '/commonDir/filter1/f' : 'out/dir2' } );
+  test.identical( src.filePath, { '/commonDir/filter1/f' : 'out/dir' } );
 
   var dst = provider.recordFilter();
   dst.prefixPath = null;
-  dst.filePath = { '/commonDir/*exclude*' : false, '/commonDir/filter1/f' : 'out/dir1/out/dir2' };
+  dst.filePath = { '/commonDir/*exclude*' : false, '/commonDir' : '', '/commonDir/filter1/f' : 'out/dir' };
   dst.basePath = null;
   var src = provider.recordFilter();
   src.prefixPath = '/commonDir/filter1';
-  src.filePath = { 'f' : 'out/dir4' };
+  src.filePath = { 'f' : 'out/dir' };
   dst.pathsExtendJoining( src );
 
   test.identical( dst.prefixPath, null );
   test.identical( dst.basePath, null );
-  test.identical( dst.filePath, { '/commonDir/filter1/f' : 'out/dir1/out/dir2/out/dir4', '/commonDir/*exclude*' : false } );
+  test.identical( dst.filePath, { '/commonDir/*exclude*' : false, '/commonDir/filter1/f' : [ 'out/dir', 'out/dir/out/dir' ] } );
   test.identical( src.prefixPath, null );
   test.identical( src.basePath, null );
-  test.identical( src.filePath, { '/commonDir/filter1/f' : 'out/dir4' } );
+  test.identical( src.filePath, { '/commonDir/filter1/f' : 'out/dir' } );
 
   var dst = provider.recordFilter();
   dst.prefixPath = null;
-  dst.filePath = { '/commonDir/filter1/f' : 'out/dir1/out/dir2/out/dir4', '/commonDir/*exclude*' : false };
+  dst.filePath = { '/commonDir/*exclude*' : false, '/commonDir' : '', '/commonDir/filter1/f' : 'out/dir' };
   dst.basePath = null;
   var src = provider.recordFilter();
   src.filePath = { '/commonDir/filter1/f' : '/commonDir/out/dir' };
   dst.pathsExtendJoining( src );
 
-  var expectedFilePath = { '/commonDir/filter1/f' : '/commonDir/out/dir', '/commonDir/*exclude*' : false };
-
   test.identical( dst.prefixPath, null );
   test.identical( dst.basePath, null );
-  test.identical( dst.filePath, expectedFilePath );
+  test.identical( dst.filePath, { '/commonDir/*exclude*' : false, '/commonDir/filter1/f' : '/commonDir/out/dir' } );
   test.identical( src.prefixPath, null );
   test.identical( src.basePath, null );
   test.identical( src.filePath, { '/commonDir/filter1/f' : '/commonDir/out/dir' } );
 
-  test.close( 'multiple extends' );
+  test.close ( 'multiple extends' );
 
   /* - */
 
-  test.case = 'dst.filePath has dot path, src.filePath has nulls';
+  test.case = 'dst.filePath is dot, extends by src.filePath ( map ), src.basePath ( string )';
   var dst = provider.recordFilter();
   dst.filePath = { '.' : null };
   var src = provider.recordFilter();
@@ -5896,15 +6089,15 @@ function pathsExtendJoining( test )
   test.identical( dst.filePath, [ '/a/b1', '/a/b2' ] );
   test.identical( src.prefixPath, null );
   test.identical( src.basePath, '/a' );
-  test.identical( src.filePath, { '/a/b1' : null, '/a/b2' : null, } );
+  test.identical( src.filePath, { '/a/b1' : null, '/a/b2' : null } );
 
   /* */
 
-  test.case = 'dst.basePath is absolute path, src.filePath has dot path';
+  test.case = 'dst.basePath is string, extends by full src form';
   var dst = provider.recordFilter();
   dst.basePath = '/base';
   var src = provider.recordFilter();
-  src.filePath = { './**' : '' };
+  src.filePath = { './**' : '' }
   src.basePath = '/base/src2';
   src.prefixPath = '/base/src2';
   dst.pathsExtendJoining( src );
@@ -5915,92 +6108,6 @@ function pathsExtendJoining( test )
   test.identical( src.prefixPath, null );
   test.identical( src.basePath, '/base/src2' );
   test.identical( src.filePath, { '/base/src2/**' : '' } );
-
-  /* */
-
-  test.case = 'dst.filePath is array, dst.basePath is map, src.basePath is null';
-  var dst = provider.recordFilter();
-  dst.filePath = [ '/dir/d1/**', '/dir/d2/**' ];
-  dst.basePath = { '/dir/d1/**' : '/dir', '/dir/d2/**' : '/dir' };
-  var src = provider.recordFilter();
-  src.basePath = null;
-  dst.pathsExtendJoining( src );
-
-  test.identical( dst.prefixPath, null );
-  test.identical( dst.filePath, [ '/dir/d1/**', '/dir/d2/**' ] );
-  test.identical( dst.basePath, { '/dir/d1/**' : '/dir', '/dir/d2/**' : '/dir', } );
-  test.identical( src.prefixPath, null );
-  test.identical( src.filePath, null );
-  test.identical( src.basePath, null );
-
-  /* */
-
-  test.case = 'dst.filePath is array, dst.basePath is map, src.basePath is empty string';
-  var dst = provider.recordFilter();
-  dst.filePath = [ '/dir/d1/**', '/dir/d2/**' ];
-  dst.basePath = { '/dir/d1/**' : '/dir', '/dir/d2/**' : '/dir' };
-  var src = provider.recordFilter();
-  src.basePath = '';
-  dst.pathsExtendJoining( src );
-
-  test.identical( dst.prefixPath, null );
-  test.identical( dst.filePath, [ '/dir/d1/**', '/dir/d2/**' ] );
-  test.identical( dst.basePath, null );
-  test.identical( src.prefixPath, null );
-  test.identical( src.filePath, null );
-  test.identical( src.basePath, '' );
-
-  /* */
-
-  test.case = 'dst.filePath is array, dst.basePath is map, src.basePath is null';
-  var dst = provider.recordFilter();
-  dst.filePath = [ '/dir/d1/**', '/dir/d2/**' ];
-  dst.basePath = { '/dir/d1/**' : '/dir', '/dir/d2/**' : '/dir' };
-  var src = provider.recordFilter();
-  src.basePath = null;
-  dst.pathsExtendJoining( src );
-
-  test.identical( dst.prefixPath, null );
-  test.identical( dst.filePath, [ '/dir/d1/**', '/dir/d2/**' ] );
-  test.identical( dst.basePath, { '/dir/d1/**' : '/dir', '/dir/d2/**' : '/dir', } );
-  test.identical( src.prefixPath, null );
-  test.identical( src.filePath, null );
-  test.identical( src.basePath, null );
-
-  /* */
-
-  test.case = 'dst.filePath is map, dst.basePath is relative path, src.prefixPath is absolute path';
-  var dst = provider.recordFilter();
-  dst.filePath = { '/dir/d1/**' : '', '/dir/d2/**' : '' };
-  dst.basePath = './dir/d1/d11';
-  var src = provider.recordFilter();
-  src.prefixPath = '/';
-  dst.pathsExtendJoining( src );
-
-  test.identical( dst.prefixPath, '/' );
-  test.identical( dst.filePath, [ '/dir/d1/**', '/dir/d2/**' ] );
-  test.identical( dst.basePath, './dir/d1/d11' );
-  test.identical( src.prefixPath, '/' );
-  test.identical( src.filePath, null );
-  test.identical( src.basePath, null );
-
-  /* */
-
-  test.case = 'dst.prefixPath is absolute path, src.filePath is map, src.basePath is relative path';
-  var dst = provider.recordFilter();
-  dst.prefixPath = '/';
-  var src = provider.recordFilter();
-  src.filePath = { '/dir/d1/**' : '', '/dir/d2/**' : '' };
-  src.basePath = './dir/d1/d11';
-  dst.pathsExtendJoining( src );
-
-  test.identical( dst.prefixPath, '/' );
-  test.identical( dst.filePath, [ '/dir/d1/**', '/dir/d2/**' ] );
-  test.identical( dst.basePath, './dir/d1/d11' );
-  test.identical( src.prefixPath, null );
-  test.identical( src.filePath, { '/dir/d1/**' : '', '/dir/d2/**' : '' } );
-  test.identical( src.basePath, './dir/d1/d11' );
-
 }
 
 //
@@ -7366,7 +7473,10 @@ var Self =
     pathsExtendOnlyBasePath,
     pathsExtendFullForm,
 
-    pathsExtendJoining,
+    pathsExtendJoiningOnlyFilePath,
+    pathsExtendJoiningOnlyBasePath,
+    pathsExtendJoiningFullForm,
+
     pathsSupplementJoining,
 
     pathsSupplementOnlyFilePath,

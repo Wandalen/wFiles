@@ -4866,7 +4866,7 @@ please duplicate all test cases in pathsExtend, pathsExtendJoing, pathsSupplemen
 qqq : please make sure it's so
 */
 
-function pathsExtend( test )
+function pathsExtendOnlyFilePath( test )
 {
   let context = this;
   let provider = new _.FileProvider.Extract();
@@ -5038,8 +5038,17 @@ function pathsExtend( test )
   test.identical( src.prefixPath, null );
   test.identical( src.filePath, { 'node_modules' : false, 'package.json' : false, '*.js' : true } );
   test.identical( src.basePath, null );
+}
 
-  /* basPath */
+//
+
+function pathsExtendOnlyBasePath( test )
+{
+  let context = this;
+  let provider = new _.FileProvider.Extract();
+  let path = provider.path;
+
+  /* basePath */
 
   test.case = 'src.basePath is string';
   var dst = provider.recordFilter();
@@ -5144,8 +5153,17 @@ function pathsExtend( test )
   test.identical( src.prefixPath, null );
   test.identical( src.filePath, null );
   test.identical( src.basePath, { 'src' : 'src/base' } );
+}
 
-  /* prefixPath, basePath, filePath */
+//
+
+function pathsExtendFullForm( test )
+{
+  let context = this;
+  let provider = new _.FileProvider.Extract();
+  let path = provider.path;
+
+  /* full form */
 
   test.case = 'full src form, src.filePath has only bools, full dst form, dst.filePath has only bools';
   var dst = provider.recordFilter();
@@ -5458,7 +5476,6 @@ function pathsExtend( test )
   test.identical( src.prefixPath, null );
   test.identical( src.basePath, '/base/src2' );
   test.identical( src.filePath, { '/base/src2/**' : '' } );
-
 }
 
 //
@@ -7345,7 +7362,10 @@ var Self =
 
     // paths ammend
 
-    pathsExtend,
+    pathsExtendOnlyFilePath,
+    pathsExtendOnlyBasePath,
+    pathsExtendFullForm,
+
     pathsExtendJoining,
     pathsSupplementJoining,
 

@@ -6897,6 +6897,121 @@ function pathsSupplementJoiningOnlyFilePath( test )
 
 //
 
+function pathsSupplementJoiningOnlyBasePath( test )
+{
+  let context = this;
+  let provider = new _.FileProvider.Extract();
+  let path = provider.path;
+
+  /* basePath */
+
+  test.case = 'src.basePath is string';
+  var dst = provider.recordFilter();
+  var src = provider.recordFilter();
+  src.basePath = 'src/base';
+  dst.pathsSupplementJoining( src );
+
+  test.identical( dst.prefixPath, null );
+  test.identical( dst.filePath, null );
+  test.identical( dst.basePath, 'src/base' );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, null );
+  test.identical( src.basePath, 'src/base' );
+
+  test.case = 'src.basePath is string, dst.basePath is string';
+  var dst = provider.recordFilter();
+  dst.basePath = 'dst/base';
+  var src = provider.recordFilter();
+  src.basePath = 'src/base';
+  dst.pathsSupplementJoining( src );
+
+  test.identical( dst.prefixPath, null );
+  test.identical( dst.filePath, null );
+  test.identical( dst.basePath, 'src/base/dst/base' );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, null );
+  test.identical( src.basePath, 'src/base' );
+
+  /* */
+
+  test.case = 'src.basePath is string, dst.basePath is map';
+  var dst = provider.recordFilter();
+  dst.basePath = { '.' : 'dst/base' };
+  var src = provider.recordFilter();
+  src.basePath = 'src/base';
+  dst.pathsSupplementJoining( src );
+
+  test.identical( dst.prefixPath, null );
+  test.identical( dst.filePath, null );
+  test.identical( dst.basePath, { '.' : 'dst/base' } );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, null );
+  test.identical( src.basePath, 'src/base' );
+
+  /* */
+
+  test.case = 'src.basePath is map';
+  var dst = provider.recordFilter();
+  var src = provider.recordFilter();
+  src.basePath = { '.' : 'src/base' };
+  dst.pathsSupplementJoining( src );
+
+  test.identical( dst.prefixPath, null );
+  test.identical( dst.filePath, null );
+  test.identical( dst.basePath, { '.' : 'src/base' } );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, null );
+  test.identical( src.basePath, { '.' : 'src/base' } );
+
+  test.case = 'src.basePath is map, dst.basePath is string';
+  var dst = provider.recordFilter();
+  dst.basePath = 'dst/base';
+  var src = provider.recordFilter();
+  src.basePath = { '.' : 'src/base' };
+  dst.pathsSupplementJoining( src );
+
+  test.identical( dst.prefixPath, null );
+  test.identical( dst.filePath, null );
+  test.identical( dst.basePath, 'dst/base' );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, null );
+  test.identical( src.basePath, { '.' : 'src/base' } );
+
+  /* */
+
+  test.case = 'src.basePath is string, dst.basePath is map, collision';
+  var dst = provider.recordFilter();
+  dst.basePath = { '.' : 'dst/base' };
+  var src = provider.recordFilter();
+  src.basePath = { '.' : 'src/base' };
+  dst.pathsSupplementJoining( src );
+
+  test.identical( dst.prefixPath, null );
+  test.identical( dst.filePath, null );
+  test.identical( dst.basePath, { '.' : 'src/base/dst/base' } );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, null );
+  test.identical( src.basePath, { '.' : 'src/base' } );
+
+  /* */
+
+  test.case = 'src.basePath is string, dst.basePath is map, not collision';
+  var dst = provider.recordFilter();
+  dst.basePath = { 'dst' : 'dst/base' };
+  var src = provider.recordFilter();
+  src.basePath = { 'src' : 'src/base' };
+  dst.pathsSupplementJoining( src );
+
+  test.identical( dst.prefixPath, null );
+  test.identical( dst.filePath, null );
+  test.identical( dst.basePath, { 'dst' : 'dst/base' } );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, null );
+  test.identical( src.basePath, { 'src' : 'src/base' } );
+}
+
+//
+
 function pathsSupplementJoining( test )
 {
   let context = this;
@@ -8089,6 +8204,7 @@ var Self =
     pathsSupplementFullForm,
 
     pathsSupplementJoiningOnlyFilePath,
+    pathsSupplementJoiningOnlyBasePath,
     pathsSupplementJoining,
     pathsSupplementJoiningLogical,
 

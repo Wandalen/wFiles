@@ -6288,6 +6288,121 @@ function pathsSupplementOnlyFilePath( test )
 
 //
 
+function pathsSupplementOnlyBasePath( test )
+{
+  let context = this;
+  let provider = new _.FileProvider.Extract();
+  let path = provider.path;
+
+  /* basePath */
+
+  test.case = 'src.basePath is string';
+  var dst = provider.recordFilter();
+  var src = provider.recordFilter();
+  src.basePath = 'src/base';
+  dst.pathsSupplement( src );
+
+  test.identical( dst.prefixPath, null );
+  test.identical( dst.filePath, null );
+  test.identical( dst.basePath, 'src/base' );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, null );
+  test.identical( src.basePath, 'src/base' );
+
+  test.case = 'src.basePath is string, dst.basePath is string';
+  var dst = provider.recordFilter();
+  dst.basePath = 'dst/base';
+  var src = provider.recordFilter();
+  src.basePath = 'src/base';
+  dst.pathsSupplement( src );
+
+  test.identical( dst.prefixPath, null );
+  test.identical( dst.filePath, null );
+  test.identical( dst.basePath, 'dst/base' );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, null );
+  test.identical( src.basePath, 'src/base' );
+
+  /* */
+
+  test.case = 'src.basePath is string, dst.basePath is map';
+  var dst = provider.recordFilter();
+  dst.basePath = { '.' : 'dst/base' };
+  var src = provider.recordFilter();
+  src.basePath = 'src/base';
+  dst.pathsSupplement( src );
+
+  test.identical( dst.prefixPath, null );
+  test.identical( dst.filePath, null );
+  test.identical( dst.basePath, { '.' : 'dst/base' } );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, null );
+  test.identical( src.basePath, 'src/base' );
+
+  /* */
+
+  test.case = 'src.basePath is map';
+  var dst = provider.recordFilter();
+  var src = provider.recordFilter();
+  src.basePath = { '.' : 'src/base' };
+  dst.pathsSupplement( src );
+
+  test.identical( dst.prefixPath, null );
+  test.identical( dst.filePath, null );
+  test.identical( dst.basePath, { '.' : 'src/base' } );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, null );
+  test.identical( src.basePath, { '.' : 'src/base' } );
+
+  test.case = 'src.basePath is map, dst.basePath is string';
+  var dst = provider.recordFilter();
+  dst.basePath = 'dst/base';
+  var src = provider.recordFilter();
+  src.basePath = { '.' : 'src/base' };
+  dst.pathsSupplement( src );
+
+  test.identical( dst.prefixPath, null );
+  test.identical( dst.filePath, null );
+  test.identical( dst.basePath, 'dst/base' );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, null );
+  test.identical( src.basePath, { '.' : 'src/base' } );
+
+  /* */
+
+  test.case = 'src.basePath is string, dst.basePath is map, collision';
+  var dst = provider.recordFilter();
+  dst.basePath = { '.' : 'dst/base' };
+  var src = provider.recordFilter();
+  src.basePath = { '.' : 'src/base' };
+  dst.pathsSupplement( src );
+
+  test.identical( dst.prefixPath, null );
+  test.identical( dst.filePath, null );
+  test.identical( dst.basePath, { '.' : 'dst/base' } );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, null );
+  test.identical( src.basePath, { '.' : 'src/base' } );
+
+  /* */
+
+  test.case = 'src.basePath is string, dst.basePath is map, not collision';
+  var dst = provider.recordFilter();
+  dst.basePath = { 'dst' : 'dst/base' };
+  var src = provider.recordFilter();
+  src.basePath = { 'src' : 'src/base' };
+  dst.pathsSupplement( src );
+
+  test.identical( dst.prefixPath, null );
+  test.identical( dst.filePath, null );
+  test.identical( dst.basePath, { 'src' : 'src/base', 'dst' : 'dst/base' } );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, null );
+  test.identical( src.basePath, { 'src' : 'src/base' } );
+}
+
+//
+
 function pathsSupplementJoining( test )
 {
   let context = this;
@@ -7579,6 +7694,7 @@ var Self =
     pathsExtendJoiningFullForm,
 
     pathsSupplementOnlyFilePath,
+    pathsSupplementOnlyBasePath,
 
     pathsSupplementJoining,
 

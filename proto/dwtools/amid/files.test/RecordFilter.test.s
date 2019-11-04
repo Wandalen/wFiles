@@ -6112,179 +6112,179 @@ function pathsExtendJoiningFullForm( test )
 
 //
 
-// function pathsSupplementOnlyFilePath( test )
-// {
-//   let context = this;
-//   let provider = new _.FileProvider.Extract();
-//   let path = provider.path;
-//
-//   /* filePath */
-//
-//   test.case = 'src.filePath is relative path ( string )';
-//   var dst = provider.recordFilter();
-//   var src = provider.recordFilter();
-//   src.filePath = 'b';
-//   dst.pathsSupplement( src );
-//
-//   test.identical( dst.prefixPath, null );
-//   test.identical( dst.filePath, 'b' );
-//   test.identical( dst.basePath, null );
-//   test.identical( src.prefixPath, null );
-//   test.identical( src.filePath, 'b' );
-//   test.identical( src.basePath, null );
-//
-//   /* */
-//
-//   test.case = 'src.filePath is relative path ( string ), dst.filePath is relative path ( string )';
-//   var dst = provider.recordFilter();
-//   dst.filePath = 'a';
-//   var src = provider.recordFilter();
-//   src.filePath = 'b';
-//   dst.pathsSupplement( src );
-//
-//   test.identical( dst.prefixPath, null );
-//   test.identical( dst.filePath, { 'a' : '', 'b' : '' } );
-//   test.identical( dst.basePath, null );
-//   test.identical( src.prefixPath, null );
-//   test.identical( src.filePath, 'b' );
-//   test.identical( src.basePath, null );
-//
-//   /* */
-//
-//   test.case = 'dst.prefix is abs str, src.file is simple map, src.prefix is empty str';
-//   var dst = provider.recordFilter();
-//   dst.prefixPath = '/dir';
-//   var src = provider.recordFilter();
-//   src.prefixPath = '';
-//   src.filePath = { 'src1Terminal/**' : `` };
-//   dst.pathsSupplement( src );
-//
-//   test.identical( dst.prefixPath, null );
-//   test.identical( dst.filePath, { 'src1Terminal/**' : `` } );
-//   test.identical( dst.basePath, null );
-//   test.identical( src.prefixPath, '' );
-//   test.identical( src.filePath, { 'src1Terminal/**' : `` } );
-//   test.identical( src.basePath, null );
-//
-//   /* */
-//
-//   test.case = 'src.filePath is absolute path ( string )';
-//   var dst = provider.recordFilter();
-//   var src = provider.recordFilter();
-//   src.filePath = '/b';
-//   dst.pathsSupplement( src );
-//
-//   test.identical( dst.prefixPath, null );
-//   test.identical( dst.filePath, '/b' );
-//   test.identical( dst.basePath, null );
-//   test.identical( src.prefixPath, null );
-//   test.identical( src.filePath, '/b' );
-//   test.identical( src.basePath, null );
-//
-//   test.case = 'src.filePath is absolute path ( string ), dst.filePath is absolute path ( string )';
-//   var dst = provider.recordFilter();
-//   dst.filePath = '/a';
-//   var src = provider.recordFilter();
-//   src.filePath = '/b';
-//   dst.pathsSupplement( src );
-//
-//   test.identical( dst.prefixPath, null );
-//   test.identical( dst.filePath, { '/a' : '', '/b' : '' } );
-//   test.identical( dst.basePath, null );
-//   test.identical( src.prefixPath, null );
-//   test.identical( src.filePath, '/b' );
-//   test.identical( src.basePath, null );
-//
-//   /* */
-//
-//   test.case = 'src.filePath is absolute path ( string ), dst.filePath is absolute path ( map )';
-//   var dst = provider.recordFilter();
-//   dst.filePath = { '/a' : '' };
-//   var src = provider.recordFilter();
-//   src.filePath = '/b';
-//   dst.pathsSupplement( src );
-//
-//   test.identical( dst.prefixPath, null );
-//   test.identical( dst.filePath, { '/a' : '', '/b' : '' } );
-//   test.identical( dst.basePath, null );
-//   test.identical( src.prefixPath, null );
-//   test.identical( src.filePath, '/b' );
-//   test.identical( src.basePath, null );
-//
-//   /* */
-//
-//   test.case = 'src.filePath is absolute path ( map )';
-//   var dst = provider.recordFilter();
-//   var src = provider.recordFilter();
-//   src.filePath = { '/b' : '' };
-//   dst.pathsSupplement( src );
-//
-//   test.identical( dst.prefixPath, null );
-//   test.identical( dst.filePath, { '/b' : '' } );
-//   test.identical( dst.basePath, null );
-//   test.identical( src.prefixPath, null );
-//   test.identical( src.filePath, { '/b' : '' } );
-//   test.identical( src.basePath, null );
-//
-//   test.case = 'src.filePath is absolute path ( map ), dst.filePath is absolute path ( string )';
-//   var dst = provider.recordFilter();
-//   dst.filePath = '/a';
-//   var src = provider.recordFilter();
-//   src.filePath = { '/b' : '' };
-//   dst.pathsSupplement( src );
-//
-//   test.identical( dst.prefixPath, null );
-//   test.identical( dst.filePath, { '/a' : '', '/b' : '' } );
-//   test.identical( dst.basePath, null );
-//   test.identical( src.prefixPath, null );
-//   test.identical( src.filePath, { '/b' : '' } );
-//   test.identical( src.basePath, null );
-//
-//   /* */
-//
-//   test.case = 'src.filePath is relative path ( map ), dst.filePath is map with bools';
-//   var dst = provider.recordFilter();
-//   dst.filePath = { 'node_modules' : 0, 'package.json' : 0, '*.js' : 1 };
-//   var src = provider.recordFilter();
-//   src.filePath = { 'dir' : '' };
-//   dst.pathsSupplement( src );
-//
-//   test.identical( dst.prefixPath, null );
-//   test.identical( dst.filePath, { 'dir' : '', 'node_modules' : false, 'package.json' : false, '*.js' : true } );
-//   test.identical( dst.basePath, null );
-//   test.identical( src.prefixPath, null );
-//   test.identical( src.filePath, { 'dir' : '' } );
-//   test.identical( src.basePath, null );
-//
-//   /* */
-//
-//   test.case = 'src.filePath is map with bools';
-//   var dst = provider.recordFilter();
-//   var src = provider.recordFilter();
-//   src.filePath = { 'node_modules' : false, 'package.json' : false, '*.js' : true };
-//   dst.pathsSupplement( src );
-//
-//   test.identical( dst.prefixPath, null );
-//   test.identical( dst.filePath, { 'node_modules' : false, 'package.json' : false, '*.js' : true } );
-//   test.identical( dst.basePath, null );
-//   test.identical( src.prefixPath, null );
-//   test.identical( src.filePath, { 'node_modules' : false, 'package.json' : false, '*.js' : true } );
-//   test.identical( src.basePath, null );
-//
-//   test.case = 'src.filePath is relative path ( string ), dst.filePath is relative path ( string )';
-//   var dst = provider.recordFilter();
-//   dst.filePath = { 'dir' : '' };
-//   var src = provider.recordFilter();
-//   src.filePath = { 'node_modules' : false, 'package.json' : false, '*.js' : true };
-//   dst.pathsSupplement( src );
-//
-//   test.identical( dst.prefixPath, null );
-//   test.identical( dst.filePath, { 'dir' : '', 'node_modules' : false, 'package.json' : false, '*.js' : true } );
-//   test.identical( dst.basePath, null );
-//   test.identical( src.prefixPath, null );
-//   test.identical( src.filePath, { 'node_modules' : false, 'package.json' : false, '*.js' : true } );
-//   test.identical( src.basePath, null );
-// }
+function pathsSupplementOnlyFilePath( test )
+{
+  let context = this;
+  let provider = new _.FileProvider.Extract();
+  let path = provider.path;
+
+  /* filePath */
+
+  test.case = 'src.filePath is relative path ( string )';
+  var dst = provider.recordFilter();
+  var src = provider.recordFilter();
+  src.filePath = 'b';
+  dst.pathsSupplement( src );
+
+  test.identical( dst.prefixPath, null );
+  test.identical( dst.filePath, 'b' );
+  test.identical( dst.basePath, null );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, 'b' );
+  test.identical( src.basePath, null );
+
+  /* */
+
+  test.case = 'src.filePath is relative path ( string ), dst.filePath is relative path ( string )';
+  var dst = provider.recordFilter();
+  dst.filePath = 'a';
+  var src = provider.recordFilter();
+  src.filePath = 'b';
+  dst.pathsSupplement( src );
+
+  test.identical( dst.prefixPath, null );
+  test.identical( dst.filePath, { 'a' : '', 'b' : '' } );
+  test.identical( dst.basePath, null );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, 'b' );
+  test.identical( src.basePath, null );
+
+  /* */
+
+  test.case = 'dst.prefix is abs str, src.file is simple map, src.prefix is empty str';
+  var dst = provider.recordFilter();
+  dst.prefixPath = '/dir';
+  var src = provider.recordFilter();
+  src.prefixPath = '';
+  src.filePath = { 'src1Terminal/**' : `` };
+  dst.pathsSupplement( src );
+
+  test.identical( dst.prefixPath, null );
+  test.identical( dst.filePath, { 'src1Terminal/**' : `` } );
+  test.identical( dst.basePath, null );
+  test.identical( src.prefixPath, '' );
+  test.identical( src.filePath, { 'src1Terminal/**' : `` } );
+  test.identical( src.basePath, null );
+
+  /* */
+
+  test.case = 'src.filePath is absolute path ( string )';
+  var dst = provider.recordFilter();
+  var src = provider.recordFilter();
+  src.filePath = '/b';
+  dst.pathsSupplement( src );
+
+  test.identical( dst.prefixPath, null );
+  test.identical( dst.filePath, '/b' );
+  test.identical( dst.basePath, null );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, '/b' );
+  test.identical( src.basePath, null );
+
+  test.case = 'src.filePath is absolute path ( string ), dst.filePath is absolute path ( string )';
+  var dst = provider.recordFilter();
+  dst.filePath = '/a';
+  var src = provider.recordFilter();
+  src.filePath = '/b';
+  dst.pathsSupplement( src );
+
+  test.identical( dst.prefixPath, null );
+  test.identical( dst.filePath, { '/a' : '', '/b' : '' } );
+  test.identical( dst.basePath, null );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, '/b' );
+  test.identical( src.basePath, null );
+
+  /* */
+
+  test.case = 'src.filePath is absolute path ( string ), dst.filePath is absolute path ( map )';
+  var dst = provider.recordFilter();
+  dst.filePath = { '/a' : '' };
+  var src = provider.recordFilter();
+  src.filePath = '/b';
+  dst.pathsSupplement( src );
+
+  test.identical( dst.prefixPath, null );
+  test.identical( dst.filePath, { '/a' : '', '/b' : '' } );
+  test.identical( dst.basePath, null );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, '/b' );
+  test.identical( src.basePath, null );
+
+  /* */
+
+  test.case = 'src.filePath is absolute path ( map )';
+  var dst = provider.recordFilter();
+  var src = provider.recordFilter();
+  src.filePath = { '/b' : '' };
+  dst.pathsSupplement( src );
+
+  test.identical( dst.prefixPath, null );
+  test.identical( dst.filePath, { '/b' : '' } );
+  test.identical( dst.basePath, null );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, { '/b' : '' } );
+  test.identical( src.basePath, null );
+
+  test.case = 'src.filePath is absolute path ( map ), dst.filePath is absolute path ( string )';
+  var dst = provider.recordFilter();
+  dst.filePath = '/a';
+  var src = provider.recordFilter();
+  src.filePath = { '/b' : '' };
+  dst.pathsSupplement( src );
+
+  test.identical( dst.prefixPath, null );
+  test.identical( dst.filePath, { '/a' : '', '/b' : '' } );
+  test.identical( dst.basePath, null );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, { '/b' : '' } );
+  test.identical( src.basePath, null );
+
+  /* */
+
+  test.case = 'src.filePath is relative path ( map ), dst.filePath is map with bools';
+  var dst = provider.recordFilter();
+  dst.filePath = { 'node_modules' : 0, 'package.json' : 0, '*.js' : 1 };
+  var src = provider.recordFilter();
+  src.filePath = { 'dir' : '' };
+  dst.pathsSupplement( src );
+
+  test.identical( dst.prefixPath, null );
+  test.identical( dst.filePath, { 'dir' : '', 'node_modules' : false, 'package.json' : false, '*.js' : true } );
+  test.identical( dst.basePath, null );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, { 'dir' : '' } );
+  test.identical( src.basePath, null );
+
+  /* */
+
+  test.case = 'src.filePath is map with bools';
+  var dst = provider.recordFilter();
+  var src = provider.recordFilter();
+  src.filePath = { 'node_modules' : false, 'package.json' : false, '*.js' : true };
+  dst.pathsSupplement( src );
+
+  test.identical( dst.prefixPath, null );
+  test.identical( dst.filePath, { 'node_modules' : false, 'package.json' : false, '*.js' : true } );
+  test.identical( dst.basePath, null );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, { 'node_modules' : false, 'package.json' : false, '*.js' : true } );
+  test.identical( src.basePath, null );
+
+  test.case = 'src.filePath is relative path ( string ), dst.filePath is relative path ( string )';
+  var dst = provider.recordFilter();
+  dst.filePath = { 'dir' : '' };
+  var src = provider.recordFilter();
+  src.filePath = { 'node_modules' : false, 'package.json' : false, '*.js' : true };
+  dst.pathsSupplement( src );
+
+  test.identical( dst.prefixPath, null );
+  test.identical( dst.filePath, { 'dir' : '', 'node_modules' : false, 'package.json' : false, '*.js' : true } );
+  test.identical( dst.basePath, null );
+  test.identical( src.prefixPath, null );
+  test.identical( src.filePath, { 'node_modules' : false, 'package.json' : false, '*.js' : true } );
+  test.identical( src.basePath, null );
+}
 
 //
 

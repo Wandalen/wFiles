@@ -3206,6 +3206,8 @@ function fileRead_body( o )
 
     if( o.throwing )
     throw _.err( err );
+    else
+    _.errAttend( err );
 
     return null;
   }

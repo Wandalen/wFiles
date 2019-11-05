@@ -135,7 +135,7 @@ function filesReflectTrivial( test )
   {
     test.case = 'specific version';
     providerDst.filesDelete( installPath );
-    let remotePath = 'npm:///wpathfundamentals#0.6.154'
+    let remotePath = 'npm:///wpathbasic#0.7.1'
     return system.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
   })
   .then( ( got ) =>
@@ -144,16 +144,15 @@ function filesReflectTrivial( test )
     let expected =
     [
       'LICENSE',
-      'package.json',
       'README.md',
-      'out',
-      'proto',
       'node_modules',
+      'package.json',
+      'proto'
     ]
     test.identical( files.sort(), expected.sort() );
     var packagePath = providerDst.path.join( installPath, 'package.json' );
     var packageRead = providerDst.fileRead({ filePath : packagePath, encoding : 'json' });
-    test.identical( packageRead.version, '0.6.154' )
+    test.identical( packageRead.version, '0.7.1' )
     return got;
   })
 
@@ -163,7 +162,7 @@ function filesReflectTrivial( test )
   {
     test.case = 'specific tag';
     providerDst.filesDelete( installPath );
-    let remotePath = 'npm:///wpathbasic#latest'
+    let remotePath = 'npm:///wpathbasic@latest'
     return system.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
   })
   .then( ( got ) =>
@@ -181,6 +180,33 @@ function filesReflectTrivial( test )
     var packagePath = providerDst.path.join( installPath, 'package.json' );
     var packageRead = providerDst.fileRead({ filePath : packagePath, encoding : 'json' });
     test.identical( packageRead._requested.fetchSpec, 'latest' )
+    return got;
+  })
+
+  /*  */
+
+  .then( () =>
+  {
+    test.case = 'specific tag';
+    providerDst.filesDelete( installPath );
+    let remotePath = 'npm:///wpathbasic@beta'
+    return system.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
+  })
+  .then( ( got ) =>
+  {
+    let files = providerDst.dirRead( installPath );
+    let expected =
+    [
+      'LICENSE',
+      'package.json',
+      'README.md',
+      'proto',
+      'node_modules',
+    ]
+    test.identical( files.sort(), expected.sort() );
+    var packagePath = providerDst.path.join( installPath, 'package.json' );
+    var packageRead = providerDst.fileRead({ filePath : packagePath, encoding : 'json' });
+    test.identical( packageRead._requested.fetchSpec, 'beta' )
     return got;
   })
 
@@ -206,7 +232,7 @@ function filesReflectTrivial( test )
   {
     test.case = 'wrong package name';
     providerDst.filesDelete( installPath );
-    let remotePath = 'npm:///wpathFundamentals';
+    let remotePath = 'npm:///wpathbasicc';
     return test.shouldThrowErrorSync( () => system.filesReflect( { reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 } ) );
   })
   .then( () =>
@@ -269,7 +295,7 @@ filesReflectTrivial.timeOut = 120000;
 //   {
 //     test.case = 'localPath with hash';
 //     providerDst.filesDelete( installPath );
-//     let remotePath = '/wpathbasic#0.6.154';
+//     let remotePath = '/wpathbasic#0.7.1';
 //     return providerSrc.filesReflect
 //     ({
 //       reflectMap : { [ remotePath ] : installPath },
@@ -292,7 +318,7 @@ filesReflectTrivial.timeOut = 120000;
 //     test.contains( files.sort(), expected.sort() );
 //     var packagePath = providerDst.path.join( installPath, 'package.json' );
 //     var packageRead = providerDst.fileRead({ filePath : packagePath, encoding : 'json' });
-//     test.identical( packageRead.version, '0.6.154' )
+//     test.identical( packageRead.version, '0.7.1' )
 //     return got;
 //   })
 
@@ -302,7 +328,7 @@ filesReflectTrivial.timeOut = 120000;
 //   {
 //     test.case = 'localPath with trailing slash and hash';
 //     providerDst.filesDelete( installPath );
-//     let remotePath = '/wpathbasic/#0.6.154';
+//     let remotePath = '/wpathbasic/#0.7.1';
 //     return providerSrc.filesReflect
 //     ({
 //       reflectMap : { [ remotePath ] : installPath },
@@ -388,7 +414,7 @@ filesReflectTrivial.timeOut = 120000;
 //     test.contains( files.sort(), expected.sort() );
 //     var packagePath = providerDst.path.join( installPath, 'package.json' );
 //     var packageRead = providerDst.fileRead({ filePath : packagePath, encoding : 'json' });
-//     test.identical( packageRead.version, '0.6.154' )
+//     test.identical( packageRead.version, '0.7.1' )
 //     return got;
 //   })
 

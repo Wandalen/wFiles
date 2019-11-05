@@ -8,6 +8,8 @@ if( typeof module !== 'undefined' )
   if( !_.FileProvider )
   require( '../UseMid.s' );
 
+  _.include( 'wNpmTools' )
+
   var Tar;
 
   try
@@ -85,72 +87,7 @@ function init( o )
 function pathParse( remotePath )
 {
   let self = this;
-  let path = self.path;
-  let result = Object.create( null );
-
-  if( _.mapIs( remotePath ) )
-  return remotePath;
-
-  _.assert( arguments.length === 1 );
-  _.assert( _.strIs( remotePath ) );
-  _.assert( path.isGlobal( remotePath ) )
-
-  /* */
-
-  let parsed1 = path.parseConsecutive( remotePath );
-  _.mapExtend( result, parsed1 );
-
-  let p = pathIsolateGlobalAndLocal( parsed1.longPath );
-  result.localVcsPath = p[ 1 ];
-
-  /* */
-
-  let parsed2 = _.mapExtend( null, parsed1 );
-  parsed2.protocol = null;
-  parsed2.hash = null;
-  parsed2.longPath = p[ 0 ];
-  result.remoteVcsPath = path.str( parsed2 );
-
-  /* */
-
-  let parsed3 = _.mapExtend( null, parsed1 );
-  parsed3.longPath = parsed2.longPath;
-  parsed3.protocol = null;
-  parsed3.hash = null;
-  result.longerRemoteVcsPath = path.str( parsed3 );
-  if( parsed1.hash )
-  result.longerRemoteVcsPath += '@' + parsed1.hash;
-
-  /* */
-
-  result.isFixated = self.pathIsFixated( result );
-
-  return result
-
-/*
-
-  remotePath : 'npm:///wColor/out/wColor#0.3.100'
-
-  protocol : 'npm',
-  hash : '0.3.100',
-  longPath : '/wColor/out/wColor',
-  localVcsPath : 'out/wColor',
-  remoteVcsPath : 'wColor',
-  longerRemoteVcsPath : 'wColor@0.3.100'
-
-*/
-
-  /* */
-
-  function pathIsolateGlobalAndLocal( longPath )
-  {
-    let parsed = path.parseConsecutive( longPath );
-    let splits = _.strIsolateLeftOrAll( parsed.longPath, /^\/?\w+\/?/ );
-    parsed.longPath = _.strRemoveEnd( _.strRemoveBegin( splits[ 1 ], '/' ), '/' );
-    let globalPath = path.str( parsed );
-    return [ globalPath, splits[ 2 ] ];
-  }
-
+  return _.npm.pathParse( remotePath );
 }
 
 //
@@ -165,13 +102,7 @@ function pathParse( remotePath )
 function pathIsFixated( filePath )
 {
   let self = this;
-  let path = self.path;
-  let parsed = self.pathParse( filePath );
-
-  if( !parsed.hash )
-  return false;
-
-  return true;
+  return _.npm.pathIsFixated( filePath );
 }
 
 //
@@ -188,33 +119,8 @@ function pathIsFixated( filePath )
 function pathFixate( o )
 {
   let self = this;
-  let path = self.path;
-
-  if( !_.mapIs( o ) )
-  o = { remotePath : o }
-  _.routineOptions( pathFixate, o );
-  _.assert( arguments.length === 1, 'Expects single argument' );
-
-  let parsed = self.pathParse( o.remotePath );
-  let latestVersion = self.versionRemoteLatestRetrive
-  ({
-    remotePath : o.remotePath,
-    verbosity : o.verbosity,
-  });
-
-  let result = path.str
-  ({
-    protocol : parsed.protocol,
-    longPath : parsed.longPath,
-    hash : latestVersion,
-  });
-
-  return result;
+  return _.npm.pathFixate( o );
 }
-
-var defaults = pathFixate.defaults = Object.create( null );
-defaults.remotePath = null;
-defaults.verbosity = 0;
 
 //
 
@@ -230,40 +136,8 @@ defaults.verbosity = 0;
 function versionLocalRetrive( o )
 {
   let self = this;
-  let path = self.path;
-
-  if( !_.mapIs( o ) )
-  o = { localPath : o }
-
-  _.routineOptions( versionLocalRetrive, o );
-  _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( !!self.system );
-
-  if( !self.isRepository( o ) )
-  return '';
-
-  let localProvider = self.system.providerForPath( o.localPath );
-
-  _.assert( localProvider instanceof _.FileProvider.HardDrive || localProvider.originalFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
-
-  let currentVersion;
-  try
-  {
-    let read = localProvider.fileRead({ filePath : path.join( o.localPath, 'package.json' ), encoding : 'json' });
-    currentVersion = read.version;
-  }
-  catch( err )
-  {
-    debugger;
-    return null;
-  }
-
-  return currentVersion || null;
+  return _.npm.versionLocalRetrive( o );
 }
-
-var defaults = versionLocalRetrive.defaults = Object.create( null );
-defaults.localPath = null;
-defaults.verbosity = 0;
 
 //
 
@@ -279,41 +153,8 @@ defaults.verbosity = 0;
 function versionRemoteLatestRetrive( o )
 {
   let self = this;
-  let path = self.path;
-
-  if( !_.mapIs( o ) )
-  o = { remotePath : o }
-
-  _.routineOptions( versionRemoteLatestRetrive, o );
-  _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( !!self.system );
-
-  let parsed = self.pathParse( o.remotePath );
-  let shell = _.process.starter
-  ({
-    verbosity : o.verbosity - 1,
-    outputCollecting : 1,
-    sync : 1,
-    deasync : 0,
-  });
-
-  let got = shell( 'npm show ' + parsed.remoteVcsPath );
-  let latestVersion = /latest.*?:.*?([0-9\.][0-9\.][0-9\.]+)/.exec( got.output );
-
-  if( !latestVersion )
-  {
-    debugger;
-    throw _.err( 'Failed to get information about NPM package', parsed.remoteVcsPath );
-  }
-
-  latestVersion = latestVersion[ 1 ];
-
-  return latestVersion;
+  return _.npm.versionRemoteLatestRetrive( o );
 }
-
-var defaults = versionRemoteLatestRetrive.defaults = Object.create( null );
-defaults.remotePath = null;
-defaults.verbosity = 0;
 
 //
 
@@ -330,25 +171,8 @@ defaults.verbosity = 0;
 function versionRemoteCurrentRetrive( o )
 {
   let self = this;
-  let path = self.path;
-
-  if( !_.mapIs( o ) )
-  o = { remotePath : o }
-
-  _.routineOptions( versionRemoteCurrentRetrive, o );
-  _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( !!self.system );
-
-  let parsed = self.pathParse( o.remotePath );
-  if( parsed.isFixated )
-  return parsed.hash;
-
-  return self.versionRemoteLatestRetrive( o );
+  return _.npm.versionRemoteCurrentRetrive( o );
 }
-
-var defaults = versionRemoteCurrentRetrive.defaults = Object.create( null );
-defaults.remotePath = null;
-defaults.verbosity = 0;
 
 //
 
@@ -365,39 +189,25 @@ defaults.verbosity = 0;
 function isUpToDate( o )
 {
   let self = this;
-  let path = self.path;
-
-  _.routineOptions( isUpToDate, o );
-  _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( !!self.system );
-
-  let parsed = self.pathParse( o.remotePath );
-
-  let currentVersion = self.versionLocalRetrive
-  ({
-    localPath : o.localPath,
-    verbosity : o.verbosity,
-  });
-
-  if( !currentVersion )
-  return false;
-
-  if( parsed.hash === currentVersion )
-  return true;
-
-  let latestVersion = self.versionRemoteLatestRetrive
-  ({
-    remotePath : o.remotePath,
-    verbosity : o.verbosity,
-  });
-
-  return currentVersion === latestVersion;
+  return _.npm.isUpToDate( o );
 }
 
-var defaults = isUpToDate.defaults = Object.create( null );
-defaults.localPath = null;
-defaults.remotePath = null;
-defaults.verbosity = 0;
+//
+
+/**
+ * @summary Returns true if path `o.localPath` contains a npm package.
+ * @param {Object} o Options map.
+ * @param {String} o.localPath Local path to package.
+ * @param {Number} o.verbosity=0 Level of verbosity.
+ * @function hasFiles
+ * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm#
+ */
+
+function hasFiles( o )
+{
+  let self = this;
+  return _.npm.hasFiles( o );
+}
 
 //
 
@@ -413,32 +223,16 @@ defaults.verbosity = 0;
 function isRepository( o )
 {
   let self = this;
-  let path = self.path;
-
-  _.routineOptions( isRepository, o );
-  _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( !!self.system );
-
-  let srcCurrentPath;
-  let localProvider = self.system.providerForPath( o.localPath );
-
-  _.assert( localProvider instanceof _.FileProvider.HardDrive || localProvider.originalFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
-
-  if( !localProvider.fileExists( o.localPath ) )
-  return false;
-
-  // if( !localProvider.isDir( path.join( o.localPath, 'node_modules' ) ) )
-  // return false;
-
-  if( !localProvider.isTerminal( path.join( o.localPath, 'package.json' ) ) )
-  return false;
-
-  return true;
+  return _.npm.isRepository( o );
 }
 
-var defaults = isRepository.defaults = Object.create( null );
-defaults.localPath = null;
-defaults.verbosity = 0;
+//
+
+function hasRemote( o )
+{
+  let self = this;
+  return _.npm.hasRemote( o );
+}
 
 // --
 // etc
@@ -497,6 +291,8 @@ function filesReflectSingle_body( o )
 
   _.sure( _.strIs( srcPath ) );
   _.sure( _.strIs( dstPath ) );
+  _.sure( _.strDefined( parsed.hash ) || _.strDefined( parsed.tag ) );
+  _.sure( !parsed.tag || !parsed.hash, 'Does not expected both hash and tag in srcPath:', _.strQuote( srcPath ) );
   _.assert( localProvider instanceof _.FileProvider.HardDrive || localProvider.originalFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
   _.sure( !o.src || !o.src.hasFiltering(), 'Does not support filtering, but {o.src} is not empty' );
   _.sure( !o.dst || !o.dst.hasFiltering(), 'Does not support filtering, but {o.dst} is not empty' );
@@ -585,7 +381,8 @@ function filesReflectSingle_body( o )
 
     let providerHttp = _.FileProvider.Http();
     let tmpPackagePath = localProvider.path.join( tmpEssentialPath, 'package' );
-    let version = parsed.hash || 'latest';
+    // let version = parsed.hash || 'latest';
+    let version = parsed.hash || parsed.tag;
     let registryUrl = `https://registry.npmjs.org/${parsed.remoteVcsPath}/${version}`;
     let tarballDstPath;
 
@@ -719,11 +516,15 @@ let Proto =
   pathParse,
   pathIsFixated,
   pathFixate,
+
   versionLocalRetrive,
   versionRemoteLatestRetrive,
   versionRemoteCurrentRetrive,
+
   isUpToDate,
+  hasFiles,
   isRepository,
+  hasRemote,
 
   // etc
 

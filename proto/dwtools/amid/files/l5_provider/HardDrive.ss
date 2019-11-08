@@ -1868,7 +1868,7 @@ function _encodingFor( encoding )
   // if( result === 'binary' )
   // throw _.err( 'not tested' );
 
-  _.assert( _.arrayHas( self.KnownNativeEncodings, result ), 'Unknown encoding:', result );
+  _.assert( _.longHas( self.KnownNativeEncodings, result ), 'Unknown encoding:', result );
 
   return result;
 }

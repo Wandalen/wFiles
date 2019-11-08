@@ -1944,7 +1944,7 @@ function filesFind2( test )
       for( var j = 0; j < src.length; j++ )
       {
         if( _.RegexpObject.Test( orderingExclusion[ i ], src[ j ]  ) )
-        if( _.arrayRightIndex( result, src[ j ] ) >= 0 )
+        if( _.longRightIndex( result, src[ j ] ) >= 0 )
         continue;
         else
         result.push( src[ j ] );
@@ -33729,7 +33729,7 @@ function filesDeleteDeletingEmptyDirs( test )
     './empty1'
   ]
   test.will = 'all files should be deleted + empty parent dirs of root';
-  test.is( _.arrayHasAll( deleted, expected ) );
+  test.is( _.longHasAll( deleted, expected ) );
 
   test.case = 'exclude empty dirs, deletingEmptyDirs off'
   provider.filesDelete( routinePath );

@@ -40520,7 +40520,7 @@ function record( test )
   let providerEffective = self.providerEffective || self.provider;
 
   test.is( providerEffective.system === system );
-  test.is( _.arrayHas( _.mapKeys( system.providersWithProtocolMap ), providerEffective.protocol ) );
+  test.is( _.longHas( _.mapKeys( system.providersWithProtocolMap ), providerEffective.protocol ) );
 
   let filePath = test.context.globalFromPreferred( '/record/terminal' );
 

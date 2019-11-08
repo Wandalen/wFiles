@@ -594,7 +594,7 @@ function EncodersGenerate()
   {
     let converter = _.FileReadEncoders[ k ].converter;
     if( converter )
-    if( !_.arrayHas( readConverters, converter ) || !_.arrayHas( converter.ext, k ) )
+    if( !_.longHas( readConverters, converter ) || !_.longHas( converter.ext, k ) )
     delete _.FileReadEncoders[ k ]
   }
 
@@ -602,7 +602,7 @@ function EncodersGenerate()
   {
     let converter = _.FileWriteEncoders[ k ].converter;
     if( converter )
-    if( !_.arrayHas( writeConverters, converter ) || !_.arrayHas( converter.ext, k ) )
+    if( !_.longHas( writeConverters, converter ) || !_.longHas( converter.ext, k ) )
     delete _.FileWriteEncoders[ k ];
   }
 
@@ -742,7 +742,7 @@ function preferredFromGlobalAct( globalPath )
   _.assert( _.strIs( globalPath.longPath ) );
   _.assert
   (
-    !self.protocols || !globalPath.protocol || _.arrayHas( self.protocols, globalPath.protocol ),
+    !self.protocols || !globalPath.protocol || _.longHas( self.protocols, globalPath.protocol ),
     () => 'File provider ' + self.qualifiedName + ' does not support protocol ' + _.strQuote( globalPath.protocol )
   );
 
@@ -955,7 +955,7 @@ function pathResolveSoftLink_body( o )
 
   if( o.results.length )
   {
-    if( _.arrayHas( o.results, result ) )
+    if( _.longHas( o.results, result ) )
     {
       if( !o.allowingCycled )
       return handleError( 'Cycle at:', o.results[ o.results.length - 1 ], 'doesn\`t exist.' );
@@ -1151,7 +1151,7 @@ function pathResolveTextLink_body( o )
 
   if( o.results.length )
   {
-    if( _.arrayHas( o.results, result ) )
+    if( _.longHas( o.results, result ) )
     {
       if( !o.allowingCycled )
       return handleError( 'Cycle at:', o.results[ o.results.length - 1 ], 'doesn\`t exist.' );
@@ -1887,7 +1887,7 @@ function pathResolveLinkTail_body( o )
   {
     let cycle = false;
     if( o2.found.length > 2 )
-    cycle = _.arrayRightIndex( o2.found, o2.found[ o2.found.length-2 ], o2.found.length-3 ) !== -1;
+    cycle = _.longRightIndex( o2.found, o2.found[ o2.found.length-2 ], o2.found.length-3 ) !== -1;
     if( cycle && o.allowingCycled || !cycle && o.allowingMissed )
     {
       result.filePath = o2.result[ o2.result.length-2 ];
@@ -1964,7 +1964,7 @@ function pathResolveLinkTailChain_body( o )
   if( system && system !== self && path.isGlobal( o.filePath ) )
   return system.pathResolveLinkTailChain.body.call( system, o );
 
-  if( _.arrayHas( o.found, o.filePath ) )
+  if( _.longHas( o.found, o.filePath ) )
   {
     if( o.throwing && !o.allowingCycled )
     {
@@ -3487,7 +3487,7 @@ function _fileInterpret_body( o )
       continue;
       if( encoder.forConfig !== undefined && !encoder.forConfig )
       continue;
-      if( _.arrayHas( encoder.exts, ext ) )
+      if( _.longHas( encoder.exts, ext ) )
       {
         o.encoding = e;
         break;
@@ -3807,7 +3807,7 @@ function dirRead_body( o )
   let result;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.arrayHas( [ 'record', 'absolute', 'relative' ], o.outputFormat ) )
+  _.assert( _.longHas( [ 'record', 'absolute', 'relative' ], o.outputFormat ) )
   _.assertRoutineOptions( dirRead_body, arguments );
 
   let filePath = o.filePath;
@@ -6467,7 +6467,7 @@ function _link_functor( fop )
       if( self.path.isGlobal( o.dstPath ) )
       {
         let dstParsed = _.uri.parse( o.dstPath );
-        if( dstParsed.protocol && !_.arrayHas( self.protocols, dstParsed.protocol ) )
+        if( dstParsed.protocol && !_.longHas( self.protocols, dstParsed.protocol ) )
         c.error( 'File provider ' + self.qualifiedName + ' does not support protocol ' + _.strQuote( globalPath.protocol ) );
         o.dstPath = dstParsed.longPath;
       }
@@ -6475,7 +6475,7 @@ function _link_functor( fop )
       if( self.path.isGlobal( o.srcPath ) )
       {
         let srcParsed = _.uri.parse( o.srcPath );
-        if( srcParsed.protocol && _.arrayHas( self.protocols, srcParsed.protocol ) )
+        if( srcParsed.protocol && _.longHas( self.protocols, srcParsed.protocol ) )
         o.srcPath = srcParsed.longPath;
       }
     }

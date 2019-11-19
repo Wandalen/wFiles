@@ -5998,7 +5998,6 @@ function _linkMultiple( o, link )
       linkOptions.allowingMissed = 0; // Vova : hardLink does not allow missing srcPath
       linkOptions.dstPath = record.absolute;
       linkOptions.srcPath = mostLinkedRecord.absolute;
-      debugger;
       return link.call( self, linkOptions );
     }
 

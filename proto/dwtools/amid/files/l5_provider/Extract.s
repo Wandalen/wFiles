@@ -765,7 +765,7 @@ function fileWriteAct( o )
 
     let writeMode = o.writeMode;
 
-    _.assert( _.arrayHas( self.WriteMode, writeMode ), 'Unknown write mode:' + writeMode );
+    _.assert( _.longHas( self.WriteMode, writeMode ), 'Unknown write mode:' + writeMode );
 
     if( descriptor === undefined || self._descriptorIsLink( descriptor ) )
     {
@@ -1793,7 +1793,7 @@ function filesAreHardLinkedAct( o )
 
   _.assert
   (
-    !_.arrayHas( descriptor1[ 0 ].hardLinks, o.filePath[ 1 ] ),
+    !_.longHas( descriptor1[ 0 ].hardLinks, o.filePath[ 1 ] ),
     'Hardlinked files are desynchronized, two hardlinked files should share the same descriptor, but those do not :',
     '\n', o.filePath[ 0 ],
     '\n', o.filePath[ 1 ]

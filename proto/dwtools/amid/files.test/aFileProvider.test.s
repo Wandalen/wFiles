@@ -7995,7 +7995,7 @@ function fileCopyLinks( test )
   provider.softLink( dstPath, srcPathTerminal );
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 0 };
   var dstStatBefore = provider.statRead( dstPath );
-  _.timeOut( 1000 ).deasync();
+  _.timeOut( 1000 ).deasyncWait();
   fileCopy( o );
   var dstStatAfter = provider.statRead( dstPath );
   test.is( dstStatBefore.mtime.getTime() !== dstStatAfter.mtime.getTime() );
@@ -39311,7 +39311,7 @@ function fileStatIs( test )
 
   let originalValue = provider.UsingBigIntForStat;
 
-  try 
+  try
   {
     provider.fileWrite( filePath,filePath );
 
@@ -39327,18 +39327,18 @@ function fileStatIs( test )
     test.is( !_.fileStatIs( null ) );
     test.case = 'instance of _.FileStat'
     test.is( _.fileStatIs( new _.FileStat  ) );
-   
+
     test.case = 'stats without bigint'
     provider.UsingBigIntForStat = false;
     var stat = provider.statResolvedRead( filePath );
     test.is( _.fileStatIs( stat ) );
-  
+
     test.case = 'stats with bigint'
     provider.UsingBigIntForStat = true;
     var stat = provider.statResolvedRead( filePath );
     test.is( _.fileStatIs( stat ) );
-  } 
-  catch( err ) 
+  }
+  catch( err )
   {
     throw err;
   }
@@ -40520,7 +40520,7 @@ function record( test )
   let providerEffective = self.providerEffective || self.provider;
 
   test.is( providerEffective.system === system );
-  test.is( _.arrayHas( _.mapKeys( system.providersWithProtocolMap ), providerEffective.protocol ) );
+  test.is( _.longHas( _.mapKeys( system.providersWithProtocolMap ), providerEffective.protocol ) );
 
   let filePath = test.context.globalFromPreferred( '/record/terminal' );
 

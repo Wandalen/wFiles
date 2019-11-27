@@ -882,7 +882,7 @@ function fileConfigFind_body( o )
   let result = o.outputFormat === 'array' ? [] : Object.create( null );
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.arrayHas( [ 'array', 'map' ], o.outputFormat ) );
+  _.assert( _.longHas( [ 'array', 'map' ], o.outputFormat ) );
 
   let exts = Object.create( null );
 
@@ -994,7 +994,7 @@ function fileConfigRead_body( o )
   let result = null;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.arrayHas( [ 'all', 'any' ], o.many ) );
+  _.assert( _.longHas( [ 'all', 'any' ], o.many ) );
 
   if( !o.found )
   o.found = self.fileConfigFind({ filePath : o.filePath });

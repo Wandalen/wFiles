@@ -778,7 +778,7 @@ function filesFind_body( o )
 
   let time;
   if( o.verbosity >= 1 )
-  time = _.timeNow();
+  time = _.time.now();
 
   if( o.verbosity >= 3 )
   self.logger.log( 'filesFind', _.toStr( o, { levels : 2 } ) );
@@ -1148,7 +1148,7 @@ function filesFind_body( o )
       /* timing */
 
       if( o.verbosity >= 1 )
-      self.logger.log( ' . Found ' + o.result.length + ' files at ' + o.filePath + ' in ', _.timeSpent( time ) );
+      self.logger.log( ' . Found ' + o.result.length + ' files at ' + o.filePath + ' in ', _.time.spent( time ) );
 
       return o.result;
     });
@@ -4031,7 +4031,7 @@ function filesReflect_body( o )
   let time;
 
   if( o.verbosity >= 1 )
-  time = _.timeNow();
+  time = _.time.now();
 
   _.assertRoutineOptions( filesReflect_body, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
@@ -4100,7 +4100,7 @@ function filesReflect_body( o )
     {
       _.assert( o.src.isPaired() );
       let mtr = o.src.moveTextualReport();
-      self.logger.log( ' + Reflect ' + o.result.length + ' files ' + mtr + ' in ' + _.timeSpent( time ) );
+      self.logger.log( ' + Reflect ' + o.result.length + ' files ' + mtr + ' in ' + _.time.spent( time ) );
     }
 
     if( o.outputFormat !== 'record' )
@@ -4394,7 +4394,7 @@ function filesFindSame_body( o )
 
   let time;
   if( o.usingTiming )
-  time = _.timeNow();
+  time = _.time.now();
 
   /* find */
 
@@ -4721,7 +4721,7 @@ function filesDelete_body( o )
   let time;
 
   if( o.verbosity >= 1 )
-  time = _.timeNow();
+  time = _.time.now();
 
   if( !o.sync )
   con = new _.Consequence().take( null );
@@ -4845,7 +4845,7 @@ function filesDelete_body( o )
 
     }
 
-    _.timeOut( 100, () =>
+    _.time.out( 100, () =>
     {
       debugger;
       if( opened )
@@ -4929,7 +4929,7 @@ function filesDelete_body( o )
 
     if( o.verbosity > 1 || ( o.verbosity === 1 && o.result.length ) )
     {
-      let spentTime = _.timeNow() - time;
+      let spentTime = _.time.now() - time;
       let groupsMap = path.group({ keys : o.filter.filePath, vals : o.result });
       let textualReport = path.groupTextualReport
       ({

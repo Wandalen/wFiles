@@ -34468,14 +34468,14 @@ function filesDeleteLatePerformance( test )
       provider.fileWrite( filePath,filePath )
     }
 
-    var t1 = _.timeNow();
+    var t1 = _.time.now();
     provider.filesDelete
     ({
       filePath : routinePath,
       sync : 1,
       late : 1
     })
-    var lateTime = _.timeNow() - t1;
+    var lateTime = _.time.now() - t1;
 
     for( var i = 0; i < files; i++ )
     {
@@ -34483,14 +34483,14 @@ function filesDeleteLatePerformance( test )
       provider.fileWrite( filePath,filePath )
     }
 
-    var t1 = _.timeNow();
+    var t1 = _.time.now();
     provider.filesDelete
     ({
       filePath : routinePath,
       sync : 1,
       late : 0
     })
-    var normalTime = _.timeNow() - t1;
+    var normalTime = _.time.now() - t1;
 
     test.lt( lateTime, normalTime );
     test.ge( normalTime / lateTime, 2 );
@@ -34529,7 +34529,7 @@ function filesDeleteAndAsyncWrite( test )
     cons.push( con );
   }
 
-  _.timeOut( 2, () =>
+  _.time.out( 2, () =>
   {
     test.shouldThrowErrorOfAnyKind( () =>
     {

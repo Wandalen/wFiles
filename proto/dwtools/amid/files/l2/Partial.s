@@ -8439,7 +8439,7 @@ function hardLinkBreak_body( o )
     if( o.sync )
     return self.fileTouch( options );
     else
-    return _.timeOut( 0, () => self.fileTouch( options ) );
+    return _.time.out( 0, () => self.fileTouch( options ) );
   }
 }
 
@@ -8492,7 +8492,7 @@ function softLinkBreak_body( o )
     if( o.sync )
     return self.fileTouch( options );
     else
-    return _.timeOut( 0, () => self.fileTouch( options ) );
+    return _.time.out( 0, () => self.fileTouch( options ) );
   }
 }
 

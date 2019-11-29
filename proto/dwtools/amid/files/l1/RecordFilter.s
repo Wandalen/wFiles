@@ -4359,13 +4359,13 @@ function _applyToRecordTime( record )
     if( record.isActual === true )
     if( filter.notOlderAge !== null )
     {
-      record[ isActualSymbol ] = _.timeNow() - filter.notOlderAge - time <= 0;
+      record[ isActualSymbol ] = _.time.now() - filter.notOlderAge - time <= 0;
     }
 
     if( record.isActual === true )
     if( filter.notNewerAge !== null )
     {
-      record[ isActualSymbol ] = _.timeNow() - filter.notNewerAge - time >= 0;
+      record[ isActualSymbol ] = _.time.now() - filter.notNewerAge - time >= 0;
     }
   }
 

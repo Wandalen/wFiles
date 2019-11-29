@@ -504,7 +504,7 @@ function fileReadAct( o )
 
   if( Config.debug )
   if( !o.sync )
-  stack = _.diagnosticStack([ 2, Infinity ]);
+  stack = _.diagnosticStack([ 1, Infinity ]);
 
   let encoder = fileReadAct.encoders[ o.encoding ];
 

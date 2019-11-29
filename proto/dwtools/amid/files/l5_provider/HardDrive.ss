@@ -1217,7 +1217,7 @@ function fileDeleteAct( o )
     /**/
 
     function handleResult( err )
-    {
+    { 
       if( err )
       con.error( err );
       else
@@ -1303,7 +1303,7 @@ function fileLockAct( o )
   let con = _.Consequence.Try( () =>
   {
     if( !self.fileExistsAct({ filePath : o.filePath }) )
-    throw _.error( 'File:', o.filePath, 'doesn\'t exist.' );
+    throw _.err( 'File:', o.filePath, 'doesn\'t exist.' );
 
     if( lockFileCounterMap[ o.filePath ] )
     if( self.fileExistsAct({ filePath : o.filePath + '.lock' } ) )
@@ -1376,7 +1376,7 @@ function fileUnlockAct( o )
   let con = _.Consequence.Try( () =>
   {
     if( !self.fileExistsAct({ filePath : o.filePath }) )
-    throw _.error( 'File:', o.filePath, 'doesn\'t exist.' );
+    throw _.err( 'File:', o.filePath, 'doesn\'t exist.' );
 
     if( lockFileCounterMap[ o.filePath ] !== undefined )
     {

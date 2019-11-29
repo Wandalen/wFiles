@@ -132,13 +132,13 @@ function testDelaySample( test )
 
   test.case = 'delay test';
 
-  var con = _.timeOut( 1000 );
+  var con = _.time.out( 1000 );
 
   test.identical( 1,1 );
 
   con.finally( function( ){ logger.log( '1000ms delay' ) } );
 
-  con.finally( _.routineSeal( _,_.timeOut,[ 1000 ] ) );
+  con.finally( _.routineSeal( _,_.time.out,[ 1000 ] ) );
 
   con.finally( function( ){ logger.log( '2000ms delay' ) } );
 
@@ -164,7 +164,7 @@ function mustNotThrowError( test )
   // test.case = 'if not passes then appears in output/total counter';
   // test.mustNotThrowError( function()
   // {
-  //   return _.timeOut( 1000,function()
+  //   return _.time.out( 1000,function()
   //   {
   //     throw _.err( 'test' );
   //   });
@@ -3407,7 +3407,7 @@ function fileTouch( test )
     provider.filesDelete( srcPath );
     provider.fileWrite( srcPath, testData );
     var statsBefore = provider.statResolvedRead( srcPath );
-    return _.timeOut( 1000, () =>
+    return _.time.out( 1000, () =>
     {
       provider.fileTouch( srcPath );
       var statsAfter = provider.statResolvedRead( srcPath );
@@ -3428,7 +3428,7 @@ function fileTouch( test )
     provider.fileWrite( srcPath, testData );
     var record = provider.recordFactory().record( srcPath );
     var statsBefore = record.stat;
-    return _.timeOut( 1000, () =>
+    return _.time.out( 1000, () =>
     {
       provider.fileTouch( record );
       var statsAfter = provider.statResolvedRead( srcPath );
@@ -3464,7 +3464,7 @@ function fileTimeSet( test )
 
   test.case = 'path does not exist';
   provider.filesDelete( filePath );
-  var time = _.timeNow();
+  var time = _.time.now();
   test.shouldThrowErrorOfAnyKind( () => provider.fileTimeSet( filePath, time, time ) );
 
   function testDiff( diff )
@@ -7995,7 +7995,7 @@ function fileCopyLinks( test )
   provider.softLink( dstPath, srcPathTerminal );
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 0 };
   var dstStatBefore = provider.statRead( dstPath );
-  _.timeOut( 1000 ).deasync();
+  _.time.out( 1000 ).deasyncWait();
   fileCopy( o );
   var dstStatAfter = provider.statRead( dstPath );
   test.is( dstStatBefore.mtime.getTime() !== dstStatAfter.mtime.getTime() );
@@ -14995,7 +14995,7 @@ function fileDeleteLocked( test )
   test.will = 'can`t be written';
   test.shouldThrowErrorSync( () => provider.fileWrite( terminalPath, terminalPath ) );
   stream.close();
-  return _.timeOut( 1000, () =>
+  return _.time.out( 1000, () =>
   {
     test.will = 'terminal is closed and removed';
     test.is( stream.closed );
@@ -15026,10 +15026,10 @@ function fileDeletePerfomance( test )
     provider.fileWrite( filePath, data )
   }
 
-  var t = _.timeNow();
+  var t = _.time.now();
   for( var i = 0; i < files; i++ )
   provider.fileDeleteAct({ filePath : filePaths[ i ], sync : 1 });
-  var spent = _.timeSpent( t );
+  var spent = _.time.spent( t );
   console.log( spent, 'for', files, 'files' );
 
 }
@@ -15492,7 +15492,7 @@ function fileLockWaitingNotSharingAsync( test )
 
     con.then( () =>
     {
-      t1 = _.timeNow();
+      t1 = _.time.now();
       let con2 = provider.fileLock
       ({
         filePath,
@@ -15507,7 +15507,7 @@ function fileLockWaitingNotSharingAsync( test )
 
     con.finally( ( err, got ) =>
     {
-      let t2 = _.timeNow();
+      let t2 = _.time.now();
       test.le( t2 - t1, 1000 );
 
       test.is( provider.fileIsLocked( filePath ) );
@@ -15545,7 +15545,7 @@ function fileLockWaitingNotSharingAsync( test )
 
     con.then( () =>
     {
-      t1 = _.timeNow();
+      t1 = _.time.now();
       let con2 = provider.fileLock
       ({
         filePath,
@@ -15560,7 +15560,7 @@ function fileLockWaitingNotSharingAsync( test )
 
     con.finally( ( err, got ) =>
     {
-      let t2 = _.timeNow();
+      let t2 = _.time.now();
       test.identical( got, null );
       test.le( t2 - t1, 1000 );
 
@@ -15699,7 +15699,7 @@ function fileLockWaitingSharingAsync( test )
 
     con.then( () =>
     {
-      t1 = _.timeNow();
+      t1 = _.time.now();
       let con2 = provider.fileLock
       ({
         filePath,
@@ -15714,7 +15714,7 @@ function fileLockWaitingSharingAsync( test )
 
     con.finally( ( err, got ) =>
     {
-      let t2 = _.timeNow();
+      let t2 = _.time.now();
       test.ge( t2 - t1, 5000 );
 
       test.is( provider.fileIsLocked( filePath ) );
@@ -15752,7 +15752,7 @@ function fileLockWaitingSharingAsync( test )
 
     con.then( () =>
     {
-      t1 = _.timeNow();
+      t1 = _.time.now();
       let con2 = provider.fileLock
       ({
         filePath,
@@ -15767,7 +15767,7 @@ function fileLockWaitingSharingAsync( test )
 
     con.finally( ( err, got ) =>
     {
-      let t2 = _.timeNow();
+      let t2 = _.time.now();
       test.identical( got, null );
       test.ge( t2 - t1, 5000 );
 
@@ -15806,7 +15806,7 @@ function fileLockWaitingSharingAsync( test )
 
     con.then( () =>
     {
-      t1 = _.timeNow();
+      t1 = _.time.now();
       let con2 = provider.fileLock
       ({
         filePath,
@@ -15817,7 +15817,7 @@ function fileLockWaitingSharingAsync( test )
         waiting : 1
       });
 
-      _.timeOut( 2000, () =>
+      _.time.out( 2000, () =>
       {
         provider.fileUnlock( filePath );
         return null;
@@ -15828,7 +15828,7 @@ function fileLockWaitingSharingAsync( test )
 
     con.finally( ( err, got ) =>
     {
-      let t2 = _.timeNow();
+      let t2 = _.time.now();
 
       test.ge( t2 - t1, 2000 );
       test.lt( t2 - t1, 5000 );
@@ -16099,7 +16099,7 @@ function fileLockNotWaitingSharingAsync( test )
 
     con.then( () =>
     {
-      t1 = _.timeNow();
+      t1 = _.time.now();
       let con2 = provider.fileLock
       ({
         filePath,
@@ -16114,7 +16114,7 @@ function fileLockNotWaitingSharingAsync( test )
 
     con.finally( ( err, got ) =>
     {
-      let t2 = _.timeNow();
+      let t2 = _.time.now();
       test.le( t2 - t1, 1000 );
 
       test.is( provider.fileIsLocked( filePath ) );
@@ -16154,7 +16154,7 @@ function fileLockNotWaitingSharingAsync( test )
 
     con.then( () =>
     {
-      t1 = _.timeNow();
+      t1 = _.time.now();
       let con2 = provider.fileLock
       ({
         filePath,
@@ -16169,7 +16169,7 @@ function fileLockNotWaitingSharingAsync( test )
 
     con.finally( ( err, got ) =>
     {
-      let t2 = _.timeNow();
+      let t2 = _.time.now();
       test.identical( got, true );
       test.le( t2 - t1, 100 );
 
@@ -16439,7 +16439,7 @@ function fileLockNotWaitingNotSharingAsync( test )
 
     con.then( () =>
     {
-      t1 = _.timeNow();
+      t1 = _.time.now();
       let con2 = provider.fileLock
       ({
         filePath,
@@ -16454,7 +16454,7 @@ function fileLockNotWaitingNotSharingAsync( test )
 
     con.finally( ( err, got ) =>
     {
-      let t2 = _.timeNow();
+      let t2 = _.time.now();
       test.le( t2 - t1, 1000 );
 
       test.is( provider.fileIsLocked( filePath ) );
@@ -16492,7 +16492,7 @@ function fileLockNotWaitingNotSharingAsync( test )
 
     con.then( () =>
     {
-      t1 = _.timeNow();
+      t1 = _.time.now();
       let con2 = provider.fileLock
       ({
         filePath,
@@ -16509,7 +16509,7 @@ function fileLockNotWaitingNotSharingAsync( test )
     {
       test.identical( got, null );
 
-      let t2 = _.timeNow();
+      let t2 = _.time.now();
       test.le( t2 - t1, 1000 );
 
       test.is( provider.fileIsLocked( filePath ) );
@@ -21096,7 +21096,7 @@ function fileWriteLinksAsync( test )
 
     var data;
 
-    return _.timeOut( 2000 )
+    return _.time.out( 2000 )
     .finally( () =>
     {
       test.case ='append link file ';
@@ -21163,7 +21163,7 @@ function fileWriteLinksAsync( test )
 
     var data;
 
-    return _.timeOut( 2000 )
+    return _.time.out( 2000 )
     .finally( () =>
     {
       test.case ='append link file ';
@@ -21241,7 +21241,7 @@ function fileWriteLinksAsync( test )
 
     var data;
 
-    return _.timeOut( 2000 )
+    return _.time.out( 2000 )
     .finally( () =>
     {
       test.case ='append link file ';
@@ -21308,7 +21308,7 @@ function fileWriteLinksAsync( test )
 
     var data;
 
-    return _.timeOut( 2000 )
+    return _.time.out( 2000 )
     .finally( () =>
     {
       test.case ='prepend link file ';
@@ -39311,7 +39311,7 @@ function fileStatIs( test )
 
   let originalValue = provider.UsingBigIntForStat;
 
-  try 
+  try
   {
     provider.fileWrite( filePath,filePath );
 
@@ -39327,18 +39327,18 @@ function fileStatIs( test )
     test.is( !_.fileStatIs( null ) );
     test.case = 'instance of _.FileStat'
     test.is( _.fileStatIs( new _.FileStat  ) );
-   
+
     test.case = 'stats without bigint'
     provider.UsingBigIntForStat = false;
     var stat = provider.statResolvedRead( filePath );
     test.is( _.fileStatIs( stat ) );
-  
+
     test.case = 'stats with bigint'
     provider.UsingBigIntForStat = true;
     var stat = provider.statResolvedRead( filePath );
     test.is( _.fileStatIs( stat ) );
-  } 
-  catch( err ) 
+  }
+  catch( err )
   {
     throw err;
   }
@@ -40520,7 +40520,7 @@ function record( test )
   let providerEffective = self.providerEffective || self.provider;
 
   test.is( providerEffective.system === system );
-  test.is( _.arrayHas( _.mapKeys( system.providersWithProtocolMap ), providerEffective.protocol ) );
+  test.is( _.longHas( _.mapKeys( system.providersWithProtocolMap ), providerEffective.protocol ) );
 
   let filePath = test.context.globalFromPreferred( '/record/terminal' );
 

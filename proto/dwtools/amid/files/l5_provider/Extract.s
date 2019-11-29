@@ -357,7 +357,7 @@ function fileReadAct( o )
   return handleError( _.err( 'Can`t read file : ' + _.strQuote( o.filePath ), result ) );
 
   if( self.usingExtraStat )
-  self._fileTimeSetAct({ filePath : o.filePath, atime : _.timeNow() });
+  self._fileTimeSetAct({ filePath : o.filePath, atime : _.time.now() });
 
   return handleEnd( result );
 
@@ -449,7 +449,7 @@ function dirReadAct( o )
   }
   else
   {
-    return _.timeOut( 0, function()
+    return _.time.out( 0, function()
     {
       readDir();
       return result;
@@ -505,7 +505,7 @@ function statReadAct( o )
   }
   else
   {
-    return _.timeOut( 0, function()
+    return _.time.out( 0, function()
     {
       return _statReadAct( o.filePath );
     })
@@ -690,7 +690,7 @@ function fileWriteAct( o )
   }
   else
   {
-    return _.timeOut( 0, () => write() );
+    return _.time.out( 0, () => write() );
   }
 
   /* */
@@ -765,7 +765,7 @@ function fileWriteAct( o )
 
     let writeMode = o.writeMode;
 
-    _.assert( _.arrayHas( self.WriteMode, writeMode ), 'Unknown write mode:' + writeMode );
+    _.assert( _.longHas( self.WriteMode, writeMode ), 'Unknown write mode:' + writeMode );
 
     if( descriptor === undefined || self._descriptorIsLink( descriptor ) )
     {
@@ -958,7 +958,7 @@ function fileDeleteAct( o )
   }
   else
   {
-    return _.timeOut( 0, () => act() );
+    return _.time.out( 0, () => act() );
   }
 
   /* - */
@@ -1028,7 +1028,7 @@ function dirMakeAct( o )
   }
   else
   {
-    return _.timeOut( 0, () => __make() );
+    return _.time.out( 0, () => __make() );
   }
 
   /* - */
@@ -1122,7 +1122,7 @@ function fileLockAct( o )
           if( tries < 0 )
           return con.error( err );
 
-          _.timeOut( 1000, () =>
+          _.time.out( 1000, () =>
           {
             lockTry();
             return null;
@@ -1277,7 +1277,7 @@ function fileRenameAct( o )
   }
   else
   {
-    return _.timeOut( 0, () => rename() );
+    return _.time.out( 0, () => rename() );
   }
 
   /* - */
@@ -1793,7 +1793,7 @@ function filesAreHardLinkedAct( o )
 
   _.assert
   (
-    !_.arrayHas( descriptor1[ 0 ].hardLinks, o.filePath[ 1 ] ),
+    !_.longHas( descriptor1[ 0 ].hardLinks, o.filePath[ 1 ] ),
     'Hardlinked files are desynchronized, two hardlinked files should share the same descriptor, but those do not :',
     '\n', o.filePath[ 0 ],
     '\n', o.filePath[ 1 ]
@@ -1835,7 +1835,7 @@ function statsAdopt()
 
   self.filesFindNominal( '/', ( r ) =>
   {
-    self._fileTimeSetAct({ filePath : r.absolute, atime : r.stat.atime || _.timeNow() });
+    self._fileTimeSetAct({ filePath : r.absolute, atime : r.stat.atime || _.time.now() });
     return r;
   });
 
@@ -2285,7 +2285,7 @@ function _descriptorWrite( o )
 
   let file = self._descriptorRead( o.filePath );
   let willBeCreated = file === undefined;
-  let time = _.timeNow();
+  let time = _.time.now();
 
   let result;
 
@@ -2344,7 +2344,7 @@ _descriptorWrite.defaults =
 function _descriptorTimeUpdate( filePath, created )
 {
   let self = this;
-  let time = _.timeNow();
+  let time = _.time.now();
 
   _.assert( arguments.length === 2 );
 

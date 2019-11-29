@@ -385,18 +385,18 @@ function filesNewer( test )
   test.identical( got, file2 );
 
   test.case = 'one files modified after creation';
-  _.fileProvider.fileTimeSet( file1, _.timeNow() / 1000, _.timeNow() / 1000 );
+  _.fileProvider.fileTimeSet( file1, _.time.now() / 1000, _.time.now() / 1000 );
   var got = _.files.filesNewer( file2, file1 );
   test.identical( got, file1 );
 
   test.case = 'two files modified at the same time';
-  let timeSet = _.timeNow() / 1000;
+  let timeSet = _.time.now() / 1000;
   _.fileProvider.fileTimeSet( file1, timeSet, timeSet );
   _.fileProvider.fileTimeSet( file2, timeSet, timeSet );
   var got = _.files.filesNewer( file1, file2 );
   test.identical( got, null );
 
-  var con = _.timeOut( 50 );
+  var con = _.time.out( 50 );
   con.finally( () =>
   {
     createTestFile( file4, 'test4' );
@@ -465,18 +465,18 @@ function filesOlder( test )
   test.identical( got, file1 );
 
   test.case = 'one files modified after creation';
-  _.fileProvider.fileTimeSet( file1, _.timeNow() / 1000, _.timeNow() / 1000 );
+  _.fileProvider.fileTimeSet( file1, _.time.now() / 1000, _.time.now() / 1000 );
   var got = _.files.filesOlder( file2, file1 );
   test.identical( got, file2 );
 
   test.case = 'two files modified at the same time';
-  let timeSet = _.timeNow() / 1000;
+  let timeSet = _.time.now() / 1000;
   _.fileProvider.fileTimeSet( file1, timeSet, timeSet );
   _.fileProvider.fileTimeSet( file2, timeSet, timeSet );
   var got = _.files.filesOlder( file1, file2 );
   test.identical( got, null );
 
-  var con = _.timeOut( 50 );
+  var con = _.time.out( 50 );
   con.finally( () =>
   {
     createTestFile( file4, 'test4' );
@@ -1097,7 +1097,7 @@ function fileSize( test )
 
   /* asynchronous file creation */
 
-  let fileCreate = _.timeOut( 10, function()
+  let fileCreate = _.time.out( 10, function()
   {
     createTestFile( file3, 'test3, any text' );
     file3 = mergePath( file3 );
@@ -1130,12 +1130,12 @@ function fileSize( test )
   test.equivalent( got, null );
 
   test.case = 'asynchronous file creation test';
-  let check1 = _.timeOut( 0, function()
+  let check1 = _.time.out( 0, function()
   {
     if( Config.debug )
     test.shouldThrowErrorSync( () => _.fileProvider.fileSize( file3 ) );
   });
-  let check2 = _.timeOut( 50, function()
+  let check2 = _.time.out( 50, function()
   {
     var got = _.fileProvider.fileSize( file3 );
     test.equivalent( got, 15 );
@@ -2364,7 +2364,7 @@ function fileSize( test )
 //       con, got;
 //
 //     createTestFile( file1 );
-//     con = _.timeOut( 50);
+//     con = _.time.out( 50);
 //     con.finally( ( ) => createTestFile( file2 ) );
 //     con.finally( ( ) =>
 //     {
@@ -3172,7 +3172,7 @@ function filesAreUpToDate2( test )
 //         return null;
 //       })
 //
-//       con.finally( _.routineSeal( _,_.timeOut,[ 1000 ] ) );
+//       con.finally( _.routineSeal( _,_.time.out,[ 1000 ] ) );
 //       con.finally( _.routineSeal( null,createTestResources,[ tc.createSecond ] ) );
 //       con.finally( _.routineSeal( console,console.log,[ '--> files created second' ] ) );
 //
@@ -3361,13 +3361,13 @@ function testDelaySample( test )
 
   test.description = 'delay test';
 
-  var con = _.timeOut( 1000 );
+  var con = _.time.out( 1000 );
 
   test.identical( 1,1 );
 
   con.finally( function( ){ logger.log( '1000ms delay' ) } );
 
-  con.finally( _.routineSeal( _,_.timeOut,[ 1000 ] ) );
+  con.finally( _.routineSeal( _,_.time.out,[ 1000 ] ) );
 
   con.finally( function( ){ logger.log( '2000ms delay' ) } );
 

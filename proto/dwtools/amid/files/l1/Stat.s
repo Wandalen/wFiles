@@ -71,7 +71,8 @@ function fileStatIs( src )
   return true;
   if( src instanceof _.FileStat )
   return true;
-  if( src instanceof Object.getPrototypeOf( File.Stats ) )
+  let proto = Object.getPrototypeOf( File.Stats );
+  if( proto.name && src instanceof proto )
   return true;
 
   return false;

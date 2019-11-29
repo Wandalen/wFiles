@@ -1029,26 +1029,26 @@ function relative( test )
 //   //
 
 //   // var filePath = _.path.join( _.path.dirTemp(), 'file' );
-//   // var t1 = _.timeNow();
+//   // var t1 = _.time.now();
 //   // var tempPath;
 //   // for( var i = 0; i < 100; i++ )
 //   // {
 //   //   tempPath = _.path.pathDirTempOpen( filePath );
 //   // }
-//   // var t2 = _.timeNow();
+//   // var t2 = _.time.now();
 //   // logger.log( 'pathDirTempOpen:', t2 - t1 )
 //   // _.path.pathDirTempClose( tempPath );
 
 //   //
 
 //   // var filePath = _.path.join( _.path.dirTemp(), 'file' );
-//   // var t1 = _.timeNow();
+//   // var t1 = _.time.now();
 //   // var paths = [];
 //   // for( var i = 0; i < 100; i++ )
 //   // {
 //   //   paths.push( _.path.pathDirTempMake( filePath ) );
 //   // }
-//   // var t2 = _.timeNow();
+//   // var t2 = _.time.now();
 //   // logger.log( 'pathDirTempMake:', t2 - t1 )
 //   // _.each( paths, ( p ) =>
 //   // {

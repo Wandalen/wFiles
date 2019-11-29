@@ -196,7 +196,7 @@ function hasLocally( filePath )
   if( !parsed.protocol )
   return true;
 
-  if( _.arrayHas( provider.protocols, parsed.protocol ) )
+  if( _.longHas( provider.protocols, parsed.protocol ) )
   return true;
 
   return false;

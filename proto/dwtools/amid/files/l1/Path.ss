@@ -812,7 +812,7 @@ function pathDirTempClose( filePath )
     /* if temp path is still in use */
     if( count[ currentTempPath ].length )
     {
-      if( !_.arrayHas( count[ currentTempPath ], filePath ) )
+      if( !_.longHas( count[ currentTempPath ], filePath ) )
       delete cache[ filePath ];
       return;
     }

@@ -183,6 +183,7 @@ function mustNotThrowError( test )
   .ifNoErrorThen( function( got )
   {
     test.identical( got, '123' );
+    return null;
   })
 
 }
@@ -1507,7 +1508,7 @@ function readWriteAsync( test )
   /**/
 
   .ifNoErrorThen( function()
-  {
+  { 
     var con = provider.fileRead
     ({
       filePath : '/invalid path',
@@ -4952,7 +4953,7 @@ function fileCopySync( test )
   /**/
 
   test.mustNotThrowError( function()
-  {
+  { 
     got = provider.fileCopy
     ({
       srcPath,
@@ -14564,7 +14565,7 @@ function fileDeleteAsync( test )
       throwing : 1
     });
 
-    return test.shouldThrowErrorOfAnyKind( con );
+    return test.shouldThrowErrorAsync( con );
   })
 
   /**/
@@ -14706,7 +14707,7 @@ function fileDeleteAsync( test )
       throwing : 1
     });
 
-    return test.shouldThrowErrorOfAnyKind( con )
+    return test.shouldThrowErrorAsync( con )
     .finally( function( err, arg )
     {
       var stat = provider.statResolvedRead( folder );
@@ -14744,7 +14745,7 @@ function fileDeleteAsync( test )
 
     //
 
-    return test.shouldThrowErrorOfAnyKind( function()
+    return test.shouldThrowErrorAsync( function()
     {
       return provider.fileDelete
       ({
@@ -14755,7 +14756,7 @@ function fileDeleteAsync( test )
     })
     .finally( function()
     {
-      return test.shouldThrowErrorOfAnyKind( function()
+      return test.shouldThrowErrorAsync( function()
       {
         provider.filesTree = {};
         return provider.fileDelete
@@ -14768,7 +14769,7 @@ function fileDeleteAsync( test )
     })
     .finally( function()
     {
-      return test.shouldThrowErrorOfAnyKind( function()
+      return test.shouldThrowErrorAsync( function()
       {
         return provider.fileDelete
         ({
@@ -14787,7 +14788,7 @@ function fileDeleteAsync( test )
         sync : 0,
         throwing : 1
       });
-      return test.shouldThrowErrorOfAnyKind( con );
+      return test.shouldThrowErrorAsync( con );
     })
   })
   .finally( () =>
@@ -18700,8 +18701,7 @@ function dirMakeAsync( test )
   {
     test.case = 'synchronous mkdir force';
     provider.filesDelete( filePath );
-    filePath = tes
-    t.context.pathFor( 'written/dirMakeAsync/make_dir/dir1/' );
+    filePath = test.context.pathFor( 'written/dirMakeAsync/make_dir/dir1/' );
     return null;
   })
 
@@ -19173,6 +19173,7 @@ function hashReadAsync( test )
     test.case = 'async filehash';
     data = 'Excepteur sint occaecat cupidatat non proident';
     filePath = test.context.pathFor( 'read/hashReadAsync/src.txt' );
+    return null;
   })
 
   /**/
@@ -19192,6 +19193,7 @@ function hashReadAsync( test )
       md5sum.update( data );
       var expected = md5sum.digest( 'hex' );
       test.identical( got, expected );
+      return null;
     });
   })
 
@@ -19201,6 +19203,7 @@ function hashReadAsync( test )
   {
     test.case = 'invalid path';
     filePath = test.context.pathFor( 'invalid.txt' );
+    return null;
   })
 
   /**/
@@ -19217,6 +19220,7 @@ function hashReadAsync( test )
     {
       var expected = NaN;
       test.identical( got, expected );
+      return null;
     });
   })
 
@@ -19248,6 +19252,7 @@ function hashReadAsync( test )
     {
       var expected = NaN;
       test.identical( got, expected );
+      return null;
     });
   })
 
@@ -20494,7 +20499,8 @@ function fileWriteAsync( test )
   .finally( () =>
   {
     provider.filesDelete( test.context.pathFor( 'write_test' ) )
-    return provider.dirMake( test.context.pathFor( 'write_test' ) )
+    provider.dirMake( test.context.pathFor( 'write_test' ) )
+    return null;
   })
 
   /*writeMode rewrite*/
@@ -22319,6 +22325,7 @@ function softLinkAsync( test )
       dstPath : srcPath,
       sync : 0,
       rewriting : 1,
+      allowingMissed : 1,
       throwing : 1
     })
     .ifNoErrorThen( function( got )
@@ -22429,7 +22436,7 @@ function softLinkAsync( test )
       rewriting : 0,
       throwing : 1
     })
-    return test.shouldThrowErrorOfAnyKind( con )
+    return test.shouldThrowErrorAsync( con )
     .ifNoErrorThen( function( got )
     {
       test.is( !provider.isSoftLink( srcPath ) );

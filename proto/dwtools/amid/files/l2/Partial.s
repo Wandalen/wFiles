@@ -3182,7 +3182,7 @@ function fileRead_body( o )
 
   function handleError( err )
   {
-
+    
     if( encoder && encoder.onError )
     try
     {
@@ -3203,9 +3203,11 @@ function fileRead_body( o )
 
     if( o.onError )
     _.Consequence.Error( o.onError, err );
-
+    
     if( o.throwing )
     throw _.err( err );
+    
+    _.errAttend( err );
 
     return null;
   }
@@ -3751,9 +3753,14 @@ function hashRead_body( o )
   {
     if( err )
     if( o.throwing )
-    throw _.err( 'Cant read hash of', o.filePath, '\n', err );
+    {
+      throw _.err( 'Cant read hash of', o.filePath, '\n', err );
+    }
     else
-    return NaN;
+    { 
+      _.errAttend( err );
+      return NaN;
+    }
     return arg;
   });
 
@@ -3844,9 +3851,14 @@ function dirRead_body( o )
     {
       if( err )
       if( o.throwing )
-      throw _.err( err );
+      {
+        throw _.err( err );
+      }
       else
-      return null;
+      { 
+        _.errAttend( err );
+        return null;
+      }
       if( list )
       return adjust( list );
       return list;
@@ -5417,6 +5429,7 @@ function fileDelete_body( o )
       {
         if( o.throwing )
         throw err;
+        _.errAttend( err );
         return null;
       }
       return arg;
@@ -5706,6 +5719,7 @@ function fileLock_body( o )
 
     if( o.throwing )
     throw err;
+    _.errAttend( err );
     return null;
   })
 
@@ -5759,6 +5773,7 @@ function fileUnlock_body( o )
 
     if( o.throwing )
     throw err;
+    _.errAttend( err );
     return null;
   })
 
@@ -5811,6 +5826,7 @@ function fileIsLocked_body( o )
 
     if( o.throwing )
     throw err;
+    _.errAttend( err );
     return null;
   })
 
@@ -6393,7 +6409,7 @@ function _link_functor( fop )
         }
 
         if( !o.allowingMissed )
-        {
+        { 
           let err = _.err( 'Making link on itself is not allowed. Please enable options {-o.allowingMissed-} if that was your goal.' );
           error( err );
           return true;
@@ -7023,7 +7039,8 @@ function _link_functor( fop )
         return end( c.result );
       }
       else
-      {
+      { 
+        _.errAttend( err );
         return end( null );
       }
     }

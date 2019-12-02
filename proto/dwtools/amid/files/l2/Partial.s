@@ -3299,7 +3299,7 @@ _.assert( _.objectIs( fileRead_body.encoders ) );
 /**
  * This callback is run before fileRead starts read the file. Accepts error as first parameter.
  * If in fileRead passed 'o.returningRead' that is set to true, callback accepts as second parameter object with key 'options'
-    and value that is reference to options object passed into fileRead method, and user has ability to configure that
+    and value that is reference to options map passed into fileRead method, and user has ability to configure that
     before start reading file.
  * @callback fileRead~onBegin
  * @param {Error} err
@@ -4958,7 +4958,7 @@ _.assert( _.objectIs( fileWrite_body.encoders ) );
  * Returns wConsequence instance.
  * By default method writes data synchronously, with replacing file if exists, and if parent dir hierarchy doesn't
    exist, it's created. Method can accept two parameters : string `filePath` and string\buffer `data`, or single
-   argument : options object, with required 'filePath' and 'data' parameters.
+   argument : options map, with required 'filePath' and 'data' parameters.
  * @example
  *
     let data = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
@@ -5110,7 +5110,7 @@ _.assert( _.boolLike( _.toJson.defaults.cloning ) );
  * Returns wConsequence instance.
  * By default method writes data synchronously, with replacing file if exists, and if parent dir hierarchy doesn't
  exist, it's created. Method can accept two parameters : string `filePath` and string\buffer `data`, or single
- argument : options object, with required 'filePath' and 'data' parameters.
+ argument : options map, with required 'filePath' and 'data' parameters.
  * @example
  * let fileProvider = _.FileProvider.Default();
  * let fs = require('fs');
@@ -7433,7 +7433,7 @@ operates.relativeSrcPath = { pathToRead : 1 }
 //
 
 /**
- * Creates copy of a file. Accepts two arguments: ( srcPath ), ( dstPath ) or options object.
+ * Creates copy of a file. Accepts two arguments: ( srcPath ), ( dstPath ) or options map.
  * Returns true if operation is finished successfully or if source and destination paths are equal.
  * Otherwise throws error with corresponding message or returns false, it depends on ( o.throwing ) property.
  * In asynchronously mode returns wConsequence instance.
@@ -7460,7 +7460,7 @@ operates.relativeSrcPath = { pathToRead : 1 }
      console.log( stats ); // returns Stats object
    });
 
- * @param {Object} o - options object.
+ * @param {Object} o - options map.
  * @param {string} o.srcPath path to source file.
  * @param {string} o.dstPath path where to copy source file.
  * @param {boolean} [o.sync=true] If set to false, method will copy file asynchronously.
@@ -7470,7 +7470,7 @@ operates.relativeSrcPath = { pathToRead : 1 }
  * @returns {wConsequence}
  * @throws {Error} If missed argument, or pass more than 2.
  * @throws {Error} If dstPath or dstPath is not string.
- * @throws {Error} If options object has unexpected property.
+ * @throws {Error} If options map has unexpected property.
  * @throws {Error} If ( o.rewriting ) is false and destination path exists.
  * @throws {Error} If path to source file( srcPath ) not exists and ( o.throwing ) is enabled, otherwise returns false.
  * @method fileCopy

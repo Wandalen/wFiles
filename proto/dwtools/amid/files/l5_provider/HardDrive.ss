@@ -907,7 +907,7 @@ _.routineExtend( fileExistsAct, Parent.prototype.fileExistsAct );
  * Returns wConsequence instance.
  * By default method writes data synchronously, with replacing file if exists, and if parent dir hierarchy doesn't
    exist, it's created. Method can accept two parameters : string `filePath` and string\buffer `data`, or single
-   argument : options object, with required 'filePath' and 'data' parameters.
+   argument : options map, with required 'filePath' and 'data' parameters.
  * @example
  *
     let data = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
@@ -1085,7 +1085,7 @@ _.routineExtend( fileTimeSetAct, Parent.prototype.fileTimeSetAct );
 //
 
 /**
- * Delete file of directory. Accepts path string or options object. Returns wConsequence instance.
+ * Delete file of directory. Accepts path string or options map. Returns wConsequence instance.
  * @example
  * let StandardFile = require( 'fs' );
 
@@ -1109,7 +1109,7 @@ _.routineExtend( fileTimeSetAct, Parent.prototype.fileTimeSetAct );
      console.log( StandardFile.existsSync( path ) ); // false (file does not exist)
    } );
 
- * @param {string|Object} o - options object.
+ * @param {string|Object} o - options map.
  * @param {string} o.filePath path to file/directory for deleting.
  * @param {boolean} [o.force=false] if sets to true, method remove file, or directory, even if directory has
     content. Else when directory to remove is not empty, wConsequence returned by method, will rejected with error.
@@ -1117,7 +1117,7 @@ _.routineExtend( fileTimeSetAct, Parent.prototype.fileTimeSetAct );
  * @returns {wConsequence}
  * @throws {Error} If missed argument, or pass more than 1.
  * @throws {Error} If filePath is not string.
- * @throws {Error} If options object has unexpected property.
+ * @throws {Error} If options map has unexpected property.
  * @function fileDeleteAct
  * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHardDrive#
  */

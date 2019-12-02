@@ -8724,7 +8724,7 @@ function filesFindSimplifyGlob( test )
   test.identical( o.withActual, true );
   test.identical( o.withTransient, false );
 
-  test.setsAreIdentical( _.mapKeys( o.filter.formedMasksMap ), [ abs( 'dir1' ) ] );
+  test.is( _.arraySetIdentical( _.mapKeys( o.filter.formedMasksMap ), [ abs( 'dir1' ) ] ) );
   test.identical( o.filter.formedMasksMap[ abs( 'dir1' ) ].maskAll.includeAll.length, 0 );
   test.identical( o.filter.formedMasksMap[ abs( 'dir1' ) ].maskAll.includeAny.length, 1 );
   test.identical( o.filter.formed, 5 );

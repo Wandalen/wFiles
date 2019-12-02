@@ -14745,8 +14745,8 @@ function fileDeleteAsync( test )
 
     //
 
-    return test.shouldThrowErrorAsync( function()
-    {
+    return test.shouldThrowErrorOfAnyKind( function()
+    { 
       return provider.fileDelete
       ({
         filePath : '.',
@@ -14769,7 +14769,7 @@ function fileDeleteAsync( test )
     })
     .finally( function()
     {
-      return test.shouldThrowErrorAsync( function()
+      return test.shouldThrowErrorOfAnyKind( function()
       {
         return provider.fileDelete
         ({

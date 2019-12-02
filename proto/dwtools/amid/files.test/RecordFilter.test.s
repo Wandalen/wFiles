@@ -3318,9 +3318,7 @@ function prefixesRelative( test )
   test.identical( dst.prefixPath, null );
   test.is( src.filePath === dst.filePath );
 
-  debugger;
   dst.prefixesRelative();
-  debugger;
   test.identical( src.formed, 1 );
   test.identical( src.filePath, { '.' : '' } );
   test.identical( src.prefixPath, '.' );

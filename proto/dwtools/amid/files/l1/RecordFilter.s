@@ -1292,9 +1292,9 @@ function prefixesRelative( prefixPath )
     if( filter.filePath )
     {
       if( filter.src )
-      filter.filePath = path.filterInplace( filter.filePath, relative_functor( 'dst' ) );
+      filter.filePath = path.filterDstInplace( filter.filePath, relative_functor( 'dst' ) );
       else if( filter.dst )
-      filter.filePath = path.filterInplace( filter.filePath, relative_functor( 'src' ) );
+      filter.filePath = path.filterSrcInplace( filter.filePath, relative_functor( 'src' ) );
       else
       filter.filePath = path.filterInplace( filter.filePath, relative_functor() );
     }

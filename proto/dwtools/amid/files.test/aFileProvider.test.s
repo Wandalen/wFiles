@@ -1508,7 +1508,7 @@ function readWriteAsync( test )
   /**/
 
   .ifNoErrorThen( function()
-  { 
+  {
     var con = provider.fileRead
     ({
       filePath : '/invalid path',
@@ -4953,7 +4953,7 @@ function fileCopySync( test )
   /**/
 
   test.mustNotThrowError( function()
-  { 
+  {
     got = provider.fileCopy
     ({
       srcPath,
@@ -14746,7 +14746,7 @@ function fileDeleteAsync( test )
     //
 
     return test.shouldThrowErrorOfAnyKind( function()
-    { 
+    {
       return provider.fileDelete
       ({
         filePath : '.',
@@ -40531,11 +40531,17 @@ function record( test )
   test.is( providerEffective.system === system );
   test.is( _.longHas( _.mapKeys( system.providersWithProtocolMap ), providerEffective.protocol ) );
 
-  let filePath = test.context.globalFromPreferred( '/record/terminal' );
-
+  var filePath = '/record/terminal';
+  var expected = filePath;
   var record = self.provider.record( filePath );
+  test.identical( record.absolute, expected );
 
-  test.identical( record.absolute, filePath );
+  var filePath = test.context.globalFromPreferred( '/record/terminal' );
+  var expected = filePath;
+  debugger;
+  var record = self.provider.record( filePath );
+  test.identical( record.absolute, expected );
+  debugger;
 
 }
 

@@ -52,10 +52,8 @@ function init( o )
   record._filterReset();
   record._statReset();
 
-  // record[ isTransientSymbol ] = null;
-  // record[ isActualSymbol ] = null;
-  // record[ statSymbol ] = 0;
-  // record[ realSymbol ] = 0;
+  if( o.input === 'file:///record/terminal' )
+  debugger;
 
   record.copy( o );
 
@@ -243,14 +241,14 @@ function _pathsForm()
 
   /* relative path */
 
-  record[ relativeSymbol ] = fileProvider.path.relative( f.basePath, inputPath );
+  record[ relativeSymbol ] = path.relative( f.basePath, inputPath );
   _.assert( record.relative[ 0 ] !== '/' );
   record[ relativeSymbol ] = path.dot( record.relative );
 
   /* absolute path */
 
   if( f.basePath )
-  record[ absoluteSymbol ] = fileProvider.path.resolve( f.basePath, record.relative );
+  record[ absoluteSymbol ] = path.resolve( f.basePath, record.relative );
   else
   record[ absoluteSymbol ] = inputPath;
 
@@ -716,7 +714,7 @@ function _absoluteGlobalGet()
   let record = this;
   let f = record.factory;
   let fileProvider = f.effectiveProvider;
-  return fileProvider.path.globalFromPreferred( record.absolute );
+  return fileProvider.path.globalFromPreferred( record.absolute ); /* xxx qqq : test is fileProvider.path proper path namespace */
 }
 
 //
@@ -726,7 +724,7 @@ function _realGlobalGet()
   let record = this;
   let f = record.factory;
   let fileProvider = f.effectiveProvider;
-  return fileProvider.path.globalFromPreferred( record.real );
+  return fileProvider.path.globalFromPreferred( record.real ); /* xxx qqq : test is fileProvider.path proper path namespace */
 }
 
 //

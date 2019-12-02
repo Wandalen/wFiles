@@ -40556,6 +40556,12 @@ function recordStat( test )
   test.is( providerEffective.system === system );
   test.is( _.longHas( _.mapKeys( system.providersWithProtocolMap ), providerEffective.protocol ) );
   
+  /* 
+    Problem with resolving of global path on line( Record.s ):
+    record[ realSymbol ] = f.effectiveProvider.pathResolveLinkFull( o2 ).filePath;
+    pathResolveLinkFull expects absolute path, but gets global path
+   */
+  
   let filePath = test.context.pathFor( 'written/recordStat/file' )
   var record = system.recordFactory({ allowingMissed : 1 }).record( filePath );
   test.identical( record.stat, null );

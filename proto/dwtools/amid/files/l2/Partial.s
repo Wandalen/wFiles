@@ -6424,7 +6424,9 @@ function _link_functor( fop )
     function verify2Async()
     {
       c.con.then( () =>
-      {
+      { 
+        if( c.ended )
+        return c.end();
         return verify2()
       });
     }
@@ -6456,7 +6458,7 @@ function _link_functor( fop )
 
       if( !o.rewriting )
       throw _.err( 'Destination file ' + _.strQuote( o2.dstPath ) + ' exist and rewriting is off.' );
-
+      
       return self.statRead
       ({
         filePath : o2.dstPath,
@@ -6500,7 +6502,9 @@ function _link_functor( fop )
     function pathsLocalizeAsync()
     {
       c.con.then( () =>
-      {
+      { 
+        if( c.ended )
+        return c.end();
         pathsLocalizeSync();
         return null;
       });
@@ -6556,7 +6560,9 @@ function _link_functor( fop )
     function pathResolveAsync()
     {
       c.con.then( () =>
-      {
+      { 
+        if( c.ended )
+        return c.end();
         pathResolve();
         return true;
       })
@@ -6661,7 +6667,10 @@ function _link_functor( fop )
     {
 
       c.con.then( () =>
-      {
+      { 
+        if( c.ended )
+        return c.end();
+        
         _.assert( path.isAbsolute( o.srcPath ) );
         _.assert( path.isAbsolute( o.dstPath ) );
 
@@ -6692,7 +6701,10 @@ function _link_functor( fop )
       /* */
 
       c.con.then( () =>
-      {
+      { 
+        if( c.ended )
+        return c.end();
+        
         if( o.resolvingSrcSoftLink || ( o.resolvingSrcTextLink && self.usingTextLink ) )
         {
           let o2 =

@@ -22418,7 +22418,7 @@ function softLinkAsync( test )
     })
     .ifNoErrorThen( function( got )
     {
-      test.identical( got, false );
+      test.identical( got, null );
       test.is( !provider.isSoftLink( srcPath ) );
       return null;
     })
@@ -22516,6 +22516,8 @@ function softLinkAsync( test )
   .finally( () =>
   {
     test.open( 'allowingMissed' );
+    provider.filesDelete( routinePath );
+    provider.dirMakeForFile( srcPath );
     return null;
   })
 

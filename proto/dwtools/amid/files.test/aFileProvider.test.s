@@ -40538,10 +40538,8 @@ function record( test )
 
   var filePath = test.context.globalFromPreferred( '/record/terminal' );
   var expected = filePath;
-  debugger;
   var record = self.provider.record( filePath );
   test.identical( record.absolute, expected );
-  debugger;
 
 }
 

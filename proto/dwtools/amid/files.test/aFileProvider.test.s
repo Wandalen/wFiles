@@ -40545,6 +40545,22 @@ function record( test )
 
 }
 
+//
+
+function recordStat( test )
+{
+  let self = this;
+  let system = self.system || self.provider;
+  let providerEffective = self.providerEffective || self.provider;
+
+  test.is( providerEffective.system === system );
+  test.is( _.longHas( _.mapKeys( system.providersWithProtocolMap ), providerEffective.protocol ) );
+  
+  let filePath = test.context.pathFor( 'written/recordStat/file' )
+  var record = system.recordFactory({ allowingMissed : 1 }).record( filePath );
+  test.identical( record.stat, null );
+}
+
 // --
 // path
 // --
@@ -48350,6 +48366,7 @@ var Self =
     // record
 
     record,
+    recordStat,
 
     // path
 

@@ -5949,11 +5949,17 @@ function _linkMultiple( o, link )
     o.throwing = 1;
 
     function handler( err, got )
-    {
-      if( err && !_.definedIs( result.err ) )
-      result.err = err;
+    { 
+      if( !err )
+      {
+        result.got &= got;
+      }
       else
-      result.got &= got;
+      {
+        _.errAttend( err );
+        if( !_.definedIs( result.err ) )
+        result.err = err;
+      }
     }
 
     for( let p = 0 ; p < records.length ; p++ )
@@ -6269,10 +6275,10 @@ function _link_functor( fop )
       });
 
       con.catch( ( err ) =>
-      {
+      { 
         return c.tempRenameRevert()
         .finally( () =>
-        {
+        { 
           return error( _.err( 'Cant', entryMethodName, o.dstPath, '<-', o.srcPath, '\n', err ) );
         })
       })
@@ -6455,7 +6461,7 @@ function _link_functor( fop )
 
     function verifyDstAsync()
     {
-
+      
       if( !o.rewriting )
       throw _.err( 'Destination file ' + _.strQuote( o2.dstPath ) + ' exist and rewriting is off.' );
       

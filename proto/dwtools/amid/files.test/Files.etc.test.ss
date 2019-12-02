@@ -1094,83 +1094,102 @@ function fileSize( test )
 
   file1 = _.fileProvider.path.nativize( file1 );
   file2 = _.fileProvider.path.nativize( file2 );
-
+  
+  let ready = new _.Consequence().take( null )
+  
   /* asynchronous file creation */
-
-  let fileCreate = _.time.out( 10, function()
-  {
-    createTestFile( file3, 'test3, any text' );
-    file3 = mergePath( file3 );
-    file3 = _.fileProvider.path.nativize( file3 );
-  });
-
+  
+  ready
+  
   /* - */
-
-  test.case = 'string path in arg';
-  var got = _.fileProvider.fileSize( file1 );
-  test.equivalent( got, 15 );
-
-  test.case = 'map in arg';
-  var got = _.fileProvider.fileSize( { filePath : file2 } );
-  test.equivalent( got, 5 );
-
-  test.case = 'file is dir';
-  var got = _.fileProvider.fileSize( { filePath : _.path.current() } );
-  test.equivalent( got, 0 );
-
-  /* - */
-
-  test.case = 'throwing : 0, stat === null';
-  var map =
+  
+  .then( () => 
   {
-    filePath : '/string',
-    throwing : 0,
-  }
-  var got = _.fileProvider.fileSize( map );
-  test.equivalent( got, null );
-
-  test.case = 'asynchronous file creation test';
-  let check1 = _.time.out( 0, function()
-  {
-    if( Config.debug )
-    test.shouldThrowErrorSync( () => _.fileProvider.fileSize( file3 ) );
-  });
-  let check2 = _.time.out( 50, function()
-  {
-    var got = _.fileProvider.fileSize( file3 );
+    test.case = 'string path in arg';
+    var got = _.fileProvider.fileSize( file1 );
     test.equivalent( got, 15 );
-  });
+  
+    test.case = 'map in arg';
+    var got = _.fileProvider.fileSize( { filePath : file2 } );
+    test.equivalent( got, 5 );
+  
+    test.case = 'file is dir';
+    var got = _.fileProvider.fileSize( { filePath : _.path.current() } );
+    test.equivalent( got, 0 );
+    
+    return null;
+  })
 
   /* - */
-
-  if( !Config.debug )
-  return;
-
-  test.case = 'without arguments';
-  test.shouldThrowErrorSync( () => _.fileProvider.fileSize() );
-
-  test.case = 'extra arguments';
-  test.shouldThrowErrorSync( () => _.fileProvider.fileSize( file1, file1 ) );
-
-  test.case = 'throwing : 1, stats === null';
-  var map =
+  
+  .then( () => 
   {
-    filePath : '/string',
-    throwing : 1,
-  }
-  test.shouldThrowErrorSync( () => _.fileProvider.fileSize( map ) );
+    test.case = 'throwing : 0, stat === null';
+    var map =
+    {
+      filePath : '/string',
+      throwing : 0,
+    }
+    var got = _.fileProvider.fileSize( map );
+    test.equivalent( got, null );
+    return null;
+  })
+  
+  .then( () => 
+  {  
+    let filePath = mergePath( file3 );
+      
+    let fileCreate = _.time.out( 100, function()
+    {
+      createTestFile( file3, 'test3, any text' );
+    });
+  
+    test.case = 'asynchronous file creation test';
+    let check1 = _.time.out( 0, function()
+    { 
+      if( Config.debug )
+      test.shouldThrowErrorSync( () => _.fileProvider.fileSize({ filePath, throwing : 1 }) );
+    });
+    let check2 = _.time.out( 100, function()
+    {
+      var got = _.fileProvider.fileSize( filePath );
+      test.equivalent( got, 15 );
+    });
+    return _.Consequence.And( [ check1,check2 ] );
+  })
+  
+  return ready;
+  
+  // /* - */
 
-  test.case = 'wrong argument';
-  test.shouldThrowErrorSync( () => _.fileProvider.fileSize( 1 ) );
-  test.shouldThrowErrorSync( () => _.fileProvider.fileSize( [ file1 ] ) );
+  // if( !Config.debug )
+  // return;
 
-  test.case = 'unnecessary field in map';
-  var map =
-  {
-    filePath : file1,
-    onUp : () => 0,
-  }
-  test.shouldThrowErrorSync( () => _.fileProvider.fileSize( map ) );
+  // test.case = 'without arguments';
+  // test.shouldThrowErrorSync( () => _.fileProvider.fileSize() );
+
+  // test.case = 'extra arguments';
+  // test.shouldThrowErrorSync( () => _.fileProvider.fileSize( file1, file1 ) );
+
+  // test.case = 'throwing : 1, stats === null';
+  // var map =
+  // {
+  //   filePath : '/string',
+  //   throwing : 1,
+  // }
+  // test.shouldThrowErrorSync( () => _.fileProvider.fileSize( map ) );
+
+  // test.case = 'wrong argument';
+  // test.shouldThrowErrorSync( () => _.fileProvider.fileSize( 1 ) );
+  // test.shouldThrowErrorSync( () => _.fileProvider.fileSize( [ file1 ] ) );
+
+  // test.case = 'unnecessary field in map';
+  // var map =
+  // {
+  //   filePath : file1,
+  //   onUp : () => 0,
+  // }
+  // test.shouldThrowErrorSync( () => _.fileProvider.fileSize( map ) );
 }
 
 //

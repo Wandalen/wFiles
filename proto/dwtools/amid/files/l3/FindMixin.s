@@ -934,6 +934,7 @@ function filesFind_body( o )
     .catch( ( err ) =>
     {
       debugger;
+      _.errAttend( err );
       throw _.err( err );
     });
 

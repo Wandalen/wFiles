@@ -14745,8 +14745,8 @@ function fileDeleteAsync( test )
 
     //
 
-    return test.shouldThrowErrorAsync( function()
-    {
+    return test.shouldThrowErrorOfAnyKind( function()
+    { 
       return provider.fileDelete
       ({
         filePath : '.',
@@ -14769,7 +14769,7 @@ function fileDeleteAsync( test )
     })
     .finally( function()
     {
-      return test.shouldThrowErrorAsync( function()
+      return test.shouldThrowErrorOfAnyKind( function()
       {
         return provider.fileDelete
         ({
@@ -22418,7 +22418,7 @@ function softLinkAsync( test )
     })
     .ifNoErrorThen( function( got )
     {
-      test.identical( got, false );
+      test.identical( got, null );
       test.is( !provider.isSoftLink( srcPath ) );
       return null;
     })
@@ -22516,6 +22516,8 @@ function softLinkAsync( test )
   .finally( () =>
   {
     test.open( 'allowingMissed' );
+    provider.filesDelete( routinePath );
+    provider.dirMakeForFile( srcPath );
     return null;
   })
 

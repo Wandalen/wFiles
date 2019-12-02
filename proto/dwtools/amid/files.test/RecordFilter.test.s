@@ -3508,11 +3508,11 @@ function prefixesRelative( test )
 
   dst.prefixesRelative();
   test.identical( src.formed, 1 );
-  test.identical( src.filePath, { '' : '/a/b' } );
+  test.identical( src.filePath, { '' : '.' } );
   test.identical( src.prefixPath, null );
   test.identical( src.basePath, null );
   test.identical( dst.formed, 1 );
-  test.identical( dst.filePath, { '' : '/a/b' } );
+  test.identical( dst.filePath, { '' : '.' } );
   test.identical( dst.prefixPath, '/a/b' );
   test.identical( dst.basePath, '.' );
   test.is( src.filePath === dst.filePath );

@@ -40553,18 +40553,21 @@ function recordStat( test )
 
   test.is( providerEffective.system === system );
   test.is( _.longHas( _.mapKeys( system.providersWithProtocolMap ), providerEffective.protocol ) );
-  
-  let filePath = test.context.pathFor( 'written/recordStat/file' )
+
+  let filePath = test.context.pathFor( 'written/recordStat/file' );
+  debugger;
   var record = system.recordFactory({ allowingMissed : 1 }).record( filePath );
+  debugger;
   test.identical( record.stat, null );
+
 }
-recordStat.description = 
-` 
+
+recordStat.description =
+`
   FileRecord instance for non existing file is created using global path and factory option allowingMissed.
   First request of record.stat property returns null.
   No errors are thrown on path resolving stage.
 `
-
 
 // --
 // path

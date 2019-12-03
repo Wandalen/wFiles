@@ -6265,6 +6265,8 @@ function fileCopyLinksSync( test )
   debugger; return; xxx
 }
 
+fileCopyLinksSync.timeOut = 15000;
+
 //
 
 function fileCopyAsync( test )
@@ -8896,6 +8898,8 @@ function fileCopySoftLinkExtended( test )
 
   test.close( 'src soft link to missing, dst terminal' );
 }
+
+fileCopySoftLinkExtended.timeOut = 15000;
 
 //
 
@@ -13026,6 +13030,8 @@ function fileRenameSoftLinkResolving( test )
 
   test.close( 'links to same file' );
 }
+
+fileRenameSoftLinkResolving.timeOut = 15000;
 
 //
 
@@ -27949,6 +27955,8 @@ function textLinkRelativeTextLinking( test )
 
 }
 
+textLinkRelativeTextLinking.timeOut = 15000;
+
 //
 
 function hardLinkSync( test )
@@ -32233,6 +32241,8 @@ function fileExchangeAsync( test )
 
 }
 
+fileExchangeAsync.timeOut = 15000;
+
 //
 
 function hardLinkSoftLinkResolving( test )
@@ -33980,6 +33990,8 @@ function hardLinkRelativeTextLinking( test )
 
   provider.fieldPop( 'usingTextLink', 1 );
 }
+
+hardLinkRelativeTextLinking.timeOut = 15000;
 
 //
 
@@ -36309,6 +36321,8 @@ function isSoftLink( test )
   provider.fieldPop( 'usingTextLink', 1 );
 
 }
+
+isSoftLink.timeOut = 15000;
 
 //
 
@@ -45206,6 +45220,8 @@ function pathResolveTextLink( test )
   test.shouldThrowErrorOfAnyKind( () => provider.pathResolveTextLink( { filePath : NaN } ) );
 
 }
+
+pathResolveTextLink.timeOut = 15000;
 
 //
 

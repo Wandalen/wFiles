@@ -28,9 +28,12 @@ function onSuiteBegin()
   this.isBrowser = typeof module === 'undefined';
 
   if( !this.isBrowser )
-  this.suitePath = _.path.pathDirTempOpen( _.path.join( __dirname, '../..' ), 'Path' );
+  { 
+    this.suiteTempPath = _.path.pathDirTempOpen( _.path.join( __dirname, '../..' ), 'Path' );
+    this.assetsOriginalSuitePath = _.path.join( __dirname, '_asset' );
+  }
   else
-  this.suitePath = _.path.current();
+  this.suiteTempPath = _.path.current();
 }
 
 //
@@ -39,8 +42,8 @@ function onSuiteEnd()
 {
   if( !this.isBrowser )
   {
-    _.assert( _.strHas( this.suitePath, '.tmp' ), this.suitePath );
-    _.path.pathDirTempClose( this.suitePath );
+    _.assert( _.strHas( this.suiteTempPath, '.tmp' ), this.suiteTempPath );
+    _.path.pathDirTempClose( this.suiteTempPath );
   }
 }
 
@@ -59,7 +62,7 @@ function createTestsDirectory( path, rmIfExists )
 
 function createInTD( path )
 {
-  return this.createTestsDirectory( _.path.join( this.suitePath, path ) );
+  return this.createTestsDirectory( _.path.join( this.suiteTempPath, path ) );
 }
 
 //
@@ -70,7 +73,7 @@ function createTestFile( path, data, decoding )
   data = path;
 
   var dataToWrite = ( decoding === 'json' ) ? JSON.stringify( data ) : data;
-  _.fileProvider.fileWrite({ filePath : _.path.join( this.suitePath, path ), data : dataToWrite })
+  _.fileProvider.fileWrite({ filePath : _.path.join( this.suiteTempPath, path ), data : dataToWrite })
 }
 
 //
@@ -105,8 +108,8 @@ function createTestSymLink( path, target, type, data )
   }
   else throw new Error( 'unexpected type' );
 
-  path = _.path.join( this.suitePath, path );
-  origin = _.path.resolve( _.path.join( this.suitePath, origin ) );
+  path = _.path.join( this.suiteTempPath, path );
+  origin = _.path.resolve( _.path.join( this.suiteTempPath, origin ) );
 
   if( _.fileProvider.statResolvedRead( path ) )
   _.fileProvider.filesDelete( path );
@@ -184,12 +187,12 @@ function from( test )
   var str1 = '/foo/bar/baz',
       str2 = 'tmp/get/test.txt',
     expected = str1,
-    expected2 = _.path.resolve( _.path.join( test.context.suitePath,str2 ) ),
+    expected2 = _.path.resolve( _.path.join( test.context.suiteTempPath,str2 ) ),
     got,
     fileRecord;
 
   test.context.createTestFile( str2 );
-  fileRecord = _.fileProvider.recordFactory().record( _.path.resolve( _.path.join( test.context.suitePath,str2 ) ) );
+  fileRecord = _.fileProvider.recordFactory().record( _.path.resolve( _.path.join( test.context.suiteTempPath,str2 ) ) );
 
   test.case = 'string argument';
   got = _.path.from( str1 );
@@ -232,9 +235,9 @@ function forCopy( test )
       srcPath : null
     },
     path1 = 'tmp/forCopy/test_original.txt',
-    expected1 = { path :  _.path.resolve( _.path.join( test.context.suitePath,'tmp/forCopy/test_original-copy.txt' ) ), error : false },
+    expected1 = { path :  _.path.resolve( _.path.join( test.context.suiteTempPath,'tmp/forCopy/test_original-copy.txt' ) ), error : false },
     path2 = 'tmp/forCopy/test_original2',
-    expected2 = { path : _.path.resolve( _.path.join( test.context.suitePath,'tmp/forCopy/test_original2-backup-2' ) ), error : false },
+    expected2 = { path : _.path.resolve( _.path.join( test.context.suiteTempPath,'tmp/forCopy/test_original2-backup-2' ) ), error : false },
     got = { path : void 0, error : void 0 };
 
   test.context.createTestFile( path1 );
@@ -243,7 +246,7 @@ function forCopy( test )
   test.case = 'simple existing file path';
   try
   {
-    got.path = _.path.forCopy( { filePath : _.path.resolve( _.path.join( test.context.suitePath,path1 ) ) } );
+    got.path = _.path.forCopy( { filePath : _.path.resolve( _.path.join( test.context.suiteTempPath,path1 ) ) } );
   }
   catch( err )
   {
@@ -256,7 +259,7 @@ function forCopy( test )
   test.case = 'generate names for several copies';
   try
   {
-    var path_tmp = _.path.forCopy( { filePath : _.path.resolve( _.path.join( test.context.suitePath,path2 ) ), postfix : 'backup' } );
+    var path_tmp = _.path.forCopy( { filePath : _.path.resolve( _.path.join( test.context.suiteTempPath,path2 ) ), postfix : 'backup' } );
     test.context.createTestFile( path_tmp );
     path_tmp = _.path.forCopy( { filePath : path_tmp, postfix : 'backup' } );
     test.context.createTestFile( path_tmp );
@@ -282,7 +285,7 @@ function forCopy( test )
     test.case = 'extra arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.path.forCopy( { srcPath : _.path.join( test.context.suitePath,path1 ) }, { srcPath : _.path.join( test.context.suitePath,path2 ) } );
+      _.path.forCopy( { srcPath : _.path.join( test.context.suiteTempPath,path1 ) }, { srcPath : _.path.join( test.context.suiteTempPath,path2 ) } );
     } );
 
     test.case = 'unexisting file';
@@ -749,7 +752,7 @@ function pathCurrent( test )
 {
   var path1 = 'tmp/pathCurrent/foo',
     expected = Process.cwd( ),
-    expected1 = _.fileProvider.path.nativize( _.path.resolve( _.path.join( test.context.suitePath,path1 ) ) );
+    expected1 = _.fileProvider.path.nativize( _.path.resolve( _.path.join( test.context.suiteTempPath,path1 ) ) );
 
   test.case = 'get pathCurrent working directory';
   var got = _.fileProvider.path.nativize( _.path.current( ) );
@@ -758,7 +761,7 @@ function pathCurrent( test )
   test.case = 'set new pathCurrent working directory';
   test.context.createInTD( path1 );
   var before = _.path.current();
-  _.path.current( _.path.normalize( _.path.join( test.context.suitePath,path1 ) ) );
+  _.path.current( _.path.normalize( _.path.join( test.context.suiteTempPath,path1 ) ) );
   var got = Process.cwd( );
   _.path.current( before );
   test.identical( got, expected1 );
@@ -775,7 +778,7 @@ function pathCurrent( test )
   test.case = 'unexist directory';
   test.shouldThrowErrorSync( function( )
   {
-    _.path.current( _.path.join( test.context.suitePath, 'tmp/pathCurrent/bar' ) );
+    _.path.current( _.path.join( test.context.suiteTempPath, 'tmp/pathCurrent/bar' ) );
   });
 
 }
@@ -1257,6 +1260,51 @@ function pathDirTemp( test )
 
 }
 
+//
+
+function pathDirTempCloseAfter( test )
+{
+  let a = test.assetFor( false );
+  let toolsPath = _testerGlobal_.wTools.strEscape( a.path.nativize( a.path.join( __dirname, '../../Tools.s' ) ) );
+  let programSourceCode =
+`
+var toolsPath = '${toolsPath}';
+${program.toString()}
+program();
+`
+
+  a.fileProvider.fileWrite( a.abs( 'Program.js' ), programSourceCode );
+  a.jsNonThrowing({ execPath : a.abs( 'Program.js' ) })
+  .then( ( op ) =>
+  { 
+    test.identical( _.strCount( op.output, 'tempDirCreated' ), 1 );
+    test.identical( _.strCount( op.output, '= Message of error' ), 1 );
+    test.is( _.strHas( op.output, 'Not found temp dir for path' ) );
+    return null;
+  });
+
+  return a.ready;
+
+  function program()
+  {
+    var _ = require( toolsPath );
+    _.include( 'wFiles' );
+    
+    var tempPath = _.path.pathDirTempOpen( _.path.normalize( __dirname ), 'pathDirTempCloseAfter' );
+    if( _.fileProvider.isDir( tempPath ) )
+    console.log( 'tempDirCreated' );
+    _.process.exitHandlerOnce( () =>
+    {
+      _.path.pathDirTempClose( tempPath )
+    });
+  }
+}
+
+pathDirTempCloseAfter.description = 
+`
+  Try to manully close temp dir after automatic close leads to an error.
+`
+
 
 // --
 // declare
@@ -1273,8 +1321,10 @@ var Self =
 
   context :
   {
-    suitePath : null,
+    suiteTempPath : null,
     isBrowser : null,
+    assetsOriginalSuitePath : null,
+    defaultJsPath : null,
 
     createTestsDirectory,
     createInTD,
@@ -1306,7 +1356,8 @@ var Self =
 
     // pathDirTempForTrivial,
 
-    pathDirTemp
+    pathDirTemp,
+    pathDirTempCloseAfter
 
   },
 

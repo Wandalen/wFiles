@@ -40550,14 +40550,13 @@ function recordStat( test )
   let self = this;
   let system = self.system || self.provider;
   let providerEffective = self.providerEffective || self.provider;
-
+  
   test.is( providerEffective.system === system );
   test.is( _.longHas( _.mapKeys( system.providersWithProtocolMap ), providerEffective.protocol ) );
 
   let filePath = test.context.pathFor( 'written/recordStat/file' );
-  debugger;
-  var record = system.recordFactory({ allowingMissed : 1 }).record( filePath );
-  debugger;
+  filePath = test.context.globalFromPreferred( filePath );
+  var record = self.provider.recordFactory({ allowingMissed : 1 }).record( filePath );
   test.identical( record.stat, null );
 
 }

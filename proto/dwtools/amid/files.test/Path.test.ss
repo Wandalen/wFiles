@@ -1074,24 +1074,23 @@ function pathDirTemp( test )
   let extract = new _.FileProvider.Extract({ filesTree })
   var name = 'pathDirTempOpenTest';
 
-  let cache = extract.path.PathDirTempForMap[ extract.id ] = Object.create( null );
-  let count = extract.path.PathDirTempCountMap[ extract.id ] = Object.create( null );
-
-  test.notIdentical( extract.id, _.fileProvider.id );
-
   //
 
   test.open( 'same drive' );
 
   var filePath1 = '/dir1'
   var got1 = extract.path.pathDirTempOpen({ filePath : filePath1, name });
-  test.identical( cache[ filePath1 ], got1 );
+  var tempDir = extract.path.Index.tempDir[ filePath1 ];
+  test.identical( tempDir, { namespace : name, tempPath : got1 } );
+  test.identical( extract.path.Index.count[ got1 ], [ filePath1 ] );
   test.is( _.strHas( got1, name ) );
   test.is( extract.isDir( got1 ) );
 
   var filePath2 = '/dir1/dir2'
   var got2 = extract.path.pathDirTempOpen({ filePath : filePath2, name });
-  test.identical( cache[ filePath2 ], got1 );
+  var tempDir = extract.path.Index.tempDir[ filePath2 ];
+  test.identical( tempDir, { namespace : name, tempPath : got2 } );
+  test.identical( extract.path.Index.count[ got2 ], [ filePath1, filePath2 ] );
   test.is( _.strHas( got2, name ) );
   test.identical( got2, got1 );
   test.is( extract.isDir( got2 ) );
@@ -1100,45 +1099,54 @@ function pathDirTemp( test )
   var got2 = extract.path.pathDirTempOpen({ filePath : filePath2, name });
   test.identical( got2, got1 );
   test.is( extract.isDir( got1 ) );
-  test.identical( cache[ filePath1 ], got1 );
-  test.identical( cache[ filePath2 ], got2 );
+  var tempDir1 = extract.path.Index.tempDir[ filePath1 ];
+  test.identical( tempDir1, { namespace : name, tempPath : got1 } );
+  var tempDir2 = extract.path.Index.tempDir[ filePath2 ];
+  test.identical( tempDir2, { namespace : name, tempPath : got2 } );
+  test.identical( extract.path.Index.count[ got2 ], [ filePath1, filePath2, filePath1, filePath2 ] );
 
   extract.path.pathDirTempClose( filePath1 );
   extract.path.pathDirTempClose( filePath2 );
-  test.identical( cache[ filePath1 ], got1 );
-  test.identical( cache[ filePath2 ], got2 );
+  var tempDir1 = extract.path.Index.tempDir[ filePath1 ];
+  test.identical( tempDir1, { namespace : name, tempPath : got1 } );
+  var tempDir2 = extract.path.Index.tempDir[ filePath2 ];
+  test.identical( tempDir2, { namespace : name, tempPath : got2 } );
   test.is( extract.isDir( got1 ) );
   test.is( extract.isDir( got2 ) );
+  test.identical( extract.path.Index.count[ got1 ], [ filePath1, filePath2 ] );
+  
 
   extract.path.pathDirTempClose( filePath1 );
-  test.identical( cache[ filePath1 ], undefined );
-  test.identical( cache[ filePath2 ], got2 );
+  test.identical( extract.path.Index.tempDir[ filePath1 ], undefined );
+  test.identical( extract.path.Index.tempDir[ filePath2 ], { namespace : name, tempPath : got2 } );
+  test.identical( extract.path.Index.count[ got1 ], [ filePath2 ] );
   test.is( extract.isDir( got1 ) );
   test.is( extract.isDir( got2 ) );
   extract.path.pathDirTempClose( filePath2 );
-  test.identical( cache[ filePath1 ], undefined );
-  test.identical( cache[ filePath2 ], undefined );
+  test.identical( extract.path.Index.tempDir[ filePath1 ], undefined );
+  test.identical( extract.path.Index.tempDir[ filePath2 ], undefined );
   test.is( !extract.isDir( got1 ) );
   test.is( !extract.isDir( got2 ) );
 
-  test.identical( count[ got1 ], undefined );
-  test.identical( count[ got2 ], undefined );
+  test.identical( extract.path.Index.count[ got1 ], undefined );
+  test.identical( extract.path.Index.count[ got2 ], undefined );
 
   var got1 = extract.path.pathDirTempOpen({ filePath : filePath1, name });
   var got2 = extract.path.pathDirTempOpen({ filePath : filePath2, name });
   test.identical( got2, got1 );
   test.is( extract.isDir( got1 ) );
-  test.identical( cache[ filePath1 ], got1 );
-  test.identical( cache[ filePath2 ], got2 );
-  debugger
+  test.identical( extract.path.Index.tempDir[ filePath1 ], { namespace : name, tempPath : got1 } );
+  test.identical( extract.path.Index.tempDir[ filePath2 ], { namespace : name, tempPath : got2 } );
+  test.identical( extract.path.Index.count[ got1 ], [ filePath1, filePath2 ] );
+  test.identical( extract.path.Index.count[ got2 ], [ filePath1, filePath2 ] );
   extract.path.pathDirTempClose();
-  test.identical( cache[ filePath1 ], undefined );
-  test.identical( cache[ filePath2 ], undefined );
+  test.identical( extract.path.Index.tempDir[ filePath1 ], undefined );
+  test.identical( extract.path.Index.tempDir[ filePath2 ], undefined );
   test.is( !extract.isDir( got1 ) );
   test.is( !extract.isDir( got2 ) );
 
-  test.identical( count[ got1 ], undefined );
-  test.identical( count[ got2 ], undefined );
+  test.identical( extract.path.Index.count[ got1 ], undefined );
+  test.identical( extract.path.Index.count[ got2 ], undefined );
 
   test.close( 'same drive' );
 
@@ -1161,16 +1169,22 @@ function pathDirTemp( test )
   test.identical( extract.path.common( got2, filePath2 ), filePath2 )
   test.is( extract.isDir( got1 ) );
   test.is( extract.isDir( got2 ) );
-  test.identical( cache[ filePath1 ], got1 );
-  test.identical( cache[ filePath2 ], got2 );
+  test.identical( extract.path.Index.tempDir[ filePath1 ], { namespace : name, tempPath : got1 } );
+  test.identical( extract.path.Index.tempDir[ filePath2 ], { namespace : name, tempPath : got2 } );
+  test.identical( extract.path.Index.count[ got1 ], [ filePath1 ] );
+  test.identical( extract.path.Index.count[ got2 ], [ filePath2 ] );
 
   extract.path.pathDirTempClose( filePath1 );
-  test.identical( cache[ filePath1 ], undefined );
-  test.identical( cache[ filePath2 ], got2 );
+  test.identical( extract.path.Index.tempDir[ filePath1 ], undefined );
+  test.identical( extract.path.Index.tempDir[ filePath2 ], { namespace : name, tempPath : got2 } );
+  test.identical( extract.path.Index.count[ got1 ], undefined );
+  test.identical( extract.path.Index.count[ got2 ], [ filePath2 ] );
   test.is( extract.isDir( got2 ) );
   extract.path.pathDirTempClose( filePath2 );
-  test.identical( cache[ filePath1 ], undefined );
-  test.identical( cache[ filePath2 ], undefined );
+  test.identical( extract.path.Index.tempDir[ filePath1 ], undefined );
+  test.identical( extract.path.Index.tempDir[ filePath2 ], undefined );
+  test.identical( extract.path.Index.count[ got1 ], undefined );
+  test.identical( extract.path.Index.count[ got2 ], undefined );
   test.is( !extract.isDir( got2 ) );
 
   test.close( 'different drive' );
@@ -1183,34 +1197,41 @@ function pathDirTemp( test )
   var got1 = extract.path.pathDirTempOpen({ filePath: filePath1, name });
   test.is( extract.isDir( got1 ) );
   test.is( _.strBegins( got1, '/temp' ) )
-  test.identical( cache[ filePath1 ], got1 );
+  test.identical( extract.path.Index.tempDir[ filePath1 ], { namespace : name, tempPath : got1 } );
+  test.identical( extract.path.Index.count[ got1 ], [ filePath1 ] );
 
   var filePath2 = '/'
   var got2 = extract.path.pathDirTempOpen({ filePath : filePath2, name });
   test.is( extract.isDir( got2 ) );
   test.identical( got1,got2 );
   test.is( _.strBegins( got2, '/temp' ) );
-  test.identical( cache[ filePath2 ], got2 );
+  test.identical( extract.path.Index.tempDir[ filePath2 ], { namespace : name, tempPath : got2 } );
+  test.identical( extract.path.Index.count[ got2 ], [ filePath1, filePath2 ] );
 
   test.case = 'should return os temp path in case of error'
 
   var filePath3 = '/dir3'
   let originalDirMake = extract.dirMake;
-  extract.dirMake = function dirMake( filePath )
-  {
+  extract.dirMake = function dirMake( o )
+  { 
+    let filePath = o;
+    if( _.objectIs( o ) )
+    filePath = o.filePath;
     if( _.strHas( filePath,'/dir3' ) )
     throw _.err( 'Test err');
+    
     return originalDirMake.apply( extract, arguments );
   }
   var got2;
   test.mustNotThrowError( () =>
-  {
+  { 
     got2 = extract.path.pathDirTempOpen({ filePath : filePath3, name });
   })
   extract.dirMake = _.routineJoin( extract, originalDirMake )
   test.is( extract.isDir( got2 ) );
   test.is( _.strBegins( got2, extract.path.dirTemp() ) );
-  test.identical( cache[ filePath3 ], got2 );
+  test.identical( extract.path.Index.tempDir[ filePath3 ], { namespace : name, tempPath : got2 } );
+  test.identical( extract.path.Index.count[ got2 ], [ filePath3 ] );
 
   test.close( 'os path' )
 
@@ -1227,7 +1248,8 @@ function pathDirTemp( test )
     extract.path.pathDirTempClose();
     extract.path.pathDirTempClose();
   })
-  test.identical( _.mapKeys( cache ).length, 0 );
+  test.identical( _.mapKeys( extract.path.Index.tempDir ).length, 0 );
+  test.identical( _.mapKeys( extract.path.Index.count ).length, 0 );
 
   test.case = 'no args';
   var got = extract.path.pathDirTempOpen();

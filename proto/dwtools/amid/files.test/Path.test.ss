@@ -1329,7 +1329,7 @@ pathDirTempCloseAfter.description =
 
 //
 
-function pathDirTempMultipleNamespaces( test )
+function pathDirTempMultipleNamespacesSamePath( test )
 {
   let filesTree = Object.create( null );
   let extract = new _.FileProvider.Extract({ filesTree })
@@ -1353,7 +1353,7 @@ function pathDirTempMultipleNamespaces( test )
   extract.path.pathDirTempClose();
 }
 
-pathDirTempMultipleNamespaces.description = 
+pathDirTempMultipleNamespacesSamePath.description = 
 `
   Two namespaces are created for single filePath.
   Index contains record for two namespaces and one tempDir.
@@ -1536,7 +1536,7 @@ var Self =
     pathDirTemp,
     pathDirTempCloseAfter,
     
-    pathDirTempMultipleNamespaces,
+    pathDirTempMultipleNamespacesSamePath,
     pathDirTempIndexLock,
     pathDirTempIndexLockThrowing,
 

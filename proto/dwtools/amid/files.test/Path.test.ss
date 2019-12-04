@@ -1362,7 +1362,7 @@ function pathDirTempIndexLock( test )
   .then( ( op ) =>
   {  
     let t2 = _.time.now();
-    test.le( t2 - t1, 5000 );
+    test.ge( t2 - t1, 2000 );
     test.identical( op.exitCode, 0 );
     test.is( !_.strHas( op.output, 'Lock file is already being held' ) )
     test.is( _.strHas( op.output, 'Temp dir created' ) )
@@ -1387,6 +1387,7 @@ function pathDirTempIndexLock( test )
 pathDirTempIndexLock.timeOut = 10000;
 pathDirTempIndexLock.description = 
 `
+Second process locks file when main releases it after two seconds.
 `
 
 //
@@ -1445,6 +1446,7 @@ function pathDirTempIndexLockThrowing( test )
 pathDirTempIndexLockThrowing.timeOut = 10000;
 pathDirTempIndexLockThrowing.description = 
 `
+Second process exits with lock error after timeout.
 `
 
 

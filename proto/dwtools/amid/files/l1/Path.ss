@@ -307,6 +307,7 @@ Unix
 
 let Index = Object.create( null );
 let IndexPath = _.path.join( Os.homedir(), '.wFiles/TempFilesIndex' );
+let IndexLockTimeOut = 30000;
 // let PathDirTempForMap = null
 // let PathDirTempCountMap = null;
 
@@ -321,15 +322,17 @@ function _loadIndex()
     self.fileProvider.fileWrite({ filePath : self.IndexPath, data : self.Index, encoding : 'json' });
   }
   
-  self.fileProvider.fileLock
+  let lockReady = self.fileProvider.fileLock
   ({
     filePath : self.IndexPath,
-    sync : 1,
+    sync : 0,
     throwing : 1,
-    timeOut : 30000,
+    timeOut : self.IndexLockTimeOut,
     sharing : 'process',
     waiting : 1
-  });
+  })
+  lockReady.deasyncWait();
+  lockReady.sync();
   _.assert( self.fileProvider.fileIsLocked( self.IndexPath ) );
   
   let loadedIndex = self.fileProvider.fileRead({ filePath : self.IndexPath, encoding : 'json' });
@@ -346,15 +349,17 @@ function _saveIndex()
   
   _.assert( _.objectIs( self.Index ) )
   
-  self.fileProvider.fileLock
+  let lockReady = self.fileProvider.fileLock
   ({
     filePath : self.IndexPath,
-    sync : 1,
+    sync : 0,
     throwing : 1,
-    timeOut : 30000,
+    timeOut : self.IndexLockTimeOut,
     sharing : 'process',
     waiting : 1
   });
+  lockReady.deasyncWait();
+  lockReady.sync();
   _.assert( self.fileProvider.fileIsLocked( self.IndexPath ) );
   let loadedIndex = self.fileProvider.fileRead({ filePath : self.IndexPath, encoding : 'json' });
   _.mapExtend( loadedIndex, self.Index );
@@ -1111,6 +1116,7 @@ let Fields =
 { 
   Index,
   IndexPath,
+  IndexLockTimeOut,
   // PathDirTempForMap,
   // PathDirTempCountMap
 }

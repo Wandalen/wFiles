@@ -1327,6 +1327,65 @@ pathDirTempCloseAfter.description =
   Try to manully close temp dir after automatic close leads to an error.
 `
 
+//
+
+function pathDirTempIndexLock( test )
+{
+  let a = test.assetFor( false );
+  let toolsPath = _testerGlobal_.wTools.strEscape( a.path.nativize( a.path.join( __dirname, '../../amid/files/UseTop.s' ) ) );
+  let programSourceCode =
+  [
+    `var toolsPath = '${toolsPath}';`,
+    program.toString(),
+    'program();'
+  ]
+  .join( '\n' )
+  a.fileProvider.fileWrite( a.abs( 'Program.js' ), programSourceCode );
+  
+  /*  */
+  
+  _.path.pathDirTempOpen( a.routinePath, 'pathDirTempIndexLock' );
+  a.fileProvider.fileLock
+  ({
+    filePath : _.path.IndexPath,
+    sync : 1,
+    throwing : 1,
+    sharing : 'process',
+    waiting : 1
+  });
+  test.is( a.fileProvider.fileIsLocked( _.path.IndexPath ) );
+  let t1 = _.time.now();
+  a.shellNonThrowing({ execPath : 'node ' + a.abs( 'Program.js' ) })
+  .then( ( op ) =>
+  {  
+    let t2 = _.time.now();
+    test.ge( t2 - t1, 5000 );
+    test.notIdentical( op.exitCode, 0 );
+    test.is( _.strHas( op.output, 'Lock file is already being held' ) )
+    a.fileProvider.fileUnlock( _.path.IndexPath )
+    test.is( !a.fileProvider.fileIsLocked( _.path.IndexPath ) );
+    return null;
+  });
+
+  return a.ready;
+
+  function program()
+  {
+    var _ = require( toolsPath );
+    _.path.IndexLockTimeOut = 5000;
+    _.path.pathDirTempOpen
+    ({ 
+      filePath : _.path.normalize( __dirname ), 
+      name : 'pathDirTempIndexLock',
+    });
+  }
+}
+pathDirTempIndexLock.timeOut = 10000;
+pathDirTempIndexLock.description = 
+
+`
+`
+
 
 // --
 // declare
@@ -1379,7 +1438,9 @@ var Self =
     // pathDirTempForTrivial,
 
     pathDirTemp,
-    pathDirTempCloseAfter
+    pathDirTempCloseAfter,
+    
+    pathDirTempIndexLock,
 
   },
 

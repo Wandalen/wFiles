@@ -1354,6 +1354,68 @@ function pathDirTempIndexLock( test )
     waiting : 1
   });
   test.is( a.fileProvider.fileIsLocked( _.path.IndexPath ) );
+  
+  _.time.out( 2000, () => a.fileProvider.fileUnlock( _.path.IndexPath ) )
+  let t1 = _.time.now();
+  
+  a.shellNonThrowing({ execPath : 'node ' + a.abs( 'Program.js' ) })
+  .then( ( op ) =>
+  {  
+    let t2 = _.time.now();
+    test.le( t2 - t1, 5000 );
+    test.identical( op.exitCode, 0 );
+    test.is( !_.strHas( op.output, 'Lock file is already being held' ) )
+    test.is( _.strHas( op.output, 'Temp dir created' ) )
+    test.is( !a.fileProvider.fileIsLocked( _.path.IndexPath ) );
+    return null;
+  });
+
+  return a.ready;
+
+  function program()
+  {
+    var _ = require( toolsPath );
+    _.path.IndexLockTimeOut = 5000;
+    _.path.pathDirTempOpen
+    ({ 
+      filePath : _.path.normalize( __dirname ), 
+      name : 'pathDirTempIndexLock',
+    });
+    console.log( 'Temp dir created' );
+  }
+}
+pathDirTempIndexLock.timeOut = 10000;
+pathDirTempIndexLock.description = 
+`
+`
+
+//
+
+function pathDirTempIndexLockThrowing( test )
+{
+  let a = test.assetFor( false );
+  let toolsPath = _testerGlobal_.wTools.strEscape( a.path.nativize( a.path.join( __dirname, '../../amid/files/UseTop.s' ) ) );
+  let programSourceCode =
+  [
+    `var toolsPath = '${toolsPath}';`,
+    program.toString(),
+    'program();'
+  ]
+  .join( '\n' )
+  a.fileProvider.fileWrite( a.abs( 'Program.js' ), programSourceCode );
+  
+  /*  */
+  
+  _.path.pathDirTempOpen( a.routinePath, 'pathDirTempIndexLockThrowing' );
+  a.fileProvider.fileLock
+  ({
+    filePath : _.path.IndexPath,
+    sync : 1,
+    throwing : 1,
+    sharing : 'process',
+    waiting : 1
+  });
+  test.is( a.fileProvider.fileIsLocked( _.path.IndexPath ) );
   let t1 = _.time.now();
   a.shellNonThrowing({ execPath : 'node ' + a.abs( 'Program.js' ) })
   .then( ( op ) =>
@@ -1376,13 +1438,12 @@ function pathDirTempIndexLock( test )
     _.path.pathDirTempOpen
     ({ 
       filePath : _.path.normalize( __dirname ), 
-      name : 'pathDirTempIndexLock',
+      name : 'pathDirTempIndexLockThrowing',
     });
   }
 }
-pathDirTempIndexLock.timeOut = 10000;
-pathDirTempIndexLock.description = 
-
+pathDirTempIndexLockThrowing.timeOut = 10000;
+pathDirTempIndexLockThrowing.description = 
 `
 `
 
@@ -1441,6 +1502,7 @@ var Self =
     pathDirTempCloseAfter,
     
     pathDirTempIndexLock,
+    pathDirTempIndexLockThrowing,
 
   },
 

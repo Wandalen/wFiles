@@ -1398,6 +1398,38 @@ pathDirTempMultipleNamespacesDiffPath.description =
 
 //
 
+function pathDirTempMultiplePathSameNamespace( test )
+{
+  let filesTree = Object.create( null );
+  let extract = new _.FileProvider.Extract({ filesTree })
+
+  var filePath1 = '/dir1'
+  var filePath2 = '/dir2'
+  var name = 'space'
+  
+  var got1 = extract.path.pathDirTempOpen({ filePath : filePath1, name });
+  var got2 = extract.path.pathDirTempOpen({ filePath : filePath2, name });
+  
+  var tempDir = extract.path.Index.tempDir[ filePath1 ];
+  test.identical( tempDir, { namespace : name, tempPath : got1 } );
+  var tempDir = extract.path.Index.tempDir[ filePath2 ];
+  test.identical( tempDir, { namespace : name, tempPath : got2 } );
+  
+  var namespaces = _.mapKeys( extract.path.Index.namespace );
+  test.identical( namespaces, [ 'space' ] );
+  var space = extract.path.Index.namespace.space;
+  test.identical( space, { tempDir : [ filePath1, filePath2 ], tempPath : [ got1, got2 ] } )
+  
+  extract.path.pathDirTempClose();
+}
+
+pathDirTempMultiplePathSameNamespace.description = 
+`
+  Two different paths are created for signle namespace.
+`
+
+//
+
 function pathDirTempIndexLock( test )
 {
   let a = test.assetFor( false );
@@ -1573,6 +1605,8 @@ var Self =
     pathDirTempCloseAfter,
     
     pathDirTempMultipleNamespacesSamePath,
+    pathDirTempMultipleNamespacesDiffPath,
+    pathDirTempMultiplePathSameNamespace,
     pathDirTempIndexLock,
     pathDirTempIndexLockThrowing,
 

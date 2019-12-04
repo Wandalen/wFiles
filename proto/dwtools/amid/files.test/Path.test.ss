@@ -1329,6 +1329,39 @@ pathDirTempCloseAfter.description =
 
 //
 
+function pathDirTempMultipleNamespaces( test )
+{
+  let filesTree = Object.create( null );
+  let extract = new _.FileProvider.Extract({ filesTree })
+
+  var filePath1 = '/dir1'
+  var name1 = 'space1'
+  var name2 = 'space2'
+  var got1 = extract.path.pathDirTempOpen({ filePath : filePath1, name : name1 });
+  var got2 = extract.path.pathDirTempOpen({ filePath : filePath1, name : name2 });
+  
+  var tempDir = extract.path.Index.tempDir[ filePath1 ];
+  test.identical( tempDir, { namespace : [ name1, name2 ], tempPath : got1 } );
+  test.identical( tempDir, { namespace : [ name1, name2 ], tempPath : got2 } );
+  
+  var namespaces = _.mapKeys( extract.path.Index.namespace );
+  test.identical( namespaces, [ 'space1', 'space2' ] );
+  
+  test.identical( extract.path.Index.namespace.space1, { tempDir : filePath1, tempPath : got1 } )
+  test.identical( extract.path.Index.namespace.space2, { tempDir : filePath1, tempPath : got2 } )
+  
+  extract.path.pathDirTempClose();
+}
+
+pathDirTempMultipleNamespaces.description = 
+`
+  Two namespaces are created for single filePath.
+  Index contains record for two namespaces and one tempDir.
+  Temp dir record contains info about two namespaces.
+`
+
+//
+
 function pathDirTempIndexLock( test )
 {
   let a = test.assetFor( false );
@@ -1503,6 +1536,7 @@ var Self =
     pathDirTemp,
     pathDirTempCloseAfter,
     
+    pathDirTempMultipleNamespaces,
     pathDirTempIndexLock,
     pathDirTempIndexLockThrowing,
 

@@ -3,14 +3,14 @@
 'use strict';
 
 // let toBuffer = null;
-// let Os = null;
+let Os = null;
 
 if( typeof module !== 'undefined' )
 {
 
   require( '../UseBase.s' );
 
-  // Os = require( 'os' );
+  Os = require( 'os' );
 
   let _ = _global_.wTools;
 
@@ -305,8 +305,64 @@ Unix
 
 // }
 
-let PathDirTempForMap = Object.create( null );
-let PathDirTempCountMap = Object.create( null );
+let Index = Object.create( null );
+let IndexPath = _.path.join( Os.homedir(), '.wFiles/TempFilesIndex' );
+// let PathDirTempForMap = null
+// let PathDirTempCountMap = null;
+
+function _loadIndex()
+{  
+  let self = this;
+  if( !self.fileProvider.fileExists( self.IndexPath ) )
+  { 
+    self.Index.namespace = Object.create( null );
+    self.Index.tempDir = Object.create( null );
+    self.Index.count = Object.create( null );
+    self.fileProvider.fileWrite({ filePath : self.IndexPath, data : self.Index, encoding : 'json' });
+  }
+  
+  self.fileProvider.fileLock
+  ({
+    filePath : self.IndexPath,
+    sync : 1,
+    throwing : 1,
+    timeOut : 30000,
+    sharing : 'process',
+    waiting : 1
+  });
+  _.assert( self.fileProvider.fileIsLocked( self.IndexPath ) );
+  
+  let loadedIndex = self.fileProvider.fileRead({ filePath : self.IndexPath, encoding : 'json' });
+  self.Index = _.mapSupplementRecursive( self.Index, loadedIndex );
+  self.fileProvider.fileUnlock( self.IndexPath );
+  _.assert( !self.fileProvider.fileIsLocked( self.IndexPath ) );
+}
+
+//
+
+function _saveIndex()
+{  
+  let self = this;
+  
+  _.assert( _.objectIs( self.Index ) )
+  
+  self.fileProvider.fileLock
+  ({
+    filePath : self.IndexPath,
+    sync : 1,
+    throwing : 1,
+    timeOut : 30000,
+    sharing : 'process',
+    waiting : 1
+  });
+  _.assert( self.fileProvider.fileIsLocked( self.IndexPath ) );
+  let loadedIndex = self.fileProvider.fileRead({ filePath : self.IndexPath, encoding : 'json' });
+  _.mapExtend( loadedIndex, self.Index );
+  self.fileProvider.fileWrite({ filePath : self.IndexPath, data : loadedIndex, encoding : 'json' });
+  self.fileProvider.fileUnlock( self.IndexPath );
+}
+
+//
 
 function pathDirTempOpen( o )
 {
@@ -327,29 +383,39 @@ function pathDirTempOpen( o )
   _.assert( self.isAbsolute( o.filePath ) );
   _.assert( self.isNormalized( o.filePath ) );
 
-  let id = self.fileProvider.id;
+  // let id = self.fileProvider.id;
+  
+  /* load cache */
+  
+  self._loadIndex();
+  
+  // let currentIndex = self.Index[ process.pid ];
 
-  if( !PathDirTempForMap[ id ] )
-  PathDirTempForMap[ id ] = Object.create( null );
-  if( !PathDirTempCountMap[ id ] )
-  PathDirTempCountMap[ id ] = Object.create( null );
-
-
+  // let cache = currentIndex.cache[ id ];
+  // let count = currentIndex.count[ id ];
+  
   /* search in cache */
-
-  let cache = PathDirTempForMap[ id ];
-  let count = PathDirTempCountMap[ id ];
-
-  let result = cache[ o.filePath ];
-
-  if( result )
-  return end();
-
+  
+  let result = null;
+  let namespace = o.name;
+  
+  let nameSpaceMap = self.Index.namespace;
+  let tempDirMap = self.Index.tempDir;
+  
+  if( tempDirMap[ o.filePath ] )
+  if( tempDirMap[ o.filePath ].namespace === namespace )
+  {
+    result = tempDirMap[ o.filePath ].tempPath;
+    return end();
+  }
+  
   let trace = self.traceToRoot( o.filePath );
 
   for( let i = trace.length - 1; i >= 0; i-- )
   {
-    if( !cache[ trace[ i ] ] )
+    if( !tempDirMap[ trace[ i ] ] )
+    continue;
+    if( tempDirMap[ trace[ i ] ].namespace !== namespace )
     continue;
 
     if( i !== trace.length - 1 )
@@ -374,7 +440,7 @@ function pathDirTempOpen( o )
       break;
     }
 
-    result = cache[ trace[ i ] ];
+    result = tempDirMap[ trace[ i ] ].tempPath;
 
     return end();
   }
@@ -388,12 +454,26 @@ function pathDirTempOpen( o )
 
   function end()
   {
-    if( count[ result ] === undefined )
-    count[ result ] = [];
-
-    count[ result ].push( o.filePath );
-
-    cache[ o.filePath ] = result;
+    if( !nameSpaceMap[ namespace ] )
+    {
+      nameSpaceMap[ namespace ] = Object.create( null );
+      nameSpaceMap[ namespace ].tempDir = o.filePath;
+      nameSpaceMap[ namespace ].tempPath = result;
+    }
+    
+    if( !tempDirMap[ o.filePath ] )
+    {
+      tempDirMap[ o.filePath ] = Object.create( null );
+      tempDirMap[ o.filePath ].namespace = namespace;
+      tempDirMap[ o.filePath ].tempPath = result;
+    }
+    
+    let countMap = self.Index.count;
+    if( !countMap[ result ] )
+    countMap[ result ] = [];
+    countMap[ result ].push( o.filePath )
+    
+    self._saveIndex();
 
     return result;
   }
@@ -594,6 +674,7 @@ function pathDirTempMake( o )
 
   if( !o.name )
   o.name = 'tmp';
+  let namespace = o.name;
   o.name = o.name + '-' + _.idWithDate() + '.tmp';
 
   let osTempDir = self.dirTemp();
@@ -606,13 +687,17 @@ function pathDirTempMake( o )
     self.fileProvider.dirMake( filePath );
     return end();
   }
+  
+  /* load cache */
+  
+  self._loadIndex();
+  
+  // let id = self.fileProvider.id;
+  // let currentIndex = self.Index[ process.pid ];
+  
+  let tempDirMap = self.Index.tempDir;
 
-  let id = self.fileProvider.id;
-
-  if( !PathDirTempForMap[ id ] )
-  PathDirTempForMap[ id ] = Object.create( null );
-
-  let cache = PathDirTempForMap[ id ];
+  // let cache = currentIndex.cache[ id ];
 
   let fileStat;
 
@@ -644,10 +729,11 @@ function pathDirTempMake( o )
         if( fileStat.dev != currentStat.dev )
         continue;
       }
-
-      if( cache[ trace[ i ] ] )
+      
+      let tempDir = tempDirMap[ trace[ i ] ];
+      if( tempDir && tempDir.namespace === namespace )
       {
-        filePath = cache[ trace[ i ] ];
+        filePath = tempDir.tempPath;
       }
       else
       {
@@ -684,6 +770,7 @@ function pathDirTempMake( o )
     });
 
     // logger.log( ' . Open temp directory ' + filePath );
+    
     return filePath;
   }
 }
@@ -770,20 +857,29 @@ function pathDirTempClose( filePath )
 
   _.assert( arguments.length <= 1 );
   _.assert( !!self.fileProvider );
+  
+  self._loadIndex();
 
-  let id = self.fileProvider.id;
+  // if( !self.PathDirTempForMap[ id ] )
+  // return;
 
-  if( !PathDirTempForMap[ id ] )
-  return;
+  // let currentIndex = self.Index[ process.pid ];
+  // let id = self.fileProvider.id;
 
-  let cache = PathDirTempForMap[ id ];
-  let count = PathDirTempCountMap[ id ];
+  // let cache = currentIndex.cache[ id ];
+  // let count = currentIndex.count[ id ];
+  
+  let namespaceMap = self.Index.namespace;
+  let tempDirMap = self.Index.tempDir;
+  let countMap = self.Index.count;
 
   if( !arguments.length )
   {
-    for( let path in cache )
-    {
-      delete count[ cache[ path ] ];
+    for( let path in tempDirMap )
+    { 
+      let tempDir = tempDirMap[ path ];
+      delete namespaceMap[ tempDir.namespace ];
+      delete countMap[ tempDir.tempPath ];
       close( path );
     }
   }
@@ -792,12 +888,15 @@ function pathDirTempClose( filePath )
     _.assert( self.isAbsolute( filePath ) );
     _.assert( self.isNormalized( filePath ) );
 
-    let currentTempPath = cache[ filePath ];
+    let currentTempPath = null;
+    
+    if( tempDirMap[ filePath ] )
+    currentTempPath = tempDirMap[ filePath ].tempPath;
 
     /* reverse search for case when filePath is a temp path */
     if( !currentTempPath )
-    for( let path in cache )
-    if( cache[ path ] === filePath )
+    for( let path in tempDirMap )
+    if( tempDirMap[ path ].tempPath === filePath )
     {
       currentTempPath = filePath;
       filePath = path;
@@ -806,36 +905,44 @@ function pathDirTempClose( filePath )
 
     if( !currentTempPath )
     throw _.err( 'Not found temp dir for path: ' + filePath );
+    
+    let namespace = tempDirMap[ filePath ].namespace;
 
-    _.arrayRemoveElementOnce( count[ currentTempPath ], filePath );
+    _.arrayRemoveElementOnce( countMap[ currentTempPath ], filePath );
 
     /* if temp path is still in use */
-    if( count[ currentTempPath ].length )
+    if( countMap[ currentTempPath ].length )
     {
-      if( !_.longHas( count[ currentTempPath ], filePath ) )
-      delete cache[ filePath ];
-      return;
+      if( !_.longHas( countMap[ currentTempPath ], filePath ) )
+      {
+        delete namespaceMap[ namespace ];
+        delete tempDirMap[ filePath ];
+      }
     }
+    else
+    {
+      _.assert( !countMap[ currentTempPath ].length );
 
-    _.assert( !count[ currentTempPath ].length );
-
-    delete count[ currentTempPath ];
-
-    close( filePath );
+      delete countMap[ currentTempPath ];
+  
+      close( filePath );
+    }
   }
+  
+  self._saveIndex();
 
   /*  */
 
   function close( filePath )
   {
-    let tempPath = cache[ filePath ];
+    let tempPath = tempDirMap[ filePath ].tempPath;
     self.fileProvider.filesDelete
     ({
       filePath : tempPath,
       safe : 0,
       throwing : 0,
     });
-    delete cache[ filePath ];
+    delete tempDirMap[ filePath ];
     _.assert( !self.fileProvider.fileExists( tempPath ), 'Temp dir:', _.strQuote( tempPath ), 'was closed, but still exist in file system.' );
     // logger.log( ' . Close temp directory ' + tempPath );
     // debugger;
@@ -1001,9 +1108,11 @@ firstAvailable.having.aspect = 'entry';
 // --
 
 let Fields =
-{
-  PathDirTempForMap,
-  PathDirTempCountMap
+{ 
+  Index,
+  IndexPath,
+  // PathDirTempForMap,
+  // PathDirTempCountMap
 }
 
 let Proto =
@@ -1030,6 +1139,9 @@ let Proto =
   pathDirTempOpen,
   pathDirTempMake,
   pathDirTempClose,
+  
+  _loadIndex,
+  _saveIndex,
 
   forCopy,
   firstAvailable,

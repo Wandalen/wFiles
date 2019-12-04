@@ -311,7 +311,7 @@ let IndexLockTimeOut = 30000;
 // let PathDirTempForMap = null
 // let PathDirTempCountMap = null;
 
-function _loadIndex()
+function _loadIndex( syncLock )
 {  
   let self = this;
   if( !self.fileProvider.fileExists( self.IndexPath ) )
@@ -325,14 +325,17 @@ function _loadIndex()
   let lockReady = self.fileProvider.fileLock
   ({
     filePath : self.IndexPath,
-    sync : 0,
+    sync : !!syncLock,
     throwing : 1,
     timeOut : self.IndexLockTimeOut,
     sharing : 'process',
     waiting : 1
   })
-  lockReady.deasyncWait();
-  lockReady.sync();
+  if( !syncLock )
+  {
+    lockReady.deasyncWait();
+    lockReady.sync();
+  }
   _.assert( self.fileProvider.fileIsLocked( self.IndexPath ) );
   
   let loadedIndex = self.fileProvider.fileRead({ filePath : self.IndexPath, encoding : 'json' });
@@ -343,7 +346,7 @@ function _loadIndex()
 
 //
 
-function _saveIndex()
+function _saveIndex( syncLock )
 {  
   let self = this;
   
@@ -352,14 +355,17 @@ function _saveIndex()
   let lockReady = self.fileProvider.fileLock
   ({
     filePath : self.IndexPath,
-    sync : 0,
+    sync : !!syncLock,
     throwing : 1,
     timeOut : self.IndexLockTimeOut,
     sharing : 'process',
     waiting : 1
   });
-  lockReady.deasyncWait();
-  lockReady.sync();
+  if( !syncLock )
+  {
+    lockReady.deasyncWait();
+    lockReady.sync();
+  }
   _.assert( self.fileProvider.fileIsLocked( self.IndexPath ) );
   let loadedIndex = self.fileProvider.fileRead({ filePath : self.IndexPath, encoding : 'json' });
   _.mapExtend( loadedIndex, self.Index );
@@ -771,7 +777,7 @@ function pathDirTempMake( o )
     _.process.exitHandlerOnce( () =>
     {
       debugger;
-      self.pathDirTempClose()
+      self.pathDirTempClose({ syncLock : 1 })
     });
 
     // logger.log( ' . Open temp directory ' + filePath );
@@ -856,14 +862,21 @@ pathDirTempMake.defaults = Object.create( pathDirTempOpen.defaults );
 
 //
 
-function pathDirTempClose( filePath )
+function pathDirTempClose( o )
 {
   let self = this;
+  
+  if( arguments.length === 0 )
+  o = Object.create( null );
+  
+  if( _.strIs( o ) )
+  o = { filePath : o }
 
   _.assert( arguments.length <= 1 );
   _.assert( !!self.fileProvider );
+  _.routineOptions( pathDirTempClose, o );
   
-  self._loadIndex();
+  self._loadIndex( o.syncLock );
 
   // if( !self.PathDirTempForMap[ id ] )
   // return;
@@ -877,8 +890,9 @@ function pathDirTempClose( filePath )
   let namespaceMap = self.Index.namespace;
   let tempDirMap = self.Index.tempDir;
   let countMap = self.Index.count;
+  let filePath = o.filePath;
 
-  if( !arguments.length )
+  if( filePath === null )
   {
     for( let path in tempDirMap )
     { 
@@ -934,7 +948,7 @@ function pathDirTempClose( filePath )
     }
   }
   
-  self._saveIndex();
+  self._saveIndex( o.syncLock );
 
   /*  */
 
@@ -955,6 +969,11 @@ function pathDirTempClose( filePath )
   }
 }
 
+pathDirTempClose.defaults = 
+{
+  filePath : null,
+  syncLock : 0
+}
 
 //
 

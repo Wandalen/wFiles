@@ -666,7 +666,7 @@ function filesReflectTrivial( test )
   return con;
 }
 
-filesReflectTrivial.timeOut = 60000;
+filesReflectTrivial.timeOut = 120000;
 
 //
 
@@ -738,7 +738,7 @@ function filesReflectNoStashing( test )
 
 }
 
-filesReflectNoStashing.timeOut = 60000;
+filesReflectNoStashing.timeOut = 120000;
 
 //
 
@@ -873,7 +873,7 @@ function filesReflectDownloadThrowing( test )
   return con;
 }
 
-filesReflectDownloadThrowing.timeOut = 60000;
+filesReflectDownloadThrowing.timeOut = 120000;
 
 //
 

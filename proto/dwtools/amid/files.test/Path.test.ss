@@ -1074,6 +1074,247 @@ function pathDirTemp( test )
   let extract = new _.FileProvider.Extract({ filesTree })
   var name = 'pathDirTempOpenTest';
 
+  let cache = extract.path.PathDirTempForMap[ extract.id ] = Object.create( null );
+  let count = extract.path.PathDirTempCountMap[ extract.id ] = Object.create( null );
+
+  test.notIdentical( extract.id, _.fileProvider.id );
+
+  //
+
+  test.open( 'same drive' );
+
+  var filePath1 = '/dir1'
+  var got1 = extract.path.pathDirTempOpen({ filePath : filePath1, name });
+  test.identical( cache[ filePath1 ], got1 );
+  test.is( _.strHas( got1, name ) );
+  test.is( extract.isDir( got1 ) );
+
+  var filePath2 = '/dir1/dir2'
+  var got2 = extract.path.pathDirTempOpen({ filePath : filePath2, name });
+  test.identical( cache[ filePath2 ], got1 );
+  test.is( _.strHas( got2, name ) );
+  test.identical( got2, got1 );
+  test.is( extract.isDir( got2 ) );
+
+  var got1 = extract.path.pathDirTempOpen({ filePath : filePath1, name });
+  var got2 = extract.path.pathDirTempOpen({ filePath : filePath2, name });
+  test.identical( got2, got1 );
+  test.is( extract.isDir( got1 ) );
+  test.identical( cache[ filePath1 ], got1 );
+  test.identical( cache[ filePath2 ], got2 );
+
+  extract.path.pathDirTempClose( filePath1 );
+  extract.path.pathDirTempClose( filePath2 );
+  test.identical( cache[ filePath1 ], got1 );
+  test.identical( cache[ filePath2 ], got2 );
+  test.is( extract.isDir( got1 ) );
+  test.is( extract.isDir( got2 ) );
+
+  extract.path.pathDirTempClose( filePath1 );
+  test.identical( cache[ filePath1 ], undefined );
+  test.identical( cache[ filePath2 ], got2 );
+  test.is( extract.isDir( got1 ) );
+  test.is( extract.isDir( got2 ) );
+  extract.path.pathDirTempClose( filePath2 );
+  test.identical( cache[ filePath1 ], undefined );
+  test.identical( cache[ filePath2 ], undefined );
+  test.is( !extract.isDir( got1 ) );
+  test.is( !extract.isDir( got2 ) );
+
+  test.identical( count[ got1 ], undefined );
+  test.identical( count[ got2 ], undefined );
+
+  var got1 = extract.path.pathDirTempOpen({ filePath : filePath1, name });
+  var got2 = extract.path.pathDirTempOpen({ filePath : filePath2, name });
+  test.identical( got2, got1 );
+  test.is( extract.isDir( got1 ) );
+  test.identical( cache[ filePath1 ], got1 );
+  test.identical( cache[ filePath2 ], got2 );
+  debugger
+  extract.path.pathDirTempClose();
+  test.identical( cache[ filePath1 ], undefined );
+  test.identical( cache[ filePath2 ], undefined );
+  test.is( !extract.isDir( got1 ) );
+  test.is( !extract.isDir( got2 ) );
+
+  test.identical( count[ got1 ], undefined );
+  test.identical( count[ got2 ], undefined );
+
+  test.close( 'same drive' );
+
+  /* */
+
+  test.open( 'different drive' );
+
+  var filePath1 = '/dir1'
+  var filePath2 = '/dir1/dir2'
+
+  extract.dirMake( filePath1 );
+  extract.dirMake( filePath2 );
+
+  extract.extraStats[ filePath1 ] = { dev : 1 }
+  extract.extraStats[ filePath2 ] = { dev : 2 }
+
+  var got1 = extract.path.pathDirTempOpen({ filePath : filePath1, name });
+  var got2 = extract.path.pathDirTempOpen({ filePath : filePath2, name });
+  test.notIdentical( got1, got2 );
+  test.identical( extract.path.common( got2, filePath2 ), filePath2 )
+  test.is( extract.isDir( got1 ) );
+  test.is( extract.isDir( got2 ) );
+  test.identical( cache[ filePath1 ], got1 );
+  test.identical( cache[ filePath2 ], got2 );
+
+  extract.path.pathDirTempClose( filePath1 );
+  test.identical( cache[ filePath1 ], undefined );
+  test.identical( cache[ filePath2 ], got2 );
+  test.is( extract.isDir( got2 ) );
+  extract.path.pathDirTempClose( filePath2 );
+  test.identical( cache[ filePath1 ], undefined );
+  test.identical( cache[ filePath2 ], undefined );
+  test.is( !extract.isDir( got2 ) );
+
+  test.close( 'different drive' );
+
+  //
+
+  test.open( 'os path' )
+
+  var filePath1 = extract.path.dir( extract.path.dirTemp() );
+  var got1 = extract.path.pathDirTempOpen({ filePath: filePath1, name });
+  test.is( extract.isDir( got1 ) );
+  test.is( _.strBegins( got1, '/temp' ) )
+  test.identical( cache[ filePath1 ], got1 );
+
+  var filePath2 = '/'
+  var got2 = extract.path.pathDirTempOpen({ filePath : filePath2, name });
+  test.is( extract.isDir( got2 ) );
+  test.identical( got1,got2 );
+  test.is( _.strBegins( got2, '/temp' ) );
+  test.identical( cache[ filePath2 ], got2 );
+
+  test.case = 'should return os temp path in case of error'
+
+  var filePath3 = '/dir3'
+  let originalDirMake = extract.dirMake;
+  extract.dirMake = function dirMake( filePath )
+  {
+    if( _.strHas( filePath,'/dir3' ) )
+    throw _.err( 'Test err');
+    return originalDirMake.apply( extract, arguments );
+  }
+  var got2;
+  test.mustNotThrowError( () =>
+  {
+    got2 = extract.path.pathDirTempOpen({ filePath : filePath3, name });
+  })
+  extract.dirMake = _.routineJoin( extract, originalDirMake )
+  test.is( extract.isDir( got2 ) );
+  test.is( _.strBegins( got2, extract.path.dirTemp() ) );
+  test.identical( cache[ filePath3 ], got2 );
+
+  test.close( 'os path' )
+
+  //
+
+  var filePath1 = '/dir1/dir3'
+  test.shouldThrowErrorSync( () => extract.path.pathDirTempClose( filePath1 ) )
+
+  //
+
+  test.case = 'several runs of pathDirTempClose'
+  test.mustNotThrowError( () =>
+  {
+    extract.path.pathDirTempClose();
+    extract.path.pathDirTempClose();
+  })
+  test.identical( _.mapKeys( cache ).length, 0 );
+
+  test.case = 'no args';
+  var got = extract.path.pathDirTempOpen();
+  test.is( _.strHas( got, '/tmp-' ) );
+  test.is( extract.isDir( got ) );
+  extract.path.pathDirTempClose( got );
+  test.is( !extract.fileExists( got ) );
+
+  test.case = 'single arg';
+  var got = extract.path.pathDirTempOpen( 'packageName' );
+  test.is( _.strHas( got, 'packageName' ) );
+  test.is( extract.isDir( got ) );
+  extract.path.pathDirTempClose( got );
+  test.is( !extract.fileExists( got ) );
+
+  test.case = 'single arg';
+  var got = extract.path.pathDirTempOpen( 'someDir/packageName' );
+  test.is( _.strHas( got, '/someDir/Temp' ) );
+  test.is( extract.isDir( got ) );
+  extract.path.pathDirTempClose( got );
+  test.is( !extract.fileExists( got ) );
+
+  test.case = 'two args';
+  var got = extract.path.pathDirTempOpen( '/dir', 'packageName' );
+  test.is( _.strHas( got, '/dir/Temp' ) );
+  test.is( _.strHas( got, 'packageName' ) );
+  test.is( extract.isDir( got ) );
+  extract.path.pathDirTempClose( got );
+  test.is( !extract.fileExists( got ) );
+
+}
+
+//
+
+function pathDirTempCloseAfter( test )
+{
+  let a = test.assetFor( false );
+  let toolsPath = _testerGlobal_.wTools.strEscape( a.path.nativize( a.path.join( __dirname, '../../Tools.s' ) ) );
+  let programSourceCode =
+`
+var toolsPath = '${toolsPath}';
+${program.toString()}
+program();
+`
+
+  a.fileProvider.fileWrite( a.abs( 'Program.js' ), programSourceCode );
+  a.jsNonThrowing({ execPath : a.abs( 'Program.js' ) })
+  .then( ( op ) =>
+  { 
+    test.identical( _.strCount( op.output, 'tempDirCreated' ), 1 );
+    test.identical( _.strCount( op.output, '= Message of error' ), 1 );
+    test.is( _.strHas( op.output, 'Not found temp dir for path' ) );
+    return null;
+  });
+
+  return a.ready;
+
+  function program()
+  {
+    var _ = require( toolsPath );
+    _.include( 'wFiles' );
+    
+    var tempPath = _.path.pathDirTempOpen( _.path.normalize( __dirname ), 'pathDirTempCloseAfter' );
+    if( _.fileProvider.isDir( tempPath ) )
+    console.log( 'tempDirCreated' );
+    _.process.exitHandlerOnce( () =>
+    {
+      _.path.pathDirTempClose( tempPath )
+    });
+  }
+}
+
+pathDirTempCloseAfter.description = 
+`
+  Try to manully close temp dir after automatic close leads to an error.
+`
+
+// --
+// next pathDirTemp* tests
+// --
+
+function nextPathDirTemp( test )
+{
+  let filesTree = Object.create( null );
+  let extract = new _.FileProvider.Extract({ filesTree })
+  var name = 'pathDirTempOpenTest';
+
   //
 
   test.open( 'same drive' );
@@ -1284,52 +1525,7 @@ function pathDirTemp( test )
 
 //
 
-function pathDirTempCloseAfter( test )
-{
-  let a = test.assetFor( false );
-  let toolsPath = _testerGlobal_.wTools.strEscape( a.path.nativize( a.path.join( __dirname, '../../Tools.s' ) ) );
-  let programSourceCode =
-`
-var toolsPath = '${toolsPath}';
-${program.toString()}
-program();
-`
-
-  a.fileProvider.fileWrite( a.abs( 'Program.js' ), programSourceCode );
-  a.jsNonThrowing({ execPath : a.abs( 'Program.js' ) })
-  .then( ( op ) =>
-  { 
-    test.identical( _.strCount( op.output, 'tempDirCreated' ), 1 );
-    test.identical( _.strCount( op.output, '= Message of error' ), 1 );
-    test.is( _.strHas( op.output, 'Not found temp dir for path' ) );
-    return null;
-  });
-
-  return a.ready;
-
-  function program()
-  {
-    var _ = require( toolsPath );
-    _.include( 'wFiles' );
-    
-    var tempPath = _.path.pathDirTempOpen( _.path.normalize( __dirname ), 'pathDirTempCloseAfter' );
-    if( _.fileProvider.isDir( tempPath ) )
-    console.log( 'tempDirCreated' );
-    _.process.exitHandlerOnce( () =>
-    {
-      _.path.pathDirTempClose( tempPath )
-    });
-  }
-}
-
-pathDirTempCloseAfter.description = 
-`
-  Try to manully close temp dir after automatic close leads to an error.
-`
-
-//
-
-function pathDirTempMultipleNamespacesSamePath( test )
+function nextPathDirTempMultipleNamespacesSamePath( test )
 {
   let filesTree = Object.create( null );
   let extract = new _.FileProvider.Extract({ filesTree })
@@ -1353,7 +1549,7 @@ function pathDirTempMultipleNamespacesSamePath( test )
   extract.path.pathDirTempClose();
 }
 
-pathDirTempMultipleNamespacesSamePath.description = 
+nextPathDirTempMultipleNamespacesSamePath.description = 
 `
   Two namespaces are created for single filePath.
   Index contains record for two namespaces and one tempDir.
@@ -1362,7 +1558,7 @@ pathDirTempMultipleNamespacesSamePath.description =
 
 //
 
-function pathDirTempMultipleNamespacesDiffPath( test )
+function nextPathDirTempMultipleNamespacesDiffPath( test )
 {
   let filesTree = Object.create( null );
   let extract = new _.FileProvider.Extract({ filesTree })
@@ -1389,7 +1585,7 @@ function pathDirTempMultipleNamespacesDiffPath( test )
   extract.path.pathDirTempClose();
 }
 
-pathDirTempMultipleNamespacesDiffPath.description = 
+nextPathDirTempMultipleNamespacesDiffPath.description = 
 `
   Two namespaces are created for different file paths.
   Index contains record for two namespaces and two tempDir's.
@@ -1398,7 +1594,7 @@ pathDirTempMultipleNamespacesDiffPath.description =
 
 //
 
-function pathDirTempMultiplePathSameNamespace( test )
+function nextPathDirTempMultiplePathSameNamespace( test )
 {
   let filesTree = Object.create( null );
   let extract = new _.FileProvider.Extract({ filesTree })
@@ -1423,14 +1619,14 @@ function pathDirTempMultiplePathSameNamespace( test )
   extract.path.pathDirTempClose();
 }
 
-pathDirTempMultiplePathSameNamespace.description = 
+nextPathDirTempMultiplePathSameNamespace.description = 
 `
   Two different paths are created for signle namespace.
 `
 
 //
 
-function pathDirTempIndexLock( test )
+function nextPathDirTempIndexLock( test )
 {
   let a = test.assetFor( false );
   let toolsPath = _testerGlobal_.wTools.strEscape( a.path.nativize( a.path.join( __dirname, '../../amid/files/UseTop.s' ) ) );
@@ -1485,15 +1681,15 @@ function pathDirTempIndexLock( test )
     console.log( 'Temp dir created' );
   }
 }
-pathDirTempIndexLock.timeOut = 10000;
-pathDirTempIndexLock.description = 
+nextPathDirTempIndexLock.timeOut = 10000;
+nextPathDirTempIndexLock.description = 
 `
 Second process locks file when main releases it after two seconds.
 `
 
 //
 
-function pathDirTempIndexLockThrowing( test )
+function nextPathDirTempIndexLockThrowing( test )
 {
   let a = test.assetFor( false );
   let toolsPath = _testerGlobal_.wTools.strEscape( a.path.nativize( a.path.join( __dirname, '../../amid/files/UseTop.s' ) ) );
@@ -1544,12 +1740,11 @@ function pathDirTempIndexLockThrowing( test )
     });
   }
 }
-pathDirTempIndexLockThrowing.timeOut = 10000;
-pathDirTempIndexLockThrowing.description = 
+nextPathDirTempIndexLockThrowing.timeOut = 10000;
+nextPathDirTempIndexLockThrowing.description = 
 `
 Second process exits with lock error after timeout.
 `
-
 
 // --
 // declare
@@ -1604,11 +1799,14 @@ var Self =
     pathDirTemp,
     pathDirTempCloseAfter,
     
-    pathDirTempMultipleNamespacesSamePath,
-    pathDirTempMultipleNamespacesDiffPath,
-    pathDirTempMultiplePathSameNamespace,
-    pathDirTempIndexLock,
-    pathDirTempIndexLockThrowing,
+    //
+    
+    // nextPathDirTemp,
+    // nextPathDirTempMultipleNamespacesSamePath,
+    // nextPathDirTempMultipleNamespacesDiffPath,
+    // nextPathDirTempMultiplePathSameNamespace,
+    // nextPathDirTempIndexLock,
+    // nextPathDirTempIndexLockThrowing
 
   },
 

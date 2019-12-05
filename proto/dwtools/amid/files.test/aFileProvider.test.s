@@ -40551,7 +40551,7 @@ function record( test )
   test.identical( record.absolute, expected );
 
   var filePath = test.context.globalFromPreferred( '/record/terminal' );
-  var expected = filePath;
+  var expected = '/record/terminal';
   var record = self.provider.record( filePath );
   test.identical( record.absolute, expected );
 
@@ -40569,10 +40569,10 @@ function recordStat( test )
   test.is( _.longHas( _.mapKeys( system.providersWithProtocolMap ), providerEffective.protocol ) );
 
   let filePath = test.context.pathFor( 'written/recordStat/file' );
-  filePath = test.context.globalFromPreferred( filePath );
   var record = self.provider.recordFactory({ allowingMissed : 1 }).record( filePath );
   test.identical( record.stat, null );
-
+  test.identical( record.absolute, providerEffective.path.preferredFromGlobal( filePath ) );
+  test.identical( record.real, providerEffective.path.preferredFromGlobal( filePath ) );
 }
 
 recordStat.description =

@@ -33234,6 +33234,10 @@ function hardLinkRelativeSoftLinking( test )
   let src2Path = test.context.pathFor( 'written/hardLinkRelativeSoftLinking/src2' );
   let src3Path = test.context.pathFor( 'written/hardLinkRelativeSoftLinking/src3' );
   let dstPath = test.context.pathFor( 'written/hardLinkRelativeSoftLinking/dst' );
+  
+  let hardLinked = true;
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) && !provider.UsingBigIntForStat )
+  hardLinked = _.maybe;
 
   /*
     src1 -> ../src2
@@ -33345,7 +33349,7 @@ test.identical( provider.pathResolveSoftLink( dstPath ),  test.context.globalFro
   test.is( provider.isSoftLink( src1Path ) );
   test.is( provider.isTerminal( src2Path ) );
   test.is( provider.isTerminal( dstPath ) );
-  test.is( provider.filesAreHardLinked([ dstPath, src2Path ]) );
+  test.identical( provider.filesAreHardLinked([ dstPath, src2Path ]), hardLinked );
 
   /* */
 
@@ -33377,7 +33381,7 @@ test.identical( provider.pathResolveSoftLink( dstPath ),  test.context.globalFro
   test.is( provider.isSoftLink( src1Path ) );
   test.is( provider.isTerminal( src2Path ) );
   test.is( provider.isTerminal( dstPath ) );
-  test.is( provider.filesAreHardLinked([ dstPath, src2Path ]) );
+  test.identical( provider.filesAreHardLinked([ dstPath, src2Path ]), hardLinked );
 
   /* missing absolute src */
 
@@ -33564,7 +33568,8 @@ test.identical( provider.pathResolveSoftLink( dstPath ),  test.context.globalFro
   test.is( provider.isSoftLink( src2Path ) );
   test.is( provider.isTerminal( dstPath ) );
   test.is( provider.isTerminal( src3Path ) );
-  test.is( provider.filesAreHardLinked([ dstPath,src3Path ]) );
+  test.identical( provider.filesAreHardLinked([ dstPath, src3Path ]), hardLinked );
+  
 
   /*  */
 
@@ -33602,7 +33607,7 @@ test.identical( provider.pathResolveSoftLink( dstPath ),  test.context.globalFro
   test.is( provider.isSoftLink( src2Path ) );
   test.is( provider.isTerminal( dstPath ) );
   test.is( provider.isTerminal( src3Path ) );
-  test.is( provider.filesAreHardLinked([ dstPath,src3Path ]) );
+  test.identical( provider.filesAreHardLinked([ dstPath, src3Path ]), hardLinked );
 }
 
 //

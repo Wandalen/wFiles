@@ -35,14 +35,15 @@ function onSuiteBegin( test )
   
   if( RunningInTravis )
   {  
-    let gitConfig = _.process.start
+    let gitConfig = _.process.starter
     ({
+      execPath : 'git config --global',
       sync : 1,
       deasync : 0,
       mode : 'shell'
     })
-    gitConfig( `git config --global user.email "test@test.com"` )
-    gitConfig( `git config --global user.name "Test"` )
+    gitConfig( `user.email "test@test.com"` )
+    gitConfig( `user.name "Test"` )
   }
 
 }

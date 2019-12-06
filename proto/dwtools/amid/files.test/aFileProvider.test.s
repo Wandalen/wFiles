@@ -25394,7 +25394,7 @@ function softLinkRelativeLinkResolving( test )
   test.close( 'links to same file' );
 }
 
-softLinkRelativeLinkResolving.timeOut = 10000;
+softLinkRelativeLinkResolving.timeOut = 30000;
 
 //
 

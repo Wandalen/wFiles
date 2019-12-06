@@ -14,6 +14,7 @@ if( typeof module !== 'undefined' )
 //
 
 var _ = _global_.wTools;
+var RunningInTravis = 'TRAVIS' in process.env && 'CI' in process.env;
 
 //
 
@@ -31,6 +32,18 @@ function onSuiteBegin( test )
   context.suitePath = path.pathDirTempOpen( path.join( __dirname, '../..'  ),'FileProviderGit' );
   context.suitePath = context.providerDst.pathResolveLinkFull({ filePath : context.suitePath, resolvingSoftLink : 1 });
   context.suitePath = context.suitePath.absolutePath;
+  
+  if( RunningInTravis )
+  {  
+    let gitConfig = _.process.start
+    ({
+      sync : 1,
+      deasync : 0,
+      mode : 'shell'
+    })
+    gitConfig( `git config --global user.email "test@test.com"` )
+    gitConfig( `git config --global user.name "Test"` )
+  }
 
 }
 

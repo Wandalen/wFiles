@@ -1466,6 +1466,8 @@ function readWriteSync( test )
   // }
 }
 
+readWriteSync.timeOut = 15000;
+
 //
 
 function readWriteAsync( test )
@@ -9374,6 +9376,7 @@ test.identical( provider.pathResolveSoftLink( dstPath ),  test.context.globalFro
   test.identical( provider.fileRead( dstPath ), src3Path );
 }
 
+fileCopyRelativeLinking.timeOut = 15000;
 
 //
 
@@ -12195,6 +12198,8 @@ function fileRenameAsync( test )
   return consequence;
 }
 
+fileRenameAsync.timeOut = 15000;
+
 //
 
 function fileRenameActSync( test )
@@ -13639,6 +13644,8 @@ function fileRenameRelativeSoftLinking( test )
   test.identical( provider.fileRead( dstPath ), src3Path );
 }
 
+fileRenameRelativeSoftLinking.timeOut = 15000;
+
 //
 
 function fileRenameRelativeTextLinking( test )
@@ -14040,6 +14047,8 @@ function fileRenameRelativeTextLinking( test )
   provider.fieldPop( 'usingTextLink', 1 )
 
 }
+
+fileRenameRelativeTextLinking.timeOut = 15000;
 
 //
 
@@ -18176,6 +18185,8 @@ function statReadActLinkedHead( test )
   test.identical( got, null );
 
 }
+
+statReadActLinkedHead.timeOut = 15000;
 
 //
 
@@ -26070,6 +26081,8 @@ test.identical( provider.pathResolveSoftLink( dstPath ),  test.context.globalFro
   test.identical( provider.pathResolveSoftLink( dstPath ),  test.context.globalFromPreferred( '../src3' ) );
 }
 
+softLinkRelativeSoftLinking.timeOut = 15000;
+
 //
 
 function softLinkRelativeTextLinking( test )
@@ -26440,6 +26453,8 @@ test.identical( provider.pathResolveSoftLink( dstPath ),  test.context.globalFro
   provider.fieldPop( 'usingTextLink', 1 )
 
 }
+
+softLinkRelativeTextLinking.timeOut = 15000;
 
 //
 
@@ -27006,6 +27021,8 @@ function textLinkSync( test )
   self.provider.fieldPop( 'usingTextLink', 1 );
 }
 
+textLinkSync.timeOut = 15000;
+
 function textLinkResolvingBasic( test )
 {
   let self = this;
@@ -27490,6 +27507,8 @@ function textLinkRelativeSoftLinking( test )
   provider.fieldPop( 'usingTextLink', 1 );
 
 }
+
+textLinkRelativeSoftLinking.timeOut = 15000;
 
 //
 
@@ -33610,6 +33629,8 @@ test.identical( provider.pathResolveSoftLink( dstPath ),  test.context.globalFro
   test.identical( provider.filesAreHardLinked([ dstPath, src3Path ]), hardLinked );
 }
 
+hardLinkRelativeSoftLinking.timeOut = 15000;
+
 //
 
 function hardLinkRelativeTextLinking( test )
@@ -36679,6 +36700,8 @@ function isTextLink( test )
 
   provider.fieldPop( 'usingTextLink', 1 )
 };
+
+isTextLink.timeOut = 15000;
 
 //
 

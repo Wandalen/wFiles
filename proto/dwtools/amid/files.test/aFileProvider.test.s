@@ -4756,6 +4756,8 @@ function fileCopyActSync( test )
 
 }
 
+fileCopyActSync.timeOut = 15000;
+
 //
 
 function fileCopySync( test )

@@ -14979,6 +14979,7 @@ function fileDeleteLocked( test )
   test.case = 'try to delete opened file using fs.createReadStream';
   provider.fileWrite( terminalPath, terminalPath );
   var stream = provider.streamRead( terminalPath );
+  _.time.out( 100 ).deasyncWait();
   var got = fs.unlinkSync( path.nativize( terminalPath ) );
   test.will = 'no errors from fs module';
   test.identical( got, undefined );

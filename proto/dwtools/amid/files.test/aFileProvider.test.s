@@ -1466,8 +1466,6 @@ function readWriteSync( test )
   // }
 }
 
-readWriteSync.timeOut = 15000;
-
 //
 
 function readWriteAsync( test )
@@ -2697,8 +2695,6 @@ function readWriteAsync( test )
 
  return consequence;
 }
-
-readWriteAsync.timeOut = 15000;
 
 //
 
@@ -4758,8 +4754,6 @@ function fileCopyActSync( test )
 
 }
 
-fileCopyActSync.timeOut = 15000;
-
 //
 
 function fileCopySync( test )
@@ -6270,8 +6264,6 @@ function fileCopyLinksSync( test )
 
   debugger; return; xxx
 }
-
-fileCopyLinksSync.timeOut = 15000;
 
 //
 
@@ -7795,8 +7787,6 @@ function fileCopySoftLinkResolving( test )
   test.close( 'links to same file' );
 }
 
-fileCopySoftLinkResolving.timeOut = 30000;
-
 //
 
 function fileCopyLinks( test )
@@ -8015,8 +8005,6 @@ function fileCopyLinks( test )
   test.identical( provider.fileRead( srcPath ), srcPathTerminal );
   test.identical( provider.fileRead( dstPath ), srcPathTerminal );
 }
-
-fileCopyLinks.timeOut = 15000;
 
 //
 
@@ -8907,8 +8895,6 @@ function fileCopySoftLinkExtended( test )
   test.close( 'src soft link to missing, dst terminal' );
 }
 
-fileCopySoftLinkExtended.timeOut = 15000;
-
 //
 
 function fileCopyResolvingBasic( test )
@@ -9381,8 +9367,6 @@ test.identical( provider.pathResolveSoftLink( dstPath ),  test.context.globalFro
   test.is( provider.isTerminal( src3Path ) );
   test.identical( provider.fileRead( dstPath ), src3Path );
 }
-
-fileCopyRelativeLinking.timeOut = 15000;
 
 //
 
@@ -11375,8 +11359,6 @@ function fileRenameRelativePath( test )
 
 }
 
-fileRenameRelativePath.timeOut = 30000;
-
 //
 
 function fileRenameAsync( test )
@@ -12203,8 +12185,6 @@ function fileRenameAsync( test )
 
   return consequence;
 }
-
-fileRenameAsync.timeOut = 15000;
 
 //
 
@@ -13042,8 +13022,6 @@ function fileRenameSoftLinkResolving( test )
   test.close( 'links to same file' );
 }
 
-fileRenameSoftLinkResolving.timeOut = 15000;
-
 //
 
 function fileRenameResolvingBasic( test )
@@ -13650,8 +13628,6 @@ function fileRenameRelativeSoftLinking( test )
   test.identical( provider.fileRead( dstPath ), src3Path );
 }
 
-fileRenameRelativeSoftLinking.timeOut = 15000;
-
 //
 
 function fileRenameRelativeTextLinking( test )
@@ -14053,8 +14029,6 @@ function fileRenameRelativeTextLinking( test )
   provider.fieldPop( 'usingTextLink', 1 )
 
 }
-
-fileRenameRelativeTextLinking.timeOut = 15000;
 
 //
 
@@ -15600,8 +15574,6 @@ function fileLockWaitingNotSharingAsync( test )
   return ready;
 }
 
-fileLockWaitingNotSharingAsync.timeOut = 30000;
-
 //
 
 function fileLockWaitingSharingAsync( test )
@@ -15866,8 +15838,6 @@ function fileLockWaitingSharingAsync( test )
 
   return ready;
 }
-
-fileLockWaitingSharingAsync.timeOut = 30000;
 
 //
 
@@ -16209,8 +16179,6 @@ function fileLockNotWaitingSharingAsync( test )
   return ready;
 }
 
-fileLockNotWaitingSharingAsync.timeOut = 30000;
-
 //
 
 function fileLockNotWaitingNotSharingSync( test )
@@ -16545,8 +16513,6 @@ function fileLockNotWaitingNotSharingAsync( test )
 
   return ready;
 }
-
-fileLockNotWaitingNotSharingAsync.timeOut = 30000;
 
 //
 
@@ -18191,8 +18157,6 @@ function statReadActLinkedHead( test )
   test.identical( got, null );
 
 }
-
-statReadActLinkedHead.timeOut = 15000;
 
 //
 
@@ -20729,8 +20693,6 @@ function fileWriteAsync( test )
   return consequence;
 }
 
-fileWriteAsync.timeOut = 30000;
-
 //
 
 function fileWriteLinksAsync( test )
@@ -21407,8 +21369,6 @@ function fileWriteLinksAsync( test )
 
   return con;
 }
-
-fileWriteLinksAsync.timeOut = 30000;
 
 //
 
@@ -23626,8 +23586,6 @@ function softLinkRelativePath( test )
   test.close( 'allowingMissed off, same path' );
 }
 
-softLinkRelativePath.timeOut = 30000;
-
 //
 
 function fileReadAsync( test )
@@ -24882,8 +24840,6 @@ function softLinkSoftLinkResolving( test )
   test.close( 'links to same file' );
 }
 
-softLinkSoftLinkResolving.timeOut = 30000;
-
 //
 
 function softLinkRelativeLinkResolving( test )
@@ -25410,8 +25366,6 @@ function softLinkRelativeLinkResolving( test )
 
   test.close( 'links to same file' );
 }
-
-softLinkRelativeLinkResolving.timeOut = 30000;
 
 //
 
@@ -26087,8 +26041,6 @@ test.identical( provider.pathResolveSoftLink( dstPath ),  test.context.globalFro
   test.identical( provider.pathResolveSoftLink( dstPath ),  test.context.globalFromPreferred( '../src3' ) );
 }
 
-softLinkRelativeSoftLinking.timeOut = 15000;
-
 //
 
 function softLinkRelativeTextLinking( test )
@@ -26459,8 +26411,6 @@ test.identical( provider.pathResolveSoftLink( dstPath ),  test.context.globalFro
   provider.fieldPop( 'usingTextLink', 1 )
 
 }
-
-softLinkRelativeTextLinking.timeOut = 15000;
 
 //
 
@@ -27027,8 +26977,6 @@ function textLinkSync( test )
   self.provider.fieldPop( 'usingTextLink', 1 );
 }
 
-textLinkSync.timeOut = 15000;
-
 function textLinkResolvingBasic( test )
 {
   let self = this;
@@ -27514,8 +27462,6 @@ function textLinkRelativeSoftLinking( test )
 
 }
 
-textLinkRelativeSoftLinking.timeOut = 15000;
-
 //
 
 function textLinkGlobal( test )
@@ -27980,8 +27926,6 @@ function textLinkRelativeTextLinking( test )
 
 }
 
-textLinkRelativeTextLinking.timeOut = 15000;
-
 //
 
 function hardLinkSync( test )
@@ -28389,8 +28333,6 @@ function hardLinkSync( test )
   var terminalStatAfter = self.provider.statRead( terminalPath );
   test.identical( terminalStatBefore.mtime.getTime(), terminalStatAfter.mtime.getTime() );
 }
-
-hardLinkSync.timeOut = 60000;
 
 //
 
@@ -28894,8 +28836,6 @@ function hardLinkMultipleSync( test )
   var ok = test.identical( src, dst );
 }
 
-hardLinkMultipleSync.timeOut = 60000;
-
 //
 
 function hardLinkRelativePath( test )
@@ -29216,8 +29156,6 @@ function hardLinkExperiment( test )
   var dst = provider.fileRead( paths[ paths.length - 1 ] );
   test.identical( src, dst );
 }
-
-hardLinkExperiment.timeOut = 30000;
 
 //
 
@@ -30964,8 +30902,6 @@ function hardLinkActAsync( test )
   return con;
 }
 
-hardLinkActAsync.timeOut = 15000;
-
 //
 
 function fileExchangeSync( test )
@@ -32266,8 +32202,6 @@ function fileExchangeAsync( test )
 
 }
 
-fileExchangeAsync.timeOut = 15000;
-
 //
 
 function hardLinkSoftLinkResolving( test )
@@ -32758,8 +32692,6 @@ function hardLinkSoftLinkResolving( test )
 
   test.close( 'links to same file' );
 }
-
-hardLinkSoftLinkResolving.timeOut = 30000;
 
 //
 
@@ -33635,8 +33567,6 @@ test.identical( provider.pathResolveSoftLink( dstPath ),  test.context.globalFro
   test.identical( provider.filesAreHardLinked([ dstPath, src3Path ]), hardLinked );
 }
 
-hardLinkRelativeSoftLinking.timeOut = 15000;
-
 //
 
 function hardLinkRelativeTextLinking( test )
@@ -34035,8 +33965,6 @@ function hardLinkRelativeTextLinking( test )
 
   provider.fieldPop( 'usingTextLink', 1 );
 }
-
-hardLinkRelativeTextLinking.timeOut = 15000;
 
 //
 
@@ -35767,8 +35695,6 @@ function isTerminal( test )
 
 };
 
-isTerminal.timeOut = 20000;
-
 //
 
 function isSoftLink( test )
@@ -36367,8 +36293,6 @@ function isSoftLink( test )
 
 }
 
-isSoftLink.timeOut = 15000;
-
 //
 
 //
@@ -36706,8 +36630,6 @@ function isTextLink( test )
 
   provider.fieldPop( 'usingTextLink', 1 )
 };
-
-isTextLink.timeOut = 15000;
 
 //
 
@@ -37903,8 +37825,6 @@ function isHardLink( test )
 
   provider.fieldPop( 'usingTextLink', 1 );
 }
-
-isHardLink.timeOut = 20000;
 
 //
 
@@ -39360,8 +39280,6 @@ function isLink( test )
 
   provider.fieldPop( 'usingTextLink', 1 );
 }
-
-isLink.timeOut = 30000;
 
 //
 
@@ -42529,8 +42447,6 @@ function pathResolveLinkTailChain( test )
   provider.fieldPop( 'usingTextLink', true );
 }
 
-pathResolveLinkTailChain.timeOut = 30000;
-
 //
 
 function pathResolveLinkFull( test )
@@ -43230,8 +43146,6 @@ function pathResolveLinkFull( test )
   // test.identical( got,pathToFile );
 
 }
-
-pathResolveLinkFull.timeOut = 30000;
 
 //
 
@@ -45267,8 +45181,6 @@ function pathResolveTextLink( test )
   test.shouldThrowErrorOfAnyKind( () => provider.pathResolveTextLink( { filePath : NaN } ) );
 
 }
-
-pathResolveTextLink.timeOut = 15000;
 
 //
 

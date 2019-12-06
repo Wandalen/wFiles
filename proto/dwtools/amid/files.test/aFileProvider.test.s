@@ -33146,6 +33146,10 @@ function hardLinkGlobal( test )
   var dstPathSecond = 'second://' + dstPath;
 
   var dstPathUnknown = 'unknown://' + dstPath;
+  
+  let hardLinked = true;
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) && !provider.UsingBigIntForStat )
+  hardLinked = _.maybe;
 
   /*  */
 
@@ -33157,7 +33161,7 @@ function hardLinkGlobal( test )
   provider.hardLink( dstPathDefault, srcPathDefault );
   test.is( provider.isTerminal( srcPath ) );
   test.is( provider.isTerminal( dstPath ) );
-  test.is( provider.filesAreHardLinked([ srcPath, dstPath ]) );
+  test.identical( provider.filesAreHardLinked([ srcPath, dstPath ]), hardLinked );
 
   test.case = 'other protocol';
   provider.filesDelete( routinePath );
@@ -33165,7 +33169,7 @@ function hardLinkGlobal( test )
   provider.hardLink( dstPathSecond, srcPathSecond );
   test.is( provider.isTerminal( srcPath ) );
   test.is( provider.isTerminal( dstPath ) );
-  test.is( provider.filesAreHardLinked([ srcPath, dstPath ]) );
+  test.identical( provider.filesAreHardLinked([ srcPath, dstPath ]), hardLinked );
 
   test.case = 'src local, dst with unknown protocol';
   provider.filesDelete( routinePath );
@@ -33188,7 +33192,7 @@ function hardLinkGlobal( test )
   provider.hardLink( dstPathDefault, srcPathDefault );
   test.is( provider.isTerminal( srcPath ) );
   test.is( provider.isTerminal( dstPath ) );
-  test.is( provider.filesAreHardLinked([ srcPath, dstPath ]) );
+  test.identical( provider.filesAreHardLinked([ srcPath, dstPath ]), hardLinked );
 
   test.case = 'other protocol';
   provider.filesDelete( routinePath );
@@ -33196,7 +33200,7 @@ function hardLinkGlobal( test )
   provider.hardLink( dstPathSecond, srcPathSecond );
   test.is( provider.isTerminal( srcPath ) );
   test.is( provider.isTerminal( dstPath ) );
-  test.is( provider.filesAreHardLinked([ srcPath, dstPath ]) );
+  test.identical( provider.filesAreHardLinked([ srcPath, dstPath ]), hardLinked );
 
   test.case = 'src local, dst with unknown protocol';
   provider.filesDelete( routinePath );

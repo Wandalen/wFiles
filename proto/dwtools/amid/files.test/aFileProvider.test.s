@@ -48264,6 +48264,8 @@ var Self =
   abstract : 1,
   silencing : 1,
   // verbosity : 7,
+  
+  routineTimeOut : 60000,
 
   onSuiteBegin,
   onSuiteEnd,

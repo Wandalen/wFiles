@@ -33021,6 +33021,10 @@ function hardLinkResolvingBasic( test )
   let src2Path = test.context.pathFor( 'written/hardLinkResolvingBasic/src2' );
   let src3Path = test.context.pathFor( 'written/hardLinkResolvingBasic/src3' );
   let dstPath = test.context.pathFor( 'written/hardLinkResolvingBasic/dst' );
+  
+  let hardLinked = true;
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) && !provider.UsingBigIntForStat )
+  hardLinked = _.maybe;
 
   /*
       src1 -> src2 -> src3
@@ -33073,7 +33077,7 @@ function hardLinkResolvingBasic( test )
   test.is( provider.isSoftLink( src2Path ) );
   test.is( provider.isTerminal( src3Path ) );
   test.is( provider.isTerminal( dstPath ) );
-  test.is( provider.filesAreHardLinked([ src3Path, dstPath ]) )
+  test.identical( provider.filesAreHardLinked([ src3Path, dstPath ]), hardLinked )
 
   /* */
 
@@ -33113,7 +33117,7 @@ function hardLinkResolvingBasic( test )
   test.is( provider.isTextLink( src2Path ) );
   test.is( provider.isTerminal( src3Path ) );
   test.is( provider.isTerminal( dstPath ) );
-  test.is( provider.filesAreHardLinked([ src3Path, dstPath ]) )
+  test.identical( provider.filesAreHardLinked([ src3Path, dstPath ]), hardLinked )
 
   provider.fieldPop( 'usingTextLink', 1 );
 

@@ -37004,7 +37004,7 @@ var Self =
   name : 'Tools.mid.files.FilesFind.Abstract',
   abstract : 1,
   silencing : 1,
-  routineTimeOut : 150000,
+  routineTimeOut : 200000,
 
   onSuiteBegin,
   onSuiteEnd,

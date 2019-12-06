@@ -14,6 +14,7 @@ if( typeof module !== 'undefined' )
 //
 
 var _ = _global_.wTools;
+var RunningInTravis = 'TRAVIS' in process.env && 'CI' in process.env;
 
 //
 
@@ -31,6 +32,19 @@ function onSuiteBegin( test )
   context.suitePath = path.pathDirTempOpen( path.join( __dirname, '../..'  ),'FileProviderGit' );
   context.suitePath = context.providerDst.pathResolveLinkFull({ filePath : context.suitePath, resolvingSoftLink : 1 });
   context.suitePath = context.suitePath.absolutePath;
+  
+  if( RunningInTravis )
+  {  
+    let gitConfig = _.process.starter
+    ({
+      execPath : 'git config --global',
+      sync : 1,
+      deasync : 0,
+      mode : 'shell'
+    })
+    gitConfig( `user.email "test@test.com"` )
+    gitConfig( `user.name "Test"` )
+  }
 
 }
 
@@ -666,7 +680,7 @@ function filesReflectTrivial( test )
   return con;
 }
 
-filesReflectTrivial.timeOut = 60000;
+filesReflectTrivial.timeOut = 120000;
 
 //
 
@@ -738,7 +752,7 @@ function filesReflectNoStashing( test )
 
 }
 
-filesReflectNoStashing.timeOut = 60000;
+filesReflectNoStashing.timeOut = 120000;
 
 //
 
@@ -873,7 +887,7 @@ function filesReflectDownloadThrowing( test )
   return con;
 }
 
-filesReflectDownloadThrowing.timeOut = 60000;
+filesReflectDownloadThrowing.timeOut = 120000;
 
 //
 

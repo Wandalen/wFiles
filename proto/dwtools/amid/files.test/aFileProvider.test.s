@@ -40089,7 +40089,7 @@ function statsAreHardLinked( test )
   var stat2 = provider.statRead( filePath2 );
   stat1.ino = stat2.ino = 1;
   stat1.size = stat2.size = 1;
-  stat1.mtime = new Date();
+  stat1.mtime = new Date( Date.UTC( 2018,1,1 ) );
   var got = _.statsAreHardLinked( stat1,stat2 );
   test.identical( got, false );
 

@@ -8016,6 +8016,8 @@ function fileCopyLinks( test )
   test.identical( provider.fileRead( dstPath ), srcPathTerminal );
 }
 
+fileCopyLinks.timeOut = 15000;
+
 //
 
 function fileCopyError( test )

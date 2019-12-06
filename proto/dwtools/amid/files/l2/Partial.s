@@ -3182,6 +3182,7 @@ function fileRead_body( o )
 
   function handleError( err )
   {
+    _.errAttend( err );
     
     if( encoder && encoder.onError )
     try
@@ -3206,8 +3207,6 @@ function fileRead_body( o )
     
     if( o.throwing )
     throw _.err( err );
-    
-    _.errAttend( err );
 
     return null;
   }

@@ -2698,6 +2698,8 @@ function readWriteAsync( test )
  return consequence;
 }
 
+readWriteAsync.timeOut = 15000;
+
 //
 
 function fileReadJson( test )

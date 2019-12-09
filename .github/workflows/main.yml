@@ -5,23 +5,21 @@ on: [push]
 jobs:
   build:
 
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
         node-version: [8.x, 10.x, 12.x]
 
     steps:
-    - name: clone
-      run: |
-        git clone https://github.com/volodymyrmigdal/wFiles.git
-        cd wFiles
+    - uses: actions/checkout@v1
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: npm install and test
+    - name: npm install, build, and test
       run: |
+        git checkout fix-test
         npm install
         npm test
       env:

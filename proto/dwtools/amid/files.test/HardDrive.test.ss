@@ -49,6 +49,7 @@ function onSuiteBegin( test )
   context.suitePath = context.provider.pathResolveLinkFull({ filePath : context.suitePath, resolvingSoftLink : 1 });
   context.suitePath = context.suitePath.absolutePath;
   context.globalFromPreferred = function globalFromPreferred( path ){ return path };
+  
   // let path = this.provider.path;
   // this.suitePath = path.pathDirTempOpen( path.join( __dirname, '../..'  ), 'Provider/HardDrive' );
 }

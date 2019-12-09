@@ -6265,8 +6265,6 @@ function fileCopyLinksSync( test )
   debugger; return; xxx
 }
 
-fileCopyLinksSync.timeOut = 15000;
-
 //
 
 function fileCopyAsync( test )
@@ -7789,8 +7787,6 @@ function fileCopySoftLinkResolving( test )
   test.close( 'links to same file' );
 }
 
-fileCopySoftLinkResolving.timeOut = 30000;
-
 //
 
 function fileCopyLinks( test )
@@ -8899,8 +8895,6 @@ function fileCopySoftLinkExtended( test )
   test.close( 'src soft link to missing, dst terminal' );
 }
 
-fileCopySoftLinkExtended.timeOut = 15000;
-
 //
 
 function fileCopyResolvingBasic( test )
@@ -9373,7 +9367,6 @@ test.identical( provider.pathResolveSoftLink( dstPath ),  test.context.globalFro
   test.is( provider.isTerminal( src3Path ) );
   test.identical( provider.fileRead( dstPath ), src3Path );
 }
-
 
 //
 
@@ -11366,8 +11359,6 @@ function fileRenameRelativePath( test )
 
 }
 
-fileRenameRelativePath.timeOut = 30000;
-
 //
 
 function fileRenameAsync( test )
@@ -13030,8 +13021,6 @@ function fileRenameSoftLinkResolving( test )
 
   test.close( 'links to same file' );
 }
-
-fileRenameSoftLinkResolving.timeOut = 15000;
 
 //
 
@@ -14990,6 +14979,7 @@ function fileDeleteLocked( test )
   test.case = 'try to delete opened file using fs.createReadStream';
   provider.fileWrite( terminalPath, terminalPath );
   var stream = provider.streamRead( terminalPath );
+  _.time.out( 100 ).deasyncWait();
   var got = fs.unlinkSync( path.nativize( terminalPath ) );
   test.will = 'no errors from fs module';
   test.identical( got, undefined );
@@ -15585,8 +15575,6 @@ function fileLockWaitingNotSharingAsync( test )
   return ready;
 }
 
-fileLockWaitingNotSharingAsync.timeOut = 30000;
-
 //
 
 function fileLockWaitingSharingAsync( test )
@@ -15851,8 +15839,6 @@ function fileLockWaitingSharingAsync( test )
 
   return ready;
 }
-
-fileLockWaitingSharingAsync.timeOut = 30000;
 
 //
 
@@ -16194,8 +16180,6 @@ function fileLockNotWaitingSharingAsync( test )
   return ready;
 }
 
-fileLockNotWaitingSharingAsync.timeOut = 30000;
-
 //
 
 function fileLockNotWaitingNotSharingSync( test )
@@ -16530,8 +16514,6 @@ function fileLockNotWaitingNotSharingAsync( test )
 
   return ready;
 }
-
-fileLockNotWaitingNotSharingAsync.timeOut = 30000;
 
 //
 
@@ -20712,8 +20694,6 @@ function fileWriteAsync( test )
   return consequence;
 }
 
-fileWriteAsync.timeOut = 30000;
-
 //
 
 function fileWriteLinksAsync( test )
@@ -21390,8 +21370,6 @@ function fileWriteLinksAsync( test )
 
   return con;
 }
-
-fileWriteLinksAsync.timeOut = 30000;
 
 //
 
@@ -23609,8 +23587,6 @@ function softLinkRelativePath( test )
   test.close( 'allowingMissed off, same path' );
 }
 
-softLinkRelativePath.timeOut = 30000;
-
 //
 
 function fileReadAsync( test )
@@ -24865,8 +24841,6 @@ function softLinkSoftLinkResolving( test )
   test.close( 'links to same file' );
 }
 
-softLinkSoftLinkResolving.timeOut = 30000;
-
 //
 
 function softLinkRelativeLinkResolving( test )
@@ -25393,8 +25367,6 @@ function softLinkRelativeLinkResolving( test )
 
   test.close( 'links to same file' );
 }
-
-softLinkRelativeLinkResolving.timeOut = 10000;
 
 //
 
@@ -27955,8 +27927,6 @@ function textLinkRelativeTextLinking( test )
 
 }
 
-textLinkRelativeTextLinking.timeOut = 15000;
-
 //
 
 function hardLinkSync( test )
@@ -28364,8 +28334,6 @@ function hardLinkSync( test )
   var terminalStatAfter = self.provider.statRead( terminalPath );
   test.identical( terminalStatBefore.mtime.getTime(), terminalStatAfter.mtime.getTime() );
 }
-
-hardLinkSync.timeOut = 60000;
 
 //
 
@@ -28869,8 +28837,6 @@ function hardLinkMultipleSync( test )
   var ok = test.identical( src, dst );
 }
 
-hardLinkMultipleSync.timeOut = 60000;
-
 //
 
 function hardLinkRelativePath( test )
@@ -29191,8 +29157,6 @@ function hardLinkExperiment( test )
   var dst = provider.fileRead( paths[ paths.length - 1 ] );
   test.identical( src, dst );
 }
-
-hardLinkExperiment.timeOut = 30000;
 
 //
 
@@ -30939,8 +30903,6 @@ function hardLinkActAsync( test )
   return con;
 }
 
-hardLinkActAsync.timeOut = 15000;
-
 //
 
 function fileExchangeSync( test )
@@ -32241,8 +32203,6 @@ function fileExchangeAsync( test )
 
 }
 
-fileExchangeAsync.timeOut = 15000;
-
 //
 
 function hardLinkSoftLinkResolving( test )
@@ -32734,8 +32694,6 @@ function hardLinkSoftLinkResolving( test )
   test.close( 'links to same file' );
 }
 
-hardLinkSoftLinkResolving.timeOut = 30000;
-
 //
 
 function hardLinkHardLinkBreaking( test )
@@ -33021,6 +32979,10 @@ function hardLinkResolvingBasic( test )
   let src2Path = test.context.pathFor( 'written/hardLinkResolvingBasic/src2' );
   let src3Path = test.context.pathFor( 'written/hardLinkResolvingBasic/src3' );
   let dstPath = test.context.pathFor( 'written/hardLinkResolvingBasic/dst' );
+  
+  let hardLinked = true;
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) && !provider.UsingBigIntForStat )
+  hardLinked = _.maybe;
 
   /*
       src1 -> src2 -> src3
@@ -33073,7 +33035,7 @@ function hardLinkResolvingBasic( test )
   test.is( provider.isSoftLink( src2Path ) );
   test.is( provider.isTerminal( src3Path ) );
   test.is( provider.isTerminal( dstPath ) );
-  test.is( provider.filesAreHardLinked([ src3Path, dstPath ]) )
+  test.identical( provider.filesAreHardLinked([ src3Path, dstPath ]), hardLinked )
 
   /* */
 
@@ -33113,7 +33075,7 @@ function hardLinkResolvingBasic( test )
   test.is( provider.isTextLink( src2Path ) );
   test.is( provider.isTerminal( src3Path ) );
   test.is( provider.isTerminal( dstPath ) );
-  test.is( provider.filesAreHardLinked([ src3Path, dstPath ]) )
+  test.identical( provider.filesAreHardLinked([ src3Path, dstPath ]), hardLinked )
 
   provider.fieldPop( 'usingTextLink', 1 );
 
@@ -33142,6 +33104,10 @@ function hardLinkGlobal( test )
   var dstPathSecond = 'second://' + dstPath;
 
   var dstPathUnknown = 'unknown://' + dstPath;
+  
+  let hardLinked = true;
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) && !provider.UsingBigIntForStat )
+  hardLinked = _.maybe;
 
   /*  */
 
@@ -33153,7 +33119,7 @@ function hardLinkGlobal( test )
   provider.hardLink( dstPathDefault, srcPathDefault );
   test.is( provider.isTerminal( srcPath ) );
   test.is( provider.isTerminal( dstPath ) );
-  test.is( provider.filesAreHardLinked([ srcPath, dstPath ]) );
+  test.identical( provider.filesAreHardLinked([ srcPath, dstPath ]), hardLinked );
 
   test.case = 'other protocol';
   provider.filesDelete( routinePath );
@@ -33161,7 +33127,7 @@ function hardLinkGlobal( test )
   provider.hardLink( dstPathSecond, srcPathSecond );
   test.is( provider.isTerminal( srcPath ) );
   test.is( provider.isTerminal( dstPath ) );
-  test.is( provider.filesAreHardLinked([ srcPath, dstPath ]) );
+  test.identical( provider.filesAreHardLinked([ srcPath, dstPath ]), hardLinked );
 
   test.case = 'src local, dst with unknown protocol';
   provider.filesDelete( routinePath );
@@ -33184,7 +33150,7 @@ function hardLinkGlobal( test )
   provider.hardLink( dstPathDefault, srcPathDefault );
   test.is( provider.isTerminal( srcPath ) );
   test.is( provider.isTerminal( dstPath ) );
-  test.is( provider.filesAreHardLinked([ srcPath, dstPath ]) );
+  test.identical( provider.filesAreHardLinked([ srcPath, dstPath ]), hardLinked );
 
   test.case = 'other protocol';
   provider.filesDelete( routinePath );
@@ -33192,7 +33158,7 @@ function hardLinkGlobal( test )
   provider.hardLink( dstPathSecond, srcPathSecond );
   test.is( provider.isTerminal( srcPath ) );
   test.is( provider.isTerminal( dstPath ) );
-  test.is( provider.filesAreHardLinked([ srcPath, dstPath ]) );
+  test.identical( provider.filesAreHardLinked([ srcPath, dstPath ]), hardLinked );
 
   test.case = 'src local, dst with unknown protocol';
   provider.filesDelete( routinePath );
@@ -33226,6 +33192,10 @@ function hardLinkRelativeSoftLinking( test )
   let src2Path = test.context.pathFor( 'written/hardLinkRelativeSoftLinking/src2' );
   let src3Path = test.context.pathFor( 'written/hardLinkRelativeSoftLinking/src3' );
   let dstPath = test.context.pathFor( 'written/hardLinkRelativeSoftLinking/dst' );
+  
+  let hardLinked = true;
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) && !provider.UsingBigIntForStat )
+  hardLinked = _.maybe;
 
   /*
     src1 -> ../src2
@@ -33337,7 +33307,7 @@ test.identical( provider.pathResolveSoftLink( dstPath ),  test.context.globalFro
   test.is( provider.isSoftLink( src1Path ) );
   test.is( provider.isTerminal( src2Path ) );
   test.is( provider.isTerminal( dstPath ) );
-  test.is( provider.filesAreHardLinked([ dstPath, src2Path ]) );
+  test.identical( provider.filesAreHardLinked([ dstPath, src2Path ]), hardLinked );
 
   /* */
 
@@ -33369,7 +33339,7 @@ test.identical( provider.pathResolveSoftLink( dstPath ),  test.context.globalFro
   test.is( provider.isSoftLink( src1Path ) );
   test.is( provider.isTerminal( src2Path ) );
   test.is( provider.isTerminal( dstPath ) );
-  test.is( provider.filesAreHardLinked([ dstPath, src2Path ]) );
+  test.identical( provider.filesAreHardLinked([ dstPath, src2Path ]), hardLinked );
 
   /* missing absolute src */
 
@@ -33556,7 +33526,8 @@ test.identical( provider.pathResolveSoftLink( dstPath ),  test.context.globalFro
   test.is( provider.isSoftLink( src2Path ) );
   test.is( provider.isTerminal( dstPath ) );
   test.is( provider.isTerminal( src3Path ) );
-  test.is( provider.filesAreHardLinked([ dstPath,src3Path ]) );
+  test.identical( provider.filesAreHardLinked([ dstPath, src3Path ]), hardLinked );
+  
 
   /*  */
 
@@ -33594,7 +33565,7 @@ test.identical( provider.pathResolveSoftLink( dstPath ),  test.context.globalFro
   test.is( provider.isSoftLink( src2Path ) );
   test.is( provider.isTerminal( dstPath ) );
   test.is( provider.isTerminal( src3Path ) );
-  test.is( provider.filesAreHardLinked([ dstPath,src3Path ]) );
+  test.identical( provider.filesAreHardLinked([ dstPath, src3Path ]), hardLinked );
 }
 
 //
@@ -33616,6 +33587,10 @@ function hardLinkRelativeTextLinking( test )
   let src2Path = test.context.pathFor( 'written/hardLinkRelativeTextLinking/src2' );
   let src3Path = test.context.pathFor( 'written/hardLinkRelativeTextLinking/src3' );
   let dstPath = test.context.pathFor( 'written/hardLinkRelativeTextLinking/dst' );
+  
+  let hardLinked = true;
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) && !provider.UsingBigIntForStat )
+  hardLinked = _.maybe;
 
   /*
     src1 -> ../src2
@@ -33729,7 +33704,7 @@ function hardLinkRelativeTextLinking( test )
   test.is( provider.isTextLink( src1Path ) );
   test.is( provider.isTerminal( src2Path ) );
   test.is( provider.isTerminal( dstPath ) );
-  test.is( provider.filesAreHardLinked([ dstPath, src2Path ]) );
+  test.identical( provider.filesAreHardLinked([ dstPath, src2Path ]), hardLinked );
 
   /* */
 
@@ -33761,7 +33736,7 @@ function hardLinkRelativeTextLinking( test )
   test.is( provider.isTextLink( src1Path ) );
   test.is( provider.isTerminal( src2Path ) );
   test.is( provider.isTerminal( dstPath ) );
-  test.is( provider.filesAreHardLinked([ dstPath, src2Path ]) );
+  test.identical( provider.filesAreHardLinked([ dstPath, src2Path ]), hardLinked );
 
   /* missing absolute src */
 
@@ -33948,7 +33923,8 @@ function hardLinkRelativeTextLinking( test )
   test.is( provider.isTextLink( src2Path ) );
   test.is( provider.isTerminal( dstPath ) );
   test.is( provider.isTerminal( src3Path ) );
-  test.is( provider.filesAreHardLinked([ dstPath,src3Path ]) );
+  test.identical( provider.filesAreHardLinked([ dstPath, src3Path ]), hardLinked );
+  
 
   /*  */
 
@@ -33986,12 +33962,10 @@ function hardLinkRelativeTextLinking( test )
   test.is( provider.isTextLink( src2Path ) );
   test.is( provider.isTerminal( dstPath ) );
   test.is( provider.isTerminal( src3Path ) );
-  test.is( provider.filesAreHardLinked([ dstPath,src3Path ]) );
+  test.identical( provider.filesAreHardLinked([ dstPath, src3Path ]), hardLinked );
 
   provider.fieldPop( 'usingTextLink', 1 );
 }
-
-hardLinkRelativeTextLinking.timeOut = 15000;
 
 //
 
@@ -35722,8 +35696,6 @@ function isTerminal( test )
 
 };
 
-isTerminal.timeOut = 20000;
-
 //
 
 function isSoftLink( test )
@@ -36321,8 +36293,6 @@ function isSoftLink( test )
   provider.fieldPop( 'usingTextLink', 1 );
 
 }
-
-isSoftLink.timeOut = 15000;
 
 //
 
@@ -37857,8 +37827,6 @@ function isHardLink( test )
   provider.fieldPop( 'usingTextLink', 1 );
 }
 
-isHardLink.timeOut = 20000;
-
 //
 
 function isLink( test )
@@ -39314,8 +39282,6 @@ function isLink( test )
   provider.fieldPop( 'usingTextLink', 1 );
 }
 
-isLink.timeOut = 30000;
-
 //
 
 function fileStatIs( test )
@@ -40123,7 +40089,7 @@ function statsAreHardLinked( test )
   var stat2 = provider.statRead( filePath2 );
   stat1.ino = stat2.ino = 1;
   stat1.size = stat2.size = 1;
-  stat1.mtime = new Date();
+  stat1.mtime = new Date( Date.UTC( 2018,1,1 ) );
   var got = _.statsAreHardLinked( stat1,stat2 );
   test.identical( got, false );
 
@@ -42482,8 +42448,6 @@ function pathResolveLinkTailChain( test )
   provider.fieldPop( 'usingTextLink', true );
 }
 
-pathResolveLinkTailChain.timeOut = 30000;
-
 //
 
 function pathResolveLinkFull( test )
@@ -43183,8 +43147,6 @@ function pathResolveLinkFull( test )
   // test.identical( got,pathToFile );
 
 }
-
-pathResolveLinkFull.timeOut = 30000;
 
 //
 
@@ -45220,8 +45182,6 @@ function pathResolveTextLink( test )
   test.shouldThrowErrorOfAnyKind( () => provider.pathResolveTextLink( { filePath : NaN } ) );
 
 }
-
-pathResolveTextLink.timeOut = 15000;
 
 //
 
@@ -48217,6 +48177,8 @@ var Self =
   abstract : 1,
   silencing : 1,
   // verbosity : 7,
+  
+  routineTimeOut : 60000,
 
   onSuiteBegin,
   onSuiteEnd,

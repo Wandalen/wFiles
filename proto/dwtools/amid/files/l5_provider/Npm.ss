@@ -572,9 +572,11 @@ function filesReflectSingle_body( o )
     let got = shell({ execPath : 'npm install', args : npmArgs });
     _.assert( got.exitCode === 0 );
 
-
     localProvider.fileRename( dstPath, tmpEssentialPath )
     localProvider.fileDelete( path.dir( tmpEssentialPath ) );
+    let etcDirPath = path.join( tmpEssentialPath, '../../etc' );
+    if( localProvider.fileExists( etcDirPath ) )
+    localProvider.fileDelete( etcDirPath );
     localProvider.fileDelete( path.dir( path.dir( tmpEssentialPath ) ) );
 
     return recordsMake();

@@ -16164,7 +16164,7 @@ function fileLockNotWaitingSharingAsync( test )
     {
       let t2 = _.time.now();
       test.identical( got, true );
-      test.le( t2 - t1, 100 );
+      test.le( t2 - t1, 500 );
 
       test.is( provider.fileIsLocked( filePath ) );
       provider.fileUnlock( filePath );

@@ -19,7 +19,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - name: npm install, build, and tests
       run: |
-        git checkout fix-test
+        git checkout fix-tests
         npm install
         npm test
       env:

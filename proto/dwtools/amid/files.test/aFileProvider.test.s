@@ -4714,7 +4714,7 @@ function fileCopyActSync( test )
 
   test.case = 'should expect normalized path, but not nativized';
   var srcPath = routinePath + '\\src';
-  provider.fileWrite( srcPath, srcPath );
+  provider.fileWrite( provider.path.normalize( srcPath ), srcPath );
   var dstPath = routinePath + '\\dst';
   var o =
   {
@@ -12574,7 +12574,7 @@ function fileRenameActSync( test )
 
   test.case = 'should expect normalized path, but not nativized';
   var srcPath = routinePath + '\\src';
-  provider.fileWrite( srcPath, srcPath );
+  provider.fileWrite( provider.path.normalize( srcPath ), srcPath );
   var dstPath = routinePath + '\\dst';
   var o =
   {
@@ -29732,7 +29732,7 @@ function hardLinkActSync( test )
 
   test.case = 'should expect normalized path, but not nativized';
   var srcPath = routinePath + '\\src';
-  provider.fileWrite( srcPath, srcPath );
+  provider.fileWrite( provider.path.normalize( srcPath ), srcPath );
   var dstPath = routinePath + '\\dst';
   var o =
   {
@@ -48168,21 +48168,6 @@ function EncodersGenerate( test )
 
 //
 
-function experimentWithPath( test )
-{ 
-  let self = this;
-  var routinePath = test.context.pathFor( 'written/fileCopy' );
-  console.log( routinePath );
-  test.case = 'nativized path';
-  var srcPath = routinePath + '\\src';
-  self.provider.fileWrite( srcPath, srcPath );
-  console.log( self.provider.dirRead( srcPath ) )
-  console.log( self.provider.dirRead( self.provider.path.join( routinePath, '..' ) ) )
-  console.log( self.provider.fileRead( srcPath ) );
-}
-
-experimentWithPath.experiment = 1;
-
 // --
 // declare
 // --
@@ -48402,10 +48387,8 @@ var Self =
 
     //static
 
-    EncodersGenerate,
+    EncodersGenerate
     
-    experimentWithPath
-
   },
 
 };

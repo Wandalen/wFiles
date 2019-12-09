@@ -48166,6 +48166,23 @@ function EncodersGenerate( test )
   }
 }
 
+//
+
+function experimentWithPath( test )
+{ 
+  let self = this;
+  var routinePath = test.context.pathFor( 'written/fileCopy' );
+  console.log( routinePath );
+  test.case = 'nativized path';
+  var srcPath = routinePath + '\\src';
+  self.provider.fileWrite( srcPath, srcPath );
+  console.log( self.provider.dirRead( srcPath ) )
+  console.log( self.provider.dirRead( self.provider.path.join( routinePath, '..' ) ) )
+  console.log( self.provider.fileRead( srcPath ) );
+}
+
+experimentWithPath.experiment = 1;
+
 // --
 // declare
 // --
@@ -48386,6 +48403,8 @@ var Self =
     //static
 
     EncodersGenerate,
+    
+    experimentWithPath
 
   },
 

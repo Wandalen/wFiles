@@ -676,10 +676,13 @@ function pathDirTempMake( o )
 
   function end()
   {
+
     if( o.auto )
-    _.process.exitHandlerOnce( () =>
+    // _.process.exitHandlerOnce( () =>
+    // _.process.on( 'available', () => _.process.on( 'exit', () =>
+    _.process.on( 'available', 'exit', () =>
     {
-      debugger;
+      //debugger;
       self.pathDirTempClose()
     });
 
@@ -850,16 +853,16 @@ function pathDirTempClose( filePath )
 // let IndexLockTimeOut = 30000;
 
 // function _loadIndex( syncLock )
-// {  
+// {
 //   let self = this;
 //   if( !self.fileProvider.fileExists( self.IndexPath ) )
-//   { 
+//   {
 //     self.Index.namespace = Object.create( null );
 //     self.Index.tempDir = Object.create( null );
 //     self.Index.count = Object.create( null );
 //     self.fileProvider.fileWrite({ filePath : self.IndexPath, data : self.Index, encoding : 'json' });
 //   }
-  
+
 //   let lockReady = self.fileProvider.fileLock
 //   ({
 //     filePath : self.IndexPath,
@@ -875,7 +878,7 @@ function pathDirTempClose( filePath )
 //     lockReady.sync();
 //   }
 //   _.assert( self.fileProvider.fileIsLocked( self.IndexPath ) );
-  
+
 //   let loadedIndex = self.fileProvider.fileRead({ filePath : self.IndexPath, encoding : 'json' });
 //   self.Index = _.mapSupplementRecursive( self.Index, loadedIndex );
 //   self.fileProvider.fileUnlock( self.IndexPath );
@@ -885,11 +888,11 @@ function pathDirTempClose( filePath )
 // //
 
 // function _saveIndex( syncLock )
-// {  
+// {
 //   let self = this;
-  
+
 //   _.assert( _.objectIs( self.Index ) )
-  
+
 //   let lockReady = self.fileProvider.fileLock
 //   ({
 //     filePath : self.IndexPath,
@@ -931,31 +934,31 @@ function pathDirTempClose( filePath )
 //   _.assert( self.isNormalized( o.filePath ) );
 
 //   // let id = self.fileProvider.id;
-  
+
 //   /* load cache */
-  
+
 //   self._loadIndex();
-  
+
 //   // let currentIndex = self.Index[ process.pid ];
 
 //   // let cache = currentIndex.cache[ id ];
 //   // let count = currentIndex.count[ id ];
-  
+
 //   /* search in cache */
-  
+
 //   let result = null;
 //   let namespace = o.name;
-  
+
 //   let nameSpaceMap = self.Index.namespace;
 //   let tempDirMap = self.Index.tempDir;
-  
+
 //   if( tempDirMap[ o.filePath ] )
 //   if( tempDirMap[ o.filePath ].namespace === namespace )
 //   {
 //     result = tempDirMap[ o.filePath ].tempPath;
 //     return end();
 //   }
-  
+
 //   let trace = self.traceToRoot( o.filePath );
 
 //   for( let i = trace.length - 1; i >= 0; i-- )
@@ -1007,19 +1010,19 @@ function pathDirTempClose( filePath )
 //       nameSpaceMap[ namespace ].tempDir = o.filePath;
 //       nameSpaceMap[ namespace ].tempPath = result;
 //     }
-    
+
 //     if( !tempDirMap[ o.filePath ] )
 //     {
 //       tempDirMap[ o.filePath ] = Object.create( null );
 //       tempDirMap[ o.filePath ].namespace = namespace;
 //       tempDirMap[ o.filePath ].tempPath = result;
 //     }
-    
+
 //     let countMap = self.Index.count;
 //     if( !countMap[ result ] )
 //     countMap[ result ] = [];
 //     countMap[ result ].push( o.filePath )
-    
+
 //     self._saveIndex();
 
 //     return result;
@@ -1071,14 +1074,14 @@ function pathDirTempClose( filePath )
 //     self.fileProvider.dirMake( filePath );
 //     return end();
 //   }
-  
+
 //   /* load cache */
-  
+
 //   self._loadIndex();
-  
+
 //   // let id = self.fileProvider.id;
 //   // let currentIndex = self.Index[ process.pid ];
-  
+
 //   let tempDirMap = self.Index.tempDir;
 
 //   // let cache = currentIndex.cache[ id ];
@@ -1113,7 +1116,7 @@ function pathDirTempClose( filePath )
 //         if( fileStat.dev != currentStat.dev )
 //         continue;
 //       }
-      
+
 //       let tempDir = tempDirMap[ trace[ i ] ];
 //       if( tempDir && tempDir.namespace === namespace )
 //       {
@@ -1154,7 +1157,7 @@ function pathDirTempClose( filePath )
 //     });
 
 //     // logger.log( ' . Open temp directory ' + filePath );
-    
+
 //     return filePath;
 //   }
 // }
@@ -1166,17 +1169,17 @@ function pathDirTempClose( filePath )
 // function _nextPathDirTempClose( o )
 // {
 //   let self = this;
-  
+
 //   if( arguments.length === 0 )
 //   o = Object.create( null );
-  
+
 //   if( _.strIs( o ) )
 //   o = { filePath : o }
 
 //   _.assert( arguments.length <= 1 );
 //   _.assert( !!self.fileProvider );
 //   _.routineOptions( _nextPathDirTempClose, o );
-  
+
 //   self._loadIndex( o.syncLock );
 
 //   // if( !self.PathDirTempForMap[ id ] )
@@ -1187,7 +1190,7 @@ function pathDirTempClose( filePath )
 
 //   // let cache = currentIndex.cache[ id ];
 //   // let count = currentIndex.count[ id ];
-  
+
 //   let namespaceMap = self.Index.namespace;
 //   let tempDirMap = self.Index.tempDir;
 //   let countMap = self.Index.count;
@@ -1196,7 +1199,7 @@ function pathDirTempClose( filePath )
 //   if( filePath === null )
 //   {
 //     for( let path in tempDirMap )
-//     { 
+//     {
 //       let tempDir = tempDirMap[ path ];
 //       delete namespaceMap[ tempDir.namespace ];
 //       delete countMap[ tempDir.tempPath ];
@@ -1209,7 +1212,7 @@ function pathDirTempClose( filePath )
 //     _.assert( self.isNormalized( filePath ) );
 
 //     let currentTempPath = null;
-    
+
 //     if( tempDirMap[ filePath ] )
 //     currentTempPath = tempDirMap[ filePath ].tempPath;
 
@@ -1225,7 +1228,7 @@ function pathDirTempClose( filePath )
 
 //     if( !currentTempPath )
 //     throw _.err( 'Not found temp dir for path: ' + filePath );
-    
+
 //     let namespace = tempDirMap[ filePath ].namespace;
 
 //     _.arrayRemoveElementOnce( countMap[ currentTempPath ], filePath );
@@ -1244,11 +1247,11 @@ function pathDirTempClose( filePath )
 //       _.assert( !countMap[ currentTempPath ].length );
 
 //       delete countMap[ currentTempPath ];
-  
+
 //       close( filePath );
 //     }
 //   }
-  
+
 //   self._saveIndex( o.syncLock );
 
 //   /*  */
@@ -1270,7 +1273,7 @@ function pathDirTempClose( filePath )
 //   }
 // }
 
-// _nextPathDirTempClose.defaults = 
+// _nextPathDirTempClose.defaults =
 // {
 //   filePath : null,
 //   syncLock : 0
@@ -1437,7 +1440,7 @@ let Fields =
 {
   PathDirTempForMap,
   PathDirTempCountMap,
-  
+
   // Index,
   // IndexPath,
   // IndexLockTimeOut,

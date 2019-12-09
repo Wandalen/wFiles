@@ -28,7 +28,7 @@ function onSuiteBegin()
   this.isBrowser = typeof module === 'undefined';
 
   if( !this.isBrowser )
-  { 
+  {
     this.suiteTempPath = _.path.pathDirTempOpen( _.path.join( __dirname, '../..' ), 'Path' );
     this.assetsOriginalSuitePath = _.path.join( __dirname, '_asset' );
   }
@@ -1276,7 +1276,7 @@ program();
   a.fileProvider.fileWrite( a.abs( 'Program.js' ), programSourceCode );
   a.jsNonThrowing({ execPath : a.abs( 'Program.js' ) })
   .then( ( op ) =>
-  { 
+  {
     test.identical( _.strCount( op.output, 'tempDirCreated' ), 1 );
     test.identical( _.strCount( op.output, '= Message of error' ), 1 );
     test.is( _.strHas( op.output, 'Not found temp dir for path' ) );
@@ -1289,18 +1289,18 @@ program();
   {
     var _ = require( toolsPath );
     _.include( 'wFiles' );
-    
+
     var tempPath = _.path.pathDirTempOpen( _.path.normalize( __dirname ), 'pathDirTempCloseAfter' );
     if( _.fileProvider.isDir( tempPath ) )
     console.log( 'tempDirCreated' );
-    _.process.exitHandlerOnce( () =>
+    _.process.on( 'available', 'exit', () =>
     {
       _.path.pathDirTempClose( tempPath )
     });
   }
 }
 
-pathDirTempCloseAfter.description = 
+pathDirTempCloseAfter.description =
 `
   Try to manully close temp dir after automatic close leads to an error.
 `
@@ -1355,7 +1355,7 @@ function nextPathDirTemp( test )
   test.is( extract.isDir( got1 ) );
   test.is( extract.isDir( got2 ) );
   test.identical( extract.path.Index.count[ got1 ], [ filePath1, filePath2 ] );
-  
+
 
   extract.path.pathDirTempClose( filePath1 );
   test.identical( extract.path.Index.tempDir[ filePath1 ], undefined );
@@ -1454,18 +1454,18 @@ function nextPathDirTemp( test )
   var filePath3 = '/dir3'
   let originalDirMake = extract.dirMake;
   extract.dirMake = function dirMake( o )
-  { 
+  {
     let filePath = o;
     if( _.objectIs( o ) )
     filePath = o.filePath;
     if( _.strHas( filePath,'/dir3' ) )
     throw _.err( 'Test err');
-    
+
     return originalDirMake.apply( extract, arguments );
   }
   var got2;
   test.mustNotThrowError( () =>
-  { 
+  {
     got2 = extract.path.pathDirTempOpen({ filePath : filePath3, name });
   })
   extract.dirMake = _.routineJoin( extract, originalDirMake )
@@ -1535,21 +1535,21 @@ function nextPathDirTempMultipleNamespacesSamePath( test )
   var name2 = 'space2'
   var got1 = extract.path.pathDirTempOpen({ filePath : filePath1, name : name1 });
   var got2 = extract.path.pathDirTempOpen({ filePath : filePath1, name : name2 });
-  
+
   var tempDir = extract.path.Index.tempDir[ filePath1 ];
   test.identical( tempDir, { namespace : [ name1, name2 ], tempPath : got1 } );
   test.identical( tempDir, { namespace : [ name1, name2 ], tempPath : got2 } );
-  
+
   var namespaces = _.mapKeys( extract.path.Index.namespace );
   test.identical( namespaces, [ 'space1', 'space2' ] );
-  
+
   test.identical( extract.path.Index.namespace.space1, { tempDir : filePath1, tempPath : got1 } )
   test.identical( extract.path.Index.namespace.space2, { tempDir : filePath1, tempPath : got2 } )
-  
+
   extract.path.pathDirTempClose();
 }
 
-nextPathDirTempMultipleNamespacesSamePath.description = 
+nextPathDirTempMultipleNamespacesSamePath.description =
 `
   Two namespaces are created for single filePath.
   Index contains record for two namespaces and one tempDir.
@@ -1567,25 +1567,25 @@ function nextPathDirTempMultipleNamespacesDiffPath( test )
   var filePath2 = '/dir2'
   var name1 = 'space1'
   var name2 = 'space2'
-  
+
   var got1 = extract.path.pathDirTempOpen({ filePath : filePath1, name : name1 });
   var got2 = extract.path.pathDirTempOpen({ filePath : filePath2, name : name2 });
-  
+
   var tempDir = extract.path.Index.tempDir[ filePath1 ];
   test.identical( tempDir, { namespace : name1, tempPath : got1 } );
   var tempDir = extract.path.Index.tempDir[ filePath2 ];
   test.identical( tempDir, { namespace : name2, tempPath : got2 } );
-  
+
   var namespaces = _.mapKeys( extract.path.Index.namespace );
   test.identical( namespaces, [ 'space1', 'space2' ] );
-  
+
   test.identical( extract.path.Index.namespace.space1, { tempDir : filePath1, tempPath : got1 } )
   test.identical( extract.path.Index.namespace.space2, { tempDir : filePath2, tempPath : got2 } )
-  
+
   extract.path.pathDirTempClose();
 }
 
-nextPathDirTempMultipleNamespacesDiffPath.description = 
+nextPathDirTempMultipleNamespacesDiffPath.description =
 `
   Two namespaces are created for different file paths.
   Index contains record for two namespaces and two tempDir's.
@@ -1602,24 +1602,24 @@ function nextPathDirTempMultiplePathSameNamespace( test )
   var filePath1 = '/dir1'
   var filePath2 = '/dir2'
   var name = 'space'
-  
+
   var got1 = extract.path.pathDirTempOpen({ filePath : filePath1, name });
   var got2 = extract.path.pathDirTempOpen({ filePath : filePath2, name });
-  
+
   var tempDir = extract.path.Index.tempDir[ filePath1 ];
   test.identical( tempDir, { namespace : name, tempPath : got1 } );
   var tempDir = extract.path.Index.tempDir[ filePath2 ];
   test.identical( tempDir, { namespace : name, tempPath : got2 } );
-  
+
   var namespaces = _.mapKeys( extract.path.Index.namespace );
   test.identical( namespaces, [ 'space' ] );
   var space = extract.path.Index.namespace.space;
   test.identical( space, { tempDir : [ filePath1, filePath2 ], tempPath : [ got1, got2 ] } )
-  
+
   extract.path.pathDirTempClose();
 }
 
-nextPathDirTempMultiplePathSameNamespace.description = 
+nextPathDirTempMultiplePathSameNamespace.description =
 `
   Two different paths are created for signle namespace.
 `
@@ -1638,9 +1638,9 @@ function nextPathDirTempIndexLock( test )
   ]
   .join( '\n' )
   a.fileProvider.fileWrite( a.abs( 'Program.js' ), programSourceCode );
-  
+
   /*  */
-  
+
   _.path.pathDirTempOpen( a.routinePath, 'pathDirTempIndexLock' );
   a.fileProvider.fileLock
   ({
@@ -1651,13 +1651,13 @@ function nextPathDirTempIndexLock( test )
     waiting : 1
   });
   test.is( a.fileProvider.fileIsLocked( _.path.IndexPath ) );
-  
+
   _.time.out( 2000, () => a.fileProvider.fileUnlock( _.path.IndexPath ) )
   let t1 = _.time.now();
-  
+
   a.shellNonThrowing({ execPath : 'node ' + a.abs( 'Program.js' ) })
   .then( ( op ) =>
-  {  
+  {
     let t2 = _.time.now();
     test.ge( t2 - t1, 2000 );
     test.identical( op.exitCode, 0 );
@@ -1674,15 +1674,15 @@ function nextPathDirTempIndexLock( test )
     var _ = require( toolsPath );
     _.path.IndexLockTimeOut = 5000;
     _.path.pathDirTempOpen
-    ({ 
-      filePath : _.path.normalize( __dirname ), 
+    ({
+      filePath : _.path.normalize( __dirname ),
       name : 'pathDirTempIndexLock',
     });
     console.log( 'Temp dir created' );
   }
 }
 nextPathDirTempIndexLock.timeOut = 10000;
-nextPathDirTempIndexLock.description = 
+nextPathDirTempIndexLock.description =
 `
 Second process locks file when main releases it after two seconds.
 `
@@ -1701,9 +1701,9 @@ function nextPathDirTempIndexLockThrowing( test )
   ]
   .join( '\n' )
   a.fileProvider.fileWrite( a.abs( 'Program.js' ), programSourceCode );
-  
+
   /*  */
-  
+
   _.path.pathDirTempOpen( a.routinePath, 'pathDirTempIndexLockThrowing' );
   a.fileProvider.fileLock
   ({
@@ -1717,7 +1717,7 @@ function nextPathDirTempIndexLockThrowing( test )
   let t1 = _.time.now();
   a.shellNonThrowing({ execPath : 'node ' + a.abs( 'Program.js' ) })
   .then( ( op ) =>
-  {  
+  {
     let t2 = _.time.now();
     test.ge( t2 - t1, 5000 );
     test.notIdentical( op.exitCode, 0 );
@@ -1734,14 +1734,14 @@ function nextPathDirTempIndexLockThrowing( test )
     var _ = require( toolsPath );
     _.path.IndexLockTimeOut = 5000;
     _.path.pathDirTempOpen
-    ({ 
-      filePath : _.path.normalize( __dirname ), 
+    ({
+      filePath : _.path.normalize( __dirname ),
       name : 'pathDirTempIndexLockThrowing',
     });
   }
 }
 nextPathDirTempIndexLockThrowing.timeOut = 10000;
-nextPathDirTempIndexLockThrowing.description = 
+nextPathDirTempIndexLockThrowing.description =
 `
 Second process exits with lock error after timeout.
 `
@@ -1798,9 +1798,9 @@ var Self =
 
     pathDirTemp,
     pathDirTempCloseAfter,
-    
+
     //
-    
+
     // nextPathDirTemp,
     // nextPathDirTempMultipleNamespacesSamePath,
     // nextPathDirTempMultipleNamespacesDiffPath,

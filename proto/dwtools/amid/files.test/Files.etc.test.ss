@@ -2934,13 +2934,14 @@ function filesLink( test )
     var statLink = _.fileProvider.statResolvedRead({ filePath : link, resolvingSoftLink : 0 }),
       // statSource = File.lstatSync( src );
       statSource = _.fileProvider.statResolvedRead({ filePath : src, resolvingSoftLink : 0 })
-
+      
     if ( !statLink || !statSource ) return false; // both files should be exists
     if ( Number( statSource.nlink ) !== 2 ) return false;
     if ( statLink.ino !== statSource.ino ) return false; // both names should be associated with same file on device.
 
     // File.unlinkSync( link );
     _.fileProvider.fileDelete( link );
+    _.time.out( 100 ).deasyncWait();
     statSource = _.fileProvider.statResolvedRead({ filePath : src, resolvingSoftLink : 0 });
 
     if ( Number( statSource.nlink ) !== 1 ) return false;
@@ -2960,7 +2961,7 @@ function filesLink( test )
     test.description = testCheck.name;
 
     try
-    {
+    { 
       got.result = _.fileProvider.hardLink({ dstPath :  link, srcPath : file, sync : 1 });
       // got.isExists = File.existsSync(  _.path.resolve( link ) );
       got.isExists = !!_.fileProvider.statResolvedRead(  _.path.resolve( link ) );

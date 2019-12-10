@@ -949,7 +949,8 @@ function fileWriteAct( o )
   let self = this;
 
   _.assertRoutineOptions( fileWriteAct, arguments );
-  _.assert( _.strIs( o.filePath ) );
+  // _.assert( _.strIs( o.filePath ) );
+  _.assert( self.path.isNormalized( o.filePath ) );
   _.assert( self.WriteMode.indexOf( o.writeMode ) !== -1 );
 
   let encoder = fileWriteAct.encoders[ o.encoding ];

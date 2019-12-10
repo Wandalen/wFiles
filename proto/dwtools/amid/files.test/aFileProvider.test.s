@@ -4714,7 +4714,7 @@ function fileCopyActSync( test )
 
   test.case = 'should expect normalized path, but not nativized';
   var srcPath = routinePath + '\\src';
-  provider.fileWrite( srcPath, srcPath );
+  provider.fileWrite( provider.path.normalize( srcPath ), srcPath );
   var dstPath = routinePath + '\\dst';
   var o =
   {
@@ -12574,7 +12574,7 @@ function fileRenameActSync( test )
 
   test.case = 'should expect normalized path, but not nativized';
   var srcPath = routinePath + '\\src';
-  provider.fileWrite( srcPath, srcPath );
+  provider.fileWrite( provider.path.normalize( srcPath ), srcPath );
   var dstPath = routinePath + '\\dst';
   var o =
   {
@@ -16164,7 +16164,7 @@ function fileLockNotWaitingSharingAsync( test )
     {
       let t2 = _.time.now();
       test.identical( got, true );
-      test.le( t2 - t1, 100 );
+      test.le( t2 - t1, 500 );
 
       test.is( provider.fileIsLocked( filePath ) );
       provider.fileUnlock( filePath );
@@ -29732,7 +29732,7 @@ function hardLinkActSync( test )
 
   test.case = 'should expect normalized path, but not nativized';
   var srcPath = routinePath + '\\src';
-  provider.fileWrite( srcPath, srcPath );
+  provider.fileWrite( provider.path.normalize( srcPath ), srcPath );
   var dstPath = routinePath + '\\dst';
   var o =
   {
@@ -48166,6 +48166,8 @@ function EncodersGenerate( test )
   }
 }
 
+//
+
 // --
 // declare
 // --
@@ -48385,8 +48387,8 @@ var Self =
 
     //static
 
-    EncodersGenerate,
-
+    EncodersGenerate
+    
   },
 
 };

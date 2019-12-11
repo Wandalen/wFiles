@@ -4835,6 +4835,8 @@ function fileWrite_pre( routine, args )
   self._providerDefaultsApply( o );
   _.assert( _.strIs( o.filePath ), 'Expects string {-o.filePath-}' );
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
+  
+  o.filePath = self.path.normalize( o.filePath );
 
   return o;
 }
@@ -4918,6 +4920,8 @@ function fileWrite_body( o )
   {
     self.filesDelete({ filePath : o2.filePath, throwing : 0 });
   }
+  
+  _.assert( self.path.isNormalized( o2.filePath ) );
 
   let result = self.fileWriteAct( o2 );
 

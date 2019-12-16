@@ -1687,7 +1687,7 @@ function basePathMapFromString( o )
     let pairs = o.filePath.map( ( fileGlob ) =>
     {
       let filePath = path.fromGlob( fileGlob );
-      if( path.hasBase( fileGlob ) )
+      if( path.hasSymbolBase( fileGlob ) )
       return [ filePath, fileGlob, fileGlob ];
       else
       return [ filePath, filePath, fileGlob ];

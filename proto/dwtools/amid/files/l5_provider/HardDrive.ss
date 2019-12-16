@@ -53,32 +53,7 @@ function init( o )
 // path
 // --
 
-// function _pathNativizeWindows( filePath )
-// {
-//   _.assert( _.strIs( filePath ), 'Expects string' ) ;
-//
-//   let result = filePath.replace( /\//g, '\\' );
-//
-//   if( result[ 0 ] === '\\' )
-//   if( result.length === 2 || result[ 2 ] === ':' || result[ 2 ] === '\\' )
-//   {
-//     result = result[ 1 ] + ':' + _.strPrependOnce( result.substring( 2 ), '\\' );
-//   }
-//
-//   return result;
-// }
-//
-// //
-//
-// function _pathNativizePosix( filePath )
-// {
-//   _.assert( _.strIs( filePath ), 'Expects string' );
-//   return filePath;
-// }
-
-//
-
-let pathNativizeAct = process.platform === 'win32' ? _.path._pathNativizeWindows : _.path._pathNativizePosix;
+let pathNativizeAct = process.platform === 'win32' ? _.path._nativizeWindows : _.path._nativizePosix;
 
 _.assert( _.routineIs( pathNativizeAct ) );
 
@@ -504,7 +479,7 @@ function fileReadAct( o )
 
   if( Config.debug )
   if( !o.sync )
-  stack = _.diagnosticStack([ 1, Infinity ]);
+  stack = _.introspector.stack([ 1, Infinity ]);
 
   let encoder = fileReadAct.encoders[ o.encoding ];
 
@@ -1218,7 +1193,7 @@ function fileDeleteAct( o )
     /**/
 
     function handleResult( err )
-    { 
+    {
       if( err )
       con.error( err );
       else
@@ -2006,8 +1981,6 @@ let Restricts =
 
 let Statics =
 {
-  // _pathNativizeWindows : _pathNativizeWindows,
-  // _pathNativizePosix : _pathNativizePosix,
   pathNativizeAct : pathNativizeAct,
   KnownNativeEncodings : KnownNativeEncodings,
   UsingBigIntForStat : UsingBigIntForStat,

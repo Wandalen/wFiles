@@ -1764,7 +1764,7 @@ var Self =
     suiteTempPath : null,
     isBrowser : null,
     assetsOriginalSuitePath : null,
-    defaultJsPath : null,
+    execJsPath : null,
 
     createTestsDirectory,
     createInTD,

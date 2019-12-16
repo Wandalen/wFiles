@@ -1464,6 +1464,123 @@ function readWriteSync( test )
   //     });
   //   });
   // }
+
+}
+
+//
+
+function fileWriteActSync( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let path = provider.path;
+
+  if( !_.routineIs( provider.fileWriteAct ) )
+  return;
+
+  var isHd = test.context.providerIsInstanceOf( _.FileProvider.HardDrive );
+  
+  let data = 'Test data'
+  
+  //
+  
+  test.case = 'normalized path, call fileWrite'
+  var filePath = test.context.pathFor( 'write_test/file' );
+  var o = _.mapExtend( null, provider.fileWriteAct.defaults );
+  o.filePath = filePath;
+  o.sync = 1;
+  o.data = data;
+  provider.dirMakeForFile( filePath )
+  provider.fileWriteAct( o );
+  test.identical( o.filePath, filePath );
+  test.identical( provider.fileRead( filePath ), data );
+  
+  //
+  
+  if( Config.debug )
+  if( isHd )
+  {
+    test.case = 'native path, call fileWrite_body'
+    var filePath = test.context.pathFor( 'write_test/file' );
+    provider.filesDelete( filePath )
+    var o = _.mapExtend( null, provider.fileWriteAct.defaults );
+    o.filePath = _.path.nativize( filePath );
+    o.sync = 1;
+    o.data = data;
+    test.shouldThrowErrorSync( () => 
+    {
+      provider.fileWriteAct( o );
+    })
+    test.is( !provider.path.isNormalized( o.filePath ) );
+    test.is( !provider.fileExists( filePath ) );
+  }
+}
+
+//
+
+function fileWriteActAsync( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let path = provider.path;
+
+  if( !_.routineIs( provider.fileWriteAct ) )
+  return;
+
+  var isHd = test.context.providerIsInstanceOf( _.FileProvider.HardDrive );
+  let data = 'Test data'
+  
+  let ready = new _.Consequence().take( null )
+  
+  //
+  
+  .finally( () => 
+  {
+    test.case = 'normalized path, call fileWrite'
+    var filePath = test.context.pathFor( 'write_test/file' );
+    var o = _.mapExtend( null, provider.fileWriteAct.defaults );
+    o.filePath = filePath;
+    o.sync = 0;
+    o.data = data;
+    provider.dirMakeForFile( filePath )
+    return provider.fileWriteAct( o )
+    .then( () => 
+    {
+      test.identical( o.filePath, filePath );
+      test.identical( provider.fileRead( filePath ), data );
+      return null;
+    })
+  })
+  
+  //
+    
+  if( Config.debug )
+  if( isHd )
+  ready.finally( () => 
+  {
+    test.case = 'native path, call fileWrite_body'
+    var filePath = test.context.pathFor( 'write_test/file' );
+    provider.filesDelete( filePath )
+    var o = _.mapExtend( null, provider.fileWriteAct.defaults );
+    o.filePath = _.path.nativize( filePath );
+    o.sync = 0;
+    o.data = data;
+    return test.shouldThrowErrorOfAnyKind( () => 
+    {
+      return provider.fileWriteAct( o );
+    })
+    .then( () => 
+    {
+      test.is( !provider.path.isNormalized( o.filePath ) );
+      test.is( !provider.fileExists( filePath ) );
+      return null;
+    })
+    
+  })
+ 
+  //
+  
+  return ready;
 }
 
 //
@@ -19974,6 +20091,47 @@ function fileWriteSync( test )
       });
     });
   }
+  
+  //
+  
+  test.case = 'native path, call fileWrite'
+  var filePath = test.context.pathFor( 'write_test/file' );
+  var o = 
+  {
+    filePath : provider.path.nativize( filePath ),
+    data,
+    sync : 1
+  }
+  provider.fileWrite( o );
+  test.identical( o.filePath, filePath );
+  test.identical( provider.fileRead( filePath ), data );
+  
+  //
+  
+  if( Config.debug )
+  if( isHd )
+  {
+    test.case = 'native path, call fileWrite_body'
+    var filePath = test.context.pathFor( 'write_test/file' );
+    provider.filesDelete( filePath )
+    var o = 
+    {
+      data,
+      sync : 1
+    }
+    var o =_.mapExtend( null, provider.fileWrite.body.defaults )
+    o.filePath = provider.path.nativize( filePath )
+    o.data = data;
+    o.sync = 1;
+    test.shouldThrowErrorSync( () => 
+    {
+      provider.fileWrite.body.call( provider,o );
+    })
+    test.is( !provider.path.isNormalized( o.filePath ) );
+    test.is( !provider.fileExists( filePath ) );
+  }
+  
+  
 }
 
 //
@@ -20481,6 +20639,7 @@ function fileWriteAsync( test )
   if( !_.routineIs( provider.fileWrite ) )
   return;
 
+  let isHd = self.providerIsInstanceOf( _.FileProvider.HardDrive );
   var consequence = new _.Consequence().take( null )
   /*writeMode rewrite*/
 
@@ -20690,7 +20849,50 @@ function fileWriteAsync( test )
 
     return test.shouldThrowErrorOfAnyKind( con );
   })
-
+  
+  //
+  
+  .finally( () => 
+  {
+    test.case = 'native path, call fileWrite'
+    var filePath = test.context.pathFor( 'write_test/file' );
+    var o = 
+    {
+      filePath : provider.path.nativize( filePath ),
+      data,
+      sync : 0
+    }
+    return provider.fileWrite( o )
+    .then( () => 
+    { 
+      test.identical( o.filePath, filePath );
+      test.identical( provider.fileRead( filePath ), data );
+      return null;
+    })
+  })
+  
+  //
+  
+  if( Config.debug )
+  if( isHd )
+  consequence.finally( () => 
+  {
+    test.case = 'native path, call fileWrite_body'
+    var filePath = test.context.pathFor( 'write_test/file' );
+    provider.filesDelete( filePath )
+    var o =_.mapExtend( null, provider.fileWrite.body.defaults )
+    o.filePath = provider.path.nativize( filePath )
+    o.data = data;
+    o.sync = 0;
+    test.shouldThrowErrorOfAnyKind( () => 
+    {
+      return provider.fileWrite.body.call( provider,o );
+    })
+    test.is( !provider.path.isNormalized( o.filePath ) );
+    test.is( !provider.fileExists( filePath ) );
+    return null;
+  })
+ 
   return consequence;
 }
 
@@ -48204,6 +48406,9 @@ var Self =
 
     readWriteSync,
     readWriteAsync,
+    
+    fileWriteActSync,
+    fileWriteActAsync,
 
     fileReadJson,
     fileWriteJson,

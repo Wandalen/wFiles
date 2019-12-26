@@ -20,7 +20,7 @@ if( typeof module !== 'undefined' )
 
 var _ = _global_.wTools;
 var Parent = wTester;
-// var suitFileLocation = _.diagnosticLocation().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
+// var suitFileLocation = _.introspector.location().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
 
 var FileRecord = _.FileRecord;
 var suitePath = _.fileProvider.path.nativize( _.path.resolve( __dirname + '/../../../../tmp.tmp/sample/FilesIndividualTest' ) );
@@ -385,18 +385,18 @@ function filesNewer( test )
   test.identical( got, file2 );
 
   test.case = 'one files modified after creation';
-  _.fileProvider.fileTimeSet( file1, _.timeNow() / 1000, _.timeNow() / 1000 );
+  _.fileProvider.fileTimeSet( file1, _.time.now() / 1000, _.time.now() / 1000 );
   var got = _.files.filesNewer( file2, file1 );
   test.identical( got, file1 );
 
   test.case = 'two files modified at the same time';
-  let timeSet = _.timeNow() / 1000;
+  let timeSet = _.time.now() / 1000;
   _.fileProvider.fileTimeSet( file1, timeSet, timeSet );
   _.fileProvider.fileTimeSet( file2, timeSet, timeSet );
   var got = _.files.filesNewer( file1, file2 );
   test.identical( got, null );
 
-  var con = _.timeOut( 50 );
+  var con = _.time.out( 50 );
   con.finally( () =>
   {
     createTestFile( file4, 'test4' );
@@ -465,18 +465,18 @@ function filesOlder( test )
   test.identical( got, file1 );
 
   test.case = 'one files modified after creation';
-  _.fileProvider.fileTimeSet( file1, _.timeNow() / 1000, _.timeNow() / 1000 );
+  _.fileProvider.fileTimeSet( file1, _.time.now() / 1000, _.time.now() / 1000 );
   var got = _.files.filesOlder( file2, file1 );
   test.identical( got, file2 );
 
   test.case = 'two files modified at the same time';
-  let timeSet = _.timeNow() / 1000;
+  let timeSet = _.time.now() / 1000;
   _.fileProvider.fileTimeSet( file1, timeSet, timeSet );
   _.fileProvider.fileTimeSet( file2, timeSet, timeSet );
   var got = _.files.filesOlder( file1, file2 );
   test.identical( got, null );
 
-  var con = _.timeOut( 50 );
+  var con = _.time.out( 50 );
   con.finally( () =>
   {
     createTestFile( file4, 'test4' );
@@ -1094,83 +1094,102 @@ function fileSize( test )
 
   file1 = _.fileProvider.path.nativize( file1 );
   file2 = _.fileProvider.path.nativize( file2 );
-
+  
+  let ready = new _.Consequence().take( null )
+  
   /* asynchronous file creation */
-
-  let fileCreate = _.timeOut( 10, function()
-  {
-    createTestFile( file3, 'test3, any text' );
-    file3 = mergePath( file3 );
-    file3 = _.fileProvider.path.nativize( file3 );
-  });
-
+  
+  ready
+  
   /* - */
-
-  test.case = 'string path in arg';
-  var got = _.fileProvider.fileSize( file1 );
-  test.equivalent( got, 15 );
-
-  test.case = 'map in arg';
-  var got = _.fileProvider.fileSize( { filePath : file2 } );
-  test.equivalent( got, 5 );
-
-  test.case = 'file is dir';
-  var got = _.fileProvider.fileSize( { filePath : _.path.current() } );
-  test.equivalent( got, 0 );
-
-  /* - */
-
-  test.case = 'throwing : 0, stat === null';
-  var map =
+  
+  .then( () => 
   {
-    filePath : '/string',
-    throwing : 0,
-  }
-  var got = _.fileProvider.fileSize( map );
-  test.equivalent( got, null );
-
-  test.case = 'asynchronous file creation test';
-  let check1 = _.timeOut( 0, function()
-  {
-    if( Config.debug )
-    test.shouldThrowErrorSync( () => _.fileProvider.fileSize( file3 ) );
-  });
-  let check2 = _.timeOut( 50, function()
-  {
-    var got = _.fileProvider.fileSize( file3 );
+    test.case = 'string path in arg';
+    var got = _.fileProvider.fileSize( file1 );
     test.equivalent( got, 15 );
-  });
+  
+    test.case = 'map in arg';
+    var got = _.fileProvider.fileSize( { filePath : file2 } );
+    test.equivalent( got, 5 );
+  
+    test.case = 'file is dir';
+    var got = _.fileProvider.fileSize( { filePath : _.path.current() } );
+    test.equivalent( got, 0 );
+    
+    return null;
+  })
 
   /* - */
-
-  if( !Config.debug )
-  return;
-
-  test.case = 'without arguments';
-  test.shouldThrowErrorSync( () => _.fileProvider.fileSize() );
-
-  test.case = 'extra arguments';
-  test.shouldThrowErrorSync( () => _.fileProvider.fileSize( file1, file1 ) );
-
-  test.case = 'throwing : 1, stats === null';
-  var map =
+  
+  .then( () => 
   {
-    filePath : '/string',
-    throwing : 1,
-  }
-  test.shouldThrowErrorSync( () => _.fileProvider.fileSize( map ) );
+    test.case = 'throwing : 0, stat === null';
+    var map =
+    {
+      filePath : '/string',
+      throwing : 0,
+    }
+    var got = _.fileProvider.fileSize( map );
+    test.equivalent( got, null );
+    return null;
+  })
+  
+  .then( () => 
+  {  
+    let filePath = mergePath( file3 );
+      
+    let fileCreate = _.time.out( 100, function()
+    {
+      createTestFile( file3, 'test3, any text' );
+    });
+  
+    test.case = 'asynchronous file creation test';
+    let check1 = _.time.out( 0, function()
+    { 
+      if( Config.debug )
+      test.shouldThrowErrorSync( () => _.fileProvider.fileSize({ filePath, throwing : 1 }) );
+    });
+    let check2 = _.time.out( 100, function()
+    {
+      var got = _.fileProvider.fileSize( filePath );
+      test.equivalent( got, 15 );
+    });
+    return _.Consequence.And( [ check1,check2 ] );
+  })
+  
+  return ready;
+  
+  // /* - */
 
-  test.case = 'wrong argument';
-  test.shouldThrowErrorSync( () => _.fileProvider.fileSize( 1 ) );
-  test.shouldThrowErrorSync( () => _.fileProvider.fileSize( [ file1 ] ) );
+  // if( !Config.debug )
+  // return;
 
-  test.case = 'unnecessary field in map';
-  var map =
-  {
-    filePath : file1,
-    onUp : () => 0,
-  }
-  test.shouldThrowErrorSync( () => _.fileProvider.fileSize( map ) );
+  // test.case = 'without arguments';
+  // test.shouldThrowErrorSync( () => _.fileProvider.fileSize() );
+
+  // test.case = 'extra arguments';
+  // test.shouldThrowErrorSync( () => _.fileProvider.fileSize( file1, file1 ) );
+
+  // test.case = 'throwing : 1, stats === null';
+  // var map =
+  // {
+  //   filePath : '/string',
+  //   throwing : 1,
+  // }
+  // test.shouldThrowErrorSync( () => _.fileProvider.fileSize( map ) );
+
+  // test.case = 'wrong argument';
+  // test.shouldThrowErrorSync( () => _.fileProvider.fileSize( 1 ) );
+  // test.shouldThrowErrorSync( () => _.fileProvider.fileSize( [ file1 ] ) );
+
+  // test.case = 'unnecessary field in map';
+  // var map =
+  // {
+  //   filePath : file1,
+  //   onUp : () => 0,
+  // }
+  // test.shouldThrowErrorSync( () => _.fileProvider.fileSize( map ) );
 }
 
 //
@@ -2364,7 +2383,7 @@ function fileSize( test )
 //       con, got;
 //
 //     createTestFile( file1 );
-//     con = _.timeOut( 50);
+//     con = _.time.out( 50);
 //     con.finally( ( ) => createTestFile( file2 ) );
 //     con.finally( ( ) =>
 //     {
@@ -2915,13 +2934,14 @@ function filesLink( test )
     var statLink = _.fileProvider.statResolvedRead({ filePath : link, resolvingSoftLink : 0 }),
       // statSource = File.lstatSync( src );
       statSource = _.fileProvider.statResolvedRead({ filePath : src, resolvingSoftLink : 0 })
-
+      
     if ( !statLink || !statSource ) return false; // both files should be exists
     if ( Number( statSource.nlink ) !== 2 ) return false;
     if ( statLink.ino !== statSource.ino ) return false; // both names should be associated with same file on device.
 
     // File.unlinkSync( link );
     _.fileProvider.fileDelete( link );
+    _.time.out( 100 ).deasyncWait();
     statSource = _.fileProvider.statResolvedRead({ filePath : src, resolvingSoftLink : 0 });
 
     if ( Number( statSource.nlink ) !== 1 ) return false;
@@ -2941,7 +2961,7 @@ function filesLink( test )
     test.description = testCheck.name;
 
     try
-    {
+    { 
       got.result = _.fileProvider.hardLink({ dstPath :  link, srcPath : file, sync : 1 });
       // got.isExists = File.existsSync(  _.path.resolve( link ) );
       got.isExists = !!_.fileProvider.statResolvedRead(  _.path.resolve( link ) );
@@ -3172,7 +3192,7 @@ function filesAreUpToDate2( test )
 //         return null;
 //       })
 //
-//       con.finally( _.routineSeal( _,_.timeOut,[ 1000 ] ) );
+//       con.finally( _.routineSeal( _,_.time.out,[ 1000 ] ) );
 //       con.finally( _.routineSeal( null,createTestResources,[ tc.createSecond ] ) );
 //       con.finally( _.routineSeal( console,console.log,[ '--> files created second' ] ) );
 //
@@ -3361,13 +3381,13 @@ function testDelaySample( test )
 
   test.description = 'delay test';
 
-  var con = _.timeOut( 1000 );
+  var con = _.time.out( 1000 );
 
   test.identical( 1,1 );
 
   con.finally( function( ){ logger.log( '1000ms delay' ) } );
 
-  con.finally( _.routineSeal( _,_.timeOut,[ 1000 ] ) );
+  con.finally( _.routineSeal( _,_.time.out,[ 1000 ] ) );
 
   con.finally( function( ){ logger.log( '2000ms delay' ) } );
 

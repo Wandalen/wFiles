@@ -1944,7 +1944,7 @@ function filesFind2( test )
       for( var j = 0; j < src.length; j++ )
       {
         if( _.RegexpObject.Test( orderingExclusion[ i ], src[ j ]  ) )
-        if( _.arrayRightIndex( result, src[ j ] ) >= 0 )
+        if( _.longRightIndex( result, src[ j ] ) >= 0 )
         continue;
         else
         result.push( src[ j ] );
@@ -8724,7 +8724,7 @@ function filesFindSimplifyGlob( test )
   test.identical( o.withActual, true );
   test.identical( o.withTransient, false );
 
-  test.setsAreIdentical( _.mapKeys( o.filter.formedMasksMap ), [ abs( 'dir1' ) ] );
+  test.is( _.arraySetIdentical( _.mapKeys( o.filter.formedMasksMap ), [ abs( 'dir1' ) ] ) );
   test.identical( o.filter.formedMasksMap[ abs( 'dir1' ) ].maskAll.includeAll.length, 0 );
   test.identical( o.filter.formedMasksMap[ abs( 'dir1' ) ].maskAll.includeAny.length, 1 );
   test.identical( o.filter.formed, 5 );
@@ -33729,7 +33729,7 @@ function filesDeleteDeletingEmptyDirs( test )
     './empty1'
   ]
   test.will = 'all files should be deleted + empty parent dirs of root';
-  test.is( _.arrayHasAll( deleted, expected ) );
+  test.is( _.longHasAll( deleted, expected ) );
 
   test.case = 'exclude empty dirs, deletingEmptyDirs off'
   provider.filesDelete( routinePath );
@@ -34468,14 +34468,14 @@ function filesDeleteLatePerformance( test )
       provider.fileWrite( filePath,filePath )
     }
 
-    var t1 = _.timeNow();
+    var t1 = _.time.now();
     provider.filesDelete
     ({
       filePath : routinePath,
       sync : 1,
       late : 1
     })
-    var lateTime = _.timeNow() - t1;
+    var lateTime = _.time.now() - t1;
 
     for( var i = 0; i < files; i++ )
     {
@@ -34483,14 +34483,14 @@ function filesDeleteLatePerformance( test )
       provider.fileWrite( filePath,filePath )
     }
 
-    var t1 = _.timeNow();
+    var t1 = _.time.now();
     provider.filesDelete
     ({
       filePath : routinePath,
       sync : 1,
       late : 0
     })
-    var normalTime = _.timeNow() - t1;
+    var normalTime = _.time.now() - t1;
 
     test.lt( lateTime, normalTime );
     test.ge( normalTime / lateTime, 2 );
@@ -34529,7 +34529,7 @@ function filesDeleteAndAsyncWrite( test )
     cons.push( con );
   }
 
-  _.timeOut( 2, () =>
+  _.time.out( 2, () =>
   {
     test.shouldThrowErrorOfAnyKind( () =>
     {
@@ -37004,7 +37004,7 @@ var Self =
   name : 'Tools.mid.files.FilesFind.Abstract',
   abstract : 1,
   silencing : 1,
-  routineTimeOut : 150000,
+  routineTimeOut : 200000,
 
   onSuiteBegin,
   onSuiteEnd,

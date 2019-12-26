@@ -1292,9 +1292,9 @@ function prefixesRelative( prefixPath )
     if( filter.filePath )
     {
       if( filter.src )
-      filter.filePath = path.filterInplace( filter.filePath, relative_functor( 'dst' ) );
+      filter.filePath = path.filterDstInplace( filter.filePath, relative_functor( 'dst' ) );
       else if( filter.dst )
-      filter.filePath = path.filterInplace( filter.filePath, relative_functor( 'src' ) );
+      filter.filePath = path.filterSrcInplace( filter.filePath, relative_functor( 'src' ) );
       else
       filter.filePath = path.filterInplace( filter.filePath, relative_functor() );
     }
@@ -1687,7 +1687,7 @@ function basePathMapFromString( o )
     let pairs = o.filePath.map( ( fileGlob ) =>
     {
       let filePath = path.fromGlob( fileGlob );
-      if( path.hasBase( fileGlob ) )
+      if( path.hasSymbolBase( fileGlob ) )
       return [ filePath, fileGlob, fileGlob ];
       else
       return [ filePath, filePath, fileGlob ];
@@ -3022,104 +3022,186 @@ function filePathArrayBoolGet( filePath )
 function filePathDstNormalizedGet( filePath )
 {
   let filter = this;
+  let dstFilter = filter.dst || filter;
   let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   if( filePath === undefined )
   filePath = filter.filePath;
 
-  filePath = filter.filePathDstArrayGet();
-
-  _.assert( _.arrayIs( filePath ) );
+  _.assert( filePath !== undefined );
   _.assert( arguments.length === 0 || arguments.length === 1 );
 
-  filePath = _.filter( filePath, ( p ) =>
+  /* xxx : use non-inplace version */
+  let result = [];
+  filePath = _.make( filePath );
+  filePath = path.filterPairsInplace( filePath, ( it ) =>
   {
-    if( _.arrayIs( p ) )
-    {
-      return _.unrollFrom( p );
-    }
-    return p;
-  });
-
-  filePath = _.filter( filePath, ( p ) =>
-  {
-    if( _.strIs( p ) )
-    return p;
-
-    if( p === null )
-    {
-      if( !!p )
-      return filter.prefixPath || filter.basePathForStemPath( p ) || undefined;
-      return;
-    }
-
-    if( _.boolLike( p ) )
+    if( _.boolLike( it.dst ) )
     return;
-
-    return p;
+    if( !it.dst )
+    return;
+    _.assert( _.strIs( it.src ) );
+    result.push( it.dst );
   });
 
-  filePath = _.arrayAppendArrayOnce( [], filePath );
+  result = _.longOnce( result );
 
-  if( filter.prefixPath || filter.postfixPath )
-  filePath = path.s.join( filter.prefixPath || '.', filePath, filter.postfixPath || '.' );
+  if( dstFilter.prefixPath || dstFilter.postfixPath )
+  result = path.s.join( dstFilter.prefixPath || '.', result, dstFilter.postfixPath || '.' );
 
-  return filePath;
+  return result;
 }
+
+// function filePathDstNormalizedGet( filePath )
+// {
+//   let filter = this;
+//   let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+//   let path = fileProvider.path;
+//
+//   if( filePath === undefined )
+//   filePath = filter.filePath;
+//
+//   filePath = filter.filePathDstArrayGet();
+//
+//   _.assert( _.arrayIs( filePath ) );
+//   _.assert( arguments.length === 0 || arguments.length === 1 );
+//
+//   filePath = _.filter( filePath, ( p ) =>
+//   {
+//     if( _.arrayIs( p ) )
+//     {
+//       return _.unrollFrom( p );
+//     }
+//     return p;
+//   });
+//
+//   filePath = _.filter( filePath, ( p ) =>
+//   {
+//     if( _.strIs( p ) )
+//     return p;
+//
+//     if( p === null )
+//     {
+//       if( !!p )
+//       return filter.prefixPath || filter.basePathForStemPath( p ) || undefined;
+//       return;
+//     }
+//
+//     if( _.boolLike( p ) )
+//     return;
+//
+//     return p;
+//   });
+//
+//   filePath = _.arrayAppendArrayOnce( [], filePath );
+//
+//   if( filter.prefixPath || filter.postfixPath )
+//   filePath = path.s.join( filter.prefixPath || '.', filePath, filter.postfixPath || '.' );
+//
+//   return filePath;
+// }
 
 //
 
 function filePathSrcNormalizedGet( filePath )
 {
   let filter = this;
+  let srcFilter = filter.src || filter;
   let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
   if( filePath === undefined )
   filePath = filter.filePath;
 
-  filePath = filter.filePathSrcArrayGet();
-
-  _.assert( _.arrayIs( filePath ) );
+  _.assert( filePath !== undefined );
   _.assert( arguments.length === 0 || arguments.length === 1 );
 
-  filePath = _.filter( filePath, ( p ) =>
+  /* xxx : use non-inplace version */
+  let result = [];
+  filePath = _.make( filePath );
+  filePath = path.filterPairsInplace( filePath, ( it ) =>
   {
-    if( _.arrayIs( p ) )
-    {
-      debugger;
-      _.assert( 0, 'not tested' );
-      return _.unrollFrom( p );
-    }
-    return p;
-  });
-
-  filePath = _.filter( filePath, ( p ) =>
-  {
-    if( _.strIs( p ) )
-    return p;
-
-    if( p === null )
-    {
-      if( !!p )
-      return filter.prefixPath || undefined;
-      return;
-    }
-
-    if( _.boolLike( p ) )
+    if( _.boolLike( it.dst ) )
     return;
-
-    return p;
+    _.assert( _.strIs( it.src ) );
+    result.push( it.src );
   });
 
-  filePath = _.arrayAppendArrayOnce( [], filePath );
+  result = _.longOnce( result );
 
-  if( filter.prefixPath || filter.postfixPath )
-  filePath = path.s.join( filter.prefixPath || '.', filePath, filter.postfixPath || '.' );
+  if( srcFilter.prefixPath || srcFilter.postfixPath )
+  result = path.s.join( srcFilter.prefixPath || '.', result, srcFilter.postfixPath || '.' );
 
-  return filePath
+  return result
 }
+
+//
+// //
+//
+// function filePathSrcNormalizedGet( filePath )
+// {
+//   let filter = this;
+//   let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+//   let path = fileProvider.path;
+//
+//   if( filePath === undefined )
+//   filePath = filter.filePath;
+//
+//   // filePath = filter.filePathSrcArrayGet();
+//
+//   // _.assert( _.arrayIs( filePath ) );
+//   _.assert( filePath !== undefined );
+//   _.assert( arguments.length === 0 || arguments.length === 1 );
+//
+//   // filePath = _.filter( filePath, ( p ) =>
+//   // {
+//   //   if( _.arrayIs( p ) )
+//   //   {
+//   //     debugger;
+//   //     _.assert( 0, 'not tested' );
+//   //     return _.unrollFrom( p );
+//   //   }
+//   //   return p;
+//   // });
+//
+//   // filePath = _.filter( filePath, ( p ) =>
+//   // {
+//   //   if( _.strIs( p ) )
+//   //   return p;
+//   //
+//   //   if( p === null )
+//   //   {
+//   //     if( !!p )
+//   //     return filter.prefixPath || undefined;
+//   //     return;
+//   //   }
+//   //
+//   //   if( _.boolLike( p ) )
+//   //   return;
+//   //
+//   //   return p;
+//   // });
+//
+//   /* xxx : use non-inplace version */
+//   let result = [];
+//   filePath = _.make( filePath );
+//   filePath = path.filterPairsInplace( filePath, ( it ) =>
+//   {
+//     if( _.boolLike( it.dst ) )
+//     return;
+//     _.assert( _.strIs( it.src ) );
+//     result.push( it.src );
+//   });
+//
+//   result = _.longOnce( result );
+//   // filePath = _.arrayAppendArrayOnce( [], filePath );
+//
+//   if( filter.prefixPath || filter.postfixPath )
+//   result = path.s.join( filter.prefixPath || '.', result, filter.postfixPath || '.' );
+//
+//   return result
+// }
 
 //
 
@@ -4277,13 +4359,13 @@ function _applyToRecordTime( record )
     if( record.isActual === true )
     if( filter.notOlderAge !== null )
     {
-      record[ isActualSymbol ] = _.timeNow() - filter.notOlderAge - time <= 0;
+      record[ isActualSymbol ] = _.time.now() - filter.notOlderAge - time <= 0;
     }
 
     if( record.isActual === true )
     if( filter.notNewerAge !== null )
     {
-      record[ isActualSymbol ] = _.timeNow() - filter.notNewerAge - time >= 0;
+      record[ isActualSymbol ] = _.time.now() - filter.notNewerAge - time >= 0;
     }
   }
 
@@ -4489,6 +4571,7 @@ let Extend =
   // pathsSupplementJoining : pathsSupplementJoining,
 
   _pathsAmmend,
+
   pathsExtend,
   pathsExtendJoining,
   pathsSupplement,
@@ -4637,8 +4720,6 @@ _.classDeclare
 });
 
 _.mapExtend( _, Globals );
-
-// _.Copyable.mixin( Self );
 
 // --
 // export

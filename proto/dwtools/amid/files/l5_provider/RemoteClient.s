@@ -633,7 +633,7 @@
 // //
 //
 // /**
-//  * Delete file of directory. Accepts path string or options object. Returns wConsequence instance.
+//  * Delete file of directory. Accepts path string or options map. Returns wConsequence instance.
 //  * @example
 //  * let fs = require('fs');
 //
@@ -657,7 +657,7 @@
 //      console.log( fs.existsSync( path ) ); // false (file does not exist)
 //    } );
 //
-//  * @param {string|Object} o - options object.
+//  * @param {string|Object} o - options map.
 //  * @param {string} o.filePath path to file/directory for deleting.
 //  * @param {boolean} [o.force=false] if sets to true, method remove file, or directory, even if directory has
 //     content. Else when directory to remove is not empty, wConsequence returned by method, will rejected with error.
@@ -665,7 +665,7 @@
 //  * @returns {wConsequence}
 //  * @throws {Error} If missed argument, or pass more than 1.
 //  * @throws {Error} If filePath is not string.
-//  * @throws {Error} If options object has unexpected property.
+//  * @throws {Error} If options map has unexpected property.
 //  * @method fileDeleteAct
 //  * @memberof wTools
 //  */
@@ -719,7 +719,7 @@
 // //
 //
 // /**
-//  * Delete file of directory. Accepts path string or options object. Returns wConsequence instance.
+//  * Delete file of directory. Accepts path string or options map. Returns wConsequence instance.
 //  * @example
 //  * let fs = require('fs');
 //
@@ -743,7 +743,7 @@
 //      console.log( fs.existsSync( path ) ); // false (file does not exist)
 //    } );
 //
-//  * @param {string|Object} o - options object.
+//  * @param {string|Object} o - options map.
 //  * @param {string} o.filePath path to file/directory for deleting.
 //  * @param {boolean} [o.force=false] if sets to true, method remove file, or directory, even if directory has
 //     content. Else when directory to remove is not empty, wConsequence returned by method, will rejected with error.
@@ -751,7 +751,7 @@
 //  * @returns {wConsequence}
 //  * @throws {Error} If missed argument, or pass more than 1.
 //  * @throws {Error} If filePath is not string.
-//  * @throws {Error} If options object has unexpected property.
+//  * @throws {Error} If options map has unexpected property.
 //  * @method fileDelete
 //  * @memberof wTools
 //  */
@@ -977,7 +977,7 @@
 //  * dir and throws error if directory already exists or one dir is not enough to complete path( o.filePath ).
 //  * Can be called in two ways:
 //  *  - First by passing only destination directory path and use default options;
-//  *  - Second by passing options object( o ).
+//  *  - Second by passing options map( o ).
 //  *
 //  * @param { wTools~dirMakeOptions } o - options { @link wTools~dirMakeOptions }.
 //  *

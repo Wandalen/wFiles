@@ -183,7 +183,7 @@ function statReadAct( o )
   }
   else
   {
-    return _.timeOut( 0, function()
+    return _.time.out( 0, function()
     {
       return _statReadAct( o.filePath );
     })

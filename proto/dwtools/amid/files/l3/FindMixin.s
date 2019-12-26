@@ -481,7 +481,7 @@ function filesFindNominal_body( o )
   {
     _.assert( arguments.length === 2 );
     let r = op.onUp.call( self, record, op );
-    _.assert( r === _.dont || r === record, 'onUp should return original record or false, but returned', _.toStrShort( r ) );
+    _.assert( r === _.dont || r === record, 'Callback onUp should return original record or _.dont, but returned', _.toStrShort( r ) );
     return r;
   }
 
@@ -491,7 +491,7 @@ function filesFindNominal_body( o )
   {
     _.assert( arguments.length === 2 );
     let r = op.onDown.call( self, record, op );
-    _.assert( r === undefined, 'onDown should return nothing( undefined ), but returned', _.toStrShort( r ) );
+    _.assert( r === undefined, 'Callback onDown should return nothing( undefined ), but returned', _.toStrShort( r ) );
   }
 
 }
@@ -610,7 +610,7 @@ function filesFindSingle_body( o )
 
     _.assert( arguments.length === 2 );
     let r = o.onUp.call( self, record, o );
-    _.assert( r === _.dont || r === record, 'onUp should return original record or false, but returned', _.toStrShort( r ) );
+    _.assert( r === _.dont || r === record, 'Callback onUp should return original record or _.dont, but returned', _.toStrShort( r ) );
 
     return r;
   }
@@ -621,7 +621,7 @@ function filesFindSingle_body( o )
   {
     _.assert( arguments.length === 2 );
     let r = o.onDown.call( self, record, o );
-    _.assert( r === undefined, 'onDown should return nothing( undefined ), but returned', _.toStrShort( r ) );
+    _.assert( r === undefined, 'Callback onDown should return nothing( undefined ), but returned', _.toStrShort( r ) );
   }
 
 }
@@ -692,12 +692,12 @@ function filesFind_pre( routine, args )
   if( Config.debug )
   {
 
-    _.assert( _.arrayHas( [ 'legacy', 'distinct' ], o.mode ), () => 'Unknown mode ' + _.strQuote( o.mode ) );
+    _.assert( _.longHas( [ 'legacy', 'distinct' ], o.mode ), () => 'Unknown mode ' + _.strQuote( o.mode ) );
 
     let knownFormats = [ 'absolute', 'relative', 'real', 'record', 'nothing' ];
     _.assert
     (
-      _.arrayHas( knownFormats, o.outputFormat ),
+      _.longHas( knownFormats, o.outputFormat ),
         'Unknown output format ' + _.toStrShort( o.outputFormat )
       + '\nKnown output formats ' + _.toStr( knownFormats )
     );
@@ -735,7 +735,7 @@ function filesFind_pre( routine, args )
   else
   o.revisiting = 3;
 
-  _.assert( _.arrayHas( [ 0, 1, 2, 3 ], o.revisiting ) );
+  _.assert( _.longHas( [ 0, 1, 2, 3 ], o.revisiting ) );
   _.assert( o.revisitingHardLinked === 0 || o.revisitingHardLinked === 1 );
 
   if( o.revisiting === 0 || o.revisitingHardLinked === 0 )
@@ -778,7 +778,7 @@ function filesFind_body( o )
 
   let time;
   if( o.verbosity >= 1 )
-  time = _.timeNow();
+  time = _.time.now();
 
   if( o.verbosity >= 3 )
   self.logger.log( 'filesFind', _.toStr( o, { levels : 2 } ) );
@@ -934,6 +934,7 @@ function filesFind_body( o )
     .catch( ( err ) =>
     {
       debugger;
+      _.errAttend( err );
       throw _.err( err );
     });
 
@@ -953,7 +954,7 @@ function filesFind_body( o )
 
     if( o.revisiting === 1 )
     {
-      if( _.arrayHas( o.visitedStack, record.real ) )
+      if( _.longHas( o.visitedStack, record.real ) )
       visited = true;
       o.visitedStack.push( record.real );
       if( visited )
@@ -961,7 +962,7 @@ function filesFind_body( o )
     }
     else if( o.revisiting === 2 )
     {
-      if( _.arrayHas( o.visitedStack, record.real ) )
+      if( _.longHas( o.visitedStack, record.real ) )
       visited = true;
       o.visitedStack.push( record.real );
     }
@@ -977,7 +978,7 @@ function filesFind_body( o )
     }
 
     let r = o.onUp.call( self, record, o );
-    _.assert( r === _.dont || r === record, 'onUp should return original record or false, but returned', _.toStrShort( r ) );
+    _.assert( r === _.dont || r === record, 'Callback onUp should return original record or _.dont, but returned', _.toStrShort( r ) );
     if( r === _.dont )
     return _.dont;
 
@@ -999,7 +1000,7 @@ function filesFind_body( o )
     {
       _.assert( o.visitedStack[ o.visitedStack.length - 1 ] === record.real );
       o.visitedStack.pop();
-      if( _.arrayHas( o.visitedStack, record.real ) )
+      if( _.longHas( o.visitedStack, record.real ) )
       return;
     }
     else if( o.revisiting === 2 )
@@ -1020,7 +1021,7 @@ function filesFind_body( o )
     }
 
     let r = o.onDown.call( self, record, o );
-    _.assert( r === undefined, 'onDown should return undefined', _.toStrShort( r ) );
+    _.assert( r === undefined, 'Callback onDown should return undefined', _.toStrShort( r ) );
 
   }
 
@@ -1148,7 +1149,7 @@ function filesFind_body( o )
       /* timing */
 
       if( o.verbosity >= 1 )
-      self.logger.log( ' . Found ' + o.result.length + ' files at ' + o.filePath + ' in ', _.timeSpent( time ) );
+      self.logger.log( ' . Found ' + o.result.length + ' files at ' + o.filePath + ' in ', _.time.spent( time ) );
 
       return o.result;
     });
@@ -1930,7 +1931,7 @@ function _filesReflectPrepare( routine, args )
   _.assert( _.arrayIs( o.result ) );
   _.assert( _.routineIs( o.onUp ) );
   _.assert( _.routineIs( o.onDown ) );
-  _.assert( _.arrayHas( [ 'fileCopy', 'hardLink', 'hardLinkMaybe', 'softLink', 'softLinkMaybe', 'nop' ], o.linking ), 'unknown kind of linking', o.linking );
+  _.assert( _.longHas( [ 'fileCopy', 'hardLink', 'hardLinkMaybe', 'softLink', 'softLinkMaybe', 'nop' ], o.linking ), 'unknown kind of linking', o.linking );
 
   return o;
 }
@@ -2420,7 +2421,7 @@ function filesReflectEvaluate_body( o )
     handleDown2.call( self, record, o );
     let r = o.onDown.call( self, record, o );
     // _.assert( r !== _.dont );
-    _.assert( r === undefined, () => 'onDown should return nothing( undefined ), but returned ' + _.toStrShort( r ) );
+    _.assert( r === undefined, () => 'Callback onDown should return nothing( undefined ), but returned ' + _.toStrShort( r ) );
 
     _.assert( record.action !== 'exclude' || record.touch === false, () => 'Attempt to exclude touched ' + record.dst.absolute );
 
@@ -2861,7 +2862,7 @@ function filesReflectEvaluate_body( o )
     for( let f = dstRecords.length-1 ; f >= 0 ; f-- )
     {
       let dstRecord = dstRecords[ f ];
-      let srcRecord = _.arrayLeft( srcRecords, dstRecord, ( r ) => r.relative ).element;
+      let srcRecord = _.longLeft( srcRecords, dstRecord, ( r ) => r.relative ).element;
       if( !srcRecord )
       continue;
       if( !srcRecord.isActual )
@@ -2928,7 +2929,7 @@ function filesReflectEvaluate_body( o )
     // debugger;
 
     _.assert( arguments.length === 2 );
-    _.assert( _.arrayHas( [ 'exclude', 'ignore', 'fileDelete', 'dirMake', 'fileCopy', 'softLink', 'hardLink', 'nop' ], action ), () => 'Unknown action ' + _.strQuote( action ) );
+    _.assert( _.longHas( [ 'exclude', 'ignore', 'fileDelete', 'dirMake', 'fileCopy', 'softLink', 'hardLink', 'nop' ], action ), () => 'Unknown action ' + _.strQuote( action ) );
 
     let absolutePath = record.dst.absolute;
     let result = actionMap[ absolutePath ] === action;
@@ -2959,7 +2960,7 @@ function filesReflectEvaluate_body( o )
 
     _.assert( _.strIs( dstPath ) );
     _.assert( arguments.length === 2 );
-    _.assert( _.arrayHas( [ 'src', 'constructive', 'destructive' ], kind ) );
+    _.assert( _.longHas( [ 'src', 'constructive', 'destructive' ], kind ) );
 
     let absolutePath = record.dst.absolute;
     kind = touchAct( absolutePath, kind );
@@ -3297,7 +3298,7 @@ function filesReflectSingle_pre( routine, args )
   o.rebasingLink = 0
   else if( o.rebasingLink === true )
   o.rebasingLink = 2;
-  _.assert( _.arrayHas( [ 0, 1, 2 ], o.rebasingLink ) );
+  _.assert( _.longHas( [ 0, 1, 2 ], o.rebasingLink ) );
 
   o.onWriteDstUp = _.routinesCompose( o.onWriteDstUp );
   o.onWriteDstDown = _.routinesCompose( o.onWriteDstDown );
@@ -3445,7 +3446,7 @@ function filesReflectSingle_body( o )
   function writeDstUp2( record )
   {
 
-    let linking = _.arrayHas( [ 'fileCopy', 'hardLink', 'softLink', 'textLink', 'nop' ], record.action );
+    let linking = _.longHas( [ 'fileCopy', 'hardLink', 'softLink', 'textLink', 'nop' ], record.action );
     if( linking && record.allow && !path.isRoot( record.dst.absolute ) )
     {
 
@@ -3938,7 +3939,7 @@ function filesReflect_pre( routine, args )
     let knownFormats = [ 'src.absolute', 'src.relative', 'dst.absolute', 'dst.relative', 'record', 'nothing' ];
     _.assert
     (
-      _.arrayHas( knownFormats, o.outputFormat ),
+      _.longHas( knownFormats, o.outputFormat ),
         'Unknown output format ' + _.toStrShort( o.outputFormat )
       + '\nKnown output formats ' + _.toStr( knownFormats )
     );
@@ -4031,7 +4032,7 @@ function filesReflect_body( o )
   let time;
 
   if( o.verbosity >= 1 )
-  time = _.timeNow();
+  time = _.time.now();
 
   _.assertRoutineOptions( filesReflect_body, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
@@ -4100,7 +4101,7 @@ function filesReflect_body( o )
     {
       _.assert( o.src.isPaired() );
       let mtr = o.src.moveTextualReport();
-      self.logger.log( ' + Reflect ' + o.result.length + ' files ' + mtr + ' in ' + _.timeSpent( time ) );
+      self.logger.log( ' + Reflect ' + o.result.length + ' files ' + mtr + ' in ' + _.time.spent( time ) );
     }
 
     if( o.outputFormat !== 'record' )
@@ -4394,7 +4395,7 @@ function filesFindSame_body( o )
 
   let time;
   if( o.usingTiming )
-  time = _.timeNow();
+  time = _.time.now();
 
   /* find */
 
@@ -4721,7 +4722,7 @@ function filesDelete_body( o )
   let time;
 
   if( o.verbosity >= 1 )
-  time = _.timeNow();
+  time = _.time.now();
 
   if( !o.sync )
   con = new _.Consequence().take( null );
@@ -4845,7 +4846,7 @@ function filesDelete_body( o )
 
     }
 
-    _.timeOut( 100, () =>
+    _.time.out( 100, () =>
     {
       debugger;
       if( opened )
@@ -4929,7 +4930,7 @@ function filesDelete_body( o )
 
     if( o.verbosity > 1 || ( o.verbosity === 1 && o.result.length ) )
     {
-      let spentTime = _.timeNow() - time;
+      let spentTime = _.time.now() - time;
       let groupsMap = path.group({ keys : o.filter.filePath, vals : o.result });
       let textualReport = path.groupTextualReport
       ({
@@ -5295,6 +5296,7 @@ let softLinksRebase = _.routineFromPreAndBody( filesFindRecursive.pre, softLinks
 //
 
 /*
+qqq : has poor coverage! please improve.
 qqq : optimize
 */
 
@@ -5326,7 +5328,7 @@ function filesHasTerminal( filePath )
   {
     debugger;
     if( terminal )
-    return false;
+    return _.dont;
     if( record.stat && !record.isDir )
     terminal = record;
     return record;

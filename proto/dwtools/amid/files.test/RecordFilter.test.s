@@ -3318,9 +3318,7 @@ function prefixesRelative( test )
   test.identical( dst.prefixPath, null );
   test.is( src.filePath === dst.filePath );
 
-  debugger;
   dst.prefixesRelative();
-  debugger;
   test.identical( src.formed, 1 );
   test.identical( src.filePath, { '.' : '' } );
   test.identical( src.prefixPath, '.' );
@@ -4854,6 +4852,40 @@ function basePathUse( test )
   test.identical( dst.prefixPath, null );
   test.identical( dst.basePath, '/app1/app2' );
   test.identical( dst.filePath, '/app1/**' );
+
+}
+
+//
+
+function filePathSrcCommon( test )
+{
+  let context = this;
+  let provider = new _.FileProvider.Extract();
+  let path = provider.path;
+
+  test.case = 'src.filePath is relative path ( string )';
+  var filter = provider.recordFilter();
+  filter.filePath = { '/dir1/dir2' : '', '/dir1/dir3' : null, '/dir3' : true, '/dir4' : false };
+  var exp = '/dir1/';
+  var got = filter.filePathSrcCommon();
+  test.identical( got, exp );
+
+}
+
+//
+
+function filePathDstCommon( test )
+{
+  let context = this;
+  let provider = new _.FileProvider.Extract();
+  let path = provider.path;
+
+  test.case = 'src.filePath is relative path ( string )';
+  var filter = provider.recordFilter();
+  filter.filePath = { '/dir1/dir2' : '/d1/d2', '/dir1/dir3' : '/d1/d3', '/dir3' : true, '/dir4' : false };
+  var exp = '/d1/';
+  var got = filter.filePathDstCommon();
+  test.identical( got, exp );
 
 }
 
@@ -9295,6 +9327,9 @@ var Self =
     filePathSelect,
     filePathArrayGet,
     basePathUse,
+
+    filePathSrcCommon,
+    filePathDstCommon,
 
     // paths ammend
 

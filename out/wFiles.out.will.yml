@@ -3,14 +3,14 @@ root:
   - wFiles.out
 consistency:
   wFiles.out.will.yml: &ref_0
-    hash: e03c44d9e6b4c7644c7399e6ccfb2eff
-    size: 49330
+    hash: 5b8addd05cf79ddd1508ad6266f70024
+    size: 49359
   ../.ex.will.yml: &ref_1
     hash: fd53f2becf731258347c6fb11a8f2d9a
     size: 3237
   ../.im.will.yml: &ref_2
-    hash: ce281dbc0467e4cdddfc834e0b2dfdae
-    size: 6460
+    hash: a8cf7d4de93217d1b00be8bd872f9d22
+    size: 6534
 module:
   wFiles.out:
     about:
@@ -92,9 +92,6 @@ module:
       download:
         criterion:
           predefined: 1
-      remote:
-        criterion:
-          predefined: 1
       repository:
         path: 'git+https:///github.com/Wandalen/wFiles.git'
       origins:
@@ -104,15 +101,15 @@ module:
       bugtracker:
         path: 'https:///github.com/Wandalen/wFiles/issues'
       in:
-        criterion:
-          predefined: 0
         path: .
       out:
-        criterion:
-          predefined: 0
         path: .
       temp:
-        path: 'path::out'
+        path:
+          - 'path::out'
+          - ../package-lock.json
+          - ../package.json
+          - ../node_modules
       proto:
         path: ../proto
       export:
@@ -177,11 +174,13 @@ module:
         path: '{path::out.*=}/source/Index.s'
       exported.dir.proto.export:
         criterion:
+          generated: 1
           content: proto
           export: 1
         path: ../proto
       exported.files.proto.export:
         criterion:
+          generated: 1
           content: proto
           export: 1
         path:
@@ -194,26 +193,6 @@ module:
           - ../proto/dwtools/amid/files/UseBase.s
           - ../proto/dwtools/amid/files/UseMid.s
           - ../proto/dwtools/amid/files/UseTop.s
-          - ../proto/dwtools/amid/files/--l0
-          - ../proto/dwtools/amid/files/--l0/Encoders.s
-          - ../proto/dwtools/amid/files/--l0/RecordContext.s
-          - ../proto/dwtools/amid/files/--l1
-          - ../proto/dwtools/amid/files/--l1/Path.s
-          - ../proto/dwtools/amid/files/--l1/Path.ss
-          - ../proto/dwtools/amid/files/--l1/Record.s
-          - ../proto/dwtools/amid/files/--l1/RecordFactory.s
-          - ../proto/dwtools/amid/files/--l1/RecordFilter.s
-          - ../proto/dwtools/amid/files/--l1/Routines.s
-          - ../proto/dwtools/amid/files/--l1/Stat.s
-          - ../proto/dwtools/amid/files/-l1
-          - ../proto/dwtools/amid/files/-l1/Encoders.s
-          - ../proto/dwtools/amid/files/-l1/FileRecord.s
-          - ../proto/dwtools/amid/files/-l1/FileRecordFactory.s
-          - ../proto/dwtools/amid/files/-l1/FileRecordFilter.s
-          - ../proto/dwtools/amid/files/-l1/FileRoutines.s
-          - ../proto/dwtools/amid/files/-l1/FileStat.s
-          - ../proto/dwtools/amid/files/-l1/Path.s
-          - ../proto/dwtools/amid/files/-l1/Path.ss
           - ../proto/dwtools/amid/files/l0
           - ../proto/dwtools/amid/files/l0/Encoders.s
           - ../proto/dwtools/amid/files/l0/RecordContext.s
@@ -522,6 +501,7 @@ module:
           prefixPath: ../proto
         mandatory: 1
         criterion:
+          generated: 1
           content: proto
           export: 1
       exported.files.proto.export:
@@ -534,6 +514,7 @@ module:
         recursive: 0
         mandatory: 1
         criterion:
+          generated: 1
           content: proto
           export: 1
     step:
@@ -891,6 +872,7 @@ module:
         opts:
           reflector: 'reflector::exported.proto.export*'
         criterion:
+          generated: 1
           content: proto
           export: 1
         inherit:
@@ -899,6 +881,7 @@ module:
         opts:
           reflector: 'reflector::exported.files.proto.export*'
         criterion:
+          generated: 1
           content: proto
           export: 1
         inherit:
@@ -1074,9 +1057,6 @@ module:
       download:
         criterion:
           predefined: 1
-      remote:
-        criterion:
-          predefined: 1
       repository:
         path: 'git+https:///github.com/Wandalen/wFiles.git'
       origins:
@@ -1090,13 +1070,17 @@ module:
       out:
         path: out
       temp:
-        path: 'path::out'
+        path:
+          - 'path::out'
+          - package-lock.json
+          - package.json
+          - node_modules
       proto:
-        path: ./proto
+        path: proto
       export:
         path: '{path::proto}/**'
       doc:
-        path: ./doc
+        path: doc
       out.raw.debug:
         criterion:
           debug: debug
@@ -1802,6 +1786,6 @@ module:
         hash: fd53f2becf731258347c6fb11a8f2d9a
         size: 3237
       ../.im.will.yml:
-        hash: ce281dbc0467e4cdddfc834e0b2dfdae
-        size: 6460
+        hash: a8cf7d4de93217d1b00be8bd872f9d22
+        size: 6534
       wFiles.out.will.yml: *ref_0

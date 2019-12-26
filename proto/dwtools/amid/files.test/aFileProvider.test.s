@@ -132,13 +132,13 @@ function testDelaySample( test )
 
   test.case = 'delay test';
 
-  var con = _.timeOut( 1000 );
+  var con = _.time.out( 1000 );
 
   test.identical( 1,1 );
 
   con.finally( function( ){ logger.log( '1000ms delay' ) } );
 
-  con.finally( _.routineSeal( _,_.timeOut,[ 1000 ] ) );
+  con.finally( _.routineSeal( _,_.time.out,[ 1000 ] ) );
 
   con.finally( function( ){ logger.log( '2000ms delay' ) } );
 
@@ -164,7 +164,7 @@ function mustNotThrowError( test )
   // test.case = 'if not passes then appears in output/total counter';
   // test.mustNotThrowError( function()
   // {
-  //   return _.timeOut( 1000,function()
+  //   return _.time.out( 1000,function()
   //   {
   //     throw _.err( 'test' );
   //   });
@@ -183,6 +183,7 @@ function mustNotThrowError( test )
   .ifNoErrorThen( function( got )
   {
     test.identical( got, '123' );
+    return null;
   })
 
 }
@@ -1463,6 +1464,123 @@ function readWriteSync( test )
   //     });
   //   });
   // }
+
+}
+
+//
+
+function fileWriteActSync( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let path = provider.path;
+
+  if( !_.routineIs( provider.fileWriteAct ) )
+  return;
+
+  var isHd = test.context.providerIsInstanceOf( _.FileProvider.HardDrive );
+  
+  let data = 'Test data'
+  
+  //
+  
+  test.case = 'normalized path, call fileWrite'
+  var filePath = test.context.pathFor( 'write_test/file' );
+  var o = _.mapExtend( null, provider.fileWriteAct.defaults );
+  o.filePath = filePath;
+  o.sync = 1;
+  o.data = data;
+  provider.dirMakeForFile( filePath )
+  provider.fileWriteAct( o );
+  test.identical( o.filePath, filePath );
+  test.identical( provider.fileRead( filePath ), data );
+  
+  //
+  
+  if( Config.debug )
+  if( isHd )
+  {
+    test.case = 'native path, call fileWrite_body'
+    var filePath = test.context.pathFor( 'write_test/file' );
+    provider.filesDelete( filePath )
+    var o = _.mapExtend( null, provider.fileWriteAct.defaults );
+    o.filePath = _.path.nativize( filePath );
+    o.sync = 1;
+    o.data = data;
+    test.shouldThrowErrorSync( () => 
+    {
+      provider.fileWriteAct( o );
+    })
+    test.is( !provider.path.isNormalized( o.filePath ) );
+    test.is( !provider.fileExists( filePath ) );
+  }
+}
+
+//
+
+function fileWriteActAsync( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let path = provider.path;
+
+  if( !_.routineIs( provider.fileWriteAct ) )
+  return;
+
+  var isHd = test.context.providerIsInstanceOf( _.FileProvider.HardDrive );
+  let data = 'Test data'
+  
+  let ready = new _.Consequence().take( null )
+  
+  //
+  
+  .finally( () => 
+  {
+    test.case = 'normalized path, call fileWrite'
+    var filePath = test.context.pathFor( 'write_test/file' );
+    var o = _.mapExtend( null, provider.fileWriteAct.defaults );
+    o.filePath = filePath;
+    o.sync = 0;
+    o.data = data;
+    provider.dirMakeForFile( filePath )
+    return provider.fileWriteAct( o )
+    .then( () => 
+    {
+      test.identical( o.filePath, filePath );
+      test.identical( provider.fileRead( filePath ), data );
+      return null;
+    })
+  })
+  
+  //
+    
+  if( Config.debug )
+  if( isHd )
+  ready.finally( () => 
+  {
+    test.case = 'native path, call fileWrite_body'
+    var filePath = test.context.pathFor( 'write_test/file' );
+    provider.filesDelete( filePath )
+    var o = _.mapExtend( null, provider.fileWriteAct.defaults );
+    o.filePath = _.path.nativize( filePath );
+    o.sync = 0;
+    o.data = data;
+    return test.shouldThrowErrorOfAnyKind( () => 
+    {
+      return provider.fileWriteAct( o );
+    })
+    .then( () => 
+    {
+      test.is( !provider.path.isNormalized( o.filePath ) );
+      test.is( !provider.fileExists( filePath ) );
+      return null;
+    })
+    
+  })
+ 
+  //
+  
+  return ready;
 }
 
 //
@@ -3407,7 +3525,7 @@ function fileTouch( test )
     provider.filesDelete( srcPath );
     provider.fileWrite( srcPath, testData );
     var statsBefore = provider.statResolvedRead( srcPath );
-    return _.timeOut( 1000, () =>
+    return _.time.out( 1000, () =>
     {
       provider.fileTouch( srcPath );
       var statsAfter = provider.statResolvedRead( srcPath );
@@ -3428,7 +3546,7 @@ function fileTouch( test )
     provider.fileWrite( srcPath, testData );
     var record = provider.recordFactory().record( srcPath );
     var statsBefore = record.stat;
-    return _.timeOut( 1000, () =>
+    return _.time.out( 1000, () =>
     {
       provider.fileTouch( record );
       var statsAfter = provider.statResolvedRead( srcPath );
@@ -3464,7 +3582,7 @@ function fileTimeSet( test )
 
   test.case = 'path does not exist';
   provider.filesDelete( filePath );
-  var time = _.timeNow();
+  var time = _.time.now();
   test.shouldThrowErrorOfAnyKind( () => provider.fileTimeSet( filePath, time, time ) );
 
   function testDiff( diff )
@@ -4713,7 +4831,7 @@ function fileCopyActSync( test )
 
   test.case = 'should expect normalized path, but not nativized';
   var srcPath = routinePath + '\\src';
-  provider.fileWrite( srcPath, srcPath );
+  provider.fileWrite( provider.path.normalize( srcPath ), srcPath );
   var dstPath = routinePath + '\\dst';
   var o =
   {
@@ -7786,8 +7904,6 @@ function fileCopySoftLinkResolving( test )
   test.close( 'links to same file' );
 }
 
-fileCopySoftLinkResolving.timeOut = 30000;
-
 //
 
 function fileCopyLinks( test )
@@ -7995,7 +8111,7 @@ function fileCopyLinks( test )
   provider.softLink( dstPath, srcPathTerminal );
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 0 };
   var dstStatBefore = provider.statRead( dstPath );
-  _.timeOut( 1000 ).deasync();
+  _.time.out( 1000 ).deasyncWait();
   fileCopy( o );
   var dstStatAfter = provider.statRead( dstPath );
   test.is( dstStatBefore.mtime.getTime() !== dstStatAfter.mtime.getTime() );
@@ -9368,7 +9484,6 @@ test.identical( provider.pathResolveSoftLink( dstPath ),  test.context.globalFro
   test.is( provider.isTerminal( src3Path ) );
   test.identical( provider.fileRead( dstPath ), src3Path );
 }
-
 
 //
 
@@ -11361,8 +11476,6 @@ function fileRenameRelativePath( test )
 
 }
 
-fileRenameRelativePath.timeOut = 30000;
-
 //
 
 function fileRenameAsync( test )
@@ -12578,7 +12691,7 @@ function fileRenameActSync( test )
 
   test.case = 'should expect normalized path, but not nativized';
   var srcPath = routinePath + '\\src';
-  provider.fileWrite( srcPath, srcPath );
+  provider.fileWrite( provider.path.normalize( srcPath ), srcPath );
   var dstPath = routinePath + '\\dst';
   var o =
   {
@@ -14564,7 +14677,7 @@ function fileDeleteAsync( test )
       throwing : 1
     });
 
-    return test.shouldThrowErrorOfAnyKind( con );
+    return test.shouldThrowErrorAsync( con );
   })
 
   /**/
@@ -14706,7 +14819,7 @@ function fileDeleteAsync( test )
       throwing : 1
     });
 
-    return test.shouldThrowErrorOfAnyKind( con )
+    return test.shouldThrowErrorAsync( con )
     .finally( function( err, arg )
     {
       var stat = provider.statResolvedRead( folder );
@@ -14755,7 +14868,7 @@ function fileDeleteAsync( test )
     })
     .finally( function()
     {
-      return test.shouldThrowErrorOfAnyKind( function()
+      return test.shouldThrowErrorAsync( function()
       {
         provider.filesTree = {};
         return provider.fileDelete
@@ -14787,7 +14900,7 @@ function fileDeleteAsync( test )
         sync : 0,
         throwing : 1
       });
-      return test.shouldThrowErrorOfAnyKind( con );
+      return test.shouldThrowErrorAsync( con );
     })
   })
   .finally( () =>
@@ -14983,6 +15096,7 @@ function fileDeleteLocked( test )
   test.case = 'try to delete opened file using fs.createReadStream';
   provider.fileWrite( terminalPath, terminalPath );
   var stream = provider.streamRead( terminalPath );
+  _.time.out( 100 ).deasyncWait();
   var got = fs.unlinkSync( path.nativize( terminalPath ) );
   test.will = 'no errors from fs module';
   test.identical( got, undefined );
@@ -14995,7 +15109,7 @@ function fileDeleteLocked( test )
   test.will = 'can`t be written';
   test.shouldThrowErrorSync( () => provider.fileWrite( terminalPath, terminalPath ) );
   stream.close();
-  return _.timeOut( 1000, () =>
+  return _.time.out( 1000, () =>
   {
     test.will = 'terminal is closed and removed';
     test.is( stream.closed );
@@ -15026,10 +15140,10 @@ function fileDeletePerfomance( test )
     provider.fileWrite( filePath, data )
   }
 
-  var t = _.timeNow();
+  var t = _.time.now();
   for( var i = 0; i < files; i++ )
   provider.fileDeleteAct({ filePath : filePaths[ i ], sync : 1 });
-  var spent = _.timeSpent( t );
+  var spent = _.time.spent( t );
   console.log( spent, 'for', files, 'files' );
 
 }
@@ -15492,7 +15606,7 @@ function fileLockWaitingNotSharingAsync( test )
 
     con.then( () =>
     {
-      t1 = _.timeNow();
+      t1 = _.time.now();
       let con2 = provider.fileLock
       ({
         filePath,
@@ -15507,7 +15621,7 @@ function fileLockWaitingNotSharingAsync( test )
 
     con.finally( ( err, got ) =>
     {
-      let t2 = _.timeNow();
+      let t2 = _.time.now();
       test.le( t2 - t1, 1000 );
 
       test.is( provider.fileIsLocked( filePath ) );
@@ -15545,7 +15659,7 @@ function fileLockWaitingNotSharingAsync( test )
 
     con.then( () =>
     {
-      t1 = _.timeNow();
+      t1 = _.time.now();
       let con2 = provider.fileLock
       ({
         filePath,
@@ -15560,7 +15674,7 @@ function fileLockWaitingNotSharingAsync( test )
 
     con.finally( ( err, got ) =>
     {
-      let t2 = _.timeNow();
+      let t2 = _.time.now();
       test.identical( got, null );
       test.le( t2 - t1, 1000 );
 
@@ -15577,8 +15691,6 @@ function fileLockWaitingNotSharingAsync( test )
 
   return ready;
 }
-
-fileLockWaitingNotSharingAsync.timeOut = 30000;
 
 //
 
@@ -15699,7 +15811,7 @@ function fileLockWaitingSharingAsync( test )
 
     con.then( () =>
     {
-      t1 = _.timeNow();
+      t1 = _.time.now();
       let con2 = provider.fileLock
       ({
         filePath,
@@ -15714,7 +15826,7 @@ function fileLockWaitingSharingAsync( test )
 
     con.finally( ( err, got ) =>
     {
-      let t2 = _.timeNow();
+      let t2 = _.time.now();
       test.ge( t2 - t1, 5000 );
 
       test.is( provider.fileIsLocked( filePath ) );
@@ -15752,7 +15864,7 @@ function fileLockWaitingSharingAsync( test )
 
     con.then( () =>
     {
-      t1 = _.timeNow();
+      t1 = _.time.now();
       let con2 = provider.fileLock
       ({
         filePath,
@@ -15767,7 +15879,7 @@ function fileLockWaitingSharingAsync( test )
 
     con.finally( ( err, got ) =>
     {
-      let t2 = _.timeNow();
+      let t2 = _.time.now();
       test.identical( got, null );
       test.ge( t2 - t1, 5000 );
 
@@ -15806,7 +15918,7 @@ function fileLockWaitingSharingAsync( test )
 
     con.then( () =>
     {
-      t1 = _.timeNow();
+      t1 = _.time.now();
       let con2 = provider.fileLock
       ({
         filePath,
@@ -15817,7 +15929,7 @@ function fileLockWaitingSharingAsync( test )
         waiting : 1
       });
 
-      _.timeOut( 2000, () =>
+      _.time.out( 2000, () =>
       {
         provider.fileUnlock( filePath );
         return null;
@@ -15828,7 +15940,7 @@ function fileLockWaitingSharingAsync( test )
 
     con.finally( ( err, got ) =>
     {
-      let t2 = _.timeNow();
+      let t2 = _.time.now();
 
       test.ge( t2 - t1, 2000 );
       test.lt( t2 - t1, 5000 );
@@ -15844,8 +15956,6 @@ function fileLockWaitingSharingAsync( test )
 
   return ready;
 }
-
-fileLockWaitingSharingAsync.timeOut = 30000;
 
 //
 
@@ -16099,7 +16209,7 @@ function fileLockNotWaitingSharingAsync( test )
 
     con.then( () =>
     {
-      t1 = _.timeNow();
+      t1 = _.time.now();
       let con2 = provider.fileLock
       ({
         filePath,
@@ -16114,7 +16224,7 @@ function fileLockNotWaitingSharingAsync( test )
 
     con.finally( ( err, got ) =>
     {
-      let t2 = _.timeNow();
+      let t2 = _.time.now();
       test.le( t2 - t1, 1000 );
 
       test.is( provider.fileIsLocked( filePath ) );
@@ -16154,7 +16264,7 @@ function fileLockNotWaitingSharingAsync( test )
 
     con.then( () =>
     {
-      t1 = _.timeNow();
+      t1 = _.time.now();
       let con2 = provider.fileLock
       ({
         filePath,
@@ -16169,9 +16279,9 @@ function fileLockNotWaitingSharingAsync( test )
 
     con.finally( ( err, got ) =>
     {
-      let t2 = _.timeNow();
+      let t2 = _.time.now();
       test.identical( got, true );
-      test.le( t2 - t1, 100 );
+      test.le( t2 - t1, 500 );
 
       test.is( provider.fileIsLocked( filePath ) );
       provider.fileUnlock( filePath );
@@ -16186,8 +16296,6 @@ function fileLockNotWaitingSharingAsync( test )
 
   return ready;
 }
-
-fileLockNotWaitingSharingAsync.timeOut = 30000;
 
 //
 
@@ -16439,7 +16547,7 @@ function fileLockNotWaitingNotSharingAsync( test )
 
     con.then( () =>
     {
-      t1 = _.timeNow();
+      t1 = _.time.now();
       let con2 = provider.fileLock
       ({
         filePath,
@@ -16454,7 +16562,7 @@ function fileLockNotWaitingNotSharingAsync( test )
 
     con.finally( ( err, got ) =>
     {
-      let t2 = _.timeNow();
+      let t2 = _.time.now();
       test.le( t2 - t1, 1000 );
 
       test.is( provider.fileIsLocked( filePath ) );
@@ -16492,7 +16600,7 @@ function fileLockNotWaitingNotSharingAsync( test )
 
     con.then( () =>
     {
-      t1 = _.timeNow();
+      t1 = _.time.now();
       let con2 = provider.fileLock
       ({
         filePath,
@@ -16509,7 +16617,7 @@ function fileLockNotWaitingNotSharingAsync( test )
     {
       test.identical( got, null );
 
-      let t2 = _.timeNow();
+      let t2 = _.time.now();
       test.le( t2 - t1, 1000 );
 
       test.is( provider.fileIsLocked( filePath ) );
@@ -16523,8 +16631,6 @@ function fileLockNotWaitingNotSharingAsync( test )
 
   return ready;
 }
-
-fileLockNotWaitingNotSharingAsync.timeOut = 30000;
 
 //
 
@@ -18700,8 +18806,7 @@ function dirMakeAsync( test )
   {
     test.case = 'synchronous mkdir force';
     provider.filesDelete( filePath );
-    filePath = tes
-    t.context.pathFor( 'written/dirMakeAsync/make_dir/dir1/' );
+    filePath = test.context.pathFor( 'written/dirMakeAsync/make_dir/dir1/' );
     return null;
   })
 
@@ -19173,6 +19278,7 @@ function hashReadAsync( test )
     test.case = 'async filehash';
     data = 'Excepteur sint occaecat cupidatat non proident';
     filePath = test.context.pathFor( 'read/hashReadAsync/src.txt' );
+    return null;
   })
 
   /**/
@@ -19192,6 +19298,7 @@ function hashReadAsync( test )
       md5sum.update( data );
       var expected = md5sum.digest( 'hex' );
       test.identical( got, expected );
+      return null;
     });
   })
 
@@ -19201,6 +19308,7 @@ function hashReadAsync( test )
   {
     test.case = 'invalid path';
     filePath = test.context.pathFor( 'invalid.txt' );
+    return null;
   })
 
   /**/
@@ -19217,6 +19325,7 @@ function hashReadAsync( test )
     {
       var expected = NaN;
       test.identical( got, expected );
+      return null;
     });
   })
 
@@ -19248,6 +19357,7 @@ function hashReadAsync( test )
     {
       var expected = NaN;
       test.identical( got, expected );
+      return null;
     });
   })
 
@@ -19981,6 +20091,47 @@ function fileWriteSync( test )
       });
     });
   }
+  
+  //
+  
+  test.case = 'native path, call fileWrite'
+  var filePath = test.context.pathFor( 'write_test/file' );
+  var o = 
+  {
+    filePath : provider.path.nativize( filePath ),
+    data,
+    sync : 1
+  }
+  provider.fileWrite( o );
+  test.identical( o.filePath, filePath );
+  test.identical( provider.fileRead( filePath ), data );
+  
+  //
+  
+  if( Config.debug )
+  if( isHd )
+  {
+    test.case = 'native path, call fileWrite_body'
+    var filePath = test.context.pathFor( 'write_test/file' );
+    provider.filesDelete( filePath )
+    var o = 
+    {
+      data,
+      sync : 1
+    }
+    var o =_.mapExtend( null, provider.fileWrite.body.defaults )
+    o.filePath = provider.path.nativize( filePath )
+    o.data = data;
+    o.sync = 1;
+    test.shouldThrowErrorSync( () => 
+    {
+      provider.fileWrite.body.call( provider,o );
+    })
+    test.is( !provider.path.isNormalized( o.filePath ) );
+    test.is( !provider.fileExists( filePath ) );
+  }
+  
+  
 }
 
 //
@@ -20488,13 +20639,15 @@ function fileWriteAsync( test )
   if( !_.routineIs( provider.fileWrite ) )
   return;
 
+  let isHd = self.providerIsInstanceOf( _.FileProvider.HardDrive );
   var consequence = new _.Consequence().take( null )
   /*writeMode rewrite*/
 
   .finally( () =>
   {
     provider.filesDelete( test.context.pathFor( 'write_test' ) )
-    return provider.dirMake( test.context.pathFor( 'write_test' ) )
+    provider.dirMake( test.context.pathFor( 'write_test' ) )
+    return null;
   })
 
   /*writeMode rewrite*/
@@ -20696,11 +20849,52 @@ function fileWriteAsync( test )
 
     return test.shouldThrowErrorOfAnyKind( con );
   })
-
+  
+  //
+  
+  .finally( () => 
+  {
+    test.case = 'native path, call fileWrite'
+    var filePath = test.context.pathFor( 'write_test/file' );
+    var o = 
+    {
+      filePath : provider.path.nativize( filePath ),
+      data,
+      sync : 0
+    }
+    return provider.fileWrite( o )
+    .then( () => 
+    { 
+      test.identical( o.filePath, filePath );
+      test.identical( provider.fileRead( filePath ), data );
+      return null;
+    })
+  })
+  
+  //
+  
+  if( Config.debug )
+  if( isHd )
+  consequence.finally( () => 
+  {
+    test.case = 'native path, call fileWrite_body'
+    var filePath = test.context.pathFor( 'write_test/file' );
+    provider.filesDelete( filePath )
+    var o =_.mapExtend( null, provider.fileWrite.body.defaults )
+    o.filePath = provider.path.nativize( filePath )
+    o.data = data;
+    o.sync = 0;
+    test.shouldThrowErrorOfAnyKind( () => 
+    {
+      return provider.fileWrite.body.call( provider,o );
+    })
+    test.is( !provider.path.isNormalized( o.filePath ) );
+    test.is( !provider.fileExists( filePath ) );
+    return null;
+  })
+ 
   return consequence;
 }
-
-fileWriteAsync.timeOut = 30000;
 
 //
 
@@ -21096,7 +21290,7 @@ function fileWriteLinksAsync( test )
 
     var data;
 
-    return _.timeOut( 2000 )
+    return _.time.out( 2000 )
     .finally( () =>
     {
       test.case ='append link file ';
@@ -21163,7 +21357,7 @@ function fileWriteLinksAsync( test )
 
     var data;
 
-    return _.timeOut( 2000 )
+    return _.time.out( 2000 )
     .finally( () =>
     {
       test.case ='append link file ';
@@ -21241,7 +21435,7 @@ function fileWriteLinksAsync( test )
 
     var data;
 
-    return _.timeOut( 2000 )
+    return _.time.out( 2000 )
     .finally( () =>
     {
       test.case ='append link file ';
@@ -21308,7 +21502,7 @@ function fileWriteLinksAsync( test )
 
     var data;
 
-    return _.timeOut( 2000 )
+    return _.time.out( 2000 )
     .finally( () =>
     {
       test.case ='prepend link file ';
@@ -21378,8 +21572,6 @@ function fileWriteLinksAsync( test )
 
   return con;
 }
-
-fileWriteLinksAsync.timeOut = 30000;
 
 //
 
@@ -22319,6 +22511,7 @@ function softLinkAsync( test )
       dstPath : srcPath,
       sync : 0,
       rewriting : 1,
+      allowingMissed : 1,
       throwing : 1
     })
     .ifNoErrorThen( function( got )
@@ -22411,7 +22604,7 @@ function softLinkAsync( test )
     })
     .ifNoErrorThen( function( got )
     {
-      test.identical( got, false );
+      test.identical( got, null );
       test.is( !provider.isSoftLink( srcPath ) );
       return null;
     })
@@ -22429,7 +22622,7 @@ function softLinkAsync( test )
       rewriting : 0,
       throwing : 1
     })
-    return test.shouldThrowErrorOfAnyKind( con )
+    return test.shouldThrowErrorAsync( con )
     .ifNoErrorThen( function( got )
     {
       test.is( !provider.isSoftLink( srcPath ) );
@@ -22509,6 +22702,8 @@ function softLinkAsync( test )
   .finally( () =>
   {
     test.open( 'allowingMissed' );
+    provider.filesDelete( routinePath );
+    provider.dirMakeForFile( srcPath );
     return null;
   })
 
@@ -23593,8 +23788,6 @@ function softLinkRelativePath( test )
 
   test.close( 'allowingMissed off, same path' );
 }
-
-softLinkRelativePath.timeOut = 30000;
 
 //
 
@@ -24850,8 +25043,6 @@ function softLinkSoftLinkResolving( test )
   test.close( 'links to same file' );
 }
 
-softLinkSoftLinkResolving.timeOut = 30000;
-
 //
 
 function softLinkRelativeLinkResolving( test )
@@ -25378,8 +25569,6 @@ function softLinkRelativeLinkResolving( test )
 
   test.close( 'links to same file' );
 }
-
-softLinkRelativeLinkResolving.timeOut = 10000;
 
 //
 
@@ -28348,8 +28537,6 @@ function hardLinkSync( test )
   test.identical( terminalStatBefore.mtime.getTime(), terminalStatAfter.mtime.getTime() );
 }
 
-hardLinkSync.timeOut = 60000;
-
 //
 
 function hardLinkMultipleSync( test )
@@ -28852,8 +29039,6 @@ function hardLinkMultipleSync( test )
   var ok = test.identical( src, dst );
 }
 
-hardLinkMultipleSync.timeOut = 60000;
-
 //
 
 function hardLinkRelativePath( test )
@@ -29174,8 +29359,6 @@ function hardLinkExperiment( test )
   var dst = provider.fileRead( paths[ paths.length - 1 ] );
   test.identical( src, dst );
 }
-
-hardLinkExperiment.timeOut = 30000;
 
 //
 
@@ -29751,7 +29934,7 @@ function hardLinkActSync( test )
 
   test.case = 'should expect normalized path, but not nativized';
   var srcPath = routinePath + '\\src';
-  provider.fileWrite( srcPath, srcPath );
+  provider.fileWrite( provider.path.normalize( srcPath ), srcPath );
   var dstPath = routinePath + '\\dst';
   var o =
   {
@@ -30921,8 +31104,6 @@ function hardLinkActAsync( test )
 
   return con;
 }
-
-hardLinkActAsync.timeOut = 15000;
 
 //
 
@@ -32715,8 +32896,6 @@ function hardLinkSoftLinkResolving( test )
   test.close( 'links to same file' );
 }
 
-hardLinkSoftLinkResolving.timeOut = 30000;
-
 //
 
 function hardLinkHardLinkBreaking( test )
@@ -33002,6 +33181,10 @@ function hardLinkResolvingBasic( test )
   let src2Path = test.context.pathFor( 'written/hardLinkResolvingBasic/src2' );
   let src3Path = test.context.pathFor( 'written/hardLinkResolvingBasic/src3' );
   let dstPath = test.context.pathFor( 'written/hardLinkResolvingBasic/dst' );
+  
+  let hardLinked = true;
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) && !provider.UsingBigIntForStat )
+  hardLinked = _.maybe;
 
   /*
       src1 -> src2 -> src3
@@ -33054,7 +33237,7 @@ function hardLinkResolvingBasic( test )
   test.is( provider.isSoftLink( src2Path ) );
   test.is( provider.isTerminal( src3Path ) );
   test.is( provider.isTerminal( dstPath ) );
-  test.is( provider.filesAreHardLinked([ src3Path, dstPath ]) )
+  test.identical( provider.filesAreHardLinked([ src3Path, dstPath ]), hardLinked )
 
   /* */
 
@@ -33094,7 +33277,7 @@ function hardLinkResolvingBasic( test )
   test.is( provider.isTextLink( src2Path ) );
   test.is( provider.isTerminal( src3Path ) );
   test.is( provider.isTerminal( dstPath ) );
-  test.is( provider.filesAreHardLinked([ src3Path, dstPath ]) )
+  test.identical( provider.filesAreHardLinked([ src3Path, dstPath ]), hardLinked )
 
   provider.fieldPop( 'usingTextLink', 1 );
 
@@ -33123,6 +33306,10 @@ function hardLinkGlobal( test )
   var dstPathSecond = 'second://' + dstPath;
 
   var dstPathUnknown = 'unknown://' + dstPath;
+  
+  let hardLinked = true;
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) && !provider.UsingBigIntForStat )
+  hardLinked = _.maybe;
 
   /*  */
 
@@ -33134,7 +33321,7 @@ function hardLinkGlobal( test )
   provider.hardLink( dstPathDefault, srcPathDefault );
   test.is( provider.isTerminal( srcPath ) );
   test.is( provider.isTerminal( dstPath ) );
-  test.is( provider.filesAreHardLinked([ srcPath, dstPath ]) );
+  test.identical( provider.filesAreHardLinked([ srcPath, dstPath ]), hardLinked );
 
   test.case = 'other protocol';
   provider.filesDelete( routinePath );
@@ -33142,7 +33329,7 @@ function hardLinkGlobal( test )
   provider.hardLink( dstPathSecond, srcPathSecond );
   test.is( provider.isTerminal( srcPath ) );
   test.is( provider.isTerminal( dstPath ) );
-  test.is( provider.filesAreHardLinked([ srcPath, dstPath ]) );
+  test.identical( provider.filesAreHardLinked([ srcPath, dstPath ]), hardLinked );
 
   test.case = 'src local, dst with unknown protocol';
   provider.filesDelete( routinePath );
@@ -33165,7 +33352,7 @@ function hardLinkGlobal( test )
   provider.hardLink( dstPathDefault, srcPathDefault );
   test.is( provider.isTerminal( srcPath ) );
   test.is( provider.isTerminal( dstPath ) );
-  test.is( provider.filesAreHardLinked([ srcPath, dstPath ]) );
+  test.identical( provider.filesAreHardLinked([ srcPath, dstPath ]), hardLinked );
 
   test.case = 'other protocol';
   provider.filesDelete( routinePath );
@@ -33173,7 +33360,7 @@ function hardLinkGlobal( test )
   provider.hardLink( dstPathSecond, srcPathSecond );
   test.is( provider.isTerminal( srcPath ) );
   test.is( provider.isTerminal( dstPath ) );
-  test.is( provider.filesAreHardLinked([ srcPath, dstPath ]) );
+  test.identical( provider.filesAreHardLinked([ srcPath, dstPath ]), hardLinked );
 
   test.case = 'src local, dst with unknown protocol';
   provider.filesDelete( routinePath );
@@ -33207,6 +33394,10 @@ function hardLinkRelativeSoftLinking( test )
   let src2Path = test.context.pathFor( 'written/hardLinkRelativeSoftLinking/src2' );
   let src3Path = test.context.pathFor( 'written/hardLinkRelativeSoftLinking/src3' );
   let dstPath = test.context.pathFor( 'written/hardLinkRelativeSoftLinking/dst' );
+  
+  let hardLinked = true;
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) && !provider.UsingBigIntForStat )
+  hardLinked = _.maybe;
 
   /*
     src1 -> ../src2
@@ -33318,7 +33509,7 @@ test.identical( provider.pathResolveSoftLink( dstPath ),  test.context.globalFro
   test.is( provider.isSoftLink( src1Path ) );
   test.is( provider.isTerminal( src2Path ) );
   test.is( provider.isTerminal( dstPath ) );
-  test.is( provider.filesAreHardLinked([ dstPath, src2Path ]) );
+  test.identical( provider.filesAreHardLinked([ dstPath, src2Path ]), hardLinked );
 
   /* */
 
@@ -33350,7 +33541,7 @@ test.identical( provider.pathResolveSoftLink( dstPath ),  test.context.globalFro
   test.is( provider.isSoftLink( src1Path ) );
   test.is( provider.isTerminal( src2Path ) );
   test.is( provider.isTerminal( dstPath ) );
-  test.is( provider.filesAreHardLinked([ dstPath, src2Path ]) );
+  test.identical( provider.filesAreHardLinked([ dstPath, src2Path ]), hardLinked );
 
   /* missing absolute src */
 
@@ -33537,7 +33728,8 @@ test.identical( provider.pathResolveSoftLink( dstPath ),  test.context.globalFro
   test.is( provider.isSoftLink( src2Path ) );
   test.is( provider.isTerminal( dstPath ) );
   test.is( provider.isTerminal( src3Path ) );
-  test.is( provider.filesAreHardLinked([ dstPath,src3Path ]) );
+  test.identical( provider.filesAreHardLinked([ dstPath, src3Path ]), hardLinked );
+  
 
   /*  */
 
@@ -33575,7 +33767,7 @@ test.identical( provider.pathResolveSoftLink( dstPath ),  test.context.globalFro
   test.is( provider.isSoftLink( src2Path ) );
   test.is( provider.isTerminal( dstPath ) );
   test.is( provider.isTerminal( src3Path ) );
-  test.is( provider.filesAreHardLinked([ dstPath,src3Path ]) );
+  test.identical( provider.filesAreHardLinked([ dstPath, src3Path ]), hardLinked );
 }
 
 //
@@ -33597,6 +33789,10 @@ function hardLinkRelativeTextLinking( test )
   let src2Path = test.context.pathFor( 'written/hardLinkRelativeTextLinking/src2' );
   let src3Path = test.context.pathFor( 'written/hardLinkRelativeTextLinking/src3' );
   let dstPath = test.context.pathFor( 'written/hardLinkRelativeTextLinking/dst' );
+  
+  let hardLinked = true;
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) && !provider.UsingBigIntForStat )
+  hardLinked = _.maybe;
 
   /*
     src1 -> ../src2
@@ -33710,7 +33906,7 @@ function hardLinkRelativeTextLinking( test )
   test.is( provider.isTextLink( src1Path ) );
   test.is( provider.isTerminal( src2Path ) );
   test.is( provider.isTerminal( dstPath ) );
-  test.is( provider.filesAreHardLinked([ dstPath, src2Path ]) );
+  test.identical( provider.filesAreHardLinked([ dstPath, src2Path ]), hardLinked );
 
   /* */
 
@@ -33742,7 +33938,7 @@ function hardLinkRelativeTextLinking( test )
   test.is( provider.isTextLink( src1Path ) );
   test.is( provider.isTerminal( src2Path ) );
   test.is( provider.isTerminal( dstPath ) );
-  test.is( provider.filesAreHardLinked([ dstPath, src2Path ]) );
+  test.identical( provider.filesAreHardLinked([ dstPath, src2Path ]), hardLinked );
 
   /* missing absolute src */
 
@@ -33929,7 +34125,8 @@ function hardLinkRelativeTextLinking( test )
   test.is( provider.isTextLink( src2Path ) );
   test.is( provider.isTerminal( dstPath ) );
   test.is( provider.isTerminal( src3Path ) );
-  test.is( provider.filesAreHardLinked([ dstPath,src3Path ]) );
+  test.identical( provider.filesAreHardLinked([ dstPath, src3Path ]), hardLinked );
+  
 
   /*  */
 
@@ -33967,7 +34164,7 @@ function hardLinkRelativeTextLinking( test )
   test.is( provider.isTextLink( src2Path ) );
   test.is( provider.isTerminal( dstPath ) );
   test.is( provider.isTerminal( src3Path ) );
-  test.is( provider.filesAreHardLinked([ dstPath,src3Path ]) );
+  test.identical( provider.filesAreHardLinked([ dstPath, src3Path ]), hardLinked );
 
   provider.fieldPop( 'usingTextLink', 1 );
 }
@@ -35700,8 +35897,6 @@ function isTerminal( test )
   provider.fieldPop( 'usingTextLink', 1 );
 
 };
-
-isTerminal.timeOut = 20000;
 
 //
 
@@ -37834,8 +38029,6 @@ function isHardLink( test )
   provider.fieldPop( 'usingTextLink', 1 );
 }
 
-isHardLink.timeOut = 20000;
-
 //
 
 function isLink( test )
@@ -39291,8 +39484,6 @@ function isLink( test )
   provider.fieldPop( 'usingTextLink', 1 );
 }
 
-isLink.timeOut = 30000;
-
 //
 
 function fileStatIs( test )
@@ -39311,7 +39502,7 @@ function fileStatIs( test )
 
   let originalValue = provider.UsingBigIntForStat;
 
-  try 
+  try
   {
     provider.fileWrite( filePath,filePath );
 
@@ -39327,18 +39518,18 @@ function fileStatIs( test )
     test.is( !_.fileStatIs( null ) );
     test.case = 'instance of _.FileStat'
     test.is( _.fileStatIs( new _.FileStat  ) );
-   
+
     test.case = 'stats without bigint'
     provider.UsingBigIntForStat = false;
     var stat = provider.statResolvedRead( filePath );
     test.is( _.fileStatIs( stat ) );
-  
+
     test.case = 'stats with bigint'
     provider.UsingBigIntForStat = true;
     var stat = provider.statResolvedRead( filePath );
     test.is( _.fileStatIs( stat ) );
-  } 
-  catch( err ) 
+  }
+  catch( err )
   {
     throw err;
   }
@@ -40100,7 +40291,7 @@ function statsAreHardLinked( test )
   var stat2 = provider.statRead( filePath2 );
   stat1.ino = stat2.ino = 1;
   stat1.size = stat2.size = 1;
-  stat1.mtime = new Date();
+  stat1.mtime = new Date( Date.UTC( 2018,1,1 ) );
   var got = _.statsAreHardLinked( stat1,stat2 );
   test.identical( got, false );
 
@@ -40520,15 +40711,44 @@ function record( test )
   let providerEffective = self.providerEffective || self.provider;
 
   test.is( providerEffective.system === system );
-  test.is( _.arrayHas( _.mapKeys( system.providersWithProtocolMap ), providerEffective.protocol ) );
+  test.is( _.longHas( _.mapKeys( system.providersWithProtocolMap ), providerEffective.protocol ) );
 
-  let filePath = test.context.globalFromPreferred( '/record/terminal' );
-
+  var filePath = '/record/terminal';
+  var expected = filePath;
   var record = self.provider.record( filePath );
+  test.identical( record.absolute, expected );
 
-  test.identical( record.absolute, filePath );
+  var filePath = test.context.globalFromPreferred( '/record/terminal' );
+  var expected = '/record/terminal';
+  var record = self.provider.record( filePath );
+  test.identical( record.absolute, expected );
 
 }
+
+//
+
+function recordStat( test )
+{
+  let self = this;
+  let system = self.system || self.provider;
+  let providerEffective = self.providerEffective || self.provider;
+  
+  test.is( providerEffective.system === system );
+  test.is( _.longHas( _.mapKeys( system.providersWithProtocolMap ), providerEffective.protocol ) );
+
+  let filePath = test.context.pathFor( 'written/recordStat/file' );
+  var record = self.provider.recordFactory({ allowingMissed : 1 }).record( filePath );
+  test.identical( record.stat, null );
+  test.identical( record.absolute, providerEffective.path.preferredFromGlobal( filePath ) );
+  test.identical( record.real, providerEffective.path.preferredFromGlobal( filePath ) );
+}
+
+recordStat.description =
+`
+  FileRecord instance for non existing file is created using global path and factory option allowingMissed.
+  First request of record.stat property returns null.
+  No errors are thrown on path resolving stage.
+`
 
 // --
 // path
@@ -42430,8 +42650,6 @@ function pathResolveLinkTailChain( test )
   provider.fieldPop( 'usingTextLink', true );
 }
 
-pathResolveLinkTailChain.timeOut = 30000;
-
 //
 
 function pathResolveLinkFull( test )
@@ -43131,8 +43349,6 @@ function pathResolveLinkFull( test )
   // test.identical( got,pathToFile );
 
 }
-
-pathResolveLinkFull.timeOut = 30000;
 
 //
 
@@ -48152,6 +48368,8 @@ function EncodersGenerate( test )
   }
 }
 
+//
+
 // --
 // declare
 // --
@@ -48163,6 +48381,8 @@ var Self =
   abstract : 1,
   silencing : 1,
   // verbosity : 7,
+  
+  routineTimeOut : 60000,
 
   onSuiteBegin,
   onSuiteEnd,
@@ -48186,6 +48406,9 @@ var Self =
 
     readWriteSync,
     readWriteAsync,
+    
+    fileWriteActSync,
+    fileWriteActAsync,
 
     fileReadJson,
     fileWriteJson,
@@ -48335,6 +48558,7 @@ var Self =
     // record
 
     record,
+    recordStat,
 
     // path
 
@@ -48368,8 +48592,8 @@ var Self =
 
     //static
 
-    EncodersGenerate,
-
+    EncodersGenerate
+    
   },
 
 };

@@ -213,7 +213,7 @@ function isLink()
   let stat = this;
   let result = false;
 
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
 
   if( !result )
   result = stat.isSoftLink();

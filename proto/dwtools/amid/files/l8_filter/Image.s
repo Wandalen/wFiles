@@ -141,7 +141,7 @@ function _routineFunctor( routine, routineName )
   op.originalCall = function originalCall()
   {
     let op2 = this;
-    _.assert( arguments.length === 0 );
+    _.assert( arguments.length === 0, 'Expects no arguments' );
     _.assert( _.arrayLike( op2.args ) );
     op2.result = op2.originalBody.apply( op2.image, op2.args );
   }

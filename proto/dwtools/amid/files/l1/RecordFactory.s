@@ -90,7 +90,7 @@ function form()
 {
   let factory = this;
 
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
   _.assert( !factory.formed );
 
   /* */

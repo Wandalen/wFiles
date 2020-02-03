@@ -1036,7 +1036,7 @@ function _defaultOriginSet( src )
 // {
 //   let self = this;
 //
-//   _.assert( arguments.length === 0 );
+//   _.assert( arguments.length === 0, 'Expects no arguments' );
 //
 //   for( var f in self.providersWithProtocolMap )
 //   {

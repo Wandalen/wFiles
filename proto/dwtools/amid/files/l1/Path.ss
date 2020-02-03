@@ -83,7 +83,7 @@ let effectiveMainFile = ( function effectiveMainFile()
   return function effectiveMainFile()
   {
     _.assert( !!this.fileProvider );
-    _.assert( arguments.length === 0 );
+    _.assert( arguments.length === 0, 'Expects no arguments' );
 
     if( result )
     return result;
@@ -121,7 +121,7 @@ let effectiveMainFile = ( function effectiveMainFile()
 
 function effectiveMainDir()
 {
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
 
   let result = this.dir( this.effectiveMainFile() );
 
@@ -156,7 +156,7 @@ function resolveTextLink( path )
 
 function dirUserHome()
 {
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
   _.assert( _.routineIs( this.fileProvider.pathDirUserHomeAct ) );
   if( this.userHomePath )
   return this.userHomePath;
@@ -167,7 +167,7 @@ function dirUserHome()
 
 function dirTemp()
 {
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
   _.assert( _.routineIs( this.fileProvider.pathDirTempAct ), () => 'Provider ' + this.fileProvider.qualifiedName + ' does not support temp files' );
   if( this.tempPath )
   return this.tempPath;

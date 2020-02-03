@@ -704,7 +704,7 @@ function providerRegisterTo( system )
 function providerUnregister()
 {
   let self = this;
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
   if( self.system )
   self.system.providerUnregister( self );
   return self;

@@ -191,7 +191,7 @@ function _safeCheck()
   let path = record.path;
   let f = record.factory;
 
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
 
   if( f.safe && f.stating )
   {
@@ -221,7 +221,7 @@ function _pathsForm()
   let path = record.path
   let inputPath = record.input;
 
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
   _.assert( _.strIs( f.basePath ) );
   _.assert( _.strIs( f.stemPath ) );
   _.assert( path.isAbsolute( f.stemPath ) );
@@ -270,7 +270,7 @@ function _filterReset()
   let record = this;
   let f = record.factory;
 
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
 
   record[ isTransientSymbol ] = null;
   record[ isActualSymbol ] = null;
@@ -284,7 +284,7 @@ function _filterApply()
   let record = this;
   let f = record.factory;
 
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
 
   if( record[ isTransientSymbol ] === null )
   record[ isTransientSymbol ] = true;
@@ -306,7 +306,7 @@ function _statReset()
   let record = this;
   let f = record.factory;
 
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
 
   record[ realSymbol ] = 0;
   record[ statSymbol ] = 0;
@@ -321,7 +321,7 @@ function _statRead()
   let f = record.factory;
   let stat;
 
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
 
   record[ realSymbol ] = record.absolute;
 
@@ -383,7 +383,7 @@ function _statAnalyze()
 
   _.assert( f instanceof _.FileRecordFactory, '_record expects instance of ( FileRecordFactory )' );
   _.assert( fileProvider instanceof _.FileProvider.Abstract, 'Expects file provider instance of FileProvider' );
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
 
   if( f.stating )
   {
@@ -407,7 +407,7 @@ function reset()
 {
   let record = this;
 
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
 
   record._filterReset();
   record._statReset();
@@ -444,7 +444,7 @@ function hashRead()
   let record = this;
   let f = record.factory;
 
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
 
   if( record.hash !== null )
   return record.hash;

@@ -46,6 +46,7 @@
     "wverbal" : "", 
     "wLogger" : "", 
     "wgittools" : "", 
+    "wnpmtools" : "", 
     "tar" : "", 
     "proper-lockfile" : ""
   }, 

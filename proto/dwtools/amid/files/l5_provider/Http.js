@@ -207,8 +207,8 @@ function fileReadAct( o )
 
   /* advanced */
 
-  debugger;
-  o.advanced = _.routineOptions( fileReadAct, o.advanced, fileReadAct.advanced );
+  // debugger;
+  o.advanced = _.routineOptions( fileReadAct, o.advanced || {}, fileReadAct.advanced );
   o.advanced.method = o.advanced.method.toUpperCase();
 
   /* http request */

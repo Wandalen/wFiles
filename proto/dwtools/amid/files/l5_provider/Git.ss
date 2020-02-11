@@ -301,7 +301,8 @@ function filesReflectSingle_body( o )
 
   _.sure( _.strDefined( parsed.remoteVcsPath ) );
   _.sure( _.strDefined( parsed.longerRemoteVcsPath ) );
-  _.sure( _.strDefined( parsed.hash ) );
+  _.sure( _.strDefined( parsed.hash ) || _.strDefined( parsed.tag ) );
+  _.sure( !parsed.tag || !parsed.hash, 'Does not expected both hash and tag in srcPath:', _.strQuote( srcPath ) );
   _.sure( _.strIs( dstPath ) );
   _.assert( localProvider instanceof _.FileProvider.HardDrive || localProvider.originalFileProvider instanceof _.FileProvider.HardDrive, 'Support only downloading on hard drive' );
   _.sure( !o.src || !o.src.hasFiltering(), 'Does not support filtering, but {o.src} is not empty' );
@@ -408,7 +409,7 @@ function filesReflectSingle_body( o )
       _.assert( arg.length === 2 );
       localChanges = _.strHasAny( arg[ 0 ].output, [ 'Changes to be committed', 'Changes not staged for commit' ] );
       mergeIsNeeded = !_.strHas( arg[ 0 ].output, 'Your branch is up to date' );
-      hashIsBranchName = _.strHas( arg[ 1 ].output, parsed.hash );
+      hashIsBranchName = _.strHas( arg[ 1 ].output, parsed.tag );
       return localChanges;
     })
   }
@@ -485,7 +486,7 @@ function filesReflectSingle_body( o )
   {
     let shellOptions =
     {
-      execPath : 'git checkout ' + parsed.hash,
+      execPath : 'git checkout ' + ( parsed.hash || parsed.tag ),
       outputCollecting : 1,
       ready : null
     }
@@ -510,7 +511,7 @@ function filesReflectSingle_body( o )
         if( !_.strHasAny( shellOptions.output, [ 'fatal: reference', 'error: pathspec' ] ) )
         throw _.err( err );
         _.errAttend( err );
-        handleGitError( 'Failed to checkout, branch/commit: ' + _.strQuote( parsed.hash ) + ' doesn\'t exist in repository at ' + _.strQuote( dstPath ) );
+        handleGitError( 'Failed to checkout, branch/commit: ' + _.strQuote( parsed.hash || parsed.tag ) + ' doesn\'t exist in repository at ' + _.strQuote( dstPath ) );
       }
       return null;
     })

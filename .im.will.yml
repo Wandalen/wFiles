@@ -55,6 +55,9 @@ submodule :
   wGitTools :
     path : npm:///wgittools
     enabled : 0 # submodule
+  wNpmTools :
+    path : npm:///wnpmtools
+    enabled : 0 # submodule
   tar :
     path : npm:///tar
     enabled : 0 # submodule

@@ -349,7 +349,8 @@ function _filesReadOldAsync( o )
 
       if( _err || arg === undefined || arg === null )
       {
-        err = _.errAttend( 'Cant read : ' + _.toStr( readOptions.filePath ) + '\n', ( _err || 'unknown reason' ) );
+        err = _.errAttend( err );
+        err = _.err( 'Cant read : ' + _.toStr( readOptions.filePath ) + '\n', ( _err || 'unknown reason' ) );
         errs[ p ] = err;
       }
       else

@@ -2,15 +2,12 @@ format: outwillfile-2.0
 root:
   - wFiles.out
 consistency:
-  wFiles.out.will.yml: &ref_0
-    hash: 5b8addd05cf79ddd1508ad6266f70024
-    size: 49359
-  ../.ex.will.yml: &ref_1
+  ../.ex.will.yml: &ref_0
     hash: fd53f2becf731258347c6fb11a8f2d9a
     size: 3237
-  ../.im.will.yml: &ref_2
-    hash: a8cf7d4de93217d1b00be8bd872f9d22
-    size: 6534
+  ../.im.will.yml: &ref_1
+    hash: 31013ab9c95e581643a8bad80acc09e2
+    size: 6604
 module:
   wFiles.out:
     about:
@@ -37,11 +34,11 @@ module:
         module to keep DRY.
       enabled: 1
       version: 0.7.0
-      interpreters:
+      interpreters: &ref_2
         - njs >= 8.0.0
         - chrome >= 60.0.0
         - firefox >= 60.0.0
-      keywords:
+      keywords: &ref_3
         - wTools
         - wFiles
         - file
@@ -49,13 +46,13 @@ module:
         - write file
       license: MIT
       author: Kostiantyn Wandalen <wanalen@willbe.so>
-      contributors:
+      contributors: &ref_4
         - Kostiantyn Wandalen <wanalen@willbe.so>
         - Volodymyr M. <volodymyr.migdal@gmail.com>
         - Ihor O. <iostashvxi@gmail.com>
         - Dmytro Kryvoruchko <dm.vict.kr@gmail.com>
       npm.name: wFiles
-      npm.scripts:
+      npm.scripts: &ref_5
         test: wtest .run proto/**
         test2: >-
           wtest .run proto/**/dwtools/amid/file.test/Provider.HardDrive.test.ss
@@ -319,6 +316,10 @@ module:
         enabled: 0
       wGitTools:
         path: 'npm:///wgittools'
+        autoExporting: 0
+        enabled: 0
+      wNpmTools:
+        path: 'npm:///wnpmtools'
         autoExporting: 0
         enabled: 0
       tar:
@@ -868,24 +869,6 @@ module:
           content: prime
         inherit:
           - files.transpile
-      exported.proto.export:
-        opts:
-          reflector: 'reflector::exported.proto.export*'
-        criterion:
-          generated: 1
-          content: proto
-          export: 1
-        inherit:
-          - files.reflect
-      exported.files.proto.export:
-        opts:
-          reflector: 'reflector::exported.files.proto.export*'
-        criterion:
-          generated: 1
-          content: proto
-          export: 1
-        inherit:
-          - files.reflect
     build:
       proto.export:
         steps:
@@ -974,9 +957,8 @@ module:
           content: proto
           export: 1
     consistency:
-      wFiles.out.will.yml: *ref_0
-      ../.ex.will.yml: *ref_1
-      ../.im.will.yml: *ref_2
+      ../.ex.will.yml: *ref_0
+      ../.im.will.yml: *ref_1
   ../:
     about:
       name: wFiles
@@ -1002,33 +984,13 @@ module:
         module to keep DRY.
       enabled: 1
       version: 0.7.0
-      interpreters:
-        - njs >= 8.0.0
-        - chrome >= 60.0.0
-        - firefox >= 60.0.0
-      keywords:
-        - wTools
-        - wFiles
-        - file
-        - read file
-        - write file
+      interpreters: *ref_2
+      keywords: *ref_3
       license: MIT
       author: Kostiantyn Wandalen <wanalen@willbe.so>
-      contributors:
-        - Kostiantyn Wandalen <wanalen@willbe.so>
-        - Volodymyr M. <volodymyr.migdal@gmail.com>
-        - Ihor O. <iostashvxi@gmail.com>
-        - Dmytro Kryvoruchko <dm.vict.kr@gmail.com>
+      contributors: *ref_4
       npm.name: wFiles
-      npm.scripts:
-        test: wtest .run proto/**
-        test2: >-
-          wtest .run proto/**/dwtools/amid/file.test/Provider.HardDrive.test.ss
-          routine : linkHardSyncRunner
-        test3: >-
-          wtest .run proto/**/dwtools/amid/file.test/Provider.HardDrive.test.ss
-          routine : linkHardAsyncRunner
-        docgen: wdocgen .build proto
+      npm.scripts: *ref_5
     path:
       module.willfiles:
         criterion:
@@ -1208,6 +1170,10 @@ module:
         enabled: 0
       wGitTools:
         path: 'npm:///wgittools'
+        autoExporting: 0
+        enabled: 0
+      wNpmTools:
+        path: 'npm:///wnpmtools'
         autoExporting: 0
         enabled: 0
       tar:
@@ -1786,6 +1752,5 @@ module:
         hash: fd53f2becf731258347c6fb11a8f2d9a
         size: 3237
       ../.im.will.yml:
-        hash: a8cf7d4de93217d1b00be8bd872f9d22
-        size: 6534
-      wFiles.out.will.yml: *ref_0
+        hash: 31013ab9c95e581643a8bad80acc09e2
+        size: 6604

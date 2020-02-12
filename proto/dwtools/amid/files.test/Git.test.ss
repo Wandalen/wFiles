@@ -78,7 +78,7 @@ function filesReflectTrivial( test )
   {
     test.case = 'no hash, no trailing /';
     providerDst.filesDelete( localPath );
-    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git';
+    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git/';
     return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }});
   })
   .then( ( got ) =>
@@ -812,12 +812,43 @@ function filesReflectDownloadThrowing( test )
   let clonePathGlobal = providerDst.path.globalFromPreferred( localPath );
 
   let con = new _.Consequence().take( null )
-
+    
+  con
   .then( () =>
   {
     test.case = 'not existing hash';
     providerDst.filesDelete( localPath );
-    let remotePath = 'git+https:///githu.com/Wandalen/wPathBasic.git/#63b39b105817e80e4a3810febd8b09ffe7cd6ad1';
+    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git/#63b39b105817e80e4a3810febd8b09ffe7cd6ad1';
+
+    let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
+    return test.shouldThrowErrorAsync( ready )
+    .then( ( got ) =>
+    {
+      test.is( !providerDst.fileExists( localPath ) )
+      return null;
+    })
+  })
+  
+  .then( () =>
+  {
+    test.case = 'not existing branch';
+    providerDst.filesDelete( localPath );
+    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git/@somebranch';
+
+    let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
+    return test.shouldThrowErrorAsync( ready )
+    .then( ( got ) =>
+    {
+      test.is( !providerDst.fileExists( localPath ) )
+      return null;
+    })
+  })
+  
+  .then( () =>
+  {
+    test.case = 'not existing tag';
+    providerDst.filesDelete( localPath );
+    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git/@v0.0.0';
 
     let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
     return test.shouldThrowErrorAsync( ready )
@@ -832,7 +863,7 @@ function filesReflectDownloadThrowing( test )
   {
     test.case = 'error on download, new directory should not be made';
     providerDst.filesDelete( localPath );
-    let remotePath = 'git+https:///githu.com/Wandalen/wPathBasic.git';
+    let remotePath = 'git+https:///github.com/Wandalen/wPathBasicc.git';
 
     let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
     return test.shouldThrowErrorAsync( ready )
@@ -848,7 +879,7 @@ function filesReflectDownloadThrowing( test )
     test.case = 'error on download, existing empty directory should be preserved';
     providerDst.filesDelete( localPath );
     providerDst.dirMake( localPath )
-    let remotePath = 'git+https:///githu.com/Wandalen/wPathBasic.git';
+    let remotePath = 'git+https:///github.com/Wandalen/wPathBasicc.git';
 
     let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
     return test.shouldThrowErrorAsync( ready )
@@ -941,6 +972,22 @@ function filesReflectDownloadThrowing( test )
         return null;
       })
     })
+  })
+  
+  if( !Config.debug )
+  return con;
+  
+  con.then( () =>
+  {
+    test.case = 'hash and tag in same ti,e';
+    providerDst.filesDelete( localPath );
+    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git/#63b39b105817e80e4a3810febd8b09ffe7cd6ad1@master';
+    test.shouldThrowErrorSync( () => 
+    {
+      system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 }); 
+      test.is( !providerDst.fileExists( localPath ) )
+    })
+    return null;
   })
 
   return con;

@@ -676,6 +676,50 @@ function filesReflectTrivial( test )
 
     return ready;
   })
+  
+  /* */
+  
+  .then( () =>
+  {
+    test.case = 'download repo, then try to checkout';
+    providerDst.filesDelete( localPath );
+    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git';
+    return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }});
+  })
+  .then( () =>
+  {
+    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git/#b5409b80e185d20b5936dd01451510cb2ecc02fe';
+    return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }});
+  })
+  .then( ( got ) =>
+  {
+    let files = providerDst.filesFind
+    ({
+      filePath : localPath,
+      withTerminals : 1,
+      withDirs : 1,
+      outputFormat : 'relative',
+      filter : { recursive : 2 }
+    });
+
+    let expected =
+    [
+      '.',
+      './.ex.will.yml',
+      './.im.will.yml',
+      './LICENSE',
+      './package.json',
+      './README.md',
+      './doc',
+      './out',
+      './out/wPathBasic.out.will.yml',
+      './proto',
+      './sample',
+    ]
+
+    test.is( _.arraySetContainAll( files,expected ) )
+    return got;
+  })
 
   return con;
 }

@@ -720,7 +720,41 @@ function filesReflectTrivial( test )
     test.is( _.arraySetContainAll( files,expected ) )
     return got;
   })
-
+  
+  //
+  
+  /* */
+  
+  .then( () =>
+  {
+    test.case = 'download repo, then try to checkout using branch name as hash';
+    providerDst.filesDelete( localPath );
+    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git';
+    return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }});
+  })
+  .then( () =>
+  {
+    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git/#master';
+    let con = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }});
+    return test.shouldThrowErrorAsync( con );
+  })
+  
+  /* */
+  
+  .then( () =>
+  {
+    test.case = 'download repo, then try to checkout using unknown branch name as tag';
+    providerDst.filesDelete( localPath );
+    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git';
+    return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }});
+  })
+  .then( () =>
+  {
+    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git/@master2';
+    let con = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }});
+    return test.shouldThrowErrorAsync( con );
+  })
+  
   return con;
 }
 
@@ -979,7 +1013,7 @@ function filesReflectDownloadThrowing( test )
   
   con.then( () =>
   {
-    test.case = 'hash and tag in same ti,e';
+    test.case = 'hash and tag in same time';
     providerDst.filesDelete( localPath );
     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git/#63b39b105817e80e4a3810febd8b09ffe7cd6ad1@master';
     test.shouldThrowErrorSync( () => 

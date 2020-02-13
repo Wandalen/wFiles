@@ -296,6 +296,13 @@ function filesReflectSingle_body( o )
   // }
 
   let parsed = self.pathParse( srcPath );
+  
+  if( parsed.hash && !parsed.isFixated )
+  {
+    let err = _.err( `Source path: ${_.color.strFormat( String( srcPath ), 'path' )} is fixated, but hash: ${_.color.strFormat( String( parsed.hash ), 'path' ) } doesn't look like commit hash.` )
+    con.error( err );
+    return con;
+  }
 
   /* */
 
@@ -484,7 +491,19 @@ function filesReflectSingle_body( o )
   /* */
 
   function gitCheckout()
-  {
+  { 
+    if( parsed.tag )
+    { 
+      let repoHasTag = _.git.repoHasTag({ localPath : dstPath, tag : parsed.tag });
+      if( !repoHasTag )
+      throw _.err
+      ( 
+        `Specified tag: ${_.strQuote( parsed.tag )} doesn't exist in local and remote copy of the repository.\
+        \nLocal path: ${_.color.strFormat( String( dstPath ), 'path' )}\
+        \nRemote path: ${_.color.strFormat( String( parsed.remoteVcsPath ), 'path' )}`
+      );
+    }
+    
     let shellOptions =
     {
       execPath : 'git checkout ' + ( parsed.hash || parsed.tag ),

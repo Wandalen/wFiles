@@ -494,7 +494,7 @@ function filesReflectSingle_body( o )
   { 
     if( parsed.tag )
     { 
-      let repoHasTag = _.git.repoHasTag({ localPath : dstPath, tag : parsed.tag });
+      let repoHasTag = _.git.repositoryHasTag({ localPath : dstPath, tag : parsed.tag });
       if( !repoHasTag )
       throw _.err
       ( 

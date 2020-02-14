@@ -22,17 +22,6 @@ let Parent = _.FileRecordContext;
 let Self = function wFileRecordFactory( o )
 {
   return _.workpiece.construct( Self, this, arguments );
-  // if( !( this instanceof Self ) )
-  // if( o instanceof Self && arguments.length === 1 )
-  // {
-  //   _.assert( arguments.length === 1, 'Expects single argument' );
-  //   return o;
-  // }
-  // else
-  // {
-  //   return new( _.constructorJoin( Self, arguments ) );
-  // }
-  // return Self.prototype.init.apply( this,arguments );
 }
 
 Self.shortName = 'FileRecordFactory';
@@ -73,23 +62,6 @@ function init( o )
   return factory;
 }
 
-// //
-//
-// /**
-//  * @summary Creates factory instance ignoring unknown options.
-//  * @param {Object} o Options map.
-//  * @function TolerantFrom
-//  * @memberof module:Tools/mid/Files.wFileRecordFactory
-// */
-//
-// function TolerantFrom( o )
-// {
-//   _.assert( arguments.length >= 1, 'Expects at least one argument' );
-//   _.assert( _.objectIs( Self.prototype.Composes ) );
-//   o = _.mapsExtend( null, arguments );
-//   return new Self( _.mapOnly( o, Self.prototype.fieldsOfCopyableGroups ) );
-// }
-
 //
 
 function _formAssociations()
@@ -109,111 +81,6 @@ function _formAssociations()
 
   /* */
 
-  // /* find file system */
-  //
-  // if( !factory.system )
-  // if( factory.effectiveProvider && factory.effectiveProvider instanceof _.FileProvider.System )
-  // {
-  //   factory.system = factory.effectiveProvider;
-  //   factory.effectiveProvider = null;
-  // }
-  //
-  // if( !factory.system )
-  // if( factory.effectiveProvider && factory.effectiveProvider.system && factory.effectiveProvider.system instanceof _.FileProvider.System )
-  // {
-  //   factory.system = factory.effectiveProvider.system;
-  // }
-  //
-  // if( !factory.system )
-  // if( factory.defaultProvider && factory.defaultProvider instanceof _.FileProvider.System )
-  // {
-  //   factory.system = factory.defaultProvider;
-  // }
-  //
-  // if( !factory.system )
-  // if( factory.defaultProvider && factory.defaultProvider.system && factory.defaultProvider.system instanceof _.FileProvider.System )
-  // {
-  //   factory.system = factory.defaultProvider.system;
-  // }
-  //
-  // if( factory.system )
-  // if( factory.system.system && factory.system.system !== factory.system )
-  // {
-  //   _.assert( !( factory.system instanceof _.FileProvider.System ) );
-  //   if( !factory.effectiveProvider )
-  //   factory.effectiveProvider = factory.system;
-  //   factory.system = factory.system.system;
-  // }
-  //
-  // /* find effective provider */
-  //
-  // if( factory.effectiveProvider && factory.effectiveProvider instanceof _.FileProvider.System )
-  // {
-  //   _.assert( factory.system === null || factory.system === factory.effectiveProvider );
-  //   factory.system = factory.effectiveProvider;
-  //   factory.effectiveProvider = null;
-  // }
-  //
-  // /* reset system */
-  //
-  // if( factory.effectiveProvider && factory.effectiveProvider.system )
-  // {
-  //   _.assert( factory.system === null || factory.system === factory.effectiveProvider.system );
-  //   factory.system = factory.effectiveProvider.system;
-  // }
-  //
-  // /* find default provider */
-  //
-  // if( !factory.defaultProvider )
-  // {
-  //   factory.defaultProvider = factory.defaultProvider || factory.effectiveProvider || factory.system;
-  // }
-  //
-  // /* reset system */
-  //
-  // if( factory.system && !( factory.system instanceof _.FileProvider.System ) )
-  // {
-  //   _.assert( factory.system === factory.defaultProvider || factory.system === factory.effectiveProvider )
-  //   factory.system = null;
-  // }
-
-  // if( factory.system )
-  // {
-  //   if( factory.system.system && factory.system.system !== factory.system )
-  //   {
-  //     _.assert( factory.effectiveProvider === null || factory.effectiveProvider === factory.system );
-  //     factory.effectiveProvider = factory.system;
-  //     factory.system = factory.system.system;
-  //   }
-  // }
-  //
-  // if( factory.effectiveProvider )
-  // {
-  //   if( factory.effectiveProvider instanceof _.FileProvider.System )
-  //   {
-  //     _.assert( factory.system === null || factory.system === factory.effectiveProvider );
-  //     factory.system = factory.effectiveProvider;
-  //     factory.effectiveProvider = null;
-  //   }
-  // }
-  //
-  // if( factory.effectiveProvider && factory.effectiveProvider.system )
-  // {
-  //   _.assert( factory.system === null || factory.system === factory.effectiveProvider.system );
-  //   factory.system = factory.effectiveProvider.system;
-  // }
-  //
-  // if( !factory.defaultProvider )
-  // {
-  //   factory.defaultProvider = factory.defaultProvider || factory.effectiveProvider || factory.system;
-  // }
-
-  /* */
-
-  // _.assert( !factory.system || factory.system instanceof _.FileProvider.Abstract, 'Expects {- factory.system -}' );
-  // _.assert( factory.defaultProvider instanceof _.FileProvider.Abstract );
-  // _.assert( !factory.effectiveProvider || !( factory.effectiveProvider instanceof _.FileProvider.System ) );
-
   return Parent.prototype._formAssociations.apply( factory, arguments );
 }
 
@@ -223,7 +90,7 @@ function form()
 {
   let factory = this;
 
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
   _.assert( !factory.formed );
 
   /* */
@@ -252,6 +119,11 @@ function form()
       let url = _.uri.parse( factory.basePath );
     }
 
+    /* yyy */
+
+    if( factory.effectiveProvider )
+    factory.basePath = factory.effectiveProvider.path.preferredFromGlobal( factory.basePath );
+
   }
 
   /* */
@@ -260,6 +132,9 @@ function form()
   {
     factory.dirPath = path.from( factory.dirPath );
     factory.dirPath = path.canonize( factory.dirPath );
+
+    if( factory.effectiveProvider )
+    factory.dirPath = factory.effectiveProvider.path.preferredFromGlobal( factory.dirPath );
 
     if( factory.basePath )
     factory.dirPath = path.join( factory.basePath, factory.dirPath );
@@ -278,6 +153,8 @@ function form()
   else if( factory.stemPath )
   {
     factory.stemPath = path.canonize( path.join( factory.basePath, factory.dirPath || '', factory.stemPath ) );
+    if( factory.effectiveProvider )
+    factory.stemPath = factory.effectiveProvider.path.preferredFromGlobal( factory.stemPath );
   }
 
   if( !factory.basePath )
@@ -326,7 +203,7 @@ function form()
     {
       _.assert( factory.filter.formed === 5 );
       _.assert( !!factory.filter.formedBasePath );
-      _.assert( !!factory.filter.src || factory.filter.formedBasePath[ factory.stemPath ] === factory.basePath ); // yyy
+      _.assert( !!factory.filter.src || factory.filter.formedBasePath[ factory.stemPath ] === factory.basePath );
       _.assert( factory.filter.effectiveProvider === factory.effectiveProvider );
       _.assert( factory.filter.system === factory.system || factory.filter.system === null );
       _.assert( factory.filter.defaultProvider === factory.defaultProvider );
@@ -648,7 +525,6 @@ let Proto =
 {
 
   init,
-  // TolerantFrom,
 
   _formAssociations,
   form,
@@ -687,10 +563,6 @@ _.classDeclare
   parent : Parent,
   extend : Proto,
 });
-
-// _.Copyable.mixin( Self );
-
-//
 
 _[ Self.shortName ] = Self;
 

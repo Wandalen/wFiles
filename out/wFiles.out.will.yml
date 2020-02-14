@@ -3,14 +3,14 @@ root:
   - wFiles.out
 consistency:
   wFiles.out.will.yml: &ref_0
-    hash: 5b8addd05cf79ddd1508ad6266f70024
-    size: 49359
+    hash: a02c06a9685b8f894b29d02307233b9a
+    size: 48452
   ../.ex.will.yml: &ref_1
     hash: fd53f2becf731258347c6fb11a8f2d9a
     size: 3237
   ../.im.will.yml: &ref_2
-    hash: a8cf7d4de93217d1b00be8bd872f9d22
-    size: 6534
+    hash: 31013ab9c95e581643a8bad80acc09e2
+    size: 6604
 module:
   wFiles.out:
     about:
@@ -193,26 +193,6 @@ module:
           - ../proto/dwtools/amid/files/UseBase.s
           - ../proto/dwtools/amid/files/UseMid.s
           - ../proto/dwtools/amid/files/UseTop.s
-          - ../proto/dwtools/amid/files/--l0
-          - ../proto/dwtools/amid/files/--l0/Encoders.s
-          - ../proto/dwtools/amid/files/--l0/RecordContext.s
-          - ../proto/dwtools/amid/files/--l1
-          - ../proto/dwtools/amid/files/--l1/Path.s
-          - ../proto/dwtools/amid/files/--l1/Path.ss
-          - ../proto/dwtools/amid/files/--l1/Record.s
-          - ../proto/dwtools/amid/files/--l1/RecordFactory.s
-          - ../proto/dwtools/amid/files/--l1/RecordFilter.s
-          - ../proto/dwtools/amid/files/--l1/Routines.s
-          - ../proto/dwtools/amid/files/--l1/Stat.s
-          - ../proto/dwtools/amid/files/-l1
-          - ../proto/dwtools/amid/files/-l1/Encoders.s
-          - ../proto/dwtools/amid/files/-l1/FileRecord.s
-          - ../proto/dwtools/amid/files/-l1/FileRecordFactory.s
-          - ../proto/dwtools/amid/files/-l1/FileRecordFilter.s
-          - ../proto/dwtools/amid/files/-l1/FileRoutines.s
-          - ../proto/dwtools/amid/files/-l1/FileStat.s
-          - ../proto/dwtools/amid/files/-l1/Path.s
-          - ../proto/dwtools/amid/files/-l1/Path.ss
           - ../proto/dwtools/amid/files/l0
           - ../proto/dwtools/amid/files/l0/Encoders.s
           - ../proto/dwtools/amid/files/l0/RecordContext.s
@@ -339,6 +319,10 @@ module:
         enabled: 0
       wGitTools:
         path: 'npm:///wgittools'
+        autoExporting: 0
+        enabled: 0
+      wNpmTools:
+        path: 'npm:///wnpmtools'
         autoExporting: 0
         enabled: 0
       tar:
@@ -1230,6 +1214,10 @@ module:
         path: 'npm:///wgittools'
         autoExporting: 0
         enabled: 0
+      wNpmTools:
+        path: 'npm:///wnpmtools'
+        autoExporting: 0
+        enabled: 0
       tar:
         path: 'npm:///tar'
         autoExporting: 0
@@ -1806,6 +1794,8 @@ module:
         hash: fd53f2becf731258347c6fb11a8f2d9a
         size: 3237
       ../.im.will.yml:
-        hash: a8cf7d4de93217d1b00be8bd872f9d22
-        size: 6534
-      wFiles.out.will.yml: *ref_0
+        hash: 31013ab9c95e581643a8bad80acc09e2
+        size: 6604
+      wFiles.out.will.yml:
+        hash: a02c06a9685b8f894b29d02307233b9a
+        size: 48452

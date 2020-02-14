@@ -53,32 +53,7 @@ function init( o )
 // path
 // --
 
-// function _pathNativizeWindows( filePath )
-// {
-//   _.assert( _.strIs( filePath ), 'Expects string' ) ;
-//
-//   let result = filePath.replace( /\//g, '\\' );
-//
-//   if( result[ 0 ] === '\\' )
-//   if( result.length === 2 || result[ 2 ] === ':' || result[ 2 ] === '\\' )
-//   {
-//     result = result[ 1 ] + ':' + _.strPrependOnce( result.substring( 2 ), '\\' );
-//   }
-//
-//   return result;
-// }
-//
-// //
-//
-// function _pathNativizePosix( filePath )
-// {
-//   _.assert( _.strIs( filePath ), 'Expects string' );
-//   return filePath;
-// }
-
-//
-
-let pathNativizeAct = process.platform === 'win32' ? _.path._pathNativizeWindows : _.path._pathNativizePosix;
+let pathNativizeAct = process.platform === 'win32' ? _.path._nativizeWindows : _.path._nativizePosix;
 
 _.assert( _.routineIs( pathNativizeAct ) );
 
@@ -504,7 +479,7 @@ function fileReadAct( o )
 
   if( Config.debug )
   if( !o.sync )
-  stack = _.diagnosticStack([ 1, Infinity ]);
+  stack = _.introspector.stack([ 1, Infinity ]);
 
   let encoder = fileReadAct.encoders[ o.encoding ];
 
@@ -907,7 +882,7 @@ _.routineExtend( fileExistsAct, Parent.prototype.fileExistsAct );
  * Returns wConsequence instance.
  * By default method writes data synchronously, with replacing file if exists, and if parent dir hierarchy doesn't
    exist, it's created. Method can accept two parameters : string `filePath` and string\buffer `data`, or single
-   argument : options object, with required 'filePath' and 'data' parameters.
+   argument : options map, with required 'filePath' and 'data' parameters.
  * @example
  *
     let data = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
@@ -949,7 +924,8 @@ function fileWriteAct( o )
   let self = this;
 
   _.assertRoutineOptions( fileWriteAct, arguments );
-  _.assert( _.strIs( o.filePath ) );
+  // _.assert( _.strIs( o.filePath ) );
+  _.assert( self.path.isNormalized( o.filePath ) );
   _.assert( self.WriteMode.indexOf( o.writeMode ) !== -1 );
 
   let encoder = fileWriteAct.encoders[ o.encoding ];
@@ -1085,7 +1061,7 @@ _.routineExtend( fileTimeSetAct, Parent.prototype.fileTimeSetAct );
 //
 
 /**
- * Delete file of directory. Accepts path string or options object. Returns wConsequence instance.
+ * Delete file of directory. Accepts path string or options map. Returns wConsequence instance.
  * @example
  * let StandardFile = require( 'fs' );
 
@@ -1109,7 +1085,7 @@ _.routineExtend( fileTimeSetAct, Parent.prototype.fileTimeSetAct );
      console.log( StandardFile.existsSync( path ) ); // false (file does not exist)
    } );
 
- * @param {string|Object} o - options object.
+ * @param {string|Object} o - options map.
  * @param {string} o.filePath path to file/directory for deleting.
  * @param {boolean} [o.force=false] if sets to true, method remove file, or directory, even if directory has
     content. Else when directory to remove is not empty, wConsequence returned by method, will rejected with error.
@@ -1117,7 +1093,7 @@ _.routineExtend( fileTimeSetAct, Parent.prototype.fileTimeSetAct );
  * @returns {wConsequence}
  * @throws {Error} If missed argument, or pass more than 1.
  * @throws {Error} If filePath is not string.
- * @throws {Error} If options object has unexpected property.
+ * @throws {Error} If options map has unexpected property.
  * @function fileDeleteAct
  * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHardDrive#
  */
@@ -1303,7 +1279,7 @@ function fileLockAct( o )
   let con = _.Consequence.Try( () =>
   {
     if( !self.fileExistsAct({ filePath : o.filePath }) )
-    throw _.error( 'File:', o.filePath, 'doesn\'t exist.' );
+    throw _.err( 'File:', o.filePath, 'doesn\'t exist.' );
 
     if( lockFileCounterMap[ o.filePath ] )
     if( self.fileExistsAct({ filePath : o.filePath + '.lock' } ) )
@@ -1376,7 +1352,7 @@ function fileUnlockAct( o )
   let con = _.Consequence.Try( () =>
   {
     if( !self.fileExistsAct({ filePath : o.filePath }) )
-    throw _.error( 'File:', o.filePath, 'doesn\'t exist.' );
+    throw _.err( 'File:', o.filePath, 'doesn\'t exist.' );
 
     if( lockFileCounterMap[ o.filePath ] !== undefined )
     {
@@ -2005,8 +1981,6 @@ let Restricts =
 
 let Statics =
 {
-  // _pathNativizeWindows : _pathNativizeWindows,
-  // _pathNativizePosix : _pathNativizePosix,
   pathNativizeAct : pathNativizeAct,
   KnownNativeEncodings : KnownNativeEncodings,
   UsingBigIntForStat : UsingBigIntForStat,

@@ -349,7 +349,8 @@ function _filesReadOldAsync( o )
 
       if( _err || arg === undefined || arg === null )
       {
-        err = _.errAttend( 'Cant read : ' + _.toStr( readOptions.filePath ) + '\n', ( _err || 'unknown reason' ) );
+        err = _.errAttend( err );
+        err = _.err( 'Cant read : ' + _.toStr( readOptions.filePath ) + '\n', ( _err || 'unknown reason' ) );
         errs[ p ] = err;
       }
       else
@@ -1157,9 +1158,6 @@ defaults.name = null;
 defaults.prefix = '// ======================================\n( function {{name}}() {\n';
 defaults.postfix = '\n})();\n';
 
-// var paths = fileCodeRead_body.paths = Object.create( fileRead.paths );
-// var having = fileCodeRead_body.having = Object.create( fileRead.having );
-
 _.routineExtend( fileCodeRead_body, fileRead );
 
 //
@@ -1273,10 +1271,6 @@ _.FileProvider[ Self.shortName ] = Self;
 // --
 // export
 // --
-
-// if( typeof module !== 'undefined' )
-// if( _global_.WTOOLS_PRIVATE )
-// { /* delete require.cache[ module.id ]; */ }
 
 if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = Self;

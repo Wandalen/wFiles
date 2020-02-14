@@ -10,7 +10,7 @@ if( typeof module !== 'undefined' )
 }
 
 // --
-//
+// declare
 // --
 
 /**
@@ -32,7 +32,7 @@ Self.shortName = 'FileRecord';
 _.assert( !_.FileRecord );
 
 // --
-//
+// inter
 // --
 
 function init( o )
@@ -52,10 +52,8 @@ function init( o )
   record._filterReset();
   record._statReset();
 
-  // record[ isTransientSymbol ] = null;
-  // record[ isActualSymbol ] = null;
-  // record[ statSymbol ] = 0;
-  // record[ realSymbol ] = 0;
+  if( _.strEnds( o.input, 'recordStat/file' ) )
+  debugger;
 
   record.copy( o );
 
@@ -193,7 +191,7 @@ function _safeCheck()
   let path = record.path;
   let f = record.factory;
 
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
 
   if( f.safe && f.stating )
   {
@@ -223,15 +221,15 @@ function _pathsForm()
   let path = record.path
   let inputPath = record.input;
 
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
   _.assert( _.strIs( f.basePath ) );
   _.assert( _.strIs( f.stemPath ) );
   _.assert( path.isAbsolute( f.stemPath ) );
 
+  /* input path */
+
   inputPath = path.normalize( inputPath );
   let isAbsolute = path.isAbsolute( inputPath );
-
-  /* input path */
 
   if( !isAbsolute )
   if( f.dirPath )
@@ -241,16 +239,18 @@ function _pathsForm()
   else if( !path.isAbsolute( inputPath ) )
   _.assert( 0, 'FileRecordFactory expects defined fields {-dirPath-} or {-basePath-} or absolute path' );
 
+  inputPath = fileProvider.path.preferredFromGlobal( inputPath );
+
   /* relative path */
 
-  record[ relativeSymbol ] = fileProvider.path.relative( f.basePath, inputPath );
+  record[ relativeSymbol ] = path.relative( f.basePath, inputPath );
   _.assert( record.relative[ 0 ] !== '/' );
   record[ relativeSymbol ] = path.dot( record.relative );
 
   /* absolute path */
 
   if( f.basePath )
-  record[ absoluteSymbol ] = fileProvider.path.resolve( f.basePath, record.relative );
+  record[ absoluteSymbol ] = path.resolve( f.basePath, record.relative );
   else
   record[ absoluteSymbol ] = inputPath;
 
@@ -270,7 +270,7 @@ function _filterReset()
   let record = this;
   let f = record.factory;
 
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
 
   record[ isTransientSymbol ] = null;
   record[ isActualSymbol ] = null;
@@ -284,7 +284,7 @@ function _filterApply()
   let record = this;
   let f = record.factory;
 
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
 
   if( record[ isTransientSymbol ] === null )
   record[ isTransientSymbol ] = true;
@@ -306,7 +306,7 @@ function _statReset()
   let record = this;
   let f = record.factory;
 
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
 
   record[ realSymbol ] = 0;
   record[ statSymbol ] = 0;
@@ -321,7 +321,7 @@ function _statRead()
   let f = record.factory;
   let stat;
 
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
 
   record[ realSymbol ] = record.absolute;
 
@@ -383,7 +383,7 @@ function _statAnalyze()
 
   _.assert( f instanceof _.FileRecordFactory, '_record expects instance of ( FileRecordFactory )' );
   _.assert( fileProvider instanceof _.FileProvider.Abstract, 'Expects file provider instance of FileProvider' );
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
 
   if( f.stating )
   {
@@ -407,13 +407,10 @@ function reset()
 {
   let record = this;
 
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
 
   record._filterReset();
   record._statReset();
-
-  // record._statRead();
-  // record._statAnalyze();
 
 }
 
@@ -432,7 +429,6 @@ function changeExt( ext )
   let path = record.path;
   _.assert( arguments.length === 1, 'Expects single argument' ); debugger;
   record.input = path.changeExt( record.input, ext );
-  // record.form();
 }
 
 //
@@ -448,7 +444,7 @@ function hashRead()
   let record = this;
   let f = record.factory;
 
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
 
   if( record.hash !== null )
   return record.hash;
@@ -524,8 +520,6 @@ function _isStemGet()
 function _isDirGet()
 {
   let record = this;
-
-  // debugger;
 
   if( !record.stat )
   return false;
@@ -717,6 +711,7 @@ function _absoluteGlobalGet()
   let f = record.factory;
   let fileProvider = f.effectiveProvider;
   return fileProvider.path.globalFromPreferred( record.absolute );
+  /* xxx qqq : test is fileProvider.path proper path namespace */
 }
 
 //
@@ -727,6 +722,7 @@ function _realGlobalGet()
   let f = record.factory;
   let fileProvider = f.effectiveProvider;
   return fileProvider.path.globalFromPreferred( record.real );
+  /* xxx qqq : test is fileProvider.path proper path namespace */
 }
 
 //
@@ -897,34 +893,34 @@ let Copiers =
 let Forbids =
 {
 
-  file : 'file',
-  relativeIn : 'relativeIn',
-  relativeOut : 'relativeOut',
-  verbosity : 'verbosity',
-  safe : 'safe',
-  basePath : 'basePath',
-  base : 'base',
-  resolvingSoftLink : 'resolvingSoftLink',
-  resolvingTextLink : 'resolvingTextLink',
-  usingTextLink : 'usingTextLink',
-  stating : 'stating',
-  effective : 'effective',
-  fileProvider : 'fileProvider',
-  effectiveProvider : 'effectiveProvider',
-  originPath : 'originPath',
-  base : 'base',
-  full : 'full',
-  superRelative : 'superRelative',
-  inclusion : 'inclusion',
-  isBase : 'isBase',
-  absoluteEffective : 'absoluteEffective',
-  realEffective : 'realEffective',
-  isBranch : 'isBranch',
-  realAbsolute : 'realAbsolute',
-  realUri : 'realUri',
-  absoluteUri : 'absoluteUri',
-  hubAbsolute : 'hubAbsolute',
-  context : 'context',
+  // file : 'file',
+  // relativeIn : 'relativeIn',
+  // relativeOut : 'relativeOut',
+  // verbosity : 'verbosity',
+  // safe : 'safe',
+  // basePath : 'basePath',
+  // base : 'base',
+  // resolvingSoftLink : 'resolvingSoftLink',
+  // resolvingTextLink : 'resolvingTextLink',
+  // usingTextLink : 'usingTextLink',
+  // stating : 'stating',
+  // effective : 'effective',
+  // fileProvider : 'fileProvider',
+  // effectiveProvider : 'effectiveProvider',
+  // originPath : 'originPath',
+  // base : 'base',
+  // full : 'full',
+  // superRelative : 'superRelative',
+  // inclusion : 'inclusion',
+  // isBase : 'isBase',
+  // absoluteEffective : 'absoluteEffective',
+  // realEffective : 'realEffective',
+  // isBranch : 'isBranch',
+  // realAbsolute : 'realAbsolute',
+  // realUri : 'realUri',
+  // absoluteUri : 'absoluteUri',
+  // hubAbsolute : 'hubAbsolute',
+  // context : 'context',
 
 }
 
@@ -965,7 +961,7 @@ let Accessors =
 }
 
 // --
-// declare
+// defined
 // --
 
 let Proto =
@@ -1048,11 +1044,6 @@ _.classDeclare
 _.Copyable.mixin( Self );
 
 _.assert( !_global_.wFileRecord && !_.FileRecord, 'wFileRecord already defined' );
-
-//
-
-// if( typeof module !== 'undefined' )
-// require( './FileRecordFactory.s' );
 
 // --
 // export

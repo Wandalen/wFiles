@@ -14,6 +14,7 @@ if( typeof module !== 'undefined' )
 //
 
 var _ = _global_.wTools;
+var RunningInTravis = 'TRAVIS' in process.env && 'CI' in process.env;
 
 //
 
@@ -31,6 +32,19 @@ function onSuiteBegin( test )
   context.suitePath = path.pathDirTempOpen( path.join( __dirname, '../..'  ),'FileProviderGit' );
   context.suitePath = context.providerDst.pathResolveLinkFull({ filePath : context.suitePath, resolvingSoftLink : 1 });
   context.suitePath = context.suitePath.absolutePath;
+  
+  if( RunningInTravis )
+  {  
+    let gitConfig = _.process.starter
+    ({
+      execPath : 'git config --global',
+      sync : 1,
+      deasync : 0,
+      mode : 'shell'
+    })
+    gitConfig( `user.email "test@test.com"` )
+    gitConfig( `user.name "Test"` )
+  }
 
 }
 
@@ -64,7 +78,7 @@ function filesReflectTrivial( test )
   {
     test.case = 'no hash, no trailing /';
     providerDst.filesDelete( localPath );
-    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git';
+    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git/';
     return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }});
   })
   .then( ( got ) =>
@@ -662,11 +676,89 @@ function filesReflectTrivial( test )
 
     return ready;
   })
+  
+  /* */
+  
+  .then( () =>
+  {
+    test.case = 'download repo, then try to checkout';
+    providerDst.filesDelete( localPath );
+    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git';
+    return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }});
+  })
+  .then( () =>
+  {
+    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git/#b5409b80e185d20b5936dd01451510cb2ecc02fe';
+    return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }});
+  })
+  .then( ( got ) =>
+  {
+    let files = providerDst.filesFind
+    ({
+      filePath : localPath,
+      withTerminals : 1,
+      withDirs : 1,
+      outputFormat : 'relative',
+      filter : { recursive : 2 }
+    });
 
+    let expected =
+    [
+      '.',
+      './.ex.will.yml',
+      './.im.will.yml',
+      './LICENSE',
+      './package.json',
+      './README.md',
+      './doc',
+      './out',
+      './out/wPathBasic.out.will.yml',
+      './proto',
+      './sample',
+    ]
+
+    test.is( _.arraySetContainAll( files,expected ) )
+    return got;
+  })
+  
+  //
+  
+  /* */
+  
+  .then( () =>
+  {
+    test.case = 'download repo, then try to checkout using branch name as hash';
+    providerDst.filesDelete( localPath );
+    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git';
+    return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }});
+  })
+  .then( () =>
+  {
+    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git/#master';
+    let con = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }});
+    return test.shouldThrowErrorAsync( con );
+  })
+  
+  /* */
+  
+  .then( () =>
+  {
+    test.case = 'download repo, then try to checkout using unknown branch name as tag';
+    providerDst.filesDelete( localPath );
+    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git';
+    return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }});
+  })
+  .then( () =>
+  {
+    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git/@master2';
+    let con = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }});
+    return test.shouldThrowErrorAsync( con );
+  })
+  
   return con;
 }
 
-filesReflectTrivial.timeOut = 60000;
+filesReflectTrivial.timeOut = 120000;
 
 //
 
@@ -738,7 +830,7 @@ function filesReflectNoStashing( test )
 
 }
 
-filesReflectNoStashing.timeOut = 60000;
+filesReflectNoStashing.timeOut = 120000;
 
 //
 
@@ -754,12 +846,43 @@ function filesReflectDownloadThrowing( test )
   let clonePathGlobal = providerDst.path.globalFromPreferred( localPath );
 
   let con = new _.Consequence().take( null )
-
+    
+  con
   .then( () =>
   {
     test.case = 'not existing hash';
     providerDst.filesDelete( localPath );
-    let remotePath = 'git+https:///githu.com/Wandalen/wPathBasic.git/#63b39b105817e80e4a3810febd8b09ffe7cd6ad1';
+    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git/#63b39b105817e80e4a3810febd8b09ffe7cd6ad1';
+
+    let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
+    return test.shouldThrowErrorAsync( ready )
+    .then( ( got ) =>
+    {
+      test.is( !providerDst.fileExists( localPath ) )
+      return null;
+    })
+  })
+  
+  .then( () =>
+  {
+    test.case = 'not existing branch';
+    providerDst.filesDelete( localPath );
+    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git/@somebranch';
+
+    let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
+    return test.shouldThrowErrorAsync( ready )
+    .then( ( got ) =>
+    {
+      test.is( !providerDst.fileExists( localPath ) )
+      return null;
+    })
+  })
+  
+  .then( () =>
+  {
+    test.case = 'not existing tag';
+    providerDst.filesDelete( localPath );
+    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git/@v0.0.0';
 
     let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
     return test.shouldThrowErrorAsync( ready )
@@ -774,7 +897,7 @@ function filesReflectDownloadThrowing( test )
   {
     test.case = 'error on download, new directory should not be made';
     providerDst.filesDelete( localPath );
-    let remotePath = 'git+https:///githu.com/Wandalen/wPathBasic.git';
+    let remotePath = 'git+https:///github.com/Wandalen/wPathBasicc.git';
 
     let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
     return test.shouldThrowErrorAsync( ready )
@@ -790,7 +913,7 @@ function filesReflectDownloadThrowing( test )
     test.case = 'error on download, existing empty directory should be preserved';
     providerDst.filesDelete( localPath );
     providerDst.dirMake( localPath )
-    let remotePath = 'git+https:///githu.com/Wandalen/wPathBasic.git';
+    let remotePath = 'git+https:///github.com/Wandalen/wPathBasicc.git';
 
     let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
     return test.shouldThrowErrorAsync( ready )
@@ -884,11 +1007,27 @@ function filesReflectDownloadThrowing( test )
       })
     })
   })
+  
+  if( !Config.debug )
+  return con;
+  
+  con.then( () =>
+  {
+    test.case = 'hash and tag in same time';
+    providerDst.filesDelete( localPath );
+    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git/#63b39b105817e80e4a3810febd8b09ffe7cd6ad1@master';
+    test.shouldThrowErrorSync( () => 
+    {
+      system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 }); 
+      test.is( !providerDst.fileExists( localPath ) )
+    })
+    return null;
+  })
 
   return con;
 }
 
-filesReflectDownloadThrowing.timeOut = 60000;
+filesReflectDownloadThrowing.timeOut = 120000;
 
 //
 

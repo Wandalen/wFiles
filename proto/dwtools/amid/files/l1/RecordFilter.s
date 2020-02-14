@@ -250,7 +250,7 @@ function _formPre()
   let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
   _.assert( filter.formed === 1 );
   _.assert( filter.prefixPath === null || _.strIs( filter.prefixPath ) || _.arrayIs( filter.prefixPath ) );
   _.assert( filter.postfixPath === null || _.strIs( filter.postfixPath ) || _.arrayIs( filter.postfixPath ) );
@@ -270,7 +270,7 @@ function _formPaths()
   if( filter.formed < 2 )
   filter._formPre();
 
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
   _.assert( filter.formed === 2 );
 
   filter.pathsRefine();
@@ -299,7 +299,7 @@ function _formMasks()
   if( Config.debug )
   {
 
-    _.assert( arguments.length === 0 );
+    _.assert( arguments.length === 0, 'Expects no arguments' );
     _.assert( filter.formed === 3 );
 
     if( filter.basePath )
@@ -348,7 +348,7 @@ function _formFinal()
   if( Config.debug )
   {
 
-    _.assert( arguments.length === 0 );
+    _.assert( arguments.length === 0, 'Expects no arguments' );
     _.assert( filter.formed === 4 );
     _.assert( _.strIs( filter.filePath ) || _.arrayIs( filter.filePath ) || _.mapIs( filter.filePath ) );
     _.assert( !!filter.src || _.mapIs( filter.formedBasePath ) || _.mapKeys( filter.formedFilePath ).length === 0 );
@@ -1292,9 +1292,9 @@ function prefixesRelative( prefixPath )
     if( filter.filePath )
     {
       if( filter.src )
-      filter.filePath = path.filterInplace( filter.filePath, relative_functor( 'dst' ) );
+      filter.filePath = path.filterDstInplace( filter.filePath, relative_functor( 'dst' ) );
       else if( filter.dst )
-      filter.filePath = path.filterInplace( filter.filePath, relative_functor( 'src' ) );
+      filter.filePath = path.filterSrcInplace( filter.filePath, relative_functor( 'src' ) );
       else
       filter.filePath = path.filterInplace( filter.filePath, relative_functor() );
     }
@@ -1631,7 +1631,7 @@ function basePathsGet()
 {
   let filter = this;
 
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
   _.assert( filter.basePath === null || _.strIs( filter.basePath ) || _.mapIs( filter.basePath ) );
 
   if( _.objectIs( filter.basePath ) )
@@ -1687,7 +1687,7 @@ function basePathMapFromString( o )
     let pairs = o.filePath.map( ( fileGlob ) =>
     {
       let filePath = path.fromGlob( fileGlob );
-      if( path.hasBase( fileGlob ) )
+      if( path.hasSymbolBase( fileGlob ) )
       return [ filePath, fileGlob, fileGlob ];
       else
       return [ filePath, filePath, fileGlob ];
@@ -1882,7 +1882,7 @@ function basePathDotUnwrap()
   let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
 
   if( !filter.basePath )
   return;
@@ -2500,7 +2500,7 @@ function filePathFromFixes()
   let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
 
   if( !filter.filePath )
   {
@@ -3258,7 +3258,7 @@ function filePathSrcCommon()
 function pairedFilterGet()
 {
   let filter = this;
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
   if( filter.src )
   return filter.src
   else
@@ -3297,7 +3297,7 @@ function pairRefineLight()
   _.assert( src instanceof Self );
   _.assert( dst.src === src );
   _.assert( src.dst === dst );
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
 
   if( _.mapIs( src.filePath ) && src.filePath === dst.filePath )
   return;
@@ -3462,7 +3462,7 @@ function pathsRefine()
   let path = fileProvider.path;
   let originalFilePath = filter.filePath;
 
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
   _.assert( filter.formed === 2 );
   _.assert( filter.basePath === null || _.strIs( filter.basePath ) || _.mapIs( filter.basePath ) );
 
@@ -3965,7 +3965,7 @@ function hasAnyPath()
 {
   let filter = this;
 
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
   _.assert( filter.basePath === null || _.strIs( filter.basePath ) || _.mapIs( filter.basePath ) );
   _.assert( filter.prefixPath === null || _.strIs( filter.prefixPath ) || _.strsAreAll( filter.prefixPath ) );
   _.assert( filter.postfixPath === null || _.strIs( filter.postfixPath ) );
@@ -4114,7 +4114,7 @@ function masksGenerate()
   let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
   _.assert( filter.formed === 3 );
   _.assert( filter.recursive === 0 || filter.recursive === 1 || filter.recursive === 2 )
 

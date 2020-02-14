@@ -56,7 +56,7 @@
 // {
 //   let self = this;
 //
-//   _.assert( arguments.length === 0 );
+//   _.assert( arguments.length === 0, 'Expects no arguments' );
 //
 //   if( !self.fileProvider )
 //   self.fileProvider = _.fileProvider;
@@ -77,7 +77,7 @@
 // // {
 // //   let self = this;
 // //
-// //   _.assert( arguments.length === 0 );
+// //   _.assert( arguments.length === 0, 'Expects no arguments' );
 // //
 // //   if( !self.fileProvider )
 // //   self.fileProvider = _.fileProvider;

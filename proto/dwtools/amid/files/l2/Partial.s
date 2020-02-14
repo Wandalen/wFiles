@@ -251,7 +251,7 @@ function init( o )
   if( self.verbosity >= 2 )
   self.logger.log( 'new', _.strType( self ) );
 
-  // _.process.exitHandlerOnce( () =>
+  // _.process._exitHandlerOnce( () =>
   // {
   //   debugger;
   //   self.path.pathDirTempClose()
@@ -704,7 +704,7 @@ function providerRegisterTo( system )
 function providerUnregister()
 {
   let self = this;
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
   if( self.system )
   self.system.providerUnregister( self );
   return self;
@@ -3182,7 +3182,8 @@ function fileRead_body( o )
 
   function handleError( err )
   {
-
+    _.errAttend( err );
+    
     if( encoder && encoder.onError )
     try
     {
@@ -3203,9 +3204,11 @@ function fileRead_body( o )
 
     if( o.onError )
     _.Consequence.Error( o.onError, err );
-
+    
     if( o.throwing )
     throw _.err( err );
+    else
+    _.errAttend( err );
 
     return null;
   }
@@ -3297,7 +3300,7 @@ _.assert( _.objectIs( fileRead_body.encoders ) );
 /**
  * This callback is run before fileRead starts read the file. Accepts error as first parameter.
  * If in fileRead passed 'o.returningRead' that is set to true, callback accepts as second parameter object with key 'options'
-    and value that is reference to options object passed into fileRead method, and user has ability to configure that
+    and value that is reference to options map passed into fileRead method, and user has ability to configure that
     before start reading file.
  * @callback fileRead~onBegin
  * @param {Error} err
@@ -3751,9 +3754,14 @@ function hashRead_body( o )
   {
     if( err )
     if( o.throwing )
-    throw _.err( 'Cant read hash of', o.filePath, '\n', err );
+    {
+      throw _.err( 'Cant read hash of', o.filePath, '\n', err );
+    }
     else
-    return NaN;
+    { 
+      _.errAttend( err );
+      return NaN;
+    }
     return arg;
   });
 
@@ -3844,9 +3852,14 @@ function dirRead_body( o )
     {
       if( err )
       if( o.throwing )
-      throw _.err( err );
+      {
+        throw _.err( err );
+      }
       else
-      return null;
+      { 
+        _.errAttend( err );
+        return null;
+      }
       if( list )
       return adjust( list );
       return list;
@@ -4824,6 +4837,8 @@ function fileWrite_pre( routine, args )
   self._providerDefaultsApply( o );
   _.assert( _.strIs( o.filePath ), 'Expects string {-o.filePath-}' );
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
+  
+  o.filePath = self.path.normalize( o.filePath );
 
   return o;
 }
@@ -4907,6 +4922,8 @@ function fileWrite_body( o )
   {
     self.filesDelete({ filePath : o2.filePath, throwing : 0 });
   }
+  
+  _.assert( self.path.isNormalized( o2.filePath ) );
 
   let result = self.fileWriteAct( o2 );
 
@@ -4946,7 +4963,7 @@ _.assert( _.objectIs( fileWrite_body.encoders ) );
  * Returns wConsequence instance.
  * By default method writes data synchronously, with replacing file if exists, and if parent dir hierarchy doesn't
    exist, it's created. Method can accept two parameters : string `filePath` and string\buffer `data`, or single
-   argument : options object, with required 'filePath' and 'data' parameters.
+   argument : options map, with required 'filePath' and 'data' parameters.
  * @example
  *
     let data = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
@@ -5098,7 +5115,7 @@ _.assert( _.boolLike( _.toJson.defaults.cloning ) );
  * Returns wConsequence instance.
  * By default method writes data synchronously, with replacing file if exists, and if parent dir hierarchy doesn't
  exist, it's created. Method can accept two parameters : string `filePath` and string\buffer `data`, or single
- argument : options object, with required 'filePath' and 'data' parameters.
+ argument : options map, with required 'filePath' and 'data' parameters.
  * @example
  * let fileProvider = _.FileProvider.Default();
  * let fs = require('fs');
@@ -5417,6 +5434,7 @@ function fileDelete_body( o )
       {
         if( o.throwing )
         throw err;
+        _.errAttend( err );
         return null;
       }
       return arg;
@@ -5706,6 +5724,7 @@ function fileLock_body( o )
 
     if( o.throwing )
     throw err;
+    _.errAttend( err );
     return null;
   })
 
@@ -5759,6 +5778,7 @@ function fileUnlock_body( o )
 
     if( o.throwing )
     throw err;
+    _.errAttend( err );
     return null;
   })
 
@@ -5811,6 +5831,7 @@ function fileIsLocked_body( o )
 
     if( o.throwing )
     throw err;
+    _.errAttend( err );
     return null;
   })
 
@@ -5933,11 +5954,17 @@ function _linkMultiple( o, link )
     o.throwing = 1;
 
     function handler( err, got )
-    {
-      if( err && !_.definedIs( result.err ) )
-      result.err = err;
+    { 
+      if( !err )
+      {
+        result.got &= got;
+      }
       else
-      result.got &= got;
+      {
+        _.errAttend( err );
+        if( !_.definedIs( result.err ) )
+        result.err = err;
+      }
     }
 
     for( let p = 0 ; p < records.length ; p++ )
@@ -6253,10 +6280,10 @@ function _link_functor( fop )
       });
 
       con.catch( ( err ) =>
-      {
+      { 
         return c.tempRenameRevert()
         .finally( () =>
-        {
+        { 
           return error( _.err( 'Cant', entryMethodName, o.dstPath, '<-', o.srcPath, '\n', err ) );
         })
       })
@@ -6393,7 +6420,7 @@ function _link_functor( fop )
         }
 
         if( !o.allowingMissed )
-        {
+        { 
           let err = _.err( 'Making link on itself is not allowed. Please enable options {-o.allowingMissed-} if that was your goal.' );
           error( err );
           return true;
@@ -6408,7 +6435,9 @@ function _link_functor( fop )
     function verify2Async()
     {
       c.con.then( () =>
-      {
+      { 
+        if( c.ended )
+        return c.end();
         return verify2()
       });
     }
@@ -6437,10 +6466,10 @@ function _link_functor( fop )
 
     function verifyDstAsync()
     {
-
+      
       if( !o.rewriting )
       throw _.err( 'Destination file ' + _.strQuote( o2.dstPath ) + ' exist and rewriting is off.' );
-
+      
       return self.statRead
       ({
         filePath : o2.dstPath,
@@ -6484,7 +6513,9 @@ function _link_functor( fop )
     function pathsLocalizeAsync()
     {
       c.con.then( () =>
-      {
+      { 
+        if( c.ended )
+        return c.end();
         pathsLocalizeSync();
         return null;
       });
@@ -6540,7 +6571,9 @@ function _link_functor( fop )
     function pathResolveAsync()
     {
       c.con.then( () =>
-      {
+      { 
+        if( c.ended )
+        return c.end();
         pathResolve();
         return true;
       })
@@ -6645,7 +6678,10 @@ function _link_functor( fop )
     {
 
       c.con.then( () =>
-      {
+      { 
+        if( c.ended )
+        return c.end();
+        
         _.assert( path.isAbsolute( o.srcPath ) );
         _.assert( path.isAbsolute( o.dstPath ) );
 
@@ -6676,7 +6712,10 @@ function _link_functor( fop )
       /* */
 
       c.con.then( () =>
-      {
+      { 
+        if( c.ended )
+        return c.end();
+        
         if( o.resolvingSrcSoftLink || ( o.resolvingSrcTextLink && self.usingTextLink ) )
         {
           let o2 =
@@ -7023,7 +7062,8 @@ function _link_functor( fop )
         return end( c.result );
       }
       else
-      {
+      { 
+        _.errAttend( err );
         return end( null );
       }
     }
@@ -7416,7 +7456,7 @@ operates.relativeSrcPath = { pathToRead : 1 }
 //
 
 /**
- * Creates copy of a file. Accepts two arguments: ( srcPath ), ( dstPath ) or options object.
+ * Creates copy of a file. Accepts two arguments: ( srcPath ), ( dstPath ) or options map.
  * Returns true if operation is finished successfully or if source and destination paths are equal.
  * Otherwise throws error with corresponding message or returns false, it depends on ( o.throwing ) property.
  * In asynchronously mode returns wConsequence instance.
@@ -7443,7 +7483,7 @@ operates.relativeSrcPath = { pathToRead : 1 }
      console.log( stats ); // returns Stats object
    });
 
- * @param {Object} o - options object.
+ * @param {Object} o - options map.
  * @param {string} o.srcPath path to source file.
  * @param {string} o.dstPath path where to copy source file.
  * @param {boolean} [o.sync=true] If set to false, method will copy file asynchronously.
@@ -7453,7 +7493,7 @@ operates.relativeSrcPath = { pathToRead : 1 }
  * @returns {wConsequence}
  * @throws {Error} If missed argument, or pass more than 2.
  * @throws {Error} If dstPath or dstPath is not string.
- * @throws {Error} If options object has unexpected property.
+ * @throws {Error} If options map has unexpected property.
  * @throws {Error} If ( o.rewriting ) is false and destination path exists.
  * @throws {Error} If path to source file( srcPath ) not exists and ( o.throwing ) is enabled, otherwise returns false.
  * @method fileCopy

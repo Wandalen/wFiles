@@ -96,7 +96,6 @@ function streamReadAct( o )
 streamReadAct.defaults = Object.create( Parent.prototype.streamReadAct.defaults );
 streamReadAct.having = Object.create( Parent.prototype.streamReadAct.having );
 
-
 //
 
 /**

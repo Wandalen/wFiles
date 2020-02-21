@@ -747,7 +747,7 @@ defaults.determiningLineNumber = 1;
 // read
 // --
 
-function fileConfigRead2( o )
+function configRead2( o )
 {
 
   let self = this;
@@ -764,33 +764,33 @@ function fileConfigRead2( o )
   if( o.result === undefined )
   o.result = Object.create( null );
 
-  _.routineOptions( fileConfigRead2, o );
+  _.routineOptions( configRead2, o );
 
   if( !o.name )
   {
     o.name = 'config';
-    self._fileConfigRead2( o );
+    self._configRead2( o );
     o.name = 'public';
-    self._fileConfigRead2( o );
+    self._configRead2( o );
     o.name = 'private';
-    self._fileConfigRead2( o );
+    self._configRead2( o );
   }
   else
   {
-    self._fileConfigRead2( o );
+    self._configRead2( o );
   }
 
   return o.result;
 }
 
-fileConfigRead2.defaults =
+configRead2.defaults =
 {
   name : null,
   dir : null,
   result : null,
 }
 
-var having = fileConfigRead2.having = Object.create( null );
+var having = configRead2.having = Object.create( null );
 
 having.writing = 0;
 having.reading = 1;
@@ -798,7 +798,7 @@ having.driving = 0;
 
 //
 
-function _fileConfigRead2( o )
+function _configRead2( o )
 {
   let self = this;
   let read;
@@ -856,7 +856,7 @@ function _fileConfigRead2( o )
   return o.result;
 }
 
-_fileConfigRead2.defaults = fileConfigRead2.defaults;
+_configRead2.defaults = configRead2.defaults;
 
 //
 
@@ -867,15 +867,15 @@ _fileConfigRead2.defaults = fileConfigRead2.defaults;
  * @param {Object} o Options map.
  * @param {Array|String} o.filePath Source paths.
  * @param {String} o.outputFormat='array', Possible formats: array, map.
- * @function fileConfigFind
+ * @function configFind
  * @memberof module:Tools/mid/Files.wFileProviderSecondary#
  */
 
 /*
-qqq : cover fileConfigFind
+qqq : cover configFind
 */
 
-function fileConfigFind_body( o )
+function configFind_body( o )
 {
   let self = this;
   let path = self.path;
@@ -936,12 +936,12 @@ function fileConfigFind_body( o )
   return result;
 }
 
-var defaults = fileConfigFind_body.defaults = Object.create( null );
+var defaults = configFind_body.defaults = Object.create( null );
 defaults.filePath = null;
 defaults.outputFormat = 'array';
 // defaults.recursive = 1;
 
-let fileConfigFind = _.routineFromPreAndBody( Partial.prototype._preFilePathVectorWithProviderDefaults, fileConfigFind_body );
+let configFind = _.routineFromPreAndBody( Partial.prototype._preFilePathVectorWithProviderDefaults, configFind_body );
 
 //
 
@@ -984,11 +984,11 @@ qqq : add test
  * @param {Array|String} o.filePath Source paths.
  * @param {Array|Object} o.found Container to store found config files.
  * @param {String} o.many='all' Checks if each of files `o.filePath` have at least one config file.
- * @function fileConfigRead
+ * @function configRead
  * @memberof module:Tools/mid/Files.wFileProviderSecondary#
  */
 
-function fileConfigRead_body( o )
+function configRead_body( o )
 {
   let self = this;
   let result = null;
@@ -997,7 +997,7 @@ function fileConfigRead_body( o )
   _.assert( _.longHas( [ 'all', 'any' ], o.many ) );
 
   if( !o.found )
-  o.found = self.fileConfigFind({ filePath : o.filePath });
+  o.found = self.configFind({ filePath : o.filePath });
 
   /* */
 
@@ -1085,9 +1085,9 @@ function fileConfigRead_body( o )
   return result;
 }
 
-_.routineExtend( fileConfigRead_body, fileRead );
+_.routineExtend( configRead_body, fileRead );
 
-var defaults = fileConfigRead_body.defaults;
+var defaults = configRead_body.defaults;
 
 defaults.encoding = null;
 defaults.many = 'all';
@@ -1095,9 +1095,35 @@ defaults.found = null;
 
 //
 
-var fileConfigRead = _.routineFromPreAndBody( Partial.prototype._preFilePathVectorWithProviderDefaults, fileConfigRead_body );
+var configRead = _.routineFromPreAndBody( Partial.prototype._preFilePathVectorWithProviderDefaults, configRead_body );
 
-fileConfigRead.having.aspect = 'entry';
+configRead.having.aspect = 'entry';
+
+//
+
+function configUserRead( o )
+{
+  let self = this;
+  let path = self.path;
+
+  if( !_.mapIs( o ) )
+  o = { filePath : o }
+
+  let userPath = path.dirUserHome();
+  o.filePath = path.join( userPath, o.filePath || '.wenv.yml' );
+
+  return self.configRead
+  ({
+    filePath : o.filePath,
+    throwing : 0,
+  });
+
+}
+
+configUserRead.defaults =
+{
+  filePath : null,
+}
 
 //
 
@@ -1166,32 +1192,6 @@ var fileCodeRead = _.routineFromPreAndBody( fileRead.pre, fileCodeRead_body );
 
 fileCodeRead.having.aspect = 'entry';
 
-//
-
-function fileConfigUserRead( o )
-{
-  let self = this;
-  let path = self.path;
-
-  if( !_.mapIs( o ) )
-  o = { filePath : o }
-
-  let userPath = path.dirUserHome();
-  o.filePath = path.join( userPath, o.filePath || '.wenv.yml' );
-
-  return self.fileConfigRead
-  ({
-    filePath : o.filePath,
-    throwing : 0,
-  });
-
-}
-
-fileConfigUserRead.defaults =
-{
-  filePath : null,
-}
-
 // --
 // relationship
 // --
@@ -1236,15 +1236,15 @@ let Supplement =
 
   // read
 
-  fileConfigRead2,
-  _fileConfigRead2,
+  configRead2,
+  _configRead2,
 
-  fileConfigFind,
-  fileConfigRead,
+  configFind,
+  configRead,
+
+  configUserRead,
 
   fileCodeRead,
-
-  fileConfigUserRead,
 
   //
 

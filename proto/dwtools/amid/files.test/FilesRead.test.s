@@ -522,7 +522,7 @@ function readToProvider( test )
 
 //
 
-function fileConfigRead( test )
+function configRead( test )
 {
   let context = this;
   let provider = context.provider || _.fileProvider;
@@ -534,9 +534,9 @@ function fileConfigRead( test )
 
   test.case = 'no config'
   provider.filesDelete( routinePath );
-  test.shouldThrowErrorSync( () => provider.fileConfigRead({ filePath : terminalPath, many : 'all' }) );
-  test.shouldThrowErrorSync( () => provider.fileConfigRead({ filePath : terminalPath, many : 'any', throwing : 1 }) );
-  test.mustNotThrowError( () => provider.fileConfigRead({ filePath : terminalPath, many : 'any', throwing : 0 }) );
+  test.shouldThrowErrorSync( () => provider.configRead({ filePath : terminalPath, many : 'all' }) );
+  test.shouldThrowErrorSync( () => provider.configRead({ filePath : terminalPath, many : 'any', throwing : 1 }) );
+  test.mustNotThrowError( () => provider.configRead({ filePath : terminalPath, many : 'any', throwing : 0 }) );
 
   //
 
@@ -556,42 +556,42 @@ function fileConfigRead( test )
   provider.filesDelete( routinePath );
   var filePath = path.changeExt( terminalPath, 'json' );
   provider.fileWrite({ filePath, data : src, encoding : 'json.fine' });
-  var got = provider.fileConfigRead({ filePath : terminalPath });
+  var got = provider.configRead({ filePath : terminalPath });
   test.identical( got, src );
 
   test.case = 'json, with ext';
   provider.filesDelete( routinePath );
   var filePath = path.changeExt( terminalPath, 'json' );
   provider.fileWrite({ filePath, data : src, encoding : 'json.fine' });
-  var got = provider.fileConfigRead({ filePath });
+  var got = provider.configRead({ filePath });
   test.identical( got, src )
 
   test.case = 'bson, no ext';
   provider.filesDelete( routinePath );
   var filePath = path.changeExt( terminalPath, 'bson' );
   provider.fileWrite({ filePath, data : src, encoding : 'bson' });
-  var got = provider.fileConfigRead({ filePath : terminalPath });
+  var got = provider.configRead({ filePath : terminalPath });
   test.identical( got, src );
 
   test.case = 'bson, with ext';
   provider.filesDelete( routinePath );
   var filePath = path.changeExt( terminalPath, 'bson' );
   provider.fileWrite({ filePath, data : src, encoding : 'bson' });
-  var got = provider.fileConfigRead({ filePath });
+  var got = provider.configRead({ filePath });
   test.identical( got, src )
 
   test.case = 'cson, no ext';
   provider.filesDelete( routinePath );
   var filePath = path.changeExt( terminalPath, 'coffee' );
   provider.fileWrite({ filePath, data : src, encoding : 'coffee' });
-  var got = provider.fileConfigRead({ filePath : terminalPath });
+  var got = provider.configRead({ filePath : terminalPath });
   test.identical( got, src );
 
   test.case = 'cson, with ext';
   provider.filesDelete( routinePath );
   var filePath = path.changeExt( terminalPath, 'coffee' );
   provider.fileWrite({ filePath, data : src, encoding : 'coffee' });
-  var got = provider.fileConfigRead({ filePath });
+  var got = provider.configRead({ filePath });
   test.identical( got, src )
 
   //
@@ -616,7 +616,7 @@ function fileConfigRead( test )
   var filePath = path.changeExt( terminalPath, 'bson' );
   provider.fileWrite({ filePath, data : src2, encoding : 'bson' });
   var filePath = path.s.changeExt( terminalPath, [ 'json', 'bson' ] );
-  var got = provider.fileConfigRead({ filePath });
+  var got = provider.configRead({ filePath });
   test.identical( got, src );
 
   //
@@ -640,7 +640,7 @@ function fileConfigRead( test )
   provider.fileWrite({ filePath, data : src1, encoding : 'json.fine' });
   var filePath = path.changeExt( terminalPath, 'bson' );
   provider.fileWrite({ filePath, data : src2, encoding : 'bson' });
-  var got = provider.fileConfigRead({ filePath : terminalPath });
+  var got = provider.configRead({ filePath : terminalPath });
   var expected =
   {
     null : null,
@@ -652,7 +652,7 @@ function fileConfigRead( test )
   test.identical( got, expected );
   test.shouldThrowErrorSync( () =>
   {
-    provider.fileConfigRead({ filePath : [ terminalPath, terminalPath ] });
+    provider.configRead({ filePath : [ terminalPath, terminalPath ] });
   })
 
   //
@@ -676,7 +676,7 @@ function fileConfigRead( test )
   var filePath = path.changeExt( terminalPath, 'bson' );
   provider.fileWrite({ filePath, data : src2, encoding : 'bson' });
   var filePath = path.s.changeExt( terminalPath, [ 'json', 'bson' ] );
-  var got = provider.fileConfigRead({ filePath });
+  var got = provider.configRead({ filePath });
   var expected =
   {
     null : 1,
@@ -704,7 +704,7 @@ function fileConfigRead( test )
   var filePath = path.changeExt( terminalPath, 'bson' );
   provider.fileWrite({ filePath, data : src2, encoding : 'bson' });
   var filePath = path.s.changeExt( terminalPath, [ 'json', 'bson' ] );
-  var got = provider.fileConfigRead({ filePath });
+  var got = provider.configRead({ filePath });
   test.identical( got, src1 );
 
 }
@@ -737,7 +737,7 @@ var Self =
     // filesTreeWrite,
     // readToProvider,
 
-    fileConfigRead, /* qqq : extend */
+    configRead, /* qqq : extend */
 
   },
 

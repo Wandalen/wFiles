@@ -299,7 +299,8 @@ function filesReflectSingle_body( o )
   
   if( parsed.hash && !parsed.isFixated )
   {
-    let err = _.err( `Source path: ${_.color.strFormat( String( srcPath ), 'path' )} is fixated, but hash: ${_.color.strFormat( String( parsed.hash ), 'path' ) } doesn't look like commit hash.` )
+    // let err = _.err( `Source path: ${_.color.strFormat( String( srcPath ), 'path' )} is fixated, but hash: ${_.color.strFormat( String( parsed.hash ), 'path' ) } doesn't look like commit hash.` )
+    let err = _.err( `Source path: ( ${_.color.strFormat( String( srcPath ), 'path' )} ) looks like path with tag, but defined as path with version. Please use @ instead of # to specify tag` );
     con.error( err );
     return con;
   }

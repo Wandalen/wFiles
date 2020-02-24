@@ -26758,6 +26758,226 @@ function softLinkToParentDirectorySync( test )
 
 //
 
+function softLinkToParentDirectoryAsync( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let path = provider.path;
+
+  if( !_.routineIs( provider.softLinkAct ) )
+  {
+    test.case = 'softLinkAct is not implemented'
+    test.identical( 1, 1 )
+    return;
+  }
+
+  if( !test.context.softLinkIsSupported() )
+  {
+    test.case = 'System does not allow to create soft links.';
+    test.identical( 1, 1 )
+    return;
+  }
+
+  var routinePath = test.context.pathFor( 'written/softLinkToParentDirectoryAsync' );
+  var srcPath,dstPath,dst2Path;
+  var con = new _.Consequence().take( null )
+  
+  .then( () => 
+  {
+    if( !provider.statResolvedRead( routinePath ) )
+    provider.dirMake( routinePath )
+    return null;
+  })
+  
+  .then( () => 
+  {
+    test.case = 'absolute paths';
+    srcPath  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir' );
+    dstPath  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir/link' );
+    provider.dirMake( srcPath );
+    return provider.softLink
+    ({
+      srcPath,
+      dstPath,
+      sync : 0,
+    })
+    .then( () => 
+    {
+      test.is( provider.isSoftLink( dstPath ) );
+      test.is( provider.isDir( srcPath ) );
+      test.identical( provider.pathResolveSoftLink( dstPath ),  srcPath );
+      return null;
+    })
+  })
+  
+  .then( () => 
+  {
+    test.case = 'absolute paths';
+    srcPath  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir' );
+    dstPath  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir/link' );
+    provider.dirMake( srcPath );
+    return provider.softLink
+    ({
+      srcPath,
+      dstPath,
+      sync : 0,
+    })
+    .then( () => 
+    {
+      test.is( provider.isSoftLink( dstPath ) );
+      test.is( provider.isDir( srcPath ) );
+      test.identical( provider.pathResolveSoftLink( dstPath ),  srcPath );
+      return null;
+    })
+  })
+  
+  .then( () => 
+  {
+    test.case = 'dst relative';
+    srcPath  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir' );
+    dstPath  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir/link' );
+    provider.dirMake( srcPath );
+    return provider.softLink
+    ({
+      srcPath,
+      dstPath : './link',
+      sync : 0,
+    })
+    .then( () => 
+    {
+      test.is( provider.isSoftLink( dstPath ) );
+      test.is( provider.isDir( srcPath ) );
+      test.identical( provider.pathResolveSoftLink( dstPath ),  srcPath );
+      return null;
+    })
+  })
+  
+  .then( () => 
+  {
+    test.case = 'src relative';
+    srcPath  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir' );
+    dstPath  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir/link' );
+    provider.dirMake( srcPath );
+    return provider.softLink
+    ({
+      srcPath : '..',
+      dstPath,
+      sync : 0,
+    })
+    .then( () => 
+    {
+      test.is( provider.isSoftLink( dstPath ) );
+      test.is( provider.isDir( srcPath ) );
+      test.identical( provider.pathResolveSoftLink( dstPath ),  test.context.globalFromPreferred( '..' ) );
+      return null;
+    })
+  })
+  
+  .then( () => 
+  {
+    test.case = 'dir -> link -> link';
+    srcPath  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir' );
+    dstPath  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir/link' );
+    dst2Path  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir/link/link2' );
+    provider.dirMake( srcPath );
+    return provider.softLink
+    ({
+      srcPath,
+      dstPath,
+      sync : 0,
+    })
+    .then( () => 
+    {
+      return provider.softLink
+      ({
+        srcPath : dstPath,
+        dstPath : dst2Path,
+        sync : 0,
+      });
+    })
+    .then( () => 
+    {
+      test.is( provider.isSoftLink( dstPath ) );
+      test.is( provider.isSoftLink( dst2Path ) );
+      test.is( provider.isDir( srcPath ) );
+      test.identical( provider.pathResolveSoftLink( dst2Path ), dstPath  );
+      test.identical( provider.pathResolveLinkFull( dst2Path ).filePath, srcPath );
+      return null;
+    })
+  })
+  
+  .then( () => 
+  {
+    test.case = 'dir -> link -> link, relative paths';
+    srcPath  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir' );
+    dstPath  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir/link' );
+    dst2Path  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir/link/link2' );
+    provider.dirMake( srcPath );
+    return provider.softLink
+    ({
+      srcPath : '..',
+      dstPath,
+      sync : 0,
+    })
+    .then( () => 
+    {
+      return provider.softLink
+      ({
+        srcPath : '..',
+        dstPath : dst2Path,
+        sync : 0,
+      });
+    })
+    .then( () => 
+    {
+      test.is( provider.isSoftLink( dstPath ) );
+      test.is( provider.isSoftLink( dst2Path ) );
+      test.is( provider.isDir( srcPath ) );
+      test.identical( provider.pathResolveSoftLink( dst2Path ), test.context.globalFromPreferred( '..' )  );
+      test.identical( provider.pathResolveLinkFull( dst2Path ).filePath, srcPath );
+      return null;
+    })
+  })
+  
+  .then( () => 
+  {
+    test.case = 'dir -> link -> link, relative paths';
+    srcPath  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir' );
+    dstPath  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir/link' );
+    dst2Path  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir/link/link2' );
+    provider.dirMake( srcPath );
+    return provider.softLink
+    ({
+      srcPath,
+      dstPath,
+      sync : 0,
+    })
+    .then( () => 
+    {
+      return provider.softLink
+      ({
+        srcPath,
+        dstPath : dst2Path,
+        resolvingSrcSoftLink : 1,
+        sync : 0,
+      });
+    })
+    .then( () => 
+    {
+      test.is( provider.isSoftLink( dstPath ) );
+      test.is( provider.isSoftLink( dst2Path ) );
+      test.is( provider.isDir( srcPath ) );
+      test.identical( provider.pathResolveSoftLink( dst2Path ), srcPath  );
+      test.identical( provider.pathResolveLinkFull( dst2Path ).filePath, srcPath );
+      return null;
+    })
+  })
+  
+  return con;
+}
+
+//
+
 function textLinkSync( test )
 {
   let self = this;
@@ -48644,6 +48864,7 @@ var Self =
     softLinkRelativeSoftLinking,
     softLinkRelativeTextLinking,
     softLinkToParentDirectorySync,
+    softLinkToParentDirectoryAsync,
 
     textLinkSync,
     textLinkResolvingBasic,

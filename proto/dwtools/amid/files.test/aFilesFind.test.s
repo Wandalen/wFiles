@@ -1713,7 +1713,7 @@ function filesFind( test )
     var dirPath = routinePath;
     var isDir = provider.isDir( o.filePath );
 
-    if( isDir && o._includingDirs && o.withTransient/*maybe withStem*/ )
+    if( isDir && o._includingDirs && o.withTransient/*maybe withStem*/ ) /* qqq xxx ? */
     {
       if( o.outputFormat === 'absolute' ||  o.outputFormat === 'record' )
       _.arrayPrependOnce( expected, o.filePath );

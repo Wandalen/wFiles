@@ -507,6 +507,21 @@ function pathDirTempAct()
 
 //
 
+function pathNativizeAct( filePath )
+{
+  let self = this;
+  let r = self._pathLocalize( filePath );
+  if( r && r.provider )
+  return r.provider.pathNativizeAct.call( r.provider, r.localPath );
+  debugger;
+  if( self.defaultProvider )
+  return self.defaultProvider.path.dirTemp.apply( self.defaultProvider.path, arguments );
+  debugger;
+  return filePath;
+}
+
+//
+
 function pathResolveLinkFull_body( o )
 {
   let self = this;
@@ -1373,6 +1388,7 @@ let Proto =
 
   pathCurrentAct,
   pathDirTempAct,
+  pathNativizeAct,
 
   pathResolveLinkFull,
   pathResolveLinkTail,

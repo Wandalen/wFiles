@@ -3183,7 +3183,7 @@ function fileRead_body( o )
   function handleError( err )
   {
     _.errAttend( err );
-    
+
     if( encoder && encoder.onError )
     try
     {
@@ -3204,7 +3204,7 @@ function fileRead_body( o )
 
     if( o.onError )
     _.Consequence.Error( o.onError, err );
-    
+
     if( o.throwing )
     throw _.err( err );
     else
@@ -3758,7 +3758,7 @@ function hashRead_body( o )
       throw _.err( 'Cant read hash of', o.filePath, '\n', err );
     }
     else
-    { 
+    {
       _.errAttend( err );
       return NaN;
     }
@@ -3856,7 +3856,7 @@ function dirRead_body( o )
         throw _.err( err );
       }
       else
-      { 
+      {
         _.errAttend( err );
         return null;
       }
@@ -4837,7 +4837,7 @@ function fileWrite_pre( routine, args )
   self._providerDefaultsApply( o );
   _.assert( _.strIs( o.filePath ), 'Expects string {-o.filePath-}' );
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
-  
+
   o.filePath = self.path.normalize( o.filePath );
 
   return o;
@@ -4922,7 +4922,7 @@ function fileWrite_body( o )
   {
     self.filesDelete({ filePath : o2.filePath, throwing : 0 });
   }
-  
+
   _.assert( self.path.isNormalized( o2.filePath ) );
 
   let result = self.fileWriteAct( o2 );
@@ -5954,7 +5954,7 @@ function _linkMultiple( o, link )
     o.throwing = 1;
 
     function handler( err, got )
-    { 
+    {
       if( !err )
       {
         result.got &= got;
@@ -6280,10 +6280,10 @@ function _link_functor( fop )
       });
 
       con.catch( ( err ) =>
-      { 
+      {
         return c.tempRenameRevert()
         .finally( () =>
-        { 
+        {
           return error( _.err( 'Cant', entryMethodName, o.dstPath, '<-', o.srcPath, '\n', err ) );
         })
       })
@@ -6420,7 +6420,7 @@ function _link_functor( fop )
         }
 
         if( !o.allowingMissed )
-        { 
+        {
           let err = _.err( 'Making link on itself is not allowed. Please enable options {-o.allowingMissed-} if that was your goal.' );
           error( err );
           return true;
@@ -6435,7 +6435,7 @@ function _link_functor( fop )
     function verify2Async()
     {
       c.con.then( () =>
-      { 
+      {
         if( c.ended )
         return c.end();
         return verify2()
@@ -6466,10 +6466,10 @@ function _link_functor( fop )
 
     function verifyDstAsync()
     {
-      
+
       if( !o.rewriting )
       throw _.err( 'Destination file ' + _.strQuote( o2.dstPath ) + ' exist and rewriting is off.' );
-      
+
       return self.statRead
       ({
         filePath : o2.dstPath,
@@ -6513,7 +6513,7 @@ function _link_functor( fop )
     function pathsLocalizeAsync()
     {
       c.con.then( () =>
-      { 
+      {
         if( c.ended )
         return c.end();
         pathsLocalizeSync();
@@ -6571,7 +6571,7 @@ function _link_functor( fop )
     function pathResolveAsync()
     {
       c.con.then( () =>
-      { 
+      {
         if( c.ended )
         return c.end();
         pathResolve();
@@ -6678,10 +6678,10 @@ function _link_functor( fop )
     {
 
       c.con.then( () =>
-      { 
+      {
         if( c.ended )
         return c.end();
-        
+
         _.assert( path.isAbsolute( o.srcPath ) );
         _.assert( path.isAbsolute( o.dstPath ) );
 
@@ -6712,10 +6712,10 @@ function _link_functor( fop )
       /* */
 
       c.con.then( () =>
-      { 
+      {
         if( c.ended )
         return c.end();
-        
+
         if( o.resolvingSrcSoftLink || ( o.resolvingSrcTextLink && self.usingTextLink ) )
         {
           let o2 =
@@ -7062,7 +7062,7 @@ function _link_functor( fop )
         return end( c.result );
       }
       else
-      { 
+      {
         _.errAttend( err );
         return end( null );
       }

@@ -3892,6 +3892,7 @@ defaults.breakingDstHardLink = null;
 defaults.resolvingDstSoftLink = null;
 defaults.resolvingDstTextLink = null;
 defaults.rebasingLink = 0;
+defaults.sync = null;
 
 var defaults = filesReflectSingle_body.defaults = Object.create( filesReflectEvaluate.defaults );
 _.mapExtend( defaults, filesReflectAdvancedDefaults );
@@ -3903,6 +3904,8 @@ having.driving = 0;
 
 let filesReflectSingle = _.routineFromPreAndBody( filesReflectSingle_pre, filesReflectSingle_body );
 filesReflectSingle.having.aspect = 'entry';
+
+_.assert( filesReflectSingle.defaults.sync !== undefined );
 
 //
 

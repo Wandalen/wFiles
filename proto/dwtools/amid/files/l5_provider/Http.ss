@@ -11,6 +11,16 @@ if( typeof module !== 'undefined' )
 
 //
 
+/* xxx qqq : add such test routine
+
+  return a.fileProvider.filesReflect
+  ({
+    reflectMap : { [ imagePath ] : a.abs( `file.img` ) },
+    sync : 1,
+  });
+
+*/
+
 /**
  @classdesc Class to transfer data over http protocol using GET/POST methods. Implementation for a server side.
  @class wFileProviderHttp
@@ -85,7 +95,6 @@ function streamReadAct( o )
 
 streamReadAct.defaults = Object.create( Parent.prototype.streamReadAct.defaults );
 streamReadAct.having = Object.create( Parent.prototype.streamReadAct.having );
-
 
 //
 

@@ -382,7 +382,7 @@ function filesReflectTrivial( test )
     ready.then( ( got ) =>
     {
       test.identical( got.exitCode, 0 );
-      test.is( _.strHas( got.output, `Your branch is up to date with 'origin/master'.` ) )
+      test.is( _.strHasAny( got.output, [ `Your branch is up to date with 'origin/master'.`, `Your branch is up-to-date with 'origin/master'.` ] ) )
       return null;
     })
 
@@ -533,7 +533,7 @@ function filesReflectTrivial( test )
     ready.then( ( got ) =>
     {
       test.identical( got.exitCode, 0 );
-      test.is( _.strHas( got.output, `Your branch is up to date with 'origin/master'.` ) )
+      test.is( _.strHasAny( got.output, [ `Your branch is up to date with 'origin/master'.`, `Your branch is up-to-date with 'origin/master'.` ] ) )
       return null;
     })
 
@@ -564,7 +564,7 @@ function filesReflectTrivial( test )
     ready.then( ( got ) =>
     {
       test.identical( got.exitCode, 0 );
-      test.is( _.strHas( got.output, `Your branch is up to date with 'origin/master'.` ) )
+      test.is( _.strHasAny( got.output, [ `Your branch is up to date with 'origin/master'.`, `Your branch is up-to-date with 'origin/master'.` ] ) )
       return null;
     })
 
@@ -649,7 +649,7 @@ function filesReflectTrivial( test )
     ready.then( ( got ) =>
     {
       test.identical( got.exitCode, 0 );
-      test.is( _.strHas( got.output, `Your branch is up to date with 'origin/master'.` ) )
+      test.is( _.strHasAny( got.output, [ `Your branch is up to date with 'origin/master'.`, `Your branch is up-to-date with 'origin/master'.` ] ) )
       return null;
     })
 
@@ -670,7 +670,7 @@ function filesReflectTrivial( test )
     ready.then( ( got ) =>
     {
       test.identical( got.exitCode, 0 );
-      test.is( _.strHas( got.output, `Your branch is up to date with 'origin/master'.` ) )
+      test.is( _.strHasAny( got.output, [ `Your branch is up to date with 'origin/master'.`, `Your branch is up-to-date with 'origin/master'.` ] ) )
       return null;
     })
 

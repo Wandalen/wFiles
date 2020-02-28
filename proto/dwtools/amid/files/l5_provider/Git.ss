@@ -299,7 +299,8 @@ function filesReflectSingle_body( o )
   
   if( parsed.hash && !parsed.isFixated )
   {
-    let err = _.err( `Source path: ${_.color.strFormat( String( srcPath ), 'path' )} is fixated, but hash: ${_.color.strFormat( String( parsed.hash ), 'path' ) } doesn't look like commit hash.` )
+    // let err = _.err( `Source path: ${_.color.strFormat( String( srcPath ), 'path' )} is fixated, but hash: ${_.color.strFormat( String( parsed.hash ), 'path' ) } doesn't look like commit hash.` )
+    let err = _.err( `Source path: ( ${_.color.strFormat( String( srcPath ), 'path' )} ) looks like path with tag, but defined as path with version. Please use @ instead of # to specify tag` );
     con.error( err );
     return con;
   }
@@ -415,7 +416,7 @@ function filesReflectSingle_body( o )
     { 
       _.assert( arg.length === 2 );
       localChanges = _.strHasAny( arg[ 0 ].output, [ 'Changes to be committed', 'Changes not staged for commit' ] );
-      mergeIsNeeded = !_.strHas( arg[ 0 ].output, 'Your branch is up to date' );
+      mergeIsNeeded = !_.strHasAny( arg[ 0 ].output, [ 'Your branch is up to date', 'Your branch is up-to-date' ] );
       if( parsed.tag )
       hashIsBranchName = _.strHas( arg[ 1 ].output, parsed.tag );
       return localChanges;

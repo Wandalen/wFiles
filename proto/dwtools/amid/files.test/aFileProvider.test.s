@@ -1479,11 +1479,11 @@ function fileWriteActSync( test )
   return;
 
   var isHd = test.context.providerIsInstanceOf( _.FileProvider.HardDrive );
-  
+
   let data = 'Test data'
-  
+
   //
-  
+
   test.case = 'normalized path, call fileWrite'
   var filePath = test.context.pathFor( 'write_test/file' );
   var o = _.mapExtend( null, provider.fileWriteAct.defaults );
@@ -1494,9 +1494,9 @@ function fileWriteActSync( test )
   provider.fileWriteAct( o );
   test.identical( o.filePath, filePath );
   test.identical( provider.fileRead( filePath ), data );
-  
+
   //
-  
+
   if( Config.debug )
   if( isHd )
   {
@@ -1507,7 +1507,7 @@ function fileWriteActSync( test )
     o.filePath = _.path.nativize( filePath );
     o.sync = 1;
     o.data = data;
-    test.shouldThrowErrorSync( () => 
+    test.shouldThrowErrorSync( () =>
     {
       provider.fileWriteAct( o );
     })
@@ -1529,12 +1529,12 @@ function fileWriteActAsync( test )
 
   var isHd = test.context.providerIsInstanceOf( _.FileProvider.HardDrive );
   let data = 'Test data'
-  
+
   let ready = new _.Consequence().take( null )
-  
+
   //
-  
-  .finally( () => 
+
+  .finally( () =>
   {
     test.case = 'normalized path, call fileWrite'
     var filePath = test.context.pathFor( 'write_test/file' );
@@ -1544,19 +1544,19 @@ function fileWriteActAsync( test )
     o.data = data;
     provider.dirMakeForFile( filePath )
     return provider.fileWriteAct( o )
-    .then( () => 
+    .then( () =>
     {
       test.identical( o.filePath, filePath );
       test.identical( provider.fileRead( filePath ), data );
       return null;
     })
   })
-  
+
   //
-    
+
   if( Config.debug )
   if( isHd )
-  ready.finally( () => 
+  ready.finally( () =>
   {
     test.case = 'native path, call fileWrite_body'
     var filePath = test.context.pathFor( 'write_test/file' );
@@ -1565,21 +1565,21 @@ function fileWriteActAsync( test )
     o.filePath = _.path.nativize( filePath );
     o.sync = 0;
     o.data = data;
-    return test.shouldThrowErrorOfAnyKind( () => 
+    return test.shouldThrowErrorOfAnyKind( () =>
     {
       return provider.fileWriteAct( o );
     })
-    .then( () => 
+    .then( () =>
     {
       test.is( !provider.path.isNormalized( o.filePath ) );
       test.is( !provider.fileExists( filePath ) );
       return null;
     })
-    
+
   })
- 
+
   //
-  
+
   return ready;
 }
 
@@ -20091,12 +20091,12 @@ function fileWriteSync( test )
       });
     });
   }
-  
+
   //
-  
+
   test.case = 'native path, call fileWrite'
   var filePath = test.context.pathFor( 'write_test/file' );
-  var o = 
+  var o =
   {
     filePath : provider.path.nativize( filePath ),
     data,
@@ -20105,16 +20105,16 @@ function fileWriteSync( test )
   provider.fileWrite( o );
   test.identical( o.filePath, filePath );
   test.identical( provider.fileRead( filePath ), data );
-  
+
   //
-  
+
   if( Config.debug )
   if( isHd )
   {
     test.case = 'native path, call fileWrite_body'
     var filePath = test.context.pathFor( 'write_test/file' );
     provider.filesDelete( filePath )
-    var o = 
+    var o =
     {
       data,
       sync : 1
@@ -20123,15 +20123,15 @@ function fileWriteSync( test )
     o.filePath = provider.path.nativize( filePath )
     o.data = data;
     o.sync = 1;
-    test.shouldThrowErrorSync( () => 
+    test.shouldThrowErrorSync( () =>
     {
       provider.fileWrite.body.call( provider,o );
     })
     test.is( !provider.path.isNormalized( o.filePath ) );
     test.is( !provider.fileExists( filePath ) );
   }
-  
-  
+
+
 }
 
 //
@@ -20849,33 +20849,33 @@ function fileWriteAsync( test )
 
     return test.shouldThrowErrorOfAnyKind( con );
   })
-  
+
   //
-  
-  .finally( () => 
+
+  .finally( () =>
   {
     test.case = 'native path, call fileWrite'
     var filePath = test.context.pathFor( 'write_test/file' );
-    var o = 
+    var o =
     {
       filePath : provider.path.nativize( filePath ),
       data,
       sync : 0
     }
     return provider.fileWrite( o )
-    .then( () => 
-    { 
+    .then( () =>
+    {
       test.identical( o.filePath, filePath );
       test.identical( provider.fileRead( filePath ), data );
       return null;
     })
   })
-  
+
   //
-  
+
   if( Config.debug )
   if( isHd )
-  consequence.finally( () => 
+  consequence.finally( () =>
   {
     test.case = 'native path, call fileWrite_body'
     var filePath = test.context.pathFor( 'write_test/file' );
@@ -20884,7 +20884,7 @@ function fileWriteAsync( test )
     o.filePath = provider.path.nativize( filePath )
     o.data = data;
     o.sync = 0;
-    test.shouldThrowErrorOfAnyKind( () => 
+    test.shouldThrowErrorOfAnyKind( () =>
     {
       return provider.fileWrite.body.call( provider,o );
     })
@@ -20892,7 +20892,7 @@ function fileWriteAsync( test )
     test.is( !provider.fileExists( filePath ) );
     return null;
   })
- 
+
   return consequence;
 }
 
@@ -23975,17 +23975,6 @@ function fileReadAsync( test )
 
 //
 
-/*
-
-/port/package/wMathSpace/node_modules/wmathspace -> /port/package/wMathSpace/
-/port/package/wMathSpace/builder -> /repo/git/trunk/builder
-/port/package/wMathSpace/node_modules/wmathspace/builder -> /repo/git/trunk/builder
-
-/a/b -> ..
-/a/c -> /x
-/a/b/c -> /x
-*/
-
 function softLinkChain( test )
 {
   let self = this;
@@ -26642,7 +26631,7 @@ function softLinkToParentDirectorySync( test )
 
   if( !provider.statResolvedRead( routinePath ) )
   provider.dirMake( routinePath )
-  
+
   test.case = 'absolute paths';
   srcPath  = test.context.pathFor( 'written/softLinkToParentDirectorySync/dir' );
   dstPath  = test.context.pathFor( 'written/softLinkToParentDirectorySync/dir/link' );
@@ -26656,7 +26645,7 @@ function softLinkToParentDirectorySync( test )
   test.is( provider.isSoftLink( dstPath ) );
   test.is( provider.isDir( srcPath ) );
   test.identical( provider.pathResolveSoftLink( dstPath ),  srcPath );
-  
+
   test.case = 'dst relative';
   srcPath  = test.context.pathFor( 'written/softLinkToParentDirectorySync/dir' );
   dstPath  = test.context.pathFor( 'written/softLinkToParentDirectorySync/dir/link' );
@@ -26670,7 +26659,7 @@ function softLinkToParentDirectorySync( test )
   test.is( provider.isSoftLink( dstPath ) );
   test.is( provider.isDir( srcPath ) );
   test.identical( provider.pathResolveSoftLink( dstPath ),  srcPath );
-  
+
   test.case = 'src relative';
   srcPath  = test.context.pathFor( 'written/softLinkToParentDirectorySync/dir' );
   dstPath  = test.context.pathFor( 'written/softLinkToParentDirectorySync/dir/link' );
@@ -26684,7 +26673,7 @@ function softLinkToParentDirectorySync( test )
   test.is( provider.isSoftLink( dstPath ) );
   test.is( provider.isDir( srcPath ) );
   test.identical( provider.pathResolveSoftLink( dstPath ),  test.context.globalFromPreferred( '..' ) );
-  
+
   test.case = 'dir -> link -> link';
   srcPath  = test.context.pathFor( 'written/softLinkToParentDirectorySync/dir' );
   dstPath  = test.context.pathFor( 'written/softLinkToParentDirectorySync/dir/link' );
@@ -26707,7 +26696,7 @@ function softLinkToParentDirectorySync( test )
   test.is( provider.isDir( srcPath ) );
   test.identical( provider.pathResolveSoftLink( dst2Path ), dstPath  );
   test.identical( provider.pathResolveLinkFull( dst2Path ).filePath, srcPath );
-  
+
   test.case = 'dir -> link -> link, relative paths';
   srcPath  = test.context.pathFor( 'written/softLinkToParentDirectorySync/dir' );
   dstPath  = test.context.pathFor( 'written/softLinkToParentDirectorySync/dir/link' );
@@ -26730,7 +26719,7 @@ function softLinkToParentDirectorySync( test )
   test.is( provider.isDir( srcPath ) );
   test.identical( provider.pathResolveSoftLink( dst2Path ), test.context.globalFromPreferred( '..' )  );
   test.identical( provider.pathResolveLinkFull( dst2Path ).filePath, srcPath  );
-  
+
   test.case = 'dir -> link -> link';
   srcPath  = test.context.pathFor( 'written/softLinkToParentDirectorySync/dir' );
   dstPath  = test.context.pathFor( 'written/softLinkToParentDirectorySync/dir/link' );
@@ -26781,15 +26770,15 @@ function softLinkToParentDirectoryAsync( test )
   var routinePath = test.context.pathFor( 'written/softLinkToParentDirectoryAsync' );
   var srcPath,dstPath,dst2Path;
   var con = new _.Consequence().take( null )
-  
-  .then( () => 
+
+  .then( () =>
   {
     if( !provider.statResolvedRead( routinePath ) )
     provider.dirMake( routinePath )
     return null;
   })
-  
-  .then( () => 
+
+  .then( () =>
   {
     test.case = 'absolute paths';
     srcPath  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir' );
@@ -26801,7 +26790,7 @@ function softLinkToParentDirectoryAsync( test )
       dstPath,
       sync : 0,
     })
-    .then( () => 
+    .then( () =>
     {
       test.is( provider.isSoftLink( dstPath ) );
       test.is( provider.isDir( srcPath ) );
@@ -26809,8 +26798,8 @@ function softLinkToParentDirectoryAsync( test )
       return null;
     })
   })
-  
-  .then( () => 
+
+  .then( () =>
   {
     test.case = 'absolute paths';
     srcPath  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir' );
@@ -26822,7 +26811,7 @@ function softLinkToParentDirectoryAsync( test )
       dstPath,
       sync : 0,
     })
-    .then( () => 
+    .then( () =>
     {
       test.is( provider.isSoftLink( dstPath ) );
       test.is( provider.isDir( srcPath ) );
@@ -26830,8 +26819,8 @@ function softLinkToParentDirectoryAsync( test )
       return null;
     })
   })
-  
-  .then( () => 
+
+  .then( () =>
   {
     test.case = 'dst relative';
     srcPath  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir' );
@@ -26843,7 +26832,7 @@ function softLinkToParentDirectoryAsync( test )
       dstPath : './link',
       sync : 0,
     })
-    .then( () => 
+    .then( () =>
     {
       test.is( provider.isSoftLink( dstPath ) );
       test.is( provider.isDir( srcPath ) );
@@ -26851,8 +26840,8 @@ function softLinkToParentDirectoryAsync( test )
       return null;
     })
   })
-  
-  .then( () => 
+
+  .then( () =>
   {
     test.case = 'src relative';
     srcPath  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir' );
@@ -26864,7 +26853,7 @@ function softLinkToParentDirectoryAsync( test )
       dstPath,
       sync : 0,
     })
-    .then( () => 
+    .then( () =>
     {
       test.is( provider.isSoftLink( dstPath ) );
       test.is( provider.isDir( srcPath ) );
@@ -26872,8 +26861,8 @@ function softLinkToParentDirectoryAsync( test )
       return null;
     })
   })
-  
-  .then( () => 
+
+  .then( () =>
   {
     test.case = 'dir -> link -> link';
     srcPath  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir' );
@@ -26886,7 +26875,7 @@ function softLinkToParentDirectoryAsync( test )
       dstPath,
       sync : 0,
     })
-    .then( () => 
+    .then( () =>
     {
       return provider.softLink
       ({
@@ -26895,7 +26884,7 @@ function softLinkToParentDirectoryAsync( test )
         sync : 0,
       });
     })
-    .then( () => 
+    .then( () =>
     {
       test.is( provider.isSoftLink( dstPath ) );
       test.is( provider.isSoftLink( dst2Path ) );
@@ -26905,8 +26894,8 @@ function softLinkToParentDirectoryAsync( test )
       return null;
     })
   })
-  
-  .then( () => 
+
+  .then( () =>
   {
     test.case = 'dir -> link -> link, relative paths';
     srcPath  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir' );
@@ -26919,7 +26908,7 @@ function softLinkToParentDirectoryAsync( test )
       dstPath,
       sync : 0,
     })
-    .then( () => 
+    .then( () =>
     {
       return provider.softLink
       ({
@@ -26928,7 +26917,7 @@ function softLinkToParentDirectoryAsync( test )
         sync : 0,
       });
     })
-    .then( () => 
+    .then( () =>
     {
       test.is( provider.isSoftLink( dstPath ) );
       test.is( provider.isSoftLink( dst2Path ) );
@@ -26938,8 +26927,8 @@ function softLinkToParentDirectoryAsync( test )
       return null;
     })
   })
-  
-  .then( () => 
+
+  .then( () =>
   {
     test.case = 'dir -> link -> link, relative paths';
     srcPath  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir' );
@@ -26952,7 +26941,7 @@ function softLinkToParentDirectoryAsync( test )
       dstPath,
       sync : 0,
     })
-    .then( () => 
+    .then( () =>
     {
       return provider.softLink
       ({
@@ -26962,7 +26951,7 @@ function softLinkToParentDirectoryAsync( test )
         sync : 0,
       });
     })
-    .then( () => 
+    .then( () =>
     {
       test.is( provider.isSoftLink( dstPath ) );
       test.is( provider.isSoftLink( dst2Path ) );
@@ -26972,7 +26961,7 @@ function softLinkToParentDirectoryAsync( test )
       return null;
     })
   })
-  
+
   return con;
 }
 
@@ -33542,7 +33531,7 @@ function hardLinkResolvingBasic( test )
   let src2Path = test.context.pathFor( 'written/hardLinkResolvingBasic/src2' );
   let src3Path = test.context.pathFor( 'written/hardLinkResolvingBasic/src3' );
   let dstPath = test.context.pathFor( 'written/hardLinkResolvingBasic/dst' );
-  
+
   let hardLinked = true;
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) && !provider.UsingBigIntForStat )
   hardLinked = _.maybe;
@@ -33667,7 +33656,7 @@ function hardLinkGlobal( test )
   var dstPathSecond = 'second://' + dstPath;
 
   var dstPathUnknown = 'unknown://' + dstPath;
-  
+
   let hardLinked = true;
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) && !provider.UsingBigIntForStat )
   hardLinked = _.maybe;
@@ -33755,7 +33744,7 @@ function hardLinkRelativeSoftLinking( test )
   let src2Path = test.context.pathFor( 'written/hardLinkRelativeSoftLinking/src2' );
   let src3Path = test.context.pathFor( 'written/hardLinkRelativeSoftLinking/src3' );
   let dstPath = test.context.pathFor( 'written/hardLinkRelativeSoftLinking/dst' );
-  
+
   let hardLinked = true;
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) && !provider.UsingBigIntForStat )
   hardLinked = _.maybe;
@@ -34090,7 +34079,7 @@ test.identical( provider.pathResolveSoftLink( dstPath ),  test.context.globalFro
   test.is( provider.isTerminal( dstPath ) );
   test.is( provider.isTerminal( src3Path ) );
   test.identical( provider.filesAreHardLinked([ dstPath, src3Path ]), hardLinked );
-  
+
 
   /*  */
 
@@ -34150,7 +34139,7 @@ function hardLinkRelativeTextLinking( test )
   let src2Path = test.context.pathFor( 'written/hardLinkRelativeTextLinking/src2' );
   let src3Path = test.context.pathFor( 'written/hardLinkRelativeTextLinking/src3' );
   let dstPath = test.context.pathFor( 'written/hardLinkRelativeTextLinking/dst' );
-  
+
   let hardLinked = true;
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) && !provider.UsingBigIntForStat )
   hardLinked = _.maybe;
@@ -34487,7 +34476,7 @@ function hardLinkRelativeTextLinking( test )
   test.is( provider.isTerminal( dstPath ) );
   test.is( provider.isTerminal( src3Path ) );
   test.identical( provider.filesAreHardLinked([ dstPath, src3Path ]), hardLinked );
-  
+
 
   /*  */
 
@@ -41093,7 +41082,7 @@ function recordStat( test )
   let self = this;
   let system = self.system || self.provider;
   let providerEffective = self.providerEffective || self.provider;
-  
+
   test.is( providerEffective.system === system );
   test.is( _.longHas( _.mapKeys( system.providersWithProtocolMap ), providerEffective.protocol ) );
 
@@ -48742,7 +48731,7 @@ var Self =
   abstract : 1,
   silencing : 1,
   // verbosity : 7,
-  
+
   routineTimeOut : 60000,
 
   onSuiteBegin,
@@ -48767,7 +48756,7 @@ var Self =
 
     readWriteSync,
     readWriteAsync,
-    
+
     fileWriteActSync,
     fileWriteActAsync,
 
@@ -48956,7 +48945,7 @@ var Self =
     //static
 
     EncodersGenerate
-    
+
   },
 
 };

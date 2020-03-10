@@ -2,19 +2,10 @@
 
 'use strict';
 
-// let toBuffer = null;
-// let Os = null;
-
 if( typeof module !== 'undefined' )
 {
 
   require( '../UseBase.s' );
-
-  // Os = require( 'os' );
-
-  let _ = _global_.wTools;
-
-  _.include( 'wPathBasic' );
 
 }
 

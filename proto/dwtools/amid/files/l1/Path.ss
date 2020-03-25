@@ -496,7 +496,7 @@ close /dir1
 
 //   if( !o.name )
 //   o.name = 'tmp';
-//   o.name = o.name + '-' + _.idWithDate() + '.tmp';
+//   o.name = o.name + '-' + _.idWithDateAndTime() + '.tmp';
 
 //   if( devicePathGet( osTempDir ) === devicePathGet( o.filePath ) )
 //   {
@@ -585,7 +585,7 @@ function pathDirTempMake( o )
 
   if( !o.name )
   o.name = 'tmp';
-  o.name = o.name + '-' + _.idWithDate() + '.tmp';
+  o.name = o.name + '-' + _.idWithDateAndTime() + '.tmp';
 
   let osTempDir = self.dirTemp();
 
@@ -1053,7 +1053,7 @@ function pathDirTempClose( filePath )
 //   if( !o.name )
 //   o.name = 'tmp';
 //   let namespace = o.name;
-//   o.name = o.name + '-' + _.idWithDate() + '.tmp';
+//   o.name = o.name + '-' + _.idWithDateAndTime() + '.tmp';
 
 //   let osTempDir = self.dirTemp();
 

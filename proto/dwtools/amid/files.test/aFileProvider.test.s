@@ -28946,7 +28946,7 @@ function hardLinkMultipleSync( test )
 
   function makeHardLinksToPath( filePath, amount )
   {
-    let routinePath = path.join( self.provider.path.dir( filePath ), _.idWithDate() );
+    let routinePath = path.join( self.provider.path.dir( filePath ), _.idWithDateAndTime() );
     provider.dirMake( routinePath )
     for( var i = 0; i < amount; i++ )
     provider.hardLink( path.join( routinePath, 'file' + i ), filePath );
@@ -29671,7 +29671,7 @@ function hardLinkExperiment( test )
 
   function makeHardLinksToPath( filePath, amount )
   {
-    let routinePath = path.join( self.provider.path.dir( filePath ), _.idWithDate() );
+    let routinePath = path.join( self.provider.path.dir( filePath ), _.idWithDateAndTime() );
     provider.dirMake( routinePath )
     for( var i = 0; i < amount; i++ )
     provider.hardLink( path.join( routinePath, 'file' + i ), filePath );
@@ -30384,7 +30384,7 @@ function hardLinkAsync( test )
 
   function makeHardLinksToPath( filePath, amount )
   {
-    let routinePath = path.join( self.provider.path.dir( filePath ), _.idWithDate() );
+    let routinePath = path.join( self.provider.path.dir( filePath ), _.idWithDateAndTime() );
     provider.dirMake( routinePath )
     for( var i = 0; i < amount; i++ )
     provider.hardLink( path.join( routinePath, 'file' + i ), filePath );

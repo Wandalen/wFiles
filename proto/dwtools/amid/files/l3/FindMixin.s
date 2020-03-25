@@ -4828,7 +4828,7 @@ function filesDelete_body( o )
     }
 
     let late = [];
-    let deleteDirName = 'delete' + '-' + _.idWithDate();
+    let deleteDirName = 'delete' + '-' + _.idWithDateAndTime();
     for( let f = o.result.length-1 ; f >= 0 ; f-- )
     {
       let record = o.result[ f ];

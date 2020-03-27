@@ -7,7 +7,7 @@ let File, StandardFile, Os, LockFile;
 if( typeof module !== 'undefined' )
 {
 
-  let _ = require( '../../../Tools.s' );
+  let _ = require( '../../../../dwtools/Tools.s' );
   if( !_.FileProvider )
   require( '../UseMid.s' );
 

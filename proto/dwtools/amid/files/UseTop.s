@@ -12,7 +12,7 @@
  */
 
 /**
- * @namespace Tools( module::Files )
+ * @namespace Tools.Files 
  * @memberof module:Tools/mid/Files
  */
 

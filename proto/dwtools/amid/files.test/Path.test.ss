@@ -1274,7 +1274,7 @@ program();
 `
 
   a.fileProvider.fileWrite( a.abs( 'Program.js' ), programSourceCode );
-  a.jsNonThrowing({ execPath : a.abs( 'Program.js' ) })
+  a.appStartNonThrowing({ execPath : a.abs( 'Program.js' ) })
   .then( ( op ) =>
   {
     test.identical( _.strCount( op.output, 'tempDirCreated' ), 1 );
@@ -1764,7 +1764,7 @@ var Self =
     suiteTempPath : null,
     isBrowser : null,
     assetsOriginalSuitePath : null,
-    execJsPath : null,
+    appJsPath : null,
 
     createTestsDirectory,
     createInTD,

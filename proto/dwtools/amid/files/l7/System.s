@@ -15,7 +15,8 @@ if( typeof module !== 'undefined' )
 /**
  @classdesc Class that allows file manipulations between different file providers using global paths.
  @class wFileSystem
- @memberof module:Tools/mid/Files.wTools.FileProvider
+ @namespace wTools.FileProvider
+ @module Tools/mid/Files
 */
 
 let _global = _global_;
@@ -75,7 +76,9 @@ function init( o )
  @description Sets default provider to `null` if no argument provided.
  @param {Object} [provider] Provider to set as default.
  @function providerDefaultSet
- @memberof module:Tools/mid/Files.wTools.FileProvider.wFileSystem#
+ @class wTools.FileProvider.wFileSystem
+ @namespace wTools.FileProvider
+ @module Tools/mid/Files
 */
 
 function providerDefaultSet( provider )
@@ -111,7 +114,9 @@ function providerDefaultSet( provider )
  @summary Short-cut for {@link module:Tools/mid/Files.wTools.FileProvider.wFileSystem.providerRegister}. Registers several file providers.
  @param {Object|Object[]} fileProvider Provider(s) to register.
  @function providerRegister
- @memberof module:Tools/mid/Files.wTools.FileProvider.wFileSystem#
+ @class wTools.FileProvider.wFileSystem
+ @namespace wTools.FileProvider
+ @module Tools/mid/Files
 */
 
 //
@@ -139,7 +144,9 @@ function providersRegister( src )
  @description Provider should have protocol and origin path defined.
  @param {Object} fileProvider Provider to register.
  @function providerRegister
- @memberof module:Tools/mid/Files.wTools.FileProvider.wFileSystem#
+ @class wTools.FileProvider.wFileSystem
+ @namespace wTools.FileProvider
+ @module Tools/mid/Files
 */
 
 function providerRegister( fileProvider ) // xxx
@@ -179,7 +186,9 @@ function providerRegister( fileProvider ) // xxx
  @description Provider must be registered in current system.
  @param {Object} fileProvider Provider to unregister.
  @function providerUnregister
- @memberof module:Tools/mid/Files.wTools.FileProvider.wFileSystem#
+ @class wTools.FileProvider.wFileSystem
+ @namespace wTools.FileProvider
+ @module Tools/mid/Files
 */
 
 function providerUnregister( fileProvider )
@@ -204,7 +213,9 @@ function providerUnregister( fileProvider )
  @description Returns default file provider if system doesn't have provider for specified path.
  @param {String} url Source url.
  @function providerForPath
- @memberof module:Tools/mid/Files.wTools.FileProvider.wFileSystem#
+ @class wTools.FileProvider.wFileSystem
+ @namespace wTools.FileProvider
+ @module Tools/mid/Files
 */
 
 function providerForPath( url )
@@ -268,7 +279,9 @@ function protocolNameGenerate( skip )
  @summary Returns true if current system has specified file `provider` in the registry.
  @param {Object} provider File provider to check.
  @function hasProvider
- @memberof module:Tools/mid/Files.wTools.FileProvider.wFileSystem#
+ @class wTools.FileProvider.wFileSystem
+ @namespace wTools.FileProvider
+ @module Tools/mid/Files
 */
 
 function hasProvider( provider )
@@ -391,7 +404,9 @@ function fieldPop()
  @summary Converts global path `filePath` to local.
  @param {String} filePath Global path.
  @function preferredFromGlobalAct
- @memberof module:Tools/mid/Files.wTools.FileProvider.wFileSystem#
+ @class wTools.FileProvider.wFileSystem
+ @namespace wTools.FileProvider
+ @module Tools/mid/Files
 */
 
 function preferredFromGlobalAct( filePath )
@@ -480,7 +495,9 @@ function pathNativizeAct( filePath )
  @summary Returns current working directory of default provider.
  @description Changes current working directory if new path is provided.
  @function pathCurrentAct
- @memberof module:Tools/mid/Files.wTools.FileProvider.wFileSystem#
+ @class wTools.FileProvider.wFileSystem
+ @namespace wTools.FileProvider
+ @module Tools/mid/Files
 */
 
 function pathCurrentAct()
@@ -1289,7 +1306,9 @@ let defaultOriginSymbol = Symbol.for( 'defaultOrigin' );
  * @property {Object} providersWithProtocolMap={}
  * @property {Object} defaultProvider
  * @property {Boolean} safe=0
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileSystem
+ * @class wFileSystem
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
 */
 
 /**
@@ -1297,7 +1316,9 @@ let defaultOriginSymbol = Symbol.for( 'defaultOrigin' );
  * @property {Boolean} empty=0
  * @property {Object[]} providers
  * @property {String} defaultOrigin
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileSystem
+ * @class wFileSystem
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
 */
 
 let Composes =

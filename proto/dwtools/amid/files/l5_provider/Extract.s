@@ -31,7 +31,8 @@ _.assert( !_.FileProvider.Extract );
  where folders are nested objects with same depth level as in real folder and contains some files that are properties
  with corresponding names and file content as a values.
  @class wFileProviderExtract
- @memberof module:Tools/mid/Files.wTools.FileProvider
+ @namespace wTools.FileProvider
+ @module Tools/mid/Files
 */
 
 let Parent = Partial;
@@ -65,7 +66,9 @@ function init( o )
  * @description Changes current path to `path` if argument is provided.
  * @param {String} [path] New current path.
  * @function pathCurrentAct
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderExtract#
+ * @class wFileProviderExtract
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
 */
 
 function pathCurrentAct()
@@ -97,7 +100,9 @@ function pathCurrentAct()
  * @param {Boolean} o.resolvingMultiple=0 Resolves chain of terminal links.
  * @param {Boolean} o.resolvingIntermediateDirectories=0 Resolves intermediate soft links.
  * @function pathResolveSoftLinkAct
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderExtract#
+ * @class wFileProviderExtract
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
 */
 
 function pathResolveSoftLinkAct( o )
@@ -184,7 +189,9 @@ _.routineExtend( pathResolveSoftLinkAct, Parent.prototype.pathResolveSoftLinkAct
  * @param {Boolean} o.resolvingMultiple=0 Resolves chain of text links.
  * @param {Boolean} o.resolvingIntermediateDirectories=0 Resolves intermediate text links.
  * @function pathResolveTextLinkAct
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderExtract#
+ * @class wFileProviderExtract
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
 */
 
 function pathResolveTextLinkAct( o )
@@ -283,7 +290,9 @@ _.routineExtend( pathResolveTextLinkAct, Parent.prototype.pathResolveTextLinkAct
  * @param {Boolean} o.resolvingSoftLink Enable resolving of soft links.
  * @param {String} o.sync Determines how to read a file, synchronously or asynchronously.
  * @function fileReadAct
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderExtract#
+ * @class wFileProviderExtract
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
 */
 
 function fileReadAct( o )
@@ -2612,7 +2621,8 @@ writeEncoders[ 'original.type' ] =
  * @property {Array} protocols
  * @property {Boolean} safe
  * @property {Object} filesTree
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderExtract
+ * @namespace wTools.FileProvider
+ @module Tools/mid/Files
  */
 
 let Composes =

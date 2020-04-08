@@ -31,7 +31,8 @@ _.assert( _.routineIs( fileRead ) );
 /**
  @classdesc Mixin to add operations on group of files with very specific purpose. For example, it has a method to search for text in files.
  @class wFileProviderSecondary
- @memberof module:Tools/mid/Files.wTools.FileProvider
+ @namespace wTools.FileProvider
+ @module Tools/mid/Files
 */
 
 let Parent = null;
@@ -387,7 +388,9 @@ function _filesReadOldAsync( o )
 //  * @param {String} dst Destination path.
 //  * @returns {Boolean} Returns result of comparison as boolean.
 //  * @function filesAreUpToDate
-//  * @memberof module:Tools/mid/Files.wFileProviderSecondary#
+//  * @class wFileProviderSecondary
+// * @namespace wTools.FileProvider
+// * @module Tools/mid/Files
 //  */
 //
 // function filesAreUpToDate( dst, src )
@@ -477,7 +480,9 @@ function _filesReadOldAsync( o )
  * @returns {boolean}
  * @throws {Error} If passed object has unexpected parameter.
  * @function filesAreUpToDate2
- * @memberof module:Tools/mid/Files.wFileProviderSecondary#
+ * @class wFileProviderSecondary
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
  */
 
 /*
@@ -611,7 +616,9 @@ var filesAreUpToDate2 = _.routineFromPreAndBody( filesAreUpToDate2_pre, filesAre
 /**
  * @summary Calculates date resolution time in milliseconds for current file system.
  * @function systemBitrateTimeGet
- * @memberof module:Tools/mid/Files.wFileProviderSecondary#
+ * @class wFileProviderSecondary
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
  */
 
 function systemBitrateTimeGet()
@@ -868,7 +875,9 @@ _configRead2.defaults = configRead2.defaults;
  * @param {Array|String} o.filePath Source paths.
  * @param {String} o.outputFormat='array', Possible formats: array, map.
  * @function configFind
- * @memberof module:Tools/mid/Files.wFileProviderSecondary#
+ * @class wFileProviderSecondary
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
  */
 
 /*
@@ -985,7 +994,9 @@ qqq : add test
  * @param {Array|Object} o.found Container to store found config files.
  * @param {String} o.many='all' Checks if each of files `o.filePath` have at least one config file.
  * @function configRead
- * @memberof module:Tools/mid/Files.wFileProviderSecondary#
+ * @class wFileProviderSecondary
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
  */
 
 function configRead_body( o )
@@ -1138,7 +1149,9 @@ configUserRead.defaults =
  * @param {String} o.prefix Inserts this string before source code.
  * @param {String} o.postfix Inserts this string after source code.
  * @function fileCodeRead
- * @memberof module:Tools/mid/Files.wFileProviderSecondary#
+ * @class wFileProviderSecondary
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
  */
 
 function fileCodeRead_body( o )

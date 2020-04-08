@@ -13,7 +13,8 @@ if( typeof module !== 'undefined' )
 
 /**
  * @class wFileRecordContext
- * @memberof module:Tools/mid/Files
+ * @namespace wTools
+ * @module Tools/mid/Files
 */
 
 let _global = _global_;
@@ -47,7 +48,9 @@ _.assert( !_.FileRecordContext );
  * @summary Creates factory instance ignoring unknown options.
  * @param {Object} o Options map.
  * @function TolerantFrom
- * @memberof module:Tools/mid/Files.wFileRecordContext
+ * @class wFileRecordContext
+ * @namespace wTools
+ * @module Tools/mid/Files
 */
 
 function TolerantFrom( o )
@@ -208,7 +211,9 @@ function _formAssociations()
 
 /**
  * @typedef {Object} Fields
- * @memberof module:Tools/mid/Files.wFileRecordContext
+ * @class wFileRecordContext
+ * @namespace wTools
+ * @module Tools/mid/Files
 */
 
 let Composes =

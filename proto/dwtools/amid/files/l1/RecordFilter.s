@@ -3584,87 +3584,87 @@ allPaths.defaults =
   inplace : 1,
 }
 
+// //
 //
-
-function isRelative( o )
-{
-  let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
-  let thePath;
-
-  o = _.routineOptions( isRelative, arguments );
-
-  _.assert( 0, 'not tested' );
-
-  let o2 = _.mapExtend( null, o );
-  o2.onEach = onEach;
-  o2.inplace = 0;
-
-  return filter.allPaths( o2 );
-
-  /* - */
-
-  function onEach( element, it )
-  {
-    debugger;
-    _.assert( 0, 'not tested' );
-    if( it.value === null )
-    return;
-    if( path.isRelative( it.value ) )
-    return;
-    // it.value = false; // yyy
-    return it.value;
-  }
-
-}
-
-isRelative.defaults =
-{
-  fixes : 1,
-  basePath : 1,
-  // filePath : 1,
-  filePath : 1,
-}
-
+// function isRelative( o )
+// {
+//   let filter = this;
+//   let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+//   let path = fileProvider.path;
+//   let thePath;
 //
-
-function sureRelative( o )
-{
-  let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
-
-  o = _.routineOptions( sureRelative, arguments );
-
-  _.assert( 0, 'not tested' );
-
-  let o2 = _.mapExtend( null, o );
-  o2.onEach = onEach;
-  o2.inplace = 0;
-
-  return filter.allPaths( o2 );
-
-  /* - */
-
-  function onEach( element, it )
-  {
-    _.sure
-    (
-      it.value === null || path.isRelative( it.value ),
-      () => 'Filter should have relative ' + it.fieldName + ', but has  ' + _.toStr( it.value )
-    );
-  }
-
-}
-
-sureRelative.defaults =
-{
-  fixes : 1,
-  basePath : 1,
-  // filePath : 1,
-  filePath : 1,
-}
+//   o = _.routineOptions( isRelative, arguments );
+//
+//   // _.assert( 0, 'not tested' );
+//
+//   let o2 = _.mapExtend( null, o );
+//   o2.onEach = onEach;
+//   o2.inplace = 0;
+//
+//   return filter.allPaths( o2 );
+//
+//   /* - */
+//
+//   function onEach( element, it )
+//   {
+//     debugger;
+//     // _.assert( 0, 'not tested' );
+//     if( it.value === null )
+//     return;
+//     if( path.isRelative( it.value ) )
+//     return;
+//     // it.value = false; // yyy
+//     return it.value;
+//   }
+//
+// }
+//
+// isRelative.defaults =
+// {
+//   fixes : 1,
+//   basePath : 1,
+//   // filePath : 1,
+//   filePath : 1,
+// }
+//
+// //
+//
+// function sureRelative( o )
+// {
+//   let filter = this;
+//   let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+//   let path = fileProvider.path;
+//
+//   o = _.routineOptions( sureRelative, arguments );
+//
+//   _.assert( 0, 'not tested' );
+//
+//   let o2 = _.mapExtend( null, o );
+//   o2.onEach = onEach;
+//   o2.inplace = 0;
+//
+//   return filter.allPaths( o2 );
+//
+//   /* - */
+//
+//   function onEach( element, it )
+//   {
+//     _.sure
+//     (
+//       it.value === null || path.isRelative( it.value ),
+//       () => 'Filter should have relative ' + it.fieldName + ', but has  ' + _.toStr( it.value )
+//     );
+//   }
+//
+// }
+//
+// sureRelative.defaults =
+// {
+//   fixes : 1,
+//   basePath : 1,
+//   // filePath : 1,
+//   filePath : 1,
+// }
 
 //
 
@@ -3674,7 +3674,7 @@ function sureRelativeOrGlobal( o )
   let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
   let path = fileProvider.path;
 
-  o = _.routineOptions( sureRelative, arguments );
+  o = _.routineOptions( sureRelativeOrGlobal, arguments );
 
   let o2 = _.mapExtend( null, o );
   o2.onEach = onEach;
@@ -3697,7 +3697,7 @@ function sureRelativeOrGlobal( o )
 
 }
 
-sureRelative.defaults =
+sureRelativeOrGlobal.defaults =
 {
   fixes : 1,
   basePath : 1,
@@ -4664,8 +4664,8 @@ let Extend =
   // iterative
 
   allPaths,
-  isRelative,
-  sureRelative,
+  // isRelative,
+  // sureRelative,
   sureRelativeOrGlobal,
   sureBasePath,
   assertBasePath,

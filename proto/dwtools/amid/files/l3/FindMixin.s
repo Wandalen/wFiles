@@ -19,7 +19,9 @@ let FileRecord = _.FileRecord;
 
 /**
  @class wFileProviderFind
- @memberof module:Tools/mid/Files.wTools.FileProvider
+ @class FileProvider
+ @namespace wTools
+ @module Tools/mid/Files
 */
 
 let Parent = null;
@@ -677,7 +679,9 @@ let filesFindSingle = _.routineFromPreAndBody( filesFindSingle_pre, filesFindSin
  * @param {} o.onDown=[]
  *
  * @function filesFind
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderFind#
+ * @class wFileProviderFind
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
  */
 
 function filesFind_pre( routine, args )
@@ -1226,7 +1230,9 @@ filesFind.having.aspect = 'entry';
  * @param {} o.onDown=[]
  *
  * @function filesFindRecursive
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderFind#
+ * @class wFileProviderFind
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
  */
 
 function filesFindRecursive_pre( routine, args )
@@ -1282,7 +1288,9 @@ defaults.allowingCycled = 1;
  * @param {} o.onDown=[]
  *
  * @function filesGlob
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderFind#
+ * @class wFileProviderFind
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
  */
 
 function filesGlob( o )
@@ -1332,7 +1340,9 @@ defaults.withTransient = 0;
  * It allows to reuse created routine changing only necessary options and don't worry about other options.
  * @param {Object} o Options map. Please see {@link module:Tools/mid/Files.wTools.FileProvider.wFileProviderFind.filesFind} for options description.
  * @function filesFinder
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderFind#
+ * @class wFileProviderFind
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
  */
 
 function filesFinder_functor( routine )
@@ -4024,7 +4034,9 @@ function filesReflect_pre( routine, args )
  *	1 - rebase link, try to make destination file lead to other destination file if last was handled in same call of filesReflect
  *	2 - rebase and resolve link, try to create copy of a file referenced by a link
  * @function filesReflect
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderFind#
+ * @class wFileProviderFind
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
  */
 
 function filesReflect_body( o )

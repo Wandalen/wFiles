@@ -24,7 +24,8 @@ if( typeof module !== 'undefined' )
 /**
  @classdesc Class to transfer data over http protocol using GET/POST methods. Implementation for a server side.
  @class wFileProviderHttp
- @memberof module:Tools/mid/Files.wTools.FileProvider
+ @namespace wTools.FileProvider
+ @module Tools/mid/Files
 */
 
 let _global = _global_;
@@ -115,7 +116,9 @@ streamReadAct.having = Object.create( Parent.prototype.streamReadAct.having );
  * @param {String} o.advanced.password Password, is used in authorization
  *
  * @function fileReadAct
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHttp#
+ * @class wFileProviderHttp
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
 */
 
 
@@ -424,7 +427,9 @@ let filesReflectSingle = _.routineFromPreAndBody( _.FileProvider.Find.prototype.
  * @param {String} o.advanced.password Password, is used in authorization
  *
  * @function fileCopyToHardDriveAct
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHttp#
+ * @class wFileProviderHttp
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
 */
 
 function fileCopyToHardDriveAct( o )
@@ -511,7 +516,9 @@ fileCopyToHardDriveAct.advanced =
  * @param {String} o.advanced.password Password, is used in authorization
  *
  * @function fileCopyToHardDriveAct
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHttp#
+ * @class wFileProviderHttp
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
 */
 
 function fileCopyToHardDrive( o )
@@ -645,7 +652,9 @@ fileReadAct.encoders = WriteEncoders;
  * @param {Boolean} usingSoftLink=0
  * @param {Boolean} usingTextLink=0
  * @param {Boolean} usingGlobalPath=1
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderHttp
+ * @class wFileProviderHttp
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
 */
 
 let Composes =

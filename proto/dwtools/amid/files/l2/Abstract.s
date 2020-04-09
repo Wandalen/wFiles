@@ -15,12 +15,13 @@ _.assert( _.routineIs( FileRecordFactory ) );
 
 /**
  * @namespace "wTools.FileProvider"
- * @memberof module:Tools/mid/Files
+ * @module Tools/mid/Files
  */
 
 /**
  * @class wFileProviderAbstract
- * @memberof module:Tools/mid/Files.wTools.FileProvider
+ * @namespace "wTools.FileProvider"
+ * @module Tools/mid/Files
 */
 
 var Parent = null;

@@ -23,7 +23,8 @@ if( typeof module !== 'undefined' )
 
 /**
  * @class wFileStat
- * @memberof module:Tools/mid/Files
+ * @namespace wTools
+ * @module Tools/mid/Files
 */
 
 let _global = _global_;
@@ -61,7 +62,8 @@ function init( o )
  * @summary Returns true if entity `src` is a file stats object.
  * @param {Object} src Entity to check.
  * @function fileStatIs
- * @memberof module:Tools/mid/Files.Tools( module::Files )
+ * @namespace wTools
+ * @module Tools/mid/Files
  */
 
 function fileStatIs( src )
@@ -86,7 +88,8 @@ function fileStatIs( src )
  * @param {Object} stat1 Stat object of first file.
  * @param {Object} stat2 Stat object of second file.
  * @function statsHaveDifferentContent
- * @memberof module:Tools/mid/Files.Tools( module::Files )
+ * @namespace wTools
+ * @module Tools/mid/Files
  */
 
 // function statResolvedReadsCouldHaveSameContent( stat1,stat2 )
@@ -115,7 +118,8 @@ function statsHaveDifferentContent( stat1, stat2 )
  * @param {Object} stat1 Stat object of first file.
  * @param {Object} stat2 Stat object of second file.
  * @function statsAreHardLinked
- * @memberof module:Tools/mid/Files.Tools( module::Files )
+ * @namespace wTools
+ * @module Tools/mid/Files
  */
 
 function statsAreHardLinked( stat1, stat2 )
@@ -174,7 +178,8 @@ function statsAreHardLinked( stat1, stat2 )
  * @summary Generates hash from stat object.
  * @param {Object} stat Stat object.
  * @function statHash2Get
- * @memberof module:Tools/mid/Files.Tools( module::Files )
+ * @namespace wTools
+ * @module Tools/mid/Files
  */
 
 function statHash2Get( stat )
@@ -205,7 +210,9 @@ function statHash2Get( stat )
 /**
  * @summary Returns true if current stats object refers to soft or text link.
  * @function isLink
- * @memberof module:Tools/mid/Files.wFileStat#
+ * @class wFileStat
+ * @namespace wTools
+ * @module Tools/mid/Files
 */
 
 function isLink()
@@ -248,7 +255,9 @@ function returnFalse()
  * @property {Date} ctime
  * @property {Date} birthtime
  * @property {String} filePath
- * @memberof module:Tools/mid/Files.wFileStat
+ * @class wFileStat
+ * @namespace wTools
+ * @module Tools/mid/Files
 */
 
 // --

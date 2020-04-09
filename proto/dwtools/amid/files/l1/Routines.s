@@ -4,7 +4,7 @@
 
 /**
  * @namespace "wTools.files"
- * @memberof module:Tools/mid/Files
+ * @module Tools/mid/Files
  */
 
 let _global = _global_;
@@ -43,7 +43,8 @@ _.assert( _.routineIs( _.FileRecord ) );
  * @throws {Error} if passed more than one argument.
  * @see {@link wTools~RegexpObject} RegexpObject
  * @function regexpAllSafe
- * @memberof module:Tools/mid/Files.wTools.files
+ * @namespace wTools.files
+ * @module Tools/mid/Files
  */
 
 function regexpAllSafe( mask )
@@ -155,7 +156,8 @@ function filterSafer( filter )
  * @throws {Error} If passed extra arguments
  * @throws {Error} If missed `PathFiile`
  * @function _fileOptionsGet
- * @memberof module:Tools/mid/Files.wTools.files
+ * @namespace wTools.files
+ * @module Tools/mid/Files
  */
 
 function _fileOptionsGet( filePath,o )
@@ -208,7 +210,8 @@ function _fileOptionsGet( filePath,o )
  * @returns {string|File.Stats}
  * @throws {Error} if type of one of arguments is not string/file.Stats
  * @function filesNewer
- * @memberof @memberof module:Tools/mid/Files.wTools.files
+ * @namespace wTools.files
+ * @module Tools/mid/Files
  */
 
 function filesNewer( dst,src )
@@ -272,7 +275,8 @@ function filesNewer( dst,src )
  * @returns {string|File.Stats}
  * @throws {Error} if type of one of arguments is not string/file.Stats
  * @function filesOlder
- * @memberof module:Tools/mid/Files.wTools.files
+ * @namespace wTools.files
+ * @module Tools/mid/Files
  */
 
 function filesOlder( dst,src )
@@ -328,7 +332,8 @@ function filesOlder( dst,src )
  * @throws {Error} If count of arguments are different from one.
  * @throws {Error} If `src` is not absolute path or FileRecord.
  * @function filesSpectre
- * @memberof module:Tools/mid/Files.wTools.files
+ * @namespace wTools.files
+ * @module Tools/mid/Files
 */
 
 function filesSpectre( src )
@@ -369,7 +374,8 @@ function filesSpectre( src )
  * @param {Function} [onReady]
  * @returns {number}
  * @function filesSimilarity
- * @memberof module:Tools/mid/Files.wTools.files
+ * @namespace wTools.files
+ * @module Tools/mid/Files
 */
 
 function filesSimilarity( o )

@@ -1,6 +1,6 @@
 // ( function _RemoteClient_s_() {
 //
-// 'use strict'; 
+// 'use strict';
 //
 // if( typeof module !== 'undefined' )
 // {
@@ -667,7 +667,7 @@
 //  * @throws {Error} If filePath is not string.
 //  * @throws {Error} If options map has unexpected property.
 //  * @method fileDeleteAct
-//  * @memberof wTools
+//  * @namespace wTools
 //  */
 //
 // function fileDeleteAct( o )
@@ -753,7 +753,7 @@
 //  * @throws {Error} If filePath is not string.
 //  * @throws {Error} If options map has unexpected property.
 //  * @method fileDelete
-//  * @memberof wTools
+//  * @namespace wTools
 //  */
 //
 // function fileDelete( o )
@@ -991,7 +991,7 @@
 //  * @throws { exception } If no argument provided.
 //  * @throws { exception } If ( o.rewriting ) is false and any file prevents making dir.
 //  * @throws { exception } If ( o.force ) is false and one dir is not enough to complete folders structure or folder already exists.
-//  * @memberof wTools
+//  * @namespace wTools
 //  */
 //
 // function dirMake( o )

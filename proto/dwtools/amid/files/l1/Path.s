@@ -63,7 +63,8 @@ function _vectorizeKeysAndVals( routine, select )
  * @throws {Error} If missed argument, or passed more then one.
  * @throws {Error} If type of argument is not string or wFileRecord.
  * @function from
- * @memberof module:Tools/PathBasic.wTools.path
+ * @namespace wTools.path
+ * @module Tools/mid/Files
  */
 
 function from( src )
@@ -85,7 +86,8 @@ function from( src )
  * @summary Converts source path `src` to platform-specific path.
  * @param {String} src Source path.
  * @function nativize
- * @memberof module:Tools/PathBasic.wTools.path
+ * @namespace wTools.path
+ * @module Tools/mid/Files
 */
 
 function nativize( src )
@@ -106,7 +108,8 @@ function nativize( src )
  * @throws {Error} If passed more than one argument.
  * @throws {Error} If passed path to not exist directory.
  * @function current
- * @memberof module:Tools/PathBasic.wTools.path
+ * @namespace wTools.path
+ * @module Tools/mid/Files
  */
 
 function current()
@@ -155,7 +158,8 @@ function current()
  * @summary Converts global path `globalPath` to local.
  * @param {String} globalPath Source path.
  * @function preferredFromGlobal
- * @memberof module:Tools/PathBasic.wTools.path
+ * @namespace wTools.path
+ * @module Tools/mid/Files
 */
 
 function preferredFromGlobal( globalPath )
@@ -171,7 +175,8 @@ function preferredFromGlobal( globalPath )
  * @summary Converts local path `localPath` to global.
  * @param {String} localPath Source path.
  * @function globalFromPreferred
- * @memberof module:Tools/PathBasic.wTools.path
+ * @namespace wTools.path
+ * @module Tools/mid/Files
 */
 
 function globalFromPreferred( localPath )

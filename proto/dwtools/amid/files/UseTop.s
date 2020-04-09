@@ -12,8 +12,8 @@
  */
 
 /**
- * @namespace Tools.Files 
- * @memberof module:Tools/mid/Files
+ * @namespace "Tools.files"
+ * @module Tools/mid/Files
  */
 
 if( typeof module !== 'undefined' )

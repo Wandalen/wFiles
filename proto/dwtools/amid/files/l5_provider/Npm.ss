@@ -29,7 +29,8 @@ let _ = _global_.wTools;
 
 /**
  @class wFileProviderNpm
- @memberof module:Tools/mid/Files.wTools.FileProvider
+ @namespace wTools.FileProvider
+ @module Tools/mid/Files
 */
 
 let Parent = _.FileProvider.Partial;
@@ -74,14 +75,18 @@ function init( o )
  * @property {String} localVcsPath
  * @property {String} remoteVcsPath
  * @property {String} longerRemoteVcsPath
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm
+ * @class wFileProviderNpm
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
  */
 
 /**
  * @summary Parses provided `remotePath` and returns object with components {@link module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm.RemotePathComponents}.
  * @param {String} remotePath Remote path.
  * @function pathParse
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm#
+ * @class wFileProviderNpm
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
  */
 
 function pathParse( remotePath )
@@ -96,7 +101,9 @@ function pathParse( remotePath )
  * @summary Returns true if remote path `filePath` has fixed version of npm package.
  * @param {String} filePath Global path.
  * @function pathIsFixated
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm#
+ * @class wFileProviderNpm
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
  */
 
 function pathIsFixated( filePath )
@@ -113,7 +120,9 @@ function pathIsFixated( filePath )
  * @param {String} o.remotePath Remote path.
  * @param {Number} o.verbosity=0 Level of verbosity.
  * @function pathIsFixated
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm#
+ * @class wFileProviderNpm
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
  */
 
 function pathFixate( o )
@@ -130,7 +139,9 @@ function pathFixate( o )
  * @param {String} o.localPath Path to npm package on hard drive.
  * @param {Number} o.verbosity=0 Level of verbosity.
  * @function versionLocalRetrive
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm#
+ * @class wFileProviderNpm
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
  */
 
 function versionLocalRetrive( o )
@@ -147,7 +158,9 @@ function versionLocalRetrive( o )
  * @param {String} o.remotePath Remote path.
  * @param {Number} o.verbosity=0 Level of verbosity.
  * @function versionRemoteLatestRetrive
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm#
+ * @class wFileProviderNpm
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
  */
 
 function versionRemoteLatestRetrive( o )
@@ -165,7 +178,9 @@ function versionRemoteLatestRetrive( o )
  * @param {String} o.remotePath Remote path.
  * @param {Number} o.verbosity=0 Level of verbosity.
  * @function versionRemoteCurrentRetrive
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm#
+ * @class wFileProviderNpm
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
  */
 
 function versionRemoteCurrentRetrive( o )
@@ -183,7 +198,9 @@ function versionRemoteCurrentRetrive( o )
  * @param {String} o.remotePath Remote path to package.
  * @param {Number} o.verbosity=0 Level of verbosity.
  * @function isUpToDate
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm#
+ * @class wFileProviderNpm
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
  */
 
 function isUpToDate( o )
@@ -200,7 +217,9 @@ function isUpToDate( o )
  * @param {String} o.localPath Local path to package.
  * @param {Number} o.verbosity=0 Level of verbosity.
  * @function hasFiles
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm#
+ * @class wFileProviderNpm
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
  */
 
 function hasFiles( o )
@@ -217,7 +236,9 @@ function hasFiles( o )
  * @param {String} o.localPath Local path to package.
  * @param {Number} o.verbosity=0 Level of verbosity.
  * @function isRepository
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm#
+ * @class wFileProviderNpm
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
  */
 
 function isRepository( o )
@@ -464,7 +485,9 @@ let filesReflectSingle = _.routineFromPreAndBody( _.FileProvider.Find.prototype.
  * @property {Boolean} limitedImplementation=1
  * @property {Boolean} isVcs=1
  * @property {Boolean} usingGlobalPath=1
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderNpm
+ * @class wFileProviderNpm
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
 */
 
 let Composes =

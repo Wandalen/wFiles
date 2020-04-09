@@ -23,7 +23,8 @@ _.assert( _.objectIs( Self ) );
  * Returns path for main module (module that running directly by node).
  * @returns {String}
  * @function realMainFile
- * @memberof module:Tools/PathBasic.wTools.path
+ * @namespace wTools.path
+ * @module Tools/mid/Files
  */
 
 let _pathRealMainFile;
@@ -40,7 +41,8 @@ function realMainFile()
  * Returns path dir name for main module (module that running directly by node).
  * @returns {String}
  * @function realMainDir
- * @memberof module:Tools/PathBasic.wTools.path
+ * @namespace wTools.path
+ * @module Tools/mid/Files
  */
 
 let _pathRealMainDir;
@@ -64,7 +66,8 @@ function realMainDir()
  * @returns {String}
  * @throws {Error} If passed any argument.
  * @function effectiveMainFile
- * @memberof module:Tools/PathBasic.wTools.path
+ * @namespace wTools.path
+ * @module Tools/mid/Files
  */
 
 let effectiveMainFile = ( function effectiveMainFile()
@@ -107,7 +110,8 @@ let effectiveMainFile = ( function effectiveMainFile()
  * @returns {String}
  * @throws {Error} If passed any argument.
  * @function effectiveMainDir
- * @memberof module:Tools/PathBasic.wTools.path
+ * @namespace wTools.path
+ * @module Tools/mid/Files
  */
 
 function effectiveMainDir()
@@ -142,7 +146,8 @@ function resolveTextLink( path )
  * for windows environment variables.
  * @returns {String}
  * @function userHome
- * @memberof module:Tools/PathBasic.wTools.path
+ * @namespace wTools.path
+ * @module Tools/mid/Files
  */
 
 function dirUserHome()
@@ -1367,7 +1372,8 @@ having.aspect = 'body';
  * @throws {Error} If passed object has unexpected property.
  * @throws {Error} If file for `o.path` is not exists.
  * @function forCopy
- * @memberof module:Tools/PathBasic.wTools.path
+ * @namespace wTools.path
+ * @module Tools/mid/Files
  */
 
 let forCopy = _.routineFromPreAndBody( forCopy_pre, forCopy_body );

@@ -16,7 +16,8 @@ if( typeof module !== 'undefined' )
 /**
  * @classdesc Class to create record for a file.
  * @class wFileRecord
- * @memberof module:Tools/mid/Files
+ * @namespace wTools
+ * @module Tools/mid/Files
 */
 
 let _global = _global_;
@@ -101,7 +102,9 @@ function form()
 /**
  * @summary Returns a clone of current file record.
  * @function clone
- * @memberof module:Tools/mid/Files.wFileRecord#
+ * @class wFileRecord
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
 */
 
 function clone( src )
@@ -125,7 +128,9 @@ function clone( src )
  * @summary Creates instance of FileRecord from provided entity `src`.
  * @param {Object|String} src Options map or path to a file.
  * @function From
- * @memberof module:Tools/mid/Files.wFileRecord
+ * @class wFileRecord
+ * @namespace wTools
+ * @module Tools/mid/Files
 */
 
 function From( src )
@@ -139,7 +144,9 @@ function From( src )
  * @summary Creates several instances of FileRecord from provided arguments.
  * @param {Array} src Array with options or paths.
  * @function FromMany
- * @memberof module:Tools/mid/Files.wFileRecord
+ * @class wFileRecord
+ * @namespace wTools
+ * @module Tools/mid/Files
 */
 
 function FromMany( src )
@@ -162,7 +169,9 @@ function FromMany( src )
  * @description Uses current instance if no argument provided.
  * @param {Object} record Instance of FileRecord.
  * @function toAbsolute
- * @memberof module:Tools/mid/Files.wFileRecord#
+ * @class wFileRecord
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
 */
 
 function toAbsolute( record )
@@ -400,7 +409,9 @@ function _statAnalyze()
 /**
  * @summary Resets stats and filter values of current instance.
  * @function reset
- * @memberof module:Tools/mid/Files.wFileRecord#
+ * @class wFileRecord
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
 */
 
 function reset()
@@ -420,7 +431,9 @@ function reset()
  * @summary Changes file extension of current record.
  * @param {String} ext New file extension.
  * @function changeExt
- * @memberof module:Tools/mid/Files.wFileRecord#
+ * @class wFileRecord
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
 */
 
 function changeExt( ext )
@@ -436,7 +449,9 @@ function changeExt( ext )
 /**
  * @summary Returns file hash of current record.
  * @function hashRead
- * @memberof module:Tools/mid/Files.wFileRecord#
+ * @class wFileRecord
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
 */
 
 function hashRead()
@@ -850,7 +865,9 @@ let absoluteSymbol = Symbol.for( 'absolute' );
  * @property {String} input Source path to a file.
  * @property {String} hash Hash of a file.
  * @property {Object} factory Instance of FileRecordFactory.
- * @memberof module:Tools/mid/Files.wFileRecord
+ * @class wFileRecord
+ * @namespace wTools
+ * @module Tools/mid/Files
 */
 
 let Composes =

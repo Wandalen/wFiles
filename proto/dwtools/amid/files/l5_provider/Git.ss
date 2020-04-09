@@ -19,8 +19,9 @@ let _ = _global_.wTools;
 
 /**
  @classdesc Class that allows file manipulations on a git repository. For example, cloning of the repositoty.
-  @class wFileProviderGit
-  @memberof module:Tools/mid/Files.wTools.FileProvider
+ @class wFileProviderGit
+ @namespace wTools.FileProvider
+ @module Tools/mid/Files
 */
 
 let Parent = _.FileProvider.Partial;
@@ -65,14 +66,18 @@ function init( o )
  * @property {String} localVcsPath
  * @property {String} remoteVcsPath
  * @property {String} longerRemoteVcsPath
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderGit
+ * @class wFileProviderGit
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
  */
 
 /**
  * @summary Parses provided `remotePath` and returns object with components {@link module:Tools/mid/Files.wTools.FileProvider.wFileProviderGit.RemotePathComponents}.
  * @param {String} remotePath Remote path.
  * @function pathParse
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderGit#
+ * @class wFileProviderGit
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
  */
 
 function pathParse( remotePath )
@@ -87,7 +92,9 @@ function pathParse( remotePath )
  * @summary Returns true if remote path `filePath` contains hash of specific commit.
  * @param {String} filePath Global path.
  * @function pathIsFixated
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderGit#
+ * @class wFileProviderGit
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
  */
 
 function pathIsFixated( filePath )
@@ -106,7 +113,9 @@ function pathIsFixated( filePath )
  * @param {String} o.remotePath Remote path.
  * @param {Number} o.verbosity=0 Level of verbosity.
  * @function pathFixate
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderGit#
+ * @class wFileProviderGit
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
  */
 
 function pathFixate( o )
@@ -131,7 +140,9 @@ function versionLocalChange( o )
  * @param {String} o.localPath Path to git repository on hard drive.
  * @param {Number} o.verbosity=0 Level of verbosity.
  * @function versionLocalRetrive
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderGit#
+ * @class wFileProviderGit
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
  */
 
 function versionLocalRetrive( o )
@@ -148,7 +159,9 @@ function versionLocalRetrive( o )
  * @param {String} o.remotePath Remote path to git repository.
  * @param {Number} o.verbosity=0 Level of verbosity.
  * @function versionRemoteLatestRetrive
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderGit#
+ * @class wFileProviderGit
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
  */
 
 function versionRemoteLatestRetrive( o )
@@ -166,7 +179,9 @@ function versionRemoteLatestRetrive( o )
  * @param {String} o.remotePath Remote path.
  * @param {Number} o.verbosity=0 Level of verbosity.
  * @function versionRemoteCurrentRetrive
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderGit#
+ * @class wFileProviderGit
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
  */
 
 function versionRemoteCurrentRetrive( o )
@@ -184,7 +199,9 @@ function versionRemoteCurrentRetrive( o )
  * @param {String} o.remotePath Remote path to repository.
  * @param {Number} o.verbosity=0 Level of verbosity.
  * @function isUpToDate
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderGit#
+ * @class wFileProviderGit
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
  */
 
 function isUpToDate( o )
@@ -201,7 +218,9 @@ function isUpToDate( o )
  * @param {String} o.localPath Local path to package.
  * @param {Number} o.verbosity=0 Level of verbosity.
  * @function hasFiles
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderGit#
+ * @class wFileProviderGit
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
  */
 
 function hasFiles( o )
@@ -296,7 +315,7 @@ function filesReflectSingle_body( o )
   // }
 
   let parsed = self.pathParse( srcPath );
-  
+
   if( parsed.hash && !parsed.isFixated )
   {
     // let err = _.err( `Source path: ${_.color.strFormat( String( srcPath ), 'path' )} is fixated, but hash: ${_.color.strFormat( String( parsed.hash ), 'path' ) } doesn't look like commit hash.` )
@@ -413,7 +432,7 @@ function filesReflectSingle_body( o )
     ]);
     ready
     .ifNoErrorThen( function( arg )
-    { 
+    {
       _.assert( arg.length === 2 );
       localChanges = _.strHasAny( arg[ 0 ].output, [ 'Changes to be committed', 'Changes not staged for commit' ] );
       mergeIsNeeded = !_.strHasAny( arg[ 0 ].output, [ 'Your branch is up to date', 'Your branch is up-to-date' ] );
@@ -492,19 +511,19 @@ function filesReflectSingle_body( o )
   /* */
 
   function gitCheckout()
-  { 
+  {
     if( parsed.tag )
-    { 
+    {
       let repoHasTag = _.git.repositoryHasTag({ localPath : dstPath, tag : parsed.tag });
       if( !repoHasTag )
       throw _.err
-      ( 
+      (
         `Specified tag: ${_.strQuote( parsed.tag )} doesn't exist in local and remote copy of the repository.\
         \nLocal path: ${_.color.strFormat( String( dstPath ), 'path' )}\
         \nRemote path: ${_.color.strFormat( String( parsed.remoteVcsPath ), 'path' )}`
       );
     }
-    
+
     let shellOptions =
     {
       execPath : 'git checkout ' + ( parsed.hash || parsed.tag ),
@@ -646,7 +665,9 @@ let filesReflectSingle = _.routineFromPreAndBody( _.FileProvider.Find.prototype.
  * @property {Boolean} limitedImplementation=1
  * @property {Boolean} isVcs=1
  * @property {Boolean} usingGlobalPath=1
- * @memberof module:Tools/mid/Files.wTools.FileProvider.wFileProviderGit
+ * @class wFileProviderGit
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
  */
 
 let Composes =

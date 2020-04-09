@@ -13,7 +13,8 @@ if( typeof module !== 'undefined' )
 
 /**
  * @class wFileRecordFactory
- * @memberof module:Tools/mid/Files
+ * @namespace wTools
+ * @module Tools/mid/Files
 */
 
 let _global = _global_;
@@ -222,7 +223,9 @@ function form()
  * @summary Creates instance of FileRecord.
  * @param {Object} o Options map.
  * @function record
- * @memberof module:Tools/mid/Files.wFileRecordFactory#
+ * @class wFileRecordFactory
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
 */
 
 function record( o )
@@ -258,14 +261,18 @@ function record( o )
  * @summary Creates instances of FileRecord for provided file paths.
  * @param {Array} filePaths Paths to files.
  * @function records
- * @memberof module:Tools/mid/Files.wFileRecordFactory#
+ * @class wFileRecordFactory
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
 */
 
 /**
  * @summary Creates instances of FileRecord for provided file paths ignoring files that don't exist in file system.
  * @param {Array} filePaths Paths to files.
  * @function recordsFiltered
- * @memberof module:Tools/mid/Files.wFileRecordFactory#
+ * @class wFileRecordFactory
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
 */
 
 function recordsFiltered( filePaths )
@@ -428,7 +435,9 @@ let safeSymbol = Symbol.for( 'safe' );
  * @property {Boolean} stating
  * @property {Boolean} resolving
  * @property {Boolean} safe
- * @memberof module:Tools/mid/Files.wFileRecordFactory
+ * @class wFileRecordFactory
+ * @namespace wTools
+ * @module Tools/mid/Files
 */
 
 let Composes =

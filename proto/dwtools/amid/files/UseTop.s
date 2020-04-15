@@ -12,7 +12,7 @@
  */
 
 /**
- * @namespace "Tools.files"
+ * @namespace Tools.files
  * @module Tools/mid/Files
  */
 

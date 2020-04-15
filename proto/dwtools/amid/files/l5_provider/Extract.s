@@ -286,7 +286,7 @@ _.routineExtend( pathResolveTextLinkAct, Parent.prototype.pathResolveTextLinkAct
  * @param {Object} o Options map.
  * @param {String} o.filePath Path to terminal file.
  * @param {String} o.encoding Desired encoding of a file concent.
- * @param {} o.advanced
+ * @param {*} o.advanced
  * @param {Boolean} o.resolvingSoftLink Enable resolving of soft links.
  * @param {String} o.sync Determines how to read a file, synchronously or asynchronously.
  * @function fileReadAct

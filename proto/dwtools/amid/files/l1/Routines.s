@@ -3,7 +3,7 @@
 'use strict';
 
 /**
- * @namespace "wTools.files"
+ * @namespace wTools.files
  * @module Tools/mid/Files
  */
 

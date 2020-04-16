@@ -649,34 +649,34 @@ let filesFindSingle = _.routineFromPreAndBody( filesFindSingle_pre, filesFindSin
  * @returns Returns flat array with FileRecord instances of found files.
  * @param {Object} o Options map.
  *
- * @param {} o.filePath
- * @param {} o.filter
- * @param {} o.withTerminals=1
- * @param {} o.withDirs=0
- * @param {} o.withStem=1
- * @param {} o.withActual=1
- * @param {} o.withTransient=0
- * @param {} o.allowingMissed=0
- * @param {} o.allowingCycled=0
+ * @param {*} o.filePath
+ * @param {*} o.filter
+ * @param {*} o.withTerminals=1
+ * @param {*} o.withDirs=0
+ * @param {*} o.withStem=1
+ * @param {*} o.withActual=1
+ * @param {*} o.withTransient=0
+ * @param {*} o.allowingMissed=0
+ * @param {*} o.allowingCycled=0
  * @param {Boolean} o.revisiting=null Controls how visited files are processed. Possible values:
  *  0 - visit and include each file once
  *	1 - visit and include each file once, break from loop on first links cycle and continue search ignoring file at which cycle begins
  *	2 - visit and include each file once, break from loop on first links cycle and continue search visiting file at which cycle begins
  *	3 - don't keep records of visited files
  *  Defaults: option o.revisiting in set to "1" if links resolving is enabled, otherwise default is "3".
- * @param {} o.resolvingSoftLink=0
- * @param {} o.resolvingTextLink=0
- * @param {} o.maskPreset='default.exclude'
- * @param {} o.outputFormat='record'
- * @param {} o.safe=null
- * @param {} o.sync=1
- * @param {} o.orderingExclusion=[]
- * @param {} o.sortingWithArray
- * @param {} o.verbosity
- * @param {} o.mandatory
- * @param {} o.result=[]
- * @param {} o.onUp=[]
- * @param {} o.onDown=[]
+ * @param {*} o.resolvingSoftLink=0
+ * @param {*} o.resolvingTextLink=0
+ * @param {*} o.maskPreset='default.exclude'
+ * @param {*} o.outputFormat='record'
+ * @param {*} o.safe=null
+ * @param {*} o.sync=1
+ * @param {*} o.orderingExclusion=[]
+ * @param {*} o.sortingWithArray
+ * @param {*} o.verbosity
+ * @param {*} o.mandatory
+ * @param {*} o.result=[]
+ * @param {*} o.onUp=[]
+ * @param {*} o.onDown=[]
  *
  * @function filesFind
  * @class wFileProviderFind
@@ -1206,28 +1206,28 @@ filesFind.having.aspect = 'entry';
  * Includes terminals,directories and transient files into the result array.
  * @param {Object} o Options map.
  *
- * @param {} o.filePath
- * @param {} o.filter
- * @param {} o.withTerminals=1
- * @param {} o.withDirs=1
- * @param {} o.withStem=1
- * @param {} o.withActual=1
- * @param {} o.withTransient=1
- * @param {} o.allowingMissed=1
- * @param {} o.allowingCycled=1
- * @param {} o.resolvingSoftLink=0
- * @param {} o.resolvingTextLink=0
- * @param {} o.maskPreset='default.exclude'
- * @param {} o.outputFormat='record'
- * @param {} o.safe=null
- * @param {} o.sync=1
- * @param {} o.orderingExclusion=[]
- * @param {} o.sortingWithArray
- * @param {} o.verbosity
- * @param {} o.mandatory
- * @param {} o.result=[]
- * @param {} o.onUp=[]
- * @param {} o.onDown=[]
+ * @param {*} o.filePath
+ * @param {*} o.filter
+ * @param {*} o.withTerminals=1
+ * @param {*} o.withDirs=1
+ * @param {*} o.withStem=1
+ * @param {*} o.withActual=1
+ * @param {*} o.withTransient=1
+ * @param {*} o.allowingMissed=1
+ * @param {*} o.allowingCycled=1
+ * @param {*} o.resolvingSoftLink=0
+ * @param {*} o.resolvingTextLink=0
+ * @param {*} o.maskPreset='default.exclude'
+ * @param {*} o.outputFormat='record'
+ * @param {*} o.safe=null
+ * @param {*} o.sync=1
+ * @param {*} o.orderingExclusion=[]
+ * @param {*} o.sortingWithArray
+ * @param {*} o.verbosity
+ * @param {*} o.mandatory
+ * @param {*} o.result=[]
+ * @param {*} o.onUp=[]
+ * @param {*} o.onDown=[]
  *
  * @function filesFindRecursive
  * @class wFileProviderFind
@@ -1264,28 +1264,28 @@ defaults.allowingCycled = 1;
  * Includes terminals,directories into the result array.
  * @param {Object} o Options map.
  *
- * @param {} o.filePath
- * @param {} o.filter
- * @param {} o.withTerminals=1
- * @param {} o.withDirs=1
- * @param {} o.withStem=1
- * @param {} o.withActual=1
- * @param {} o.withTransient=0
- * @param {} o.allowingMissed=0
- * @param {} o.allowingCycled=0
- * @param {} o.resolvingSoftLink=0
- * @param {} o.resolvingTextLink=0
- * @param {} o.maskPreset='default.exclude'
- * @param {} o.outputFormat='absolute'
- * @param {} o.safe=null
- * @param {} o.sync=1
- * @param {} o.orderingExclusion=[]
- * @param {} o.sortingWithArray
- * @param {} o.verbosity
- * @param {} o.mandatory
- * @param {} o.result=[]
- * @param {} o.onUp=[]
- * @param {} o.onDown=[]
+ * @param {*} o.filePath
+ * @param {*} o.filter
+ * @param {*} o.withTerminals=1
+ * @param {*} o.withDirs=1
+ * @param {*} o.withStem=1
+ * @param {*} o.withActual=1
+ * @param {*} o.withTransient=0
+ * @param {*} o.allowingMissed=0
+ * @param {*} o.allowingCycled=0
+ * @param {*} o.resolvingSoftLink=0
+ * @param {*} o.resolvingTextLink=0
+ * @param {*} o.maskPreset='default.exclude'
+ * @param {*} o.outputFormat='absolute'
+ * @param {*} o.safe=null
+ * @param {*} o.sync=1
+ * @param {*} o.orderingExclusion=[]
+ * @param {*} o.sortingWithArray
+ * @param {*} o.verbosity
+ * @param {*} o.mandatory
+ * @param {*} o.result=[]
+ * @param {*} o.onUp=[]
+ * @param {*} o.onDown=[]
  *
  * @function filesGlob
  * @class wFileProviderFind
@@ -4019,7 +4019,7 @@ function filesReflect_pre( routine, args )
  * @param {Boolean} o.dstRewritingOnlyPreserving=0
  * @param {Boolean} o.preservingTime=0
  * @param {Boolean} o.preservingSame=0
- * @param {} o.extral
+ * @param {*} o.extral
  * @param {Boolean} o.revisiting=null Controls how visited files are processed. Possible values:
  *  0 - visit and include each file once
  *	1 - visit and include each file once, break from loop on first links cycle and continue search ignoring file at which cycle begins

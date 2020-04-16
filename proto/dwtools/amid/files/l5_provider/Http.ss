@@ -110,7 +110,7 @@ streamReadAct.having = Object.create( Parent.prototype.streamReadAct.having );
  * @param {Boolean} o.resolvingSoftLink Enable resolving of soft links.
  * @param {String} o.sync Determines how to read a file, synchronously or asynchronously.
  * @param {Object} o.advanced Advanced options for http method
- * @param {} o.advanced.send Data to send.
+ * @param {*} o.advanced.send Data to send.
  * @param {String} o.advanced.method Which http method to use: 'GET' or 'POST'.
  * @param {String} o.advanced.user Username, is used in authorization
  * @param {String} o.advanced.password Password, is used in authorization
@@ -421,7 +421,7 @@ let filesReflectSingle = _.routineFromPreAndBody( _.FileProvider.Find.prototype.
  * @param {Boolean} o.resolvingSoftLink Enable resolving of soft links.
  * @param {String} o.sync Determines how to read a file, synchronously or asynchronously.
  * @param {Object} o.advanced Advanced options for http method
- * @param {} o.advanced.send Data to send.
+ * @param {*} o.advanced.send Data to send.
  * @param {String} o.advanced.method Which http method to use: 'GET' or 'POST'.
  * @param {String} o.advanced.user Username, is used in authorization
  * @param {String} o.advanced.password Password, is used in authorization
@@ -510,7 +510,7 @@ fileCopyToHardDriveAct.advanced =
  * @param {Boolean} o.resolvingSoftLink Enable resolving of soft links.
  * @param {String} o.sync Determines how to read a file, synchronously or asynchronously.
  * @param {Object} o.advanced Advanced options for http method
- * @param {} o.advanced.send Data to send.
+ * @param {*} o.advanced.send Data to send.
  * @param {String} o.advanced.method Which http method to use: 'GET' or 'POST'.
  * @param {String} o.advanced.user Username, is used in authorization
  * @param {String} o.advanced.password Password, is used in authorization

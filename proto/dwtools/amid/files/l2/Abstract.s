@@ -14,13 +14,13 @@ _.assert( _.routineIs( FileRecordFilter ) );
 _.assert( _.routineIs( FileRecordFactory ) );
 
 /**
- * @namespace "wTools.FileProvider"
+ * @namespace wTools.FileProvider
  * @module Tools/mid/Files
  */
 
 /**
  * @class wFileProviderAbstract
- * @namespace "wTools.FileProvider"
+ * @namespace wTools.FileProvider
  * @module Tools/mid/Files
 */
 

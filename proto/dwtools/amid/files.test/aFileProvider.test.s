@@ -41282,7 +41282,9 @@ function pathResolve( test )
   var expected = '/baz/foo';
   test.identical( got, expected );
 
-  test.case = 'here cases'; /* */
+  /* */
+
+  test.case = 'here cases';
 
   var expected = join( current(), 'aa/cc' );
   var got = resolve( 'aa','.','cc' );
@@ -41296,7 +41298,9 @@ function pathResolve( test )
   var got = resolve( '.','aa','cc' );
   test.identical( got, expected );
 
-  test.case = 'down cases'; /* */
+  /* */
+
+  test.case = 'down cases';
 
   var expected = join( current(), 'aa' );
   var got = resolve( '.','aa','cc','..' );
@@ -41312,7 +41316,9 @@ function pathResolve( test )
   var got = resolve( 'aa','cc','..','..','..' );
   test.identical( got, expected );
 
-  test.case = 'like-down or like-here cases'; /* */
+  /* */
+
+  test.case = 'like-down or like-here cases';
 
   var expected = join( current(), '.x./aa/bb/.x.' );
   var got = resolve( '.x.','aa','bb','.x.' );
@@ -41322,7 +41328,9 @@ function pathResolve( test )
   var got = resolve( '..x..','aa','bb','..x..' )
   test.identical( got, expected );
 
-  test.case = 'period and double period combined'; /* */
+  /* */
+
+  test.case = 'period and double period combined';
 
   var expected = '/a/b';
   var got = resolve( '/abc','./../a/b');

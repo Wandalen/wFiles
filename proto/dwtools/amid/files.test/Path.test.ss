@@ -316,7 +316,9 @@ function pathResolve( test )
   var got = provider.path.resolve.apply( provider.path, paths );
   test.identical( got, expected );
 
-  test.case = 'here cases'; /* */
+  /* */
+
+  test.case = 'here cases';
 
   var paths = [ 'aa','.','cc' ];
   var expected = _.path.join( _.path.current(), 'aa/cc' );
@@ -333,7 +335,9 @@ function pathResolve( test )
   var got = provider.path.resolve.apply( provider.path, paths );
   test.identical( got, expected );
 
-  test.case = 'down cases'; /* */
+  /* */
+
+  test.case = 'down cases';
 
   var paths = [  '.','aa','cc','..' ];
   var expected = _.path.join( _.path.current(), 'aa' );
@@ -353,7 +357,9 @@ function pathResolve( test )
   var got = provider.path.resolve.apply( provider.path, paths );
   test.identical( got, expected );
 
-  test.case = 'like-down or like-here cases'; /* */
+  /* */
+
+  test.case = 'like-down or like-here cases';
 
   var paths = [  '.x.','aa','bb','.x.' ];
   var expected = _.path.join( _.path.current(), '.x./aa/bb/.x.' );
@@ -365,7 +371,9 @@ function pathResolve( test )
   var got = provider.path.resolve.apply( provider.path, paths );
   test.identical( got, expected );
 
-  test.case = 'period and double period combined'; /* */
+  /* */
+
+  test.case = 'period and double period combined';
 
   var paths = [  '/abc','./../a/b' ];
   var expected = '/a/b';
@@ -554,7 +562,9 @@ function pathsResolve( test )
 function regexpMakeSafe( test )
 {
 
-  test.case = 'only default safe paths'; /* */
+  /* */
+
+  test.case = 'only default safe paths';
   var expected1 =
   {
     includeAny : [],
@@ -574,7 +584,9 @@ function regexpMakeSafe( test )
   test.identical( got.excludeAny, expected1.excludeAny );
   test.identical( got.excludeAll, expected1.excludeAll );
 
-  test.case = 'single path for include any mask'; /* */
+  /* */
+
+  test.case = 'single path for include any mask';
   var path2 = 'foo/bar';
   var expected2 =
   {
@@ -593,7 +605,9 @@ function regexpMakeSafe( test )
   test.identical( got.excludeAny, expected2.excludeAny );
   test.identical( got.excludeAll, expected2.excludeAll );
 
-  test.case = 'array of paths for include any mask'; /* */
+  /* */
+
+  test.case = 'array of paths for include any mask';
   var path3 = [ 'foo/bar', 'foo2/bar2/baz', 'some.txt' ];
   var expected3 =
   {
@@ -612,7 +626,9 @@ function regexpMakeSafe( test )
   test.identical( got.excludeAny, expected3.excludeAny );
   test.identical( got.excludeAll, expected3.excludeAll );
 
-  test.case = 'regex object passed as mask for include any mask'; /* */
+  /* */
+
+  test.case = 'regex object passed as mask for include any mask';
   var paths4 =
   {
     includeAny : [ 'foo/bar', 'foo2/bar2/baz', 'some.txt' ],
@@ -682,14 +698,18 @@ function realMainDir( test )
   var got = _.fileProvider.path.nativize( _.path.realMainDir( ) );
   test.identical( _.path.normalize( got ), _.path.normalize( expected1 ) );
 
-  test.case = 'absolute paths'; /* */
+  /* */
+
+  test.case = 'absolute paths';
   var from = _.path.realMainDir();
   var to = _.path.realMainFile();
   var expected = _.path.name({ path : _.path.realMainFile(), full : 1 });
   var got = _.path.relative( from, to );
   test.identical( got, expected );
 
-  test.case = 'absolute paths, from === to'; /* */
+  /* */
+
+  test.case = 'absolute paths, from === to';
   var from = _.path.realMainDir();
   var to = _.path.realMainDir();
   var expected = '.';
@@ -921,14 +941,18 @@ function relative( test )
 
   // _.path.relative accepts only two arguments
 
-  // test.case = 'both relative, long, not direct, resolving : 1'; /* */
+  // /* */
+
+ test.case = 'both relative, long, not direct, resolving : 1';
   // var from = 'a/b/xx/yy/zz';
   // var to = 'a/b/files/x/y/z.txt';
   // var expected = '../../../files/x/y/z.txt';
   // var got = _.path.relative({ relative : from, path : to, resolving : 1 });
   // test.identical( got, expected );
 
-  // test.case = 'both relative, long, not direct,resolving 1'; /* */
+  // /* */
+
+ test.case = 'both relative, long, not direct,resolving 1';
   // var from = 'a/b/xx/yy/zz';
   // var to = 'a/b/files/x/y/z.txt';
   // var expected = '../../../files/x/y/z.txt';

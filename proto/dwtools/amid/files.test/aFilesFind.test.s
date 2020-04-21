@@ -5932,7 +5932,9 @@ function filesFindGlob( test )
   var gotRelative = _.select( records, '*/relative' );
   test.identical( gotRelative, expectedRelative );
 
-  test.case = 'globTerminals src1/*'; /* */
+  /* */
+
+  test.case = 'globTerminals src1/*';
   var expectedRelative = [ './src1/a', './src1/b', './src1/c' ];
   var records = globTerminals( abs( 'src1/*' ) );
   var gotRelative = _.select( records, '*/relative' );
@@ -5944,7 +5946,9 @@ function filesFindGlob( test )
   var gotRelative = _.select( records, '*/relative' );
   test.identical( gotRelative, expectedRelative );
 
-  test.case = 'globTerminals src1*'; /* */
+  /* */
+
+  test.case = 'globTerminals src1*';
   var expectedRelative = [ './src1Terminal' ];
   var records = globTerminals( abs( 'src1*' ) );
   var gotRelative = _.select( records, '*/relative' );
@@ -5956,7 +5960,9 @@ function filesFindGlob( test )
   var gotRelative = _.select( records, '*/relative' );
   test.identical( gotRelative, expectedRelative );
 
-  test.case = 'globTerminals src3/** - nothing'; /* */
+  /* */
+
+  test.case = 'globTerminals src3/** - nothing';
   var expectedRelative = [];
   var records = globTerminals( abs( 'src3/**' ) );
   var gotRelative = _.select( records, '*/relative' );
@@ -5968,7 +5974,9 @@ function filesFindGlob( test )
   var gotRelative = _.select( records, '*/relative' );
   test.identical( gotRelative, expectedRelative );
 
-  test.case = 'globTerminals src?'; /* */
+  /* */
+
+  test.case = 'globTerminals src?';
   var expectedRelative = [ './srcT' ];
   var records = globTerminals( abs( 'src?' ) );
   var gotRelative = _.select( records, '*/relative' );
@@ -5980,7 +5988,9 @@ function filesFindGlob( test )
   var gotRelative = _.select( records, '*/relative' );
   test.identical( gotRelative, expectedRelative );
 
-  test.case = 'globTerminals src?*'; /* */
+  /* */
+
+  test.case = 'globTerminals src?*';
   var expectedRelative = [ './src1Terminal', './srcT' ];
   var records = globTerminals( abs( 'src?*' ) );
   var gotRelative = _.select( records, '*/relative' );
@@ -5992,7 +6002,9 @@ function filesFindGlob( test )
   var gotRelative = _.select( records, '*/relative' );
   test.identical( gotRelative, expectedRelative );
 
-  test.case = 'globTerminals src*?'; /* */
+  /* */
+
+  test.case = 'globTerminals src*?';
   var expectedRelative = [ './src1Terminal', './srcT' ];
   var records = globTerminals( abs( 'src*?' ) );
   var gotRelative = _.select( records, '*/relative' );
@@ -6074,7 +6086,9 @@ function filesFindGlob( test )
   var gotRelative = _.select( records, '*/relative' );
   test.identical( gotRelative, expectedRelative );
 
-  test.case = 'globTerminals +(src)2'; /* */
+  /* */
+
+  test.case = 'globTerminals +(src)2';
   var expectedRelative = [];
   var records = globTerminals( abs( '+(src)2' ) );
   var gotRelative = _.select( records, '*/relative' );
@@ -6086,7 +6100,9 @@ function filesFindGlob( test )
   var gotRelative = _.select( records, '*/relative' );
   test.identical( gotRelative, expectedRelative );
 
-  test.case = 'globTerminals +(alt)/*'; /* */
+  /* */
+
+  test.case = 'globTerminals +(alt)/*';
   var expectedRelative = [ './alt/a', './altalt/a' ];
   var records = globTerminals( abs( '+(alt)/*' ) );
   var gotRelative = _.select( records, '*/relative' );
@@ -6098,7 +6114,9 @@ function filesFindGlob( test )
   var gotRelative = _.select( records, '*/relative' );
   test.identical( gotRelative, expectedRelative );
 
-  test.case = 'globTerminals +(alt|ctrl)/*'; /* */
+  /* */
+
+  test.case = 'globTerminals +(alt|ctrl)/*';
   var expectedRelative = [ './alt/a', './altalt/a', './altctrl/a', './altctrlalt/a', './ctrl/a', './ctrlctrl/a' ]
   var records = globTerminals( abs( '+(alt|ctrl)/*' ) );
   var gotRelative = _.select( records, '*/relative' );
@@ -6110,7 +6128,9 @@ function filesFindGlob( test )
   var gotRelative = _.select( records, '*/relative' );
   test.identical( gotRelative, expectedRelative );
 
-  test.case = 'globTerminals *(alt|ctrl)/*'; /* */
+  /* */
+
+  test.case = 'globTerminals *(alt|ctrl)/*';
   var expectedRelative = [ './alt/a', './altalt/a', './altctrl/a', './altctrlalt/a', './ctrl/a', './ctrlctrl/a' ];
   var records = globTerminals( abs( '*(alt|ctrl)/*' ) );
   var gotRelative = _.select( records, '*/relative' );
@@ -6122,7 +6142,9 @@ function filesFindGlob( test )
   var gotRelative = _.select( records, '*/relative' );
   test.identical( gotRelative, expectedRelative );
 
-  test.case = 'globTerminals alt*(alt|ctrl)?/*'; /* */
+  /* */
+
+  test.case = 'globTerminals alt*(alt|ctrl)?/*';
   var expectedRelative = [ './alt2/a', './altalt2/a', './altctrl2/a', './altctrlalt2/a' ];
   var records = globTerminals( abs( 'alt*(alt|ctrl)?/*' ) );
   var gotRelative = _.select( records, '*/relative' );
@@ -6134,7 +6156,9 @@ function filesFindGlob( test )
   var gotRelative = _.select( records, '*/relative' );
   test.identical( gotRelative, expectedRelative );
 
-  test.case = 'globTerminals *(alt|ctrl|2)/*'; /* */
+  /* */
+
+  test.case = 'globTerminals *(alt|ctrl|2)/*';
   var expectedRelative = [ './alt/a', './alt2/a', './altalt/a', './altalt2/a', './altctrl/a', './altctrl2/a', './altctrlalt/a', './altctrlalt2/a', './ctrl/a', './ctrl2/a', './ctrlctrl/a', './ctrlctrl2/a' ];
   var records = globTerminals( abs( '*(alt|ctrl|2)/*' ) );
   var gotRelative = _.select( records, '*/relative' );
@@ -6149,7 +6173,9 @@ function filesFindGlob( test )
   var gotRelative = _.select( records, '*/relative' );
   test.identical( gotRelative, expectedRelative );
 
-  test.case = 'globTerminals alt?(alt|ctrl)?/*'; /* */
+  /* */
+
+  test.case = 'globTerminals alt?(alt|ctrl)?/*';
   var expectedRelative = [ './alt2/a', './altalt2/a', './altctrl2/a' ];
   var records = globTerminals( abs( 'alt?(alt|ctrl)?/*' ) );
   var gotRelative = _.select( records, '*/relative' );
@@ -6161,7 +6187,9 @@ function filesFindGlob( test )
   var gotRelative = _.select( records, '*/relative' );
   test.identical( gotRelative, expectedRelative );
 
-  test.case = 'globTerminals alt!(alt|ctrl)?/*'; /* */
+  /* */
+
+  test.case = 'globTerminals alt!(alt|ctrl)?/*';
   var expectedRelative = [ './alt2/a' ];
   var records = globTerminals( abs( 'alt!(alt|ctrl)?/*' ) );
   var gotRelative = _.select( records, '*/relative' );
@@ -6173,7 +6201,9 @@ function filesFindGlob( test )
   var gotRelative = _.select( records, '*/relative' );
   test.identical( gotRelative, expectedRelative );
 
-  test.case = 'globTerminals alt!(ctrl)?/*'; /* */
+  /* */
+
+  test.case = 'globTerminals alt!(ctrl)?/*';
   var expectedRelative = [ './alt2/a', './altalt/a', './altalt2/a' ];
   var records = globTerminals( abs( 'alt!(ctrl)?/*' ) );
   var gotRelative = _.select( records, '*/relative' );
@@ -6185,7 +6215,9 @@ function filesFindGlob( test )
   var gotRelative = _.select( records, '*/relative' );
   test.identical( gotRelative, expectedRelative );
 
-  test.case = 'globTerminals @(alt|ctrl)?/*'; /* */
+  /* */
+
+  test.case = 'globTerminals @(alt|ctrl)?/*';
   var expectedRelative = [ './alt2/a', './ctrl2/a' ];
   var records = globTerminals( abs( '@(alt|ctrl)?/*' ) );
   var gotRelative = _.select( records, '*/relative' );
@@ -7374,7 +7406,9 @@ function filesFindOn( test )
 
   test.open( 'extended' );
 
-  test.case = 'globTerminals src1/**'; /* */
+  /* */
+
+  test.case = 'globTerminals src1/**';
 
   clean();
 

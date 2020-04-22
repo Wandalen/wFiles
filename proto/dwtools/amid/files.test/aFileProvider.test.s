@@ -45296,7 +45296,31 @@ function pathResolveTextLink( test )
   var o = { filePath : linkPath };
   var got = provider.pathResolveTextLink( o );
   test.identical( got, filePath );
-
+  
+  test.case = 'file with jsdoc link tag'
+  var jsdocData = '@link module:Tools/base/Proto.wTools.define.own'
+  provider.filesDelete( routinePath );
+  provider.fileWrite( linkPath, jsdocData );
+  var o = { filePath : linkPath };
+  var got = provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
+  
+  test.case = 'file with jsdoc link tag'
+  var jsdocData = '/**\n  @link module:Tools/base/Proto.wTools.define.own\n*/'
+  provider.filesDelete( routinePath );
+  provider.fileWrite( linkPath, jsdocData );
+  var o = { filePath : linkPath };
+  var got = provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
+  
+  test.case = 'line on second line'
+  var jsdocData = '\nlink ' + filePath;
+  provider.filesDelete( routinePath );
+  provider.fileWrite( linkPath, jsdocData );
+  var o = { filePath : linkPath };
+  var got = provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
+  
   /*
 
     Add test cases :

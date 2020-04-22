@@ -110,7 +110,7 @@ function _isTextLink( filePath )
       advanced : null,
       resolvingSoftLink : 0
     })
-    let regexp = /link ([^\n]+)\n?$/;
+    let regexp = /^link ([^\n]+)\n?$/;
     return regexp.test( read );
   }
 
@@ -179,7 +179,7 @@ let buffer;
 //     if( stat.isTerminal() )
 //     {
 
-//       let regexp = /link ([^\n]+)\n?$/;
+//       let regexp = /^link ([^\n]+)\n?$/;
 //       let size = Number( stat.size );
 //       let readSize = _.bigIntIs( size ) ? BigInt( 256 ) : 256;
 //       let f = File.openSync( cpath, 'r' );
@@ -282,7 +282,7 @@ function pathResolveTextLinkAct( o )
   return false;
 
   let filePath = self.path.nativize( o.filePath );
-  let regexp = /link ([^\n]+)\n?$/;
+  let regexp = /^link ([^\n]+)\n?$/;
   let size = Number( stat.size );
   let readSize = _.bigIntIs( size ) ? BigInt( 256 ) : 256;
   let f = File.openSync( filePath, 'r' );

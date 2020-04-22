@@ -50,6 +50,6 @@
     "tar" : "", 
     "proper-lockfile" : ""
   }, 
-  "devDependencies" : { "wait-sync" : "", "cli-table2" : "^0.2.0", "wTesting" : "" }, 
+  "devDependencies" : { "wait-sync" : "", "cli-table2" : "^0.2.0", "wTesting" : "", "wFiles": "file:." }, 
   "keywords" : [ "wTools", "wFiles", "file", "read file", "write file" ]
 }

@@ -221,7 +221,7 @@ function pathResolveTextLinkAct( o )
 
   _.assert( _.strIs( file ) );
 
-  let regexp = /link ([^\n]+)\n?$/;
+  let regexp = /^link ([^\n]+)\n?$/;
   let m = file.match( regexp );
 
   if( !m )

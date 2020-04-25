@@ -971,9 +971,9 @@ let Accessors =
   isTextLink : { readOnly : 1 },
   isLink : { readOnly : 1 },
 
-  absolute : { setter : absoluteSet },
-  relative : { setter : relativeSet },
-  input : { setter : inputSet },
+  absolute : { set : absoluteSet },
+  relative : { set : relativeSet },
+  input : { set : inputSet },
 
 }
 

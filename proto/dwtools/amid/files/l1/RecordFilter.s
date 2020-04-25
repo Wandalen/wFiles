@@ -4567,9 +4567,9 @@ let Accessors =
 {
 
   filePath : {},
-  basePath : { setter : basePathSet },
-  basePaths : { getter : basePathsGet, readOnly : 1 },
-  pairedFilter : { getter : pairedFilterGet, readOnly : 1 },
+  basePath : { set : basePathSet },
+  basePaths : { get : basePathsGet, readOnly : 1 },
+  pairedFilter : { get : pairedFilterGet, readOnly : 1 },
 
 }
 

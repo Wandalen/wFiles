@@ -2650,7 +2650,7 @@ let Restricts =
 
 let Accessors =
 {
-  filesTree : { setter : filesTreeSet },
+  filesTree : { set : filesTreeSet },
 }
 
 let Statics =

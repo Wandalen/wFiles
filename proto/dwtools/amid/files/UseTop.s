@@ -48,10 +48,10 @@ if( typeof module !== 'undefined' )
 
   /* l8 */
 
-  try { require( './l8_filter/Caching.s' ); } catch( err ) {}
-  try { require( './l8_filter/CachingContent.s' ); } catch( err ) {}
-  try { require( './l8_filter/CachingFolders.s' ); } catch( err ) {}
-  try { require( './l8_filter/Reroot.s' ); } catch( err ) {}
+  try { if( Config.interpreter === 'njs' ) require( './l8_filter/Caching.s' ); } catch( err ) {}
+  try { if( Config.interpreter === 'njs' ) require( './l8_filter/CachingContent.s' ); } catch( err ) {}
+  try { if( Config.interpreter === 'njs' ) require( './l8_filter/CachingFolders.s' ); } catch( err ) {}
+  try { if( Config.interpreter === 'njs' ) require( './l8_filter/Reroot.s' ); } catch( err ) {}
 
   require( './l8_filter/Image.s' );
 

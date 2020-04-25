@@ -11,6 +11,7 @@ if( typeof module !== 'undefined' )
 
   try
   {
+    if( Config.interpreter === 'njs' )
     File = require( 'fs' );
   }
   catch( err )

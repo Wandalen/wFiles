@@ -15121,6 +15121,63 @@ function fileDeleteLocked( test )
 
 //
 
+function fileDeleteFileWithSpecialSymbols( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let path = provider.path;
+  let providerEffective = self.providerEffective || self.provider;
+
+  if( !_.routineIs( provider.fileDeleteAct ) )
+  {
+    test.identical( 1,1 );
+    return;
+  }
+
+  var routinePath = test.context.pathFor( 'written/fileDeleteFileWithSpecialSymbols' );
+  if( !provider.statResolvedRead( routinePath ) )
+  provider.dirMake( routinePath );
+  
+  test.case = 'filename contains @, global path'
+  var filePath = provider.path.join( routinePath, '@file' );
+  provider.fileWrite( filePath, filePath );
+  provider.fileDelete( filePath );
+  test.is( !provider.fileExists( filePath ) );
+  
+  test.case = 'filename contains @, local path'
+  var filePath = provider.path.join( routinePath, '@file' );
+  provider.fileWrite( filePath, filePath );
+  debugger
+  provider.fileDelete( providerEffective.path.preferredFromGlobal( filePath ) );
+  test.is( !provider.fileExists( filePath ) );
+  
+  test.case = 'filename contains #, global path'
+  var filePath = provider.path.join( routinePath, '#file' );
+  provider.fileWrite( filePath, filePath );
+  provider.fileDelete( filePath );
+  test.is( !provider.fileExists( filePath ) );
+  
+  test.case = 'filename contains #, local path'
+  var filePath = provider.path.join( routinePath, '#file' );
+  provider.fileWrite( filePath, filePath );
+  provider.fileDelete( providerEffective.path.preferredFromGlobal( filePath ) );
+  test.is( !provider.fileExists( filePath ) );
+  
+  test.case = 'filename contains ?, global path'
+  var filePath = provider.path.join( routinePath, '?file=a' );
+  provider.fileWrite( filePath, filePath );
+  provider.fileDelete( filePath );
+  test.is( !provider.fileExists( filePath ) );
+  
+  test.case = 'filename contains ?, local path'
+  var filePath = provider.path.join( routinePath, '?file=a' );
+  provider.fileWrite( filePath, filePath );
+  provider.fileDelete( providerEffective.path.preferredFromGlobal( filePath ) );
+  test.is( !provider.fileExists( filePath ) );
+}
+
+//
+
 function fileDeletePerfomance( test )
 {
   let self = this;
@@ -48835,6 +48892,7 @@ var Self =
     fileDeleteActSync,
     fileDeleteAsync,
     fileDeleteLocked,
+    fileDeleteFileWithSpecialSymbols,
     fileDeletePerfomance,
 
     fileLockWaitingSharingSync,

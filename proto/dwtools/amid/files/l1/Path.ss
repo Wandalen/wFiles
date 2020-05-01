@@ -870,7 +870,7 @@ function pathDirTempClose( filePath )
 //   })
 //   if( !syncLock )
 //   {
-//     lockReady.deasyncWait();
+//     lockReady.deasync();
 //     lockReady.sync();
 //   }
 //   _.assert( self.fileProvider.fileIsLocked( self.IndexPath ) );
@@ -900,7 +900,7 @@ function pathDirTempClose( filePath )
 //   });
 //   if( !syncLock )
 //   {
-//     lockReady.deasyncWait();
+//     lockReady.deasync();
 //     lockReady.sync();
 //   }
 //   _.assert( self.fileProvider.fileIsLocked( self.IndexPath ) );

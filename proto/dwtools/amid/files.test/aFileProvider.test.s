@@ -8111,7 +8111,7 @@ function fileCopyLinks( test )
   provider.softLink( dstPath, srcPathTerminal );
   var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 0 };
   var dstStatBefore = provider.statRead( dstPath );
-  _.time.out( 1000 ).deasyncWait();
+  _.time.out( 1000 ).deasync();
   fileCopy( o );
   var dstStatAfter = provider.statRead( dstPath );
   test.is( dstStatBefore.mtime.getTime() !== dstStatAfter.mtime.getTime() );
@@ -15096,7 +15096,7 @@ function fileDeleteLocked( test )
   test.case = 'try to delete opened file using fs.createReadStream';
   provider.fileWrite( terminalPath, terminalPath );
   var stream = provider.streamRead( terminalPath );
-  _.time.out( 100 ).deasyncWait();
+  _.time.out( 100 ).deasync();
   var got = fs.unlinkSync( path.nativize( terminalPath ) );
   test.will = 'no errors from fs module';
   test.identical( got, undefined );

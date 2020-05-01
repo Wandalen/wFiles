@@ -881,6 +881,7 @@ function filesFind_body( o )
       resolvingTextLink : o.resolvingTextLink,
       allowingMissed : o.allowingMissed,
       allowingCycled : o.allowingCycled,
+      safe : o.safe,
     };
     _.assert( _.strDefined( o4.basePath ), 'No base path for', stemPath );
     o3.factory = _.FileRecordFactory.TolerantFrom( o3, o4 ).form();

@@ -2941,7 +2941,7 @@ function filesLink( test )
 
     // File.unlinkSync( link );
     _.fileProvider.fileDelete( link );
-    _.time.out( 100 ).deasyncWait();
+    _.time.out( 100 ).deasync();
     statSource = _.fileProvider.statResolvedRead({ filePath : src, resolvingSoftLink : 0 });
 
     if ( Number( statSource.nlink ) !== 1 ) return false;

@@ -748,11 +748,11 @@ function preferredFromGlobalAct( globalPath )
     !self.protocols || !globalPath.protocol || _.longHas( self.protocols, globalPath.protocol ),
     () => 'File provider ' + self.qualifiedName + ' does not support protocol ' + _.strQuote( globalPath.protocol )
   );
-
+  
   if( self.usingGlobalPath )
   return globalPath.full;
   else
-  return globalPath.longPath;
+  return globalPath.longPathWithParams;
 }
 
 //

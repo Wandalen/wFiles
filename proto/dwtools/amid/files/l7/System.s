@@ -985,6 +985,25 @@ function filesAreHardLinkedAct( o )
 
 _.routineExtend( filesAreHardLinkedAct, Parent.prototype.filesAreHardLinkedAct );
 
+
+//
+
+function dirMake_body( o )
+{
+  let self = this;
+
+  _.assert( arguments.length === 1 );
+
+  let r = self._pathLocalize( o.filePath );
+  let o2 = _.mapExtend( null, o );
+  o2.filePath = r.localPath;
+  return r.provider.dirMake.body.call( r.provider, o2 );
+}
+
+_.routineExtend( dirMake_body, Parent.prototype.dirMake );
+
+let dirMake = _.routineFromPreAndBody( Parent.prototype.dirMake.pre, dirMake_body );
+
 // --
 //
 // --
@@ -1437,6 +1456,10 @@ let Proto =
   hardLinkBreak,
 
   filesAreHardLinkedAct,
+  
+  //
+  
+  dirMake,
 
   // accessor
 

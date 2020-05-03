@@ -1032,7 +1032,7 @@ function configRead_body( o )
     for( let f1 = filePath.length-1 ; f1 >= 0 ; f1-- )
     {
       let filePath1 = filePath[ f1 ];
-      debugger;
+      //debugger;
       if( !o.throwing && o.throwing !== null && o.throwing !== undefined )
       return null;
       throw _.err( 'None config was found\n', _.strQuote( filePath1 ) );

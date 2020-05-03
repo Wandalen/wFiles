@@ -74,7 +74,7 @@ function init( o )
  * @property {String} longPath
  * @property {String} localVcsPath
  * @property {String} remoteVcsPath
- * @property {String} longerRemoteVcsPath
+ * @property {String} remoteVcsLongerPath
  * @class wFileProviderNpm
  * @namespace wTools.FileProvider
  * @module Tools/mid/Files
@@ -384,7 +384,7 @@ function filesReflectSingle_body( o )
       '--legacy-bundling',
       '--prefix',
       localProvider.path.nativize( tmpPath ),
-      parsed.longerRemoteVcsPath
+      parsed.remoteVcsLongerPath
     ];
     let got = shell({ execPath : 'npm install', args : npmArgs });
     _.assert( got.exitCode === 0 );
@@ -457,7 +457,7 @@ function filesReflectSingle_body( o )
   function occupiedErr( msg )
   {
     debugger;
-    return _.err( 'Cant download NPM package ' + _.color.strFormat( parsed.longerRemoteVcsPath, 'path' ) + ' to ' + _.color.strFormat( dstPath, 'path' ) + ( msg || '' ) )
+    return _.err( 'Cant download NPM package ' + _.color.strFormat( parsed.remoteVcsLongerPath, 'path' ) + ' to ' + _.color.strFormat( dstPath, 'path' ) + ( msg || '' ) )
   }
 
 }

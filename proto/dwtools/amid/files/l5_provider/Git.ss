@@ -65,7 +65,7 @@ function init( o )
  * @property {String} longPath
  * @property {String} localVcsPath
  * @property {String} remoteVcsPath
- * @property {String} longerRemoteVcsPath
+ * @property {String} remoteVcsLongerPath
  * @class wFileProviderGit
  * @namespace wTools.FileProvider
  * @module Tools/mid/Files
@@ -327,7 +327,7 @@ function filesReflectSingle_body( o )
   /* */
 
   _.sure( _.strDefined( parsed.remoteVcsPath ) );
-  _.sure( _.strDefined( parsed.longerRemoteVcsPath ) );
+  _.sure( _.strDefined( parsed.remoteVcsLongerPath ) );
   _.sure( _.strDefined( parsed.hash ) || _.strDefined( parsed.tag ) );
   _.sure( !parsed.tag || !parsed.hash, 'Does not expected both hash and tag in srcPath:', _.strQuote( srcPath ) );
   _.sure( _.strIs( dstPath ) );
@@ -412,7 +412,7 @@ function filesReflectSingle_body( o )
   {
     /* !!! delete dst dir maybe */
     if( !localProvider.fileExists( path.join( dstPath, '.git' ) ) )
-    shell( 'git clone ' + parsed.longerRemoteVcsPath + ' ' + '.' );
+    shell( 'git clone ' + parsed.remoteVcsLongerPath + ' ' + '.' );
   }
   else
   {

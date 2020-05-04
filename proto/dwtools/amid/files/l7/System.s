@@ -1118,6 +1118,7 @@ function routinesGenerate()
     having : null,
     encoders : null,
     operates : null,
+    vectorized : null,
   }
 
   for( let r in Parent.prototype ) (function()
@@ -1456,9 +1457,9 @@ let Proto =
   hardLinkBreak,
 
   filesAreHardLinkedAct,
-  
+
   //
-  
+
   dirMake,
 
   // accessor

@@ -752,7 +752,7 @@ function preferredFromGlobalAct( globalPath )
   if( self.usingGlobalPath )
   return globalPath.full;
   else
-  return globalPath.longPathWithParams;
+  return globalPath.parametrizedPath;
 }
 
 //

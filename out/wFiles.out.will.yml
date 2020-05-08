@@ -48,9 +48,9 @@ module:
         - read file
         - write file
       license: MIT
-      author: Kostiantyn Wandalen <wanalen@willbe.so>
+      author: Kostiantyn Wandalen <wanalen@01.school>
       contributors:
-        - Kostiantyn Wandalen <wanalen@willbe.so>
+        - Kostiantyn Wandalen <wanalen@01.school>
         - Volodymyr M. <volodymyr.migdal@gmail.com>
         - Ihor O. <iostashvxi@gmail.com>
         - Dmytro Kryvoruchko <dm.vict.kr@gmail.com>
@@ -1017,9 +1017,9 @@ module:
         - read file
         - write file
       license: MIT
-      author: Kostiantyn Wandalen <wanalen@willbe.so>
+      author: Kostiantyn Wandalen <wanalen@01.school>
       contributors:
-        - Kostiantyn Wandalen <wanalen@willbe.so>
+        - Kostiantyn Wandalen <wanalen@01.school>
         - Volodymyr M. <volodymyr.migdal@gmail.com>
         - Ihor O. <iostashvxi@gmail.com>
         - Dmytro Kryvoruchko <dm.vict.kr@gmail.com>

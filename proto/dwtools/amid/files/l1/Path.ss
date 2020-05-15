@@ -587,21 +587,26 @@ function pathDirTempMake( o )
     _.assert( o.filePath === '/' );
     trace = [ o.filePath ];
   }
+  else if( trace.length > 1 )
+  trace.shift();
 
   if( !o.name )
   o.name = 'tmp';
   o.name = o.name + '-' + _.idWithDateAndTime() + '.tmp';
-
+  
+  //
+  
   let osTempDir = self.dirTemp();
-
   let common = self.common( osTempDir, trace[ 0 ] )
-
+  
   if( common === trace[ 0 ] )
   {
     filePath = self.join( osTempDir, o.name );
     self.fileProvider.dirMake( filePath );
     return end();
   }
+  
+  //
 
   let id = self.fileProvider.id;
 

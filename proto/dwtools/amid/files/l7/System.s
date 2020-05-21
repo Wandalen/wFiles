@@ -1520,7 +1520,7 @@ _.assert( Self.Path === Self.prototype.Path );
 
 _.FileProvider[ Self.shortName ] = Self;
 
-if( typeof module !== 'undefined' && module !== null )
+if( typeof module !== 'undefined' )
 module[ 'exports' ] = Self;
 
 })();

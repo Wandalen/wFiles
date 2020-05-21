@@ -394,7 +394,7 @@ _.mapExtend( _, Globals );
 // if( _global_.WTOOLS_PRIVATE )
 // { /* delete require.cache[ module.id ]; */ }
 
-if( typeof module !== 'undefined' && module !== null )
+if( typeof module !== 'undefined' )
 module[ 'exports' ] = Self;
 
 })();

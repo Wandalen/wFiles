@@ -1068,7 +1068,7 @@ _.assert( !_global_.wFileRecord && !_.FileRecord, 'wFileRecord already defined' 
 
 _[ Self.shortName ] = Self;
 
-if( typeof module !== 'undefined' && module !== null )
+if( typeof module !== 'undefined' )
 module[ 'exports' ] = Self;
 
 })();

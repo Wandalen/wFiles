@@ -1317,7 +1317,7 @@ program();
     var tempPath = _.path.pathDirTempOpen( _.path.normalize( __dirname ), 'pathDirTempCloseAfter' );
     if( _.fileProvider.isDir( tempPath ) )
     console.log( 'tempDirCreated' );
-    _.process.once( 'available', _.event.Name( 'exit' ), () =>
+    _.process.on( 'available', _.event.Name( 'exit' ), () =>
     {
       _.path.pathDirTempClose( tempPath )
     });

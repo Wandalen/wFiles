@@ -3756,6 +3756,7 @@ function filesReflectSingle_body( o )
         resolvingSrcTextLink : o.resolvingSrcTextLink,
         resolvingDstSoftLink : o.resolvingDstSoftLink,
         resolvingDstTextLink : o.resolvingDstTextLink,
+        breakingDstHardLink : o.breakingDstHardLink,
       });
     }
     else if( action === 'hardLink' )

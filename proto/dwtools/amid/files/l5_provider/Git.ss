@@ -412,7 +412,7 @@ function filesReflectSingle_body( o )
   {
     /* !!! delete dst dir maybe */
     if( !localProvider.fileExists( path.join( dstPath, '.git' ) ) )
-    shell( 'git clone ' + parsed.remoteVcsLongerPath + ' ' + '.' );
+    shell( 'git -c "core.autocrlf=false" clone ' + parsed.remoteVcsLongerPath + ' ' + '.' );
   }
   else
   {

@@ -16,7 +16,7 @@
   "files" : [ "proto/dwtools/amid/files", "proto/dwtools/Tools.s", "out" ],
   "scripts" :
   {
-    "test" : "wtest .run proto/**",
+    "test" : "wtest .run 'proto/**'",
     "test2" : "wtest .run proto/**/dwtools/amid/file.test/Provider.HardDrive.test.ss routine : linkHardSyncRunner",
     "test3" : "wtest .run proto/**/dwtools/amid/file.test/Provider.HardDrive.test.ss routine : linkHardAsyncRunner",
     "docgen" : "wdocgen proto"

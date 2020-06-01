@@ -32,9 +32,9 @@ function onSuiteBegin( test )
   context.suitePath = path.pathDirTempOpen( path.join( __dirname, '../..'  ),'FileProviderGit' );
   context.suitePath = context.providerDst.pathResolveLinkFull({ filePath : context.suitePath, resolvingSoftLink : 1 });
   context.suitePath = context.suitePath.absolutePath;
-  
+
   if( RunningInTravis )
-  {  
+  {
     let gitConfig = _.process.starter
     ({
       execPath : 'git config --global',
@@ -676,9 +676,9 @@ function filesReflectTrivial( test )
 
     return ready;
   })
-  
+
   /* */
-  
+
   .then( () =>
   {
     test.case = 'download repo, then try to checkout';
@@ -720,11 +720,11 @@ function filesReflectTrivial( test )
     test.is( _.arraySetContainAll( files,expected ) )
     return got;
   })
-  
+
   //
-  
+
   /* */
-  
+
   .then( () =>
   {
     test.case = 'download repo, then try to checkout using branch name as hash';
@@ -738,9 +738,9 @@ function filesReflectTrivial( test )
     let con = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }});
     return test.shouldThrowErrorAsync( con );
   })
-  
+
   /* */
-  
+
   .then( () =>
   {
     test.case = 'download repo, then try to checkout using unknown branch name as tag';
@@ -754,7 +754,7 @@ function filesReflectTrivial( test )
     let con = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }});
     return test.shouldThrowErrorAsync( con );
   })
-  
+
   return con;
 }
 
@@ -846,7 +846,7 @@ function filesReflectDownloadThrowing( test )
   let clonePathGlobal = providerDst.path.globalFromPreferred( localPath );
 
   let con = new _.Consequence().take( null )
-    
+
   con
   .then( () =>
   {
@@ -862,7 +862,7 @@ function filesReflectDownloadThrowing( test )
       return null;
     })
   })
-  
+
   .then( () =>
   {
     test.case = 'not existing branch';
@@ -877,7 +877,7 @@ function filesReflectDownloadThrowing( test )
       return null;
     })
   })
-  
+
   .then( () =>
   {
     test.case = 'not existing tag';
@@ -1007,18 +1007,18 @@ function filesReflectDownloadThrowing( test )
       })
     })
   })
-  
+
   if( !Config.debug )
   return con;
-  
+
   con.then( () =>
   {
     test.case = 'hash and tag in same time';
     providerDst.filesDelete( localPath );
     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git/#63b39b105817e80e4a3810febd8b09ffe7cd6ad1@master';
-    test.shouldThrowErrorSync( () => 
+    test.shouldThrowErrorSync( () =>
     {
-      system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 }); 
+      system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
       test.is( !providerDst.fileExists( localPath ) )
     })
     return null;
@@ -1028,6 +1028,91 @@ function filesReflectDownloadThrowing( test )
 }
 
 filesReflectDownloadThrowing.timeOut = 120000;
+
+//
+
+function filesReflectEol( test )
+{
+  let context = this;
+  let providerSrc = context.providerSrc;
+  let providerDst = context.providerDst;
+  let system = context.system;
+  let path = context.providerDst.path;
+  let testPath = path.join( context.suitePath, 'routine-' + test.name );
+  let localPath = path.join( testPath, 'clone' );
+  let clonePathGlobal = providerDst.path.globalFromPreferred( localPath );
+  let repoPath = path.join( testPath, 'repo' );
+  let expectedHash1;
+  let expectedHash2;
+  let con = new _.Consequence().take( null );
+
+  prepare();
+
+  /* - */
+
+  con
+  .then( () =>
+  {
+    providerDst.filesDelete( localPath );
+    let remotePath = 'git+hd://' + repoPath;
+
+    let autocrlfOriginal = gitConfigGlobalRead( 'core.autocrlf' );
+
+    return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 })
+    .then( () =>
+    {
+      test.case = 'global git config was not changed';
+      let autocrlf = gitConfigGlobalRead( 'core.autocrlf' );
+      test.identical( autocrlf, autocrlfOriginal );
+
+      let hash1 = providerDst.hashRead( path.join( localPath, 'file1' ) );
+      test.identical( hash1, expectedHash1 );
+      let hash2 = providerDst.hashRead( path.join( localPath, 'file2' ) );
+      test.identical( hash2, expectedHash2 );
+      return null;
+    })
+  })
+
+  return con;
+
+  /* - */
+
+  function prepare()
+  {
+    let start = _.process.starter({ currentPath : repoPath, ready : con });
+    con.then( () =>
+    {
+      providerDst.dirMake( repoPath );
+      providerDst.fileWrite( path.join( repoPath, 'file1' ), 'abc\n' );
+      providerDst.fileWrite( path.join( repoPath, 'file2' ), 'abc\r\n' );
+      return null;
+    });
+
+    start( 'git init' )
+    start( 'git config --local core.autocrlf false' )
+    start( 'git add .' )
+    start( 'git commit -m init' )
+
+    con.then( () =>
+    {
+      expectedHash1 = providerDst.hashRead( path.join( repoPath, 'file1' ) );
+      expectedHash2 = providerDst.hashRead( path.join( repoPath, 'file2' ) );
+      return null;
+    });
+  }
+
+  function gitConfigGlobalRead( property )
+  {
+    let o =
+    {
+      execPath : 'git config --get --global ' + property,
+      sync : 1,
+      outputCollecting : 1
+    };
+    var got = _.process.start( o );
+    return _.strStrip( got.output );
+  }
+}
 
 //
 
@@ -1060,6 +1145,7 @@ var Proto =
     filesReflectTrivial,
     filesReflectNoStashing,
     filesReflectDownloadThrowing,
+    filesReflectEol
   },
 
 }

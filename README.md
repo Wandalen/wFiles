@@ -1,4 +1,4 @@
-# wFiles [![Build Status](https://travis-ci.org/Wandalen/wFiles.svg?branch=master)](https://travis-ci.org/Wandalen/wFiles) 
+# wFiles [![Build Status](https://github.com/Wandalen/wFiles/workflows/Test/badge.svg)](https://github.com/Wandalen/wFiles/actions?query=workflow%3ATest)
 
 Collection of classes to abstract files systems. Many interfaces provide files, but not called as file systems and treated differently. For example server-side gives access to local files and browser-side HTTP/HTTPS protocol gives access to files as well, but in the very different way, it does the first. This problem forces a developer to break fundamental programming principle DRY and make code written to solve a problem not applicable to the same problem, on another platform/technology.
 

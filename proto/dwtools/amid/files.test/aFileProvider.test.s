@@ -1498,6 +1498,7 @@ function fileWriteActSync( test )
   //
 
   if( Config.debug )
+  if( process.platform === 'win32' )
   if( isHd )
   {
     test.case = 'native path, call fileWrite_body'
@@ -1555,6 +1556,7 @@ function fileWriteActAsync( test )
   //
 
   if( Config.debug )
+  if( process.platform === 'win32' )
   if( isHd )
   ready.finally( () =>
   {
@@ -15137,38 +15139,38 @@ function fileDeleteFileWithSpecialSymbols( test )
   var routinePath = test.context.pathFor( 'written/fileDeleteFileWithSpecialSymbols' );
   if( !provider.statResolvedRead( routinePath ) )
   provider.dirMake( routinePath );
-  
+
   test.case = 'filename contains @, global path'
   var filePath = provider.path.join( routinePath, '@file' );
   provider.fileWrite( filePath, filePath );
   provider.fileDelete( filePath );
   test.is( !provider.fileExists( filePath ) );
-  
+
   test.case = 'filename contains @, local path'
   var filePath = provider.path.join( routinePath, '@file' );
   provider.fileWrite( filePath, filePath );
   debugger
   provider.fileDelete( providerEffective.path.preferredFromGlobal( filePath ) );
   test.is( !provider.fileExists( filePath ) );
-  
+
   test.case = 'filename contains #, global path'
   var filePath = provider.path.join( routinePath, '#file' );
   provider.fileWrite( filePath, filePath );
   provider.fileDelete( filePath );
   test.is( !provider.fileExists( filePath ) );
-  
+
   test.case = 'filename contains #, local path'
   var filePath = provider.path.join( routinePath, '#file' );
   provider.fileWrite( filePath, filePath );
   provider.fileDelete( providerEffective.path.preferredFromGlobal( filePath ) );
   test.is( !provider.fileExists( filePath ) );
-  
+
   test.case = 'filename contains ?, global path'
   var filePath = provider.path.join( routinePath, '?file=a' );
   provider.fileWrite( filePath, filePath );
   provider.fileDelete( filePath );
   test.is( !provider.fileExists( filePath ) );
-  
+
   test.case = 'filename contains ?, local path'
   var filePath = provider.path.join( routinePath, '?file=a' );
   provider.fileWrite( filePath, filePath );
@@ -45353,7 +45355,7 @@ function pathResolveTextLink( test )
   var o = { filePath : linkPath };
   var got = provider.pathResolveTextLink( o );
   test.identical( got, filePath );
-  
+
   test.case = 'file with jsdoc link tag'
   var jsdocData = '@link module:Tools/base/Proto.wTools.define.own'
   provider.filesDelete( routinePath );
@@ -45361,7 +45363,7 @@ function pathResolveTextLink( test )
   var o = { filePath : linkPath };
   var got = provider.pathResolveTextLink( o );
   test.identical( got, linkPath );
-  
+
   test.case = 'file with jsdoc link tag'
   var jsdocData = '/**\n  @link module:Tools/base/Proto.wTools.define.own\n*/'
   provider.filesDelete( routinePath );
@@ -45369,7 +45371,7 @@ function pathResolveTextLink( test )
   var o = { filePath : linkPath };
   var got = provider.pathResolveTextLink( o );
   test.identical( got, linkPath );
-  
+
   test.case = 'line on second line'
   var jsdocData = '\nlink ' + filePath;
   provider.filesDelete( routinePath );
@@ -45377,7 +45379,7 @@ function pathResolveTextLink( test )
   var o = { filePath : linkPath };
   var got = provider.pathResolveTextLink( o );
   test.identical( got, linkPath );
-  
+
   /*
 
     Add test cases :

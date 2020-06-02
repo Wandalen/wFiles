@@ -7075,9 +7075,8 @@ function _link_functor( fop )
         let err = `Faield to ${entryMethodName} ${o.dstPath} from ${o.srcPath}. Destination file does not exist.`;
         throw _.err( err );
       }
-
       if( actMethodName === 'softLinkAct' ||  actMethodName === 'textLinkAct' || actMethodName === 'fileCopyAct' )
-      if( _.strBegins( dstPath, srcPath ) || _.strBegins( dstPath, srcStat.filePath ) )
+      if( _.strBegins( dstPath, srcPath ) || _.strBegins( path.preferredFromGlobal( dstPath ), srcStat.filePath ) )
       srcStat = c.onStat( srcStat.filePath, 0 );
 
       //qqq: find better solution to check text links

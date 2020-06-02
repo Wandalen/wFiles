@@ -14596,7 +14596,7 @@ function fileDeleteActSync( test )
       filePath : srcPath,
       sync : 1
     }
-    var originalPath = o.filePath;
+    var originalPath = provider.path.preferredFromGlobal( o.filePath );
     o.filePath = provider.path.nativize( o.filePath );
     if( o.filePath !== originalPath )
     {
@@ -17691,7 +17691,7 @@ function statReadActSync( test )
       throwing : 0,
       resolvingSoftLink : 1,
     }
-    var originalPath = o.filePath;
+    var originalPath = provider.path.preferredFromGlobal( o.filePath );
     o.filePath = provider.path.nativize( o.filePath );
     if( o.filePath !== originalPath )
     {

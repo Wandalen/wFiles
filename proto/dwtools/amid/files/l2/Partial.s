@@ -7076,8 +7076,8 @@ function _link_functor( fop )
         throw _.err( err );
       }
 
-      if( actMethodName === 'softLinkAct' )
-      if( _.strBegins( dstPath, srcPath ) )
+      if( actMethodName === 'softLinkAct' ||  actMethodName === 'textLinkAct' || actMethodName === 'fileCopyAct' )
+      if( _.strBegins( dstPath, srcPath ) || _.strBegins( dstPath, srcStat.filePath ) )
       srcStat = c.onStat( srcStat.filePath, 0 );
 
       //qqq: find better solution to check text links

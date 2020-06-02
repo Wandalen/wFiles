@@ -12,7 +12,6 @@ if( typeof module !== 'undefined' )
   require( '../files/UseTop.s' );
 
   var crypto = require( 'crypto' );
-  var waitSync = require( 'wait-sync' );
 
 }
 
@@ -20168,6 +20167,7 @@ function fileWriteSync( test )
   //
 
   if( Config.debug )
+  if( process.platform === 'win32' )
   if( isHd )
   {
     test.case = 'native path, call fileWrite_body'
@@ -20933,6 +20933,7 @@ function fileWriteAsync( test )
   //
 
   if( Config.debug )
+  if( process.platform === 'win32' )
   if( isHd )
   consequence.finally( () =>
   {
@@ -28974,10 +28975,10 @@ function hardLinkMultipleSync( test )
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) && !provider.UsingBigIntForStat )
   hardLinked = _.maybe;
 
-  var delay = 0.01;
+  var delay = 10;
 
   if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  delay = provider.systemBitrateTimeGet() / 1000;
+  delay = provider.systemBitrateTimeGet();
 
   function makeFiles( names, dirPath, sameTime )
   {
@@ -28993,7 +28994,7 @@ function hardLinkMultipleSync( test )
       }
       else if( i > 0 )
       {
-        waitSync( delay );
+        _.time.out( delay ).deasync();
         provider.fileWrite({ filePath, data : path.name( filePath ) });
       }
 
@@ -29269,7 +29270,7 @@ function hardLinkMultipleSync( test )
   paths = provider.path.s.normalize( paths );
   provider.hardLink({ dstPath : paths });
   var stat = provider.statResolvedRead( paths[ 0 ] );
-  waitSync( delay );
+  _.time.out( delay ).deasync();
   provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
   provider.fileWrite( paths[ paths.length - 1 ], 'different content' );
   var files = provider.recordFactory().records( paths );
@@ -29288,7 +29289,7 @@ function hardLinkMultipleSync( test )
   paths = provider.path.s.normalize( paths );
   provider.hardLink({ dstPath : paths });
   var stat = provider.statResolvedRead( paths[ 0 ] );
-  waitSync( delay );
+  _.time.out( delay ).deasync();
   provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
   provider.fileWrite( paths[ paths.length - 1 ], 'different content' );
   var files = provider.recordFactory().records( paths );
@@ -29699,10 +29700,10 @@ function hardLinkExperiment( test )
   let provider = self.provider;
   let path = provider.path;
 
-  var delay = 0.01;
+  var delay = 10;
 
   if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  delay = provider.systemBitrateTimeGet() / 1000;
+  delay = provider.systemBitrateTimeGet();
 
   function makeFiles( names, dirPath, sameTime )
   {
@@ -29718,7 +29719,7 @@ function hardLinkExperiment( test )
       }
       else if( i > 0 )
       {
-        waitSync( delay );
+        _.time.out( delay ).deasync();
         provider.fileWrite({ filePath, data : path.name( filePath ) });
       }
 
@@ -30412,10 +30413,10 @@ function hardLinkAsync( test )
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) && !provider.UsingBigIntForStat )
   hardLinked = _.maybe;
 
-  var delay = 0.01;
+  var delay = 10;
 
   if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  delay = provider.systemBitrateTimeGet() / 1000;
+  delay = provider.systemBitrateTimeGet();
 
   function makeFiles( names, dirPath, sameTime )
   {
@@ -30431,7 +30432,7 @@ function hardLinkAsync( test )
       }
       else if( i > 0 )
       {
-        waitSync( delay );
+        _.time.out( delay ).deasync();
         provider.fileWrite({ filePath, data : path.name( filePath ) });
       }
 
@@ -31082,7 +31083,7 @@ function hardLinkAsync( test )
     var paths = makeFiles( fileNames, currentTestDir, true );
     provider.hardLink({ dstPath : paths });
     var stat = provider.statResolvedRead( paths[ 0 ] );
-    waitSync( delay );
+    _.time.out( delay ).deasync();
     provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
     provider.fileWrite( paths[ paths.length - 1 ], 'different content' );
     var files = provider.recordFactory().records( paths );
@@ -31112,7 +31113,7 @@ function hardLinkAsync( test )
     var paths = provider.path.s.normalize( makeFiles( fileNames, currentTestDir ) );
     provider.hardLink({ dstPath : paths });
     var stat = provider.statResolvedRead( paths[ 0 ] );
-    waitSync( delay );
+    _.time.out( delay ).deasync();
     provider.fileTouch({ filePath : paths[ paths.length - 1 ], purging : 1 });
     provider.fileWrite( paths[ paths.length - 1 ], 'different content' );
     var files = provider.recordFactory().records( paths );
@@ -31170,7 +31171,7 @@ function hardLinkAsync( test )
     var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
     provider.filesDelete( test.context.pathFor( currentTestDir ) );
     var paths = makeFiles( fileNames, currentTestDir );
-    waitSync( delay );
+    _.time.out( delay ).deasync();
     provider.fileWrite( paths[ 0 ], 'max links file' );
     test.is( paths.length >= 3 );
     makeHardLinksToPath( paths[ 0 ], 3 ); //3 links to a file

@@ -20161,7 +20161,7 @@ function fileWriteSync( test )
     sync : 1
   }
   provider.fileWrite( o );
-  test.identical( o.filePath, filePath );
+  test.identical( o.filePath, provider.path.preferredFromGlobal( filePath ) );
   test.identical( provider.fileRead( filePath ), data );
 
   //
@@ -20924,7 +20924,7 @@ function fileWriteAsync( test )
     return provider.fileWrite( o )
     .then( () =>
     {
-      test.identical( o.filePath, filePath );
+      test.identical( o.filePath, provider.path.preferredFromGlobal( filePath ) );
       test.identical( provider.fileRead( filePath ), data );
       return null;
     })
@@ -24526,7 +24526,7 @@ function softLinkActSync( test )
     type : null,
     sync : 1
   }
-  var originalPath = o.srcPath;
+  var originalPath = provider.path.preferredFromGlobal( o.srcPath );
   o.srcPath = provider.path.nativize( o.srcPath );
   o.dstPath = provider.path.nativize( o.dstPath );
   if( o.srcPath !== originalPath )

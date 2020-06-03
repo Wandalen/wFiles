@@ -1305,7 +1305,9 @@ function filesFindPreset( test )
   test.identical( found, expected );
 
   var maskAll = _.files.regexpMakeSafe();
+  debugger;
   test.identical( o.filter.maskAll, maskAll );
+  debugger;
 
   /* */
 

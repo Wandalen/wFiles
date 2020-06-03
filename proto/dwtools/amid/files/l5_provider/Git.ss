@@ -458,7 +458,7 @@ function filesReflectSingle_body( o )
   {
     if( localChanges )
     if( o.extra.stashing )
-    shell( 'git stash' );
+    shell( 'git -c "core.autocrlf=false" stash' );
 
     ready.then( () => gitCheckout() )
 
@@ -530,7 +530,7 @@ function filesReflectSingle_body( o )
 
     let shellOptions =
     {
-      execPath : 'git checkout ' + ( parsed.hash || parsed.tag ),
+      execPath : 'git -c "core.autocrlf=false" checkout ' + ( parsed.hash || parsed.tag ),
       outputCollecting : 1,
       ready : null
     }
@@ -545,7 +545,7 @@ function filesReflectSingle_body( o )
         if( o.extra.stashing )
         shell
         ({
-          execPath : 'git stash pop',
+          execPath : 'git -c "core.autocrlf=false" stash pop',
           sync : 1,
           deasync : 0,
           throwingExitCode : 0,
@@ -577,7 +577,7 @@ function filesReflectSingle_body( o )
     {
       let o =
       {
-        execPath : 'git merge',
+        execPath : 'git -c "core.autocrlf=false" merge',
         outputCollecting : 1,
         ready : null
       }
@@ -613,7 +613,7 @@ function filesReflectSingle_body( o )
 
     let o =
     {
-      execPath : 'git stash pop',
+      execPath : 'git -c "core.autocrlf=false" stash pop',
       outputCollecting : 1,
       ready : null
     };

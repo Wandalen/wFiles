@@ -1053,17 +1053,64 @@ function filesReflectEol( test )
   con
   .then( () =>
   {
+    test.description =
+    `clone git repo
+     file endings should be preserved
+     local config should have auto.crlf false
+     global config should not be modified
+    `
     providerDst.filesDelete( localPath );
     let remotePath = 'git+hd://' + repoPath;
 
-    let autocrlfOriginal = gitConfigGlobalRead( 'core.autocrlf' );
+    let autocrlfGlobalOriginal = gitConfigGlobalRead( 'core.autocrlf' );
 
     return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 })
     .then( () =>
     {
       test.case = 'global git config was not changed';
-      let autocrlf = gitConfigGlobalRead( 'core.autocrlf' );
-      test.identical( autocrlf, autocrlfOriginal );
+      let autocrlfGlobal = gitConfigGlobalRead( 'core.autocrlf' );
+      test.identical( autocrlfGlobal, autocrlfGlobalOriginal );
+
+      let autocrlfLocal = gitConfigLocalRead( localPath, 'core.autocrlf' )
+      test.identical( autocrlfLocal, 'false' );
+
+      let hash1 = providerDst.hashRead( path.join( localPath, 'file1' ) );
+      test.identical( hash1, expectedHash1 );
+      let hash2 = providerDst.hashRead( path.join( localPath, 'file2' ) );
+      test.identical( hash2, expectedHash2 );
+      return null;
+    })
+  })
+
+  //
+
+  con
+  .then( () =>
+  {
+    test.description =
+    `clone and checkout to other branch
+     repo should be on branch specified in path
+     file endings should be preserved
+     local config should have auto.crlf false
+     global config should not be modified
+    `
+    providerDst.filesDelete( localPath );
+    let remotePath = 'git+hd://' + repoPath + '/@secondbranch';
+
+    let autocrlfGlobalOriginal = gitConfigGlobalRead( 'core.autocrlf' );
+
+    return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 })
+    .then( () =>
+    {
+      test.case = 'global git config was not changed';
+      let autocrlfGlobal = gitConfigGlobalRead( 'core.autocrlf' );
+      test.identical( autocrlfGlobal, autocrlfGlobalOriginal );
+
+      let autocrlfLocal = gitConfigLocalRead( localPath, 'core.autocrlf' )
+      test.identical( autocrlfLocal, 'false' );
+
+      let branch = _.git.versionLocalRetrive({ localPath });
+      test.identical( branch, 'secondbranch' )
 
       let hash1 = providerDst.hashRead( path.join( localPath, 'file1' ) );
       test.identical( hash1, expectedHash1 );
@@ -1092,6 +1139,7 @@ function filesReflectEol( test )
     start( 'git config --local core.autocrlf false' )
     start( 'git add .' )
     start( 'git commit -m init' )
+    start( 'git checkout -b secondbranch' )
 
     con.then( () =>
     {
@@ -1106,6 +1154,19 @@ function filesReflectEol( test )
     let o =
     {
       execPath : 'git config --get --global ' + property,
+      sync : 1,
+      outputCollecting : 1
+    };
+    var got = _.process.start( o );
+    return _.strStrip( got.output );
+  }
+
+  function gitConfigLocalRead( localPath, property )
+  {
+    let o =
+    {
+      execPath : 'git config --get --local ' + property,
+      currentPath : localPath,
       sync : 1,
       outputCollecting : 1
     };

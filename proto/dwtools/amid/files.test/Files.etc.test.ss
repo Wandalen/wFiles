@@ -1046,18 +1046,30 @@ function filesSize( test )
 
   test.case = 'string in arg';
   var got = _.fileProvider.filesSize( file2 );
+  if( _.fileProvider.UsingBigIntForStat )
+  test.equivalent( got, BigInt( 5 ) );
+  else
   test.equivalent( got, 5 );
 
   test.case = 'array in arg';
   var got = _.fileProvider.filesSize( [ file1, file2, file3 ] );
+  if( _.fileProvider.UsingBigIntForStat )
+  test.equivalent( got, BigInt( 25 ) );
+  else
   test.equivalent( got, 25 );
 
   test.case = 'map options, one file';
   var got = _.fileProvider.filesSize( { filePath : file1 } );
+  if( _.fileProvider.UsingBigIntForStat )
+  test.equivalent( got, BigInt( 15 ) );
+  else
   test.equivalent( got, 15 );
 
   test.case = 'map options, aray';
   var got = _.fileProvider.filesSize( { filePath : [ file1, file2, file3 ] } );
+  if( _.fileProvider.UsingBigIntForStat )
+  test.equivalent( got, BigInt( 25 ) );
+  else
   test.equivalent( got, 25 );
 
   if( !Config.debug )
@@ -1094,35 +1106,44 @@ function fileSize( test )
 
   file1 = _.fileProvider.path.nativize( file1 );
   file2 = _.fileProvider.path.nativize( file2 );
-  
+
   let ready = new _.Consequence().take( null )
-  
+
   /* asynchronous file creation */
-  
+
   ready
-  
+
   /* - */
-  
-  .then( () => 
+
+  .then( () =>
   {
     test.case = 'string path in arg';
     var got = _.fileProvider.fileSize( file1 );
+    if( _.fileProvider.UsingBigIntForStat )
+    test.equivalent( got, BigInt( 15 ) );
+    else
     test.equivalent( got, 15 );
-  
+
     test.case = 'map in arg';
     var got = _.fileProvider.fileSize( { filePath : file2 } );
+    if( _.fileProvider.UsingBigIntForStat )
+    test.equivalent( got, BigInt( 5 ) );
+    else
     test.equivalent( got, 5 );
-  
+
     test.case = 'file is dir';
     var got = _.fileProvider.fileSize( { filePath : _.path.current() } );
+    if( _.fileProvider.UsingBigIntForStat )
+    test.equivalent( got, BigInt( 0 ) );
+    else
     test.equivalent( got, 0 );
-    
+
     return null;
   })
 
   /* - */
-  
-  .then( () => 
+
+  .then( () =>
   {
     test.case = 'throwing : 0, stat === null';
     var map =
@@ -1134,32 +1155,35 @@ function fileSize( test )
     test.equivalent( got, null );
     return null;
   })
-  
-  .then( () => 
-  {  
+
+  .then( () =>
+  {
     let filePath = mergePath( file3 );
-      
+
     let fileCreate = _.time.out( 100, function()
     {
       createTestFile( file3, 'test3, any text' );
     });
-  
+
     test.case = 'asynchronous file creation test';
     let check1 = _.time.out( 0, function()
-    { 
+    {
       if( Config.debug )
       test.shouldThrowErrorSync( () => _.fileProvider.fileSize({ filePath, throwing : 1 }) );
     });
     let check2 = _.time.out( 100, function()
     {
       var got = _.fileProvider.fileSize( filePath );
+      if( _.fileProvider.UsingBigIntForStat )
+      test.equivalent( got, BigInt( 15 ) );
+      else
       test.equivalent( got, 15 );
     });
     return _.Consequence.And( [ check1,check2 ] );
   })
-  
+
   return ready;
-  
+
   // /* - */
 
   // if( !Config.debug )
@@ -2934,7 +2958,7 @@ function filesLink( test )
     var statLink = _.fileProvider.statResolvedRead({ filePath : link, resolvingSoftLink : 0 }),
       // statSource = File.lstatSync( src );
       statSource = _.fileProvider.statResolvedRead({ filePath : src, resolvingSoftLink : 0 })
-      
+
     if ( !statLink || !statSource ) return false; // both files should be exists
     if ( Number( statSource.nlink ) !== 2 ) return false;
     if ( statLink.ino !== statSource.ino ) return false; // both names should be associated with same file on device.
@@ -2961,7 +2985,7 @@ function filesLink( test )
     test.description = testCheck.name;
 
     try
-    { 
+    {
       got.result = _.fileProvider.hardLink({ dstPath :  link, srcPath : file, sync : 1 });
       // got.isExists = File.existsSync(  _.path.resolve( link ) );
       got.isExists = !!_.fileProvider.statResolvedRead(  _.path.resolve( link ) );

@@ -748,7 +748,7 @@ function preferredFromGlobalAct( globalPath )
     !self.protocols || !globalPath.protocol || _.longHas( self.protocols, globalPath.protocol ),
     () => 'File provider ' + self.qualifiedName + ' does not support protocol ' + _.strQuote( globalPath.protocol )
   );
-  
+
   if( self.usingGlobalPath )
   return globalPath.full;
   else
@@ -1953,8 +1953,8 @@ function pathResolveLinkTailChain_body( o )
   let path = self.path;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.boolLike( o.resolvingSoftLink ) );
-  _.assert( _.boolLike( o.resolvingTextLink ) );
+  _.assert( _.boolLike( o.resolvingSoftLink ) || _.numberIs( o.resolvingSoftLink ) );
+  _.assert( _.boolLike( o.resolvingTextLink ) || _.numberIs( o.resolvingTextLink ) );
   _.assert( _.boolLike( o.allowingMissed ) );
   _.assert( _.boolLike( o.allowingCycled ) );
   _.assert( _.boolLike( o.throwing ) );
@@ -2126,8 +2126,8 @@ function pathResolveLinkHeadDirect_body( o )
   let path = self.path;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.boolLike( o.resolvingSoftLink ) );
-  _.assert( _.boolLike( o.resolvingTextLink ) );
+  _.assert( _.boolLike( o.resolvingSoftLink ) || _.numberIs( o.resolvingSoftLink ) );
+  _.assert( _.boolLike( o.resolvingTextLink ) || _.numberIs( o.resolvingTextLink ) );
   _.assert( _.boolLike( o.allowingMissed ) );
   _.assert( _.boolLike( o.allowingCycled ) );
   _.assert( _.boolLike( o.throwing ) );
@@ -2216,8 +2216,8 @@ function pathResolveLinkHeadReverse_body( o )
   let path = self.path;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.boolLike( o.resolvingSoftLink ) );
-  _.assert( _.boolLike( o.resolvingTextLink ) );
+  _.assert( _.boolLike( o.resolvingSoftLink ) || _.numberIs( o.resolvingSoftLink ) );
+  _.assert( _.boolLike( o.resolvingTextLink ) || _.numberIs( o.resolvingTextLink ) );
   _.assert( _.boolLike( o.allowingMissed ) );
   _.assert( _.boolLike( o.allowingCycled ) );
   _.assert( _.boolLike( o.throwing ) );
@@ -4326,8 +4326,8 @@ function isTerminal_body( o )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.assertRoutineOptions( isTerminal_body, arguments ) );
-  _.assert( _.boolLike( o.resolvingSoftLink ) );
-  _.assert( _.boolLike( o.resolvingTextLink ) );
+  _.assert( _.boolLike( o.resolvingSoftLink ) || _.numberIs( o.resolvingSoftLink ) );
+  _.assert( _.boolLike( o.resolvingTextLink ) || _.numberIs( o.resolvingTextLink ) );
 
   let o2 =
   {
@@ -4408,8 +4408,8 @@ function isDir_body( o )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.assertRoutineOptions( isDir_body, arguments ) );
-  _.assert( _.boolLike( o.resolvingSoftLink ) );
-  _.assert( _.boolLike( o.resolvingTextLink ) );
+  _.assert( _.boolLike( o.resolvingSoftLink ) || _.numberIs( o.resolvingSoftLink ) );
+  _.assert( _.boolLike( o.resolvingTextLink ) || _.numberIs( o.resolvingTextLink ) );
 
   let o2 =
   {
@@ -4501,8 +4501,8 @@ function isHardLink_body( o )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.assertRoutineOptions( isHardLink_body, arguments ) );
-  _.assert( _.boolLike( o.resolvingSoftLink ) );
-  _.assert( _.boolLike( o.resolvingTextLink ) );
+  _.assert( _.boolLike( o.resolvingSoftLink ) || _.numberIs( o.resolvingSoftLink ) );
+  _.assert( _.boolLike( o.resolvingTextLink ) || _.numberIs( o.resolvingTextLink ) );
 
   let o2 =
   {
@@ -4572,7 +4572,8 @@ function isSoftLink_body( o )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.assertRoutineOptions( isSoftLink_body, arguments ) );
-  _.assert( _.boolLike( o.resolvingTextLink ) );
+  _.assert( _.boolLike( o.resolvingTextLink ) || _.numberIs( o.resolvingTextLink ) );
+
 
   let o2 =
   {
@@ -4625,7 +4626,7 @@ function isTextLink_body( o )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.assertRoutineOptions( isTextLink_body, arguments ) );
-  _.assert( _.boolLike( o.resolvingSoftLink ) );
+  _.assert( _.boolLike( o.resolvingSoftLink ) || _.numberIs( o.resolvingSoftLink ) );
 
   let o2 =
   {
@@ -6373,10 +6374,10 @@ function _link_functor( fop )
       _.assert( _.routineIs( c.linkAct ), 'method', actMethodName, 'is not implemented' );
       _.assert( _.objectIs( c.linkAct.defaults ), 'method', actMethodName, 'does not have defaults, but should' );
       _.assertRoutineOptions( _link_body, args );
-      _.assert( _.boolLike( o.resolvingSrcSoftLink ) );
-      _.assert( _.boolLike( o.resolvingSrcTextLink ) );
-      _.assert( _.boolLike( o.resolvingDstSoftLink ) );
-      _.assert( _.boolLike( o.resolvingDstTextLink ) );
+      _.assert( _.boolLike( o.resolvingSrcSoftLink ) || _.numberIs( o.resolvingSrcSoftLink ) );
+      _.assert( _.boolLike( o.resolvingSrcTextLink ) || _.numberIs( o.resolvingSrcTextLink ) );
+      _.assert( _.boolLike( o.resolvingDstSoftLink ) || _.numberIs( o.resolvingDstSoftLink ) );
+      _.assert( _.boolLike( o.resolvingDstTextLink ) || _.numberIs( o.resolvingDstTextLink ) );
       _.assert( _.boolLike( o.allowingMissed ) );
       _.assert( _.boolLike( o.allowingCycled ) );
       _.assert( o.originalSrcPath === undefined );
@@ -7074,9 +7075,8 @@ function _link_functor( fop )
         let err = `Faield to ${entryMethodName} ${o.dstPath} from ${o.srcPath}. Destination file does not exist.`;
         throw _.err( err );
       }
-
-      if( actMethodName === 'softLinkAct' )
-      if( _.strBegins( dstPath, srcPath ) )
+      if( actMethodName === 'softLinkAct' ||  actMethodName === 'textLinkAct' || actMethodName === 'fileCopyAct' )
+      if( _.strBegins( dstPath, srcPath ) || _.strBegins( path.preferredFromGlobal( dstPath ), srcStat.filePath ) )
       srcStat = c.onStat( srcStat.filePath, 0 );
 
       //qqq: find better solution to check text links

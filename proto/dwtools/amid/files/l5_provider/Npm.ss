@@ -307,6 +307,7 @@ function filesReflectSingle_body( o )
   // }
 
   let parsed = self.pathParse( srcPath );
+  let version = parsed.hash || parsed.tag;
 
   /* */
 
@@ -384,7 +385,7 @@ function filesReflectSingle_body( o )
       '--legacy-bundling',
       '--prefix',
       localProvider.path.nativize( tmpPath ),
-      parsed.remoteVcsLongerPath
+      `${parsed.remoteVcsLongerPath}@${version}`
     ];
     let got = shell({ execPath : 'npm install', args : npmArgs });
     _.assert( got.exitCode === 0 );
@@ -405,7 +406,6 @@ function filesReflectSingle_body( o )
     let providerHttp = _.FileProvider.Http();
     let tmpPackagePath = localProvider.path.join( tmpEssentialPath, 'package' );
     // let version = parsed.hash || 'latest';
-    let version = parsed.hash || parsed.tag;
     let registryUrl = `https://registry.npmjs.org/${parsed.remoteVcsPath}/${version}`;
     let tarballDstPath;
 

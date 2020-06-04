@@ -351,6 +351,9 @@ function filesReflectSingle_body( o )
   self.streamRead({ filePath : srcPath })
   .give( function( err, response )
   {
+    if( err )
+    return onError( err );
+
     response.pipe( writeStream );
     response.on( 'error', onError );
   });
@@ -390,7 +393,7 @@ function filesReflectSingle_body( o )
     debugger;
     try
     {
-      HardDrive.fileDelete( o.filePath );
+      dstFileProvider.fileDelete( dstPath );
     }
     catch( err )
     {

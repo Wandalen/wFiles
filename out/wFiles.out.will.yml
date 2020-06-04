@@ -271,7 +271,7 @@ module:
         autoExporting: 0
         enabled: 0
       wGdfStrategy:
-        path: 'npm:///wgdfstrategy'
+        path: 'npm:///wgdf'
         autoExporting: 0
         enabled: 0
       wRoutineBasic:
@@ -1186,7 +1186,7 @@ module:
         autoExporting: 0
         enabled: 0
       wGdfStrategy:
-        path: 'npm:///wgdfstrategy'
+        path: 'npm:///wgdf'
         autoExporting: 0
         enabled: 0
       wRoutineBasic:

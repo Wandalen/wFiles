@@ -17,7 +17,7 @@ submodule :
     path : npm:///wCopyable
     enabled : 0 # submodule
   wGdfStrategy :
-    path : npm:///wgdfstrategy
+    path : npm:///wgdf
     enabled : 0 # submodule
   wRoutineBasic :
     path : npm:///wroutinebasic

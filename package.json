@@ -33,7 +33,7 @@
     "wstringsextra" : "alpha",
     "wConsequence" : "alpha",
     "wCopyable" : "alpha",
-    "wgdfstrategy" : "alpha",
+    "wgdf" : "alpha",
     "wroutinebasic" : "alpha",
     "wpathbasic" : "alpha",
     "wpathtools" : "alpha",

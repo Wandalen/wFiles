@@ -257,7 +257,13 @@ function filesReflectTrivial( test )
   .then( ( got ) =>
   {
     test.is( !providerDst.fileExists( localPath ) );
-    test.is( !providerDst.fileExists( localPath2 ) );
+    test.is( providerDst.fileExists( localPath2 ) );
+
+    let file2 = providerDst.fileRead( localPath2 );
+    test.is( _.strHas( file2, '# wTools' ) );
+    test.is( _.strHas( file2, '### Try out' ) );
+    test.is( _.strHas( file2, '### Contributors' ) );
+
     return got;
   })
 

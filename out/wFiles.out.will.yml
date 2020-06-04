@@ -239,6 +239,7 @@ module:
           - ../proto/dwtools/amid/files.test/FilesRead.test.s
           - ../proto/dwtools/amid/files.test/Git.test.ss
           - ../proto/dwtools/amid/files.test/HardDrive.test.ss
+          - ../proto/dwtools/amid/files.test/Http.test.ss
           - ../proto/dwtools/amid/files.test/Npm.test.ss
           - ../proto/dwtools/amid/files.test/Path.test.ss
           - ../proto/dwtools/amid/files.test/Record.test.s

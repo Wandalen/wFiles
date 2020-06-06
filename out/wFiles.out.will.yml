@@ -2,10 +2,13 @@ format: outwillfile-2.0
 root:
   - wFiles.out
 consistency:
-  ../.ex.will.yml: &ref_0
+  wFiles.out.will.yml: &ref_0
+    hash: 3ebf740da6285018f6551a26833825e9
+    size: 49856
+  ../.ex.will.yml: &ref_1
     hash: cbf73b464f50989e1f82f88d31248278
     size: 3237
-  ../.im.will.yml: &ref_1
+  ../.im.will.yml: &ref_2
     hash: d2d7427b6868be981e37181fb524ef1c
     size: 6596
 module:
@@ -34,11 +37,11 @@ module:
         module to keep DRY.
       enabled: 1
       version: 0.7.0
-      interpreters: &ref_2
+      interpreters:
         - njs >= 8.0.0
         - chrome >= 60.0.0
         - firefox >= 60.0.0
-      keywords: &ref_3
+      keywords:
         - wTools
         - wFiles
         - file
@@ -46,13 +49,13 @@ module:
         - write file
       license: MIT
       author: Kostiantyn Wandalen <wanalen@01.school>
-      contributors: &ref_4
+      contributors:
         - Kostiantyn Wandalen <wanalen@01.school>
         - Volodymyr M. <volodymyr.migdal@gmail.com>
         - Ihor O. <iostashvxi@gmail.com>
         - Dmytro Kryvoruchko <dm.vict.kr@gmail.com>
       npm.name: wFiles
-      npm.scripts: &ref_5
+      npm.scripts:
         test: wtest .run proto/**
         test2: >-
           wtest .run proto/**/dwtools/amid/file.test/Provider.HardDrive.test.ss
@@ -892,6 +895,24 @@ module:
           content: prime
         inherit:
           - files.transpile
+      exported.proto.export:
+        opts:
+          filePath: 'reflector::exported.proto.export*'
+        criterion:
+          generated: 1
+          content: proto
+          export: 1
+        inherit:
+          - files.reflect
+      exported.files.proto.export:
+        opts:
+          filePath: 'reflector::exported.files.proto.export*'
+        criterion:
+          generated: 1
+          content: proto
+          export: 1
+        inherit:
+          - files.reflect
     build:
       proto.export:
         steps:
@@ -980,8 +1001,9 @@ module:
           content: proto
           export: 1
     consistency:
-      ../.ex.will.yml: *ref_0
-      ../.im.will.yml: *ref_1
+      wFiles.out.will.yml: *ref_0
+      ../.ex.will.yml: *ref_1
+      ../.im.will.yml: *ref_2
   ../:
     about:
       name: wFiles
@@ -1007,13 +1029,33 @@ module:
         module to keep DRY.
       enabled: 1
       version: 0.7.0
-      interpreters: *ref_2
-      keywords: *ref_3
+      interpreters:
+        - njs >= 8.0.0
+        - chrome >= 60.0.0
+        - firefox >= 60.0.0
+      keywords:
+        - wTools
+        - wFiles
+        - file
+        - read file
+        - write file
       license: MIT
       author: Kostiantyn Wandalen <wanalen@01.school>
-      contributors: *ref_4
+      contributors:
+        - Kostiantyn Wandalen <wanalen@01.school>
+        - Volodymyr M. <volodymyr.migdal@gmail.com>
+        - Ihor O. <iostashvxi@gmail.com>
+        - Dmytro Kryvoruchko <dm.vict.kr@gmail.com>
       npm.name: wFiles
-      npm.scripts: *ref_5
+      npm.scripts:
+        test: wtest .run proto/**
+        test2: >-
+          wtest .run proto/**/dwtools/amid/file.test/Provider.HardDrive.test.ss
+          routine : linkHardSyncRunner
+        test3: >-
+          wtest .run proto/**/dwtools/amid/file.test/Provider.HardDrive.test.ss
+          routine : linkHardAsyncRunner
+        docgen: wdocgen .build proto
     path:
       module.willfiles:
         criterion:
@@ -1795,3 +1837,6 @@ module:
       ../.im.will.yml:
         hash: d2d7427b6868be981e37181fb524ef1c
         size: 6596
+      wFiles.out.will.yml:
+        hash: 3ebf740da6285018f6551a26833825e9
+        size: 49856

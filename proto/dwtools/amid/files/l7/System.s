@@ -154,7 +154,7 @@ function providerRegister( fileProvider ) // xxx
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( fileProvider instanceof _.FileProvider.Abstract, () => 'Expects file providers, but got ' + _.strTypeOf( fileProvider ) );
+  _.assert( fileProvider instanceof _.FileProvider.Abstract, () => 'Expects file providers, but got ' + _.strType( fileProvider ) );
   _.assert( _.arrayIs( fileProvider.protocols ) );
   _.assert( _.strDefined( fileProvider.protocol ), 'Cant register file provider without {-protocol-} defined', _.strQuote( fileProvider.qualifiedName ) );
   _.assert( _.strDefined( fileProvider.originPath ) );

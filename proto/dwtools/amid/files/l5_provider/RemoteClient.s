@@ -561,7 +561,7 @@
 //   if( _.bufferTypedIs( o.data ) || _.bufferRawIs( o.data ) )
 //   o.data = _.bufferNodeFrom( o.data );
 //
-//   _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ),'Expects string or node buffer, but got',_.strTypeOf( o.data ) );
+//   _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ),'Expects string or node buffer, but got',_.strType( o.data ) );
 //
 //   /* write */
 //

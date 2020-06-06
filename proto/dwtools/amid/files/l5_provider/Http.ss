@@ -56,11 +56,7 @@ function streamReadAct( o )
 {
   let self = this;
 
-  // if( _.strIs( o ) )
-  // {
-  //   o = { filePath : o };
-  // }
-
+  _.assert( 0, 'not implemented' ); /* qqq : implement */
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.strIs( o.filePath ),'streamReadAct :','Expects {-o.filePath-}' );
 
@@ -444,8 +440,6 @@ function fileCopyToHardDriveAct( o )
   _.assert( _.strIs( o.url ),'fileCopyToHardDriveAct :','Expects {-o.filePath-}' );
   _.assert( _.strIs( o.filePath ),'fileCopyToHardDriveAct :','Expects {-o.filePath-}' );
 
- //
-
   let dstFileProvider = _.FileProvider.HardDrive( );
   let writeStream = null;
   let dstPath = dstFileProvider.path.nativize( o.filePath );
@@ -744,10 +738,6 @@ _.FileProvider[ Self.shortName ] = Self;
 // --
 // export
 // --
-
-// if( typeof module !== 'undefined' )
-// if( _global_.WTOOLS_PRIVATE )
-// { /* delete require.cache[ module.id ]; */ }
 
 if( typeof module !== 'undefined' )
 module[ 'exports' ] = Self;

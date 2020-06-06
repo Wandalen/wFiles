@@ -684,7 +684,7 @@ function fileWriteAct( o )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assertRoutineOptions( fileWriteAct, o );
-  _.assert( _.strIs( o.filePath ) );
+  _.assert( self.path.isNormalized( o.filePath ) );
   _.assert( self.WriteMode.indexOf( o.writeMode ) !== -1 );
 
   let encoder = fileWriteAct.encoders[ o.encoding ];
@@ -956,7 +956,7 @@ function fileDeleteAct( o )
 
   _.assertRoutineOptions( fileDeleteAct, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.strIs( o.filePath ) );
+  _.assert( self.path.isNormalized( o.filePath ) );
 
   // logger.log( 'Extract.fileDeleteAct', o.filePath );
   // debugger;
@@ -1075,7 +1075,7 @@ function fileLockAct( o )
 
   _.assert( !o.locking, 'not implemented' );
   _.assert( !o.sharing || o.sharing === 'process', 'not implemented' );
-  _.assert( _.strIs( o.filePath ) );
+  _.assert( self.path.isNormalized( o.filePath ) );
   _.assert( !o.waiting || o.timeOut >= 1000 );
   _.assertRoutineOptions( fileLockAct, arguments );
 
@@ -1183,7 +1183,7 @@ function fileUnlockAct( o )
 {
   let self = this;
 
-  _.assert( _.strIs( o.filePath ) );
+  _.assert( self.path.isNormalized( o.filePath ) );
   _.assertRoutineOptions( fileUnlockAct, arguments );
 
   let con = _.Consequence.Try( () =>
@@ -1246,7 +1246,7 @@ function fileIsLockedAct( o )
   let self = this;
 
   _.assertRoutineOptions( fileIsLockedAct, arguments );
-  _.assert( _.strIs( o.filePath ) );
+  _.assert( self.path.isNormalized( o.filePath ) );
 
   let con = _.Consequence.Try( () =>
   {
@@ -1986,8 +1986,8 @@ function _descriptorReadResolved( o )
 
   return result;
 }
+
 _.routineExtend( _descriptorReadResolved, _descriptorRead );
-// _descriptorReadResolved.defaults = Object.create( _descriptorRead.defaults );
 
 //
 
@@ -2656,9 +2656,6 @@ let Accessors =
 let Statics =
 {
 
-  // filesTreeRead,
-  // readToProvider,
-
   _descriptorIsDir,
   _descriptorIsTerminal,
   _descriptorIsLink,
@@ -2732,9 +2729,6 @@ let Proto =
   filesTreeSet,
   statsAdopt,
   linksRebase,
-  // filesTreeRead,
-  // rewriteFromProvider,
-  // readToProvider,
 
   //
 

@@ -30,7 +30,7 @@ function onSuiteBegin()
   if( !this.isBrowser )
   {
     this.suiteTempPath = _.path.pathDirTempOpen( _.path.join( __dirname, '../..' ), 'Path' );
-    this.assetsOriginalSuitePath = _.path.join( __dirname, '_asset' );
+    this.assetsOriginalPath = _.path.join( __dirname, '_asset' );
   }
   else
   this.suiteTempPath = _.path.current();
@@ -1787,7 +1787,7 @@ var Self =
   {
     suiteTempPath : null,
     isBrowser : null,
-    assetsOriginalSuitePath : null,
+    assetsOriginalPath : null,
     appJsPath : null,
 
     createTestsDirectory,

@@ -105,7 +105,6 @@ var Proto =
     filesTree,
     pathFor,
     globalFromPreferred : null
-    // testFile : 'file1'
   },
 
   tests :

@@ -1,4 +1,4 @@
-( function _FileProvider_Npm_test_ss_( ) {
+( function _Npm_test_ss_( ) {
 
 'use strict';
 
@@ -11,11 +11,11 @@ if( typeof module !== 'undefined' )
   require( '../files/UseTop.s' );
 }
 
-//
-
 var _ = _global_.wTools;
 
-//
+// --
+// context
+// --
 
 function onSuiteBegin( test )
 {
@@ -25,19 +25,17 @@ function onSuiteBegin( test )
   context.providerDst = _.FileProvider.HardDrive();
   context.system = _.FileProvider.System({ providers : [ context.providerSrc, context.providerDst ] });
 
-  let path = context.providerDst.path;
-
-  context.suitePath = path.pathDirTempOpen( path.join( __dirname, '../..'  ), 'FileProviderNpm' );
-  context.suitePath = context.providerDst.pathResolveLinkFull({ filePath : context.suitePath, resolvingSoftLink : 1 });
+  context.suitePath = _.fileProvider.pathDirTempOpen( _.fileProvider.path.join( __dirname, '../..'  ), 'FileProviderNpm' );
+  context.suitePath = _.fileProvider.pathResolveLinkFull({ filePath : context.suitePath, resolvingSoftLink : 1 }); /* qqq : ? */
   context.suitePath = context.suitePath.absolutePath;
 }
+
+//
 
 function onSuiteEnd( test )
 {
   let context = this;
-  let path = context.providerDst.path;
-  _.assert( _.strHas( context.suitePath, 'FileProviderNpm' ), context.suitePath );
-  path.pathDirTempClose( context.suitePath );
+  _.fileProvider.path.pathDirTempClose( context.suitePath );
 }
 
 // --
@@ -482,7 +480,7 @@ var Proto =
 
 //
 
-var Self = new wTestSuite( Proto )/* .inherit( Parent ); */
+var Self = new wTestSuite( Proto )
 if( typeof module !== 'undefined' && !module.parent )
 wTester.test( Self.name );
 

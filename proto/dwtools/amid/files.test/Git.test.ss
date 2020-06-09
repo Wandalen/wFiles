@@ -14,7 +14,7 @@ if( typeof module !== 'undefined' )
 //
 
 var _ = _global_.wTools;
-var RunningInTravis = 'TRAVIS' in process.env && 'CI' in process.env;
+var RunningInsideTestContainer = _.process.insideTestContainer();
 
 //
 
@@ -33,17 +33,20 @@ function onSuiteBegin( test )
   context.suitePath = context.providerDst.pathResolveLinkFull({ filePath : context.suitePath, resolvingSoftLink : 1 });
   context.suitePath = context.suitePath.absolutePath;
 
-  if( RunningInTravis )
+  if( RunningInsideTestContainer )
   {
-    let gitConfig = _.process.starter
+    let gitConfig = context.gitConfigStart = _.process.starter
     ({
       execPath : 'git config --global',
       sync : 1,
       deasync : 0,
-      mode : 'shell'
+      mode : 'shell',
+      outputCollecting : 1
     })
     gitConfig( `user.email "test@test.com"` )
     gitConfig( `user.name "Test"` )
+    context.gitOriginalCoreAutocrlf = _.strStrip( gitConfig( `core.autocrlf` ).output );
+    gitConfig( `core.autocrlf true` )
   }
 
 }
@@ -52,6 +55,13 @@ function onSuiteEnd( test )
 {
   let context = this;
   let path = context.providerDst.path;
+
+  if( RunningInsideTestContainer )
+  {
+    let gitConfig = context.gitConfigStart;
+    gitConfig( `core.autocrlf ${context.gitOriginalCoreAutocrlf}` )
+  }
+
   _.assert( _.strHas( context.suitePath, 'FileProviderGit' ), context.suitePath );
   path.pathDirTempClose( context.suitePath );
 }
@@ -1048,6 +1058,15 @@ function filesReflectEol( test )
 
   prepare();
 
+  /*
+    +clone
+    +checkout
+    change core.autocrl in local git config then checkout
+    merge
+    change core.autocrl in local git config then merge
+    merge stashing : 1
+  */
+
   /* - */
 
   con
@@ -1198,6 +1217,8 @@ var Proto =
     suitePath : null,
     providerSrc : null,
     providerDst : null,
+    gitConfigStart : null,
+    gitOriginalCoreAutocrlf : null,
     system : null
   },
 

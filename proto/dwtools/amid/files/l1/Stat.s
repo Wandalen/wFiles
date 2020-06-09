@@ -31,7 +31,8 @@ if( typeof module !== 'undefined' )
 let _global = _global_;
 let _ = _global_.wTools;
 let Parent = null;
-let Self = function wFileStat( o )
+let Self = wFileStat;
+function wFileStat( o )
 {
   return _.workpiece.construct( Self, this, arguments );
 }

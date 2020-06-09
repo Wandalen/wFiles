@@ -21,7 +21,8 @@ if( typeof module !== 'undefined' )
 let _global = _global_;
 let _ = _global_.wTools;
 let Parent = _.FileRecordContext;
-let Self = function wFileRecordFilter( o )
+let Self = wFileRecordFilter;
+function wFileRecordFilter( o )
 {
   return _.workpiece.construct( Self, this, arguments );
 }

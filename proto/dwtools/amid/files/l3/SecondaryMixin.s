@@ -20,6 +20,8 @@ let Find = _.FileProvider.Find;
 
 let fileRead = Partial.prototype.fileRead;
 
+_.assert( _.lengthOf( _.FileReadEncoders ) > 0 );
+// _.assert( _.lengthOf( fileRead.encoders ) > 0 );
 _.assert( _.routineIs( _.FileRecord ) );
 _.assert( _.routineIs( Abstract ) );
 _.assert( _.routineIs( Partial ) );
@@ -36,7 +38,8 @@ _.assert( _.routineIs( fileRead ) );
 */
 
 let Parent = null;
-let Self = function wFileProviderSecondary( o )
+let Self = wFileProviderSecondary;
+function wFileProviderSecondary( o )
 {
   return _.workpiece.construct( Self, this, arguments );
 }
@@ -895,9 +898,9 @@ function configFind_body( o )
 
   let exts = Object.create( null );
 
-  for( let e in fileRead.encoders )
+  for( let e in _.FileReadEncoders )
   {
-    let encoder = fileRead.encoders[ e ];
+    let encoder = _.FileReadEncoders[ e ];
     if( encoder === null )
     continue;
     _.assert( _.objectIs( encoder ), 'Read encoder', e, 'is missing' );

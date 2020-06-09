@@ -114,7 +114,7 @@ let readJsNode =
   onEnd : function( e )
   {
     if( !_.strIs( e.data ) )
-    throw _.err( '( fileRead.encoders.js.node.onEnd ) expects string' );
+    throw _.err( 'Expects string' );
     e.data = require( _.fileProvider.path.nativize( e.operation.filePath ) );
   },
 
@@ -201,10 +201,10 @@ _.FileWriteEncoders = _.FileWriteEncoders || Object.create( null );
 Object.assign( _.FileReadEncoders, FileReadEncoders );
 Object.assign( _.FileWriteEncoders, FileWriteEncoders );
 
-if( _.FileProvider && _.FileProvider.Partial && _.FileProvider.Partial.prototype.fileRead.encoders )
-_.assert( _.isPrototypeOf( _.FileReadEncoders, _.FileProvider.Partial.prototype.fileRead.encoders ) );
-if( _.FileProvider && _.FileProvider.Partial && _.FileProvider.Partial.prototype.fileWrite.encoders )
-_.assert( _.isPrototypeOf( _.FileWriteEncoders, _.FileProvider.Partial.prototype.fileWrite.encoders ) );
+// if( _.FileProvider && _.FileProvider.Partial && _.FileProvider.Partial.prototype.fileRead.encoders )
+// _.assert( _.isPrototypeOf( _.FileReadEncoders, _.FileProvider.Partial.prototype.fileRead.encoders ) );
+// if( _.FileProvider && _.FileProvider.Partial && _.FileProvider.Partial.prototype.fileWrite.encoders )
+// _.assert( _.isPrototypeOf( _.FileWriteEncoders, _.FileProvider.Partial.prototype.fileWrite.encoders ) );
 
 // --
 // export

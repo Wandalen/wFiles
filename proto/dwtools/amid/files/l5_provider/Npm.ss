@@ -34,7 +34,8 @@ let _ = _global_.wTools;
 */
 
 let Parent = _.FileProvider.Partial;
-let Self = function wFileProviderNpm( o )
+let Self = wFileProviderNpm;
+function wFileProviderNpm( o )
 {
   return _.workpiece.construct( Self, this, arguments );
 }

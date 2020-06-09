@@ -25,7 +25,8 @@ let FileRecord = _.FileRecord;
 */
 
 let Parent = null;
-let Self = function wFileProviderFind( o )
+let Self = wFileProviderFind;
+function wFileProviderFind( o )
 {
   return _.workpiece.construct( Self, this, arguments );
 }

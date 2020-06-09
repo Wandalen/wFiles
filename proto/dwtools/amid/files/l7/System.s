@@ -24,7 +24,8 @@ let _ = _global_.wTools;
 let Routines = Object.create( null );
 let FileRecord = _.FileRecord;
 let Parent = _.FileProvider.Partial;
-let Self = function wFileSystem( o )
+let Self = wFileSystem;
+function wFileSystem( o )
 {
   return _.workpiece.construct( Self, this, arguments );
 }

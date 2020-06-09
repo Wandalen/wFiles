@@ -20,7 +20,8 @@ if( typeof module !== 'undefined' )
 let _global = _global_;
 let _ = _global_.wTools;
 let Parent = null;
-let Self = function wFileRecordContext( o )
+let Self = wFileRecordContext;
+function wFileRecordContext( o )
 {
   return _.workpiece.construct( Self, this, arguments );
   // if( !( this instanceof Self ) )

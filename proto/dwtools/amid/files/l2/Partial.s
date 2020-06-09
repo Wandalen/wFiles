@@ -80,7 +80,8 @@ fileIsLockedAct.defaults =
 */
 
 let Parent = _.FileProvider.Abstract;
-let Self = function wFileProviderPartial( o )
+let Self = wFileProviderPartial;
+function wFileProviderPartial( o )
 {
   return _.workpiece.construct( Self, this, arguments );
 }
@@ -3006,8 +3007,13 @@ function streamRead_body( o )
 {
   let self = this;
   let result;
+  let error;
+  let encoder = _.FileReadEncoders[ o.encoding ];
+
   let optionsRead = _.mapExtend( null, o );
   delete optionsRead.throwing;
+
+  handleBegin();
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
@@ -3027,7 +3033,83 @@ function streamRead_body( o )
     result = self.streamReadAct( optionsRead );
   }
 
+  result.on( 'error', ( err ) => handleError( err ) );
+  result.on( 'end', () => handleEnd() );
+
+  if( error )
+  {
+    debugger;
+    if( o.throwing )
+    throw error;
+  }
+
   return result;
+
+
+  /* begin */
+
+  function handleBegin()
+  {
+    if( encoder && encoder.onBegin )
+    {
+      debugger;
+      let r = encoder.onBegin.call( self, { operation : o, encoder : encoder, provider : self })
+      _.sure( r === undefined );
+    }
+  }
+
+  /* end */
+
+  function handleEnd()
+  {
+
+    if( encoder && encoder.onEnd )
+    try
+    {
+      debugger;
+      let o2 = { data : result, operation : o, encoder : encoder, provider : self };
+      encoder.onEnd.call( self, o2 );
+      _.sure( r === undefined );
+      result = o2.result;
+    }
+    catch( err )
+    {
+      debugger;
+      handleError( err );
+      return null;
+    }
+
+  }
+
+  /* error */
+
+  function handleError( err )
+  {
+
+    err = _._err
+    ({
+      args : [ stack, '\nfileRead( ', o.filePath, ' )\n', err ],
+      usingSourceCode : 0,
+      level : 0,
+    });
+
+    if( encoder && encoder.onError )
+    try
+    {
+      err = encoder.onError.call( self, { error : err, operation : o, encoder : encoder, provider : self }) /* xxx : remove encoder.onError? */
+    }
+    catch( err2 )
+    {
+      /* the simplest output is reqired to avoid recursion */
+      console.error( err2 );
+      console.error( err.toString() + '\n' + err.stack );
+    }
+
+    // if( o.throwing )
+    // throw err;
+    return null;
+  }
+
 }
 
 _.routineExtend( streamRead_body, streamReadAct );
@@ -3088,7 +3170,8 @@ function fileRead_body( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.strIs( o.encoding ) );
 
-  let encoder = fileRead.encoders[ o.encoding ];
+  // let encoder = fileRead.encoders[ o.encoding ];
+  let encoder = _.FileReadEncoders[ o.encoding ];
 
   if( o.resolvingTextLink && self.usingTextLink )
   o.filePath = self.pathResolveTextLink( o.filePath );
@@ -3130,25 +3213,18 @@ function fileRead_body( o )
     return result;
   }
 
-  /* return */
-
-  return handleEnd( result );
-
   /* begin */
 
   function handleBegin()
   {
-
     if( encoder && encoder.onBegin )
-    _.sure( encoder.onBegin.call( self, { operation : o, encoder : encoder }) === undefined );
-
-    if( !o.onBegin )
-    return;
-
-    let r = o
-
-    debugger;
-    _.Consequence.Take( o.onBegin, r );
+    {
+      debugger;
+      let r = encoder.onBegin.call( self, { operation : o, encoder : encoder, provider : self })
+      _.sure( r === undefined );
+    }
+    // debugger;
+    // _.Consequence.Take( o.onBegin, o );
   }
 
   /* end */
@@ -3156,12 +3232,14 @@ function fileRead_body( o )
   function handleEnd( data )
   {
 
+    if( encoder && encoder.onEnd )
     try
     {
-      let context = { data : data, operation : o, encoder : encoder, provider : self };
-      if( encoder && encoder.onEnd )
-      _.sure( encoder.onEnd.call( self, context ) === undefined );
-      data = context.data;
+      debugger;
+      let o2 = { data : data, operation : o, encoder : encoder, provider : self };
+      let r = encoder.onEnd.call( self, o2 );
+      _.sure( r === undefined );
+      data = o2.data;
     }
     catch( err )
     {
@@ -3176,15 +3254,15 @@ function fileRead_body( o )
     o.result = data;
 
     let r;
-    if( o.returningRead )
+    if( o.returningRead ) /* xxx : rename to outputFormat */
     r = data;
     else
     r = o;
 
-    if( o.onEnd )
-    debugger;
-    if( o.onEnd )
-    _.Consequence.Take( o.onEnd, o );
+    // if( o.onEnd )
+    // debugger;
+    // if( o.onEnd )
+    // _.Consequence.Take( o.onEnd, o );
 
     return r;
   }
@@ -3193,36 +3271,37 @@ function fileRead_body( o )
 
   function handleError( err )
   {
-    _.errAttend( err );
+
+    // _.errAttend( err ); /* qqq xxx : no! */
+
+    err = _._err
+    ({
+      args : [ stack, '\nfileRead( ', o.filePath, ' )\n', err ],
+      usingSourceCode : 0,
+      level : 0,
+    });
 
     if( encoder && encoder.onError )
     try
     {
-      err = _._err
-      ({
-        args : [ stack, '\nfileRead( ', o.filePath, ' )\n', err ],
-        usingSourceCode : 0,
-        level : 0,
-      });
-      err = encoder.onError.call( self, { error : err, operation : o, encoder : encoder })
+      err = encoder.onError.call( self, { error : err, operation : o, encoder : encoder, provider : self }) /* xxx : remove encoder.onError? */
     }
     catch( err2 )
     {
-      /* there the simplest output is reqired to avoid recursion */
+      /* the simplest output is reqired to avoid recursion */
       console.error( err2 );
       console.error( err.toString() + '\n' + err.stack );
     }
 
-    if( o.onError )
-    _.Consequence.Error( o.onError, err );
+    // if( o.onError )
+    // _.Consequence.Error( o.onError, err );
 
     if( o.throwing )
-    throw _.err( err );
-    else
-    _.errAttend( err );
-
+    throw err
     return null;
   }
+
+  /* */
 
 }
 
@@ -3231,7 +3310,6 @@ _.routineExtend( fileRead_body, fileReadAct );
 var defaults = fileRead_body.defaults;
 defaults.returningRead = 1;
 defaults.throwing = null;
-// defaults.name = null;
 defaults.onBegin = null;
 defaults.onEnd = null;
 defaults.onError = null;
@@ -3242,8 +3320,8 @@ var having = fileRead_body.having;
 having.driving = 0;
 having.aspect = 'body';
 
-fileRead_body.encoders = _.FileReadEncoders;
-_.assert( _.objectIs( fileRead_body.encoders ) );
+// fileRead_body.encoders = _.FileReadEncoders; // yyy
+// _.assert( _.objectIs( fileRead_body.encoders ) );
 
 //
 
@@ -3338,6 +3416,9 @@ let fileRead = _.routineFromPreAndBody( fileRead_pre, fileRead_body );
 
 fileRead.having.aspect = 'entry';
 fileRead.having.hubResolving = 1;
+
+_.assert( fileRead.encoders === undefined );
+// _.assert( _.mapHasAll( fileRead.encoders, fileRead_body.encoders ) );
 
 //
 
@@ -3497,12 +3578,14 @@ function _fileInterpret_body( o )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
+  debugger;
   if( !o.encoding )
   {
     let ext = self.path.ext( o.filePath );
     for( let e in fileInterpret.encoders )
     {
-      let encoder = fileInterpret.encoders[ e ];
+      // let encoder = fileInterpret.encoders[ e ];
+      let encoder = _.FileReadEncoders[ o.encoding ];
       if( !encoder.exts )
       continue;
       if( encoder.forConfig !== undefined && !encoder.forConfig )
@@ -4890,7 +4973,8 @@ function fileWrite_body( o )
 
   o.encoding = o.encoding || self.encoding;
 
-  let encoder = self.fileWrite.encoders[ o.encoding ];
+  // let encoder = self.fileWrite.encoders[ o.encoding ];
+  let encoder = _.FileWriteEncoders[ o.encoding ];
 
   let o2 = _.mapOnly( o, self.fileWriteAct.defaults );
 
@@ -7476,6 +7560,8 @@ defaults.resolvingSrcTextLink = 0;
 defaults.resolvingDstSoftLink = 0;
 defaults.resolvingDstTextLink = 0;
 
+_.mapExtend( fileRename.defaults, fileRename.body.defaults );
+
 //
 
 let fileCopyAct = Object.create( null );
@@ -7722,6 +7808,8 @@ defaults.resolvingSrcTextLink = 0;
 defaults.breakingDstHardLink = 0;
 defaults.resolvingDstSoftLink = 0;
 defaults.resolvingDstTextLink = 0;
+
+_.mapExtend( fileCopy.defaults, fileCopy.body.defaults );
 
 //
 
@@ -8000,6 +8088,8 @@ defaults.breakingDstHardLink = 1;
 defaults.resolvingDstSoftLink = 0;
 defaults.resolvingDstTextLink = 0;
 
+_.mapExtend( hardLink.defaults, hardLink.body.defaults );
+
 //
 
 let softLinkAct = Object.create( null );
@@ -8107,6 +8197,8 @@ defaults.resolvingSrcSoftLink = 0;
 defaults.resolvingSrcTextLink = 0;
 defaults.resolvingDstSoftLink = 0;
 defaults.resolvingDstTextLink = 0;
+
+_.mapExtend( softLink.defaults, softLink.body.defaults );
 
 //
 
@@ -8245,6 +8337,8 @@ defaults.resolvingSrcSoftLink = 0;
 defaults.resolvingSrcTextLink = 0;
 defaults.resolvingDstSoftLink = 0;
 defaults.resolvingDstTextLink = 0;
+
+_.mapExtend( textLink.defaults, textLink.body.defaults );
 
 //
 

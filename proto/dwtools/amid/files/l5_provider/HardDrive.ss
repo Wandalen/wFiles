@@ -33,7 +33,8 @@ let _global = _global_;
 let _ = _global_.wTools;
 let FileRecord = _.FileRecord;
 let Parent = _.FileProvider.Partial;
-let Self = function wFileProviderHardDrive( o )
+let Self = wFileProviderHardDrive;
+function wFileProviderHardDrive( o )
 {
   return _.workpiece.construct( Self, this, arguments );
 }
@@ -476,15 +477,49 @@ function fileReadAct( o )
 
   let filePath = self.path.nativize( o.filePath );
 
-  // if( Config.debug )
-  // if( !o.sync )
-  // stack = _._err({ usingSourceCode : 0, args : [] });
-
   if( Config.debug )
   if( !o.sync )
   stack = _.introspector.stack([ 1, Infinity ]);
 
   let encoder = fileReadAct.encoders[ o.encoding ];
+
+  /* exec */
+
+  handleBegin();
+
+  if( !o.resolvingSoftLink && self.isSoftLink( o.filePath ) )
+  {
+    let err = _.err( 'fileReadAct: Reading from soft link is not allowed when "resolvingSoftLink" is disabled' );
+    return handleError( err );
+  }
+
+  if( o.sync )
+  {
+    try
+    {
+      result = File.readFileSync( filePath, { encoding : self._encodingFor( o.encoding ) } );
+    }
+    catch( err )
+    {
+      return handleError( err );
+    }
+
+    return handleEnd( result );
+  }
+  else
+  {
+    con = new _.Consequence();
+
+    File.readFile( filePath, { encoding : self._encodingFor( o.encoding ) }, function( err, data )
+    {
+      if( err )
+      return handleError( err );
+      else
+      return handleEnd( data );
+    });
+
+    return con;
+  }
 
   /* begin */
 
@@ -515,17 +550,19 @@ function fileReadAct( o )
 
   function handleError( err )
   {
+
+    err = _._err
+    ({
+      args : [ '\nfileReadAct( ', o.filePath, ' )\n', err ],
+      usingSourceCode : 0,
+      level : 0,
+      stack : stack,
+    });
+
     if( encoder && encoder.onError )
     try
     {
       debugger;
-      err = _._err
-      ({
-        args : [ '\nfileReadAct( ', o.filePath, ' )\n', err ],
-        usingSourceCode : 0,
-        level : 0,
-        stack : stack,
-      });
       err = encoder.onError.call( self, { error : err, transaction : o, encoder : encoder })
     }
     catch( err2 )
@@ -539,51 +576,8 @@ function fileReadAct( o )
     if( o.sync )
     throw err;
     else
-    return con.error( _.err( err ) );
+    return con.error( err );
 
-  }
-
-  /* exec */
-
-  handleBegin();
-
-  // if( _.strHas( o.filePath, 'icons.woff2' ) )
-  // debugger;
-
-  if( !o.resolvingSoftLink && self.isSoftLink( o.filePath ) )
-  {
-    let err = _.err( 'fileReadAct: Reading from soft link is not allowed when "resolvingSoftLink" is disabled' );
-    return handleError( err );
-  }
-
-  if( o.sync )
-  {
-    try
-    {
-      result = File.readFileSync( filePath, { encoding : self._encodingFor( o.encoding ) } );
-    }
-    catch( err )
-    {
-      return handleError( err );
-    }
-
-    return handleEnd( result );
-  }
-  else
-  {
-    con = new _.Consequence();
-
-    File.readFile( filePath, { encoding : self._encodingFor( o.encoding ) }, function( err, data )
-    {
-
-      if( err )
-      return handleError( err );
-      else
-      return handleEnd( data );
-
-    });
-
-    return con;
   }
 
 }
@@ -595,18 +589,77 @@ _.routineExtend( fileReadAct, Parent.prototype.fileReadAct );
 function streamReadAct( o )
 {
   let self = this;
+  let result;
+  let encoder = fileReadAct.encoders[ o.encoding ];
 
   _.assertRoutineOptions( streamReadAct, arguments );
 
   let filePath = self.path.nativize( o.filePath );
 
+  handleBegin();
+
   try
   {
-    return File.createReadStream( filePath, { encoding : o.encoding } );
+    result = File.createReadStream( filePath, { encoding : self._encodingFor( o.encoding ) } );
   }
   catch( err )
   {
     throw _.err( err );
+  }
+
+  result.on( 'error', ( err ) => handleError( err ) );
+  result.on( 'end', () => handleEnd() );
+
+  return result;
+
+  /* begin */
+
+  function handleBegin()
+  {
+
+    if( encoder && encoder.onBegin )
+    encoder.onBegin.call( self, { transaction : o, encoder : encoder })
+
+  }
+
+  /* end */
+
+  function handleEnd()
+  {
+
+    if( encoder && encoder.onEnd )
+    encoder.onEnd.call( self, { stream : result, transaction : o, encoder })
+
+  }
+
+  /* error */
+
+  function handleError( err )
+  {
+
+    debugger;
+    err = _._err
+    ({
+      args : [ '\nfileReadAct( ', o.filePath, ' )\n', err ],
+      usingSourceCode : 0,
+      level : 0,
+      stack : stack,
+    });
+
+    if( encoder && encoder.onError )
+    try
+    {
+      debugger;
+      err = encoder.onError.call( self, { error : err, transaction : o, encoder : encoder })
+    }
+    catch( err2 )
+    {
+      console.error( err2.message );
+      console.error( err2.stack );
+      console.error( err.message );
+      console.error( err.stack );
+    }
+
   }
 
 }
@@ -960,7 +1013,6 @@ function fileWriteAct( o )
       File.appendFileSync( fileNativePath, o.data, { encoding : self._encodingFor( o.encoding ) } );
       else if( o.writeMode === 'prepend' )
       {
-
         if( self.fileExistsAct({ filePath : o.filePath, sync : 1 }) )
         {
           let data = File.readFileSync( fileNativePath, { encoding : undefined } );
@@ -997,7 +1049,9 @@ function fileWriteAct( o )
         File.writeFile( fileNativePath, o.data, { encoding : self._encodingFor( o.encoding ) }, handleEnd );
       });
       else
-      File.writeFile( fileNativePath, o.data, { encoding : self._encodingFor( o.encoding ) }, handleEnd );
+      {
+        File.writeFile( fileNativePath, o.data, { encoding : self._encodingFor( o.encoding ) }, handleEnd );
+      }
     }
     else handleEnd( _.err( 'Not implemented write mode', o.writeMode ) );
 
@@ -1869,19 +1923,19 @@ encoders[ 'buffer.raw' ] =
 
   onBegin : function( e )
   {
+    // debugger;
     _.assert( e.transaction.encoding === 'buffer.raw' );
     e.transaction.encoding = 'buffer.node';
   },
 
   onEnd : function( e )
   {
+    if( e.stream )
+    return;
     _.assert( _.bufferNodeIs( e.data ) || _.bufferTypedIs( e.data ) || _.bufferRawIs( e.data ) );
-
     let result = _.bufferRawFrom( e.data );
-
     _.assert( !_.bufferNodeIs( result ) );
     _.assert( _.bufferRawIs( result ) );
-
     return result;
   },
 
@@ -1889,21 +1943,22 @@ encoders[ 'buffer.raw' ] =
 
 //
 
-encoders[ 'js.node' ] =
-{
-
-  exts : [ 'js', 's', 'ss' ],
-
-  onBegin : function( e )
-  {
-    e.transaction.encoding = 'utf8';
-  },
-
-  onEnd : function( e )
-  {
-    return require( _.fileProvider.path.nativize( e.transaction.filePath ) );
-  },
-}
+// yyy
+// encoders[ 'js.node' ] =
+// {
+//
+//   exts : [ 'js', 's', 'ss' ],
+//
+//   onBegin : function( e )
+//   {
+//     e.transaction.encoding = 'utf8';
+//   },
+//
+//   onEnd : function( e )
+//   {
+//     return require( _.fileProvider.path.nativize( e.transaction.filePath ) );
+//   },
+// }
 
 encoders[ 'buffer.bytes' ] =
 {

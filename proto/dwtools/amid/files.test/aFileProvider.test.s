@@ -436,7 +436,7 @@ function readWriteSync( test )
 
   test.case = 'encoder not finded';
   var encoding = 'unknown';
-  test.identical( provider.fileRead.encoders[ encoding ], undefined );
+  test.identical( _.FileReadEncoders[ encoding ], undefined );
   // test.identical( provider.fileReadAct.encoders[ encoding ], undefined );
   test.shouldThrowErrorOfAnyKind( () =>
   {
@@ -2766,7 +2766,7 @@ function readWriteAsync( test )
     {
       test.case = 'encoder not finded';
       var encoding = 'unknown';
-      test.identical( provider.fileRead.encoders[ encoding ], undefined );
+      test.identical( _.FileReadEncoders[ encoding ], undefined );
       // test.identical( provider.fileReadAct.encoders[ encoding ], undefined );
       var con = provider.fileRead
       ({

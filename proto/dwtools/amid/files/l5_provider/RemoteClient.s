@@ -19,7 +19,8 @@
 // //
 //
 // let Parent = _.FileProvider.Partial;
-// let Self = function wFileProviderRemote( o )
+// let Self = wFileProviderRemote;
+function wFileProviderRemote( o )
 // {
 //   return _.workpiece.construct( Self, this, arguments );
 // }

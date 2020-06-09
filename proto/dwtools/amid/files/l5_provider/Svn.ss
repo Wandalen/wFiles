@@ -20,7 +20,8 @@
 // //
 //
 // let Parent = _.FileProvider.Partial;
-// let Self = function wFileProviderSvn( o )
+// let Self = wFileProviderSvn;
+function wFileProviderSvn( o )
 // {
 //   return _.workpiece.construct( Self, this, arguments );
 // }

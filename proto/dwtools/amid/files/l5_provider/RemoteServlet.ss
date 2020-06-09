@@ -25,7 +25,8 @@
 // //
 //
 // let Parent = null;
-// let Self = function wRemoteServerForFileProvider( o )
+// let Self = wRemoteServerForFileProvider;
+function wRemoteServerForFileProvider( o )
 // {
 //   return _.workpiece.construct( Self, this, arguments );
 // }

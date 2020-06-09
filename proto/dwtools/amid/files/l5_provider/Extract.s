@@ -36,7 +36,8 @@ _.assert( !_.FileProvider.Extract );
 */
 
 let Parent = Partial;
-let Self = function wFileProviderExtract( o )
+let Self = wFileProviderExtract;
+function wFileProviderExtract( o )
 {
   return _.workpiece.construct( Self, this, arguments );
 }

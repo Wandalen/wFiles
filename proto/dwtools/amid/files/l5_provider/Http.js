@@ -21,7 +21,8 @@ if( typeof module !== 'undefined' )
 let _global = _global_;
 let _ = _global_.wTools;
 let Parent = _.FileProvider.Partial;
-let Self = function wFileProviderHttp( o )
+let Self = wFileProviderHttp;
+function wFileProviderHttp( o )
 {
   return _.workpiece.construct( Self, this, arguments );
 }

@@ -25,7 +25,8 @@ let _ = _global_.wTools;
 */
 
 let Parent = _.FileProvider.Partial;
-let Self = function wFileProviderGit( o )
+let Self = wFileProviderGit;
+function wFileProviderGit( o )
 {
   return _.workpiece.construct( Self, this, arguments );
 }

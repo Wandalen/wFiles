@@ -303,9 +303,6 @@ function filesReflectSingle_body( o )
   let localProvider = o.dst.providerForPath();
   let srcPath = o.src.filePathSimplest();
   let dstPath = o.dst.filePathSimplest();
-  // let srcPath = o.srcPath;
-  // let dstPath = o.dstPath;
-  let srcCurrentPath;
 
   // if( _.mapIs( srcPath ) )
   // {
@@ -380,42 +377,26 @@ function filesReflectSingle_body( o )
   // debugger;
 
   if( gitConfigExists )
-  ready
-  // .give( () => GitConfig( localProvider.path.nativize( dstPath ), ready.tolerantCallback() ) )
-  .then( () => _.git.configRead( dstPath ) )
-  .ifNoErrorThen( function( arg )
+  ready.then( () =>
   {
-
-    // debugger;
-    _.sure
-    (
-      !!arg[ 'remote "origin"' ] && !!arg[ 'remote "origin"' ] && _.strIs( arg[ 'remote "origin"' ].url ),
-      'GIT config does not have {-remote.origin.url-}'
-    );
-
-    srcCurrentPath = arg[ 'remote "origin"' ].url;
-
-    _.sure
-    (
-      _.strEnds( _.strRemoveEnd( srcCurrentPath, '/' ), _.strRemoveEnd( parsed.remoteVcsPath, '/' ) ),
-      () => 'GIT repository at directory ' + _.strQuote( dstPath ) + '\n' +
-      'Has origin ' + _.strQuote( srcCurrentPath ) + '\n' +
-      'Should have ' + _.strQuote( parsed.remoteVcsPath )
-    );
-
-    return arg || null;
-  });
+    return _.git.sureHasOrigin
+    ({
+      localPath : dstPath,
+      remotePath : parsed
+    });
+  })
 
   /* no repository yet */
 
   if( !gitConfigExists )
   {
     /* !!! delete dst dir maybe */
-    if( !localProvider.fileExists( path.join( dstPath, '.git' ) ) )
-    {
-      shell( 'git -c "core.autocrlf=false" clone ' + parsed.remoteVcsLongerPath + ' ' + '.' );
-      shell( 'git config --local core.autocrlf false' );
-    }
+    ready.then( () => _.git.repositoryClone
+    ({
+      remotePath : parsed,
+      localPath : dstPath,
+      verbosity : o.verbosity - 1
+    }))
 
   }
   else
@@ -426,7 +407,7 @@ function filesReflectSingle_body( o )
 
   let localChanges = false;
   let mergeIsNeeded = false;
-  let hashIsBranchName = false;
+  let tagIsBranchName = false;
   if( gitConfigExists )
   {
     shellAll
@@ -441,7 +422,7 @@ function filesReflectSingle_body( o )
       localChanges = _.strHasAny( arg[ 0 ].output, [ 'Changes to be committed', 'Changes not staged for commit' ] );
       mergeIsNeeded = !_.strHasAny( arg[ 0 ].output, [ 'Your branch is up to date', 'Your branch is up-to-date' ] );
       if( parsed.tag )
-      hashIsBranchName = _.strHas( arg[ 1 ].output, parsed.tag );
+      tagIsBranchName = _.strHas( arg[ 1 ].output, parsed.tag );
       return localChanges;
     })
   }
@@ -458,11 +439,19 @@ function filesReflectSingle_body( o )
   {
     if( localChanges )
     if( o.extra.stashing )
-    shell( 'git -c "core.autocrlf=false" stash' );
+    ready.then( () =>
+    {
+      return _.git.repositoryStash
+      ({
+        localPath : dstPath,
+        pop : 0,
+        verbosity : o.verbosity - 1
+      })
+    })
 
     ready.then( () => gitCheckout() )
 
-    if( mergeIsNeeded && hashIsBranchName )
+    if( mergeIsNeeded && tagIsBranchName )
     {
       if( localChanges && !o.extra.stashing )
       {
@@ -516,88 +505,37 @@ function filesReflectSingle_body( o )
 
   function gitCheckout()
   {
-    if( parsed.tag )
-    {
-      let repoHasTag = _.git.repositoryHasTag({ localPath : dstPath, tag : parsed.tag });
-      if( !repoHasTag )
-      throw _.err
-      (
-        `Specified tag: ${_.strQuote( parsed.tag )} doesn't exist in local and remote copy of the repository.\
-        \nLocal path: ${_.color.strFormat( String( dstPath ), 'path' )}\
-        \nRemote path: ${_.color.strFormat( String( parsed.remoteVcsPath ), 'path' )}`
-      );
-    }
-
-    let shellOptions =
-    {
-      execPath : 'git -c "core.autocrlf=false" checkout ' + ( parsed.hash || parsed.tag ),
-      outputCollecting : 1,
-      ready : null
-    }
-
-    let con = shell( shellOptions );
-
-    con.finally( ( err, got ) =>
-    {
-      if( err )
-      {
-        if( localChanges )
-        if( o.extra.stashing )
-        shell
-        ({
-          execPath : 'git -c "core.autocrlf=false" stash pop',
-          sync : 1,
-          deasync : 0,
-          throwingExitCode : 0,
-          ready : null
-        })
-
-        if( !_.strHasAny( shellOptions.output, [ 'fatal: reference', 'error: pathspec' ] ) )
-        throw _.err( err );
-        _.errAttend( err );
-        handleGitError( 'Failed to checkout, branch/commit: ' + _.strQuote( parsed.hash || parsed.tag ) + ' doesn\'t exist in repository at ' + _.strQuote( dstPath ) );
-      }
-      return null;
+    return _.git.repositoryCheckout
+    ({
+      remotePath : parsed,
+      localPath : dstPath,
+      verbosity : o.verbosity - 1,
     })
-
-    return con;
+    .catch( ( err ) =>
+    {
+      if( err.reason === 'git' )
+      handleGitError( err );
+      else
+      throw err;
+    })
   }
 
   /*  */
 
   function gitMerge()
   {
-    let con = shell
+    return _.git.repositoryMerge
     ({
-      execPath : 'git config merge.defaultToUpstream true',
-      ready : null
-    });
-
-    con.then( () =>
-    {
-      let o =
-      {
-        execPath : 'git -c "core.autocrlf=false" merge',
-        outputCollecting : 1,
-        ready : null
-      }
-
-      return shell( o )
-      .finally( ( err, got ) =>
-      {
-        if( err )
-        {
-          if( !_.strHas( o.output, 'CONFLICT' ) )
-          throw _.err( err )
-          _.errAttend( err );
-          gitMergeFailed = true;
-          handleGitError( 'Automatic merge of remote-tracking branch failed in repository at ' + _.strQuote( dstPath ) + '. Fix conflict(s) manually.' );
-        }
-        return null;
-      })
+      localPath : dstPath,
+      verbosity : o.verbosity - 1
     })
-
-    return con;
+    .catch( ( err ) =>
+    {
+      if( err.reason !== 'git' )
+      throw err;
+      gitMergeFailed = true;
+      handleGitError( err );
+    })
   }
 
   /* */
@@ -611,28 +549,19 @@ function filesReflectSingle_body( o )
       return null;
     }
 
-    let o =
-    {
-      execPath : 'git -c "core.autocrlf=false" stash pop',
-      outputCollecting : 1,
-      ready : null
-    };
-
-    let con = shell( o );
-
-    con.finally( ( err, got ) =>
-    {
-      if( err )
-      {
-        if( !_.strHas( o.output, 'CONFLICT' ) )
-        throw _.err( err );
-        _.errAttend( err );
-        handleGitError( 'Automatic merge of stashed changes failed in repository at ' + _.strQuote( dstPath ) + '. Fix conflict(s) manually.' );
-      }
-      return null;
+    return _.git.repositoryStash
+    ({
+      localPath : dstPath,
+      pop : 1,
+      verbosity : o.verbosity - 1
     })
-
-    return con;
+    .catch( ( err ) =>
+    {
+      if( err.reason === 'git' )
+      handleGitError( err );
+      else
+      throw err;
+    })
   }
 
   /* */

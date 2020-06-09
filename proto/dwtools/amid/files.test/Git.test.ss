@@ -1061,10 +1061,10 @@ function filesReflectEol( test )
   /*
     +clone
     +checkout
-    change core.autocrl in local git config then checkout
-    merge
-    change core.autocrl in local git config then merge
-    merge stashing : 1
+    +change core.autocrl in local git config then checkout
+    +merge
+    +change core.autocrl in local git config then merge
+    +merge stashing : 1
   */
 
   /* - */
@@ -1101,7 +1101,7 @@ function filesReflectEol( test )
     })
   })
 
-  //
+  /* - */
 
   con
   .then( () =>
@@ -1139,6 +1139,246 @@ function filesReflectEol( test )
     })
   })
 
+  /* - */
+
+  con
+  .then( () =>
+  {
+    test.description =
+    `clone git repo, change local core.autocrlf to true, then checkout to other branch
+     file endings should be preserved
+     local config should have auto.crlf false
+     global config should not be modified
+    `
+    providerDst.filesDelete( localPath );
+    let remotePath = 'git+hd://' + repoPath;
+    let remotePath2 = 'git+hd://' + repoPath + '/@secondbranch';
+
+    let autocrlfGlobalOriginal = gitConfigGlobalRead( 'core.autocrlf' );
+
+    return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 })
+    .then( () =>
+    {
+      gitConfigLocalWrite( localPath, 'core.autocrlf true' );
+      return system.filesReflect({ reflectMap : { [ remotePath2 ] : clonePathGlobal }, verbosity : 5 })
+    })
+    .then( () =>
+    {
+      test.case = 'global git config was not changed';
+      let autocrlfGlobal = gitConfigGlobalRead( 'core.autocrlf' );
+      test.identical( autocrlfGlobal, autocrlfGlobalOriginal );
+
+      let autocrlfLocal = gitConfigLocalRead( localPath, 'core.autocrlf' )
+      test.identical( autocrlfLocal, 'true' );
+
+      let branch = _.git.versionLocalRetrive({ localPath });
+      test.identical( branch, 'secondbranch' )
+
+      let hash1 = providerDst.hashRead( path.join( localPath, 'file1' ) );
+      test.identical( hash1, expectedHash1 );
+      let hash2 = providerDst.hashRead( path.join( localPath, 'file2' ) );
+      test.identical( hash2, expectedHash2 );
+      return null;
+    })
+  })
+
+  /* - */
+
+  con
+  .then( () =>
+  {
+    test.description =
+    `merge
+     file endings should be preserved
+     local config should have auto.crlf false
+     global config should not be modified
+    `
+    providerDst.filesDelete( localPath );
+    let remotePath = 'git+hd://' + repoPath;
+
+    let autocrlfGlobalOriginal = gitConfigGlobalRead( 'core.autocrlf' );
+
+    let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 })
+    .then( () =>
+    {
+      let start = _.process.starter
+      ({
+        currentPath : localPath,
+        sync : 1
+      });
+
+      start( 'git reset --hard HEAD~1' )
+      start( 'git commit -m emptycommit --allow-empty' )
+
+      return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 })
+    })
+    .then( () =>
+    {
+      test.case = 'global git config was not changed';
+      let autocrlfGlobal = gitConfigGlobalRead( 'core.autocrlf' );
+      test.identical( autocrlfGlobal, autocrlfGlobalOriginal );
+
+      let autocrlfLocal = gitConfigLocalRead( localPath, 'core.autocrlf' )
+      test.identical( autocrlfLocal, 'false' );
+
+      let hash1 = providerDst.hashRead( path.join( localPath, 'file1' ) );
+      test.identical( hash1, expectedHash1 );
+      let hash2 = providerDst.hashRead( path.join( localPath, 'file2' ) );
+      test.identical( hash2, expectedHash2 );
+      return null;
+    })
+
+    _.process.start
+    ({
+      execPath : 'git log -n 2',
+      currentPath : localPath,
+      ready,
+      outputCollecting : 1
+    })
+    .then( ( got ) =>
+    {
+      test.identical( got.exitCode, 0 );
+      test.is( _.strHas( got.output, `Merge remote-tracking branch 'refs/remotes/origin/master'` ) )
+      test.is( _.strHas( got.output, `emptycommit` ) )
+      return null;
+    })
+
+    return ready;
+  })
+
+  /* - */
+
+  con
+  .then( () =>
+  {
+    test.description =
+    `change local config, then merge
+     file endings should be preserved
+     local config should have auto.crlf false
+     global config should not be modified
+    `
+    providerDst.filesDelete( localPath );
+    let remotePath = 'git+hd://' + repoPath;
+
+    let autocrlfGlobalOriginal = gitConfigGlobalRead( 'core.autocrlf' );
+
+    let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 })
+    .then( () =>
+    {
+      let start = _.process.starter
+      ({
+        currentPath : localPath,
+        sync : 1
+      });
+
+      start( 'git reset --hard HEAD~1' )
+      start( 'git commit -m emptycommit --allow-empty' )
+      start( 'git config --local core.autocrlf true' )
+
+      return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 })
+    })
+    .then( () =>
+    {
+      test.case = 'global git config was not changed';
+      let autocrlfGlobal = gitConfigGlobalRead( 'core.autocrlf' );
+      test.identical( autocrlfGlobal, autocrlfGlobalOriginal );
+
+      let autocrlfLocal = gitConfigLocalRead( localPath, 'core.autocrlf' )
+      test.identical( autocrlfLocal, 'true' );
+
+      let hash1 = providerDst.hashRead( path.join( localPath, 'file1' ) );
+      test.identical( hash1, expectedHash1 );
+      let hash2 = providerDst.hashRead( path.join( localPath, 'file2' ) );
+      test.identical( hash2, expectedHash2 );
+      return null;
+    })
+
+    _.process.start
+    ({
+      execPath : 'git log -n 2',
+      currentPath : localPath,
+      ready,
+      outputCollecting : 1
+    })
+    .then( ( got ) =>
+    {
+      test.identical( got.exitCode, 0 );
+      test.is( _.strHas( got.output, `Merge remote-tracking branch 'refs/remotes/origin/master'` ) )
+      test.is( _.strHas( got.output, `emptycommit` ) )
+      return null;
+    })
+
+    return ready;
+  })
+
+  /* - */
+
+  con
+  .then( () =>
+  {
+    test.description =
+    `extra.stashing enabled
+     change local config, then merge
+     file endings should be preserved
+     local config should have auto.crlf false
+     global config should not be modified
+    `
+    providerDst.filesDelete( localPath );
+    let remotePath = 'git+hd://' + repoPath;
+
+    let autocrlfGlobalOriginal = gitConfigGlobalRead( 'core.autocrlf' );
+
+    let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 })
+    .then( () =>
+    {
+      let start = _.process.starter
+      ({
+        currentPath : localPath,
+        sync : 1
+      });
+
+      start( 'git reset --hard HEAD~1' )
+      start( 'git commit -m emptycommit --allow-empty' )
+      start( 'git config --local core.autocrlf true' )
+
+      providerDst.fileWrite( path.join( localPath, 'file1' ), 'abcc\n' );
+
+      return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5, extra : { stashing : 1 } })
+    })
+    .then( () =>
+    {
+      test.case = 'global git config was not changed';
+      let autocrlfGlobal = gitConfigGlobalRead( 'core.autocrlf' );
+      test.identical( autocrlfGlobal, autocrlfGlobalOriginal );
+
+      let autocrlfLocal = gitConfigLocalRead( localPath, 'core.autocrlf' )
+      test.identical( autocrlfLocal, 'true' );
+
+      let hash1 = providerDst.hashRead( path.join( localPath, 'file1' ) );
+      test.notIdentical( hash1, expectedHash1 );
+      let hash2 = providerDst.hashRead( path.join( localPath, 'file2' ) );
+      test.identical( hash2, expectedHash2 );
+      return null;
+    })
+
+    _.process.start
+    ({
+      execPath : 'git log -n 2',
+      currentPath : localPath,
+      ready,
+      outputCollecting : 1
+    })
+    .then( ( got ) =>
+    {
+      test.identical( got.exitCode, 0 );
+      test.is( _.strHas( got.output, `Merge remote-tracking branch 'refs/remotes/origin/master'` ) )
+      test.is( _.strHas( got.output, `emptycommit` ) )
+      return null;
+    })
+
+    return ready;
+  })
+
   return con;
 
   /* - */
@@ -1158,6 +1398,7 @@ function filesReflectEol( test )
     start( 'git config --local core.autocrlf false' )
     start( 'git add .' )
     start( 'git commit -m init' )
+    start( 'git commit -m change --allow-empty' )
     start( 'git checkout -b secondbranch' )
 
     con.then( () =>
@@ -1191,6 +1432,17 @@ function filesReflectEol( test )
     };
     var got = _.process.start( o );
     return _.strStrip( got.output );
+  }
+
+  function gitConfigLocalWrite( localPath, property )
+  {
+    let o =
+    {
+      execPath : 'git config --local ' + property,
+      currentPath : localPath,
+      sync : 1
+    };
+    _.process.start( o );
   }
 }
 

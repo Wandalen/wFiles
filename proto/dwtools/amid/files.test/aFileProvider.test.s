@@ -45337,395 +45337,395 @@ function pathResolveTextLink( test )
 
   provider.fieldPush( 'usingTextLink', 1 );
 
-  // test.case = 'regular file';
-  // provider.filesDelete( routinePath );
-  // provider.fileWrite( filePath, testData );
-  // var o = { filePath };
-  // var got = provider.pathResolveTextLink( o );
-  // test.identical( got, filePath );
+  test.case = 'regular file';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( filePath, testData );
+  var o = { filePath };
+  var got = provider.pathResolveTextLink( o );
+  test.identical( got, filePath );
 
-  // test.case = 'hardLink to regular file';
-  // provider.filesDelete( routinePath );
-  // provider.fileWrite( filePath, testData );
-  // provider.hardLink({ dstPath : linkPath, srcPath : filePath });
-  // var o = { filePath : linkPath };
-  // var got = provider.pathResolveTextLink( o );
-  // test.identical( got, linkPath );
+  test.case = 'hardLink to regular file';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( filePath, testData );
+  provider.hardLink({ dstPath : linkPath, srcPath : filePath });
+  var o = { filePath : linkPath };
+  var got = provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
 
-  // test.case = 'absolute softLink to regular file';
-  // provider.filesDelete( routinePath );
-  // provider.fileWrite( filePath, testData );
-  // provider.softLink({ dstPath : linkPath, srcPath : filePath });
-  // var o = { filePath : linkPath };
-  // var got = provider.pathResolveTextLink( o );
-  // test.identical( got, linkPath );
+  test.case = 'absolute softLink to regular file';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( filePath, testData );
+  provider.softLink({ dstPath : linkPath, srcPath : filePath });
+  var o = { filePath : linkPath };
+  var got = provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
 
-  // test.case = 'absolute textLink to regular file';
-  // provider.filesDelete( routinePath );
-  // provider.fileWrite( filePath, testData );
-  // provider.textLink({ dstPath : linkPath, srcPath : filePath });
-  // var o = { filePath : linkPath };
-  // var got = provider.pathResolveTextLink( o );
-  // test.identical( got, filePath );
+  test.case = 'absolute textLink to regular file';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( filePath, testData );
+  provider.textLink({ dstPath : linkPath, srcPath : filePath });
+  var o = { filePath : linkPath };
+  var got = provider.pathResolveTextLink( o );
+  test.identical( got, filePath );
 
-  // test.case = 'file with jsdoc link tag'
-  // var jsdocData = '@link module:Tools/base/Proto.wTools.define.own'
-  // provider.filesDelete( routinePath );
-  // provider.fileWrite( linkPath, jsdocData );
-  // var o = { filePath : linkPath };
-  // var got = provider.pathResolveTextLink( o );
-  // test.identical( got, linkPath );
+  test.case = 'file with jsdoc link tag'
+  var jsdocData = '@link module:Tools/base/Proto.wTools.define.own'
+  provider.filesDelete( routinePath );
+  provider.fileWrite( linkPath, jsdocData );
+  var o = { filePath : linkPath };
+  var got = provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
 
-  // test.case = 'file with jsdoc link tag'
-  // var jsdocData = '/**\n  @link module:Tools/base/Proto.wTools.define.own\n*/'
-  // provider.filesDelete( routinePath );
-  // provider.fileWrite( linkPath, jsdocData );
-  // var o = { filePath : linkPath };
-  // var got = provider.pathResolveTextLink( o );
-  // test.identical( got, linkPath );
+  test.case = 'file with jsdoc link tag'
+  var jsdocData = '/**\n  @link module:Tools/base/Proto.wTools.define.own\n*/'
+  provider.filesDelete( routinePath );
+  provider.fileWrite( linkPath, jsdocData );
+  var o = { filePath : linkPath };
+  var got = provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
 
-  // test.case = 'line on second line'
-  // var jsdocData = '\nlink ' + filePath;
-  // provider.filesDelete( routinePath );
-  // provider.fileWrite( linkPath, jsdocData );
-  // var o = { filePath : linkPath };
-  // var got = provider.pathResolveTextLink( o );
-  // test.identical( got, linkPath );
+  test.case = 'line on second line'
+  var jsdocData = '\nlink ' + filePath;
+  provider.filesDelete( routinePath );
+  provider.fileWrite( linkPath, jsdocData );
+  var o = { filePath : linkPath };
+  var got = provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
 
-  // /*
+  /*
 
-  //   Add test cases :
+    Add test cases :
 
-  //   absolute textLink to file that does not exist
-  //   relative textLink to file that does not exist
-  //   relative textLink to regular file
+    absolute textLink to file that does not exist
+    relative textLink to file that does not exist
+    relative textLink to regular file
 
-  //   use allowingMissed : 1 option to create link for missing file
-  // */
+    use allowingMissed : 1 option to create link for missing file
+  */
 
-  // test.case = 'absolute textLink to file that does not exist';
-  // provider.filesDelete( routinePath );  // remove temp files created by previous test case
-  // provider.textLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1, makingDirectory : 1  });
-  // var o = { filePath : linkPath }; // create options map for current test case
-  // var got = provider.pathResolveTextLink( o ); // call routine and save result
-  // test.identical( got, filePath ); // check result
+  test.case = 'absolute textLink to file that does not exist';
+  provider.filesDelete( routinePath );  // remove temp files created by previous test case
+  provider.textLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1, makingDirectory : 1  });
+  var o = { filePath : linkPath }; // create options map for current test case
+  var got = provider.pathResolveTextLink( o ); // call routine and save result
+  test.identical( got, filePath ); // check result
 
-  // test.case = 'relative textLink to file that does not exist';
-  // provider.filesDelete( routinePath );
-  // provider.textLink({ dstPath : linkPath, srcPath : '../file2', allowingMissed : 1, makingDirectory : 1 });
-  // var o = { filePath : linkPath };
-  // var got = provider.pathResolveTextLink( o );
-  // test.identical( got, test.context.globalFromPreferred( '../file2' ) );
+  test.case = 'relative textLink to file that does not exist';
+  provider.filesDelete( routinePath );
+  provider.textLink({ dstPath : linkPath, srcPath : '../file2', allowingMissed : 1, makingDirectory : 1 });
+  var o = { filePath : linkPath };
+  var got = provider.pathResolveTextLink( o );
+  test.identical( got, test.context.globalFromPreferred( '../file2' ) );
 
-  // test.case = 'relative textLink to regular file';
-  // provider.filesDelete( routinePath );
-  // provider.fileWrite( filePath, testData );
-  // provider.textLink({ dstPath : linkPath, srcPath : '../file' });
-  // var o = { filePath : linkPath };
-  // var got = provider.pathResolveTextLink( o );
-  // test.identical( got, test.context.globalFromPreferred( '../file' ) );
+  test.case = 'relative textLink to regular file';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( filePath, testData );
+  provider.textLink({ dstPath : linkPath, srcPath : '../file' });
+  var o = { filePath : linkPath };
+  var got = provider.pathResolveTextLink( o );
+  test.identical( got, test.context.globalFromPreferred( '../file' ) );
 
-  // test.case = 'absolute softLink to file that does not exist';
-  // provider.filesDelete( routinePath );  // remove temp files created by previous test case
-  // provider.softLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 }); // prepare link for test case
-  // var o = { filePath : linkPath }; // create options map for current test case
-  // var got = provider.pathResolveTextLink( o ); // call routine and save result
-  // test.identical( got, linkPath ); // check result
+  test.case = 'absolute softLink to file that does not exist';
+  provider.filesDelete( routinePath );  // remove temp files created by previous test case
+  provider.softLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 }); // prepare link for test case
+  var o = { filePath : linkPath }; // create options map for current test case
+  var got = provider.pathResolveTextLink( o ); // call routine and save result
+  test.identical( got, linkPath ); // check result
 
-  // test.case = 'relative softLink to file that does not exist';
-  // provider.filesDelete( routinePath );
-  // provider.softLink({ dstPath : linkPath, srcPath : '../file2', allowingMissed : 1, makingDirectory : 1 });
-  // var o = { filePath : linkPath };
-  // var got = provider.pathResolveTextLink( o );
-  // test.identical( got, linkPath );
+  test.case = 'relative softLink to file that does not exist';
+  provider.filesDelete( routinePath );
+  provider.softLink({ dstPath : linkPath, srcPath : '../file2', allowingMissed : 1, makingDirectory : 1 });
+  var o = { filePath : linkPath };
+  var got = provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
 
-  // test.case = 'relative softLink to regular file';
-  // provider.filesDelete( routinePath );
-  // provider.fileWrite( filePath, testData );
-  // provider.softLink({ dstPath : linkPath, srcPath : '../file' });
-  // var o = { filePath : linkPath };
-  // var got = provider.pathResolveTextLink( o );
-  // test.identical( got, linkPath );
+  test.case = 'relative softLink to regular file';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( filePath, testData );
+  provider.softLink({ dstPath : linkPath, srcPath : '../file' });
+  var o = { filePath : linkPath };
+  var got = provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
 
-  // test.case = 'Chain with two absolute text links';
-  // provider.filesDelete( routinePath );
-  // provider.fileWrite( filePath, testData );
-  // provider.textLink({ dstPath : linkPath2, srcPath : filePath });
-  // provider.textLink({ dstPath : linkPath, srcPath : linkPath2 });
-  // var got = provider.pathResolveTextLink( { filePath : linkPath } );
-  // test.identical( got, linkPath2 );
-  // var got1 = provider.pathResolveTextLink( { filePath : got } );
-  // test.identical( got1, filePath );
-  // var got2 = provider.pathResolveTextLink( { filePath : got1 } );
-  // test.identical( got2, filePath );
+  test.case = 'Chain with two absolute text links';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( filePath, testData );
+  provider.textLink({ dstPath : linkPath2, srcPath : filePath });
+  provider.textLink({ dstPath : linkPath, srcPath : linkPath2 });
+  var got = provider.pathResolveTextLink( { filePath : linkPath } );
+  test.identical( got, linkPath2 );
+  var got1 = provider.pathResolveTextLink( { filePath : got } );
+  test.identical( got1, filePath );
+  var got2 = provider.pathResolveTextLink( { filePath : got1 } );
+  test.identical( got2, filePath );
 
-  // test.case = 'Chain with relative and absolute text links';
-  // provider.filesDelete( routinePath );
-  // provider.fileWrite( filePath, testData );
-  // provider.textLink({ dstPath : linkPath2, srcPath : '../file' });
-  // provider.textLink({ dstPath : linkPath, srcPath : linkPath2 });
-  // var got = provider.pathResolveTextLink( { filePath : linkPath } );
-  // test.identical( got, linkPath2 );
-  // var got1 = provider.pathResolveTextLink( { filePath : got } );
-  // test.identical( got1, test.context.globalFromPreferred( '../file' ) );
-  // var got2 = provider.path.resolve( linkPath2, got1 );
-  // test.identical( got2, filePath );
+  test.case = 'Chain with relative and absolute text links';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( filePath, testData );
+  provider.textLink({ dstPath : linkPath2, srcPath : '../file' });
+  provider.textLink({ dstPath : linkPath, srcPath : linkPath2 });
+  var got = provider.pathResolveTextLink( { filePath : linkPath } );
+  test.identical( got, linkPath2 );
+  var got1 = provider.pathResolveTextLink( { filePath : got } );
+  test.identical( got1, test.context.globalFromPreferred( '../file' ) );
+  var got2 = provider.path.resolve( linkPath2, got1 );
+  test.identical( got2, filePath );
 
-  // test.case = 'Chain with absolute and relative text link that doesn´t exist';
-  // provider.filesDelete( routinePath );
-  // provider.fileWrite( filePath, testData );
-  // provider.textLink({ dstPath : linkPath2, srcPath : '../file0', allowingMissed : 1, makingDirectory : 1  });
-  // provider.textLink({ dstPath : linkPath, srcPath : linkPath2  });
-  // var got = provider.pathResolveTextLink( { filePath : linkPath } );
-  // test.identical( got, linkPath2 );
-  // var got1 = provider.pathResolveTextLink( { filePath : got } );
-  // test.identical( got1, test.context.globalFromPreferred( '../file0' ) );
-  // var got2 = provider.path.resolve( linkPath2, got1 );
-  // test.identical( got2, filePath + '0' );
+  test.case = 'Chain with absolute and relative text link that doesn´t exist';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( filePath, testData );
+  provider.textLink({ dstPath : linkPath2, srcPath : '../file0', allowingMissed : 1, makingDirectory : 1  });
+  provider.textLink({ dstPath : linkPath, srcPath : linkPath2  });
+  var got = provider.pathResolveTextLink( { filePath : linkPath } );
+  test.identical( got, linkPath2 );
+  var got1 = provider.pathResolveTextLink( { filePath : got } );
+  test.identical( got1, test.context.globalFromPreferred( '../file0' ) );
+  var got2 = provider.path.resolve( linkPath2, got1 );
+  test.identical( got2, filePath + '0' );
 
-  // test.case = 'Chain with two absolute soft links';
-  // provider.filesDelete( routinePath );
-  // provider.fileWrite( filePath, testData );
-  // provider.softLink({ dstPath : linkPath2, srcPath : filePath });
-  // provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
-  // var got = provider.pathResolveTextLink( { filePath : linkPath } );
-  // test.identical( got, linkPath );
+  test.case = 'Chain with two absolute soft links';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( filePath, testData );
+  provider.softLink({ dstPath : linkPath2, srcPath : filePath });
+  provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
+  var got = provider.pathResolveTextLink( { filePath : linkPath } );
+  test.identical( got, linkPath );
 
-  // test.case = 'Chain with relative and absolute soft links';
-  // provider.filesDelete( routinePath );
-  // provider.fileWrite( filePath, testData );
-  // provider.softLink({ dstPath : linkPath2, srcPath : '../file' });
-  // provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
-  // var got = provider.pathResolveTextLink( { filePath : linkPath } );
-  // test.identical( got, linkPath );
+  test.case = 'Chain with relative and absolute soft links';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( filePath, testData );
+  provider.softLink({ dstPath : linkPath2, srcPath : '../file' });
+  provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
+  var got = provider.pathResolveTextLink( { filePath : linkPath } );
+  test.identical( got, linkPath );
 
-  // test.case = 'Chain with absolute and relative soft link that doesn´t exist';
-  // provider.filesDelete( routinePath );
-  // provider.fileWrite( filePath, testData );
-  // provider.softLink({ dstPath : linkPath2, srcPath : '../file0', allowingMissed : 1, makingDirectory : 1  });
-  // provider.softLink({ dstPath : linkPath, srcPath : linkPath2  });
-  // var got = provider.pathResolveTextLink( { filePath : linkPath } );
-  // test.identical( got, linkPath );
+  test.case = 'Chain with absolute and relative soft link that doesn´t exist';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( filePath, testData );
+  provider.softLink({ dstPath : linkPath2, srcPath : '../file0', allowingMissed : 1, makingDirectory : 1  });
+  provider.softLink({ dstPath : linkPath, srcPath : linkPath2  });
+  var got = provider.pathResolveTextLink( { filePath : linkPath } );
+  test.identical( got, linkPath );
 
-  // test.case = 'Chain with absolute soft and text links';
-  // provider.filesDelete( routinePath );
-  // provider.fileWrite( filePath, testData );
-  // provider.softLink({ dstPath : linkPath, srcPath : filePath });
-  // provider.textLink({ dstPath : linkPath2, srcPath : linkPath });
-  // var got = provider.pathResolveTextLink( { filePath : linkPath2 } );
-  // test.identical( got, linkPath );
+  test.case = 'Chain with absolute soft and text links';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( filePath, testData );
+  provider.softLink({ dstPath : linkPath, srcPath : filePath });
+  provider.textLink({ dstPath : linkPath2, srcPath : linkPath });
+  var got = provider.pathResolveTextLink( { filePath : linkPath2 } );
+  test.identical( got, linkPath );
 
-  // test.case = 'Chain with relative soft and text links';
-  // provider.filesDelete( routinePath );
-  // provider.fileWrite( filePath, testData );
-  // provider.softLink({ dstPath : linkPath, srcPath : '../file', allowingMissed : 1, makingDirectory : 1 });
-  // provider.textLink({ dstPath : linkPath2, srcPath : linkPath });
-  // var got = provider.pathResolveTextLink( { filePath : linkPath2 } );
-  // test.identical( got, linkPath );
+  test.case = 'Chain with relative soft and text links';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( filePath, testData );
+  provider.softLink({ dstPath : linkPath, srcPath : '../file', allowingMissed : 1, makingDirectory : 1 });
+  provider.textLink({ dstPath : linkPath2, srcPath : linkPath });
+  var got = provider.pathResolveTextLink( { filePath : linkPath2 } );
+  test.identical( got, linkPath );
 
-  // provider.fieldPop( 'usingTextLink', 1 );
+  provider.fieldPop( 'usingTextLink', 1 );
 
-  // /**/
+  /**/
 
-  // provider.fieldPush( 'usingTextLink', 0 );
+  provider.fieldPush( 'usingTextLink', 0 );
 
-  // test.case = 'regular file';
-  // provider.filesDelete( routinePath );
-  // provider.fileWrite( filePath, testData );
-  // var o = { filePath };
-  // var got = provider.pathResolveTextLink( o );
-  // test.identical( got, filePath );
+  test.case = 'regular file';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( filePath, testData );
+  var o = { filePath };
+  var got = provider.pathResolveTextLink( o );
+  test.identical( got, filePath );
 
-  // test.case = 'hardLink to regular file';
-  // provider.filesDelete( routinePath );
-  // provider.fileWrite( filePath, testData );
-  // provider.hardLink({ dstPath : linkPath, srcPath : filePath });
-  // var o = { filePath : linkPath };
-  // var got = provider.pathResolveTextLink( o );
-  // test.identical( got, linkPath );
+  test.case = 'hardLink to regular file';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( filePath, testData );
+  provider.hardLink({ dstPath : linkPath, srcPath : filePath });
+  var o = { filePath : linkPath };
+  var got = provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
 
-  // test.case = 'absolute softLink to regular file';
-  // provider.filesDelete( routinePath );
-  // provider.fileWrite( filePath, testData );
-  // provider.softLink({ dstPath : linkPath, srcPath : filePath });
-  // var o = { filePath : linkPath };
-  // var got = provider.pathResolveTextLink( o );
-  // test.identical( got, linkPath );
+  test.case = 'absolute softLink to regular file';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( filePath, testData );
+  provider.softLink({ dstPath : linkPath, srcPath : filePath });
+  var o = { filePath : linkPath };
+  var got = provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
 
-  // test.case = 'absolute textLink to regular file';
-  // provider.filesDelete( routinePath );
-  // provider.fileWrite( filePath, testData );
-  // provider.textLink({ dstPath : linkPath, srcPath : filePath });
-  // var o = { filePath : linkPath };
-  // var got = provider.pathResolveTextLink( o );
-  // test.identical( got, linkPath );
+  test.case = 'absolute textLink to regular file';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( filePath, testData );
+  provider.textLink({ dstPath : linkPath, srcPath : filePath });
+  var o = { filePath : linkPath };
+  var got = provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
 
-  // test.case = 'absolute textLink to file that does not exist';
-  // provider.filesDelete( routinePath );
-  // provider.textLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1, makingDirectory : 1  });
-  // var o = { filePath : linkPath };
-  // var got = provider.pathResolveTextLink( o );
-  // test.identical( got, linkPath );
+  test.case = 'absolute textLink to file that does not exist';
+  provider.filesDelete( routinePath );
+  provider.textLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1, makingDirectory : 1  });
+  var o = { filePath : linkPath };
+  var got = provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
 
-  // test.case = 'relative textLink to file that does not exist';
-  // provider.filesDelete( routinePath );
-  // provider.textLink({ dstPath : linkPath, srcPath : '../file2', allowingMissed : 1, makingDirectory : 1 });
-  // var o = { filePath : linkPath };
-  // var got = provider.pathResolveTextLink( o );
-  // test.identical( got, linkPath );
+  test.case = 'relative textLink to file that does not exist';
+  provider.filesDelete( routinePath );
+  provider.textLink({ dstPath : linkPath, srcPath : '../file2', allowingMissed : 1, makingDirectory : 1 });
+  var o = { filePath : linkPath };
+  var got = provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
 
-  // test.case = 'relative textLink to regular file';
-  // provider.filesDelete( routinePath );
-  // provider.fileWrite( filePath, testData );
-  // provider.textLink({ dstPath : linkPath, srcPath : '../file' });
-  // var o = { filePath : linkPath };
-  // var got = provider.pathResolveTextLink( o );
-  // test.identical( got, linkPath );
+  test.case = 'relative textLink to regular file';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( filePath, testData );
+  provider.textLink({ dstPath : linkPath, srcPath : '../file' });
+  var o = { filePath : linkPath };
+  var got = provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
 
-  // test.case = 'absolute softLink to file that does not exist';
-  // provider.filesDelete( routinePath );
-  // provider.softLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 }); // prepare link for test case
-  // var o = { filePath : linkPath };
-  // var got = provider.pathResolveTextLink( o );
-  // test.identical( got, linkPath );
+  test.case = 'absolute softLink to file that does not exist';
+  provider.filesDelete( routinePath );
+  provider.softLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 }); // prepare link for test case
+  var o = { filePath : linkPath };
+  var got = provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
 
-  // test.case = 'relative softLink to file that does not exist';
-  // provider.filesDelete( routinePath );
-  // provider.softLink({ dstPath : linkPath, srcPath : '../file2', allowingMissed : 1, makingDirectory : 1 });
-  // var o = { filePath : linkPath };
-  // var got = provider.pathResolveTextLink( o );
-  // test.identical( got, linkPath );
+  test.case = 'relative softLink to file that does not exist';
+  provider.filesDelete( routinePath );
+  provider.softLink({ dstPath : linkPath, srcPath : '../file2', allowingMissed : 1, makingDirectory : 1 });
+  var o = { filePath : linkPath };
+  var got = provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
 
-  // test.case = 'relative softLink to regular file';
-  // provider.filesDelete( routinePath );
-  // provider.fileWrite( filePath, testData );
-  // provider.softLink({ dstPath : linkPath, srcPath : '../file' });
-  // var o = { filePath : linkPath };
-  // var got = provider.pathResolveTextLink( o );
-  // test.identical( got, linkPath );
+  test.case = 'relative softLink to regular file';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( filePath, testData );
+  provider.softLink({ dstPath : linkPath, srcPath : '../file' });
+  var o = { filePath : linkPath };
+  var got = provider.pathResolveTextLink( o );
+  test.identical( got, linkPath );
 
-  // test.case = 'Chain with two absolute text links';
-  // provider.filesDelete( routinePath );
-  // provider.fileWrite( filePath, testData );
-  // provider.textLink({ dstPath : linkPath2, srcPath : filePath });
-  // provider.textLink({ dstPath : linkPath, srcPath : linkPath2 });
-  // var got = provider.pathResolveTextLink( { filePath : linkPath } );
-  // test.identical( got, linkPath );
+  test.case = 'Chain with two absolute text links';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( filePath, testData );
+  provider.textLink({ dstPath : linkPath2, srcPath : filePath });
+  provider.textLink({ dstPath : linkPath, srcPath : linkPath2 });
+  var got = provider.pathResolveTextLink( { filePath : linkPath } );
+  test.identical( got, linkPath );
 
-  // test.case = 'Chain with relative and absolute text links';
-  // provider.filesDelete( routinePath );
-  // provider.fileWrite( filePath, testData );
-  // provider.textLink({ dstPath : linkPath2, srcPath : '../file' });
-  // provider.textLink({ dstPath : linkPath, srcPath : linkPath2 });
-  // var got = provider.pathResolveTextLink( { filePath : linkPath } );
-  // test.identical( got, linkPath );
+  test.case = 'Chain with relative and absolute text links';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( filePath, testData );
+  provider.textLink({ dstPath : linkPath2, srcPath : '../file' });
+  provider.textLink({ dstPath : linkPath, srcPath : linkPath2 });
+  var got = provider.pathResolveTextLink( { filePath : linkPath } );
+  test.identical( got, linkPath );
 
-  // test.case = 'Chain with absolute and relative text link that doesn´t exist';
-  // provider.filesDelete( routinePath );
-  // provider.fileWrite( filePath, testData );
-  // provider.textLink({ dstPath : linkPath2, srcPath : '../file0', allowingMissed : 1, makingDirectory : 1  });
-  // provider.textLink({ dstPath : linkPath, srcPath : linkPath2  });
-  // var got = provider.pathResolveTextLink( { filePath : linkPath } );
-  // test.identical( got, linkPath );
+  test.case = 'Chain with absolute and relative text link that doesn´t exist';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( filePath, testData );
+  provider.textLink({ dstPath : linkPath2, srcPath : '../file0', allowingMissed : 1, makingDirectory : 1  });
+  provider.textLink({ dstPath : linkPath, srcPath : linkPath2  });
+  var got = provider.pathResolveTextLink( { filePath : linkPath } );
+  test.identical( got, linkPath );
 
-  // test.case = 'Chain with two absolute soft links';
-  // provider.filesDelete( routinePath );
-  // provider.fileWrite( filePath, testData );
-  // provider.softLink({ dstPath : linkPath2, srcPath : filePath });
-  // provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
-  // var got = provider.pathResolveTextLink( { filePath : linkPath } );
-  // test.identical( got, linkPath );
+  test.case = 'Chain with two absolute soft links';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( filePath, testData );
+  provider.softLink({ dstPath : linkPath2, srcPath : filePath });
+  provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
+  var got = provider.pathResolveTextLink( { filePath : linkPath } );
+  test.identical( got, linkPath );
 
-  // test.case = 'Chain with relative and absolute soft links';
-  // provider.filesDelete( routinePath );
-  // provider.fileWrite( filePath, testData );
-  // provider.softLink({ dstPath : linkPath2, srcPath : '../file' });
-  // provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
-  // var got = provider.pathResolveTextLink( { filePath : linkPath } );
-  // test.identical( got, linkPath );
+  test.case = 'Chain with relative and absolute soft links';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( filePath, testData );
+  provider.softLink({ dstPath : linkPath2, srcPath : '../file' });
+  provider.softLink({ dstPath : linkPath, srcPath : linkPath2 });
+  var got = provider.pathResolveTextLink( { filePath : linkPath } );
+  test.identical( got, linkPath );
 
-  // test.case = 'Chain with absolute and relative soft link that doesn´t exist';
-  // provider.filesDelete( routinePath );
-  // provider.fileWrite( filePath, testData );
-  // provider.softLink({ dstPath : linkPath2, srcPath : '../file0', allowingMissed : 1, makingDirectory : 1  });
-  // provider.softLink({ dstPath : linkPath, srcPath : linkPath2  });
-  // var got = provider.pathResolveTextLink( { filePath : linkPath } );
-  // test.identical( got, linkPath );
+  test.case = 'Chain with absolute and relative soft link that doesn´t exist';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( filePath, testData );
+  provider.softLink({ dstPath : linkPath2, srcPath : '../file0', allowingMissed : 1, makingDirectory : 1  });
+  provider.softLink({ dstPath : linkPath, srcPath : linkPath2  });
+  var got = provider.pathResolveTextLink( { filePath : linkPath } );
+  test.identical( got, linkPath );
 
-  // test.case = 'Chain with absolute soft and text links';
-  // provider.filesDelete( routinePath );
-  // provider.fileWrite( filePath, testData );
-  // provider.softLink({ dstPath : linkPath, srcPath : filePath });
-  // provider.textLink({ dstPath : linkPath2, srcPath : linkPath });
-  // var got = provider.pathResolveTextLink( { filePath : linkPath2 } );
-  // test.identical( got, linkPath2 );
+  test.case = 'Chain with absolute soft and text links';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( filePath, testData );
+  provider.softLink({ dstPath : linkPath, srcPath : filePath });
+  provider.textLink({ dstPath : linkPath2, srcPath : linkPath });
+  var got = provider.pathResolveTextLink( { filePath : linkPath2 } );
+  test.identical( got, linkPath2 );
 
-  // test.case = 'Chain with relative soft and text links';
-  // provider.filesDelete( routinePath );
-  // provider.fileWrite( filePath, testData );
-  // provider.softLink({ dstPath : linkPath, srcPath : '../file', allowingMissed : 1, makingDirectory : 1 });
-  // provider.textLink({ dstPath : linkPath2, srcPath : linkPath });
-  // var got = provider.pathResolveTextLink( { filePath : linkPath2 } );
-  // test.identical( got, linkPath2 );
+  test.case = 'Chain with relative soft and text links';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( filePath, testData );
+  provider.softLink({ dstPath : linkPath, srcPath : '../file', allowingMissed : 1, makingDirectory : 1 });
+  provider.textLink({ dstPath : linkPath2, srcPath : linkPath });
+  var got = provider.pathResolveTextLink( { filePath : linkPath2 } );
+  test.identical( got, linkPath2 );
 
-  // provider.fieldPop( 'usingTextLink', 0 );
+  provider.fieldPop( 'usingTextLink', 0 );
 
 
-  // provider.fieldPush( 'usingTextLink', 1 );
+  provider.fieldPush( 'usingTextLink', 1 );
 
-  // /* resolvingMultiple */
+  /* resolvingMultiple */
 
-  // test.case = 'single text link';
-  // provider.filesDelete( routinePath );
-  // provider.fileWrite( filePath, testData );
-  // provider.textLink( linkPath, filePath );
-  // var got = provider.pathResolveTextLink({ filePath : linkPath, resolvingMultiple : 1 });
-  // test.identical( got, filePath );
+  test.case = 'single text link';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( filePath, testData );
+  provider.textLink( linkPath, filePath );
+  var got = provider.pathResolveTextLink({ filePath : linkPath, resolvingMultiple : 1 });
+  test.identical( got, filePath );
 
-  // test.case = 'double text link';
-  // provider.filesDelete( routinePath );
-  // provider.fileWrite( filePath, testData );
-  // provider.textLink( linkPath2, filePath );
-  // provider.textLink( linkPath, linkPath2 );
-  // var got = provider.pathResolveTextLink({ filePath : linkPath, resolvingMultiple : 3 });
-  // test.identical( got, filePath );
+  test.case = 'double text link';
+  provider.filesDelete( routinePath );
+  provider.fileWrite( filePath, testData );
+  provider.textLink( linkPath2, filePath );
+  provider.textLink( linkPath, linkPath2 );
+  var got = provider.pathResolveTextLink({ filePath : linkPath, resolvingMultiple : 3 });
+  test.identical( got, filePath );
 
-  // test.case = 'Chain with two textlinks and soft link to missing file';
-  // provider.filesDelete( routinePath );
-  // provider.softLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
-  // provider.textLink({ dstPath : linkPath2, srcPath : linkPath });
-  // provider.textLink({ dstPath : linkPath3, srcPath : linkPath2 });
-  // var got = provider.pathResolveTextLink( { filePath : linkPath3, resolvingMultiple : 3 } );
-  // test.identical( got, linkPath );
+  test.case = 'Chain with two textlinks and soft link to missing file';
+  provider.filesDelete( routinePath );
+  provider.softLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
+  provider.textLink({ dstPath : linkPath2, srcPath : linkPath });
+  provider.textLink({ dstPath : linkPath3, srcPath : linkPath2 });
+  var got = provider.pathResolveTextLink( { filePath : linkPath3, resolvingMultiple : 3 } );
+  test.identical( got, linkPath );
 
-  // test.case = 'Chain with two textlinks, last link is broken';
-  // provider.filesDelete( routinePath );
-  // provider.textLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
-  // provider.textLink({ dstPath : linkPath2, srcPath : linkPath });
-  // var got = provider.pathResolveTextLink( { filePath : linkPath2, resolvingMultiple : 3 } );
-  // test.identical( got, filePath );
+  test.case = 'Chain with two textlinks, last link is broken';
+  provider.filesDelete( routinePath );
+  provider.textLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
+  provider.textLink({ dstPath : linkPath2, srcPath : linkPath });
+  var got = provider.pathResolveTextLink( { filePath : linkPath2, resolvingMultiple : 3 } );
+  test.identical( got, filePath );
 
-  // test.case = 'Chain with two softlinks';
-  // provider.filesDelete( routinePath );
-  // provider.softLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
-  // provider.softLink({ dstPath : linkPath2, srcPath : linkPath });
-  // var got = provider.pathResolveTextLink( { filePath : linkPath2, resolvingMultiple : 3 } );
-  // test.identical( got, linkPath2 );
+  test.case = 'Chain with two softlinks';
+  provider.filesDelete( routinePath );
+  provider.softLink({ dstPath : linkPath, srcPath : filePath, allowingMissed : 1, makingDirectory : 1 });
+  provider.softLink({ dstPath : linkPath2, srcPath : linkPath });
+  var got = provider.pathResolveTextLink( { filePath : linkPath2, resolvingMultiple : 3 } );
+  test.identical( got, linkPath2 );
 
-  // test.case = 'Chain with two relative textlinks';
-  // provider.filesDelete( routinePath );
-  // provider.textLink({ dstPath : linkPath, srcPath : '../file', allowingMissed : 1, makingDirectory : 1 });
-  // provider.textLink({ dstPath : linkPath2, srcPath : '../link' });
-  // var got = provider.pathResolveTextLink( { filePath : linkPath2, resolvingMultiple : 3 } );
-  // test.identical( got, self.globalFromPreferred( '../file' ) );
+  test.case = 'Chain with two relative textlinks';
+  provider.filesDelete( routinePath );
+  provider.textLink({ dstPath : linkPath, srcPath : '../file', allowingMissed : 1, makingDirectory : 1 });
+  provider.textLink({ dstPath : linkPath2, srcPath : '../link' });
+  var got = provider.pathResolveTextLink( { filePath : linkPath2, resolvingMultiple : 3 } );
+  test.identical( got, self.globalFromPreferred( '../file' ) );
 
-  // test.case = 'Chain with relative and absolute textlinks';
-  // provider.filesDelete( routinePath );
-  // provider.textLink({ dstPath : linkPath, srcPath : '../file', allowingMissed : 1, makingDirectory : 1 });
-  // provider.textLink({ dstPath : linkPath2, srcPath : linkPath });
-  // provider.textLink({ dstPath : linkPath3, srcPath : '../link2' });
-  // var got = provider.pathResolveTextLink( { filePath : linkPath3, resolvingMultiple : 3 } );
-  // test.identical( got, self.globalFromPreferred( '../file' ) );
+  test.case = 'Chain with relative and absolute textlinks';
+  provider.filesDelete( routinePath );
+  provider.textLink({ dstPath : linkPath, srcPath : '../file', allowingMissed : 1, makingDirectory : 1 });
+  provider.textLink({ dstPath : linkPath2, srcPath : linkPath });
+  provider.textLink({ dstPath : linkPath3, srcPath : '../link2' });
+  var got = provider.pathResolveTextLink( { filePath : linkPath3, resolvingMultiple : 3 } );
+  test.identical( got, self.globalFromPreferred( '../file' ) );
 
   /* resolvingIntermediateDirectories */
 

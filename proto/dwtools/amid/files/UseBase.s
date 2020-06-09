@@ -8,7 +8,7 @@ if( typeof module !== 'undefined' )
   let _ = require( '../../../dwtools/Tools.s' );
 
   _.include( 'wSelector' );
-  _.include( 'wAppBasic' );
+  _.include( 'wProcess' );
   _.include( 'wRoutineBasic' );
   _.include( 'wProto' );
 

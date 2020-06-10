@@ -43,6 +43,7 @@ function onSuiteBegin( test )
 
   context.provider = _.FileProvider.HardDrive({ /* protocol : 'current', */ protocols : [ 'current', 'second' ] });
   context.system = _.FileProvider.System({ providers : [ context.provider ] });
+  context.system.defaultProvider = context.provider;
 
   let path = context.provider.path;
   context.suitePath = path.pathDirTempOpen( path.join( __dirname, '../..'  ),'HardDrive' );

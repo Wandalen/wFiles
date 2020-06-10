@@ -643,7 +643,7 @@ function streamReadAct( o )
       args : [ '\nfileReadAct( ', o.filePath, ' )\n', err ],
       usingSourceCode : 0,
       level : 0,
-      stack : stack,
+      // stack : stack,
     });
 
     if( encoder && encoder.onError )

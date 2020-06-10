@@ -43,8 +43,6 @@ function onSuiteBegin( test )
       mode : 'shell',
       outputCollecting : 1
     })
-    gitConfig( `user.email "test@test.com"` )
-    gitConfig( `user.name "Test"` )
     context.gitOriginalCoreAutocrlf = _.strStrip( gitConfig( `core.autocrlf` ).output );
     gitConfig( `core.autocrlf true` )
   }

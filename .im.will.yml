@@ -34,8 +34,8 @@ submodule :
   wWebUriBasic :
     path : npm:///wweburibasic
     enabled : 0 # submodule
-  wAppBasic :
-    path : npm:///wappbasic
+  wProcess :
+    path : npm:///wprocess
     enabled : 0 # submodule
   wFieldsStack :
     path : npm:///wfieldsstack

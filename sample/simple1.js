@@ -2,7 +2,7 @@
 if( typeof module !== 'undefined' )
 var _ = require( '..' )
 
-_.include( 'wAppBasic' )
+_.include( 'wProcess' )
 
 let o = 
 {

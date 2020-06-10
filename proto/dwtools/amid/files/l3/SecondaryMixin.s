@@ -813,7 +813,7 @@ function _configRead2( o )
   let self = this;
   let read;
 
-  // _.include( 'wAppBasic' );
+  // _.include( 'wProcess' );
 
   if( o.name === undefined )
   o.name = 'config';

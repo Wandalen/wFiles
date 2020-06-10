@@ -676,7 +676,12 @@ function configRead( test )
   var filePath = path.changeExt( terminalPath, 'bson' );
   provider.fileWrite({ filePath, data : src2, encoding : 'bson' });
   var filePath = path.s.changeExt( terminalPath, [ 'json', 'bson' ] );
-  var got = provider.configRead({ filePath });
+  var found = filePath.map( ( path ) =>
+  {
+    let ext = _.path.ext( path );
+    return { particularPath : path, abstractPath : path, encoding : ext, ext }
+  })
+  var got = provider.configRead({ filePath, found });
   var expected =
   {
     null : 1,

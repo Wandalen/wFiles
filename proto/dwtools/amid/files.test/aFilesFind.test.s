@@ -1628,7 +1628,7 @@ function filesFind( test )
     var files = provider.filesFind( _.cloneJust( o ) );
 
     // var tester = path.globRegexpsForTerminal( glob, routinePath, info.filter.basePath );
-    var tester = path.globsFullToRegexps( glob, routinePath, info.filter.basePath, true ).actual;
+    var tester = path.globsFullToRegexps( glob, routinePath, info.filter.basePath /*, true */).actual;
 
     var expected = allFiles.slice();
     expected = expected.filter( ( p ) =>
@@ -1797,7 +1797,7 @@ function filesFind( test )
           // if( o.glob )
           // passed = path.globRegexpsForTerminal( o.glob, o.filePath, o.basePath || routinePath ).test( relative );
           if( o.glob )
-          passed = path.globsFullToRegexps( o.glob, o.filePath, o.basePath || routinePath, true ).actual.test( relative );
+          passed = path.globsFullToRegexps( o.glob, o.filePath, o.basePath || routinePath/*, true*/ ).actual.test( relative );
 
           if( passed )
           {
@@ -34468,7 +34468,7 @@ function filesDeleteLate( test )
   provider.filesDelete( routinePath );
   tree.filesReflectTo( provider, routinePath );
   let files = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative' });
-  test.is( files.length );
+  test.is( files.length > 0 );
   var o =
   {
     filePath : routinePath,

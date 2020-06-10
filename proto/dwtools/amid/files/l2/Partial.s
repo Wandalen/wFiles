@@ -3224,7 +3224,8 @@ function fileRead_body( o )
       _.sure( r === undefined );
     }
     // debugger;
-    // _.Consequence.Take( o.onBegin, o );
+    if( o.onBegin )
+    _.Consequence.Take( o.onBegin, o );
   }
 
   /* end */
@@ -3259,10 +3260,10 @@ function fileRead_body( o )
     else
     r = o;
 
-    // if( o.onEnd )
-    // debugger;
-    // if( o.onEnd )
-    // _.Consequence.Take( o.onEnd, o );
+    if( o.onEnd )
+    debugger;
+    if( o.onEnd )
+    _.Consequence.Take( o.onEnd, o );
 
     return r;
   }
@@ -3294,11 +3295,14 @@ function fileRead_body( o )
       console.error( err.toString() + '\n' + err.stack );
     }
 
-    // if( o.onError )
-    // _.Consequence.Error( o.onError, err );
+    if( o.onError )
+    _.Consequence.Error( o.onError, err );
 
     if( o.throwing )
-    throw err
+    throw err;
+
+    _.errAttend( err );
+
     return null;
   }
 
@@ -7160,9 +7164,21 @@ function _link_functor( fop )
         let err = `Faield to ${entryMethodName} ${o.dstPath} from ${o.srcPath}. Destination file does not exist.`;
         throw _.err( err );
       }
+
       if( actMethodName === 'softLinkAct' ||  actMethodName === 'textLinkAct' || actMethodName === 'fileCopyAct' )
-      if( _.strBegins( dstPath, srcPath ) || _.strBegins( path.preferredFromGlobal( dstPath ), srcStat.filePath ) )
-      srcStat = c.onStat( srcStat.filePath, 0 );
+      {
+        let updateStat =  _.strBegins( dstPath, srcPath );
+        let filePath = srcStat.filePath;
+
+        if( self instanceof _.FileProvider.System  )
+        filePath = self.providerForPath( srcPath ).path.globalFromPreferred( filePath );
+
+        if( !updateStat )
+        updateStat = _.strBegins( dstPath, filePath )
+
+        if( updateStat  )
+        srcStat = c.onStat( filePath, 0 );
+      }
 
       //qqq: find better solution to check text links
       if( /* srcStat.isTextLink() && */ c.dstStat.isTextLink() )

@@ -386,7 +386,7 @@ function filesReflectSingle_body( o )
       '--legacy-bundling',
       '--prefix',
       localProvider.path.nativize( tmpPath ),
-      `${parsed.remoteVcsLongerPath}@${version}`
+      parsed.remoteVcsLongerPath
     ];
     let got = shell({ execPath : 'npm install', args : npmArgs });
     _.assert( got.exitCode === 0 );

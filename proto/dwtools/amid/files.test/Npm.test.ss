@@ -25,7 +25,7 @@ function onSuiteBegin( test )
   context.providerDst = _.FileProvider.HardDrive();
   context.system = _.FileProvider.System({ providers : [ context.providerSrc, context.providerDst ] });
 
-  context.suitePath = _.fileProvider.pathDirTempOpen( _.fileProvider.path.join( __dirname, '../..'  ), 'FileProviderNpm' );
+  context.suitePath = _.fileProvider.path.pathDirTempOpen( _.fileProvider.path.join( __dirname, '../..'  ), 'FileProviderNpm' );
   context.suitePath = _.fileProvider.pathResolveLinkFull({ filePath : context.suitePath, resolvingSoftLink : 1 }); /* qqq : ? */
   context.suitePath = context.suitePath.absolutePath;
 }

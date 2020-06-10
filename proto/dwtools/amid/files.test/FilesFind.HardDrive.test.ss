@@ -24,9 +24,9 @@ function onSuiteBegin( test )
   context.provider = _.FileProvider.HardDrive({ protocol : 'current' });
   context.system = _.FileProvider.System({ providers : [ context.provider ], defaultProvider : context.provider });
   let path = context.provider.path;
-  context.suitePath = path.pathDirTempOpen( path.join( __dirname, '../..'  ), 'suite-' + 'FilesFind' );
-  context.suitePath = context.provider.pathResolveLinkFull({ filePath : context.suitePath, resolvingSoftLink : 1 });
-  context.suitePath = context.suitePath.absolutePath;
+  context.suiteTempPath = path.pathDirTempOpen( path.join( __dirname, '../..'  ), 'suite-' + 'FilesFind' );
+  context.suiteTempPath = context.provider.pathResolveLinkFull({ filePath : context.suiteTempPath, resolvingSoftLink : 1 });
+  context.suiteTempPath = context.suiteTempPath.absolutePath;
 }
 
 //
@@ -35,8 +35,8 @@ function onSuiteBegin( test )
 // function onSuiteEnd()
 // {
 //   let path = this.provider.path;
-//   _.assert( _.strHas( this.suitePath, 'Provider/HardDrive' ) );
-//   path.pathDirTempClose( this.suitePath );
+//   _.assert( _.strHas( this.suiteTempPath, 'Provider/HardDrive' ) );
+//   path.pathDirTempClose( this.suiteTempPath );
 // }
 
 // --

@@ -38,7 +38,7 @@ if( typeof module !== 'undefined' )
 
 var _ = _global_.wTools;
 var Parent = wTester;
-var suitePath;
+var suiteTempPath;
 
 // --
 // context
@@ -47,9 +47,9 @@ var suitePath;
 function onSuiteBegin()
 {
   if( Config.interpreter === 'njs' )
-  suitePath = _.path.pathDirTempOpen( _.path.join( __dirname, '../..' ), 'FileRecordFilter' );
+  suiteTempPath = _.path.pathDirTempOpen( _.path.join( __dirname, '../..' ), 'FileRecordFilter' );
   else
-  suitePath = _.path.current();
+  suiteTempPath = _.path.current();
 }
 
 //
@@ -58,8 +58,8 @@ function onSuiteEnd()
 {
   if( Config.interpreter === 'njs' )
   {
-    _.assert( _.strHas( suitePath, '.tmp' ), suitePath );
-    _.path.pathDirTempClose( suitePath );
+    _.assert( _.strHas( suiteTempPath, '.tmp' ), suiteTempPath );
+    _.path.pathDirTempClose( suiteTempPath );
   }
 }
 

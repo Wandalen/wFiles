@@ -23,14 +23,14 @@ var _ = _global_.wTools;
 
 function onSuiteBegin( test )
 {
-  this.suitePath = _.path.dirTempOpen( _.path.join( __dirname, '../..'  ) );
+  this.suiteTempPath = _.path.dirTempOpen( _.path.join( __dirname, '../..'  ) );
 }
 
 //
 
 function onSuiteEnd()
 {
-  _.fileProvider.filesDelete({ filePath : this.suitePath });
+  _.fileProvider.filesDelete({ filePath : this.suiteTempPath });
 }
 
 //
@@ -46,7 +46,7 @@ function copy( test )
   self.system.providerRegister( simpleStructure );
 
   var hdUrl = hardDrive.path.globalFromPreferred( _.path.normalize( __dirname ) );
-  var hdUrlDst = hardDrive.path.globalFromPreferred( _.path.join( self.suitePath, test.name + '_copy' ) );
+  var hdUrlDst = hardDrive.path.globalFromPreferred( _.path.join( self.suiteTempPath, test.name + '_copy' ) );
   var ssUrl = simpleStructure.path.globalFromPreferred( '/root/files/copy' );
   var ssUrlDst = simpleStructure.path.globalFromPreferred( '/root/files/_copy' );
 
@@ -198,7 +198,7 @@ var Proto =
   context :
   {
     system : _.FileProvider.System({ empty : 1 }),
-    suitePath : null,
+    suiteTempPath : null,
   },
 
   tests :

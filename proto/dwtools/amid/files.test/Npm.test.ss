@@ -25,9 +25,9 @@ function onSuiteBegin( test )
   context.providerDst = _.FileProvider.HardDrive();
   context.system = _.FileProvider.System({ providers : [ context.providerSrc, context.providerDst ] });
 
-  context.suitePath = _.fileProvider.path.pathDirTempOpen( _.fileProvider.path.join( __dirname, '../..'  ), 'FileProviderNpm' );
-  context.suitePath = _.fileProvider.pathResolveLinkFull({ filePath : context.suitePath, resolvingSoftLink : 1 }); /* qqq : ? */
-  context.suitePath = context.suitePath.absolutePath;
+  context.suiteTempPath = _.fileProvider.pathDirTempOpen( _.fileProvider.path.join( __dirname, '../..'  ), 'FileProviderNpm' );
+  context.suiteTempPath = _.fileProvider.pathResolveLinkFull({ filePath : context.suiteTempPath, resolvingSoftLink : 1 }); /* qqq : ? */
+  context.suiteTempPath = context.suiteTempPath.absolutePath;
 }
 
 //
@@ -35,7 +35,7 @@ function onSuiteBegin( test )
 function onSuiteEnd( test )
 {
   let context = this;
-  _.fileProvider.path.pathDirTempClose( context.suitePath );
+  _.fileProvider.path.pathDirTempClose( context.suiteTempPath );
 }
 
 // --
@@ -49,7 +49,7 @@ function filesReflectTrivial( test )
   let providerDst = context.providerDst;
   let system = context.system;
   let path = context.providerDst.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
   let installPath = path.join( routinePath, 'wPathBasic' );
   let installPathGlobal = providerDst.path.globalFromPreferred( installPath );
 
@@ -254,7 +254,7 @@ filesReflectTrivial.timeOut = 120000;
 //   let providerSrc = context.providerSrc;
 //   let providerDst = context.providerDst;
 //   let path = context.providerDst.path;
-//   let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+//   let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 //   let installPath = path.join( routinePath, 'wPathBasic' );
 
 //   let con = new _.Consequence().take( null )
@@ -464,7 +464,7 @@ var Proto =
 
   context :
   {
-    suitePath : null,
+    suiteTempPath : null,
     providerSrc : null,
     providerDst : null,
     system : null

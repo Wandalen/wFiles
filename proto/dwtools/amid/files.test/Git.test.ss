@@ -29,9 +29,9 @@ function onSuiteBegin( test )
 
   let path = context.providerDst.path;
 
-  context.suitePath = path.pathDirTempOpen( path.join( __dirname, '../..'  ),'FileProviderGit' );
-  context.suitePath = context.providerDst.pathResolveLinkFull({ filePath : context.suitePath, resolvingSoftLink : 1 });
-  context.suitePath = context.suitePath.absolutePath;
+  context.suiteTempPath = path.pathDirTempOpen( path.join( __dirname, '../..'  ),'FileProviderGit' );
+  context.suiteTempPath = context.providerDst.pathResolveLinkFull({ filePath : context.suiteTempPath, resolvingSoftLink : 1 });
+  context.suiteTempPath = context.suiteTempPath.absolutePath;
 
   if( RunningInsideTestContainer )
   {
@@ -60,8 +60,8 @@ function onSuiteEnd( test )
     gitConfig( `core.autocrlf ${context.gitOriginalCoreAutocrlf}` )
   }
 
-  _.assert( _.strHas( context.suitePath, 'FileProviderGit' ), context.suitePath );
-  path.pathDirTempClose( context.suitePath );
+  _.assert( _.strHas( context.suiteTempPath, 'FileProviderGit' ), context.suiteTempPath );
+  path.pathDirTempClose( context.suiteTempPath );
 }
 
 // --
@@ -75,7 +75,7 @@ function filesReflectTrivial( test )
   let providerDst = context.providerDst;
   let system = context.system;
   let path = context.providerDst.path;
-  let testPath = path.join( context.suitePath, 'routine-' + test.name );
+  let testPath = path.join( context.suiteTempPath, 'routine-' + test.name );
   let localPath = path.join( testPath, 'wPathBasic' );
   debugger;
   let clonePathGlobal = providerDst.path.globalFromPreferred( localPath );
@@ -777,7 +777,7 @@ function filesReflectNoStashing( test )
   let providerDst = context.providerDst;
   let system = context.system;
   let path = context.providerDst.path;
-  let testPath = path.join( context.suitePath, 'routine-' + test.name );
+  let testPath = path.join( context.suiteTempPath, 'routine-' + test.name );
   let localPath = path.join( testPath, 'wPathBasic' );
   debugger;
   let clonePathGlobal = providerDst.path.globalFromPreferred( localPath );
@@ -849,7 +849,7 @@ function filesReflectDownloadThrowing( test )
   let providerDst = context.providerDst;
   let system = context.system;
   let path = context.providerDst.path;
-  let testPath = path.join( context.suitePath, 'routine-' + test.name );
+  let testPath = path.join( context.suiteTempPath, 'routine-' + test.name );
   let localPath = path.join( testPath, 'wPathBasic' );
   let clonePathGlobal = providerDst.path.globalFromPreferred( localPath );
 
@@ -1046,7 +1046,7 @@ function filesReflectEol( test )
   let providerDst = context.providerDst;
   let system = context.system;
   let path = context.providerDst.path;
-  let testPath = path.join( context.suitePath, 'routine-' + test.name );
+  let testPath = path.join( context.suiteTempPath, 'routine-' + test.name );
   let localPath = path.join( testPath, 'clone' );
   let clonePathGlobal = providerDst.path.globalFromPreferred( localPath );
   let repoPath = path.join( testPath, 'repo' );
@@ -1464,7 +1464,7 @@ var Proto =
 
   context :
   {
-    suitePath : null,
+    suiteTempPath : null,
     providerSrc : null,
     providerDst : null,
     gitConfigStart : null,

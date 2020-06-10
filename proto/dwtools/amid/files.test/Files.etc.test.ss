@@ -23,7 +23,7 @@ var Parent = wTester;
 // var suitFileLocation = _.introspector.location().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
 
 var FileRecord = _.FileRecord;
-var suitePath = _.fileProvider.path.nativize( _.path.resolve( __dirname + '/../../../../tmp.tmp/sample/FilesIndividualTest' ) );
+var suiteTempPath = _.fileProvider.path.nativize( _.path.resolve( __dirname + '/../../../../tmp.tmp/sample/FilesIndividualTest' ) );
 
 //
 
@@ -40,7 +40,7 @@ function createTestsDirectory( path, rmIfExists )
 
 function createInTD( path )
 {
-  return createTestsDirectory( _.path.join( suitePath, path ) );
+  return createTestsDirectory( _.path.join( suiteTempPath, path ) );
 }
 
 //
@@ -48,9 +48,9 @@ function createInTD( path )
 function createTestFile( path, data, decoding )
 {
   var dataToWrite = ( decoding === 'json' ) ? JSON.stringify( data ) : data;
-  // File.createFileSync( _.path.join( suitePath, path ) );
-  // dataToWrite && File.writeFileSync( _.path.join( suitePath, path ), dataToWrite );
-  _.fileProvider.fileWrite({ filePath : _.path.join( suitePath, path ), data : dataToWrite });
+  // File.createFileSync( _.path.join( suiteTempPath, path ) );
+  // dataToWrite && File.writeFileSync( _.path.join( suiteTempPath, path ), dataToWrite );
+  _.fileProvider.fileWrite({ filePath : _.path.join( suiteTempPath, path ), data : dataToWrite });
 }
 
 //
@@ -85,8 +85,8 @@ function createTestSymLink( path, target, type, data )
   }
   else throw new Error( 'unexpected type' );
 
-  path = _.path.join( suitePath, path );
-  origin = _.path.resolve( _.path.join( suitePath, origin ) );
+  path = _.path.join( suiteTempPath, path );
+  origin = _.path.resolve( _.path.join( suiteTempPath, origin ) );
 
   // File.existsSync( path ) && File.removeSync( path );
   if( _.fileProvider.statResolvedRead( path ) )
@@ -116,8 +116,8 @@ function createTestHardLink( path, target, data )
   data = data || 'test origin';
   createTestFile( origin, data );
 
-  path = _.path.join( suitePath, path );
-  origin = _.path.resolve( _.path.join( suitePath, origin ) );
+  path = _.path.join( suiteTempPath, path );
+  origin = _.path.resolve( _.path.join( suiteTempPath, origin ) );
 
   // File.existsSync( path ) && File.removeSync( path );
   if( _.fileProvider.statResolvedRead( path ) )
@@ -209,7 +209,7 @@ function createTestResources( cases, dir )
 
 function mergePath( path )
 {
-  return _.path.join( suitePath, path );
+  return _.path.join( suiteTempPath, path );
 }
 
 // --
@@ -264,7 +264,7 @@ function mergePath( path )
 //   for( let testCheck of testChecks )
 //   {
 //     test.description = testCheck.name;
-//     let got = !! _.fileProvider.isDir( _.path.join( suitePath, testCheck.path ) );
+//     let got = !! _.fileProvider.isDir( _.path.join( suiteTempPath, testCheck.path ) );
 //     test.identical( got , testCheck.expected );
 //   }
 
@@ -1441,7 +1441,7 @@ function fileSize( test )
 //         content : null,
 //         exist : null
 //       },
-//       path = _.path.join( suitePath, testCheck.path );
+//       path = _.path.join( suiteTempPath, testCheck.path );
 
 //     // clear
 //     // File.existsSync( path ) && File.removeSync( path );
@@ -3473,7 +3473,7 @@ var Self =
 
 };
 
-createTestsDirectory( suitePath, true );
+createTestsDirectory( suiteTempPath, true );
 
 Self = wTestSuite( Self )
 if( typeof module !== 'undefined' && !module.parent )

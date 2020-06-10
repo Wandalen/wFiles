@@ -26,9 +26,9 @@ function onSuiteBegin()
   this.isBrowser = typeof module === 'undefined';
 
   if( !this.isBrowser )
-  this.suitePath = _.path.pathDirTempOpen( _.path.join( __dirname, '../..' ), 'FilesRead' );
+  this.suiteTempPath = _.path.pathDirTempOpen( _.path.join( __dirname, '../..' ), 'FilesRead' );
   else
-  this.suitePath = _.path.current();
+  this.suiteTempPath = _.path.current();
 }
 
 //
@@ -37,8 +37,8 @@ function onSuiteEnd()
 {
   if( !this.isBrowser )
   {
-    _.assert( _.strHas( this.suitePath, '.tmp' ) );
-    _.path.pathDirTempClose(  this.suitePath );
+    _.assert( _.strHas( this.suiteTempPath, '.tmp' ) );
+    _.path.pathDirTempClose(  this.suiteTempPath );
   }
 }
 
@@ -62,7 +62,7 @@ function filesReadOld( test )
   //
 
   var provider = _.fileProvider;
-  var testDir = _.path.join( test.context.suitePath, test.name );
+  var testDir = _.path.join( test.context.suiteTempPath, test.name );
   var fileNames = [ 'a', 'b', 'c' ];
 
   test.case = 'sync reading of files, all files are present';
@@ -132,7 +132,7 @@ function filesReadOld( test )
 
 // function filesTreeRead( test )
 // {
-//   var currentTestDir = _.path.join( test.context.suitePath, test.name );
+//   var currentTestDir = _.path.join( test.context.suiteTempPath, test.name );
 //   var provider = _.fileProvider;
 //   provider.safe = 1;
 //   var filesTreeReadFixedOptions =
@@ -346,7 +346,7 @@ function filesReadOld( test )
 // {
 //   test.case = 'filesTreeWrite';
 
-//   var currentTestDir = _.path.join( test.context.suitePath, test.name );
+//   var currentTestDir = _.path.join( test.context.suiteTempPath, test.name );
 //   var provider = _.fileProvider;
 
 //   var fixedOptions =
@@ -527,7 +527,7 @@ function configRead( test )
   let context = this;
   let provider = context.provider || _.fileProvider;
   let path = provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
   let terminalPath = path.join( routinePath, 'terminal' );
 
   //
@@ -730,7 +730,7 @@ var Self =
 
   context :
   {
-    suitePath : null,
+    suiteTempPath : null,
     isBrowser : null
   },
 

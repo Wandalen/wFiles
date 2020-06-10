@@ -132,6 +132,8 @@ let readBufferBytes =
 
   onEnd : function( e )
   {
+    if( e.stream )
+    return;
     e.data = e.data;
     _.assert( _.bufferBytesIs( e.data ) );
   },

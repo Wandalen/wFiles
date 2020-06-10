@@ -3052,7 +3052,6 @@ function streamRead_body( o )
   {
     if( encoder && encoder.onBegin )
     {
-      debugger;
       let r = encoder.onBegin.call( self, { operation : o, encoder : encoder, provider : self })
       _.sure( r === undefined );
     }
@@ -3066,9 +3065,8 @@ function streamRead_body( o )
     if( encoder && encoder.onEnd )
     try
     {
-      debugger;
-      let o2 = { data : result, operation : o, encoder : encoder, provider : self };
-      encoder.onEnd.call( self, o2 );
+      let o2 = { stream : result, operation : o, encoder : encoder, provider : self };
+      let r = encoder.onEnd.call( self, o2 );
       _.sure( r === undefined );
       result = o2.result;
     }
@@ -3086,9 +3084,11 @@ function streamRead_body( o )
   function handleError( err )
   {
 
+    debugger;
     err = _._err
     ({
-      args : [ stack, '\nfileRead( ', o.filePath, ' )\n', err ],
+      // args : [ stack, '\nfileRead( ', o.filePath, ' )\n', err ],
+      args : [ err, '\nfileRead( ', o.filePath, ' )\n' ],
       usingSourceCode : 0,
       level : 0,
     });
@@ -3096,7 +3096,7 @@ function streamRead_body( o )
     if( encoder && encoder.onError )
     try
     {
-      err = encoder.onError.call( self, { error : err, operation : o, encoder : encoder, provider : self }) /* xxx : remove encoder.onError? */
+      err = encoder.onError.call( self, { error : err, stream : result, operation : o, encoder : encoder, provider : self }) /* xxx : remove encoder.onError? */
     }
     catch( err2 )
     {
@@ -3276,7 +3276,8 @@ function fileRead_body( o )
 
     err = _._err
     ({
-      args : [ stack, '\nfileRead( ', o.filePath, ' )\n', err ],
+      // args : [ stack, '\nfileRead( ', o.filePath, ' )\n', err ],
+      args : [ err, '\nfileRead( ', o.filePath, ' )\n' ],
       usingSourceCode : 0,
       level : 0,
     });

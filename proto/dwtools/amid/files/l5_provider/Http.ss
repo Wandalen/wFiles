@@ -145,15 +145,24 @@ function fileReadAct( o )
   function handleError( err )
   {
 
+    debugger;
+    err = _._err
+    ({
+      // args : [ stack, '\nfileReadAct( ', o.filePath, ' )\n', err ],
+      args : [ err, '\nfileRead( ', o.filePath, ' )\n' ],
+      usingSourceCode : 0,
+      level : 0,
+    });
+
     if( encoder && encoder.onError )
     try
     {
-      err = _._err
-      ({
-        args : [ stack,'\nfileReadAct( ',o.filePath,' )\n',err ],
-        usingSourceCode : 0,
-        level : 0,
-      });
+      // err = _._err
+      // ({
+      //   args : [ stack,'\nfileReadAct( ',o.filePath,' )\n',err ],
+      //   usingSourceCode : 0,
+      //   level : 0,
+      // });
       err = encoder.onError.call( self,{ error : err, operation : o, encoder : encoder })
     }
     catch( err2 )

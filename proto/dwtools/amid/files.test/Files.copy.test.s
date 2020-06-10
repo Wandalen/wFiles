@@ -29,12 +29,12 @@ function onSuiteBegin()
   this.isBrowser = typeof module === 'undefined';
 
   if( !this.isBrowser )
-  this.suitePath = _.path.pathDirTempOpen( _.path.join( __dirname, '../..'  ), 'FilesCopy' );
+  this.suiteTempPath = _.path.pathDirTempOpen( _.path.join( __dirname, '../..'  ), 'FilesCopy' );
   else
-  this.suitePath = _.path.current();
+  this.suiteTempPath = _.path.current();
 
-  this.dstPath = _.path.join( this.suitePath, 'dst' );
-  this.srcPath = _.path.join( this.suitePath, 'src' );
+  this.dstPath = _.path.join( this.suiteTempPath, 'dst' );
+  this.srcPath = _.path.join( this.suiteTempPath, 'src' );
 
   this.filePathSrc = _.path.join( this.srcPath, 'file.src' );
   this.filePathDst = _.path.join( this.dstPath, 'file.dst' );
@@ -48,8 +48,8 @@ function onSuiteEnd()
 {
   if( !this.isBrowser )
   {
-    _.assert( _.strHas( this.suitePath, 'FilesCopy' ) );
-    _.path.pathDirTempClose( this.suitePath );
+    _.assert( _.strHas( this.suiteTempPath, 'FilesCopy' ) );
+    _.path.pathDirTempClose( this.suiteTempPath );
   }
 }
 
@@ -219,7 +219,7 @@ function drawInfo( info )
 
 //   // combinations.forEach( ( src ) =>
 //   // {
-//   //   _.fileProvider.filesDelete( test.context.suitePath );
+//   //   _.fileProvider.filesDelete( test.context.suiteTempPath );
 
 //   //   var info =
 //   //   {
@@ -295,7 +295,7 @@ function drawInfo( info )
 //       // if( n !== 29 )
 //       // return;
 
-//       _.fileProvider.filesDelete( test.context.suitePath );
+//       _.fileProvider.filesDelete( test.context.suiteTempPath );
 
 //       if( src.level !== dst.level )
 //       return;
@@ -408,7 +408,7 @@ function drawInfo( info )
 
 //   // combinations.forEach( ( dst ) =>
 //   // {
-//   //   _.fileProvider.filesDelete( test.context.suitePath );
+//   //   _.fileProvider.filesDelete( test.context.suiteTempPath );
 
 //   //   var info =
 //   //   {
@@ -479,7 +479,7 @@ function drawInfo( info )
 //   //     checks : []
 //   //   };
 
-//   //   _.fileProvider.filesDelete( test.context.suitePath );
+//   //   _.fileProvider.filesDelete( test.context.suiteTempPath );
 
 //   //   o.src = srcPath;
 //   //   o.dst = dstPath;
@@ -682,7 +682,7 @@ var Self =
   context :
   {
     isBrowser : null,
-    suitePath : null,
+    suiteTempPath : null,
     dstPath : null,
     srcPath : null,
     filePathSrc : null,

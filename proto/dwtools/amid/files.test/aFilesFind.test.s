@@ -36,8 +36,8 @@ function onSuiteEnd()
 {
   let path = this.provider.path;
   _.assert( Object.keys( this.system.providersWithProtocolMap ).length === 1, 'System should have single registered provider at the end of function testing' );
-  _.assert( _.strHas( this.suitePath, '.tmp' ) );
-  path.pathDirTempClose( this.suitePath );
+  _.assert( _.strHas( this.suiteTempPath, '.tmp' ) );
+  path.pathDirTempClose( this.suiteTempPath );
   this.provider.finit();
   this.system.finit();
 }
@@ -64,7 +64,7 @@ function softLinkIsSupported()
   if( process.platform === 'win32' )
   {
     var allow = false;
-    var dir = path.join( context.suitePath, 'softLinkIsSupported' );
+    var dir = path.join( context.suiteTempPath, 'softLinkIsSupported' );
     var srcPath = path.join( dir, 'src' );
     var dstPath = path.join( dir, 'dst' );
 
@@ -295,7 +295,7 @@ function filesFindTrivial( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   function abs()
   {
@@ -836,7 +836,7 @@ function filesFindTrivialAsync( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
   let con = new _.Consequence().take( null );
 
   /* */
@@ -854,8 +854,8 @@ function filesFindTrivialAsync( test )
   test.case = 'setup trivial';
 
   provider.filesDelete( routinePath );
-  extract1.filesReflectTo({ dstProvider : provider, dst : context.suitePath });
-  var gotTree = provider.filesExtract( context.suitePath );
+  extract1.filesReflectTo({ dstProvider : provider, dst : context.suiteTempPath });
+  var gotTree = provider.filesExtract( context.suiteTempPath );
   gotTree.filesFind({ filePath : '/', filter : { recursive : 2 }, onDown : function onDown( r, o )
   {
     if( r.isTerminal )
@@ -863,7 +863,7 @@ function filesFindTrivialAsync( test )
   }})
   test.identical( gotTree.filesTree, extract1.filesTree );
 
-  extract1.filesReflectTo( provider, context.suitePath );
+  extract1.filesReflectTo( provider, context.suiteTempPath );
 
   //
 
@@ -872,7 +872,7 @@ function filesFindTrivialAsync( test )
     test.case = 'trivial async';
     var o =
     {
-      filePath : path.join( context.suitePath ),
+      filePath : path.join( context.suiteTempPath ),
       outputFormat : 'relative',
       sync : 0,
       filter : { recursive : 2 },
@@ -911,7 +911,7 @@ function filesFindMaskTerminal( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
   var terminalPath = path.join( routinePath, 'package.json' );
 
   provider.filesDelete( routinePath );
@@ -939,7 +939,7 @@ function filesFindCriticalCases( test )
 {
   let context = this
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
   let provider = context.provider;
   let system = context.system;
 
@@ -1386,7 +1386,7 @@ function filesFind( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   if( provider instanceof _.FileProvider.Extract )
   return test.is( true );
@@ -1900,7 +1900,7 @@ function filesFind2( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
   var terminalPath, got, expected;
 
   var filesTree =
@@ -1975,7 +1975,7 @@ function filesFind2( test )
 
   /*terminalPath - empty dir*/
 
-  terminalPath = path.join( context.suitePath, 'tmp/empty' );
+  terminalPath = path.join( context.suiteTempPath, 'tmp/empty' );
   provider.dirMake( terminalPath )
   got = provider.filesFind( terminalPath );
   test.identical( got, [] );
@@ -2076,19 +2076,19 @@ function filesFind2( test )
 
   /*terminalPath - empty dir, withTerminals, withTransient on*/
 
-  provider.dirMake( path.join( context.suitePath, 'empty' ) )
+  provider.dirMake( path.join( context.suiteTempPath, 'empty' ) )
   got = provider.filesFind({ filePath : path.join( routinePath, 'empty' ), withTerminals : 1, withTransient/*maybe withStem*/ : 1, allowingMissed : 1 });
   test.identical( got, [] );
 
   /*terminalPath - empty dir, withTerminals, withTransient on, withTransient off*/
 
-  provider.dirMake( path.join( context.suitePath, 'empty' ) )
+  provider.dirMake( path.join( context.suiteTempPath, 'empty' ) )
   got = provider.filesFind({ filePath : path.join( routinePath, 'empty' ), withTerminals : 1, withTransient/*maybe withStem*/ : 1, withStem : 0, allowingMissed : 1 });
   test.identical( got, [] );
 
   /*terminalPath - empty dir, withTerminals, withTransient off*/
 
-  provider.dirMake( path.join( context.suitePath, 'empty' ) )
+  provider.dirMake( path.join( context.suiteTempPath, 'empty' ) )
   got = provider.filesFind({ filePath : path.join( routinePath, 'empty' ), withTerminals : 0, withStem/*maybe withTransient*/ : 0, allowingMissed : 1 });
   test.identical( got, [] );
 
@@ -2212,7 +2212,7 @@ function filesFind2( test )
 
   /* terminalPath - directory, maskDirectory, withTransient */
 
-  terminalPath = path.join( context.suitePath, 'tmp/dir' );
+  terminalPath = path.join( context.suiteTempPath, 'tmp/dir' );
   provider.dirMake( terminalPath );
 
   got = provider.filesFind
@@ -2330,7 +2330,7 @@ function filesFindRecursive( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   function abs()
   {
@@ -2529,7 +2529,7 @@ function filesFindLinked( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   /*
     link : [ normal, double, broken, context cycled, cycled, dst and src resolving to the same file ]
@@ -3048,7 +3048,7 @@ function filesFindSoftLinksExtract( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   function abs()
   {
@@ -3758,7 +3758,7 @@ function filesFindSoftLinksLoopsExtract( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   function abs()
   {
@@ -4486,7 +4486,7 @@ function filesFindSoftLinks( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   function abs()
   {
@@ -4654,7 +4654,7 @@ function filesFindResolving( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
   let terminalPath = path.join( routinePath, 'terminal' );
   let softLinkIsSupported = context.softLinkIsSupported();
 
@@ -5699,7 +5699,7 @@ function filesFindResolvingExperiment( test )
   let context = this;
   let provider = context.provider;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   test.case = 'textLink->dir, resolvingTextLink : 1, usingTextLink : 1';
   let srcDirPath = path.join( routinePath, 'dir' );
@@ -5737,7 +5737,7 @@ function filesFindGlob( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   var src = context.makeStandardExtract();
   src.filesReflectTo( provider, routinePath );
@@ -7304,7 +7304,7 @@ function filesFindOn( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   var src = context.makeStandardExtract();
   src.filesReflectTo( provider, routinePath );
@@ -7534,7 +7534,7 @@ function filesFindBaseFromGlob( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   var src = context.makeStandardExtract();
   src.filesReflectTo( provider, routinePath );
@@ -7986,7 +7986,7 @@ function filesGlob( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   var filesTree =
   {
@@ -8279,7 +8279,7 @@ function filesFindDistinct( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   function abs()
   {
@@ -8629,7 +8629,7 @@ function filesFindSimplifyGlob( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   function abs()
   {
@@ -8781,7 +8781,7 @@ function filesFindOptimalFilePath( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   function abs()
   {
@@ -9458,7 +9458,7 @@ function filesFindVisitingCertain( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   function abs()
   {
@@ -9714,7 +9714,7 @@ function filesFindMandatoryString( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   function abs()
   {
@@ -9881,7 +9881,7 @@ function filesFindMandatoryMap( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   function abs()
   {
@@ -10229,7 +10229,7 @@ function filesFindExcluding( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   function abs()
   {
@@ -10477,7 +10477,7 @@ function filesFindGlobLogic( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   function abs()
   {
@@ -10820,7 +10820,7 @@ function filesFindGlobComplex( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   function abs()
   {
@@ -11184,7 +11184,7 @@ function filesFindGlobWillfiles( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   function abs()
   {
@@ -11284,7 +11284,7 @@ function filesFindAnyPositive( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   function abs()
   {
@@ -12163,7 +12163,7 @@ function filesFindTotalPositive( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   function abs()
   {
@@ -13039,7 +13039,7 @@ function filesFindSeveralTotalPositive( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   function abs()
   {
@@ -13495,7 +13495,7 @@ function filesFindTotalNegative( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   function abs()
   {
@@ -14392,7 +14392,7 @@ function filesFindGroups( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   function abs()
   {
@@ -14643,7 +14643,7 @@ function filesReflectEvaluate( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   function abs()
   {
@@ -14718,7 +14718,7 @@ function filesReflectTrivial( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   /* */
 
@@ -15884,7 +15884,7 @@ function filesReflectOutputFormat( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   function abs()
   {
@@ -16076,7 +16076,7 @@ function filesReflectMandatory( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   function abs()
   {
@@ -16169,7 +16169,7 @@ function filesReflectMutuallyExcluding( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
   var precise = true;
 
   function abs()
@@ -16977,7 +16977,7 @@ function filesReflectWithFilter( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   function prepareSingle()
   {
@@ -17040,7 +17040,7 @@ function _filesReflectWithFilter( test, o )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   function makeOptions()
   {
@@ -17441,7 +17441,7 @@ function filesReflect( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   function prepareSingle()
   {
@@ -17520,7 +17520,7 @@ function _filesReflect( test, o )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   function optionsMake()
   {
@@ -18922,7 +18922,7 @@ function filesReflectOverlap( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   function abs()
   {
@@ -19096,7 +19096,7 @@ function filesReflectGrab( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   /* */
 
@@ -19706,7 +19706,7 @@ function filesReflectorBasic( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
   let dst = provider;
 
   function abs()
@@ -20046,7 +20046,7 @@ function filesReflectWithSystem( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
   let dstProvider = provider;
   let dstPath = routinePath;
 
@@ -20060,7 +20060,7 @@ function filesReflectWithSystem( test )
   // var dstProvider = new _.FileProvider.HardDrive();
   var srcPath = '/src';
 
-  // var dstPath = path.join( context.suitePath, test.name, 'dst' );
+  // var dstPath = path.join( context.suiteTempPath, test.name, 'dst' );
   // var system = new _.FileProvider.System({ empty : 1 });
   // system.providerRegister( srcProvider );
   // system.providerRegister( dstProvider );
@@ -20134,7 +20134,7 @@ function filesReflectLinkWithSystem( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
   let dstPath = routinePath;
   let dst = provider;
 
@@ -21065,7 +21065,7 @@ function filesReflectOnlyPreserving( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   var filesTree =
   {
@@ -21561,7 +21561,7 @@ function filesReflectOnlyPreservingLinks( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
 
   var srcPath = provider.path.join( routinePath, 'src' );
@@ -22559,7 +22559,7 @@ function filesReflectOnlyPreservingMultipleSrc( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   /*  */
 
@@ -22931,7 +22931,7 @@ function filesReflectOnlyPreservingEmpty( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   /* rewriting of empty files with same time */
 
@@ -23595,7 +23595,7 @@ function filesReflectDstDeletingDirs( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   /* */
 
@@ -24039,7 +24039,7 @@ function filesReflectLinked( test )
   let system = context.system;
   let path = context.provider.path;
 
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
   var srcPath = path.join( routinePath, 'src' );
   var dstPath = path.join( routinePath, 'dst' );
   var dstLinkPath = path.join( dstPath, 'link' );
@@ -24473,7 +24473,7 @@ function filesReflectLinkedExperiment( test )
   let system = context.system;
   let path = context.provider.path;
 
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
   var srcPath = path.join( routinePath, 'src' );
   var dstPath = path.join( routinePath, 'dst' );
   var dstLinkPath = path.join( dstPath, 'link' );
@@ -24510,7 +24510,7 @@ function filesReflectTo( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   /* */
 
@@ -24615,7 +24615,7 @@ function filesReflectToWithSoftLinks( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   function abs()
   {
@@ -25186,7 +25186,7 @@ function filesReflectToWithSoftLinksRebasing( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   function abs()
   {
@@ -27642,7 +27642,7 @@ function filesReflectToWithSoftLinksResolving( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   function abs()
   {
@@ -32186,7 +32186,7 @@ function filesReflectDstIgnoring( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   /* */
 
@@ -32433,7 +32433,7 @@ function filesDeleteTrivial( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
   let softLinkIsSupported = context.softLinkIsSupported();
 
   var terminalPath = path.join( routinePath, 'terminal' );
@@ -32867,7 +32867,7 @@ function filesDelete( test )
   let provider = context.provider;
   let system = context.system;
 
-  var routinePath = path.join( context.suitePath, test.name );
+  var routinePath = path.join( context.suiteTempPath, test.name );
 
   var tree = _.FileProvider.Extract
   ({
@@ -33294,7 +33294,7 @@ function filesDeleteAsync( test )
   let system = context.system;
   let softLinkIsSupported = context.softLinkIsSupported();
 
-  var routinePath = path.join( context.suitePath, test.name );
+  var routinePath = path.join( context.suiteTempPath, test.name );
   var terminalPath = path.join( routinePath, 'terminal' );
   var dirPath = path.join( routinePath, 'dir' );
   var con = new _.Consequence().take( null )
@@ -33671,7 +33671,7 @@ function filesDeleteDeletingEmptyDirs( test )
   let provider = context.provider;
   let system = context.system;
 
-  var routinePath = path.join( context.suitePath, test.name );
+  var routinePath = path.join( context.suiteTempPath, test.name );
 
   var tree = _.FileProvider.Extract
   ({
@@ -33864,7 +33864,7 @@ function filesDeleteEmptyDirs( test )
   let path = context.provider.path;
   let provider = context.provider;
 
-  var routinePath = path.join( context.suitePath, test.name );
+  var routinePath = path.join( context.suiteTempPath, test.name );
 
   var tree = _.FileProvider.Extract
   ({
@@ -34214,7 +34214,7 @@ function filesDeleteTerminals( test )
   let path = context.provider.path;
   let provider = context.provider;
 
-  let routinePath = path.join( context.suitePath, test.name );
+  let routinePath = path.join( context.suiteTempPath, test.name );
 
   var tree = _.FileProvider.Extract
   ({
@@ -34458,7 +34458,7 @@ function filesDeleteLate( test )
   let path = context.provider.path;
   let provider = context.provider;
 
-  let routinePath = path.join( context.suitePath, test.name );
+  let routinePath = path.join( context.suiteTempPath, test.name );
 
   var tree = context.makeStandardExtract();
 
@@ -34488,7 +34488,7 @@ function filesDeleteLatePerformance( test )
   let path = context.provider.path;
   let provider = context.provider;
 
-  let routinePath = path.join( context.suitePath, test.name );
+  let routinePath = path.join( context.suiteTempPath, test.name );
 
   /* */
 
@@ -34552,7 +34552,7 @@ function filesDeleteAndAsyncWrite( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  // let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  // let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   test.case = 'try to delete dir before async write will be completed';
 
@@ -34596,13 +34596,13 @@ function filesFindDifference( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   /* zzz Needs repair. Files tree is written with "sameTime" option enabled, but files are not having same timestamps anyway,
      probably problem is in method used by HardDrive.fileTimeSetAct
   */
 
-  var testRoutineDir = path.join( context.suitePath, test.name );
+  var testRoutineDir = path.join( context.suiteTempPath, test.name );
 
   var samples =
   [
@@ -35260,9 +35260,9 @@ function filesCopyWithAdapter( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
-  var testRoutineDir = path.join( context.suitePath, test.name );
+  var testRoutineDir = path.join( context.suiteTempPath, test.name );
 
   var samples =
   [
@@ -36901,7 +36901,7 @@ function experiment( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   var src = path.join( routinePath, 'src' );
   var dst = path.join( routinePath, 'dst' );
@@ -36926,7 +36926,7 @@ function filesFindExperiment2( test )
   let context = this;
   let provider = context.provider;
   let path = context.provider.path;
-  let routinePath = path.join( context.suitePath, 'routine-' + test.name );
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   var filesTree =
   {
@@ -36986,7 +36986,7 @@ function filesReflectExperiment( test )
   let path = context.provider.path;
   let provider = context.provider;
 
-  var routinePath = path.join( context.suitePath, test.name );
+  var routinePath = path.join( context.suiteTempPath, test.name );
 
   var srcPath = path.join( routinePath, 'src' );
   var dstPath = path.join( routinePath, 'dst' );
@@ -37051,7 +37051,7 @@ var Self =
 
     provider : null,
     system : null,
-    suitePath : null,
+    suiteTempPath : null,
 
     softLinkIsSupported,
     makeStandardExtract,

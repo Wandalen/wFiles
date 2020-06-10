@@ -21,7 +21,7 @@ _.assert( !!Parent );
 // function onSuiteBegin( test )
 // {
 //   let path = this.provider.path;
-//   this.suitePath = path.pathDirTempOpen( path.join( __dirname, '../..'  ), 'Provider/HardDrive' );
+//   this.suiteTempPath = path.pathDirTempOpen( path.join( __dirname, '../..'  ), 'Provider/HardDrive' );
 // }
 //
 // //
@@ -31,8 +31,8 @@ _.assert( !!Parent );
 //   let path = this.provider.path;
 //   // qqq : error here
 //   // aaa : format of temp path was changed and has unique id at the end
-//   _.assert( _.strHas( this.suitePath, 'Provider/HardDrive' ) );
-//   path.pathDirTempClose( this.suitePath );
+//   _.assert( _.strHas( this.suiteTempPath, 'Provider/HardDrive' ) );
+//   path.pathDirTempClose( this.suiteTempPath );
 // }
 
 //
@@ -45,12 +45,12 @@ function onSuiteBegin( test )
   context.system = _.FileProvider.System({ providers : [ context.provider ] });
 
   let path = context.provider.path;
-  context.suitePath = path.pathDirTempOpen( path.join( __dirname, '../..'  ),'HardDrive' );
-  context.suitePath = context.provider.pathResolveLinkFull({ filePath : context.suitePath, resolvingSoftLink : 1 });
-  context.suitePath = context.suitePath.absolutePath;
+  context.suiteTempPath = path.pathDirTempOpen( path.join( __dirname, '../..'  ),'HardDrive' );
+  context.suiteTempPath = context.provider.pathResolveLinkFull({ filePath : context.suiteTempPath, resolvingSoftLink : 1 });
+  context.suiteTempPath = context.suiteTempPath.absolutePath;
   context.globalFromPreferred = function globalFromPreferred( path ){ return path };
   // let path = this.provider.path;
-  // this.suitePath = path.pathDirTempOpen( path.join( __dirname, '../..'  ), 'Provider/HardDrive' );
+  // this.suiteTempPath = path.pathDirTempOpen( path.join( __dirname, '../..'  ), 'Provider/HardDrive' );
 }
 
 // --
@@ -74,7 +74,7 @@ var Proto =
   {
     provider : _.FileProvider.HardDrive(),
     // onSuiteBegin,
-    suitePath : null,
+    suiteTempPath : null,
     globalFromPreferred : null
   },
 

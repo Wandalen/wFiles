@@ -118,7 +118,6 @@ streamReadAct.having = Object.create( Parent.prototype.streamReadAct.having );
  * @module Tools/mid/Files
 */
 
-
 function fileReadAct( o )
 {
   let self = this;

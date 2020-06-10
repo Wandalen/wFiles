@@ -35,8 +35,8 @@ function onSuiteBegin( test )
 function onSuiteEnd()
 {
   let path = this.provider.path;
-  _.assert( _.strHas( this.suitePath, '.tmp' ) );
-  path.pathDirTempClose( this.suitePath );
+  _.assert( _.strHas( this.suiteTempPath, '.tmp' ) );
+  path.pathDirTempClose( this.suiteTempPath );
   this.provider.finit();
   this.system.finit();
 }
@@ -58,7 +58,7 @@ function onRoutineEnd( test )
 function pathFor( filePath )
 {
   let path = this.provider.path;
-  filePath =  path.join( this.suitePath, filePath );
+  filePath =  path.join( this.suiteTempPath, filePath );
   return path.normalize( filePath );
 }
 
@@ -48846,7 +48846,7 @@ var Self =
     pathFor,
     providerIsInstanceOf,
     softLinkIsSupported,
-    suitePath : null,
+    suiteTempPath : null,
     system : null,
     // shouldWriteOnlyOnce
   },

@@ -3224,7 +3224,8 @@ function fileRead_body( o )
       _.sure( r === undefined );
     }
     // debugger;
-    // _.Consequence.Take( o.onBegin, o );
+    if( o.onBegin )
+    _.Consequence.Take( o.onBegin, o );
   }
 
   /* end */
@@ -3259,10 +3260,10 @@ function fileRead_body( o )
     else
     r = o;
 
-    // if( o.onEnd )
-    // debugger;
-    // if( o.onEnd )
-    // _.Consequence.Take( o.onEnd, o );
+    if( o.onEnd )
+    debugger;
+    if( o.onEnd )
+    _.Consequence.Take( o.onEnd, o );
 
     return r;
   }
@@ -3276,7 +3277,7 @@ function fileRead_body( o )
 
     err = _._err
     ({
-      args : [ stack, '\nfileRead( ', o.filePath, ' )\n', err ],
+      args : [ /* stack ,*/ '\nfileRead( ', o.filePath, ' )\n', err ],
       usingSourceCode : 0,
       level : 0,
     });
@@ -3293,8 +3294,8 @@ function fileRead_body( o )
       console.error( err.toString() + '\n' + err.stack );
     }
 
-    // if( o.onError )
-    // _.Consequence.Error( o.onError, err );
+    if( o.onError )
+    _.Consequence.Error( o.onError, err );
 
     if( o.throwing )
     throw err

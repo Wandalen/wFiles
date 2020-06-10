@@ -3299,7 +3299,10 @@ function fileRead_body( o )
     _.Consequence.Error( o.onError, err );
 
     if( o.throwing )
-    throw err
+    throw err;
+
+    _.errAttend( err );
+
     return null;
   }
 

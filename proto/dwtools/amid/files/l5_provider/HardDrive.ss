@@ -1970,6 +1970,7 @@ encoders[ 'buffer.bytes' ] =
 
   onEnd : function( e )
   {
+    if( !e.stream )
     return _.bufferBytesFrom( e.data );
   },
 

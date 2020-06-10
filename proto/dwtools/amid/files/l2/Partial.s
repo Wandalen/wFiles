@@ -7164,9 +7164,21 @@ function _link_functor( fop )
         let err = `Faield to ${entryMethodName} ${o.dstPath} from ${o.srcPath}. Destination file does not exist.`;
         throw _.err( err );
       }
+
       if( actMethodName === 'softLinkAct' ||  actMethodName === 'textLinkAct' || actMethodName === 'fileCopyAct' )
-      if( _.strBegins( dstPath, srcPath ) || _.strBegins( path.preferredFromGlobal( dstPath ), srcStat.filePath ) )
-      srcStat = c.onStat( srcStat.filePath, 0 );
+      {
+        let updateStat =  _.strBegins( dstPath, srcPath );
+        let filePath = srcStat.filePath;
+
+        if( self instanceof _.FileProvider.System  )
+        filePath = self.providerForPath( srcPath ).path.globalFromPreferred( filePath );
+
+        if( !updateStat )
+        updateStat = _.strBegins( dstPath, filePath )
+
+        if( updateStat  )
+        srcStat = c.onStat( filePath, 0 );
+      }
 
       //qqq: find better solution to check text links
       if( /* srcStat.isTextLink() && */ c.dstStat.isTextLink() )

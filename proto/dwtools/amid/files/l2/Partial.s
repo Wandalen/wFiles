@@ -2992,6 +2992,7 @@ statReadAct.name = 'streamReadAct';
 var defaults = streamReadAct.defaults = Object.create( null );
 defaults.filePath = null;
 defaults.encoding = null;
+defaults.onStreamBegin = null;
 
 var having = streamReadAct.having = Object.create( null );
 having.writing = 0;

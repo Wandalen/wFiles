@@ -59,51 +59,24 @@ function streamReadAct( o )
 {
   let self = this;
 
-  // _.assert( 0, 'not implemented' ); /* qqq : implement */
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.strIs( o.filePath ),'streamReadAct :','Expects {-o.filePath-}' );
-
-  // let con = new _.Consequence( );
-  // let Request = null;
-
-  // function get( url )
-  // {
-  //   let info = _.uri.parse( url );
-  //   Request = info.protocol ? require( info.protocol ) : require( 'http' );
-
-  //   Request.get( url, function( response )
-  //   {
-  //     debugger
-  //     if( response.statusCode > 300 && response.statusCode < 400 )
-  //     {
-  //       get( response.headers.location );
-  //     }
-  //     else if( response.statusCode !== 200 )
-  //     {
-  //       con.error( _.err( "Network error. StatusCode: ", response.statusCode ) );
-  //     }
-  //     else
-  //     {
-  //       con.take( response );
-  //     }
-  //   });
-  // }
-
-  // get( o.filePath );
-
-  // return con;
 
   if( !Needle )
   Needle = require( 'needle' );
 
   let stream = Needle.get( o.filePath, { follow_max : 5 } );
 
+  if( o.onStreamBegin === null )
+  o.onStreamBegin = function( o )
+  {
+    if( o.response.statusCode >= 400 && o.response.statusCode < 500 )
+    o.stream.emit( 'error', _.err( `Client error. StatusCode: ${o.response.statusCode}` ) );
+  }
+
   stream.on( 'response', ( res ) =>
   {
-    if( res.statusCode !== 200 )
-    stream.emit( 'error', _.err( `Network error. StatusCode: ${res.statusCode}` ) );
-    else
-    stream.emit( 'begin', true );
+    o.onStreamBegin.call( self, { operation : o, stream : stream, response : res } );
   })
 
   return stream;
@@ -370,8 +343,9 @@ function filesReflectSingle_body( o )
 
   let readStream = self.streamRead({ filePath : srcPath })
 
-  readStream.on( 'begin', () =>
+  readStream.on( 'header', ( statusCode ) =>
   {
+    if( statusCode === 200 )
     readStream.pipe( writeStream );
   })
 

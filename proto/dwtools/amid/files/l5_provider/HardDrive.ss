@@ -1544,7 +1544,7 @@ function fileCopyAct( o )
     return new _.Consequence().error( err );
   }
 
-  if( o.breakingDstHardLink && self.isHardLink( o.dstPath ) )
+  if( o.breakingDstHardLink && self.isHardLink( o.dstPath ) ) /* qqq2 : remove option breakingDstHardLink from Act routine */
   self.hardLinkBreak({ filePath : o.dstPath, sync : 1 });
 
   if( self.isSoftLink( o.srcPath ) ) /* qqq2 : should not be here. move to partial */

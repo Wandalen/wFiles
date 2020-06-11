@@ -1547,7 +1547,7 @@ function fileCopyAct( o )
   if( o.breakingDstHardLink && self.isHardLink( o.dstPath ) )
   self.hardLinkBreak({ filePath : o.dstPath, sync : 1 });
 
-  if( self.isSoftLink( o.srcPath ) )
+  if( self.isSoftLink( o.srcPath ) ) /* qqq2 : should not be here. move to partial */
   {
     if( self.fileExistsAct({ filePath : o.dstPath }) )
     self.fileDeleteAct({ filePath : o.dstPath, sync : 1 })
@@ -1587,6 +1587,7 @@ function fileCopyAct( o )
     let con = new _.Consequence().take( null );
     let readCon = new _.Consequence();
     let writeCon = new _.Consequence();
+    /* qqq2 : too many consequences? */
 
     con.andKeep( [ readCon, writeCon ] );
 

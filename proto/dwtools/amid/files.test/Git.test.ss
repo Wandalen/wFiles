@@ -1444,6 +1444,8 @@ function filesReflectEol( test )
   }
 }
 
+filesReflectEol.timeOut = 120000;
+
 //
 
 // --

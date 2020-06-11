@@ -9,6 +9,8 @@ if( typeof module !== 'undefined' )
   require( '../UseMid.s' );
 }
 
+let Needle;
+
 //
 
 /* xxx qqq : add such test routine
@@ -57,38 +59,54 @@ function streamReadAct( o )
 {
   let self = this;
 
-  _.assert( 0, 'not implemented' ); /* qqq : implement */
+  // _.assert( 0, 'not implemented' ); /* qqq : implement */
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.strIs( o.filePath ),'streamReadAct :','Expects {-o.filePath-}' );
 
-  let con = new _.Consequence( );
-  let Request = null;
+  // let con = new _.Consequence( );
+  // let Request = null;
 
-  function get( url )
+  // function get( url )
+  // {
+  //   let info = _.uri.parse( url );
+  //   Request = info.protocol ? require( info.protocol ) : require( 'http' );
+
+  //   Request.get( url, function( response )
+  //   {
+  //     debugger
+  //     if( response.statusCode > 300 && response.statusCode < 400 )
+  //     {
+  //       get( response.headers.location );
+  //     }
+  //     else if( response.statusCode !== 200 )
+  //     {
+  //       con.error( _.err( "Network error. StatusCode: ", response.statusCode ) );
+  //     }
+  //     else
+  //     {
+  //       con.take( response );
+  //     }
+  //   });
+  // }
+
+  // get( o.filePath );
+
+  // return con;
+
+  if( !Needle )
+  Needle = require( 'needle' );
+
+  let stream = Needle.get( o.filePath, { follow_max : 5 } );
+
+  stream.on( 'response', ( res ) =>
   {
-    let info = _.uri.parse( url );
-    Request = info.protocol ? require( info.protocol ) : require( 'http' );
+    if( res.statusCode !== 200 )
+    stream.emit( 'error', _.err( `Network error. StatusCode: ${res.statusCode}` ) );
+    else
+    stream.emit( 'begin', true );
+  })
 
-    Request.get( url, function( response )
-    {
-      if( response.statusCode > 300 && response.statusCode < 400 )
-      {
-        get( response.headers.location );
-      }
-      else if( response.statusCode !== 200 )
-      {
-        con.error( _.err( "Network error. StatusCode: ", response.statusCode ) );
-      }
-      else
-      {
-        con.take( response );
-      }
-    });
-  }
-
-  get( o.filePath );
-
-  return con;
+  return stream;
 }
 
 streamReadAct.defaults = Object.create( Parent.prototype.streamReadAct.defaults );
@@ -347,32 +365,21 @@ function filesReflectSingle_body( o )
   writeStream.on( 'error', onError );
   writeStream.on( 'finish', function( )
   {
-    writeStream.close( function( )
-    {
-      con.take( null );
-    })
+    writeStream.close( () => con.take( null ) )
   });
 
-  self.streamRead({ filePath : srcPath })
-  .give( function( err, response )
+  let readStream = self.streamRead({ filePath : srcPath })
+
+  readStream.on( 'begin', () =>
   {
-    if( err )
-    return onError( err );
+    readStream.pipe( writeStream );
+  })
 
-    response.pipe( writeStream );
-    response.on( 'error', onError );
-  });
+  readStream.on( 'error', onError )
 
   /* handle error if any */
 
-  con
-  .finally( function( err, arg )
-  {
-    debugger;
-    if( err )
-    throw _.err( err );
-    return recordsMake();
-  });
+  con.then( () => recordsMake() )
 
   return con;
 

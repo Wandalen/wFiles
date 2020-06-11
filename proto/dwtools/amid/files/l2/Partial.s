@@ -3007,7 +3007,6 @@ function streamRead_body( o )
 {
   let self = this;
   let result;
-  let error;
   let encoder = _.FileReadEncoders[ o.encoding ];
 
   let optionsRead = _.mapExtend( null, o );
@@ -3035,13 +3034,6 @@ function streamRead_body( o )
 
   result.on( 'error', ( err ) => handleError( err ) );
   result.on( 'end', () => handleEnd() );
-
-  if( error )
-  {
-    debugger;
-    if( o.throwing )
-    throw error;
-  }
 
   return result;
 
@@ -3105,8 +3097,6 @@ function streamRead_body( o )
       console.error( err.toString() + '\n' + err.stack );
     }
 
-    // if( o.throwing )
-    // throw err;
     return null;
   }
 

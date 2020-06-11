@@ -48,7 +48,8 @@
     "wgittools" : "",
     "wnpmtools" : "",
     "tar" : "",
-    "proper-lockfile" : ""
+    "proper-lockfile" : "",
+    "needle" : ""
   },
   "devDependencies" :
   {

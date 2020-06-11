@@ -1606,7 +1606,12 @@ function fileCopyAct( o )
     //   con.take( err, data );
     // });
 
-    let readStream = self.streamReadAct({ filePath : srcPath, encoding : self.encoding });
+    let readStream = self.streamReadAct
+    ({
+      filePath : srcPath,
+      encoding : self.encoding,
+      onStreamBegin : null
+    });
 
     readStream.on( 'error', ( err ) =>
     {

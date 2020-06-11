@@ -124,7 +124,9 @@ function pathResolveSoftLinkAct( o )
   if( o.resolvingIntermediateDirectories )
   return resolveIntermediateDirectories();
 
-  let descriptor = self._descriptorRead( o.filePath );
+  let filePath = self._pathResolveIntermediateDirs( o.filePath );
+
+  let descriptor = self._descriptorRead( filePath );
 
   if( !self._descriptorIsSoftLink( descriptor ) )
   return o.filePath;
@@ -1302,13 +1304,13 @@ function fileRenameAct( o )
     let srcDirPath = self.path.dir( o.srcPath );
     let dstDirPath = self.path.dir( o.dstPath );
 
-    let srcDir = self._descriptorRead( srcDirPath );
+    let srcDir = self._descriptorReadResolved( srcDirPath );
     if( !srcDir || !srcDir[ srcName ] )
     throw _.err( 'Source path', _.strQuote( o.srcPath ), 'doesn`t exist!' );
 
     /*  */
 
-    let dstDir = self._descriptorRead( dstDirPath );
+    let dstDir = self._descriptorReadResolved( dstDirPath );
     if( !dstDir )
     throw _.err( 'Directory for', o.dstPath, 'does not exist' );
     else if( !self._descriptorIsDir( dstDir ) )
@@ -1591,6 +1593,7 @@ function softLinkAct( o )
       if( stat )
       throw _.err( 'softLinkAct', o.dstPath, 'already exists' );
 
+
       dstDirCheck();
 
       self._descriptorWrite( o.dstPath, self._descriptorSoftLinkMake( o.relativeSrcPath ) );
@@ -1603,7 +1606,7 @@ function softLinkAct( o )
 
   function dstDirCheck()
   {
-    let dstDir = self._descriptorRead( self.path.dir( o.dstPath ) );
+    let dstDir = self._descriptorReadResolved( self.path.dir( o.dstPath ) );
     if( !dstDir )
     throw _.err( 'Directory for', o.dstPath, 'does not exist' );
     else if( !self._descriptorIsDir( dstDir ) )
@@ -1981,10 +1984,25 @@ function _descriptorReadResolved( o )
   if( _.strIs( arguments[ 0 ] ) )
   o = { filePath : arguments[ 0 ] };
 
-  let result = self._descriptorRead( o );
+  let filePath = self._pathResolveIntermediateDirs( o.filePath );
+
+  let result = self._descriptorRead( filePath );
 
   if( self._descriptorIsLink( result ) )
-  result = self._descriptorResolve({ descriptor : result });
+  {
+    let filePathResolved = self.pathResolveLinkFull
+    ({
+      filePath,
+      allowingMissed : 1,
+      allowingCycled : 0,
+      resolvingSoftLink : 1,
+      resolvingTextLink : 0,
+      preservingRelative : 0,
+      throwing : 1
+    });
+    result = self._descriptorRead( filePathResolved.absolutePath );
+    // result = self._descriptorResolve({ descriptor : result });
+  }
 
   return result;
 }
@@ -2164,7 +2182,7 @@ function _descriptorResolveSoftLink( descriptor )
   else
   {
     debugger;
-    result = self._descriptorRead( url.localPath );
+    result = self._descriptorRead( url.resourcePath );
   }
 
   return result;
@@ -2293,6 +2311,8 @@ function _descriptorWrite( o )
     _.assert( _.objectLike( self.filesTree ) );
     o.filesTree = self.filesTree;
   }
+
+  o.filePath = self._pathResolveIntermediateDirs( o.filePath )
 
   let file = self._descriptorRead( o.filePath );
   let willBeCreated = file === undefined;

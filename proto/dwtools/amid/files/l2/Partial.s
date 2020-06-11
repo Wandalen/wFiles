@@ -6991,9 +6991,7 @@ function _link_functor( fop )
     function tempRenameRevertAsync()
     {
       if( !c.tempPath )
-      return null;
-      // if( !c.tempPath )
-      // return new _.Consequence().take( null ); /* xxx */
+      return new _.Consequence().take( null );
 
       return self.fileRenameAct
       ({

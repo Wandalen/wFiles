@@ -3219,7 +3219,7 @@ function fileRead_body( o )
   {
     if( encoder && encoder.onBegin )
     {
-      debugger;
+      // debugger;
       let r = encoder.onBegin.call( self, { operation : o, encoder : encoder, provider : self })
       _.sure( r === undefined );
     }
@@ -3236,7 +3236,7 @@ function fileRead_body( o )
     if( encoder && encoder.onEnd )
     try
     {
-      debugger;
+      // debugger;
       let o2 = { data : data, operation : o, encoder : encoder, provider : self };
       let r = encoder.onEnd.call( self, o2 );
       _.sure( r === undefined );

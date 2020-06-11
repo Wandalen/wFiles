@@ -3219,7 +3219,7 @@ function fileRead_body( o )
   {
     if( encoder && encoder.onBegin )
     {
-      debugger;
+      // debugger;
       let r = encoder.onBegin.call( self, { operation : o, encoder : encoder, provider : self })
       _.sure( r === undefined );
     }
@@ -3236,7 +3236,7 @@ function fileRead_body( o )
     if( encoder && encoder.onEnd )
     try
     {
-      debugger;
+      // debugger;
       let o2 = { data : data, operation : o, encoder : encoder, provider : self };
       let r = encoder.onEnd.call( self, o2 );
       _.sure( r === undefined );
@@ -6296,9 +6296,6 @@ function _link_functor( fop )
       if( c.ended )
       return c.end();
 
-      // if( o.srcPath === "extract5:///f" )
-      // debugger;
-
       c.linksResolve();
       if( c.ended )
       return c.end();
@@ -6312,6 +6309,7 @@ function _link_functor( fop )
       try
       {
 
+        debugger;
         if( self.fileExists( o2.dstPath ) )
         {
           c.verifyDst()
@@ -7002,7 +7000,9 @@ function _link_functor( fop )
     function tempRenameRevertAsync()
     {
       if( !c.tempPath )
-      return new _.Consequence().take( null );
+      return null;
+      // if( !c.tempPath )
+      // return new _.Consequence().take( null ); /* xxx */
 
       return self.fileRenameAct
       ({
@@ -7591,7 +7591,7 @@ defaults.srcPath = null;
 // defaults.originalSrcPath = null;
 defaults.relativeDstPath = null;
 defaults.relativeSrcPath = null;
-defaults.breakingDstHardLink = 0;
+defaults.breakingDstHardLink = 0; /* qqq2 : remove the option from Act method? */
 defaults.sync = null;
 
 var having = fileCopyAct.having = Object.create( null );
@@ -7690,20 +7690,14 @@ function _fileCopyVerify2( c )
   if( c.srcStat === undefined )
   c.srcStat = self.statRead({ filePath : o.srcPath, sync : 1 });
 
-  // if( c.srcStat === null )
-  // return;
 }
 
 function _fileCopyAct( c )
 {
   let self = this;
-  // let o = c.options2;
   let o = c.options;
 
   _.assert( _.fileStatIs( c.srcStat ) || c.srcStat === null );
-
-  // if( o.srcPath === 'extract4:///src/proto/terLink1' )
-  // debugger;
 
   let srcStat = c.srcStat;
 

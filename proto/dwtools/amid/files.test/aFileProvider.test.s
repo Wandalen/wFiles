@@ -14316,7 +14316,7 @@ function fileRenameHardLinkedSync( test )
   test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), hardLinked );
   else
   test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), true );
-  provider.fileRename({ dstPath, srcPath, breakingDstHardLink : 0 });
+  provider.fileRename({ dstPath, srcPath, rewriting : 1, breakingDstHardLink : 0 });
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), hardLinked );
   else
@@ -14332,8 +14332,11 @@ function fileRenameHardLinkedSync( test )
   test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), hardLinked );
   else
   test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), true );
-  provider.fileRename({ dstPath, srcPath, breakingDstHardLink : 1 });
+  provider.fileRename({ dstPath, srcPath, rewriting : 1, breakingDstHardLink : 1 });
   test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), false );
+  test.is( !provider.fileExists( srcPath ) );
+  test.identical( provider.fileRead( dstPath ), 'data' );
+
 }
 
 //
@@ -14376,6 +14379,7 @@ function fileRenameHardLinkedAsync( test )
     ({
       dstPath,
       srcPath,
+      rewriting : 1,
       breakingDstHardLink : 0,
       sync : 0
     });
@@ -14405,6 +14409,7 @@ function fileRenameHardLinkedAsync( test )
     ({
       dstPath,
       srcPath,
+      rewriting : 1,
       breakingDstHardLink : 1,
       sync : 0
     });
@@ -14412,6 +14417,8 @@ function fileRenameHardLinkedAsync( test )
   .then( () =>
   {
     test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), false );
+    test.is( !provider.fileExists( srcPath ) );
+    test.identical( provider.fileRead( dstPath ), 'data' );
     return null;
   })
 
@@ -27321,7 +27328,7 @@ function softLinkHardLinkedSync( test )
 
   /* - */
 
-  test.case = 'breakingDstHardLink=0'
+  test.case = 'soft link two hard linked files'
   provider.filesDelete( routinePath )
   provider.fileWrite( srcPath, 'data' );
   provider.hardLink( dstPath, srcPath );
@@ -27329,24 +27336,11 @@ function softLinkHardLinkedSync( test )
   test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), hardLinked );
   else
   test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), true );
-  provider.softLink({ dstPath, srcPath, breakingDstHardLink : 0 });
-  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), hardLinked );
-  else
-  test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), true );
-
-  /* - */
-
-  test.case = 'breakingDstHardLink=1'
-  provider.filesDelete( routinePath )
-  provider.fileWrite( srcPath, 'data' );
-  provider.hardLink( dstPath, srcPath );
-  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), hardLinked );
-  else
-  test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), true );
-  provider.softLink({ dstPath, srcPath, breakingDstHardLink : 1 });
+  provider.softLink({ dstPath, srcPath });
   test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), false );
+  test.is( provider.isTerminal( srcPath ) );
+  test.is( provider.isSoftLink( dstPath ) );
+  test.identical( provider.pathResolveSoftLink( dstPath ), srcPath );
 }
 
 //
@@ -27377,7 +27371,7 @@ function softLinkHardLinkedAsync( test )
 
   .then( () =>
   {
-    test.case = 'breakingDstHardLink=0'
+    test.case = 'soft link two hard linked files'
     provider.filesDelete( routinePath )
     provider.fileWrite( srcPath, 'data' );
     provider.hardLink( dstPath, srcPath );
@@ -27389,42 +27383,15 @@ function softLinkHardLinkedAsync( test )
     ({
       dstPath,
       srcPath,
-      breakingDstHardLink : 0,
-      sync : 0
-    });
-  })
-  .then( () =>
-  {
-    if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-    test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), hardLinked );
-    else
-    test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), true );
-    return null;
-  })
-
-  /* - */
-
-  .then( () =>
-  {
-    test.case = 'breakingDstHardLink=1'
-    provider.filesDelete( routinePath )
-    provider.fileWrite( srcPath, 'data' );
-    provider.hardLink( dstPath, srcPath );
-    if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-    test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), hardLinked );
-    else
-    test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), true );
-    return provider.softLink
-    ({
-      dstPath,
-      srcPath,
-      breakingDstHardLink : 1,
       sync : 0
     });
   })
   .then( () =>
   {
     test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), false );
+    test.is( provider.isTerminal( srcPath ) );
+    test.is( provider.isSoftLink( dstPath ) );
+    test.identical( provider.pathResolveSoftLink( dstPath ), srcPath );
     return null;
   })
 
@@ -28971,7 +28938,10 @@ function textLinkHardLinkedSync( test )
 
   /* - */
 
-  test.case = 'breakingDstHardLink=0'
+  provider.fieldPush( 'resolvingTextLink', 1 );
+  provider.fieldPush( 'usingTextLink', 1 );
+
+  test.case = 'text link two hard linked files'
   provider.filesDelete( routinePath )
   provider.fileWrite( srcPath, 'data' );
   provider.hardLink( dstPath, srcPath );
@@ -28979,24 +28949,14 @@ function textLinkHardLinkedSync( test )
   test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), hardLinked );
   else
   test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), true );
-  provider.textLink({ dstPath, srcPath, breakingDstHardLink : 0 });
-  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), hardLinked );
-  else
-  test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), true );
-
-  /* - */
-
-  test.case = 'breakingDstHardLink=1'
-  provider.filesDelete( routinePath )
-  provider.fileWrite( srcPath, 'data' );
-  provider.hardLink( dstPath, srcPath );
-  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), hardLinked );
-  else
-  test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), true );
-  provider.textLink({ dstPath, srcPath, breakingDstHardLink : 1 });
+  provider.textLink({ dstPath, srcPath });
   test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), false );
+  test.is( provider.isTerminal( srcPath ) );
+  test.is( provider.isTextLink( dstPath ) );
+  test.identical( provider.pathResolveTextLink( dstPath ), srcPath );
+
+  provider.fieldPop( 'resolvingTextLink', 1 );
+  provider.fieldPop( 'usingTextLink', 1 );
 }
 
 //
@@ -29027,7 +28987,11 @@ function textLinkHardLinkedAsync( test )
 
   .then( () =>
   {
-    test.case = 'breakingDstHardLink=0'
+    test.case = 'text link two hard linked files'
+
+    provider.fieldPush( 'resolvingTextLink', 1 );
+    provider.fieldPush( 'usingTextLink', 1 );
+
     provider.filesDelete( routinePath )
     provider.fileWrite( srcPath, 'data' );
     provider.hardLink( dstPath, srcPath );
@@ -29039,42 +29003,19 @@ function textLinkHardLinkedAsync( test )
     ({
       dstPath,
       srcPath,
-      breakingDstHardLink : 0,
-      sync : 0
-    });
-  })
-  .then( () =>
-  {
-    if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-    test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), hardLinked );
-    else
-    test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), true );
-    return null;
-  })
-
-  /* - */
-
-  .then( () =>
-  {
-    test.case = 'breakingDstHardLink=1'
-    provider.filesDelete( routinePath )
-    provider.fileWrite( srcPath, 'data' );
-    provider.hardLink( dstPath, srcPath );
-    if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-    test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), hardLinked );
-    else
-    test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), true );
-    return provider.textLink
-    ({
-      dstPath,
-      srcPath,
-      breakingDstHardLink : 1,
       sync : 0
     });
   })
   .then( () =>
   {
     test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), false );
+    test.is( provider.isTerminal( srcPath ) );
+    test.is( provider.isTextLink( dstPath ) );
+    test.identical( provider.pathResolveTextLink( dstPath ), srcPath );
+
+    provider.fieldPop( 'resolvingTextLink', 1 );
+    provider.fieldPop( 'usingTextLink', 1 );
+
     return null;
   })
 
@@ -35158,7 +35099,7 @@ function hardLinkHardLinkedSync( test )
 
   /* - */
 
-  test.case = 'breakingDstHardLink=0'
+  test.case = 'breakingSrcHardLink=0 breakingDstHardLink=0'
   provider.filesDelete( routinePath )
   provider.fileWrite( srcPath, 'data' );
   provider.hardLink( dstPath, srcPath );
@@ -35166,7 +35107,7 @@ function hardLinkHardLinkedSync( test )
   test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), hardLinked );
   else
   test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), true );
-  provider.hardLink({ dstPath, srcPath, breakingDstHardLink : 0 });
+  test.shouldThrowErrorSync( () => provider.hardLink({ dstPath, srcPath, breakingDstHardLink : 0, breakingSrcHardLink : 0 }) );
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), hardLinked );
   else
@@ -35174,7 +35115,7 @@ function hardLinkHardLinkedSync( test )
 
   /* - */
 
-  test.case = 'breakingDstHardLink=1'
+  test.case = 'breakingSrcHardLink=1 breakingDstHardLink=0'
   provider.filesDelete( routinePath )
   provider.fileWrite( srcPath, 'data' );
   provider.hardLink( dstPath, srcPath );
@@ -35182,8 +35123,43 @@ function hardLinkHardLinkedSync( test )
   test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), hardLinked );
   else
   test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), true );
-  provider.textLink({ dstPath, srcPath, breakingDstHardLink : 1 });
-  test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), false );
+  provider.hardLink({ dstPath, srcPath, breakingDstHardLink : 0, breakingSrcHardLink : 1 });
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), hardLinked );
+  else
+  test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), true );
+
+  /* - */
+
+  test.case = 'breakingSrcHardLink=1 breakingDstHardLink=1'
+  provider.filesDelete( routinePath )
+  provider.fileWrite( srcPath, 'data' );
+  provider.hardLink( dstPath, srcPath );
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), hardLinked );
+  else
+  test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), true );
+  provider.hardLink({ dstPath, srcPath, breakingDstHardLink : 1, breakingSrcHardLink : 0 });
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), hardLinked );
+  else
+  test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), true );
+
+  /* - */
+
+  test.case = 'breakingSrcHardLink=1 breakingDstHardLink=1'
+  provider.filesDelete( routinePath )
+  provider.fileWrite( srcPath, 'data' );
+  provider.hardLink( dstPath, srcPath );
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), hardLinked );
+  else
+  test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), true );
+  provider.hardLink({ dstPath, srcPath, breakingDstHardLink : 1, breakingSrcHardLink : 1 });
+  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), hardLinked );
+  else
+  test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), true );
 }
 
 //
@@ -35214,7 +35190,7 @@ function hardLinkHardLinkedAsync( test )
 
   .then( () =>
   {
-    test.case = 'breakingDstHardLink=0'
+    test.case = 'breakingSrcHardLink=0 breakingDstHardLink=0'
     provider.filesDelete( routinePath )
     provider.fileWrite( srcPath, 'data' );
     provider.hardLink( dstPath, srcPath );
@@ -35222,13 +35198,15 @@ function hardLinkHardLinkedAsync( test )
     test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), hardLinked );
     else
     test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), true );
-    return provider.hardLink
+    var con = provider.hardLink
     ({
       dstPath,
       srcPath,
+      breakingSrcHardLink : 0,
       breakingDstHardLink : 0,
       sync : 0
     });
+    return test.shouldThrowErrorAsync( con );
   })
   .then( () =>
   {
@@ -35243,7 +35221,7 @@ function hardLinkHardLinkedAsync( test )
 
   .then( () =>
   {
-    test.case = 'breakingDstHardLink=1'
+    test.case = 'breakingSrcHardLink=1 breakingDstHardLink=0'
     provider.filesDelete( routinePath )
     provider.fileWrite( srcPath, 'data' );
     provider.hardLink( dstPath, srcPath );
@@ -35255,6 +35233,61 @@ function hardLinkHardLinkedAsync( test )
     ({
       dstPath,
       srcPath,
+      breakingSrcHardLink : 1,
+      breakingDstHardLink : 0,
+      sync : 0
+    });
+  })
+  .then( () =>
+  {
+    test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), true );
+    return null;
+  })
+
+  /* - */
+
+  .then( () =>
+  {
+    test.case = 'breakingSrcHardLink=0 breakingDstHardLink=1'
+    provider.filesDelete( routinePath )
+    provider.fileWrite( srcPath, 'data' );
+    provider.hardLink( dstPath, srcPath );
+    if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+    test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), hardLinked );
+    else
+    test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), true );
+    return provider.hardLink
+    ({
+      dstPath,
+      srcPath,
+      breakingSrcHardLink : 0,
+      breakingDstHardLink : 1,
+      sync : 0
+    });
+  })
+  .then( () =>
+  {
+    test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), true );
+    return null;
+  })
+
+  /* - */
+
+  .then( () =>
+  {
+    test.case = 'breakingSrcHardLink=1 breakingDstHardLink=1'
+    provider.filesDelete( routinePath )
+    provider.fileWrite( srcPath, 'data' );
+    provider.hardLink( dstPath, srcPath );
+    if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+    test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), hardLinked );
+    else
+    test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), true );
+    return provider.hardLink
+    ({
+      dstPath,
+      srcPath,
+      breakingSrcHardLink : 1,
       breakingDstHardLink : 1,
       sync : 0
     });

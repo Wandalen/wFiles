@@ -7370,6 +7370,21 @@ operates.relativeSrcPath = { pathToRead : 1 }
  * @module Tools/mid/Files
  */
 
+function _fileRenameVerify2( c )
+{
+  let self = this;
+  let o = c.options;
+
+  if( !o.breakingDstHardLink )
+  {
+    let linked = self.filesAreHardLinked([ o.dstPath, o.srcPath ]);
+    if( linked || linked === _.maybe )
+    c.end( true );
+  }
+}
+
+//
+
 function _fileRenameAct( c )
 {
   let self = this;
@@ -7546,6 +7561,7 @@ let fileRename = _link_functor
 ({
   actMethodName : 'fileRenameAct',
   onAct : _fileRenameAct,
+  onVerify2 : _fileRenameVerify2,
   skippingSamePath : true,
   skippingMissed : false,
 });
@@ -7565,6 +7581,8 @@ defaults.resolvingSrcSoftLink = 1;
 defaults.resolvingSrcTextLink = 0;
 defaults.resolvingDstSoftLink = 0;
 defaults.resolvingDstTextLink = 0;
+
+defaults.breakingDstHardLink = 1;
 
 _.mapExtend( fileRename.defaults, fileRename.body.defaults );
 
@@ -7679,6 +7697,12 @@ function _fileCopyVerify2( c )
   if( c.srcStat === undefined )
   c.srcStat = self.statRead({ filePath : o.srcPath, sync : 1 });
 
+  if( !o.breakingDstHardLink )
+  {
+    let linked = self.filesAreHardLinked([ o.dstPath, o.srcPath ]);
+    if( linked || linked === _.maybe )
+    c.end( true );
+  }
 }
 
 function _fileCopyAct( c )

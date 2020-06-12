@@ -6300,7 +6300,7 @@ function _link_functor( fop )
       try
       {
 
-        debugger;
+        // debugger;
         if( self.fileExists( o2.dstPath ) )
         {
           c.verifyDst()

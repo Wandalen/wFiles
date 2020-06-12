@@ -7370,21 +7370,6 @@ operates.relativeSrcPath = { pathToRead : 1 }
  * @module Tools/mid/Files
  */
 
-function _fileRenameVerify2( c )
-{
-  let self = this;
-  let o = c.options;
-
-  if( !o.breakingDstHardLink )
-  {
-    let linked = self.filesAreHardLinked([ o.dstPath, o.srcPath ]);
-    if( linked || linked === _.maybe )
-    c.end( true );
-  }
-}
-
-//
-
 function _fileRenameAct( c )
 {
   let self = this;
@@ -7551,7 +7536,32 @@ function _fileRenameAct( c )
   }
   else
   {
+    let dstIsHardLink = c.dstStat && c.dstStat.isHardLink();
+
+    if( !dstIsHardLink )
     return self.fileRenameAct( c.options2 );
+
+    let con = _.Consequence.Try( () =>
+    {
+      if( !c.srcStat.isHardLink() )
+      return true;
+      let result = self.hardLinkBreak({ filePath : c.options2.srcPath, sync : o.sync });
+      return o.sync ? true : result;
+    })
+    .then( () =>
+    {
+      let o2 = _.mapExtend( null, c.options2 );
+      o2.breakingDstHardLink = o.breakingDstHardLink;
+      let result = self.fileCopyAct( o2 );
+      return o.sync ? true : result;
+    })
+    .then( () =>
+    {
+      self.fileDelete( c.options2.srcPath );
+      return true;
+    })
+
+    return con.syncMaybe();
   }
 }
 
@@ -7561,7 +7571,6 @@ let fileRename = _link_functor
 ({
   actMethodName : 'fileRenameAct',
   onAct : _fileRenameAct,
-  onVerify2 : _fileRenameVerify2,
   skippingSamePath : true,
   skippingMissed : false,
 });

@@ -14308,23 +14308,72 @@ function fileRenameHardLinkedSync( test )
 
   /* - */
 
-  test.case = 'breakingDstHardLink=0'
+  test.case = 'src is a terminal, dst has 5 hardlinks, breakingDstHardLink=0'
   provider.filesDelete( routinePath )
-  provider.fileWrite( srcPath, 'data' );
+  provider.fileWrite( srcPath, srcPath );
+  provider.fileWrite( dstPath, dstPath );
+  makeHardLinksToPath( dstPath, 5 );
+  test.identical( provider.fileRead( dstPath ), dstPath );
+  provider.fileRename({ dstPath, srcPath, rewriting : 1, breakingDstHardLink : 0 });
+  test.is( !provider.fileExists( srcPath ) );
+  test.is( provider.fileExists( dstPath ) );
+  var nlink = provider.statResolvedRead( dstPath).nlink;
+  test.identical( Number( nlink ), 6 );
+  test.identical( provider.fileRead( dstPath ), srcPath );
+
+  /* - */
+
+  test.case = 'src is a terminal, dst has 5 hardlinks, breakingDstHardLink=1'
+  provider.filesDelete( routinePath )
+  provider.fileWrite( srcPath, srcPath );
+  provider.fileWrite( dstPath, dstPath );
+  makeHardLinksToPath( dstPath, 5 );
+  test.identical( provider.fileRead( dstPath ), dstPath );
+  provider.fileRename({ dstPath, srcPath, rewriting : 1, breakingDstHardLink : 1 });
+  test.is( !provider.fileExists( srcPath ) );
+  test.is( provider.fileExists( dstPath ) );
+  var nlink = provider.statResolvedRead( dstPath).nlink;
+  test.identical( Number( nlink ), 1 );
+  test.identical( provider.fileRead( dstPath ), srcPath );
+
+  /* - */
+
+  test.case = 'src and dst are not linked together, breakingDstHardLink=0'
+  provider.filesDelete( routinePath )
+  provider.fileWrite( srcPath, srcPath );
+  provider.fileWrite( dstPath, dstPath );
+  makeHardLinksToPath( srcPath, 3 );
+  makeHardLinksToPath( dstPath, 5 );
+  test.identical( provider.fileRead( dstPath ), dstPath );
+  provider.fileRename({ dstPath, srcPath, rewriting : 1, breakingDstHardLink : 0 });
+  test.is( !provider.fileExists( srcPath ) );
+  test.is( provider.fileExists( dstPath ) );
+  var nlink = provider.statResolvedRead( dstPath).nlink;
+  test.identical( Number( nlink ), 6 );
+  test.identical( provider.fileRead( dstPath ), srcPath );
+
+  /* - */
+
+  test.case = 'src and dst are linked together, breakingDstHardLink=0'
+  provider.filesDelete( routinePath )
+  provider.fileWrite( srcPath, srcPath );
   provider.hardLink( dstPath, srcPath );
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), hardLinked );
   else
   test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), true );
   provider.fileRename({ dstPath, srcPath, rewriting : 1, breakingDstHardLink : 0 });
-  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), hardLinked );
-  else
-  test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), true );
+  test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), false );
+  test.is( !provider.fileExists( srcPath ) );
+  test.is( provider.fileExists( dstPath ) );
+  var nlink = provider.statResolvedRead( dstPath).nlink;
+  test.identical( Number( nlink ), 1 );
+  test.identical( provider.fileRead( dstPath ), srcPath );
+
 
   /* - */
 
-  test.case = 'breakingDstHardLink=1'
+  test.case = 'src and dst are linked together, breakingDstHardLink=0'
   provider.filesDelete( routinePath )
   provider.fileWrite( srcPath, 'data' );
   provider.hardLink( dstPath, srcPath );
@@ -14336,6 +14385,32 @@ function fileRenameHardLinkedSync( test )
   test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), false );
   test.is( !provider.fileExists( srcPath ) );
   test.identical( provider.fileRead( dstPath ), 'data' );
+
+  /* - */
+
+  test.case = 'src and dst are not linked together, breakingDstHardLink=1'
+  provider.filesDelete( routinePath )
+  provider.fileWrite( srcPath, srcPath );
+  provider.fileWrite( dstPath, dstPath );
+  makeHardLinksToPath( srcPath, 3 );
+  makeHardLinksToPath( dstPath, 4 );
+  test.identical( provider.fileRead( dstPath ), dstPath );
+  provider.fileRename({ dstPath, srcPath, rewriting : 1, breakingDstHardLink : 1 });
+  test.is( !provider.fileExists( srcPath ) );
+  test.is( provider.fileExists( dstPath ) );
+  var nlink = provider.statResolvedRead( dstPath ).nlink;
+  test.identical( Number( nlink ), 1 );
+  test.identical( provider.fileRead( dstPath ), srcPath );
+
+  /* - */
+
+  function makeHardLinksToPath( filePath, amount )
+  {
+    let routinePath = path.join( self.provider.path.dir( filePath ), _.idWithDateAndTime() );
+    provider.dirMake( routinePath )
+    for( var i = 0; i < amount; i++ )
+    provider.hardLink( path.join( routinePath, 'file' + i ), filePath );
+  }
 
 }
 
@@ -14367,29 +14442,21 @@ function fileRenameHardLinkedAsync( test )
 
   .then( () =>
   {
-    test.case = 'breakingDstHardLink=0'
+    test.case = 'src is a terminal, dst has 5 hardlinks, breakingDstHardLink=0'
     provider.filesDelete( routinePath )
-    provider.fileWrite( srcPath, 'data' );
-    provider.hardLink( dstPath, srcPath );
-    if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-    test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), hardLinked );
-    else
-    test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), true );
-    return provider.fileRename
-    ({
-      dstPath,
-      srcPath,
-      rewriting : 1,
-      breakingDstHardLink : 0,
-      sync : 0
-    });
+    provider.fileWrite( srcPath, srcPath );
+    provider.fileWrite( dstPath, dstPath );
+    makeHardLinksToPath( dstPath, 5 );
+    test.identical( provider.fileRead( dstPath ), dstPath );
+    return provider.fileRename({ dstPath, srcPath, rewriting : 1, breakingDstHardLink : 0, sync : 0 });
   })
   .then( () =>
   {
-    if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-    test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), hardLinked );
-    else
-    test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), true );
+    test.is( !provider.fileExists( srcPath ) );
+    test.is( provider.fileExists( dstPath ) );
+    var nlink = provider.statResolvedRead( dstPath).nlink;
+    test.identical( Number( nlink ), 6 );
+    test.identical( provider.fileRead( dstPath ), srcPath );
     return null;
   })
 
@@ -14397,7 +14464,77 @@ function fileRenameHardLinkedAsync( test )
 
   .then( () =>
   {
-    test.case = 'breakingDstHardLink=1'
+    test.case = 'src is a terminal, dst has 5 hardlinks, breakingDstHardLink=1'
+    provider.filesDelete( routinePath )
+    provider.fileWrite( srcPath, srcPath );
+    provider.fileWrite( dstPath, dstPath );
+    makeHardLinksToPath( dstPath, 5 );
+    test.identical( provider.fileRead( dstPath ), dstPath );
+    return provider.fileRename({ dstPath, srcPath, rewriting : 1, breakingDstHardLink : 1, sync : 0 });
+  })
+  .then( () =>
+  {
+    test.is( !provider.fileExists( srcPath ) );
+    test.is( provider.fileExists( dstPath ) );
+    var nlink = provider.statResolvedRead( dstPath).nlink;
+    test.identical( Number( nlink ), 1 );
+    test.identical( provider.fileRead( dstPath ), srcPath );
+    return null;
+  })
+
+  /* - */
+
+  .then( () =>
+  {
+    test.case = 'src and dst are not linked together, breakingDstHardLink=0'
+    provider.filesDelete( routinePath )
+    provider.fileWrite( srcPath, srcPath );
+    provider.fileWrite( dstPath, dstPath );
+    makeHardLinksToPath( srcPath, 3 );
+    makeHardLinksToPath( dstPath, 5 );
+    test.identical( provider.fileRead( dstPath ), dstPath );
+    return provider.fileRename({ dstPath, srcPath, rewriting : 1, breakingDstHardLink : 0, sync : 0 });
+  })
+  .then( () =>
+  {
+    test.is( !provider.fileExists( srcPath ) );
+    test.is( provider.fileExists( dstPath ) );
+    var nlink = provider.statResolvedRead( dstPath).nlink;
+    test.identical( Number( nlink ), 6 );
+    test.identical( provider.fileRead( dstPath ), srcPath );
+    return null;
+  })
+
+  /* - */
+
+  .then( () =>
+  {
+    test.case = 'src and dst are linked together, breakingDstHardLink=0'
+    provider.filesDelete( routinePath )
+    provider.fileWrite( srcPath, srcPath );
+    provider.hardLink( dstPath, srcPath );
+    if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+    test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), hardLinked );
+    else
+    test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), true );
+    return provider.fileRename({ dstPath, srcPath, rewriting : 1, breakingDstHardLink : 0, sync : 0 });
+  })
+  .then( () =>
+  {
+    test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), false );
+    test.is( !provider.fileExists( srcPath ) );
+    test.is( provider.fileExists( dstPath ) );
+    var nlink = provider.statResolvedRead( dstPath).nlink;
+    test.identical( Number( nlink ), 1 );
+    test.identical( provider.fileRead( dstPath ), srcPath );
+    return null;
+  })
+
+  /* - */
+
+  .then( () =>
+  {
+    test.case = 'src and dst are linked together, breakingDstHardLink=0'
     provider.filesDelete( routinePath )
     provider.fileWrite( srcPath, 'data' );
     provider.hardLink( dstPath, srcPath );
@@ -14405,14 +14542,7 @@ function fileRenameHardLinkedAsync( test )
     test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), hardLinked );
     else
     test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), true );
-    return provider.fileRename
-    ({
-      dstPath,
-      srcPath,
-      rewriting : 1,
-      breakingDstHardLink : 1,
-      sync : 0
-    });
+    return provider.fileRename({ dstPath, srcPath, rewriting : 1, breakingDstHardLink : 1, sync : 0 });
   })
   .then( () =>
   {
@@ -14424,7 +14554,42 @@ function fileRenameHardLinkedAsync( test )
 
   /* - */
 
+  .then( () =>
+  {
+    test.case = 'src and dst are not linked together, breakingDstHardLink=1'
+    provider.filesDelete( routinePath )
+    provider.fileWrite( srcPath, srcPath );
+    provider.fileWrite( dstPath, dstPath );
+    makeHardLinksToPath( srcPath, 3 );
+    makeHardLinksToPath( dstPath, 4 );
+    test.identical( provider.fileRead( dstPath ), dstPath );
+    return provider.fileRename({ dstPath, srcPath, rewriting : 1, breakingDstHardLink : 1, sync : 0 });
+  })
+  .then( () =>
+  {
+    test.is( !provider.fileExists( srcPath ) );
+    test.is( provider.fileExists( dstPath ) );
+    var nlink = provider.statResolvedRead( dstPath ).nlink;
+    test.identical( Number( nlink ), 1 );
+    test.identical( provider.fileRead( dstPath ), srcPath );
+    return null;
+  })
+
+  /* - */
+
   return ready;
+
+  /* - */
+
+  function makeHardLinksToPath( filePath, amount )
+  {
+    let routinePath = path.join( self.provider.path.dir( filePath ), _.idWithDateAndTime() );
+    provider.dirMake( routinePath )
+    for( var i = 0; i < amount; i++ )
+    provider.hardLink( path.join( routinePath, 'file' + i ), filePath );
+  }
+
+
 }
 
 //
@@ -15354,7 +15519,7 @@ function fileDeleteLocked( test )
   var buffer = BufferNode.alloc( 50 );
   fs.readSync( fd, buffer, 0, buffer.byteLength );
   var got =  buffer.toString();
-  test.is( got.length )
+  test.is( got.length > 0 )
   test.is( _.strHas( terminalPath, got ) )
   fs.closeSync( fd );
   test.will = 'terminal is closed and removed';

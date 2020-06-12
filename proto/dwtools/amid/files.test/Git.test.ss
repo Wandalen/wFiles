@@ -41,7 +41,8 @@ function onSuiteBegin( test )
       sync : 1,
       deasync : 0,
       mode : 'shell',
-      outputCollecting : 1
+      outputCollecting : 1,
+      throwingExitCode : 0,
     })
     context.gitOriginalCoreAutocrlf = _.strStrip( gitConfig( `core.autocrlf` ).output );
     gitConfig( `core.autocrlf true` )

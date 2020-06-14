@@ -17,8 +17,6 @@
   "scripts" :
   {
     "test" : "wtest .run 'proto/**' rapidity:-3",
-    "test2" : "wtest .run proto/**/dwtools/amid/file.test/Provider.HardDrive.test.ss routine : linkHardSyncRunner",
-    "test3" : "wtest .run proto/**/dwtools/amid/file.test/Provider.HardDrive.test.ss routine : linkHardAsyncRunner",
     "docgen" : "wdocgen proto"
   },
   "repository" : { "type" : "git", "url" : "https://github.com/Wandalen/wFiles.git" },

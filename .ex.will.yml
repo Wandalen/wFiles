@@ -13,8 +13,7 @@ about :
   - wTools
   - wFiles
   - file
-  - read file
-  - write file
+  - standardized abstract interface
   license : MIT
   author : 'Kostiantyn Wandalen <wanalen@01.school>'
   contributors :

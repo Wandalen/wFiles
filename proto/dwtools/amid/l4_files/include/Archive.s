@@ -1,0 +1,25 @@
+(function _Archive_s_() {
+
+'use strict';
+
+if( typeof module !== 'undefined' )
+{
+  let _ = require( '../../../../dwtools/Tools.s' );
+
+  _.include( 'wVerbal' );
+  _.include( 'wFiles' );
+  _.include( 'wStateStorage' );
+
+  require( '../l4/ArchiveRecord.s' );
+  require( '../l4/ArchiveRecordFactory.s' );
+
+  require( '../l8_filter/Archive.s' );
+
+  require( '../l9/Archive.s' );
+  // require( '../l9/GraphOld.s' );
+  require( '../l9/GraphArchive.s' );
+
+  module[ 'exports' ] = _;
+}
+
+})();

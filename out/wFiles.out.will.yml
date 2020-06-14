@@ -2,15 +2,12 @@ format: outwillfile-2.0
 root:
   - wFiles.out
 consistency:
-  wFiles.out.will.yml: &ref_0
-    hash: 031c346efe50ac18f18fe8a22ffb08c1
-    size: 54222
-  ../.ex.will.yml: &ref_1
+  ../.ex.will.yml: &ref_0
     hash: 2758b5957727d4d34e21f2839aebbcbd
     size: 3245
-  ../.im.will.yml: &ref_2
-    hash: d7c737da4f7613d5079bac77896fd112
-    size: 6672
+  ../.im.will.yml: &ref_1
+    hash: cf09c55ddbeeda40b68cfe87c0add76e
+    size: 6579
 module:
   wFiles.out:
     about:
@@ -37,24 +34,24 @@ module:
         module to keep DRY.
       enabled: 1
       version: 0.7.0
-      interpreters:
+      interpreters: &ref_2
         - njs >= 10.0.0
         - chrome >= 60.0.0
         - firefox >= 60.0.0
-      keywords:
+      keywords: &ref_3
         - wTools
         - wFiles
         - file
         - standardized abstract interface
       license: MIT
       author: Kostiantyn Wandalen <wanalen@01.school>
-      contributors:
+      contributors: &ref_4
         - Kostiantyn Wandalen <wanalen@01.school>
         - Volodymyr M. <volodymyr.migdal@gmail.com>
         - Ihor O. <iostashvxi@gmail.com>
         - Dmytro Kryvoruchko <dm.vict.kr@gmail.com>
       npm.name: wFiles
-      npm.scripts:
+      npm.scripts: &ref_5
         test: wtest .run proto/**
         test2: >-
           wtest .run proto/**/dwtools/amid/file.test/Provider.HardDrive.test.ss
@@ -422,15 +419,15 @@ module:
         autoExporting: 0
         enabled: 0
       tar:
-        path: 'npm:///tar'
+        path: 'npm:///tar#6.0.2'
         autoExporting: 0
         enabled: 0
       proper-lockfile:
-        path: 'npm:///proper-lockfile'
+        path: 'npm:///proper-lockfile#4.1.1'
         autoExporting: 0
         enabled: 0
       needle:
-        path: 'npm:///needle'
+        path: 'npm:///needle#2.5.0'
         autoExporting: 0
         enabled: 0
       wFiles:
@@ -440,13 +437,7 @@ module:
         criterion:
           development: 1
       wait-sync:
-        path: 'npm:///wait-sync'
-        autoExporting: 0
-        enabled: 0
-        criterion:
-          development: 1
-      cli-table2:
-        path: 'npm:///cli-table2#^0.2.0'
+        path: 'npm:///wait-sync#1.0.1'
         autoExporting: 0
         enabled: 0
         criterion:
@@ -964,24 +955,6 @@ module:
           content: prime
         inherit:
           - files.transpile
-      exported.proto.export:
-        opts:
-          filePath: 'reflector::exported.proto.export*'
-        criterion:
-          generated: 1
-          content: proto
-          export: 1
-        inherit:
-          - files.reflect
-      exported.files.proto.export:
-        opts:
-          filePath: 'reflector::exported.files.proto.export*'
-        criterion:
-          generated: 1
-          content: proto
-          export: 1
-        inherit:
-          - files.reflect
     build:
       proto.export:
         steps:
@@ -1070,9 +1043,8 @@ module:
           content: proto
           export: 1
     consistency:
-      wFiles.out.will.yml: *ref_0
-      ../.ex.will.yml: *ref_1
-      ../.im.will.yml: *ref_2
+      ../.ex.will.yml: *ref_0
+      ../.im.will.yml: *ref_1
   ../:
     about:
       name: wFiles
@@ -1098,32 +1070,13 @@ module:
         module to keep DRY.
       enabled: 1
       version: 0.7.0
-      interpreters:
-        - njs >= 10.0.0
-        - chrome >= 60.0.0
-        - firefox >= 60.0.0
-      keywords:
-        - wTools
-        - wFiles
-        - file
-        - standardized abstract interface
+      interpreters: *ref_2
+      keywords: *ref_3
       license: MIT
       author: Kostiantyn Wandalen <wanalen@01.school>
-      contributors:
-        - Kostiantyn Wandalen <wanalen@01.school>
-        - Volodymyr M. <volodymyr.migdal@gmail.com>
-        - Ihor O. <iostashvxi@gmail.com>
-        - Dmytro Kryvoruchko <dm.vict.kr@gmail.com>
+      contributors: *ref_4
       npm.name: wFiles
-      npm.scripts:
-        test: wtest .run proto/**
-        test2: >-
-          wtest .run proto/**/dwtools/amid/file.test/Provider.HardDrive.test.ss
-          routine : linkHardSyncRunner
-        test3: >-
-          wtest .run proto/**/dwtools/amid/file.test/Provider.HardDrive.test.ss
-          routine : linkHardAsyncRunner
-        docgen: wdocgen .build proto
+      npm.scripts: *ref_5
     path:
       module.willfiles:
         criterion:
@@ -1310,15 +1263,15 @@ module:
         autoExporting: 0
         enabled: 0
       tar:
-        path: 'npm:///tar'
+        path: 'npm:///tar#6.0.2'
         autoExporting: 0
         enabled: 0
       proper-lockfile:
-        path: 'npm:///proper-lockfile'
+        path: 'npm:///proper-lockfile#4.1.1'
         autoExporting: 0
         enabled: 0
       needle:
-        path: 'npm:///needle'
+        path: 'npm:///needle#2.5.0'
         autoExporting: 0
         enabled: 0
       wFiles:
@@ -1328,13 +1281,7 @@ module:
         criterion:
           development: 1
       wait-sync:
-        path: 'npm:///wait-sync'
-        autoExporting: 0
-        enabled: 0
-        criterion:
-          development: 1
-      cli-table2:
-        path: 'npm:///cli-table2#^0.2.0'
+        path: 'npm:///wait-sync#1.0.1'
         autoExporting: 0
         enabled: 0
         criterion:
@@ -1880,8 +1827,5 @@ module:
         hash: 2758b5957727d4d34e21f2839aebbcbd
         size: 3245
       ../.im.will.yml:
-        hash: d7c737da4f7613d5079bac77896fd112
-        size: 6672
-      wFiles.out.will.yml:
-        hash: 031c346efe50ac18f18fe8a22ffb08c1
-        size: 54222
+        hash: cf09c55ddbeeda40b68cfe87c0add76e
+        size: 6579

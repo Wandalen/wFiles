@@ -1,76 +1,50 @@
 {
-  "name": "wFiles",
-  "version": "0.6.804",
-  "engine": "node >= 10.0.0",
-  "enabled": 1,
-  "description": "Collection of classes to abstract files systems. Many interfaces provide files, but not called as file systems and treated differently. For example server-side gives access to local files and browser-side HTTP/HTTPS protocol gives access to files as well, but in the very different way, it does the first. This problem forces a developer to break fundamental programming principle DRY and make code written to solve a problem not applicable to the same problem, on another platform/technology. Files treats any file-system-like interface as files system. Files combines all files available to the application into the single namespace where each file has unique Path/URI, so that operating with several files on different files systems is not what user of the module should worry about. If Files does not have an adapter for your files system you may design it providing a short list of stupid methods fulfilling completely or partly good defined API and get access to all sophisticated general algorithms on files for free. Is concept of file applicable to external entities of an application? Files makes possible to treat internals of a program as files system(s). Use the module to keep DRY.",
-  "license": "MIT",
-  "author": "Kostiantyn Wandalen <wanalen@01.school>",
-  "contributors": [
-    {
-      "name": "Kostiantyn Wandalen",
-      "email": "wanalen@01.school"
-    },
-    {
-      "name": "Volodymyr M.",
-      "email": "volodymyr.migdal@gmail.com"
-    },
-    {
-      "name": "Ihor Ostash",
-      "email": "iostashvxi@gmail.com"
-    }
+  "name" : "wFiles",
+  "version" : "0.6.805",
+  "engine" : "node >= 10.0.0",
+  "enabled" : 1,
+  "description" : "Collection of classes to abstract files systems. Many interfaces provide files, but not called as file systems and treated differently. For example server-side gives access to local files and browser-side HTTP/HTTPS protocol gives access to files as well, but in the very different way, it does the first. This problem forces a developer to break fundamental programming principle DRY and make code written to solve a problem not applicable to the same problem, on another platform/technology. Files treats any file-system-like interface as files system. Files combines all files available to the application into the single namespace where each file has unique Path/URI, so that operating with several files on different files systems is not what user of the module should worry about. If Files does not have an adapter for your files system you may design it providing a short list of stupid methods fulfilling completely or partly good defined API and get access to all sophisticated general algorithms on files for free. Is concept of file applicable to external entities of an application? Files makes possible to treat internals of a program as files system(s). Use the module to keep DRY.",
+  "license" : "MIT",
+  "author" : "Kostiantyn Wandalen <wanalen@01.school>",
+  "contributors" :
+  [
+    { "name" : "Kostiantyn Wandalen", "email" : "wanalen@01.school" },
+    { "name" : "Volodymyr M.", "email" : "volodymyr.migdal@gmail.com" },
+    { "name" : "Ihor Ostash", "email" : "iostashvxi@gmail.com" }
   ],
-  "main": "proto/dwtools/amid/l4_files/entry/Files.s",
-  "files": [
-    "proto/dwtools/amid/l4_files",
-    "proto/dwtools/Tools.s",
-    "out"
-  ],
-  "scripts": {
-    "test": "wtest .run 'proto/**' rapidity:-3",
-    "docgen": "wdocgen proto"
+  "main" : "proto/dwtools/amid/l4_files/entry/Files.s",
+  "files" : [ "proto/dwtools/amid/l4_files", "proto/dwtools/Tools.s", "out" ],
+  "scripts" : { "test" : "wtest .run 'proto/**' rapidity:-3", "docgen" : "wdocgen proto" },
+  "repository" : { "type" : "git", "url" : "https://github.com/Wandalen/wFiles.git" },
+  "bugs" :
+  {
+    "url" : "https://github.com/Wandalen/wFiles/issues"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Wandalen/wFiles.git"
+  "dependencies" :
+  {
+    "tar" : "=6.0.2",
+    "proper-lockfile" : "=4.1.1",
+    "needle" : "=2.5.0",
+    "wTools" : "alpha",
+    "wstringer" : "alpha",
+    "wstringsextra" : "alpha",
+    "wConsequence" : "alpha",
+    "wCopyable" : "alpha",
+    "wgdf" : "alpha",
+    "wroutinebasic" : "alpha",
+    "wpathbasic" : "alpha",
+    "wpathtools" : "alpha",
+    "wuribasic" : "alpha",
+    "wweburibasic" : "alpha",
+    "wprocess" : "alpha",
+    "wfieldsstack" : "alpha",
+    "wRegexpObject" : "alpha",
+    "wselector" : "alpha",
+    "wverbal" : "alpha",
+    "wLogger" : "alpha",
+    "wgittools" : "alpha",
+    "wnpmtools" : "alpha"
   },
-  "bugs": {
-    "url": "https://github.com/Wandalen/wFiles/issues"
-  },
-  "dependencies": {
-    "wTools": "alpha",
-    "wstringer": "alpha",
-    "wstringsextra": "alpha",
-    "wConsequence": "alpha",
-    "wCopyable": "alpha",
-    "wgdf": "alpha",
-    "wroutinebasic": "alpha",
-    "wpathbasic": "alpha",
-    "wpathtools": "alpha",
-    "wuribasic": "alpha",
-    "wweburibasic": "alpha",
-    "wprocess": "alpha",
-    "wfieldsstack": "alpha",
-    "wRegexpObject": "alpha",
-    "wselector": "alpha",
-    "wverbal": "alpha",
-    "wLogger": "alpha",
-    "wgittools": "alpha",
-    "wnpmtools": "alpha",
-    "tar": "6.0.2",
-    "proper-lockfile": "4.1.1",
-    "needle": "2.5.0"
-  },
-  "devDependencies": {
-    "cli-table2": "^0.2.0",
-    "wFiles": "file:.",
-    "wait-sync": "1.0.1",
-    "wTesting": "alpha"
-  },
-  "keywords": [
-    "wTools",
-    "wFiles",
-    "file",
-    "standardized abstract interface"
-  ]
+  "devDependencies" : { "wait-sync" : "=1.0.1", "wFiles" : "file:.", "wTesting" : "alpha" },
+  "keywords" : [ "wTools", "wFiles", "file", "standardized abstract interface" ]
 }

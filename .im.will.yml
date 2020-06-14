@@ -59,13 +59,13 @@ submodule :
     path : npm:///wnpmtools
     enabled : 0 # submodule
   tar :
-    path : npm:///tar
+    path : npm:///tar#6.0.2
     enabled : 0 # submodule
   proper-lockfile :
-    path : npm:///proper-lockfile
+    path : npm:///proper-lockfile#4.1.1
     enabled : 0 # submodule
   needle :
-    path : npm:///needle
+    path : npm:///needle#2.5.0
     enabled : 0 # submodule
   wFiles :
     path : hd://.
@@ -73,12 +73,7 @@ submodule :
     criterion :
       development : 1
   wait-sync :
-    path : npm:///wait-sync
-    enabled : 0 # submodule
-    criterion :
-      development : 1
-  cli-table2 :
-    path : npm:///cli-table2#^0.2.0
+    path : npm:///wait-sync#1.0.1
     enabled : 0 # submodule
     criterion :
       development : 1

@@ -6,6 +6,7 @@ if( typeof module !== 'undefined' )
 {
   let _ = require( '../../../../dwtools/Tools.s' );
 
+  // _.include( 'wFilesBasic' );
   _.include( 'wGitTools' );
   require( '../l7_provider/Git.ss' );
 

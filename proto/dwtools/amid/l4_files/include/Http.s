@@ -6,6 +6,7 @@ if( typeof module !== 'undefined' )
 {
   let _ = require( '../../../../dwtools/Tools.s' );
 
+  // _.include( 'wFilesBasic' );
   if( Config.interpreter === 'browser' )
   require( '../l7_provider/Http.js' );
   if( Config.interpreter === 'njs' )

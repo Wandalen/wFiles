@@ -6,15 +6,20 @@ if( typeof module !== 'undefined' )
 {
   let _ = require( './Mid.s' );
 
+  debugger;
+
   /* l7_provider */
 
   require( './Extract.s' );
   if( Config.interpreter === 'njs' )
-  require( './Git.ss' );
-  if( Config.interpreter === 'njs' )
   require( './HardDrive.ss' );
   require( './Http.s' );
+
+  // xxx
+  if( Config.interpreter === 'njs' )
   require( './Npm.ss' );
+  if( Config.interpreter === 'njs' )
+  require( './Git.ss' );
 
   /* l8_filter */
 
@@ -61,6 +66,8 @@ if( typeof module !== 'undefined' )
   // require( './l8_filter/Image.s' );
   //
   // _.path.currentAtBegin = _.path.current();
+
+  debugger;
 
   module[ 'exports' ] = _;
 }

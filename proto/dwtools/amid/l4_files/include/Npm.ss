@@ -6,6 +6,7 @@ if( typeof module !== 'undefined' )
 {
   let _ = require( '../../../../dwtools/Tools.s' );
 
+  // _.include( 'wFilesBasic' );
   _.include( 'wNpmTools' )
 
   require( '../l7_provider/Npm.ss' );

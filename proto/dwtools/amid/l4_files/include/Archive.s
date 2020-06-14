@@ -6,8 +6,8 @@ if( typeof module !== 'undefined' )
 {
   let _ = require( '../../../../dwtools/Tools.s' );
 
-  _.include( 'wVerbal' );
   _.include( 'wFiles' );
+  _.include( 'wVerbal' );
   _.include( 'wStateStorage' );
 
   require( '../l4/ArchiveRecord.s' );

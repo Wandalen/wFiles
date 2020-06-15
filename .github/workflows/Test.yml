@@ -38,7 +38,10 @@ jobs :
       with :
         node-version : ${{ matrix.node-version }}
     - run : npm i
-    - run : node proto/dwtools/amid/l4_files.test/aFileProvider.test.s r:fileDeleteFileWithSpecialSymbols v:10
+    - run : node proto/dwtools/amid/l4_files.test/HardDrive.test.ss.test.s r:fileDeleteFileWithSpecialSymbols v:10
+    - run : node proto/dwtools/amid/l4_files.test/HardDrive.test.ss.test.s r:hardLinkMultipleSync v:10
+    - run : node proto/dwtools/amid/l4_files.test/HardDrive.test.ss.test.s r:pathNativize v:10
+    - run : node proto/dwtools/amid/l4_files.test/System.HardDrive.test.ss r:softLinkActSync v:10
 
   Full :
     if : "startsWith( github.event.head_commit.message, 'version' )"

@@ -15603,14 +15603,30 @@ function fileDeleteFileWithSpecialSymbols( test )
 
   test.case = 'filename contains ?, global path'
   var filePath = provider.path.join( routinePath, '?file=a' );
-  provider.fileWrite( filePath, filePath );
-  provider.fileDelete( filePath );
+  if( process.platform === 'win32')
+  test.shouldThrowErrorSync( () => 
+  {
+    provider.fileWrite( filePath, filePath );
+  })
+  else
+  {
+    provider.fileWrite( filePath, filePath );
+    provider.fileDelete( filePath );
+  }
   test.is( !provider.fileExists( filePath ) );
 
   test.case = 'filename contains ?, local path'
   var filePath = provider.path.join( routinePath, '?file=a' );
-  provider.fileWrite( filePath, filePath );
-  provider.fileDelete( providerEffective.path.preferredFromGlobal( filePath ) );
+  if( process.platform === 'win32')
+  test.shouldThrowErrorSync( () => 
+  {
+    provider.fileWrite( filePath, filePath );
+  })
+  else
+  {
+    provider.fileWrite( filePath, filePath );
+    provider.fileDelete( providerEffective.path.preferredFromGlobal( filePath ) );
+  }
   test.is( !provider.fileExists( filePath ) );
 }
 
@@ -29621,28 +29637,40 @@ function hardLinkMultipleSync( test )
   var delay = 10;
 
   if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  delay = provider.systemBitrateTimeGet();
+  delay = provider.systemBitrateTimeGet() / 1000;
 
   function makeFiles( names, dirPath, sameTime )
   {
-    let now = _.time.now();
+    let ready = new _.Consequence().take( null );
     var paths = names.map( ( name, i ) =>
     {
       var filePath = self.pathFor( path.join( dirPath, name ) );
-      provider.fileWrite({ filePath, data : filePath, purging : 1 });
+      
+      ready.then( () => 
+      {
+        provider.fileWrite({ filePath, data : filePath, purging : 1 });
 
-      if( sameTime )
-      {
-        provider.fileTimeSet( filePath, delay, delay );
-      }
-      else if( i > 0 )
-      {
-        let time = now + ( i + 1 ) * delay;
-        provider.fileTimeSet( filePath, time, time );
-      }
+        if( sameTime )
+        {
+          provider.fileTimeSet( filePath, delay, delay );
+        }
+        else if( i > 0 )
+        {
+          return _.time.out( delay )
+          .then( () => 
+          {
+            provider.fileWrite({ filePath, data : path.name( filePath ) });
+            return true;
+          })
+        }
+        
+        return null;
+      })
 
       return filePath;
     });
+    
+    ready.deasync();
 
     return paths;
   }
@@ -49161,7 +49189,7 @@ function pathNativize( t )
     var path = '/A';
     var got = provider.path.nativize( path );
     // var expected = 'A:\\';
-    var expected = 'A:';
+    var expected = 'A:\\';
     t.identical( got, expected );
 
     /**/

@@ -18,12 +18,12 @@ _.assert( !!Parent );
 
 //
 
-function onSuiteBegin( test )
+function onSuiteBegin( test ) /* qqq2 : review all onSuite* */
 {
   let context = this;
   context.provider = _.FileProvider.HardDrive({ protocol : 'current' });
   context.system = _.FileProvider.System({ providers : [ context.provider ], defaultProvider : context.provider });
-  let path = context.provider.path;
+  let path = context.provider.path; /* qqq2 : remove redundant path */
   context.suiteTempPath = path.pathDirTempOpen( path.join( __dirname, '../..'  ), 'suite-' + 'FilesFind' );
   context.suiteTempPath = context.provider.pathResolveLinkFull({ filePath : context.suiteTempPath, resolvingSoftLink : 1 }); /* qqq2 */
   context.suiteTempPath = context.suiteTempPath.absolutePath;

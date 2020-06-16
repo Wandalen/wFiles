@@ -6,8 +6,6 @@ if( typeof module !== 'undefined' )
 {
   let _ = require( './Mid.s' );
 
-  debugger;
-
   /* l7_provider */
 
   require( './Extract.s' );
@@ -66,8 +64,6 @@ if( typeof module !== 'undefined' )
   // require( './l8_filter/Image.s' );
   //
   // _.path.currentAtBegin = _.path.current();
-
-  debugger;
 
   module[ 'exports' ] = _;
 }

@@ -510,117 +510,6 @@ function _preSrcDstPathWithProviderDefaults( routine, args )
 
 //
 
-function EncodersGenerate()
-{
-  _.assert( _.Gdf, 'GdfStrategy is required to generate encoders!' );
-  _.assert( _.mapIs( _.Gdf.InMap ) );
-  _.assert( _.mapIs( _.Gdf.OutMap ) );
-
-  for( let k in _.Gdf.InOutMap )
-  {
-    if( !_.strHas( k, 'structure' ) )
-    continue;
-    var defaults = _.entityFilter( _.Gdf.InOutMap[ k ], ( c ) => c.default ? c : undefined );
-    if( defaults.length > 1 )
-    throw _.err( `Several default converters for '${k}' in-out combination:`, _.select( defaults, '*/name' )  );
-  }
-
-  let writeConverters = _.Gdf.InMap[ 'structure' ];
-  let readConverters = _.Gdf.OutMap[ 'structure' ];
-
-  let WriteEndoders = Object.create( null );
-  let ReadEncoders = Object.create( null );
-
-  /**/
-
-  writeConverters.forEach( ( converter ) =>
-  {
-    let encoder = Object.create( null );
-
-    encoder.converter = converter;
-    encoder.exts = converter.ext.slice();
-
-    encoder.onBegin = function( e )
-    {
-      let encoded = converter.encode({ data : e.operation.data, envMap : e.operation });
-      e.operation.data = encoded.data;
-      if( encoded.format === 'string' )
-      e.operation.encoding = 'utf8';
-      else
-      e.operation.encoding = encoded.format;
-    }
-
-    _.assert( converter.ext.length );
-
-    _.each( converter.ext, ( ext ) =>
-    {
-      if( !WriteEndoders[ ext ] || converter.default )
-      WriteEndoders[ ext ] = encoder;
-    })
-
-  })
-
-  /**/
-
-  readConverters.forEach( ( converter ) =>
-  {
-    let encoder = Object.create( null );
-
-    encoder.converter = converter;
-    encoder.exts = converter.ext.slice();
-    encoder.forConfig = converter.forConfig;
-
-    encoder.onBegin = function( e )
-    {
-      if( converter.in[ 0 ] === 'string' )
-      e.operation.encoding = 'utf8';
-      else
-      e.operation.encoding = converter.in[ 0 ];
-    }
-    encoder.onEnd = function( e )
-    {
-      let decoded = converter.encode({ data : e.data, envMap : e.operation });
-      e.data = decoded.data;
-    }
-
-    _.assert( converter.ext.length );
-
-    _.each( converter.ext, ( ext ) =>
-    {
-      if( !ReadEncoders[ ext ] || converter.default )
-      ReadEncoders[ ext ] = encoder;
-    })
-  })
-
-  /* */
-
-  for( let k in _.FileReadEncoders )
-  {
-    let converter = _.FileReadEncoders[ k ].converter;
-    if( converter )
-    if( !_.longHas( readConverters, converter ) || !_.longHas( converter.ext, k ) )
-    delete _.FileReadEncoders[ k ]
-  }
-
-  for( let k in _.FileWriteEncoders )
-  {
-    let converter = _.FileWriteEncoders[ k ].converter;
-    if( converter )
-    if( !_.longHas( writeConverters, converter ) || !_.longHas( converter.ext, k ) )
-    delete _.FileWriteEncoders[ k ];
-  }
-
-  /* */
-
-  _.assert( _.mapIs( _.FileReadEncoders ) );
-  _.assert( _.mapIs( _.FileWriteEncoders ) );
-
-  Object.assign( _.FileReadEncoders, ReadEncoders );
-  Object.assign( _.FileWriteEncoders, WriteEndoders );
-}
-
-//
-
 /**
  * Return options for file read/write. If `filePath is an object, method returns it. Method validate result option
     properties by default parameters from invocation context.
@@ -3010,7 +2899,7 @@ function streamRead_body( o )
 {
   let self = this;
   let result;
-  let encoder = _.FileReadEncoders[ o.encoding ];
+  let encoder = _.files.ReadEncoders[ o.encoding ];
 
   let optionsRead = _.mapExtend( null, o );
   delete optionsRead.throwing;
@@ -3163,7 +3052,7 @@ function fileRead_body( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.strIs( o.encoding ) );
 
-  let encoder = _.FileReadEncoders[ o.encoding ];
+  let encoder = _.files.ReadEncoders[ o.encoding ];
 
   if( o.resolvingTextLink && self.usingTextLink )
   o.filePath = self.pathResolveTextLink( o.filePath );
@@ -3209,6 +3098,7 @@ function fileRead_body( o )
 
   function handleBegin()
   {
+    // debugger;
     if( encoder && encoder.onBegin )
     {
       let r = encoder.onBegin.call( self, { operation : o, encoder : encoder, provider : self })
@@ -3226,6 +3116,7 @@ function fileRead_body( o )
     if( encoder && encoder.onEnd )
     try
     {
+      // debugger;
       let o2 = { data : data, operation : o, encoder : encoder, provider : self };
       let r = encoder.onEnd.call( self, o2 );
       _.sure( r === undefined );
@@ -3574,7 +3465,7 @@ function _fileInterpret_body( o )
     for( let e in fileInterpret.encoders )
     {
       // let encoder = fileInterpret.encoders[ e ];
-      let encoder = _.FileReadEncoders[ o.encoding ];
+      let encoder = _.files.ReadEncoders[ o.encoding ];
       if( !encoder.exts )
       continue;
       if( encoder.forConfig !== undefined && !encoder.forConfig )
@@ -4961,9 +4852,9 @@ function fileWrite_body( o )
   let path = self.path;
 
   o.encoding = o.encoding || self.encoding;
-
-  // let encoder = self.fileWrite.encoders[ o.encoding ];
-  let encoder = _.FileWriteEncoders[ o.encoding ];
+  if( o.encoding === _.unknown )
+  o.encoding = _.files.encoderDeduce({ filePath : o.filePath, returning : 'name', criterion : { writer : true } });
+  let encoder = _.files.WriteEncoders[ o.encoding ];
 
   let o2 = _.mapOnly( o, self.fileWriteAct.defaults );
 
@@ -5064,8 +4955,8 @@ var having = fileWrite_body.having;
 having.driving = 0;
 having.aspect = 'body';
 
-fileWrite_body.encoders = _.FileWriteEncoders;
-_.assert( _.objectIs( fileWrite_body.encoders ) );
+// fileWrite_body.encoders = _.files.WriteEncoders;
+// _.assert( _.objectIs( fileWrite_body.encoders ) );
 
 //
 
@@ -5118,7 +5009,7 @@ let fileWrite = _.routineFromPreAndBody( fileWrite_pre, fileWrite_body );
 fileWrite.having.aspect = 'entry';
 
 // debugger;
-_.assert( _.mapLike( fileWrite.encoders ) );
+// _.assert( _.mapLike( fileWrite.encoders ) );
 // debugger;
 
 //
@@ -9152,7 +9043,6 @@ let Statics =
   Path : _.path.CloneExtending({ fileProvider : Self }),
   WriteMode : WriteMode,
   ProviderDefaults : ProviderDefaults,
-  EncodersGenerate : EncodersGenerate,
   Counter : 0,
 }
 
@@ -9210,6 +9100,7 @@ let Extension =
 
   // functors
 
+  /* xxx2 : move to namespace */
   _vectorize,
   _vectorizeAll,
   _vectorizeAny,
@@ -9231,8 +9122,6 @@ let Extension =
   _preSrcDstPathWithoutProviderDefaults,
   _preSrcDstPathWithProviderDefaults,
 
-  EncodersGenerate,
-
   // system
 
   protocolsForOrigins,
@@ -9249,7 +9138,7 @@ let Extension =
 
   pathNativizeAct,
   pathCurrentAct : null,
-  pathDirTempAct,
+  pathDirTempAct, /* qqq : remove default implementation */
 
   // resolve
 
@@ -9499,24 +9388,17 @@ _.Copyable.mixin( Self );
 _.FieldsStack.mixin( Self );
 _.Verbal.mixin( Self );
 
-// _.FileProvider.Find.mixin( Self );
-// _.FileProvider.Secondary.mixin( Self );
-
 _.assert( _.routineIs( Self.prototype.statsResolvedRead ) );
 _.assert( _.objectIs( Self.prototype.statsResolvedRead.defaults ) );
-
-Self.EncodersGenerate();
+_.assert( Self.prototype.statRead.defaults.resolvingSoftLink === 0 );
+_.assert( Self.prototype.statRead.defaults.resolvingTextLink === 0 );
 
 // --
 // export
 // --
 
 _.FileProvider[ Self.shortName ] = Self;
-
 if( typeof module !== 'undefined' )
 module[ 'exports' ] = Self;
-
-_.assert( _.FileProvider.Partial.prototype.statRead.defaults.resolvingSoftLink === 0 );
-_.assert( _.FileProvider.Partial.prototype.statRead.defaults.resolvingTextLink === 0 );
 
 })();

@@ -9,7 +9,7 @@ let Abstract = _.FileProvider.Abstract;
 let Partial = _.FileProvider.Partial;
 let fileRead = Partial.prototype.fileRead;
 
-_.assert( _.lengthOf( _.FileReadEncoders ) > 0 );
+_.assert( _.lengthOf( _.files.ReadEncoders ) > 0 );
 _.assert( _.routineIs( _.FileRecord ) );
 _.assert( _.routineIs( Abstract ) );
 _.assert( _.routineIs( Partial ) );
@@ -3762,7 +3762,7 @@ function filesReflectSingle_body( o )
     }
     else if( action === 'hardLink' )
     {
-      /* zzz : should not change time of file if it is already linked */
+      /* qqq2 : should not change time of file if it is already linked */
 
       dst.hardLink
       ({
@@ -3780,7 +3780,7 @@ function filesReflectSingle_body( o )
     }
     else if( action === 'softLink' )
     {
-      /* zzz : should not change time of file if it is already linked */
+      /* qqq2 : should not change time of file if it is already linked */
 
       system.softLink
       ({
@@ -3797,7 +3797,7 @@ function filesReflectSingle_body( o )
     }
     else if( action === 'textLink' )
     {
-      /* zzz : should not change time of file if it is already linked */
+      /* qqq2 : should not change time of file if it is already linked */
       system.textLink
       ({
         dstPath,

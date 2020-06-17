@@ -10,7 +10,7 @@
 if( typeof module !== 'undefined' )
 {
   let _ = require( '../../../../dwtools/Tools.s' );
-  require( '../include/Top.s' )
+  require( '../include/Top.s' );
   module[ 'exports' ] = _;
 }
 

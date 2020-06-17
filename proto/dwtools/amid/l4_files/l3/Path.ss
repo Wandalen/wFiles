@@ -145,7 +145,6 @@ function resolveTextLink( path )
 
 function dirUserHome()
 {
-  debugger;
   let fileProvider = this.fileProvider.preferredProvider;
   _.assert( arguments.length === 0, 'Expects no arguments' );
   _.assert( _.routineIs( fileProvider.pathDirUserHomeAct ) );

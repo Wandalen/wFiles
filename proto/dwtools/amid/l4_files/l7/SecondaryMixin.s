@@ -10,7 +10,7 @@ let Partial = _.FileProvider.Partial;
 let Find = _.FileProvider.Find;
 let fileRead = Partial.prototype.fileRead;
 
-_.assert( _.lengthOf( _.FileReadEncoders ) > 0 );
+_.assert( _.lengthOf( _.files.ReadEncoders ) > 0 );
 _.assert( _.routineIs( _.FileRecord ) );
 _.assert( _.routineIs( Abstract ) );
 _.assert( _.routineIs( Partial ) );
@@ -887,12 +887,12 @@ function configFind_body( o )
 
   let exts = Object.create( null );
 
-  for( let e in _.FileReadEncoders )
+  for( let e in _.files.ReadEncoders )
   {
-    let encoder = _.FileReadEncoders[ e ];
+    let encoder = _.files.ReadEncoders[ e ];
     if( encoder === null )
     continue;
-    _.assert( _.objectIs( encoder ), 'Read encoder', e, 'is missing' );
+    _.assert( _.objectIs( encoder ), `Read encoder ${e} is missing` );
     if( encoder.exts )
     for( let s = 0 ; s < encoder.exts.length ; s++ )
     exts[ encoder.exts[ s ] ] = e;
@@ -1110,6 +1110,68 @@ function configUserRead( o )
   let path = self.path;
 
   if( !_.mapIs( o ) )
+  o = { name : o }
+
+  o = _.routineOptions( configUserRead, o );
+  _.assert( _.strDefined( o.name ) );
+
+  let userPath = path.dirUserHome();
+  let filePath = path.join( userPath, o.dirPath, o.name );
+
+  return self.configRead
+  ({
+    filePath,
+    throwing : 0,
+  });
+
+}
+
+configUserRead.defaults =
+{
+  dirPath : '.',
+  name : '.wenv.yml',
+}
+
+//
+
+function configUserWrite( o )
+{
+  let self = this;
+  let path = self.path;
+
+  if( !_.mapIs( o ) )
+  o = { name : arguments[ 0 ], structure : arguments[ 1 ] }
+  o = _.routineOptions( configUserWrite, o );
+  _.assert( _.strDefined( o.name ) );
+  _.assert( o.structure !== null );
+
+  let userPath = path.dirUserHome();
+  let filePath = path.join( userPath, o.dirPath, o.name );
+
+  return self.fileWrite
+  ({
+    filePath,
+    data : o.structure,
+    encoding : _.unknown, /* qqq2 : cover option encoding of method fileWrite */
+  });
+
+}
+
+configUserWrite.defaults =
+{
+  dirPath : '.',
+  structure : null,
+  name : '.wenv.yml',
+}
+
+//
+
+function configUserRead( o )
+{
+  let self = this;
+  let path = self.path;
+
+  if( !_.mapIs( o ) )
   o = { filePath : o }
 
   let userPath = path.dirUserHome();
@@ -1126,6 +1188,7 @@ function configUserRead( o )
 configUserRead.defaults =
 {
   filePath : null,
+  name : '.wenv.yml',
 }
 
 //
@@ -1245,7 +1308,8 @@ let Supplement =
   configFind,
   configRead,
 
-  configUserRead,
+  configUserRead, /* qqq : cover */
+  configUserWrite, /* qqq : cover */
 
   fileCodeRead,
 

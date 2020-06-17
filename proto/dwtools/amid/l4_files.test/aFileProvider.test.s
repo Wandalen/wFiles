@@ -429,7 +429,7 @@ function readWriteSync( test )
 
   test.case = 'encoder not finded';
   var encoding = 'unknown';
-  test.identical( _.FileReadEncoders[ encoding ], undefined );
+  test.identical( _.files.ReadEncoders[ encoding ], undefined );
   // test.identical( provider.fileReadAct.encoders[ encoding ], undefined );
   test.shouldThrowErrorOfAnyKind( () =>
   {
@@ -2759,7 +2759,7 @@ function readWriteAsync( test )
     {
       test.case = 'encoder not finded';
       var encoding = 'unknown';
-      test.identical( _.FileReadEncoders[ encoding ], undefined );
+      test.identical( _.files.ReadEncoders[ encoding ], undefined );
       // test.identical( provider.fileReadAct.encoders[ encoding ], undefined );
       var con = provider.fileRead
       ({
@@ -2954,12 +2954,12 @@ function fileReadWithEncoding( test )
   provider.filesDelete( filePath );
   provider.fileWrite( filePath, data );
 
-  //
+  /* */
 
   var got = provider.fileRead({ filePath, encoding : 'buffer.bytes' });
   test.identical( got, _.bufferBytesFrom( data ) );
 
-  //
+  /* */
 
   if( isHd )
   {
@@ -2967,14 +2967,14 @@ function fileReadWithEncoding( test )
     test.identical( got, _.bufferNodeFrom( data ) )
   }
 
-  //
+  /* */
 
   var got = provider.fileRead({ filePath, encoding : 'buffer.raw' });
   test.identical( got, _.bufferRawFrom( data ) )
 
   test.close( 'buffer.*' );
 
-  /**/
+  /* - */
 
   test.open( 'json' );
 
@@ -2984,7 +2984,7 @@ function fileReadWithEncoding( test )
   var got = provider.fileRead({ filePath, encoding : 'json' });
   test.identical( got, data );
 
-  //
+  /* */
 
   var data = [ 1,2,3 ];
   provider.filesDelete( filePath );
@@ -2992,7 +2992,7 @@ function fileReadWithEncoding( test )
   var got = provider.fileRead({ filePath, encoding : 'json' });
   test.identical( got, data );
 
-  //
+  /* */
 
   var data = '{a : b}';
   provider.filesDelete( filePath );
@@ -3002,7 +3002,7 @@ function fileReadWithEncoding( test )
     provider.fileRead({ filePath, encoding : 'json' });
   })
 
-  //
+  /* */
 
   var data =
   {
@@ -3018,7 +3018,7 @@ function fileReadWithEncoding( test )
 
   test.close( 'json' );
 
-  /**/
+  /* - */
 
   test.open( 'js' );
 
@@ -49589,30 +49589,30 @@ function hardLinkExperiment( test )
 
 //
 
-function EncodersGenerate( test )
+function encodersFromGdfs( test )
 {
   let self = this;
   let provider = self.provider;
-  let writeConverters = _.Gdf.InMap[ 'structure' ];
-  let readConverters = _.Gdf.OutMap[ 'structure' ];
+  let writeConverters = _.gdf.inMap[ 'structure' ];
+  let readConverters = _.gdf.outMap[ 'structure' ];
 
   /* */
 
   test.case = 'check if all write encoders are generated';
-  _checkEncoders( _.FileWriteEncoders, writeConverters );
+  _checkEncoders( _.files.WriteEncoders, writeConverters );
 
   /* */
 
   test.case = 'check if all read encoders are generated';
-  _checkEncoders( _.FileReadEncoders, readConverters );
+  _checkEncoders( _.files.ReadEncoders, readConverters );
 
   /* */
 
-  test.case = 'add and remove write converter';
+  test.case = 'add and remove write gdf';
 
-  test.will = 'encoder and converter should not exist';
-  test.is( !_.FileWriteEncoders[ 'testEncoder' ] );
-  test.is( !_.Gdf.ExtMap[ 'testEncoder' ] || !_.Gdf.ExtMap[ 'testEncoder' ].length );
+  test.will = 'encoder and gdf should not exist';
+  test.is( !_.files.WriteEncoders[ 'testEncoder' ] );
+  test.is( !_.gdf.extMap[ 'testEncoder' ] || !_.gdf.extMap[ 'testEncoder' ].length );
   var testConverter =
   {
     ext : [ 'testEncoder' ],
@@ -49625,28 +49625,28 @@ function EncodersGenerate( test )
       op.out.format = 'string';
     }
   }
-  var converter = _.Gdf([ testConverter ])[ 0 ];
+  var gdf = _.Gdf([ testConverter ])[ 0 ];
 
   test.will = 'encoder should not exist';
-  test.is( !_.FileWriteEncoders[ 'testEncoder' ] );
+  test.is( !_.files.WriteEncoders[ 'testEncoder' ] );
 
   test.will = 'update encoders, encoder should exist';
-  provider.EncodersGenerate();
-  var encoder = _.FileWriteEncoders[ 'testEncoder' ];
+  _.files.encodersFromGdfs();
+  var encoder = _.files.WriteEncoders[ 'testEncoder' ];
   test.is( _.mapIs( encoder ) );
-  test.identical( encoder.exts, converter.ext );
-  test.identical( encoder.converter, converter );
+  test.identical( encoder.exts, gdf.ext );
+  test.identical( encoder.gdf, gdf );
 
-  test.will = 'finit converter, encoder should exist';
-  converter.finit();
-  test.is( _.mapIs( _.FileWriteEncoders[ 'testEncoder' ] ) );
-  provider.EncodersGenerate();
+  test.will = 'finit gdf, encoder should exist';
+  gdf.finit();
+  test.is( _.mapIs( _.files.WriteEncoders[ 'testEncoder' ] ) );
+  _.files.encodersFromGdfs();
   test.will = 'update encoders, encoder should not exist';
-  test.is( !_.FileWriteEncoders[ 'testEncoder' ] );
+  test.is( !_.files.WriteEncoders[ 'testEncoder' ] );
 
   /* */
 
-  test.case = 'adjust converter exts'
+  test.case = 'adjust gdf exts'
   var testConverter =
   {
     ext : [ 'testEncoder' ],
@@ -49659,51 +49659,50 @@ function EncodersGenerate( test )
       op.out.format = 'string';
     }
   }
-  var converter = _.Gdf([ testConverter ])[ 0 ];
+  var gdf = _.Gdf([ testConverter ])[ 0 ];
   var ext = 'testExt';
-  let originalExt = converter.ext.slice();
-  converter.ext = [ ext ];
-  test.is( !_.mapIs( _.FileWriteEncoders[ ext ] ) );
-  provider.EncodersGenerate();
-  var encoder = _.FileWriteEncoders[ ext ];
+  let originalExt = gdf.ext.slice();
+  gdf.ext = [ ext ];
+  test.is( !_.mapIs( _.files.WriteEncoders[ ext ] ) );
+  _.files.encodersFromGdfs();
+  var encoder = _.files.WriteEncoders[ ext ];
   test.is( _.mapIs( encoder ) );
-  test.identical( encoder.exts, converter.ext );
-  test.identical( encoder.converter, converter );
-  converter.ext = originalExt.slice();
-  converter.finit();
-  provider.EncodersGenerate();
-  test.is( !_.mapIs( _.FileWriteEncoders[ ext ] ) );
+  test.identical( encoder.exts, gdf.ext );
+  test.identical( encoder.gdf, gdf );
+  gdf.ext = originalExt.slice();
+  gdf.finit();
+  _.files.encodersFromGdfs();
+  test.is( !_.mapIs( _.files.WriteEncoders[ ext ] ) );
 
   /* - */
 
   function _checkEncoders( encoders, converters )
   {
-    _.each( converters, ( converter ) =>
+    _.each( converters, ( gdf ) =>
     {
-      _.each( converter.ext, ( ext ) =>
+      _.each( gdf.ext, ( ext ) =>
       {
-        if( encoders[ ext ].converter.default )
+        if( encoders[ ext ].gdf.default )
         {
-          test.will = 'Expects only one default converter for encoder: ' + ext;
-          let defaultConverter = _.Gdf.ExtMap[ ext ].filter( ( c ) => !!c.default )
+          test.will = 'Expects only one default gdf for encoder: ' + ext;
+          let defaultConverter = _.gdf.extMap[ ext ].filter( ( c ) => !!c.default )
           test.identical( defaultConverter.length, 1 );
-
           test.will = ext + ' encoder should exist';
           test.is( _.mapIs( encoders[ ext ] ) );
-          test.will = ext + ' encoder should use default converter: ' + defaultConverter[ 0 ].name;
-          test.is( encoders[ ext ].converter === defaultConverter[ 0 ] );
+          test.will = ext + ' encoder should use default gdf: ' + defaultConverter[ 0 ].name;
+          test.is( encoders[ ext ].gdf === defaultConverter[ 0 ] );
         }
         else
         {
           test.will = ext + ' encoder should exist';
           test.is( _.mapIs( encoders[ ext ] ) );
-          test.will = ext + ' encoder should exist and use converter: ' + converter.name;
-          test.is( encoders[ ext ].converter === converter );
+          test.will = ext + ' encoder should exist and use gdf: ' + gdf.name;
+          test.is( encoders[ ext ].gdf === gdf );
         }
 
         test.will = ext + ' encoder should have onBegin/onEnd or both';
 
-        if( _.FileWriteEncoders[ ext ] )
+        if( _.files.WriteEncoders[ ext ] )
         {
           test.is( _.routineIs( encoders[ ext ].onBegin ) );
         }
@@ -49719,8 +49718,6 @@ function EncodersGenerate( test )
     })
   }
 }
-
-//
 
 // --
 // declare
@@ -49952,9 +49949,9 @@ var Self =
     experiment2,
     hardLinkExperiment,
 
-    //static
+    // static
 
-    EncodersGenerate,
+    encodersFromGdfs,
 
   },
 

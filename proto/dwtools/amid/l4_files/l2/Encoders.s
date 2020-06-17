@@ -6,64 +6,16 @@ let _global = _global_;
 let _ = _global_.wTools;
 let Self = _global_.wTools;
 
-// _.include( 'wGdf' );
-
 // --
 // encoders
 // --
 
-// let ReadEncoders = fileRead.encoders;
-// let WriteEncoders = fileWrite.encoders;
-
-// let readJson =
-// {
-
-//   exts : [ 'json' ],
-//   forConfig : 1,
-
-//   onBegin : function( e )
-//   {
-//     _.assert( e.operation.encoding === 'json' );
-//     e.operation.encoding = 'utf8';
-//   },
-
-//   onEnd : function( e )
-//   {
-//     if( !_.strIs( e.data ) )
-//     throw _.err( '( fileRead.encoders.json.onEnd ) expects string' );
-//     e.data = _.jsonParse( e.data );
-//   },
-
-// }
-
-// //
-
-// let readJsStructure =
-// {
-
-//   exts : [ 'js','s','ss','jstruct' ],
-//   forConfig : 0,
-
-//   onBegin : function( e )
-//   {
-//     e.operation.encoding = 'utf8';
-//   },
-
-//   onEnd : function( e )
-//   {
-//     if( !_.strIs( e.data ) )
-//     throw _.err( '( fileRead.encoders.js.structure.onEnd ) expects string' );
-//     e.data = _.exec({ code : e.data, filePath : e.operation.filePath, prependingReturn : 1 });
-//   },
-
-// }
-
-//
-
 let readJsSmart =
 {
 
+  name : 'js.smart',
   exts : [ 'js','s','ss','jstruct','jslike' ],
+  criterion : { reader : true, config : true },
   forConfig : 1,
 
   onBegin : function( e )
@@ -103,7 +55,9 @@ let readJsSmart =
 let readJsNode =
 {
 
+  name : 'js.node',
   exts : [ 'js','s','ss','jstruct' ],
+  criterion : { reader : true },
   forConfig : 0,
 
   onBegin : function( e )
@@ -125,6 +79,9 @@ let readJsNode =
 let readBufferBytes =
 {
 
+  name : 'buffer.bytes',
+  criterion : { reader : true },
+
   onBegin : function( e )
   {
     _.assert( e.operation.encoding === 'buffer.bytes' );
@@ -141,80 +98,36 @@ let readBufferBytes =
 }
 
 // --
-//
-// --
-
-// let writeJsonMin =
-// {
-//   onBegin : function( e )
-//   {
-//     e.operation.data = JSON.stringify( e.operation.data );
-//     e.operation.encoding = 'utf8';
-//   }
-// }
-
-// let writeJsonFine =
-// {
-//   onBegin : function( e )
-//   {
-//     e.operation.data = _.cloneData({ src : e.operation.data });
-//     e.operation.data = _.toJson( e.operation.data, { cloning : 0 } );
-//     e.operation.encoding = 'utf8';
-//   }
-// }
-
-// let writeJsStrcuture =
-// {
-//   onBegin : function( e )
-//   {
-//     e.operation.data = _.toJs( e.data );
-//     e.operation.encoding = 'utf8';
-//   }
-// }
-
-// --
 // declare
 // --
 
-let FileReadEncoders =
-{
+// let ReadEncoders =
+// {
+//
+//   // 'js.smart' : readJsSmart,
+//   // 'js.node' : readJsNode,
+//   // 'buffer.bytes' : readBufferBytes,
+//
+// }
+//
+// let WriteEncoders =
+// {
+// }
 
-  // 'json' : readJson,
-  // 'js.structure' : readJsStructure,
-  'js.smart' : readJsSmart,
-  'js.node' : readJsNode,
-  'buffer.bytes' : readBufferBytes,
+_.files.ReadEncoders = _.files.ReadEncoders || Object.create( null );
+_.files.WriteEncoders = _.files.WriteEncoders || Object.create( null );
 
-}
+// Object.assign( _.files.ReadEncoders, ReadEncoders );
+// Object.assign( _.files.WriteEncoders, WriteEncoders );
 
-let FileWriteEncoders =
-{
-
-  // 'json' : writeJsonMin,
-  // 'json.min' : writeJsonMin,
-  // 'json.fine' : writeJsonFine,
-  // 'js.structure' : writeJsStrcuture,
-
-}
-
-_.FileReadEncoders = _.FileReadEncoders || Object.create( null );
-_.FileWriteEncoders = _.FileWriteEncoders || Object.create( null );
-
-Object.assign( _.FileReadEncoders, FileReadEncoders );
-Object.assign( _.FileWriteEncoders, FileWriteEncoders );
-
-// if( _.FileProvider && _.FileProvider.Partial && _.FileProvider.Partial.prototype.fileRead.encoders )
-// _.assert( _.isPrototypeOf( _.FileReadEncoders, _.FileProvider.Partial.prototype.fileRead.encoders ) );
-// if( _.FileProvider && _.FileProvider.Partial && _.FileProvider.Partial.prototype.fileWrite.encoders )
-// _.assert( _.isPrototypeOf( _.FileWriteEncoders, _.FileProvider.Partial.prototype.fileWrite.encoders ) );
+_.files.encoderRegister( readJsSmart );
+_.files.encoderRegister( readJsNode );
+_.files.encoderRegister( readBufferBytes );
+_.files.encodersFromGdfs(); /* xxx2 : review and probably remove! */
 
 // --
 // export
 // --
-
-// if( typeof module !== 'undefined' )
-// if( _global_.WTOOLS_PRIVATE )
-// { /* delete require.cache[ module.id ]; */ }
 
 /* xxx : clean */
 

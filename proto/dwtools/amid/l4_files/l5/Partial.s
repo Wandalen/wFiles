@@ -3726,7 +3726,7 @@ function hashRead_body( o )
   catch( err )
   {
     if( o.throwing )
-    throw _.err( 'Cant read hash of', o.filePath, '\n', err );
+    throw _.err( err, '\nCant read hash of', o.filePath );
     else
     return NaN;
   }
@@ -3737,7 +3737,7 @@ function hashRead_body( o )
     if( err )
     if( o.throwing )
     {
-      throw _.err( 'Cant read hash of', o.filePath, '\n', err );
+      throw _.err( err, '\nCant read hash of', o.filePath );
     }
     else
     {
@@ -3762,6 +3762,35 @@ having.aspect = 'body';
 
 let hashRead = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, hashRead_body );
 hashRead.having.aspect = 'entry';
+
+//
+
+function hashszRead_body( o )
+{
+  let self = this;
+  let result;
+
+  let stat = self.statRead({ filePath : o.filePath, sync : o.sync });
+  let hash = self.hashRead( o );
+
+  let ready = _.Consequence.AndKeep_( _.Consequence.From( stat ), _.Consequence.From( hash ) ).then( ( arg ) => /* xxx : remove Consequence.From */
+  {
+    return arg[ 0 ].size + '-' + arg[ 1 ];
+  });
+
+  if( o.sync )
+  return ready.sync();
+  return ready;
+}
+
+_.routineExtend( hashszRead_body, hashRead.body );
+
+var defaults = hashszRead_body.defaults;
+defaults.throwing = null;
+defaults.verbosity = null;
+
+let hashszRead = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, hashszRead_body );
+hashszRead.having.aspect = 'entry';
 
 //
 
@@ -6208,7 +6237,7 @@ function _link_functor( fop )
 
         debugger;
         c.tempRenameRevert();
-        return error( _.err( 'Cant', entryMethodName, o.dstPath, '<-', o.srcPath, '\n', err ) );
+        return error( _.err( err, '\nCant', entryMethodName, o.dstPath, '<-', o.srcPath ) );
 
       }
 
@@ -6290,7 +6319,7 @@ function _link_functor( fop )
         return c.tempRenameRevert()
         .finally( () =>
         {
-          return error( _.err( 'Cant', entryMethodName, o.dstPath, '<-', o.srcPath, '\n', err ) );
+          return error( _.err( err, '\nCant', entryMethodName, o.dstPath, '<-', o.srcPath ) );
         })
       })
 
@@ -9278,6 +9307,7 @@ let Extension =
 
   hashReadAct,
   hashRead,
+  hashszRead,
 
   dirReadAct,
   dirRead,

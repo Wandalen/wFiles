@@ -68,12 +68,16 @@ function onSuiteBegin()
   // self.provider.defaultProtocol = self.providerEffective.protocol;
 }
 
+//
+
 function onRoutineEnd( test )
 {
   let context = this;
   let provider = context.provider;
   _.sure( _.arraySetIdentical( _.mapKeys( provider.providersWithProtocolMap ), [ 'second', 'current' ] ), test.name, 'has not restored system!' );
 }
+
+//
 
 function onSuiteEnd()
 {

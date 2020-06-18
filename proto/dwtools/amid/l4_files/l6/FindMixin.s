@@ -4268,6 +4268,8 @@ function filesReflectTo_body( o )
   _.assertRoutineOptions( filesReflectTo_body, arguments );
   _.assert( !src.system || !dst.system || src.system === dst.system, 'not implemented' );
 
+  debugger;
+
   if( src.system )
   {
     system = src.system;

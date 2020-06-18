@@ -32426,6 +32426,41 @@ function filesReflectDstIgnoring( test )
 
 //
 
+function filesExtractBasic( test )
+{
+  let context = this;
+  // let provider = context.provider;
+  // let system = context.system;
+  // let path = context.provider.path;
+  // let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
+
+  /* */
+
+  test.case = 'basic';
+
+  var extract1 = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+    },
+  });
+
+  extract1.filesReflectTo( provider, routinePath );
+
+  var gotTree = provider.filesExtract( routinePath );
+
+  /* qqq2 : implement please test routine
+      construct a system from 2 providers( of current type! )
+      call system.filesExtract( filePath );
+      must be an issue!
+  */
+
+  /* */
+
+}
+
+//
+
 function filesDeleteTrivial( test )
 {
   let context = this;
@@ -37123,6 +37158,7 @@ var Self =
     filesReflectToWithSoftLinksRebasing, /* qqq : implement filesReflectToWithTextLinksRebasing */
     filesReflectToWithSoftLinksResolving, /* qqq : implement filesReflectToWithTextLinksResolving */
     filesReflectDstIgnoring,
+    filesExtractBasic,
 
     filesDeleteTrivial,
     filesDelete,

@@ -1104,6 +1104,31 @@ configRead.having.aspect = 'entry';
 
 //
 
+function configUserPath( o )
+{
+  let self = this;
+  let path = self.path;
+
+  if( !_.mapIs( o ) )
+  o = { name : o }
+
+  o = _.routineOptions( configUserPath, o );
+  _.assert( _.strDefined( o.name ) );
+
+  let userPath = path.dirUserHome();
+  let filePath = path.join( userPath, o.dirPath, o.name );
+
+  return filePath;
+}
+
+configUserPath.defaults =
+{
+  dirPath : '.',
+  name : '.wenv.yml',
+}
+
+//
+
 function configUserRead( o )
 {
   let self = this;
@@ -1113,10 +1138,8 @@ function configUserRead( o )
   o = { name : o }
 
   o = _.routineOptions( configUserRead, o );
-  _.assert( _.strDefined( o.name ) );
 
-  let userPath = path.dirUserHome();
-  let filePath = path.join( userPath, o.dirPath, o.name );
+  let filePath = self.configUserPath( o );
 
   return self.configRead
   ({
@@ -1128,8 +1151,7 @@ function configUserRead( o )
 
 configUserRead.defaults =
 {
-  dirPath : '.',
-  name : '.wenv.yml',
+  ... configUserPath.defaults,
 }
 
 //
@@ -1142,11 +1164,9 @@ function configUserWrite( o )
   if( !_.mapIs( o ) )
   o = { name : arguments[ 0 ], structure : arguments[ 1 ] }
   o = _.routineOptions( configUserWrite, o );
-  _.assert( _.strDefined( o.name ) );
   _.assert( o.structure !== null );
 
-  let userPath = path.dirUserHome();
-  let filePath = path.join( userPath, o.dirPath, o.name );
+  let filePath = self.configUserPath( _.mapBut( o, [ 'structure' ] ) );
 
   return self.fileWrite
   ({
@@ -1159,9 +1179,8 @@ function configUserWrite( o )
 
 configUserWrite.defaults =
 {
-  dirPath : '.',
+  ... configUserPath.defaults,
   structure : null,
-  name : '.wenv.yml',
 }
 
 //
@@ -1308,6 +1327,7 @@ let Supplement =
   configFind,
   configRead,
 
+  configUserPath, /* qqq : cover */
   configUserRead, /* qqq : cover */
   configUserWrite, /* qqq : cover */
 
@@ -1334,7 +1354,6 @@ _.classDeclare
 
 _.FileProvider = _.FileProvider || Object.create( null );
 _.FileProvider[ Self.shortName ] = Self;
-
 _.FileProvider.Secondary.mixin( Partial );
 
 _.assert( !!_.FileProvider.Partial.prototype.configUserRead );

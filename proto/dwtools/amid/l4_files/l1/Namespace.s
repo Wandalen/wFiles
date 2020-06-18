@@ -661,7 +661,7 @@ function encoderReaderFromGdf( gdf )
     if( expectsString )
     e.operation.encoding = 'utf8';
     else
-    e.operation.encoding = op.encoder.gdf.in[ 0 ];
+    e.operation.encoding = e.encoder.gdf.in[ 0 ];
   }
 
   encoder.onEnd = function( op ) /* xxx : should be onData */

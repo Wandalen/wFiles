@@ -1471,6 +1471,7 @@ function fileWriteActSync( test )
   return;
 
   var isHd = test.context.providerIsInstanceOf( _.FileProvider.HardDrive );
+  var isSystem = provider instanceof _.FileProvider.System;
 
   let data = 'Test data'
 
@@ -1491,7 +1492,7 @@ function fileWriteActSync( test )
 
   if( Config.debug )
   if( process.platform === 'win32' )
-  if( isHd )
+  if( !isSystem && isHd )
   {
     test.case = 'native path, call fileWrite_body'
     var filePath = test.context.pathFor( 'write_test/file' );
@@ -1521,6 +1522,8 @@ function fileWriteActAsync( test )
   return;
 
   var isHd = test.context.providerIsInstanceOf( _.FileProvider.HardDrive );
+  var isSystem = provider instanceof _.FileProvider.System;
+  
   let data = 'Test data'
 
   let ready = new _.Consequence().take( null )
@@ -1549,7 +1552,7 @@ function fileWriteActAsync( test )
 
   if( Config.debug )
   if( process.platform === 'win32' )
-  if( isHd )
+  if( !isSystem && isHd )
   ready.finally( () =>
   {
     test.case = 'native path, call fileWrite_body'
@@ -15023,6 +15026,7 @@ function fileDeleteActSync( test )
 
   //
 
+  if( !self.providerIsInstanceOf( _.FileProvider.System ) )
   if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   {
     test.case = 'should expect normalized path, but not nativized';
@@ -15571,6 +15575,8 @@ function fileDeleteFileWithSpecialSymbols( test )
     test.identical( 1,1 );
     return;
   }
+  
+  let isHd = test.context.providerIsInstanceOf( _.FileProvider.HardDrive );
 
   var routinePath = test.context.pathFor( 'written/fileDeleteFileWithSpecialSymbols' );
   if( !provider.statResolvedRead( routinePath ) )
@@ -15603,7 +15609,7 @@ function fileDeleteFileWithSpecialSymbols( test )
 
   test.case = 'filename contains ?, global path'
   var filePath = provider.path.join( routinePath, '?file=a' );
-  if( process.platform === 'win32')
+  if( process.platform === 'win32' && isHd )
   test.shouldThrowErrorSync( () => 
   {
     provider.fileWrite( filePath, filePath );
@@ -15617,7 +15623,7 @@ function fileDeleteFileWithSpecialSymbols( test )
 
   test.case = 'filename contains ?, local path'
   var filePath = provider.path.join( routinePath, '?file=a' );
-  if( process.platform === 'win32')
+  if( process.platform === 'win32' && isHd )
   test.shouldThrowErrorSync( () => 
   {
     provider.fileWrite( filePath, filePath );
@@ -18135,6 +18141,7 @@ function statReadActSync( test )
 
   //
 
+  if( !test.context.providerIsInstanceOf( _.FileProvider.System ) )
   if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   {
     var o =
@@ -24982,12 +24989,15 @@ function softLinkActSync( test )
   var originalPath = provider.path.preferredFromGlobal( o.srcPath );
   o.srcPath = provider.path.nativize( o.srcPath );
   o.dstPath = provider.path.nativize( o.dstPath );
-  if( o.srcPath !== originalPath )
+  if( !( provider instanceof _.FileProvider.System ) )
   {
-    test.shouldThrowErrorOfAnyKind( () =>
+    if( o.srcPath !== originalPath )
     {
-      provider.softLinkAct( o );
-    })
+      test.shouldThrowErrorOfAnyKind( () =>
+      {
+        provider.softLinkAct( o );
+      })
+    }
   }
   else
   {
@@ -49802,7 +49812,7 @@ var Self =
     fileDeleteSync,
     fileDeleteActSync,
     fileDeleteAsync,
-    fileDeleteLocked,
+    // fileDeleteLocked
     fileDeleteFileWithSpecialSymbols,
     fileDeletePerfomance,
 

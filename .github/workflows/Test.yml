@@ -38,10 +38,7 @@ jobs :
       with :
         node-version : ${{ matrix.node-version }}
     - run : npm i
-    - run : node proto/dwtools/amid/l4_files.test/HardDrive.test.ss r:fileDeleteFileWithSpecialSymbols v:10
-    - run : node proto/dwtools/amid/l4_files.test/HardDrive.test.ss r:hardLinkMultipleSync v:10
-    - run : node proto/dwtools/amid/l4_files.test/HardDrive.test.ss r:pathNativize v:10
-    - run : node proto/dwtools/amid/l4_files.test/System.HardDrive.test.ss r:softLinkActSync v:10
+    - run : npm test
 
   Full :
     if : "startsWith( github.event.head_commit.message, 'version' )"

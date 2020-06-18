@@ -15456,6 +15456,8 @@ function fileDeleteAsync( test )
 
 //
 
+// qqq Vova:investigate why fileDeleteLocked fails when executed with other tests
+
 function fileDeleteLocked( test )
 {
   let self = this;

@@ -173,12 +173,12 @@ function readerFromGdf( gdf )
   encoder.criterion.reader = true;
   let expectsString = _.longHas( gdf.in, 'string' );
 
-  encoder.onBegin = function( e )
+  encoder.onBegin = function( op )
   {
     if( expectsString )
-    e.operation.encoding = 'utf8';
+    op.operation.encoding = 'utf8';
     else
-    e.operation.encoding = op.encoder.gdf.in[ 0 ];
+    op.operation.encoding = op.encoder.gdf.in[ 0 ];
   }
 
   encoder.onEnd = function( op ) /* zzz : should be onData */

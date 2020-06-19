@@ -672,6 +672,7 @@ let Restricts =
 
 _.mapSupplement( _.files._, Restricts );
 
+let Files =
 {
 
   // regexp
@@ -700,7 +701,7 @@ _.mapSupplement( _.files._, Restricts );
 
 }
 
-_.mapSupplement( _.files, Extension );
+_.mapSupplement( _.files, Files );
 
 // --
 // export

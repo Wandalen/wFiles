@@ -20,12 +20,9 @@ _.assert( _.objectIs( Self ) );
  * @module Tools/mid/Files
  */
 
-let _pathRealMainFile;
 function realMainFile()
 {
-  if( _pathRealMainFile ) return _pathRealMainFile;
-  _pathRealMainFile = this.normalize( require.main.filename );
-  return _pathRealMainFile;
+  return _.process.realMainFile();
 }
 
 //
@@ -38,18 +35,9 @@ function realMainFile()
  * @module Tools/mid/Files
  */
 
-let _pathRealMainDir;
 function realMainDir()
 {
-  if( _pathRealMainDir )
-  return _pathRealMainDir;
-
-  if( require.main )
-  _pathRealMainDir = this.normalize( this.dir( require.main.filename ) );
-  else
-  return this.effectiveMainFile();
-
-  return _pathRealMainDir;
+  return _.process.realMainDir();
 }
 
 //
@@ -63,38 +51,10 @@ function realMainDir()
  * @module Tools/mid/Files
  */
 
-let effectiveMainFile = ( function effectiveMainFile()
+function effectiveMainFile()
 {
-  let result = '';
-
-  return function effectiveMainFile() /* qqq2 : move to process, review */
-  {
-    _.assert( !!this.fileProvider );
-    _.assert( arguments.length === 0, 'Expects no arguments' );
-
-    if( result )
-    return result;
-
-    if( process.argv[ 0 ] || process.argv[ 1 ] )
-    {
-      result = this.join( this.currentAtBegin, process.argv[ 1 ] || process.argv[ 0 ] );
-      result = this.resolve( result );
-    }
-
-    if( !this.fileProvider.statResolvedRead( result ) )
-    {
-      debugger;
-      console.error( 'process.argv :', process.argv.join( ', ' ) );
-      console.error( 'currentAtBegin :', this.currentAtBegin );
-      console.error( 'effectiveMainFile.raw :', this.join( this.currentAtBegin, process.argv[ 1 ] || process.argv[ 0 ] ) );
-      console.error( 'effectiveMainFile :', result );
-      result = this.realMainFile();
-    }
-
-    return result;
-  }
-
-})()
+  return _.process.effectiveMainFile();
+}
 
 //
 
@@ -385,8 +345,12 @@ function pathDirTempOpen( o )
     count[ result ].push( o.filePath );
 
     cache[ o.filePath ] = result;
-
+    
+    if( !o.returnResolved )
     return result;
+    
+    result = self.fileProvider.pathResolveLinkFull({ filePath : result, resolvingSoftLink : 1 });
+    return result.absolutePath;
   }
 }
 
@@ -394,6 +358,7 @@ pathDirTempOpen.defaults =
 {
   filePath : null,
   name : null,
+  returnResolved : 0,
   auto : 1
 }
 

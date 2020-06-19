@@ -20,7 +20,6 @@ let _ = _global_.wTools;
 function onSuiteBegin( test )
 {
   let context = this;
-  let path = context.provider.path;
 }
 
 //
@@ -4815,7 +4814,6 @@ function fileCopyActSync( test )
     dstPath,
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
-    breakingDstHardLink : 0,
     sync : 1,
     redundant : 'redundant'
   }
@@ -4836,7 +4834,6 @@ function fileCopyActSync( test )
     dstPath,
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
-    breakingDstHardLink : 0,
     sync : 1
   }
   if( !self.providerIsInstanceOf( _.FileProvider.System ) )
@@ -4856,7 +4853,6 @@ function fileCopyActSync( test )
     dstPath,
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
-    breakingDstHardLink : 0,
     sync : 1
   }
   var expected = _.mapExtend( null, o );

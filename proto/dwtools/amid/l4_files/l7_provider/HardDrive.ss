@@ -1547,7 +1547,7 @@ function fileCopyAct( o )
   // if( o.breakingDstHardLink && self.isHardLink( o.dstPath ) ) /* qqq2 : remove option breakingDstHardLink from Act routine aaa:done */
   // self.hardLinkBreak({ filePath : o.dstPath, sync : 1 });
 
-  if( self.isSoftLink( o.srcPath ) ) /* qqq2 : should not be here. move to partial */
+  if( self.isSoftLink( o.srcPath ) ) /* qqq2 : should not be here. move to partial aaa: should be here becase Extract has more optiomal implementation of this case */
   {
     if( self.fileExistsAct({ filePath : o.dstPath }) )
     self.fileDeleteAct({ filePath : o.dstPath, sync : 1 })

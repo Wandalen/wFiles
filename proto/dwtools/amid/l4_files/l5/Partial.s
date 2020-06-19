@@ -4537,7 +4537,7 @@ function fileWrite_body( o )
 
   o.encoding = o.encoding || self.encoding;
   if( o.encoding === _.unknown )
-  o.encoding = _.files.encoderDeduce({ filePath : o.filePath, returning : 'name', criterion : { writer : true } });
+  o.encoding = _.files.encoder.deduce({ filePath : o.filePath, returning : 'name', criterion : { writer : true } });
   let encoder = _.files.WriteEncoders[ o.encoding ];
 
   let o2 = _.mapOnly( o, self.fileWriteAct.defaults );

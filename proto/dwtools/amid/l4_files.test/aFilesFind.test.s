@@ -32429,30 +32429,148 @@ function filesReflectDstIgnoring( test )
 function filesExtractBasic( test )
 {
   let context = this;
-  // let provider = context.provider;
-  // let system = context.system;
-  // let path = context.provider.path;
-  // let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
-
-  /* */
-
-  test.case = 'basic';
-
-  var extract1 = _.FileProvider.Extract
+  let provider = context.provider;
+  let path = context.provider.path;
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
+  
+  var tree1 = _.FileProvider.Extract
   ({
     filesTree :
     {
-    },
+      'file1' : 'file1'
+    }
+  })
+  var tree2 = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      'file2' : 'file2'
+    }
+  })
+  
+  /* */
+  
+  test.case = 'two providers, no default provider, global path';
+  
+  var hub = _.FileProvider.System({ providers : [] });
+  var provider1 = new context.provider.constructor({ protocol : 'ext1' }).providerRegisterTo( hub );
+  var provider2 = new context.provider.constructor({ protocol : 'ext2' }).providerRegisterTo( hub );
+  
+  tree1.filesReflectTo( provider1, routinePath );
+  tree2.filesReflectTo( provider2, routinePath );
+  
+  var filePath = provider1.path.globalFromPreferred( routinePath );
+  var gotTree = hub.filesExtract( filePath );
+  test.is( gotTree instanceof _.FileProvider.Extract );
+  test.identical( gotTree.filesTree, tree1.filesTree );
+  test.notIdentical( gotTree, provider1 )
+  
+  var filePath = provider2.path.globalFromPreferred( routinePath );
+  var gotTree = hub.filesExtract( filePath );
+  test.is( gotTree instanceof _.FileProvider.Extract );
+  test.identical( gotTree.filesTree, tree2.filesTree );
+  test.notIdentical( gotTree, provider2 );
+  
+  provider1.finit();
+  provider2.finit();
+  hub.finit();
+  
+  /* */
+  
+  test.case = 'two providers, default provider, local path';
+  
+  var hub = _.FileProvider.System({ providers : [] });
+  var provider1 = new context.provider.constructor({ protocol : 'ext1' }).providerRegisterTo( hub );
+  var provider2 = new context.provider.constructor({ protocol : 'ext2' }).providerRegisterTo( hub );
+  hub.defaultProvider = provider1;
+  tree1.filesReflectTo( provider1, routinePath );
+  tree2.filesReflectTo( provider2, routinePath );
+  var gotTree = hub.filesExtract( routinePath );
+  test.is( gotTree instanceof _.FileProvider.Extract );
+  test.identical( gotTree.filesTree, tree1.filesTree );
+  test.notIdentical( gotTree, provider1 )
+  
+  provider1.finit();
+  provider2.finit();
+  hub.finit();
+  
+  /* */
+
+  test.case = 'two providers, dst : localPath';
+
+  var hub = _.FileProvider.System({ providers : [] });
+  var provider1 = new context.provider.constructor({ protocol : 'ext1' }).providerRegisterTo( hub );
+  var provider2 = new context.provider.constructor({ protocol : 'ext2' }).providerRegisterTo( hub );
+  tree1.filesReflectTo( provider1, routinePath );
+  tree2.filesReflectTo( provider2, routinePath );
+  var srcFilePath = provider1.path.globalFromPreferred( routinePath );
+  var gotTree = hub.filesExtract({ src : srcFilePath, dst : routinePath });
+  test.is( gotTree instanceof _.FileProvider.Extract );
+  test.identical( gotTree.filesTree, provider1.filesTree );
+  test.is( gotTree.filesTree !== provider1.filesTree );
+  test.notIdentical( gotTree, provider1 )
+  
+  provider1.finit();
+  provider2.finit();
+  hub.finit();
+  
+  /* */
+
+  if( !Config.debug )
+  {
+    tree1.finit();
+    tree2.finit();
+    return;
+  }
+
+  /* */
+  
+  test.case = 'two providers, no default provider, local path';
+
+  var hub = _.FileProvider.System({ providers : [] });
+  var provider1 = new context.provider.constructor({ protocol : 'ext1' }).providerRegisterTo( hub );
+  var provider2 = new context.provider.constructor({ protocol : 'ext2' }).providerRegisterTo( hub );
+  test.shouldThrowErrorSync( () => 
+  {
+    hub.filesExtract( routinePath );
   });
+  provider1.finit();
+  provider2.finit();
+  hub.finit();
+  
+  /* */
+  
+  test.case = 'two providers, dst : globalPath to different provider';
 
-  extract1.filesReflectTo( provider, routinePath );
-
-  var gotTree = provider.filesExtract( routinePath );
-
+  var hub = _.FileProvider.System({ providers : [] });
+  var provider1 = new context.provider.constructor({ protocol : 'ext1' }).providerRegisterTo( hub );
+  var provider2 = new context.provider.constructor({ protocol : 'ext2' }).providerRegisterTo( hub );
+  var srcFilePath = provider1.path.globalFromPreferred( routinePath );
+  var dstFilePath = provider2.path.globalFromPreferred( routinePath );
+  test.shouldThrowErrorSync( () => 
+  {
+    hub.filesExtract({ src : srcFilePath, dst : dstFilePath });
+  });
+  
+  provider1.finit();
+  provider2.finit();
+  hub.finit();
+  
+  /* */
+  
+  
+  tree1.finit();
+  tree2.finit();
+  
+  
   /* qqq2 : implement please test routine
       construct a system from 2 providers( of current type! )
       call system.filesExtract( filePath );
       must be an issue!
+    aaa Vova: 
+      added test cases
+      fixed the issue
+      extended routine filesReflectTo with asserts to check that src/dst path reffers to right src/dst provider
   */
 
   /* */

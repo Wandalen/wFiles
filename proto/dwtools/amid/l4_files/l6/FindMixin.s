@@ -4264,7 +4264,12 @@ function filesReflectTo_body( o )
   let dst = o.dstProvider;
   let system;
   let result;
-
+  
+  if( src instanceof _.FileProvider.System )
+  src = src.providerForPath( o.src );
+  
+  _.assert( !( src instanceof _.FileProvider.System ) && src instanceof _.FileProvider.Abstract, 'Source provider should be an instance of _.FileProvider.Abstract' )
+  
   _.assertRoutineOptions( filesReflectTo_body, arguments );
   _.assert( !src.system || !dst.system || src.system === dst.system, 'not implemented' );
 
@@ -4311,10 +4316,16 @@ function filesReflectTo_body( o )
 
     // let filePath = { [ src.path.globalFromPreferred( o.srcPath ) ] : dst.path.globalFromPreferred( o.dstPath ) }
     // let filePath = { [ src.path.globalFromPreferred( o.src ) ] : dst.path.globalFromPreferred( o.dst ) }
-
+    
+    if( Config.debug )
+    {
+      let dstProvider = system.providerForPath( dst.path.globalFromPreferred( o.dst ) );
+      _.assert( dstProvider === dst, `Dst path: ${o.dst} reffers to different dst provider: ${dstProvider.protocol}, routine expects: ${dst.protocol}` );
+    }
+    
     o.src = src.recordFilter( o.src );
     o.dst = dst.recordFilter( o.dst );
-
+    
     let o2 = _.mapOnly( o, filesReflect.defaults );
 
     // o2.reflectMap = filePath;

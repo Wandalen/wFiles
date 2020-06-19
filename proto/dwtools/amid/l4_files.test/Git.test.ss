@@ -28,8 +28,6 @@ function onSuiteBegin( test )
   context.system.defaultProvider = context.providerDst;
 
   context.suiteTempPath = context.providerDst.path.pathDirTempOpen( context.providerDst.path.join( __dirname, '../..'  ),'FileProviderGit' );
-  context.suiteTempPath = context.providerDst.pathResolveLinkFull({ filePath : context.suiteTempPath, resolvingSoftLink : 1 });
-  context.suiteTempPath = context.suiteTempPath.absolutePath;
 
   if( RunningInsideTestContainer )
   {

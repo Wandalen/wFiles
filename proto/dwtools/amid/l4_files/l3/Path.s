@@ -8,33 +8,40 @@ let Self = _global_.wTools.path;
 
 _.assert( _.objectIs( Self ) );
 
-// --
-// functor
-// --
+let vectorizeKeysAndVals = _.files._.vectorizeKeysAndVals;
+let vectorize = _.files._.vectorize;
+let vectorizeAll = _.files._.vectorizeAll;
+let vectorizeAny = _.files._.vectorizeAny;
+let vectorizeNone = _.files._.vectorizeNone;
 
-function _vectorizeKeysAndVals( routine, select ) /* xxx : move out */
-{
-  select = select || 1;
-
-  let routineName = routine.name;
-
-  _.assert( _.routineIs( routine ) );
-  _.assert( _.strDefined( routineName ) );
-  _.assert( arguments.length === 1 || arguments.length === 2 );
-
-  let routine2 = _.routineVectorize_functor
-  ({
-    routine : [ routineName ],
-    vectorizingArray : 1,
-    vectorizingMapVals : 1,
-    vectorizingMapKeys : 1,
-    select : select,
-  });
-
-  _.routineExtend( routine2, routine );
-
-  return routine2;
-}
+// // --
+// // functor
+// // --
+//
+// function _vectorizeKeysAndVals( routine, select ) /* xxx : move out */
+// {
+//   select = select || 1;
+//
+//   let routineName = routine.name;
+//
+//   _.assert( _.routineIs( routine ) );
+//   _.assert( _.strDefined( routineName ) );
+//   _.assert( arguments.length === 1 || arguments.length === 2 );
+//
+//   let routine2 = _.routineVectorize_functor
+//   ({
+//     routine : [ routineName ],
+//     vectorizingArray : 1,
+//     vectorizingMapVals : 1,
+//     vectorizingMapKeys : 1,
+//     select : select,
+//   });
+//
+//   _.routineExtend( routine2, routine );
+//
+//   return routine2;
+// }
+// zzz : clean
 
 // --
 // routines
@@ -220,9 +227,9 @@ let Extension =
   from,
 
   preferredFromGlobal,
-  localsFromGlobals : _vectorizeKeysAndVals( preferredFromGlobal ),
+  localsFromGlobals : vectorizeKeysAndVals( preferredFromGlobal ),
   globalFromPreferred,
-  globalsFromLocals : _vectorizeKeysAndVals( globalFromPreferred ),
+  globalsFromLocals : vectorizeKeysAndVals( globalFromPreferred ),
 
   nativize,
   current,

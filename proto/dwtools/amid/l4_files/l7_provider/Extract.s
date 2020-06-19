@@ -2275,6 +2275,7 @@ function _descriptorIsScript( file )
     _.assert( file.length === 1 );
     file = file[ 0 ];
   }
+
   _.assert( !!file );
   return !!file.code;
 }
@@ -2677,7 +2678,7 @@ let Statics =
   _descriptorIsHardLink,
   _descriptorIsTextLink,
 
-  _descriptorScriptMake,
+  _descriptorScriptMake, /* xxx : deprecate */
   _descriptorSoftLinkMake,
   _descriptorHardLinkMake,
 

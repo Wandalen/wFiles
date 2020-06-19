@@ -184,17 +184,19 @@ function hashStatFrom( stat )
 let Tools =
 {
   fileStatIs,
-  // different, /* xxx : move */
+  // different,
   // areHardLinked,
   // hashStatFrom,
 }
+
+/* zzz : clean */
 
 _.mapExtend( _, Tools );
 
 let Stat =
 {
   is : fileStatIs,
-  different, /* xxx : move */
+  different,
   areHardLinked,
   hashStatFrom,
 }

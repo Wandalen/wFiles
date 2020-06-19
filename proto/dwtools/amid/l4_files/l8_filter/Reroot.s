@@ -51,7 +51,6 @@ function pathNativizeAct( filePath )
 {
   var self = this;
 
-  // debugger; xxx
   _.assert( arguments.length === 1 );
 
   filePath = self.path.rebase( filePath, self.oldPath, self.newPath );
@@ -88,18 +87,10 @@ var Restricts =
 // declare
 // --
 
-// var Extend =
-// {
-//   // _initReroot : _initReroot,
-// }
-
-//
-
 var Extension =
 {
 
   init : init,
-  // _initReroot : _initReroot,
 
   pathNativizeAct : pathNativizeAct,
 
@@ -112,6 +103,9 @@ var Extension =
   Restricts : Restricts,
 
 }
+
+/* qqq : normalize styles */
+/* qqq : implement basic test */
 
 //
 

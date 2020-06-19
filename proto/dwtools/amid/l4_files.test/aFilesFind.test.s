@@ -24465,6 +24465,129 @@ function filesReflectLinked( test )
 
 //
 
+function filesReflectSrcAndDstLinked( test )
+{
+  let context = this;
+  let provider = context.provider;
+  let system = context.system;
+  let path = context.provider.path;
+
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
+  var srcPath = path.join( routinePath, 'src' );
+  var dstPath = path.join( routinePath, 'dst' );
+
+  /* - */
+
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath )
+  provider.hardLink
+  ({
+    srcPath : srcPath,
+    dstPath : dstPath
+  })
+  
+  var srcStat = provider.statResolvedRead( srcPath );
+  var dstStat = provider.statResolvedRead( dstPath );
+  
+  provider.filesReflect
+  ({
+    reflectMap : { [ srcPath ] : dstPath },
+    linking : 'hardLink'
+  });
+  
+  var srcStat2 = provider.statResolvedRead( srcPath );
+  var dstStat2 = provider.statResolvedRead( dstPath );
+  
+  test.identical( srcStat.amtime, srcStat2.amtime )
+  test.identical( srcStat.birthtime, srcStat2.birthtime )
+  test.identical( srcStat.ctime, srcStat2.ctime )
+  test.identical( srcStat.mtime, srcStat2.mtime )
+  
+  test.identical( dstStat.amtime, dstStat2.amtime )
+  test.identical( dstStat.birthtime, dstStat2.birthtime )
+  test.identical( dstStat.ctime, dstStat2.ctime )
+  test.identical( dstStat.mtime, dstStat2.mtime )
+  
+  test.is( provider.filesAreHardLinked([ srcPath, dstPath ]) );
+  
+  /* - */
+
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath )
+  provider.softLink
+  ({
+    srcPath : srcPath,
+    dstPath : dstPath
+  })
+  
+  var srcStat = provider.statResolvedRead( srcPath );
+  var dstStat = provider.statResolvedRead( dstPath );
+  
+  provider.filesReflect
+  ({
+    reflectMap : { [ srcPath ] : dstPath },
+    linking : 'softLink'
+  });
+  
+  var srcStat2 = provider.statResolvedRead( srcPath );
+  var dstStat2 = provider.statResolvedRead( dstPath );
+  
+  test.identical( srcStat.amtime, srcStat2.amtime )
+  test.identical( srcStat.birthtime, srcStat2.birthtime )
+  test.identical( srcStat.ctime, srcStat2.ctime )
+  test.identical( srcStat.mtime, srcStat2.mtime )
+  
+  test.identical( dstStat.amtime, dstStat2.amtime )
+  test.identical( dstStat.birthtime, dstStat2.birthtime )
+  test.identical( dstStat.ctime, dstStat2.ctime )
+  test.identical( dstStat.mtime, dstStat2.mtime )
+  
+  test.is( provider.filesAreSoftLinked([ srcPath, dstPath ]) );
+  
+  /* - */
+  
+  provider.fieldPush( 'usingTextLink', 1 );
+
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath )
+  provider.textLink
+  ({
+    srcPath : srcPath,
+    dstPath : dstPath
+  })
+  
+  var srcStat = provider.statResolvedRead( srcPath );
+  var dstStat = provider.statResolvedRead( dstPath );
+  
+  provider.filesReflect
+  ({
+    reflectMap : { [ srcPath ] : dstPath },
+    linking : 'textLink'
+  });
+  
+  var srcStat2 = provider.statResolvedRead( srcPath );
+  var dstStat2 = provider.statResolvedRead( dstPath );
+  
+  test.identical( srcStat.amtime, srcStat2.amtime )
+  test.identical( srcStat.birthtime, srcStat2.birthtime )
+  test.identical( srcStat.ctime, srcStat2.ctime )
+  test.identical( srcStat.mtime, srcStat2.mtime )
+  
+  test.identical( dstStat.amtime, dstStat2.amtime )
+  test.identical( dstStat.birthtime, dstStat2.birthtime )
+  test.identical( dstStat.ctime, dstStat2.ctime )
+  test.identical( dstStat.mtime, dstStat2.mtime )
+  
+  test.is( provider.filesAreTextLinked([ srcPath, dstPath ]) );
+  
+  provider.fieldPop( 'usingTextLink', 1 );
+  
+}
+
+filesReflectSrcAndDstLinked.timeOut = 30000;
+
+//
+
 function filesReflectLinkedExperiment( test )
 {
   let context = this;
@@ -37283,6 +37406,7 @@ var Self =
     filesReflectOnlyPreservingEmpty,
     filesReflectDstDeletingDirs,
     filesReflectLinked,
+    filesReflectSrcAndDstLinked,
     filesReflectTo,
     filesReflectToWithSoftLinks, /* qqq : implement filesReflectToWithTextLinks */
     filesReflectToWithSoftLinksRebasing, /* qqq : implement filesReflectToWithTextLinksRebasing */

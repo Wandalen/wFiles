@@ -27,7 +27,7 @@ function onSuiteBegin( test )
   context.system = _.FileProvider.System({ providers : [ context.providerSrc, context.providerDst ] });
   context.system.defaultProvider = context.providerDst;
 
-  context.suiteTempPath = context.provider.path.pathDirTempOpen( context.provider.path.join( __dirname, '../..'  ),'FileProviderGit' );
+  context.suiteTempPath = context.providerDst.path.pathDirTempOpen( context.providerDst.path.join( __dirname, '../..'  ),'FileProviderGit' );
   context.suiteTempPath = context.providerDst.pathResolveLinkFull({ filePath : context.suiteTempPath, resolvingSoftLink : 1 });
   context.suiteTempPath = context.suiteTempPath.absolutePath;
 
@@ -51,7 +51,6 @@ function onSuiteBegin( test )
 function onSuiteEnd( test )
 {
   let context = this;
-  let path = context.providerDst.path;
 
   if( RunningInsideTestContainer )
   {
@@ -60,7 +59,7 @@ function onSuiteEnd( test )
   }
 
   _.assert( _.strHas( context.suiteTempPath, 'FileProviderGit' ), context.suiteTempPath );
-  path.pathDirTempClose( context.suiteTempPath );
+  context.providerDst.path.pathDirTempClose( context.suiteTempPath );
 }
 
 // --

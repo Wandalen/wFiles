@@ -7800,8 +7800,6 @@ defaults.srcPath = null;
 // defaults.originalSrcPath = null;
 defaults.relativeDstPath = null;
 defaults.relativeSrcPath = null;
-// defaults.breakingSrcHardLink = 0;
-// defaults.breakingDstHardLink = 1;
 defaults.sync = null;
 
 var having = hardLinkAct.having = Object.create( null );

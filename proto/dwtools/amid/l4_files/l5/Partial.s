@@ -6,7 +6,6 @@ let _global = _global_;
 let _ = _global_.wTools;
 
 _.assert( !!_.FileProvider.Abstract );
-// _.assert( !!_.FileProvider.Abstract2 );
 _.assert( !_.FileProvider.Partial );
 _.assert( _.routineIs( _.routineVectorize_functor ) );
 _.assert( _.routineIs( _.path.join ) );
@@ -91,7 +90,7 @@ function wFileProviderPartial( o )
 Self.shortName = 'Partial';
 
 // --
-// shortcuts
+// meta
 // --
 
 let vectorizeKeysAndVals = _.files._.vectorizeKeysAndVals;
@@ -99,113 +98,6 @@ let vectorize = _.files._.vectorize;
 let vectorizeAll = _.files._.vectorizeAll;
 let vectorizeAny = _.files._.vectorizeAny;
 let vectorizeNone = _.files._.vectorizeNone;
-
-// function _vectorizeKeysAndVals( routine, select )
-// {
-//   select = select || 1;
-//
-//   let routineName = routine.name;
-//
-//   _.assert( _.routineIs( routine ) );
-//   _.assert( _.strDefined( routineName ) );
-//   _.assert( arguments.length === 1 || arguments.length === 2 );
-//
-//   let routine2 = _.routineVectorize_functor
-//   ({
-//     routine : [ routineName ],
-//     vectorizingArray : 1,
-//     vectorizingMapVals : 1,
-//     vectorizingMapKeys : 1,
-//     select : select,
-//   });
-//
-//   _.routineExtend( routine2, routine );
-//
-//   return routine2;
-// }
-//
-// //
-//
-// function vectorize( routine, select )
-// {
-//   select = select || 1;
-//
-//   let routineName = routine.name;
-//
-//   _.assert( _.routineIs( routine ) );
-//   _.assert( _.strDefined( routineName ) );
-//   _.assert( arguments.length === 1 || arguments.length === 2 );
-//
-//   let routine2 = _.routineVectorize_functor
-//   ({
-//     routine : [ routineName ],
-//     vectorizingArray : 1,
-//     vectorizingMapVals : 0,
-//     vectorizingMapKeys : 0,
-//     select : select,
-//   });
-//
-//   _.routineExtend( routine2, routine );
-//
-//   return routine2;
-// }
-//
-// //
-//
-// function vectorizeAll( routine, select )
-// {
-//   _.assert( arguments.length === 1 || arguments.length === 2 );
-//   let routine2 = vectorize( routine, select );
-//   _.routineExtend( all, routine );
-//   return all;
-//
-//   /* */
-//
-//   function all()
-//   {
-//     let result = routine2.apply( this, arguments );
-//     return _.all( result );
-//   }
-//
-// }
-//
-// //
-//
-// function vectorizeAny( routine, select )
-// {
-//   _.assert( arguments.length === 1 || arguments.length === 2 );
-//   let routine2 = vectorize( routine, select );
-//   _.routineExtend( any, routine );
-//   return any;
-//
-//   /* */
-//
-//   function any()
-//   {
-//     let result = routine2.apply( this, arguments );
-//     return _.any( result );
-//   }
-//
-// }
-//
-// //
-//
-// function vectorizeNone( routine, select )
-// {
-//   _.assert( arguments.length === 1 || arguments.length === 2 );
-//   let routine2 = vectorize( routine, select );
-//   _.routineExtend( none, routine );
-//   return none;
-//
-//   /* */
-//
-//   function none()
-//   {
-//     let result = routine2.apply( this, arguments );
-//     return _.none( result );
-//   }
-//
-// }
 
 // --
 // inter
@@ -789,9 +681,6 @@ pathResolveSoftLinkAct.name = 'pathResolveSoftLinkAct';
 
 var defaults = pathResolveSoftLinkAct.defaults = Object.create( null );
 defaults.filePath = null;
-// defaults.resolvingMultiple = 0;
-/* qqq : rename option resolvingMultiple to recursive and teach all routines to accept 3 values 0, 1, 2 */
-// defaults.resolvingIntermediateDirectories = 0;
 
 var having = pathResolveSoftLinkAct.having = Object.create( null );
 having.writing = 0;
@@ -959,8 +848,6 @@ pathResolveTextLinkAct.name = 'pathResolveTextLinkAct';
 
 var defaults = pathResolveTextLinkAct.defaults = Object.create( null );
 defaults.filePath = null;
-// defaults.resolvingMultiple = 0;
-// defaults.resolvingIntermediateDirectories = 0;
 
 var having = pathResolveTextLinkAct.having = Object.create( null );
 having.writing = 0;
@@ -1151,7 +1038,6 @@ let pathResolveTextLink = _.routineFromPreAndBody( pathResolveTextLink_pre, path
 let _pathResolveLink = Object.create( null );
 
 var defaults = _pathResolveLink.defaults = Object.create( null );
-// defaults.system = null;
 defaults.filePath = null;
 defaults.resolvingSoftLink = null;
 defaults.resolvingTextLink = null;
@@ -1380,7 +1266,7 @@ function pathResolveLinkFull_body( o )
             debugger;
             throw _.err( 'File does not exist', _.strQuote( o.filePath ) );
           }
-          return result; // xxx
+          return result;
         }
       }
 
@@ -1421,15 +1307,13 @@ function pathResolveLinkFull_body( o )
         }
       }
 
-      // return _.mapIs( result ) ? result.filePath : result; // qqq xxx
+      // return _.mapIs( result ) ? result.filePath : result;
+      // debugger;
       return result;
     }
     catch( err )
     {
-      // if( o.throwing )
       throw _.err( `Failed to resolve ${o.filePath}\n`, err );
-      // else
-      // return null;
     }
   }
 
@@ -1460,10 +1344,7 @@ function pathResolveLinkFull_body( o )
     catch( err )
     {
       result.relativePath = result.filePath = result.absolutePath = null;
-      // if( o.throwing )
       throw _.err( `Failed to resolve ${o.filePath}\n`, err );
-      // else
-      // return null;
     }
 
   }
@@ -1475,112 +1356,6 @@ function pathResolveLinkFull_body( o )
 
     _statRead();
     return _resolve();
-
-    //   if( !o.resolvingSoftLink && ( !o.resolvingTextLink || !self.usingTextLink ) )
-    //   {
-    //
-    //     if( o.stat )
-    //     return result;
-    //
-    //     if( !o.allowingMissed )
-    //     {
-    //       result = null;
-    //       if( o.throwing )
-    //       {
-    //         debugger;
-    //         throw _.err( 'File does not exist', _.strQuote( o.filePath ) );
-    //       }
-    //     }
-    //
-    //     return result;
-    //   }
-    //
-    //   if( o.resolvingHeadDirect )
-    //   {
-    //
-    //     let filePath = result;
-    //     let o2 =
-    //     {
-    //       system : system,
-    //       filePath : result,
-    //       resolvingSoftLink : o.resolvingSoftLink,
-    //       resolvingTextLink : o.resolvingTextLink,
-    //       allowingMissed : o.allowingMissed,
-    //       allowingCycled: o.allowingCycled,
-    //       throwing : o.throwing,
-    //       stat : null,
-    //     }
-    //
-    //     result = self.pathResolveLinkHeadDirect.body.call( self, o2 );
-    //
-    //   }
-    //
-    //   if( result )
-    //   {
-    //
-    //     let o2 =
-    //     {
-    //       stat : o.stat,
-    //       system : system,
-    //       filePath : result,
-    //       resolvingSoftLink : o.resolvingSoftLink,
-    //       resolvingTextLink : o.resolvingTextLink,
-    //       preservingRelative : o.preservingRelative,
-    //       allowingMissed : o.allowingMissed,
-    //       allowingCycled : o.allowingCycled,
-    //       throwing : o.throwing,
-    //     }
-    //
-    //     result = self.pathResolveLinkTail.body.call( self, o2 );
-    //     o.stat = o2.stat;
-    //     _.assert( o.stat !== undefined );
-    //
-    //   }
-    //   else
-    //   {
-    //     if( !o.allowingMissed )
-    //     {
-    //       result = null;
-    //       if( o.throwing )
-    //       {
-    //         debugger;
-    //         throw _.err( 'File does not exist', _.strQuote( o.filePath ) );
-    //       }
-    //     }
-    //   }
-    //
-    //   if( o.stat && o.resolvingHeadReverse )
-    //   {
-    //
-    //     let absolutePath = _.mapIs( result ) ? result.absolutePath : result;
-    //     let o2 =
-    //     {
-    //       system : system,
-    //       filePath : absolutePath,
-    //       resolvingSoftLink : o.resolvingSoftLink,
-    //       resolvingTextLink : o.resolvingTextLink,
-    //       allowingMissed : o.allowingMissed,
-    //       allowingCycled: o.allowingCycled,
-    //       throwing : o.throwing,
-    //     }
-    //
-    //     let r = self.pathResolveLinkHeadReverse.body.call( self, o2 );
-    //     if( r === absolutePath )
-    //     r = _.mapIs( result ) ? result.filePath : result;
-    //     result = r;
-    //
-    //   }
-    //
-    //   return _.mapIs( result ) ? result.filePath : result;
-    // }
-    // catch( err )
-    // {
-    //   // if( o.throwing )
-    //   throw _.err( `Failed to resolve ${o.filePath}\n`, err );
-    //   // else
-    //   // return null;
-    // }
-
   }
 
   /**/
@@ -1593,125 +1368,13 @@ function pathResolveLinkFull_body( o )
     con.then( () =>
     {
       return _statRead();
-      // return self.statReadAct
-      // ({
-      //   filePath : result,
-      //   throwing : 0,
-      //   resolvingSoftLink : 0,
-      //   sync : 0
-      // })
     })
 
     con.then( ( stat ) =>
     {
       o.stat = stat;
       return _resolve();
-
-      // if( !o.resolvingSoftLink && ( !o.resolvingTextLink || !self.usingTextLink ) )
-      // {
-      //
-      //   if( o.stat )
-      //   return result;
-      //
-      //   if( !o.allowingMissed )
-      //   {
-      //     result = null;
-      //     if( o.throwing )
-      //     {
-      //       debugger;
-      //       throw _.err( 'File does not exist', _.strQuote( o.filePath ) );
-      //     }
-      //   }
-      //
-      //   return result;
-      // }
-      //
-      // if( o.resolvingHeadDirect )
-      // {
-      //
-      //   let filePath = result;
-      //   let o2 =
-      //   {
-      //     system : system,
-      //     filePath : result,
-      //     resolvingSoftLink : o.resolvingSoftLink,
-      //     resolvingTextLink : o.resolvingTextLink,
-      //     allowingMissed : o.allowingMissed,
-      //     allowingCycled: o.allowingCycled,
-      //     throwing : o.throwing,
-      //     stat : null,
-      //   }
-      //
-      //   result = self.pathResolveLinkHeadDirect.body.call( self, o2 );
-      //
-      // }
-      //
-      // if( result )
-      // {
-      //
-      //   let o2 =
-      //   {
-      //     stat : o.stat,
-      //     system : system,
-      //     filePath : result,
-      //     resolvingSoftLink : o.resolvingSoftLink,
-      //     resolvingTextLink : o.resolvingTextLink,
-      //     preservingRelative : o.preservingRelative,
-      //     allowingMissed : o.allowingMissed,
-      //     allowingCycled : o.allowingCycled,
-      //     throwing : o.throwing,
-      //   }
-      //
-      //   result = self.pathResolveLinkTail.body.call( self, o2 );
-      //   o.stat = o2.stat;
-      //   _.assert( o.stat !== undefined );
-      //
-      // }
-      // else
-      // {
-      //   if( !o.allowingMissed )
-      //   {
-      //     result = null;
-      //     if( o.throwing )
-      //     {
-      //       debugger;
-      //       throw _.err( 'File does not exist', _.strQuote( o.filePath ) );
-      //     }
-      //   }
-      // }
-      //
-      // if( o.stat && o.resolvingHeadReverse )
-      // {
-      //
-      //   let absolutePath = _.mapIs( result ) ? result.absolutePath : result;
-      //   let o2 =
-      //   {
-      //     system : system,
-      //     filePath : absolutePath,
-      //     resolvingSoftLink : o.resolvingSoftLink,
-      //     resolvingTextLink : o.resolvingTextLink,
-      //     allowingMissed : o.allowingMissed,
-      //     allowingCycled: o.allowingCycled,
-      //     throwing : o.throwing,
-      //   }
-      //
-      //   let r = self.pathResolveLinkHeadReverse.body.call( self, o2 );
-      //   if( r === absolutePath )
-      //   r = _.mapIs( result ) ? result.filePath : result;
-      //   result = r;
-      //
-      // }
-      //
-      // return _.mapIs( result ) ? result.filePath : result;
     })
-
-    // con.catch( ( err ) =>
-    // {
-    //   // if( o.throwing )
-    //   throw _.err( `Failed to resolve ${o.filePath}\n`, err );
-    //   // else
-    //   // return null;
-    // });
 
     return con;
   }
@@ -2977,7 +2640,6 @@ function streamRead_body( o )
     debugger;
     err = _._err
     ({
-      // args : [ stack, '\nfileRead( ', o.filePath, ' )\n', err ],
       args : [ err, '\nfileRead( ', o.filePath, ' )\n' ],
       usingSourceCode : 0,
       level : 0,
@@ -2986,11 +2648,12 @@ function streamRead_body( o )
     if( encoder && encoder.onError )
     try
     {
-      err = encoder.onError.call( self, { error : err, stream : result, operation : o, encoder : encoder, provider : self }) /* xxx : remove encoder.onError? */
+      /* zzz : remove encoder.onError? */
+      err = encoder.onError.call( self, { error : err, stream : result, operation : o, encoder : encoder, provider : self })
     }
     catch( err2 )
     {
-      /* the simplest output is reqired to avoid recursion */
+      /* the simplest output is required to avoid recursion */
       console.error( err2 );
       console.error( err.toString() + '\n' + err.stack );
     }
@@ -3020,8 +2683,7 @@ function fileRead_pre( routine, args )
 
   let o = self._preFilePathScalarWithoutProviderDefaults.apply( self, arguments );
 
-  // if( o.verbosity === null )
-  // o.verbosity = _.numberClamp( self.verbosity - 5, 0, 9 );
+  _.assert( _.longHas( [ 'data', 'o' ], o.outputFormat ) );
 
   self._providerDefaultsApply( o );
 
@@ -3057,6 +2719,7 @@ function fileRead_body( o )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.strIs( o.encoding ) );
+  _.assert( _.longHas( [ 'data', 'o' ], o.outputFormat ) );
 
   let encoder = _.files.ReadEncoders[ o.encoding ];
 
@@ -3104,7 +2767,6 @@ function fileRead_body( o )
 
   function handleBegin()
   {
-    // debugger;
     if( encoder && encoder.onBegin )
     {
       let r = encoder.onBegin.call( self, { operation : o, encoder : encoder, provider : self })
@@ -3122,7 +2784,6 @@ function fileRead_body( o )
     if( encoder && encoder.onEnd )
     try
     {
-      // debugger;
       let o2 = { data : data, operation : o, encoder : encoder, provider : self };
       let r = encoder.onEnd.call( self, o2 );
       _.sure( r === undefined );
@@ -3141,7 +2802,7 @@ function fileRead_body( o )
     o.result = data;
 
     let r;
-    if( o.returningRead ) /* xxx : rename to outputFormat */
+    if( o.outputFormat === 'data' )
     r = data;
     else
     r = o;
@@ -3169,7 +2830,8 @@ function fileRead_body( o )
     if( encoder && encoder.onError )
     try
     {
-      err = encoder.onError.call( self, { error : err, operation : o, encoder : encoder, provider : self }) /* xxx : remove encoder.onError? */
+      /* zzz : remove encoder.onError? */
+      err = encoder.onError.call( self, { error : err, operation : o, encoder : encoder, provider : self })
     }
     catch( err2 )
     {
@@ -3193,11 +2855,10 @@ function fileRead_body( o )
 
 }
 
-// _.routineExtend( fileRead_body, Parent.prototype.fileRead );
 _.routineExtend( fileRead_body, fileReadAct );
 
 var defaults = fileRead_body.defaults;
-defaults.returningRead = 1;
+defaults.outputFormat = 'data';
 defaults.throwing = null;
 defaults.onBegin = null;
 defaults.onEnd = null;
@@ -3253,7 +2914,7 @@ having.aspect = 'body';
     asynchronously, else synchronously
  * Note : if even o.sync sets to true, but o.returnRead if false, method will path resolve read content through wConsequence
     anyway.
- * @param {Boolean} [o.returningRead=true] If this parameter sets to true, o.onBegin callback will get `o` options, wrapped
+ * @param {Boolean} [o.outputFormat='data'] If this parameter sets to true, o.onBegin callback will get `o` options, wrapped
     into object with key 'options' and options as value.
  * @param {Boolean} [o.throwing=false] Controls error throwing. Returns null if error occurred and ( throwing ) is disabled.
  * @param {String} [o.name=null]
@@ -3276,7 +2937,7 @@ having.aspect = 'body';
 
 /**
  * This callback is run before fileRead starts read the file. Accepts error as first parameter.
- * If in fileRead passed 'o.returningRead' that is set to true, callback accepts as second parameter object with key 'options'
+ * If in fileRead passed 'o.outputFormat' that is set to true, callback accepts as second parameter object with key 'options'
     and value that is reference to options map passed into fileRead method, and user has ability to configure that
     before start reading file.
  * @callback fileRead~onBegin
@@ -3331,7 +2992,7 @@ _.assert( fileRead.encoders === undefined );
 
  * @param {Object} o read options
  * @param {string} o.filePath path to read file
- * @param {boolean} [o.returningRead=true] If this parameter sets to true, o.onBegin callback will get `o` options, wrapped
+ * @param {boolean} [o.outputFormat='data'] If this parameter sets to true, o.onBegin callback will get `o` options, wrapped
  into object with key 'options' and options as value.
  * @param {boolean} [o.silent=false] If set to true, method will caught errors occurred during read file process, and
  pass into o.onEnd as first parameter. Note : if sync is set to false, error will caught anyway.
@@ -3567,10 +3228,7 @@ let hashReadAct = ( function hashReadAct()
 
       stream.on( 'error', function( err )
       {
-        // if( o.throwing )
         con.error( _.err( err ) );
-        // else
-        // con.take( NaN );
       });
 
       return con;
@@ -3582,7 +3240,6 @@ let hashReadAct = ( function hashReadAct()
 var defaults = hashReadAct.defaults = Object.create( null );
 defaults.filePath = null;
 defaults.sync = null;
-// defaults.throwing = null;
 
 var having = hashReadAct.having = Object.create( null );
 having.writing = 0;
@@ -3591,87 +3248,6 @@ having.driving = 1;
 
 var operates = hashReadAct.operates = Object.create( null );
 operates.filePath = { pathToRead : 1 }
-
-//
-//
-// let hashRead_body = ( function()
-// {
-//   let Crypto;
-//
-//   return function hashRead( o )
-//   {
-//     let self = this;
-//
-//     _.assert( arguments.length === 1, 'Expects single argument' );
-//
-//     debugger;
-//     if( o.verbosity >= 3 )
-//     self.logger.log( ' . hashRead :', o.filePath );
-//
-//     if( Crypto === undefined )
-//     Crypto = require( 'crypto' );
-//     let md5sum = Crypto.createHash( 'md5' );
-//
-//     /* */
-//
-//     if( o.sync && _.boolLike( o.sync ) )
-//     {
-//       let result;
-//       try
-//       {
-//         let stat = self.statResolvedRead({ filePath : o.filePath, sync : 1, throwing : 0 });
-//         _.sure( !!stat, 'Cant get stats of file ' + _.strQuote( o.filePath ) );
-//         if( stat.size > self.hashFileSizeLimit )
-//         throw _.err( 'File is too big ' + _.strQuote( o.filePath ) + ' ' + stat.size + ' > ' + self.hashFileSizeLimit );
-//         let read = self.fileReadSync( o.filePath );
-//         md5sum.update( read );
-//         result = md5sum.digest( 'hex' );
-//       }
-//       catch( err )
-//       {
-//         if( o.throwing )
-//         throw err;
-//         result = NaN;
-//       }
-//
-//       return result;
-//
-//     }
-//     else if( o.sync === 'worker' )
-//     {
-//
-//       debugger; throw _.err( 'not implemented' );
-//
-//     }
-//     else
-//     {
-//       let con = new _.Consequence();
-//       let stream = self.streamRead( o.filePath );
-//
-//       stream.on( 'data', function( d )
-//       {
-//         md5sum.update( d );
-//       });
-//
-//       stream.on( 'end', function()
-//       {
-//         let hash = md5sum.digest( 'hex' );
-//         con.take( hash );
-//       });
-//
-//       stream.on( 'error', function( err )
-//       {
-//         if( o.throwing )
-//         con.error( _.err( err ) );
-//         else
-//         con.take( NaN );
-//       });
-//
-//       return con;
-//     }
-//   }
-//
-// })();
 
 //
 
@@ -3779,7 +3355,7 @@ function hashSzRead_body( o )
   let stat = self.statRead({ filePath : o.filePath, sync : o.sync, throwing : o.throwing });
   let hash = self.hashRead( o );
 
-  /* xxx : remove Consequence.From after And will be adjusted */
+  /* zzz : remove Consequence.From after And will be adjusted */
   let ready = _.Consequence.AndKeep_( _.Consequence.From( stat ), _.Consequence.From( hash ) ).then( ( arg ) =>
   {
     if( !arg[ 0 ] || !arg[ 1 ] )
@@ -6192,7 +5768,6 @@ function _link_functor( fop )
 
   having.driving = 0;
   having.aspect = 'body';
-  // having.hubRedirecting = 0;
 
   let linkEntry = _.routineFromPreAndBody( _link_pre, _link_body, entryMethodName );
 
@@ -6243,12 +5818,6 @@ function _link_functor( fop )
     if( !o.sync )
     {
       c.con = new _.Consequence().take( null );
-      // zzz : why two?
-      /* aaa : to split execution into veryfication and linking:
-      linking stage needs own exception handler,
-      linking stage will not be launched if error was thrown on veryfication or stage ended earlier
-      */
-
     }
 
     Object.preventExtensions( c );
@@ -6292,7 +5861,6 @@ function _link_functor( fop )
       try
       {
 
-        // debugger;
         if( self.fileExists( o2.dstPath ) )
         {
           c.verifyDst()
@@ -6348,9 +5916,10 @@ function _link_functor( fop )
 
       c.con.then( () =>
       {
-        if( c.result !== undefined ) //return result if ended earlier
+        /* return result if ended earlier */
+        if( c.result !== undefined )
         return c.result;
-        //prepare options map and launch main part
+        /* prepare options map and launch main part */
         o2 = c.options2 = _.mapOnly( o, c.linkAct.defaults );
         /* main part */
         return mainPartAsync();
@@ -6430,7 +5999,6 @@ function _link_functor( fop )
         filePath : filePath,
         throwing : 0,
         resolvingSoftLink : resolving,
-        // resolvingTextLink : resolving && actMethodName === 'textLinkAct' ? 1 : 0,
         resolvingTextLink : 0,
         sync : 1,
       });
@@ -6483,10 +6051,6 @@ function _link_functor( fop )
       {
         if( c.srcStat === undefined )
         debugger;
-        // if( c.srcStat === undefined )
-        // c.srcStat = c.onStat( o.srcPath, 0 );
-        // if( !c.srcStat )
-        // c.srcStat = c.onStat( o.srcPath, 0 );
         if( !c.srcStat )
         {
           if( !o.allowingMissed )
@@ -6643,17 +6207,11 @@ function _link_functor( fop )
       o.relativeSrcPath = o.srcPath;
       o.relativeDstPath = o.dstPath;
 
-      // if( !o.originalSrcPath )
-      // o.originalSrcPath = o.srcPath;
-      // if( !o.originalDstPath )
-      // o.originalDstPath = o.dstPath;
-
       if( !path.isAbsolute( o.dstPath ) )
       {
         _.assert( path.isAbsolute( o.srcPath ), () => 'Expects absolute path {-o.srcPath-}, but got', _.strQuote( o.srcPath ) );
         o.dstPath = path.join( o.srcPath, o.dstPath );
       }
-      // else if( !_.path.isGlobal( o.srcPath ) && !path.isAbsolute( o.srcPath ) )
       else if( !path.isAbsolute( o.srcPath ) )
       {
         _.assert( path.isAbsolute( o.dstPath ), () => 'Expects absolute path {-o.dstPath-}, but got', _.strQuote( o.dstPath ) );
@@ -6698,9 +6256,6 @@ function _link_functor( fop )
     function linksResolve()
     {
 
-      // if( o.srcPath === "extract5:///f" )
-      // debugger;
-
       try
       {
 
@@ -6724,7 +6279,6 @@ function _link_functor( fop )
         }
         else
         {
-          // o.relativeDstPath = o.dstPath;
         }
 
         /* */
@@ -6740,7 +6294,6 @@ function _link_functor( fop )
             allowingMissed : o.allowingMissed,
             throwing : o.throwing
           }
-          // o.srcPath = self.pathResolveLinkFull( o2 ).filePath;
           let resolved = self.pathResolveLinkFull( o2 );
           o.srcPath = resolved.absolutePath;
 
@@ -6764,8 +6317,6 @@ function _link_functor( fop )
         else
         {
           /* do not read stat if possible */
-          // o.relativeSrcPath = o.srcPath;
-          // c.srcStat = self.statRead({ filePath : o.srcPath, sync : 1 });
           c.srcStat = c.onStat( o.srcPath, 0 );
 
           c.srcResolvedStat = c.srcStat;
@@ -6814,7 +6365,6 @@ function _link_functor( fop )
           {
             o.dstPath = resolved.absolutePath;
             o.relativeDstPath = resolved.relativePath;
-            // o.dstPath = resolved.filePath;
             c.dstStat = o2.stat;
             return true;
           })
@@ -6847,8 +6397,6 @@ function _link_functor( fop )
           .then( ( resolved ) =>
           {
             o.srcPath = resolved.absolutePath;
-            // o.relativeSrcPath = resolved.relativePath;
-            // o.srcPath = resolved.filePath;
 
             if( resolved.relativePath )
             {
@@ -6913,8 +6461,6 @@ function _link_functor( fop )
       ({
         dstPath : c.tempPath,
         srcPath : o.dstPath,
-        // originalDstPath : c.tempPath,
-        // originalSrcPath : o.dstPath,
         relativeDstPath : c.tempPath,
         relativeSrcPath : o.dstPath,
         sync : 1,
@@ -6945,8 +6491,6 @@ function _link_functor( fop )
         ({
           dstPath : c.tempPath,
           srcPath : o.dstPath,
-          // originalDstPath : c.tempPath,
-          // originalSrcPath : o.dstPath,
           relativeDstPath : c.tempPath,
           relativeSrcPath : o.dstPath,
           sync : 0,
@@ -6965,8 +6509,6 @@ function _link_functor( fop )
         ({
           dstPath : o.dstPath,
           srcPath : c.tempPath,
-          // originalDstPath : o.dstPath,
-          // originalSrcPath : c.tempPath,
           relativeDstPath : o.dstPath,
           relativeSrcPath : c.tempPath,
           sync : 1,
@@ -6989,8 +6531,6 @@ function _link_functor( fop )
       ({
         dstPath : o.dstPath,
         srcPath : c.tempPath,
-        // originalDstPath : o.dstPath,
-        // originalSrcPath : c.tempPath,
         relativeDstPath : o.dstPath,
         relativeSrcPath : c.tempPath,
         sync : 0,
@@ -7042,56 +6582,11 @@ function _link_functor( fop )
       if( !Config.debug )
       return;
 
-      // debugger
-
-      // if( !c.srcStat )
-      // return;
-      // if( c.srcStat.isSoftLink() )
-      // return;
-
       if( o.srcPath === o.dstPath )
       return;
 
       let srcPath = o.srcPath;
       let dstPath = o.dstPath;
-
-      // if( actMethodName === 'fileCopyAct' )
-      // {
-      //   if( c.srcStat.isSoftLink() )
-      //   {
-      //     let srcPathResolved = self.pathResolveSoftLink( srcPath );
-      //     srcPath = self.path.join( srcPath, srcPathResolved );
-      //     let srcStat = self.statReadAct({ filePath : srcPath, throwing : 0, resolvingSoftLink : 0, sync : 1 });
-      //     if( srcStat )
-      //     {
-      //       c.srcStat = srcStat;
-      //       let dstPathResolved = self.pathResolveSoftLink( dstPath );
-      //       dstPath = self.path.join( dstPath, dstPathResolved );
-      //     }
-      //   }
-      // }
-      // else if( actMethodName === 'softLinkAct' )
-      // {
-      //   let dstPathResolved = self.pathResolveSoftLink( o.dstPath );
-      //   dstPath = self.path.join( dstPath, dstPathResolved );
-      // }
-      // else if( actMethodName === 'textLinkAct' )
-      // {
-      //   self.fieldPush( 'usingTextLink', 1 );
-      //   let dstPathResolved = self.pathResolveTextLink( o.dstPath );
-      //   self.fieldPop( 'usingTextLink', 1 );
-      //   dstPath = self.path.join( dstPath, dstPathResolved );
-      // }
-      //
-      // c.dstStat = self.statReadAct({ filePath : dstPath, throwing : 0, resolvingSoftLink : 0, sync : 1 });
-
-      // let resolvingSrcSoftLink = o.resolvingSrcSoftLink;
-      // if( resolvingSrcSoftLink === undefined || resolvingSrcSoftLink === null )
-      // resolvingSrcSoftLink = 1;
-      //
-      // let resolvingSrcTextLink = o.resolvingSrcTextLink;
-      // if( resolvingSrcTextLink === undefined || resolvingSrcTextLink === null )
-      // resolvingSrcTextLink = 1;
 
       let srcStat = c.srcResolvedStat;
 
@@ -7101,11 +6596,9 @@ function _link_functor( fop )
       if( !srcStat )
       {
         debugger;
-        // srcStat = c.onStat( o.srcPath, 0 );
         srcStat = c.srcStat;
         if( srcStat )
         {
-          // xxx onSizeCheck
           if( onSizeCheck )
           onSizeCheck.call( self, c );
           return;
@@ -7119,16 +6612,6 @@ function _link_functor( fop )
         throw _.err( err );
       }
 
-      // if( c.onIsLink( srcStat ) )
-      // srcStat = c.onStat( o.srcPath, 1 );
-      //
-      // if( !srcStat )
-      // {
-      //   srcStat = c.onStat( o.srcPath, 0 );
-      //   if( srcStat )
-      //   return;
-      // }
-
       c.dstStat = c.onStat( dstPath, 1 );
 
       if( !c.dstStat )
@@ -7140,7 +6623,6 @@ function _link_functor( fop )
 
 
       if( !c.dstStat )
-      // if( !o.allowingMissed && !skippingMissed ) // xxx
       {
         let err = `Faield to ${entryMethodName} ${o.dstPath} from ${o.srcPath}. Destination file does not exist.`;
         throw _.err( err );
@@ -7161,7 +6643,7 @@ function _link_functor( fop )
         srcStat = c.onStat( filePath, 0 );
       }
 
-      //qqq: find better solution to check text links
+      /* qqq: find better solution to check text links */
       if( /* srcStat.isTextLink() && */ c.dstStat.isTextLink() )
       if( self.filesAreTextLinked([ c.dstStat.filePath, srcStat.filePath ]) )
       return;
@@ -7245,8 +6727,6 @@ fileRenameAct.name = 'fileRenameAct';
 var defaults = fileRenameAct.defaults = Object.create( null );
 defaults.dstPath = null;
 defaults.srcPath = null;
-// defaults.originalDstPath = null;
-// defaults.originalSrcPath = null;
 defaults.relativeDstPath = null;
 defaults.relativeSrcPath = null;
 defaults.sync = null;
@@ -7594,8 +7074,6 @@ fileCopyAct.name = 'fileCopyAct';
 var defaults = fileCopyAct.defaults = Object.create( null );
 defaults.dstPath = null;
 defaults.srcPath = null;
-// defaults.originalDstPath = null;
-// defaults.originalSrcPath = null;
 defaults.relativeDstPath = null;
 defaults.relativeSrcPath = null;
 // defaults.breakingDstHardLink = 0; /* qqq2 : remove the option from Act method? aaa:done */
@@ -7874,8 +7352,6 @@ hardLinkAct.name = 'hardLinkAct';
 var defaults = hardLinkAct.defaults = Object.create( null );
 defaults.dstPath = null;
 defaults.srcPath = null;
-// defaults.originalDstPath = null;
-// defaults.originalSrcPath = null;
 defaults.relativeDstPath = null;
 defaults.relativeSrcPath = null;
 defaults.sync = null;
@@ -8135,8 +7611,6 @@ softLinkAct.name = 'softLinkAct';
 var defaults = softLinkAct.defaults = Object.create( null );
 defaults.dstPath = null;
 defaults.srcPath = null;
-// defaults.originalDstPath = null;
-// defaults.originalSrcPath = null;
 defaults.relativeDstPath = null;
 defaults.relativeSrcPath = null;
 defaults.sync = null;
@@ -8248,9 +7722,6 @@ function textLinkAct( o )
   _.assert( path.is( o.srcPath ) );
   _.assert( path.isAbsolute( o.dstPath ) );
 
-  // let srcPath = o.srcPath;
-  // if( !self.path.isAbsolute( o.originalSrcPath ) )
-  // srcPath = o.originalSrcPath;
   let srcPath = o.relativeSrcPath;
 
   let result = self.fileWrite
@@ -8271,8 +7742,6 @@ var defaults = textLinkAct.defaults = Object.create( null );
 defaults.dstPath = null;
 defaults.srcPath = null;
 defaults.sync = null;
-// defaults.originalDstPath = null;
-// defaults.originalSrcPath = null;
 defaults.relativeDstPath = null;
 defaults.relativeSrcPath = null;
 
@@ -9217,14 +8686,6 @@ let Extension =
   init,
   finit,
   MakeDefault,
-
-  // functors
-
-  // /* xxx2 : move to namespace */
-  // vectorize,
-  // vectorizeAll,
-  // vectorizeAny,
-  // vectorizeNone,
 
   // etc
 

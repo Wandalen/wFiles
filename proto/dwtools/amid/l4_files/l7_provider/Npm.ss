@@ -445,7 +445,7 @@ function filesReflectSingle_body( o )
 
   function recordsMake()
   {
-    /* xxx : fast solution to return some records instead of empty arrray */
+    /* qqq : fast solution to return some records instead of empty arrray. find better solution */
     o.result = localProvider.filesReflectEvaluate
     ({
       src : { filePath : dstPath },

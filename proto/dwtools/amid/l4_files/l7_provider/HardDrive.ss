@@ -86,8 +86,6 @@ function _isTextLink( filePath )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  // debugger; xxx
-
   if( !self.usingTextLink )
   return false;
 

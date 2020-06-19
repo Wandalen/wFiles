@@ -22,7 +22,7 @@ function onSuiteBegin( test )
   let context = this;
 
   context.suiteTempPath = context.provider.path.pathDirTempOpen( context.provider.path.join( __dirname, '../..'  ),'FilesEtc' );
-  context.suiteTempPath = context.provider.pathResolveLinkFull({ filePath : context.suiteTempPath, resolvingSoftLink : 1 }); /* xxx */
+  context.suiteTempPath = context.provider.pathResolveLinkFull({ filePath : context.suiteTempPath, resolvingSoftLink : 1 }); /* qqq2 : review pathDirTempOpen */
   context.suiteTempPath = context.suiteTempPath.absolutePath;
 }
 
@@ -42,7 +42,7 @@ function createTestFile( path, data, encoding )
 {
   let context = this;
   let provider = context.provider;
-  
+
   provider.fileWrite
   ({
     filePath : _.path.join( context.suiteTempPath, path ),
@@ -57,7 +57,7 @@ function createTestSymLink( path, target, type, data )
 {
   let context = this;
   let provider = context.provider;
-  
+
   var origin,
     typeOrigin;
 
@@ -132,10 +132,10 @@ function createTestHardLink( path, target, data )
 //
 
 function createTestResources( cases, dir )
-{ 
+{
   let context = this;
   let provider = context.provider;
-  
+
   if( !Array.isArray( cases ) ) cases = [ cases ];
 
   var l = cases.length,
@@ -281,10 +281,10 @@ function mergePath( path )
 //
 
 function _fileOptionsGet( test ) {
-  
+
   let context = this;
   let provider = context.provider;
-  
+
   var defaultContextObj =
     {
       defaults :
@@ -366,11 +366,11 @@ qqq : rewrite test routine for filesNewer, filesOlder. coverage should be Good
 */
 
 function filesNewer( test )
-{ 
-  
+{
+
   let context = this;
   let provider = context.provider;
-  
+
   /* files creation */
 
   var file1 = 'tmp.tmp/filesNewer/test1',
@@ -453,7 +453,7 @@ function filesOlder( test )
 {
   let context = this;
   let provider = context.provider;
-  
+
   /* files creation */
 
   var file1 = 'tmp.tmp/filesOlder/test1',
@@ -536,7 +536,7 @@ function filesSpectre( test )
 {
   let context = this;
   let provider = context.provider;
-  
+
   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     textData2 = ' Aenean non feugiat mauris',
 
@@ -783,7 +783,7 @@ function filesSimilarity( test )
 {
   let context = this;
   let provider = context.provider;
-  
+
   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     textData2 = ' Aenean non feugiat mauris',
     bufferData1 = new U8x( [ 0x01, 0x02, 0x03, 0x04 ] ),
@@ -1046,7 +1046,7 @@ function filesSize( test )
 {
   let context = this;
   let provider = context.provider;
-  
+
   /* file creation */
 
   var file1 = 'tmp.tmp/filesAreUpToDate/src/test1',
@@ -1119,7 +1119,7 @@ function fileSize( test )
 {
   let context = this;
   let provider = context.provider;
-  
+
   /* file creation */
 
   var file1 = 'tmp.tmp/fileSize/test1',
@@ -2932,7 +2932,7 @@ function filesLink( test )
 {
   let context = this;
   let provider = context.provider;
-  
+
   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     textData2 = ' Aenean non feugiat mauris',
     bufferData1 = new U8x( [ 0x01, 0x02, 0x03, 0x04 ] ),
@@ -3079,7 +3079,7 @@ function filesAreUpToDate2( test )
 {
   let context = this;
   let provider = context.provider;
-  
+
   /* file creation */
 
   var file1 = 'tmp.tmp/filesAreUpToDate/src/test1',
@@ -3467,15 +3467,15 @@ var Self =
   name : 'Tools.mid.files.Other',
   silencing : 1,
   enabled : 1,
-  
+
   onSuiteBegin,
   onSuiteEnd,
-  
+
   context :
   {
     provider : _.fileProvider,
     suiteTempPath : null,
-    
+
     createTestFile,
     createTestSymLink,
     createTestHardLink,

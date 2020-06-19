@@ -2,18 +2,11 @@
 
 'use strict';
 
-// if( typeof module !== 'undefined' )
-// {
-//   let _ = require( '../../../../dwtools/Tools.s' );
-//   if( !_.FileProvider )
-//   require( '../UseMid.s' );
-// }
-
 let Needle;
 
 //
 
-/* xxx qqq : add such test routine
+/* qqq : add such test routine
 
   return a.fileProvider.filesReflect
   ({
@@ -361,7 +354,7 @@ function filesReflectSingle_body( o )
 
   function recordsMake()
   {
-    /* xxx : fast solution to return records instead of empty arrray */
+    /* qqq : fast solution to return some records instead of empty arrray. find better solution */
     debugger;
     o.result = dstFileProvider.filesReflectEvaluate
     ({

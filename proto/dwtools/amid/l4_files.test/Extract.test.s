@@ -79,8 +79,8 @@ function copy( test )
   test.is( op.filesTree === extract1.filesTree );
   test.is( extract1.filesTree === extract2.filesTree );
 
-  /* xxx qqq !!! fix that ? */
-
+  // /* zzz : fix that */
+  //
   // test.case = 'from another instance with constructor';
   //
   // var op = { filesTree : {} }

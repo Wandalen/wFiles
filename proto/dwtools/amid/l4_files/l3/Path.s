@@ -18,7 +18,7 @@ let vectorizeNone = _.files._.vectorizeNone;
 // // functor
 // // --
 //
-// function _vectorizeKeysAndVals( routine, select ) /* xxx : move out */
+// function _vectorizeKeysAndVals( routine, select )
 // {
 //   select = select || 1;
 //

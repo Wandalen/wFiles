@@ -24,7 +24,8 @@ if( typeof module !== 'undefined' )
   require( '../l3/Record.s' );
   require( '../l3/RecordFactory.s' );
   require( '../l3/RecordFilter.s' );
-  require( '../l3/Stat.s' );
+  require( '../l3/StatClass.s' );
+  require( '../l3/StatNamespace.s' );
 
   require( '../l4/Abstract.s' );
 

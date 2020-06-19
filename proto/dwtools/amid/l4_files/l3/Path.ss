@@ -67,7 +67,7 @@ let effectiveMainFile = ( function effectiveMainFile()
 {
   let result = '';
 
-  return function effectiveMainFile() /* xxx : review */
+  return function effectiveMainFile() /* qqq2 : move to process, review */
   {
     _.assert( !!this.fileProvider );
     _.assert( arguments.length === 0, 'Expects no arguments' );

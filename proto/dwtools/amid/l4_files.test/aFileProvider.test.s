@@ -49690,7 +49690,7 @@ function encodersFromGdfs( test )
   test.is( !_.files.WriteEncoders[ 'testEncoder' ] );
 
   test.will = 'update encoders, encoder should exist';
-  _.files.encoders.fromGdfs();
+  _.files.encoder.fromGdfs();
   var encoder = _.files.WriteEncoders[ 'testEncoder' ];
   test.is( _.mapIs( encoder ) );
   test.identical( encoder.exts, gdf.ext );
@@ -49699,7 +49699,7 @@ function encodersFromGdfs( test )
   test.will = 'finit gdf, encoder should exist';
   gdf.finit();
   test.is( _.mapIs( _.files.WriteEncoders[ 'testEncoder' ] ) );
-  _.files.encoders.fromGdfs();
+  _.files.encoder.fromGdfs();
   test.will = 'update encoders, encoder should not exist';
   test.is( !_.files.WriteEncoders[ 'testEncoder' ] );
 
@@ -49723,14 +49723,14 @@ function encodersFromGdfs( test )
   let originalExt = gdf.ext.slice();
   gdf.ext = [ ext ];
   test.is( !_.mapIs( _.files.WriteEncoders[ ext ] ) );
-  _.files.encoders.fromGdfs();
+  _.files.encoder.fromGdfs();
   var encoder = _.files.WriteEncoders[ ext ];
   test.is( _.mapIs( encoder ) );
   test.identical( encoder.exts, gdf.ext );
   test.identical( encoder.gdf, gdf );
   gdf.ext = originalExt.slice();
   gdf.finit();
-  _.files.encoders.fromGdfs();
+  _.files.encoder.fromGdfs();
   test.is( !_.mapIs( _.files.WriteEncoders[ ext ] ) );
 
   /* - */

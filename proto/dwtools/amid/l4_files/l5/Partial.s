@@ -4242,7 +4242,7 @@ function filesAreSameCommon_body( o )
 
   if( o.ins1.factory.effectiveProvider === o.ins2.factory.effectiveProvider && o.ins1.stat.ino > 0 )
   {
-    let could = _.statsAreHardLinked( o.ins1.stat, o.ins2.stat );
+    let could = _.files.stat.areHardLinked( o.ins1.stat, o.ins2.stat );
     if( could === true || could === _.maybe )
     return true;
   }
@@ -6029,7 +6029,7 @@ function _linkMultiple( o, link )
   for( let p = 0 ; p < records.length ; p++ )
   {
     let record = records[ p ];
-    if( !record.stat || !_.statsAreHardLinked( newestRecord.stat, record.stat ) )
+    if( !record.stat || !_.files.stat.areHardLinked( newestRecord.stat, record.stat ) )
     {
       needed = 1;
       break;
@@ -6124,7 +6124,7 @@ function _linkMultiple( o, link )
     if( !o.allowDiffContent )
     if( record.stat && newestRecord.stat.mtime.getTime() === record.stat.mtime.getTime() && newestRecord.stat.birthtime.getTime() === record.stat.birthtime.getTime() )
     {
-      if( _.statsHaveDifferentContent( newestRecord.stat , record.stat ) )
+      if( _.files.stat.different( newestRecord.stat , record.stat ) )
       {
         let err = _.err( 'Several files has the same date but different content', newestRecord.absolute, record.absolute );
         debugger;
@@ -6135,7 +6135,7 @@ function _linkMultiple( o, link )
       }
     }
 
-    if( !record.stat || !_.statsAreHardLinked( mostLinkedRecord.stat , record.stat ) )
+    if( !record.stat || !_.files.stat.areHardLinked( mostLinkedRecord.stat , record.stat ) )
     {
       let linkOptions = _.mapExtend( null, o );
       linkOptions.allowingMissed = 0; // Vova : hardLink does not allow missing srcPath
@@ -7789,14 +7789,14 @@ function _fileCopyAct( c )
         throw _.err( 'Cant copy directory ' + _.strQuote( o.srcPath ) + ', consider method filesReflect'  );
       }
     }
-    
-    let con = _.Consequence.Try( () => 
+
+    let con = _.Consequence.Try( () =>
     {
       if( o.breakingDstHardLink && self.isHardLink( o.dstPath ) )
       return self.hardLinkBreak({ filePath : o.dstPath, sync : o.sync });
       return true;
     });
-    
+
     con.then( () =>
     {
       let result = self.fileCopyAct
@@ -7809,10 +7809,10 @@ function _fileCopyAct( c )
       });
       return o.sync ? true : result;
     })
-  
+
     if( o.sync )
     return con.syncMaybe();
-    
+
     return con;
   }
 

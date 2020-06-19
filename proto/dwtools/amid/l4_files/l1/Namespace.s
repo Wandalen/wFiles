@@ -156,7 +156,7 @@ let vectorizeNone = _.routineDefaults( null, _.vectorizeNone, { vectorizingConta
 
 //
 
-function vectorizeKeysAndVals( routine, select ) /* xxx : move out */
+function vectorizeKeysAndVals( routine, select ) 
 {
   select = select || 1;
 

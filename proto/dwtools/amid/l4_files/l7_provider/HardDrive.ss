@@ -1887,7 +1887,7 @@ function filesAreHardLinkedAct( o )
     should return _.maybe, not true if result is not precise
   */
 
-  return _.statsAreHardLinked( statFirst, statSecond );
+  return _.files.stat.areHardLinked( statFirst, statSecond );
 }
 
 _.routineExtend( filesAreHardLinkedAct, Parent.prototype.filesAreHardLinkedAct );

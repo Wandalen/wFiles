@@ -49965,25 +49965,6 @@ var Self =
 
     encodersFromGdfs,
 
-  },
-  tests : 
-  {
-    hardLinkSync,
-    hardLinkMultipleSync,
-    hardLinkRelativePath,
-    // hardLinkExperiment,
-    hardLinkSoftlinked,
-    hardLinkActSync,
-    hardLinkAsync,
-    hardLinkActAsync,
-    hardLinkSoftLinkResolving,
-    hardLinkHardLinkBreaking,
-    hardLinkResolvingBasic,
-    hardLinkGlobal,
-    hardLinkRelativeSoftLinking,
-    hardLinkRelativeTextLinking,
-    hardLinkHardLinkedSync,
-    hardLinkHardLinkedAsync,
   }
 
 };

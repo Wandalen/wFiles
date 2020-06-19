@@ -56,8 +56,7 @@ function onSuiteBegin( test )
   Parent.onSuiteBegin.apply( this, arguments );
   context.provider = _.FileProvider.Extract({ usingExtraStat : 1, protocol : 'current' });
   context.system = _.FileProvider.System({ providers : [ context.provider ] });
-  let path = context.provider.path;
-  context.suiteTempPath = path.pathDirTempOpen( 'suite-' + 'FilesFind' );
+  context.suiteTempPath = context.provider.path.pathDirTempOpen( 'suite-' + 'FilesFind' );
 }
 
 //

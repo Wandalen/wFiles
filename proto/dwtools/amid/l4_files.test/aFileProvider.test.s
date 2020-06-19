@@ -30426,84 +30426,6 @@ function hardLinkRelativePath( test )
 
 //
 
-function hardLinkExperiment( test )
-{
-  let self = this;
-  let provider = self.provider;
-  let path = provider.path;
-
-  var delay = 10;
-
-  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  delay = provider.systemBitrateTimeGet();
-
-  function makeFiles( names, dirPath, sameTime )
-  {
-    let now = _.time.now();
-    var paths = names.map( ( name, i ) =>
-    {
-      var filePath = self.pathFor( path.join( dirPath, name ) );
-      provider.fileWrite({ filePath, data : filePath, purging : 1 });
-
-      if( sameTime )
-      {
-        provider.fileTimeSet( filePath, delay, delay );
-      }
-      else if( i > 0 )
-      {
-        let time = now + ( i + 1 ) * delay;
-        provider.fileTimeSet( filePath, time, time );
-      }
-
-      return filePath;
-    });
-
-    return paths;
-  }
-
-  function makeHardLinksToPath( filePath, amount )
-  {
-    let routinePath = path.join( self.provider.path.dir( filePath ), _.idWithDateAndTime() );
-    provider.dirMake( routinePath )
-    for( var i = 0; i < amount; i++ )
-    provider.hardLink( path.join( routinePath, 'file' + i ), filePath );
-  }
-
-
-  var routinePath = test.context.pathFor( 'written/hardLink' );
-  var srcPath,dstPath;
-
-  var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
-  test.case = 'sourceMode: src - oldest file with maximal amount of links';
-  var paths = makeFiles( fileNames, routinePath );
-  test.is( paths.length >= 3 );
-  makeHardLinksToPath( paths[ 0 ], 3 ); // #1 most linked+oldest file
-  makeHardLinksToPath( paths[ paths.length - 1 ], 4 ); // #2 most linked+newest file
-  paths = provider.path.s.normalize( paths );
-  var records = provider.recordFactory().records( paths );
-  logger.log( _.select( records, '*/name' ) )
-  logger.log( 'nlink: ', _.select( records, '*/stat/nlink' ) )
-  logger.log( 'atime: ', _.select( records, '*/stat/atime' ).map( ( r ) => r.getTime() ) )
-  logger.log( 'mtime: ', _.select( records, '*/stat/mtime' ).map( ( r ) => r.getTime() ) )
-  logger.log( 'ctime: ', _.select( records, '*/stat/ctime' ).map( ( r ) => r.getTime() ) )
-  logger.log( 'birthtime: ', _.select( records, '*/stat/birthtime' ).map( ( r ) => r.getTime() ) )
-  var selectedFile = provider._recordsSort({ src : records, sorter : 'modified<hardlinks>' });
-  provider.hardLink
-  ({
-    dstPath : paths,
-    sourceMode : 'modified<hardlinks>'
-  });
-  test.identical( provider.filesAreHardLinked( paths ), hardLinked );
-  var srcPath = paths[ 0 ];
-  test.identical( selectedFile.absolute, srcPath );
-  test.identical( selectedFile.stat.nlink, 4 );
-  var src = provider.fileRead( srcPath );
-  var dst = provider.fileRead( paths[ paths.length - 1 ] );
-  test.identical( src, dst );
-}
-
-//
-
 function hardLinkSoftlinked( test )
 {
   let self = this;
@@ -41536,7 +41458,7 @@ function statsAreHardLinked( test )
   let linkPath1 = self.pathFor( 'written/statsAreHardLinked/link1' );
   let linkPath2 = self.pathFor( 'written/statsAreHardLinked/link2' );
 
-  if( !_.routineIs( _.statsAreHardLinked ) )
+  if( !_.routineIs( _.files.stat.areHardLinked ) )
   {
     test.identical( 1,1 )
     return;
@@ -41546,7 +41468,7 @@ function statsAreHardLinked( test )
   provider.filesDelete( routinePath );
   provider.fileWrite( filePath1, filePath1 );
   var stat = provider.statRead( filePath1 );
-  var got = _.statsAreHardLinked( stat,stat );
+  var got = _.files.stat.areHardLinked( stat,stat );
   if( provider.UsingBigIntForStat )
   test.identical( got, true );
   else
@@ -41558,7 +41480,7 @@ function statsAreHardLinked( test )
   provider.fileWrite( filePath2, filePath2 );
   var stat1 = provider.statRead( filePath1 );
   var stat2 = provider.statRead( filePath2 );
-  var got = _.statsAreHardLinked( stat1,stat2 );
+  var got = _.files.stat.areHardLinked( stat1,stat2 );
   test.identical( got, false );
 
   test.case = 'comparing with terminal of same content';
@@ -41567,7 +41489,7 @@ function statsAreHardLinked( test )
   provider.fileWrite( filePath2, filePath1 );
   var stat1 = provider.statRead( filePath1 );
   var stat2 = provider.statRead( filePath2 );
-  var got = _.statsAreHardLinked( stat1,stat2 );
+  var got = _.files.stat.areHardLinked( stat1,stat2 );
   test.identical( got, false );
 
   test.case = 'imitate problem with same ino, on lower nodejs versions, compare similar files';
@@ -41580,9 +41502,8 @@ function statsAreHardLinked( test )
   stat1.mtime = stat2.mtime;
   stat1.birthtime = stat2.birthtime;
   stat1.ctime = stat2.ctime;
-  var got = _.statsAreHardLinked( stat1,stat2 );
+  var got = _.files.stat.areHardLinked( stat1,stat2 );
   test.identical( got, _.maybe );
-
 
   test.case = 'comparing with hardlink';
   provider.filesDelete( routinePath );
@@ -41590,7 +41511,7 @@ function statsAreHardLinked( test )
   provider.hardLink( filePath2, filePath1 );
   var stat1 = provider.statRead( filePath1 );
   var stat2 = provider.statRead( filePath2 );
-  var got = _.statsAreHardLinked( stat1,stat2 );
+  var got = _.files.stat.areHardLinked( stat1,stat2 );
   if( provider.UsingBigIntForStat )
   test.identical( got, true );
   else
@@ -41602,7 +41523,7 @@ function statsAreHardLinked( test )
   provider.softLink( filePath2, filePath1 );
   var stat1 = provider.statRead( filePath1 );
   var stat2 = provider.statRead( filePath2 );
-  var got = _.statsAreHardLinked( stat1,stat2 );
+  var got = _.files.stat.areHardLinked( stat1,stat2 );
   test.identical( got, false );
 
   test.case = 'comparing with textlink';
@@ -41611,7 +41532,7 @@ function statsAreHardLinked( test )
   provider.textLink( filePath2, filePath1 );
   var stat1 = provider.statRead( filePath1 );
   var stat2 = provider.statRead( filePath2 );
-  var got = _.statsAreHardLinked( stat1,stat2 );
+  var got = _.files.stat.areHardLinked( stat1,stat2 );
   test.identical( got, false );
 
   test.case = 'comparing two diff hardlinks';
@@ -41622,7 +41543,7 @@ function statsAreHardLinked( test )
   provider.hardLink( linkPath2, filePath2 );
   var stat1 = provider.statRead( linkPath1 );
   var stat2 = provider.statRead( linkPath2 );
-  var got = _.statsAreHardLinked( stat1,stat2 );
+  var got = _.files.stat.areHardLinked( stat1,stat2 );
   test.identical( got, false );
 
   test.case = 'comparing two hardlinks to same file';
@@ -41632,7 +41553,7 @@ function statsAreHardLinked( test )
   provider.hardLink( linkPath2, filePath1 );
   var stat1 = provider.statRead( linkPath1 );
   var stat2 = provider.statRead( linkPath2 );
-  var got = _.statsAreHardLinked( stat1,stat2 );
+  var got = _.files.stat.areHardLinked( stat1,stat2 );
   if( provider.UsingBigIntForStat )
   test.identical( got, true );
   else
@@ -41647,7 +41568,7 @@ function statsAreHardLinked( test )
   stat1.ino = stat2.ino = 1;
   stat1.size = 1;
   stat2.size = 2;
-  var got = _.statsAreHardLinked( stat1,stat2 );
+  var got = _.files.stat.areHardLinked( stat1,stat2 );
   test.identical( got, false );
 
   test.case = 'same ino different nlink';
@@ -41659,7 +41580,7 @@ function statsAreHardLinked( test )
   stat1.ino = stat2.ino = 1;
   stat1.nlink = 1;
   stat2.nlink = 2;
-  var got = _.statsAreHardLinked( stat1,stat2 );
+  var got = _.files.stat.areHardLinked( stat1,stat2 );
   test.identical( got, false );
 
   test.case = 'same ino, size, but different date';
@@ -41671,7 +41592,7 @@ function statsAreHardLinked( test )
   stat1.ino = stat2.ino = 1;
   stat1.size = stat2.size = 1;
   stat1.mtime = new Date( Date.UTC( 2018,1,1 ) );
-  var got = _.statsAreHardLinked( stat1,stat2 );
+  var got = _.files.stat.areHardLinked( stat1,stat2 );
   test.identical( got, false );
 
 }
@@ -49314,6 +49235,140 @@ function pathNativize( t )
 }
 
 // --
+// static
+// --
+
+function encodersFromGdfs( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let writeConverters = _.gdf.inMap[ 'structure' ];
+  let readConverters = _.gdf.outMap[ 'structure' ];
+
+  /* */
+
+  test.case = 'check if all write encoders are generated';
+  _checkEncoders( _.files.WriteEncoders, writeConverters );
+
+  /* */
+
+  test.case = 'check if all read encoders are generated';
+  _checkEncoders( _.files.ReadEncoders, readConverters );
+
+  /* */
+
+  test.case = 'add and remove write gdf';
+
+  test.will = 'encoder and gdf should not exist';
+  test.is( !_.files.WriteEncoders[ 'testEncoder' ] );
+  test.is( !_.gdf.extMap[ 'testEncoder' ] || !_.gdf.extMap[ 'testEncoder' ].length );
+  var testConverter =
+  {
+    ext : [ 'testEncoder' ],
+    in : [ 'structure' ],
+    out : [ 'string' ],
+
+    onEncode : function( op )
+    {
+      op.out.data = _.toStr( op.out.data, { levels : 99 } );
+      op.out.format = 'string';
+    }
+  }
+  var gdf = _.Gdf([ testConverter ])[ 0 ];
+
+  test.will = 'encoder should not exist';
+  test.is( !_.files.WriteEncoders[ 'testEncoder' ] );
+
+  test.will = 'update encoders, encoder should exist';
+  _.files.encoder.fromGdfs();
+  var encoder = _.files.WriteEncoders[ 'testEncoder' ];
+  test.is( _.mapIs( encoder ) );
+  test.identical( encoder.exts, gdf.ext );
+  test.identical( encoder.gdf, gdf );
+
+  test.will = 'finit gdf, encoder should exist';
+  gdf.finit();
+  test.is( _.mapIs( _.files.WriteEncoders[ 'testEncoder' ] ) );
+  _.files.encoder.fromGdfs();
+  test.will = 'update encoders, encoder should not exist';
+  test.is( !_.files.WriteEncoders[ 'testEncoder' ] );
+
+  /* */
+
+  test.case = 'adjust gdf exts'
+  var testConverter =
+  {
+    ext : [ 'testEncoder' ],
+    in : [ 'structure' ],
+    out : [ 'string' ],
+
+    onEncode : function( op )
+    {
+      op.out.data = _.toStr( op.out.data, { levels : 99 } );
+      op.out.format = 'string';
+    }
+  }
+  var gdf = _.Gdf([ testConverter ])[ 0 ];
+  var ext = 'testExt';
+  let originalExt = gdf.ext.slice();
+  gdf.ext = [ ext ];
+  test.is( !_.mapIs( _.files.WriteEncoders[ ext ] ) );
+  _.files.encoder.fromGdfs();
+  var encoder = _.files.WriteEncoders[ ext ];
+  test.is( _.mapIs( encoder ) );
+  test.identical( encoder.exts, gdf.ext );
+  test.identical( encoder.gdf, gdf );
+  gdf.ext = originalExt.slice();
+  gdf.finit();
+  _.files.encoder.fromGdfs();
+  test.is( !_.mapIs( _.files.WriteEncoders[ ext ] ) );
+
+  /* - */
+
+  function _checkEncoders( encoders, converters )
+  {
+    _.each( converters, ( gdf ) =>
+    {
+      _.each( gdf.ext, ( ext ) =>
+      {
+        if( encoders[ ext ].gdf.default )
+        {
+          test.will = 'Expects only one default gdf for encoder: ' + ext;
+          let defaultConverter = _.gdf.extMap[ ext ].filter( ( c ) => !!c.default )
+          test.identical( defaultConverter.length, 1 );
+          test.will = ext + ' encoder should exist';
+          test.is( _.mapIs( encoders[ ext ] ) );
+          test.will = ext + ' encoder should use default gdf: ' + defaultConverter[ 0 ].name;
+          test.is( encoders[ ext ].gdf === defaultConverter[ 0 ] );
+        }
+        else
+        {
+          test.will = ext + ' encoder should exist';
+          test.is( _.mapIs( encoders[ ext ] ) );
+          test.will = ext + ' encoder should exist and use gdf: ' + gdf.name;
+          test.is( encoders[ ext ].gdf === gdf );
+        }
+
+        test.will = ext + ' encoder should have onBegin/onEnd or both';
+
+        if( _.files.WriteEncoders[ ext ] )
+        {
+          test.is( _.routineIs( encoders[ ext ].onBegin ) );
+        }
+        else
+        {
+          test.is( _.routineIs( encoders[ ext ].onBegin ) );
+          test.is( _.routineIs( encoders[ ext ].onEnd ) );
+        }
+
+        test.will = ext + ' encoder should have exts arrays';
+        test.is( _.arrayIs( encoders[ ext ].exts ) )
+      })
+    })
+  }
+}
+
+// --
 // experiment
 // --
 
@@ -49639,7 +49694,7 @@ function hardLinkExperiment( test )
   debugger;
   test.identical( statTerminal.ino, statLink.ino );
   debugger;
-  var got = _.statsAreHardLinked( statTerminal, statLink );
+  var got = _.files.stat.areHardLinked( statTerminal, statLink );
   test.identical( got, _.maybe );
   var got = provider.filesAreHardLinked([ linkPath, terminalPath ]);
   test.identical( got, true );
@@ -49648,134 +49703,81 @@ function hardLinkExperiment( test )
 
 //
 
-function encodersFromGdfs( test )
+function hardLinkExperiment( test )
 {
   let self = this;
   let provider = self.provider;
-  let writeConverters = _.gdf.inMap[ 'structure' ];
-  let readConverters = _.gdf.outMap[ 'structure' ];
+  let path = provider.path;
 
-  /* */
+  var delay = 10;
 
-  test.case = 'check if all write encoders are generated';
-  _checkEncoders( _.files.WriteEncoders, writeConverters );
+  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  delay = provider.systemBitrateTimeGet();
 
-  /* */
-
-  test.case = 'check if all read encoders are generated';
-  _checkEncoders( _.files.ReadEncoders, readConverters );
-
-  /* */
-
-  test.case = 'add and remove write gdf';
-
-  test.will = 'encoder and gdf should not exist';
-  test.is( !_.files.WriteEncoders[ 'testEncoder' ] );
-  test.is( !_.gdf.extMap[ 'testEncoder' ] || !_.gdf.extMap[ 'testEncoder' ].length );
-  var testConverter =
+  function makeFiles( names, dirPath, sameTime )
   {
-    ext : [ 'testEncoder' ],
-    in : [ 'structure' ],
-    out : [ 'string' ],
-
-    onEncode : function( op )
+    let now = _.time.now();
+    var paths = names.map( ( name, i ) =>
     {
-      op.out.data = _.toStr( op.out.data, { levels : 99 } );
-      op.out.format = 'string';
-    }
-  }
-  var gdf = _.Gdf([ testConverter ])[ 0 ];
+      var filePath = self.pathFor( path.join( dirPath, name ) );
+      provider.fileWrite({ filePath, data : filePath, purging : 1 });
 
-  test.will = 'encoder should not exist';
-  test.is( !_.files.WriteEncoders[ 'testEncoder' ] );
-
-  test.will = 'update encoders, encoder should exist';
-  _.files.encoder.fromGdfs();
-  var encoder = _.files.WriteEncoders[ 'testEncoder' ];
-  test.is( _.mapIs( encoder ) );
-  test.identical( encoder.exts, gdf.ext );
-  test.identical( encoder.gdf, gdf );
-
-  test.will = 'finit gdf, encoder should exist';
-  gdf.finit();
-  test.is( _.mapIs( _.files.WriteEncoders[ 'testEncoder' ] ) );
-  _.files.encoder.fromGdfs();
-  test.will = 'update encoders, encoder should not exist';
-  test.is( !_.files.WriteEncoders[ 'testEncoder' ] );
-
-  /* */
-
-  test.case = 'adjust gdf exts'
-  var testConverter =
-  {
-    ext : [ 'testEncoder' ],
-    in : [ 'structure' ],
-    out : [ 'string' ],
-
-    onEncode : function( op )
-    {
-      op.out.data = _.toStr( op.out.data, { levels : 99 } );
-      op.out.format = 'string';
-    }
-  }
-  var gdf = _.Gdf([ testConverter ])[ 0 ];
-  var ext = 'testExt';
-  let originalExt = gdf.ext.slice();
-  gdf.ext = [ ext ];
-  test.is( !_.mapIs( _.files.WriteEncoders[ ext ] ) );
-  _.files.encoder.fromGdfs();
-  var encoder = _.files.WriteEncoders[ ext ];
-  test.is( _.mapIs( encoder ) );
-  test.identical( encoder.exts, gdf.ext );
-  test.identical( encoder.gdf, gdf );
-  gdf.ext = originalExt.slice();
-  gdf.finit();
-  _.files.encoder.fromGdfs();
-  test.is( !_.mapIs( _.files.WriteEncoders[ ext ] ) );
-
-  /* - */
-
-  function _checkEncoders( encoders, converters )
-  {
-    _.each( converters, ( gdf ) =>
-    {
-      _.each( gdf.ext, ( ext ) =>
+      if( sameTime )
       {
-        if( encoders[ ext ].gdf.default )
-        {
-          test.will = 'Expects only one default gdf for encoder: ' + ext;
-          let defaultConverter = _.gdf.extMap[ ext ].filter( ( c ) => !!c.default )
-          test.identical( defaultConverter.length, 1 );
-          test.will = ext + ' encoder should exist';
-          test.is( _.mapIs( encoders[ ext ] ) );
-          test.will = ext + ' encoder should use default gdf: ' + defaultConverter[ 0 ].name;
-          test.is( encoders[ ext ].gdf === defaultConverter[ 0 ] );
-        }
-        else
-        {
-          test.will = ext + ' encoder should exist';
-          test.is( _.mapIs( encoders[ ext ] ) );
-          test.will = ext + ' encoder should exist and use gdf: ' + gdf.name;
-          test.is( encoders[ ext ].gdf === gdf );
-        }
+        provider.fileTimeSet( filePath, delay, delay );
+      }
+      else if( i > 0 )
+      {
+        let time = now + ( i + 1 ) * delay;
+        provider.fileTimeSet( filePath, time, time );
+      }
 
-        test.will = ext + ' encoder should have onBegin/onEnd or both';
+      return filePath;
+    });
 
-        if( _.files.WriteEncoders[ ext ] )
-        {
-          test.is( _.routineIs( encoders[ ext ].onBegin ) );
-        }
-        else
-        {
-          test.is( _.routineIs( encoders[ ext ].onBegin ) );
-          test.is( _.routineIs( encoders[ ext ].onEnd ) );
-        }
-
-        test.will = ext + ' encoder should have exts arrays';
-        test.is( _.arrayIs( encoders[ ext ].exts ) )
-      })
-    })
+    return paths;
   }
+
+  function makeHardLinksToPath( filePath, amount )
+  {
+    let routinePath = path.join( self.provider.path.dir( filePath ), _.idWithDateAndTime() );
+    provider.dirMake( routinePath )
+    for( var i = 0; i < amount; i++ )
+    provider.hardLink( path.join( routinePath, 'file' + i ), filePath );
+  }
+
+
+  var routinePath = test.context.pathFor( 'written/hardLink' );
+  var srcPath,dstPath;
+
+  var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
+  test.case = 'sourceMode: src - oldest file with maximal amount of links';
+  var paths = makeFiles( fileNames, routinePath );
+  test.is( paths.length >= 3 );
+  makeHardLinksToPath( paths[ 0 ], 3 ); // #1 most linked+oldest file
+  makeHardLinksToPath( paths[ paths.length - 1 ], 4 ); // #2 most linked+newest file
+  paths = provider.path.s.normalize( paths );
+  var records = provider.recordFactory().records( paths );
+  logger.log( _.select( records, '*/name' ) )
+  logger.log( 'nlink: ', _.select( records, '*/stat/nlink' ) )
+  logger.log( 'atime: ', _.select( records, '*/stat/atime' ).map( ( r ) => r.getTime() ) )
+  logger.log( 'mtime: ', _.select( records, '*/stat/mtime' ).map( ( r ) => r.getTime() ) )
+  logger.log( 'ctime: ', _.select( records, '*/stat/ctime' ).map( ( r ) => r.getTime() ) )
+  logger.log( 'birthtime: ', _.select( records, '*/stat/birthtime' ).map( ( r ) => r.getTime() ) )
+  var selectedFile = provider._recordsSort({ src : records, sorter : 'modified<hardlinks>' });
+  provider.hardLink
+  ({
+    dstPath : paths,
+    sourceMode : 'modified<hardlinks>'
+  });
+  test.identical( provider.filesAreHardLinked( paths ), hardLinked );
+  var srcPath = paths[ 0 ];
+  test.identical( selectedFile.absolute, srcPath );
+  test.identical( selectedFile.stat.nlink, 4 );
+  var src = provider.fileRead( srcPath );
+  var dst = provider.fileRead( paths[ paths.length - 1 ] );
+  test.identical( src, dst );
+
 }
 
 // --
@@ -50001,6 +50003,10 @@ var Self =
 
     pathNativize,
 
+    // static
+
+    encodersFromGdfs,
+
     // experiment
 
     fileCopyExperiment,
@@ -50008,10 +50014,6 @@ var Self =
     experiment,
     experiment2,
     hardLinkExperiment,
-
-    // static
-
-    encodersFromGdfs,
 
   }
 

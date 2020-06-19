@@ -1429,9 +1429,7 @@ function fileCopyAct( o )
     .then( ( got ) =>
     {
       dstStat = got;
-
-      if( dstStat )
-      return true;
+      return null;
     })
     .then( () =>
     {

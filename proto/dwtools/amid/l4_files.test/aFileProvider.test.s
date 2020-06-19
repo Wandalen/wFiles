@@ -3845,7 +3845,7 @@ function fileCopyActSync( test )
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath2,
     sync : 1,
-    breakingDstHardLink : 0,
+    // breakingDstHardLink : 0,
   }
   test.shouldThrowErrorSync( () => provider.fileCopyAct( o ) );
   test.is( provider.isTerminal( srcPath ) );
@@ -3864,7 +3864,7 @@ function fileCopyActSync( test )
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
       sync : 1,
-      breakingDstHardLink : 0,
+      // breakingDstHardLink : 0,
       // breakingDstSoftLink : 0
     })
   })
@@ -3882,7 +3882,7 @@ function fileCopyActSync( test )
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
       sync : 1,
-      breakingDstHardLink : 1,
+      // breakingDstHardLink : 1,
       // breakingDstSoftLink : 0
     })
   })
@@ -3900,7 +3900,7 @@ function fileCopyActSync( test )
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
       sync : 1,
-      breakingDstHardLink : 0,
+      // breakingDstHardLink : 0,
       // breakingDstSoftLink : 1
     })
   })
@@ -3918,7 +3918,7 @@ function fileCopyActSync( test )
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
       sync : 1,
-      breakingDstHardLink : 1,
+      // breakingDstHardLink : 1,
       // breakingDstSoftLink : 1
     })
   })
@@ -3937,7 +3937,7 @@ function fileCopyActSync( test )
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
       sync : 1,
-      breakingDstHardLink : 0,
+      // breakingDstHardLink : 0,
       // breakingDstSoftLink : 0
     })
   })
@@ -3958,7 +3958,7 @@ function fileCopyActSync( test )
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
       sync : 1,
-      breakingDstHardLink : 1,
+      // breakingDstHardLink : 1,
       // breakingDstSoftLink : 0
     })
   })
@@ -3979,7 +3979,7 @@ function fileCopyActSync( test )
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
       sync : 1,
-      breakingDstHardLink : 0,
+      // breakingDstHardLink : 0,
       // breakingDstSoftLink : 1
     })
   })
@@ -4000,7 +4000,7 @@ function fileCopyActSync( test )
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
       sync : 1,
-      breakingDstHardLink : 1,
+      // breakingDstHardLink : 1,
       // breakingDstSoftLink : 1
     })
   })
@@ -4021,7 +4021,7 @@ function fileCopyActSync( test )
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
       sync : 1,
-      breakingDstHardLink : 0,
+      // breakingDstHardLink : 0,
       // breakingDstSoftLink : 0
     })
   })
@@ -4042,7 +4042,7 @@ function fileCopyActSync( test )
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
       sync : 1,
-      breakingDstHardLink : 1,
+      // breakingDstHardLink : 1,
       // breakingDstSoftLink : 0
     })
   })
@@ -4063,7 +4063,7 @@ function fileCopyActSync( test )
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
       sync : 1,
-      breakingDstHardLink : 0,
+      // breakingDstHardLink : 0,
       // breakingDstSoftLink : 1
     })
   })
@@ -4084,7 +4084,7 @@ function fileCopyActSync( test )
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
       sync : 1,
-      breakingDstHardLink : 1,
+      // breakingDstHardLink : 1,
       // breakingDstSoftLink : 1
     })
   })
@@ -4107,7 +4107,7 @@ function fileCopyActSync( test )
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
       sync : 1,
-      breakingDstHardLink : 0,
+      // breakingDstHardLink : 0,
       // breakingDstSoftLink : 0
     })
   })
@@ -4130,7 +4130,7 @@ function fileCopyActSync( test )
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
       sync : 1,
-      breakingDstHardLink : 1,
+      // breakingDstHardLink : 1,
       // breakingDstSoftLink : 0
     })
   })
@@ -4153,7 +4153,7 @@ function fileCopyActSync( test )
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
       sync : 1,
-      breakingDstHardLink : 0,
+      // breakingDstHardLink : 0,
       // breakingDstSoftLink : 1
     })
   })
@@ -4176,7 +4176,7 @@ function fileCopyActSync( test )
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
       sync : 1,
-      breakingDstHardLink : 1,
+      // breakingDstHardLink : 1,
       // breakingDstSoftLink : 1
     })
   })
@@ -4200,7 +4200,7 @@ function fileCopyActSync( test )
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
       sync : 1,
-      breakingDstHardLink : 0,
+      // breakingDstHardLink : 0,
       // breakingDstSoftLink : 0
     })
   })
@@ -4226,7 +4226,7 @@ function fileCopyActSync( test )
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
       sync : 1,
-      breakingDstHardLink : 1,
+      // breakingDstHardLink : 1,
       // breakingDstSoftLink : 0
     })
   })
@@ -4252,7 +4252,7 @@ function fileCopyActSync( test )
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
       sync : 1,
-      breakingDstHardLink : 0,
+      // breakingDstHardLink : 0,
       // breakingDstSoftLink : 1
     })
   })
@@ -4278,7 +4278,7 @@ function fileCopyActSync( test )
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
       sync : 1,
-      breakingDstHardLink : 1,
+      // breakingDstHardLink : 1,
       // breakingDstSoftLink : 1
     })
   })
@@ -4866,6 +4866,57 @@ function fileCopyActSync( test )
   })
   test.identical( o.srcPath, expected.srcPath );
 
+}
+
+//
+
+function fileCopyActAsync( test )
+{
+  let self = this;
+  let provider = self.provider;
+  let path = provider.path;
+
+  if( !_.routineIs( provider.fileCopyAct ) )
+  {
+    test.identical( 1,1 );
+    return;
+  }
+
+  var got;
+  var con = new _.Consequence().take( null );
+
+  var routinePath = test.context.pathFor( 'written/fileCopy' );
+  var srcPath = path.join( routinePath,'src' );
+  var dstPath = path.join( routinePath,'dst' );
+
+  /* */
+  
+  con.then( () =>
+  {
+    provider.filesDelete( routinePath );
+    provider.fileWrite( srcPath, srcPath );
+    var o =
+    {
+      srcPath,
+      dstPath : dstPath,
+      relativeSrcPath : srcPath,
+      relativeDstPath : dstPath,
+      sync : 0
+    }
+    return provider.fileCopyAct( o )
+    .then( () => 
+    {
+      test.is( provider.isTerminal( srcPath ) );
+      test.is( provider.isTerminal( dstPath ) );
+      var file = provider.fileRead( dstPath );
+      test.identical( file, srcPath );
+      return null;
+    })
+  })
+  
+  /* */
+
+  return con;
 }
 
 //
@@ -49782,6 +49833,7 @@ var Self =
     // qqq : extend linking routines with cases using resolvingSrcSoftLink:2 and resolvingSrcTextLink:0-2
 
     fileCopyActSync,
+    fileCopyActAsync,
     fileCopySync,
     fileCopyRelativePath,
     fileCopyLinksSync,

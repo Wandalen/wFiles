@@ -94,112 +94,118 @@ Self.shortName = 'Partial';
 // shortcuts
 // --
 
-function _vectorizeKeysAndVals( routine, select )
-{
-  select = select || 1;
+let vectorizeKeysAndVals = _.files._.vectorizeKeysAndVals;
+let vectorize = _.files._.vectorize;
+let vectorizeAll = _.files._.vectorizeAll;
+let vectorizeAny = _.files._.vectorizeAny;
+let vectorizeNone = _.files._.vectorizeNone;
 
-  let routineName = routine.name;
-
-  _.assert( _.routineIs( routine ) );
-  _.assert( _.strDefined( routineName ) );
-  _.assert( arguments.length === 1 || arguments.length === 2 );
-
-  let routine2 = _.routineVectorize_functor
-  ({
-    routine : [ routineName ],
-    vectorizingArray : 1,
-    vectorizingMapVals : 1,
-    vectorizingMapKeys : 1,
-    select : select,
-  });
-
-  _.routineExtend( routine2, routine );
-
-  return routine2;
-}
-
+// function _vectorizeKeysAndVals( routine, select )
+// {
+//   select = select || 1;
 //
-
-function _vectorize( routine, select )
-{
-  select = select || 1;
-
-  let routineName = routine.name;
-
-  _.assert( _.routineIs( routine ) );
-  _.assert( _.strDefined( routineName ) );
-  _.assert( arguments.length === 1 || arguments.length === 2 );
-
-  let routine2 = _.routineVectorize_functor
-  ({
-    routine : [ routineName ],
-    vectorizingArray : 1,
-    vectorizingMapVals : 0,
-    vectorizingMapKeys : 0,
-    select : select,
-  });
-
-  _.routineExtend( routine2, routine );
-
-  return routine2;
-}
-
+//   let routineName = routine.name;
 //
-
-function _vectorizeAll( routine, select )
-{
-  _.assert( arguments.length === 1 || arguments.length === 2 );
-  let routine2 = _vectorize( routine, select );
-  _.routineExtend( all, routine );
-  return all;
-
-  /* */
-
-  function all()
-  {
-    let result = routine2.apply( this, arguments );
-    return _.all( result );
-  }
-
-}
-
+//   _.assert( _.routineIs( routine ) );
+//   _.assert( _.strDefined( routineName ) );
+//   _.assert( arguments.length === 1 || arguments.length === 2 );
 //
-
-function _vectorizeAny( routine, select )
-{
-  _.assert( arguments.length === 1 || arguments.length === 2 );
-  let routine2 = _vectorize( routine, select );
-  _.routineExtend( any, routine );
-  return any;
-
-  /* */
-
-  function any()
-  {
-    let result = routine2.apply( this, arguments );
-    return _.any( result );
-  }
-
-}
-
+//   let routine2 = _.routineVectorize_functor
+//   ({
+//     routine : [ routineName ],
+//     vectorizingArray : 1,
+//     vectorizingMapVals : 1,
+//     vectorizingMapKeys : 1,
+//     select : select,
+//   });
 //
-
-function _vectorizeNone( routine, select )
-{
-  _.assert( arguments.length === 1 || arguments.length === 2 );
-  let routine2 = _vectorize( routine, select );
-  _.routineExtend( none, routine );
-  return none;
-
-  /* */
-
-  function none()
-  {
-    let result = routine2.apply( this, arguments );
-    return _.none( result );
-  }
-
-}
+//   _.routineExtend( routine2, routine );
+//
+//   return routine2;
+// }
+//
+// //
+//
+// function vectorize( routine, select )
+// {
+//   select = select || 1;
+//
+//   let routineName = routine.name;
+//
+//   _.assert( _.routineIs( routine ) );
+//   _.assert( _.strDefined( routineName ) );
+//   _.assert( arguments.length === 1 || arguments.length === 2 );
+//
+//   let routine2 = _.routineVectorize_functor
+//   ({
+//     routine : [ routineName ],
+//     vectorizingArray : 1,
+//     vectorizingMapVals : 0,
+//     vectorizingMapKeys : 0,
+//     select : select,
+//   });
+//
+//   _.routineExtend( routine2, routine );
+//
+//   return routine2;
+// }
+//
+// //
+//
+// function vectorizeAll( routine, select )
+// {
+//   _.assert( arguments.length === 1 || arguments.length === 2 );
+//   let routine2 = vectorize( routine, select );
+//   _.routineExtend( all, routine );
+//   return all;
+//
+//   /* */
+//
+//   function all()
+//   {
+//     let result = routine2.apply( this, arguments );
+//     return _.all( result );
+//   }
+//
+// }
+//
+// //
+//
+// function vectorizeAny( routine, select )
+// {
+//   _.assert( arguments.length === 1 || arguments.length === 2 );
+//   let routine2 = vectorize( routine, select );
+//   _.routineExtend( any, routine );
+//   return any;
+//
+//   /* */
+//
+//   function any()
+//   {
+//     let result = routine2.apply( this, arguments );
+//     return _.any( result );
+//   }
+//
+// }
+//
+// //
+//
+// function vectorizeNone( routine, select )
+// {
+//   _.assert( arguments.length === 1 || arguments.length === 2 );
+//   let routine2 = vectorize( routine, select );
+//   _.routineExtend( none, routine );
+//   return none;
+//
+//   /* */
+//
+//   function none()
+//   {
+//     let result = routine2.apply( this, arguments );
+//     return _.none( result );
+//   }
+//
+// }
 
 // --
 // inter
@@ -3765,16 +3771,19 @@ hashRead.having.aspect = 'entry';
 
 //
 
-function hashszRead_body( o )
+function hashSzRead_body( o )
 {
   let self = this;
   let result;
 
-  let stat = self.statRead({ filePath : o.filePath, sync : o.sync });
+  let stat = self.statRead({ filePath : o.filePath, sync : o.sync, throwing : o.throwing });
   let hash = self.hashRead( o );
 
-  let ready = _.Consequence.AndKeep_( _.Consequence.From( stat ), _.Consequence.From( hash ) ).then( ( arg ) => /* xxx : remove Consequence.From */
+  /* xxx : remove Consequence.From after And will be adjusted */
+  let ready = _.Consequence.AndKeep_( _.Consequence.From( stat ), _.Consequence.From( hash ) ).then( ( arg ) =>
   {
+    if( !arg[ 0 ] || !arg[ 1 ] )
+    return null;
     return arg[ 0 ].size + '-' + arg[ 1 ];
   });
 
@@ -3783,14 +3792,84 @@ function hashszRead_body( o )
   return ready;
 }
 
-_.routineExtend( hashszRead_body, hashRead.body );
+_.routineExtend( hashSzRead_body, hashRead.body );
 
-var defaults = hashszRead_body.defaults;
-defaults.throwing = null;
-defaults.verbosity = null;
+var defaults = hashSzRead_body.defaults;
+let hashSzRead = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, hashSzRead_body );
+hashSzRead.having.aspect = 'entry';
 
-let hashszRead = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, hashszRead_body );
-hashszRead.having.aspect = 'entry';
+//
+
+function hashSzIsUpToDate_pre( routine, args )
+{
+  let self = this;
+  // let path = self.path;
+
+  if( args.length === 2 )
+  args = [{ filePath : args[ 0 ], hash : args[ 1 ] }];
+
+  return self._preFilePathScalarWithProviderDefaults( routine, args );
+
+  // _.assert( arguments.length === 2, 'Expects exactly two arguments' );
+  // _.assert( _.objectIs( args[ 0 ] ) || path.is( args[ 0 ] ), 'Expects options map or path' );
+  // _.assert( args && args.length === 1, 'Routine ' + routine.name + ' expects exactly one argument' );
+  //
+  // let o = args[ 0 ];
+  //
+  // if( path.like( o ) )
+  // o = { filePath : path.from( o ) };
+  //
+  // _.routineOptions( routine, o );
+  //
+  // o.filePath = path.normalize( o.filePath );
+  //
+  // _.assert( path.isAbsolute( o.filePath ), () => 'Expects absolute path {-o.filePath-}, but got ' + _.strQuote( o.filePath ) );
+  //
+  // self._providerDefaultsApply( o );
+  //
+  // return o;
+}
+
+function hashSzIsUpToDate_body( o )
+{
+  let self = this;
+  let result;
+
+  _.assert( _.strDefined( o.hash ) );
+
+  let ready = _.Consequence.From( self.statRead({ filePath : o.filePath, sync : o.sync, throwing : o.throwing }) );
+  let parsed = o.hash.split( '-' );
+  parsed[ 0 ] = _.bigIntFrom( parsed[ 0 ] );
+
+  ready
+  .then( ( stat ) =>
+  {
+    if( stat === null )
+    return null;
+    if( stat.size !== parsed[ 0 ] )
+    return false;
+    return self.hashRead( _.mapOnly( o, self.hashRead.defaults ) );
+  })
+  .then( ( hash ) =>
+  {
+    if( !hash )
+    return hash;
+    if( hash !== parsed[ 1 ] )
+    return false;
+    return true;
+  });
+
+  if( o.sync )
+  return ready.sync();
+  return ready;
+}
+
+_.routineExtend( hashSzIsUpToDate_body, hashRead.body );
+
+var defaults = hashSzIsUpToDate_body.defaults;
+defaults.hash = null;
+let hashSzIsUpToDate = _.routineFromPreAndBody( hashSzIsUpToDate_pre, hashSzIsUpToDate_body );
+hashSzIsUpToDate.having.aspect = 'entry';
 
 //
 
@@ -9141,11 +9220,11 @@ let Extension =
 
   // functors
 
-  /* xxx2 : move to namespace */
-  _vectorize,
-  _vectorizeAll,
-  _vectorizeAny,
-  _vectorizeNone,
+  // /* xxx2 : move to namespace */
+  // vectorize,
+  // vectorizeAll,
+  // vectorizeAny,
+  // vectorizeNone,
 
   // etc
 
@@ -9214,96 +9293,96 @@ let Extension =
 
   statReadAct,
   statRead,
-  statsRead : _vectorize( statRead ),
+  statsRead : vectorize( statRead ),
   statResolvedRead,
-  statsResolvedRead : _vectorize( statResolvedRead ),
+  statsResolvedRead : vectorize( statResolvedRead ),
 
   filesSize,
   fileSize,
 
   fileExistsAct,
   fileExists,
-  filesExists : _vectorize( fileExists ),
-  filesExistsAll : _vectorizeAll( fileExists ),
-  filesExistsAny : _vectorizeAny( fileExists ),
-  filesExistsNone : _vectorizeNone( fileExists ),
+  filesExists : vectorize( fileExists ),
+  filesExistsAll : vectorizeAll( fileExists ),
+  filesExistsAny : vectorizeAny( fileExists ),
+  filesExistsNone : vectorizeNone( fileExists ),
 
   isTerminal,
-  areTerminals : _vectorize( isTerminal ),
-  allAreTerminals : _vectorizeAll( isTerminal ),
-  anyAreTerminals : _vectorizeAny( isTerminal ),
-  noneAreTerminals : _vectorizeNone( isTerminal ),
+  areTerminals : vectorize( isTerminal ),
+  allAreTerminals : vectorizeAll( isTerminal ),
+  anyAreTerminals : vectorizeAny( isTerminal ),
+  noneAreTerminals : vectorizeNone( isTerminal ),
   resolvedIsTerminal,
-  resolvedAreTerminals : _vectorize( resolvedIsTerminal ),
-  resolvedAllAreTerminals : _vectorizeAll( resolvedIsTerminal ),
-  resolvedAnyAreTerminals : _vectorizeAny( resolvedIsTerminal ),
-  resolvedNoneAreTerminals : _vectorizeNone( resolvedIsTerminal ),
+  resolvedAreTerminals : vectorize( resolvedIsTerminal ),
+  resolvedAllAreTerminals : vectorizeAll( resolvedIsTerminal ),
+  resolvedAnyAreTerminals : vectorizeAny( resolvedIsTerminal ),
+  resolvedNoneAreTerminals : vectorizeNone( resolvedIsTerminal ),
 
   isDir,
-  areDirs : _vectorize( isDir ),
-  allAreDirs : _vectorizeAll( isDir ),
-  anyAreDirs : _vectorizeAny( isDir ),
-  noneAreDirs : _vectorizeNone( isDir ),
+  areDirs : vectorize( isDir ),
+  allAreDirs : vectorizeAll( isDir ),
+  anyAreDirs : vectorizeAny( isDir ),
+  noneAreDirs : vectorizeNone( isDir ),
   resolvedIsDir,
-  resolvedAreDirs : _vectorize( resolvedIsDir ),
-  resolvedAllAreDirs : _vectorizeAll( resolvedIsDir ),
-  resolvedAnyAreDirs : _vectorizeAny( resolvedIsDir ),
-  resolvedNoneAreDirs : _vectorizeNone( resolvedIsDir ),
+  resolvedAreDirs : vectorize( resolvedIsDir ),
+  resolvedAllAreDirs : vectorizeAll( resolvedIsDir ),
+  resolvedAnyAreDirs : vectorizeAny( resolvedIsDir ),
+  resolvedNoneAreDirs : vectorizeNone( resolvedIsDir ),
 
   isHardLink,
-  areHardLinks : _vectorize( isHardLink ),
-  allAreHardLinks : _vectorizeAll( isHardLink ),
-  anyAreHardLinks : _vectorizeAny( isHardLink ),
-  noneAreHardLinks : _vectorizeNone( isHardLink ),
+  areHardLinks : vectorize( isHardLink ),
+  allAreHardLinks : vectorizeAll( isHardLink ),
+  anyAreHardLinks : vectorizeAny( isHardLink ),
+  noneAreHardLinks : vectorizeNone( isHardLink ),
   resolvedIsHardLink,
-  resolvedAreHardLinks : _vectorize( resolvedIsHardLink ),
-  resolvedAllAreHardLinks : _vectorizeAll( resolvedIsHardLink ),
-  resolvedAnyAreHardLinks : _vectorizeAny( resolvedIsHardLink ),
-  resolvedNoneAreHardLinks : _vectorizeNone( resolvedIsHardLink ),
+  resolvedAreHardLinks : vectorize( resolvedIsHardLink ),
+  resolvedAllAreHardLinks : vectorizeAll( resolvedIsHardLink ),
+  resolvedAnyAreHardLinks : vectorizeAny( resolvedIsHardLink ),
+  resolvedNoneAreHardLinks : vectorizeNone( resolvedIsHardLink ),
 
   isSoftLink,
-  filesAreSoftLinks : _vectorize( isSoftLink ),
-  allAreSoftLinks : _vectorizeAll( isSoftLink ),
-  anyAreSoftLinks : _vectorizeAny( isSoftLink ),
-  noneAreSoftLinks : _vectorizeNone( isSoftLink ),
+  filesAreSoftLinks : vectorize( isSoftLink ),
+  allAreSoftLinks : vectorizeAll( isSoftLink ),
+  anyAreSoftLinks : vectorizeAny( isSoftLink ),
+  noneAreSoftLinks : vectorizeNone( isSoftLink ),
   resolvedIsSoftLink,
-  resolvedAreSoftLinks : _vectorize( resolvedIsSoftLink ),
-  resolvedAllAreSoftLinks : _vectorizeAll( resolvedIsSoftLink ),
-  resolvedAnyAreSoftLinks : _vectorizeAny( resolvedIsSoftLink ),
-  resolvedNoneAreSoftLinks : _vectorizeNone( resolvedIsSoftLink ),
+  resolvedAreSoftLinks : vectorize( resolvedIsSoftLink ),
+  resolvedAllAreSoftLinks : vectorizeAll( resolvedIsSoftLink ),
+  resolvedAnyAreSoftLinks : vectorizeAny( resolvedIsSoftLink ),
+  resolvedNoneAreSoftLinks : vectorizeNone( resolvedIsSoftLink ),
 
   isTextLink,
-  filesAreTextLinks : _vectorize( isTextLink ),
-  allAreTextLinks : _vectorizeAll( isTextLink ),
-  anyAreTextLinks : _vectorizeAny( isTextLink ),
-  noneAreTextLinks : _vectorizeNone( isTextLink ),
+  filesAreTextLinks : vectorize( isTextLink ),
+  allAreTextLinks : vectorizeAll( isTextLink ),
+  anyAreTextLinks : vectorizeAny( isTextLink ),
+  noneAreTextLinks : vectorizeNone( isTextLink ),
   resolvedIsTextLink,
-  resolvedAreTextLinks : _vectorize( resolvedIsTextLink ),
-  resolvedAllAreTextLinks : _vectorizeAll( resolvedIsTextLink ),
-  resolvedAnyAreTextLinks : _vectorizeAny( resolvedIsTextLink ),
-  resolvedNoneAreTextLinks : _vectorizeNone( resolvedIsTextLink ),
+  resolvedAreTextLinks : vectorize( resolvedIsTextLink ),
+  resolvedAllAreTextLinks : vectorizeAll( resolvedIsTextLink ),
+  resolvedAnyAreTextLinks : vectorizeAny( resolvedIsTextLink ),
+  resolvedNoneAreTextLinks : vectorizeNone( resolvedIsTextLink ),
 
   isLink,
-  areLinks : _vectorize( isLink ),
-  allAreLinks : _vectorizeAll( isLink ),
-  anyAreLinks : _vectorizeAny( isLink ),
-  noneAreLinks : _vectorizeNone( isLink ),
+  areLinks : vectorize( isLink ),
+  allAreLinks : vectorizeAll( isLink ),
+  anyAreLinks : vectorizeAny( isLink ),
+  noneAreLinks : vectorizeNone( isLink ),
   resolvedIsLink,
-  filesResolvedAreLinks : _vectorize( resolvedIsLink ),
-  filesResolvedAllAreLinks : _vectorizeAll( resolvedIsLink ),
-  filesResolvedAnyAreLinks : _vectorizeAny( resolvedIsLink ),
-  filesResolvedNoneAreLinks : _vectorizeNone( resolvedIsLink ),
+  filesResolvedAreLinks : vectorize( resolvedIsLink ),
+  filesResolvedAllAreLinks : vectorizeAll( resolvedIsLink ),
+  filesResolvedAnyAreLinks : vectorizeAny( resolvedIsLink ),
+  filesResolvedNoneAreLinks : vectorizeNone( resolvedIsLink ),
 
   dirIsEmpty,
-  dirsAreEmpty : _vectorize( dirIsEmpty ),
-  dirsAllAreEmpty : _vectorizeAll( dirIsEmpty ),
-  dirsAnyAreEmpty : _vectorizeAny( dirIsEmpty ),
-  dirsNoneAreEmpty : _vectorizeNone( dirIsEmpty ),
+  dirsAreEmpty : vectorize( dirIsEmpty ),
+  dirsAllAreEmpty : vectorizeAll( dirIsEmpty ),
+  dirsAnyAreEmpty : vectorizeAny( dirIsEmpty ),
+  dirsNoneAreEmpty : vectorizeNone( dirIsEmpty ),
   resolvedDirIsEmpty,
-  resolvedDirsAreEmpty : _vectorize( resolvedDirIsEmpty ),
-  resolvedDirsAllAreEmpty : _vectorizeAll( resolvedDirIsEmpty ),
-  resolvedDirsAnyAreEmpty : _vectorizeAny( resolvedDirIsEmpty ),
-  resolvedDirsNoneAreEmpty : _vectorizeNone( resolvedDirIsEmpty ),
+  resolvedDirsAreEmpty : vectorize( resolvedDirIsEmpty ),
+  resolvedDirsAllAreEmpty : vectorizeAll( resolvedDirIsEmpty ),
+  resolvedDirsAnyAreEmpty : vectorizeAny( resolvedDirIsEmpty ),
+  resolvedDirsNoneAreEmpty : vectorizeNone( resolvedDirIsEmpty ),
 
   // read
 
@@ -9319,7 +9398,8 @@ let Extension =
 
   hashReadAct,
   hashRead,
-  hashszRead,
+  hashSzRead, /* qqq : cover */
+  hashSzIsUpToDate, /* qqq : cover */
 
   dirReadAct,
   dirRead,

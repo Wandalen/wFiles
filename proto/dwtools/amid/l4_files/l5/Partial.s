@@ -7543,7 +7543,6 @@ function _fileRenameAct( c )
     .then( () =>
     {
       let o2 = _.mapExtend( null, c.options2 );
-      o2.breakingDstHardLink = o.breakingDstHardLink;
       let result = self.fileCopyAct( o2 );
       return o.sync ? true : result;
     })
@@ -7599,7 +7598,7 @@ defaults.srcPath = null;
 // defaults.originalSrcPath = null;
 defaults.relativeDstPath = null;
 defaults.relativeSrcPath = null;
-defaults.breakingDstHardLink = 0; /* qqq2 : remove the option from Act method? */
+// defaults.breakingDstHardLink = 0; /* qqq2 : remove the option from Act method? aaa:done */
 defaults.sync = null;
 
 var having = fileCopyAct.having = Object.create( null );
@@ -7790,16 +7789,31 @@ function _fileCopyAct( c )
         throw _.err( 'Cant copy directory ' + _.strQuote( o.srcPath ) + ', consider method filesReflect'  );
       }
     }
-
-    return self.fileCopyAct
-    ({
-      dstPath : o.dstPath,
-      srcPath : o.srcPath,
-      relativeDstPath : o.relativeDstPath,
-      relativeSrcPath : o.relativeSrcPath,
-      breakingDstHardLink : o.breakingDstHardLink,
-      sync : o.sync,
+    
+    let con = _.Consequence.Try( () => 
+    {
+      if( o.breakingDstHardLink && self.isHardLink( o.dstPath ) )
+      return self.hardLinkBreak({ filePath : o.dstPath, sync : o.sync });
+      return true;
     });
+    
+    con.then( () =>
+    {
+      let result = self.fileCopyAct
+      ({
+        dstPath : o.dstPath,
+        srcPath : o.srcPath,
+        relativeDstPath : o.relativeDstPath,
+        relativeSrcPath : o.relativeSrcPath,
+        sync : o.sync,
+      });
+      return o.sync ? true : result;
+    })
+  
+    if( o.sync )
+    return con.syncMaybe();
+    
+    return con;
   }
 
 }
@@ -7864,8 +7878,6 @@ defaults.srcPath = null;
 // defaults.originalSrcPath = null;
 defaults.relativeDstPath = null;
 defaults.relativeSrcPath = null;
-defaults.breakingSrcHardLink = 0;
-defaults.breakingDstHardLink = 1;
 defaults.sync = null;
 
 var having = hardLinkAct.having = Object.create( null );

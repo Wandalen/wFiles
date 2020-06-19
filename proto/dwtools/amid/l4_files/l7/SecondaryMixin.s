@@ -1168,11 +1168,13 @@ function configUserWrite( o )
 
   let filePath = self.configUserPath( _.mapBut( o, [ 'structure' ] ) );
 
+  /* qqq : cover option encoding of method fileWrite */
+  /* qqq : cover encoding : _.unknown of method fileWrite */
   return self.fileWrite
   ({
     filePath,
     data : o.structure,
-    encoding : _.unknown, /* qqq2 : cover option encoding of method fileWrite */
+    encoding : _.unknown, 
   });
 
 }

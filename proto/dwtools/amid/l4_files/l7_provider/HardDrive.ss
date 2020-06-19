@@ -1544,10 +1544,10 @@ function fileCopyAct( o )
     return new _.Consequence().error( err );
   }
 
-  if( o.breakingDstHardLink && self.isHardLink( o.dstPath ) ) /* qqq2 : remove option breakingDstHardLink from Act routine */
-  self.hardLinkBreak({ filePath : o.dstPath, sync : 1 });
+  // if( o.breakingDstHardLink && self.isHardLink( o.dstPath ) ) /* qqq2 : remove option breakingDstHardLink from Act routine aaa:done */
+  // self.hardLinkBreak({ filePath : o.dstPath, sync : 1 });
 
-  if( self.isSoftLink( o.srcPath ) ) /* qqq2 : should not be here. move to partial */
+  if( self.isSoftLink( o.srcPath ) ) /* qqq2 : should not be here. move to partial aaa: should be here becase Extract has more optiomal implementation of this case */
   {
     if( self.fileExistsAct({ filePath : o.dstPath }) )
     self.fileDeleteAct({ filePath : o.dstPath, sync : 1 })
@@ -1587,7 +1587,7 @@ function fileCopyAct( o )
     let con = new _.Consequence().take( null );
     let readCon = new _.Consequence();
     let writeCon = new _.Consequence();
-    /* qqq2 : too many consequences? */
+    /* qqq2 : too many consequences? aaa : one per stream and one consequence to handle messages from first two */
 
     con.andKeep( [ readCon, writeCon ] );
 

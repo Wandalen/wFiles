@@ -672,7 +672,6 @@ let Restricts =
 
 _.mapSupplement( _.files._, Restricts );
 
-let Extension = /* zzz : review */
 {
 
   // regexp

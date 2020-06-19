@@ -7464,7 +7464,6 @@ function _fileRenameAct( c )
     .then( () =>
     {
       let o2 = _.mapExtend( null, c.options2 );
-      o2.breakingDstHardLink = o.breakingDstHardLink;
       let result = self.fileCopyAct( o2 );
       return o.sync ? true : result;
     })

@@ -3842,7 +3842,7 @@ function fileCopyActSync( test )
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
       sync : 1,
-      // breakingDstHardLink : 1,
+      breakingDstHardLink : 1,
       // breakingDstSoftLink : 0
     })
   })
@@ -3878,7 +3878,7 @@ function fileCopyActSync( test )
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
       sync : 1,
-      // breakingDstHardLink : 1,
+      breakingDstHardLink : 1,
       // breakingDstSoftLink : 1
     })
   })
@@ -3918,7 +3918,7 @@ function fileCopyActSync( test )
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
       sync : 1,
-      // breakingDstHardLink : 1,
+      breakingDstHardLink : 1,
       // breakingDstSoftLink : 0
     })
   })
@@ -3960,7 +3960,7 @@ function fileCopyActSync( test )
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
       sync : 1,
-      // breakingDstHardLink : 1,
+      breakingDstHardLink : 1,
       // breakingDstSoftLink : 1
     })
   })
@@ -4002,7 +4002,7 @@ function fileCopyActSync( test )
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
       sync : 1,
-      // breakingDstHardLink : 1,
+      breakingDstHardLink : 1,
       // breakingDstSoftLink : 0
     })
   })
@@ -4044,7 +4044,7 @@ function fileCopyActSync( test )
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
       sync : 1,
-      // breakingDstHardLink : 1,
+      breakingDstHardLink : 1,
       // breakingDstSoftLink : 1
     })
   })
@@ -4090,7 +4090,7 @@ function fileCopyActSync( test )
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
       sync : 1,
-      // breakingDstHardLink : 1,
+      breakingDstHardLink : 1,
       // breakingDstSoftLink : 0
     })
   })
@@ -4136,7 +4136,7 @@ function fileCopyActSync( test )
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
       sync : 1,
-      // breakingDstHardLink : 1,
+      breakingDstHardLink : 1,
       // breakingDstSoftLink : 1
     })
   })
@@ -4186,7 +4186,7 @@ function fileCopyActSync( test )
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
       sync : 1,
-      // breakingDstHardLink : 1,
+      breakingDstHardLink : 1,
       // breakingDstSoftLink : 0
     })
   })
@@ -4238,7 +4238,7 @@ function fileCopyActSync( test )
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
       sync : 1,
-      // breakingDstHardLink : 1,
+      breakingDstHardLink : 1,
       // breakingDstSoftLink : 1
     })
   })
@@ -30474,8 +30474,8 @@ function hardLinkActSync( test )
     dstPath,
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
-    // breakingSrcHardLink : 0,
-    // breakingDstHardLink : 1,
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1,
     sync : 1
   }
   var expected = _.mapOwnKeys( o );
@@ -30499,8 +30499,8 @@ function hardLinkActSync( test )
     dstPath,
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
-    // breakingSrcHardLink : 0,
-    // breakingDstHardLink : 1,
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1,
     sync : 1
   }
   test.shouldThrowErrorOfAnyKind( () =>
@@ -30522,8 +30522,8 @@ function hardLinkActSync( test )
     dstPath,
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
-    // breakingSrcHardLink : 0,
-    // breakingDstHardLink : 1,
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1,
     sync : 1
   }
   test.shouldThrowErrorOfAnyKind( () =>
@@ -30546,8 +30546,8 @@ function hardLinkActSync( test )
     dstPath,
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
-    // breakingSrcHardLink : 0,
-    // breakingDstHardLink : 1,
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1,
     sync : 1
   }
   provider.hardLinkAct( o );
@@ -30572,8 +30572,8 @@ function hardLinkActSync( test )
     dstPath,
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
-    // breakingSrcHardLink : 0,
-    // breakingDstHardLink : 1,
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1,
     sync : 1
   }
   var expected = _.mapOwnKeys( o );
@@ -30607,8 +30607,8 @@ function hardLinkActSync( test )
       dstPath,
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
-      // breakingSrcHardLink : 0,
-      // breakingDstHardLink : 1,
+      breakingSrcHardLink : 0,
+      breakingDstHardLink : 1,
       sync : 1
     }
     provider.hardLinkAct( o );
@@ -30641,8 +30641,8 @@ function hardLinkActSync( test )
       dstPath,
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
-      // breakingSrcHardLink : 0,
-      // breakingDstHardLink : 1,
+      breakingSrcHardLink : 0,
+      breakingDstHardLink : 1,
       sync : 1
     }
     test.shouldThrowErrorOfAnyKind( () => provider.hardLinkAct( o ) )
@@ -30666,8 +30666,8 @@ function hardLinkActSync( test )
     dstPath,
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
-    // breakingSrcHardLink : 0,
-    // breakingDstHardLink : 1,
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1,
     sync : 1
   }
   test.shouldThrowErrorOfAnyKind( () =>
@@ -30693,8 +30693,8 @@ function hardLinkActSync( test )
     dstPath,
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
-    // breakingSrcHardLink : 0,
-    // breakingDstHardLink : 1,
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1,
     sync : 1
   }
   test.shouldThrowErrorOfAnyKind( () =>
@@ -30725,8 +30725,8 @@ function hardLinkActSync( test )
       dstPath,
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
-      // breakingSrcHardLink : 0,
-      // breakingDstHardLink : 1,
+      breakingSrcHardLink : 0,
+      breakingDstHardLink : 1,
       sync : 1
     }
     test.shouldThrowErrorOfAnyKind( () =>
@@ -30756,8 +30756,8 @@ function hardLinkActSync( test )
     dstPath,
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
-    // breakingSrcHardLink : 0,
-    // breakingDstHardLink : 1,
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1,
     sync : 1
   }
   test.shouldThrowErrorOfAnyKind( () =>
@@ -30785,8 +30785,8 @@ function hardLinkActSync( test )
     dstPath,
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
-    // breakingSrcHardLink : 0,
-    // breakingDstHardLink : 1,
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1,
     sync : 1
   }
   test.shouldThrowErrorOfAnyKind( () =>
@@ -30808,8 +30808,8 @@ function hardLinkActSync( test )
     dstPath,
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
-    // breakingSrcHardLink : 0,
-    // breakingDstHardLink : 1,
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1,
     sync : 1
   }
 
@@ -30835,8 +30835,8 @@ function hardLinkActSync( test )
     dstPath,
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
-    // breakingSrcHardLink : 0,
-    // breakingDstHardLink : 1,
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1,
     sync : 1
   }
   var expected = _.mapOwnKeys( o );
@@ -30861,7 +30861,7 @@ function hardLinkActSync( test )
     dstPath : dstMissingPath,
     relativeSrcPath : srcPath,
     relativeDstPath : dstMissingPath,
-    // breakingSrcHardLink : 0,
+    breakingSrcHardLink : 0,
     // breakingDstHardLink : 0,
     sync : 1
   }
@@ -30882,7 +30882,7 @@ function hardLinkActSync( test )
     dstPath : dstPath2,
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath2,
-    // breakingSrcHardLink : 0,
+    breakingSrcHardLink : 0,
     // breakingDstHardLink : 0,
     sync : 1
   }
@@ -30907,8 +30907,8 @@ function hardLinkActSync( test )
       dstPath,
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
-      // breakingSrcHardLink : 0,
-      // breakingDstHardLink : 1,
+      breakingSrcHardLink : 0,
+      breakingDstHardLink : 1,
       sync : 1
     });
   })
@@ -30927,7 +30927,7 @@ function hardLinkActSync( test )
     dstPath,
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
-    // breakingSrcHardLink : 0,
+    breakingSrcHardLink : 0,
     // breakingDstHardLink : 1
   }
   test.shouldThrowErrorOfAnyKind( () =>
@@ -30943,8 +30943,8 @@ function hardLinkActSync( test )
     dstPath,
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
-    // breakingSrcHardLink : 0,
-    // breakingDstHardLink : 1,
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1,
     sync : 1,
     redundant : 'redundant'
   }
@@ -30965,8 +30965,8 @@ function hardLinkActSync( test )
     dstPath,
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
-    // breakingSrcHardLink : 0,
-    // breakingDstHardLink : 1,
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1,
     sync : 1
   }
   if( !self.providerIsInstanceOf( _.FileProvider.System ) )
@@ -30986,8 +30986,8 @@ function hardLinkActSync( test )
     dstPath,
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
-    // breakingSrcHardLink : 0,
-    // breakingDstHardLink : 1,
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1,
     sync : 1
   }
   var expected = _.mapExtend( null, o );
@@ -31869,8 +31869,8 @@ function hardLinkActAsync( test )
       dstPath,
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
-      // breakingSrcHardLink : 0,
-      // breakingDstHardLink : 1,
+      breakingSrcHardLink : 0,
+      breakingDstHardLink : 1,
       sync : 0
     }
     var expected = _.mapOwnKeys( o );
@@ -31902,8 +31902,8 @@ function hardLinkActAsync( test )
       dstPath,
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
-      // breakingSrcHardLink : 0,
-      // breakingDstHardLink : 1,
+      breakingSrcHardLink : 0,
+      breakingDstHardLink : 1,
       sync : 0
     }
     var expected = _.mapOwnKeys( o );
@@ -31933,8 +31933,8 @@ function hardLinkActAsync( test )
       dstPath,
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
-      // breakingSrcHardLink : 0,
-      // breakingDstHardLink : 1,
+      breakingSrcHardLink : 0,
+      breakingDstHardLink : 1,
       sync : 0
     }
     var expected = _.mapOwnKeys( o );
@@ -31966,8 +31966,8 @@ function hardLinkActAsync( test )
       dstPath,
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
-      // breakingSrcHardLink : 0,
-      // breakingDstHardLink : 1,
+      breakingSrcHardLink : 0,
+      breakingDstHardLink : 1,
       sync : 0
     }
     var expected = _.mapOwnKeys( o );
@@ -31998,8 +31998,8 @@ function hardLinkActAsync( test )
       dstPath,
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
-     // breakingSrcHardLink : 0,
-      // breakingDstHardLink : 1,
+      breakingSrcHardLink : 0,
+      breakingDstHardLink : 1,
       sync : 0
     }
     var expected = _.mapOwnKeys( o );
@@ -32028,8 +32028,8 @@ function hardLinkActAsync( test )
       dstPath,
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
-     // breakingSrcHardLink : 0,
-      // breakingDstHardLink : 1,
+      breakingSrcHardLink : 0,
+      breakingDstHardLink : 1,
       sync : 0
     }
     var expected = _.mapOwnKeys( o );
@@ -32060,8 +32060,8 @@ function hardLinkActAsync( test )
       dstPath,
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
-      // breakingSrcHardLink : 0,
-      // breakingDstHardLink : 1,
+      breakingSrcHardLink : 0,
+      breakingDstHardLink : 1,
       sync : 0
     }
     var expected = _.mapOwnKeys( o );
@@ -32093,8 +32093,8 @@ function hardLinkActAsync( test )
       dstPath : dstMissingPath,
       relativeSrcPath : srcPath,
       relativeDstPath : dstMissingPath,
-      // breakingSrcHardLink : 0,
-      // breakingDstHardLink : 0,
+      breakingSrcHardLink : 0,
+      breakingDstHardLink : 0,
       sync : 0
     }
     return test.shouldThrowErrorAsync( provider.hardLinkAct( o ) )
@@ -32121,8 +32121,8 @@ function hardLinkActAsync( test )
       dstPath : dstPath2,
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath2,
-      // breakingSrcHardLink : 0,
-      // breakingDstHardLink : 0,
+      breakingSrcHardLink : 0,
+      breakingDstHardLink : 0,
       sync : 0
     }
     return test.shouldThrowErrorAsync( provider.hardLinkAct( o ) )
@@ -49628,48 +49628,13 @@ function hardLinkExperiment( test )
 {
   let self = this;
   let provider = self.provider;
-  let routinePath = test.context.pathFor( 'hardLinkExperiment' );
-  let terminalPath = test.context.pathFor( 'hardLinkExperiment/terminal' );
-  let linkPath = test.context.pathFor( 'hardLinkExperiment/hardLink' );
-
-  if( self.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  {
-    test.identical( 1, 1 );
-    return;
-  }
-
-  provider.filesDelete( routinePath );
-  provider.fileWrite( terminalPath, terminalPath );
-  provider.hardLink( linkPath, terminalPath );
-  debugger;
-  var statTerminal = provider.statRead( terminalPath );
-  var statLink = provider.statRead( linkPath );
-  debugger;
-  test.identical( statTerminal.ino, statLink.ino );
-  debugger;
-  var got = _.files.stat.areHardLinked( statTerminal, statLink );
-  test.identical( got, _.maybe );
-  var got = provider.filesAreHardLinked([ linkPath, terminalPath ]);
-  test.identical( got, true );
-
-}
-
-//
-
-function hardLinkExperiment( test )
-{
-  let self = this;
-  let provider = self.provider;
   let path = provider.path;
 
-  var delay = 10;
-
-  if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
-  delay = provider.systemBitrateTimeGet();
+  var delay = 50;
 
   function makeFiles( names, dirPath, sameTime )
   {
-    let now = _.time.now();
+    let ready = new _.Consequence().take( null );
     var paths = names.map( ( name, i ) =>
     {
       var filePath = self.pathFor( path.join( dirPath, name ) );
@@ -49677,16 +49642,24 @@ function hardLinkExperiment( test )
 
       if( sameTime )
       {
-        provider.fileTimeSet( filePath, delay, delay );
+        var time = delay * 1000;
+        provider.fileTimeSet( filePath, time, time );
       }
       else if( i > 0 )
       {
-        let time = now + ( i + 1 ) * delay;
-        provider.fileTimeSet( filePath, time, time );
+        ready.then( () =>
+        {
+          return _.time.out( delay ).then( () =>
+          {
+            return provider.fileWrite({ filePath, data : path.name( filePath ), sync : 0 });
+          })
+        })
       }
 
       return filePath;
     });
+
+    ready.deasync();
 
     return paths;
   }
@@ -49723,15 +49696,17 @@ function hardLinkExperiment( test )
     dstPath : paths,
     sourceMode : 'modified<hardlinks>'
   });
-  test.identical( provider.filesAreHardLinked( paths ), hardLinked );
+  test.identical( provider.filesAreHardLinked( paths ), true );
   var srcPath = paths[ 0 ];
   test.identical( selectedFile.absolute, srcPath );
-  test.identical( selectedFile.stat.nlink, 4 );
+  test.identical( Number( selectedFile.stat.nlink ), 4 );
   var src = provider.fileRead( srcPath );
   var dst = provider.fileRead( paths[ paths.length - 1 ] );
   test.identical( src, dst );
 
 }
+
+hardLinkExperiment.experimental = 1;
 
 // --
 // declare
@@ -49884,7 +49859,6 @@ var Self =
     hardLinkSync,
     hardLinkMultipleSync,
     hardLinkRelativePath,
-    // hardLinkExperiment,
     hardLinkSoftlinked,
     hardLinkActSync,
     hardLinkAsync,

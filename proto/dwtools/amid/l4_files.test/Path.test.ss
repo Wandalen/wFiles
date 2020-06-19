@@ -670,79 +670,6 @@ function regexpMakeSafe( test )
 
 //
 
-function realMainFile( test )
-{
-  if( require.main === module )
-  var expected1 = __filename;
-  else
-  var expected1 = require.main.filename;
-
-  test.case = 'compare with __filename path for main file';
-  var got = _.fileProvider.path.nativize( _.path.realMainFile( ) );
-  test.identical( got, expected1 );
-};
-
-//
-
-function realMainDir( test )
-{
-
-  if( require.main === module )
-  var file = __filename;
-  else
-  var file = require.main.filename;
-
-  var expected1 = _.path.dir( file );
-
-  test.case = 'compare with __filename path dir';
-  var got = _.fileProvider.path.nativize( _.path.realMainDir( ) );
-  test.identical( _.path.normalize( got ), _.path.normalize( expected1 ) );
-
-  /* */
-
-  test.case = 'absolute paths';
-  var from = _.path.realMainDir();
-  var to = _.path.realMainFile();
-  var expected = _.path.name({ path : _.path.realMainFile(), full : 1 });
-  var got = _.path.relative( from, to );
-  test.identical( got, expected );
-
-  /* */
-
-  test.case = 'absolute paths, from === to';
-  var from = _.path.realMainDir();
-  var to = _.path.realMainDir();
-  var expected = '.';
-  var got = _.path.relative( from, to );
-  test.identical( got, expected );
-
-}
-
-//
-
-function effectiveMainFile( test )
-{
-  if( require.main === module )
-  var expected1 = __filename;
-  else
-  var expected1 = process.argv[ 1 ];
-
-  test.case = 'compare with __filename path for main file';
-  var got = _.fileProvider.path.nativize( _.path.effectiveMainFile( ) );
-  test.identical( got, expected1 );
-
-  if( Config.debug )
-  {
-    test.case = 'extra arguments';
-    test.shouldThrowErrorSync( function( )
-    {
-      _.path.effectiveMainFile( 'package.json' );
-    } );
-  }
-};
-
-//
-
 function effectiveMainDir( test )
 {
   if( require.main === module )
@@ -1808,9 +1735,6 @@ var Self =
 
     regexpMakeSafe,
 
-    realMainFile,
-    realMainDir,
-    effectiveMainFile,
     effectiveMainDir,
 
     pathCurrent,

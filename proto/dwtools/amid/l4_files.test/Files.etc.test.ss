@@ -22,8 +22,6 @@ function onSuiteBegin( test )
   let context = this;
 
   context.suiteTempPath = context.provider.path.pathDirTempOpen( context.provider.path.join( __dirname, '../..'  ),'FilesEtc' );
-  context.suiteTempPath = context.provider.pathResolveLinkFull({ filePath : context.suiteTempPath, resolvingSoftLink : 1 }); /* qqq2 : review pathDirTempOpen */
-  context.suiteTempPath = context.suiteTempPath.absolutePath;
 }
 
 //
@@ -3473,7 +3471,7 @@ var Self =
 
   context :
   {
-    provider : _.fileProvider,
+    provider : _.FileProvider.HardDrive(),
     suiteTempPath : null,
 
     createTestFile,

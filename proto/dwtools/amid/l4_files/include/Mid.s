@@ -14,6 +14,7 @@ if( typeof module !== 'undefined' )
 
   require( '../l1/Namespace.s' );
 
+  require( '../l2/Encoder.s' );
   require( '../l2/Encoders.s' );
   require( '../l2/RecordContext.s' );
 

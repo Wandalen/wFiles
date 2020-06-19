@@ -26,8 +26,7 @@ function onSuiteBegin( test )
   context.system = _.FileProvider.System({ providers : [ context.provider ] });
   context.system.defaultProvider = context.provider;
 
-  let path = context.provider.path;
-  context.suiteTempPath = path.pathDirTempOpen( 'FilesFind' );
+  context.suiteTempPath = context.provider.path.pathDirTempOpen( 'FilesFind' );
   context.globalFromPreferred = function globalFromPreferred( path ){ return path };
 
 }

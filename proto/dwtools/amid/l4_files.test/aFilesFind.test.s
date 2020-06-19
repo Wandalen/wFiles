@@ -24465,6 +24465,129 @@ function filesReflectLinked( test )
 
 //
 
+function filesReflectSrcAndDstLinked( test )
+{
+  let context = this;
+  let provider = context.provider;
+  let system = context.system;
+  let path = context.provider.path;
+
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
+  var srcPath = path.join( routinePath, 'src' );
+  var dstPath = path.join( routinePath, 'dst' );
+
+  /* - */
+
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath )
+  provider.hardLink
+  ({
+    srcPath : srcPath,
+    dstPath : dstPath
+  })
+  
+  var srcStat = provider.statResolvedRead( srcPath );
+  var dstStat = provider.statResolvedRead( dstPath );
+  
+  provider.filesReflect
+  ({
+    reflectMap : { [ srcPath ] : dstPath },
+    linking : 'hardLink'
+  });
+  
+  var srcStat2 = provider.statResolvedRead( srcPath );
+  var dstStat2 = provider.statResolvedRead( dstPath );
+  
+  test.identical( srcStat.amtime, srcStat2.amtime )
+  test.identical( srcStat.birthtime, srcStat2.birthtime )
+  test.identical( srcStat.ctime, srcStat2.ctime )
+  test.identical( srcStat.mtime, srcStat2.mtime )
+  
+  test.identical( dstStat.amtime, dstStat2.amtime )
+  test.identical( dstStat.birthtime, dstStat2.birthtime )
+  test.identical( dstStat.ctime, dstStat2.ctime )
+  test.identical( dstStat.mtime, dstStat2.mtime )
+  
+  test.is( provider.filesAreHardLinked([ srcPath, dstPath ]) );
+  
+  /* - */
+
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath )
+  provider.softLink
+  ({
+    srcPath : srcPath,
+    dstPath : dstPath
+  })
+  
+  var srcStat = provider.statResolvedRead( srcPath );
+  var dstStat = provider.statResolvedRead( dstPath );
+  
+  provider.filesReflect
+  ({
+    reflectMap : { [ srcPath ] : dstPath },
+    linking : 'softLink'
+  });
+  
+  var srcStat2 = provider.statResolvedRead( srcPath );
+  var dstStat2 = provider.statResolvedRead( dstPath );
+  
+  test.identical( srcStat.amtime, srcStat2.amtime )
+  test.identical( srcStat.birthtime, srcStat2.birthtime )
+  test.identical( srcStat.ctime, srcStat2.ctime )
+  test.identical( srcStat.mtime, srcStat2.mtime )
+  
+  test.identical( dstStat.amtime, dstStat2.amtime )
+  test.identical( dstStat.birthtime, dstStat2.birthtime )
+  test.identical( dstStat.ctime, dstStat2.ctime )
+  test.identical( dstStat.mtime, dstStat2.mtime )
+  
+  test.is( provider.filesAreSoftLinked([ srcPath, dstPath ]) );
+  
+  /* - */
+  
+  provider.fieldPush( 'usingTextLink', 1 );
+
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath )
+  provider.textLink
+  ({
+    srcPath : srcPath,
+    dstPath : dstPath
+  })
+  
+  var srcStat = provider.statResolvedRead( srcPath );
+  var dstStat = provider.statResolvedRead( dstPath );
+  
+  provider.filesReflect
+  ({
+    reflectMap : { [ srcPath ] : dstPath },
+    linking : 'textLink'
+  });
+  
+  var srcStat2 = provider.statResolvedRead( srcPath );
+  var dstStat2 = provider.statResolvedRead( dstPath );
+  
+  test.identical( srcStat.amtime, srcStat2.amtime )
+  test.identical( srcStat.birthtime, srcStat2.birthtime )
+  test.identical( srcStat.ctime, srcStat2.ctime )
+  test.identical( srcStat.mtime, srcStat2.mtime )
+  
+  test.identical( dstStat.amtime, dstStat2.amtime )
+  test.identical( dstStat.birthtime, dstStat2.birthtime )
+  test.identical( dstStat.ctime, dstStat2.ctime )
+  test.identical( dstStat.mtime, dstStat2.mtime )
+  
+  test.is( provider.filesAreTextLinked([ srcPath, dstPath ]) );
+  
+  provider.fieldPop( 'usingTextLink', 1 );
+  
+}
+
+filesReflectSrcAndDstLinked.timeOut = 30000;
+
+//
+
 function filesReflectLinkedExperiment( test )
 {
   let context = this;
@@ -32429,33 +32552,163 @@ function filesReflectDstIgnoring( test )
 function filesExtractBasic( test )
 {
   let context = this;
-  // let provider = context.provider;
-  // let system = context.system;
-  // let path = context.provider.path;
-  // let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
-
-  /* */
-
-  test.case = 'basic';
-
-  var extract1 = _.FileProvider.Extract
+  let provider = context.provider;
+  let path = context.provider.path;
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
+  
+  var tree1 = _.FileProvider.Extract
   ({
     filesTree :
     {
-    },
+      'file1' : 'file1'
+    }
+  })
+  var tree2 = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      'file2' : 'file2'
+    }
+  })
+  
+  /* */
+  
+  test.case = 'two providers, no default provider, global path';
+  
+  var hub = _.FileProvider.System({ providers : [] });
+  var provider1 = new context.provider.constructor({ protocol : 'ext1' }).providerRegisterTo( hub );
+  var provider2 = new context.provider.constructor({ protocol : 'ext2' }).providerRegisterTo( hub );
+  
+  tree1.filesReflectTo( provider1, _.path.join( routinePath, 'ext1' ) );
+  tree2.filesReflectTo( provider2, _.path.join( routinePath, 'ext2' ) );
+  
+  var filePath = provider1.path.globalFromPreferred( _.path.join( routinePath, 'ext1' ) );
+  var gotTree = hub.filesExtract( filePath );
+  adaptResultMaybe( provider1, gotTree, '/' );
+  test.is( gotTree instanceof _.FileProvider.Extract );
+  test.identical( gotTree.filesTree, tree1.filesTree );
+  test.notIdentical( gotTree, provider1 )
+  
+  var filePath = provider2.path.globalFromPreferred( _.path.join( routinePath, 'ext2' ) );
+  var gotTree = hub.filesExtract( filePath );
+  adaptResultMaybe( provider1, gotTree, '/' );
+  test.is( gotTree instanceof _.FileProvider.Extract );
+  test.identical( gotTree.filesTree, tree2.filesTree );
+  test.notIdentical( gotTree, provider2 );
+  
+  provider1.finit();
+  provider2.finit();
+  hub.finit();
+  
+  /* */
+  
+  test.case = 'two providers, default provider, local path';
+  
+  var hub = _.FileProvider.System({ providers : [] });
+  var provider1 = new context.provider.constructor({ protocol : 'ext1' }).providerRegisterTo( hub );
+  var provider2 = new context.provider.constructor({ protocol : 'ext2' }).providerRegisterTo( hub );
+  hub.defaultProvider = provider1;
+  tree1.filesReflectTo( provider1, _.path.join( routinePath, 'ext1' ) );
+  tree2.filesReflectTo( provider2, _.path.join( routinePath, 'ext2' ) );
+  var gotTree = hub.filesExtract( _.path.join( routinePath, 'ext1' ) );
+  adaptResultMaybe( provider1, gotTree, '/' );
+  test.is( gotTree instanceof _.FileProvider.Extract );
+  test.identical( gotTree.filesTree, tree1.filesTree );
+  test.notIdentical( gotTree, provider1 )
+  
+  provider1.finit();
+  provider2.finit();
+  hub.finit();
+  
+  /* */
+
+  test.case = 'two providers, dst : localPath';
+
+  var hub = _.FileProvider.System({ providers : [] });
+  var provider1 = new context.provider.constructor({ protocol : 'ext1' }).providerRegisterTo( hub );
+  var provider2 = new context.provider.constructor({ protocol : 'ext2' }).providerRegisterTo( hub );
+  tree1.filesReflectTo( provider1, _.path.join( routinePath, 'ext1' ) );
+  tree2.filesReflectTo( provider2, _.path.join( routinePath, 'ext2' ) );
+  var srcFilePath = provider1.path.globalFromPreferred( _.path.join( routinePath, 'ext1' ) );
+  var gotTree = hub.filesExtract({ src : srcFilePath, dst : _.path.join( routinePath, 'ext1' ) });
+  adaptResultMaybe( provider1, gotTree, _.path.join( routinePath, 'ext1' ) );
+  test.is( gotTree instanceof _.FileProvider.Extract );
+  test.identical( _.select( gotTree.filesTree, _.path.join( routinePath, 'ext1' ) ), tree1.filesTree );
+  test.is( gotTree.filesTree !== tree1.filesTree );
+  test.notIdentical( gotTree, provider1 )
+  
+  provider1.finit();
+  provider2.finit();
+  hub.finit();
+  
+  /* */
+
+  if( !Config.debug )
+  {
+    tree1.finit();
+    tree2.finit();
+    return;
+  }
+
+  /* */
+  
+  test.case = 'two providers, no default provider, local path';
+
+  var hub = _.FileProvider.System({ providers : [] });
+  var provider1 = new context.provider.constructor({ protocol : 'ext1' }).providerRegisterTo( hub );
+  var provider2 = new context.provider.constructor({ protocol : 'ext2' }).providerRegisterTo( hub );
+  test.shouldThrowErrorSync( () => 
+  {
+    hub.filesExtract( routinePath );
   });
+  provider1.finit();
+  provider2.finit();
+  hub.finit();
+  
+  /* */
+  
+  test.case = 'two providers, dst : globalPath to different provider';
 
-  extract1.filesReflectTo( provider, routinePath );
-
-  var gotTree = provider.filesExtract( routinePath );
-
+  var hub = _.FileProvider.System({ providers : [] });
+  var provider1 = new context.provider.constructor({ protocol : 'ext1' }).providerRegisterTo( hub );
+  var provider2 = new context.provider.constructor({ protocol : 'ext2' }).providerRegisterTo( hub );
+  var srcFilePath = provider1.path.globalFromPreferred( routinePath );
+  var dstFilePath = provider2.path.globalFromPreferred( routinePath );
+  test.shouldThrowErrorSync( () => 
+  {
+    hub.filesExtract({ src : srcFilePath, dst : dstFilePath });
+  });
+  
+  provider1.finit();
+  provider2.finit();
+  hub.finit();
+  
+  /* */
+  
+  
+  tree1.finit();
+  tree2.finit();
+  
+  
   /* qqq2 : implement please test routine
       construct a system from 2 providers( of current type! )
       call system.filesExtract( filePath );
       must be an issue!
+    aaa Vova: 
+      added test cases
+      fixed the issue
+      extended routine filesReflectTo with asserts to check that src/dst path reffers to right src/dst provider
   */
 
   /* */
+  
+  function adaptResultMaybe( provider, resultTree, filePath )
+  {
+    if( !provider instanceof _.FileProvider.HardDrive )
+    return
+    var files = resultTree.filesFindRecursive({ filePath, withTerminals : 1, withDirs : 0, withStem/*maybe withTransient*/ : 0 })
+    _.each( files, ( f ) => resultTree.fileWrite( f.absolute, resultTree.fileRead( f.absolute ) ) )
+  }
 
 }
 
@@ -37153,6 +37406,7 @@ var Self =
     filesReflectOnlyPreservingEmpty,
     filesReflectDstDeletingDirs,
     filesReflectLinked,
+    filesReflectSrcAndDstLinked,
     filesReflectTo,
     filesReflectToWithSoftLinks, /* qqq : implement filesReflectToWithTextLinks */
     filesReflectToWithSoftLinksRebasing, /* qqq : implement filesReflectToWithTextLinksRebasing */

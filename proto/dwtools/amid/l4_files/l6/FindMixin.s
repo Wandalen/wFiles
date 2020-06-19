@@ -1943,7 +1943,7 @@ function _filesReflectPrepare( routine, args )
   _.assert( _.arrayIs( o.result ) );
   _.assert( _.routineIs( o.onUp ) );
   _.assert( _.routineIs( o.onDown ) );
-  _.assert( _.longHas( [ 'fileCopy', 'hardLink', 'hardLinkMaybe', 'softLink', 'softLinkMaybe', 'nop' ], o.linking ), 'unknown kind of linking', o.linking );
+  _.assert( _.longHas( [ 'fileCopy', 'hardLink', 'hardLinkMaybe', 'softLink', 'softLinkMaybe', 'textLink', 'nop' ], o.linking ), 'unknown kind of linking', o.linking );
 
   return o;
 }
@@ -2941,7 +2941,7 @@ function filesReflectEvaluate_body( o )
     // debugger;
 
     _.assert( arguments.length === 2 );
-    _.assert( _.longHas( [ 'exclude', 'ignore', 'fileDelete', 'dirMake', 'fileCopy', 'softLink', 'hardLink', 'nop' ], action ), () => 'Unknown action ' + _.strQuote( action ) );
+    _.assert( _.longHas( [ 'exclude', 'ignore', 'fileDelete', 'dirMake', 'fileCopy', 'softLink', 'hardLink', 'textLink', 'nop' ], action ), () => 'Unknown action ' + _.strQuote( action ) );
 
     let absolutePath = record.dst.absolute;
     let result = actionMap[ absolutePath ] === action;
@@ -3882,7 +3882,7 @@ function filesReflectSingle_body( o )
     }
     else
     {
-      _.assert( record.action === 'fileCopy' || record.action === 'hardLink' || record.action === 'softLink' || record.action === 'nop' );
+      _.assert( record.action === 'fileCopy' || record.action === 'hardLink' || record.action === 'softLink' || record.action === 'textLink' || record.action === 'nop' );
       record.src.factory.effectiveProvider.fileDelete( record.src.absolute );
     }
 
@@ -4264,7 +4264,12 @@ function filesReflectTo_body( o )
   let dst = o.dstProvider;
   let system;
   let result;
-
+  
+  if( src instanceof _.FileProvider.System )
+  src = src.providerForPath( o.src );
+  
+  _.assert( !( src instanceof _.FileProvider.System ) && src instanceof _.FileProvider.Abstract, 'Source provider should be an instance of _.FileProvider.Abstract' )
+  
   _.assertRoutineOptions( filesReflectTo_body, arguments );
   _.assert( !src.system || !dst.system || src.system === dst.system, 'not implemented' );
 
@@ -4311,10 +4316,16 @@ function filesReflectTo_body( o )
 
     // let filePath = { [ src.path.globalFromPreferred( o.srcPath ) ] : dst.path.globalFromPreferred( o.dstPath ) }
     // let filePath = { [ src.path.globalFromPreferred( o.src ) ] : dst.path.globalFromPreferred( o.dst ) }
-
+    
+    if( Config.debug )
+    {
+      let dstProvider = system.providerForPath( dst.path.globalFromPreferred( o.dst ) );
+      _.assert( dstProvider === dst, `Dst path: ${o.dst} reffers to different dst provider: ${dstProvider.protocol}, routine expects: ${dst.protocol}` );
+    }
+    
     o.src = src.recordFilter( o.src );
     o.dst = dst.recordFilter( o.dst );
-
+    
     let o2 = _.mapOnly( o, filesReflect.defaults );
 
     // o2.reflectMap = filePath;

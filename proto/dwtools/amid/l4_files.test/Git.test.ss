@@ -27,9 +27,7 @@ function onSuiteBegin( test )
   context.system = _.FileProvider.System({ providers : [ context.providerSrc, context.providerDst ] });
   context.system.defaultProvider = context.providerDst;
 
-  let path = context.providerDst.path;
-
-  context.suiteTempPath = path.pathDirTempOpen( path.join( __dirname, '../..'  ),'FileProviderGit' );
+  context.suiteTempPath = context.provider.path.pathDirTempOpen( context.provider.path.join( __dirname, '../..'  ),'FileProviderGit' );
   context.suiteTempPath = context.providerDst.pathResolveLinkFull({ filePath : context.suiteTempPath, resolvingSoftLink : 1 });
   context.suiteTempPath = context.suiteTempPath.absolutePath;
 

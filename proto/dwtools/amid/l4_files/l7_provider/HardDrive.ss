@@ -1587,7 +1587,7 @@ function fileCopyAct( o )
     let con = new _.Consequence().take( null );
     let readCon = new _.Consequence();
     let writeCon = new _.Consequence();
-    /* qqq2 : too many consequences? */
+    /* qqq2 : too many consequences? aaa : one per stream and one consequence to handle messages from first two */
 
     con.andKeep( [ readCon, writeCon ] );
 

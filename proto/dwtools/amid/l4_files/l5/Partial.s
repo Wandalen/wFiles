@@ -5737,7 +5737,7 @@ function _link_functor( fop )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.routineOptions( _link_functor, fop );
 
-  let onAct = fop.onAct;
+  let onDo = fop.onDo;
   let actMethodName = fop.actMethodName;
   let entryMethodName = _.strRemoveEnd( fop.actMethodName, 'Act' );
   let onVerify1 = fop.onVerify1;
@@ -5749,15 +5749,15 @@ function _link_functor( fop )
   let skippingSamePath = fop.skippingSamePath;
   let skippingMissed = fop.skippingMissed;
 
-  _.assert( _.routineIs( onAct ) );
-  _.assert( _.objectIs( onAct.defaults ) );
+  _.assert( _.routineIs( onDo ) );
+  _.assert( _.objectIs( onDo.defaults ) );
   _.assert( onVerify1 === null || _.routineIs( onVerify1 ) );
   _.assert( onVerify2 === null || _.routineIs( onVerify2 ) );
   _.assert( onIsLink2 === null || _.routineIs( onIsLink2 ) );
   _.assert( onStat2 === null || _.routineIs( onStat2 ) );
   _.assert( onSizeCheck === null || _.routineIs( onSizeCheck ) );
 
-  _.routineExtend( _link_body, onAct )
+  _.routineExtend( _link_body, onDo )
   _link_body.defaults = _.mapExtend( null, _link_body.defaults );
   delete _link_body.defaults.originalSrcPath;
   delete _link_body.defaults.originalDstPath;
@@ -5788,7 +5788,7 @@ function _link_functor( fop )
     c.onIsLink = onIsLink;
     c.onStat = onStat;
     c.ended = false;
-    c.linkAct = onAct;
+    c.linkDo = onDo;
     c.result = undefined;
     c.tempPath = undefined;
     c.tempPathSrc = undefined;
@@ -5836,7 +5836,7 @@ function _link_functor( fop )
       Vova : low priority
       */
 
-      if( _.longIs( o.dstPath ) && c.linkAct.having.hardLinking )
+      if( _.longIs( o.dstPath ) && c.linkDo.having.hardLinking )
       return _linkMultiple.call( self, o, _link_body );
       _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
 
@@ -5856,7 +5856,7 @@ function _link_functor( fop )
       if( c.ended )
       return c.end();
 
-      o2 = c.options2 = _.mapOnly( o, c.linkAct.defaults );
+      o2 = c.options2 = _.mapOnly( o, c.linkDo.defaults );
 
       try
       {
@@ -5872,7 +5872,7 @@ function _link_functor( fop )
           self.dirMakeForFile( o2.dstPath );
         }
 
-        c.linkAct.call( self, c );
+        c.linkDo.call( self, c );
         log();
 
         c.validateSize();
@@ -5899,7 +5899,7 @@ function _link_functor( fop )
 
       c.con.then( () =>
       {
-        if( _.longIs( o.dstPath ) && c.linkAct.having.hardLinking )
+        if( _.longIs( o.dstPath ) && c.linkDo.having.hardLinking )
         {
           c.result = _linkMultiple.call( self, o, _link_body );
           return true;
@@ -5920,7 +5920,7 @@ function _link_functor( fop )
         if( c.result !== undefined )
         return c.result;
         /* prepare options map and launch main part */
-        o2 = c.options2 = _.mapOnly( o, c.linkAct.defaults );
+        o2 = c.options2 = _.mapOnly( o, c.linkDo.defaults );
         /* main part */
         return mainPartAsync();
       })
@@ -5948,7 +5948,7 @@ function _link_functor( fop )
         return dstExists;
       });
 
-      con.then( _.routineSeal( self, c.linkAct, [ c ] ) );
+      con.then( _.routineSeal( self, c.linkDo, [ c ] ) );
 
       con.then( ( got ) =>
       {
@@ -6009,8 +6009,8 @@ function _link_functor( fop )
     function verify1( args )
     {
       _.assert( args.length === 1, 'Expects single argument' );
-      _.assert( _.routineIs( c.linkAct ), 'method', actMethodName, 'is not implemented' );
-      _.assert( _.objectIs( c.linkAct.defaults ), 'method', actMethodName, 'does not have defaults, but should' );
+      _.assert( _.routineIs( c.linkDo ), 'method', actMethodName, 'is not implemented' );
+      _.assert( _.objectIs( c.linkDo.defaults ), 'method', actMethodName, 'does not have defaults, but should' );
       _.assertRoutineOptions( _link_body, args );
       _.assert( _.boolLike( o.resolvingSrcSoftLink ) || _.numberIs( o.resolvingSrcSoftLink ) );
       _.assert( _.boolLike( o.resolvingSrcTextLink ) || _.numberIs( o.resolvingSrcTextLink ) );
@@ -6706,7 +6706,7 @@ _link_functor.defaults =
 {
 
   actMethodName : null,
-  onAct : null,
+  onDo : null,
   onVerify1 : null,
   onVerify2 : null,
   onIsLink : null,
@@ -6842,7 +6842,7 @@ operates.relativeSrcPath = { pathToRead : 1 }
  * @module Tools/mid/Files
  */
 
-function _fileRenameAct( c )
+function _fileRenameDo( c )
 {
   let self = this;
   let o = c.options;
@@ -7036,12 +7036,12 @@ function _fileRenameAct( c )
   }
 }
 
-_.routineExtend( _fileRenameAct, fileRenameAct );
+_.routineExtend( _fileRenameDo, fileRenameAct );
 
 let fileRename = _link_functor
 ({
   actMethodName : 'fileRenameAct',
-  onAct : _fileRenameAct,
+  onDo : _fileRenameDo,
   skippingSamePath : true,
   skippingMissed : false,
 });
@@ -7183,7 +7183,7 @@ function _fileCopyVerify2( c )
   }
 }
 
-function _fileCopyAct( c )
+function _fileCopyDo( c )
 {
   let self = this;
   let o = c.options;
@@ -7296,12 +7296,12 @@ function _fileCopyAct( c )
 
 }
 
-_.routineExtend( _fileCopyAct, fileCopyAct );
+_.routineExtend( _fileCopyDo, fileCopyAct );
 
 let fileCopy = _link_functor
 ({
   actMethodName : 'fileCopyAct',
-  onAct : _fileCopyAct,
+  onDo : _fileCopyDo,
   onVerify2 : _fileCopyVerify2,
   onSizeCheck : _fileCopySizeCheck,
   skippingSamePath : true,
@@ -7447,7 +7447,7 @@ function _hardLinkVerify2( c )
   }
 }
 
-function _hardLinkAct( c )
+function _hardLinkDo( c )
 {
   let self = this;
   let o = c.options;
@@ -7517,7 +7517,7 @@ function _hardLinkAct( c )
       })
     }
 
-    //
+    /* */
 
     if( c.options.breakingSrcHardLink )
     if( !self.fileExists( c.options2.dstPath ) )
@@ -7543,7 +7543,7 @@ function _hardLinkAct( c )
   }
 }
 
-// function _hardLinkAct( c )
+// function _hardLinkDo( c )
 // {
 //   let self = this;
 
@@ -7570,12 +7570,12 @@ function _hardLinkAct( c )
 //   return self.hardLinkAct( c.options2 );
 // }
 
-_.routineExtend( _hardLinkAct, hardLinkAct );
+_.routineExtend( _hardLinkDo, hardLinkAct );
 
 let hardLink = _link_functor
 ({
   actMethodName : 'hardLinkAct',
-  onAct : _hardLinkAct,
+  onDo : _hardLinkDo,
   onVerify1 : _hardLinkVerify1,
   onVerify2 : _hardLinkVerify2,
   skippingSamePath : true,
@@ -7658,13 +7658,13 @@ operates.relativeSrcPath = { pathToRead : 1 }
  * @module Tools/mid/Files
  */
 
-function _softLinkAct( c )
+function _softLinkDo( c )
 {
   let self = this;
   return self.softLinkAct( c.options2 );
 }
 
-_.routineExtend( _softLinkAct, softLinkAct );
+_.routineExtend( _softLinkDo, softLinkAct );
 
 function _softLinkVerify2( c )
 {
@@ -7688,7 +7688,7 @@ function _softLinkVerify2( c )
 let softLink = _link_functor
 ({
   actMethodName : 'softLinkAct',
-  onAct : _softLinkAct,
+  onDo : _softLinkDo,
   onVerify2 : _softLinkVerify2,
   skippingSamePath : false,
   skippingMissed : false,
@@ -7774,13 +7774,13 @@ operates.relativeSrcPath = { pathToRead : 1 }
  * @module Tools/mid/Files
  */
 
-function _textLinkAct( c )
+function _textLinkDo( c )
 {
   let self = this;
   return self.textLinkAct( c.options2 );
 }
 
-_.routineExtend( _textLinkAct, textLinkAct );
+_.routineExtend( _textLinkDo, textLinkAct );
 
 function _textLinkVerify2( c )
 {
@@ -7821,7 +7821,7 @@ function _textOnStat( filePath, resolving )
 let textLink = _link_functor
 ({
   actMethodName : 'textLinkAct',
-  onAct : _textLinkAct,
+  onDo : _textLinkDo,
   onVerify2 : _textLinkVerify2,
   onIsLink : _textIsLink,
   onStat : _textOnStat,

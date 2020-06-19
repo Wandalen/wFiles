@@ -3471,7 +3471,7 @@ var Self =
 
   context :
   {
-    provider : _.fileProvider,
+    provider : _.FileProvider.HardDrive(),
     suiteTempPath : null,
 
     createTestFile,

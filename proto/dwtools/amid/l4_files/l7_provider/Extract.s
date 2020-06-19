@@ -1371,10 +1371,6 @@ function fileCopyAct( o )
 
     _.assert( self.isTerminal( o.srcPath ), () => _.strQuote( o.srcPath ), 'is not terminal' );
 
-    if( dstStat )
-    if( o.breakingDstHardLink && dstStat.isHardLink() )
-    self.hardLinkBreak({ filePath : o.dstPath, sync : 1 });
-
     /* qqq : ? aaa : redundant, just copy the descriptor instead of this */
     // if( self.isSoftLink( o.srcPath ) )
     // {
@@ -1435,8 +1431,6 @@ function fileCopyAct( o )
       dstStat = got;
 
       if( dstStat )
-      if( o.breakingDstHardLink && dstStat.isHardLink() )
-      return self.hardLinkBreak({ filePath : o.dstPath, sync : 0 });
       return true;
     })
     .then( () =>

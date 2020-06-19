@@ -4301,7 +4301,7 @@ function fileCopyActSync( test )
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
     sync : 1,
-    breakingDstHardLink : 0,
+    // breakingDstHardLink : 0,
     // breakingDstSoftLink : 0
   });
   var files = provider.dirRead( routinePath );
@@ -4324,7 +4324,7 @@ function fileCopyActSync( test )
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
     sync : 1,
-    breakingDstHardLink : 1,
+    // breakingDstHardLink : 1,
     // breakingDstSoftLink : 0
   });
   var files = provider.dirRead( routinePath );
@@ -4347,7 +4347,7 @@ function fileCopyActSync( test )
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
     sync : 1,
-    breakingDstHardLink : 0,
+    // breakingDstHardLink : 0,
     // breakingDstSoftLink : 1
   });
   var files = provider.dirRead( routinePath );
@@ -4370,79 +4370,7 @@ function fileCopyActSync( test )
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
     sync : 1,
-    breakingDstHardLink : 1,
-    // breakingDstSoftLink : 1
-  });
-  var files = provider.dirRead( routinePath );
-  var expected = [ 'dst', 'src' ];
-  test.identical( files, expected );
-  var dstFile = provider.fileRead( dstPath );
-  test.identical( srcPath, dstFile );
-
-  //
-
-  test.case = 'simple, rewrite';
-  var srcPath = path.join( routinePath,'src' );
-  var dstPath = path.join( routinePath,'dst' );
-  provider.filesDelete( routinePath );
-  provider.fileWrite( srcPath, srcPath );
-  provider.fileWrite( dstPath, dstPath );
-  provider.fileCopyAct
-  ({
-    srcPath,
-    dstPath,
-    relativeSrcPath : srcPath,
-    relativeDstPath : dstPath,
-    sync : 1,
-    breakingDstHardLink : 0,
-    // breakingDstSoftLink : 0
-  });
-  var files = provider.dirRead( routinePath );
-  var expected = [ 'dst', 'src' ];
-  test.identical( files, expected );
-  var dstFile = provider.fileRead( dstPath );
-  test.identical( srcPath, dstFile );
-
-  //
-
-  test.case = 'simple, rewrite';
-  var srcPath = path.join( routinePath,'src' );
-  var dstPath = path.join( routinePath,'dst' );
-  provider.filesDelete( routinePath );
-  provider.fileWrite( srcPath, srcPath );
-  provider.fileWrite( dstPath, dstPath );
-  provider.fileCopyAct
-  ({
-    srcPath,
-    dstPath,
-    relativeSrcPath : srcPath,
-    relativeDstPath : dstPath,
-    sync : 1,
-    breakingDstHardLink : 1,
-    // breakingDstSoftLink : 0
-  });
-  var files = provider.dirRead( routinePath );
-  var expected = [ 'dst', 'src' ];
-  test.identical( files, expected );
-  var dstFile = provider.fileRead( dstPath );
-  test.identical( srcPath, dstFile );
-
-  //
-
-  test.case = 'simple, rewrite';
-  var srcPath = path.join( routinePath,'src' );
-  var dstPath = path.join( routinePath,'dst' );
-  provider.filesDelete( routinePath );
-  provider.fileWrite( srcPath, srcPath );
-  provider.fileWrite( dstPath, dstPath );
-  provider.fileCopyAct
-  ({
-    srcPath,
-    dstPath,
-    relativeSrcPath : srcPath,
-    relativeDstPath : dstPath,
-    sync : 1,
-    breakingDstHardLink : 0,
+    // breakingDstHardLink : 1,
     // breakingDstSoftLink : 1
   });
   var files = provider.dirRead( routinePath );
@@ -4466,7 +4394,79 @@ function fileCopyActSync( test )
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
     sync : 1,
-    breakingDstHardLink : 1,
+    // breakingDstHardLink : 0,
+    // breakingDstSoftLink : 0
+  });
+  var files = provider.dirRead( routinePath );
+  var expected = [ 'dst', 'src' ];
+  test.identical( files, expected );
+  var dstFile = provider.fileRead( dstPath );
+  test.identical( srcPath, dstFile );
+
+  //
+
+  test.case = 'simple, rewrite';
+  var srcPath = path.join( routinePath,'src' );
+  var dstPath = path.join( routinePath,'dst' );
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  provider.fileWrite( dstPath, dstPath );
+  provider.fileCopyAct
+  ({
+    srcPath,
+    dstPath,
+    relativeSrcPath : srcPath,
+    relativeDstPath : dstPath,
+    sync : 1,
+    // breakingDstHardLink : 1,
+    // breakingDstSoftLink : 0
+  });
+  var files = provider.dirRead( routinePath );
+  var expected = [ 'dst', 'src' ];
+  test.identical( files, expected );
+  var dstFile = provider.fileRead( dstPath );
+  test.identical( srcPath, dstFile );
+
+  //
+
+  test.case = 'simple, rewrite';
+  var srcPath = path.join( routinePath,'src' );
+  var dstPath = path.join( routinePath,'dst' );
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  provider.fileWrite( dstPath, dstPath );
+  provider.fileCopyAct
+  ({
+    srcPath,
+    dstPath,
+    relativeSrcPath : srcPath,
+    relativeDstPath : dstPath,
+    sync : 1,
+    // breakingDstHardLink : 0,
+    // breakingDstSoftLink : 1
+  });
+  var files = provider.dirRead( routinePath );
+  var expected = [ 'dst', 'src' ];
+  test.identical( files, expected );
+  var dstFile = provider.fileRead( dstPath );
+  test.identical( srcPath, dstFile );
+
+  //
+
+  test.case = 'simple, rewrite';
+  var srcPath = path.join( routinePath,'src' );
+  var dstPath = path.join( routinePath,'dst' );
+  provider.filesDelete( routinePath );
+  provider.fileWrite( srcPath, srcPath );
+  provider.fileWrite( dstPath, dstPath );
+  provider.fileCopyAct
+  ({
+    srcPath,
+    dstPath,
+    relativeSrcPath : srcPath,
+    relativeDstPath : dstPath,
+    sync : 1,
+    // breakingDstHardLink : 1,
     // breakingDstSoftLink : 1
   });
   var files = provider.dirRead( routinePath );
@@ -4497,7 +4497,7 @@ function fileCopyActSync( test )
     relativeDstPath : dstPath,
     sync : 1,
     // breakingDstSoftLink : 0,
-    breakingDstHardLink : 0
+    // breakingDstHardLink : 0
   });
   test.is( provider.isHardLink( dstPath ) );
   var dstFile = provider.fileRead( dstPath );
@@ -4526,7 +4526,7 @@ function fileCopyActSync( test )
     relativeDstPath : dstPath,
     sync : 1,
     // breakingDstSoftLink : 1,
-    breakingDstHardLink : 0
+    // breakingDstHardLink : 0
   });
   test.is( provider.isHardLink( dstPath ) );
   var dstFile = provider.fileRead( dstPath );
@@ -4540,64 +4540,64 @@ function fileCopyActSync( test )
   test.identical( dstFile, srcFile );
   test.is( srcFile !== otherFile );
 
-  //
+  //qqq: move this test case to one of fileCopy test routines
 
-  test.case = 'dst is a hard link, breakingDstHardLink : 1';
-  provider.filesDelete( routinePath );
-  provider.fileWrite( srcPath, srcPath );
-  provider.fileWrite( otherPath, otherPath );
-  provider.hardLink( dstPath, srcPath );
-  debugger
-  provider.fileCopyAct
-  ({
-    dstPath,
-    srcPath : otherPath,
-    relativeSrcPath : otherPath,
-    relativeDstPath : dstPath,
-    sync : 1,
-    // breakingDstSoftLink : 0,
-    breakingDstHardLink : 1
-  });
-  test.is( !provider.isHardLink( dstPath ) );
-  var dstFile = provider.fileRead( dstPath );
-  var srcFile = provider.fileRead( srcPath );
-  var otherFile = provider.fileRead( otherPath );
-  test.identical( otherFile, dstFile );
-  test.is( srcFile !== dstFile );
-  provider.fileWrite( srcPath, srcPath );
-  var dstFile = provider.fileRead( dstPath );
-  var srcFile = provider.fileRead( srcPath );
-  test.identical( dstFile, otherFile );
-  test.is( srcFile !== dstFile );
+  // test.case = 'dst is a hard link, breakingDstHardLink : 1';
+  // provider.filesDelete( routinePath );
+  // provider.fileWrite( srcPath, srcPath );
+  // provider.fileWrite( otherPath, otherPath );
+  // provider.hardLink( dstPath, srcPath );
+  // debugger
+  // provider.fileCopyAct
+  // ({
+  //   dstPath,
+  //   srcPath : otherPath,
+  //   relativeSrcPath : otherPath,
+  //   relativeDstPath : dstPath,
+  //   sync : 1,
+  //   // breakingDstSoftLink : 0,
+  //   // breakingDstHardLink : 1
+  // });
+  // test.is( !provider.isHardLink( dstPath ) );
+  // var dstFile = provider.fileRead( dstPath );
+  // var srcFile = provider.fileRead( srcPath );
+  // var otherFile = provider.fileRead( otherPath );
+  // test.identical( otherFile, dstFile );
+  // test.is( srcFile !== dstFile );
+  // provider.fileWrite( srcPath, srcPath );
+  // var dstFile = provider.fileRead( dstPath );
+  // var srcFile = provider.fileRead( srcPath );
+  // test.identical( dstFile, otherFile );
+  // test.is( srcFile !== dstFile );
 
-  //
-
-  test.case = 'dst is a hard link, breakingDstSoftLink : 1, breakingDstHardLink : 1';
-  provider.filesDelete( routinePath );
-  provider.fileWrite( srcPath, srcPath );
-  provider.fileWrite( otherPath, otherPath );
-  provider.hardLink( dstPath, srcPath );
-  provider.fileCopyAct
-  ({
-    dstPath,
-    srcPath : otherPath,
-    relativeSrcPath : otherPath,
-    relativeDstPath : dstPath,
-    sync : 1,
-    // breakingDstSoftLink : 1,
-    breakingDstHardLink : 1
-  });
-  test.is( !provider.isHardLink( dstPath ) );
-  var dstFile = provider.fileRead( dstPath );
-  var srcFile = provider.fileRead( srcPath );
-  var otherFile = provider.fileRead( otherPath );
-  test.identical( otherFile, dstFile );
-  test.is( srcFile !== dstFile );
-  provider.fileWrite( srcPath, srcPath );
-  var dstFile = provider.fileRead( dstPath );
-  var srcFile = provider.fileRead( srcPath );
-  test.identical( dstFile, otherFile );
-  test.is( srcFile !== dstFile );
+  //qqq: move this test case to one of fileCopy test routines
+  
+  // test.case = 'dst is a hard link, breakingDstSoftLink : 1, breakingDstHardLink : 1';
+  // provider.filesDelete( routinePath );
+  // provider.fileWrite( srcPath, srcPath );
+  // provider.fileWrite( otherPath, otherPath );
+  // provider.hardLink( dstPath, srcPath );
+  // provider.fileCopyAct
+  // ({
+  //   dstPath,
+  //   srcPath : otherPath,
+  //   relativeSrcPath : otherPath,
+  //   relativeDstPath : dstPath,
+  //   sync : 1,
+  //   // breakingDstSoftLink : 1,
+  //   // breakingDstHardLink : 1
+  // });
+  // test.is( !provider.isHardLink( dstPath ) );
+  // var dstFile = provider.fileRead( dstPath );
+  // var srcFile = provider.fileRead( srcPath );
+  // var otherFile = provider.fileRead( otherPath );
+  // test.identical( otherFile, dstFile );
+  // test.is( srcFile !== dstFile );
+  // provider.fileWrite( srcPath, srcPath );
+  // var dstFile = provider.fileRead( dstPath );
+  // var srcFile = provider.fileRead( srcPath );
+  // test.identical( dstFile, otherFile );
+  // test.is( srcFile !== dstFile );
 
   /* links */
 
@@ -4617,7 +4617,7 @@ function fileCopyActSync( test )
     relativeDstPath : dstPath,
     sync : 1,
     // breakingDstSoftLink : 0,
-    breakingDstHardLink : 0
+    // breakingDstHardLink : 0
   });
   test.is( provider.isSoftLink( dstPath ) );
   var dstFile = provider.fileRead( dstPath );
@@ -4646,7 +4646,7 @@ function fileCopyActSync( test )
     relativeDstPath : dstPath,
     sync : 1,
     // breakingDstSoftLink : 1,
-    breakingDstHardLink : 0
+    // breakingDstHardLink : 0
   });
   test.is( provider.isSoftLink( dstPath ) );
   var dstFile = provider.fileRead( dstPath );
@@ -4675,7 +4675,7 @@ function fileCopyActSync( test )
     relativeDstPath : dstPath,
     sync : 1,
     // breakingDstSoftLink : 1,
-    breakingDstHardLink : 1
+    // breakingDstHardLink : 1
   });
   test.is( provider.isSoftLink( dstPath ) );
   var dstFile = provider.fileRead( dstPath );
@@ -4701,8 +4701,8 @@ function fileCopyActSync( test )
     dstPath,
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
-    breakingSrcHardLink : 0,
-    breakingDstHardLink : 1,
+    // breakingSrcHardLink : 0,
+    // breakingDstHardLink : 1,
     sync : 1
   }
   test.shouldThrowErrorOfAnyKind( () =>
@@ -4725,7 +4725,7 @@ function fileCopyActSync( test )
     dstPath,
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
-    breakingDstHardLink : 0,
+    // breakingDstHardLink : 0,
     sync : 1
   }
   var expected = _.mapOwnKeys( o );
@@ -4750,7 +4750,7 @@ function fileCopyActSync( test )
     dstPath,
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
-    breakingDstHardLink : 0,
+    // breakingDstHardLink : 0,
     sync : 1
   }
 
@@ -49965,7 +49965,7 @@ var Self =
 
     encodersFromGdfs,
 
-  },
+  }
 
 };
 

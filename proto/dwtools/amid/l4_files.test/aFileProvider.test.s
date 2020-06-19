@@ -1522,7 +1522,7 @@ function fileWriteActAsync( test )
 
   var isHd = test.context.providerIsInstanceOf( _.FileProvider.HardDrive );
   var isSystem = provider instanceof _.FileProvider.System;
-  
+
   let data = 'Test data'
 
   let ready = new _.Consequence().take( null )
@@ -4570,7 +4570,7 @@ function fileCopyActSync( test )
   // test.is( srcFile !== dstFile );
 
   //qqq: move this test case to one of fileCopy test routines
-  
+
   // test.case = 'dst is a hard link, breakingDstSoftLink : 1, breakingDstHardLink : 1';
   // provider.filesDelete( routinePath );
   // provider.fileWrite( srcPath, srcPath );
@@ -4886,7 +4886,7 @@ function fileCopyActAsync( test )
   var dstPath = path.join( routinePath,'dst' );
 
   /* */
-  
+
   con.then( () =>
   {
     provider.filesDelete( routinePath );
@@ -4900,7 +4900,7 @@ function fileCopyActAsync( test )
       sync : 0
     }
     return provider.fileCopyAct( o )
-    .then( () => 
+    .then( () =>
     {
       test.is( provider.isTerminal( srcPath ) );
       test.is( provider.isTerminal( dstPath ) );
@@ -4909,7 +4909,7 @@ function fileCopyActAsync( test )
       return null;
     })
   })
-  
+
   /* */
 
   return con;
@@ -15624,7 +15624,7 @@ function fileDeleteFileWithSpecialSymbols( test )
     test.identical( 1,1 );
     return;
   }
-  
+
   let isHd = test.context.providerIsInstanceOf( _.FileProvider.HardDrive );
 
   var routinePath = test.context.pathFor( 'written/fileDeleteFileWithSpecialSymbols' );
@@ -15659,7 +15659,7 @@ function fileDeleteFileWithSpecialSymbols( test )
   test.case = 'filename contains ?, global path'
   var filePath = provider.path.join( routinePath, '?file=a' );
   if( process.platform === 'win32' && isHd )
-  test.shouldThrowErrorSync( () => 
+  test.shouldThrowErrorSync( () =>
   {
     provider.fileWrite( filePath, filePath );
   })
@@ -15673,7 +15673,7 @@ function fileDeleteFileWithSpecialSymbols( test )
   test.case = 'filename contains ?, local path'
   var filePath = provider.path.join( routinePath, '?file=a' );
   if( process.platform === 'win32' && isHd )
-  test.shouldThrowErrorSync( () => 
+  test.shouldThrowErrorSync( () =>
   {
     provider.fileWrite( filePath, filePath );
   })
@@ -29704,8 +29704,8 @@ function hardLinkMultipleSync( test )
     var paths = names.map( ( name, i ) =>
     {
       var filePath = self.pathFor( path.join( dirPath, name ) );
-      
-      ready.then( () => 
+
+      ready.then( () =>
       {
         provider.fileWrite({ filePath, data : filePath, purging : 1 });
 
@@ -29716,19 +29716,19 @@ function hardLinkMultipleSync( test )
         else if( i > 0 )
         {
           return _.time.out( delay )
-          .then( () => 
+          .then( () =>
           {
             provider.fileWrite({ filePath, data : path.name( filePath ) });
             return true;
           })
         }
-        
+
         return null;
       })
 
       return filePath;
     });
-    
+
     ready.deasync();
 
     return paths;
@@ -49690,7 +49690,7 @@ function encodersFromGdfs( test )
   test.is( !_.files.WriteEncoders[ 'testEncoder' ] );
 
   test.will = 'update encoders, encoder should exist';
-  _.files.encodersFromGdfs();
+  _.files.encoders.fromGdfs();
   var encoder = _.files.WriteEncoders[ 'testEncoder' ];
   test.is( _.mapIs( encoder ) );
   test.identical( encoder.exts, gdf.ext );
@@ -49699,7 +49699,7 @@ function encodersFromGdfs( test )
   test.will = 'finit gdf, encoder should exist';
   gdf.finit();
   test.is( _.mapIs( _.files.WriteEncoders[ 'testEncoder' ] ) );
-  _.files.encodersFromGdfs();
+  _.files.encoders.fromGdfs();
   test.will = 'update encoders, encoder should not exist';
   test.is( !_.files.WriteEncoders[ 'testEncoder' ] );
 
@@ -49723,14 +49723,14 @@ function encodersFromGdfs( test )
   let originalExt = gdf.ext.slice();
   gdf.ext = [ ext ];
   test.is( !_.mapIs( _.files.WriteEncoders[ ext ] ) );
-  _.files.encodersFromGdfs();
+  _.files.encoders.fromGdfs();
   var encoder = _.files.WriteEncoders[ ext ];
   test.is( _.mapIs( encoder ) );
   test.identical( encoder.exts, gdf.ext );
   test.identical( encoder.gdf, gdf );
   gdf.ext = originalExt.slice();
   gdf.finit();
-  _.files.encodersFromGdfs();
+  _.files.encoders.fromGdfs();
   test.is( !_.mapIs( _.files.WriteEncoders[ ext ] ) );
 
   /* - */

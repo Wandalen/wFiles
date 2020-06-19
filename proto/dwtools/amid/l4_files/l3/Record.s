@@ -727,7 +727,6 @@ function _absoluteGlobalGet()
   let f = record.factory;
   let fileProvider = f.effectiveProvider;
   return fileProvider.path.globalFromPreferred( record.absolute );
-  /* xxx qqq : test is fileProvider.path proper path namespace */
 }
 
 //
@@ -738,7 +737,6 @@ function _realGlobalGet()
   let f = record.factory;
   let fileProvider = f.effectiveProvider;
   return fileProvider.path.globalFromPreferred( record.real );
-  /* xxx qqq : test is fileProvider.path proper path namespace */
 }
 
 //

@@ -32456,17 +32456,19 @@ function filesExtractBasic( test )
   var provider1 = new context.provider.constructor({ protocol : 'ext1' }).providerRegisterTo( hub );
   var provider2 = new context.provider.constructor({ protocol : 'ext2' }).providerRegisterTo( hub );
   
-  tree1.filesReflectTo( provider1, routinePath );
-  tree2.filesReflectTo( provider2, routinePath );
+  tree1.filesReflectTo( provider1, _.path.join( routinePath, 'ext1' ) );
+  tree2.filesReflectTo( provider2, _.path.join( routinePath, 'ext2' ) );
   
-  var filePath = provider1.path.globalFromPreferred( routinePath );
+  var filePath = provider1.path.globalFromPreferred( _.path.join( routinePath, 'ext1' ) );
   var gotTree = hub.filesExtract( filePath );
+  adaptResultMaybe( provider1, gotTree, '/' );
   test.is( gotTree instanceof _.FileProvider.Extract );
   test.identical( gotTree.filesTree, tree1.filesTree );
   test.notIdentical( gotTree, provider1 )
   
-  var filePath = provider2.path.globalFromPreferred( routinePath );
+  var filePath = provider2.path.globalFromPreferred( _.path.join( routinePath, 'ext2' ) );
   var gotTree = hub.filesExtract( filePath );
+  adaptResultMaybe( provider1, gotTree, '/' );
   test.is( gotTree instanceof _.FileProvider.Extract );
   test.identical( gotTree.filesTree, tree2.filesTree );
   test.notIdentical( gotTree, provider2 );
@@ -32483,9 +32485,10 @@ function filesExtractBasic( test )
   var provider1 = new context.provider.constructor({ protocol : 'ext1' }).providerRegisterTo( hub );
   var provider2 = new context.provider.constructor({ protocol : 'ext2' }).providerRegisterTo( hub );
   hub.defaultProvider = provider1;
-  tree1.filesReflectTo( provider1, routinePath );
-  tree2.filesReflectTo( provider2, routinePath );
-  var gotTree = hub.filesExtract( routinePath );
+  tree1.filesReflectTo( provider1, _.path.join( routinePath, 'ext1' ) );
+  tree2.filesReflectTo( provider2, _.path.join( routinePath, 'ext2' ) );
+  var gotTree = hub.filesExtract( _.path.join( routinePath, 'ext1' ) );
+  adaptResultMaybe( provider1, gotTree, '/' );
   test.is( gotTree instanceof _.FileProvider.Extract );
   test.identical( gotTree.filesTree, tree1.filesTree );
   test.notIdentical( gotTree, provider1 )
@@ -32501,13 +32504,14 @@ function filesExtractBasic( test )
   var hub = _.FileProvider.System({ providers : [] });
   var provider1 = new context.provider.constructor({ protocol : 'ext1' }).providerRegisterTo( hub );
   var provider2 = new context.provider.constructor({ protocol : 'ext2' }).providerRegisterTo( hub );
-  tree1.filesReflectTo( provider1, routinePath );
-  tree2.filesReflectTo( provider2, routinePath );
-  var srcFilePath = provider1.path.globalFromPreferred( routinePath );
-  var gotTree = hub.filesExtract({ src : srcFilePath, dst : routinePath });
+  tree1.filesReflectTo( provider1, _.path.join( routinePath, 'ext1' ) );
+  tree2.filesReflectTo( provider2, _.path.join( routinePath, 'ext2' ) );
+  var srcFilePath = provider1.path.globalFromPreferred( _.path.join( routinePath, 'ext1' ) );
+  var gotTree = hub.filesExtract({ src : srcFilePath, dst : _.path.join( routinePath, 'ext1' ) });
+  adaptResultMaybe( provider1, gotTree, _.path.join( routinePath, 'ext1' ) );
   test.is( gotTree instanceof _.FileProvider.Extract );
-  test.identical( gotTree.filesTree, provider1.filesTree );
-  test.is( gotTree.filesTree !== provider1.filesTree );
+  test.identical( _.select( gotTree.filesTree, _.path.join( routinePath, 'ext1' ) ), tree1.filesTree );
+  test.is( gotTree.filesTree !== tree1.filesTree );
   test.notIdentical( gotTree, provider1 )
   
   provider1.finit();
@@ -32574,6 +32578,14 @@ function filesExtractBasic( test )
   */
 
   /* */
+  
+  function adaptResultMaybe( provider, resultTree, filePath )
+  {
+    if( !provider instanceof _.FileProvider.HardDrive )
+    return
+    var files = resultTree.filesFindRecursive({ filePath, withTerminals : 1, withDirs : 0, withStem/*maybe withTransient*/ : 0 })
+    _.each( files, ( f ) => resultTree.fileWrite( f.absolute, resultTree.fileRead( f.absolute ) ) )
+  }
 
 }
 

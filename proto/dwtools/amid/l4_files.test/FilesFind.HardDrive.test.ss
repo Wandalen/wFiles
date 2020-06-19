@@ -24,8 +24,6 @@ function onSuiteBegin( test ) /* qqq2 : review all onSuite* */
   context.provider = _.FileProvider.HardDrive({ protocol : 'current' });
   context.system = _.FileProvider.System({ providers : [ context.provider ], defaultProvider : context.provider });
   context.suiteTempPath = context.provider.path.pathDirTempOpen( context.provider.path.join( __dirname, '../..'  ), 'suite-' + 'FilesFind' );
-  context.suiteTempPath = context.provider.pathResolveLinkFull({ filePath : context.suiteTempPath, resolvingSoftLink : 1 }); /* qqq2 */
-  context.suiteTempPath = context.suiteTempPath.absolutePath;
 }
 
 //

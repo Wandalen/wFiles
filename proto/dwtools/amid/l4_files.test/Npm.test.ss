@@ -26,8 +26,6 @@ function onSuiteBegin( test )
   context.system = _.FileProvider.System({ providers : [ context.providerSrc, context.providerDst ] });
 
   context.suiteTempPath = _.fileProvider.path.pathDirTempOpen( _.fileProvider.path.join( __dirname, '../..'  ), 'FileProviderNpm' );
-  context.suiteTempPath = _.fileProvider.pathResolveLinkFull({ filePath : context.suiteTempPath, resolvingSoftLink : 1 }); /* qqq : ? */
-  context.suiteTempPath = context.suiteTempPath.absolutePath;
 }
 
 //

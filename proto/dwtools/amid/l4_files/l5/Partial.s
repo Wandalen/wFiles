@@ -3333,12 +3333,25 @@ function hashRead_body( o )
     }
     result = self.hashReadAct( o );
   }
-  catch( err )
+  catch( err ) /* qqq : make sure catch blocks of other methods return consequence if o.sync ~ false */
   {
-    if( o.throwing )
-    throw _.err( err, '\nCant read hash of', o.filePath );
+    debugger;
+    err = _.err( err, '\nCant read hash of', o.filePath )
+    if( o.sync )
+    {
+      if( o.throwing )
+      throw err;
+      else
+      return NaN;
+    }
     else
-    return NaN;
+    {
+      let result = new _.Consequence();
+      if( o.throwing )
+      return result.error( err );
+      else
+      return result.take( NaN );
+    }
   }
 
   if( _.consequenceIs( result ) )

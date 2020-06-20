@@ -19872,6 +19872,7 @@ function hashReadAsync( test )
 
   .finally( function()
   {
+    debugger;
     var con = provider.hashRead
     ({
       filePath,

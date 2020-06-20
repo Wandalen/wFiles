@@ -7228,7 +7228,7 @@ function _fileCopyVerify2( c )
   {
     let linked = self.filesAreHardLinked([ o.dstPath, o.srcPath ]);
     if( linked || linked === _.maybe )
-    c.end( true );
+    c.end( false );
   }
 }
 
@@ -7494,7 +7494,7 @@ function _hardLinkVerify2( c )
   {
     let linked = self.filesAreHardLinked([ o.dstPath, o.srcPath ]);
     if( linked || linked === _.maybe )
-    c.end( true );
+    c.end( false );
   }
 }
 
@@ -7840,7 +7840,7 @@ function _textLinkVerify2( c )
   // if( o.dstPath !== o.srcPath && self.filesAreTextLinked([ o.dstPath, o.srcPath ]) )
   // debugger;
   if( o.dstPath !== o.srcPath && self.filesAreTextLinked([ o.dstPath, o.srcPath ]) )
-  c.end( true );
+  c.end( false );
 }
 
 function _textIsLink( stat )

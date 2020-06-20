@@ -3578,9 +3578,9 @@ function filesReflectSingle_body( o )
     let srcAbsolute = record.src.real;
     /* qqq : use ( resolvingMultiple / recursive ) option instead of if-else */
 
-    debugger;
-    if( _.strHas( srcAbsolute, 'terLink' ) )
-    debugger;
+    // debugger;
+    // if( _.strHas( srcAbsolute, 'terLink' ) )
+    // debugger;
 
     let resolvingSrcSoftLink = self.usingSoftLink ? o.resolvingSrcSoftLink : 0;
     let resolvingSrcTextLink = self.usingTextLink ? o.resolvingSrcTextLink : 0;
@@ -3672,27 +3672,27 @@ function filesReflectSingle_body( o )
 
     record.src = record.src.factory.record( srcAbsolute );
 
-    if( path.isAbsolute( srcPath ) )
-    {
-      debugger;
-      path.join( dstRecord.absolute, path.relative( srcRecord.absolute, srcAbsolute ) );
-    }
+    // if( path.isAbsolute( srcPath ) )
+    // {
+    //   debugger;
+    //   path.join( dstRecord.absolute, path.relative( srcRecord.absolute, srcAbsolute ) );
+    // }
 
     let action = isSoftLink ? 'softLink' : 'textLink';
 
     if( action === 'softLink' )
     {
       if( o.resolvingSrcSoftLink === 2 )
-      linkWithAction( record.dst.absolutePreferred, srcPath, 'fileCopy' );
+      linkWithAction( record, record.dst.absolutePreferred, srcPath, 'fileCopy' );
       else
-      linkWithAction( record.dst.absolutePreferred, srcPath, action, 1 );
+      linkWithAction( record, record.dst.absolutePreferred, srcPath, action, 1 );
     }
     else if( action === 'textLink' )
     {
       if( o.resolvingSrcTextLink === 2 )
-      linkWithAction( record.dst.absolutePreferred, srcPath, 'fileCopy' );
+      linkWithAction( record, record.dst.absolutePreferred, srcPath, 'fileCopy' );
       else
-      linkWithAction( record.dst.absolutePreferred, srcPath, action, 1 );
+      linkWithAction( record, record.dst.absolutePreferred, srcPath, action, 1 );
     }
 
     return true;
@@ -3700,15 +3700,20 @@ function filesReflectSingle_body( o )
 
   /* */
 
-  function linkWithAction( dstPath, srcPath, action, allowingMissed )
+  function linkWithAction( record, dstPath, srcPath, action, allowingMissed )
   {
+    let r;
 
     if( action === 'nop' )
-    return false;
+    {
+      record.performed = 'nop';
+      return false;
+    }
 
     if( action === 'fileCopy' )
     {
-      system.fileCopy
+      /* qqq : should return true / false / null. false if no change is done! */
+      r = system.fileCopy
       ({
         dstPath,
         srcPath,
@@ -3724,9 +3729,9 @@ function filesReflectSingle_body( o )
     }
     else if( action === 'hardLink' )
     {
-      /* qqq2 : should not change time of file if it is already linked */
-
-      dst.hardLink
+      /* qqq : should not change time of file if it is already linked. check tests */
+      /* qqq : should return true / false / null. false if no change is done! */
+      r = dst.hardLink
       ({
         dstPath,
         srcPath,
@@ -3742,9 +3747,9 @@ function filesReflectSingle_body( o )
     }
     else if( action === 'softLink' )
     {
-      /* qqq2 : should not change time of file if it is already linked */
-
-      system.softLink
+      /* qqq : should not change time of file if it is already linked. check tests */
+      /* qqq : should return true / false / null. false if no change is done! */
+      r = system.softLink
       ({
         dstPath,
         srcPath,
@@ -3759,8 +3764,9 @@ function filesReflectSingle_body( o )
     }
     else if( action === 'textLink' )
     {
-      /* qqq2 : should not change time of file if it is already linked */
-      system.textLink
+      /* qqq : should not change time of file if it is already linked. check tests */
+      /* qqq : should return true / false / null. false if no change is done! */
+      r = system.textLink
       ({
         dstPath,
         srcPath,
@@ -3774,6 +3780,12 @@ function filesReflectSingle_body( o )
       });
     }
     else _.assert( 0 );
+
+    debugger;
+    if( _.consequenceIs( r ) )
+    r.then( () => record.performed = r );
+    else
+    record.performed = r;
 
     return true;
   }
@@ -3799,7 +3811,7 @@ function filesReflectSingle_body( o )
     if( linkRebasing( record ) )
     return true;
 
-    return linkWithAction( record.dst.absolutePreferred, record.src.absolutePreferred, action );
+    return linkWithAction( record, record.dst.absolutePreferred, record.src.absolutePreferred, action );
   }
 
   /* */
@@ -4077,11 +4089,32 @@ function filesReflect_body( o )
       throw _.err( 'Error. No file moved :', mtr );
     }
 
+    /* qqq xxx : implement tests to cover log
+    Implement and use LoggerToString for that.
+    */
+
+    if( o.verbosity >= 3 )
+    {
+      debugger;
+
+      o.result.forEach( ( record ) =>
+      {
+        if( !record.performed )
+        return;
+        let mtr = path.moveTextualReport( record.dst.absolute, record.src.absolute );
+        self.logger.log( ` + Reflect ${mtr}` );
+      });
+
+      /* qqq xxx : verbosity > 3 should log each modified file, but not more
+      */
+
+    }
+
     if( o.verbosity >= 1 )
     {
       _.assert( o.src.isPaired() );
       let mtr = o.src.moveTextualReport();
-      self.logger.log( ' + Reflect ' + o.result.length + ' files ' + mtr + ' in ' + _.time.spent( time ) );
+      self.logger.log( ` + Reflect ${ o.result.length } files ${ mtr } in ${ _.time.spent( time ) }` );
     }
 
     if( o.outputFormat !== 'record' )

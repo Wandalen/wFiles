@@ -3810,7 +3810,7 @@ function filesReflectSingle_body( o )
     if( !record.allow || record.preserve )
     return;
 
-    if( action === 'nop' )
+    if( record.action === 'nop' )
     {
       record.performed = 'nop';
       return false;

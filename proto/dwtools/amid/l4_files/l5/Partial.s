@@ -7498,7 +7498,7 @@ function _hardLinkVerify2( c )
   else if( !srcStat.isTerminal() )
   {
     debugger;
-    c.error( _.err( 'Source file should be a terminal.' ) );
+    c.error( _.err( `Source file should be a terminal:\n  ${o.srcPath}` ) );
   }
   else
   {

@@ -31,6 +31,7 @@
 let _global = _global_;
 let _ = _global_.wTools;
 let Self = _.files = _.files || Object.create( null );
+let Crypto;
 
 _.FileProvider = _.files.FileProvider = _.FileProvider || _.files.FileProvider || Object.create( null );
 _.FileFilter = _.files.FileFilter = _.FileFilter || _.files.FileFilter || Object.create( null );
@@ -156,7 +157,7 @@ let vectorizeNone = _.routineDefaults( null, _.vectorizeNone, { vectorizingConta
 
 //
 
-function vectorizeKeysAndVals( routine, select ) 
+function vectorizeKeysAndVals( routine, select )
 {
   select = select || 1;
 
@@ -310,7 +311,9 @@ function filterSafer( filter )
   return filter;
 }
 
-//
+// --
+// etc
+// --
 
 /**
  * Return o for file red/write. If `filePath is an object, method returns it. Method validate result option
@@ -327,7 +330,7 @@ function filterSafer( filter )
  * @module Tools/mid/Files
  */
 
-function _fileOptionsGet( filePath,o )
+function _fileOptionsGet( filePath, o ) /* xxx : check */
 {
   o = o || {};
 
@@ -341,7 +344,7 @@ function _fileOptionsGet( filePath,o )
   }
 
   if( !o.filePath )
-  throw _.err( '_fileOptionsGet :','Expects "o.filePath"' );
+  throw _.err( 'Expects "o.filePath"' );
 
   _.assertMapHasOnly( o,this.defaults );
   _.assert( arguments.length === 1 || arguments.length === 2 );
@@ -503,7 +506,7 @@ function filesOlder( dst,src )
  * @module Tools/mid/Files
 */
 
-function filesSpectre( src )
+function filesSpectre( src ) /* xxx : redo or remove */
 {
 
   _.assert( arguments.length === 1, 'filesSpectre :','expect single argument' );
@@ -554,10 +557,7 @@ function filesSimilarity( o )
   o.src1 = _.fileProvider.recordFactory().record( o.src1 );
   o.src2 = _.fileProvider.recordFactory().record( o.src2 );
 
-  // if( !o.src1.latters )
   let latters1 = _.files.filesSpectre( o.src1.absolute );
-
-  // if( !o.src2.latters )
   let latters2 = _.files.filesSpectre( o.src2.absolute );
 
   let result = _.strLattersSpectresSimilarity( latters1,latters2 );
@@ -573,7 +573,7 @@ filesSimilarity.defaults =
 
 //
 
-function filesShadow( shadows,owners )
+function filesShadow( shadows, owners ) /* xxx : check */
 {
 
   for( let s = 0 ; s < shadows.length ; s++ )
@@ -590,7 +590,6 @@ function filesShadow( shadows,owners )
 
       if( _.strBegins( shadow,_.path.prefixGet( owner ) ) )
       {
-        //logger.log( '?',shadow,'shadowed by',owner );
         shadows.splice( s,1 );
         s -= 1;
         break;
@@ -604,7 +603,7 @@ function filesShadow( shadows,owners )
 
 //
 
-function fileReport( file )
+function fileReport( file ) /* xxx : rename */
 {
   let report = '';
 
@@ -634,7 +633,123 @@ function fileReport( file )
 
 //
 
-function nodeJsIsSameOrNewer( src )
+function hashFrom( o )
+{
+
+  if( !_.mapIs( arguments[ 0 ] ) )
+  o = { src : arguments[ 0 ] }
+  _.routineOptions( hashFrom, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+
+  return _.files.hashMd5From( o );
+}
+
+hashFrom.defaults =
+{
+  src : null,
+}
+
+//
+
+function hashSzFrom( o )
+{
+
+  if( !_.mapIs( arguments[ 0 ] ) )
+  o = { src : arguments[ 0 ] }
+  _.routineOptions( hashSzFrom, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( !_.streamIs( o.src ), 'not implemented' ); /* qqq : implement */
+
+  let result = _.files.hashMd5From( o );
+
+  if( !result )
+  return result;
+
+  let size = _.sizeOf( o.src );
+  _.assert( _.numberIs( size ) );
+  result = size + '-' + result;
+
+  return result;
+}
+
+hashSzFrom.defaults =
+{
+  ... hashFrom.defaults,
+}
+
+//
+
+function hashMd5From( o )
+{
+
+  if( !_.mapIs( arguments[ 0 ] ) )
+  o = { src : arguments[ 0 ] }
+  _.routineOptions( hashMd5From, o );
+  _.assert( arguments.length === 1, 'Expects single argument' );
+
+  if( Crypto === undefined )
+  Crypto = require( 'crypto' );
+  let md5sum = Crypto.createHash( 'md5' );
+
+  /* */
+
+  if( _.streamIs( o.src ) )
+  {
+    let con = new _.Consequence();
+    let done = false;
+
+    o.src.on( 'data', function( d )
+    {
+      md5sum.update( d );
+    });
+
+    o.src.on( 'end', function()
+    {
+      if( done )
+      return;
+      done = true;
+      let hash = md5sum.digest( 'hex' );
+      con.take( hash );
+    });
+
+    o.src.on( 'error', function( err )
+    {
+      if( done )
+      return;
+      done = true;
+      con.error( _.err( err ) );
+    });
+
+    return con;
+  }
+  else
+  {
+    let result;
+    try
+    {
+      o.src = _.bufferNodeFrom( o.src );
+      md5sum.update( o.src );
+      result = md5sum.digest( 'hex' );
+    }
+    catch( err )
+    {
+      throw err;
+    }
+    return result;
+  }
+
+  /* */
+
+}
+
+hashMd5From.defaults =
+{
+  ... hashFrom.defaults,
+}
+
+//
+
+function nodeJsIsSameOrNewer( src ) /* xxx : rename */
 {
   _.assert( arguments.length === 1 );
   _.assert( _.longIs( src ) );
@@ -683,9 +798,9 @@ let Files =
   regexpDirSafe,
   filterSafer,
 
-  _fileOptionsGet,
-
   // etc
+
+  _fileOptionsGet,
 
   filesNewer,
   filesOlder,
@@ -698,6 +813,13 @@ let Files =
   fileReport,
 
   nodeJsIsSameOrNewer,
+
+  hashFrom, /* qqq : cover */
+  hashMd5From, /* qqq : cover */
+  hashSzFrom, /* qqq : cover */
+
+  // fields
+
 
 }
 

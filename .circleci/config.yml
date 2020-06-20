@@ -9,6 +9,9 @@ jobs :
       - checkout
       - node/with-cache:
           steps :
+            - run : git config --global user.email "testing@testing.com"
+            - run : git config --global user.name "Testing"
+            - run : node -v
             - run : npm install
             - run : npm test
 workflows :

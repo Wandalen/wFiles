@@ -280,20 +280,22 @@ function _preFilePathVectorWithoutProviderDefaults( routine, args )
   let path = self.path;
 
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
-  _.assert( args && args.length === 1, 'Routine ' + routine.name + ' expects exactly one argument' );
+  _.assert( args && args.length === 1, `Routine ${ routine.name } expects exactly one argument` );
 
   let o = args[ 0 ];
 
   if( path.like( o ) )
-  o = { filePath : path.from( o ) };
+  o = { filePath : args[ 0 ] };
   else if( _.arrayIs( o ) )
-  o = { filePath : path.s.from( o ) };
-  else if( _.arrayIs( o.filePath ) )
+  o = { filePath : args[ 0 ] };
+
+  if( _.arrayIs( o.filePath ) )
   o.filePath = path.s.from( o.filePath );
+  else
+  o.filePath = path.from( o.filePath );
 
   _.routineOptions( routine, o );
-
-  _.assert( path.s.allAreAbsolute( o.filePath ), () => 'Expects absolute path {-o.filePath-}, but got ' + _.strQuote( o.filePath ) );
+  _.assert( path.s.allAreAbsolute( o.filePath ), () => `Expects absolute path {-o.filePath-}, but got "${ o.filePath }"` );
 
   o.filePath = path.s.normalize( o.filePath );
 
@@ -2681,7 +2683,12 @@ function fileRead_pre( routine, args )
 {
   let self = this;
 
-  let o = self._preFilePathScalarWithoutProviderDefaults.apply( self, arguments );
+  _.assert( args.length === 1 || args.length === 2 );
+
+  if( args.length === 2 )
+  args = [{ filePath : args[ 0 ], encoding : args[ 1 ] }]; /* qqq : add test to cover this */
+
+  let o = self._preFilePathScalarWithoutProviderDefaults( routine, args );
 
   _.assert( _.longHas( [ 'data', 'o' ], o.outputFormat ) );
 
@@ -3161,81 +3168,94 @@ fileInterpret.having.aspect = 'entry';
 
 //
 
-// let hashReadAct = Object.create( null );
-// hashReadAct.name = 'hashReadAct';
+// let hashReadAct = ( function hashReadAct()
+// {
+//   let Crypto;
+//
+//   return function hashReadAct( o )
+//   {
+//     let self = this;
+//
+//     _.assert( arguments.length === 1, 'Expects single argument' );
+//
+//     if( Crypto === undefined )
+//     Crypto = require( 'crypto' );
+//     let md5sum = Crypto.createHash( 'md5' );
+//
+//     /* */
+//
+//     if( o.sync && _.boolLike( o.sync ) )
+//     {
+//       let result;
+//       try
+//       {
+//         let stat = self.statResolvedRead({ filePath : o.filePath, sync : 1, throwing : 0 });
+//         _.sure( !!stat, 'Cant get stats of file ' + _.strQuote( o.filePath ) );
+//         if( stat.size > self.hashFileSizeLimit )
+//         throw _.err( 'File is too big ' + _.strQuote( o.filePath ) + ' ' + stat.size + ' > ' + self.hashFileSizeLimit );
+//         let read = self.fileReadSync( o.filePath );
+//         md5sum.update( read );
+//         result = md5sum.digest( 'hex' );
+//       }
+//       catch( err )
+//       {
+//         throw err;
+//       }
+//
+//       return result;
+//
+//     }
+//     else if( !o.sync )
+//     {
+//       let con = new _.Consequence();
+//       let stream = self.streamRead( o.filePath );
+//
+//       stream.on( 'data', function( d )
+//       {
+//         md5sum.update( d );
+//       });
+//
+//       stream.on( 'end', function()
+//       {
+//         let hash = md5sum.digest( 'hex' );
+//         con.take( hash );
+//       });
+//
+//       stream.on( 'error', function( err )
+//       {
+//         con.error( _.err( err ) );
+//       });
+//
+//       return con;
+//     }
+//     else _.assert( 0 );
+//   }
+//
+// })();
 
-let hashReadAct = ( function hashReadAct()
+function hashReadAct( o )
 {
-  let Crypto;
+  let self = this;
 
-  return function hashReadAct( o )
+  _.assert( arguments.length === 1, 'Expects single argument' );
+
+  /* */
+
+  if( o.sync && _.boolLike( o.sync ) )
   {
-    let self = this;
-
-    _.assert( arguments.length === 1, 'Expects single argument' );
-
-    // if( o.verbosity >= 3 )
-    // self.logger.log( ' . hashRead :', o.filePath );
-
-    if( Crypto === undefined )
-    Crypto = require( 'crypto' );
-    let md5sum = Crypto.createHash( 'md5' );
-
-    /* */
-
-    if( o.sync && _.boolLike( o.sync ) )
-    {
-      let result;
-      try
-      {
-        let stat = self.statResolvedRead({ filePath : o.filePath, sync : 1, throwing : 0 });
-        _.sure( !!stat, 'Cant get stats of file ' + _.strQuote( o.filePath ) );
-        if( stat.size > self.hashFileSizeLimit )
-        throw _.err( 'File is too big ' + _.strQuote( o.filePath ) + ' ' + stat.size + ' > ' + self.hashFileSizeLimit );
-        let read = self.fileReadSync( o.filePath );
-        md5sum.update( read );
-        result = md5sum.digest( 'hex' );
-      }
-      catch( err )
-      {
-        throw err;
-      }
-
-      return result;
-
-    }
-    else if( o.sync === 'worker' )
-    {
-
-      debugger; throw _.err( 'not implemented' );
-
-    }
-    else
-    {
-      let con = new _.Consequence();
-      let stream = self.streamRead( o.filePath );
-
-      stream.on( 'data', function( d )
-      {
-        md5sum.update( d );
-      });
-
-      stream.on( 'end', function()
-      {
-        let hash = md5sum.digest( 'hex' );
-        con.take( hash );
-      });
-
-      stream.on( 'error', function( err )
-      {
-        con.error( _.err( err ) );
-      });
-
-      return con;
-    }
+    let read = self.fileReadSync( o.filePath, 'buffer.raw' );
+    return _.files.hashFrom( read );
   }
+  else if( !o.sync )
+  {
+    let stream = self.streamRead( o.filePath );
+    return _.files.hashFrom( stream );
+  }
+  else _.assert( 0 );
 
-})();
+  /* */
+
+}
 
 var defaults = hashReadAct.defaults = Object.create( null );
 defaults.filePath = null;
@@ -3300,9 +3320,17 @@ function hashRead_body( o )
 
   if( o.verbosity >= 1 )
   self.logger.log( ' . hashRead :', o.filePath );
+  if( o.hashFileSizeLimit === null )
+  o.hashFileSizeLimit = self.hashFileSizeLimit;
 
   try
   {
+    if( o.hashFileSizeLimit )
+    {
+      let stat = self.statResolvedRead({ filePath : o.filePath, sync : 1, throwing : 1 });
+      if( stat.size > o.hashFileSizeLimit )
+      throw _.err( `File ${ o.filePath } is too big ${ stat.size } > ${ o.hashFileSizeLimit }` );
+    }
     result = self.hashReadAct( o );
   }
   catch( err )
@@ -3337,6 +3365,7 @@ _.routineExtend( hashRead_body, hashReadAct );
 var defaults = hashRead_body.defaults;
 defaults.throwing = null;
 defaults.verbosity = null;
+defaults.hashFileSizeLimit = null;
 
 var having = hashRead_body.having;
 having.driving = 0;
@@ -3352,8 +3381,24 @@ function hashSzRead_body( o )
   let self = this;
   let result;
 
-  let stat = self.statRead({ filePath : o.filePath, sync : o.sync, throwing : o.throwing });
-  let hash = self.hashRead( o );
+  /* */
+
+  if( o.sync )
+  {
+    let stat = self.statResolvedRead({ filePath : o.filePath, sync : 1, throwing : 1 });
+    if( stat.size > self.hashFileSizeLimit )
+    throw _.err( `File ${ o.filePath } is too big ${ stat.size } > ${ self.hashFileSizeLimit }` );
+    let read = self.fileReadSync( o.filePath, 'buffer.raw' );
+    return _.files.hashSzFrom( read );
+  }
+  else if( !o.sync )
+  {
+    let stream = self.streamRead( o.filePath );
+    return _.files.hashSzFrom( stream );
+  }
+  else _.assert( 0 );
+
+  /* */
 
   /* zzz : remove Consequence.From after And will be adjusted */
   let ready = _.Consequence.AndKeep_( _.Consequence.From( stat ), _.Consequence.From( hash ) ).then( ( arg ) =>
@@ -3362,6 +3407,17 @@ function hashSzRead_body( o )
     return null;
     return arg[ 0 ].size + '-' + arg[ 1 ];
   });
+
+  // let stat = self.statRead({ filePath : o.filePath, sync : o.sync, throwing : o.throwing });
+  // let hash = self.hashRead( o );
+  //
+  // /* zzz : remove Consequence.From after And will be adjusted */
+  // let ready = _.Consequence.AndKeep_( _.Consequence.From( stat ), _.Consequence.From( hash ) ).then( ( arg ) =>
+  // {
+  //   if( !arg[ 0 ] || !arg[ 1 ] )
+  //   return null;
+  //   return arg[ 0 ].size + '-' + arg[ 1 ];
+  // });
 
   if( o.sync )
   return ready.sync();
@@ -3379,31 +3435,11 @@ hashSzRead.having.aspect = 'entry';
 function hashSzIsUpToDate_pre( routine, args )
 {
   let self = this;
-  // let path = self.path;
 
   if( args.length === 2 )
   args = [{ filePath : args[ 0 ], hash : args[ 1 ] }];
 
   return self._preFilePathScalarWithProviderDefaults( routine, args );
-
-  // _.assert( arguments.length === 2, 'Expects exactly two arguments' );
-  // _.assert( _.objectIs( args[ 0 ] ) || path.is( args[ 0 ] ), 'Expects options map or path' );
-  // _.assert( args && args.length === 1, 'Routine ' + routine.name + ' expects exactly one argument' );
-  //
-  // let o = args[ 0 ];
-  //
-  // if( path.like( o ) )
-  // o = { filePath : path.from( o ) };
-  //
-  // _.routineOptions( routine, o );
-  //
-  // o.filePath = path.normalize( o.filePath );
-  //
-  // _.assert( path.isAbsolute( o.filePath ), () => 'Expects absolute path {-o.filePath-}, but got ' + _.strQuote( o.filePath ) );
-  //
-  // self._providerDefaultsApply( o );
-  //
-  // return o;
 }
 
 function hashSzIsUpToDate_body( o )
@@ -8558,7 +8594,7 @@ let ProviderDefaults =
  * @typedef {Object} Fields
  * @property {String[]} protocols=[]
  * @property {String} encoding='utf8'
- * @property {Number} hashFileSizeLimit=1<<22
+ * @property {Number} hashFileSizeLimit=8MB
  * @property {Boolean} resolvingSoftLink=1
  * @property {Boolean} resolvingTextLink=0
  * @property {Boolean} usingSoftLink=1
@@ -8589,7 +8625,7 @@ let Composes =
   protocols : _.define.own([]),
 
   encoding : 'utf8',
-  hashFileSizeLimit : 1 << 22,
+  hashFileSizeLimit : 1 << 23,
 
   resolvingSoftLink : 1,
   resolvingTextLink : 0,

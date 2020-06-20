@@ -46,7 +46,22 @@ function onSuiteEnd()
 function pathFor( filePath )
 {
   let self = this;
-  return self.provider.path.normalize('/' + filePath );
+  return self.provider.path.normalize( '/' + filePath );
+}
+
+//
+
+function providerMake()
+{
+  let context = this;
+
+  let provider = _.FileProvider.Extract({ protocols : [ 'current', 'second' ] });
+  let system = _.FileProvider.System({ providers : [ provider ] });
+
+  _.assert( system.defaultProvider === null );
+  // system.defaultProvider = provider;
+
+  return provider;
 }
 
 // --
@@ -127,10 +142,12 @@ var Proto =
 
   context :
   {
+    pathFor,
+    providerMake,
+
     // filesTree,
     provider : _.FileProvider.Extract( { usingExtraStat : 1 } ),
     globalFromPreferred : null,
-    pathFor,
     testFile : '/file1'
   },
 

@@ -5876,6 +5876,9 @@ function _link_functor( fop )
     if( o.sync )
     {
 
+      // if( _.strEnds( o.srcPath, "#dir2/file" ) ) /* yyy */
+      // debugger;
+
       c.verify1( arguments );
       if( c.ended )
       return c.end();
@@ -6214,7 +6217,13 @@ function _link_functor( fop )
 
     /* - */
 
-    function pathsLocalizeSync()
+    /* qqq : implement test suite:
+      - system
+      - no default provider
+      -
+    */
+
+    function pathsLocalizeSync() /* qqq : ignoring provider is temp workaround. please redo */
     {
       if( self instanceof _.FileProvider.System )
       return;
@@ -7488,6 +7497,7 @@ function _hardLinkVerify2( c )
   }
   else if( !srcStat.isTerminal() )
   {
+    debugger;
     c.error( _.err( 'Source file should be a terminal.' ) );
   }
   else

@@ -1631,238 +1631,6 @@ let filesRead = _.routineFromPreAndBody( filesFindGroups.pre, filesRead_body );
 //
 // --
 
-//
-// _.routineExtend( filesCopyOld, filesFindDifference );
-//
-// var defaults = filesCopyOld.defaults;
-//
-// defaults.verbosity = 1;
-// defaults.linking = 0;
-// defaults.resolvingSoftLink = 0;
-// defaults.resolvingTextLink = 0;
-//
-// defaults.removingSource = 0;
-// defaults.removingSourceTerminals = 0;
-//
-// defaults.recursive = 2;
-// defaults.allowDelete = 0;
-// defaults.allowWrite = 0;
-// defaults.allowRewrite = 1;
-// defaults.allowRewriteFileByDir = 0;
-//
-// defaults.tryingPreserve = 1;
-// defaults.silentPreserve = 1;
-// defaults.preservingTime = 1;
-
-//
-
-// function filesCopyWithAdapter( o )
-// {
-//   let self = this;
-
-//   if( arguments.length === 2 )
-//   o = { dst : arguments[ 0 ] , src : arguments[ 1 ] }
-
-//   _.assert( arguments.length === 1 || arguments.length === 2 );
-
-//   if( !o.allowDelete && o.investigateDestination === undefined )
-//   o.investigateDestination = 0;
-
-//   if( o.allowRewrite === undefined )
-//   o.allowRewrite = filesCopyWithAdapter.defaults.allowRewrite;
-
-//   if( o.allowRewrite && o.allowWrite === undefined )
-//   o.allowWrite = 1;
-
-//   if( o.allowRewrite && o.allowRewriteFileByDir === undefined  )
-//   o.allowRewriteFileByDir = true;
-
-//   _.routineOptions( filesCopyWithAdapter, o );
-//   self._providerDefaultsApply( o );
-
-//   if( o.onUp === null )
-//   o.onUp = [];
-//   if( o.onDown === null )
-//   o.onDown = [];
-
-//   /* safe */
-
-//   // if( self.safe )
-//   // if( o.removingSource && ( !o.allowWrite || !o.allowRewrite ) )
-//   // throw _.err( 'not safe removingSource:1 with allowWrite:0 or allowRewrite:0' );
-
-//   o.src = self.path.normalize( o.src );
-//   o.dst = self.path.normalize( o.dst );
-
-//   let options = Object.create( null );
-//   _.mapExtend( options, _.mapOnly( o, filesReflect.defaults ) );
-
-//   /*
-//     'investigateDestination',
-//     'verbosity',
-//     'silentPreserve?',
-//     'resolvingSoftLink',
-//     'resolvingTextLink',
-//     'allowDelete',
-//     'allowWrite',
-//     'allowRewrite',
-//     'allowRewriteFileByDir',
-//     'removingSourceTerminals',
-//     'removingSource',
-//     'tryingPreserve',
-//     'ext?',
-//     'maxSize?',
-//     'usingExtraStat?',
-//   */
-
-//   options.linking = options.linking ? 'hardLink' : 'fileCopy';
-//   options.srcDeleting = o.removingSource || o.removingSourceTerminals; // check it
-//   options.dstDeleting = o.allowDelete;
-//   options.writing = o.allowWrite;
-//   options.dstRewriting = o.allowRewrite;
-//   options.dstRewritingByDistinct = o.allowRewriteFileByDir; // check it
-//   options.preservingTime = o.preservingTime;
-//   options.preservingSame = o.tryingPreserve; // check it
-//   options.includingDst = o.investigateDestination;
-
-//   /*
-//   zzz : wrong! resolving*Link and resolvingSoftLink are not related, as well as resolvingTextLink
-//   Vova : low priority
-//   */
-
-//   options.resolvingSrcSoftLink = o.resolvingSoftLink;
-//   options.resolvingDstSoftLink = o.resolvingSoftLink;
-//   options.resolvingSrcTextLink = o.resolvingTextLink;
-//   options.resolvingDstTextLink = o.resolvingTextLink;
-
-//   options.onWriteDstUp = o.onUp;
-//   options.onWriteDstDown = o.onDown;
-
-//   delete options.onUp;
-//   delete options.onDown;
-
-//   options.reflectMap = Object.create( null );
-//   options.reflectMap[ o.src ] = o.dst;
-
-//   // options.srcProvider = self;
-//   // options.dstProvider = self;
-
-//   if( !options.filter )
-//   options.filter = Object.create( null );
-
-//   if( options.filter instanceof _.FileRecordFilter )
-//   {
-//     options.src = options.filter.clone();
-//     // options.dst = options.filter.clone();
-//   }
-//   else
-//   {
-//     options.src = self.recordFilter( options.filter );
-//     // options.dst = self.recordFilter( options.filter );
-//   }
-
-//   options.filter = null;
-
-//   options.src.effectiveProvider = self;
-//   // options.dst.effectiveProvider = self;
-
-//   if( o.ext )
-//   {
-//     _.assert( _.strIs( o.ext ) );
-//     _.assert( !o.onDstName, 'o.ext is not compatible with o.onDstName' );
-//     let ext = o.ext;
-//     options.onDstName = function( relative, dstRecordFactory, op, o, srcRecord )
-//     {
-//       if( !srcRecord.isDir )
-//       return self.path.changeExt( relative, ext );
-//       return relative;
-//     }
-//   }
-
-//   let result = self.filesReflect( options );
-
-//   result.forEach( ( r ) =>
-//   {
-
-//     if( !r.relative )
-//     r.relative = r.effective.relative;
-
-//     if( r.action === 'dirMake' )
-//     if( r.preserve )
-//     r.action = 'directory preserved';
-//     else
-//     r.action = 'directory new';
-
-//     if( r.action === 'fileCopy' )
-//     if( r.preserve )
-//     r.action = 'same';
-//     else
-//     r.action = 'copied'
-
-//   })
-
-//   return result;
-// }
-
-// filesCopyWithAdapter.defaults =
-// {
-//   outputFormat : 'record',
-//   ext : null,
-//   investigateDestination : 1,
-
-//   maxSize : 1 << 21,
-//   usingExtraStat : 1,
-//   recursive : 0,
-
-//   withTerminals : 1,
-//   withDirs : 1,
-
-//   resolvingSoftLink : 0,
-//   resolvingTextLink : 0,
-
-//   filter : null,
-//   result : null,
-//   src : null,
-//   dst : null,
-
-//   onUp : null,
-//   onDown : null,
-// }
-
-// // filesCopyWithAdapter.defaults.__proto__ = filesFindMasksAdjust.defaults
-// // var paths = filesCopyWithAdapter.paths = Object.create( null );
-// // paths.src = null;
-// // paths.dst = null;
-
-// var having = filesCopyWithAdapter.having = Object.create( null );
-// having.writing = 0;
-// having.reading = 1;
-// having.driving = 0;
-
-// // _.routineExtend( filesCopyWithAdapter, filesFindDifference );
-
-// var defaults = filesCopyWithAdapter.defaults;
-
-// defaults.verbosity = 1;
-// defaults.linking = 0;
-// defaults.resolvingSoftLink = 0;
-// defaults.resolvingTextLink = 0;
-
-// defaults.removingSource = 0;
-// defaults.removingSourceTerminals = 0;
-
-// defaults.recursive = 2;
-// defaults.allowDelete = 0;
-// defaults.allowWrite = 0;
-// defaults.allowRewrite = 1;
-// defaults.allowRewriteFileByDir = 0;
-
-// defaults.tryingPreserve = 1;
-// defaults.silentPreserve = 1;
-// defaults.preservingTime = 1;
-
-//
-
 function _filesFiltersPrepare( routine, o )
 {
   let self = this;
@@ -2907,6 +2675,8 @@ function filesReflectEvaluate_body( o )
 
     // if( _.strEnds( record.dst.absolute, debugPath ) )
     // debugger;
+    // if( _.strHas( record.dst.absolute, 'clean-special/out' ) )
+    // debugger;
 
     _.assert( arguments.length === 2 );
     _.assert( _.longHas( [ 'exclude', 'ignore', 'fileDelete', 'dirMake', 'fileCopy', 'softLink', 'hardLink', 'textLink', 'nop' ], action ), () => 'Unknown action ' + _.strQuote( action ) );
@@ -3738,6 +3508,10 @@ function filesReflectSingle_body( o )
     {
       /* qqq : should not change time of file if it is already linked. check tests */
       /* qqq : should return true / false / null. false if no change is done! */
+
+      if( _.strEnds( dstPath, "#dir2/file" ) ) /* yyy */
+      debugger;
+
       r = dst.hardLink
       ({
         dstPath,
@@ -3788,7 +3562,6 @@ function filesReflectSingle_body( o )
     }
     else _.assert( 0 );
 
-    debugger;
     if( _.consequenceIs( r ) )
     r.then( () => record.performed = r );
     else
@@ -4116,16 +3889,16 @@ function filesReflect_body( o )
       {
         if( record.action === 'fileDelete' )
         {
-          self.logger.log( ` - Delete ${ record.dst.absolute }` );
+          self.logger.log( ` - ${ record.action } ${ record.dst.absolute }` );
         }
         else
         {
           let mtr = path.moveTextualReport( record.dst.absolute, record.src.absolute );
-          self.logger.log( ` + Reflect ${ mtr }` );
+          self.logger.log( ` + ${ record.action } ${ mtr }` );
         }
       });
 
-      /* qqq xxx : verbosity > 3 should log each modified file, but not more
+      /* qqq xxx yyy : verbosity > 3 should log each modified file, but not more
       */
 
     }

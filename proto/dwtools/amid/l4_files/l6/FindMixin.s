@@ -3520,12 +3520,14 @@ function filesReflectSingle_body( o )
     _.assert( !!record.touch );
     _.assert( !!record.action );
 
-    record.dst.factory.effectiveProvider.dirMake
+    debugger;
+    let r = record.dst.factory.effectiveProvider.dirMake
     ({
       recursive : 1,
       rewritingTerminal : 0,
       filePath : record.dst.absolute,
     });
+    record.performed = r;
 
   }
 
@@ -3537,7 +3539,12 @@ function filesReflectSingle_body( o )
     return;
     if( record.dst.absolute === record.src.absolute )
     return;
-    record.dst.factory.effectiveProvider.fileDelete( record.dst.absolute );
+
+    debugger;
+    let r = record.dst.factory.effectiveProvider.fileDelete( record.dst.absolute );
+    record.performed = r;
+    /* qqq : should be in v >= 3 log as : " - deleted ..." */
+
   }
 
   /* */
@@ -3803,8 +3810,11 @@ function filesReflectSingle_body( o )
     if( !record.allow || record.preserve )
     return;
 
-    if( record.action === 'nop' )
-    return false;
+    if( action === 'nop' )
+    {
+      record.performed = 'nop';
+      return false;
+    }
 
     let action = record.action;
 
@@ -4093,16 +4103,26 @@ function filesReflect_body( o )
     Implement and use LoggerToString for that.
     */
 
+    let result = o.result;
+
+    if( o.verbosity >= 1 )
+    result = result.filter( ( record ) => record.performed );
+
     if( o.verbosity >= 3 )
     {
       debugger;
 
-      o.result.forEach( ( record ) =>
+      result.forEach( ( record ) =>
       {
-        if( !record.performed )
-        return;
-        let mtr = path.moveTextualReport( record.dst.absolute, record.src.absolute );
-        self.logger.log( ` + Reflect ${mtr}` );
+        if( record.action === 'fileDelete' )
+        {
+          self.logger.log( ` - Delete ${ record.dst.absolute }` );
+        }
+        else
+        {
+          let mtr = path.moveTextualReport( record.dst.absolute, record.src.absolute );
+          self.logger.log( ` + Reflect ${ mtr }` );
+        }
       });
 
       /* qqq xxx : verbosity > 3 should log each modified file, but not more
@@ -4114,7 +4134,7 @@ function filesReflect_body( o )
     {
       _.assert( o.src.isPaired() );
       let mtr = o.src.moveTextualReport();
-      self.logger.log( ` + Reflect ${ o.result.length } files ${ mtr } in ${ _.time.spent( time ) }` );
+      self.logger.log( ` + Reflect ${ result.length } files ${ mtr } in ${ _.time.spent( time ) }` );
     }
 
     if( o.outputFormat !== 'record' )

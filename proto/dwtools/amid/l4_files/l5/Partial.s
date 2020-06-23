@@ -7447,7 +7447,7 @@ operates.relativeSrcPath = { pathToRead : 1 }
  * breakingSrcHardLink:1 breakingDstHardLink:1 - breaks hardlinks: f1 = src and dst = f2
  * breakingSrcHardLink:1 breakingDstHardLink:0 - breaks hardlink f1 = src
  * breakingSrcHardLink:0 breakingDstHardLink:1 - breaks hardlink dst = f2
- * breakingSrcHardLink:0 breakingDstHardLink:0 - preserves both hardlinks, is forbidden because its impossible to implement on FileProvider.HardDrive
+ * breakingSrcHardLink:0 breakingDstHardLink:0 - preserves both hardlinks, is forbidden because its impossible to implement on FileProvider.HardААА
  *
  * @method hardLink
  * @throws { exception } If( o.srcPath ) doesn`t exist.

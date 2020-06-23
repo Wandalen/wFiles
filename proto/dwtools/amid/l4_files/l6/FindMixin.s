@@ -3509,8 +3509,8 @@ function filesReflectSingle_body( o )
       /* qqq : should not change time of file if it is already linked. check tests */
       /* qqq : should return true / false / null. false if no change is done! */
 
-      if( _.strEnds( dstPath, "#dir2/file" ) ) /* yyy */
-      debugger;
+      // if( _.strEnds( dstPath, "#dir2/file" ) ) /* yyy */
+      // debugger;
 
       r = dst.hardLink
       ({

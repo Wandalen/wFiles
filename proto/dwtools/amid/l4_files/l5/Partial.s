@@ -544,7 +544,7 @@ function preferredFromGlobalAct( globalPath )
   if( self.usingGlobalPath )
   return globalPath.full;
   else
-  return globalPath.parametrizedPath;
+  return globalPath.postfixedPath;
 }
 
 //
@@ -3604,6 +3604,9 @@ function dirRead_body( o )
       return 0;
     });
 
+    // debugger;
+    // result = result.map( ( p ) => _.path.escape( p ) ); /* yyy */
+
     if( o.outputFormat === 'absolute' )
     result = result.map( function( relative )
     {
@@ -4688,9 +4691,6 @@ var having = fileWrite_body.having;
 having.driving = 0;
 having.aspect = 'body';
 
-// fileWrite_body.encoders = _.files.WriteEncoders;
-// _.assert( _.objectIs( fileWrite_body.encoders ) );
-
 //
 
 /**
@@ -5399,6 +5399,7 @@ function dirMakeForFile_body( o )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
+  debugger;
   o.filePath = self.path.dir( o.filePath );
 
   return self.dirMake( o );
@@ -8954,6 +8955,8 @@ let Extension =
   dirMakeAct,
   dirMake,
   dirMakeForFile,
+
+  // locking
 
   fileLockAct,
   fileLock,

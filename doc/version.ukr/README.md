@@ -6,6 +6,18 @@
   Це набір атрибутів (характеристик) файла, що дозволяє файловій системі та іншим API ідентифікувати файл і виконувати операції над ним.
 </details>
 
+<details><summary><a href="./concept/Stats.md">
+      Тонкий інтерфейс
+  </a></summary>
+  
+</details>
+
+<details><summary><a href="./concept/Stats.md">
+      Товстий інтерфейс
+  </a></summary>
+  
+</details>
+
 # Туторіали
 
 <details><summary><a href="./tutorial/Abstract.md">

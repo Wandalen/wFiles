@@ -997,7 +997,6 @@ function fileWriteAct( o )
 
   /* write */
 
-  debugger;
   if( o.sync )
   {
 

@@ -3604,8 +3604,7 @@ function dirRead_body( o )
       return 0;
     });
 
-    // debugger;
-    // result = result.map( ( p ) => _.path.escape( p ) ); /* yyy */
+    // result = result.map( ( p ) => self.path.escape( p ) ); /* yyy */
 
     if( o.outputFormat === 'absolute' )
     result = result.map( function( relative )
@@ -5399,7 +5398,6 @@ function dirMakeForFile_body( o )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  debugger;
   o.filePath = self.path.dir( o.filePath );
 
   return self.dirMake( o );
@@ -5877,9 +5875,6 @@ function _link_functor( fop )
     if( o.sync )
     {
 
-      // if( _.strEnds( o.srcPath, "#dir2/file" ) ) /* yyy */
-      // debugger;
-
       c.verify1( arguments );
       if( c.ended )
       return c.end();
@@ -5914,6 +5909,7 @@ function _link_functor( fop )
       try
       {
 
+        debugger;
         if( self.fileExists( o2.dstPath ) )
         {
           c.verifyDst()

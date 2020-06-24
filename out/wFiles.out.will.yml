@@ -188,6 +188,24 @@ module:
           - ../proto/dwtools/Tools.s
           - ../proto/dwtools/abase
           - ../proto/dwtools/amid
+          - ../proto/dwtools/amid/-l4_files.test
+          - ../proto/dwtools/amid/-l4_files.test/aFileProvider.test.s
+          - ../proto/dwtools/amid/-l4_files.test/aFilesFind.test.s
+          - ../proto/dwtools/amid/-l4_files.test/Extract.html
+          - ../proto/dwtools/amid/-l4_files.test/Extract.test.s
+          - ../proto/dwtools/amid/-l4_files.test/Files.etc.test.ss
+          - ../proto/dwtools/amid/-l4_files.test/FilesFind.Extract.test.s
+          - ../proto/dwtools/amid/-l4_files.test/FilesFind.HardDrive.test.ss
+          - ../proto/dwtools/amid/-l4_files.test/FilesGraph.test.s
+          - ../proto/dwtools/amid/-l4_files.test/FilesRead.test.s
+          - ../proto/dwtools/amid/-l4_files.test/Git.test.ss
+          - ../proto/dwtools/amid/-l4_files.test/HardDrive.test.ss
+          - ../proto/dwtools/amid/-l4_files.test/Npm.test.ss
+          - ../proto/dwtools/amid/-l4_files.test/Path.test.ss
+          - ../proto/dwtools/amid/-l4_files.test/Record.test.s
+          - ../proto/dwtools/amid/-l4_files.test/RecordFilter.test.s
+          - ../proto/dwtools/amid/-l4_files.test/System.Extract.test.s
+          - ../proto/dwtools/amid/-l4_files.test/System.HardDrive.test.ss
           - ../proto/dwtools/amid/l4_files
           - ../proto/dwtools/amid/l4_files/entry
           - ../proto/dwtools/amid/l4_files/entry/Extract.s
@@ -250,24 +268,14 @@ module:
           - ../proto/dwtools/amid/l4_files/l7_provider/Imap.ss
           - ../proto/dwtools/amid/l4_files/l7_provider/Npm.ss
           - ../proto/dwtools/amid/l4_files/l8_filter
-          - ../proto/dwtools/amid/l4_files/l8_filter/-Caching.s
-          - ../proto/dwtools/amid/l4_files/l8_filter/-CachingContent.s
-          - ../proto/dwtools/amid/l4_files/l8_filter/-CachingFolders.s
-          - ../proto/dwtools/amid/l4_files/l8_filter/-Surrogate.s
           - ../proto/dwtools/amid/l4_files/l8_filter/Image.s
           - ../proto/dwtools/amid/l4_files/l8_filter/Reroot.s
           - ../proto/dwtools/amid/l4_files/l9
           - ../proto/dwtools/amid/l4_files/l9/Namespace.s
           - ../proto/dwtools/amid/l4_files.test
-          - ../proto/dwtools/amid/l4_files.test/-Files.copy.test.s
-          - ../proto/dwtools/amid/l4_files.test/-Filter.Caching.html
-          - ../proto/dwtools/amid/l4_files.test/-Filter.Caching.test.ss
-          - ../proto/dwtools/amid/l4_files.test/-Filter.CachingDir.test.s
-          - ../proto/dwtools/amid/l4_files.test/-Filter.CachingRecord.test.s
-          - ../proto/dwtools/amid/l4_files.test/-Filter.CachingStats.test.s
-          - ../proto/dwtools/amid/l4_files.test/-System.copy.test.ss
-          - ../proto/dwtools/amid/l4_files.test/-Uri.test.ss
           - ../proto/dwtools/amid/l4_files.test/aFileProvider.test.s
+          - >-
+            ../proto/dwtools/amid/l4_files.test/aFileProviderSystemDefault.test.s
           - ../proto/dwtools/amid/l4_files.test/aFilesFind.test.s
           - ../proto/dwtools/amid/l4_files.test/Extract.html
           - ../proto/dwtools/amid/l4_files.test/Extract.test.s
@@ -282,8 +290,8 @@ module:
           - ../proto/dwtools/amid/l4_files.test/Path.test.ss
           - ../proto/dwtools/amid/l4_files.test/Record.test.s
           - ../proto/dwtools/amid/l4_files.test/RecordFilter.test.s
-          - ../proto/dwtools/amid/l4_files.test/System.Extract.test.s
-          - ../proto/dwtools/amid/l4_files.test/System.HardDrive.test.ss
+          - ../proto/dwtools/amid/l4_files.test/SystemDefaultExtract.test.s
+          - ../proto/dwtools/amid/l4_files.test/SystemDefaultHardDrive.test.ss
           - ../proto/dwtools/atop
     submodule:
       wTools:

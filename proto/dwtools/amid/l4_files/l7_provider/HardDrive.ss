@@ -8,14 +8,9 @@ if( typeof module !== 'undefined' )
 {
   let _ = require( '../../../../dwtools/Tools.s' );
 
-  // if( !_.FileProvider )
-  // require( '../UseMid.s' );
-
-  // File = require( 'fs-extra' );
   File = require( 'fs' );
   StandardFile = require( 'fs' );
   Os = require( 'os' );
-
   LockFile = require( 'proper-lockfile' )
 
 }
@@ -55,7 +50,7 @@ function init( o )
 // path
 // --
 
-let pathNativizeAct = process.platform === 'win32' ? _.path._nativizeWindows : _.path._nativizePosix;
+let pathNativizeAct = process.platform === 'win32' ? ( src ) => _.path._nativizeWindows( src ) : ( src ) => _.path._nativizePosix( src );
 
 _.assert( _.routineIs( pathNativizeAct ) );
 
@@ -85,8 +80,6 @@ function _isTextLink( filePath )
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-
-  // debugger; xxx
 
   if( !self.usingTextLink )
   return false;
@@ -1004,6 +997,7 @@ function fileWriteAct( o )
 
   /* write */
 
+  debugger;
   if( o.sync )
   {
 
@@ -1544,10 +1538,10 @@ function fileCopyAct( o )
     return new _.Consequence().error( err );
   }
 
-  if( o.breakingDstHardLink && self.isHardLink( o.dstPath ) ) /* qqq2 : remove option breakingDstHardLink from Act routine */
-  self.hardLinkBreak({ filePath : o.dstPath, sync : 1 });
+  // if( o.breakingDstHardLink && self.isHardLink( o.dstPath ) ) /* qqq2 : remove option breakingDstHardLink from Act routine aaa:done */
+  // self.hardLinkBreak({ filePath : o.dstPath, sync : 1 });
 
-  if( self.isSoftLink( o.srcPath ) ) /* qqq2 : should not be here. move to partial */
+  if( self.isSoftLink( o.srcPath ) ) /* qqq2 : should not be here. move to partial aaa: should be here becase Extract has more optiomal implementation of this case */
   {
     if( self.fileExistsAct({ filePath : o.dstPath }) )
     self.fileDeleteAct({ filePath : o.dstPath, sync : 1 })
@@ -1587,7 +1581,6 @@ function fileCopyAct( o )
     let con = new _.Consequence().take( null );
     let readCon = new _.Consequence();
     let writeCon = new _.Consequence();
-    /* qqq2 : too many consequences? */
 
     con.andKeep( [ readCon, writeCon ] );
 
@@ -1600,11 +1593,6 @@ function fileCopyAct( o )
 
       return got;
     })
-
-    // File.copyFile( o.srcPath, o.dstPath, function( err, data )
-    // {
-    //   con.take( err, data );
-    // });
 
     let readStream = self.streamReadAct
     ({
@@ -1887,7 +1875,7 @@ function filesAreHardLinkedAct( o )
     should return _.maybe, not true if result is not precise
   */
 
-  return _.statsAreHardLinked( statFirst, statSecond );
+  return _.files.stat.areHardLinked( statFirst, statSecond );
 }
 
 _.routineExtend( filesAreHardLinkedAct, Parent.prototype.filesAreHardLinkedAct );
@@ -2112,7 +2100,7 @@ let Extend =
 
   // link
 
-  filesAreHardLinkedAct, // qqq : implement filesAreHardLinkedAct Vova : done, pass tests
+  filesAreHardLinkedAct,
 
   // etc
 
@@ -2136,9 +2124,6 @@ _.classDeclare
   parent : Parent,
   extend : Extend,
 });
-
-// _.FileProvider.Find.mixin( Self );
-// _.FileProvider.Secondary.mixin( Self );
 
 _.assert( _.routineIs( Self.prototype.pathCurrentAct ) );
 _.assert( _.routineIs( Self.Path.current ) );

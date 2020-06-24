@@ -1,4 +1,4 @@
-( function _FileStat_s_() {
+( function _StatNamespace_s_() {
 
 'use strict';
 
@@ -18,41 +18,14 @@ if( typeof module !== 'undefined' )
 
 }
 
-//
-
 /**
- * @class wFileStat
- * @namespace wTools
+ * @namespace wTools.files.stat
  * @module Tools/mid/Files
-*/
+ */
 
 let _global = _global_;
 let _ = _global_.wTools;
-let Parent = null;
-let Self = wFileStat;
-function wFileStat( o )
-{
-  return _.workpiece.construct( Self, this, arguments );
-}
-
-Self.shortName = 'FileStat';
-
-// --
-//
-// --
-
-function init( o )
-{
-  let self = this;
-
-  _.workpiece.initFields( self );
-
-  if( o )
-  self.copy( o );
-
-  Object.preventExtensions( self );
-
-}
+let Self = _.files.stat = _.files.stat || Object.create( null );
 
 // --
 //
@@ -62,7 +35,7 @@ function init( o )
  * @summary Returns true if entity `src` is a file stats object.
  * @param {Object} src Entity to check.
  * @function fileStatIs
- * @namespace wTools
+ * @namespace wTools/files
  * @module Tools/mid/Files
  */
 
@@ -71,12 +44,12 @@ function fileStatIs( src )
   if( File )
   if( src instanceof File.Stats )
   return true;
+  if( _.FileStat )
   if( src instanceof _.FileStat )
   return true;
   let proto = Object.getPrototypeOf( File.Stats );
   if( proto.name && src instanceof proto )
   return true;
-
   return false;
 }
 
@@ -87,13 +60,12 @@ function fileStatIs( src )
  * @description Returns `true` if files have different concents, `false` if files have same concent and `null` if result is not precise.
  * @param {Object} stat1 Stat object of first file.
  * @param {Object} stat2 Stat object of second file.
- * @function statsHaveDifferentContent
- * @namespace wTools
+ * @function different
+ * @namespace wTools/files
  * @module Tools/mid/Files
  */
 
-// function statResolvedReadsCouldHaveSameContent( stat1,stat2 )
-function statsHaveDifferentContent( stat1, stat2 )
+function different( stat1, stat2 )
 {
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
 
@@ -117,12 +89,12 @@ function statsHaveDifferentContent( stat1, stat2 )
  * @description Returns `true` if files have different concents, `false` if files have same concent and `null` if result is not precise.
  * @param {Object} stat1 Stat object of first file.
  * @param {Object} stat2 Stat object of second file.
- * @function statsAreHardLinked
- * @namespace wTools
+ * @function areHardLinked
+ * @namespace wTools/files
  * @module Tools/mid/Files
  */
 
-function statsAreHardLinked( stat1, stat2 )
+function areHardLinked( stat1, stat2 )
 {
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
   _.assert( _.fileStatIs( stat1 ) );
@@ -177,12 +149,12 @@ function statsAreHardLinked( stat1, stat2 )
 /**
  * @summary Generates hash from stat object.
  * @param {Object} stat Stat object.
- * @function statHash2Get
- * @namespace wTools
+ * @function hashStatFrom
+ * @namespace wTools/files
  * @module Tools/mid/Files
  */
 
-function statHash2Get( stat )
+function hashStatFrom( stat )
 {
 
   _.assert( arguments.length === 1, 'Expects single argument' );
@@ -205,193 +177,35 @@ function statHash2Get( stat )
   return result;
 }
 
-//
-
-/**
- * @summary Returns true if current stats object refers to soft or text link.
- * @function isLink
- * @class wFileStat
- * @namespace wTools
- * @module Tools/mid/Files
-*/
-
-function isLink()
-{
-  let stat = this;
-  let result = false;
-
-  _.assert( arguments.length === 0, 'Expects no arguments' );
-
-  if( !result )
-  result = stat.isSoftLink();
-
-  if( !result )
-  result = stat.isTextLink();
-
-  return result;
-}
-
-//
-
-function returnFalse()
-{
-  return false;
-}
-
-/**
- * @typedef {Object} Fields
- * @property {Number} dev
- * @property {Number} mode
- * @property {Number} nlink
- * @property {Number} uid
- * @property {Number} gid
- * @property {Number} rdev
- * @property {Number} blksize
- * @property {Number} ino
- * @property {Number} size
- * @property {Number} blocks
- * @property {Date} atime
- * @property {Date} mtime
- * @property {Date} ctime
- * @property {Date} birthtime
- * @property {String} filePath
- * @class wFileStat
- * @namespace wTools
- * @module Tools/mid/Files
-*/
-
 // --
 //
 // --
 
-let Composes =
-{
-  dev : null,
-  mode : null,
-  nlink : null,
-  uid : null,
-  gid : null,
-  rdev : null,
-  blksize : null,
-  ino : null,
-  size : null,
-  blocks : null,
-  atime : null,
-  mtime : null,
-  ctime : null,
-  birthtime : null,
-}
-
-let Aggregates =
-{
-}
-
-let Associates =
-{
-  associated : null,
-  filePath : null,
-}
-
-let Restricts =
-{
-
-  isDir : null,
-  isTerminal : null,
-  isTextLink : null,
-  isSoftLink : null,
-  isHardLink : null,
-
-  isDirectory : null, /* alias */
-  isFile : null, /* alias */
-  isSymbolicLink : null, /* alias */
-
-  isBlockDevice : returnFalse,
-  isCharacterDevice : returnFalse,
-  isFIFO : returnFalse,
-  isSocket : returnFalse,
-
-  // _checkModeProperty : null,
-
-}
-
-let Statics =
-{
-}
-
-let Globals =
+let Tools =
 {
   fileStatIs,
-  statsHaveDifferentContent, /* xxx : move */
-  statsAreHardLinked,
-  // statsAreHardLinked,
-  statHash2Get,
+  // different,
+  // areHardLinked,
+  // hashStatFrom,
 }
 
-let Forbids =
+/* zzz : clean */
+
+_.mapExtend( _, Tools );
+
+let Stat =
 {
+  is : fileStatIs,
+  different,
+  areHardLinked,
+  hashStatFrom,
 }
 
-// --
-// declare
-// --
-
-let Extend =
-{
-
-  init,
-
-  isDir : null,
-  isTerminal : null,
-  isTextLink : null,
-  isSoftLink : null,
-  isHardLink : null,
-  isLink,
-
-  isDirectory : null, /* alias */
-  isFile : null, /* alias */
-  isSymbolicLink : null, /* alias */
-
-  isBlockDevice : returnFalse,
-  isCharacterDevice : returnFalse,
-  isFIFO : returnFalse,
-  isSocket : returnFalse,
-
-  // _checkModeProperty : null,
-
-  //
-
-  Composes,
-  Aggregates,
-  Associates,
-  Restricts,
-  Statics,
-  Forbids,
-
-}
-
-//
-
-_.classDeclare
-({
-  cls : Self,
-  parent : Parent,
-  extend : Extend,
-});
-
-if( _global_.wCopyable )
-_.Copyable.mixin( Self );
-
-_[ Self.shortName ] = Self;
-
-_.mapExtend( _, Globals );
+_.mapExtend( _.files.stat, Stat );
 
 // --
 // export
 // --
-
-// if( typeof module !== 'undefined' )
-// if( _global_.WTOOLS_PRIVATE )
-// { /* delete require.cache[ module.id ]; */ }
 
 if( typeof module !== 'undefined' )
 module[ 'exports' ] = Self;

@@ -1631,238 +1631,6 @@ let filesRead = _.routineFromPreAndBody( filesFindGroups.pre, filesRead_body );
 //
 // --
 
-//
-// _.routineExtend( filesCopyOld, filesFindDifference );
-//
-// var defaults = filesCopyOld.defaults;
-//
-// defaults.verbosity = 1;
-// defaults.linking = 0;
-// defaults.resolvingSoftLink = 0;
-// defaults.resolvingTextLink = 0;
-//
-// defaults.removingSource = 0;
-// defaults.removingSourceTerminals = 0;
-//
-// defaults.recursive = 2;
-// defaults.allowDelete = 0;
-// defaults.allowWrite = 0;
-// defaults.allowRewrite = 1;
-// defaults.allowRewriteFileByDir = 0;
-//
-// defaults.tryingPreserve = 1;
-// defaults.silentPreserve = 1;
-// defaults.preservingTime = 1;
-
-//
-
-// function filesCopyWithAdapter( o )
-// {
-//   let self = this;
-
-//   if( arguments.length === 2 )
-//   o = { dst : arguments[ 0 ] , src : arguments[ 1 ] }
-
-//   _.assert( arguments.length === 1 || arguments.length === 2 );
-
-//   if( !o.allowDelete && o.investigateDestination === undefined )
-//   o.investigateDestination = 0;
-
-//   if( o.allowRewrite === undefined )
-//   o.allowRewrite = filesCopyWithAdapter.defaults.allowRewrite;
-
-//   if( o.allowRewrite && o.allowWrite === undefined )
-//   o.allowWrite = 1;
-
-//   if( o.allowRewrite && o.allowRewriteFileByDir === undefined  )
-//   o.allowRewriteFileByDir = true;
-
-//   _.routineOptions( filesCopyWithAdapter, o );
-//   self._providerDefaultsApply( o );
-
-//   if( o.onUp === null )
-//   o.onUp = [];
-//   if( o.onDown === null )
-//   o.onDown = [];
-
-//   /* safe */
-
-//   // if( self.safe )
-//   // if( o.removingSource && ( !o.allowWrite || !o.allowRewrite ) )
-//   // throw _.err( 'not safe removingSource:1 with allowWrite:0 or allowRewrite:0' );
-
-//   o.src = self.path.normalize( o.src );
-//   o.dst = self.path.normalize( o.dst );
-
-//   let options = Object.create( null );
-//   _.mapExtend( options, _.mapOnly( o, filesReflect.defaults ) );
-
-//   /*
-//     'investigateDestination',
-//     'verbosity',
-//     'silentPreserve?',
-//     'resolvingSoftLink',
-//     'resolvingTextLink',
-//     'allowDelete',
-//     'allowWrite',
-//     'allowRewrite',
-//     'allowRewriteFileByDir',
-//     'removingSourceTerminals',
-//     'removingSource',
-//     'tryingPreserve',
-//     'ext?',
-//     'maxSize?',
-//     'usingExtraStat?',
-//   */
-
-//   options.linking = options.linking ? 'hardLink' : 'fileCopy';
-//   options.srcDeleting = o.removingSource || o.removingSourceTerminals; // check it
-//   options.dstDeleting = o.allowDelete;
-//   options.writing = o.allowWrite;
-//   options.dstRewriting = o.allowRewrite;
-//   options.dstRewritingByDistinct = o.allowRewriteFileByDir; // check it
-//   options.preservingTime = o.preservingTime;
-//   options.preservingSame = o.tryingPreserve; // check it
-//   options.includingDst = o.investigateDestination;
-
-//   /*
-//   zzz : wrong! resolving*Link and resolvingSoftLink are not related, as well as resolvingTextLink
-//   Vova : low priority
-//   */
-
-//   options.resolvingSrcSoftLink = o.resolvingSoftLink;
-//   options.resolvingDstSoftLink = o.resolvingSoftLink;
-//   options.resolvingSrcTextLink = o.resolvingTextLink;
-//   options.resolvingDstTextLink = o.resolvingTextLink;
-
-//   options.onWriteDstUp = o.onUp;
-//   options.onWriteDstDown = o.onDown;
-
-//   delete options.onUp;
-//   delete options.onDown;
-
-//   options.reflectMap = Object.create( null );
-//   options.reflectMap[ o.src ] = o.dst;
-
-//   // options.srcProvider = self;
-//   // options.dstProvider = self;
-
-//   if( !options.filter )
-//   options.filter = Object.create( null );
-
-//   if( options.filter instanceof _.FileRecordFilter )
-//   {
-//     options.src = options.filter.clone();
-//     // options.dst = options.filter.clone();
-//   }
-//   else
-//   {
-//     options.src = self.recordFilter( options.filter );
-//     // options.dst = self.recordFilter( options.filter );
-//   }
-
-//   options.filter = null;
-
-//   options.src.effectiveProvider = self;
-//   // options.dst.effectiveProvider = self;
-
-//   if( o.ext )
-//   {
-//     _.assert( _.strIs( o.ext ) );
-//     _.assert( !o.onDstName, 'o.ext is not compatible with o.onDstName' );
-//     let ext = o.ext;
-//     options.onDstName = function( relative, dstRecordFactory, op, o, srcRecord )
-//     {
-//       if( !srcRecord.isDir )
-//       return self.path.changeExt( relative, ext );
-//       return relative;
-//     }
-//   }
-
-//   let result = self.filesReflect( options );
-
-//   result.forEach( ( r ) =>
-//   {
-
-//     if( !r.relative )
-//     r.relative = r.effective.relative;
-
-//     if( r.action === 'dirMake' )
-//     if( r.preserve )
-//     r.action = 'directory preserved';
-//     else
-//     r.action = 'directory new';
-
-//     if( r.action === 'fileCopy' )
-//     if( r.preserve )
-//     r.action = 'same';
-//     else
-//     r.action = 'copied'
-
-//   })
-
-//   return result;
-// }
-
-// filesCopyWithAdapter.defaults =
-// {
-//   outputFormat : 'record',
-//   ext : null,
-//   investigateDestination : 1,
-
-//   maxSize : 1 << 21,
-//   usingExtraStat : 1,
-//   recursive : 0,
-
-//   withTerminals : 1,
-//   withDirs : 1,
-
-//   resolvingSoftLink : 0,
-//   resolvingTextLink : 0,
-
-//   filter : null,
-//   result : null,
-//   src : null,
-//   dst : null,
-
-//   onUp : null,
-//   onDown : null,
-// }
-
-// // filesCopyWithAdapter.defaults.__proto__ = filesFindMasksAdjust.defaults
-// // var paths = filesCopyWithAdapter.paths = Object.create( null );
-// // paths.src = null;
-// // paths.dst = null;
-
-// var having = filesCopyWithAdapter.having = Object.create( null );
-// having.writing = 0;
-// having.reading = 1;
-// having.driving = 0;
-
-// // _.routineExtend( filesCopyWithAdapter, filesFindDifference );
-
-// var defaults = filesCopyWithAdapter.defaults;
-
-// defaults.verbosity = 1;
-// defaults.linking = 0;
-// defaults.resolvingSoftLink = 0;
-// defaults.resolvingTextLink = 0;
-
-// defaults.removingSource = 0;
-// defaults.removingSourceTerminals = 0;
-
-// defaults.recursive = 2;
-// defaults.allowDelete = 0;
-// defaults.allowWrite = 0;
-// defaults.allowRewrite = 1;
-// defaults.allowRewriteFileByDir = 0;
-
-// defaults.tryingPreserve = 1;
-// defaults.silentPreserve = 1;
-// defaults.preservingTime = 1;
-
-//
-
 function _filesFiltersPrepare( routine, o )
 {
   let self = this;
@@ -1943,7 +1711,7 @@ function _filesReflectPrepare( routine, args )
   _.assert( _.arrayIs( o.result ) );
   _.assert( _.routineIs( o.onUp ) );
   _.assert( _.routineIs( o.onDown ) );
-  _.assert( _.longHas( [ 'fileCopy', 'hardLink', 'hardLinkMaybe', 'softLink', 'softLinkMaybe', 'nop' ], o.linking ), 'unknown kind of linking', o.linking );
+  _.assert( _.longHas( [ 'fileCopy', 'hardLink', 'hardLinkMaybe', 'softLink', 'softLinkMaybe', 'textLink', 'nop' ], o.linking ), 'unknown kind of linking', o.linking );
 
   return o;
 }
@@ -2036,8 +1804,6 @@ function filesReflectEvaluate_body( o )
     srcOptions.onUp = [ handleSrcUp ];
     srcOptions.onDown = [ handleSrcDown ];
 
-    // _.mapSupplement( srcOptions, self.filesFindSingle.defaults ); // xxx
-
     return srcOptions;
   }
 
@@ -2062,7 +1828,6 @@ function filesReflectEvaluate_body( o )
     dstOptions.filter = o.dst;
     dstOptions.filePath = o.dst.filePathSimplest( o.dst.filePathNormalizedGet() );
     dstOptions.withStem = 1;
-    // dstOptions.recursive = 2;
     dstOptions.revisiting = 3;
     dstOptions.resolvingSoftLink = 0;
     dstOptions.resolvingTextLink = 0;
@@ -2167,20 +1932,9 @@ function filesReflectEvaluate_body( o )
   function handleUp( record, op )
   {
 
-    // if( _.strEnds( record.dst.absolute, debugPath ) )
-    // debugger;
-
-    // if( touchMap[ record.dst.absolute ] )
-    // debugger;
     if( touchMap[ record.dst.absolute ] )
     touch( record, touchMap[ record.dst.absolute ] );
     _.assert( touchMap[ record.dst.absolute ] === record.touch || !record.touch );
-
-    // if( actionMap[ record.dst.absolute ] )
-    // debugger;
-    // if( actionMap[ record.dst.absolute ] ) // yyy
-    // action( record, actionMap[ record.dst.absolute ] ); // yyy
-    // _.assert( actionMap[ record.dst.absolute ] === record.action || !record.action ); // yyy
 
     _.sure( !_.strBegins( record.dst.absolute, '/../' ), () => 'Destination path ' + _.strQuote( record.dst.absolute ) + ' leads out of file system.' );
 
@@ -2255,14 +2009,14 @@ function filesReflectEvaluate_body( o )
     {
       /* src does not exist or is not actual */
 
-      if( 0 ) // xxx
-      if( o.mandatory )
-      if( record.src.isStem )
-      throw _.err
-      (
-        `Stem file does not exist: ${_.strQuote( record.src.absolute )}` +
-        `\nTo fix it you may set option mandatory to false or exclude the file from filePath of source filter`
-      );
+      // if( 0 )
+      // if( o.mandatory )
+      // if( record.src.isStem )
+      // throw _.err
+      // (
+      //   `Stem file does not exist: ${_.strQuote( record.src.absolute )}` +
+      //   `\nTo fix it you may set option mandatory to false or exclude the file from filePath of source filter`
+      // );
 
       if( record.reason === 'dstDeleting' && !record.dst.isActual )
       {
@@ -2404,7 +2158,6 @@ function filesReflectEvaluate_body( o )
     // if( _.strEnds( record.dst.absolute, debugPath ) )
     // debugger;
 
-    // _.assert( touchMap[ record.dst.absolute ] === record.touch || !record.touch ); // yyy
     if( touchMap[ record.dst.absolute ] )
     touch( record, touchMap[ record.dst.absolute ] );
     _.assert( touchMap[ record.dst.absolute ] === record.touch || !record.touch );
@@ -2432,7 +2185,6 @@ function filesReflectEvaluate_body( o )
 
     handleDown2.call( self, record, o );
     let r = o.onDown.call( self, record, o );
-    // _.assert( r !== _.dont );
     _.assert( r === undefined, () => 'Callback onDown should return nothing( undefined ), but returned ' + _.toStrShort( r ) );
 
     _.assert( record.action !== 'exclude' || record.touch === false, () => 'Attempt to exclude touched ' + record.dst.absolute );
@@ -2472,17 +2224,12 @@ function filesReflectEvaluate_body( o )
 
     // if( _.strEnds( record.dst.absolute, debugPath ) )
     // debugger;
-    // if( _.strEnds( record.dst.absolute, 'Typing.test.s' ) )
-    // debugger;
 
     _.assert( arguments.length === 2 );
     _.assert( !!record.touch === !!touchMap[ record.dst.absolute ] );
 
     if( record.reason === 'srcLooking' )
     {
-      // if( !record.src.stat )
-      // debugger;
-      // if( ( !record.src.isActual || !record.src.stat ) && !record.touch )
       if( !record.src.isActual || !record.src.stat )
       if( !record.touch || actionMap[ record.dst.absolute ] )
       {
@@ -2714,9 +2461,6 @@ function filesReflectEvaluate_body( o )
     if( !dstRecord.included )
     return dstRecord;
 
-    // if( _.strEnds( dstRecord.absolute, debugPath ) )
-    // debugger;
-
     _.assert( arguments.length === 5 );
     _.assert( _.strIs( reason ) );
     let srcRecord = srcContext.record( dstRecord.relative );
@@ -2739,7 +2483,6 @@ function filesReflectEvaluate_body( o )
     return;
 
     handleDown( record, op );
-    // return record;
   }
 
   /* */
@@ -2765,8 +2508,6 @@ function filesReflectEvaluate_body( o )
       if( record.dst.absolute === dstPath )
       {
         debugger;
-        // o.filesGraph.dstPath = o.dstPath;
-        // o.filesGraph.srcPath = o.srcPath;
         o.filesGraph.dst.filePath = o.dst.filePath;
         o.filesGraph.src.filePath = o.src.filePath;
         o.filesGraph.actionBegin( o.dst.filePath + ' <- ' + o.src.filePath );
@@ -2821,7 +2562,6 @@ function filesReflectEvaluate_body( o )
     return srcRecord;
     else
     return _.dont;
-    // return _.dont;
   }
 
   /* */
@@ -2839,9 +2579,6 @@ function filesReflectEvaluate_body( o )
       o.filesGraph.dependencyAdd( record.dst, record.src );
     }
 
-    // if( _.strEnds( record.dst.absolute, debugPath ) )
-    // debugger;
-
     dstDelete( record, op );
     handleDown( record, op );
 
@@ -2851,13 +2588,12 @@ function filesReflectEvaluate_body( o )
       o.filesGraph.actionEnd();
     }
 
-    // return record;
   }
 
   function dstDelete( record, op )
   {
 
-    _.assert( !!record ); // xxx
+    _.assert( !!record );
     if( !o.includingDst )
     return;
     if( !record.dst.isDir || !record.src.isDir )
@@ -2939,9 +2675,11 @@ function filesReflectEvaluate_body( o )
 
     // if( _.strEnds( record.dst.absolute, debugPath ) )
     // debugger;
+    // if( _.strHas( record.dst.absolute, 'clean-special/out' ) )
+    // debugger;
 
     _.assert( arguments.length === 2 );
-    _.assert( _.longHas( [ 'exclude', 'ignore', 'fileDelete', 'dirMake', 'fileCopy', 'softLink', 'hardLink', 'nop' ], action ), () => 'Unknown action ' + _.strQuote( action ) );
+    _.assert( _.longHas( [ 'exclude', 'ignore', 'fileDelete', 'dirMake', 'fileCopy', 'softLink', 'hardLink', 'textLink', 'nop' ], action ), () => 'Unknown action ' + _.strQuote( action ) );
 
     let absolutePath = record.dst.absolute;
     let result = actionMap[ absolutePath ] === action;
@@ -3221,7 +2959,7 @@ function filesReflectEvaluate_body( o )
 
   }
 
-  //
+  /* */
 
   function checkSrcTerminalsSameDst( record, op )
   {
@@ -3266,7 +3004,6 @@ defaults.withTerminals = 1;
 defaults.withDirs = 1;
 defaults.includingNonAllowed = 1;
 defaults.includingDst = null;
-// defaults.recursive = 2;
 defaults.revisiting = null;
 defaults.resolvingSoftLink = 0;
 defaults.resolvingTextLink = 0;
@@ -3360,9 +3097,6 @@ function filesReflectSingle_body( o )
 
   if( o.writing )
   forEach( writeDstUp2, writeDstDown2 );
-
-  // if( o.writing && ( o.resolvingSrcSoftLink === 2 || o.resolvingSrcTextLink === 2 ) )
-  // forEach( writeDstUp3, writeDstDown3 );
 
   if( o.writing && o.srcDeleting )
   forEach( writeSrcUp, writeSrcDown );
@@ -3556,12 +3290,14 @@ function filesReflectSingle_body( o )
     _.assert( !!record.touch );
     _.assert( !!record.action );
 
-    record.dst.factory.effectiveProvider.dirMake
+    debugger;
+    let r = record.dst.factory.effectiveProvider.dirMake
     ({
       recursive : 1,
       rewritingTerminal : 0,
       filePath : record.dst.absolute,
     });
+    record.performed = r;
 
   }
 
@@ -3573,7 +3309,12 @@ function filesReflectSingle_body( o )
     return;
     if( record.dst.absolute === record.src.absolute )
     return;
-    record.dst.factory.effectiveProvider.fileDelete( record.dst.absolute );
+
+    debugger;
+    let r = record.dst.factory.effectiveProvider.fileDelete( record.dst.absolute );
+    record.performed = r;
+    /* qqq : should be in v >= 3 log as : " - deleted ..." */
+
   }
 
   /* */
@@ -3612,11 +3353,11 @@ function filesReflectSingle_body( o )
 
     let srcPath;
     let srcAbsolute = record.src.real;
-    /* xxx qqq : use ( resolvingMultiple / recursive ) option instead of if-else */
+    /* qqq : use ( resolvingMultiple / recursive ) option instead of if-else */
 
-    debugger;
-    if( _.strHas( srcAbsolute, 'terLink' ) )
-    debugger;
+    // debugger;
+    // if( _.strHas( srcAbsolute, 'terLink' ) )
+    // debugger;
 
     let resolvingSrcSoftLink = self.usingSoftLink ? o.resolvingSrcSoftLink : 0;
     let resolvingSrcTextLink = self.usingTextLink ? o.resolvingSrcTextLink : 0;
@@ -3705,32 +3446,30 @@ function filesReflectSingle_body( o )
     debugger;
     if( record.src === dstRecord )
     return false;
-    // record.src = dstRecord;
 
     record.src = record.src.factory.record( srcAbsolute );
 
-    // xxx yyy
-    if( path.isAbsolute( srcPath ) )
-    {
-      debugger;
-      path.join( dstRecord.absolute, path.relative( srcRecord.absolute, srcAbsolute ) );
-    }
+    // if( path.isAbsolute( srcPath ) )
+    // {
+    //   debugger;
+    //   path.join( dstRecord.absolute, path.relative( srcRecord.absolute, srcAbsolute ) );
+    // }
 
     let action = isSoftLink ? 'softLink' : 'textLink';
 
     if( action === 'softLink' )
     {
       if( o.resolvingSrcSoftLink === 2 )
-      linkWithAction( record.dst.absolutePreferred, srcPath, 'fileCopy' );
+      linkWithAction( record, record.dst.absolutePreferred, srcPath, 'fileCopy' );
       else
-      linkWithAction( record.dst.absolutePreferred, srcPath, action, 1 );
+      linkWithAction( record, record.dst.absolutePreferred, srcPath, action, 1 );
     }
     else if( action === 'textLink' )
     {
       if( o.resolvingSrcTextLink === 2 )
-      linkWithAction( record.dst.absolutePreferred, srcPath, 'fileCopy' );
+      linkWithAction( record, record.dst.absolutePreferred, srcPath, 'fileCopy' );
       else
-      linkWithAction( record.dst.absolutePreferred, srcPath, action, 1 );
+      linkWithAction( record, record.dst.absolutePreferred, srcPath, action, 1 );
     }
 
     return true;
@@ -3738,15 +3477,20 @@ function filesReflectSingle_body( o )
 
   /* */
 
-  function linkWithAction( dstPath, srcPath, action, allowingMissed )
+  function linkWithAction( record, dstPath, srcPath, action, allowingMissed )
   {
+    let r;
 
     if( action === 'nop' )
-    return false;
+    {
+      record.performed = 'nop';
+      return false;
+    }
 
     if( action === 'fileCopy' )
     {
-      system.fileCopy
+      /* qqq : should return true / false / null. false if no change is done! */
+      r = system.fileCopy
       ({
         dstPath,
         srcPath,
@@ -3762,9 +3506,13 @@ function filesReflectSingle_body( o )
     }
     else if( action === 'hardLink' )
     {
-      /* qqq2 : should not change time of file if it is already linked */
+      /* qqq : should not change time of file if it is already linked. check tests */
+      /* qqq : should return true / false / null. false if no change is done! */
 
-      dst.hardLink
+      // if( _.strEnds( dstPath, "#dir2/file" ) ) /* yyy */
+      // debugger;
+
+      r = dst.hardLink
       ({
         dstPath,
         srcPath,
@@ -3780,9 +3528,9 @@ function filesReflectSingle_body( o )
     }
     else if( action === 'softLink' )
     {
-      /* qqq2 : should not change time of file if it is already linked */
-
-      system.softLink
+      /* qqq : should not change time of file if it is already linked. check tests */
+      /* qqq : should return true / false / null. false if no change is done! */
+      r = system.softLink
       ({
         dstPath,
         srcPath,
@@ -3797,8 +3545,9 @@ function filesReflectSingle_body( o )
     }
     else if( action === 'textLink' )
     {
-      /* qqq2 : should not change time of file if it is already linked */
-      system.textLink
+      /* qqq : should not change time of file if it is already linked. check tests */
+      /* qqq : should return true / false / null. false if no change is done! */
+      r = system.textLink
       ({
         dstPath,
         srcPath,
@@ -3812,6 +3561,11 @@ function filesReflectSingle_body( o )
       });
     }
     else _.assert( 0 );
+
+    if( _.consequenceIs( r ) )
+    r.then( () => record.performed = r );
+    else
+    record.performed = r;
 
     return true;
   }
@@ -3830,14 +3584,17 @@ function filesReflectSingle_body( o )
     return;
 
     if( record.action === 'nop' )
-    return false;
+    {
+      record.performed = 'nop';
+      return false;
+    }
 
     let action = record.action;
 
     if( linkRebasing( record ) )
     return true;
 
-    return linkWithAction( record.dst.absolutePreferred, record.src.absolutePreferred, action );
+    return linkWithAction( record, record.dst.absolutePreferred, record.src.absolutePreferred, action );
   }
 
   /* */
@@ -3882,7 +3639,7 @@ function filesReflectSingle_body( o )
     }
     else
     {
-      _.assert( record.action === 'fileCopy' || record.action === 'hardLink' || record.action === 'softLink' || record.action === 'nop' );
+      _.assert( record.action === 'fileCopy' || record.action === 'hardLink' || record.action === 'softLink' || record.action === 'textLink' || record.action === 'nop' );
       record.src.factory.effectiveProvider.fileDelete( record.src.absolute );
     }
 
@@ -4115,11 +3872,42 @@ function filesReflect_body( o )
       throw _.err( 'Error. No file moved :', mtr );
     }
 
+    /* qqq xxx : implement tests to cover log
+    Implement and use LoggerToString for that.
+    */
+
+    let result = o.result;
+
+    if( o.verbosity >= 1 )
+    result = result.filter( ( record ) => record.performed );
+
+    if( o.verbosity >= 3 )
+    {
+      debugger;
+
+      result.forEach( ( record ) =>
+      {
+        if( record.action === 'fileDelete' )
+        {
+          self.logger.log( ` - ${ record.action } ${ record.dst.absolute }` );
+        }
+        else
+        {
+          let mtr = path.moveTextualReport( record.dst.absolute, record.src.absolute );
+          self.logger.log( ` + ${ record.action } ${ mtr }` );
+        }
+      });
+
+      /* qqq xxx yyy : verbosity > 3 should log each modified file, but not more
+      */
+
+    }
+
     if( o.verbosity >= 1 )
     {
       _.assert( o.src.isPaired() );
       let mtr = o.src.moveTextualReport();
-      self.logger.log( ' + Reflect ' + o.result.length + ' files ' + mtr + ' in ' + _.time.spent( time ) );
+      self.logger.log( ` + Reflect ${ result.length } files ${ mtr } in ${ _.time.spent( time ) }` );
     }
 
     if( o.outputFormat !== 'record' )
@@ -4265,8 +4053,15 @@ function filesReflectTo_body( o )
   let system;
   let result;
 
+  if( src instanceof _.FileProvider.System )
+  src = src.providerForPath( o.src );
+
+  _.assert( !( src instanceof _.FileProvider.System ) && src instanceof _.FileProvider.Abstract, 'Source provider should be an instance of _.FileProvider.Abstract' )
+
   _.assertRoutineOptions( filesReflectTo_body, arguments );
   _.assert( !src.system || !dst.system || src.system === dst.system, 'not implemented' );
+
+  debugger;
 
   if( src.system )
   {
@@ -4309,6 +4104,12 @@ function filesReflectTo_body( o )
 
     // let filePath = { [ src.path.globalFromPreferred( o.srcPath ) ] : dst.path.globalFromPreferred( o.dstPath ) }
     // let filePath = { [ src.path.globalFromPreferred( o.src ) ] : dst.path.globalFromPreferred( o.dst ) }
+
+    if( Config.debug )
+    {
+      let dstProvider = system.providerForPath( dst.path.globalFromPreferred( o.dst ) );
+      _.assert( dstProvider === dst, `Dst path: ${o.dst} reffers to different dst provider: ${dstProvider.protocol}, routine expects: ${dst.protocol}` );
+    }
 
     o.src = src.recordFilter( o.src );
     o.dst = dst.recordFilter( o.dst );
@@ -4476,7 +4277,7 @@ function filesFindSame_body( o )
       let minSize = Math.min( file1.stat.size, file2.stat.size );
       let maxSize = Math.max( file1.stat.size, file2.stat.size );
 
-      if( _.statsAreHardLinked( file1.stat, file2.stat ) )
+      if( _.files.stat.areHardLinked( file1.stat, file2.stat ) )
       {
         linkAdd();
         continue;
@@ -4754,35 +4555,6 @@ function filesDelete_body( o )
   _.assert( _.numberIs( o.safe ) );
   _.assert( o.filter.formed === 5 );
   _.assert( arguments.length === 1 );
-
-  /* qqq xxx : strange code! */
-
-  // let filePath = o.filter.filePathArrayGet( o.filter.formedFilePath );
-  // if( filePath.length === 1 && !o.deletingEmptyDirs )
-  // {
-  //   filePath = filePath[ 0 ];
-  //   if( !provider.fileExists( filePath ) )
-  //   return end();
-  //
-  //   /*
-  //     reminder : masks are not applicable to stem file
-  //   */
-  //
-  //   if( provider.isTerminal( filePath ) )
-  //   {
-  //     let file = provider.record( filePath );
-  //     file.isActual = true;
-  //     file.isTransient = true;
-  //     o.result.push( file );
-  //     if( o.writing )
-  //     fileDelete( file );
-  //
-  //     if( o.sync )
-  //     return end();
-  //     else
-  //     return con.then( () => end() );
-  //   }
-  // }
 
   /* */
 
@@ -5069,7 +4841,7 @@ defaults.tempPath = null;
 defaults.deletingEmptyDirs = 0;
 
 /*
-xxx qqq : implement and cover option late for method filesDelete.
+qqq : implement and cover option late for method filesDelete.
 */
 
 //

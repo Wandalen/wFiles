@@ -14,44 +14,48 @@ if( typeof module !== 'undefined' )
 //
 
 var _ = _global_.wTools;
-var Parent = wTester;
-// var suitFileLocation = _.introspector.location().full; // typeof module !== 'undefined' ? __filename : document.scripts[ document.scripts.length-1 ].src;
-
-var FileRecord = _.FileRecord;
-var suiteTempPath = _.fileProvider.path.nativize( _.path.resolve( __dirname + '/../../../../tmp.tmp/sample/FilesIndividualTest' ) );
 
 //
 
-function createTestsDirectory( path, rmIfExists )
+function onSuiteBegin( test )
 {
-  // rmIfExists && File.existsSync( path ) && File.removeSync( path );
-  // return File.mkdirsSync( path );
-  if( rmIfExists && _.fileProvider.statResolvedRead( path ) )
-  _.fileProvider.filesDelete( path );
-  return _.fileProvider.dirMake( path );
+  let context = this;
+
+  context.suiteTempPath = context.provider.path.pathDirTempOpen( context.provider.path.join( __dirname, '../..'  ),'FilesEtc' );
 }
 
 //
 
-function createInTD( path )
+function onSuiteEnd()
 {
-  return createTestsDirectory( _.path.join( suiteTempPath, path ) );
+  let path = this.provider.path;
+  _.assert( _.strHas( this.suiteTempPath, '.tmp' ) );
+  path.pathDirTempClose( this.suiteTempPath );
+  this.provider.finit();
 }
 
 //
 
-function createTestFile( path, data, decoding )
+function createTestFile( path, data, encoding )
 {
-  var dataToWrite = ( decoding === 'json' ) ? JSON.stringify( data ) : data;
-  // File.createFileSync( _.path.join( suiteTempPath, path ) );
-  // dataToWrite && File.writeFileSync( _.path.join( suiteTempPath, path ), dataToWrite );
-  _.fileProvider.fileWrite({ filePath : _.path.join( suiteTempPath, path ), data : dataToWrite });
+  let context = this;
+  let provider = context.provider;
+
+  provider.fileWrite
+  ({
+    filePath : _.path.join( context.suiteTempPath, path ),
+    data,
+    encoding
+  });
 }
 
 //
 
 function createTestSymLink( path, target, type, data )
 {
+  let context = this;
+  let provider = context.provider;
+
   var origin,
     typeOrigin;
 
@@ -71,29 +75,31 @@ function createTestSymLink( path, target, type, data )
   {
     typeOrigin = 'file';
     data = data || 'test origin';
-    createTestFile( origin, data );
+    context.createTestFile( origin, data );
   }
   else if( 'sd' === type )
   {
     typeOrigin = 'dir';
-    createInTD( origin );
+    provider.dirMake( provider.path.join( context.suiteTempPath, origin ) );
   }
   else throw new Error( 'unexpected type' );
 
-  path = _.path.join( suiteTempPath, path );
-  origin = _.path.resolve( _.path.join( suiteTempPath, origin ) );
+  path = _.path.join( context.suiteTempPath, path );
+  origin = _.path.resolve( _.path.join( context.suiteTempPath, origin ) );
 
   // File.existsSync( path ) && File.removeSync( path );
-  if( _.fileProvider.statResolvedRead( path ) )
-  _.fileProvider.fileDelete( path );
+  if( provider.statResolvedRead( path ) )
+  provider.fileDelete( path );
   // File.symlinkSync( origin, path, typeOrigin );
-  _.fileProvider.softLink( path, origin );
+  provider.softLink( path, origin );
 }
 
 //
 
 function createTestHardLink( path, target, data )
 {
+  let context = this;
+  let provider = context.provider;
   var origin;
 
   if( target === void 0 )
@@ -109,22 +115,25 @@ function createTestHardLink( path, target, data )
   }
 
   data = data || 'test origin';
-  createTestFile( origin, data );
+  context.createTestFile( origin, data );
 
-  path = _.path.join( suiteTempPath, path );
-  origin = _.path.resolve( _.path.join( suiteTempPath, origin ) );
+  path = _.path.join( context.suiteTempPath, path );
+  origin = _.path.resolve( _.path.join( context.suiteTempPath, origin ) );
 
   // File.existsSync( path ) && File.removeSync( path );
-  if( _.fileProvider.statResolvedRead( path ) )
-  _.fileProvider.fileDelete( path );
+  if( provider.statResolvedRead( path ) )
+  provider.fileDelete( path );
   // File.linkSync( origin, path );
-  _.fileProvider.hardLink( path, origin )
+  provider.hardLink( path, origin )
 }
 
 //
 
 function createTestResources( cases, dir )
 {
+  let context = this;
+  let provider = context.provider;
+
   if( !Array.isArray( cases ) ) cases = [ cases ];
 
   var l = cases.length,
@@ -144,10 +153,10 @@ function createTestResources( cases, dir )
           {
             let res =
               ( Array.isArray( testCheck.createResource ) && testCheck.createResource[i] ) || testCheck.createResource;
-            createTestFile( path, res );
+            context.createTestFile( path, res );
           }
           else
-          createTestFile( path );
+          context.createTestFile( path );
         } );
         break;
 
@@ -156,11 +165,11 @@ function createTestResources( cases, dir )
         paths.forEach( ( path, i ) =>
         {
           path = dir ? _.path.join( dir, path ) : path;
-          createInTD( path );
+          provider.dirMake( provider.path.join( context.suiteTempPath, path ) )
           if ( testCheck.folderContent )
           {
             var res = Array.isArray( testCheck.folderContent ) ? testCheck.folderContent : [ testCheck.folderContent ];
-            createTestResources( res, path );
+            context.createTestResources( res, path );
           }
         } );
         break;
@@ -178,7 +187,7 @@ function createTestResources( cases, dir )
           path = dir ? _.path.join( dir, testCheck.path ) : testCheck.path;
           target = dir ? _.path.join( dir, testCheck.linkTarget ) : testCheck.linkTarget;
         }
-        createTestSymLink( path, target, testCheck.type, testCheck.createResource );
+        context.createTestSymLink( path, target, testCheck.type, testCheck.createResource );
         break;
       case 'hf' :
         var path, target;
@@ -192,7 +201,7 @@ function createTestResources( cases, dir )
           path = dir ? _.path.join( dir, testCheck.path ) : testCheck.path;
           target = dir ? _.path.join( dir, testCheck.linkTarget ) : testCheck.linkTarget;
         }
-        createTestHardLink( path, target, testCheck.createResource );
+        context.createTestHardLink( path, target, testCheck.createResource );
         break;
     }
   }
@@ -204,7 +213,9 @@ function createTestResources( cases, dir )
 
 function mergePath( path )
 {
-  return _.path.join( suiteTempPath, path );
+  let context = this;
+  let provider = context.provider;
+  return provider.path.join( context.suiteTempPath, path );
 }
 
 // --
@@ -254,12 +265,12 @@ function mergePath( path )
 //       }
 //     ];
 
-//   createTestResources( testChecks );
+//   context.createTestResources( testChecks );
 
 //   for( let testCheck of testChecks )
 //   {
 //     test.description = testCheck.name;
-//     let got = !! _.fileProvider.isDir( _.path.join( suiteTempPath, testCheck.path ) );
+//     let got = !! provider.isDir( _.path.join( context.suiteTempPath, testCheck.path ) );
 //     test.identical( got , testCheck.expected );
 //   }
 
@@ -268,6 +279,10 @@ function mergePath( path )
 //
 
 function _fileOptionsGet( test ) {
+
+  let context = this;
+  let provider = context.provider;
+
   var defaultContextObj =
     {
       defaults :
@@ -303,15 +318,15 @@ function _fileOptionsGet( test ) {
     expected4 = path4;
 
   test.description = 'non empty path';
-  var got = _.fileProvider._fileOptionsGet.call( defaultContextObj, path2 );
+  var got = provider._fileOptionsGet.call( defaultContextObj, path2 );
   test.identical( got , expected2 );
 
   test.description = 'non empty path, call with options';
-  var got = _.fileProvider._fileOptionsGet.call( defaultContextObj, path3, options1 );
+  var got = provider._fileOptionsGet.call( defaultContextObj, path3, options1 );
   test.identical( got , expected3 );
 
   test.description = 'path is object';
-  var got = _.fileProvider._fileOptionsGet.call( defaultContextObj, path4, options1 );
+  var got = provider._fileOptionsGet.call( defaultContextObj, path4, options1 );
   test.identical( got , expected4 );
 
   if( Config.debug )
@@ -319,25 +334,25 @@ function _fileOptionsGet( test ) {
     test.description = 'missed arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileProvider._fileOptionsGet.call( defaultContextObj );
+      provider._fileOptionsGet.call( defaultContextObj );
     } );
 
     test.description = 'extra arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileProvider._fileOptionsGet.call( defaultContextObj, path2, options1, {} );
+      provider._fileOptionsGet.call( defaultContextObj, path2, options1, {} );
     } );
 
     test.description = 'empty path';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileProvider._fileOptionsGet.call( defaultContextObj, path1 );
+      provider._fileOptionsGet.call( defaultContextObj, path1 );
     } );
 
     test.description = 'extra options ';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileProvider._fileOptionsGet.call( defaultContextObj, path3, wrongOptions );
+      provider._fileOptionsGet.call( defaultContextObj, path3, wrongOptions );
     } );
   }
 }
@@ -350,6 +365,10 @@ qqq : rewrite test routine for filesNewer, filesOlder. coverage should be Good
 
 function filesNewer( test )
 {
+
+  let context = this;
+  let provider = context.provider;
+
   /* files creation */
 
   var file1 = 'tmp.tmp/filesNewer/test1',
@@ -357,21 +376,21 @@ function filesNewer( test )
       file3 = 'tmp.tmp/filesNewer/test3',
       file4 = 'tmp.tmp/filesNewer/test4';
 
-  var delay = _.fileProvider.systemBitrateTimeGet() / 1000;
+  var delay = provider.systemBitrateTimeGet() / 1000;
 
-  createTestFile( file1, 'test1' );
+  context.createTestFile( file1, 'test1' );
   waitSync( delay );
-  createTestFile( file2, 'test2' );
+  context.createTestFile( file2, 'test2' );
   waitSync( delay );
-  createTestFile( file3, 'test3' );
+  context.createTestFile( file3, 'test3' );
 
-  file1 = mergePath( file1 );
-  file2 = mergePath( file2 );
-  file3 = mergePath( file3 );
+  file1 = context.mergePath( file1 );
+  file2 = context.mergePath( file2 );
+  file3 = context.mergePath( file3 );
 
-  file1 = _.fileProvider.path.nativize( file1 );
-  file2 = _.fileProvider.path.nativize( file2 );
-  file3 = _.fileProvider.path.nativize( file3 );
+  file1 = provider.path.nativize( file1 );
+  file2 = provider.path.nativize( file2 );
+  file3 = provider.path.nativize( file3 );
 
   /* tests */
 
@@ -380,23 +399,23 @@ function filesNewer( test )
   test.identical( got, file2 );
 
   test.case = 'one files modified after creation';
-  _.fileProvider.fileTimeSet( file1, _.time.now() / 1000, _.time.now() / 1000 );
+  provider.fileTimeSet( file1, _.time.now() / 1000, _.time.now() / 1000 );
   var got = _.files.filesNewer( file2, file1 );
   test.identical( got, file1 );
 
   test.case = 'two files modified at the same time';
   let timeSet = _.time.now() / 1000;
-  _.fileProvider.fileTimeSet( file1, timeSet, timeSet );
-  _.fileProvider.fileTimeSet( file2, timeSet, timeSet );
+  provider.fileTimeSet( file1, timeSet, timeSet );
+  provider.fileTimeSet( file2, timeSet, timeSet );
   var got = _.files.filesNewer( file1, file2 );
   test.identical( got, null );
 
   var con = _.time.out( 50 );
   con.finally( () =>
   {
-    createTestFile( file4, 'test4' );
-    file4 = mergePath( file4 );
-    file4 = _.fileProvider.path.nativize( file4 );
+    context.createTestFile( file4, 'test4' );
+    file4 = context.mergePath( file4 );
+    file4 = provider.path.nativize( file4 );
     test.case = 'two files created at different time, async test';
     var got = _.files.filesNewer( file3, file4 );
     test.identical( got, file4 );
@@ -430,6 +449,9 @@ function filesNewer( test )
 
 function filesOlder( test )
 {
+  let context = this;
+  let provider = context.provider;
+
   /* files creation */
 
   var file1 = 'tmp.tmp/filesOlder/test1',
@@ -437,21 +459,21 @@ function filesOlder( test )
       file3 = 'tmp.tmp/filesOlder/test3',
       file4 = 'tmp.tmp/filesOlder/test4';
 
-  var delay = _.fileProvider.systemBitrateTimeGet() / 1000;
+  var delay = provider.systemBitrateTimeGet() / 1000;
 
-  createTestFile( file1, 'test1' );
+  context.createTestFile( file1, 'test1' );
   waitSync( delay );
-  createTestFile( file2, 'test2' );
+  context.createTestFile( file2, 'test2' );
   waitSync( delay );
-  createTestFile( file3, 'test3' );
+  context.createTestFile( file3, 'test3' );
 
-  file1 = mergePath( file1 );
-  file2 = mergePath( file2 );
-  file3 = mergePath( file3 );
+  file1 = context.mergePath( file1 );
+  file2 = context.mergePath( file2 );
+  file3 = context.mergePath( file3 );
 
-  file1 = _.fileProvider.path.nativize( file1 );
-  file2 = _.fileProvider.path.nativize( file2 );
-  file3 = _.fileProvider.path.nativize( file3 );
+  file1 = provider.path.nativize( file1 );
+  file2 = provider.path.nativize( file2 );
+  file3 = provider.path.nativize( file3 );
 
   /* tests */
 
@@ -460,23 +482,23 @@ function filesOlder( test )
   test.identical( got, file1 );
 
   test.case = 'one files modified after creation';
-  _.fileProvider.fileTimeSet( file1, _.time.now() / 1000, _.time.now() / 1000 );
+  provider.fileTimeSet( file1, _.time.now() / 1000, _.time.now() / 1000 );
   var got = _.files.filesOlder( file2, file1 );
   test.identical( got, file2 );
 
   test.case = 'two files modified at the same time';
   let timeSet = _.time.now() / 1000;
-  _.fileProvider.fileTimeSet( file1, timeSet, timeSet );
-  _.fileProvider.fileTimeSet( file2, timeSet, timeSet );
+  provider.fileTimeSet( file1, timeSet, timeSet );
+  provider.fileTimeSet( file2, timeSet, timeSet );
   var got = _.files.filesOlder( file1, file2 );
   test.identical( got, null );
 
   var con = _.time.out( 50 );
   con.finally( () =>
   {
-    createTestFile( file4, 'test4' );
-    file4 = mergePath( file4 );
-    file4 = _.fileProvider.path.nativize( file4 );
+    context.createTestFile( file4, 'test4' );
+    file4 = context.mergePath( file4 );
+    file4 = provider.path.nativize( file4 );
     test.case = 'two files created at different time, async test';
     var got = _.files.filesOlder( file3, file4 );
     test.identical( got, file3 );
@@ -510,6 +532,9 @@ function filesOlder( test )
 
 function filesSpectre( test )
 {
+  let context = this;
+  let provider = context.provider;
+
   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     textData2 = ' Aenean non feugiat mauris',
 
@@ -580,14 +605,14 @@ function filesSpectre( test )
       }
     ];
 
-  createTestResources( testChecks )
+  context.createTestResources( testChecks )
 
   // regular tests
   for( let testCheck of testChecks )
   {
     // join several test aspects together
 
-    let path = _.path.resolve( mergePath( testCheck.path ) ),
+    let path = _.path.resolve( context.mergePath( testCheck.path ) ),
       got;
 
     test.description = testCheck.name;
@@ -715,15 +740,15 @@ function filesSpectre( test )
 //       // }
 //     ];
 //
-//   createTestResources( testChecks );
+//   context.createTestResources( testChecks );
 //
 //   // regular tests
 //   for( let testCheck of testChecks )
 //   {
 //     // join several test aspects together
 //
-//     let path1 = _.path.resolve( mergePath( testCheck.path[0] ) ),
-//       path2 = _.path.resolve( mergePath( testCheck.path[1] ) ),
+//     let path1 = _.path.resolve( context.mergePath( testCheck.path[0] ) ),
+//       path2 = _.path.resolve( context.mergePath( testCheck.path[1] ) ),
 //       got;
 //
 //     test.case = testCheck.name;
@@ -754,6 +779,9 @@ function filesSpectre( test )
 
 function filesSimilarity( test )
 {
+  let context = this;
+  let provider = context.provider;
+
   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     textData2 = ' Aenean non feugiat mauris',
     bufferData1 = new U8x( [ 0x01, 0x02, 0x03, 0x04 ] ),
@@ -826,15 +854,15 @@ function filesSimilarity( test )
       // }
     ];
 
-  createTestResources( testChecks );
+  context.createTestResources( testChecks );
 
   // regular tests
   for( let testCheck of testChecks )
   {
     // join several test aspects together
 
-    let path1 = _.path.resolve( mergePath( testCheck.path[0] ) ),
-      path2 = _.path.resolve( mergePath( testCheck.path[1] ) ),
+    let path1 = _.path.resolve( context.mergePath( testCheck.path[0] ) ),
+      path2 = _.path.resolve( context.mergePath( testCheck.path[1] ) ),
       got;
 
     test.description = testCheck.name;
@@ -960,20 +988,20 @@ function filesSimilarity( test )
 //   for( let testCheck of testChecks )
 //   {
 //     // join several test aspects together
-//     let path = mergePath( testCheck.path );
+//     let path = context.mergePath( testCheck.path );
 //
 //     // clear
 //     // File.existsSync( path ) && File.removeSync( path );
-//     if( _.fileProvider.statResolvedRead( path ) )
-//     _.fileProvider.fileDelete( path );
+//     if( provider.statResolvedRead( path ) )
+//     provider.fileDelete( path );
 //
 //     // prepare to write if need
 //     testCheck.createResource !== undefined
-//     && createTestFile( testCheck.path, testCheck.createResource, testCheck.readOptions.encoding );
+//     && context.createTestFile( testCheck.path, testCheck.createResource, testCheck.readOptions.encoding );
 //
 //     var o = _.mapExtend( null, testCheck.readOptions, { filePath : path } );
-//     // let got = _.fileProvider.fileReadSync( path, testCheck.readOptions );
-//     let got = _.fileProvider.fileReadSync( o );
+//     // let got = provider.fileReadSync( path, testCheck.readOptions );
+//     let got = provider.fileReadSync( o );
 //
 //     if( got instanceof BufferRaw )
 //     {
@@ -993,19 +1021,19 @@ function filesSimilarity( test )
 //     test.description = 'missed arguments';
 //     test.shouldThrowErrorSync( function( )
 //     {
-//       _.fileProvider.fileReadSync( );
+//       provider.fileReadSync( );
 //     } );
 //
 //     test.description = 'passed unexpected property in options';
 //     test.shouldThrowErrorSync( function( )
 //     {
-//       _.fileProvider.fileReadSync( wrongReadOptions0 );
+//       provider.fileReadSync( wrongReadOptions0 );
 //     } );
 //
 //     test.description = 'filePath is not defined';
 //     test.shouldThrowErrorSync( function( )
 //     {
-//      _.fileProvider.fileReadSync( { encoding : 'json' } );
+//      provider.fileReadSync( { encoding : 'json' } );
 //     } );
 //
 //   }
@@ -1014,6 +1042,9 @@ function filesSimilarity( test )
 
 function filesSize( test )
 {
+  let context = this;
+  let provider = context.provider;
+
   /* file creation */
 
   var file1 = 'tmp.tmp/filesAreUpToDate/src/test1',
@@ -1021,48 +1052,48 @@ function filesSize( test )
       file3 = 'tmp.tmp/filesAreUpToDate/src/test3',
       file4 = 'tmp.tmp/filesAreUpToDate/dst/test4';
 
-  var delay = _.fileProvider.systemBitrateTimeGet() / 1000;
+  var delay = provider.systemBitrateTimeGet() / 1000;
 
-  createTestFile( file1, 'test1, any text' );
+  context.createTestFile( file1, 'test1, any text' );
   waitSync( delay );
-  createTestFile( file2, 'test2' );
+  context.createTestFile( file2, 'test2' );
   waitSync( delay );
-  createTestFile( file3, 'test3' );
+  context.createTestFile( file3, 'test3' );
 
-  file1 = mergePath( file1 );
-  file2 = mergePath( file2 );
-  file3 = mergePath( file3 );
+  file1 = context.mergePath( file1 );
+  file2 = context.mergePath( file2 );
+  file3 = context.mergePath( file3 );
 
-  file1 = _.fileProvider.path.nativize( file1 );
-  file2 = _.fileProvider.path.nativize( file2 );
-  file3 = _.fileProvider.path.nativize( file3 );
+  file1 = provider.path.nativize( file1 );
+  file2 = provider.path.nativize( file2 );
+  file3 = provider.path.nativize( file3 );
 
   /* - */
 
   test.case = 'string in arg';
-  var got = _.fileProvider.filesSize( file2 );
-  if( _.fileProvider.UsingBigIntForStat )
+  var got = provider.filesSize( file2 );
+  if( provider.UsingBigIntForStat )
   test.equivalent( got, BigInt( 5 ) );
   else
   test.equivalent( got, 5 );
 
   test.case = 'array in arg';
-  var got = _.fileProvider.filesSize( [ file1, file2, file3 ] );
-  if( _.fileProvider.UsingBigIntForStat )
+  var got = provider.filesSize( [ file1, file2, file3 ] );
+  if( provider.UsingBigIntForStat )
   test.equivalent( got, BigInt( 25 ) );
   else
   test.equivalent( got, 25 );
 
   test.case = 'map options, one file';
-  var got = _.fileProvider.filesSize( { filePath : file1 } );
-  if( _.fileProvider.UsingBigIntForStat )
+  var got = provider.filesSize( { filePath : file1 } );
+  if( provider.UsingBigIntForStat )
   test.equivalent( got, BigInt( 15 ) );
   else
   test.equivalent( got, 15 );
 
   test.case = 'map options, aray';
-  var got = _.fileProvider.filesSize( { filePath : [ file1, file2, file3 ] } );
-  if( _.fileProvider.UsingBigIntForStat )
+  var got = provider.filesSize( { filePath : [ file1, file2, file3 ] } );
+  if( provider.UsingBigIntForStat )
   test.equivalent( got, BigInt( 25 ) );
   else
   test.equivalent( got, 25 );
@@ -1071,36 +1102,39 @@ function filesSize( test )
   return;
 
   test.case = 'without arguments';
-  test.shouldThrowErrorSync( () => _.fileProvider.filesSize() );
+  test.shouldThrowErrorSync( () => provider.filesSize() );
 
   test.case = 'extra arguments';
-  test.shouldThrowErrorSync( () => _.fileProvider.filesSize( file1, file2, file3 ) );
+  test.shouldThrowErrorSync( () => provider.filesSize( file1, file2, file3 ) );
 
   test.case = 'wrong arguments';
-  test.shouldThrowErrorSync( () => _.fileProvider.filesSize( 1 ) );
+  test.shouldThrowErrorSync( () => provider.filesSize( 1 ) );
 }
 
 //
 
 function fileSize( test )
 {
+  let context = this;
+  let provider = context.provider;
+
   /* file creation */
 
   var file1 = 'tmp.tmp/fileSize/test1',
       file2 = 'tmp.tmp/fileSize/test2',
       file3 = 'tmp.tmp/fileSize/test3';
 
-  var delay = _.fileProvider.systemBitrateTimeGet() / 1000;
+  var delay = provider.systemBitrateTimeGet() / 1000;
 
-  createTestFile( file1, 'test1, any text' );
+  context.createTestFile( file1, 'test1, any text' );
   waitSync( delay );
-  createTestFile( file2, 'test2' );
+  context.createTestFile( file2, 'test2' );
 
-  file1 = mergePath( file1 );
-  file2 = mergePath( file2 );
+  file1 = context.mergePath( file1 );
+  file2 = context.mergePath( file2 );
 
-  file1 = _.fileProvider.path.nativize( file1 );
-  file2 = _.fileProvider.path.nativize( file2 );
+  file1 = provider.path.nativize( file1 );
+  file2 = provider.path.nativize( file2 );
 
   let ready = new _.Consequence().take( null )
 
@@ -1113,22 +1147,22 @@ function fileSize( test )
   .then( () =>
   {
     test.case = 'string path in arg';
-    var got = _.fileProvider.fileSize( file1 );
-    if( _.fileProvider.UsingBigIntForStat )
+    var got = provider.fileSize( file1 );
+    if( provider.UsingBigIntForStat )
     test.equivalent( got, BigInt( 15 ) );
     else
     test.equivalent( got, 15 );
 
     test.case = 'map in arg';
-    var got = _.fileProvider.fileSize( { filePath : file2 } );
-    if( _.fileProvider.UsingBigIntForStat )
+    var got = provider.fileSize( { filePath : file2 } );
+    if( provider.UsingBigIntForStat )
     test.equivalent( got, BigInt( 5 ) );
     else
     test.equivalent( got, 5 );
 
     test.case = 'file is dir';
-    var got = _.fileProvider.fileSize( { filePath : _.path.current() } );
-    if( _.fileProvider.UsingBigIntForStat )
+    var got = provider.fileSize( { filePath : _.path.current() } );
+    if( provider.UsingBigIntForStat )
     test.equivalent( got, BigInt( 0 ) );
     else
     test.equivalent( got, 0 );
@@ -1146,30 +1180,30 @@ function fileSize( test )
       filePath : '/string',
       throwing : 0,
     }
-    var got = _.fileProvider.fileSize( map );
+    var got = provider.fileSize( map );
     test.equivalent( got, null );
     return null;
   })
 
   .then( () =>
   {
-    let filePath = mergePath( file3 );
+    let filePath = context.mergePath( file3 );
 
     let fileCreate = _.time.out( 100, function()
     {
-      createTestFile( file3, 'test3, any text' );
+      context.createTestFile( file3, 'test3, any text' );
     });
 
     test.case = 'asynchronous file creation test';
     let check1 = _.time.out( 0, function()
     {
       if( Config.debug )
-      test.shouldThrowErrorSync( () => _.fileProvider.fileSize({ filePath, throwing : 1 }) );
+      test.shouldThrowErrorSync( () => provider.fileSize({ filePath, throwing : 1 }) );
     });
     let check2 = _.time.out( 100, function()
     {
-      var got = _.fileProvider.fileSize( filePath );
-      if( _.fileProvider.UsingBigIntForStat )
+      var got = provider.fileSize( filePath );
+      if( provider.UsingBigIntForStat )
       test.equivalent( got, BigInt( 15 ) );
       else
       test.equivalent( got, 15 );
@@ -1185,10 +1219,10 @@ function fileSize( test )
   // return;
 
   // test.case = 'without arguments';
-  // test.shouldThrowErrorSync( () => _.fileProvider.fileSize() );
+  // test.shouldThrowErrorSync( () => provider.fileSize() );
 
   // test.case = 'extra arguments';
-  // test.shouldThrowErrorSync( () => _.fileProvider.fileSize( file1, file1 ) );
+  // test.shouldThrowErrorSync( () => provider.fileSize( file1, file1 ) );
 
   // test.case = 'throwing : 1, stats === null';
   // var map =
@@ -1196,11 +1230,11 @@ function fileSize( test )
   //   filePath : '/string',
   //   throwing : 1,
   // }
-  // test.shouldThrowErrorSync( () => _.fileProvider.fileSize( map ) );
+  // test.shouldThrowErrorSync( () => provider.fileSize( map ) );
 
   // test.case = 'wrong argument';
-  // test.shouldThrowErrorSync( () => _.fileProvider.fileSize( 1 ) );
-  // test.shouldThrowErrorSync( () => _.fileProvider.fileSize( [ file1 ] ) );
+  // test.shouldThrowErrorSync( () => provider.fileSize( 1 ) );
+  // test.shouldThrowErrorSync( () => provider.fileSize( [ file1 ] ) );
 
   // test.case = 'unnecessary field in map';
   // var map =
@@ -1208,7 +1242,7 @@ function fileSize( test )
   //   filePath : file1,
   //   onUp : () => 0,
   // }
-  // test.shouldThrowErrorSync( () => _.fileProvider.fileSize( map ) );
+  // test.shouldThrowErrorSync( () => provider.fileSize( map ) );
 }
 
 //
@@ -1436,26 +1470,26 @@ function fileSize( test )
 //         content : null,
 //         exist : null
 //       },
-//       path = _.path.join( suiteTempPath, testCheck.path );
+//       path = _.path.join( context.suiteTempPath, testCheck.path );
 
 //     // clear
 //     // File.existsSync( path ) && File.removeSync( path );
-//     if( _.fileProvider.statResolvedRead( path ) )
-//     _.fileProvider.fileDelete( path );
+//     if( provider.statResolvedRead( path ) )
+//     provider.fileDelete( path );
 
 //     // prepare to write if need
-//     testCheck.createResource && createTestFile( testCheck.path, testCheck.createResource );
+//     testCheck.createResource && context.createTestFile( testCheck.path, testCheck.createResource );
 
 
 //     var writeMode = testCheck.data.append ? 'append' : 'rewrite';
 //     let gotFW = typeof testCheck.data === 'object'
-//       ? ( testCheck.data.filePath = mergePath( testCheck.data.filePath ) ) && _.fileProvider.fileWrite({ filePath :  path, writeMode,sync : testCheck.data.sync, data : testCheck.data.data })
-//       : _.fileProvider.fileWrite({ filePath :  path, data : testCheck.data })
+//       ? ( testCheck.data.filePath = context.mergePath( testCheck.data.filePath ) ) && provider.fileWrite({ filePath :  path, writeMode,sync : testCheck.data.sync, data : testCheck.data.data })
+//       : provider.fileWrite({ filePath :  path, data : testCheck.data })
 
 //     // fileWtrite must returns wConsequence
 //     got.instance = _.consequenceIs( gotFW );
 
-//     path = _.fileProvider.path.nativize( path );
+//     path = provider.path.nativize( path );
 
 //     if ( testCheck.data && testCheck.data.sync === false )
 //     {
@@ -1463,7 +1497,7 @@ function fileSize( test )
 //       {
 //         // recorded file should exists
 //         // got.exist = File.existsSync( path );
-//         got.exist = !!_.fileProvider.statResolvedRead( path );
+//         got.exist = !!provider.statResolvedRead( path );
 //         // check content of created file.
 //         got.content = File.readFileSync( path, testCheck.readOptions )
 //         test.description = testCheck.name;
@@ -1475,7 +1509,7 @@ function fileSize( test )
 
 //     // recorded file should exists
 //     // got.exist = File.existsSync( path );
-//     got.exist = !!_.fileProvider.statResolvedRead( path );
+//     got.exist = !!provider.statResolvedRead( path );
 //     // check content of created file.
 //     got.content = File.readFileSync( path, testCheck.readOptions )
 //     test.description = testCheck.name;
@@ -1489,31 +1523,31 @@ function fileSize( test )
 //     test.description = 'missed arguments';
 //     test.shouldThrowErrorSync( function( )
 //     {
-//       _.fileProvider.fileWrite( );
+//       provider.fileWrite( );
 //     } );
 
 //     test.description = 'extra arguments';
 //     test.shouldThrowErrorSync( function( )
 //     {
-//       _.fileProvider.fileWrite( 'temp/sample.txt', 'hello', 'world' );
+//       provider.fileWrite( 'temp/sample.txt', 'hello', 'world' );
 //     } );
 
 //     test.description = 'path is not string';
 //     test.shouldThrowErrorSync( function( )
 //     {
-//       _.fileProvider.fileWrite( 3, 'hello' );
+//       provider.fileWrite( 3, 'hello' );
 //     } );
 
 //     test.description = 'passed unexpected property in options';
 //     test.shouldThrowErrorSync( function( )
 //     {
-//       _.fileProvider.fileWrite( { filePath : 'temp/some.txt', data : 'hello', parentDir : './work/project' } );
+//       provider.fileWrite( { filePath : 'temp/some.txt', data : 'hello', parentDir : './work/project' } );
 //     } );
 
 //     test.description = 'data is not string or buffer';
 //     test.shouldThrowErrorSync( function( )
 //     {
-//       _.fileProvider.fileWrite( { filePath : 'temp/some.txt', data : { count : 1 } } );
+//       provider.fileWrite( { filePath : 'temp/some.txt', data : { count : 1 } } );
 //     } );
 //   }
 
@@ -1769,14 +1803,14 @@ function fileSize( test )
 //           error : null,
 //           content : null
 //         },
-//         path = mergePath( testCheck.path );
+//         path = context.mergePath( testCheck.path );
 
 //       // clear
 //       File.existsSync( path ) && File.removeSync( path );
 
 //       // prepare to write if need
 //       testCheck.createResource !== undefined
-//       && createTestFile( testCheck.path, testCheck.createResource, testCheck.readOptions.encoding );
+//       && context.createTestFile( testCheck.path, testCheck.createResource, testCheck.readOptions.encoding );
 
 //       testCheck.readOptions.filePath = path;
 //       testCheck.readOptions.onBegin = function( err, data )
@@ -1806,7 +1840,7 @@ function fileSize( test )
 
 //       };
 
-//       let gotFR = _.fileProvider.fileRead( testCheck.readOptions );
+//       let gotFR = provider.fileRead( testCheck.readOptions );
 //     } )( _.cloneJust( testCheck ) );
 
 //   }
@@ -1818,14 +1852,14 @@ function fileSize( test )
 //     test.description = 'missed arguments';
 //     test.shouldThrowErrorSync( function( )
 //     {
-//       _.fileProvider.fileRead( );
+//       provider.fileRead( );
 //     } );
 
 
 //     test.description = 'passed unexpected property in options';
 //     test.shouldThrowErrorSync( function( )
 //     {
-//       _.fileProvider.fileRead( wrongReadOptions0 );
+//       provider.fileRead( wrongReadOptions0 );
 //     } );
 
 //   }
@@ -2048,18 +2082,18 @@ function fileSize( test )
 //   for( let testCheck of testChecks )
 //   {
 //     // join several test aspects together
-//     let path = mergePath( testCheck.path );
+//     let path = context.mergePath( testCheck.path );
 //
 //     // clear
 //     // File.existsSync( path ) && File.removeSync( path );
-//     if( _.fileProvider.statResolvedRead( path ) )
-//     _.fileProvider.fileDelete( path );
+//     if( provider.statResolvedRead( path ) )
+//     provider.fileDelete( path );
 //
 //     // prepare to write if need
 //     testCheck.createResource !== undefined
-//     && createTestFile( testCheck.path, testCheck.createResource, testCheck.readOptions.encoding );
+//     && context.createTestFile( testCheck.path, testCheck.createResource, testCheck.readOptions.encoding );
 //
-//     let got = _.fileProvider.fileReadSync( path, testCheck.readOptions );
+//     let got = provider.fileReadSync( path, testCheck.readOptions );
 //
 //     if( got instanceof BufferRaw )
 //     {
@@ -2078,19 +2112,19 @@ function fileSize( test )
 //     test.case = 'missed arguments';
 //     test.shouldThrowErrorSync( function( )
 //     {
-//       _.fileProvider.fileReadSync( );
+//       provider.fileReadSync( );
 //     } );
 //
 //     test.case = 'passed unexpected property in options';
 //     test.shouldThrowErrorSync( function( )
 //     {
-//       _.fileProvider.fileReadSync( wrongReadOptions0 );
+//       provider.fileReadSync( wrongReadOptions0 );
 //     } );
 //
 //     test.case = 'filePath is not defined';
 //     test.shouldThrowErrorSync( function( )
 //     {
-//      _.fileProvider.fileReadSync( { encoding : 'json' } );
+//      provider.fileReadSync( { encoding : 'json' } );
 //     } );
 //
 //   }
@@ -2174,20 +2208,20 @@ function fileSize( test )
 //         error : null,
 //         content : void 0
 //       },
-//       path = mergePath( testCheck.path );
+//       path = context.mergePath( testCheck.path );
 //
 //     // clear
 //     // File.existsSync( path ) && File.removeSync( path );
-//     if( _.fileProvider.statResolvedRead( path ) )
-//     _.fileProvider.fileDelete( path );
+//     if( provider.statResolvedRead( path ) )
+//     provider.fileDelete( path );
 //
 //     // prepare to write if need
 //     testCheck.createResource !== undefined
-//       && createTestFile( testCheck.path, testCheck.createResource , testCheck.encoding );
+//       && context.createTestFile( testCheck.path, testCheck.createResource , testCheck.encoding );
 //
 //     try
 //     {
-//       got.content = _.fileProvider.fileReadJs( path );
+//       got.content = provider.fileReadJs( path );
 //     }
 //     catch ( err )
 //     {
@@ -2205,13 +2239,13 @@ function fileSize( test )
 //     test.case = 'missed arguments';
 //     test.shouldThrowErrorSync( function( )
 //     {
-//       _.fileProvider.fileReadJs( );
+//       provider.fileReadJs( );
 //     } );
 //
 //     test.case = 'extra arguments';
 //     test.shouldThrowErrorSync( function( )
 //     {
-//       _.fileProvider.fileReadJs( 'tmp.tmp/tmp.tmp.json', {} );
+//       provider.fileReadJs( 'tmp.tmp/tmp.tmp.json', {} );
 //     } );
 //   }
 //
@@ -2290,22 +2324,22 @@ function fileSize( test )
 //     }
 //   ];
 //
-//   createTestResources( testChecks )
+//   context.createTestResources( testChecks )
 //
 //   // regular tests
 //   for( let testCheck of testChecks )
 //   {
 //     // join several test aspects together
 //
-//     let file1 = _.path.resolve( mergePath( testCheck.path[0] ) ),
-//       file2 = _.path.resolve( mergePath( testCheck.path[1] ) ),
+//     let file1 = _.path.resolve( context.mergePath( testCheck.path[0] ) ),
+//       file2 = _.path.resolve( context.mergePath( testCheck.path[1] ) ),
 //       got;
 //
 //     test.case = testCheck.name;
 //
 //     try
 //     {
-//       got = _.fileProvider.filesSame({ ins1 :  file1, ins2 : file2, usingExtraStat : testCheck.checkTime, usingSymlink : 1 } );
+//       got = provider.filesSame({ ins1 :  file1, ins2 : file2, usingExtraStat : testCheck.checkTime, usingSymlink : 1 } );
 //     }
 //     catch( err ) {
 //       console.log( err );
@@ -2320,7 +2354,7 @@ function fileSize( test )
 //     test.case = 'missed arguments';
 //     test.shouldThrowErrorSync( function( )
 //     {
-//       _.fileProvider.filesSame( );
+//       provider.filesSame( );
 //     } );
 //   }
 //
@@ -2330,18 +2364,18 @@ function fileSize( test )
 //   var path1 =  'tmp.tmp/filesSame/rfile1',
 //     path2 =   'tmp.tmp/filesSame/rfile2';
 //
-//   createTestFile( path1, textData1 );
-//   createTestFile( path2, textData1 );
+//   context.createTestFile( path1, textData1 );
+//   context.createTestFile( path2, textData1 );
 //
-//   path1 = _.path.resolve( mergePath( path1 ) ),
-//   path2 = _.path.resolve( mergePath( path2 ) );
+//   path1 = _.path.resolve( context.mergePath( path1 ) ),
+//   path2 = _.path.resolve( context.mergePath( path2 ) );
 //
-//   var file1 = _.fileProvider.recordFactory().record( path1 ),
-//     file2 = _.fileProvider.recordFactory().record( path2 );
+//   var file1 = provider.recordFactory().record( path1 ),
+//     file2 = provider.recordFactory().record( path2 );
 //
 //   try
 //   {
-//     got = _.fileProvider.filesSame( { ins1 : file1, ins2 : file2 } );
+//     got = provider.filesSame( { ins1 : file1, ins2 : file2 } );
 //   }
 //   catch( err ) {
 //     console.log( err );
@@ -2355,15 +2389,15 @@ function fileSize( test )
 //   createTestSymLink( path1, void 0, 'sf', textData1 );
 //   createTestSymLink( path2, void 0, 'sf', textData1 );
 //
-//   path1 = _.path.resolve( mergePath( path1 ) ),
-//     path2 = _.path.resolve( mergePath( path2 ) );
+//   path1 = _.path.resolve( context.mergePath( path1 ) ),
+//     path2 = _.path.resolve( context.mergePath( path2 ) );
 //
-//   var file1 = _.fileProvider.recordFactory().record( path1 ),
-//     file2 = _.fileProvider.recordFactory().record( path2 );
+//   var file1 = provider.recordFactory().record( path1 ),
+//     file2 = provider.recordFactory().record( path2 );
 //
 //   try
 //   {
-//     got = _.fileProvider.filesSame( { ins1 : file1, ins2 : file2, usingSymlink : 1 } );
+//     got = provider.filesSame( { ins1 : file1, ins2 : file2, usingSymlink : 1 } );
 //   }
 //   catch( err ) {
 //     console.log( err );
@@ -2375,19 +2409,19 @@ function fileSize( test )
 //     path2 =  'tmp.tmp/filesSame/rfile4',
 //     link =  'tmp.tmp/filesSame/lfile4';
 //
-//   createTestFile( path1, textData1 );
-//   createTestFile( path2, textData1 );
+//   context.createTestFile( path1, textData1 );
+//   context.createTestFile( path2, textData1 );
 //
-//   path1 = _.path.resolve( mergePath( path1 ) );
-//   link = _.path.resolve( mergePath( link ) );
-//   path2 = mergePath( path2 );
+//   path1 = _.path.resolve( context.mergePath( path1 ) );
+//   link = _.path.resolve( context.mergePath( link ) );
+//   path2 = context.mergePath( path2 );
 //
-//   var file1 = _.fileProvider.recordFactory().record( path1 );
+//   var file1 = provider.recordFactory().record( path1 );
 //   // File.symlinkSync( path2, link, 'file' );
-//   _.fileProvider.softLink( link, path2 );
+//   provider.softLink( link, path2 );
 //   try
 //   {
-//     got = _.fileProvider.filesSame( { ins1 : file1, ins2 : link } );
+//     got = provider.filesSame( { ins1 : file1, ins2 : link } );
 //   }
 //   catch( err ) {
 //     console.log( err );
@@ -2397,18 +2431,18 @@ function fileSize( test )
 //   // time check
 //     test.case = 'files with identical content : time check';
 //     var expected = false,
-//       file1 = _.path.resolve( mergePath( 'tmp.tmp/filesSame/identical3' ) ),
-//       file2 = _.path.resolve( mergePath( 'tmp.tmp/filesSame/identical4' ) ),
+//       file1 = _.path.resolve( context.mergePath( 'tmp.tmp/filesSame/identical3' ) ),
+//       file2 = _.path.resolve( context.mergePath( 'tmp.tmp/filesSame/identical4' ) ),
 //       con, got;
 //
-//     createTestFile( file1 );
+//     context.createTestFile( file1 );
 //     con = _.time.out( 50);
-//     con.finally( ( ) => createTestFile( file2 ) );
+//     con.finally( ( ) => context.createTestFile( file2 ) );
 //     con.finally( ( ) =>
 //     {
 //       try
 //       {
-//         got = _.fileProvider.filesSame( file1, file2, true );
+//         got = provider.filesSame( file1, file2, true );
 //       }
 //       catch( err ) {}
 //       test.identical( got, expected );
@@ -2474,28 +2508,28 @@ function fileSize( test )
 //       // }
 //     ];
 //
-//   createTestResources( testChecks )
+//   context.createTestResources( testChecks )
 //
 //   // regular tests
 //   for( let testCheck of testChecks )
 //   {
 //     // join several test aspects together
 //
-//     let file1 = _.path.resolve( mergePath( testCheck.path[ 0 ] ) ),
-//       file2 = _.path.resolve( mergePath( testCheck.path[ 1 ] ) ),
+//     let file1 = _.path.resolve( context.mergePath( testCheck.path[ 0 ] ) ),
+//       file2 = _.path.resolve( context.mergePath( testCheck.path[ 1 ] ) ),
 //       got;
 //
 //     if( testCheck.fileRecord )
 //     {
-//       file1 = _.fileProvider.recordFactory().record( file1 );
-//       file2 = _.fileProvider.recordFactory().record( file2 );
+//       file1 = provider.recordFactory().record( file1 );
+//       file2 = provider.recordFactory().record( file2 );
 //     }
 //
 //     test.case = testCheck.name;
 //
 //     try
 //     {
-//       got = _.fileProvider.filesLinked( file1, file2 );
+//       got = provider.filesLinked( file1, file2 );
 //     }
 //     catch ( err ) {}
 //     finally
@@ -2511,7 +2545,7 @@ function fileSize( test )
 //   //   test.case = 'missed arguments';
 //   //   test.shouldThrowErrorSync( function( )
 //   //   {
-//   //     _.fileProvider.hardLinked( );
+//   //     provider.hardLinked( );
 //   //   } );
 //   // }
 // };
@@ -2651,7 +2685,7 @@ function fileSize( test )
 //     ];
 
 
-//   createTestResources( testChecks );
+//   context.createTestResources( testChecks );
 
 //   var counter = 0;
 //   // regular tests
@@ -2665,14 +2699,14 @@ function fileSize( test )
 //           exception : false,
 //           exist : false,
 //         },
-//         path = mergePath( testCheck.path ),
+//         path = context.mergePath( testCheck.path ),
 //         continueFlag = false;
-//       path = _.fileProvider.path.nativize( path );
+//       path = provider.path.nativize( path );
 //       try
 //       {
 //         let gotFD = typeof testCheck.delOptions === 'object'
-//           ? ( testCheck.delOptions.filePath = path ) && _.fileProvider.fileDelete( testCheck.delOptions )
-//           : _.fileProvider.fileDelete( path );
+//           ? ( testCheck.delOptions.filePath = path ) && provider.fileDelete( testCheck.delOptions )
+//           : provider.fileDelete( path );
 
 //         if( testCheck.delOptions && !!testCheck.delOptions.sync === false )
 //         {
@@ -2680,7 +2714,7 @@ function fileSize( test )
 //           gotFD.give( ( err ) =>
 //           {
 //             // deleted file should  not exists
-//             got.exist = !!_.fileProvider.statResolvedRead( path );
+//             got.exist = !!provider.statResolvedRead( path );
 
 //             // check exceptions
 //             got.exception = !!err;
@@ -2701,7 +2735,7 @@ function fileSize( test )
 //       if ( !continueFlag )
 //       {
 //         // deleted file should not exists
-//         got.exist = !!_.fileProvider.statResolvedRead( path );
+//         got.exist = !!provider.statResolvedRead( path );
 
 //         // check content of created file.
 //         test.description = testCheck.name;
@@ -2717,19 +2751,19 @@ function fileSize( test )
 //     test.description = 'missed arguments';
 //     test.shouldThrowErrorSync( function( )
 //     {
-//       _.fileProvider.fileDelete( );
+//       provider.fileDelete( );
 //     } );
 
 //     test.description = 'extra arguments';
 //     test.shouldThrowErrorSync( function( )
 //     {
-//       _.fileProvider.fileDelete( 'temp/sample.txt', fileDelOptions );
+//       provider.fileDelete( 'temp/sample.txt', fileDelOptions );
 //     } );
 
 //     test.description = 'path is not string';
 //     test.shouldThrowErrorSync( function( )
 //     {
-//       _.fileProvider.fileDelete( {
+//       provider.fileDelete( {
 //         filePath : null,
 //         force : 0,
 //         sync : 1,
@@ -2739,7 +2773,7 @@ function fileSize( test )
 //     test.description = 'passed unexpected property in options';
 //     test.shouldThrowErrorSync( function( )
 //     {
-//       _.fileProvider.fileWrite( {
+//       provider.fileWrite( {
 //         filePath : 'temp/some.txt',
 //         force : 0,
 //         sync : 1,
@@ -2800,24 +2834,24 @@ function fileSize( test )
 //
 //     ];
 //
-//   createTestResources( testChecks );
+//   context.createTestResources( testChecks );
 //
 //   function checkHardLink( link, src )
 //   {
 //     link = _.path.resolve( link );
 //     src = _.path.resolve( src );
 //     // var statLink = File.lstatSync( link ),
-//     var statLink = _.fileProvider.statResolvedRead({ filePath : link, resolvingSoftLink : 0 }),
+//     var statLink = provider.statResolvedRead({ filePath : link, resolvingSoftLink : 0 }),
 //       // statSource = File.lstatSync( src );
-//       statSource = _.fileProvider.statResolvedRead({ filePath : src, resolvingSoftLink : 0 })
+//       statSource = provider.statResolvedRead({ filePath : src, resolvingSoftLink : 0 })
 //
 //     if ( !statLink || !statSource ) return false; // both files should be exists
 //     if ( statSource.nlink !== 2 ) return false;
 //     if ( statLink.ino !== statSource.ino ) return false; // both names should be associated with same file on device.
 //
 //     // File.unlinkSync( link );
-//     _.fileProvider.fileDelete( link );
-//     statSource = _.fileProvider.statResolvedRead({ filePath : src, resolvingSoftLink : 0 });
+//     provider.fileDelete( link );
+//     statSource = provider.statResolvedRead({ filePath : src, resolvingSoftLink : 0 });
 //
 //     if ( statSource.nlink !== 1 ) return false;
 //
@@ -2829,17 +2863,17 @@ function fileSize( test )
 //   {
 //     // join several test aspects together
 //
-//     let file = Array.isArray( testCheck.path) ? mergePath( testCheck.path[0] ) : mergePath( testCheck.path ),
-//       link = mergePath( testCheck.link ),
+//     let file = Array.isArray( testCheck.path) ? context.mergePath( testCheck.path[0] ) : context.mergePath( testCheck.path ),
+//       link = context.mergePath( testCheck.link ),
 //       got = { result : false, isExists : false, ishard : false, err : false };
 //
 //     test.case = testCheck.name;
 //
 //     try
 //     {
-//       got.result = _.fileProvider.hardLink({ dstPath :  link, srcPath : file, sync : 1 });
+//       got.result = provider.hardLink({ dstPath :  link, srcPath : file, sync : 1 });
 //       // got.isExists = File.existsSync(  _.path.resolve( link ) );
-//       got.isExists = !!_.fileProvider.statResolvedRead(  _.path.resolve( link ) );
+//       got.isExists = !!provider.statResolvedRead(  _.path.resolve( link ) );
 //       got.ishard = checkHardLink( link, file );
 //     }
 //     catch( err )
@@ -2862,25 +2896,25 @@ function fileSize( test )
 //     test.case = 'missed arguments';
 //     test.shouldThrowErrorSync( function( )
 //     {
-//       _.fileProvider.hardLink( );
+//       provider.hardLink( );
 //     } );
 //
 //     test.case = 'extra arguments';
 //     test.shouldThrowErrorSync( function( )
 //     {
-//       _.fileProvider.hardLink( 'tmp.tmp/filesLink/identical1', 'tmp.tmp/filesLink/same_text.txt', 'tmp.tmp/filesLink/same_text.txt' );
+//       provider.hardLink( 'tmp.tmp/filesLink/identical1', 'tmp.tmp/filesLink/same_text.txt', 'tmp.tmp/filesLink/same_text.txt' );
 //     } );
 //
 //     test.case = 'argumetns is not string';
 //     test.shouldThrowErrorSync( function( )
 //     {
-//       _.fileProvider.hardLink( 34, {} );
+//       provider.hardLink( 34, {} );
 //     } );
 //
 //     test.case = 'passed unexpected property';
 //     test.shouldThrowErrorSync( function( )
 //     {
-//       _.fileProvider.hardLink( {
+//       provider.hardLink( {
 //         dstPath : 'tmp.tmp/fileHardlink/src1',
 //         srcPath : 'tmp.tmp/fileHardlink/hard_text.txt',
 //         dir : 'tmp.tmp/fileHardlink'
@@ -2894,6 +2928,9 @@ function fileSize( test )
 
 function filesLink( test )
 {
+  let context = this;
+  let provider = context.provider;
+
   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     textData2 = ' Aenean non feugiat mauris',
     bufferData1 = new U8x( [ 0x01, 0x02, 0x03, 0x04 ] ),
@@ -2943,25 +2980,25 @@ function filesLink( test )
 
     ];
 
-  createTestResources( testChecks );
+  context.createTestResources( testChecks );
 
   function checkHardLink( link, src )
   {
     link = _.path.resolve( link );
     src = _.path.resolve( src );
     // var statLink = File.lstatSync( link ),
-    var statLink = _.fileProvider.statResolvedRead({ filePath : link, resolvingSoftLink : 0 }),
+    var statLink = provider.statResolvedRead({ filePath : link, resolvingSoftLink : 0 }),
       // statSource = File.lstatSync( src );
-      statSource = _.fileProvider.statResolvedRead({ filePath : src, resolvingSoftLink : 0 })
+      statSource = provider.statResolvedRead({ filePath : src, resolvingSoftLink : 0 })
 
     if ( !statLink || !statSource ) return false; // both files should be exists
     if ( Number( statSource.nlink ) !== 2 ) return false;
     if ( statLink.ino !== statSource.ino ) return false; // both names should be associated with same file on device.
 
     // File.unlinkSync( link );
-    _.fileProvider.fileDelete( link );
+    provider.fileDelete( link );
     _.time.out( 100 ).deasync();
-    statSource = _.fileProvider.statResolvedRead({ filePath : src, resolvingSoftLink : 0 });
+    statSource = provider.statResolvedRead({ filePath : src, resolvingSoftLink : 0 });
 
     if ( Number( statSource.nlink ) !== 1 ) return false;
 
@@ -2973,17 +3010,17 @@ function filesLink( test )
   {
     // join several test aspects together
 
-    let file = Array.isArray( testCheck.path) ? mergePath( testCheck.path[0] ) : mergePath( testCheck.path ),
-      link = mergePath( testCheck.link ),
+    let file = Array.isArray( testCheck.path) ? context.mergePath( testCheck.path[0] ) : context.mergePath( testCheck.path ),
+      link = context.mergePath( testCheck.link ),
       got = { result : false, isExists : false, ishard : false, err : false };
 
     test.description = testCheck.name;
 
     try
     {
-      got.result = _.fileProvider.hardLink({ dstPath :  link, srcPath : file, sync : 1 });
+      got.result = provider.hardLink({ dstPath :  link, srcPath : file, sync : 1 });
       // got.isExists = File.existsSync(  _.path.resolve( link ) );
-      got.isExists = !!_.fileProvider.statResolvedRead(  _.path.resolve( link ) );
+      got.isExists = !!provider.statResolvedRead(  _.path.resolve( link ) );
       got.ishard = checkHardLink( link, file );
     }
     catch( err )
@@ -3006,25 +3043,25 @@ function filesLink( test )
     test.description = 'missed arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileProvider.hardLink( );
+      provider.hardLink( );
     } );
 
     test.description = 'extra arguments';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileProvider.hardLink( 'tmp.tmp/filesLink/identical1', 'tmp.tmp/filesLink/same_text.txt', 'tmp.tmp/filesLink/same_text.txt' );
+      provider.hardLink( 'tmp.tmp/filesLink/identical1', 'tmp.tmp/filesLink/same_text.txt', 'tmp.tmp/filesLink/same_text.txt' );
     } );
 
     test.description = 'argumetns is not string';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileProvider.hardLink( 34, {} );
+      provider.hardLink( 34, {} );
     } );
 
     test.description = 'passed unexpected property';
     test.shouldThrowErrorSync( function( )
     {
-      _.fileProvider.hardLink( {
+      provider.hardLink( {
         dstPath : 'tmp.tmp/fileHardlink/src1',
         srcPath : 'tmp.tmp/fileHardlink/hard_text.txt',
         dir : 'tmp.tmp/fileHardlink'
@@ -3038,6 +3075,9 @@ function filesLink( test )
 
 function filesAreUpToDate2( test )
 {
+  let context = this;
+  let provider = context.provider;
+
   /* file creation */
 
   var file1 = 'tmp.tmp/filesAreUpToDate/src/test1',
@@ -3045,34 +3085,34 @@ function filesAreUpToDate2( test )
       file3 = 'tmp.tmp/filesAreUpToDate/src/test3',
       file4 = 'tmp.tmp/filesAreUpToDate/dst/test4';
 
-  var delay = _.fileProvider.systemBitrateTimeGet() / 1000;
+  var delay = provider.systemBitrateTimeGet() / 1000;
 
-  createTestFile( file1, 'test1' );
+  context.createTestFile( file1, 'test1' );
   waitSync( delay );
-  createTestFile( file2, 'test2' );
+  context.createTestFile( file2, 'test2' );
   waitSync( delay );
-  createTestFile( file3, 'test3' );
+  context.createTestFile( file3, 'test3' );
   waitSync( delay );
-  createTestFile( file4, 'test4' );
+  context.createTestFile( file4, 'test4' );
 
-  file1 = mergePath( file1 );
-  file2 = mergePath( file2 );
-  file3 = mergePath( file3 );
-  file4 = mergePath( file4 );
+  file1 = context.mergePath( file1 );
+  file2 = context.mergePath( file2 );
+  file3 = context.mergePath( file3 );
+  file4 = context.mergePath( file4 );
 
-  file1 = _.fileProvider.path.nativize( file1 );
-  file2 = _.fileProvider.path.nativize( file2 );
-  file3 = _.fileProvider.path.nativize( file3 );
-  file4 = _.fileProvider.path.nativize( file4 );
+  file1 = provider.path.nativize( file1 );
+  file2 = provider.path.nativize( file2 );
+  file3 = provider.path.nativize( file3 );
+  file4 = provider.path.nativize( file4 );
 
   /* - */
 
   test.description = 'src files is up to date';
-  var got = _.fileProvider.filesAreUpToDate2( { src : file1, dst : file2 } );
+  var got = provider.filesAreUpToDate2( { src : file1, dst : file2 } );
   test.identical( got, true );
 
   var map = { src : [ file1, file2 ], dst : [ file3, file4 ] };
-  var got = _.fileProvider.filesAreUpToDate2( map );
+  var got = provider.filesAreUpToDate2( map );
   test.identical( got, true );
 
   test.description = 'src files is up to date, youngerThan';
@@ -3083,25 +3123,25 @@ function filesAreUpToDate2( test )
     youngerThan : new Date(),
     verbosity : 3
   };
-  var got = _.fileProvider.filesAreUpToDate2( map );
+  var got = provider.filesAreUpToDate2( map );
   test.identical( got, true );
 
 
   /* Dmytro : need help to write
   test.description = 'src files is up to date, verbosity';
   var map = { src : [ file1, file2 ], dst : [ file3, file4 ], verbosity : 4 };
-  var got = _.fileProvider.filesAreUpToDate2( map );
+  var got = provider.filesAreUpToDate2( map );
   test.identical( got, true );
   */
 
   /* - */
 
   test.description = 'src files is outdated';
-  var got = _.fileProvider.filesAreUpToDate2( { src : file2, dst : file1 } );
+  var got = provider.filesAreUpToDate2( { src : file2, dst : file1 } );
   test.identical( got, false );
 
   var map = { src : [ file3, file4 ], dst : [ file1, file2 ] };
-  var got = _.fileProvider.filesAreUpToDate2( map );
+  var got = provider.filesAreUpToDate2( map );
   test.identical( got, false );
 
   test.description = 'src files is up to date, youngerThan';
@@ -3112,7 +3152,7 @@ function filesAreUpToDate2( test )
     youngerThan : new Date( 2100, 7, 17),
     verbosity : 3
   };
-  var got = _.fileProvider.filesAreUpToDate2( map );
+  var got = provider.filesAreUpToDate2( map );
   test.identical( got, true );
 
   /* - */
@@ -3121,20 +3161,20 @@ function filesAreUpToDate2( test )
   return;
 
   test.case = 'without arguments';
-  test.shouldThrowErrorSync( () => _.fileProvider.filesAreUpToDate2() );
+  test.shouldThrowErrorSync( () => provider.filesAreUpToDate2() );
 
   test.case = 'extra arguments';
   var map = { src : file1, dst : file2 };
-  test.shouldThrowErrorSync( () => _.fileProvider.filesAreUpToDate2( map, map ) );
+  test.shouldThrowErrorSync( () => provider.filesAreUpToDate2( map, map ) );
 
   test.case = 'wrong arguments';
   var map = { src : file1, dst : file2 };
-  test.shouldThrowErrorSync( () => _.fileProvider.filesAreUpToDate2( 'str' ) );
-  test.shouldThrowErrorSync( () => _.fileProvider.filesAreUpToDate2( file1 ) );
+  test.shouldThrowErrorSync( () => provider.filesAreUpToDate2( 'str' ) );
+  test.shouldThrowErrorSync( () => provider.filesAreUpToDate2( file1 ) );
 
   test.case = 'o.newer settled, not a date';
   var map = { src : file1, dst : file2, newer : 1 };
-  test.shouldThrowErrorSync( () => _.fileProvider.filesAreUpToDate2( map ) );
+  test.shouldThrowErrorSync( () => provider.filesAreUpToDate2( map ) );
 
 
 //   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
@@ -3190,7 +3230,7 @@ function filesAreUpToDate2( test )
 //     var con = wConsequence( );
 //     setTimeout( function( )
 //     {
-//       createTestResources( fileLists );
+//       context.createTestResources( fileLists );
 //       console.log( '--> files created second' );
 //       con.take( );
 //     }, delay );
@@ -3206,7 +3246,7 @@ function filesAreUpToDate2( test )
 //       con.finally( () =>
 //       {
 //         console.log( 'tc : ' + tc.name );
-//         createTestResources( tc.createFirst );
+//         context.createTestResources( tc.createFirst );
 //         console.log( '--> files create first' );
 //         return null;
 //       })
@@ -3231,10 +3271,10 @@ function filesAreUpToDate2( test )
 //         test.description = tc.name;
 //         try
 //         {
-//           var got = _.fileProvider.filesAreUpToDate2
+//           var got = provider.filesAreUpToDate2
 //           ({
-//             src : tc.src.map( ( v ) => _.path.resolve( mergePath( v ) ) ),
-//             dst : tc.dst.map( ( v ) => _.path.resolve( mergePath( v ) ) )
+//             src : tc.src.map( ( v ) => _.path.resolve( context.mergePath( v ) ) ),
+//             dst : tc.dst.map( ( v ) => _.path.resolve( context.mergePath( v ) ) )
 //           });
 //         }
 //         catch( err )
@@ -3361,14 +3401,14 @@ function filesAreUpToDate2( test )
 //     ];
 
 
-//   createTestResources( testChecks );
+//   context.createTestResources( testChecks );
 
 //   // regular tests
 //   for( let testCheck of testChecks )
 //   {
 //     // join several test aspects together
 
-//     let path = mergePath( testCheck.path ),
+//     let path = context.mergePath( testCheck.path ),
 //       got = { list : void 0, err : void 0 };
 
 //     test.description = testCheck.name;
@@ -3426,6 +3466,21 @@ var Self =
   silencing : 1,
   enabled : 1,
 
+  onSuiteBegin,
+  onSuiteEnd,
+
+  context :
+  {
+    provider : _.FileProvider.HardDrive(),
+    suiteTempPath : null,
+
+    createTestFile,
+    createTestSymLink,
+    createTestHardLink,
+    createTestResources,
+    mergePath
+  },
+
   tests :
   {
     // from l1/FileRoutines.s
@@ -3463,14 +3518,12 @@ var Self =
 
     // testDelaySample,
 
-  },
+  }
 
 };
-
-createTestsDirectory( suiteTempPath, true ); /* qqq2 : remove and adjsut styles please */
 
 Self = wTestSuite( Self )
 if( typeof module !== 'undefined' && !module.parent )
 wTester.test( Self.name );
 
-} )( );
+})();

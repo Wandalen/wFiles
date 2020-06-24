@@ -1062,7 +1062,7 @@ function prefixesApply( o )
 
       if( _.mapIs( filter.basePath ) )
       {
-        _.mapDelete( filter.basePath ); // xxx : cover
+        _.mapDelete( filter.basePath );
         _.mapExtend( filter.basePath, basePath2 );
       }
       else
@@ -1391,7 +1391,7 @@ function prefixPathFromFilePath( o )
 prefixPathFromFilePath.defaults =
 {
   filePath : null,
-  usingBools : 1, /* xxx : default to false */
+  usingBools : 1, /* zzz : default to false */
 }
 
 //
@@ -1686,7 +1686,7 @@ function basePathMapFromString( o )
     for( let s = 0 ; s < o.filePath.length ; s++ )
     {
       let thisFilePath = o.filePath[ s ];
-      if( o.prefixingWithFilePath && path.isRelative( o.basePath ) ) // yyy xxx
+      if( o.prefixingWithFilePath && path.isRelative( o.basePath ) )
       basePath2[ thisFilePath ] = path.detrail( path.join( path.fromGlob( thisFilePath ), o.basePath ) );
       else
       basePath2[ thisFilePath ] = o.basePath;
@@ -1892,7 +1892,9 @@ function basePathSimplest( basePath )
   return basePath;
 }
 
-// xxx : remove maybe?
+//
+
+/* zzz : remove maybe? */
 
 function basePathDotUnwrap()
 {
@@ -1912,7 +1914,7 @@ function basePathDotUnwrap()
   return;
 
   debugger;
-  let filePath = filter.filePathArrayNonBoolGet(); // xxx : booleanFallingBack?
+  let filePath = filter.filePathArrayNonBoolGet(); /* zzz : booleanFallingBack? */
 
   let basePath = _.mapIs( filter.basePath ) ? filter.basePath : Object.create( null );
   delete basePath[ '.' ];
@@ -3052,7 +3054,7 @@ function filePathDstNormalizedGet( filePath )
   _.assert( filePath !== undefined );
   _.assert( arguments.length === 0 || arguments.length === 1 );
 
-  /* xxx : use non-inplace version */
+  /* zzz : use non-inplace version */
   let result = [];
   filePath = _.make( filePath );
   filePath = path.filterPairsInplace( filePath, ( it ) =>
@@ -3073,55 +3075,6 @@ function filePathDstNormalizedGet( filePath )
   return result;
 }
 
-// function filePathDstNormalizedGet( filePath )
-// {
-//   let filter = this;
-//   let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-//   let path = fileProvider.path;
-//
-//   if( filePath === undefined )
-//   filePath = filter.filePath;
-//
-//   filePath = filter.filePathDstArrayGet();
-//
-//   _.assert( _.arrayIs( filePath ) );
-//   _.assert( arguments.length === 0 || arguments.length === 1 );
-//
-//   filePath = _.filter( filePath, ( p ) =>
-//   {
-//     if( _.arrayIs( p ) )
-//     {
-//       return _.unrollFrom( p );
-//     }
-//     return p;
-//   });
-//
-//   filePath = _.filter( filePath, ( p ) =>
-//   {
-//     if( _.strIs( p ) )
-//     return p;
-//
-//     if( p === null )
-//     {
-//       if( !!p )
-//       return filter.prefixPath || filter.basePathForStemPath( p ) || undefined;
-//       return;
-//     }
-//
-//     if( _.boolLike( p ) )
-//     return;
-//
-//     return p;
-//   });
-//
-//   filePath = _.arrayAppendArrayOnce( [], filePath );
-//
-//   if( filter.prefixPath || filter.postfixPath )
-//   filePath = path.s.join( filter.prefixPath || '.', filePath, filter.postfixPath || '.' );
-//
-//   return filePath;
-// }
-
 //
 
 function filePathSrcNormalizedGet( filePath )
@@ -3137,7 +3090,7 @@ function filePathSrcNormalizedGet( filePath )
   _.assert( filePath !== undefined );
   _.assert( arguments.length === 0 || arguments.length === 1 );
 
-  /* xxx : use non-inplace version */
+  /* zzz : use non-inplace version */
   let result = [];
   filePath = _.make( filePath );
   filePath = path.filterPairsInplace( filePath, ( it ) =>
@@ -3155,73 +3108,6 @@ function filePathSrcNormalizedGet( filePath )
 
   return result
 }
-
-//
-// //
-//
-// function filePathSrcNormalizedGet( filePath )
-// {
-//   let filter = this;
-//   let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-//   let path = fileProvider.path;
-//
-//   if( filePath === undefined )
-//   filePath = filter.filePath;
-//
-//   // filePath = filter.filePathSrcArrayGet();
-//
-//   // _.assert( _.arrayIs( filePath ) );
-//   _.assert( filePath !== undefined );
-//   _.assert( arguments.length === 0 || arguments.length === 1 );
-//
-//   // filePath = _.filter( filePath, ( p ) =>
-//   // {
-//   //   if( _.arrayIs( p ) )
-//   //   {
-//   //     debugger;
-//   //     _.assert( 0, 'not tested' );
-//   //     return _.unrollFrom( p );
-//   //   }
-//   //   return p;
-//   // });
-//
-//   // filePath = _.filter( filePath, ( p ) =>
-//   // {
-//   //   if( _.strIs( p ) )
-//   //   return p;
-//   //
-//   //   if( p === null )
-//   //   {
-//   //     if( !!p )
-//   //     return filter.prefixPath || undefined;
-//   //     return;
-//   //   }
-//   //
-//   //   if( _.boolLike( p ) )
-//   //   return;
-//   //
-//   //   return p;
-//   // });
-//
-//   /* xxx : use non-inplace version */
-//   let result = [];
-//   filePath = _.make( filePath );
-//   filePath = path.filterPairsInplace( filePath, ( it ) =>
-//   {
-//     if( _.boolLike( it.dst ) )
-//     return;
-//     _.assert( _.strIs( it.src ) );
-//     result.push( it.src );
-//   });
-//
-//   result = _.longOnce( result );
-//   // filePath = _.arrayAppendArrayOnce( [], filePath );
-//
-//   if( filter.prefixPath || filter.postfixPath )
-//   result = path.s.join( filter.prefixPath || '.', result, filter.postfixPath || '.' );
-//
-//   return result
-// }
 
 //
 
@@ -4006,27 +3892,13 @@ function hasAnyPath()
   if( _.any( filter.postfixPath, ( e ) => _.strIs( e ) && e ) )
   return true;
 
-  // let filePath = filter.filePathArrayGet();
   let filePath = filter.filePathArrayNonBoolGet();
 
   if( filePath.length === 1 )
-  if( filePath[ 0 ] === '' || filePath[ 0 ] === null ) // xxx
+  if( filePath[ 0 ] === '' || filePath[ 0 ] === null )
   {
     return false;
   }
-
-  // if( filePath.length === 1 )
-  // if( filePath[ 0 ] === '.' || filePath[ 0 ] === '' || filePath[ 0 ] === null ) // xxx
-  // {
-  //   /*
-  //   exception for dst filter
-  //   actually, exception for src filter
-  //   */
-  //   if( filter.src )
-  //   if( filePath[ 0 ] === '.' ) // xxx
-  //   return true;
-  //   return false;
-  // }
 
   if( filePath.length )
   return true;
@@ -4599,12 +4471,6 @@ let Extend =
   And,
   and,
 
-  // _pathsJoin, /* xxx : deprecate maybe? */
-  // pathsJoin, /* xxx : deprecate maybe? */
-  // pathsJoinWithoutNull, /* xxx : deprecate maybe? */
-  // pathsSupplementJoining, /* xxx : deprecate maybe? */
-  // pathsSupplementJoining : pathsSupplementJoining,
-
   _pathsAmmend,
 
   pathsExtend,
@@ -4671,9 +4537,9 @@ let Extend =
   filePathSrcArrayBoolGet,
   filePathArrayBoolGet,
 
-  filePathDstNormalizedGet, /* xxx : remove maybe? */
-  filePathSrcNormalizedGet, /* xxx : remove maybe? */
-  filePathNormalizedGet, /* xxx : remove maybe? */
+  filePathDstNormalizedGet, /* zzz : remove maybe? */
+  filePathSrcNormalizedGet, /* zzz : remove maybe? */
+  filePathNormalizedGet, /* zzz : remove maybe? */
 
   filePathCommon,
   filePathDstCommon,

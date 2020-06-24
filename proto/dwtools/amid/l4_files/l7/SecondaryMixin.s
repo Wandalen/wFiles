@@ -39,225 +39,208 @@ Self.shortName = 'Secondary';
 // files read
 // --
 
-function filesReadOld( o )
-{
-  let self = this;
-
-  /* options */
-
-  if( _.arrayIs( o ) )
-  o = { paths : o };
-
-  if( o.preset )
-  {
-    _.assert( _.objectIs( filesReadOld.presets[ o.preset ] ), 'unknown preset', o.preset );
-    _.mapSupplementAppending( o, filesReadOld.presets[ o.preset ] );
-  }
-
-  _.routineOptions( filesReadOld, o );
-  _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.arrayIs( o.paths ) || _.objectIs( o.paths ) || _.strIs( o.paths ) );
-
-  o.onBegin = o.onBegin ? _.arrayAs( o.onBegin ) : [];
-  o.onEnd = o.onEnd ? _.arrayAs( o.onEnd ) : [];
-  o.onProgress = o.onProgress ? _.arrayAs( o.onProgress ) : [];
-
-  let onBegin = o.onBegin;
-  let onEnd = o.onEnd;
-  let onProgress = o.onProgress;
-
-  delete o.onBegin;
-  delete o.onEnd;
-  delete o.onProgress;
-
-  if( Config.debug )
-  {
-    for( let i = 0 ; i < onBegin.length ; i++ )
-    _.assert( onBegin[ i ].length === 1 );
-    for( let i = 0 ; i < onEnd.length ; i++ )
-    _.assert( onEnd[ i ].length === 1 );
-    for( let i = 0 ; i < onProgress.length ; i++ )
-    _.assert( onProgress[ i ].length === 1 );
-  }
-
-  /* paths */
-
-  if( _.objectIs( o.paths ) )
-  {
-    let _paths = [];
-    for( let p in o.paths )
-    _paths.push({ filePath : o.paths[ p ], name : p });
-    o.paths = _paths;
-  }
-
-  o.paths = _.arrayAs( o.paths );
-
-  /* result */
-
-  let result = Object.create( null );
-  result.options = o;
-
-  /* */
-
-  o._filesReadOldEnd = _filesReadOldEnd;
-  o._optionsForFileRead = _optionsForFileRead;
-
-  /* begin */
-
-  _filesReadOldBegin();
-
-  if( o.sync )
-  {
-    return self._filesReadOldSync( o );
-  }
-  else
-  {
-    return self._filesReadOldAsync( o );
-  }
-
-  /* - */
-
-  function _optionsForFileRead( src )
-  {
-    let readOptions = _.mapOnly( o, self.fileRead.defaults );
-    readOptions.onEnd = o.onEach;
-
-    if( _.objectIs( src ) )
-    {
-      if( _.FileRecord && src instanceof _.FileRecord )
-      readOptions.filePath = src.absolute;
-      else
-      _.mapExtend( readOptions, _.mapOnly( src, self.fileRead.defaults ) );
-    }
-    else
-    readOptions.filePath = src;
-
-    // if( o.sync )
-    // readOptions.returnRead = true;
-
-    return readOptions;
-  }
-
-  /* */
-
-  function _filesReadOldBegin()
-  {
-    if( !onBegin.length )
-    return;
-    debugger;
-    _.routinesCall( self, onBegin, [ result ] );
-  }
-
-  /* */
-
-  function _filesReadOldEnd( errs, got )
-  {
-    let err;
-    let errsArray = [];
-
-    for( let k in errs )
-    errsArray.push( errs[ k ] );
-
-    if( errsArray.length )
-    {
-      errs.total = errsArray.length;
-      err = _.err.apply( _, errsArray );
-    }
-
-    let read = got;
-    // if( !o.returningRead )
-    // debugger;
-    if( !o.returningRead )
-    read = _.entityMap( got, ( e ) => e.result );
-
-    if( o.map === 'name' )
-    {
-
-      // let read2 = Object.create( null );
-      // for( let p = 0 ; p < o.paths.length ; p++ )
-      // read2[ o.paths[ p ].name ] = read[ p ];
-      // read = read2;
-
-      // let got2 = Object.create( null );
-      // for( let p = 0 ; p < o.paths.length ; p++ )
-      // got2[ o.paths[ p ].name ] = got[ p ];
-      // got = got2;
-
-      let read2 = Object.create( null );
-      let got2 = Object.create( null );
-
-      for( let p = 0 ; p < o.paths.length ; p++ )
-      {
-        let path = o.paths[ p ];
-        let name;
-
-        if( _.strIs( path ) )
-        {
-          name = self.path.name( path );
-        }
-        else if( _.objectIs( path ) )
-        {
-          _.assert( _.strIs( path.name ) )
-          name = path.name;
-        }
-        else
-        _.assert( 0, 'unknown type of path', _.strType( path ) );
-
-        read2[ name ] = read[ p ];
-        got2[ name ] = got[ p ];
-      }
-
-      read = read2;
-      got = got2;
-
-    }
-    else if( o.map )
-    _.assert( 0, 'unknown map : ' + o.map );
-
-    // debugger;
-
-    result.read = read;
-    result.data = read;
-    result.got = got;
-    result.errs = errs;
-    result.err = err;
-
-    if( onEnd.length )
-    {
-      _.routinesCall( self, onEnd, [ result ] );
-    }
-
-    return result;
-  }
-
-}
-
-filesReadOld.defaults =
-{
-  paths : null,
-  onEach : null,
-  map : '',
-  sync : 1,
-  preset : null,
-}
-
-filesReadOld.defaults.__proto__ = fileRead.defaults;
-
-filesReadOld.presets = Object.create( null );
-
-filesReadOld.presets.js =
-{
-  onEnd : function format( o )
-  {
-    let prefix = '// ======================================\n( function() {\n';
-    let postfix = '\n})();\n';
-    _.assert( _.arrayIs( o.data ) );
-    if( o.data.length > 1 )
-    o.data = prefix + o.data.join( postfix + prefix ) + postfix;
-    else
-    o.data = o.data[ 0 ];
-  }
-}
+// function filesReadOld( o )
+// {
+//   let self = this;
+//
+//   /* options */
+//
+//   if( _.arrayIs( o ) )
+//   o = { paths : o };
+//
+//   if( o.preset )
+//   {
+//     _.assert( _.objectIs( filesReadOld.presets[ o.preset ] ), 'unknown preset', o.preset );
+//     _.mapSupplementAppending( o, filesReadOld.presets[ o.preset ] );
+//   }
+//
+//   _.routineOptions( filesReadOld, o );
+//   _.assert( arguments.length === 1, 'Expects single argument' );
+//   _.assert( _.arrayIs( o.paths ) || _.objectIs( o.paths ) || _.strIs( o.paths ) );
+//
+//   o.onBegin = o.onBegin ? _.arrayAs( o.onBegin ) : [];
+//   o.onEnd = o.onEnd ? _.arrayAs( o.onEnd ) : [];
+//   o.onProgress = o.onProgress ? _.arrayAs( o.onProgress ) : [];
+//
+//   let onBegin = o.onBegin;
+//   let onEnd = o.onEnd;
+//   let onProgress = o.onProgress;
+//
+//   delete o.onBegin;
+//   delete o.onEnd;
+//   delete o.onProgress;
+//
+//   if( Config.debug )
+//   {
+//     for( let i = 0 ; i < onBegin.length ; i++ )
+//     _.assert( onBegin[ i ].length === 1 );
+//     for( let i = 0 ; i < onEnd.length ; i++ )
+//     _.assert( onEnd[ i ].length === 1 );
+//     for( let i = 0 ; i < onProgress.length ; i++ )
+//     _.assert( onProgress[ i ].length === 1 );
+//   }
+//
+//   /* paths */
+//
+//   if( _.objectIs( o.paths ) )
+//   {
+//     let _paths = [];
+//     for( let p in o.paths )
+//     _paths.push({ filePath : o.paths[ p ], name : p });
+//     o.paths = _paths;
+//   }
+//
+//   o.paths = _.arrayAs( o.paths );
+//
+//   /* result */
+//
+//   let result = Object.create( null );
+//   result.options = o;
+//
+//   /* */
+//
+//   o._filesReadOldEnd = _filesReadOldEnd;
+//   o._optionsForFileRead = _optionsForFileRead;
+//
+//   /* begin */
+//
+//   _filesReadOldBegin();
+//
+//   if( o.sync )
+//   {
+//     return self._filesReadOldSync( o );
+//   }
+//   else
+//   {
+//     return self._filesReadOldAsync( o );
+//   }
+//
+//   /* - */
+//
+//   function _optionsForFileRead( src )
+//   {
+//     let readOptions = _.mapOnly( o, self.fileRead.defaults );
+//     readOptions.onEnd = o.onEach;
+//
+//     if( _.objectIs( src ) )
+//     {
+//       if( _.FileRecord && src instanceof _.FileRecord )
+//       readOptions.filePath = src.absolute;
+//       else
+//       _.mapExtend( readOptions, _.mapOnly( src, self.fileRead.defaults ) );
+//     }
+//     else
+//     readOptions.filePath = src;
+//
+//     return readOptions;
+//   }
+//
+//   /* */
+//
+//   function _filesReadOldBegin()
+//   {
+//     if( !onBegin.length )
+//     return;
+//     debugger;
+//     _.routinesCall( self, onBegin, [ result ] );
+//   }
+//
+//   /* */
+//
+//   function _filesReadOldEnd( errs, got )
+//   {
+//     let err;
+//     let errsArray = [];
+//
+//     for( let k in errs )
+//     errsArray.push( errs[ k ] );
+//
+//     if( errsArray.length )
+//     {
+//       errs.total = errsArray.length;
+//       err = _.err.apply( _, errsArray );
+//     }
+//
+//     let read = got;
+//     if( !o.returningRead )
+//     read = _.entityMap( got, ( e ) => e.result );
+//
+//     if( o.map === 'name' )
+//     {
+//
+//       let read2 = Object.create( null );
+//       let got2 = Object.create( null );
+//
+//       for( let p = 0 ; p < o.paths.length ; p++ )
+//       {
+//         let path = o.paths[ p ];
+//         let name;
+//
+//         if( _.strIs( path ) )
+//         {
+//           name = self.path.name( path );
+//         }
+//         else if( _.objectIs( path ) )
+//         {
+//           _.assert( _.strIs( path.name ) )
+//           name = path.name;
+//         }
+//         else
+//         _.assert( 0, 'unknown type of path', _.strType( path ) );
+//
+//         read2[ name ] = read[ p ];
+//         got2[ name ] = got[ p ];
+//       }
+//
+//       read = read2;
+//       got = got2;
+//
+//     }
+//     else if( o.map )
+//     _.assert( 0, 'unknown map : ' + o.map );
+//
+//     result.read = read;
+//     result.data = read;
+//     result.got = got;
+//     result.errs = errs;
+//     result.err = err;
+//
+//     if( onEnd.length )
+//     {
+//       _.routinesCall( self, onEnd, [ result ] );
+//     }
+//
+//     return result;
+//   }
+//
+// }
+//
+// filesReadOld.defaults =
+// {
+//   paths : null,
+//   onEach : null,
+//   map : '',
+//   sync : 1,
+//   preset : null,
+// }
+//
+// filesReadOld.defaults.__proto__ = fileRead.defaults;
+//
+// filesReadOld.presets = Object.create( null );
+//
+// filesReadOld.presets.js =
+// {
+//   onEnd : function format( o )
+//   {
+//     let prefix = '// ======================================\n( function() {\n';
+//     let postfix = '\n})();\n';
+//     _.assert( _.arrayIs( o.data ) );
+//     if( o.data.length > 1 )
+//     o.data = prefix + o.data.join( postfix + prefix ) + postfix;
+//     else
+//     o.data = o.data[ 0 ];
+//   }
+// }
 
 //
 
@@ -797,7 +780,7 @@ defaults.determiningLineNumber = 1;
 //
 // //
 //
-// function _configRead2( o ) /* xxx : remove? */
+// function _configRead2( o ) /* zzz : remove? */
 // {
 //   let self = this;
 //   let read;
@@ -1104,6 +1087,31 @@ configRead.having.aspect = 'entry';
 
 //
 
+function configUserPath( o )
+{
+  let self = this;
+  let path = self.path;
+
+  if( !_.mapIs( o ) )
+  o = { name : o }
+
+  o = _.routineOptions( configUserPath, o );
+  _.assert( _.strDefined( o.name ) );
+
+  let userPath = path.dirUserHome();
+  let filePath = path.join( userPath, o.dirPath, o.name );
+
+  return filePath;
+}
+
+configUserPath.defaults =
+{
+  dirPath : '.',
+  name : '.wenv.yml',
+}
+
+//
+
 function configUserRead( o )
 {
   let self = this;
@@ -1113,10 +1121,8 @@ function configUserRead( o )
   o = { name : o }
 
   o = _.routineOptions( configUserRead, o );
-  _.assert( _.strDefined( o.name ) );
 
-  let userPath = path.dirUserHome();
-  let filePath = path.join( userPath, o.dirPath, o.name );
+  let filePath = self.configUserPath( o );
 
   return self.configRead
   ({
@@ -1128,8 +1134,7 @@ function configUserRead( o )
 
 configUserRead.defaults =
 {
-  dirPath : '.',
-  name : '.wenv.yml',
+  ... configUserPath.defaults,
 }
 
 //
@@ -1142,26 +1147,25 @@ function configUserWrite( o )
   if( !_.mapIs( o ) )
   o = { name : arguments[ 0 ], structure : arguments[ 1 ] }
   o = _.routineOptions( configUserWrite, o );
-  _.assert( _.strDefined( o.name ) );
   _.assert( o.structure !== null );
 
-  let userPath = path.dirUserHome();
-  let filePath = path.join( userPath, o.dirPath, o.name );
+  let filePath = self.configUserPath( _.mapBut( o, [ 'structure' ] ) );
 
+  /* qqq : cover option encoding of method fileWrite */
+  /* qqq : cover encoding : _.unknown of method fileWrite */
   return self.fileWrite
   ({
     filePath,
     data : o.structure,
-    encoding : _.unknown, /* qqq2 : cover option encoding of method fileWrite */
+    encoding : _.unknown,
   });
 
 }
 
 configUserWrite.defaults =
 {
-  dirPath : '.',
+  ... configUserPath.defaults,
   structure : null,
-  name : '.wenv.yml',
 }
 
 //
@@ -1287,9 +1291,9 @@ let Supplement =
 
   // files read
 
-  filesReadOld,
-  _filesReadOldAsync,
-  _filesReadOldSync,
+  // filesReadOld,
+  // _filesReadOldAsync,
+  // _filesReadOldSync,
 
   // etc
 
@@ -1308,6 +1312,7 @@ let Supplement =
   configFind,
   configRead,
 
+  configUserPath, /* qqq : cover */
   configUserRead, /* qqq : cover */
   configUserWrite, /* qqq : cover */
 
@@ -1334,7 +1339,6 @@ _.classDeclare
 
 _.FileProvider = _.FileProvider || Object.create( null );
 _.FileProvider[ Self.shortName ] = Self;
-
 _.FileProvider.Secondary.mixin( Partial );
 
 _.assert( !!_.FileProvider.Partial.prototype.configUserRead );

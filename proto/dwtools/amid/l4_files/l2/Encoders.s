@@ -101,35 +101,17 @@ let readBufferBytes =
 // declare
 // --
 
-// let ReadEncoders =
-// {
-//
-//   // 'js.smart' : readJsSmart,
-//   // 'js.node' : readJsNode,
-//   // 'buffer.bytes' : readBufferBytes,
-//
-// }
-//
-// let WriteEncoders =
-// {
-// }
-
 _.files.ReadEncoders = _.files.ReadEncoders || Object.create( null );
 _.files.WriteEncoders = _.files.WriteEncoders || Object.create( null );
 
-// Object.assign( _.files.ReadEncoders, ReadEncoders );
-// Object.assign( _.files.WriteEncoders, WriteEncoders );
-
-_.files.encoderRegister( readJsSmart );
-_.files.encoderRegister( readJsNode );
-_.files.encoderRegister( readBufferBytes );
-_.files.encodersFromGdfs(); /* xxx2 : review and probably remove! */
+_.files.encoder.register( readJsSmart );
+_.files.encoder.register( readJsNode );
+_.files.encoder.register( readBufferBytes );
+_.files.encoder.fromGdfs(); /* xxx2 : review and probably remove! */
 
 // --
 // export
 // --
-
-/* xxx : clean */
 
 if( typeof module !== 'undefined' )
 module[ 'exports' ] = Self;

@@ -45,13 +45,24 @@ function onSuiteBegin( test )
   context.system = _.FileProvider.System({ providers : [ context.provider ] });
   context.system.defaultProvider = context.provider;
 
-  let path = context.provider.path;
-  context.suiteTempPath = path.pathDirTempOpen( path.join( __dirname, '../..'  ),'HardDrive' );
-  context.suiteTempPath = context.provider.pathResolveLinkFull({ filePath : context.suiteTempPath, resolvingSoftLink : 1 }); /* xxx */
+  context.suiteTempPath = context.provider.path.pathDirTempOpen( context.provider.path.join( __dirname, '../..'  ),'HardDrive' ); /* xxx */
+  context.suiteTempPath = context.provider.pathResolveLinkFull({ filePath : context.suiteTempPath, resolvingSoftLink : 1 }); /* zzz */
   context.suiteTempPath = context.suiteTempPath.absolutePath;
   context.globalFromPreferred = function globalFromPreferred( path ){ return path };
   // let path = this.provider.path;
   // this.suiteTempPath = path.pathDirTempOpen( path.join( __dirname, '../..'  ), 'Provider/HardDrive' );
+}
+
+//
+
+function providerMake()
+{
+  let context = this;
+  let provider = _.FileProvider.HardDrive({ protocols : [ 'current', 'second' ] });
+  let system = _.FileProvider.System({ providers : [ provider ] });
+  // system.defaultProvider = provider;
+  _.assert( system.defaultProvider === null );
+  return provider;
 }
 
 // --
@@ -73,6 +84,7 @@ var Proto =
 
   context :
   {
+    providerMake,
     provider : _.FileProvider.HardDrive(),
     // onSuiteBegin,
     suiteTempPath : null,

@@ -26,8 +26,7 @@ function onSuiteBegin( test )
   context.system = _.FileProvider.System({ providers : [ context.provider ] });
   context.system.defaultProvider = context.provider;
 
-  let path = context.provider.path;
-  context.suiteTempPath = path.pathDirTempOpen( 'FilesFind' );
+  context.suiteTempPath = context.provider.path.pathDirTempOpen( 'FilesFind' );
   context.globalFromPreferred = function globalFromPreferred( path ){ return path };
 
 }
@@ -47,7 +46,22 @@ function onSuiteEnd()
 function pathFor( filePath )
 {
   let self = this;
-  return self.provider.path.normalize('/' + filePath );
+  return self.provider.path.normalize( '/' + filePath );
+}
+
+//
+
+function providerMake()
+{
+  let context = this;
+
+  let provider = _.FileProvider.Extract({ protocols : [ 'current', 'second' ] });
+  let system = _.FileProvider.System({ providers : [ provider ] });
+
+  _.assert( system.defaultProvider === null );
+  // system.defaultProvider = provider;
+
+  return provider;
 }
 
 // --
@@ -80,8 +94,8 @@ function copy( test )
   test.is( op.filesTree === extract1.filesTree );
   test.is( extract1.filesTree === extract2.filesTree );
 
-  /* xxx qqq !!! fix that ? */
-
+  // /* zzz : fix that */
+  //
   // test.case = 'from another instance with constructor';
   //
   // var op = { filesTree : {} }
@@ -128,10 +142,12 @@ var Proto =
 
   context :
   {
+    pathFor,
+    providerMake,
+
     // filesTree,
     provider : _.FileProvider.Extract( { usingExtraStat : 1 } ),
     globalFromPreferred : null,
-    pathFor,
     testFile : '/file1'
   },
 

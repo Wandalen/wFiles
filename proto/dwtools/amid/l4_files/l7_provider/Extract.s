@@ -318,9 +318,6 @@ function fileReadAct( o )
 
   handleBegin();
 
-  // if( _.strHas( o.filePath, 'icons.woff2' ) )
-  // debugger;
-
   o.filePath = self.pathResolveLinkFull
   ({
     filePath : o.filePath,
@@ -336,22 +333,10 @@ function fileReadAct( o )
 
   result = self._descriptorRead( o.filePath );
 
-  // if( self._descriptorIsLink( result ) )
-  // {
-  //   result = self._descriptorResolve({ descriptor : result });
-  //   if( result === undefined )
-  //   return handleError( _.err( 'Cant resolve :', result ) );
-  // }
-
   if( self._descriptorIsHardLink( result ) )
   {
     result = result[ 0 ].data;
     _.assert( result !== undefined );
-    // debugger; xxx
-    // let resolved = self._descriptorResolve({ descriptor : result });
-    // if( resolved === undefined )
-    // return handleError( _.err( 'Cant resolve :', result ) );
-    // result = resolved;
   }
 
   if( result === undefined || result === null )
@@ -882,10 +867,6 @@ function _fileTimeSetAct( o )
 {
   let self = this;
 
-/* qqq xxx : implement for hardlinks
-
-*/
-
   if( !self.usingExtraStat )
   return;
 
@@ -1371,10 +1352,6 @@ function fileCopyAct( o )
 
     _.assert( self.isTerminal( o.srcPath ), () => _.strQuote( o.srcPath ), 'is not terminal' );
 
-    if( dstStat )
-    if( o.breakingDstHardLink && dstStat.isHardLink() )
-    self.hardLinkBreak({ filePath : o.dstPath, sync : 1 });
-
     /* qqq : ? aaa : redundant, just copy the descriptor instead of this */
     // if( self.isSoftLink( o.srcPath ) )
     // {
@@ -1433,11 +1410,7 @@ function fileCopyAct( o )
     .then( ( got ) =>
     {
       dstStat = got;
-
-      if( dstStat )
-      if( o.breakingDstHardLink && dstStat.isHardLink() )
-      return self.hardLinkBreak({ filePath : o.dstPath, sync : 0 });
-      return true;
+      return null;
     })
     .then( () =>
     {
@@ -1858,49 +1831,48 @@ function statsAdopt()
 
 //
 
-function linksRebase( o )
-{
-  let self = this;
-
-  _.routineOptions( linksRebase, o );
-  _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( 0, 'not tested' );
-
-  function onUp( file )
-  {
-    let descriptor = self._descriptorRead( file.absolute );
-
-    xxx
-    if( self._descriptorIsHardLink( descriptor ) )
-    {
-      debugger;
-      descriptor = descriptor[ 0 ];
-      let was = descriptor.hardLink;
-      let url = _.uri.parseAtomic( descriptor.hardLink ); debugger; xxx
-      url.longPath = self.path.rebase( url.longPath, o.oldPath, o.newPath );
-      descriptor.hardLink = _.uri.str( url );
-      logger.log( '* linksRebase :', descriptor.hardLink, '<-', was );
-      debugger;
-    }
-
-    return file;
-  }
-
-  self.filesFind
-  ({
-    filePath : o.filePath,
-    recursive : 2,
-    onUp : onUp,
-  });
-
-}
-
-linksRebase.defaults =
-{
-  filePath : '/',
-  oldPath : '',
-  newPath : '',
-}
+// function linksRebase( o )
+// {
+//   let self = this;
+//
+//   _.routineOptions( linksRebase, o );
+//   _.assert( arguments.length === 1, 'Expects single argument' );
+//   _.assert( 0, 'not tested' );
+//
+//   self.filesFind
+//   ({
+//     filePath : o.filePath,
+//     recursive : 2,
+//     onUp : onUp,
+//   });
+//
+//   function onUp( file )
+//   {
+//     let descriptor = self._descriptorRead( file.absolute );
+//
+//     if( self._descriptorIsHardLink( descriptor ) )
+//     {
+//       debugger;
+//       descriptor = descriptor[ 0 ];
+//       let was = descriptor.hardLink;
+//       let url = _.uri.parseAtomic( descriptor.hardLink );
+//       url.longPath = self.path.rebase( url.longPath, o.oldPath, o.newPath );
+//       descriptor.hardLink = _.uri.str( url );
+//       logger.log( '* linksRebase :', descriptor.hardLink, '<-', was );
+//       debugger;
+//     }
+//
+//     return file;
+//   }
+//
+// }
+//
+// linksRebase.defaults =
+// {
+//   filePath : '/',
+//   oldPath : '',
+//   newPath : '',
+// }
 
 // --
 //
@@ -1915,7 +1887,7 @@ function _pathResolveIntermediateDirs( filePath )
   _.assert( self.path.isAbsolute( filePath ) );
   _.assert( self.path.isNormalized( filePath ) );
 
-  if( _.strCount( filePath, self.path._upStr ) > 1 )
+  if( _.strCount( filePath, self.path.upToken ) > 1 )
   {
     let fileName = self.path.name({ path : filePath, full : 1 });
     filePath = self.pathResolveSoftLinkAct
@@ -2283,6 +2255,7 @@ function _descriptorIsScript( file )
     _.assert( file.length === 1 );
     file = file[ 0 ];
   }
+
   _.assert( !!file );
   return !!file.code;
 }
@@ -2393,37 +2366,37 @@ function _descriptorTimeUpdate( filePath, created )
   {
     o2.atime = time;
     o2.birthtime = time;
-    o2.updatingDir = 1; xxx
+    o2.updatingDir = 1;
   }
 
   self._fileTimeSetAct( o2 );
 }
 
+// //
 //
-
-function _descriptorScriptMake( filePath, data )
-{
-
-  if( _.strIs( data ) )
-  try
-  {
-    data = _.routineMake({ code : data, prependingReturn : 0 });
-  }
-  catch( err )
-  {
-    debugger;
-    throw _.err( 'Cant make routine for file :\n' + filePath + '\n', err );
-  }
-
-  _.assert( _.routineIs( data ) );
-  _.assert( arguments.length === 2, 'Expects exactly two arguments' );
-
-  let d = Object.create( null );
-  d.filePath = filePath;
-  d.code = data;
-  // d.ino = ++Self.InoCounter;
-  return [ d ];
-}
+// function _descriptorScriptMake( filePath, data )
+// {
+//
+//   if( _.strIs( data ) )
+//   try
+//   {
+//     data = _.routineMake({ code : data, prependingReturn : 0 });
+//   }
+//   catch( err )
+//   {
+//     debugger;
+//     throw _.err( 'Cant make routine for file :\n' + filePath + '\n', err );
+//   }
+//
+//   _.assert( _.routineIs( data ) );
+//   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
+//
+//   let d = Object.create( null );
+//   d.filePath = filePath;
+//   d.code = data;
+//   // d.ino = ++Self.InoCounter;
+//   return [ d ];
+// }
 
 //
 
@@ -2649,7 +2622,7 @@ writeEncoders[ 'original.type' ] =
 
 let Composes =
 {
-  usingExtraStat : null,
+  usingExtraStat : null, /* add test suite for this provider and usingExtraStat : 1 */
   protocols : _.define.own( [] ),
   _currentPath : '/',
   safe : 0,
@@ -2685,7 +2658,7 @@ let Statics =
   _descriptorIsHardLink,
   _descriptorIsTextLink,
 
-  _descriptorScriptMake,
+  // _descriptorScriptMake, /* zzz : deprecate */
   _descriptorSoftLinkMake,
   _descriptorHardLinkMake,
 
@@ -2750,7 +2723,7 @@ let Extension =
 
   filesTreeSet,
   statsAdopt,
-  linksRebase,
+  // linksRebase,
 
   //
 
@@ -2782,7 +2755,7 @@ let Extension =
 
   _descriptorTimeUpdate,
 
-  _descriptorScriptMake,
+  // _descriptorScriptMake,
   _descriptorSoftLinkMake,
   _descriptorHardLinkMake,
 

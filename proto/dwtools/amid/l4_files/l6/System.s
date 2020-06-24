@@ -150,7 +150,7 @@ function providersRegister( src )
  @module Tools/mid/Files
 */
 
-function providerRegister( fileProvider ) // xxx
+function providerRegister( fileProvider )
 {
   let self = this;
 
@@ -485,7 +485,7 @@ function pathNativizeAct( filePath )
   let self = this;
   let r = self._pathLocalize( self, filePath );
   r.localPath = r.provider.path.nativize( r.localPath );
-  _.assert( 0, 'not implemented' ); xxx
+  _.assert( 0, 'not implemented' );
   _.assert( _.objectIs( r.provider ), 'No provider for path', filePath );
   _.assert( arguments.length === 1 );
 }

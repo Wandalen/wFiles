@@ -207,7 +207,8 @@ function trivial( test )
   test.identical( gotActions, expActions );
   test.identical( gotPreserve, expPreserve );
 
-  debugger; return; xxx
+  // debugger; return; xxx
+  debugger;
 
   /* - */
 

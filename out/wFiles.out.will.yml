@@ -188,65 +188,6 @@ module:
           - ../proto/dwtools/Tools.s
           - ../proto/dwtools/abase
           - ../proto/dwtools/amid
-          - ../proto/dwtools/amid/-files
-          - ../proto/dwtools/amid/-files/UseBase.s
-          - ../proto/dwtools/amid/-files/UseMid.s
-          - ../proto/dwtools/amid/-files/UseTop.s
-          - ../proto/dwtools/amid/-files/l0
-          - ../proto/dwtools/amid/-files/l0/Encoders.s
-          - ../proto/dwtools/amid/-files/l0/RecordContext.s
-          - ../proto/dwtools/amid/-files/l1
-          - ../proto/dwtools/amid/-files/l1/Path.s
-          - ../proto/dwtools/amid/-files/l1/Path.ss
-          - ../proto/dwtools/amid/-files/l1/Record.s
-          - ../proto/dwtools/amid/-files/l1/RecordFactory.s
-          - ../proto/dwtools/amid/-files/l1/RecordFilter.s
-          - ../proto/dwtools/amid/-files/l1/Routines.s
-          - ../proto/dwtools/amid/-files/l1/Stat.s
-          - ../proto/dwtools/amid/-files/l2
-          - ../proto/dwtools/amid/-files/l2/Abstract.s
-          - ../proto/dwtools/amid/-files/l2/Partial.s
-          - ../proto/dwtools/amid/-files/l3
-          - ../proto/dwtools/amid/-files/l3/FindMixin.s
-          - ../proto/dwtools/amid/-files/l3/SecondaryMixin.s
-          - ../proto/dwtools/amid/-files/l5_provider
-          - ../proto/dwtools/amid/-files/l5_provider/Extract.s
-          - ../proto/dwtools/amid/-files/l5_provider/Git.ss
-          - ../proto/dwtools/amid/-files/l5_provider/HardDrive.ss
-          - ../proto/dwtools/amid/-files/l5_provider/HtmlDocument.js
-          - ../proto/dwtools/amid/-files/l5_provider/Http.js
-          - ../proto/dwtools/amid/-files/l5_provider/Http.ss
-          - ../proto/dwtools/amid/-files/l5_provider/Npm.ss
-          - ../proto/dwtools/amid/-files/l5_provider/RemoteClient.s
-          - ../proto/dwtools/amid/-files/l5_provider/RemoteServlet.ss
-          - ../proto/dwtools/amid/-files/l5_provider/Svn.ss
-          - ../proto/dwtools/amid/-files/l7
-          - ../proto/dwtools/amid/-files/l7/System.s
-          - ../proto/dwtools/amid/-files/l8_filter
-          - ../proto/dwtools/amid/-files/l8_filter/Image.s
-          - ../proto/dwtools/amid/-files/l8_filter/Reroot.s
-          - ../proto/dwtools/amid/-files/l9
-          - ../proto/dwtools/amid/-files.test
-          - ../proto/dwtools/amid/-files.test/aFileProvider.test.s
-          - ../proto/dwtools/amid/-files.test/aFilesFind.test.s
-          - ../proto/dwtools/amid/-files.test/Extract.html
-          - ../proto/dwtools/amid/-files.test/Extract.test.s
-          - ../proto/dwtools/amid/-files.test/Files.copy.test.s
-          - ../proto/dwtools/amid/-files.test/Files.etc.test.ss
-          - ../proto/dwtools/amid/-files.test/FilesFind.Extract.test.s
-          - ../proto/dwtools/amid/-files.test/FilesFind.HardDrive.test.ss
-          - ../proto/dwtools/amid/-files.test/FilesRead.test.s
-          - ../proto/dwtools/amid/-files.test/Git.test.ss
-          - ../proto/dwtools/amid/-files.test/HardDrive.test.ss
-          - ../proto/dwtools/amid/-files.test/Http.test.ss
-          - ../proto/dwtools/amid/-files.test/Npm.test.ss
-          - ../proto/dwtools/amid/-files.test/Path.test.ss
-          - ../proto/dwtools/amid/-files.test/Record.test.s
-          - ../proto/dwtools/amid/-files.test/RecordFilter.test.s
-          - ../proto/dwtools/amid/-files.test/System.copy.test.ss
-          - ../proto/dwtools/amid/-files.test/System.Extract.test.s
-          - ../proto/dwtools/amid/-files.test/System.HardDrive.test.ss
-          - ../proto/dwtools/amid/-files.test/Uri.test.ss
           - ../proto/dwtools/amid/l4_files
           - ../proto/dwtools/amid/l4_files/entry
           - ../proto/dwtools/amid/l4_files/entry/Extract.s
@@ -273,6 +214,7 @@ module:
           - ../proto/dwtools/amid/l4_files/l1
           - ../proto/dwtools/amid/l4_files/l1/Namespace.s
           - ../proto/dwtools/amid/l4_files/l2
+          - ../proto/dwtools/amid/l4_files/l2/Encoder.s
           - ../proto/dwtools/amid/l4_files/l2/Encoders.s
           - ../proto/dwtools/amid/l4_files/l2/RecordContext.s
           - ../proto/dwtools/amid/l4_files/l3
@@ -282,7 +224,8 @@ module:
           - ../proto/dwtools/amid/l4_files/l3/Record.s
           - ../proto/dwtools/amid/l4_files/l3/RecordFactory.s
           - ../proto/dwtools/amid/l4_files/l3/RecordFilter.s
-          - ../proto/dwtools/amid/l4_files/l3/Stat.s
+          - ../proto/dwtools/amid/l4_files/l3/StatClass.s
+          - ../proto/dwtools/amid/l4_files/l3/StatNamespace.s
           - ../proto/dwtools/amid/l4_files/l4
           - ../proto/dwtools/amid/l4_files/l4/Abstract.s
           - ../proto/dwtools/amid/l4_files/l4/Carriage.s
@@ -1868,6 +1811,4 @@ module:
       ../.im.will.yml:
         hash: cf09c55ddbeeda40b68cfe87c0add76e
         size: 6579
-      wFiles.out.will.yml:
-        hash: eb6d9a2becbf23727649bf41d40dead6
-        size: 53976
+      wFiles.out.will.yml: *ref_0

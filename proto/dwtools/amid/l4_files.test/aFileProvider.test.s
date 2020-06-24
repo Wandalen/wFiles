@@ -49784,6 +49784,20 @@ function hardLinkExperiment( test )
 
 hardLinkExperiment.experimental = 1;
 
+function hardLinkReturnSync( test )
+{
+  let context = this;
+  let a = context.assetFor( test, false ); /* qqq3 */
+
+  test.case = 'basic';
+  a.reflect();
+  var srcPath = a.abs( 'File1.txt' );
+  var dstPath = a.abs( 'File2.txt' );
+  var srcGlobalPath = a.system.path.join( `${a.fileProvider.protocol}:///`, srcPath );
+  var dstGlobalPath = a.system.path.join( `${a.fileProvider.protocol}:///`, dstPath );
+  test.is( a.path.isGlobal( srcGlobalPath ) );
+}
+
 // --
 // declare
 // --
@@ -49956,6 +49970,7 @@ var Self =
     hardLinkHardLinkedSync,
     hardLinkHardLinkedAsync,
     hardLinkSpecialPath,
+    hardLinkReturnSync,
 
     /* qqq3 : extend linking tests to check returned value. must be false if success, but no change was done */
 

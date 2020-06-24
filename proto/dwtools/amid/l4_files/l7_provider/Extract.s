@@ -1887,7 +1887,7 @@ function _pathResolveIntermediateDirs( filePath )
   _.assert( self.path.isAbsolute( filePath ) );
   _.assert( self.path.isNormalized( filePath ) );
 
-  if( _.strCount( filePath, self.path._upStr ) > 1 )
+  if( _.strCount( filePath, self.path.upToken ) > 1 )
   {
     let fileName = self.path.name({ path : filePath, full : 1 });
     filePath = self.pathResolveSoftLinkAct

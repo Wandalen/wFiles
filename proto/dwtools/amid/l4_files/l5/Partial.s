@@ -544,7 +544,7 @@ function preferredFromGlobalAct( globalPath )
   if( self.usingGlobalPath )
   return globalPath.full;
   else
-  return globalPath.parametrizedPath;
+  return globalPath.postfixedPath;
 }
 
 //
@@ -3604,6 +3604,8 @@ function dirRead_body( o )
       return 0;
     });
 
+    // result = result.map( ( p ) => self.path.escape( p ) ); /* yyy */
+
     if( o.outputFormat === 'absolute' )
     result = result.map( function( relative )
     {
@@ -4687,9 +4689,6 @@ defaults.purging = 0;
 var having = fileWrite_body.having;
 having.driving = 0;
 having.aspect = 'body';
-
-// fileWrite_body.encoders = _.files.WriteEncoders;
-// _.assert( _.objectIs( fileWrite_body.encoders ) );
 
 //
 
@@ -5876,9 +5875,6 @@ function _link_functor( fop )
     if( o.sync )
     {
 
-      // if( _.strEnds( o.srcPath, "#dir2/file" ) ) /* yyy */
-      // debugger;
-
       c.verify1( arguments );
       if( c.ended )
       return c.end();
@@ -5913,6 +5909,7 @@ function _link_functor( fop )
       try
       {
 
+        debugger;
         if( self.fileExists( o2.dstPath ) )
         {
           c.verifyDst()
@@ -8954,6 +8951,8 @@ let Extension =
   dirMakeAct,
   dirMake,
   dirMakeForFile,
+
+  // locking
 
   fileLockAct,
   fileLock,

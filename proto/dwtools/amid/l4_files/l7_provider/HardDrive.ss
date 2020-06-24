@@ -8,14 +8,9 @@ if( typeof module !== 'undefined' )
 {
   let _ = require( '../../../../dwtools/Tools.s' );
 
-  // if( !_.FileProvider )
-  // require( '../UseMid.s' );
-
-  // File = require( 'fs-extra' );
   File = require( 'fs' );
   StandardFile = require( 'fs' );
   Os = require( 'os' );
-
   LockFile = require( 'proper-lockfile' )
 
 }
@@ -55,7 +50,7 @@ function init( o )
 // path
 // --
 
-let pathNativizeAct = process.platform === 'win32' ? _.path._nativizeWindows : _.path._nativizePosix;
+let pathNativizeAct = process.platform === 'win32' ? ( src ) => _.path._nativizeWindows( src ) : ( src ) => _.path._nativizePosix( src );
 
 _.assert( _.routineIs( pathNativizeAct ) );
 
@@ -1585,7 +1580,6 @@ function fileCopyAct( o )
     let con = new _.Consequence().take( null );
     let readCon = new _.Consequence();
     let writeCon = new _.Consequence();
-    /* qqq2 : too many consequences? aaa : one per stream and one consequence to handle messages from first two */
 
     con.andKeep( [ readCon, writeCon ] );
 
@@ -1598,11 +1592,6 @@ function fileCopyAct( o )
 
       return got;
     })
-
-    // File.copyFile( o.srcPath, o.dstPath, function( err, data )
-    // {
-    //   con.take( err, data );
-    // });
 
     let readStream = self.streamReadAct
     ({
@@ -2110,7 +2099,7 @@ let Extend =
 
   // link
 
-  filesAreHardLinkedAct, // qqq : implement filesAreHardLinkedAct Vova : done, pass tests
+  filesAreHardLinkedAct,
 
   // etc
 
@@ -2134,9 +2123,6 @@ _.classDeclare
   parent : Parent,
   extend : Extend,
 });
-
-// _.FileProvider.Find.mixin( Self );
-// _.FileProvider.Secondary.mixin( Self );
 
 _.assert( _.routineIs( Self.prototype.pathCurrentAct ) );
 _.assert( _.routineIs( Self.Path.current ) );

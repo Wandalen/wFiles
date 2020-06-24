@@ -28,7 +28,9 @@ function onSuiteEnd()
 {
   let path = this.provider.path;
   _.assert( _.strHas( this.suiteTempPath, '.tmp' ) );
+  debugger;
   path.pathDirTempClose( this.suiteTempPath );
+  debugger;
   this.provider.finit();
   this.system.finit();
 }
@@ -35454,36 +35456,37 @@ function hardLinkHardLinkedAsync( test )
 function hardLinkSpecialPath( test )
 {
   let context = this;
-  let a = context.assetFor( test, false ); /* qqq3 */
+  let a = context.assetFor( test, false );
+  /* qqq3 : use assetFor in each test routine */
+  /* qqq3 : implement similar test routine for each method */
 
   // if( !a.system )
   // return test.is( true );
 
   /* */
 
-  // test.case = 'basic';
-  // a.reflect();
-  // var srcPath = a.abs( 'File1.txt' );
-  // var dstPath = a.abs( 'File2.txt' );
-  // var srcGlobalPath = a.system.path.join( `${a.fileProvider.protocol}:///`, srcPath );
-  // var dstGlobalPath = a.system.path.join( `${a.fileProvider.protocol}:///`, dstPath );
-  // test.is( a.path.isGlobal( srcGlobalPath ) );
-  // test.is( a.path.isGlobal( dstGlobalPath ) );
-  // a.system.fileWrite( srcGlobalPath, 'File1.txt' );
-  // test.is( a.system.fileExists( srcGlobalPath ) );
-  // test.isNot( a.system.fileExists( dstGlobalPath ) );
-  // test.isNot( a.system.filesAreHardLinked( dstGlobalPath, srcGlobalPath ) );
-  // var got = a.system.hardLink( dstGlobalPath, srcGlobalPath );
-  // test.is( got );
-  // test.is( a.system.filesAreHardLinked( dstGlobalPath, srcGlobalPath ) );
-  // var got = a.system.hardLink( dstGlobalPath, srcGlobalPath );
-  // test.isNot( got );
-  // test.is( a.system.filesAreHardLinked( dstGlobalPath, srcGlobalPath ) );
-  // xxx
+  test.case = 'basic';
+  a.reflect();
+  var srcPath = a.abs( 'File1.txt' );
+  var dstPath = a.abs( 'File2.txt' );
+  var srcGlobalPath = a.system.path.join( `${a.fileProvider.protocol}:///`, srcPath );
+  var dstGlobalPath = a.system.path.join( `${a.fileProvider.protocol}:///`, dstPath );
+  test.is( a.path.isGlobal( srcGlobalPath ) );
+  test.is( a.path.isGlobal( dstGlobalPath ) );
+  a.system.fileWrite( srcGlobalPath, 'File1.txt' );
+  test.is( a.system.fileExists( srcGlobalPath ) );
+  test.isNot( a.system.fileExists( dstGlobalPath ) );
+  test.isNot( a.system.filesAreHardLinked( dstGlobalPath, srcGlobalPath ) );
+  var got = a.system.hardLink( dstGlobalPath, srcGlobalPath );
+  test.is( got );
+  test.is( a.system.filesAreHardLinked( dstGlobalPath, srcGlobalPath ) );
+  var got = a.system.hardLink({ dstPath : dstGlobalPath, srcPath : srcGlobalPath, makingDirectory : 1 });
+  test.isNot( got );
+  test.is( a.system.filesAreHardLinked( dstGlobalPath, srcGlobalPath ) );
 
   /* */
 
-  test.case = '# @ ! ?'; /* qqq : make it working */
+  test.case = '# @ ! ?';
   a.reflect();
   var srcPath = a.abs( '"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"/File1.txt' );
   var dstPath = a.abs( '"b1#"/"b2@"/"b3!"/"b4?"/"#b5"/"@b6"/"!b7"/"?b8"/File1.txt' );
@@ -35491,13 +35494,11 @@ function hardLinkSpecialPath( test )
   var dstGlobalPath = a.system.path.join( `${a.fileProvider.protocol}:///`, dstPath );
   test.is( a.path.isGlobal( srcGlobalPath ) );
   test.is( a.path.isGlobal( dstGlobalPath ) );
-  debugger;
   a.system.fileWrite( srcGlobalPath, 'File1.txt' );
-  debugger;
   test.is( a.system.fileExists( srcGlobalPath ) );
   test.isNot( a.system.fileExists( dstGlobalPath ) );
   test.isNot( a.system.filesAreHardLinked( dstGlobalPath, srcGlobalPath ) );
-  var got = a.system.hardLink( dstGlobalPath, srcGlobalPath );
+  var got = a.system.hardLink({ dstPath : dstGlobalPath, srcPath : srcGlobalPath, makingDirectory : 1 });
   test.is( got );
   test.is( a.system.filesAreHardLinked( dstGlobalPath, srcGlobalPath ) );
   var got = a.system.hardLink( dstGlobalPath, srcGlobalPath );

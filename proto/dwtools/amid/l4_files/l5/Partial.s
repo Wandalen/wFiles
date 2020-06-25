@@ -5856,6 +5856,7 @@ function _link_functor( fop )
     c.log = log;
     c.tempRenameCan = tempRenameCan;
     c.tempRename = o.sync ? tempRenameSync : tempRenameAsync;
+    c.tempRenameMaybe = tempRenameMaybe;
     c.tempRenameRevert = o.sync ? tempRenameRevertSync : tempRenameRevertAsync;
     c.tempDelete = tempDelete;
     c.tempNameMake = tempNameMake
@@ -6520,7 +6521,7 @@ function _link_functor( fop )
         relativeSrcPath : o.dstPath,
         sync : 1,
       });
-
+      return true;
     }
 
     function tempRenameAsync()
@@ -6551,6 +6552,18 @@ function _link_functor( fop )
           sync : 0,
         });
       })
+    }
+
+    /* - */
+
+    function tempRenameMaybe()
+    {
+      if( !self.fileExists( c.options2.dstPath ) )
+      return false;
+      if( !o.breakingDstHardLink && c.dstStat.isHardLink() )
+      return false;
+      renaming = true;
+      return c.tempRename();
     }
 
     /* - */
@@ -7412,6 +7425,7 @@ defaults.relativeSrcPath = null;
 defaults.breakingSrcHardLink = 0;
 defaults.breakingDstHardLink = 1;
 defaults.sync = null;
+defaults.context = null;
 
 var having = hardLinkAct.having = Object.create( null );
 having.writing = 1;
@@ -7517,44 +7531,48 @@ function _hardLinkDo( c )
 
   if( c.srcStat.isSoftLink() )
   {
-
     if( o.resolvingSrcSoftLink === 2 )
     {
-      if( c.srcResolvedStat === null )
-      return null;
+      if( c.srcResolvedStat )
       return act();
+      return tempRenameThen( () => null );
     }
 
-    return self.softLinkAct
-    ({
-      dstPath : o.dstPath,
-      srcPath : o.srcPath,
-      relativeDstPath : o.relativeDstPath,
-      relativeSrcPath : o.relativeSrcPath,
-      sync : o.sync,
-      type : null,
-    });
+    return tempRenameThen( () =>
+    {
+      return self.softLinkAct
+      ({
+        dstPath : o.dstPath,
+        srcPath : o.srcPath,
+        relativeDstPath : o.relativeDstPath,
+        relativeSrcPath : o.relativeSrcPath,
+        sync : o.sync,
+        type : null,
+      });
+    })
   }
   else if( c.srcStat.isTextLink() )
   {
 
     if( o.resolvingSrcTextLink === 2 )
     {
-      if( c.srcResolvedStat === null )
-      return null;
+      if( c.srcResolvedStat )
       return act();
+      return tempRenameThen( () => null );
     }
 
-    /* qqq : cover, please */
-    return self.textLinkAct
-    ({
-      dstPath : o.dstPath,
-      srcPath : o.srcPath,
-      relativeDstPath : o.relativeDstPath,
-      relativeSrcPath : o.relativeSrcPath,
-      sync : o.sync,
-    });
-
+    return tempRenameThen( () =>
+    {
+      /* qqq : cover, please */
+      return self.textLinkAct
+      ({
+        dstPath : o.dstPath,
+        srcPath : o.srcPath,
+        relativeDstPath : o.relativeDstPath,
+        relativeSrcPath : o.relativeSrcPath,
+        sync : o.sync,
+      });
+    })
   }
   else
   {
@@ -7568,37 +7586,41 @@ function _hardLinkDo( c )
     if( o.resolvingSrcSoftLink === 2 || o.resolvingSrcTextLink === 2 )
     {
       if( c.srcResolvedStat.isDir() )
-      return self.dirMakeAct
-      ({
-        filePath : o.dstPath,
-        sync : o.sync
-      })
-    }
-
-    /* */
-
-    if( c.options.breakingSrcHardLink )
-    if( !self.fileExists( c.options2.dstPath ) )
-    {
-      if( c.srcStat.isHardLink() )
-      self.hardLinkBreak( c.options2.srcPath );
-    }
-    else
-    {
-      if( !c.options.breakingDstHardLink )
-      if( c.dstStat.isHardLink() )
       {
-        let srcData = self.fileRead( c.options2.srcPath );
-        self.fileWrite( c.options2.dstPath, srcData );
-        self.fileDelete( c.options2.srcPath );
-        let dstPath = c.options2.dstPath;
-        c.options2.dstPath = c.options2.srcPath;
-        c.options2.srcPath = dstPath;
+        return tempRenameThen( () =>
+        {
+          return self.dirMakeAct
+          ({
+            filePath : o.dstPath,
+            sync : o.sync
+          })
+        })
       }
     }
 
+    c.options2.context = c;
+
     return self.hardLinkAct( c.options2 );
   }
+
+  /* */
+
+  function tempRenameThen( callback )
+  {
+    let con = _.Consequence.Try( () => c.tempRenameMaybe() );
+
+    con.then( () =>
+    {
+      let result = callback();
+      return o.sync ? true : result;
+    });
+
+    if( o.sync )
+    return con.syncMaybe();
+
+    return con;
+  }
+
 }
 
 // function _hardLinkDo( c )
@@ -7638,6 +7660,7 @@ let hardLink = _link_functor
   onVerify2 : _hardLinkVerify2,
   skippingSamePath : true,
   skippingMissed : false,
+  renaming : false
 });
 
 var defaults = hardLink.body.defaults;

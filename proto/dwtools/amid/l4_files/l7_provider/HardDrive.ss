@@ -1,3 +1,5 @@
+const { c } = require('tar');
+
 ( function _HardDrive_ss_() {
 
 'use strict';
@@ -1777,6 +1779,8 @@ function hardLinkAct( o )
   _.assert( !!o.dstPath );
   _.assert( !!o.srcPath );
 
+  let c = o.context;
+
   /* */
 
   if( o.sync )
@@ -1787,7 +1791,7 @@ function hardLinkAct( o )
 
     /* this makse info about error more clear */
 
-    let stat = self.statReadAct
+    let srcStat = self.statReadAct
     ({
       filePath : o.srcPath,
       throwing : 1,
@@ -1795,49 +1799,127 @@ function hardLinkAct( o )
       resolvingSoftLink : 0,
     });
 
-    if( !stat )
+    if( !srcStat )
     throw _.err( '{o.srcPath} does not exist on hard drive:', o.srcPath );
-    if( !stat.isTerminal() )
+    if( !srcStat.isTerminal() )
     throw _.err( '{o.srcPath} is not a terminal file:', o.srcPath );
 
     try
     {
+
+      if( !c )
+      return File.linkSync( srcPath, dstPath );
+
+      c.tempRenameMaybe();
+
+      if( c.options.breakingSrcHardLink )
+      if( !self.fileExists( c.options2.dstPath ) )
+      {
+        if( c.srcStat.isHardLink() )
+        self.hardLinkBreak( c.options2.srcPath );
+      }
+      else
+      {
+        if( !c.options.breakingDstHardLink )
+        if( c.dstStat.isHardLink() )
+        {
+          let srcData = self.fileRead( c.options2.srcPath );
+          self.fileWrite( c.options2.dstPath, srcData );
+          self.fileDelete( c.options2.srcPath );
+          let dstPathTemp = c.options2.dstPath;
+          dstPath = srcPath
+          srcPath = dstPathTemp;
+        }
+      }
+
       File.linkSync( srcPath, dstPath );
+
+      c.tempDelete();
+
       return true;
     }
     catch ( err )
     {
+      if( c )
+      c.tempRenameRevert();
       throw _.err( err );
     }
 
   }
   else
   {
-    let con = new _.Consequence();
-
     if( o.dstPath === o.srcPath )
-    return con.take( true );
+    return new _.Consequence().take( true );
 
-    self.statReadAct
+    let con = self.statReadAct
     ({
       filePath : o.srcPath,
       sync : 0,
       throwing : 0,
       resolvingSoftLink : 0,
     })
-    .give( function( err, stat )
-    {
-      if( err )
-      return con.error( err );
-      if( !stat )
-      return con.error( _.err( '{o.srcPath} does not exist on hard drive:', o.srcPath ) );
-      if( !stat.isTerminal() )
-      return con.error( _.err( '{o.srcPath} is not a terminal file:', o.srcPath ) );
 
+    con
+    .then( function( stat )
+    {
+      if( !stat )
+      throw _.err( '{o.srcPath} does not exist on hard drive:', o.srcPath );
+      if( !stat.isTerminal() )
+      throw _.err( '{o.srcPath} is not a terminal file:', o.srcPath );
+      return null;
+    });
+
+    if( c )
+    con.then( () => c.tempRenameMaybe() )
+
+    if( c )
+    con.then( () =>
+    {
+      if( c.options.breakingSrcHardLink )
+      if( !self.fileExists( c.options2.dstPath ) )
+      {
+        if( c.srcStat.isHardLink() )
+        return self.hardLinkBreak({ filePath : c.options2.srcPath, sync : 0 });
+      }
+      else
+      {
+        if( !c.options.breakingDstHardLink )
+        if( c.dstStat.isHardLink() )
+        {
+          return self.fileRead({ filePath : c.options2.srcPath, sync : 0 })
+          .then( ( srcData ) => self.fileWrite({ filePath : c.options2.dstPath, data : srcData, sync : 0 }) )
+          .then( () => self.fileDelete({ filePath : c.options2.srcPath, sync : 0 }) )
+          .then( () =>
+          {
+            let dstPathTemp = c.options2.dstPath;
+            dstPath = srcPath
+            srcPath = dstPathTemp;
+            return null;
+          })
+        }
+      }
+      return null;
+    })
+
+
+    con.then( () =>
+    {
+      let con = new _.Consequence();
       File.link( srcPath, dstPath, function( err )
       {
         return err ? con.error( err ) : con.take( true );
       });
+      return con;
+    })
+
+    con.catch( ( err ) =>
+    {
+      _.errAttend( err );
+      return c.tempRenameRevert()
+      .finally( () =>
+      {
+        throw _.err( err );
+      })
     })
 
     return con;

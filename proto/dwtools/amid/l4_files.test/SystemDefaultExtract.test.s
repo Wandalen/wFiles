@@ -41,6 +41,7 @@ function onSuiteBegin()
   context.provider.defaultProvider = context.providerEffective;
   context.globalFromPreferred = _.routineJoin( context.providerEffective.path, context.providerEffective.path.globalFromPreferred );
   context.provider.UsingBigIntForStat = context.providerEffective.UsingBigIntForStat;
+
 }
 
 //
@@ -78,6 +79,7 @@ function providerMake()
   system.providerRegister( provider );
 
   system.defaultProvider = provider;
+  system.UsingBigIntForStat = provider.UsingBigIntForStat;
 
   return system;
 }

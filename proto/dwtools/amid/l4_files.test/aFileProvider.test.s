@@ -65,6 +65,8 @@ function assetFor( test, a )
     a.fileProvider = context.providerMake();
   }
 
+  a.suiteTempPath = a.fileProvider.path.pathDirTempOpen( a.fileProvider.constructor.name );
+
   a = test.assetFor( a );
 
   if( a.fileProvider.system )

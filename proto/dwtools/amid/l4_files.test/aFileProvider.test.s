@@ -49794,10 +49794,10 @@ hardLinkExperiment.experimental = 1;
 
 function hardLinkReturnSync( test )
 {
-  // базова, сюди потрапляє все, що не потрапляє в інші 6
   let context = this;
-
   let a = context.assetFor( test, false ); /* qqq3 */
+
+  //
 
   test.case = 'hard link does not exist';
 
@@ -49809,6 +49809,7 @@ function hardLinkReturnSync( test )
   a.fileProvider.fileWrite( srcPath, 'some text' );
   var got = a.fileProvider.hardLink( dstPath, srcPath );
   test.identical( got, false );
+  test.identical( a.fileProvider.filesAreHardLinked( dstPath, srcPath ), true );
 
 }
 

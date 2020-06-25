@@ -49794,18 +49794,40 @@ hardLinkExperiment.experimental = 1;
 
 function hardLinkReturnSync( test )
 {
-  // базова, сиди потрапляє все, що не потрапляє в інші 6
+  // базова, сюди потрапляє все, що не потрапляє в інші 6
   let context = this;
-  let provider = context.provider;
-  let path = provider.path;
-  
+  // let provider = context.provider;
+  // let path = provider.path;
+
   let a = context.assetFor( test, false ); /* qqq3 */
 
-  test.case = 'hardLink';
+  test.case = 'basic';
+
   a.reflect();
+
   var srcPath = a.abs( 'File1.txt' );
   var dstPath = a.abs( 'File2.txt' );
-  // hardLink
+
+  var srcGlobalPath = a.system.path.join( `${a.fileProvider.protocol}:///`, srcPath );
+  var dstGlobalPath = a.system.path.join( `${a.fileProvider.protocol}:///`, dstPath );
+
+  a.fileProvider.fileWrite( srcPath, 'File1.txt' );
+
+  var got = a.system.hardLink( dstGlobalPath, srcGlobalPath );
+  test.identical( got, true );
+
+  //
+
+  // a.system.fileWrite( srcGlobalPath, 'File1.txt' );
+  // test.is( a.system.fileExists( srcGlobalPath ) );
+  // test.isNot( a.system.fileExists( dstGlobalPath ) );
+  // test.isNot( a.system.filesAreHardLinked( dstGlobalPath, srcGlobalPath ) );
+  // var got = a.system.hardLink( dstGlobalPath, srcGlobalPath );
+  // test.is( got );
+  // test.is( a.system.filesAreHardLinked( dstGlobalPath, srcGlobalPath ) );
+  // var got = a.system.hardLink({ dstPath : dstGlobalPath, srcPath : srcGlobalPath, makingDirectory : 1 });
+  // test.isNot( got );
+  // test.is( a.system.filesAreHardLinked( dstGlobalPath, srcGlobalPath ) );
 }
 
 //

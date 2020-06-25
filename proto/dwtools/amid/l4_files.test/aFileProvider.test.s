@@ -49820,17 +49820,37 @@ function hardLinkReturnSync( test )
 
   /* */
 
-  test.case = 'rewriting : 1';
+  test.case = 'rewriting : 1, dist exists';
 
   a.reflect();
 
   a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
   a.fileProvider.fileWrite( a.abs( 'dst' ), 'it will be rewritten' );
-  
   var got = a.fileProvider.hardLink( { dstPath : a.abs( 'dst' ), srcPath : a.abs( 'src' ), rewriting : 1 } );
   test.identical( got, true );
   test.identical( a.fileProvider.filesAreHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), true );
 
+  /* */
+
+  test.case = 'rewriting : 1, dist does not exist';
+
+  a.reflect();
+
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  var got = a.fileProvider.hardLink( { dstPath : a.abs( 'dst' ), srcPath : a.abs( 'src' ), rewriting : 1 } );
+  test.identical( got, true );
+  test.identical( a.fileProvider.filesAreHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), true );
+
+  /* */
+
+  test.case = 'rewriting : 0, dist does not exist';
+
+  a.reflect();
+
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  var got = a.fileProvider.hardLink( { dstPath : a.abs( 'dst' ), srcPath : a.abs( 'src' ), rewriting : 0 } );
+  test.identical( got, true );
+  test.identical( a.fileProvider.filesAreHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), true );
 }
 
 // --

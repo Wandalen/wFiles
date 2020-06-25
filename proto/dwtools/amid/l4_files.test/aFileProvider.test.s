@@ -49803,34 +49803,11 @@ function hardLinkReturnSync( test )
 
   a.reflect();
 
-  var srcPath = a.abs( 'File1.txt' );
-  var dstPath = a.abs( 'File2.txt' );
+  a.fileProvider.fileWrite( a.abs( '/File1.txt' ), 'File1.txt' )
+  a.fileProvider.hardLink( 'File2.txt', 'File1.txt' )
+  var got = a.fileProvider.hardLink( 'File2.txt', 'File1.txt' ) 
+  test.identical( got, false )
 
-  // var srcGlobalPath = a.system.path.join( `${a.fileProvider.protocol}:///`, srcPath );
-  // var dstGlobalPath = a.system.path.join( `${a.fileProvider.protocol}:///`, dstPath );
-
-  a.fileProvider.fileWrite( srcPath, 'File1.txt' );
-
-  var got = a.system.hardLink( dstPath, srcPath );
-  test.identical( got, true );
-
-  //
-
-  test.case = 'hard link exists';
-
-  a.reflect();
-
-  var srcPath = a.abs( 'File1.txt' );
-  var dstPath = a.abs( 'File2.txt' );
-
-  var srcGlobalPath = a.system.path.join( `${a.fileProvider.protocol}:///`, srcPath );
-  var dstGlobalPath = a.system.path.join( `${a.fileProvider.protocol}:///`, dstPath );
-
-  a.fileProvider.fileWrite( srcPath, 'File1.txt' );
-
-  a.system.hardLink( dstGlobalPath, srcGlobalPath );
-  var got = a.system.hardLink( dstGlobalPath, srcGlobalPath );
-  test.identical( got, false );
 }
 
 //

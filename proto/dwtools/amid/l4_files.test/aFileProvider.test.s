@@ -30498,7 +30498,8 @@ function hardLinkActSync( test )
     relativeDstPath : dstPath,
     breakingSrcHardLink : 0,
     breakingDstHardLink : 1,
-    sync : 1
+    sync : 1,
+    context : null
   }
   var expected = _.mapOwnKeys( o );
   provider.hardLinkAct( o );
@@ -30523,7 +30524,8 @@ function hardLinkActSync( test )
     relativeDstPath : dstPath,
     breakingSrcHardLink : 0,
     breakingDstHardLink : 1,
-    sync : 1
+    sync : 1,
+    context : null
   }
   test.shouldThrowErrorOfAnyKind( () =>
   {
@@ -30546,7 +30548,8 @@ function hardLinkActSync( test )
     relativeDstPath : dstPath,
     breakingSrcHardLink : 0,
     breakingDstHardLink : 1,
-    sync : 1
+    sync : 1,
+    context : null
   }
   test.shouldThrowErrorOfAnyKind( () =>
   {
@@ -30570,7 +30573,8 @@ function hardLinkActSync( test )
     relativeDstPath : dstPath,
     breakingSrcHardLink : 0,
     breakingDstHardLink : 1,
-    sync : 1
+    sync : 1,
+    context : null
   }
   provider.hardLinkAct( o );
   if( context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
@@ -30596,7 +30600,8 @@ function hardLinkActSync( test )
     relativeDstPath : dstPath,
     breakingSrcHardLink : 0,
     breakingDstHardLink : 1,
-    sync : 1
+    sync : 1,
+    context : null
   }
   var expected = _.mapOwnKeys( o );
   provider.hardLinkAct( o );
@@ -30631,7 +30636,8 @@ function hardLinkActSync( test )
       relativeDstPath : dstPath,
       breakingSrcHardLink : 0,
       breakingDstHardLink : 1,
-      sync : 1
+      sync : 1,
+      context : null
     }
     provider.hardLinkAct( o );
     if( context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
@@ -30665,7 +30671,8 @@ function hardLinkActSync( test )
       relativeDstPath : dstPath,
       breakingSrcHardLink : 0,
       breakingDstHardLink : 1,
-      sync : 1
+      sync : 1,
+      context : null
     }
     test.shouldThrowErrorOfAnyKind( () => provider.hardLinkAct( o ) )
     test.is( !provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
@@ -30690,7 +30697,8 @@ function hardLinkActSync( test )
     relativeDstPath : dstPath,
     breakingSrcHardLink : 0,
     breakingDstHardLink : 1,
-    sync : 1
+    sync : 1,
+    context : null
   }
   test.shouldThrowErrorOfAnyKind( () =>
   {
@@ -30717,7 +30725,8 @@ function hardLinkActSync( test )
     relativeDstPath : dstPath,
     breakingSrcHardLink : 0,
     breakingDstHardLink : 1,
-    sync : 1
+    sync : 1,
+    context : null
   }
   test.shouldThrowErrorOfAnyKind( () =>
   {
@@ -30749,7 +30758,8 @@ function hardLinkActSync( test )
       relativeDstPath : dstPath,
       breakingSrcHardLink : 0,
       breakingDstHardLink : 1,
-      sync : 1
+      sync : 1,
+      context : null
     }
     test.shouldThrowErrorOfAnyKind( () =>
     {
@@ -30780,7 +30790,8 @@ function hardLinkActSync( test )
     relativeDstPath : dstPath,
     breakingSrcHardLink : 0,
     breakingDstHardLink : 1,
-    sync : 1
+    sync : 1,
+    context : null
   }
   test.shouldThrowErrorOfAnyKind( () =>
   {
@@ -30809,7 +30820,8 @@ function hardLinkActSync( test )
     relativeDstPath : dstPath,
     breakingSrcHardLink : 0,
     breakingDstHardLink : 1,
-    sync : 1
+    sync : 1,
+    context : null
   }
   test.shouldThrowErrorOfAnyKind( () =>
   {
@@ -30832,7 +30844,8 @@ function hardLinkActSync( test )
     relativeDstPath : dstPath,
     breakingSrcHardLink : 0,
     breakingDstHardLink : 1,
-    sync : 1
+    sync : 1,
+    context : null
   }
 
   var expected = _.mapExtend( null, o );
@@ -30859,7 +30872,8 @@ function hardLinkActSync( test )
     relativeDstPath : dstPath,
     breakingSrcHardLink : 0,
     breakingDstHardLink : 1,
-    sync : 1
+    sync : 1,
+    context : null
   }
   var expected = _.mapOwnKeys( o );
   provider.hardLinkAct( o );
@@ -30885,7 +30899,8 @@ function hardLinkActSync( test )
     relativeDstPath : dstMissingPath,
     breakingSrcHardLink : 0,
     // breakingDstHardLink : 0,
-    sync : 1
+    sync : 1,
+    context : null
   }
   test.shouldThrowErrorSync( () => provider.hardLinkAct( o ) );
   test.will = 'parent directory of dstPath must not be created';
@@ -30906,7 +30921,8 @@ function hardLinkActSync( test )
     relativeDstPath : dstPath2,
     breakingSrcHardLink : 0,
     // breakingDstHardLink : 0,
-    sync : 1
+    sync : 1,
+    context : null
   }
   test.shouldThrowErrorSync( () => provider.hardLinkAct( o ) );
   test.is( provider.isTerminal( srcPath ) );
@@ -30931,7 +30947,8 @@ function hardLinkActSync( test )
       relativeDstPath : dstPath,
       breakingSrcHardLink : 0,
       breakingDstHardLink : 1,
-      sync : 1
+      sync : 1,
+      context : null
     });
   })
 
@@ -30951,6 +30968,7 @@ function hardLinkActSync( test )
     relativeDstPath : dstPath,
     breakingSrcHardLink : 0,
     // breakingDstHardLink : 1
+    context : null
   }
   test.shouldThrowErrorOfAnyKind( () =>
   {
@@ -30968,6 +30986,7 @@ function hardLinkActSync( test )
     breakingSrcHardLink : 0,
     breakingDstHardLink : 1,
     sync : 1,
+    context : null,
     redundant : 'redundant'
   }
   test.shouldThrowErrorOfAnyKind( () =>
@@ -30989,7 +31008,8 @@ function hardLinkActSync( test )
     relativeDstPath : dstPath,
     breakingSrcHardLink : 0,
     breakingDstHardLink : 1,
-    sync : 1
+    sync : 1,
+    context : null
   }
   if( !context.providerIsInstanceOf( _.FileProvider.System ) )
   test.shouldThrowErrorOfAnyKind( () => provider.hardLinkAct( o ) );
@@ -31010,7 +31030,8 @@ function hardLinkActSync( test )
     relativeDstPath : dstPath,
     breakingSrcHardLink : 0,
     breakingDstHardLink : 1,
-    sync : 1
+    sync : 1,
+    context : null
   }
   var expected = _.mapExtend( null, o );
   test.shouldThrowErrorOfAnyKind( () =>
@@ -31893,7 +31914,8 @@ function hardLinkActAsync( test )
       relativeDstPath : dstPath,
       breakingSrcHardLink : 0,
       breakingDstHardLink : 1,
-      sync : 0
+      sync : 0,
+      context : null
     }
     var expected = _.mapOwnKeys( o );
     return test.mustNotThrowError( provider.hardLinkAct( o ) )
@@ -31926,7 +31948,8 @@ function hardLinkActAsync( test )
       relativeDstPath : dstPath,
       breakingSrcHardLink : 0,
       breakingDstHardLink : 1,
-      sync : 0
+      sync : 0,
+      context : null
     }
     var expected = _.mapOwnKeys( o );
     return test.shouldThrowErrorOfAnyKind( provider.hardLinkAct( o ) )
@@ -31957,7 +31980,8 @@ function hardLinkActAsync( test )
       relativeDstPath : dstPath,
       breakingSrcHardLink : 0,
       breakingDstHardLink : 1,
-      sync : 0
+      sync : 0,
+      context : null
     }
     var expected = _.mapOwnKeys( o );
     return test.shouldThrowErrorOfAnyKind( provider.hardLinkAct( o ) )
@@ -31990,7 +32014,8 @@ function hardLinkActAsync( test )
       relativeDstPath : dstPath,
       breakingSrcHardLink : 0,
       breakingDstHardLink : 1,
-      sync : 0
+      sync : 0,
+      context : null
     }
     var expected = _.mapOwnKeys( o );
     return test.shouldThrowErrorOfAnyKind( provider.hardLinkAct( o ) )
@@ -32022,7 +32047,8 @@ function hardLinkActAsync( test )
       relativeDstPath : dstPath,
       breakingSrcHardLink : 0,
       breakingDstHardLink : 1,
-      sync : 0
+      sync : 0,
+      context : null
     }
     var expected = _.mapOwnKeys( o );
     return test.shouldThrowErrorOfAnyKind( provider.hardLinkAct( o ) )
@@ -32052,7 +32078,8 @@ function hardLinkActAsync( test )
       relativeDstPath : dstPath,
       breakingSrcHardLink : 0,
       breakingDstHardLink : 1,
-      sync : 0
+      sync : 0,
+      context : null
     }
     var expected = _.mapOwnKeys( o );
     return test.mustNotThrowError( provider.hardLinkAct( o ) )
@@ -32084,7 +32111,8 @@ function hardLinkActAsync( test )
       relativeDstPath : dstPath,
       breakingSrcHardLink : 0,
       breakingDstHardLink : 1,
-      sync : 0
+      sync : 0,
+      context : null
     }
     var expected = _.mapOwnKeys( o );
     return test.mustNotThrowError( provider.hardLinkAct( o ) )
@@ -32117,7 +32145,8 @@ function hardLinkActAsync( test )
       relativeDstPath : dstMissingPath,
       breakingSrcHardLink : 0,
       breakingDstHardLink : 0,
-      sync : 0
+      sync : 0,
+      context : null
     }
     return test.shouldThrowErrorAsync( provider.hardLinkAct( o ) )
     .then( () =>
@@ -32145,7 +32174,8 @@ function hardLinkActAsync( test )
       relativeDstPath : dstPath2,
       breakingSrcHardLink : 0,
       breakingDstHardLink : 0,
-      sync : 0
+      sync : 0,
+      context : null
     }
     return test.shouldThrowErrorAsync( provider.hardLinkAct( o ) )
     .then( () =>

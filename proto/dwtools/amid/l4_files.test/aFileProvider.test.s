@@ -49807,10 +49807,26 @@ function hardLinkReturnSync( test )
   var dstPath = _.path.join( '/dir1/dir2', 'File2.txt' );
 
   a.fileProvider.fileWrite( srcPath, 'some text' );
+
   var got = a.fileProvider.hardLink( dstPath, srcPath );
   test.identical( got, false );
   test.identical( a.fileProvider.filesAreHardLinked( dstPath, srcPath ), true );
 
+  //
+
+  test.case = 'hard link exists';
+
+  a.reflect();
+
+  var srcPath = _.path.join( '/dir1/dir2', 'File1.txt' );
+  var dstPath = _.path.join( '/dir1/dir2', 'File2.txt' );
+
+  a.fileProvider.fileWrite( srcPath, 'some text' );
+
+  a.fileProvider.hardLink( dstPath, srcPath );
+  var got = a.fileProvider.hardLink( dstPath, srcPath );
+  test.identical( got, false );
+  test.identical( a.fileProvider.filesAreHardLinked( dstPath, srcPath ), true );
 }
 
 //

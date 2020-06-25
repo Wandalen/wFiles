@@ -49807,7 +49807,7 @@ function hardLinkReturnSync( test )
   a.fileProvider.fileWrite( srcPath, 'some text' );
 
   var got = a.fileProvider.hardLink( dstPath, srcPath );
-  test.identical( got, false );
+  test.identical( got, true );
   test.identical( a.fileProvider.filesAreHardLinked( dstPath, srcPath ), true );
 
   //
@@ -49823,7 +49823,7 @@ function hardLinkReturnSync( test )
 
   a.fileProvider.hardLink( dstPath, srcPath );
   var got = a.fileProvider.hardLink( dstPath, srcPath );
-  test.identical( got, true );
+  test.identical( got, false );
   test.identical( a.fileProvider.filesAreHardLinked( dstPath, srcPath ), true );
 
   //
@@ -49837,18 +49837,7 @@ function hardLinkReturnSync( test )
 
   var got = a.fileProvider.hardLink( dstPath, srcPath );
   test.identical( got, false );
-
-  //
-
-  test.case = 'dsf';
-
-  a.reflect();
-
-  var srcPath = _.path.join( '/dir1/dir2', 'File1.txt' );
-  var dstPath = _.path.join( '/dir1/dir2', 'File2.txt' );
-
-  var got = a.fileProvider.hardLink( dstPath, srcPath );
-  test.identical( got, false );
+  test.identical( a.fileProvider.filesAreHardLinked( dstPath, srcPath ), true );
 }
 
 //

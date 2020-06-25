@@ -427,7 +427,7 @@ function pathsLocalizeSync() /* qqq : ignoring provider is temp workaround. plea
   {
     let dstParsed = _.uri.parse( o.dstPath );
     if( dstParsed.protocol && !_.longHas( self.protocols, dstParsed.protocol ) )
-    c.error( 'File provider ' + self.qualifiedName + ' does not support protocol ' + _.strQuote( globalPath.protocol ) );
+    c.error( 'File provider ' + self.qualifiedName + ' does not support protocol ' + _.strQuote( dstParsed.protocol ) );
     o.dstPath = dstParsed.longPath;
   }
 

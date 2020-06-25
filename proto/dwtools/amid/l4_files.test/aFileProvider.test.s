@@ -49790,8 +49790,6 @@ hardLinkExperiment.experimental = 1;
 
 //
 
-// передбачити всі ключові сценарії, без зайвих, при яких повертається true або false
-
 function hardLinkReturnSync( test )
 {
   let context = this;
@@ -49809,7 +49807,7 @@ function hardLinkReturnSync( test )
   a.fileProvider.fileWrite( srcPath, 'some text' );
 
   var got = a.fileProvider.hardLink( dstPath, srcPath );
-  test.identical( got, false );
+  test.identical( got, true );
   test.identical( a.fileProvider.filesAreHardLinked( dstPath, srcPath ), true );
 
   //

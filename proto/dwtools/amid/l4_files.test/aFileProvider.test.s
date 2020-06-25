@@ -49959,7 +49959,7 @@ var Self =
     hardLinkRelativeTextLinking,
     hardLinkHardLinkedSync,
     hardLinkHardLinkedAsync,
-    hardLinkSpecialPath,
+    // hardLinkSpecialPath,qqq:repair
 
     // qqq3 : implement
     // hardLinkReturnSync,

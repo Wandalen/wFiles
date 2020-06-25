@@ -1779,88 +1779,50 @@ function hardLinkAct( o )
   _.assert( !!o.dstPath );
   _.assert( !!o.srcPath );
 
-  let c = o.context;
+  /* */
+
+  let con = _.Consequence().take( true );
+
+  if( o.dstPath === o.srcPath )
+  return o.sync ? true : con;
+
+  con.then( checkSrc )
+
+  if( o.context )
+  {
+    con.then( () => o.context.tempRenameMaybe() )
+    con.then( handleHardlinkBreaking );
+  }
+
+  con.then( link );
+
+  if( o.context )
+  {
+    con.then( tempDelete );
+    con.finally( tempRenameRevert );
+  }
+
+  if( o.sync )
+  return con.syncMaybe();
+
+  return con;
 
   /* */
 
-  if( o.sync )
+  function checkSrc()
   {
-
-    if( o.dstPath === o.srcPath )
-    return true;
-
-    /* this makse info about error more clear */
-
-    let srcStat = self.statReadAct
-    ({
-      filePath : o.srcPath,
-      throwing : 1,
-      sync : 1,
-      resolvingSoftLink : 0,
-    });
-
-    if( !srcStat )
-    throw _.err( '{o.srcPath} does not exist on hard drive:', o.srcPath );
-    if( !srcStat.isTerminal() )
-    throw _.err( '{o.srcPath} is not a terminal file:', o.srcPath );
-
-    try
+    var con = _.Consequence.Try( () =>
     {
-
-      if( !c )
-      return File.linkSync( srcPath, dstPath );
-
-      c.tempRenameMaybe();
-
-      if( c.options.breakingSrcHardLink )
-      if( !self.fileExists( c.options2.dstPath ) )
-      {
-        if( c.srcStat.isHardLink() )
-        self.hardLinkBreak( c.options2.srcPath );
-      }
-      else
-      {
-        if( !c.options.breakingDstHardLink )
-        if( c.dstStat.isHardLink() )
-        {
-          let srcData = self.fileRead( c.options2.srcPath );
-          self.fileWrite( c.options2.dstPath, srcData );
-          self.fileDelete( c.options2.srcPath );
-          let dstPathTemp = c.options2.dstPath;
-          dstPath = srcPath
-          srcPath = dstPathTemp;
-        }
-      }
-
-      File.linkSync( srcPath, dstPath );
-
-      c.tempDelete();
-
-      return true;
-    }
-    catch ( err )
-    {
-      if( c )
-      c.tempRenameRevert();
-      throw _.err( err );
-    }
-
-  }
-  else
-  {
-    if( o.dstPath === o.srcPath )
-    return new _.Consequence().take( true );
-
-    let con = self.statReadAct
-    ({
-      filePath : o.srcPath,
-      sync : 0,
-      throwing : 0,
-      resolvingSoftLink : 0,
+      return self.statReadAct
+      ({
+        filePath : o.srcPath,
+        throwing : 0,
+        sync : o.sync,
+        resolvingSoftLink : 0,
+      });
     })
 
-    con
-    .then( function( stat )
+    con.then( function( stat )
     {
       if( !stat )
       throw _.err( '{o.srcPath} does not exist on hard drive:', o.srcPath );
@@ -1869,61 +1831,140 @@ function hardLinkAct( o )
       return null;
     });
 
-    if( c )
-    con.then( () => c.tempRenameMaybe() )
-
-    if( c )
-    con.then( () =>
-    {
-      if( c.options.breakingSrcHardLink )
-      if( !self.fileExists( c.options2.dstPath ) )
-      {
-        if( c.srcStat.isHardLink() )
-        return self.hardLinkBreak({ filePath : c.options2.srcPath, sync : 0 });
-      }
-      else
-      {
-        if( !c.options.breakingDstHardLink )
-        if( c.dstStat.isHardLink() )
-        {
-          return self.fileRead({ filePath : c.options2.srcPath, sync : 0 })
-          .then( ( srcData ) => self.fileWrite({ filePath : c.options2.dstPath, data : srcData, sync : 0 }) )
-          .then( () => self.fileDelete({ filePath : c.options2.srcPath, sync : 0 }) )
-          .then( () =>
-          {
-            let dstPathTemp = c.options2.dstPath;
-            dstPath = srcPath
-            srcPath = dstPathTemp;
-            return null;
-          })
-        }
-      }
-      return null;
-    })
-
-
-    con.then( () =>
-    {
-      let con = new _.Consequence();
-      File.link( srcPath, dstPath, function( err )
-      {
-        return err ? con.error( err ) : con.take( true );
-      });
-      return con;
-    })
-
-    con.catch( ( err ) =>
-    {
-      _.errAttend( err );
-      return c.tempRenameRevert()
-      .finally( () =>
-      {
-        throw _.err( err );
-      })
-    })
+    if( o.sync )
+    return con.syncMaybe();
 
     return con;
   }
+
+  /* */
+
+  function handleHardlinkBreaking()
+  {
+    let c = o.context;
+
+    if( c.options.breakingSrcHardLink )
+    if( !self.fileExists( c.options2.dstPath ) )
+    {
+      if( c.srcStat.isHardLink() )
+      return self.hardLinkBreak({ filePath : c.options2.srcPath, sync : o.sync });
+    }
+    else
+    {
+      if( !c.options.breakingDstHardLink )
+      if( c.dstStat.isHardLink() )
+      {
+        let con = _.Consequence.Try( () =>
+        {
+          return self.fileReadAct
+          ({
+            filePath : c.options2.srcPath,
+            encoding : self.encoding,
+            advanced : null,
+            resolvingSoftLink : self.resolvingSoftLink,
+            sync : o.sync
+          })
+        })
+        .then( ( srcData ) =>
+        {
+          let r = self.fileWriteAct
+          ({
+            filePath : c.options2.dstPath,
+            data : srcData,
+            encoding : 'original.type',
+            writeMode : 'rewrite',
+            sync : o.sync
+          })
+          return o.sync ? true : r;
+        })
+        .then( () =>
+        {
+          let r = self.fileDeleteAct
+          ({
+            filePath : c.options2.srcPath,
+            sync : o.sync
+          })
+          return o.sync ? true : r;
+        })
+        .then( () =>
+        {
+          let dstPathTemp = c.options2.dstPath;
+          dstPath = srcPath
+          srcPath = dstPathTemp;
+          return null;
+        })
+
+        if( o.sync )
+        return con.syncMaybe();
+
+        return con;
+      }
+    }
+    return null;
+  }
+
+  /* */
+
+  function link()
+  {
+    if( o.sync )
+    {
+      File.linkSync( srcPath, dstPath );
+      return true;
+    }
+
+    let linkReady = new _.Consequence();
+    File.link( srcPath, dstPath, function( err )
+    {
+      if( err )
+      return linkReady.error( err )
+      linkReady.take( true )
+    });
+    return linkReady;
+  }
+
+  /* */
+
+  function tempDelete( got )
+  {
+    let r = _.Consequence.Try( () =>
+    {
+      let result = o.context.tempDelete();
+      return o.sync ? true : result;
+    })
+    r.then( () => got );
+
+    if( o.sync )
+    return r.syncMaybe();
+
+    return r;
+  }
+
+  /* */
+
+  function tempRenameRevert( err, got )
+  {
+    if( !err )
+    return got;
+
+    _.errAttend( err );
+
+    let r = _.Consequence.Try( () =>
+    {
+      let result = o.context.tempRenameRevert()
+      return o.sync ? true : result;
+    })
+    .finally( () =>
+    {
+      throw _.err( err );
+    })
+
+    if( o.sync )
+    return r.syncMaybe();
+
+    return r;
+  }
+
 }
 
 _.routineExtend( hardLinkAct, Parent.prototype.hardLinkAct );

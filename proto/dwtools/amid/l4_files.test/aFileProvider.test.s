@@ -49702,7 +49702,7 @@ function experiment2( test )
   test.identical( o.found, [ linkPath, filePath ] );
 }
 
-experiment.experimental = 1;
+experiment2.experimental = 1;
 
 //
 

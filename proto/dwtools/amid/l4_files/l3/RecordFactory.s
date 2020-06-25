@@ -121,8 +121,6 @@ function form()
       let url = _.uri.parse( factory.basePath );
     }
 
-    /* yyy */
-
     if( factory.effectiveProvider )
     factory.basePath = factory.effectiveProvider.path.preferredFromGlobal( factory.basePath );
 

@@ -49788,19 +49788,95 @@ function hardLinkExperiment( test )
 
 hardLinkExperiment.experimental = 1;
 
+//
+
+// передбачити всі ключові сценарії, без зайвих, при яких повертається true або false
+
 function hardLinkReturnSync( test )
 {
+  // базова, сиди потрапляє все, що не потрапляє в інші 6
   let context = this;
+  let provider = context.provider;
+  let path = provider.path;
+  
   let a = context.assetFor( test, false ); /* qqq3 */
 
-  test.case = 'basic';
+  test.case = 'hardLink';
   a.reflect();
   var srcPath = a.abs( 'File1.txt' );
   var dstPath = a.abs( 'File2.txt' );
-  var srcGlobalPath = a.system.path.join( `${a.fileProvider.protocol}:///`, srcPath );
-  var dstGlobalPath = a.system.path.join( `${a.fileProvider.protocol}:///`, dstPath );
-  test.is( a.path.isGlobal( srcGlobalPath ) );
+  // hardLink
 }
+
+//
+
+function hardLinkReturnAsync( test )
+{
+  // базова, сиди потрапляє все, що не потрапляє в інші 6
+  let context = this;
+  let a = context.assetFor( test, false );
+
+  test.case = 'hardLink';
+  a.reflect();
+  var srcPath = a.abs( 'File1.txt' );
+  var dstPath = a.abs( 'File2.txt' );
+}
+
+//
+
+function hardLinkReturnThrowing0Sync( test )
+{
+  // коли опція throwing : 0, 
+  let context = this;
+  let a = context.assetFor( test, false );
+}
+
+//
+
+function hardLinkReturnThrowing0Async( test )
+{
+  // коли опція throwing : 0,
+  let context = this;
+  let a = context.assetFor( test, false );
+}
+
+//
+
+function hardLinkReturnSoftLinkedSync( test )
+{
+  // коли в вхідний або вихідний файли src, dst є софт лінком 
+  let context = this;
+  let a = context.assetFor( test, false );
+}
+
+//
+
+function hardLinkReturnSoftLinkedAsync( test )
+{
+  // коли в вхідний або вихідний файли src, dst є софт лінком 
+  let context = this;
+  let a = context.assetFor( test, false );
+}
+
+//
+
+function hardLinkReturnTextLinkedSync( test )
+{
+  // коли в вхідний або вихідний файли src, dst є текст лінком 
+  let context = this;
+  let a = context.assetFor( test, false );
+}
+
+//
+
+function hardLinkReturnTextLinkedAsync( test )
+{
+  // коли в вхідний або вихідний файли src, dst є текст лінком 
+  let context = this;
+  let a = context.assetFor( test, false );
+}
+
+
 
 // --
 // declare

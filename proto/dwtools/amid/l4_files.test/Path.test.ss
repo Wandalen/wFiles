@@ -1256,6 +1256,75 @@ pathDirTempCloseAfter.description =
   Try to manully close temp dir after automatic close leads to an error.
 `
 
+function pathDirTempReturnResolved( test )
+{
+  let extract = new _.FileProvider.Extract()
+  var name = 'pathDirTempReturnResolved';
+
+  let cache = extract.path.PathDirTempForMap[ extract.id ] = Object.create( null );
+  let count = extract.path.PathDirTempCountMap[ extract.id ] = Object.create( null );
+
+  test.notIdentical( extract.id, _.fileProvider.id );
+
+  extract.dirMake( '/_temp' );
+  extract.softLink( '/temp', '/_temp' );
+
+  /* */
+
+  clear();
+  var filePath1 = '/temp/dir1'
+  var got1 = extract.path.pathDirTempOpen({ filePath : filePath1, name, returnResolved : 0 });
+  test.identical( cache[ filePath1 ], got1 );
+  test.is( _.strBegins( got1, '/temp' ) );
+  test.is( _.strHas( got1, name ) );
+  test.is( extract.isDir( got1 ) );
+
+  /* */
+
+  clear();
+  var filePath1 = '/temp/dir2'
+  var got1 = extract.path.pathDirTempOpen({ filePath : filePath1, name, returnResolved : 1 });
+  test.notIdentical( cache[ filePath1 ], got1 );
+  test.is( _.strBegins( got1, '/_temp' ) );
+  test.is( _.strHas( got1, name ) );
+  test.is( extract.isDir( got1 ) );
+
+  /* */
+
+  clear();
+  var filePath1 = '/dir1/dir2'
+  extract.dirMake( '/dir3' );
+  extract.softLink( '/dir1', '/dir3' );
+  var got1 = extract.path.pathDirTempOpen({ filePath : filePath1, name, returnResolved : 0 });
+  test.identical( cache[ filePath1 ], got1 );
+  test.is( _.strBegins( got1, '/dir1' ) );
+  test.is( _.strHas( got1, name ) );
+  test.is( extract.isDir( got1 ) );
+
+  /* */
+
+  clear();
+  var filePath1 = '/dir2/dir3'
+  extract.dirMake( '/dir4' );
+  extract.softLink( '/dir2', '/dir4' );
+  var got1 = extract.path.pathDirTempOpen({ filePath : filePath1, name, returnResolved : 1 });
+  test.notIdentical( cache[ filePath1 ], got1 );
+  test.is( _.strBegins( got1, '/dir4' ) );
+  test.is( _.strHas( got1, name ) );
+  test.is( extract.isDir( got1 ) );
+
+  /* */
+
+  function clear()
+  {
+    for( let k in cache )
+    delete cache[ k ]
+    for( let k in count )
+    delete count[ k ]
+  }
+
+}
+
 // --
 // next pathDirTemp* tests
 // --
@@ -1746,6 +1815,7 @@ var Self =
 
     pathDirTemp,
     pathDirTempCloseAfter,
+    pathDirTempReturnResolved
 
     //
 

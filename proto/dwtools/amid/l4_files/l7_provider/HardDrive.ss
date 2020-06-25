@@ -1844,10 +1844,10 @@ function hardLinkAct( o )
     let c = o.context;
 
     if( c.options.breakingSrcHardLink )
-    if( !self.fileExists( c.options2.dstPath ) )
+    if( !self.fileExists( dstPath ) )
     {
       if( c.srcStat.isHardLink() )
-      return self.hardLinkBreak({ filePath : c.options2.srcPath, sync : o.sync });
+      return self.hardLinkBreak({ filePath : srcPath, sync : o.sync });
     }
     else
     {
@@ -1858,7 +1858,7 @@ function hardLinkAct( o )
         {
           return self.fileReadAct
           ({
-            filePath : c.options2.srcPath,
+            filePath : srcPath,
             encoding : self.encoding,
             advanced : null,
             resolvingSoftLink : self.resolvingSoftLink,
@@ -1869,7 +1869,7 @@ function hardLinkAct( o )
         {
           let r = self.fileWriteAct
           ({
-            filePath : c.options2.dstPath,
+            filePath : dstPath,
             data : srcData,
             encoding : 'original.type',
             writeMode : 'rewrite',
@@ -1881,14 +1881,14 @@ function hardLinkAct( o )
         {
           let r = self.fileDeleteAct
           ({
-            filePath : c.options2.srcPath,
+            filePath : srcPath,
             sync : o.sync
           })
           return o.sync ? true : r;
         })
         .then( () =>
         {
-          let dstPathTemp = c.options2.dstPath;
+          let dstPathTemp = dstPath;
           dstPath = srcPath
           srcPath = dstPathTemp;
           return null;

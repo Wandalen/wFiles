@@ -2141,7 +2141,7 @@ fileWriteAct.encoders = writeEncoders;
 // --
 
 let KnownNativeEncodings = [ undefined, 'ascii', 'base64', 'binary', 'hex', 'ucs2', 'ucs-2', 'utf16le', 'utf-16le', 'utf8', 'latin1' ]
-let UsingBigIntForStat = _.files.nodeJsIsSameOrNewer( [ 10, 5, 0 ] );
+let UsingBigIntForStat = _.files.nodeJsIsSameOrNewer( [ 10, 5, 0 ] ); /* xxx : remove */
 
 let Composes =
 {

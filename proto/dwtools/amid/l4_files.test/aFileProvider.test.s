@@ -65,6 +65,8 @@ function assetFor( test, a )
     a.fileProvider = context.providerMake();
   }
 
+  a.suiteTempPath = a.fileProvider.path.pathDirTempOpen( a.fileProvider.constructor.name );
+
   a = test.assetFor( a );
 
   if( a.fileProvider.system )
@@ -49705,6 +49707,8 @@ experiment/linkToDir2
 
 }
 
+experiment.experimental = 1;
+
 //
 
 function experiment2( test )
@@ -49730,7 +49734,7 @@ function experiment2( test )
   test.identical( o.found, [ linkPath, filePath ] );
 }
 
-experiment.experimental = 1;
+experiment2.experimental = 1;
 
 //
 
@@ -49817,6 +49821,28 @@ function hardLinkExperiment( test )
 }
 
 hardLinkExperiment.experimental = 1;
+
+//
+
+function hardLinkReturnSync( test )
+{
+  let context = this;
+  let a = context.assetFor( test, false ); /* qqq3 */
+
+  /* */
+
+  test.case = 'hard link does not exist';
+
+  a.reflect();
+
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  var got = a.fileProvider.hardLink( a.abs( 'dst' ), a.abs( 'src' ) );
+  test.identical( got, true );
+  test.identical( a.fileProvider.filesAreHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), true );
+
+  /* */
+
+}
 
 // --
 // declare
@@ -49989,7 +50015,10 @@ var Self =
     hardLinkRelativeTextLinking,
     hardLinkHardLinkedSync,
     hardLinkHardLinkedAsync,
-    // hardLinkSpecialPath,qqq:repair
+
+    // hardLinkSpecialPath, /* xxx */
+
+    hardLinkReturnSync,
 
     // qqq3 : implement
     // hardLinkReturnSync,

@@ -524,7 +524,7 @@ function filesFindSingle_pre( routine, args )
   let path = self.path;
 
   let o = self._filesFindPrepare0( routine, args );
-  self._filesFindFilterAbsorb( routine, [ o ] ); // yyy
+  self._filesFindFilterAbsorb( routine, [ o ] );
   self._filesFindPrepare1( routine, [ o ] );
   self._filesFindPrepare2( routine, [ o ] );
 
@@ -3509,9 +3509,6 @@ function filesReflectSingle_body( o )
       /* qqq : should not change time of file if it is already linked. check tests */
       /* qqq : should return true / false / null. false if no change is done! */
 
-      // if( _.strEnds( dstPath, "#dir2/file" ) ) /* yyy */
-      // debugger;
-
       r = dst.hardLink
       ({
         dstPath,
@@ -3898,7 +3895,7 @@ function filesReflect_body( o )
         }
       });
 
-      /* qqq xxx yyy : verbosity > 3 should log each modified file, but not more
+      /* qqq xxx : verbosity > 3 should log each modified file, but not more
       */
 
     }
@@ -3991,20 +3988,12 @@ function filesReflector_functor( routine )
         op2.src = op2.src || Object.create( null );
         if( op2.src.filePath === undefined )
         op2.src.filePath = '';
-        // op2.src.filePath = '.'; // yyy
 
         op2.dst = op2.dst || Object.create( null );
 
         o.filter.and( op2.filter ).pathsExtendJoining( op2.filter );
         o.src.and( op2.src ).pathsExtendJoining( op2.src );
         o.dst.and( op2.dst ).pathsExtendJoining( op2.dst );
-
-        // o.filter.and( op2.filter );
-        // o.filter.pathsJoin( op2.filter );
-        // o.src.and( op2.src );
-        // o.src.pathsJoin( op2.src );
-        // o.dst.and( op2.dst );
-        // o.dst.pathsJoin( op2.dst );
 
         op2.filter = o.filter;
         op2.src = o.src;

@@ -3604,7 +3604,7 @@ function dirRead_body( o )
       return 0;
     });
 
-    // result = result.map( ( p ) => self.path.escape( p ) ); /* yyy */
+    result = result.map( ( p ) => self.path.escape( p ) ); /* yyy */
 
     if( o.outputFormat === 'absolute' )
     result = result.map( function( relative )

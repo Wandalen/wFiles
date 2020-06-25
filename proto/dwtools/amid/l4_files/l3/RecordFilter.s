@@ -1844,8 +1844,7 @@ function basePathNormalize( filePath, basePath )
     ({
       filePath : filePath,
       basePath : basePath,
-      // prefixingWithFilePath : 0,
-      prefixingWithFilePath : 1, // yyy
+      prefixingWithFilePath : 1,
     });
   }
   else if( _.mapIs( basePath ) )
@@ -2158,7 +2157,7 @@ function filePathSelect( srcPath, dstPath )
     }
 
     dst.filePath = filePath;
-    dst._formPaths(); // yyy
+    dst._formPaths();
     dstPath = dst.filePathSimplest();
     _.assert( _.strIs( dstPath ) );
     filePath = dst.filePath;
@@ -2184,7 +2183,7 @@ function filePathSelect( srcPath, dstPath )
 
     src.filePath = filePath;
     _.assert( dst === null || src.filePath === dst.filePath );
-    src._formPaths(); // yyy
+    src._formPaths();
     _.assert( dst === null || src.filePath === dst.filePath );
   }
   catch( err )
@@ -3495,88 +3494,6 @@ allPaths.defaults =
   filePath : 1,
   inplace : 1,
 }
-
-// //
-//
-// function isRelative( o )
-// {
-//   let filter = this;
-//   let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-//   let path = fileProvider.path;
-//   let thePath;
-//
-//   o = _.routineOptions( isRelative, arguments );
-//
-//   // _.assert( 0, 'not tested' );
-//
-//   let o2 = _.mapExtend( null, o );
-//   o2.onEach = onEach;
-//   o2.inplace = 0;
-//
-//   return filter.allPaths( o2 );
-//
-//   /* - */
-//
-//   function onEach( element, it )
-//   {
-//     debugger;
-//     // _.assert( 0, 'not tested' );
-//     if( it.value === null )
-//     return;
-//     if( path.isRelative( it.value ) )
-//     return;
-//     // it.value = false; // yyy
-//     return it.value;
-//   }
-//
-// }
-//
-// isRelative.defaults =
-// {
-//   fixes : 1,
-//   basePath : 1,
-//   // filePath : 1,
-//   filePath : 1,
-// }
-//
-// //
-//
-// function sureRelative( o )
-// {
-//   let filter = this;
-//   let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-//   let path = fileProvider.path;
-//
-//   o = _.routineOptions( sureRelative, arguments );
-//
-//   _.assert( 0, 'not tested' );
-//
-//   let o2 = _.mapExtend( null, o );
-//   o2.onEach = onEach;
-//   o2.inplace = 0;
-//
-//   return filter.allPaths( o2 );
-//
-//   /* - */
-//
-//   function onEach( element, it )
-//   {
-//     _.sure
-//     (
-//       it.value === null || path.isRelative( it.value ),
-//       () => 'Filter should have relative ' + it.fieldName + ', but has  ' + _.toStr( it.value )
-//     );
-//   }
-//
-// }
-//
-// sureRelative.defaults =
-// {
-//   fixes : 1,
-//   basePath : 1,
-//   // filePath : 1,
-//   filePath : 1,
-// }
 
 //
 

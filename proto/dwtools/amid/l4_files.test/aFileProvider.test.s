@@ -49820,8 +49820,6 @@ function hardLinkReturnSync( test )
 
   /* */
 
-  test.open('rewriting option');
-
   test.case = 'rewriting : 1';
 
   a.reflect();
@@ -49829,18 +49827,10 @@ function hardLinkReturnSync( test )
   a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
   a.fileProvider.fileWrite( a.abs( 'dst' ), 'it will be rewritten' );
   
-  a.fileProvider.hardLink( a.abs( 'dst' ), a.abs( 'src' ) );
-  var got = a.fileProvider.fileRead( a.abs( 'dst' ) );
-  test.identical( got, 'some text' );
+  var got = a.fileProvider.hardLink( { dstPath : a.abs( 'dst' ), srcPath : a.abs( 'src' ), rewriting : 1 } );
+  test.identical( got, true );
   test.identical( a.fileProvider.filesAreHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), true );
 
-  //
-
-  // test.case = 'rewriting : 0';
-
-  // a.reflect();
-
-  test.close('rewriting option');
 }
 
 // --

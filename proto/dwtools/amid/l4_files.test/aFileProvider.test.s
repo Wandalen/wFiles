@@ -49822,11 +49822,23 @@ function hardLinkReturnSync( test )
 
   test.open('rewriting option');
 
-  test.case = 'default value - rewriting : 1';
+  test.case = 'rewriting : 1';
 
   a.reflect();
 
-  // ...
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  a.fileProvider.fileWrite( a.abs( 'dst' ), 'it will be rewritten' );
+  
+  a.fileProvider.hardLink( a.abs( 'dst' ), a.abs( 'src' ) );
+  var got = a.fileProvider.fileRead( a.abs( 'dst' ) );
+  test.identical( got, 'some text' );
+  test.identical( a.fileProvider.filesAreHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), true );
+
+  //
+
+  // test.case = 'rewriting : 0';
+
+  // a.reflect();
 
   test.close('rewriting option');
 }

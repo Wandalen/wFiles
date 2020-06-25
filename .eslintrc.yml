@@ -400,7 +400,7 @@ rules :
   max-statements-per-line : off
   max-statements :
     - warn
-    - max : 10000
+    - max : 100
   complexity :
     - error
     - max : 100

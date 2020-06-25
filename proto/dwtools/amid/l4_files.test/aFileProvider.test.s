@@ -49801,7 +49801,7 @@ function hardLinkReturnSync( test )
 
   let a = context.assetFor( test, false ); /* qqq3 */
 
-  test.case = 'basic';
+  test.case = 'hard link does not exist';
 
   a.reflect();
 
@@ -49818,6 +49818,22 @@ function hardLinkReturnSync( test )
 
   //
 
+  test.case = 'hard link exists';
+
+  a.reflect();
+
+  var srcPath = a.abs( 'File1.txt' );
+  var dstPath = a.abs( 'File2.txt' );
+
+  var srcGlobalPath = a.system.path.join( `${a.fileProvider.protocol}:///`, srcPath );
+  var dstGlobalPath = a.system.path.join( `${a.fileProvider.protocol}:///`, dstPath );
+
+  a.fileProvider.fileWrite( srcPath, 'File1.txt' );
+
+  a.system.hardLink( dstGlobalPath, srcGlobalPath );
+  var got = a.system.hardLink( dstGlobalPath, srcGlobalPath );
+  test.identical( got, false );
+
   // a.system.fileWrite( srcGlobalPath, 'File1.txt' );
   // test.is( a.system.fileExists( srcGlobalPath ) );
   // test.isNot( a.system.fileExists( dstGlobalPath ) );
@@ -49830,74 +49846,19 @@ function hardLinkReturnSync( test )
   // test.is( a.system.filesAreHardLinked( dstGlobalPath, srcGlobalPath ) );
 }
 
-//
-
 function hardLinkReturnAsync( test )
 {
   // базова, сиди потрапляє все, що не потрапляє в інші 6
   let context = this;
   let a = context.assetFor( test, false );
 
-  test.case = 'hardLink';
+  test.case = 'basic';
   a.reflect();
   var srcPath = a.abs( 'File1.txt' );
   var dstPath = a.abs( 'File2.txt' );
 }
 
 //
-
-function hardLinkReturnThrowing0Sync( test )
-{
-  // коли опція throwing : 0, 
-  let context = this;
-  let a = context.assetFor( test, false );
-}
-
-//
-
-function hardLinkReturnThrowing0Async( test )
-{
-  // коли опція throwing : 0,
-  let context = this;
-  let a = context.assetFor( test, false );
-}
-
-//
-
-function hardLinkReturnSoftLinkedSync( test )
-{
-  // коли в вхідний або вихідний файли src, dst є софт лінком 
-  let context = this;
-  let a = context.assetFor( test, false );
-}
-
-//
-
-function hardLinkReturnSoftLinkedAsync( test )
-{
-  // коли в вхідний або вихідний файли src, dst є софт лінком 
-  let context = this;
-  let a = context.assetFor( test, false );
-}
-
-//
-
-function hardLinkReturnTextLinkedSync( test )
-{
-  // коли в вхідний або вихідний файли src, dst є текст лінком 
-  let context = this;
-  let a = context.assetFor( test, false );
-}
-
-//
-
-function hardLinkReturnTextLinkedAsync( test )
-{
-  // коли в вхідний або вихідний файли src, dst є текст лінком 
-  let context = this;
-  let a = context.assetFor( test, false );
-}
-
 
 
 // --

@@ -49677,6 +49677,8 @@ experiment/linkToDir2
 
 }
 
+experiment.experimental = 1;
+
 //
 
 function experiment2( test )

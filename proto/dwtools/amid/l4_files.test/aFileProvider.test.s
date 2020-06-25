@@ -49788,6 +49788,34 @@ function hardLinkExperiment( test )
 
 hardLinkExperiment.experimental = 1;
 
+//
+
+// передбачити всі ключові сценарії, без зайвих, при яких повертається true або false
+
+function hardLinkReturnSync( test )
+{
+  let context = this;
+  let a = context.assetFor( test, false ); /* qqq3 */
+
+  //
+
+  test.case = 'hard link does not exist';
+
+  a.reflect();
+
+  var srcPath = _.path.join( '/dir1/dir2', 'File1.txt' );
+  var dstPath = _.path.join( '/dir1/dir2', 'File2.txt' );
+
+  a.fileProvider.fileWrite( srcPath, 'some text' );
+  var got = a.fileProvider.hardLink( dstPath, srcPath );
+  test.identical( got, false );
+  test.identical( a.fileProvider.filesAreHardLinked( dstPath, srcPath ), true );
+
+}
+
+//
+
+
 // --
 // declare
 // --
@@ -49960,6 +49988,7 @@ var Self =
     hardLinkHardLinkedSync,
     hardLinkHardLinkedAsync,
     // hardLinkSpecialPath,qqq:repair
+    hardLinkReturnSync,
 
     // qqq3 : implement
     // hardLinkReturnSync,

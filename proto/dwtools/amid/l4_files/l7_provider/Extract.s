@@ -1599,121 +1599,196 @@ function hardLinkAct( o )
   _.assert( self.path.isNormalized( o.srcPath ) );
   _.assert( self.path.isNormalized( o.dstPath ) );
 
-  if( o.sync )
+  let con = _.Consequence().take( true );
+
+  if( o.dstPath === o.srcPath )
+  return o.sync ? true : con;
+
+  let dstPath = o.dstPath;
+  let srcPath = o.srcPath;
+
+  con.then( checkPaths )
+
+  if( o.context )
   {
-    if( o.dstPath === o.srcPath )
-    return true;
+    con.then( () => o.context.tempRenameMaybe() )
+    con.then( handleHardlinkBreaking );
+  }
 
-    let dstExists = self.fileExists( o.dstPath );
-    let srcStat = self.statRead( o.srcPath );
+  con.then( link );
 
-    if( !srcStat )
+  if( o.context )
+  {
+    con.then( tempDelete );
+    con.finally( tempRenameRevert );
+  }
+
+  if( o.sync )
+  return con.syncMaybe();
+
+  return con;
+
+  /* */
+
+  function checkPaths()
+  {
+    var con = _.Consequence.Try( () =>
     {
-      debugger;
-      throw _.err( o.srcPath, 'does not exist' );
+      return self.statReadAct
+      ({
+        filePath : o.srcPath,
+        throwing : 0,
+        sync : o.sync,
+        resolvingSoftLink : 0,
+      });
+    })
+
+    con.then( function( stat )
+    {
+      if( !stat )
+      throw _.err( '{o.srcPath} does not exist on hard drive:', o.srcPath );
+      if( !stat.isTerminal() )
+      throw _.err( '{o.srcPath} is not a terminal file:', o.srcPath );
+      return true;
+    });
+
+    if( o.sync )
+    return con.syncMaybe();
+
+    return con;
+  }
+
+  /* */
+
+  function handleHardlinkBreaking()
+  {
+    let c = o.context;
+
+    if( c.options.breakingSrcHardLink )
+    if( !self.fileExists( c.options2.dstPath ) )
+    {
+      if( c.srcStat.isHardLink() )
+      return self.hardLinkBreak({ filePath : c.options2.srcPath, sync : o.sync });
     }
+    else
+    {
+      if( !c.options.breakingDstHardLink )
+      if( c.dstStat.isHardLink() )
+      {
+        let con = _.Consequence.Try( () =>
+        {
+          return self.fileReadAct
+          ({
+            filePath : c.options2.srcPath,
+            encoding : self.encoding,
+            advanced : null,
+            resolvingSoftLink : self.resolvingSoftLink,
+            sync : o.sync
+          })
+        })
+        .then( ( srcData ) =>
+        {
+          let r = self.fileWriteAct
+          ({
+            filePath : c.options2.dstPath,
+            data : srcData,
+            encoding : 'original.type',
+            writeMode : 'rewrite',
+            sync : o.sync
+          })
+          return o.sync ? true : r;
+        })
+        .then( () =>
+        {
+          let r = self.fileDeleteAct
+          ({
+            filePath : c.options2.srcPath,
+            sync : o.sync
+          })
+          return o.sync ? true : r;
+        })
+        .then( () =>
+        {
+          let dstPathTemp = c.options2.dstPath;
+          dstPath = srcPath
+          srcPath = dstPathTemp;
+          return null;
+        })
 
-    if( !srcStat.isTerminal( o.srcPath ) )
-    throw _.err( o.srcPath, 'is not a terminal file' );
+        if( o.sync )
+        return con.syncMaybe();
 
-    if( dstExists )
-    throw _.err( o.dstPath, 'already exists' );
+        return con;
+      }
+    }
+    return null;
+  }
 
-    dstDirCheck();
+  /* */
 
-    let srcDescriptor = self._descriptorRead( o.srcPath );
-    let descriptor = self._descriptorHardLinkMake( [ o.dstPath, o.srcPath ], srcDescriptor );
+  function link()
+  {
+    if( self.fileExists( dstPath ) )
+    throw _.err( dstPath, 'already exists' );
+
+    let dstDir = self._descriptorRead( self.path.dir( dstPath ) );
+    if( !dstDir )
+    throw _.err( 'Directory for', dstPath, 'does not exist' );
+    else if( !self._descriptorIsDir( dstDir ) )
+    throw _.err( 'Parent of', dstPath, 'is not a directory' );
+
+    let srcDescriptor = self._descriptorRead( srcPath );
+    let descriptor = self._descriptorHardLinkMake( [ dstPath, srcPath ], srcDescriptor );
     if( srcDescriptor !== descriptor )
-    self._descriptorWrite( o.srcPath, descriptor );
-    self._descriptorWrite( o.dstPath, descriptor );
+    self._descriptorWrite( srcPath, descriptor );
+    self._descriptorWrite( dstPath, descriptor );
 
     if( self.usingExtraStat )
     self.extraStats[ o.dstPath ] = self.extraStats[ o.srcPath ]; /* Vova : check which stats hardlinked files should have in common */
 
     return true;
   }
-  else
+
+  /* */
+
+  function tempDelete( got )
   {
-    let con = new _.Consequence().take( true );
-
-    /* qqq : synchronize wtih sync version, please aaa : done */
-
-    if( o.dstPath === o.srcPath )
-    return con;
-
-    let dstExists;
-
-    con.then( () => self.fileExists( o.dstPath ) );
-    con.then( ( got ) =>
+    let r = _.Consequence.Try( () =>
     {
-      dstExists = got;
-      return self.statRead({ filePath : o.srcPath, sync : 0 })
-    });
-    con.then( ( srcStat ) =>
-    {
-      if( !srcStat )
-      {
-        debugger;
-        throw _.err( o.srcPath, 'does not exist' );
-      }
-
-      if( !srcStat.isTerminal() )
-      throw _.err( o.srcPath, 'is not a terminal file' );
-
-      if( dstExists )
-      throw _.err( o.dstPath, 'already exists' );
-
-      dstDirCheck();
-
-      let srcDescriptor = self._descriptorRead( o.srcPath );
-      let descriptor = self._descriptorHardLinkMake( [ o.dstPath, o.srcPath ], srcDescriptor );
-      if( srcDescriptor !== descriptor )
-      self._descriptorWrite( o.srcPath, descriptor );
-      self._descriptorWrite( o.dstPath, descriptor );
-
-      return true;
+      let result = o.context.tempDelete();
+      return o.sync ? true : result;
     })
+    r.then( () => got );
 
-    return con;
+    if( o.sync )
+    return r.syncMaybe();
 
-
-    // return self.statRead({ filePath : o.dstPath, sync : 0 })
-    // .finally( ( err, stat ) =>
-    // {
-    //   if( err )
-    //   throw _.err( err );
-
-    //   if( stat )
-    //   throw _.err( o.dstPath, 'already exists' );
-
-    //   let file = self._descriptorRead( o.srcPath );
-
-    //   if( !file )
-    //   throw _.err( o.srcPath, 'does not exist' );
-
-    //   // if( !self._descriptorIsLink( file ) )
-    //   if( !self.isTerminal( o.srcPath ) )
-    //   throw _.err( o.srcPath, ' is not a terminal file' );
-
-    //   let dstDir = self._descriptorRead( self.path.dir( o.dstPath ) );
-    //   if( !dstDir )
-    //   throw _.err( 'hardLinkAct: dirs structure before', o.dstPath, ' does not exist' );
-
-    //   self._descriptorWrite( o.dstPath, self._descriptorHardLinkMake( o.srcPath ) );
-
-    //   return true;
-    // })
+    return r;
   }
 
-  /*  */
+  /* */
 
-  function dstDirCheck()
+  function tempRenameRevert( err, got )
   {
-    let dstDir = self._descriptorRead( self.path.dir( o.dstPath ) );
-    if( !dstDir )
-    throw _.err( 'Directory for', o.dstPath, 'does not exist' );
-    else if( !self._descriptorIsDir( dstDir ) )
-    throw _.err( 'Parent of', o.dstPath, 'is not a directory' );
+    if( !err )
+    return got;
+
+    _.errAttend( err );
+
+    let r = _.Consequence.Try( () =>
+    {
+      let result = o.context.tempRenameRevert()
+      return o.sync ? true : result;
+    })
+    .finally( () =>
+    {
+      throw _.err( err );
+    })
+
+    if( o.sync )
+    return r.syncMaybe();
+
+    return r;
   }
 
 }
@@ -1734,17 +1809,24 @@ function hardLinkBreakAct( o )
   // let read = self._descriptorResolve({ descriptor : descriptor });
   // _.assert( self._descriptorIsTerminal( read ) );
 
-  _.arrayRemoveOnce( descriptor[ 0 ].hardLinks, o.filePath );
+  let con = _.Consequence.Try( () =>
+  {
+    _.arrayRemoveOnce( descriptor[ 0 ].hardLinks, o.filePath );
 
-  self._descriptorWrite
-  ({
-    filePath : o.filePath,
-    data : descriptor[ 0 ].data,
-    breakingHardLink : true
-  });
+    self._descriptorWrite
+    ({
+      filePath : o.filePath,
+      data : descriptor[ 0 ].data,
+      breakingHardLink : true
+    });
 
-  if( !o.sync )
-  return new _.Consequence().take( null );
+    return true;
+  })
+
+  if( o.sync )
+  return con.syncMaybe();
+
+  return con;
 }
 
 _.routineExtend( hardLinkBreakAct, Parent.prototype.hardLinkBreakAct );

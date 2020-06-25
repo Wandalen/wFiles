@@ -49803,10 +49803,12 @@ function hardLinkReturnSync( test )
 
   a.reflect();
 
-  a.fileProvider.fileWrite( _.path.join( '/dir1/dir2', '/File1.txt' ), 'File1.txt' )
-  a.fileProvider.hardLink( 'File2.txt', 'File1.txt' )
-  var got = a.fileProvider.hardLink( 'File2.txt', 'File1.txt' ) 
-  test.identical( got, false )
+  var srcPath = _.path.join( '/dir1/dir2', 'File1.txt' );
+  var dstPath = _.path.join( '/dir1/dir2', 'File2.txt' );
+
+  a.fileProvider.fileWrite( srcPath, 'some text' );
+  var got = a.fileProvider.hardLink( dstPath, srcPath );
+  test.identical( got, false );
 
 }
 

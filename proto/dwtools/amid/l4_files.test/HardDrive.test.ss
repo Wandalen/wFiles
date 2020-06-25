@@ -16,25 +16,6 @@ var Parent = wTests[ 'Tools.mid.files.fileProvider.Abstract' ];
 
 _.assert( !!Parent );
 
-// //
-//
-// function onSuiteBegin( test )
-// {
-//   let path = this.provider.path;
-//   this.suiteTempPath = path.pathDirTempOpen( path.join( __dirname, '../..'  ), 'Provider/HardDrive' );
-// }
-//
-// //
-//
-// function onSuiteEnd()
-// {
-//   let path = this.provider.path;
-//   // qqq : error here
-//   // aaa : format of temp path was changed and has unique id at the end
-//   _.assert( _.strHas( this.suiteTempPath, 'Provider/HardDrive' ) );
-//   path.pathDirTempClose( this.suiteTempPath );
-// }
-
 //
 
 function onSuiteBegin( test )
@@ -49,8 +30,7 @@ function onSuiteBegin( test )
   context.suiteTempPath = context.provider.pathResolveLinkFull({ filePath : context.suiteTempPath, resolvingSoftLink : 1 }); /* zzz */
   context.suiteTempPath = context.suiteTempPath.absolutePath;
   context.globalFromPreferred = function globalFromPreferred( path ){ return path };
-  // let path = this.provider.path;
-  // this.suiteTempPath = path.pathDirTempOpen( path.join( __dirname, '../..'  ), 'Provider/HardDrive' );
+
 }
 
 //
@@ -60,7 +40,6 @@ function providerMake()
   let context = this;
   let provider = _.FileProvider.HardDrive({ protocols : [ 'current', 'second' ] });
   let system = _.FileProvider.System({ providers : [ provider ] });
-  // system.defaultProvider = provider;
   _.assert( system.defaultProvider === null );
   return provider;
 }
@@ -86,7 +65,6 @@ var Proto =
   {
     providerMake,
     provider : _.FileProvider.HardDrive(),
-    // onSuiteBegin,
     suiteTempPath : null,
     globalFromPreferred : null
   },

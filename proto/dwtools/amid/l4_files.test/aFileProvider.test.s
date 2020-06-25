@@ -49838,6 +49838,23 @@ function hardLinkReturnSync( test )
   var got = a.fileProvider.hardLink( dstPath, srcPath );
   test.identical( got, false );
   test.identical( a.fileProvider.filesAreHardLinked( dstPath, srcPath ), true );
+
+  //
+
+  test.open('rewriting option');
+
+  // test.case = 'default value - rewriting : 1';
+
+  // a.reflect();
+
+  // var srcPath = _.path.join( '/dir1/dir2', 'File1.txt' );
+  // var dstPath = _.path.join( '/dir1/dir2', 'File2.txt' );
+
+  // var got = a.fileProvider.hardLink( dstPath, srcPath );
+  // test.identical( got, false );
+  // test.identical( a.fileProvider.filesAreHardLinked( dstPath, srcPath ), true );
+
+  test.close('rewriting option');
 }
 
 //

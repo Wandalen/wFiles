@@ -49820,37 +49820,62 @@ function hardLinkReturnSync( test )
 
   /* */
 
+  test.open( 'rewriting  option' );
+
   test.case = 'rewriting : 1, dist exists';
 
   a.reflect();
-
   a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
   a.fileProvider.fileWrite( a.abs( 'dst' ), 'it will be rewritten' );
   var got = a.fileProvider.hardLink( { dstPath : a.abs( 'dst' ), srcPath : a.abs( 'src' ), rewriting : 1 } );
   test.identical( got, true );
   test.identical( a.fileProvider.filesAreHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), true );
 
-  /* */
+  //
 
   test.case = 'rewriting : 1, dist does not exist';
 
   a.reflect();
-
   a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
   var got = a.fileProvider.hardLink( { dstPath : a.abs( 'dst' ), srcPath : a.abs( 'src' ), rewriting : 1 } );
   test.identical( got, true );
   test.identical( a.fileProvider.filesAreHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), true );
 
-  /* */
+  //
 
   test.case = 'rewriting : 0, dist does not exist';
 
   a.reflect();
-
   a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
   var got = a.fileProvider.hardLink( { dstPath : a.abs( 'dst' ), srcPath : a.abs( 'src' ), rewriting : 0 } );
   test.identical( got, true );
   test.identical( a.fileProvider.filesAreHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), true );
+
+  test.close( 'rewriting  option' );
+
+  /* */
+
+  test.open( 'makingDirectory option' );
+
+  test.case = 'makingDirectory : 0';
+
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  var got = a.fileProvider.hardLink( { dstPath : a.abs( 'dst' ), srcPath : a.abs( 'src' ), makingDirectory : 0 } );
+  test.identical( got, true );
+  test.identical( a.fileProvider.filesAreHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), true );
+
+  //
+
+  test.case = 'makingDirectory : 1';
+
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  var got = a.fileProvider.hardLink( { dstPath : a.abs( 'dir/dst' ), srcPath : a.abs( 'src' ), makingDirectory : 1 } );
+  test.identical( got, true );
+  test.identical( a.fileProvider.filesAreHardLinked( a.abs( 'dir/dst' ), a.abs( 'src' ) ), true );
+
+  test.close( 'makingDirectory option' );
 }
 
 // --

@@ -69,8 +69,23 @@ function assetFor( test, a )
 
   a = test.assetFor( a );
 
-  if( a.fileProvider.system )
-  a.system = a.fileProvider.system;
+  if( !a.system )
+  {
+    if( a.fileProvider.system )
+    a.system = a.fileProvider.system;
+    else if( a.fileProvider instanceof _.FileProvider.System )
+    a.system = a.fileProvider;
+  }
+
+  if( !a.effectiveProvider )
+  {
+    if( !( a.fileProvider instanceof _.FileProvider.System ) )
+    a.effectiveProvider = a.fileProvider;
+    else if( a.fileProvider.defaultProvider )
+    a.effectiveProvider = a.fileProvider.defaultProvider;
+  }
+
+  _.assert( a.effectiveProvider instanceof _.FileProvider.Abstract, 'effectiveProvider is not specificed' );
 
   return a;
 }
@@ -221,9 +236,9 @@ function readWriteSync( test )
   //     throwing : 1,
   //   })
   // });
-  //
+  /* - */
   // /**/
-  //
+  /* - */
   // test.mustNotThrowError( function()
   // {
   //   debugger
@@ -235,15 +250,15 @@ function readWriteSync( test )
   //   });
   //   test.identical( got, null );
   // })
-  //
+  /* - */
   // /* - */
-  //
+  /* - */
   // test.case = 'fileRead, path ways to not a terminal file';
   // filePath = test.context.pathFor( 'written/readWriteSync/dir' );
   // provider.dirMake( filePath );
-  //
+  /* - */
   // /**/
-  //
+  /* - */
   // test.shouldThrowErrorSync( function()
   // {
   //   provider.fileRead
@@ -253,9 +268,9 @@ function readWriteSync( test )
   //     throwing : 1,
   //   })
   // });
-  //
+  /* - */
   // /**/
-  //
+  /* - */
   // test.mustNotThrowError( function()
   // {
   //   var got = provider.fileRead
@@ -266,18 +281,18 @@ function readWriteSync( test )
   //   });
   //   test.identical( got, null );
   // });
-  //
+  /* - */
   // /* - */
-  //
+  /* - */
   // test.case = 'fileRead,simple file read ';
   // provider.filesDelete( routinePath );
   // filePath = test.context.pathFor( 'written/readWriteSync/file' );
   // provider.fileWrite( filePath, testData );
   // var files = provider.dirRead( routinePath );
   // test.identical( files, [ 'file' ] );
-  //
+  /* - */
   // /**/
-  //
+  /* - */
   // test.mustNotThrowError( function()
   // {
   //   got = provider.fileRead
@@ -289,9 +304,9 @@ function readWriteSync( test )
   //   })
   // });
   // test.identical( got, testData );
-  //
+  /* - */
   // /**/
-  //
+  /* - */
   // test.shouldThrowErrorSync( function()
   // {
   //   provider.fileRead
@@ -302,9 +317,9 @@ function readWriteSync( test )
   //     throwing : 1,
   //   })
   // });
-  //
+  /* - */
   // /**/
-  //
+  /* - */
   // test.mustNotThrowError( function()
   // {
   //   var got = provider.fileRead
@@ -316,15 +331,15 @@ function readWriteSync( test )
   //   });
   //   test.identical( got, null );
   // });
-  //
+  /* - */
   // /* - */
-  //
+  /* - */
   // test.case = 'fileRead,file read with common encodings';
   // provider.filesDelete( routinePath );
   // filePath = test.context.pathFor( 'written/readWriteSync/file' );
-  //
+  /* - */
   // /**/
-  //
+  /* - */
   // testData = { a : 'abc' };
   // provider.fileWrite( filePath, JSON.stringify( testData ) );
   // got = provider.fileRead
@@ -335,16 +350,16 @@ function readWriteSync( test )
   //   throwing : 1,
   // });
   // test.identical( got , testData );
-  //
+  /* - */
   // /**/
-  //
+  /* - */
   // var isHd = context.providerIsInstanceOf( _.FileProvider.HardDrive );
-  //
+  /* - */
   // if( isHd )
   // testData = 'module.exports = { a : 1 }';
   // else
   // testData = '1 + 2';
-  //
+  /* - */
   // provider.fileWrite( filePath, testData );
   // got = provider.fileRead
   // ({
@@ -353,7 +368,7 @@ function readWriteSync( test )
   //   encoding : isHd ? 'js.node' : 'js.structure',
   //   throwing : 1,
   // });
-  //
+  /* - */
   // if( context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   // {
   //   test.identical( got, { a : 1 } );
@@ -368,9 +383,9 @@ function readWriteSync( test )
   //   });
   //   test.identical( got , expected );
   // }
-  //
+  /* - */
   // /**/
-  //
+  /* - */
   // testData = filePath;
   // provider.fileWrite( filePath, testData );
   // got = provider.fileRead
@@ -380,7 +395,7 @@ function readWriteSync( test )
   //   encoding : 'original.type',
   //   throwing : 1,
   // });
-  //
+  /* - */
   // if( context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   // {
   //   test.is( _.bufferBytesIs( got ) )
@@ -390,9 +405,9 @@ function readWriteSync( test )
   // {
   //   test.identical( got , testData );
   // }
-  //
+  /* - */
   // /**/
-  //
+  /* - */
   // test.shouldThrowErrorOfAnyKind( () =>
   // {
   //   provider.fileRead
@@ -403,9 +418,9 @@ function readWriteSync( test )
   //     throwing : 1,
   //   });
   // })
-  //
+  /* - */
   // /**/
-  //
+  /* - */
   // test.mustNotThrowError( () =>
   // {
   //   var got = provider.fileRead
@@ -417,9 +432,9 @@ function readWriteSync( test )
   //   });
   //   test.identical( got, null );
   // })
-  //
+  /* - */
   // /**/
-  //
+  /* - */
   // test.case = 'encoder not finded';
   // var encoding = 'unknown';
   // test.identical( _.files.ReadEncoders[ encoding ], undefined );
@@ -433,16 +448,16 @@ function readWriteSync( test )
   //     encoding
   //   });
   // });
-  //
+  /* - */
   // /* - */
-  //
+  /* - */
   // if( Config.interpreter === 'njs' )
   // {
   //   test.case = 'other encodings';
   //   provider.filesDelete( routinePath );
   //   filePath = test.context.pathFor( 'written/readWriteSync/file' );
   //   testData = 'abc';
-  //
+  /* - */
   //   provider.fileWrite( filePath, testData );
   //   got = provider.fileRead
   //   ({
@@ -452,7 +467,7 @@ function readWriteSync( test )
   //     throwing : 1,
   //   });
   //   test.is( _.bufferNodeIs( got ) );
-  //
+  /* - */
   //   provider.fileWrite( filePath, testData );
   //   got = provider.fileRead
   //   ({
@@ -1278,7 +1293,7 @@ function readWriteSync( test )
     // test.identical( got, data );
     // test.is( !provider.isHardLink( linkPath ) );
 
-    //
+    /* - */
 
     // provider.fieldPop( 'resolvingHardLink', 0 );
 
@@ -1352,13 +1367,13 @@ function readWriteSync( test )
     test.identical( got, data );
     test.is( !provider.isSoftLink( linkPath ) );
 
-    //
+    /* - */
 
     provider.fieldPop( 'resolvingSoftLink', 0 );
     provider.fieldPop( 'safe', 0 );
   }
 
-  //
+  /* - */
 
   // var data1 = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit';
   // provider.fileWrite
@@ -1367,11 +1382,11 @@ function readWriteSync( test )
   //   data : data1,
   //   sync : 1,
   // });
-  //
+  /* - */
   // test.case = 'single file is written';
   // var files = provider.dirRead( test.context.pathFor( 'written/readWriteSync/' ) );
   // test.identical( files, [ 'test.txt' ] );
-  //
+  /* - */
   // test.case = 'synchronous, writeMode : rewrite';
   // var got = provider.fileRead
   // ({
@@ -1380,7 +1395,7 @@ function readWriteSync( test )
   // });
   // var expected = data1;
   // test.identical( got, expected );
-  //
+  /* - */
   // var data2 = 'LOREM';
   // provider.fileWrite
   // ({
@@ -1389,11 +1404,11 @@ function readWriteSync( test )
   //   sync : 1,
   //   writeMode : 'append'
   // });
-  //
+  /* - */
   // test.case = 'single file is written';
   // var files = provider.dirRead( test.context.pathFor( 'written/readWriteSync/' ) );
   // test.identical( files, [ 'test.txt' ] );
-  //
+  /* - */
   // test.case = 'synchronous, writeMode : append';
   // var got = provider.fileRead
   // ({
@@ -1402,7 +1417,7 @@ function readWriteSync( test )
   // });
   // var expected = data1 + data2;
   // test.identical( got, expected );
-  //
+  /* - */
   // var data2 = 'LOREM';
   // provider.fileWrite
   // ({
@@ -1411,11 +1426,11 @@ function readWriteSync( test )
   //   sync : 1,
   //   writeMode : 'prepend'
   // });
-  //
+  /* - */
   // test.case = 'single file is written';
   // var files = provider.dirRead( test.context.pathFor( 'written/readWriteSync/' ) );
   // test.identical( files, [ 'test.txt' ] );
-  //
+  /* - */
   // test.case = 'synchronous, writeMode : prepend';
   // var got = provider.fileRead
   // ({
@@ -1424,7 +1439,7 @@ function readWriteSync( test )
   // });
   // var expected = data2 + data1 + data2;
   // test.identical( got, expected );
-  //
+  /* - */
   // if( Config.debug )
   // {
   //   test.case = 'file doesn`t exist';
@@ -1436,7 +1451,7 @@ function readWriteSync( test )
   //       sync : 1
   //     });
   //   });
-  //
+  /* - */
   //   test.case = 'try to read dir';
   //   test.shouldThrowErrorSync( function( )
   //   {
@@ -1466,7 +1481,7 @@ function fileWriteActSync( test )
 
   let data = 'Test data'
 
-  //
+  /* - */
 
   test.case = 'normalized path, call fileWrite'
   var filePath = test.context.pathFor( 'write_test/file' );
@@ -1479,7 +1494,7 @@ function fileWriteActSync( test )
   test.identical( o.filePath, filePath );
   test.identical( provider.fileRead( filePath ), data );
 
-  //
+  /* - */
 
   if( Config.debug )
   if( process.platform === 'win32' )
@@ -1519,7 +1534,7 @@ function fileWriteActAsync( test )
 
   let ready = new _.Consequence().take( null )
 
-  //
+  /* - */
 
   .finally( () =>
   {
@@ -1539,7 +1554,7 @@ function fileWriteActAsync( test )
     })
   })
 
-  //
+  /* - */
 
   if( Config.debug )
   if( process.platform === 'win32' )
@@ -1566,7 +1581,7 @@ function fileWriteActAsync( test )
 
   })
 
-  //
+  /* - */
 
   return ready;
 }
@@ -1628,7 +1643,7 @@ function readWriteAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -1669,7 +1684,7 @@ function readWriteAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -1729,7 +1744,7 @@ function readWriteAsync( test )
     return test.mustNotThrowError( con );
   })
 
-  //
+  /* - */
 
   .finally( function( err, arg )
   {
@@ -1799,7 +1814,7 @@ function readWriteAsync( test )
     });
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( ( arg ) =>
   {
@@ -1829,7 +1844,7 @@ function readWriteAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -2142,7 +2157,7 @@ function readWriteAsync( test )
     return test.shouldThrowErrorOfAnyKind( con );
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -2233,7 +2248,7 @@ function readWriteAsync( test )
     return null;
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -2321,7 +2336,7 @@ function readWriteAsync( test )
     return null;
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -2411,7 +2426,7 @@ function readWriteAsync( test )
     return null;
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -2709,7 +2724,7 @@ function readWriteAsync( test )
 
 
 
-  //
+  /* - */
 
   if( Config.interpreter === 'njs' )
   {
@@ -2747,7 +2762,7 @@ function readWriteAsync( test )
       return null;
     });
 
-    //
+    /* - */
 
     consequence.ifNoErrorThen( function( arg )
     {
@@ -2912,7 +2927,7 @@ function fileReadJson( test )
     test.identical( got, testCheck.expected );
   }
 
-  //
+  /* - */
 
   if( Config.debug )
   {
@@ -3039,7 +3054,7 @@ function fileReadWithEncoding( test )
   var got = provider.fileRead({ filePath, encoding : 'js.structure' });
   test.identical( got, expected )
 
-  //
+  /* - */
 
   var data = '{a : b}';
   provider.filesDelete( filePath );
@@ -3066,7 +3081,7 @@ function fileReadWithEncoding( test )
   else
   test.identical( got, 1 );
 
-  //
+  /* - */
 
   var data = '{a : b}';
   var filePath2 = test.context.pathFor( 'written/fileReadWithEncoding/dstFile2' );
@@ -3090,7 +3105,7 @@ function fileReadWithEncoding( test )
     var got = provider.fileRead({ filePath, encoding : 'js.node' });
     test.identical( got, { data : 1 });
 
-    //
+    /* - */
 
     var data = 'module.exports = { data : 1 '
     var filePath3 = test.context.pathFor( 'written/fileReadWithEncoding/dstFile3' );
@@ -3464,7 +3479,7 @@ function fileTouch( test )
   var srcPath = path.normalize( test.context.pathFor( 'written/fileTouch/src.txt' ) );
   var testData = 'test';
 
-  //
+  /* - */
 
   test.case = 'filePath doesnt exist'
   // provider.filesDelete( srcPath );
@@ -3823,7 +3838,7 @@ function fileCopyActSync( test )
   var srcPath = path.join( routinePath,'src' );
   var dstPath = path.join( routinePath,'dst' );
 
-  //
+  /* - */
 
   test.case = 'use terminal as parent directory';
   provider.filesDelete( routinePath );
@@ -3842,7 +3857,7 @@ function fileCopyActSync( test )
   test.is( provider.isTerminal( srcPath ) );
   test.is( !provider.fileExists( dstPath2 ) );
 
-  //
+  /* - */
 
   test.case = 'no src';
   provider.filesDelete( routinePath );
@@ -3860,7 +3875,7 @@ function fileCopyActSync( test )
     })
   })
 
-  //
+  /* - */
 
   test.case = 'no src';
   provider.filesDelete( routinePath );
@@ -3878,7 +3893,7 @@ function fileCopyActSync( test )
     })
   })
 
-  //
+  /* - */
 
   test.case = 'no src';
   provider.filesDelete( routinePath );
@@ -3896,7 +3911,7 @@ function fileCopyActSync( test )
     })
   })
 
-  //
+  /* - */
 
   test.case = 'no src';
   provider.filesDelete( routinePath );
@@ -3914,7 +3929,7 @@ function fileCopyActSync( test )
     })
   })
 
-  //
+  /* - */
 
   test.case = 'no src, dst exists';
   provider.filesDelete( routinePath );
@@ -3935,7 +3950,7 @@ function fileCopyActSync( test )
   var dstFile = provider.fileRead( dstPath );
   test.identical( dstFile, dstPath );
 
-  //
+  /* - */
 
   test.case = 'no src, dst exists';
   provider.filesDelete( routinePath );
@@ -3956,7 +3971,7 @@ function fileCopyActSync( test )
   var dstFile = provider.fileRead( dstPath );
   test.identical( dstFile, dstPath );
 
-  //
+  /* - */
 
   test.case = 'no src, dst exists';
   provider.filesDelete( routinePath );
@@ -3977,7 +3992,7 @@ function fileCopyActSync( test )
   var dstFile = provider.fileRead( dstPath );
   test.identical( dstFile, dstPath );
 
-  //
+  /* - */
 
   test.case = 'no src, dst exists';
   provider.filesDelete( routinePath );
@@ -3998,7 +4013,7 @@ function fileCopyActSync( test )
   var dstFile = provider.fileRead( dstPath );
   test.identical( dstFile, dstPath );
 
-  //
+  /* - */
 
   test.case = 'src : directory, no dst';
   provider.filesDelete( routinePath );
@@ -4019,7 +4034,7 @@ function fileCopyActSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'src' ] )
 
-  //
+  /* - */
 
   test.case = 'src : directory, no dst';
   provider.filesDelete( routinePath );
@@ -4040,7 +4055,7 @@ function fileCopyActSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'src' ] );
 
-  //
+  /* - */
 
   test.case = 'src : directory, no dst';
   provider.filesDelete( routinePath );
@@ -4061,7 +4076,7 @@ function fileCopyActSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'src' ] );
 
-  //
+  /* - */
 
   test.case = 'src : directory, no dst';
   provider.filesDelete( routinePath );
@@ -4082,7 +4097,7 @@ function fileCopyActSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'src' ] )
 
-  //
+  /* - */
 
   test.case = 'no structure before dst';
   var srcPath = path.join( routinePath,'src' );
@@ -4105,7 +4120,7 @@ function fileCopyActSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'src' ] );
 
-  //
+  /* - */
 
   test.case = 'no structure before dst';
   var srcPath = path.join( routinePath,'src' );
@@ -4128,7 +4143,7 @@ function fileCopyActSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'src' ] );
 
-  //
+  /* - */
 
   test.case = 'no structure before dst';
   var srcPath = path.join( routinePath,'src' );
@@ -4151,7 +4166,7 @@ function fileCopyActSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'src' ] );
 
-  //
+  /* - */
 
   test.case = 'no structure before dst';
   var srcPath = path.join( routinePath,'src' );
@@ -4174,7 +4189,7 @@ function fileCopyActSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'src' ] );
 
-  //
+  /* - */
 
   test.case = 'src - terminal, dst - directory';
   var srcPath = path.join( routinePath,'src' );
@@ -4200,7 +4215,7 @@ function fileCopyActSync( test )
   var files = provider.dirRead( dstPath );
   test.identical( files, [] );
 
-  //
+  /* - */
 
   test.case = 'src - terminal, dst - directory';
   var srcPath = path.join( routinePath,'src' );
@@ -4226,7 +4241,7 @@ function fileCopyActSync( test )
   var files = provider.dirRead( dstPath );
   test.identical( files, [] );
 
-  //
+  /* - */
 
   test.case = 'src - terminal, dst - directory';
   var srcPath = path.join( routinePath,'src' );
@@ -4252,7 +4267,7 @@ function fileCopyActSync( test )
   var files = provider.dirRead( dstPath );
   test.identical( files, [] );
 
-  //
+  /* - */
 
   test.case = 'src - terminal, dst - directory';
   var srcPath = path.join( routinePath,'src' );
@@ -4278,7 +4293,7 @@ function fileCopyActSync( test )
   var files = provider.dirRead( dstPath );
   test.identical( files, [] );
 
-  //
+  /* - */
 
   test.case = 'simple copy';
   var srcPath = path.join( routinePath,'src' );
@@ -4301,7 +4316,7 @@ function fileCopyActSync( test )
   var dstFile = provider.fileRead( dstPath );
   test.identical( srcPath, dstFile );
 
-  //
+  /* - */
 
   test.case = 'simple copy';
   var srcPath = path.join( routinePath,'src' );
@@ -4324,7 +4339,7 @@ function fileCopyActSync( test )
   var dstFile = provider.fileRead( dstPath );
   test.identical( srcPath, dstFile );
 
-  //
+  /* - */
 
   test.case = 'simple copy';
   var srcPath = path.join( routinePath,'src' );
@@ -4347,7 +4362,7 @@ function fileCopyActSync( test )
   var dstFile = provider.fileRead( dstPath );
   test.identical( srcPath, dstFile );
 
-  //
+  /* - */
 
   test.case = 'simple copy';
   var srcPath = path.join( routinePath,'src' );
@@ -4370,7 +4385,7 @@ function fileCopyActSync( test )
   var dstFile = provider.fileRead( dstPath );
   test.identical( srcPath, dstFile );
 
-  //
+  /* - */
 
   test.case = 'simple, rewrite';
   var srcPath = path.join( routinePath,'src' );
@@ -4394,7 +4409,7 @@ function fileCopyActSync( test )
   var dstFile = provider.fileRead( dstPath );
   test.identical( srcPath, dstFile );
 
-  //
+  /* - */
 
   test.case = 'simple, rewrite';
   var srcPath = path.join( routinePath,'src' );
@@ -4418,7 +4433,7 @@ function fileCopyActSync( test )
   var dstFile = provider.fileRead( dstPath );
   test.identical( srcPath, dstFile );
 
-  //
+  /* - */
 
   test.case = 'simple, rewrite';
   var srcPath = path.join( routinePath,'src' );
@@ -4442,7 +4457,7 @@ function fileCopyActSync( test )
   var dstFile = provider.fileRead( dstPath );
   test.identical( srcPath, dstFile );
 
-  //
+  /* - */
 
   test.case = 'simple, rewrite';
   var srcPath = path.join( routinePath,'src' );
@@ -4466,7 +4481,7 @@ function fileCopyActSync( test )
   var dstFile = provider.fileRead( dstPath );
   test.identical( srcPath, dstFile );
 
-  //
+  /* - */
 
   var routinePath = test.context.pathFor( 'written/' + test.name );
   var srcPath = path.join( routinePath, 'src' );
@@ -4502,7 +4517,7 @@ function fileCopyActSync( test )
   test.identical( dstFile, srcFile );
   test.is( srcFile !== otherFile );
 
-  //
+  /* - */
 
   test.case = 'dst is a hard link, breakingDstSoftLink : 1 ,breakingDstHardLink : 0';
   provider.filesDelete( routinePath );
@@ -4622,7 +4637,7 @@ function fileCopyActSync( test )
   test.identical( dstFile, srcFile );
   test.is( srcFile !== otherFile );
 
-  //
+  /* - */
 
   test.case = 'dst is a soft link';
   provider.filesDelete( routinePath );
@@ -4651,7 +4666,7 @@ function fileCopyActSync( test )
   test.identical( dstFile, srcFile );
   test.is( srcFile !== otherFile );
 
-  //
+  /* - */
 
   test.case = 'dst is a soft link';
   provider.filesDelete( routinePath );
@@ -4680,7 +4695,7 @@ function fileCopyActSync( test )
   test.identical( dstFile, srcFile );
   test.is( srcFile !== otherFile );
 
-  //
+  /* - */
 
   test.case = 'should not create folders structure for path';
   var srcPath = path.join( routinePath,'src' );
@@ -4703,7 +4718,7 @@ function fileCopyActSync( test )
   test.is( !provider.fileExists( dstPath ) );
   provider.filesDelete( routinePath );
 
-  //
+  /* - */
 
   test.case = 'should not extend or delete fields of options map, no _providerDefaultsApply, routineOptions';
   provider.filesDelete( routinePath );
@@ -4729,7 +4744,7 @@ function fileCopyActSync( test )
   test.identical( got, expected );
   provider.filesDelete( routinePath );
 
-  //
+  /* - */
 
   test.case = 'should path nativize all paths in options map if needed by its own means';
   var srcPath = path.join( routinePath,'src' );
@@ -4755,7 +4770,7 @@ function fileCopyActSync( test )
   test.identical( o, expected );
   provider.filesDelete( routinePath );
 
-  //
+  /* - */
 
   if( !Config.debug )
   return;
@@ -4777,7 +4792,7 @@ function fileCopyActSync( test )
     });
   })
 
-  //
+  /* - */
 
   test.case = 'should not extend or delete fields of options map, no _providerDefaultsApply, routineOptions';
   var srcPath = path.join( routinePath,'src' );;
@@ -4814,7 +4829,7 @@ function fileCopyActSync( test )
     provider.fileCopyAct( o );
   });
 
-  //
+  /* - */
 
   test.case = 'should expect normalized path, but not nativized';
   var srcPath = routinePath + '\\src';
@@ -4835,7 +4850,7 @@ function fileCopyActSync( test )
   test.mustNotThrowError( () => provider.fileCopyAct( o ) );
   provider.filesDelete( routinePath );
 
-  //
+  /* - */
 
   test.case = 'should expect ready options map, no complex arguments preprocessing';
   var srcPath = path.join( routinePath,'src' );
@@ -4931,7 +4946,7 @@ function fileCopySync( test )
   if( !provider.statResolvedRead( routinePath ) )
   provider.dirMake( routinePath );
 
-  //
+  /* - */
 
   test.case = 'src not exist';
 
@@ -4993,7 +5008,7 @@ function fileCopySync( test )
   });
   test.identical( got, null );
 
-  //
+  /* - */
 
   test.case = 'dst path not exist';
   var srcPath = test.context.pathFor( 'written/fileCopy/src.txt' );
@@ -5055,7 +5070,7 @@ function fileCopySync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'dst.txt', 'src.txt' ] );
 
-  //
+  /* - */
 
   test.case = 'dst path exist';
   provider.filesDelete( routinePath );
@@ -5121,7 +5136,7 @@ function fileCopySync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'dst.txt', 'src.txt' ] );
 
-  //
+  /* - */
 
   test.case = 'src is equal to dst';
   provider.filesDelete( routinePath );
@@ -5195,7 +5210,7 @@ function fileCopySync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'src.txt' ] );
 
-  //
+  /* - */
 
   if( context.providerIsInstanceOf( _.FileProvider.Extract ) )
   return;
@@ -5285,7 +5300,7 @@ function fileCopySync( test )
   var dirAfter = provider.dirRead( routinePath );
   test.identical( dirAfter, dirBefore );
 
-  //
+  /* - */
 
   test.case = 'makingDirectory creates routinePath for a file, dstPath structure not exists'
   provider.filesDelete( routinePath );
@@ -5303,7 +5318,7 @@ function fileCopySync( test )
   });
   test.is( !!provider.statResolvedRead( dstPath ) );
 
-  //
+  /* - */
 
   test.case = 'rewriting off, dstPath structure not exists'
   provider.filesDelete( routinePath );
@@ -5323,7 +5338,7 @@ function fileCopySync( test )
   })
   test.is( !provider.statResolvedRead( dstPath ) );
 
-  //
+  /* - */
 
   test.case = 'rewriting off, dstPath structure not exists'
   provider.filesDelete( routinePath );
@@ -5343,7 +5358,7 @@ function fileCopySync( test )
   })
   test.is( !provider.statResolvedRead( dstPath ) );
 
-  //
+  /* - */
 
   test.case = 'rewriting on, parentDir is a terminal file'
   provider.filesDelete( routinePath );
@@ -5365,7 +5380,7 @@ function fileCopySync( test )
   test.is( provider.isDir( terminalFilePath ) );
   test.is( !!provider.statResolvedRead( dstPath ) );
 
-  //
+  /* - */
 
   test.case = 'rewriting on, parentDir is a directory with files, routinePath must be preserved'
   provider.filesDelete( routinePath );
@@ -5388,7 +5403,7 @@ function fileCopySync( test )
   var expected = [ 'dir', 'dst', 'src.txt' ];
   test.identical( files, expected );
 
-  //
+  /* - */
 
   test.case = 'rewriting off, parentDir is a directory with files, routinePath must be preserved'
   provider.filesDelete( routinePath );
@@ -5418,7 +5433,7 @@ function fileCopySync( test )
   var srcPath = path.join( routinePath,'src' );
   var dstPath = path.join( routinePath,'dst' );
 
-  //
+  /* - */
 
   provider.filesDelete( routinePath );
   provider.fileWrite( srcPath, srcPath );
@@ -5435,7 +5450,7 @@ function fileCopySync( test )
   var dstFile = provider.fileRead( dstPath );
   test.identical( srcPath, dstFile );
 
-  //
+  /* - */
 
   provider.filesDelete( routinePath );
   provider.fileWrite( srcPath, srcPath );
@@ -5495,7 +5510,7 @@ function fileCopySync( test )
   var srcFile = provider.fileRead( srcPath );
   test.identical( srcPath, srcFile );
 
-  //
+  /* - */
 
   test.case = 'dst - terminal, rewrite by src - terminal'
   provider.filesDelete( routinePath );
@@ -5592,7 +5607,7 @@ function fileCopyRelativePath( test )
 
   test.close( 'src - relative path to a file' );
 
-  //
+  /* - */
 
   test.open( 'dst - relative path to a file' );
 
@@ -5637,7 +5652,7 @@ function fileCopyRelativePath( test )
 
   test.close( 'dst - relative path to a file' );
 
-  //
+  /* - */
 
   test.open( 'src - relative path to a dir' );
 
@@ -5653,7 +5668,7 @@ function fileCopyRelativePath( test )
 
   test.close( 'src - relative path to a dir' );
 
-  //
+  /* - */
 
   test.open( 'dst - relative path to a dir' );
 
@@ -5718,7 +5733,7 @@ function fileCopyLinksSync( test )
   if( !provider.statResolvedRead( routinePath ) )
   provider.dirMake( routinePath );
 
-  //
+  /* - */
 
   /* hardLink */
 
@@ -5747,7 +5762,7 @@ function fileCopyLinksSync( test )
   test.identical( dstFile, srcFile );
   test.is( srcFile !== otherFile );
 
-  //
+  /* - */
 
   test.case = 'dst is a hard link, breakingDstSoftLink : 1 ,breakingDstHardLink : 0';
   provider.filesDelete( routinePath );
@@ -5774,7 +5789,7 @@ function fileCopyLinksSync( test )
   test.identical( dstFile, srcFile );
   test.is( srcFile !== otherFile );
 
-  //
+  /* - */
 
   test.case = 'dst is a hard link, breakingDstHardLink : 1';
   provider.filesDelete( routinePath );
@@ -5801,7 +5816,7 @@ function fileCopyLinksSync( test )
   test.identical( dstFile, otherFile );
   test.is( srcFile !== dstFile );
 
-  //
+  /* - */
 
   test.case = 'dst is a hard link, breakingDstSoftLink : 1, breakingDstHardLink : 1';
   provider.filesDelete( routinePath );
@@ -5828,7 +5843,7 @@ function fileCopyLinksSync( test )
   test.identical( dstFile, otherFile );
   test.is( srcFile !== dstFile );
 
-  //
+  /* - */
 
   test.case = 'src - not terminal, dst - hard link';
   provider.filesDelete( routinePath );
@@ -5857,7 +5872,7 @@ function fileCopyLinksSync( test )
   var otherFile = provider.fileRead( otherPath );
   test.identical( dstFile, otherFile );
 
-  //
+  /* - */
 
   test.case = 'src - not terminal, dst - hard link';
   provider.filesDelete( routinePath );
@@ -5886,7 +5901,7 @@ function fileCopyLinksSync( test )
   var otherFile = provider.fileRead( otherPath );
   test.identical( dstFile, otherFile );
 
-  //
+  /* - */
 
   test.case = 'src - not terminal, dst - hard link';
   provider.filesDelete( routinePath );
@@ -5915,7 +5930,7 @@ function fileCopyLinksSync( test )
   var otherFile = provider.fileRead( otherPath );
   test.identical( dstFile, otherFile );
 
-  //
+  /* - */
 
   test.case = 'src - not terminal, dst - hard link';
   provider.filesDelete( routinePath );
@@ -5944,7 +5959,7 @@ function fileCopyLinksSync( test )
   var otherFile = provider.fileRead( otherPath );
   test.identical( dstFile, otherFile );
 
-   //
+   /* - */
 
   test.case = 'src - not terminal, dst - hard link';
   provider.filesDelete( routinePath );
@@ -5973,7 +5988,7 @@ function fileCopyLinksSync( test )
   var otherFile = provider.fileRead( otherPath );
   test.identical( dstFile, otherFile );
 
-  //
+  /* - */
 
   if( !test.context.softLinkIsSupported() )
   return;
@@ -6002,7 +6017,7 @@ function fileCopyLinksSync( test )
   var srcFile = provider.fileRead( srcPath );
   test.identical( dstFile, otherFile );
 
-  //
+  /* - */
 
   test.case = 'dst is a soft link, breakingDstSoftLink : 0 ,breakingDstHardLink : 1';
   provider.filesDelete( routinePath );
@@ -6028,7 +6043,7 @@ function fileCopyLinksSync( test )
   var srcFile = provider.fileRead( srcPath );
   test.identical( dstFile, otherFile );
 
-  //
+  /* - */
 
   test.case = 'src - not terminal, dst - soft link';
   provider.filesDelete( routinePath );
@@ -6057,7 +6072,7 @@ function fileCopyLinksSync( test )
   var otherFile = provider.fileRead( otherPath );
   test.identical( dstFile, otherFile );
 
-  //
+  /* - */
 
   test.case = 'src - not terminal, dst - soft link';
   provider.filesDelete( routinePath );
@@ -6086,7 +6101,7 @@ function fileCopyLinksSync( test )
   var otherFile = provider.fileRead( otherPath );
   test.identical( dstFile, otherFile );
 
-  //
+  /* - */
 
   test.case = 'src - not terminal, dst - soft link';
   provider.filesDelete( routinePath );
@@ -6115,7 +6130,7 @@ function fileCopyLinksSync( test )
   var otherFile = provider.fileRead( otherPath );
   test.identical( dstFile, otherFile );
 
-  //
+  /* - */
 
   test.case = 'src - not terminal, dst - soft link';
   provider.filesDelete( routinePath );
@@ -6144,7 +6159,7 @@ function fileCopyLinksSync( test )
   var otherFile = provider.fileRead( otherPath );
   test.identical( dstFile, otherFile );
 
-  //
+  /* - */
 
   test.case = 'src - not terminal, dst - soft link';
   provider.filesDelete( routinePath );
@@ -6173,7 +6188,7 @@ function fileCopyLinksSync( test )
   var otherFile = provider.fileRead( otherPath );
   test.identical( dstFile, otherFile );
 
-  //
+  /* - */
 
   test.case = 'src link is broken, src resolving is on'
   var srcPath = path.join( routinePath, 'src' );
@@ -6205,7 +6220,7 @@ function fileCopyLinksSync( test )
   test.is( !provider.fileExists( path.join( dstPath, 'fileNotExists' ) ) );
   test.is( provider.fileExists( path.join( dstPath, 'terminal' ) ) );
 
-  //
+  /* - */
 
   test.case = 'src link is broken, src resolving is on'
   var srcPath = path.join( routinePath, 'src' );
@@ -6238,7 +6253,7 @@ function fileCopyLinksSync( test )
   test.is( !provider.fileExists( path.join( dstPath, 'fileNotExists' ) ) );
   test.is( provider.fileExists( path.join( dstPath, 'terminal' ) ) );
 
-  //
+  /* - */
 
   test.case = 'src link is broken, src resolving is off'
   var srcPath = path.join( routinePath, 'src' );
@@ -6270,7 +6285,7 @@ function fileCopyLinksSync( test )
   test.is( !provider.fileExists( path.join( dstPath, 'fileNotExists' ) ) );
   test.is( provider.fileExists( path.join( dstPath, 'terminal' ) ) );
 
-  //
+  /* - */
 
   test.case = 'src link is broken, src resolving is on, allowingMissed is off'
   var srcPath = path.join( routinePath, 'src' );
@@ -6306,7 +6321,7 @@ function fileCopyLinksSync( test )
   test.is( !provider.fileExists( path.join( dstPath, 'fileNotExists' ) ) );
   test.is( provider.fileExists( path.join( dstPath, 'terminal' ) ) );
 
-  //
+  /* - */
 
   test.case = 'src link is cycled, src resolving is on'
   var srcPath = path.join( routinePath, 'src' );
@@ -6340,7 +6355,7 @@ function fileCopyLinksSync( test )
   test.is( provider.fileExists( dstLinkPath ) );
   test.is( provider.fileExists( path.join( dstPath, 'terminal' ) ) );
 
-  //
+  /* - */
 
   test.case = 'src link is cycled, src resolving is off'
   var srcPath = path.join( routinePath, 'src' );
@@ -6374,7 +6389,7 @@ function fileCopyLinksSync( test )
   test.is( provider.fileExists( dstLinkPath ) );
   test.is( provider.fileExists( path.join( dstPath, 'terminal' ) ) );
 
-  //
+  /* - */
 
   test.case = 'src link is cycled, src resolving is on, allowingMissed is off'
   var srcPath = path.join( routinePath, 'src' );
@@ -6440,7 +6455,7 @@ function fileCopyAsync( test )
 
   var consequence = new _.Consequence().take( null );
 
-  //
+  /* - */
 
   consequence
   .ifNoErrorThen( function( arg )
@@ -6520,7 +6535,7 @@ function fileCopyAsync( test )
     });
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -6547,7 +6562,7 @@ function fileCopyAsync( test )
     });
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -6643,7 +6658,7 @@ function fileCopyAsync( test )
     });
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -6739,7 +6754,7 @@ function fileCopyAsync( test )
     });
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -6837,7 +6852,7 @@ function fileCopyAsync( test )
     });
   });
 
-  //
+  /* - */
 
   if( context.providerIsInstanceOf( _.FileProvider.Extract ) )
   return consequence;
@@ -6982,7 +6997,7 @@ function fileCopyLinksAsync( test )
 
   var con = new _.Consequence().take( null )
 
-  //
+  /* - */
 
   /* hardLink */
 
@@ -7018,7 +7033,7 @@ function fileCopyLinksAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( () =>
   {
@@ -7052,7 +7067,7 @@ function fileCopyLinksAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( () =>
   {
@@ -7086,7 +7101,7 @@ function fileCopyLinksAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( () =>
   {
@@ -7120,7 +7135,7 @@ function fileCopyLinksAsync( test )
     })
   });
 
-  //
+  /* - */
 
   if( !test.context.softLinkIsSupported() )
   return con;
@@ -7154,7 +7169,7 @@ function fileCopyLinksAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .finally( () =>
   {
@@ -7585,7 +7600,7 @@ function fileCopySoftLinkResolving( test )
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
-  //
+  /* - */
 
   provider.filesDelete( routinePath );
   provider.dirMake( routinePath );
@@ -7650,7 +7665,7 @@ function fileCopySoftLinkResolving( test )
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
-  //
+  /* - */
 
   provider.filesDelete( routinePath );
   provider.dirMake( routinePath );
@@ -7716,7 +7731,7 @@ function fileCopySoftLinkResolving( test )
   //test.identical( provider.statResolvedRead( srcPath ), null );
   //test.identical( provider.statResolvedRead( dstPath ), null );
 
-  //
+  /* - */
 
   provider.filesDelete( routinePath );
   provider.dirMake( routinePath );
@@ -8185,7 +8200,7 @@ function fileCopyError( test )
   test.is( !provider.fileExists( srcPath ) );
   test.is( !provider.fileExists( dstPath ) );
 
-  //
+  /* - */
 
   test.case = 'missing';
   provider.filesDelete( routinePath );
@@ -8201,7 +8216,7 @@ function fileCopyError( test )
   test.is( !provider.fileExists( srcPath ) );
   test.is( !provider.fileExists( dstPath ) );
 
-  //
+  /* - */
 
   test.case = 'try to copy dir';
   provider.filesDelete( routinePath );
@@ -8217,7 +8232,7 @@ function fileCopyError( test )
   test.is( provider.isDir( srcPath ) );
   test.is( !provider.fileExists( dstPath ) );
 
-  //
+  /* - */
 
   test.case = 'try to copy dir';
   provider.filesDelete( routinePath );
@@ -8234,7 +8249,7 @@ function fileCopyError( test )
   test.is( provider.isDir( srcPath ) );
   test.is( !provider.fileExists( dstPath ) );
 
-  //
+  /* - */
 
   test.case = 'try to copy soft link to dir';
   provider.filesDelete( routinePath );
@@ -8254,7 +8269,7 @@ function fileCopyError( test )
   test.is( provider.isSoftLink( dstPath ) );
   test.identical( provider.pathResolveSoftLink( dstPath ), srcPath );
 
-  //
+  /* - */
 
   test.case = 'try to copy soft link to dir';
   provider.filesDelete( routinePath );
@@ -8272,7 +8287,7 @@ function fileCopyError( test )
   test.is( provider.isSoftLink( dstPath ) );
   test.identical( provider.pathResolveSoftLink( dstPath ), routinePath );
 
-  //
+  /* - */
 
   test.case = 'try to copy soft link to dir';
   provider.filesDelete( routinePath );
@@ -8307,7 +8322,7 @@ function fileCopyError( test )
   test.identical( provider.fileRead( srcPath ), srcPath );
   test.identical( provider.fileRead( dstPath ), dstPath );
 
-  //
+  /* - */
 
   test.case = 'rewriting terminal';
   provider.filesDelete( routinePath );
@@ -8327,7 +8342,7 @@ function fileCopyError( test )
   test.identical( provider.fileRead( srcPath ), srcPath );
   test.identical( provider.fileRead( dstPath ), dstPath );
 
-  //
+  /* - */
 
   test.case = 'rewriting routinePath by terminal';
   provider.filesDelete( routinePath );
@@ -8347,7 +8362,7 @@ function fileCopyError( test )
   test.identical( provider.fileRead( srcPath ), srcPath );
   test.identical( provider.dirRead( dstPath ), [] );
 
-  //
+  /* - */
 
   test.case = 'rewriting routinePath by terminal';
   provider.filesDelete( routinePath );
@@ -8368,7 +8383,7 @@ function fileCopyError( test )
   test.identical( provider.fileRead( srcPath ), srcPath );
   test.identical( provider.dirRead( dstPath ), [] );
 
-  //
+  /* - */
 
   test.case = 'error on resolve src';
   provider.filesDelete( routinePath );
@@ -8385,7 +8400,7 @@ function fileCopyError( test )
   test.is( provider.isTerminal( dstPath ) );
   test.identical( provider.fileRead( dstPath ), dstPath );
 
-  //
+  /* - */
 
   test.case = 'error on resolve src';
   provider.filesDelete( routinePath );
@@ -8403,7 +8418,7 @@ function fileCopyError( test )
   test.is( provider.isTerminal( dstPath ) );
   test.identical( provider.fileRead( dstPath ), dstPath );
 
-  //
+  /* - */
 
   test.case = 'error on resolve src';
   provider.filesDelete( routinePath );
@@ -8423,7 +8438,7 @@ function fileCopyError( test )
   test.identical( provider.pathResolveSoftLink( srcPath ), missingPath );
   test.identical( provider.pathResolveSoftLink( dstPath ), srcPath );
 
-  //
+  /* - */
 
   test.case = 'error on resolve src';
   provider.filesDelete( routinePath );
@@ -8443,7 +8458,7 @@ function fileCopyError( test )
   test.identical( provider.pathResolveSoftLink( srcPath ), missingPath );
   test.identical( provider.pathResolveSoftLink( dstPath ), srcPath );
 
-  //
+  /* - */
 
   test.case = 'error on fileCopy missed link should not be throwen';
   provider.filesDelete( routinePath );
@@ -8463,7 +8478,7 @@ function fileCopyError( test )
   test.is( provider.isSoftLink( dstPath ) );
   test.identical( provider.pathResolveSoftLink( srcPath ), missingPath );
 
-  //
+  /* - */
 
   test.case = 'error on fileCopy missed link should not be throwen';
   provider.filesDelete( routinePath );
@@ -8483,7 +8498,7 @@ function fileCopyError( test )
   test.is( provider.isSoftLink( dstPath ) );
   test.identical( provider.pathResolveSoftLink( srcPath ), missingPath );
 
-  //
+  /* - */
 
   test.case = 'error on resolve src';
   provider.filesDelete( routinePath );
@@ -8503,7 +8518,7 @@ function fileCopyError( test )
   test.identical( provider.pathResolveSoftLink( srcPath ), missingPath );
   test.identical( provider.fileRead( dstPath ), dstPath );
 
-  //
+  /* - */
 
   test.case = 'error on resolve src';
   provider.filesDelete( routinePath );
@@ -9649,7 +9664,7 @@ function fileCopyAsyncThrowingError( test )
     })
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -9673,7 +9688,7 @@ function fileCopyAsyncThrowingError( test )
     })
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -9698,7 +9713,7 @@ function fileCopyAsyncThrowingError( test )
 
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -9724,7 +9739,7 @@ function fileCopyAsyncThrowingError( test )
 
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -9752,7 +9767,7 @@ function fileCopyAsyncThrowingError( test )
     })
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -9778,7 +9793,7 @@ function fileCopyAsyncThrowingError( test )
     })
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -9805,7 +9820,7 @@ function fileCopyAsyncThrowingError( test )
     })
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -9832,7 +9847,7 @@ function fileCopyAsyncThrowingError( test )
     })
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -9861,7 +9876,7 @@ function fileCopyAsyncThrowingError( test )
 
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -9890,7 +9905,7 @@ function fileCopyAsyncThrowingError( test )
 
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -9919,7 +9934,7 @@ function fileCopyAsyncThrowingError( test )
     })
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -9944,7 +9959,7 @@ function fileCopyAsyncThrowingError( test )
     })
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -9999,7 +10014,7 @@ function fileCopyAsyncThrowingError( test )
     })
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -10027,7 +10042,7 @@ function fileCopyAsyncThrowingError( test )
     })
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -10056,7 +10071,7 @@ function fileCopyAsyncThrowingError( test )
 
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -10084,7 +10099,7 @@ function fileCopyAsyncThrowingError( test )
     })
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -10112,7 +10127,7 @@ function fileCopyAsyncThrowingError( test )
     })
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -10374,7 +10389,7 @@ function fileRenameSync( test )
   var dstPath = test.context.pathFor( 'written/fileRename/dst' );
   var routinePath  = context.provider.path.dir( srcPath );
 
-  //
+  /* - */
 
   test.case = 'src not exist';
 
@@ -10434,7 +10449,7 @@ function fileRenameSync( test )
   });
   test.identical( got, null );
 
-  //
+  /* - */
 
   test.case = 'rename in same directory,dst not exist';
 
@@ -10501,7 +10516,7 @@ function fileRenameSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'dst' ] );
 
-  //
+  /* - */
 
   test.case = 'rename with rewriting in same directory';
 
@@ -10565,7 +10580,7 @@ function fileRenameSync( test )
   });
   test.identical( got, null );
 
-  //
+  /* - */
 
   test.case = 'rename routinePath, dst not exist';
   provider.filesDelete( routinePath );
@@ -10633,7 +10648,7 @@ function fileRenameSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'dst' ] );
 
-  //
+  /* - */
 
   test.case = 'rename moving to other existing dir';
 
@@ -10709,7 +10724,7 @@ function fileRenameSync( test )
   var files = provider.dirRead( context.provider.path.dir( dstPath ) );
   test.identical( files, [ 'dst' ] );
 
-  //
+  /* - */
 
   test.case = 'rename moving to not existing dir';
 
@@ -10782,7 +10797,7 @@ function fileRenameSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'src' ] );
 
-  //
+  /* - */
 
   test.case = 'dst is not empty dir';
 
@@ -10984,7 +10999,7 @@ function fileRenameSync2( test )
   test.identical( srcRead, srcPath );
   test.identical( dstRead, dstPath );
 
-  //
+  /* - */
 
   test.shouldThrowErrorOfAnyKind( () =>
   {
@@ -11004,7 +11019,7 @@ function fileRenameSync2( test )
   test.identical( srcRead, srcPath );
   test.identical( dstRead, dstPath );
 
-  //
+  /* - */
 
   test.mustNotThrowError( () =>
   {
@@ -11024,7 +11039,7 @@ function fileRenameSync2( test )
   test.identical( srcRead, srcPath );
   test.identical( dstRead, dstPath );
 
-  //
+  /* - */
 
   test.mustNotThrowError( () =>
   {
@@ -11044,7 +11059,7 @@ function fileRenameSync2( test )
   test.identical( srcRead, srcPath );
   test.identical( dstRead, dstPath );
 
-  //
+  /* - */
 
   provider.filesDelete( routinePath );
   provider.fileWrite( srcPath, srcPath );
@@ -11062,7 +11077,7 @@ function fileRenameSync2( test )
   var dstRead = provider.fileRead( dstPath );
   test.identical( dstRead, srcPath );
 
-  //
+  /* - */
 
   provider.fileWrite( srcPath, srcPath );
   provider.fileWrite( dstPath, dstPath );
@@ -11105,7 +11120,7 @@ function fileRenameSync2( test )
   var srcRead = provider.fileRead( srcPath );
   test.identical( srcRead, srcPath );
 
-  //
+  /* - */
 
   test.shouldThrowErrorOfAnyKind( () =>
   {
@@ -11123,7 +11138,7 @@ function fileRenameSync2( test )
   var srcRead = provider.fileRead( srcPath );
   test.identical( srcRead, srcPath );
 
-  //
+  /* - */
 
   test.mustNotThrowError( () =>
   {
@@ -11141,7 +11156,7 @@ function fileRenameSync2( test )
   var srcRead = provider.fileRead( srcPath );
   test.identical( srcRead, srcPath );
 
-  //
+  /* - */
 
   test.mustNotThrowError( () =>
   {
@@ -11159,7 +11174,7 @@ function fileRenameSync2( test )
   var srcRead = provider.fileRead( srcPath );
   test.identical( srcRead, srcPath );
 
-  //
+  /* - */
 
   provider.filesDelete( routinePath );
   provider.fileWrite( srcPath, srcPath );
@@ -11180,7 +11195,7 @@ function fileRenameSync2( test )
   var srcRead = provider.fileRead( srcPath );
   test.identical( srcRead, srcPath );
 
-  //
+  /* - */
 
   provider.filesDelete( routinePath );
   provider.fileWrite( srcPath, srcPath );
@@ -11207,7 +11222,7 @@ function fileRenameSync2( test )
   dstPath = provider.path.join( dstPath, 'dstFile' );
   provider.filesDelete( routinePath );
 
-  //
+  /* - */
 
   provider.fileWrite( srcPath, srcPath );
   test.shouldThrowErrorOfAnyKind( () =>
@@ -11227,7 +11242,7 @@ function fileRenameSync2( test )
   var srcRead = provider.fileRead( srcPath );
   test.identical( srcRead, srcPath );
 
-  //
+  /* - */
 
   provider.fileWrite( srcPath, srcPath );
   test.mustNotThrowError( () =>
@@ -11247,7 +11262,7 @@ function fileRenameSync2( test )
   var srcRead = provider.fileRead( srcPath );
   test.identical( srcRead, srcPath );
 
-  //
+  /* - */
 
   provider.fileWrite( srcPath, srcPath );
   provider.fileRename
@@ -11356,7 +11371,7 @@ function fileRenameRelativePath( test )
 
   test.close( 'src - relative path to a file' );
 
-  //
+  /* - */
 
   test.open( 'dst - relative path to a file' );
 
@@ -11436,7 +11451,7 @@ function fileRenameRelativePath( test )
 
   test.close( 'dst - relative path to a file' );
 
-  //
+  /* - */
 
   test.open( 'src - relative path to a dir' );
 
@@ -11512,7 +11527,7 @@ function fileRenameRelativePath( test )
 
   test.close( 'src - relative path to a dir' );
 
-  //
+  /* - */
 
   test.open( 'dst - relative path to a dir' );
 
@@ -11751,7 +11766,7 @@ function fileRenameAsync( test )
     });
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -11858,7 +11873,7 @@ function fileRenameAsync( test )
     });
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -11955,7 +11970,7 @@ function fileRenameAsync( test )
     });
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -12063,7 +12078,7 @@ function fileRenameAsync( test )
     });
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -12176,7 +12191,7 @@ function fileRenameAsync( test )
     });
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -12283,7 +12298,7 @@ function fileRenameAsync( test )
     });
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -12493,7 +12508,7 @@ function fileRenameActSync( test )
   var srcPath = path.join( routinePath,'src' );
   var dstPath = path.join( routinePath,'dst' );
 
-  //
+  /* - */
 
   test.case = 'no src';
   provider.filesDelete( routinePath );
@@ -12509,7 +12524,7 @@ function fileRenameActSync( test )
     })
   })
 
-  //
+  /* - */
 
   test.case = 'no src';
   provider.filesDelete( routinePath );
@@ -12525,7 +12540,7 @@ function fileRenameActSync( test )
     })
   })
 
-  //
+  /* - */
 
   test.case = 'no src';
   provider.filesDelete( routinePath );
@@ -12541,7 +12556,7 @@ function fileRenameActSync( test )
     })
   })
 
-  //
+  /* - */
 
   test.case = 'no src';
   provider.filesDelete( routinePath );
@@ -12557,7 +12572,7 @@ function fileRenameActSync( test )
     })
   })
 
-  //
+  /* - */
 
   test.case = 'no src, dst exists';
   provider.filesDelete( routinePath );
@@ -12576,7 +12591,7 @@ function fileRenameActSync( test )
   var dstFile = provider.fileRead( dstPath );
   test.identical( dstFile, dstPath );
 
-  //
+  /* - */
 
   test.case = 'src : directory, no dst';
   provider.filesDelete( routinePath );
@@ -12592,7 +12607,7 @@ function fileRenameActSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'dst' ] )
 
-  //
+  /* - */
 
   test.case = 'no structure before dst';
   var srcPath = path.join( routinePath,'src' );
@@ -12613,7 +12628,7 @@ function fileRenameActSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'src' ] );
 
-  //
+  /* - */
 
   test.case = 'src - terminal, dst - directory';
   var srcPath = path.join( routinePath,'src' );
@@ -12636,7 +12651,7 @@ function fileRenameActSync( test )
   test.identical( files, [ 'dstPath', 'src' ] );
   var files = provider.dirRead( dstPath );
   test.identical( files, [] );
-  //
+  /* - */
 
   test.case = 'simple rename';
   var srcPath = path.join( routinePath,'src' );
@@ -12657,7 +12672,7 @@ function fileRenameActSync( test )
   var dstFile = provider.fileRead( dstPath );
   test.identical( srcPath, dstFile );
 
-  //
+  /* - */
 
   test.case = 'dst exists';
   var srcPath = path.join( routinePath,'src' );
@@ -12703,14 +12718,14 @@ function fileRenameActSync( test )
     test.identical( dstFile, dstPath );
   }
 
-  //
+  /* - */
 
   var routinePath = test.context.pathFor( 'written/' + test.name );
   var srcPath = path.join( routinePath, 'src' );
   var dstPath = path.join( routinePath, 'dst' );
   var otherPath = path.join( routinePath, 'other' );
 
-  //
+  /* - */
 
   test.case = 'should not create folders structure for path';
   var srcPath = path.join( routinePath,'src' );
@@ -12731,7 +12746,7 @@ function fileRenameActSync( test )
   test.is( !provider.fileExists( dstPath ) );
   provider.filesDelete( routinePath );
 
-  //
+  /* - */
 
   test.case = 'should not extend or delete fields of options map, no _providerDefaultsApply, routineOptions';
   provider.filesDelete( routinePath );
@@ -12756,7 +12771,7 @@ function fileRenameActSync( test )
   test.identical( got, expected );
   provider.filesDelete( routinePath );
 
-  //
+  /* - */
 
   test.case = 'should path nativize all paths in options map if needed by its own means';
   var srcPath = path.join( routinePath,'src' );
@@ -12781,7 +12796,7 @@ function fileRenameActSync( test )
   test.identical( o, expected );
   provider.filesDelete( routinePath );
 
-  //
+  /* - */
 
   test.case = 'use terminal as parent directory';
   var srcPath = path.join( routinePath,'src' );
@@ -12800,7 +12815,7 @@ function fileRenameActSync( test )
   test.is( provider.isTerminal( srcPath ) );
   test.is( !provider.fileExists( dstPath2 ) );
 
-  //
+  /* - */
 
   if( !Config.debug )
   return;
@@ -12821,7 +12836,7 @@ function fileRenameActSync( test )
     });
   })
 
-  //
+  /* - */
 
   test.case = 'should not extend or delete fields of options map, no _providerDefaultsApply, routineOptions';
   var srcPath = path.join( routinePath,'src' );;
@@ -12857,7 +12872,7 @@ function fileRenameActSync( test )
     provider.fileRenameAct( o );
   });
 
-  //
+  /* - */
 
   test.case = 'should expect normalized path, but not nativized';
   var srcPath = routinePath + '\\src';
@@ -12877,7 +12892,7 @@ function fileRenameActSync( test )
   test.mustNotThrowError( () => provider.fileRenameAct( o ) );
   provider.filesDelete( routinePath );
 
-  //
+  /* - */
 
   test.case = 'should expect ready options map, no complex arguments preprocessing';
   var srcPath = path.join( routinePath,'src' );
@@ -14649,7 +14664,7 @@ function fileDeleteSync( test )
   if( !provider.statResolvedRead( routinePath ) )
   provider.dirMake( routinePath );
 
-  //
+  /* - */
 
   test.case = 'removing not existing path';
 
@@ -14678,7 +14693,7 @@ function fileDeleteSync( test )
     test.identical( got, null );
   });
 
-  //
+  /* - */
 
   test.case = 'removing existing file';
   var filePath = test.context.pathFor( 'written/fileDelete/file.txt');
@@ -14707,7 +14722,7 @@ function fileDeleteSync( test )
   var stat = provider.statResolvedRead( filePath );
   test.identical( stat, null );
 
-  //
+  /* - */
 
   test.case = 'removing empty folder';
   var filePath = test.context.pathFor( 'written/fileDelete/folder');
@@ -14736,7 +14751,7 @@ function fileDeleteSync( test )
   var stat = provider.statResolvedRead( filePath );
   test.identical( stat, null );
 
-  //
+  /* - */
 
   test.case = 'try removing folder with file';
   var filePath = test.context.pathFor( 'written/fileDelete/folder/file.txt');
@@ -14776,7 +14791,7 @@ function fileDeleteSync( test )
   {
     test.case = 'try to remove filesTree';
 
-    //
+    /* - */
 
     // test.shouldThrowErrorSync( function()
     // {
@@ -14832,11 +14847,11 @@ function fileDeleteSync( test )
     test.is( !!stat );
   }
 
-  //
+  /* - */
 
   var filePath = path.join( routinePath, 'file' );
 
-  //
+  /* - */
 
   // test.case = 'delete soft link, resolvingHardLink 1';
   // provider.filesDelete( routinePath );
@@ -14864,7 +14879,7 @@ function fileDeleteSync( test )
   // test.is( !!stat );
   // provider.fieldPop( 'resolvingHardLink', 0 );
 
-  //
+  /* - */
 
   if( !test.context.softLinkIsSupported() )
   return;
@@ -14913,7 +14928,7 @@ function fileDeleteActSync( test )
   var mp = _.routineJoin( test.context, test.context.pathFor );
   var routinePath = mp( 'fileDeleteActSync' );
 
-  //
+  /* - */
 
   test.case = 'basic usage';
   var srcPath = path.join( routinePath,'src' );
@@ -14930,7 +14945,7 @@ function fileDeleteActSync( test )
   test.is( !stat );
   provider.filesDelete( routinePath );
 
-  //
+  /* - */
 
   test.case = 'no src';
   var srcPath = path.join( routinePath,'src' );
@@ -14946,7 +14961,7 @@ function fileDeleteActSync( test )
   var stat = provider.statResolvedRead( srcPath );
   test.is( !stat );
 
-  //
+  /* - */
 
   test.case = 'src is empty dir';
   provider.filesDelete( routinePath );
@@ -14962,7 +14977,7 @@ function fileDeleteActSync( test )
   test.is( !stat );
   provider.filesDelete( routinePath );
 
-  //
+  /* - */
 
   test.case = 'src is empty dir';
   provider.filesDelete( routinePath );
@@ -14981,7 +14996,7 @@ function fileDeleteActSync( test )
   test.is( !!stat );
   provider.filesDelete( routinePath );
 
-  //
+  /* - */
 
   test.case = 'should path nativize all paths in options map if needed by its own means';
   var srcPath = path.join( routinePath,'src' );
@@ -14998,7 +15013,7 @@ function fileDeleteActSync( test )
   test.is( !stat );
   provider.filesDelete( routinePath );
 
-  //
+  /* - */
 
   test.case = 'should not extend or delete fields of options map, no _providerDefaultsApply, routineOptions';
   var srcPath = path.join( routinePath,'src' );
@@ -15016,7 +15031,7 @@ function fileDeleteActSync( test )
   test.is( !stat );
   provider.filesDelete( routinePath );
 
-  //
+  /* - */
 
   if( !Config.debug )
   return;
@@ -15033,7 +15048,7 @@ function fileDeleteActSync( test )
     });
   })
 
-  //
+  /* - */
 
   test.case = 'should not extend or delete fields of options map, no _providerDefaultsApply, routineOptions';
   var srcPath = path.join( routinePath,'src' );
@@ -15061,7 +15076,7 @@ function fileDeleteActSync( test )
     provider.fileDeleteAct( o );
   });
 
-  //
+  /* - */
 
   if( !context.providerIsInstanceOf( _.FileProvider.System ) )
   if( context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
@@ -15093,7 +15108,7 @@ function fileDeleteActSync( test )
     provider.filesDelete( routinePath );
   }
 
-  //
+  /* - */
 
   test.case = 'should expect ready options map, no complex arguments preprocessing';
   var srcPath = path.join( routinePath,'src' );
@@ -15175,7 +15190,7 @@ function fileDeleteAsync( test )
 
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -15226,7 +15241,7 @@ function fileDeleteAsync( test )
     });
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -15275,7 +15290,7 @@ function fileDeleteAsync( test )
     });
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -15334,7 +15349,7 @@ function fileDeleteAsync( test )
 
     test.case = 'try to remove filesTree';
 
-    //
+    /* - */
 
     return test.shouldThrowErrorOfAnyKind( function()
     {
@@ -15515,7 +15530,7 @@ function fileDeleteLocked( test )
     return;
   }
 
-  //
+  /* - */
 
   let fs = require( 'fs' );
   let routinePath = context.pathFor( 'write/fileDeleteLocked' );
@@ -15539,7 +15554,7 @@ function fileDeleteLocked( test )
   test.will = 'terminal is closed and removed';
   test.is( !provider.fileExists( terminalPath ) );
 
-  //
+  /* - */
 
   test.case = 'try to delete opened file, using fileDelete';
   provider.fileWrite( terminalPath, terminalPath );
@@ -15561,7 +15576,7 @@ function fileDeleteLocked( test )
   test.will = 'terminal is closed and removed';
   test.is( !provider.fileExists( terminalPath ) );
 
-  //
+  /* - */
 
   // for( let i = 0; i < 1000; i++ )
   // {
@@ -15572,7 +15587,7 @@ function fileDeleteLocked( test )
   //   fs.closeSync( fd );
   // }
 
-  //
+  /* - */
 
   test.case = 'try to delete opened file using fs.createReadStream';
   provider.fileWrite( terminalPath, terminalPath );
@@ -15726,7 +15741,7 @@ function statResolvedReadSync( test )
   if( !provider.statResolvedRead( routinePath ) )
   provider.dirMake( routinePath );
 
-  //
+  /* - */
 
   filePath = test.context.pathFor( 'read/statResolvedRead/src.txt' );
   provider.fileWrite( filePath, 'Excepteur sint occaecat cupidatat non proident' );
@@ -15752,7 +15767,7 @@ function statResolvedReadSync( test )
   expected = BigInt( expected );
   test.identical( got.size, expected );
 
-  //
+  /* - */
 
   test.case = 'invalid path';
   filePath = test.context.pathFor( '///bad path///test.txt' );
@@ -15815,7 +15830,7 @@ function fileLockWaitingSharingSync( test )
   provider.fileUnlock( filePath );
   test.is( !provider.fileIsLocked( filePath ) );
 
-  //
+  /* - */
 
   test.case = 'fileFile is missing'
   provider.filesDelete( routinePath );
@@ -15832,7 +15847,7 @@ function fileLockWaitingSharingSync( test )
     });
   });
 
-  //
+  /* - */
 
   test.case = 'fileFile is missing, throwing off'
   provider.filesDelete( routinePath );
@@ -15847,7 +15862,7 @@ function fileLockWaitingSharingSync( test )
   });
   test.identical( got, null );
 
-  //
+  /* - */
 
   test.case = 'try to lock file for second time';
   provider.filesDelete( routinePath )
@@ -15880,7 +15895,7 @@ function fileLockWaitingSharingSync( test )
   test.is( !provider.fileIsLocked( filePath ) );
 
 
-  //
+  /* - */
 
   test.case = 'try to lock file for second time, throwing off';
   provider.filesDelete( routinePath )
@@ -15947,7 +15962,7 @@ function fileLockWaitingNotSharingSync( test )
   provider.fileUnlock( filePath );
   test.is( !provider.fileIsLocked( filePath ) );
 
-  //
+  /* - */
 
   test.case = 'fileFile is missing'
   provider.filesDelete( routinePath );
@@ -15964,7 +15979,7 @@ function fileLockWaitingNotSharingSync( test )
     });
   });
 
-  //
+  /* - */
 
   test.case = 'fileFile is missing, throwing off'
   provider.filesDelete( routinePath );
@@ -15979,7 +15994,7 @@ function fileLockWaitingNotSharingSync( test )
   });
   test.identical( got, null );
 
-  //
+  /* - */
 
   test.case = 'try to lock file for second time';
   provider.filesDelete( routinePath )
@@ -16012,7 +16027,7 @@ function fileLockWaitingNotSharingSync( test )
   test.is( !provider.fileIsLocked( filePath ) );
 
 
-  //
+  /* - */
 
   test.case = 'try to lock file for second time, throwing off';
   provider.filesDelete( routinePath )
@@ -16089,7 +16104,7 @@ function fileLockWaitingNotSharingAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -16113,7 +16128,7 @@ function fileLockWaitingNotSharingAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -16136,7 +16151,7 @@ function fileLockWaitingNotSharingAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -16189,7 +16204,7 @@ function fileLockWaitingNotSharingAsync( test )
     return con;
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -16243,7 +16258,7 @@ function fileLockWaitingNotSharingAsync( test )
     return con;
   })
 
-  //
+  /* - */
 
   return ready;
 }
@@ -16294,7 +16309,7 @@ function fileLockWaitingSharingAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -16318,7 +16333,7 @@ function fileLockWaitingSharingAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -16341,7 +16356,7 @@ function fileLockWaitingSharingAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -16394,7 +16409,7 @@ function fileLockWaitingSharingAsync( test )
     return con;
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -16448,7 +16463,7 @@ function fileLockWaitingSharingAsync( test )
     return con;
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -16549,7 +16564,7 @@ function fileLockNotWaitingSharingSync( test )
   provider.fileUnlock( filePath );
   test.is( !provider.fileIsLocked( filePath ) );
 
-  //
+  /* - */
 
   test.case = 'fileFile is missing'
   provider.filesDelete( routinePath );
@@ -16566,7 +16581,7 @@ function fileLockNotWaitingSharingSync( test )
     });
   });
 
-  //
+  /* - */
 
   test.case = 'fileFile is missing, throwing off'
   provider.filesDelete( routinePath );
@@ -16581,7 +16596,7 @@ function fileLockNotWaitingSharingSync( test )
   });
   test.identical( got, null );
 
-  //
+  /* - */
 
   test.case = 'try to lock file for second time';
   provider.filesDelete( routinePath )
@@ -16613,7 +16628,7 @@ function fileLockNotWaitingSharingSync( test )
   provider.fileUnlock( filePath );
   test.is( !provider.fileIsLocked( filePath ) );
 
-  //
+  /* - */
 
   test.case = 'try to lock file for second time, throwing off';
   provider.filesDelete( routinePath )
@@ -16692,7 +16707,7 @@ function fileLockNotWaitingSharingAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -16716,7 +16731,7 @@ function fileLockNotWaitingSharingAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -16739,7 +16754,7 @@ function fileLockNotWaitingSharingAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -16794,7 +16809,7 @@ function fileLockNotWaitingSharingAsync( test )
     return con;
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -16889,7 +16904,7 @@ function fileLockNotWaitingNotSharingSync( test )
   provider.fileUnlock( filePath );
   test.is( !provider.fileIsLocked( filePath ) );
 
-  //
+  /* - */
 
   test.case = 'fileFile is missing'
   provider.filesDelete( routinePath );
@@ -16906,7 +16921,7 @@ function fileLockNotWaitingNotSharingSync( test )
     });
   });
 
-  //
+  /* - */
 
   test.case = 'fileFile is missing, throwing off'
   provider.filesDelete( routinePath );
@@ -16921,7 +16936,7 @@ function fileLockNotWaitingNotSharingSync( test )
   });
   test.identical( got, null );
 
-  //
+  /* - */
 
   test.case = 'try to lock file for second time';
   provider.filesDelete( routinePath )
@@ -16953,7 +16968,7 @@ function fileLockNotWaitingNotSharingSync( test )
   provider.fileUnlock( filePath );
   test.is( !provider.fileIsLocked( filePath ) );
 
-  //
+  /* - */
 
   test.case = 'try to lock file for second time, throwing off';
   provider.filesDelete( routinePath )
@@ -17030,7 +17045,7 @@ function fileLockNotWaitingNotSharingAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -17054,7 +17069,7 @@ function fileLockNotWaitingNotSharingAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -17077,7 +17092,7 @@ function fileLockNotWaitingNotSharingAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -17130,7 +17145,7 @@ function fileLockNotWaitingNotSharingAsync( test )
     return con;
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -17787,7 +17802,7 @@ function statReadActSync( test )
   else
   test.identical( stat.size, read.length );
 
-  //
+  /* - */
 
   provider.fieldPush( 'usingTextLink', 0 );
 
@@ -17857,7 +17872,7 @@ function statReadActSync( test )
 
   provider.fieldPop( 'usingTextLink', 0 );
 
-  //
+  /* - */
 
   test.description = 'file2, resolving';
   var o =
@@ -17982,7 +17997,7 @@ function statReadActSync( test )
   test.is( !!stat );
   provider.filesDelete( routinePath );
 
-  //
+  /* - */
 
   test.case = 'no src';
   var srcPath = path.join( routinePath,'src' );
@@ -17999,7 +18014,7 @@ function statReadActSync( test )
   test.is( !stat );
   provider.filesDelete( routinePath );
 
-  //
+  /* - */
 
   test.case = 'no src';
   var srcPath = path.join( routinePath,'src' );
@@ -18015,7 +18030,7 @@ function statReadActSync( test )
   test.identical( o, expected );
   provider.filesDelete( routinePath );
 
-  //
+  /* - */
 
   test.case = 'should not extend or delete fields of options map, no _providerDefaultsApply, routineOptions';
   var srcPath = path.join( routinePath,'src' );
@@ -18035,7 +18050,7 @@ function statReadActSync( test )
   test.is( !!stat );
   provider.filesDelete( routinePath );
 
-  //
+  /* - */
 
   if( test.context.softLinkIsSupported() )
   {
@@ -18056,7 +18071,7 @@ function statReadActSync( test )
     test.is( !stat.isSoftLink() );
     provider.filesDelete( routinePath );
 
-    //
+    /* - */
 
     test.case = 'src is a soft link';
     var srcPath = path.join( routinePath,'src' );
@@ -18076,7 +18091,7 @@ function statReadActSync( test )
     provider.filesDelete( routinePath );
   }
 
-  //
+  /* - */
 
   if( !Config.debug )
   return;
@@ -18100,7 +18115,7 @@ function statReadActSync( test )
 
 
 
-  //
+  /* - */
 
   test.shouldThrowErrorOfAnyKind( () =>
   {
@@ -18113,7 +18128,7 @@ function statReadActSync( test )
     });
   })
 
-  //
+  /* - */
 
   test.case = 'should not extend or delete fields of options map, no _providerDefaultsApply, routineOptions';
   var srcPath = path.join( routinePath,'src' );
@@ -18130,7 +18145,7 @@ function statReadActSync( test )
     });
   });
 
-  //
+  /* - */
 
   test.shouldThrowErrorOfAnyKind( () =>
   {
@@ -18157,7 +18172,7 @@ function statReadActSync( test )
     provider.statReadAct( o );
   });
 
-  //
+  /* - */
 
   var o =
   {
@@ -18172,13 +18187,13 @@ function statReadActSync( test )
     provider.statReadAct( o );
   });
 
-  //
+  /* - */
 
   test.case = 'should expect normalized path, but not nativized';
   var srcPath = path.join( routinePath,'src' );
   provider.fileWrite( srcPath, srcPath );
 
-  //
+  /* - */
 
   if( !test.context.providerIsInstanceOf( _.FileProvider.System ) )
   if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
@@ -18208,7 +18223,7 @@ function statReadActSync( test )
     }
     provider.filesDelete( routinePath );
 
-    //
+    /* - */
 
     var o =
     {
@@ -18225,12 +18240,12 @@ function statReadActSync( test )
     provider.filesDelete( routinePath );
   }
 
-  //
+  /* - */
 
   test.case = 'should expect ready options map, no complex arguments preprocessing';
   var srcPath = path.join( routinePath,'src' );
 
-  //
+  /* - */
 
   var o =
   {
@@ -18246,7 +18261,7 @@ function statReadActSync( test )
   })
   test.identical( o.filePath, expected.filePath );
 
-  //
+  /* - */
 
   var o =
   {
@@ -18289,7 +18304,7 @@ function statResolvedReadAsync( test )
 
   var consequence = new _.Consequence().take( null );
 
-  //
+  /* - */
 
   consequence
   .ifNoErrorThen( function( arg )
@@ -18340,7 +18355,7 @@ function statResolvedReadAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -18857,7 +18872,7 @@ function dirMakeSync( test )
   if( !provider.statResolvedRead( routinePath ) )
   provider.dirMake( routinePath );
 
-  //
+  /* - */
 
   test.case = 'synchronous mkdir';
   filePath = test.context.pathFor( 'written/dirMake/make_dir' );
@@ -18868,7 +18883,7 @@ function dirMakeSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'make_dir' ] );
 
-  //
+  /* - */
 
   test.case = 'synchronous mkdir force';
   provider.filesDelete( filePath );
@@ -18897,7 +18912,7 @@ function dirMakeSync( test )
     });
   })
 
-  //
+  /* - */
 
   test.case = 'try to rewrite terminal file';
   filePath = test.context.pathFor( 'written/dirMake/terminal.txt' );
@@ -18931,7 +18946,7 @@ function dirMakeSync( test )
     });
   })
 
-  //
+  /* - */
 
   test.case = 'try to rewrite empty dir';
   filePath = test.context.pathFor( 'written/dirMake/empty' );
@@ -19011,7 +19026,7 @@ function dirMakeSync( test )
     });
   });
 
-  //
+  /* - */
 
   test.case = '/dir exists, no rewritingTerminal, no force';
   filePath = test.context.pathFor( 'written/dirMake/make_dir/' );
@@ -19031,7 +19046,7 @@ function dirMakeSync( test )
     });
   });
 
-  //
+  /* - */
 
   test.case = 'try to rewrite folder with files';
   filePath = test.context.pathFor( 'written/dirMake/make_dir/file' );
@@ -19080,7 +19095,7 @@ function dirMakeSync( test )
   test.identical( files, [ 'make_dir' ] );
 
 
-  //
+  /* - */
 
   test.case = 'folders structure not exist';
   provider.filesDelete( routinePath );
@@ -19328,7 +19343,7 @@ function dirMakeAsync( test )
 
   var consequence = new _.Consequence().take( null );
 
-  //
+  /* - */
 
   consequence
   .ifNoErrorThen( function( arg )
@@ -19357,7 +19372,7 @@ function dirMakeAsync( test )
     });
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -19401,7 +19416,7 @@ function dirMakeAsync( test )
     return test.shouldThrowErrorOfAnyKind( con );
   })
 
-  //
+  /* - */
 
   .finally( function()
   {
@@ -19446,7 +19461,7 @@ function dirMakeAsync( test )
     return test.shouldThrowErrorOfAnyKind( con );
   })
 
-  //
+  /* - */
 
   .finally( function()
   {
@@ -19529,7 +19544,7 @@ function dirMakeAsync( test )
     return test.shouldThrowErrorOfAnyKind( con );
   })
 
-  //
+  /* - */
 
   .finally( function()
   {
@@ -19554,7 +19569,7 @@ function dirMakeAsync( test )
     return test.shouldThrowErrorOfAnyKind( con );
   })
 
-  //
+  /* - */
 
   .finally( function()
   {
@@ -19614,7 +19629,7 @@ function dirMakeAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -19717,7 +19732,7 @@ function hashReadSync( test )
   if( !provider.statResolvedRead( routinePath ) )
   provider.dirMake( routinePath );
 
-  //
+  /* - */
 
   test.case = 'synchronous filehash';
   data = 'Excepteur sint occaecat cupidatat non proident';
@@ -19732,7 +19747,7 @@ function hashReadSync( test )
   var expected = md5sum.digest( 'hex' );
   test.identical( got, expected );
 
-  //
+  /* - */
 
   test.case = 'invalid path';
   filePath = test.context.pathFor( 'invalid.txt' );
@@ -19828,7 +19843,7 @@ function hashReadAsync( test )
 
   consequence
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -19859,7 +19874,7 @@ function hashReadAsync( test )
     });
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -19974,7 +19989,7 @@ function dirReadSync( test )
   if( !provider.statResolvedRead( routinePath ) )
   provider.dirMake( routinePath );
 
-  //
+  /* - */
 
   test.case = 'synchronous read';
   filePath = test.context.pathFor( 'read/dirRead/1.txt' ),
@@ -19998,7 +20013,7 @@ function dirReadSync( test )
   var expected = [ "1.txt" ];
   test.identical( got.sort(), expected.sort() );
 
-  //
+  /* - */
 
   test.case = 'synchronous, filePath points to file';
   filePath = test.context.pathFor( 'read/dirRead/1.txt' );
@@ -20022,7 +20037,7 @@ function dirReadSync( test )
   var expected = [ '1.txt' ];
   test.identical( got, expected );
 
-  //
+  /* - */
 
   test.case = 'path not exist';
   filePath = test.context.pathFor( 'non_existing_folder' );
@@ -20213,7 +20228,7 @@ function dirReadAsync( test )
 
   consequence
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -20260,7 +20275,7 @@ function dirReadAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -20309,7 +20324,7 @@ function dirReadAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -20490,7 +20505,7 @@ function fileWriteSync( test )
     test.identical( got, expected );
   }
 
-  //
+  /* - */
 
   if( Config.debug )
   {
@@ -20554,7 +20569,7 @@ function fileWriteSync( test )
   var expected = 'APPENDAPPEND';
   test.identical( got, expected );
 
-  //
+  /* - */
 
   if( Config.debug )
   {
@@ -20620,7 +20635,7 @@ function fileWriteSync( test )
   var expected = 'new textLorem';
   test.identical( got, expected );
 
-  //
+  /* - */
 
   if( Config.debug )
   {
@@ -20650,7 +20665,7 @@ function fileWriteSync( test )
     });
   }
 
-  //
+  /* - */
 
   test.case = 'native path, call fileWrite'
   var filePath = test.context.pathFor( 'write_test/file' );
@@ -20664,7 +20679,7 @@ function fileWriteSync( test )
   test.identical( o.filePath, provider.path.preferredFromGlobal( filePath ) );
   test.identical( provider.fileRead( filePath ), data );
 
-  //
+  /* - */
 
   if( Config.debug )
   if( process.platform === 'win32' )
@@ -20717,7 +20732,7 @@ function fileWriteLinksSync( test )
 
   /*writeMode rewrite*/
 
-  //
+  /* - */
 
   provider.filesDelete( dirPath )
 
@@ -20770,7 +20785,7 @@ function fileWriteLinksSync( test )
   else
   test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), true );
 
-  //
+  /* - */
 
   provider.filesDelete( dirPath )
 
@@ -20824,7 +20839,7 @@ function fileWriteLinksSync( test )
   else
   test.identical( provider.filesAreHardLinked( [ srcPath, dstPath ] ), true );
 
-  //
+  /* - */
 
   provider.filesDelete( dirPath )
 
@@ -20930,7 +20945,7 @@ function fileWriteLinksSync( test )
   test.identical( got, data );
   test.is( provider.isSoftLink( dstPath ) );
 
-  //
+  /* - */
 
   provider.filesDelete( dirPath )
 
@@ -20981,7 +20996,7 @@ function fileWriteLinksSync( test )
   test.identical( got, expected );
   test.is( !provider.isSoftLink( dstPath ) );
 
-  //
+  /* - */
 
   provider.filesDelete( dirPath )
 
@@ -21033,7 +21048,7 @@ function fileWriteLinksSync( test )
   test.identical( got, expected );
   test.is( !provider.isSoftLink( dstPath ) );
 
-  //
+  /* - */
 
   provider.filesDelete( dirPath )
 
@@ -21085,7 +21100,7 @@ function fileWriteLinksSync( test )
   test.identical( got, expected );
   test.is( !provider.isSoftLink( dstPath ) );
 
-  //
+  /* - */
 
   provider.filesDelete( dirPath )
 
@@ -21135,7 +21150,7 @@ function fileWriteLinksSync( test )
   test.identical( got, data + data + data );
   test.is( provider.isSoftLink( dstPath ) );
 
-  //
+  /* - */
 
   provider.filesDelete( dirPath )
 
@@ -21409,7 +21424,7 @@ function fileWriteAsync( test )
     return test.shouldThrowErrorOfAnyKind( con );
   })
 
-  //
+  /* - */
 
   .finally( () =>
   {
@@ -21430,7 +21445,7 @@ function fileWriteAsync( test )
     })
   })
 
-  //
+  /* - */
 
   if( Config.debug )
   if( process.platform === 'win32' )
@@ -21482,7 +21497,7 @@ function fileWriteLinksAsync( test )
 
   var con = new _.Consequence().take( null )
 
-  //
+  /* - */
 
   .finally( function()
   {
@@ -21551,7 +21566,7 @@ function fileWriteLinksAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .finally( function()
   {
@@ -21623,7 +21638,7 @@ function fileWriteLinksAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .finally( function()
   {
@@ -21696,7 +21711,7 @@ function fileWriteLinksAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .finally( function()
   {
@@ -21769,7 +21784,7 @@ function fileWriteLinksAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .finally( function()
   {
@@ -22161,7 +22176,7 @@ function softLinkSync( test )
   if( !provider.statResolvedRead( routinePath ) )
   provider.dirMake( routinePath );
 
-  //
+  /* - */
 
   test.case = 'make link sync';
   srcPath  = test.context.pathFor( 'written/softLink/link_test.txt' );
@@ -22191,7 +22206,7 @@ function softLinkSync( test )
   var expected = '000new text';
   test.identical( got, expected );
 
-  //
+  /* - */
 
   test.case = 'make for file that not exist';
   provider.filesDelete( routinePath );
@@ -22228,7 +22243,7 @@ function softLinkSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, null );
 
-  //
+  /* - */
 
   test.case = 'link already exists';
   srcPath = test.context.pathFor( 'written/softLink/link_test.txt' );
@@ -22303,7 +22318,7 @@ function softLinkSync( test )
     });
   });
 
-  //
+  /* - */
 
   test.case = 'src is equal to dst';
   provider.filesDelete( routinePath );
@@ -22415,7 +22430,7 @@ function softLinkSync( test )
   });
   test.is( !provider.isSoftLink( srcPath ) );
 
-  //
+  /* - */
 
   test.case = 'try make softLink to folder';
   provider.filesDelete( routinePath );
@@ -22464,7 +22479,7 @@ function softLinkSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'link', 'link_test' ]  );
 
-  //
+  /* - */
 
   test.open( 'allowingMissed' );
 
@@ -22535,7 +22550,7 @@ function softLinkSync( test )
     });
   })
 
-  //
+  /* - */
 
   var notExistingPath = test.context.pathFor( 'written/softLink/notExisting' );
   provider.filesDelete( notExistingPath );
@@ -22574,7 +22589,7 @@ function softLinkSync( test )
   // }
 
 
-  //
+  /* - */
 
   var notExistingPath = test.context.pathFor( 'written/softLink/notExisting' );
   provider.filesDelete( notExistingPath );
@@ -22611,7 +22626,7 @@ function softLinkSync( test )
   //   test.identical( got, notExistingPath );
   // }
 
-  //
+  /* - */
 
   var notExistingPath = test.context.pathFor( 'written/softLink/notExisting' );
   provider.filesDelete( notExistingPath );
@@ -22648,7 +22663,7 @@ function softLinkSync( test )
   //   test.identical( got, notExistingPath );
   // }
 
-  //
+  /* - */
 
   var notExistingPath = test.context.pathFor( 'written/softLink/notExisting' );
   provider.filesDelete( notExistingPath );
@@ -22685,7 +22700,7 @@ function softLinkSync( test )
   //   test.identical( got, notExistingPath );
   // }
 
-  //
+  /* - */
 
   var notExistingPath = test.context.pathFor( 'written/softLink/notExisting' );
   provider.filesDelete( notExistingPath );
@@ -22705,7 +22720,7 @@ function softLinkSync( test )
 
   test.is( !provider.isSoftLink( dstPath ) );
 
-  //
+  /* - */
 
   var notExistingPath = test.context.pathFor( 'written/softLink/notExisting' );
   provider.filesDelete( notExistingPath );
@@ -22725,7 +22740,7 @@ function softLinkSync( test )
 
   test.is( !provider.isSoftLink( dstPath ) );
 
-  //
+  /* - */
 
   var notExistingPath = test.context.pathFor( 'written/softLink/notExisting' );
   provider.filesDelete( notExistingPath );
@@ -22745,7 +22760,7 @@ function softLinkSync( test )
 
   test.is( !provider.isSoftLink( dstPath ) );
 
-  //
+  /* - */
 
   var notExistingPath = test.context.pathFor( 'written/softLink/notExisting' );
   provider.filesDelete( notExistingPath );
@@ -22765,7 +22780,7 @@ function softLinkSync( test )
 
   test.is( !provider.isSoftLink( dstPath ) );
 
-  //
+  /* - */
 
   test.shouldThrowErrorOfAnyKind( () =>
   {
@@ -22780,7 +22795,7 @@ function softLinkSync( test )
     });
   })
 
-  //
+  /* - */
 
   test.shouldThrowErrorOfAnyKind( () =>
   {
@@ -22795,7 +22810,7 @@ function softLinkSync( test )
     });
   })
 
-  //
+  /* - */
 
   test.shouldThrowErrorOfAnyKind( () =>
   {
@@ -22810,7 +22825,7 @@ function softLinkSync( test )
     });
   })
 
-  //
+  /* - */
 
   test.mustNotThrowError( () =>
   {
@@ -22873,7 +22888,7 @@ function softLinkAsync( test )
   var consequence = new _.Consequence().take( null );
   consequence
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -22914,7 +22929,7 @@ function softLinkAsync( test )
     });
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -22961,7 +22976,7 @@ function softLinkAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -23051,7 +23066,7 @@ function softLinkAsync( test )
     return test.mustNotThrowError( con );
   })
 
-  //
+  /* - */
   .ifNoErrorThen( function( arg )
   {
     test.case = 'src is equal to dst';
@@ -23190,7 +23205,7 @@ function softLinkAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .finally( function()
   {
@@ -23257,7 +23272,7 @@ function softLinkAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .finally( () =>
   {
@@ -23267,7 +23282,7 @@ function softLinkAsync( test )
     return null;
   })
 
-  //
+  /* - */
 
   .finally( () =>
   {
@@ -23623,7 +23638,7 @@ function softLinkRelativePath( test )
 
   test.close( 'src - relative path to a file' );
 
-  //
+  /* - */
 
   test.open( 'src - relative path to a dir' );
 
@@ -23715,7 +23730,7 @@ function softLinkRelativePath( test )
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, path.normalize( srcPath ) );
 
-  //
+  /* - */
 
   var srcPath = test.context.globalFromPreferred( './.././a/b/c' );
   var pathToDir2 = test.context.pathFor( 'written/softLinkRelativePath/a/b/c' );
@@ -23942,7 +23957,7 @@ function softLinkRelativePath( test )
 
   test.close( 'dst - relative path to a file' );
 
-  //
+  /* - */
 
   test.open( 'dst - relative path to a dir' );
 
@@ -24020,7 +24035,7 @@ function softLinkRelativePath( test )
 
   test.close( 'dst - relative path to a dir' );
 
-  //
+  /* - */
 
   test.open( 'allowingMissed on, relative path to src' );
 
@@ -24178,7 +24193,7 @@ function softLinkRelativePath( test )
 
   test.close( 'allowingMissed on, relative path to src' );
 
-  //
+  /* - */
 
   test.open( 'allowingMissed on, same path' );
 
@@ -24208,7 +24223,7 @@ function softLinkRelativePath( test )
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, srcPath );
 
-  //
+  /* - */
 
   var srcPath = pathToFile;
   var dstPath = test.context.globalFromPreferred( '../file' );
@@ -24239,7 +24254,7 @@ function softLinkRelativePath( test )
 
   test.close( 'allowingMissed on, same path' );
 
-  //
+  /* - */
 
   test.open( 'allowingMissed off, relative path to src' );
 
@@ -24621,7 +24636,7 @@ function softLinkActSync( test )
     return;
   }
 
-  //
+  /* - */
 
   test.case = 'basic usage';
   var srcPath = path.join( routinePath,'src' );
@@ -24645,7 +24660,7 @@ function softLinkActSync( test )
   test.identical( got, expected );
   provider.filesDelete( routinePath );
 
-  //
+  /* - */
 
   test.case = 'no src';
   var srcPath = path.join( routinePath,'src' );
@@ -24669,7 +24684,7 @@ function softLinkActSync( test )
   test.identical( got, expected );
   provider.filesDelete( routinePath );
 
-  //
+  /* - */
 
   test.case = 'src is a directory';
   provider.filesDelete( routinePath );
@@ -24694,7 +24709,7 @@ function softLinkActSync( test )
   test.identical( got, expected );
   provider.filesDelete( routinePath );
 
-  //
+  /* - */
 
   test.case = 'src is a terminal, check link';
   provider.filesDelete( routinePath );
@@ -24746,7 +24761,7 @@ function softLinkActSync( test )
   var file = provider.fileRead( filePath );
   test.identical( srcFile, file );
 
-  //
+  /* - */
 
   test.case = 'dst is a terminal';
   provider.filesDelete( routinePath );
@@ -24770,7 +24785,7 @@ function softLinkActSync( test )
   test.is( !provider.isSoftLink( dstPath ) );
   provider.filesDelete( routinePath );
 
-  //
+  /* - */
 
   test.case = 'dst is a hard link';
   provider.filesDelete( routinePath );
@@ -24800,7 +24815,7 @@ function softLinkActSync( test )
   test.identical( dstFile, srcPath );
   provider.filesDelete( routinePath );
 
-  //
+  /* - */
 
   test.case = 'dst is dir';
   provider.filesDelete( routinePath );
@@ -24833,7 +24848,7 @@ function softLinkActSync( test )
   test.identical( file2, filePath2 );
   provider.filesDelete( routinePath );
 
-  //
+  /* - */
 
   test.case = 'should not create folders structure for path';
   var srcPath = path.join( routinePath,'src' );
@@ -24856,7 +24871,7 @@ function softLinkActSync( test )
   test.is( !provider.fileExists( dstPath ) );
   provider.filesDelete( routinePath );
 
-  //
+  /* - */
 
   test.case = 'should path nativize all paths in options map if needed by its own means';
   var srcPath = path.join( routinePath,'src' );
@@ -24886,7 +24901,7 @@ function softLinkActSync( test )
   test.identical( got, srcPath );
   provider.filesDelete( routinePath );
 
-  //
+  /* - */
 
   test.case = 'should not extend or delete fields of options map, no _providerDefaultsApply, routineOptions';
   var srcPath = path.join( routinePath,'src' );
@@ -24912,7 +24927,7 @@ function softLinkActSync( test )
   test.identical( got, expected );
   provider.filesDelete( routinePath );
 
-  //
+  /* - */
 
   test.case = 'create link in not existing directory';
   provider.filesDelete( routinePath );
@@ -24929,7 +24944,7 @@ function softLinkActSync( test )
   test.will = 'parent directory of dstPath must not be created';
   test.is( !provider.fileExists( path.dir( dstPath ) ) );
 
-  //
+  /* - */
 
   test.case = 'use terminal as parent directory';
   var srcPath = path.join( routinePath,'src' );
@@ -24949,7 +24964,7 @@ function softLinkActSync( test )
   test.is( provider.isTerminal( srcPath ) );
   test.is( !provider.fileExists( dstPath2 ) );
 
-  //
+  /* - */
 
   if( !Config.debug )
   return;
@@ -24973,7 +24988,7 @@ function softLinkActSync( test )
     });
   })
 
-  //
+  /* - */
 
   test.case = 'should not extend or delete fields of options map, no _providerDefaultsApply, routineOptions';
   var srcPath = path.join( routinePath,'src' );;
@@ -25011,7 +25026,7 @@ function softLinkActSync( test )
     provider.softLinkAct( o );
   });
 
-  //
+  /* - */
 
   test.case = 'should expect normalized path, but not nativized';
   var srcPath = path.join( routinePath,'src' );
@@ -25049,7 +25064,7 @@ function softLinkActSync( test )
 
   provider.filesDelete( routinePath );
 
-  //
+  /* - */
 
   test.case = 'should expect ready options map, no complex arguments preprocessing';
   var srcPath = path.join( routinePath,'src' );
@@ -25304,7 +25319,7 @@ function softLinkSoftLinkResolving( test )
   test.identical( provider.fileRead( srcPath ), srcPathTerminal );
   test.identical( provider.fileRead( dstPath ), srcPathTerminal );
 
-  //
+  /* - */
 
   test.close( 'double' );
 
@@ -25832,7 +25847,7 @@ function softLinkRelativeLinkResolving( test )
   test.identical( provider.fileRead( srcPath ), srcPathTerminal );
   test.identical( provider.fileRead( dstPath ), srcPathTerminal );
 
-  //
+  /* - */
 
   test.close( 'double' );
 
@@ -27642,7 +27657,7 @@ function textLinkSync( test )
 
   context.provider.fieldPush( 'usingTextLink', 1 );
 
-  //
+  /* - */
 
   test.case = 'textlink to missing';
   provider.filesDelete( routinePath );
@@ -29755,7 +29770,7 @@ function hardLinkMultipleSync( test )
   if( !provider.statResolvedRead( routinePath ) )
   provider.dirMake( routinePath );
 
-  //
+  /* - */
 
   if( context.providerIsInstanceOf( _.FileProvider.Extract ) )
   {
@@ -29764,7 +29779,7 @@ function hardLinkMultipleSync( test )
     return;
   }
 
-  //
+  /* - */
 
   var fileNames = [ 'a1', 'a2', 'a3' ];
   var currentTestDir = 'written/hardLink/';
@@ -29846,7 +29861,7 @@ function hardLinkMultipleSync( test )
   });
   test.identical( got, false );
 
-  //
+  /* - */
 
   test.case = 'dstPath option, groups of linked files ';
   var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
@@ -30046,7 +30061,7 @@ function hardLinkMultipleSync( test )
   var dst = provider.fileRead( paths[ 1 ] );
   test.identical( src, dst );
 
-  //
+  /* - */
 
   test.case = 'sourceMode: src - newest file with maximal amount of links';
   var paths = makeFiles( fileNames, currentTestDir );
@@ -30068,7 +30083,7 @@ function hardLinkMultipleSync( test )
   var dst = provider.fileRead( paths[ 0 ] );
   test.identical( src, dst );
 
-  //
+  /* - */
 
   test.case = 'sourceMode: src - oldest file with maximal amount of links';
   var paths = makeFiles( fileNames, currentTestDir );
@@ -30090,7 +30105,7 @@ function hardLinkMultipleSync( test )
   var dst = provider.fileRead( paths[ paths.length - 1 ] );
   test.identical( src, dst );
 
-  //
+  /* - */
 
   test.case = 'sourceMode: src - oldest file with maximal amount of links';
   var paths = makeFiles( fileNames, currentTestDir );
@@ -30110,7 +30125,7 @@ function hardLinkMultipleSync( test )
   var dst = provider.fileRead( paths[ paths.length - 1 ] );
   test.identical( src, dst );
 
-  //
+  /* - */
 
   test.case = 'sourceMode: src - same time, max amount of links';
   var paths = makeFiles( fileNames, currentTestDir, true );
@@ -30135,7 +30150,7 @@ function hardLinkMultipleSync( test )
   var dst = provider.fileRead( paths[ 0 ] );
   test.identical( src, dst );
 
-  //
+  /* - */
 
   test.case = 'sourceMode: src - same time, min amount of links';
   var paths = makeFiles( fileNames, currentTestDir, true );
@@ -30266,7 +30281,7 @@ function hardLinkRelativePath( test )
 
   test.close( 'src - relative path to a file' );
 
-  //
+  /* - */
 
   test.open( 'src - relative path to a dir' );
 
@@ -30364,7 +30379,7 @@ function hardLinkRelativePath( test )
 
   test.close( 'dst - relative path to a file' );
 
-  //
+  /* - */
 
   test.open( 'dst - relative path to a dir' );
 
@@ -30486,7 +30501,7 @@ function hardLinkActSync( test )
 
   var softLinkIsSupported = test.context.softLinkIsSupported();
 
-  //
+  /* - */
 
   test.case = 'basic usage';
   var srcPath = path.join( routinePath,'src' );
@@ -30513,7 +30528,7 @@ function hardLinkActSync( test )
   test.identical( got, expected );
   provider.filesDelete( routinePath );
 
-  //
+  /* - */
 
   test.case = 'no src';
   var srcPath = path.join( routinePath,'src' );
@@ -30535,7 +30550,7 @@ function hardLinkActSync( test )
   })
   test.is( !provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
 
-  //
+  /* - */
 
   test.case = 'src is not a terminal';
   provider.filesDelete( routinePath );
@@ -30560,7 +30575,7 @@ function hardLinkActSync( test )
   test.is( !provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
   provider.filesDelete( routinePath );
 
-  //
+  /* - */
 
   test.case = 'src is a terminal, check link';
   provider.filesDelete( routinePath );
@@ -30615,7 +30630,7 @@ function hardLinkActSync( test )
   test.identical( got, expected );
   provider.filesDelete( routinePath );
 
-  //
+  /* - */
 
   if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   {
@@ -30654,7 +30669,7 @@ function hardLinkActSync( test )
     provider.filesDelete( routinePath );
   }
 
-  //
+  /* - */
 
   if( softLinkIsSupported )
   {
@@ -30683,7 +30698,7 @@ function hardLinkActSync( test )
   }
 
 
-  //
+  /* - */
 
   test.case = 'dst is a terminal';
   provider.filesDelete( routinePath );
@@ -30711,7 +30726,7 @@ function hardLinkActSync( test )
   test.identical( dstFile, dstPath );
   provider.filesDelete( routinePath );
 
-  //
+  /* - */
 
   test.case = 'dst is a hard link';
   provider.filesDelete( routinePath );
@@ -30742,7 +30757,7 @@ function hardLinkActSync( test )
   test.identical( dstFile, srcPath );
   provider.filesDelete( routinePath );
 
-  //
+  /* - */
 
   if( softLinkIsSupported )
   {
@@ -30773,7 +30788,7 @@ function hardLinkActSync( test )
     provider.filesDelete( routinePath );
   }
 
-  //
+  /* - */
 
   test.case = 'dst is dir';
   provider.filesDelete( routinePath );
@@ -30808,7 +30823,7 @@ function hardLinkActSync( test )
   test.identical( file2, filePath2 );
   provider.filesDelete( routinePath );
 
-  //
+  /* - */
 
   test.case = 'should not create folders structure for path';
   var srcPath = path.join( routinePath,'src' );
@@ -30832,7 +30847,7 @@ function hardLinkActSync( test )
   test.is( !provider.filesAreHardLinked( [ srcPath, dstPath ] ) );
   provider.filesDelete( routinePath );
 
-  //
+  /* - */
 
   test.case = 'should path nativize all paths in options map if needed by its own means';
   var srcPath = path.join( routinePath,'src' );
@@ -30860,7 +30875,7 @@ function hardLinkActSync( test )
   test.identical( o, expected );
   provider.filesDelete( routinePath );
 
-  //
+  /* - */
 
   test.case = 'should not extend or delete fields of options map, no _providerDefaultsApply, routineOptions';
   var srcPath = path.join( routinePath,'src' );
@@ -30887,7 +30902,7 @@ function hardLinkActSync( test )
   test.identical( got, expected );
   provider.filesDelete( routinePath );
 
-  //
+  /* - */
 
   test.case = 'create link in not existing directory';
   provider.filesDelete( routinePath );
@@ -30908,7 +30923,7 @@ function hardLinkActSync( test )
   test.will = 'parent directory of dstPath must not be created';
   test.is( !provider.fileExists( path.dir( dstMissingPath ) ) );
 
-  //
+  /* - */
 
   test.case = 'use terminal as parent directory';
   var srcPath = path.join( routinePath,'src' );
@@ -30930,7 +30945,7 @@ function hardLinkActSync( test )
   test.is( provider.isTerminal( srcPath ) );
   test.is( !provider.fileExists( dstPath2 ) );
 
-  //
+  /* - */
 
   if( !Config.debug )
   return;
@@ -30954,7 +30969,7 @@ function hardLinkActSync( test )
     });
   })
 
-  //
+  /* - */
 
   test.case = 'should not extend or delete fields of options map, no _providerDefaultsApply, routineOptions';
   var srcPath = path.join( routinePath,'src' );;
@@ -30996,7 +31011,7 @@ function hardLinkActSync( test )
     provider.hardLinkAct( o );
   });
 
-  //
+  /* - */
 
   test.case = 'should expect normalized path, but not nativized';
   var srcPath = routinePath + '\\src';
@@ -31019,7 +31034,7 @@ function hardLinkActSync( test )
   test.mustNotThrowError( () => provider.hardLinkAct( o ) );
   provider.filesDelete( routinePath );
 
-  //
+  /* - */
 
   test.case = 'should expect ready options map, no complex arguments preprocessing';
   var srcPath = path.join( routinePath,'src' );
@@ -31133,7 +31148,7 @@ function hardLinkAsync( test )
 
   consequence
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -31172,7 +31187,7 @@ function hardLinkAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -31218,7 +31233,7 @@ function hardLinkAsync( test )
     });
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -31314,7 +31329,7 @@ function hardLinkAsync( test )
     return test.mustNotThrowError( con );
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -31409,7 +31424,7 @@ function hardLinkAsync( test )
     });
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -31481,7 +31496,7 @@ function hardLinkAsync( test )
     return test.mustNotThrowError( con );
   });
 
-  //
+  /* - */
 
   if( context.providerIsInstanceOf( _.FileProvider.Extract ) )
   {
@@ -31574,7 +31589,7 @@ function hardLinkAsync( test )
     });
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -31830,7 +31845,7 @@ function hardLinkAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -31900,7 +31915,7 @@ function hardLinkActAsync( test )
   let softLinkIsSupported = test.context.softLinkIsSupported();
   let con = new _.Consequence().take( null )
 
-  //
+  /* - */
 
   .finally( () =>
   {
@@ -31935,7 +31950,7 @@ function hardLinkActAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .finally( () =>
   {
@@ -31966,7 +31981,7 @@ function hardLinkActAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .finally( () =>
   {
@@ -31998,7 +32013,7 @@ function hardLinkActAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .finally( () =>
   {
@@ -32032,7 +32047,7 @@ function hardLinkActAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .finally( () =>
   {
@@ -32065,7 +32080,7 @@ function hardLinkActAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .finally( () =>
   {
@@ -32095,7 +32110,7 @@ function hardLinkActAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .finally( () =>
   {
@@ -32159,7 +32174,7 @@ function hardLinkActAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .finally( () =>
   {
@@ -32213,7 +32228,7 @@ function fileExchangeSync( test )
   if( !provider.statResolvedRead( routinePath ) )
   provider.dirMake( routinePath );
 
-  //
+  /* - */
 
   test.case = 'swap two files content';
   srcPath = test.context.pathFor( 'written/fileExchange/src' );
@@ -32248,7 +32263,7 @@ function fileExchangeSync( test )
   dst = provider.fileRead( dstPath );
   test.identical( [ src, dst ], [ 'dst', 'src' ] )
 
-  //
+  /* - */
 
   test.case = 'swap two dirs content';
   srcPath = test.context.pathFor( 'written/fileExchange/src/src.txt' );
@@ -32292,7 +32307,7 @@ function fileExchangeSync( test )
   dst = provider.fileRead( _.strReplaceAll( dstPath, 'dst.txt', 'src.txt' ) );
   test.identical( [ src, dst ], [ 'dst', 'src' ] );
 
-  //
+  /* - */
 
   test.case = 'path not exist';
   srcPath = test.context.pathFor( 'written/fileExchange/src' );
@@ -32487,7 +32502,7 @@ function fileExchangeSync( test )
   });
   test.identical( got, null );
 
-  //
+  /* - */
 
   test.case = 'two soft links to terminals';
   provider.filesDelete( routinePath );
@@ -32508,7 +32523,7 @@ function fileExchangeSync( test )
   var dst = provider.fileRead( dstPath );
   test.identical( dst, srcPathTerminal );
 
-  //
+  /* - */
 
   test.case = 'two text links to terminals';
   provider.fieldPush( 'resolvingTextLink', 1 );
@@ -32533,7 +32548,7 @@ function fileExchangeSync( test )
   provider.fieldPop( 'resolvingTextLink', 1 );
   provider.fieldPop( 'usingTextLink', 1 );
 
-  //
+  /* - */
 
   test.case = 'two soft links to missing, not allowed';
   provider.filesDelete( routinePath );
@@ -32557,7 +32572,7 @@ function fileExchangeSync( test )
   test.identical( provider.pathResolveSoftLink( srcPath ), srcPathTerminal )
   test.identical( provider.pathResolveSoftLink( dstPath ), dstPathTerminal )
 
-  //
+  /* - */
 
   test.case = 'two soft links to missing, allowed';
   provider.filesDelete( routinePath );
@@ -32578,7 +32593,7 @@ function fileExchangeSync( test )
   test.identical( provider.pathResolveSoftLink( srcPath ), srcPathTerminal );
   test.identical( provider.pathResolveSoftLink( dstPath ), dstPathTerminal );
 
-  //
+  /* - */
 
   test.case = 'soft link and terminal';
   provider.filesDelete( routinePath );
@@ -32771,7 +32786,7 @@ function fileExchangeAsync( test )
 
   consequence
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -32831,7 +32846,7 @@ function fileExchangeAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -32895,7 +32910,7 @@ function fileExchangeAsync( test )
     });
   })
 
-  //
+  /* - */
 
   .ifNoErrorThen( function( arg )
   {
@@ -33172,7 +33187,7 @@ function fileExchangeAsync( test )
 
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -33204,7 +33219,7 @@ function fileExchangeAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -33233,7 +33248,7 @@ function fileExchangeAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -33261,7 +33276,7 @@ function fileExchangeAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -33290,7 +33305,7 @@ function fileExchangeAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -33346,7 +33361,7 @@ function fileExchangeAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -33375,7 +33390,7 @@ function fileExchangeAsync( test )
 
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -33403,7 +33418,7 @@ function fileExchangeAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -33431,7 +33446,7 @@ function fileExchangeAsync( test )
 
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -33459,7 +33474,7 @@ function fileExchangeAsync( test )
     })
   })
 
-  //
+  /* - */
 
   .then( () =>
   {
@@ -35485,15 +35500,13 @@ function hardLinkHardLinkedAsync( test )
 
 //
 
-function hardLinkSpecialPath( test )
+function hardLinkEscapedPath( test )
 {
   let context = this;
   let a = context.assetFor( test, false );
+
   /* qqq3 : use assetFor in each test routine */
   /* qqq3 : implement similar test routine for each method */
-
-  // if( !a.system )
-  // return test.is( true );
 
   /* */
 
@@ -35501,8 +35514,8 @@ function hardLinkSpecialPath( test )
   a.reflect();
   var srcPath = a.abs( 'File1.txt' );
   var dstPath = a.abs( 'File2.txt' );
-  var srcGlobalPath = a.system.path.join( `${a.fileProvider.protocol}:///`, srcPath );
-  var dstGlobalPath = a.system.path.join( `${a.fileProvider.protocol}:///`, dstPath );
+  var srcGlobalPath = a.system.path.join( `${a.effectiveProvider.protocol}:///`, srcPath );
+  var dstGlobalPath = a.system.path.join( `${a.effectiveProvider.protocol}:///`, dstPath );
   test.is( a.path.isGlobal( srcGlobalPath ) );
   test.is( a.path.isGlobal( dstGlobalPath ) );
   a.system.fileWrite( srcGlobalPath, 'File1.txt' );
@@ -35522,8 +35535,8 @@ function hardLinkSpecialPath( test )
   a.reflect();
   var srcPath = a.abs( '"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"/File1.txt' );
   var dstPath = a.abs( '"b1#"/"b2@"/"b3!"/"b4?"/"#b5"/"@b6"/"!b7"/"?b8"/File1.txt' );
-  var srcGlobalPath = a.system.path.join( `${a.fileProvider.protocol}:///`, srcPath );
-  var dstGlobalPath = a.system.path.join( `${a.fileProvider.protocol}:///`, dstPath );
+  var srcGlobalPath = a.system.path.join( `${a.effectiveProvider.protocol}:///`, srcPath );
+  var dstGlobalPath = a.system.path.join( `${a.effectiveProvider.protocol}:///`, dstPath );
   test.is( a.path.isGlobal( srcGlobalPath ) );
   test.is( a.path.isGlobal( dstGlobalPath ) );
   a.system.fileWrite( srcGlobalPath, 'File1.txt' );
@@ -35551,7 +35564,6 @@ function hardLinkSyncRunner( test )
 
   var suite = test.suite;
   var tests = suite.tests;
-
   var runsLimit = 50;
 
   for( var i = 0; i < runsLimit; i++ )
@@ -35919,19 +35931,19 @@ function dirIsEmpty( test )
   var filePath = test.context.pathFor( 'written/dirIsEmpty' );
   provider.filesDelete( filePath );
 
-  //
+  /* - */
 
   test.case = 'non existing path'
   test.identical( provider.dirIsEmpty( filePath ), false );
 
-  //
+  /* - */
 
   test.case = 'file'
   provider.filesDelete( filePath );
   provider.fileWrite( filePath, '' );
   test.identical( provider.dirIsEmpty( filePath ), false );
 
-  //
+  /* - */
 
   test.case = 'path with dot';
   provider.filesDelete( filePath );
@@ -35939,21 +35951,21 @@ function dirIsEmpty( test )
   provider.dirMake( path )
   test.identical( provider.dirIsEmpty( path ), true );
 
-  //
+  /* - */
 
   test.case = 'directory with file'
   provider.filesDelete( filePath );
   provider.fileWrite( context.provider.path.join( filePath, 'a' ), '' );
   test.identical( provider.dirIsEmpty( filePath ), false );
 
-  //
+  /* - */
 
   test.case = 'empty directory'
   provider.filesDelete( filePath );
   provider.dirMake( filePath );
   test.identical( provider.dirIsEmpty( filePath ), true );
 
-  //
+  /* - */
 
   test.case = 'softLink to file';
   provider.filesDelete( filePath );
@@ -35962,7 +35974,7 @@ function dirIsEmpty( test )
   provider.softLink( filePath, src );
   test.identical( provider.dirIsEmpty( filePath ), false );
 
-  //
+  /* - */
 
   test.case = 'textLink to file';
   provider.filesDelete( filePath );
@@ -35971,7 +35983,7 @@ function dirIsEmpty( test )
   provider.textLink( filePath, src );
   test.identical( provider.dirIsEmpty( filePath ), false );
 
-  //
+  /* - */
 
   test.case = 'softLink empty dir';
   provider.filesDelete( filePath );
@@ -35980,7 +35992,7 @@ function dirIsEmpty( test )
   provider.softLink( filePath, src );
   test.identical( provider.dirIsEmpty( filePath ), false );
 
-  //
+  /* - */
 
   test.case = 'textLink to empty dir';
   provider.filesDelete( filePath );
@@ -36003,7 +36015,7 @@ function dirIsEmpty( test )
   test.identical( provider.resolvedDirIsEmpty( filePath ), true );
   provider.fieldPop( 'resolvingSoftLink', 1 );
 
-  //
+  /* - */
 
   test.case = 'textLink empty dir';
   provider.filesDelete( filePath );
@@ -36023,7 +36035,7 @@ function dirIsEmpty( test )
 
   provider.fieldPop( 'usingTextLink', 0 );
 
-  //
+  /* - */
 
   test.case = 'textLink empty dir';
   provider.filesDelete( filePath );
@@ -40936,7 +40948,7 @@ function filesAreHardLinked( test )
   if( context.providerIsInstanceOf( _.FileProvider.HardDrive ) && !provider.UsingBigIntForStat )
   hardLinked = _.maybe;
 
-  //
+  /* - */
 
   test.case = 'same text file';
   var filePath = test.context.pathFor( 'written/filesAreHardLinked/file' );
@@ -40945,7 +40957,7 @@ function filesAreHardLinked( test )
   test.identical( got, hardLinked );
 
 
-  //
+  /* - */
 
   test.case = 'softLink to a file';
   provider.filesDelete( test.context.pathFor( 'written/filesAreHardLinked' ) );
@@ -40964,7 +40976,7 @@ function filesAreHardLinked( test )
   provider.fieldPop( 'resolvingSoftLink', 1 );
   test.identical( got, false );
 
-  //
+  /* - */
 
   test.case = 'different files with identical binary content';
   var filePath = test.context.pathFor( 'written/filesAreHardLinked/file' );
@@ -40975,7 +40987,7 @@ function filesAreHardLinked( test )
   var got = provider.filesAreHardLinked([ filePath, filePath2 ]);
   test.identical( got, false );
 
-  //
+  /* - */
 
   test.case = 'symlink to file with  binary content';
   provider.filesDelete( test.context.pathFor( 'written/filesAreHardLinked' ) );
@@ -40994,7 +41006,7 @@ function filesAreHardLinked( test )
   provider.fieldPop( 'resolvingSoftLink', 1 );
   test.identical( got, false );
 
-  //
+  /* - */
 
   test.case = 'hardLink to file with  binary content';
   provider.filesDelete( test.context.pathFor( 'written/filesAreHardLinked' ) );
@@ -41005,7 +41017,7 @@ function filesAreHardLinked( test )
   var got = provider.filesAreHardLinked([ linkPath, filePath ]);
   test.identical( got, hardLinked );
 
-  //
+  /* - */
 
   test.case = 'hardLink to file with  text content : file record';
   provider.filesDelete( test.context.pathFor( 'written/filesAreHardLinked' ) );
@@ -41348,7 +41360,7 @@ function filesCanBeSame( test )
   }
 
 
-  //
+  /* - */
 
   test.case = 'same file with empty content';
   var filePath = test.context.pathFor( 'written/filesCanBeSame/file' );
@@ -41356,7 +41368,7 @@ function filesCanBeSame( test )
   var got = provider.filesCanBeSame( filePath, filePath );
   test.identical( got, true );
 
-  //
+  /* - */
 
   test.case = 'two different files with empty content';
   var filePath = test.context.pathFor( 'written/filesCanBeSame/file' );
@@ -41366,7 +41378,7 @@ function filesCanBeSame( test )
   var got = provider.filesCanBeSame( filePath, filePath2 );
   test.identical( got, true );
 
-  //
+  /* - */
 
   test.case = 'files with identical binary content';
   var filePath = test.context.pathFor( 'written/filesCanBeSame/file' );
@@ -41376,7 +41388,7 @@ function filesCanBeSame( test )
   var got = provider.filesCanBeSame( filePath, filePath2 );
   test.identical( got, true );
 
-  //
+  /* - */
 
   test.case = 'files with non identical text content';
   var filePath = test.context.pathFor( 'written/filesCanBeSame/file' );
@@ -41386,7 +41398,7 @@ function filesCanBeSame( test )
   var got = provider.filesCanBeSame( filePath, filePath2 );
   test.identical( got, false );
 
-  //
+  /* - */
 
   test.case = 'files with non identical binart content';
   var filePath = test.context.pathFor( 'written/filesCanBeSame/file' );
@@ -41396,7 +41408,7 @@ function filesCanBeSame( test )
   var got = provider.filesCanBeSame( filePath, filePath2 );
   test.identical( got, false );
 
-  //
+  /* - */
 
   test.case = 'file and symlink to file';
   var filePath = test.context.pathFor( 'written/filesCanBeSame/file' );
@@ -41414,7 +41426,7 @@ function filesCanBeSame( test )
   provider.fieldPop( 'resolvingSoftLink', 1 );
   test.identical( got, false );
 
-  //
+  /* - */
 
   test.case = 'not existing path';
   var filePath = test.context.pathFor( 'written/filesCanBeSame/file' );
@@ -41425,7 +41437,7 @@ function filesCanBeSame( test )
   test.identical( got, false )
 
 
-  //
+  /* - */
 
   test.case = 'two file records asociated with two regular files';
   var filePath = test.context.pathFor( 'written/filesCanBeSame/file' );
@@ -41435,7 +41447,7 @@ function filesCanBeSame( test )
   var got = provider.filesCanBeSame( provider.recordFactory().record( filePath ), provider.recordFactory().record( filePath2 ) );
   test.identical( got, true );
 
-  //
+  /* - */
 
   test.case = 'two file records asociated with two regular files, same content';
   var filePath = test.context.pathFor( 'written/filesCanBeSame/file' );
@@ -41445,7 +41457,7 @@ function filesCanBeSame( test )
   var got = provider.filesCanBeSame( provider.recordFactory().record( filePath ), provider.recordFactory().record( filePath2 ) );
   test.identical( got, true );
 
-  //
+  /* - */
 
   test.case = 'two file records asociated with two regular files, diff content';
   var filePath = test.context.pathFor( 'written/filesCanBeSame/file' );
@@ -41456,7 +41468,7 @@ function filesCanBeSame( test )
   var got = provider.filesCanBeSame( provider.recordFactory().record( filePath ), provider.recordFactory().record( filePath2 ) );
   test.identical( got, false );
 
-  //
+  /* - */
 
   test.case = 'two file records asociated with two symlinks, same content';
   var filePath = test.context.pathFor( 'written/filesCanBeSame/file' );
@@ -41479,7 +41491,7 @@ function filesCanBeSame( test )
   provider.fieldPop( 'resolvingSoftLink', 1 );
   test.identical( got, true );
 
-  //
+  /* - */
 
   test.case = 'two file records asociated with two symlinks, diff content';
   var filePath = test.context.pathFor( 'written/filesCanBeSame/file' );
@@ -41502,7 +41514,7 @@ function filesCanBeSame( test )
   provider.fieldPop( 'resolvingSoftLink', 1 );
   test.identical( got, false );
 
-  //
+  /* - */
 
   if( Config.debug )
   {
@@ -41869,7 +41881,7 @@ function fileSize( test )
     test.identical( got, expected );
   }
 
-  //
+  /* - */
 
   if( Config.debug )
   return;
@@ -41997,7 +42009,7 @@ function fileExistsCompliantBehavior( test )
   test.is( !provider.fileExists( srcPath ) );
   test.is( provider.fileExists( dstPath ) );
 
-  //
+  /* - */
 
   test.case = 'soft link chain to missing, not intermediate links';
   provider.filesDelete( routinePath );
@@ -42018,7 +42030,7 @@ function fileExistsCompliantBehavior( test )
   test.is( provider.fileExists( dstPath ) );
   test.is( provider.fileExists( dstPath2 ) );
 
-  //
+  /* - */
 
   test.case = 'path to missing, intermediate link to testDir';
   provider.filesDelete( routinePath );
@@ -42033,7 +42045,7 @@ function fileExistsCompliantBehavior( test )
   test.is( !provider.fileExists( pathToCheck ) );
   test.is( provider.fileExists( dstPath ) );
 
-  //
+  /* - */
 
   test.case = 'path to terminal, intermediate link to testDir';
   provider.filesDelete( routinePath );
@@ -42048,7 +42060,7 @@ function fileExistsCompliantBehavior( test )
   test.is( provider.fileExists( srcPath ) );
   test.is( provider.fileExists( dstPath ) );
 
-  //
+  /* - */
 
   test.case = 'path to terminal, intermediate link to soft link in same directory';
   provider.filesDelete( routinePath );
@@ -42381,8 +42393,9 @@ function pathResolve( test )
   var got = resolve( '/abc','./../.' );
   test.identical( got, expected );
 
-  //
+  /* - */
 
+  // var expected = current();
   var expected = null;
   var got = resolve( null );
   test.identical( got, expected );
@@ -42395,9 +42408,13 @@ function pathResolve( test )
   var got = resolve( null, '/a', 'b' );
   test.identical( got, expected );
 
-  var expected = join( current(), 'b' );
+  debugger;
+  // var expected = join( current(), 'b' );
+  var expected = 'b';
+  debugger;
   var got = resolve( '/a', null, 'b' );
   test.identical( got, expected );
+  debugger;
 
   var expected = null;
   var got = resolve( '/a', 'b', null );
@@ -42419,18 +42436,23 @@ function pathResolve( test )
   var got = resolve( null, '/a', '../b' );
   test.identical( got, expected );
 
-  var expected = join( provider.path.dir( current() ), 'b' );
+  // var expected = join( provider.path.dir( current() ), 'b' );
+  var expected = '../b';
   var got = resolve( '/a', null, '../b' );
   test.identical( got, expected );
 
-  if( !Config.debug ) //
+  var expected = current();
+  var got = resolve();
+  test.identical( got, expected );
+
+  if( !Config.debug )
   return;
 
-  test.case = 'nothing passed';
-  test.shouldThrowErrorSync( function()
-  {
-    resolve();
-  });
+  // test.case = 'nothing passed';
+  // test.shouldThrowErrorSync( function()
+  // {
+  //   resolve();
+  // });
 
   test.case = 'non string passed';
   test.shouldThrowErrorSync( function()
@@ -42445,13 +42467,14 @@ function pathResolve( test )
 function uriResolve( test )
 {
   let context = this;
-  let provider = context.provider;
+  let a = context.assetFor( test, false );
+  let provider = a.fileProvider;
   let path = provider.path;
   let resolve = _.routineJoin( provider.path, provider.path.resolve );
   let join = _.routineJoin( provider.path, provider.path.join );
   let current = _.routineJoin( provider.path, provider.path.current );
 
-  if( context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
+  if( !path.Uri )
   {
     test.identical( 1,1 );
     return;
@@ -42642,13 +42665,14 @@ function uriResolve( test )
   var got = resolve( 'http://127.0.0.1:61726', '../path'  );
   test.identical( got, join( current(), 'http://path' ) );
 
-  //
+  /* - */
 
   var expected = 'file:///staging';
   var got = resolve( null, 'file:///some/index.html', '/staging' );
   test.identical( got, expected );
 
-  var expected = join( current(), 'staging' );
+  // var expected = join( current(), 'staging' );
+  var expected = 'staging';
   var got = resolve( 'file:///some/index.html', null, 'staging' );
   test.identical( got, expected );
 
@@ -42672,7 +42696,8 @@ function uriResolve( test )
   var got = resolve( null, 'file:///some', '../b' );
   test.identical( got, expected );
 
-  var expected = join( provider.path.dir( current() ), 'b' );
+  // var expected = join( provider.path.dir( current() ), 'b' );
+  var expected = '../b';
   var got = resolve( 'file:///some', null, '../b' );
   test.identical( got, expected );
 
@@ -42757,7 +42782,7 @@ function linkingCriticalCases( test )
   // });
   // test.identical( got, null );
 
-  //
+  /* - */
 
   test.case = 'not existing file';
   provider.filesDelete( context.provider.path.dir( filePath ) );
@@ -42968,7 +42993,7 @@ function pathResolveLinkTailChain( test )
   test.identical( o.result, [ linkPath, filePath ] )
   test.identical( o.found, [ linkPath, filePath ] )
 
-  //
+  /* - */
 
   test.case = 'absolute softLink to missing'
   provider.filesDelete( context.provider.path.dir( filePath ) );
@@ -42996,7 +43021,7 @@ function pathResolveLinkTailChain( test )
   test.identical( o.result, expectedResult );
   test.identical( o.found, expectedFound );
 
-  //
+  /* - */
 
   test.case = 'absolute softLink to missing'
   provider.filesDelete( context.provider.path.dir( filePath ) );
@@ -43024,7 +43049,7 @@ function pathResolveLinkTailChain( test )
   test.identical( o.result, expectedResult );
   test.identical( o.found, expectedFound );
 
-  //
+  /* - */
 
   test.case = 'relative softLink to missing'
   provider.filesDelete( context.provider.path.dir( filePath ) );
@@ -43053,7 +43078,7 @@ function pathResolveLinkTailChain( test )
   test.identical( o.result, expectedResult );
   test.identical( o.found, expectedFound );
 
-  //
+  /* - */
 
   test.case = 'relative softLink to missing'
   provider.filesDelete( context.provider.path.dir( filePath ) );
@@ -43082,7 +43107,7 @@ function pathResolveLinkTailChain( test )
   test.identical( o.result, expectedResult );
   test.identical( o.found, expectedFound );
 
-  //
+  /* - */
 
   test.case = 'absolute softLink to missing, allowingMissed : 0'
   provider.filesDelete( context.provider.path.dir( filePath ) );
@@ -43096,7 +43121,7 @@ function pathResolveLinkTailChain( test )
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissed : 0 } );
   test.shouldThrowErrorOfAnyKind( () => provider.pathResolveLinkTailChain( o ) );
 
-  //
+  /* - */
 
   test.case = 'absolute softLink to missing, allowingMissed : 1'
   provider.filesDelete( context.provider.path.dir( filePath ) );
@@ -43124,7 +43149,7 @@ function pathResolveLinkTailChain( test )
   test.identical( o.result, expectedResult );
   test.identical( o.found, expectedFound );
 
-  //
+  /* - */
 
   test.case = 'relative softLink to missing'
   provider.filesDelete( context.provider.path.dir( filePath ) );
@@ -43139,7 +43164,7 @@ function pathResolveLinkTailChain( test )
   var o = _.mapExtend( null, o1, { filePath : linkPath, throwing : 1, allowingMissed : 0  } );
   test.shouldThrowErrorOfAnyKind( () => provider.pathResolveLinkTailChain( o ) );
 
-  //
+  /* - */
 
   test.case = 'relative softLink to missing'
   provider.filesDelete( context.provider.path.dir( filePath ) );
@@ -43759,7 +43784,7 @@ function pathResolveLinkTailChain( test )
   o1.allowingMissed = 0;
   o1.throwing = 1;
 
-  //
+  /* - */
 
   test.case = 'not existing file';
   provider.filesDelete( context.provider.path.dir( filePath ) );
@@ -43893,7 +43918,7 @@ function pathResolveLinkTailChain( test )
   o1.allowingMissed = 0;
   o1.throwing = 0;
 
-  //
+  /* - */
 
   test.case = 'not existing file';
   provider.filesDelete( context.provider.path.dir( filePath ) );
@@ -44297,7 +44322,7 @@ function pathResolveLinkFull( test )
   // });
   // test.identical( got, null );
 
-  //
+  /* - */
 
   test.case = 'absolute softLink to missing'
   provider.filesDelete( context.provider.path.dir( filePath ) );
@@ -44345,7 +44370,7 @@ function pathResolveLinkFull( test )
   });
   test.identical( got.absolutePath, filePath );
 
-  //
+  /* - */
 
   test.case = 'context cycle softLink'
   provider.filesDelete( context.provider.path.dir( filePath ) );
@@ -44388,7 +44413,7 @@ function pathResolveLinkFull( test )
   });
   test.identical( got.absolutePath, linkPath );
 
-  //
+  /* - */
 
   test.case = 'cycle softLink'
   provider.filesDelete( context.provider.path.dir( filePath ) );
@@ -44456,7 +44481,7 @@ function pathResolveLinkFull( test )
   // var expected = path.join( routinePath, 'link/file' );
   // test.identical( got,expected )
 
-  //
+  /* - */
 
   // test.case = 'two soft links in path';
   // provider.filesDelete( context.provider.path.dir( filePath ) );
@@ -44468,7 +44493,7 @@ function pathResolveLinkFull( test )
   // var expected = filePath;
   // test.identical( got,expected );
 
-  //
+  /* - */
 
   // test.case = 'several absolute soft links in path';
   // var dirPath = context.provider.path.dir( filePath );
@@ -44504,7 +44529,7 @@ function pathResolveLinkFull( test )
   // var got = provider.pathResolveLinkFull( o );
   // test.identical( got,path.join( dirPath, pathToFile ) );
 
-  //
+  /* - */
 
   // test.case = 'several absolute soft links in path';
   // var dirPath = context.provider.path.dir( filePath );
@@ -44540,7 +44565,7 @@ function pathResolveLinkFull( test )
   // var got = provider.pathResolveLinkFull( o );
   // test.identical( got,pathToFile );
 
-  //
+  /* - */
 
   // test.case = 'several relative soft links in path';
   // var dirPath = context.provider.path.dir( filePath );
@@ -44578,7 +44603,7 @@ function pathResolveLinkFull( test )
   // test.identical( got,expected );
 
 
-  //
+  /* - */
 
   test.case = 'several relative soft links in path';
   var dirPath = context.provider.path.dir( filePath );
@@ -44614,7 +44639,7 @@ function pathResolveLinkFull( test )
   var got = provider.pathResolveLinkFull( o );
   test.identical( got.absolutePath,pathToFile );
 
-  //
+  /* - */
 
   test.case = 'several relative soft links in path';
   var dirPath = context.provider.path.dir( filePath );
@@ -44651,7 +44676,7 @@ function pathResolveLinkFull( test )
   var expected = provider.path.relative( linkInDir2, pathToFile );
   test.identical( got.filePath,expected );
 
-  //
+  /* - */
 
   // test.case = 'several absolute text links in path';
   // var dirPath = context.provider.path.dir( filePath );
@@ -44687,7 +44712,7 @@ function pathResolveLinkFull( test )
   // var got = provider.pathResolveLinkFull( o );
   // test.identical( got,routinePath );
 
-  //
+  /* - */
 
   // test.case = 'several absolute text links in path';
   // var dirPath = context.provider.path.dir( filePath );
@@ -45510,7 +45535,7 @@ function pathResolveSoftLinkExtended( test )
   });
   test.identical( got, null )
 
-  //
+  /* - */
 
   var got = provider.pathResolveSoftLink
   ({
@@ -45542,7 +45567,7 @@ function pathResolveSoftLinkExtended( test )
   });
   test.identical( got, filePath )
 
-  //
+  /* - */
 
   test.shouldThrowErrorSync( () =>
   {
@@ -45580,7 +45605,7 @@ function pathResolveSoftLinkExtended( test )
     });
   })
 
-  //
+  /* - */
 
   var got = provider.pathResolveSoftLink
   ({
@@ -45702,7 +45727,7 @@ function pathResolveSoftLinkExtended( test )
   });
   test.identical( got, null )
 
-  //
+  /* - */
 
   var got = provider.pathResolveSoftLink
   ({
@@ -45734,7 +45759,7 @@ function pathResolveSoftLinkExtended( test )
   });
   test.identical( got, filePath )
 
-  //
+  /* - */
 
   test.shouldThrowErrorSync( () =>
   {
@@ -45772,7 +45797,7 @@ function pathResolveSoftLinkExtended( test )
     });
   })
 
-  //
+  /* - */
 
   var got = provider.pathResolveSoftLink
   ({
@@ -45844,7 +45869,7 @@ function pathResolveSoftLinkExtended( test )
   });
   test.identical( got, null )
 
-  //
+  /* - */
 
   var got = provider.pathResolveSoftLink
   ({
@@ -45876,7 +45901,7 @@ function pathResolveSoftLinkExtended( test )
   });
   test.identical( got, linkPath )
 
-  //
+  /* - */
 
   test.shouldThrowErrorSync( () =>
   {
@@ -45914,7 +45939,7 @@ function pathResolveSoftLinkExtended( test )
     });
   })
 
-  //
+  /* - */
 
   var got = provider.pathResolveSoftLink
   ({
@@ -46839,7 +46864,7 @@ function pathResolveTextLinkExtended( test )
   });
   test.identical( got, null )
 
-  //
+  /* - */
 
   var got = provider.pathResolveTextLink
   ({
@@ -46871,7 +46896,7 @@ function pathResolveTextLinkExtended( test )
   });
   test.identical( got, filePath )
 
-  //
+  /* - */
 
   test.shouldThrowErrorSync( () =>
   {
@@ -46909,7 +46934,7 @@ function pathResolveTextLinkExtended( test )
     });
   })
 
-  //
+  /* - */
 
   var got = provider.pathResolveTextLink
   ({
@@ -47029,7 +47054,7 @@ function pathResolveTextLinkExtended( test )
   });
   test.identical( got, null )
 
-  //
+  /* - */
 
   var got = provider.pathResolveTextLink
   ({
@@ -47061,7 +47086,7 @@ function pathResolveTextLinkExtended( test )
   });
   test.identical( got, filePath )
 
-  //
+  /* - */
 
   test.shouldThrowErrorSync( () =>
   {
@@ -47099,7 +47124,7 @@ function pathResolveTextLinkExtended( test )
     });
   })
 
-  //
+  /* - */
 
   var got = provider.pathResolveTextLink
   ({
@@ -47171,7 +47196,7 @@ function pathResolveTextLinkExtended( test )
   });
   test.identical( got, null )
 
-  //
+  /* - */
 
   var got = provider.pathResolveTextLink
   ({
@@ -47203,7 +47228,7 @@ function pathResolveTextLinkExtended( test )
   });
   test.identical( got, linkPath )
 
-  //
+  /* - */
 
   test.shouldThrowErrorSync( () =>
   {
@@ -47241,7 +47266,7 @@ function pathResolveTextLinkExtended( test )
     });
   })
 
-  //
+  /* - */
 
   var got = provider.pathResolveTextLink
   ({
@@ -47643,7 +47668,7 @@ function pathResolveLinkFullSpecial( test )
   var expected = test.context.globalFromPreferred( '../file' );
   test.identical( got, expected );
 
-  //
+  /* - */
 
   test.case = 'cycled softLink, throwing on'
   provider.filesDelete( context.provider.path.dir( filePath ) );
@@ -49509,7 +49534,7 @@ function statReadExperiment( test )
     debugger;
   })
 
-  //
+  /* - */
 
   var got = provider.statRead({ filePath : srcPath, throwing : 0 });
   test.identical( got, null );
@@ -49558,7 +49583,7 @@ function experiment( test )
   // provider.softLink( linkToDir1Path, provider.path.relative( linkToDir1Path, dirPath2 ) );
   // // provider.softLink( linkToTerminalPath, provider.path.relative( linkToTerminalPath, dirPath2 ) );
   // provider.softLink( linkInDir2, provider.path.relative( linkInDir2, pathToFile ) );
-  //
+  /* - */
   // /*
   //   dir :
   //     // dir1 :
@@ -49567,10 +49592,10 @@ function experiment( test )
   //       linkToTerminal
   //     linkToDir2
   //     file
-  //
+  /* - */
   //   path : '/dir/linkToDir1/linkToDir2/linkToTerminal' -> 'dir/file'
   // */
-  //
+  /* - */
   // var routinePath = path.join( dirPath, 'linkToDir1/linkToTerminal' )
   // var o = _.mapExtend( null, o1, { filePath : routinePath, preservingRelative : 1, resolvingHeadDirect : 1, resolvingHeadReverse : 1 } );
   // debugger;
@@ -49868,7 +49893,6 @@ var Self =
     providerIsInstanceOf,
     softLinkIsSupported,
     providerMake : null,
-
     system : null, /* xxx qqq : remove the field */
 
     suiteTempPath : null,
@@ -50016,7 +50040,7 @@ var Self =
     hardLinkHardLinkedSync,
     hardLinkHardLinkedAsync,
 
-    // hardLinkSpecialPath, /* xxx */
+    hardLinkEscapedPath, /* xxx */
 
     hardLinkReturnSync,
 

@@ -18,7 +18,7 @@ _.assert( !!Parent );
 
 //
 
-var filesTree =
+var filesTree = /* xxx : remove? */
 {
 }
 
@@ -32,7 +32,6 @@ function onSuiteBegin()
 
   context.providerEffective = _.FileProvider.Extract
   ({
-    // filesTree,
     protocols : [ 'current', 'second' ],
     usingExtraStat : 1
   });

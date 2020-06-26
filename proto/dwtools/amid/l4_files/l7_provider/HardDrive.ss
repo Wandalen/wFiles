@@ -345,9 +345,10 @@ _.routineExtend( pathResolveTextLinkAct, Parent.prototype.pathResolveTextLinkAct
 function pathResolveSoftLinkAct( o )
 {
   let self = this;
+  let path = self.system ? self.system.path : self.path;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( self.path.isAbsolute( o.filePath ) );
+  _.assert( path.isAbsolute( o.filePath ) );
 
   let result;
 
@@ -366,7 +367,7 @@ function pathResolveSoftLinkAct( o )
     // debugger;
     /* qqq : why? add experiment please? */
     /* aaa : makes path relative to link instead of directory where link is located */
-    if( !self.path.isAbsolute( self.path.normalize( result ) ) )
+    if( !path.isAbsolute( path.normalize( result ) ) )
     {
       if( _.strBegins( result, '.\\' ) )
       result = _.strIsolateLeftOrNone( result, '.\\' )[ 2 ];
@@ -391,7 +392,7 @@ function pathResolveSoftLinkAct( o )
     if( o.resolvingMultiple )
     return File.realpathSync( self.path.nativize( o.filePath ) );
 
-    let splits = self.path.split( o.filePath );
+    let splits = path.split( o.filePath );
     let o2 = _.mapExtend( null, o );
 
     o2.resolvingIntermediateDirectories = 0;
@@ -399,12 +400,12 @@ function pathResolveSoftLinkAct( o )
 
     for( let i = 1 ; i < splits.length ; i++ )
     {
-      o2.filePath = self.path.join( o2.filePath, splits[ i ] );
+      o2.filePath = path.join( o2.filePath, splits[ i ] );
 
       if( self.isSoftLink( o2.filePath ) )
       {
         result = self.pathResolveSoftLinkAct( o2 )
-        o2.filePath = self.path.join( o2.filePath, result );
+        o2.filePath = path.join( o2.filePath, result );
       }
     }
     return o2.filePath;
@@ -414,7 +415,7 @@ function pathResolveSoftLinkAct( o )
 
   function multipleResolve()
   {
-    result = self.path.join( o.filePath, self.path.normalize( result ) );
+    result = path.join( o.filePath, path.normalize( result ) );
     if( !self.isSoftLink( result ) )
     return result;
     let o2 = _.mapExtend( null, o );
@@ -1647,6 +1648,8 @@ function softLinkAct( o )
   _.assert( self.path.isNormalized( o.srcPath ) );
   _.assert( self.path.isNormalized( o.dstPath ) );
   _.assert( o.type === null || o.type === 'dir' ||  o.type === 'file' );
+
+  debugger;
 
   if( !srcIsAbsolute )
   {

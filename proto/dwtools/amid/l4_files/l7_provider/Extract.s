@@ -62,6 +62,18 @@ function init( o )
 // path
 // --
 
+function pathNativizeAct( filePath )
+{
+  let self = this;
+  let result = filePath;
+  _.assert( _.strIs( filePath ), 'Expects string' );
+  _.assert( _.routineIs( self.path.unescape ) );
+  result = self.path.unescape( result ); /* yyy */
+  return result;
+}
+
+//
+
 /**
  * @summary Return path to current working directory.
  * @description Changes current path to `path` if argument is provided.
@@ -739,19 +751,11 @@ function fileWriteAct( o )
       descriptor = self._descriptorRead( resolvedPath );
       filePath = resolvedPath;
 
-      //descriptor should be missing/text/hard/terminal
+      // descriptor should be missing/text/hard/terminal
       _.assert( descriptor === undefined || self._descriptorIsTerminal( descriptor ) || self._descriptorIsHardLink( descriptor )  );
-
-      // if( !self._descriptorIsLink( descriptor ) )
-      // {
-      //   filePath = resolvedPath;
-      //   if( descriptor === undefined )
-      //   throw _.err( 'Link refers to file ->', filePath, 'that doesn`t exist' );
-      // }
 
     }
 
-    // let dstName = self.path.name({ path : filePath, full : 1 });
     let dstDir = self._descriptorRead( self.path.dir( filePath ) );
     if( !dstDir )
     throw _.err( 'Directory for', filePath, 'does not exist' );
@@ -943,9 +947,6 @@ function fileDeleteAct( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( self.path.isNormalized( o.filePath ) );
 
-  // logger.log( 'Extract.fileDeleteAct', o.filePath );
-  // debugger;
-
   if( o.sync )
   {
     act();
@@ -975,7 +976,8 @@ function fileDeleteAct( o )
       throw _.err( 'Path', _.strQuote( o.filePath ), 'doesn`t exist!' );
     }
 
-    // Vova: intermediate dirs should be resolved, stat.filePath stores that resolved path
+    /* Vova: intermediate dirs should be resolved, stat.filePath stores that resolved path */
+
     filePath = stat.filePath;
 
     let file = self._descriptorRead( filePath );
@@ -988,13 +990,11 @@ function fileDeleteAct( o )
     let dirPath = self.path.dir( filePath );
     let dir = self._descriptorRead( dirPath );
 
-    _.sure( !!dir, () => 'Cant delete root directory ' + _.strQuote( o.filePath ) );
+    _.sure( !!dir, () => `Cant delete root directory ${ o.filePath }` );
 
-    let fileName = self.path.name({ path : filePath, full : 1 });
+    let fileName = self.path.nativize( self.path.name({ path : filePath, full : 1 }) );
     delete dir[ fileName ];
 
-    // for( let k in self.extraStats[ o.filePath ] )
-    // self.extraStats[ o.filePath ][ k ] = null;
     delete self.extraStats[ o.filePath ];
     self._descriptorTimeUpdate( dirPath, 0 );
 
@@ -1280,8 +1280,8 @@ function fileRenameAct( o )
 
   function rename( )
   {
-    let dstName = self.path.name({ path : o.dstPath, full : 1 });
-    let srcName = self.path.name({ path : o.srcPath, full : 1 });
+    let dstName = self.path.nativize( self.path.name({ path : o.dstPath, full : 1 }) );
+    let srcName = self.path.nativize( self.path.name({ path : o.srcPath, full : 1 }) );
     let srcDirPath = self.path.dir( o.srcPath );
     let dstDirPath = self.path.dir( o.dstPath );
 
@@ -2016,6 +2016,9 @@ function _descriptorRead( o )
   o2.upToken = o.upToken;
   o2.usingIndexedAccessToMap = 0;
   o2.globing = 0;
+
+  // if( _.strEnds( o2.selector, '"?a8"' ) )
+  // debugger;
 
   let result = _.select( o2 );
 
@@ -2762,6 +2765,7 @@ let Extension =
 
   // path
 
+  pathNativizeAct,
   pathCurrentAct,
   pathResolveSoftLinkAct,
   pathResolveTextLinkAct,

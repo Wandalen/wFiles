@@ -54,13 +54,9 @@ function pathFor( filePath )
 function providerMake()
 {
   let context = this;
-
   let provider = _.FileProvider.Extract({ protocols : [ 'current', 'second' ] });
-  let system = _.FileProvider.System({ providers : [ provider ] });
-
+  let system = _.FileProvider.System({ providers : [ provider ] }); /* xxx : try without the system ? */
   _.assert( system.defaultProvider === null );
-  // system.defaultProvider = provider;
-
   return provider;
 }
 

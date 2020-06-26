@@ -36,6 +36,17 @@ function onSuiteBegin( test ) /* qqq2 : review all onSuite* */
 //   path.pathDirTempClose( this.suiteTempPath );
 // }
 
+//
+
+function providerMake()
+{
+  let context = this;
+  let provider = _.FileProvider.HardDrive({ protocols : [ 'current', 'second' ] });
+  let system = _.FileProvider.System({ providers : [ provider ] });
+  _.assert( system.defaultProvider === null );
+  return provider;
+}
+
 // --
 // declare
 // --
@@ -56,6 +67,7 @@ var Proto =
 
   context :
   {
+    providerMake,
   },
 
   tests :

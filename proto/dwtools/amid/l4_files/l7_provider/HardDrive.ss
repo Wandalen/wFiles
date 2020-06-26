@@ -1,3 +1,5 @@
+const { c } = require('tar');
+
 ( function _HardDrive_ss_() {
 
 'use strict';
@@ -1779,69 +1781,190 @@ function hardLinkAct( o )
 
   /* */
 
-  if( o.sync )
+  let con = _.Consequence().take( true );
+
+  if( o.dstPath === o.srcPath )
+  return o.sync ? true : con;
+
+  con.then( checkSrc )
+
+  if( o.context )
   {
+    con.then( () => o.context.tempRenameMaybe() )
+    con.then( handleHardlinkBreaking );
+  }
 
-    if( o.dstPath === o.srcPath )
-    return true;
+  con.then( link );
 
-    /* this makse info about error more clear */
+  if( o.context )
+  {
+    con.then( tempDelete );
+    con.finally( tempRenameRevert );
+  }
 
-    let stat = self.statReadAct
-    ({
-      filePath : o.srcPath,
-      throwing : 1,
-      sync : 1,
-      resolvingSoftLink : 0,
+  if( o.sync )
+  return con.syncMaybe();
+
+  return con;
+
+  /* */
+
+  function checkSrc()
+  {
+    var con = _.Consequence.Try( () =>
+    {
+      return self.statReadAct
+      ({
+        filePath : o.srcPath,
+        throwing : 0,
+        sync : o.sync,
+        resolvingSoftLink : 0,
+      });
+    })
+
+    con.then( function( stat )
+    {
+      if( !stat )
+      throw _.err( '{o.srcPath} does not exist on hard drive:', o.srcPath );
+      if( !stat.isTerminal() )
+      throw _.err( '{o.srcPath} is not a terminal file:', o.srcPath );
+      return null;
     });
 
-    if( !stat )
-    throw _.err( '{o.srcPath} does not exist on hard drive:', o.srcPath );
-    if( !stat.isTerminal() )
-    throw _.err( '{o.srcPath} is not a terminal file:', o.srcPath );
+    if( o.sync )
+    return con.syncMaybe();
 
-    try
+    return con;
+  }
+
+  /* */
+
+  function handleHardlinkBreaking()
+  {
+    let c = o.context;
+
+    if( c.options.breakingSrcHardLink )
+    if( !self.fileExists( dstPath ) )
+    {
+      if( c.srcStat.isHardLink() )
+      return self.hardLinkBreak({ filePath : srcPath, sync : o.sync });
+    }
+    else
+    {
+      if( !c.options.breakingDstHardLink )
+      if( c.dstStat.isHardLink() )
+      {
+        let con = _.Consequence.Try( () =>
+        {
+          return self.fileReadAct
+          ({
+            filePath : srcPath,
+            encoding : self.encoding,
+            advanced : null,
+            resolvingSoftLink : self.resolvingSoftLink,
+            sync : o.sync
+          })
+        })
+        .then( ( srcData ) =>
+        {
+          let r = self.fileWriteAct
+          ({
+            filePath : dstPath,
+            data : srcData,
+            encoding : 'original.type',
+            writeMode : 'rewrite',
+            sync : o.sync
+          })
+          return o.sync ? true : r;
+        })
+        .then( () =>
+        {
+          let r = self.fileDeleteAct
+          ({
+            filePath : srcPath,
+            sync : o.sync
+          })
+          return o.sync ? true : r;
+        })
+        .then( () =>
+        {
+          let dstPathTemp = dstPath;
+          dstPath = srcPath
+          srcPath = dstPathTemp;
+          return null;
+        })
+
+        if( o.sync )
+        return con.syncMaybe();
+
+        return con;
+      }
+    }
+    return null;
+  }
+
+  /* */
+
+  function link()
+  {
+    if( o.sync )
     {
       File.linkSync( srcPath, dstPath );
       return true;
     }
-    catch ( err )
-    {
-      throw _.err( err );
-    }
 
-  }
-  else
-  {
-    let con = new _.Consequence();
-
-    if( o.dstPath === o.srcPath )
-    return con.take( true );
-
-    self.statReadAct
-    ({
-      filePath : o.srcPath,
-      sync : 0,
-      throwing : 0,
-      resolvingSoftLink : 0,
-    })
-    .give( function( err, stat )
+    let linkReady = new _.Consequence();
+    File.link( srcPath, dstPath, function( err )
     {
       if( err )
-      return con.error( err );
-      if( !stat )
-      return con.error( _.err( '{o.srcPath} does not exist on hard drive:', o.srcPath ) );
-      if( !stat.isTerminal() )
-      return con.error( _.err( '{o.srcPath} is not a terminal file:', o.srcPath ) );
+      return linkReady.error( err )
+      linkReady.take( true )
+    });
+    return linkReady;
+  }
 
-      File.link( srcPath, dstPath, function( err )
-      {
-        return err ? con.error( err ) : con.take( true );
-      });
+  /* */
+
+  function tempDelete( got )
+  {
+    let r = _.Consequence.Try( () =>
+    {
+      let result = o.context.tempDelete();
+      return o.sync ? true : result;
+    })
+    r.then( () => got );
+
+    if( o.sync )
+    return r.syncMaybe();
+
+    return r;
+  }
+
+  /* */
+
+  function tempRenameRevert( err, got )
+  {
+    if( !err )
+    return got;
+
+    _.errAttend( err );
+
+    let r = _.Consequence.Try( () =>
+    {
+      let result = o.context.tempRenameRevert()
+      return o.sync ? true : result;
+    })
+    .finally( () =>
+    {
+      throw _.err( err );
     })
 
-    return con;
+    if( o.sync )
+    return r.syncMaybe();
+
+    return r;
   }
+
 }
 
 _.routineExtend( hardLinkAct, Parent.prototype.hardLinkAct );

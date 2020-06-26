@@ -35039,48 +35039,6 @@ function filesDeleteEscapedPath( test )
 }
 
 //
-// {
-//   let context = this;
-//   let a = context.assetFor( test, false );
-//
-//   /* */
-//
-//   test.case = 'basic';
-//   a.reflect();
-//   var srcPath = a.abs( '"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"/File1.txt' );
-//   var srcGlobalPath = a.system.path.join( `${a.effectiveProvider.protocol}:///`, srcPath );
-//   test.is( a.path.isGlobal( srcGlobalPath ) );
-//   a.system.fileWrite( srcGlobalPath, 'File1.txt' );
-//   test.is( a.system.fileExists( srcGlobalPath ) );
-//
-//   var exp =
-//   [
-//     '.',
-//     './"a1#"',
-//     './"a1#"/"a2@"',
-//     './"a1#"/"a2@"/"a3!"',
-//     './"a1#"/"a2@"/"a3!"/"a4?"',
-//     './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"',
-//     './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"',
-//     './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"',
-//     './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"',
-//     './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"/File1.txt'
-//   ]
-//   var found = a.system.filesDelete
-//   ({
-//     filePath : a.abs( '.' ),
-//     outputFormat : 'relative',
-//     withDirs : 1,
-//   });
-//   test.identical( found, exp );
-//
-//   test.is( !a.system.fileExists( srcGlobalPath ) );
-//
-//   /* */
-//
-// }
-
-//
 
 function filesDeleteAndAsyncWrite( test )
 {
@@ -35088,7 +35046,6 @@ function filesDeleteAndAsyncWrite( test )
   let provider = context.provider;
   let system = context.system;
   let path = context.provider.path;
-  // let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   test.case = 'try to delete dir before async write will be completed';
 

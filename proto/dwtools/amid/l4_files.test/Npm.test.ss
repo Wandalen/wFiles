@@ -158,7 +158,7 @@ function filesReflectTrivial( test )
   {
     test.case = 'specific tag';
     providerDst.filesDelete( installPath );
-    let remotePath = 'npm:///wpathbasic@latest'
+    let remotePath = 'npm:///wpathbasic!latest'
     return system.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
   })
   .then( ( got ) =>
@@ -185,7 +185,7 @@ function filesReflectTrivial( test )
   {
     test.case = 'specific tag';
     providerDst.filesDelete( installPath );
-    let remotePath = 'npm:///wpathbasic@beta'
+    let remotePath = 'npm:///wpathbasic!beta'
     return system.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
   })
   .then( ( got ) =>

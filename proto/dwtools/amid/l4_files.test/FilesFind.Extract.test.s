@@ -16,7 +16,7 @@ _.assert( !!Parent );
 
 //
 
-var filesTree =
+var filesTree = /* xxx : remove? */
 {
   'folder.abc' :
   {
@@ -39,6 +39,17 @@ var filesTree =
   'softLinkToFile' : [{ softLink : '/file' }],
   'softLinkToUnknown' : [{ softLink : '/unknown' }],
   'softLinkToDir' : [{ softLink : '/test_dir' }],
+}
+
+//
+
+function providerMake()
+{
+  let context = this;
+  let provider = _.FileProvider.Extract({ protocols : [ 'current', 'second' ] });
+  let system = _.FileProvider.System({ providers : [ provider ] }); 
+  _.assert( system.defaultProvider === null );
+  return provider;
 }
 
 //
@@ -88,6 +99,7 @@ var Proto =
   {
     filesTree,
     // provider : _.FileProvider.Extract({ filesTree, usingExtraStat : 1, protocol : 'current' }),
+    providerMake,
     pathFor,
     testFile : '/file1',
   },

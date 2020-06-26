@@ -240,7 +240,7 @@ function assertProviderDefaults( o )
 function _preFilePathScalarWithoutProviderDefaults( routine, args )
 {
   let self = this;
-  let path = self.path;
+  let path = self.system ? self.system.path : self.path;;
 
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
   _.assert( _.objectIs( args[ 0 ] ) || path.is( args[ 0 ] ), 'Expects options map or path' );
@@ -277,7 +277,7 @@ function _preFilePathScalarWithProviderDefaults( routine, args )
 function _preFilePathVectorWithoutProviderDefaults( routine, args )
 {
   let self = this;
-  let path = self.path;
+  let path = self.system ? self.system.path : self.path;;
 
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
   _.assert( args && args.length === 1, `Routine ${ routine.name } expects exactly one argument` );
@@ -319,7 +319,7 @@ function _preFilePathVectorWithProviderDefaults( routine, args )
 function _preFileFilterWithoutProviderDefaults( routine, args )
 {
   let self = this;
-  let path = self.path;
+  let path = self.system ? self.system.path : self.path;;
 
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
   _.assert( args && args.length === 1, 'Routine ' + routine.name + ' expects exactly one argument' );
@@ -369,7 +369,7 @@ function _preFileFilterWithProviderDefaults( routine, args )
 function _preSrcDstPathWithoutProviderDefaults( routine, args )
 {
   let self = this;
-  let path = self.path;
+  let path = self.system ? self.system.path : self.path;;
 
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
   _.assert( args.length === 1 || args.length === 2, 'Routine ' + routine.name + ' expects one or two arguments' );
@@ -552,7 +552,8 @@ function preferredFromGlobalAct( globalPath )
 function globalFromPreferredAct( localPath )
 {
   let self = this;
-  let path = self.path.parse ? self.path : _.uri;
+  let path = self.system ? self.system.path : self.path;
+  // let path = self.path.parse ? self.path : _.uri; /* yyy */
 
   if( _.boolLike( localPath ) )
   return localPath;
@@ -591,7 +592,7 @@ let pathCurrentAct = null;
 function pathDirTempAct()
 {
   let self = this;
-  let path = self.path;
+  let path = self.system ? self.system.path : self.path;;
   return '/temp';
 }
 
@@ -864,7 +865,7 @@ operates.filePath = { pathToRead : 1 };
 function pathResolveTextLink_pre( routine, args )
 {
   let self = this;
-  let path = self.path;
+  let path = self.system ? self.system.path : self.path;;
 
   let o = args[ 0 ];
 
@@ -1067,7 +1068,7 @@ function pathResolveLinkStep_pre()
 function pathResolveLinkStep_body( o )
 {
   let self = this;
-  let path = self.path;
+  let path = self.system ? self.system.path : self.path;;
 
   if( o.resolvingSoftLink )
   {
@@ -1155,7 +1156,7 @@ function pathResolveLinkFull_pre()
 function pathResolveLinkFull_body( o )
 {
   let self = this;
-  let path = self.path;
+  let path = self.system ? self.system.path : self.path;;
   let result = Object.create( null );
   result.filePath = o.filePath;
   result.absolutePath = o.filePath;
@@ -1288,8 +1289,6 @@ function pathResolveLinkFull_body( o )
         }
 
         let r = self.pathResolveLinkHeadReverse.body.call( self, o2 );
-        if( r !== result.absolutePath ) /* qqq : preserve relative path */
-        debugger;
         if( r !== result.absolutePath )
         {
           result.filePath = result.absolutePath = r;
@@ -1309,8 +1308,6 @@ function pathResolveLinkFull_body( o )
         }
       }
 
-      // return _.mapIs( result ) ? result.filePath : result;
-      // debugger;
       return result;
     }
     catch( err )
@@ -1488,7 +1485,7 @@ pathResolveLinkTail.having.aspect = 'entry';
 function pathResolveLinkTailChain_pre()
 {
   let self = this;
-  let path = self.path;
+  let path = self.system ? self.system.path : self.path;;
   let o = self._preFilePathScalarWithProviderDefaults.apply( self, arguments );
 
   _.assert( path.isAbsolute( o.filePath ) );
@@ -1513,7 +1510,7 @@ function pathResolveLinkTailChain_pre()
 function pathResolveLinkTailChain_body( o )
 {
   let self = this;
-  let path = self.path;
+  let path = self.system ? self.system.path : self.path;;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.boolLike( o.resolvingSoftLink ) || _.numberIs( o.resolvingSoftLink ) );
@@ -1686,7 +1683,7 @@ function pathResolveLinkHeadDirect_pre()
 function pathResolveLinkHeadDirect_body( o )
 {
   let self = this;
-  let path = self.path;
+  let path = self.system ? self.system.path : self.path;;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.boolLike( o.resolvingSoftLink ) || _.numberIs( o.resolvingSoftLink ) );
@@ -1776,7 +1773,7 @@ function pathResolveLinkHeadReverse_pre()
 function pathResolveLinkHeadReverse_body( o )
 {
   let self = this;
-  let path = self.path;
+  let path = self.system ? self.system.path : self.path;;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.boolLike( o.resolvingSoftLink ) || _.numberIs( o.resolvingSoftLink ) );
@@ -1815,8 +1812,11 @@ function pathResolveLinkHeadReverse_body( o )
 
   let result = '/' + postfixPath + '/' + path.fullName( o.filePath );
 
+  // if( path.parse )
+  // result = ( path.parse( prefixPath ).origin || '' ) + result;
+
   if( path.parse )
-  result = ( path.parse( prefixPath ).origin || '' ) + result;
+  result = path.join( prefixPath, result )
 
   return result;
 }
@@ -4584,7 +4584,7 @@ function fileWrite_pre( routine, args )
 function fileWrite_body( o )
 {
   let self = this;
-  let path = self.path;
+  let path = self.system ? self.system.path : self.path;;
 
   o.encoding = o.encoding || self.encoding;
   if( o.encoding === _.unknown )
@@ -5071,7 +5071,7 @@ operates.filePath = { pathToWrite : 1 }
 function fileDelete_body( o )
 {
   let self = this;
-  let path = self.path;
+  let path = self.system ? self.system.path : self.path;;
   let result = null;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
@@ -5278,7 +5278,7 @@ operates.filePath = { pathToWrite : 1 }
 function dirMake_body( o )
 {
   let self = this;
-  let path = self.path;
+  let path = self.system ? self.system.path : self.path;;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( path.isNormalized( o.filePath ) );
@@ -5909,7 +5909,6 @@ function _link_functor( fop )
       try
       {
 
-        debugger;
         if( self.fileExists( o2.dstPath ) )
         {
           c.verifyDst()
@@ -7774,7 +7773,7 @@ _.mapExtend( softLink.defaults, softLink.body.defaults );
 function textLinkAct( o )
 {
   let self = this;
-  let path = self.path;
+  let path = self.system ? self.system.path : self.path;;
 
   _.assertRoutineOptions( textLinkAct, arguments );
   _.assert( path.is( o.srcPath ) );
@@ -8384,7 +8383,7 @@ having.aspect = 'entry';
 function filesAreSoftLinked_body( o )
 {
   let self = this;
-  let path = self.path;
+  let path = self.system ? self.system.path : self.path;;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assertRoutineOptions( filesAreSoftLinked_body, arguments );
@@ -8398,6 +8397,10 @@ function filesAreSoftLinked_body( o )
   return false;
 
   let resolved = [];
+
+  // xxx
+  // if( o.filePath[ 1 ] === 'extract+dst:///dst/a1' )
+  // debugger;
 
   for( let i = 0 ; i < o.filePath.length ; i++ )
   {
@@ -8444,7 +8447,7 @@ filesAreSoftLinked.having.aspect = 'entry';
 function filesAreTextLinked_body( o )
 {
   let self = this;
-  let path = self.path;
+  let path = self.system ? self.system.path : self.path;;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assertRoutineOptions( filesAreTextLinked_body, arguments );

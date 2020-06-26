@@ -3290,7 +3290,6 @@ function filesReflectSingle_body( o )
     _.assert( !!record.touch );
     _.assert( !!record.action );
 
-    debugger;
     let r = record.dst.factory.effectiveProvider.dirMake
     ({
       recursive : 1,
@@ -3310,7 +3309,6 @@ function filesReflectSingle_body( o )
     if( record.dst.absolute === record.src.absolute )
     return;
 
-    debugger;
     let r = record.dst.factory.effectiveProvider.fileDelete( record.dst.absolute );
     record.performed = r;
     /* qqq : should be in v >= 3 log as : " - deleted ..." */

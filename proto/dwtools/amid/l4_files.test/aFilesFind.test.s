@@ -54,6 +54,64 @@ function onRoutineEnd( test )
 
 //
 
+function assetFor( test, a )
+{
+  let context = this;
+
+  if( !_.mapIs( a ) )
+  {
+    if( _.boolIs( arguments[ 1 ] ) )
+    a = { originalAssetPath : arguments[ 1 ] }
+    else
+    a = { assetName : arguments[ 1 ] }
+  }
+
+  if( !a.fileProvider )
+  {
+    a.fileProvider = context.providerMake();
+  }
+
+  a.suiteTempPath = a.fileProvider.path.pathDirTempOpen( a.fileProvider.constructor.name );
+
+  a = test.assetFor( a );
+
+  if( !a.system )
+  {
+    if( a.fileProvider.system )
+    a.system = a.fileProvider.system;
+    else if( a.fileProvider instanceof _.FileProvider.System )
+    a.system = a.fileProvider;
+  }
+
+  if( !a.effectiveProvider )
+  {
+    if( !( a.fileProvider instanceof _.FileProvider.System ) )
+    a.effectiveProvider = a.fileProvider;
+    else if( a.fileProvider.defaultProvider )
+    a.effectiveProvider = a.fileProvider.defaultProvider;
+  }
+
+  _.assert( a.effectiveProvider instanceof _.FileProvider.Abstract, 'effectiveProvider is not specificed' );
+
+  if( !a.global )
+  {
+    a.global = globalFor;
+  }
+
+  return a;
+
+  function globalFor()
+  {
+    let a = this;
+    let abs = a.abs( ... arguments );
+    let result = a.system.path.s.join( a.effectiveProvider.protocol + '://', abs );
+    return result;
+  }
+
+}
+
+//
+
 function softLinkIsSupported()
 {
   let context = this;
@@ -864,7 +922,7 @@ function filesFindTrivialAsync( test )
 
   extract1.filesReflectTo( provider, context.suiteTempPath );
 
-  //
+  /* */
 
   con.then( () =>
   {
@@ -1448,7 +1506,7 @@ function filesFind( test )
   test.identical( got.length + 1, _.mapOwnKeys( onUpMap ).length );
   test.identical( got.length + 1, _.mapOwnKeys( onDownMap ).length );
 
-  //
+  /* */
 
   provider.safe = 1;
 
@@ -2122,7 +2180,7 @@ function filesFind2( test )
   got = provider.filesFind({ filePath : terminalPath, withTerminals : 0, withTransient : 1 });
   test.identical( got, [] );
 
-  //
+  /* */
 
   test.description = 'outputFormat option';
 
@@ -2137,7 +2195,6 @@ function filesFind2( test )
 
   got = provider.filesFind({ filePath : routinePath, outputFormat : 'absolute' });
   expected = provider.dirRead( routinePath );
-  // test.identical( check( got, path.isAbsolute ), true );
   test.identical( path.s.allAreAbsolute( got ), true );
 
   /*terminalPath - directory, outputFormat relative */
@@ -2160,7 +2217,7 @@ function filesFind2( test )
     provider.filesFind({ filePath : routinePath, outputFormat : 'unexpected' });
   })
 
-  //
+  /* */
 
   test.description = 'result option';
 
@@ -2185,7 +2242,7 @@ function filesFind2( test )
     provider.filesFind({ filePath : routinePath, result : got });
   });
 
-  //
+  /* */
 
   test.description = 'masking'
 
@@ -2266,7 +2323,7 @@ function filesFind2( test )
   expected[ i ] = './' + expected[ i ];
   test.identical( got, expected )
 
-  //
+  /* */
 
   test.description = 'change relative path in record';
 
@@ -2418,7 +2475,7 @@ function filesFindRecursive( test )
   var expected = [ './a1' ]
   test.identical( got, expected );
 
-  //
+  /* */
 
   var got = provider.filesFind
   ({
@@ -2559,7 +2616,7 @@ function filesFindLinked( test )
   let dirPath = path.join( routinePath, 'directory' );
   let toDirPath = path.join( routinePath, 'toDir' );
 
-  //
+  /* */
 
   test.open( 'normal' );
 
@@ -4703,7 +4760,7 @@ function filesFindResolving( test )
 
   */
 
-  //
+  /* */
 
   provider.filesDelete( routinePath );
   provider.fileWrite( terminalPath, terminalPath );
@@ -4734,7 +4791,7 @@ function filesFindResolving( test )
   test.identical( filtered, expected )
   provider.fieldPop( 'usingTextLink', 0 );
 
-  //
+  /* */
 
   provider.filesDelete( routinePath );
   provider.fileWrite( terminalPath, terminalPath );
@@ -4765,7 +4822,7 @@ function filesFindResolving( test )
   test.identical( filtered, expected )
   provider.fieldPop( 'usingTextLink', 0 );
 
-  //
+  /* */
 
   provider.filesDelete( routinePath );
   provider.fileWrite( terminalPath, terminalPath );
@@ -4796,7 +4853,7 @@ function filesFindResolving( test )
   test.identical( filtered, expected )
   provider.fieldPop( 'usingTextLink', 0 );
 
-  //
+  /* */
 
   provider.filesDelete( routinePath );
   provider.fileWrite( terminalPath, terminalPath );
@@ -4827,7 +4884,7 @@ function filesFindResolving( test )
   test.identical( filtered, expected )
   provider.fieldPop( 'usingTextLink', 1 );
 
-  //
+  /* */
 
   test.case = 'text link to a file, resolvingSoftLink : 0, resolvingTextLink : 0';
   provider.filesDelete( routinePath );
@@ -4872,7 +4929,7 @@ function filesFindResolving( test )
   provider.fieldPop( 'usingTextLink', 0 );
 
 
-  //
+  /* */
 
   test.case = 'text link to a file, resolvingSoftLink : 0, resolvingTextLink : 1, usingTextLink : 0';
   provider.filesDelete( routinePath );
@@ -4916,7 +4973,7 @@ function filesFindResolving( test )
   test.is( srcFileStat.ino !== textLinkStat.ino );
   provider.fieldPop( 'usingTextLink', 0 );
 
-  //
+  /* */
 
   test.case = 'text link to a file, resolvingSoftLink : 0, resolvingTextLink : 1, usingTextLink : 1';
   provider.filesDelete( routinePath );
@@ -4960,7 +5017,7 @@ function filesFindResolving( test )
   test.identical( srcFileStat.ino, textLinkStat.ino );
   provider.fieldPop( 'usingTextLink', 1 );
 
-  //
+  /* */
 
   test.case = 'text link to a file, resolvingSoftLink : 1, resolvingTextLink : 1, usingTextLink : 1';
   provider.filesDelete( routinePath );
@@ -5004,7 +5061,7 @@ function filesFindResolving( test )
   test.identical( srcFileStat.ino, textLinkStat.ino );
   provider.fieldPop( 'usingTextLink', 1 );
 
-   //
+   /* */
 
   test.case = 'text link to a file, resolvingSoftLink : 1, resolvingTextLink : 1, usingTextLink : 1';
   provider.filesDelete( routinePath );
@@ -5048,7 +5105,7 @@ function filesFindResolving( test )
   test.identical( srcFileStat.ino, textLinkStat.ino );
   provider.fieldPop( 'usingTextLink', 1 );
 
-  //
+  /* */
 
   test.case = 'text->text->terminal, resolvingSoftLink : 1, resolvingTextLink : 1, usingTextLink : 1';
   provider.filesDelete( routinePath );
@@ -5146,7 +5203,7 @@ function filesFindResolving( test )
   test.is( srcFileStat.ino !== softLinkStat.ino );
   provider.fieldPop( 'usingTextLink', 0 );
 
-  //
+  /* */
 
   test.case = 'soft link to a file, resolvingSoftLink : 1, resolvingTextLink : 0'
   provider.filesDelete( routinePath );
@@ -5188,7 +5245,7 @@ function filesFindResolving( test )
   test.identical( srcFileStat.ino, softLinkStat.ino );
   provider.fieldPop( 'usingTextLink', 0 );
 
-  //
+  /* */
 
   test.case = 'soft link to a file, resolvingSoftLink : 1, resolvingTextLink : 1'
   provider.filesDelete( routinePath );
@@ -5232,7 +5289,7 @@ function filesFindResolving( test )
   test.identical( srcFileStat.ino, softLinkStat.ino );
   provider.fieldPop( 'usingTextLink', 1 );
 
-  //
+  /* */
 
   test.case = 'soft link to a dir, resolvingSoftLink : 1, resolvingTextLink : 0';
   var srcDirPath = path.join( routinePath, 'dir' );
@@ -5288,7 +5345,7 @@ function filesFindResolving( test )
   test.identical( srcDirStat.ino, softLinkStat.ino );
   provider.fieldPop( 'usingTextLink', 0 );
 
-  //
+  /* */
 
   test.case = 'soft link to a dir, resolvingSoftLink : 1, resolvingTextLink : 1';
   var srcDirPath = path.join( routinePath, 'dir' );
@@ -5345,7 +5402,7 @@ function filesFindResolving( test )
   test.identical( srcDirStat.ino, softLinkStat.ino );
   provider.fieldPop( 'usingTextLink', 1 );
 
-  //
+  /* */
 
   test.case = 'multiple soft links in chain, resolvingSoftLink : 1, resolvingTextLink : 0'
   provider.filesDelete( routinePath );
@@ -5399,7 +5456,7 @@ function filesFindResolving( test )
   test.identical( srcFileStat.ino, softLink2Stat.ino );
   provider.fieldPop( 'usingTextLink', 0 );
 
-  //
+  /* */
 
   test.case = 'multiple soft links in chain, resolvingSoftLink : 1, resolvingTextLink : 1'
   provider.filesDelete( routinePath );
@@ -5453,7 +5510,7 @@ function filesFindResolving( test )
   test.identical( srcFileStat.ino, softLink2Stat.ino );
   provider.fieldPop( 'usingTextLink', 1 );
 
-  //
+  /* */
 
   test.case = 'multiple soft links to single file, resolvingSoftLink : 1, resolvingTextLink : 0'
   provider.filesDelete( routinePath );
@@ -5507,7 +5564,7 @@ function filesFindResolving( test )
   test.identical( srcFileStat.ino, softLink2Stat.ino );
   provider.fieldPop( 'usingTextLink', 0 );
 
-  //
+  /* */
 
   test.case = 'multiple soft links to single file, resolvingSoftLink : 1, resolvingTextLink : 1'
   provider.filesDelete( routinePath );
@@ -5561,7 +5618,7 @@ function filesFindResolving( test )
   test.identical( srcFileStat.ino, softLink2Stat.ino );
   provider.fieldPop( 'usingTextLink', 1 );
 
-  //
+  /* */
 
   test.case = 'soft->text->terminal, resolvingSoftLink : 1, resolvingTextLink : 1, usingTextLink : 1';
   provider.filesDelete( routinePath );
@@ -5687,6 +5744,76 @@ function filesFindResolving( test )
   test.is( srcFileStat.ino !== textLinkStat.ino )
   test.is( srcFileStat.ino !== softLinkStat.ino )
   provider.fieldPop( 'usingTextLink', 1 );
+
+}
+
+//
+
+function filesFindEscapedPath( test )
+{
+  let context = this;
+  let a = context.assetFor( test, false );
+
+  /* */
+
+  test.case = 'provider';
+  a.reflect();
+  var srcPath = a.abs( '"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"/File1.txt' );
+  a.fileProvider.fileWrite( srcPath, 'File1.txt' );
+  test.is( a.fileProvider.fileExists( srcPath ) );
+
+  var exp =
+  [
+    '.',
+    './"a1#"',
+    './"a1#"/"a2@"',
+    './"a1#"/"a2@"/"a3!"',
+    './"a1#"/"a2@"/"a3!"/"a4?"',
+    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"',
+    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"',
+    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"',
+    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"',
+    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"/File1.txt'
+  ]
+  var found = a.fileProvider.filesFind
+  ({
+    filePath : a.abs( '.' ),
+    outputFormat : 'relative',
+    withDirs : 1,
+  });
+  test.identical( found, exp );
+
+  /* */
+
+  test.case = 'system';
+  a.reflect();
+  var srcPath = a.abs( '"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"/File1.txt' );
+  test.is( a.path.isGlobal( a.global( srcPath ) ) );
+  a.system.fileWrite( a.global( srcPath ), 'File1.txt' );
+  test.is( a.system.fileExists( a.global( srcPath ) ) );
+
+  var exp =
+  [
+    '.',
+    './"a1#"',
+    './"a1#"/"a2@"',
+    './"a1#"/"a2@"/"a3!"',
+    './"a1#"/"a2@"/"a3!"/"a4?"',
+    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"',
+    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"',
+    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"',
+    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"',
+    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"/File1.txt'
+  ]
+  var found = a.system.filesFind
+  ({
+    filePath : a.global( '.' ),
+    outputFormat : 'relative',
+    withDirs : 1,
+  });
+  test.identical( found, exp );
+
+  /* */
 
 }
 
@@ -8242,7 +8369,7 @@ function filesGlob( test )
   //   './a.txt'
   // ]
   // test.identical( got, expected );
-  //
+  /* */
   // var  glob = '**/c/{x.*, c.*}';
   // var options = completeOptions( glob );
   // var got = provider.filesGlob( options );
@@ -8254,7 +8381,7 @@ function filesGlob( test )
   //   './a/c/c.txt',
   // ]
   // test.identical( got, expected );
-  //
+  /* */
   // var  glob = 'b/*/{x, c}/a/*';
   // var options = completeOptions( glob );
   // var got = provider.filesGlob( options );
@@ -14632,7 +14759,9 @@ function filesFindGroups( test )
 
 }
 
-//
+// --
+// reflect
+// --
 
 function filesReflectEvaluate( test )
 {
@@ -15342,7 +15471,7 @@ function filesReflectTrivial( test )
   }
   test.identical( extract.filesTree, expectedTree );
 
-  //
+  /* */
 
   var tree =
   {
@@ -15517,7 +15646,7 @@ function filesReflectTrivial( test )
   test.identical( srcAllow, expectedSrcAllow );
   test.identical( reason, expectedReason );
 
-  //
+  /* */
 
   test.case = 'onUp changes dst path'
   var tree =
@@ -15569,7 +15698,7 @@ function filesReflectTrivial( test )
   extract.filesReflect( o );
   test.identical( extract.filesTree, expectedTree );
 
-  //
+  /* */
 
   test.case = 'linking : nop, dst files will be deleted for rewriting after onWriteDstUp call'
   var tree =
@@ -15624,7 +15753,7 @@ function filesReflectTrivial( test )
 
   test.identical( extract.filesTree, expectedTree );
 
-  //
+  /* */
 
   test.case = 'linking : nop, return _.dont from onWriteDstUp to prevent any action'
   var tree =
@@ -17439,6 +17568,26 @@ function filesReflect( test )
   let path = context.provider.path;
   let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
+  /* */
+
+  var o =
+  {
+    prepare : prepareSingle,
+  }
+
+  _filesReflect.call( context, test, o );
+
+  /* */
+
+  var o =
+  {
+    prepare : prepareTwo,
+  }
+
+  _filesReflect.call( context, test, o );
+
+  /* */
+
   function prepareSingle()
   {
 
@@ -17457,6 +17606,8 @@ function filesReflect( test )
 
     return { src : tree, dst : tree, system : tree };
   }
+
+  /* */
 
   function prepareTwo()
   {
@@ -17488,1427 +17639,1409 @@ function filesReflect( test )
 
   /* */
 
-  var o =
+  function _filesReflect( test, o )
   {
-    prepare : prepareSingle,
-  }
+    let context = this;
+    let provider = context.provider;
+    let system = context.system;
+    let path = context.provider.path;
+    let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
-  _filesReflect.call( context, test, o );
+    function optionsMake()
+    {
+      var options =
+      {
+        reflectMap : { '/src' : '/dst' },
+        src : { effectiveProvider : p.src },
+        dst : { effectiveProvider : p.dst },
+      }
+      return options;
+    }
 
-  /* */
+    /* */
 
-  var o =
-  {
-    prepare : prepareTwo,
-  }
+    var p = o.prepare();
+    var o1 = optionsMake();
+    var o2 =
+    {
+      linking : 'fileCopy',
+      srcDeleting : 0,
+      dstDeleting : 0,
+      writing : 1,
+      dstRewriting : 1,
+      dstRewritingByDistinct : 1,
+      preservingTime : 0,
+    }
 
-  _filesReflect.call( context, test, o );
+    test.case = 'complex move\n' + _.toStr( o2 );
+
+    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+
+    var expected = _.FileProvider.Extract
+    ({
+      filesTree :
+      {
+        src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+        dst : { a2 : '2', a1 : '1', b : '1', c : '1', dir : { a2 : '2', a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir4 : {}, dir5 : {}, srcFile : '1', dstFile : { f : '1' } },
+      },
+    });
+
+    test.identical( p.src.filesTree.src, expected.filesTree.src );
+    test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
+
+    var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/srcFile/f', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
+    var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/srcFile/f', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
+    var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'fileCopy', 'fileDelete', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy' ];
+    var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
+    var expectedPreserve = [ true, false, false, false, false, false, true, false, false, false, false, false, false, false, true, false, true, false, false, false ];
+    var expectedReason = [ 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'dstRewriting', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking' ];
+
+    var dstAbsolute = _.select( records, '*/dst/absolute' );
+    var srcAbsolute = _.select( records, '*/src/absolute' );
+    var action = _.select( records, '*/action' );
+    var allow = _.select( records, '*/allow' );
+    var preserve = _.select( records, '*/preserve' );
+    var reason = _.select( records, '*/reason' );
+
+    test.identical( dstAbsolute, expectedDstAbsolute );
+    test.identical( srcAbsolute, expectedSrcAbsolute );
+    test.identical( action, expectedAction );
+    test.identical( allow, expectedAllow );
+    test.identical( preserve, expectedPreserve );
+    test.identical( reason, expectedReason );
+
+    test.identical( p.system.filesAreSoftLinked([ p.src.path.globalFromPreferred( '/src/a1' ), p.dst.path.globalFromPreferred( '/dst/a1' ) ]), false );
+    test.identical( p.system.filesAreSoftLinked([ p.src.path.globalFromPreferred( '/src/a1' ), p.src.path.globalFromPreferred( '/src/a1' ) ]), false );
+    test.identical( p.system.filesAreHardLinked([ p.src.path.globalFromPreferred( '/src/a1' ), p.dst.path.globalFromPreferred( '/dst/a1' ) ]), false );
+    test.identical( p.system.filesAreHardLinked([ p.src.path.globalFromPreferred( '/src/a1' ), p.src.path.globalFromPreferred( '/src/a1' ) ]), true );
+
+    /* */
+
+    var p = o.prepare();
+    var o1 = optionsMake();
+    var o2 =
+    {
+      linking : 'softLink',
+      srcDeleting : 0,
+      dstDeleting : 0,
+      writing : 1,
+      dstRewriting : 1,
+      dstRewritingByDistinct : 1,
+      preservingTime : 0,
+    }
+
+    test.case = 'complex move with linking : softLink\n' + _.toStr( o2 );
+
+    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+
+    var expected = _.FileProvider.Extract
+    ({
+      filesTree :
+      {
+        src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+        dst : { a2 : '2', a1 : [{ softLink : p.src.path.globalFromPreferred( '/src/a1' ) }], b : [{ softLink : p.src.path.globalFromPreferred( '/src/b' ) }], c : [{ softLink : p.src.path.globalFromPreferred( '/src/c' ) }], dir : { a2 : '2', a1 : [{ softLink : p.src.path.globalFromPreferred( '/src/dir/a1' ) }], b : [{ softLink : p.src.path.globalFromPreferred( '/src/dir/b' ) }], c : [{ softLink : p.src.path.globalFromPreferred( '/src/dir/c' ) }] }, dirSame : { d : [{ softLink : p.src.path.globalFromPreferred( '/src/dirSame/d' ) }] }, dir1 : { a1 : [{ softLink : p.src.path.globalFromPreferred( '/src/dir1/a1' ) }], b : [{ softLink : p.src.path.globalFromPreferred( '/src/dir1/b' ) }], c : [{ softLink : p.src.path.globalFromPreferred( '/src/dir1/c' ) }] }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir4 : {}, dir5 : {}, srcFile : [{ softLink : p.src.path.globalFromPreferred( '/src/srcFile' ) }], dstFile : { f : [{ softLink : p.src.path.globalFromPreferred( '/src/dstFile/f' ) }] } },
+      },
+    });
+
+    test.identical( p.src.filesTree.src, expected.filesTree.src );
+    test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
+
+    var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/srcFile/f', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
+    var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/srcFile/f', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
+
+    var expectedAction = [ 'dirMake', 'softLink', 'softLink', 'softLink', 'softLink', 'fileDelete', 'dirMake', 'softLink', 'softLink', 'softLink', 'dirMake', 'softLink', 'softLink', 'softLink', 'dirMake', 'dirMake', 'dirMake', 'softLink', 'dirMake', 'softLink' ];
+    var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
+
+    var dstAbsolute = _.select( records, '*/dst/absolute' );
+    var srcAbsolute = _.select( records, '*/src/absolute' );
+
+    var action = _.select( records, '*/action' );
+    var allow = _.select( records, '*/allow' );
+
+    test.identical( dstAbsolute, expectedDstAbsolute );
+    test.identical( srcAbsolute, expectedSrcAbsolute );
+
+    test.identical( action, expectedAction );
+    test.identical( allow, expectedAllow );
+
+    test.identical( p.system.filesAreSoftLinked([ p.src.path.globalFromPreferred( '/src/a1' ), p.dst.path.globalFromPreferred( '/dst/a1' ) ]), true );
+    test.identical( p.system.filesAreSoftLinked([ p.src.path.globalFromPreferred( '/src/a2' ), p.dst.path.globalFromPreferred( '/dst/a2' ) ]), false );
+    test.identical( p.system.filesAreSoftLinked([ p.src.path.globalFromPreferred( '/src/b' ), p.dst.path.globalFromPreferred( '/dst/b' ) ]), true );
+    test.identical( p.system.filesAreSoftLinked([ p.src.path.globalFromPreferred( '/src/dir/a1' ), p.dst.path.globalFromPreferred( '/dst/dir/a1' ) ]), true );
+    test.identical( p.system.filesAreSoftLinked([ p.src.path.globalFromPreferred( '/src/dir/a2' ), p.dst.path.globalFromPreferred( '/dst/dir/a2' ) ]), false );
+    test.identical( p.system.filesAreSoftLinked([ p.src.path.globalFromPreferred( '/src/dir/b' ), p.dst.path.globalFromPreferred( '/dst/dir/b' ) ]), true );
+
+    /* */
+
+    var p = o.prepare();
+    var o1 = optionsMake();
+    var o2 =
+    {
+      linking : 'fileCopy',
+      srcDeleting : 0,
+      dstDeleting : 0,
+      writing : 1,
+      dstRewriting : 0,
+      dstRewritingByDistinct : 1,
+      includingNonAllowed : 0,
+      preservingTime : 0,
+    }
+
+    test.case = 'complex move with dstRewriting:0, includingNonAllowed:0\n' + _.toStr( o2 );
+
+    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+
+    var expected = _.FileProvider.Extract
+    ({
+      filesTree :
+      {
+        src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+        dst : { a2 : '2', a1 : '1', b : '1', c : '2', dir : { a2 : '2', a1 : '1', b : '1', c : '2' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir4 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
+      },
+    });
+
+    test.identical( p.src.filesTree.src, expected.filesTree.src );
+    test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
+
+    var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/dir', '/dst/dir/a1', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame' ];
+    var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame' ];
+
+    var expectedAction = [ 'dirMake', 'fileCopy', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake' ];
+    var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true ];
+
+    var dstAbsolute = _.select( records, '*/dst/absolute' );
+    var srcAbsolute = _.select( records, '*/src/absolute' );
+
+    var action = _.select( records, '*/action' );
+    var allow = _.select( records, '*/allow' );
+
+    test.identical( dstAbsolute, expectedDstAbsolute );
+    test.identical( srcAbsolute, expectedSrcAbsolute );
+
+    test.identical( action, expectedAction );
+    test.identical( allow, expectedAllow );
+
+    /* */
+
+    var p = o.prepare();
+    var o1 = optionsMake();
+    var o2 =
+    {
+      linking : 'fileCopy',
+      srcDeleting : 0,
+      dstDeleting : 0,
+      writing : 1,
+      dstRewriting : 0,
+      dstRewritingByDistinct : 1,
+      includingNonAllowed : 1,
+      preservingTime : 0,
+    }
+
+    test.case = 'complex move with dstRewriting:0, includingNonAllowed:1\n' + _.toStr( o2 );
+
+    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+
+    var expected = _.FileProvider.Extract
+    ({
+      filesTree :
+      {
+        src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+        dst : { a2 : '2', a1 : '1', b : '1', c : '2', dir : { a2 : '2', a1 : '1', b : '1', c : '2' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir4 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
+      },
+    });
+
+    test.identical( p.src.filesTree.src, expected.filesTree.src );
+    test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
+
+    var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/srcFile/f', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile' ];
+    var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/srcFile/f', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
+
+    var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'fileCopy', 'fileDelete', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake', 'fileCopy', 'dirMake' ];
+    var expectedAllow = [ true, true, false, false, false, false, true, true, false, false, true, true, true, true, true, true, true, false, false ];
+
+    var dstAbsolute = _.select( records, '*/dst/absolute' );
+    var srcAbsolute = _.select( records, '*/src/absolute' );
+
+    var action = _.select( records, '*/action' );
+    var allow = _.select( records, '*/allow' );
+
+    test.identical( dstAbsolute, expectedDstAbsolute );
+    test.identical( srcAbsolute, expectedSrcAbsolute );
+
+    test.identical( action, expectedAction );
+    test.identical( allow, expectedAllow );
+
+    /* */
+
+    var p = o.prepare();
+
+    var o1 = optionsMake();
+    var o2 =
+    {
+      linking : 'fileCopy',
+      srcDeleting : 0,
+      dstDeleting : 0,
+      writing : 0,
+      dstRewriting : 1,
+      dstRewritingByDistinct : 1,
+      preservingTime : 0,
+    }
+
+    test.case = 'complex move with writing : 0\n' + _.toStr( o2 );
+
+    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+
+    var expected = _.FileProvider.Extract
+    ({
+      filesTree :
+      {
+        src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+        dst : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
+      },
+    });
+
+    test.identical( p.src.filesTree.src, expected.filesTree.src );
+    test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
+
+    var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/srcFile/f', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
+    var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/srcFile/f', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
+
+    var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'fileCopy', 'fileDelete', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy' ];
+    var expectedAllow = [ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false ];
+
+    var dstAbsolute = _.select( records, '*/dst/absolute' );
+    var srcAbsolute = _.select( records, '*/src/absolute' );
+
+    var action = _.select( records, '*/action' );
+    var allow = _.select( records, '*/allow' );
+
+    test.identical( dstAbsolute, expectedDstAbsolute );
+    test.identical( srcAbsolute, expectedSrcAbsolute );
+
+    test.identical( action, expectedAction );
+    test.identical( allow, expectedAllow );
+
+    /* */
+
+    var p = o.prepare();
+
+    var o1 = optionsMake();
+    var o2 =
+    {
+      linking : 'nop',
+      srcDeleting : 0,
+      dstDeleting : 0,
+      writing : 1,
+      dstRewriting : 1,
+      dstRewritingByDistinct : 1,
+      preservingTime : 0,
+    }
+
+    test.case = 'complex move with writing : 1, linking : nop\n' + _.toStr( o2 );
+
+    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+
+    var expected = _.FileProvider.Extract
+    ({
+      filesTree :
+      {
+        src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+        dst :
+        {
+          a2 : '2',
+          b : '1',
+          c : '2',
+          dir : { a2 : '2', b : '1', c : '2' },
+          dirSame : { d : '1' },
+          dir2 : { a2 : '2', b : '1', c : '2' },
+          dir3 : {},
+          dir5 : {},
+          dir1 : {},
+          dir4 : {},
+          dstFile : {},
+        },
+      },
+    });
+
+    test.identical( p.src.filesTree.src, expected.filesTree.src );
+    test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
+
+    var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/srcFile/f', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
+    var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/srcFile/f', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
+
+    var expectedAction = [ 'dirMake', 'nop', 'nop', 'nop', 'nop', 'fileDelete', 'dirMake', 'nop', 'nop', 'nop', 'dirMake', 'nop', 'nop', 'nop', 'dirMake', 'dirMake', 'dirMake', 'nop', 'dirMake', 'nop' ];
+    var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
+
+    var dstAbsolute = _.select( records, '*/dst/absolute' );
+    var srcAbsolute = _.select( records, '*/src/absolute' );
+
+    var action = _.select( records, '*/action' );
+    var allow = _.select( records, '*/allow' );
+
+    // logger.log( 'expectedEffAbsolute', expectedEffAbsolute );
+    logger.log( 'action', action );
+
+    test.identical( dstAbsolute, expectedDstAbsolute );
+    test.identical( srcAbsolute, expectedSrcAbsolute );
+
+    test.identical( action, expectedAction );
+    test.identical( allow, expectedAllow );
+
+    /* */
+
+    var p = o.prepare();
+    var o1 = optionsMake();
+    var o2 =
+    {
+      linking : 'nop',
+      srcDeleting : 0,
+      dstDeleting : 0,
+      writing : 1,
+      dstRewriting : 0,
+      dstRewritingByDistinct : 1,
+      preservingTime : 0,
+      includingNonAllowed : 0,
+    }
+
+    test.case = 'complex move with writing : 1, dstRewriting : 0, includingNonAllowed : 0, linking : nop\n' + _.toStr( o2 );
+
+    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+
+    var expected = _.FileProvider.Extract
+    ({
+      filesTree :
+      {
+        src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+        dst : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dir1 : {}, dir4 : {}, dstFile : '1', srcFile : { f : '2' } },
+      },
+    });
+
+    test.identical( p.src.filesTree.src, expected.filesTree.src );
+    test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
+
+    var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/dir', '/dst/dir/a1', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame' ];
+    var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame' ];
+
+    var expectedAction = [ 'dirMake', 'nop', 'dirMake', 'nop', 'dirMake', 'nop', 'nop', 'nop', 'dirMake', 'dirMake', 'dirMake' ];
+    var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true ];
+
+    var dstAbsolute = _.select( records, '*/dst/absolute' );
+    var srcAbsolute = _.select( records, '*/src/absolute' );
+
+    var action = _.select( records, '*/action' );
+    var allow = _.select( records, '*/allow' );
+
+    // logger.log( 'expectedEffAbsolute', expectedEffAbsolute );
+    logger.log( 'action', action );
+
+    test.identical( dstAbsolute, expectedDstAbsolute );
+    test.identical( srcAbsolute, expectedSrcAbsolute );
+
+    test.identical( action, expectedAction );
+    test.identical( allow, expectedAllow );
+
+    /* */
+
+    var p = o.prepare();
+    var o1 = optionsMake();
+    var o2 =
+    {
+      linking : 'nop',
+      srcDeleting : 0,
+      dstDeleting : 0,
+      writing : 1,
+      dstRewriting : 0,
+      dstRewritingByDistinct : 1,
+      preservingTime : 0,
+      includingNonAllowed : 1,
+    }
+
+    test.case = 'complex move with writing : 1, dstRewriting : 0, includingNonAllowed : 1, linking : nop\n' + _.toStr( o2 );
+
+    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+
+    var expected = _.FileProvider.Extract
+    ({
+      filesTree :
+      {
+        src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+        dst : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dir1 : {}, dir4 : {}, dstFile : '1', srcFile : { f : '2' } },
+      },
+    });
+
+    test.identical( p.src.filesTree.src, expected.filesTree.src );
+    test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
+
+    var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/srcFile/f', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile' ];
+    var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/srcFile/f', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
+
+    var expectedAction = [ 'dirMake', 'nop', 'nop', 'nop', 'nop', 'fileDelete', 'dirMake', 'nop', 'nop', 'nop', 'dirMake', 'nop', 'nop', 'nop', 'dirMake', 'dirMake', 'dirMake', 'nop', 'dirMake' ];
+    var expectedAllow = [ true, true, false, false, false, false, true, true, false, false, true, true, true, true, true, true, true, false, false ];
+
+    var dstAbsolute = _.select( records, '*/dst/absolute' );
+    var srcAbsolute = _.select( records, '*/src/absolute' );
+
+    var action = _.select( records, '*/action' );
+    var allow = _.select( records, '*/allow' );
+
+    // logger.log( 'expectedEffAbsolute', expectedEffAbsolute );
+    logger.log( 'action', action );
+
+    test.identical( dstAbsolute, expectedDstAbsolute );
+    test.identical( srcAbsolute, expectedSrcAbsolute );
+
+    test.identical( action, expectedAction );
+    test.identical( allow, expectedAllow );
+
+    /* */
+
+    var p = o.prepare();
+    var o1 = optionsMake();
+    var o2 =
+    {
+      linking : 'fileCopy',
+      srcDeleting : 0,
+      dstDeleting : 0,
+      writing : 1,
+      dstRewriting : 1,
+      dstRewritingByDistinct : 1,
+      preservingTime : 0,
+      preservingSame : 1,
+    }
+
+    test.case = 'complex move with preservingSame : 1, linking : fileCopy\n' + _.toStr( o2 );
+
+    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+
+    var expected = _.FileProvider.Extract
+    ({
+      filesTree :
+      {
+        src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+        dst : { a2 : '2', a1 : '1', b : '1', c : '1', dir : { a2 : '2', a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir4 : {}, dir5 : {}, srcFile : '1', dstFile : { f : '1' } },
+      },
+    });
+
+    test.identical( p.src.filesTree.src, expected.filesTree.src );
+    test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
+
+    var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/srcFile/f', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
+    var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/srcFile/f', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
+
+    var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'fileCopy', 'fileDelete', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy' ];
+    var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
+    var expectedPreserve = [ true, false, true, false, false, false, true, false, true, false, false, false, false, false, true, false, true, true, false, false ];
+
+    var dstAbsolute = _.select( records, '*/dst/absolute' );
+    var srcAbsolute = _.select( records, '*/src/absolute' );
+
+    var action = _.select( records, '*/action' );
+    var allow = _.select( records, '*/allow' );
+    var preserve = _.select( records, '*/preserve' );
+
+    test.identical( dstAbsolute, expectedDstAbsolute );
+    test.identical( srcAbsolute, expectedSrcAbsolute );
+
+    test.identical( action, expectedAction );
+    test.identical( allow, expectedAllow );
+    test.identical( preserve, expectedPreserve );
+
+    /* */
+
+    var p = o.prepare();
+    var o1 = optionsMake();
+    var o2 =
+    {
+      linking : 'fileCopy',
+      srcDeleting : 1,
+      dstDeleting : 0,
+      writing : 1,
+      dstRewriting : 1,
+      dstRewritingByDistinct : 1,
+      preservingTime : 0,
+    }
+
+    test.case = 'complex move with srcDeleting : 1\n' + _.toStr( o2 );
+
+    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+
+    var expected = _.FileProvider.Extract
+    ({
+      filesTree :
+      {
+        dst : { a2 : '2', a1 : '1', b : '1', c : '1', dir : { a2 : '2', a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir4 : {}, dir5 : {}, srcFile : '1', dstFile : { f : '1' } },
+      },
+    });
+
+    test.identical( p.src.filesTree.src, expected.filesTree.src );
+    test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
+
+    var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/srcFile/f', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
+    var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/srcFile/f', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
+
+    var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'fileCopy', 'fileDelete', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy' ];
+    var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
+    var expectedSrcActions = [ 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', null, 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete' ];
+    var expectedSrcAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
+
+    var dstAbsolute = _.select( records, '*/dst/absolute' );
+    var srcAbsolute = _.select( records, '*/src/absolute' );
+
+    var action = _.select( records, '*/action' );
+    var allow = _.select( records, '*/allow' );
+    var srcActions = _.select( records, '*/srcAction' );
+    var srcAllow = _.select( records, '*/srcAllow' );
+
+    test.identical( dstAbsolute, expectedDstAbsolute );
+    test.identical( srcAbsolute, expectedSrcAbsolute );
+
+    test.identical( action, expectedAction );
+    test.identical( allow, expectedAllow );
+    test.identical( srcActions, expectedSrcActions );
+    test.identical( srcAllow, expectedSrcAllow );
+
+    /* */
+
+    var p = o.prepare();
+    var o1 = optionsMake();
+    var o2 =
+    {
+      linking : 'fileCopy',
+      srcDeleting : 1,
+      dstDeleting : 0,
+      writing : 1,
+      dstRewriting : 0,
+      dstRewritingByDistinct : 1,
+      preservingTime : 0,
+    }
+
+    test.case = 'complex move with srcDeleting : 1, dstRewriting : 0\n' + _.toStr( o2 );
+
+    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+
+    var expected = _.FileProvider.Extract
+    ({
+      filesTree :
+      {
+        src : { b : '1', c : '1', dir : { b : '1', c : '1' }, dirSame : { d : '1' }, srcFile : '1', dstFile : { f : '1' } },
+        dst : { a2 : '2', a1 : '1', b : '1', c : '2', dir : { a2 : '2', a1 : '1', b : '1', c : '2' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir4 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
+      },
+    });
+
+    test.identical( p.src.filesTree.src, expected.filesTree.src );
+    test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
+
+    var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/srcFile/f', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile' ];
+    var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/srcFile/f', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
+
+    var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'fileCopy', 'fileDelete', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake', 'fileCopy', 'dirMake' ];
+    var expectedAllow = [ true, true, false, false, false, false, true, true, false, false, true, true, true, true, true, true, true, false, false ];
+    var expectedSrcActions = [ 'fileDelete', 'fileDelete', null, null, null, null, 'fileDelete', 'fileDelete', null, null, 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', null, null ];
+    var expectedSrcAllow = [ false, true, true, true, true, true, false, true, true, true, true, true, true, true, true, true, false, true, true ];
+
+    var dstAbsolute = _.select( records, '*/dst/absolute' );
+    var srcAbsolute = _.select( records, '*/src/absolute' );
+
+    var action = _.select( records, '*/action' );
+    var allow = _.select( records, '*/allow' );
+    var srcActions = _.select( records, '*/srcAction' );
+    var srcAllow = _.select( records, '*/srcAllow' );
+
+    test.identical( dstAbsolute, expectedDstAbsolute );
+    test.identical( srcAbsolute, expectedSrcAbsolute );
+
+    test.identical( action, expectedAction );
+    test.identical( allow, expectedAllow );
+    test.identical( srcActions, expectedSrcActions );
+    test.identical( srcAllow, expectedSrcAllow );
+
+    /* */
+
+    var p = o.prepare();
+    var o1 = optionsMake();
+    var o2 =
+    {
+      linking : 'fileCopy',
+      srcDeleting : 1,
+      dstDeleting : 0,
+      writing : 1,
+      dstRewriting : 0,
+      dstRewritingByDistinct : 1,
+      preservingTime : 0,
+      includingNonAllowed : 0,
+    }
+
+    test.case = 'complex move with srcDeleting : 1, dstRewriting : 0, includingNonAllowed : 0\n' + _.toStr( o2 );
+
+    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+
+    var expected = _.FileProvider.Extract
+    ({
+      filesTree :
+      {
+        src : { b : '1', c : '1', dir : { b : '1', c : '1' }, dirSame : { d : '1' }, srcFile : '1', dstFile : { f : '1' } },
+        dst : { a2 : '2', a1 : '1', b : '1', c : '2', dir : { a2 : '2', a1 : '1', b : '1', c : '2' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir4 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
+      },
+    });
+
+    test.identical( p.src.filesTree.src, expected.filesTree.src );
+    test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
+
+    var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/dir', '/dst/dir/a1', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame' ];
+    var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame' ];
+
+    var expectedAction = [ 'dirMake', 'fileCopy', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake' ];
+    var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true ];
+    var expectedSrcActions = [ 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete' ];
+    var expectedSrcAllow = [ false, true, false, true, true, true, true, true, true, true, false ];
+
+    var dstAbsolute = _.select( records, '*/dst/absolute' );
+    var srcAbsolute = _.select( records, '*/src/absolute' );
+
+    var action = _.select( records, '*/action' );
+    var allow = _.select( records, '*/allow' );
+    var srcActions = _.select( records, '*/srcAction' );
+    var srcAllow = _.select( records, '*/srcAllow' );
+
+    test.identical( dstAbsolute, expectedDstAbsolute );
+    test.identical( srcAbsolute, expectedSrcAbsolute );
+
+    test.identical( action, expectedAction );
+    test.identical( allow, expectedAllow );
+    test.identical( srcActions, expectedSrcActions );
+    test.identical( srcAllow, expectedSrcAllow );
+
+    /* */
+
+    var p = o.prepare();
+    var o1 = optionsMake();
+    var o2 =
+    {
+      linking : 'fileCopy',
+      srcDeleting : 0,
+      dstDeleting : 1,
+      writing : 1,
+      dstRewriting : 1,
+      dstRewritingByDistinct : 1,
+      preservingTime : 0,
+    }
+
+    test.case = 'complex move with dstDeleting : 1\n' + _.toStr( o2 );
+
+    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+
+    var expected = _.FileProvider.Extract
+    ({
+      filesTree :
+      {
+        src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+        dst : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+      },
+    });
+
+    test.identical( p.src.filesTree.src, expected.filesTree.src );
+    test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
+
+    var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/srcFile/f', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir/a2', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f', '/dst/a2', '/dst/dir2', '/dst/dir2/a2', '/dst/dir2/b', '/dst/dir2/c', '/dst/dir5' ];
+    var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/srcFile/f', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir/a2', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f', '/src/a2', '/src/dir2', '/src/dir2/a2', '/src/dir2/b', '/src/dir2/c', '/src/dir5' ];
+
+    var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'fileCopy', 'fileDelete', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'fileDelete', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete' ];
+    var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
+    var expectedPreserve = [ true, false, false, false, false, false, true, false, false, false, false, false, false, false, false, true, false, true, false, false, false, false, false, false, false, false, false ];
+
+    var dstAbsolute = _.select( records, '*/dst/absolute' );
+    var srcAbsolute = _.select( records, '*/src/absolute' );
+
+    var action = _.select( records, '*/action' );
+    var allow = _.select( records, '*/allow' );
+    var preserve = _.select( records, '*/preserve' );
+
+    test.identical( dstAbsolute, expectedDstAbsolute );
+    test.identical( srcAbsolute, expectedSrcAbsolute );
+
+    test.identical( action, expectedAction );
+    test.identical( allow, expectedAllow );
+    test.identical( preserve, expectedPreserve );
+
+    /* */
+
+    var p = o.prepare();
+    var o1 = optionsMake();
+    var o2 =
+    {
+      linking : 'fileCopy',
+      srcDeleting : 1,
+      dstDeleting : 1,
+      writing : 1,
+      dstRewriting : 0,
+      dstRewritingByDistinct : 1,
+      preservingTime : 0,
+      includingNonAllowed : 0,
+    }
+
+    test.case = 'complex move with dstDeleting : 1, dstRewriting : 0, srcDeleting : 1, includingNonAllowed : 0\n' + _.toStr( o2 );
+
+    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+
+    var expected = _.FileProvider.Extract
+    ({
+      filesTree :
+      {
+        src : { b : '1', c : '1', dir : { b : '1', c : '1' }, dirSame : { d : '1' }, srcFile : '1', dstFile : { f : '1' } },
+        dst :
+        {
+          b : '1', c : '2', dirSame : { d : '1' }, dstFile : '1', srcFile : { f : '2' },
+          dir : { b : '1', c : '2', a1 : '1' },
+          dir3 : {},
+          a1 : '1',
+          dir1 : { a1 : '1', b : '1', c : '1' },
+          dir4 : {},
+        },
+      },
+    });
+
+    test.identical( p.src.filesTree.src, expected.filesTree.src );
+    test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
+
+    var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/dir', '/dst/dir/a1', '/dst/dir/a2', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/a2', '/dst/dir2', '/dst/dir2/a2', '/dst/dir2/b', '/dst/dir2/c', '/dst/dir5' ];
+    var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/src/dir/a2', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/a2', '/src/dir2', '/src/dir2/a2', '/src/dir2/b', '/src/dir2/c', '/src/dir5' ];
+
+    var expectedAction = [ 'dirMake', 'fileCopy', 'dirMake', 'fileCopy', 'fileDelete', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete' ];
+    var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
+    var expectedPreserve = [ true, false, true, false, false, false, false, false, false, true, false, true, false, false, false, false, false, false ];
+
+    var dstAbsolute = _.select( records, '*/dst/absolute' );
+    var srcAbsolute = _.select( records, '*/src/absolute' );
+
+    var action = _.select( records, '*/action' );
+    var allow = _.select( records, '*/allow' );
+    var preserve = _.select( records, '*/preserve' );
+
+    test.identical( dstAbsolute, expectedDstAbsolute );
+    test.identical( srcAbsolute, expectedSrcAbsolute );
+
+    test.identical( action, expectedAction );
+    test.identical( allow, expectedAllow );
+    test.identical( preserve, expectedPreserve );
+
+    /* */
+
+    var p = o.prepare();
+    var o1 = optionsMake();
+    o1.reflectMap =
+    {
+      '/src/dir' : [ '/dst', '/dstNew' ],
+      '/src/dirSame' : [ '/dst', '/dstNew' ],
+    }
+
+    var o2 =
+    {
+      linking : 'fileCopy',
+      srcDeleting : 0,
+      dstDeleting : 0,
+      writing : 1,
+      dstRewriting : 1,
+      dstRewritingByDistinct : 1,
+      preservingTime : 0,
+    }
+
+    test.case = 'several srcs, dsts\n' + _.toStr( o2 );
+
+    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+
+    var expected = _.FileProvider.Extract
+    ({
+      filesTree :
+      {
+
+        src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+
+        dst :
+        {
+          a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' },
+          dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' },
+          dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' },
+          /**/
+          a1 : '1', b : '1', c : '1',
+          d : '1',
+        },
+
+        dstNew :
+        {
+          a1 : '1', b : '1', c : '1',
+          d : '1',
+        },
+
+      },
+    });
+
+    test.identical( p.src.filesTree.src, expected.filesTree.src );
+    test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
+    test.identical( p.dst.filesTree.dstNew, expected.filesTree.dstNew );
+
+    var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst', '/dst/d', '/dstNew', '/dstNew/a1', '/dstNew/b', '/dstNew/c', '/dstNew', '/dstNew/d' ];
+    var expectedSrcAbsolute = [ '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d' ];
+
+    var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy' ];
+    var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true ];
+    var expectedPreserve = [ true, false, false, false, true, false, false, false, false, false, true, false ];
+
+    var dstAbsolute = _.select( records, '*/dst/absolute' );
+    var srcAbsolute = _.select( records, '*/src/absolute' );
+
+    var action = _.select( records, '*/action' );
+    var allow = _.select( records, '*/allow' );
+    var preserve = _.select( records, '*/preserve' );
+
+    test.identical( dstAbsolute, expectedDstAbsolute );
+    test.identical( srcAbsolute, expectedSrcAbsolute );
+
+    test.identical( action, expectedAction );
+    test.identical( allow, expectedAllow );
+    test.identical( preserve, expectedPreserve );
+
+    /* */
+
+    var p = o.prepare();
+    var o1 = optionsMake();
+    o1.reflectMap =
+    {
+      '/src/dir/**' : '/dstNew',
+      '/src/dirSame/**' : '/dstNew',
+    }
+
+    var o2 =
+    {
+      linking : 'fileCopy',
+      srcDeleting : 0,
+      dstDeleting : 0,
+      writing : 1,
+      dstRewriting : 1,
+      dstRewritingByDistinct : 1,
+      preservingTime : 0,
+    }
+
+    test.case = 'several srcs, dsts\n' + _.toStr( o2 );
+
+    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+
+    var expected = _.FileProvider.Extract
+    ({
+      filesTree :
+      {
+
+        src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+
+        dstNew :
+        {
+          a1 : '1', b : '1', c : '1',
+          d : '1',
+        },
+
+      },
+    });
+
+    test.identical( p.src.filesTree.src, expected.filesTree.src );
+    test.identical( p.dst.filesTree.dstNew, expected.filesTree.dstNew );
+
+    var expectedDstAbsolute = [ '/dstNew', '/dstNew/a1', '/dstNew/b', '/dstNew/c', '/dstNew', '/dstNew/d' ];
+    var expectedSrcAbsolute = [ '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d' ];
+
+    var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy' ];
+    var expectedAllow = [ true, true, true, true, true, true ];
+    var expectedPreserve = [ false, false, false, false, true, false ];
+
+    var dstAbsolute = _.select( records, '*/dst/absolute' );
+    var srcAbsolute = _.select( records, '*/src/absolute' );
+
+    var action = _.select( records, '*/action' );
+    var allow = _.select( records, '*/allow' );
+    var preserve = _.select( records, '*/preserve' );
+
+    test.identical( dstAbsolute, expectedDstAbsolute );
+    test.identical( srcAbsolute, expectedSrcAbsolute );
+
+    test.identical( action, expectedAction );
+    test.identical( allow, expectedAllow );
+    test.identical( preserve, expectedPreserve );
+
+    /* */
+
+    var p = o.prepare();
+    var o1 = optionsMake();
+    o1.reflectMap =
+    {
+      '/src/dir/**' : [ '/dstNew', '/dst' ],
+      '/src/dirSame/**' : [ '/dstNew', '/dst' ],
+    }
+
+    var o2 =
+    {
+      linking : 'fileCopy',
+      srcDeleting : 0,
+      dstDeleting : 0,
+      writing : 1,
+      dstRewriting : 1,
+      dstRewritingByDistinct : 1,
+      preservingTime : 0,
+    }
+
+    test.case = 'several srcs, dsts\n' + _.toStr( o2 );
+
+    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+
+    var expected = _.FileProvider.Extract
+    ({
+      filesTree :
+      {
+
+        src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+
+        dst :
+        {
+          a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' },
+          dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' },
+          dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' },
+          /**/
+          a1 : '1', b : '1', c : '1',
+          d : '1',
+        },
+
+        dstNew :
+        {
+          a1 : '1', b : '1', c : '1',
+          d : '1',
+        },
+
+      },
+    });
+
+    test.identical( p.src.filesTree.src, expected.filesTree.src );
+    test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
+    test.identical( p.dst.filesTree.dstNew, expected.filesTree.dstNew );
+
+    var expectedDstAbsolute = [ '/dstNew', '/dstNew/a1', '/dstNew/b', '/dstNew/c', '/dstNew', '/dstNew/d', '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst', '/dst/d' ];
+    var expectedSrcAbsolute = [ '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d' ];
+
+    var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy' ];
+    var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true ];
+
+    var dstAbsolute = _.select( records, '*/dst/absolute' );
+    var srcAbsolute = _.select( records, '*/src/absolute' );
+
+    var action = _.select( records, '*/action' );
+    var allow = _.select( records, '*/allow' );
+
+    test.identical( dstAbsolute, expectedDstAbsolute );
+    test.identical( srcAbsolute, expectedSrcAbsolute );
+
+    test.identical( action, expectedAction );
+    test.identical( allow, expectedAllow );
+
+    /* */
+
+    test.case = 'strange behavior fix';
+
+    var p = o.prepare();
+    var o1 = optionsMake();
+    o1.reflectMap =
+    {
+      '/src/*()dir/**b**' : '/dst',
+    }
+
+    var o2 =
+    {
+      linking : 'fileCopy',
+      srcDeleting : 0,
+      dstDeleting : 0,
+      writing : 1,
+      dstRewriting : 1,
+      dstRewritingByDistinct : 1,
+      preservingTime : 0,
+    }
+
+    test.case = 'base marker *()\n' + _.toStr( o2 );
+
+    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+
+    var expected = _.FileProvider.Extract
+    ({
+      filesTree :
+      {
+
+        src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+
+        dst :
+        {
+          a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' },
+          dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' },
+          dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' },
+          /**/
+          dir : { a2 : '2', b : '1', c : '2' },
+        },
+
+      },
+    });
+
+    test.identical( p.src.filesTree.src, expected.filesTree.src );
+    test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
+
+    var expectedDstAbsolute = [ '/dst', '/dst/dir', '/dst/dir/b' ];
+    var expectedSrcAbsolute = [ '/src', '/src/dir', '/src/dir/b' ];
+
+    var expectedAction = [ 'dirMake', 'dirMake', 'fileCopy' ];
+    var expectedAllow = [ true, true, true ];
+    var expectedPreserve = [ true, true, false ];
+
+    var dstAbsolute = _.select( records, '*/dst/absolute' );
+    var srcAbsolute = _.select( records, '*/src/absolute' );
+
+    var action = _.select( records, '*/action' );
+    var allow = _.select( records, '*/allow' );
+    var preserve = _.select( records, '*/preserve' );
+
+    test.identical( dstAbsolute, expectedDstAbsolute );
+    test.identical( srcAbsolute, expectedSrcAbsolute );
+
+    test.identical( action, expectedAction );
+    test.identical( allow, expectedAllow );
+    test.identical( preserve, expectedPreserve );
+
+  /*
+
+  var dst = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      dst : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
+      dst2 : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
+      dst3 : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
+    },
+  });
+
+  var src = _.FileProvider.Extract
+  ({
+    filesTree :
+    {
+      src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+      src2 : { ax2 : '10', bx : '10', cx : '10', dirx : { a : '10' } },
+      src3 : { ax2 : '20', by : '20', cy : '20', dirx : { a : '20' } },
+    },
+  });
+
+  */
+
+    /* */
+
+    var p = o.prepare();
+    var o1 = optionsMake();
+    o1.reflectMap =
+    {
+      '/src/dir/**b**' : '/dst',
+    }
+
+    var o2 =
+    {
+      linking : 'fileCopy',
+      srcDeleting : 0,
+      dstDeleting : 1,
+      writing : 1,
+      dstRewriting : 1,
+      dstRewritingByDistinct : 1,
+      preservingTime : 0,
+    }
+
+    test.case = 'several srcs, dsts\n' + _.toStr( o2 );
+
+    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+
+    var expected = _.FileProvider.Extract
+    ({
+      filesTree :
+      {
+
+        src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+
+        dst :
+        {
+          // a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' },
+          // dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' },
+          // dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' },
+          // /**/
+          b : '1',
+        },
+
+      },
+    });
+
+    test.identical( p.src.filesTree.src, expected.filesTree.src );
+    test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
+
+    var expectedDstAbsolute = [ '/dst', '/dst/b', '/dst/a2', '/dst/c', '/dst/dir', '/dst/dir/a2', '/dst/dir/b', '/dst/dir/c', '/dst/dir2', '/dst/dir2/a2', '/dst/dir2/b', '/dst/dir2/c', '/dst/dir3', '/dst/dir5', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/srcFile', '/dst/srcFile/f' ];
+    var expectedSrcAbsolute = [ '/src/dir', '/src/dir/b', '/src/dir/a2', '/src/dir/c', '/src/dir/dir', '/src/dir/dir/a2', '/src/dir/dir/b', '/src/dir/dir/c', '/src/dir/dir2', '/src/dir/dir2/a2', '/src/dir/dir2/b', '/src/dir/dir2/c', '/src/dir/dir3', '/src/dir/dir5', '/src/dir/dirSame', '/src/dir/dirSame/d', '/src/dir/dstFile', '/src/dir/srcFile', '/src/dir/srcFile/f' ];
+
+    var expectedAction = [ 'dirMake', 'fileCopy', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete' ];
+    var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
+    var expectedPreserve = [ true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false ];
+    var expectedReason = [ 'srcLooking', 'srcLooking', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting' ];
+
+    var dstAbsolute = _.select( records, '*/dst/absolute' );
+    var srcAbsolute = _.select( records, '*/src/absolute' );
+
+    var action = _.select( records, '*/action' );
+    var allow = _.select( records, '*/allow' );
+    var preserve = _.select( records, '*/preserve' );
+    var reason = _.select( records, '*/reason' );
+
+    test.identical( dstAbsolute, expectedDstAbsolute );
+    test.identical( srcAbsolute, expectedSrcAbsolute );
+
+    test.identical( action, expectedAction );
+    test.identical( allow, expectedAllow );
+    test.identical( preserve, expectedPreserve );
+    test.identical( reason, expectedReason );
+
+    /* */
+
+    var p = o.prepare();
+    var o1 = optionsMake();
+    o1.reflectMap =
+    {
+      '/src/dir/**b**' : [ '/dstNew', '/dst' ],
+      '/src/dirSame/**d**' : [ '/dstNew', '/dst' ],
+    }
+
+    var o2 =
+    {
+      linking : 'fileCopy',
+      srcDeleting : 0,
+      dstDeleting : 1,
+      writing : 1,
+      dstRewriting : 1,
+      dstRewritingByDistinct : 1,
+      preservingTime : 0,
+    }
+
+    test.case = 'several srcs, dsts\n' + _.toStr( o2 );
+
+    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+
+    var expected = _.FileProvider.Extract
+    ({
+      filesTree :
+      {
+
+        src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+
+        dst :
+        {
+          // a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' },
+          // dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' },
+          // dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' },
+          // /**/
+          b : '1',
+          d : '1',
+        },
+
+        dstNew :
+        {
+          b : '1',
+          d : '1',
+        },
+
+      },
+    });
+
+    test.identical( p.src.filesTree.src, expected.filesTree.src );
+    test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
+    test.identical( p.dst.filesTree.dstNew, expected.filesTree.dstNew );
+
+    var expectedDstAbsolute = [ '/dstNew', '/dstNew/b', '/dstNew', '/dstNew/d', '/dst', '/dst/b', '/dst/a2', '/dst/c', '/dst/dir', '/dst/dir/a2', '/dst/dir/b', '/dst/dir/c', '/dst/dir2', '/dst/dir2/a2', '/dst/dir2/b', '/dst/dir2/c', '/dst/dir3', '/dst/dir5', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/srcFile', '/dst/srcFile/f', '/dst', '/dst/d' ];
+    var expectedSrcAbsolute = [ '/src/dir', '/src/dir/b', '/src/dirSame', '/src/dirSame/d', '/src/dir', '/src/dir/b', '/src/dir/a2', '/src/dir/c', '/src/dir/dir', '/src/dir/dir/a2', '/src/dir/dir/b', '/src/dir/dir/c', '/src/dir/dir2', '/src/dir/dir2/a2', '/src/dir/dir2/b', '/src/dir/dir2/c', '/src/dir/dir3', '/src/dir/dir5', '/src/dir/dirSame', '/src/dir/dirSame/d', '/src/dir/dstFile', '/src/dir/srcFile', '/src/dir/srcFile/f', '/src/dirSame', '/src/dirSame/d' ];
+
+    var expectedAction = [ 'dirMake', 'fileCopy', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'dirMake', 'fileCopy' ];
+    var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
+    var expectedPreserve = [ false, false, true, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false ];
+    var expectedReason = [ 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'srcLooking', 'srcLooking' ];
+
+    var dstAbsolute = _.select( records, '*/dst/absolute' );
+    var srcAbsolute = _.select( records, '*/src/absolute' );
+
+    var action = _.select( records, '*/action' );
+    var allow = _.select( records, '*/allow' );
+    var preserve = _.select( records, '*/preserve' );
+    var reason = _.select( records, '*/reason' );
+
+    test.identical( dstAbsolute, expectedDstAbsolute );
+    test.identical( srcAbsolute, expectedSrcAbsolute );
+
+    test.identical( action, expectedAction );
+    test.identical( allow, expectedAllow );
+    test.identical( preserve, expectedPreserve );
+    test.identical( reason, expectedReason );
+
+    /* */
+
+    var p = o.prepare();
+    var o1 = optionsMake();
+    o1.reflectMap =
+    {
+      '/src/dir/**b**' : [ '/dstNew', '/dst' ],
+      '/src/dirSame/**d**' : [ '/dstNew', '/dst' ],
+    }
+
+    var o2 =
+    {
+      linking : 'fileCopy',
+      srcDeleting : 0,
+      dstDeleting : 0,
+      writing : 1,
+      dstRewriting : 1,
+      dstRewritingByDistinct : 1,
+      preservingTime : 0,
+    }
+
+    test.case = 'several srcs, dsts\n' + _.toStr( o2 );
+
+    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+
+    var expected = _.FileProvider.Extract
+    ({
+      filesTree :
+      {
+
+        src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+
+        dst :
+        {
+          a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' },
+          dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' },
+          dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' },
+          /**/
+          b : '1',
+          d : '1',
+        },
+
+        dstNew :
+        {
+          b : '1',
+          d : '1',
+        },
+
+      },
+    });
+
+    test.identical( p.src.filesTree.src, expected.filesTree.src );
+    test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
+    test.identical( p.dst.filesTree.dstNew, expected.filesTree.dstNew );
+
+    var expectedDstAbsolute = [ '/dstNew', '/dstNew/b', '/dstNew', '/dstNew/d', '/dst', '/dst/b', '/dst', '/dst/d' ];
+    var expectedSrcAbsolute = [ '/src/dir', '/src/dir/b', '/src/dirSame', '/src/dirSame/d', '/src/dir', '/src/dir/b', '/src/dirSame', '/src/dirSame/d' ];
+
+    var expectedAction = [ 'dirMake', 'fileCopy', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy' ];
+    var expectedAllow = [ true, true, true, true, true, true, true, true ];
+    var expectedPreserve = [ false, false, true, false, true, false, true, false ];
+
+    var dstAbsolute = _.select( records, '*/dst/absolute' );
+    var srcAbsolute = _.select( records, '*/src/absolute' );
+
+    var action = _.select( records, '*/action' );
+    var allow = _.select( records, '*/allow' );
+    var preserve = _.select( records, '*/preserve' );
+
+    test.identical( dstAbsolute, expectedDstAbsolute );
+    test.identical( srcAbsolute, expectedSrcAbsolute );
+
+    test.identical( action, expectedAction );
+    test.identical( allow, expectedAllow );
+    test.identical( preserve, expectedPreserve );
+
+  /*
+  dst : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
+  src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+  */
+
+    /* */
+
+    var p = o.prepare();
+    var o1 = optionsMake();
+    o1.reflectMap =
+    {
+      '/src/*()dir/**b**' : [ '/dstNew', '/dst' ],
+      '/src/dirSame/**d**' : [ '/dstNew', '/dst' ],
+    }
+
+    var o2 =
+    {
+      linking : 'fileCopy',
+      srcDeleting : 0,
+      dstDeleting : 0,
+      writing : 1,
+      dstRewriting : 1,
+      dstRewritingByDistinct : 1,
+      preservingTime : 0,
+    }
+
+    test.case = 'base marker *()\n' + _.toStr( o2 );
+
+    var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
+
+    var expected = _.FileProvider.Extract
+    ({
+      filesTree :
+      {
+
+        src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
+
+        dst :
+        {
+          a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' },
+          dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' },
+          dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' },
+          /**/
+          dir : { a2 : '2', b : '1', c : '2' },
+          d : '1',
+        },
+
+        dstNew :
+        {
+          dir : { b : '1' },
+          d : '1',
+        },
+
+      },
+    });
+
+    test.identical( p.src.filesTree.src, expected.filesTree.src );
+    test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
+    test.identical( p.dst.filesTree.dstNew, expected.filesTree.dstNew );
+
+    var expectedDstAbsolute = [ '/dstNew', '/dstNew/dir', '/dstNew/dir/b', '/dstNew', '/dstNew/d', '/dst', '/dst/dir', '/dst/dir/b', '/dst', '/dst/d' ];
+    var expectedSrcAbsolute = [ '/src', '/src/dir', '/src/dir/b', '/src/dirSame', '/src/dirSame/d', '/src', '/src/dir', '/src/dir/b', '/src/dirSame', '/src/dirSame/d' ];
+
+    var expectedAction = [ 'dirMake', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy', 'dirMake', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy' ];
+    var expectedAllow = [ true, true, true, true, true, true, true, true, true, true ];
+    var expectedPreserve = [ false, false, false, true, false, true, true, false, true, false ];
+
+    var dstAbsolute = _.select( records, '*/dst/absolute' );
+    var srcAbsolute = _.select( records, '*/src/absolute' );
+
+    var action = _.select( records, '*/action' );
+    var allow = _.select( records, '*/allow' );
+    var preserve = _.select( records, '*/preserve' );
+
+    test.identical( dstAbsolute, expectedDstAbsolute );
+    test.identical( srcAbsolute, expectedSrcAbsolute );
+
+    test.identical( action, expectedAction );
+    test.identical( allow, expectedAllow );
+    test.identical( preserve, expectedPreserve );
+
+  } /* eof _filesReflect */
 
 }
 
 filesReflect.timeOut = 300000;
-
-//
-
-function _filesReflect( test, o )
-{
-  let context = this;
-  let provider = context.provider;
-  let system = context.system;
-  let path = context.provider.path;
-  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
-
-  function optionsMake()
-  {
-    var options =
-    {
-      reflectMap : { '/src' : '/dst' },
-      src : { effectiveProvider : p.src },
-      dst : { effectiveProvider : p.dst },
-    }
-    return options;
-  }
-
-  /* */
-
-  var p = o.prepare();
-  var o1 = optionsMake();
-  var o2 =
-  {
-    linking : 'fileCopy',
-    srcDeleting : 0,
-    dstDeleting : 0,
-    writing : 1,
-    dstRewriting : 1,
-    dstRewritingByDistinct : 1,
-    preservingTime : 0,
-  }
-
-  test.case = 'complex move\n' + _.toStr( o2 );
-
-  var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
-
-  var expected = _.FileProvider.Extract
-  ({
-    filesTree :
-    {
-      src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-      dst : { a2 : '2', a1 : '1', b : '1', c : '1', dir : { a2 : '2', a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir4 : {}, dir5 : {}, srcFile : '1', dstFile : { f : '1' } },
-    },
-  });
-
-  test.identical( p.src.filesTree.src, expected.filesTree.src );
-  test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
-
-  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/srcFile/f', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
-  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/srcFile/f', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
-  var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'fileCopy', 'fileDelete', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy' ];
-  var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
-  var expectedPreserve = [ true, false, false, false, false, false, true, false, false, false, false, false, false, false, true, false, true, false, false, false ];
-  var expectedReason = [ 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'dstRewriting', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking' ];
-
-  var dstAbsolute = _.select( records, '*/dst/absolute' );
-  var srcAbsolute = _.select( records, '*/src/absolute' );
-  var action = _.select( records, '*/action' );
-  var allow = _.select( records, '*/allow' );
-  var preserve = _.select( records, '*/preserve' );
-  var reason = _.select( records, '*/reason' );
-
-  test.identical( dstAbsolute, expectedDstAbsolute );
-  test.identical( srcAbsolute, expectedSrcAbsolute );
-  test.identical( action, expectedAction );
-  test.identical( allow, expectedAllow );
-  test.identical( preserve, expectedPreserve );
-  test.identical( reason, expectedReason );
-
-  test.identical( p.system.filesAreSoftLinked([ p.src.path.globalFromPreferred( '/src/a1' ), p.dst.path.globalFromPreferred( '/dst/a1' ) ]), false );
-  test.identical( p.system.filesAreSoftLinked([ p.src.path.globalFromPreferred( '/src/a1' ), p.src.path.globalFromPreferred( '/src/a1' ) ]), false );
-  test.identical( p.system.filesAreHardLinked([ p.src.path.globalFromPreferred( '/src/a1' ), p.dst.path.globalFromPreferred( '/dst/a1' ) ]), false );
-  test.identical( p.system.filesAreHardLinked([ p.src.path.globalFromPreferred( '/src/a1' ), p.src.path.globalFromPreferred( '/src/a1' ) ]), true );
-
-  /* */
-
-  var p = o.prepare();
-  var o1 = optionsMake();
-  var o2 =
-  {
-    linking : 'softLink',
-    srcDeleting : 0,
-    dstDeleting : 0,
-    writing : 1,
-    dstRewriting : 1,
-    dstRewritingByDistinct : 1,
-    preservingTime : 0,
-  }
-
-  test.case = 'complex move with linking : softLink\n' + _.toStr( o2 );
-
-  var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
-
-  var expected = _.FileProvider.Extract
-  ({
-    filesTree :
-    {
-      src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-      dst : { a2 : '2', a1 : [{ softLink : p.src.path.globalFromPreferred( '/src/a1' ) }], b : [{ softLink : p.src.path.globalFromPreferred( '/src/b' ) }], c : [{ softLink : p.src.path.globalFromPreferred( '/src/c' ) }], dir : { a2 : '2', a1 : [{ softLink : p.src.path.globalFromPreferred( '/src/dir/a1' ) }], b : [{ softLink : p.src.path.globalFromPreferred( '/src/dir/b' ) }], c : [{ softLink : p.src.path.globalFromPreferred( '/src/dir/c' ) }] }, dirSame : { d : [{ softLink : p.src.path.globalFromPreferred( '/src/dirSame/d' ) }] }, dir1 : { a1 : [{ softLink : p.src.path.globalFromPreferred( '/src/dir1/a1' ) }], b : [{ softLink : p.src.path.globalFromPreferred( '/src/dir1/b' ) }], c : [{ softLink : p.src.path.globalFromPreferred( '/src/dir1/c' ) }] }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir4 : {}, dir5 : {}, srcFile : [{ softLink : p.src.path.globalFromPreferred( '/src/srcFile' ) }], dstFile : { f : [{ softLink : p.src.path.globalFromPreferred( '/src/dstFile/f' ) }] } },
-    },
-  });
-
-  test.identical( p.src.filesTree.src, expected.filesTree.src );
-  test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
-
-  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/srcFile/f', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
-  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/srcFile/f', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
-
-  var expectedAction = [ 'dirMake', 'softLink', 'softLink', 'softLink', 'softLink', 'fileDelete', 'dirMake', 'softLink', 'softLink', 'softLink', 'dirMake', 'softLink', 'softLink', 'softLink', 'dirMake', 'dirMake', 'dirMake', 'softLink', 'dirMake', 'softLink' ];
-  var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
-
-  var dstAbsolute = _.select( records, '*/dst/absolute' );
-  var srcAbsolute = _.select( records, '*/src/absolute' );
-
-  var action = _.select( records, '*/action' );
-  var allow = _.select( records, '*/allow' );
-
-  test.identical( dstAbsolute, expectedDstAbsolute );
-  test.identical( srcAbsolute, expectedSrcAbsolute );
-
-  test.identical( action, expectedAction );
-  test.identical( allow, expectedAllow );
-
-  test.identical( p.system.filesAreSoftLinked([ p.src.path.globalFromPreferred( '/src/a1' ), p.dst.path.globalFromPreferred( '/dst/a1' ) ]), true );
-  test.identical( p.system.filesAreSoftLinked([ p.src.path.globalFromPreferred( '/src/a2' ), p.dst.path.globalFromPreferred( '/dst/a2' ) ]), false );
-  test.identical( p.system.filesAreSoftLinked([ p.src.path.globalFromPreferred( '/src/b' ), p.dst.path.globalFromPreferred( '/dst/b' ) ]), true );
-  test.identical( p.system.filesAreSoftLinked([ p.src.path.globalFromPreferred( '/src/dir/a1' ), p.dst.path.globalFromPreferred( '/dst/dir/a1' ) ]), true );
-  test.identical( p.system.filesAreSoftLinked([ p.src.path.globalFromPreferred( '/src/dir/a2' ), p.dst.path.globalFromPreferred( '/dst/dir/a2' ) ]), false );
-  test.identical( p.system.filesAreSoftLinked([ p.src.path.globalFromPreferred( '/src/dir/b' ), p.dst.path.globalFromPreferred( '/dst/dir/b' ) ]), true );
-
-  /* */
-
-  var p = o.prepare();
-  var o1 = optionsMake();
-  var o2 =
-  {
-    linking : 'fileCopy',
-    srcDeleting : 0,
-    dstDeleting : 0,
-    writing : 1,
-    dstRewriting : 0,
-    dstRewritingByDistinct : 1,
-    includingNonAllowed : 0,
-    preservingTime : 0,
-  }
-
-  test.case = 'complex move with dstRewriting:0, includingNonAllowed:0\n' + _.toStr( o2 );
-
-  var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
-
-  var expected = _.FileProvider.Extract
-  ({
-    filesTree :
-    {
-      src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-      dst : { a2 : '2', a1 : '1', b : '1', c : '2', dir : { a2 : '2', a1 : '1', b : '1', c : '2' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir4 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
-    },
-  });
-
-  test.identical( p.src.filesTree.src, expected.filesTree.src );
-  test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
-
-  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/dir', '/dst/dir/a1', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame' ];
-  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame' ];
-
-  var expectedAction = [ 'dirMake', 'fileCopy', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake' ];
-  var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true ];
-
-  var dstAbsolute = _.select( records, '*/dst/absolute' );
-  var srcAbsolute = _.select( records, '*/src/absolute' );
-
-  var action = _.select( records, '*/action' );
-  var allow = _.select( records, '*/allow' );
-
-  test.identical( dstAbsolute, expectedDstAbsolute );
-  test.identical( srcAbsolute, expectedSrcAbsolute );
-
-  test.identical( action, expectedAction );
-  test.identical( allow, expectedAllow );
-
-  /* */
-
-  var p = o.prepare();
-  var o1 = optionsMake();
-  var o2 =
-  {
-    linking : 'fileCopy',
-    srcDeleting : 0,
-    dstDeleting : 0,
-    writing : 1,
-    dstRewriting : 0,
-    dstRewritingByDistinct : 1,
-    includingNonAllowed : 1,
-    preservingTime : 0,
-  }
-
-  test.case = 'complex move with dstRewriting:0, includingNonAllowed:1\n' + _.toStr( o2 );
-
-  var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
-
-  var expected = _.FileProvider.Extract
-  ({
-    filesTree :
-    {
-      src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-      dst : { a2 : '2', a1 : '1', b : '1', c : '2', dir : { a2 : '2', a1 : '1', b : '1', c : '2' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir4 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
-    },
-  });
-
-  test.identical( p.src.filesTree.src, expected.filesTree.src );
-  test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
-
-  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/srcFile/f', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile' ];
-  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/srcFile/f', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
-
-  var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'fileCopy', 'fileDelete', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake', 'fileCopy', 'dirMake' ];
-  var expectedAllow = [ true, true, false, false, false, false, true, true, false, false, true, true, true, true, true, true, true, false, false ];
-
-  var dstAbsolute = _.select( records, '*/dst/absolute' );
-  var srcAbsolute = _.select( records, '*/src/absolute' );
-
-  var action = _.select( records, '*/action' );
-  var allow = _.select( records, '*/allow' );
-
-  test.identical( dstAbsolute, expectedDstAbsolute );
-  test.identical( srcAbsolute, expectedSrcAbsolute );
-
-  test.identical( action, expectedAction );
-  test.identical( allow, expectedAllow );
-
-  /* */
-
-  var p = o.prepare();
-
-  var o1 = optionsMake();
-  var o2 =
-  {
-    linking : 'fileCopy',
-    srcDeleting : 0,
-    dstDeleting : 0,
-    writing : 0,
-    dstRewriting : 1,
-    dstRewritingByDistinct : 1,
-    preservingTime : 0,
-  }
-
-  test.case = 'complex move with writing : 0\n' + _.toStr( o2 );
-
-  var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
-
-  var expected = _.FileProvider.Extract
-  ({
-    filesTree :
-    {
-      src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-      dst : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
-    },
-  });
-
-  test.identical( p.src.filesTree.src, expected.filesTree.src );
-  test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
-
-  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/srcFile/f', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
-  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/srcFile/f', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
-
-  var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'fileCopy', 'fileDelete', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy' ];
-  var expectedAllow = [ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false ];
-
-  var dstAbsolute = _.select( records, '*/dst/absolute' );
-  var srcAbsolute = _.select( records, '*/src/absolute' );
-
-  var action = _.select( records, '*/action' );
-  var allow = _.select( records, '*/allow' );
-
-  test.identical( dstAbsolute, expectedDstAbsolute );
-  test.identical( srcAbsolute, expectedSrcAbsolute );
-
-  test.identical( action, expectedAction );
-  test.identical( allow, expectedAllow );
-
-  /* */
-
-  var p = o.prepare();
-
-  var o1 = optionsMake();
-  var o2 =
-  {
-    linking : 'nop',
-    srcDeleting : 0,
-    dstDeleting : 0,
-    writing : 1,
-    dstRewriting : 1,
-    dstRewritingByDistinct : 1,
-    preservingTime : 0,
-  }
-
-  test.case = 'complex move with writing : 1, linking : nop\n' + _.toStr( o2 );
-
-  var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
-
-  var expected = _.FileProvider.Extract
-  ({
-    filesTree :
-    {
-      src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-      dst :
-      {
-        a2 : '2',
-        b : '1',
-        c : '2',
-        dir : { a2 : '2', b : '1', c : '2' },
-        dirSame : { d : '1' },
-        dir2 : { a2 : '2', b : '1', c : '2' },
-        dir3 : {},
-        dir5 : {},
-        dir1 : {},
-        dir4 : {},
-        dstFile : {},
-      },
-    },
-  });
-
-  test.identical( p.src.filesTree.src, expected.filesTree.src );
-  test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
-
-  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/srcFile/f', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
-  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/srcFile/f', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
-
-  var expectedAction = [ 'dirMake', 'nop', 'nop', 'nop', 'nop', 'fileDelete', 'dirMake', 'nop', 'nop', 'nop', 'dirMake', 'nop', 'nop', 'nop', 'dirMake', 'dirMake', 'dirMake', 'nop', 'dirMake', 'nop' ];
-  var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
-
-  var dstAbsolute = _.select( records, '*/dst/absolute' );
-  var srcAbsolute = _.select( records, '*/src/absolute' );
-
-  var action = _.select( records, '*/action' );
-  var allow = _.select( records, '*/allow' );
-
-  // logger.log( 'expectedEffAbsolute', expectedEffAbsolute );
-  logger.log( 'action', action );
-
-  test.identical( dstAbsolute, expectedDstAbsolute );
-  test.identical( srcAbsolute, expectedSrcAbsolute );
-
-  test.identical( action, expectedAction );
-  test.identical( allow, expectedAllow );
-
-  /* */
-
-  var p = o.prepare();
-  var o1 = optionsMake();
-  var o2 =
-  {
-    linking : 'nop',
-    srcDeleting : 0,
-    dstDeleting : 0,
-    writing : 1,
-    dstRewriting : 0,
-    dstRewritingByDistinct : 1,
-    preservingTime : 0,
-    includingNonAllowed : 0,
-  }
-
-  test.case = 'complex move with writing : 1, dstRewriting : 0, includingNonAllowed : 0, linking : nop\n' + _.toStr( o2 );
-
-  var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
-
-  var expected = _.FileProvider.Extract
-  ({
-    filesTree :
-    {
-      src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-      dst : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dir1 : {}, dir4 : {}, dstFile : '1', srcFile : { f : '2' } },
-    },
-  });
-
-  test.identical( p.src.filesTree.src, expected.filesTree.src );
-  test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
-
-  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/dir', '/dst/dir/a1', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame' ];
-  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame' ];
-
-  var expectedAction = [ 'dirMake', 'nop', 'dirMake', 'nop', 'dirMake', 'nop', 'nop', 'nop', 'dirMake', 'dirMake', 'dirMake' ];
-  var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true ];
-
-  var dstAbsolute = _.select( records, '*/dst/absolute' );
-  var srcAbsolute = _.select( records, '*/src/absolute' );
-
-  var action = _.select( records, '*/action' );
-  var allow = _.select( records, '*/allow' );
-
-  // logger.log( 'expectedEffAbsolute', expectedEffAbsolute );
-  logger.log( 'action', action );
-
-  test.identical( dstAbsolute, expectedDstAbsolute );
-  test.identical( srcAbsolute, expectedSrcAbsolute );
-
-  test.identical( action, expectedAction );
-  test.identical( allow, expectedAllow );
-
-  /* */
-
-  var p = o.prepare();
-  var o1 = optionsMake();
-  var o2 =
-  {
-    linking : 'nop',
-    srcDeleting : 0,
-    dstDeleting : 0,
-    writing : 1,
-    dstRewriting : 0,
-    dstRewritingByDistinct : 1,
-    preservingTime : 0,
-    includingNonAllowed : 1,
-  }
-
-  test.case = 'complex move with writing : 1, dstRewriting : 0, includingNonAllowed : 1, linking : nop\n' + _.toStr( o2 );
-
-  var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
-
-  var expected = _.FileProvider.Extract
-  ({
-    filesTree :
-    {
-      src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-      dst : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dir1 : {}, dir4 : {}, dstFile : '1', srcFile : { f : '2' } },
-    },
-  });
-
-  test.identical( p.src.filesTree.src, expected.filesTree.src );
-  test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
-
-  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/srcFile/f', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile' ];
-  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/srcFile/f', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
-
-  var expectedAction = [ 'dirMake', 'nop', 'nop', 'nop', 'nop', 'fileDelete', 'dirMake', 'nop', 'nop', 'nop', 'dirMake', 'nop', 'nop', 'nop', 'dirMake', 'dirMake', 'dirMake', 'nop', 'dirMake' ];
-  var expectedAllow = [ true, true, false, false, false, false, true, true, false, false, true, true, true, true, true, true, true, false, false ];
-
-  var dstAbsolute = _.select( records, '*/dst/absolute' );
-  var srcAbsolute = _.select( records, '*/src/absolute' );
-
-  var action = _.select( records, '*/action' );
-  var allow = _.select( records, '*/allow' );
-
-  // logger.log( 'expectedEffAbsolute', expectedEffAbsolute );
-  logger.log( 'action', action );
-
-  test.identical( dstAbsolute, expectedDstAbsolute );
-  test.identical( srcAbsolute, expectedSrcAbsolute );
-
-  test.identical( action, expectedAction );
-  test.identical( allow, expectedAllow );
-
-  /* */
-
-  var p = o.prepare();
-  var o1 = optionsMake();
-  var o2 =
-  {
-    linking : 'fileCopy',
-    srcDeleting : 0,
-    dstDeleting : 0,
-    writing : 1,
-    dstRewriting : 1,
-    dstRewritingByDistinct : 1,
-    preservingTime : 0,
-    preservingSame : 1,
-  }
-
-  test.case = 'complex move with preservingSame : 1, linking : fileCopy\n' + _.toStr( o2 );
-
-  var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
-
-  var expected = _.FileProvider.Extract
-  ({
-    filesTree :
-    {
-      src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-      dst : { a2 : '2', a1 : '1', b : '1', c : '1', dir : { a2 : '2', a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir4 : {}, dir5 : {}, srcFile : '1', dstFile : { f : '1' } },
-    },
-  });
-
-  test.identical( p.src.filesTree.src, expected.filesTree.src );
-  test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
-
-  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/srcFile/f', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
-  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/srcFile/f', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
-
-  var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'fileCopy', 'fileDelete', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy' ];
-  var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
-  var expectedPreserve = [ true, false, true, false, false, false, true, false, true, false, false, false, false, false, true, false, true, true, false, false ];
-
-  var dstAbsolute = _.select( records, '*/dst/absolute' );
-  var srcAbsolute = _.select( records, '*/src/absolute' );
-
-  var action = _.select( records, '*/action' );
-  var allow = _.select( records, '*/allow' );
-  var preserve = _.select( records, '*/preserve' );
-
-  test.identical( dstAbsolute, expectedDstAbsolute );
-  test.identical( srcAbsolute, expectedSrcAbsolute );
-
-  test.identical( action, expectedAction );
-  test.identical( allow, expectedAllow );
-  test.identical( preserve, expectedPreserve );
-
-  /* */
-
-  var p = o.prepare();
-  var o1 = optionsMake();
-  var o2 =
-  {
-    linking : 'fileCopy',
-    srcDeleting : 1,
-    dstDeleting : 0,
-    writing : 1,
-    dstRewriting : 1,
-    dstRewritingByDistinct : 1,
-    preservingTime : 0,
-  }
-
-  test.case = 'complex move with srcDeleting : 1\n' + _.toStr( o2 );
-
-  var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
-
-  var expected = _.FileProvider.Extract
-  ({
-    filesTree :
-    {
-      dst : { a2 : '2', a1 : '1', b : '1', c : '1', dir : { a2 : '2', a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir4 : {}, dir5 : {}, srcFile : '1', dstFile : { f : '1' } },
-    },
-  });
-
-  test.identical( p.src.filesTree.src, expected.filesTree.src );
-  test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
-
-  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/srcFile/f', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f' ];
-  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/srcFile/f', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f' ];
-
-  var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'fileCopy', 'fileDelete', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy' ];
-  var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
-  var expectedSrcActions = [ 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', null, 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete' ];
-  var expectedSrcAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
-
-  var dstAbsolute = _.select( records, '*/dst/absolute' );
-  var srcAbsolute = _.select( records, '*/src/absolute' );
-
-  var action = _.select( records, '*/action' );
-  var allow = _.select( records, '*/allow' );
-  var srcActions = _.select( records, '*/srcAction' );
-  var srcAllow = _.select( records, '*/srcAllow' );
-
-  test.identical( dstAbsolute, expectedDstAbsolute );
-  test.identical( srcAbsolute, expectedSrcAbsolute );
-
-  test.identical( action, expectedAction );
-  test.identical( allow, expectedAllow );
-  test.identical( srcActions, expectedSrcActions );
-  test.identical( srcAllow, expectedSrcAllow );
-
-  /* */
-
-  var p = o.prepare();
-  var o1 = optionsMake();
-  var o2 =
-  {
-    linking : 'fileCopy',
-    srcDeleting : 1,
-    dstDeleting : 0,
-    writing : 1,
-    dstRewriting : 0,
-    dstRewritingByDistinct : 1,
-    preservingTime : 0,
-  }
-
-  test.case = 'complex move with srcDeleting : 1, dstRewriting : 0\n' + _.toStr( o2 );
-
-  var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
-
-  var expected = _.FileProvider.Extract
-  ({
-    filesTree :
-    {
-      src : { b : '1', c : '1', dir : { b : '1', c : '1' }, dirSame : { d : '1' }, srcFile : '1', dstFile : { f : '1' } },
-      dst : { a2 : '2', a1 : '1', b : '1', c : '2', dir : { a2 : '2', a1 : '1', b : '1', c : '2' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir4 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
-    },
-  });
-
-  test.identical( p.src.filesTree.src, expected.filesTree.src );
-  test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
-
-  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/srcFile/f', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile' ];
-  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/srcFile/f', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile' ];
-
-  var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'fileCopy', 'fileDelete', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake', 'fileCopy', 'dirMake' ];
-  var expectedAllow = [ true, true, false, false, false, false, true, true, false, false, true, true, true, true, true, true, true, false, false ];
-  var expectedSrcActions = [ 'fileDelete', 'fileDelete', null, null, null, null, 'fileDelete', 'fileDelete', null, null, 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', null, null ];
-  var expectedSrcAllow = [ false, true, true, true, true, true, false, true, true, true, true, true, true, true, true, true, false, true, true ];
-
-  var dstAbsolute = _.select( records, '*/dst/absolute' );
-  var srcAbsolute = _.select( records, '*/src/absolute' );
-
-  var action = _.select( records, '*/action' );
-  var allow = _.select( records, '*/allow' );
-  var srcActions = _.select( records, '*/srcAction' );
-  var srcAllow = _.select( records, '*/srcAllow' );
-
-  test.identical( dstAbsolute, expectedDstAbsolute );
-  test.identical( srcAbsolute, expectedSrcAbsolute );
-
-  test.identical( action, expectedAction );
-  test.identical( allow, expectedAllow );
-  test.identical( srcActions, expectedSrcActions );
-  test.identical( srcAllow, expectedSrcAllow );
-
-  /* */
-
-  var p = o.prepare();
-  var o1 = optionsMake();
-  var o2 =
-  {
-    linking : 'fileCopy',
-    srcDeleting : 1,
-    dstDeleting : 0,
-    writing : 1,
-    dstRewriting : 0,
-    dstRewritingByDistinct : 1,
-    preservingTime : 0,
-    includingNonAllowed : 0,
-  }
-
-  test.case = 'complex move with srcDeleting : 1, dstRewriting : 0, includingNonAllowed : 0\n' + _.toStr( o2 );
-
-  var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
-
-  var expected = _.FileProvider.Extract
-  ({
-    filesTree :
-    {
-      src : { b : '1', c : '1', dir : { b : '1', c : '1' }, dirSame : { d : '1' }, srcFile : '1', dstFile : { f : '1' } },
-      dst : { a2 : '2', a1 : '1', b : '1', c : '2', dir : { a2 : '2', a1 : '1', b : '1', c : '2' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir4 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
-    },
-  });
-
-  test.identical( p.src.filesTree.src, expected.filesTree.src );
-  test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
-
-  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/dir', '/dst/dir/a1', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame' ];
-  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame' ];
-
-  var expectedAction = [ 'dirMake', 'fileCopy', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake' ];
-  var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true ];
-  var expectedSrcActions = [ 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete' ];
-  var expectedSrcAllow = [ false, true, false, true, true, true, true, true, true, true, false ];
-
-  var dstAbsolute = _.select( records, '*/dst/absolute' );
-  var srcAbsolute = _.select( records, '*/src/absolute' );
-
-  var action = _.select( records, '*/action' );
-  var allow = _.select( records, '*/allow' );
-  var srcActions = _.select( records, '*/srcAction' );
-  var srcAllow = _.select( records, '*/srcAllow' );
-
-  test.identical( dstAbsolute, expectedDstAbsolute );
-  test.identical( srcAbsolute, expectedSrcAbsolute );
-
-  test.identical( action, expectedAction );
-  test.identical( allow, expectedAllow );
-  test.identical( srcActions, expectedSrcActions );
-  test.identical( srcAllow, expectedSrcAllow );
-
-  /* */
-
-  var p = o.prepare();
-  var o1 = optionsMake();
-  var o2 =
-  {
-    linking : 'fileCopy',
-    srcDeleting : 0,
-    dstDeleting : 1,
-    writing : 1,
-    dstRewriting : 1,
-    dstRewritingByDistinct : 1,
-    preservingTime : 0,
-  }
-
-  test.case = 'complex move with dstDeleting : 1\n' + _.toStr( o2 );
-
-  var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
-
-  var expected = _.FileProvider.Extract
-  ({
-    filesTree :
-    {
-      src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-      dst : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-    },
-  });
-
-  test.identical( p.src.filesTree.src, expected.filesTree.src );
-  test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
-
-  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst/srcFile', '/dst/srcFile/f', '/dst/dir', '/dst/dir/a1', '/dst/dir/b', '/dst/dir/c', '/dst/dir/a2', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/dstFile/f', '/dst/a2', '/dst/dir2', '/dst/dir2/a2', '/dst/dir2/b', '/dst/dir2/c', '/dst/dir5' ];
-  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/b', '/src/c', '/src/srcFile', '/src/srcFile/f', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dir/a2', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/dirSame/d', '/src/dstFile', '/src/dstFile/f', '/src/a2', '/src/dir2', '/src/dir2/a2', '/src/dir2/b', '/src/dir2/c', '/src/dir5' ];
-
-  var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'fileCopy', 'fileDelete', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'fileDelete', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete' ];
-  var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
-  var expectedPreserve = [ true, false, false, false, false, false, true, false, false, false, false, false, false, false, false, true, false, true, false, false, false, false, false, false, false, false, false ];
-
-  var dstAbsolute = _.select( records, '*/dst/absolute' );
-  var srcAbsolute = _.select( records, '*/src/absolute' );
-
-  var action = _.select( records, '*/action' );
-  var allow = _.select( records, '*/allow' );
-  var preserve = _.select( records, '*/preserve' );
-
-  test.identical( dstAbsolute, expectedDstAbsolute );
-  test.identical( srcAbsolute, expectedSrcAbsolute );
-
-  test.identical( action, expectedAction );
-  test.identical( allow, expectedAllow );
-  test.identical( preserve, expectedPreserve );
-
-  /* */
-
-  var p = o.prepare();
-  var o1 = optionsMake();
-  var o2 =
-  {
-    linking : 'fileCopy',
-    srcDeleting : 1,
-    dstDeleting : 1,
-    writing : 1,
-    dstRewriting : 0,
-    dstRewritingByDistinct : 1,
-    preservingTime : 0,
-    includingNonAllowed : 0,
-  }
-
-  test.case = 'complex move with dstDeleting : 1, dstRewriting : 0, srcDeleting : 1, includingNonAllowed : 0\n' + _.toStr( o2 );
-
-  var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
-
-  var expected = _.FileProvider.Extract
-  ({
-    filesTree :
-    {
-      src : { b : '1', c : '1', dir : { b : '1', c : '1' }, dirSame : { d : '1' }, srcFile : '1', dstFile : { f : '1' } },
-      dst :
-      {
-        b : '1', c : '2', dirSame : { d : '1' }, dstFile : '1', srcFile : { f : '2' },
-        dir : { b : '1', c : '2', a1 : '1' },
-        dir3 : {},
-        a1 : '1',
-        dir1 : { a1 : '1', b : '1', c : '1' },
-        dir4 : {},
-      },
-    },
-  });
-
-  test.identical( p.src.filesTree.src, expected.filesTree.src );
-  test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
-
-  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/dir', '/dst/dir/a1', '/dst/dir/a2', '/dst/dir1', '/dst/dir1/a1', '/dst/dir1/b', '/dst/dir1/c', '/dst/dir3', '/dst/dir4', '/dst/dirSame', '/dst/a2', '/dst/dir2', '/dst/dir2/a2', '/dst/dir2/b', '/dst/dir2/c', '/dst/dir5' ];
-  var expectedSrcAbsolute = [ '/src', '/src/a1', '/src/dir', '/src/dir/a1', '/src/dir/a2', '/src/dir1', '/src/dir1/a1', '/src/dir1/b', '/src/dir1/c', '/src/dir3', '/src/dir4', '/src/dirSame', '/src/a2', '/src/dir2', '/src/dir2/a2', '/src/dir2/b', '/src/dir2/c', '/src/dir5' ];
-
-  var expectedAction = [ 'dirMake', 'fileCopy', 'dirMake', 'fileCopy', 'fileDelete', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'dirMake', 'dirMake', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete' ];
-  var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
-  var expectedPreserve = [ true, false, true, false, false, false, false, false, false, true, false, true, false, false, false, false, false, false ];
-
-  var dstAbsolute = _.select( records, '*/dst/absolute' );
-  var srcAbsolute = _.select( records, '*/src/absolute' );
-
-  var action = _.select( records, '*/action' );
-  var allow = _.select( records, '*/allow' );
-  var preserve = _.select( records, '*/preserve' );
-
-  test.identical( dstAbsolute, expectedDstAbsolute );
-  test.identical( srcAbsolute, expectedSrcAbsolute );
-
-  test.identical( action, expectedAction );
-  test.identical( allow, expectedAllow );
-  test.identical( preserve, expectedPreserve );
-
-  /* */
-
-  var p = o.prepare();
-  var o1 = optionsMake();
-  o1.reflectMap =
-  {
-    '/src/dir' : [ '/dst', '/dstNew' ],
-    '/src/dirSame' : [ '/dst', '/dstNew' ],
-  }
-
-  var o2 =
-  {
-    linking : 'fileCopy',
-    srcDeleting : 0,
-    dstDeleting : 0,
-    writing : 1,
-    dstRewriting : 1,
-    dstRewritingByDistinct : 1,
-    preservingTime : 0,
-  }
-
-  test.case = 'several srcs, dsts\n' + _.toStr( o2 );
-
-  var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
-
-  var expected = _.FileProvider.Extract
-  ({
-    filesTree :
-    {
-
-      src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-
-      dst :
-      {
-        a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' },
-        dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' },
-        dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' },
-        /**/
-        a1 : '1', b : '1', c : '1',
-        d : '1',
-      },
-
-      dstNew :
-      {
-        a1 : '1', b : '1', c : '1',
-        d : '1',
-      },
-
-    },
-  });
-
-  test.identical( p.src.filesTree.src, expected.filesTree.src );
-  test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
-  test.identical( p.dst.filesTree.dstNew, expected.filesTree.dstNew );
-
-  var expectedDstAbsolute = [ '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst', '/dst/d', '/dstNew', '/dstNew/a1', '/dstNew/b', '/dstNew/c', '/dstNew', '/dstNew/d' ];
-  var expectedSrcAbsolute = [ '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d' ];
-
-  var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy' ];
-  var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true ];
-  var expectedPreserve = [ true, false, false, false, true, false, false, false, false, false, true, false ];
-
-  var dstAbsolute = _.select( records, '*/dst/absolute' );
-  var srcAbsolute = _.select( records, '*/src/absolute' );
-
-  var action = _.select( records, '*/action' );
-  var allow = _.select( records, '*/allow' );
-  var preserve = _.select( records, '*/preserve' );
-
-  test.identical( dstAbsolute, expectedDstAbsolute );
-  test.identical( srcAbsolute, expectedSrcAbsolute );
-
-  test.identical( action, expectedAction );
-  test.identical( allow, expectedAllow );
-  test.identical( preserve, expectedPreserve );
-
-  /* */
-
-  var p = o.prepare();
-  var o1 = optionsMake();
-  o1.reflectMap =
-  {
-    '/src/dir/**' : '/dstNew',
-    '/src/dirSame/**' : '/dstNew',
-  }
-
-  var o2 =
-  {
-    linking : 'fileCopy',
-    srcDeleting : 0,
-    dstDeleting : 0,
-    writing : 1,
-    dstRewriting : 1,
-    dstRewritingByDistinct : 1,
-    preservingTime : 0,
-  }
-
-  test.case = 'several srcs, dsts\n' + _.toStr( o2 );
-
-  var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
-
-  var expected = _.FileProvider.Extract
-  ({
-    filesTree :
-    {
-
-      src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-
-      dstNew :
-      {
-        a1 : '1', b : '1', c : '1',
-        d : '1',
-      },
-
-    },
-  });
-
-  test.identical( p.src.filesTree.src, expected.filesTree.src );
-  test.identical( p.dst.filesTree.dstNew, expected.filesTree.dstNew );
-
-  var expectedDstAbsolute = [ '/dstNew', '/dstNew/a1', '/dstNew/b', '/dstNew/c', '/dstNew', '/dstNew/d' ];
-  var expectedSrcAbsolute = [ '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d' ];
-
-  var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy' ];
-  var expectedAllow = [ true, true, true, true, true, true ];
-  var expectedPreserve = [ false, false, false, false, true, false ];
-
-  var dstAbsolute = _.select( records, '*/dst/absolute' );
-  var srcAbsolute = _.select( records, '*/src/absolute' );
-
-  var action = _.select( records, '*/action' );
-  var allow = _.select( records, '*/allow' );
-  var preserve = _.select( records, '*/preserve' );
-
-  test.identical( dstAbsolute, expectedDstAbsolute );
-  test.identical( srcAbsolute, expectedSrcAbsolute );
-
-  test.identical( action, expectedAction );
-  test.identical( allow, expectedAllow );
-  test.identical( preserve, expectedPreserve );
-
-  /* */
-
-  var p = o.prepare();
-  var o1 = optionsMake();
-  o1.reflectMap =
-  {
-    '/src/dir/**' : [ '/dstNew', '/dst' ],
-    '/src/dirSame/**' : [ '/dstNew', '/dst' ],
-  }
-
-  var o2 =
-  {
-    linking : 'fileCopy',
-    srcDeleting : 0,
-    dstDeleting : 0,
-    writing : 1,
-    dstRewriting : 1,
-    dstRewritingByDistinct : 1,
-    preservingTime : 0,
-  }
-
-  test.case = 'several srcs, dsts\n' + _.toStr( o2 );
-
-  var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
-
-  var expected = _.FileProvider.Extract
-  ({
-    filesTree :
-    {
-
-      src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-
-      dst :
-      {
-        a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' },
-        dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' },
-        dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' },
-        /**/
-        a1 : '1', b : '1', c : '1',
-        d : '1',
-      },
-
-      dstNew :
-      {
-        a1 : '1', b : '1', c : '1',
-        d : '1',
-      },
-
-    },
-  });
-
-  test.identical( p.src.filesTree.src, expected.filesTree.src );
-  test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
-  test.identical( p.dst.filesTree.dstNew, expected.filesTree.dstNew );
-
-  var expectedDstAbsolute = [ '/dstNew', '/dstNew/a1', '/dstNew/b', '/dstNew/c', '/dstNew', '/dstNew/d', '/dst', '/dst/a1', '/dst/b', '/dst/c', '/dst', '/dst/d' ];
-  var expectedSrcAbsolute = [ '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d', '/src/dir', '/src/dir/a1', '/src/dir/b', '/src/dir/c', '/src/dirSame', '/src/dirSame/d' ];
-
-  var expectedAction = [ 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy', 'fileCopy', 'fileCopy', 'dirMake', 'fileCopy' ];
-  var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true ];
-
-  var dstAbsolute = _.select( records, '*/dst/absolute' );
-  var srcAbsolute = _.select( records, '*/src/absolute' );
-
-  var action = _.select( records, '*/action' );
-  var allow = _.select( records, '*/allow' );
-
-  test.identical( dstAbsolute, expectedDstAbsolute );
-  test.identical( srcAbsolute, expectedSrcAbsolute );
-
-  test.identical( action, expectedAction );
-  test.identical( allow, expectedAllow );
-
-  /* */
-
-  test.case = 'strange behavior fix';
-
-  var p = o.prepare();
-  var o1 = optionsMake();
-  o1.reflectMap =
-  {
-    '/src/*()dir/**b**' : '/dst',
-  }
-
-  var o2 =
-  {
-    linking : 'fileCopy',
-    srcDeleting : 0,
-    dstDeleting : 0,
-    writing : 1,
-    dstRewriting : 1,
-    dstRewritingByDistinct : 1,
-    preservingTime : 0,
-  }
-
-  test.case = 'base marker *()\n' + _.toStr( o2 );
-
-  var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
-
-  var expected = _.FileProvider.Extract
-  ({
-    filesTree :
-    {
-
-      src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-
-      dst :
-      {
-        a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' },
-        dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' },
-        dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' },
-        /**/
-        dir : { a2 : '2', b : '1', c : '2' },
-      },
-
-    },
-  });
-
-  test.identical( p.src.filesTree.src, expected.filesTree.src );
-  test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
-
-  var expectedDstAbsolute = [ '/dst', '/dst/dir', '/dst/dir/b' ];
-  var expectedSrcAbsolute = [ '/src', '/src/dir', '/src/dir/b' ];
-
-  var expectedAction = [ 'dirMake', 'dirMake', 'fileCopy' ];
-  var expectedAllow = [ true, true, true ];
-  var expectedPreserve = [ true, true, false ];
-
-  var dstAbsolute = _.select( records, '*/dst/absolute' );
-  var srcAbsolute = _.select( records, '*/src/absolute' );
-
-  var action = _.select( records, '*/action' );
-  var allow = _.select( records, '*/allow' );
-  var preserve = _.select( records, '*/preserve' );
-
-  test.identical( dstAbsolute, expectedDstAbsolute );
-  test.identical( srcAbsolute, expectedSrcAbsolute );
-
-  test.identical( action, expectedAction );
-  test.identical( allow, expectedAllow );
-  test.identical( preserve, expectedPreserve );
-
-/*
-
-var dst = _.FileProvider.Extract
-({
-  filesTree :
-  {
-    dst : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
-    dst2 : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
-    dst3 : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
-  },
-});
-
-var src = _.FileProvider.Extract
-({
-  filesTree :
-  {
-    src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-    src2 : { ax2 : '10', bx : '10', cx : '10', dirx : { a : '10' } },
-    src3 : { ax2 : '20', by : '20', cy : '20', dirx : { a : '20' } },
-  },
-});
-
-*/
-
-  /* */
-
-  var p = o.prepare();
-  var o1 = optionsMake();
-  o1.reflectMap =
-  {
-    '/src/dir/**b**' : '/dst',
-  }
-
-  var o2 =
-  {
-    linking : 'fileCopy',
-    srcDeleting : 0,
-    dstDeleting : 1,
-    writing : 1,
-    dstRewriting : 1,
-    dstRewritingByDistinct : 1,
-    preservingTime : 0,
-  }
-
-  test.case = 'several srcs, dsts\n' + _.toStr( o2 );
-
-  var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
-
-  var expected = _.FileProvider.Extract
-  ({
-    filesTree :
-    {
-
-      src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-
-      dst :
-      {
-        // a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' },
-        // dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' },
-        // dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' },
-        // /**/
-        b : '1',
-      },
-
-    },
-  });
-
-  test.identical( p.src.filesTree.src, expected.filesTree.src );
-  test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
-
-  var expectedDstAbsolute = [ '/dst', '/dst/b', '/dst/a2', '/dst/c', '/dst/dir', '/dst/dir/a2', '/dst/dir/b', '/dst/dir/c', '/dst/dir2', '/dst/dir2/a2', '/dst/dir2/b', '/dst/dir2/c', '/dst/dir3', '/dst/dir5', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/srcFile', '/dst/srcFile/f' ];
-  var expectedSrcAbsolute = [ '/src/dir', '/src/dir/b', '/src/dir/a2', '/src/dir/c', '/src/dir/dir', '/src/dir/dir/a2', '/src/dir/dir/b', '/src/dir/dir/c', '/src/dir/dir2', '/src/dir/dir2/a2', '/src/dir/dir2/b', '/src/dir/dir2/c', '/src/dir/dir3', '/src/dir/dir5', '/src/dir/dirSame', '/src/dir/dirSame/d', '/src/dir/dstFile', '/src/dir/srcFile', '/src/dir/srcFile/f' ];
-
-  var expectedAction = [ 'dirMake', 'fileCopy', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete' ];
-  var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
-  var expectedPreserve = [ true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false ];
-  var expectedReason = [ 'srcLooking', 'srcLooking', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting' ];
-
-  var dstAbsolute = _.select( records, '*/dst/absolute' );
-  var srcAbsolute = _.select( records, '*/src/absolute' );
-
-  var action = _.select( records, '*/action' );
-  var allow = _.select( records, '*/allow' );
-  var preserve = _.select( records, '*/preserve' );
-  var reason = _.select( records, '*/reason' );
-
-  test.identical( dstAbsolute, expectedDstAbsolute );
-  test.identical( srcAbsolute, expectedSrcAbsolute );
-
-  test.identical( action, expectedAction );
-  test.identical( allow, expectedAllow );
-  test.identical( preserve, expectedPreserve );
-  test.identical( reason, expectedReason );
-
-  /* */
-
-  var p = o.prepare();
-  var o1 = optionsMake();
-  o1.reflectMap =
-  {
-    '/src/dir/**b**' : [ '/dstNew', '/dst' ],
-    '/src/dirSame/**d**' : [ '/dstNew', '/dst' ],
-  }
-
-  var o2 =
-  {
-    linking : 'fileCopy',
-    srcDeleting : 0,
-    dstDeleting : 1,
-    writing : 1,
-    dstRewriting : 1,
-    dstRewritingByDistinct : 1,
-    preservingTime : 0,
-  }
-
-  test.case = 'several srcs, dsts\n' + _.toStr( o2 );
-
-  var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
-
-  var expected = _.FileProvider.Extract
-  ({
-    filesTree :
-    {
-
-      src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-
-      dst :
-      {
-        // a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' },
-        // dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' },
-        // dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' },
-        // /**/
-        b : '1',
-        d : '1',
-      },
-
-      dstNew :
-      {
-        b : '1',
-        d : '1',
-      },
-
-    },
-  });
-
-  test.identical( p.src.filesTree.src, expected.filesTree.src );
-  test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
-  test.identical( p.dst.filesTree.dstNew, expected.filesTree.dstNew );
-
-  var expectedDstAbsolute = [ '/dstNew', '/dstNew/b', '/dstNew', '/dstNew/d', '/dst', '/dst/b', '/dst/a2', '/dst/c', '/dst/dir', '/dst/dir/a2', '/dst/dir/b', '/dst/dir/c', '/dst/dir2', '/dst/dir2/a2', '/dst/dir2/b', '/dst/dir2/c', '/dst/dir3', '/dst/dir5', '/dst/dirSame', '/dst/dirSame/d', '/dst/dstFile', '/dst/srcFile', '/dst/srcFile/f', '/dst', '/dst/d' ];
-  var expectedSrcAbsolute = [ '/src/dir', '/src/dir/b', '/src/dirSame', '/src/dirSame/d', '/src/dir', '/src/dir/b', '/src/dir/a2', '/src/dir/c', '/src/dir/dir', '/src/dir/dir/a2', '/src/dir/dir/b', '/src/dir/dir/c', '/src/dir/dir2', '/src/dir/dir2/a2', '/src/dir/dir2/b', '/src/dir/dir2/c', '/src/dir/dir3', '/src/dir/dir5', '/src/dir/dirSame', '/src/dir/dirSame/d', '/src/dir/dstFile', '/src/dir/srcFile', '/src/dir/srcFile/f', '/src/dirSame', '/src/dirSame/d' ];
-
-  var expectedAction = [ 'dirMake', 'fileCopy', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'fileDelete', 'dirMake', 'fileCopy' ];
-  var expectedAllow = [ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true ];
-  var expectedPreserve = [ false, false, true, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false ];
-  var expectedReason = [ 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'srcLooking', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'dstDeleting', 'srcLooking', 'srcLooking' ];
-
-  var dstAbsolute = _.select( records, '*/dst/absolute' );
-  var srcAbsolute = _.select( records, '*/src/absolute' );
-
-  var action = _.select( records, '*/action' );
-  var allow = _.select( records, '*/allow' );
-  var preserve = _.select( records, '*/preserve' );
-  var reason = _.select( records, '*/reason' );
-
-  test.identical( dstAbsolute, expectedDstAbsolute );
-  test.identical( srcAbsolute, expectedSrcAbsolute );
-
-  test.identical( action, expectedAction );
-  test.identical( allow, expectedAllow );
-  test.identical( preserve, expectedPreserve );
-  test.identical( reason, expectedReason );
-
-  /* */
-
-  var p = o.prepare();
-  var o1 = optionsMake();
-  o1.reflectMap =
-  {
-    '/src/dir/**b**' : [ '/dstNew', '/dst' ],
-    '/src/dirSame/**d**' : [ '/dstNew', '/dst' ],
-  }
-
-  var o2 =
-  {
-    linking : 'fileCopy',
-    srcDeleting : 0,
-    dstDeleting : 0,
-    writing : 1,
-    dstRewriting : 1,
-    dstRewritingByDistinct : 1,
-    preservingTime : 0,
-  }
-
-  test.case = 'several srcs, dsts\n' + _.toStr( o2 );
-
-  var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
-
-  var expected = _.FileProvider.Extract
-  ({
-    filesTree :
-    {
-
-      src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-
-      dst :
-      {
-        a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' },
-        dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' },
-        dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' },
-        /**/
-        b : '1',
-        d : '1',
-      },
-
-      dstNew :
-      {
-        b : '1',
-        d : '1',
-      },
-
-    },
-  });
-
-  test.identical( p.src.filesTree.src, expected.filesTree.src );
-  test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
-  test.identical( p.dst.filesTree.dstNew, expected.filesTree.dstNew );
-
-  var expectedDstAbsolute = [ '/dstNew', '/dstNew/b', '/dstNew', '/dstNew/d', '/dst', '/dst/b', '/dst', '/dst/d' ];
-  var expectedSrcAbsolute = [ '/src/dir', '/src/dir/b', '/src/dirSame', '/src/dirSame/d', '/src/dir', '/src/dir/b', '/src/dirSame', '/src/dirSame/d' ];
-
-  var expectedAction = [ 'dirMake', 'fileCopy', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy' ];
-  var expectedAllow = [ true, true, true, true, true, true, true, true ];
-  var expectedPreserve = [ false, false, true, false, true, false, true, false ];
-
-  var dstAbsolute = _.select( records, '*/dst/absolute' );
-  var srcAbsolute = _.select( records, '*/src/absolute' );
-
-  var action = _.select( records, '*/action' );
-  var allow = _.select( records, '*/allow' );
-  var preserve = _.select( records, '*/preserve' );
-
-  test.identical( dstAbsolute, expectedDstAbsolute );
-  test.identical( srcAbsolute, expectedSrcAbsolute );
-
-  test.identical( action, expectedAction );
-  test.identical( allow, expectedAllow );
-  test.identical( preserve, expectedPreserve );
-
-/*
-dst : { a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' }, dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' }, dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' } },
-src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-*/
-
-  /* */
-
-  var p = o.prepare();
-  var o1 = optionsMake();
-  o1.reflectMap =
-  {
-    '/src/*()dir/**b**' : [ '/dstNew', '/dst' ],
-    '/src/dirSame/**d**' : [ '/dstNew', '/dst' ],
-  }
-
-  var o2 =
-  {
-    linking : 'fileCopy',
-    srcDeleting : 0,
-    dstDeleting : 0,
-    writing : 1,
-    dstRewriting : 1,
-    dstRewritingByDistinct : 1,
-    preservingTime : 0,
-  }
-
-  test.case = 'base marker *()\n' + _.toStr( o2 );
-
-  var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
-
-  var expected = _.FileProvider.Extract
-  ({
-    filesTree :
-    {
-
-      src : { a1 : '1', b : '1', c : '1', dir : { a1 : '1', b : '1', c : '1' }, dirSame : { d : '1' }, dir1 : { a1 : '1', b : '1', c : '1' }, dir3 : {}, dir4 : {}, srcFile : '1', dstFile : { f : '1' } },
-
-      dst :
-      {
-        a2 : '2', b : '1', c : '2', dir : { a2 : '2', b : '1', c : '2' },
-        dirSame : { d : '1' }, dir2 : { a2 : '2', b : '1', c : '2' },
-        dir3 : {}, dir5 : {}, dstFile : '1', srcFile : { f : '2' },
-        /**/
-        dir : { a2 : '2', b : '1', c : '2' },
-        d : '1',
-      },
-
-      dstNew :
-      {
-        dir : { b : '1' },
-        d : '1',
-      },
-
-    },
-  });
-
-  test.identical( p.src.filesTree.src, expected.filesTree.src );
-  test.identical( p.dst.filesTree.dst, expected.filesTree.dst );
-  test.identical( p.dst.filesTree.dstNew, expected.filesTree.dstNew );
-
-  var expectedDstAbsolute = [ '/dstNew', '/dstNew/dir', '/dstNew/dir/b', '/dstNew', '/dstNew/d', '/dst', '/dst/dir', '/dst/dir/b', '/dst', '/dst/d' ];
-  var expectedSrcAbsolute = [ '/src', '/src/dir', '/src/dir/b', '/src/dirSame', '/src/dirSame/d', '/src', '/src/dir', '/src/dir/b', '/src/dirSame', '/src/dirSame/d' ];
-
-  var expectedAction = [ 'dirMake', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy', 'dirMake', 'dirMake', 'fileCopy', 'dirMake', 'fileCopy' ];
-  var expectedAllow = [ true, true, true, true, true, true, true, true, true, true ];
-  var expectedPreserve = [ false, false, false, true, false, true, true, false, true, false ];
-
-  var dstAbsolute = _.select( records, '*/dst/absolute' );
-  var srcAbsolute = _.select( records, '*/src/absolute' );
-
-  var action = _.select( records, '*/action' );
-  var allow = _.select( records, '*/allow' );
-  var preserve = _.select( records, '*/preserve' );
-
-  test.identical( dstAbsolute, expectedDstAbsolute );
-  test.identical( srcAbsolute, expectedSrcAbsolute );
-
-  test.identical( action, expectedAction );
-  test.identical( allow, expectedAllow );
-  test.identical( preserve, expectedPreserve );
-
-} /* eof _filesReflect */
 
 //
 
@@ -21604,7 +21737,7 @@ function filesReflectOnlyPreservingLinks( test )
   test.identical( provider.fileRead( dstTerminalPath ), _.select( extract.filesTree, '/dst/terminal' ) )
   test.identical( provider.fileRead( dstLinkPath ), _.select( extract.filesTree, '/dst/terminal' ) )
 
-  //
+  /* */
 
   provider.filesDelete( routinePath );
   extract.filesReflectTo( provider, routinePath );
@@ -21632,7 +21765,7 @@ function filesReflectOnlyPreservingLinks( test )
   test.identical( provider.fileRead( dstTerminalPath ), _.select( extract.filesTree, '/dst/terminal' ) )
   test.identical( provider.fileRead( dstLinkPath ), _.select( extract.filesTree, '/src/terminal' ) )
 
-  //
+  /* */
 
   provider.filesDelete( routinePath );
   extract.filesReflectTo( provider, routinePath );
@@ -21660,7 +21793,7 @@ function filesReflectOnlyPreservingLinks( test )
   test.identical( provider.fileRead( dstTerminalPath ), _.select( extract.filesTree, '/dst/terminal' ) )
   test.identical( provider.fileRead( dstLinkPath ), _.select( extract.filesTree, '/dst/terminal' ) )
 
-  //
+  /* */
 
   provider.filesDelete( routinePath );
   extract.filesReflectTo( provider, routinePath );
@@ -21688,7 +21821,7 @@ function filesReflectOnlyPreservingLinks( test )
   test.identical( provider.fileRead( dstTerminalPath ), _.select( extract.filesTree, '/dst/terminal' ) )
   test.identical( provider.fileRead( dstLinkPath ), _.select( extract.filesTree, '/dst/terminal' ) )
 
-  //
+  /* */
 
   provider.filesDelete( routinePath );
   extract.filesReflectTo( provider, routinePath );
@@ -21716,7 +21849,7 @@ function filesReflectOnlyPreservingLinks( test )
   test.identical( provider.fileRead( dstTerminalPath ), _.select( extract.filesTree, '/dst/terminal' ) )
   test.identical( provider.fileRead( dstLinkPath ), _.select( extract.filesTree, '/dst/terminal' ) )
 
-  //
+  /* */
 
   provider.filesDelete( routinePath );
   extract.filesReflectTo( provider, routinePath );
@@ -21744,7 +21877,7 @@ function filesReflectOnlyPreservingLinks( test )
   test.identical( provider.fileRead( dstTerminalPath ), _.select( extract.filesTree, '/src/terminal' ) )
   test.identical( provider.fileRead( dstLinkPath ), _.select( extract.filesTree, '/dst/terminal' ) )
 
-  //
+  /* */
 
   provider.filesDelete( routinePath );
   extract.filesReflectTo( provider, routinePath );
@@ -21837,7 +21970,7 @@ function filesReflectOnlyPreservingLinks( test )
   test.identical( provider.fileRead( dstTerminalPath ), _.select( extract.filesTree, '/dst/terminal' ) )
   test.identical( provider.fileRead( dstLinkPath ), _.select( extract.filesTree, '/dst/terminal' ) )
 
-  //
+  /* */
 
   provider.filesDelete( routinePath );
   extract.filesReflectTo( provider, routinePath );
@@ -21865,7 +21998,7 @@ function filesReflectOnlyPreservingLinks( test )
   test.identical( provider.fileRead( dstTerminalPath ), _.select( extract.filesTree, '/dst/terminal' ) )
   test.identical( provider.fileRead( dstLinkPath ), _.select( extract.filesTree, '/src/terminal' ) )
 
-  //
+  /* */
 
   provider.filesDelete( routinePath );
   extract.filesReflectTo( provider, routinePath );
@@ -21893,7 +22026,7 @@ function filesReflectOnlyPreservingLinks( test )
   test.identical( provider.fileRead( dstTerminalPath ), _.select( extract.filesTree, '/dst/terminal' ) )
   test.identical( provider.fileRead( dstLinkPath ), _.select( extract.filesTree, '/dst/terminal' ) )
 
-  //
+  /* */
 
   provider.filesDelete( routinePath );
   extract.filesReflectTo( provider, routinePath );
@@ -21921,7 +22054,7 @@ function filesReflectOnlyPreservingLinks( test )
   test.identical( provider.fileRead( dstTerminalPath ), _.select( extract.filesTree, '/dst/terminal' ) )
   test.identical( provider.fileRead( dstLinkPath ), _.select( extract.filesTree, '/src/terminal' ) )
 
-  //
+  /* */
 
   provider.filesDelete( routinePath );
   extract.filesReflectTo( provider, routinePath );
@@ -21949,7 +22082,7 @@ function filesReflectOnlyPreservingLinks( test )
   test.identical( provider.fileRead( dstTerminalPath ), _.select( extract.filesTree, '/dst/terminal' ) )
   test.identical( provider.fileRead( dstLinkPath ), _.select( extract.filesTree, '/dst/terminal' ) )
 
-  //
+  /* */
 
   provider.filesDelete( routinePath );
   extract.filesReflectTo( provider, routinePath );
@@ -21977,7 +22110,7 @@ function filesReflectOnlyPreservingLinks( test )
   test.identical( provider.fileRead( dstTerminalPath ), _.select( extract.filesTree, '/src/terminal' ) )
   test.identical( provider.fileRead( dstLinkPath ), _.select( extract.filesTree, '/src/terminal' ) )
 
-  //
+  /* */
 
   provider.filesDelete( routinePath );
   extract.filesReflectTo( provider, routinePath );
@@ -22104,7 +22237,7 @@ function filesReflectOnlyPreservingLinks( test )
   test.identical( provider.fileRead( srcLinkPath ), _.select( extract.filesTree, '/src/terminal' ) )
   test.identical( provider.fileRead( dstLinkPath ), _.select( extract.filesTree, '/dst/terminal' ) )
 
-  //
+  /* */
 
   provider.filesDelete( routinePath );
   extract.filesReflectTo( provider, routinePath );
@@ -22361,7 +22494,7 @@ function filesReflectOnlyPreservingLinks( test )
   test.identical( provider.fileRead( srcLinkPath ), _.select( extract.filesTree, '/src/terminal' ) )
   test.identical( provider.fileRead( dstLinkPath ), _.select( extract.filesTree, '/src/terminal' ) )
 
-  //
+  /* */
 
   provider.filesDelete( routinePath );
   extract.filesReflectTo( provider, routinePath );
@@ -23322,7 +23455,7 @@ function filesReflectOnlyPreservingEmpty( test )
 
   test.close( 'rewriting of linked empty files, src and dst are same' );
 
-  //
+  /* */
 
   test.open( 'rewriting of linked empty files, src and dst are different' );
 
@@ -23617,7 +23750,7 @@ function filesReflectDstDeletingDirs( test )
   }
   test.identical( extract.filesTree, expected );
 
-  //
+  /* */
 
   test.case = 'dst/dir is actual, will be deleted';
   var filesTree =
@@ -23641,7 +23774,7 @@ function filesReflectDstDeletingDirs( test )
   }
   test.identical( extract.filesTree, expected );
 
-  //
+  /* */
 
   test.case = 'dst/dir is excluded, will not be deleted';
   var filesTree =
@@ -23666,7 +23799,7 @@ function filesReflectDstDeletingDirs( test )
   }
   test.identical( extract.filesTree, expected );
 
-  //
+  /* */
 
   test.case = 'dst/dir is excluded, will not be deleted';
   var filesTree =
@@ -23691,7 +23824,7 @@ function filesReflectDstDeletingDirs( test )
   }
   test.identical( extract.filesTree, expected );
 
-  //
+  /* */
 
   test.case = 'dst/dir cleaned, not actual, dstDeletingCleanedDirs : 1 ';
   var filesTree =
@@ -23716,7 +23849,7 @@ function filesReflectDstDeletingDirs( test )
   }
   test.identical( extract.filesTree, expected );
 
-  //
+  /* */
 
   test.case = 'dst/dir cleaned, actual, dstDeletingCleanedDirs : 1 ';
   var filesTree =
@@ -23741,7 +23874,7 @@ function filesReflectDstDeletingDirs( test )
   }
   test.identical( extract.filesTree, expected );
 
-  //
+  /* */
 
   test.case = 'dst/dir cleaned, not actual, dstDeletingCleanedDirs : 0';
   var filesTree =
@@ -23766,7 +23899,7 @@ function filesReflectDstDeletingDirs( test )
   }
   test.identical( extract.filesTree, expected );
 
-  //
+  /* */
 
   test.case = 'dst/dir cleaned, actual, dstDeletingCleanedDirs : 0 ';
   var filesTree =
@@ -23791,7 +23924,7 @@ function filesReflectDstDeletingDirs( test )
   }
    test.identical( extract.filesTree, expected );
 
-  //
+  /* */
 
   test.case = 'file included, parent dir excluded, dstDeletingCleanedDirs : 1 ';
   var filesTree =
@@ -23816,7 +23949,7 @@ function filesReflectDstDeletingDirs( test )
   }
   test.identical( extract.filesTree, expected );
 
-  //
+  /* */
 
   test.case = 'file included, parent dir excluded, dstDeletingCleanedDirs : 0 ';
   var filesTree =
@@ -23841,7 +23974,7 @@ function filesReflectDstDeletingDirs( test )
   }
   test.identical( extract.filesTree, expected );
 
-  //
+  /* */
 
   test.case = 'cleaned dir have files, dstDeletingCleanedDirs : 1 ';
   var filesTree =
@@ -24087,7 +24220,7 @@ function filesReflectLinked( test )
   test.is( provider.isTerminal( dstLinkPath ) );
   test.identical( provider.fileRead( dstLinkPath ), 'file' );
 
-  //
+  /* */
 
   test.case = 'resolvingSrcSoftLink - 1';
   provider.filesDelete( routinePath );
@@ -24109,7 +24242,7 @@ function filesReflectLinked( test )
   test.is( provider.isTerminal( dstLinkPath ) );
   test.identical( provider.fileRead( dstLinkPath ), 'file' );
 
-  //
+  /* */
 
   test.case = 'resolvingSrcSoftLink - 2';
   provider.filesDelete( routinePath );
@@ -24164,7 +24297,7 @@ function filesReflectLinked( test )
   var dstLink1 = provider.pathResolveSoftLink( dstLinkPath );
   test.identical( dstLink1, path.join( srcPath, 'link' ) );
 
-  //
+  /* */
 
   test.case = 'resolvingSrcSoftLink - 1';
   provider.filesDelete( routinePath );
@@ -24193,7 +24326,7 @@ function filesReflectLinked( test )
   var dstLink1 = provider.pathResolveSoftLink( dstLinkPath );
   test.identical( dstLink1, path.join( srcPath, 'fileNotExists' ) );
 
-  //
+  /* */
 
   test.case = 'resolvingSrcSoftLink - 2';
   provider.filesDelete( routinePath );
@@ -24252,7 +24385,7 @@ function filesReflectLinked( test )
   test.is( provider.isSoftLink( dstLinkPath ) );
   test.identical( provider.pathResolveSoftLink( dstLinkPath ), srcLinkPath );
 
-  //
+  /* */
 
   test.case = 'resolvingSrcSoftLink : 1';
   provider.filesDelete( routinePath );
@@ -24279,7 +24412,7 @@ function filesReflectLinked( test )
   test.is( provider.isSoftLink( dstLinkPath ) );
   test.identical( provider.pathResolveSoftLink( dstLinkPath ), path.join( srcPath, 'fileNotExists' ) );
 
-  //
+  /* */
 
   test.case = 'resolvingSrcSoftLink : 2';
   provider.filesDelete( routinePath );
@@ -33174,7 +33307,7 @@ function filesDelete( test )
   })
   tree.providerRegisterTo( system );
 
-  //
+  /* */
 
   test.case = 'mask single directory';
   var tree2 = _.FileProvider.Extract
@@ -33976,7 +34109,7 @@ function filesDeleteDeletingEmptyDirs( test )
     }
   })
 
-  //
+  /* */
 
   test.case = 'mask dir, deletingEmptyDirs off'
   provider.filesDelete( routinePath );
@@ -34219,7 +34352,7 @@ function filesDeleteEmptyDirs( test )
   var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
   test.identical( got, expected );
 
-  //
+  /* */
 
   test.case = 'filter'
   provider.filesDelete( routinePath );
@@ -34253,7 +34386,7 @@ function filesDeleteEmptyDirs( test )
   var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
   test.identical( got, expected );
 
-  //
+  /* */
 
   test.case = 'filter for not existing dir'
   provider.filesDelete( routinePath );
@@ -34289,7 +34422,7 @@ function filesDeleteEmptyDirs( test )
   var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
   test.identical( got, expected );
 
-  //
+  /* */
 
   test.case = 'filter for terminals'
   provider.filesDelete( routinePath );
@@ -34319,7 +34452,7 @@ function filesDeleteEmptyDirs( test )
   var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
   test.identical( got, expected );
 
-  //
+  /* */
 
   test.case = 'glob for dir'
   provider.filesDelete( routinePath );
@@ -34352,7 +34485,7 @@ function filesDeleteEmptyDirs( test )
   var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
   test.identical( got, expected );
 
-  //
+  /* */
 
   test.case = 'glob for terminals'
   provider.filesDelete( routinePath );
@@ -34386,7 +34519,7 @@ function filesDeleteEmptyDirs( test )
   var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
   test.identical( got, expected );
 
-  //
+  /* */
 
   test.case = 'glob not existing file'
   provider.filesDelete( routinePath );
@@ -34420,7 +34553,7 @@ function filesDeleteEmptyDirs( test )
   var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
   test.identical( got, expected );
 
-  //
+  /* */
 
   test.case = 'resolvingSoftLink : 1'
   provider.filesDelete( routinePath );
@@ -34478,7 +34611,7 @@ function filesDeleteEmptyDirs( test )
   var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
   test.identical( got, expected );
 
-  //
+  /* */
 
   if( !Config.debug )
   {
@@ -34640,7 +34773,7 @@ function filesDeleteTerminals( test )
   var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
   test.identical( got, expected );
 
-  //
+  /* */
 
   test.case = 'soft link to directory';
   provider.filesDelete( routinePath );
@@ -34678,7 +34811,7 @@ function filesDeleteTerminals( test )
   // var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
   // test.identical( got, expected );
 
-  //
+  /* */
 
   test.case = 'writing controls delete';
   provider.filesDelete( routinePath );
@@ -34698,7 +34831,7 @@ function filesDeleteTerminals( test )
   var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
   test.identical( got, expected );
 
-  //
+  /* */
 
   test.case = 'broken soft link';
   provider.filesDelete( routinePath );
@@ -34721,7 +34854,7 @@ function filesDeleteTerminals( test )
   var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
   test.identical( got, expected );
 
-  //
+  /* */
 
   if( Config.debug )
   {
@@ -34833,6 +34966,122 @@ filesDeleteLatePerformance.experimental = 1;
 
 //
 
+function filesDeleteEscapedPath( test )
+{
+  let context = this;
+  let a = context.assetFor( test, false );
+
+  /* */
+
+  test.case = 'provider';
+  a.reflect();
+  var srcPath = a.abs( '"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"/File1.txt' );
+  a.fileProvider.fileWrite( srcPath, 'File1.txt' );
+  test.is( a.fileProvider.fileExists( srcPath ) );
+
+  var exp =
+  [
+    '.',
+    './"a1#"',
+    './"a1#"/"a2@"',
+    './"a1#"/"a2@"/"a3!"',
+    './"a1#"/"a2@"/"a3!"/"a4?"',
+    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"',
+    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"',
+    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"',
+    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"',
+    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"/File1.txt'
+  ]
+  var found = a.fileProvider.filesDelete
+  ({
+    filePath : a.abs( '.' ),
+    outputFormat : 'relative',
+    withDirs : 1,
+  });
+  test.identical( found, exp );
+
+  test.is( !a.fileProvider.fileExists( srcPath ) );
+
+  /* */
+
+  test.case = 'system';
+  a.reflect();
+  var srcPath = a.abs( '"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"/File1.txt' );
+  test.is( a.path.isGlobal( a.global( srcPath ) ) );
+  a.system.fileWrite( a.global( srcPath ), 'File1.txt' );
+  test.is( a.system.fileExists( a.global( srcPath ) ) );
+
+  var exp =
+  [
+    '.',
+    './"a1#"',
+    './"a1#"/"a2@"',
+    './"a1#"/"a2@"/"a3!"',
+    './"a1#"/"a2@"/"a3!"/"a4?"',
+    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"',
+    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"',
+    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"',
+    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"',
+    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"/File1.txt'
+  ]
+  var found = a.system.filesDelete
+  ({
+    filePath : a.global( '.' ),
+    outputFormat : 'relative',
+    withDirs : 1,
+  });
+  test.identical( found, exp );
+
+  test.is( !a.system.fileExists( a.global( srcPath ) ) );
+
+  /* */
+
+}
+
+//
+// {
+//   let context = this;
+//   let a = context.assetFor( test, false );
+//
+//   /* */
+//
+//   test.case = 'basic';
+//   a.reflect();
+//   var srcPath = a.abs( '"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"/File1.txt' );
+//   var srcGlobalPath = a.system.path.join( `${a.effectiveProvider.protocol}:///`, srcPath );
+//   test.is( a.path.isGlobal( srcGlobalPath ) );
+//   a.system.fileWrite( srcGlobalPath, 'File1.txt' );
+//   test.is( a.system.fileExists( srcGlobalPath ) );
+//
+//   var exp =
+//   [
+//     '.',
+//     './"a1#"',
+//     './"a1#"/"a2@"',
+//     './"a1#"/"a2@"/"a3!"',
+//     './"a1#"/"a2@"/"a3!"/"a4?"',
+//     './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"',
+//     './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"',
+//     './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"',
+//     './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"',
+//     './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"/File1.txt'
+//   ]
+//   var found = a.system.filesDelete
+//   ({
+//     filePath : a.abs( '.' ),
+//     outputFormat : 'relative',
+//     withDirs : 1,
+//   });
+//   test.identical( found, exp );
+//
+//   test.is( !a.system.fileExists( srcGlobalPath ) );
+//
+//   /* */
+//
+// }
+
+//
+
 function filesDeleteAndAsyncWrite( test )
 {
   let context = this;
@@ -34894,7 +35143,7 @@ function filesFindDifference( test )
   var samples =
   [
 
-    //
+    /* */
 
     {
       name : 'simple1',
@@ -34914,7 +35163,7 @@ function filesFindDifference( test )
       ],
     },
 
-    //
+    /* */
 
     {
       name : 'file-file-same',
@@ -34932,7 +35181,7 @@ function filesFindDifference( test )
       ],
     },
 
-    //
+    /* */
 
     {
       name : 'file-file-different',
@@ -34950,7 +35199,7 @@ function filesFindDifference( test )
       ],
     },
 
-    //
+    /* */
 
     {
       name : 'file-dir',
@@ -34970,7 +35219,7 @@ function filesFindDifference( test )
       ],
     },
 
-    //
+    /* */
 
     {
       name : 'dir-file',
@@ -34990,7 +35239,7 @@ function filesFindDifference( test )
       ],
     },
 
-    //
+    /* */
 
     {
       name : 'not-same',
@@ -35034,7 +35283,7 @@ function filesFindDifference( test )
       ],
     },
 
-    //
+    /* */
 
     {
       name : 'levels-1',
@@ -35067,7 +35316,7 @@ function filesFindDifference( test )
       ],
     },
 
-    //
+    /* */
 
     {
       name : 'same-1',
@@ -35111,7 +35360,7 @@ function filesFindDifference( test )
       ],
     },
 
-    //
+    /* */
 
     {
       name : 'lacking-files-1',
@@ -35153,7 +35402,7 @@ function filesFindDifference( test )
       ],
     },
 
-    //
+    /* */
 
     {
       name : 'lacking-dir-1',
@@ -35198,7 +35447,7 @@ function filesFindDifference( test )
       ],
     },
 
-    //
+    /* */
 
     {
       name : 'dir-to-file-1',
@@ -35246,7 +35495,7 @@ function filesFindDifference( test )
       ],
     },
 
-    //
+    /* */
 
     {
       name : 'file-to-dir-1',
@@ -35302,7 +35551,7 @@ function filesFindDifference( test )
       ],
     },
 
-    //
+    /* */
 
     {
       name : 'not-lacking-but-masked-1',
@@ -35353,7 +35602,7 @@ function filesFindDifference( test )
       ],
     },
 
-    //
+    /* */
 
     {
       name : 'complex-1',
@@ -35397,7 +35646,7 @@ function filesFindDifference( test )
 
     },
 
-    //
+    /* */
 
     {
       name : 'exclude-1',
@@ -35468,7 +35717,7 @@ function filesFindDifference( test )
 
   ];
 
-  //
+  /* */
 
   for( var s = 0 ; s < samples.length ; s++ )
   {
@@ -35577,7 +35826,7 @@ function filesCopyWithAdapter( test )
       ],
     },
 
-    //
+    /* */
 
     {
       name : 'root-exist',
@@ -35603,7 +35852,7 @@ function filesCopyWithAdapter( test )
       ],
     },
 
-    //
+    /* */
 
     {
       name : 'simple-2',
@@ -35631,7 +35880,7 @@ function filesCopyWithAdapter( test )
       ],
     },
 
-    //
+    /* */
 
     {
       name : 'remove-source-1',
@@ -35659,7 +35908,7 @@ function filesCopyWithAdapter( test )
       ],
     },
 
-    //
+    /* */
 
     {
       name : 'remove-source-files-1',
@@ -35919,7 +36168,7 @@ function filesCopyWithAdapter( test )
 
     },
 
-    //
+    /* */
 
     {
       name : 'levels-1',
@@ -36002,7 +36251,7 @@ function filesCopyWithAdapter( test )
       ],
     },
 
-    //
+    /* */
 
     {
       name : 'remove-source-files-2',
@@ -36075,7 +36324,7 @@ function filesCopyWithAdapter( test )
       ],
     },
 
-    //
+    /* */
 
     {
       name : 'remove-source-2',
@@ -36145,7 +36394,7 @@ function filesCopyWithAdapter( test )
       ],
     },
 
-    //
+    /* */
 
     {
 
@@ -36219,7 +36468,7 @@ function filesCopyWithAdapter( test )
 
     },
 
-    //
+    /* */
 
     {
 
@@ -36290,7 +36539,7 @@ function filesCopyWithAdapter( test )
 
     },
 
-    //
+    /* */
 
     // {
 
@@ -36370,7 +36619,7 @@ function filesCopyWithAdapter( test )
 
     // },
 
-    //
+    /* */
 
   //   {
 
@@ -36448,7 +36697,7 @@ function filesCopyWithAdapter( test )
 
   //   },
 
-  //   //
+  //   /* */
 
   //   {
 
@@ -36528,7 +36777,7 @@ function filesCopyWithAdapter( test )
 
   //   },
 
-  //   //
+  //   /* */
 
   //   {
 
@@ -36610,7 +36859,7 @@ function filesCopyWithAdapter( test )
 
   //   },
 
-  //   //
+  //   /* */
 
   //   {
 
@@ -36691,7 +36940,7 @@ function filesCopyWithAdapter( test )
 
   //   },
 
-  //   //
+  //   /* */
 
   //   {
   //     name : 'filtered-out-dst-empty-1',
@@ -36714,7 +36963,7 @@ function filesCopyWithAdapter( test )
   //     ],
   //   },
 
-  //   //
+  //   /* */
 
   //   {
   //     name : 'filtered-out-dst-filled-1',
@@ -36741,7 +36990,7 @@ function filesCopyWithAdapter( test )
   //     ],
   //   },
 
-  //   //
+  //   /* */
 
   //   {
   //     name : 'filtered-out-dst-filled-1',
@@ -36769,7 +37018,7 @@ function filesCopyWithAdapter( test )
   //     ],
   //   },
 
-  //   //
+  //   /* */
 
   //   {
   //     name : 'exclude-1',
@@ -36820,7 +37069,7 @@ function filesCopyWithAdapter( test )
 
   //   },
 
-  //   //
+  //   /* */
 
   //   {
   //     name : 'exclude-2',
@@ -36868,7 +37117,7 @@ function filesCopyWithAdapter( test )
 
   //   },
 
-  //   //
+  //   /* */
 
   //   {
   //     name : 'softLink-1',
@@ -37111,7 +37360,7 @@ function filesCopyWithAdapter( test )
 
   ];
 
-  //
+  /* */
 
   for( var s = 0 ; s < samples.length ; s++ )
   {
@@ -37340,6 +37589,9 @@ var Self =
     system : null,
     suiteTempPath : null,
 
+    providerMake : null,
+
+    assetFor,
     softLinkIsSupported,
     makeStandardExtract,
 
@@ -37363,6 +37615,7 @@ var Self =
     /* qqq : implement filesFindTextLinksExtract */
     /* qqq : implement filesFindTextLinksLoopsExtract */
     filesFindResolving,
+    filesFindEscapedPath,
     filesFindGlob,
     filesFindOn,
     filesFindBaseFromGlob,
@@ -37383,7 +37636,6 @@ var Self =
     filesFindTotalNegative,
     /* qqq : implement filesFindTotalNegative, */
     /* qqq : implement filesFindSeveralTotalNegative, */
-
     filesFindGroups,
 
     filesReflectEvaluate,
@@ -37422,6 +37674,7 @@ var Self =
     filesDeleteTerminals,
     filesDeleteLate,
     filesDeleteLatePerformance,
+    filesDeleteEscapedPath,
 
     // filesDeleteAndAsyncWrite,
     // filesFindDifference,

@@ -1488,7 +1488,6 @@ function filesFind( test )
   {
     test.identical( onDownMap[ r.absolute ], undefined )
     onDownMap[ r.absolute ] = 1;
-    // return r;
   }
 
   var got = provider.filesFind
@@ -1946,8 +1945,6 @@ function filesFind( test )
   }
 
 }
-
-filesFind.timeOut = 60000;
 
 //
 

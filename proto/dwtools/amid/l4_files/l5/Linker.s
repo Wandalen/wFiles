@@ -1205,7 +1205,6 @@ function functor( fop )
       try
       {
 
-        debugger;
         if( self.fileExists( o2.dstPath ) )
         {
           c.verifyDst()

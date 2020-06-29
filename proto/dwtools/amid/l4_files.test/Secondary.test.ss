@@ -1,4 +1,4 @@
-( function _File_etc_test_ss_( ) {
+( function _Secondary_test_ss_( ) {
 
 'use strict';
 
@@ -3462,7 +3462,7 @@ function filesAreUpToDate2( test )
 var Self =
 {
 
-  name : 'Tools.mid.files.Other',
+  name : 'Tools.mid.files.Secondary.ss',
   silencing : 1,
   enabled : 1,
 

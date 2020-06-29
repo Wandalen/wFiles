@@ -1,4 +1,4 @@
-( function _Files_read_test_s_( ) {
+( function _Secondary_test_s_( ) {
 
 'use strict';
 
@@ -721,7 +721,7 @@ function configRead( test )
 var Self =
 {
 
-  name : 'Tools.mid.files.FilesRead',
+  name : 'Tools.mid.files.Secondary.s',
   silencing : 1,
   // verbosity : 7,
 

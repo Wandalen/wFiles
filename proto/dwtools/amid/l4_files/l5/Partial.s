@@ -3494,6 +3494,9 @@ function hashSzIsUpToDate_body( o )
     return null;
     if( stat.size !== parsed[ 0 ] )
     return false;
+    if( o.data !== null )
+    return _.files.hashFrom( o.data );
+    else
     return self.hashRead( _.mapOnly( o, self.hashRead.defaults ) );
   })
   .then( ( hash ) =>
@@ -3514,6 +3517,7 @@ _.routineExtend( hashSzIsUpToDate_body, hashRead.body );
 
 var defaults = hashSzIsUpToDate_body.defaults;
 defaults.hash = null;
+defaults.data = null;
 let hashSzIsUpToDate = _.routineFromPreAndBody( hashSzIsUpToDate_pre, hashSzIsUpToDate_body );
 hashSzIsUpToDate.having.aspect = 'entry';
 

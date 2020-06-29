@@ -563,9 +563,30 @@ function globalFromPreferredAct( localPath )
   _.assert( !self.protocols.length || _.strIs( self.originPath ) );
 
   if( self.originPath )
-  return path.join( self.originPath, localPath );
+  {
+    if( path.parse )
+    return path.join( self.originPath, localPath );
+    else if( _.uri )
+    return _.uri.join( self.originPath, localPath );
+    else
+    return self.originPath + localPath;
+  }
   else
-  return localPath;
+  {
+    return localPath;
+  }
+
+  // if( self.originPath && path.parse )
+  // return path.join( self.originPath, localPath );
+  // else if( self.originPath )
+  // return self.originPath + localPath;
+  // else
+  // return localPath;
+
+  // if( self.originPath )
+  // return path.join( self.originPath, localPath );
+  // else
+  // return localPath;
 }
 
 //

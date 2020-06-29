@@ -42213,6 +42213,7 @@ function localsFromGlobals( test )
 function globalsFromLocals( test )
 {
   let context = this;
+  // let a = context.assetFor( test, false ); xxx
   let srcProvider = context.providerEffective || context.provider;
   let provider = new srcProvider.constructor({ protocol : 'global' });
 

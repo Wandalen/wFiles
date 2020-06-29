@@ -1,0 +1,178 @@
+= hardlink cases
+test groups:
+ - dst does not exist && directory does not exist
+ - dst does not exist && directory exists
+ - dst exists, is not hard linked
+ - dst exists, is hard linked
+ - src === dist
+
+cases:
+ - rewriting : 1
+ - rewriting : 0
+
+ - rewritingDirs : 1
+ - rewritingDirs : 0
+
+ - makingDirectory : 1
+ - makingDirectory : 0
+
+ - breakingSrcHardLink : 0, breakingDstHardLink : 1
+ - breakingSrcHardLink : 1, breakingDstHardLink : 0
+ - breakingSrcHardLink : 1, breakingDstHardLink : 1
+
+total : 120
+
+/* hardlink shorten cases  */
+
+// dst does not exist && directory does not exist -> 8
+ - rewriting : 1
+ - rewriting : 0
+
+ - rewritingDirs : 1
+ - rewritingDirs : 0
+
+ - makingDirectory : 1
+
+ - breakingSrcHardLink : 0, breakingDstHardLink : 1
+ - breakingSrcHardLink : 1, breakingDstHardLink : 0
+ - breakingSrcHardLink : 1, breakingDstHardLink : 1
+
+// dst does not exist && directory exists -> 8
+ - rewriting : 1
+ - rewriting : 0
+
+ - rewritingDirs : 1
+ - rewritingDirs : 0
+
+ - makingDirectory : 1
+
+ - breakingSrcHardLink : 0, breakingDstHardLink : 1
+ - breakingSrcHardLink : 1, breakingDstHardLink : 0
+ - breakingSrcHardLink : 1, breakingDstHardLink : 1
+
+// dst exists, is not hard linked -> 6
+ - rewriting : 1
+
+ - rewritingDirs : 1
+
+ - makingDirectory : 1
+
+ - breakingSrcHardLink : 0, breakingDstHardLink : 1
+ - breakingSrcHardLink : 1, breakingDstHardLink : 0
+ - breakingSrcHardLink : 1, breakingDstHardLink : 1
+
+// dst exists, is hard linked -> 6
+ - rewriting : 1
+
+ - rewritingDirs : 1
+
+ - makingDirectory : 1
+
+ - breakingSrcHardLink : 0, breakingDstHardLink : 1
+ - breakingSrcHardLink : 1, breakingDstHardLink : 0
+ - breakingSrcHardLink : 1, breakingDstHardLink : 1
+
+// src === dist -> 8
+ - rewriting : 1
+ - rewriting : 0
+
+ - rewritingDirs : 1
+ - rewritingDirs : 0
+
+ - makingDirectory : 1
+
+ - breakingSrcHardLink : 0, breakingDstHardLink : 1
+ - breakingSrcHardLink : 1, breakingDstHardLink : 0
+ - breakingSrcHardLink : 1, breakingDstHardLink : 1
+
+total : 36
+
+/* */
+
+= softlink cases
+test groups:
+ - dst does not exist && directory does not exist
+ - dst does not exist && directory exists
+ - dst exists, is not soft linked
+ - dst exists, is soft linked
+ - src === dist
+
+cases:
+ - rewriting : 1
+ - rewriting : 0
+
+ - rewritingDirs : 1
+ - rewritingDirs : 0
+
+ - makingDirectory : 1
+ - makingDirectory : 0
+
+total : 40
+
+/* */
+
+= textlink cases
+test groups:
+ - dst does not exist && directory does not exist
+ - dst does not exist && directory exists
+ - dst exists, is not soft linked
+ - dst exists, is soft linked
+ - src === dist
+
+cases:
+ - rewriting : 1
+ - rewriting : 0
+
+ - rewritingDirs : 1
+ - rewritingDirs : 0
+
+ - makingDirectory : 1
+ - makingDirectory : 0
+
+
+total: 40
+
+/* */
+
+= fileRename cases
+test groups:
+ - dst does not exist && directory does not exist
+ - dst does not exist && directory exists
+ - dst exists
+ - src === dist
+
+cases:
+ - rewriting : 1
+ - rewriting : 0
+
+ - rewritingDirs : 1
+ - rewritingDirs : 0
+
+ - makingDirectory : 1
+ - makingDirectory : 0
+
+ - onlyMoving : 1
+ - onlyMoving : 0
+
+total : 64
+
+/* */
+
+= fileCopy cases
+test groups:
+ - dst does not exist && directory does not exist
+ - dst does not exist && directory exists
+ - dst exists
+ - src === dst
+
+cases:
+ - rewriting : 1
+ - rewriting : 0
+
+ - rewritingDirs : 1
+ - rewritingDirs : 0
+
+ - makingDirectory : 1
+ - makingDirectory : 0
+
+total : 64

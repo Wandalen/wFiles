@@ -345,11 +345,15 @@ function pathDirTempOpen( o )
     count[ result ].push( o.filePath );
 
     cache[ o.filePath ] = result;
-    
+
     if( !o.returnResolved )
     return result;
-    
-    result = self.fileProvider.pathResolveLinkFull({ filePath : result, resolvingSoftLink : 1 });
+
+    result = self.fileProvider.pathResolveLinkFull
+    ({
+      filePath : result,
+      resolvingSoftLink : 1
+    });
     return result.absolutePath;
   }
 }
@@ -358,7 +362,7 @@ pathDirTempOpen.defaults =
 {
   filePath : null,
   name : null,
-  returnResolved : 0,
+  returnResolved : 1,
   auto : 1
 }
 

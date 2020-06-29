@@ -160,7 +160,7 @@ function filesReflectTrivial( test )
   {
     test.case = 'tag, no trailing /';
     providerDst.filesDelete( localPath );
-    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git/@master';
+    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git/!master';
     return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }});
   })
   .then( ( got ) =>
@@ -224,7 +224,7 @@ function filesReflectTrivial( test )
   {
     test.case = 'reflect twice in a row';
     providerDst.filesDelete( localPath );
-    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git/@master';
+    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git/!master';
     let o = { reflectMap : { [ remotePath ] : clonePathGlobal }};
 
     let ready = new _.Consequence().take( null );
@@ -269,7 +269,7 @@ function filesReflectTrivial( test )
   {
     test.case = 'reflect twice in a row, fetching off';
     providerDst.filesDelete( localPath );
-    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git/@master';
+    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git/!master';
     let o =
     {
       reflectMap : { [ remotePath ] : clonePathGlobal },
@@ -582,7 +582,7 @@ function filesReflectTrivial( test )
     test.case = 'local has changes, checkout throws an error';
     providerDst.filesDelete( localPath );
     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git';
-    let remotePathUnknownHash = 'git+https:///github.com/Wandalen/wPathBasic.git/@other';
+    let remotePathUnknownHash = 'git+https:///github.com/Wandalen/wPathBasic.git/!other';
 
     let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
 
@@ -638,7 +638,7 @@ function filesReflectTrivial( test )
     test.case = 'no local changes, checkout throws an error';
     providerDst.filesDelete( localPath );
     let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git';
-    let remotePathUnknownHash = 'git+https:///github.com/Wandalen/wPathBasic.git/@other';
+    let remotePathUnknownHash = 'git+https:///github.com/Wandalen/wPathBasic.git/!other';
 
     let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
 
@@ -754,7 +754,7 @@ function filesReflectTrivial( test )
   })
   .then( () =>
   {
-    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git/@master2';
+    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git/!master2';
     let con = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }});
     return test.shouldThrowErrorAsync( con );
   })
@@ -871,7 +871,7 @@ function filesReflectDownloadThrowing( test )
   {
     test.case = 'not existing branch';
     providerDst.filesDelete( localPath );
-    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git/@somebranch';
+    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git/!somebranch';
 
     let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
     return test.shouldThrowErrorAsync( ready )
@@ -886,7 +886,7 @@ function filesReflectDownloadThrowing( test )
   {
     test.case = 'not existing tag';
     providerDst.filesDelete( localPath );
-    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git/@v0.0.0';
+    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git/!v0.0.0';
 
     let ready = system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
     return test.shouldThrowErrorAsync( ready )
@@ -1019,7 +1019,7 @@ function filesReflectDownloadThrowing( test )
   {
     test.case = 'hash and tag in same time';
     providerDst.filesDelete( localPath );
-    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git/#63b39b105817e80e4a3810febd8b09ffe7cd6ad1@master';
+    let remotePath = 'git+https:///github.com/Wandalen/wPathBasic.git/#63b39b105817e80e4a3810febd8b09ffe7cd6ad1!master';
     test.shouldThrowErrorSync( () =>
     {
       system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
@@ -1108,7 +1108,7 @@ function filesReflectEol( test )
      global config should not be modified
     `
     providerDst.filesDelete( localPath );
-    let remotePath = 'git+hd://' + repoPath + '/@secondbranch';
+    let remotePath = 'git+hd://' + repoPath + '/!secondbranch';
 
     let autocrlfGlobalOriginal = gitConfigGlobalRead( 'core.autocrlf' );
 
@@ -1146,7 +1146,7 @@ function filesReflectEol( test )
     `
     providerDst.filesDelete( localPath );
     let remotePath = 'git+hd://' + repoPath;
-    let remotePath2 = 'git+hd://' + repoPath + '/@secondbranch';
+    let remotePath2 = 'git+hd://' + repoPath + '/!secondbranch';
 
     let autocrlfGlobalOriginal = gitConfigGlobalRead( 'core.autocrlf' );
 

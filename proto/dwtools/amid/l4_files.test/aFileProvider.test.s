@@ -49841,7 +49841,7 @@ function hardLinkReturnSync( test )
  - breakingSrcHardLink : 1, breakingDstHardLink : 0
  - breakingSrcHardLink : 1, breakingDstHardLink : 1
 
-// src === dist -> 8
+// src === dst -> 8
  - rewriting : 1
  - rewriting : 0
 
@@ -50245,7 +50245,7 @@ total : 36
 
   /* */
 
-  test.open( 'src === dist' );
+  test.open( 'src === dst' );
 
   test.case = 'rewriting : 1';
   a.reflect();
@@ -50337,7 +50337,7 @@ total : 36
   test.identical( got, true );
   test.identical( a.fileProvider.filesAreHardLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), true );
 
-  test.close( 'src === dist' );
+  test.close( 'src === dst' );
 }
 
 //
@@ -50355,7 +50355,7 @@ function hardLinkReturnThrowing0Sync( test )
   ({
     dstPath : a.abs( 'dst' ),
     srcPath : a.abs( 'src' ),
-    throwing : 1,
+    throwing : 0,
     rewriting: 0,
   });
   test.identical( got, true );

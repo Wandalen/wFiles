@@ -131,6 +131,15 @@ total : 40
   - makingDirectory : 1
   - makingDirectory : 0
 
+// dst exists, is not hard linked -> 5
+ - rewriting : 1
+
+ - rewritingDirs : 1
+ - rewritingDirs : 0
+
+ - makingDirectory : 1
+ - makingDirectory : 0
+
 /* */
 
 = textlink cases

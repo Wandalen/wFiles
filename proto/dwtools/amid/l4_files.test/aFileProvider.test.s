@@ -50421,7 +50421,7 @@ function softLinkReturnSync( test )
     test.case = 'rewriting : 1';
     a.reflect();
     a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-    var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dst' ), srcPath : a.abs( 'src' ), rewriting : 1 });
+    var got = a.fileProvider.softLink({ dstPath : a.abs( 'dst' ), srcPath : a.abs( 'src' ), rewriting : 1 });
     test.identical( got, true );
     test.identical( a.fileProvider.filesAreHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), true );
 
@@ -50525,6 +50525,38 @@ function softLinkReturnSync( test )
     test.identical( a.fileProvider.filesAreHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'src' ) ), true );
   }
   test.close( 'dst does not exist && directory exists' );
+
+  // test.open( 'dst exists, is not soft linked' );
+  // {
+    // test.case = 'rewriting : 1';
+    // a.reflect();
+    // a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+    // a.fileProvider.fileWrite( a.abs( 'dir1/dst' ), 'some text' );
+    // var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), rewriting : 1 });
+    // test.identical( got, true );
+    // test.identical( a.fileProvider.filesAreHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
+
+    //
+
+    // test.case = 'rewritingDirs : 1';
+    // a.reflect();
+    // a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+    // a.fileProvider.fileWrite( a.abs( 'dir1/dst' ), 'some text' );
+    // var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), rewritingDirs : 1 });
+    // test.identical( got, true );
+    // test.identical( a.fileProvider.filesAreHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
+
+    //
+
+    // test.case = 'makingDirectory : 1';
+    // a.reflect();
+    // a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+    // a.fileProvider.fileWrite( a.abs( 'dir1/dst' ), 'some text' );
+    // var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), makingDirectory : 1 });
+    // test.identical( got, true );
+    // test.identical( a.fileProvider.filesAreHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
+  // }
+  // test.close( 'dst exists, is not hard linked' );
 }
 
 // --

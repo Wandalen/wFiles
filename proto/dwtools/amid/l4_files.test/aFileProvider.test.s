@@ -49914,6 +49914,7 @@ total : 36
     test.case = 'rewritingDirs : 1';
     a.reflect();
     a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+    a.fileProvider.dirMake( '/dir1/dir2/dst' );
     var got = a.fileProvider.hardLink({ dstPath : a.abs( '/dir1/dir2/dst' ), srcPath : a.abs( 'src' ), rewritingDirs : 1 });
     test.identical( got, true );
     test.identical( a.fileProvider.filesAreHardLinked( a.abs( '/dir1/dir2/dst' ), a.abs( 'src' ) ), true );
@@ -50010,10 +50011,11 @@ total : 36
     test.case = 'rewritingDirs : 1';
     a.reflect();
     a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-    a.fileProvider.fileWrite( a.abs( 'dir1/test' ), 'some text' );
-    var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), rewritingDirs : 1 });
+    a.fileProvider.fileWrite( a.abs( '/dir1/test' ), 'some text' );
+    a.fileProvider.dirMake( '/dir1/dst' );
+    var got = a.fileProvider.hardLink({ dstPath : a.abs( '/dir1/dst' ), srcPath : a.abs( 'src' ), rewritingDirs : 1 });
     test.identical( got, true );
-    test.identical( a.fileProvider.filesAreHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
+    test.identical( a.fileProvider.filesAreHardLinked( a.abs( '/dir1/dst' ), a.abs( 'src' ) ), true );
 
     //
 
@@ -50102,10 +50104,11 @@ total : 36
     test.case = 'rewritingDirs : 1';
     a.reflect();
     a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-    a.fileProvider.fileWrite( a.abs( 'dir1/dst' ), 'some text' );
-    var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), rewritingDirs : 1 });
+    a.fileProvider.fileWrite( a.abs( '/dir1/dst' ), 'some text' );
+    a.fileProvider.dirMake( '/dir1/dst' );
+    var got = a.fileProvider.hardLink({ dstPath : a.abs( '/dir1/dst' ), srcPath : a.abs( 'src' ), rewritingDirs : 1 });
     test.identical( got, true );
-    test.identical( a.fileProvider.filesAreHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
+    test.identical( a.fileProvider.filesAreHardLinked( a.abs( '/dir1/dst' ), a.abs( 'src' ) ), true );
 
     //
 
@@ -50185,11 +50188,12 @@ total : 36
     test.case = 'rewritingDirs : 1';
     a.reflect();
     a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-    a.fileProvider.fileWrite( a.abs( 'dir1/dst' ), 'some text' );
-    a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), rewritingDirs : 1 });
-    var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), rewritingDirs : 1 });
+    a.fileProvider.fileWrite( a.abs( '/dir1/dst' ), 'some text' );
+    a.fileProvider.dirMake( '/dir1/dst' );
+    a.fileProvider.hardLink({ dstPath : a.abs( '/dir1/dst' ), srcPath : a.abs( 'src' ), rewritingDirs : 1 });
+    var got = a.fileProvider.hardLink({ dstPath : a.abs( '/dir1/dst' ), srcPath : a.abs( 'src' ), rewritingDirs : 1 });
     test.identical( got, false );
-    test.identical( a.fileProvider.filesAreHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
+    test.identical( a.fileProvider.filesAreHardLinked( a.abs( '/dir1/dst' ), a.abs( 'src' ) ), true );
 
     //
 
@@ -50297,10 +50301,10 @@ total : 36
 
     test.case = 'rewritingDirs : 1';
     a.reflect();
-    a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
-    var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/src' ), srcPath : a.abs( 'dir1/src' ), rewritingDirs : 1 });
+    a.fileProvider.dirMake( '/dir1/src' );
+    var got = a.fileProvider.hardLink({ dstPath : a.abs( '/dir1/src' ), srcPath : a.abs( '/dir1/src' ), rewritingDirs : 1 });
     test.identical( got, true );
-    test.identical( a.fileProvider.filesAreHardLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), true );
+    test.identical( a.fileProvider.filesAreHardLinked( a.abs( '/dir1/src' ), a.abs( '/dir1/src' ) ), true );
 
     //
 

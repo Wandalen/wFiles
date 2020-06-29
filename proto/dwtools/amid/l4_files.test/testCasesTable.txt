@@ -107,13 +107,7 @@ cases:
  - makingDirectory : 1
  - makingDirectory : 0
 
- - resolvingSrcSoftLink : 1
- - resolvingSrcSoftLink : 0
-
- - resolvingDstSoftLink : 1
- - resolvingDstSoftLink : 0
-
-total : 160
+total : 40
 
 /* */
 
@@ -135,13 +129,8 @@ cases:
  - makingDirectory : 1
  - makingDirectory : 0
 
- - resolvingSrcTextLink: 1
- - resolvingSrcTextLink: 0
 
- - resolvingDstTextLink: 1
- - resolvingDstTextLink: 0
-
-total: 160
+total: 40
 
 /* */
 
@@ -165,22 +154,7 @@ cases:
  - onlyMoving : 1
  - onlyMoving : 0
 
- - resolvingSrcSoftLink : 1
- - resolvingSrcSoftLink : 0
-
- - resolvingSrcTextLink : 1
- - resolvingSrcTextLink : 0
-
- - resolvingDstSoftLink : 1
- - resolvingDstSoftLink : 0
-
- - resolvingDstTextLink : 1
- - resolvingDstTextLink : 0
-
- - breakingDstHardLink : 1
- - breakingDstHardLink : 0
-
-total :
+total : 64
 
 /* */
 
@@ -201,19 +175,4 @@ cases:
  - makingDirectory : 1
  - makingDirectory : 0
 
- - resolvingSrcSoftLink : 1
- - resolvingSrcSoftLink : 0
-
- - resolvingSrcTextLink : 1
- - resolvingSrcTextLink : 0
-
- - resolvingDstSoftLink : 1
- - resolvingDstSoftLink : 0
-
- - resolvingDstTextLink : 1
- - resolvingDstTextLink : 0
-
- - breakingDstHardLink : 1
- - breakingDstHardLink : 0
-
-total :
+total : 64

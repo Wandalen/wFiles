@@ -15617,7 +15617,7 @@ function fileDeleteLocked( test )
 
 //
 
-function fileDeleteFileWithSpecialSymbols( test )
+function fileDeletePathEscaped( test )
 {
   let context = this;
   let provider = context.provider;
@@ -15632,7 +15632,7 @@ function fileDeleteFileWithSpecialSymbols( test )
 
   let isHd = test.context.providerIsInstanceOf( _.FileProvider.HardDrive );
 
-  var routinePath = test.context.pathFor( 'written/fileDeleteFileWithSpecialSymbols' );
+  var routinePath = test.context.pathFor( 'written/fileDeletePathEscaped' );
   if( !provider.statResolvedRead( routinePath ) )
   provider.dirMake( routinePath );
 
@@ -49973,7 +49973,7 @@ total : 36
     a.reflect();
     a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
     var got = a.fileProvider.hardLink
-    ({ 
+    ({
       dstPath : a.abs( 'dst' ),
       srcPath : a.abs( 'src' ),
       breakingSrcHardLink : 0,
@@ -49988,7 +49988,7 @@ total : 36
     a.reflect();
     a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
     var got = a.fileProvider.hardLink
-    ({ 
+    ({
       dstPath : a.abs( 'dst' ),
       srcPath : a.abs( 'src' ),
       breakingSrcHardLink : 1,
@@ -50003,7 +50003,7 @@ total : 36
     a.reflect();
     a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
     var got = a.fileProvider.hardLink
-    ({ 
+    ({
       dstPath : a.abs( 'dst' ),
       srcPath : a.abs( 'src' ),
       breakingSrcHardLink : 1,
@@ -50074,7 +50074,7 @@ total : 36
     a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
     a.fileProvider.fileWrite( a.abs( 'dir1/test' ), 'some text' );
     var got = a.fileProvider.hardLink
-    ({ 
+    ({
       dstPath : a.abs( 'dir1/dst' ),
       srcPath : a.abs( 'src' ),
       breakingSrcHardLink : 0,
@@ -50090,7 +50090,7 @@ total : 36
     a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
     a.fileProvider.fileWrite( a.abs( 'dir1/test' ), 'some text' );
     var got = a.fileProvider.hardLink
-    ({ 
+    ({
       dstPath : a.abs( 'dir1/dst' ),
       srcPath : a.abs( 'src' ),
       breakingSrcHardLink : 1,
@@ -50106,7 +50106,7 @@ total : 36
     a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
     a.fileProvider.fileWrite( a.abs( 'dir1/test' ), 'some text' );
     var got = a.fileProvider.hardLink
-    ({ 
+    ({
       dstPath : a.abs( 'dir1/dst' ),
       srcPath : a.abs( 'src' ),
       breakingSrcHardLink : 1,
@@ -50157,7 +50157,7 @@ total : 36
     a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
     a.fileProvider.fileWrite( a.abs( 'dir1/dst' ), 'some text' );
     var got = a.fileProvider.hardLink
-    ({ 
+    ({
       dstPath : a.abs( 'dir1/dst' ),
       srcPath : a.abs( 'src' ),
       breakingSrcHardLink : 0,
@@ -50173,7 +50173,7 @@ total : 36
     a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
     a.fileProvider.fileWrite( a.abs( 'dir1/dst' ), 'some text' );
     var got = a.fileProvider.hardLink
-    ({ 
+    ({
       dstPath : a.abs( 'dir1/dst' ),
       srcPath : a.abs( 'src' ),
       breakingSrcHardLink : 1,
@@ -50189,7 +50189,7 @@ total : 36
     a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
     a.fileProvider.fileWrite( a.abs( 'dir1/dst' ), 'some text' );
     var got = a.fileProvider.hardLink
-    ({ 
+    ({
       dstPath : a.abs( 'dir1/dst' ),
       srcPath : a.abs( 'src' ),
       breakingSrcHardLink : 1,
@@ -50243,14 +50243,14 @@ total : 36
     a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
     a.fileProvider.fileWrite( a.abs( 'dir1/dst' ), 'some text' );
     a.fileProvider.hardLink
-    ({ 
+    ({
       dstPath : a.abs( 'dir1/dst' ),
       srcPath : a.abs( 'src' ),
       breakingSrcHardLink : 0,
       breakingDstHardLink : 1
     });
     var got = a.fileProvider.hardLink
-    ({ 
+    ({
       dstPath : a.abs( 'dir1/dst' ),
       srcPath : a.abs( 'src' ),
       breakingSrcHardLink : 0,
@@ -50266,14 +50266,14 @@ total : 36
     a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
     a.fileProvider.fileWrite( a.abs( 'dir1/dst' ), 'some text' );
     a.fileProvider.hardLink
-    ({ 
+    ({
       dstPath : a.abs( 'dir1/dst' ),
       srcPath : a.abs( 'src' ),
       breakingSrcHardLink : 1,
       breakingDstHardLink : 0
     });
     var got = a.fileProvider.hardLink
-    ({ 
+    ({
       dstPath : a.abs( 'dir1/dst' ),
       srcPath : a.abs( 'src' ),
       breakingSrcHardLink : 1,
@@ -50289,14 +50289,14 @@ total : 36
     a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
     a.fileProvider.fileWrite( a.abs( 'dir1/dst' ), 'some text' );
     a.fileProvider.hardLink
-    ({ 
+    ({
       dstPath : a.abs( 'dir1/dst' ),
       srcPath : a.abs( 'src' ),
       breakingSrcHardLink : 1,
       breakingDstHardLink : 1
     });
     var got = a.fileProvider.hardLink
-    ({ 
+    ({
       dstPath : a.abs( 'dir1/dst' ),
       srcPath : a.abs( 'src' ),
       breakingSrcHardLink : 1,
@@ -50360,7 +50360,7 @@ total : 36
     a.reflect();
     a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
     var got = a.fileProvider.hardLink
-    ({ 
+    ({
       dstPath : a.abs( 'dir1/src' ),
       srcPath : a.abs( 'dir1/src' ),
       breakingSrcHardLink : 0,
@@ -50376,7 +50376,7 @@ total : 36
     a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
     a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
     var got = a.fileProvider.hardLink
-    ({ 
+    ({
       dstPath : a.abs( 'dir1/src' ),
       srcPath : a.abs( 'dir1/src' ),
       breakingSrcHardLink : 1,
@@ -50392,7 +50392,7 @@ total : 36
     a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
     a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
     var got = a.fileProvider.hardLink
-    ({ 
+    ({
       dstPath : a.abs( 'dir1/src' ),
       srcPath : a.abs( 'dir1/src' ),
       breakingSrcHardLink : 1,
@@ -50563,7 +50563,7 @@ var Self =
     fileDeleteActSync,
     fileDeleteAsync,
     // fileDeleteLocked
-    fileDeleteFileWithSpecialSymbols,
+    fileDeletePathEscaped,
     fileDeletePerfomance,
 
     fileLockWaitingSharingSync,

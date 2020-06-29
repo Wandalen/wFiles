@@ -15628,10 +15628,15 @@ function fileDeletePathEscaped( test )
     test.identical( 1,1 );
     return;
   }
+  
+  let isSystem = provider instanceof _.FileProvider.System;
 
   var routinePath = test.context.pathFor( 'written/fileDeletePathEscaped' );
+  var routinePathLocal = providerEffective.path.preferredFromGlobal( routinePath )
   if( !provider.statResolvedRead( routinePath ) )
   provider.dirMake( routinePath );
+  
+  /* */
 
   test.case = 'filename contains @, global path'
   var filePath = provider.path.join( routinePath, '@file' );
@@ -15647,6 +15652,8 @@ function fileDeletePathEscaped( test )
     provider.fileDelete( filePath );
   }
   test.is( !provider.fileExists( filePath ) );
+  
+  /* */
 
   test.case = 'filename contains @, local path'
   var filePath = provider.path.join( routinePath, '@file' );
@@ -15663,24 +15670,28 @@ function fileDeletePathEscaped( test )
   }
   test.is( !provider.fileExists( filePath ) );
   
+  /* */
+  
   test.case = 'filename contains #, global path'
-  var filePath = provider.path.join( routinePath, '#file' );
-  var localPath = providerEffective.path.preferredFromGlobal( filePath );
+  var filePath = provider.path.join( routinePath, isSystem ? '"#file"' : '#file' );
+  var localPath = providerEffective.path.join( routinePathLocal, '#file' );
   if( !providerEffective.pathAllowedAct( localPath ) )
-  test.shouldThrowErrorSync( () =>
   {
     provider.fileWrite( filePath, filePath );
-  })
+  }
   else
   {
     provider.fileWrite( filePath, filePath );
     provider.fileDelete( filePath );
   }
+ 
   test.is( !provider.fileExists( filePath ) );
+  
+  /* */
 
   test.case = 'filename contains #, local path'
-  var filePath = provider.path.join( routinePath, '#file' );
-  var localPath = providerEffective.path.preferredFromGlobal( filePath );
+  var filePath = provider.path.join( routinePath, isSystem ? '"#file"' : '#file' );
+  var localPath = providerEffective.path.join( routinePathLocal, '#file' );
   if( !providerEffective.pathAllowedAct( localPath ) )
   test.shouldThrowErrorSync( () =>
   {
@@ -15692,10 +15703,12 @@ function fileDeletePathEscaped( test )
     provider.fileDelete( providerEffective.path.preferredFromGlobal( filePath ) );
   }
   test.is( !provider.fileExists( filePath ) );
-
+  
+  /* */
+  
   test.case = 'filename contains ?, global path'
-  var filePath = provider.path.join( routinePath, '?file=a' );
-  var localPath = providerEffective.path.preferredFromGlobal( filePath );
+  var filePath = provider.path.join( routinePath, isSystem ? '"?file=a"' : '?file=a' );
+  var localPath = providerEffective.path.join( routinePathLocal, '?file=a' );
   if( !providerEffective.pathAllowedAct( localPath ) )
   test.shouldThrowErrorSync( () =>
   {
@@ -15707,10 +15720,12 @@ function fileDeletePathEscaped( test )
     provider.fileDelete( filePath );
   }
   test.is( !provider.fileExists( filePath ) );
-
+  
+  /* */
+  
   test.case = 'filename contains ?, local path'
-  var filePath = provider.path.join( routinePath, '?file=a' );
-  var localPath = providerEffective.path.preferredFromGlobal( filePath );
+  var filePath = provider.path.join( routinePath, isSystem ? '"?file=a"' : '?file=a' );
+  var localPath = providerEffective.path.join( routinePathLocal, '?file=a' );
   if( !providerEffective.pathAllowedAct( localPath ) )
   test.shouldThrowErrorSync( () =>
   {

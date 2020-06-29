@@ -228,7 +228,7 @@ function providerForPath( url )
   url = path.parse( url );
 
   _.assert( _.mapIs( url ) );
-  _.assert( ( url.protocols.length ) ? _.routineIs( url.protocols[ 0 ].toLowerCase ) : true );
+  _.assert( ( url.protocols && url.protocols.length ) ? _.routineIs( url.protocols[ 0 ].toLowerCase ) : true );
   _.assert( arguments.length === 1, 'Expects single argument' );
 
   /* */

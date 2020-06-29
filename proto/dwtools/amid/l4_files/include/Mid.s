@@ -29,6 +29,7 @@ if( typeof module !== 'undefined' )
 
   require( '../l4/Abstract.s' );
 
+  require( '../l5/Linker.s' );
   require( '../l5/Partial.s' );
   require( '../l6/System.s' );
   require( './Find.s' )

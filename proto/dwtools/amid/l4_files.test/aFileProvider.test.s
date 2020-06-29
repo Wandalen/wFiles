@@ -15612,7 +15612,6 @@ function fileDeleteLocked( test )
     test.is( !provider.fileExists( terminalPath ) );
   })
 
-
 }
 
 //

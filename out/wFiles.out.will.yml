@@ -230,6 +230,7 @@ module:
           - ../proto/dwtools/amid/l4_files/l4/Carriage.s
           - ../proto/dwtools/amid/l4_files/l4/Carrier.s
           - ../proto/dwtools/amid/l4_files/l5
+          - ../proto/dwtools/amid/l4_files/l5/Linker.s
           - ../proto/dwtools/amid/l4_files/l5/Partial.s
           - ../proto/dwtools/amid/l4_files/l6
           - ../proto/dwtools/amid/l4_files/l6/FindMixin.s
@@ -256,19 +257,20 @@ module:
           - ../proto/dwtools/amid/l4_files.test/aFilesFind.test.s
           - ../proto/dwtools/amid/l4_files.test/Extract.html
           - ../proto/dwtools/amid/l4_files.test/Extract.test.s
-          - ../proto/dwtools/amid/l4_files.test/Files.etc.test.ss
           - ../proto/dwtools/amid/l4_files.test/FilesFind.Extract.test.s
           - ../proto/dwtools/amid/l4_files.test/FilesFind.HardDrive.test.ss
           - ../proto/dwtools/amid/l4_files.test/FilesGraph.test.s
-          - ../proto/dwtools/amid/l4_files.test/FilesRead.test.s
           - ../proto/dwtools/amid/l4_files.test/Git.test.ss
           - ../proto/dwtools/amid/l4_files.test/HardDrive.test.ss
           - ../proto/dwtools/amid/l4_files.test/Npm.test.ss
           - ../proto/dwtools/amid/l4_files.test/Path.test.ss
           - ../proto/dwtools/amid/l4_files.test/Record.test.s
           - ../proto/dwtools/amid/l4_files.test/RecordFilter.test.s
+          - ../proto/dwtools/amid/l4_files.test/Secondary.test.s
+          - ../proto/dwtools/amid/l4_files.test/Secondary.test.ss
           - ../proto/dwtools/amid/l4_files.test/SystemDefaultExtract.test.s
           - ../proto/dwtools/amid/l4_files.test/SystemDefaultHardDrive.test.ss
+          - ../proto/dwtools/amid/l4_files.test/testCasesTable.txt
           - ../proto/dwtools/atop
     submodule:
       wTools:

@@ -414,10 +414,10 @@ function pathResolve( test )
   return;
 
   test.case = 'nothing passed';
-  test.shouldThrowErrorSync( function()
-  {
-    provider.path.resolve();
-  });
+  var expected = provider.path.current();
+  var got = provider.path.resolve();
+  test.identical( got, expected )
+
 
   test.case = 'non string passed';
   test.shouldThrowErrorSync( function()

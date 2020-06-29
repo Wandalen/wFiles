@@ -109,6 +109,28 @@ cases:
 
 total : 40
 
+/* softlink shorten cases  */
+
+// dst does not exist && directory does not exist -> 6
+ - rewriting : 1
+ - rewriting : 0
+
+ - rewritingDirs : 1
+ - rewritingDirs : 0
+
+ - makingDirectory : 1
+ - makingDirectory : 0
+
+// dst does not exist && directory exists -> 6
+  - rewriting : 1
+  - rewriting : 0
+
+  - rewritingDirs : 1
+  - rewritingDirs : 0
+
+  - makingDirectory : 1
+  - makingDirectory : 0
+
 /* */
 
 = textlink cases

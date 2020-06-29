@@ -15629,40 +15629,74 @@ function fileDeletePathEscaped( test )
     return;
   }
 
-  let isHd = test.context.providerIsInstanceOf( _.FileProvider.HardDrive );
-
   var routinePath = test.context.pathFor( 'written/fileDeletePathEscaped' );
   if( !provider.statResolvedRead( routinePath ) )
   provider.dirMake( routinePath );
 
   test.case = 'filename contains @, global path'
   var filePath = provider.path.join( routinePath, '@file' );
-  provider.fileWrite( filePath, filePath );
-  provider.fileDelete( filePath );
+  var localPath = providerEffective.path.preferredFromGlobal( filePath );
+  if( !providerEffective.pathAllowedAct( localPath ) )
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.fileWrite( filePath, filePath );
+  })
+  else
+  {
+    provider.fileWrite( filePath, filePath );
+    provider.fileDelete( filePath );
+  }
   test.is( !provider.fileExists( filePath ) );
 
   test.case = 'filename contains @, local path'
   var filePath = provider.path.join( routinePath, '@file' );
-  provider.fileWrite( filePath, filePath );
-  debugger
-  provider.fileDelete( providerEffective.path.preferredFromGlobal( filePath ) );
+  var localPath = providerEffective.path.preferredFromGlobal( filePath );
+  if( !providerEffective.pathAllowedAct( localPath ) )
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.fileWrite( filePath, filePath );
+  })
+  else
+  {
+    provider.fileWrite( filePath, filePath );
+    provider.fileDelete( providerEffective.path.preferredFromGlobal( filePath ) );
+  }
   test.is( !provider.fileExists( filePath ) );
-
+  
   test.case = 'filename contains #, global path'
   var filePath = provider.path.join( routinePath, '#file' );
-  provider.fileWrite( filePath, filePath );
-  provider.fileDelete( filePath );
+  var localPath = providerEffective.path.preferredFromGlobal( filePath );
+  if( !providerEffective.pathAllowedAct( localPath ) )
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.fileWrite( filePath, filePath );
+  })
+  else
+  {
+    provider.fileWrite( filePath, filePath );
+    provider.fileDelete( filePath );
+  }
   test.is( !provider.fileExists( filePath ) );
 
   test.case = 'filename contains #, local path'
   var filePath = provider.path.join( routinePath, '#file' );
-  provider.fileWrite( filePath, filePath );
-  provider.fileDelete( providerEffective.path.preferredFromGlobal( filePath ) );
+  var localPath = providerEffective.path.preferredFromGlobal( filePath );
+  if( !providerEffective.pathAllowedAct( localPath ) )
+  test.shouldThrowErrorSync( () =>
+  {
+    provider.fileWrite( filePath, filePath );
+  })
+  else
+  {
+    provider.fileWrite( filePath, filePath );
+    provider.fileDelete( providerEffective.path.preferredFromGlobal( filePath ) );
+  }
   test.is( !provider.fileExists( filePath ) );
 
   test.case = 'filename contains ?, global path'
   var filePath = provider.path.join( routinePath, '?file=a' );
-  if( process.platform === 'win32' && isHd )
+  var localPath = providerEffective.path.preferredFromGlobal( filePath );
+  if( !providerEffective.pathAllowedAct( localPath ) )
   test.shouldThrowErrorSync( () =>
   {
     provider.fileWrite( filePath, filePath );
@@ -15676,7 +15710,8 @@ function fileDeletePathEscaped( test )
 
   test.case = 'filename contains ?, local path'
   var filePath = provider.path.join( routinePath, '?file=a' );
-  if( process.platform === 'win32' && isHd )
+  var localPath = providerEffective.path.preferredFromGlobal( filePath );
+  if( !providerEffective.pathAllowedAct( localPath ) )
   test.shouldThrowErrorSync( () =>
   {
     provider.fileWrite( filePath, filePath );

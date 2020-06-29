@@ -50472,6 +50472,58 @@ function hardLinkReturnThrowing0Sync( test )
 
 function softLinkReturnSync( test )
 {
+/*
+  = softlink cases
+test groups:
+ - dst does not exist && directory does not exist
+ - dst does not exist && directory exists
+ - dst exists, is not soft linked
+ - dst exists, is soft linked
+ - src === dist
+
+cases:
+ - rewriting : 1
+ - rewriting : 0
+
+ - rewritingDirs : 1
+ - rewritingDirs : 0
+
+ - makingDirectory : 1
+ - makingDirectory : 0
+
+total : 40
+
+// softlink shorten cases
+
+// dst does not exist && directory does not exist -> 6
+ - rewriting : 1
+ - rewriting : 0
+
+ - rewritingDirs : 1
+ - rewritingDirs : 0
+
+ - makingDirectory : 1
+ - makingDirectory : 0
+
+// dst does not exist && directory exists -> 6
+  - rewriting : 1
+  - rewriting : 0
+
+  - rewritingDirs : 1
+  - rewritingDirs : 0
+
+  - makingDirectory : 1
+  - makingDirectory : 0
+
+// dst exists, is not hard linked -> 5
+ - rewriting : 1
+
+ - rewritingDirs : 1
+ - rewritingDirs : 0
+
+ - makingDirectory : 1
+ - makingDirectory : 0
+*/
   let context = this;
   let a = context.assetFor( test, false );
 

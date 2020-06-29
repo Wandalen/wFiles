@@ -362,7 +362,7 @@ pathDirTempOpen.defaults =
 {
   filePath : null,
   name : null,
-  returnResolved : 0,
+  returnResolved : 1,
   auto : 1
 }
 

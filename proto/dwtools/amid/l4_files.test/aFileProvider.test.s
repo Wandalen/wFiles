@@ -50347,7 +50347,20 @@ function hardLinkReturnThrowing0Sync( test )
   let context = this;
   let a = context.assetFor( test, false );
 
-  test.case = 'throwing : 1';
+  test.case = 'src does not exists';
+  a.reflect();
+  var got = a.fileProvider.hardLink
+  ({
+    dstPath : a.abs( 'dst' ),
+    srcPath : a.abs( 'src' ),
+    throwing : 0,
+  });
+  test.identical( got, null );
+  test.identical( a.fileProvider.filesAreHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), false );
+
+  //
+
+  test.case = 'rewriting : 0';
   a.reflect();
   a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
   a.fileProvider.fileWrite( a.abs( 'dst' ), 'some text' );
@@ -50358,8 +50371,23 @@ function hardLinkReturnThrowing0Sync( test )
     throwing : 0,
     rewriting: 0,
   });
-  test.identical( got, true );
-  test.identical( a.fileProvider.filesAreHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), true );
+  test.identical( got, null );
+  test.identical( a.fileProvider.filesAreHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), false );
+
+  //
+
+  test.case = 'makingDirectory : 0';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  var got = a.fileProvider.hardLink
+  ({
+    dstPath : a.abs( 'dir1/dir2/dst' ),
+    srcPath : a.abs( 'src' ),
+    throwing : 0,
+    makingDirectory: 0,
+  });
+  test.identical( got, null );
+  test.identical( a.fileProvider.filesAreHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'src' ) ), false );
 }
 
 // --

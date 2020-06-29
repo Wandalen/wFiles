@@ -50340,6 +50340,28 @@ total : 36
   test.close( 'src === dist' );
 }
 
+//
+
+function hardLinkReturnThrowing0Sync( test )
+{
+  let context = this;
+  let a = context.assetFor( test, false );
+
+  test.case = 'throwing : 1';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  a.fileProvider.fileWrite( a.abs( 'dst' ), 'some text' );
+  var got = a.fileProvider.hardLink
+  ({
+    dstPath : a.abs( 'dst' ),
+    srcPath : a.abs( 'src' ),
+    throwing : 1,
+    rewriting: 0,
+  });
+  test.identical( got, true );
+  test.identical( a.fileProvider.filesAreHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), true );
+}
+
 // --
 // declare
 // --
@@ -50519,7 +50541,7 @@ var Self =
     // qqq3 : implement
     // hardLinkReturnSync,
     // hardLinkReturnAsync,
-    // hardLinkReturnThrowing0Sync,
+    hardLinkReturnThrowing0Sync,
     // hardLinkReturnThrowing0Async,
     // hardLinkReturnSoftLinkedSync,
     // hardLinkReturnSoftLinkedAsync,

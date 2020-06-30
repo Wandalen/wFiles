@@ -34973,30 +34973,39 @@ function filesDeleteEscapedPath( test )
   test.case = 'provider';
   a.reflect();
   var srcPath = a.abs( '"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"/File1.txt' );
-  a.fileProvider.fileWrite( srcPath, 'File1.txt' );
-  test.is( a.fileProvider.fileExists( srcPath ) );
+  if( a.fileProvider.pathAllowedAct( srcPath ) )
+  {
+    a.fileProvider.fileWrite( srcPath, 'File1.txt' );
+    test.is( a.fileProvider.fileExists( srcPath ) );
 
-  var exp =
-  [
-    '.',
-    './"a1#"',
-    './"a1#"/"a2@"',
-    './"a1#"/"a2@"/"a3!"',
-    './"a1#"/"a2@"/"a3!"/"a4?"',
-    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"',
-    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"',
-    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"',
-    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"',
-    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"/File1.txt'
-  ]
-  var found = a.fileProvider.filesDelete
-  ({
-    filePath : a.abs( '.' ),
-    outputFormat : 'relative',
-    withDirs : 1,
-  });
-  test.identical( found, exp );
-
+    var exp =
+    [
+      '.',
+      './"a1#"',
+      './"a1#"/"a2@"',
+      './"a1#"/"a2@"/"a3!"',
+      './"a1#"/"a2@"/"a3!"/"a4?"',
+      './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"',
+      './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"',
+      './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"',
+      './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"',
+      './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"/File1.txt'
+    ]
+    var found = a.fileProvider.filesDelete
+    ({
+      filePath : a.abs( '.' ),
+      outputFormat : 'relative',
+      withDirs : 1,
+    });
+    test.identical( found, exp );
+  }
+  else
+  {
+    test.shouldThrowErrorSync( () =>
+    {
+      a.fileProvider.fileWrite( srcPath, 'File1.txt' );
+    })
+  }
   test.is( !a.fileProvider.fileExists( srcPath ) );
 
   /* */
@@ -35005,30 +35014,39 @@ function filesDeleteEscapedPath( test )
   a.reflect();
   var srcPath = a.abs( '"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"/File1.txt' );
   test.is( a.path.isGlobal( a.global( srcPath ) ) );
-  a.system.fileWrite( a.global( srcPath ), 'File1.txt' );
-  test.is( a.system.fileExists( a.global( srcPath ) ) );
+  if( a.system.pathAllowedAct( a.global( srcPath ) ) )
+  {
+    a.system.fileWrite( a.global( srcPath ), 'File1.txt' );
+    test.is( a.system.fileExists( a.global( srcPath ) ) );
 
-  var exp =
-  [
-    '.',
-    './"a1#"',
-    './"a1#"/"a2@"',
-    './"a1#"/"a2@"/"a3!"',
-    './"a1#"/"a2@"/"a3!"/"a4?"',
-    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"',
-    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"',
-    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"',
-    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"',
-    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"/File1.txt'
-  ]
-  var found = a.system.filesDelete
-  ({
-    filePath : a.global( '.' ),
-    outputFormat : 'relative',
-    withDirs : 1,
-  });
-  test.identical( found, exp );
-
+    var exp =
+    [
+      '.',
+      './"a1#"',
+      './"a1#"/"a2@"',
+      './"a1#"/"a2@"/"a3!"',
+      './"a1#"/"a2@"/"a3!"/"a4?"',
+      './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"',
+      './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"',
+      './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"',
+      './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"',
+      './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"/File1.txt'
+    ]
+    var found = a.system.filesDelete
+    ({
+      filePath : a.global( '.' ),
+      outputFormat : 'relative',
+      withDirs : 1,
+    });
+    test.identical( found, exp );
+  }
+  else
+  {
+    test.shouldThrowErrorSync( () =>
+    {
+      a.system.fileWrite( a.global( srcPath ), 'File1.txt' );
+    })
+  }
   test.is( !a.system.fileExists( a.global( srcPath ) ) );
 
   /* */

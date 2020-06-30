@@ -457,6 +457,28 @@ function pathDirUserHomeAct()
   return result;
 }
 
+//
+
+function pathAllowedAct( filePath )
+{
+  let self = this;
+  
+  _.assert( arguments.length === 1 );
+  _.assert( self.path.isNormalized( filePath ), 'Expects normalized path.' );
+  _.assert( self.path.isAbsolute( filePath ), 'Expects absolute path.' );
+  
+  filePath = self.path.unescape( filePath );
+  
+  if( process.platform === 'win32' )
+  return !_.strHasAny( filePath, [ '<','>', ':', '"', '\\', '|', '?', '*' ] );
+  
+  if( process.platform === 'darwin' )
+  return !_.strHasAny( filePath, [ ':' ] );
+  
+  return true;
+}
+
+
 // --
 // read
 // --
@@ -2193,6 +2215,7 @@ let Extend =
 
   pathDirTempAct,
   pathDirUserHomeAct,
+  pathAllowedAct,
 
   // read
 

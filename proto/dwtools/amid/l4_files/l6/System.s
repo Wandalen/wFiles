@@ -492,6 +492,15 @@ function pathNativizeAct( filePath )
 
 //
 
+function pathAllowedAct( filePath )
+{
+  let self = this;
+  let r = self._pathLocalize( filePath );
+  return r.provider.pathAllowedAct( r.localPath );
+}
+
+//
+
 /**
  @summary Returns current working directory of default provider.
  @description Changes current working directory if new path is provided.
@@ -1477,6 +1486,7 @@ let Extension =
   pathCurrentAct,
   pathDirTempAct,
   pathNativizeAct,
+  pathAllowedAct,
 
   pathResolveLinkFull,
   pathResolveLinkTail,

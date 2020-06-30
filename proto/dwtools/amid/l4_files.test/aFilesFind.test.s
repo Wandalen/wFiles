@@ -75,7 +75,7 @@ function assetFor( test, a )
 
   a = test.assetFor( a );
 
-  if( !a.system )
+  // if( !a.system )
   {
     if( a.fileProvider.system )
     a.system = a.fileProvider.system;
@@ -83,7 +83,7 @@ function assetFor( test, a )
     a.system = a.fileProvider;
   }
 
-  if( !a.effectiveProvider )
+  // if( !a.effectiveProvider )
   {
     if( !( a.fileProvider instanceof _.FileProvider.System ) )
     a.effectiveProvider = a.fileProvider;
@@ -5756,29 +5756,40 @@ function filesFindEscapedPath( test )
   test.case = 'provider';
   a.reflect();
   var srcPath = a.abs( '"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"/File1.txt' );
-  a.fileProvider.fileWrite( srcPath, 'File1.txt' );
-  test.is( a.fileProvider.fileExists( srcPath ) );
+  if( a.fileProvider.pathAllowedAct( srcPath ) )
+  {
+    a.fileProvider.fileWrite( srcPath, 'File1.txt' );
+    test.is( a.fileProvider.fileExists( srcPath ) );
 
-  var exp =
-  [
-    '.',
-    './"a1#"',
-    './"a1#"/"a2@"',
-    './"a1#"/"a2@"/"a3!"',
-    './"a1#"/"a2@"/"a3!"/"a4?"',
-    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"',
-    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"',
-    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"',
-    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"',
-    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"/File1.txt'
-  ]
-  var found = a.fileProvider.filesFind
-  ({
-    filePath : a.abs( '.' ),
-    outputFormat : 'relative',
-    withDirs : 1,
-  });
-  test.identical( found, exp );
+    var exp =
+    [
+      '.',
+      './"a1#"',
+      './"a1#"/"a2@"',
+      './"a1#"/"a2@"/"a3!"',
+      './"a1#"/"a2@"/"a3!"/"a4?"',
+      './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"',
+      './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"',
+      './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"',
+      './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"',
+      './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"/File1.txt'
+    ]
+    var found = a.fileProvider.filesFind
+    ({
+      filePath : a.abs( '.' ),
+      outputFormat : 'relative',
+      withDirs : 1,
+    });
+    test.identical( found, exp );
+  }
+  else
+  {
+    test.shouldThrowErrorSync( () =>
+    {
+      a.fileProvider.fileWrite( srcPath, 'File1.txt' );
+    })
+  }
+
 
   /* */
 
@@ -5786,29 +5797,39 @@ function filesFindEscapedPath( test )
   a.reflect();
   var srcPath = a.abs( '"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"/File1.txt' );
   test.is( a.path.isGlobal( a.global( srcPath ) ) );
-  a.system.fileWrite( a.global( srcPath ), 'File1.txt' );
-  test.is( a.system.fileExists( a.global( srcPath ) ) );
+  if( a.system.pathAllowedAct( a.global( srcPath ) ) )
+  {
+    a.system.fileWrite( a.global( srcPath ), 'File1.txt' );
+    test.is( a.system.fileExists( a.global( srcPath ) ) );
 
-  var exp =
-  [
-    '.',
-    './"a1#"',
-    './"a1#"/"a2@"',
-    './"a1#"/"a2@"/"a3!"',
-    './"a1#"/"a2@"/"a3!"/"a4?"',
-    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"',
-    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"',
-    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"',
-    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"',
-    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"/File1.txt'
-  ]
-  var found = a.system.filesFind
-  ({
-    filePath : a.global( '.' ),
-    outputFormat : 'relative',
-    withDirs : 1,
-  });
-  test.identical( found, exp );
+    var exp =
+    [
+      '.',
+      './"a1#"',
+      './"a1#"/"a2@"',
+      './"a1#"/"a2@"/"a3!"',
+      './"a1#"/"a2@"/"a3!"/"a4?"',
+      './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"',
+      './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"',
+      './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"',
+      './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"',
+      './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"/File1.txt'
+    ]
+    var found = a.system.filesFind
+    ({
+      filePath : a.global( '.' ),
+      outputFormat : 'relative',
+      withDirs : 1,
+    });
+    test.identical( found, exp );
+  }
+  else
+  {
+    test.shouldThrowErrorSync( () =>
+    {
+      a.system.fileWrite( a.global( srcPath ), 'File1.txt' );
+    })
+  }
 
   /* */
 
@@ -14627,20 +14648,6 @@ function filesFindGroups( test )
 
   /* */
 
-  test.case = 'sync : 0';
-  var o2 =
-  {
-    src,
-    dst,
-    outputFormat : 'relative',
-    sync : 0,
-  }
-  var found = provider.filesFindGroups( o2 );
-  found.options = !!found.options;
-  test.identical( found, expected );
-
-  /* */
-
   test.case = 'mode : legacy';
   var o2 =
   {
@@ -14754,6 +14761,118 @@ function filesFindGroups( test )
     });
   }
 
+}
+
+//
+
+function filesFindGroupsAsync( test )
+{
+  let context = this;
+  let provider = context.provider;
+  let system = context.system;
+  let path = context.provider.path;
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
+  let con = _.Consequence().take( null );
+
+  function abs()
+  {
+    let args = _.longSlice( arguments );
+    args.unshift( routinePath );
+    return path.s.join.apply( path.s, args );
+  }
+
+  var filesTree =
+  {
+    'a.js' : 'a.js',
+    'b.js' : 'b.js',
+    'a.txt' : 'a.txt',
+    'b.txt' : 'b.txt',
+    'dir' :
+    {
+      'a.js' : 'dir/a.js',
+      'b.js' : 'dir/b.js',
+      'a.txt' : 'dir/a.txt',
+      'b.txt' : 'dir/b.txt',
+    }
+  }
+
+  var extract1 = new _.FileProvider.Extract({ filesTree });
+  extract1.filesReflectTo( provider, routinePath );
+
+  var expected =
+  {
+    'pathsGrouped' :
+    {
+      [ abs( 'Produced.txt' ) ] : { [ abs( '**.txt' ) ] : '' },
+      [ abs( 'Produced.js' ) ] : { [ abs( '**.js' ) ] : '' }
+    },
+    'filesGrouped' :
+    {
+      [ abs( 'Produced.txt' ) ] :
+      [
+        './a.txt', './b.txt', './dir/a.txt', './dir/b.txt'
+      ],
+      [ abs( 'Produced.js' ) ] :
+      [
+        './a.js', './b.js', './dir/a.js', './dir/b.js'
+      ]
+    },
+    'srcFiles' :
+    {
+      './a.txt' : './a.txt',
+      './b.txt' : './b.txt',
+      './dir/a.txt' : './dir/a.txt',
+      './dir/b.txt' : './dir/b.txt',
+      './a.js' : './a.js',
+      './b.js' : './b.js',
+      './dir/a.js' : './dir/a.js',
+      './dir/b.js' : './dir/b.js',
+    },
+    'errors' : [],
+    'options' : true,
+  }
+
+  var filePath =
+  {
+    '**.txt' : 'Produced.txt',
+    '**.js' : 'Produced.js',
+  }
+  var src =
+  {
+    filePath,
+    prefixPath : routinePath,
+  }
+  var dst =
+  {
+    prefixPath : routinePath,
+  }
+
+  /* tests */
+
+  con
+
+  .then( () =>
+  {
+    test.case = 'sync : 0';
+    var o2 =
+    {
+      src,
+      dst,
+      outputFormat : 'relative',
+      sync : 0,
+    }
+    return provider.filesFindGroups( o2 )
+    .then( found =>
+    {
+      found.options = !!found.options;
+      test.identical( found, expected );
+      return null;
+    })
+  })
+
+  /* */
+
+  return con;
 }
 
 // --
@@ -34973,30 +35092,39 @@ function filesDeleteEscapedPath( test )
   test.case = 'provider';
   a.reflect();
   var srcPath = a.abs( '"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"/File1.txt' );
-  a.fileProvider.fileWrite( srcPath, 'File1.txt' );
-  test.is( a.fileProvider.fileExists( srcPath ) );
+  if( a.fileProvider.pathAllowedAct( srcPath ) )
+  {
+    a.fileProvider.fileWrite( srcPath, 'File1.txt' );
+    test.is( a.fileProvider.fileExists( srcPath ) );
 
-  var exp =
-  [
-    '.',
-    './"a1#"',
-    './"a1#"/"a2@"',
-    './"a1#"/"a2@"/"a3!"',
-    './"a1#"/"a2@"/"a3!"/"a4?"',
-    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"',
-    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"',
-    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"',
-    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"',
-    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"/File1.txt'
-  ]
-  var found = a.fileProvider.filesDelete
-  ({
-    filePath : a.abs( '.' ),
-    outputFormat : 'relative',
-    withDirs : 1,
-  });
-  test.identical( found, exp );
-
+    var exp =
+    [
+      '.',
+      './"a1#"',
+      './"a1#"/"a2@"',
+      './"a1#"/"a2@"/"a3!"',
+      './"a1#"/"a2@"/"a3!"/"a4?"',
+      './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"',
+      './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"',
+      './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"',
+      './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"',
+      './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"/File1.txt'
+    ]
+    var found = a.fileProvider.filesDelete
+    ({
+      filePath : a.abs( '.' ),
+      outputFormat : 'relative',
+      withDirs : 1,
+    });
+    test.identical( found, exp );
+  }
+  else
+  {
+    test.shouldThrowErrorSync( () =>
+    {
+      a.fileProvider.fileWrite( srcPath, 'File1.txt' );
+    })
+  }
   test.is( !a.fileProvider.fileExists( srcPath ) );
 
   /* */
@@ -35005,30 +35133,39 @@ function filesDeleteEscapedPath( test )
   a.reflect();
   var srcPath = a.abs( '"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"/File1.txt' );
   test.is( a.path.isGlobal( a.global( srcPath ) ) );
-  a.system.fileWrite( a.global( srcPath ), 'File1.txt' );
-  test.is( a.system.fileExists( a.global( srcPath ) ) );
+  if( a.system.pathAllowedAct( a.global( srcPath ) ) )
+  {
+    a.system.fileWrite( a.global( srcPath ), 'File1.txt' );
+    test.is( a.system.fileExists( a.global( srcPath ) ) );
 
-  var exp =
-  [
-    '.',
-    './"a1#"',
-    './"a1#"/"a2@"',
-    './"a1#"/"a2@"/"a3!"',
-    './"a1#"/"a2@"/"a3!"/"a4?"',
-    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"',
-    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"',
-    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"',
-    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"',
-    './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"/File1.txt'
-  ]
-  var found = a.system.filesDelete
-  ({
-    filePath : a.global( '.' ),
-    outputFormat : 'relative',
-    withDirs : 1,
-  });
-  test.identical( found, exp );
-
+    var exp =
+    [
+      '.',
+      './"a1#"',
+      './"a1#"/"a2@"',
+      './"a1#"/"a2@"/"a3!"',
+      './"a1#"/"a2@"/"a3!"/"a4?"',
+      './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"',
+      './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"',
+      './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"',
+      './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"',
+      './"a1#"/"a2@"/"a3!"/"a4?"/"#a5"/"@a6"/"!a7"/"?a8"/File1.txt'
+    ]
+    var found = a.system.filesDelete
+    ({
+      filePath : a.global( '.' ),
+      outputFormat : 'relative',
+      withDirs : 1,
+    });
+    test.identical( found, exp );
+  }
+  else
+  {
+    test.shouldThrowErrorSync( () =>
+    {
+      a.system.fileWrite( a.global( srcPath ), 'File1.txt' );
+    })
+  }
   test.is( !a.system.fileExists( a.global( srcPath ) ) );
 
   /* */
@@ -37591,6 +37728,7 @@ var Self =
     /* qqq : implement filesFindTotalNegative, */
     /* qqq : implement filesFindSeveralTotalNegative, */
     filesFindGroups,
+    filesFindGroupsAsync,
 
     filesReflectEvaluate,
     filesReflectTrivial,

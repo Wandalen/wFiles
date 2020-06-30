@@ -1155,7 +1155,7 @@ function fileLockAct( o )
   })
 
   if( o.sync )
-  return con.syncMaybe();
+  return con.sync();
 
   return con;
 }
@@ -1217,7 +1217,7 @@ function fileUnlockAct( o )
   })
 
   if( o.sync )
-  return con.syncMaybe();
+  return con.sync();
 
   return con;
 }
@@ -1244,7 +1244,7 @@ function fileIsLockedAct( o )
   })
 
   if( o.sync )
-  return con.syncMaybe();
+  return con.sync();
 
   return con;
 }
@@ -1624,7 +1624,7 @@ function hardLinkAct( o )
   }
 
   if( o.sync )
-  return con.syncMaybe();
+  return con.sync();
 
   return con;
 
@@ -1653,7 +1653,7 @@ function hardLinkAct( o )
     });
 
     if( o.sync )
-    return con.syncMaybe();
+    return con.sync();
 
     return con;
   }
@@ -1716,7 +1716,7 @@ function hardLinkAct( o )
         })
 
         if( o.sync )
-        return con.syncMaybe();
+        return con.sync();
 
         return con;
       }
@@ -1761,7 +1761,7 @@ function hardLinkAct( o )
     r.then( () => got );
 
     if( o.sync )
-    return r.syncMaybe();
+    return r.sync();
 
     return r;
   }
@@ -1786,7 +1786,7 @@ function hardLinkAct( o )
     })
 
     if( o.sync )
-    return r.syncMaybe();
+    return r.sync();
 
     return r;
   }
@@ -1824,7 +1824,7 @@ function hardLinkBreakAct( o )
   })
 
   if( o.sync )
-  return con.syncMaybe();
+  return con.sync();
 
   return con;
 }

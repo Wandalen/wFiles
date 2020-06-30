@@ -746,7 +746,8 @@ function filesFind_pre( routine, args )
   _.assert( _.longHas( [ 0, 1, 2, 3 ], o.revisiting ) );
   _.assert( o.revisitingHardLinked === 0 || o.revisitingHardLinked === 1 );
 
-  if( o.revisiting === 0 || o.revisitingHardLinked === 0 )
+  // if( o.revisiting === 0 || o.revisitingHardLinked === 0 ) /* yyy */
+  if( o.revisiting === 0 )
   if( o.visitedMap === null )
   o.visitedMap = Object.create( null );
 
@@ -927,7 +928,7 @@ function filesFind_body( o )
     .catch( ( err ) =>
     {
       debugger;
-      _.errAttend( err );
+      // _.errAttend( err );
       throw _.err( err );
     });
 
@@ -3998,6 +3999,7 @@ function filesReflect_body( o )
     }
 
     if( o.verbosity >= 1 )
+    if( result.length )
     {
       _.assert( o.src.isPaired() );
       let mtr = o.src.moveTextualReport();

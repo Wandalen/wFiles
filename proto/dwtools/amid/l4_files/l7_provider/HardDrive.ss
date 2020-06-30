@@ -457,6 +457,28 @@ function pathDirUserHomeAct()
   return result;
 }
 
+//
+
+function pathAllowedAct( filePath )
+{
+  let self = this;
+
+  _.assert( arguments.length === 1 );
+  _.assert( self.path.isNormalized( filePath ), 'Expects normalized path.' );
+  _.assert( self.path.isAbsolute( filePath ), 'Expects absolute path.' );
+
+  filePath = self.path.unescape( filePath );
+
+  if( process.platform === 'win32' )
+  return !_.strHasAny( filePath, [ '<','>', ':', '"', '\\', '|', '?', '*' ] );
+
+  if( process.platform === 'darwin' )
+  return !_.strHasAny( filePath, [ ':' ] );
+
+  return true;
+}
+
+
 // --
 // read
 // --
@@ -1389,7 +1411,7 @@ function fileLockAct( o )
   })
 
   if( o.sync )
-  return con.syncMaybe();
+  return con.sync();
 
   return con;
 }
@@ -1444,7 +1466,7 @@ function fileUnlockAct( o )
   })
 
   if( o.sync )
-  return con.syncMaybe();
+  return con.sync();
 
   return con;
 }
@@ -1475,7 +1497,7 @@ function fileIsLockedAct( o )
   })
 
   if( o.sync )
-  return con.syncMaybe();
+  return con.sync();
 
   return con;
 }
@@ -1806,7 +1828,7 @@ function hardLinkAct( o )
   }
 
   if( o.sync )
-  return con.syncMaybe();
+  return con.sync();
 
   return con;
 
@@ -1835,7 +1857,7 @@ function hardLinkAct( o )
     });
 
     if( o.sync )
-    return con.syncMaybe();
+    return con.sync();
 
     return con;
   }
@@ -1898,7 +1920,7 @@ function hardLinkAct( o )
         })
 
         if( o.sync )
-        return con.syncMaybe();
+        return con.sync();
 
         return con;
       }
@@ -1938,7 +1960,7 @@ function hardLinkAct( o )
     r.then( () => got );
 
     if( o.sync )
-    return r.syncMaybe();
+    return r.sync();
 
     return r;
   }
@@ -1963,7 +1985,7 @@ function hardLinkAct( o )
     })
 
     if( o.sync )
-    return r.syncMaybe();
+    return r.sync();
 
     return r;
   }
@@ -2193,6 +2215,7 @@ let Extend =
 
   pathDirTempAct,
   pathDirUserHomeAct,
+  pathAllowedAct,
 
   // read
 

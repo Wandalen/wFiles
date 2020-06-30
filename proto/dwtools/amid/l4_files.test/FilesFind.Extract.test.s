@@ -16,38 +16,11 @@ _.assert( !!Parent );
 
 //
 
-var filesTree = /* xxx : remove? */
-{
-  'folder.abc' :
-  {
-    'test1.js' : "test\n.gitignore\n.travis.yml\nMakefile\nexample.js\n",
-    'test2' : "var concatMap = require('concat-map');\nvar balanced = require('balanced-match');",
-    'folder2.x' :
-    {
-      'test1.txt' : "var concatMap = require('concat-map');\nvar balanced = require('balanced-match');",
-    }
-  },
-  'test_dir' :
-  {
-    'test3.js' : 'test\n.gitignore\n.travis.yml\nMakefile\nexample.js\n',
-  },
-  'file1' : 'Excepteur sint occaecat cupidatat non proident',
-  'file' : 'abc',
-  'linkToFile' : [{ hardLink : '/file' }],
-  'linkToUnknown' : [{ hardLink : '/unknown' }],
-  'linkToDir' : [{ hardLink : '/test_dir' }],
-  'softLinkToFile' : [{ softLink : '/file' }],
-  'softLinkToUnknown' : [{ softLink : '/unknown' }],
-  'softLinkToDir' : [{ softLink : '/test_dir' }],
-}
-
-//
-
 function providerMake()
 {
   let context = this;
   let provider = _.FileProvider.Extract({ protocols : [ 'current', 'second' ] });
-  let system = _.FileProvider.System({ providers : [ provider ] }); 
+  let system = _.FileProvider.System({ providers : [ provider ] });
   _.assert( system.defaultProvider === null );
   return provider;
 }
@@ -76,7 +49,7 @@ function onSuiteEnd()
 {
   let context = this;
   let path = this.provider.path;
-  _.assert( _.mapKeys( context.provider.filesTree ).length === 1 );
+  _.assert( _.mapKeys( context.provider.filesTree ).length === 1, context.provider.filesTree );
   return Parent.onSuiteEnd.apply( this, arguments );
 }
 
@@ -97,8 +70,6 @@ var Proto =
 
   context :
   {
-    filesTree,
-    // provider : _.FileProvider.Extract({ filesTree, usingExtraStat : 1, protocol : 'current' }),
     providerMake,
     pathFor,
     testFile : '/file1',

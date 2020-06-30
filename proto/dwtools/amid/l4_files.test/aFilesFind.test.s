@@ -14648,20 +14648,6 @@ function filesFindGroups( test )
 
   /* */
 
-  test.case = 'sync : 0';
-  var o2 =
-  {
-    src,
-    dst,
-    outputFormat : 'relative',
-    sync : 0,
-  }
-  var found = provider.filesFindGroups( o2 );
-  found.options = !!found.options;
-  test.identical( found, expected );
-
-  /* */
-
   test.case = 'mode : legacy';
   var o2 =
   {
@@ -14775,6 +14761,118 @@ function filesFindGroups( test )
     });
   }
 
+}
+
+//
+
+function filesFindGroupsAsync( test )
+{
+  let context = this;
+  let provider = context.provider;
+  let system = context.system;
+  let path = context.provider.path;
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
+  let con = _.Consequence().take( null );
+
+  function abs()
+  {
+    let args = _.longSlice( arguments );
+    args.unshift( routinePath );
+    return path.s.join.apply( path.s, args );
+  }
+
+  var filesTree =
+  {
+    'a.js' : 'a.js',
+    'b.js' : 'b.js',
+    'a.txt' : 'a.txt',
+    'b.txt' : 'b.txt',
+    'dir' :
+    {
+      'a.js' : 'dir/a.js',
+      'b.js' : 'dir/b.js',
+      'a.txt' : 'dir/a.txt',
+      'b.txt' : 'dir/b.txt',
+    }
+  }
+
+  var extract1 = new _.FileProvider.Extract({ filesTree });
+  extract1.filesReflectTo( provider, routinePath );
+
+  var expected =
+  {
+    'pathsGrouped' :
+    {
+      [ abs( 'Produced.txt' ) ] : { [ abs( '**.txt' ) ] : '' },
+      [ abs( 'Produced.js' ) ] : { [ abs( '**.js' ) ] : '' }
+    },
+    'filesGrouped' :
+    {
+      [ abs( 'Produced.txt' ) ] :
+      [
+        './a.txt', './b.txt', './dir/a.txt', './dir/b.txt'
+      ],
+      [ abs( 'Produced.js' ) ] :
+      [
+        './a.js', './b.js', './dir/a.js', './dir/b.js'
+      ]
+    },
+    'srcFiles' :
+    {
+      './a.txt' : './a.txt',
+      './b.txt' : './b.txt',
+      './dir/a.txt' : './dir/a.txt',
+      './dir/b.txt' : './dir/b.txt',
+      './a.js' : './a.js',
+      './b.js' : './b.js',
+      './dir/a.js' : './dir/a.js',
+      './dir/b.js' : './dir/b.js',
+    },
+    'errors' : [],
+    'options' : true,
+  }
+
+  var filePath =
+  {
+    '**.txt' : 'Produced.txt',
+    '**.js' : 'Produced.js',
+  }
+  var src =
+  {
+    filePath,
+    prefixPath : routinePath,
+  }
+  var dst =
+  {
+    prefixPath : routinePath,
+  }
+
+  /* tests */
+
+  con
+
+  .then( () =>
+  {
+    test.case = 'sync : 0';
+    var o2 =
+    {
+      src,
+      dst,
+      outputFormat : 'relative',
+      sync : 0,
+    }
+    return provider.filesFindGroups( o2 )
+    .then( found =>
+    {
+      found.options = !!found.options;
+      test.identical( found, expected );
+      return null;
+    })
+  })
+
+  /* */
+
+  return con;
 }
 
 // --
@@ -37630,6 +37728,7 @@ var Self =
     /* qqq : implement filesFindTotalNegative, */
     /* qqq : implement filesFindSeveralTotalNegative, */
     filesFindGroups,
+    filesFindGroupsAsync,
 
     filesReflectEvaluate,
     filesReflectTrivial,

@@ -981,6 +981,7 @@ function error( err )
   let o = c.options;
 
   _.assert( arguments.length === 1 );
+
   if( o.throwing )
   {
     if( o.sync )
@@ -993,6 +994,7 @@ function error( err )
     _.errAttend( err );
     return c.end( null );
   }
+
 }
 
 //

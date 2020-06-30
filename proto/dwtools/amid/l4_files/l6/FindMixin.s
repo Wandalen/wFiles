@@ -3998,6 +3998,7 @@ function filesReflect_body( o )
     }
 
     if( o.verbosity >= 1 )
+    if( result.length )
     {
       _.assert( o.src.isPaired() );
       let mtr = o.src.moveTextualReport();

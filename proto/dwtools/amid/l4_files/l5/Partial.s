@@ -7328,8 +7328,8 @@ function filesAreTextLinked_body( o )
 
   _.assert( path.s.allAreAbsolute( o.filePath ) );
 
-  if( o.filePath[ 0 ] === o.filePath[ 1 ] )
-  return false;
+  // if( o.filePath[ 0 ] === o.filePath[ 1 ] )
+  // return false;
 
   let resolved = [];
 

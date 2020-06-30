@@ -87,8 +87,61 @@ function assetFor( test, a )
 
   _.assert( a.effectiveProvider instanceof _.FileProvider.Abstract, 'effectiveProvider is not specificed' );
 
+  if( !a.global )
+  a.global = globalFor;
+
   return a;
+
+  function globalFor()
+  {
+    let a = this;
+    let abs = a.abs( ... arguments );
+    let result = a.system.path.s.join( a.effectiveProvider.protocol + '://', abs );
+    return result;
+  }
+
 }
+
+// {
+//   let context = this;
+//
+//   if( !_.mapIs( a ) )
+//   {
+//     if( _.boolIs( arguments[ 1 ] ) )
+//     a = { originalAssetPath : arguments[ 1 ] }
+//     else
+//     a = { assetName : arguments[ 1 ] }
+//   }
+//
+//   if( !a.fileProvider )
+//   {
+//     a.fileProvider = context.providerMake();
+//   }
+//
+//   a.suiteTempPath = a.fileProvider.path.pathDirTempOpen( a.fileProvider.constructor.name );
+//
+//   a = test.assetFor( a );
+//
+//   if( !a.system )
+//   {
+//     if( a.fileProvider.system )
+//     a.system = a.fileProvider.system;
+//     else if( a.fileProvider instanceof _.FileProvider.System )
+//     a.system = a.fileProvider;
+//   }
+//
+//   if( !a.effectiveProvider )
+//   {
+//     if( !( a.fileProvider instanceof _.FileProvider.System ) )
+//     a.effectiveProvider = a.fileProvider;
+//     else if( a.fileProvider.defaultProvider )
+//     a.effectiveProvider = a.fileProvider.defaultProvider;
+//   }
+//
+//   _.assert( a.effectiveProvider instanceof _.FileProvider.Abstract, 'effectiveProvider is not specificed' );
+//
+//   return a;
+// }
 
 //
 

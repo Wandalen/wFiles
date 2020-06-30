@@ -75,7 +75,7 @@ function assetFor( test, a )
 
   a = test.assetFor( a );
 
-  // if( !a.system )
+  if( !a.system )
   {
     if( a.fileProvider.system )
     a.system = a.fileProvider.system;
@@ -83,7 +83,7 @@ function assetFor( test, a )
     a.system = a.fileProvider;
   }
 
-  // if( !a.effectiveProvider )
+  if( !a.effectiveProvider )
   {
     if( !( a.fileProvider instanceof _.FileProvider.System ) )
     a.effectiveProvider = a.fileProvider;
@@ -94,9 +94,7 @@ function assetFor( test, a )
   _.assert( a.effectiveProvider instanceof _.FileProvider.Abstract, 'effectiveProvider is not specificed' );
 
   if( !a.global )
-  {
-    a.global = globalFor;
-  }
+  a.global = globalFor;
 
   return a;
 
@@ -14520,6 +14518,60 @@ function filesFindTotalNegative( test )
   /* - */
 
 } /* end of function filesFindTotalNegative */
+
+//
+
+function filesFindOptionRevisitingHardLinked( test )
+{
+  let context = this;
+  let a = context.assetFor( test, false );
+
+  /* */
+
+  test.case = 'revisitingHardLinked : 1';
+
+  a.fileProvider.fileWrite( a.abs( 'File1.txt' ), 'File1.txt' );
+  a.fileProvider.fileWrite( a.abs( 'File2.txt' ), 'File2.txt' );
+  a.fileProvider.fileWrite( a.abs( 'dir/File3.txt' ), 'dir/File3.txt' );
+  a.fileProvider.hardLink( a.abs( 'dir/File1h.txt' ), a.abs( 'File1.txt' ) );
+  test.identical( a.fileProvider.filesAreHardLinked([ a.abs( 'File1.txt' ), a.abs( 'dir/File1h.txt' ) ]), true );
+
+  var exp = [ '.', './File1.txt', './File2.txt', './dir', './dir/File1h.txt', './dir/File3.txt' ];
+  var got = a.fileProvider.filesFind
+  ({
+    filter : { filePath : a.abs( '**' ) },
+    mode : 'distinct',
+    withDirs : 1,
+    revisitingHardLinked : 1,
+    outputFormat : 'relative',
+  });
+
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'revisitingHardLinked : 0';
+
+  a.fileProvider.fileWrite( a.abs( 'File1.txt' ), 'File1.txt' );
+  a.fileProvider.fileWrite( a.abs( 'File2.txt' ), 'File2.txt' );
+  a.fileProvider.fileWrite( a.abs( 'dir/File3.txt' ), 'dir/File3.txt' );
+  a.fileProvider.hardLink( a.abs( 'dir/File1h.txt' ), a.abs( 'File1.txt' ) );
+
+  var exp = [ '.', './File1.txt', './File2.txt', './dir', './dir/File3.txt' ];
+  var got = a.fileProvider.filesFind
+  ({
+    filter : { filePath : a.abs( '**' ) },
+    mode : 'distinct',
+    withDirs : 1,
+    revisitingHardLinked : 0,
+    outputFormat : 'relative',
+  });
+
+  test.identical( got, exp );
+
+  /* */
+
+}
 
 //
 
@@ -37727,6 +37779,8 @@ var Self =
     filesFindTotalNegative,
     /* qqq : implement filesFindTotalNegative, */
     /* qqq : implement filesFindSeveralTotalNegative, */
+    filesFindOptionRevisitingHardLinked,
+
     filesFindGroups,
     filesFindGroupsAsync,
 

@@ -2449,6 +2449,39 @@ _.assert( fileSize.having.hubRedirecting === 0 );
 
 //
 
+function isInoAct( o )
+{
+  let self = this;
+  _.assertRoutineOptions( isInoAct, arguments );
+  if( _.numberIs( o.ino ) || _.bigIntIs( o.ino ) )
+  return true;
+  return false;
+}
+
+isInoAct.defaults =
+{
+  ino : null,
+}
+
+//
+
+function isIno( o )
+{
+  let self = this;
+  if( !_.mapIs( arguments[ 0 ] ) )
+  o = { ino : arguments[ 0 ] }
+  _.assert( arguments.length === 1 );
+  o = _.routineOptions( isIno, o );
+  return self.isInoAct( o );
+}
+
+isIno.defaults =
+{
+  ... isInoAct.defaults,
+}
+
+//
+
 let _fileExistsAct = Object.create( null );
 statReadAct.name = 'fileExistsAct';
 
@@ -7560,11 +7593,15 @@ let Medials =
 
 let Statics =
 {
+
   MakeDefault : MakeDefault,
   Path : _.path.CloneExtending({ fileProvider : Self }),
   WriteMode : WriteMode,
   ProviderDefaults : ProviderDefaults,
   Counter : 0,
+
+  SupportsIno : 0,
+
 }
 
 let Forbids =
@@ -7691,8 +7728,11 @@ let Extension =
   statResolvedRead,
   statsResolvedRead : vectorize( statResolvedRead ),
 
-  filesSize,
+  filesSize, /* xxx : move */
   fileSize,
+
+  isInoAct,
+  isIno,
 
   fileExistsAct,
   fileExists,

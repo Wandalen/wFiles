@@ -751,6 +751,10 @@ function filesFind_pre( routine, args )
   if( o.visitedMap === null )
   o.visitedMap = Object.create( null );
 
+  if( o.revisitingHardLinked === 0 )
+  if( o.visitedInosSet === null )
+  o.visitedInosSet = new Set;
+
   if( o.revisiting === 1 || o.revisiting === 2 )
   if( o.visitedStack === null )
   o.visitedStack = [];
@@ -851,6 +855,7 @@ function filesFind_body( o )
     delete o2.revisitingHardLinked;
     delete o2.visitedMap;
     delete o2.visitedStack;
+    delete o2.visitedInosSet;
     delete o2.result;
     delete o2.resolvingSoftLink;
     delete o2.resolvingTextLink;
@@ -928,7 +933,7 @@ function filesFind_body( o )
     .catch( ( err ) =>
     {
       debugger;
-      // _.errAttend( err );
+      // _.errAttend( err ); // yyy : no!
       throw _.err( err );
     });
 
@@ -945,6 +950,13 @@ function filesFind_body( o )
     counter += 1;
 
     let visited = false;
+
+    if( o.revisitingHardLinked === 0 )
+    {
+      _.assert( self.isIno({ ino : record.stat.ino }) );
+      if( o.visitedInosSet.has( record.stat.ino ) )
+      return _.dont;
+    }
 
     if( o.revisiting === 1 )
     {
@@ -978,6 +990,12 @@ function filesFind_body( o )
 
     if( o.visitedMap )
     o.visitedMap[ record.real ] = record;
+
+    if( o.visitedInosSet )
+    {
+      _.assert( self.isIno({ ino : record.stat.ino }) );
+      o.visitedInosSet.add( record.stat.ino );
+    }
 
     if( visited )
     return 'dontButRecord';
@@ -1176,6 +1194,7 @@ defaults.revisiting = null;
 defaults.revisitingHardLinked = 1;
 defaults.visitedMap = null;
 defaults.visitedStack = null;
+defaults.visitedInosSet = null;
 defaults.resolvingSoftLink = 0;
 defaults.resolvingTextLink = 0;
 defaults.allowingMissed = 0;

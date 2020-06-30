@@ -2187,10 +2187,13 @@ let Restricts =
 
 let Statics =
 {
+
   pathNativizeAct : pathNativizeAct,
   KnownNativeEncodings : KnownNativeEncodings,
   UsingBigIntForStat : UsingBigIntForStat,
   Path : _.path.CloneExtending({ fileProvider : Self }),
+  SupportsIno : 1,
+
 }
 
 // --

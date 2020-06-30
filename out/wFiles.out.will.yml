@@ -216,6 +216,7 @@ module:
           - ../proto/dwtools/amid/l4_files/l2
           - ../proto/dwtools/amid/l4_files/l2/Encoder.s
           - ../proto/dwtools/amid/l4_files/l2/Encoders.s
+          - ../proto/dwtools/amid/l4_files/l2/Linker.s
           - ../proto/dwtools/amid/l4_files/l2/RecordContext.s
           - ../proto/dwtools/amid/l4_files/l3
           - ../proto/dwtools/amid/l4_files/l3/Path.s
@@ -230,7 +231,6 @@ module:
           - ../proto/dwtools/amid/l4_files/l4/Carriage.s
           - ../proto/dwtools/amid/l4_files/l4/Carrier.s
           - ../proto/dwtools/amid/l4_files/l5
-          - ../proto/dwtools/amid/l4_files/l5/Linker.s
           - ../proto/dwtools/amid/l4_files/l5/Partial.s
           - ../proto/dwtools/amid/l4_files/l6
           - ../proto/dwtools/amid/l4_files/l6/FindMixin.s

@@ -745,6 +745,12 @@ function filesFind_pre( routine, args )
 
   _.assert( _.longHas( [ 0, 1, 2, 3 ], o.revisiting ) );
   _.assert( o.revisitingHardLinked === 0 || o.revisitingHardLinked === 1 );
+  _.assert
+  (
+      o.revisitingHardLinked === 1 || self.SupportsIno >= 1
+    , `Option revisitingHardLinked : 0 is supported only if file provider supports ino of files.`
+    + `\nBut file provider ${self.constructor.name} does not support ino of files.`
+  );
 
   // if( o.revisiting === 0 || o.revisitingHardLinked === 0 ) /* yyy */
   if( o.revisiting === 0 )

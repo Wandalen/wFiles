@@ -467,11 +467,13 @@ function pathAllowedAct( filePath )
   _.assert( self.path.isNormalized( filePath ), 'Expects normalized path.' );
   _.assert( self.path.isAbsolute( filePath ), 'Expects absolute path.' );
   
+  filePath = self.path.unescape( filePath );
+  
   if( process.platform === 'win32' )
-  return _.strHasNone( filePath, [ '<','>', ':', '"', '\\', '|', '?', '*' ] );
+  return !_.strHasAny( filePath, [ '<','>', ':', '"', '\\', '|', '?', '*' ] );
   
   if( process.platform === 'darwin' )
-  return _.strHasNone( filePath, [ ':' ] );
+  return !_.strHasAny( filePath, [ ':' ] );
   
   return true;
 }

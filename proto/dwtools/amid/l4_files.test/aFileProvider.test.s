@@ -35588,16 +35588,38 @@ function hardLinkEscapedPath( test )
   var dstGlobalPath = a.system.path.join( `${a.effectiveProvider.protocol}:///`, dstPath );
   test.is( a.path.isGlobal( srcGlobalPath ) );
   test.is( a.path.isGlobal( dstGlobalPath ) );
-  a.system.fileWrite( srcGlobalPath, 'File1.txt' );
-  test.is( a.system.fileExists( srcGlobalPath ) );
+  if( a.system.pathAllowedAct( srcGlobalPath ) )
+  {
+    a.system.fileWrite( srcGlobalPath, 'File1.txt' );
+    test.is( a.system.fileExists( srcGlobalPath ) );
+  }
+  else
+  {
+    test.shouldThrowErrorSync( () => 
+    {
+      a.system.fileWrite( srcGlobalPath, 'File1.txt' );
+    })
+  } 
   test.isNot( a.system.fileExists( dstGlobalPath ) );
   test.isNot( a.system.filesAreHardLinked( dstGlobalPath, srcGlobalPath ) );
-  var got = a.system.hardLink({ dstPath : dstGlobalPath, srcPath : srcGlobalPath, makingDirectory : 1 });
-  test.is( got );
-  test.is( a.system.filesAreHardLinked( dstGlobalPath, srcGlobalPath ) );
-  var got = a.system.hardLink( dstGlobalPath, srcGlobalPath );
-  test.isNot( got );
-  test.is( a.system.filesAreHardLinked( dstGlobalPath, srcGlobalPath ) );
+  if( a.system.pathAllowedAct( dstGlobalPath ) )
+  {
+    var got = a.system.hardLink({ dstPath : dstGlobalPath, srcPath : srcGlobalPath, makingDirectory : 1 });
+    test.is( got );
+    test.is( a.system.filesAreHardLinked( dstGlobalPath, srcGlobalPath ) );
+    var got = a.system.hardLink( dstGlobalPath, srcGlobalPath );
+    test.isNot( got );
+    test.is( a.system.filesAreHardLinked( dstGlobalPath, srcGlobalPath ) );
+  }
+  else
+  {
+    test.shouldThrowErrorSync( () => 
+    {
+      a.system.hardLink({ dstPath : dstGlobalPath, srcPath : srcGlobalPath, makingDirectory : 1 });
+    })
+  }
+  
+  
 
   /* */
 

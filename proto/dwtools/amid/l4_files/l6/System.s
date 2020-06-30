@@ -472,8 +472,6 @@ function _pathRelocalize( r, provider )
   r.localPath = r.provider.path.preferredFromGlobal( r.parsedPath );
   else
   r.localPath = r.originalPath;
-  
-  r.localPath = path.unescape( r.localPath );
 
   _.assert( _.strIs( r.localPath ) );
 
@@ -490,6 +488,15 @@ function pathNativizeAct( filePath )
   _.assert( 0, 'not implemented' );
   _.assert( _.objectIs( r.provider ), 'No provider for path', filePath );
   _.assert( arguments.length === 1 );
+}
+
+//
+
+function pathAllowedAct( filePath )
+{
+  let self = this;
+  let r = self._pathLocalize( filePath );
+  return r.provider.pathAllowedAct( r.localPath );
 }
 
 //
@@ -1479,6 +1486,7 @@ let Extension =
   pathCurrentAct,
   pathDirTempAct,
   pathNativizeAct,
+  pathAllowedAct,
 
   pathResolveLinkFull,
   pathResolveLinkTail,

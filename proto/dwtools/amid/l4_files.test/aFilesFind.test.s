@@ -75,7 +75,7 @@ function assetFor( test, a )
 
   a = test.assetFor( a );
 
-  if( !a.system )
+  // if( !a.system )
   {
     if( a.fileProvider.system )
     a.system = a.fileProvider.system;
@@ -83,7 +83,7 @@ function assetFor( test, a )
     a.system = a.fileProvider;
   }
 
-  if( !a.effectiveProvider )
+  // if( !a.effectiveProvider )
   {
     if( !( a.fileProvider instanceof _.FileProvider.System ) )
     a.effectiveProvider = a.fileProvider;

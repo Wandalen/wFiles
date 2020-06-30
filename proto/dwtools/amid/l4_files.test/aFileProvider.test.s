@@ -41188,6 +41188,22 @@ function filesAreTextLinked( test )
 
 }
 
+function filesAreTextLinkedSrcEqualDst( test )
+{
+  let context = this;
+  let a = context.assetFor( test, false );
+  a.fileProvider.usingTextLink = 1;
+
+  test.case = 'src === dst';
+
+  test.case = 'rewriting : 1';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  var got = a.fileProvider.textLink({ dstPath : a.abs( 'src' ), srcPath : a.abs( 'src' ), rewriting : 1, allowingMissed : 1 });
+  test.identical( got, true );
+  test.identical( a.fileProvider.filesAreTextLinked({ filePath : [ a.abs( 'src' ), a.abs( 'src' ) ] }), true );
+}
+
 //
 
 function filesAreSoftLinked( test )
@@ -51141,6 +51157,7 @@ var Self =
 
     filesAreHardLinked,
     filesAreTextLinked,
+    filesAreTextLinkedSrcEqualDst,
     filesAreSoftLinked,
     filesCanBeSame,
 

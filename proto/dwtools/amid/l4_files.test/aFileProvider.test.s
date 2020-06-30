@@ -50886,6 +50886,50 @@ function textLinkReturnSync( test )
     test.identical( a.fileProvider.filesAreTextLinked({ filePath : [ a.abs( 'src' ), a.abs( 'dir1/dir2/dst' ) ] }), true );
   }
   test.close( 'dst exists, is text linked' );
+
+  /* */
+
+  test.open( 'src === dst' );
+  {
+    test.case = 'rewriting : 1';
+    a.reflect();
+    a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+    var got = a.fileProvider.textLink({ dstPath : a.abs( 'src' ), srcPath : a.abs( 'src' ), rewriting : 1, allowingMissed : 1 });
+    test.identical( got, true );
+    test.identical( a.fileProvider.filesAreTextLinked({ filePath : [ a.abs( 'src' ), a.abs( 'src' ) ] }), false );
+
+    //
+
+    // test.case = 'rewritingDirs : 1';
+    // a.reflect();
+    // a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+    // a.fileProvider.dirMake( a.abs( 'dir1/dst' ) );
+    // a.fileProvider.textLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), rewritingDirs : 1 });
+    // var got = a.fileProvider.textLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), rewritingDirs : 1 });
+    // test.identical( got, false );
+    // test.identical( a.fileProvider.filesAreTextLinked({ filePath : [ a.abs( 'src' ), a.abs( 'dir1/dst' ) ] }), true );
+
+    //
+
+    // test.case = 'makingDirectory : 1';
+    // a.reflect();
+    // a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+    // a.fileProvider.textLink({ dstPath : a.abs( 'dir1/dir2/dst' ), srcPath : a.abs( 'src' ), makingDirectory : 1 });
+    // var got = a.fileProvider.textLink({ dstPath : a.abs( 'dir1/dir2/dst' ), srcPath : a.abs( 'src' ), makingDirectory : 1 });
+    // test.identical( got, false );
+    // test.identical( a.fileProvider.filesAreTextLinked({ filePath : [ a.abs( 'src' ), a.abs( 'dir1/dir2/dst' ) ] }), true );
+
+    //
+
+    // test.case = 'makingDirectory : 0';
+    // a.reflect();
+    // a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+    // a.fileProvider.textLink({ dstPath : a.abs( 'dir1/dir2/dst' ), srcPath : a.abs( 'src' ), makingDirectory : 0 });
+    // var got = a.fileProvider.textLink({ dstPath : a.abs( 'dir1/dir2/dst' ), srcPath : a.abs( 'src' ), makingDirectory : 0 });
+    // test.identical( got, false );
+    // test.identical( a.fileProvider.filesAreTextLinked({ filePath : [ a.abs( 'src' ), a.abs( 'dir1/dir2/dst' ) ] }), true );
+  }
+  test.close( 'src === dst' );
 }
 
 // --

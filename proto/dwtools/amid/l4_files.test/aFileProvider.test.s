@@ -50684,8 +50684,8 @@ function textLinkReturnSync( test )
     a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
     var got = a.fileProvider.textLink({ dstPath : a.abs( 'dst' ), srcPath : a.abs( 'src' ), rewriting : 1 });
     test.identical( got, true );
-    test.identical( a.fileProvider.filesAreTextLinked( a.abs( 'dst' ), a.abs( 'src' ) ), true );
-
+    test.identical( a.fileProvider.filesAreTextLinked({ filePath : [ a.abs( 'src' ), a.abs( 'dst' ) ] }), true );
+  
     //
 
     // test.case = 'rewriting : 0';

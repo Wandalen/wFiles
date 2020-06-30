@@ -5502,7 +5502,7 @@ function fileLock_body( o )
   })
 
   if( o.sync )
-  return con.syncMaybe();
+  return con.sync();
 
   return con;
 }
@@ -5556,7 +5556,7 @@ function fileUnlock_body( o )
   })
 
   if( o.sync )
-  return con.syncMaybe();
+  return con.sync();
 
   return con;
 }
@@ -5609,7 +5609,7 @@ function fileIsLocked_body( o )
   })
 
   if( o.sync )
-  return con.syncMaybe();
+  return con.sync();
 
   return con;
 }
@@ -5838,7 +5838,10 @@ function _fileRenameDo( c )
       return true;
     })
 
-    return con.syncMaybe();
+    if( o.sync )
+    return con.sync();
+
+    return con;
   }
   else if( c.srcStat.isTextLink() )
   {
@@ -5910,7 +5913,10 @@ function _fileRenameDo( c )
       return true;
     })
 
-    return con.syncMaybe();
+    if( o.sync )
+    return con.sync();
+
+    return con;
   }
   else
   {
@@ -5938,7 +5944,10 @@ function _fileRenameDo( c )
       return true;
     })
 
-    return con.syncMaybe();
+    if( o.sync )
+    return con.sync();
+
+    return con;
   }
 }
 
@@ -6195,7 +6204,7 @@ function _fileCopyDo( c )
     })
 
     if( o.sync )
-    return con.syncMaybe();
+    return con.sync();
 
     return con;
   }
@@ -6454,7 +6463,7 @@ function _hardLinkDo( c )
     });
 
     if( o.sync )
-    return con.syncMaybe();
+    return con.sync();
 
     return con;
   }

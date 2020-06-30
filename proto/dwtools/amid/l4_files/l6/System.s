@@ -472,6 +472,8 @@ function _pathRelocalize( r, provider )
   r.localPath = r.provider.path.preferredFromGlobal( r.parsedPath );
   else
   r.localPath = r.originalPath;
+  
+  r.localPath = path.unescape( r.localPath );
 
   _.assert( _.strIs( r.localPath ) );
 

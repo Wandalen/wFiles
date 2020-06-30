@@ -619,6 +619,14 @@ function pathDirTempAct()
 
 //
 
+function pathAllowedAct( filePath )
+{
+  _.assert( _.strIs( filePath ), 'Expects string' ) ;
+  return true;
+}
+
+//
+
 function pathForCopy_pre( routine, args )
 {
   let self = this;
@@ -7635,6 +7643,7 @@ let Extension =
   pathNativizeAct,
   pathCurrentAct : null,
   pathDirTempAct, /* qqq : remove default implementation */
+  pathAllowedAct,
 
   // resolve
 

@@ -1691,7 +1691,6 @@ _.routineExtend( fileCopyAct, Parent.prototype.fileCopyAct );
 function softLinkAct( o )
 {
   let self = this;
-  // let srcIsAbsolute = self.path.isAbsolute( o.originalSrcPath );
   let srcIsAbsolute = self.path.isAbsolute( o.relativeSrcPath );
   let srcPath = o.srcPath;
 
@@ -1700,8 +1699,6 @@ function softLinkAct( o )
   _.assert( self.path.isNormalized( o.srcPath ) );
   _.assert( self.path.isNormalized( o.dstPath ) );
   _.assert( o.type === null || o.type === 'dir' ||  o.type === 'file' );
-
-  debugger;
 
   if( !srcIsAbsolute )
   {
@@ -2032,11 +2029,11 @@ _.routineExtend( hardLinkAct, Parent.prototype.hardLinkAct );
 
 //
 
-function filesAreHardLinkedAct( o )
+function areHardLinkedAct( o )
 {
   let self = this;
 
-  _.assertRoutineOptions( filesAreHardLinkedAct, arguments );
+  _.assertRoutineOptions( areHardLinkedAct, arguments );
   _.assert( o.filePath.length === 2, 'Expects exactly two arguments' );
 
   if( o.filePath[ 0 ] === o.filePath[ 1 ] )
@@ -2061,7 +2058,7 @@ function filesAreHardLinkedAct( o )
   return _.files.stat.areHardLinked( statFirst, statSecond );
 }
 
-_.routineExtend( filesAreHardLinkedAct, Parent.prototype.filesAreHardLinkedAct );
+_.routineExtend( areHardLinkedAct, Parent.prototype.areHardLinkedAct );
 
 // --
 // etc
@@ -2288,7 +2285,7 @@ let Extend =
 
   // link
 
-  filesAreHardLinkedAct,
+  areHardLinkedAct,
 
   // etc
 

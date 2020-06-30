@@ -748,8 +748,8 @@ function filesFind_pre( routine, args )
   _.assert
   (
       o.revisitingHardLinked === 1 || self.SupportsIno >= 1
-    , `Option revisitingHardLinked : 0 is supported only if file provider supports ino of files.`
-    + `\nBut file provider ${self.constructor.name} does not support ino of files.`
+    , `Option revisitingHardLinked : 0 is supported only if file provider supports ino of file.`
+    + `\nBut file provider ${self.constructor.name} does not support ino of file.`
   );
 
   // if( o.revisiting === 0 || o.revisitingHardLinked === 0 ) /* yyy */
@@ -1705,7 +1705,7 @@ function filesRead_body( o )
 
   function fileRead( record, dstPath )
   {
-    let r;
+    let r = null;
     let index = result.dataArray.length;
 
     try
@@ -1732,6 +1732,7 @@ function filesRead_body( o )
     }
     catch( err )
     {
+      debugger;
       err = _.err( err, `\nFailed to read ${record.absolute}` );
       err.filePath = record.absolute;
       result.errors.push( err );
@@ -1747,6 +1748,8 @@ var defaults = filesRead_body.defaults = _.mapExtend( null, Partial.prototype.fi
 defaults.sync = 1;
 defaults.throwing = null;
 defaults.mode = 'distinct';
+defaults.resolvingSoftLink = 1;
+defaults.resolvingTextLink = 1;
 
 delete defaults.outputFormat;
 

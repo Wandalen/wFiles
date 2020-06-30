@@ -584,7 +584,7 @@ _.routineExtend( hardLinkBreakAct, Parent.prototype.hardLinkBreakAct );
 
 //
 
-function filesAreHardLinkedAct( o )
+function areHardLinkedAct( o )
 {
   let self = this;
 
@@ -593,7 +593,7 @@ function filesAreHardLinkedAct( o )
   return false;
 }
 
-_.routineExtend( filesAreHardLinkedAct, Parent.prototype.filesAreHardLinkedAct );
+_.routineExtend( areHardLinkedAct, Parent.prototype.areHardLinkedAct );
 
 // --
 // relationship
@@ -679,7 +679,7 @@ let Extension =
   hardLinkAct,
 
   hardLinkBreakAct,
-  filesAreHardLinkedAct,
+  areHardLinkedAct,
 
   //
 

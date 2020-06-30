@@ -2932,6 +2932,7 @@ defaults.throwing = null;
 defaults.onBegin = null;
 defaults.onEnd = null;
 defaults.onError = null;
+defaults.resolvingSoftLink = 1; /* yyy */
 defaults.resolvingTextLink = null;
 defaults.verbosity = null;
 
@@ -3524,23 +3525,42 @@ function hashSzIsUpToDate_body( o )
 
   _.assert( _.strDefined( o.hash ) );
 
-  let ready = _.Consequence.From( self.statRead({ filePath : o.filePath, sync : o.sync, throwing : o.throwing }) );
+  let ready;
+
+  if( o.data === null )
+  ready = _.Consequence.From( self.statRead
+  ({
+    filePath : o.filePath,
+    sync : o.sync,
+    throwing : o.throwing,
+    resolvingSoftLink : 1,
+    resolvingTextLink : 1,
+  }));
+  else
+  ready = _.Consequence.From( null );
+
   let parsed = o.hash.split( '-' );
   parsed[ 0 ] = _.bigIntFrom( parsed[ 0 ] );
 
-  ready
-  .then( ( stat ) =>
+  if( o.data === null )
+  ready.then( ( stat ) =>
   {
     if( stat === null )
     return null;
     if( stat.size !== parsed[ 0 ] )
     return false;
-    if( o.data !== null )
-    return _.files.hashFrom( o.data );
-    else
     return self.hashRead( _.mapOnly( o, self.hashRead.defaults ) );
   })
-  .then( ( hash ) =>
+  else
+  ready.then( ( stat ) =>
+  {
+    let data = _.bufferBytesFrom( o.data );
+    if( _.bigIntFrom( data.byteLength ) !== parsed[ 0 ] )
+    return false;
+    return _.files.hashFrom( data );
+  })
+
+  ready.then( ( hash ) =>
   {
     if( !hash )
     return hash;
@@ -5998,7 +6018,7 @@ var defaults = fileRename.body.defaults;
 
 defaults.rewriting = 0;
 defaults.rewritingDirs = 0;
-defaults.makingDirectory = 0;
+defaults.makingDirectory = 0; /* qqq2 : change default to makingDirectory : 1 */
 defaults.allowingMissed = 0;
 defaults.allowingCycled = 0;
 defaults.throwing = null;
@@ -6125,7 +6145,7 @@ function _fileCopyVerify2( c )
 
   if( !o.breakingDstHardLink )
   {
-    let linked = self.filesAreHardLinked([ o.dstPath, o.srcPath ]);
+    let linked = self.areHardLinked([ o.dstPath, o.srcPath ]);
     if( linked || linked === _.maybe )
     c.end( false );
   }
@@ -6260,7 +6280,7 @@ var defaults = fileCopy.body.defaults;
 
 defaults.rewriting = 1;
 defaults.rewritingDirs = 0;
-defaults.makingDirectory = 0;
+defaults.makingDirectory = 0; /* qqq2 : change default to makingDirectory : 1 */
 defaults.allowingMissed = 0;
 defaults.allowingCycled = 0;
 defaults.throwing = null;
@@ -6393,7 +6413,7 @@ function _hardLinkVerify2( c )
   }
   else
   {
-    let linked = self.filesAreHardLinked([ o.dstPath, o.srcPath ]);
+    let linked = self.areHardLinked([ o.dstPath, o.srcPath ]);
     if( linked || linked === _.maybe )
     c.end( false );
   }
@@ -6547,7 +6567,7 @@ var defaults = hardLink.body.defaults;
 
 defaults.rewriting = 1;
 defaults.rewritingDirs = 0;
-defaults.makingDirectory = 0;
+defaults.makingDirectory = 0; /* qqq2 : change default to makingDirectory : 1 */
 defaults.throwing = null;
 defaults.verbosity = null;
 defaults.allowDiffContent = 0;
@@ -6633,15 +6653,15 @@ function _softLinkVerify2( c )
   let o = c.options;
 
   if( !o.allowingMissed )
-  // if( self.filesAreSoftLinked([ o.dstPath, o.srcPath ]) )
+  // if( self.areSoftLinked([ o.dstPath, o.srcPath ]) )
   if( o.dstPath === o.srcPath )
   c.error( _.err( 'Soft link cycle', path.moveTextualReport( o.dstPath, o.srcPath ) ) );
 
-  // if( o.dstPath !== o.srcPath && self.filesAreSoftLinked([ o.dstPath, o.srcPath ]) )
+  // if( o.dstPath !== o.srcPath && self.areSoftLinked([ o.dstPath, o.srcPath ]) )
   // if( o.dstPath === o.srcPath )
   // return true;
 
-  // if( o.dstPath !== o.srcPath && self.filesAreSoftLinked([ o.dstPath, o.srcPath ]) )
+  // if( o.dstPath !== o.srcPath && self.areSoftLinked([ o.dstPath, o.srcPath ]) )
   // return true;
 
 }
@@ -6659,7 +6679,7 @@ var defaults = softLink.body.defaults;
 
 defaults.rewriting = 1;
 defaults.rewritingDirs = 0;
-defaults.makingDirectory = 0;
+defaults.makingDirectory = 0; /* qqq2 : change default to makingDirectory : 1 */
 defaults.throwing = null;
 defaults.verbosity = null;
 defaults.allowingMissed = 0;
@@ -6747,9 +6767,9 @@ function _textLinkVerify2( c )
 {
   let self = this;
   let o = c.options;
-  // if( o.dstPath !== o.srcPath && self.filesAreTextLinked([ o.dstPath, o.srcPath ]) )
+  // if( o.dstPath !== o.srcPath && self.areTextLinked([ o.dstPath, o.srcPath ]) )
   // debugger;
-  if( o.dstPath !== o.srcPath && self.filesAreTextLinked([ o.dstPath, o.srcPath ]) )
+  if( o.dstPath !== o.srcPath && self.areTextLinked([ o.dstPath, o.srcPath ]) )
   c.end( false );
 }
 
@@ -6794,7 +6814,7 @@ var defaults = textLink.body.defaults;
 
 defaults.rewriting = 1;
 defaults.rewritingDirs = 0;
-defaults.makingDirectory = 0;
+defaults.makingDirectory = 0; /* qqq2 : change default to makingDirectory : 1 */
 defaults.throwing = null;
 defaults.verbosity = null;
 defaults.allowingMissed = 0;
@@ -7171,18 +7191,18 @@ softLinkBreak.having.aspect = 'entry';
 
 //
 
-let filesAreHardLinkedAct = Object.create( null );
-filesAreHardLinkedAct.name = 'filesAreHardLinkedAct';
+let areHardLinkedAct = Object.create( null );
+areHardLinkedAct.name = 'areHardLinkedAct';
 
-var defaults = filesAreHardLinkedAct.defaults = Object.create( null );
+var defaults = areHardLinkedAct.defaults = Object.create( null );
 defaults.filePath = null;
 
-var having = filesAreHardLinkedAct.having = Object.create( null );
+var having = areHardLinkedAct.having = Object.create( null );
 having.writing = 0;
 having.reading = 1;
 having.driving = 1;
 
-var operates = filesAreHardLinkedAct.operates = Object.create( null );
+var operates = areHardLinkedAct.operates = Object.create( null );
 operates.filePath = { pathToRead : 1, vector : [ 2, 2 ] }
 
 //
@@ -7199,14 +7219,14 @@ operates.filePath = { pathToRead : 1, vector : [ 2, 2 ] }
    wTools.fileWrite( { filePath : path1, data : buffer } );
    fs.symlinkSync( path1, path2 );
 
-   let linked = wTools.filesAreHardLinked( path1, path2 ); // true
+   let linked = wTools.areHardLinked( path1, path2 ); // true
 
  * @param {string|wFileRecord} ins1 path string/file record instance
  * @param {string|wFileRecord} ins2 path string/file record instance
 
  * @returns {boolean}
  * @throws {Error} if missed one of arguments or pass more then 2 arguments.
- * @method filesAreHardLinked
+ * @method areHardLinked
  * @class wFileProviderPartial
  * @namespace wTools.FileProvider
  * @module Tools/mid/Files
@@ -7246,12 +7266,12 @@ function filesAreLinked_pre( routine, args )
 
 //
 
-function filesAreHardLinked_body( o ) /* qqq : refactor. probably move some code to filesAreHardLinkedAct */
+function areHardLinked_body( o ) /* qqq : refactor. probably move some code to areHardLinkedAct */
 {
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertRoutineOptions( filesAreHardLinked_body, arguments );
+  _.assertRoutineOptions( areHardLinked_body, arguments );
 
   if( !o.filePath.length )
   return true;
@@ -7260,7 +7280,7 @@ function filesAreHardLinked_body( o ) /* qqq : refactor. probably move some code
 
   for( let i = 1 ; i < o.filePath.length ; i++ )
   {
-    result = self.filesAreHardLinkedAct({ filePath : [ o.filePath[ 0 ], o.filePath[ i ] ] });
+    result = self.areHardLinkedAct({ filePath : [ o.filePath[ 0 ], o.filePath[ i ] ] });
     _.assert( _.boolIs( result ) || result === _.maybe );
     if( !result )
     break;
@@ -7269,28 +7289,28 @@ function filesAreHardLinked_body( o ) /* qqq : refactor. probably move some code
   return result;
 }
 
-_.routineExtend( filesAreHardLinked_body, filesAreHardLinkedAct );
+_.routineExtend( areHardLinked_body, areHardLinkedAct );
 
-var having = filesAreHardLinked_body.having;
+var having = areHardLinked_body.having;
 having.aspect = 'body';
 
 //
 
-let filesAreHardLinked = _.routineFromPreAndBody( filesAreLinked_pre, filesAreHardLinked_body );
+let areHardLinked = _.routineFromPreAndBody( filesAreLinked_pre, areHardLinked_body );
 
-var having = filesAreHardLinked.having;
+var having = areHardLinked.having;
 having.driving = 0;
 having.aspect = 'entry';
 
 //
 
-function filesAreSoftLinked_body( o )
+function areSoftLinked_body( o )
 {
   let self = this;
   let path = self.system ? self.system.path : self.path;;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertRoutineOptions( filesAreSoftLinked_body, arguments );
+  _.assertRoutineOptions( areSoftLinked_body, arguments );
   _.assert( o.filePath.length >= 2 );
 
   o.filePath = path.s.normalize( o.filePath );
@@ -7326,14 +7346,14 @@ function filesAreSoftLinked_body( o )
   return true;
 }
 
-var defaults = filesAreSoftLinked_body.defaults = Object.create( null );
+var defaults = areSoftLinked_body.defaults = Object.create( null );
 defaults.filePath = null;
 defaults.resolvingTextLink = 0;
 
-var operates = filesAreSoftLinked_body.operates = Object.create( null );
+var operates = areSoftLinked_body.operates = Object.create( null );
 operates.filePath = { pathToRead : 1 }
 
-var having = filesAreSoftLinked_body.having = Object.create( null );
+var having = areSoftLinked_body.having = Object.create( null );
 having.writing = 0;
 having.reading = 1;
 having.driving = 0;
@@ -7341,20 +7361,20 @@ having.aspect = 'body';
 
 //
 
-let filesAreSoftLinked = _.routineFromPreAndBody( filesAreLinked_pre, filesAreSoftLinked_body );
+let areSoftLinked = _.routineFromPreAndBody( filesAreLinked_pre, areSoftLinked_body );
 
-filesAreSoftLinked.having.driving = 0;
-filesAreSoftLinked.having.aspect = 'entry';
+areSoftLinked.having.driving = 0;
+areSoftLinked.having.aspect = 'entry';
 
 //
 
-function filesAreTextLinked_body( o )
+function areTextLinked_body( o )
 {
   let self = this;
   let path = self.system ? self.system.path : self.path;;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertRoutineOptions( filesAreTextLinked_body, arguments );
+  _.assertRoutineOptions( areTextLinked_body, arguments );
   _.assert( o.filePath.length >= 2 );
 
   o.filePath = path.s.normalize( o.filePath );
@@ -7386,14 +7406,14 @@ function filesAreTextLinked_body( o )
   return true;
 }
 
-var defaults = filesAreTextLinked_body.defaults = Object.create( null );
+var defaults = areTextLinked_body.defaults = Object.create( null );
 defaults.filePath = null;
 defaults.resolvingSoftLink = 0;
 
-var operates = filesAreTextLinked_body.operates = Object.create( null );
+var operates = areTextLinked_body.operates = Object.create( null );
 operates.filePath = { pathToRead : 1 }
 
-var having = filesAreTextLinked_body.having = Object.create( null );
+var having = areTextLinked_body.having = Object.create( null );
 having.writing = 0;
 having.reading = 1;
 having.driving = 0;
@@ -7401,10 +7421,10 @@ having.aspect = 'body';
 
 //
 
-let filesAreTextLinked = _.routineFromPreAndBody( filesAreLinked_pre, filesAreTextLinked_body );
+let areTextLinked = _.routineFromPreAndBody( filesAreLinked_pre, areTextLinked_body );
 
-filesAreTextLinked.having.driving = 0;
-filesAreTextLinked.having.aspect = 'entry';
+areTextLinked.having.driving = 0;
+areTextLinked.having.aspect = 'entry';
 
 // --
 // accessor
@@ -7775,7 +7795,7 @@ let Extension =
   resolvedNoneAreHardLinks : vectorizeNone( resolvedIsHardLink ),
 
   isSoftLink,
-  filesAreSoftLinks : vectorize( isSoftLink ),
+  areSoftLinks : vectorize( isSoftLink ),
   allAreSoftLinks : vectorizeAll( isSoftLink ),
   anyAreSoftLinks : vectorizeAny( isSoftLink ),
   noneAreSoftLinks : vectorizeNone( isSoftLink ),
@@ -7786,7 +7806,7 @@ let Extension =
   resolvedNoneAreSoftLinks : vectorizeNone( resolvedIsSoftLink ),
 
   isTextLink,
-  filesAreTextLinks : vectorize( isTextLink ),
+  areTextLinks : vectorize( isTextLink ),
   allAreTextLinks : vectorizeAll( isTextLink ),
   anyAreTextLinks : vectorizeAny( isTextLink ),
   noneAreTextLinks : vectorizeNone( isTextLink ),
@@ -7902,10 +7922,10 @@ let Extension =
   softLinkBreakAct,
   softLinkBreak,
 
-  filesAreHardLinkedAct,
-  filesAreHardLinked,
-  filesAreSoftLinked,
-  filesAreTextLinked,
+  areHardLinkedAct,
+  areHardLinked,
+  areSoftLinked,
+  areTextLinked,
 
   // accessor
 

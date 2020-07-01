@@ -117,7 +117,9 @@ function assetFor( test, a )
 function softLinkIsSupported()
 {
   let context = this;
+  let provider = context.provider
   let path = context.provider.path;
+  
 
   if( Config.interpreter === 'njs' && typeof process !== undefined )
   if( process.platform === 'win32' )
@@ -127,13 +129,13 @@ function softLinkIsSupported()
     var srcPath = path.join( dir, 'src' );
     var dstPath = path.join( dir, 'dst' );
 
-    _.fileProvider.filesDelete( dir );
-    _.fileProvider.fileWrite( srcPath, srcPath );
+    provider.filesDelete( dir );
+    provider.fileWrite( srcPath, srcPath );
 
     try
     {
-      _.fileProvider.softLink({ dstPath, srcPath, throwing : 1, sync : 1 });
-      allow = _.fileProvider.isSoftLink( dstPath );
+      provider.softLink({ dstPath, srcPath, throwing : 1, sync : 1 });
+      allow = provider.isSoftLink( dstPath );
     }
     catch( err )
     {

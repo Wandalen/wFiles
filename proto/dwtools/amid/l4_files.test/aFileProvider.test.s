@@ -67,9 +67,13 @@ function assetFor( test, a )
 
   a.suiteTempPath = a.fileProvider.path.pathDirTempOpen( a.fileProvider.constructor.name );
 
+  let system = a.system;
+  let effectiveProvider = a.effectiveProvider;
+  let global = a.global;
+
   a = test.assetFor( a );
 
-  if( !a.system )
+  if( !system )
   {
     if( a.fileProvider.system )
     a.system = a.fileProvider.system;
@@ -77,7 +81,7 @@ function assetFor( test, a )
     a.system = a.fileProvider;
   }
 
-  if( !a.effectiveProvider )
+  if( !effectiveProvider )
   {
     if( !( a.fileProvider instanceof _.FileProvider.System ) )
     a.effectiveProvider = a.fileProvider;
@@ -87,7 +91,7 @@ function assetFor( test, a )
 
   _.assert( a.effectiveProvider instanceof _.FileProvider.Abstract, 'effectiveProvider is not specificed' );
 
-  if( !a.global )
+  if( !global )
   a.global = globalFor;
 
   return a;
@@ -1036,7 +1040,7 @@ function readWriteSync( test )
     test.identical( got, data);
     provider.fieldPop( 'resolvingSoftLink', 1 );
 
-    test.case = 'read from soft link, resolvingSoftLink on';
+    test.case = 'read from soft link, resolvingSoftLink off';
     var data = 'data';
     provider.fieldPush( 'resolvingSoftLink', 0 );
     provider.fileWrite( filePath, data );
@@ -1044,7 +1048,7 @@ function readWriteSync( test )
     provider.softLink( linkPath, filePath );
     test.shouldThrowErrorOfAnyKind( () =>
     {
-      provider.fileRead( linkPath );
+      provider.fileRead({ linkPath, resolvingSoftLink : 0 });
     });
     provider.fieldPop( 'resolvingSoftLink', 0 );
 
@@ -1411,7 +1415,7 @@ function readWriteSync( test )
 
     test.case = 'resolving disabled, read using softLink';
     var linkPath = '/softLinkToFile';
-    test.shouldThrowErrorOfAnyKind( () => provider.fileRead( linkPath ) );
+    test.shouldThrowErrorOfAnyKind( () => provider.fileRead({ linkPath, resolvingSoftLink : 0 }) );
 
     test.case = 'resolving disabled, write using softLink, link becomes usual file';
     var linkPath = '/softLinkToFile';
@@ -2601,13 +2605,15 @@ function readWriteAsync( test )
 
     test.case = 'read from soft link, resolvingSoftLink on';
     var data = 'data';
+    //qqq2 Vova: duplicate cases that are using fieldPush to own routine, use option resolvingSoftLink explicitly here
+    //qqq2 Vova: use field usingSoftLink instead of resolvingSoftLink in combination with fileRead to simulate old behaviour
     provider.fieldPush( 'resolvingSoftLink', 0 );
     return provider.fileWrite({ filePath, data, sync : 0 })
     .finally( () =>
     {
       var linkPath = test.context.pathFor( 'written/readWriteAsync/link' );
       provider.softLink( linkPath, filePath );
-      var con = provider.fileRead({ filePath : linkPath, sync : 0 });
+      var con = provider.fileRead({ filePath : linkPath, sync : 0, resolvingSoftLink : 0 });
       return test.shouldThrowErrorOfAnyKind( con )
       .finally( () =>
       {

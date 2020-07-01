@@ -1512,9 +1512,10 @@ function filesFindGroups_body( o )
   {
     if( r.errors.length )
     {
-      debugger;
+      r.errors.forEach( ( err, index ) => index > 0 ? _.errAttend( err ) : null ); /* yyy */
       if( o.throwing )
       throw r.errors[ 0 ];
+      // throw _.err.apply( _, r.errors )
     }
     return r;
   });

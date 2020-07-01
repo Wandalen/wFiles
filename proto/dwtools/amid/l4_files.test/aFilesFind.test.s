@@ -73,9 +73,13 @@ function assetFor( test, a )
 
   a.suiteTempPath = a.fileProvider.path.pathDirTempOpen( a.fileProvider.constructor.name );
 
+  let system = a.system;
+  let effectiveProvider = a.effectiveProvider;
+  let global = a.global;
+
   a = test.assetFor( a );
 
-  if( !a.system )
+  if( !system )
   {
     if( a.fileProvider.system )
     a.system = a.fileProvider.system;
@@ -83,7 +87,7 @@ function assetFor( test, a )
     a.system = a.fileProvider;
   }
 
-  if( !a.effectiveProvider )
+  if( !effectiveProvider )
   {
     if( !( a.fileProvider instanceof _.FileProvider.System ) )
     a.effectiveProvider = a.fileProvider;
@@ -93,7 +97,7 @@ function assetFor( test, a )
 
   _.assert( a.effectiveProvider instanceof _.FileProvider.Abstract, 'effectiveProvider is not specificed' );
 
-  if( !a.global )
+  if( !global )
   a.global = globalFor;
 
   return a;
@@ -113,7 +117,9 @@ function assetFor( test, a )
 function softLinkIsSupported()
 {
   let context = this;
+  let provider = context.provider
   let path = context.provider.path;
+  
 
   if( Config.interpreter === 'njs' && typeof process !== undefined )
   if( process.platform === 'win32' )
@@ -123,13 +129,13 @@ function softLinkIsSupported()
     var srcPath = path.join( dir, 'src' );
     var dstPath = path.join( dir, 'dst' );
 
-    _.fileProvider.filesDelete( dir );
-    _.fileProvider.fileWrite( srcPath, srcPath );
+    provider.filesDelete( dir );
+    provider.fileWrite( srcPath, srcPath );
 
     try
     {
-      _.fileProvider.softLink({ dstPath, srcPath, throwing : 1, sync : 1 });
-      allow = _.fileProvider.isSoftLink( dstPath );
+      provider.softLink({ dstPath, srcPath, throwing : 1, sync : 1 });
+      allow = provider.isSoftLink( dstPath );
     }
     catch( err )
     {

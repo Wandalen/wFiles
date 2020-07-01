@@ -958,7 +958,7 @@ function validateSize()
 
   /* qqq: find better solution to check text links */
   if( /* srcStat.isTextLink() && */ c.dstStat.isTextLink() )
-  if( self.filesAreTextLinked([ c.dstStat.filePath, srcStat.filePath ]) )
+  if( self.areTextLinked([ c.dstStat.filePath, srcStat.filePath ]) )
   return;
 
   let srcSize = srcStat ? srcStat.size : NaN;

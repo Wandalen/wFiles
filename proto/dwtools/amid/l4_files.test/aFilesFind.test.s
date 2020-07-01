@@ -75,7 +75,7 @@ function assetFor( test, a )
 
   a = test.assetFor( a );
 
-  // if( !a.system )
+  if( !a.system )
   {
     if( a.fileProvider.system )
     a.system = a.fileProvider.system;
@@ -83,7 +83,7 @@ function assetFor( test, a )
     a.system = a.fileProvider;
   }
 
-  // if( !a.effectiveProvider )
+  if( !a.effectiveProvider )
   {
     if( !( a.fileProvider instanceof _.FileProvider.System ) )
     a.effectiveProvider = a.fileProvider;
@@ -94,9 +94,7 @@ function assetFor( test, a )
   _.assert( a.effectiveProvider instanceof _.FileProvider.Abstract, 'effectiveProvider is not specificed' );
 
   if( !a.global )
-  {
-    a.global = globalFor;
-  }
+  a.global = globalFor;
 
   return a;
 
@@ -14523,6 +14521,69 @@ function filesFindTotalNegative( test )
 
 //
 
+function filesFindOptionRevisitingHardLinked( test )
+{
+  let context = this;
+  let a = context.assetFor( test, false );
+
+  /* */
+
+  test.case = 'revisitingHardLinked : 1';
+
+  a.fileProvider.fileWrite( a.abs( 'File1.txt' ), 'File1.txt' );
+  a.fileProvider.fileWrite( a.abs( 'File2.txt' ), 'File2.txt' );
+  a.fileProvider.fileWrite( a.abs( 'dir/File3.txt' ), 'dir/File3.txt' );
+  a.fileProvider.hardLink( a.abs( 'dir/File1h.txt' ), a.abs( 'File1.txt' ) );
+  test.identical( a.fileProvider.areHardLinked([ a.abs( 'File1.txt' ), a.abs( 'dir/File1h.txt' ) ]), true );
+
+  var exp = [ '.', './File1.txt', './File2.txt', './dir', './dir/File1h.txt', './dir/File3.txt' ];
+  var got = a.fileProvider.filesFind
+  ({
+    filter : { filePath : a.abs( '**' ) },
+    mode : 'distinct',
+    withDirs : 1,
+    revisitingHardLinked : 1,
+    outputFormat : 'relative',
+  });
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'revisitingHardLinked : 0';
+
+  a.fileProvider.fileWrite( a.abs( 'File1.txt' ), 'File1.txt' );
+  a.fileProvider.fileWrite( a.abs( 'File2.txt' ), 'File2.txt' );
+  a.fileProvider.fileWrite( a.abs( 'dir/File3.txt' ), 'dir/File3.txt' );
+  a.fileProvider.hardLink( a.abs( 'dir/File1h.txt' ), a.abs( 'File1.txt' ) );
+
+  var exp = [ '.', './File1.txt', './File2.txt', './dir', './dir/File3.txt' ];
+  var got = a.fileProvider.filesFind
+  ({
+    filter : { filePath : a.abs( '**' ) },
+    mode : 'distinct',
+    withDirs : 1,
+    revisitingHardLinked : 0,
+    outputFormat : 'relative',
+  });
+  test.identical( got, exp );
+
+  var exp = [ '.', './File1h.txt', './File3.txt' ];
+  var got = a.fileProvider.filesFind
+  ({
+    filter : { filePath : a.abs( 'dir/**' ) },
+    mode : 'distinct',
+    withDirs : 1,
+    revisitingHardLinked : 0,
+    outputFormat : 'relative',
+  });
+  test.identical( got, exp );
+
+  /* */
+
+}
+
+//
+
 /*
 qqq : extend coverage of filesFindGroups
 qqq : please, clean filesFindGroups
@@ -17826,10 +17887,10 @@ function filesReflect( test )
     test.identical( preserve, expectedPreserve );
     test.identical( reason, expectedReason );
 
-    test.identical( p.system.filesAreSoftLinked([ p.src.path.globalFromPreferred( '/src/a1' ), p.dst.path.globalFromPreferred( '/dst/a1' ) ]), false );
-    test.identical( p.system.filesAreSoftLinked([ p.src.path.globalFromPreferred( '/src/a1' ), p.src.path.globalFromPreferred( '/src/a1' ) ]), false );
-    test.identical( p.system.filesAreHardLinked([ p.src.path.globalFromPreferred( '/src/a1' ), p.dst.path.globalFromPreferred( '/dst/a1' ) ]), false );
-    test.identical( p.system.filesAreHardLinked([ p.src.path.globalFromPreferred( '/src/a1' ), p.src.path.globalFromPreferred( '/src/a1' ) ]), true );
+    test.identical( p.system.areSoftLinked([ p.src.path.globalFromPreferred( '/src/a1' ), p.dst.path.globalFromPreferred( '/dst/a1' ) ]), false );
+    test.identical( p.system.areSoftLinked([ p.src.path.globalFromPreferred( '/src/a1' ), p.src.path.globalFromPreferred( '/src/a1' ) ]), false );
+    test.identical( p.system.areHardLinked([ p.src.path.globalFromPreferred( '/src/a1' ), p.dst.path.globalFromPreferred( '/dst/a1' ) ]), false );
+    test.identical( p.system.areHardLinked([ p.src.path.globalFromPreferred( '/src/a1' ), p.src.path.globalFromPreferred( '/src/a1' ) ]), true );
 
     /* */
 
@@ -17880,12 +17941,12 @@ function filesReflect( test )
     test.identical( action, expectedAction );
     test.identical( allow, expectedAllow );
 
-    test.identical( p.system.filesAreSoftLinked([ p.src.path.globalFromPreferred( '/src/a1' ), p.dst.path.globalFromPreferred( '/dst/a1' ) ]), true );
-    test.identical( p.system.filesAreSoftLinked([ p.src.path.globalFromPreferred( '/src/a2' ), p.dst.path.globalFromPreferred( '/dst/a2' ) ]), false );
-    test.identical( p.system.filesAreSoftLinked([ p.src.path.globalFromPreferred( '/src/b' ), p.dst.path.globalFromPreferred( '/dst/b' ) ]), true );
-    test.identical( p.system.filesAreSoftLinked([ p.src.path.globalFromPreferred( '/src/dir/a1' ), p.dst.path.globalFromPreferred( '/dst/dir/a1' ) ]), true );
-    test.identical( p.system.filesAreSoftLinked([ p.src.path.globalFromPreferred( '/src/dir/a2' ), p.dst.path.globalFromPreferred( '/dst/dir/a2' ) ]), false );
-    test.identical( p.system.filesAreSoftLinked([ p.src.path.globalFromPreferred( '/src/dir/b' ), p.dst.path.globalFromPreferred( '/dst/dir/b' ) ]), true );
+    test.identical( p.system.areSoftLinked([ p.src.path.globalFromPreferred( '/src/a1' ), p.dst.path.globalFromPreferred( '/dst/a1' ) ]), true );
+    test.identical( p.system.areSoftLinked([ p.src.path.globalFromPreferred( '/src/a2' ), p.dst.path.globalFromPreferred( '/dst/a2' ) ]), false );
+    test.identical( p.system.areSoftLinked([ p.src.path.globalFromPreferred( '/src/b' ), p.dst.path.globalFromPreferred( '/dst/b' ) ]), true );
+    test.identical( p.system.areSoftLinked([ p.src.path.globalFromPreferred( '/src/dir/a1' ), p.dst.path.globalFromPreferred( '/dst/dir/a1' ) ]), true );
+    test.identical( p.system.areSoftLinked([ p.src.path.globalFromPreferred( '/src/dir/a2' ), p.dst.path.globalFromPreferred( '/dst/dir/a2' ) ]), false );
+    test.identical( p.system.areSoftLinked([ p.src.path.globalFromPreferred( '/src/dir/b' ), p.dst.path.globalFromPreferred( '/dst/dir/b' ) ]), true );
 
     /* */
 
@@ -24754,7 +24815,7 @@ function filesReflectSrcAndDstLinked( test )
   test.identical( dstStat.ctime, dstStat2.ctime )
   test.identical( dstStat.mtime, dstStat2.mtime )
 
-  test.is( provider.filesAreHardLinked([ srcPath, dstPath ]) );
+  test.is( provider.areHardLinked([ srcPath, dstPath ]) );
 
   /* - */
 
@@ -24788,7 +24849,7 @@ function filesReflectSrcAndDstLinked( test )
   test.identical( dstStat.ctime, dstStat2.ctime )
   test.identical( dstStat.mtime, dstStat2.mtime )
 
-  test.is( provider.filesAreSoftLinked([ srcPath, dstPath ]) );
+  test.is( provider.areSoftLinked([ srcPath, dstPath ]) );
 
   /* - */
 
@@ -24824,7 +24885,7 @@ function filesReflectSrcAndDstLinked( test )
   test.identical( dstStat.ctime, dstStat2.ctime )
   test.identical( dstStat.mtime, dstStat2.mtime )
 
-  test.is( provider.filesAreTextLinked([ srcPath, dstPath ]) );
+  test.is( provider.areTextLinked([ srcPath, dstPath ]) );
 
   provider.fieldPop( 'usingTextLink', 1 );
 
@@ -37727,6 +37788,8 @@ var Self =
     filesFindTotalNegative,
     /* qqq : implement filesFindTotalNegative, */
     /* qqq : implement filesFindSeveralTotalNegative, */
+    filesFindOptionRevisitingHardLinked,
+
     filesFindGroups,
     filesFindGroupsAsync,
 

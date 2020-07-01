@@ -77,6 +77,17 @@ function pathCurrentAct()
 
 //
 
+function _pathHasDriveLetter( filePath )
+{
+  _.assert( _.strIs( filePath ), 'Expects nativized path.' );
+
+  if( process.platform === 'win32' )
+  return /^[a-zA-Z]:\\/.test( filePath );
+  return true;
+}
+
+//
+
 function _isTextLink( filePath )
 {
   let self = this;
@@ -1020,6 +1031,8 @@ function fileWriteAct( o )
 
   let fileNativePath = self.path.nativize( o.filePath );
 
+  _.assert( self._pathHasDriveLetter( fileNativePath ), `Expects path that begins with drive letter, but got:"${o.filePath}"` );
+
   /* write */
 
   if( o.sync )
@@ -1090,6 +1103,8 @@ function streamWriteAct( o )
 
   let filePath = self.path.nativize( o.filePath );
 
+  _.assert( self._pathHasDriveLetter( filePath ), `Expects path that begins with drive letter, but got:"${o.filePath}"` );
+
   try
   {
     return File.createWriteStream( filePath );
@@ -1119,6 +1134,9 @@ function fileTimeSetAct( o )
   */
 
   let fileNativePath = self.path.nativize( o.filePath );
+
+  _.assert( self._pathHasDriveLetter( fileNativePath ), `Expects path that begins with drive letter, but got:"${o.filePath}"` );
+
   let flags = process.platform === 'win32' ? 'r+' : 'r';
   let descriptor = File.openSync( fileNativePath, flags );
   try
@@ -1188,6 +1206,8 @@ function fileDeleteAct( o )
   // console.log( 'fileDeleteAct', o.filePath );
 
   let filePath = self.path.nativize( o.filePath );
+
+  _.assert( self._pathHasDriveLetter( filePath ), `Expects path that begins with drive letter, but got:"${o.filePath}"` );
 
   if( o.sync )
   {
@@ -1306,6 +1326,8 @@ function dirMakeAct( o )
   let fileNativePath = self.path.nativize( o.filePath );
 
   _.assertRoutineOptions( dirMakeAct, arguments );
+  _.assert( self._pathHasDriveLetter( fileNativePath ), `Expects path that begins with drive letter, but got:"${o.filePath}"` );
+
 
   if( o.sync )
   {
@@ -1354,6 +1376,7 @@ function fileLockAct( o )
   _.assert( self.path.isNormalized( o.filePath ) );
   _.assert( !o.waiting || o.timeOut >= 1000 );
   _.assertRoutineOptions( fileLockAct, arguments );
+  _.assert( self._pathHasDriveLetter( fileNativePath ), `Expects path that begins with drive letter, but got:"${o.filePath}"` );
 
   let con = _.Consequence.Try( () =>
   {
@@ -1427,6 +1450,7 @@ function fileUnlockAct( o )
 
   _.assert( self.path.isNormalized( o.filePath ) );
   _.assertRoutineOptions( fileUnlockAct, arguments );
+  _.assert( self._pathHasDriveLetter( fileNativePath ), `Expects path that begins with drive letter, but got:"${o.filePath}"` );
 
   let con = _.Consequence.Try( () =>
   {
@@ -1518,6 +1542,9 @@ function fileRenameAct( o )
   let dstPath = self.path.nativize( o.dstPath );
   let srcPath = self.path.nativize( o.srcPath );
 
+  _.assert( self._pathHasDriveLetter( srcPath ), `Expects src path that begins with drive letter, but got:"${o.srcPath}"` );
+  _.assert( self._pathHasDriveLetter( dstPath ), `Expects dst path that begins with drive letter, but got:"${o.dstPath}"` );
+
   _.assert( !!dstPath );
   _.assert( !!srcPath );
 
@@ -1590,6 +1617,9 @@ function fileCopyAct( o )
   let dstPath = self.path.nativize( o.dstPath );
   let srcPath = self.path.nativize( o.srcPath );
 
+  _.assert( self._pathHasDriveLetter( srcPath ), `Expects src path that begins with drive letter, but got:"${o.srcPath}"` );
+  _.assert( self._pathHasDriveLetter( dstPath ), `Expects dst path that begins with drive letter, but got:"${o.dstPath}"` );
+
   _.assert( !!dstPath );
   _.assert( !!srcPath );
 
@@ -1661,7 +1691,6 @@ _.routineExtend( fileCopyAct, Parent.prototype.fileCopyAct );
 function softLinkAct( o )
 {
   let self = this;
-  // let srcIsAbsolute = self.path.isAbsolute( o.originalSrcPath );
   let srcIsAbsolute = self.path.isAbsolute( o.relativeSrcPath );
   let srcPath = o.srcPath;
 
@@ -1670,8 +1699,6 @@ function softLinkAct( o )
   _.assert( self.path.isNormalized( o.srcPath ) );
   _.assert( self.path.isNormalized( o.dstPath ) );
   _.assert( o.type === null || o.type === 'dir' ||  o.type === 'file' );
-
-  debugger;
 
   if( !srcIsAbsolute )
   {
@@ -1710,6 +1737,9 @@ function softLinkAct( o )
 
   let dstNativePath = self.path.nativize( o.dstPath );
   let srcNativePath = self.path.nativize( srcPath );
+
+  _.assert( !srcIsAbsolute || self._pathHasDriveLetter( srcNativePath ), `Expects src path that begins with drive letter, but got:"${srcPath}"` );
+  _.assert( self._pathHasDriveLetter( dstNativePath ), `Expects dst path that begins with drive letter, but got:"${o.dstPath}"` );
 
   /* */
 
@@ -1800,6 +1830,9 @@ function hardLinkAct( o )
 
   let dstPath = self.path.nativize( o.dstPath );
   let srcPath = self.path.nativize( o.srcPath );
+
+  _.assert( self._pathHasDriveLetter( srcPath ), `Expects src path that begins with drive letter, but got:"${o.srcPath}"` );
+  _.assert( self._pathHasDriveLetter( dstPath ), `Expects dst path that begins with drive letter, but got:"${o.dstPath}"` );
 
   _.assert( !!o.dstPath );
   _.assert( !!o.srcPath );
@@ -1996,11 +2029,11 @@ _.routineExtend( hardLinkAct, Parent.prototype.hardLinkAct );
 
 //
 
-function filesAreHardLinkedAct( o )
+function areHardLinkedAct( o )
 {
   let self = this;
 
-  _.assertRoutineOptions( filesAreHardLinkedAct, arguments );
+  _.assertRoutineOptions( areHardLinkedAct, arguments );
   _.assert( o.filePath.length === 2, 'Expects exactly two arguments' );
 
   if( o.filePath[ 0 ] === o.filePath[ 1 ] )
@@ -2025,7 +2058,7 @@ function filesAreHardLinkedAct( o )
   return _.files.stat.areHardLinked( statFirst, statSecond );
 }
 
-_.routineExtend( filesAreHardLinkedAct, Parent.prototype.filesAreHardLinkedAct );
+_.routineExtend( areHardLinkedAct, Parent.prototype.areHardLinkedAct );
 
 // --
 // etc
@@ -2187,10 +2220,13 @@ let Restricts =
 
 let Statics =
 {
+
   pathNativizeAct : pathNativizeAct,
   KnownNativeEncodings : KnownNativeEncodings,
   UsingBigIntForStat : UsingBigIntForStat,
   Path : _.path.CloneExtending({ fileProvider : Self }),
+  SupportsIno : 1,
+
 }
 
 // --
@@ -2208,6 +2244,7 @@ let Extend =
 
   pathNativizeAct,
   pathCurrentAct,
+  _pathHasDriveLetter,
 
   _isTextLink,
   pathResolveTextLinkAct,
@@ -2248,7 +2285,7 @@ let Extend =
 
   // link
 
-  filesAreHardLinkedAct,
+  areHardLinkedAct,
 
   // etc
 

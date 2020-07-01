@@ -16,6 +16,7 @@ if( typeof module !== 'undefined' )
 
   require( '../l2/Encoder.s' );
   require( '../l2/Encoders.s' );
+  require( '../l2/Linker.s' );
   require( '../l2/RecordContext.s' );
 
   require( '../l3/Path.s' );
@@ -29,7 +30,6 @@ if( typeof module !== 'undefined' )
 
   require( '../l4/Abstract.s' );
 
-  require( '../l5/Linker.s' );
   require( '../l5/Partial.s' );
   require( '../l6/System.s' );
   require( './Find.s' )

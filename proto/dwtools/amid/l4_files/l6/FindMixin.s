@@ -745,11 +745,21 @@ function filesFind_pre( routine, args )
 
   _.assert( _.longHas( [ 0, 1, 2, 3 ], o.revisiting ) );
   _.assert( o.revisitingHardLinked === 0 || o.revisitingHardLinked === 1 );
+  _.assert
+  (
+      o.revisitingHardLinked === 1 || self.SupportsIno >= 1
+    , `Option revisitingHardLinked : 0 is supported only if file provider supports ino of file.`
+    + `\nBut file provider ${self.constructor.name} does not support ino of file.`
+  );
 
   // if( o.revisiting === 0 || o.revisitingHardLinked === 0 ) /* yyy */
   if( o.revisiting === 0 )
   if( o.visitedMap === null )
   o.visitedMap = Object.create( null );
+
+  if( o.revisitingHardLinked === 0 )
+  if( o.visitedInosSet === null )
+  o.visitedInosSet = new Set;
 
   if( o.revisiting === 1 || o.revisiting === 2 )
   if( o.visitedStack === null )
@@ -851,6 +861,7 @@ function filesFind_body( o )
     delete o2.revisitingHardLinked;
     delete o2.visitedMap;
     delete o2.visitedStack;
+    delete o2.visitedInosSet;
     delete o2.result;
     delete o2.resolvingSoftLink;
     delete o2.resolvingTextLink;
@@ -928,7 +939,7 @@ function filesFind_body( o )
     .catch( ( err ) =>
     {
       debugger;
-      // _.errAttend( err );
+      // _.errAttend( err ); // yyy : no!
       throw _.err( err );
     });
 
@@ -945,6 +956,13 @@ function filesFind_body( o )
     counter += 1;
 
     let visited = false;
+
+    if( o.revisitingHardLinked === 0 )
+    {
+      _.assert( self.isIno({ ino : record.stat.ino }) );
+      if( o.visitedInosSet.has( record.stat.ino ) )
+      return _.dont;
+    }
 
     if( o.revisiting === 1 )
     {
@@ -978,6 +996,12 @@ function filesFind_body( o )
 
     if( o.visitedMap )
     o.visitedMap[ record.real ] = record;
+
+    if( o.visitedInosSet )
+    {
+      _.assert( self.isIno({ ino : record.stat.ino }) );
+      o.visitedInosSet.add( record.stat.ino );
+    }
 
     if( visited )
     return 'dontButRecord';
@@ -1176,6 +1200,7 @@ defaults.revisiting = null;
 defaults.revisitingHardLinked = 1;
 defaults.visitedMap = null;
 defaults.visitedStack = null;
+defaults.visitedInosSet = null;
 defaults.resolvingSoftLink = 0;
 defaults.resolvingTextLink = 0;
 defaults.allowingMissed = 0;
@@ -1680,7 +1705,7 @@ function filesRead_body( o )
 
   function fileRead( record, dstPath )
   {
-    let r;
+    let r = null;
     let index = result.dataArray.length;
 
     try
@@ -1707,6 +1732,7 @@ function filesRead_body( o )
     }
     catch( err )
     {
+      debugger;
       err = _.err( err, `\nFailed to read ${record.absolute}` );
       err.filePath = record.absolute;
       result.errors.push( err );
@@ -1722,6 +1748,8 @@ var defaults = filesRead_body.defaults = _.mapExtend( null, Partial.prototype.fi
 defaults.sync = 1;
 defaults.throwing = null;
 defaults.mode = 'distinct';
+defaults.resolvingSoftLink = 1;
+defaults.resolvingTextLink = 1;
 
 delete defaults.outputFormat;
 

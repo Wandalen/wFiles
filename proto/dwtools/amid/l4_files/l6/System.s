@@ -974,11 +974,11 @@ let hardLinkBreak = _.routineFromPreAndBody( Parent.prototype._preFilePathScalar
 
 //
 
-function filesAreHardLinkedAct( o )
+function areHardLinkedAct( o )
 {
   let self = this;
 
-  _.assertRoutineOptions( filesAreHardLinkedAct, arguments );
+  _.assertRoutineOptions( areHardLinkedAct, arguments );
   _.assert( o.filePath.length === 2, 'Expects exactly two arguments' );
 
   let dst = self._pathLocalize( o.filePath[ 0 ] );
@@ -990,10 +990,10 @@ function filesAreHardLinkedAct( o )
   if( dst.provider !== src.provider )
   return false;
 
-  return dst.provider.filesAreHardLinkedAct({ filePath : [ dst.localPath, src.localPath ] });
+  return dst.provider.areHardLinkedAct({ filePath : [ dst.localPath, src.localPath ] });
 }
 
-_.routineExtend( filesAreHardLinkedAct, Parent.prototype.filesAreHardLinkedAct );
+_.routineExtend( areHardLinkedAct, Parent.prototype.areHardLinkedAct );
 
 
 //
@@ -1513,7 +1513,7 @@ let Extension =
 
   hardLinkBreak,
 
-  filesAreHardLinkedAct,
+  areHardLinkedAct,
 
   //
 

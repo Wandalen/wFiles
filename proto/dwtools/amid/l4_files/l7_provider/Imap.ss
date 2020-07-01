@@ -365,14 +365,14 @@ function statReadAct( o )
     result.isSymbolicLink = returnFalse;
     result.nlink = 1;
 
-    if( self._descriptorIsDir( d ) )
+    if( self._DescriptorIsDir( d ) )
     {
       result.isDirectory = returnTrue;
       result.isDir = returnTrue;
     }
-    else if( self._descriptorIsTerminal( d ) || self._descriptorIsHardLink( d ) )
+    else if( self._DescriptorIsTerminal( d ) || self._DescriptorIsHardLink( d ) )
     {
-      if( self._descriptorIsHardLink( d ) )
+      if( self._DescriptorIsHardLink( d ) )
       {
         if( _.arrayIs( d[ 0 ].hardLinks ) )
         result.nlink = d[ 0 ].hardLinks.length;
@@ -397,19 +397,19 @@ function statReadAct( o )
       {
         if( !self.usingTextLink )
         return false;
-        return self._descriptorIsTextLink( d );
+        return self._DescriptorIsTextLink( d );
       }
     }
-    else if( self._descriptorIsSoftLink( d ) )
+    else if( self._DescriptorIsSoftLink( d ) )
     {
       result.isSymbolicLink = returnTrue;
       result.isSoftLink = returnTrue;
     }
-    else if( self._descriptorIsHardLink( d ) )
+    else if( self._DescriptorIsHardLink( d ) )
     {
       _.assert( 0 );
     }
-    else if( self._descriptorIsScript( d ) )
+    else if( self._DescriptorIsScript( d ) )
     {
       result.isTerminal = returnTrue;
       result.isFile = returnTrue;
@@ -584,7 +584,7 @@ _.routineExtend( hardLinkBreakAct, Parent.prototype.hardLinkBreakAct );
 
 //
 
-function filesAreHardLinkedAct( o )
+function areHardLinkedAct( o )
 {
   let self = this;
 
@@ -593,7 +593,7 @@ function filesAreHardLinkedAct( o )
   return false;
 }
 
-_.routineExtend( filesAreHardLinkedAct, Parent.prototype.filesAreHardLinkedAct );
+_.routineExtend( areHardLinkedAct, Parent.prototype.areHardLinkedAct );
 
 // --
 // relationship
@@ -679,7 +679,7 @@ let Extension =
   hardLinkAct,
 
   hardLinkBreakAct,
-  filesAreHardLinkedAct,
+  areHardLinkedAct,
 
   //
 

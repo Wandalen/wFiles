@@ -1098,14 +1098,18 @@ function configUserPath( o )
   o = _.routineOptions( configUserPath, o );
   _.assert( _.strDefined( o.name ) );
 
-  let userPath = path.dirUserHome();
-  let filePath = path.join( userPath, o.dirPath, o.name );
+  if( o.filePath )
+  return o.filePath;
 
-  return filePath;
+  let userPath = path.dirUserHome();
+  o.filePath = path.join( userPath, o.dirPath, o.name );
+
+  return o.filePath;
 }
 
 configUserPath.defaults =
 {
+  filePath : null,
   dirPath : '.',
   name : '.wenv.yml',
 }
@@ -1122,7 +1126,15 @@ function configUserRead( o )
 
   o = _.routineOptions( configUserRead, o );
 
-  let filePath = self.configUserPath( o );
+  let o2 = _.mapOnly( o, self.configUserPath.defaults );
+  let filePath = self.configUserPath( o2 );
+
+  if( !self.fileExists( filePath ) )
+  return null;
+
+  if( o.locking )
+  self.configUserLock({ filePath });
+  // self.fileLock({ filePath });
 
   return self.configRead
   ({
@@ -1135,6 +1147,7 @@ function configUserRead( o )
 configUserRead.defaults =
 {
   ... configUserPath.defaults,
+  locking : 0,
 }
 
 //
@@ -1149,50 +1162,76 @@ function configUserWrite( o )
   o = _.routineOptions( configUserWrite, o );
   _.assert( o.structure !== null );
 
-  let filePath = self.configUserPath( _.mapBut( o, [ 'structure' ] ) );
+  let o2 = _.mapOnly( o, self.configUserPath.defaults );
+  let filePath = self.configUserPath( o2 );
 
   /* qqq : cover option encoding of method fileWrite */
   /* qqq : cover encoding : _.unknown of method fileWrite */
-  return self.fileWrite
+  let result = self.fileWrite
   ({
     filePath,
     data : o.structure,
     encoding : _.unknown,
+    sync : 1,
   });
 
+  _.assert( !_.consequenceLike( result ) );
+
+  // debugger;
+  if( o.unlocking )
+  self.configUserUnlock({ filePath });
+  // self.fileUnlock({ filePath });
+
+  return result;
 }
 
 configUserWrite.defaults =
 {
   ... configUserPath.defaults,
   structure : null,
+  unlocking : 0,
 }
 
 //
 
-function configUserRead( o )
+function configUserLock( o )
 {
   let self = this;
   let path = self.path;
 
   if( !_.mapIs( o ) )
-  o = { filePath : o }
+  o = { name : arguments[ 0 ] }
+  o = _.routineOptions( configUserLock, o );
 
-  let userPath = path.dirUserHome();
-  o.filePath = path.join( userPath, o.filePath || '.wenv.yml' );
+  let filePath = self.configUserPath( o );
 
-  return self.configRead
-  ({
-    filePath : o.filePath,
-    throwing : 0,
-  });
-
+  return self.fileLock({ filePath });
 }
 
-configUserRead.defaults =
+configUserLock.defaults =
 {
-  filePath : null,
-  name : '.wenv.yml',
+  ... configUserPath.defaults,
+}
+
+//
+
+function configUserUnlock( o )
+{
+  let self = this;
+  let path = self.path;
+
+  if( !_.mapIs( o ) )
+  o = { name : arguments[ 0 ] }
+  o = _.routineOptions( configUserUnlock, o );
+
+  let filePath = self.configUserPath( o );
+
+  return self.fileUnlock({ filePath });
+}
+
+configUserUnlock.defaults =
+{
+  ... configUserPath.defaults,
 }
 
 //
@@ -1315,6 +1354,8 @@ let Supplement =
   configUserPath, /* qqq : cover */
   configUserRead, /* qqq : cover */
   configUserWrite, /* qqq : cover */
+  configUserLock,
+  configUserUnlock,
 
   fileCodeRead,
 

@@ -1,5 +1,3 @@
-const { c } = require('tar');
-
 ( function _HardDrive_ss_() {
 
 'use strict';

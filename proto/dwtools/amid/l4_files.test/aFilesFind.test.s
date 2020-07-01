@@ -75,7 +75,7 @@ function assetFor( test, a )
 
   a = test.assetFor( a );
 
-  if( !a.system )
+  if( !_.mapOwnKey( a, 'system' ) )
   {
     if( a.fileProvider.system )
     a.system = a.fileProvider.system;
@@ -83,7 +83,7 @@ function assetFor( test, a )
     a.system = a.fileProvider;
   }
 
-  if( !a.effectiveProvider )
+  if( !_.mapOwnKey( a, 'effectiveProvider' ) )
   {
     if( !( a.fileProvider instanceof _.FileProvider.System ) )
     a.effectiveProvider = a.fileProvider;
@@ -93,7 +93,7 @@ function assetFor( test, a )
 
   _.assert( a.effectiveProvider instanceof _.FileProvider.Abstract, 'effectiveProvider is not specificed' );
 
-  if( !a.global )
+  if( !_.mapOwnKey( a, 'global' ) )
   a.global = globalFor;
 
   return a;

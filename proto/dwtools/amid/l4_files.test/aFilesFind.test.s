@@ -73,9 +73,13 @@ function assetFor( test, a )
 
   a.suiteTempPath = a.fileProvider.path.pathDirTempOpen( a.fileProvider.constructor.name );
 
+  let system = a.system;
+  let effectiveProvider = a.effectiveProvider;
+  let global = a.global;
+
   a = test.assetFor( a );
 
-  if( !_.mapOwnKey( a, 'system' ) )
+  if( !system )
   {
     if( a.fileProvider.system )
     a.system = a.fileProvider.system;
@@ -83,7 +87,7 @@ function assetFor( test, a )
     a.system = a.fileProvider;
   }
 
-  if( !_.mapOwnKey( a, 'effectiveProvider' ) )
+  if( !effectiveProvider )
   {
     if( !( a.fileProvider instanceof _.FileProvider.System ) )
     a.effectiveProvider = a.fileProvider;
@@ -93,7 +97,7 @@ function assetFor( test, a )
 
   _.assert( a.effectiveProvider instanceof _.FileProvider.Abstract, 'effectiveProvider is not specificed' );
 
-  if( !_.mapOwnKey( a, 'global' ) )
+  if( !global )
   a.global = globalFor;
 
   return a;

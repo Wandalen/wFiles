@@ -605,7 +605,7 @@ function systemBitrateTimeGet()
   if( _.FileProvider.HardDrive && self instanceof _.FileProvider.HardDrive )
   {
     // let testDir = self.path.dirTempAtOpen( self.path.join( __dirname, '../../..'  ), 'SecondaryMixin' );
-    debugger
+    // debugger
     let testDir = self.path.pathDirTempOpen({ filePath : self.path.join( __dirname, '../../..'  ), name :'SecondaryMixin' });
     let tempFile = self.path.join( testDir, 'systemBitrateTimeGet' );
     self.fileWrite( tempFile, tempFile );

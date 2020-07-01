@@ -51223,7 +51223,7 @@ var Self =
 
     softLinkReturnSync,
 
-    textLinkReturnSync,
+    // textLinkReturnSync,
 
     /* qqq3 : extend linking tests to check returned value. must be false if success, but no change was done */
 
@@ -51247,7 +51247,7 @@ var Self =
 
     filesAreHardLinked,
     filesAreTextLinked,
-    filesAreTextLinkedSrcEqualDst,
+    // filesAreTextLinkedSrcEqualDst,
     filesAreSoftLinked,
     filesCanBeSame,
 

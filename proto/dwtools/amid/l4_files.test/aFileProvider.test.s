@@ -50334,6 +50334,10 @@ total : 36
 
   test.open( 'dst exists, is hard linked' );
   {
+    test.case = 'src is hard linked';
+
+    /* */
+
     test.case = 'rewriting : 1';
     a.reflect();
     var srcPath = 'src';
@@ -51599,9 +51603,9 @@ var Self =
     // hardLinkReturnTextLinkedSync,
     // hardLinkReturnTextLinkedAsync,
 
-    softLinkReturnSync,
+    // softLinkReturnSync,
 
-    textLinkReturnSync,
+    // textLinkReturnSync,
 
     /* qqq3 : extend linking tests to check returned value. must be false if success, but no change was done */
 
@@ -51625,7 +51629,7 @@ var Self =
 
     areHardLinked,
     areTextLinked,
-    areTextLinkedSrcEqualDst,
+    // areTextLinkedSrcEqualDst,
     areSoftLinked,
     filesCanBeSame,
 
@@ -51676,7 +51680,7 @@ var Self =
     experiment2,
     hardLinkExperiment,
 
-    hardLinkSrcDoesNotExistExperiment,
+    // hardLinkSrcDoesNotExistExperiment,
   }
 
 };

@@ -7275,9 +7275,9 @@ function areHardLinked_body( o ) /* qqq : refactor. probably move some code to a
 
   if( !o.filePath.length )
   return true;
-  debugger;
-  if( o.filePath[ 0 ] === o.filePath[ 1 ] && !_.fileProvider.fileExists( o.filePath[ 1 ] ) )
-  return false;
+  // debugger;
+  // if( o.filePath[ 0 ] === o.filePath[ 1 ] && !_.fileProvider.fileExists( o.filePath[ 1 ] ) )
+  // return false;
 
   let result;
 
@@ -7379,7 +7379,7 @@ function areTextLinked_body( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assertRoutineOptions( areTextLinked_body, arguments );
   _.assert( o.filePath.length >= 2 );
-
+  debugger;
   o.filePath = path.s.normalize( o.filePath );
 
   _.assert( path.s.allAreAbsolute( o.filePath ) );

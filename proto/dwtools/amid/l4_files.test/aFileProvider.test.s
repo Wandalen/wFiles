@@ -41325,9 +41325,12 @@ function areTextLinkedSrcEqualDst( test )
   let a = context.assetFor( test, false );
   a.fileProvider.usingTextLink = 1;
 
-  test.case = 'src === dst';
+  test.case = 'src does not exist';
+  a.reflect();
+  a.fileProvider.textLink({ dstPath : a.abs( 'src' ), srcPath : a.abs( 'src' ), rewriting : 1, allowingMissed : 1 });
+  test.identical( a.fileProvider.areTextLinked({ filePath : [ a.abs( 'src' ), a.abs( 'src' ) ] }), false );
 
-  test.case = 'rewriting : 1';
+  test.case = 'src === dst';
   a.reflect();
   a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
   var got = a.fileProvider.textLink({ dstPath : a.abs( 'src' ), srcPath : a.abs( 'src' ), rewriting : 1, allowingMissed : 1 });
@@ -50512,15 +50515,7 @@ total : 36
   test.close( 'dst exists, is hard linked' );
 
   /* -- */
-  /*
-    -
-    src - exists
-    areHardLinked( src, src ) - true
-    -
-    src - does not exists
-    areHardLinked( src, src ) - false
-    -
-  */
+
   test.open( 'src === dst' );
   {
     test.case = 'src does not exist';

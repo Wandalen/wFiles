@@ -50636,11 +50636,10 @@ function hardLinkSrcDoesNotExistExperiment( test )
 {
   let context = this;
   let a = context.assetFor( test, false );
-  // a.fileProvider.fileExists(a.abs('dir1/src'))
 
-  // test.case = 'src does not exist';
-  // a.reflect();
-  // test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), false );
+  test.case = 'src does not exist';
+  a.reflect();
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), false );
 
   test.case = 'src exists';
   a.reflect();
@@ -51708,7 +51707,7 @@ var Self =
     experiment2,
     hardLinkExperiment,
 
-    // hardLinkSrcDoesNotExistExperiment,
+    hardLinkSrcDoesNotExistExperiment,
   }
 
 };

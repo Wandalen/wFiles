@@ -50334,8 +50334,36 @@ total : 36
 
   test.open( 'dst exists, is hard linked' );
   {
-    test.case = 'src is hard linked';
-
+    test.case = 'two dst is hard linked with the same src';
+    a.reflect();
+    var srcPath = 'src';
+    var dst1 = 'dst1';
+    var dst2 = 'dst2';
+    a.fileProvider.fileWrite( a.abs( srcPath ), 'some text' );
+    a.fileProvider.hardLink({ dstPath : a.abs( dst1 ), srcPath : a.abs( srcPath ), rewriting : 1 });
+    a.fileProvider.hardLink({ dstPath : a.abs( dst2 ), srcPath : a.abs( srcPath ), rewriting : 1 });
+    var srcStatBefore = a.fileProvider.statRead( a.abs( dst1 ) );
+    var dstStatBefore = a.fileProvider.statRead( a.abs( dst2 ) );
+    var got = a.fileProvider.hardLink({ dstPath : a.abs( dst2 ), srcPath : a.abs( dst1 ), rewriting : 1 });
+    var srcStatAfter = a.fileProvider.statRead( a.abs( dst1 ) );
+    var dstStatAfter = a.fileProvider.statRead( a.abs( dst2 ) );
+    test.identical( got, false );
+    test.identical( srcStatBefore.ctimeNs, srcStatAfter.ctimeNs );
+    test.identical( dstStatBefore.ctimeNs, dstStatAfter.ctimeNs );
+    test.identical( a.fileProvider.areHardLinked( a.abs( dst2 ), a.abs( srcPath ) ), true );
+    
+    /* */
+    
+    test.case = 'two dst is hard linked with different src';
+    a.reflect();
+    a.fileProvider.fileWrite( a.abs( 'src1' ), 'some text' );
+    a.fileProvider.fileWrite( a.abs( 'src2' ), 'some text' );
+    a.fileProvider.hardLink({ dstPath : a.abs( 'dst1' ), srcPath : a.abs( 'src1' ), rewriting : 1 });
+    a.fileProvider.hardLink({ dstPath : a.abs( 'dst2' ), srcPath : a.abs( 'src2' ), rewriting : 1 });
+    var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dst2' ), srcPath : a.abs( 'dst1' ), rewriting : 1 });
+    test.identical( got, true );
+    test.identical( a.fileProvider.areHardLinked( a.abs( 'dst2' ), a.abs( 'src1' ) ), true );
+    
     /* */
 
     test.case = 'rewriting : 1';

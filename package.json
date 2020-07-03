@@ -12,56 +12,39 @@
     { "name" : "Volodymyr M.", "email" : "volodymyr.migdal@gmail.com" },
     { "name" : "Ihor Ostash", "email" : "iostashvxi@gmail.com" }
   ],
-  "main": "proto/dwtools/amid/l4_files/entry/Files.s",
-  "files": [
-    "proto/dwtools/amid/l4_files",
-    "proto/dwtools/Tools.s",
-    "out"
-  ],
-  "scripts": {
-    "test": "wtest .run 'proto/**' rapidity:-3",
-    "docgen": "wdocgen proto"
+  "main" : "proto/dwtools/amid/l4_files/entry/Files.s",
+  "files" : [ "proto/dwtools/amid/l4_files", "proto/dwtools/Tools.s", "out" ],
+  "scripts" : { "test" : "wtest .run 'proto/**' rapidity:-3", "docgen" : "wdocgen proto" },
+  "repository" : { "type" : "git", "url" : "https://github.com/Wandalen/wFiles.git" },
+  "bugs" :
+  {
+    "url" : "https://github.com/Wandalen/wFiles/issues"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Wandalen/wFiles.git"
+  "dependencies" :
+  {
+    "tar" : "=6.0.2",
+    "proper-lockfile" : "=4.1.1",
+    "needle" : "=2.5.0",
+    "wTools" : "alpha",
+    "wstringer" : "alpha",
+    "wstringsextra" : "alpha",
+    "wConsequence" : "alpha",
+    "wCopyable" : "alpha",
+    "wgdf" : "alpha",
+    "wroutinebasic" : "alpha",
+    "wpathbasic" : "alpha",
+    "wpathtools" : "alpha",
+    "wuribasic" : "alpha",
+    "wweburibasic" : "alpha",
+    "wprocess" : "alpha",
+    "wfieldsstack" : "alpha",
+    "wRegexpObject" : "alpha",
+    "wselector" : "alpha",
+    "wverbal" : "alpha",
+    "wLogger" : "alpha",
+    "wgittools" : "alpha",
+    "wnpmtools" : "alpha"
   },
-  "bugs": {
-    "url": "https://github.com/Wandalen/wFiles/issues"
-  },
-  "dependencies": {
-    "tar": "=6.0.2",
-    "proper-lockfile": "=4.1.1",
-    "needle": "=2.5.0",
-    "wTools": "alpha",
-    "wstringer": "alpha",
-    "wstringsextra": "alpha",
-    "wConsequence": "alpha",
-    "wCopyable": "alpha",
-    "wgdf": "alpha",
-    "wroutinebasic": "alpha",
-    "wpathbasic": "alpha",
-    "wpathtools": "alpha",
-    "wuribasic": "alpha",
-    "wweburibasic": "alpha",
-    "wprocess": "alpha",
-    "wfieldsstack": "alpha",
-    "wRegexpObject": "alpha",
-    "wselector": "alpha",
-    "wverbal": "alpha",
-    "wLogger": "alpha",
-    "wgittools": "alpha",
-    "wnpmtools": "alpha"
-  },
-  "devDependencies": {
-    "wait-sync": "=1.0.1",
-    "wFiles": "file:.",
-    "wTesting": "alpha"
-  },
-  "keywords": [
-    "wTools",
-    "wFiles",
-    "file",
-    "standardized abstract interface"
-  ]
+  "devDependencies" : { "wait-sync" : "=1.0.1", "wFiles" : "file:.", "wTesting" : "alpha" },
+  "keywords" : [ "wTools", "wFiles", "file", "standardized abstract interface" ]
 }

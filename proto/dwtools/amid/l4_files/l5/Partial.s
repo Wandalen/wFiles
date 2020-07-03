@@ -6659,11 +6659,13 @@ function _softLinkVerify2( c )
   if( o.dstPath === o.srcPath )
   c.error( _.err( 'Soft link cycle', path.moveTextualReport( o.dstPath, o.srcPath ) ) );
 
-  if( self.areSoftLinked([ o.dstPath, o.srcPath ]) )
-  {
-    c.ended = true;
-    c.result = false;
-  }
+  /* Artem B. attempt to fix a bug */
+  // if( self.areSoftLinked([ o.dstPath, o.srcPath ]) )
+  // {
+  //   c.ended = true;
+  //   c.result = false;
+  // }
+  /* Artem B. attempt to fix a bug */
 
   // if( o.dstPath !== o.srcPath && self.areSoftLinked([ o.dstPath, o.srcPath ]) )
   // if( o.dstPath === o.srcPath )
@@ -7322,7 +7324,7 @@ function areSoftLinked_body( o )
 {
   let self = this;
   let path = self.system ? self.system.path : self.path;;
-
+  debugger;
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assertRoutineOptions( areSoftLinked_body, arguments );
   _.assert( o.filePath.length >= 2 );
@@ -7390,7 +7392,7 @@ function areTextLinked_body( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assertRoutineOptions( areTextLinked_body, arguments );
   _.assert( o.filePath.length >= 2 );
-  debugger;
+
   o.filePath = path.s.normalize( o.filePath );
 
   _.assert( path.s.allAreAbsolute( o.filePath ) );

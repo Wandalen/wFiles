@@ -4174,11 +4174,8 @@ function filesReflectTo_body( o )
   src = src.providerForPath( o.src );
 
   _.assert( !( src instanceof _.FileProvider.System ) && src instanceof _.FileProvider.Abstract, 'Source provider should be an instance of _.FileProvider.Abstract' )
-
   _.assertRoutineOptions( filesReflectTo_body, arguments );
   _.assert( !src.system || !dst.system || src.system === dst.system, 'not implemented' );
-
-  debugger;
 
   if( src.system )
   {

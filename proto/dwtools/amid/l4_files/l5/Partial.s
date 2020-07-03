@@ -6552,6 +6552,8 @@ function _hardLinkDo( c )
 
 _.routineExtend( _hardLinkDo, hardLinkAct );
 
+/* qqq2 : cover returned value of hardLink if dstPath is array of files. should be number */
+
 let hardLink = _.files.linker.functor
 ({
   actMethodName : 'hardLinkAct',

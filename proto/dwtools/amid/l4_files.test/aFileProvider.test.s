@@ -50339,21 +50339,18 @@ total : 36
   {
     test.case = 'two dst is hard linked with the same src';
     a.reflect();
-    var srcPath = 'src';
-    var dst1 = 'dst1';
-    var dst2 = 'dst2';
-    a.fileProvider.fileWrite( a.abs( srcPath ), 'some text' );
-    a.fileProvider.hardLink({ dstPath : a.abs( dst1 ), srcPath : a.abs( srcPath ), rewriting : 1 });
-    a.fileProvider.hardLink({ dstPath : a.abs( dst2 ), srcPath : a.abs( srcPath ), rewriting : 1 });
-    var srcStatBefore = a.fileProvider.statRead( a.abs( dst1 ) );
-    var dstStatBefore = a.fileProvider.statRead( a.abs( dst2 ) );
-    var got = a.fileProvider.hardLink({ dstPath : a.abs( dst2 ), srcPath : a.abs( dst1 ), rewriting : 1 });
-    var srcStatAfter = a.fileProvider.statRead( a.abs( dst1 ) );
-    var dstStatAfter = a.fileProvider.statRead( a.abs( dst2 ) );
+    a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+    a.fileProvider.hardLink({ dstPath : a.abs( 'dst1' ), srcPath : a.abs( 'src' ), rewriting : 1 });
+    a.fileProvider.hardLink({ dstPath : a.abs( 'dst2' ), srcPath : a.abs( 'src' ), rewriting : 1 });
+    var srcStatBefore = a.fileProvider.statRead( a.abs( 'dst1' ) );
+    var dstStatBefore = a.fileProvider.statRead( a.abs( 'dst2' ) );
+    var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dst2' ), srcPath : a.abs( 'dst1' ), rewriting : 1 });
+    var srcStatAfter = a.fileProvider.statRead( a.abs( 'dst1' ) );
+    var dstStatAfter = a.fileProvider.statRead( a.abs( 'dst2' ) );
     test.identical( got, false );
     test.identical( srcStatBefore.ctimeNs, srcStatAfter.ctimeNs );
     test.identical( dstStatBefore.ctimeNs, dstStatAfter.ctimeNs );
-    test.identical( a.fileProvider.areHardLinked( a.abs( dst2 ), a.abs( srcPath ) ), true );
+    test.identical( a.fileProvider.areHardLinked( a.abs( 'dst2' ), a.abs( 'src' ) ), true );
     
     /* */
     
@@ -50371,146 +50368,162 @@ total : 36
 
     test.case = 'rewriting : 1';
     a.reflect();
-    var srcPath = 'src';
-    var dstPath = 'dst';
-    a.fileProvider.fileWrite( a.abs( srcPath ), 'some text' );
-    a.fileProvider.hardLink({ dstPath : a.abs( dstPath ), srcPath : a.abs( srcPath ), rewriting : 1 });
-    var srcStatBefore = a.fileProvider.statRead( a.abs( srcPath ) );
-    var dstStatBefore = a.fileProvider.statRead( a.abs( dstPath ) );
-    var got = a.fileProvider.hardLink({ dstPath : a.abs( dstPath ), srcPath : a.abs( srcPath ), rewriting : 1 });
-    var srcStatAfter = a.fileProvider.statRead( a.abs( srcPath ) );
-    var dstStatAfter = a.fileProvider.statRead( a.abs( dstPath ) );
+    a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+    a.fileProvider.hardLink({ dstPath : a.abs( 'dst' ), srcPath : a.abs( 'src' ), rewriting : 1 });
+    var srcStatBefore = a.fileProvider.statRead( a.abs( 'src' ) );
+    var dstStatBefore = a.fileProvider.statRead( a.abs( 'dst' ) );
+    var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dst' ), srcPath : a.abs( 'src' ), rewriting : 1 });
+    var srcStatAfter = a.fileProvider.statRead( a.abs( 'src' ) );
+    var dstStatAfter = a.fileProvider.statRead( a.abs( 'dst' ) );
     test.identical( got, false );
     test.identical( srcStatBefore.ctimeNs, srcStatAfter.ctimeNs );
     test.identical( dstStatBefore.ctimeNs, dstStatAfter.ctimeNs );
-    test.identical( a.fileProvider.areHardLinked( a.abs( dstPath ), a.abs( srcPath ) ), true );
+    test.identical( a.fileProvider.areHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), true );
 
     /* */
 
     test.case = 'rewritingDirs : 1';
     a.reflect();
-    var srcPath = 'src';
-    var dstPath = 'dir1/dst';
-    a.fileProvider.fileWrite( a.abs( srcPath ), 'some text' );
-    a.fileProvider.dirMake( a.abs( dstPath ) );
-    a.fileProvider.hardLink({ dstPath : a.abs( dstPath ), srcPath : a.abs( srcPath ), rewritingDirs : 1 });
-    var srcStatBefore = a.fileProvider.statRead( a.abs( srcPath ) );
-    var dstStatBefore = a.fileProvider.statRead( a.abs( dstPath ) );
-    var got = a.fileProvider.hardLink({ dstPath : a.abs( dstPath ), srcPath : a.abs( srcPath ), rewritingDirs : 1 });
-    var srcStatAfter = a.fileProvider.statRead( a.abs( srcPath ) );
-    var dstStatAfter = a.fileProvider.statRead( a.abs( dstPath ) );
+    a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+    a.fileProvider.dirMake( a.abs( 'dir1/dst' ) );
+    a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), rewritingDirs : 1 });
+    var srcStatBefore = a.fileProvider.statRead( a.abs( 'src' ) );
+    var dstStatBefore = a.fileProvider.statRead( a.abs( 'dir1/dst' ) );
+    var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), rewritingDirs : 1 });
+    var srcStatAfter = a.fileProvider.statRead( a.abs( 'src' ) );
+    var dstStatAfter = a.fileProvider.statRead( a.abs( 'dir1/dst' ) );
     test.identical( got, false );
     test.identical( srcStatBefore.ctimeNs, srcStatAfter.ctimeNs );
     test.identical( dstStatBefore.ctimeNs, dstStatAfter.ctimeNs );
-    test.identical( a.fileProvider.areHardLinked( a.abs( dstPath ), a.abs( srcPath ) ), true );
+    test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
 
     /* */
 
     test.case = 'makingDirectory : 1';
     a.reflect();
-    var srcPath = 'src';
-    var dstPath = 'dir1/dst';
-    a.fileProvider.fileWrite( a.abs( srcPath ), 'some text' );
-    a.fileProvider.hardLink({ dstPath : a.abs( dstPath ), srcPath : a.abs( srcPath ), makingDirectory : 1 });
-    var srcStatBefore = a.fileProvider.statRead( a.abs( srcPath ) );
-    var dstStatBefore = a.fileProvider.statRead( a.abs( dstPath ) );
-    var got = a.fileProvider.hardLink({ dstPath : a.abs( dstPath ), srcPath : a.abs( srcPath ), makingDirectory : 1 });
-    var srcStatAfter = a.fileProvider.statRead( a.abs( srcPath ) );
-    var dstStatAfter = a.fileProvider.statRead( a.abs( dstPath ) );
+    a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+    a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), makingDirectory : 1 });
+    var srcStatBefore = a.fileProvider.statRead( a.abs( 'src' ) );
+    var dstStatBefore = a.fileProvider.statRead( a.abs( 'dir1/dst' ) );
+    var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), makingDirectory : 1 });
+    var srcStatAfter = a.fileProvider.statRead( a.abs( 'src' ) );
+    var dstStatAfter = a.fileProvider.statRead( a.abs( 'dir1/dst' ) );
     test.identical( got, false );
     test.identical( srcStatBefore.ctimeNs, srcStatAfter.ctimeNs );
     test.identical( dstStatBefore.ctimeNs, dstStatAfter.ctimeNs );
-    test.identical( a.fileProvider.areHardLinked( a.abs( dstPath ), a.abs( srcPath ) ), true );
+    test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
 
     /* */
 
     test.case = 'breakingSrcHardLink : 0, breakingDstHardLink : 1';
     a.reflect();
-    var srcPath = 'src';
-    var dstPath = 'dst';
-    a.fileProvider.fileWrite( a.abs( srcPath ), 'some text' );
+    a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
     a.fileProvider.hardLink
     ({
-      dstPath : a.abs( dstPath ),
-      srcPath : a.abs( srcPath ),
+      dstPath : a.abs( 'dst' ),
+      srcPath : a.abs( 'src' ),
       breakingSrcHardLink : 0,
       breakingDstHardLink : 1
     });
-    var srcStatBefore = a.fileProvider.statRead( a.abs( srcPath ) );
-    var dstStatBefore = a.fileProvider.statRead( a.abs( dstPath ) );
+    var srcStatBefore = a.fileProvider.statRead( a.abs( 'src' ) );
+    var dstStatBefore = a.fileProvider.statRead( a.abs( 'dst' ) );
     var got = a.fileProvider.hardLink
     ({
-      dstPath : a.abs( dstPath ),
-      srcPath : a.abs( srcPath ),
+      dstPath : a.abs( 'dst' ),
+      srcPath : a.abs( 'src' ),
       breakingSrcHardLink : 0,
       breakingDstHardLink : 1
     });
-    var srcStatAfter = a.fileProvider.statRead( a.abs( srcPath ) );
-    var dstStatAfter = a.fileProvider.statRead( a.abs( dstPath ) );
+    var srcStatAfter = a.fileProvider.statRead( a.abs( 'src' ) );
+    var dstStatAfter = a.fileProvider.statRead( a.abs( 'dst' ) );
     test.identical( got, false );
     test.identical( srcStatBefore.ctimeNs, srcStatAfter.ctimeNs );
     test.identical( dstStatBefore.ctimeNs, dstStatAfter.ctimeNs );
-    test.identical( a.fileProvider.areHardLinked( a.abs( dstPath ), a.abs( srcPath ) ), true );
+    test.identical( a.fileProvider.areHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), true );
 
     /* */
 
-    test.case = 'breakingSrcHardLink : 1, breakingDstHardLink : 0';
+    test.case = 'breakingSrcHardLink : 1, breakingDstHardLink : 0, two files';
     a.reflect();
-    var srcPath = 'src';
-    var dstPath = 'dst';
-    a.fileProvider.fileWrite( a.abs( srcPath ), 'some text' );
+    a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
     a.fileProvider.hardLink
     ({
-      dstPath : a.abs( dstPath ),
-      srcPath : a.abs( srcPath ),
+      dstPath : a.abs( 'dst' ),
+      srcPath : a.abs( 'src' ),
       breakingSrcHardLink : 1,
       breakingDstHardLink : 0
     });
-    var srcStatBefore = a.fileProvider.statRead( a.abs( srcPath ) );
-    var dstStatBefore = a.fileProvider.statRead( a.abs( dstPath ) );
+    var srcStatBefore = a.fileProvider.statRead( a.abs( 'src' ) );
+    var dstStatBefore = a.fileProvider.statRead( a.abs( 'dst' ) );
     var got = a.fileProvider.hardLink
     ({
-      dstPath : a.abs( dstPath ),
-      srcPath : a.abs( srcPath ),
+      dstPath : a.abs( 'dst' ),
+      srcPath : a.abs( 'src' ),
       breakingSrcHardLink : 1,
       breakingDstHardLink : 0
     });
-    var srcStatAfter = a.fileProvider.statRead( a.abs( srcPath ) );
-    var dstStatAfter = a.fileProvider.statRead( a.abs( dstPath ) );
+    var srcStatAfter = a.fileProvider.statRead( a.abs( 'src' ) );
+    var dstStatAfter = a.fileProvider.statRead( a.abs( 'dst' ) );
     test.identical( got, false );
     test.identical( srcStatBefore.ctimeNs, srcStatAfter.ctimeNs );
     test.identical( dstStatBefore.ctimeNs, dstStatAfter.ctimeNs );
-    test.identical( a.fileProvider.areHardLinked( a.abs( dstPath ), a.abs( srcPath ) ), true );
+    test.identical( a.fileProvider.areHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), true );
 
+    /* */
+
+    test.case = 'breakingSrcHardLink : 1, breakingDstHardLink : 0, two files';
+    a.reflect();
+    a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+    a.fileProvider.hardLink
+    ({
+      dstPath : a.abs( 'dst' ),
+      srcPath : a.abs( 'src' ),
+      breakingSrcHardLink : 1,
+      breakingDstHardLink : 0
+    });
+    var srcStatBefore = a.fileProvider.statRead( a.abs( 'src' ) );
+    var dstStatBefore = a.fileProvider.statRead( a.abs( 'dst' ) );
+    var got = a.fileProvider.hardLink
+    ({
+      dstPath : a.abs( 'dst' ),
+      srcPath : a.abs( 'src' ),
+      breakingSrcHardLink : 1,
+      breakingDstHardLink : 0
+    });
+    var srcStatAfter = a.fileProvider.statRead( a.abs( 'src' ) );
+    var dstStatAfter = a.fileProvider.statRead( a.abs( 'dst' ) );
+    test.identical( got, false );
+    test.identical( srcStatBefore.ctimeNs, srcStatAfter.ctimeNs );
+    test.identical( dstStatBefore.ctimeNs, dstStatAfter.ctimeNs );
+    test.identical( a.fileProvider.areHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), true );
+    
     /* */
 
     test.case = 'breakingSrcHardLink : 1, breakingDstHardLink : 1';
     a.reflect();
-    var srcPath = 'src';
-    var dstPath = 'dst';
-    a.fileProvider.fileWrite( a.abs( srcPath ), 'some text' );
+    a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
     a.fileProvider.hardLink
     ({
-      dstPath : a.abs( dstPath ),
-      srcPath : a.abs( srcPath ),
+      dstPath : a.abs( 'dst' ),
+      srcPath : a.abs( 'src' ),
       breakingSrcHardLink : 1,
       breakingDstHardLink : 1
     });
-    var srcStatBefore = a.fileProvider.statRead( a.abs( srcPath ) );
-    var dstStatBefore = a.fileProvider.statRead( a.abs( dstPath ) );
+    var srcStatBefore = a.fileProvider.statRead( a.abs( 'src' ) );
+    var dstStatBefore = a.fileProvider.statRead( a.abs( 'dst' ) );
     var got = a.fileProvider.hardLink
     ({
-      dstPath : a.abs( dstPath ),
-      srcPath : a.abs( srcPath ),
+      dstPath : a.abs( 'dst' ),
+      srcPath : a.abs( 'src' ),
       breakingSrcHardLink : 1,
       breakingDstHardLink : 1
     });
-    var srcStatAfter = a.fileProvider.statRead( a.abs( srcPath ) );
-    var dstStatAfter = a.fileProvider.statRead( a.abs( dstPath ) );
+    var srcStatAfter = a.fileProvider.statRead( a.abs( 'src' ) );
+    var dstStatAfter = a.fileProvider.statRead( a.abs( 'dst' ) );
     test.identical( got, false );
     test.identical( srcStatBefore.ctimeNs, srcStatAfter.ctimeNs );
     test.identical( dstStatBefore.ctimeNs, dstStatAfter.ctimeNs );
-    test.identical( a.fileProvider.areHardLinked( a.abs( dstPath ), a.abs( srcPath ) ), true );
+    test.identical( a.fileProvider.areHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), true );
   }
   test.close( 'dst exists, is hard linked' );
 
@@ -50623,6 +50636,19 @@ total : 36
 
     test.close( 'src === dst' );
   }
+
+  /* -- */
+
+  test.open( 'more then two files hard linked' );
+  {
+    a.reflect();
+    a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+    a.fileProvider.hardLink({ dstPath : a.abs( 'dst1' ), srcPath : a.abs( 'src' ) });
+    // a.fileProvider.hardLink({ dstPath : a.abs( 'dst2' ), srcPath : a.abs( 'src' ) });
+    // a.fileProvider.hardLink({ dstPath : a.abs( 'dst3' ), srcPath : a.abs( 'src' ) });
+    // test.identical( a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'src' ) ), true );
+  }
+  test.close( 'more then two files hard linked' );
 }
 
 //
@@ -50632,14 +50658,19 @@ function hardLinkSrcDoesNotExistExperiment( test )
   let context = this;
   let a = context.assetFor( test, false );
 
-  test.case = 'src does not exist';
-  a.reflect();
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), false );
+  // test.case = 'src does not exist';
+  // a.reflect();
+  // test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), false );
 
-  test.case = 'src exists';
+  // test.case = 'src exists';
+  // a.reflect();
+  // a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
+  // test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), true );
+
+  test.case = 'maybe hardLink bug';
   a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), true );
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  a.fileProvider.hardLink({ dstPath : a.abs( 'dst' ), srcPath : a.abs( 'src' ) });
 }
 
 hardLinkSrcDoesNotExistExperiment.experimental = 1

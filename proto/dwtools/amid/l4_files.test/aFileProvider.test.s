@@ -50501,6 +50501,132 @@ total : 36
 
   /* -- */
 
+  test.open( 'breakingSrcHardLink : 1, breakingDstHardLink : 0, more than two files' );
+  {
+    test.case = 'dst does not exist, directory does not exist';
+    a.reflect();
+    a.fileProvider.fileWrite( a.abs( 'srcDataFile' ), 'src data' );
+    a.fileProvider.hardLink({ dstPath : a.abs( 'src' ), srcPath : a.abs( 'srcDataFile' ) });
+    a.fileProvider.hardLink({ dstPath : a.abs( 'src1' ), srcPath : a.abs( 'srcDataFile' ) });
+    a.fileProvider.hardLink({ dstPath : a.abs( 'src2' ), srcPath : a.abs( 'srcDataFile' ) });
+    var got = a.fileProvider.hardLink
+    ({
+      dstPath : a.abs( 'dst' ),
+      srcPath : a.abs( 'src' ),
+      breakingSrcHardLink : 1,
+      breakingDstHardLink : 0
+    });
+    test.identical( got, true );
+    test.identical( a.fileProvider.areHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), true );
+
+    /* */
+
+    test.case = 'dst does not exist, directory exists';
+    a.reflect();
+    a.fileProvider.fileWrite( a.abs( 'srcDataFile' ), 'src data' );
+    a.fileProvider.hardLink({ dstPath : a.abs( 'src' ), srcPath : a.abs( 'srcDataFile' ) });
+    a.fileProvider.hardLink({ dstPath : a.abs( 'src1' ), srcPath : a.abs( 'srcDataFile' ) });
+    a.fileProvider.hardLink({ dstPath : a.abs( 'src2' ), srcPath : a.abs( 'srcDataFile' ) });
+    a.fileProvider.dirMake( a.abs( 'dir1/dir2' ) );
+    var got = a.fileProvider.hardLink
+    ({
+      dstPath : a.abs( 'dir1/dir2/dst' ),
+      srcPath : a.abs( 'src' ),
+      breakingSrcHardLink : 1,
+      breakingDstHardLink : 0
+    });
+    test.identical( got, true );
+    test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'src' ) ), true );
+
+    /* */
+
+    test.case = 'dst exists, is not hard linked';
+    a.reflect();
+    a.fileProvider.fileWrite( a.abs( 'srcDataFile' ), 'src data' );
+    a.fileProvider.hardLink({ dstPath : a.abs( 'src' ), srcPath : a.abs( 'srcDataFile' ) });
+    a.fileProvider.hardLink({ dstPath : a.abs( 'src1' ), srcPath : a.abs( 'srcDataFile' ) });
+    a.fileProvider.hardLink({ dstPath : a.abs( 'src2' ), srcPath : a.abs( 'srcDataFile' ) });
+    a.fileProvider.fileWrite( a.abs( 'dst' ), 'some text' );
+    var got = a.fileProvider.hardLink
+    ({
+      dstPath : a.abs( 'dst' ),
+      srcPath : a.abs( 'src' ),
+      breakingSrcHardLink : 1,
+      breakingDstHardLink : 0
+    });
+    test.identical( got, true );
+    test.identical( a.fileProvider.areHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), true );
+
+    /* */
+
+    test.case = 'dst exists, is hard linked, points to another file';
+    a.reflect();
+    a.fileProvider.fileWrite( a.abs( 'srcDataFile' ), 'src data' );
+    a.fileProvider.hardLink({ dstPath : a.abs( 'src' ), srcPath : a.abs( 'srcDataFile' ) });
+    a.fileProvider.hardLink({ dstPath : a.abs( 'src1' ), srcPath : a.abs( 'srcDataFile' ) });
+    a.fileProvider.hardLink({ dstPath : a.abs( 'src2' ), srcPath : a.abs( 'srcDataFile' ) });
+    a.fileProvider.fileWrite( a.abs( 'dstDataFile' ), 'dst data' );
+    a.fileProvider.hardLink({ dstPath : a.abs( 'dst' ), srcPath : a.abs( 'dstDataFile' ) });
+    a.fileProvider.hardLink({ dstPath : a.abs( 'dst1' ), srcPath : a.abs( 'dstDataFile' ) });
+    a.fileProvider.hardLink({ dstPath : a.abs( 'dst2' ), srcPath : a.abs( 'dstDataFile' ) });
+    a.fileProvider.hardLink
+    ({
+      dstPath : a.abs( 'dst' ),
+      srcPath : a.abs( 'src' ),
+      breakingSrcHardLink : 1,
+      breakingDstHardLink : 0
+    });
+    var srcStatBefore = a.fileProvider.statRead( a.abs( 'src' ) );
+    var dstStatBefore = a.fileProvider.statRead( a.abs( 'dst' ) );
+    var got = a.fileProvider.hardLink
+    ({
+      dstPath : a.abs( 'dst' ),
+      srcPath : a.abs( 'src' ),
+      breakingSrcHardLink : 1,
+      breakingDstHardLink : 0
+    });
+    var srcStatAfter = a.fileProvider.statRead( a.abs( 'src' ) );
+    var dstStatAfter = a.fileProvider.statRead( a.abs( 'dst' ) );
+    test.identical( got, false );
+    test.identical( srcStatBefore.ctimeNs, srcStatAfter.ctimeNs );
+    test.identical( dstStatBefore.ctimeNs, dstStatAfter.ctimeNs );
+    test.identical( a.fileProvider.areHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), true );
+
+    /* */
+
+    test.case = 'dst exists, is hard linked, points to the same file';
+    a.reflect();
+    a.fileProvider.fileWrite( a.abs( 'srcDataFile' ), 'src data' );
+    a.fileProvider.hardLink({ dstPath : a.abs( 'src' ), srcPath : a.abs( 'srcDataFile' ) });
+    a.fileProvider.hardLink({ dstPath : a.abs( 'src1' ), srcPath : a.abs( 'srcDataFile' ) });
+    a.fileProvider.hardLink({ dstPath : a.abs( 'src2' ), srcPath : a.abs( 'srcDataFile' ) });
+    a.fileProvider.hardLink
+    ({
+      dstPath : a.abs( 'src' ),
+      srcPath : a.abs( 'src1' ),
+      breakingSrcHardLink : 1,
+      breakingDstHardLink : 0
+    });
+    var srcStatBefore = a.fileProvider.statRead( a.abs( 'src1' ) );
+    var dstStatBefore = a.fileProvider.statRead( a.abs( 'src' ) );
+    var got = a.fileProvider.hardLink
+    ({
+      dstPath : a.abs( 'src' ),
+      srcPath : a.abs( 'src1' ),
+      breakingSrcHardLink : 1,
+      breakingDstHardLink : 0
+    });
+    var srcStatAfter = a.fileProvider.statRead( a.abs( 'src1' ) );
+    var dstStatAfter = a.fileProvider.statRead( a.abs( 'src' ) );
+    test.identical( got, false );
+    test.identical( srcStatBefore.ctimeNs, srcStatAfter.ctimeNs );
+    test.identical( dstStatBefore.ctimeNs, dstStatAfter.ctimeNs );
+    test.identical( a.fileProvider.areHardLinked( a.abs( 'src' ), a.abs( 'src1' ) ), true );
+  }
+  test.close( 'breakingSrcHardLink : 1, breakingDstHardLink : 0, more than two files' );
+
+  /* -- */
+
   test.open( 'src === dst' );
   {
     test.case = 'src does not exist';
@@ -50625,7 +50751,7 @@ total : 36
 
 //
 
-function hardLinkSrcDoesNotExistExperiment( test )
+function hardLinkForDebuggingExperiment( test )
 {
   let context = this;
   let a = context.assetFor( test, false );
@@ -50645,7 +50771,7 @@ function hardLinkSrcDoesNotExistExperiment( test )
   a.fileProvider.hardLink({ dstPath : a.abs( 'dst' ), srcPath : a.abs( 'src' ) });
 }
 
-hardLinkSrcDoesNotExistExperiment.experimental = 1
+hardLinkForDebuggingExperiment.experimental = 1
 
 //
 
@@ -51619,7 +51745,7 @@ var Self =
     hardLinkEscapedPath, /* xxx */
 
     // qqq3 : implement
-    // hardLinkReturnSync,
+    hardLinkReturnSync,
     // hardLinkReturnAsync,
     // hardLinkReturnThrowing0Sync,
     // hardLinkReturnThrowing0Async,
@@ -51705,7 +51831,7 @@ var Self =
     experiment2,
     hardLinkExperiment,
 
-    hardLinkSrcDoesNotExistExperiment,
+    hardLinkForDebuggingExperiment,
   }
 
 };

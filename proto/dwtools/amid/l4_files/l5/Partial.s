@@ -7282,8 +7282,8 @@ function areHardLinked_body( o ) /* qqq : refactor. probably move some code to a
 
   for( let i = 1 ; i < o.filePath.length ; i++ )
   {
-    if( o.filePath[ 0 ] === o.filePath[ i ] && o.filePath.filter( ( path ) => !self.fileExists( path ) ).length )
-    return false;
+    // if( o.filePath[ 0 ] === o.filePath[ i ] && o.filePath.filter( ( path ) => !self.fileExists( path ) ).length )
+    // return false;
 
     result = self.areHardLinkedAct({ filePath : [ o.filePath[ 0 ], o.filePath[ i ] ] });
     _.assert( _.boolIs( result ) || result === _.maybe );

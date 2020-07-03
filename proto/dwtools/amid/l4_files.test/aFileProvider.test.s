@@ -50415,7 +50415,7 @@ total : 36
 
     /* */
 
-    test.case = 'breakingSrcHardLink : 0, breakingDstHardLink : 1';
+    test.case = 'breakingSrcHardLink : 0, breakingDstHardLink : 1, two files';
     a.reflect();
     a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
     a.fileProvider.hardLink
@@ -50471,35 +50471,7 @@ total : 36
 
     /* */
 
-    test.case = 'breakingSrcHardLink : 1, breakingDstHardLink : 0, two files';
-    a.reflect();
-    a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-    a.fileProvider.hardLink
-    ({
-      dstPath : a.abs( 'dst' ),
-      srcPath : a.abs( 'src' ),
-      breakingSrcHardLink : 1,
-      breakingDstHardLink : 0
-    });
-    var srcStatBefore = a.fileProvider.statRead( a.abs( 'src' ) );
-    var dstStatBefore = a.fileProvider.statRead( a.abs( 'dst' ) );
-    var got = a.fileProvider.hardLink
-    ({
-      dstPath : a.abs( 'dst' ),
-      srcPath : a.abs( 'src' ),
-      breakingSrcHardLink : 1,
-      breakingDstHardLink : 0
-    });
-    var srcStatAfter = a.fileProvider.statRead( a.abs( 'src' ) );
-    var dstStatAfter = a.fileProvider.statRead( a.abs( 'dst' ) );
-    test.identical( got, false );
-    test.identical( srcStatBefore.ctimeNs, srcStatAfter.ctimeNs );
-    test.identical( dstStatBefore.ctimeNs, dstStatAfter.ctimeNs );
-    test.identical( a.fileProvider.areHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), true );
-    
-    /* */
-
-    test.case = 'breakingSrcHardLink : 1, breakingDstHardLink : 1';
+    test.case = 'breakingSrcHardLink : 1, breakingDstHardLink : 1, two files';
     a.reflect();
     a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
     a.fileProvider.hardLink
@@ -51647,7 +51619,7 @@ var Self =
     hardLinkEscapedPath, /* xxx */
 
     // qqq3 : implement
-    hardLinkReturnSync,
+    // hardLinkReturnSync,
     // hardLinkReturnAsync,
     // hardLinkReturnThrowing0Sync,
     // hardLinkReturnThrowing0Async,

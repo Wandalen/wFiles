@@ -6659,6 +6659,12 @@ function _softLinkVerify2( c )
   if( o.dstPath === o.srcPath )
   c.error( _.err( 'Soft link cycle', path.moveTextualReport( o.dstPath, o.srcPath ) ) );
 
+  if( self.areSoftLinked([ o.dstPath, o.srcPath ]) )
+  {
+    c.ended = true;
+    c.result = false;
+  }
+
   // if( o.dstPath !== o.srcPath && self.areSoftLinked([ o.dstPath, o.srcPath ]) )
   // if( o.dstPath === o.srcPath )
   // return true;

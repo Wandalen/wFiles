@@ -40997,6 +40997,7 @@ function isLink( test )
 
   provider.fieldPop( 'usingTextLink', 1 );
 }
+isLink.timeOut = 60000;
 
 //
 

@@ -32,7 +32,7 @@ function multiple( o, link )
   let self = this;
 
   if( o.dstPath.length < 2 )
-  return o.sync ? true : new _.Consequence().take( true );
+  return o.sync ? 0 : new _.Consequence().take( 0 );
 
   _.assert( !!o );
   _.assert( _.strIs( o.srcPath ) || o.srcPath === null );
@@ -78,7 +78,7 @@ function multiple( o, link )
   }
 
   if( !needed )
-  return o.sync ? true : new _.Consequence().take( true );
+  return o.sync ? 0 : new _.Consequence().take( 0 );
 
   /* */
 
@@ -1182,7 +1182,7 @@ function functor( fop )
       Vova : low priority
       */
 
-      if( _.longIs( o.dstPath ) && c.linkDo.having.hardLinking )
+      if( _.longIs( o.dstPath ) && c.linkDo.having.hardLinking ) /* qqq : functor cant use fields of c.linkDo! check code */
       return multiple.call( self, o, functor_body );
       _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
 

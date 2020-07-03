@@ -1134,7 +1134,6 @@ function configUserRead( o )
 
   if( o.locking )
   self.configUserLock({ filePath });
-  // self.fileLock({ filePath });
 
   return self.configRead
   ({
@@ -1177,10 +1176,8 @@ function configUserWrite( o )
 
   _.assert( !_.consequenceLike( result ) );
 
-  // debugger;
   if( o.unlocking )
   self.configUserUnlock({ filePath });
-  // self.fileUnlock({ filePath });
 
   return result;
 }

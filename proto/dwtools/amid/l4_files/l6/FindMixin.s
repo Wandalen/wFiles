@@ -120,7 +120,7 @@ function _filesFindPrepare0( routine, args ) /* qqq : cover each case */
       _.assert( !o.onUp );
       o.onUp = args[ 1 ];
     }
-    else _.assert( 0, 'Expects filer or callback onUp as the second argument' );
+    else _.assert( 0, 'Expects censor or callback onUp as the second argument' );
   }
 
   _.routineOptions( routine, o );

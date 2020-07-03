@@ -8,7 +8,7 @@
 </details>
 
 <details>
-  <summary><a href="./concept/BasicConcepts.md#тонкий-інтерфейс">
+  <summary><a href="./concept/BasicConcepts.md">
     Тонкий інтерфейс
   </a></summary>
     Це абстрактиний інтерфейс (back-end), який містить мінімальний специфічний для кожної файлової системи набір методів та полів.
@@ -42,4 +42,11 @@
     Файлові операції в віртуальній файловій системі
   </a></summary>
     Як створити файлову систему в оперативній пам'яті та працювати з нею. Виконання синхронних і асинхронних файлових операцій.
+</details>
+
+<details>
+  <summary><a href="./tutorial/HardLinkBasicUse.md">
+    Базове використання hardLink
+  </a></summary>
+    Використання базових можливостей методу <code>hardLink</code>.
 </details>

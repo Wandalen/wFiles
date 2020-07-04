@@ -558,20 +558,18 @@ function storageRead( o )
 
     _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
 
-    storageName = _.path.normalize( o.storageDir );
+    storageName = self.path.normalize( o.storageDir );
 
     storagePath = self.configUserPath( storageName );
 
     if( !self.fileExists( storagePath ) )
     return null;
 
-    debugger
     let result = self.filesRead
     ({
       filePath : self.path.join( storagePath, '**' ),
       encoding : _.unknown,
     });
-    debugger;
 
     return result.dataMap;
   }
@@ -602,7 +600,7 @@ function storageReset( o )
 
     _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
 
-    storageName = _.path.normalize( o.storageDir );
+    storageName = self.path.normalize( o.storageDir );
 
     storagePath = self.configUserPath( storageName );
 
@@ -643,20 +641,20 @@ function storageProfileRead( o )
     _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
     _.assert( _.strIs( o.profileDir ), 'Expects defined {- o.profileDir -}' );
 
-    storageName = _.path.join( o.storageDir, o.profileDir );
+    storageName = self.path.join( o.storageDir, o.profileDir );
 
     storagePath = self.configUserPath( storageName );
 
     if( !self.fileExists( storagePath ) )
     return null;
 
-    return self.configUserRead
+    let result = self.filesRead
     ({
-      name : storageName,
-      locking : 0,
+      filePath : self.path.join( storagePath, '**' ),
+      encoding : _.unknown,
     });
 
-    // return self.fileRead( storagePath );
+    return result.dataMap;
   }
   catch( err )
   {
@@ -667,7 +665,7 @@ function storageProfileRead( o )
 storageProfileRead.defaults =
 {
   storageDir : null,
-  profileDir : null,
+  profileDir : 'default',
 }
 
 //
@@ -687,12 +685,12 @@ function storageProfileReset( o )
     _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
     _.assert( _.strIs( o.profileDir ), 'Expects defined {- o.profileDir -}' );
 
-    storageName = _.path.join( o.storageDir, o.profileDir );
+    storageName = self.path.join( o.storageDir, o.profileDir );
 
     storagePath = self.configUserPath( storageName );
 
     if( self.fileExists( storagePath ) )
-    self.fileDelete
+    self.filesDelete
     ({
       filePath : storagePath,
       verbosity : o.verbosity ? 3 : 0,
@@ -709,7 +707,7 @@ function storageProfileReset( o )
 storageProfileReset.defaults =
 {
   storageDir : null,
-  profileDir : null,
+  profileDir : 'default',
   verbosity : 0,
 }
 
@@ -728,9 +726,16 @@ function storageTerminalRead( o )
 
     _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
     _.assert( _.strIs( o.profileDir ), 'Expects defined {- o.profileDir -}' );
+    _.assert( _.strIs( o.storageTerminalPrefix ), 'Expects defined {- o.storageTerminalPrefix -}' );
     _.assert( _.strIs( o.storageTerminal ), 'Expects defined {- o.storageTerminal -}' );
+    _.assert( _.strIs( o.storageTerminalPostfix ), 'Expects defined {- o.storageTerminalPostfix -}' );
 
-    storageName = _.path.join( o.storageDir, o.profileDir, o.storageTerminal );
+    storageName = self.path.join
+    (
+      o.storageDir,
+      o.profileDir,
+      o.storageTerminalPrefix + o.storageTerminal + o.storageTerminalPostfix,
+    );
 
     storagePath = self.configUserPath( storageName );
 
@@ -754,8 +759,10 @@ function storageTerminalRead( o )
 storageTerminalRead.defaults =
 {
   storageDir : null,
-  profileDir : null,
+  profileDir : 'default',
+  storageTerminalPrefix : '',
   storageTerminal : null,
+  storageTerminalPostfix : '',
 }
 
 //
@@ -773,9 +780,16 @@ function storageTerminalOpen( o )
 
     _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
     _.assert( _.strIs( o.profileDir ), 'Expects defined {- o.profileDir -}' );
+    _.assert( _.strIs( o.storageTerminalPrefix ), 'Expects defined {- o.storageTerminalPrefix -}' );
     _.assert( _.strIs( o.storageTerminal ), 'Expects defined {- o.storageTerminal -}' );
+    _.assert( _.strIs( o.storageTerminalPostfix ), 'Expects defined {- o.storageTerminalPostfix -}' );
 
-    storageName = _.path.join( o.storageDir, o.profileDir, o.storageTerminal );
+    storageName = self.path.join
+    (
+      o.storageDir,
+      o.profileDir,
+      o.storageTerminalPrefix + o.storageTerminal + o.storageTerminalPostfix,
+    );
 
     o.storage = self.configUserRead
     ({
@@ -805,8 +819,10 @@ function storageTerminalOpen( o )
 storageTerminalOpen.defaults =
 {
   storageDir : null,
-  profileDir : null,
+  profileDir : 'default',
+  storageTerminalPrefix : '',
   storageTerminal : null,
+  storageTerminalPostfix : '',
   onStorageConstruct : null,
   locking : 1,
   throwing : 1,
@@ -829,9 +845,16 @@ function storageTerminalClose( o )
     _.assert( _.mapIs( o.storage ), 'Expects defined {- o.storage -}' );
     _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
     _.assert( _.strIs( o.profileDir ), 'Expects defined {- o.profileDir -}' );
+    _.assert( _.strIs( o.storageTerminalPrefix ), 'Expects defined {- o.storageTerminalPrefix -}' );
     _.assert( _.strIs( o.storageTerminal ), 'Expects defined {- o.storageTerminal -}' );
+    _.assert( _.strIs( o.storageTerminalPostfix ), 'Expects defined {- o.storageTerminalPostfix -}' );
 
-    storageName = _.path.join( o.storageDir, o.profileDir, o.storageTerminal );
+    storageName = self.path.join
+    (
+      o.storageDir,
+      o.profileDir,
+      o.storageTerminalPrefix + o.storageTerminal + o.storageTerminalPostfix,
+    );
 
     o.storage = self.configUserWrite
     ({
@@ -872,14 +895,21 @@ function storageTerminalReset( o )
 
     _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
     _.assert( _.strIs( o.profileDir ), 'Expects defined {- o.profileDir -}' );
+    _.assert( _.strIs( o.storageTerminalPrefix ), 'Expects defined {- o.storageTerminalPrefix -}' );
     _.assert( _.strIs( o.storageTerminal ), 'Expects defined {- o.storageTerminal -}' );
+    _.assert( _.strIs( o.storageTerminalPostfix ), 'Expects defined {- o.storageTerminalPostfix -}' );
 
-    storageName = _.path.join( o.storageDir, o.profileDir, o.storageTerminal );
+    storageName = self.path.join
+    (
+      o.storageDir,
+      o.profileDir,
+      o.storageTerminalPrefix + o.storageTerminal + o.storageTerminalPostfix,
+    );
 
     storagePath = self.configUserPath( storageName );
 
     if( self.fileExists( storagePath ) )
-    self.fileDelete
+    self.filesDelete
     ({
       filePath : storagePath,
       verbosity : o.verbosity ? 3 : 0,
@@ -896,8 +926,10 @@ function storageTerminalReset( o )
 storageTerminalReset.defaults =
 {
   storageDir : null,
-  profileDir : null,
+  profileDir : 'default',
+  storageTerminalPrefix : '',
   storageTerminal : null,
+  storageTerminalPostfix : '',
   verbosity : 0,
 }
 

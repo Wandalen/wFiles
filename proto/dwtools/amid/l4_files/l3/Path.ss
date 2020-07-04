@@ -213,7 +213,7 @@ Unix
 
 */
 
-// function pathDirTempOpen( o )
+// function tempOpen( o )
 // {
 //   let self = this;
 
@@ -223,7 +223,7 @@ Unix
 //   o.name = arguments[ 1 ];
 //   o.filePath = self.resolve( o.filePath );
 
-//   _.routineOptions( pathDirTempOpen, o );
+//   _.routineOptions( tempOpen, o );
 //   _.assert( arguments.length === 1 || arguments.length === 2 );
 //   _.assert( !!self.fileProvider );
 //   _.assert( self.isAbsolute( o.filePath ) );
@@ -259,7 +259,7 @@ Unix
 let PathDirTempForMap = Object.create( null );
 let PathDirTempCountMap = Object.create( null );
 
-function pathDirTempOpen( o )
+function tempOpen( o )
 {
   let self = this;
 
@@ -272,7 +272,7 @@ function pathDirTempOpen( o )
   else
   o.filePath = self.resolve( o.filePath );
 
-  _.routineOptions( pathDirTempOpen, o );
+  _.routineOptions( tempOpen, o );
   _.assert( arguments.length <= 2 );
   _.assert( !!self.fileProvider );
   _.assert( self.isAbsolute( o.filePath ) );
@@ -358,7 +358,7 @@ function pathDirTempOpen( o )
   }
 }
 
-pathDirTempOpen.defaults =
+tempOpen.defaults =
 {
   filePath : null,
   name : null,
@@ -523,7 +523,7 @@ close /dir1
 //     _.appExitHandlerOnce( () =>
 //     {
 //       debugger;
-//       self.pathDirTempClose()
+//       self.tempClose()
 //     });
 //     logger.log( ' . Open temp directory ' + filePath2 );
 //     return filePath2;
@@ -648,7 +648,7 @@ function pathDirTempMake( o )
     _.process.on( 'available', _.event.Name( 'exit' ), () =>
     {
       //debugger;
-      self.pathDirTempClose()
+      self.tempClose()
     });
 
     // logger.log( ' . Open temp directory ' + filePath );
@@ -656,11 +656,11 @@ function pathDirTempMake( o )
   }
 }
 
-pathDirTempMake.defaults = Object.create( pathDirTempOpen.defaults );
+pathDirTempMake.defaults = Object.create( tempOpen.defaults );
 
 //
 
-// function pathDirTempClose( tempDirPath )
+// function tempClose( tempDirPath )
 // {
 //   let self = this;
 
@@ -732,7 +732,7 @@ pathDirTempMake.defaults = Object.create( pathDirTempOpen.defaults );
 
 //
 
-function pathDirTempClose( filePath )
+function tempClose( filePath )
 {
   let self = this;
 
@@ -1426,15 +1426,15 @@ let Extension =
   dirUserHome,
   dirTemp,
 
-  /* qqq merge dirTempAtOpen + pathDirTempOpen and dirTempAtClose + pathDirTempClose */
+  /* qqq merge dirTempAtOpen + tempOpen and dirTempAtClose + tempClose */
 
   dirTempAt,
   // dirTempAtOpen,
   // dirTempAtClose,
 
-  pathDirTempOpen,
+  tempOpen,
   pathDirTempMake,
-  pathDirTempClose,
+  tempClose,
 
   forCopy,
   firstAvailable,

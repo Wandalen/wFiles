@@ -17,7 +17,7 @@ let _global = _global_;
 let _ = _global_.wTools;
 let Abstract = _.FileProvider.Abstract;
 let Partial = _.FileProvider.Partial;
-let Find = _.FileProvider.Find;
+let Find = _.FileProvider.FindMixin;
 
 _.assert( _.routineIs( _.FileRecord ) );
 _.assert( _.routineIs( Abstract ) );
@@ -701,7 +701,7 @@ _.classDeclare
   extend : Extension,
 });
 
-// _.FileProvider.Find.mixin( Self );
+// _.FileProvider.FindMixin.mixin( Self );
 // _.FileProvider.Secondary.mixin( Self );
 
 _.FileProvider[ Self.shortName ] = Self;

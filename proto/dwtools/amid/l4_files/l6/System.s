@@ -1549,7 +1549,7 @@ _.classDeclare
   extend : Extension,
 });
 
-// _.FileProvider.Find.mixin( Self );
+// _.FileProvider.FindMixin.mixin( Self );
 // _.FileProvider.Secondary.mixin( Self );
 
 _Setup2();

@@ -18,20 +18,20 @@ _.assert( _.routineIs( fileRead ) );
 //
 
 /**
- @class wFileProviderFind
+ @class wFileProviderFindMixin
  @class FileProvider
  @namespace wTools
  @module Tools/mid/Files
 */
 
 let Parent = null;
-let Self = wFileProviderFind;
-function wFileProviderFind( o )
+let Self = wFileProviderFindMixin;
+function wFileProviderFindMixin( o )
 {
   return _.workpiece.construct( Self, this, arguments );
 }
 
-Self.shortName = 'Find';
+Self.shortName = 'FindMixin';
 
 // let debugPath = '/dstNew';
 
@@ -680,7 +680,7 @@ let filesFindSingle = _.routineFromPreAndBody( filesFindSingle_pre, filesFindSin
  * @param {*} o.onDown=[]
  *
  * @function filesFind
- * @class wFileProviderFind
+ * @class wFileProviderFindMixin
  * @namespace wTools.FileProvider
  * @module Tools/mid/Files
  */
@@ -1216,7 +1216,7 @@ filesFind.having.aspect = 'entry';
 //
 
 /**
- * @description Short-cut for {@link module:Tools/mid/Files.wTools.FileProvider.Find.filesFind}.
+ * @description Short-cut for {@link module:Tools/mid/Files.wTools.FileProvider.FindMixin.filesFind}.
  * Performs recursive search for files from specified path `o.filePath`.
  * Includes terminals,directories and transient files into the result array.
  * @param {Object} o Options map.
@@ -1245,7 +1245,7 @@ filesFind.having.aspect = 'entry';
  * @param {*} o.onDown=[]
  *
  * @function filesFindRecursive
- * @class wFileProviderFind
+ * @class wFileProviderFindMixin
  * @namespace wTools.FileProvider
  * @module Tools/mid/Files
  */
@@ -1274,7 +1274,7 @@ defaults.allowingCycled = 1;
 //
 
 /**
- * @description Short-cut for {@link module:Tools/mid/Files.wTools.FileProvider.Find.filesFind}.
+ * @description Short-cut for {@link module:Tools/mid/Files.wTools.FileProvider.FindMixin.filesFind}.
  * Performs recursive search for files using glob pattern `o.filePath` using glob pattern.
  * Includes terminals,directories into the result array.
  * @param {Object} o Options map.
@@ -1303,7 +1303,7 @@ defaults.allowingCycled = 1;
  * @param {*} o.onDown=[]
  *
  * @function filesGlob
- * @class wFileProviderFind
+ * @class wFileProviderFindMixin
  * @namespace wTools.FileProvider
  * @module Tools/mid/Files
  */
@@ -1350,12 +1350,12 @@ defaults.withTransient = 0;
 //
 
 /**
- * @description Functor for {@link module:Tools/mid/Files.wTools.FileProvider.Find.filesFind} routine.
+ * @description Functor for {@link module:Tools/mid/Files.wTools.FileProvider.FindMixin.filesFind} routine.
  * Creates a filesFind routine with options saved in inner context.
  * It allows to reuse created routine changing only necessary options and don't worry about other options.
- * @param {Object} o Options map. Please see {@link module:Tools/mid/Files.wTools.FileProvider.Find.filesFind} for options description.
+ * @param {Object} o Options map. Please see {@link module:Tools/mid/Files.wTools.FileProvider.FindMixin.filesFind} for options description.
  * @function filesFinder
- * @class wFileProviderFind
+ * @class wFileProviderFindMixin
  * @namespace wTools.FileProvider
  * @module Tools/mid/Files
  */
@@ -1751,6 +1751,7 @@ defaults.throwing = null;
 defaults.mode = 'distinct';
 defaults.resolvingSoftLink = 1;
 defaults.resolvingTextLink = 1;
+defaults.withDirs = 0;
 
 delete defaults.outputFormat;
 
@@ -3918,7 +3919,7 @@ function filesReflect_pre( routine, args )
  *	1 - rebase link, try to make destination file lead to other destination file if last was handled in same call of filesReflect
  *	2 - rebase and resolve link, try to create copy of a file referenced by a link
  * @function filesReflect
- * @class wFileProviderFind
+ * @class wFileProviderFindMixin
  * @namespace wTools.FileProvider
  * @module Tools/mid/Files
  */
@@ -4724,7 +4725,7 @@ function filesDelete_body( o )
     if( o.tempPath === null )
     {
       debugger;
-      o.tempPath = path.pathDirTempOpen( o.result[ 0 ].absolute );
+      o.tempPath = path.tempOpen( o.result[ 0 ].absolute );
       opened = true;
     }
 
@@ -4754,7 +4755,7 @@ function filesDelete_body( o )
     {
       debugger;
       if( opened )
-      path.pathDirTempClose( o.tempPath );
+      path.tempClose( o.tempPath );
       else
       late.forEach( ( dstPath ) => self.filesDelete( dstPath ) );
       debugger;
@@ -5388,9 +5389,9 @@ _.classDeclare
 _.FileProvider = _.FileProvider || Object.create( null );
 _.FileProvider[ Self.shortName ] = Self;
 
-_.assert( !!_.FileProvider.Find.prototype.filesDelete.defaults.withDirs );
+_.assert( !!_.FileProvider.FindMixin.prototype.filesDelete.defaults.withDirs );
 
-_.FileProvider.Find.mixin( Partial );
+Self.mixin( Partial );
 
 _.assert( !!_.FileProvider.Partial.prototype.filesDelete.defaults.withDirs );
 

@@ -23,7 +23,7 @@ function onSuiteBegin( test ) /* qqq2 : review all onSuite* */
   let context = this;
   context.provider = _.FileProvider.HardDrive({ protocol : 'current' });
   context.system = _.FileProvider.System({ providers : [ context.provider ], defaultProvider : context.provider });
-  context.suiteTempPath = context.provider.path.pathDirTempOpen( context.provider.path.join( __dirname, '../..'  ), 'suite-' + 'FilesFind' );
+  context.suiteTempPath = context.provider.path.tempOpen( context.provider.path.join( __dirname, '../..'  ), 'suite-' + 'FilesFind' );
 }
 
 //
@@ -33,7 +33,7 @@ function onSuiteBegin( test ) /* qqq2 : review all onSuite* */
 // {
 //   let path = this.provider.path;
 //   _.assert( _.strHas( this.suiteTempPath, 'Provider/HardDrive' ) );
-//   path.pathDirTempClose( this.suiteTempPath );
+//   path.tempClose( this.suiteTempPath );
 // }
 
 //

@@ -1306,7 +1306,7 @@ function fileDeleteAct( o )
   {
     let fileName = self.path.name({ path : o.filePath, full : 1 });
     let tempName = fileName + '-' + _.idWithGuid() + '.tmp';
-    let tempDirPath = self.path.pathDirTempOpen( o.filePath );
+    let tempDirPath = self.path.tempOpen( o.filePath );
     let tempPath = self.path.join( tempDirPath, tempName );
     tempPath = self.path.nativize( tempPath );
     return tempPath;

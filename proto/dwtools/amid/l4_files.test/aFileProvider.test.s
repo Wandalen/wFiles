@@ -29,7 +29,7 @@ function onSuiteEnd()
   let path = this.provider.path;
   _.assert( _.strHas( this.suiteTempPath, '.tmp' ) );
   debugger;
-  path.pathDirTempClose( this.suiteTempPath );
+  path.tempClose( this.suiteTempPath );
   debugger;
   this.provider.finit();
   this.system.finit();
@@ -65,7 +65,7 @@ function assetFor( test, a )
     a.fileProvider = context.providerMake();
   }
 
-  a.suiteTempPath = a.fileProvider.path.pathDirTempOpen( a.fileProvider.constructor.name );
+  a.suiteTempPath = a.fileProvider.path.tempOpen( a.fileProvider.constructor.name );
 
   let system = a.system;
   let effectiveProvider = a.effectiveProvider;
@@ -122,7 +122,7 @@ function assetFor( test, a )
 //     a.fileProvider = context.providerMake();
 //   }
 //
-//   a.suiteTempPath = a.fileProvider.path.pathDirTempOpen( a.fileProvider.constructor.name );
+//   a.suiteTempPath = a.fileProvider.path.tempOpen( a.fileProvider.constructor.name );
 //
 //   a = test.assetFor( a );
 //
@@ -24670,7 +24670,7 @@ function softLinkChain( test )
     return
   }
 
-  // var routinePath = path.pathDirTempOpen();
+  // var routinePath = path.tempOpen();
   var routinePath = test.context.pathFor( 'written/softLinkChain' );
 
   debugger;

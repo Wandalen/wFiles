@@ -24,7 +24,7 @@ function onSuiteBegin()
 {
   var context = this;
 
-  context.suiteTempPath = _.path.pathDirTempOpen( _.path.join( __dirname, '../..'  ), 'System/HardDrive' );
+  context.suiteTempPath = _.path.tempOpen( _.path.join( __dirname, '../..'  ), 'System/HardDrive' );
 
   context.providerEffective = _.FileProvider.HardDrive();
 
@@ -45,7 +45,7 @@ function onSuiteEnd()
   context.provider.finit();
   _.assert( _.strHas( this.suiteTempPath, '.tmp' ), this.suiteTempPath );
   // this.providerEffective.filesDelete({ filePath : this.suiteTempPath });
-  _.path.pathDirTempClose( this.suiteTempPath );
+  _.path.tempClose( this.suiteTempPath );
 }
 
 //

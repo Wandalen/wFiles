@@ -26,7 +26,7 @@ function onSuiteBegin()
   this.isBrowser = typeof module === 'undefined';
 
   if( !this.isBrowser )
-  this.suiteTempPath = _.path.pathDirTempOpen( _.path.join( __dirname, '../..' ), 'FilesRead' );
+  this.suiteTempPath = _.path.tempOpen( _.path.join( __dirname, '../..' ), 'FilesRead' );
   else
   this.suiteTempPath = _.path.current();
 }
@@ -38,7 +38,7 @@ function onSuiteEnd()
   if( !this.isBrowser )
   {
     _.assert( _.strHas( this.suiteTempPath, '.tmp' ) );
-    _.path.pathDirTempClose(  this.suiteTempPath );
+    _.path.tempClose(  this.suiteTempPath );
   }
 }
 

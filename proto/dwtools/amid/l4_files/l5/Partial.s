@@ -156,7 +156,7 @@ function init( o )
   // _.process._exitHandlerOnce( () =>
   // {
   //   debugger;
-  //   self.path.pathDirTempClose()
+  //   self.path.tempClose()
   // });
 
 }
@@ -2786,6 +2786,9 @@ function fileRead_body( o )
   let self = this;
   let result = null;
 
+  if( o.encoding === _.unknown ) /* qqq : cover */
+  o.encoding = _.files.encoder.deduce({ filePath : o.filePath, returning : 'name', criterion : { reader : true } });
+
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.strIs( o.encoding ) );
   _.assert( _.longHas( [ 'data', 'o' ], o.outputFormat ) );
@@ -4673,7 +4676,7 @@ function fileWrite_body( o )
   let path = self.system ? self.system.path : self.path;;
 
   o.encoding = o.encoding || self.encoding;
-  if( o.encoding === _.unknown )
+  if( o.encoding === _.unknown ) /* qqq : cover */
   o.encoding = _.files.encoder.deduce({ filePath : o.filePath, returning : 'name', criterion : { writer : true } });
   let encoder = _.files.WriteEncoders[ o.encoding ];
 

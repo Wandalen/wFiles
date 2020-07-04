@@ -36,7 +36,7 @@ function onSuiteEnd()
   let path = this.provider.path;
   _.assert( Object.keys( this.system.providersWithProtocolMap ).length === 1, 'System should have single registered provider at the end of function testing' );
   _.assert( _.strHas( this.suiteTempPath, '.tmp' ) );
-  path.pathDirTempClose( this.suiteTempPath );
+  path.tempClose( this.suiteTempPath );
   this.provider.finit();
   this.system.finit();
 }
@@ -71,7 +71,7 @@ function assetFor( test, a )
     a.fileProvider = context.providerMake();
   }
 
-  a.suiteTempPath = a.fileProvider.path.pathDirTempOpen( a.fileProvider.constructor.name );
+  a.suiteTempPath = a.fileProvider.path.tempOpen( a.fileProvider.constructor.name );
 
   let system = a.system;
   let effectiveProvider = a.effectiveProvider;

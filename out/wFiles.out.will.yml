@@ -201,15 +201,16 @@ module:
           - ../proto/dwtools/amid/l4_files/include
           - ../proto/dwtools/amid/l4_files/include/Basic.s
           - ../proto/dwtools/amid/l4_files/include/Extract.s
-          - ../proto/dwtools/amid/l4_files/include/Find.s
           - ../proto/dwtools/amid/l4_files/include/Git.ss
           - ../proto/dwtools/amid/l4_files/include/HardDrive.ss
           - ../proto/dwtools/amid/l4_files/include/Http.s
           - ../proto/dwtools/amid/l4_files/include/Imap.ss
           - ../proto/dwtools/amid/l4_files/include/Mid.s
+          - ../proto/dwtools/amid/l4_files/include/MixinConfig.s
+          - ../proto/dwtools/amid/l4_files/include/MixinFind.s
+          - ../proto/dwtools/amid/l4_files/include/MixinSecondary.s
           - ../proto/dwtools/amid/l4_files/include/Npm.ss
           - ../proto/dwtools/amid/l4_files/include/Reroot.s
-          - ../proto/dwtools/amid/l4_files/include/Secondary.s
           - ../proto/dwtools/amid/l4_files/include/Top.s
           - ../proto/dwtools/amid/l4_files/l1
           - ../proto/dwtools/amid/l4_files/l1/Namespace.s
@@ -236,6 +237,7 @@ module:
           - ../proto/dwtools/amid/l4_files/l6/FindMixin.s
           - ../proto/dwtools/amid/l4_files/l6/System.s
           - ../proto/dwtools/amid/l4_files/l7
+          - ../proto/dwtools/amid/l4_files/l7/ConfigMixin.s
           - ../proto/dwtools/amid/l4_files/l7/SecondaryMixin.s
           - ../proto/dwtools/amid/l4_files/l7_provider
           - ../proto/dwtools/amid/l4_files/l7_provider/Extract.s

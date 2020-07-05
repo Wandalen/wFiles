@@ -6575,7 +6575,7 @@ defaults.rewritingDirs = 0;
 defaults.makingDirectory = 0; /* qqq2 : change default to makingDirectory : 1 */
 defaults.throwing = null;
 defaults.verbosity = null;
-defaults.allowDiffContent = 0;
+defaults.allowingDiscrepancy = 1;
 defaults.allowingMissed = 0;
 defaults.allowingCycled = 0;
 defaults.sourceMode = 'modified>hardlinks>';
@@ -6588,6 +6588,8 @@ defaults.resolvingDstSoftLink = 0;
 defaults.resolvingDstTextLink = 0;
 
 _.mapExtend( hardLink.defaults, hardLink.body.defaults );
+
+/* xxx qqq2 : add test routine to check linking methods fails if context is passed */
 
 //
 

@@ -3106,10 +3106,16 @@ function filesReflectEvaluate_body( o )
             debugger
             throw _.err
             (
-              'Source terminal files: \n' + _.strQuote( result.src.absolute ) + ' and ' + _.strQuote( record.src.absolute ) + '\n' +
-              'have same destination path: ' + _.strQuote( record.dst.absolute ) +', but different content.' + '\n' +
-              'Can\'t perform rewrite operation when option dstRewritingOnlyPreserving is enabled.'
+              'Cant\'t rewrite destination file by source file, because they have different content and option::dstRewritingOnlyPreserving is true\n'
+              + `\ndst: ${result.dst.absolute}`
+              + `\nsrc: ${result.src.absolute}`
             );
+            // throw _.err
+            // (
+            //   'Source terminal files: \n' + _.strQuote( result.src.absolute ) + ' and ' + _.strQuote( record.src.absolute ) + '\n' +
+            //   'have same destination path: ' + _.strQuote( record.dst.absolute ) +', but different content.' + '\n' +
+            //   'Can\'t perform rewrite operation when option dstRewritingOnlyPreserving is enabled.'
+            // );
           }
         }
         break;
@@ -3144,7 +3150,7 @@ defaults.dstDeleting = 0;
 defaults.dstDeletingCleanedDirs = 1;
 defaults.dstRewriting = 1;
 defaults.dstRewritingByDistinct = 1;
-defaults.dstRewritingOnlyPreserving = 0;
+defaults.dstRewritingOnlyPreserving = 0; /* xxx : rename to dstRewritingAllowingDiscrepancy and invert */
 defaults.preservingTime = 0;
 defaults.preservingSame = 0;
 

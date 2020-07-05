@@ -162,19 +162,32 @@ function multiple( o, link )
     if( record === mostLinkedRecord )
     return o.sync ? true : new _.Consequence().take( true );
 
-    if( !o.allowDiffContent )
-    if( record.stat && newestRecord.stat.mtime.getTime() === record.stat.mtime.getTime() && newestRecord.stat.birthtime.getTime() === record.stat.birthtime.getTime() )
-    {
-      if( _.files.stat.different( newestRecord.stat , record.stat ) )
-      {
-        let err = _.err( 'Several files has the same date but different content', newestRecord.absolute, record.absolute );
-        debugger;
-        if( o.sync )
-        throw err;
-        else
-        return new _.Consequence().error( err );
-      }
-    }
+    // if( !o.allowingDiscrepancy ) /* qqq : cover */
+    // if( !self.filesCanBeSame( result.src, record.src, true ) )
+    // if( result.src.stat.size !== 0 || record.src.stat.size !== 0 )
+    // {
+    //   debugger
+    //   throw _.err
+    //   (
+    //     'Cant\'t rewrite destination file by source file, because they have different content and option::allowingDiscrepancy is false\n'
+    //     + `\ndst: ${result.dst.absolute}`
+    //     + `\nsrc: ${result.src.absolute}`
+    //   );
+    // }
+
+    // if( !o.allowingDiscrepancy )
+    // // if( record.stat && newestRecord.stat.mtime.getTime() === record.stat.mtime.getTime() && newestRecord.stat.birthtime.getTime() === record.stat.birthtime.getTime() )
+    // {
+    //   if( _.files.stat.different( newestRecord.stat , record.stat ) )
+    //   {
+    //     let err = _.err( 'Several files has the same date but different content', newestRecord.absolute, record.absolute );
+    //     debugger;
+    //     if( o.sync )
+    //     throw err;
+    //     else
+    //     return new _.Consequence().error( err );
+    //   }
+    // }
 
     if( !record.stat || !_.files.stat.areHardLinked( mostLinkedRecord.stat , record.stat ) )
     {
@@ -182,6 +195,7 @@ function multiple( o, link )
       linkOptions.allowingMissed = 0; // Vova : hardLink does not allow missing srcPath
       linkOptions.dstPath = record.absolute;
       linkOptions.srcPath = mostLinkedRecord.absolute;
+      debugger;
       return link.call( self, linkOptions );
     }
 
@@ -302,6 +316,25 @@ function verify2()
   if( c.verifyEqualPaths() )
   return true;
 
+  /* */
+
+  if( _.boolLikeFalse( o.allowingDiscrepancy ) )
+  debugger;
+  if( _.boolLikeFalse( o.allowingDiscrepancy ) ) /* qqq : cover */
+  if( c.srcResolvedStat )
+  if( self.fileExists( c.options2.dstPath ) )
+  if( !self.filesAreSameForSure( c.options2.srcPath, c.options2.dstPath, false ) ) /* xxx : optimize */
+  if( Number( c.srcResolvedStat.size ) !== 0 )
+  {
+    debugger
+    throw _.err
+    (
+      'Cant\'t rewrite destination file by source file, because they have different content and option::allowingDiscrepancy is false\n'
+      + `\ndst: ${o.dstPath}`
+      + `\nsrc: ${o.srcPath}`
+    );
+  }
+
   /* skipping */
 
   if( c.onVerify2 )
@@ -421,7 +454,10 @@ function pathsLocalizeSync() /* qqq : ignoring provider is temp workaround. plea
   let o = c.options;
 
   if( self instanceof _.FileProvider.System )
-  return;
+  {
+    debugger;
+    return;
+  }
 
   if( self.path.isGlobal( o.dstPath ) )
   {
@@ -437,6 +473,7 @@ function pathsLocalizeSync() /* qqq : ignoring provider is temp workaround. plea
     if( srcParsed.protocol && _.longHas( self.protocols, srcParsed.protocol ) )
     o.srcPath = srcParsed.longPath;
   }
+
 }
 
 //
@@ -496,7 +533,7 @@ function pathResolve()
   c.verifyEqualPaths();
 }
 
-/* */
+//
 
 function pathResolveAsync()
 {
@@ -601,6 +638,8 @@ function linksResolve()
   }
 
 }
+
+//
 
 function linksResolveAsync()
 {

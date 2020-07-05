@@ -5345,7 +5345,7 @@ let Supplement =
 
   filesReflectEvaluate,
   filesReflectSingle,
-  filesReflect,
+  filesReflect, /* xxx qqq : write test of filesReflect into itself with goal to change extensions */
 
   filesReflector_functor,
   filesReflector,

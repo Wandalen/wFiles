@@ -6,13 +6,6 @@ Files treats any file-system-like interface as files system. Files combines all 
 
 Files manipulation library of middle level. Module offers several implementations  of single interface, called ( FileProvider ) to perform file operations in the same manner with different sources/destinations.
 
-### Avaible operations:
-* File read/write operations.
-* Creating read/write steams.
-* Operations with file [stats](https://nodejs.org/api/fs.html#fs_class_fs_stats) object.
-* File create,delete,rename,copy operations.
-* Making [soft](https://en.wikipedia.org/wiki/Symbolic_link)/[hard](https://en.wikipedia.org/wiki/Hard_link) links.
-
 ### Installation
 ```terminal
 npm install wFiles

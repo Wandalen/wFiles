@@ -119,7 +119,7 @@ function softLinkIsSupported()
   let context = this;
   let provider = context.provider
   let path = context.provider.path;
-  
+
 
   if( Config.interpreter === 'njs' && typeof process !== undefined )
   if( process.platform === 'win32' )
@@ -32862,6 +32862,56 @@ function filesReflectDstIgnoring( test )
 
 //
 
+function filesReflectRenaming( test )
+{
+  let context = this;
+  let a = context.assetFor( test, false );
+
+  /* */
+
+  test.case = 'provider';
+  a.reflect();
+
+  a.fileProvider.fileWrite( a.abs( 'F1.txt' ), 'F1.txt' );
+  a.fileProvider.fileWrite( a.abs( 'F1.txt2' ), 'F1.txt2' );
+  a.fileProvider.fileWrite( a.abs( 'dir1/F1.txt' ), 'dir1/F1.txt' );
+  a.fileProvider.fileWrite( a.abs( 'dir1/F1.txt2' ), 'dir1/F1.txt2' );
+  a.fileProvider.fileWrite( a.abs( 'dir1/dir2/F1.txt' ), 'dir1/dir2/F1.txt' );
+  a.fileProvider.fileWrite( a.abs( 'dir1/dir2/F1.txt2' ), 'dir1/dir2/F1.txt2' );
+
+  debugger;
+  a.fileProvider.filesReflect
+  ({
+    filter : { filePath : { [ a.abs( 'dir1' ) ] : a.abs( 'dir1' ) } },
+    // srcDeleting : 1,
+    onWriteDstUp,
+  });
+  debugger;
+
+  var exp = [ 'xxx' ];
+  var got = a.findAll( a.abs( 'dir1' ) );
+  test.identical( got, exp );
+
+  /* */
+
+  function onWriteDstUp( r )
+  {
+    // debugger;
+    if( a.path.ext( r.dst.absolute ) === 'txt2' )
+    {
+      r.dst.absolute = a.path.changeExt( r.dst.absolute, 'txt3' );
+      r.srcAction = 'fileDelete';
+      debugger;
+      // r.src.action = '';
+    }
+    // debugger;
+    // console.log( r );
+  }
+
+}
+
+//
+
 function filesExtractBasic( test )
 {
   let context = this;
@@ -37825,6 +37875,7 @@ var Self =
     filesReflectToWithSoftLinksRebasing, /* qqq : implement filesReflectToWithTextLinksRebasing */
     filesReflectToWithSoftLinksResolving, /* qqq : implement filesReflectToWithTextLinksResolving */
     filesReflectDstIgnoring,
+    filesReflectRenaming,
     filesExtractBasic,
 
     filesDeleteTrivial,

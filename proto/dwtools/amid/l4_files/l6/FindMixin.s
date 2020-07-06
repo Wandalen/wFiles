@@ -3235,6 +3235,7 @@ function filesReflectSingle_body( o )
   forEach( writeDstUp2, writeDstDown2 );
 
   if( o.writing && o.srcDeleting )
+  // if( o.writing ) /* xxx : use this */
   forEach( writeSrcUp, writeSrcDown );
 
   /* */

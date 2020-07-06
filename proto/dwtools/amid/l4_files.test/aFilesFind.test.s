@@ -32869,43 +32869,59 @@ function filesReflectRenaming( test )
 
   /* */
 
-  test.case = 'provider';
-  a.reflect();
+  test.case = 'filesReflect';
 
-  a.fileProvider.fileWrite( a.abs( 'F1.txt' ), 'F1.txt' );
-  a.fileProvider.fileWrite( a.abs( 'F1.txt2' ), 'F1.txt2' );
-  a.fileProvider.fileWrite( a.abs( 'dir1/F1.txt' ), 'dir1/F1.txt' );
-  a.fileProvider.fileWrite( a.abs( 'dir1/F1.txt2' ), 'dir1/F1.txt2' );
-  a.fileProvider.fileWrite( a.abs( 'dir1/dir2/F1.txt' ), 'dir1/dir2/F1.txt' );
-  a.fileProvider.fileWrite( a.abs( 'dir1/dir2/F1.txt2' ), 'dir1/dir2/F1.txt2' );
+  setup();
 
-  debugger;
   a.fileProvider.filesReflect
   ({
     filter : { filePath : { [ a.abs( 'dir1' ) ] : a.abs( 'dir1' ) } },
-    // srcDeleting : 1,
     onWriteDstUp,
   });
-  debugger;
 
-  var exp = [ 'xxx' ];
+  var exp = [ '.', './F1.txt', './F1.txt3', './dir2', './dir2/F1.txt', './dir2/F1.txt3' ];
   var got = a.findAll( a.abs( 'dir1' ) );
   test.identical( got, exp );
 
   /* */
 
-  function onWriteDstUp( r )
+  test.case = 'filesRename';
+
+  setup();
+
+  a.fileProvider.filesReflect
+  ({
+    filter : { filePath : { [ a.abs( 'dir1' ) ] : a.abs( 'dir1' ) } },
+    onWriteDstUp,
+  });
+
+  var exp = [ '.', './F1.txt', './F1.txt3', './dir2', './dir2/F1.txt', './dir2/F1.txt3' ];
+  var got = a.findAll( a.abs( 'dir1' ) );
+  test.identical( got, exp );
+
+  /* */
+
+  function setup()
   {
-    // debugger;
+    a.reflect();
+    a.fileProvider.fileWrite( a.abs( 'F1.txt' ), 'F1.txt' );
+    a.fileProvider.fileWrite( a.abs( 'F1.txt2' ), 'F1.txt2' );
+    a.fileProvider.fileWrite( a.abs( 'dir1/F1.txt' ), 'dir1/F1.txt' );
+    a.fileProvider.fileWrite( a.abs( 'dir1/F1.txt2' ), 'dir1/F1.txt2' );
+    a.fileProvider.fileWrite( a.abs( 'dir1/dir2/F1.txt' ), 'dir1/dir2/F1.txt' );
+    a.fileProvider.fileWrite( a.abs( 'dir1/dir2/F1.txt2' ), 'dir1/dir2/F1.txt2' );
+  }
+
+  /* */
+
+  function onWriteDstUp( r, o )
+  {
+    o.srcDeleting = 1;
     if( a.path.ext( r.dst.absolute ) === 'txt2' )
     {
       r.dst.absolute = a.path.changeExt( r.dst.absolute, 'txt3' );
       r.srcAction = 'fileDelete';
-      debugger;
-      // r.src.action = '';
     }
-    // debugger;
-    // console.log( r );
   }
 
 }

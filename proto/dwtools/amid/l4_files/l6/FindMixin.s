@@ -3150,7 +3150,7 @@ defaults.dstDeleting = 0;
 defaults.dstDeletingCleanedDirs = 1;
 defaults.dstRewriting = 1;
 defaults.dstRewritingByDistinct = 1;
-defaults.dstRewritingOnlyPreserving = 0; /* xxx : rename to dstRewritingAllowingDiscrepancy and invert */
+defaults.dstRewritingOnlyPreserving = 0; /* qqq2 xxx : rename to dstRewritingAllowingDiscrepancy and invert */
 defaults.preservingTime = 0;
 defaults.preservingSame = 0;
 
@@ -3235,7 +3235,7 @@ function filesReflectSingle_body( o )
   forEach( writeDstUp2, writeDstDown2 );
 
   if( o.writing && o.srcDeleting )
-  // if( o.writing ) /* xxx : use this */
+  if( o.writing ) /* xxx : use this */
   forEach( writeSrcUp, writeSrcDown );
 
   /* */

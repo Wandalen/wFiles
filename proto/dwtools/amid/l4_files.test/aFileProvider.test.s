@@ -51148,18 +51148,18 @@ function softLinkReturnSync( test )
     /* */
 
     /* Artem B. bug in areSoftLinked, case: src === dst && src is soft link on itself, returns false */
-    // test.case = 'src is soft link on itself';
-    // a.reflect();
-    // a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
-    // var got = a.fileProvider.softLink
-    // ({
-    //   dstPath : a.abs( 'dir1/src' ),
-    //   srcPath : a.abs( 'dir1/src' ),
-    //   rewriting : 1,
-    //   allowingMissed : 1,
-    // });
-    // test.identical( got, true );
-    // test.identical( a.fileProvider.areSoftLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), true );
+    test.case = 'src is soft link on itself';
+    a.reflect();
+    a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
+    var got = a.fileProvider.softLink
+    ({
+      dstPath : a.abs( 'dir1/src' ),
+      srcPath : a.abs( 'dir1/src' ),
+      rewriting : 1,
+      allowingMissed : 1,
+    });
+    test.identical( got, true );
+    test.identical( a.fileProvider.areSoftLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), true );
 
     /* */
 
@@ -51177,82 +51177,82 @@ function softLinkReturnSync( test )
     /* */
 
     /* Artem B. bug in areSoftLinked, case: src === dst && src is soft link on itself, returns false */
-    // test.case = 'rewriting : 1';
-    // a.reflect();
-    // a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
-    // var got = a.fileProvider.softLink
-    // ({
-    //   dstPath : a.abs( 'dir1/src' ),
-    //   srcPath : a.abs( 'dir1/src' ),
-    //   rewriting : 1,
-    //   allowingMissed : 1,
-    // });
-    // test.identical( got, true );
-    // test.identical( a.fileProvider.areSoftLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), true );
+    test.case = 'rewriting : 1';
+    a.reflect();
+    a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
+    var got = a.fileProvider.softLink
+    ({
+      dstPath : a.abs( 'dir1/src' ),
+      srcPath : a.abs( 'dir1/src' ),
+      rewriting : 1,
+      allowingMissed : 1,
+    });
+    test.identical( got, true );
+    test.identical( a.fileProvider.areSoftLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), true );
 
     /* */
 
     /* Artem B. bug in areSoftLinked, case: src === dst && src is soft link on itself, returns false */
-    // test.case = 'rewritingDirs : 1';
-    // a.reflect();
-    // a.fileProvider.dirMake( a.abs( 'dir1/src' ) )
-    // var got = a.fileProvider.softLink
-    // ({
-    //   dstPath : a.abs( 'dir1/src' ),
-    //   srcPath : a.abs( 'dir1/src' ),
-    //   rewritingDirs : 1,
-    //   allowingMissed : 1,
-    // });
-    // test.identical( got, true );
-    // test.identical( a.fileProvider.areSoftLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), true );
+    test.case = 'rewritingDirs : 1';
+    a.reflect();
+    a.fileProvider.dirMake( a.abs( 'dir1/src' ) )
+    var got = a.fileProvider.softLink
+    ({
+      dstPath : a.abs( 'dir1/src' ),
+      srcPath : a.abs( 'dir1/src' ),
+      rewritingDirs : 1,
+      allowingMissed : 1,
+    });
+    test.identical( got, true );
+    test.identical( a.fileProvider.areSoftLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), true );
     
     /* */
 
     /* Artem B. bug in areSoftLinked, case: src === dst && src is soft link on itself, returns false */
-    // test.case = 'rewritingDirs : 0';
-    // a.reflect();
-    // a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
-    // var got = a.fileProvider.softLink
-    // ({
-    //   dstPath : a.abs( 'dir1/src' ),
-    //   srcPath : a.abs( 'dir1/src' ),
-    //   rewritingDirs : 0,
-    //   allowingMissed : 1,
-    // });
-    // test.identical( got, true );
-    // test.identical( a.fileProvider.areSoftLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), true );
+    test.case = 'rewritingDirs : 0';
+    a.reflect();
+    a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
+    var got = a.fileProvider.softLink
+    ({
+      dstPath : a.abs( 'dir1/src' ),
+      srcPath : a.abs( 'dir1/src' ),
+      rewritingDirs : 0,
+      allowingMissed : 1,
+    });
+    test.identical( got, true );
+    test.identical( a.fileProvider.areSoftLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), true );
 
     /* */
 
     /* Artem B. bug in areSoftLinked, case: src === dst && src is soft link on itself, returns false */
-    // test.case = 'makingDirectory : 1';
-    // a.reflect();
-    // a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
-    // var got = a.fileProvider.softLink
-    // ({
-    //   dstPath : a.abs( 'dir1/src' ),
-    //   srcPath : a.abs( 'dir1/src' ),
-    //   makingDirectory : 1,
-    //   allowingMissed : 1,
-    // });
-    // test.identical( got, true );
-    // test.identical( a.fileProvider.areSoftLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), true );
+    test.case = 'makingDirectory : 1';
+    a.reflect();
+    a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
+    var got = a.fileProvider.softLink
+    ({
+      dstPath : a.abs( 'dir1/src' ),
+      srcPath : a.abs( 'dir1/src' ),
+      makingDirectory : 1,
+      allowingMissed : 1,
+    });
+    test.identical( got, true );
+    test.identical( a.fileProvider.areSoftLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), true );
 
     /* */
 
     /* Artem B. bug in areSoftLinked, case: src === dst && src is soft link on itself, returns false */
-    // test.case = 'makingDirectory : 0';
-    // a.reflect();
-    // a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
-    // var got = a.fileProvider.softLink
-    // ({
-    //   dstPath : a.abs( 'dir1/src' ),
-    //   srcPath : a.abs( 'dir1/src' ),
-    //   makingDirectory : 0,
-    //   allowingMissed : 1,
-    // });
-    // test.identical( got, true );
-    // test.identical( a.fileProvider.areSoftLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), true );
+    test.case = 'makingDirectory : 0';
+    a.reflect();
+    a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
+    var got = a.fileProvider.softLink
+    ({
+      dstPath : a.abs( 'dir1/src' ),
+      srcPath : a.abs( 'dir1/src' ),
+      makingDirectory : 0,
+      allowingMissed : 1,
+    });
+    test.identical( got, true );
+    test.identical( a.fileProvider.areSoftLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), true );
   }
   test.close( 'src === dst' );
 }
@@ -51283,7 +51283,7 @@ function areSoftLinkedForDebuggingExperiment( test )
   let context = this;
   let a = context.assetFor( test, false );
 
-  test.case = 'src is terminal file';
+  test.case = 'src === dst, src is terminal file';
   a.reflect();
   a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
   test.identical( a.fileProvider.areSoftLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), false );
@@ -51302,6 +51302,19 @@ function areSoftLinkedForDebuggingExperiment( test )
   });
   test.identical( got, true );
   test.identical( a.fileProvider.areSoftLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), true );
+
+  /* */
+
+  test.case = 'src is soft link on another file';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'dir1/src1' ), 'some text' );
+  var got = a.fileProvider.softLink
+  ({
+    dstPath : a.abs( 'dir1/src' ),
+    srcPath : a.abs( 'dir1/src1' ),
+  });
+  test.identical( got, true );
+  test.identical( a.fileProvider.areSoftLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), false );
 }
 areSoftLinkedForDebuggingExperiment.experimental = 1;
 

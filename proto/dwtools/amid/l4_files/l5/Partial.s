@@ -7284,7 +7284,7 @@ function filesAreLinked_pre( routine, args )
 function areHardLinked_body( o ) /* qqq : refactor. probably move some code to areHardLinkedAct */
 {
   let self = this;
-
+  debugger;
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assertRoutineOptions( areHardLinked_body, arguments );
 
@@ -7345,8 +7345,20 @@ function areSoftLinked_body( o )
 
   _.assert( path.s.allAreAbsolute( o.filePath ) );
 
-  if( o.filePath[ 0 ] === o.filePath[ 1 ] )
+  let isTheSamePath = true;
+  for (let i = 1; i < o.filePath.length; i++)
+  if( o.filePath[ 0 ] !== o.filePath[ i ] )
+  {
+    isTheSamePath = false;
+    break;
+  }
+
+  if( isTheSamePath && self.isLink( o.filePath[ 0 ] ) && self.pathResolveSoftLinkAct({ filePath : o.filePath[ 0 ] }) === self.path.s.nativize(o.filePath[ 0 ]) )
+  return true;  
+  else if( isTheSamePath )
   return false;
+  // if( o.filePath[ 0 ] === o.filePath[ 1 ] )
+  // return false;
 
   let resolved = [];
 

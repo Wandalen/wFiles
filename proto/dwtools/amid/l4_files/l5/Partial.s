@@ -6665,11 +6665,11 @@ function _softLinkVerify2( c )
   c.error( _.err( 'Soft link cycle', path.moveTextualReport( o.dstPath, o.srcPath ) ) );
 
   /* Artem B. attempt to fix a bug */
-  if( self.areSoftLinked([ o.dstPath, o.srcPath ]) )
-  {
-    c.ended = true;
-    c.result = false;
-  }
+  // if( self.areSoftLinked([ o.dstPath, o.srcPath ]) )
+  // {
+  //   c.ended = true;
+  //   c.result = false;
+  // }
   /* Artem B. attempt to fix a bug */
 
   // if( o.dstPath !== o.srcPath && self.areSoftLinked([ o.dstPath, o.srcPath ]) )

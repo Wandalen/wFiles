@@ -7421,20 +7421,20 @@ function areTextLinked_body( o )
 
   _.assert( path.s.allAreAbsolute( o.filePath ) );
 
-  // let isTheSamePath = true;
-  // for (let i = 1; i < o.filePath.length; i++)
-  // if( o.filePath[ 0 ] !== o.filePath[ i ] )
-  // {
-  //   isTheSamePath = false;
-  //   break;
-  // }
+  let isTheSamePath = true;
+  for (let i = 1; i < o.filePath.length; i++)
+  if( o.filePath[ 0 ] !== o.filePath[ i ] )
+  {
+    isTheSamePath = false;
+    break;
+  }
   debugger;
-  // if( isTheSamePath && self.isLink( o.filePath[ 0 ] ) && self.pathResolveTextLinkAct({ filePath : o.filePath[ 0 ] }) === self.path.s.nativize(o.filePath[ 0 ]) )
-  // return true;  
-  // else if( isTheSamePath )
-  // return false;
-  if( o.filePath[ 0 ] === o.filePath[ 1 ] )
+  if( isTheSamePath && self.isLink( o.filePath[ 0 ] ) && self.pathResolveTextLinkAct({ filePath : o.filePath[ 0 ] }) === o.filePath[ 0 ] )
+  return true;  
+  else if( isTheSamePath )
   return false;
+  // if( o.filePath[ 0 ] === o.filePath[ 1 ] )
+  // return false;
 
   let resolved = [];
 

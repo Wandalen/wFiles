@@ -1,17 +1,10 @@
-# wFiles [![Status](https://github.com/Wandalen/wFiles/workflows/Test/badge.svg)](https://github.com/Wandalen/wFiles/actions?query=workflow%3ATest) [![Status](https://circleci.com/gh/Wandalen/wFiles.svg?style=svg)](https://circleci.com/gh/Wandalen/wFiles)
+# module::Files [![Status](https://img.shields.io/circleci/build/github/Wandalen/wFiles?label=Test&logo=Test)](https://circleci.com/gh/Wandalen/wFiles) [![Status](https://github.com/Wandalen/wFiles/workflows/Test/badge.svg)](https://github.com/Wandalen/wFiles/actions?query=workflow%3ATest) [![experimental](https://img.shields.io/badge/stability-experimental-orange.svg)](https://github.com/emersion/stability-badges#experimental)
 
 Collection of classes to abstract files systems. Many interfaces provide files, but not called as file systems and treated differently. For example server-side gives access to local files and browser-side HTTP/HTTPS protocol gives access to files as well, but in the very different way, it does the first. This problem forces a developer to break fundamental programming principle DRY and make code written to solve a problem not applicable to the same problem, on another platform/technology.
 
 Files treats any file-system-like interface as files system. Files combines all files available to the application into the single namespace where each file has unique Path/URI, so that operating with several files on different files systems is not what user of the module should worry about. If Files does not have an adapter for your files system you may design it providing a short list of stupid methods fulfilling completely or partly good defined API and get access to all sophisticated general algorithms on files for free. Is concept of file applicable to external entities of an application? Files makes possible to treat internals of a program as files system(s). Use the module to keep DRY.
 
 Files manipulation library of middle level. Module offers several implementations  of single interface, called ( FileProvider ) to perform file operations in the same manner with different sources/destinations.
-
-### Avaible operations:
-* File read/write operations.
-* Creating read/write steams.
-* Operations with file [stats](https://nodejs.org/api/fs.html#fs_class_fs_stats) object.
-* File create,delete,rename,copy operations.
-* Making [soft](https://en.wikipedia.org/wiki/Symbolic_link)/[hard](https://en.wikipedia.org/wiki/Hard_link) links.
 
 ### Installation
 ```terminal

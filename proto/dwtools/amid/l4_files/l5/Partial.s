@@ -156,7 +156,7 @@ function init( o )
   // _.process._exitHandlerOnce( () =>
   // {
   //   debugger;
-  //   self.path.pathDirTempClose()
+  //   self.path.tempClose()
   // });
 
 }
@@ -2786,6 +2786,9 @@ function fileRead_body( o )
   let self = this;
   let result = null;
 
+  if( o.encoding === _.unknown ) /* qqq : cover */
+  o.encoding = _.files.encoder.deduce({ filePath : o.filePath, returning : 'name', criterion : { reader : true } });
+
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.strIs( o.encoding ) );
   _.assert( _.longHas( [ 'data', 'o' ], o.outputFormat ) );
@@ -4673,7 +4676,7 @@ function fileWrite_body( o )
   let path = self.system ? self.system.path : self.path;;
 
   o.encoding = o.encoding || self.encoding;
-  if( o.encoding === _.unknown )
+  if( o.encoding === _.unknown ) /* qqq : cover */
   o.encoding = _.files.encoder.deduce({ filePath : o.filePath, returning : 'name', criterion : { writer : true } });
   let encoder = _.files.WriteEncoders[ o.encoding ];
 
@@ -6572,7 +6575,7 @@ defaults.rewritingDirs = 0;
 defaults.makingDirectory = 0; /* qqq2 : change default to makingDirectory : 1 */
 defaults.throwing = null;
 defaults.verbosity = null;
-defaults.allowDiffContent = 0;
+defaults.allowingDiscrepancy = 1;
 defaults.allowingMissed = 0;
 defaults.allowingCycled = 0;
 defaults.sourceMode = 'modified>hardlinks>';
@@ -6585,6 +6588,8 @@ defaults.resolvingDstSoftLink = 0;
 defaults.resolvingDstTextLink = 0;
 
 _.mapExtend( hardLink.defaults, hardLink.body.defaults );
+
+/* xxx qqq2 : add test routine to check linking methods fails if context is passed */
 
 //
 

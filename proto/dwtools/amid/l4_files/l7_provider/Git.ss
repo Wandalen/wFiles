@@ -577,14 +577,14 @@ function filesReflectSingle_body( o )
 
 }
 
-_.routineExtend( filesReflectSingle_body, _.FileProvider.Find.prototype.filesReflectSingle );
+_.routineExtend( filesReflectSingle_body, _.FileProvider.FindMixin.prototype.filesReflectSingle );
 
 var extra = filesReflectSingle_body.extra = Object.create( null );
 extra.fetching = 1;
 extra.stashing = 0;
 
 var defaults = filesReflectSingle_body.defaults;
-let filesReflectSingle = _.routineFromPreAndBody( _.FileProvider.Find.prototype.filesReflectSingle.pre, filesReflectSingle_body );
+let filesReflectSingle = _.routineFromPreAndBody( _.FileProvider.FindMixin.prototype.filesReflectSingle.pre, filesReflectSingle_body );
 
 // --
 // relationship
@@ -694,7 +694,7 @@ _.classDeclare
   extend : Extension,
 });
 
-// _.FileProvider.Find.mixin( Self );
+// _.FileProvider.FindMixin.mixin( Self );
 // _.FileProvider.Secondary.mixin( Self );
 
 //

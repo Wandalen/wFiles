@@ -27,7 +27,7 @@ var suiteTempPath;
 function onSuiteBegin()
 {
   if( Config.interpreter === 'njs' )
-  suiteTempPath = _.path.pathDirTempOpen( _.path.join( __dirname, '../..' ), 'FileRecord' );
+  suiteTempPath = _.path.tempOpen( _.path.join( __dirname, '../..' ), 'FileRecord' );
   else
   suiteTempPath = _.path.current();
 }
@@ -39,7 +39,7 @@ function onSuiteEnd()
   if( Config.interpreter === 'njs' )
   {
     _.assert( _.strHas( suiteTempPath, '.tmp' ), suiteTempPath );
-    _.path.pathDirTempClose( suiteTempPath );
+    _.path.tempClose( suiteTempPath );
   }
 }
 

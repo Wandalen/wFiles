@@ -40,7 +40,7 @@ function onSuiteBegin( test )
   Parent.onSuiteBegin.apply( this, arguments );
   context.provider = _.FileProvider.Extract({ usingExtraStat : 1, protocol : 'current' });
   context.system = _.FileProvider.System({ providers : [ context.provider ] });
-  context.suiteTempPath = context.provider.path.pathDirTempOpen( 'suite-' + 'FilesFind' );
+  context.suiteTempPath = context.provider.path.tempOpen( 'suite-' + 'FilesFind' );
 }
 
 //

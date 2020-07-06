@@ -7,7 +7,7 @@ let _ = _global_.wTools;
 let Abstract = _.FileProvider.Abstract;
 let Partial = _.FileProvider.Partial;
 let FileRecord = _.FileRecord;
-let Find = _.FileProvider.Find;
+let Find = _.FileProvider.FindMixin;
 
 _.assert( _.routineIs( _.FileRecord ) );
 _.assert( _.routineIs( Abstract ) );

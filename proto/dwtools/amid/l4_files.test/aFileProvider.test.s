@@ -29,7 +29,7 @@ function onSuiteEnd()
   let path = this.provider.path;
   _.assert( _.strHas( this.suiteTempPath, '.tmp' ) );
   debugger;
-  path.pathDirTempClose( this.suiteTempPath );
+  path.tempClose( this.suiteTempPath );
   debugger;
   this.provider.finit();
   this.system.finit();
@@ -65,7 +65,7 @@ function assetFor( test, a )
     a.fileProvider = context.providerMake();
   }
 
-  a.suiteTempPath = a.fileProvider.path.pathDirTempOpen( a.fileProvider.constructor.name );
+  a.suiteTempPath = a.fileProvider.path.tempOpen( a.fileProvider.constructor.name );
 
   let system = a.system;
   let effectiveProvider = a.effectiveProvider;
@@ -122,7 +122,7 @@ function assetFor( test, a )
 //     a.fileProvider = context.providerMake();
 //   }
 //
-//   a.suiteTempPath = a.fileProvider.path.pathDirTempOpen( a.fileProvider.constructor.name );
+//   a.suiteTempPath = a.fileProvider.path.tempOpen( a.fileProvider.constructor.name );
 //
 //   a = test.assetFor( a );
 //
@@ -24670,7 +24670,7 @@ function softLinkChain( test )
     return
   }
 
-  // var routinePath = path.pathDirTempOpen();
+  // var routinePath = path.tempOpen();
   var routinePath = test.context.pathFor( 'written/softLinkChain' );
 
   debugger;
@@ -30113,13 +30113,13 @@ function hardLinkMultipleSync( test )
   files[ files.length - 1 ].stat.birthtime = files[ 0 ].stat.birthtime;
   test.shouldThrowErrorOfAnyKind( () =>
   {
-    provider.hardLink({ dstPath : files, allowDiffContent : 0 });
+    provider.hardLink({ dstPath : files, allowingDiscrepancy : 0 });
   });
   test.is( !provider.areHardLinked( paths ) ); */
 
   /* repair */
 
-  /* test.case = 'dstPath option, same date but different content, allowDiffContent';
+  /* test.case = 'dstPath option, same date but different content, allowingDiscrepancy';
   var paths = makeFiles( fileNames, currentTestDir, true );
   paths = provider.path.s.normalize( paths );
   provider.hardLink({ dstPath : paths });
@@ -30130,7 +30130,7 @@ function hardLinkMultipleSync( test )
   var files = provider.recordFactory().records( paths );
   files[ files.length - 1 ].stat.mtime = files[ 0 ].stat.mtime;
   files[ files.length - 1 ].stat.birthtime = files[ 0 ].stat.birthtime;
-  provider.hardLink({ dstPath : files, allowDiffContent : 1 });
+  provider.hardLink({ dstPath : files, allowingDiscrepancy : 1 });
   test.identical( provider.areHardLinked( paths ), null ); */
 
   /**/
@@ -31885,7 +31885,7 @@ function hardLinkAsync( test )
       dstPath : files,
       rewriting : 1,
       throwing : 1,
-      allowDiffContent : 0
+      allowingDiscrepancy : 0
     })
     return test.shouldThrowErrorOfAnyKind( con )
     .finally( () =>
@@ -31915,7 +31915,7 @@ function hardLinkAsync( test )
       dstPath : files,
       rewriting : 1,
       throwing : 1,
-      allowDiffContent : 1
+      allowingDiscrepancy : 1
     })
     .finally( () =>
     {

@@ -32,8 +32,10 @@ if( typeof module !== 'undefined' )
 
   require( '../l5/Partial.s' );
   require( '../l6/System.s' );
-  require( './Find.s' )
-  require( './Secondary.s' )
+
+  require( './MixinFind.s' );
+  require( './MixinConfig.s' );
+  require( './MixinSecondary.s' );
 
   module[ 'exports' ] = _;
 }

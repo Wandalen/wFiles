@@ -1,0 +1,1024 @@
+( function _ConfigMixin_s_() {
+
+'use strict';
+
+let _global = _global_;
+let _ = _global_.wTools;
+let FileRecord = _.FileRecord;
+let Abstract = _.FileProvider.Abstract;
+let Partial = _.FileProvider.Partial;
+let Find = _.FileProvider.FindMixin;
+let fileRead = Partial.prototype.fileRead;
+
+_.assert( _.lengthOf( _.files.ReadEncoders ) > 0 );
+_.assert( _.routineIs( _.FileRecord ) );
+_.assert( _.routineIs( Abstract ) );
+_.assert( _.routineIs( Partial ) );
+_.assert( _.routineIs( Find ) );
+_.assert( _.routineIs( fileRead ) );
+
+//
+
+/**
+ @classdesc Mixin to add operations on group of files with very specific purpose. For example, it has a method to search for text in files.
+ @class wFileProviderConfigMixin
+ @namespace wTools.FileProvider
+ @module Tools/mid/Files
+*/
+
+let Parent = null;
+let Self = wFileProviderConfigMixin;
+function wFileProviderConfigMixin( o )
+{
+  return _.workpiece.construct( Self, this, arguments );
+}
+
+Self.shortName = 'ConfigMixin';
+
+// --
+// read
+// --
+
+// function configRead2( o )
+// {
+//
+//   let self = this;
+//   o = o || Object.create( null );
+//
+//   if( _.strIs( o ) )
+//   {
+//     o = { name : o };
+//   }
+//
+//   if( o.dir === undefined )
+//   o.dir = self.path.normalize( self.path.effectiveMainDir() );
+//
+//   if( o.result === undefined )
+//   o.result = Object.create( null );
+//
+//   _.routineOptions( configRead2, o );
+//
+//   if( !o.name )
+//   {
+//     o.name = 'config';
+//     self._configRead2( o );
+//     o.name = 'public';
+//     self._configRead2( o );
+//     o.name = 'private';
+//     self._configRead2( o );
+//   }
+//   else
+//   {
+//     self._configRead2( o );
+//   }
+//
+//   return o.result;
+// }
+//
+// configRead2.defaults =
+// {
+//   name : null,
+//   dir : null,
+//   result : null,
+// }
+//
+// var having = configRead2.having = Object.create( null );
+//
+// having.writing = 0;
+// having.reading = 1;
+// having.driving = 0;
+//
+// //
+//
+// function _configRead2( o ) /* zzz : remove? */
+// {
+//   let self = this;
+//   let read;
+//
+//   // _.include( 'wProcess' );
+//
+//   if( o.name === undefined )
+//   o.name = 'config';
+//
+//   let terminal = self.path.join( o.dir, o.name );
+//
+//   /**/
+//
+//   if( typeof Coffee !== 'undefined' )
+//   {
+//     let fileName = terminal + '.coffee';
+//     if( self.statResolvedRead( fileName ) )
+//     {
+//
+//       read = self.fileReadSync( fileName );
+//       read = Coffee.eval( read,
+//       {
+//         filename : fileName,
+//       });
+//       _.mapExtend( o.result, read );
+//
+//     }
+//   }
+//
+//   /**/
+//
+//   let fileName = terminal + '.json';
+//   if( self.statResolvedRead( fileName ) )
+//   {
+//
+//     read = self.fileReadSync( fileName );
+//     read = JSON.parse( read );
+//     _.mapExtend( o.result, read );
+//
+//   }
+//
+//   /**/
+//
+//   fileName = terminal + '.s';
+//   if( self.statResolvedRead( fileName ) )
+//   {
+//
+//     debugger;
+//     read = self.fileReadSync( fileName );
+//     read = _.exec( read );
+//     _.mapExtend( o.result, read );
+//
+//   }
+//
+//   return o.result;
+// }
+//
+// _configRead2.defaults = configRead2.defaults;
+
+//
+
+/**
+ * @description Finds config files that have name of files from `o.filePath`.
+ * Mixes name of files from `o.filePath` with different extensions to find config files that can be read by availbale read encoders.
+ * Returns results as array or map.
+ * @param {Object} o Options map.
+ * @param {Array|String} o.filePath Source paths.
+ * @param {String} o.outputFormat='array', Possible formats: array, map.
+ * @function configFind
+ * @class wFileProviderConfigMixin
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
+ */
+
+/*
+qqq : cover configFind
+*/
+
+function configFind_body( o )
+{
+  let self = this;
+  let path = self.path;
+  let result = o.outputFormat === 'array' ? [] : Object.create( null );
+
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( _.longHas( [ 'array', 'map' ], o.outputFormat ) );
+
+  let exts = Object.create( null );
+
+  for( let e in _.files.ReadEncoders )
+  {
+    let encoder = _.files.ReadEncoders[ e ];
+    if( encoder === null )
+    continue;
+    _.assert( _.objectIs( encoder ), `Read encoder ${e} is missing` );
+    if( encoder.exts )
+    for( let s = 0 ; s < encoder.exts.length ; s++ )
+    exts[ encoder.exts[ s ] ] = e;
+  }
+
+  o.filePath = _.arrayAs( o.filePath );
+  _.assert( _.strsAreAll( o.filePath ) );
+
+  /* */
+
+  _.each( exts, ( encoderName, ext ) =>
+  {
+    _.each( o.filePath, ( filePath ) =>
+    {
+      _.assert( _.strIs( ext ) );
+      _.assert( _.strIs( filePath ) );
+      let filePath2 = _.strAppendOnce( filePath, '.' + ext );
+      if( self.statRead( filePath2 ) )
+      {
+        let element =
+        {
+          particularPath : filePath2,
+          abstractPath : filePath,
+          encoding : exts[ ext ],
+          ext : ext,
+        }
+        if( o.outputFormat === 'array' )
+        {
+          result.push( element );
+        }
+        else
+        {
+          _.sure( result[ filePath ] === undefined, () => 'Several configs exists for ' + _.strQuote( filePath ) );
+          result[ filePath ] = element;
+        }
+      }
+    });
+  });
+
+  /* */
+
+  return result;
+}
+
+var defaults = configFind_body.defaults = Object.create( null );
+defaults.filePath = null;
+defaults.outputFormat = 'array';
+// defaults.recursive = 1;
+
+let configFind = _.routineFromPreAndBody( Partial.prototype._preFilePathVectorWithProviderDefaults, configFind_body );
+
+//
+
+// function _fileRead_pre( routine, args )
+// {
+//   let self = this;
+//
+//   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
+//   _.assert( args && args.length === 1 );
+//
+//   let o = args[ 0 ];
+//
+//   if( self.path.like( o ) )
+//   o = { filePath : self.path.from( o ) };
+//
+//   _.routineOptions( routine, o );
+//
+//   o.filePath = self.path.normalize( o.filePath );
+//
+//   _.assert( self.path.isAbsolute( o.filePath ), 'Expects absolute path {-o.filePath-}, but got', o.filePath );
+//
+//   if( o.verbosity === null )
+//   o.verbosity = _.numberClamp( self.verbosity - 4, 0, 9 );
+//
+//   self._providerDefaultsApply( o );
+//
+//   return o;
+// }
+
+//
+
+/*
+qqq : add test
+*/
+
+/**
+ * @summary Read config files one by one and extends result with fields from each config file.
+ * @description Finds config files if they were not provided through option `o.found`.
+ * @param {Object} o Options map.
+ * @param {Array|String} o.filePath Source paths.
+ * @param {Array|Object} o.found Container to store found config files.
+ * @param {String} o.many='all' Checks if each of files `o.filePath` have at least one config file.
+ * @function configRead
+ * @class wFileProviderConfigMixin
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
+ */
+
+function configRead_body( o )
+{
+  let self = this;
+  let result = null;
+
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( _.longHas( [ 'all', 'any' ], o.many ) );
+
+  if( !o.found )
+  o.found = self.configFind({ filePath : o.filePath });
+
+  /* */
+
+  if( o.many === 'all' )
+  {
+    let filePath = _.arrayAs( o.filePath ).slice();
+    let found = o.found.slice();
+
+    for( let f1 = filePath.length-1 ; f1 >= 0 ; f1-- )
+    {
+      let filePath1 = filePath[ f1 ];
+      for( let f2 = found.length-1 ; f2 >= 0 ; f2-- )
+      if( found[ f2 ].abstractPath === filePath1 || found[ f2 ].particularPath === filePath1 )
+      {
+        filePath.splice( f1, 1 );
+        found.splice( f2, 1 );
+        continue;
+      }
+    }
+
+    for( let f1 = filePath.length-1 ; f1 >= 0 ; f1-- )
+    {
+      let filePath1 = filePath[ f1 ];
+      //debugger;
+      if( !o.throwing && o.throwing !== null && o.throwing !== undefined )
+      return null;
+      throw _.err( 'None config was found\n', _.strQuote( filePath1 ) );
+    }
+
+    for( let f2 = found.length-1 ; f2 >= 0 ; f2-- )
+    {
+      debugger;
+      if( !o.throwing && o.throwing !== null && o.throwing !== undefined )
+      return null;
+      throw _.err( 'Some configs were loaded several times\n', _.strQuote( found[ f2 ].particularPath ) );
+    }
+
+  }
+
+  /* */
+
+  if( o.found && o.found.length )
+  {
+
+    for( let f = 0 ; f < o.found.length ; f++ )
+    {
+      let file = o.found[ f ];
+
+      let o2 = _.mapExtend( null, o );
+      o2.filePath = file.particularPath;
+      o2.encoding = file.encoding;
+      // if( o2.verbosity >= 2 )
+      // o2.verbosity = 5;
+      delete o2.many;
+      delete o2.found;
+
+      let read = self.fileRead( o2 );
+
+      if( read === undefined )
+      read = Object.create( null );
+
+      _.sure( _.mapIs( read ), () => 'Expects map, but read ' + _.toStrShort( result ) + ' from ' + o2.filePath );
+
+      if( result === null )
+      result = read;
+      else
+      result = _.mapExtendRecursive( result, read );
+
+    }
+
+  }
+
+  /* */
+
+  if( result === null || result === undefined )
+  {
+    debugger;
+    if( o.throwing )
+    throw _.err( 'Found no config at', () => o.filePath + '.*' );
+    result = null;
+  }
+
+  /* */
+
+  return result;
+}
+
+_.routineExtend( configRead_body, fileRead );
+
+var defaults = configRead_body.defaults;
+
+defaults.encoding = null;
+defaults.many = 'all';
+defaults.found = null;
+
+//
+
+var configRead = _.routineFromPreAndBody( Partial.prototype._preFilePathVectorWithProviderDefaults, configRead_body );
+
+configRead.having.aspect = 'entry';
+
+//
+
+function configUserPath( o )
+{
+  let self = this;
+  let path = self.path;
+
+  if( !_.mapIs( o ) )
+  o = { name : o }
+
+  o = _.routineOptions( configUserPath, o );
+  _.assert( _.strDefined( o.name ) );
+
+  if( o.filePath )
+  return o.filePath;
+
+  let userPath = path.dirUserHome();
+  o.filePath = path.join( userPath, o.dirPath, o.name );
+
+  return o.filePath;
+}
+
+configUserPath.defaults =
+{
+  filePath : null,
+  dirPath : '.',
+  name : '.wenv.yml',
+}
+
+//
+
+function configUserRead( o )
+{
+  let self = this;
+  let path = self.path;
+
+  if( !_.mapIs( o ) )
+  o = { name : o }
+
+  o = _.routineOptions( configUserRead, o );
+
+  let o2 = _.mapOnly( o, self.configUserPath.defaults );
+  let filePath = self.configUserPath( o2 );
+
+  if( !self.fileExists( filePath ) )
+  return null;
+
+  if( o.locking )
+  self.configUserLock({ filePath });
+
+  return self.configRead
+  ({
+    filePath,
+    throwing : 0,
+  });
+
+}
+
+configUserRead.defaults =
+{
+  ... configUserPath.defaults,
+  locking : 0,
+}
+
+//
+
+function configUserWrite( o )
+{
+  let self = this;
+  let path = self.path;
+
+  if( !_.mapIs( o ) )
+  o = { name : arguments[ 0 ], structure : arguments[ 1 ] }
+  o = _.routineOptions( configUserWrite, o );
+  _.assert( o.structure !== null );
+
+  let o2 = _.mapOnly( o, self.configUserPath.defaults );
+  let filePath = self.configUserPath( o2 );
+
+  /* qqq : cover option encoding of method fileWrite */
+  /* qqq : cover encoding : _.unknown of method fileWrite */
+  let result = self.fileWrite
+  ({
+    filePath,
+    data : o.structure,
+    encoding : _.unknown,
+    sync : 1,
+  });
+
+  _.assert( !_.consequenceLike( result ) );
+
+  if( o.unlocking )
+  self.configUserUnlock({ filePath });
+
+  return result;
+}
+
+configUserWrite.defaults =
+{
+  ... configUserPath.defaults,
+  structure : null,
+  unlocking : 0,
+}
+
+//
+
+function configUserLock( o )
+{
+  let self = this;
+  let path = self.path;
+
+  if( !_.mapIs( o ) )
+  o = { name : arguments[ 0 ] }
+  o = _.routineOptions( configUserLock, o );
+
+  let filePath = self.configUserPath( o );
+
+  return self.fileLock({ filePath });
+}
+
+configUserLock.defaults =
+{
+  ... configUserPath.defaults,
+}
+
+//
+
+function configUserUnlock( o )
+{
+  let self = this;
+  let path = self.path;
+
+  if( !_.mapIs( o ) )
+  o = { name : arguments[ 0 ] }
+  o = _.routineOptions( configUserUnlock, o );
+
+  let filePath = self.configUserPath( o );
+
+  return self.fileUnlock({ filePath });
+}
+
+configUserUnlock.defaults =
+{
+  ... configUserPath.defaults,
+}
+
+// --
+// storage
+// --
+
+function storageRead( o )
+{
+  let self = this;
+  let storageName, storagePath;
+  try
+  {
+
+    if( _.strIs( arguments[ 0 ] ) )
+    o = { storageDir : arguments[ 0 ] };
+    o = _.routineOptions( storageRead, o );
+
+    _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
+
+    storageName = self.path.normalize( o.storageDir );
+
+    storagePath = self.configUserPath( storageName );
+
+    if( !self.fileExists( storagePath ) )
+    return null;
+
+    let result = self.filesRead
+    ({
+      filePath : self.path.join( storagePath, '**' ),
+      encoding : _.unknown,
+    });
+
+    return result.dataMap;
+  }
+  catch( err )
+  {
+    throw _.err( err, `\nFailed to read storage::${storageName} at ${storagePath}` );
+  }
+}
+
+storageRead.defaults =
+{
+  storageDir : null,
+}
+
+//
+
+function storageReset( o )
+{
+  let self = this;
+  let storageName, storagePath;
+
+  try
+  {
+
+    if( _.strIs( arguments[ 0 ] ) )
+    o = { storageDir : arguments[ 0 ] };
+    o = _.routineOptions( storageReset, o );
+
+    _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
+
+    storageName = self.path.normalize( o.storageDir );
+
+    storagePath = self.configUserPath( storageName );
+
+    if( self.fileExists( storagePath ) )
+    self.filesDelete
+    ({
+      filePath : storagePath,
+      verbosity : o.verbosity ? 3 : 0,
+    });
+
+  }
+  catch( err )
+  {
+    throw _.err( err, `\nFailed to delete storage::${storageName} at ${storagePath}` );
+  }
+
+}
+
+storageReset.defaults =
+{
+  storageDir : null,
+  verbosity : 0,
+}
+
+//
+
+function storageProfileRead( o )
+{
+  let self = this;
+  let storageName, storagePath;
+  try
+  {
+
+    if( _.strIs( arguments[ 0 ] ) )
+    o = { storageDir : arguments[ 0 ] };
+    o = _.routineOptions( storageProfileRead, o );
+
+    _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
+    _.assert( _.strIs( o.profileDir ), 'Expects defined {- o.profileDir -}' );
+
+    storageName = self.path.join( o.storageDir, o.profileDir );
+
+    storagePath = self.configUserPath( storageName );
+
+    if( !self.fileExists( storagePath ) )
+    return null;
+
+    let result = self.filesRead
+    ({
+      filePath : self.path.join( storagePath, '**' ),
+      encoding : _.unknown,
+    });
+
+    return result.dataMap;
+  }
+  catch( err )
+  {
+    throw _.err( err, `\nFailed to read storage::${storageName} at ${storagePath}` );
+  }
+}
+
+storageProfileRead.defaults =
+{
+  storageDir : null,
+  profileDir : 'default',
+}
+
+//
+
+function storageProfileReset( o )
+{
+  let self = this;
+  let storageName, storagePath;
+
+  try
+  {
+
+    if( _.strIs( arguments[ 0 ] ) )
+    o = { storageDir : arguments[ 0 ] };
+    o = _.routineOptions( storageProfileReset, o );
+
+    _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
+    _.assert( _.strIs( o.profileDir ), 'Expects defined {- o.profileDir -}' );
+
+    storageName = self.path.join( o.storageDir, o.profileDir );
+
+    storagePath = self.configUserPath( storageName );
+
+    if( self.fileExists( storagePath ) )
+    self.filesDelete
+    ({
+      filePath : storagePath,
+      verbosity : o.verbosity ? 3 : 0,
+    });
+
+  }
+  catch( err )
+  {
+    throw _.err( err, `\nFailed to delete storage::${storageName} at ${storagePath}` );
+  }
+
+}
+
+storageProfileReset.defaults =
+{
+  storageDir : null,
+  profileDir : 'default',
+  verbosity : 0,
+}
+
+//
+
+function storageTerminalRead( o )
+{
+  let self = this;
+  let storageName, storagePath;
+  try
+  {
+
+    if( _.strIs( arguments[ 0 ] ) )
+    o = { storageDir : arguments[ 0 ] };
+    o = _.routineOptions( storageTerminalRead, o );
+
+    _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
+    _.assert( _.strIs( o.profileDir ), 'Expects defined {- o.profileDir -}' );
+    _.assert( _.strIs( o.storageTerminalPrefix ), 'Expects defined {- o.storageTerminalPrefix -}' );
+    _.assert( _.strIs( o.storageTerminal ), 'Expects defined {- o.storageTerminal -}' );
+    _.assert( _.strIs( o.storageTerminalPostfix ), 'Expects defined {- o.storageTerminalPostfix -}' );
+
+    storageName = self.path.join
+    (
+      o.storageDir,
+      o.profileDir,
+      o.storageTerminalPrefix + o.storageTerminal + o.storageTerminalPostfix,
+    );
+
+    storagePath = self.configUserPath( storageName );
+
+    if( !self.fileExists( storagePath ) )
+    return null;
+
+    return self.configUserRead
+    ({
+      name : storageName,
+      locking : 0,
+    });
+
+    // return self.fileRead( storagePath );
+  }
+  catch( err )
+  {
+    throw _.err( err, `\nFailed to read storage::${storageName} at ${storagePath}` );
+  }
+}
+
+storageTerminalRead.defaults =
+{
+  storageDir : null,
+  profileDir : 'default',
+  storageTerminalPrefix : '',
+  storageTerminal : null,
+  storageTerminalPostfix : '',
+}
+
+//
+
+function storageTerminalOpen( o )
+{
+  let self = this;
+  let storageName;
+  try
+  {
+
+    if( _.strIs( arguments[ 0 ] ) )
+    o = { storageName : arguments[ 0 ] };
+    o = _.routineOptions( storageTerminalOpen, o );
+
+    _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
+    _.assert( _.strIs( o.profileDir ), 'Expects defined {- o.profileDir -}' );
+    _.assert( _.strIs( o.storageTerminalPrefix ), 'Expects defined {- o.storageTerminalPrefix -}' );
+    _.assert( _.strIs( o.storageTerminal ), 'Expects defined {- o.storageTerminal -}' );
+    _.assert( _.strIs( o.storageTerminalPostfix ), 'Expects defined {- o.storageTerminalPostfix -}' );
+
+    storageName = self.path.join
+    (
+      o.storageDir,
+      o.profileDir,
+      o.storageTerminalPrefix + o.storageTerminal + o.storageTerminalPostfix,
+    );
+
+    o.storage = self.configUserRead
+    ({
+      name : storageName,
+      locking : o.locking,
+    });
+
+    if( !o.storage )
+    {
+      o.storage = o.onStorageConstruct( o );
+      _.assert( _.mapIs( o.storage ) );
+      self.configUserWrite( storageName, o.storage );
+      if( o.locking )
+      self.configUserLock( storageName );
+    }
+
+    return o;
+  }
+  catch( err )
+  {
+    if( !o.throwing )
+    return null;
+    throw _.err( err, `\nFailed to open storage::${storageName}` );
+  }
+}
+
+storageTerminalOpen.defaults =
+{
+  storageDir : null,
+  profileDir : 'default',
+  storageTerminalPrefix : '',
+  storageTerminal : null,
+  storageTerminalPostfix : '',
+  onStorageConstruct : null,
+  locking : 1,
+  throwing : 1,
+}
+
+//
+
+function storageTerminalClose( o )
+{
+  let self = this;
+  let storageName;
+
+  try
+  {
+
+    if( _.strIs( arguments[ 0 ] ) )
+    o = { storageDir : arguments[ 0 ] };
+    o = _.routineOptions( storageTerminalClose, o );
+
+    _.assert( _.mapIs( o.storage ), 'Expects defined {- o.storage -}' );
+    _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
+    _.assert( _.strIs( o.profileDir ), 'Expects defined {- o.profileDir -}' );
+    _.assert( _.strIs( o.storageTerminalPrefix ), 'Expects defined {- o.storageTerminalPrefix -}' );
+    _.assert( _.strIs( o.storageTerminal ), 'Expects defined {- o.storageTerminal -}' );
+    _.assert( _.strIs( o.storageTerminalPostfix ), 'Expects defined {- o.storageTerminalPostfix -}' );
+
+    storageName = self.path.join
+    (
+      o.storageDir,
+      o.profileDir,
+      o.storageTerminalPrefix + o.storageTerminal + o.storageTerminalPostfix,
+    );
+
+    o.storage = self.configUserWrite
+    ({
+      name : storageName,
+      structure : o.storage,
+      unlocking : o.locking,
+    });
+
+    return o;
+  }
+  catch( err )
+  {
+    if( !o.throwing )
+    return null;
+    throw _.err( err, `\nFailed to close storage::${storageName}` );
+  }
+}
+
+storageTerminalClose.defaults =
+{
+  ... storageTerminalOpen.defaults,
+  storage : null,
+}
+
+//
+
+function storageTerminalReset( o )
+{
+  let self = this;
+  let storageName, storagePath;
+
+  try
+  {
+
+    if( _.strIs( arguments[ 0 ] ) )
+    o = { storageDir : arguments[ 0 ] };
+    o = _.routineOptions( storageTerminalReset, o );
+
+    _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
+    _.assert( _.strIs( o.profileDir ), 'Expects defined {- o.profileDir -}' );
+    _.assert( _.strIs( o.storageTerminalPrefix ), 'Expects defined {- o.storageTerminalPrefix -}' );
+    _.assert( _.strIs( o.storageTerminal ), 'Expects defined {- o.storageTerminal -}' );
+    _.assert( _.strIs( o.storageTerminalPostfix ), 'Expects defined {- o.storageTerminalPostfix -}' );
+
+    storageName = self.path.join
+    (
+      o.storageDir,
+      o.profileDir,
+      o.storageTerminalPrefix + o.storageTerminal + o.storageTerminalPostfix,
+    );
+
+    storagePath = self.configUserPath( storageName );
+
+    if( self.fileExists( storagePath ) )
+    self.filesDelete
+    ({
+      filePath : storagePath,
+      verbosity : o.verbosity ? 3 : 0,
+    });
+
+  }
+  catch( err )
+  {
+    throw _.err( err, `\nFailed to delete storage::${storageName} at ${storagePath}` );
+  }
+
+}
+
+storageTerminalReset.defaults =
+{
+  storageDir : null,
+  profileDir : 'default',
+  storageTerminalPrefix : '',
+  storageTerminal : null,
+  storageTerminalPostfix : '',
+  verbosity : 0,
+}
+
+// --
+// relationship
+// --
+
+let Composes =
+{
+}
+
+let Aggregates =
+{
+}
+
+let Associates =
+{
+}
+
+let Restricts =
+{
+}
+
+// --
+// declare
+// --
+
+let Supplement =
+{
+
+  // read
+
+  // configRead2,
+  // _configRead2,
+
+  configFind,
+  configRead,
+
+  // user config
+
+  configUserPath, /* qqq : cover */
+  configUserRead, /* qqq : cover */
+  configUserWrite, /* qqq : cover */
+  configUserLock, /* qqq : cover */
+  configUserUnlock, /* qqq : cover */
+
+  // storage
+
+  storageRead,
+  storageReset,
+
+  storageProfileRead,
+  storageProfileReset,
+
+  storageTerminalRead,
+  storageTerminalOpen,
+  storageTerminalClose,
+  storageTerminalReset,
+
+  // relation
+
+  Composes,
+  Aggregates,
+  Associates,
+  Restricts,
+
+}
+
+//
+
+_.classDeclare
+({
+  cls : Self,
+  supplement : Supplement,
+  withMixin : true,
+  withClass : true,
+});
+
+_.FileProvider = _.FileProvider || Object.create( null );
+_.FileProvider[ Self.shortName ] = Self;
+Self.mixin( Partial );
+
+_.assert( !!_.FileProvider.Partial.prototype.configUserRead );
+
+// --
+// export
+// --
+
+if( typeof module !== 'undefined' )
+module[ 'exports' ] = Self;
+
+})();

@@ -595,8 +595,8 @@ _.classDeclare
   extend : Extension,
 });
 
-// if( _.FileProvider.Find )
-// _.FileProvider.Find.mixin( Self );
+// if( _.FileProvider.FindMixin )
+// _.FileProvider.FindMixin.mixin( Self );
 // if( _.FileProvider.Secondary )
 // _.FileProvider.Secondary.mixin( Self );
 

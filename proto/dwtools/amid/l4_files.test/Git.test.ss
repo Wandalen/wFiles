@@ -27,7 +27,7 @@ function onSuiteBegin( test )
   context.system = _.FileProvider.System({ providers : [ context.providerSrc, context.providerDst ] });
   context.system.defaultProvider = context.providerDst;
 
-  context.suiteTempPath = context.providerDst.path.pathDirTempOpen( context.providerDst.path.join( __dirname, '../..'  ),'FileProviderGit' );
+  context.suiteTempPath = context.providerDst.path.tempOpen( context.providerDst.path.join( __dirname, '../..'  ),'FileProviderGit' );
 
   if( RunningInsideTestContainer )
   {
@@ -57,7 +57,7 @@ function onSuiteEnd( test )
   }
 
   _.assert( _.strHas( context.suiteTempPath, 'FileProviderGit' ), context.suiteTempPath );
-  context.providerDst.path.pathDirTempClose( context.suiteTempPath );
+  context.providerDst.path.tempClose( context.suiteTempPath );
 }
 
 // --

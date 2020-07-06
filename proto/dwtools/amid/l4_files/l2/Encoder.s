@@ -287,11 +287,17 @@ function deduce( o )
   _.assert( _.strIs( o.ext ) || o.ext === null );
   _.assert( _.mapIs( o.criterion ) );
   _.assert( o.criterion.writer || o.criterion.reader );
+  _.assert( _.mapIs( _.gdf.inMap ) );
+  _.assert( _.mapIs( _.gdf.outMap ) );
+
+  let fromMethodName = o.criterion.writer ? 'writerFromGdf' : 'readerFromGdf';
+  let typeMap = o.criterion.writer ? _.gdf.outMap : _.gdf.inMap;
+  let encodersMap = o.criterion.writer ? _.files.WriteEncoders : _.files.ReadEncoders;
 
   if( o.ext )
-  if( _.files.WriteEncoders[ o.ext ] )
+  if( encodersMap[ o.ext ] )
   {
-    let encoder = _.files.WriteEncoders[ o.ext ];
+    let encoder = encodersMap[ o.ext ];
     _.assert( _.objectIs( encoder ), `Write encoder ${o.ext} is missing` );
     _.assert( _.longHas( encoder.exts, o.ext ) );
     _.arrayAppendOnce( result, encoder );
@@ -300,19 +306,19 @@ function deduce( o )
   result = filterAll( result );
 
   if( !o.single || !result.length )
-  for( let i = 0 ; i < _.files.encoder.gdfTypesToWrite.length ; i++ )
+  for( let i = 0 ; i < _.files.encoder.gdfTypesForFiles.length ; i++ )
   {
-    let type = _.files.encoder.gdfTypesToWrite[ i ];
-    if( !_.gdf.outMap[ type ] )
+    let type = _.files.encoder.gdfTypesForFiles[ i ];
+    if( !typeMap[ type ] )
     continue;
-    for( let i2 = 0 ; i2 < _.gdf.outMap[ type ].length ; i2++ )
+    for( let i2 = 0 ; i2 < typeMap[ type ].length ; i2++ )
     {
-      let gdf = _.gdf.outMap[ type ][ i2 ];
+      let gdf = typeMap[ type ][ i2 ];
       let o2 = _.mapBut( o, [ 'single', 'returning', 'criterion' ] );
-      let methodName = o.criterion.reader ? supportsInput : supportsOutput;
+      let methodName = o.criterion.reader ? 'supportsInput' : 'supportsOutput';
       let supports = gdf[ methodName ]( o2 );
       if( supports )
-      _.arrayAppendOnce( result, _.files.encoder.writerFromGdf( gdf ) );
+      _.arrayAppendOnce( result, _.files.encoder[ fromMethodName ]( gdf ) );
     }
   }
 
@@ -382,7 +388,7 @@ deduce.defaults =
 // declaration
 // --
 
-let gdfTypesToWrite = [ 'string', 'buffer.raw', 'buffer.bytes', 'buffer.node' ];
+let gdfTypesForFiles = [ 'string', 'buffer.raw', 'buffer.bytes', 'buffer.node' ];
 
 let Extension =
 {
@@ -399,7 +405,7 @@ let Extension =
 
   // fields
 
-  gdfTypesToWrite,
+  gdfTypesForFiles,
 
 }
 

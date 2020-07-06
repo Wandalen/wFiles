@@ -21,7 +21,7 @@ function onSuiteBegin( test )
 {
   let context = this;
 
-  context.suiteTempPath = context.provider.path.pathDirTempOpen( context.provider.path.join( __dirname, '../..'  ),'FilesEtc' );
+  context.suiteTempPath = context.provider.path.tempOpen( context.provider.path.join( __dirname, '../..'  ),'FilesEtc' );
 }
 
 //
@@ -30,7 +30,7 @@ function onSuiteEnd()
 {
   let path = this.provider.path;
   _.assert( _.strHas( this.suiteTempPath, '.tmp' ) );
-  path.pathDirTempClose( this.suiteTempPath );
+  path.tempClose( this.suiteTempPath );
   this.provider.finit();
 }
 

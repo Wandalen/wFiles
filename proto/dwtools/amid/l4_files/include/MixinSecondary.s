@@ -1,4 +1,4 @@
-(function _Find_s_() {
+(function _MixinSecondary_s_() {
 
 'use strict';
 
@@ -6,8 +6,7 @@ if( typeof module !== 'undefined' )
 {
   let _ = require( '../../../../dwtools/Tools.s' );
 
-  // _.include( 'wFilesBasic' );
-  require( '../l6/FindMixin.s' );
+  require( '../l7/SecondaryMixin.s' );
 
   module[ 'exports' ] = _;
 }

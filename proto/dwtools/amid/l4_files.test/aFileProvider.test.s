@@ -51283,10 +51283,10 @@ function areSoftLinkedForDebuggingExperiment( test )
   let context = this;
   let a = context.assetFor( test, false );
 
-  test.case = 'src === dst, src is terminal file';
-  a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
-  test.identical( a.fileProvider.areSoftLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), false );
+  // test.case = 'src === dst, src is terminal file';
+  // a.reflect();
+  // a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
+  // test.identical( a.fileProvider.areSoftLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), false );
 
   /* */
 
@@ -51641,6 +51641,95 @@ function textLinkReturnSync( test )
   // test.close( 'src === dst' );
 }
 
+//
+
+function textLinkForDebuggingExperiment( test )
+{
+  let context = this;
+  let a = context.assetFor( test, false );
+
+  // test.case = 'dst exists, is text linked';
+  // a.reflect();
+  // a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  // a.fileProvider.textLink({ dstPath : a.abs( 'dst' ), srcPath : a.abs( 'src' ), allowingMissed : 1 });
+  // var got = a.fileProvider.textLink({ dstPath : a.abs( 'dst' ), srcPath : a.abs( 'src' ), allowingMissed : 1 });
+  // test.identical( got, false );
+
+  /* */
+
+  test.case = 'dst exists, is not text linked';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  a.fileProvider.fileWrite( a.abs( 'dst' ), 'some text' );
+  var got = a.fileProvider.textLink({ dstPath : a.abs( 'dst' ), srcPath : a.abs( 'src' ), rewriting : 1 });
+  test.identical( got, true );
+  test.identical( a.fileProvider.areTextLinked({ filePath : [ a.abs( 'src' ), a.abs( 'dst' ) ] }), true );
+}
+textLinkForDebuggingExperiment.experimental = 1;
+
+//
+
+function textLinkForDebuggingExperiment1( test )
+{
+  let context = this;
+  let a = context.assetFor( test, false );
+
+  test.case = 'src === dst, src is text link on itself';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  var got = a.fileProvider.textLink
+  ({
+    dstPath : a.abs( 'src' ),
+    srcPath : a.abs( 'src' ),
+    allowingMissed : 1
+  });
+  test.identical( got, false );
+  test.identical( a.fileProvider.areTextLinked({ filePath : [ a.abs( 'src' ), a.abs( 'src' ) ] }), true );
+}
+textLinkForDebuggingExperiment1.experimental = 1;
+
+//
+
+function areTextLinkedForDebuggingExperiment( test )
+{
+  let context = this;
+  let a = context.assetFor( test, false );
+
+  // test.case = 'src === dst, src is terminal file';
+  // a.reflect();
+  // a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
+  // test.identical( a.fileProvider.areTextLinked({ filePath : [ a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ] }), false );
+
+  /* */
+
+  test.case = 'src === dst, src is text link on itself';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
+  var got = a.fileProvider.textLink
+  ({
+    dstPath : a.abs( 'dir1/src' ),
+    srcPath : a.abs( 'dir1/src' ),
+    rewriting : 1,
+    allowingMissed : 1
+  });
+  test.identical( got, true );
+  test.identical( a.fileProvider.areTextLinked({ filePath : [ a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ] }), true );
+
+  /* */
+
+  // test.case = 'src === dst, src is text link on another file';
+  // a.reflect();
+  // a.fileProvider.fileWrite( a.abs( 'dir1/src1' ), 'some text' );
+  // var got = a.fileProvider.softLink
+  // ({
+  //   dstPath : a.abs( 'dir1/src' ),
+  //   srcPath : a.abs( 'dir1/src1' ),
+  // });
+  // test.identical( got, true );
+  // test.identical( a.fileProvider.areTextLinked({ filePath : [ a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ] }), false );
+}
+areTextLinkedForDebuggingExperiment.experimental = 1;
+
 // --
 // declare
 // --
@@ -51826,7 +51915,7 @@ var Self =
 
     softLinkReturnSync,
 
-    // textLinkReturnSync,
+    textLinkReturnSync,
 
     /* qqq3 : extend linking tests to check returned value. must be false if success, but no change was done */
 
@@ -51902,8 +51991,11 @@ var Self =
     hardLinkExperiment,
 
     hardLinkForDebuggingExperiment,
-    areSoftLinkedForDebuggingExperiment,
     softLinkForDebuggingExperiment,
+    textLinkForDebuggingExperiment,
+    textLinkForDebuggingExperiment1,
+    areSoftLinkedForDebuggingExperiment,
+    areTextLinkedForDebuggingExperiment,
   }
 
 };

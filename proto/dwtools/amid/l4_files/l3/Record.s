@@ -2,13 +2,6 @@
 
 'use strict';
 
-// if( typeof module !== 'undefined' )
-// {
-//
-//   require( '../UseBase.s' );
-//
-// }
-
 // --
 // declare
 // --
@@ -74,7 +67,6 @@ function init( o )
   }
 
   record.form();
-
   return record;
 }
 
@@ -687,9 +679,33 @@ function _pathGet()
 {
   let record = this;
   let f = record.factory;
-  _.assert( !!f );
+  // _.assert( !!f );
+  if( !f )
+  return null;
   let fileProvider = f.system;
   return fileProvider.path;
+}
+
+//
+
+function _effectiveProviderGet()
+{
+  let record = this;
+  let f = record.factory;
+  if( !f )
+  return null;
+  return f.effectiveProvider;
+}
+
+//
+
+function _systemGet()
+{
+  let record = this;
+  let f = record.factory;
+  if( !f )
+  return null;
+  return f.effectiveProvider;
 }
 
 //
@@ -908,42 +924,14 @@ let Copiers =
 
 let Forbids =
 {
-
-  // file : 'file',
-  // relativeIn : 'relativeIn',
-  // relativeOut : 'relativeOut',
-  // verbosity : 'verbosity',
-  // safe : 'safe',
-  // basePath : 'basePath',
-  // base : 'base',
-  // resolvingSoftLink : 'resolvingSoftLink',
-  // resolvingTextLink : 'resolvingTextLink',
-  // usingTextLink : 'usingTextLink',
-  // stating : 'stating',
-  // effective : 'effective',
-  // fileProvider : 'fileProvider',
-  // effectiveProvider : 'effectiveProvider',
-  // originPath : 'originPath',
-  // base : 'base',
-  // full : 'full',
-  // superRelative : 'superRelative',
-  // inclusion : 'inclusion',
-  // isBase : 'isBase',
-  // absoluteEffective : 'absoluteEffective',
-  // realEffective : 'realEffective',
-  // isBranch : 'isBranch',
-  // realAbsolute : 'realAbsolute',
-  // realUri : 'realUri',
-  // absoluteUri : 'absoluteUri',
-  // hubAbsolute : 'hubAbsolute',
-  // context : 'context',
-
 }
 
 let Accessors =
 {
 
   path : { readOnly : 1 },
+  effectiveProvider : { readOnly : 1 },
+  system : { readOnly : 1 },
   stat : { readOnly : 1 },
 
   real : { readOnly : 1 },
@@ -1019,6 +1007,8 @@ let Extension =
   inputSet,
 
   _pathGet,
+  _effectiveProviderGet,
+  _systemGet,
   _statGet,
 
   _realGet,

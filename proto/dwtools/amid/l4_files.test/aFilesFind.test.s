@@ -14590,6 +14590,98 @@ function filesFindOptionRevisitingHardLinked( test )
 
 //
 
+function filesFindRenaming( test )
+{
+  let context = this;
+  let a = context.assetFor( test, false );
+
+  /* */
+
+  test.case = 'filesFind';
+
+  setup();
+
+  a.fileProvider.filesFind
+  ({
+    filePath : a.abs( 'dir1' ),
+    onDown,
+  });
+
+  var exp = [ '.', './F1.txt', './F1.txt3', './dir2', './dir2/F1.txt', './dir2/F1.txt3' ];
+  var got = a.findAll( a.abs( 'dir1' ) );
+  test.identical( got, exp );
+
+  /* */
+
+  function setup()
+  {
+    a.reflect();
+    a.fileProvider.fileWrite( a.abs( 'F1.txt' ), 'F1.txt' );
+    a.fileProvider.fileWrite( a.abs( 'F1.txt2' ), 'F1.txt2' );
+    a.fileProvider.fileWrite( a.abs( 'dir1/F1.txt' ), 'dir1/F1.txt' );
+    a.fileProvider.fileWrite( a.abs( 'dir1/F1.txt2' ), 'dir1/F1.txt2' );
+    a.fileProvider.fileWrite( a.abs( 'dir1/dir2/F1.txt' ), 'dir1/dir2/F1.txt' );
+    a.fileProvider.fileWrite( a.abs( 'dir1/dir2/F1.txt2' ), 'dir1/dir2/F1.txt2' );
+  }
+
+  /* */
+
+  function onDown( r, o )
+  {
+    if( r.path.ext( r.absolute ) === 'txt2' )
+    {
+      let absolute = a.path.changeExt( r.absolute, 'txt3' );
+      r.effectiveProvider.fileRename( absolute, r.absolute );
+      r.absolute = absolute
+    }
+  }
+
+  /* */
+
+}
+
+//
+
+function filesRenameBasic( test )
+{
+  let context = this;
+  let a = context.assetFor( test, false );
+
+  /* */
+
+  test.case = 'filesRename';
+
+  setup();
+
+  a.fileProvider.filesRename
+  ({
+    filePath : a.abs( 'dir1/**' ),
+    onRename : ( r, o ) => r.ext === 'txt2' ? r.path.changeExt( r.absolute, 'txt3' ) : undefined,
+  });
+
+  var exp = [ '.', './F1.txt', './F1.txt3', './dir2', './dir2/F1.txt', './dir2/F1.txt3' ];
+  var got = a.findAll( a.abs( 'dir1' ) );
+  test.identical( got, exp );
+
+  /* */
+
+  function setup()
+  {
+    a.reflect();
+    a.fileProvider.fileWrite( a.abs( 'F1.txt' ), 'F1.txt' );
+    a.fileProvider.fileWrite( a.abs( 'F1.txt2' ), 'F1.txt2' );
+    a.fileProvider.fileWrite( a.abs( 'dir1/F1.txt' ), 'dir1/F1.txt' );
+    a.fileProvider.fileWrite( a.abs( 'dir1/F1.txt2' ), 'dir1/F1.txt2' );
+    a.fileProvider.fileWrite( a.abs( 'dir1/dir2/F1.txt' ), 'dir1/dir2/F1.txt' );
+    a.fileProvider.fileWrite( a.abs( 'dir1/dir2/F1.txt2' ), 'dir1/dir2/F1.txt2' );
+  }
+
+  /* */
+
+}
+
+//
+
 /*
 qqq : extend coverage of filesFindGroups
 qqq : please, clean filesFindGroups
@@ -32869,23 +32961,7 @@ function filesReflectRenaming( test )
 
   /* */
 
-  test.case = 'filesReflect';
-
-  setup();
-
-  a.fileProvider.filesReflect
-  ({
-    filter : { filePath : { [ a.abs( 'dir1' ) ] : a.abs( 'dir1' ) } },
-    onWriteDstUp,
-  });
-
-  var exp = [ '.', './F1.txt', './F1.txt3', './dir2', './dir2/F1.txt', './dir2/F1.txt3' ];
-  var got = a.findAll( a.abs( 'dir1' ) );
-  test.identical( got, exp );
-
-  /* */
-
-  test.case = 'filesRename';
+  test.case = 'basic';
 
   setup();
 
@@ -32917,12 +32993,14 @@ function filesReflectRenaming( test )
   function onWriteDstUp( r, o )
   {
     o.srcDeleting = 1;
-    if( a.path.ext( r.dst.absolute ) === 'txt2' )
+    if( r.dst.path.ext( r.dst.absolute ) === 'txt2' )
     {
-      r.dst.absolute = a.path.changeExt( r.dst.absolute, 'txt3' );
+      r.dst.absolute = r.dst.path.changeExt( r.dst.absolute, 'txt3' );
       r.srcAction = 'fileDelete';
     }
   }
+
+  /* */
 
 }
 
@@ -37861,6 +37939,8 @@ var Self =
     /* qqq : implement filesFindTotalNegative, */
     /* qqq : implement filesFindSeveralTotalNegative, */
     filesFindOptionRevisitingHardLinked,
+    filesFindRenaming,
+    filesRenameBasic,
 
     filesFindGroups,
     filesFindGroupsAsync,

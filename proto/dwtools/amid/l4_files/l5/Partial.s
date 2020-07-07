@@ -7345,6 +7345,9 @@ function areSoftLinked_body( o )
 
   _.assert( path.s.allAreAbsolute( o.filePath ) );
 
+  if( o.filePath.filter( ( path ) => !self.fileExists( path ) ).length )
+  return false;
+
   let isTheSamePath = true;
   for (let i = 1; i < o.filePath.length; i++)
   if( o.filePath[ 0 ] !== o.filePath[ i ] )
@@ -7420,6 +7423,9 @@ function areTextLinked_body( o )
   o.filePath = path.s.normalize( o.filePath );
 
   _.assert( path.s.allAreAbsolute( o.filePath ) );
+
+  if( o.filePath.filter( ( path ) => !self.fileExists( path ) ).length )
+  return false;
 
   let isTheSamePath = true;
   for (let i = 1; i < o.filePath.length; i++)

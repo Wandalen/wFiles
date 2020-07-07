@@ -1195,7 +1195,7 @@ defaults.safe = null;
 defaults.maskPreset = 'default.exclude';
 defaults.outputFormat = 'record';
 defaults.result = null;
-defaults.mode = 'legacy';
+defaults.mode = 'legacy'; /* xxx : change to distincy */
 defaults.revisiting = null;
 defaults.revisitingHardLinked = 1;
 defaults.visitedMap = null;
@@ -1590,8 +1590,6 @@ function filesReadGroups_body( o )
   return ready.sync();
   return ready;
 
-  // return ready.syncMaybe();
-
   /* */
 
   function fileRead( record, dstPath )
@@ -1637,125 +1635,6 @@ function filesReadGroups_body( o )
 filesReadGroups_body.defaults = Object.create( filesFindGroups.defaults );
 
 let filesReadGroups = _.routineFromPreAndBody( filesReadGroups_pre, filesReadGroups_body );
-
-//
-
-function filesRead_pre( routine, args )
-{
-  let self = this;
-  let o = args[ 0 ];
-
-  if( !_.mapIs( o ) )
-  o = { filePath : args[ 0 ] }
-
-  _.assert( args.length === 1 );
-  _.assert( arguments.length === 2 );
-
-  o = self.filesFind.pre.call( self, routine, [ o ] );
-
-  return o;
-}
-
-function filesRead_body( o )
-{
-  let self = this;
-  let path = self.path;
-  let result = Object.create( null );
-  result.dataMap = Object.create( null );
-  result.dataArray = [];
-  result.errors = [];
-
-  _.assert( o.outputFormat === undefined );
-
-  let o2 = _.mapOnly( o, self.filesFind.defaults );
-  o2.outputFormat = 'record';
-  let ready = _.Consequence.From( self.filesFind.body.call( self, o2 ) );
-
-  ready.then( ( files ) =>
-  {
-    let ready = _.Consequence().take( result );
-
-    result.files = files;
-
-    for( let i = 0 ; i < files.length ; i++ )
-    ready.also( () => fileRead( files[ i ] ) );
-
-    return ready;
-  });
-
-  ready.finally( ( err, arg ) =>
-  {
-    if( err )
-    {
-      if( o.throwing )
-      throw _.err( err );
-      else
-      result.errors.push( _.err( err ) );
-    }
-    if( result.errors.length )
-    if( o.throwing )
-    throw _.err( result.errors[ 0 ] );
-    return result;
-  });
-
-  if( o.sync )
-  return ready.sync();
-  return ready;
-
-  /* */
-
-  function fileRead( record, dstPath )
-  {
-    let r = null;
-    let index = result.dataArray.length;
-
-    try
-    {
-      let o2 = _.mapOnly( o, self.fileRead.defaults );
-      o2.filePath = record.absolute;
-      o2.outputFormat = 'data';
-      r = _.Consequence.From( self.fileRead( o2 ) );
-
-      r.finally( ( err, data ) =>
-      {
-        if( err )
-        {
-          err = _.err( err, `\nFailed to read ${record.absolute}` );
-          err.filePath = record.absolute;
-          result.errors.push( err );
-          return null;
-        }
-        result.dataMap[ record.absolute ] = data;
-        result.dataArray[ index ] = data;
-        return null;
-      });
-
-    }
-    catch( err )
-    {
-      debugger;
-      err = _.err( err, `\nFailed to read ${record.absolute}` );
-      err.filePath = record.absolute;
-      result.errors.push( err );
-    }
-
-    return r;
-  }
-
-}
-
-var defaults = filesRead_body.defaults = _.mapExtend( null, Partial.prototype.fileRead.defaults, filesFind.defaults );
-
-defaults.sync = 1;
-defaults.throwing = null;
-defaults.mode = 'distinct';
-defaults.resolvingSoftLink = 1;
-defaults.resolvingTextLink = 1;
-defaults.withDirs = 0;
-
-delete defaults.outputFormat;
-
-let filesRead = _.routineFromPreAndBody( filesRead_pre, filesRead_body );
 
 // --
 //
@@ -3150,7 +3029,7 @@ defaults.dstDeleting = 0;
 defaults.dstDeletingCleanedDirs = 1;
 defaults.dstRewriting = 1;
 defaults.dstRewritingByDistinct = 1;
-defaults.dstRewritingOnlyPreserving = 0; /* xxx : rename to dstRewritingAllowingDiscrepancy and invert */
+defaults.dstRewritingOnlyPreserving = 0; /* qqq2 xxx : rename to dstRewritingAllowingDiscrepancy and invert */
 defaults.preservingTime = 0;
 defaults.preservingSame = 0;
 
@@ -3235,6 +3114,7 @@ function filesReflectSingle_body( o )
   forEach( writeDstUp2, writeDstDown2 );
 
   if( o.writing && o.srcDeleting )
+  if( o.writing ) /* xxx : use this */
   forEach( writeSrcUp, writeSrcDown );
 
   /* */
@@ -5103,6 +4983,195 @@ let filesDeleteEmptyDirs = _.routineFromPreAndBody( filesFindRecursive.pre, file
 // other find
 // --
 
+function filesRead_pre( routine, args )
+{
+  let self = this;
+  let o = args[ 0 ];
+
+  if( !_.mapIs( o ) )
+  o = { filePath : args[ 0 ] }
+
+  _.assert( args.length === 1 );
+  _.assert( arguments.length === 2 );
+
+  o = self.filesFind.pre.call( self, routine, [ o ] );
+
+  return o;
+}
+
+function filesRead_body( o )
+{
+  let self = this;
+  let path = self.path;
+  let result = Object.create( null );
+  result.dataMap = Object.create( null );
+  result.dataArray = [];
+  result.errors = [];
+
+  _.assert( o.outputFormat === undefined );
+
+  let o2 = _.mapOnly( o, self.filesFind.defaults );
+  o2.outputFormat = 'record';
+  let ready = _.Consequence.From( self.filesFind.body.call( self, o2 ) );
+
+  ready.then( ( files ) =>
+  {
+    let ready = _.Consequence().take( result );
+
+    result.files = files;
+
+    for( let i = 0 ; i < files.length ; i++ )
+    ready.also( () => fileRead( files[ i ] ) );
+
+    return ready;
+  });
+
+  ready.finally( ( err, arg ) =>
+  {
+    if( err )
+    {
+      if( o.throwing )
+      throw _.err( err );
+      else
+      result.errors.push( _.err( err ) );
+    }
+    if( result.errors.length )
+    if( o.throwing )
+    throw _.err( result.errors[ 0 ] );
+    return result;
+  });
+
+  if( o.sync )
+  return ready.sync();
+  return ready;
+
+  /* */
+
+  function fileRead( record, dstPath )
+  {
+    let r = null;
+    let index = result.dataArray.length;
+
+    try
+    {
+      let o2 = _.mapOnly( o, self.fileRead.defaults );
+      o2.filePath = record.absolute;
+      o2.outputFormat = 'data';
+      r = _.Consequence.From( self.fileRead( o2 ) );
+
+      r.finally( ( err, data ) =>
+      {
+        if( err )
+        {
+          err = _.err( err, `\nFailed to read ${record.absolute}` );
+          err.filePath = record.absolute;
+          result.errors.push( err );
+          return null;
+        }
+        result.dataMap[ record.absolute ] = data;
+        result.dataArray[ index ] = data;
+        return null;
+      });
+
+    }
+    catch( err )
+    {
+      debugger;
+      err = _.err( err, `\nFailed to read ${record.absolute}` );
+      err.filePath = record.absolute;
+      result.errors.push( err );
+    }
+
+    return r;
+  }
+
+}
+
+var defaults = filesRead_body.defaults = _.mapExtend( null, Partial.prototype.fileRead.defaults, filesFind.defaults );
+
+defaults.sync = 1;
+defaults.throwing = null;
+defaults.mode = 'distinct';
+defaults.resolvingSoftLink = 1;
+defaults.resolvingTextLink = 1;
+defaults.withDirs = 0;
+
+delete defaults.outputFormat;
+
+let filesRead = _.routineFromPreAndBody( filesRead_pre, filesRead_body );
+
+//
+
+function filesRename_pre( routine, args )
+{
+  let self = this;
+  let o = args[ 0 ];
+
+  if( !_.mapIs( o ) )
+  o = { filePath : args[ 0 ] }
+
+  o = self.filesFind.pre.call( self, routine, [ o ] );
+
+  _.assert( args.length === 1 );
+  _.assert( arguments.length === 2 );
+  _.assert( _.routineIs( o.onRename ) );
+  _.assert( _.routineIs( self[ o.linking ] ), `Unknown linking method ${o.linking}` );
+
+  return o;
+}
+
+function filesRename_body( o )
+{
+  let self = this;
+  let path = self.path;
+  let result = Object.create( null );
+  result.dataMap = Object.create( null );
+  result.dataArray = [];
+  result.errors = [];
+
+  _.assert( o.outputFormat === undefined );
+
+  let o3 = _.mapOnly( o, self[ o.linking ].defaults );
+  let o2 = _.mapOnly( o, self.filesFind.defaults );
+  o2.outputFormat = 'record';
+  o2.onDown = onDown;
+  return self.filesFind.body.call( self, o2 );
+
+  function onDown( r )
+  {
+    let dstPath = o.onRename( r, o );
+    _.assert( dstPath === undefined || path.isAbsolute( dstPath ), '{- o.onRename -} should return undefined or absolute path of destination' );
+    if( dstPath !== undefined )
+    {
+      let o4 = Object.assign( Object.create( null ), o3 );
+      o4.srcPath = r.absolute;
+      o4.dstPath = dstPath;
+      r.effectiveProvider[ o.linking ]( o4 );
+      r.absolute = dstPath;
+    }
+    if( o.onDown )
+    return o.onDown( ... arguments );
+  }
+
+}
+
+var defaults = filesRename_body.defaults = _.mapExtend( null, Partial.prototype.fileRename.defaults, filesFind.defaults );
+
+defaults.sync = 1;
+defaults.throwing = null;
+defaults.mode = 'distinct';
+defaults.linking = 'fileRename';
+defaults.resolvingSoftLink = 1;
+defaults.resolvingTextLink = 1;
+defaults.withDirs = 0;
+defaults.onRename = null;
+
+delete defaults.outputFormat;
+
+let filesRename = _.routineFromPreAndBody( filesRename_pre, filesRename_body );
+
+//
+
 function softLinksBreak_body( o )
 {
   let self = this;
@@ -5336,7 +5405,6 @@ let Supplement =
 
   filesFindGroups,
   filesReadGroups,
-  filesRead, /* qqq : cover please */
 
   // reflect
 
@@ -5364,6 +5432,9 @@ let Supplement =
   filesDeleteEmptyDirs,
 
   // other find
+
+  filesRead, /* qqq : cover please */
+  filesRename, /* qqq : cover please */
 
   softLinksBreak,
   softLinksRebase,

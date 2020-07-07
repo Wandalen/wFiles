@@ -51064,7 +51064,7 @@ function softLinkReturnSync( test )
 
   /* -- */
 
-  /* Artem B. bug in softLink, case: dst exists and is already soft linked, returns true, all cases in this block fail */
+  /* Artem B. bug in softLink, case: dst exists and is already soft linked, all cases in this block fail */
   test.open( 'dst exists, is soft linked' );
   {
     test.case = 'rewriting : 1';
@@ -51264,15 +51264,93 @@ function softLinkForDebuggingExperiment( test )
   let context = this;
   let a = context.assetFor( test, false );
 
-  /* */
-
   test.case = 'dst exists, is soft linked';
   a.reflect();
   a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
   a.fileProvider.softLink({ dstPath : a.abs( 'dst' ), srcPath : a.abs( 'src' ), rewriting : 1 });
   var got = a.fileProvider.softLink({ dstPath : a.abs( 'dst' ), srcPath : a.abs( 'src' ), rewriting : 1 });
   test.identical( got, false );
-  // test.identical( a.fileProvider.areSoftLinked( a.abs( 'dst' ), a.abs( 'src' ) ), true );
+  test.identical( a.fileProvider.areSoftLinked( a.abs( 'dst' ), a.abs( 'src' ) ), true );
+
+  /* */
+
+  let provider = context.provider;
+  let path = provider.path;
+
+  if( !_.routineIs( provider.fileCopyAct ) )
+  {
+    test.identical( 1,1 );
+    return;
+  }
+
+  function fileCopy( o )
+  {
+    let o2 =
+    {
+      srcPath,
+      dstPath,
+      sync : 1,
+      rewriting : 1
+    }
+    _.mapSupplement( o, o2 )
+    return provider.fileCopy( o );
+  }
+
+  let routinePath = test.context.pathFor( 'written/fileCopySoftLinkResolving' );
+  let srcPath = provider.path.join( routinePath, 'src' );
+  let srcPath2 = provider.path.join( routinePath, 'src2' );
+  let dstPath = provider.path.join( routinePath, 'dst' );
+  let dstPath2 = provider.path.join( routinePath, 'dst2' );
+  let srcPathTerminal = provider.path.join( routinePath, 'srcTerminal' );
+  let dstPathTerminal = provider.path.join( routinePath, 'dstTerminal' );
+
+  /* */
+
+  provider.filesDelete( routinePath );
+  provider.dirMake( routinePath );
+  provider.softLink({ dstPath : srcPath, srcPath : srcPath2, allowingMissed : 1 });
+  provider.softLink({ dstPath : srcPath2, srcPath, allowingMissed : 1 });
+  provider.softLink({ dstPath, srcPath : dstPath2, allowingMissed : 1 });
+  provider.softLink({ dstPath : dstPath2, srcPath : dstPath, allowingMissed : 1 });
+  var o = { resolvingSrcSoftLink : 0, resolvingDstSoftLink : 0 };
+  fileCopy( o );
+  test.identical( o.srcPath, srcPath );
+  test.identical( o.dstPath, dstPath );
+  test.is( provider.isSoftLink( srcPath ) );
+  test.is( provider.isSoftLink( srcPath2 ) );
+  test.is( provider.isSoftLink( dstPath ) );
+  test.is( provider.isSoftLink( dstPath2 ) );
+  test.identical( provider.pathResolveSoftLink( srcPath ), srcPath2 );
+  test.identical( provider.pathResolveSoftLink( dstPath ), srcPath );
+  test.identical( provider.pathResolveSoftLink( srcPath2 ), srcPath );
+  test.identical( provider.pathResolveSoftLink( dstPath2 ), dstPath );
+
+  /* */
+
+  test.case = 'link already exists';
+  srcPath = test.context.pathFor( 'written/softLink/link_test.txt' );
+  dstPath = test.context.pathFor( 'written/softLink/link.txt' );
+  provider.fileWrite( srcPath, 'abc' );
+  provider.softLink
+  ({
+    srcPath,
+    dstPath,
+    rewriting : 1,
+    throwing : 1,
+    sync : 1,
+  });
+
+  test.shouldThrowErrorSync( function( )
+  {
+    provider.softLink
+    ({
+      srcPath,
+      dstPath,
+      rewriting : 0,
+      throwing : 1,
+      sync : 1,
+    });
+  });
 }
 softLinkForDebuggingExperiment.experimental = 1;
 

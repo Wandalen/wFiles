@@ -6663,14 +6663,14 @@ function _softLinkVerify2( c )
   // if( self.areSoftLinked([ o.dstPath, o.srcPath ]) )
   if( o.dstPath === o.srcPath )
   c.error( _.err( 'Soft link cycle', path.moveTextualReport( o.dstPath, o.srcPath ) ) );
-
-  /* Artem B. attempt to fix a bug */
-  // if( self.areSoftLinked([ o.dstPath, o.srcPath ]) )
-  // {
-  //   c.ended = true;
-  //   c.result = false;
-  // }
-  /* Artem B. attempt to fix a bug */
+  debugger;
+  /* Artem B. attempt to fix a bug, case: dst exists and is already soft linked, */
+  if( self.isLink( o.dstPath ) && self.pathResolveSoftLinkAct({ filePath: o.dstPath }) === o.srcPath )
+  {
+    c.ended = true;
+    c.result = false; 
+  }
+  /* Artem B. attempt to fix a bug, case: dst exists and is already soft linked, */
 
   // if( o.dstPath !== o.srcPath && self.areSoftLinked([ o.dstPath, o.srcPath ]) )
   // if( o.dstPath === o.srcPath )

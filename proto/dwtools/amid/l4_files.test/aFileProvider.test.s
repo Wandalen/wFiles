@@ -50931,57 +50931,108 @@ hardLinkForDebuggingExperiment.experimental = 1
 function hardLinkReturnThrowing0Sync( test )
 {
 /*
+// without restrictions (3){rewriting : 1, rewritingDirs : 1, makingDirectory : 1}
  - src does not exist, directory does not exist
  - src does not exist, directory exists
+ - src === dst, src is directory
 
-// rewriting 0 -> 2
+// rewriting : 0 (2){rewriting : 0, makingDirectory : 1}
  - dst exists, is not hard linked
- - dst exists, is hard linked on another file
- - dst exists, is hard linked on itself ?
- - src === dst ?
+ - dst exists, is hard linked with itself ?(тут не потрібно, перевірити наявність в попередній рутині)
 
-// rewritingDirs 0 -> 1
+// rewritingDirs : 0 (1){rewriting : 1, rewritingDirs : 0, makingDirectory : 1}
  - dst exists, dst is directory
- - src === dst, src is directory ?
 
-// makingDirectory 0 -> 1
- - dst does not exist
+// makingDirectory : 0 (1){rewriting : 1, rewritingDirs : 1, makingDirectory : 0}
+ - dir for dst does not exist
 
- - breakingSrcHardLink : 0, breakingDstHardLink : 0 
+// allowingMissed{rewriting : 1, rewritingDirs : 1, makingDirectory : 1, allowingMissed : 0, allowingCycled : 1}
+ - resolvingSrcSoftLink : 1
+ - resolvingDstSoftLink : 1(додати також в попередню тест рутину із allowingMissed : 1)
+
+// allowingCycled{rewriting : 1, rewritingDirs : 1, makingDirectory : 1, allowingMissed : 1, allowingCycled : 0}
+ - resolvingSrcSoftLink : 1
+ - resolvingDstSoftLink : 1(додати також в попередню тест рутину із allowingCycled : 1)
+
+// allowingDiscrepancy {allowingDiscrepancy: 0, rewriting : 1, rewritingDirs : 1, makingDirectory : 1}(написати окрему тест рутину)
+ - src exists, dst exists, different content
 
 total : 7
 */
   let context = this;
   let a = context.assetFor( test, false );
 
-  test.case = 'src does not exist, directory does not exist';
-  a.reflect();
-  var got = a.fileProvider.hardLink
-  ({
-    dstPath : a.abs( 'dst' ),
-    srcPath : a.abs( 'src' ),
-    throwing : 0,
-  });
-  test.identical( got, null );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), false );
+  test.open( 'without restrictions' );
+  {
+    test.case = 'src does not exist, directory does not exist';
+    a.reflect();
+    var got = a.fileProvider.hardLink
+    ({
+      dstPath : a.abs( 'dst' ),
+      srcPath : a.abs( 'src' ),
+      rewriting : 1,
+      rewritingDirs : 1,
+      makingDirectory : 1,
+      throwing : 0,
+    });
+    test.identical( got, null );
+    test.identical( a.fileProvider.areHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), false );
 
-  /* */
+    /* */
 
-  test.case = 'src does not exist, directory exists';
-  a.reflect();
-  a.fileProvider.dirMake( a.abs( 'dir1/dir2' ) );
-  var got = a.fileProvider.hardLink
-  ({
-    dstPath : a.abs( 'dst' ),
-    srcPath : a.abs( 'dir1/dir2/src' ),
-    throwing : 0,
-  });
-  test.identical( got, null );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), false );
+    test.case = 'src does not exist, directory exists';
+    a.reflect();
+    a.fileProvider.dirMake( a.abs( 'dir1/dir2' ) );
+    var got = a.fileProvider.hardLink
+    ({
+      dstPath : a.abs( 'dst' ),
+      srcPath : a.abs( 'dir1/dir2/src' ),
+      rewriting : 1,
+      rewritingDirs : 1,
+      makingDirectory : 1,
+      throwing : 0,
+    });
+    test.identical( got, null );
+    test.identical( a.fileProvider.areHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), false );
+
+    /* */
+
+    // test.case = 'src === dst, src is not directory';
+    // a.reflect();
+    // a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+    // var got = a.fileProvider.hardLink
+    // ({
+    //   dstPath : a.abs( 'src' ),
+    //   srcPath : a.abs( 'src' ),
+    //   throwing : 0,
+    //   rewriting: 0,
+    // });
+    // test.identical( got, null );
+    // test.identical( a.fileProvider.areHardLinked( a.abs( 'src' ), a.abs( 'src' ) ), false );
+    
+    /* */
+
+    // test.case = 'src === dst, src is directory'; // there is bug supposedly
+    // a.reflect();
+    // a.fileProvider.dirMake( a.abs( 'dir1/dir2' ) );
+    // var got = a.fileProvider.hardLink
+    // ({
+    //   dstPath : a.abs( 'dir1/dir2' ),
+    //   srcPath : a.abs( 'dir1/dir2' ),
+    //   rewriting : 1,
+    //   rewritingDirs : 1,
+    //   makingDirectory : 1,
+    //   throwing : 0,
+    //   rewritingDirs: 0,
+    // });
+    // test.identical( got, null );
+    // test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2' ), a.abs( 'dir1/dir2' ) ), false );
+  }
+  test.close( 'without restrictions' );
 
   /* -- */
 
-  test.open( 'rewriting 0' );
+  test.open( 'rewriting : 0' );
   {
     test.case = 'dst exists, is not hard linked';
     a.reflect();
@@ -50996,57 +51047,8 @@ total : 7
     });
     test.identical( got, null );
     test.identical( a.fileProvider.areHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), false );
-
-    /* */
-
-    // test.case = 'dst exists, is hard linked on itself';
-    // a.reflect();
-    // a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-    // a.fileProvider.hardLink({ dstPath : a.abs( 'src' ), srcPath : a.abs( 'src' ) });
-    // test.identical( a.fileProvider.areHardLinked( a.abs( 'src' ), a.abs( 'src' ) ), true );
-    // var got = a.fileProvider.hardLink
-    // ({
-    //   dstPath : a.abs( 'src' ),
-    //   srcPath : a.abs( 'src' ),
-    //   throwing : 0,
-    //   rewriting: 0,
-    // });
-    // test.identical( got, null );
-    // test.identical( a.fileProvider.areHardLinked( a.abs( 'src' ), a.abs( 'src' ) ), true );
-
-    /* */
-
-    test.case = 'dst exists, is hard linked on another file';
-    a.reflect();
-    a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-    a.fileProvider.fileWrite( a.abs( 'src1' ), 'some text' );
-    a.fileProvider.hardLink({ dstPath : a.abs( 'dst' ), srcPath : a.abs( 'src1' ) });
-    var got = a.fileProvider.hardLink
-    ({
-      dstPath : a.abs( 'dst' ),
-      srcPath : a.abs( 'src' ),
-      throwing : 0,
-      rewriting: 0,
-    });
-    test.identical( got, null );
-    test.identical( a.fileProvider.areHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), false );
-
-    /* */
-
-    // test.case = 'src === dst';
-    // a.reflect();
-    // a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-    // var got = a.fileProvider.hardLink
-    // ({
-    //   dstPath : a.abs( 'src' ),
-    //   srcPath : a.abs( 'src' ),
-    //   throwing : 0,
-    //   rewriting: 0,
-    // });
-    // test.identical( got, null );
-    // test.identical( a.fileProvider.areHardLinked( a.abs( 'src' ), a.abs( 'src' ) ), false );
   }
-  test.close( 'rewriting 0' );
+  test.close( 'rewriting : 0' );
 
   /* -- */
 
@@ -51065,21 +51067,6 @@ total : 7
     });
     test.identical( got, null );
     test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2' ), a.abs( 'src' ) ), false );
-
-    /* */
-
-    // test.case = 'src === dst, src is directory';
-    // a.reflect();
-    // a.fileProvider.dirMake( a.abs( 'dir1/dir2' ) );
-    // var got = a.fileProvider.hardLink
-    // ({
-    //   dstPath : a.abs( 'dir1/dir2' ),
-    //   srcPath : a.abs( 'dir1/dir2' ),
-    //   throwing : 0,
-    //   rewritingDirs: 0,
-    // });
-    // test.identical( got, null );
-    // test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2' ), a.abs( 'dir1/dir2' ) ), false );
   }
   test.close( 'rewritingDirs 0' );
 
@@ -51724,6 +51711,34 @@ areSoftLinkedForDebuggingExperiment.experimental = 1;
 function softLinkReturnThrowing0Sync( test )
 {
 /*
+// no options (3){rewriting : 1, rewritingDirs : 1, makingDirectory : 1}
+ - src does not exist, directory does not exist
+ - src does not exist, directory exists
+ - src === dst, src is directory
+
+// rewriting : 0 (2){rewriting : 0, makingDirectory : 1}
+ - dst exists, is not hard linked
+ - dst exists, is hard linked with itself ?(тут не потрібно, перевірити наявність в попередній рутині)
+
+// rewritingDirs : 0 (1){rewriting : 1, rewritingDirs : 0, makingDirectory : 1}
+ - dst exists, dst is directory
+
+// makingDirectory : 0 (1){rewriting : 1, rewritingDirs : 1, makingDirectory : 0}
+ - dir for dst does not exist
+
+// allowingMissed{rewriting : 1, rewritingDirs : 1, makingDirectory : 1, allowingMissed : 0, allowingCycled : 1}
+ - resolvingSrcSoftLink : 1
+ - resolvingDstSoftLink : 1(додати також в попередню тест рутину із allowingMissed : 1)
+
+// allowingCycled{rewriting : 1, rewritingDirs : 1, makingDirectory : 1, allowingMissed : 1, allowingCycled : 0}
+ - resolvingSrcSoftLink : 1
+ - resolvingDstSoftLink : 1(додати також в попередню тест рутину із allowingCycled : 1)
+
+// allowingDiscrepancy {allowingDiscrepancy: 0, rewriting : 1, rewritingDirs : 1, makingDirectory : 1}(написати окрему тест рутину)
+ - src exists, dst exists, different content
+
+//
+
  - src does not exist, directory does not exist
  - src does not exist, directory exists
 

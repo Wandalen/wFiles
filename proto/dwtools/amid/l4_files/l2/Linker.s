@@ -324,7 +324,7 @@ function verify2()
   if( _.boolLikeFalse( o.allowingDiscrepancy ) ) /* qqq : cover */
   if( c.srcResolvedStat )
   if( self.fileExists( c.options2.dstPath ) )
-  if( !self.filesAreSameForSure( c.options2.srcPath, c.options2.dstPath, false ) ) /* xxx : optimize */
+  if( !self.filesAreSameForSure( c.options2.srcPath, c.options2.dstPath, false ) ) /* qqq xxx : optimize */
   if( Number( c.srcResolvedStat.size ) !== 0 )
   {
     debugger

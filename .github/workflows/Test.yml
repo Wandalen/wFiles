@@ -38,7 +38,7 @@ jobs :
       with :
         node-version : ${{ matrix.node-version }}
     - run : npm i
-    - run : node proto/dwtools/amid/l4_files.test/SystemDefaultExtract.test.s
+    - run : npm test
 
   Full :
     if : "startsWith( github.event.head_commit.message, 'version' )"

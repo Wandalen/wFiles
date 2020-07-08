@@ -456,7 +456,6 @@ function pathsLocalizeSync() /* qqq : ignoring provider is temp workaround. plea
 
   if( self instanceof _.FileProvider.System )
   {
-    debugger;
     return;
   }
 

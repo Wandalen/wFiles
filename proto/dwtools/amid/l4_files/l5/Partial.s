@@ -6665,7 +6665,7 @@ function _softLinkVerify2( c )
   c.error( _.err( 'Soft link cycle', path.moveTextualReport( o.dstPath, o.srcPath ) ) );
   debugger;
   /* Artem B. attempt to fix a bug, case: dst exists and is already soft linked, */
-  if( self.isLink( o.dstPath ) && self.pathResolveSoftLink({ filePath: o.dstPath }) === self.path.s.nativize( o.srcPath ) && o.rewriting )
+  if( self.isLink( o.dstPath ) && self.pathResolveSoftLink({ filePath: o.dstPath }) === self.pathResolveSoftLink({ filePath: o.srcPath }) && o.rewriting )
   {
     c.ended = true;
     c.result = false;

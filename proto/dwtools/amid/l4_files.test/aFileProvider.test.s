@@ -35622,6 +35622,36 @@ function hardLinkHardLinkedAsync( test )
 
 //
 
+function hardLinkBreakingSrcDstHardLinkEqual0Sync( test )
+{
+  let context = this;
+  let a = context.assetFor( test, false );
+
+  test.case = 'breakingSrcHardLink : 0, breakingDstHardLink : 0';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'srcDataFile' ), 'src data' );
+  a.fileProvider.hardLink({ dstPath : a.abs( 'src' ), srcPath : a.abs( 'srcDataFile' ) });
+  a.fileProvider.hardLink({ dstPath : a.abs( 'src1' ), srcPath : a.abs( 'srcDataFile' ) });
+  a.fileProvider.hardLink({ dstPath : a.abs( 'src2' ), srcPath : a.abs( 'srcDataFile' ) });
+  a.fileProvider.fileWrite( a.abs( 'dstDataFile' ), 'dst data' );
+  a.fileProvider.hardLink({ dstPath : a.abs( 'dst' ), srcPath : a.abs( 'dstDataFile' ) });
+  a.fileProvider.hardLink({ dstPath : a.abs( 'dst1' ), srcPath : a.abs( 'dstDataFile' ) });
+  a.fileProvider.hardLink({ dstPath : a.abs( 'dst2' ), srcPath : a.abs( 'dstDataFile' ) });
+  test.shouldThrowErrorSync( () =>
+  {
+    a.fileProvider.hardLink
+    ({
+      dstPath : a.abs( 'dst' ),
+      srcPath : a.abs( 'src' ),
+      breakingSrcHardLink : 0,
+      breakingDstHardLink : 0,
+      throwing : 0,
+    });
+  })
+}
+
+//
+
 function hardLinkEscapedPath( test )
 {
   let context = this;
@@ -50957,7 +50987,7 @@ function hardLinkReturnThrowing0Sync( test )
 // allowingDiscrepancy {allowingDiscrepancy: 0, rewriting : 1, rewritingDirs : 1, makingDirectory : 1}(написати окрему тест рутину)
  - src exists, dst exists, different content
 
-total : 7
+total : 11
 */
   let context = this;
   let a = context.assetFor( test, false );
@@ -51005,7 +51035,9 @@ total : 7
     //   dstPath : a.abs( 'src' ),
     //   srcPath : a.abs( 'src' ),
     //   throwing : 0,
-    //   rewriting: 0,
+    //   rewriting : 0,
+    //   rewritingDirs : 1,
+    //   makingDirectory : 1,
     // });
     // test.identical( got, null );
     // test.identical( a.fileProvider.areHardLinked( a.abs( 'src' ), a.abs( 'src' ) ), false );
@@ -51023,7 +51055,6 @@ total : 7
     //   rewritingDirs : 1,
     //   makingDirectory : 1,
     //   throwing : 0,
-    //   rewritingDirs: 0,
     // });
     // test.identical( got, null );
     // test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2' ), a.abs( 'dir1/dir2' ) ), false );
@@ -51044,6 +51075,7 @@ total : 7
       srcPath : a.abs( 'src' ),
       throwing : 0,
       rewriting: 0,
+      makingDirectory : 1,
     });
     test.identical( got, null );
     test.identical( a.fileProvider.areHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), false );
@@ -51063,7 +51095,9 @@ total : 7
       dstPath : a.abs( 'dir1/dir2' ),
       srcPath : a.abs( 'src' ),
       throwing : 0,
-      rewritingDirs: 0,
+      rewriting : 1,
+      rewritingDirs : 0,
+      makingDirectory : 1,
     });
     test.identical( got, null );
     test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2' ), a.abs( 'src' ) ), false );
@@ -51079,6 +51113,8 @@ total : 7
       dstPath : a.abs( 'dir1/dir2/dst' ),
       srcPath : a.abs( 'src' ),
       throwing : 0,
+      rewriting : 1,
+      rewritingDirs : 1,
       makingDirectory: 0,
     });
     test.identical( got, null );
@@ -51086,28 +51122,46 @@ total : 7
   }
   test.close( 'makingDirectory 0' );
 
-  /* */
+  /* -- */
 
-  // test.case = 'breakingSrcHardLink : 0, breakingDstHardLink : 0';
-  // a.reflect();
-  // a.fileProvider.fileWrite( a.abs( 'srcDataFile' ), 'src data' );
-  // a.fileProvider.hardLink({ dstPath : a.abs( 'src' ), srcPath : a.abs( 'srcDataFile' ) });
-  // a.fileProvider.hardLink({ dstPath : a.abs( 'src1' ), srcPath : a.abs( 'srcDataFile' ) });
-  // a.fileProvider.hardLink({ dstPath : a.abs( 'src2' ), srcPath : a.abs( 'srcDataFile' ) });
-  // a.fileProvider.fileWrite( a.abs( 'dstDataFile' ), 'dst data' );
-  // a.fileProvider.hardLink({ dstPath : a.abs( 'dst' ), srcPath : a.abs( 'dstDataFile' ) });
-  // a.fileProvider.hardLink({ dstPath : a.abs( 'dst1' ), srcPath : a.abs( 'dstDataFile' ) });
-  // a.fileProvider.hardLink({ dstPath : a.abs( 'dst2' ), srcPath : a.abs( 'dstDataFile' ) });
-  // var got = a.fileProvider.hardLink
-  // ({
-  //   dstPath : a.abs( 'dst' ),
-  //   srcPath : a.abs( 'src' ),
-  //   breakingSrcHardLink : 0,
-  //   breakingDstHardLink : 0,
-  //   throwing : 0,
-  // });
-  // test.identical( got, null );
-  // test.identical( a.fileProvider.areHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), false );
+  test.open( 'allowingMissed : 0' );
+  {
+// allowingMissed{rewriting : 1, rewritingDirs : 1, makingDirectory : 1, allowingMissed : 0, allowingCycled : 1}
+// - resolvingSrcSoftLink : 1
+// - resolvingDstSoftLink : 1(додати також в попередню тест рутину із allowingMissed : 1)
+    test.case = 'resolvingSrcSoftLink : 1';
+    // ...
+
+    test.case = 'resolvingDstSoftLink : 1';
+    // ...
+  }
+  test.close( 'allowingMissed : 0' );
+
+  /* -- */
+
+  test.open( 'allowingCycled : 0' );
+  {
+// allowingCycled{rewriting : 1, rewritingDirs : 1, makingDirectory : 1, allowingMissed : 1, allowingCycled : 0}
+// - resolvingSrcSoftLink : 1
+// - resolvingDstSoftLink : 1(додати також в попередню тест рутину із allowingCycled : 1)
+    test.case = 'resolvingSrcSoftLink : 1';
+    // ...
+
+    test.case = 'resolvingDstSoftLink : 1';
+    // ...
+  }
+  test.close( 'allowingCycled : 0' );
+
+  /* -- */
+
+  test.open( 'allowingDiscrepancy : 0' );
+  {
+// allowingDiscrepancy {allowingDiscrepancy: 0, rewriting : 1, rewritingDirs : 1, makingDirectory : 1}(написати окрему тест рутину)
+// - src exists, dst exists, different content
+    test.case = 'src exists, dst exists, different content';
+    // ...
+  }
+  test.close( 'allowingDiscrepancy : 0' );
 }
 
 //
@@ -52715,6 +52769,7 @@ var Self =
     hardLinkRelativeTextLinking,
     hardLinkHardLinkedSync,
     hardLinkHardLinkedAsync,
+    hardLinkBreakingSrcDstHardLinkEqual0Sync,
 
     hardLinkEscapedPath, /* xxx */
 

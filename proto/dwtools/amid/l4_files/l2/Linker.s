@@ -219,7 +219,7 @@ function onIsLink( stat )
   return false;
 }
 
-/* */
+//
 
 function onStat( filePath, resolving )
 {
@@ -239,7 +239,7 @@ function onStat( filePath, resolving )
   });
 }
 
-/* */
+//
 
 function verify1( args )
 {
@@ -1092,6 +1092,7 @@ function contextMake( o )
 
     c.options2 = _.mapOnly( options, c.linkDo.defaults );
   }
+  else debugger;
 
   c.entryMethodName = undefined;
 
@@ -1314,7 +1315,7 @@ function functor( fop )
       return c.con;
     }
 
-    //
+    /* */
 
     function mainPartAsync()
     {
@@ -1392,6 +1393,5 @@ let Proto =
 }
 
 _.mapExtend( Self, Proto )
-
 
 })()

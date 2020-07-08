@@ -99,7 +99,7 @@ var Proto =
   name : 'Tools.mid.files.fileProvider.system.default.HardDrive',
   abstract : 0,
   silencing : 1,
-  enabled : 1,
+  enabled : 0,
 
   onSuiteBegin,
   onSuiteEnd,

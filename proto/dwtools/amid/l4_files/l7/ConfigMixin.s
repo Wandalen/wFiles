@@ -545,10 +545,82 @@ configUserUnlock.defaults =
 // storage
 // --
 
+function storageNameFrom( o )
+{
+  let self = this;
+
+  if( _.strIs( arguments[ 0 ] ) )
+  o = { storageName : arguments[ 0 ] };
+  o = _.routineOptions( storageNameFrom, o );
+
+  _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
+
+  return self.path.normalize( o.storageDir );
+}
+
+storageNameFrom.defaults =
+{
+  storageName : null,
+  storagePath : null,
+  storageDir : null,
+}
+
+//
+
+function storagePathFrom( o )
+{
+  let self = this;
+
+  if( _.strIs( arguments[ 0 ] ) )
+  o = { storageName : arguments[ 0 ] };
+  o = _.routineOptions( storagePathFrom, o );
+
+  if( o.storagePath === null )
+  o.storagePath = self.configUserPath( o.storageName );
+
+  return o.storagePath;
+  // return self.storageNameMapFrom( o ).storagePath;
+}
+
+storagePathFrom.defaults =
+{
+  ... storageNameFrom.defaults,
+}
+
+//
+
+function storageNameMapFrom( o )
+{
+  let self = this;
+
+  if( _.strIs( arguments[ 0 ] ) )
+  o = { storageName : arguments[ 0 ] };
+  o = _.routineOptions( storageNameMapFrom, o );
+
+  if( o.storageName === null )
+  o.storageName = self.storageNameFrom( o );
+  if( o.storagePath === null )
+  o.storagePath = self.storagePathFrom( o );
+
+  // if( o.storagePath === null )
+  // o.storagePath = self.configUserPath( o.storageName );
+
+  return o;
+}
+
+storageNameMapFrom.defaults =
+{
+  ... storageNameFrom.defaults,
+  // storageName : null,
+  // storagePath : null,
+}
+
+//
+
 function storageRead( o )
 {
   let self = this;
-  let storageName, storagePath;
+  // let storageName, storagePath;
   try
   {
 
@@ -558,16 +630,16 @@ function storageRead( o )
 
     _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
 
-    storageName = self.path.normalize( o.storageDir );
+    self.storageNameMapFrom( o );
+    // storageName = self.path.normalize( o.storageDir );
+    // storagePath = self.configUserPath( storageName );
 
-    storagePath = self.configUserPath( storageName );
-
-    if( !self.fileExists( storagePath ) )
+    if( !self.fileExists( o.storagePath ) )
     return null;
 
     let result = self.filesRead
     ({
-      filePath : self.path.join( storagePath, '**' ),
+      filePath : self.path.join( o.storagePath, '**' ),
       encoding : _.unknown,
     });
 
@@ -575,13 +647,14 @@ function storageRead( o )
   }
   catch( err )
   {
-    throw _.err( err, `\nFailed to read storage::${storageName} at ${storagePath}` );
+    throw _.err( err, `\nFailed to read storage::${o.storageName} at ${o.storagePath}` );
   }
 }
 
 storageRead.defaults =
 {
-  storageDir : null,
+  ... storageNameMapFrom.defaults,
+  // storageDir : null,
 }
 
 //
@@ -589,7 +662,7 @@ storageRead.defaults =
 function storageReset( o )
 {
   let self = this;
-  let storageName, storagePath;
+  // let storageName, storagePath;
 
   try
   {
@@ -600,29 +673,114 @@ function storageReset( o )
 
     _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
 
-    storageName = self.path.normalize( o.storageDir );
+    let o2 = _.mapOnly( o, self.storageNameMapFrom.defaults );
+    self.storageNameMapFrom( o2 );
+    _.mapExtend( o, o2 );
+    // storageName = self.path.normalize( o.storageDir );
+    // storagePath = self.configUserPath( storageName );
 
-    storagePath = self.configUserPath( storageName );
-
-    if( self.fileExists( storagePath ) )
+    if( self.fileExists( o.storagePath ) )
     self.filesDelete
     ({
-      filePath : storagePath,
+      filePath : o.storagePath,
       verbosity : o.verbosity ? 3 : 0,
     });
 
   }
   catch( err )
   {
-    throw _.err( err, `\nFailed to delete storage::${storageName} at ${storagePath}` );
+    throw _.err( err, `\nFailed to delete storage::${o.storageName} at ${o.storagePath}` );
   }
 
 }
 
 storageReset.defaults =
 {
-  storageDir : null,
+  ... storageNameMapFrom.defaults,
+  // storageDir : null,
   verbosity : 0,
+}
+
+//
+
+function storageProfileNameFrom( o )
+{
+  let self = this;
+
+  if( _.strIs( arguments[ 0 ] ) )
+  o = { storageName : arguments[ 0 ] };
+  o = _.routineOptions( storageProfileNameFrom, o );
+
+  _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
+  _.assert( _.strIs( o.profileDir ), 'Expects defined {- o.profileDir -}' );
+
+  if( o.storageName === null )
+  o.storageName = self.path.join
+  (
+    o.storageDir,
+    o.profileDir,
+  );
+
+  return o.storageName;
+}
+
+storageProfileNameFrom.defaults =
+{
+  storageDir : null,
+  profileDir : 'default',
+  storageName : null,
+  storagePath : null,
+}
+
+//
+
+function storageProfilePathFrom( o )
+{
+  let self = this;
+
+  if( _.strIs( arguments[ 0 ] ) )
+  o = { storageName : arguments[ 0 ] };
+  o = _.routineOptions( storageProfilePathFrom, o );
+
+  if( o.storagePath === null )
+  o.storagePath = self.configUserPath( o.storageName );
+
+  // return self.storageProfileNameMapFrom( o ).storagePath;
+
+  return o.storagePath
+}
+
+storageProfilePathFrom.defaults =
+{
+  ... storageProfileNameFrom.defaults,
+}
+
+//
+
+function storageProfileNameMapFrom( o )
+{
+  let self = this;
+
+  if( _.strIs( arguments[ 0 ] ) )
+  o = { storageName : arguments[ 0 ] };
+  o = _.routineOptions( storageProfileNameMapFrom, o );
+
+  if( o.storageName === null )
+  o.storageName = self.storageProfileNameFrom( o );
+  if( o.storagePath === null )
+  o.storagePath = self.storageProfilePathFrom( o );
+
+  // if( o.storagePath === null )
+  // o.storagePath = self.configUserPath( o.storageName );
+
+  return o;
+}
+
+storageProfileNameMapFrom.defaults =
+{
+  ... storageProfileNameFrom.defaults,
+  // storageName : null,
+  // storagePath : null,
 }
 
 //
@@ -630,7 +788,7 @@ storageReset.defaults =
 function storageProfileRead( o )
 {
   let self = this;
-  let storageName, storagePath;
+  // let storageName, storagePath;
   try
   {
 
@@ -641,16 +799,16 @@ function storageProfileRead( o )
     _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
     _.assert( _.strIs( o.profileDir ), 'Expects defined {- o.profileDir -}' );
 
-    storageName = self.path.join( o.storageDir, o.profileDir );
+    self.storageProfileNameMapFrom( o );
+    // storageName = self.path.join( o.storageDir, o.profileDir );
+    // storagePath = self.configUserPath( storageName );
 
-    storagePath = self.configUserPath( storageName );
-
-    if( !self.fileExists( storagePath ) )
+    if( !self.fileExists( o.storagePath ) )
     return null;
 
     let result = self.filesRead
     ({
-      filePath : self.path.join( storagePath, '**' ),
+      filePath : self.path.join( o.storagePath, '**' ),
       encoding : _.unknown,
     });
 
@@ -658,14 +816,15 @@ function storageProfileRead( o )
   }
   catch( err )
   {
-    throw _.err( err, `\nFailed to read storage::${storageName} at ${storagePath}` );
+    throw _.err( err, `\nFailed to read storage::${o.storageName} at ${o.storagePath}` );
   }
 }
 
 storageProfileRead.defaults =
 {
-  storageDir : null,
-  profileDir : 'default',
+  ... storageProfileNameMapFrom.defaults,
+  // storageDir : null,
+  // profileDir : 'default',
 }
 
 //
@@ -673,7 +832,7 @@ storageProfileRead.defaults =
 function storageProfileReset( o )
 {
   let self = this;
-  let storageName, storagePath;
+  // let storageName, storagePath;
 
   try
   {
@@ -685,30 +844,126 @@ function storageProfileReset( o )
     _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
     _.assert( _.strIs( o.profileDir ), 'Expects defined {- o.profileDir -}' );
 
-    storageName = self.path.join( o.storageDir, o.profileDir );
+    // storageName = self.path.join( o.storageDir, o.profileDir );
 
-    storagePath = self.configUserPath( storageName );
+    let o2 = _.mapOnly( o, self.storageProfileNameMapFrom.defaults );
+    self.storageProfileNameMapFrom( o2 );
+    _.mapExtend( o, o2 );
 
-    if( self.fileExists( storagePath ) )
+    // storagePath = self.configUserPath( o.storageName );
+
+    if( self.fileExists( o.storagePath ) )
     self.filesDelete
     ({
-      filePath : storagePath,
+      filePath : o.storagePath,
       verbosity : o.verbosity ? 3 : 0,
     });
 
   }
   catch( err )
   {
-    throw _.err( err, `\nFailed to delete storage::${storageName} at ${storagePath}` );
+    throw _.err( err, `\nFailed to delete storage::${o.storageName} at ${o.storagePath}` );
   }
 
 }
 
 storageProfileReset.defaults =
 {
+  ... storageProfileNameMapFrom.defaults,
+  // storageDir : null,
+  // profileDir : 'default',
+  verbosity : 0,
+}
+
+//
+
+function storageTerminalNameFrom( o )
+{
+  let self = this;
+
+  if( _.strIs( arguments[ 0 ] ) )
+  o = { storageName : arguments[ 0 ] };
+  o = _.routineOptions( storageTerminalNameFrom, o );
+
+  _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
+  _.assert( _.strIs( o.profileDir ), 'Expects defined {- o.profileDir -}' );
+  _.assert( _.strIs( o.storageTerminalPrefix ), 'Expects defined {- o.storageTerminalPrefix -}' );
+  _.assert( _.strIs( o.storageTerminal ), 'Expects defined {- o.storageTerminal -}' );
+  _.assert( _.strIs( o.storageTerminalPostfix ), 'Expects defined {- o.storageTerminalPostfix -}' );
+
+  if( o.storageName === null )
+  o.storageName = self.path.join
+  (
+    o.storageDir,
+    o.profileDir,
+    o.storageTerminalPrefix + o.storageTerminal + o.storageTerminalPostfix,
+  );
+
+  _.assert( _.strDefined( o.storageName ) );
+
+  return o.storageName;
+}
+
+storageTerminalNameFrom.defaults =
+{
   storageDir : null,
   profileDir : 'default',
-  verbosity : 0,
+  storageTerminalPrefix : '',
+  storageTerminal : null,
+  storageTerminalPostfix : '',
+  storageName : null,
+  storagePath : null,
+}
+
+//
+
+function storageTerminalPathFrom( o )
+{
+  let self = this;
+
+  if( _.strIs( arguments[ 0 ] ) )
+  o = { storageName : arguments[ 0 ] };
+  o = _.routineOptions( storageTerminalPathFrom, o );
+
+  if( o.storagePath === null )
+  o.storagePath = self.configUserPath( o.storageName );
+
+  // return self.storageTerminalNameMapFrom( o ).storagePath;
+
+  return o.storagePath;
+}
+
+storageTerminalPathFrom.defaults =
+{
+  ... storageTerminalNameFrom.defaults,
+}
+
+//
+
+function storageTerminalNameMapFrom( o )
+{
+  let self = this;
+
+  if( _.strIs( arguments[ 0 ] ) )
+  o = { storageName : arguments[ 0 ] };
+  o = _.routineOptions( storageTerminalNameMapFrom, o );
+
+  if( o.storageName === null )
+  o.storageName = self.storageTerminalNameFrom( o );
+  if( o.storagePath === null )
+  o.storagePath = self.storageTerminalPathFrom( o );
+
+  // if( o.storagePath === null )
+  // o.storagePath = self.configUserPath( o.storageName );
+
+  return o;
+}
+
+storageTerminalNameMapFrom.defaults =
+{
+  ... storageTerminalNameFrom.defaults,
+  // storageName : null,
+  // storagePath : null,
 }
 
 //
@@ -716,7 +971,7 @@ storageProfileReset.defaults =
 function storageTerminalRead( o )
 {
   let self = this;
-  let storageName, storagePath;
+  // let storageName, storagePath;
   try
   {
 
@@ -724,27 +979,30 @@ function storageTerminalRead( o )
     o = { storageDir : arguments[ 0 ] };
     o = _.routineOptions( storageTerminalRead, o );
 
-    _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
-    _.assert( _.strIs( o.profileDir ), 'Expects defined {- o.profileDir -}' );
-    _.assert( _.strIs( o.storageTerminalPrefix ), 'Expects defined {- o.storageTerminalPrefix -}' );
-    _.assert( _.strIs( o.storageTerminal ), 'Expects defined {- o.storageTerminal -}' );
-    _.assert( _.strIs( o.storageTerminalPostfix ), 'Expects defined {- o.storageTerminalPostfix -}' );
+    // _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
+    // _.assert( _.strIs( o.profileDir ), 'Expects defined {- o.profileDir -}' );
+    // _.assert( _.strIs( o.storageTerminalPrefix ), 'Expects defined {- o.storageTerminalPrefix -}' );
+    // _.assert( _.strIs( o.storageTerminal ), 'Expects defined {- o.storageTerminal -}' );
+    // _.assert( _.strIs( o.storageTerminalPostfix ), 'Expects defined {- o.storageTerminalPostfix -}' );
+    //
+    // storageName = self.path.join
+    // (
+    //   o.storageDir,
+    //   o.profileDir,
+    //   o.storageTerminalPrefix + o.storageTerminal + o.storageTerminalPostfix,
+    // );
 
-    storageName = self.path.join
-    (
-      o.storageDir,
-      o.profileDir,
-      o.storageTerminalPrefix + o.storageTerminal + o.storageTerminalPostfix,
-    );
+    self.storageTerminalNameMapFrom( o );
 
-    storagePath = self.configUserPath( storageName );
+    // storageName = self.storageTerminalNameFrom( o );
+    // storagePath = self.configUserPath( storageName ); /* xxx */
 
-    if( !self.fileExists( storagePath ) )
+    if( !self.fileExists( o.storagePath ) )
     return null;
 
     return self.configUserRead
     ({
-      name : storageName,
+      name : o.storageName,
       locking : 0,
     });
 
@@ -752,17 +1010,18 @@ function storageTerminalRead( o )
   }
   catch( err )
   {
-    throw _.err( err, `\nFailed to read storage::${storageName} at ${storagePath}` );
+    throw _.err( err, `\nFailed to read storage::${o.storageName} at ${o.storagePath}` );
   }
 }
 
 storageTerminalRead.defaults =
 {
-  storageDir : null,
-  profileDir : 'default',
-  storageTerminalPrefix : '',
-  storageTerminal : null,
-  storageTerminalPostfix : '',
+  ... storageTerminalNameMapFrom.defaults,
+  // storageDir : null, /* xxx */
+  // profileDir : 'default',
+  // storageTerminalPrefix : '',
+  // storageTerminal : null,
+  // storageTerminalPostfix : '',
 }
 
 //
@@ -770,7 +1029,7 @@ storageTerminalRead.defaults =
 function storageTerminalOpen( o )
 {
   let self = this;
-  let storageName;
+  // let storageName;
   try
   {
 
@@ -778,22 +1037,26 @@ function storageTerminalOpen( o )
     o = { storageName : arguments[ 0 ] };
     o = _.routineOptions( storageTerminalOpen, o );
 
-    _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
-    _.assert( _.strIs( o.profileDir ), 'Expects defined {- o.profileDir -}' );
-    _.assert( _.strIs( o.storageTerminalPrefix ), 'Expects defined {- o.storageTerminalPrefix -}' );
-    _.assert( _.strIs( o.storageTerminal ), 'Expects defined {- o.storageTerminal -}' );
-    _.assert( _.strIs( o.storageTerminalPostfix ), 'Expects defined {- o.storageTerminalPostfix -}' );
+    // _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
+    // _.assert( _.strIs( o.profileDir ), 'Expects defined {- o.profileDir -}' );
+    // _.assert( _.strIs( o.storageTerminalPrefix ), 'Expects defined {- o.storageTerminalPrefix -}' );
+    // _.assert( _.strIs( o.storageTerminal ), 'Expects defined {- o.storageTerminal -}' );
+    // _.assert( _.strIs( o.storageTerminalPostfix ), 'Expects defined {- o.storageTerminalPostfix -}' );
+    //
+    // storageName = self.path.join
+    // (
+    //   o.storageDir,
+    //   o.profileDir,
+    //   o.storageTerminalPrefix + o.storageTerminal + o.storageTerminalPostfix,
+    // );
 
-    storageName = self.path.join
-    (
-      o.storageDir,
-      o.profileDir,
-      o.storageTerminalPrefix + o.storageTerminal + o.storageTerminalPostfix,
-    );
+    let o2 = _.mapOnly( o, self.storageTerminalNameFrom.defaults );
+    self.storageTerminalNameMapFrom( o2 );
+    _.mapExtend( o, o2 );
 
     o.storage = self.configUserRead
     ({
-      name : storageName,
+      name : o.storageName,
       locking : o.locking,
     });
 
@@ -801,9 +1064,9 @@ function storageTerminalOpen( o )
     {
       o.storage = o.onStorageConstruct( o );
       _.assert( _.mapIs( o.storage ) );
-      self.configUserWrite( storageName, o.storage );
+      self.configUserWrite( o.storageName, o.storage );
       if( o.locking )
-      self.configUserLock( storageName );
+      self.configUserLock( o.storageName );
     }
 
     return o;
@@ -812,17 +1075,18 @@ function storageTerminalOpen( o )
   {
     if( !o.throwing )
     return null;
-    throw _.err( err, `\nFailed to open storage::${storageName}` );
+    throw _.err( err, `\nFailed to open storage::${o.storageName}` );
   }
 }
 
 storageTerminalOpen.defaults =
 {
-  storageDir : null,
-  profileDir : 'default',
-  storageTerminalPrefix : '',
-  storageTerminal : null,
-  storageTerminalPostfix : '',
+  ... storageTerminalNameMapFrom.defaults,
+  // storageDir : null,
+  // profileDir : 'default',
+  // storageTerminalPrefix : '',
+  // storageTerminal : null,
+  // storageTerminalPostfix : '',
   onStorageConstruct : null,
   locking : 1,
   throwing : 1,
@@ -833,7 +1097,7 @@ storageTerminalOpen.defaults =
 function storageTerminalClose( o )
 {
   let self = this;
-  let storageName;
+  // let storageName;
 
   try
   {
@@ -843,22 +1107,30 @@ function storageTerminalClose( o )
     o = _.routineOptions( storageTerminalClose, o );
 
     _.assert( _.mapIs( o.storage ), 'Expects defined {- o.storage -}' );
-    _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
-    _.assert( _.strIs( o.profileDir ), 'Expects defined {- o.profileDir -}' );
-    _.assert( _.strIs( o.storageTerminalPrefix ), 'Expects defined {- o.storageTerminalPrefix -}' );
-    _.assert( _.strIs( o.storageTerminal ), 'Expects defined {- o.storageTerminal -}' );
-    _.assert( _.strIs( o.storageTerminalPostfix ), 'Expects defined {- o.storageTerminalPostfix -}' );
+    // _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
+    // _.assert( _.strIs( o.profileDir ), 'Expects defined {- o.profileDir -}' );
+    // _.assert( _.strIs( o.storageTerminalPrefix ), 'Expects defined {- o.storageTerminalPrefix -}' );
+    // _.assert( _.strIs( o.storageTerminal ), 'Expects defined {- o.storageTerminal -}' );
+    // _.assert( _.strIs( o.storageTerminalPostfix ), 'Expects defined {- o.storageTerminalPostfix -}' );
+    //
+    // storageName = self.path.join
+    // (
+    //   o.storageDir,
+    //   o.profileDir,
+    //   o.storageTerminalPrefix + o.storageTerminal + o.storageTerminalPostfix,
+    // );
 
-    storageName = self.path.join
-    (
-      o.storageDir,
-      o.profileDir,
-      o.storageTerminalPrefix + o.storageTerminal + o.storageTerminalPostfix,
-    );
+    // let o2 = _.mapOnly( o, self.storageTerminalNameFrom.defaults );
+    // storageName = self.storageTerminalNameFrom( o2 );
+    // _.mapExtend( o, o2 );
+
+    let o2 = _.mapOnly( o, self.storageTerminalNameFrom.defaults );
+    self.storageTerminalNameMapFrom( o2 );
+    _.mapExtend( o, o2 );
 
     o.storage = self.configUserWrite
     ({
-      name : storageName,
+      name : o.storageName,
       structure : o.storage,
       unlocking : o.locking,
     });
@@ -884,7 +1156,7 @@ storageTerminalClose.defaults =
 function storageTerminalReset( o )
 {
   let self = this;
-  let storageName, storagePath;
+  // let storageName, storagePath;
 
   try
   {
@@ -893,43 +1165,48 @@ function storageTerminalReset( o )
     o = { storageDir : arguments[ 0 ] };
     o = _.routineOptions( storageTerminalReset, o );
 
-    _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
-    _.assert( _.strIs( o.profileDir ), 'Expects defined {- o.profileDir -}' );
-    _.assert( _.strIs( o.storageTerminalPrefix ), 'Expects defined {- o.storageTerminalPrefix -}' );
-    _.assert( _.strIs( o.storageTerminal ), 'Expects defined {- o.storageTerminal -}' );
-    _.assert( _.strIs( o.storageTerminalPostfix ), 'Expects defined {- o.storageTerminalPostfix -}' );
+    // _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
+    // _.assert( _.strIs( o.profileDir ), 'Expects defined {- o.profileDir -}' );
+    // _.assert( _.strIs( o.storageTerminalPrefix ), 'Expects defined {- o.storageTerminalPrefix -}' );
+    // _.assert( _.strIs( o.storageTerminal ), 'Expects defined {- o.storageTerminal -}' );
+    // _.assert( _.strIs( o.storageTerminalPostfix ), 'Expects defined {- o.storageTerminalPostfix -}' );
+    //
+    // storageName = self.path.join
+    // (
+    //   o.storageDir,
+    //   o.profileDir,
+    //   o.storageTerminalPrefix + o.storageTerminal + o.storageTerminalPostfix,
+    // );
 
-    storageName = self.path.join
-    (
-      o.storageDir,
-      o.profileDir,
-      o.storageTerminalPrefix + o.storageTerminal + o.storageTerminalPostfix,
-    );
+    let o2 = _.mapOnly( o, self.storageTerminalNameMapFrom.defaults );
+    self.storageTerminalNameMapFrom( o2 );
+    _.mapExtend( o, o2 );
 
-    storagePath = self.configUserPath( storageName );
+    // o.storagePath = self.configUserPath( o.storageName );
 
-    if( self.fileExists( storagePath ) )
+    if( self.fileExists( o.storagePath ) )
     self.filesDelete
     ({
-      filePath : storagePath,
+      filePath : o.storagePath,
       verbosity : o.verbosity ? 3 : 0,
     });
 
   }
   catch( err )
   {
-    throw _.err( err, `\nFailed to delete storage::${storageName} at ${storagePath}` );
+    throw _.err( err, `\nFailed to delete storage::${o.storageName} at ${o.storagePath}` );
   }
 
 }
 
 storageTerminalReset.defaults =
 {
-  storageDir : null,
-  profileDir : 'default',
-  storageTerminalPrefix : '',
-  storageTerminal : null,
-  storageTerminalPostfix : '',
+  ... storageTerminalNameMapFrom.defaults,
+  // storageDir : null,
+  // profileDir : 'default',
+  // storageTerminalPrefix : '',
+  // storageTerminal : null,
+  // storageTerminalPostfix : '',
   verbosity : 0,
 }
 
@@ -978,12 +1255,21 @@ let Supplement =
 
   // storage
 
+  storageNameFrom,
+  storagePathFrom,
+  storageNameMapFrom,
   storageRead,
   storageReset,
 
+  storageProfileNameFrom,
+  storageProfilePathFrom,
+  storageProfileNameMapFrom,
   storageProfileRead,
   storageProfileReset,
 
+  storageTerminalNameFrom,
+  storageTerminalPathFrom,
+  storageTerminalNameMapFrom,
   storageTerminalRead,
   storageTerminalOpen,
   storageTerminalClose,

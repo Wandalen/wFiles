@@ -318,6 +318,7 @@ function verify2()
 
   /* */
 
+  /* xxx qqq : allowingDiscrepancy should be similar to !dstRewritingOnlyPreserving */
   if( _.boolLikeFalse( o.allowingDiscrepancy ) )
   debugger;
   if( _.boolLikeFalse( o.allowingDiscrepancy ) ) /* qqq : cover */

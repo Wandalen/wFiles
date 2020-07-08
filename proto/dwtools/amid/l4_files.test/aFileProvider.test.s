@@ -27312,7 +27312,7 @@ function softLinkToParentDirectorySync( test )
     return;
   }
 
-  var routinePath = test.context.pathFor( 'written/softLinkToParentDirectorySync' );
+  var routinePath = a.abs( 'written/softLinkToParentDirectorySync' );
   var srcPath, dstPath, dst2Path;
 
   if( !provider.statResolvedRead( routinePath ) )
@@ -27442,7 +27442,8 @@ function softLinkToParentDirectorySync( test )
 function softLinkToParentDirectoryAsync( test )
 {
   let context = this;
-  let provider = context.provider;
+  let a = context.assetFor( test, false );
+  let provider = a.fileProvider;
   let path = provider.path;
 
   if( !_.routineIs( provider.softLinkAct ) )
@@ -27459,8 +27460,8 @@ function softLinkToParentDirectoryAsync( test )
     return;
   }
 
-  var routinePath = test.context.pathFor( 'written/softLinkToParentDirectoryAsync' );
-  var srcPath,dstPath,dst2Path;
+  var routinePath = a.abs( 'written/softLinkToParentDirectoryAsync' );
+  var srcPath, dstPath, dst2Path;
   var con = new _.Consequence().take( null )
 
   .then( () =>
@@ -27473,8 +27474,9 @@ function softLinkToParentDirectoryAsync( test )
   .then( () =>
   {
     test.case = 'absolute paths';
-    srcPath  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir' );
-    dstPath  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir/link' );
+    a.reflect();
+    srcPath  = a.abs( 'written/softLinkToParentDirectoryAsync/dir' );
+    dstPath  = a.abs( 'written/softLinkToParentDirectoryAsync/dir/link' );
     provider.dirMake( srcPath );
     return provider.softLink
     ({
@@ -27494,8 +27496,9 @@ function softLinkToParentDirectoryAsync( test )
   .then( () =>
   {
     test.case = 'absolute paths';
-    srcPath  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir' );
-    dstPath  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir/link' );
+    a.reflect();
+    srcPath  = a.abs( 'written/softLinkToParentDirectoryAsync/dir' );
+    dstPath  = a.abs( 'written/softLinkToParentDirectoryAsync/dir/link' );
     provider.dirMake( srcPath );
     return provider.softLink
     ({
@@ -27515,8 +27518,9 @@ function softLinkToParentDirectoryAsync( test )
   .then( () =>
   {
     test.case = 'dst relative';
-    srcPath  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir' );
-    dstPath  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir/link' );
+    a.reflect();
+    srcPath  = a.abs( 'written/softLinkToParentDirectoryAsync/dir' );
+    dstPath  = a.abs( 'written/softLinkToParentDirectoryAsync/dir/link' );
     provider.dirMake( srcPath );
     return provider.softLink
     ({
@@ -27536,8 +27540,9 @@ function softLinkToParentDirectoryAsync( test )
   .then( () =>
   {
     test.case = 'src relative';
-    srcPath  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir' );
-    dstPath  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir/link' );
+    a.reflect();
+    srcPath  = a.abs( 'written/softLinkToParentDirectoryAsync/dir' );
+    dstPath  = a.abs( 'written/softLinkToParentDirectoryAsync/dir/link' );
     provider.dirMake( srcPath );
     return provider.softLink
     ({
@@ -27557,9 +27562,10 @@ function softLinkToParentDirectoryAsync( test )
   .then( () =>
   {
     test.case = 'dir -> link -> link';
-    srcPath  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir' );
-    dstPath  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir/link' );
-    dst2Path  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir/link/link2' );
+    a.reflect();
+    srcPath  = a.abs( 'written/softLinkToParentDirectoryAsync/dir' );
+    dstPath  = a.abs( 'written/softLinkToParentDirectoryAsync/dir/link' );
+    dst2Path  = a.abs( 'written/softLinkToParentDirectoryAsync/dir/link/link2' );
     provider.dirMake( srcPath );
     return provider.softLink
     ({
@@ -27590,9 +27596,10 @@ function softLinkToParentDirectoryAsync( test )
   .then( () =>
   {
     test.case = 'dir -> link -> link, relative paths';
-    srcPath  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir' );
-    dstPath  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir/link' );
-    dst2Path  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir/link/link2' );
+    a.reflect();
+    srcPath  = a.abs( 'written/softLinkToParentDirectoryAsync/dir' );
+    dstPath  = a.abs( 'written/softLinkToParentDirectoryAsync/dir/link' );
+    dst2Path  = a.abs( 'written/softLinkToParentDirectoryAsync/dir/link/link2' );
     provider.dirMake( srcPath );
     return provider.softLink
     ({
@@ -27623,9 +27630,10 @@ function softLinkToParentDirectoryAsync( test )
   .then( () =>
   {
     test.case = 'dir -> link -> link, relative paths';
-    srcPath  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir' );
-    dstPath  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir/link' );
-    dst2Path  = test.context.pathFor( 'written/softLinkToParentDirectoryAsync/dir/link/link2' );
+    a.reflect();
+    srcPath  = a.abs( 'written/softLinkToParentDirectoryAsync/dir' );
+    dstPath  = a.abs( 'written/softLinkToParentDirectoryAsync/dir/link' );
+    dst2Path  = a.abs( 'written/softLinkToParentDirectoryAsync/dir/link/link2' );
     provider.dirMake( srcPath );
     return provider.softLink
     ({

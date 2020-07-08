@@ -327,7 +327,7 @@ function verify2()
   if( !self.filesAreSameForSure( c.options2.srcPath, c.options2.dstPath, false ) ) /* qqq xxx : optimize */
   if( Number( c.srcResolvedStat.size ) !== 0 )
   {
-    debugger
+    debugger;
     throw _.err
     (
       'Cant\'t rewrite destination file by source file, because they have different content and option::allowingDiscrepancy is false\n'
@@ -1389,7 +1389,7 @@ functor.defaults =
 let Proto =
 {
   contextMake,
-  functor
+  functor,
 }
 
 _.mapExtend( Self, Proto )

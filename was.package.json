@@ -12,8 +12,8 @@
     { "name" : "Volodymyr M.", "email" : "volodymyr.migdal@gmail.com" },
     { "name" : "Ihor Ostash", "email" : "iostashvxi@gmail.com" }
   ],
-  "main" : "proto/dwtools/amid/l4_files/entry/Files.s",
-  "files" : [ "proto/dwtools/amid/l4_files", "proto/dwtools/Tools.s", "out" ],
+  "main" : "proto/wtools/amid/l4_files/entry/Files.s",
+  "files" : [ "proto/wtools/amid/l4_files", "proto/wtools/Tools.s", "out" ],
   "scripts" : { "test" : "wtest .run 'proto/**'", "docgen" : "wdocgen proto" },
   "repository" : { "type" : "git", "url" : "https://github.com/Wandalen/wFiles.git" },
   "bugs" :

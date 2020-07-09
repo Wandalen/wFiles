@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title> FileProvider.SimpleSctucture unit test </title>
+    <script src="../../../../node_modules/wTools/staging/wtools/abase/l1/aFundamental.s"></script>
+    <script src="../../../../node_modules/wTools/staging/wtools/abase/l1/cDiagnostics.s"></script>
+    <script src="../../../../node_modules/wTools/staging/wtools/abase/l1/eFieldMapper.s"></script>
+    <script src="../../../../node_modules/wTools/staging/wtools/abase/l1/kArrayDescriptor.s"></script>
+    <script src="../../../../node_modules/wTools/staging/wtools/abase/l1/zSetup.s"></script>
+    <script src="../../../../node_modules/wTools/staging/wtools/abase/l2/fNameTools.s"></script>
+    <script src="../../../../node_modules/wTools/staging/wtools/abase/l2/fExecTools.s"></script>
+    <script src="../../../../node_modules/wTools/staging/wtools/abase/l2/fStringTools.s"></script>
+    <script src="../../../../node_modules/wTools/staging/wtools/abase/l4/aStringer.s"></script>
+    <script src="../../../../node_modules/wTools/staging/wtools/abase/l2/fIncludeTools.s"></script>
+
+    <script src="../../../../node_modules/wPathBasic/staging/wtools/l3/Path.s"></script>
+    <script src="../../../../node_modules/wProto/staging/wtools/l3/Proto.s"></script>
+    <script src="../../../../node_modules/wcloner/staging/wtools/abase/l5/Cloner.s"></script>
+    <script src="../../../../node_modules/wCopyable/staging/wtools/abase/l7_mixin/Copyable.s"></script>
+    <script src="../../../../node_modules/winstancing/staging/wtools/abase/l7_mixin/Instancing.s"></script>
+    <script src="../../../../node_modules/wConsequence/staging/wtools/abase/l9/consequence/Consequence.s"></script>
+    <script src="../../../../node_modules/wColor/staging/wtools/amid/color/Color.s"></script>
+    <script src="../../../../node_modules/wRegexpObject/staging/wtools/abase/l9/consequence/RegexpObject.s"></script>
+    <script src="../../../../node_modules/wfieldsstack/staging/wtools/abase/l7_mixin/FieldsStack.s"></script>
+
+    <script src="../files/UseBase.s"></script>
+    <script src="../files/UseMid.s"></script>
+    <script src="../files/UseTop.s"></script>
+    <script src="../files/alayer1/FileRecordFactory.s"></script>
+    <script src="../files/alayer1/FileRecord.s"></script>
+    <script src="../files/alayer1/FileStat.s"></script>
+    <script src="../files/fprovider/aAbstract.s"></script>
+    <script src="../files/fprovider/aPartial.s"></script>
+    <script src="../files/fprovider/mFindMixin.s"></script>
+    <script src="../files/fprovider/mSecondaryMixin.s"></script>
+    <script src="../files/fprovider/pExtract.s"></script>
+
+    <script src="../../../../node_modules/wLogger/staging/wtools/abase/l9/logger/aChainingMixin.s"></script>
+    <script src="../../../../node_modules/wLogger/staging/wtools/abase/l9/logger/aColoredMixin.s"></script>
+    <script src="../../../../node_modules/wLogger/staging/wtools/abase/l9/logger/PrinterBase.s"></script>
+    <script src="../../../../node_modules/wLogger/staging/wtools/abase/l9/logger/LoggerMid.s"></script>
+    <script src="../../../../node_modules/wLogger/staging/wtools/abase/l9/logger/LoggerTop.s"></script>
+    <script src="../../../../node_modules/wLogger/staging/wtools/abase/l9/logger/entry/Logger.s"></script>
+
+    <script src="../../../../node_modules/wTesting/staging/wtools/atop/tester/aTestSuit.debug.s"></script>
+    <script src="../../../../node_modules/wTesting/staging/wtools/atop/tester/bTestRoutine.debug.s"></script>
+    <script src="../../../../node_modules/wTesting/staging/wtools/atop/tester/cTester.debug.s"></script>
+
+    <script src="./aFileProvider.test.s"></script>
+    <script src="./Provider.Extract.test.s"></script>
+  </head>
+  <body>
+    <script>
+      var _ = _global_.wTools;
+      wTester.verbosity = 10;
+      wTester.testAll();
+    </script>
+  </body>
+</html>

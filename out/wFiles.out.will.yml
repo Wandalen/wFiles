@@ -57,10 +57,10 @@ module:
       npm.scripts:
         test: wtest .run proto/**
         test2: >-
-          wtest .run proto/**/dwtools/amid/file.test/Provider.HardDrive.test.ss
+          wtest .run proto/**/wtools/amid/file.test/Provider.HardDrive.test.ss
           routine : linkHardSyncRunner
         test3: >-
-          wtest .run proto/**/dwtools/amid/file.test/Provider.HardDrive.test.ss
+          wtest .run proto/**/wtools/amid/file.test/Provider.HardDrive.test.ss
           routine : linkHardAsyncRunner
         docgen: wdocgen .build proto
     path:
@@ -142,7 +142,7 @@ module:
       entry.proto.no.tests:
         criterion:
           tests: no.tests
-        path: ../proto/dwtools/amid/l4_files/entry/Files.s
+        path: ../proto/wtools/amid/l4_files/entry/Files.s
       entry.proto.only.tests:
         criterion:
           tests: only.tests
@@ -152,13 +152,13 @@ module:
           debug: debug
           raw: raw
           content: prime
-        path: '{path::out.*=1}/source/dwtools/amid/l4_files/entry/Files.s'
+        path: '{path::out.*=1}/source/wtools/amid/l4_files/entry/Files.s'
       entry.out.raw.debug.release:
         criterion:
           debug: release
           raw: raw
           content: prime
-        path: '{path::out.*=1}/source/dwtools/amid/l4_files/entry/Files.s'
+        path: '{path::out.*=1}/source/wtools/amid/l4_files/entry/Files.s'
       entry.out.compiled.debug.debug:
         criterion:
           debug: debug
@@ -185,96 +185,96 @@ module:
         path:
           - ../proto
           - ../proto/Integration.test.s
-          - ../proto/dwtools
-          - ../proto/dwtools/Tools.s
-          - ../proto/dwtools/abase
-          - ../proto/dwtools/amid
-          - ../proto/dwtools/amid/l4_files
-          - ../proto/dwtools/amid/l4_files/entry
-          - ../proto/dwtools/amid/l4_files/entry/Extract.s
-          - ../proto/dwtools/amid/l4_files/entry/Files.s
-          - ../proto/dwtools/amid/l4_files/entry/Git.ss
-          - ../proto/dwtools/amid/l4_files/entry/HardDrive.ss
-          - ../proto/dwtools/amid/l4_files/entry/Http.s
-          - ../proto/dwtools/amid/l4_files/entry/Imap.ss
-          - ../proto/dwtools/amid/l4_files/entry/Npm.ss
-          - ../proto/dwtools/amid/l4_files/entry/Reroot.s
-          - ../proto/dwtools/amid/l4_files/include
-          - ../proto/dwtools/amid/l4_files/include/Basic.s
-          - ../proto/dwtools/amid/l4_files/include/Extract.s
-          - ../proto/dwtools/amid/l4_files/include/Git.ss
-          - ../proto/dwtools/amid/l4_files/include/HardDrive.ss
-          - ../proto/dwtools/amid/l4_files/include/Http.s
-          - ../proto/dwtools/amid/l4_files/include/Imap.ss
-          - ../proto/dwtools/amid/l4_files/include/Mid.s
-          - ../proto/dwtools/amid/l4_files/include/MixinConfig.s
-          - ../proto/dwtools/amid/l4_files/include/MixinFind.s
-          - ../proto/dwtools/amid/l4_files/include/MixinSecondary.s
-          - ../proto/dwtools/amid/l4_files/include/Npm.ss
-          - ../proto/dwtools/amid/l4_files/include/Reroot.s
-          - ../proto/dwtools/amid/l4_files/include/Top.s
-          - ../proto/dwtools/amid/l4_files/l1
-          - ../proto/dwtools/amid/l4_files/l1/Namespace.s
-          - ../proto/dwtools/amid/l4_files/l2
-          - ../proto/dwtools/amid/l4_files/l2/Encoder.s
-          - ../proto/dwtools/amid/l4_files/l2/Encoders.s
-          - ../proto/dwtools/amid/l4_files/l2/Linker.s
-          - ../proto/dwtools/amid/l4_files/l2/RecordContext.s
-          - ../proto/dwtools/amid/l4_files/l3
-          - ../proto/dwtools/amid/l4_files/l3/Path.s
-          - ../proto/dwtools/amid/l4_files/l3/Path.ss
-          - ../proto/dwtools/amid/l4_files/l3/Record.s
-          - ../proto/dwtools/amid/l4_files/l3/RecordFactory.s
-          - ../proto/dwtools/amid/l4_files/l3/RecordFilter.s
-          - ../proto/dwtools/amid/l4_files/l3/StatClass.s
-          - ../proto/dwtools/amid/l4_files/l3/StatNamespace.s
-          - ../proto/dwtools/amid/l4_files/l4
-          - ../proto/dwtools/amid/l4_files/l4/Abstract.s
-          - ../proto/dwtools/amid/l4_files/l4/Carriage.s
-          - ../proto/dwtools/amid/l4_files/l4/Carrier.s
-          - ../proto/dwtools/amid/l4_files/l5
-          - ../proto/dwtools/amid/l4_files/l5/Partial.s
-          - ../proto/dwtools/amid/l4_files/l6
-          - ../proto/dwtools/amid/l4_files/l6/FindMixin.s
-          - ../proto/dwtools/amid/l4_files/l6/System.s
-          - ../proto/dwtools/amid/l4_files/l7
-          - ../proto/dwtools/amid/l4_files/l7/ConfigMixin.s
-          - ../proto/dwtools/amid/l4_files/l7/SecondaryMixin.s
-          - ../proto/dwtools/amid/l4_files/l7_provider
-          - ../proto/dwtools/amid/l4_files/l7_provider/Extract.s
-          - ../proto/dwtools/amid/l4_files/l7_provider/Git.ss
-          - ../proto/dwtools/amid/l4_files/l7_provider/HardDrive.ss
-          - ../proto/dwtools/amid/l4_files/l7_provider/Http.js
-          - ../proto/dwtools/amid/l4_files/l7_provider/Http.ss
-          - ../proto/dwtools/amid/l4_files/l7_provider/Imap.ss
-          - ../proto/dwtools/amid/l4_files/l7_provider/Npm.ss
-          - ../proto/dwtools/amid/l4_files/l8_filter
-          - ../proto/dwtools/amid/l4_files/l8_filter/Image.s
-          - ../proto/dwtools/amid/l4_files/l8_filter/Reroot.s
-          - ../proto/dwtools/amid/l4_files/l9
-          - ../proto/dwtools/amid/l4_files/l9/Namespace.s
-          - ../proto/dwtools/amid/l4_files.test
-          - ../proto/dwtools/amid/l4_files.test/aFileProvider.test.s
+          - ../proto/wtools
+          - ../proto/wtools/Tools.s
+          - ../proto/wtools/abase
+          - ../proto/wtools/amid
+          - ../proto/wtools/amid/l4_files
+          - ../proto/wtools/amid/l4_files/entry
+          - ../proto/wtools/amid/l4_files/entry/Extract.s
+          - ../proto/wtools/amid/l4_files/entry/Files.s
+          - ../proto/wtools/amid/l4_files/entry/Git.ss
+          - ../proto/wtools/amid/l4_files/entry/HardDrive.ss
+          - ../proto/wtools/amid/l4_files/entry/Http.s
+          - ../proto/wtools/amid/l4_files/entry/Imap.ss
+          - ../proto/wtools/amid/l4_files/entry/Npm.ss
+          - ../proto/wtools/amid/l4_files/entry/Reroot.s
+          - ../proto/wtools/amid/l4_files/include
+          - ../proto/wtools/amid/l4_files/include/Basic.s
+          - ../proto/wtools/amid/l4_files/include/Extract.s
+          - ../proto/wtools/amid/l4_files/include/Git.ss
+          - ../proto/wtools/amid/l4_files/include/HardDrive.ss
+          - ../proto/wtools/amid/l4_files/include/Http.s
+          - ../proto/wtools/amid/l4_files/include/Imap.ss
+          - ../proto/wtools/amid/l4_files/include/Mid.s
+          - ../proto/wtools/amid/l4_files/include/MixinConfig.s
+          - ../proto/wtools/amid/l4_files/include/MixinFind.s
+          - ../proto/wtools/amid/l4_files/include/MixinSecondary.s
+          - ../proto/wtools/amid/l4_files/include/Npm.ss
+          - ../proto/wtools/amid/l4_files/include/Reroot.s
+          - ../proto/wtools/amid/l4_files/include/Top.s
+          - ../proto/wtools/amid/l4_files/l1
+          - ../proto/wtools/amid/l4_files/l1/Namespace.s
+          - ../proto/wtools/amid/l4_files/l2
+          - ../proto/wtools/amid/l4_files/l2/Encoder.s
+          - ../proto/wtools/amid/l4_files/l2/Encoders.s
+          - ../proto/wtools/amid/l4_files/l2/Linker.s
+          - ../proto/wtools/amid/l4_files/l2/RecordContext.s
+          - ../proto/wtools/amid/l4_files/l3
+          - ../proto/wtools/amid/l4_files/l3/Path.s
+          - ../proto/wtools/amid/l4_files/l3/Path.ss
+          - ../proto/wtools/amid/l4_files/l3/Record.s
+          - ../proto/wtools/amid/l4_files/l3/RecordFactory.s
+          - ../proto/wtools/amid/l4_files/l3/RecordFilter.s
+          - ../proto/wtools/amid/l4_files/l3/StatClass.s
+          - ../proto/wtools/amid/l4_files/l3/StatNamespace.s
+          - ../proto/wtools/amid/l4_files/l4
+          - ../proto/wtools/amid/l4_files/l4/Abstract.s
+          - ../proto/wtools/amid/l4_files/l4/Carriage.s
+          - ../proto/wtools/amid/l4_files/l4/Carrier.s
+          - ../proto/wtools/amid/l4_files/l5
+          - ../proto/wtools/amid/l4_files/l5/Partial.s
+          - ../proto/wtools/amid/l4_files/l6
+          - ../proto/wtools/amid/l4_files/l6/FindMixin.s
+          - ../proto/wtools/amid/l4_files/l6/System.s
+          - ../proto/wtools/amid/l4_files/l7
+          - ../proto/wtools/amid/l4_files/l7/ConfigMixin.s
+          - ../proto/wtools/amid/l4_files/l7/SecondaryMixin.s
+          - ../proto/wtools/amid/l4_files/l7_provider
+          - ../proto/wtools/amid/l4_files/l7_provider/Extract.s
+          - ../proto/wtools/amid/l4_files/l7_provider/Git.ss
+          - ../proto/wtools/amid/l4_files/l7_provider/HardDrive.ss
+          - ../proto/wtools/amid/l4_files/l7_provider/Http.js
+          - ../proto/wtools/amid/l4_files/l7_provider/Http.ss
+          - ../proto/wtools/amid/l4_files/l7_provider/Imap.ss
+          - ../proto/wtools/amid/l4_files/l7_provider/Npm.ss
+          - ../proto/wtools/amid/l4_files/l8_filter
+          - ../proto/wtools/amid/l4_files/l8_filter/Image.s
+          - ../proto/wtools/amid/l4_files/l8_filter/Reroot.s
+          - ../proto/wtools/amid/l4_files/l9
+          - ../proto/wtools/amid/l4_files/l9/Namespace.s
+          - ../proto/wtools/amid/l4_files.test
+          - ../proto/wtools/amid/l4_files.test/aFileProvider.test.s
           - >-
-            ../proto/dwtools/amid/l4_files.test/aFileProviderSystemDefault.test.s
-          - ../proto/dwtools/amid/l4_files.test/aFilesFind.test.s
-          - ../proto/dwtools/amid/l4_files.test/Extract.html
-          - ../proto/dwtools/amid/l4_files.test/Extract.test.s
-          - ../proto/dwtools/amid/l4_files.test/FilesFind.Extract.test.s
-          - ../proto/dwtools/amid/l4_files.test/FilesFind.HardDrive.test.ss
-          - ../proto/dwtools/amid/l4_files.test/FilesGraph.test.s
-          - ../proto/dwtools/amid/l4_files.test/Git.test.ss
-          - ../proto/dwtools/amid/l4_files.test/HardDrive.test.ss
-          - ../proto/dwtools/amid/l4_files.test/Npm.test.ss
-          - ../proto/dwtools/amid/l4_files.test/Path.test.ss
-          - ../proto/dwtools/amid/l4_files.test/Record.test.s
-          - ../proto/dwtools/amid/l4_files.test/RecordFilter.test.s
-          - ../proto/dwtools/amid/l4_files.test/Secondary.test.s
-          - ../proto/dwtools/amid/l4_files.test/Secondary.test.ss
-          - ../proto/dwtools/amid/l4_files.test/SystemDefaultExtract.test.s
-          - ../proto/dwtools/amid/l4_files.test/SystemDefaultHardDrive.test.ss
-          - ../proto/dwtools/amid/l4_files.test/testCasesTable.txt
-          - ../proto/dwtools/atop
+            ../proto/wtools/amid/l4_files.test/aFileProviderSystemDefault.test.s
+          - ../proto/wtools/amid/l4_files.test/aFilesFind.test.s
+          - ../proto/wtools/amid/l4_files.test/Extract.html
+          - ../proto/wtools/amid/l4_files.test/Extract.test.s
+          - ../proto/wtools/amid/l4_files.test/FilesFind.Extract.test.s
+          - ../proto/wtools/amid/l4_files.test/FilesFind.HardDrive.test.ss
+          - ../proto/wtools/amid/l4_files.test/FilesGraph.test.s
+          - ../proto/wtools/amid/l4_files.test/Git.test.ss
+          - ../proto/wtools/amid/l4_files.test/HardDrive.test.ss
+          - ../proto/wtools/amid/l4_files.test/Npm.test.ss
+          - ../proto/wtools/amid/l4_files.test/Path.test.ss
+          - ../proto/wtools/amid/l4_files.test/Record.test.s
+          - ../proto/wtools/amid/l4_files.test/RecordFilter.test.s
+          - ../proto/wtools/amid/l4_files.test/Secondary.test.s
+          - ../proto/wtools/amid/l4_files.test/Secondary.test.ss
+          - ../proto/wtools/amid/l4_files.test/SystemDefaultExtract.test.s
+          - ../proto/wtools/amid/l4_files.test/SystemDefaultHardDrive.test.ss
+          - ../proto/wtools/amid/l4_files.test/testCasesTable.txt
+          - ../proto/wtools/atop
     submodule:
       wTools:
         path: 'npm:///wTools'
@@ -1043,10 +1043,10 @@ module:
       npm.scripts:
         test: wtest .run proto/**
         test2: >-
-          wtest .run proto/**/dwtools/amid/file.test/Provider.HardDrive.test.ss
+          wtest .run proto/**/wtools/amid/file.test/Provider.HardDrive.test.ss
           routine : linkHardSyncRunner
         test3: >-
-          wtest .run proto/**/dwtools/amid/file.test/Provider.HardDrive.test.ss
+          wtest .run proto/**/wtools/amid/file.test/Provider.HardDrive.test.ss
           routine : linkHardAsyncRunner
         docgen: wdocgen .build proto
     path:
@@ -1128,7 +1128,7 @@ module:
       entry.proto.no.tests:
         criterion:
           tests: no.tests
-        path: proto/dwtools/amid/l4_files/entry/Files.s
+        path: proto/wtools/amid/l4_files/entry/Files.s
       entry.proto.only.tests:
         criterion:
           tests: only.tests
@@ -1138,13 +1138,13 @@ module:
           debug: debug
           raw: raw
           content: prime
-        path: '{path::out.*=1}/source/dwtools/amid/l4_files/entry/Files.s'
+        path: '{path::out.*=1}/source/wtools/amid/l4_files/entry/Files.s'
       entry.out.raw.debug.release:
         criterion:
           debug: release
           raw: raw
           content: prime
-        path: '{path::out.*=1}/source/dwtools/amid/l4_files/entry/Files.s'
+        path: '{path::out.*=1}/source/wtools/amid/l4_files/entry/Files.s'
       entry.out.compiled.debug.debug:
         criterion:
           debug: debug

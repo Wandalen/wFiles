@@ -2785,7 +2785,7 @@ function fileRead_body( o )
 {
   let self = this;
   let result = null;
-
+  debugger;
   if( o.encoding === _.unknown ) /* qqq : cover */
   o.encoding = _.files.encoder.deduce({ filePath : o.filePath, returning : 'name', criterion : { reader : true } });
 

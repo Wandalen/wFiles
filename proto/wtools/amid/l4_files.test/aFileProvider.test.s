@@ -50966,21 +50966,21 @@ function hardLinkReturnThrowing0Sync( test )
  - src does not exist, directory exists
  - src === dst, src is directory
 
-// rewriting : 0 (2){rewriting : 0, makingDirectory : 1}
+// rewriting (2){rewriting : 0, makingDirectory : 1}
  - dst exists, is not hard linked
  - dst exists, is hard linked with itself ?(тут не потрібно, перевірити наявність в попередній рутині)
 
-// rewritingDirs : 0 (1){rewriting : 1, rewritingDirs : 0, makingDirectory : 1}
+// rewritingDirs (1){rewriting : 1, rewritingDirs : 0, makingDirectory : 1}
  - dst exists, dst is directory
 
-// makingDirectory : 0 (1){rewriting : 1, rewritingDirs : 1, makingDirectory : 0}
+// makingDirectory (1){rewriting : 1, rewritingDirs : 1, makingDirectory : 0}
  - dir for dst does not exist
 
-// allowingMissed{rewriting : 1, rewritingDirs : 1, makingDirectory : 1, allowingMissed : 0, allowingCycled : 1}
+// allowingMissed {rewriting : 1, rewritingDirs : 1, makingDirectory : 1, allowingMissed : 0, allowingCycled : 1}
  - resolvingSrcSoftLink : 1
  - resolvingDstSoftLink : 1(додати також в попередню тест рутину із allowingMissed : 1)
 
-// allowingCycled{rewriting : 1, rewritingDirs : 1, makingDirectory : 1, allowingMissed : 1, allowingCycled : 0}
+// allowingCycled {rewriting : 1, rewritingDirs : 1, makingDirectory : 1, allowingMissed : 1, allowingCycled : 0}
  - resolvingSrcSoftLink : 1
  - resolvingDstSoftLink : 1(додати також в попередню тест рутину із allowingCycled : 1)
 
@@ -51024,23 +51024,6 @@ total : 11
     });
     test.identical( got, null );
     test.identical( a.fileProvider.areHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), false );
-
-    /* */
-
-    // test.case = 'src === dst, src is not directory';
-    // a.reflect();
-    // a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-    // var got = a.fileProvider.hardLink
-    // ({
-    //   dstPath : a.abs( 'src' ),
-    //   srcPath : a.abs( 'src' ),
-    //   throwing : 0,
-    //   rewriting : 0,
-    //   rewritingDirs : 1,
-    //   makingDirectory : 1,
-    // });
-    // test.identical( got, null );
-    // test.identical( a.fileProvider.areHardLinked( a.abs( 'src' ), a.abs( 'src' ) ), false );
     
     /* */
 
@@ -51788,25 +51771,23 @@ function softLinkReturnThrowing0Sync( test )
  - resolvingSrcSoftLink : 1
  - resolvingDstSoftLink : 1(додати також в попередню тест рутину із allowingCycled : 1)
 
-// allowingDiscrepancy {allowingDiscrepancy: 0, rewriting : 1, rewritingDirs : 1, makingDirectory : 1}(написати окрему тест рутину)
- - src exists, dst exists, different content
 
 //
 
  - src does not exist, directory does not exist
  - src does not exist, directory exists
 
-// rewriting 0 -> 4
+// rewriting : 0 (4)
  - dst exists, is not soft linked
  - dst exists, is soft linked on itself
  - dst exists, is soft linked on another file
  - src === dst
 
-// rewritingDirs 0 -> 2
+// rewritingDirs : 0 (2)
  - dst exists, dst is directory
  - src === dst, src is directory
 
-// makingDirectory 0 -> 1
+// makingDirectory : 0 (1)
  - dst does not exist
 
 total : 9
@@ -52433,20 +52414,46 @@ function textLinkReturnThrowing0Sync( test )
  - src does not exist, directory does not exist
  - src does not exist, directory exists
 
-// rewriting 0 -> 4
+// rewriting : 0 (4)
  - dst exists, is not text linked
  - dst exists, is text linked on itself
  - dst exists, is text linked on another file
  - src === dst
 
-// rewritingDirs 0 -> 2
+// rewritingDirs : 0 (2)
  - dst exists, dst is directory
  - src === dst, src is directory
 
-// makingDirectory 0 -> 1
+// makingDirectory : 0 (1) 1
  - dst does not exist
 
 total : 9
+
+//
+
+// without restrictions (3){rewriting : 1, rewritingDirs : 1, makingDirectory : 1}
+ - src does not exist, directory does not exist
+ - src does not exist, directory exists
+ - src === dst, src is directory
+
+// rewriting : 0 (2){rewriting : 0, makingDirectory : 1}
+ - dst exists, is not hard linked
+ - dst exists, is hard linked with itself ?(тут не потрібно, перевірити наявність в попередній рутині)
+
+// rewritingDirs : 0 (1){rewriting : 1, rewritingDirs : 0, makingDirectory : 1}
+ - dst exists, dst is directory
+
+// makingDirectory : 0 (1){rewriting : 1, rewritingDirs : 1, makingDirectory : 0}
+ - dir for dst does not exist
+
+// allowingMissed{rewriting : 1, rewritingDirs : 1, makingDirectory : 1, allowingMissed : 0, allowingCycled : 1}
+ - resolvingSrcSoftLink : 1
+ - resolvingDstSoftLink : 1(додати також в попередню тест рутину із allowingMissed : 1)
+
+// allowingCycled{rewriting : 1, rewritingDirs : 1, makingDirectory : 1, allowingMissed : 1, allowingCycled : 0}
+ - resolvingSrcSoftLink : 1
+ - resolvingDstSoftLink : 1(додати також в попередню тест рутину із allowingCycled : 1)
+
 */
   let context = this;
   let a = context.assetFor( test, false );

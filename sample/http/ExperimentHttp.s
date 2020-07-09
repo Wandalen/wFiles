@@ -3,14 +3,11 @@ if( typeof module !== 'undefined' )
 require( 'wFiles' )
 
 var _ = wTools;
-var provider = _.FileProvider.BackUrl();
+var provider = _.FileProvider.Http();
 
 var url = 'http://github.com/Wandalen/wTools/archive/master.zip';
-var read = provider.fileReadAct({ file : url, encoding : 'base64'} )
-
-// console.log( 'read',read );
-
-read.got( function( err, data )
+provider.fileCopyToHardDrive( url )
+.got( function( err, data )
 {
   if( err )
   throw err;

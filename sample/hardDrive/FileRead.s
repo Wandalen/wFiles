@@ -21,4 +21,8 @@ files.fileRead
   filePath : `${__dirname}/../tmp.tmp/forReading.txt`,
   sync : 0
 })
-.got( ( data ) => console.log( data ) );
+.finallyGive( ( err, data ) =>
+{
+  if( err ) throw err;
+  console.log( data )
+});

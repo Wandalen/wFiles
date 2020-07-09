@@ -21,4 +21,9 @@ files.statRead
    filePath : `${__dirname}/../tmp.tmp/forReading.txt`,
    throwing : 1,
    sync : 0
-}).got( ( stats ) => console.log( stats ) );
+})
+.finallyGive( ( err, arg ) =>
+{
+  if( err ) throw err;
+  console.log( arg );
+});

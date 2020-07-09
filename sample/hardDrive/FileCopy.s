@@ -28,10 +28,10 @@ var con = files.fileCopy
   sync : 0
 });
 
-con.got( ( err ) =>
+con.finallyGive( ( err, arg ) =>
 {
-  // if( err )
-  // throw err;
+  if( err ) throw err;
+
   var copiedData = files.fileRead({ filePath : dstPath, sync : 1 });
   console.log( copiedData );
   files.fileDelete({ filePath : dstPath, sync : 1 });

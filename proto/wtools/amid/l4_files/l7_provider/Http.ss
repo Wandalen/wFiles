@@ -105,7 +105,7 @@ streamReadAct.having = Object.create( Parent.prototype.streamReadAct.having );
 function fileReadAct( o )
 {
   let self = this;
-  let con = new _.Consequence( );
+  let con = new _.Consequence();
 
   // if( _.strIs( o ) )
   // {
@@ -118,12 +118,70 @@ function fileReadAct( o )
   _.assert( _.strIs( o.encoding ),'fileReadAct :','Expects {-o.encoding-}' );
   _.assert( !o.sync,'sync version is not implemented' );
 
+  if( !Needle )
+  Needle = require( 'needle' );
+
   o.encoding = o.encoding.toLowerCase();
   let encoder = fileReadAct.encoders[ o.encoding ];
 
-  logger.log( 'fileReadAct',o );
+  // logger.log( 'fileReadAct', o );
 
   /* on encoding : arraybuffer or encoding : buffer should return buffer( in consequence ) */
+
+  // написати через needle
+  var options = {
+    compressed         : true, // sets 'Accept-Encoding' to 'gzip, deflate, br'
+    follow_max         : 5,    // follow up to five redirects
+    rejectUnauthorized : true  // verify SSL certificate
+  }
+  
+  Needle.get( o.filePath, function( err, response )
+  {
+    con.take(response.body);
+  });
+  // read the chunks from the 'readable' event, so the stream gets consumed.
+  // stream.on('readable', function() {
+  //   while (data = this.read()) {
+  //     console.log(data.toString());
+  //   }
+  // })
+  
+  // stream.on('done', function(err, res) {
+  //   // if our request had an error, our 'done' event will tell us.
+  //   console.log(res)
+  //   if (err) throw err;
+  //   con.take(res);
+  // })
+  //_.Consequence.From( promise )
+  // self.streamReadAct({ filePath :  o.filePath })
+  // .give( function( err, response )
+  // {
+  //   debugger;
+
+  //   if( err )
+  //   return handleError( err );
+
+  //   _.assert( _.strIs( o.encoding ) || o.encoding === null );
+
+  //   if( o.encoding === null )
+  //   {
+  //     totalSize = response.headers[ 'content-length' ];
+  //     result = new BufferRaw( totalSize );
+  //   }
+  //   else
+  //   {
+  //     response.setEncoding( o.encoding );
+  //     result = '';
+  //   }
+
+  //   response.on( 'data', onData );
+  //   response.on( 'end', onEnd );
+  //   response.on( 'error', handleError );
+  //   debugger;
+
+  // });
+
+  return con;
 
   function handleError( err )
   {
@@ -195,36 +253,6 @@ function fileReadAct( o )
 
   if( encoder && encoder.onBegin )
   _.sure( encoder.onBegin.call( self, { operation : o, encoder : encoder }) === undefined );
-
-  self.streamReadAct({ filePath :  o.filePath })
-  .give( function( err, response )
-  {
-    debugger;
-
-    if( err )
-    return handleError( err );
-
-    _.assert( _.strIs( o.encoding ) || o.encoding === null );
-
-    if( o.encoding === null )
-    {
-      totalSize = response.headers[ 'content-length' ];
-      result = new BufferRaw( totalSize );
-    }
-    else
-    {
-      response.setEncoding( o.encoding );
-      result = '';
-    }
-
-    response.on( 'data', onData );
-    response.on( 'end', onEnd );
-    response.on( 'error', handleError );
-    debugger;
-
-  });
-
- return con;
 
   /* */
 
@@ -418,7 +446,7 @@ function fileCopyToHardDriveAct( o )
 {
   let self = this;
   let con = new _.Consequence( );
-
+  debugger;
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.strIs( o.url ),'fileCopyToHardDriveAct :','Expects {-o.filePath-}' );
   _.assert( _.strIs( o.filePath ),'fileCopyToHardDriveAct :','Expects {-o.filePath-}' );

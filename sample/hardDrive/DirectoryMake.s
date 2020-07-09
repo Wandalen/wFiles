@@ -16,10 +16,10 @@ files.fileDelete( dstPath );
 // directoryMake async
 
 var con = files.dirMake({ filePath : dstPath, sync : 0 });
-con.got( ( err ) =>
+con.finallyGive( ( err, arg ) =>
 {
-  // if(err)
-  // throw err;
+  if( err ) throw err;
+  
   console.log( 'async dirMake: ', files.fileExists( dstPath ) );
   files.fileDelete( dstPath );
 })

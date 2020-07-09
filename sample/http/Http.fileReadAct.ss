@@ -4,16 +4,13 @@ require( 'wFiles' )
 
 var _ = wTools;
 var provider = _.FileProvider.Http();
+debugger;
+var url = 'https://raw.githubusercontent.com/Wandalen/wModuleForTesting1/master/package.json';
+var read = provider.fileRead({ filePath : url, encoding : 'utf8', sync : 0 } )
 
-var url = 'http://github.com/Wandalen/wTools/archive/master.zip';
-var read = provider.fileReadAct({ filePath : url, encoding : 'base64', sync : 0, advanced : {}, resolvingSoftLink : 1 } )
-// error: self.streamReadAct(...).give is not a function
-// console.log( 'read',read );
-
-read.got( function( err, data )
+read.finallyGive( function( err, arg )
 {
-  if( err )
-  throw err;
-  else
-  console.log( data );
+  if( err ) throw err;
+  
+  console.log( arg );
 });

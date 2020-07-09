@@ -43,10 +43,10 @@ var con = files.fileRename
   srcPath : srcPathFile,
   sync : 0
 });
-con.got( ( err ) =>
+con.finallyGive( ( err, arg ) =>
 {
-  // if(err)
-  // throw err;
+  if(err) throw err;
+
   var dataFromRenamedFile = files.fileRead({ filePath : dstPathFile, sync : 1 });
   console.log( dataFromRenamedFile ); // logs: from renamed file...
   files.fileRename( { dstPath : srcPathFile, srcPath : dstPathFile, sync : 1 } );
@@ -59,10 +59,10 @@ var con = files.fileRename
   srcPath : srcPathDir,
   sync : 0
 });
-con.got( ( err ) =>
+con.finallyGive( ( err, arg ) =>
 {
-  // if(err)
-  // throw err;
+  if(err) throw err;
+
   var content = files.dirRead({ filePath : dstPathDir });
   console.log( content ); // logs: [ 'file.txt' ]
   files.fileRename( { dstPath : srcPathDir, srcPath : dstPathDir, sync : 1 } );

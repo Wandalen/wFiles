@@ -20,17 +20,16 @@ var result = files.fileRead({ filePath : path, sync : 1 });
 console.log( result === dataSync );
 
 // fileWrite async
-debugger;
+
 files.fileWrite
 ({
   filePath : path,
   data : dataAsync,
   sync : 0
 })
-.got( ( err ) =>
+.finallyGive( ( err, arg ) =>
 {
-  // if( err )
-  // throw err;
+  if( err ) throw err;
   var result = files.fileRead({ filePath : path, sync : 1 });
   console.log( result === dataAsync );
 });

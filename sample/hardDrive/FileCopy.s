@@ -4,19 +4,35 @@ require( 'wFiles' )
 var _ = wTools;
 
 var files = _.FileProvider.HardDrive();
+var srcPath = `${__dirname}/../tmp.tmp/forCopying.txt`;
+var dstPath = `${__dirname}/../tmp.tmp/forCopyingCopied.txt`;
 
 // fileCopy sync
 
-// require( 'fs' ).writeFileSync( 'file.txt');
-// files.fileCopy( { dst : 'text1.txt', src : 'file.txt', sync : 1 } );
+files.fileCopy
+({
+  dstPath,
+  srcPath,
+  sync : 1
+});
+var copiedData = files.fileRead({ filePath : dstPath, sync : 1 });
+console.log( copiedData );
+files.fileDelete({ filePath : dstPath, sync : 1 });
 
 // fileCopy async
 
-// require( 'fs' ).writeFileSync( 'file.txt');
-// var con = files.fileCopy( { dst : './tmp/text1.txt', src : 'file.txt'  } );
-//
-// con.got( function( err )
-// {
-//   if( err )
-//   throw err;
-// } )
+var con = files.fileCopy
+({
+  dstPath,
+  srcPath,
+  sync : 0
+});
+
+con.got( ( err ) =>
+{
+  // if( err )
+  // throw err;
+  var copiedData = files.fileRead({ filePath : dstPath, sync : 1 });
+  console.log( copiedData );
+  files.fileDelete({ filePath : dstPath, sync : 1 });
+})

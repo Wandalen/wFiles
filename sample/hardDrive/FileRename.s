@@ -4,20 +4,66 @@ require( 'wFiles' )
 var _ = wTools;
 
 var files = _.FileProvider.HardDrive();
+var srcPathFile = `${__dirname}/../tmp.tmp/forRenaming.txt`;
+var dstPathFile = `${__dirname}/../tmp.tmp/forRenamingRenamed.txt`;
 
-// fileRename sync
+var srcPathDir = `${__dirname}/../tmp.tmp/forRenamingDir`;
+var dstPathDir = `${__dirname}/../tmp.tmp/forRenamingDirRenamed`;
 
-// require( 'fs' ).writeFileSync( 'file.txt');
-// files.fileRename( { dst : 'text1.txt', src : 'file.txt', sync : 1 } );
+/* fileRename sync */
 
-// files.directoryMake( { file : __dirname + '/test_folder', sync : 1, force : 1 } );
-// files.fileRename( { dst : 'new_test_folder', src : 'test_folder', sync : 1 } );
+// file renaming
+files.fileRename
+({
+  dstPath : dstPathFile,
+  srcPath : srcPathFile,
+  sync : 1
+});
+var dataFromRenamedFile = files.fileRead({ filePath : dstPathFile, sync : 1 });
+console.log( dataFromRenamedFile ); // logs: from renamed file...
+files.fileRename( { dstPath : srcPathFile, srcPath : dstPathFile, sync : 1 } );
 
-// fileRename async
+// directory renaming
+files.fileRename
+({
+  dstPath : dstPathDir,
+  srcPath : srcPathDir,
+  sync : 1
+});
+var content = files.dirRead({ filePath : dstPathDir });
+console.log( content ); // logs: [ 'file.txt' ]
+files.fileRename( { dstPath : srcPathDir, srcPath : dstPathDir, sync : 1 } );
 
-// require( 'fs' ).writeFileSync( 'file.txt');
-// var con = files.fileRename( 'text1.txt', 'file.txt' );
-// con.got( function( err )
-// {
-//   console.log( err );
-// });
+/* fileRename async */
+
+// file renaming
+var con = files.fileRename
+({
+  dstPath : dstPathFile,
+  srcPath : srcPathFile,
+  sync : 0
+});
+con.got( ( err ) =>
+{
+  // if(err)
+  // throw err;
+  var dataFromRenamedFile = files.fileRead({ filePath : dstPathFile, sync : 1 });
+  console.log( dataFromRenamedFile ); // logs: from renamed file...
+  files.fileRename( { dstPath : srcPathFile, srcPath : dstPathFile, sync : 1 } );
+});
+
+// directory renaming
+var con = files.fileRename
+({
+  dstPath : dstPathDir,
+  srcPath : srcPathDir,
+  sync : 0
+});
+con.got( ( err ) =>
+{
+  // if(err)
+  // throw err;
+  var content = files.dirRead({ filePath : dstPathDir });
+  console.log( content ); // logs: [ 'file.txt' ]
+  files.fileRename( { dstPath : srcPathDir, srcPath : dstPathDir, sync : 1 } );
+});

@@ -7,15 +7,10 @@ var files = _.FileProvider.HardDrive();
 
 //directoryRead sync
 
-// var dir = files.directoryRead({ file : __dirname });
-// console.log( dir );
+var content = files.dirRead({ filePath : `${__dirname}/../tmp.tmp` });
+console.log( content );
 
 // directoryRead async
 
-// var con = files.directoryRead({ file : __dirname, sync : 0 });
-// con.got( function( err, dir )
-// {
-//   if( err )
-//   throw err;
-//   console.log( dir );
-// });
+var con = files.dirRead({ filePath : `${__dirname}/../tmp.tmp`, sync : 0 });
+con.got( ( content ) => console.log( content ) );

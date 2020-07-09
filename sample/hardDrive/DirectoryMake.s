@@ -4,35 +4,22 @@ require( 'wFiles' )
 var _ = wTools;
 
 var files = _.FileProvider.HardDrive();
+var srcPath = `${__dirname}/../tmp.tmp/forRenaming.txt`;
+var dstPath = `${__dirname}/../tmp.tmp/madeDir`;
 
 // directoryMake sync
 
-// files.directoryMake( { file : __dirname + '/test_folder', sync : 1, force : 1 } );
-
-// no structure same with path throws error
-// files.directoryMake( { file : __dirname + '/test_folder/inner_folder/folder/', sync : 1, force : 1 } );
-
-// replaces file with dir same name
-// require( 'fs' ).writeFileSync( __dirname + '/test_folder/file.txt');
-// files.directoryMake( { file : __dirname + '/test_folder/file.txt', sync : 1, force : 1 } );
-
-
-// dir exists throws error
-// files.directoryMake( { file : __dirname + 'test_folder', sync : 1, force : 1 } );
-
-// throws error, force 0 cant replace file with dir
-// require( 'fs' ).writeFileSync( __dirname + '/test_folder/file.txt');
-// files.directoryMake( { file : __dirname + 'test_folder/file.txt', sync : 1, force : 0 } );
+files.dirMake({ filePath : dstPath, sync : 1 });
+console.log( 'sync dirMake: ', files.fileExists( dstPath ) );
+files.fileDelete( dstPath );
 
 // directoryMake async
 
-// var con = files.directoryMake( { file : __dirname + '/test/', sync : 0, force : 1 } );
-//
-// //replaces file with dir same name
-// require( 'fs' ).writeFileSync( __dirname + '/test_folder/test.txt');
-// var con = files.directoryMake( { file : __dirname + '/test/test.txt/', sync : 0, force : 1 } );
-//
-// con.got( function( err )
-// {
-//   console.log( err ); // false (file does not exist)
-// });
+var con = files.dirMake({ filePath : dstPath, sync : 0 });
+con.got( ( err ) =>
+{
+  // if(err)
+  // throw err;
+  console.log( 'async dirMake: ', files.fileExists( dstPath ) );
+  files.fileDelete( dstPath );
+})

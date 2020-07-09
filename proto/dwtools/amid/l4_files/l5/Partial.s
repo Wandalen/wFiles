@@ -727,7 +727,7 @@ operates.filePath = { pathToRead : 1 };
 function pathResolveSoftLink_body( o )
 {
   let self = this;
-
+  debugger;
   _.assert( _.routineIs( self.pathResolveSoftLinkAct ) );
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( !!o.filePath );
@@ -6664,13 +6664,13 @@ function _softLinkVerify2( c )
   if( o.dstPath === o.srcPath )
   c.error( _.err( 'Soft link cycle', path.moveTextualReport( o.dstPath, o.srcPath ) ) );
   debugger;
-  /* Artem B. attempt to fix a bug, case: dst exists and is already soft linked, */
-  if( self.isLink( o.dstPath ) && self.pathResolveSoftLink({ filePath: o.dstPath }) === self.pathResolveSoftLink({ filePath: o.srcPath }) && o.rewriting )
+  /* Artem B. attempt to fix a bug, case: dst exists and is already soft linked with src, */
+  if( self.isLink( o.dstPath ) && self.pathResolveSoftLink({ filePath: o.dstPath }) === self.pathResolveSoftLink({ filePath: o.srcPath }) &&  self.pathResolveSoftLink({ filePath: o.srcPath }) === o.srcPath  && o.rewriting )
   {
     c.ended = true;
     c.result = false;
   }
-  /* Artem B. attempt to fix a bug, case: dst exists and is already soft linked, */
+  /* Artem B. attempt to fix a bug, case: dst exists and is already soft linked with src, */
 
   // if( o.dstPath !== o.srcPath && self.areSoftLinked([ o.dstPath, o.srcPath ]) )
   // if( o.dstPath === o.srcPath )

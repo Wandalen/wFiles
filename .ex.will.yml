@@ -24,8 +24,8 @@ about :
   npm.name : 'wFiles'
   npm.scripts :
     test : 'wtest .run proto/**'
-    test2 : 'wtest .run proto/**/dwtools/amid/file.test/Provider.HardDrive.test.ss routine : linkHardSyncRunner'
-    test3 : 'wtest .run proto/**/dwtools/amid/file.test/Provider.HardDrive.test.ss routine : linkHardAsyncRunner'
+    test2 : 'wtest .run proto/**/wtools/amid/file.test/Provider.HardDrive.test.ss routine : linkHardSyncRunner'
+    test3 : 'wtest .run proto/**/wtools/amid/file.test/Provider.HardDrive.test.ss routine : linkHardAsyncRunner'
     docgen : 'wdocgen .build proto'
 
 path :

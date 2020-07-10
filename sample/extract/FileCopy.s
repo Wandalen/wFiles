@@ -25,7 +25,7 @@ provider.fileCopy
   sync : 1
 });
 var copiedFileData = provider.fileRead({ filePath : '/dir1/dir2/copied.txt', sync : 1 });
-console.log( 'sync copying: ', copiedFileData );
+console.log( 'sync copying: ', copiedFileData ); // logs: sync copying: data from copied file...
 
 // fileCopy async
 
@@ -40,5 +40,5 @@ con.finallyGive( ( err, arg ) =>
 {
   if( err ) throw err;
   var copiedData = provider.fileRead({ filePath : '/dir1.2/copied.txt', sync : 1 });
-  console.log( 'async copying: ', copiedData );
+  console.log( 'async copying: ', copiedData ); // logs: async copying: data from copied file...
 })

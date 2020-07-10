@@ -17,7 +17,7 @@ files.fileWrite
   sync : 1
 });
 var result = files.fileRead({ filePath : path, sync : 1 });
-console.log( result === dataSync );
+console.log( result === dataSync ); // logs: true
 
 // fileWrite async
 
@@ -31,5 +31,5 @@ files.fileWrite
 {
   if( err ) throw err;
   var result = files.fileRead({ filePath : path, sync : 1 });
-  console.log( result === dataAsync );
+  console.log( result === dataAsync ); // logs: true
 });

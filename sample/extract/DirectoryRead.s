@@ -21,9 +21,9 @@ var provider = _.FileProvider.Extract({ filesTree : tree });
 //directoryRead sync
 
 var content = provider.dirRead({ filePath : '/dir1/dir2' });
-console.log( content );
+console.log( 'read sync: ', content ); // logs: read sync: [ 'file1.txt', 'file2.txt' ]
 
 // directoryRead async
 
 var con = provider.dirRead({ filePath : '/dir1/dir2', sync : 0 });
-con.got( ( content ) => console.log( content ) );
+con.got( ( content ) => console.log( 'read async: ', content ) ); // logs: read async: [ 'file1.txt', 'file2.txt' ]

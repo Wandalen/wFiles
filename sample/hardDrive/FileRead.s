@@ -12,7 +12,7 @@ var data = files.fileRead
   filePath : `${__dirname}/../tmp.tmp/forReading.txt`,
   sync : 1
 });
-console.log( data );
+console.log( 'read sync: ', data ); // logs: read sync: Read data...
 
 // fileRead async
 
@@ -24,5 +24,5 @@ files.fileRead
 .finallyGive( ( err, data ) =>
 {
   if( err ) throw err;
-  console.log( data )
+  console.log( 'read async: ', data ); // logs: read async: Read data...
 });

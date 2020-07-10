@@ -4,13 +4,12 @@ require( 'wFiles' )
 var _ = wTools;
 
 var files = _.FileProvider.HardDrive();
-var srcPath = `${__dirname}/../tmp.tmp/forRenaming.txt`;
 var dstPath = `${__dirname}/../tmp.tmp/madeDir`;
 
 // directoryMake sync
 
 files.dirMake({ filePath : dstPath, sync : 1 });
-console.log( 'sync dirMake: ', files.fileExists( dstPath ) );
+console.log( 'sync dirMake: ', files.fileExists( dstPath ) ); // logs: sync dirMake: true
 files.fileDelete( dstPath );
 
 // directoryMake async
@@ -20,6 +19,6 @@ con.finallyGive( ( err, arg ) =>
 {
   if( err ) throw err;
 
-  console.log( 'async dirMake: ', files.fileExists( dstPath ) );
+  console.log( 'async dirMake: ', files.fileExists( dstPath ) ); // logs: async dirMake: true
   files.fileDelete( dstPath );
 })

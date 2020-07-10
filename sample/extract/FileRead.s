@@ -25,7 +25,7 @@ var data = provider.fileRead
   filePath : '/dir1/dir2/fileSync.txt',
   sync : 1
 });
-console.log( data );
+console.log( data ); // logs: read sync data...
 
 // fileRead async
 
@@ -37,5 +37,5 @@ provider.fileRead
 .finallyGive( ( err, data ) =>
 {
   if( err ) throw err;
-  console.log( data )
+  console.log( data ); // logs: read async data...
 });

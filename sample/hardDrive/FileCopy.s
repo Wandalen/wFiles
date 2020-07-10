@@ -16,7 +16,7 @@ files.fileCopy
   sync : 1
 });
 var copiedData = files.fileRead({ filePath : dstPath, sync : 1 });
-console.log( copiedData );
+console.log( 'copied sync: ', copiedData ); // logs: copied sync: for copying data...
 files.fileDelete({ filePath : dstPath, sync : 1 });
 
 // fileCopy async
@@ -33,6 +33,6 @@ con.finallyGive( ( err, arg ) =>
   if( err ) throw err;
 
   var copiedData = files.fileRead({ filePath : dstPath, sync : 1 });
-  console.log( copiedData );
+  console.log( 'copied async: ', copiedData ); // logs: copied async: for copying data...
   files.fileDelete({ filePath : dstPath, sync : 1 });
 })

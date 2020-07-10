@@ -399,14 +399,14 @@ function filesNewer( test )
   test.identical( got, file2 );
 
   test.case = 'one files modified after creation';
-  provider.fileTimeSet( file1, _.time.now() / 1000, _.time.now() / 1000 );
+  provider.timeWrite( file1, _.time.now() / 1000, _.time.now() / 1000 );
   var got = _.files.filesNewer( file2, file1 );
   test.identical( got, file1 );
 
   test.case = 'two files modified at the same time';
   let timeSet = _.time.now() / 1000;
-  provider.fileTimeSet( file1, timeSet, timeSet );
-  provider.fileTimeSet( file2, timeSet, timeSet );
+  provider.timeWrite( file1, timeSet, timeSet );
+  provider.timeWrite( file2, timeSet, timeSet );
   var got = _.files.filesNewer( file1, file2 );
   test.identical( got, null );
 
@@ -482,14 +482,14 @@ function filesOlder( test )
   test.identical( got, file1 );
 
   test.case = 'one files modified after creation';
-  provider.fileTimeSet( file1, _.time.now() / 1000, _.time.now() / 1000 );
+  provider.timeWrite( file1, _.time.now() / 1000, _.time.now() / 1000 );
   var got = _.files.filesOlder( file2, file1 );
   test.identical( got, file2 );
 
   test.case = 'two files modified at the same time';
   let timeSet = _.time.now() / 1000;
-  provider.fileTimeSet( file1, timeSet, timeSet );
-  provider.fileTimeSet( file2, timeSet, timeSet );
+  provider.timeWrite( file1, timeSet, timeSet );
+  provider.timeWrite( file2, timeSet, timeSet );
   var got = _.files.filesOlder( file1, file2 );
   test.identical( got, null );
 

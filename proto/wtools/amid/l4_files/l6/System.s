@@ -2,16 +2,6 @@
 
 'use strict';
 
-// if( typeof module !== 'undefined' )
-// {
-//   let _global = _global_;
-//   let _ = _global_.wTools;
-//   if( !_.FileProvider )
-//   require( '../UseMid.s' );
-// }
-
-//
-
 /**
  @classdesc Class that allows file manipulations between different file providers using global paths.
  @class wFileSystem
@@ -1290,7 +1280,7 @@ function _Setup1()
 
 //
 
-function _Setup2()
+function Init()
 {
 
   _.mapSupplementOwn( Self.prototype, FilteredRoutines );
@@ -1335,14 +1325,16 @@ let FilteredRoutines =
   dirReadAct : Routines.dirReadAct,
   statReadAct : Routines.statReadAct,
   fileExistsAct : Routines.fileExistsAct,
+  rightsReadAct : Routines.rightsReadAct,
 
   // write
 
   fileWriteAct : Routines.fileWriteAct,
   streamWriteAct : Routines.streamWriteAct,
-  fileTimeSetAct : Routines.fileTimeSetAct,
+  timeWriteAct : Routines.timeWriteAct,
   fileDeleteAct : Routines.fileDeleteAct,
   dirMakeAct : Routines.dirMakeAct,
+  rightsWriteAct : Routines.rightsWriteAct,
 
   // lock
 
@@ -1549,10 +1541,7 @@ _.classDeclare
   extend : Extension,
 });
 
-// _.FileProvider.FindMixin.mixin( Self );
-// _.FileProvider.Secondary.mixin( Self );
-
-_Setup2();
+Init();
 
 // --
 // export

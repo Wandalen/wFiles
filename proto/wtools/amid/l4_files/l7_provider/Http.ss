@@ -43,7 +43,7 @@ _.assert( !_.FileProvider.Http );
 function init( o )
 {
   let self = this;
-  Parent.prototype.init.call( self,o );
+  Parent.prototype.init.call( self, o );
 }
 
 //
@@ -53,7 +53,7 @@ function streamReadAct( o )
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.strIs( o.filePath ),'streamReadAct :','Expects {-o.filePath-}' );
+  _.assert( _.strIs( o.filePath ), 'streamReadAct :', 'Expects {-o.filePath-}' );
 
   if( !Needle )
   Needle = require( 'needle' );
@@ -105,18 +105,18 @@ streamReadAct.having = Object.create( Parent.prototype.streamReadAct.having );
 function fileReadAct( o )
 {
   let self = this;
-  let con = new _.Consequence();
+  let ready = new _.Consequence();
 
   // if( _.strIs( o ) )
   // {
   //   o = { filePath : o };
   // }
 
-  _.assertRoutineOptions( fileReadAct,arguments );
+  _.assertRoutineOptions( fileReadAct, arguments );
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.strIs( o.filePath ),'fileReadAct :','Expects {-o.filePath-}' );
-  _.assert( _.strIs( o.encoding ),'fileReadAct :','Expects {-o.encoding-}' );
-  _.assert( !o.sync,'sync version is not implemented' );
+  _.assert( _.strIs( o.filePath ), 'fileReadAct :', 'Expects {-o.filePath-}' );
+  _.assert( _.strIs( o.encoding ), 'fileReadAct :', 'Expects {-o.encoding-}' );
+  // _.assert( !o.sync,'sync version is not implemented' );
 
   if( !Needle )
   Needle = require( 'needle' );
@@ -127,15 +127,24 @@ function fileReadAct( o )
   // logger.log( 'fileReadAct', o );
 
   /* on encoding : arraybuffer or encoding : buffer should return buffer( in consequence ) */
-  console.log( o.encoding );
+
   // написати через needle(_.Consequence.From( promise ))
   Needle.get( o.filePath, ( err, response ) =>
   {
     if( err )
-    con.error( err );
+    ready.error( err );
     else
-    con.take( response.body );
+    ready.take( response.body );
   });
+
+
+  if( o.sync )
+  {
+    ready.deasync();
+    return ready.sync();
+  }
+
+  return ready;
 
   // self.streamReadAct({ filePath :  o.filePath })
   // .give( function( err, response )
@@ -165,95 +174,93 @@ function fileReadAct( o )
 
   // });
 
-  return con;
+  // function handleError( err )
+  // {
 
-  function handleError( err )
-  {
+  //   debugger;
+  //   err = _._err
+  //   ({
+  //     // args : [ stack, '\nfileReadAct( ', o.filePath, ' )\n', err ],
+  //     args : [ err, '\nfileRead( ', o.filePath, ' )\n' ],
+  //     usingSourceCode : 0,
+  //     level : 0,
+  //   });
 
-    debugger;
-    err = _._err
-    ({
-      // args : [ stack, '\nfileReadAct( ', o.filePath, ' )\n', err ],
-      args : [ err, '\nfileRead( ', o.filePath, ' )\n' ],
-      usingSourceCode : 0,
-      level : 0,
-    });
+  //   if( encoder && encoder.onError )
+  //   try
+  //   {
+  //     // err = _._err
+  //     // ({
+  //     //   args : [ stack,'\nfileReadAct( ',o.filePath,' )\n',err ],
+  //     //   usingSourceCode : 0,
+  //     //   level : 0,
+  //     // });
+  //     err = encoder.onError.call( self,{ error : err, operation : o, encoder : encoder })
+  //   }
+  //   catch( err2 )
+  //   {
+  //     console.error( err2 );
+  //     console.error( err.toString() + '\n' + err.stack );
+  //   }
 
-    if( encoder && encoder.onError )
-    try
-    {
-      // err = _._err
-      // ({
-      //   args : [ stack,'\nfileReadAct( ',o.filePath,' )\n',err ],
-      //   usingSourceCode : 0,
-      //   level : 0,
-      // });
-      err = encoder.onError.call( self,{ error : err, operation : o, encoder : encoder })
-    }
-    catch( err2 )
-    {
-      console.error( err2 );
-      console.error( err.toString() + '\n' + err.stack );
-    }
-
-    if( o.sync )
-    {
-      throw err;
-    }
-    else
-    {
-      con.error( err );
-    }
-  }
+  //   if( o.sync )
+  //   {
+  //     throw err;
+  //   }
+  //   else
+  //   {
+  //     con.error( err );
+  //   }
+  // }
 
   /* */
 
-  function onData( data )
-  {
+  // function onData( data )
+  // {
 
-    if( o.encoding === null )
-    {
-      _.bufferMove
-      ({
-        dst : result,
-        src : data,
-        dstOffset : dstOffset
-      });
+  //   if( o.encoding === null )
+  //   {
+  //     _.bufferMove
+  //     ({
+  //       dst : result,
+  //       src : data,
+  //       dstOffset : dstOffset
+  //     });
 
-      dstOffset += data.length;
-    }
-    else
-    {
-      result += data;
-    }
+  //     dstOffset += data.length;
+  //   }
+  //   else
+  //   {
+  //     result += data;
+  //   }
 
-  }
-
-  /* */
-
-  let result = null;;
-  let totalSize = null;
-  let dstOffset = 0;
-
-  if( encoder && encoder.onBegin )
-  _.sure( encoder.onBegin.call( self, { operation : o, encoder : encoder }) === undefined );
+  // }
 
   /* */
 
-  function onEnd()
-  {
-    if( o.encoding === null )
-    _.assert( _.bufferRawIs( result ) );
-    else
-    _.assert( _.strIs( result ) );
+  // let result = null;;
+  // let totalSize = null;
+  // let dstOffset = 0;
 
-    let context = { data : result, operation : o, encoder : encoder };
-    if( encoder && encoder.onEnd )
-    _.sure( encoder.onEnd.call( self,context ) === undefined );
-    result = context.data
+  // if( encoder && encoder.onBegin )
+  // _.sure( encoder.onBegin.call( self, { operation : o, encoder : encoder }) === undefined );
 
-    con.take( result );
-  }
+  /* */
+
+  // function onEnd()
+  // {
+  //   if( o.encoding === null )
+  //   _.assert( _.bufferRawIs( result ) );
+  //   else
+  //   _.assert( _.strIs( result ) );
+
+  //   let context = { data : result, operation : o, encoder : encoder };
+  //   if( encoder && encoder.onEnd )
+  //   _.sure( encoder.onEnd.call( self,context ) === undefined );
+  //   result = context.data
+
+  //   con.take( result );
+  // }
 
 }
 
@@ -432,8 +439,8 @@ function fileCopyToHardDriveAct( o )
   let con = new _.Consequence( );
   debugger;
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.strIs( o.url ),'fileCopyToHardDriveAct :','Expects {-o.filePath-}' );
-  _.assert( _.strIs( o.filePath ),'fileCopyToHardDriveAct :','Expects {-o.filePath-}' );
+  _.assert( _.strIs( o.url ), 'fileCopyToHardDriveAct :', 'Expects {-o.filePath-}' );
+  _.assert( _.strIs( o.filePath ), 'fileCopyToHardDriveAct :', 'Expects {-o.filePath-}' );
 
   let dstFileProvider = _.FileProvider.HardDrive( );
   let writeStream = null;
@@ -525,8 +532,8 @@ function fileCopyToHardDrive( o )
   else
   {
     _.assert( arguments.length === 1, 'Expects single argument' );
-    _.assert( _.strIs( o.url ),'fileCopyToHardDrive :','Expects {-o.filePath-}' );
-    _.assert( _.strIs( o.filePath ),'fileCopyToHardDrive :','Expects {-o.filePath-}' );
+    _.assert( _.strIs( o.url ), 'fileCopyToHardDrive :', 'Expects {-o.filePath-}' );
+    _.assert( _.strIs( o.filePath ), 'fileCopyToHardDrive :', 'Expects {-o.filePath-}' );
 
     let HardDrive = _.FileProvider.HardDrive();
     let dirPath = self.path.dir( o.filePath );

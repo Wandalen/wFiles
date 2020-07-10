@@ -20,11 +20,12 @@ var extractProvider = _.FileProvider.Extract({ protocol : 'ext', filesTree : tre
 
 hub.providerRegister( hardDriveProvider );
 hub.providerRegister( extractProvider );
+hub.defaultProvider = hardDriveProvider;
 /* or vice versa
 hardDriveProvider.providerRegisterTo( hub );
 extractProvider.providerRegisterTo( hub );
 */
-
+// bug maybe. Create test suite with system...
 hub.fileCopy
 ({
   dstPath : 'ext:///dir1/dir2/fileFromHardDrive.txt',

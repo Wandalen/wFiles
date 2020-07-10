@@ -127,7 +127,7 @@ function fileReadAct( o )
   // logger.log( 'fileReadAct', o );
 
   /* on encoding : arraybuffer or encoding : buffer should return buffer( in consequence ) */
-
+  console.log( o.encoding );
   // написати через needle(_.Consequence.From( promise ))
   Needle.get( o.filePath, ( err, response ) =>
   {

@@ -28,7 +28,7 @@ var dir = '/dir/my_folder';
 var relative = '/X';
 var provider = _.FileProvider.HardDrive();
 /* dir option affects on record.absolute property, relative option is used to create record.relative property */
-var record = _.FileRecord( filePath , { fileProvider : provider, dir : dir, relative : relative } );
+var record = _.FileRecord( filePath, { fileProvider : provider, dir : dir, relative : relative } );
 console.log( record );
 
 /* Using mask to filter file record */
@@ -37,10 +37,10 @@ var filePath = '/my_folder/file';
 RegExpObject - Object-container of regular expressions.
 More about RegexpObject: https://github.com/Wandalen/wRegexpObject/blob/master/README.md
 */
-var mask = _.RegexpObject( 'file','includeAny' );
+var mask = _.RegexpObject( 'file', 'includeAny' );
 var provider = _.FileProvider.HardDrive();
 /* Generated record.relative path will be tested by provided mask and result( true/false ) recorded into record.inclusion property */
-var record = _.FileRecord( filePath , { fileProvider : provider, maskAll : mask } );
+var record = _.FileRecord( filePath, { fileProvider : provider, maskAll : mask } );
 console.log( record.inclusion );
 
 /* Using notOlderAge options to check if file was created 1 second ago */

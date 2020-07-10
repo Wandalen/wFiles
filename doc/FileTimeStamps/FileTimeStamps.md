@@ -60,7 +60,7 @@ Dst:
 
 -----
 
-#### Modification of atime,mtime timestamps ( fileTimeSet )
+#### Modification of atime,mtime timestamps ( timeWrite )
 
 |   |atime|mtime| ctime  | birthtime  |
 |:---:|:---:|:---:|:---:|:---:|

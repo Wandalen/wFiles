@@ -11,4 +11,6 @@ var pathFile = _.path.join( _.path.current(), './dir/File.txt' );
 
 // create file
 
-var record = fileProvider.fileWrite(  pathFile, 'Hello, world' );
+fileProvider.fileWrite( pathFile, 'Hello, world' );
+
+console.log( record );

@@ -10,7 +10,7 @@ var _ = wTools;
 
 // var statBefore = _.fileProvider.fileStat( filePath );
 
-// _.fileProvider.fileTimeSet( filePath, statBefore.atime, statBefore.mtime );
+// _.fileProvider.timeWrite( filePath, statBefore.atime, statBefore.mtime );
 
 // var statAfter = _.fileProvider.fileStat( filePath );
 
@@ -26,7 +26,7 @@ var _ = wTools;
 var path = _.dir( __filename );
 var time = new Date( 1529332034399 )
 console.log( 'time: ', time.getTime() )
-_.fileProvider.fileTimeSet( path, time, time )
+_.fileProvider.timeWrite( path, time, time )
 
 var r = _.fileProvider.fileStat( path )
 console.log( 'atime: ', r.atime.getTime() )

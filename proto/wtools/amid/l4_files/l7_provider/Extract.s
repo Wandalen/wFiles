@@ -357,7 +357,7 @@ function fileReadAct( o )
   return handleError( _.err( 'Can`t read file : ' + _.strQuote( o.filePath ), result ) );
 
   if( self.usingExtraStat )
-  self._fileTimeSetAct({ filePath : o.filePath, atime : _.time.now() });
+  self._timeWriteAct({ filePath : o.filePath, atime : _.time.now() });
 
   return handleEnd( result );
 
@@ -841,26 +841,26 @@ _.routineExtend( fileWriteAct, Parent.prototype.fileWriteAct );
 
 //
 
-function fileTimeSetAct( o )
+function timeWriteAct( o )
 {
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertMapHasOnly( o, fileTimeSetAct.defaults );
+  _.assertMapHasOnly( o, timeWriteAct.defaults );
 
   let file = self._descriptorRead( o.filePath );
   if( !file )
   throw _.err( 'File:', o.filePath, 'doesn\'t exist. Can\'t set time stats.' );
 
-  self._fileTimeSetAct( o );
+  self._timeWriteAct( o );
 
 }
 
-_.routineExtend( fileTimeSetAct, Parent.prototype.fileTimeSetAct );
+_.routineExtend( timeWriteAct, Parent.prototype.timeWriteAct );
 
 //
 
-function _fileTimeSetAct( o )
+function _timeWriteAct( o )
 {
   let self = this;
 
@@ -914,13 +914,13 @@ function _fileTimeSetAct( o )
 
     o.filePath = dirPath;
 
-    self._fileTimeSetAct( o );
+    self._timeWriteAct( o );
   }
 
   return extra;
 }
 
-_fileTimeSetAct.defaults =
+_timeWriteAct.defaults =
 {
   filePath : null,
   atime : null,
@@ -1922,7 +1922,7 @@ function statsAdopt()
 
   self.filesFindNominal( '/', ( r ) =>
   {
-    self._fileTimeSetAct({ filePath : r.absolute, atime : r.stat.atime || _.time.now() });
+    self._timeWriteAct({ filePath : r.absolute, atime : r.stat.atime || _.time.now() });
     return r;
   });
 
@@ -2441,7 +2441,7 @@ function _descriptorWrite( o )
   }
 
   if( self.usingExtraStat )
-  self._fileTimeSetAct( timeOptions );
+  self._timeWriteAct( timeOptions );
 
   return result;
 }
@@ -2481,7 +2481,7 @@ function _descriptorTimeUpdate( filePath, created )
     o2.updatingDir = 1;
   }
 
-  self._fileTimeSetAct( o2 );
+  self._timeWriteAct( o2 );
 }
 
 // //
@@ -2811,8 +2811,8 @@ let Extension =
   // write
 
   fileWriteAct,
-  fileTimeSetAct,
-  _fileTimeSetAct,
+  timeWriteAct,
+  _timeWriteAct,
   fileDeleteAct,
   dirMakeAct,
   streamWriteAct : null,

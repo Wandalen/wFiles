@@ -3625,7 +3625,7 @@ function fileTouch( test )
 
 //
 
-function fileTimeSet( test )
+function timeWrite( test )
 {
   let context = this;
   let provider = context.provider;
@@ -3637,15 +3637,15 @@ function fileTimeSet( test )
     return;
   }
 
-  let routinePath = test.context.pathFor( 'written/fileTimeSet' );
-  let filePath = test.context.pathFor( 'written/fileTimeSet/file' );
+  let routinePath = test.context.pathFor( 'written/timeWrite' );
+  let filePath = test.context.pathFor( 'written/timeWrite/file' );
 
   let maxDiff = provider.systemBitrateTimeGet();
 
   test.case = 'path does not exist';
   provider.filesDelete( filePath );
   var time = _.time.now();
-  test.shouldThrowErrorOfAnyKind( () => provider.fileTimeSet( filePath, time, time ) );
+  test.shouldThrowErrorOfAnyKind( () => provider.timeWrite( filePath, time, time ) );
 
   function testDiff( diff )
   {
@@ -3659,7 +3659,7 @@ function fileTimeSet( test )
   provider.filesDelete( filePath );
   provider.fileWrite( filePath, filePath );
   var time = new Date();
-  provider.fileTimeSet( filePath, time, time );
+  provider.timeWrite( filePath, time, time );
   var stat  = provider.statResolvedRead( filePath );
   test.is( stat.isTerminal() );
   var adiff = time.getTime() - stat.atime.getTime();
@@ -3671,7 +3671,7 @@ function fileTimeSet( test )
   provider.filesDelete( routinePath );
   provider.fileWrite( filePath, filePath );
   var time = new Date();
-  provider.fileTimeSet( routinePath, time, time );
+  provider.timeWrite( routinePath, time, time );
   var stat  = provider.statResolvedRead( routinePath );
   test.is( stat.isDir() );
   var adiff = time.getTime() - stat.atime.getTime();
@@ -3683,7 +3683,7 @@ function fileTimeSet( test )
   provider.filesDelete( filePath );
   provider.fileWrite( filePath, filePath );
   var time = new Date();
-  provider.fileTimeSet({ filePath, atime : time, mtime : time });
+  provider.timeWrite({ filePath, atime : time, mtime : time });
   var stat  = provider.statResolvedRead( filePath );
   test.is( stat.isTerminal() );
   var adiff = time.getTime() - stat.atime.getTime();
@@ -3695,7 +3695,7 @@ function fileTimeSet( test )
   provider.filesDelete( routinePath );
   provider.fileWrite( filePath, filePath );
   var time = new Date();
-  provider.fileTimeSet({ filePath : routinePath, atime : time, mtime : time });
+  provider.timeWrite({ filePath : routinePath, atime : time, mtime : time });
   var stat  = provider.statResolvedRead( routinePath );
   test.is( stat.isDir() );
   var adiff = time.getTime() - stat.atime.getTime();
@@ -3706,11 +3706,11 @@ function fileTimeSet( test )
   test.case = 'two args, file';
   provider.filesDelete( routinePath );
   provider.fileWrite( filePath, filePath );
-  var filePath2 = test.context.pathFor( 'written/fileTimeSet/file2' );
+  var filePath2 = test.context.pathFor( 'written/timeWrite/file2' );
   provider.fileWrite( filePath2, filePath2 );
   var time = new Date();
-  provider.fileTimeSet( filePath2, time, time );
-  provider.fileTimeSet( filePath, filePath2 );
+  provider.timeWrite( filePath2, time, time );
+  provider.timeWrite( filePath, filePath2 );
   var stat  = provider.statResolvedRead( filePath );
   test.is( stat.isTerminal() );
   var adiff = time.getTime() - stat.atime.getTime();
@@ -3721,11 +3721,11 @@ function fileTimeSet( test )
   test.case = 'two args, dir';
   provider.filesDelete( routinePath );
   provider.fileWrite( filePath, filePath );
-  var filePath2 = test.context.pathFor( 'written/fileTimeSet/dir' );
+  var filePath2 = test.context.pathFor( 'written/timeWrite/dir' );
   provider.dirMake( filePath2 );
   var time = new Date();
-  provider.fileTimeSet( filePath2, time, time );
-  provider.fileTimeSet( routinePath, filePath2 );
+  provider.timeWrite( filePath2, time, time );
+  provider.timeWrite( routinePath, filePath2 );
   var stat  = provider.statResolvedRead( routinePath );
   test.is( stat.isDir() );
   var adiff = time.getTime() - stat.atime.getTime();
@@ -3737,7 +3737,7 @@ function fileTimeSet( test )
   provider.filesDelete( routinePath );
   provider.fileWrite( filePath, filePath );
   var statb  = provider.statResolvedRead( routinePath );
-  provider.fileTimeSet( filePath, -1, -1 );
+  provider.timeWrite( filePath, -1, -1 );
   var stata  = provider.statResolvedRead( routinePath );
   test.ge( statb.mtime, stata.mtime );
   test.ge( statb.atime, stata.atime );
@@ -3746,7 +3746,7 @@ function fileTimeSet( test )
   provider.filesDelete( routinePath );
   provider.fileWrite( filePath, filePath );
   var statb  = provider.statResolvedRead( routinePath );
-  provider.fileTimeSet( filePath, 0, 0 );
+  provider.timeWrite( filePath, 0, 0 );
   var stata  = provider.statResolvedRead( routinePath );
   test.ge( statb.mtime, stata.mtime );
   test.ge( statb.atime, stata.atime );
@@ -3759,7 +3759,7 @@ function fileTimeSet( test )
     provider.fileWrite( filePath, filePath );
     var time = new Date().getTime();
     var statb  = provider.statResolvedRead( filePath );
-    test.shouldThrowErrorOfAnyKind( () => provider.fileTimeSet( filePath, time, time ) );
+    test.shouldThrowErrorOfAnyKind( () => provider.timeWrite( filePath, time, time ) );
     var stata  = provider.statResolvedRead( filePath );
     test.identical( statb.atime, stata.atime );
     test.identical( statb.mtime, stata.mtime );
@@ -3770,7 +3770,7 @@ function fileTimeSet( test )
     provider.filesDelete( filePath );
     provider.fileWrite( filePath, filePath );
     var time = new Date().getTime();
-    provider.fileTimeSet( filePath, time, time );
+    provider.timeWrite( filePath, time, time );
     var stat  = provider.statResolvedRead( filePath );
     test.is( stat.isTerminal() );
     var adiff = time - stat.atime.getTime();
@@ -3783,7 +3783,7 @@ function fileTimeSet( test )
   provider.filesDelete( filePath );
   provider.fileWrite( filePath, filePath );
   var time = new Date().getTime();
-  provider.fileTimeSet( filePath, time / 1000, time / 1000 );
+  provider.timeWrite( filePath, time / 1000, time / 1000 );
   var stat  = provider.statResolvedRead( filePath );
   test.is( stat.isTerminal() );
   var adiff = time - stat.atime.getTime();
@@ -3796,7 +3796,7 @@ function fileTimeSet( test )
   provider.fileWrite( filePath, filePath );
   var time = new Date();
   var statb  = provider.statResolvedRead( filePath );
-  test.shouldThrowErrorOfAnyKind( () => provider.fileTimeSet( filePath, {}, time ) );
+  test.shouldThrowErrorOfAnyKind( () => provider.timeWrite( filePath, {}, time ) );
   var stata  = provider.statResolvedRead( filePath );
   test.identical( statb.atime, stata.atime );
   test.identical( statb.mtime, stata.mtime );
@@ -3804,10 +3804,10 @@ function fileTimeSet( test )
   test.case = 'two args, second file does not exist';
   provider.filesDelete( routinePath );
   provider.fileWrite( filePath, filePath );
-  var filePath2 = test.context.pathFor( 'written/fileTimeSet/dir' );
+  var filePath2 = test.context.pathFor( 'written/timeWrite/dir' );
   var time = new Date();
   var statb  = provider.statResolvedRead( filePath );
-  test.shouldThrowErrorOfAnyKind( () => provider.fileTimeSet( filePath, filePath2 ) );
+  test.shouldThrowErrorOfAnyKind( () => provider.timeWrite( filePath, filePath2 ) );
   var stata  = provider.statResolvedRead( filePath );
   test.identical( statb.atime, stata.atime );
   test.identical( statb.mtime, stata.mtime );
@@ -3817,7 +3817,7 @@ function fileTimeSet( test )
   provider.fileWrite( filePath, filePath );
   var time = new Date();
   var statb  = provider.statResolvedRead( filePath );
-  test.shouldThrowErrorOfAnyKind( () => provider.fileTimeSet({ filePath, atime : time }) );
+  test.shouldThrowErrorOfAnyKind( () => provider.timeWrite({ filePath, atime : time }) );
   var stata  = provider.statResolvedRead( filePath );
   test.identical( statb.atime, stata.atime );
   test.identical( statb.mtime, stata.mtime );
@@ -3827,7 +3827,7 @@ function fileTimeSet( test )
   provider.fileWrite( filePath, filePath );
   var time = new Date();
   var statb  = provider.statResolvedRead( filePath );
-  test.shouldThrowErrorOfAnyKind( () => provider.fileTimeSet({ filePath, mtime : time }) );
+  test.shouldThrowErrorOfAnyKind( () => provider.timeWrite({ filePath, mtime : time }) );
   var stata  = provider.statResolvedRead( filePath );
   test.identical( statb.atime, stata.atime );
   test.identical( statb.mtime, stata.mtime );
@@ -3837,8 +3837,8 @@ function fileTimeSet( test )
 
   var time = new Date();
   test.case = 'invalid arguments'
-  test.shouldThrowErrorOfAnyKind( () => provider.fileTimeSet( 1 ) );
-  test.shouldThrowErrorOfAnyKind( () => provider.fileTimeSet({ filePath : 1, atime : time, mtime : time } ) );
+  test.shouldThrowErrorOfAnyKind( () => provider.timeWrite( 1 ) );
+  test.shouldThrowErrorOfAnyKind( () => provider.timeWrite({ filePath : 1, atime : time, mtime : time } ) );
 }
 
 //
@@ -29830,7 +29830,7 @@ function hardLinkMultipleSync( test )
 
         if( sameTime )
         {
-          provider.fileTimeSet( filePath, delay, delay );
+          provider.timeWrite( filePath, delay, delay );
         }
         else if( i > 0 )
         {
@@ -31224,7 +31224,7 @@ function hardLinkAsync( test )
       if( sameTime )
       {
         var time = delay * 1000;
-        provider.fileTimeSet( filePath, time, time );
+        provider.timeWrite( filePath, time, time );
       }
       else if( i > 0 )
       {
@@ -41783,7 +41783,78 @@ function filesCanBeSame( test )
     } );
   }
 
-};
+}
+
+//
+
+function rightsSet( test )
+{
+  let context = this;
+  let a = context.assetFor( test, false );
+  let c = 0;
+
+  /* */
+
+  test.case = 'same';
+  c += 1;
+  a.fileProvider.fileWrite( a.abs( `F${c}.txt` ), `F${c}.txt` );
+  var stat = a.fileProvider.statRead( a.abs( `F${c}.txt` ) );
+  console.log( 'stat', stat );
+  var rights = a.fileProvider.rightsRead( a.abs( `F${c}.txt` ) );
+  console.log( 'rights', ( rights ).toString( 8 ) );
+  test.identical( stat.mode, rights );
+  test.identical( Number( rights ) & 0o777, 0o644 );
+
+  /* */
+
+  test.case = 'setRights';
+  c += 1;
+  a.fileProvider.fileWrite( a.abs( `F${c}.txt` ), `F${c}.txt` );
+  var got = a.fileProvider.rightsWrite({ filePath : a.abs( `F${c}.txt` ), setRights : 0o777 });
+  test.identical( got, true );
+  var rights = a.fileProvider.rightsRead( a.abs( `F${c}.txt` ) );
+  console.log( 'rights', ( rights ).toString( 8 ) );
+  test.identical( Number( rights ) & 0o777, 0o777 );
+
+  /* */
+
+  test.case = 'addRights';
+  c += 1;
+  a.fileProvider.fileWrite( a.abs( `F${c}.txt` ), `F${c}.txt` );
+  var got = a.fileProvider.rightsWrite({ filePath : a.abs( `F${c}.txt` ), addRights : 0o777 });
+  test.identical( got, true );
+  var rights = a.fileProvider.rightsRead( a.abs( `F${c}.txt` ) );
+  console.log( 'rights', ( rights ).toString( 8 ) );
+  test.identical( Number( rights ) & 0o777, 0o777 );
+
+  /* */
+
+  test.case = 'delRights';
+  c += 1;
+  a.fileProvider.fileWrite( a.abs( `F${c}.txt` ), `F${c}.txt` );
+  var got = a.fileProvider.rightsWrite({ filePath : a.abs( `F${c}.txt` ), delRights : 0o777 });
+  test.identical( got, true );
+  var rights = a.fileProvider.rightsRead( a.abs( `F${c}.txt` ) );
+  console.log( 'rights', ( rights ).toString( 8 ) );
+  test.identical( Number( rights ) & 0o777, 0 );
+
+  /* */
+
+  test.case = 'args';
+  c += 1;
+  a.fileProvider.fileWrite( a.abs( `F${c}.txt` ), `F${c}.txt` );
+  var got = a.fileProvider.rightsWrite( a.abs( `F${c}.txt` ), 0o001 );
+  test.identical( got, true );
+  var rights = a.fileProvider.rightsRead( a.abs( `F${c}.txt` ) );
+  console.log( 'rights', ( rights ).toString( 8 ) );
+  test.identical( Number( rights ) & 0o777, 0o001 );
+
+  /* */
+
+  /* qqq : extend the test. try BigInts. try all options */
+  /* qqq : implements similar tests for rightsAdd, rightsDel */
+
+}
 
 //
 
@@ -41793,7 +41864,7 @@ function statsAreHardLinked( test )
   let provider = context.provider;
   let path = provider.path;
 
-  let routinePath = context.pathFor( 'written/statsAreHardLinked' )
+  let routinePath = context.pathFor( 'written/statsAreHardLinked' );
   let filePath1 = context.pathFor( 'written/statsAreHardLinked/file1' );
   let filePath2 = context.pathFor( 'written/statsAreHardLinked/file2' );
   let linkPath1 = context.pathFor( 'written/statsAreHardLinked/link1' );
@@ -50041,7 +50112,7 @@ function hardLinkExperiment( test )
       if( sameTime )
       {
         var time = delay * 1000;
-        provider.fileTimeSet( filePath, time, time );
+        provider.timeWrite( filePath, time, time );
       }
       else if( i > 0 )
       {
@@ -52657,7 +52728,7 @@ var Self =
     fileWriteWithEncoding,
 
     fileTouch,
-    fileTimeSet,
+    timeWrite,
 
     writeAsyncThrowingError,
 
@@ -52822,9 +52893,11 @@ var Self =
     areSoftLinked,
     filesCanBeSame,
 
+    rightsSet,
+
     statsAreHardLinked,
 
-    filesSize,
+    filesSize, /* xxx : move out */
     fileSize,
 
     fileExists,

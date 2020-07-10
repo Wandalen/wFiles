@@ -9,7 +9,7 @@ if( typeof module !== 'undefined' )
   let _ = require( '../../../../wtools/Tools.s' );
 
   File = require( 'fs' );
-  StandardFile = require( 'fs' );
+  StandardFile = require( 'fs' ); /* xxx : remove */
   Os = require( 'os' );
   LockFile = require( 'proper-lockfile' )
 
@@ -702,7 +702,7 @@ function dirReadAct( o )
 
   _.assertRoutineOptions( dirReadAct, arguments );
 
-  let fileNativePath = self.path.nativize( o.filePath );
+  let nativizedFilePath = self.path.nativize( o.filePath );
 
   /* read dir */
 
@@ -719,7 +719,7 @@ function dirReadAct( o )
       });
       if( stat.isDir() )
       {
-        result = File.readdirSync( fileNativePath );
+        result = File.readdirSync( nativizedFilePath );
         return result
       }
       else
@@ -754,7 +754,7 @@ function dirReadAct( o )
       }
       else if( stat.isDir() )
       {
-        File.readdir( fileNativePath, function( err, files )
+        File.readdir( nativizedFilePath, function( err, files )
         {
           if( err )
           {
@@ -797,8 +797,8 @@ function statReadAct( o )
   _.assert( self.path.isNormalized( o.filePath ), 'Expects normalized {-o.FilePath-}, but got', o.filePath );
   _.assertRoutineOptions( statReadAct, arguments );
 
-  let fileNativePath = self.path.nativize( o.filePath );
-  let args = [ fileNativePath ];
+  let nativizedFilePath = self.path.nativize( o.filePath );
+  let args = [ nativizedFilePath ];
 
   if( self.UsingBigIntForStat )
   args.push( { bigint : true } );
@@ -928,10 +928,10 @@ _.routineExtend( statReadAct, Parent.prototype.statReadAct );
 function fileExistsAct( o )
 {
   let self = this;
-  let fileNativePath = self.path.nativize( o.filePath );
+  let nativizedFilePath = self.path.nativize( o.filePath );
   try
   {
-    File.accessSync( fileNativePath, File.constants.F_OK );
+    File.accessSync( nativizedFilePath, File.constants.F_OK );
   }
   catch( err )
   {
@@ -955,6 +955,26 @@ function fileExistsAct( o )
 }
 
 _.routineExtend( fileExistsAct, Parent.prototype.fileExistsAct );
+
+// //
+//
+// function rightsReadAct( o )
+// {
+//   let self = this;
+//   let nativizedFilePath = self.path.nativize( o.filePath );
+//
+//   _.assertRoutineOptions( rightsReadAct, o );
+//
+//   debugger;
+//   let result = File.accessSync( nativizedFilePath );
+//   debugger;
+//   // let d = File.openSync( './files/file.txt', 'r' );
+//   // File.fchmodSync(fd, 0o777);
+//
+//   return result;
+// }
+//
+// _.routineExtend( rightsReadAct, Parent.prototype.rightsReadAct );
 
 // --
 // write
@@ -1027,9 +1047,9 @@ function fileWriteAct( o )
 
   _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ) || _.bufferBytesIs( o.data ), 'Expects string or node buffer, but got', _.strType( o.data ) );
 
-  let fileNativePath = self.path.nativize( o.filePath );
+  let nativizedFilePath = self.path.nativize( o.filePath );
 
-  _.assert( self._pathHasDriveLetter( fileNativePath ), `Expects path that begins with drive letter, but got:"${o.filePath}"` );
+  _.assert( self._pathHasDriveLetter( nativizedFilePath ), `Expects path that begins with drive letter, but got:"${o.filePath}"` );
 
   /* write */
 
@@ -1037,17 +1057,17 @@ function fileWriteAct( o )
   {
 
       if( o.writeMode === 'rewrite' )
-      File.writeFileSync( fileNativePath, o.data, { encoding : self._encodingFor( o.encoding ) } );
+      File.writeFileSync( nativizedFilePath, o.data, { encoding : self._encodingFor( o.encoding ) } );
       else if( o.writeMode === 'append' )
-      File.appendFileSync( fileNativePath, o.data, { encoding : self._encodingFor( o.encoding ) } );
+      File.appendFileSync( nativizedFilePath, o.data, { encoding : self._encodingFor( o.encoding ) } );
       else if( o.writeMode === 'prepend' )
       {
         if( self.fileExistsAct({ filePath : o.filePath, sync : 1 }) )
         {
-          let data = File.readFileSync( fileNativePath, { encoding : undefined } );
+          let data = File.readFileSync( nativizedFilePath, { encoding : undefined } );
           o.data = _.bufferJoin( _.bufferNodeFrom( o.data ), data );
         }
-        File.writeFileSync( fileNativePath, o.data, { encoding : self._encodingFor( o.encoding ) } );
+        File.writeFileSync( nativizedFilePath, o.data, { encoding : self._encodingFor( o.encoding ) } );
       }
       else throw _.err( 'Not implemented write mode', o.writeMode );
 
@@ -1064,22 +1084,22 @@ function fileWriteAct( o )
     }
 
     if( o.writeMode === 'rewrite' )
-    File.writeFile( fileNativePath, o.data, { encoding : self._encodingFor( o.encoding ) }, handleEnd );
+    File.writeFile( nativizedFilePath, o.data, { encoding : self._encodingFor( o.encoding ) }, handleEnd );
     else if( o.writeMode === 'append' )
-    File.appendFile( fileNativePath, o.data, { encoding : self._encodingFor( o.encoding ) }, handleEnd );
+    File.appendFile( nativizedFilePath, o.data, { encoding : self._encodingFor( o.encoding ) }, handleEnd );
     else if( o.writeMode === 'prepend' )
     {
       if( self.fileExistsAct({ filePath : o.filePath, sync : 1 }) )
-      File.readFile( fileNativePath, { encoding : undefined }, function( err, data )
+      File.readFile( nativizedFilePath, { encoding : undefined }, function( err, data )
       {
         if( err )
         return handleEnd( err );
         o.data = _.bufferJoin( _.bufferNodeFrom( o.data ), data );
-        File.writeFile( fileNativePath, o.data, { encoding : self._encodingFor( o.encoding ) }, handleEnd );
+        File.writeFile( nativizedFilePath, o.data, { encoding : self._encodingFor( o.encoding ) }, handleEnd );
       });
       else
       {
-        File.writeFile( fileNativePath, o.data, { encoding : self._encodingFor( o.encoding ) }, handleEnd );
+        File.writeFile( nativizedFilePath, o.data, { encoding : self._encodingFor( o.encoding ) }, handleEnd );
       }
     }
     else handleEnd( _.err( 'Not implemented write mode', o.writeMode ) );
@@ -1117,11 +1137,11 @@ _.routineExtend( streamWriteAct, Parent.prototype.streamWriteAct );
 
 //
 
-function fileTimeSetAct( o )
+function timeWriteAct( o )
 {
   let self = this;
 
-  _.assertRoutineOptions( fileTimeSetAct, arguments );
+  _.assertRoutineOptions( timeWriteAct, arguments );
 
   // File.utimesSync( o.filePath, o.atime, o.mtime );
 
@@ -1131,12 +1151,12 @@ function fileTimeSetAct( o )
     unix up to nanoseconds, but stat.mtime works properly up to milliseconds otherwise returns "Invalid Date"
   */
 
-  let fileNativePath = self.path.nativize( o.filePath );
+  let nativizedFilePath = self.path.nativize( o.filePath );
 
-  _.assert( self._pathHasDriveLetter( fileNativePath ), `Expects path that begins with drive letter, but got:"${o.filePath}"` );
+  _.assert( self._pathHasDriveLetter( nativizedFilePath ), `Expects path that begins with drive letter, but got:"${o.filePath}"` );
 
   let flags = process.platform === 'win32' ? 'r+' : 'r';
-  let descriptor = File.openSync( fileNativePath, flags );
+  let descriptor = File.openSync( nativizedFilePath, flags );
   try
   {
     File.futimesSync( descriptor, o.atime, o.mtime );
@@ -1149,7 +1169,41 @@ function fileTimeSetAct( o )
   }
 }
 
-_.routineExtend( fileTimeSetAct, Parent.prototype.fileTimeSetAct );
+_.routineExtend( timeWriteAct, Parent.prototype.timeWriteAct );
+
+//
+
+function rightsWriteAct( o )
+{
+  let self = this;
+  let nativizedFilePath = self.path.nativize( o.filePath );
+
+  _.assertRoutineOptions( rightsWriteAct, o );
+
+  if( o.addRights !== null || o.delRights !== null )
+  {
+
+    if( o.setRights === null )
+    o.setRights = self.rightsRead({ filePath : o.filePath, sync : 1 });
+    if( o.addRights !== null )
+    o.setRights = Number( o.setRights ) | Number( o.addRights );
+    if( o.delRights !== null )
+    o.setRights = Number( o.setRights ) & Number( ~o.delRights );
+
+  }
+
+  if( o.setRights !== null )
+  {
+    let d = File.openSync( o.filePath, 'r' );
+    File.fchmodSync( d, Number( o.setRights ) );
+    File.closeSync( d );
+    return true;
+  }
+
+  return false;
+}
+
+_.routineExtend( rightsWriteAct, Parent.prototype.rightsWriteAct );
 
 //
 
@@ -1321,10 +1375,10 @@ _.routineExtend( fileDeleteAct, Parent.prototype.fileDeleteAct );
 function dirMakeAct( o )
 {
   let self = this;
-  let fileNativePath = self.path.nativize( o.filePath );
+  let nativizedFilePath = self.path.nativize( o.filePath );
 
   _.assertRoutineOptions( dirMakeAct, arguments );
-  _.assert( self._pathHasDriveLetter( fileNativePath ), `Expects path that begins with drive letter, but got:"${o.filePath}"` );
+  _.assert( self._pathHasDriveLetter( nativizedFilePath ), `Expects path that begins with drive letter, but got:"${o.filePath}"` );
 
 
   if( o.sync )
@@ -1332,7 +1386,7 @@ function dirMakeAct( o )
 
     try
     {
-      File.mkdirSync( fileNativePath );
+      File.mkdirSync( nativizedFilePath );
     }
     catch( err )
     {
@@ -1345,7 +1399,7 @@ function dirMakeAct( o )
   {
     let con = new _.Consequence();
 
-    File.mkdir( fileNativePath, function( err )
+    File.mkdir( nativizedFilePath, function( err )
     {
       if( err )
       con.error( err );
@@ -1367,14 +1421,14 @@ let lockFileCounterMap = Object.create( null );
 function fileLockAct( o )
 {
   let self = this;
-  let fileNativePath = self.path.nativize( o.filePath );
+  let nativizedFilePath = self.path.nativize( o.filePath );
 
   _.assert( !o.locking, 'not implemented' );
   _.assert( !o.sharing || o.sharing === 'process', 'not implemented' );
   _.assert( self.path.isNormalized( o.filePath ) );
   _.assert( !o.waiting || o.timeOut >= 1000 );
   _.assertRoutineOptions( fileLockAct, arguments );
-  _.assert( self._pathHasDriveLetter( fileNativePath ), `Expects path that begins with drive letter, but got:"${o.filePath}"` );
+  _.assert( self._pathHasDriveLetter( nativizedFilePath ), `Expects path that begins with drive letter, but got:"${o.filePath}"` );
 
   let con = _.Consequence.Try( () =>
   {
@@ -1385,7 +1439,7 @@ function fileLockAct( o )
     if( self.fileExistsAct({ filePath : o.filePath + '.lock' } ) )
     {
       if( !o.sharing )
-      throw _.err( 'File', fileNativePath, 'is already locked by current process' );
+      throw _.err( 'File', nativizedFilePath, 'is already locked by current process' );
 
       if( !o.waiting )
       {
@@ -1394,7 +1448,7 @@ function fileLockAct( o )
       else if( o.sync )
       {
         throw _.err
-        ( 'File', fileNativePath, 'is already locked by current process.',
+        ( 'File', nativizedFilePath, 'is already locked by current process.',
           'With option {-o.waiting-} enabled, lock will be waiting for itself.',
           'Please use existing lock or execute method with {-o.sync-} set to 0.'
         )
@@ -1405,7 +1459,7 @@ function fileLockAct( o )
 
     if( o.sync )
     {
-      LockFile.lockSync( fileNativePath, lockOptions );
+      LockFile.lockSync( nativizedFilePath, lockOptions );
       return true;
     }
     else
@@ -1417,7 +1471,7 @@ function fileLockAct( o )
         minTimeout : 1000,
         maxRetryTime : o.timeOut
       }
-      return _.Consequence.From( LockFile.lock( fileNativePath, lockOptions ) );
+      return _.Consequence.From( LockFile.lock( nativizedFilePath, lockOptions ) );
     }
   })
 
@@ -1444,11 +1498,11 @@ _.routineExtend( fileLockAct, Parent.prototype.fileLockAct );
 function fileUnlockAct( o )
 {
   let self = this;
-  let fileNativePath = self.path.nativize( o.filePath );
+  let nativizedFilePath = self.path.nativize( o.filePath );
 
   _.assert( self.path.isNormalized( o.filePath ) );
   _.assertRoutineOptions( fileUnlockAct, arguments );
-  _.assert( self._pathHasDriveLetter( fileNativePath ), `Expects path that begins with drive letter, but got:"${o.filePath}"` );
+  _.assert( self._pathHasDriveLetter( nativizedFilePath ), `Expects path that begins with drive letter, but got:"${o.filePath}"` );
 
   let con = _.Consequence.Try( () =>
   {
@@ -1467,12 +1521,12 @@ function fileUnlockAct( o )
 
     if( o.sync )
     {
-      LockFile.unlockSync( fileNativePath );
+      LockFile.unlockSync( nativizedFilePath );
       return true;
     }
     else
     {
-      return _.Consequence.From( LockFile.unlock( fileNativePath ) );
+      return _.Consequence.From( LockFile.unlock( nativizedFilePath ) );
     }
 
   })
@@ -1500,7 +1554,7 @@ _.routineExtend( fileUnlockAct, Parent.prototype.fileUnlockAct );
 function fileIsLockedAct( o )
 {
   let self = this;
-  let fileNativePath = self.path.nativize( o.filePath );
+  let nativizedFilePath = self.path.nativize( o.filePath );
 
   _.assertRoutineOptions( fileIsLockedAct, arguments );
   _.assert( self.path.isNormalized( o.filePath ) );
@@ -1510,11 +1564,11 @@ function fileIsLockedAct( o )
     debugger
     if( o.sync )
     {
-      return LockFile.checkSync( fileNativePath );
+      return LockFile.checkSync( nativizedFilePath );
     }
     else
     {
-      return _.Consequence.From( LockFile.check( fileNativePath ) );
+      return _.Consequence.From( LockFile.check( nativizedFilePath ) );
     }
   })
 
@@ -1587,19 +1641,12 @@ function fileCopyAct( o )
     return new _.Consequence().error( err );
   }
 
-  // if( o.breakingDstHardLink && self.isHardLink( o.dstPath ) ) /* qqq2 : remove option breakingDstHardLink from Act routine aaa:done */
-  // self.hardLinkBreak({ filePath : o.dstPath, sync : 1 });
-
   if( self.isSoftLink( o.srcPath ) ) /* qqq2 : should not be here. move to partial aaa: should be here becase Extract has more optiomal implementation of this case */
   {
     if( self.fileExistsAct({ filePath : o.dstPath }) )
     self.fileDeleteAct({ filePath : o.dstPath, sync : 1 })
-    // let srcPathResolved = self.pathResolveSoftLink( o.srcPath );
-    // let srcPath = self.path.join( o.srcPath, srcPathResolved );
     return self.softLinkAct
     ({
-      // originalDstPath : o.originalDstPath,
-      // originalSrcPath : srcPathResolved,
       srcPath : o.srcPath,
       dstPath : o.dstPath,
 
@@ -2095,7 +2142,6 @@ encoders[ 'buffer.raw' ] =
 
   onBegin : function( e )
   {
-    // debugger;
     _.assert( e.transaction.encoding === 'buffer.raw' );
     e.transaction.encoding = 'buffer.node';
   },
@@ -2223,7 +2269,9 @@ let Statics =
   KnownNativeEncodings : KnownNativeEncodings,
   UsingBigIntForStat : UsingBigIntForStat,
   Path : _.path.CloneExtending({ fileProvider : Self }),
+
   SupportsIno : 1,
+  SupportsRights : 1,
 
 }
 
@@ -2264,7 +2312,8 @@ let Extend =
 
   fileWriteAct,
   streamWriteAct,
-  fileTimeSetAct,
+  timeWriteAct,
+  rightsWriteAct,
   fileDeleteAct,
   dirMakeAct,
 

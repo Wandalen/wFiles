@@ -666,7 +666,7 @@ let Extension =
   // write
 
   fileWriteAct,
-  fileTimeSetAct : null,
+  timeWriteAct : null,
   fileDeleteAct,
   dirMakeAct,
   streamWriteAct : null,

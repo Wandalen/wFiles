@@ -35437,7 +35437,7 @@ function filesFindDifference( test )
   let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
 
   /* zzz Needs repair. Files tree is written with "sameTime" option enabled, but files are not having same timestamps anyway,
-     probably problem is in method used by HardDrive.fileTimeSetAct
+     probably problem is in method used by HardDrive.timeWriteAct
   */
 
   var testRoutineDir = path.join( context.suiteTempPath, test.name );

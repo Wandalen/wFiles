@@ -188,8 +188,52 @@ function MakeDefault()
 }
 
 // --
-// etc
+// helper
 // --
+
+/**
+ * Return options for file read/write. If `filePath is an object, method returns it. Method validate result option
+    properties by default parameters from invocation context.
+ * @param {string|Object} filePath
+ * @param {Object} [o] Object with default options parameters
+ * @returns {Object} Result options
+ * @private
+ * @throws {Error} If arguments is missed
+ * @throws {Error} If passed extra arguments
+ * @throws {Error} If missed `PathFiile`
+ * @method _fileOptionsGet
+ * @class wFileProviderPartial
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
+ */
+
+function _fileOptionsGet( filePath, o )
+{
+  let self = this;
+  o = o || Object.create( null );
+
+  if( _.objectIs( filePath ) )
+  {
+    o = filePath;
+  }
+  else
+  {
+    o.filePath = filePath;
+  }
+
+  if( !o.filePath )
+  throw _.err( '_fileOptionsGet :', 'Expects (-o.filePath-)' );
+
+  _.assertMapHasOnly( o, this.defaults );
+  _.assert( arguments.length === 1 || arguments.length === 2 );
+
+  if( o.sync === undefined )
+  o.sync = 1;
+
+  return o;
+}
+
+//
 
 function _providerDefaultsApply( o )
 {
@@ -404,50 +448,6 @@ function _preSrcDstPathWithProviderDefaults( routine, args )
 
   let o = self._preSrcDstPathWithoutProviderDefaults.apply( self, arguments );
   self._providerDefaultsApply( o );
-
-  return o;
-}
-
-//
-
-/**
- * Return options for file read/write. If `filePath is an object, method returns it. Method validate result option
-    properties by default parameters from invocation context.
- * @param {string|Object} filePath
- * @param {Object} [o] Object with default options parameters
- * @returns {Object} Result options
- * @private
- * @throws {Error} If arguments is missed
- * @throws {Error} If passed extra arguments
- * @throws {Error} If missed `PathFiile`
- * @method _fileOptionsGet
- * @class wFileProviderPartial
- * @namespace wTools.FileProvider
- * @module Tools/mid/Files
- */
-
-function _fileOptionsGet( filePath, o )
-{
-  let self = this;
-  o = o || Object.create( null );
-
-  if( _.objectIs( filePath ) )
-  {
-    o = filePath;
-  }
-  else
-  {
-    o.filePath = filePath;
-  }
-
-  if( !o.filePath )
-  throw _.err( '_fileOptionsGet :', 'Expects (-o.filePath-)' );
-
-  _.assertMapHasOnly( o, this.defaults );
-  _.assert( arguments.length === 1 || arguments.length === 2 );
-
-  if( o.sync === undefined )
-  o.sync = 1;
 
   return o;
 }
@@ -2606,6 +2606,477 @@ let fileExists = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults
 var having = fileExists.having;
 fileExists.having.aspect = 'entry';
 
+//
+
+function isTerminal_body( o )
+{
+  let self = this;
+
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( _.assertRoutineOptions( isTerminal_body, arguments ) );
+  _.assert( _.boolLike( o.resolvingSoftLink ) || _.numberIs( o.resolvingSoftLink ) );
+  _.assert( _.boolLike( o.resolvingTextLink ) || _.numberIs( o.resolvingTextLink ) );
+
+  let o2 =
+  {
+    filePath : o.filePath,
+    resolvingSoftLink : o.resolvingSoftLink,
+    resolvingTextLink : o.resolvingTextLink,
+    throwing : 0
+  }
+
+  o.filePath = self.pathResolveLinkFull( o2 ).absolutePath;
+
+  _.assert( o2.stat !== undefined );
+
+  if( o2.stat === null )
+  return false;
+
+  return o2.stat.isTerminal();
+}
+
+var defaults = isTerminal_body.defaults = Object.create( null );
+defaults.filePath = null;
+defaults.resolvingSoftLink = 0;
+defaults.resolvingTextLink = 0;
+
+var having = isTerminal_body.having = Object.create( null );
+having.writing = 0;
+having.reading = 1;
+having.driving = 0;
+having.hubResolving = 1;
+
+var operates = isTerminal_body.operates = Object.create( null );
+operates.filePath = { pathToRead : 1 }
+
+//
+
+/**
+ * Returns true if file at ( filePath ) is an existing regular terminal file.
+ * @example
+ * wTools.isTerminal( './existingDir/test.txt' ); // true
+ * @param {string} filePath Path string
+ * @returns {boolean}
+ * @method isTerminal
+ * @class wFileProviderPartial
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
+ */
+
+let isTerminal = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isTerminal_body );
+
+isTerminal.having.aspect = 'entry';
+
+//
+
+/**
+ * Returns true if resolved file at ( filePath ) is an existing regular terminal file.
+ * @example
+ * wTools.isTerminal( './existingDir/test.txt' ); // true
+ * @param {string} filePath Path string
+ * @returns {boolean}
+ * @method resolvedIsTerminal
+ * @class wFileProviderPartial
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
+ */
+
+let resolvedIsTerminal = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isTerminal_body );
+
+resolvedIsTerminal.defaults.resolvingSoftLink = null;
+resolvedIsTerminal.defaults.resolvingTextLink = null;
+
+resolvedIsTerminal.having.aspect = 'entry';
+
+//
+
+function isDir_body( o )
+{
+  let self = this;
+
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( _.assertRoutineOptions( isDir_body, arguments ) );
+  _.assert( _.boolLike( o.resolvingSoftLink ) || _.numberIs( o.resolvingSoftLink ) );
+  _.assert( _.boolLike( o.resolvingTextLink ) || _.numberIs( o.resolvingTextLink ) );
+
+  let o2 =
+  {
+    filePath : o.filePath,
+    resolvingSoftLink : o.resolvingSoftLink,
+    resolvingTextLink : o.resolvingTextLink,
+    throwing : 0
+  }
+
+  o.filePath = self.pathResolveLinkFull( o2 ).absolutePath;
+
+  _.assert( o2.stat !== undefined );
+
+  if( !o2.stat )
+  return false;
+
+  return o2.stat.isDir();
+}
+
+var defaults = isDir_body.defaults = Object.create( null );
+defaults.filePath = null;
+defaults.resolvingSoftLink = 0;
+defaults.resolvingTextLink = 0;
+
+var having = isDir_body.having = Object.create( null );
+having.writing = 0;
+having.reading = 1;
+having.driving = 0;
+
+var operates = isDir_body.operates = Object.create( null );
+operates.filePath = { pathToRead : 1 }
+
+//
+
+/**
+ * Return True if file at ( filePath ) is an existing directory.
+ * If file is symbolic link to file or directory return false.
+ * @example
+ * wTools.isDir( './existingDir/' ); // true
+ * @param {string} filePath Tested path string
+ * @returns {boolean}
+ * @method isDir
+ * @class wFileProviderPartial
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
+ */
+
+let isDir = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isDir_body );
+
+isDir.having.aspect = 'entry';
+
+//
+
+/**
+ * Return True if file at resolved ( filePath ) is an existing directory.
+ * If file is symbolic link to file or directory return false.
+ * @example
+ * wTools.isDir( './existingDir/' ); // true
+ * @param {string} filePath Tested path string
+ * @returns {boolean}
+ * @method resolvedIsDir
+ * @class wFileProviderPartial
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
+ */
+
+let resolvedIsDir = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isDir_body );
+
+resolvedIsDir.defaults.resolvingSoftLink = null;
+resolvedIsDir.defaults.resolvingTextLink = null;
+
+resolvedIsDir.having.aspect = 'entry';
+
+//
+
+/**
+ * Return True if file at `filePath` is a hard link.
+ * @param filePath
+ * @returns {boolean}
+ * @method isHardLink
+ * @class wFileProviderPartial
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
+ */
+
+function isHardLink_body( o )
+{
+  let self = this;
+
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( _.assertRoutineOptions( isHardLink_body, arguments ) );
+  _.assert( _.boolLike( o.resolvingSoftLink ) || _.numberIs( o.resolvingSoftLink ) );
+  _.assert( _.boolLike( o.resolvingTextLink ) || _.numberIs( o.resolvingTextLink ) );
+
+  let o2 =
+  {
+    filePath : o.filePath,
+    resolvingSoftLink : o.resolvingSoftLink,
+    resolvingTextLink : o.resolvingTextLink,
+    throwing : 0
+  }
+
+  o.filePath = self.pathResolveLinkFull( o2 ).absolutePath;
+
+  _.assert( o2.stat !== undefined );
+
+  if( o2.stat === null )
+  return false;
+
+  return o2.stat.isHardLink();
+}
+
+var defaults = isHardLink_body.defaults = Object.create( null );
+defaults.filePath = null;
+defaults.resolvingSoftLink = 0;
+defaults.resolvingTextLink = 0;
+
+var having = isHardLink_body.having = Object.create( null );
+having.writing = 0;
+having.reading = 1;
+having.driving = 0;
+having.hubResolving = 1;
+
+var operates = isHardLink_body.operates = Object.create( null );
+operates.filePath = { pathToRead : 1 }
+
+//
+
+let isHardLink = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isHardLink_body );
+
+isHardLink.defaults.resolvingSoftLink = 0;
+isHardLink.defaults.resolvingTextLink = 0;
+
+isHardLink.having.aspect = 'entry';
+
+//
+
+let resolvedIsHardLink = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isHardLink_body );
+
+resolvedIsHardLink.defaults.resolvingSoftLink = null;
+resolvedIsHardLink.defaults.resolvingTextLink = null;
+
+resolvedIsHardLink.having.aspect = 'entry';
+
+//
+
+/**
+ * Return True if `filePath` is a symbolic link.
+ * @param filePath
+ * @returns {boolean}
+ * @method isSoftLink
+ * @class wFileProviderPartial
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
+ */
+
+function isSoftLink_body( o )
+{
+  let self = this;
+
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( _.assertRoutineOptions( isSoftLink_body, arguments ) );
+  _.assert( _.boolLike( o.resolvingTextLink ) || _.numberIs( o.resolvingTextLink ) );
+
+
+  let o2 =
+  {
+    filePath : o.filePath,
+    resolvingSoftLink : 0,
+    resolvingTextLink : o.resolvingTextLink,
+    throwing : 0,
+  }
+
+  o.filePath = self.pathResolveLinkFull( o2 ).absolutePath;
+
+  _.assert( o2.stat !== undefined );
+
+  if( o2.stat === null )
+  return false;
+
+  return o2.stat.isSoftLink()
+}
+
+var defaults = isSoftLink_body.defaults = Object.create( null );
+defaults.filePath = null;
+defaults.resolvingTextLink = 0;
+
+var having = isSoftLink_body.having = Object.create( null );
+having.writing = 0;
+having.reading = 1;
+having.driving = 0;
+having.hubResolving = 1;
+
+var operates = isSoftLink_body.operates = Object.create( null );
+operates.filePath = { pathToRead : 1 }
+
+//
+
+let isSoftLink = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isSoftLink_body );
+isSoftLink.defaults.resolvingTextLink = 0;
+isSoftLink.having.aspect = 'entry';
+
+//
+
+let resolvedIsSoftLink = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isSoftLink_body );
+resolvedIsSoftLink.defaults.resolvingTextLink = null;
+resolvedIsSoftLink.having.aspect = 'entry';
+
+//
+
+function isTextLink_body( o )
+{
+  let self = this;
+
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.assert( _.assertRoutineOptions( isTextLink_body, arguments ) );
+  _.assert( _.boolLike( o.resolvingSoftLink ) || _.numberIs( o.resolvingSoftLink ) );
+
+  let o2 =
+  {
+    filePath : o.filePath,
+    resolvingSoftLink : o.resolvingSoftLink,
+    resolvingTextLink : 0,
+    throwing : 0
+  }
+
+  o.filePath = self.pathResolveLinkFull( o2 ).absolutePath;
+
+  _.assert( o2.stat !== undefined );
+
+  if( o2.stat === null )
+  return false;
+
+  return o2.stat.isTextLink();
+}
+
+var defaults = isTextLink_body.defaults = Object.create( null );
+defaults.filePath = null;
+defaults.resolvingSoftLink = 0;
+
+var having = isTextLink_body.having = Object.create( null );
+having.writing = 0;
+having.reading = 1;
+having.driving = 0;
+having.hubResolving = 1;
+
+var operates = isTextLink_body.operates = Object.create( null );
+operates.filePath = { pathToRead : 1 }
+
+//
+
+let isTextLink = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isTextLink_body );
+isTextLink.defaults.resolvingSoftLink = 0;
+isTextLink.having.aspect = 'entry';
+
+//
+
+let resolvedIsTextLink = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isTextLink_body );
+resolvedIsTextLink.defaults.resolvingSoftLink = null;
+resolvedIsTextLink.having.aspect = 'entry';
+
+//
+
+function isLink_body( o )
+{
+  let self = this;
+
+  _.assert( arguments.length === 1, 'Expects single argument' );
+
+  let result = false;
+
+  if( o.resolvingSoftLink && o.resolvingTextLink )
+  return result;
+
+  let o2 =
+  {
+    filePath : o.filePath,
+    resolvingSoftLink : o.resolvingSoftLink,
+    resolvingTextLink : o.resolvingTextLink,
+    throwing : 0
+  }
+
+  o.filePath = self.pathResolveLinkFull( o2 ).absolutePath;
+
+  _.assert( o2.stat !== undefined );
+
+  if( o2.stat === null )
+  return result;
+
+  result = o2.stat.isLink();
+
+  return result;
+}
+
+var defaults = isLink_body.defaults = Object.create( null );
+defaults.filePath = null;
+defaults.resolvingSoftLink = 0;
+defaults.resolvingTextLink = 0;
+defaults.usingTextLink = 0;
+
+var having = isLink_body.having = Object.create( null );
+having.writing = 0;
+having.reading = 1;
+having.aspect = 'body';
+having.driving = 0;
+
+var operates = isLink_body.operates = Object.create( null );
+operates.filePath = { pathToRead : 1 };
+
+//
+
+let isLink = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isLink_body );
+
+isLink.having.aspect = 'entry';
+
+//
+
+let resolvedIsLink = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isLink_body );
+
+resolvedIsLink.defaults.resolvingSoftLink = null;
+resolvedIsLink.defaults.resolvingTextLink = null;
+
+resolvedIsLink.having.aspect = 'entry';
+
+//
+
+/**
+ * Returns True if file at ( filePath ) is an existing empty directory, otherwise returns false.
+ * If file is symbolic link to file or directory return false.
+ * @example
+ * wTools.fileProvider.dirIsEmpty( './existingEmptyDir/' ); // true
+ * @param {string} filePath - Path to the directory.
+ * @returns {boolean}
+ * @method dirIsEmpty
+ * @class wFileProviderPartial
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
+ */
+
+function dirIsEmpty( filePath )
+{
+  let self = this;
+
+  _.assert( arguments.length === 1, 'Expects single argument' );
+
+  if( self.isDir( filePath ) )
+  return !self.dirRead( filePath ).length;
+
+  return false;
+}
+
+var having = dirIsEmpty.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.driving = 0;
+
+//
+
+function resolvedDirIsEmpty( filePath )
+{
+  let self = this;
+
+  _.assert( arguments.length === 1, 'Expects single argument' );
+
+  let o = { filePath : filePath };
+
+  if( self.resolvedIsDir( o ) )
+  return !self.dirRead( o.filePath ).length;
+
+  return false;
+}
+
+var having = resolvedDirIsEmpty.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.driving = 0;
+
 // --
 // read
 // --
@@ -2785,7 +3256,7 @@ function fileRead_body( o )
 {
   let self = this;
   let result = null;
-  debugger;
+
   if( o.encoding === _.unknown ) /* qqq : cover */
   o.encoding = _.files.encoder.deduce({ filePath : o.filePath, returning : 'name', criterion : { reader : true } });
 
@@ -3846,6 +4317,71 @@ dirReadTerminals.having.aspect = 'entry';
 
 //
 
+// let rightsReadAct = Object.create( null );
+// rightsReadAct.name = 'rightsReadAct';
+
+function rightsReadAct( o )
+{
+  let self = this;
+  let stat = self.statRead( o );
+  return stat.mode;
+}
+
+var defaults = rightsReadAct.defaults = Object.create( null );
+defaults.filePath = null;
+defaults.sync = null;
+
+var having = rightsReadAct.having = Object.create( null );
+having.writing = 0;
+having.reading = 1;
+having.driving = 1;
+
+var operates = rightsReadAct.operates = Object.create( null );
+operates.filePath = { pathToRead : 1 }
+
+//
+
+function rightsRead_pre( routine, args )
+{
+  let self = this;
+
+  let o = args[ 0 ];
+  if( _.strIs( args[ 0 ] ) )
+  o = { filePath : args[ 0 ] }
+  _.assert( args.length === 1 );
+
+  _.assert( arguments.length === 2, 'Expects exactly two arguments' );
+  _.routineOptions( routine, o );
+
+  if( o.sync === null )
+  o.sync = self.sync;
+
+  return o;
+}
+
+//
+
+function rightsRead_body( o )
+{
+  let self = this;
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  return self.rightsReadAct( o );
+}
+
+_.routineExtend( rightsRead_body, rightsReadAct );
+
+var having = rightsRead_body.having;
+having.driving = 0;
+having.aspect = 'body';
+
+//
+
+let rightsRead = _.routineFromPreAndBody( rightsRead_pre, rightsRead_body );
+var having = rightsRead.having;
+having.aspect = 'entry';
+
+//
+
 function filesFingerprints( files )
 {
   let self = this;
@@ -4104,477 +4640,6 @@ _.routineExtend( filesAreSameForSure_body, filesAreSameCommon_body );
 
 let filesAreSameForSure = _.routineFromPreAndBody( filesAreSame_pre, filesAreSameForSure_body );
 filesAreSameForSure.having.aspect = 'entry';
-
-//
-
-function isTerminal_body( o )
-{
-  let self = this;
-
-  _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.assertRoutineOptions( isTerminal_body, arguments ) );
-  _.assert( _.boolLike( o.resolvingSoftLink ) || _.numberIs( o.resolvingSoftLink ) );
-  _.assert( _.boolLike( o.resolvingTextLink ) || _.numberIs( o.resolvingTextLink ) );
-
-  let o2 =
-  {
-    filePath : o.filePath,
-    resolvingSoftLink : o.resolvingSoftLink,
-    resolvingTextLink : o.resolvingTextLink,
-    throwing : 0
-  }
-
-  o.filePath = self.pathResolveLinkFull( o2 ).absolutePath;
-
-  _.assert( o2.stat !== undefined );
-
-  if( o2.stat === null )
-  return false;
-
-  return o2.stat.isTerminal();
-}
-
-var defaults = isTerminal_body.defaults = Object.create( null );
-defaults.filePath = null;
-defaults.resolvingSoftLink = 0;
-defaults.resolvingTextLink = 0;
-
-var having = isTerminal_body.having = Object.create( null );
-having.writing = 0;
-having.reading = 1;
-having.driving = 0;
-having.hubResolving = 1;
-
-var operates = isTerminal_body.operates = Object.create( null );
-operates.filePath = { pathToRead : 1 }
-
-//
-
-/**
- * Returns true if file at ( filePath ) is an existing regular terminal file.
- * @example
- * wTools.isTerminal( './existingDir/test.txt' ); // true
- * @param {string} filePath Path string
- * @returns {boolean}
- * @method isTerminal
- * @class wFileProviderPartial
- * @namespace wTools.FileProvider
- * @module Tools/mid/Files
- */
-
-let isTerminal = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isTerminal_body );
-
-isTerminal.having.aspect = 'entry';
-
-//
-
-/**
- * Returns true if resolved file at ( filePath ) is an existing regular terminal file.
- * @example
- * wTools.isTerminal( './existingDir/test.txt' ); // true
- * @param {string} filePath Path string
- * @returns {boolean}
- * @method resolvedIsTerminal
- * @class wFileProviderPartial
- * @namespace wTools.FileProvider
- * @module Tools/mid/Files
- */
-
-let resolvedIsTerminal = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isTerminal_body );
-
-resolvedIsTerminal.defaults.resolvingSoftLink = null;
-resolvedIsTerminal.defaults.resolvingTextLink = null;
-
-resolvedIsTerminal.having.aspect = 'entry';
-
-//
-
-function isDir_body( o )
-{
-  let self = this;
-
-  _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.assertRoutineOptions( isDir_body, arguments ) );
-  _.assert( _.boolLike( o.resolvingSoftLink ) || _.numberIs( o.resolvingSoftLink ) );
-  _.assert( _.boolLike( o.resolvingTextLink ) || _.numberIs( o.resolvingTextLink ) );
-
-  let o2 =
-  {
-    filePath : o.filePath,
-    resolvingSoftLink : o.resolvingSoftLink,
-    resolvingTextLink : o.resolvingTextLink,
-    throwing : 0
-  }
-
-  o.filePath = self.pathResolveLinkFull( o2 ).absolutePath;
-
-  _.assert( o2.stat !== undefined );
-
-  if( !o2.stat )
-  return false;
-
-  return o2.stat.isDir();
-}
-
-var defaults = isDir_body.defaults = Object.create( null );
-defaults.filePath = null;
-defaults.resolvingSoftLink = 0;
-defaults.resolvingTextLink = 0;
-
-var having = isDir_body.having = Object.create( null );
-having.writing = 0;
-having.reading = 1;
-having.driving = 0;
-
-var operates = isDir_body.operates = Object.create( null );
-operates.filePath = { pathToRead : 1 }
-
-//
-
-/**
- * Return True if file at ( filePath ) is an existing directory.
- * If file is symbolic link to file or directory return false.
- * @example
- * wTools.isDir( './existingDir/' ); // true
- * @param {string} filePath Tested path string
- * @returns {boolean}
- * @method isDir
- * @class wFileProviderPartial
- * @namespace wTools.FileProvider
- * @module Tools/mid/Files
- */
-
-let isDir = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isDir_body );
-
-isDir.having.aspect = 'entry';
-
-//
-
-/**
- * Return True if file at resolved ( filePath ) is an existing directory.
- * If file is symbolic link to file or directory return false.
- * @example
- * wTools.isDir( './existingDir/' ); // true
- * @param {string} filePath Tested path string
- * @returns {boolean}
- * @method resolvedIsDir
- * @class wFileProviderPartial
- * @namespace wTools.FileProvider
- * @module Tools/mid/Files
- */
-
-let resolvedIsDir = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isDir_body );
-
-resolvedIsDir.defaults.resolvingSoftLink = null;
-resolvedIsDir.defaults.resolvingTextLink = null;
-
-resolvedIsDir.having.aspect = 'entry';
-
-//
-
-/**
- * Return True if file at `filePath` is a hard link.
- * @param filePath
- * @returns {boolean}
- * @method isHardLink
- * @class wFileProviderPartial
- * @namespace wTools.FileProvider
- * @module Tools/mid/Files
- */
-
-function isHardLink_body( o )
-{
-  let self = this;
-
-  _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.assertRoutineOptions( isHardLink_body, arguments ) );
-  _.assert( _.boolLike( o.resolvingSoftLink ) || _.numberIs( o.resolvingSoftLink ) );
-  _.assert( _.boolLike( o.resolvingTextLink ) || _.numberIs( o.resolvingTextLink ) );
-
-  let o2 =
-  {
-    filePath : o.filePath,
-    resolvingSoftLink : o.resolvingSoftLink,
-    resolvingTextLink : o.resolvingTextLink,
-    throwing : 0
-  }
-
-  o.filePath = self.pathResolveLinkFull( o2 ).absolutePath;
-
-  _.assert( o2.stat !== undefined );
-
-  if( o2.stat === null )
-  return false;
-
-  return o2.stat.isHardLink();
-}
-
-var defaults = isHardLink_body.defaults = Object.create( null );
-defaults.filePath = null;
-defaults.resolvingSoftLink = 0;
-defaults.resolvingTextLink = 0;
-
-var having = isHardLink_body.having = Object.create( null );
-having.writing = 0;
-having.reading = 1;
-having.driving = 0;
-having.hubResolving = 1;
-
-var operates = isHardLink_body.operates = Object.create( null );
-operates.filePath = { pathToRead : 1 }
-
-//
-
-let isHardLink = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isHardLink_body );
-
-isHardLink.defaults.resolvingSoftLink = 0;
-isHardLink.defaults.resolvingTextLink = 0;
-
-isHardLink.having.aspect = 'entry';
-
-//
-
-let resolvedIsHardLink = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isHardLink_body );
-
-resolvedIsHardLink.defaults.resolvingSoftLink = null;
-resolvedIsHardLink.defaults.resolvingTextLink = null;
-
-resolvedIsHardLink.having.aspect = 'entry';
-
-//
-
-/**
- * Return True if `filePath` is a symbolic link.
- * @param filePath
- * @returns {boolean}
- * @method isSoftLink
- * @class wFileProviderPartial
- * @namespace wTools.FileProvider
- * @module Tools/mid/Files
- */
-
-function isSoftLink_body( o )
-{
-  let self = this;
-
-  _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.assertRoutineOptions( isSoftLink_body, arguments ) );
-  _.assert( _.boolLike( o.resolvingTextLink ) || _.numberIs( o.resolvingTextLink ) );
-
-
-  let o2 =
-  {
-    filePath : o.filePath,
-    resolvingSoftLink : 0,
-    resolvingTextLink : o.resolvingTextLink,
-    throwing : 0,
-  }
-
-  o.filePath = self.pathResolveLinkFull( o2 ).absolutePath;
-
-  _.assert( o2.stat !== undefined );
-
-  if( o2.stat === null )
-  return false;
-
-  return o2.stat.isSoftLink()
-}
-
-var defaults = isSoftLink_body.defaults = Object.create( null );
-defaults.filePath = null;
-defaults.resolvingTextLink = 0;
-
-var having = isSoftLink_body.having = Object.create( null );
-having.writing = 0;
-having.reading = 1;
-having.driving = 0;
-having.hubResolving = 1;
-
-var operates = isSoftLink_body.operates = Object.create( null );
-operates.filePath = { pathToRead : 1 }
-
-//
-
-let isSoftLink = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isSoftLink_body );
-isSoftLink.defaults.resolvingTextLink = 0;
-isSoftLink.having.aspect = 'entry';
-
-//
-
-let resolvedIsSoftLink = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isSoftLink_body );
-resolvedIsSoftLink.defaults.resolvingTextLink = null;
-resolvedIsSoftLink.having.aspect = 'entry';
-
-//
-
-function isTextLink_body( o )
-{
-  let self = this;
-
-  _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.assertRoutineOptions( isTextLink_body, arguments ) );
-  _.assert( _.boolLike( o.resolvingSoftLink ) || _.numberIs( o.resolvingSoftLink ) );
-
-  let o2 =
-  {
-    filePath : o.filePath,
-    resolvingSoftLink : o.resolvingSoftLink,
-    resolvingTextLink : 0,
-    throwing : 0
-  }
-
-  o.filePath = self.pathResolveLinkFull( o2 ).absolutePath;
-
-  _.assert( o2.stat !== undefined );
-
-  if( o2.stat === null )
-  return false;
-
-  return o2.stat.isTextLink();
-}
-
-var defaults = isTextLink_body.defaults = Object.create( null );
-defaults.filePath = null;
-defaults.resolvingSoftLink = 0;
-
-var having = isTextLink_body.having = Object.create( null );
-having.writing = 0;
-having.reading = 1;
-having.driving = 0;
-having.hubResolving = 1;
-
-var operates = isTextLink_body.operates = Object.create( null );
-operates.filePath = { pathToRead : 1 }
-
-//
-
-let isTextLink = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isTextLink_body );
-isTextLink.defaults.resolvingSoftLink = 0;
-isTextLink.having.aspect = 'entry';
-
-//
-
-let resolvedIsTextLink = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isTextLink_body );
-resolvedIsTextLink.defaults.resolvingSoftLink = null;
-resolvedIsTextLink.having.aspect = 'entry';
-
-//
-
-function isLink_body( o )
-{
-  let self = this;
-
-  _.assert( arguments.length === 1, 'Expects single argument' );
-
-  let result = false;
-
-  if( o.resolvingSoftLink && o.resolvingTextLink )
-  return result;
-
-  let o2 =
-  {
-    filePath : o.filePath,
-    resolvingSoftLink : o.resolvingSoftLink,
-    resolvingTextLink : o.resolvingTextLink,
-    throwing : 0
-  }
-
-  o.filePath = self.pathResolveLinkFull( o2 ).absolutePath;
-
-  _.assert( o2.stat !== undefined );
-
-  if( o2.stat === null )
-  return result;
-
-  result = o2.stat.isLink();
-
-  return result;
-}
-
-var defaults = isLink_body.defaults = Object.create( null );
-defaults.filePath = null;
-defaults.resolvingSoftLink = 0;
-defaults.resolvingTextLink = 0;
-defaults.usingTextLink = 0;
-
-var having = isLink_body.having = Object.create( null );
-having.writing = 0;
-having.reading = 1;
-having.aspect = 'body';
-having.driving = 0;
-
-var operates = isLink_body.operates = Object.create( null );
-operates.filePath = { pathToRead : 1 };
-
-//
-
-let isLink = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isLink_body );
-
-isLink.having.aspect = 'entry';
-
-//
-
-let resolvedIsLink = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isLink_body );
-
-resolvedIsLink.defaults.resolvingSoftLink = null;
-resolvedIsLink.defaults.resolvingTextLink = null;
-
-resolvedIsLink.having.aspect = 'entry';
-
-//
-
-/**
- * Returns True if file at ( filePath ) is an existing empty directory, otherwise returns false.
- * If file is symbolic link to file or directory return false.
- * @example
- * wTools.fileProvider.dirIsEmpty( './existingEmptyDir/' ); // true
- * @param {string} filePath - Path to the directory.
- * @returns {boolean}
- * @method dirIsEmpty
- * @class wFileProviderPartial
- * @namespace wTools.FileProvider
- * @module Tools/mid/Files
- */
-
-function dirIsEmpty( filePath )
-{
-  let self = this;
-
-  _.assert( arguments.length === 1, 'Expects single argument' );
-
-  if( self.isDir( filePath ) )
-  return !self.dirRead( filePath ).length;
-
-  return false;
-}
-
-var having = dirIsEmpty.having = Object.create( null );
-
-having.writing = 0;
-having.reading = 1;
-having.driving = 0;
-
-//
-
-function resolvedDirIsEmpty( filePath )
-{
-  let self = this;
-
-  _.assert( arguments.length === 1, 'Expects single argument' );
-
-  let o = { filePath : filePath };
-
-  if( self.resolvedIsDir( o ) )
-  return !self.dirRead( o.filePath ).length;
-
-  return false;
-}
-
-var having = resolvedDirIsEmpty.having = Object.create( null );
-
-having.writing = 0;
-having.reading = 1;
-having.driving = 0;
 
 // --
 // write
@@ -5063,25 +5128,26 @@ fileTouch.having.aspect = 'entry';
 
 //
 
-let fileTimeSetAct = Object.create( null );
-fileTimeSetAct.name = 'fileTimeSetAct';
+let timeWriteAct = Object.create( null );
+timeWriteAct.name = 'timeWriteAct';
 
-var defaults = fileTimeSetAct.defaults = Object.create( null );
+var defaults = timeWriteAct.defaults = Object.create( null );
 defaults.filePath = null;
 defaults.atime = null;
 defaults.mtime = null;
+/* qqq : add and cover option sync */
 
-var having = fileTimeSetAct.having = Object.create( null );
+var having = timeWriteAct.having = Object.create( null );
 having.writing = 1;
 having.reading = 0;
 having.driving = 1;
 
-var operates = fileTimeSetAct.operates = Object.create( null );
+var operates = timeWriteAct.operates = Object.create( null );
 operates.filePath = { pathToWrite : 1 }
 
 //
 
-function fileTimeSet_pre( routine, args )
+function timeWrite_pre( routine, args )
 {
   let self = this;
   let o;
@@ -5119,23 +5185,109 @@ function fileTimeSet_pre( routine, args )
 
 //
 
-function fileTimeSet_body( o )
+function timeWrite_body( o )
 {
   let self = this;
   _.assert( arguments.length === 1, 'Expects single argument' );
-  return self.fileTimeSetAct( o );
+  return self.timeWriteAct( o );
 }
 
-_.routineExtend( fileTimeSet_body, fileTimeSetAct );
+_.routineExtend( timeWrite_body, timeWriteAct );
 
-var having = fileTimeSet_body.having;
+var having = timeWrite_body.having;
 having.driving = 0;
 having.aspect = 'body';
 
 //
 
-let fileTimeSet = _.routineFromPreAndBody( fileTimeSet_pre, fileTimeSet_body );
-var having = fileTimeSet.having;
+let timeWrite = _.routineFromPreAndBody( timeWrite_pre, timeWrite_body );
+timeWrite.having.aspect = 'entry';
+
+//
+
+let rightsWriteAct = Object.create( null );
+rightsWriteAct.name = 'rightsWriteAct';
+
+var defaults = rightsWriteAct.defaults = Object.create( null );
+defaults.filePath = null;
+defaults.addRights = null;
+defaults.delRights = null;
+defaults.setRights = null;
+defaults.sync = null;
+
+var having = rightsWriteAct.having = Object.create( null );
+having.writing = 1;
+having.reading = 0;
+having.driving = 1;
+
+var operates = rightsWriteAct.operates = Object.create( null );
+operates.filePath = { pathToWrite : 1 }
+
+//
+
+function rightsWrite_pre_functor( defaultKey )
+{
+
+  return function rightsWrite_pre( routine, args )
+  {
+    let self = this;
+    let o;
+
+    if( args.length === 2 )
+    {
+      let rights = args[ 1 ];
+      if( _.strIs( rights ) )
+      rights = self.rightsRead({ filePath : stat, sync : 1, throwing : 1 })
+      o =
+      {
+        filePath : args[ 0 ],
+        [ defaultKey ] : rights,
+      }
+    }
+    else
+    {
+      _.assert( args.length === 1 );
+      o = args[ 0 ];
+    }
+
+    _.assert( arguments.length === 2, 'Expects exactly two arguments' );
+    _.routineOptions( routine, o );
+
+    if( o.sync === null )
+    o.sync = self.sync;
+
+    return o;
+  }
+
+}
+
+//
+
+function rightsWrite_body( o )
+{
+  let self = this;
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  return self.rightsWriteAct( o );
+}
+
+_.routineExtend( rightsWrite_body, rightsWriteAct );
+
+var having = rightsWrite_body.having;
+having.driving = 0;
+having.aspect = 'body';
+
+//
+
+let rightsWrite = _.routineFromPreAndBody( rightsWrite_pre_functor( 'setRights' ), rightsWrite_body );
+var having = rightsWrite.having;
+having.aspect = 'entry';
+
+let rightsAdd = _.routineFromPreAndBody( rightsWrite_pre_functor( 'addRights' ), rightsWrite_body );
+var having = rightsAdd.having;
+having.aspect = 'entry';
+
+let rightsDel = _.routineFromPreAndBody( rightsWrite_pre_functor( 'delRights' ), rightsWrite_body );
+var having = rightsDel.having;
 having.aspect = 'entry';
 
 //
@@ -5681,7 +5833,9 @@ having.aspect = 'body';
 let fileIsLocked = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, fileIsLocked_body );
 dirMakeForFile.having.aspect = 'entry';
 
-//
+// --
+// linking
+// --
 
 let fileRenameAct = Object.create( null );
 fileRenameAct.name = 'fileRenameAct';
@@ -7674,11 +7828,12 @@ let Statics =
 
   MakeDefault : MakeDefault,
   Path : _.path.CloneExtending({ fileProvider : Self }),
-  WriteMode : WriteMode,
-  ProviderDefaults : ProviderDefaults,
+  WriteMode,
+  ProviderDefaults,
   Counter : 0,
 
   SupportsIno : 0,
+  SupportsRights : 0,
 
 }
 
@@ -7734,7 +7889,7 @@ let Extension =
   finit,
   MakeDefault,
 
-  // etc
+  // helper
 
   _fileOptionsGet,
   _providerDefaultsApply,
@@ -7766,7 +7921,7 @@ let Extension =
 
   pathNativizeAct,
   pathCurrentAct : null,
-  pathDirTempAct, /* qqq : remove default implementation */
+  pathDirTempAct, /* xxx qqq : remove default implementation */
   pathAllowedAct,
 
   // resolve
@@ -7918,6 +8073,11 @@ let Extension =
   dirReadDirs,
   dirReadTerminals,
 
+  /* qqq : implement and cover timeRead and timeReadAct */
+
+  rightsReadAct,
+  rightsRead,
+
   filesFingerprints,
   filesCanBeSame,
   filesAreSameForSure,
@@ -7934,8 +8094,13 @@ let Extension =
   fileWriteJs,
   fileTouch,
 
-  fileTimeSetAct,
-  fileTimeSet,
+  timeWriteAct,
+  timeWrite,
+
+  rightsWriteAct,
+  rightsWrite,
+  rightsAdd,
+  rightsDel,
 
   fileDeleteAct,
   fileDelete,
@@ -7955,6 +8120,8 @@ let Extension =
 
   fileIsLockedAct,
   fileIsLocked,
+
+  // linking
 
   fileRenameAct,
   fileRename,

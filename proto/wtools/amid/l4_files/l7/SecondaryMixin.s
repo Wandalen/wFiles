@@ -602,7 +602,7 @@ function systemBitrateTimeGet()
     mtime.setMilliseconds( ms );
     try
     {
-      self.fileTimeSet( tempFile, ostat.atime, mtime );
+      self.timeWrite( tempFile, ostat.atime, mtime );
       let stat = self.statResolvedRead( tempFile );
       let diff = mtime.getTime() - stat.mtime.getTime();
       if( diff )

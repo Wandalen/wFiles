@@ -19,7 +19,7 @@ var con = files.dirMake({ filePath : dstPath, sync : 0 });
 con.finallyGive( ( err, arg ) =>
 {
   if( err ) throw err;
-  
+
   console.log( 'async dirMake: ', files.fileExists( dstPath ) );
   files.fileDelete( dstPath );
 })

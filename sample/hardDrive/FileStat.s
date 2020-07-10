@@ -18,9 +18,9 @@ console.log( stats );
 
 files.statRead
 ({
-   filePath : `${__dirname}/../tmp.tmp/forReading.txt`,
-   throwing : 1,
-   sync : 0
+  filePath : `${__dirname}/../tmp.tmp/forReading.txt`,
+  throwing : 1,
+  sync : 0
 })
 .finallyGive( ( err, arg ) =>
 {

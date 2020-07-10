@@ -5,7 +5,7 @@ var _ = wTools;
 
 var files = _.FileProvider.HardDrive();
 
-//fileRead sync
+// fileRead sync
 
 var data = files.fileRead
 ({
@@ -14,7 +14,7 @@ var data = files.fileRead
 });
 console.log( data );
 
-//fileRead async
+// fileRead async
 
 files.fileRead
 ({

@@ -21,7 +21,7 @@ files.fileRename
 });
 var dataFromRenamedFile = files.fileRead({ filePath : dstPathFile, sync : 1 });
 console.log( dataFromRenamedFile ); // logs: from renamed file...
-files.fileRename( { dstPath : srcPathFile, srcPath : dstPathFile, sync : 1 } );
+files.fileRename({ dstPath : srcPathFile, srcPath : dstPathFile, sync : 1 });
 
 // directory renaming
 files.fileRename
@@ -32,7 +32,7 @@ files.fileRename
 });
 var content = files.dirRead({ filePath : dstPathDir });
 console.log( content ); // logs: [ 'file.txt' ]
-files.fileRename( { dstPath : srcPathDir, srcPath : dstPathDir, sync : 1 } );
+files.fileRename({ dstPath : srcPathDir, srcPath : dstPathDir, sync : 1 });
 
 /* fileRename async */
 
@@ -45,11 +45,11 @@ var con = files.fileRename
 });
 con.finallyGive( ( err, arg ) =>
 {
-  if(err) throw err;
+  if( err ) throw err;
 
   var dataFromRenamedFile = files.fileRead({ filePath : dstPathFile, sync : 1 });
   console.log( dataFromRenamedFile ); // logs: from renamed file...
-  files.fileRename( { dstPath : srcPathFile, srcPath : dstPathFile, sync : 1 } );
+  files.fileRename({ dstPath : srcPathFile, srcPath : dstPathFile, sync : 1 });
 });
 
 // directory renaming
@@ -61,9 +61,9 @@ var con = files.fileRename
 });
 con.finallyGive( ( err, arg ) =>
 {
-  if(err) throw err;
+  if( err ) throw err;
 
   var content = files.dirRead({ filePath : dstPathDir });
   console.log( content ); // logs: [ 'file.txt' ]
-  files.fileRename( { dstPath : srcPathDir, srcPath : dstPathDir, sync : 1 } );
+  files.fileRename({ dstPath : srcPathDir, srcPath : dstPathDir, sync : 1 });
 });

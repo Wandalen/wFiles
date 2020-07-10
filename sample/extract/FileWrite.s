@@ -1,4 +1,3 @@
-
 if( typeof module !== 'undefined' )
 require( 'wFiles' )
 
@@ -18,7 +17,7 @@ var tree =
 var _ = wTools;
 var provider = _.FileProvider.Extract({ filesTree : tree });
 
-// fileRead sync
+// fileWrite sync
 
 provider.fileWrite
 ({
@@ -30,7 +29,7 @@ provider.fileWrite
 var result = provider.fileRead({ filePath : '/dir1/dir2/file.txt', sync : 1 });
 console.log( result ); // logs: new sync data...
 
-//fileRead async
+//fileWrite async
 
 provider.fileWrite
 ({

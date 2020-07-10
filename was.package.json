@@ -10,7 +10,8 @@
   [
     { "name" : "Kostiantyn Wandalen", "email" : "wanalen@01.school" },
     { "name" : "Volodymyr M.", "email" : "volodymyr.migdal@gmail.com" },
-    { "name" : "Ihor Ostash", "email" : "iostashvxi@gmail.com" }
+    { "name" : "Ihor Ostash", "email" : "iostashvxi@gmail.com" },
+    { "name" : "Artem Bohush", "email" : "art.bohush@gmail.com" }
   ],
   "main" : "proto/wtools/amid/l4_files/entry/Files.s",
   "files" : [ "proto/wtools/amid/l4_files", "proto/wtools/Tools.s", "out" ],

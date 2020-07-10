@@ -128,31 +128,15 @@ function fileReadAct( o )
 
   /* on encoding : arraybuffer or encoding : buffer should return buffer( in consequence ) */
 
-  // написати через needle
-  var options = {
-    compressed         : true, // sets 'Accept-Encoding' to 'gzip, deflate, br'
-    follow_max         : 5,    // follow up to five redirects
-    rejectUnauthorized : true  // verify SSL certificate
-  }
-  
-  Needle.get( o.filePath, function( err, response )
+  // написати через needle(_.Consequence.From( promise ))
+  Needle.get( o.filePath, ( err, response ) =>
   {
-    con.take(response.body);
+    if( err )
+    con.error( err );
+    else
+    con.take( response.body );
   });
-  // read the chunks from the 'readable' event, so the stream gets consumed.
-  // stream.on('readable', function() {
-  //   while (data = this.read()) {
-  //     console.log(data.toString());
-  //   }
-  // })
-  
-  // stream.on('done', function(err, res) {
-  //   // if our request had an error, our 'done' event will tell us.
-  //   console.log(res)
-  //   if (err) throw err;
-  //   con.take(res);
-  // })
-  //_.Consequence.From( promise )
+
   // self.streamReadAct({ filePath :  o.filePath })
   // .give( function( err, response )
   // {

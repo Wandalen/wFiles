@@ -6,7 +6,7 @@ var _ = wTools;
 
 var fs = require( 'fs' );
 
-var file = _.path.join( __dirname, 'file' );
+var file = _.path.join( __dirname, 'data/tmp.tmp/TimeStamps.txt' );
 
 _.fileProvider.fileWrite( file, file );
 

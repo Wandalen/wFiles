@@ -3,13 +3,13 @@ require( 'wFiles' )
 
 var _ = wTools;
 
-var testDir = `${__dirname}/tmp.tmp/textLinkSample`;
+var testDir = `${__dirname}/data/tmp.tmp`;
 
 var dst = _.path.join( testDir, 'dst' );
 var src = _.path.join( testDir, 'src' );
 
-var filePathDst = _.path.join( dst + '2', 'file.dst' );
-var filePathSrc = _.path.join( src, 'file.src' );
+var filePathDst = _.path.join( dst, 'FileDst.txt' );
+var filePathSrc = _.path.join( src, 'FileSrc.txt' );
 
 var o =
 {
@@ -23,16 +23,16 @@ var o =
   resolvingTextLink : 1
 }
 
-//cleanup
-_.fileProvider.fileDelete( testDir );
+// cleanup
+_.fileProvider.filesDelete( testDir );
 
-//making src : dir with file
+// making src : dir with file
 _.fileProvider.fileWrite( filePathSrc, filePathSrc );
 
-//making dst : dir with file
+// making dst : dir with file
 _.fileProvider.fileWrite( filePathDst, filePathDst );
-
-//making text link to dst
-_.fileProvider.fileWrite( o.dst, 'link ' + dst + '2' );
+debugger;
+// making text link to dst
+_.fileProvider.fileWrite( o.dstPath, 'link ' + dst + '2' );
 
 _.fileProvider.fileCopy( o );

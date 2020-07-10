@@ -12,6 +12,7 @@ wFileRecord uses it to generate record.stat object.
 More about provider: https://github.com/Wandalen/wFiles/blob/master/README.md
 */
 var provider = _.FileProvider.HardDrive();
+debugger
 var record = _.FileRecord( filePath, { fileProvider : provider } );
 console.log( record );
 

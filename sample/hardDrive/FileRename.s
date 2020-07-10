@@ -4,11 +4,11 @@ require( 'wFiles' )
 var _ = wTools;
 
 var files = _.FileProvider.HardDrive();
-var srcPathFile = `${__dirname}/../tmp.tmp/forRenaming.txt`;
-var dstPathFile = `${__dirname}/../tmp.tmp/forRenamingRenamed.txt`;
+var srcPathFile = `${__dirname}/../data/File1.txt`;
+var dstPathFile = `${__dirname}/../data/RenamedFile.txt`;
 
-var srcPathDir = `${__dirname}/../tmp.tmp/forRenamingDir`;
-var dstPathDir = `${__dirname}/../tmp.tmp/forRenamingDirRenamed`;
+var srcPathDir = `${__dirname}/../data/forRenamingDir`;
+var dstPathDir = `${__dirname}/../data/renamedDir`;
 
 /* fileRename sync */
 
@@ -30,8 +30,7 @@ files.fileRename
   srcPath : srcPathDir,
   sync : 1
 });
-var content = files.dirRead({ filePath : dstPathDir });
-console.log( content ); // logs: [ 'file.txt' ]
+console.log( files.fileExists( dstPathDir ) ); // logs: true
 files.fileRename({ dstPath : srcPathDir, srcPath : dstPathDir, sync : 1 });
 
 /* fileRename async */
@@ -63,7 +62,6 @@ con.finallyGive( ( err, arg ) =>
 {
   if( err ) throw err;
 
-  var content = files.dirRead({ filePath : dstPathDir });
-  console.log( content ); // logs: [ 'file.txt' ]
+  console.log( files.fileExists( dstPathDir ) ); // logs: true
   files.fileRename({ dstPath : srcPathDir, srcPath : dstPathDir, sync : 1 });
 });

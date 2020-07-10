@@ -4,7 +4,7 @@ require( 'wFiles' )
 var _ = wTools;
 
 var files = _.FileProvider.HardDrive();
-var path = `${__dirname}/../tmp.tmp/forWriting.txt`;
+var path = `${__dirname}/../data/tmp.tmp/WrittenFile.txt`;
 var dataSync = 'sync data';
 var dataAsync = 'async data';
 
@@ -14,7 +14,8 @@ files.fileWrite
 ({
   filePath : path,
   data : dataSync,
-  sync : 1
+  sync : 1,
+  makingDirectory : 1
 });
 var result = files.fileRead({ filePath : path, sync : 1 });
 console.log( result === dataSync ); // logs: true
@@ -25,7 +26,8 @@ files.fileWrite
 ({
   filePath : path,
   data : dataAsync,
-  sync : 0
+  sync : 0,
+  makingDirectory : 1
 })
 .finallyGive( ( err, arg ) =>
 {

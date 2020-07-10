@@ -9,20 +9,20 @@ var files = _.FileProvider.HardDrive();
 
 var data = files.fileRead
 ({
-  filePath : `${__dirname}/../tmp.tmp/forReading.txt`,
+  filePath : `${__dirname}/../data/File1.txt`,
   sync : 1
 });
-console.log( 'read sync: ', data ); // logs: read sync: Read data...
+console.log( 'read sync: ', data );
 
 // fileRead async
 
 files.fileRead
 ({
-  filePath : `${__dirname}/../tmp.tmp/forReading.txt`,
+  filePath : `${__dirname}/../data/File1.txt`,
   sync : 0
 })
 .finallyGive( ( err, data ) =>
 {
   if( err ) throw err;
-  console.log( 'read async: ', data ); // logs: read async: Read data...
+  console.log( 'read async: ', data );
 });

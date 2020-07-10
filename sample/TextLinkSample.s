@@ -5,11 +5,11 @@ var _ = wTools;
 
 var testDir = `${__dirname}/tmp.tmp/textLinkSample`;
 
-var dst = _.path.s.join( testDir, 'dst' );
-var src = _.path.s.join( testDir, 'src' );
+var dst = _.path.join( testDir, 'dst' );
+var src = _.path.join( testDir, 'src' );
 
-var filePathDst = _.path.s.join( dst + '2', 'file.dst' );
-var filePathSrc = _.path.s.join( src, 'file.src' );
+var filePathDst = _.path.join( dst + '2', 'file.dst' );
+var filePathSrc = _.path.join( src, 'file.src' );
 
 var o =
 {

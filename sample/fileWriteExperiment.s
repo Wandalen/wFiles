@@ -36,8 +36,8 @@ function showStats( s, o )
     }
 }
 
-var testDir = _.path.s.join( __dirname, 'statsDoc' );
-var testFile = _.path.s.join( testDir, 'file' );
+var testDir = _.path.join( __dirname, 'data/tmp.tmp' );
+var testFile = _.path.join( testDir, 'FileStat.txt' );
 
 //
 

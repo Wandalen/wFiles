@@ -4,7 +4,7 @@ require( 'wFiles' )
 var _ = wTools;
 
 var files = _.FileProvider.HardDrive();
-var dstPath = `${__dirname}/../tmp.tmp/madeDir`;
+var dstPath = `${__dirname}/../data/tmp.tmp/madeDir`;
 
 // directoryMake sync
 

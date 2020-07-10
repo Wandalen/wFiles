@@ -6,7 +6,7 @@ var _ = wTools;
 
 var fs = require( 'fs' );
 
-var file = _.path.s.join( __dirname, 'file' );
+var file = _.path.join( __dirname, 'file' );
 
 _.fileProvider.fileWrite( file, file );
 

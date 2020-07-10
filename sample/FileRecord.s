@@ -6,7 +6,7 @@ var _ = wTools;
 
 //
 
-var filePath = _.path.s.join( __dirname, 'File.txt' );
+var filePath = _.path.join( __dirname, 'File.txt' );
 
 var record = _.fileProvider.record( filePath );
 console.log( _.toStr( record, { levels : 5 } ) );

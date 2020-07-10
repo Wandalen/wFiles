@@ -9,7 +9,7 @@ var files = _.FileProvider.HardDrive();
 
 var stats = files.statRead
 ({
-  filePath : `${__dirname}/../tmp.tmp/forReading.txt`,
+  filePath : `${__dirname}/../data/File1.txt`,
   sync : 1
 });
 console.log( stats );
@@ -18,7 +18,7 @@ console.log( stats );
 
 files.statRead
 ({
-  filePath : `${__dirname}/../tmp.tmp/forReading.txt`,
+  filePath : `${__dirname}/../data/File1.txt`,
   throwing : 1,
   sync : 0
 })

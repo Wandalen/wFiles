@@ -104,20 +104,13 @@ streamReadAct.having = Object.create( Parent.prototype.streamReadAct.having );
 
 function fileReadAct( o )
 {
-  debugger;
   let self = this;
   let ready = new _.Consequence();
-
-  // if( _.strIs( o ) )
-  // {
-  //   o = { filePath : o };
-  // }
-
+  debugger;
   _.assertRoutineOptions( fileReadAct, arguments );
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.strIs( o.filePath ), 'fileReadAct :', 'Expects {-o.filePath-}' );
   _.assert( _.strIs( o.encoding ), 'fileReadAct :', 'Expects {-o.encoding-}' );
-  // _.assert( !o.sync,'sync version is not implemented' );
 
   if( !Needle )
   Needle = require( 'needle' );
@@ -133,9 +126,9 @@ function fileReadAct( o )
   Needle.get( o.filePath, ( err, response ) =>
   {
     if( err )
-    ready.error( err );
+    handleError( err );
     else
-    ready.take( response.body );
+    handleEnd( response.body );
   });
 
 
@@ -146,6 +139,37 @@ function fileReadAct( o )
   }
 
   return ready;
+
+  //
+
+  function handleEnd( result )
+  {
+    _.assert( _.strIs( result ) );
+
+    let context = { data : result, operation : o, encoder };
+    if( encoder && encoder.onEnd )
+    _.sure( encoder.onEnd.call( self, context ) === undefined );
+
+    ready.take( result );
+  }
+
+  //
+
+  function handleError( err )
+  {
+    err = _._err
+    ({
+      args : [ err, '\nfileReadAct( ', o.filePath, ' )\n' ],
+      usingSourceCode : 0,
+      level : 0,
+    });
+    if( o.sync )
+    throw err;
+    else
+    ready.error( err );
+  }
+
+  /* */
 
   // self.streamReadAct({ filePath :  o.filePath })
   // .give( function( err, response )
@@ -177,7 +201,6 @@ function fileReadAct( o )
 
   // function handleError( err )
   // {
-
   //   debugger;
   //   err = _._err
   //   ({
@@ -262,7 +285,6 @@ function fileReadAct( o )
 
   //   con.take( result );
   // }
-
 }
 
 fileReadAct.defaults = Object.create( Parent.prototype.fileReadAct.defaults );

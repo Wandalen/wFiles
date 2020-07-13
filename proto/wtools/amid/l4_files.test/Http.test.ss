@@ -126,26 +126,116 @@ function fileReadActSync( test )
 {
   let context = this;
   let a = context.assetFor( test, false );
-  debugger;
-  /* */
+  let provider = _.FileProvider.Http(); // temporary, till fixed problem
 
-  let ready = new _.Consequence().take( null )
-  let provider = _.FileProvider.Http();
+  let ready = new _.Consequence().take( null );
+
   ready
 
   .then( () =>
   {
-    test.case = 'encoding : utf8';
-    var url = 'https://raw.githubusercontent.com/Wandalen/wModuleForTesting1/master/package.json'
-    var got = provider.fileRead({ filePath : url, encoding : 'utf8', sync : 1 });
-    console.log(got);
+    test.case = 'encoding does not specified';
+    var url = 'https://raw.githubusercontent.com/Wandalen/wModuleForTesting1/master/package.json';
+    var got = provider.fileRead({ filePath : url, sync : 1 });
     test.identical( _.strIs( got ), true );
     return null;
-  });
+  })
+
+  .then( () =>
+  {
+    test.case = 'encoding : utf8';
+    var url = 'https://raw.githubusercontent.com/Wandalen/wModuleForTesting1/master/package.json';
+    var got = provider.fileRead({ filePath : url, encoding : 'utf8', sync : 1 });
+    test.identical( _.strIs( got ), true );
+    return null;
+  })
+
+  .then( () =>
+  {
+    test.case = 'file does not exist';
+    var url = 'https://raw.githubusercontent.com/Wandalen/wModuleForTesting1/master/nonexistentFile.json';
+    var got = provider.fileRead({ filePath : url, sync : 1 });
+    test.identical( _.strIs( got ), true );
+    test.identical( got, '404: Not Found' );
+    return null;
+  })
+
+  .then( () =>
+  {
+    test.case = 'wrong protocol';
+    var url = 'hhttppss://raw.githubusercontent.com/Wandalen/wModuleForTesting1/master/package.json';
+    test.shouldThrowErrorSync( () =>
+    {
+      provider.fileRead({ filePath : url, sync : 1 });
+    });
+    return null;
+  })
 
   return ready;
 }
 
+//
+
+function fileReadActAsync( test )
+{
+  let context = this;
+  let a = context.assetFor( test, false );
+  let provider = _.FileProvider.Http(); // temporary, till fixed problem
+
+  let ready = new _.Consequence().take( null );
+
+  ready
+
+  .then( () =>
+  {
+    test.case = 'encoding does not specified';
+    var url = 'https://raw.githubusercontent.com/Wandalen/wModuleForTesting1/master/package.json';
+    return provider.fileRead({ filePath : url, sync : 0 });
+  })
+  .then( ( got ) =>
+  {
+    test.identical( _.strIs( got ), true );
+    return null;
+  })
+
+  .then( () =>
+  {
+    test.case = 'encoding : utf8';
+    var url = 'https://raw.githubusercontent.com/Wandalen/wModuleForTesting1/master/package.json';
+    return provider.fileRead({ filePath : url, encoding : 'utf8', sync : 0 });
+  })
+  .then( ( got ) =>
+  {
+    test.identical( _.strIs( got ), true );
+    return null;
+  })
+
+  .then( () =>
+  {
+    test.case = 'file does not exist';
+    var url = 'https://raw.githubusercontent.com/Wandalen/wModuleForTesting1/master/nonexistentFile.json';
+    return provider.fileRead({ filePath : url, sync : 0 });
+  })
+  .then( ( got ) =>
+  {
+    test.identical( _.strIs( got ), true );
+    test.identical( got, '404: Not Found' );
+    return null;
+  })
+
+  .then( () =>
+  {
+    test.case = 'wrong protocol';
+    var url = 'hhttppss://raw.githubusercontent.com/Wandalen/wModuleForTesting1/master/package.json';
+    test.shouldThrowErrorSync( () =>
+    {
+      provider.fileRead({ filePath : url, sync : 1 });
+    });
+    return null;
+  })
+
+  return ready;
+}
 
 // --
 // declare
@@ -173,6 +263,7 @@ var Proto =
   tests :
   {
     fileReadActSync,
+    fileReadActAsync,
   },
 
 }

@@ -138,6 +138,7 @@ function fileReadActSync( test )
     test.case = 'encoding : utf8';
     var url = 'https://raw.githubusercontent.com/Wandalen/wModuleForTesting1/master/package.json'
     var got = provider.fileRead({ filePath : url, encoding : 'utf8', sync : 1 });
+    console.log(got);
     test.identical( _.strIs( got ), true );
     return null;
   });

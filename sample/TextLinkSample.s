@@ -21,7 +21,7 @@ _.fileProvider.fileWrite( filePathSrc, filePathSrc );
 
 // making dst : dir with file
 _.fileProvider.fileWrite( filePathDst, filePathDst );
-debugger;
+
 // making text link to dst
 _.fileProvider.fileWrite( filePathDst, 'link ' + dst + '2' );
 var link = _.fileProvider.fileRead({ filePath : filePathDst});

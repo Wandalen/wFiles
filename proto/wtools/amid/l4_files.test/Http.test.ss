@@ -1,4 +1,4 @@
-( function _Npm_test_ss_( )
+( function _Http_test_ss_( )
 {
 
 'use strict';
@@ -18,23 +18,104 @@ var _ = _global_.wTools;
 // context
 // --
 
-function onSuiteBegin( test )
+function onSuiteBegin()
 {
   let context = this;
-
-  context.providerSrc = _.FileProvider.Http();
-  context.providerDst = _.FileProvider.HardDrive();
-  context.system = _.FileProvider.System({ providers : [ context.providerSrc, context.providerDst ] });
-
   context.suiteTempPath = _.fileProvider.path.tempOpen( _.fileProvider.path.join( __dirname, '../..' ), 'FileProviderHttp' );
 }
 
 //
 
-function onSuiteEnd( test )
+function onSuiteEnd()
 {
   let context = this;
   _.fileProvider.path.tempClose( context.suiteTempPath );
+}
+
+//
+
+function providerMake()
+{
+  let context = this;
+
+  let system = _.FileProvider.System({ empty : 1 });
+
+  let HardDrive = _.FileProvider.HardDrive
+  ({
+    protocols : [ 'current', 'second' ],
+  });
+
+  let Http = _.FileProvider.Http
+  ({
+    protocols : [ 'http', 'https' ],
+  });
+
+  system.providerRegister( HardDrive );
+  system.providerRegister( Http );
+
+  system.defaultProvider = HardDrive;
+
+  return system;
+}
+
+//
+
+function assetFor( test, a )
+{
+  let context = this;
+
+  if( !_.mapIs( a ) )
+  {
+    if( _.boolIs( arguments[ 1 ] ) )
+    a = { originalAssetPath : arguments[ 1 ] }
+    else
+    a = { assetName : arguments[ 1 ] }
+  }
+
+  if( !a.fileProvider )
+  {
+    a.fileProvider = context.providerMake();
+  }
+
+  a.suiteTempPath = a.fileProvider.path.tempOpen( a.fileProvider.constructor.name );
+
+  let system = a.system;
+  let effectiveProvider = a.effectiveProvider;
+  let global = a.global;
+
+  a = test.assetFor( a );
+
+  if( !system )
+  {
+    if( a.fileProvider.system )
+    a.system = a.fileProvider.system;
+    else if( a.fileProvider instanceof _.FileProvider.System )
+    a.system = a.fileProvider;
+  }
+
+  if( !effectiveProvider )
+  {
+    if( !( a.fileProvider instanceof _.FileProvider.System ) )
+    a.effectiveProvider = a.fileProvider;
+    else if( a.fileProvider.defaultProvider )
+    a.effectiveProvider = a.fileProvider.defaultProvider;
+  }
+
+  _.assert( a.effectiveProvider instanceof _.FileProvider.Abstract, 'effectiveProvider is not specificed' );
+
+  if( !global )
+  a.global = globalFor;
+
+  return a;
+
+  function globalFor()
+  {
+    let a = this;
+    let abs = a.abs( ... arguments );
+    let result = a.system.path.s.join( a.effectiveProvider.protocol + '://', abs );
+    return result;
+  }
+
 }
 
 // --
@@ -43,13 +124,13 @@ function onSuiteEnd( test )
 
 function fileReadActSync( test )
 {
-  const context = this;
-  const provider = _.FileProvider.Http();
-
+  let context = this;
+  let a = context.assetFor( test, false );
+  debugger;
   /* */
 
   let ready = new _.Consequence().take( null )
-
+  let provider = _.FileProvider.Http();
   ready
 
   .then( () =>
@@ -83,10 +164,9 @@ var Proto =
 
   context :
   {
+    assetFor,
     suiteTempPath : null,
-    providerSrc : null,
-    providerDst : null,
-    system : null
+    providerMake,
   },
 
   tests :

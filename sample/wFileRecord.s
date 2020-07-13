@@ -20,7 +20,7 @@ console.log( record );
 var fileName = 'file';
 var directory = '/my_folder'
 var provider = _.FileProvider.HardDrive();
-var record = _.FileRecord( fileName, { fileProvider : provider, dir : directory } );
+var record = _.fileProvider.record( filePath );
 console.log( record );
 
 /* Getting file record using dir and relative options */
@@ -29,7 +29,7 @@ var dir = '/dir/my_folder';
 var relative = '/X';
 var provider = _.FileProvider.HardDrive();
 /* dir option affects on record.absolute property, relative option is used to create record.relative property */
-var record = _.FileRecord( filePath, { fileProvider : provider, dir : dir, relative : relative } );
+var record = _.FileRecord( filePath, { fileProvider : provider, dir, relative } );
 console.log( record );
 
 /* Using mask to filter file record */

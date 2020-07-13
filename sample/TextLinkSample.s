@@ -11,17 +11,7 @@ var src = _.path.join( testDir, 'src' );
 var filePathDst = _.path.join( dst, 'FileDst.txt' );
 var filePathSrc = _.path.join( src, 'FileSrc.txt' );
 
-var o =
-{
-  allowDelete : 1,
-  allowWrite : 1,
-  allowRewrite : 1,
-  allowRewriteFileByDir : 1,
-  recursive : 1,
-  srcPath : src,
-  dstPath : dst,
-  resolvingTextLink : 1
-}
+_.fileProvider.usingTextLink = true;
 
 // cleanup
 _.fileProvider.filesDelete( testDir );
@@ -33,6 +23,6 @@ _.fileProvider.fileWrite( filePathSrc, filePathSrc );
 _.fileProvider.fileWrite( filePathDst, filePathDst );
 debugger;
 // making text link to dst
-_.fileProvider.fileWrite( o.dstPath, 'link ' + dst + '2' );
-
-_.fileProvider.fileCopy( o );
+_.fileProvider.fileWrite( filePathDst, 'link ' + dst + '2' );
+var link = _.fileProvider.fileRead({ filePath : filePathDst});
+console.log( link );

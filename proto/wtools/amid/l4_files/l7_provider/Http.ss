@@ -104,6 +104,7 @@ streamReadAct.having = Object.create( Parent.prototype.streamReadAct.having );
 
 function fileReadAct( o )
 {
+  debugger;
   let self = this;
   let ready = new _.Consequence();
 

@@ -29,7 +29,7 @@ extractProvider.providerRegisterTo( hub );
 hub.fileCopy
 ({
   dstPath : 'ext:///dir1/dir2/fileFromHardDrive.txt',
-  srcPath : `hard://${__dirname}/fileOnHardDrive.txt`,
+  srcPath : `hard://${__dirname}/../data/File1.txt`,
   sync : 1
 });
 

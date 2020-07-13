@@ -28207,6 +28207,7 @@ function textLinkSync( test )
       sync : 1,
       rewriting : 1,
       allowingMissed : 1,
+      makingDirectory : 0,
       throwing : 1
     });
   })
@@ -28223,6 +28224,7 @@ function textLinkSync( test )
       sync : 1,
       rewriting : 1,
       allowingMissed : 1,
+      makingDirectory : 0,
       throwing : 0
     });
   })

@@ -300,6 +300,30 @@ fileReadAct.advanced =
 
 //
 
+function fileCopyAct( o )
+{
+  // fileCopy of this provider should work in system only
+  let self = this;
+  let ready = new _.Consequence();
+  debugger;
+  _.assertRoutineOptions( fileCopyAct, arguments );
+
+  return 'staging';
+}
+
+fileCopyAct.defaults = Object.create( Parent.prototype.fileCopyAct.defaults );
+fileCopyAct.having = Object.create( Parent.prototype.fileCopyAct.having );
+
+fileCopyAct.advanced =
+{
+  send : null,
+  method : 'GET',
+  user : null,
+  password : null,
+}
+
+//
+
 function filesReflectSingle_body( o )
 {
   let self = this;
@@ -732,6 +756,8 @@ let Extension =
 
   fileCopyToHardDriveAct,
   fileCopyToHardDrive,
+
+  fileCopyAct,
 
   //
 

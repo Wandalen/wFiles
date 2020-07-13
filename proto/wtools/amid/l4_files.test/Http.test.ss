@@ -237,6 +237,27 @@ function fileReadActAsync( test )
   return ready;
 }
 
+//
+
+function fileCopyAct( test )
+{
+  let context = this;
+  let a = context.assetFor( test, false );
+  let provider = _.FileProvider.Http(); // temporary, till fixed problem
+
+  test.case = 'initial case';
+  a.reflect();
+  var got = provider.fileCopyAct
+  ({
+    dstPath : a.abs( 'dst.json' ),
+    srcPath : 'https://raw.githubusercontent.com/Wandalen/wModuleForTesting1/master/package.json',
+    relativeDstPath : '',
+    relativeSrcPath : '',
+    sync : 1
+  });
+  test.identical( got, 'staging' );
+}
+
 // --
 // declare
 // --
@@ -264,6 +285,8 @@ var Proto =
   {
     fileReadActSync,
     fileReadActAsync,
+
+    fileCopyAct,
   },
 
 }

@@ -6726,7 +6726,7 @@ var defaults = hardLink.body.defaults;
 
 defaults.rewriting = 1;
 defaults.rewritingDirs = 0;
-defaults.makingDirectory = 0; /* qqq2 : change default to makingDirectory : 1 */
+defaults.makingDirectory = 1; /* qqq2 : change default to makingDirectory : 1 */
 defaults.throwing = null;
 defaults.verbosity = null;
 defaults.allowingDiscrepancy = 1;
@@ -6848,7 +6848,7 @@ var defaults = softLink.body.defaults;
 
 defaults.rewriting = 1;
 defaults.rewritingDirs = 0;
-defaults.makingDirectory = 0; /* qqq2 : change default to makingDirectory : 1 */
+defaults.makingDirectory = 1; /* qqq2 : change default to makingDirectory : 1 */
 defaults.throwing = null;
 defaults.verbosity = null;
 defaults.allowingMissed = 0;
@@ -6983,7 +6983,7 @@ var defaults = textLink.body.defaults;
 
 defaults.rewriting = 1;
 defaults.rewritingDirs = 0;
-defaults.makingDirectory = 0; /* qqq2 : change default to makingDirectory : 1 */
+defaults.makingDirectory = 1; /* qqq2 : change default to makingDirectory : 1 */
 defaults.throwing = null;
 defaults.verbosity = null;
 defaults.allowingMissed = 0;

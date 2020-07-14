@@ -51132,20 +51132,20 @@ total : 11
     /* */
 
     /* Artem B. there is a bug. */
-    // test.case = 'src === dst, src is directory';
-    // a.reflect();
-    // a.fileProvider.dirMake( a.abs( 'dir1/dir2' ) );
-    // var got = a.fileProvider.hardLink
-    // ({
-    //   dstPath : a.abs( 'dir1/dir2' ),
-    //   srcPath : a.abs( 'dir1/dir2' ),
-    //   rewriting : 1,
-    //   rewritingDirs : 1,
-    //   makingDirectory : 1,
-    //   throwing : 0,
-    // });
-    // test.identical( got, null );
-    // test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2' ), a.abs( 'dir1/dir2' ) ), false );
+    test.case = 'src === dst, src is directory';
+    a.reflect();
+    a.fileProvider.dirMake( a.abs( 'dir1/dir2' ) );
+    var got = a.fileProvider.hardLink
+    ({
+      dstPath : a.abs( 'dir1/dir2' ),
+      srcPath : a.abs( 'dir1/dir2' ),
+      rewriting : 1,
+      rewritingDirs : 1,
+      makingDirectory : 1,
+      throwing : 0,
+    });
+    test.identical( got, null );
+    test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2' ), a.abs( 'dir1/dir2' ) ), false );
   }
   test.close( 'without restrictions' );
 
@@ -51335,6 +51335,47 @@ total : 11
   }
   test.close( 'allowingDiscrepancy' );
 }
+
+//
+
+function hardLinkReturnThrowing0SyncForDebugExperiment( test )
+{
+  let context = this;
+  let a = context.assetFor( test, false );
+
+  test.case = 'src does not exist, directory does not exist';
+  a.reflect();
+ 
+  var got = a.fileProvider.hardLink
+  ({
+    dstPath : a.abs( 'dst' ),
+    srcPath : a.abs( 'src' ),
+    rewriting : 1,
+    rewritingDirs : 1,
+    makingDirectory : 1,
+    throwing : 0,
+  });
+  test.identical( got, null );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), false );
+
+  /* */
+
+  test.case = 'src === dst, src is directory';
+  a.reflect();
+  a.fileProvider.dirMake( a.abs( 'dir1/dir2' ) );
+  var got = a.fileProvider.hardLink
+  ({
+    dstPath : a.abs( 'dir1/dir2' ),
+    srcPath : a.abs( 'dir1/dir2' ),
+    rewriting : 1,
+    rewritingDirs : 1,
+    makingDirectory : 1,
+    throwing : 0,
+  });
+  test.identical( got, null );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2' ), a.abs( 'dir1/dir2' ) ), false );
+}
+hardLinkReturnThrowing0SyncForDebugExperiment.experimental = 1;
 
 //
 
@@ -53390,6 +53431,8 @@ var Self =
     textLinkForDebuggingExperiment,
     areSoftLinkedForDebuggingExperiment,
     areTextLinkedForDebuggingExperiment,
+
+    hardLinkReturnThrowing0SyncForDebugExperiment,
   }
 
 };

@@ -1627,7 +1627,6 @@ function pathResolveLinkTailChain_body( o )
     // should throw error if any part of chain does not exist
     if( o.throwing && !o.allowingMissed )
     {
-      debugger;
       throw _.err( 'Does not exist file', _.strQuote( o.filePath ) );
     }
 
@@ -6544,7 +6543,7 @@ function _hardLinkVerify2( c )
 {
   let self = this;
   let o = c.options;
-
+  debugger
   if( c.srcStat === undefined )
   c.srcStat = self.statRead({ filePath : o.srcPath, sync : 1 });
 
@@ -6580,7 +6579,7 @@ function _hardLinkDo( c )
 {
   let self = this;
   let o = c.options;
-
+  debugger
   _.assert( _.fileStatIs( c.srcStat ) || c.srcStat === null );
 
   if( c.srcStat === null )

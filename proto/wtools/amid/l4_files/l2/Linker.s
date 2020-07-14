@@ -497,7 +497,14 @@ function pathResolve()
   let c = this;
   let self = c.provider;
   let path = self.system ? self.system.path : self.path;
-  let o = c.options;
+  let o = c.options; 
+
+  if( self.fileExists( o.srcPath ) && !self.statRead({ filePath : o.srcPath, sync : 1 }).isTerminal() )
+  {
+    let err = _.err( `Source file should be a terminal:\n  ${o.srcPath}` );
+    c.error( err );
+    return null;
+  }
 
   o.relativeSrcPath = o.srcPath;
   o.relativeDstPath = o.dstPath;

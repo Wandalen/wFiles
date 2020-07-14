@@ -51362,6 +51362,7 @@ function softLinkReturnSync( test )
  - rewriting : 0
  - rewritingDirs : 1
  - rewritingDirs : 0
+ - makingDirectory by default
  - makingDirectory : 1
  - makingDirectory : 0
 
@@ -51370,6 +51371,7 @@ function softLinkReturnSync( test )
   - rewriting : 0
   - rewritingDirs : 1
   - rewritingDirs : 0
+  - makingDirectory by default
   - makingDirectory : 1
   - makingDirectory : 0
 
@@ -51443,6 +51445,15 @@ total 31
 
     /* */
 
+    test.case = 'makingDirectory by default';
+    a.reflect();
+    a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+    var got = a.fileProvider.softLink({ dstPath : a.abs( 'dir1/dir2/dst' ), srcPath : a.abs( 'src' ) });
+    test.identical( got, true );
+    test.identical( a.fileProvider.areSoftLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'src' ) ), true );
+
+    /* */
+
     test.case = 'makingDirectory : 1';
     a.reflect();
     a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
@@ -51501,6 +51512,15 @@ total 31
     a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
     a.fileProvider.dirMake( a.abs( 'dir1/dir2' ) );
     var got = a.fileProvider.softLink({ dstPath : a.abs( 'dir1/dir2/dst' ), srcPath : a.abs( 'src' ), rewritingDirs : 0 });
+    test.identical( got, true );
+    test.identical( a.fileProvider.areSoftLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'src' ) ), true );
+
+    /* */
+
+    test.case = 'makingDirectory by default';
+    a.reflect();
+    a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+    var got = a.fileProvider.softLink({ dstPath : a.abs( 'dir1/dir2/dst' ), srcPath : a.abs( 'src' ) });
     test.identical( got, true );
     test.identical( a.fileProvider.areSoftLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'src' ) ), true );
 
@@ -52284,6 +52304,7 @@ function textLinkReturnSync( test )
   - rewriting : 0
   - rewritingDirs : 1
   - rewritingDirs : 0
+  - makingDirectory by default
   - makingDirectory : 1
   - makingDirectory : 0
 
@@ -52292,6 +52313,7 @@ function textLinkReturnSync( test )
   - rewriting : 0
   - rewritingDirs : 1
   - rewritingDirs : 0
+  - makingDirectory by default
   - makingDirectory : 1
   - makingDirectory : 0
 
@@ -52357,6 +52379,15 @@ function textLinkReturnSync( test )
 
     /* */
 
+    test.case = 'makingDirectory by default';
+    a.reflect();
+    a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+    var got = a.fileProvider.textLink({ dstPath : a.abs( 'dir1/dir2/dst' ), srcPath : a.abs( 'src' ) });
+    test.identical( got, true );
+    test.identical( a.fileProvider.areTextLinked({ filePath : [ a.abs( 'src' ), a.abs( 'dir1/dir2/dst' ) ] }), true );
+
+    /* */
+
     test.case = 'makingDirectory : 1';
     a.reflect();
     a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
@@ -52416,6 +52447,16 @@ function textLinkReturnSync( test )
     var got = a.fileProvider.textLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), rewritingDirs : 0 });
     test.identical( got, true );
     test.identical( a.fileProvider.areTextLinked({ filePath : [ a.abs( 'src' ), a.abs( 'dir1/dst' ) ] }), true );
+
+    /* */
+
+    test.case = 'makingDirectory by default';
+    a.reflect();
+    a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+    a.fileProvider.dirMake( a.abs( 'dir1' ) );
+    var got = a.fileProvider.textLink({ dstPath : a.abs( 'dir1/dir2/dst' ), srcPath : a.abs( 'src' ) });
+    test.identical( got, true );
+    test.identical( a.fileProvider.areTextLinked({ filePath : [ a.abs( 'src' ), a.abs( 'dir1/dir2/dst' ) ] }), true );
 
     /* */
 

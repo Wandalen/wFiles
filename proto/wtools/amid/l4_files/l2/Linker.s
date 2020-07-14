@@ -533,12 +533,12 @@ function pathResolve()
     return null;
   }
 
-  // if( self.isSoftLink(o.dstPath) && !self.fileExists( self.pathResolveSoftLink(o.dstPath) ) && !o.allowingMissed )
-  // {
-  //   let err = _.err( `Dst file:\n ${o.srcPath} is a soft link to a nonexistent file.\n Please enable options {-o.allowingMissed-} if that was your goal.` );
-  //   c.error( err );
-  //   return null;
-  // }
+  if( c.actMethodName === 'hardLinkAct' && self.isSoftLink(o.dstPath) && !self.fileExists( self.pathResolveSoftLink(o.dstPath) ) && !o.allowingMissed )
+  {
+    let err = _.err( `Dst file:\n ${o.srcPath} is a soft link to a nonexistent file.\n Please enable options {-o.allowingMissed-} if that was your goal.` );
+    c.error( err );
+    return null;
+  }
 
   c.originalSrcResolvedPath = o.srcPath;
 

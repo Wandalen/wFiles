@@ -51131,7 +51131,7 @@ total : 11
     
     /* */
 
-    /* Artem B. there is a bug. */
+    /* Artem B. Bug fixed. */
     test.case = 'src === dst, src is directory';
     a.reflect();
     a.fileProvider.dirMake( a.abs( 'dir1/dir2' ) );
@@ -51145,7 +51145,7 @@ total : 11
       throwing : 0,
     });
     test.identical( got, null );
-    test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2' ), a.abs( 'dir1/dir2' ) ), false );
+    test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2' ), a.abs( 'dir1/dir2' ) ), true );
   }
   test.close( 'without restrictions' );
 
@@ -51342,21 +51342,6 @@ function hardLinkReturnThrowing0SyncForDebugExperiment( test )
 {
   let context = this;
   let a = context.assetFor( test, false );
-
-  test.case = 'src does not exist, directory does not exist';
-  a.reflect();
- 
-  var got = a.fileProvider.hardLink
-  ({
-    dstPath : a.abs( 'dst' ),
-    srcPath : a.abs( 'src' ),
-    rewriting : 1,
-    rewritingDirs : 1,
-    makingDirectory : 1,
-    throwing : 0,
-  });
-  test.identical( got, null );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), false );
 
   /* */
 

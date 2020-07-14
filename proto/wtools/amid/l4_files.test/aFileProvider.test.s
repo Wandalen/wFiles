@@ -10800,6 +10800,7 @@ function fileRenameSync( test )
       dstPath,
       sync : 1,
       rewriting : 1,
+      makingDirectory : 0,
       throwing : 1
     });
   });
@@ -10816,6 +10817,7 @@ function fileRenameSync( test )
       dstPath,
       sync : 1,
       rewriting : 0,
+      makingDirectory : 0,
       throwing : 1
     });
   });
@@ -10832,6 +10834,7 @@ function fileRenameSync( test )
       dstPath,
       sync : 1,
       rewriting : 1,
+      makingDirectory : 0,
       throwing : 0
     });
   });
@@ -10849,6 +10852,7 @@ function fileRenameSync( test )
       dstPath,
       sync : 1,
       rewriting : 0,
+      makingDirectory : 0,
       throwing : 0
     });
   });
@@ -12271,6 +12275,7 @@ function fileRenameAsync( test )
       dstPath,
       sync : 0,
       rewriting : 1,
+      makingDirectory : 0,
       throwing : 1
     });
 
@@ -12295,6 +12300,7 @@ function fileRenameAsync( test )
       dstPath,
       sync : 0,
       rewriting : 0,
+      makingDirectory : 0,
       throwing : 1
     });
 
@@ -12319,6 +12325,7 @@ function fileRenameAsync( test )
       dstPath,
       sync : 0,
       rewriting : 1,
+      makingDirectory : 0,
       throwing : 0
     });
 
@@ -12344,6 +12351,7 @@ function fileRenameAsync( test )
       dstPath,
       sync : 0,
       rewriting : 0,
+      makingDirectory : 0,
       throwing : 0
     });
 

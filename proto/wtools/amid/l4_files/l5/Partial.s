@@ -6175,7 +6175,7 @@ var defaults = fileRename.body.defaults;
 
 defaults.rewriting = 0;
 defaults.rewritingDirs = 0;
-defaults.makingDirectory = 0; /* qqq2 : change default to makingDirectory : 1 */
+defaults.makingDirectory = 1; /* qqq2 : change default to makingDirectory : 1 */
 defaults.allowingMissed = 0;
 defaults.allowingCycled = 0;
 defaults.throwing = null;

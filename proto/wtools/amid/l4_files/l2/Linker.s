@@ -499,20 +499,6 @@ function pathResolve()
   let path = self.system ? self.system.path : self.path;
   let o = c.options; 
 
-  if( self.fileExists( o.srcPath ) && !self.statRead({ filePath : o.srcPath, sync : 1 }).isTerminal() )
-  {
-    let err = _.err( `Source file should be a terminal:\n  ${o.srcPath}` );
-    c.error( err );
-    return null;
-  }
-
-  if( self.isSoftLink(o.dstPath) && !self.fileExists( self.pathResolveSoftLink(o.dstPath) ) && !o.allowingMissed )
-  {
-    let err = _.err( `Dst file:\n ${o.srcPath} is a soft link to a nonexistent file.\n Please enable options {-o.allowingMissed-} if that was your goal.` );
-    c.error( err );
-    return null;
-  }
-
   o.relativeSrcPath = o.srcPath;
   o.relativeDstPath = o.dstPath;
 
@@ -539,6 +525,20 @@ function pathResolve()
 
   _.assert( path.isAbsolute( o.srcPath ) );
   _.assert( path.isAbsolute( o.dstPath ) );
+
+  if( c.actMethodName === 'hardLinkAct' && self.fileExists( o.srcPath ) && self.isDir( o.srcPath ) )
+  {
+    let err = _.err( `Source file should be a terminal:\n  ${o.srcPath}` );
+    c.error( err );
+    return null;
+  }
+
+  // if( self.isSoftLink(o.dstPath) && !self.fileExists( self.pathResolveSoftLink(o.dstPath) ) && !o.allowingMissed )
+  // {
+  //   let err = _.err( `Dst file:\n ${o.srcPath} is a soft link to a nonexistent file.\n Please enable options {-o.allowingMissed-} if that was your goal.` );
+  //   c.error( err );
+  //   return null;
+  // }
 
   c.originalSrcResolvedPath = o.srcPath;
 
@@ -1247,7 +1247,7 @@ function functor( fop )
       c.pathResolve();
       if( c.ended )
       return c.end();
-      debugger;
+
       c.linksResolve();
       if( c.ended )
       return c.end();

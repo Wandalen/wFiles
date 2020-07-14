@@ -5386,12 +5386,13 @@ function fileCopySync( test )
   test.is( !provider.statResolvedRead( dstPath ) );
   test.shouldThrowErrorOfAnyKind( () =>
   {
-     provider.fileCopy
+    provider.fileCopy
     ({
       srcPath,
       dstPath,
       sync : 1,
       rewriting : 0,
+      makingDirectory : 0,
       throwing : 1
     });
   })
@@ -5406,12 +5407,13 @@ function fileCopySync( test )
   test.is( !provider.statResolvedRead( dstPath ) );
   test.mustNotThrowError( () =>
   {
-     provider.fileCopy
+    provider.fileCopy
     ({
       srcPath,
       dstPath,
       sync : 1,
       rewriting : 0,
+      makingDirectory : 0,
       throwing : 0
     });
   })
@@ -50197,6 +50199,7 @@ function hardLinkReturnSync( test )
  - rewriting : 0
  - rewritingDirs : 1
  - rewritingDirs : 0
+ - makingDirectory by default
  - makingDirectory : 1
  - makingDirectory : 0
  - breakingSrcHardLink : 0, breakingDstHardLink : 1
@@ -50208,6 +50211,7 @@ function hardLinkReturnSync( test )
  - rewriting : 0
  - rewritingDirs : 1
  - rewritingDirs : 0
+ - makingDirectory by default
  - makingDirectory : 1
  - makingDirectory : 0
  - breakingSrcHardLink : 0, breakingDstHardLink : 1
@@ -50296,6 +50300,15 @@ total : 50
     a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
     a.fileProvider.dirMake( a.abs( 'dir1/dir2' ) );
     var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dir2/dst' ), srcPath : a.abs( 'src' ), rewritingDirs : 0 });
+    test.identical( got, true );
+    test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'src' ) ), true );
+
+    /* */
+
+    test.case = 'makingDirectory by default';
+    a.reflect();
+    a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+    var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dir2/dst' ), srcPath : a.abs( 'src' ) });
     test.identical( got, true );
     test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'src' ) ), true );
 
@@ -50406,6 +50419,16 @@ total : 50
     var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), rewritingDirs : 0 });
     test.identical( got, true );
     test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
+
+    /* */
+
+    test.case = 'makingDirectory by default';
+    a.reflect();
+    a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+    a.fileProvider.fileWrite( a.abs( 'dir1/test' ), 'some text' );
+    var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dir2/dst' ), srcPath : a.abs( 'src' ) });
+    test.identical( got, true );
+    test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'src' ) ), true );
 
     /* */
 

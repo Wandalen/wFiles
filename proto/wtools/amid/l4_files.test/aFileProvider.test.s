@@ -50956,15 +50956,6 @@ total : 50
 
     /* */
 
-    // test.case = 'rewritingDirs : 1';
-    // a.reflect();
-    // a.fileProvider.dirMake( a.abs( 'dir1/src' ) );
-    // var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/src' ), srcPath : a.abs( 'dir1/src' ), rewritingDirs : 1 });
-    // test.identical( got, true );
-    // test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), true );
-
-    /* */
-
     test.case = 'rewritingDirs : 0';
     a.reflect();
     a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );

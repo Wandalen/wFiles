@@ -51068,6 +51068,7 @@ total : 49
     test.close( 'src === dst' );
   }
 }
+hardLinkReturnSync.timeOut = 60000;
 
 //
 

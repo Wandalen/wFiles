@@ -98,7 +98,7 @@ function multiple( o, link )
   {
     for( let p = 0 ; p < records.length ; p++ )
     {
-      if( !onRecord( records[ p ] ) )
+      if( !onRecord({ record : records[ p ], self, options : o, mostLinkedRecord, link }) )
       return false;
     }
     return true;
@@ -110,7 +110,8 @@ function multiple( o, link )
     let throwing = o.throwing;
     o.throwing = 1;
 
-    function handler( err, got )
+    for( let p = 0 ; p < records.length ; p++ )
+    cons.push( onRecord({ record : records[ p ], self, options : o, mostLinkedRecord, link }).tap( ( err, got ) =>
     {
       if( !err )
       {
@@ -122,10 +123,7 @@ function multiple( o, link )
         if( !_.definedIs( result.err ) )
         result.err = err;
       }
-    }
-
-    for( let p = 0 ; p < records.length ; p++ )
-    cons.push( onRecord( records[ p ] ).tap( handler ) );
+    }) );
 
     let con = new _.Consequence().take( null );
 
@@ -154,54 +152,53 @@ function multiple( o, link )
     else
     return new _.Consequence().error( err );
   }
+}
 
-  /* */
+//
 
-  function onRecord( record )
+function onRecord( o )
+{
+  if( o.record === o.mostLinkedRecord )
+  return o.options.sync ? true : new _.Consequence().take( true );
+
+  // if( !o.allowingDiscrepancy ) /* qqq : cover */
+  // if( !self.filesCanBeSame( result.src, record.src, true ) )
+  // if( result.src.stat.size !== 0 || record.src.stat.size !== 0 )
+  // {
+  //   debugger
+  //   throw _.err
+  //   (
+  //     'Cant\'t rewrite destination file by source file, because they have different content and option::allowingDiscrepancy is false\n'
+  //     + `\ndst: ${result.dst.absolute}`
+  //     + `\nsrc: ${result.src.absolute}`
+  //   );
+  // }
+
+  // if( !o.allowingDiscrepancy )
+  // // if( record.stat && newestRecord.stat.mtime.getTime() === record.stat.mtime.getTime() && newestRecord.stat.birthtime.getTime() === record.stat.birthtime.getTime() )
+  // {
+  //   if( _.files.stat.different( newestRecord.stat , record.stat ) )
+  //   {
+  //     let err = _.err( 'Several files has the same date but different content', newestRecord.absolute, record.absolute );
+  //     debugger;
+  //     if( o.sync )
+  //     throw err;
+  //     else
+  //     return new _.Consequence().error( err );
+  //   }
+  // }
+
+  if( !o.record.stat || !_.files.stat.areHardLinked( o.mostLinkedRecord.stat , o.record.stat ) )
   {
-    if( record === mostLinkedRecord )
-    return o.sync ? true : new _.Consequence().take( true );
-
-    // if( !o.allowingDiscrepancy ) /* qqq : cover */
-    // if( !self.filesCanBeSame( result.src, record.src, true ) )
-    // if( result.src.stat.size !== 0 || record.src.stat.size !== 0 )
-    // {
-    //   debugger
-    //   throw _.err
-    //   (
-    //     'Cant\'t rewrite destination file by source file, because they have different content and option::allowingDiscrepancy is false\n'
-    //     + `\ndst: ${result.dst.absolute}`
-    //     + `\nsrc: ${result.src.absolute}`
-    //   );
-    // }
-
-    // if( !o.allowingDiscrepancy )
-    // // if( record.stat && newestRecord.stat.mtime.getTime() === record.stat.mtime.getTime() && newestRecord.stat.birthtime.getTime() === record.stat.birthtime.getTime() )
-    // {
-    //   if( _.files.stat.different( newestRecord.stat , record.stat ) )
-    //   {
-    //     let err = _.err( 'Several files has the same date but different content', newestRecord.absolute, record.absolute );
-    //     debugger;
-    //     if( o.sync )
-    //     throw err;
-    //     else
-    //     return new _.Consequence().error( err );
-    //   }
-    // }
-
-    if( !record.stat || !_.files.stat.areHardLinked( mostLinkedRecord.stat , record.stat ) )
-    {
-      let linkOptions = _.mapExtend( null, o );
-      linkOptions.allowingMissed = 0; // Vova : hardLink does not allow missing srcPath
-      linkOptions.dstPath = record.absolute;
-      linkOptions.srcPath = mostLinkedRecord.absolute;
-      debugger;
-      return link.call( self, linkOptions );
-    }
-
-    return o.sync ? true : new _.Consequence().take( true );
+    let linkOptions = _.mapExtend( null, o.options );
+    linkOptions.allowingMissed = 0; // Vova : hardLink does not allow missing srcPath
+    linkOptions.dstPath = o.record.absolute;
+    linkOptions.srcPath = o.mostLinkedRecord.absolute;
+    debugger;
+    return o.link.call( o.self, linkOptions );
   }
 
+  return o.options.sync ? true : new _.Consequence().take( true );
 }
 
 //
@@ -1161,7 +1158,6 @@ contextMake.defaults =
 
 function functor( fop )
 {
-
   /*
     qqq : optimize, fix consequences problem
   */
@@ -1322,60 +1318,58 @@ function functor( fop )
         /* prepare options map and launch main part */
         o2 = c.options2 = _.mapExtend( c.options2, _.mapOnly( o, c.linkDo.defaults ) );
         /* main part */
-        return mainPartAsync();
+        return mainPartAsync({ self, o2, c, options : o });
       })
 
       return c.con;
     }
-
-    /* */
-
-    function mainPartAsync()
-    {
-      let con = new _.Consequence().take( null );
-
-      con.then( () => self.fileExists( o2.dstPath ) );
-      con.then( ( dstExists ) =>
-      {
-        if( dstExists )
-        {
-          return c.verifyDst().then( () => tempRenameAsync.call( c ) )
-        }
-        else if( o.makingDirectory )
-        {
-          return self.dirMakeForFile({ filePath : o2.dstPath, sync : 0 });
-        }
-        return dstExists;
-      });
-
-      con.then( _.routineSeal( self, c.linkDo, [ c ] ) );
-
-      con.then( ( got ) =>
-      {
-        c.log();
-        return c.tempDelete();
-      });
-      con.then( () =>
-      {
-        c.tempPath = null;
-        c.validateSize();
-        return true;
-      });
-
-      con.catch( ( err ) =>
-      {
-        return c.tempRenameRevert()
-        .finally( () =>
-        {
-          return c.error( _.err( err, '\nCant', c.entryMethodName, o.dstPath, '<-', o.srcPath ) );
-        })
-      })
-
-      return con;
-    }
-
   }
+}
 
+//
+
+function mainPartAsync( o )
+{
+  let con = new _.Consequence().take( null );
+
+  con.then( () => o.self.fileExists( o.o2.dstPath ) );
+  con.then( ( dstExists ) =>
+  {
+    if( dstExists )
+    {
+      return o.c.verifyDst().then( () => tempRenameAsync.call( o.c ) )
+    }
+    else if( o.options.makingDirectory )
+    {
+      return o.self.dirMakeForFile({ filePath : o.o2.dstPath, sync : 0 });
+    }
+    return dstExists;
+  });
+
+  con.then( _.routineSeal( o.self, o.c.linkDo, [ o.c ] ) );
+
+  con.then( ( got ) =>
+  {
+    o.c.log();
+    return o.c.tempDelete();
+  });
+  con.then( () =>
+  {
+    o.c.tempPath = null;
+    o.c.validateSize();
+    return true;
+  });
+
+  con.catch( ( err ) =>
+  {
+    return o.c.tempRenameRevert()
+    .finally( () =>
+    {
+      return o.c.error( _.err( err, '\nCant', o.c.entryMethodName, o.options.dstPath, '<-', o.options.srcPath ) );
+    })
+  })
+
+  return con;
 }
 
 functor.defaults =
@@ -1401,8 +1395,38 @@ functor.defaults =
 
 let Proto =
 {
+  functor_pre,
+  multiple,
+  onRecord,
+  onIsLink,
+  onStat,
+  verify1,
+  verify1Async,
+  verify2,
+  verifyEqualPaths,
+  verify2Async,
+  verifyDstSync,
+  verifyDstAsync,
+  pathsLocalizeSync,
+  pathsLocalizeAsync,
+  pathResolve,
+  linksResolve,
+  linksResolveAsync,
+  log,
+  tempRenameCan,
+  tempRenameSync,
+  tempRenameAsync,
+  tempRenameMaybe,
+  tempRenameRevertSync,
+  tempRenameRevertAsync,
+  tempDelete,
+  tempNameMake,
+  validateSize,
+  error,
+  end,
   contextMake,
   functor,
+  mainPartAsync,
 }
 
 _.mapExtend( Self, Proto )

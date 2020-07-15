@@ -526,19 +526,19 @@ function pathResolve()
   _.assert( path.isAbsolute( o.srcPath ) );
   _.assert( path.isAbsolute( o.dstPath ) );
 
-  if( c.actMethodName === 'hardLinkAct' && self.fileExists( o.srcPath ) && self.isDir( o.srcPath ) )
-  {
-    let err = _.err( `Source file should be a terminal:\n  ${o.srcPath}` );
-    c.error( err );
-    return null;
-  }
+  // if( c.actMethodName === 'hardLinkAct' && self.fileExists( o.srcPath ) && self.isDir( o.srcPath ) )
+  // {
+  //   let err = _.err( `Source file should be a terminal:\n  ${o.srcPath}` );
+  //   c.error( err );
+  //   return null;
+  // }
 
-  if( c.actMethodName === 'hardLinkAct' && self.isSoftLink(o.dstPath) && !self.fileExists( self.pathResolveSoftLink(o.dstPath) ) && !o.allowingMissed )
-  {
-    let err = _.err( `Dst file:\n ${o.srcPath} is a soft link to a nonexistent file.\n Please enable options {-o.allowingMissed-} if that was your goal.` );
-    c.error( err );
-    return null;
-  }
+  // if( c.actMethodName === 'hardLinkAct' && self.isSoftLink(o.dstPath) && !self.fileExists( self.pathResolveSoftLink(o.dstPath) ) && !o.allowingMissed && o.resolvingDstSoftLink )
+  // {
+  //   let err = _.err( `Dst file:\n ${o.srcPath} is a soft link to a nonexistent file.\n Please enable options {-o.allowingMissed-} if that was your goal.` );
+  //   c.error( err );
+  //   return null;
+  // }
 
   c.originalSrcResolvedPath = o.srcPath;
 

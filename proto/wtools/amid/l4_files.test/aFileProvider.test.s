@@ -35677,6 +35677,29 @@ function hardLinkBreakingSrcDstHardLinkEqual0Sync( test )
   })
 }
 
+function hardLinkOptionDiscrepancy( test )
+{
+  let context = this;
+  let a = context.assetFor( test, false );
+
+  test.case = 'src exists, dst exists, different content, allowingDiscrepancy : 0';
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'src content' );
+  a.fileProvider.fileWrite( a.abs( 'dst' ), 'dst content' );
+  test.shouldThrowErrorSync( () =>
+  {
+    a.fileProvider.hardLink
+    ({
+      dstPath : a.abs( 'dst' ),
+      srcPath : a.abs( 'src' ),
+      allowingDiscrepancy : 0,
+      throwing : 1,
+      rewriting : 1,
+      rewritingDirs : 1,
+      makingDirectory: 1
+    });
+  })
+}
+
 //
 
 function hardLinkEscapedPath( test )
@@ -51322,21 +51345,21 @@ total : 11
   test.open( 'allowingDiscrepancy' );
   {
 // allowingDiscrepancy {allowingDiscrepancy: 0, rewriting : 1, rewritingDirs : 1, makingDirectory : 1}(написати окрему тест рутину)
-  //   test.case = 'src exists, dst exists, different content';
-  //   a.fileProvider.fileWrite( a.abs( 'src' ), 'src content' );
-  //   a.fileProvider.fileWrite( a.abs( 'dst' ), 'dst content' );
-  //   var got = a.fileProvider.hardLink
-  //   ({
-  //     dstPath : a.abs( 'dst' ),
-  //     srcPath : a.abs( 'src' ),
-  //     allowingDiscrepancy : 0, // throws uncaught error
-  //     throwing : 0,
-  //     rewriting : 1,
-  //     rewritingDirs : 1,
-  //     makingDirectory: 1
-  //   });
-  //   test.identical( got, null );
-  //   test.identical( a.fileProvider.areHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), false );
+    // test.case = 'src exists, dst exists, different content';
+    // a.fileProvider.fileWrite( a.abs( 'src' ), 'src content' );
+    // a.fileProvider.fileWrite( a.abs( 'dst' ), 'dst content' );
+    // var got = a.fileProvider.hardLink
+    // ({
+    //   dstPath : a.abs( 'dst' ),
+    //   srcPath : a.abs( 'src' ),
+    //   allowingDiscrepancy : 0, // throws uncaught error
+    //   throwing : 0,
+    //   rewriting : 1,
+    //   rewritingDirs : 1,
+    //   makingDirectory: 1
+    // });
+    // test.identical( got, null );
+    // test.identical( a.fileProvider.areHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), false );
   }
   test.close( 'allowingDiscrepancy' );
 }
@@ -53389,6 +53412,7 @@ var Self =
     hardLinkHardLinkedSync,
     hardLinkHardLinkedAsync,
     hardLinkBreakingSrcDstHardLinkEqual0Sync,
+    hardLinkOptionDiscrepancy,
 
     hardLinkEscapedPath, /* xxx */
 

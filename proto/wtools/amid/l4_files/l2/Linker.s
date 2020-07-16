@@ -307,12 +307,12 @@ function verify2()
       }
     }
 
-    // if( o.resolvingDstSoftLink && !self.fileExists( o.dstPath ) )
-    // {
-    //   let err = _.err( `Dst file:\n ${o.srcPath} is a soft link to a nonexistent file.\n Please enable options {-o.allowingMissed-} if that was your goal.` );
-    //   c.error( err );
-    //   return null;
-    // }
+    if( c.actMethodName === 'hardLinkAct' && o.resolvingDstSoftLink && !self.fileExists( o.dstPath ) )
+    {
+      let err = _.err( `Dst file: ${o.srcPath}\n is a soft link to a nonexistent file and option {-o.allowingMissed-} is false.` );
+      c.error( err );
+      return null;
+    }
   }
 
   /* equal paths */

@@ -307,9 +307,23 @@ function verify2()
       }
     }
 
+    /* Artem B. hardLink bud fixed. case: dst is soft link to nonexisting file, allowingMissed : 0, resolvingDstSoftLink : 1 */
     if( c.actMethodName === 'hardLinkAct' && o.resolvingDstSoftLink && !self.fileExists( o.dstPath ) )
     {
       let err = _.err( `Dst file: ${o.srcPath}\n is a soft link to a nonexistent file and option {-o.allowingMissed-} is false.` );
+      c.error( err );
+      return null;
+    }
+  }
+
+  /* allowingCycled */
+
+  /* Artem B. hardLink bud fixed. case: dst is soft link to itself, allowingCycled : 0, resolvingDstSoftLink : 1 */
+  if( !o.allowingCycled )
+  {
+    if( c.actMethodName === 'hardLinkAct' && self.isSoftLink( o.dstPath ) && self.pathResolveSoftLink( o.dstPath ) === o.dstPath && o.resolvingDstSoftLink )
+    {
+      let err = _.err( `Dst file: ${o.srcPath}\n is a soft link to itself and option {-o.allowingCycled-} is false.` );
       c.error( err );
       return null;
     }
@@ -531,6 +545,8 @@ function pathResolve()
 
   _.assert( path.isAbsolute( o.srcPath ) );
   _.assert( path.isAbsolute( o.dstPath ) );
+
+  /* Artem B. hardLink bud fixed. case: src === dst and src file is a directory */
 
   if( c.actMethodName === 'hardLinkAct' && self.fileExists( o.srcPath ) && self.isDir( o.srcPath ) )
   {

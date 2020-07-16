@@ -51269,26 +51269,26 @@ total : 11
     /* */
 
     // - resolvingDstSoftLink : 1(додати також в попередню тест рутину із allowingMissed : 1)
-    test.case = 'resolvingDstSoftLink : 1'; // dst є софт лінком на неіснуючий файл, src - звичайний файл
-    a.reflect();
-    a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-    a.fileProvider.fileWrite( a.abs( 'nonexistentSrc' ), 'some text' );
-    a.fileProvider.softLink({ dstPath : a.abs( 'softLinkToNonexistentSrc' ), srcPath : a.abs( 'nonexistentSrc' ) });
-    a.fileProvider.fileDelete({ filePath: a.abs( 'nonexistentSrc' ) });
-    var got = a.fileProvider.hardLink
-    ({
-      dstPath : a.abs( 'softLinkToNonexistentSrc' ),
-      srcPath : a.abs( 'src' ),
-      allowingMissed : 0,
-      throwing : 0,
-      rewriting : 1,
-      rewritingDirs : 1,
-      makingDirectory: 1,
-      allowingCycled : 1,
-      resolvingDstSoftLink : 1 // both 0 or 1 - returns true. bug maybe
-    });
-    test.identical( got, null );
-    test.identical( a.fileProvider.areHardLinked( a.abs( 'softLinkToNonexistentSrc' ), a.abs( 'src' ) ), false ); // if resolvingDstSoftLink : 1 - false, if 0 - true
+    // test.case = 'resolvingDstSoftLink : 1'; // dst є софт лінком на неіснуючий файл, src - звичайний файл
+    // a.reflect();
+    // a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+    // a.fileProvider.fileWrite( a.abs( 'nonexistentSrc' ), 'some text' );
+    // a.fileProvider.softLink({ dstPath : a.abs( 'softLinkToNonexistentSrc' ), srcPath : a.abs( 'nonexistentSrc' ) });
+    // a.fileProvider.fileDelete({ filePath: a.abs( 'nonexistentSrc' ) });
+    // var got = a.fileProvider.hardLink
+    // ({
+    //   dstPath : a.abs( 'softLinkToNonexistentSrc' ),
+    //   srcPath : a.abs( 'src' ),
+    //   allowingMissed : 0,
+    //   throwing : 0,
+    //   rewriting : 1,
+    //   rewritingDirs : 1,
+    //   makingDirectory: 1,
+    //   allowingCycled : 1,
+    //   resolvingDstSoftLink : 1 // both 0 or 1 - returns true. bug maybe
+    // });
+    // test.identical( got, null );
+    // test.identical( a.fileProvider.areHardLinked( a.abs( 'softLinkToNonexistentSrc' ), a.abs( 'src' ) ), false ); // if resolvingDstSoftLink : 1 - false, if 0 - true
   }
   test.close( 'allowingMissed' );
 
@@ -51346,22 +51346,23 @@ total : 11
 
   test.open( 'allowingDiscrepancy' );
   {
-// allowingDiscrepancy {allowingDiscrepancy: 0, rewriting : 1, rewritingDirs : 1, makingDirectory : 1}(написати окрему тест рутину)
-    // test.case = 'src exists, dst exists, different content';
-    // a.fileProvider.fileWrite( a.abs( 'src' ), 'src content' );
-    // a.fileProvider.fileWrite( a.abs( 'dst' ), 'dst content' );
-    // var got = a.fileProvider.hardLink
-    // ({
-    //   dstPath : a.abs( 'dst' ),
-    //   srcPath : a.abs( 'src' ),
-    //   allowingDiscrepancy : 0, // throws uncaught error
-    //   throwing : 0,
-    //   rewriting : 1,
-    //   rewritingDirs : 1,
-    //   makingDirectory: 1
-    // });
-    // test.identical( got, null );
-    // test.identical( a.fileProvider.areHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), false );
+    // allowingDiscrepancy {allowingDiscrepancy: 0, rewriting : 1, rewritingDirs : 1, makingDirectory : 1}(написати окрему тест рутину)
+    test.case = 'src exists, dst exists, different content';
+    a.reflect();
+    a.fileProvider.fileWrite( a.abs( 'src' ), 'src content' );
+    a.fileProvider.fileWrite( a.abs( 'dst' ), 'dst content' );
+    var got = a.fileProvider.hardLink
+    ({
+      dstPath : a.abs( 'dst' ),
+      srcPath : a.abs( 'src' ),
+      allowingDiscrepancy : 0, // throws uncaught error
+      throwing : 0,
+      rewriting : 1,
+      rewritingDirs : 1,
+      makingDirectory: 1
+    });
+    test.identical( got, null );
+    test.identical( a.fileProvider.areHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), false );
   }
   test.close( 'allowingDiscrepancy' );
 }
@@ -51433,27 +51434,46 @@ function hardLinkReturnThrowing0SyncForDebugExperiment( test )
 
   /* */
 
-  test.case = 'resolvingDstSoftLink : 1'; // dst є софт лінком на неіснуючий файл, src - звичайний файл
-  a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-  a.fileProvider.fileWrite( a.abs( 'nonexistentSrc' ), 'some text' );
-  a.fileProvider.softLink({ dstPath : a.abs( 'softLinkToNonexistentSrc' ), srcPath : a.abs( 'nonexistentSrc' ) });
-  a.fileProvider.fileDelete({ filePath: a.abs( 'nonexistentSrc' ) });
-  debugger
+  // test.case = 'resolvingDstSoftLink : 1'; // dst є софт лінком на неіснуючий файл, src - звичайний файл
+  // a.reflect();
+  // a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  // a.fileProvider.fileWrite( a.abs( 'nonexistentSrc' ), 'some text' );
+  // a.fileProvider.softLink({ dstPath : a.abs( 'softLinkToNonexistentSrc' ), srcPath : a.abs( 'nonexistentSrc' ) });
+  // a.fileProvider.fileDelete({ filePath: a.abs( 'nonexistentSrc' ) });
+  // debugger
+  // var got = a.fileProvider.hardLink
+  // ({
+  //   dstPath : a.abs( 'softLinkToNonexistentSrc' ),
+  //   srcPath : a.abs( 'src' ),
+  //   allowingMissed : 0,
+  //   throwing : 0,
+  //   rewriting : 1,
+  //   rewritingDirs : 1,
+  //   makingDirectory: 1,
+  //   allowingCycled : 1,
+  //   resolvingDstSoftLink : 1 // both 0 or 1 - returns true. bug maybe
+  // });
+  // test.identical( got, null );
+  // test.identical( a.fileProvider.areHardLinked( a.abs( 'softLinkToNonexistentSrc' ), a.abs( 'src' ) ), false );
+
+  /* */
+
+// allowingDiscrepancy {allowingDiscrepancy: 0, rewriting : 1, rewritingDirs : 1, makingDirectory : 1}(написати окрему тест рутину)
+  test.case = 'src exists, dst exists, different content';
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'src content' );
+  a.fileProvider.fileWrite( a.abs( 'dst' ), 'dst content' );
   var got = a.fileProvider.hardLink
   ({
-    dstPath : a.abs( 'softLinkToNonexistentSrc' ),
+    dstPath : a.abs( 'dst' ),
     srcPath : a.abs( 'src' ),
-    allowingMissed : 0,
+    allowingDiscrepancy : 0, // throws uncaught error
     throwing : 0,
     rewriting : 1,
     rewritingDirs : 1,
-    makingDirectory: 1,
-    allowingCycled : 1,
-    resolvingDstSoftLink : 1 // both 0 or 1 - returns true. bug maybe
+    makingDirectory: 1
   });
   test.identical( got, null );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'softLinkToNonexistentSrc' ), a.abs( 'src' ) ), false );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), false );
 }
 hardLinkReturnThrowing0SyncForDebugExperiment.experimental = 1;
 

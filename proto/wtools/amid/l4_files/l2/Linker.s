@@ -332,12 +332,14 @@ function verify2()
   if( Number( c.srcResolvedStat.size ) !== 0 )
   {
     debugger;
-    throw _.err
+    let err = _.err
     (
       'Cant\'t rewrite destination file by source file, because they have different content and option::allowingDiscrepancy is false\n'
       + `\ndst: ${o.dstPath}`
       + `\nsrc: ${o.srcPath}`
     );
+    c.error( err );
+    return null;
   }
 
   /* skipping */

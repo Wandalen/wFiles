@@ -2,7 +2,7 @@
 if( typeof module !== 'undefined' )
 require( 'wFiles' )
 
-var _ = wTools;
+let _ = wTools;
 var testDir = _.resolve( __dirname, '../tmp.tmp/filesCopy' );
 var dst, src;
 

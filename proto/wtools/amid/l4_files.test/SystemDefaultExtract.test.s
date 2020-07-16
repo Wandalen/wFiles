@@ -11,8 +11,8 @@ if( typeof module !== 'undefined' )
 
 //
 
-var _ = _global_.wTools;
-var Parent = wTests[ 'Tools.mid.files.fileProvider.system.default.Abstract' ];
+let _ = _global_.wTools;
+let Parent = wTests[ 'Tools.mid.files.fileProvider.system.default.Abstract' ];
 
 _.assert( !!Parent );
 
@@ -117,7 +117,7 @@ var Proto =
 
 //
 
-var Self = new wTestSuite( Proto ).inherit( Parent );
+let Self = new wTestSuite( Proto ).inherit( Parent );
 if( typeof module !== 'undefined' && !module.parent )
 wTester.test( Self.name );
 

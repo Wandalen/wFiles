@@ -1,6 +1,6 @@
 
 if( typeof module !== 'undefined' )
-var _ = require( '..' )
+let _ = require( '..' )
 
 _.include( 'wProcess' )
 

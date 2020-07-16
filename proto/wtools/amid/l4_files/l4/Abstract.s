@@ -2,8 +2,8 @@
 
 'use strict';
 
-var _global = _global_;
-var _ = _global_.wTools;
+let _global = _global_;
+let _ = _global_.wTools;
 var FileRecord = _.FileRecord;
 var FileRecordFilter = _.FileRecordFilter;
 var FileRecordFactory = _.FileRecordFactory;
@@ -19,8 +19,8 @@ _.assert( _.routineIs( FileRecordFactory ) );
  * @module Tools/mid/Files
 */
 
-var Parent = null;
-var Self = function wFileProviderAbstract( o )
+let Parent = null;
+let Self = function wFileProviderAbstract( o )
 {
   return _.workpiece.construct( Self, this, arguments );
 }

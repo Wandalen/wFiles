@@ -2,7 +2,7 @@
 if( typeof module !== 'undefined' )
 require( 'wFiles' )
 
-var _ = wTools;
+let _ = wTools;
 var provider = _.FileProvider.BackUrl();
 
 var url = 'http://github.com/Wandalen/wTools/archive/master.zip';

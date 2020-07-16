@@ -18,8 +18,8 @@ if( typeof module !== 'undefined' )
 
 //
 
-var _ = _global_.wTools;
-var Parent = wTester;
+let _ = _global_.wTools;
+let Parent = wTester;
 
 //
 
@@ -1238,7 +1238,7 @@ program();
 
   function program()
   {
-    var _ = require( toolsPath );
+    let _ = require( toolsPath );
     _.include( 'wFiles' );
 
     var tempPath = _.path.tempOpen( _.path.normalize( __dirname ), 'tempCloseAfter' );
@@ -1691,7 +1691,7 @@ function nextPathDirTempIndexLock( test )
 
   function program()
   {
-    var _ = require( toolsPath );
+    let _ = require( toolsPath );
     _.path.IndexLockTimeOut = 5000;
     _.path.tempOpen
     ({
@@ -1751,7 +1751,7 @@ function nextPathDirTempIndexLockThrowing( test )
 
   function program()
   {
-    var _ = require( toolsPath );
+    let _ = require( toolsPath );
     _.path.IndexLockTimeOut = 5000;
     _.path.tempOpen
     ({
@@ -1770,7 +1770,7 @@ Second process exits with lock error after timeout.
 // declare
 // --
 
-var Self =
+let Self =
 {
 
   name : 'Tools.mid.files.Paths',

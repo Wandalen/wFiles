@@ -1,5 +1,5 @@
 require( 'wFiles' );
-var _ = wTools;
+let _ = wTools;
 
 // provider
 

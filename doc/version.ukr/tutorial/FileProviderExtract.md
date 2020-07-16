@@ -45,7 +45,7 @@ files
 
 ```js    
 require( 'wFiles' );
-var _ = wTools;
+let _ = wTools;
 
 // files tree
 

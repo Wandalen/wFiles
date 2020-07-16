@@ -16,8 +16,8 @@ if( typeof module !== 'undefined' )
 
 //
 
-var _ = _global_.wTools;
-var Parent = wTester;
+let _ = _global_.wTools;
+let Parent = wTester;
 
 //
 
@@ -718,7 +718,7 @@ function configRead( test )
 // declare
 // --
 
-var Self =
+let Self =
 {
 
   name : 'Tools.mid.files.Secondary.s',

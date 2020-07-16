@@ -54,7 +54,7 @@ files
 
 ```js    
 require( 'wFiles' );
-var _ = wTools;
+let _ = wTools;
 
 // provider
 
@@ -130,7 +130,7 @@ fileProvider
 
 ```js    
 require( 'wFiles' );
-var _ = wTools;
+let _ = wTools;
 
 // provider
 

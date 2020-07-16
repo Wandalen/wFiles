@@ -2,10 +2,10 @@
 
 'use strict'; 
 
-var _global = _global_;
-var _ = _global_.wTools;
-var Parent = null;
-var Self = function wStatsCarrier( o )
+let _global = _global_;
+let _ = _global_.wTools;
+let Parent = null;
+let Self = function wStatsCarrier( o )
 {
   return _.workpiece.construct( Self, this, arguments );
 }

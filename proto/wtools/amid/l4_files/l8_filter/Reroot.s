@@ -2,23 +2,20 @@
 
 'use strict';
 
-var _global = _global_;
-var _global = _global_;
-var _ = _global_.wTools;
-_.assert( !_.FileFilter.Reroot );
-
-var _global = _global_;
-var _ = _global_.wTools;
+let _global = _global_;
+let _ = _global_.wTools;
 var Abstract = _.FileProvider.Abstract;
 var Partial = _.FileProvider.Partial;
 var Default = _.FileProvider.Default;
-var Parent = null;
-var Self = function wFileFilterReroot( o )
+let Parent = null;
+let Self = function wFileFilterReroot( o )
 {
   return _.workpiece.construct( Self, this, arguments );
 }
 
 Self.shortName = 'Reroot';
+
+_.assert( !_.FileFilter.Reroot );
 
 //
 

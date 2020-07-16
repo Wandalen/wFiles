@@ -50677,7 +50677,7 @@ function hardLinkReturnThrowing0Sync( test )
 // declare
 // --
 
-var Self =
+let Self =
 {
 
   name : 'Tools.mid.files.fileProvider.Abstract',

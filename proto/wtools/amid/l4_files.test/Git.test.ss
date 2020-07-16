@@ -13,7 +13,7 @@ if( typeof module !== 'undefined' )
 
 //
 
-var _ = _global_.wTools;
+let _ = _global_.wTools;
 var RunningInsideTestContainer = _.process.insideTestContainer();
 
 //
@@ -1482,7 +1482,7 @@ var Proto =
 
 //
 
-var Self = new wTestSuite( Proto )/* .inherit( Parent ); */
+let Self = new wTestSuite( Proto )/* .inherit( Parent ); */
 if( typeof module !== 'undefined' && !module.parent )
 wTester.test( Self.name );
 

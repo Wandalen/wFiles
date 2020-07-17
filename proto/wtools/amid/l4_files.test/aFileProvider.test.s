@@ -51706,205 +51706,604 @@ function hardLinkReturnSoftLinkedSync( test )
  - resolvingSrcSoftLink : 0
  - resolvingSrcSoftLink : 1
 
-total : 8
+// dst is a soft link to nonexistent file
+ - resolvingDstSoftLink by default
+   -- allowingMissed : 0
+   -- allowingMissed : 1
+ - resolvingDstSoftLink : 0
+   -- allowingMissed : 0
+   -- allowingMissed : 1
+ - resolvingDstSoftLink : 1
+   -- allowingMissed : 0
+   -- allowingMissed : 1
+
+// dst is a soft link to existing file
+ - resolvingDstSoftLink by default
+ - resolvingDstSoftLink : 0
+ - resolvingDstSoftLink : 1
+
+// dst is a soft link to self
+ - resolvingDstSoftLink by default
+   -- allowingCycled : 0
+   -- allowingCycled : 1
+ - resolvingDstSoftLink : 0
+   -- allowingCycled : 0
+   -- allowingCycled : 1
+ - resolvingDstSoftLink : 1
+   -- allowingCycled : 0
+   -- allowingCycled : 1
+
+total : 23
 */
-  // test.open( 'src is a soft link to nonexistent file' );
-  // {
-  //   /* Artem B. bug */
-  //   test.case = 'resolvingSrcSoftLink by default';
-  //   a.reflect();
-  //   a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-  //   a.fileProvider.softLink({ dstPath : a.abs( 'softLinkToNonexistentSrc' ), srcPath : a.abs( 'src' ) });
-  //   a.fileProvider.fileDelete({ filePath: a.abs( 'src' ) });
-  //   test.shouldThrowErrorSync( ( ) =>
-  //   {
-  //     a.fileProvider.hardLink
-  //     ({
-  //       dstPath : a.abs( 'dir1/dir2/dst' ),
-  //       srcPath : a.abs( 'softLinkToNonexistentSrc' ),
-  //       allowingMissed : 1,
-  //       throwing : 1,
-  //       rewriting : 1,
-  //       rewritingDirs : 1,
-  //       makingDirectory: 1,
-  //       allowingCycled : 1
-  //     });
-  //   });
-  //   test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'softLinkToNonexistentSrc' ) ), false );
+  test.open( 'src is a soft link to nonexistent file' );
+  {
+    /* Artem B. bug */
+    test.case = 'resolvingSrcSoftLink by default';
+    a.reflect();
+    a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+    a.fileProvider.softLink({ dstPath : a.abs( 'softLinkToNonexistentSrc' ), srcPath : a.abs( 'src' ) });
+    a.fileProvider.fileDelete({ filePath: a.abs( 'src' ) });
+    test.shouldThrowErrorSync( ( ) =>
+    {
+      a.fileProvider.hardLink
+      ({
+        dstPath : a.abs( 'dir1/dir2/dst' ),
+        srcPath : a.abs( 'softLinkToNonexistentSrc' ),
+        allowingMissed : 1,
+        throwing : 1,
+        rewriting : 1,
+        rewritingDirs : 1,
+        makingDirectory: 1,
+        allowingCycled : 1
+      });
+    });
+    test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'softLinkToNonexistentSrc' ) ), false );
 
-  //   /* */
+    /* */
 
-  //   test.case = 'resolvingSrcSoftLink : 0';
-  //   a.reflect();
-  //   a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-  //   a.fileProvider.softLink({ dstPath : a.abs( 'softLinkToNonexistentSrc' ), srcPath : a.abs( 'src' ) });
-  //   a.fileProvider.fileDelete({ filePath: a.abs( 'src' ) });
-  //   test.shouldThrowErrorSync( ( ) =>
-  //   {
-  //     a.fileProvider.hardLink
-  //     ({
-  //       dstPath : a.abs( 'dir1/dir2/dst' ),
-  //       srcPath : a.abs( 'softLinkToNonexistentSrc' ),
-  //       allowingMissed : 1,
-  //       throwing : 1,
-  //       rewriting : 1,
-  //       rewritingDirs : 1,
-  //       makingDirectory: 1,
-  //       allowingCycled : 1,
-  //       resolvingSrcSoftLink : 0
-  //     });
-  //   });
-  //   test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'softLinkToNonexistentSrc' ) ), false );
+    test.case = 'resolvingSrcSoftLink : 0';
+    a.reflect();
+    a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+    a.fileProvider.softLink({ dstPath : a.abs( 'softLinkToNonexistentSrc' ), srcPath : a.abs( 'src' ) });
+    a.fileProvider.fileDelete({ filePath: a.abs( 'src' ) });
+    test.shouldThrowErrorSync( ( ) =>
+    {
+      a.fileProvider.hardLink
+      ({
+        dstPath : a.abs( 'dir1/dir2/dst' ),
+        srcPath : a.abs( 'softLinkToNonexistentSrc' ),
+        allowingMissed : 1,
+        throwing : 1,
+        rewriting : 1,
+        rewritingDirs : 1,
+        makingDirectory: 1,
+        allowingCycled : 1,
+        resolvingSrcSoftLink : 0
+      });
+    });
+    test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'softLinkToNonexistentSrc' ) ), false );
 
-  //   /* */
+    /* */
 
-  //   test.case = 'resolvingSrcSoftLink : 1';
-  //   a.reflect();
-  //   a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-  //   a.fileProvider.softLink({ dstPath : a.abs( 'softLinkToNonexistentSrc' ), srcPath : a.abs( 'src' ) });
-  //   a.fileProvider.fileDelete({ filePath: a.abs( 'src' ) });
-  //   test.shouldThrowErrorSync( ( ) =>
-  //   {
-  //     a.fileProvider.hardLink
-  //     ({
-  //       dstPath : a.abs( 'dir1/dir2/dst' ),
-  //       srcPath : a.abs( 'softLinkToNonexistentSrc' ),
-  //       allowingMissed : 1,
-  //       throwing : 1,
-  //       rewriting : 1,
-  //       rewritingDirs : 1,
-  //       makingDirectory: 1,
-  //       allowingCycled : 1,
-  //       resolvingSrcSoftLink : 1
-  //     });
-  //   });
-  //   test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'softLinkToNonexistentSrc' ) ), false );
-  // }
-  // test.close( 'src is a soft link to nonexistent file' );
+    test.case = 'resolvingSrcSoftLink : 1';
+    a.reflect();
+    a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+    a.fileProvider.softLink({ dstPath : a.abs( 'softLinkToNonexistentSrc' ), srcPath : a.abs( 'src' ) });
+    a.fileProvider.fileDelete({ filePath: a.abs( 'src' ) });
+    test.shouldThrowErrorSync( ( ) =>
+    {
+      a.fileProvider.hardLink
+      ({
+        dstPath : a.abs( 'dir1/dir2/dst' ),
+        srcPath : a.abs( 'softLinkToNonexistentSrc' ),
+        allowingMissed : 1,
+        throwing : 1,
+        rewriting : 1,
+        rewritingDirs : 1,
+        makingDirectory: 1,
+        allowingCycled : 1,
+        resolvingSrcSoftLink : 1
+      });
+    });
+    test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'softLinkToNonexistentSrc' ) ), false );
+  }
+  test.close( 'src is a soft link to nonexistent file' );
 
-  // /* -- */
+  /* -- */
 
-  // test.open( 'src is a soft link to existing file' );
-  // {
-  //   /* Artem B. bug */
-  //   test.case = 'resolvingSrcSoftLink : 0';
-  //   a.reflect();
-  //   a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-  //   a.fileProvider.softLink({ dstPath : a.abs( 'softLinkToExistingFile' ), srcPath : a.abs( 'src' ) });
-  //   test.shouldThrowErrorSync( ( ) =>
-  //   {
-  //     a.fileProvider.hardLink
-  //     ({
-  //       dstPath : a.abs( 'dir1/dir2/dst' ),
-  //       srcPath : a.abs( 'softLinkToExistingFile' ),
-  //       allowingMissed : 1,
-  //       throwing : 1,
-  //       rewriting : 1,
-  //       rewritingDirs : 1,
-  //       makingDirectory: 1,
-  //       allowingCycled : 1,
-  //       resolvingSrcSoftLink : 0
-  //     });
-  //   });
-  //   test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'softLinkToExistingFile' ) ), false );
+  test.open( 'src is a soft link to existing file' );
+  {
+    /* Artem B. bug */
+    test.case = 'resolvingSrcSoftLink : 0';
+    a.reflect();
+    a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+    a.fileProvider.softLink({ dstPath : a.abs( 'softLinkToExistingFile' ), srcPath : a.abs( 'src' ) });
+    test.shouldThrowErrorSync( ( ) =>
+    {
+      a.fileProvider.hardLink
+      ({
+        dstPath : a.abs( 'dir1/dir2/dst' ),
+        srcPath : a.abs( 'softLinkToExistingFile' ),
+        allowingMissed : 1,
+        throwing : 1,
+        rewriting : 1,
+        rewritingDirs : 1,
+        makingDirectory: 1,
+        allowingCycled : 1,
+        resolvingSrcSoftLink : 0
+      });
+    });
+    test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'softLinkToExistingFile' ) ), false );
     
-  //   /* */
+    /* */
 
-  //   /* Artem B. bug */
-  //   test.case = 'resolvingSrcSoftLink : 1';
-  //   a.reflect();
-  //   a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-  //   a.fileProvider.softLink({ dstPath : a.abs( 'softLinkToExistingFile' ), srcPath : a.abs( 'src' ) });
-  //   var got = a.fileProvider.hardLink
-  //   ({
-  //     dstPath : a.abs( 'dir1/dir2/dst' ),
-  //     srcPath : a.abs( 'softLinkToExistingFile' ),
-  //     allowingMissed : 1,
-  //     rewriting : 1,
-  //     rewritingDirs : 1,
-  //     makingDirectory: 1,
-  //     allowingCycled : 1,
-  //     resolvingSrcSoftLink : 1
-  //   });
-  //   test.identical( got, true );
-  //   test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'src' ) ), true );
-  // }
-  // test.close( 'src is a soft link to existing file' );
+    /* Artem B. bug */
+    test.case = 'resolvingSrcSoftLink : 1';
+    a.reflect();
+    a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+    a.fileProvider.softLink({ dstPath : a.abs( 'softLinkToExistingFile' ), srcPath : a.abs( 'src' ) });
+    var got = a.fileProvider.hardLink
+    ({
+      dstPath : a.abs( 'dir1/dir2/dst' ),
+      srcPath : a.abs( 'softLinkToExistingFile' ),
+      allowingMissed : 1,
+      rewriting : 1,
+      rewritingDirs : 1,
+      makingDirectory: 1,
+      allowingCycled : 1,
+      resolvingSrcSoftLink : 1
+    });
+    test.identical( got, true );
+    test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'src' ) ), true );
+  }
+  test.close( 'src is a soft link to existing file' );
 
-  // /* -- */
+  /* -- */
 
-  // test.open( 'src is a soft link to self' );
-  // {
-  //   /* Artem B. bug */
-  //   test.case = 'resolvingSrcSoftLink by default';
-  //   a.reflect();
-  //   a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-  //   a.fileProvider.softLink({ dstPath : a.abs( 'src' ), srcPath : a.abs( 'src' ), allowingMissed : 1 });
-  //   test.shouldThrowErrorSync( ( ) =>
-  //   {
-  //     a.fileProvider.hardLink
-  //     ({
-  //       dstPath : a.abs( 'dir1/dir2/dst' ),
-  //       srcPath : a.abs( 'src' ),
-  //       allowingMissed : 1,
-  //       throwing : 1,
-  //       rewriting : 1,
-  //       rewritingDirs : 1,
-  //       makingDirectory: 1,
-  //       allowingCycled : 1
-  //     });
-  //   });
-  //   test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'src' ) ), false );
+  test.open( 'src is a soft link to self' );
+  {
+    /* Artem B. bug */
+    test.case = 'resolvingSrcSoftLink by default';
+    a.reflect();
+    a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+    a.fileProvider.softLink({ dstPath : a.abs( 'src' ), srcPath : a.abs( 'src' ), allowingMissed : 1 });
+    test.shouldThrowErrorSync( ( ) =>
+    {
+      a.fileProvider.hardLink
+      ({
+        dstPath : a.abs( 'dir1/dir2/dst' ),
+        srcPath : a.abs( 'src' ),
+        allowingMissed : 1,
+        throwing : 1,
+        rewriting : 1,
+        rewritingDirs : 1,
+        makingDirectory: 1,
+        allowingCycled : 1
+      });
+    });
+    test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'src' ) ), false );
 
-  //   /* */
+    /* */
 
-  //   /* Artem B. bug */
-  //   test.case = 'resolvingSrcSoftLink : 0';
-  //   a.reflect();
-  //   a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-  //   a.fileProvider.softLink({ dstPath : a.abs( 'src' ), srcPath : a.abs( 'src' ), allowingMissed : 1 });
-  //   test.shouldThrowErrorSync( ( ) =>
-  //   {
-  //     a.fileProvider.hardLink
-  //     ({
-  //       dstPath : a.abs( 'dir1/dir2/dst' ),
-  //       srcPath : a.abs( 'src' ),
-  //       allowingMissed : 1,
-  //       throwing : 1,
-  //       rewriting : 1,
-  //       rewritingDirs : 1,
-  //       makingDirectory: 1,
-  //       allowingCycled : 1,
-  //       resolvingSrcSoftLink : 0
-  //     });
-  //   });
-  //   test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'src' ) ), false );
+    /* Artem B. bug */
+    test.case = 'resolvingSrcSoftLink : 0';
+    a.reflect();
+    a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+    a.fileProvider.softLink({ dstPath : a.abs( 'src' ), srcPath : a.abs( 'src' ), allowingMissed : 1 });
+    test.shouldThrowErrorSync( ( ) =>
+    {
+      a.fileProvider.hardLink
+      ({
+        dstPath : a.abs( 'dir1/dir2/dst' ),
+        srcPath : a.abs( 'src' ),
+        allowingMissed : 1,
+        throwing : 1,
+        rewriting : 1,
+        rewritingDirs : 1,
+        makingDirectory: 1,
+        allowingCycled : 1,
+        resolvingSrcSoftLink : 0
+      });
+    });
+    test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'src' ) ), false );
 
-  //   /* */
+    /* */
 
-  //   /* Artem B. bug */
-  //   test.case = 'resolvingSrcSoftLink : 1';
-  //   a.reflect();
-  //   a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-  //   a.fileProvider.softLink({ dstPath : a.abs( 'src' ), srcPath : a.abs( 'src' ), allowingMissed : 1 });
-  //   test.shouldThrowErrorSync( ( ) =>
-  //   {
-  //     a.fileProvider.hardLink
-  //     ({
-  //       dstPath : a.abs( 'dir1/dir2/dst' ),
-  //       srcPath : a.abs( 'src' ),
-  //       allowingMissed : 1,
-  //       throwing : 1,
-  //       rewriting : 1,
-  //       rewritingDirs : 1,
-  //       makingDirectory: 1,
-  //       allowingCycled : 1,
-  //       resolvingSrcSoftLink : 1
-  //     });
-  //   });
-  //   test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'src' ) ), false );
-  // }
-  // test.close( 'src is a soft link to self' );
+    /* Artem B. bug */
+    test.case = 'resolvingSrcSoftLink : 1';
+    a.reflect();
+    a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+    a.fileProvider.softLink({ dstPath : a.abs( 'src' ), srcPath : a.abs( 'src' ), allowingMissed : 1 });
+    test.shouldThrowErrorSync( ( ) =>
+    {
+      a.fileProvider.hardLink
+      ({
+        dstPath : a.abs( 'dir1/dir2/dst' ),
+        srcPath : a.abs( 'src' ),
+        allowingMissed : 1,
+        throwing : 1,
+        rewriting : 1,
+        rewritingDirs : 1,
+        makingDirectory: 1,
+        allowingCycled : 1,
+        resolvingSrcSoftLink : 1
+      });
+    });
+    test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'src' ) ), false );
+  }
+  test.close( 'src is a soft link to self' );
+
+  /* -- */
+
+  test.open( 'dst is a soft link to nonexistent file' );
+  {
+    test.open( 'resolvingDstSoftLink by default' );
+    {
+      test.case = 'allowingMissed : 0';
+      a.reflect();
+      a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+      a.fileProvider.fileWrite( a.abs( 'dst' ), 'some text' );
+      a.fileProvider.softLink({ dstPath : a.abs( 'softLinkToNonexistentDst' ), srcPath : a.abs( 'dst' ) });
+      a.fileProvider.fileDelete({ filePath: a.abs( 'dst' ) });
+      var got = a.fileProvider.hardLink
+      ({
+        dstPath : a.abs( 'softLinkToNonexistentDst' ),
+        srcPath : a.abs( 'src' ),
+        throwing : 0,
+        rewriting : 1,
+        rewritingDirs : 1,
+        makingDirectory: 1,
+        allowingCycled : 1,
+        allowingMissed : 0
+      });
+      test.identical( got, null );
+      test.identical( a.fileProvider.areHardLinked( a.abs( 'softLinkToNonexistentDst' ), a.abs( 'src' ) ), false );
+
+      /* */
+
+      test.case = 'allowingMissed : 1';
+      a.reflect();
+      a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+      a.fileProvider.fileWrite( a.abs( 'dst' ), 'some text' );
+      a.fileProvider.softLink({ dstPath : a.abs( 'softLinkToNonexistentDst' ), srcPath : a.abs( 'dst' ) });
+      a.fileProvider.fileDelete({ filePath: a.abs( 'dst' ) });
+      var got = a.fileProvider.hardLink
+      ({
+        dstPath : a.abs( 'softLinkToNonexistentDst' ),
+        srcPath : a.abs( 'src' ),
+        throwing : 0,
+        rewriting : 1,
+        rewritingDirs : 1,
+        makingDirectory: 1,
+        allowingCycled : 1,
+        allowingMissed : 1 // throws uncaught error - o.allowingMissed could be disabled when linking two files
+      });
+      test.identical( got, true );
+      test.identical( a.fileProvider.areHardLinked( a.abs( 'softLinkToNonexistentDst' ), a.abs( 'src' ) ), false );
+    }
+    test.close( 'resolvingDstSoftLink by default' );
+
+    /* -- */
+
+    test.open( 'resolvingDstSoftLink : 0' );
+    {
+      test.case = 'allowingMissed : 0';
+      a.reflect();
+      a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+      a.fileProvider.fileWrite( a.abs( 'dst' ), 'some text' );
+      a.fileProvider.softLink({ dstPath : a.abs( 'softLinkToNonexistentDst' ), srcPath : a.abs( 'dst' ) });
+      a.fileProvider.fileDelete({ filePath: a.abs( 'dst' ) });
+      var got = a.fileProvider.hardLink
+      ({
+        dstPath : a.abs( 'softLinkToNonexistentDst' ),
+        srcPath : a.abs( 'src' ),
+        throwing : 0,
+        rewriting : 1,
+        rewritingDirs : 1,
+        makingDirectory: 1,
+        allowingCycled : 1,
+        allowingMissed : 0,
+        resolvingDstSoftLink : 0
+      });
+      test.identical( got, null );
+      test.identical( a.fileProvider.areHardLinked( a.abs( 'softLinkToNonexistentDst' ), a.abs( 'src' ) ), false );
+
+      /* */
+
+      test.case = 'allowingMissed : 1';
+      a.reflect();
+      a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+      a.fileProvider.fileWrite( a.abs( 'dst' ), 'some text' );
+      a.fileProvider.softLink({ dstPath : a.abs( 'softLinkToNonexistentDst' ), srcPath : a.abs( 'dst' ) });
+      a.fileProvider.fileDelete({ filePath: a.abs( 'dst' ) });
+      var got = a.fileProvider.hardLink
+      ({
+        dstPath : a.abs( 'softLinkToNonexistentDst' ),
+        srcPath : a.abs( 'src' ),
+        throwing : 0,
+        rewriting : 1,
+        rewritingDirs : 1,
+        makingDirectory: 1,
+        allowingCycled : 1,
+        allowingMissed : 1, // throws uncaught error - o.allowingMissed could be disabled when linking two files
+        resolvingDstSoftLink : 0
+      });
+      test.identical( got, true );
+      test.identical( a.fileProvider.areHardLinked( a.abs( 'softLinkToNonexistentDst' ), a.abs( 'src' ) ), false );
+    }
+    test.close( 'resolvingDstSoftLink : 0' );
+
+    /* -- */
+
+    test.open( 'resolvingDstSoftLink : 1' );
+    {
+      test.case = 'allowingMissed : 0';
+      a.reflect();
+      a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+      a.fileProvider.fileWrite( a.abs( 'dst' ), 'some text' );
+      a.fileProvider.softLink({ dstPath : a.abs( 'softLinkToNonexistentDst' ), srcPath : a.abs( 'dst' ) });
+      a.fileProvider.fileDelete({ filePath: a.abs( 'dst' ) });
+      var got = a.fileProvider.hardLink
+      ({
+        dstPath : a.abs( 'softLinkToNonexistentDst' ),
+        srcPath : a.abs( 'src' ),
+        throwing : 0,
+        rewriting : 1,
+        rewritingDirs : 1,
+        makingDirectory: 1,
+        allowingCycled : 1,
+        allowingMissed : 0,
+        resolvingDstSoftLink : 1
+      });
+      test.identical( got, null );
+      test.identical( a.fileProvider.areHardLinked( a.abs( 'softLinkToNonexistentDst' ), a.abs( 'src' ) ), false );
+
+      /* */
+
+      test.case = 'allowingMissed : 1';
+      a.reflect();
+      a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+      a.fileProvider.fileWrite( a.abs( 'dst' ), 'some text' );
+      a.fileProvider.softLink({ dstPath : a.abs( 'softLinkToNonexistentDst' ), srcPath : a.abs( 'dst' ) });
+      a.fileProvider.fileDelete({ filePath: a.abs( 'dst' ) });
+      var got = a.fileProvider.hardLink
+      ({
+        dstPath : a.abs( 'softLinkToNonexistentDst' ),
+        srcPath : a.abs( 'src' ),
+        throwing : 0,
+        rewriting : 1,
+        rewritingDirs : 1,
+        makingDirectory: 1,
+        allowingCycled : 1,
+        allowingMissed : 1, // throws uncaught error - o.allowingMissed could be disabled when linking two files
+        resolvingDstSoftLink : 1
+      });
+      test.identical( got, true );
+      test.identical( a.fileProvider.areHardLinked( a.abs( 'softLinkToNonexistentDst' ), a.abs( 'src' ) ), false );
+    }
+    test.close( 'resolvingDstSoftLink : 1' );
+  }
+  test.close( 'dst is a soft link to nonexistent file' );
+
+  /* -- */
+
+  test.open( 'dst is a soft link to existing file' );
+  {
+    test.case = 'resolvingDstSoftLink by default';
+    a.reflect();
+    a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+    a.fileProvider.fileWrite( a.abs( 'dst' ), 'some text' );
+    a.fileProvider.softLink({ dstPath : a.abs( 'softLinkToExistingFile' ), srcPath : a.abs( 'dst' ) });
+    var got = a.fileProvider.hardLink
+    ({
+      dstPath : a.abs( 'softLinkToExistingFile' ),
+      srcPath : a.abs( 'src' ),
+      throwing : 0,
+      rewriting : 1,
+      rewritingDirs : 1,
+      makingDirectory: 1,
+      allowingCycled : 0,
+      allowingMissed : 0
+    });
+    test.identical( got, true );
+    test.identical( a.fileProvider.areHardLinked( a.abs( 'softLinkToExistingFile' ), a.abs( 'src' ) ), true );
+    
+    /* */
+
+    test.case = 'resolvingDstSoftLink : 0';
+    a.reflect();
+    a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+    a.fileProvider.fileWrite( a.abs( 'dst' ), 'some text' );
+    a.fileProvider.softLink({ dstPath : a.abs( 'softLinkToExistingFile' ), srcPath : a.abs( 'dst' ) });
+    var got = a.fileProvider.hardLink
+    ({
+      dstPath : a.abs( 'softLinkToExistingFile' ),
+      srcPath : a.abs( 'src' ),
+      throwing : 0,
+      rewriting : 1,
+      rewritingDirs : 1,
+      makingDirectory: 1,
+      allowingCycled : 0,
+      allowingMissed : 0,
+      resolvingDstSoftLink : 0
+    });
+    test.identical( got, true );
+    test.identical( a.fileProvider.areHardLinked( a.abs( 'softLinkToExistingFile' ), a.abs( 'src' ) ), true );
+
+    /* */
+
+    test.case = 'resolvingDstSoftLink : 1';
+    a.reflect();
+    a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+    a.fileProvider.fileWrite( a.abs( 'dst' ), 'some text' );
+    a.fileProvider.softLink({ dstPath : a.abs( 'softLinkToExistingFile' ), srcPath : a.abs( 'dst' ) });
+    var got = a.fileProvider.hardLink
+    ({
+      dstPath : a.abs( 'softLinkToExistingFile' ),
+      srcPath : a.abs( 'src' ),
+      throwing : 0,
+      rewriting : 1,
+      rewritingDirs : 1,
+      makingDirectory: 1,
+      allowingCycled : 0,
+      allowingMissed : 0,
+      resolvingDstSoftLink : 1
+    });
+    test.identical( got, true );
+    test.identical( a.fileProvider.areHardLinked( a.abs( 'softLinkToExistingFile' ), a.abs( 'src' ) ), true );
+  }
+  test.close( 'dst is a soft link to existing file' );
+
+  /* -- */
+
+  test.open( 'dst is a soft link to self' );
+  {
+    test.open( 'resolvingDstSoftLink by default' );
+    {
+      test.case = 'allowingCycled : 0';
+      a.reflect();
+      a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+      a.fileProvider.fileWrite( a.abs( 'dst' ), 'some text' );
+      a.fileProvider.softLink({ dstPath : a.abs( 'dst' ), srcPath : a.abs( 'dst' ), allowingMissed : 1 });
+      var got = a.fileProvider.hardLink
+      ({
+        dstPath : a.abs( 'dst' ),
+        srcPath : a.abs( 'src' ),
+        throwing : 0,
+        rewriting : 1,
+        rewritingDirs : 1,
+        makingDirectory: 1,
+        allowingCycled : 0,
+        allowingMissed : 1
+      });
+      test.identical( got, null );
+      test.identical( a.fileProvider.areHardLinked( a.abs( 'softLinkToNonexistentDst' ), a.abs( 'src' ) ), false );
+
+      /* */
+
+      test.case = 'allowingCycled : 1';
+      a.reflect();
+      a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+      a.fileProvider.fileWrite( a.abs( 'dst' ), 'some text' );
+      a.fileProvider.softLink({ dstPath : a.abs( 'softLinkToNonexistentDst' ), srcPath : a.abs( 'dst' ) });
+      a.fileProvider.fileDelete({ filePath: a.abs( 'dst' ) });
+      var got = a.fileProvider.hardLink
+      ({
+        dstPath : a.abs( 'softLinkToNonexistentDst' ),
+        srcPath : a.abs( 'src' ),
+        throwing : 0,
+        rewriting : 1,
+        rewritingDirs : 1,
+        makingDirectory: 1,
+        allowingCycled : 1,
+        allowingMissed : 1 // throws uncaught error - o.allowingMissed could be disabled when linking two files
+      });
+      test.identical( got, true );
+      test.identical( a.fileProvider.areHardLinked( a.abs( 'softLinkToNonexistentDst' ), a.abs( 'src' ) ), false );
+    }
+    test.close( 'resolvingDstSoftLink by default' );
+
+    /* -- */
+
+    test.open( 'resolvingDstSoftLink : 0' );
+    {
+      test.case = 'allowingCycled : 0';
+      a.reflect();
+      a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+      a.fileProvider.fileWrite( a.abs( 'dst' ), 'some text' );
+      a.fileProvider.softLink({ dstPath : a.abs( 'softLinkToNonexistentDst' ), srcPath : a.abs( 'dst' ) });
+      a.fileProvider.fileDelete({ filePath: a.abs( 'dst' ) });
+      var got = a.fileProvider.hardLink
+      ({
+        dstPath : a.abs( 'softLinkToNonexistentDst' ),
+        srcPath : a.abs( 'src' ),
+        throwing : 0,
+        rewriting : 1,
+        rewritingDirs : 1,
+        makingDirectory: 1,
+        allowingCycled : 0,
+        allowingMissed : 1,
+        resolvingDstSoftLink : 0
+      });
+      test.identical( got, null );
+      test.identical( a.fileProvider.areHardLinked( a.abs( 'softLinkToNonexistentDst' ), a.abs( 'src' ) ), false );
+
+      /* */
+
+      test.case = 'allowingCycled : 1';
+      a.reflect();
+      a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+      a.fileProvider.fileWrite( a.abs( 'dst' ), 'some text' );
+      a.fileProvider.softLink({ dstPath : a.abs( 'softLinkToNonexistentDst' ), srcPath : a.abs( 'dst' ) });
+      a.fileProvider.fileDelete({ filePath: a.abs( 'dst' ) });
+      var got = a.fileProvider.hardLink
+      ({
+        dstPath : a.abs( 'softLinkToNonexistentDst' ),
+        srcPath : a.abs( 'src' ),
+        throwing : 0,
+        rewriting : 1,
+        rewritingDirs : 1,
+        makingDirectory: 1,
+        allowingCycled : 1,
+        allowingMissed : 1, // throws uncaught error - o.allowingMissed could be disabled when linking two files
+        resolvingDstSoftLink : 0
+      });
+      test.identical( got, true );
+      test.identical( a.fileProvider.areHardLinked( a.abs( 'softLinkToNonexistentDst' ), a.abs( 'src' ) ), false );
+    }
+    test.close( 'resolvingDstSoftLink : 0' );
+
+    /* -- */
+
+    test.open( 'resolvingDstSoftLink : 1' );
+    {
+      test.case = 'allowingCycled : 0';
+      a.reflect();
+      a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+      a.fileProvider.fileWrite( a.abs( 'dst' ), 'some text' );
+      a.fileProvider.softLink({ dstPath : a.abs( 'softLinkToNonexistentDst' ), srcPath : a.abs( 'dst' ) });
+      a.fileProvider.fileDelete({ filePath: a.abs( 'dst' ) });
+      var got = a.fileProvider.hardLink
+      ({
+        dstPath : a.abs( 'softLinkToNonexistentDst' ),
+        srcPath : a.abs( 'src' ),
+        throwing : 0,
+        rewriting : 1,
+        rewritingDirs : 1,
+        makingDirectory: 1,
+        allowingCycled : 0,
+        allowingMissed : 1,
+        resolvingDstSoftLink : 1
+      });
+      test.identical( got, null );
+      test.identical( a.fileProvider.areHardLinked( a.abs( 'softLinkToNonexistentDst' ), a.abs( 'src' ) ), false );
+
+      /* */
+
+      test.case = 'allowingCycled : 1';
+      a.reflect();
+      a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+      a.fileProvider.fileWrite( a.abs( 'dst' ), 'some text' );
+      a.fileProvider.softLink({ dstPath : a.abs( 'softLinkToNonexistentDst' ), srcPath : a.abs( 'dst' ) });
+      a.fileProvider.fileDelete({ filePath: a.abs( 'dst' ) });
+      var got = a.fileProvider.hardLink
+      ({
+        dstPath : a.abs( 'softLinkToNonexistentDst' ),
+        srcPath : a.abs( 'src' ),
+        throwing : 0,
+        rewriting : 1,
+        rewritingDirs : 1,
+        makingDirectory: 1,
+        allowingCycled : 1,
+        allowingMissed : 1, // throws uncaught error - o.allowingMissed could be disabled when linking two files
+        resolvingDstSoftLink : 1
+      });
+      test.identical( got, true );
+      test.identical( a.fileProvider.areHardLinked( a.abs( 'softLinkToNonexistentDst' ), a.abs( 'src' ) ), false );
+    }
+    test.close( 'resolvingDstSoftLink : 1' );
+  }
+  test.close( 'dst is a soft link to self' );
 }
 
 //

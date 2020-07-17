@@ -30,20 +30,40 @@
 
 ### Застосування рутини `hardLink` до файлів, які є софт лінками.
 
+У таблиці нижче наведені всі можливі очікувані результати виконання `hardLink` у випадку коли `src` та/або `dst` файли є софт лінками.
+
 |Return|src is a soft link to|dst is a soft link to|throwing|resolvingSrcSoftLink|resolvingDstSoftLink|allowingMissed|allowingCycled|
 |:----:|:-------------------:|:-------------------:|:------:|:------------------:|:------------------:|:------------:|:------------:|
-|null  |nonexistent file     |                     |0       |d                   |                    |1             |1             |
-|error |nonexistent file     |                     |1       |d                   |                    |1             |1             |
-|null  |nonexistent file     |                     |0       |0                   |                    |1             |1             |
-|error |nonexistent file     |                     |1       |0                   |                    |1             |1             |
-|null  |nonexistent file     |                     |0       |1                   |                    |1             |1             |
-|error |nonexistent file     |                     |1       |1                   |                    |1             |1             |
-|null  |existing file        |                     |0       |0                   |                    |1             |1             |
-|error |existing file        |                     |1       |0                   |                    |1             |1             |
-|true  |existing file        |                     |d       |1                   |                    |1             |1             |
-|null  |self                 |                     |0       |d                   |                    |1             |1             |
-|error |self                 |                     |1       |d                   |                    |1             |1             |
-|null  |self                 |                     |0       |0                   |                    |1             |1             |
-|error |self                 |                     |1       |0                   |                    |1             |1             |
-|null  |self                 |                     |0       |1                   |                    |1             |1             |
-|error |self                 |                     |1       |1                   |                    |1             |1             |
+|null  |nonexistent file     |terminal/not exists  |0       |d                   |d                   |1             |1             |
+|error |nonexistent file     |terminal/not exists  |1       |d                   |d                   |1             |1             |
+|null  |nonexistent file     |terminal/not exists  |0       |0                   |d                   |1             |1             |
+|error |nonexistent file     |terminal/not exists  |1       |0                   |d                   |1             |1             |
+|null  |nonexistent file     |terminal/not exists  |0       |1                   |d                   |1             |1             |
+|error |nonexistent file     |terminal/not exists  |1       |1                   |d                   |1             |1             |
+|null  |existing file        |terminal/not exists  |0       |0                   |d                   |1             |1             |
+|error |existing file        |terminal/not exists  |1       |0                   |d                   |1             |1             |
+|True  |existing file        |terminal/not exists  |d       |1                   |d                   |1             |1             |
+|null  |self                 |terminal/not exists  |0       |d                   |d                   |1             |1             |
+|error |self                 |terminal/not exists  |1       |d                   |d                   |1             |1             |
+|null  |self                 |terminal/not exists  |0       |0                   |d                   |1             |1             |
+|error |self                 |terminal/not exists  |1       |0                   |d                   |1             |1             |
+|null  |self                 |terminal/not exists  |0       |1                   |d                   |1             |1             |
+|error |self                 |terminal/not exists  |1       |1                   |d                   |1             |1             |
+|||||||||
+|True  |terminal file        |nonexistent file     |0       |d                   |d                   |1             |1             |
+|True  |terminal file        |nonexistent file     |0       |d                   |0                   |1             |1             |
+|True  |terminal file        |nonexistent file     |0       |d                   |1                   |1             |1             |
+|True  |terminal file        |existing file        |0       |d                   |d                   |0             |0             |
+|True  |terminal file        |existing file        |0       |d                   |0                   |0             |0             |
+|True  |terminal file        |existing file        |0       |d                   |1                   |0             |0             |
+|True  |terminal file        |self                 |0       |d                   |d                   |1             |1             |
+|True  |terminal file        |self                 |0       |d                   |0                   |1             |1             |
+|True  |terminal file        |self                 |0       |d                   |1                   |1             |1             |
+|null  |terminal file        |nonexistent file     |0       |d                   |d                   |0             |1             |
+|null  |terminal file        |nonexistent file     |0       |d                   |0                   |0             |1             |
+|null  |terminal file        |nonexistent file     |0       |d                   |1                   |0             |1             |
+|null  |terminal file        |self                 |0       |d                   |d                   |1             |0             |
+|null  |terminal file        |self                 |0       |d                   |0                   |1             |0             |
+|null  |terminal file        |self                 |0       |d                   |1                   |1             |0             |
+
+Для більшої зрозумілості всі випадки розділено на дві групи. Спочатку лише `src` є софт лінком, а `dst` термінальний файл або не існує (розгляд опції `resolvingDstSoftLink` немає сенсу). Потім `src` є термінальним файлом (розгляд опції `resolvingSrcSoftLink` немає сенсу), а `dst` софт лінком.

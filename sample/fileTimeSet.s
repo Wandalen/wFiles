@@ -2,7 +2,7 @@
 if( typeof module !== 'undefined' )
 require( 'wFiles' )
 
-var _ = wTools;
+let _ = wTools;
 
 var filePath = _.path.join( __dirname, 'data/tmp.tmp/FileTimeSet.txt' );
 

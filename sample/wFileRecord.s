@@ -1,7 +1,7 @@
 if( typeof module !== 'undefined' )
 require( 'wFiles' )
 
-var _ = wTools;
+let _ = wTools;
 
 /* Getting file record using absolute path */
 var filePath = '/D/folder/file_name';

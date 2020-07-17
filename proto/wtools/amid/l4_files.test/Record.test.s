@@ -16,8 +16,8 @@ if( typeof module !== 'undefined' )
 
 //
 
-var _ = _global_.wTools;
-var Parent = wTester;
+let _ = _global_.wTools;
+let Parent = wTester;
 var suiteTempPath;
 
 // --
@@ -1466,7 +1466,7 @@ recordSystemExperiment.experimental = 1;
 // proto
 // --
 
-var Self =
+let Self =
 {
 
   name : 'Tools.mid.files.Record',

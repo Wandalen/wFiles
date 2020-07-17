@@ -1,4 +1,4 @@
-var _ = require( '..')
+let _ = require( '..' )
 var fs = require( 'fs' );
 var path = require( 'path' );
 
@@ -10,7 +10,7 @@ var tempPath = path.join( __dirname, 'tempFile' );
 /* solution rename + unlink */
 
 var fd = fs.openSync( terminalPath, 'w+' );
-fs.renameSync( terminalPath,tempPath );
+fs.renameSync( terminalPath, tempPath );
 fs.unlinkSync( tempPath );
 console.log( 'Original exists after combination:', _.fileProvider.fileExists( terminalPath ) );
 fs.closeSync( fd );

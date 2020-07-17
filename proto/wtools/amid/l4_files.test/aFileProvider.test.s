@@ -53679,7 +53679,7 @@ total : 14
 // declare
 // --
 
-var Self =
+let Self =
 {
 
   name : 'Tools.mid.files.fileProvider.Abstract',

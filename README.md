@@ -16,7 +16,7 @@ Allows files manipulations on local drive.
 
 ###### Declaration
 ```javascript
-var _ = wTools;
+let _ = wTools;
 var provider = _.FileProvider.HardDrive();
 ```
 
@@ -36,7 +36,7 @@ var tree =
 ```
 ###### Declaration
 ```javascript
-var _ = wTools;
+let _ = wTools;
 var provider = _.FileProvider.Extract({ filesTree : tree });
 ```
 <!-- ###### FileProvider.Url desc here -->

@@ -2,14 +2,6 @@
 
 'use strict';
 
-
-// if( typeof module !== 'undefined' )
-// {
-//
-//   require( '../UseBase.s' );
-//
-// }
-
 //
 
 /**
@@ -35,25 +27,6 @@ _.assert( !!_.regexpsEscape );
 // --
 // inter
 // --
-
-// /**
-//  * @summary Creates filter instance ignoring unknown options.
-//  * @param {Object} o Options map.
-//  * @function TolerantFrom
-//  * @class wFileRecordFilter
-//  * @namespace wTools
-//  * @module Tools/mid/Files
-// */
-//
-// function TolerantFrom( o )
-// {
-//   _.assert( arguments.length >= 1, 'Expects at least one argument' );
-//   _.assert( _.objectIs( Self.prototype.Composes ) );
-//   o = _.mapsExtend( null, arguments );
-//   return new Self( _.mapOnly( o, Self.prototype.fieldsOfCopyableGroups ) );
-// }
-
-//
 
 function init( o )
 {
@@ -2066,13 +2039,14 @@ function filePathCopy( o )
 
 filePathCopy.defaults =
 {
-  dstInstance : null,
-  srcInstance : null,
-  instanceKey : null,
-  srcContainer : null,
-  dstContainer : null,
-  containerKey : null,
-  value : null,
+  ... _.accessor.copyIterationMake.defaults,
+  // dstInstance : null,
+  // srcInstance : null,
+  // instanceKey : null,
+  // srcContainer : null,
+  // dstContainer : null,
+  // containerKey : null,
+  // value : null,
 }
 
 // //
@@ -4369,7 +4343,6 @@ let Accessors =
 let Extend =
 {
 
-  // TolerantFrom,
   init,
   copy,
   pairedClone,
@@ -4544,7 +4517,6 @@ _.mapExtend( _, Globals );
 // --
 
 _[ Self.shortName ] = Self;
-
 if( typeof module !== 'undefined' )
 module[ 'exports' ] = Self;
 

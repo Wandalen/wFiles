@@ -29,3 +29,21 @@
 Створення хард лінка з опціями breakingSrcHardLink:0, breakingDstHardLink:0 є забороненим.
 
 ### Застосування рутини `hardLink` до файлів, які є софт лінками.
+
+|Return|src is a soft link to|dst is a soft link to|throwing|resolvingSrcSoftLink|resolvingDstSoftLink|allowingMissed|allowingCycled|
+|:----:|:-------------------:|:-------------------:|:------:|:------------------:|:------------------:|:------------:|:------------:|
+|null  |nonexistent file     |                     |0       |d                   |                    |1             |1             |
+|error |nonexistent file     |                     |1       |d                   |                    |1             |1             |
+|null  |nonexistent file     |                     |0       |0                   |                    |1             |1             |
+|error |nonexistent file     |                     |1       |0                   |                    |1             |1             |
+|null  |nonexistent file     |                     |0       |1                   |                    |1             |1             |
+|error |nonexistent file     |                     |1       |1                   |                    |1             |1             |
+|null  |existing file        |                     |0       |0                   |                    |1             |1             |
+|error |existing file        |                     |1       |0                   |                    |1             |1             |
+|true  |existing file        |                     |d       |1                   |                    |1             |1             |
+|null  |self                 |                     |0       |d                   |                    |1             |1             |
+|error |self                 |                     |1       |d                   |                    |1             |1             |
+|null  |self                 |                     |0       |0                   |                    |1             |1             |
+|error |self                 |                     |1       |0                   |                    |1             |1             |
+|null  |self                 |                     |0       |1                   |                    |1             |1             |
+|error |self                 |                     |1       |1                   |                    |1             |1             |

@@ -51189,6 +51189,28 @@ total : 11
     // test.open( 'src is a soft link to nonexistent file' );
     // {
     //   /* Artem B. bug */
+      // test.case = 'resolvingSrcSoftLink by default';
+      // a.reflect();
+      // a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+      // a.fileProvider.softLink({ dstPath : a.abs( 'softLinkToNonexistentSrc' ), srcPath : a.abs( 'src' ) });
+      // a.fileProvider.fileDelete({ filePath: a.abs( 'src' ) });
+      // var got = a.fileProvider.hardLink
+      // ({
+      //   dstPath : a.abs( 'dir1/dir2/dst' ),
+      //   srcPath : a.abs( 'softLinkToNonexistentSrc' ),
+      //   allowingMissed : 1,
+      //   throwing : 0,
+      //   rewriting : 1,
+      //   rewritingDirs : 1,
+      //   makingDirectory: 1,
+      //   allowingCycled : 1
+      // });
+      // test.identical( got, null );
+      // test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'softLinkToNonexistentSrc' ) ), false );
+    
+    //   /* */
+
+    //   /* Artem B. bug */
     //   test.case = 'resolvingSrcSoftLink : 0';
     //   a.reflect();
     //   a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
@@ -51238,6 +51260,7 @@ total : 11
 
     // test.open( 'src is a soft link to existing file' );
     // {
+    //   /* Artem B. bug */
     //   test.case = 'resolvingSrcSoftLink : 0';
     //   a.reflect();
     //   a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
@@ -51263,6 +51286,7 @@ total : 11
 
     // test.open( 'src is a soft link to self' );
     // {
+    //   /* Artem B. bug */
     //   test.case = 'resolvingSrcSoftLink by default';
     //   a.reflect();
     //   a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
@@ -51282,7 +51306,7 @@ total : 11
     //   test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'src' ) ), false );
 
     //   /* */
-
+    //   /* Artem B. bug */
     //   test.case = 'resolvingSrcSoftLink : 0';
     //   a.reflect();
     //   a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
@@ -51303,7 +51327,7 @@ total : 11
     //   test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'src' ) ), false );
 
     //   /* */
-
+    //   /* Artem B. bug */
     //   test.case = 'resolvingSrcSoftLink : 1';
     //   a.reflect();
     //   a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
@@ -51663,19 +51687,225 @@ hardLinkReturnThrowing0SyncForDebugExperiment.experimental = 1;
 
 //
 
-// function hardLinkReturnSoftLinkedSync( test )
-// {
-//   let context = this;
-//   let a = context.assetFor( test, false );
+function hardLinkReturnSoftLinkedSync( test )
+{
+  let context = this;
+  let a = context.assetFor( test, false );
+/*
+// src is a soft link to nonexistent file
+ - resolvingSrcSoftLink by default
+ - resolvingSrcSoftLink : 0
+ - resolvingSrcSoftLink : 1
 
-//   /*
-//   - resolvingSrcSoftLink: 1
-//   - resolvingSrcSoftLink: 0
+// src is a soft link to existing file
+ - resolvingSrcSoftLink : 0
+ - resolvingSrcSoftLink : 1
 
-//   - resolvingDstSoftLink: 1
-//   - resolvingDstSoftLink: 0
-//   */
-// }
+// src is a soft link to self
+ - resolvingSrcSoftLink by default
+ - resolvingSrcSoftLink : 0
+ - resolvingSrcSoftLink : 1
+
+total : 8
+*/
+  // test.open( 'src is a soft link to nonexistent file' );
+  // {
+  //   /* Artem B. bug */
+  //   test.case = 'resolvingSrcSoftLink by default';
+  //   a.reflect();
+  //   a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  //   a.fileProvider.softLink({ dstPath : a.abs( 'softLinkToNonexistentSrc' ), srcPath : a.abs( 'src' ) });
+  //   a.fileProvider.fileDelete({ filePath: a.abs( 'src' ) });
+  //   test.shouldThrowErrorSync( ( ) =>
+  //   {
+  //     a.fileProvider.hardLink
+  //     ({
+  //       dstPath : a.abs( 'dir1/dir2/dst' ),
+  //       srcPath : a.abs( 'softLinkToNonexistentSrc' ),
+  //       allowingMissed : 1,
+  //       throwing : 1,
+  //       rewriting : 1,
+  //       rewritingDirs : 1,
+  //       makingDirectory: 1,
+  //       allowingCycled : 1
+  //     });
+  //   });
+  //   test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'softLinkToNonexistentSrc' ) ), false );
+
+  //   /* */
+
+  //   test.case = 'resolvingSrcSoftLink : 0';
+  //   a.reflect();
+  //   a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  //   a.fileProvider.softLink({ dstPath : a.abs( 'softLinkToNonexistentSrc' ), srcPath : a.abs( 'src' ) });
+  //   a.fileProvider.fileDelete({ filePath: a.abs( 'src' ) });
+  //   test.shouldThrowErrorSync( ( ) =>
+  //   {
+  //     a.fileProvider.hardLink
+  //     ({
+  //       dstPath : a.abs( 'dir1/dir2/dst' ),
+  //       srcPath : a.abs( 'softLinkToNonexistentSrc' ),
+  //       allowingMissed : 1,
+  //       throwing : 1,
+  //       rewriting : 1,
+  //       rewritingDirs : 1,
+  //       makingDirectory: 1,
+  //       allowingCycled : 1,
+  //       resolvingSrcSoftLink : 0
+  //     });
+  //   });
+  //   test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'softLinkToNonexistentSrc' ) ), false );
+
+  //   /* */
+
+  //   test.case = 'resolvingSrcSoftLink : 1';
+  //   a.reflect();
+  //   a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  //   a.fileProvider.softLink({ dstPath : a.abs( 'softLinkToNonexistentSrc' ), srcPath : a.abs( 'src' ) });
+  //   a.fileProvider.fileDelete({ filePath: a.abs( 'src' ) });
+  //   test.shouldThrowErrorSync( ( ) =>
+  //   {
+  //     a.fileProvider.hardLink
+  //     ({
+  //       dstPath : a.abs( 'dir1/dir2/dst' ),
+  //       srcPath : a.abs( 'softLinkToNonexistentSrc' ),
+  //       allowingMissed : 1,
+  //       throwing : 1,
+  //       rewriting : 1,
+  //       rewritingDirs : 1,
+  //       makingDirectory: 1,
+  //       allowingCycled : 1,
+  //       resolvingSrcSoftLink : 1
+  //     });
+  //   });
+  //   test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'softLinkToNonexistentSrc' ) ), false );
+  // }
+  // test.close( 'src is a soft link to nonexistent file' );
+
+  // /* -- */
+
+  // test.open( 'src is a soft link to existing file' );
+  // {
+  //   /* Artem B. bug */
+  //   test.case = 'resolvingSrcSoftLink : 0';
+  //   a.reflect();
+  //   a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  //   a.fileProvider.softLink({ dstPath : a.abs( 'softLinkToExistingFile' ), srcPath : a.abs( 'src' ) });
+  //   test.shouldThrowErrorSync( ( ) =>
+  //   {
+  //     a.fileProvider.hardLink
+  //     ({
+  //       dstPath : a.abs( 'dir1/dir2/dst' ),
+  //       srcPath : a.abs( 'softLinkToExistingFile' ),
+  //       allowingMissed : 1,
+  //       throwing : 1,
+  //       rewriting : 1,
+  //       rewritingDirs : 1,
+  //       makingDirectory: 1,
+  //       allowingCycled : 1,
+  //       resolvingSrcSoftLink : 0
+  //     });
+  //   });
+  //   test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'softLinkToExistingFile' ) ), false );
+    
+  //   /* */
+
+  //   /* Artem B. bug */
+  //   test.case = 'resolvingSrcSoftLink : 1';
+  //   a.reflect();
+  //   a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  //   a.fileProvider.softLink({ dstPath : a.abs( 'softLinkToExistingFile' ), srcPath : a.abs( 'src' ) });
+  //   var got = a.fileProvider.hardLink
+  //   ({
+  //     dstPath : a.abs( 'dir1/dir2/dst' ),
+  //     srcPath : a.abs( 'softLinkToExistingFile' ),
+  //     allowingMissed : 1,
+  //     rewriting : 1,
+  //     rewritingDirs : 1,
+  //     makingDirectory: 1,
+  //     allowingCycled : 1,
+  //     resolvingSrcSoftLink : 1
+  //   });
+  //   test.identical( got, true );
+  //   test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'src' ) ), true );
+  // }
+  // test.close( 'src is a soft link to existing file' );
+
+  // /* -- */
+
+  // test.open( 'src is a soft link to self' );
+  // {
+  //   /* Artem B. bug */
+  //   test.case = 'resolvingSrcSoftLink by default';
+  //   a.reflect();
+  //   a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  //   a.fileProvider.softLink({ dstPath : a.abs( 'src' ), srcPath : a.abs( 'src' ), allowingMissed : 1 });
+  //   test.shouldThrowErrorSync( ( ) =>
+  //   {
+  //     a.fileProvider.hardLink
+  //     ({
+  //       dstPath : a.abs( 'dir1/dir2/dst' ),
+  //       srcPath : a.abs( 'src' ),
+  //       allowingMissed : 1,
+  //       throwing : 1,
+  //       rewriting : 1,
+  //       rewritingDirs : 1,
+  //       makingDirectory: 1,
+  //       allowingCycled : 1
+  //     });
+  //   });
+  //   test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'src' ) ), false );
+
+  //   /* */
+
+  //   /* Artem B. bug */
+  //   test.case = 'resolvingSrcSoftLink : 0';
+  //   a.reflect();
+  //   a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  //   a.fileProvider.softLink({ dstPath : a.abs( 'src' ), srcPath : a.abs( 'src' ), allowingMissed : 1 });
+  //   test.shouldThrowErrorSync( ( ) =>
+  //   {
+  //     a.fileProvider.hardLink
+  //     ({
+  //       dstPath : a.abs( 'dir1/dir2/dst' ),
+  //       srcPath : a.abs( 'src' ),
+  //       allowingMissed : 1,
+  //       throwing : 1,
+  //       rewriting : 1,
+  //       rewritingDirs : 1,
+  //       makingDirectory: 1,
+  //       allowingCycled : 1,
+  //       resolvingSrcSoftLink : 0
+  //     });
+  //   });
+  //   test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'src' ) ), false );
+
+  //   /* */
+
+  //   /* Artem B. bug */
+  //   test.case = 'resolvingSrcSoftLink : 1';
+  //   a.reflect();
+  //   a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  //   a.fileProvider.softLink({ dstPath : a.abs( 'src' ), srcPath : a.abs( 'src' ), allowingMissed : 1 });
+  //   test.shouldThrowErrorSync( ( ) =>
+  //   {
+  //     a.fileProvider.hardLink
+  //     ({
+  //       dstPath : a.abs( 'dir1/dir2/dst' ),
+  //       srcPath : a.abs( 'src' ),
+  //       allowingMissed : 1,
+  //       throwing : 1,
+  //       rewriting : 1,
+  //       rewritingDirs : 1,
+  //       makingDirectory: 1,
+  //       allowingCycled : 1,
+  //       resolvingSrcSoftLink : 1
+  //     });
+  //   });
+  //   test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'src' ) ), false );
+  // }
+  // test.close( 'src is a soft link to self' );
+}
 
 //
 
@@ -53625,7 +53855,7 @@ var Self =
     // hardLinkReturnAsync,
     hardLinkReturnThrowing0Sync,
     // hardLinkReturnThrowing0Async,
-    // hardLinkReturnSoftLinkedSync,
+    hardLinkReturnSoftLinkedSync,
     // hardLinkReturnSoftLinkedAsync,
     // hardLinkReturnTextLinkedSync,
     // hardLinkReturnTextLinkedAsync,

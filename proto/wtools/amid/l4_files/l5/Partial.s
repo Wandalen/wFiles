@@ -6817,13 +6817,13 @@ function _softLinkVerify2( c )
   if( o.dstPath === o.srcPath )
   c.error( _.err( 'Soft link cycle', path.moveTextualReport( o.dstPath, o.srcPath ) ) );
   debugger;
-  /* Artem B. attempt to fix a bug, case: dst exists and is already soft linked with src, */
+  /* Artem B. bug fixed. case: dst exists and is already soft linked with src */
   if( self.isLink( o.dstPath ) && self.pathResolveSoftLink({ filePath: o.dstPath }) === self.pathResolveSoftLink({ filePath: o.srcPath }) &&  self.pathResolveSoftLink({ filePath: o.srcPath }) === o.srcPath  && o.rewriting )
   {
     c.ended = true;
     c.result = false;
   }
-  /* Artem B. attempt to fix a bug, case: dst exists and is already soft linked with src, */
+  /* Artem B. bug fixed. case: dst exists and is already soft linked with src */
 
   // if( o.dstPath !== o.srcPath && self.areSoftLinked([ o.dstPath, o.srcPath ]) )
   // if( o.dstPath === o.srcPath )
@@ -7444,6 +7444,7 @@ function areHardLinked_body( o ) /* qqq : refactor. probably move some code to a
   if( !o.filePath.length )
   return true;
 
+  /* Artem B. bug fixed. case: src does not exist */
   if( o.filePath.filter( ( path ) => !self.fileExists( path ) ).length )
   return false;
 
@@ -7456,6 +7457,7 @@ function areHardLinked_body( o ) /* qqq : refactor. probably move some code to a
   }
   if( isTheSamePath )
   return true;
+  /* Artem B. bug fixed. case: src does not exist */
 
   let result;
 
@@ -7489,7 +7491,7 @@ function areSoftLinked_body( o )
 {
   let self = this;
   let path = self.system ? self.system.path : self.path;;
-  debugger;
+
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assertRoutineOptions( areSoftLinked_body, arguments );
   _.assert( o.filePath.length >= 2 );
@@ -7498,6 +7500,7 @@ function areSoftLinked_body( o )
 
   _.assert( path.s.allAreAbsolute( o.filePath ) );
 
+  /* Artem B. bug fixed. case: src does not exist */
   if( o.filePath.filter( ( path ) => !self.fileExists( path ) ).length )
   return false;
 
@@ -7508,13 +7511,19 @@ function areSoftLinked_body( o )
     isTheSamePath = false;
     break;
   }
+  /* Artem B. bug fixed. case: src does not exist */
 
+  /* Artem B. bug fixed. case: src === dst and src is soft link on itself */
   if( isTheSamePath && self.isLink( o.filePath[ 0 ] ) && self.pathResolveSoftLinkAct({ filePath : o.filePath[ 0 ] }) === self.path.s.nativize(o.filePath[ 0 ]) )
   return true;  
   else if( isTheSamePath )
   return false;
+
+  /* Artem B. commented previous code */
   // if( o.filePath[ 0 ] === o.filePath[ 1 ] )
   // return false;
+  /* Artem B. commented previous code */
+  /* Artem B. bug fixed. case: src === dst and src is soft link on itself */
 
   let resolved = [];
 
@@ -7577,6 +7586,7 @@ function areTextLinked_body( o )
 
   _.assert( path.s.allAreAbsolute( o.filePath ) );
 
+  /* Artem B. bug fixed. case: src does not exist */
   if( o.filePath.filter( ( path ) => !self.fileExists( path ) ).length )
   return false;
 
@@ -7587,13 +7597,20 @@ function areTextLinked_body( o )
     isTheSamePath = false;
     break;
   }
-  debugger;
+  /* Artem B. bug fixed. case: src does not exist */
+
+  /* Artem B. bug fixed. case: src === dst and src is text link on itself. Now fails only with SystemDefaultExtract.test and SystemDefaultHardDrive.test providers. */
   if( isTheSamePath && self.isLink( o.filePath[ 0 ] ) && self.pathResolveTextLinkAct({ filePath : o.filePath[ 0 ] }) === o.filePath[ 0 ] )
   return true;  
   else if( isTheSamePath )
   return false;
+
+  /* Artem B. commented previous code */
   // if( o.filePath[ 0 ] === o.filePath[ 1 ] )
   // return false;
+  /* Artem B. commented previous code */
+  /* Artem B. bug fixed. case: src === dst and src is text link on itself. Now fails only with SystemDefaultExtract.test and SystemDefaultHardDrive.test providers. */
+
 
   let resolved = [];
 

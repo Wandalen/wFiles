@@ -314,6 +314,7 @@ function verify2()
       c.error( err );
       return null;
     }
+    /* Artem B. hardLink bud fixed. case: dst is soft link to nonexisting file, allowingMissed : 0, resolvingDstSoftLink : 1 */
   }
 
   /* allowingCycled */
@@ -328,6 +329,7 @@ function verify2()
       return null;
     }
   }
+  /* Artem B. hardLink bud fixed. case: dst is soft link to itself, allowingCycled : 0, resolvingDstSoftLink : 1 */
 
   /* equal paths */
 
@@ -346,6 +348,7 @@ function verify2()
   if( Number( c.srcResolvedStat.size ) !== 0 )
   {
     debugger;
+    /* Artem B. hardLink bud fixed. case: different content, allowingDiscrepancy : 0 */
     let err = _.err
     (
       'Cant\'t rewrite destination file by source file, because they have different content and option::allowingDiscrepancy is false\n'
@@ -354,6 +357,7 @@ function verify2()
     );
     c.error( err );
     return null;
+    /* Artem B. hardLink bud fixed. case: different content, allowingDiscrepancy : 0 */
   }
 
   /* skipping */
@@ -547,13 +551,13 @@ function pathResolve()
   _.assert( path.isAbsolute( o.dstPath ) );
 
   /* Artem B. hardLink bud fixed. case: src === dst and src file is a directory */
-
   if( c.actMethodName === 'hardLinkAct' && self.fileExists( o.srcPath ) && self.isDir( o.srcPath ) )
   {
     let err = _.err( `Source file should be a terminal:\n  ${o.srcPath}` );
     c.error( err );
     return null;
   }
+  /* Artem B. hardLink bud fixed. case: src === dst and src file is a directory */
 
   c.originalSrcResolvedPath = o.srcPath;
 

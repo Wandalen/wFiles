@@ -1740,7 +1740,7 @@ function filesFind( test )
       colWidth : 10
     }
 
-    var output = _.strTable( o );
+    var output = _.strTable_old( o );
     console.log( output );
   }
 

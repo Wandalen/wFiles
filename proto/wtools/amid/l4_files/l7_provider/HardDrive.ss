@@ -2279,7 +2279,7 @@ let Statics =
 // declare
 // --
 
-let Extend =
+let Extension =
 {
 
   // inter
@@ -2354,7 +2354,7 @@ _.classDeclare
 ({
   cls : Self,
   parent : Parent,
-  extend : Extend,
+  extend : Extension,
 });
 
 _.assert( _.routineIs( Self.prototype.pathCurrentAct ) );

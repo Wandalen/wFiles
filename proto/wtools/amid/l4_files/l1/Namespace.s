@@ -14,7 +14,7 @@
  */
 
 /**
- * @namespace wTools.files.FileFIlter
+ * @namespace wTools.files.FileFilter
  * @module Tools/mid/Files
  */
 

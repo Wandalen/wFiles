@@ -1177,6 +1177,11 @@ function rightsWriteAct( o )
 {
   let self = this;
   let nativizedFilePath = self.path.nativize( o.filePath );
+  
+  /* 
+    https://nodejs.org/api/fs.html#fs_file_modes
+    Node caveats: on Windows only the write permission can be changed, and the distinction among the permissions of group, owner or others is not implemented. 
+  */
 
   _.assertRoutineOptions( rightsWriteAct, o );
 
@@ -1194,7 +1199,7 @@ function rightsWriteAct( o )
 
   if( o.setRights !== null )
   {
-    let d = File.openSync( o.filePath, 'r' );
+    let d = File.openSync( nativizedFilePath, 'r' );
     File.fchmodSync( d, Number( o.setRights ) );
     File.closeSync( d );
     return true;

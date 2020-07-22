@@ -41664,6 +41664,15 @@ function rightsSet( test )
   let context = this;
   let a = context.assetFor( test, false );
   let c = 0;
+  
+  if( a.effectiveProvider instanceof _.FileProvider.Extract )
+  return test.identical( 1, 1 );
+  
+  /* 
+    https://nodejs.org/api/fs.html#fs_file_modes
+    Node caveats: on Windows only the write permission can be changed, and the distinction among the permissions of group, owner or others is not implemented. 
+  */
+
 
   /* */
 
@@ -41675,8 +41684,11 @@ function rightsSet( test )
   var rights = a.fileProvider.rightsRead( a.abs( `F${c}.txt` ) );
   console.log( 'rights', ( rights ).toString( 8 ) );
   test.identical( stat.mode, rights );
+  if( process.platform === 'win32' )
+  test.identical( Number( rights ) & 0o777, 0o666 );
+  else
   test.identical( Number( rights ) & 0o777, 0o644 );
-
+  
   /* */
 
   test.case = 'setRights';
@@ -41686,8 +41698,11 @@ function rightsSet( test )
   test.identical( got, true );
   var rights = a.fileProvider.rightsRead( a.abs( `F${c}.txt` ) );
   console.log( 'rights', ( rights ).toString( 8 ) );
+  if( process.platform === 'win32' )
+  test.identical( Number( rights ) & 0o777, 0o666 );
+  else
   test.identical( Number( rights ) & 0o777, 0o777 );
-
+  
   /* */
 
   test.case = 'addRights';
@@ -41697,6 +41712,9 @@ function rightsSet( test )
   test.identical( got, true );
   var rights = a.fileProvider.rightsRead( a.abs( `F${c}.txt` ) );
   console.log( 'rights', ( rights ).toString( 8 ) );
+  if( process.platform === 'win32' )
+  test.identical( Number( rights ) & 0o777, 0o666 );
+  else
   test.identical( Number( rights ) & 0o777, 0o777 );
 
   /* */
@@ -41708,6 +41726,9 @@ function rightsSet( test )
   test.identical( got, true );
   var rights = a.fileProvider.rightsRead( a.abs( `F${c}.txt` ) );
   console.log( 'rights', ( rights ).toString( 8 ) );
+  if( process.platform === 'win32' )
+  test.identical( Number( rights ) & 0o777, 0o444 );
+  else
   test.identical( Number( rights ) & 0o777, 0 );
 
   /* */
@@ -41719,6 +41740,9 @@ function rightsSet( test )
   test.identical( got, true );
   var rights = a.fileProvider.rightsRead( a.abs( `F${c}.txt` ) );
   console.log( 'rights', ( rights ).toString( 8 ) );
+  if( process.platform === 'win32' )
+  test.identical( Number( rights ) & 0o777, 0o444 );
+  else
   test.identical( Number( rights ) & 0o777, 0o001 );
 
   /* */

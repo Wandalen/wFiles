@@ -14,7 +14,7 @@
   ],
   "main" : "proto/wtools/amid/l4_files/entry/Files.s",
   "files" : [ "proto/wtools/amid/l4_files", "proto/wtools/Tools.s", "out" ],
-  "scripts" : { "test" : "wtest .run 'proto/**'", "docgen" : "wdocgen proto" },
+  "scripts" : { "test" : "wtest .run 'proto/**' rapidity:-1", "docgen" : "wdocgen proto" },
   "repository" : { "type" : "git", "url" : "https://github.com/Wandalen/wFiles.git" },
   "bugs" :
   {

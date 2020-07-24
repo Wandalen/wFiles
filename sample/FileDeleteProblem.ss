@@ -1,5 +1,5 @@
 
-let _ = require( '..' );
+var _ = require( '..' );
 var fs = require( 'fs' );
 var path = require( 'path' );
 

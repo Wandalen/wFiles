@@ -22,9 +22,9 @@ var filesTree =
 
 //
 
-let _ = wTools;
+var _ = wTools;
 var fileProvider = _.FileProvider.Extract({ filesTree : filesTree });
 
-fileProvider.fileWriteAct( 'xxx','xxx' );
+fileProvider.fileWrite( 'xxx', 'xxx' );
 
-console.log( 'filesTree.xxx',filesTree.xxx );
+console.log( 'filesTree.xxx', filesTree.xxx );

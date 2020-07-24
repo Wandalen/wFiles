@@ -1,5 +1,5 @@
 require( 'wFiles' );
-let _ = wTools;
+var _ = wTools;
 
 // files tree
 

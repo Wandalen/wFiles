@@ -409,10 +409,10 @@ function filesFindTrivial( test )
 
   /* */
 
-  test.case = 'find single terminal file . withStem/*maybe withTransient*/ : 0';
+  test.case = 'find single terminal file . withStem : 0';
   clean();
   var o1 = { filePath : path.join( routinePath ), outputFormat : 'relative', onUp, onDown }
-  var o2 = { filter : { recursive : 2 }, withTransient : 1, withStem/*maybe withTransient*/ : 0, withTerminals : 1 }
+  var o2 = { filter : { recursive : 2 }, withTransient : 1, withStem : 0, withTerminals : 1 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [];
   test.identical( got, expected );
@@ -423,10 +423,10 @@ function filesFindTrivial( test )
 
   /* */
 
-  test.case = 'find single terminal file . withStem/*maybe withTransient*/ : 0';
+  test.case = 'find single terminal file . withStem : 0';
   clean();
   var o1 = { filePath : path.join( routinePath ), outputFormat : 'relative', onUp, onDown }
-  var o2 = { filter : { recursive : 2 }, withStem/*maybe withTransient*/ : 0, withTransient : 1, withTerminals : 1 }
+  var o2 = { filter : { recursive : 2 }, withStem : 0, withTransient : 1, withTerminals : 1 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [];
   test.identical( got, expected );
@@ -437,10 +437,10 @@ function filesFindTrivial( test )
 
   /* */
 
-  test.case = 'find single terminal file . withStem/*maybe withTransient*/ : 0';
+  test.case = 'find single terminal file . withStem : 0';
   clean();
   var o1 = { filePath : path.join( routinePath ), outputFormat : 'relative', onUp, onDown }
-  var o2 = { filter : { recursive : 2 }, withStem/*maybe withTransient*/ : 0, withStem/*maybe withTransient*/ : 0, withTerminals : 1 }
+  var o2 = { filter : { recursive : 2 }, withStem : 0, withStem : 0, withTerminals : 1 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [];
   test.identical( got, expected );
@@ -503,7 +503,7 @@ function filesFindTrivial( test )
 
   /* */
 
-  test.case = 'find single terminal file . withStem/*maybe withTransient*/ : 0';
+  test.case = 'find single terminal file . withStem : 0';
   clean();
   var o1 = { filePath : path.join( routinePath, 'f' ), outputFormat : 'relative', onUp, onDown }
   var o2 = { filter : { recursive : 2 }, withStem : 0, withTransient : 1, withTerminals : 1 }
@@ -855,7 +855,7 @@ function filesFindTrivial( test )
   var filePath = { [ abs( 'dir1/' + '**a**' ) ] : null, [ abs( 'dir2' + '**b**' ) ] : null };
   var filter = { filePath, recursive : 2 }
   var o1 = { filter, outputFormat : 'relative', onUp, onDown }
-  var o2 = { withTransient : 1, withStem/*maybe withTransient*/ : 0, withTerminals : 1, withDirs : 0 }
+  var o2 = { withTransient : 1, withStem : 0, withTerminals : 1, withDirs : 0 }
   var got = provider.filesFind( _.mapExtend( null, o1, o2 ) );
   var expected = [ './dir2/b', './dir1/a', './dir1/dir11/a' ]
   test.identical( got, expected );
@@ -1468,10 +1468,10 @@ function filesFind( test )
   ({
     filePath : __filename,
     withTerminals : 1,
-    withStem/*maybe withTransient*/ : 0,
+    withStem : 0,
     outputFormat : 'absolute'
   });
-  var expected = [ /* path.normalize( __filename ) */ ];
+  var expected = [];
   test.identical( got, expected );
 
   /* */
@@ -1669,7 +1669,7 @@ function filesFind( test )
     {
       outputFormat : 'absolute',
       withTerminals : 1,
-      withStem/*maybe withTransient*/ : 0,
+      withStem : 0,
       filePath : path.join( routinePath, glob ),
       filter :
       {
@@ -1711,12 +1711,12 @@ function filesFind( test )
 
   function drawInfo( info )
   {
-    var test = [];
+    var data = [];
 
     info.forEach( ( i ) =>
     {
-      test.push
-      ([
+      data.push
+      ( ... [
         i.number,
         i.level,
         i.outputFormat,
@@ -1726,22 +1726,32 @@ function filesFind( test )
         i.glob || '-',
         !!i.passed
       ])
-    })
+    });
+
+    // var o =
+    // {
+    //   data,
+    //   head : [ '#', 'level', 'outputFormat', 'recursive', 'i.terminals', 'i.dirs', 'glob', 'passed' ],
+    //   colWidths :
+    //   {
+    //     0 : 4,
+    //     1 : 4,
+    //   },
+    //   colWidth : 10
+    // }
+    // var output = _.strTable_old( o );
+    // console.log( output );
 
     var o =
     {
-      data : test,
-      head : [ '#', 'level', 'outputFormat', 'recursive', 'i.terminals', 'i.dirs', 'glob', 'passed' ],
-      colWidths :
-      {
-        0 : 4,
-        1 : 4,
-      },
-      colWidth : 10
+      data,
+      dim : [ info.length, 8 ],
+      style : 'doubleBorder',
+      colSplits : 1,
     }
+    var output = _.strTable( o );
+    console.log( output.result );
 
-    var output = _.strTable_old( o );
-    console.log( output );
   }
 
   /* - */
@@ -2147,7 +2157,7 @@ function filesFind2( test )
   /*terminalPath - empty dir, withTerminals, withTransient off*/
 
   provider.dirMake( path.join( context.suiteTempPath, 'empty' ) )
-  got = provider.filesFind({ filePath : path.join( routinePath, 'empty' ), withTerminals : 0, withStem/*maybe withTransient*/ : 0, allowingMissed : 1 });
+  got = provider.filesFind({ filePath : path.join( routinePath, 'empty' ), withTerminals : 0, withStem : 0, allowingMissed : 1 });
   test.identical( got, [] );
 
   /*terminalPath - directory, withTerminals, withTransient on*/
@@ -2158,7 +2168,7 @@ function filesFind2( test )
 
   /*terminalPath - directory, withTerminals, withTransient off*/
 
-  got = provider.filesFind({ filePath : routinePath, withTerminals : 0, withStem/*maybe withTransient*/ : 0 });
+  got = provider.filesFind({ filePath : routinePath, withTerminals : 0, withStem : 0 });
   expected = provider.dirRead( routinePath );
   test.identical( got, [] );
 
@@ -2171,7 +2181,7 @@ function filesFind2( test )
   /*terminalPath - terminal file, withTerminals, withTransient off*/
 
   terminalPath = path.join( routinePath, 'terminal' );
-  got = provider.filesFind({ filePath : terminalPath, withTerminals : 0, withStem/*maybe withTransient*/ : 0 });
+  got = provider.filesFind({ filePath : terminalPath, withTerminals : 0, withStem : 0 });
   expected = provider.dirRead( routinePath );
   test.identical( got, [] );
 
@@ -7509,7 +7519,7 @@ function filesFindOn( test )
     onDown,
     withTerminals : 1,
     withDirs : 0,
-    withStem/*maybe withTransient*/ : 0,
+    withStem : 0,
     allowingMissed : 1,
     filter : { recursive : 2 },
     filter : { basePath : routinePath },
@@ -7533,7 +7543,7 @@ function filesFindOn( test )
     onDown,
     withTerminals : 1,
     withDirs : 0,
-    withStem/*maybe withTransient*/ : 0,
+    withStem : 0,
     allowingMissed : 1,
     filter : { recursive : 2 },
     filter : { prefixPath : routinePath },
@@ -7707,7 +7717,7 @@ function filesFindBaseFromGlob( test )
   ({
     withTerminals : 1,
     withDirs : 0,
-    withStem/*maybe withTransient*/ : 0,
+    withStem : 0,
     allowingMissed : 1,
     filter : { recursive : 2 },
     filter : { basePath : routinePath },
@@ -7727,7 +7737,7 @@ function filesFindBaseFromGlob( test )
   ({
     withTerminals : 1,
     withDirs : 0,
-    withStem/*maybe withTransient*/ : 0,
+    withStem : 0,
     allowingMissed : 1,
     filter : { recursive : 2 },
     filter : { prefixPath : routinePath },
@@ -16591,7 +16601,7 @@ function filesReflectMutuallyExcluding( test )
       filePath : '/',
       withTerminals : 1,
       withDirs : 0,
-      withStem/*maybe withTransient*/ : 0,
+      withStem : 0,
       onDown : handleDown
     })
 
@@ -20282,7 +20292,7 @@ function filesReflectorBasic( test )
   var extract = provider.filesExtract( routinePath );
   if( provider instanceof _.FileProvider.HardDrive )
   {
-    var files = extract.filesFindRecursive({ filePath : '/', withTerminals : 1, withDirs : 0, withStem/*maybe withTransient*/ : 0 })
+    var files = extract.filesFindRecursive({ filePath : '/', withTerminals : 1, withDirs : 0, withStem : 0 })
     _.each( files, ( f ) => extract.fileWrite( f.absolute, extract.fileRead( f.absolute ) ) )
   }
   test.identical( extract.filesTree, src.filesTree );
@@ -20304,7 +20314,7 @@ function filesReflectorBasic( test )
   var extract = provider.filesExtract( routinePath );
   if( provider instanceof _.FileProvider.HardDrive )
   {
-    var files = extract.filesFindRecursive({ filePath : '/', withTerminals : 1, withDirs : 0, withStem/*maybe withTransient*/ : 0 })
+    var files = extract.filesFindRecursive({ filePath : '/', withTerminals : 1, withDirs : 0, withStem : 0 })
     _.each( files, ( f ) => extract.fileWrite( f.absolute, extract.fileRead( f.absolute ) ) )
   }
   test.identical( extract.filesTree, { alt : { a : '/alt/a' } } );
@@ -20352,7 +20362,7 @@ function filesReflectorBasic( test )
   var extract = provider.filesExtract( routinePath );
   if( provider instanceof _.FileProvider.HardDrive )
   {
-    var files = extract.filesFindRecursive({ filePath : '/', withTerminals : 1, withDirs : 0, withStem/*maybe withTransient*/ : 0 })
+    var files = extract.filesFindRecursive({ filePath : '/', withTerminals : 1, withDirs : 0, withStem : 0 })
     _.each( files, ( f ) => extract.fileWrite( f.absolute, extract.fileRead( f.absolute ) ) )
   }
   test.identical( extract.filesTree, expected );
@@ -20374,7 +20384,7 @@ function filesReflectorBasic( test )
   var extract = provider.filesExtract( routinePath );
   if( provider instanceof _.FileProvider.HardDrive )
   {
-    var files = extract.filesFindRecursive({ filePath : '/', withTerminals : 1, withDirs : 0, withStem/*maybe withTransient*/ : 0 })
+    var files = extract.filesFindRecursive({ filePath : '/', withTerminals : 1, withDirs : 0, withStem : 0 })
     _.each( files, ( f ) => extract.fileWrite( f.absolute, extract.fileRead( f.absolute ) ) )
   }
   test.identical( extract.filesTree, { alt : { a : '/alt/a' } } );
@@ -33163,7 +33173,7 @@ function filesExtractBasic( test )
   {
     if( !provider instanceof _.FileProvider.HardDrive )
     return
-    var files = resultTree.filesFindRecursive({ filePath, withTerminals : 1, withDirs : 0, withStem/*maybe withTransient*/ : 0 })
+    var files = resultTree.filesFindRecursive({ filePath, withTerminals : 1, withDirs : 0, withStem : 0 })
     _.each( files, ( f ) => resultTree.fileWrite( f.absolute, resultTree.fileRead( f.absolute ) ) )
   }
 
@@ -34643,7 +34653,7 @@ function filesDeleteEmptyDirs( test )
     './dir1/dir2',
     './dir1/dir2/file'
   ]
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem : 0 });
   test.identical( expected, got );
 
   /* */
@@ -34676,7 +34686,7 @@ function filesDeleteEmptyDirs( test )
     './dir1/dir2/empty3',
     './dir1/empty2'
   ]
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem : 0 });
   test.identical( got, expected );
 
   /* */
@@ -34710,7 +34720,7 @@ function filesDeleteEmptyDirs( test )
     './dir1/dir2/empty3',
     './empty1'
   ]
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem : 0 });
   test.identical( got, expected );
 
   /* */
@@ -34746,7 +34756,7 @@ function filesDeleteEmptyDirs( test )
     './dir1/empty2',
     './empty1'
   ]
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem : 0 });
   test.identical( got, expected );
 
   /* */
@@ -34776,7 +34786,7 @@ function filesDeleteEmptyDirs( test )
     './dir1/dir2',
     './dir1/dir2/file'
   ]
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem : 0 });
   test.identical( got, expected );
 
   /* */
@@ -34809,7 +34819,7 @@ function filesDeleteEmptyDirs( test )
     './dir1/empty2',
     './empty1'
   ]
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem : 0 });
   test.identical( got, expected );
 
   /* */
@@ -34843,7 +34853,7 @@ function filesDeleteEmptyDirs( test )
     './dir1/empty2',
     './empty1'
   ]
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem : 0 });
   test.identical( got, expected );
 
   /* */
@@ -34877,7 +34887,7 @@ function filesDeleteEmptyDirs( test )
     './dir1/empty2',
     './empty1'
   ]
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem : 0 });
   test.identical( got, expected );
 
   /* */
@@ -34898,7 +34908,7 @@ function filesDeleteEmptyDirs( test )
     './dir1/dir2/file',
     './empty1'
   ]
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem : 0 });
   test.identical( got, expected );
 
   test.case = 'resolvingSoftLink : 0'
@@ -34935,7 +34945,7 @@ function filesDeleteEmptyDirs( test )
     './dir1/empty2',
     './empty1'
   ]
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem : 0 });
   test.identical( got, expected );
 
   /* */
@@ -34993,7 +35003,7 @@ function filesDeleteTerminals( test )
     './dir1/emptyDir1',
     './emptyDir0'
   ]
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem : 0 });
   test.identical( got, expected );
 
   /* */
@@ -35013,7 +35023,7 @@ function filesDeleteTerminals( test )
     './dir1/emptyDir1',
     './emptyDir0'
   ]
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem : 0 });
   test.identical( got, expected );
 
   test.case = 'recursion only first level'
@@ -35030,7 +35040,7 @@ function filesDeleteTerminals( test )
     './dir1/emptyDir1',
     './emptyDir0'
   ]
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem : 0 });
   test.identical( got, expected );
 
   test.case = 'mask terminals'
@@ -35047,7 +35057,7 @@ function filesDeleteTerminals( test )
     './dir1/emptyDir1',
     './emptyDir0'
   ]
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem : 0 });
   test.identical( got, expected );
 
   test.case = 'mask dirs'
@@ -35063,7 +35073,7 @@ function filesDeleteTerminals( test )
     './dir1/emptyDir1',
     './emptyDir0'
   ]
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem : 0 });
   test.identical( got, expected );
 
   test.case = 'mask not existing terminal'
@@ -35082,7 +35092,7 @@ function filesDeleteTerminals( test )
     './dir1/emptyDir1',
     './emptyDir0'
   ]
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem : 0 });
   test.identical( got, expected );
 
   test.case = 'glob for terminals'
@@ -35097,7 +35107,7 @@ function filesDeleteTerminals( test )
     './dir1/emptyDir1',
     './emptyDir0'
   ]
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem : 0 });
   test.identical( got, expected );
 
   /* */
@@ -35118,7 +35128,7 @@ function filesDeleteTerminals( test )
     './dir1/emptyDir1',
     './emptyDir0'
   ]
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem : 0 });
   test.identical( got, expected );
 
   // qqq ?
@@ -35135,7 +35145,7 @@ function filesDeleteTerminals( test )
   //   './dir1/emptyDir1',
   //   './emptyDir0'
   // ]
-  // var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
+  // var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem : 0 });
   // test.identical( got, expected );
 
   /* */
@@ -35155,7 +35165,7 @@ function filesDeleteTerminals( test )
     './dir1/emptyDir1',
     './emptyDir0'
   ]
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem : 0 });
   test.identical( got, expected );
 
   /* */
@@ -35175,10 +35185,10 @@ function filesDeleteTerminals( test )
     './emptyDir0'
   ]
   provider.filesDeleteTerminals({ filePath : routinePath, allowingMissed : 1 });
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem : 0 });
   test.identical( got, expected );
   provider.filesDeleteTerminals({ filePath : routinePath, allowingMissed : 0 });
-  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem/*maybe withTransient*/ : 0 });
+  var got = provider.filesFindRecursive({ filePath : routinePath, outputFormat : 'relative', withStem : 0 });
   test.identical( got, expected );
 
   /* */

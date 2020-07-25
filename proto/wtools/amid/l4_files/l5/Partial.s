@@ -3258,7 +3258,7 @@ function fileRead_body( o )
   let result = null;
 
   if( o.encoding === _.unknown ) /* qqq : cover */
-  o.encoding = _.files.encoder.deduce({ filePath : o.filePath, returning : 'name', criterion : { reader : true } });
+  o.encoding = _.files.encoder.deduce({ filePath : o.filePath, returning : 'name', feature : { reader : true } });
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.strIs( o.encoding ) );
@@ -3679,8 +3679,13 @@ function _fileInterpret_body( o )
       let encoder = _.files.ReadEncoders[ o.encoding ];
       if( !encoder.exts )
       continue;
-      if( encoder.forConfig !== undefined && !encoder.forConfig )
+      // if( encoder.forConfig !== undefined && !encoder.forConfig )
+      // continue;
+
+      debugger;
+      if( encoder.feature.config !== undefined && !encoder.feature.config )
       continue;
+
       if( _.longHas( encoder.exts, ext ) )
       {
         o.encoding = e;
@@ -3866,7 +3871,10 @@ function hashRead_body( o )
     {
       let stat = self.statResolvedRead({ filePath : o.filePath, sync : 1, throwing : 1 });
       if( stat.size > o.hashFileSizeLimit )
-      throw _.err( `File ${ o.filePath } is too big ${ stat.size } > ${ o.hashFileSizeLimit }` );
+      {
+        debugger;
+        throw _.err( `File ${ o.filePath } is too big ${ stat.size } > ${ o.hashFileSizeLimit }` );
+      }
     }
     result = self.hashReadAct( o );
   }
@@ -3933,11 +3941,18 @@ function hashSzRead_body( o )
 
   /* */
 
+  debugger;
+  if( o.hashFileSizeLimit === null )
+  o.hashFileSizeLimit = self.hashFileSizeLimit;
+
   if( o.sync )
   {
     let stat = self.statResolvedRead({ filePath : o.filePath, sync : 1, throwing : 1 });
-    if( stat.size > self.hashFileSizeLimit )
-    throw _.err( `File ${ o.filePath } is too big ${ stat.size } > ${ self.hashFileSizeLimit }` );
+    if( o.hashFileSizeLimit && stat.size > o.hashFileSizeLimit )
+    {
+      debugger;
+      throw _.err( `File ${ o.filePath } is too big ${ stat.size } > ${ o.hashFileSizeLimit }` );
+    }
     let read = self.fileReadSync( o.filePath, 'buffer.raw' );
     return _.files.hashSzFrom( read );
   }
@@ -4742,7 +4757,7 @@ function fileWrite_body( o )
 
   o.encoding = o.encoding || self.encoding;
   if( o.encoding === _.unknown ) /* qqq : cover */
-  o.encoding = _.files.encoder.deduce({ filePath : o.filePath, returning : 'name', criterion : { writer : true } });
+  o.encoding = _.files.encoder.deduce({ filePath : o.filePath, returning : 'name', feature : { writer : true } });
   let encoder = _.files.WriteEncoders[ o.encoding ];
 
   let o2 = _.mapOnly( o, self.fileWriteAct.defaults );

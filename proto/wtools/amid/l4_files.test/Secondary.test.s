@@ -59,7 +59,7 @@ function filesReadOld( test )
   test.is( _.strIs( read.data ) );
   test.is( read.data.indexOf( '======\n( function()' ) !== -1 );
 
-  //
+  /* */
 
   var provider = _.fileProvider;
   var testDir = _.path.join( test.context.suiteTempPath, test.name );
@@ -82,7 +82,7 @@ function filesReadOld( test )
   test.identical( result.errs, {} );
   test.identical( result.err, undefined );
 
-  //
+  /* */
 
   test.case = 'sync reading of files, not all files are present, throwing on';
   var paths = fileNames.map( ( path ) =>
@@ -102,7 +102,7 @@ function filesReadOld( test )
     });
   })
 
-  //
+  /* */
 
   test.case = 'sync reading of files, not all files are present, throwing off';
   var paths = fileNames.map( ( path ) =>
@@ -254,7 +254,7 @@ function filesReadOld( test )
 //     return result;
 //   }
 
-//   //
+//   /* */
 
 //   var filesTree =
 //   {
@@ -530,7 +530,7 @@ function configRead( test )
   let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
   let terminalPath = path.join( routinePath, 'terminal' );
 
-  //
+  /* */
 
   test.case = 'no config'
   provider.filesDelete( routinePath );
@@ -538,7 +538,7 @@ function configRead( test )
   test.shouldThrowErrorSync( () => provider.configRead({ filePath : terminalPath, many : 'any', throwing : 1 }) );
   test.mustNotThrowError( () => provider.configRead({ filePath : terminalPath, many : 'any', throwing : 0 }) );
 
-  //
+  /* */
 
   let src =
   {
@@ -550,7 +550,7 @@ function configRead( test )
     array : [ { a : '1', dir : { b : 2 }, c : [ 1,2,3 ] } ],
   }
 
-  //
+  /* */
 
   test.case = 'json, no ext';
   provider.filesDelete( routinePath );
@@ -594,7 +594,7 @@ function configRead( test )
   var got = provider.configRead({ filePath });
   test.identical( got, src )
 
-  //
+  /* */
 
   test.case = 'several configs';
 
@@ -619,7 +619,7 @@ function configRead( test )
   var got = provider.configRead({ filePath });
   test.identical( got, src );
 
-  //
+  /* */
 
   test.case = 'several configs, no ext';
 
@@ -655,7 +655,7 @@ function configRead( test )
     provider.configRead({ filePath : [ terminalPath, terminalPath ] });
   })
 
-  //
+  /* */
 
   test.case = 'second config rewrites some properties of first';
   var src1 =
@@ -690,7 +690,7 @@ function configRead( test )
   }
   test.identical( got, expected );
 
-  //
+  /* */
 
   test.case = 'second config is empty';
   var src1 =

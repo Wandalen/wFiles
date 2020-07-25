@@ -15,8 +15,8 @@ let readJsSmart =
 
   name : 'js.smart',
   exts : [ 'js','s','ss','jstruct','jslike' ],
-  criterion : { reader : true, config : true },
-  forConfig : 1,
+  feature : { reader : true, config : true },
+  // forConfig : 1,
 
   onBegin : function( e )
   {
@@ -57,8 +57,8 @@ let readJsNode =
 
   name : 'js.node',
   exts : [ 'js','s','ss','jstruct' ],
-  criterion : { reader : true },
-  forConfig : 0,
+  feature : { reader : true },
+  // forConfig : 0,
 
   onBegin : function( e )
   {
@@ -80,7 +80,7 @@ let readBufferBytes =
 {
 
   name : 'buffer.bytes',
-  criterion : { reader : true },
+  feature : { reader : true },
 
   onBegin : function( e )
   {

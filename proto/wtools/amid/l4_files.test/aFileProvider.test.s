@@ -41664,13 +41664,13 @@ function rightsSet( test )
   let context = this;
   let a = context.assetFor( test, false );
   let c = 0;
-  
+
   if( a.effectiveProvider instanceof _.FileProvider.Extract )
   return test.identical( 1, 1 );
-  
-  /* 
+
+  /*
     https://nodejs.org/api/fs.html#fs_file_modes
-    Node caveats: on Windows only the write permission can be changed, and the distinction among the permissions of group, owner or others is not implemented. 
+    Node caveats: on Windows only the write permission can be changed, and the distinction among the permissions of group, owner or others is not implemented.
   */
 
 
@@ -41688,7 +41688,7 @@ function rightsSet( test )
   test.identical( Number( rights ) & 0o777, 0o666 );
   else
   test.identical( Number( rights ) & 0o777, 0o644 );
-  
+
   /* */
 
   test.case = 'setRights';
@@ -41702,7 +41702,7 @@ function rightsSet( test )
   test.identical( Number( rights ) & 0o777, 0o666 );
   else
   test.identical( Number( rights ) & 0o777, 0o777 );
-  
+
   /* */
 
   test.case = 'addRights';
@@ -49566,12 +49566,12 @@ function encodersFromGdfs( test )
   /* */
 
   test.case = 'check if all write encoders are generated';
-  _checkEncoders( _.files.WriteEncoders, writeConverters );
+  _checkEncoders( _.files.WriteEncoders, writeConverters, 1 );
 
   /* */
 
   test.case = 'check if all read encoders are generated';
-  _checkEncoders( _.files.ReadEncoders, readConverters );
+  _checkEncoders( _.files.ReadEncoders, readConverters, 0 );
 
   /* */
 
@@ -49585,6 +49585,7 @@ function encodersFromGdfs( test )
     ext : [ 'testEncoder' ],
     in : [ 'structure' ],
     out : [ 'string' ],
+    feature : {},
 
     onEncode : function( op )
     {
@@ -49619,7 +49620,7 @@ function encodersFromGdfs( test )
     ext : [ 'testEncoder' ],
     in : [ 'structure' ],
     out : [ 'string' ],
-
+    feature : {},
     onEncode : function( op )
     {
       op.out.data = _.toStr( op.out.data, { levels : 99 } );
@@ -49643,16 +49644,24 @@ function encodersFromGdfs( test )
 
   /* - */
 
-  function _checkEncoders( encoders, converters )
+  function _checkEncoders( encoders, converters, writing )
   {
     _.each( converters, ( gdf ) =>
     {
       _.each( gdf.ext, ( ext ) =>
       {
-        if( encoders[ ext ].gdf.default )
+        if( encoders[ ext ].gdf.feature.default )
         {
           test.will = 'Expects only one default gdf for encoder: ' + ext;
-          let defaultConverter = _.gdf.extMap[ ext ].filter( ( c ) => !!c.default )
+          if( ext === 'json' )
+          debugger;
+          if( ext === 'json.min' )
+          debugger;
+
+          let defaultConverter = _.gdf.extMap[ ext ].filter( ( c ) => !!c.feature.default );
+
+          defaultConverter = defaultConverter.filter( ( c ) => !writing ^ _.strHas( c.in[ 0 ], 'structure' ) );
+
           test.identical( defaultConverter.length, 1 );
           test.will = ext + ' encoder should exist';
           test.is( _.mapIs( encoders[ ext ] ) );
@@ -49664,6 +49673,8 @@ function encodersFromGdfs( test )
           test.will = ext + ' encoder should exist';
           test.is( _.mapIs( encoders[ ext ] ) );
           test.will = ext + ' encoder should exist and use gdf: ' + gdf.name;
+          // if( encoders[ ext ].gdf !== gdf )
+          // debugger;
           test.is( encoders[ ext ].gdf === gdf );
         }
 

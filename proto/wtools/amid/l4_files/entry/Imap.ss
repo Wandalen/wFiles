@@ -10,6 +10,7 @@
 if( typeof module !== 'undefined' )
 {
   let _ = require( '../../../../wtools/Tools.s' );
+  require( './Basic.s' );
   require( '../include/Imap.ss' )
   module[ 'exports' ] = _;
 }

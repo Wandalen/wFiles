@@ -773,9 +773,9 @@ function pathCurrent2( test )
 
       /*changing cwd*/
 
-      got = _.path.current( './proto' );
+      got = _.path.current( '..' );
       expected = _.path.normalize( process.cwd() );
-      test.identical( got,expected );
+      test.identical( got, expected );
 
       /*try change cwd to terminal file*/
 

@@ -27,11 +27,11 @@ function normalize( o )
   o.exts = [];
 
   _.assert( arguments.length === 1 );
-  _.assert( _.mapIs( o.criterion ) );
+  _.assert( _.mapIs( o.feature ) );
   _.assert( _.longIs( o.exts ) );
-  _.assert( o.criterion.reader || o.criterion.writer );
+  _.assert( o.feature.reader || o.feature.writer );
 
-  let collectionMap = o.criterion.reader ? _.files.ReadEncoders : _.files.WriteEncoders;
+  let collectionMap = o.feature.reader ? _.files.ReadEncoders : _.files.WriteEncoders;
 
   if( o.name === null && o.exts.length )
   o.name = nameGenerate();
@@ -62,9 +62,9 @@ normalize.defaults =
 
   name : null,
   exts : null,
-  criterion : null,
+  feature : null,
   gdf : null,
-  forConfig : null, /* zzz : remove */
+  // forConfig : null, /* zzz : remove */
 
   onBegin : null,
   onEnd : null,
@@ -80,7 +80,7 @@ function register( o, ext )
 
   o = _.files.encoder.normalize( o );
 
-  let collectionMap = o.criterion.reader ? _.files.ReadEncoders : _.files.WriteEncoders;
+  let collectionMap = o.feature.reader ? _.files.ReadEncoders : _.files.WriteEncoders;
   let name = ext ? ext : o.name;
 
   _.assert( arguments.length === 1 || arguments.length === 2 );
@@ -91,9 +91,9 @@ function register( o, ext )
     let encoder2 = collectionMap[ o.name ];
     if( encoder2 === o )
     return o;
-    if( encoder2.criterion.default )
+    if( encoder2.feature.default )
     return o;
-    if( !o.criterion.default )
+    if( !o.feature.default )
     return o;
   }
 
@@ -122,14 +122,16 @@ function _fromGdf( gdf )
   let encoder = Object.create( null );
   encoder.gdf = gdf;
   encoder.exts = gdf.ext.slice();
-  if( gdf.forConfig ) /* zzz : remove */
-  encoder.forConfig = true;
 
-  encoder.criterion = Object.create( null );
-  if( gdf.forConfig )
-  encoder.criterion.config = true;
-  if( gdf.default )
-  encoder.criterion.default = true;
+  // if( gdf.forConfig ) /* zzz : remove */
+  // encoder.forConfig = true;
+
+  encoder.feature = Object.create( null );
+  if( gdf.feature.config )
+  encoder.feature.config = true;
+  // if( gdf.default )
+  if( gdf.feature.default )
+  encoder.feature.default = true;
 
   return encoder;
 }
@@ -144,7 +146,7 @@ function writerFromGdf( gdf )
   return _writerFromGdfCache.get( gdf );
 
   let encoder = _.files.encoder._fromGdf( gdf );
-  encoder.criterion.writer = true;
+  encoder.feature.writer = true;
 
   encoder.onBegin = function( op )
   {
@@ -170,7 +172,7 @@ function readerFromGdf( gdf )
   return _readerFromGdfCache.get( gdf );
 
   let encoder = _.files.encoder._fromGdf( gdf );
-  encoder.criterion.reader = true;
+  encoder.feature.reader = true;
   let expectsString = _.longHas( gdf.in, 'string' );
 
   encoder.onBegin = function( op )
@@ -203,9 +205,12 @@ function fromGdfs()
   {
     if( !_.strHas( k, 'structure' ) )
     continue;
-    var defaults = _.entityFilter( _.gdf.inOutMap[ k ], ( c ) => c.default ? c : undefined );
+    var defaults = _.entityFilter( _.gdf.inOutMap[ k ], ( c ) => c.feature.default ? c : undefined );
     if( defaults.length > 1 )
-    throw _.err( `Several default converters for '${k}' in-out combination:`, _.select( defaults, '*/name' )  );
+    {
+      debugger;
+      throw _.err( `Several default converters for '${k}' in-out combination:`, _.select( defaults, '*/name' )  );
+    }
   }
 
   let writeGdf = _.gdf.inMap[ 'structure' ];
@@ -220,7 +225,8 @@ function fromGdfs()
     _.assert( gdf.ext.length );
     _.each( gdf.ext, ( ext ) =>
     {
-      if( !WriteEndoders[ ext ] || gdf.default )
+      // debugger;
+      if( !WriteEndoders[ ext ] || gdf.feature.default )
       _.files.encoder.register( encoder, ext );
     })
   })
@@ -233,7 +239,8 @@ function fromGdfs()
     _.assert( gdf.ext.length );
     _.each( gdf.ext, ( ext ) =>
     {
-      if( !ReadEncoders[ ext ] || gdf.default )
+      // debugger;
+      if( !ReadEncoders[ ext ] || gdf.feature.default )
       _.files.encoder.register( encoder, ext );
     })
   })
@@ -285,14 +292,14 @@ function deduce( o )
   o.ext = o.ext.toLowerCase();
 
   _.assert( _.strIs( o.ext ) || o.ext === null );
-  _.assert( _.mapIs( o.criterion ) );
-  _.assert( o.criterion.writer || o.criterion.reader );
+  _.assert( _.mapIs( o.feature ) );
+  _.assert( o.feature.writer || o.feature.reader );
   _.assert( _.mapIs( _.gdf.inMap ) );
   _.assert( _.mapIs( _.gdf.outMap ) );
 
-  let fromMethodName = o.criterion.writer ? 'writerFromGdf' : 'readerFromGdf';
-  let typeMap = o.criterion.writer ? _.gdf.outMap : _.gdf.inMap;
-  let encodersMap = o.criterion.writer ? _.files.WriteEncoders : _.files.ReadEncoders;
+  let fromMethodName = o.feature.writer ? 'writerFromGdf' : 'readerFromGdf';
+  let typeMap = o.feature.writer ? _.gdf.outMap : _.gdf.inMap;
+  let encodersMap = o.feature.writer ? _.files.WriteEncoders : _.files.ReadEncoders;
 
   if( o.ext )
   if( encodersMap[ o.ext ] )
@@ -314,8 +321,8 @@ function deduce( o )
     for( let i2 = 0 ; i2 < typeMap[ type ].length ; i2++ )
     {
       let gdf = typeMap[ type ][ i2 ];
-      let o2 = _.mapBut( o, [ 'single', 'returning', 'criterion' ] );
-      let methodName = o.criterion.reader ? 'supportsInput' : 'supportsOutput';
+      let o2 = _.mapBut( o, [ 'single', 'returning', 'feature' ] );
+      let methodName = o.feature.reader ? 'supportsInput' : 'supportsOutput';
       let supports = gdf[ methodName ]( o2 );
       if( supports )
       _.arrayAppendOnce( result, _.files.encoder[ fromMethodName ]( gdf ) );
@@ -328,7 +335,7 @@ function deduce( o )
   {
 
     if( result.length > 1 )
-    _.filter_( result, ( encoder ) => encoder.criterion.default ? encoder : undefined );
+    _.filter_( result, ( encoder ) => encoder.feature.default ? encoder : undefined );
 
     _.assert
     (
@@ -354,16 +361,16 @@ function deduce( o )
 
   function filterAll( encoders )
   {
-    if( o.criterion === null )
+    if( o.feature === null )
     return encoders;
-    if( _.mapKeys( o.criterion ).length === 0 )
+    if( _.mapKeys( o.feature ).length === 0 )
     return encoders;
     return _.filter_( encoders, ( encoder ) =>
     {
       let satisfied = _.objectSatisfy
       ({
-        src : encoder.criterion,
-        template : o.criterion,
+        src : encoder.feature,
+        template : o.feature,
         levels : 1,
         strict : false,
       });
@@ -379,7 +386,7 @@ deduce.defaults =
   format : null,
   filePath : null,
   ext : null,
-  criterion : null,
+  feature : null,
   single : 1,
   returning : 'name',
 }

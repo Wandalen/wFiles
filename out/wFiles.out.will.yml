@@ -184,13 +184,14 @@ module:
           export: 1
         path:
           - ../proto
-          - ../proto/Integration.test.s
+          - ../proto/Integration.test.ss
           - ../proto/wtools
           - ../proto/wtools/Tools.s
           - ../proto/wtools/abase
           - ../proto/wtools/amid
           - ../proto/wtools/amid/l4_files
           - ../proto/wtools/amid/l4_files/entry
+          - ../proto/wtools/amid/l4_files/entry/Basic.s
           - ../proto/wtools/amid/l4_files/entry/Extract.s
           - ../proto/wtools/amid/l4_files/entry/Files.s
           - ../proto/wtools/amid/l4_files/entry/Git.ss
@@ -272,7 +273,6 @@ module:
           - ../proto/wtools/amid/l4_files.test/Secondary.test.ss
           - ../proto/wtools/amid/l4_files.test/SystemDefaultExtract.test.s
           - ../proto/wtools/amid/l4_files.test/SystemDefaultHardDrive.test.ss
-          - ../proto/wtools/amid/l4_files.test/testCasesTable.txt
           - ../proto/wtools/atop
     submodule:
       wTools:

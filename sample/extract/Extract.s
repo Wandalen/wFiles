@@ -21,11 +21,11 @@ var tree =
 
 // file provider, copy files tree to memory
 
-var extract = _.FileProvider.Extract( { filesTree : tree } );
+var extract = _.FileProvider.Extract({ filesTree : tree });
 
 // asynchronous deletion of files
 
-var filesDelete = _.timeOut( 100, function ()
+var filesDelete = _.time.out( 100, function ()
 {
   console.log( extract.filesTree );
   console.log( '' );
@@ -39,7 +39,13 @@ var fileCopy = extract.fileCopy( { dstPath : '/user/File.txt', srcPath : '/root/
 
 // copy files to hard drive
 
-extract.readToProvider( _.FileProvider.HardDrive(), _.path.current() );
+var hardDrive = _.FileProvider.HardDrive();
+extract.filesReflectTo( hardDrive, _.path.current() );
+
+// delete copied files on hard drive
+
+hardDrive.filesDelete( _.path.join( _.path.current(), 'root' ) );
+hardDrive.filesDelete( _.path.join( _.path.current(), 'user' ) );
 
 // files tree in memory
 

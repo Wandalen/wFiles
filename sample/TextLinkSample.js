@@ -3,34 +3,36 @@ if( typeof module !== 'undefined' )
 require( 'wFiles' )
 
 var _ = wTools;
-var testDir = _.resolve( __dirname, '../tmp.tmp/filesCopy' );
-var dst, src;
+var testDir = _.path.resolve( __dirname, './filesCopy' );
 
-dst = _.join( testDir, 'dst' );
-src = _.join( testDir, 'src' );
+var dst = _.path.join( testDir, 'dst' );
+var src = _.path.join( testDir, 'src' );
 
-var filePathDst = _.join( dst + '2', 'file.dst' );
-var filePathSrc = _.join( src, 'file.src' );
+var filePathDst = _.path.join( dst + '2', 'file.dst' );
+var filePathSrc = _.path.join( src, 'file.src' );
 
 var o =
 {
-  allowDelete : 1,
-  allowWrite : 1,
-  allowRewrite : 1,
-  allowRewriteFileByDir : 1,
-  recursive : 1,
-  src : src,
-  dst : dst,
-  resolvingTextLink : 1
+  rewriting : 1,
+  rewritingDirs : 1,
+  srcPath : filePathSrc,
+  dstPath : filePathDst,
+  resolvingSrcTextLink : 1,
+  resolvingDstTextLink : 1,
 }
 
 //cleanup
-_.fileProvider.fileDelete( testDir );
+_.fileProvider.filesDelete( testDir );
 //making src : dir with file
 _.fileProvider.fileWrite( filePathSrc, filePathSrc );
 //making dst : dir with file
 _.fileProvider.fileWrite( filePathDst, filePathDst );
 //making text link to dst
-_.fileProvider.fileWrite( o.dst, 'link ' + dst + '2' );
+_.fileProvider.fileWrite( o.dstPath, 'link ' + dst + '2' );
 
-_.fileProvider.filesCopy( o );
+_.fileProvider.fileCopy( o );
+
+console.log( _.fileProvider.fileRead( filePathDst ) );
+
+_.fileProvider.filesDelete( testDir );
+

@@ -25,6 +25,6 @@ var filesTree =
 var _ = wTools;
 var fileProvider = _.FileProvider.Extract({ filesTree : filesTree });
 
-fileProvider.fileWrite( 'xxx', 'xxx' );
+fileProvider.fileWrite( '/xxx', 'xxx' );
 
 console.log( 'filesTree.xxx', filesTree.xxx );

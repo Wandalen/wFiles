@@ -23,11 +23,11 @@ var _ = wTools;
 // console.log( "statAfter.mtime: ", statAfter.mtime.getTime() )
 // console.log( "statBefore: ", statBefore.mtime.getTime() )
 
-var path = _.dir( __filename );
+var path = _.path.dir( __filename );
 var time = new Date( 1529332034399 )
 console.log( 'time: ', time.getTime() )
-_.fileProvider.fileTimeSet( path, time, time )
+_.fileProvider.timeWriteAct({ filePath : path, atime : time, mtime : time });
 
-var r = _.fileProvider.fileStat( path )
+var r = _.fileProvider.statRead( path )
 console.log( 'atime: ', r.atime.getTime() )
 console.log( 'mtime: ', r.mtime.getTime() )

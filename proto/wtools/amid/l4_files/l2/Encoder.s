@@ -117,7 +117,7 @@ function _fromGdf( gdf )
 {
 
   _.assert( gdf.ext.length );
-  _.assert( gdf instanceof _.gdf.Converter );
+  _.assert( gdf instanceof _.gdf.Encoder );
 
   let encoder = Object.create( null );
   encoder.gdf = gdf;
@@ -150,12 +150,12 @@ function writerFromGdf( gdf )
 
   encoder.onBegin = function( op )
   {
-    let encoded = op.encoder.gdf.encode({ data : op.operation.data, secondary : op.operation });
-    op.operation.data = encoded.data;
-    if( encoded.format === 'string' )
+    let encoded = op.encoder.gdf.encode({ data : op.operation.data, params : op.operation });
+    op.operation.data = encoded.out.data;
+    if( encoded.out.format === 'string' || encoded.out.format === 'string.utf8' || encoded.out.format === 'utf8.string' )
     op.operation.encoding = 'utf8';
     else
-    op.operation.encoding = encoded.format;
+    op.operation.encoding = encoded.out.format;
   }
 
   _writerFromGdfCache.set( gdf, encoder );
@@ -173,20 +173,23 @@ function readerFromGdf( gdf )
 
   let encoder = _.files.encoder._fromGdf( gdf );
   encoder.feature.reader = true;
-  let expectsString = _.longHas( gdf.in, 'string' );
+  // let expectsString = _.longHas( gdf.inFormat, 'string' );
+  let expectsString = gdf.inFormatSupports( 'string' );
+  // if( expectsString )
+  // debugger;
 
   encoder.onBegin = function( op )
   {
     if( expectsString )
     op.operation.encoding = 'utf8';
     else
-    op.operation.encoding = op.encoder.gdf.in[ 0 ];
+    op.operation.encoding = op.encoder.gdf.inFormat[ 0 ];
   }
 
   encoder.onEnd = function( op ) /* zzz : should be onData */
   {
-    let decoded = op.encoder.gdf.encode({ data : op.data, secondary : op.operation });
-    op.data = decoded.data;
+    let decoded = op.encoder.gdf.encode({ data : op.data, params : op.operation });
+    op.data = decoded.out.data;
   }
 
   _readerFromGdfCache.set( gdf, encoder );

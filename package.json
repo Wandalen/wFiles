@@ -45,6 +45,6 @@
     "wgittools" : "alpha",
     "wnpmtools" : "alpha"
   },
-  "devDependencies" : { "wait-sync" : "=1.0.1", "wFiles" : "file:.", "wTesting" : "alpha" },
+  "devDependencies" : { "eslint" : "7.1.0", "wait-sync" : "=1.0.1", "wFiles" : "file:.", "wTesting" : "alpha" },
   "keywords" : [ "wTools", "wFiles", "file", "standardized abstract interface" ]
 }

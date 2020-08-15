@@ -1827,6 +1827,8 @@ function readWriteAsync( test )
     return test.mustNotThrowError( con )
     .finally( function( err, got )
     {
+      if( err )
+      throw err;
       test.identical( got , testData );
       return got;
     });
@@ -49583,14 +49585,13 @@ function encodersFromGdfs( test )
   var testConverter =
   {
     ext : [ 'testEncoder' ],
-    in : [ 'structure' ],
-    out : [ 'string' ],
+    inFormat : [ 'structure' ],
+    outFormat : [ 'string.utf8' ],
     feature : {},
-
     onEncode : function( op )
     {
       op.out.data = _.toStr( op.out.data, { levels : 99 } );
-      op.out.format = 'string';
+      // op.out.format = 'string';
     }
   }
   var gdf = _.Gdf([ testConverter ])[ 0 ];
@@ -49618,13 +49619,13 @@ function encodersFromGdfs( test )
   var testConverter =
   {
     ext : [ 'testEncoder' ],
-    in : [ 'structure' ],
-    out : [ 'string' ],
+    inFormat : [ 'structure' ],
+    outFormat : [ 'string.utf8' ],
     feature : {},
     onEncode : function( op )
     {
       op.out.data = _.toStr( op.out.data, { levels : 99 } );
-      op.out.format = 'string';
+      // op.out.format = 'string';
     }
   }
   var gdf = _.Gdf([ testConverter ])[ 0 ];
@@ -49660,7 +49661,7 @@ function encodersFromGdfs( test )
 
           let defaultConverter = _.gdf.extMap[ ext ].filter( ( c ) => !!c.feature.default );
 
-          defaultConverter = defaultConverter.filter( ( c ) => !writing ^ _.strHas( c.in[ 0 ], 'structure' ) );
+          defaultConverter = defaultConverter.filter( ( c ) => !writing ^ _.strHas( c.inFormat[ 0 ], 'structure' ) );
 
           test.identical( defaultConverter.length, 1 );
           test.will = ext + ' encoder should exist';

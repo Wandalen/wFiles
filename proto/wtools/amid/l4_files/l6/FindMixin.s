@@ -3894,7 +3894,6 @@ function filesReflect_body( o )
 
     if( o.verbosity >= 3 )
     {
-      debugger;
 
       result.forEach( ( record ) =>
       {

@@ -6,11 +6,8 @@ var _ = wTools;
 
 //
 
-
-debugger
-var record = _.fileProvider.fileRecord(  _.join( __dirname, 'xxx' ) );
+var record = _.fileProvider.record(  _.path.join( __dirname, 'xxx' ) );
 console.log( _.toStr( record, { levels : 5 } ) )
-debugger
 
 // var files = _.fileProvider.filesFind
 // ({

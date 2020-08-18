@@ -6,11 +6,8 @@ var _ = wTools;
 var o =
 {
   outputFormat : "record",
-  filePath : _.realMainFile(),
-  _globPath : "*.js",
-  relative : null,
+  filePath : _.fileProvider.path.realMainFile(),
 }
 
-debugger
 var file = _.fileProvider.filesFind( o );
 console.log( file );

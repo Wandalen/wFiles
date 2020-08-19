@@ -47,8 +47,8 @@ function init( o )
   record._filterReset();
   record._statReset();
 
-  if( _.strEnds( o.input, 'recordStat/file' ) )
-  debugger;
+  // if( _.strEnds( o.input, 'recordStat/file' ) )
+  // debugger;
 
   record.copy( o );
 
@@ -348,12 +348,11 @@ function _statRead()
     let resolved = f.effectiveProvider.pathResolveLinkFull( o2 );
     record[ realSymbol ] = resolved.filePath;
 
-    // debugger;
     record[ isCycledSymbol ] = !!resolved.isCycled;
     record[ isMissedSymbol ] = !!resolved.isMissed;
 
-    if( _.strEnds( record.absolute, 'Cycled.txt' ) )
-    debugger;
+    // if( _.strEnds( record.absolute, 'Cycled.txt' ) )
+    // debugger;
 
     stat = o2.stat;
   }
@@ -442,7 +441,7 @@ function changeExt( ext )
 {
   let record = this;
   let path = record.path;
-  _.assert( arguments.length === 1, 'Expects single argument' ); debugger;
+  _.assert( arguments.length === 1, 'Expects single argument' );
   record.input = path.changeExt( record.input, ext );
 }
 

@@ -607,10 +607,12 @@ function filesFindSingle_body( o )
       return _.dont;
     }
 
-    if( _.strEnds( record.absolute, '/Cycled.txt' ) )
-    debugger;
-    if( _.strEnds( record.absolute, '/Missed.txt' ) )
-    debugger;
+    // if( _.strEnds( record.absolute, '/Cycled.txt' ) )
+    // debugger;
+    // if( _.strEnds( record.absolute, '/Missed.txt' ) )
+    // debugger;
+    // if( _global_.debugger )
+    // debugger;
 
     let includingFile = record.isDir ? o.withDirs : o.withTerminals;
     let withTransient = ( o.withTransient && record.isTransient );
@@ -970,8 +972,8 @@ function filesFind_body( o )
 
     let visited = false;
 
-    if( _global_.debugger )
-    debugger;
+    // if( _global_.debugger )
+    // debugger;
     // if( o.revisitingHardLinked === 0 && record.stat )
     if( o.visitedInosSet && record.stat )
     {

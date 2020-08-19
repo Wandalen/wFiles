@@ -636,7 +636,10 @@ function recordFiltering( test )
   var filePath = _.path.normalize( __filename );
   var filter = makeFilter({ notOlderAge : new Date( Date.UTC( 1970, 1, 1 ) ), basePath : filePath, filePath })
   var factory = _.FileRecordFactory.TolerantFrom( o, { filter, basePath : filePath  }).form();
+  // debugger;
+  // _global_.debugger = true;
   var got = factory.record({ input : filePath, factory });
+  // debugger;
   test.identical( got.isActual, true );
 
   /* notNewerAge */

@@ -14631,7 +14631,38 @@ function filesFindLinksBroken( test )
 
   /* */
 
-  test.case = 'basic';
+  test.case = 'revisitingHardLinked : 1, withDefunct : 0';
+  setup();
+
+  var exp = [ 'Cycled.txt', 'dir1', 'F1.txt', 'Missed.txt' ];
+  var got = a.fileProvider.dirRead( a.abs( '.' ) );
+  test.identical( got, exp );
+
+  var exp = [ 'Cycled.txt', 'dir2', 'F1.txt', 'Missed.txt' ];
+  var got = a.fileProvider.dirRead( a.abs( 'dir1' ) );
+  test.identical( got, exp );
+
+  var filter = { filePath : a.abs( '**' ) };
+  var files = a.fileProvider.filesFind
+  ({
+    filter,
+    mode : 'distinct',
+    outputFormat : 'relative',
+    mandatory : 0,
+    withDirs : 0,
+    withDefunct : 0,
+    revisitingHardLinked : 1,
+    resolvingSoftLink : 1,
+    revisiting : 0,
+    allowingCycled : 1,
+    allowingMissed : 1,
+  });
+  var exp = [ './F1.txt', './dir1/F1.txt', './dir1/dir2/F1.txt' ];
+  test.identical( files, exp );
+
+  /* */
+
+  test.case = 'revisitingHardLinked : 0, withDefunct : 0';
   setup();
 
   var exp = [ 'Cycled.txt', 'dir1', 'F1.txt', 'Missed.txt' ];
@@ -14662,7 +14693,7 @@ function filesFindLinksBroken( test )
 
   /* */
 
-  test.case = 'revisitingHardLinked : 1';
+  test.case = 'revisitingHardLinked : 0, withDefunct : 1';
   setup();
 
   var exp = [ 'Cycled.txt', 'dir1', 'F1.txt', 'Missed.txt' ];
@@ -14681,14 +14712,14 @@ function filesFindLinksBroken( test )
     outputFormat : 'relative',
     mandatory : 0,
     withDirs : 0,
-    withDefunct : 0,
+    withDefunct : 1,
     revisitingHardLinked : 1,
     resolvingSoftLink : 1,
     revisiting : 0,
     allowingCycled : 1,
     allowingMissed : 1,
   });
-  var exp = [ './F1.txt', './dir1/F1.txt', './dir1/dir2/F1.txt' ];
+  var exp = [ './Cycled.txt', './F1.txt', './Missed.txt', './dir1/Cycled.txt', './dir1/F1.txt', './dir1/Missed.txt', './dir1/dir2/F1.txt' ];
   test.identical( files, exp );
 
   /* */

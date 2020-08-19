@@ -468,6 +468,12 @@ function filesFindNominal_body( o )
   function forTerminal( r, op )
   {
 
+    // debugger;
+    // if( _.strEnds( r.absolute, '/Cycled.txt' ) )
+    // debugger;
+    // if( _.strEnds( r.absolute, '/Missed.txt' ) )
+    // debugger;
+
     if( r.isDir )
     return;
     if( !r.isTransient && !r.isActual )
@@ -601,6 +607,11 @@ function filesFindSingle_body( o )
       return _.dont;
     }
 
+    if( _.strEnds( record.absolute, '/Cycled.txt' ) )
+    debugger;
+    if( _.strEnds( record.absolute, '/Missed.txt' ) )
+    debugger;
+
     let includingFile = record.isDir ? o.withDirs : o.withTerminals;
     let withTransient = ( o.withTransient && record.isTransient );
     let withActual = ( o.withActual && record.isActual );
@@ -609,6 +620,8 @@ function filesFindSingle_body( o )
     included = included && ( includingFile );
     included = included && ( o.withStem || !record.isStem );
     included = included && ( o.withDefunct || !!record.stat );
+    included = included && ( o.withDefunct || record.isCycled !== true );
+    included = included && ( o.withDefunct || record.isMissed !== true );
     record.included = included;
 
     _.assert( arguments.length === 2 );
@@ -957,9 +970,12 @@ function filesFind_body( o )
 
     let visited = false;
 
-    if( o.revisitingHardLinked === 0 )
+    if( _global_.debugger )
+    debugger;
+    // if( o.revisitingHardLinked === 0 && record.stat )
+    if( o.visitedInosSet && record.stat )
     {
-      _.assert( self.isIno({ ino : record.stat.ino }) );
+      _.assert( record.stat && self.isIno({ ino : record.stat.ino }) );
       if( o.visitedInosSet.has( record.stat.ino ) )
       return _.dont;
     }
@@ -997,7 +1013,7 @@ function filesFind_body( o )
     if( o.visitedMap )
     o.visitedMap[ record.real ] = record;
 
-    if( o.visitedInosSet )
+    if( o.visitedInosSet && record.stat )
     {
       _.assert( self.isIno({ ino : record.stat.ino }) );
       o.visitedInosSet.add( record.stat.ino );

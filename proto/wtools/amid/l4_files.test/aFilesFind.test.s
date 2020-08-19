@@ -2841,7 +2841,7 @@ function filesFindLinked( test )
 
   /* */
 
-  test.case = 'resolvingSoftLink : 1, allowingMissed : 0, allowingCycled : 1';
+  test.case = 'resolvingSoftLink : 1, allowingMissed : 0, allowingCycled : 1, withDefunct : 1';
 
   var got = context.provider.filesFind
   ({
@@ -2856,10 +2856,34 @@ function filesFindLinked( test )
     allowingMissed : 0,
     allowingCycled : 1,
     revisiting : 2,
+    withDefunct : 1,
   })
   test.identical( select( got, '*/absolute' ), [ '/', '/auto', '/normal', '/terminal' ] );
   test.identical( select( got, '*/real' ), [ '/', '/auto', '/terminal', '/terminal' ] );
   test.identical( select( got, '*/stat' ).map( ( e ) => !!e ), [ true, true, true, true ] );
+
+  /* */
+
+  test.case = 'resolvingSoftLink : 1, allowingMissed : 0, allowingCycled : 1, withDefunct : 0';
+
+  var got = context.provider.filesFind
+  ({
+    filePath : routinePath,
+    outputFormat : 'record',
+    withTransient : 1,
+    withTerminals : 1,
+    withDirs : 1,
+    withTransient : 1,
+    filter : { recursive : 2 },
+    resolvingSoftLink : 1,
+    allowingMissed : 0,
+    allowingCycled : 1,
+    revisiting : 2,
+    withDefunct : 0,
+  })
+  test.identical( select( got, '*/absolute' ), [ '/', '/normal', '/terminal' ] );
+  test.identical( select( got, '*/real' ), [ '/', '/terminal', '/terminal' ] );
+  test.identical( select( got, '*/stat' ).map( ( e ) => !!e ), [ true, true, true ] );
 
   /* */
 
@@ -14595,6 +14619,128 @@ function filesFindOptionRevisitingHardLinked( test )
   test.identical( got, exp );
 
   /* */
+
+}
+
+//
+
+function filesFindLinksBroken( test )
+{
+  let context = this;
+  let a = context.assetFor( test, false );
+
+  /* */
+
+  test.case = 'basic';
+  setup();
+
+  var exp = [ 'Cycled.txt', 'dir1', 'F1.txt', 'Missed.txt' ];
+  var got = a.fileProvider.dirRead( a.abs( '.' ) );
+  test.identical( got, exp );
+
+  var exp = [ 'Cycled.txt', 'dir2', 'F1.txt', 'Missed.txt' ];
+  var got = a.fileProvider.dirRead( a.abs( 'dir1' ) );
+  test.identical( got, exp );
+
+  var filter = { filePath : a.abs( '**' ) };
+  var files = a.fileProvider.filesFind
+  ({
+    filter,
+    mode : 'distinct',
+    outputFormat : 'relative',
+    mandatory : 0,
+    withDirs : 0,
+    withDefunct : 0,
+    revisitingHardLinked : 0,
+    resolvingSoftLink : 1,
+    revisiting : 0,
+    allowingCycled : 1,
+    allowingMissed : 1,
+  });
+  var exp = [ './F1.txt', './dir1/F1.txt', './dir1/dir2/F1.txt' ];
+  test.identical( files, exp );
+
+  /* */
+
+  test.case = 'revisitingHardLinked : 1';
+  setup();
+
+  var exp = [ 'Cycled.txt', 'dir1', 'F1.txt', 'Missed.txt' ];
+  var got = a.fileProvider.dirRead( a.abs( '.' ) );
+  test.identical( got, exp );
+
+  var exp = [ 'Cycled.txt', 'dir2', 'F1.txt', 'Missed.txt' ];
+  var got = a.fileProvider.dirRead( a.abs( 'dir1' ) );
+  test.identical( got, exp );
+
+  var filter = { filePath : a.abs( '**' ) };
+  var files = a.fileProvider.filesFind
+  ({
+    filter,
+    mode : 'distinct',
+    outputFormat : 'relative',
+    mandatory : 0,
+    withDirs : 0,
+    withDefunct : 0,
+    revisitingHardLinked : 1,
+    resolvingSoftLink : 1,
+    revisiting : 0,
+    allowingCycled : 1,
+    allowingMissed : 1,
+  });
+  var exp = [ './F1.txt', './dir1/F1.txt', './dir1/dir2/F1.txt' ];
+  test.identical( files, exp );
+
+  /* */
+
+  function setup()
+  {
+    a.reflect();
+    a.fileProvider.fileWrite( a.abs( 'F1.txt' ), 'F1.txt' );
+    a.fileProvider.fileWrite( a.abs( 'dir1/F1.txt' ), 'dir1/F1.txt' );
+    a.fileProvider.fileWrite( a.abs( 'dir1/dir2/F1.txt' ), 'dir1/dir2/F1.txt' );
+
+    a.fileProvider.softLink
+    ({
+      dstPath : a.abs( 'Missed.txt' ),
+      srcPath : a.abs( 'DoesNotExist.txt' ),
+      makingDirectory : 1,
+      allowingCycled : 1,
+      allowingMissed : 1,
+      sync : 1
+    });
+
+    a.fileProvider.softLink
+    ({
+      dstPath : a.abs( 'Cycled.txt' ),
+      srcPath : a.abs( 'Cycled.txt' ),
+      makingDirectory : 1,
+      allowingCycled : 1,
+      allowingMissed : 1,
+      sync : 1
+    });
+
+    a.fileProvider.softLink
+    ({
+      dstPath : a.abs( 'dir1/Missed.txt' ),
+      srcPath : a.abs( 'dir1/DoesNotExist.txt' ),
+      makingDirectory : 1,
+      allowingCycled : 1,
+      allowingMissed : 1,
+      sync : 1
+    });
+
+    a.fileProvider.softLink
+    ({
+      dstPath : a.abs( 'dir1/Cycled.txt' ),
+      srcPath : a.abs( 'dir1/Cycled.txt' ),
+      makingDirectory : 1,
+      allowingCycled : 1,
+      allowingMissed : 1,
+      sync : 1
+    });
+
+  }
 
 }
 
@@ -37949,6 +38095,7 @@ let Self =
     /* qqq : implement filesFindTotalNegative, */
     /* qqq : implement filesFindSeveralTotalNegative, */
     filesFindOptionRevisitingHardLinked,
+    filesFindLinksBroken,
     filesFindRenaming,
     filesRenameBasic,
 

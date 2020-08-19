@@ -312,6 +312,8 @@ function _statReset()
 
   record[ realSymbol ] = 0;
   record[ statSymbol ] = 0;
+  record[ isCycledSymbol ] = null;
+  record[ isMissedSymbol ] = null;
 
 }
 
@@ -343,10 +345,17 @@ function _statRead()
       throwing : 1,
     }
 
-    record[ realSymbol ] = f.effectiveProvider.pathResolveLinkFull( o2 ).filePath;
+    let resolved = f.effectiveProvider.pathResolveLinkFull( o2 );
+    record[ realSymbol ] = resolved.filePath;
+
+    // debugger;
+    record[ isCycledSymbol ] = !!resolved.isCycled;
+    record[ isMissedSymbol ] = !!resolved.isMissed;
+
+    if( _.strEnds( record.absolute, 'Cycled.txt' ) )
+    debugger;
 
     stat = o2.stat;
-
   }
 
   /* read and set stat */
@@ -873,6 +882,9 @@ let inputSymbol = Symbol.for( 'input' );
 let relativeSymbol = Symbol.for( 'relative' );
 let absoluteSymbol = Symbol.for( 'absolute' );
 
+let isCycledSymbol = Symbol.for( 'isCycled' );
+let isMissedSymbol = Symbol.for( 'isMissed' );
+
 /**
  * @typedef {Object} Fields
  * @property {String} absolute Absolute path to a file.
@@ -957,6 +969,9 @@ let Accessors =
   isSoftLink : { readOnly : 1 },
   isTextLink : { readOnly : 1 },
   isLink : { readOnly : 1 },
+
+  isCycled : { set : 0 },
+  isMissed : { set : 0 },
 
   absolute : { set : absoluteSet },
   relative : { set : relativeSet },

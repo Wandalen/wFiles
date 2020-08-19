@@ -1223,7 +1223,9 @@ function pathResolveLinkFull_body( o )
 
         if( !o.allowingMissed )
         {
+          // debugger;
           result.relativePath = result.filePath = result.absolutePath = null;
+          result.isMissed = true;
           if( o.throwing )
           {
             debugger;
@@ -1292,7 +1294,9 @@ function pathResolveLinkFull_body( o )
       {
         if( !o.allowingMissed )
         {
+          debugger;
           result.relativePath = result.filePath = result.absolutePath = null;
+          result.isMissed = true;
           if( o.throwing )
           {
             debugger;
@@ -1371,7 +1375,9 @@ function pathResolveLinkFull_body( o )
     }
     catch( err )
     {
+      debugger;
       result.relativePath = result.filePath = result.absolutePath = null;
+      result.isMissed = true;
       throw _.err( `Failed to resolve ${o.filePath}\n`, err );
     }
 
@@ -1485,6 +1491,8 @@ function pathResolveLinkTail_body( o )
       result.filePath = o2.result[ o2.result.length-2 ];
       result.relativePath = o2.result[ o2.result.length-2 ];
       result.absolutePath = o2.found[ o2.found.length-2 ];
+      // debugger;
+      result.isCycled = !!cycle;
     }
   }
 

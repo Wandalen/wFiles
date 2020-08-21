@@ -7,9 +7,6 @@ let Imap;
 
 if( typeof module !== 'undefined' )
 {
-  // let _ = require( '../../../../wtools/Tools.s' );
-  // if( !_.FileProvider )
-  // require( '../UseMid.s' );
   Imap = require( 'imap-simple' );
 }
 
@@ -83,15 +80,11 @@ function form()
     }
   };
 
-  debugger;
   return _.Consequence.Try( () => Imap.connect( config ) )
   .then( function( connection )
   {
-
-    debugger;
     self._connection = connection;
     self.ready.take( connection );
-
     return connection;
   })
   // return _.Consequence.Try( () => Imap.connect( config ) )
@@ -144,8 +137,7 @@ function unform()
 {
   let self = this;
   // let a = self._connection.imap.closeBox( true );
-  let b = self._connection.end();
-  debugger;
+  self._connection.end();
   return self;
 }
 
@@ -232,18 +224,90 @@ _.routineExtend( pathResolveSoftLinkAct, Parent.prototype.pathResolveSoftLinkAct
 function fileReadAct( o )
 {
   let self = this;
-  let con = new _.Consequence();
+  let path = self.path;
+  let ready = self.ready.split();
   let result = null;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assertRoutineOptions( fileReadAct, o );
   _.assert( _.strIs( o.encoding ) );
+  o.advanced = _.routineOptions( null, o.advanced || Object.create( null ), fileReadAct.advanced );
 
-  _.assert( 0, 'not implemented' );
+  let filePath = path.unabsolute( o.filePath );
+  let dirPath = path.dir( filePath );
+  let name = path.name( o.filePath );
+
+  _.assert( _.strBegins( name, '@' ) );
+  name = _.strRemoveBegin( name, '@' );
+
+  ready.then( () => _read( o.filePath ) );
+  ready.then( () => result );
+
+  if( o.sync )
+  {
+    ready.deasync();
+    return ready.sync();
+  }
+
+  return ready;
+
+  /* */
+
+  function _read()
+  {
+    return self._connection.openBox( dirPath ).then( function ()
+    {
+      let searchCriteria = [ `${name}` ];
+      let bodies = [];
+      if( o.advanced.withHeader )
+      bodies.push( 'HEADER' );
+      if( o.advanced.withBody )
+      bodies.push( 'TEXT' );
+      if( o.advanced.withTail )
+      bodies.push( '' );
+      let fetchOptions =
+      {
+        bodies,
+        struct : !!o.advanced.structing,
+      };
+      return self._connection.search( searchCriteria, fetchOptions ).then( function( messages )
+      {
+        _.assert( messages.length === 1 );
+        result = messages[ 0 ];
+        resultHandle( result );
+      });
+    });
+  }
+
+  /* */
+
+  function resultHandle( result )
+  {
+    debugger;
+    if( o.advanced.withHeader )
+    {
+      result.header = Object.create( null );
+      let headers = result.parts.filter( ( e ) => e.which === 'HEADER' );
+      headers.forEach( ( header ) =>
+      {
+        _.mapExtend( result.header, header );
+      });
+    }
+  }
+
+  /* */
 
 }
 
 _.routineExtend( fileReadAct, Parent.prototype.fileReadAct );
+
+fileReadAct.advanced =
+{
+  withHeader : 1,
+  withBody : 1,
+  withTail : 1,
+  structing : 1,
+}
 
 //
 
@@ -251,25 +315,81 @@ function dirReadAct( o )
 {
   let self = this;
   let path = self.path;
-  let result = self.ready.split();
+  let ready = self.ready.split();
+  let result;
 
   _.assertRoutineOptions( dirReadAct, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( self.path.isNormalized( o.filePath ) );
 
-  result.then( () => self._connection.getBoxes() );
-  result.then( ( map ) => filter( map ) );
+  ready.then( () => self._connection.getBoxes() );
+  ready.then( ( map ) =>
+  {
+    result = filter( map );
+    return result;
+  });
+
+  ready.then( () => _mailsRead( o.filePath ) );
+  ready.then( () => result );
 
   if( o.sync )
   {
-    result.deasync();
-    return result.sync();
+    ready.deasync();
+    return ready.sync();
   }
-  return result;
+
+  return ready;
+
+  function _mailsRead( filePath )
+  {
+    if( result === null )
+    return result;
+    if( filePath === '/' )
+    return result;
+
+    filePath = path.unabsolute( filePath );
+    return self._connection.openBox( filePath ).then( function ()
+    {
+      let searchCriteria = [ 'ALL' ];
+      let fetchOptions =
+      {
+        bodies : [ 'HEADER' ],
+        struct : false,
+        // bodies : [ 'HEADER', 'TEXT', '' ],
+        // struct : true,
+      };
+      return self._connection.search( searchCriteria, fetchOptions ).then( function( messages )
+      {
+        messages.forEach( function( message, k )
+        {
+          debugger;
+          // let mid = message.parts[ 0 ].body[ 'message-id' ][ 0 ];
+          let mid = message.attributes.uid;
+          _.assert( _.numberIs( mid ) );
+          debugger;
+          _.arrayAppendOnceStrictly( result, '@' + String( mid ) );
+          debugger;
+        });
+      });
+    });
+
+  }
 
   function filter( map )
   {
-    let result = _.select( map, o.filePath );
+    // console.log( 0 ? self._connection : 0 );
+    if( o.filePath === path.rootToken )
+    return _.mapKeys( map );
+    let isAbsolute = path.isAbsolute( o.filePath );
+    let filePath = path.unabsolute( o.filePath );
+    filePath = filePath.split( '/' ).map( ( e, k ) => `${e}/children` ).join( '/' );
+    if( isAbsolute )
+    filePath = path.absolute( filePath );
+    let result = _.select( map, filePath );
+    if( result === null )
+    return [];
+    if( !result )
+    return null;
     return _.mapKeys( result );
   }
 
@@ -609,6 +729,7 @@ let Composes =
   hostUri : null,
   authTimeOut : 5000,
   tls : true,
+  // tls : false,
 
 }
 
@@ -700,9 +821,6 @@ _.classDeclare
   parent : Parent,
   extend : Extension,
 });
-
-// _.FileProvider.FindMixin.mixin( Self );
-// _.FileProvider.Secondary.mixin( Self );
 
 _.FileProvider[ Self.shortName ] = Self;
 

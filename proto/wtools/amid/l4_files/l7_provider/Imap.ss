@@ -80,6 +80,7 @@ function form()
     }
   };
 
+  // debugger;
   return _.Consequence.Try( () => Imap.connect( config ) )
   .then( function( connection )
   {
@@ -87,41 +88,6 @@ function form()
     self.ready.take( connection );
     return connection;
   })
-  // return _.Consequence.Try( () => Imap.connect( config ) )
-  // .then( function( connection )
-  // {
-  //
-  //   self._connection = connection;
-  //
-  //   // return connection.openBox( 'INBOX' ).then( function()
-  //   // {
-  //   //   let searchCriteria = [ 'UNSEEN' ];
-  //   //
-  //   //   let fetchOptions =
-  //   //   {
-  //   //     bodies : [ 'HEADER', 'TEXT' ],
-  //   //     markSeen : false
-  //   //   };
-  //   //
-  //   //   return connection.search( searchCriteria, fetchOptions ).then( function( results )
-  //   //   {
-  //   //     let subjects = results.map( function( res )
-  //   //     {
-  //   //       return res.parts.filter( function( part )
-  //   //       {
-  //   //         return part.which === 'HEADER';
-  //   //       })[ 0 ].body.subject[ 0 ];
-  //   //     });
-  //   //     console.log( subjects );
-  //   //     self.ready.take( subjects );
-  //   //   });
-  //   //
-  //   // });
-  //
-  //   self.ready.take( connection );
-  //
-  //   return connection;
-  // })
   .catch( ( err ) =>
   {
     err = _.err( err );
@@ -187,7 +153,7 @@ function pathCurrentAct()
  * @class wFileProviderImap
  * @namespace wTools.FileProvider
  * @module Tools/mid/Files
-*/
+ */
 
 function pathResolveSoftLinkAct( o )
 {
@@ -200,6 +166,26 @@ function pathResolveSoftLinkAct( o )
 }
 
 _.routineExtend( pathResolveSoftLinkAct, Parent.prototype.pathResolveSoftLinkAct )
+
+//
+
+function pathParse( filePath )
+{
+  let self = this;
+  let path = self.path;
+  let result = Object.create( null );
+
+  result.originalPath = filePath;
+  result.unabsolutePath = path.unabsolute( filePath );
+  result.dirPath = path.dir( result.originalPath );
+  result.fullName = path.fullName( filePath );
+
+  result.isTerminal = _.strInsideOf( result.fullName, '<', '>' );
+  result.stripName = result.isTerminal ? result.isTerminal : result.fullName;
+  result.isTerminal = !!result.isTerminal;
+
+  return result;
+}
 
 // --
 // read
@@ -219,7 +205,7 @@ _.routineExtend( pathResolveSoftLinkAct, Parent.prototype.pathResolveSoftLinkAct
  * @class wFileProviderImap
  * @namespace wTools.FileProvider
  * @module Tools/mid/Files
-*/
+ */
 
 function fileReadAct( o )
 {
@@ -233,14 +219,13 @@ function fileReadAct( o )
   _.assert( _.strIs( o.encoding ) );
   o.advanced = _.routineOptions( null, o.advanced || Object.create( null ), fileReadAct.advanced );
 
-  let filePath = path.unabsolute( o.filePath );
-  let dirPath = path.dir( filePath );
-  let name = path.name( o.filePath );
+  let parsed = self.pathParse( o.filePath );
+  parsed.dirPath = path.unabsolute( parsed.dirPath );
 
-  _.assert( _.strBegins( name, '@' ) );
-  name = _.strRemoveBegin( name, '@' );
+  if( !parsed.isTerminal )
+  throw _.err( `${o.filePath} is not a terminal` );
 
-  ready.then( () => _read( o.filePath ) );
+  ready.then( () => _read() );
   ready.then( () => result );
 
   if( o.sync )
@@ -255,9 +240,9 @@ function fileReadAct( o )
 
   function _read()
   {
-    return self._connection.openBox( dirPath ).then( function ()
+    return self._connection.openBox( parsed.dirPath ).then( function ( extra ) /* xxx : need to close? */
     {
-      let searchCriteria = [ `${name}` ];
+      let searchCriteria = [ `${parsed.stripName}` ];
       let bodies = [];
       if( o.advanced.withHeader )
       bodies.push( 'HEADER' );
@@ -269,12 +254,15 @@ function fileReadAct( o )
       {
         bodies,
         struct : !!o.advanced.structing,
+        markSeen : false,
       };
       return self._connection.search( searchCriteria, fetchOptions ).then( function( messages )
       {
-        _.assert( messages.length === 1 );
+        _.assert( messages.length >= 1, 'Terminal does not exist' );
+        _.assert( messages.length <= 1, 'There are several such terminals' );
         result = messages[ 0 ];
         resultHandle( result );
+        self._connection.closeBox( parsed.dirPath );
       });
     });
   }
@@ -283,14 +271,13 @@ function fileReadAct( o )
 
   function resultHandle( result )
   {
-    debugger;
     if( o.advanced.withHeader )
     {
       result.header = Object.create( null );
       let headers = result.parts.filter( ( e ) => e.which === 'HEADER' );
       headers.forEach( ( header ) =>
       {
-        _.mapExtend( result.header, header );
+        _.mapExtend( result.header, header.body );
       });
     }
   }
@@ -340,6 +327,8 @@ function dirReadAct( o )
 
   return ready;
 
+  /* */
+
   function _mailsRead( filePath )
   {
     if( result === null )
@@ -348,36 +337,33 @@ function dirReadAct( o )
     return result;
 
     filePath = path.unabsolute( filePath );
-    return self._connection.openBox( filePath ).then( function ()
+    return self._connection.openBox( filePath ).then( function( extra ) /* xxx : need to close? */
     {
       let searchCriteria = [ 'ALL' ];
       let fetchOptions =
       {
         bodies : [ 'HEADER' ],
         struct : false,
-        // bodies : [ 'HEADER', 'TEXT', '' ],
-        // struct : true,
+        markSeen : false,
       };
       return self._connection.search( searchCriteria, fetchOptions ).then( function( messages )
       {
         messages.forEach( function( message, k )
         {
-          debugger;
-          // let mid = message.parts[ 0 ].body[ 'message-id' ][ 0 ];
           let mid = message.attributes.uid;
           _.assert( _.numberIs( mid ) );
-          debugger;
-          _.arrayAppendOnceStrictly( result, '@' + String( mid ) );
-          debugger;
+          _.arrayAppendOnceStrictly( result, '<' + String( mid ) + '>' );
         });
+        self._connection.closeBox( filePath );
       });
     });
 
   }
 
+  /* */
+
   function filter( map )
   {
-    // console.log( 0 ? self._connection : 0 );
     if( o.filePath === path.rootToken )
     return _.mapKeys( map );
     let isAbsolute = path.isAbsolute( o.filePath );
@@ -393,6 +379,8 @@ function dirReadAct( o )
     return _.mapKeys( result );
   }
 
+  /* */
+
 }
 
 _.routineExtend( dirReadAct, Parent.prototype.dirReadAct );
@@ -404,136 +392,127 @@ _.routineExtend( dirReadAct, Parent.prototype.dirReadAct );
 function statReadAct( o )
 {
   let self = this;
+  let path = self.path;
+  let parsed = self.pathParse( o.filePath );
+  let stat;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assertRoutineOptions( statReadAct, o );
-  _.assert( 0, 'not implemented' );
 
   /* */
+
+  let result = _statReadAct();
 
   if( o.sync )
   {
-    return _statReadAct( o.filePath );
+    if( _.consequenceIs( result ) )
+    {
+      result.deasync();
+      return result.sync();
+    }
   }
   else
   {
-    return _.time.out( 0, function()
+    if( !_.consequenceIs( result ) )
+    return new _.Consequence().take( result );
+  }
+
+  return result;
+
+  /* */
+
+  function _statReadAct()
+  {
+    stat = null;
+    let throwing = 0;
+    let sync = 1;
+
+    if( parsed.isTerminal )
     {
-      return _statReadAct( o.filePath );
-    })
+      let files = self.dirRead({ filePath : parsed.dirPath, throwing, sync });
+      if( !_.longHas( files, parsed.fullName ) )
+      throw _.err( `File ${o.filePath} does not exist` );
+      let advanced =
+      {
+        withHeader : 1,
+        withBody : 0,
+        withTail : 0,
+        structing : 0,
+      }
+      let o2 = _.mapSupplement( { filePath : o.filePath, advanced, throwing, sync }, self.fileReadAct.defaults );
+      let read = self.fileRead( o2 );
+      stat = statMake();
+      stat.isFile = returnTrue;
+    }
+    else
+    {
+      stat = statMake();
+      stat.isDirectory = returnTrue;
+      stat.isDir = returnTrue;
+      let ready = _.Consequence.From( _dirRead() );
+      return ready;
+      debugger;
+    }
+
+    return stat;
   }
 
   /* */
 
-  function _statReadAct( filePath )
+  function _dirRead()
   {
-    let result = null;
-
-    if( o.resolvingSoftLink )
+    return self.ready.split()
+    .give( function()
     {
-
-      let o2 =
+      let con = this;
+      let dirPath = path.unabsolute( parsed.originalPath );
+      self._connection.openBox( dirPath )
+      .then( ( extra ) => /* xxx : need to close? */
       {
-        filePath,
-        resolvingSoftLink : o.resolvingSoftLink,
-        resolvingTextLink : 0,
-      };
+        result.extra = extra;
+        self._connection.closeBox( dirPath );
+        debugger;
+        con.take( stat );
+      })
+      .catch( ( err ) =>
+      {
+        con.error( _.err( err ) );
+      });
+    });
+    // .then( () =>
+    // {
+    //   debugger;
+    //   return result;
+    // });
+  }
 
-      filePath = self.pathResolveLinkFull( o2 ).absolutePath;
-      _.assert( o2.stat !== undefined );
+  /* */
 
-      if( !o2.stat && o.throwing )
-      throw _.err( 'File', _.strQuote( filePath ), 'doesn`t exist!' );
+  function statMake()
+  {
+    let result = new _.FileStat();
 
-      return o2.stat;
-    }
-    else
-    {
-      filePath = self._pathResolveIntermediateDirs( filePath );
-    }
+    // if( self.extraStats && self.extraStats[ filePath ] )
+    // {
+    //   let extraStat = self.extraStats[ filePath ];
+    //   result.atime = new Date( extraStat.atime );
+    //   result.mtime = new Date( extraStat.mtime );
+    //   result.ctime = new Date( extraStat.ctime );
+    //   result.birthtime = new Date( extraStat.birthtime );
+    //   result.ino = extraStat.ino || null;
+    //   result.dev = extraStat.dev || null;
+    // }
 
-    let d = self._descriptorRead( filePath );
-
-    if( !_.definedIs( d ) )
-    {
-      if( o.throwing )
-      throw _.err( 'File', _.strQuote( filePath ), 'doesn`t exist!' );
-      return result;
-    }
-
-    result = new _.FileStat();
-
-    if( self.extraStats && self.extraStats[ filePath ] )
-    {
-      let extraStat = self.extraStats[ filePath ];
-      result.atime = new Date( extraStat.atime );
-      result.mtime = new Date( extraStat.mtime );
-      result.ctime = new Date( extraStat.ctime );
-      result.birthtime = new Date( extraStat.birthtime );
-      result.ino = extraStat.ino || null;
-      result.dev = extraStat.dev || null;
-    }
-
-    result.filePath = filePath;
+    result.filePath = o.filePath;
     result.isTerminal = returnFalse;
     result.isDir = returnFalse;
-    result.isTextLink = returnFalse; /* qqq : implement and add coverage, please */
+    result.isTextLink = returnFalse;
     result.isSoftLink = returnFalse;
-    result.isHardLink = returnFalse; /* qqq : implement and add coverage, please */
-    result.isFile = returnFalse;
+    result.isHardLink = returnFalse;
     result.isDirectory = returnFalse;
+    result.isFile = returnFalse;
     result.isSymbolicLink = returnFalse;
     result.nlink = 1;
-
-    if( self._DescriptorIsDir( d ) )
-    {
-      result.isDirectory = returnTrue;
-      result.isDir = returnTrue;
-    }
-    else if( self._DescriptorIsTerminal( d ) || self._DescriptorIsHardLink( d ) )
-    {
-      if( self._DescriptorIsHardLink( d ) )
-      {
-        if( _.arrayIs( d[ 0 ].hardLinks ) )
-        result.nlink = d[ 0 ].hardLinks.length;
-
-        d = d[ 0 ].data;
-        result.isHardLink = returnTrue;
-      }
-
-      result.isTerminal = returnTrue;
-      result.isFile = returnTrue;
-
-      if( _.numberIs( d ) )
-      result.size = String( d ).length;
-      else if( _.strIs( d ) )
-        result.size = d.length;
-      else
-        result.size = d.byteLength;
-
-      _.assert( result.size >= 0 );
-
-      result.isTextLink = function isTextLink()
-      {
-        if( !self.usingTextLink )
-        return false;
-        return self._DescriptorIsTextLink( d );
-      }
-    }
-    else if( self._DescriptorIsSoftLink( d ) )
-    {
-      result.isSymbolicLink = returnTrue;
-      result.isSoftLink = returnTrue;
-    }
-    else if( self._DescriptorIsHardLink( d ) )
-    {
-      _.assert( 0 );
-    }
-    else if( self._DescriptorIsScript( d ) )
-    {
-      result.isTerminal = returnTrue;
-      result.isFile = returnTrue;
-    }
 
     return result;
   }
@@ -551,6 +530,8 @@ function statReadAct( o )
   {
     return true;
   }
+
+  /* */
 
 }
 
@@ -775,6 +756,7 @@ let Extension =
 
   pathCurrentAct,
   pathResolveSoftLinkAct,
+  pathParse,
 
   // read
 

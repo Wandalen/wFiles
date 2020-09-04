@@ -1223,7 +1223,6 @@ function pathResolveLinkFull_body( o )
 
         if( !o.allowingMissed )
         {
-          // debugger;
           result.relativePath = result.filePath = result.absolutePath = null;
           result.isMissed = true;
           if( o.throwing )
@@ -1345,12 +1344,12 @@ function pathResolveLinkFull_body( o )
     }
     catch( err )
     {
+      debugger;
       throw _.err( `Failed to resolve ${o.filePath}\n`, err );
     }
   }
 
   /* */
-
 
   function _statRead()
   {
@@ -1375,7 +1374,6 @@ function pathResolveLinkFull_body( o )
     }
     catch( err )
     {
-      debugger;
       result.relativePath = result.filePath = result.absolutePath = null;
       result.isMissed = true;
       throw _.err( `Failed to resolve ${o.filePath}\n`, err );
@@ -1387,12 +1385,11 @@ function pathResolveLinkFull_body( o )
 
   function _pathResolveLinkFullSync()
   {
-
     _statRead();
     return _resolve();
   }
 
-  /**/
+  /* */
 
   function _pathResolveLinkFullAsync()
   {
@@ -2139,6 +2136,7 @@ operates.filePath = { pathToRead : 1, allowingMissed : 1 }
 function statRead_body( o )
 {
   let self = this;
+  let result;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.routineIs( self.statReadAct ) );
@@ -2154,7 +2152,19 @@ function statRead_body( o )
   	allowingCycled : 0,
   }
 
-  let result = self.pathResolveLinkFull( o2 );
+  try
+  {
+    result = self.pathResolveLinkFull( o2 );
+  }
+  catch( err )
+  {
+    if( !o.throwing )
+    {
+      _.errAttend( err );
+      return null;
+    }
+    throw _.err( err );
+  }
 
   if( o.sync )
   {

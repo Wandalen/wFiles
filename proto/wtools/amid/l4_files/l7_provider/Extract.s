@@ -198,7 +198,7 @@ _.routineExtend( pathResolveSoftLinkAct, Parent.prototype.pathResolveSoftLinkAct
  * @class wFileProviderExtract
  * @namespace wTools.FileProvider
  * @module Tools/mid/Files
-*/
+ */
 
 function pathResolveTextLinkAct( o )
 {
@@ -2903,7 +2903,6 @@ _.classDeclare
 // --
 
 _.FileProvider[ Self.shortName ] = Self;
-
 if( typeof module !== 'undefined' )
 module[ 'exports' ] = Self;
 

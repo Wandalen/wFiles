@@ -6688,7 +6688,7 @@ function _hardLinkDo( c )
       }
     }
 
-    c.options2.context = c;
+    c.options2.context = c; /* qqq : move to linker. make it working for all 5 methods */
 
     return self.hardLinkAct( c.options2 );
   }
@@ -7816,6 +7816,7 @@ let Statics =
 
   SupportsIno : 0,
   SupportsRights : 0,
+  SupportsLinks : 1,
 
 }
 

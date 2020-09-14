@@ -249,7 +249,7 @@ function verify1( args )
   _.assert( args.length === 1, 'Expects single argument' );
   _.assert( _.routineIs( c.linkDo ), 'method', c.actMethodName, 'is not implemented' );
   _.assert( _.objectIs( c.linkDo.defaults ), 'method', c.actMethodName, 'does not have defaults, but should' );
-  _.assertRoutineOptions( c.functor_body, args );
+  _.assertRoutineOptions( c.linkBody, args );
   _.assert( _.boolLike( o.resolvingSrcSoftLink ) || _.numberIs( o.resolvingSrcSoftLink ) );
   _.assert( _.boolLike( o.resolvingSrcTextLink ) || _.numberIs( o.resolvingSrcTextLink ) );
   _.assert( _.boolLike( o.resolvingDstSoftLink ) || _.numberIs( o.resolvingDstSoftLink ) );
@@ -268,6 +268,8 @@ function verify1( args )
   }
 
 }
+
+//
 
 function verify1Async( args )
 {
@@ -863,6 +865,8 @@ function tempRenameRevertSync()
 
 }
 
+//
+
 function tempRenameRevertAsync()
 {
   let c = this;
@@ -980,7 +984,7 @@ function validateSize()
     throw _.err( err );
   }
 
-  if( c.actMethodName === 'softLinkAct' ||  c.actMethodName === 'textLinkAct' || c.actMethodName === 'fileCopyAct' )
+  if( c.actMethodName === 'softLinkAct' ||  c.actMethodName === 'textLinkAct' || c.actMethodName === 'fileCopyAct' ) /* qqq : fix temp workaround */
   {
     let updateStat =  _.strBegins( dstPath, srcPath );
     let filePath = srcStat.filePath;
@@ -1072,7 +1076,7 @@ function contextMake( o )
   let c = Object.create( null );
 
   c.provider = provider;
-  c.functor_body = undefined;
+  c.linkBody = undefined;
 
   if( fop )
   {
@@ -1130,7 +1134,6 @@ function contextMake( o )
     c.con = new _.Consequence().take( null );
   }
 
-
   Object.preventExtensions( c );
 
   return c;
@@ -1175,28 +1178,29 @@ function functor( fop )
   _.assert( onStat2 === null || _.routineIs( onStat2 ) );
   _.assert( onSizeCheck === null || _.routineIs( onSizeCheck ) );
 
-  _.routineExtend( functor_body, onDo )
-  functor_body.defaults = _.mapExtend( null, functor_body.defaults );
-  delete functor_body.defaults.originalSrcPath;
-  delete functor_body.defaults.originalDstPath;
-  delete functor_body.defaults.relativeSrcPath;
-  delete functor_body.defaults.relativeDstPath;
+  _.routineExtend( link_body, onDo )
+  link_body.defaults = _.mapExtend( null, link_body.defaults );
+  delete link_body.defaults.originalSrcPath;
+  delete link_body.defaults.originalDstPath;
+  delete link_body.defaults.relativeSrcPath;
+  delete link_body.defaults.relativeDstPath;
 
-  var having = functor_body.having;
+  var having = link_body.having;
 
   having.driving = 0;
   having.aspect = 'body';
 
-  let linkEntry = _.routineFromPreAndBody( functor_pre, functor_body, entryMethodName );
+  let linkEntry = _.routineFromPreAndBody( functor_pre, link_body, entryMethodName );
 
   var having = linkEntry.having;
   having.aspect = 'entry';
 
   return linkEntry;
 
-  //
+  /* */
 
-  function functor_body( o )
+
+  function link_body( o )
   {
     let self = this;
     let path = self.system ? self.system.path : self.path;
@@ -1205,8 +1209,7 @@ function functor( fop )
     let c = Self.contextMake({ provider : self, options : o, fop });
 
     c.entryMethodName = entryMethodName;
-    c.functor_body = functor_body;
-
+    c.linkBody = link_body;
 
     /* */
 
@@ -1223,7 +1226,7 @@ function functor( fop )
       */
 
       if( _.longIs( o.dstPath ) && c.linkDo.having.hardLinking ) /* qqq : functor cant use fields of c.linkDo! check code */
-      return multiple.call( self, o, functor_body );
+      return multiple.call( self, o, link_body );
       _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
 
       c.pathsLocalize();
@@ -1287,7 +1290,7 @@ function functor( fop )
       {
         if( _.longIs( o.dstPath ) && c.linkDo.having.hardLinking )
         {
-          c.result = multiple.call( self, o, functor_body );
+          c.result = multiple.call( self, o, link_body );
           return true;
         }
         _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
@@ -1381,14 +1384,26 @@ functor.defaults =
 
 }
 
+/*
+
+fileCopy
+fileRename
+softLink
+hardLink
+textLink
+
+*/
+
 // --
 //
 // --
 
 let Proto =
 {
+
   contextMake,
   functor,
+
 }
 
 _.mapExtend( Self, Proto )

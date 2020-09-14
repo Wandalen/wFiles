@@ -1177,10 +1177,10 @@ function rightsWriteAct( o )
 {
   let self = this;
   let nativizedFilePath = self.path.nativize( o.filePath );
-  
-  /* 
+
+  /*
     https://nodejs.org/api/fs.html#fs_file_modes
-    Node caveats: on Windows only the write permission can be changed, and the distinction among the permissions of group, owner or others is not implemented. 
+    Node caveats: on Windows only the write permission can be changed, and the distinction among the permissions of group, owner or others is not implemented.
   */
 
   _.assertRoutineOptions( rightsWriteAct, o );

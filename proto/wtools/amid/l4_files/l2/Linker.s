@@ -1,4 +1,5 @@
-( function _Linker_s_() {
+( function _Linker_s_()
+{
 
 'use strict';
 
@@ -12,20 +13,6 @@ let Self = _.files.linker = _.files.linker || Object.create( null );
 // --
 // linking
 // --
-
-function functor_pre( routine, args )
-{
-  let self = this;
-  // let o = self._preSrcDstPathWithProviderDefaults.apply( self, arguments );
-
-  let o = self._preSrcDstPathWithoutProviderDefaults.apply( self, arguments );
-  self._providerDefaultsApply( o );
-
-  _.mapSupplementNulls( o, routine.defaults );
-  return o;
-}
-
-//
 
 function multiple( o, link )
 {
@@ -1015,7 +1002,6 @@ function validateSize()
   if( !( srcSize == dstSize ) )
   {
     let err = `Failed to ${c.entryMethodName} ${o.dstPath} (${dstSize}) from ${o.srcPath} (${srcSize}). Have different size after ${c.entryMethodName} operation.`;
-    debugger;
     throw _.err( err );
   }
 
@@ -1153,6 +1139,20 @@ contextMake.defaults =
 
 //
 
+function functor_pre( routine, args )
+{
+  let self = this;
+  // let o = self._preSrcDstPathWithProviderDefaults.apply( self, arguments );
+
+  let o = self._preSrcDstPathWithoutProviderDefaults.apply( self, arguments );
+  self._providerDefaultsApply( o );
+
+  _.mapSupplementNulls( o, routine.defaults );
+  return o;
+}
+
+//
+
 function functor( fop )
 {
 
@@ -1230,6 +1230,7 @@ function functor( fop )
       Vova : low priority
       */
 
+      debugger;
       if( _.longIs( o.dstPath ) && c.linkDo.having.hardLinking ) /* qqq : functor cant use fields of c.linkDo! check code */
       return multiple.call( self, o, link_body );
       _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
@@ -1407,6 +1408,44 @@ textLink
 
 let Proto =
 {
+  multiple,
+
+  onIsLink,
+  onStat,
+
+  verify1,
+  verify1Async,
+  verify2,
+  verifyEqualPaths,
+  verify2Async,
+  verifyDstSync,
+  verifyDstAsync,
+
+  pathsLocalizeSync,
+  pathsLocalizeAsync,
+
+  pathResolve,
+  pathResolveAsync,
+
+  linksResolve,
+  linksResolveAsync,
+
+  log,
+
+  tempRenameCan,
+  tempRenameSync,
+  tempRenameAsync,
+  tempRenameMaybe,
+  tempRenameRevertSync,
+  tempRenameRevertAsync,
+
+  tempDelete,
+  tempNameMake,
+
+  validateSize,
+
+  error,
+  end,
 
   contextMake,
   functor,

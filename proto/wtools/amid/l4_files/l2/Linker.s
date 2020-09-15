@@ -1246,6 +1246,7 @@ function functor( fop )
       return c.end();
 
       o2 = c.options2 = _.mapExtend( c.options2, _.mapOnly( o, c.linkDo.defaults ) );
+      o2.context = c.options2.context = c;
 
       try
       {
@@ -1310,6 +1311,7 @@ function functor( fop )
         return c.result;
         /* prepare options map and launch main part */
         o2 = c.options2 = _.mapExtend( c.options2, _.mapOnly( o, c.linkDo.defaults ) );
+        o2.context = c.options2.context = c;
         /* main part */
         return mainPartAsync();
       })

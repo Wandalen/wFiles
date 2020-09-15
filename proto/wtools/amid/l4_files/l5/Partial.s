@@ -6573,6 +6573,8 @@ function _hardLinkVerify1( c )
 
 }
 
+//
+
 function _hardLinkVerify2( c )
 {
   let self = this;
@@ -6609,6 +6611,8 @@ function _hardLinkVerify2( c )
   }
 }
 
+//
+
 function _hardLinkDo( c )
 {
   let self = this;
@@ -6638,6 +6642,7 @@ function _hardLinkDo( c )
         relativeSrcPath : o.relativeSrcPath,
         sync : o.sync,
         type : null,
+        context : c,
       });
     })
   }
@@ -6661,6 +6666,7 @@ function _hardLinkDo( c )
         relativeDstPath : o.relativeDstPath,
         relativeSrcPath : o.relativeSrcPath,
         sync : o.sync,
+        context : c,
       });
     })
   }
@@ -6688,7 +6694,7 @@ function _hardLinkDo( c )
       }
     }
 
-    c.options2.context = c; /* qqq : move to linker. make it working for all 5 methods */
+    // c.options2.context = c; /* aaa : move to linker. make it working for all 5 methods */ /* Dmytro : moved */
 
     return self.hardLinkAct( c.options2 );
   }
@@ -6790,6 +6796,7 @@ defaults.relativeDstPath = null;
 defaults.relativeSrcPath = null;
 defaults.sync = null;
 defaults.type = null;
+defaults.context = null;
 
 var having = softLinkAct.having = Object.create( null );
 having.writing = 1;
@@ -6919,6 +6926,7 @@ defaults.srcPath = null;
 defaults.sync = null;
 defaults.relativeDstPath = null;
 defaults.relativeSrcPath = null;
+defaults.context = null;
 
 var having = textLinkAct.having = Object.create( null );
 having.writing = 1;

@@ -988,7 +988,8 @@ function validateSize()
     throw _.err( err );
   }
 
-  if( c.actMethodName === 'softLinkAct' ||  c.actMethodName === 'textLinkAct' || c.actMethodName === 'fileCopyAct' ) /* qqq : fix temp workaround */
+  // if( c.actMethodName === 'softLinkAct' ||  c.actMethodName === 'textLinkAct' || c.actMethodName === 'fileCopyAct' ) /* aaa : fix temp workaround */ /* Dmytro : added option `linkMaybe`, when functor creates routine it should be 1 for link routines */
+  if( c.linkMaybe )
   {
     let updateStat =  _.strBegins( dstPath, srcPath );
     let filePath = srcStat.filePath;
@@ -1276,7 +1277,6 @@ function functor( fop )
       catch( err )
       {
 
-        debugger;
         c.tempRenameRevert();
         return c.error( _.err( err, '\nCant', c.entryMethodName, o.dstPath, '<-', o.srcPath ) );
 
@@ -1384,6 +1384,7 @@ functor.defaults =
   onStat : null,
   onSizeCheck : null,
 
+  linkMaybe : false,
   renaming : true,
   skippingSamePath : true,
   skippingMissed : false,

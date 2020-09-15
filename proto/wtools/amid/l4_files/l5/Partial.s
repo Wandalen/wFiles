@@ -6765,6 +6765,7 @@ let hardLink = _.files.linker.functor
   onVerify2 : _hardLinkVerify2,
   skippingSamePath : true,
   skippingMissed : false,
+  linkMaybe : true,
   renaming : false
 });
 
@@ -6881,6 +6882,7 @@ let softLink = _.files.linker.functor
   onVerify2 : _softLinkVerify2,
   skippingSamePath : false,
   skippingMissed : false,
+  linkMaybe : true,
 });
 
 var defaults = softLink.body.defaults;
@@ -7017,6 +7019,7 @@ let textLink = _.files.linker.functor
   onStat : _textOnStat,
   skippingSamePath : false,
   skippingMissed : false,
+  linkMaybe : true,
 });
 
 var defaults = textLink.body.defaults;

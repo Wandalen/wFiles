@@ -977,7 +977,7 @@ function validateSize()
 
   if( !c.dstStat )
   {
-    let err = `Faield to ${c.entryMethodName} ${o.dstPath} from ${o.srcPath}. Destination file does not exist.`;
+    let err = `Failed to ${c.entryMethodName} ${o.dstPath} from ${o.srcPath}. Destination file does not exist.`;
     throw _.err( err );
   }
 

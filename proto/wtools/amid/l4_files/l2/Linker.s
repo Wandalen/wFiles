@@ -1005,8 +1005,7 @@ function validateSize()
   let srcSize = srcStat ? srcStat.size : NaN;
   let dstSize = c.dstStat ? c.dstStat.size : NaN;
 
-  // if( !( srcSize == dstSize ) )
-  if( !( srcSize === dstSize ) )
+  if( !( srcSize == dstSize ) ) /* Dmytro : does this condition are valid? I found mistake in MacOS if === is used. */
   {
     let err =
     `Failed to ${c.entryMethodName} ${o.dstPath} (${dstSize}) from ${o.srcPath} (${srcSize}). `
@@ -1239,7 +1238,6 @@ function functor( fop )
       Vova : low priority
       */
 
-      debugger;
       if( _.longIs( o.dstPath ) && c.linkDo.having.hardLinking ) /* qqq : functor cant use fields of c.linkDo! check code */
       return multiple.call( self, o, link_body );
       _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );

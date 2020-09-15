@@ -33705,7 +33705,7 @@ function hardLinkSoftLinkResolving( test )
       sync : 1,
       rewriting : 1
     }
-    _.mapSupplement( o, o2 )
+    _.mapSupplement( o, o2 );
     return provider.hardLink( o );
   }
 

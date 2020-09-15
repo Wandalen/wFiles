@@ -32,8 +32,8 @@ function multiple( o, link )
   let records = factory.records( o.dstPath );
   // Vova : should allow missing files?
   // Kos : test routine?
-  let newestRecord;
-  let mostLinkedRecord;
+  let newestRecord,
+    mostLinkedRecord;
 
   if( o.srcPath )
   {
@@ -81,6 +81,8 @@ function multiple( o, link )
 
   /* */
 
+  let result = { err : undefined, got : true };
+
   if( o.sync )
   {
     for( let p = 0 ; p < records.length ; p++ )
@@ -93,23 +95,9 @@ function multiple( o, link )
   else
   {
     let cons = [];
-    let result = { err : undefined, got : true };
+    // let result = { err : undefined, got : true };
     let throwing = o.throwing;
     o.throwing = 1;
-
-    function handler( err, got )
-    {
-      if( !err )
-      {
-        result.got &= got;
-      }
-      else
-      {
-        _.errAttend( err );
-        if( !_.definedIs( result.err ) )
-        result.err = err;
-      }
-    }
 
     for( let p = 0 ; p < records.length ; p++ )
     cons.push( onRecord( records[ p ] ).tap( handler ) );
@@ -140,6 +128,22 @@ function multiple( o, link )
     throw err;
     else
     return new _.Consequence().error( err );
+  }
+
+  /* */
+
+  function handler( err, got )
+  {
+    if( !err )
+    {
+      result.got &= got;
+    }
+    else
+    {
+      _.errAttend( err );
+      if( !_.definedIs( result.err ) )
+      result.err = err;
+    }
   }
 
   /* */
@@ -176,7 +180,7 @@ function multiple( o, link )
     //   }
     // }
 
-    if( !record.stat || !_.files.stat.areHardLinked( mostLinkedRecord.stat , record.stat ) )
+    if( !record.stat || !_.files.stat.areHardLinked( mostLinkedRecord.stat, record.stat ) )
     {
       let linkOptions = _.mapExtend( null, o );
       linkOptions.allowingMissed = 0; // Vova : hardLink does not allow missing srcPath
@@ -218,7 +222,7 @@ function onStat( filePath, resolving )
 
   return self.statRead
   ({
-    filePath : filePath,
+    filePath,
     throwing : 0,
     resolvingSoftLink : resolving,
     resolvingTextLink : 0,
@@ -835,22 +839,24 @@ function tempRenameRevertSync()
   let self = this.provider;
   let o = c.options;
 
-  if( c.tempPath ) try
+  if( c.tempPath )
   {
-    self.fileRenameAct
-    ({
-      dstPath : o.dstPath,
-      srcPath : c.tempPath,
-      relativeDstPath : o.dstPath,
-      relativeSrcPath : c.tempPath,
-      sync : 1,
-      context : c,
-    });
-  }
-  catch( err2 )
-  {
-    debugger;
-    console.error( err2 );
+    try
+    {
+      self.fileRenameAct
+      ({
+        dstPath : o.dstPath,
+        srcPath : c.tempPath,
+        relativeDstPath : o.dstPath,
+        relativeSrcPath : c.tempPath,
+        sync : 1,
+        context : c,
+      });
+    }
+    catch( err2 )
+    {
+      console.error( err2 );
+    }
   }
 
 }
@@ -999,9 +1005,12 @@ function validateSize()
   let srcSize = srcStat ? srcStat.size : NaN;
   let dstSize = c.dstStat ? c.dstStat.size : NaN;
 
-  if( !( srcSize == dstSize ) )
+  // if( !( srcSize == dstSize ) )
+  if( !( srcSize === dstSize ) )
   {
-    let err = `Failed to ${c.entryMethodName} ${o.dstPath} (${dstSize}) from ${o.srcPath} (${srcSize}). Have different size after ${c.entryMethodName} operation.`;
+    let err =
+    `Failed to ${c.entryMethodName} ${o.dstPath} (${dstSize}) from ${o.srcPath} (${srcSize}). `
+    + `Have different size after ${c.entryMethodName} operation.`;
     throw _.err( err );
   }
 
@@ -1335,7 +1344,7 @@ function functor( fop )
       {
         if( dstExists )
         {
-          return c.verifyDst().then( () => tempRenameAsync.call( c ) )
+          return c.verifyDst().then( () => tempRenameAsync.call( c ) );
         }
         else if( o.makingDirectory )
         {

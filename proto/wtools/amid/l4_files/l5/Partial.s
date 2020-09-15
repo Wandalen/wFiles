@@ -6542,7 +6542,7 @@ var having = hardLinkAct.having = Object.create( null );
 having.writing = 1;
 having.reading = 0;
 having.driving = 1;
-having.hardLinking = 1;
+// having.hardLinking = 1;
 
 var operates = hardLinkAct.operates = Object.create( null );
 operates.dstPath = { pathToWrite : 1 }
@@ -6784,7 +6784,8 @@ let hardLink = _.files.linker.functor
   skippingSamePath : true,
   skippingMissed : false,
   linkMaybe : true,
-  renaming : false
+  hardLinking : true,
+  renaming : false,
 });
 
 var defaults = hardLink.body.defaults;

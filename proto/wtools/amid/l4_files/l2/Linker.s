@@ -1005,7 +1005,8 @@ function validateSize()
   let srcSize = srcStat ? srcStat.size : NaN;
   let dstSize = c.dstStat ? c.dstStat.size : NaN;
 
-  if( !( srcSize == dstSize ) ) /* Dmytro : does this condition are valid? I found mistake in MacOS if === is used. */
+  // if( !( srcSize == dstSize ) )
+  if( !( srcSize === dstSize ) )
   {
     let err =
     `Failed to ${c.entryMethodName} ${o.dstPath} (${dstSize}) from ${o.srcPath} (${srcSize}). `
@@ -1127,6 +1128,7 @@ function contextMake( o )
   c.validateSize = validateSize;
   c.error = error;
   c.end = end;
+  c.linkMaybe = fop.linkMaybe;
 
   if( !options.sync )
   {
@@ -1182,6 +1184,7 @@ function functor( fop )
   let renaming = fop.renaming;
   let skippingSamePath = fop.skippingSamePath;
   let skippingMissed = fop.skippingMissed;
+  let hardLinking = fop.hardLinking;
 
   _.assert( _.routineIs( onDo ) );
   _.assert( _.objectIs( onDo.defaults ) );
@@ -1238,7 +1241,8 @@ function functor( fop )
       Vova : low priority
       */
 
-      if( _.longIs( o.dstPath ) && c.linkDo.having.hardLinking ) /* qqq : functor cant use fields of c.linkDo! check code */
+      // if( _.longIs( o.dstPath ) && c.linkDo.having.hardLinking ) /* aaa : functor cant use fields of c.linkDo! check code */
+      if( _.longIs( o.dstPath ) && hardLinking )
       return multiple.call( self, o, link_body );
       _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
 
@@ -1301,7 +1305,8 @@ function functor( fop )
 
       c.con.then( () =>
       {
-        if( _.longIs( o.dstPath ) && c.linkDo.having.hardLinking )
+        // if( _.longIs( o.dstPath ) && c.linkDo.having.hardLinking )
+        if( _.longIs( o.dstPath ) && hardLinking )
         {
           c.result = multiple.call( self, o, link_body );
           return true;
@@ -1393,6 +1398,7 @@ functor.defaults =
   onSizeCheck : null,
 
   linkMaybe : false,
+  hardLinking : false,
   renaming : true,
   skippingSamePath : true,
   skippingMissed : false,

@@ -2447,7 +2447,7 @@ function fileSize_body( o )
   _.sure( _.objectIs( stat ) );
 
   if( stat.isDir() )
-  return 0;
+  return self.UsingBigIntForStat ? 0n : 0;
 
   return stat.size;
 }

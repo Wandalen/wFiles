@@ -961,7 +961,6 @@ function validateSize()
   if( !srcStat )
   {
     let err = `Failed to ${c.entryMethodName} ${o.dstPath} from ${o.srcPath}. Source file does not exist.`;
-    debugger;
     throw _.err( err );
   }
 
@@ -1005,8 +1004,7 @@ function validateSize()
   let srcSize = srcStat ? srcStat.size : NaN;
   let dstSize = c.dstStat ? c.dstStat.size : NaN;
 
-  // if( !( srcSize == dstSize ) )
-  if( !( srcSize === dstSize ) )
+  if( !( srcSize == dstSize ) )
   {
     let err =
     `Failed to ${c.entryMethodName} ${o.dstPath} (${dstSize}) from ${o.srcPath} (${srcSize}). `

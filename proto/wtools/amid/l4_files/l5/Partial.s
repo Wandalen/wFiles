@@ -6485,6 +6485,7 @@ let fileCopy = _.files.linker.functor
   onSizeCheck : _fileCopySizeCheck,
   skippingSamePath : true,
   skippingMissed : false,
+  linkMaybe : true,
 });
 
 var defaults = fileCopy.body.defaults;
@@ -6783,7 +6784,6 @@ let hardLink = _.files.linker.functor
   onVerify2 : _hardLinkVerify2,
   skippingSamePath : true,
   skippingMissed : false,
-  linkMaybe : true,
   hardLinking : true,
   renaming : false,
 });

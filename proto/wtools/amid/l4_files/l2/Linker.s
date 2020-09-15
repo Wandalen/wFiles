@@ -783,6 +783,7 @@ function tempRenameSync()
     relativeDstPath : c.tempPath,
     relativeSrcPath : o.dstPath,
     sync : 1,
+    context : c,
   });
   return true;
 }
@@ -818,6 +819,7 @@ function tempRenameAsync()
       relativeDstPath : c.tempPath,
       relativeSrcPath : o.dstPath,
       sync : 0,
+      context : c,
     });
   })
 }
@@ -855,6 +857,7 @@ function tempRenameRevertSync()
       relativeDstPath : o.dstPath,
       relativeSrcPath : c.tempPath,
       sync : 1,
+      context : c,
     });
   }
   catch( err2 )
@@ -883,6 +886,7 @@ function tempRenameRevertAsync()
     relativeDstPath : o.dstPath,
     relativeSrcPath : c.tempPath,
     sync : 0,
+    context : c,
   })
   .finally( ( err2, got ) =>
   {

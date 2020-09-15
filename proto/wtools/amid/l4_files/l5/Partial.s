@@ -5879,6 +5879,7 @@ defaults.srcPath = null;
 defaults.relativeDstPath = null;
 defaults.relativeSrcPath = null;
 defaults.sync = null;
+defaults.context = null;
 
 var having = fileRenameAct.having = Object.create( null );
 having.writing = 1;
@@ -6071,6 +6072,7 @@ function _fileRenameDo( c )
           relativeSrcPath : o.relativeSrcPath,
           sync : o.sync,
           type : null,
+          context : c,
         });
       }
       return o.sync ? true : result;
@@ -6146,6 +6148,7 @@ function _fileRenameDo( c )
           relativeDstPath : o.relativeDstPath,
           relativeSrcPath : o.relativeSrcPath,
           sync : o.sync,
+          context : c,
         });
       }
       return o.sync ? true : result;
@@ -6236,6 +6239,7 @@ defaults.relativeDstPath = null;
 defaults.relativeSrcPath = null;
 // defaults.breakingDstHardLink = 0; /* qqq2 : remove the option from Act method? aaa:done */
 defaults.sync = null;
+defaults.context = null;
 
 var having = fileCopyAct.having = Object.create( null );
 having.writing = 1;
@@ -6375,6 +6379,7 @@ function _fileCopyDo( c )
       relativeSrcPath : o.relativeSrcPath,
       sync : o.sync,
       type : null,
+      context : c,
     });
   }
   else if( c.srcStat.isTextLink() )
@@ -6395,6 +6400,7 @@ function _fileCopyDo( c )
       relativeDstPath : o.relativeDstPath,
       relativeSrcPath : o.relativeSrcPath,
       sync : o.sync,
+      context : c,
     });
 
   }
@@ -6442,6 +6448,7 @@ function _fileCopyDo( c )
         relativeDstPath : o.relativeDstPath,
         relativeSrcPath : o.relativeSrcPath,
         sync : o.sync,
+        context : c,
       });
       return o.sync ? true : result;
     })

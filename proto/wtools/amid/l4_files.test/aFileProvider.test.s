@@ -4368,6 +4368,7 @@ function fileCopyActSync( test )
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
     sync : 1,
+    context : provider,
     // breakingDstHardLink : 0,
     // breakingDstSoftLink : 0
   });
@@ -4391,6 +4392,7 @@ function fileCopyActSync( test )
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
     sync : 1,
+    context : provider,
     // breakingDstHardLink : 1,
     // breakingDstSoftLink : 0
   });
@@ -4414,6 +4416,7 @@ function fileCopyActSync( test )
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
     sync : 1,
+    context : provider,
     // breakingDstHardLink : 0,
     // breakingDstSoftLink : 1
   });
@@ -4437,6 +4440,7 @@ function fileCopyActSync( test )
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
     sync : 1,
+    context : provider,
     // breakingDstHardLink : 1,
     // breakingDstSoftLink : 1
   });
@@ -4461,6 +4465,7 @@ function fileCopyActSync( test )
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
     sync : 1,
+    context : provider,
     // breakingDstHardLink : 0,
     // breakingDstSoftLink : 0
   });
@@ -4485,6 +4490,7 @@ function fileCopyActSync( test )
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
     sync : 1,
+    context : provider,
     // breakingDstHardLink : 1,
     // breakingDstSoftLink : 0
   });
@@ -4509,6 +4515,7 @@ function fileCopyActSync( test )
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
     sync : 1,
+    context : provider,
     // breakingDstHardLink : 0,
     // breakingDstSoftLink : 1
   });
@@ -4533,6 +4540,7 @@ function fileCopyActSync( test )
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
     sync : 1,
+    context : provider,
     // breakingDstHardLink : 1,
     // breakingDstSoftLink : 1
   });
@@ -4563,6 +4571,7 @@ function fileCopyActSync( test )
     relativeSrcPath : otherPath,
     relativeDstPath : dstPath,
     sync : 1,
+    context : provider,
     // breakingDstSoftLink : 0,
     // breakingDstHardLink : 0
   });
@@ -4592,6 +4601,7 @@ function fileCopyActSync( test )
     relativeSrcPath : otherPath,
     relativeDstPath : dstPath,
     sync : 1,
+    context : provider,
     // breakingDstSoftLink : 1,
     // breakingDstHardLink : 0
   });
@@ -4683,6 +4693,7 @@ function fileCopyActSync( test )
     relativeSrcPath : otherPath,
     relativeDstPath : dstPath,
     sync : 1,
+    context : provider,
     // breakingDstSoftLink : 0,
     // breakingDstHardLink : 0
   });
@@ -4712,6 +4723,7 @@ function fileCopyActSync( test )
     relativeSrcPath : otherPath,
     relativeDstPath : dstPath,
     sync : 1,
+    context : provider,
     // breakingDstSoftLink : 1,
     // breakingDstHardLink : 0
   });
@@ -4741,6 +4753,7 @@ function fileCopyActSync( test )
     relativeSrcPath : otherPath,
     relativeDstPath : dstPath,
     sync : 1,
+    context : provider,
     // breakingDstSoftLink : 1,
     // breakingDstHardLink : 1
   });
@@ -4770,7 +4783,8 @@ function fileCopyActSync( test )
     relativeDstPath : dstPath,
     // breakingSrcHardLink : 0,
     // breakingDstHardLink : 1,
-    sync : 1
+    sync : 1,
+    context : provider,
   }
   test.shouldThrowErrorOfAnyKind( () =>
   {
@@ -4793,7 +4807,8 @@ function fileCopyActSync( test )
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
     // breakingDstHardLink : 0,
-    sync : 1
+    sync : 1,
+    context : provider,
   }
   var expected = _.mapOwnKeys( o );
   provider.fileCopyAct( o );
@@ -4818,7 +4833,8 @@ function fileCopyActSync( test )
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
     // breakingDstHardLink : 0,
-    sync : 1
+    sync : 1,
+    context : provider,
   }
 
   var expected = _.mapExtend( null, o );
@@ -4849,6 +4865,7 @@ function fileCopyActSync( test )
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
       sync : 1,
+      context : provider,
       breakingDstHardLink : 0
     });
   })
@@ -4865,6 +4882,7 @@ function fileCopyActSync( test )
   {
     srcPath,
     dstPath,
+    context : provider,
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
     breakingDstHardLink : 0
@@ -4883,6 +4901,7 @@ function fileCopyActSync( test )
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
     sync : 1,
+    context : provider,
     redundant : 'redundant'
   }
   test.shouldThrowErrorOfAnyKind( () =>
@@ -4902,7 +4921,8 @@ function fileCopyActSync( test )
     dstPath,
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
-    sync : 1
+    sync : 1,
+    context : provider,
   }
 
   if( !context.providerIsInstanceOf( _.FileProvider.System ) )
@@ -4922,7 +4942,8 @@ function fileCopyActSync( test )
     dstPath,
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
-    sync : 1
+    sync : 1,
+    context : provider,
   }
   var expected = _.mapExtend( null, o );
   test.shouldThrowErrorOfAnyKind( () =>
@@ -4966,7 +4987,8 @@ function fileCopyActAsync( test )
       dstPath : dstPath,
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
-      sync : 0
+      sync : 0,
+      context : provider,
     }
     return provider.fileCopyAct( o )
     .then( () =>
@@ -12664,6 +12686,7 @@ function fileRenameActSync( test )
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
     sync : 1,
+    context : provider,
   })
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'dst' ] )
@@ -12684,6 +12707,7 @@ function fileRenameActSync( test )
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
       sync : 1,
+      context : provider,
     })
   })
   var files = provider.dirRead( routinePath );
@@ -12706,6 +12730,7 @@ function fileRenameActSync( test )
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
       sync : 1,
+      context : provider,
     })
   })
   var files = provider.dirRead( routinePath );
@@ -12726,6 +12751,7 @@ function fileRenameActSync( test )
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
     sync : 1,
+    context : provider,
   });
   var files = provider.dirRead( routinePath );
   var expected = [ 'dst' ];
@@ -12750,6 +12776,7 @@ function fileRenameActSync( test )
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
       sync : 1,
+      context : provider,
     });
     var files = provider.dirRead( routinePath );
     var expected = [ 'dst' ];
@@ -12768,6 +12795,7 @@ function fileRenameActSync( test )
         relativeSrcPath : srcPath,
         relativeDstPath : dstPath,
         sync : 1,
+        context : provider,
       });
     })
     var files = provider.dirRead( routinePath );
@@ -12798,7 +12826,8 @@ function fileRenameActSync( test )
     dstPath,
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
-    sync : 1
+    sync : 1,
+    context : provider,
   }
   test.shouldThrowErrorOfAnyKind( () =>
   {
@@ -12820,7 +12849,8 @@ function fileRenameActSync( test )
     dstPath,
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
-    sync : 1
+    sync : 1,
+    context : provider,
   }
   var expected = _.mapOwnKeys( o );
   provider.fileRenameAct( o );
@@ -12844,7 +12874,8 @@ function fileRenameActSync( test )
     dstPath,
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
-    sync : 1
+    sync : 1,
+    context : provider,
   }
 
   var expected = _.mapExtend( null, o );
@@ -12870,7 +12901,8 @@ function fileRenameActSync( test )
     dstPath : dstPath2,
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath2,
-    sync : 1
+    sync : 1,
+    context : provider,
   }
   test.shouldThrowErrorSync( () => provider.fileRenameAct( o ) );
   test.is( provider.isTerminal( srcPath ) );
@@ -12894,6 +12926,7 @@ function fileRenameActSync( test )
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
       sync : 1,
+      context : provider,
     });
   })
 
@@ -12911,6 +12944,7 @@ function fileRenameActSync( test )
     dstPath,
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
+    context : provider,
   }
   test.shouldThrowErrorOfAnyKind( () =>
   {
@@ -12926,6 +12960,7 @@ function fileRenameActSync( test )
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
     sync : 1,
+    context : provider,
     redundant : 'redundant'
   }
   test.shouldThrowErrorOfAnyKind( () =>
@@ -12945,7 +12980,8 @@ function fileRenameActSync( test )
     dstPath,
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
-    sync : 1
+    sync : 1,
+    context : provider,
   }
   if( !context.providerIsInstanceOf( _.FileProvider.System ) )
   test.shouldThrowErrorOfAnyKind( () => provider.fileRenameAct( o ) );
@@ -12964,7 +13000,8 @@ function fileRenameActSync( test )
     dstPath,
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
-    sync : 1
+    sync : 1,
+    context : provider,
   }
   var expected = _.mapExtend( null, o );
   test.shouldThrowErrorOfAnyKind( () =>
@@ -24765,7 +24802,8 @@ function softLinkActSync( test )
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
     type : null,
-    sync : 1
+    sync : 1,
+    context : provider,
   }
   var expected = _.mapOwnKeys( o );
   provider.softLinkAct( o );
@@ -24789,7 +24827,8 @@ function softLinkActSync( test )
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
     type : null,
-    sync : 1
+    sync : 1,
+    context : provider,
   }
   var expected = _.mapOwnKeys( o );
   provider.softLinkAct( o );
@@ -24814,7 +24853,8 @@ function softLinkActSync( test )
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
     type : null,
-    sync : 1
+    sync : 1,
+    context : provider,
   }
   var expected = _.mapOwnKeys( o );
   provider.softLinkAct( o );
@@ -24839,7 +24879,8 @@ function softLinkActSync( test )
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
     type : null,
-    sync : 1
+    sync : 1,
+    context : provider,
   }
   provider.softLinkAct( o );
   test.is( provider.isSoftLink( dstPath ) );
@@ -24864,13 +24905,13 @@ function softLinkActSync( test )
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
     type : null,
-    sync : 1
+    sync : 1,
+    context : provider,
   }
   provider.softLinkAct( o );
   test.is( provider.isSoftLink( dstPath ) );
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, srcPath );
-  debugger
   provider.fileWrite( dstPath, dstPath );
   var srcFile = provider.fileRead( srcPath );
   test.identical( srcFile, dstPath );
@@ -24892,7 +24933,8 @@ function softLinkActSync( test )
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
     type : null,
-    sync : 1
+    sync : 1,
+    context : provider,
   }
   test.shouldThrowErrorOfAnyKind( () =>
   {
@@ -24916,7 +24958,8 @@ function softLinkActSync( test )
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
     type : null,
-    sync : 1
+    sync : 1,
+    context : provider,
   }
   test.shouldThrowErrorOfAnyKind( () =>
   {
@@ -24949,7 +24992,8 @@ function softLinkActSync( test )
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
     type : null,
-    sync : 1
+    sync : 1,
+    context : provider,
   }
   test.shouldThrowErrorOfAnyKind( () =>
   {
@@ -24978,7 +25022,8 @@ function softLinkActSync( test )
     relativeDstPath : dstPath,
     breakingSrcHardLink : 0,
     breakingDstHardLink : 1,
-    sync : 1
+    sync : 1,
+    context : provider,
   }
   test.shouldThrowErrorOfAnyKind( () =>
   {
@@ -25000,7 +25045,8 @@ function softLinkActSync( test )
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
     type : null,
-    sync : 1
+    sync : 1,
+    context : provider,
   }
 
   var expected = _.mapExtend( null, o );
@@ -25030,7 +25076,8 @@ function softLinkActSync( test )
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
     type : null,
-    sync : 1
+    sync : 1,
+    context : provider,
   }
   var expected = _.mapOwnKeys( o );
   if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
@@ -25054,7 +25101,8 @@ function softLinkActSync( test )
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
     type : null,
-    sync : 1
+    sync : 1,
+    context : provider,
   }
   test.shouldThrowErrorSync( () => provider.softLinkAct( o ) );
   test.will = 'parent directory of dstPath must not be created';
@@ -25074,7 +25122,8 @@ function softLinkActSync( test )
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath2,
     type : null,
-    sync : 1
+    sync : 1,
+    context : provider,
   }
   test.shouldThrowErrorSync( () => provider.softLinkAct( o ) );
   test.is( provider.isTerminal( srcPath ) );
@@ -25100,7 +25149,8 @@ function softLinkActSync( test )
       relativeSrcPath : srcPath,
       relativeDstPath : dstPath,
       type : null,
-      sync : 1
+      sync : 1,
+      context : provider,
     });
   })
 
@@ -25118,7 +25168,8 @@ function softLinkActSync( test )
     dstPath,
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
-    type : null
+    type : null,
+    context : provider,
   }
   test.shouldThrowErrorOfAnyKind( () =>
   {
@@ -25135,6 +25186,7 @@ function softLinkActSync( test )
     relativeDstPath : dstPath,
     type : null,
     sync : 1,
+    context : provider,
     redundant : 'redundant'
   }
   test.shouldThrowErrorOfAnyKind( () =>
@@ -25155,7 +25207,8 @@ function softLinkActSync( test )
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
     type : null,
-    sync : 1
+    sync : 1,
+    context : provider,
   }
   var originalPath = provider.path.preferredFromGlobal( o.srcPath );
   o.srcPath = provider.path.nativize( o.srcPath );
@@ -25192,7 +25245,8 @@ function softLinkActSync( test )
     relativeSrcPath : srcPath,
     relativeDstPath : dstPath,
     type : null,
-    sync : 1
+    sync : 1,
+    context : provider,
   }
   var expected = _.mapExtend( null, o );
   test.shouldThrowErrorOfAnyKind( () =>

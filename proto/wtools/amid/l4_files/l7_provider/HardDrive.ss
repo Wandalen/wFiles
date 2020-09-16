@@ -1,4 +1,5 @@
-( function _HardDrive_ss_() {
+( function _HardDrive_ss_()
+{
 
 'use strict';
 
@@ -99,7 +100,7 @@ function _isTextLink( filePath )
 
   let stat = self.statReadAct
   ({
-    filePath : filePath,
+    filePath,
     throwing : 0,
     sync : 1,
     resolvingSoftLink : 0,
@@ -109,7 +110,7 @@ function _isTextLink( filePath )
   {
     let read = self.fileReadAct
     ({
-      filePath : filePath,
+      filePath,
       sync : 1,
       encoding : 'utf8',
       advanced : null,
@@ -460,7 +461,7 @@ function pathDirTempAct()
 function pathDirUserHomeAct()
 {
   _.assert( arguments.length === 0, 'Expects single argument' );
-  let result = process.env[ ( process.platform == 'win32' ) ? 'USERPROFILE' : 'HOME' ] || __dirname;
+  let result = process.env[ ( process.platform === 'win32' ) ? 'USERPROFILE' : 'HOME' ] || __dirname;
   _.assert( _.strIs( result ) );
   result = _.path.normalize( result );
   return result;
@@ -479,7 +480,7 @@ function pathAllowedAct( filePath )
   filePath = self.path.unescape( filePath );
 
   if( process.platform === 'win32' )
-  return !_.strHasAny( filePath, [ '<','>', ':', '"', '\\', '|', '?', '*' ] );
+  return !_.strHasAny( filePath, [ '<', '>', ':', '"', '\\', '|', '?', '*' ] );
 
   if( process.platform === 'darwin' )
   return !_.strHasAny( filePath, [ ':' ] );
@@ -554,7 +555,7 @@ function fileReadAct( o )
   {
 
     if( encoder && encoder.onBegin )
-    encoder.onBegin.call( self, { transaction : o, encoder : encoder })
+    encoder.onBegin.call( self, { transaction : o, encoder })
 
   }
 
@@ -564,7 +565,7 @@ function fileReadAct( o )
   {
 
     if( encoder && encoder.onEnd )
-    data = encoder.onEnd.call( self, { data : data, transaction : o, encoder : encoder })
+    data = encoder.onEnd.call( self, { data, transaction : o, encoder })
 
     if( o.sync )
     return data;
@@ -590,7 +591,7 @@ function fileReadAct( o )
     try
     {
       debugger;
-      err = encoder.onError.call( self, { error : err, transaction : o, encoder : encoder })
+      err = encoder.onError.call( self, { error : err, transaction : o, encoder })
     }
     catch( err2 )
     {
@@ -645,7 +646,7 @@ function streamReadAct( o )
   {
 
     if( encoder && encoder.onBegin )
-    encoder.onBegin.call( self, { transaction : o, encoder : encoder })
+    encoder.onBegin.call( self, { transaction : o, encoder });
 
   }
 
@@ -677,7 +678,7 @@ function streamReadAct( o )
     try
     {
       debugger;
-      err = encoder.onError.call( self, { error : err, transaction : o, encoder : encoder })
+      err = encoder.onError.call( self, { error : err, transaction : o, encoder });
     }
     catch( err2 )
     {
@@ -727,7 +728,7 @@ function dirReadAct( o )
         result = self.path.name({ path : o.filePath, full : 1 });
       }
     }
-    catch ( err )
+    catch( err )
     {
       throw _.err( err );
       result = null;
@@ -827,35 +828,35 @@ function statReadAct( o )
 
     return result;
   }
+
+  /* */
+
+  let con = new _.Consequence();
+
+  args.push( handleAsyncEnd );
+
+  if( o.resolvingSoftLink )
+  StandardFile.stat.apply( StandardFile, args );
   else
+  StandardFile.lstat.apply( StandardFile, args );
+
+  return con;
+
+  /* */
+
+  function handleAsyncEnd( err, stat )
   {
-    let con = new _.Consequence();
-
-    args.push( handleAsyncEnd );
-
-    if( o.resolvingSoftLink )
-    StandardFile.stat.apply( StandardFile, args );
-    else
-    StandardFile.lstat.apply( StandardFile, args );
-
-    return con;
-
-    /* */
-
-    function handleAsyncEnd( err, stat )
+    if( err )
     {
-      if( err )
-      {
-        if( o.throwing )
-        con.error( _.err( err ) );
-        else
-        con.take( null );
-      }
+      if( o.throwing )
+      con.error( _.err( err ) );
       else
-      {
-        handleEnd( stat );
-        con.take( stat );
-      }
+      con.take( null );
+    }
+    else
+    {
+      handleEnd( stat );
+      con.take( stat );
     }
   }
 
@@ -942,7 +943,7 @@ function fileExistsAct( o )
         aaa : possible solution is to use faccessat, it accepts flag that disables resolving of the soft links.
         But we need to implement own c++ addon for faccessat. https://linux.die.net/man/2/faccessat.
       */
-      if( process.platform != 'win32' )
+      if( process.platform !== 'win32' )
       return !!self.statReadAct({ filePath : o.filePath, sync : 1, throwing : 0, resolvingSoftLink : 0 });
 
       return false;
@@ -1036,7 +1037,7 @@ function fileWriteAct( o )
   let encoder = fileWriteAct.encoders[ o.encoding ];
 
   if( encoder && encoder.onBegin )
-  _.sure( encoder.onBegin.call( self, { operation : o, encoder : encoder, data : o.data } ) === undefined );
+  _.sure( encoder.onBegin.call( self, { operation : o, encoder, data : o.data } ) === undefined );
 
   /* data conversion */
 
@@ -1045,66 +1046,91 @@ function fileWriteAct( o )
 
   // /* qqq : is it possible to do it without conversion from raw buffer? */
 
-  _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ) || _.bufferBytesIs( o.data ), 'Expects string or node buffer, but got', _.strType( o.data ) );
+  _.assert
+  (
+    _.strIs( o.data ) || _.bufferNodeIs( o.data ) || _.bufferBytesIs( o.data ),
+    'Expects string or node buffer, but got', _.strType( o.data )
+  );
 
   let nativizedFilePath = self.path.nativize( o.filePath );
 
-  _.assert( self._pathHasDriveLetter( nativizedFilePath ), `Expects path that begins with drive letter, but got:"${o.filePath}"` );
+  _.assert
+  (
+    self._pathHasDriveLetter( nativizedFilePath ),
+    `Expects path that begins with drive letter, but got:"${o.filePath}"`
+  );
 
   /* write */
 
   if( o.sync )
   {
 
-      if( o.writeMode === 'rewrite' )
-      File.writeFileSync( nativizedFilePath, o.data, { encoding : self._encodingFor( o.encoding ) } );
-      else if( o.writeMode === 'append' )
-      File.appendFileSync( nativizedFilePath, o.data, { encoding : self._encodingFor( o.encoding ) } );
-      else if( o.writeMode === 'prepend' )
-      {
-        if( self.fileExistsAct({ filePath : o.filePath, sync : 1 }) )
-        {
-          let data = File.readFileSync( nativizedFilePath, { encoding : undefined } );
-          o.data = _.bufferJoin( _.bufferNodeFrom( o.data ), data );
-        }
-        File.writeFileSync( nativizedFilePath, o.data, { encoding : self._encodingFor( o.encoding ) } );
-      }
-      else throw _.err( 'Not implemented write mode', o.writeMode );
-
-  }
-  else
-  {
-    let con = _.Consequence();
-
-    function handleEnd( err )
-    {
-      if( err )
-      return con.error(  _.err( err ) );
-      return con.take( o );
-    }
-
     if( o.writeMode === 'rewrite' )
-    File.writeFile( nativizedFilePath, o.data, { encoding : self._encodingFor( o.encoding ) }, handleEnd );
+    {
+      File.writeFileSync( nativizedFilePath, o.data, { encoding : self._encodingFor( o.encoding ) } );
+    }
     else if( o.writeMode === 'append' )
-    File.appendFile( nativizedFilePath, o.data, { encoding : self._encodingFor( o.encoding ) }, handleEnd );
+    {
+      File.appendFileSync( nativizedFilePath, o.data, { encoding : self._encodingFor( o.encoding ) } );
+    }
     else if( o.writeMode === 'prepend' )
     {
       if( self.fileExistsAct({ filePath : o.filePath, sync : 1 }) )
-      File.readFile( nativizedFilePath, { encoding : undefined }, function( err, data )
       {
-        if( err )
-        return handleEnd( err );
+        let data = File.readFileSync( nativizedFilePath, { encoding : undefined } );
         o.data = _.bufferJoin( _.bufferNodeFrom( o.data ), data );
-        File.writeFile( nativizedFilePath, o.data, { encoding : self._encodingFor( o.encoding ) }, handleEnd );
-      });
-      else
-      {
-        File.writeFile( nativizedFilePath, o.data, { encoding : self._encodingFor( o.encoding ) }, handleEnd );
       }
+      File.writeFileSync( nativizedFilePath, o.data, { encoding : self._encodingFor( o.encoding ) } );
     }
-    else handleEnd( _.err( 'Not implemented write mode', o.writeMode ) );
+    else
+    {
+      throw _.err( 'Not implemented write mode', o.writeMode );
+    }
+    return;
 
-    return con;
+  }
+
+  /* */
+
+  let con = _.Consequence();
+
+  if( o.writeMode === 'rewrite' )
+  {
+    File.writeFile( nativizedFilePath, o.data, { encoding : self._encodingFor( o.encoding ) }, handleEnd );
+  }
+  else if( o.writeMode === 'append' )
+  {
+    File.appendFile( nativizedFilePath, o.data, { encoding : self._encodingFor( o.encoding ) }, handleEnd );
+  }
+  else if( o.writeMode === 'prepend' )
+  {
+    if( self.fileExistsAct({ filePath : o.filePath, sync : 1 }) )
+    File.readFile( nativizedFilePath, { encoding : undefined }, function( err, data )
+    {
+      if( err )
+      return handleEnd( err );
+      o.data = _.bufferJoin( _.bufferNodeFrom( o.data ), data );
+      File.writeFile( nativizedFilePath, o.data, { encoding : self._encodingFor( o.encoding ) }, handleEnd );
+    });
+    else
+    {
+      File.writeFile( nativizedFilePath, o.data, { encoding : self._encodingFor( o.encoding ) }, handleEnd );
+    }
+  }
+  else
+  {
+    handleEnd( _.err( 'Not implemented write mode', o.writeMode ) );
+  }
+
+  return con;
+
+  /* */
+
+  function handleEnd( err )
+  {
+    if( err )
+    return con.error(  _.err( err ) );
+    return con.take( o );
   }
 
 }
@@ -1153,7 +1179,11 @@ function timeWriteAct( o )
 
   let nativizedFilePath = self.path.nativize( o.filePath );
 
-  _.assert( self._pathHasDriveLetter( nativizedFilePath ), `Expects path that begins with drive letter, but got:"${o.filePath}"` );
+  _.assert
+  (
+    self._pathHasDriveLetter( nativizedFilePath ),
+    `Expects path that begins with drive letter, but got:"${o.filePath}"`
+  );
 
   let flags = process.platform === 'win32' ? 'r+' : 'r';
   let descriptor = File.openSync( nativizedFilePath, flags );
@@ -1294,7 +1324,7 @@ function fileDeleteAct( o )
       let tempPath = tempPathGet();
       try
       {
-        File.renameSync( filePath,tempPath );
+        File.renameSync( filePath, tempPath );
       }
       catch( err )
       {
@@ -1312,54 +1342,45 @@ function fileDeleteAct( o )
     else
     File.unlinkSync( filePath );
 
+    return;
   }
-  else
+
+  /* */
+
+  let con = self.statReadAct
+  ({
+    filePath : o.filePath,
+    resolvingSoftLink : 0,
+    sync : 0,
+    throwing : 0,
+  });
+  con.give( ( err, stat ) =>
   {
-    let con = self.statReadAct
-    ({
-      filePath : o.filePath,
-      resolvingSoftLink : 0,
-      sync : 0,
-      throwing : 0,
-    });
-    con.give( ( err, stat ) =>
-    {
-      if( err )
-      return con.error( err );
+    if( err )
+    return con.error( err );
 
-      if( stat && stat.isDir() )
-      File.rmdir( filePath, handleResult );
-      else if( process.platform === 'win32' )
+    if( stat && stat.isDir() )
+    File.rmdir( filePath, handleResult );
+    else if( process.platform === 'win32' )
+    {
+      let tempPath = tempPathGet();
+      File.rename( filePath, tempPath, ( err ) =>
       {
-        let tempPath = tempPathGet();
-        File.rename( filePath,tempPath, ( err ) =>
-        {
-          if( err )
-          _.errLogOnce( err );
-          else
-          filePath = tempPath;
+        if( err )
+        _.errLogOnce( err );
+        else
+        filePath = tempPath;
 
-          File.unlink( filePath, handleResult );
-        });
-      }
-      else
-      File.unlink( filePath, handleResult );
-    })
-
-    /**/
-
-    function handleResult( err )
-    {
-      if( err )
-      con.error( err );
-      else
-      con.take( true );
+        File.unlink( filePath, handleResult );
+      });
     }
+    else
+    File.unlink( filePath, handleResult );
+  })
 
-    return con;
-  }
+  return con;
 
-  /**/
+  /* */
 
   function tempPathGet()
   {
@@ -1369,6 +1390,16 @@ function fileDeleteAct( o )
     let tempPath = self.path.join( tempDirPath, tempName );
     tempPath = self.path.nativize( tempPath );
     return tempPath;
+  }
+
+  /* */
+
+  function handleResult( err )
+  {
+    if( err )
+    con.error( err );
+    else
+    con.take( true );
   }
 
 }
@@ -1383,7 +1414,11 @@ function dirMakeAct( o )
   let nativizedFilePath = self.path.nativize( o.filePath );
 
   _.assertRoutineOptions( dirMakeAct, arguments );
-  _.assert( self._pathHasDriveLetter( nativizedFilePath ), `Expects path that begins with drive letter, but got:"${o.filePath}"` );
+  _.assert
+  (
+    self._pathHasDriveLetter( nativizedFilePath ),
+    `Expects path that begins with drive letter, but got:"${o.filePath}"`
+  );
 
 
   if( o.sync )
@@ -1433,7 +1468,11 @@ function fileLockAct( o )
   _.assert( self.path.isNormalized( o.filePath ) );
   _.assert( !o.waiting || o.timeOut >= 1000 );
   _.assertRoutineOptions( fileLockAct, arguments );
-  _.assert( self._pathHasDriveLetter( nativizedFilePath ), `Expects path that begins with drive letter, but got:"${o.filePath}"` );
+  _.assert
+  (
+    self._pathHasDriveLetter( nativizedFilePath ),
+    `Expects path that begins with drive letter, but got:"${o.filePath}"`
+  );
 
   let con = _.Consequence.Try( () =>
   {
@@ -1453,7 +1492,8 @@ function fileLockAct( o )
       else if( o.sync )
       {
         throw _.err
-        ( 'File', nativizedFilePath, 'is already locked by current process.',
+        (
+          'File', nativizedFilePath, 'is already locked by current process.',
           'With option {-o.waiting-} enabled, lock will be waiting for itself.',
           'Please use existing lock or execute method with {-o.sync-} set to 0.'
         )
@@ -1507,7 +1547,11 @@ function fileUnlockAct( o )
 
   _.assert( self.path.isNormalized( o.filePath ) );
   _.assertRoutineOptions( fileUnlockAct, arguments );
-  _.assert( self._pathHasDriveLetter( nativizedFilePath ), `Expects path that begins with drive letter, but got:"${o.filePath}"` );
+  _.assert
+  (
+    self._pathHasDriveLetter( nativizedFilePath ),
+    `Expects path that begins with drive letter, but got:"${o.filePath}"`
+  );
 
   let con = _.Consequence.Try( () =>
   {
@@ -1788,8 +1832,16 @@ function softLinkAct( o )
   let dstNativePath = self.path.nativize( o.dstPath );
   let srcNativePath = self.path.nativize( srcPath );
 
-  _.assert( !srcIsAbsolute || self._pathHasDriveLetter( srcNativePath ), `Expects src path that begins with drive letter, but got:"${srcPath}"` );
-  _.assert( self._pathHasDriveLetter( dstNativePath ), `Expects dst path that begins with drive letter, but got:"${o.dstPath}"` );
+  _.assert
+  (
+    !srcIsAbsolute || self._pathHasDriveLetter( srcNativePath ),
+    `Expects src path that begins with drive letter, but got:"${srcPath}"`
+  );
+  _.assert
+  (
+    self._pathHasDriveLetter( dstNativePath ),
+    `Expects dst path that begins with drive letter, but got:"${o.dstPath}"`
+  );
 
   /* */
 
@@ -1797,33 +1849,30 @@ function softLinkAct( o )
   {
 
     if( process.platform === 'win32' )
-    {
-      File.symlinkSync( srcNativePath, dstNativePath, o.type );
-    }
+    File.symlinkSync( srcNativePath, dstNativePath, o.type );
     else
-    {
-      File.symlinkSync( srcNativePath, dstNativePath );
-    }
+    File.symlinkSync( srcNativePath, dstNativePath );
 
+    return;
   }
+
+  let con = new _.Consequence();
+
+  if( process.platform === 'win32' )
+  File.symlink( srcNativePath, dstNativePath, o.type, onSymlink );
   else
+  File.symlink( srcNativePath, dstNativePath, onSymlink );
+
+  return con;
+
+  /* */
+
+  function onSymlink( err )
   {
-    let con = new _.Consequence();
-
-    function onSymlink( err )
-    {
-      if( err )
-      con.error( err );
-      else
-      con.take( true );
-    }
-
-    if( process.platform === 'win32' )
-    File.symlink( srcNativePath, dstNativePath, o.type, onSymlink );
+    if( err )
+    con.error( err );
     else
-    File.symlink( srcNativePath, dstNativePath, onSymlink );
-
-    return con;
+    con.take( true );
   }
 
 }
@@ -2270,9 +2319,9 @@ let Restricts =
 let Statics =
 {
 
-  pathNativizeAct : pathNativizeAct,
-  KnownNativeEncodings : KnownNativeEncodings,
-  UsingBigIntForStat : UsingBigIntForStat,
+  pathNativizeAct,
+  KnownNativeEncodings,
+  UsingBigIntForStat,
   Path : _.path.CloneExtending({ fileProvider : Self }),
 
   SupportsIno : 1,

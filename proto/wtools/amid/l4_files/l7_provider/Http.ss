@@ -417,7 +417,7 @@ let filesReflectSingle = _.routineFromPreAndBody( _.FileProvider.FindMixin.proto
 function fileCopyToHardDriveAct( o )
 {
   let self = this;
-  let con = new _.Consequence( );
+  let con = new _.Consequence();
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.strIs( o.url ),'fileCopyToHardDriveAct :','Expects {-o.filePath-}' );

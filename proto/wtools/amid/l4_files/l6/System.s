@@ -913,25 +913,45 @@ function _fileCopyActDifferent( op )
   });
 
   if( o.sync )
-  op.result = op.dst.provider.fileWrite
-  ({
-    filePath : op.dst.localPath,
-    data : read,
-    encoding : 'original.type',
-  });
-  else
-  op.result = read.then( ( read ) =>
   {
-    return op.dst.provider.fileWrite
+    op.result = op.dst.provider.fileWrite
     ({
       filePath : op.dst.localPath,
       data : read,
-      sync : 0,
       encoding : 'original.type',
     });
-  });
+
+    dstPathValidate();
+  }
+  else
+  {
+    op.result = read.then( ( read ) =>
+    {
+      return op.dst.provider.fileWrite
+      ({
+        filePath : op.dst.localPath,
+        data : read,
+        sync : 0,
+        encoding : 'original.type',
+      });
+    })
+    .then( ( arg ) =>
+    {
+      dstPathValidate();
+      return arg;
+    })
+  }
 
   return op.end();
+
+  /* */
+
+  function dstPathValidate()
+  {
+    if( op.dst.provider.pathMocking !== undefined )
+    if( !op.dst.provider.fileExists( op.dst.localPath ) )
+    op.options.context.options.dstPath = op.dst.provider.pathUnmock( op.dst.localPath, 1 );
+  }
 }
 
 let fileCopyAct = _link_functor

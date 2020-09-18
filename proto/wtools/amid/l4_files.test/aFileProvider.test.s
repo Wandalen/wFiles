@@ -41763,7 +41763,7 @@ function rightsSet( test )
   if( process.platform === 'win32' )
   test.identical( Number( rights ) & 0o777, 0o666 );
   else
-  // test.identical( Number( rights ) & 0o777, 0o644 ); /* Dmytro : this value depends on umask value. The profile settings can be 002 and 022 */
+  // test.identical( Number( rights ) & 0o777, 0o644 ); /* Dmytro : this value depends on umask value. The user profile settings for umask can be 002 and 022 */
   test.is( ( Number( rights ) & 0o777 ) === 0o644 || ( Number( rights ) & 0o777 ) === 0o664 );
 
   /* */

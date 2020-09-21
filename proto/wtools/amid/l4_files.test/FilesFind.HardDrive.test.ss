@@ -1,4 +1,5 @@
-( function _FilesFind_HardDrive_test_ss_( ) {
+( function _FilesFind_HardDrive_test_ss_()
+{
 
 'use strict';
 

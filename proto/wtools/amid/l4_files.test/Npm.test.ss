@@ -1,4 +1,5 @@
-( function _Npm_test_ss_( ) {
+( function _Npm_test_ss_()
+{
 
 'use strict';
 
@@ -214,7 +215,11 @@ function filesReflectTrivial( test )
     providerDst.filesDelete( installPath );
     providerDst.fileWrite( installPath, installPath );
     let remotePath = 'npm:///wpathbasic';
-    return test.shouldThrowErrorSync( () => system.filesReflect( { reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 } ));
+    return
+    test.shouldThrowErrorSync
+    (
+      () => system.filesReflect( { reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 } )
+    );
   })
   .then( () =>
   {
@@ -229,7 +234,11 @@ function filesReflectTrivial( test )
     test.case = 'wrong package name';
     providerDst.filesDelete( installPath );
     let remotePath = 'npm:///wpathbasicc';
-    return test.shouldThrowErrorSync( () => system.filesReflect( { reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 } ) );
+    return
+    test.shouldThrowErrorSync
+    (
+      () => system.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 })
+    );
   })
   .then( () =>
   {

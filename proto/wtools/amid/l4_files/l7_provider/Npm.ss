@@ -1,4 +1,5 @@
-( function _Npm_ss_( ) {
+( function _Npm_ss_()
+{
 
 'use strict';
 
@@ -62,7 +63,7 @@ function finit()
 function init( o )
 {
   let self = this;
-  Parent.prototype.init.call( self,o );
+  Parent.prototype.init.call( self, o );
 }
 
 // --
@@ -472,7 +473,8 @@ extra.usingNpm = 1;
 
 var defaults = filesReflectSingle_body.defaults;
 
-let filesReflectSingle = _.routineFromPreAndBody( _.FileProvider.FindMixin.prototype.filesReflectSingle.pre, filesReflectSingle_body );
+let filesReflectSingle =
+_.routineFromPreAndBody( _.FileProvider.FindMixin.prototype.filesReflectSingle.pre, filesReflectSingle_body );
 
 // --
 // relationship
@@ -588,9 +590,7 @@ _.FileProvider[ Self.shortName ] = Self;
 // export
 // --
 
-
-
 if( typeof module !== 'undefined' )
 module[ 'exports' ] = Self;
 
-})( );
+})();

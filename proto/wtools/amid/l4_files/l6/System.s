@@ -796,6 +796,9 @@ function _link_functor( fop )
     if( op.relativeSrc.provider && !op.relativeDst.provider )
     self._pathRelocalize( op.relativeDst, op.relativeSrc.provider );
 
+    if( op.relativeDst.provider.pathMocking && op.relativeDst.provider.pathMock !== undefined )
+    op.relativeDst.localPath = op.relativeDst.provider.pathMock( op.relativeDst.localPath );
+
     _.assert( !!op.relativeDst.provider, 'No provider for path', op.options.relativeDstPath );
     _.assert( allowingMissedSrc || !!op.relativeSrc.provider, 'No provider for path', op.options.relativeSrcPath );
 
@@ -808,6 +811,9 @@ function _link_functor( fop )
     self._pathRelocalize( op.src, op.dst.provider );
     if( op.src.provider && !op.dst.provider )
     self._pathRelocalize( op.dst, op.src.provider );
+
+    if( op.dst.provider.pathMocking && op.relativeDst.provider.pathMock !== undefined )
+    op.dst.localPath = op.dst.provider.pathMock( op.dst.localPath );
 
     _.assert( !!op.dst.provider, 'No provider for path', op.options.dstPath );
     _.assert( allowingMissedSrc || !!op.src.provider, 'No provider for path', op.options.srcPath );

@@ -1,4 +1,5 @@
-( function _Git_ss_( ) {
+( function _Git_ss_()
+{
 
 'use strict';
 
@@ -51,7 +52,7 @@ function init( o )
 {
   let self = this;
 
-  Parent.prototype.init.call( self,o );
+  Parent.prototype.init.call( self, o );
 
 }
 
@@ -103,8 +104,6 @@ function pathIsFixated( filePath )
   let self = this;
   return _.git.pathIsFixated( filePath );
 }
-
-
 
 //
 
@@ -340,14 +339,14 @@ function filesReflectSingle_body( o )
   let shell = _.process.starter
   ({
     verbosity : o.verbosity - 1,
-    ready : ready,
+    ready,
     currentPath : dstPath,
   });
 
   let shellAll = _.process.starter
   ({
     verbosity : o.verbosity - 1,
-    ready : ready,
+    ready,
     currentPath : dstPath,
     throwingExitCode : 0,
     outputCollecting : 1,
@@ -584,7 +583,8 @@ extra.fetching = 1;
 extra.stashing = 0;
 
 var defaults = filesReflectSingle_body.defaults;
-let filesReflectSingle = _.routineFromPreAndBody( _.FileProvider.FindMixin.prototype.filesReflectSingle.pre, filesReflectSingle_body );
+let filesReflectSingle =
+_.routineFromPreAndBody( _.FileProvider.FindMixin.prototype.filesReflectSingle.pre, filesReflectSingle_body );
 
 // --
 // relationship
@@ -708,4 +708,4 @@ _.FileProvider[ Self.shortName ] = Self;
 if( typeof module !== 'undefined' )
 module[ 'exports' ] = Self;
 
-})( );
+})();

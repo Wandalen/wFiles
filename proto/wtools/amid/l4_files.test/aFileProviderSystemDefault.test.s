@@ -1,4 +1,5 @@
-( function _aFileProviderSystemDefault_test_s_( ) {
+( function _aFileProviderSystemDefault_test_s_()
+{
 
 'use strict';
 

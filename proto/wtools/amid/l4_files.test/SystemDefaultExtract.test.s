@@ -1,4 +1,5 @@
-( function _SystemDefaultExtract_test_s_( ) {
+( function _SystemDefaultExtract_test_s_()
+{
 
 'use strict';
 
@@ -38,7 +39,8 @@ function onSuiteBegin()
   context.provider.providerRegister( context.providerEffective );
 
   context.provider.defaultProvider = context.providerEffective;
-  context.globalFromPreferred = _.routineJoin( context.providerEffective.path, context.providerEffective.path.globalFromPreferred );
+  context.globalFromPreferred =
+  _.routineJoin( context.providerEffective.path, context.providerEffective.path.globalFromPreferred );
   context.provider.UsingBigIntForStat = context.providerEffective.UsingBigIntForStat;
 
 }

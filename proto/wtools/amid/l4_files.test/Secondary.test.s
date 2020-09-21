@@ -1,4 +1,5 @@
-( function _Secondary_test_s_( ) {
+( function _Secondary_test_s_()
+{
 
 'use strict';
 
@@ -480,9 +481,9 @@ function readToProvider( test )
     {
       'b' :
       {
-        'rlink' : [{ softLink : '../../../file' }],
-        'alink' : [{ softLink : '/file' }],
-        'hlink' : [{ hardLink : '/file' }]
+        'rlink' : [ { softLink : '../../../file' } ],
+        'alink' : [ { softLink : '/file' } ],
+        'hlink' : [ { hardLink : '/file' } ]
       }
     }
   }
@@ -506,9 +507,9 @@ function readToProvider( test )
     {
       'b' :
       {
-        'rlink' : [{ softLink : '/file' }],
-        'alink' : [{ softLink : '/file' }],
-        'hlink' : [{ hardLink : '/file' }]
+        'rlink' : [ { softLink : '/file' } ],
+        'alink' : [ { softLink : '/file' } ],
+        'hlink' : [ { hardLink : '/file' } ]
       }
     }
   }
@@ -546,8 +547,8 @@ function configRead( test )
     null : null,
     number : 13,
     string : 'something',
-    map : { a : '1', dir : { b : 2 }, c : [ 1,2,3 ] },
-    array : [ { a : '1', dir : { b : 2 }, c : [ 1,2,3 ] } ],
+    map : { a : '1', dir : { b : 2 }, c : [ 1, 2, 3 ] },
+    array : [ { a : '1', dir : { b : 2 }, c : [ 1, 2, 3 ] } ],
   }
 
   /* */
@@ -607,8 +608,8 @@ function configRead( test )
   }
   var src2 =
   {
-    map : { a : '1', dir : { b : 2 }, c : [ 1,2,3 ] },
-    array : [ { a : '1', dir : { b : 2 }, c : [ 1,2,3 ] } ],
+    map : { a : '1', dir : { b : 2 }, c : [ 1, 2, 3 ] },
+    array : [ { a : '1', dir : { b : 2 }, c : [ 1, 2, 3 ] } ],
   }
   provider.filesDelete( routinePath );
   var filePath = path.changeExt( terminalPath, 'json' );
@@ -632,8 +633,8 @@ function configRead( test )
   }
   var src2 =
   {
-    map : { a : '1', dir : { b : 2 }, c : [ 1,2,3 ] },
-    array : [ { a : '1', dir : { b : 2 }, c : [ 1,2,3 ] } ],
+    map : { a : '1', dir : { b : 2 }, c : [ 1, 2, 3 ] },
+    array : [ { a : '1', dir : { b : 2 }, c : [ 1, 2, 3 ] } ],
   }
   provider.filesDelete( routinePath );
   var filePath = path.changeExt( terminalPath, 'json' );
@@ -646,8 +647,8 @@ function configRead( test )
     null : null,
     number : 13,
     string : 'something',
-    map : { a : '1', dir : { b : 2 }, c : [ 1,2,3 ] },
-    array : [ { a : '1', dir : { b : 2 }, c : [ 1,2,3 ] } ],
+    map : { a : '1', dir : { b : 2 }, c : [ 1, 2, 3 ] },
+    array : [ { a : '1', dir : { b : 2 }, c : [ 1, 2, 3 ] } ],
   };
   test.identical( got, expected );
   test.shouldThrowErrorSync( () =>

@@ -20825,7 +20825,7 @@ function filesReflectorBasic( test )
   {
     var extract7 = provider.filesExtract( routinePath );
     test.identical( extract7.filesTree, { alt : { a : [ { softLink : 'src:///alt/a' } ] } } );
-    test.identical( provider7.statRead( routinePath + '/alt/a' ).isSoftLink(), true );
+    test.identical( provider.statRead( routinePath + '/alt/a' ).isSoftLink(), true );
   }
 
   dst.filesDelete( routinePath );

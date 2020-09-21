@@ -1,4 +1,5 @@
-( function _System_s_() {
+( function _System_s_()
+{
 
 'use strict';
 
@@ -119,11 +120,18 @@ function providersRegister( src )
   _.assert( arguments.length === 1, 'Expects single argument' );
 
   if( src instanceof _.FileProvider.Abstract )
-  self.providerRegister( src );
+  {
+    self.providerRegister( src );
+  }
   else if( _.arrayIs( src ) )
-  for( let p = 0 ; p < src.length ; p++ )
-  self.providerRegister( src[ p ] );
-  else _.assert( 0, 'Unknown kind of argument', src );
+  {
+    for( let p = 0 ; p < src.length ; p++ )
+    self.providerRegister( src[ p ] );
+  }
+  else
+  {
+    _.assert( 0, 'Unknown kind of argument', src );
+  }
 
   return self;
 }
@@ -1454,7 +1462,7 @@ let Accessors =
 
 let Statics =
 {
-  Path : Path,
+  Path,
 }
 
 let Forbids =

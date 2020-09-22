@@ -1,4 +1,5 @@
-( function _RecordFactoryAbstract_s_() {
+( function _RecordFactoryAbstract_s_()
+{
 
 'use strict';
 
@@ -91,7 +92,12 @@ function _formAssociations()
   }
 
   if( !factory.system )
-  if( factory.effectiveProvider && factory.effectiveProvider.system && factory.effectiveProvider.system instanceof _.FileProvider.System )
+  if
+  (
+    factory.effectiveProvider
+    && factory.effectiveProvider.system
+    && factory.effectiveProvider.system instanceof _.FileProvider.System
+  )
   {
     factory.system = factory.effectiveProvider.system;
   }
@@ -103,7 +109,12 @@ function _formAssociations()
   }
 
   if( !factory.system )
-  if( factory.defaultProvider && factory.defaultProvider.system && factory.defaultProvider.system instanceof _.FileProvider.System )
+  if
+  (
+    factory.defaultProvider
+    && factory.defaultProvider.system
+    && factory.defaultProvider.system instanceof _.FileProvider.System
+  )
   {
     factory.system = factory.defaultProvider.system;
   }

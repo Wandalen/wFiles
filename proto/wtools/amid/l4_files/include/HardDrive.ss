@@ -1,4 +1,5 @@
-(function _HardDrive_ss_() {
+( function _HardDrive_ss_()
+{
 
 'use strict';
 

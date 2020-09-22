@@ -1,4 +1,5 @@
-(function _Extract_s_() {
+( function _Extract_s_()
+{
 
 'use strict';
 

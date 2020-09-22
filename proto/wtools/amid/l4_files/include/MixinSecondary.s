@@ -1,4 +1,5 @@
-(function _MixinSecondary_s_() {
+( function _MixinSecondary_s_()
+{
 
 'use strict';
 

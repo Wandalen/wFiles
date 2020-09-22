@@ -46,7 +46,8 @@ _.files._ = _.files._ || Object.create( null );
 let vectorize = _.routineDefaults( null, _.vectorize, { vectorizingContainerAdapter : 1, unwrapingContainerAdapter : 0 } );
 let vectorizeAll = _.routineDefaults( null, _.vectorizeAll, { vectorizingContainerAdapter : 1, unwrapingContainerAdapter : 0 } );
 let vectorizeAny = _.routineDefaults( null, _.vectorizeAny, { vectorizingContainerAdapter : 1, unwrapingContainerAdapter : 0 } );
-let vectorizeNone = _.routineDefaults( null, _.vectorizeNone, { vectorizingContainerAdapter : 1, unwrapingContainerAdapter : 0 } );
+let vectorizeNone =
+_.routineDefaults( null, _.vectorizeNone, { vectorizingContainerAdapter : 1, unwrapingContainerAdapter : 0 } );
 
 // //
 //
@@ -173,7 +174,7 @@ function vectorizeKeysAndVals( routine, select )
     vectorizingArray : 1,
     vectorizingMapVals : 1,
     vectorizingMapKeys : 1,
-    select : select,
+    select,
   });
 
   _.routineExtend( routine2, routine );
@@ -254,9 +255,7 @@ function regexpTerminalSafe( mask )
 
   let excludeMask = _.RegexpObject
   ({
-    excludeAny :
-    [
-    ],
+    excludeAny : [],
   });
 
   if( mask )
@@ -346,7 +345,7 @@ function _fileOptionsGet( filePath, o ) /* xxx : check */
   if( !o.filePath )
   throw _.err( 'Expects "o.filePath"' );
 
-  _.assertMapHasOnly( o,this.defaults );
+  _.assertMapHasOnly( o, this.defaults );
   _.assert( arguments.length === 1 || arguments.length === 2 );
 
   if( o.sync === undefined )
@@ -384,7 +383,7 @@ function _fileOptionsGet( filePath, o ) /* xxx : check */
  * @module Tools/mid/Files
  */
 
-function filesNewer( dst,src )
+function filesNewer( dst, src )
 {
   let odst = dst;
   let osrc = src;
@@ -421,7 +420,7 @@ function filesNewer( dst,src )
   return null;
 }
 
-  //
+//
 
 /**
  * Returns path/stats associated with file with older modified time.
@@ -449,12 +448,12 @@ function filesNewer( dst,src )
  * @module Tools/mid/Files
  */
 
-function filesOlder( dst,src )
+function filesOlder( dst, src )
 {
 
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
 
-  let result = filesNewer( dst,src );
+  let result = filesNewer( dst, src );
 
   if( result === dst )
   return src;
@@ -509,7 +508,7 @@ function filesOlder( dst,src )
 function filesSpectre( src ) /* xxx : redo or remove */
 {
 
-  _.assert( arguments.length === 1, 'filesSpectre :','expect single argument' );
+  _.assert( arguments.length === 1, 'filesSpectre :', 'expect single argument' );
 
   src = _.fileProvider.recordFactory().record( src );
   let read = src.read;
@@ -552,7 +551,7 @@ function filesSimilarity( o )
 {
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.routineOptions( filesSimilarity,o );
+  _.routineOptions( filesSimilarity, o );
 
   o.src1 = _.fileProvider.recordFactory().record( o.src1 );
   o.src2 = _.fileProvider.recordFactory().record( o.src2 );
@@ -560,7 +559,7 @@ function filesSimilarity( o )
   let latters1 = _.files.filesSpectre( o.src1.absolute );
   let latters2 = _.files.filesSpectre( o.src2.absolute );
 
-  let result = _.strLattersSpectresSimilarity( latters1,latters2 );
+  let result = _.strLattersSpectresSimilarity( latters1, latters2 );
 
   return result;
 }
@@ -588,9 +587,9 @@ function filesShadow( shadows, owners ) /* xxx : check */
 
       owner = _.objectIs( owner ) ? owner.relative : owner;
 
-      if( _.strBegins( shadow,_.path.prefixGet( owner ) ) )
+      if( _.strBegins( shadow, _.path.prefixGet( owner ) ) )
       {
-        shadows.splice( s,1 );
+        shadows.splice( s, 1 );
         s -= 1;
         break;
       }
@@ -622,11 +621,11 @@ function fileReport( file ) /* xxx : rename */
     fileTypes.isSocket = file.stat.isSocket();
   }
 
-  report += _.toStr( file,{ levels : 2, wrap : 0 } );
+  report += _.toStr( file, { levels : 2, wrap : 0 } );
   report += '\n';
-  report += _.toStr( file.stat,{ levels : 2, wrap : 0 } );
+  report += _.toStr( file.stat, { levels : 2, wrap : 0 } );
   report += '\n';
-  report += _.toStr( fileTypes,{ levels : 2, wrap : 0 } );
+  report += _.toStr( fileTypes, { levels : 2, wrap : 0 } );
 
   return report;
 }
@@ -733,6 +732,7 @@ function hashMd5From( o )
     }
     catch( err )
     {
+      _.errAttend( err );
       throw err;
     }
     return result;

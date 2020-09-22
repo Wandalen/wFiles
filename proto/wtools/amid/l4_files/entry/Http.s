@@ -1,4 +1,5 @@
-(function _Http_s_() {
+( function _Http_s_()
+{
 
 'use strict';
 

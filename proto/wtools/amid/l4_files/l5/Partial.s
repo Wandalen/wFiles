@@ -3246,7 +3246,7 @@ function fileRead_pre( routine, args )
   _.assert( args.length === 1 || args.length === 2 );
 
   if( args.length === 2 )
-  args = [ { filePath : args[ 0 ], encoding : args[ 1 ] } ]; /* qqq : add test to cover this */
+  args = [ { filePath : args[ 0 ], encoding : args[ 1 ] } ]; /* aaa : add test to cover this */ /* Dmytro : covered in routine `fileReadWithEncoding` */
 
   let o = self._preFilePathScalarWithoutProviderDefaults( routine, args );
 

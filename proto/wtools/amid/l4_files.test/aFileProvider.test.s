@@ -3029,62 +3029,90 @@ function fileReadWithEncoding( test )
   let filePath = test.context.pathFor( 'written/fileReadWithEncoding/dstFile' );
   let isHd = context.providerIsInstanceOf( _.FileProvider.HardDrive );
 
+  /* - */
+
   test.open( 'buffer.*' );
 
-  var data = 'abc'
+  test.case = 'encoding = buffer.bytes, call with map';
+  var data = 'abc';
   provider.filesDelete( filePath );
   provider.fileWrite( filePath, data );
-
-  /* */
-
   var got = provider.fileRead({ filePath, encoding : 'buffer.bytes' });
   test.identical( got, _.bufferBytesFrom( data ) );
 
-  /* */
-
-  if( isHd )
+  if( isHd && Config.interpreter === 'njs' )
   {
+    test.case = 'encoding - buffer.node, call with map';
+    var data1 = 'abc';
+    provider.filesDelete( filePath );
+    provider.fileWrite( filePath, data1 );
     var got1 = provider.fileRead({ filePath, encoding : 'buffer.node' });
-    test.identical( got1, _.bufferNodeFrom( data ) )
+    test.identical( got1, _.bufferNodeFrom( data1 ) )
   }
 
+  test.case = 'encoding - buffer.raw, call with map';
+  var data = 'abc';
+  provider.filesDelete( filePath );
+  provider.fileWrite( filePath, data );
+  var got = provider.fileRead({ filePath, encoding : 'buffer.raw' });
+  test.identical( got, _.bufferRawFrom( data ) )
+
   /* */
 
-  var got = provider.fileRead({ filePath, encoding : 'buffer.raw' });
+  test.case = 'encoding = buffer.bytes, call with 2 arguments';
+  var data = 'abc';
+  provider.filesDelete( filePath );
+  provider.fileWrite( filePath, data );
+  var got = provider.fileRead( filePath, 'buffer.bytes' );
+  test.identical( got, _.bufferBytesFrom( data ) );
+
+  if( isHd && Config.interpreter === 'njs' )
+  {
+    test.case = 'encoding - buffer.node, call with 2 arguments';
+    var data2 = 'abc';
+    provider.filesDelete( filePath );
+    provider.fileWrite( filePath, data2 );
+    var got2 = provider.fileRead( filePath, 'buffer.node' );
+    test.identical( got2, _.bufferNodeFrom( data2 ) )
+  }
+
+  test.case = 'encoding - buffer.raw, call with 2 arguments';
+  var data = 'abc';
+  provider.filesDelete( filePath );
+  provider.fileWrite( filePath, data );
+  var got = provider.fileRead( filePath, 'buffer.raw' );
   test.identical( got, _.bufferRawFrom( data ) )
 
   test.close( 'buffer.*' );
 
   /* - */
 
-  test.open( 'json' );
+  test.open( 'encoding - json' );
 
-  var data = 'string'
+  test.case = 'data - string, call with map';
+  var data = 'string';
   provider.filesDelete( filePath );
   provider.fileWrite({ filePath, data, encoding : 'json' });
   var got = provider.fileRead({ filePath, encoding : 'json' });
   test.identical( got, data );
 
-  /* */
-
+  test.case = 'data - array of numbers, call with map';
   var data = [ 1, 2, 3 ];
   provider.filesDelete( filePath );
   provider.fileWrite({ filePath, data, encoding : 'json' });
   var got = provider.fileRead({ filePath, encoding : 'json' });
   test.identical( got, data );
 
-  /* */
-
+  test.case = 'data - string with map literal declaration, call with map';
   var data = '{a : b}';
   provider.filesDelete( filePath );
   provider.fileWrite({ filePath, data });
   test.shouldThrowErrorOfAnyKind( () =>
   {
     provider.fileRead({ filePath, encoding : 'json' });
-  })
+  });
 
-  /* */
-
+  test.case = 'data - map with fields, call with map';
   var data =
   {
     string : 'string',
@@ -3097,12 +3125,51 @@ function fileReadWithEncoding( test )
   var got = provider.fileRead({ filePath, encoding : 'json' });
   test.identical( got, data );
 
-  test.close( 'json' );
+  /* */
+
+  test.case = 'data - string, call with 2 arguments';
+  var data = 'string';
+  provider.filesDelete( filePath );
+  provider.fileWrite({ filePath, data, encoding : 'json' });
+  var got = provider.fileRead( filePath, 'json' );
+  test.identical( got, data );
+
+  test.case = 'data - array of numbers, call with 2 arguments';
+  var data = [ 1, 2, 3 ];
+  provider.filesDelete( filePath );
+  provider.fileWrite({ filePath, data, encoding : 'json' });
+  var got = provider.fileRead( filePath, 'json' );
+  test.identical( got, data );
+
+  test.case = 'data - string with map literal declaration, call with 2 arguments';
+  var data = '{a : b}';
+  provider.filesDelete( filePath );
+  provider.fileWrite({ filePath, data });
+  test.shouldThrowErrorOfAnyKind( () =>
+  {
+    provider.fileRead( filePath, 'json' );
+  });
+
+  test.case = 'data - map with fields, call with 2 arguments';
+  var data =
+  {
+    string : 'string',
+    number : 1,
+    array : [ 1, 'string' ],
+    map : { string : 'string', number : 1, array : [ 'string', 1 ] }
+  };
+  provider.filesDelete( filePath );
+  provider.fileWrite({ filePath, data, encoding : 'json' });
+  var got = provider.fileRead( filePath, 'json' );
+  test.identical( got, data );
+
+  test.close( 'encoding - json' );
 
   /* - */
 
-  test.open( 'js' );
+  test.open( 'encoding - js.structure' );
 
+  test.case = 'data - string with map structure, call with map';
   var data  =
   `{
     string : 'string',
@@ -3120,31 +3187,66 @@ function fileReadWithEncoding( test )
     date : new Date( Date.UTC( 2018, 1, 1 ) ),
     buffer : new U16x([ 1, 2, 3 ]),
     map : { string : 'string', number : 1, array : [ 'string', 1 ] }
-  }
+  };
   provider.filesDelete( filePath );
   provider.fileWrite({ filePath, data });
   var got = provider.fileRead({ filePath, encoding : 'js.structure' });
   test.identical( got, expected )
 
-  /* - */
-
+  test.case = 'data - string with imitation of structure, call with map';
   var data = '{a : b}';
   provider.filesDelete( filePath );
   provider.fileWrite({ filePath, data });
   test.shouldThrowErrorOfAnyKind( () =>
   {
     provider.fileRead({ filePath, encoding : 'js.structure' });
-  })
-
-  test.close( 'js' );
+  });
 
   /* */
 
-  test.open( 'js.smart' );
+  test.case = 'data - string with map structure, call with 2 arguments';
+  var data  =
+  `{
+    string : 'string',
+    number : 1,
+    array : [ 1, 'string' ],
+    date : new Date( Date.UTC( 2018, 1, 1 ) ),
+    buffer : new U16x([ 1, 2, 3 ]),
+    map : { string : 'string', number : 1, array : [ 'string', 1 ] }
+  }`;
+  var expected =
+  {
+    string : 'string',
+    number : 1,
+    array : [ 1, 'string' ],
+    date : new Date( Date.UTC( 2018, 1, 1 ) ),
+    buffer : new U16x([ 1, 2, 3 ]),
+    map : { string : 'string', number : 1, array : [ 'string', 1 ] }
+  };
+  provider.filesDelete( filePath );
+  provider.fileWrite({ filePath, data });
+  var got = provider.fileRead( filePath, 'js.structure' );
+  test.identical( got, expected )
 
+  test.case = 'data - string with imitation of structure, call with 2 arguments';
+  var data = '{a : b}';
+  provider.filesDelete( filePath );
+  provider.fileWrite({ filePath, data });
+  test.shouldThrowErrorOfAnyKind( () =>
+  {
+    provider.fileRead( filePath, 'js.structure' );
+  });
+
+  test.close( 'encoding - js.structure' );
+
+  /* */
+
+  test.open( 'encoding - js.smart' );
+
+  test.case = 'data - string with code, call with map';
   var data = 'return 1';
   if( isHd )
-  data = 'module.exports = { data : 1 }'
+  data = 'module.exports = { data : 1 }';
   provider.filesDelete( filePath );
   provider.fileWrite({ filePath, data });
   var got = provider.fileRead({ filePath, encoding : 'js.smart' });
@@ -3153,8 +3255,7 @@ function fileReadWithEncoding( test )
   else
   test.identical( got, 1 );
 
-  /* - */
-
+  test.case = 'data - string with imitation of structure, call with map';
   var data = '{a : b}';
   var filePath2 = test.context.pathFor( 'written/fileReadWithEncoding/dstFile2' );
   provider.filesDelete( filePath2 );
@@ -3162,31 +3263,73 @@ function fileReadWithEncoding( test )
   test.shouldThrowErrorOfAnyKind( () =>
   {
     provider.fileRead({ filePath : filePath2, encoding : 'js.smart' });
-  })
-
-  test.close( 'js.smart' );
+  });
 
   /* */
 
+  test.case = 'data - string with code, call with 2 arguments';
+  var data = 'return 1';
   if( isHd )
+  data = 'module.exports = { data : 1 }';
+  provider.filesDelete( filePath );
+  provider.fileWrite({ filePath, data });
+  var got = provider.fileRead( filePath, 'js.smart' );
+  if( isHd )
+  test.identical( got, { data : 1 } );
+  else
+  test.identical( got, 1 );
+
+  test.case = 'data - string with imitation of structure, call with 2 arguments';
+  var data = '{a : b}';
+  var filePath2 = test.context.pathFor( 'written/fileReadWithEncoding/dstFile2' );
+  provider.filesDelete( filePath2 );
+  provider.fileWrite({ filePath : filePath2, data });
+  test.shouldThrowErrorOfAnyKind( () =>
   {
-    test.case = 'js.node'
-    var data2 = 'module.exports = { data : 1 }'
+    provider.fileRead( filePath2, 'js.smart' );
+  });
+
+  test.close( 'encoding - js.smart' );
+
+  /* */
+
+  if( isHd && Config.interpreter === 'njs' )
+  {
+    test.case = 'data - code, encoding - js.node, call with map';
+    var data3 = 'module.exports = { data : 1 }';
     provider.filesDelete( filePath );
-    provider.fileWrite({ filePath, data : data2 });
-    var got2 = provider.fileRead({ filePath, encoding : 'js.node' });
-    test.identical( got2, { data : 1 });
+    provider.fileWrite({ filePath, data : data3 });
+    var got3 = provider.fileRead({ filePath, encoding : 'js.node' });
+    test.identical( got3, { data : 1 });
 
-    /* - */
-
-    var data2 = 'module.exports = { data : 1'
-    var filePath3 = test.context.pathFor( 'written/fileReadWithEncoding/dstFile3' );
+    test.case = 'data - code with mistake, encoding - js.node, call with map';
+    var data3 = 'module.exports = { data : 1';
+    var filePath3 = test.context.pathFor( 'written/fileReadWithEncoding/dstFile2' );
     provider.filesDelete( filePath3 );
-    provider.fileWrite({ filePath : filePath3, data : data2 });
+    provider.fileWrite({ filePath : filePath3, data : data3 });
     test.shouldThrowErrorOfAnyKind( () =>
     {
       provider.fileRead({ filePath : filePath3, encoding : 'js.node' });
-    })
+    });
+
+    /* */
+
+    test.case = 'data - code, encoding - js.node, call with 2 arguments';
+    var data3 = 'module.exports = { data : 1 }';
+    provider.filesDelete( filePath );
+    provider.fileWrite({ filePath, data : data3 });
+    var got3 = provider.fileRead( filePath, 'js.node' );
+    test.identical( got3, { data : 1 });
+
+    test.case = 'data - code with mistake, encoding - js.node, call with 2 arguments';
+    var data3 = 'module.exports = { data : 1';
+    var filePath3 = test.context.pathFor( 'written/fileReadWithEncoding/dstFile2' );
+    provider.filesDelete( filePath3 );
+    provider.fileWrite({ filePath : filePath3, data : data3 });
+    test.shouldThrowErrorOfAnyKind( () =>
+    {
+      provider.fileRead( filePath3, 'js.node' );
+    });
   }
 }
 

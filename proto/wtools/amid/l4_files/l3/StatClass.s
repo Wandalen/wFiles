@@ -1,4 +1,5 @@
-( function _StatClass_s_() {
+( function _StatClass_s_()
+{
 
 'use strict';
 

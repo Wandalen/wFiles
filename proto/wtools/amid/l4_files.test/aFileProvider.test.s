@@ -29,9 +29,7 @@ function onSuiteEnd()
 {
   let path = this.provider.path;
   _.assert( _.strHas( this.suiteTempPath, '.tmp' ) );
-  debugger;
   path.tempClose( this.suiteTempPath );
-  debugger;
   this.provider.finit();
   this.system.finit();
 }
@@ -221,22 +219,33 @@ function softLinkIsSupported()
 function testDelaySample( test )
 {
   let context = this;
-  let provider = context.provider;
-  let path = provider.path;
+
+  /* */
 
   test.case = 'delay test';
-
   var con = _.time.out( 1000 );
 
   test.identical( 1, 1 );
 
-  con.finally( function( ){ logger.log( '1000ms delay' ) } );
+  con.finally( () =>
+  {
+    logger.log( '1000ms delay' );
+    return null;
+  });
 
   con.finally( _.routineSeal( _, _.time.out, [ 1000 ] ) );
 
-  con.finally( function( ){ logger.log( '2000ms delay' ) } );
+  con.finally( () =>
+  {
+    logger.log( '2000ms delay' )
+    return null;
+  });
 
-  con.finally( function( ){ test.identical( 1, 1 ); } );
+  con.finally( () =>
+  {
+    test.identical( 1, 1 );
+    return null;
+  });
 
   return con;
 }
@@ -246,13 +255,11 @@ function testDelaySample( test )
 function mustNotThrowError( test )
 {
 
-  /**/
-
   test.case = 'mustNotThrowError must return con with message';
 
   var con = new _.Consequence().take( '123' );
   test.mustNotThrowError( con )
-  .ifNoErrorThen( function( got )
+  .ifNoErrorThen( ( got ) =>
   {
     test.identical( got, '123' );
     return null;
@@ -265,6 +272,7 @@ function mustNotThrowError( test )
 function readWriteSync( test )
 {
   let context = this;
+  let a = context.assetFor( test, false );
   let provider = context.provider;
   let path = provider.path;
 
@@ -274,7 +282,7 @@ function readWriteSync( test )
     return;
   }
 
-  var routinePath = path.normalize( test.context.pathFor( 'written/readWriteSync' ) );
+  var routinePath = a.abs( 'written/readWriteSync' );
   var got, filePath, readOptions, writeOptions;
   var testData = 'Lorem ipsum dolor sit amet';
 
@@ -302,7 +310,7 @@ function readWriteSync( test )
   //   debugger
   //   var got = provider.fileRead
   //   ({
-  //     filePath : test.context.pathFor( 'invalid path' ),
+  //     filePath : a.abs( 'invalid path' ),
   //     sync : 1,
   //     throwing : 0,
   //   });
@@ -312,7 +320,7 @@ function readWriteSync( test )
   // /* - */
   /* - */
   // test.case = 'fileRead, path ways to not a terminal file';
-  // filePath = test.context.pathFor( 'written/readWriteSync/dir' );
+  // filePath = a.abs( 'written/readWriteSync/dir' );
   // provider.dirMake( filePath );
   /* - */
   // /**/
@@ -344,7 +352,7 @@ function readWriteSync( test )
   /* - */
   // test.case = 'fileRead, simple file read ';
   // provider.filesDelete( routinePath );
-  // filePath = test.context.pathFor( 'written/readWriteSync/file' );
+  // filePath = a.abs( 'written/readWriteSync/file' );
   // provider.fileWrite( filePath, testData );
   // var files = provider.dirRead( routinePath );
   // test.identical( files, [ 'file' ] );
@@ -394,7 +402,7 @@ function readWriteSync( test )
   /* - */
   // test.case = 'fileRead, file read with common encodings';
   // provider.filesDelete( routinePath );
-  // filePath = test.context.pathFor( 'written/readWriteSync/file' );
+  // filePath = a.abs( 'written/readWriteSync/file' );
   /* - */
   // /**/
   /* - */
@@ -513,7 +521,7 @@ function readWriteSync( test )
   // {
   //   test.case = 'other encodings';
   //   provider.filesDelete( routinePath );
-  //   filePath = test.context.pathFor( 'written/readWriteSync/file' );
+  //   filePath = a.abs( 'written/readWriteSync/file' );
   //   testData = 'abc';
   /* - */
   //   provider.fileWrite( filePath, testData );
@@ -541,7 +549,7 @@ function readWriteSync( test )
 
   test.case = 'fileRead, onBegin, onEnd, onError';
   provider.filesDelete( routinePath );
-  filePath = test.context.pathFor( 'written/readWriteSync/file' );
+  filePath = a.abs( 'written/readWriteSync/file' );
   testData = 'Lorem ipsum dolor sit amet';
   function onBegin( err, o )
   {
@@ -638,7 +646,7 @@ function readWriteSync( test )
       sync : 1,
       outputFormat : 'o',
       throwing : 1,
-      filePath : test.context.pathFor( 'invalid path' ),
+      filePath : a.abs( 'invalid path' ),
       encoding : 'utf8',
       onBegin : null,
       onEnd : null,
@@ -658,7 +666,7 @@ function readWriteSync( test )
       sync : 1,
       outputFormat : 'data',
       throwing : 1,
-      filePath : test.context.pathFor( 'invalid path' ),
+      filePath : a.abs( 'invalid path' ),
       encoding : 'utf8',
       onBegin : null,
       onEnd : null,
@@ -676,7 +684,7 @@ function readWriteSync( test )
       sync : 1,
       outputFormat : 'o',
       throwing : 0,
-      filePath : test.context.pathFor( 'invalid path' ),
+      filePath : a.abs( 'invalid path' ),
       encoding : 'utf8',
       onBegin : null,
       onEnd : null,
@@ -694,7 +702,7 @@ function readWriteSync( test )
       sync : 1,
       outputFormat : 'o',
       throwing : 1,
-      filePath : test.context.pathFor( 'invalid path' ),
+      filePath : a.abs( 'invalid path' ),
       encoding : 'utf8',
       onBegin : null,
       onEnd : null,
@@ -706,7 +714,7 @@ function readWriteSync( test )
   /* - */
 
   test.case = 'fileWrite, path not exist, default settings';
-  filePath = test.context.pathFor( 'written/readWriteSync/file' );
+  filePath = a.abs( 'written/readWriteSync/file' );
   testData = 'Lorem ipsum dolor sit amet';
 
   /**/
@@ -725,7 +733,7 @@ function readWriteSync( test )
   /* path includes not existing directory */
 
   provider.filesDelete( routinePath );
-  filePath = test.context.pathFor( 'written/readWriteSync/files/file' );
+  filePath = a.abs( 'written/readWriteSync/files/file' );
   provider.fileWrite( filePath, testData );
   var files = provider.dirRead( context.provider.path.dir( filePath ) );
   test.identical( files, [ 'file' ] );
@@ -739,7 +747,7 @@ function readWriteSync( test )
   /* - */
 
   test.case = 'fileWrite, path already exist, default settings';
-  filePath = test.context.pathFor( 'written/readWriteSync/file' );
+  filePath = a.abs( 'written/readWriteSync/file' );
   testData = 'Lorem ipsum dolor sit amet';
   provider.fileWrite( filePath, testData );
 
@@ -766,7 +774,7 @@ function readWriteSync( test )
 
   test.case = 'fileWrite, path already exist';
   provider.filesDelete( routinePath );
-  filePath = test.context.pathFor( 'written/readWriteSync/file' );
+  filePath = a.abs( 'written/readWriteSync/file' );
   testData = 'Lorem ipsum dolor sit amet';
   provider.fileWrite( filePath, testData );
 
@@ -832,7 +840,7 @@ function readWriteSync( test )
   test.case = 'fileWrite, path not exist';
   provider.filesDelete( routinePath );
   testData = 'Lorem ipsum dolor sit amet';
-  filePath = test.context.pathFor( 'written/readWriteSync/file' );
+  filePath = a.abs( 'written/readWriteSync/file' );
 
 
   /*path includes not existing directory*/
@@ -903,7 +911,7 @@ function readWriteSync( test )
   test.case = 'fileWrite, different write modes';
   provider.filesDelete( routinePath );
   testData = 'Lorem ipsum dolor sit amet';
-  filePath = test.context.pathFor( 'written/readWriteSync/file' );
+  filePath = a.abs( 'written/readWriteSync/file' );
 
   /*rewrite*/
 
@@ -967,7 +975,7 @@ function readWriteSync( test )
   test.case = 'fileWrite, any writeMode should create file it not exist';
   provider.filesDelete( routinePath );
   testData = 'Lorem ipsum dolor sit amet';
-  filePath = test.context.pathFor( 'written/readWriteSync/file' );
+  filePath = a.abs( 'written/readWriteSync/file' );
 
   /*rewrite*/
 
@@ -1039,7 +1047,7 @@ function readWriteSync( test )
     var data1 = 'data';
     provider.fieldPush( 'resolvingSoftLink', 1 );
     provider.fileWrite( filePath, data1 );
-    var linkPath1 = test.context.pathFor( 'written/readWriteSync/link' );
+    var linkPath1 = a.abs( 'written/readWriteSync/link' );
     provider.softLink( linkPath1, filePath );
     var got1 = provider.fileRead( linkPath1 );
     test.identical( got1, data1);
@@ -1049,7 +1057,7 @@ function readWriteSync( test )
     var data1 = 'data';
     provider.fieldPush( 'resolvingSoftLink', 0 );
     provider.fileWrite( filePath, data1 );
-    var linkPath1 = test.context.pathFor( 'written/readWriteSync/link' );
+    var linkPath1 = a.abs( 'written/readWriteSync/link' );
     provider.softLink( linkPath1, filePath );
     test.shouldThrowErrorOfAnyKind( () =>
     {
@@ -1061,7 +1069,7 @@ function readWriteSync( test )
     var data1 = 'data';
     provider.fieldPush( 'resolvingSoftLink', 1 );
     provider.fileWrite( filePath, data1 );
-    var linkPath1 = test.context.pathFor( 'written/readWriteSync/link' );
+    var linkPath1 = a.abs( 'written/readWriteSync/link' );
     provider.softLink( linkPath1, filePath );
     provider.fileWrite( linkPath1, data1 + data1 );
     var got1 = provider.fileRead( filePath );
@@ -1074,7 +1082,7 @@ function readWriteSync( test )
     var data1 = 'data';
     provider.fieldPush( 'resolvingSoftLink', 0 );
     provider.fileWrite( filePath, data1 );
-    var linkPath1 = test.context.pathFor( 'written/readWriteSync/link' );
+    var linkPath1 = a.abs( 'written/readWriteSync/link' );
     provider.softLink( linkPath1, filePath );
     provider.fileWrite( linkPath1, data1 + data1 );
     var got1 = provider.fileRead( filePath );
@@ -1087,7 +1095,7 @@ function readWriteSync( test )
     var data1 = 'data';
     provider.fieldPush( 'resolvingSoftLink', 0 );
     provider.fileWrite( filePath, data1 );
-    var linkPath1 = test.context.pathFor( 'written/readWriteSync/link' );
+    var linkPath1 = a.abs( 'written/readWriteSync/link' );
     provider.softLink( linkPath1, filePath );
     provider.fileWrite
     ({
@@ -1105,7 +1113,7 @@ function readWriteSync( test )
     var data1 = 'data';
     provider.fieldPush( 'resolvingSoftLink', 0 );
     provider.fileWrite( filePath, data1 );
-    var linkPath1 = test.context.pathFor( 'written/readWriteSync/link' );
+    var linkPath1 = a.abs( 'written/readWriteSync/link' );
     provider.softLink( linkPath1, filePath );
     provider.fileWrite
     ({
@@ -1129,7 +1137,7 @@ function readWriteSync( test )
       encoding : 'original.type',
       data : data1,
     });
-    var linkPath1 = test.context.pathFor( 'written/readWriteSync/link' );
+    var linkPath1 = a.abs( 'written/readWriteSync/link' );
     provider.softLink( linkPath1, filePath );
     var appendData = 'abc';
     provider.fileWrite
@@ -1150,7 +1158,7 @@ function readWriteSync( test )
     var data1 = 'data';
     provider.fieldPush( 'resolvingSoftLink', 0 );
     provider.fileWrite( filePath, data1 );
-    var linkPath1 = test.context.pathFor( 'written/readWriteSync/link' );
+    var linkPath1 = a.abs( 'written/readWriteSync/link' );
     provider.softLink( linkPath1, filePath );
     provider.fileWrite
     ({
@@ -1168,7 +1176,7 @@ function readWriteSync( test )
     var data1 = 'data';
     provider.fieldPush( 'resolvingSoftLink', 0 );
     provider.fileWrite( filePath, data1 );
-    var linkPath1 = test.context.pathFor( 'written/readWriteSync/link' );
+    var linkPath1 = a.abs( 'written/readWriteSync/link' );
     provider.softLink( linkPath1, filePath );
     provider.fileWrite
     ({
@@ -1192,7 +1200,7 @@ function readWriteSync( test )
       encoding : 'original.type',
       data : data1,
     });
-    var linkPath1 = test.context.pathFor( 'written/readWriteSync/link' );
+    var linkPath1 = a.abs( 'written/readWriteSync/link' );
     provider.softLink( linkPath1, filePath );
     var appendData = 'abc';
     provider.fileWrite
@@ -1219,7 +1227,7 @@ function readWriteSync( test )
     provider.filesDelete( routinePath );
     testData = 'Lorem ipsum dolor sit amet';
     var buffer = _.bufferRawFrom( BufferNode.from( testData ) );
-    filePath = test.context.pathFor( 'written/readWriteSync/file' );
+    filePath = a.abs( 'written/readWriteSync/file' );
 
     /**/
 
@@ -1261,7 +1269,7 @@ function readWriteSync( test )
         var data2 = 'data';
         provider.fieldPush( 'resolvingSoftLink', 0 );
         provider.fileWrite( filePath, data2 );
-        var linkPath2 = test.context.pathFor( 'written/readWriteSync/link' );
+        var linkPath2 = a.abs( 'written/readWriteSync/link' );
         provider.softLink( linkPath2, filePath );
         provider.fileWrite
         ({
@@ -1279,7 +1287,7 @@ function readWriteSync( test )
         var data2 = 'data';
         provider.fieldPush( 'resolvingSoftLink', 0 );
         provider.fileWrite( filePath, data2 );
-        var linkPath2 = test.context.pathFor( 'written/readWriteSync/link' );
+        var linkPath2 = a.abs( 'written/readWriteSync/link' );
         provider.softLink( linkPath2, filePath );
         provider.fileWrite
         ({
@@ -1440,19 +1448,19 @@ function readWriteSync( test )
   // var data1 = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit';
   // provider.fileWrite
   // ({
-  //   filePath : test.context.pathFor( 'written/readWriteSync/test.txt' ),
+  //   filePath : a.abs( 'written/readWriteSync/test.txt' ),
   //   data : data1,
   //   sync : 1,
   // });
   /* - */
   // test.case = 'single file is written';
-  // var files = provider.dirRead( test.context.pathFor( 'written/readWriteSync/' ) );
+  // var files = provider.dirRead( a.abs( 'written/readWriteSync/' ) );
   // test.identical( files, [ 'test.txt' ] );
   /* - */
   // test.case = 'synchronous, writeMode : rewrite';
   // var got = provider.fileRead
   // ({
-  //   filePath : test.context.pathFor( 'written/readWriteSync/test.txt' ),
+  //   filePath : a.abs( 'written/readWriteSync/test.txt' ),
   //   sync : 1
   // });
   // var expected = data1;
@@ -1461,20 +1469,20 @@ function readWriteSync( test )
   // var data2 = 'LOREM';
   // provider.fileWrite
   // ({
-  //   filePath : test.context.pathFor( 'written/readWriteSync/test.txt' ),
+  //   filePath : a.abs( 'written/readWriteSync/test.txt' ),
   //   data : data2,
   //   sync : 1,
   //   writeMode : 'append'
   // });
   /* - */
   // test.case = 'single file is written';
-  // var files = provider.dirRead( test.context.pathFor( 'written/readWriteSync/' ) );
+  // var files = provider.dirRead( a.abs( 'written/readWriteSync/' ) );
   // test.identical( files, [ 'test.txt' ] );
   /* - */
   // test.case = 'synchronous, writeMode : append';
   // var got = provider.fileRead
   // ({
-  //   filePath : test.context.pathFor( 'written/readWriteSync/test.txt' ),
+  //   filePath : a.abs( 'written/readWriteSync/test.txt' ),
   //   sync : 1
   // });
   // var expected = data1 + data2;
@@ -1483,20 +1491,20 @@ function readWriteSync( test )
   // var data2 = 'LOREM';
   // provider.fileWrite
   // ({
-  //   filePath : test.context.pathFor( 'written/readWriteSync/test.txt' ),
+  //   filePath : a.abs( 'written/readWriteSync/test.txt' ),
   //   data : data2,
   //   sync : 1,
   //   writeMode : 'prepend'
   // });
   /* - */
   // test.case = 'single file is written';
-  // var files = provider.dirRead( test.context.pathFor( 'written/readWriteSync/' ) );
+  // var files = provider.dirRead( a.abs( 'written/readWriteSync/' ) );
   // test.identical( files, [ 'test.txt' ] );
   /* - */
   // test.case = 'synchronous, writeMode : prepend';
   // var got = provider.fileRead
   // ({
-  //   filePath : test.context.pathFor( 'written/readWriteSync/test.txt' ),
+  //   filePath : a.abs( 'written/readWriteSync/test.txt' ),
   //   sync : 1
   // });
   // var expected = data2 + data1 + data2;
@@ -1509,7 +1517,7 @@ function readWriteSync( test )
   //   {
   //     provider.fileRead
   //     ({
-  //       filePath : test.context.pathFor( 'unknown' ),
+  //       filePath : a.abs( 'unknown' ),
   //       sync : 1
   //     });
   //   });
@@ -1519,7 +1527,7 @@ function readWriteSync( test )
   //   {
   //     provider.fileRead
   //     ({
-  //       filePath : test.context.pathFor( '/' ),
+  //       filePath : a.abs( '/' ),
   //       sync : 1
   //     });
   //   });
@@ -50758,7 +50766,7 @@ let Self =
   tests :
   {
 
-    //testDelaySample,
+    // testDelaySample,
     mustNotThrowError,
 
     readWriteSync,

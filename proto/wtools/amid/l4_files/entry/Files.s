@@ -1,4 +1,5 @@
-(function _Files_s_() {
+( function _Files_s_()
+{
 
 'use strict';
 

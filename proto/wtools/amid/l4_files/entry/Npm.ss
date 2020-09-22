@@ -1,4 +1,5 @@
-(function _Npm_ss_() {
+( function _Npm_ss_()
+{
 
 'use strict';
 

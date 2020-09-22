@@ -1,4 +1,5 @@
-(function _Path_ss_() {
+(function _Path_ss_()
+{
 
 'use strict';
 
@@ -1290,8 +1291,8 @@ function forCopy_body( o )
 
   /*file.absolute =  file.dir + '/' + file.name + file.extWithDot;*/
 
-  let filePath = path.join( file.dir , name + postfix + file.extWithDot );
-  if( !fileProvider.statResolvedRead({ filePath : filePath , sync : 1 }) )
+  let filePath = path.join( file.dir, name + postfix + file.extWithDot );
+  if( !fileProvider.statResolvedRead({ filePath, sync : 1 }) )
   return filePath;
 
   let attempts = 1 << 13;
@@ -1300,9 +1301,9 @@ function forCopy_body( o )
   while( attempts > 0 )
   {
 
-    let filePath = path.join( file.dir , name + postfix + '-' + index + file.extWithDot );
+    let filePath = path.join( file.dir, name + postfix + '-' + index + file.extWithDot );
 
-    if( !fileProvider.statResolvedRead({ filePath : filePath , sync : 1 }) )
+    if( !fileProvider.statResolvedRead({ filePath, sync : 1 }) )
     return filePath;
 
     attempts -= 1;
@@ -1451,8 +1452,6 @@ _.mapExtend( Self, Extension );
 // --
 // export
 // --
-
-
 
 if( typeof module !== 'undefined' )
 module[ 'exports' ] = Self;

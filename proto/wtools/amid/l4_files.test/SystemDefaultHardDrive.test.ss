@@ -1,4 +1,5 @@
-( function _SystemDefaultHardDrive_test_ss_( ) {
+( function _SystemDefaultHardDrive_test_ss_()
+{
 
 'use strict';
 
@@ -31,7 +32,8 @@ function onSuiteBegin()
   context.provider = _.FileProvider.System({ empty : 1 });
   context.provider.providerRegister( context.providerEffective );
   context.provider.defaultProvider = context.providerEffective;
-  context.globalFromPreferred = _.routineJoin( context.providerEffective.path, context.providerEffective.path.globalFromPreferred );
+  context.globalFromPreferred =
+  _.routineJoin( context.providerEffective.path, context.providerEffective.path.globalFromPreferred );
   context.provider.UsingBigIntForStat = context.providerEffective.UsingBigIntForStat;
 
 }

@@ -11,17 +11,17 @@ var filesTree =
 {
   'folder.abc' :
   {
-    'test1.js' : "test\n.gitignore\n.travis.yml\nMakefile\nexample.js\n",
-    'test2' : "var concatMap = require('concat-map');\nvar balanced = require('balanced-match');",
+    'test1.js' : 'test\n.gitignore\n.travis.yml\nMakefile\nexample.js\n',
+    'test2' : 'var concatMap = require(\'concat-map\');\nvar balanced = require(\'balanced-match\');',
     'folder2.x' :
     {
-      'test1.txt' : "var concatMap = require('concat-map');\nvar balanced = require('balanced-match');",
+      'test1.txt' : 'var concatMap = require(\'concat-map\');\nvar balanced = require(\'balanced-match\');',
     }
   }
 }
 var simpleStructure = _.FileProvider.Extract
 ({
-  filesTree : filesTree,
+  filesTree,
   safe : 0
 });
 
@@ -39,3 +39,4 @@ hub.filesCopy
 
 var files = hub.filesFind( hdUrl );
 console.log( files );
+

@@ -1,4 +1,5 @@
-( function _Extract_s_() {
+( function _Extract_s_()
+{
 
 'use strict';
 
@@ -367,7 +368,7 @@ function fileReadAct( o )
   {
 
     if( encoder && encoder.onBegin )
-    _.sure( encoder.onBegin.call( self, { operation : o, encoder : encoder }) === undefined );
+    _.sure( encoder.onBegin.call( self, { operation : o, encoder }) === undefined );
 
   }
 
@@ -376,7 +377,7 @@ function fileReadAct( o )
   function handleEnd( data )
   {
 
-    let context = { data : data, operation : o, encoder : encoder };
+    let context = { data, operation : o, encoder };
     if( encoder && encoder.onEnd )
     _.sure( encoder.onEnd.call( self, context ) === undefined );
     data = context.data;
@@ -409,7 +410,7 @@ function fileReadAct( o )
     if( encoder && encoder.onError )
     try
     {
-      err = encoder.onError.call( self, { error : err, operation : o, encoder : encoder })
+      err = encoder.onError.call( self, { error : err, operation : o, encoder })
     }
     catch( err2 )
     {
@@ -523,7 +524,7 @@ function statReadAct( o )
 
       let o2 =
       {
-        filePath : filePath,
+        filePath,
         resolvingSoftLink : o.resolvingSoftLink,
         resolvingTextLink : 0,
       };
@@ -617,11 +618,11 @@ function statReadAct( o )
       result.isSymbolicLink = returnTrue;
       result.isSoftLink = returnTrue;
     }
-    else if( self._DescriptorIsHardLink( d ) )
-    {
-      _.assert( 0 );
-      // result.isHardLink = returnTrue;
-    }
+    // else if( self._DescriptorIsHardLink( d ) ) /* Dmytro : strange duplicate */
+    // {
+    //   _.assert( 0 );
+    //   // result.isHardLink = returnTrue;
+    // }
     else if( self._DescriptorIsScript( d ) )
     {
       result.isTerminal = returnTrue;
@@ -714,7 +715,7 @@ function fileWriteAct( o )
     return o.data;
 
     _.assert( _.routineIs( encoder.onBegin ) )
-    let context = { data : o.data, read : read, operation : o, encoder : encoder };
+    let context = { data : o.data, read, operation : o, encoder };
     _.sure( encoder.onBegin.call( self, context ) === undefined );
 
     return context.data;
@@ -733,7 +734,7 @@ function fileWriteAct( o )
     {
       let resolvedPath = self.pathResolveLinkFull
       ({
-        filePath : filePath,
+        filePath,
         allowingMissed : 1,
         allowingCycled : 0,
         resolvingSoftLink : 1,
@@ -745,7 +746,12 @@ function fileWriteAct( o )
       filePath = resolvedPath;
 
       // descriptor should be missing/text/hard/terminal
-      _.assert( descriptor === undefined || self._DescriptorIsTerminal( descriptor ) || self._DescriptorIsHardLink( descriptor )  );
+      _.assert
+      (
+        descriptor === undefined
+        || self._DescriptorIsTerminal( descriptor )
+        || self._DescriptorIsHardLink( descriptor )
+      );
 
     }
 
@@ -957,7 +963,7 @@ function fileDeleteAct( o )
 
     let stat = self.statReadAct
     ({
-      filePath : filePath,
+      filePath,
       resolvingSoftLink : 0,
       sync : 1,
       throwing : 0,
@@ -1078,12 +1084,15 @@ function fileLockAct( o )
       else if( o.sync )
       {
         throw _.err
-        ( 'File', o.filePath, 'is already locked by current process.',
+        (
+          'File', o.filePath, 'is already locked by current process.',
           'With option {-o.waiting-} enabled, lock will be waiting for itself.',
           'Please use existing lock or execute method with {-o.sync-} set to 0.'
         )
       }
     }
+
+    let tries, con;
 
     if( !o.waiting )
     {
@@ -1091,31 +1100,10 @@ function fileLockAct( o )
     }
     else
     {
-      let tries = o.timeOut / 1000;
-      let con = new _.Consequence();
+      tries = o.timeOut / 1000;
+      con = new _.Consequence();
 
       lockTry();
-
-      function lockTry()
-      {
-        tries -= 1;
-        try
-        {
-          let result = lock();
-          con.take( result );
-        }
-        catch( err )
-        {
-          if( tries < 0 )
-          return con.error( err );
-
-          _.time.out( 1000, () =>
-          {
-            lockTry();
-            return null;
-          })
-        }
-      }
 
       return con;
     }
@@ -1131,6 +1119,27 @@ function fileLockAct( o )
 
       self._descriptorWrite( lockFilePath, o.filePath );
       return true;
+    }
+
+    function lockTry()
+    {
+      tries -= 1;
+      try
+      {
+        let result = lock();
+        con.take( result );
+      }
+      catch( err )
+      {
+        if( tries < 0 )
+        return con.error( err );
+
+        _.time.out( 1000, () =>
+        {
+          lockTry();
+          return null;
+        })
+      }
     }
   })
 
@@ -1318,6 +1327,8 @@ function fileCopyAct( o )
   let self = this;
   let srcFile;
 
+  debugger;
+
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assertRoutineOptions( fileCopyAct, arguments );
   _.assert( self.path.isNormalized( o.srcPath ) );
@@ -1386,8 +1397,7 @@ function fileCopyAct( o )
   else
   {
     let con = new _.Consequence().take( null );
-    let dstStat;
-    let data;
+    let dstStat, data;
 
     con.then( () =>
     {
@@ -2294,10 +2304,10 @@ function _DescriptorIsLink( file )
   return false;
 
   // if( _.arrayIs( file ) )
-  {
-    _.assert( file.length === 1 );
-    file = file[ 0 ];
-  }
+  // {
+  _.assert( file.length === 1 );
+  file = file[ 0 ];
+  // }
   _.assert( !!file );
   return !!( file.hardLinks || file.softLink );
 }
@@ -2310,10 +2320,10 @@ function _DescriptorIsSoftLink( file )
   return false;
 
   // if( _.arrayIs( file ) )
-  {
-    _.assert( file.length === 1 );
-    file = file[ 0 ];
-  }
+  // {
+  _.assert( file.length === 1 );
+  file = file[ 0 ];
+  // }
   _.assert( !!file );
   return !!file.softLink;
 }
@@ -2326,10 +2336,10 @@ function _DescriptorIsHardLink( file )
   return false;
 
   // if( _.arrayIs( file ) )
-  {
-    _.assert( file.length === 1 );
-    file = file[ 0 ];
-  }
+  // {
+  _.assert( file.length === 1 );
+  file = file[ 0 ];
+  // }
 
   _.assert( !!file );
   _.assert( !file.hardLink );
@@ -2363,10 +2373,10 @@ function _DescriptorIsScript( file )
   return false;
 
   // if( _.arrayIs( file ) )
-  {
-    _.assert( file.length === 1 );
-    file = file[ 0 ];
-  }
+  // {
+  _.assert( file.length === 1 );
+  file = file[ 0 ];
+  // }
 
   _.assert( !!file );
   return !!file.code;
@@ -2469,7 +2479,7 @@ function _descriptorTimeUpdate( filePath, created )
 
   let o2 =
   {
-    filePath : filePath,
+    filePath,
     ctime : time,
     mtime : time
   }

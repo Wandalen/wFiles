@@ -1,4 +1,5 @@
-( function _Record_test_s_( ) {
+( function _Record_test_s_()
+{
 
 'use strict';
 
@@ -172,7 +173,7 @@ function recordFields( test )
   var factory = _.FileRecordFactory.TolerantFrom( o, { dirPath : dir, basePath : _.path.dir( dir ) } ).form();
   var got = factory.record({ input : filePath, factory });
   // test.identical( got.relative, './file.test/Record.test.s' );
-  test.identical( got.relative, './' + _.path.relative( _.path.join( __filename, '../..' ) , __filename ) );
+  test.identical( got.relative, './' + _.path.relative( _.path.join( __filename, '../..' ), __filename ) );
   test.identical( got.stat.isTerminal(), true );
 
   /*relative option can be any absolute path*/
@@ -467,7 +468,7 @@ function recordFields( test )
     test.identical( record.name, _.path.name( filePath ) );
   }
   var filePath = _.path.normalize( __filename );
-  var factory = _.FileRecordFactory.TolerantFrom( o, { dirPath : dir, onRecord : _onRecord} ).form();
+  var factory = _.FileRecordFactory.TolerantFrom( o, { dirPath : dir, onRecord : _onRecord } ).form();
   factory.record({ input : filePath, factory });
 
   //
@@ -689,7 +690,7 @@ function recordFiltering( test )
     test.identical( record.name, _.path.name( filePath ) );
   }
   var filePath = _.path.normalize( __filename );
-  var factory = _.FileRecordFactory.TolerantFrom( o, { dirPath : dir, onRecord : _onRecord} ).form();
+  var factory = _.FileRecordFactory.TolerantFrom( o, { dirPath : dir, onRecord : _onRecord } ).form();
   factory.record({ input : filePath, factory });
 
   //
@@ -999,8 +1000,18 @@ function recordForRelativeLink( test )
   _.fileProvider.softLink( pathLinkToDir, _.path.relative( pathLinkToDir, pathToDir ) );
   _.fileProvider.softLink( pathLinkToLinkToTerminal, _.path.relative( pathLinkToLinkToTerminal, pathLinkToTerminal ) );
   _.fileProvider.softLink( pathLinkToLinkToDir, _.path.relative( pathLinkToLinkToDir, pathLinkToDir ) );
-  _.fileProvider.softLink({ dstPath : pathLinkToMissing, srcPath : _.path.relative( pathLinkToMissing, pathToMissing ), allowingMissed : 1 });
-  _.fileProvider.softLink({ dstPath : pathLinkToLinkToMissing, srcPath : _.path.relative( pathLinkToLinkToMissing, pathLinkToMissing ), allowingMissed : 1 });
+  _.fileProvider.softLink
+  ({
+    dstPath : pathLinkToMissing,
+    srcPath : _.path.relative( pathLinkToMissing, pathToMissing ),
+    allowingMissed : 1
+  });
+  _.fileProvider.softLink
+  ({
+    dstPath : pathLinkToLinkToMissing,
+    srcPath : _.path.relative( pathLinkToLinkToMissing, pathLinkToMissing ),
+    allowingMissed : 1
+  });
 
   test.case = 'link to missing';
 
@@ -1138,7 +1149,12 @@ function recordForRelativeLink( test )
 
   var pathLinkAbsolute = _.path.join( dir, 'pathLinkAbsolute' );
   var pathLinkRelative = _.path.join( dir, 'pathLinkRelative' );
-  _.fileProvider.softLink({ dstPath : pathLinkRelative, srcPath : _.path.resolve( pathLinkRelative, pathToMissing ), allowingMissed : 1 });
+  _.fileProvider.softLink
+  ({
+    dstPath : pathLinkRelative,
+    srcPath : _.path.resolve( pathLinkRelative, pathToMissing ),
+    allowingMissed : 1
+  });
   _.fileProvider.softLink( pathLinkAbsolute, pathLinkRelative );
 
   var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 0 }).form();

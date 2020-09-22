@@ -1,4 +1,5 @@
-( function _Image_s_() {
+( function _Image_s_()
+{
 
 'use strict';
 
@@ -42,8 +43,13 @@ function init( o )
       return self._routineFunctor( result, k );
       return result;
     },
-    set : function( self, k, val, proxy )
+    set : function( /* self, k, val, proxy */ )
     {
+      let self = arguments[ 0 ];
+      let k = arguments[ 1 ];
+      let val = arguments[ 2 ];
+      let proxy = arguments[ 3 ];
+
       if( self[ k ] !== undefined )
       self[ k ] = val;
       else if( self.originalFileProvider[ k ] !== undefined )
@@ -210,7 +216,7 @@ let Composes =
 let Aggregates =
 {
   onCallBegin : null,
-  onCall : onCall,
+  onCall,
   onCallEnd : null,
 }
 

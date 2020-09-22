@@ -1,4 +1,5 @@
-(function _Git_ss_() {
+( function _Git_ss_()
+{
 
 'use strict';
 

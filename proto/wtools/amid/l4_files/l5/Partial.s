@@ -1,4 +1,5 @@
-( function _Partial_s_() {
+( function _Partial_s_()
+{
 
 'use strict';
 
@@ -672,8 +673,8 @@ function pathForCopy_body( o )
 
   /*file.absolute =  file.dir + '/' + file.name + file.extWithDot;*/
 
-  let path = fileProvider.path.join( file.dir , name + postfix + file.extWithDot );
-  if( !fileProvider.statResolvedRead({ filePath : path , sync : 1 }) )
+  let path = fileProvider.path.join( file.dir, name + postfix + file.extWithDot );
+  if( !fileProvider.statResolvedRead({ filePath : path, sync : 1 }) )
   return path;
 
   let attempts = 1 << 13;
@@ -682,9 +683,9 @@ function pathForCopy_body( o )
   while( attempts > 0 )
   {
 
-    let path = fileProvider.path.join( file.dir , name + postfix + '-' + index + file.extWithDot );
+    let path = fileProvider.path.join( file.dir, name + postfix + '-' + index + file.extWithDot );
 
-    if( !fileProvider.statResolvedRead({ filePath : path , sync : 1 }) )
+    if( !fileProvider.statResolvedRead({ filePath : path, sync : 1 }) )
     return path;
 
     attempts -= 1;
@@ -1240,12 +1241,12 @@ function pathResolveLinkFull_body( o )
 
         let o2 =
         {
-          system : system,
+          system,
           filePath : result.absolutePath,
           resolvingSoftLink : o.resolvingSoftLink,
           resolvingTextLink : o.resolvingTextLink,
           allowingMissed : o.allowingMissed,
-          allowingCycled: o.allowingCycled,
+          allowingCycled : o.allowingCycled,
           throwing : o.throwing,
           recursive : o.recursive,
           stat : null,
@@ -1261,7 +1262,7 @@ function pathResolveLinkFull_body( o )
         let o2 =
         {
           stat : o.stat,
-          system : system,
+          system,
           filePath : result.absolutePath,
           resolvingSoftLink : o.resolvingSoftLink,
           resolvingTextLink : o.resolvingTextLink,
@@ -1310,12 +1311,12 @@ function pathResolveLinkFull_body( o )
 
         let o2 =
         {
-          system : system,
+          system,
           filePath : result.absolutePath,
           resolvingSoftLink : o.resolvingSoftLink,
           resolvingTextLink : o.resolvingTextLink,
           allowingMissed : o.allowingMissed,
-          allowingCycled: o.allowingCycled,
+          allowingCycled : o.allowingCycled,
           recursive : o.recursive,
           throwing : o.throwing,
         }
@@ -1758,7 +1759,7 @@ function pathResolveLinkHeadDirect_body( o )
     if( !o2.stat )
     o2.stat = self.statReadAct
     ({
-      filePath : filePath,
+      filePath,
       throwing : 0,
       sync : 1,
       resolvingSoftLink : 0,
@@ -1771,10 +1772,18 @@ function pathResolveLinkHeadDirect_body( o )
       break;
     }
 
-    if( ( o2.resolvingSoftLink && o2.stat.isSoftLink() ) || ( o2.resolvingTextLink && self.usingTextLink && o2.stat.isTextLink() ) )
-    filePath = self.pathResolveLinkTail.body.call( self, o2 ).absolutePath;
-    if( i === splits.length-1 )
-    o.stat = o2.stat;
+    if
+    (
+      ( o2.resolvingSoftLink && o2.stat.isSoftLink() )
+      || ( o2.resolvingTextLink && self.usingTextLink && o2.stat.isTextLink() )
+    )
+    {
+      filePath = self.pathResolveLinkTail.body.call( self, o2 ).absolutePath;
+    }
+    if( i === splits.length - 1 )
+    {
+      o.stat = o2.stat;
+    }
   }
 
   return filePath;
@@ -2148,8 +2157,8 @@ function statRead_body( o )
     resolvingSoftLink : o.resolvingSoftLink,
     sync : o.sync,
     throwing : o.throwing,
-  	allowingMissed : 0,
-  	allowingCycled : 0,
+    allowingMissed : 0,
+    allowingCycled : 0,
   }
 
   try
@@ -2447,7 +2456,7 @@ function fileSize_body( o )
   _.sure( _.objectIs( stat ) );
 
   if( stat.isDir() )
-  return 0;
+  return self.UsingBigIntForStat ? 0n : 0;
 
   return stat.size;
 }
@@ -3081,7 +3090,7 @@ function resolvedDirIsEmpty( filePath )
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
-  let o = { filePath : filePath };
+  let o = { filePath };
 
   if( self.resolvedIsDir( o ) )
   return !self.dirRead( o.filePath ).length;
@@ -3158,7 +3167,7 @@ function streamRead_body( o )
   {
     if( encoder && encoder.onBegin )
     {
-      let r = encoder.onBegin.call( self, { operation : o, encoder : encoder, provider : self })
+      let r = encoder.onBegin.call( self, { operation : o, encoder, provider : self })
       _.sure( r === undefined );
     }
   }
@@ -3171,7 +3180,7 @@ function streamRead_body( o )
     if( encoder && encoder.onEnd )
     try
     {
-      let o2 = { stream : result, operation : o, encoder : encoder, provider : self };
+      let o2 = { stream : result, operation : o, encoder, provider : self };
       let r = encoder.onEnd.call( self, o2 );
       _.sure( r === undefined );
       result = o2.result;
@@ -3202,7 +3211,7 @@ function streamRead_body( o )
     try
     {
       /* zzz : remove encoder.onError? */
-      err = encoder.onError.call( self, { error : err, stream : result, operation : o, encoder : encoder, provider : self })
+      err = encoder.onError.call( self, { error : err, stream : result, operation : o, encoder, provider : self })
     }
     catch( err2 )
     {
@@ -3237,7 +3246,7 @@ function fileRead_pre( routine, args )
   _.assert( args.length === 1 || args.length === 2 );
 
   if( args.length === 2 )
-  args = [{ filePath : args[ 0 ], encoding : args[ 1 ] }]; /* qqq : add test to cover this */
+  args = [ { filePath : args[ 0 ], encoding : args[ 1 ] } ]; /* aaa : add test to cover this */ /* Dmytro : covered in routine `fileReadWithEncoding` */
 
   let o = self._preFilePathScalarWithoutProviderDefaults( routine, args );
 
@@ -3318,8 +3327,7 @@ function fileRead_body( o )
 
     result
     .then( handleEnd )
-    .catch( handleError )
-    ;
+    .catch( handleError );
 
     return result;
   }
@@ -3330,7 +3338,7 @@ function fileRead_body( o )
   {
     if( encoder && encoder.onBegin )
     {
-      let r = encoder.onBegin.call( self, { operation : o, encoder : encoder, provider : self })
+      let r = encoder.onBegin.call( self, { operation : o, encoder, provider : self })
       _.sure( r === undefined );
     }
     if( o.onBegin )
@@ -3345,7 +3353,7 @@ function fileRead_body( o )
     if( encoder && encoder.onEnd )
     try
     {
-      let o2 = { data : data, operation : o, encoder : encoder, provider : self };
+      let o2 = { data, operation : o, encoder, provider : self };
       let r = encoder.onEnd.call( self, o2 );
       _.sure( r === undefined );
       data = o2.data;
@@ -3392,7 +3400,7 @@ function fileRead_body( o )
     try
     {
       /* zzz : remove encoder.onError? */
-      err = encoder.onError.call( self, { error : err, operation : o, encoder : encoder, provider : self })
+      err = encoder.onError.call( self, { error : err, operation : o, encoder, provider : self })
     }
     catch( err2 )
     {
@@ -3899,11 +3907,11 @@ function hashRead_body( o )
   catch( err ) /* qqq : make sure catch blocks of other methods return consequence if o.sync ~ false */
   {
     debugger;
-    err = _.err( err, '\nCant read hash of', o.filePath )
+    let error = _.err( err, '\nCant read hash of', o.filePath )
     if( o.sync )
     {
       if( o.throwing )
-      throw err;
+      throw error;
       else
       return NaN;
     }
@@ -3911,7 +3919,7 @@ function hashRead_body( o )
     {
       let result = new _.Consequence();
       if( o.throwing )
-      return result.error( err );
+      return result.error( error );
       else
       return result.take( NaN );
     }
@@ -4020,7 +4028,7 @@ function hashSzIsUpToDate_pre( routine, args )
   let self = this;
 
   if( args.length === 2 )
-  args = [{ filePath : args[ 0 ], hash : args[ 1 ] }];
+  args = [ { filePath : args[ 0 ], hash : args[ 1 ] } ];
 
   return self._preFilePathScalarWithProviderDefaults( routine, args );
 }
@@ -4192,8 +4200,11 @@ function dirRead_body( o )
     {
       a = a.toLowerCase();
       b = b.toLowerCase();
-      if( a < b ) return -1;
-      if( a > b ) return +1;
+      if( a < b )
+      return -1;
+      if( a > b )
+      return +1;
+
       return 0;
     });
 
@@ -4782,7 +4793,7 @@ function fileWrite_body( o )
 
   if( encoder && encoder.onBegin )
   {
-    let r = encoder.onBegin.call( self, { operation : o2, encoder : encoder, data : o2.data } );
+    let r = encoder.onBegin.call( self, { operation : o2, encoder, data : o2.data } );
     _.sure( r === undefined );
   }
 
@@ -4852,7 +4863,7 @@ function fileWrite_body( o )
   let result = self.fileWriteAct( o2 );
 
   if( encoder && encoder.onEnd )
-  _.sure( encoder.onEnd.call( self, { operation : o, encoder : encoder, data : o.data, result : result } ) === undefined );
+  _.sure( encoder.onEnd.call( self, { operation : o, encoder, data : o.data, result } ) === undefined );
 
   return result;
 
@@ -4891,7 +4902,7 @@ having.aspect = 'body';
       options =
       {
         filePath : 'tmp/sample.txt',
-        data : data,
+        data,
         sync : false,
       };
     let con = wTools.fileWrite( options );
@@ -4984,22 +4995,25 @@ function fileWriteJson_body( o )
 
   /* validate */
 
-  if( Config.debug && o.pretty ) try
+  if( Config.debug && o.pretty )
   {
+    try /* Dmytro : are this code need extension? */
+    {
 
-    // let parsedData = o.jsLike ? _.exec( o.data ) : JSON.parse( o.data );
-    // _.assert( _.entityEquivalent( parsedData, originalData ), 'not identical' );
+      // let parsedData = o.jsLike ? _.exec( o.data ) : JSON.parse( o.data );
+      // _.assert( _.entityEquivalent( parsedData, originalData ), 'not identical' );
 
-  }
-  catch( err )
-  {
+    }
+    catch( err )
+    {
 
-    // debugger;
-    self.logger.log( '-' );
-    self.logger.error( 'JSON:' );
-    self.logger.error( _.toStr( o.data, { levels : 999 } ) );
-    self.logger.log( '-' );
-    throw _.err( 'Cant convert JSON\n', err );
+      // debugger;
+      self.logger.log( '-' );
+      self.logger.error( 'JSON:' );
+      self.logger.error( _.toStr( o.data, { levels : 999 } ) );
+      self.logger.log( '-' );
+      throw _.err( 'Cant convert JSON\n', err );
+    }
   }
 
   /* write */
@@ -5879,6 +5893,7 @@ defaults.srcPath = null;
 defaults.relativeDstPath = null;
 defaults.relativeSrcPath = null;
 defaults.sync = null;
+defaults.context = null;
 
 var having = fileRenameAct.having = Object.create( null );
 having.writing = 1;
@@ -6071,6 +6086,7 @@ function _fileRenameDo( c )
           relativeSrcPath : o.relativeSrcPath,
           sync : o.sync,
           type : null,
+          context : c,
         });
       }
       return o.sync ? true : result;
@@ -6146,6 +6162,7 @@ function _fileRenameDo( c )
           relativeDstPath : o.relativeDstPath,
           relativeSrcPath : o.relativeSrcPath,
           sync : o.sync,
+          context : c,
         });
       }
       return o.sync ? true : result;
@@ -6236,6 +6253,7 @@ defaults.relativeDstPath = null;
 defaults.relativeSrcPath = null;
 // defaults.breakingDstHardLink = 0; /* qqq2 : remove the option from Act method? aaa:done */
 defaults.sync = null;
+defaults.context = null;
 
 var having = fileCopyAct.having = Object.create( null );
 having.writing = 1;
@@ -6375,6 +6393,7 @@ function _fileCopyDo( c )
       relativeSrcPath : o.relativeSrcPath,
       sync : o.sync,
       type : null,
+      context : c,
     });
   }
   else if( c.srcStat.isTextLink() )
@@ -6395,6 +6414,7 @@ function _fileCopyDo( c )
       relativeDstPath : o.relativeDstPath,
       relativeSrcPath : o.relativeSrcPath,
       sync : o.sync,
+      context : c,
     });
 
   }
@@ -6442,6 +6462,7 @@ function _fileCopyDo( c )
         relativeDstPath : o.relativeDstPath,
         relativeSrcPath : o.relativeSrcPath,
         sync : o.sync,
+        context : c,
       });
       return o.sync ? true : result;
     })
@@ -6464,6 +6485,7 @@ let fileCopy = _.files.linker.functor
   onSizeCheck : _fileCopySizeCheck,
   skippingSamePath : true,
   skippingMissed : false,
+  linkMaybe : true,
 });
 
 var defaults = fileCopy.body.defaults;
@@ -6521,7 +6543,7 @@ var having = hardLinkAct.having = Object.create( null );
 having.writing = 1;
 having.reading = 0;
 having.driving = 1;
-having.hardLinking = 1;
+// having.hardLinking = 1;
 
 var operates = hardLinkAct.operates = Object.create( null );
 operates.dstPath = { pathToWrite : 1 }
@@ -6573,6 +6595,8 @@ function _hardLinkVerify1( c )
 
 }
 
+//
+
 function _hardLinkVerify2( c )
 {
   let self = this;
@@ -6609,6 +6633,8 @@ function _hardLinkVerify2( c )
   }
 }
 
+//
+
 function _hardLinkDo( c )
 {
   let self = this;
@@ -6638,6 +6664,7 @@ function _hardLinkDo( c )
         relativeSrcPath : o.relativeSrcPath,
         sync : o.sync,
         type : null,
+        context : c,
       });
     })
   }
@@ -6661,6 +6688,7 @@ function _hardLinkDo( c )
         relativeDstPath : o.relativeDstPath,
         relativeSrcPath : o.relativeSrcPath,
         sync : o.sync,
+        context : c,
       });
     })
   }
@@ -6688,7 +6716,7 @@ function _hardLinkDo( c )
       }
     }
 
-    c.options2.context = c; /* qqq : move to linker. make it working for all 5 methods */
+    // c.options2.context = c; /* aaa : move to linker. make it working for all 5 methods */ /* Dmytro : moved */
 
     return self.hardLinkAct( c.options2 );
   }
@@ -6701,8 +6729,12 @@ function _hardLinkDo( c )
 
     con.then( () =>
     {
-      let result = callback();
-      return o.sync ? true : result;
+      if( o.sync )
+      {
+        callback();
+        return true;
+      }
+      return callback();
     });
 
     if( o.sync )
@@ -6752,7 +6784,8 @@ let hardLink = _.files.linker.functor
   onVerify2 : _hardLinkVerify2,
   skippingSamePath : true,
   skippingMissed : false,
-  renaming : false
+  hardLinking : true,
+  renaming : false,
 });
 
 var defaults = hardLink.body.defaults;
@@ -6790,6 +6823,7 @@ defaults.relativeDstPath = null;
 defaults.relativeSrcPath = null;
 defaults.sync = null;
 defaults.type = null;
+defaults.context = null;
 
 var having = softLinkAct.having = Object.create( null );
 having.writing = 1;
@@ -6867,6 +6901,7 @@ let softLink = _.files.linker.functor
   onVerify2 : _softLinkVerify2,
   skippingSamePath : false,
   skippingMissed : false,
+  linkMaybe : true,
 });
 
 var defaults = softLink.body.defaults;
@@ -6919,6 +6954,7 @@ defaults.srcPath = null;
 defaults.sync = null;
 defaults.relativeDstPath = null;
 defaults.relativeSrcPath = null;
+defaults.context = null;
 
 var having = textLinkAct.having = Object.create( null );
 having.writing = 1;
@@ -6983,7 +7019,7 @@ function _textOnStat( filePath, resolving )
   self.fieldPush( 'usingTextLink', 1 );
   let result = self.statRead
   ({
-    filePath : filePath,
+    filePath,
     throwing : 0,
     resolvingSoftLink : resolving,
     resolvingTextLink : resolving,
@@ -7002,6 +7038,7 @@ let textLink = _.files.linker.functor
   onStat : _textOnStat,
   skippingSamePath : false,
   skippingMissed : false,
+  linkMaybe : true,
 });
 
 var defaults = textLink.body.defaults;
@@ -7175,7 +7212,7 @@ function fileExchange_body( o )
   {
     let o2 =
     {
-      filePath : filePath,
+      filePath,
       resolvingTextLink : self.resolvingTextLink,
       resolvingSoftLink : self.resolvingSoftLink,
       sync : 1,
@@ -7184,7 +7221,7 @@ function fileExchange_body( o )
       allowingCycled : o.allowingCycled,
     }
     filePath = self.pathResolveLinkFull( o2 ).absolutePath;
-    return { filePath : filePath, stat : o2.stat };
+    return { filePath, stat : o2.stat };
   }
 
   /* - */
@@ -7808,7 +7845,7 @@ let Medials =
 let Statics =
 {
 
-  MakeDefault : MakeDefault,
+  MakeDefault,
   Path : _.path.CloneExtending({ fileProvider : Self }),
   WriteMode,
   ProviderDefaults,

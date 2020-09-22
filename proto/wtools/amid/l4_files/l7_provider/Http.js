@@ -1,4 +1,5 @@
-( function _Http_js_() {
+( function _Http_js_()
+{
 
 'use strict';
 
@@ -283,7 +284,7 @@ function fileReadAct( o )
   {
 
     if( encoder && encoder.onBegin )
-    _.sure( encoder.onBegin.call( self, { operation : o, encoder : encoder }) === undefined );
+    _.sure( encoder.onBegin.call( self, { operation : o, encoder }) === undefined );
 
     if( !o.sync )
     if( encoder && encoder.responseType )
@@ -304,7 +305,7 @@ function fileReadAct( o )
 
       result = getData( request );
 
-      let context = { data : result, operation : o, encoder : encoder };
+      let context = { data : result, operation : o, encoder };
       if( encoder && encoder.onEnd )
       _.sure( encoder.onEnd.call( self, context ) === undefined );
       result = context.data
@@ -328,11 +329,7 @@ function fileReadAct( o )
     /* qqq : not implemented well, please implement */
     if( e.lengthComputable )
     if( o.onProgress )
-    _.Consequence.Take( o.onProgress,
-    {
-      progress : e.loaded / e.total,
-      options : o,
-    });
+    _.Consequence.Take( o.onProgress, { progress : e.loaded / e.total, options : o });
   }
 
   /* error */
@@ -354,7 +351,7 @@ function fileReadAct( o )
     if( encoder && encoder.onError )
     try
     {
-      err = encoder.onError.call( self, { error : err, operation : o, encoder : encoder })
+      err = encoder.onError.call( self, { error : err, operation : o, encoder });
     }
     catch( err2 )
     {
@@ -389,10 +386,12 @@ function fileReadAct( o )
     {
 
       let data = getData( this );
-      if( !data ) return;
+      if( !data )
+      return;
       if( !total ) total = this.getResponseHeader( 'Content-Length' );
       total = Number( total ) || 1;
-      if( isNaN( total ) ) return;
+      if( isNaN( total ) )
+      return;
       handleProgress( data.length / total, o );
 
     }

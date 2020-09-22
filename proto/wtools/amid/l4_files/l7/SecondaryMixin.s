@@ -1,4 +1,5 @@
-( function _SecondaryMixin_s_() {
+( function _SecondaryMixin_s_()
+{
 
 'use strict';
 
@@ -345,7 +346,7 @@ function _filesReadOldAsync( o )
   con.take( null ).give( function filesReadOldEnd()
   {
     let result = _filesReadOldEnd( errs, read );
-    con.take( o.throwing ? err : undefined , result );
+    con.take( o.throwing ? err : undefined, result );
   });
 
   /* */
@@ -593,7 +594,7 @@ function systemBitrateTimeGet()
 
   if( _.FileProvider.HardDrive && self instanceof _.FileProvider.HardDrive )
   {
-    let testDir = self.path.tempOpen({ filePath : self.path.join( __dirname, '../../..'  ), name :'SecondaryMixin' });
+    let testDir = self.path.tempOpen({ filePath : self.path.join( __dirname, '../../..'  ), name : 'SecondaryMixin' });
     let tempFile = self.path.join( testDir, 'systemBitrateTimeGet' );
     self.fileWrite( tempFile, tempFile );
     let ostat = self.statResolvedRead( tempFile );

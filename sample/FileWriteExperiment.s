@@ -20,19 +20,19 @@ function showStats( s, o )
 
   if( o )
   {
-     console.log( '\n' )
+    console.log( '\n' )
 
-     if( s.atime.getTime() !== o.atime.getTime() )
-     console.log( '   atime changed' );
+    if( s.atime.getTime() !== o.atime.getTime() )
+    console.log( '   atime changed' );
 
-     if( s.mtime.getTime() !== o.mtime.getTime() )
-     console.log( '   mtime changed' );
+    if( s.mtime.getTime() !== o.mtime.getTime() )
+    console.log( '   mtime changed' );
 
-     if( s.ctime.getTime() !== o.ctime.getTime() )
-     console.log( '   ctime changed' );
+    if( s.ctime.getTime() !== o.ctime.getTime() )
+    console.log( '   ctime changed' );
 
-     if( s.birthtime.getTime() !== o.birthtime.getTime() )
-     console.log( '   birthtime changed' );
+    if( s.birthtime.getTime() !== o.birthtime.getTime() )
+    console.log( '   birthtime changed' );
   }
 }
 
@@ -58,7 +58,7 @@ function fileWriteTest( delay )
   var diff = stats.mtime.getTime() - ostats.mtime.getTime();
   delay = delay * 1000;
 
-  console.log( 'new:' , stats.mtime.getTime(), 'old:', ostats.mtime.getTime() )
+  console.log( 'new:', stats.mtime.getTime(), 'old:', ostats.mtime.getTime() )
   console.log( 'diff:', diff )
   console.log( 'delay:', delay )
 
@@ -69,19 +69,19 @@ function fileWriteTest( delay )
 
   if( !ok )
   {
-      console.log( '\n--------------------\n' )
-      console.log( 'new:' , stats.mtime.getTime(), 'old:', ostats.mtime.getTime() )
-      console.log( 'diff:', diff )
-      console.log( 'delay:', delay )
+    console.log( '\n--------------------\n' )
+    console.log( 'new:', stats.mtime.getTime(), 'old:', ostats.mtime.getTime() )
+    console.log( 'diff:', diff )
+    console.log( 'delay:', delay )
 
-      console.log( '\n--------------------\n' )
+    console.log( '\n--------------------\n' )
 
-      showStats(ostats);
-      showStats(stats, ostats);
+    showStats(ostats);
+    showStats(stats, ostats);
 
-      console.log( '\n--------------------\n' )
+    console.log( '\n--------------------\n' )
 
-      throw _.err( 'Delay not working' )
+    throw _.err( 'Delay not working' )
   }
 
   c--;
@@ -101,6 +101,6 @@ var range = [ 0.3, 0.5 ];
 
 var interval = setInterval( () =>
 {
-    fileWriteTest( range[ 0 ] + Math.random()*( range[ 1 ] - range[ 0 ] ) );
+  fileWriteTest( range[ 0 ] + Math.random()*( range[ 1 ] - range[ 0 ] ) );
 }, 50 );
 

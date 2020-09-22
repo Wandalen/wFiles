@@ -1,4 +1,5 @@
-( function _Reroot_s_() {
+( function _Reroot_s_()
+{
 
 'use strict';
 
@@ -8,7 +9,8 @@ var Abstract = _.FileProvider.Abstract;
 var Partial = _.FileProvider.Partial;
 var Default = _.FileProvider.Default;
 let Parent = null;
-let Self = function wFileFilterReroot( o )
+let Self = wFileFilterReroot;
+function wFileFilterReroot( o )
 {
   return _.workpiece.construct( Self, this, arguments );
 }
@@ -87,17 +89,17 @@ var Restricts =
 var Extension =
 {
 
-  init : init,
+  init,
 
-  pathNativizeAct : pathNativizeAct,
+  pathNativizeAct,
 
   //
 
 
-  Composes : Composes,
-  Aggregates : Aggregates,
-  Associates : Associates,
-  Restricts : Restricts,
+  Composes,
+  Aggregates,
+  Associates,
+  Restricts,
 
 }
 

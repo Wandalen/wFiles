@@ -1,4 +1,5 @@
-(function _Encoders_s_() {
+(function _Encoders_s_()
+{
 
 'use strict';
 
@@ -14,7 +15,7 @@ let readJsSmart =
 {
 
   name : 'js.smart',
-  exts : [ 'js','s','ss','jstruct','jslike' ],
+  exts : [ 'js', 's', 'ss', 'jstruct', 'jslike' ],
   feature : { reader : true, config : true },
   // forConfig : 1,
 
@@ -56,7 +57,7 @@ let readJsNode =
 {
 
   name : 'js.node',
-  exts : [ 'js','s','ss','jstruct' ],
+  exts : [ 'js', 's', 'ss', 'jstruct' ],
   feature : { reader : true },
   // forConfig : 0,
 

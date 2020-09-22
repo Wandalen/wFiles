@@ -16,6 +16,3 @@ console.log( 'File exists after unlink:', _.fileProvider.fileExists( terminalPat
 fs.closeSync( fd );
 console.log( 'File exists after fd is closed:', _.fileProvider.fileExists( terminalPath ) );
 
-
-
-

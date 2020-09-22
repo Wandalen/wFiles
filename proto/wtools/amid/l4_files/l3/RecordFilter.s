@@ -1,4 +1,5 @@
-( function _FileRecordFilter_s_() {
+( function _FileRecordFilter_s_()
+{
 
 'use strict';
 
@@ -526,8 +527,8 @@ function and( src )
   {
     _.assert
     (
-        !filter[ n ] || !src[ n ] || filter[ n ] === src[ n ]
-      , `Cant "and" filter with another filter, them both have field ${n}`
+      !filter[ n ] || !src[ n ] || filter[ n ] === src[ n ],
+      `Cant "and" filter with another filter, them both have field ${n}`
     );
     if( filter[ n ] === null && src[ n ] !== null )
     filter[ n ] = src[ n ];
@@ -568,7 +569,13 @@ function _pathsAmmend( o )
   _.assert( !filter.system || !o.src.system || filter.system === o.src.system );
   _.assert( o.src !== filter );
 
-  let fileProvider = filter.effectiveProvider || filter.system || filter.defaultProvider || o.src.effectiveProvider || o.src.system || o.src.defaultProvider;
+  let fileProvider = filter.effectiveProvider
+  || filter.system
+  || filter.defaultProvider
+  || o.src.effectiveProvider
+  || o.src.system
+  || o.src.defaultProvider;
+
   let path = fileProvider.path;
 
   /* */
@@ -583,7 +590,12 @@ function _pathsAmmend( o )
   let dstFilePathArrayNonBool = filter.filePathArrayNonBoolGet();
   let srcFilePathArrayNonBool = o.src.filePathArrayNonBoolGet();
   let filePathDeducingFromFixes = !dstFilePathArrayNonBool.length && !srcFilePathArrayNonBool.length;
-  let booleanFallingBack = filePathDeducingFromFixes ? true : false;
+  let booleanFallingBack;
+  if( filePathDeducingFromFixes )
+  booleanFallingBack = true;
+  else
+  booleanFallingBack = false;
+
   filePathDeducingFromFixes = true;
   booleanFallingBack = false;
 
@@ -628,18 +640,19 @@ function _pathsAmmend( o )
 
   /* base path */
 
+  let srcBaseMap;
   let basePathReady = false;
   if( o.src.basePath && filter.basePath )
   {
 
-    let srcBaseMap = o.src.basePath;
+    srcBaseMap = o.src.basePath;
     if( _.strIs( srcBaseMap ) )
     srcBaseMap = o.src.basePathMapFromString
     ({
       filePath : o.src.filePath || {},
       basePath : srcBaseMap,
       prefixingWithFilePath : 0,
-      booleanFallingBack : booleanFallingBack,
+      booleanFallingBack,
     });
     _.assert( _.mapIs( srcBaseMap ) || _.strIs( srcBaseMap ) );
 
@@ -649,76 +662,16 @@ function _pathsAmmend( o )
       filePath : filter.filePath || {},
       basePath : filter.basePath,
       prefixingWithFilePath : 0,
-      booleanFallingBack : booleanFallingBack,
+      booleanFallingBack,
     });
     _.assert( _.mapIs( filter.basePath ) || _.strIs( filter.basePath ) );
 
     if( o.joining )
     {
+
       if( path.isEmpty( filter.filePath ) && path.isEmpty( o.src.filePath ) )
-      {
+      basePathSet();
 
-        basePathReady = true;
-        if( !filter.basePath || !o.src.basePath )
-        {
-          filter.basePath = filter.basePath || srcBaseMap;
-        }
-        else
-        {
-          let dstBasePath = filter.basePath;
-          let srcBasePath = o.src.basePath;
-
-          filter.basePath = path.simplifyDst( filter.basePath );
-          srcBaseMap = path.simplifyDst( srcBaseMap );
-
-          if( filter.basePath === '' )
-          {
-            filter.basePath === srcBaseMap;
-          }
-          else if( _.mapIs( srcBaseMap ) || _.mapIs( filter.basePath ) )
-          {
-            if( !_.mapIs( filter.basePath ) )
-            filter.basePath = { '' : filter.basePath };
-            if( !_.mapIs( srcBaseMap ) )
-            srcBaseMap = { '' : srcBaseMap };
-
-            let baseMap2 = Object.create( null );
-            if( o.supplementing )
-            for( let filePath in filter.basePath )
-            {
-              let basePath = filter.basePath[ filePath ];
-              let basePath2 = srcBaseMap[ filePath ];
-              if( !basePath2 )
-              baseMap2[ filePath ] = basePath;
-              else
-              baseMap2[ filePath ] = path.join( basePath2, basePath );
-            }
-            else for( let filePath in srcBaseMap )
-            {
-              let basePath = filter.basePath[ filePath ];
-              let basePath2 = srcBaseMap[ filePath ];
-              if( !basePath )
-              baseMap2[ filePath ] = basePath2;
-              else
-              baseMap2[ filePath ] = path.join( basePath, basePath2 );
-            }
-
-            filter.basePath = path.simplifyDst( baseMap2 );
-            if( filter.basePath === '' )
-            filter.basePath = null;
-          }
-          else
-          {
-
-            if( o.supplementing )
-            filter.basePath = path.join( srcBaseMap, filter.basePath );
-            else
-            filter.basePath = path.join( filter.basePath, srcBaseMap );
-
-          }
-
-        }
-      }
     }
     else if( !o.joining )
     {
@@ -888,6 +841,74 @@ function _pathsAmmend( o )
     return result;
   }
 
+  /* */
+
+  function basePathSet()
+  {
+    basePathReady = true;
+    if( !filter.basePath || !o.src.basePath )
+    {
+      filter.basePath = filter.basePath || srcBaseMap;
+    }
+    else
+    {
+      let dstBasePath = filter.basePath;
+      let srcBasePath = o.src.basePath;
+
+      filter.basePath = path.simplifyDst( filter.basePath );
+      srcBaseMap = path.simplifyDst( srcBaseMap );
+
+      if( filter.basePath === '' )
+      {
+        filter.basePath === srcBaseMap;
+      }
+      else if( _.mapIs( srcBaseMap ) || _.mapIs( filter.basePath ) )
+      {
+        if( !_.mapIs( filter.basePath ) )
+        filter.basePath = { '' : filter.basePath };
+        if( !_.mapIs( srcBaseMap ) )
+        srcBaseMap = { '' : srcBaseMap };
+
+        let baseMap2 = Object.create( null );
+        if( o.supplementing )
+        for( let filePath in filter.basePath )
+        {
+          let basePath = filter.basePath[ filePath ];
+          let basePath2 = srcBaseMap[ filePath ];
+          if( !basePath2 )
+          baseMap2[ filePath ] = basePath;
+          else
+          baseMap2[ filePath ] = path.join( basePath2, basePath );
+        }
+        else
+        for( let filePath in srcBaseMap )
+        {
+          let basePath = filter.basePath[ filePath ];
+          let basePath2 = srcBaseMap[ filePath ];
+          if( !basePath )
+          baseMap2[ filePath ] = basePath2;
+          else
+          baseMap2[ filePath ] = path.join( basePath, basePath2 );
+        }
+
+        filter.basePath = path.simplifyDst( baseMap2 );
+        if( filter.basePath === '' )
+        filter.basePath = null;
+      }
+      else
+      {
+
+        if( o.supplementing )
+        filter.basePath = path.join( srcBaseMap, filter.basePath );
+        else
+        filter.basePath = path.join( filter.basePath, srcBaseMap );
+
+      }
+
+    }
+
+  }
+
 }
 
 _pathsAmmend.defaults =
@@ -904,7 +925,7 @@ function pathsExtend( src )
   let filter = this;
   return filter._pathsAmmend
   ({
-    src : src,
+    src,
     joining : 0,
     supplementing : 0,
   });
@@ -917,7 +938,7 @@ function pathsExtendJoining( src )
   let filter = this;
   return filter._pathsAmmend
   ({
-    src : src,
+    src,
     joining : 1,
     supplementing : 0,
   });
@@ -930,7 +951,7 @@ function pathsSupplement( src )
   let filter = this;
   return filter._pathsAmmend
   ({
-    src : src,
+    src,
     joining : 0,
     supplementing : 1,
   });
@@ -943,7 +964,7 @@ function pathsSupplementJoining( src )
   let filter = this;
   return filter._pathsAmmend
   ({
-    src : src,
+    src,
     joining : 1,
     supplementing : 1,
   });
@@ -1169,8 +1190,12 @@ function prefixesApply( o )
 
   /* */
 
-  function basePathsForFilePaths( filePath, prefixPath, postfixPath, addingAnyway )
+  function basePathsForFilePaths( /* filePath, prefixPath, postfixPath, addingAnyway */ )
   {
+    let filePath = arguments[ 0 ];
+    let prefixPath = arguments[ 1 ];
+    let postfixPath = arguments[ 2 ];
+    let addingAnyway = arguments[ 3 ];
 
     _.assert( arguments.length === 4 );
 
@@ -1199,8 +1224,13 @@ function prefixesApply( o )
 
   /* */
 
-  function basePathEach( filePath, basePath, prefixPath, postfixPath )
+  function basePathEach( /* filePath, basePath, prefixPath, postfixPath */ )
   {
+    let filePath = arguments[ 0 ];
+    let basePath = arguments[ 1 ];
+    let prefixPath = arguments[ 2 ];
+    let postfixPath = arguments[ 3 ];
+
     _.assert( _.strIs( filePath ) );
 
     let prefixPath2 = prefixPath;
@@ -1815,8 +1845,8 @@ function basePathNormalize( filePath, basePath )
     basePath = filter.pathLocalize( basePath );
     basePath = filter.basePathMapFromString
     ({
-      filePath : filePath,
-      basePath : basePath,
+      filePath,
+      basePath,
       prefixingWithFilePath : 1,
     });
   }
@@ -1828,7 +1858,7 @@ function basePathNormalize( filePath, basePath )
 
   _.assert
   (
-       basePath === null
+    basePath === null
     || _.mapIs( basePath )
     || filter.filePathArrayNonBoolGet( filePath, 1 ).filter( ( e ) => e !== null ).length === 0
   );
@@ -3772,7 +3802,13 @@ function hasAnyPath()
   _.assert( filter.basePath === null || _.strIs( filter.basePath ) || _.mapIs( filter.basePath ) );
   _.assert( filter.prefixPath === null || _.strIs( filter.prefixPath ) || _.strsAreAll( filter.prefixPath ) );
   _.assert( filter.postfixPath === null || _.strIs( filter.postfixPath ) );
-  _.assert( filter.filePath === null || _.strIs( filter.filePath ) || _.arrayIs( filter.filePath ) || _.mapIs( filter.filePath ) );
+  _.assert
+  (
+    filter.filePath === null
+    || _.strIs( filter.filePath )
+    || _.arrayIs( filter.filePath )
+    || _.mapIs( filter.filePath )
+  );
 
   if( _.strIs( filter.basePath ) || _.mapIsPopulated( filter.basePath ) )
   return true;
@@ -3862,7 +3898,7 @@ function maskBeginsApply()
     filter.begins = _.arrayAs( filter.begins );
     filter.begins = new RegExp( '^(\\.\\/)?(' + _.regexpsEscape( filter.begins ).join( '|' ) + ')' );
 
-    filter.maskAll = _.RegexpObject.And( filter.maskAll,{ includeAll : filter.begins } );
+    filter.maskAll = _.RegexpObject.And( filter.maskAll, { includeAll : filter.begins } );
     filter.begins = null;
   }
 
@@ -3889,7 +3925,7 @@ function maskEndsApply()
     filter.ends = _.arrayAs( filter.ends );
     filter.ends = new RegExp( '(' + '^\.|' + _.regexpsEscape( filter.ends ).join( '|' ) + ')$' );
 
-    filter.maskAll = _.RegexpObject.And( filter.maskAll,{ includeAll : filter.ends } );
+    filter.maskAll = _.RegexpObject.And( filter.maskAll, { includeAll : filter.ends } );
     filter.ends = null;
   }
 

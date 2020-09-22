@@ -1,4 +1,5 @@
-(function _Reroot_s_() {
+( function _Reroot_s_()
+{
 
 'use strict';
 

@@ -1,4 +1,5 @@
-( function _Record_s_() {
+( function _Record_s_()
+{
 
 'use strict';
 
@@ -923,9 +924,9 @@ let Restricts =
 
 let Statics =
 {
-  From : From,
-  FromMany : FromMany,
-  toAbsolute : toAbsolute,
+  From,
+  FromMany,
+  toAbsolute,
 }
 
 let Copiers =

@@ -1,4 +1,5 @@
-(function _MixinConfig_s_() {
+( function _MixinConfig_s_()
+{
 
 'use strict';
 

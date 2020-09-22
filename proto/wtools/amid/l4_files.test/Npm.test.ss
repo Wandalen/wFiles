@@ -215,8 +215,7 @@ function filesReflectTrivial( test )
     providerDst.filesDelete( installPath );
     providerDst.fileWrite( installPath, installPath );
     let remotePath = 'npm:///wpathbasic';
-    return
-    test.shouldThrowErrorSync
+    return test.shouldThrowErrorSync
     (
       () => system.filesReflect( { reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 } )
     );
@@ -234,8 +233,7 @@ function filesReflectTrivial( test )
     test.case = 'wrong package name';
     providerDst.filesDelete( installPath );
     let remotePath = 'npm:///wpathbasicc';
-    return
-    test.shouldThrowErrorSync
+    return test.shouldThrowErrorSync
     (
       () => system.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 })
     );

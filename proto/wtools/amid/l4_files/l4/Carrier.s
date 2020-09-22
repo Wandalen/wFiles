@@ -1,11 +1,13 @@
-( function _Carrier_s_() {
+( function _Carrier_s_()
+{
 
-'use strict'; 
+'use strict';
 
 let _global = _global_;
 let _ = _global_.wTools;
 let Parent = null;
-let Self = function wStatsCarrier( o )
+let Self = wStatsCarrier;
+function wStatsCarrier( o )
 {
   return _.workpiece.construct( Self, this, arguments );
 }
@@ -83,13 +85,12 @@ _.Copyable.mixin( Self );
 
 //
 
-_.[ Self.shortName ] = Self;
+// _.[ Self.shortName ] = Self;
+_[ Self.shortName ] = Self;
 
 // --
 // export
 // --
-
-
 
 if( typeof module !== 'undefined' )
 module[ 'exports' ] = Self;

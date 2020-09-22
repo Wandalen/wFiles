@@ -1,4 +1,5 @@
-(function _MixinFind_s_() {
+( function _MixinFind_s_()
+{
 
 'use strict';
 

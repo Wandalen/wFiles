@@ -1,4 +1,5 @@
-( function _Http_ss_( ) {
+( function _Http_ss_()
+{
 
 'use strict';
 
@@ -43,7 +44,7 @@ _.assert( !_.FileProvider.Http );
 function init( o )
 {
   let self = this;
-  Parent.prototype.init.call( self,o );
+  Parent.prototype.init.call( self, o );
 }
 
 //
@@ -53,7 +54,7 @@ function streamReadAct( o )
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.strIs( o.filePath ),'streamReadAct :','Expects {-o.filePath-}' );
+  _.assert( _.strIs( o.filePath ), 'streamReadAct :', 'Expects {-o.filePath-}' );
 
   if( !Needle )
   Needle = require( 'needle' );
@@ -69,7 +70,7 @@ function streamReadAct( o )
 
   stream.on( 'response', ( res ) =>
   {
-    o.onStreamBegin.call( self, { operation : o, stream : stream, response : res } );
+    o.onStreamBegin.call( self, { operation : o, stream, response : res } );
   })
 
   return stream;
@@ -112,16 +113,16 @@ function fileReadAct( o )
   //   o = { filePath : o };
   // }
 
-  _.assertRoutineOptions( fileReadAct,arguments );
+  _.assertRoutineOptions( fileReadAct, arguments );
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.strIs( o.filePath ),'fileReadAct :','Expects {-o.filePath-}' );
-  _.assert( _.strIs( o.encoding ),'fileReadAct :','Expects {-o.encoding-}' );
-  _.assert( !o.sync,'sync version is not implemented' );
+  _.assert( _.strIs( o.filePath ), 'fileReadAct :', 'Expects {-o.filePath-}' );
+  _.assert( _.strIs( o.encoding ), 'fileReadAct :', 'Expects {-o.encoding-}' );
+  _.assert( !o.sync, 'sync version is not implemented' );
 
   o.encoding = o.encoding.toLowerCase();
   let encoder = fileReadAct.encoders[ o.encoding ];
 
-  logger.log( 'fileReadAct',o );
+  logger.log( 'fileReadAct', o );
 
   /* on encoding : arraybuffer or encoding : buffer should return buffer( in consequence ) */
 
@@ -146,7 +147,7 @@ function fileReadAct( o )
       //   usingSourceCode : 0,
       //   level : 0,
       // });
-      err = encoder.onError.call( self,{ error : err, operation : o, encoder : encoder })
+      err = encoder.onError.call( self, { error : err, operation : o, encoder } );
     }
     catch( err2 )
     {
@@ -175,7 +176,7 @@ function fileReadAct( o )
       ({
         dst : result,
         src : data,
-        dstOffset : dstOffset
+        dstOffset
       });
 
       dstOffset += data.length;
@@ -194,7 +195,7 @@ function fileReadAct( o )
   let dstOffset = 0;
 
   if( encoder && encoder.onBegin )
-  _.sure( encoder.onBegin.call( self, { operation : o, encoder : encoder }) === undefined );
+  _.sure( encoder.onBegin.call( self, { operation : o, encoder }) === undefined );
 
   self.streamReadAct({ filePath :  o.filePath })
   .give( function( err, response )
@@ -224,7 +225,7 @@ function fileReadAct( o )
 
   });
 
- return con;
+  return con;
 
   /* */
 
@@ -235,9 +236,9 @@ function fileReadAct( o )
     else
     _.assert( _.strIs( result ) );
 
-    let context = { data : result, operation : o, encoder : encoder };
+    let context = { data : result, operation : o, encoder };
     if( encoder && encoder.onEnd )
-    _.sure( encoder.onEnd.call( self,context ) === undefined );
+    _.sure( encoder.onEnd.call( self, context ) === undefined );
     result = context.data
 
     con.take( result );
@@ -388,7 +389,8 @@ var extra = filesReflectSingle_body.extra = Object.create( null );
 extra.fetching = 1;
 
 var defaults = filesReflectSingle_body.defaults;
-let filesReflectSingle = _.routineFromPreAndBody( _.FileProvider.FindMixin.prototype.filesReflectSingle.pre, filesReflectSingle_body );
+let filesReflectSingle =
+_.routineFromPreAndBody( _.FileProvider.FindMixin.prototype.filesReflectSingle.pre, filesReflectSingle_body );
 
 //
 
@@ -417,11 +419,11 @@ let filesReflectSingle = _.routineFromPreAndBody( _.FileProvider.FindMixin.proto
 function fileCopyToHardDriveAct( o )
 {
   let self = this;
-  let con = new _.Consequence( );
+  let con = new _.Consequence();
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.strIs( o.url ),'fileCopyToHardDriveAct :','Expects {-o.filePath-}' );
-  _.assert( _.strIs( o.filePath ),'fileCopyToHardDriveAct :','Expects {-o.filePath-}' );
+  _.assert( _.strIs( o.url ), 'fileCopyToHardDriveAct :', 'Expects {-o.filePath-}' );
+  _.assert( _.strIs( o.filePath ), 'fileCopyToHardDriveAct :', 'Expects {-o.filePath-}' );
 
   let dstFileProvider = _.FileProvider.HardDrive( );
   let writeStream = null;
@@ -431,16 +433,16 @@ function fileCopyToHardDriveAct( o )
 
   writeStream = dstFileProvider.streamWrite({ filePath : dstPath });
   writeStream.on( 'error', onError );
-  writeStream.on( 'finish', function( )
+  writeStream.on( 'finish', function()
   {
-    writeStream.close( function( )
+    writeStream.close( function()
     {
       con.take( o.filePath );
     })
   });
 
   self.streamReadAct({ filePath : o.url })
-  .give( function( err, response )
+  .give( function( errn, response )
   {
     response.pipe( writeStream );
     response.on( 'error', onError );
@@ -508,13 +510,13 @@ function fileCopyToHardDrive( o )
   if( _.strIs( o ) )
   {
     let filePath = self.path.join( self.path.realMainDir( ), self.path.name({ path : o, full : 1 }) );
-    o = { url : o, filePath : filePath };
+    o = { url : o, filePath };
   }
   else
   {
     _.assert( arguments.length === 1, 'Expects single argument' );
-    _.assert( _.strIs( o.url ),'fileCopyToHardDrive :','Expects {-o.filePath-}' );
-    _.assert( _.strIs( o.filePath ),'fileCopyToHardDrive :','Expects {-o.filePath-}' );
+    _.assert( _.strIs( o.url ), 'fileCopyToHardDrive :', 'Expects {-o.filePath-}' );
+    _.assert( _.strIs( o.filePath ), 'fileCopyToHardDrive :', 'Expects {-o.filePath-}' );
 
     let HardDrive = _.FileProvider.HardDrive();
     let dirPath = self.path.dir( o.filePath );
@@ -523,9 +525,9 @@ function fileCopyToHardDrive( o )
     {
       try
       {
-        HardDrive.dirMake({ filePath : dirPath, recursive : 1})
+        HardDrive.dirMake({ filePath : dirPath, recursive : 1 })
       }
-      catch ( err )
+      catch( err )
       {
       }
     }

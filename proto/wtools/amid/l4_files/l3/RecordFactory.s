@@ -1,4 +1,5 @@
-( function _FileRecordFactory_s_() {
+( function _FileRecordFactory_s_()
+{
 
 'use strict';
 
@@ -284,7 +285,7 @@ function recordsFiltered( filePaths )
 
   for( var r = result.length-1 ; r >= 0 ; r-- )
   if( !result[ r ].stat )
-  result.splice( r,1 );
+  result.splice( r, 1 );
 
   return result;
 }

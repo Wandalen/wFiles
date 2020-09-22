@@ -1,4 +1,5 @@
-( function _Linker_s_() {
+( function _Linker_s_()
+{
 
 'use strict';
 
@@ -12,20 +13,6 @@ let Self = _.files.linker = _.files.linker || Object.create( null );
 // --
 // linking
 // --
-
-function functor_pre( routine, args )
-{
-  let self = this;
-  // let o = self._preSrcDstPathWithProviderDefaults.apply( self, arguments );
-
-  let o = self._preSrcDstPathWithoutProviderDefaults.apply( self, arguments );
-  self._providerDefaultsApply( o );
-
-  _.mapSupplementNulls( o, routine.defaults );
-  return o;
-}
-
-//
 
 function multiple( o, link )
 {
@@ -45,8 +32,8 @@ function multiple( o, link )
   let records = factory.records( o.dstPath );
   // Vova : should allow missing files?
   // Kos : test routine?
-  let newestRecord;
-  let mostLinkedRecord;
+  let newestRecord,
+    mostLinkedRecord;
 
   if( o.srcPath )
   {
@@ -94,6 +81,8 @@ function multiple( o, link )
 
   /* */
 
+  let result = { err : undefined, got : true };
+
   if( o.sync )
   {
     for( let p = 0 ; p < records.length ; p++ )
@@ -106,23 +95,9 @@ function multiple( o, link )
   else
   {
     let cons = [];
-    let result = { err : undefined, got : true };
+    // let result = { err : undefined, got : true };
     let throwing = o.throwing;
     o.throwing = 1;
-
-    function handler( err, got )
-    {
-      if( !err )
-      {
-        result.got &= got;
-      }
-      else
-      {
-        _.errAttend( err );
-        if( !_.definedIs( result.err ) )
-        result.err = err;
-      }
-    }
 
     for( let p = 0 ; p < records.length ; p++ )
     cons.push( onRecord( records[ p ] ).tap( handler ) );
@@ -153,6 +128,22 @@ function multiple( o, link )
     throw err;
     else
     return new _.Consequence().error( err );
+  }
+
+  /* */
+
+  function handler( err, got )
+  {
+    if( !err )
+    {
+      result.got &= got;
+    }
+    else
+    {
+      _.errAttend( err );
+      if( !_.definedIs( result.err ) )
+      result.err = err;
+    }
   }
 
   /* */
@@ -189,7 +180,7 @@ function multiple( o, link )
     //   }
     // }
 
-    if( !record.stat || !_.files.stat.areHardLinked( mostLinkedRecord.stat , record.stat ) )
+    if( !record.stat || !_.files.stat.areHardLinked( mostLinkedRecord.stat, record.stat ) )
     {
       let linkOptions = _.mapExtend( null, o );
       linkOptions.allowingMissed = 0; // Vova : hardLink does not allow missing srcPath
@@ -231,7 +222,7 @@ function onStat( filePath, resolving )
 
   return self.statRead
   ({
-    filePath : filePath,
+    filePath,
     throwing : 0,
     resolvingSoftLink : resolving,
     resolvingTextLink : 0,
@@ -783,6 +774,7 @@ function tempRenameSync()
     relativeDstPath : c.tempPath,
     relativeSrcPath : o.dstPath,
     sync : 1,
+    context : c,
   });
   return true;
 }
@@ -818,6 +810,7 @@ function tempRenameAsync()
       relativeDstPath : c.tempPath,
       relativeSrcPath : o.dstPath,
       sync : 0,
+      context : c,
     });
   })
 }
@@ -846,21 +839,24 @@ function tempRenameRevertSync()
   let self = this.provider;
   let o = c.options;
 
-  if( c.tempPath ) try
+  if( c.tempPath )
   {
-    self.fileRenameAct
-    ({
-      dstPath : o.dstPath,
-      srcPath : c.tempPath,
-      relativeDstPath : o.dstPath,
-      relativeSrcPath : c.tempPath,
-      sync : 1,
-    });
-  }
-  catch( err2 )
-  {
-    debugger;
-    console.error( err2 );
+    try
+    {
+      self.fileRenameAct
+      ({
+        dstPath : o.dstPath,
+        srcPath : c.tempPath,
+        relativeDstPath : o.dstPath,
+        relativeSrcPath : c.tempPath,
+        sync : 1,
+        context : c,
+      });
+    }
+    catch( err2 )
+    {
+      console.error( err2 );
+    }
   }
 
 }
@@ -883,6 +879,7 @@ function tempRenameRevertAsync()
     relativeDstPath : o.dstPath,
     relativeSrcPath : c.tempPath,
     sync : 0,
+    context : c,
   })
   .finally( ( err2, got ) =>
   {
@@ -964,7 +961,6 @@ function validateSize()
   if( !srcStat )
   {
     let err = `Failed to ${c.entryMethodName} ${o.dstPath} from ${o.srcPath}. Source file does not exist.`;
-    debugger;
     throw _.err( err );
   }
 
@@ -980,11 +976,12 @@ function validateSize()
 
   if( !c.dstStat )
   {
-    let err = `Faield to ${c.entryMethodName} ${o.dstPath} from ${o.srcPath}. Destination file does not exist.`;
+    let err = `Failed to ${c.entryMethodName} ${o.dstPath} from ${o.srcPath}. Destination file does not exist.`;
     throw _.err( err );
   }
 
-  if( c.actMethodName === 'softLinkAct' ||  c.actMethodName === 'textLinkAct' || c.actMethodName === 'fileCopyAct' ) /* qqq : fix temp workaround */
+  // if( c.actMethodName === 'softLinkAct' ||  c.actMethodName === 'textLinkAct' || c.actMethodName === 'fileCopyAct' ) /* aaa : fix temp workaround */ /* Dmytro : added option `linkMaybe`, when functor creates routine it should be 1 for link routines */
+  if( c.linkMaybe )
   {
     let updateStat =  _.strBegins( dstPath, srcPath );
     let filePath = srcStat.filePath;
@@ -1009,8 +1006,9 @@ function validateSize()
 
   if( !( srcSize == dstSize ) )
   {
-    let err = `Failed to ${c.entryMethodName} ${o.dstPath} (${dstSize}) from ${o.srcPath} (${srcSize}). Have different size after ${c.entryMethodName} operation.`;
-    debugger;
+    let err =
+    `Failed to ${c.entryMethodName} ${o.dstPath} (${dstSize}) from ${o.srcPath} (${srcSize}). `
+    + `Have different size after ${c.entryMethodName} operation.`;
     throw _.err( err );
   }
 
@@ -1128,6 +1126,7 @@ function contextMake( o )
   c.validateSize = validateSize;
   c.error = error;
   c.end = end;
+  c.linkMaybe = fop.linkMaybe;
 
   if( !options.sync )
   {
@@ -1144,6 +1143,20 @@ contextMake.defaults =
   provider : null,
   options : null,
   fop : null
+}
+
+//
+
+function functor_pre( routine, args )
+{
+  let self = this;
+  // let o = self._preSrcDstPathWithProviderDefaults.apply( self, arguments );
+
+  let o = self._preSrcDstPathWithoutProviderDefaults.apply( self, arguments );
+  self._providerDefaultsApply( o );
+
+  _.mapSupplementNulls( o, routine.defaults );
+  return o;
 }
 
 //
@@ -1169,6 +1182,7 @@ function functor( fop )
   let renaming = fop.renaming;
   let skippingSamePath = fop.skippingSamePath;
   let skippingMissed = fop.skippingMissed;
+  let hardLinking = fop.hardLinking;
 
   _.assert( _.routineIs( onDo ) );
   _.assert( _.objectIs( onDo.defaults ) );
@@ -1225,7 +1239,8 @@ function functor( fop )
       Vova : low priority
       */
 
-      if( _.longIs( o.dstPath ) && c.linkDo.having.hardLinking ) /* qqq : functor cant use fields of c.linkDo! check code */
+      // if( _.longIs( o.dstPath ) && c.linkDo.having.hardLinking ) /* aaa : functor cant use fields of c.linkDo! check code */
+      if( _.longIs( o.dstPath ) && hardLinking )
       return multiple.call( self, o, link_body );
       _.assert( _.strIs( o.srcPath ) && _.strIs( o.dstPath ) );
 
@@ -1246,6 +1261,7 @@ function functor( fop )
       return c.end();
 
       o2 = c.options2 = _.mapExtend( c.options2, _.mapOnly( o, c.linkDo.defaults ) );
+      o2.context = c.options2.context = c;
 
       try
       {
@@ -1271,7 +1287,6 @@ function functor( fop )
       catch( err )
       {
 
-        debugger;
         c.tempRenameRevert();
         return c.error( _.err( err, '\nCant', c.entryMethodName, o.dstPath, '<-', o.srcPath ) );
 
@@ -1288,7 +1303,8 @@ function functor( fop )
 
       c.con.then( () =>
       {
-        if( _.longIs( o.dstPath ) && c.linkDo.having.hardLinking )
+        // if( _.longIs( o.dstPath ) && c.linkDo.having.hardLinking )
+        if( _.longIs( o.dstPath ) && hardLinking )
         {
           c.result = multiple.call( self, o, link_body );
           return true;
@@ -1310,6 +1326,7 @@ function functor( fop )
         return c.result;
         /* prepare options map and launch main part */
         o2 = c.options2 = _.mapExtend( c.options2, _.mapOnly( o, c.linkDo.defaults ) );
+        o2.context = c.options2.context = c;
         /* main part */
         return mainPartAsync();
       })
@@ -1328,7 +1345,7 @@ function functor( fop )
       {
         if( dstExists )
         {
-          return c.verifyDst().then( () => tempRenameAsync.call( c ) )
+          return c.verifyDst().then( () => tempRenameAsync.call( c ) );
         }
         else if( o.makingDirectory )
         {
@@ -1378,6 +1395,8 @@ functor.defaults =
   onStat : null,
   onSizeCheck : null,
 
+  linkMaybe : false,
+  hardLinking : false,
   renaming : true,
   skippingSamePath : true,
   skippingMissed : false,
@@ -1400,6 +1419,44 @@ textLink
 
 let Proto =
 {
+  multiple,
+
+  onIsLink,
+  onStat,
+
+  verify1,
+  verify1Async,
+  verify2,
+  verifyEqualPaths,
+  verify2Async,
+  verifyDstSync,
+  verifyDstAsync,
+
+  pathsLocalizeSync,
+  pathsLocalizeAsync,
+
+  pathResolve,
+  pathResolveAsync,
+
+  linksResolve,
+  linksResolveAsync,
+
+  log,
+
+  tempRenameCan,
+  tempRenameSync,
+  tempRenameAsync,
+  tempRenameMaybe,
+  tempRenameRevertSync,
+  tempRenameRevertAsync,
+
+  tempDelete,
+  tempNameMake,
+
+  validateSize,
+
+  error,
+  end,
 
   contextMake,
   functor,

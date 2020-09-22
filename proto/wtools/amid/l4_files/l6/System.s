@@ -1,4 +1,5 @@
-( function _System_s_() {
+( function _System_s_()
+{
 
 'use strict';
 
@@ -119,11 +120,18 @@ function providersRegister( src )
   _.assert( arguments.length === 1, 'Expects single argument' );
 
   if( src instanceof _.FileProvider.Abstract )
-  self.providerRegister( src );
+  {
+    self.providerRegister( src );
+  }
   else if( _.arrayIs( src ) )
-  for( let p = 0 ; p < src.length ; p++ )
-  self.providerRegister( src[ p ] );
-  else _.assert( 0, 'Unknown kind of argument', src );
+  {
+    for( let p = 0 ; p < src.length ; p++ )
+    self.providerRegister( src[ p ] );
+  }
+  else
+  {
+    _.assert( 0, 'Unknown kind of argument', src );
+  }
 
   return self;
 }
@@ -796,6 +804,9 @@ function _link_functor( fop )
     if( op.relativeSrc.provider && !op.relativeDst.provider )
     self._pathRelocalize( op.relativeDst, op.relativeSrc.provider );
 
+    if( op.relativeDst.provider.pathMocking && op.relativeDst.provider.pathMock !== undefined )
+    op.relativeDst.localPath = op.relativeDst.provider.pathMock( op.relativeDst.localPath );
+
     _.assert( !!op.relativeDst.provider, 'No provider for path', op.options.relativeDstPath );
     _.assert( allowingMissedSrc || !!op.relativeSrc.provider, 'No provider for path', op.options.relativeSrcPath );
 
@@ -808,6 +819,9 @@ function _link_functor( fop )
     self._pathRelocalize( op.src, op.dst.provider );
     if( op.src.provider && !op.dst.provider )
     self._pathRelocalize( op.dst, op.src.provider );
+
+    if( op.dst.provider.pathMocking && op.relativeDst.provider.pathMock !== undefined )
+    op.dst.localPath = op.dst.provider.pathMock( op.dst.localPath );
 
     _.assert( !!op.dst.provider, 'No provider for path', op.options.dstPath );
     _.assert( allowingMissedSrc || !!op.src.provider, 'No provider for path', op.options.srcPath );
@@ -913,25 +927,45 @@ function _fileCopyActDifferent( op )
   });
 
   if( o.sync )
-  op.result = op.dst.provider.fileWrite
-  ({
-    filePath : op.dst.localPath,
-    data : read,
-    encoding : 'original.type',
-  });
-  else
-  op.result = read.then( ( read ) =>
   {
-    return op.dst.provider.fileWrite
+    op.result = op.dst.provider.fileWrite
     ({
       filePath : op.dst.localPath,
       data : read,
-      sync : 0,
       encoding : 'original.type',
     });
-  });
+
+    dstPathValidate();
+  }
+  else
+  {
+    op.result = read.then( ( read ) =>
+    {
+      return op.dst.provider.fileWrite
+      ({
+        filePath : op.dst.localPath,
+        data : read,
+        sync : 0,
+        encoding : 'original.type',
+      });
+    })
+    .then( ( arg ) =>
+    {
+      dstPathValidate();
+      return arg;
+    })
+  }
 
   return op.end();
+
+  /* */
+
+  function dstPathValidate()
+  {
+    if( op.dst.provider.pathMocking !== undefined )
+    if( !op.dst.provider.fileExists( op.dst.localPath ) )
+    op.options.context.options.dstPath = op.dst.provider.pathUnmock( op.dst.localPath, 1 );
+  }
 }
 
 let fileCopyAct = _link_functor
@@ -1428,7 +1462,7 @@ let Accessors =
 
 let Statics =
 {
-  Path : Path,
+  Path,
 }
 
 let Forbids =

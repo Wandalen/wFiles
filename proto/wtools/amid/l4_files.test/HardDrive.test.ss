@@ -1,4 +1,5 @@
-( function _FileProvider_HardDrive_test_ss_( ) {
+( function _FileProvider_HardDrive_test_ss_()
+{
 
 'use strict';
 
@@ -26,7 +27,7 @@ function onSuiteBegin( test )
   context.system = _.FileProvider.System({ providers : [ context.provider ] });
   context.system.defaultProvider = context.provider;
 
-  context.suiteTempPath = context.provider.path.tempOpen( context.provider.path.join( __dirname, '../..'  ),'HardDrive' ); /* xxx */
+  context.suiteTempPath = context.provider.path.tempOpen( context.provider.path.join( __dirname, '../..'  ), 'HardDrive' ); /* xxx */
   context.suiteTempPath = context.provider.pathResolveLinkFull({ filePath : context.suiteTempPath, resolvingSoftLink : 1 }); /* qqq xxx */
   context.suiteTempPath = context.suiteTempPath.absolutePath;
   context.globalFromPreferred = function globalFromPreferred( path ){ return path };

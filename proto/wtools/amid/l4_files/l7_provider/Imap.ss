@@ -367,8 +367,12 @@ function dirReadAct( o )
     if( o.filePath === path.rootToken )
     return _.mapKeys( map );
     let isAbsolute = path.isAbsolute( o.filePath );
+
     let filePath = path.unabsolute( o.filePath );
-    filePath = filePath.split( '/' ).map( ( e, k ) => `${e}/children` ).join( '/' );
+    filePath = filePath.split( '/' )
+    .map( ( e, k ) => `${e}/children` )
+    .join( '/' );
+
     if( isAbsolute )
     filePath = path.absolute( filePath );
     let result = _.select( map, filePath );

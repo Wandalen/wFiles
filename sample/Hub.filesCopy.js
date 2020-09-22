@@ -25,3 +25,4 @@ hub.filesCopy
 
 var tree = _.toStr( simpleStructure.filesTree, { levels : 4 } );
 console.log( tree );
+

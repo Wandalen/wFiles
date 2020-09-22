@@ -1,4 +1,5 @@
-( function _ConfigMixin_s_() {
+( function _ConfigMixin_s_()
+{
 
 'use strict';
 
@@ -187,8 +188,10 @@ function configFind_body( o )
     continue;
     _.assert( _.objectIs( encoder ), `Read encoder ${e} is missing` );
     if( encoder.exts )
-    for( let s = 0 ; s < encoder.exts.length ; s++ )
-    exts[ encoder.exts[ s ] ] = e;
+    {
+      for( let s = 0 ; s < encoder.exts.length ; s++ )
+      exts[ encoder.exts[ s ] ] = e;
+    }
   }
 
   o.filePath = _.arrayAs( o.filePath );
@@ -210,7 +213,7 @@ function configFind_body( o )
           particularPath : filePath2,
           abstractPath : filePath,
           encoding : exts[ ext ],
-          ext : ext,
+          ext,
         }
         if( o.outputFormat === 'array' )
         {

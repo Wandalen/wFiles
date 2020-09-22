@@ -1,4 +1,5 @@
-( function _StatNamespace_s_() {
+( function _StatNamespace_s_()
+{
 
 'use strict';
 

@@ -11,10 +11,9 @@ var tempPath = path.join( __dirname, 'tempFile' );
 /* solution rename + unlink */
 
 var fd = fs.openSync( terminalPath, 'w+' );
-fs.renameSync( terminalPath,tempPath );
+fs.renameSync( terminalPath, tempPath );
 fs.unlinkSync( tempPath );
 console.log( 'Original exists after combination:', _.fileProvider.fileExists( terminalPath ) );
 fs.closeSync( fd );
 console.log( 'Temp exists after fd is closed:', _.fileProvider.fileExists( terminalPath ) );
-
 

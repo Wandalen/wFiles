@@ -1,4 +1,5 @@
-(function _Imap_ss_() {
+( function _Imap_ss_()
+{
 
 'use strict';
 

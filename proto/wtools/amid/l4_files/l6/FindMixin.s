@@ -1,4 +1,5 @@
-( function _FindMixin_s_() {
+( function _FindMixin_s_()
+{
 
 'use strict';
 
@@ -676,9 +677,9 @@ let filesFindSingle = _.routineFromPreAndBody( filesFindSingle_pre, filesFindSin
  * @param {*} o.allowingCycled=0
  * @param {Boolean} o.revisiting=null Controls how visited files are processed. Possible values:
  *  0 - visit and include each file once
- *	1 - visit and include each file once, break from loop on first links cycle and continue search ignoring file at which cycle begins
- *	2 - visit and include each file once, break from loop on first links cycle and continue search visiting file at which cycle begins
- *	3 - don't keep records of visited files
+ *  1 - visit and include each file once, break from loop on first links cycle and continue search ignoring file at which cycle begins
+ *  2 - visit and include each file once, break from loop on first links cycle and continue search visiting file at which cycle begins
+ *  3 - don't keep records of visited files
  *  Defaults: option o.revisiting in set to "1" if links resolving is enabled, otherwise default is "3".
  * @param {*} o.resolvingSoftLink=0
  * @param {*} o.resolvingTextLink=0
@@ -720,7 +721,7 @@ function filesFind_pre( routine, args )
       _.assert
       (
         _.longHas( knownFormats, o.outputFormat ),
-          'Unknown output format ' + _.toStrShort( o.outputFormat )
+        'Unknown output format ' + _.toStrShort( o.outputFormat )
         + '\nKnown output formats : ' + _.toStr( knownFormats )
       );
     }
@@ -762,8 +763,8 @@ function filesFind_pre( routine, args )
   _.assert( o.revisitingHardLinked === 0 || o.revisitingHardLinked === 1 );
   _.assert
   (
-      o.revisitingHardLinked === 1 || self.SupportsIno >= 1
-    , `Option revisitingHardLinked : 0 is supported only if file provider supports ino of file.`
+    o.revisitingHardLinked === 1 || self.SupportsIno >= 1,
+    `Option revisitingHardLinked : 0 is supported only if file provider supports ino of file.`
     + `\nBut file provider ${self.constructor.name} does not support ino of file.`
   );
 
@@ -906,7 +907,7 @@ function filesFind_body( o )
 
     let o4 =
     {
-      stemPath : stemPath,
+      stemPath,
       basePath : o2.filter.formedBasePath[ stemPath ],
       resolvingSoftLink : o.resolvingSoftLink,
       resolvingTextLink : o.resolvingTextLink,
@@ -1712,7 +1713,7 @@ function _filesReflectPrepare( routine, args )
   _.assert( args.length === 1 || args.length === 2 );
 
   if( args.length === 2 )
-  o = { dst : args[ 0 ] , src : args[ 1 ] }
+  o = { dst : args[ 0 ], src : args[ 1 ] }
 
   _.routineOptions( routine, o );
   self._providerDefaultsApply( o );
@@ -1891,7 +1892,11 @@ function filesReflectEvaluate_body( o )
     let dstRecordFactory = _.FileRecordFactory.TolerantFrom( o, dstOp ).form();
 
     _.assert( _.strIs( dstOp.basePath ) );
-    _.assert( dstRecordFactory.basePath === _.uri.parse( dstPath ).longPath || dstRecordFactory.basePath === _.uri.parse( o.dst.formedBasePath[ dstPath ] ).longPath );
+    _.assert
+    (
+      dstRecordFactory.basePath === _.uri.parse( dstPath ).longPath
+      || dstRecordFactory.basePath === _.uri.parse( o.dst.formedBasePath[ dstPath ] ).longPath
+    );
 
     return dstRecordFactory;
   }
@@ -2462,9 +2467,9 @@ function filesReflectEvaluate_body( o )
           let same = self.filesCanBeSame( record.src, record.dst, true );
           throw _.err
           (
-            'Can\'t rewrite' + ' ' + 'terminal file ' + _.strQuote( record.dst.absolute ) + '\n' +
-            'by terminal file ' + _.strQuote( record.src.absolute ) + '\n' +
-            'files have different content'
+            'Can\'t rewrite terminal file ' + _.strQuote( record.dst.absolute ) + '\n'
+            + 'by terminal file ' + _.strQuote( record.src.absolute ) + '\n'
+            + 'files have different content'
           );
         }
       }
@@ -2482,8 +2487,13 @@ function filesReflectEvaluate_body( o )
 
   /* */
 
-  function handleDstUp( srcContext, reason, dst, dstRecord, op )
+  function handleDstUp( /* srcContext, reason, dst, dstRecord, op */ )
   {
+    let srcContext = arguments[ 0 ];
+    let reason = arguments[ 1 ];
+    let dst = arguments[ 2 ];
+    let dstRecord = arguments[ 3 ];
+    let op = arguments[ 4 ];
 
     if( !dstRecord.included )
     return dstRecord;
@@ -3509,8 +3519,14 @@ function filesReflectSingle_body( o )
 
   /* */
 
-  function linkWithAction( record, dstPath, srcPath, action, allowingMissed )
+  function linkWithAction( /* record, dstPath, srcPath, action, allowingMissed */ )
   {
+    let record = arguments[ 0 ];
+    let dstPath = arguments[ 1 ];
+    let srcPath = arguments[ 2 ];
+    let action = arguments[ 3 ];
+    let allowingMissed = arguments[ 4 ];
+
     let r;
 
     if( action === 'nop' )
@@ -3734,15 +3750,15 @@ function filesReflect_pre( routine, args )
     _.assert
     (
       // o.src.filePath === '.' || o.filter === null || o.filter.filePath === null || o.filter.filePath === undefined
-      o.filter === null || o.filter.filePath === null || o.filter.filePath === undefined ||
-      _.entityIdentical( o.filter.filePath, o.src.filePath ),
+      o.filter === null || o.filter.filePath === null || o.filter.filePath === undefined
+      || _.entityIdentical( o.filter.filePath, o.src.filePath ),
     );
 
     let knownFormats = [ 'src.absolute', 'src.relative', 'dst.absolute', 'dst.relative', 'record', 'nothing' ];
     _.assert
     (
       _.longHas( knownFormats, o.outputFormat ),
-        'Unknown output format ' + _.toStrShort( o.outputFormat )
+      'Unknown output format ' + _.toStrShort( o.outputFormat )
       + '\nKnown output formats : ' + _.toStr( knownFormats )
     );
 
@@ -3811,17 +3827,17 @@ function filesReflect_pre( routine, args )
  * @param {*} o.extral
  * @param {Boolean} o.revisiting=null Controls how visited files are processed. Possible values:
  *  0 - visit and include each file once
- *	1 - visit and include each file once, break from loop on first links cycle and continue search ignoring file at which cycle begins
- *	2 - visit and include each file once, break from loop on first links cycle and continue search visiting file at which cycle begins
- *	3 - don't keep records of visited files
+ *  1 - visit and include each file once, break from loop on first links cycle and continue search ignoring file at which cycle begins
+ *  2 - visit and include each file once, break from loop on first links cycle and continue search visiting file at which cycle begins
+ *  3 - don't keep records of visited files
  *  Defaults: option o.revisiting in set to "1" if links resolving is enabled, otherwise default is "3".
  * @param {Function} o.onUp
  * @param {Function} o.onDown
  * @param {Function} o.onDstName
  * @param {Boolean} o.rebasingLink=0 Controls link rebasing during copy. Possible values:
- * 	0 - keep link as is, destination path will lead to source file
- *	1 - rebase link, try to make destination file lead to other destination file if last was handled in same call of filesReflect
- *	2 - rebase and resolve link, try to create copy of a file referenced by a link
+ *  0 - keep link as is, destination path will lead to source file
+ *  1 - rebase link, try to make destination file lead to other destination file if last was handled in same call of filesReflect
+ *  2 - rebase and resolve link, try to create copy of a file referenced by a link
  * @function filesReflect
  * @class wFileProviderFindMixin
  * @namespace wTools.FileProvider
@@ -3880,7 +3896,11 @@ function filesReflect_body( o )
 
   if( _.any( cons, ( ready ) => _.consequenceIs( ready ) ) )
   {
-    let ready = new _.Consequence().take( null ).andKeep( cons );
+    let ready =
+    new _.Consequence()
+    .take( null )
+    .andKeep( cons );
+
     ready.ifNoErrorThen( end );
     return ready;
   }
@@ -4071,8 +4091,7 @@ function filesReflectTo_body( o )
   let self = this;
   let src = self;
   let dst = o.dstProvider;
-  let system;
-  let result;
+  let system, result;
 
   if( src instanceof _.FileProvider.System )
   src = src.providerForPath( o.src );
@@ -4126,7 +4145,11 @@ function filesReflectTo_body( o )
     if( Config.debug )
     {
       let dstProvider = system.providerForPath( dst.path.globalFromPreferred( o.dst ) );
-      _.assert( dstProvider === dst, `Dst path: ${o.dst} reffers to different dst provider: ${dstProvider.protocol}, routine expects: ${dst.protocol}` );
+      _.assert
+      (
+        dstProvider === dst,
+        `Dst path: ${o.dst} reffers to different dst provider: ${dstProvider.protocol}, routine expects: ${dst.protocol}`
+      );
     }
 
     o.src = src.recordFilter( o.src );
@@ -4555,8 +4578,7 @@ function filesDelete_body( o )
   let self = this;
   let provider = o.filter.effectiveProvider;
   let path = self.path;
-  let ready;
-  let time;
+  let ready, time;
 
   if( o.verbosity >= 1 )
   time = _.time.now();
@@ -4649,7 +4671,7 @@ function filesDelete_body( o )
       self.fileRename
       ({
         srcPath : record.absolute,
-        dstPath : dstPath,
+        dstPath,
       })
 
     }
@@ -4743,9 +4765,9 @@ function filesDelete_body( o )
       let textualReport = path.groupTextualReport
       ({
         explanation : o.writing ? ' - Deleted ' : ' - Will delete ',
-        groupsMap : groupsMap,
+        groupsMap,
         verbosity : o.verbosity,
-        spentTime : spentTime,
+        spentTime,
       });
       if( textualReport )
       provider.logger.log( textualReport );
@@ -5094,9 +5116,9 @@ function filesRead_body( o )
     catch( err )
     {
       debugger;
-      err = _.err( err, `\nFailed to read ${record.absolute}` );
-      err.filePath = record.absolute;
-      result.errors.push( err );
+      let error = _.err( err, `\nFailed to read ${record.absolute}` );
+      error.filePath = record.absolute;
+      result.errors.push( error );
     }
 
     return r;
@@ -5307,11 +5329,11 @@ function filesHasTerminal( filePath )
   debugger;
   self.filesFindRecursive
   ({
-    filePath : filePath,
+    filePath,
     withStem : 1,
     withDirs : 1,
     withTerminals : 1,
-    onUp : onUp,
+    onUp,
     resolvingSoftLink : 0,
     resolvingTextLink : 0,
     // recursive : 2

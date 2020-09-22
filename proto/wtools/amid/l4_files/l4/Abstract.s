@@ -1,4 +1,5 @@
-( function _Abstract_s_() {
+( function _Abstract_s_()
+{
 
 'use strict';
 
@@ -20,7 +21,8 @@ _.assert( _.routineIs( FileRecordFactory ) );
 */
 
 let Parent = null;
-let Self = function wFileProviderAbstract( o )
+let Self = wFileProviderAbstract;
+function wFileProviderAbstract( o )
 {
   return _.workpiece.construct( Self, this, arguments );
 }

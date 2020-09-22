@@ -1,4 +1,5 @@
-(function _Mid_s_() {
+( function _Mid_s_()
+{
 
 'use strict';
 

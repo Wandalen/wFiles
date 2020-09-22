@@ -28,8 +28,8 @@ var dstStat = hub.fileStat( dstPath );
 // problem : extract calculates size as length of the string
 // 2 chars, extract : 2 bytes, hd : 4 bytes
 
-console.log( 'srcFile.size:',srcStat.size );
-console.log( 'dstFile.size:',dstStat.size );
+console.log( 'srcFile.size:', srcStat.size );
+console.log( 'dstFile.size:', dstStat.size );
 
 //encoding is not a problem, files are same
 
@@ -37,4 +37,5 @@ var srcFile = hub.fileRead( srcPath );
 var dstFile = hub.fileRead( dstPath );
 console.log( 'srcFile.length:', srcFile.length )
 console.log( 'dstFile.length:', dstFile.length  )
-console.log( 'Diff: ',_.entityDiff( srcFile,dstFile ) )
+console.log( 'Diff: ', _.entityDiff( srcFile, dstFile ) )
+

@@ -3,7 +3,7 @@ var _ = wTools;
 
 // provider
 
-fileProvider = _.FileProvider.HardDrive();
+var fileProvider = _.FileProvider.HardDrive();
 
 // path
 

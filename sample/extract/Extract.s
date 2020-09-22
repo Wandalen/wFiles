@@ -7,10 +7,10 @@ var tree =
 {
   'root' :
   {
-    'File.js' : "console.log( 'This is content of File.js' )",
+    'File.js' : 'console.log( \'This is content of File.js\' )',
     'folder' :
     {
-      'File.txt' : "This is content of File.txt",
+      'File.txt' : 'This is content of File.txt',
     }
   },
   'user' :
@@ -35,7 +35,7 @@ var filesDelete = _.time.out( 100, function ()
 
 // asynchronous copying of files
 
-var fileCopy = extract.fileCopy( { dstPath : '/user/File.txt', srcPath : '/root/folder/File.txt' , sync : 0  } );
+var fileCopy = extract.fileCopy( { dstPath : '/user/File.txt', srcPath : '/root/folder/File.txt', sync : 0  } );
 
 // copy files to hard drive
 

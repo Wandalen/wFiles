@@ -6,15 +6,15 @@ var _ = wTools;
 
 var tree =
 {
- "folder.abc" :
- {
-   'test1.js' : "test\n.gitignore\n.travis.yml\nMakefile\nexample.js\n",
-   'test2' : "var concatMap = require('concat-map');\nvar balanced = require('balanced-match');",
-   'folder2.x' :
-   {
-     'test1.txt' : "var concatMap = require('concat-map');\nvar balanced = require('balanced-match');",
-   }
- }
+  'folder.abc' :
+  {
+    'test1.js' : 'test\n.gitignore\n.travis.yml\nMakefile\nexample.js\n',
+    'test2' : 'var concatMap = require(\'concat-map\');\nvar balanced = require(\'balanced-match\');',
+    'folder2.x' :
+    {
+      'test1.txt' : 'var concatMap = require(\'concat-map\');\nvar balanced = require(\'balanced-match\');',
+    }
+  }
 }
 
 var files = _.FileProvider.Extract( { filesTree : tree } );

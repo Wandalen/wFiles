@@ -1540,11 +1540,15 @@ function readWriteSync( test )
 function fileWriteActSync( test )
 {
   let context = this;
+  let a = context.assetFor( test, false );
   let provider = context.provider;
   let path = provider.path;
 
   if( !_.routineIs( provider.fileWriteAct ) )
-  return;
+  {
+    test.identical( 1, 1 );
+    return;
+  }
 
   var isHd = test.context.providerIsInstanceOf( _.FileProvider.HardDrive );
   var isSystem = provider instanceof _.FileProvider.System;
@@ -1554,12 +1558,12 @@ function fileWriteActSync( test )
   /* - */
 
   test.case = 'normalized path, call fileWrite'
-  var filePath = test.context.pathFor( 'write_test/file' );
+  var filePath = a.abs( 'write_test/file' );
   var o = _.mapExtend( null, provider.fileWriteAct.defaults );
   o.filePath = filePath;
   o.sync = 1;
   o.data = data;
-  provider.dirMakeForFile( filePath )
+  provider.dirMakeForFile( filePath );
   provider.fileWriteAct( o );
   test.identical( o.filePath, filePath );
   test.identical( provider.fileRead( filePath ), data );
@@ -1571,7 +1575,7 @@ function fileWriteActSync( test )
   if( !isSystem && isHd )
   {
     test.case = 'native path, call fileWrite_body'
-    var filePath2 = test.context.pathFor( 'write_test/file' );
+    var filePath2 = a.abs( 'write_test/file' );
     provider.filesDelete( filePath2 )
     var o2 = _.mapExtend( null, provider.fileWriteAct.defaults );
     o2.filePath = _.path.nativize( filePath2 );

@@ -81,7 +81,8 @@ function providerMake()
 
   let provider = _.FileProvider.HardDrive
   ({
-    protocols : [ 'current', 'second' ],
+    protocols : [ 'file', 'hd' ],
+    // protocols : [ 'current', 'second' ],
   });
 
   system.providerRegister( provider );

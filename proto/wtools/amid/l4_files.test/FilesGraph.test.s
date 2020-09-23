@@ -311,6 +311,7 @@ let Self =
   name : 'Tools.mid.files.Graph',
   silencing : 1,
   enabled : 1,
+  routineTimeOut : 10000,
 
   context :
   {

@@ -139,13 +139,15 @@ var Proto =
 
   context :
   {
+
     pathFor,
     providerMake,
 
     // filesTree,
     provider : _.FileProvider.Extract( { usingExtraStat : 1 } ),
     globalFromPreferred : null,
-    testFile : '/file1'
+    testFile : '/file1',
+
   },
 
   tests :

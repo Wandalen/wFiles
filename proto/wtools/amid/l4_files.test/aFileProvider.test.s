@@ -1667,6 +1667,7 @@ function readWriteAsync( test )
 {
   let context = this;
   let provider = context.provider;
+  let a = context.assetFor( test, false );
   let path = provider.path;
 
   if( !_.routineIs( provider.fileWriteAct ) )
@@ -1676,7 +1677,7 @@ function readWriteAsync( test )
   }
 
   var softLinkIsSupported = test.context.softLinkIsSupported();
-  var routinePath = test.context.pathFor( 'written/readWriteAsync' );
+  var routinePath = a.abs( 'written/readWriteAsync' );
   var got, filePath, readOptions, writeOptions, onBegin, onEnd, onError, buffer;
   var testData = 'Lorem ipsum dolor sit amet';
 
@@ -1723,7 +1724,7 @@ function readWriteAsync( test )
   .ifNoErrorThen( function( arg )
   {
     test.case = 'fileRead, path ways to not a terminal file';
-    filePath = test.context.pathFor( 'written/readWriteAsync/dir' );
+    filePath = a.abs( 'written/readWriteAsync/dir' );
     provider.dirMake( filePath );
     return null;
   })
@@ -1765,7 +1766,7 @@ function readWriteAsync( test )
   {
     test.case = 'fileRead, simple file read ';
     provider.filesDelete( routinePath );
-    filePath = test.context.pathFor( 'written/readWriteAsync/file' );
+    filePath = a.abs( 'written/readWriteAsync/file' );
     provider.fileWrite( filePath, testData );
     var files = provider.dirRead( routinePath );
     test.identical( files, [ 'file' ] );
@@ -1825,7 +1826,7 @@ function readWriteAsync( test )
   {
     test.case = 'fileRead, file read with common encodings';
     provider.filesDelete( routinePath );
-    filePath = test.context.pathFor( 'written/readWriteAsync/file' );
+    filePath = a.abs( 'written/readWriteAsync/file' );
     return null;
   })
 
@@ -1927,7 +1928,7 @@ function readWriteAsync( test )
   {
     test.case = 'fileRead, onBegin, onEnd, onError';
     provider.filesDelete( routinePath );
-    filePath = test.context.pathFor( 'written/readWriteAsync/file' );
+    filePath = a.abs( 'written/readWriteAsync/file' );
     testData = 'Lorem ipsum dolor sit amet';
     onBegin = function onBegin( err, o )
     {
@@ -2136,7 +2137,7 @@ function readWriteAsync( test )
   {
     test.case = 'fileWrite, path not exist, default settings';
     provider.filesDelete( routinePath );
-    filePath = test.context.pathFor( 'written/readWriteAsync/file' );
+    filePath = a.abs( 'written/readWriteAsync/file' );
     testData = 'Lorem ipsum dolor sit amet';
     return null;
   })
@@ -2170,7 +2171,7 @@ function readWriteAsync( test )
 
   .ifNoErrorThen( function( arg )
   {
-    filePath = test.context.pathFor( 'written/readWriteAsync/files/file.txt' );
+    filePath = a.abs( 'written/readWriteAsync/files/file.txt' );
     return provider.fileWrite
     ({
       sync : 0,
@@ -2180,7 +2181,7 @@ function readWriteAsync( test )
   })
   .ifNoErrorThen( function( arg )
   {
-    var files = provider.dirRead( test.context.pathFor( 'written/readWriteAsync/files' ) );
+    var files = provider.dirRead( a.abs( 'written/readWriteAsync/files' ) );
     test.identical( files, [ 'file.txt' ] );
     got = provider.fileRead
     ({
@@ -2195,7 +2196,7 @@ function readWriteAsync( test )
   {
     test.case = 'fileWrite, path already exist, default settings';
     provider.filesDelete( routinePath );
-    filePath = test.context.pathFor( 'written/readWriteAsync/file' );
+    filePath = a.abs( 'written/readWriteAsync/file' );
     testData = 'Lorem ipsum dolor sit amet';
     provider.fileWrite( filePath, testData );
     return null;
@@ -2244,7 +2245,7 @@ function readWriteAsync( test )
   {
     test.case = 'fileWrite, path already exist';
     provider.filesDelete( routinePath );
-    filePath = test.context.pathFor( 'written/readWriteAsync/file' );
+    filePath = a.abs( 'written/readWriteAsync/file' );
     testData = 'Lorem ipsum dolor sit amet';
     provider.fileWrite( filePath, testData );
     return null;
@@ -2336,7 +2337,7 @@ function readWriteAsync( test )
     test.case = 'fileWrite, path not exist';
     provider.filesDelete( routinePath );
     testData = 'Lorem ipsum dolor sit amet';
-    filePath = test.context.pathFor( 'written/readWriteAsync/file' );
+    filePath = a.abs( 'written/readWriteAsync/file' );
     return null;
   })
 
@@ -2424,7 +2425,7 @@ function readWriteAsync( test )
     test.case = 'fileWrite, different write modes';
     provider.filesDelete( routinePath );
     testData = 'Lorem ipsum dolor sit amet';
-    filePath = test.context.pathFor( 'written/readWriteAsync/file' );
+    filePath = a.abs( 'written/readWriteAsync/file' );
     return null;
   })
 
@@ -2514,7 +2515,7 @@ function readWriteAsync( test )
     test.case = 'fileWrite, any writeMode should create file it not exist';
     provider.filesDelete( routinePath );
     testData = 'Lorem ipsum dolor sit amet';
-    filePath = test.context.pathFor( 'written/readWriteAsync/file' );
+    filePath = a.abs( 'written/readWriteAsync/file' );
     return null;
   })
 
@@ -2609,7 +2610,7 @@ function readWriteAsync( test )
     return provider.fileWrite({ filePath, data, sync : 0 })
     .finally( () =>
     {
-      var linkPath = test.context.pathFor( 'written/readWriteAsync/link' );
+      var linkPath = a.abs( 'written/readWriteAsync/link' );
       provider.softLink( linkPath, filePath );
       return provider.fileRead({ filePath : linkPath, sync : 0 })
       .then( ( got ) =>
@@ -2635,7 +2636,7 @@ function readWriteAsync( test )
     return provider.fileWrite({ filePath, data, sync : 0 })
     .finally( () =>
     {
-      var linkPath = test.context.pathFor( 'written/readWriteAsync/link' );
+      var linkPath = a.abs( 'written/readWriteAsync/link' );
       provider.softLink( linkPath, filePath );
       var con = provider.fileRead({ filePath : linkPath, sync : 0, resolvingSoftLink : 0 });
       return test.shouldThrowErrorOfAnyKind( con )
@@ -2659,7 +2660,7 @@ function readWriteAsync( test )
     return provider.fileWrite({ filePath, data, sync : 0 })
     .finally( () =>
     {
-      var linkPath = test.context.pathFor( 'written/readWriteAsync/link' );
+      var linkPath = a.abs( 'written/readWriteAsync/link' );
       provider.softLink( linkPath, filePath );
       return provider.fileWrite({ filePath, data : data + data, sync : 0 })
     })
@@ -2680,7 +2681,7 @@ function readWriteAsync( test )
     test.case = 'write using link, resolvingSoftLink off';
     var data = 'data';
     provider.fieldPush( 'resolvingSoftLink', 0 );
-    var linkPath = test.context.pathFor( 'written/readWriteAsync/link' );
+    var linkPath = a.abs( 'written/readWriteAsync/link' );
     return provider.fileWrite({ filePath, data, sync : 0 })
     .finally( () =>
     {
@@ -2720,7 +2721,7 @@ function readWriteAsync( test )
     test.case = 'write using link, resolvingSoftLink off';
     var data = 'data';
     provider.fieldPush( 'resolvingSoftLink', 0 );
-    var linkPath = test.context.pathFor( 'written/readWriteAsync/link' );
+    var linkPath = a.abs( 'written/readWriteAsync/link' );
     return provider.fileWrite({ filePath, data, sync : 0 })
     .finally( () =>
     {
@@ -2766,7 +2767,7 @@ function readWriteAsync( test )
     test.case = 'write using link, resolvingSoftLink off';
     var data = 'data';
     provider.fieldPush( 'resolvingSoftLink', 0 );
-    var linkPath = test.context.pathFor( 'written/readWriteAsync/link' );
+    var linkPath = a.abs( 'written/readWriteAsync/link' );
     return provider.fileWrite({ filePath, data, sync : 0 })
     .finally( () =>
     {
@@ -2815,7 +2816,7 @@ function readWriteAsync( test )
       provider.filesDelete( routinePath );
       testData = 'Lorem ipsum dolor sit amet';
       buffer = _.bufferRawFrom( BufferNode.from( testData ) );
-      filePath = test.context.pathFor( 'written/readWriteAsync/file' );
+      filePath = a.abs( 'written/readWriteAsync/file' );
       return null;
     })
 
@@ -2864,7 +2865,7 @@ function readWriteAsync( test )
     {
       test.case = 'other encodings';
       provider.filesDelete( routinePath );
-      filePath = test.context.pathFor( 'written/readWriteSync/file' );
+      filePath = a.abs( 'written/readWriteSync/file' );
       testData = 'abc';
       return null;
     })

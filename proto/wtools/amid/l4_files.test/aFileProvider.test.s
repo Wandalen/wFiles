@@ -3487,20 +3487,18 @@ function fileWriteWithEncoding( test )
   var got = provider.fileRead({ filePath, encoding : 'buffer.raw' });
   test.identical( got, _.bufferJoin( src, src ) );
 
-};
+}
 
 //
 
 function fileWriteJson( test )
 {
   let context = this;
+  let a = context.assetFor( test, false );
   let provider = context.provider;
   let path = provider.path;
 
-  var defReadOptions =
-  {
-    encoding : 'utf8'
-  };
+  var defReadOptions = { encoding : 'utf8' };
   var dataToJSON1 = [ 1, 'a', { b : 34 } ];
   var dataToJSON2 = { a : 1, b : 's', c : [ 1, 3, 4 ] };
   var dataToJSON3 = '{ "a" : "3" }';
@@ -3569,7 +3567,7 @@ function fileWriteJson( test )
       exist : null
     }
 
-    let path = test.context.pathFor( testCheck.path );
+    let path = a.abs( testCheck.path );
 
     // clear
 
@@ -3593,31 +3591,24 @@ function fileWriteJson( test )
     test.identical( got, testCheck.expected );
   }
 
+  /* - */
+
   if( Config.debug )
   {
     test.case = 'missed arguments';
-    test.shouldThrowErrorSync( function( )
-    {
-      provider.fileWriteJson( );
-    } );
+    test.shouldThrowErrorSync( () => provider.fileWriteJson() );
 
     test.case = 'extra arguments';
-    test.shouldThrowErrorSync( function( )
-    {
-      provider.fileWriteJson( 'temp/sample.txt', { a : 'hello' }, { b : 'world' } );
-    } );
+    test.shouldThrowErrorSync( () => provider.fileWriteJson( 'temp/sample.txt', { a : 'hello' }, { b : 'world' } ) );
 
     test.case = 'path is not string';
-    test.shouldThrowErrorSync( function( )
-    {
-      provider.fileWriteJson( 3, 'hello' );
-    } );
+    test.shouldThrowErrorSync( () => provider.fileWriteJson( 3, 'hello' ) );
 
     test.case = 'passed unexpected property in options';
-    test.shouldThrowErrorSync( function( )
-    {
-      provider.fileWriteJson( { filePath : 'temp/some.txt', data : 'hello', parentDir : './work/project' } );
-    } );
+    test.shouldThrowErrorSync
+    (
+      () => provider.fileWriteJson({ filePath : 'temp/some.txt', data : 'hello', parentDir : './work/project' })
+    );
   }
 }
 

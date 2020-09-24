@@ -3290,10 +3290,11 @@ function fileReadWithEncoding( test )
 function fileWriteWithEncoding( test )
 {
   let context = this;
+  let a = context.assetFor( test, false );
   let provider = context.provider;
   let path = provider.path;
 
-  let filePath = test.context.pathFor( 'written/fileWriteWithEncoding/dstFile' );
+  let filePath = a.abs( 'written/fileWriteWithEncoding/dstFile' );
   let isHd = context.providerIsInstanceOf( _.FileProvider.HardDrive );
 
   /* js */

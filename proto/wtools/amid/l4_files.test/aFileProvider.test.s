@@ -1578,7 +1578,7 @@ function fileWriteActSync( test )
     var filePath2 = a.abs( 'write_test/file' );
     provider.filesDelete( filePath2 )
     var o2 = _.mapExtend( null, provider.fileWriteAct.defaults );
-    o2.filePath = _.path.nativize( filePath2 );
+    o2.filePath = a.path.nativize( filePath2 );
     o2.sync = 1;
     o2.data = data;
     test.shouldThrowErrorSync( () =>
@@ -1595,6 +1595,7 @@ function fileWriteActSync( test )
 function fileWriteActAsync( test )
 {
   let context = this;
+  let a = context.assetFor( test, false );
   let provider = context.provider;
   let path = provider.path;
 
@@ -1613,7 +1614,7 @@ function fileWriteActAsync( test )
   .finally( () =>
   {
     test.case = 'normalized path, call fileWrite'
-    var filePath = test.context.pathFor( 'write_test/file' );
+    var filePath = a.abs( 'write_test/file' );
     var o = _.mapExtend( null, provider.fileWriteAct.defaults );
     o.filePath = filePath;
     o.sync = 0;
@@ -1636,10 +1637,10 @@ function fileWriteActAsync( test )
   ready.finally( () =>
   {
     test.case = 'native path, call fileWrite_body'
-    var filePath = test.context.pathFor( 'write_test/file' );
+    var filePath = a.abs( 'write_test/file' );
     provider.filesDelete( filePath )
     var o = _.mapExtend( null, provider.fileWriteAct.defaults );
-    o.filePath = _.path.nativize( filePath );
+    o.filePath = a.path.nativize( filePath );
     o.sync = 0;
     o.data = data;
     return test.shouldThrowErrorOfAnyKind( () =>

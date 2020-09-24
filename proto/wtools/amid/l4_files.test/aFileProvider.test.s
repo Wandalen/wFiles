@@ -274,7 +274,6 @@ function readWriteSync( test )
   let context = this;
   let a = context.assetFor( test, false );
   let provider = context.provider;
-  let path = provider.path;
 
   if( !_.routineIs( provider.fileWriteAct ) )
   {
@@ -291,7 +290,7 @@ function readWriteSync( test )
 
   test.case = 'fileRead, invalid path';
 
-  /**/
+  /* */
 
   // test.shouldThrowErrorSync( function()
   // {
@@ -303,7 +302,7 @@ function readWriteSync( test )
   //   })
   // });
   /* - */
-  // /**/
+  // /* */
   /* - */
   // test.mustNotThrowError( function()
   // {
@@ -323,7 +322,7 @@ function readWriteSync( test )
   // filePath = a.abs( 'written/readWriteSync/dir' );
   // provider.dirMake( filePath );
   /* - */
-  // /**/
+  // /* */
   /* - */
   // test.shouldThrowErrorSync( function()
   // {
@@ -335,7 +334,7 @@ function readWriteSync( test )
   //   })
   // });
   /* - */
-  // /**/
+  // /* */
   /* - */
   // test.mustNotThrowError( function()
   // {
@@ -357,7 +356,7 @@ function readWriteSync( test )
   // var files = provider.dirRead( routinePath );
   // test.identical( files, [ 'file' ] );
   /* - */
-  // /**/
+  // /* */
   /* - */
   // test.mustNotThrowError( function()
   // {
@@ -371,7 +370,7 @@ function readWriteSync( test )
   // });
   // test.identical( got, testData );
   /* - */
-  // /**/
+  // /* */
   /* - */
   // test.shouldThrowErrorSync( function()
   // {
@@ -384,7 +383,7 @@ function readWriteSync( test )
   //   })
   // });
   /* - */
-  // /**/
+  // /* */
   /* - */
   // test.mustNotThrowError( function()
   // {
@@ -404,7 +403,7 @@ function readWriteSync( test )
   // provider.filesDelete( routinePath );
   // filePath = a.abs( 'written/readWriteSync/file' );
   /* - */
-  // /**/
+  // /* */
   /* - */
   // testData = { a : 'abc' };
   // provider.fileWrite( filePath, JSON.stringify( testData ) );
@@ -417,7 +416,7 @@ function readWriteSync( test )
   // });
   // test.identical( got, testData );
   /* - */
-  // /**/
+  // /* */
   /* - */
   // var isHd = context.providerIsInstanceOf( _.FileProvider.HardDrive );
   /* - */
@@ -450,7 +449,7 @@ function readWriteSync( test )
   //   test.identical( got, expected );
   // }
   /* - */
-  // /**/
+  // /* */
   /* - */
   // testData = filePath;
   // provider.fileWrite( filePath, testData );
@@ -472,7 +471,7 @@ function readWriteSync( test )
   //   test.identical( got, testData );
   // }
   /* - */
-  // /**/
+  // /* */
   /* - */
   // test.shouldThrowErrorOfAnyKind( () =>
   // {
@@ -485,7 +484,7 @@ function readWriteSync( test )
   //   });
   // })
   /* - */
-  // /**/
+  // /* */
   /* - */
   // test.mustNotThrowError( () =>
   // {
@@ -499,7 +498,7 @@ function readWriteSync( test )
   //   test.identical( got, null );
   // })
   /* - */
-  // /**/
+  // /* */
   /* - */
   // test.case = 'encoder not finded';
   // var encoding = 'unknown';
@@ -717,7 +716,7 @@ function readWriteSync( test )
   filePath = a.abs( 'written/readWriteSync/file' );
   testData = 'Lorem ipsum dolor sit amet';
 
-  /**/
+  /* */
 
   provider.filesDelete( routinePath );
   provider.fileWrite( filePath, testData );
@@ -751,7 +750,7 @@ function readWriteSync( test )
   testData = 'Lorem ipsum dolor sit amet';
   provider.fileWrite( filePath, testData );
 
-  /**/
+  /* */
 
   provider.filesDelete( routinePath );
   provider.fileWrite( filePath, testData );
@@ -778,7 +777,7 @@ function readWriteSync( test )
   testData = 'Lorem ipsum dolor sit amet';
   provider.fileWrite( filePath, testData );
 
-  /**/
+  /* */
 
   provider.fileWrite
   ({
@@ -797,7 +796,7 @@ function readWriteSync( test )
   });
   test.identical( got, testData );
 
-  /**/
+  /* */
 
   provider.fileWrite
   ({
@@ -816,7 +815,7 @@ function readWriteSync( test )
   });
   test.identical( got, testData );
 
-  /**/
+  /* */
 
   provider.fileWrite
   ({
@@ -1229,7 +1228,7 @@ function readWriteSync( test )
     var buffer = _.bufferRawFrom( BufferNode.from( testData ) );
     filePath = a.abs( 'written/readWriteSync/file' );
 
-    /**/
+    /* */
 
     provider.fileWrite( filePath, buffer );
     got = provider.fileRead
@@ -1542,7 +1541,6 @@ function fileWriteActSync( test )
   let context = this;
   let a = context.assetFor( test, false );
   let provider = context.provider;
-  let path = provider.path;
 
   if( !_.routineIs( provider.fileWriteAct ) )
   {
@@ -1597,7 +1595,6 @@ function fileWriteActAsync( test )
   let context = this;
   let a = context.assetFor( test, false );
   let provider = context.provider;
-  let path = provider.path;
 
   if( !_.routineIs( provider.fileWriteAct ) )
   return;
@@ -1666,9 +1663,8 @@ function fileWriteActAsync( test )
 function readWriteAsync( test )
 {
   let context = this;
-  let provider = context.provider;
   let a = context.assetFor( test, false );
-  let path = provider.path;
+  let provider = context.provider;
 
   if( !_.routineIs( provider.fileWriteAct ) )
   {
@@ -1687,7 +1683,7 @@ function readWriteAsync( test )
   var consequence = new _.Consequence().take( null );
   consequence
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -1701,7 +1697,7 @@ function readWriteAsync( test )
     return test.shouldThrowErrorOfAnyKind( con );
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function()
   {
@@ -1729,7 +1725,7 @@ function readWriteAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -1742,7 +1738,7 @@ function readWriteAsync( test )
     return test.shouldThrowErrorOfAnyKind( con );
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function()
   {
@@ -1773,7 +1769,7 @@ function readWriteAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -1792,7 +1788,7 @@ function readWriteAsync( test )
     })
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -1806,7 +1802,7 @@ function readWriteAsync( test )
     return test.shouldThrowErrorOfAnyKind( con );
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function()
   {
@@ -1830,7 +1826,7 @@ function readWriteAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -1853,7 +1849,7 @@ function readWriteAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -2142,7 +2138,7 @@ function readWriteAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -2202,7 +2198,7 @@ function readWriteAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -2251,7 +2247,7 @@ function readWriteAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -2277,7 +2273,7 @@ function readWriteAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -2304,7 +2300,7 @@ function readWriteAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -2820,7 +2816,7 @@ function readWriteAsync( test )
       return null;
     })
 
-    /**/
+    /* */
 
     consequence.ifNoErrorThen( function( arg )
     {
@@ -2905,7 +2901,6 @@ function fileReadJson( test )
   let context = this;
   let a = context.assetFor( test, false );
   let provider = context.provider;
-  let path = provider.path;
 
   /* */
 
@@ -2976,7 +2971,6 @@ function fileReadWithEncoding( test )
   let context = this;
   let a = context.assetFor( test, false );
   let provider = context.provider;
-  let path = provider.path;
 
   let filePath = a.abs( 'written/fileReadWithEncoding/dstFile' );
   let isHd = context.providerIsInstanceOf( _.FileProvider.HardDrive );
@@ -3292,7 +3286,6 @@ function fileWriteWithEncoding( test )
   let context = this;
   let a = context.assetFor( test, false );
   let provider = context.provider;
-  let path = provider.path;
 
   let filePath = a.abs( 'written/fileWriteWithEncoding/dstFile' );
   let isHd = context.providerIsInstanceOf( _.FileProvider.HardDrive );
@@ -3496,7 +3489,6 @@ function fileWriteJson( test )
   let context = this;
   let a = context.assetFor( test, false );
   let provider = context.provider;
-  let path = provider.path;
 
   /* */
 
@@ -3562,8 +3554,8 @@ function fileWriteJson( test )
 function fileTouch( test )
 {
   let context = this;
+  let a = context.assetFor( test, false );
   let provider = context.provider;
-  let path = provider.path;
 
   if( !_.routineIs( provider.fileWriteAct ) || context.providerIsInstanceOf( _.FileProvider.Extract )  )
   {
@@ -3571,22 +3563,22 @@ function fileTouch( test )
     return;
   }
 
-  var got;
+  /* */
 
-  var routinePath = test.context.pathFor( 'written/fileTouch' );
+  var routinePath = a.abs( 'written/fileTouch' );
 
   provider.filesDelete( routinePath );
 
   if( !provider.statResolvedRead( routinePath ) )
   provider.dirMake( routinePath );
 
-  var srcPath = path.normalize( test.context.pathFor( 'written/fileTouch/src.txt' ) );
+  var srcPath = provider.path.normalize( a.abs( 'written/fileTouch/src.txt' ) );
   var testData = 'test';
 
-  /* - */
+  /* */
 
   test.case = 'filePath doesnt exist'
-  // provider.filesDelete( srcPath );
+  provider.filesDelete( srcPath );
   provider.fileTouch( srcPath );
   var stat = provider.statResolvedRead( srcPath );
   test.is( _.objectIs( stat ) );
@@ -3624,7 +3616,7 @@ function fileTouch( test )
 
   var con = new _.Consequence().take( null )
 
-  /**/
+  /* */
 
   .ifNoErrorThen( ( arg ) =>
   {
@@ -3644,7 +3636,7 @@ function fileTouch( test )
     })
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( ( arg ) =>
   {
@@ -5076,7 +5068,7 @@ function fileCopySync( test )
 
   test.case = 'src not exist';
 
-  /**/
+  /* */
 
   test.shouldThrowErrorSync( function()
   {
@@ -5090,7 +5082,7 @@ function fileCopySync( test )
     });
   });
 
-  /**/
+  /* */
 
   test.mustNotThrowError( function()
   {
@@ -5105,7 +5097,7 @@ function fileCopySync( test )
   });
   test.identical( got, null );
 
-  /**/
+  /* */
 
   test.shouldThrowErrorSync( function()
   {
@@ -5119,7 +5111,7 @@ function fileCopySync( test )
     });
   });
 
-  /**/
+  /* */
 
   test.mustNotThrowError( function()
   {
@@ -5141,7 +5133,7 @@ function fileCopySync( test )
   var dstPath = test.context.pathFor( 'written/fileCopy/dst.txt' );
   provider.fileWrite( srcPath, ' ' );
 
-  /**/
+  /* */
 
   provider.fileCopy
   ({
@@ -5154,7 +5146,7 @@ function fileCopySync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'dst.txt', 'src.txt' ] );
 
-  /**/
+  /* */
 
   provider.filesDelete( dstPath );
   provider.fileCopy
@@ -5168,7 +5160,7 @@ function fileCopySync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'dst.txt', 'src.txt' ] );
 
-  /**/
+  /* */
 
   provider.filesDelete( dstPath );
   provider.fileCopy
@@ -5182,7 +5174,7 @@ function fileCopySync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'dst.txt', 'src.txt' ] );
 
-  /**/
+  /* */
 
   provider.filesDelete( dstPath );
   provider.fileCopy
@@ -5203,7 +5195,7 @@ function fileCopySync( test )
   provider.fileWrite( srcPath, ' ' );
   provider.fileWrite( dstPath, ' ' );
 
-  /**/
+  /* */
 
   provider.fileCopy
   ({
@@ -5216,7 +5208,7 @@ function fileCopySync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'dst.txt', 'src.txt' ] );
 
-  /**/
+  /* */
 
   provider.fileCopy
   ({
@@ -5229,7 +5221,7 @@ function fileCopySync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'dst.txt', 'src.txt' ] );
 
-  /**/
+  /* */
 
   test.shouldThrowErrorSync( function()
   {
@@ -5245,7 +5237,7 @@ function fileCopySync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'dst.txt', 'src.txt' ] );
 
-  /**/
+  /* */
 
   test.mustNotThrowError( function()
   {
@@ -5268,7 +5260,7 @@ function fileCopySync( test )
   provider.filesDelete( routinePath );
   provider.fileWrite( srcPath, ' ' );
 
-  /**/
+  /* */
 
   test.mustNotThrowError( function()
   {
@@ -5285,7 +5277,7 @@ function fileCopySync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'src.txt' ] );
 
-  /**/
+  /* */
 
   test.mustNotThrowError( function()
   {
@@ -5302,7 +5294,7 @@ function fileCopySync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'src.txt' ] );
 
-  /**/
+  /* */
 
   test.mustNotThrowError( function()
   {
@@ -5319,7 +5311,7 @@ function fileCopySync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'src.txt' ] );
 
-  /**/
+  /* */
 
   test.mustNotThrowError( function()
   {
@@ -6590,7 +6582,7 @@ function fileCopyAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -6605,7 +6597,7 @@ function fileCopyAsync( test )
     return test.shouldThrowErrorOfAnyKind( con );
   })
 
-  /**/
+  /* */
 
   .finally( function()
   {
@@ -6626,7 +6618,7 @@ function fileCopyAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -6641,7 +6633,7 @@ function fileCopyAsync( test )
     return test.shouldThrowErrorOfAnyKind( con )
   })
 
-  /**/
+  /* */
 
   .finally( function()
   {
@@ -6697,7 +6689,7 @@ function fileCopyAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -6718,7 +6710,7 @@ function fileCopyAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -6740,7 +6732,7 @@ function fileCopyAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -6762,7 +6754,7 @@ function fileCopyAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -6795,7 +6787,7 @@ function fileCopyAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -6816,7 +6808,7 @@ function fileCopyAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -6837,7 +6829,7 @@ function fileCopyAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -6858,7 +6850,7 @@ function fileCopyAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -6890,7 +6882,7 @@ function fileCopyAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -6912,7 +6904,7 @@ function fileCopyAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -6934,7 +6926,7 @@ function fileCopyAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -6956,7 +6948,7 @@ function fileCopyAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -7370,7 +7362,7 @@ function fileCopySoftLinkResolving( test )
   let srcPathTerminal = provider.path.join( routinePath, 'srcTerminal' );
   let dstPathTerminal = provider.path.join( routinePath, 'dstTerminal' );
 
-  /**/
+  /* */
 
   test.open( 'normal' );
 
@@ -7441,7 +7433,7 @@ function fileCopySoftLinkResolving( test )
 
   test.close( 'normal' );
 
-  // /**/
+  // /* */
 
   test.open( 'double' );
 
@@ -7530,7 +7522,7 @@ function fileCopySoftLinkResolving( test )
 
   test.close( 'double' );
 
-  /**/
+  /* */
 
   test.open( 'broken' );
 
@@ -7597,7 +7589,7 @@ function fileCopySoftLinkResolving( test )
 
   test.close( 'broken' );
 
-  /**/
+  /* */
 
   test.open( 'context cycled' );
 
@@ -8014,7 +8006,7 @@ function fileCopySoftLinkResolving( test )
 
   test.close( 'cycled' );
 
-  /**/
+  /* */
 
   test.open( 'links to same file' );
 
@@ -8311,7 +8303,7 @@ function fileCopyError( test )
   let dstPath = test.context.pathFor( 'written/fileCopyError/dst' );
   let missingPath = test.context.pathFor( 'written/fileCopyError/missing' );
 
-  /**/
+  /* */
 
   test.case = 'missing';
   provider.filesDelete( routinePath );
@@ -9767,7 +9759,7 @@ function fileCopyAsyncThrowingError( test )
 
   let con = new _.Consequence().take( null )
 
-  /**/
+  /* */
 
   .then( () =>
   {
@@ -10529,7 +10521,7 @@ function fileRenameSync( test )
     });
   });
 
-  /**/
+  /* */
 
   test.mustNotThrowError( function()
   {
@@ -10544,7 +10536,7 @@ function fileRenameSync( test )
   });
   test.identical( got, null );
 
-  /**/
+  /* */
 
   test.shouldThrowErrorSync( function()
   {
@@ -10558,7 +10550,7 @@ function fileRenameSync( test )
     });
   });
 
-  /**/
+  /* */
 
   test.mustNotThrowError( function()
   {
@@ -10577,7 +10569,7 @@ function fileRenameSync( test )
 
   test.case = 'rename in same directory, dst not exist';
 
-  /**/
+  /* */
 
   provider.fileWrite( srcPath, ' ' );
   got = provider.fileRename
@@ -10592,7 +10584,7 @@ function fileRenameSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'dst' ] );
 
-  /**/
+  /* */
 
   provider.filesDelete( routinePath );
   provider.fileWrite( srcPath, ' ' );
@@ -10608,7 +10600,7 @@ function fileRenameSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'dst' ] );
 
-  /**/
+  /* */
 
   provider.filesDelete( routinePath );
   provider.fileWrite( srcPath, ' ' );
@@ -10624,7 +10616,7 @@ function fileRenameSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'dst' ] );
 
-  /**/
+  /* */
 
   provider.filesDelete( routinePath );
   provider.fileWrite( srcPath, ' ' );
@@ -10644,7 +10636,7 @@ function fileRenameSync( test )
 
   test.case = 'rename with rewriting in same directory';
 
-  /**/
+  /* */
 
   provider.fileWrite( srcPath, ' ' );
   got = provider.fileRename
@@ -10659,7 +10651,7 @@ function fileRenameSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'dst' ] );
 
-  /**/
+  /* */
 
   provider.fileWrite( srcPath, ' ' );
   got = provider.fileRename
@@ -10674,7 +10666,7 @@ function fileRenameSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'dst' ] );
 
-  /**/
+  /* */
 
   provider.fileWrite( srcPath, ' ' );
   test.shouldThrowErrorSync( function()
@@ -10689,7 +10681,7 @@ function fileRenameSync( test )
     });
   });
 
-  /**/
+  /* */
 
   test.mustNotThrowError( function()
   {
@@ -10709,7 +10701,7 @@ function fileRenameSync( test )
   test.case = 'rename routinePath, dst not exist';
   provider.filesDelete( routinePath );
 
-  /**/
+  /* */
 
   provider.dirMake( srcPath );
   got = provider.fileRename
@@ -10724,7 +10716,7 @@ function fileRenameSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'dst' ] );
 
-  /**/
+  /* */
 
   provider.filesDelete( dstPath );
   provider.dirMake( srcPath );
@@ -10740,7 +10732,7 @@ function fileRenameSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'dst' ] );
 
-  /**/
+  /* */
 
   provider.filesDelete( dstPath );
   provider.dirMake( srcPath );
@@ -10756,7 +10748,7 @@ function fileRenameSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'dst' ] );
 
-  /**/
+  /* */
 
   provider.filesDelete( dstPath );
   provider.dirMake( srcPath );
@@ -10776,7 +10768,7 @@ function fileRenameSync( test )
 
   test.case = 'rename moving to other existing dir';
 
-  /**/
+  /* */
 
   provider.filesDelete( routinePath );
   provider.fileWrite( srcPath, ' ' );
@@ -10794,7 +10786,7 @@ function fileRenameSync( test )
   var files = provider.dirRead( context.provider.path.dir( dstPath ) );
   test.identical( files, [ 'dst' ] );
 
-  /**/
+  /* */
 
   provider.filesDelete( routinePath );
   provider.fileWrite( srcPath, ' ' );
@@ -10812,7 +10804,7 @@ function fileRenameSync( test )
   var files = provider.dirRead( context.provider.path.dir( dstPath ) );
   test.identical( files, [ 'dst' ] );
 
-  /**/
+  /* */
 
   provider.filesDelete( routinePath );
   provider.fileWrite( srcPath, ' ' );
@@ -10830,7 +10822,7 @@ function fileRenameSync( test )
   var files = provider.dirRead( context.provider.path.dir( dstPath ) );
   test.identical( files, [ 'dst' ] );
 
-  /**/
+  /* */
 
   provider.filesDelete( routinePath );
   provider.fileWrite( srcPath, ' ' );
@@ -10852,7 +10844,7 @@ function fileRenameSync( test )
 
   test.case = 'rename moving to not existing dir';
 
-  /**/
+  /* */
 
   provider.filesDelete( routinePath );
   provider.fileWrite( srcPath, ' ' );
@@ -10871,7 +10863,7 @@ function fileRenameSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'src' ] );
 
-  /**/
+  /* */
 
   test.shouldThrowErrorSync( function()
   {
@@ -10887,7 +10879,7 @@ function fileRenameSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'src' ] );
 
-  /**/
+  /* */
 
   test.mustNotThrowError( function()
   {
@@ -10904,7 +10896,7 @@ function fileRenameSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'src' ] );
 
-  /**/
+  /* */
 
   test.mustNotThrowError( function()
   {
@@ -10925,7 +10917,7 @@ function fileRenameSync( test )
 
   test.case = 'dst is not empty dir';
 
-  /**/
+  /* */
 
   debugger
   provider.filesDelete( routinePath );
@@ -10945,7 +10937,7 @@ function fileRenameSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'routinePath' ] );
 
-  /**/
+  /* */
 
   provider.filesDelete( routinePath );
   provider.fileWrite( srcPath, ' ' );
@@ -10964,7 +10956,7 @@ function fileRenameSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'routinePath' ] );
 
-  /**/
+  /* */
 
   provider.filesDelete( routinePath );
   provider.fileWrite( srcPath, ' ' );
@@ -10982,7 +10974,7 @@ function fileRenameSync( test )
     });
   });
 
-  /**/
+  /* */
 
   provider.filesDelete( routinePath );
   provider.fileWrite( srcPath, ' ' );
@@ -11010,7 +11002,7 @@ function fileRenameSync( test )
   provider.filesDelete( routinePath );
   provider.fileWrite( srcPath, ' ' );
 
-  /**/
+  /* */
 
   test.mustNotThrowError( function()
   {
@@ -11027,7 +11019,7 @@ function fileRenameSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'src' ] );
 
-  /**/
+  /* */
 
   test.mustNotThrowError( function()
   {
@@ -11044,7 +11036,7 @@ function fileRenameSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'src' ] );
 
-  /**/
+  /* */
 
   test.mustNotThrowError( function()
   {
@@ -11061,7 +11053,7 @@ function fileRenameSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'src' ] );
 
-  /**/
+  /* */
 
   test.mustNotThrowError( function()
   {
@@ -11220,7 +11212,7 @@ function fileRenameSync2( test )
 
   test.close( 'rewriting terminal' );
 
-  /**/
+  /* */
 
   test.open( 'rewriting directory' );
 
@@ -11339,7 +11331,7 @@ function fileRenameSync2( test )
 
   test.close( 'rewriting directory' );
 
-  /**/
+  /* */
 
   test.open( 'making directory' );
 
@@ -11814,7 +11806,7 @@ function fileRenameAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -11830,7 +11822,7 @@ function fileRenameAsync( test )
     return test.shouldThrowErrorOfAnyKind( con );
   })
 
-  /**/
+  /* */
 
   consequence
   .finally( function()
@@ -11852,7 +11844,7 @@ function fileRenameAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   consequence
   .ifNoErrorThen( function( arg )
@@ -11869,7 +11861,7 @@ function fileRenameAsync( test )
     return test.shouldThrowErrorOfAnyKind( con );
   })
 
-  /**/
+  /* */
 
   .finally( function()
   {
@@ -11898,7 +11890,7 @@ function fileRenameAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -11922,7 +11914,7 @@ function fileRenameAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -11947,7 +11939,7 @@ function fileRenameAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -11972,7 +11964,7 @@ function fileRenameAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -12005,7 +11997,7 @@ function fileRenameAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -12030,7 +12022,7 @@ function fileRenameAsync( test )
 
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -12055,7 +12047,7 @@ function fileRenameAsync( test )
 
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -12072,7 +12064,7 @@ function fileRenameAsync( test )
     return test.shouldThrowErrorOfAnyKind( con );
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -12103,7 +12095,7 @@ function fileRenameAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -12127,7 +12119,7 @@ function fileRenameAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -12152,7 +12144,7 @@ function fileRenameAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -12177,7 +12169,7 @@ function fileRenameAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -12211,7 +12203,7 @@ function fileRenameAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -12237,7 +12229,7 @@ function fileRenameAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -12263,7 +12255,7 @@ function fileRenameAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -12289,7 +12281,7 @@ function fileRenameAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -12324,7 +12316,7 @@ function fileRenameAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -12348,7 +12340,7 @@ function fileRenameAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -12372,7 +12364,7 @@ function fileRenameAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -12397,7 +12389,7 @@ function fileRenameAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -12431,7 +12423,7 @@ function fileRenameAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -12458,7 +12450,7 @@ function fileRenameAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -12485,7 +12477,7 @@ function fileRenameAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -12504,7 +12496,7 @@ function fileRenameAsync( test )
     return test.shouldThrowErrorOfAnyKind( con );
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -12540,7 +12532,7 @@ function fileRenameAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -12563,7 +12555,7 @@ function fileRenameAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -12586,7 +12578,7 @@ function fileRenameAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -13095,7 +13087,7 @@ function fileRenameSoftLinkResolving( test )
   let srcPathTerminal = provider.path.join( routinePath, 'srcTerminal' );
   let dstPathTerminal = provider.path.join( routinePath, 'dstTerminal' );
 
-  /**/
+  /* */
 
   test.open( 'normal' );
 
@@ -13159,7 +13151,7 @@ function fileRenameSoftLinkResolving( test )
 
   test.close( 'normal' );
 
-  /**/
+  /* */
 
   test.open( 'double' );
 
@@ -13225,7 +13217,7 @@ function fileRenameSoftLinkResolving( test )
 
   test.close( 'double' );
 
-  /**/
+  /* */
 
   test.open( 'broken' );
 
@@ -13282,7 +13274,7 @@ function fileRenameSoftLinkResolving( test )
 
   test.close( 'broken' );
 
-  /**/
+  /* */
 
   test.open( 'context cycled' );
 
@@ -13414,7 +13406,7 @@ function fileRenameSoftLinkResolving( test )
 
   test.close( 'cycled' );
 
-  /**/
+  /* */
 
   test.open( 'links to same file' );
 
@@ -14807,7 +14799,7 @@ function fileDeleteSync( test )
 
   test.case = 'removing not existing path';
 
-  /**/
+  /* */
 
   test.shouldThrowErrorSync( function()
   {
@@ -14819,7 +14811,7 @@ function fileDeleteSync( test )
     })
   });
 
-  /**/
+  /* */
 
   test.mustNotThrowError( function()
   {
@@ -14837,7 +14829,7 @@ function fileDeleteSync( test )
   test.case = 'removing existing file';
   var filePath = test.context.pathFor( 'written/fileDelete/file.txt');
 
-  /**/
+  /* */
 
   provider.fileWrite( filePath, ' ' );
   provider.fileDelete
@@ -14849,7 +14841,7 @@ function fileDeleteSync( test )
   var stat = provider.statResolvedRead( filePath );
   test.identical( stat, null );
 
-  /**/
+  /* */
 
   provider.fileWrite( filePath, ' ' );
   provider.fileDelete
@@ -14866,7 +14858,7 @@ function fileDeleteSync( test )
   test.case = 'removing empty folder';
   var filePath = test.context.pathFor( 'written/fileDelete/folder');
 
-  /**/
+  /* */
 
   provider.dirMake( filePath );
   provider.fileDelete
@@ -14878,7 +14870,7 @@ function fileDeleteSync( test )
   var stat = provider.statResolvedRead( filePath );
   test.identical( stat, null );
 
-  /**/
+  /* */
 
   provider.dirMake( filePath );
   provider.fileDelete
@@ -14896,7 +14888,7 @@ function fileDeleteSync( test )
   var filePath = test.context.pathFor( 'written/fileDelete/folder/file.txt');
   var folder = context.provider.path.dir( filePath );
 
-  /**/
+  /* */
 
   provider.fileWrite( filePath, ' ' );
   test.shouldThrowErrorSync( function()
@@ -14911,7 +14903,7 @@ function fileDeleteSync( test )
   var stat = provider.statResolvedRead( folder );
   test.is( !!stat );
 
-  /**/
+  /* */
 
   test.mustNotThrowError( () =>
   {
@@ -14942,7 +14934,7 @@ function fileDeleteSync( test )
     //   });
     // })
 
-    /**/
+    /* */
 
     test.shouldThrowErrorSync( function()
     {
@@ -14955,7 +14947,7 @@ function fileDeleteSync( test )
       });
     })
 
-    /**/
+    /* */
 
     // test.mustNotThrowError( function()
     // {
@@ -14970,7 +14962,7 @@ function fileDeleteSync( test )
     // var stat = provider.statResolvedRead( '.' );
     // test.is( !!stat );
 
-    /**/
+    /* */
 
     test.shouldThrowErrorSync( function()
     {
@@ -15299,7 +15291,7 @@ function fileDeleteAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -15313,7 +15305,7 @@ function fileDeleteAsync( test )
     return test.shouldThrowErrorAsync( con );
   })
 
-  /**/
+  /* */
 
   .finally( function()
   {
@@ -15338,7 +15330,7 @@ function fileDeleteAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -15359,7 +15351,7 @@ function fileDeleteAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -15389,7 +15381,7 @@ function fileDeleteAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -15409,7 +15401,7 @@ function fileDeleteAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -15439,7 +15431,7 @@ function fileDeleteAsync( test )
 
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -15461,7 +15453,7 @@ function fileDeleteAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -15936,14 +15928,14 @@ function statResolvedReadSync( test )
   test.case = 'synchronous file stat default options';
   expected = 46;
 
-  /**/
+  /* */
 
   var got = provider.statResolvedRead( filePath );
   if( _.bigIntIs( got.size ) )
   expected = BigInt( expected );
   test.identical( got.size, expected );
 
-  /**/
+  /* */
 
   var got = provider.statResolvedRead
   ({
@@ -15960,7 +15952,7 @@ function statResolvedReadSync( test )
   test.case = 'invalid path';
   filePath = test.context.pathFor( '///bad path///test.txt' );
 
-  /**/
+  /* */
 
   var got = provider.statResolvedRead
   ({
@@ -15971,7 +15963,7 @@ function statResolvedReadSync( test )
   var expected = null;
   test.identical( got, expected );
 
-  /**/
+  /* */
 
   test.shouldThrowErrorSync( function()
   {
@@ -18500,7 +18492,7 @@ function statResolvedReadAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -18520,7 +18512,7 @@ function statResolvedReadAsync( test )
     })
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -18548,7 +18540,7 @@ function statResolvedReadAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -18566,7 +18558,7 @@ function statResolvedReadAsync( test )
     })
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -18599,7 +18591,7 @@ function statReadActLinkedHead( test )
   var linkPath = path.join( routinePath, 'link' );
   var linkPath2 = path.join( dirPath2, 'link2' );
 
-  /**/
+  /* */
 
   test.case = 'intermediate soft link to directory with terminal';
   provider.filesDelete( routinePath );
@@ -18617,7 +18609,7 @@ function statReadActLinkedHead( test )
   test.is( _.fileStatIs( got ) );
   test.is( got.isTerminal() );
 
-  /**/
+  /* */
 
   test.case = 'intermediate soft link to directory with terminal';
   provider.filesDelete( routinePath );
@@ -18635,7 +18627,7 @@ function statReadActLinkedHead( test )
   test.is( _.fileStatIs( got ) );
   test.is( got.isTerminal() );
 
-  /**/
+  /* */
 
   test.case = 'intermediate soft link to directory with soft link';
   provider.filesDelete( routinePath );
@@ -18654,7 +18646,7 @@ function statReadActLinkedHead( test )
   test.is( _.fileStatIs( got ) );
   test.is( got.isSoftLink() );
 
-  /**/
+  /* */
 
   test.case = 'intermediate soft link to directory with soft link';
   provider.filesDelete( routinePath );
@@ -18673,7 +18665,7 @@ function statReadActLinkedHead( test )
   test.is( _.fileStatIs( got ) );
   test.is( got.isTerminal() );
 
-  /**/
+  /* */
 
   test.case = 'intermediate soft link to directory with missing file';
   provider.filesDelete( routinePath );
@@ -18690,7 +18682,7 @@ function statReadActLinkedHead( test )
   var got = provider.statReadAct( o );
   test.identical( got, null );
 
-  /**/
+  /* */
 
   test.case = 'intermediate soft link to directory with missing file';
   provider.filesDelete( routinePath );
@@ -18707,7 +18699,7 @@ function statReadActLinkedHead( test )
   var got = provider.statReadAct( o );
   test.identical( got, null );
 
-  /**/
+  /* */
 
   test.case = 'intermediate soft link to terminal';
   provider.filesDelete( routinePath );
@@ -18724,7 +18716,7 @@ function statReadActLinkedHead( test )
   var got = provider.statReadAct( o );
   test.identical( got, null );
 
-  /**/
+  /* */
 
   test.case = 'intermediate soft link to terminal';
   provider.filesDelete( routinePath );
@@ -18741,7 +18733,7 @@ function statReadActLinkedHead( test )
   var got = provider.statReadAct( o );
   test.identical( got, null );
 
-  /**/
+  /* */
 
   test.case = 'soft->soft->dir/terminal';
   var linkPath2 = path.join( routinePath, 'link2' );
@@ -18761,7 +18753,7 @@ function statReadActLinkedHead( test )
   test.is( _.fileStatIs( got ) );
   test.is( got.isTerminal() );
 
-  /**/
+  /* */
 
   test.case = 'soft->soft->dir/terminal';
   var linkPath2 = path.join( routinePath, 'link2' );
@@ -18781,7 +18773,7 @@ function statReadActLinkedHead( test )
   test.is( _.fileStatIs( got ) );
   test.is( got.isTerminal() );
 
-  /**/
+  /* */
 
   test.case = 'soft->soft->dir/soft->terminal';
   var linkPath2 = path.join( routinePath, 'link2' );
@@ -18802,7 +18794,7 @@ function statReadActLinkedHead( test )
   test.is( _.fileStatIs( got ) );
   test.is( got.isSoftLink() );
 
-  /**/
+  /* */
 
   test.case = 'soft->soft->dir/soft->terminal';
   var linkPath2 = path.join( routinePath, 'link2' );
@@ -18823,7 +18815,7 @@ function statReadActLinkedHead( test )
   test.is( _.fileStatIs( got ) );
   test.is( got.isTerminal() );
 
-  /**/
+  /* */
 
   test.case = 'soft->soft->dir/missing';
   var linkPath2 = path.join( routinePath, 'link2' );
@@ -18842,7 +18834,7 @@ function statReadActLinkedHead( test )
   var got = provider.statReadAct( o );
   test.identical( got, null );
 
-  /**/
+  /* */
 
   test.case = 'soft->soft->dir/missing';
   var linkPath2 = path.join( routinePath, 'link2' );
@@ -18861,7 +18853,7 @@ function statReadActLinkedHead( test )
   var got = provider.statReadAct( o );
   test.identical( got, null );
 
-  /**/
+  /* */
 
   test.case = 'two intermediate links in path, soft/soft/terminal';
   var linkPath2 = path.join( dirPath2, 'link2' );
@@ -18882,7 +18874,7 @@ function statReadActLinkedHead( test )
   test.is( _.fileStatIs( got ) );
   test.is( got.isTerminal() );
 
-  /**/
+  /* */
 
   test.case = 'two intermediate links in path, soft/soft/terminal';
   var linkPath2 = path.join( dirPath2, 'link2' );
@@ -18903,7 +18895,7 @@ function statReadActLinkedHead( test )
   test.is( _.fileStatIs( got ) );
   test.is( got.isTerminal() );
 
-  /**/
+  /* */
 
   test.case = 'two intermediate links in path, soft/soft/missing';
   var linkPath2 = path.join( dirPath2, 'link2' );
@@ -18923,7 +18915,7 @@ function statReadActLinkedHead( test )
   var got = provider.statReadAct( o );
   test.identical( got, null );
 
-  /**/
+  /* */
 
   test.case = 'two intermediate links in path, soft/soft/missing';
   var linkPath2 = path.join( dirPath2, 'link2' );
@@ -18943,7 +18935,7 @@ function statReadActLinkedHead( test )
   var got = provider.statReadAct( o );
   test.identical( got, null );
 
-  /**/
+  /* */
 
   test.case = 'two intermediate links in path, soft/soft/soft->terminal';
   var linkPath2 = path.join( dirPath2, 'link2' );
@@ -18965,7 +18957,7 @@ function statReadActLinkedHead( test )
   test.is( _.fileStatIs( got ) );
   test.is( got.isSoftLink() );
 
-  /**/
+  /* */
 
   test.case = 'two intermediate links in path, soft/soft/soft->terminal';
   var linkPath2 = path.join( dirPath2, 'link2' );
@@ -18987,7 +18979,7 @@ function statReadActLinkedHead( test )
   test.is( _.fileStatIs( got ) );
   test.is( got.isTerminal() );
 
-  /**/
+  /* */
 
   test.case = 'two intermediate links in path, soft/soft/soft->missing';
   var linkPath2 = path.join( dirPath2, 'link2' );
@@ -19009,7 +19001,7 @@ function statReadActLinkedHead( test )
   test.is( _.fileStatIs( got ) );
   test.is( got.isSoftLink() );
 
-  /**/
+  /* */
 
   test.case = 'two intermediate links in path, soft/soft/soft->missing';
   var linkPath2 = path.join( dirPath2, 'link2' );
@@ -19061,7 +19053,7 @@ function dirMakeSync( test )
   test.case = 'synchronous mkdir';
   filePath = test.context.pathFor( 'written/dirMake/make_dir' );
 
-  /**/
+  /* */
 
   provider.dirMake( filePath );
   var files = provider.dirRead( routinePath );
@@ -19073,7 +19065,7 @@ function dirMakeSync( test )
   provider.filesDelete( filePath );
   filePath = test.context.pathFor( 'written/dirMake/make_dir/dir1' );
 
-  /**/
+  /* */
   provider.dirMake
   ({
     filePath,
@@ -19083,7 +19075,7 @@ function dirMakeSync( test )
   var files = provider.dirRead( context.provider.path.dir( filePath ) );
   test.identical( files, [ 'dir1' ] );
 
-  /**/
+  /* */
 
   test.shouldThrowErrorSync( function()
   {
@@ -19102,7 +19094,7 @@ function dirMakeSync( test )
   filePath = test.context.pathFor( 'written/dirMake/terminal.txt' );
   provider.fileWrite( filePath, ' ' );
 
-  /**/
+  /* */
 
   provider.dirMake
   ({
@@ -19115,7 +19107,7 @@ function dirMakeSync( test )
   var files = provider.dirRead( context.provider.path.dir( filePath ) );
   test.identical( files, [ 'terminal.txt' ] );
 
-  /**/
+  /* */
 
   provider.filesDelete( routinePath );
   provider.fileWrite( filePath, ' ' );
@@ -19135,7 +19127,7 @@ function dirMakeSync( test )
   test.case = 'try to rewrite empty dir';
   filePath = test.context.pathFor( 'written/dirMake/empty' );
 
-  /**/
+  /* */
 
   provider.filesDelete( routinePath )
   provider.dirMake( filePath );
@@ -19150,7 +19142,7 @@ function dirMakeSync( test )
   var files = provider.dirRead( context.provider.path.dir( filePath ) );
   test.identical( files, [ 'empty' ] );
 
-  /**/
+  /* */
 
   provider.filesDelete( routinePath )
   provider.dirMake( filePath );
@@ -19165,7 +19157,7 @@ function dirMakeSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'empty' ] );
 
-  /**/
+  /* */
 
   provider.filesDelete( routinePath )
   provider.dirMake( filePath );
@@ -19180,7 +19172,7 @@ function dirMakeSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'empty' ] );
 
-  /**/
+  /* */
 
   provider.filesDelete( routinePath )
   provider.dirMake( filePath );
@@ -19195,7 +19187,7 @@ function dirMakeSync( test )
     });
   });
 
-  /**/
+  /* */
 
   provider.filesDelete( routinePath )
   provider.dirMake( filePath );
@@ -19215,7 +19207,7 @@ function dirMakeSync( test )
   test.case = '/dir exists, no rewritingTerminal, no force';
   filePath = test.context.pathFor( 'written/dirMake/make_dir/' );
 
-  /**/
+  /* */
 
   // provider.filesDelete( filePath );
   provider.dirMake( filePath );
@@ -19236,7 +19228,7 @@ function dirMakeSync( test )
   filePath = test.context.pathFor( 'written/dirMake/make_dir/file' );
   provider.filesDelete( routinePath );
 
-  /**/
+  /* */
 
   provider.fileWrite( filePath, ' ' );
   test.shouldThrowErrorSync( function()
@@ -19250,7 +19242,7 @@ function dirMakeSync( test )
     });
   });
 
-  /**/
+  /* */
 
   provider.fileWrite( filePath, ' ' );
   test.shouldThrowErrorSync( function()
@@ -19264,7 +19256,7 @@ function dirMakeSync( test )
     });
   });
 
-  /**/
+  /* */
 
   provider.fileWrite( filePath, ' ' );
   provider.dirMake
@@ -19285,7 +19277,7 @@ function dirMakeSync( test )
   provider.filesDelete( routinePath );
   filePath = test.context.pathFor( 'written/dirMake/routinePath' );
 
-  /**/
+  /* */
 
   test.shouldThrowErrorSync( function()
   {
@@ -19298,7 +19290,7 @@ function dirMakeSync( test )
     });
   });
 
-  /**/
+  /* */
 
   test.shouldThrowErrorSync( function()
   {
@@ -19311,7 +19303,7 @@ function dirMakeSync( test )
     });
   });
 
-  /**/
+  /* */
 
   provider.dirMake
   ({
@@ -19323,7 +19315,7 @@ function dirMakeSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'routinePath' ] );
 
-  /**/
+  /* */
 
   provider.filesDelete( routinePath );
   provider.dirMake
@@ -19537,7 +19529,7 @@ function dirMakeAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -19566,7 +19558,7 @@ function dirMakeAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -19585,7 +19577,7 @@ function dirMakeAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -19610,7 +19602,7 @@ function dirMakeAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -19629,7 +19621,7 @@ function dirMakeAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -19654,7 +19646,7 @@ function dirMakeAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -19675,7 +19667,7 @@ function dirMakeAsync( test )
     })
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -19696,7 +19688,7 @@ function dirMakeAsync( test )
     })
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -19712,7 +19704,7 @@ function dirMakeAsync( test )
     return test.shouldThrowErrorOfAnyKind( con );
   })
 
-  /**/
+  /* */
 
   .finally( function()
   {
@@ -19737,7 +19729,7 @@ function dirMakeAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -19763,7 +19755,7 @@ function dirMakeAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -19778,7 +19770,7 @@ function dirMakeAsync( test )
     return test.shouldThrowErrorOfAnyKind( con );
   })
 
-  /**/
+  /* */
 
   .finally( function()
   {
@@ -19793,7 +19785,7 @@ function dirMakeAsync( test )
     return test.shouldThrowErrorOfAnyKind( con );
   })
 
-  /**/
+  /* */
 
   .finally( function()
   {
@@ -19823,7 +19815,7 @@ function dirMakeAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -19837,7 +19829,7 @@ function dirMakeAsync( test )
     return test.shouldThrowErrorOfAnyKind( con );
   })
 
-  /**/
+  /* */
 
   .finally( function()
   {
@@ -19851,7 +19843,7 @@ function dirMakeAsync( test )
     return test.shouldThrowErrorOfAnyKind( con );
   })
 
-  /**/
+  /* */
 
   .finally( function()
   {
@@ -19870,7 +19862,7 @@ function dirMakeAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -19927,7 +19919,7 @@ function hashReadSync( test )
   data = 'Excepteur sint occaecat cupidatat non proident';
   filePath = test.context.pathFor( 'read/hashRead/src.txt' );
 
-  /**/
+  /* */
 
   provider.fileWrite( filePath, data );
   got = provider.hashRead( filePath );
@@ -19941,7 +19933,7 @@ function hashReadSync( test )
   test.case = 'invalid path';
   filePath = test.context.pathFor( 'invalid.txt' );
 
-  /**/
+  /* */
 
   got = provider.hashRead
   ({
@@ -20047,7 +20039,7 @@ function hashReadAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -20077,7 +20069,7 @@ function hashReadAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -20437,7 +20429,7 @@ function dirReadAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -20456,7 +20448,7 @@ function dirReadAsync( test )
     })
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -20484,7 +20476,7 @@ function dirReadAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -20504,7 +20496,7 @@ function dirReadAsync( test )
     })
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -20533,7 +20525,7 @@ function dirReadAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -20551,7 +20543,7 @@ function dirReadAsync( test )
     })
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -22386,7 +22378,7 @@ function softLinkSync( test )
   dstPath = test.context.pathFor( 'written/softLink/link.txt' );
   provider.fileWrite( srcPath, '000' );
 
-  /**/
+  /* */
 
   provider.softLink
   ({
@@ -22416,7 +22408,7 @@ function softLinkSync( test )
   srcPath  = test.context.pathFor( 'written/softLink/no_file.txt' );
   dstPath = test.context.pathFor( 'written/softLink/link2.txt' );
 
-  /**/
+  /* */
 
   test.shouldThrowErrorSync( function()
   {
@@ -22430,7 +22422,7 @@ function softLinkSync( test )
     });
   })
 
-  /**/
+  /* */
 
   test.mustNotThrowError( function()
   {
@@ -22461,7 +22453,7 @@ function softLinkSync( test )
     sync : 1,
   });
 
-  /**/
+  /* */
 
   test.mustNotThrowError( function( )
   {
@@ -22477,7 +22469,7 @@ function softLinkSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'link.txt', 'link_test.txt' ] )
 
-  /**/
+  /* */
 
   test.mustNotThrowError( function( )
   {
@@ -22493,7 +22485,7 @@ function softLinkSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'link.txt', 'link_test.txt' ] )
 
-  /**/
+  /* */
 
   test.shouldThrowErrorSync( function( )
   {
@@ -22507,7 +22499,7 @@ function softLinkSync( test )
     });
   });
 
-  /**/
+  /* */
 
   test.mustNotThrowError( function( )
   {
@@ -22528,7 +22520,7 @@ function softLinkSync( test )
   srcPath = test.context.pathFor( 'written/softLink/link_test.txt' );
   provider.fileWrite( srcPath, ' ' );
 
-  /**/
+  /* */
 
   test.mustNotThrowError( function()
   {
@@ -22545,7 +22537,7 @@ function softLinkSync( test )
   test.identical( got, true );
   test.is( provider.isSoftLink( srcPath ) );
 
-  /**/
+  /* */
 
   provider.fileDelete( srcPath );
   test.mustNotThrowError( function()
@@ -22563,7 +22555,7 @@ function softLinkSync( test )
   test.identical( got, true );
   test.is( provider.isSoftLink( srcPath ) );
 
-  /**/
+  /* */
 
   provider.fileDelete( srcPath );
   test.mustNotThrowError( function()
@@ -22581,7 +22573,7 @@ function softLinkSync( test )
   test.identical( got, true );
   test.is( provider.isSoftLink( srcPath ) );
 
-  /**/
+  /* */
 
   provider.fileDelete( srcPath );
   test.mustNotThrowError( function()
@@ -22599,7 +22591,7 @@ function softLinkSync( test )
   test.identical( got, true );
   test.is( provider.isSoftLink( srcPath ) );
 
-  /**/
+  /* */
 
   provider.filesDelete( srcPath );
   test.shouldThrowErrorOfAnyKind( function()
@@ -22616,7 +22608,7 @@ function softLinkSync( test )
   });
   test.is( !provider.isSoftLink( srcPath ) );
 
-  /**/
+  /* */
 
   provider.filesDelete( srcPath );
   test.mustNotThrowError( function()
@@ -22641,7 +22633,7 @@ function softLinkSync( test )
   dstPath = test.context.pathFor( 'written/softLink/link' );
   provider.dirMake( srcPath );
 
-  /**/
+  /* */
 
   provider.softLink
   ({
@@ -22654,7 +22646,7 @@ function softLinkSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'link', 'link_test' ]  );
 
-  /**/
+  /* */
 
   test.shouldThrowErrorSync( function()
   {
@@ -22668,7 +22660,7 @@ function softLinkSync( test )
     });
   })
 
-  /**/
+  /* */
 
   debugger
   provider.softLink
@@ -23045,7 +23037,7 @@ function softLinkSync( test )
 
   test.close( 'allowingMissed' );
 
-  /**/
+  /* */
 
   test.mustNotThrowError( function()
   {
@@ -23102,7 +23094,7 @@ function softLinkAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -23143,7 +23135,7 @@ function softLinkAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -23158,7 +23150,7 @@ function softLinkAsync( test )
     return test.shouldThrowErrorOfAnyKind( con );
   })
 
-  /**/
+  /* */
 
   .finally( function( )
   {
@@ -23197,7 +23189,7 @@ function softLinkAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -23218,7 +23210,7 @@ function softLinkAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -23239,7 +23231,7 @@ function softLinkAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -23254,7 +23246,7 @@ function softLinkAsync( test )
     return test.shouldThrowErrorOfAnyKind( con );
   })
 
-  /**/
+  /* */
 
   .finally( function()
   {
@@ -23279,7 +23271,7 @@ function softLinkAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -23300,7 +23292,7 @@ function softLinkAsync( test )
     })
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -23322,7 +23314,7 @@ function softLinkAsync( test )
     })
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -23344,7 +23336,7 @@ function softLinkAsync( test )
     })
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -23366,7 +23358,7 @@ function softLinkAsync( test )
     })
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -23420,7 +23412,7 @@ function softLinkAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -23440,7 +23432,7 @@ function softLinkAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -23455,7 +23447,7 @@ function softLinkAsync( test )
     return test.shouldThrowErrorOfAnyKind( con );
   })
 
-  /**/
+  /* */
 
   .finally( function()
   {
@@ -23581,7 +23573,7 @@ function softLinkAsync( test )
 
   .finally( () => test.close( 'allowingMissed' ) )
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -25355,7 +25347,7 @@ function softLinkSoftLinkResolving( test )
   let srcPathTerminal = provider.path.join( routinePath, 'srcTerminal' );
   let dstPathTerminal = provider.path.join( routinePath, 'dstTerminal' );
 
-  /**/
+  /* */
 
   test.open( 'normal' );
 
@@ -25441,7 +25433,7 @@ function softLinkSoftLinkResolving( test )
 
   test.close( 'normal' );
 
-  /**/
+  /* */
 
   test.open( 'double' );
 
@@ -25549,7 +25541,7 @@ function softLinkSoftLinkResolving( test )
 
   test.close( 'double' );
 
-  /**/
+  /* */
 
   test.open( 'broken' );
 
@@ -25615,7 +25607,7 @@ function softLinkSoftLinkResolving( test )
 
   test.close( 'broken' );
 
-  /**/
+  /* */
 
   test.open( 'context cycled' );
 
@@ -25769,7 +25761,7 @@ function softLinkSoftLinkResolving( test )
 
   test.close( 'cycled' );
 
-  /**/
+  /* */
 
   test.open( 'links to same file' );
 
@@ -25883,7 +25875,7 @@ function softLinkRelativeLinkResolving( test )
   let dstPathTerminal = provider.path.join( routinePath, 'dstTerminal' );
   let dstPathRelativeTerminal = provider.path.relative( dstPath, dstPathTerminal );
 
-  /**/
+  /* */
 
   test.open( 'normal' );
 
@@ -25969,7 +25961,7 @@ function softLinkRelativeLinkResolving( test )
 
   test.close( 'normal' );
 
-  /**/
+  /* */
 
   test.open( 'double' );
 
@@ -26077,7 +26069,7 @@ function softLinkRelativeLinkResolving( test )
 
   test.close( 'double' );
 
-  /**/
+  /* */
 
   test.open( 'broken' );
 
@@ -26144,7 +26136,7 @@ function softLinkRelativeLinkResolving( test )
 
   test.close( 'broken' );
 
-  /**/
+  /* */
 
   test.open( 'context cycled' );
 
@@ -26298,7 +26290,7 @@ function softLinkRelativeLinkResolving( test )
 
   test.close( 'cycled' );
 
-  /**/
+  /* */
 
   test.open( 'links to same file' );
 
@@ -27960,7 +27952,7 @@ function textLinkSync( test )
   var got = provider.pathResolveTextLink( linkPath2 );
   test.identical( got, linkPath1 );
 
-  /**/
+  /* */
 
   test.case = 'try to rewrite existing terminal'
   provider.filesDelete( routinePath );
@@ -28027,7 +28019,7 @@ function textLinkSync( test )
   var got = provider.pathResolveTextLink( linkPath1 );
   test.identical( got, filePath1 );
 
-  /**/
+  /* */
 
   test.case = 'equal path';
   provider.filesDelete( routinePath );
@@ -29522,7 +29514,7 @@ function hardLinkSync( test )
   dstPath = test.context.pathFor( 'written/hardLink/link.txt' );
   provider.fileWrite( srcPath, '000' );
 
-  /**/
+  /* */
 
   provider.hardLink
   ({
@@ -29551,7 +29543,7 @@ function hardLinkSync( test )
   srcPath  = test.context.pathFor( 'written/hardLink/no_file.txt' );
   dstPath = test.context.pathFor( 'written/hardLink/link2.txt' );
 
-  /**/
+  /* */
 
   test.shouldThrowErrorSync( function()
   {
@@ -29565,7 +29557,7 @@ function hardLinkSync( test )
     });
   })
 
-  /**/
+  /* */
 
   test.mustNotThrowError( function()
   {
@@ -29597,7 +29589,7 @@ function hardLinkSync( test )
   });
   test.identical( got, true );
 
-  /**/
+  /* */
 
   test.mustNotThrowError( function( )
   {
@@ -29614,7 +29606,7 @@ function hardLinkSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'link.txt', 'link_test.txt' ] )
 
-  /**/
+  /* */
 
   test.mustNotThrowError( function( )
   {
@@ -29631,7 +29623,7 @@ function hardLinkSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'link.txt', 'link_test.txt' ] )
 
-  /**/
+  /* */
 
   var got = provider.hardLink
   ({
@@ -29647,7 +29639,7 @@ function hardLinkSync( test )
   else
   test.identical( provider.areHardLinked([ srcPath, dstPath ]), true )
 
-  /**/
+  /* */
 
   test.mustNotThrowError( function( )
   {
@@ -29668,7 +29660,7 @@ function hardLinkSync( test )
   srcPath = test.context.pathFor( 'written/hardLink/link_test.txt' );
   provider.fileWrite( srcPath, ' ' );
 
-  /**/
+  /* */
 
   test.mustNotThrowError( function()
   {
@@ -29685,7 +29677,7 @@ function hardLinkSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'link_test.txt' ] );
 
-  /**/
+  /* */
 
   test.mustNotThrowError( function()
   {
@@ -29702,7 +29694,7 @@ function hardLinkSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'link_test.txt' ] );
 
-  /**/
+  /* */
 
   test.mustNotThrowError( function()
   {
@@ -29719,7 +29711,7 @@ function hardLinkSync( test )
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'link_test.txt' ] );
 
-  /**/
+  /* */
 
   test.mustNotThrowError( function()
   {
@@ -29744,7 +29736,7 @@ function hardLinkSync( test )
   dstPath = test.context.pathFor( 'written/hardLink/link' );
   provider.dirMake( srcPath );
 
-  /**/
+  /* */
 
   test.shouldThrowErrorSync( function()
   {
@@ -29758,7 +29750,7 @@ function hardLinkSync( test )
     });
   })
 
-  /**/
+  /* */
 
   test.shouldThrowErrorSync( function()
   {
@@ -29772,7 +29764,7 @@ function hardLinkSync( test )
     });
   })
 
-  /**/
+  /* */
 
   test.mustNotThrowError( function()
   {
@@ -29787,7 +29779,7 @@ function hardLinkSync( test )
     });
   })
 
-  /**/
+  /* */
 
   test.mustNotThrowError( function()
   {
@@ -29801,7 +29793,7 @@ function hardLinkSync( test )
     });
   })
 
-  /**/
+  /* */
 
   test.case = 'try to link same file, srcPath has intermediate soft link to same dir';
   context.provider.filesDelete( routinePath );
@@ -30011,7 +30003,7 @@ function hardLinkMultipleSync( test )
   var currentTestDir = 'written/hardLink/';
   var data = ' ';
 
-  /**/
+  /* */
 
   test.case = 'dstPath option, files are not linked';
   var paths = makeFiles( fileNames, currentTestDir );
@@ -30025,7 +30017,7 @@ function hardLinkMultipleSync( test )
   })
   test.identical( provider.areHardLinked( paths ), hardLinked );
 
-  /**/
+  /* */
 
   test.case = 'dstPath option, linking files from different dirs';
   paths = fileNames.map( ( n ) => path.join( 'dir_'+ n, n ) );
@@ -30041,7 +30033,7 @@ function hardLinkMultipleSync( test )
   })
   test.identical( provider.areHardLinked( paths ), hardLinked );
 
-  /**/
+  /* */
 
   test.case = 'dstPath option, try to link already linked files';
   var paths = makeFiles( fileNames, currentTestDir );
@@ -30063,7 +30055,7 @@ function hardLinkMultipleSync( test )
   })
   test.identical( provider.areHardLinked( paths ), hardLinked );
 
-  /**/
+  /* */
 
   test.case = 'dstPath, rewriting off, try to rewrite existing files';
   var paths = makeFiles( fileNames, currentTestDir );
@@ -30093,7 +30085,7 @@ function hardLinkMultipleSync( test )
   var fileNames = [ 'a1', 'a2', 'a3', 'a4', 'a5', 'a6' ];
   provider.filesDelete( test.context.pathFor( currentTestDir ) );
 
-  /**/
+  /* */
 
   var groups = [ [ 0, 1 ], [ 2, 3, 4 ], [ 5 ] ];
   var paths = makeFiles( fileNames, currentTestDir );
@@ -30108,7 +30100,7 @@ function hardLinkMultipleSync( test )
   })
   test.identical( provider.areHardLinked( paths ), hardLinked );
 
-  /**/
+  /* */
 
   var groups = [ [ 0, 1 ], [ 1, 2, 3 ], [ 3, 4, 5 ] ];
   var paths = makeFiles( fileNames, currentTestDir );
@@ -30123,7 +30115,7 @@ function hardLinkMultipleSync( test )
   })
   test.identical( provider.areHardLinked( paths ), hardLinked );
 
-  /**/
+  /* */
 
   var groups = [ [ 0, 1, 2, 3 ], [ 4, 5 ] ];
   var paths = makeFiles( fileNames, currentTestDir );
@@ -30138,7 +30130,7 @@ function hardLinkMultipleSync( test )
   })
   test.identical( provider.areHardLinked( paths ), hardLinked );
 
-  /**/
+  /* */
 
   var groups = [ [ 0, 1, 2, 3, 4 ], [ 0, 5 ] ];
   var paths = makeFiles( fileNames, currentTestDir );
@@ -30153,7 +30145,7 @@ function hardLinkMultipleSync( test )
   })
   test.identical( provider.areHardLinked( paths ), hardLinked );
 
-  /**/
+  /* */
 
   test.case = 'dstPath option, only first path exists';
   var fileNames = [ 'a1', 'a2', 'a3' ];
@@ -30176,7 +30168,7 @@ function hardLinkMultipleSync( test )
   provider.fileWrite( paths[ paths.length - 1 ], fileNames[ fileNames.length - 1 ] );
   test.identical( provider.fileRead( paths[ 0 ] ), provider.fileRead( paths[ paths.length - 1 ] ) );
 
-  /**/
+  /* */
 
   test.case = 'dstPath option, only first path exists';
   var fileNames = [ 'a1', 'a2', 'a3' ];
@@ -30199,7 +30191,7 @@ function hardLinkMultipleSync( test )
   test.is( !provider.fileExists( paths[ 1 ] ) );
   test.is( !provider.fileExists( paths[ 2 ] ) );
 
-  /**/
+  /* */
 
   test.case = 'dstPath option, all paths not exist';
   provider.filesDelete( test.context.pathFor( currentTestDir ) );
@@ -30251,7 +30243,7 @@ function hardLinkMultipleSync( test )
   provider.hardLink({ dstPath : files, allowingDiscrepancy : 1 });
   test.identical( provider.areHardLinked( paths ), null ); */
 
-  /**/
+  /* */
 
   test.case = 'using srcPath as source for files from dstPath';
   var paths = makeFiles( fileNames, currentTestDir );
@@ -31385,7 +31377,7 @@ function hardLinkAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -31424,7 +31416,7 @@ function hardLinkAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -31439,7 +31431,7 @@ function hardLinkAsync( test )
     return test.shouldThrowErrorOfAnyKind( con );
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -31477,7 +31469,7 @@ function hardLinkAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -31497,7 +31489,7 @@ function hardLinkAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -31517,7 +31509,7 @@ function hardLinkAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -31540,7 +31532,7 @@ function hardLinkAsync( test )
     })
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -31566,7 +31558,7 @@ function hardLinkAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -31587,7 +31579,7 @@ function hardLinkAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -31608,7 +31600,7 @@ function hardLinkAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -31629,7 +31621,7 @@ function hardLinkAsync( test )
     });
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -31662,7 +31654,7 @@ function hardLinkAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -31677,7 +31669,7 @@ function hardLinkAsync( test )
     return test.shouldThrowErrorOfAnyKind( con );
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -31692,7 +31684,7 @@ function hardLinkAsync( test )
     return test.shouldThrowErrorOfAnyKind( con );
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -31707,7 +31699,7 @@ function hardLinkAsync( test )
     return test.mustNotThrowError( con );
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -31730,7 +31722,7 @@ function hardLinkAsync( test )
     return consequence;
   }
 
-  /**/
+  /* */
 
   consequence.ifNoErrorThen( function( arg )
   {
@@ -31746,7 +31738,7 @@ function hardLinkAsync( test )
     .finally( () => test.identical( provider.areHardLinked( paths ), hardLinked ) );
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -31763,7 +31755,7 @@ function hardLinkAsync( test )
     .finally( () => test.identical( provider.areHardLinked( paths ), hardLinked ) );
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -31787,7 +31779,7 @@ function hardLinkAsync( test )
     .finally( () => test.identical( provider.areHardLinked( paths ), hardLinked ) );
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -31825,7 +31817,7 @@ function hardLinkAsync( test )
     return null;
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -31842,7 +31834,7 @@ function hardLinkAsync( test )
     .finally( () => test.identical( provider.areHardLinked( paths ), hardLinked ) );
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -31874,7 +31866,7 @@ function hardLinkAsync( test )
     .finally( () => test.identical( provider.areHardLinked( paths ), hardLinked ) );
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -31891,7 +31883,7 @@ function hardLinkAsync( test )
     .finally( () => test.identical( provider.areHardLinked( paths ), hardLinked ) );
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -31917,7 +31909,7 @@ function hardLinkAsync( test )
     })
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -31945,7 +31937,7 @@ function hardLinkAsync( test )
     })
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -32472,7 +32464,7 @@ function fileExchangeSync( test )
   dst = provider.fileRead( dstPath );
   test.identical( [ src, dst ], [ 'dst', 'src' ] )
 
-  /**/
+  /* */
 
   provider.fileWrite( srcPath, 'src' );
   provider.fileWrite( dstPath, 'dst' );
@@ -33047,7 +33039,7 @@ function fileExchangeAsync( test )
     })
   })
 
-  /**/
+  /* */
 
   .ifNoErrorThen( function( arg )
   {
@@ -33777,7 +33769,7 @@ function hardLinkSoftLinkResolving( test )
   if( context.providerIsInstanceOf( _.FileProvider.HardDrive ) && !provider.UsingBigIntForStat )
   hardLinked = _.maybe;
 
-  /**/
+  /* */
 
   test.open( 'normal' );
 
@@ -33854,7 +33846,7 @@ function hardLinkSoftLinkResolving( test )
 
   test.close( 'normal' );
 
-  /**/
+  /* */
 
   test.open( 'double' );
 
@@ -33950,7 +33942,7 @@ function hardLinkSoftLinkResolving( test )
 
   test.close( 'double' );
 
-  /**/
+  /* */
 
   test.open( 'broken' );
 
@@ -34017,7 +34009,7 @@ function hardLinkSoftLinkResolving( test )
 
   test.close( 'broken' );
 
-  /**/
+  /* */
 
   test.open( 'context cycled' );
 
@@ -34165,7 +34157,7 @@ function hardLinkSoftLinkResolving( test )
 
   test.close( 'cycled' );
 
-  /**/
+  /* */
 
   test.open( 'links to same file' );
 
@@ -38134,7 +38126,7 @@ function isTextLink( test )
   let filePath2 = test.context.pathFor( 'written/isTextLink/file2' );
   let linkPath = test.context.pathFor( 'written/isTextLink/link' );
 
-  /**/
+  /* */
 
   provider.fieldPush( 'usingTextLink', 0 )
 
@@ -38217,7 +38209,7 @@ function isTextLink( test )
 
   provider.fieldPop( 'usingTextLink', 0 )
 
-  /**/
+  /* */
 
   provider.fieldPush( 'usingTextLink', 1 )
   provider.filesDelete( dirPath );
@@ -46831,7 +46823,7 @@ function pathResolveTextLink( test )
 
   provider.fieldPop( 'usingTextLink', 1 );
 
-  /**/
+  /* */
 
   provider.fieldPush( 'usingTextLink', 0 );
 
@@ -49576,7 +49568,7 @@ function pathNativize( t )
   {
     t.description = 'path in win32 style ';
 
-    /**/
+    /* */
 
     debugger
     var path = '/A/abc/';
@@ -49584,14 +49576,14 @@ function pathNativize( t )
     var expected = 'A:\\abc\\';
     t.identical( got, expected );
 
-    /**/
+    /* */
 
     var path = '/A/';
     var got = provider.path.nativize( path );
     var expected = 'A:\\';
     t.identical( got, expected );
 
-    /**/
+    /* */
 
     var path = '/A';
     var got = provider.path.nativize( path );
@@ -49599,49 +49591,49 @@ function pathNativize( t )
     var expected = 'A:\\';
     t.identical( got, expected );
 
-    /**/
+    /* */
 
     var path = '/A/a';
     var got = provider.path.nativize( path );
     var expected = 'A:\\a';
     t.identical( got, expected );
 
-    /**/
+    /* */
 
     var path = 'A:/a';
     var got = provider.path.nativize( path );
     var expected = 'A:\\a';
     t.identical( got, expected );
 
-    /**/
+    /* */
 
     var path = '\\A\\a';
     var got = provider.path.nativize( path );
     var expected = 'A:\\a';
     t.identical( got, expected );
 
-    /**/
+    /* */
 
     var path = 'A';
     var got = provider.path.nativize( path );
     var expected = 'A';
     t.identical( got, expected );
 
-    /**/
+    /* */
 
     var path = '/c/a';
     var got = provider.path.nativize( path );
     var expected = 'c:\\a';
     t.identical( got, expected );
 
-    /**/
+    /* */
 
     var path = '/A/1.txt';
     var got = provider.path.nativize( path );
     var expected = 'A:\\1.txt';
     t.identical( got, expected );
 
-    /**/
+    /* */
 
     var path = 'A:/a\\b/c\\d';
     var got = provider.path.nativize( path );

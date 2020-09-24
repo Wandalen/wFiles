@@ -2974,10 +2974,11 @@ function fileReadJson( test )
 function fileReadWithEncoding( test )
 {
   let context = this;
+  let a = context.assetFor( test, false );
   let provider = context.provider;
   let path = provider.path;
 
-  let filePath = test.context.pathFor( 'written/fileReadWithEncoding/dstFile' );
+  let filePath = a.abs( 'written/fileReadWithEncoding/dstFile' );
   let isHd = context.providerIsInstanceOf( _.FileProvider.HardDrive );
 
   /* - */
@@ -3208,7 +3209,7 @@ function fileReadWithEncoding( test )
 
   test.case = 'data - string with imitation of structure, call with map';
   var data = '{a : b}';
-  var filePath2 = test.context.pathFor( 'written/fileReadWithEncoding/dstFile2' );
+  var filePath2 = a.abs( 'written/fileReadWithEncoding/dstFile2' );
   provider.filesDelete( filePath2 );
   provider.fileWrite({ filePath : filePath2, data });
   test.shouldThrowErrorOfAnyKind( () =>
@@ -3232,7 +3233,7 @@ function fileReadWithEncoding( test )
 
   test.case = 'data - string with imitation of structure, call with 2 arguments';
   var data = '{a : b}';
-  var filePath2 = test.context.pathFor( 'written/fileReadWithEncoding/dstFile2' );
+  var filePath2 = a.abs( 'written/fileReadWithEncoding/dstFile2' );
   provider.filesDelete( filePath2 );
   provider.fileWrite({ filePath : filePath2, data });
   test.shouldThrowErrorOfAnyKind( () =>
@@ -3255,7 +3256,7 @@ function fileReadWithEncoding( test )
 
     test.case = 'data - code with mistake, encoding - js.node, call with map';
     var data3 = 'module.exports = { data : 1';
-    var filePath3 = test.context.pathFor( 'written/fileReadWithEncoding/dstFile2' );
+    var filePath3 = a.abs( 'written/fileReadWithEncoding/dstFile2' );
     provider.filesDelete( filePath3 );
     provider.fileWrite({ filePath : filePath3, data : data3 });
     test.shouldThrowErrorOfAnyKind( () =>
@@ -3274,7 +3275,7 @@ function fileReadWithEncoding( test )
 
     test.case = 'data - code with mistake, encoding - js.node, call with 2 arguments';
     var data3 = 'module.exports = { data : 1';
-    var filePath3 = test.context.pathFor( 'written/fileReadWithEncoding/dstFile2' );
+    var filePath3 = a.abs( 'written/fileReadWithEncoding/dstFile2' );
     provider.filesDelete( filePath3 );
     provider.fileWrite({ filePath : filePath3, data : data3 });
     test.shouldThrowErrorOfAnyKind( () =>

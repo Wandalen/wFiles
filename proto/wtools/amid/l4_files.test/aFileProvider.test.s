@@ -3665,8 +3665,8 @@ function fileTouch( test )
 function timeWrite( test )
 {
   let context = this;
+  let a = context.assetFor( test, false );
   let provider = context.provider;
-  let path = provider.path;
 
   if( !test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   {
@@ -3674,8 +3674,10 @@ function timeWrite( test )
     return;
   }
 
-  let routinePath = test.context.pathFor( 'written/timeWrite' );
-  let filePath = test.context.pathFor( 'written/timeWrite/file' );
+  /* */
+
+  let routinePath = a.abs( 'written/timeWrite' );
+  let filePath = a.abs( 'written/timeWrite/file' );
 
   let maxDiff = provider.systemBitrateTimeGet();
 
@@ -3743,7 +3745,7 @@ function timeWrite( test )
   test.case = 'two args, file';
   provider.filesDelete( routinePath );
   provider.fileWrite( filePath, filePath );
-  var filePath2 = test.context.pathFor( 'written/timeWrite/file2' );
+  var filePath2 = a.abs( 'written/timeWrite/file2' );
   provider.fileWrite( filePath2, filePath2 );
   var time = new Date();
   provider.timeWrite( filePath2, time, time );
@@ -3758,7 +3760,7 @@ function timeWrite( test )
   test.case = 'two args, dir';
   provider.filesDelete( routinePath );
   provider.fileWrite( filePath, filePath );
-  var filePath2 = test.context.pathFor( 'written/timeWrite/dir' );
+  var filePath2 = a.abs( 'written/timeWrite/dir' );
   provider.dirMake( filePath2 );
   var time = new Date();
   provider.timeWrite( filePath2, time, time );
@@ -3841,7 +3843,7 @@ function timeWrite( test )
   test.case = 'two args, second file does not exist';
   provider.filesDelete( routinePath );
   provider.fileWrite( filePath, filePath );
-  var filePath2 = test.context.pathFor( 'written/timeWrite/dir' );
+  var filePath2 = a.abs( 'written/timeWrite/dir' );
   var time = new Date();
   var statb  = provider.statResolvedRead( filePath );
   test.shouldThrowErrorOfAnyKind( () => provider.timeWrite( filePath, filePath2 ) );
@@ -3872,9 +3874,11 @@ function timeWrite( test )
   if( !Config.debug )
   return;
 
+  test.case = 'without arguments';
+  test.shouldThrowErrorOfAnyKind( () => provider.timeWrite() );
+
+  test.case = 'date object as value for atime and mtime';
   var time = new Date();
-  test.case = 'invalid arguments'
-  test.shouldThrowErrorOfAnyKind( () => provider.timeWrite( 1 ) );
   test.shouldThrowErrorOfAnyKind( () => provider.timeWrite({ filePath : 1, atime : time, mtime : time } ) );
 }
 

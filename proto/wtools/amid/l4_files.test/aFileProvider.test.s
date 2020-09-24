@@ -2903,6 +2903,7 @@ function readWriteAsync( test )
 function fileReadJson( test )
 {
   let context = this;
+  let a = context.assetFor( test, false );
   let provider = context.provider;
   let path = provider.path;
 
@@ -2987,19 +2988,15 @@ function fileReadJson( test )
       // content : void 0
     };
 
-    let path = test.context.pathFor( testCheck.path );
+    let path = a.abs( testCheck.path );
 
     if( provider.statResolvedRead( path ) )
     provider.fileDelete( path );
 
     if( testCheck.encoding === 'json' )
-    {
-      provider.fileWriteJson( path, testCheck.data );
-    }
+    provider.fileWriteJson( path, testCheck.data );
     else
-    {
-      provider.fileWrite({ filePath : path, data : testCheck.data })
-    }
+    provider.fileWrite({ filePath : path, data : testCheck.data })
 
     try
     {

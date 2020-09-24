@@ -2907,127 +2907,67 @@ function fileReadJson( test )
   let provider = context.provider;
   let path = provider.path;
 
-  var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
-  var bufferData1;
+  /* */
 
+  test.case = 'try to load empty text file as json';
+  var data = '';
+  var filePath = a.abs( 'fileReadJson/rtext1.txt' );
+  provider.filesDelete( filePath );
+  provider.fileWrite({ filePath, data });
+  var got;
+  test.shouldThrowErrorSync( () => { got = provider.fileReadJson( filePath ) } );
+  test.identical( got, undefined );
+
+  test.case = 'try to read non json string as json';
+  var data = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+  var filePath = a.abs( 'fileReadJson/text2.txt' );
+  provider.filesDelete( filePath );
+  provider.fileWrite({ filePath, data });
+  var got;
+  test.shouldThrowErrorSync( () => { got = provider.fileReadJson( filePath ) } );
+  test.identical( got, undefined );
+
+  test.case = 'try to parse buffer as json';
+  var data;
   if( Config.interpreter === 'browser' || context.providerIsInstanceOf( _.FileProvider.Extract ))
-  bufferData1 = new BufferRaw( 4 );
+  data = new BufferRaw( 4 );
   else
-  bufferData1 = BufferNode.from( [ 0x01, 0x02, 0x03, 0x04 ] );
+  data = BufferNode.from([ 0x01, 0x02, 0x03, 0x04 ]);
+  var filePath = a.abs( 'fileReadJson/data0' );
+  provider.filesDelete( filePath );
+  provider.fileWrite({ filePath, data });
+  var got;
+  test.shouldThrowErrorSync( () => { got = provider.fileReadJson( filePath ) } );
+  test.identical( got, undefined );
 
+  test.case = 'read json from file';
+  var data = [ 1, 'a', { b : 34 } ];
+  var filePath = a.abs( 'fileReadJson/json1.json' );
+  provider.filesDelete( filePath );
+  provider.fileWriteJson( filePath, data );
+  var got = provider.fileReadJson( filePath );
+  test.identical( got, [ 1, 'a', { b : 34 } ] );
 
-  var dataToJSON1 = [ 1, 'a', { b : 34 } ];
-  var dataToJSON2 = { a : 1, b : 's', c : [ 1, 3, 4 ] };
-
-  var testChecks =
-  [
-    {
-      name : 'try to load empty text file as json',
-      data : '',
-      path : 'fileReadJson/rtext1.txt',
-      expected :
-      {
-        error : true,
-        content : undefined,
-        // content : void 0
-      },
-    },
-    {
-      name : 'try to read non json string as json',
-      data : textData1,
-      path : 'fileReadJson/text2.txt',
-      expected :
-      {
-        error : true,
-        content : undefined,
-        // content : void 0
-      }
-    },
-    {
-      name : 'try to parse buffer as json',
-      data : bufferData1,
-      path : 'fileReadJson/data0',
-      expected :
-      {
-        error : true,
-        content : undefined,
-        // content : void 0
-      }
-    },
-    {
-      name : 'read json from file',
-      data : dataToJSON1,
-      path : 'fileReadJson/jason1.json',
-      encoding : 'json',
-      expected :
-      {
-        error : null,
-        content : dataToJSON1
-      }
-    },
-    {
-      name : 'read json from file 2',
-      data : dataToJSON2,
-      path : 'fileReadJson/json2.json',
-      encoding : 'json',
-      expected :
-      {
-        error : null,
-        content : dataToJSON2
-      }
-    }
-  ];
-
-  for( var testCheck of testChecks )
-  {
-    // join several test aspects together
-    var got =
-    {
-      error : null,
-      content : undefined,
-      // content : void 0
-    };
-
-    let path = a.abs( testCheck.path );
-
-    if( provider.statResolvedRead( path ) )
-    provider.fileDelete( path );
-
-    if( testCheck.encoding === 'json' )
-    provider.fileWriteJson( path, testCheck.data );
-    else
-    provider.fileWrite({ filePath : path, data : testCheck.data })
-
-    try
-    {
-      got.content = provider.fileReadJson( path );
-    }
-    catch( err )
-    {
-      got.error = true;
-    }
-
-    test.identical( got, testCheck.expected );
-  }
+  test.case = 'read json from file 2';
+  var data = { a : 1, b : 's', c : [ 1, 3, 4 ] };
+  var filePath = a.abs( 'fileReadJson/json2.json' );
+  provider.filesDelete( filePath );
+  provider.fileWriteJson( filePath, data );
+  var got = provider.fileReadJson( filePath );
+  test.identical( got, { a : 1, b : 's', c : [ 1, 3, 4 ] } );
 
   /* - */
 
   if( Config.debug )
   {
-    test.case = 'missed arguments';
-    test.shouldThrowErrorSync( function( )
-    {
-      provider.fileReadJson( );
-    });
+    test.case = 'without arguments';
+    test.shouldThrowErrorSync( () => provider.fileReadJson() );
 
     test.case = 'extra arguments';
-    test.shouldThrowErrorSync( function( )
-    {
-      provider.fileReadJson( 'tmp.tmp/tmp.tmp.json', {} );
-    });
+    test.shouldThrowErrorSync( () => provider.fileReadJson( 'tmp.tmp/tmp.tmp.json', {} ) );
   }
 
-};
+}
 
 //
 

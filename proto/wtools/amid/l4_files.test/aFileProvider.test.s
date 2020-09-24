@@ -3887,23 +3887,22 @@ function timeWrite( test )
 function writeAsyncThrowingError( test )
 {
   let context = this;
+  let a = context.assetFor( test, false );
   let provider = context.provider;
-  let path = provider.path;
 
   if( !_.routineIs( provider.fileWrite ) )
   return;
 
   var consequence = new _.Consequence().take( null );
 
-  consequence
-  .ifNoErrorThen( function( arg )
+  consequence.ifNoErrorThen( function( arg )
   {
 
     test.case = 'async, try to rewrite dir';
 
-    var path = test.context.pathFor( 'dir' );
+    var path = a.abs( 'dir' );
     provider.dirMake( path );
-    test.identical( provider.isDir( path ), true )
+    test.identical( provider.isDir( path ), true );
     var data1 = 'data1';
     var con = provider.fileWrite
     ({

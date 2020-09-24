@@ -3498,98 +3498,43 @@ function fileWriteJson( test )
   let provider = context.provider;
   let path = provider.path;
 
-  var defReadOptions = { encoding : 'utf8' };
-  var dataToJSON1 = [ 1, 'a', { b : 34 } ];
-  var dataToJSON2 = { a : 1, b : 's', c : [ 1, 3, 4 ] };
-  var dataToJSON3 = '{ "a" : "3" }';
+  /* */
 
-  var testChecks =
-  [
-    {
-      name : 'write empty JSON string file',
-      data : '',
-      path : 'fileWriteJson/data1.json',
-      expected :
-      {
-        instance : false,
-        content : '',
-        exist : true
-      },
-      readOptions : defReadOptions
-    },
-    {
-      name : 'write array to file',
-      data : dataToJSON1,
-      path : 'fileWriteJson/data1.json',
-      expected :
-      {
-        instance : false,
-        content : dataToJSON1,
-        exist : true
-      },
-      readOptions : defReadOptions
-    },
-    {
-      name : 'write object using options',
-      data : dataToJSON2,
-      path : 'fileWriteJson/data2.json',
-      expected :
-      {
-        instance : false,
-        content : dataToJSON2,
-        exist : true
-      },
-      readOptions : defReadOptions
-    },
-    {
-      name : 'write jason string',
-      data : dataToJSON3,
-      path : 'fileWriteJson/data3.json',
-      expected :
-      {
-        instance : false,
-        content : dataToJSON3,
-        exist : true
-      },
-      readOptions : defReadOptions
-    }
-  ];
+  test.case = 'write empty JSON string file';
+  var data = '';
+  var filePath = a.abs( 'fileWriteJson/data1.json' );
+  provider.filesDelete( filePath );
+  var got = provider.fileWriteJson( filePath, data );
+  test.isNot( _.consequenceIs( got ) );
+  var got = JSON.parse( provider.fileRead( filePath, 'utf8' ) );
+  test.identical( got, '' );
 
+  test.case = 'write array to file';
+  var data = [ 1, 'a', { b : 34 } ];
+  var filePath = a.abs( 'fileWriteJson/data1.json' );
+  provider.filesDelete( filePath );
+  var got = provider.fileWriteJson( filePath, data );
+  test.isNot( _.consequenceIs( got ) );
+  var got = JSON.parse( provider.fileRead( filePath, 'utf8' ) );
+  test.identical( got, [ 1, 'a', { b : 34 } ] );
 
-  // regular tests
-  for( var testCheck of testChecks )
-  {
-    // join several test aspects together
-    var got =
-    {
-      instance : null,
-      content : null,
-      exist : null
-    }
+  test.case = 'write object using options';
+  var data = { a : 1, b : 's', c : [ 1, 3, 4 ] };
+  var filePath = a.abs( 'fileWriteJson/data2.json' );
+  provider.filesDelete( filePath );
+  var got = provider.fileWriteJson( filePath, data );
+  test.isNot( _.consequenceIs( got ) );
+  var got = JSON.parse( provider.fileRead( filePath, 'utf8' ) );
+  test.identical( got, { a : 1, b : 's', c : [ 1, 3, 4 ] } );
 
-    let path = a.abs( testCheck.path );
-
-    // clear
-
-    if( provider.statResolvedRead( path ) )
-    provider.fileDelete( path );
-
-    var con = provider.fileWriteJson( path, testCheck.data );
-
-    // fileWtrite must returns wConsequence
-    got.instance = _.consequenceIs( con );
-
-    // recorded file should exists
-    got.exist = !!provider.statResolvedRead( path );
-
-    // check content of created file.
-    var o = _.mapExtend( null, testCheck.readOptions, { filePath : path } );
-    // got.content = JSON.parse( _.fileProvider.fileRead( path, testCheck.readOptions ) );
-    got.content = JSON.parse( provider.fileRead( o ) );
-
-    test.case = testCheck.name;
-    test.identical( got, testCheck.expected );
-  }
+  test.case = 'write object using options';
+  var data = '{ "a" : "3" }';
+  var filePath = a.abs( 'fileWriteJson/data3.json' );
+  provider.filesDelete( filePath );
+  var got = provider.fileWriteJson( filePath, data );
+  test.isNot( _.consequenceIs( got ) );
+  var got = JSON.parse( provider.fileRead( filePath, 'utf8' ) );
+  test.identical( got, '{ "a" : "3" }' );
 
   /* - */
 

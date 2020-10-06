@@ -430,7 +430,7 @@ function pathResolve( test )
 
   test.case = 'nothing passed';
   var expected = provider.path.current();
-  var got = provider.path.resolve();
+  var got = provider.path.resolve( '.' );
   test.identical( got, expected )
 
 

@@ -42770,7 +42770,7 @@ function pathResolve( test )
   test.identical( got, expected );
 
   var expected = current();
-  var got = resolve();
+  var got = resolve( '.' );
   test.identical( got, expected );
 
   if( !Config.debug )

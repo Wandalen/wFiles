@@ -3992,7 +3992,7 @@ function hashSzRead_body( o )
   /* */
 
   /* zzz : remove Consequence.From after And will be adjusted */
-  let ready = _.Consequence.AndKeep_( _.Consequence.From( stat ), _.Consequence.From( hash ) ).then( ( arg ) =>
+  let ready = _.Consequence.AndKeep( _.Consequence.From( stat ), _.Consequence.From( hash ) ).then( ( arg ) =>
   {
     if( !arg[ 0 ] || !arg[ 1 ] )
     return null;
@@ -4003,7 +4003,7 @@ function hashSzRead_body( o )
   // let hash = self.hashRead( o );
   //
   // /* zzz : remove Consequence.From after And will be adjusted */
-  // let ready = _.Consequence.AndKeep_( _.Consequence.From( stat ), _.Consequence.From( hash ) ).then( ( arg ) =>
+  // let ready = _.Consequence.AndKeep( _.Consequence.From( stat ), _.Consequence.From( hash ) ).then( ( arg ) =>
   // {
   //   if( !arg[ 0 ] || !arg[ 1 ] )
   //   return null;

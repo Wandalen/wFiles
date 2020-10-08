@@ -25,11 +25,11 @@ _.assert( !_.FileProvider.Imap );
 //
 
 /**
- @classdesc Imap files provider.
- @class wFileProviderImap
- @namespace wTools.FileProvider
- @module Tools/mid/Files
-*/
+ * @classdesc Imap files provider.
+ * @class wFileProviderImap
+ * @namespace wTools.FileProvider
+ * @module Tools/mid/Files
+ */
 
 let Parent = Partial;
 let Self = wFileProviderImap;
@@ -80,7 +80,6 @@ function form()
     }
   };
 
-  // debugger;
   return _.Consequence.Try( () => Imap.connect( config ) )
   .then( function( connection )
   {
@@ -119,7 +118,7 @@ function unform()
  * @class wFileProviderImap
  * @namespace wTools.FileProvider
  * @module Tools/mid/Files
-*/
+ */
 
 function pathCurrentAct()
 {
@@ -226,7 +225,33 @@ function fileReadAct( o )
   throw _.err( `${o.filePath} is not a terminal` );
 
   ready.then( () => _read() );
-  ready.then( () => result );
+  ready.then( () =>
+  {
+    if( o.encoding === 'map' )
+    return result;
+
+    let length = result.parts.length;
+    result = result.parts[ length - 1 ].body !== undefined ? result.parts[ length - 1 ].body : JSON.stringify( result );
+
+    if( o.encoding === 'buffer.raw' )
+    {
+      result = _.bufferBytesFrom( result ).buffer;
+    }
+    else if( !( o.encoding === 'utf8' ) && !( o.encoding === 'original.type' ) )
+    {
+      try
+      {
+        result = BufferNode.from( result, o.encoding );
+      }
+      catch( err )
+      {
+        _.errAttend( err );
+        throw _.err( 'Unknown encoding', err );
+      }
+    }
+
+    return result;
+  });
 
   if( o.sync )
   {
@@ -240,16 +265,19 @@ function fileReadAct( o )
 
   function _read()
   {
-    return self._connection.openBox( parsed.dirPath ).then( function ( extra ) /* xxx : need to close? */
+    let mailbox = parsed.dirPath.split( '/' ).join( '.' );
+    return self._connection.openBox( mailbox ).then( function ( extra ) /* xxx : need to close? */
     {
       let searchCriteria = [ `${parsed.stripName}` ];
       let bodies = [];
+
       if( o.advanced.withHeader )
       bodies.push( 'HEADER' );
       if( o.advanced.withBody )
       bodies.push( 'TEXT' );
       if( o.advanced.withTail )
       bodies.push( '' );
+
       let fetchOptions =
       {
         bodies,
@@ -281,8 +309,6 @@ function fileReadAct( o )
       });
     }
   }
-
-  /* */
 
 }
 
@@ -337,6 +363,7 @@ function dirReadAct( o )
     return result;
 
     filePath = path.unabsolute( filePath );
+    filePath = filePath.split( '/' ).join( '.' );
     return self._connection.openBox( filePath ).then( function( extra ) /* xxx : need to close? */
     {
       let searchCriteria = [ 'ALL' ];
@@ -375,6 +402,7 @@ function dirReadAct( o )
 
     if( isAbsolute )
     filePath = path.absolute( filePath );
+
     let result = _.select( map, filePath );
     if( result === null )
     return [];
@@ -434,19 +462,25 @@ function statReadAct( o )
     if( parsed.isTerminal )
     {
       let files = self.dirRead({ filePath : parsed.dirPath, throwing, sync });
-      if( !_.longHas( files, parsed.fullName ) )
-      throw _.err( `File ${o.filePath} does not exist` );
+      if( files === null || !_.longHas( files, parsed.fullName ) )
+      {
+        if( o.throwing )
+        throw _.err( `File ${o.filePath} does not exist` );
+        return null;
+      }
       let advanced =
       {
         withHeader : 1,
         withBody : 0,
-        withTail : 0,
+        withTail : 1,
         structing : 0,
       }
-      let o2 = _.mapSupplement( { filePath : o.filePath, advanced, throwing, sync }, self.fileReadAct.defaults );
+      let o2 = _.mapSupplement( { filePath : o.filePath, advanced, throwing, sync, encoding : 'map' }, self.fileReadAct.defaults );
       let read = self.fileRead( o2 );
       stat = statMake();
       stat.isFile = returnTrue;
+      stat.atime = read.attributes.date;
+      stat.size = read.parts[ 1 ].size >= 0 ? read.parts[ 1 ].size : null;
     }
     else
     {
@@ -454,8 +488,18 @@ function statReadAct( o )
       stat.isDirectory = returnTrue;
       stat.isDir = returnTrue;
       let ready = _.Consequence.From( _dirRead() );
+      ready.finally( ( err, arg ) =>
+      {
+        if( err )
+        {
+          if( o.throwing )
+          throw _.err( err );
+          _.errAttend( err );
+          return null;
+        }
+        return arg;
+      })
       return ready;
-      debugger;
     }
 
     return stat;
@@ -469,13 +513,13 @@ function statReadAct( o )
     .give( function()
     {
       let con = this;
-      let dirPath = path.unabsolute( parsed.originalPath );
+      let dirPath = parsed.unabsolutePath.split( '/' ).join( '.' );
+
       self._connection.openBox( dirPath )
       .then( ( extra ) => /* xxx : need to close? */
       {
         result.extra = extra;
         self._connection.closeBox( dirPath );
-        debugger;
         con.take( stat );
       })
       .catch( ( err ) =>
@@ -485,7 +529,6 @@ function statReadAct( o )
     });
     // .then( () =>
     // {
-    //   debugger;
     //   return result;
     // });
   }
@@ -549,9 +592,15 @@ function fileExistsAct( o )
 
   _.assert( arguments.length === 1 );
   _.assert( self.path.isNormalized( o.filePath ) );
-  _.assert( 0, 'not implemented' );
 
-  return !!file;
+  let exists = self.statReadAct
+  ({
+    filePath : o.filePath,
+    sync : 1,
+    throwing : 0,
+    resolvingSoftLink : 0,
+  });
+  return !!exists;
 }
 
 _.routineExtend( fileExistsAct, Parent.prototype.fileExistsAct );
@@ -563,15 +612,79 @@ _.routineExtend( fileExistsAct, Parent.prototype.fileExistsAct );
 function fileWriteAct( o )
 {
   let self = this;
+  let path = self.path;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assertRoutineOptions( fileWriteAct, o );
   _.assert( self.path.isNormalized( o.filePath ) );
   _.assert( self.WriteMode.indexOf( o.writeMode ) !== -1 );
+  o.advanced = _.routineOptions( null, o.advanced || Object.create( null ), fileReadAct.advanced );
 
-  _.assert( 0, 'not implemented' );
+  /* data conversion */
+
+  if( _.bufferTypedIs( o.data ) && !_.bufferBytesIs( o.data ) || _.bufferRawIs( o.data ) )
+  o.data = _.bufferNodeFrom( o.data );
+
+  _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ) || _.bufferBytesIs( o.data ), 'Expects string or node buffer, but got', _.strType( o.data ) );
+
+  /* write */
+
+  let result = _fileWrite();
+
+  if( o.sync )
+  {
+    result.deasync();
+    return result.sync();
+  }
+
+  return result;
+
+  /* */
+
+  function _fileWrite()
+  {
+    return self.ready.split()
+    .give( function()
+    {
+      let con = this;
+      let parsed = self.pathParse( o.filePath );
+
+      if( parsed.fullName !== '<$>' )
+      return con.error( _.err( 'Cannot write file with defined filename. Please, use name <$> instead.' ) );
+
+      if( o.writeMode === 'rewrite' )
+      {
+        let dirPath = path.unabsolute( parsed.dirPath );
+        let mailbox = dirPath.split( '/' ).join( '.' );
+
+        let o2 = Object.create( null );
+        o2.mailbox = mailbox;
+        if( o.advanced.flag !== null )
+        o2.flag = o.advanced.flag;
+
+        self._connection.append( o.data, o2 )
+        .then( ( etra ) =>
+        {
+          con.take( null );
+        })
+        .catch( ( err ) =>
+        {
+          con.error( _.err( err ) );
+        })
+      }
+      else
+      {
+        con.error( _.err( `Not implemented write mode ${ o.writeMode }` ) );
+      }
+    });
+  }
 
 }
+
+fileWriteAct.advanced =
+{
+  flag : null,
+};
 
 _.routineExtend( fileWriteAct, Parent.prototype.fileWriteAct );
 
@@ -580,12 +693,95 @@ _.routineExtend( fileWriteAct, Parent.prototype.fileWriteAct );
 function fileDeleteAct( o )
 {
   let self = this;
+  let path = self.path;
+  let parsed = self.pathParse( o.filePath );
 
   _.assertRoutineOptions( fileDeleteAct, o );
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( self.path.isNormalized( o.filePath ) );
-  _.assert( 0, 'not implemented' );
+  _.assert( path.isNormalized( o.filePath ) );
 
+  let result = _fileDelete();
+
+  if( o.sync )
+  {
+    result.deasync();
+    return result.sync();
+  }
+
+  return result;
+
+  /* */
+
+  function _fileDelete()
+  {
+    let con = new _.Consequence();
+    let stat = self.statReadAct
+    ({
+      filePath : o.filePath,
+      sync : 1,
+      throwing : 0,
+      resolvingSoftLink : 0
+    });
+    let mailbox = path.unabsolute( parsed.isTerminal ? parsed.dirPath : parsed.originalPath );
+    mailbox = mailbox.split( '/' ).join( '.' );
+
+    if( stat && stat.isDir() )
+    {
+      if( _.longHas( [ '.', 'Drafts', 'INBOX', 'Junk', 'Sent', 'Trash' ], mailbox ) )
+      throw _.err( 'Unable to delete builtin directory.' );
+
+      let deletedList = [ mailbox ];
+
+      /* Dmytro : server can't delete directories with subdirectories directly, paths list creates iterative */
+      let dirQueue = [ o.filePath ];
+      while( dirQueue.length > 0 )
+      {
+        let dirs = self.dirRead({ filePath : dirQueue[ 0 ], throwing : 0, sync : 1 });
+        dirs = dirs.filter( ( e ) => !_.strInsideOf( e, '<', '>' ) );
+        dirQueue.push( ... dirs.map( ( e ) => `${ dirQueue[ 0 ] }/${ e }` ) );
+
+        let mailboxPath = path.unabsolute( dirQueue[ 0 ] );
+        mailboxPath = mailboxPath.split( '/' ).join( '.' );
+        deletedList.push( ... dirs.map( ( e ) => `${ mailboxPath }.${ e }` ) );
+
+        dirQueue.shift();
+      }
+
+      let ready = new _.Consequence().take( null );
+      for( let i = deletedList.length - 1 ; i >= 0 ; i-- )
+      ready.then( () => self._connection.delBox( deletedList[ i ] ) );
+
+      con.take( ready );
+    }
+    else
+    {
+      let files = self.dirRead({ filePath : parsed.dirPath, sync : 1, throwing : 0 });
+
+      if( !_.longHas( files, parsed.fullName ) )
+      return con.error( _.err( `File ${ parsed.originalPath } does not exists.` ) );
+
+      self._connection.openBox( mailbox )
+      .then( () =>
+      {
+        self._connection.deleteMessage( parsed.stripName )
+        .then( () =>
+        {
+          self._connection.closeBox( mailbox );
+          con.take( null );
+        })
+        .catch( ( err ) =>
+        {
+          con.error( _.err( err ) );
+        })
+      })
+      .catch( ( err ) =>
+      {
+        con.error( _.err( err ) );
+      })
+    }
+
+    return con;
+  }
 }
 
 _.routineExtend( fileDeleteAct, Parent.prototype.fileDeleteAct );
@@ -595,11 +791,46 @@ _.routineExtend( fileDeleteAct, Parent.prototype.fileDeleteAct );
 function dirMakeAct( o )
 {
   let self = this;
+  let path = self.path;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assertRoutineOptions( dirMakeAct, o );
-  _.assert( 0, 'not implemented' );
+  _.assert( self.path.isNormalized( o.filePath ) );
 
+  let ready = _dirMake();
+
+  if( o.sync )
+  {
+    ready.deasync();
+    return ready.sync();
+  }
+
+  return ready;
+
+  /* */
+
+  function _dirMake()
+  {
+    let con = new _.Consequence();
+    let parsed = self.pathParse( o.filePath );
+
+    if( parsed.isTerminal )
+    return con.error( 'Path to directory should have not name of terminal file.' );
+
+    let dirPath = parsed.unabsolutePath.split( '/' ).join( '.' );
+
+    self._connection.addBox( dirPath )
+    .then( () => /* xxx : need to close? */
+    {
+      con.take( null );
+    })
+    .catch( ( err ) =>
+    {
+      con.error( _.err( err ) );
+    });
+
+    return con;
+  }
 }
 
 _.routineExtend( dirMakeAct, Parent.prototype.dirMakeAct );
@@ -611,13 +842,52 @@ _.routineExtend( dirMakeAct, Parent.prototype.dirMakeAct );
 function fileRenameAct( o )
 {
   let self = this;
+  let ready = new _.Consequence();
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assertRoutineOptions( fileRenameAct, arguments );
   _.assert( self.path.isNormalized( o.srcPath ) );
   _.assert( self.path.isNormalized( o.dstPath ) );
-  _.assert( 0, 'not implemented' );
 
+  let result = new _.Consequence().take( null );
+  result.then( () => _fileRename() );
+
+  if( o.sync )
+  {
+    result.deasync();
+    return result.sync();
+  }
+
+  return result;
+
+  /* */
+
+  function _fileRename()
+  {
+    let srcParsed = self.pathParse( o.srcPath );
+    if( srcParsed.isTerminal )
+    return ready.error( _.err( '{-o.srcPath-} should be path to directory.' ) );
+    if( _.longHas( [ '.', 'Drafts', 'INBOX', 'Junk', 'Sent', 'Trash' ], srcParsed.unabsolutePath ) )
+    return con.error( _.err( 'Unable to rename builtin directory.' ) );
+    let dstParsed = self.pathParse( o.dstPath );
+    if( dstParsed.isTerminal )
+    return ready.error( _.err( '{-o.dstPath-} should be path to directory.' ) );
+
+    let srcPath = srcParsed.unabsolutePath.split( '/' ).join( '.' );
+    let dstPath = dstParsed.unabsolutePath.split( '/' ).join( '.' );
+
+    self._connection.imap.renameBox( srcPath, dstPath, handleErr );
+
+    return ready;
+  }
+
+  function handleErr( err )
+  {
+    if( err )
+    ready.error( _.err( err ) );
+    else
+    ready.take( true );
+  }
 }
 
 _.routineExtend( fileRenameAct, Parent.prototype.fileRenameAct );
@@ -627,13 +897,71 @@ _.routineExtend( fileRenameAct, Parent.prototype.fileRenameAct );
 function fileCopyAct( o )
 {
   let self = this;
-  let srcFile;
+  let path = self.path;
+  let ready = new _.Consequence();
 
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assertRoutineOptions( fileCopyAct, arguments );
-  _.assert( self.path.isNormalized( o.srcPath ) );
-  _.assert( self.path.isNormalized( o.dstPath ) );
-  _.assert( 0, 'not implemented' );
+  _.assert( path.isNormalized( o.srcPath ) );
+  _.assert( path.isNormalized( o.dstPath ) );
+
+  let srcParsed = self.pathParse( o.srcPath );
+  let dstParsed = self.pathParse( o.dstPath );
+
+  let result = new _.Consequence().take( null );
+  result.then( () => _fileCopy() );
+
+  if( o.sync )
+  {
+    result.deasync();
+    return result.sync();
+  }
+
+  return result;
+
+  /* */
+
+  function _fileCopy()
+  {
+
+    if( !srcParsed.isTerminal )
+    return ready.error( _.err( '{-o.srcPath-} should be path to terminal file.' ) );
+
+    if( dstParsed.fullName !== '<$>' )
+    return ready.error( _.err( '{-o.dstPath-} should be path to file with name <$>.' ) );
+
+    let srcPath = path.unabsolute( srcParsed.dirPath );
+    srcPath = srcPath.split( '/' ).join( '.' );
+    let dstPath = path.unabsolute( dstParsed.dirPath );
+    dstPath = dstPath.split( '/' ).join( '.' );
+    let msgId = _.arrayAs( srcParsed.stripName );
+
+    self._connection.openBox( srcPath )
+    .then( () =>
+    {
+      self._connection.imap.copy( msgId, dstPath, handle );
+    })
+
+    ready.finally( ( err, arg ) =>
+    {
+      if( err )
+      throw _.err( err );
+
+      o.context.options.dstPath = self.pathUnmock( o.dstPath );
+      self._connection.closeBox( srcPath );
+      return arg;
+    });
+
+    return ready;
+  }
+
+  function handle( err )
+  {
+    if( err )
+    ready.error( _.err( err ) );
+    else
+    ready.take( true );
+  }
 
 }
 
@@ -693,12 +1021,42 @@ function areHardLinkedAct( o )
 {
   let self = this;
 
-  _.assert( 0, 'not implemented' );
+  _.assertRoutineOptions( areHardLinkedAct, arguments );
+  _.assert( o.filePath.length === 2, 'Expects exactly two arguments' );
+  _.assert( self.path.isNormalized( o.filePath[ 0 ] ) );
+  _.assert( self.path.isNormalized( o.filePath[ 1 ] ) );
 
+  if( o.filePath[ 0 ] === o.filePath[ 1 ] )
+  return true;
   return false;
 }
 
 _.routineExtend( areHardLinkedAct, Parent.prototype.areHardLinkedAct );
+
+//
+
+function pathMock( path, global )
+{
+  let self = this;
+
+  let parsed = self.pathParse( path );
+  return self.path.join( parsed.dirPath, '<$>' );
+}
+
+//
+
+function pathUnmock( path, global )
+{
+  let self = this;
+
+  let parsed = self.pathParse( path );
+  if( !parsed.isTerminal )
+  return;
+
+  let prefix = global ? self.originPath : '';
+  let files = self.dirReadAct({ filePath : parsed.dirPath, sync : 1 });
+  return self.path.join( prefix + parsed.dirPath, files[ files.length - 1 ] );
+}
 
 // --
 // relationship
@@ -715,6 +1073,8 @@ let Composes =
   authTimeOut : 5000,
   tls : true,
   // tls : false,
+  safe : 0,
+  pathMocking : 1,
 
 }
 
@@ -741,6 +1101,7 @@ let Accessors =
 let Statics =
 {
   Path : _.uri.CloneExtending({ fileProvider : Self }),
+  SupportsLinks : 0,
 }
 
 // --
@@ -787,6 +1148,11 @@ let Extension =
 
   hardLinkBreakAct,
   areHardLinkedAct,
+
+  //
+
+  pathMock,
+  pathUnmock,
 
   //
 

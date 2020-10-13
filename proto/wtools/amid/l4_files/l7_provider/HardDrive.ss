@@ -2030,7 +2030,8 @@ function hardLinkAct( o )
             data : srcData,
             encoding : 'original.type',
             writeMode : 'rewrite',
-            sync : o.sync
+            sync : o.sync,
+            advanced : null,
           })
           return o.sync ? true : r;
         })

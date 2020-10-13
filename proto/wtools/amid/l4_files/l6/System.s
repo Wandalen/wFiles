@@ -917,7 +917,14 @@ function _fileCopyActDifferent( op )
     otherwise extract does not resolve intermediate directories
   */
 
-  let read = op.src.provider.fileRead
+  let read = null;
+  if( op.src.provider._fileCopyPrepare )
+  read = op.src.provider._fileCopyPrepare({ dstProvider : op.dst.provider, srcProvider : op.src.provider, options : o, data : read });
+  if( op.dst.provider._fileCopyPrepare )
+  read = op.dst.provider._fileCopyPrepare({ dstProvider : op.dst.provider, srcProvider : op.src.provider, options : o, data : read });
+
+  if( read === null )
+  read = op.src.provider.fileRead
   ({
     filePath : op.src.localPath,
     resolvingTextLink : 1,

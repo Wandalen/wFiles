@@ -299,8 +299,8 @@ module:
         path: 'npm:///wgdf'
         autoExporting: 0
         enabled: 0
-      wRoutineBasic:
-        path: 'npm:///wroutinebasic'
+      wIntrospectorBasic:
+        path: 'npm:///wintrospectorbasic'
         autoExporting: 0
         enabled: 0
       wPathBasic:
@@ -1181,8 +1181,8 @@ module:
         path: 'npm:///wgdf'
         autoExporting: 0
         enabled: 0
-      wRoutineBasic:
-        path: 'npm:///wroutinebasic'
+      wIntrospectorBasic:
+        path: 'npm:///wintrospectorbasic'
         autoExporting: 0
         enabled: 0
       wPathBasic:

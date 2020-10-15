@@ -585,7 +585,7 @@ function pathResolveLinkFull_body( o )
 
 _.routineExtend( pathResolveLinkFull_body, Parent.prototype.pathResolveLinkFull );
 
-let pathResolveLinkFull = _.routineFromPreAndBody( Parent.prototype.pathResolveLinkFull.pre, pathResolveLinkFull_body );
+let pathResolveLinkFull = _.routineUnite( Parent.prototype.pathResolveLinkFull.head, pathResolveLinkFull_body );
 
 //
 
@@ -614,7 +614,7 @@ function pathResolveLinkTail_body( o )
 
 _.routineExtend( pathResolveLinkTail_body, Parent.prototype.pathResolveLinkTail );
 
-let pathResolveLinkTail = _.routineFromPreAndBody( Parent.prototype.pathResolveLinkTail.pre, pathResolveLinkTail_body );
+let pathResolveLinkTail = _.routineUnite( Parent.prototype.pathResolveLinkTail.head, pathResolveLinkTail_body );
 
 //
 
@@ -649,7 +649,7 @@ function pathResolveSoftLink_body( o )
 
 _.routineExtend( pathResolveSoftLink_body, Parent.prototype.pathResolveSoftLink );
 
-let pathResolveSoftLink = _.routineFromPreAndBody( Parent.prototype.pathResolveSoftLink.pre, pathResolveSoftLink_body );
+let pathResolveSoftLink = _.routineUnite( Parent.prototype.pathResolveSoftLink.head, pathResolveSoftLink_body );
 
 //
 
@@ -684,7 +684,7 @@ function pathResolveTextLink_body( o )
 
 _.routineExtend( pathResolveTextLink_body, Parent.prototype.pathResolveTextLink );
 
-let pathResolveTextLink = _.routineFromPreAndBody( Parent.prototype.pathResolveTextLink.pre, pathResolveTextLink_body );
+let pathResolveTextLink = _.routineUnite( Parent.prototype.pathResolveTextLink.head, pathResolveTextLink_body );
 
 //
 
@@ -715,7 +715,7 @@ function fileRead_body( o )
 
 _.routineExtend( fileRead_body, Parent.prototype.fileRead );
 
-let fileRead = _.routineFromPreAndBody( Parent.prototype.fileRead.pre, fileRead_body );
+let fileRead = _.routineUnite( Parent.prototype.fileRead.head, fileRead_body );
 
 // --
 // linker
@@ -1001,7 +1001,7 @@ function hardLinkBreak_body( o )
 
 _.routineExtend( hardLinkBreak_body, Parent.prototype.hardLinkBreak );
 
-let hardLinkBreak = _.routineFromPreAndBody( Parent.prototype._preFilePathScalarWithProviderDefaults, hardLinkBreak_body );
+let hardLinkBreak = _.routineUnite( Parent.prototype._preFilePathScalarWithProviderDefaults, hardLinkBreak_body );
 
 //
 
@@ -1043,7 +1043,7 @@ function dirMake_body( o )
 
 _.routineExtend( dirMake_body, Parent.prototype.dirMake );
 
-let dirMake = _.routineFromPreAndBody( Parent.prototype.dirMake.pre, dirMake_body );
+let dirMake = _.routineUnite( Parent.prototype.dirMake.head, dirMake_body );
 
 // --
 // accessor
@@ -1170,7 +1170,7 @@ function _Setup1()
   let KnownRoutineFields =
   {
     name : null,
-    pre : null,
+    head : null,
     body : null,
     defaults : null,
     // paths : null,
@@ -1223,7 +1223,7 @@ function _Setup1()
     let havingBare = having.driving;
     var operates = original.operates;
     let operatesLength = operates ? _.mapKeys( operates ).length : 0;
-    let pre = original.pre;
+    let head = original.head;
     let body = original.body;
 
     /* */
@@ -1286,12 +1286,12 @@ function _Setup1()
           o = { filePath : o }
         }
 
-        if( pre )
-        o = pre.call( this, wrap, arguments );
+        if( head )
+        o = head.call( this, wrap, arguments );
 
         let o2 = _.mapExtend( null, o );
 
-        if( !pre && wrap.defaults )
+        if( !head && wrap.defaults )
         if( !wrap.having || !wrap.having.driving )
         _.routineOptions( wrap, o2 );
 

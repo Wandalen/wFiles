@@ -20,7 +20,7 @@ if( typeof module !== 'undefined' )
 
   _.include( 'wSelector' );
   _.include( 'wProcess' );
-  _.include( 'wRoutineBasic' );
+  _.include( 'wIntrospectorBasic' );
   _.include( 'wLogger' );
   _.include( 'wWebUriBasic' );
 

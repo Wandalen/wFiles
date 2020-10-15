@@ -628,7 +628,7 @@ function pathAllowedAct( filePath )
 
 //
 
-function pathForCopy_pre( routine, args )
+function pathForCopy_head( routine, args )
 {
   let self = this;
 
@@ -869,7 +869,7 @@ having.aspect = 'body';
 
 //
 
-let pathResolveSoftLink = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, pathResolveSoftLink_body );
+let pathResolveSoftLink = _.routineUnite( _preFilePathScalarWithProviderDefaults, pathResolveSoftLink_body );
 
 var having = pathResolveSoftLink.having;
 having.aspect = 'entry';
@@ -892,7 +892,7 @@ operates.filePath = { pathToRead : 1 };
 
 //
 
-function pathResolveTextLink_pre( routine, args )
+function pathResolveTextLink_head( routine, args )
 {
   let self = this;
   let path = self.system ? self.system.path : self.path;;
@@ -1064,7 +1064,7 @@ var having = pathResolveTextLink_body.having;
 having.driving = 0;
 having.aspect = 'body';
 
-let pathResolveTextLink = _.routineFromPreAndBody( pathResolveTextLink_pre, pathResolveTextLink_body );
+let pathResolveTextLink = _.routineUnite( pathResolveTextLink_head, pathResolveTextLink_body );
 
 //
 
@@ -1088,7 +1088,7 @@ operates.filePath = { pathToRead : 1 };
 
 //
 
-function pathResolveLinkStep_pre()
+function pathResolveLinkStep_head()
 {
   let self = this;
   let o = self._preFilePathScalarWithProviderDefaults.apply( self, arguments );
@@ -1171,12 +1171,12 @@ var defaults = pathResolveLinkStep_body.defaults;
 defaults.relativeOriginalFile = 0;
 defaults.preservingRelative = 0;
 
-let pathResolveLinkStep = _.routineFromPreAndBody( pathResolveLinkStep_pre, pathResolveLinkStep_body );
+let pathResolveLinkStep = _.routineUnite( pathResolveLinkStep_head, pathResolveLinkStep_body );
 pathResolveLinkStep.having.aspect = 'entry';
 
 //
 
-function pathResolveLinkFull_pre()
+function pathResolveLinkFull_head()
 {
   let self = this;
   let o = self._preFilePathScalarWithProviderDefaults.apply( self, arguments );
@@ -1438,12 +1438,12 @@ qqq : even if preservingRelative:1 result.relativePath should be relative ( if l
 
 //
 
-let pathResolveLinkFull = _.routineFromPreAndBody( pathResolveLinkFull_pre, pathResolveLinkFull_body );
+let pathResolveLinkFull = _.routineUnite( pathResolveLinkFull_head, pathResolveLinkFull_body );
 pathResolveLinkFull.having.aspect = 'entry';
 
 //
 
-function pathResolveLinkTail_pre()
+function pathResolveLinkTail_head()
 {
   let self = this;
   let o = self._preFilePathScalarWithProviderDefaults.apply( self, arguments );
@@ -1512,12 +1512,12 @@ defaults.recursive = 3;
 
 //
 
-let pathResolveLinkTail = _.routineFromPreAndBody( pathResolveLinkTail_pre, pathResolveLinkTail_body );
+let pathResolveLinkTail = _.routineUnite( pathResolveLinkTail_head, pathResolveLinkTail_body );
 pathResolveLinkTail.having.aspect = 'entry';
 
 //
 
-function pathResolveLinkTailChain_pre()
+function pathResolveLinkTailChain_head()
 {
   let self = this;
   let path = self.system ? self.system.path : self.path;;
@@ -1701,12 +1701,12 @@ defaults.found = null;
 
 //
 
-let pathResolveLinkTailChain = _.routineFromPreAndBody( pathResolveLinkTailChain_pre, pathResolveLinkTailChain_body );
+let pathResolveLinkTailChain = _.routineUnite( pathResolveLinkTailChain_head, pathResolveLinkTailChain_body );
 pathResolveLinkTailChain.having.aspect = 'entry';
 
 //
 
-function pathResolveLinkHeadDirect_pre()
+function pathResolveLinkHeadDirect_head()
 {
   let self = this;
   let o = self._preFilePathScalarWithProviderDefaults.apply( self, arguments );
@@ -1799,12 +1799,12 @@ defaults.recursive = 3;
 
 //
 
-let pathResolveLinkHeadDirect = _.routineFromPreAndBody( pathResolveLinkHeadDirect_pre, pathResolveLinkHeadDirect_body );
+let pathResolveLinkHeadDirect = _.routineUnite( pathResolveLinkHeadDirect_head, pathResolveLinkHeadDirect_body );
 pathResolveLinkHeadDirect.having.aspect = 'entry';
 
 //
 
-function pathResolveLinkHeadReverse_pre()
+function pathResolveLinkHeadReverse_head()
 {
   let self = this;
   let o = self._preFilePathScalarWithProviderDefaults.apply( self, arguments );
@@ -1873,7 +1873,7 @@ defaults.recursive = 3;
 
 //
 
-let pathResolveLinkHeadReverse = _.routineFromPreAndBody( pathResolveLinkHeadReverse_pre, pathResolveLinkHeadReverse_body );
+let pathResolveLinkHeadReverse = _.routineUnite( pathResolveLinkHeadReverse_head, pathResolveLinkHeadReverse_body );
 pathResolveLinkHeadReverse.having.aspect = 'entry';
 
 // --
@@ -2285,7 +2285,7 @@ statRead_body.having.aspect = 'body';
  * @module Tools/mid/Files
  */
 
-let statRead = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, statRead_body );
+let statRead = _.routineUnite( _preFilePathScalarWithProviderDefaults, statRead_body );
 
 statRead.having.aspect = 'entry';
 statRead.having.hubRedirecting = 0;
@@ -2295,7 +2295,7 @@ statRead.defaults.resolvingTextLink = 0;
 
 //
 
-let statResolvedRead = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, statRead_body );
+let statResolvedRead = _.routineUnite( _preFilePathScalarWithProviderDefaults, statRead_body );
 
 statResolvedRead.having.aspect = 'entry';
 statResolvedRead.having.hubRedirecting = 0;
@@ -2329,11 +2329,11 @@ statResolvedRead.defaults.resolvingTextLink = null;
  */
 
 /*
-qqq : split pre / body
+qqq : split head / body
 Dmytro : split routine. Create simple ( smoke ) test routines filesSize().
 */
 
-function filesSize_pre( routine, args )
+function filesSize_head( routine, args )
 {
   let o = args[ 0 ] || Object.create( null );
 
@@ -2389,7 +2389,7 @@ having.driving = 0;
 
 var operates = filesSize_body.operates = Object.create( null );
 
-let filesSize = _.routineFromPreAndBody( filesSize_pre, filesSize_body );
+let filesSize = _.routineUnite( filesSize_head, filesSize_body );
 
 //
 
@@ -2439,7 +2439,7 @@ let filesSize = _.routineFromPreAndBody( filesSize_pre, filesSize_body );
 qqq : extend test, check cases when does not exist, check throwing option
 Dmytro : extended test routine. Throwing option is checked. Async mode is used.
          Description of routine has callback onEnd, but now it is not used because
-         _.routineFromPreAndBody check srcMap and screenMap in assert.
+         _.routineUnite check srcMap and screenMap in assert.
 */
 
 function fileSize_body( o )
@@ -2468,7 +2468,7 @@ having.driving = 0;
 having.aspect = 'body';
 having.hubRedirecting = 0;
 
-let fileSize = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, fileSize_body );
+let fileSize = _.routineUnite( _preFilePathScalarWithProviderDefaults, fileSize_body );
 
 fileSize.having.aspect = 'entry';
 
@@ -2628,7 +2628,7 @@ having.aspect = 'body';
 
 //
 
-let fileExists = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, fileExists_body );
+let fileExists = _.routineUnite( _preFilePathScalarWithProviderDefaults, fileExists_body );
 
 var having = fileExists.having;
 fileExists.having.aspect = 'entry';
@@ -2690,7 +2690,7 @@ operates.filePath = { pathToRead : 1 }
  * @module Tools/mid/Files
  */
 
-let isTerminal = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isTerminal_body );
+let isTerminal = _.routineUnite( _preFilePathScalarWithProviderDefaults, isTerminal_body );
 
 isTerminal.having.aspect = 'entry';
 
@@ -2708,7 +2708,7 @@ isTerminal.having.aspect = 'entry';
  * @module Tools/mid/Files
  */
 
-let resolvedIsTerminal = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isTerminal_body );
+let resolvedIsTerminal = _.routineUnite( _preFilePathScalarWithProviderDefaults, isTerminal_body );
 
 resolvedIsTerminal.defaults.resolvingSoftLink = null;
 resolvedIsTerminal.defaults.resolvingTextLink = null;
@@ -2772,7 +2772,7 @@ operates.filePath = { pathToRead : 1 }
  * @module Tools/mid/Files
  */
 
-let isDir = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isDir_body );
+let isDir = _.routineUnite( _preFilePathScalarWithProviderDefaults, isDir_body );
 
 isDir.having.aspect = 'entry';
 
@@ -2791,7 +2791,7 @@ isDir.having.aspect = 'entry';
  * @module Tools/mid/Files
  */
 
-let resolvedIsDir = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isDir_body );
+let resolvedIsDir = _.routineUnite( _preFilePathScalarWithProviderDefaults, isDir_body );
 
 resolvedIsDir.defaults.resolvingSoftLink = null;
 resolvedIsDir.defaults.resolvingTextLink = null;
@@ -2853,7 +2853,7 @@ operates.filePath = { pathToRead : 1 }
 
 //
 
-let isHardLink = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isHardLink_body );
+let isHardLink = _.routineUnite( _preFilePathScalarWithProviderDefaults, isHardLink_body );
 
 isHardLink.defaults.resolvingSoftLink = 0;
 isHardLink.defaults.resolvingTextLink = 0;
@@ -2862,7 +2862,7 @@ isHardLink.having.aspect = 'entry';
 
 //
 
-let resolvedIsHardLink = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isHardLink_body );
+let resolvedIsHardLink = _.routineUnite( _preFilePathScalarWithProviderDefaults, isHardLink_body );
 
 resolvedIsHardLink.defaults.resolvingSoftLink = null;
 resolvedIsHardLink.defaults.resolvingTextLink = null;
@@ -2923,13 +2923,13 @@ operates.filePath = { pathToRead : 1 }
 
 //
 
-let isSoftLink = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isSoftLink_body );
+let isSoftLink = _.routineUnite( _preFilePathScalarWithProviderDefaults, isSoftLink_body );
 isSoftLink.defaults.resolvingTextLink = 0;
 isSoftLink.having.aspect = 'entry';
 
 //
 
-let resolvedIsSoftLink = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isSoftLink_body );
+let resolvedIsSoftLink = _.routineUnite( _preFilePathScalarWithProviderDefaults, isSoftLink_body );
 resolvedIsSoftLink.defaults.resolvingTextLink = null;
 resolvedIsSoftLink.having.aspect = 'entry';
 
@@ -2976,13 +2976,13 @@ operates.filePath = { pathToRead : 1 }
 
 //
 
-let isTextLink = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isTextLink_body );
+let isTextLink = _.routineUnite( _preFilePathScalarWithProviderDefaults, isTextLink_body );
 isTextLink.defaults.resolvingSoftLink = 0;
 isTextLink.having.aspect = 'entry';
 
 //
 
-let resolvedIsTextLink = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isTextLink_body );
+let resolvedIsTextLink = _.routineUnite( _preFilePathScalarWithProviderDefaults, isTextLink_body );
 resolvedIsTextLink.defaults.resolvingSoftLink = null;
 resolvedIsTextLink.having.aspect = 'entry';
 
@@ -3036,13 +3036,13 @@ operates.filePath = { pathToRead : 1 };
 
 //
 
-let isLink = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isLink_body );
+let isLink = _.routineUnite( _preFilePathScalarWithProviderDefaults, isLink_body );
 
 isLink.having.aspect = 'entry';
 
 //
 
-let resolvedIsLink = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, isLink_body );
+let resolvedIsLink = _.routineUnite( _preFilePathScalarWithProviderDefaults, isLink_body );
 
 resolvedIsLink.defaults.resolvingSoftLink = null;
 resolvedIsLink.defaults.resolvingTextLink = null;
@@ -3234,12 +3234,12 @@ var having = streamRead_body.having;
 having.driving = 0;
 having.aspect = 'body';
 
-let streamRead = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, streamRead_body );
+let streamRead = _.routineUnite( _preFilePathScalarWithProviderDefaults, streamRead_body );
 streamRead.having.aspect = 'entry';
 
 //
 
-function fileRead_pre( routine, args )
+function fileRead_head( routine, args )
 {
   let self = this;
 
@@ -3529,7 +3529,7 @@ having.aspect = 'body';
  * @param {Error} error
  */
 
-let fileRead = _.routineFromPreAndBody( fileRead_pre, fileRead_body );
+let fileRead = _.routineUnite( fileRead_head, fileRead_body );
 
 fileRead.having.aspect = 'entry';
 fileRead.having.hubResolving = 1;
@@ -3584,7 +3584,7 @@ _.assert( fileRead.encoders === undefined );
  * @module Tools/mid/Files
  */
 
-let fileReadSync = _.routineFromPreAndBody( fileRead.pre, fileRead.body );
+let fileReadSync = _.routineUnite( fileRead.head, fileRead.body );
 
 fileReadSync.defaults.sync = 1;
 fileReadSync.having.aspect = 'entry';
@@ -3629,7 +3629,7 @@ having.aspect = 'body';
  * @module Tools/mid/Files
  */
 
-let fileReadJson = _.routineFromPreAndBody( fileRead.pre, fileReadJson_body );
+let fileReadJson = _.routineUnite( fileRead.head, fileReadJson_body );
 
 fileReadJson.having.aspect = 'entry';
 
@@ -3656,13 +3656,13 @@ having.aspect = 'body';
 
 //
 
-let fileReadJs = _.routineFromPreAndBody( fileRead.pre, fileReadJs_body );
+let fileReadJs = _.routineUnite( fileRead.head, fileReadJs_body );
 var having = fileReadJs.having;
 fileReadJs.having.aspect = 'entry';
 
 //
 
-function _fileInterpret_pre( routine, args )
+function _fileInterpret_head( routine, args )
 {
   let self = this;
 
@@ -3730,7 +3730,7 @@ _.routineExtend( _fileInterpret_body, fileRead );
 
 _fileInterpret_body.defaults.encoding = null;
 
-let fileInterpret = _.routineFromPreAndBody( _fileInterpret_pre, _fileInterpret_body );
+let fileInterpret = _.routineUnite( _fileInterpret_head, _fileInterpret_body );
 
 fileInterpret.having.aspect = 'entry';
 
@@ -3955,7 +3955,7 @@ var having = hashRead_body.having;
 having.driving = 0;
 having.aspect = 'body';
 
-let hashRead = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, hashRead_body );
+let hashRead = _.routineUnite( _preFilePathScalarWithProviderDefaults, hashRead_body );
 hashRead.having.aspect = 'entry';
 
 //
@@ -4018,12 +4018,12 @@ function hashSzRead_body( o )
 _.routineExtend( hashSzRead_body, hashRead.body );
 
 var defaults = hashSzRead_body.defaults;
-let hashSzRead = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, hashSzRead_body );
+let hashSzRead = _.routineUnite( _preFilePathScalarWithProviderDefaults, hashSzRead_body );
 hashSzRead.having.aspect = 'entry';
 
 //
 
-function hashSzIsUpToDate_pre( routine, args )
+function hashSzIsUpToDate_head( routine, args )
 {
   let self = this;
 
@@ -4094,7 +4094,7 @@ _.routineExtend( hashSzIsUpToDate_body, hashRead.body );
 var defaults = hashSzIsUpToDate_body.defaults;
 defaults.hash = null;
 defaults.data = null;
-let hashSzIsUpToDate = _.routineFromPreAndBody( hashSzIsUpToDate_pre, hashSzIsUpToDate_body );
+let hashSzIsUpToDate = _.routineUnite( hashSzIsUpToDate_head, hashSzIsUpToDate_body );
 hashSzIsUpToDate.having.aspect = 'entry';
 
 //
@@ -4116,7 +4116,7 @@ operates.filePath = { pathToRead : 1 }
 
 //
 
-function dirRead_pre( routine, args )
+function dirRead_head( routine, args )
 {
   let self = this;
   let o = self._preFilePathScalarWithProviderDefaults.apply( self, arguments );
@@ -4292,7 +4292,7 @@ having.aspect = 'body';
  * @module Tools/mid/Files
  */
 
-let dirRead = _.routineFromPreAndBody( dirRead_pre, dirRead_body );
+let dirRead = _.routineUnite( dirRead_head, dirRead_body );
 
 dirRead.having.aspect = 'entry';
 
@@ -4324,7 +4324,7 @@ having.aspect = 'body';
 
 //
 
-let dirReadDirs = _.routineFromPreAndBody( dirRead.pre, dirReadDirs_body );
+let dirReadDirs = _.routineUnite( dirRead.head, dirReadDirs_body );
 dirReadDirs.having.aspect = 'entry';
 
 //
@@ -4356,7 +4356,7 @@ having.aspect = 'body';
 
 //
 
-let dirReadTerminals = _.routineFromPreAndBody( dirRead.pre, dirReadTerminals_body );
+let dirReadTerminals = _.routineUnite( dirRead.head, dirReadTerminals_body );
 dirReadTerminals.having.aspect = 'entry';
 
 //
@@ -4385,7 +4385,7 @@ operates.filePath = { pathToRead : 1 }
 
 //
 
-function rightsRead_pre( routine, args )
+function rightsRead_head( routine, args )
 {
   let self = this;
 
@@ -4420,7 +4420,7 @@ having.aspect = 'body';
 
 //
 
-let rightsRead = _.routineFromPreAndBody( rightsRead_pre, rightsRead_body );
+let rightsRead = _.routineUnite( rightsRead_head, rightsRead_body );
 var having = rightsRead.having;
 having.aspect = 'entry';
 
@@ -4490,7 +4490,7 @@ having.driving = 0;
  * @module Tools/mid/Files
  */
 
-function filesAreSame_pre( routine, args )
+function filesAreSame_head( routine, args )
 {
   let self = this;
   let o;
@@ -4657,7 +4657,7 @@ function filesCanBeSame_body( o )
 
 _.routineExtend( filesCanBeSame_body, filesAreSameCommon_body );
 
-let filesCanBeSame = _.routineFromPreAndBody( filesAreSame_pre, filesCanBeSame_body );
+let filesCanBeSame = _.routineUnite( filesAreSame_head, filesCanBeSame_body );
 filesCanBeSame.having.aspect = 'entry';
 
 //
@@ -4682,7 +4682,7 @@ _.routineExtend( filesAreSameForSure_body, filesAreSameCommon_body );
 
 //
 
-let filesAreSameForSure = _.routineFromPreAndBody( filesAreSame_pre, filesAreSameForSure_body );
+let filesAreSameForSure = _.routineUnite( filesAreSame_head, filesAreSameForSure_body );
 filesAreSameForSure.having.aspect = 'entry';
 
 // --
@@ -4724,7 +4724,7 @@ having.aspect = 'body';
 
 //
 
-let streamWrite = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, streamWrite_body );
+let streamWrite = _.routineUnite( _preFilePathScalarWithProviderDefaults, streamWrite_body );
 streamWrite.having.aspect = 'entry';
 
 //
@@ -4750,7 +4750,7 @@ operates.filePath = { pathToWrite : 1 }
 
 //
 
-function fileWrite_pre( routine, args )
+function fileWrite_head( routine, args )
 {
   let self = this;
   let o;
@@ -4935,7 +4935,7 @@ having.aspect = 'body';
  * @module Tools/mid/Files
  */
 
-let fileWrite = _.routineFromPreAndBody( fileWrite_pre, fileWrite_body );
+let fileWrite = _.routineUnite( fileWrite_head, fileWrite_body );
 
 fileWrite.having.aspect = 'entry';
 
@@ -4963,7 +4963,7 @@ having.aspect = 'body';
 
 //
 
-let fileAppend = _.routineFromPreAndBody( fileWrite_pre, fileAppend_body );
+let fileAppend = _.routineUnite( fileWrite_head, fileAppend_body );
 fileAppend.having.aspect = 'entry';
 
 //
@@ -5085,12 +5085,12 @@ _.assert( _.boolLike( _.toJson.defaults.cloning ) );
  * @module Tools/mid/Files
 */
 
-let fileWriteJson = _.routineFromPreAndBody( fileWrite_pre, fileWriteJson_body );
+let fileWriteJson = _.routineUnite( fileWrite_head, fileWriteJson_body );
 fileWriteJson.having.aspect = 'entry';
 
 //
 
-let fileWriteJs = _.routineFromPreAndBody( fileWrite_pre, fileWriteJson_body );
+let fileWriteJs = _.routineUnite( fileWrite_head, fileWriteJson_body );
 
 var defaults = fileWriteJs.defaults;
 defaults.jsLike = 1;
@@ -5101,7 +5101,7 @@ having.aspect = 'body';
 
 //
 
-function fileTouch_pre( routine, args )
+function fileTouch_head( routine, args )
 {
   let self = this;
 
@@ -5171,7 +5171,7 @@ having.aspect = 'body';
 
 //
 
-let fileTouch = _.routineFromPreAndBody( fileTouch_pre, fileTouch_body );
+let fileTouch = _.routineUnite( fileTouch_head, fileTouch_body );
 fileTouch.having.aspect = 'entry';
 
 //
@@ -5195,7 +5195,7 @@ operates.filePath = { pathToWrite : 1 }
 
 //
 
-function timeWrite_pre( routine, args )
+function timeWrite_head( routine, args )
 {
   let self = this;
   let o;
@@ -5248,7 +5248,7 @@ having.aspect = 'body';
 
 //
 
-let timeWrite = _.routineFromPreAndBody( timeWrite_pre, timeWrite_body );
+let timeWrite = _.routineUnite( timeWrite_head, timeWrite_body );
 timeWrite.having.aspect = 'entry';
 
 //
@@ -5276,7 +5276,7 @@ operates.filePath = { pathToWrite : 1 }
 function rightsWrite_pre_functor( defaultKey )
 {
 
-  return function rightsWrite_pre( routine, args )
+  return function rightsWrite_head( routine, args )
   {
     let self = this;
     let o;
@@ -5326,15 +5326,15 @@ having.aspect = 'body';
 
 //
 
-let rightsWrite = _.routineFromPreAndBody( rightsWrite_pre_functor( 'setRights' ), rightsWrite_body );
+let rightsWrite = _.routineUnite( rightsWrite_pre_functor( 'setRights' ), rightsWrite_body );
 var having = rightsWrite.having;
 having.aspect = 'entry';
 
-let rightsAdd = _.routineFromPreAndBody( rightsWrite_pre_functor( 'addRights' ), rightsWrite_body );
+let rightsAdd = _.routineUnite( rightsWrite_pre_functor( 'addRights' ), rightsWrite_body );
 var having = rightsAdd.having;
 having.aspect = 'entry';
 
-let rightsDel = _.routineFromPreAndBody( rightsWrite_pre_functor( 'delRights' ), rightsWrite_body );
+let rightsDel = _.routineUnite( rightsWrite_pre_functor( 'delRights' ), rightsWrite_body );
 var having = rightsDel.having;
 having.aspect = 'entry';
 
@@ -5535,12 +5535,12 @@ having.aspect = 'body';
  * @module Tools/mid/Files
  */
 
-let fileDelete = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, fileDelete_body );
+let fileDelete = _.routineUnite( _preFilePathScalarWithProviderDefaults, fileDelete_body );
 fileDelete.having.aspect = 'entry';
 
 //
 
-let fileResolvedDelete = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, fileDelete_body, 'fileResolvedDelete' );
+let fileResolvedDelete = _.routineUnite( _preFilePathScalarWithProviderDefaults, fileDelete_body, 'fileResolvedDelete' );
 fileResolvedDelete.defaults.resolvingSoftLink = null;
 fileResolvedDelete.defaults.resolvingTextLink = null;
 fileResolvedDelete.having.aspect = 'entry';
@@ -5676,7 +5676,7 @@ having.aspect = 'body';
 
 //
 
-let dirMake = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, dirMake_body );
+let dirMake = _.routineUnite( _preFilePathScalarWithProviderDefaults, dirMake_body );
 dirMake.having.aspect = 'entry';
 
 //
@@ -5703,7 +5703,7 @@ having.aspect = 'body';
 
 //
 
-let dirMakeForFile = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, dirMakeForFile_body );
+let dirMakeForFile = _.routineUnite( _preFilePathScalarWithProviderDefaults, dirMakeForFile_body );
 dirMakeForFile.having.aspect = 'entry';
 
 // --
@@ -5771,7 +5771,7 @@ having.aspect = 'body';
 
 //
 
-let fileLock = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, fileLock_body );
+let fileLock = _.routineUnite( _preFilePathScalarWithProviderDefaults, fileLock_body );
 dirMakeForFile.having.aspect = 'entry';
 
 //
@@ -5825,7 +5825,7 @@ having.aspect = 'body';
 
 //
 
-let fileUnlock = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, fileUnlock_body );
+let fileUnlock = _.routineUnite( _preFilePathScalarWithProviderDefaults, fileUnlock_body );
 dirMakeForFile.having.aspect = 'entry';
 
 //
@@ -5878,7 +5878,7 @@ having.aspect = 'body';
 
 //
 
-let fileIsLocked = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, fileIsLocked_body );
+let fileIsLocked = _.routineUnite( _preFilePathScalarWithProviderDefaults, fileIsLocked_body );
 dirMakeForFile.having.aspect = 'entry';
 
 // --
@@ -7061,7 +7061,7 @@ _.mapExtend( textLink.defaults, textLink.body.defaults );
 
 //
 
-function fileExchange_pre( routine, args )
+function fileExchange_head( routine, args )
 {
   let self = this;
   let o;
@@ -7310,7 +7310,7 @@ having.aspect = 'body';
  * @module Tools/mid/Files
  */
 
-let fileExchange = _.routineFromPreAndBody( fileExchange_pre, fileExchange_body );
+let fileExchange = _.routineUnite( fileExchange_head, fileExchange_body );
 fileExchange.having.aspect = 'entry';
 
 // --
@@ -7365,7 +7365,7 @@ having.aspect = 'body';
 
 //
 
-let hardLinkBreak = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, hardLinkBreak_body );
+let hardLinkBreak = _.routineUnite( _preFilePathScalarWithProviderDefaults, hardLinkBreak_body );
 hardLinkBreak.having.aspect = 'entry';
 
 //
@@ -7418,7 +7418,7 @@ having.aspect = 'body';
 
 //
 
-let softLinkBreak = _.routineFromPreAndBody( _preFilePathScalarWithProviderDefaults, softLinkBreak_body );
+let softLinkBreak = _.routineUnite( _preFilePathScalarWithProviderDefaults, softLinkBreak_body );
 softLinkBreak.having.aspect = 'entry';
 
 //
@@ -7464,7 +7464,7 @@ operates.filePath = { pathToRead : 1, vector : [ 2, 2 ] }
  * @module Tools/mid/Files
  */
 
-function filesAreLinked_pre( routine, args )
+function filesAreLinked_head( routine, args )
 {
   let self = this;
   let o;
@@ -7528,7 +7528,7 @@ having.aspect = 'body';
 
 //
 
-let areHardLinked = _.routineFromPreAndBody( filesAreLinked_pre, areHardLinked_body );
+let areHardLinked = _.routineUnite( filesAreLinked_head, areHardLinked_body );
 
 var having = areHardLinked.having;
 having.driving = 0;
@@ -7593,7 +7593,7 @@ having.aspect = 'body';
 
 //
 
-let areSoftLinked = _.routineFromPreAndBody( filesAreLinked_pre, areSoftLinked_body );
+let areSoftLinked = _.routineUnite( filesAreLinked_head, areSoftLinked_body );
 
 areSoftLinked.having.driving = 0;
 areSoftLinked.having.aspect = 'entry';
@@ -7653,7 +7653,7 @@ having.aspect = 'body';
 
 //
 
-let areTextLinked = _.routineFromPreAndBody( filesAreLinked_pre, areTextLinked_body );
+let areTextLinked = _.routineUnite( filesAreLinked_head, areTextLinked_body );
 
 areTextLinked.having.driving = 0;
 areTextLinked.having.aspect = 'entry';

@@ -464,10 +464,10 @@ function _filesReadOldAsync( o )
 /*
 qqq :
 - add GOOD coverage for the routine filesAreUpToDate2
-- make pre/body for the routine
+- make head/body for the routine
 */
 
-function filesAreUpToDate2_pre( routine, args )
+function filesAreUpToDate2_head( routine, args )
 {
   var o = args[ 0 ];
 
@@ -574,7 +574,7 @@ having.writing = 0;
 having.reading = 1;
 having.driving = 0;
 
-var filesAreUpToDate2 = _.routineFromPreAndBody( filesAreUpToDate2_pre, filesAreUpToDate2_body );
+var filesAreUpToDate2 = _.routineUnite( filesAreUpToDate2_head, filesAreUpToDate2_body );
 
 //
 
@@ -762,7 +762,7 @@ defaults.postfix = '\n})();\n';
 
 _.routineExtend( fileCodeRead_body, fileRead );
 
-var fileCodeRead = _.routineFromPreAndBody( fileRead.pre, fileCodeRead_body );
+var fileCodeRead = _.routineUnite( fileRead.head, fileCodeRead_body );
 
 fileCodeRead.having.aspect = 'entry';
 

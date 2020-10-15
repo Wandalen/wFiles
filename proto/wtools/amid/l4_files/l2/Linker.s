@@ -1147,7 +1147,7 @@ contextMake.defaults =
 
 //
 
-function functor_pre( routine, args )
+function functor_head( routine, args )
 {
   let self = this;
   // let o = self._preSrcDstPathWithProviderDefaults.apply( self, arguments );
@@ -1204,7 +1204,7 @@ function functor( fop )
   having.driving = 0;
   having.aspect = 'body';
 
-  let linkEntry = _.routineFromPreAndBody( functor_pre, link_body, entryMethodName );
+  let linkEntry = _.routineUnite( functor_head, link_body, entryMethodName );
 
   var having = linkEntry.having;
   having.aspect = 'entry';

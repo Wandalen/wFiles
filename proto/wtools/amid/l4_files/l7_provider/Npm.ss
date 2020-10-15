@@ -474,7 +474,7 @@ extra.usingNpm = 1;
 var defaults = filesReflectSingle_body.defaults;
 
 let filesReflectSingle =
-_.routineFromPreAndBody( _.FileProvider.FindMixin.prototype.filesReflectSingle.pre, filesReflectSingle_body );
+_.routineUnite( _.FileProvider.FindMixin.prototype.filesReflectSingle.head, filesReflectSingle_body );
 
 // --
 // relationship

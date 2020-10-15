@@ -123,7 +123,7 @@ function _routineFunctor( routine, routineName )
   if( self.routines[ routineName ] )
   return self.routines[ routineName ];
 
-  let pre = routine.pre;
+  let head = routine.head;
   let body = routine.body || routine;
   let op = Object.create( null );
   op.routine = routine;
@@ -158,11 +158,11 @@ function _routineFunctor( routine, routineName )
       op2.args = _.unrollFrom( arguments );
       op2.result = undefined;
 
-      if( pre )
+      if( head )
       {
         // debugger;
         // _.assert( 0, 'not tested' );
-        op2.args = pre.call( this.originalFileProvider, resultRoutine, op2.args );
+        op2.args = head.call( this.originalFileProvider, resultRoutine, op2.args );
         if( !_.unrollIs( op2.args ) )
         op2.args = _.unrollFrom([ op2.args ]);
       }

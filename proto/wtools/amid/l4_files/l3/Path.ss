@@ -1247,7 +1247,7 @@ function tempClose( filePath )
 
 //
 
-function forCopy_pre( routine, args )
+function forCopy_head( routine, args )
 {
 
   _.assert( args.length === 1 );
@@ -1345,11 +1345,11 @@ having.aspect = 'body';
  * @module Tools/mid/Files
  */
 
-let forCopy = _.routineFromPreAndBody( forCopy_pre, forCopy_body );
+let forCopy = _.routineUnite( forCopy_head, forCopy_body );
 
 forCopy.having.aspect = 'entry';
 
-function _firstAvailable_pre( routine, args )
+function _firstAvailable_head( routine, args )
 {
 
   _.assert( args.length === 1 );
@@ -1395,7 +1395,7 @@ var having = _firstAvailable_body.having = Object.create( null );
 having.driving = 0;
 having.aspect = 'body';
 
-let firstAvailable = _.routineFromPreAndBody( _firstAvailable_pre, _firstAvailable_body );
+let firstAvailable = _.routineUnite( _firstAvailable_head, _firstAvailable_body );
 firstAvailable.having.aspect = 'entry';
 
 // --

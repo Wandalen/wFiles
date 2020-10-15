@@ -238,11 +238,11 @@ defaults.filePath = null;
 defaults.outputFormat = 'array';
 // defaults.recursive = 1;
 
-let configFind = _.routineFromPreAndBody( Partial.prototype._preFilePathVectorWithProviderDefaults, configFind_body );
+let configFind = _.routineUnite( Partial.prototype._preFilePathVectorWithProviderDefaults, configFind_body );
 
 //
 
-// function _fileRead_pre( routine, args )
+// function _fileRead_head( routine, args )
 // {
 //   let self = this;
 //
@@ -394,7 +394,7 @@ defaults.found = null;
 
 //
 
-var configRead = _.routineFromPreAndBody( Partial.prototype._preFilePathVectorWithProviderDefaults, configRead_body );
+var configRead = _.routineUnite( Partial.prototype._preFilePathVectorWithProviderDefaults, configRead_body );
 
 configRead.having.aspect = 'entry';
 

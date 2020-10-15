@@ -186,6 +186,16 @@ function pathParse( filePath )
   return result;
 }
 
+//
+
+function _pathDirNormalize( srcPath )
+{
+  let self = this;
+  let path = self.path;
+
+  return srcPath.split( path.upToken ).join( path.hereToken );
+}
+
 // --
 // read
 // --
@@ -222,16 +232,56 @@ function fileReadAct( o )
   parsed.dirPath = path.unabsolute( parsed.dirPath );
 
   if( !parsed.isTerminal )
-  throw _.err( `${o.filePath} is not a terminal` );
+  throw _.err( `${ o.filePath } is not a terminal` );
+
+  let attachments;
+  if( o.advanced.withTail )
+  attachments = self.attachmentsGet
+  ({
+    filePath : o.filePath,
+    decoding : 1,
+    sync : 1,
+  });
 
   ready.then( () => _read() );
   ready.then( () =>
   {
+    if( o.advanced.withTail && attachments &&  attachments.length > 0 );
+    result.attachments = attachments;
+
     if( o.encoding === 'map' )
     return result;
 
-    let length = result.parts.length;
-    result = result.parts[ length - 1 ].body !== undefined ? result.parts[ length - 1 ].body : JSON.stringify( result );
+    if( o.advanced.withHeader && o.advanced.withBody && o.advanced.withTail )
+    {
+      result = result.parts[ result.parts.length - 1 ].body;
+    }
+    else
+    {
+      let message = '{\n';
+      if( o.advanced.withHeader )
+      {
+        if( _.mapKeys( result.header ).length > 0 )
+        message += '"header" : ' + _.toJson( result.header ) + ',\n';
+      }
+      if( o.advanced.withBody )
+      {
+        let bodyArray = result.parts.filter( ( e ) => e.which === 'TEXT' );
+        if( bodyArray[ 0 ].body )
+        message += '"body" : ' + _.toJson( bodyArray[ 0 ].body ) + ',\n';
+      }
+      if( o.advanced.withTail )
+      {
+        if( result.attachments.length > 0 )
+        message += '"attachments" : ' + _.toJson( result.attachments ) + '\n';
+      }
+
+      if( _.strEnds( message, ',\n' ) )
+      message = _.strReplaceEnd( message, ',\n', '\n' );
+      message += '}';
+
+      result = message;
+    }
 
     if( o.encoding === 'buffer.raw' )
     {
@@ -241,7 +291,7 @@ function fileReadAct( o )
     {
       try
       {
-        result = BufferNode.from( result, o.encoding );
+        result = BufferNode.from( result, o.encoding ).toString( 'utf8' );
       }
       catch( err )
       {
@@ -265,7 +315,7 @@ function fileReadAct( o )
 
   function _read()
   {
-    let mailbox = parsed.dirPath.split( '/' ).join( '.' );
+    let mailbox = self._pathDirNormalize( parsed.dirPath );
     return self._connection.openBox( mailbox ).then( function ( extra ) /* xxx : need to close? */
     {
       let searchCriteria = [ `${parsed.stripName}` ];
@@ -275,7 +325,7 @@ function fileReadAct( o )
       bodies.push( 'HEADER' );
       if( o.advanced.withBody )
       bodies.push( 'TEXT' );
-      if( o.advanced.withTail )
+      // if( o.advanced.withTail )
       bodies.push( '' );
 
       let fetchOptions =
@@ -324,6 +374,160 @@ fileReadAct.advanced =
 
 //
 
+function attachmentsGet( o )
+{
+  let self = this;
+  let path = self.path;
+  let result = null;
+  let conWithdata;
+
+  _.assert( arguments.length === 1, 'Expects single argument' );
+  _.routineOptions( attachmentsGet, o );
+
+  let parsed = self.pathParse( o.filePath );
+  parsed.dirPath = path.unabsolute( parsed.dirPath );
+
+  if( !parsed.isTerminal )
+  throw _.err( `${ o.filePath } is not a terminal` );
+
+  let ready = _attachmentsGet();
+  ready.then( () => result );
+
+  if( o.sync )
+  {
+    ready.deasync();
+    return ready.sync();
+  }
+
+  return ready;
+
+  /* */
+
+  function _attachmentsGet()
+  {
+    let ready = self.ready.split();
+    let mailbox = self._pathDirNormalize( parsed.dirPath );
+
+    if( !self.fileExists( o.filePath ) )
+    return ready.take( null );
+
+    return ready.give( function()
+    {
+      let con = this;
+
+      self._connection.openBox( mailbox )
+      .then( ( extra ) =>
+      {
+        let searchCriteria = [ `${ parsed.stripName }` ];
+        let bodies = [ '' ];
+
+        let fetchOptions =
+        {
+          bodies,
+          struct : true,
+          markSeen : false,
+        };
+
+        return self._connection.search( searchCriteria, fetchOptions )
+        .then( ( messages ) =>
+        {
+          _.assert( messages.length === 1, 'Expects single message.' );
+
+          let message = messages[ 0 ];
+          result = _.filter_( null, message.attributes.struct, ( e ) =>
+          {
+            if( _.arrayIs( e ) )
+            e = e[ 0 ];
+            if( e.disposition && e.disposition.type )
+            if( _.longHasAny( [ 'INLINE', 'ATTACHMENT' ], e.disposition.type.toUpperCase() ) )
+            return e;
+          });
+
+          /* */
+
+          let con2 = replacePartsByAttachments( result, message );
+          con.take( con2 );
+
+        })
+      })
+
+    })
+    .then( () =>
+    {
+      self._connection.closeBox( mailbox );
+      return null;
+    });
+  }
+
+  /* */
+
+  function replacePartsByAttachments( parts, message )
+  {
+    let con = new _.Consequence().take( null );
+    for( let i = 0 ; i < parts.length ; i++ )
+    {
+      con.then( () =>
+      {
+        conWithdata = new _.Consequence();
+        attachmentDataGet( message, parts[ i ] );
+        return conWithdata;
+      })
+      .then( ( data ) =>
+      {
+        let attachment = Object.create( null );
+        attachment.fileName = parts[ i ].disposition.params.filename;
+
+        if( o.decoding )
+        {
+          data = dataDecode( data, o.encoding );
+          attachment.encoding = o.encoding;
+          attachment.size = data.length;
+        }
+        else
+        {
+          attachment.encoding = parts[ i ].encoding;
+          attachment.size = parts[ i ].size;
+        }
+
+        attachment.data = data;
+
+        parts[ i ] = attachment;
+        return data;
+      })
+    }
+
+    return con;
+  }
+
+  /* */
+
+  function attachmentDataGet( message, part )
+  {
+    self._connection.getPartData( message, part )
+    .then( ( data ) => conWithdata.take( data ) );
+  }
+
+  /* */
+
+  function dataDecode( data, encoding )
+  {
+    _.assert( BufferNode.isEncoding( encoding ), 'Unknown encoding' );
+    return BufferNode.from( data ).toString( encoding );
+  }
+
+}
+
+attachmentsGet.defaults =
+{
+  sync : 1,
+  filePath : null,
+
+  decoding : 0,
+  encoding : 'utf8',
+};
+
+//
+
 function dirReadAct( o )
 {
   let self = this;
@@ -363,7 +567,7 @@ function dirReadAct( o )
     return result;
 
     filePath = path.unabsolute( filePath );
-    filePath = filePath.split( '/' ).join( '.' );
+    filePath = self._pathDirNormalize( filePath );
     return self._connection.openBox( filePath ).then( function( extra ) /* xxx : need to close? */
     {
       let searchCriteria = [ 'ALL' ];
@@ -472,7 +676,7 @@ function statReadAct( o )
       {
         withHeader : 1,
         withBody : 0,
-        withTail : 1,
+        withTail : 0,
         structing : 0,
       }
       let o2 = _.mapSupplement( { filePath : o.filePath, advanced, throwing, sync, encoding : 'map' }, self.fileReadAct.defaults );
@@ -513,7 +717,7 @@ function statReadAct( o )
     .give( function()
     {
       let con = this;
-      let dirPath = parsed.unabsolutePath.split( '/' ).join( '.' );
+      let dirPath = self._pathDirNormalize( parsed.unabsolutePath );
 
       self._connection.openBox( dirPath )
       .then( ( extra ) => /* xxx : need to close? */
@@ -618,7 +822,7 @@ function fileWriteAct( o )
   _.assertRoutineOptions( fileWriteAct, o );
   _.assert( self.path.isNormalized( o.filePath ) );
   _.assert( self.WriteMode.indexOf( o.writeMode ) !== -1 );
-  o.advanced = _.routineOptions( null, o.advanced || Object.create( null ), fileReadAct.advanced );
+  o.advanced = _.routineOptions( null, o.advanced || Object.create( null ), fileWriteAct.advanced );
 
   /* data conversion */
 
@@ -655,17 +859,17 @@ function fileWriteAct( o )
       if( o.writeMode === 'rewrite' )
       {
         let dirPath = path.unabsolute( parsed.dirPath );
-        let mailbox = dirPath.split( '/' ).join( '.' );
+        let mailbox = self._pathDirNormalize( dirPath );
 
         let o2 = Object.create( null );
         o2.mailbox = mailbox;
         if( o.advanced.flag !== null )
-        o2.flag = o.advanced.flag;
+        o2.flags = o.advanced.flags;
 
         self._connection.append( o.data, o2 )
         .then( ( etra ) =>
         {
-          con.take( null );
+          con.take( true );
         })
         .catch( ( err ) =>
         {
@@ -683,7 +887,7 @@ function fileWriteAct( o )
 
 fileWriteAct.advanced =
 {
-  flag : null,
+  flags : null,
 };
 
 _.routineExtend( fileWriteAct, Parent.prototype.fileWriteAct );
@@ -723,7 +927,7 @@ function fileDeleteAct( o )
       resolvingSoftLink : 0
     });
     let mailbox = path.unabsolute( parsed.isTerminal ? parsed.dirPath : parsed.originalPath );
-    mailbox = mailbox.split( '/' ).join( '.' );
+    mailbox = self._pathDirNormalize( mailbox );
 
     if( stat && stat.isDir() )
     {
@@ -741,7 +945,7 @@ function fileDeleteAct( o )
         dirQueue.push( ... dirs.map( ( e ) => `${ dirQueue[ 0 ] }/${ e }` ) );
 
         let mailboxPath = path.unabsolute( dirQueue[ 0 ] );
-        mailboxPath = mailboxPath.split( '/' ).join( '.' );
+        mailboxPath = self._pathDirNormalize( mailboxPath );
         deletedList.push( ... dirs.map( ( e ) => `${ mailboxPath }.${ e }` ) );
 
         dirQueue.shift();
@@ -817,7 +1021,7 @@ function dirMakeAct( o )
     if( parsed.isTerminal )
     return con.error( 'Path to directory should have not name of terminal file.' );
 
-    let dirPath = parsed.unabsolutePath.split( '/' ).join( '.' );
+    let dirPath = self._pathDirNormalize( parsed.unabsolutePath );
 
     self._connection.addBox( dirPath )
     .then( () => /* xxx : need to close? */
@@ -868,13 +1072,13 @@ function fileRenameAct( o )
     if( srcParsed.isTerminal )
     return ready.error( _.err( '{-o.srcPath-} should be path to directory.' ) );
     if( _.longHas( [ '.', 'Drafts', 'INBOX', 'Junk', 'Sent', 'Trash' ], srcParsed.unabsolutePath ) )
-    return con.error( _.err( 'Unable to rename builtin directory.' ) );
+    return ready.error( _.err( 'Unable to rename builtin directory.' ) );
     let dstParsed = self.pathParse( o.dstPath );
     if( dstParsed.isTerminal )
     return ready.error( _.err( '{-o.dstPath-} should be path to directory.' ) );
 
-    let srcPath = srcParsed.unabsolutePath.split( '/' ).join( '.' );
-    let dstPath = dstParsed.unabsolutePath.split( '/' ).join( '.' );
+    let srcPath = self._pathDirNormalize( srcParsed.unabsolutePath );
+    let dstPath = self._pathDirNormalize( dstParsed.unabsolutePath );
 
     self._connection.imap.renameBox( srcPath, dstPath, handleErr );
 
@@ -931,9 +1135,9 @@ function fileCopyAct( o )
     return ready.error( _.err( '{-o.dstPath-} should be path to file with name <$>.' ) );
 
     let srcPath = path.unabsolute( srcParsed.dirPath );
-    srcPath = srcPath.split( '/' ).join( '.' );
+    srcPath = self._pathDirNormalize( srcPath );
     let dstPath = path.unabsolute( dstParsed.dirPath );
-    dstPath = dstPath.split( '/' ).join( '.' );
+    dstPath = self._pathDirNormalize( dstPath );
     let msgId = _.arrayAs( srcParsed.stripName );
 
     self._connection.openBox( srcPath )
@@ -966,6 +1170,56 @@ function fileCopyAct( o )
 }
 
 _.routineExtend( fileCopyAct, Parent.prototype.fileCopyAct );
+
+//
+
+function _fileCopyPrepare( o )
+{
+  let self = this;
+
+  _.assert( arguments.length === 1, 'Expects single options map {-o-}.' );
+  _.routineOptions( _fileCopyPrepare, o );
+
+  let read = o.srcProvider.system.fileRead({ filePath : o.options.srcPath, encoding : 'utf8', sync : 1 });
+
+  if( o.srcProvider instanceof _.FileProvider.Imap || !o.srcProvider )
+  {
+    _.assert( o.dstProvider, 'Expects destination provider {-dstProvider-}.' );
+
+    let numberOfLines = _.strLinesCount( read );
+    if( numberOfLines === 1 )
+    {
+      o.data = BufferNode.from( read, 'base64' );
+      o.data = _.bufferBytesFrom( o.data );
+      o.options.context.srcResolvedStat.size = o.options.context.srcStat.size = o.data.length;
+    }
+  }
+  else if( !( o.srcProvider instanceof _.FileProvider.Imap ) )
+  {
+    _.assert( !o.dstProvider || o.dstProvider instanceof _.FileProvider.Imap, 'Expects provider Imap {-o.dstProvider-}.' );
+
+    let parsed = self.pathParse( o.options.srcPath );
+    if( !parsed.isTerminal )
+    {
+      o.data = BufferNode.from( read ).toString( 'base64' );
+      o.options.context.srcResolvedStat.size = o.options.context.srcStat.size = o.data.length;
+    }
+  }
+  else
+  {
+    _.assert( 0, 'Unknown instance of file provider {-o.srcProvider-}.' );
+  }
+
+  return o.data;
+}
+
+_fileCopyPrepare.defaults =
+{
+  srcProvider : null,
+  dstProvider : null,
+  options : null,
+  data : null,
+};
 
 //
 
@@ -1070,7 +1324,7 @@ let Composes =
   login : null,
   password : null,
   hostUri : null,
-  authTimeOut : 5000,
+  authTimeOut : 10000, /* 5000 */
   tls : true,
   // tls : false,
   safe : 0,
@@ -1122,10 +1376,12 @@ let Extension =
   pathCurrentAct,
   pathResolveSoftLinkAct,
   pathParse,
+  _pathDirNormalize,
 
   // read
 
   fileReadAct,
+  attachmentsGet,
   dirReadAct,
   streamReadAct : null,
   statReadAct,
@@ -1143,6 +1399,7 @@ let Extension =
 
   fileRenameAct,
   fileCopyAct,
+  _fileCopyPrepare,
   softLinkAct,
   hardLinkAct,
 

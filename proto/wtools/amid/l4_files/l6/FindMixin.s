@@ -284,7 +284,7 @@ function _filesFindFilterAbsorb( routine, args )
 
 //
 
-function filesFindNominal_pre( routine, args )
+function filesFindNominal_head( routine, args )
 {
   let self = this;
   let path = self.path;
@@ -521,11 +521,11 @@ having.writing = 0;
 having.reading = 1;
 having.driving = 0;
 
-let filesFindNominal = _.routineFromPreAndBody( filesFindNominal_pre, filesFindNominal_body );
+let filesFindNominal = _.routineUnite( filesFindNominal_head, filesFindNominal_body );
 
 //
 
-function filesFindSingle_pre( routine, args )
+function filesFindSingle_head( routine, args )
 {
   let self = this;
   let path = self.path;
@@ -657,7 +657,7 @@ defaults.withStem = true;
 defaults.withDefunct = null;
 defaults.visitingCertain = true;
 
-let filesFindSingle = _.routineFromPreAndBody( filesFindSingle_pre, filesFindSingle_body );
+let filesFindSingle = _.routineUnite( filesFindSingle_head, filesFindSingle_body );
 
 //
 
@@ -701,7 +701,7 @@ let filesFindSingle = _.routineFromPreAndBody( filesFindSingle_pre, filesFindSin
  * @module Tools/mid/Files
  */
 
-function filesFind_pre( routine, args )
+function filesFind_head( routine, args )
 {
   let self = this;
   let path = self.path;
@@ -1228,7 +1228,7 @@ defaults.allowingCycled = 0;
 _.assert( defaults.maskAll === undefined );
 _.assert( defaults.glob === undefined );
 
-let filesFind = _.routineFromPreAndBody( filesFind_pre, filesFind_body );
+let filesFind = _.routineUnite( filesFind_head, filesFind_body );
 
 filesFind.having.aspect = 'entry';
 
@@ -1269,17 +1269,17 @@ filesFind.having.aspect = 'entry';
  * @module Tools/mid/Files
  */
 
-function filesFindRecursive_pre( routine, args )
+function filesFindRecursive_head( routine, args )
 {
   let self = this;
   let o = self._filesFindPrepare0( routine, args );
   // self._filesFindFilterAbsorb( routine, [ o ] );
   if( o.filter.recursive === undefined || o.filter.recursive === null )
   o.filter.recursive = 2;
-  return self.filesFind.pre.call( self, routine, [ o ] );
+  return self.filesFind.head.call( self, routine, [ o ] );
 }
 
-let filesFindRecursive = _.routineFromPreAndBody( filesFindRecursive_pre, filesFind.body );
+let filesFindRecursive = _.routineUnite( filesFindRecursive_head, filesFind.body );
 
 var defaults = filesFindRecursive.defaults;
 defaults.filePath = null;
@@ -1446,7 +1446,7 @@ let filesGlober = filesFinder_functor( filesGlob );
 // files find groups
 // --
 
-function filesFindGroups_pre( routine, args )
+function filesFindGroups_head( routine, args )
 {
   let self = this;
 
@@ -1559,11 +1559,11 @@ defaults.mode = 'distinct';
 
 //
 
-let filesFindGroups = _.routineFromPreAndBody( filesFindGroups_pre, filesFindGroups_body );
+let filesFindGroups = _.routineUnite( filesFindGroups_head, filesFindGroups_body );
 
 //
 
-function filesReadGroups_pre( routine, args )
+function filesReadGroups_head( routine, args )
 {
   let self = this;
 
@@ -1653,7 +1653,7 @@ function filesReadGroups_body( o )
 
 filesReadGroups_body.defaults = Object.create( filesFindGroups.defaults );
 
-let filesReadGroups = _.routineFromPreAndBody( filesReadGroups_pre, filesReadGroups_body );
+let filesReadGroups = _.routineUnite( filesReadGroups_head, filesReadGroups_body );
 
 // --
 //
@@ -1746,7 +1746,7 @@ function _filesReflectPrepare( routine, args )
 
 //
 
-function filesReflectEvaluate_pre( routine, args )
+function filesReflectEvaluate_head( routine, args )
 {
   let self = this;
   let o = self._filesReflectPrepare( routine, args );
@@ -3076,12 +3076,12 @@ having.writing = 0;
 having.reading = 1;
 having.driving = 0;
 
-let filesReflectEvaluate = _.routineFromPreAndBody( filesReflectEvaluate_pre, filesReflectEvaluate_body );
+let filesReflectEvaluate = _.routineUnite( filesReflectEvaluate_head, filesReflectEvaluate_body );
 filesReflectEvaluate.having.aspect = 'entry';
 
 //
 
-function filesReflectSingle_pre( routine, args )
+function filesReflectSingle_head( routine, args )
 {
   let self = this;
   let o = self._filesReflectPrepare( routine, args );
@@ -3717,14 +3717,14 @@ having.writing = 0;
 having.reading = 1;
 having.driving = 0;
 
-let filesReflectSingle = _.routineFromPreAndBody( filesReflectSingle_pre, filesReflectSingle_body );
+let filesReflectSingle = _.routineUnite( filesReflectSingle_head, filesReflectSingle_body );
 filesReflectSingle.having.aspect = 'entry';
 
 _.assert( filesReflectSingle.defaults.sync !== undefined );
 
 //
 
-function filesReflect_pre( routine, args )
+function filesReflect_head( routine, args )
 {
   let self = this;
   let path = self.path;
@@ -3736,7 +3736,7 @@ function filesReflect_pre( routine, args )
   if( args.length === 2 )
   o = { reflectMap : { [ args[ 1 ] ] : args[ 0 ] } }
 
-  self.filesReflectSingle.pre.call( self, routine, args );
+  self.filesReflectSingle.head.call( self, routine, args );
 
   if( Config.debug )
   {
@@ -4001,7 +4001,7 @@ defaults.filter = null;
 defaults.reflectMap = null;
 defaults.outputFormat = 'record';
 
-let filesReflect = _.routineFromPreAndBody( filesReflect_pre, filesReflect_body );
+let filesReflect = _.routineUnite( filesReflect_head, filesReflect_body );
 
 _.assert( _.boolLike( filesReflect_body.defaults.mandatory ) );
 
@@ -4065,7 +4065,7 @@ let filesReflector = filesReflector_functor( filesReflect );
 
 //
 
-function filesReflectTo_pre( routine, args )
+function filesReflectTo_head( routine, args )
 {
   let self = this;
   let path = self.path;
@@ -4193,11 +4193,11 @@ defaults.dstProvider = null;
 defaults.dst = '/';
 defaults.src = '/';
 
-let filesReflectTo = _.routineFromPreAndBody( filesReflectTo_pre, filesReflectTo_body );
+let filesReflectTo = _.routineUnite( filesReflectTo_head, filesReflectTo_body );
 
 //
 
-function filesExtract_pre( routine, args )
+function filesExtract_head( routine, args )
 {
   let self = this;
   let path = self.path;
@@ -4234,7 +4234,7 @@ function filesExtract_body( o )
 
 var defaults = filesExtract_body.defaults = Object.create( filesReflectTo.defaults );
 
-let filesExtract = _.routineFromPreAndBody( filesExtract_pre, filesExtract_body );
+let filesExtract = _.routineUnite( filesExtract_head, filesExtract_body );
 
 //
 
@@ -4534,7 +4534,7 @@ defaults.relativePaths = 0;
 
 defaults.result = null;
 
-let filesFindSame = _.routineFromPreAndBody( filesFind.pre, filesFindSame_body );
+let filesFindSame = _.routineUnite( filesFind.head, filesFindSame_body );
 
 filesFindSame.having.aspect = 'entry';
 
@@ -4542,11 +4542,11 @@ filesFindSame.having.aspect = 'entry';
 // delete
 // --
 
-function filesDelete_pre( routine, args )
+function filesDelete_head( routine, args )
 {
   let self = this;
   args = _.longSlice( args );
-  let o = self.filesFind.pre.call( self, routine, args );
+  let o = self.filesFind.head.call( self, routine, args );
   return o;
 }
 
@@ -4886,7 +4886,7 @@ qqq : implement and cover option late for method filesDelete.
 
 //
 
-let filesDelete = _.routineFromPreAndBody( filesFindRecursive.pre, filesDelete_body );
+let filesDelete = _.routineUnite( filesFindRecursive.head, filesDelete_body );
 filesDelete.having.aspect = 'entry';
 
 var defaults = filesDelete.defaults;
@@ -4950,7 +4950,7 @@ defaults.withTerminals = 1;
 defaults.withDirs = 0;
 defaults.withTransient = 0;
 
-let filesDeleteTerminals = _.routineFromPreAndBody( filesFindRecursive.pre, filesDeleteTerminals_body );
+let filesDeleteTerminals = _.routineUnite( filesFindRecursive.head, filesDeleteTerminals_body );
 
 //
 
@@ -5016,13 +5016,13 @@ defaults.withTerminals = 0;
 defaults.withDirs = 1;
 defaults.withTransient = 0;
 
-let filesDeleteEmptyDirs = _.routineFromPreAndBody( filesFindRecursive.pre, filesDeleteEmptyDirs_body );
+let filesDeleteEmptyDirs = _.routineUnite( filesFindRecursive.head, filesDeleteEmptyDirs_body );
 
 // --
 // other find
 // --
 
-function filesRead_pre( routine, args )
+function filesRead_head( routine, args )
 {
   let self = this;
   let o = args[ 0 ];
@@ -5033,7 +5033,7 @@ function filesRead_pre( routine, args )
   _.assert( args.length === 1 );
   _.assert( arguments.length === 2 );
 
-  o = self.filesFind.pre.call( self, routine, [ o ] );
+  o = self.filesFind.head.call( self, routine, [ o ] );
 
   return o;
 }
@@ -5137,11 +5137,11 @@ defaults.withDirs = 0;
 
 delete defaults.outputFormat;
 
-let filesRead = _.routineFromPreAndBody( filesRead_pre, filesRead_body );
+let filesRead = _.routineUnite( filesRead_head, filesRead_body );
 
 //
 
-function filesRename_pre( routine, args )
+function filesRename_head( routine, args )
 {
   let self = this;
   let o = args[ 0 ];
@@ -5149,7 +5149,7 @@ function filesRename_pre( routine, args )
   if( !_.mapIs( o ) )
   o = { filePath : args[ 0 ] }
 
-  o = self.filesFind.pre.call( self, routine, [ o ] );
+  o = self.filesFind.head.call( self, routine, [ o ] );
 
   _.assert( args.length === 1 );
   _.assert( arguments.length === 2 );
@@ -5207,7 +5207,7 @@ defaults.onRename = null;
 
 delete defaults.outputFormat;
 
-let filesRename = _.routineFromPreAndBody( filesRename_pre, filesRename_body );
+let filesRename = _.routineUnite( filesRename_head, filesRename_body );
 
 //
 
@@ -5215,7 +5215,7 @@ function softLinksBreak_body( o )
 {
   let self = this;
 
-  // o = self.filesFind.pre.call( self, softLinksBreak, arguments );
+  // o = self.filesFind.head.call( self, softLinksBreak, arguments );
 
   _.assertRoutineOptions( softLinksBreak_body, arguments );
   _.assert( o.outputFormat === 'record' );
@@ -5254,14 +5254,14 @@ defaults.breakingSoftLink = 1;
 defaults.breakingTextLink = 0;
 // defaults.recursive = 2;
 
-let softLinksBreak = _.routineFromPreAndBody( filesFindRecursive.pre, softLinksBreak_body );
+let softLinksBreak = _.routineUnite( filesFindRecursive.head, softLinksBreak_body );
 
 //
 
 function softLinksRebase_body( o )
 {
   let self = this;
-  // o = self.filesFind.pre.call( self, softLinksRebase, arguments );
+  // o = self.filesFind.head.call( self, softLinksRebase, arguments );
 
   _.assertRoutineOptions( softLinksRebase_body, arguments );
   _.assert( o.outputFormat === 'record' );
@@ -5310,7 +5310,7 @@ defaults.newPath = null;
 // defaults.recursive = 2;
 defaults.resolvingSoftLink = 0;
 
-let softLinksRebase = _.routineFromPreAndBody( filesFindRecursive.pre, softLinksRebase_body );
+let softLinksRebase = _.routineUnite( filesFindRecursive.head, softLinksRebase_body );
 
 //
 

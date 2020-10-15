@@ -19,8 +19,8 @@ submodule :
   wGdfStrategy :
     path : npm:///wgdf
     enabled : 0 # submodule
-  wRoutineBasic :
-    path : npm:///wroutinebasic
+  wIntrospectorBasic :
+    path : npm:///wintrospectorbasic
     enabled : 0 # submodule
   wPathBasic :
     path : npm:///wpathbasic

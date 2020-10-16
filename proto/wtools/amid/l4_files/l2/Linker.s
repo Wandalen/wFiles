@@ -1204,7 +1204,7 @@ function functor( fop )
   having.driving = 0;
   having.aspect = 'body';
 
-  let linkEntry = _.routineUnite( functor_head, link_body, entryMethodName );
+  let linkEntry = _.routineUnite({ head : functor_head, body : link_body, name : entryMethodName });
 
   var having = linkEntry.having;
   having.aspect = 'entry';

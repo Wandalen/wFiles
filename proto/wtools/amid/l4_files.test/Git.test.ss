@@ -1056,7 +1056,6 @@ function filesReflectEol( test )
 
   /* */
 
-  debugger;
   let config = _.process.start
   ({
     execPath : 'git config --get --global core.autocrlf',
@@ -1065,7 +1064,7 @@ function filesReflectEol( test )
     throwingExitCode : 0,
   });
 
-  if( config.exitCode !== 0 )
+  if( config.exitCode !== 0 && process.env.CI === undefined )
   {
     test.is( true );
     return;

@@ -418,11 +418,12 @@ function filesReflectSingle_body( o )
     ready
     .ifNoErrorThen( function( arg )
     {
-      _.assert( arg.length === 2 );
-      localChanges = _.strHasAny( arg[ 0 ].output, [ 'Changes to be committed', 'Changes not staged for commit' ] );
-      mergeIsNeeded = !_.strHasAny( arg[ 0 ].output, [ 'Your branch is up to date', 'Your branch is up-to-date' ] );
+      let args = arg.runs;
+      _.assert( args.length === 2 );
+      localChanges = _.strHasAny( args[ 0 ].output, [ 'Changes to be committed', 'Changes not staged for commit' ] );
+      mergeIsNeeded = !_.strHasAny( args[ 0 ].output, [ 'Your branch is up to date', 'Your branch is up-to-date' ] );
       if( parsed.tag )
-      tagIsBranchName = _.strHas( arg[ 1 ].output, parsed.tag );
+      tagIsBranchName = _.strHas( args[ 1 ].output, parsed.tag );
       return localChanges;
     })
   }

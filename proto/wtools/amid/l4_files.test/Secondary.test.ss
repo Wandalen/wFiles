@@ -1222,7 +1222,7 @@ function fileSize( test )
       else
       test.equivalent( got, 15 );
     });
-    return _.Consequence.And_( check1, check2 );
+    return _.Consequence.And( check1, check2 );
   })
 
   return ready;

@@ -781,7 +781,6 @@ function filesReflectNoStashing( test )
   let path = context.providerDst.path;
   let testPath = path.join( context.suiteTempPath, 'routine-' + test.name );
   let localPath = path.join( testPath, 'wPathBasic' );
-  debugger;
   let clonePathGlobal = providerDst.path.globalFromPreferred( localPath );
 
   let con = new _.Consequence().take( null )
@@ -1054,6 +1053,24 @@ function filesReflectEol( test )
   let repoPath = path.join( testPath, 'repo' );
   let expectedHash1, expectedHash2;
   let con = new _.Consequence().take( null );
+
+  /* */
+
+  let config = _.process.start
+  ({
+    execPath : 'git config --get --global core.autocrlf',
+    sync : 1,
+    outputCollecting : 1,
+    throwingExitCode : 0,
+  });
+
+  if( config.exitCode !== 0 && !_.process.insideTestContainer() )
+  {
+    test.is( true );
+    return;
+  }
+
+  /* */
 
   prepare();
 

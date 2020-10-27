@@ -5540,7 +5540,7 @@ fileDelete.having.aspect = 'entry';
 
 //
 
-let fileResolvedDelete = _.routineUnite( _preFilePathScalarWithProviderDefaults, fileDelete_body, 'fileResolvedDelete' );
+let fileResolvedDelete = _.routineUnite({ head : _preFilePathScalarWithProviderDefaults, body : fileDelete_body, name : 'fileResolvedDelete' });
 fileResolvedDelete.defaults.resolvingSoftLink = null;
 fileResolvedDelete.defaults.resolvingTextLink = null;
 fileResolvedDelete.having.aspect = 'entry';

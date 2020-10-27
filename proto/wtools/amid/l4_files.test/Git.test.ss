@@ -1064,7 +1064,7 @@ function filesReflectEol( test )
     throwingExitCode : 0,
   });
 
-  if( config.exitCode !== 0 && process.env.CI === undefined )
+  if( config.exitCode !== 0 && !_.process.insideTestContainer() )
   {
     test.is( true );
     return;

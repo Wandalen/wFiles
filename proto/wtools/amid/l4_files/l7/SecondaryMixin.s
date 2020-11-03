@@ -578,6 +578,82 @@ var filesAreUpToDate2 = _.routineUnite( filesAreUpToDate2_head, filesAreUpToDate
 
 //
 
+function filesAreOnSameDevice_head( routine, args )
+{
+  var o = args[ 0 ];
+
+  _.assert( args.length === 1 || args.length === 2 );
+  _.assert( arguments.length === 2 );
+  
+  if( args.length === 2 )
+  {
+    o = { src : args[ 0 ], dst : args[ 1 ] }
+  }
+
+  _.routineOptions( routine, o );
+  
+  _.assert( _.strDefined( o.src ) );
+  _.assert( _.strDefined( o.dst ) );
+
+  return o;
+}
+
+//
+
+function filesAreOnSameDevice_body( o )
+{
+  let self = this;
+  
+  let src = 
+  {
+    filePath : o.src,
+    resolvingSoftLink : 1,
+    throwing : 0
+  }
+  self.pathResolveLinkFull( src );
+  
+  let dst = 
+  {
+    filePath : o.dst,
+    resolvingSoftLink : 1,
+    throwing : 0
+  }
+  self.pathResolveLinkFull( dst );
+  
+  if( !src.stat || !dst.stat )
+  {
+    let trace = self.path.traceToRoot( o.src );
+    if( !trace.length )
+    {
+      _.assert( o.filePath === '/' );
+      trace = [ o.filePath ];
+    }
+    else if( trace.length > 1 )
+    trace.shift();
+    
+    let common = self.path.common( o.dst, trace[ 0 ] );
+    return common === trace[ 0 ];
+  }
+  
+  return src.stat.dev === dst.stat.dev;
+}
+
+filesAreOnSameDevice_body.defaults =
+{
+  src : null, 
+  dst : null
+}
+
+var having = filesAreOnSameDevice_body.having = Object.create( null );
+
+having.writing = 0;
+having.reading = 1;
+having.driving = 0;
+
+var filesAreOnSameDevice = _.routineUnite( filesAreOnSameDevice_head, filesAreOnSameDevice_body );
+
+//
+
 /**
  * @summary Calculates date resolution time in milliseconds for current file system.
  * @function systemBitrateTimeGet
@@ -803,6 +879,7 @@ let Supplement =
 
   // filesAreUpToDate,
   filesAreUpToDate2,
+  filesAreOnSameDevice,
 
   filesSearchText,
 

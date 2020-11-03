@@ -3472,6 +3472,96 @@ function filesAreUpToDate2( test )
 //   return con;
 // }
 
+//
+
+function filesAreOnSameDevice( test )
+{
+  let context = this;
+  let filesTree = 
+  {
+    a : 
+    {
+      b : 'b',
+      c : 'c'
+    },
+    b : 
+    {
+      d : 'd'
+    },
+    
+    'softLink1' : [{ softLink : '../a/b'}],
+    'softLink2' : [{ softLink : '../a/c'}],
+    'softLink3' : [{ softLink : '../b/d'}],
+  }
+  
+  let extraStats = 
+  {
+    '/a/b' : { dev : 1 },
+    '/a/c' : { dev : 1 },
+    '/b/d' : { dev : 2 },
+  }
+  
+  let provider = new _.FileProvider.Extract({ filesTree });
+  _.mapSupplement( provider.extraStats, extraStats );
+
+  test.case = 'same path, does not exist'
+  var testPath = '/a/b';
+  var got = provider.filesAreOnSameDevice( testPath, testPath );
+  test.identical( got, true );
+  
+  test.case = 'same path, exists'
+  var testPath = '/a/b';
+  var got = provider.filesAreOnSameDevice( testPath, testPath );
+  test.identical( got, true );
+  
+  test.case = 'different paths, same device, paths do not exist'
+  var testPath1 = '/a/b'
+  var testPath2 = '/a/c';
+  var got = provider.filesAreOnSameDevice( testPath1, testPath2 );
+  test.identical( got, true );
+  
+  test.case = 'different paths, same device, paths exist'
+  var testPath1 = '/a/b'
+  var testPath2 = '/a/c';
+  var got = provider.filesAreOnSameDevice( testPath1, testPath2 );
+  
+  test.case = 'different devices, paths do not exist'
+  var testPath1 = '/a/x';
+  var testPath2 = '/b/x';
+  var got = provider.filesAreOnSameDevice( testPath1, testPath2 );
+  test.identical( got, false );
+  
+  test.case = 'different devices, paths exist'
+  var testPath1 = '/a/b';
+  var testPath2 = '/b/d';
+  var got = provider.filesAreOnSameDevice( testPath1, testPath2 );
+  test.identical( got, false );
+  
+  test.case = 'different devices, first path does not exist'
+  var testPath1 = '/a/x';
+  var testPath2 = '/b/d';
+  var got = provider.filesAreOnSameDevice( testPath1, testPath2 );
+  test.identical( got, false );
+  
+  test.case = 'different devices, second path does not exist'
+  var testPath1 = '/a/b';
+  var testPath2 = '/b/x';
+  var got = provider.filesAreOnSameDevice( testPath1, testPath2 );
+  test.identical( got, false );
+  
+  test.case = 'soft links on same device'
+  var testPath1 = '/softLink1';
+  var testPath2 = '/softLink2';
+  var got = provider.filesAreOnSameDevice( testPath1, testPath2 );
+  test.identical( got, true );
+  
+  test.case = 'soft links to different devices'
+  var testPath1 = '/softLink1';
+  var testPath2 = '/softLink3';
+  var got = provider.filesAreOnSameDevice( testPath1, testPath2 );
+  test.identical( got, false );
+}
+
 // --
 // proto
 // --
@@ -3534,6 +3624,8 @@ let Self =
     // filesList,
 
     // testDelaySample,
+    
+    filesAreOnSameDevice
 
   }
 

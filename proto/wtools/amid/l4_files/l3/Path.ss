@@ -561,7 +561,7 @@ function pathDirTempMake( o )
   //
 
   let osTempDir = self.dirTemp();
-  let sameDevice = onSameDeviceWithOs();
+  let sameDevice = self.fileProvider.filesAreOnSameDevice( o.filePath, osTempDir );
   
   if( sameDevice )
   {
@@ -637,35 +637,6 @@ function pathDirTempMake( o )
 
   return end();
   
-  /* */
-  
-  function onSameDeviceWithOs()
-  {
-    let o1 = 
-    {
-      filePath : o.filePath,
-      resolvingSoftLink : 1,
-      throwing : 0
-    }
-    self.fileProvider.pathResolveLinkFull( o1 );
-    
-    let o2 = 
-    {
-      filePath : osTempDir,
-      resolvingSoftLink : 1,
-      throwing : 0
-    }
-    self.fileProvider.pathResolveLinkFull( o2 );
-    
-    if( !o1.stat || !o2.stat )
-    {
-      let common = self.common( osTempDir, trace[ 0 ] )
-      return common === trace[ 0 ];
-    }
-    
-    return o1.stat.dev === o2.stat.dev;
-  }
-
   /* */
 
   function end()

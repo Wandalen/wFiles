@@ -340,22 +340,21 @@ function tempOpen( o )
 
   function end()
   {
+    if( o.returnResolved )
+    result = self.fileProvider.pathResolveLinkFull
+    ({
+      filePath : result,
+      resolvingSoftLink : 1
+    }).absolutePath;
+    
     if( count[ result ] === undefined )
     count[ result ] = [];
 
     count[ result ].push( o.filePath );
 
     cache[ o.filePath ] = result;
-
-    if( !o.returnResolved )
+    
     return result;
-
-    result = self.fileProvider.pathResolveLinkFull
-    ({
-      filePath : result,
-      resolvingSoftLink : 1
-    });
-    return result.absolutePath;
   }
 }
 
@@ -562,9 +561,9 @@ function pathDirTempMake( o )
   //
 
   let osTempDir = self.dirTemp();
-  let common = self.common( osTempDir, trace[ 0 ] )
-
-  if( common === trace[ 0 ] )
+  let sameDevice = onSameDeviceWithOs();
+  
+  if( sameDevice )
   {
     filePath = self.join( osTempDir, o.name );
     self.fileProvider.dirMake( filePath );
@@ -637,6 +636,35 @@ function pathDirTempMake( o )
   }
 
   return end();
+  
+  /* */
+  
+  function onSameDeviceWithOs()
+  {
+    let o1 = 
+    {
+      filePath : o.filePath,
+      resolvingSoftLink : 1,
+      throwing : 0
+    }
+    self.fileProvider.pathResolveLinkFull( o1 );
+    
+    let o2 = 
+    {
+      filePath : osTempDir,
+      resolvingSoftLink : 1,
+      throwing : 0
+    }
+    self.fileProvider.pathResolveLinkFull( o2 );
+    
+    if( !o1.stat || !o2.stat )
+    {
+      let common = self.common( osTempDir, trace[ 0 ] )
+      return common === trace[ 0 ];
+    }
+    
+    return o1.stat.dev === o2.stat.dev;
+  }
 
   /* */
 
@@ -1371,14 +1399,14 @@ function _firstAvailable_head( routine, args )
 function _firstAvailable_body( o )
 {
   let path = this;
-  let fileProvdier = path.fileProvider;
+  let fileProvider = path.fileProvider;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
   for( let p = 0 ; p < o.paths.length ; p++ )
   {
     let path = o.paths[ p ];
-    if( fileProvdier.fileExists( o.onPath ? o.onPath.call( o, path, p ) : path ) )
+    if( fileProvider.fileExists( o.onPath ? o.onPath.call( o, path, p ) : path ) )
     return path;
   }
 

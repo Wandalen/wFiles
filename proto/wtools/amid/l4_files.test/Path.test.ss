@@ -1299,7 +1299,7 @@ function pathDirTempReturnResolved( test )
   clear();
   var filePath1 = '/temp/dir2'
   var got1 = extract.path.tempOpen({ filePath : filePath1, name, returnResolved : 1 });
-  test.notIdentical( cache[ filePath1 ], got1 );
+  test.identical( cache[ filePath1 ], got1 );
   test.is( _.strBegins( got1, '/_temp' ) );
   test.is( _.strHas( got1, name ) );
   test.is( extract.isDir( got1 ) );
@@ -1323,7 +1323,7 @@ function pathDirTempReturnResolved( test )
   extract.dirMake( '/dir4' );
   extract.softLink( '/dir2', '/dir4' );
   var got1 = extract.path.tempOpen({ filePath : filePath1, name, returnResolved : 1 });
-  test.notIdentical( cache[ filePath1 ], got1 );
+  test.identical( cache[ filePath1 ], got1 );
   test.is( _.strBegins( got1, '/dir4' ) );
   test.is( _.strHas( got1, name ) );
   test.is( extract.isDir( got1 ) );
@@ -1339,6 +1339,75 @@ function pathDirTempReturnResolved( test )
   }
 
 }
+
+//
+
+function tempOpenSystemPath( test )
+{
+  let provider = new _.FileProvider.Extract();
+  let name = 'tempOpenSystemPath'
+  let osTempPath = provider.path.dirTemp();
+  provider.dirMake( osTempPath );
+  
+  /* - */
+  
+  test.open( 'filePath and Os temp dir are on same device' )
+  
+  test.case = 'target path does not exist'
+  var filePath = '/dir1';
+  var got = provider.path.tempOpen({ filePath, name });
+  var expectedBegin = '/dir1/Temp/tempOpenSystemPath-';
+  test.is( _.strBegins( got, expectedBegin ) )
+  test.is( _.strEnds( got, '.tmp' ) );
+  test.is( provider.isDir( got ) );
+  provider.path.tempClose();
+  
+  test.case = 'target path does not exist, but has common with os temp path'
+  var filePath = provider.path.join( osTempPath, 'dir1' );
+  var got = provider.path.tempOpen({ filePath, name });
+  var expectedBegin = provider.path.join( osTempPath, 'tempOpenSystemPath-' );
+  test.is( _.strBegins( got, expectedBegin ) )
+  test.is( _.strEnds( got, '.tmp' ) );
+  test.is( provider.isDir( got ) );
+  provider.path.tempClose();
+  
+  //
+  
+  test.case = 'target path exists'
+  var filePath = '/dir1';
+  provider.dirMake( filePath );
+  var got = provider.path.tempOpen({ filePath, name });
+  var expectedBegin = provider.path.join( osTempPath, 'tempOpenSystemPath-' );
+  test.is( _.strBegins( got, expectedBegin ) )
+  test.is( _.strEnds( got, '.tmp' ) );
+  test.is( provider.isDir( got ) );
+  
+  //
+  
+  test.case = 'target path is an empty soft link'
+  var filePath = '/dir1/' + _.idWithDateAndTime();
+  var srcPath = '/dir1/' + _.idWithDateAndTime();
+  provider.softLink({ dstPath : filePath, srcPath, allowingMissed : 1 });
+  var got = provider.path.tempOpen({ filePath, name });
+  var expectedBegin = provider.path.join( osTempPath, 'tempOpenSystemPath-' );
+  console.log( got )
+  test.is( _.strBegins( got, expectedBegin ) )
+  test.is( _.strEnds( got, '.tmp' ) );
+  test.is( provider.isDir( got ) );
+  
+  test.close( 'filePath and Os temp dir are on same device' )
+  
+  /* - */
+  
+  provider.path.tempClose();
+  provider.finit();
+}
+
+tempOpenSystemPath.description = 
+`
+Checks that routine path.tempOpen returns temp path that includes os temp dir
+if both paths are on the same device
+`
 
 // --
 // next pathDirTemp* tests
@@ -1830,7 +1899,8 @@ let Self =
 
     pathDirTemp,
     tempCloseAfter,
-    pathDirTempReturnResolved
+    pathDirTempReturnResolved,
+    tempOpenSystemPath,
 
     //
 

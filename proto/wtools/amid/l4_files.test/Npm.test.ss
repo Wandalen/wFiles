@@ -44,26 +44,26 @@ function onSuiteEnd( test )
 function filesReflectTrivial( test )
 {
   let context = this;
+  let a = test.assetFor( false );
   let providerSrc = context.providerSrc;
   let providerDst = context.providerDst;
   let system = context.system;
   let path = context.providerDst.path;
-  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
-  let installPath = path.join( routinePath, 'wPathBasic' );
-  let installPathGlobal = providerDst.path.globalFromPreferred( installPath );
+  let installPathGlobal = providerDst.path.globalFromPreferred( a.abs( 'wPathBasic' ) );
 
-  let con = new _.Consequence().take( null )
+  a.fileProvider.dirMake( a.routinePath );
+  a.shell( 'npm i -g pacote' );
 
-  .then( () =>
+  a.ready.then( () =>
   {
     test.case = 'no hash, no trailing /';
-    providerDst.filesDelete( installPath );
+    providerDst.filesDelete( a.abs( 'wPathBasic' ) );
     let remotePath = 'npm:///wpathbasic';
     return system.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
   })
   .then( ( got ) =>
   {
-    let files = providerDst.dirRead( installPath );
+    let files = providerDst.dirRead( a.abs( 'wPathBasic' ) );
     let expected =
     [
       'LICENSE',
@@ -75,19 +75,27 @@ function filesReflectTrivial( test )
     test.contains( files.sort(), expected.sort() );
     return got;
   })
+  a.shell( 'pacote manifest wpathbasic' )
+  .then( ( op ) =>
+  {
+    test.identical( op.exitCode, 0 );
+    debugger;
+    test.identical( _.strCount( op.output, '"_from": "wpathbasic@"' ), 1 );
+    return null;
+  })
 
   /*  */
 
   .then( () =>
   {
     test.case = 'no hash, with trailing /';
-    providerDst.filesDelete( installPath );
+    providerDst.filesDelete( a.abs( 'wPathBasic' ) );
     let remotePath = 'npm:///wpathbasic/'
     return system.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
   })
   .then( ( got ) =>
   {
-    let files = providerDst.dirRead( installPath );
+    let files = providerDst.dirRead( a.abs( 'wPathBasic' ) );
     let expected =
     [
       'LICENSE',
@@ -105,7 +113,7 @@ function filesReflectTrivial( test )
   .then( () =>
   {
     test.case = 'already exists';
-    providerDst.filesDelete( installPath );
+    providerDst.filesDelete( a.abs( 'wPathBasic' ) );
     let remotePath = 'npm:///wpathbasic';
     let o = { reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 };
     system.filesReflect( _.cloneJust( o ) )
@@ -113,7 +121,7 @@ function filesReflectTrivial( test )
   })
   .then( ( got ) =>
   {
-    let files = providerDst.dirRead( installPath );
+    let files = providerDst.dirRead( a.abs( 'wPathBasic' ) );
     let expected =
     [
       'LICENSE',
@@ -131,13 +139,13 @@ function filesReflectTrivial( test )
   .then( () =>
   {
     test.case = 'specific version';
-    providerDst.filesDelete( installPath );
+    providerDst.filesDelete( a.abs( 'wPathBasic' ) );
     let remotePath = 'npm:///wpathbasic#0.7.1'
     return system.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
   })
   .then( ( got ) =>
   {
-    let files = providerDst.dirRead( installPath );
+    let files = providerDst.dirRead( a.abs( 'wPathBasic' ) );
     let expected =
     [
       'LICENSE',
@@ -147,24 +155,31 @@ function filesReflectTrivial( test )
       'proto'
     ]
     test.identical( files.sort(), expected.sort() );
-    var packagePath = providerDst.path.join( installPath, 'package.json' );
+    var packagePath = providerDst.path.join( a.abs( 'wPathBasic' ), 'package.json' );
     var packageRead = providerDst.fileRead({ filePath : packagePath, encoding : 'json' });
     test.identical( packageRead.version, '0.7.1' )
     return got;
   })
+  a.shell( 'pacote manifest wpathbasic@0.7.1' )
+  .then( ( op ) =>
+  {
+    test.identical( op.exitCode, 0 );
+    test.identical( _.strCount( op.output, '"_from": "wpathbasic@0.7.1"' ), 1 );
+    return null;
+  })
 
   /*  */
 
-  .then( () =>
+  a.ready.then( () =>
   {
     test.case = 'specific tag';
-    providerDst.filesDelete( installPath );
+    providerDst.filesDelete( a.abs( 'wPathBasic' ) );
     let remotePath = 'npm:///wpathbasic!latest'
     return system.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
   })
   .then( ( got ) =>
   {
-    let files = providerDst.dirRead( installPath );
+    let files = providerDst.dirRead( a.abs( 'wPathBasic' ) );
     let expected =
     [
       'LICENSE',
@@ -172,12 +187,20 @@ function filesReflectTrivial( test )
       'README.md',
       'proto',
       'node_modules',
-    ]
+    ];
     test.identical( files.sort(), expected.sort() );
-    var packagePath = providerDst.path.join( installPath, 'package.json' );
+    var packagePath = providerDst.path.join( a.abs( 'wPathBasic' ), 'package.json' );
     var packageRead = providerDst.fileRead({ filePath : packagePath, encoding : 'json' });
+    if( packageRead._requested )
     test.identical( packageRead._requested.fetchSpec, 'latest' )
     return got;
+  })
+  a.shell( 'pacote manifest wpathbasic@latest' )
+  .then( ( op ) =>
+  {
+    test.identical( op.exitCode, 0 );
+    test.identical( _.strCount( op.output, '"_from": "wpathbasic@latest"' ), 1 );
+    return null;
   })
 
   /*  */
@@ -185,13 +208,13 @@ function filesReflectTrivial( test )
   .then( () =>
   {
     test.case = 'specific tag';
-    providerDst.filesDelete( installPath );
+    providerDst.filesDelete( a.abs( 'wPathBasic' ) );
     let remotePath = 'npm:///wpathbasic!beta'
     return system.filesReflect({ reflectMap : { [ remotePath ] : installPathGlobal }, verbosity : 3 });
   })
   .then( ( got ) =>
   {
-    let files = providerDst.dirRead( installPath );
+    let files = providerDst.dirRead( a.abs( 'wPathBasic' ) );
     let expected =
     [
       'LICENSE',
@@ -201,10 +224,18 @@ function filesReflectTrivial( test )
       'node_modules',
     ]
     test.identical( files.sort(), expected.sort() );
-    var packagePath = providerDst.path.join( installPath, 'package.json' );
+    var packagePath = providerDst.path.join( a.abs( 'wPathBasic' ), 'package.json' );
     var packageRead = providerDst.fileRead({ filePath : packagePath, encoding : 'json' });
+    if( packageRead._requested )
     test.identical( packageRead._requested.fetchSpec, 'beta' )
     return got;
+  })
+  a.shell( 'pacote manifest wpathbasic@beta' )
+  .then( ( op ) =>
+  {
+    test.identical( op.exitCode, 0 );
+    test.identical( _.strCount( op.output, '"_from": "wpathbasic@beta"' ), 1 );
+    return null;
   })
 
   /*  */
@@ -212,8 +243,8 @@ function filesReflectTrivial( test )
   .then( () =>
   {
     test.case = 'path is occupied';
-    providerDst.filesDelete( installPath );
-    providerDst.fileWrite( installPath, installPath );
+    providerDst.filesDelete( a.abs( 'wPathBasic' ) );
+    providerDst.fileWrite( a.abs( 'wPathBasic' ), a.abs( 'wPathBasic' ) );
     let remotePath = 'npm:///wpathbasic';
     return test.shouldThrowErrorSync
     (
@@ -222,7 +253,7 @@ function filesReflectTrivial( test )
   })
   .then( () =>
   {
-    test.is( providerDst.isTerminal( installPath ) );
+    test.is( providerDst.isTerminal( a.abs( 'wPathBasic' ) ) );
     return null;
   })
 
@@ -231,7 +262,7 @@ function filesReflectTrivial( test )
   .then( () =>
   {
     test.case = 'wrong package name';
-    providerDst.filesDelete( installPath );
+    providerDst.filesDelete( a.abs( 'wPathBasic' ) );
     let remotePath = 'npm:///wpathbasicc';
     return test.shouldThrowErrorSync
     (
@@ -240,11 +271,11 @@ function filesReflectTrivial( test )
   })
   .then( () =>
   {
-    test.is( !providerDst.fileExists( installPath ) );
+    test.is( !providerDst.fileExists( a.abs( 'wPathBasic' ) ) );
     return null;
   })
 
-  return con;
+  return a.ready;
 }
 
 filesReflectTrivial.timeOut = 120000;

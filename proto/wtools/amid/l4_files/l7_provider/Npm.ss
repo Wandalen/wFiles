@@ -378,6 +378,7 @@ function filesReflectSingle_body( o )
   /* */
 
   let tmpPath = dstPath + '-' + _.idWithGuid();
+  localProvider.dirMake( tmpPath );
   let tmpEssentialPath = path.join( tmpPath, 'node_modules', parsed.remoteVcsPath );
 
   if( o.extra.usingNpm )
@@ -394,11 +395,11 @@ function filesReflectSingle_body( o )
     _.assert( got.exitCode === 0 );
 
     localProvider.fileRename( dstPath, tmpEssentialPath )
-    localProvider.fileDelete( path.dir( tmpEssentialPath ) );
+    localProvider.filesDelete( path.dir( tmpEssentialPath ) );
     let etcDirPath = path.join( tmpEssentialPath, '../../etc' );
     if( localProvider.fileExists( etcDirPath ) )
     localProvider.fileDelete( etcDirPath );
-    localProvider.fileDelete( path.dir( path.dir( tmpEssentialPath ) ) );
+    localProvider.filesDelete( path.dir( path.dir( tmpEssentialPath ) ) );
 
     return recordsMake();
   }

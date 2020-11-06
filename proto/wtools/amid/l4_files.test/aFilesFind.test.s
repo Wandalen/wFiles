@@ -22354,7 +22354,7 @@ function filesReflectOnlyPreserving( test )
 
 } /* end of function filesReflectOnlyPreserving */
 
-filesReflectOnlyPreserving.timeOut = 300000;
+filesReflectOnlyPreserving.timeOut = 600000;
 
 //
 

@@ -1266,6 +1266,8 @@ program();
   }
 }
 
+tempCloseAfter.timeOut = 15000;
+
 tempCloseAfter.description =
 `
   Try to manully close temp dir after automatic close leads to an error.
@@ -1348,11 +1350,11 @@ function tempOpenSystemPath( test )
   let name = 'tempOpenSystemPath'
   let osTempPath = provider.path.dirTemp();
   provider.dirMake( osTempPath );
-  
+
   /* - */
-  
+
   test.open( 'filePath and Os temp dir are on same device' )
-  
+
   test.case = 'target path does not exist'
   var filePath = '/dir1';
   var got = provider.path.tempOpen({ filePath, name });
@@ -1361,7 +1363,7 @@ function tempOpenSystemPath( test )
   test.is( _.strEnds( got, '.tmp' ) );
   test.is( provider.isDir( got ) );
   provider.path.tempClose();
-  
+
   test.case = 'target path does not exist, but has common with os temp path'
   var filePath = provider.path.join( osTempPath, 'dir1' );
   var got = provider.path.tempOpen({ filePath, name });
@@ -1370,9 +1372,9 @@ function tempOpenSystemPath( test )
   test.is( _.strEnds( got, '.tmp' ) );
   test.is( provider.isDir( got ) );
   provider.path.tempClose();
-  
+
   //
-  
+
   test.case = 'target path exists'
   var filePath = '/dir1';
   provider.dirMake( filePath );
@@ -1381,9 +1383,9 @@ function tempOpenSystemPath( test )
   test.is( _.strBegins( got, expectedBegin ) )
   test.is( _.strEnds( got, '.tmp' ) );
   test.is( provider.isDir( got ) );
-  
+
   //
-  
+
   test.case = 'target path is an empty soft link'
   var filePath = '/dir1/' + _.idWithDateAndTime();
   var srcPath = '/dir1/' + _.idWithDateAndTime();
@@ -1394,16 +1396,16 @@ function tempOpenSystemPath( test )
   test.is( _.strBegins( got, expectedBegin ) )
   test.is( _.strEnds( got, '.tmp' ) );
   test.is( provider.isDir( got ) );
-  
+
   test.close( 'filePath and Os temp dir are on same device' )
-  
+
   /* - */
-  
+
   provider.path.tempClose();
   provider.finit();
 }
 
-tempOpenSystemPath.description = 
+tempOpenSystemPath.description =
 `
 Checks that routine path.tempOpen returns temp path that includes os temp dir
 if both paths are on the same device

@@ -37516,6 +37516,8 @@ function isTerminal( test )
 
 };
 
+isTerminal.timeOut = 60000;
+
 //
 
 function isSoftLink( test )
@@ -39647,6 +39649,8 @@ function isHardLink( test )
   provider.fieldPop( 'usingTextLink', 1 );
 }
 
+isHardLink.timeOut = 60000;
+
 //
 
 function isLink( test )
@@ -41101,6 +41105,8 @@ function isLink( test )
 
   provider.fieldPop( 'usingTextLink', 1 );
 }
+
+isLink.timeOut = 60000;
 
 //
 
@@ -50540,6 +50546,8 @@ total : 36
   test.close( 'src === dst' );
 
 }
+
+hardLinkReturnSync.timeOut = 60000;
 
 //
 

@@ -52,7 +52,7 @@ function filesReflectTrivial( test )
   let installPathGlobal = providerDst.path.globalFromPreferred( a.abs( 'wPathBasic' ) );
 
   a.fileProvider.dirMake( a.routinePath );
-  a.shell( 'npm i pacote --prefix ./' );
+  a.shell({ execPath : 'npm i pacote --no-package-lock' });
 
   a.ready.then( () =>
   {
@@ -73,10 +73,9 @@ function filesReflectTrivial( test )
       'node_modules',
     ]
     test.contains( files.sort(), expected.sort() );
-    debugger;
     return got;
   })
-  a.shell( 'node node_modules/.bin/pacote manifest wpathbasic' )
+  a.shell( './node_modules/.bin/pacote manifest wpathbasic' )
   .then( ( op ) =>
   {
     test.identical( op.exitCode, 0 );
@@ -160,7 +159,7 @@ function filesReflectTrivial( test )
     test.identical( packageRead.version, '0.7.1' )
     return got;
   })
-  a.shell( 'node node_modules/.bin/pacote manifest wpathbasic@0.7.1' )
+  a.shell( './node_modules/.bin/pacote manifest wpathbasic@0.7.1' )
   .then( ( op ) =>
   {
     test.identical( op.exitCode, 0 );
@@ -195,7 +194,7 @@ function filesReflectTrivial( test )
     test.identical( packageRead._requested.fetchSpec, 'latest' )
     return got;
   })
-  a.shell( 'node node_modules/.bin/pacote manifest wpathbasic@latest' )
+  a.shell( 'node_modules/.bin/pacote manifest wpathbasic@latest' )
   .then( ( op ) =>
   {
     test.identical( op.exitCode, 0 );
@@ -230,7 +229,7 @@ function filesReflectTrivial( test )
     test.identical( packageRead._requested.fetchSpec, 'beta' )
     return got;
   })
-  a.shell( 'node node_modules/.bin/pacote manifest wpathbasic@beta' )
+  a.shell( 'node_modules/.bin/pacote manifest wpathbasic@beta' )
   .then( ( op ) =>
   {
     test.identical( op.exitCode, 0 );

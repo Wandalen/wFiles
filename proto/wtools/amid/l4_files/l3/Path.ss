@@ -281,11 +281,11 @@ function tempOpen( o )
 
   let id = self.fileProvider.id;
 
+  /* qqq : use single map */
   if( !PathDirTempForMap[ id ] )
   PathDirTempForMap[ id ] = Object.create( null );
   if( !PathDirTempCountMap[ id ] )
   PathDirTempCountMap[ id ] = Object.create( null );
-
 
   /* search in cache */
 
@@ -346,14 +346,14 @@ function tempOpen( o )
       filePath : result,
       resolvingSoftLink : 1
     }).absolutePath;
-    
+
     if( count[ result ] === undefined )
     count[ result ] = [];
 
     count[ result ].push( o.filePath );
 
     cache[ o.filePath ] = result;
-    
+
     return result;
   }
 }
@@ -562,7 +562,7 @@ function pathDirTempMake( o )
 
   let osTempDir = self.dirTemp();
   let sameDevice = self.fileProvider.filesAreOnSameDevice( o.filePath, osTempDir );
-  
+
   if( sameDevice )
   {
     filePath = self.join( osTempDir, o.name );
@@ -636,7 +636,7 @@ function pathDirTempMake( o )
   }
 
   return end();
-  
+
   /* */
 
   function end()

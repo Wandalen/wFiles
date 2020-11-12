@@ -1231,7 +1231,7 @@ function pathDirTemp( test )
 function tempCloseAfter( test )
 {
   let a = test.assetFor( false );
-  let toolsPath = _testerGlobal_.wTools.strEscape( a.path.nativize( a.path.join( __dirname, '../../../wtools/Tools.s' ) ) );
+  let toolsPath = _globals_.testing.wTools.strEscape( a.path.nativize( a.path.join( __dirname, '../../../wtools/Tools.s' ) ) );
   let programSourceCode =
 `
 var toolsPath = '${toolsPath}';
@@ -1735,7 +1735,7 @@ nextPathDirTempMultiplePathSameNamespace.description =
 function nextPathDirTempIndexLock( test )
 {
   let a = test.assetFor( false );
-  let toolsPath = _testerGlobal_.wTools.strEscape( a.path.nativize( a.path.join( __dirname, '../../amid/l3/files/UseTop.s' ) ) );
+  let toolsPath = _globals_.testing.wTools.strEscape( a.path.nativize( a.path.join( __dirname, '../../amid/l3/files/UseTop.s' ) ) );
   let programSourceCode =
   [
     `var toolsPath = '${toolsPath}';`,
@@ -1798,7 +1798,7 @@ Second process locks file when main releases it after two seconds.
 function nextPathDirTempIndexLockThrowing( test )
 {
   let a = test.assetFor( false );
-  let toolsPath = _testerGlobal_.wTools.strEscape( a.path.nativize( a.path.join( __dirname, '../../amid/l3/files/UseTop.s' ) ) );
+  let toolsPath = _globals_.testing.wTools.strEscape( a.path.nativize( a.path.join( __dirname, '../../amid/l3/files/UseTop.s' ) ) );
   let programSourceCode =
   [
     `var toolsPath = '${toolsPath}';`,

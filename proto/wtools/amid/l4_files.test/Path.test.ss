@@ -1259,7 +1259,7 @@ program();
     var tempPath = _.path.tempOpen( _.path.normalize( __dirname ), 'tempCloseAfter' );
     if( _.fileProvider.isDir( tempPath ) )
     console.log( 'tempDirCreated' );
-    _.process.on( 'available', _.event.Name( 'exit' ), () =>
+    _.process.on( _.event.Chain( 'available', 'exit' ), () =>
     {
       _.path.tempClose( tempPath )
     });

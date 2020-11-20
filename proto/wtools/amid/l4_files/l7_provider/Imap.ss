@@ -665,6 +665,7 @@ function statReadAct( o )
 
     if( parsed.isTerminal )
     {
+      debugger;
       let files = self.dirRead({ filePath : parsed.dirPath, throwing, sync });
       if( files === null || !_.longHas( files, parsed.fullName ) )
       {
@@ -1152,7 +1153,6 @@ function fileCopyAct( o )
       throw _.err( err );
 
       o.context.options.dstPath = self.pathUnmock( o.dstPath );
-      self._connection.closeBox( srcPath );
       return arg;
     });
 

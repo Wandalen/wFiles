@@ -112,7 +112,7 @@ function filesReflectTrivial( test )
       './sample',
     ]
 
-    test.is( _.arraySetContainAll( files, expected ) )
+    test.true( _.arraySetContainAll( files, expected ) )
     return got;
   })
 
@@ -151,7 +151,7 @@ function filesReflectTrivial( test )
       './sample',
     ]
 
-    test.is( _.arraySetContainAll( files, expected ) )
+    test.true( _.arraySetContainAll( files, expected ) )
     return got;
   })
 
@@ -190,7 +190,7 @@ function filesReflectTrivial( test )
       './sample',
     ]
 
-    test.is( _.arraySetContainAll( files, expected ) )
+    test.true( _.arraySetContainAll( files, expected ) )
     return got;
   })
 
@@ -260,7 +260,7 @@ function filesReflectTrivial( test )
       './sample',
     ]
 
-    test.is( _.arraySetContainAll( files, expected ) )
+    test.true( _.arraySetContainAll( files, expected ) )
     return got;
   })
 
@@ -309,7 +309,7 @@ function filesReflectTrivial( test )
       './sample',
     ]
 
-    test.is( _.arraySetContainAll( files, expected ) )
+    test.true( _.arraySetContainAll( files, expected ) )
     return got;
   })
 
@@ -346,7 +346,7 @@ function filesReflectTrivial( test )
       './sample'
     ]
 
-    test.is( _.arraySetContainAll( files, expected ) )
+    test.true( _.arraySetContainAll( files, expected ) )
     let packagePath = providerDst.path.join( localPath, 'package.json' );
     let packageRead = providerDst.fileRead
     ({
@@ -388,7 +388,7 @@ function filesReflectTrivial( test )
     {
       test.identical( got.exitCode, 0 );
       var exp = [ `Your branch is up to date with 'origin/master'.`, `Your branch is up-to-date with 'origin/master'.` ];
-      test.is( _.strHasAny( got.output, exp ) )
+      test.true( _.strHasAny( got.output, exp ) )
       return null;
     })
 
@@ -425,7 +425,7 @@ function filesReflectTrivial( test )
     ready.then( ( got ) =>
     {
       test.identical( got.exitCode, 0 );
-      test.is( _.strHas( got.output, `Your branch is ahead of 'origin/master' by 1 commit` ) )
+      test.true( _.strHas( got.output, `Your branch is ahead of 'origin/master' by 1 commit` ) )
       return null;
     })
 
@@ -440,8 +440,8 @@ function filesReflectTrivial( test )
     ready.then( ( got ) =>
     {
       test.identical( got.exitCode, 0 );
-      test.is( !_.strHas( got.output, `Merge remote-tracking branch 'refs/remotes/origin/master'` ) )
-      test.is( _.strHas( got.output, `emptycommit` ) )
+      test.true( !_.strHas( got.output, `Merge remote-tracking branch 'refs/remotes/origin/master'` ) )
+      test.true( _.strHas( got.output, `emptycommit` ) )
       return null;
     })
 
@@ -485,7 +485,7 @@ function filesReflectTrivial( test )
     ready.then( ( got ) =>
     {
       test.identical( got.exitCode, 0 );
-      test.is( _.strHas( got.output, `Your branch is ahead of 'origin/master' by 2 commits` ) )
+      test.true( _.strHas( got.output, `Your branch is ahead of 'origin/master' by 2 commits` ) )
       return null;
     })
 
@@ -500,8 +500,8 @@ function filesReflectTrivial( test )
     ready.then( ( got ) =>
     {
       test.identical( got.exitCode, 0 );
-      test.is( _.strHas( got.output, `Merge remote-tracking branch 'refs/remotes/origin/master'` ) )
-      test.is( _.strHas( got.output, `emptycommit` ) )
+      test.true( _.strHas( got.output, `Merge remote-tracking branch 'refs/remotes/origin/master'` ) )
+      test.true( _.strHas( got.output, `emptycommit` ) )
       return null;
     })
 
@@ -540,7 +540,7 @@ function filesReflectTrivial( test )
     {
       test.identical( got.exitCode, 0 );
       var exp = [ `Your branch is up to date with 'origin/master'.`, `Your branch is up-to-date with 'origin/master'.` ];
-      test.is( _.strHasAny( got.output, exp ) )
+      test.true( _.strHasAny( got.output, exp ) )
       return null;
     })
 
@@ -572,7 +572,7 @@ function filesReflectTrivial( test )
     {
       test.identical( got.exitCode, 0 );
       var exp = [ `Your branch is up to date with 'origin/master'.`, `Your branch is up-to-date with 'origin/master'.` ];
-      test.is( _.strHasAny( got.output, exp ) )
+      test.true( _.strHasAny( got.output, exp ) )
       return null;
     })
 
@@ -607,7 +607,7 @@ function filesReflectTrivial( test )
     ready.then( ( got ) =>
     {
       test.identical( got.exitCode, 0 );
-      test.is( _.strHas( got.output, `modified:   README.md` ) )
+      test.true( _.strHas( got.output, `modified:   README.md` ) )
       return null;
     })
 
@@ -628,7 +628,7 @@ function filesReflectTrivial( test )
     ready.then( ( got ) =>
     {
       test.identical( got.exitCode, 0 );
-      test.is( _.strHas( got.output, `modified:   README.md` ) )
+      test.true( _.strHas( got.output, `modified:   README.md` ) )
       return null;
     })
 
@@ -658,7 +658,7 @@ function filesReflectTrivial( test )
     {
       test.identical( got.exitCode, 0 );
       var exp = [ `Your branch is up to date with 'origin/master'.`, `Your branch is up-to-date with 'origin/master'.` ];
-      test.is( _.strHasAny( got.output, exp ) )
+      test.true( _.strHasAny( got.output, exp ) )
       return null;
     })
 
@@ -680,7 +680,7 @@ function filesReflectTrivial( test )
     {
       test.identical( got.exitCode, 0 );
       var exp = [ `Your branch is up to date with 'origin/master'.`, `Your branch is up-to-date with 'origin/master'.` ];
-      test.is( _.strHasAny( got.output, exp ) )
+      test.true( _.strHasAny( got.output, exp ) )
       return null;
     })
 
@@ -727,7 +727,7 @@ function filesReflectTrivial( test )
       './sample',
     ]
 
-    test.is( _.arraySetContainAll( files, expected ) );
+    test.true( _.arraySetContainAll( files, expected ) );
     return got;
   })
 
@@ -828,7 +828,7 @@ function filesReflectNoStashing( test )
     ready.then( ( got ) =>
     {
       test.identical( got.exitCode, 0 );
-      test.is( _.strHas( got.output, `modified:   README.md` ) )
+      test.true( _.strHas( got.output, `modified:   README.md` ) )
       return null;
     })
 
@@ -867,7 +867,7 @@ function filesReflectDownloadThrowing( test )
     return test.shouldThrowErrorAsync( ready )
     .then( ( got ) =>
     {
-      test.is( !providerDst.fileExists( localPath ) )
+      test.true( !providerDst.fileExists( localPath ) )
       return null;
     })
   })
@@ -882,7 +882,7 @@ function filesReflectDownloadThrowing( test )
     return test.shouldThrowErrorAsync( ready )
     .then( ( got ) =>
     {
-      test.is( !providerDst.fileExists( localPath ) )
+      test.true( !providerDst.fileExists( localPath ) )
       return null;
     })
   })
@@ -897,7 +897,7 @@ function filesReflectDownloadThrowing( test )
     return test.shouldThrowErrorAsync( ready )
     .then( ( got ) =>
     {
-      test.is( !providerDst.fileExists( localPath ) )
+      test.true( !providerDst.fileExists( localPath ) )
       return null;
     })
   })
@@ -912,7 +912,7 @@ function filesReflectDownloadThrowing( test )
     return test.shouldThrowErrorAsync( ready )
     .then( ( got ) =>
     {
-      test.is( !providerDst.fileExists( localPath ) )
+      test.true( !providerDst.fileExists( localPath ) )
       return null;
     })
   })
@@ -928,7 +928,7 @@ function filesReflectDownloadThrowing( test )
     return test.shouldThrowErrorAsync( ready )
     .then( ( got ) =>
     {
-      test.is( providerDst.fileExists( localPath ) );
+      test.true( providerDst.fileExists( localPath ) );
       test.identical( providerDst.dirRead( localPath ), [] );
       return null;
     })
@@ -965,7 +965,7 @@ function filesReflectDownloadThrowing( test )
     return test.shouldThrowErrorAsync( ready )
     .then( ( got ) =>
     {
-      test.is( providerDst.fileExists( localPath ) );
+      test.true( providerDst.fileExists( localPath ) );
       test.identical( providerDst.dirRead( localPath ), [ 'file' ] );
       return null;
     })
@@ -982,7 +982,7 @@ function filesReflectDownloadThrowing( test )
     return test.shouldThrowErrorAsync( ready )
     .then( ( got ) =>
     {
-      test.is( providerDst.isTerminal( localPath ) );
+      test.true( providerDst.isTerminal( localPath ) );
       return null;
     })
   })
@@ -1009,7 +1009,7 @@ function filesReflectDownloadThrowing( test )
       return test.shouldThrowErrorAsync( ready )
       .then( () =>
       {
-        test.is( providerDst.fileExists( localPath ) );
+        test.true( providerDst.fileExists( localPath ) );
         let filesAfter = find( localPath );
         test.identical( filesAfter, filesBefore );
         return null;
@@ -1028,7 +1028,7 @@ function filesReflectDownloadThrowing( test )
     test.shouldThrowErrorSync( () =>
     {
       system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 });
-      test.is( !providerDst.fileExists( localPath ) )
+      test.true( !providerDst.fileExists( localPath ) )
     })
     return null;
   })
@@ -1066,7 +1066,7 @@ function filesReflectEol( test )
 
   if( config.exitCode !== 0 && !_.process.insideTestContainer() )
   {
-    test.is( true );
+    test.true( true );
     return;
   }
 
@@ -1254,8 +1254,8 @@ function filesReflectEol( test )
     .then( ( got ) =>
     {
       test.identical( got.exitCode, 0 );
-      test.is( _.strHas( got.output, `Merge remote-tracking branch 'refs/remotes/origin/master'` ) )
-      test.is( _.strHas( got.output, `emptycommit` ) )
+      test.true( _.strHas( got.output, `Merge remote-tracking branch 'refs/remotes/origin/master'` ) )
+      test.true( _.strHas( got.output, `emptycommit` ) )
       return null;
     })
 
@@ -1319,8 +1319,8 @@ function filesReflectEol( test )
     .then( ( got ) =>
     {
       test.identical( got.exitCode, 0 );
-      test.is( _.strHas( got.output, `Merge remote-tracking branch 'refs/remotes/origin/master'` ) )
-      test.is( _.strHas( got.output, `emptycommit` ) )
+      test.true( _.strHas( got.output, `Merge remote-tracking branch 'refs/remotes/origin/master'` ) )
+      test.true( _.strHas( got.output, `emptycommit` ) )
       return null;
     })
 
@@ -1387,8 +1387,8 @@ function filesReflectEol( test )
     .then( ( got ) =>
     {
       test.identical( got.exitCode, 0 );
-      test.is( _.strHas( got.output, `Merge remote-tracking branch 'refs/remotes/origin/master'` ) )
-      test.is( _.strHas( got.output, `emptycommit` ) )
+      test.true( _.strHas( got.output, `Merge remote-tracking branch 'refs/remotes/origin/master'` ) )
+      test.true( _.strHas( got.output, `emptycommit` ) )
       return null;
     })
 

@@ -91,8 +91,8 @@ function trivial( test )
   var image = _.FileFilter.Image({ originalFileProvider : extract });
   var archive = new _.FilesGraphArchive({ imageFileProvider : image });
 
-  test.is( image.proxyImage === image );
-  test.is( image.archive === archive );
+  test.true( image.proxyImage === image );
+  test.true( image.archive === archive );
 
   archive.timelapseBegin();
 

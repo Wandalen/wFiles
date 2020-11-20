@@ -252,7 +252,7 @@ function filesReflectTrivial( test )
   })
   .then( () =>
   {
-    test.is( providerDst.isTerminal( a.abs( 'wPathBasic' ) ) );
+    test.true( providerDst.isTerminal( a.abs( 'wPathBasic' ) ) );
     return null;
   })
 
@@ -270,7 +270,7 @@ function filesReflectTrivial( test )
   })
   .then( () =>
   {
-    test.is( !providerDst.fileExists( a.abs( 'wPathBasic' ) ) );
+    test.true( !providerDst.fileExists( a.abs( 'wPathBasic' ) ) );
     return null;
   })
 
@@ -470,7 +470,7 @@ filesReflectTrivial.timeOut = 120000;
 //   })
 //   .then( ( got ) =>
 //   {
-//     test.is( providerDst.isTerminal( installPath ) );
+//     test.true( providerDst.isTerminal( installPath ) );
 //     return got;
 //   })
 

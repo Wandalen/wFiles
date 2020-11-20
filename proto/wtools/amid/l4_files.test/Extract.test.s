@@ -72,15 +72,15 @@ function copy( test )
 
   var extract1 = new _.FileProvider.Extract();
   var extract2 = new _.FileProvider.Extract({});
-  test.is( extract1.filesTree !== extract2.filesTree );
+  test.true( extract1.filesTree !== extract2.filesTree );
 
   test.case = 'from map with constructor';
 
   var op = { filesTree : {} }
   var extract1 = new _.FileProvider.Extract( op );
   var extract2 = new _.FileProvider.Extract( op );
-  test.is( op.filesTree === extract1.filesTree );
-  test.is( extract1.filesTree === extract2.filesTree );
+  test.true( op.filesTree === extract1.filesTree );
+  test.true( extract1.filesTree === extract2.filesTree );
 
   test.case = 'from map with copy';
 
@@ -88,8 +88,8 @@ function copy( test )
   var extract1 = new _.FileProvider.Extract( op );
   var extract2 = new _.FileProvider.Extract();
   extract2.copy( op );
-  test.is( op.filesTree === extract1.filesTree );
-  test.is( extract1.filesTree === extract2.filesTree );
+  test.true( op.filesTree === extract1.filesTree );
+  test.true( extract1.filesTree === extract2.filesTree );
 
   // /* zzz : fix that */
   //
@@ -98,8 +98,8 @@ function copy( test )
   // var op = { filesTree : {} }
   // var extract1 = new _.FileProvider.Extract( op );
   // var extract2 = new _.FileProvider.Extract( extract1 );
-  // test.is( op.filesTree === extract1.filesTree );
-  // test.is( extract1.filesTree !== extract2.filesTree );
+  // test.true( op.filesTree === extract1.filesTree );
+  // test.true( extract1.filesTree !== extract2.filesTree );
   //
   // test.case = 'from another instance with copy';
   //
@@ -107,8 +107,8 @@ function copy( test )
   // var extract1 = new _.FileProvider.Extract( op );
   // var extract2 = new _.FileProvider.Extract();
   // extract2.copy( extract1 );
-  // test.is( op.filesTree === extract1.filesTree );
-  // test.is( extract1.filesTree !== extract2.filesTree );
+  // test.true( op.filesTree === extract1.filesTree );
+  // test.true( extract1.filesTree !== extract2.filesTree );
   //
   // test.case = 'from another instance with clone';
   //
@@ -116,8 +116,8 @@ function copy( test )
   // var extract1 = new _.FileProvider.Extract( op );
   // var extract2 = extract1.clone();
   // extract2.copy( extract1 );
-  // test.is( op.filesTree === extract1.filesTree );
-  // test.is( extract1.filesTree !== extract2.filesTree );
+  // test.true( op.filesTree === extract1.filesTree );
+  // test.true( extract1.filesTree !== extract2.filesTree );
 
 }
 

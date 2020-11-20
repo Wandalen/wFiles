@@ -55,10 +55,10 @@ function filesReadOld( test )
   var read = _.fileProvider.filesReadOld({ paths : files, preset : 'js' });
 
   test.identical( read.errs, {} );
-  test.is( read.err === undefined );
-  test.is( _.arrayIs( read.read ) );
-  test.is( _.strIs( read.data ) );
-  test.is( read.data.indexOf( '======\n( function()' ) !== -1 );
+  test.true( read.err === undefined );
+  test.true( _.arrayIs( read.read ) );
+  test.true( _.strIs( read.data ) );
+  test.true( read.data.indexOf( '======\n( function()' ) !== -1 );
 
   /* */
 
@@ -123,8 +123,8 @@ function filesReadOld( test )
   var expectedData = fileNames.slice();
   expectedData.push( null );
   test.identical( result.data, expectedData );
-  test.is( _.errIs( result.errs[ paths.length - 1 ] ) );
-  test.is( _.errIs( result.err ) );
+  test.true( _.errIs( result.errs[ paths.length - 1 ] ) );
+  test.true( _.errIs( result.err ) );
 
   // logger.log( _.toStr( result, { levels : 99 } ) )
 }

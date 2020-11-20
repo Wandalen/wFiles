@@ -773,15 +773,15 @@ function recordForLink( test )
   var record = factory.record( pathLinkToMissing );
   test.identical( record.absolute, pathLinkToMissing );
   test.identical( record.real, pathLinkToMissing );
-  test.is( record.isSoftLink );
-  test.is( !record.isTerminal );
+  test.true( record.isSoftLink );
+  test.true( !record.isTerminal );
 
   var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 1 }).form();
   var record = factory.record( pathLinkToMissing );
   test.identical( record.absolute, pathLinkToMissing );
   test.identical( record.real, pathLinkToMissing );
-  test.is( record.isSoftLink );
-  test.is( !record.isTerminal );
+  test.true( record.isSoftLink );
+  test.true( !record.isTerminal );
 
   var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 0 }).form();
   test.shouldThrowErrorSync( () =>
@@ -794,9 +794,9 @@ function recordForLink( test )
   var record = factory.record( pathLinkToMissing );
   test.identical( record.absolute, pathLinkToMissing );
   test.identical( record.real, pathToMissing );
-  test.is( !record.isSoftLink );
-  test.is( !record.isTerminal );
-  test.is( !record.isDir );
+  test.true( !record.isSoftLink );
+  test.true( !record.isTerminal );
+  test.true( !record.isDir );
   test.identical( record.stat, null );
 
   test.case = 'link to link to missing';
@@ -805,15 +805,15 @@ function recordForLink( test )
   var record = factory.record( pathLinkToLinkToMissing );
   test.identical( record.absolute, pathLinkToLinkToMissing );
   test.identical( record.real, pathLinkToLinkToMissing );
-  test.is( record.isSoftLink );
-  test.is( !record.isTerminal );
+  test.true( record.isSoftLink );
+  test.true( !record.isTerminal );
 
   var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 1 }).form();
   var record = factory.record( pathLinkToLinkToMissing );
   test.identical( record.absolute, pathLinkToLinkToMissing );
   test.identical( record.real, pathLinkToLinkToMissing );
-  test.is( record.isSoftLink );
-  test.is( !record.isTerminal );
+  test.true( record.isSoftLink );
+  test.true( !record.isTerminal );
 
   var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 0 }).form();
   test.shouldThrowErrorSync( () =>
@@ -826,9 +826,9 @@ function recordForLink( test )
   var record = factory.record( pathLinkToLinkToMissing );
   test.identical( record.absolute, pathLinkToLinkToMissing );
   test.identical( record.real, pathToMissing );
-  test.is( !record.isSoftLink );
-  test.is( !record.isTerminal );
-  test.is( !record.isDir );
+  test.true( !record.isSoftLink );
+  test.true( !record.isTerminal );
+  test.true( !record.isDir );
   test.identical( record.stat, null );
 
   test.case = 'link to terminal';
@@ -837,15 +837,15 @@ function recordForLink( test )
   var record = factory.record( pathLinkToTerminal );
   test.identical( record.absolute, pathLinkToTerminal );
   test.identical( record.real, pathLinkToTerminal );
-  test.is( record.isSoftLink );
-  test.is( !record.isTerminal );
+  test.true( record.isSoftLink );
+  test.true( !record.isTerminal );
 
   var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1 }).form();
   var record = factory.record( pathLinkToTerminal );
   test.identical( record.absolute, pathLinkToTerminal );
   test.identical( record.real, pathTerminal );
-  test.is( !record.isSoftLink );
-  test.is( record.isTerminal );
+  test.true( !record.isSoftLink );
+  test.true( record.isTerminal );
 
   test.case = 'link to directory';
 
@@ -853,17 +853,17 @@ function recordForLink( test )
   var record = factory.record( pathLinkToDir );
   test.identical( record.absolute, pathLinkToDir );
   test.identical( record.real, pathLinkToDir );
-  test.is( record.isSoftLink );
-  test.is( !record.isTerminal );
-  test.is( !record.isDir );
+  test.true( record.isSoftLink );
+  test.true( !record.isTerminal );
+  test.true( !record.isDir );
 
   var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1 }).form();
   var record = factory.record( pathLinkToDir );
   test.identical( record.absolute, pathLinkToDir );
   test.identical( record.real, pathToDir );
-  test.is( !record.isSoftLink );
-  test.is( !record.isTerminal );
-  test.is( record.isDir );
+  test.true( !record.isSoftLink );
+  test.true( !record.isTerminal );
+  test.true( record.isDir );
 
   test.case = 'link - link - terminal';
 
@@ -871,15 +871,15 @@ function recordForLink( test )
   var record = factory.record( pathLinkToLinkToTerminal );
   test.identical( record.absolute, pathLinkToLinkToTerminal );
   test.identical( record.real, pathLinkToLinkToTerminal );
-  test.is( record.isSoftLink );
-  test.is( !record.isTerminal );
+  test.true( record.isSoftLink );
+  test.true( !record.isTerminal );
 
   var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1 }).form();
   var record = factory.record( pathLinkToLinkToTerminal );
   test.identical( record.absolute, pathLinkToLinkToTerminal );
   test.identical( record.real, pathTerminal );
-  test.is( !record.isSoftLink );
-  test.is( record.isTerminal );
+  test.true( !record.isSoftLink );
+  test.true( record.isTerminal );
 
   test.case = 'link - link - directory';
 
@@ -887,17 +887,17 @@ function recordForLink( test )
   var record = factory.record( pathLinkToLinkToDir );
   test.identical( record.absolute, pathLinkToLinkToDir );
   test.identical( record.real, pathLinkToLinkToDir );
-  test.is( record.isSoftLink );
-  test.is( !record.isTerminal );
-  test.is( !record.isDir );
+  test.true( record.isSoftLink );
+  test.true( !record.isTerminal );
+  test.true( !record.isDir );
 
   var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1 }).form();
   var record = factory.record( pathLinkToLinkToDir );
   test.identical( record.absolute, pathLinkToLinkToDir );
   test.identical( record.real, pathToDir );
-  test.is( !record.isSoftLink );
-  test.is( !record.isTerminal );
-  test.is( record.isDir );
+  test.true( !record.isSoftLink );
+  test.true( !record.isTerminal );
+  test.true( record.isDir );
 
   test.case = 'self cycled';
 
@@ -908,15 +908,15 @@ function recordForLink( test )
   var record = factory.record( pathSelfCycled );
   test.identical( record.absolute, pathSelfCycled );
   test.identical( record.real, pathSelfCycled );
-  test.is( record.isSoftLink );
-  test.is( !record.isTerminal );
+  test.true( record.isSoftLink );
+  test.true( !record.isTerminal );
 
   var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 1 }).form();
   var record = factory.record( pathSelfCycled );
   test.identical( record.absolute, pathSelfCycled );
   test.identical( record.real, pathSelfCycled );
-  test.is( record.isSoftLink );
-  test.is( !record.isTerminal );
+  test.true( record.isSoftLink );
+  test.true( !record.isTerminal );
 
   var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 0, allowingCycled : 0 }).form();
   test.shouldThrowErrorSync( () =>
@@ -929,8 +929,8 @@ function recordForLink( test )
   var record = factory.record( pathSelfCycled );
   test.identical( record.absolute, pathSelfCycled );
   test.identical( record.real, pathSelfCycled );
-  test.is( record.isSoftLink );
-  test.is( !record.isTerminal );
+  test.true( record.isSoftLink );
+  test.true( !record.isTerminal );
 
   test.case = 'cycled';
 
@@ -943,15 +943,15 @@ function recordForLink( test )
   var record = factory.record( pathA );
   test.identical( record.absolute, pathA );
   test.identical( record.real, pathA );
-  test.is( record.isSoftLink );
-  test.is( !record.isTerminal );
+  test.true( record.isSoftLink );
+  test.true( !record.isTerminal );
 
   var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 0, allowingCycled : 1 }).form();
   var record = factory.record( pathA );
   test.identical( record.absolute, pathA );
   test.identical( record.real, pathA );
-  test.is( record.isSoftLink );
-  test.is( !record.isTerminal );
+  test.true( record.isSoftLink );
+  test.true( !record.isTerminal );
 
   var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 1, allowingCycled : 0 }).form();
   test.shouldThrowErrorSync( () =>
@@ -964,8 +964,8 @@ function recordForLink( test )
   var record = factory.record( pathA );
   test.identical( record.absolute, pathA );
   test.identical( record.real, pathA ); /* qqq : fix please aaa : changed expected result */
-  test.is( record.isSoftLink );
-  test.is( !record.isTerminal );
+  test.true( record.isSoftLink );
+  test.true( !record.isTerminal );
 
 }
 
@@ -1019,15 +1019,15 @@ function recordForRelativeLink( test )
   var record = factory.record( pathLinkToMissing );
   test.identical( record.absolute, pathLinkToMissing );
   test.identical( record.real, pathLinkToMissing );
-  test.is( record.isSoftLink );
-  test.is( !record.isTerminal );
+  test.true( record.isSoftLink );
+  test.true( !record.isTerminal );
 
   var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 1 }).form();
   var record = factory.record( pathLinkToMissing );
   test.identical( record.absolute, pathLinkToMissing );
   test.identical( record.real, pathLinkToMissing );
-  test.is( record.isSoftLink );
-  test.is( !record.isTerminal );
+  test.true( record.isSoftLink );
+  test.true( !record.isTerminal );
 
   var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 0 }).form();
   test.shouldThrowErrorSync( () =>
@@ -1040,9 +1040,9 @@ function recordForRelativeLink( test )
   var record = factory.record( pathLinkToMissing );
   test.identical( record.absolute, pathLinkToMissing );
   test.identical( record.real, pathToMissing );
-  test.is( !record.isSoftLink );
-  test.is( !record.isTerminal );
-  test.is( !record.isDir );
+  test.true( !record.isSoftLink );
+  test.true( !record.isTerminal );
+  test.true( !record.isDir );
   test.identical( record.stat, null );
 
   test.case = 'link relative - link relative to missing';
@@ -1051,15 +1051,15 @@ function recordForRelativeLink( test )
   var record = factory.record( pathLinkToLinkToMissing );
   test.identical( record.absolute, pathLinkToLinkToMissing );
   test.identical( record.real, pathLinkToLinkToMissing );
-  test.is( record.isSoftLink );
-  test.is( !record.isTerminal );
+  test.true( record.isSoftLink );
+  test.true( !record.isTerminal );
 
   var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 1 }).form();
   var record = factory.record( pathLinkToLinkToMissing );
   test.identical( record.absolute, pathLinkToLinkToMissing );
   test.identical( record.real, pathLinkToLinkToMissing );
-  test.is( record.isSoftLink );
-  test.is( !record.isTerminal );
+  test.true( record.isSoftLink );
+  test.true( !record.isTerminal );
 
   var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 0 }).form();
   test.shouldThrowErrorSync( () =>
@@ -1072,9 +1072,9 @@ function recordForRelativeLink( test )
   var record = factory.record( pathLinkToLinkToMissing );
   test.identical( record.absolute, pathLinkToLinkToMissing );
   test.identical( record.real, pathToMissing );
-  test.is( !record.isSoftLink );
-  test.is( !record.isTerminal );
-  test.is( !record.isDir );
+  test.true( !record.isSoftLink );
+  test.true( !record.isTerminal );
+  test.true( !record.isDir );
   test.identical( record.stat, null );
 
   test.case = 'link to terminal';
@@ -1083,15 +1083,15 @@ function recordForRelativeLink( test )
   var record = factory.record( pathLinkToTerminal );
   test.identical( record.absolute, pathLinkToTerminal );
   test.identical( record.real, pathLinkToTerminal );
-  test.is( record.isSoftLink );
-  test.is( !record.isTerminal );
+  test.true( record.isSoftLink );
+  test.true( !record.isTerminal );
 
   var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1 }).form();
   var record = factory.record( pathLinkToTerminal );
   test.identical( record.absolute, pathLinkToTerminal );
   test.identical( record.real, pathTerminal );
-  test.is( !record.isSoftLink );
-  test.is( record.isTerminal );
+  test.true( !record.isSoftLink );
+  test.true( record.isTerminal );
 
   test.case = 'link to directory';
 
@@ -1099,17 +1099,17 @@ function recordForRelativeLink( test )
   var record = factory.record( pathLinkToDir );
   test.identical( record.absolute, pathLinkToDir );
   test.identical( record.real, pathLinkToDir );
-  test.is( record.isSoftLink );
-  test.is( !record.isTerminal );
-  test.is( !record.isDir );
+  test.true( record.isSoftLink );
+  test.true( !record.isTerminal );
+  test.true( !record.isDir );
 
   var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1 }).form();
   var record = factory.record( pathLinkToDir );
   test.identical( record.absolute, pathLinkToDir );
   test.identical( record.real, pathToDir );
-  test.is( !record.isSoftLink );
-  test.is( !record.isTerminal );
-  test.is( record.isDir );
+  test.true( !record.isSoftLink );
+  test.true( !record.isTerminal );
+  test.true( record.isDir );
 
   test.case = 'link relative - link relative - terminal';
 
@@ -1117,15 +1117,15 @@ function recordForRelativeLink( test )
   var record = factory.record( pathLinkToLinkToTerminal );
   test.identical( record.absolute, pathLinkToLinkToTerminal );
   test.identical( record.real, pathLinkToLinkToTerminal );
-  test.is( record.isSoftLink );
-  test.is( !record.isTerminal );
+  test.true( record.isSoftLink );
+  test.true( !record.isTerminal );
 
   var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1 }).form();
   var record = factory.record( pathLinkToLinkToTerminal );
   test.identical( record.absolute, pathLinkToLinkToTerminal );
   test.identical( record.real, pathTerminal );
-  test.is( !record.isSoftLink );
-  test.is( record.isTerminal );
+  test.true( !record.isSoftLink );
+  test.true( record.isTerminal );
 
   test.case = 'link relative - link relative - directory';
 
@@ -1133,17 +1133,17 @@ function recordForRelativeLink( test )
   var record = factory.record( pathLinkToLinkToDir );
   test.identical( record.absolute, pathLinkToLinkToDir );
   test.identical( record.real, pathLinkToLinkToDir );
-  test.is( record.isSoftLink );
-  test.is( !record.isTerminal );
-  test.is( !record.isDir );
+  test.true( record.isSoftLink );
+  test.true( !record.isTerminal );
+  test.true( !record.isDir );
 
   var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1 }).form();
   var record = factory.record( pathLinkToLinkToDir );
   test.identical( record.absolute, pathLinkToLinkToDir );
   test.identical( record.real, pathToDir );
-  test.is( !record.isSoftLink );
-  test.is( !record.isTerminal );
-  test.is( record.isDir );
+  test.true( !record.isSoftLink );
+  test.true( !record.isTerminal );
+  test.true( record.isDir );
 
   test.case = 'link absolute - link relative - missing';
 
@@ -1161,15 +1161,15 @@ function recordForRelativeLink( test )
   var record = factory.record( pathLinkAbsolute );
   test.identical( record.absolute, pathLinkAbsolute );
   test.identical( record.real, pathLinkAbsolute );
-  test.is( record.isSoftLink );
-  test.is( !record.isTerminal );
+  test.true( record.isSoftLink );
+  test.true( !record.isTerminal );
 
   var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 1 }).form();
   var record = factory.record( pathLinkAbsolute );
   test.identical( record.absolute, pathLinkAbsolute );
   test.identical( record.real, pathLinkAbsolute );
-  test.is( record.isSoftLink );
-  test.is( !record.isTerminal );
+  test.true( record.isSoftLink );
+  test.true( !record.isTerminal );
 
   var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 0 }).form();
   test.shouldThrowErrorSync( () =>
@@ -1182,9 +1182,9 @@ function recordForRelativeLink( test )
   var record = factory.record( pathLinkAbsolute );
   test.identical( record.absolute, pathLinkAbsolute );
   test.identical( record.real, pathToMissing );
-  test.is( !record.isSoftLink );
-  test.is( !record.isTerminal );
-  test.is( !record.isDir );
+  test.true( !record.isSoftLink );
+  test.true( !record.isTerminal );
+  test.true( !record.isDir );
   test.identical( record.stat, null );
 
   test.case = 'link absolute - link relative - terminal';
@@ -1198,17 +1198,17 @@ function recordForRelativeLink( test )
   var record = factory.record( pathLinkAbsolute );
   test.identical( record.absolute, pathLinkAbsolute );
   test.identical( record.real, pathLinkAbsolute );
-  test.is( record.isSoftLink );
-  test.is( !record.isTerminal );
-  test.is( !record.isDir );
+  test.true( record.isSoftLink );
+  test.true( !record.isTerminal );
+  test.true( !record.isDir );
 
   var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1 }).form();
   var record = factory.record( pathLinkAbsolute );
   test.identical( record.absolute, pathLinkAbsolute );
   test.identical( record.real, pathTerminal );
-  test.is( !record.isSoftLink );
-  test.is( record.isTerminal );
-  test.is( !record.isDir );
+  test.true( !record.isSoftLink );
+  test.true( record.isTerminal );
+  test.true( !record.isDir );
 
   test.case = 'link absolute - link relative - directory';
 
@@ -1221,17 +1221,17 @@ function recordForRelativeLink( test )
   var record = factory.record( pathLinkAbsolute );
   test.identical( record.absolute, pathLinkAbsolute );
   test.identical( record.real, pathLinkAbsolute );
-  test.is( record.isSoftLink );
-  test.is( !record.isTerminal );
-  test.is( !record.isDir );
+  test.true( record.isSoftLink );
+  test.true( !record.isTerminal );
+  test.true( !record.isDir );
 
   var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1 }).form();
   var record = factory.record( pathLinkAbsolute );
   test.identical( record.absolute, pathLinkAbsolute );
   test.identical( record.real, pathToDir );
-  test.is( !record.isSoftLink );
-  test.is( !record.isTerminal );
-  test.is( record.isDir );
+  test.true( !record.isSoftLink );
+  test.true( !record.isTerminal );
+  test.true( record.isDir );
 
   test.case = 'link relative - link absolute - missing';
 
@@ -1244,15 +1244,15 @@ function recordForRelativeLink( test )
   var record = factory.record( pathLinkAbsolute );
   test.identical( record.absolute, pathLinkAbsolute );
   test.identical( record.real, pathLinkAbsolute );
-  test.is( record.isSoftLink );
-  test.is( !record.isTerminal );
+  test.true( record.isSoftLink );
+  test.true( !record.isTerminal );
 
   var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 1 }).form();
   var record = factory.record( pathLinkAbsolute );
   test.identical( record.absolute, pathLinkAbsolute );
   test.identical( record.real, pathLinkAbsolute );
-  test.is( record.isSoftLink );
-  test.is( !record.isTerminal );
+  test.true( record.isSoftLink );
+  test.true( !record.isTerminal );
 
   var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 0 }).form();
   test.shouldThrowErrorSync( () =>
@@ -1265,9 +1265,9 @@ function recordForRelativeLink( test )
   var record = factory.record( pathLinkAbsolute );
   test.identical( record.absolute, pathLinkAbsolute );
   test.identical( record.real, pathToMissing );
-  test.is( !record.isSoftLink );
-  test.is( !record.isTerminal );
-  test.is( !record.isDir );
+  test.true( !record.isSoftLink );
+  test.true( !record.isTerminal );
+  test.true( !record.isDir );
   test.identical( record.stat, null );
 
   test.case = 'link relative - link absolute - terminal';
@@ -1281,17 +1281,17 @@ function recordForRelativeLink( test )
   var record = factory.record( pathLinkAbsolute );
   test.identical( record.absolute, pathLinkAbsolute );
   test.identical( record.real, pathLinkAbsolute );
-  test.is( record.isSoftLink );
-  test.is( !record.isTerminal );
-  test.is( !record.isDir );
+  test.true( record.isSoftLink );
+  test.true( !record.isTerminal );
+  test.true( !record.isDir );
 
   var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1 }).form();
   var record = factory.record( pathLinkAbsolute );
   test.identical( record.absolute, pathLinkAbsolute );
   test.identical( record.real, pathTerminal );
-  test.is( !record.isSoftLink );
-  test.is( record.isTerminal );
-  test.is( !record.isDir );
+  test.true( !record.isSoftLink );
+  test.true( record.isTerminal );
+  test.true( !record.isDir );
 
   test.case = 'link absolute - link relative - directory';
 
@@ -1304,17 +1304,17 @@ function recordForRelativeLink( test )
   var record = factory.record( pathLinkAbsolute );
   test.identical( record.absolute, pathLinkAbsolute );
   test.identical( record.real, pathLinkAbsolute );
-  test.is( record.isSoftLink );
-  test.is( !record.isTerminal );
-  test.is( !record.isDir );
+  test.true( record.isSoftLink );
+  test.true( !record.isTerminal );
+  test.true( !record.isDir );
 
   var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1 }).form();
   var record = factory.record( pathLinkAbsolute );
   test.identical( record.absolute, pathLinkAbsolute );
   test.identical( record.real, pathToDir );
-  test.is( !record.isSoftLink );
-  test.is( !record.isTerminal );
-  test.is( record.isDir );
+  test.true( !record.isSoftLink );
+  test.true( !record.isTerminal );
+  test.true( record.isDir );
 
   test.case = 'self cycled';
 
@@ -1325,15 +1325,15 @@ function recordForRelativeLink( test )
   var record = factory.record( pathSelfCycled );
   test.identical( record.absolute, pathSelfCycled );
   test.identical( record.real, pathSelfCycled );
-  test.is( record.isSoftLink );
-  test.is( !record.isTerminal );
+  test.true( record.isSoftLink );
+  test.true( !record.isTerminal );
 
   var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 0, allowingCycled : 1 }).form();
   var record = factory.record( pathSelfCycled );
   test.identical( record.absolute, pathSelfCycled );
   test.identical( record.real, pathSelfCycled );
-  test.is( record.isSoftLink );
-  test.is( !record.isTerminal );
+  test.true( record.isSoftLink );
+  test.true( !record.isTerminal );
 
   var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 1, allowingCycled : 0 }).form();
   test.shouldThrowErrorSync( () =>
@@ -1346,8 +1346,8 @@ function recordForRelativeLink( test )
   var record = factory.record( pathSelfCycled );
   test.identical( record.absolute, pathSelfCycled );
   test.identical( record.real, pathSelfCycled );
-  test.is( record.isSoftLink );
-  test.is( !record.isTerminal );
+  test.true( record.isSoftLink );
+  test.true( !record.isTerminal );
 
   test.case = 'cycled';
 
@@ -1360,15 +1360,15 @@ function recordForRelativeLink( test )
   var record = factory.record( pathA );
   test.identical( record.absolute, pathA );
   test.identical( record.real, pathA );
-  test.is( record.isSoftLink );
-  test.is( !record.isTerminal );
+  test.true( record.isSoftLink );
+  test.true( !record.isTerminal );
 
   var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 0, allowingMissed : 0, allowingCycled : 1 }).form();
   var record = factory.record( pathA );
   test.identical( record.absolute, pathA );
   test.identical( record.real, pathA );
-  test.is( record.isSoftLink );
-  test.is( !record.isTerminal );
+  test.true( record.isSoftLink );
+  test.true( !record.isTerminal );
 
   var factory = _.FileRecordFactory.TolerantFrom( o, { resolvingSoftLink : 1, allowingMissed : 1, allowingCycled : 0 }).form();
   test.shouldThrowErrorSync( () =>
@@ -1381,8 +1381,8 @@ function recordForRelativeLink( test )
   var record = factory.record( pathA );
   test.identical( record.absolute, pathA );
   test.identical( record.real, pathA ); /* qqq : fix please aaa : changed expected result */
-  test.is( record.isSoftLink );
-  test.is( !record.isTerminal );
+  test.true( record.isSoftLink );
+  test.true( !record.isTerminal );
 
 }
 
@@ -1416,7 +1416,7 @@ function recordStating( test )
   var factory = _.FileRecordFactory.TolerantFrom( o ).form();
   var got = factory.record({ input : filePath, factory });
   var stat = got.stat;
-  test.is( _.fileStatIs( stat ) );
+  test.true( _.fileStatIs( stat ) );
 }
 
 //
@@ -1472,7 +1472,7 @@ function recordSystemExperiment( test )
   test.mustNotThrowError( () =>
   {
     let stat = record.stat;
-    test.is( stat.isTerminal() );
+    test.true( stat.isTerminal() );
   })
 
   provider.finit();

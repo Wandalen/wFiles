@@ -645,9 +645,10 @@ function pathDirTempMake( o )
     if( o.auto )
     // _.process._exitHandlerOnce( () =>
     // _.process.on( 'available', () => _.process.on( 'exit', () =>
-    _.process.on( 'available', _.event.Name( 'exit' ), () =>
+
+    // _.process.on( 'available', _.event.Name( 'exit' ), () =>
+    _.process.on( _.event.Chain( 'available', 'exit' ), () =>
     {
-      //debugger;
       self.tempClose()
     });
 

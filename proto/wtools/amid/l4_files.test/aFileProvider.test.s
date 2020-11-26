@@ -15044,6 +15044,7 @@ function fileDeleteSync( test )
   provider.fieldPop( 'resolvingSoftLink', 0 );
 }
 
+
 //
 
 function fileDeleteActSync( test )

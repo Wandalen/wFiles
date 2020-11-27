@@ -74,7 +74,6 @@ function filesReflectTrivial( test )
   let path = context.providerDst.path;
   let testPath = path.join( context.suiteTempPath, 'routine-' + test.name );
   let localPath = path.join( testPath, 'wPathBasic' );
-  debugger;
   let clonePathGlobal = providerDst.path.globalFromPreferred( localPath );
 
   let con = new _.Consequence().take( null )

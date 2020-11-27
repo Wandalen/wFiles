@@ -30398,7 +30398,7 @@ function hardLinkMultipleSync( test )
   var ok = test.identical( src, dst );
 }
 
-hardLinkMultipleSync.timeOut = 120000;
+hardLinkMultipleSync.timeOut = 240000;
 
 //
 

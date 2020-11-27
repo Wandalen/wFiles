@@ -415,10 +415,11 @@ function filesReflectSingle_body( o )
       'git status',
       'git branch'
     ]);
-    ready
-    .ifNoErrorThen( function( arg )
+
+    ready.ifNoErrorThen( function( arg )
     {
-      let args = arg.runs;
+      // let args = arg.runs;
+      let args = arg.sessions;
       _.assert( args.length === 2 );
       localChanges = _.strHasAny( args[ 0 ].output, [ 'Changes to be committed', 'Changes not staged for commit' ] );
       mergeIsNeeded = !_.strHasAny( args[ 0 ].output, [ 'Your branch is up to date', 'Your branch is up-to-date' ] );

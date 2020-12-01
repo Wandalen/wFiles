@@ -1324,7 +1324,7 @@ function _Setup1()
 function Init()
 {
 
-  _.mapSupplementOwn( Self.prototype, FilteredRoutines );
+  _.mapExtendDstNotOwn( Self.prototype, FilteredRoutines );
 
   let missingMap = Object.create( null );
   for( let r in Routines )

@@ -111,7 +111,7 @@ function filesReflectTrivial( test )
       './sample',
     ]
 
-    test.true( _.arraySetContainAll( files, expected ) )
+    test.true( _.arraySetContainAll_( null, files, expected ) )
     return got;
   })
 
@@ -150,7 +150,7 @@ function filesReflectTrivial( test )
       './sample',
     ]
 
-    test.true( _.arraySetContainAll( files, expected ) )
+    test.true( _.arraySetContainAll_( null, files, expected ) )
     return got;
   })
 
@@ -189,7 +189,7 @@ function filesReflectTrivial( test )
       './sample',
     ]
 
-    test.true( _.arraySetContainAll( files, expected ) )
+    test.true( _.arraySetContainAll_( null, files, expected ) )
     return got;
   })
 
@@ -259,7 +259,7 @@ function filesReflectTrivial( test )
       './sample',
     ]
 
-    test.true( _.arraySetContainAll( files, expected ) )
+    test.true( _.arraySetContainAll_( null, files, expected ) )
     return got;
   })
 
@@ -308,7 +308,7 @@ function filesReflectTrivial( test )
       './sample',
     ]
 
-    test.true( _.arraySetContainAll( files, expected ) )
+    test.true( _.arraySetContainAll_( null, files, expected ) )
     return got;
   })
 
@@ -345,7 +345,7 @@ function filesReflectTrivial( test )
       './sample'
     ]
 
-    test.true( _.arraySetContainAll( files, expected ) )
+    test.true( _.arraySetContainAll_( null, files, expected ) )
     let packagePath = providerDst.path.join( localPath, 'package.json' );
     let packageRead = providerDst.fileRead
     ({
@@ -726,7 +726,7 @@ function filesReflectTrivial( test )
       './sample',
     ]
 
-    test.true( _.arraySetContainAll( files, expected ) );
+    test.true( _.arraySetContainAll_( null, files, expected ) );
     return got;
   })
 

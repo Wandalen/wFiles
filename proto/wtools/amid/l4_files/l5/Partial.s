@@ -2013,7 +2013,7 @@ function _recordsSort( o )
     if( sortMethod === 'modified' )
     {
       let selectedRecord = routine( result, ( record ) => record.stat ? record.stat.mtime.getTime() : 0 ).element;
-      result = _.entityFilter( result, ( record ) =>
+      result = _.filter_( null, result, ( record ) =>
       {
         if( record.stat && record.stat.mtime.getTime() === selectedRecord.stat.mtime.getTime() )
         return record;

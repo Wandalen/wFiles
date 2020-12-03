@@ -2842,7 +2842,7 @@ function filePathDstArrayNonBoolGet( filePath, booleanFallingBack )
   }
   else
   {
-    filePath = _.filter( filePath, ( e ) =>
+    filePath = _.filter_( null, filePath, ( e ) =>
     {
       if( !_.boolLike( e ) )
       return e;
@@ -2959,7 +2959,7 @@ function filePathDstArrayBoolGet( filePath )
     filePath = path.mapDstFromSrc( filePath );
   }
 
-  let filePath2 = _.filter( filePath, ( e ) => _.boolLike( e ) ? !!e : undefined );
+  let filePath2 = _.filter_( null, filePath, ( e ) => _.boolLike( e ) ? !!e : undefined );
   filePath = _./*longOnce*/arrayAppendArrayOnce( null, filePath2 );
 
   _.assert( _.arrayIs( filePath ) );
@@ -3583,12 +3583,13 @@ function sureBasePath( filePath, basePath )
 
   filePath = path.s.fromGlob( filePath );
 
-  let diff = _.arraySetDiff( basePath, filePath );
+  debugger; /* yyy */
+  let diff = _.arraySetDiff_( null, basePath, filePath );
   if( diff.length !== 0 )
   {
-    debugger;
-    let fileWithoutBasePath = _.arraySetBut( filePath.slice(), basePath );
-    let baseWithoutFilePath = _.arraySetBut( basePath.slice(), filePath );
+    debugger; /* yyy */
+    let fileWithoutBasePath = _.arraySetBut_( null, filePath.slice(), basePath );
+    let baseWithoutFilePath = _.arraySetBut_( null, basePath.slice(), filePath );
     let err = 'Each file path should have base path';
     if( fileWithoutBasePath.length )
     err += '\nFile path without base path : ' + _.strQuote( fileWithoutBasePath );

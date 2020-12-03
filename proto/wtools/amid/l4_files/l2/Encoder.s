@@ -208,7 +208,7 @@ function fromGdfs()
   {
     if( !_.strHas( k, 'structure' ) )
     continue;
-    var defaults = _.entityFilter( _.gdf.inOutMap[ k ], ( c ) => c.feature.default ? c : undefined );
+    var defaults = _.filter_( null, _.gdf.inOutMap[ k ], ( c ) => c.feature.default ? c : undefined );
     if( defaults.length > 1 )
     {
       debugger;

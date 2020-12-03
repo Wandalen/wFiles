@@ -5918,12 +5918,12 @@ function filesFindGlob( test )
 
   function selectTransients( records )
   {
-    return _.filter( records, ( record ) => record.isTransient ? record.relative : undefined );
+    return _.filter_( null, records, ( record ) => record.isTransient ? record.relative : undefined );
   }
 
   function selectActuals( records )
   {
-    return _.filter( records, ( record ) => record.isActual ? record.relative : undefined );
+    return _.filter_( null, records, ( record ) => record.isActual ? record.relative : undefined );
   }
 
   function abs()
@@ -7505,12 +7505,12 @@ function filesFindOn( test )
 
   function selectTransients( records )
   {
-    return _.filter( records, ( record ) => record.isTransient ? record.relative : undefined );
+    return _.filter_( null, records, ( record ) => record.isTransient ? record.relative : undefined );
   }
 
   function selectActuals( records )
   {
-    return _.filter( records, ( record ) => record.isActual ? record.relative : undefined );
+    return _.filter_( null, records, ( record ) => record.isActual ? record.relative : undefined );
   }
 
   var onUpRelativeTransients = [];
@@ -7718,12 +7718,12 @@ function filesFindBaseFromGlob( test )
 
   function selectTransients( records )
   {
-    return _.filter( records, ( record ) => record.isTransient ? record.relative : undefined );
+    return _.filter_( null, records, ( record ) => record.isTransient ? record.relative : undefined );
   }
 
   function selectActuals( records )
   {
-    return _.filter( records, ( record ) => record.isActual ? record.relative : undefined );
+    return _.filter_( null, records, ( record ) => record.isActual ? record.relative : undefined );
   }
 
   function abs()

@@ -3583,7 +3583,6 @@ function sureBasePath( filePath, basePath )
 
   filePath = path.s.fromGlob( filePath );
 
-  debugger; /* yyy */
   let diff = _.arraySetDiff_( null, basePath, filePath );
   if( diff.length !== 0 )
   {
@@ -3597,7 +3596,6 @@ function sureBasePath( filePath, basePath )
     err += '\nBase path without file path : ' + _.strQuote( baseWithoutFilePath );
     err += '\nBase path : ' + _.strQuote( basePath );
     err += '\nFile path : ' + _.strQuote( filePath );
-
     debugger;
     throw _.err( err );
   }

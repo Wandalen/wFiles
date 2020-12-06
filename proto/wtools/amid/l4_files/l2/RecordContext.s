@@ -57,7 +57,7 @@ _.assert( !_.FileRecordContext );
 
 function TolerantFrom( o )
 {
-  let Cls = _.constructorOf( this );
+  let Cls = _.workpiece.constructorOf( this );
   _.assert( arguments.length >= 1, 'Expects at least one argument' );
   _.assert( _.objectIs( Cls.prototype.Composes ) );
   o = _.mapsExtend( null, arguments );

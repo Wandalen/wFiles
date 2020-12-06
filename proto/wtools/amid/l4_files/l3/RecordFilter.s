@@ -1997,10 +1997,10 @@ function basePathUse( basePath )
 // file path
 // --
 
-function filePathCopy( o )
+function filePathMove( o )
 {
 
-  _.assertRoutineOptions( filePathCopy, arguments );
+  _.assertRoutineOptions( filePathMove, arguments );
 
   /* get */
 
@@ -2067,9 +2067,9 @@ function filePathCopy( o )
   return o;
 }
 
-filePathCopy.defaults =
+filePathMove.defaults =
 {
-  ... _.accessor.copyIterationMake.defaults,
+  ... _.accessor.moveItMake.defaults,
   // dstInstance : null,
   // srcInstance : null,
   // instanceKey : null,
@@ -4428,7 +4428,7 @@ let Extension =
 
   // file path
 
-  filePathCopy,
+  filePathMove,
   // filePathGet,
   // filePathSet,
 

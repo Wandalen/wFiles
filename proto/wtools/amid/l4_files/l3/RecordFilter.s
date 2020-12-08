@@ -2069,7 +2069,7 @@ function filePathMove( o )
 
 filePathMove.defaults =
 {
-  ... _.accessor.moveItMake.defaults,
+  ... _.accessor._moveItMake.defaults,
   // dstInstance : null,
   // srcInstance : null,
   // instanceKey : null,
@@ -4366,8 +4366,8 @@ let Accessors =
 
   filePath : {},
   basePath : { set : basePathSet },
-  basePaths : { get : basePathsGet, readOnly : 1 },
-  pairedFilter : { get : pairedFilterGet, readOnly : 1 },
+  basePaths : { get : basePathsGet, writable : 0 },
+  pairedFilter : { get : pairedFilterGet, writable : 0 },
 
 }
 

@@ -864,7 +864,7 @@ function statCopier( it )
 {
   let record = this;
   if( it.technique === 'data' )
-  return _.mapFields( it.src );
+  return _.property.fields( it.src );
   else
   return it.src;
 }

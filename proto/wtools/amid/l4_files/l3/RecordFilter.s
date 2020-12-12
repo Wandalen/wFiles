@@ -3480,11 +3480,11 @@ function allPaths( o )
 
   /* - */
 
-  function each( thePath, fieldName )
+  function each( thePath, propName )
   {
     let result = o.inplace ? path.filterInplace( thePath, o.onEach ) : path.filter( thePath, o.onEach );
     if( o.inplace )
-    filter[ fieldName ] = result;
+    filter[ propName ] = result;
     return result;
   }
 
@@ -3524,7 +3524,7 @@ function sureRelativeOrGlobal( o )
     _.sure
     (
       it.value === null || _.boolLike( it.value ) || path.s.allAreRelative( it.value ) || path.s.allAreGlobal( it.value ),
-      () => 'Filter should have relative ' + it.fieldName + ', but has ' + _.toStr( it.value )
+      () => 'Filter should have relative ' + it.propName + ', but has ' + _.toStr( it.value )
     );
   }
 
@@ -3735,9 +3735,9 @@ function toStr()
 
   for( let f in FieldNames )
   {
-    let fieldName = FieldNames[ f ];
-    if( filter[ fieldName ] !== null )
-    result += '\n' + '  ' + fieldName + ' :\n' + _.toJs( filter[ fieldName ], { levels : 2 } );
+    let propName = FieldNames[ f ];
+    if( filter[ propName ] !== null )
+    result += '\n' + '  ' + propName + ' :\n' + _.toJs( filter[ propName ], { levels : 2 } );
   }
 
   return result;

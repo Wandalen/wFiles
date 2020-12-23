@@ -42,7 +42,7 @@ function onSuiteEnd( test )
 // tests
 // --
 
-function streamRead( test )
+function streamReadProviderWithoutSystem( test )
 {
   let context = this;
   let a = test.assetFor( 'basic' );
@@ -55,12 +55,15 @@ function streamRead( test )
     test.case = 'regular http path';
     var con = new _.Consequence();
 
+    var providerSrc = _.FileProvider.Http();
+    var providerDst = _.FileProvider.HardDrive();
+
     var dstPath = a.abs( 'ModuleForTesting1.s' );
-    var writeStream = context.providerDst.streamWrite({ filePath : dstPath });
+    var writeStream = providerDst.streamWrite({ filePath : dstPath });
     writeStream.on( 'finish', () => writeStream.close( () => con.take( null ) ) );
 
-    var filePath = 'https:///raw.githubusercontent.com/Wandalen/wModuleForTesting1/master/proto/wtools/testing/l1/ModuleForTesting1.s';
-    var readStream = context.providerSrc.streamRead({ filePath });
+    var filePath = 'https://raw.githubusercontent.com/Wandalen/wModuleForTesting1/master/proto/wtools/testing/l1/ModuleForTesting1.s';
+    var readStream = providerSrc.streamRead({ filePath });
     readStream.on( 'header', ( statusCode ) =>
     {
       if( statusCode === 200 )
@@ -69,7 +72,7 @@ function streamRead( test )
 
     con.then( () =>
     {
-      return context.providerDst.filesReflectEvaluate
+      return providerDst.filesReflectEvaluate
       ({
         src : { filePath : dstPath },
         dst : { filePath : dstPath },
@@ -96,12 +99,15 @@ function streamRead( test )
     test.case = 'global http path';
     var con = new _.Consequence();
 
+    var providerSrc = _.FileProvider.Http();
+    var providerDst = _.FileProvider.HardDrive();
+
     var dstPath = a.abs( 'ModuleForTesting1.s' );
-    var writeStream = context.providerDst.streamWrite({ filePath : dstPath });
+    var writeStream = providerDst.streamWrite({ filePath : dstPath });
     writeStream.on( 'finish', () => writeStream.close( () => con.take( null ) ) );
 
     var filePath = 'https:///raw.githubusercontent.com/Wandalen/wModuleForTesting1/master/proto/wtools/testing/l1/ModuleForTesting1.s';
-    var readStream = context.providerSrc.streamRead({ filePath });
+    var readStream = providerSrc.streamRead({ filePath });
     readStream.on( 'header', ( statusCode ) =>
     {
       if( statusCode === 200 )
@@ -110,7 +116,7 @@ function streamRead( test )
 
     con.then( () =>
     {
-      return context.providerDst.filesReflectEvaluate
+      return providerDst.filesReflectEvaluate
       ({
         src : { filePath : dstPath },
         dst : { filePath : dstPath },
@@ -157,7 +163,7 @@ var Proto =
 
   tests :
   {
-    streamRead,
+    streamReadProviderWithoutSystem,
   },
 
 }

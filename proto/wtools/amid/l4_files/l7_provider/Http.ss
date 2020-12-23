@@ -54,7 +54,10 @@ function streamReadAct( o )
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( _.strIs( o.filePath ), 'streamReadAct :', 'Expects {-o.filePath-}' );
+  _.assert( self.path.isAbsolute( o.filePath ), 'Expects absolute {-o.filePath-}' );
+  // _.assert( _.strIs( o.filePath ), 'streamReadAct :', 'Expects {-o.filePath-}' );
+
+  o.filePath = o.filePath.replace( '///', '//' );
 
   if( !Needle )
   Needle = require( 'needle' );

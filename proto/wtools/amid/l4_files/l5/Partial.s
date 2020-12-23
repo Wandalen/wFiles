@@ -285,11 +285,17 @@ function assertProviderDefaults( o )
 function _preFilePathScalarWithoutProviderDefaults( routine, args )
 {
   let self = this;
-  let path = self.system ? self.system.path : self.path;;
+  // let path = self.system ? self.system.path : self.path;
+  /*
+    Dmytro : the provider should know about its paths,
+    the system provider handle several different providers and for some path can return wrong result
+  */
+
+  let path = self.path;
 
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
   _.assert( _.objectIs( args[ 0 ] ) || path.is( args[ 0 ] ), 'Expects options map or path' );
-  _.assert( args && args.length === 1, 'Routine ' + routine.name + ' expects exactly one argument' );
+  _.assert( args && args.length === 1, `Routine ${ routine.name } expects exactly one argument` );
 
   let o = args[ 0 ];
 
@@ -300,7 +306,7 @@ function _preFilePathScalarWithoutProviderDefaults( routine, args )
 
   o.filePath = path.normalize( o.filePath );
 
-  _.assert( path.isAbsolute( o.filePath ), () => 'Expects absolute path {-o.filePath-}, but got ' + _.strQuote( o.filePath ) );
+  _.assert( path.isAbsolute( o.filePath ), () => `Expects absolute path {-o.filePath-}, but got ${ _.strQuote( o.filePath ) }` );
 
   return o;
 }

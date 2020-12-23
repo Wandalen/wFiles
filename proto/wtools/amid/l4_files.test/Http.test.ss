@@ -139,6 +139,99 @@ function streamReadProviderWithoutSystem( test )
   return a.ready;
 }
 
+//
+
+function streamReadProviderWithSystem( test )
+{
+  let context = this;
+  let a = test.assetFor( 'basic' );
+  a.fileProvider.dirMake( a.abs( '.' ) );
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = 'regular http path';
+    var con = new _.Consequence();
+
+    var dstPath = a.abs( 'ModuleForTesting1.s' );
+    var writeStream = context.providerDst.streamWrite({ filePath : dstPath });
+    writeStream.on( 'finish', () => writeStream.close( () => con.take( null ) ) );
+
+    var filePath = 'https://raw.githubusercontent.com/Wandalen/wModuleForTesting1/master/proto/wtools/testing/l1/ModuleForTesting1.s';
+    var readStream = context.providerSrc.streamRead({ filePath });
+    readStream.on( 'header', ( statusCode ) =>
+    {
+      if( statusCode === 200 )
+      readStream.pipe( writeStream );
+    });
+
+    con.then( () =>
+    {
+      return context.providerDst.filesReflectEvaluate
+      ({
+        src : { filePath : dstPath },
+        dst : { filePath : dstPath },
+      });
+    });
+
+    return con;
+  });
+
+  a.ready.then( ( op ) =>
+  {
+    var got = a.fileProvider.fileExists( a.abs( 'ModuleForTesting1.s' ) );
+    test.true( got );
+    var got = a.fileProvider.fileRead( a.abs( 'ModuleForTesting1.s' ) );
+    test.ge( got.length, 200 );
+
+    return null;
+  });
+
+  /* */
+
+  a.ready.then( () =>
+  {
+    test.case = 'global http path';
+    var con = new _.Consequence();
+
+    var dstPath = a.abs( 'ModuleForTesting1.s' );
+    var writeStream = context.providerDst.streamWrite({ filePath : dstPath });
+    writeStream.on( 'finish', () => writeStream.close( () => con.take( null ) ) );
+
+    var filePath = 'https:///raw.githubusercontent.com/Wandalen/wModuleForTesting1/master/proto/wtools/testing/l1/ModuleForTesting1.s';
+    var readStream = context.providerSrc.streamRead({ filePath });
+    readStream.on( 'header', ( statusCode ) =>
+    {
+      if( statusCode === 200 )
+      readStream.pipe( writeStream );
+    });
+
+    con.then( () =>
+    {
+      return context.providerDst.filesReflectEvaluate
+      ({
+        src : { filePath : dstPath },
+        dst : { filePath : dstPath },
+      });
+    });
+
+    return con;
+  });
+
+  a.ready.then( ( op ) =>
+  {
+    var got = a.fileProvider.fileExists( a.abs( 'ModuleForTesting1.s' ) );
+    test.true( got );
+    var got = a.fileProvider.fileRead( a.abs( 'ModuleForTesting1.s' ) );
+    test.ge( got.length, 200 );
+
+    return null;
+  });
+
+  return a.ready;
+}
+
 // --
 // declare
 // --
@@ -164,6 +257,7 @@ var Proto =
   tests :
   {
     streamReadProviderWithoutSystem,
+    streamReadProviderWithSystem,
   },
 
 }

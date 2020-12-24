@@ -135,7 +135,6 @@ provider.fileCopy
 
 ```
 
-
 <!-- # Methods -> later
 If sync option is avaible - method supports sync/async modes. Use `true` for synchronous and `false` for async. In asynchronous mode [wConsequence]( https://github.com/Wandalen/wConsequence ) object is returned.
 * ##### fileReadAct - returns file content in specified `encoding`.

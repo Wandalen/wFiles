@@ -161,7 +161,7 @@ function filesReadOld( test )
 //   }
 
 //   var combinations = [];
-//   var keys = _.mapOwnKeys( map );
+//   var keys = _.mapOnlyOwnKeys( map );
 
 //   function combine( i, o )
 //   {
@@ -223,7 +223,7 @@ function filesReadOld( test )
 
 //   function flatMapToTree( map, o )
 //   {
-//     var paths = _.mapOwnKeys( map );
+//     var paths = _.mapOnlyOwnKeys( map );
 //     _.arrayRemoveElementOnce( paths, currentTestDir );
 //     var result = Object.create( null );
 //     var tree = new _.FileProvider.Extract({ filesTree : result })
@@ -408,7 +408,7 @@ function filesReadOld( test )
 //   ]
 
 //   var combinations = [];
-//   var keys = _.mapOwnKeys( map );
+//   var keys = _.mapOnlyOwnKeys( map );
 
 //   function combine( i, o )
 //   {

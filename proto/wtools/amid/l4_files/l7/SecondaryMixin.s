@@ -584,14 +584,14 @@ function filesAreOnSameDevice_head( routine, args )
 
   _.assert( args.length === 1 || args.length === 2 );
   _.assert( arguments.length === 2 );
-  
+
   if( args.length === 2 )
   {
     o = { src : args[ 0 ], dst : args[ 1 ] }
   }
 
   _.routineOptions( routine, o );
-  
+
   _.assert( _.strDefined( o.src ) );
   _.assert( _.strDefined( o.dst ) );
 
@@ -603,23 +603,23 @@ function filesAreOnSameDevice_head( routine, args )
 function filesAreOnSameDevice_body( o )
 {
   let self = this;
-  
-  let src = 
+
+  let src =
   {
     filePath : o.src,
     resolvingSoftLink : 1,
     throwing : 0
   }
   self.pathResolveLinkFull( src );
-  
-  let dst = 
+
+  let dst =
   {
     filePath : o.dst,
     resolvingSoftLink : 1,
     throwing : 0
   }
   self.pathResolveLinkFull( dst );
-  
+
   if( !src.stat || !dst.stat )
   {
     let trace = self.path.traceToRoot( o.src );
@@ -630,17 +630,17 @@ function filesAreOnSameDevice_body( o )
     }
     else if( trace.length > 1 )
     trace.shift();
-    
+
     let common = self.path.common( o.dst, trace[ 0 ] );
     return common === trace[ 0 ];
   }
-  
+
   return src.stat.dev === dst.stat.dev;
 }
 
 filesAreOnSameDevice_body.defaults =
 {
-  src : null, 
+  src : null,
   dst : null
 }
 
@@ -827,7 +827,7 @@ function fileCodeRead_body( o )
   return result;
 }
 
-var defaults = fileCodeRead_body.defaults = Object.create( fileRead.defaults );
+var defaults = fileCodeRead_body.defaults = _.mapExtend( null, fileRead.defaults );
 
 defaults.encoding = 'utf8';
 defaults.wrapping = 1;

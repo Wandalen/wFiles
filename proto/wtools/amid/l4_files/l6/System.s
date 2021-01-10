@@ -1330,7 +1330,7 @@ function Init()
   for( let r in Routines )
   {
     _.assert( !!Self.prototype[ r ], 'routine', r, 'does not exist in prototype' );
-    if( !_.mapOwnKey( Self.prototype, r ) && Routines[ r ] !== Self.prototype[ r ] )
+    if( !_.mapOnlyOwnKey( Self.prototype, r ) && Routines[ r ] !== Self.prototype[ r ] )
     missingMap[ r ] = 'Routines.' + r;
   }
 

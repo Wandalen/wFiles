@@ -1510,8 +1510,8 @@ function filesFind( test )
   });
 
   test.true( got.length > 0 );
-  test.identical( got.length + 1, _.mapOwnKeys( onUpMap ).length );
-  test.identical( got.length + 1, _.mapOwnKeys( onDownMap ).length );
+  test.identical( got.length + 1, _.mapOnlyOwnKeys( onUpMap ).length );
+  test.identical( got.length + 1, _.mapOnlyOwnKeys( onDownMap ).length );
 
   /* */
 
@@ -1934,7 +1934,7 @@ function filesFind( test )
 
     for( var i = 0; i < numberOfDuplicates; i++ )
     {
-      var keys = _.mapOwnKeys( tree );
+      var keys = _.mapOnlyOwnKeys( tree );
       var key = keys.pop();
       tree[ String.fromCharCode( key.charCodeAt(0) + 1 ) ] = _.cloneJust( tree[ key ] );
     }
@@ -1944,7 +1944,7 @@ function filesFind( test )
 
     function makePaths( test, _path )
     {
-      var keys = _.mapOwnKeys( test );
+      var keys = _.mapOnlyOwnKeys( test );
       keys.forEach( ( key ) =>
       {
         if( _.objectIs( test[ key ] ) )

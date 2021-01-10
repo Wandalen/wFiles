@@ -4848,13 +4848,13 @@ function fileCopyActSync( test )
     sync : 1,
     context : provider,
   }
-  var expected = _.mapOwnKeys( o );
+  var expected = _.mapOnlyOwnKeys( o );
   provider.fileCopyAct( o );
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'dst', 'src' ] );
   var dstFile = provider.fileRead( dstPath );
   test.identical( srcPath, dstFile );
-  var got = _.mapOwnKeys( o );
+  var got = _.mapOnlyOwnKeys( o );
   test.identical( got, expected );
   provider.filesDelete( routinePath );
 
@@ -12888,13 +12888,13 @@ function fileRenameActSync( test )
     sync : 1,
     context : provider,
   }
-  var expected = _.mapOwnKeys( o );
+  var expected = _.mapOnlyOwnKeys( o );
   provider.fileRenameAct( o );
   var files = provider.dirRead( routinePath );
   test.identical( files, [ 'dst' ] );
   var dstFile = provider.fileRead( dstPath );
   test.identical( srcPath, dstFile );
-  var got = _.mapOwnKeys( o );
+  var got = _.mapOnlyOwnKeys( o );
   test.identical( got, expected );
   provider.filesDelete( routinePath );
 
@@ -15158,9 +15158,9 @@ function fileDeleteActSync( test )
     filePath : srcPath,
     sync : 1
   }
-  var expected = _.mapOwnKeys( o );
+  var expected = _.mapOnlyOwnKeys( o );
   provider.fileDeleteAct( o );
-  var got = _.mapOwnKeys( o );
+  var got = _.mapOnlyOwnKeys( o );
   test.identical( got, expected );
   var stat = provider.statResolvedRead( srcPath );
   test.true( !stat );
@@ -18226,10 +18226,10 @@ function statReadActSync( test )
     throwing : 0,
     resolvingSoftLink : 1
   }
-  var expected = _.mapOwnKeys( o );
+  var expected = _.mapOnlyOwnKeys( o );
   // expected.filePath = provider.path.nativize( o.filePath );
   var stat = provider.statReadAct( o );
-  var got = _.mapOwnKeys( o );
+  var got = _.mapOnlyOwnKeys( o );
   test.identical( got, expected );
   test.true( !!stat );
   provider.filesDelete( routinePath );
@@ -24857,12 +24857,12 @@ function softLinkActSync( test )
     sync : 1,
     context : provider,
   }
-  var expected = _.mapOwnKeys( o );
+  var expected = _.mapOnlyOwnKeys( o );
   provider.softLinkAct( o );
   test.true( provider.isSoftLink( dstPath ) );
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, srcPath );
-  var got = _.mapOwnKeys( o );
+  var got = _.mapOnlyOwnKeys( o );
   test.identical( got, expected );
   provider.filesDelete( routinePath );
 
@@ -24882,12 +24882,12 @@ function softLinkActSync( test )
     sync : 1,
     context : provider,
   }
-  var expected = _.mapOwnKeys( o );
+  var expected = _.mapOnlyOwnKeys( o );
   provider.softLinkAct( o );
   test.true( provider.isSoftLink( dstPath ) );
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, srcPath );
-  var got = _.mapOwnKeys( o );
+  var got = _.mapOnlyOwnKeys( o );
   test.identical( got, expected );
   provider.filesDelete( routinePath );
 
@@ -24908,12 +24908,12 @@ function softLinkActSync( test )
     sync : 1,
     context : provider,
   }
-  var expected = _.mapOwnKeys( o );
+  var expected = _.mapOnlyOwnKeys( o );
   provider.softLinkAct( o );
   test.true( provider.isSoftLink( dstPath ) );
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, srcPath );
-  var got = _.mapOwnKeys( o );
+  var got = _.mapOnlyOwnKeys( o );
   test.identical( got, expected );
   provider.filesDelete( routinePath );
 
@@ -25131,14 +25131,14 @@ function softLinkActSync( test )
     sync : 1,
     context : provider,
   }
-  var expected = _.mapOwnKeys( o );
+  var expected = _.mapOnlyOwnKeys( o );
   if( test.context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   expected.type = 'file'
   provider.softLinkAct( o );
   test.true( provider.isSoftLink( dstPath ) );
   var got = provider.pathResolveSoftLink({ filePath : dstPath/*, readLink : 1*/ });
   test.identical( got, srcPath );
-  var got = _.mapOwnKeys( o );
+  var got = _.mapOnlyOwnKeys( o );
   test.identical( got, expected );
   provider.filesDelete( routinePath );
 
@@ -30740,13 +30740,13 @@ function hardLinkActSync( test )
     sync : 1,
     context : null
   }
-  var expected = _.mapOwnKeys( o );
+  var expected = _.mapOnlyOwnKeys( o );
   provider.hardLinkAct( o );
   if( context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   test.identical( provider.areHardLinked( [ srcPath, dstPath ] ), hardLinked );
   else
   test.identical( provider.areHardLinked( [ srcPath, dstPath ] ), true );
-  var got = _.mapOwnKeys( o );
+  var got = _.mapOnlyOwnKeys( o );
   test.identical( got, expected );
   provider.filesDelete( routinePath );
 
@@ -30842,13 +30842,13 @@ function hardLinkActSync( test )
     sync : 1,
     context : null
   }
-  var expected = _.mapOwnKeys( o );
+  var expected = _.mapOnlyOwnKeys( o );
   provider.hardLinkAct( o );
   if( context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   test.identical( provider.areHardLinked( [ srcPath, dstPath ] ), hardLinked );
   else
   test.identical( provider.areHardLinked( [ srcPath, dstPath ] ), true );
-  var got = _.mapOwnKeys( o );
+  var got = _.mapOnlyOwnKeys( o );
   test.identical( got, expected );
   provider.filesDelete( routinePath );
 
@@ -31114,13 +31114,13 @@ function hardLinkActSync( test )
     sync : 1,
     context : null
   }
-  var expected = _.mapOwnKeys( o );
+  var expected = _.mapOnlyOwnKeys( o );
   provider.hardLinkAct( o );
   if( context.providerIsInstanceOf( _.FileProvider.HardDrive ) )
   test.identical( provider.areHardLinked( [ srcPath, dstPath ] ), hardLinked );
   else
   test.identical( provider.areHardLinked( [ srcPath, dstPath ] ), true );
-  var got = _.mapOwnKeys( o );
+  var got = _.mapOnlyOwnKeys( o );
   test.identical( got, expected );
   provider.filesDelete( routinePath );
 
@@ -32156,7 +32156,7 @@ function hardLinkActAsync( test )
       sync : 0,
       context : null
     }
-    var expected = _.mapOwnKeys( o );
+    var expected = _.mapOnlyOwnKeys( o );
     return test.mustNotThrowError( provider.hardLinkAct( o ) )
     .then( ( got ) =>
     {
@@ -32165,7 +32165,7 @@ function hardLinkActAsync( test )
       test.identical( provider.areHardLinked( [ srcPath, dstPath ] ), hardLinked );
       else
       test.identical( provider.areHardLinked( [ srcPath, dstPath ] ), true );
-      got = _.mapOwnKeys( o );
+      got = _.mapOnlyOwnKeys( o );
       test.identical( got, expected );
       provider.filesDelete( routinePath );
       return null;
@@ -32190,13 +32190,13 @@ function hardLinkActAsync( test )
       sync : 0,
       context : null
     }
-    var expected = _.mapOwnKeys( o );
+    var expected = _.mapOnlyOwnKeys( o );
     return test.shouldThrowErrorOfAnyKind( provider.hardLinkAct( o ) )
     .then( ( got ) =>
     {
       test.true( _.errIs( got ) );
       test.true( !provider.areHardLinked( [ srcPath, dstPath ] ) );
-      got = _.mapOwnKeys( o );
+      got = _.mapOnlyOwnKeys( o );
       test.identical( got, expected );
       provider.filesDelete( routinePath );
       return null;
@@ -32222,13 +32222,13 @@ function hardLinkActAsync( test )
       sync : 0,
       context : null
     }
-    var expected = _.mapOwnKeys( o );
+    var expected = _.mapOnlyOwnKeys( o );
     return test.shouldThrowErrorOfAnyKind( provider.hardLinkAct( o ) )
     .then( ( got ) =>
     {
       test.true( _.errIs( got ) );
       test.true( !provider.areHardLinked( [ srcPath, dstPath ] ) );
-      got = _.mapOwnKeys( o );
+      got = _.mapOnlyOwnKeys( o );
       test.identical( got, expected );
       provider.filesDelete( routinePath );
       return null;
@@ -32256,13 +32256,13 @@ function hardLinkActAsync( test )
       sync : 0,
       context : null
     }
-    var expected = _.mapOwnKeys( o );
+    var expected = _.mapOnlyOwnKeys( o );
     return test.shouldThrowErrorOfAnyKind( provider.hardLinkAct( o ) )
     .then( ( got ) =>
     {
       test.true( _.errIs( got ) );
       test.true( !provider.areHardLinked( [ srcPath, dstPath ] ) );
-      got = _.mapOwnKeys( o );
+      got = _.mapOnlyOwnKeys( o );
       test.identical( got, expected );
       provider.filesDelete( routinePath );
       return null;
@@ -32289,13 +32289,13 @@ function hardLinkActAsync( test )
       sync : 0,
       context : null
     }
-    var expected = _.mapOwnKeys( o );
+    var expected = _.mapOnlyOwnKeys( o );
     return test.shouldThrowErrorOfAnyKind( provider.hardLinkAct( o ) )
     .then( ( got ) =>
     {
       test.true( _.errIs( got ) );
       test.true( !provider.areHardLinked( [ srcPath, dstPath ] ) );
-      got = _.mapOwnKeys( o );
+      got = _.mapOnlyOwnKeys( o );
       test.identical( got, expected );
       provider.filesDelete( routinePath );
       return null;
@@ -32320,13 +32320,13 @@ function hardLinkActAsync( test )
       sync : 0,
       context : null
     }
-    var expected = _.mapOwnKeys( o );
+    var expected = _.mapOnlyOwnKeys( o );
     return test.mustNotThrowError( provider.hardLinkAct( o ) )
     .then( ( got ) =>
     {
       test.identical( got, true );
       test.true( !provider.isHardLink( dstPath ) );
-      got = _.mapOwnKeys( o );
+      got = _.mapOnlyOwnKeys( o );
       test.identical( got, expected );
       return null;
     })
@@ -32353,7 +32353,7 @@ function hardLinkActAsync( test )
       sync : 0,
       context : null
     }
-    var expected = _.mapOwnKeys( o );
+    var expected = _.mapOnlyOwnKeys( o );
     return test.mustNotThrowError( provider.hardLinkAct( o ) )
     .then( ( got ) =>
     {
@@ -32362,7 +32362,7 @@ function hardLinkActAsync( test )
       test.identical( provider.areHardLinked( [ srcPath, dstPath ] ), hardLinked );
       else
       test.identical( provider.areHardLinked( [ srcPath, dstPath ] ), true );
-      got = _.mapOwnKeys( o );
+      got = _.mapOnlyOwnKeys( o );
       test.identical( got, expected );
       provider.filesDelete( routinePath );
       return null;

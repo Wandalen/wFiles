@@ -80,21 +80,80 @@ function form()
     }
   };
 
-  return _.Consequence.Try( () => Imap.connect( config ) )
-  .then( function( connection )
+  let error = null;
+  for( let i = 0 ; i < self.authRetryLimit ; i++ )
   {
-    self._connection = connection;
-    self.ready.take( connection );
-    return connection;
-  })
-  .catch( ( err ) =>
-  {
-    err = _.err( err );
-    self.ready.error( err );
-    throw err;
-  });
+    let provider = connect()
+    .deasync()
+    .sync();
+    if( provider )
+    return provider;
+  }
 
+  throw _.err( error, 'Cannot connect to server' );
+
+  /* */
+
+  function connect()
+  {
+    return _.Consequence.Try( () => Imap.connect( config ) )
+    .then( function( connection )
+    {
+      self._connection = connection;
+      self.ready.take( connection );
+      return connection;
+    })
+    .catch( ( err ) =>
+    {
+      error = _.err( err );
+      error = _.errOnce( error );
+      _.errAttend( error );
+      return null;
+    })
+  }
 }
+
+// function form()
+// {
+//   let self = this;
+//   let path = self.path;
+//
+//   _.assert( _.strDefined( self.login ) );
+//   _.assert( _.strDefined( self.password ) );
+//   _.assert( _.strDefined( self.hostUri ) );
+//
+//   if( !path.isGlobal( self.hostUri ) )
+//   self.hostUri = '://' + self.hostUri;
+//
+//   let parsed = path.parse( self.hostUri );
+//   let config =
+//   {
+//     imap :
+//     {
+//       user : self.login,
+//       password : self.password,
+//       host : parsed.host,
+//       port : parsed.port || 993,
+//       tls : self.tls,
+//       authTimeout : self.authTimeOut,
+//     }
+//   };
+//
+//   return _.Consequence.Try( () => Imap.connect( config ) )
+//   .then( function( connection )
+//   {
+//     self._connection = connection;
+//     self.ready.take( connection );
+//     return connection;
+//   })
+//   .catch( ( err ) =>
+//   {
+//     err = _.err( err );
+//     self.ready.error( err );
+//     throw err;
+//   });
+//
+// }
 
 //
 
@@ -1340,7 +1399,8 @@ let Composes =
   login : null,
   password : null,
   hostUri : null,
-  authTimeOut : 10000, /* 5000 */
+  authTimeOut : 5000, /* 5000 */
+  authRetryLimit : 3,
   tls : true,
   // tls : false,
   safe : 0,

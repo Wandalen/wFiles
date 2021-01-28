@@ -2017,7 +2017,7 @@ function filePathMove( o )
 
   if( o.srcInstance && o.dstInstance )
   {
-    o.value = _.entityMake( o.value );
+    o.value = _.entity.make( o.value );
   }
 
   /* set */
@@ -3562,7 +3562,7 @@ function sureBasePath( filePath, basePath )
   basePath = path.s.fromGlob( basePath );
 
   // let filePathWithFallback = filter.filePathArrayNonBoolGet( filePath, 1 );
-  let originalFilePath = _.entityMake( filePath );
+  let originalFilePath = _.entity.make( filePath );
   filePath = filter.filePathArrayNonBoolGet( filePath, 0 );
   filePath = filePath.filter( ( e ) => _.strIs( e ) && e );
   filePath = path.s.join( filter.prefixPath || '', filePath );
@@ -4066,10 +4066,10 @@ function masksGenerate()
 
     /* if base path is redundant then return empty map */
     if( _.mapIs( basePath ) )
-    filter.formedBasePath = _.entityMake( basePath );
+    filter.formedBasePath = _.entity.make( basePath );
     else
     filter.formedBasePath = Object.create( null );
-    filter.formedFilePath = _.entityMake( filePath );
+    filter.formedFilePath = _.entity.make( filePath );
 
   }
 

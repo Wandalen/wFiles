@@ -41599,7 +41599,6 @@ function filesCanBeSame( test )
     bufferData2 =  BufferNode.from( [ 0x07, 0x06, 0x05 ] );
   }
 
-
   /* - */
 
   test.case = 'same file with empty content';

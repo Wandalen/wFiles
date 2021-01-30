@@ -4545,7 +4545,8 @@ function filesAreSameCommon_body( o )
   if( o.ins1.factory.effectiveProvider === o.ins2.factory.effectiveProvider && o.ins1.stat.ino > 0 )
   {
     let could = _.files.stat.areHardLinked( o.ins1.stat, o.ins2.stat );
-    if( could === true || could === _.maybe )
+    if( could === true )
+    // if( could === true || could === _.maybe ) /* yyy */
     return true;
   }
 

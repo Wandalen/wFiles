@@ -85,7 +85,8 @@ function init( o )
 function pathParse( remotePath )
 {
   let self = this;
-  return _.git.pathParse( remotePath );
+  return _.git.path.parse( remotePath );
+  // return _.git.pathParse( remotePath );
 }
 
 //
@@ -323,8 +324,9 @@ function filesReflectSingle_body( o )
 
   /* */
 
-  _.sure( _.strDefined( parsed.remoteVcsPath ) );
-  _.sure( _.strDefined( parsed.remoteVcsLongerPath ) );
+  // _.sure( _.strDefined( parsed.remoteVcsPath ) );
+  // _.sure( _.strDefined( parsed.remoteVcsLongerPath ) );
+  _.sure( _.strDefined( parsed.longPath ) );
   _.sure( _.strDefined( parsed.hash ) || _.strDefined( parsed.tag ) );
   _.sure( !parsed.tag || !parsed.hash, 'Does not expected both hash and tag in srcPath:', _.strQuote( srcPath ) );
   _.sure( _.strIs( dstPath ) );

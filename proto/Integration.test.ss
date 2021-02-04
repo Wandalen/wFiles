@@ -96,10 +96,10 @@ function production( test )
   let isFork = mdlRepoParsed.user !== remotePathParsed.user || mdlRepoParsed.repo !== remotePathParsed.repo;
 
   let version;
-  if( !isFork )
-  version = _.npm.versionRemoteRetrive( `npm:///${ mdl.name }!alpha` ) === '' ? 'latest' : 'alpha';
-  else
+  if( isFork === true )
   version = _.git.path.nativize( remotePath );
+  else
+  version = _.npm.versionRemoteRetrive( `npm:///${ mdl.name }!alpha` ) === '' ? 'latest' : 'alpha';
 
   if( !version )
   throw _.err( 'Cannot obtain version to install' );

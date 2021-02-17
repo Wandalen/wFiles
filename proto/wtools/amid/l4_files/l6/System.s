@@ -1340,7 +1340,7 @@ function Init()
   _.assertMapHasNoUndefine( FilteredRoutines );
   _.assertMapHasNoUndefine( Extension );
   _.assertMapHasNoUndefine( Self );
-  _.assert( _.prototypeHas( Self.prototype.Path, _.uri ) );
+  _.assert( _.prototype.has( Self.prototype.Path, _.uri ) );
   _.assert( Self.Path === Self.prototype.Path );
 }
 
@@ -1398,7 +1398,7 @@ let FilteredRoutines =
 // --
 
 let Path = _.uri.CloneExtending({ fileProvider : Self });
-_.assert( _.prototypeHas( Path, _.uri ) );
+_.assert( _.prototype.has( Path, _.uri ) );
 
 // --
 // relationship

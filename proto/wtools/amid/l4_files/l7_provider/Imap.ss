@@ -305,7 +305,7 @@ function fileReadAct( o )
   ready.then( () => _read() );
   ready.then( () =>
   {
-    if( o.advanced.withTail && attachments &&  attachments.length > 0 );
+    if( o.advanced.withTail && attachments && attachments.length > 0 );
     result.attachments = attachments;
 
     if( o.encoding === 'map' )

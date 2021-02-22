@@ -4947,7 +4947,7 @@ let fileWrite = _.routineUnite( fileWrite_head, fileWrite_body );
 fileWrite.having.aspect = 'entry';
 
 // debugger;
-// _.assert( _.auxiliary.is( fileWrite.encoders ) );
+// _.assert( _.aux.is( fileWrite.encoders ) );
 // debugger;
 
 //

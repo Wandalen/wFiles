@@ -49698,7 +49698,7 @@ function encodersFromGdfs( test )
     feature : {},
     onEncode : function( op )
     {
-      op.out.data = _.toStr( op.out.data, { levels : 99 } );
+      op.out.data = _.entity.exportString( op.out.data, { levels : 99 } );
       // op.out.format = 'string';
     }
   }
@@ -49732,7 +49732,7 @@ function encodersFromGdfs( test )
     feature : {},
     onEncode : function( op )
     {
-      op.out.data = _.toStr( op.out.data, { levels : 99 } );
+      op.out.data = _.entity.exportString( op.out.data, { levels : 99 } );
       // op.out.format = 'string';
     }
   }

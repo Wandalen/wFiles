@@ -126,7 +126,7 @@ function filesReadOld( test )
   test.true( _.errIs( result.errs[ paths.length - 1 ] ) );
   test.true( _.errIs( result.err ) );
 
-  // logger.log( _.toStr( result, { levels : 99 } ) )
+  // logger.log( _.entity.exportString( result, { levels : 99 } ) )
 }
 
 //
@@ -314,7 +314,7 @@ function filesReadOld( test )
 //   {
 //     var info = _.mapSupplement( {}, c );
 //     info.number = ++n;
-//     test.case = _.toStr( info, { levels : 3 } )
+//     test.case = _.entity.exportString( info, { levels : 3 } )
 //     var checks = [];
 //     var options = _.mapSupplement( {}, c );
 //     _.mapSupplement( options, filesTreeReadFixedOptions );
@@ -336,7 +336,7 @@ function filesReadOld( test )
 //     testsInfo.push( info );
 //   })
 
-//   console.log( _.toStr( testsInfo, { levels : 3 } ) )
+//   console.log( _.entity.exportString( testsInfo, { levels : 3 } ) )
 // }
 
 // filesTreeRead.timeOut = 30000;
@@ -444,7 +444,7 @@ function filesReadOld( test )
 //     {
 //       var info = _.mapSupplement( {}, c );
 //       info.number = ++n;
-//       test.case = _.toStr( info, { levels : 3 } )
+//       test.case = _.entity.exportString( info, { levels : 3 } )
 //       var checks = [];
 //       var options = _.mapSupplement( {}, c );
 //       _.mapSupplement( options, fixedOptions );

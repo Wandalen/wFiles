@@ -72,7 +72,7 @@ function from( src )
   return src;
   else if( src instanceof _.FileRecord )
   return src.absolute;
-  else _.assert( 0, 'Expects string, but got', _.strType( src ) );
+  else _.assert( 0, 'Expects string, but got', _.entity.strType( src ) );
 
 }
 

@@ -1049,7 +1049,7 @@ function fileWriteAct( o )
   _.assert
   (
     _.strIs( o.data ) || _.bufferNodeIs( o.data ) || _.bufferBytesIs( o.data ),
-    'Expects string or node buffer, but got', _.strType( o.data )
+    'Expects string or node buffer, but got', _.entity.strType( o.data )
   );
 
   let nativizedFilePath = self.path.nativize( o.filePath );

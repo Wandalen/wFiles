@@ -358,7 +358,7 @@ function configRead_body( o )
       if( read === undefined )
       read = Object.create( null );
 
-      _.sure( _.mapIs( read ), () => 'Expects map, but read ' + _.toStrShort( result ) + ' from ' + o2.filePath );
+      _.sure( _.mapIs( read ), () => 'Expects map, but read ' + _.entity.exportStringShort( result ) + ' from ' + o2.filePath );
 
       if( result === null )
       result = read;

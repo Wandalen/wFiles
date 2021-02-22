@@ -152,7 +152,7 @@ function init( o )
   }
 
   if( self.verbosity >= 2 )
-  self.logger.log( 'new', _.strType( self ) );
+  self.logger.log( 'new', _.entity.strType( self ) );
 
   // _.process._exitHandlerOnce( () =>
   // {
@@ -1943,7 +1943,7 @@ function record( filePath )
     return filePath;
   }
 
-  _.assert( _.strIs( filePath ), () => 'Expects string {-filePath-}, but got ' + _.strType( filePath ) );
+  _.assert( _.strIs( filePath ), () => 'Expects string {-filePath-}, but got ' + _.entity.strType( filePath ) );
 
   return self.recordFactory().record( filePath );
 }
@@ -1994,7 +1994,7 @@ function _recordsSort( o )
   for( let i = 0; i < o.src.length; i++ )
   {
     if( !( o.src[ i ] instanceof _.FileRecord ) )
-    throw _.err( '_recordsSort : expects FileRecord instances in src, got:', _.strType( o.src[ i ] ) );
+    throw _.err( '_recordsSort : expects FileRecord instances in src, got:', _.entity.strType( o.src[ i ] ) );
   }
 
   let result = o.src.slice();
@@ -4837,7 +4837,7 @@ function fileWrite_body( o )
     else if( _.bufferRawIs( readData ) )
     writeData = _.bufferRawFrom( writeData );
     else
-    _.assert( _.strIs( readData ), 'not implemented for:', _.strType( readData ) );
+    _.assert( _.strIs( readData ), 'not implemented for:', _.entity.strType( readData ) );
 
     if( o.writeMode === 'append' )
     {
@@ -4880,7 +4880,7 @@ function fileWrite_body( o )
   function log()
   {
     if( o.verbosity >= 3 )
-    self.logger.log( ' + writing', _.toStrShort( o.data ), 'to', o.filePath );
+    self.logger.log( ' + writing', _.entity.exportStringShort( o.data ), 'to', o.filePath );
   }
 
 }
@@ -4986,14 +4986,14 @@ function fileWriteJson_body( o )
   let originalData = o.data;
   if( o.jsLike )
   {
-    o.data = _.toJs( o.data );
+    o.data = _.entity.exportJs( o.data );
   }
   else
   {
     if( o.cloning )
     o.data = _.cloneData({ src : o.data });
     if( o.pretty )
-    o.data = _.toJson( o.data, { cloning : 0 } );
+    o.data = _.entity.exportJson( o.data, { cloning : 0 } );
     else
     o.data = JSON.stringify( o.data );
   }
@@ -5018,7 +5018,7 @@ function fileWriteJson_body( o )
       // debugger;
       self.logger.log( '-' );
       self.logger.error( 'JSON:' );
-      self.logger.error( _.toStr( o.data, { levels : 999 } ) );
+      self.logger.error( _.entity.exportString( o.data, { levels : 999 } ) );
       self.logger.log( '-' );
       throw _.err( 'Cant convert JSON\n', err );
     }
@@ -5043,14 +5043,14 @@ defaults.prefix = '';
 defaults.jsLike = 0;
 defaults.pretty = 1;
 defaults.sync = null;
-defaults.cloning = _.toJson.defaults.cloning;
+defaults.cloning = _.entity.exportJson.defaults.cloning;
 _.assert( defaults.cloning !== undefined );
 
 var having = fileWriteJson_body.having;
 having.driving = 0;
 having.aspect = 'body';
 
-_.assert( _.boolLike( _.toJson.defaults.cloning ) );
+_.assert( _.boolLike( _.entity.exportJson.defaults.cloning ) );
 
 //
 
@@ -5133,7 +5133,7 @@ function fileTouch_head( routine, args )
 
   _.routineOptions( routine, o );
   self._providerDefaultsApply( o );
-  _.assert( _.strIs( o.filePath ), 'Expects string {-o.filePath-}, but got', _.strType( o.filePath ) );
+  _.assert( _.strIs( o.filePath ), 'Expects string {-o.filePath-}, but got', _.entity.strType( o.filePath ) );
 
   return o;
 }

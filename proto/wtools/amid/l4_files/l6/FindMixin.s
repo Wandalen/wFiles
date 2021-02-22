@@ -491,7 +491,7 @@ function filesFindNominal_body( o )
   {
     _.assert( arguments.length === 2 );
     let r = op.onUp.call( self, record, op );
-    _.assert( r === _.dont || r === record, 'Callback onUp should return original record or _.dont, but returned', _.toStrShort( r ) );
+    _.assert( r === _.dont || r === record, 'Callback onUp should return original record or _.dont, but returned', _.entity.exportStringShort( r ) );
     return r;
   }
 
@@ -501,7 +501,7 @@ function filesFindNominal_body( o )
   {
     _.assert( arguments.length === 2 );
     let r = op.onDown.call( self, record, op );
-    _.assert( r === undefined, 'Callback onDown should return nothing( undefined ), but returned', _.toStrShort( r ) );
+    _.assert( r === undefined, 'Callback onDown should return nothing( undefined ), but returned', _.entity.exportStringShort( r ) );
   }
 
 }
@@ -629,7 +629,7 @@ function filesFindSingle_body( o )
 
     _.assert( arguments.length === 2 );
     let r = o.onUp.call( self, record, o );
-    _.assert( r === _.dont || r === record, 'Callback onUp should return original record or _.dont, but returned', _.toStrShort( r ) );
+    _.assert( r === _.dont || r === record, 'Callback onUp should return original record or _.dont, but returned', _.entity.exportStringShort( r ) );
 
     return r;
   }
@@ -640,7 +640,7 @@ function filesFindSingle_body( o )
   {
     _.assert( arguments.length === 2 );
     let r = o.onDown.call( self, record, o );
-    _.assert( r === undefined, 'Callback onDown should return nothing( undefined ), but returned', _.toStrShort( r ) );
+    _.assert( r === undefined, 'Callback onDown should return nothing( undefined ), but returned', _.entity.exportStringShort( r ) );
   }
 
 }
@@ -721,8 +721,8 @@ function filesFind_head( routine, args )
       _.assert
       (
         _.longHas( knownFormats, o.outputFormat ),
-        'Unknown output format ' + _.toStrShort( o.outputFormat )
-        + '\nKnown output formats : ' + _.toStr( knownFormats )
+        'Unknown output format ' + _.entity.exportStringShort( o.outputFormat )
+        + '\nKnown output formats : ' + _.entity.exportString( knownFormats )
       );
     }
 
@@ -816,7 +816,7 @@ function filesFind_body( o )
   time = _.time.now();
 
   if( o.verbosity >= 3 )
-  self.logger.log( 'filesFind', _.toStr( o, { levels : 2 } ) );
+  self.logger.log( 'filesFind', _.entity.exportString( o, { levels : 2 } ) );
 
   let pathMap = o.filter.formedFilePath;
 
@@ -1009,7 +1009,7 @@ function filesFind_body( o )
     }
 
     let r = o.onUp.call( self, record, o );
-    _.assert( r === _.dont || r === record, 'Callback onUp should return original record or _.dont, but returned', _.toStrShort( r ) );
+    _.assert( r === _.dont || r === record, 'Callback onUp should return original record or _.dont, but returned', _.entity.exportStringShort( r ) );
     if( r === _.dont )
     return _.dont;
 
@@ -1058,7 +1058,7 @@ function filesFind_body( o )
     }
 
     let r = o.onDown.call( self, record, o );
-    _.assert( r === undefined, 'Callback onDown should return undefined', _.toStrShort( r ) );
+    _.assert( r === undefined, 'Callback onDown should return undefined', _.entity.exportStringShort( r ) );
 
   }
 
@@ -2217,7 +2217,7 @@ function filesReflectEvaluate_body( o )
 
     handleDown2.call( self, record, o );
     let r = o.onDown.call( self, record, o );
-    _.assert( r === undefined, () => 'Callback onDown should return nothing( undefined ), but returned ' + _.toStrShort( r ) );
+    _.assert( r === undefined, () => 'Callback onDown should return nothing( undefined ), but returned ' + _.entity.exportStringShort( r ) );
 
     _.assert( record.action !== 'exclude' || record.touch === false, () => 'Attempt to exclude touched ' + record.dst.absolute );
 
@@ -3758,8 +3758,8 @@ function filesReflect_head( routine, args )
     _.assert
     (
       _.longHas( knownFormats, o.outputFormat ),
-      'Unknown output format ' + _.toStrShort( o.outputFormat )
-      + '\nKnown output formats : ' + _.toStr( knownFormats )
+      'Unknown output format ' + _.entity.exportStringShort( o.outputFormat )
+      + '\nKnown output formats : ' + _.entity.exportString( knownFormats )
     );
 
   }
@@ -4077,7 +4077,7 @@ function filesReflectTo_head( routine, args )
   _.assert( arguments.length === 2, 'Expects exactly two arguments' );
   _.assert( 1 === args.length || 2 === args.length );
   _.routineOptions( routine, o );
-  _.assert( o.dstProvider instanceof _.FileProvider.Abstract, () => 'Expects file provider {- o.dstProvider -}, but got ' + _.strType( o.dstProvider ) );
+  _.assert( o.dstProvider instanceof _.FileProvider.Abstract, () => 'Expects file provider {- o.dstProvider -}, but got ' + _.entity.strType( o.dstProvider ) );
   // _.assert( path.s.isAbsolute( o.dst ), 'Expects simple path string {- o.dst -}' );
   // _.assert( path.s.isAbsolute( o.src ), 'Expects simple path string {- o.src -}' );
 

@@ -1603,7 +1603,7 @@ function filesFind( test )
       var info = _.cloneJust( c )
       info.level = l;
       info.number = ++n;
-      test.case = _.toStr( info, { levels : 3 } )
+      test.case = _.entity.exportString( info, { levels : 3 } )
       var checks = [];
       var options = _.cloneJust( c );
 
@@ -1644,8 +1644,8 @@ function filesFind( test )
 
         if( options.outputFormat === 'absolute' || options.outputFormat === 'relative' )
         {
-          logger.log( 'Files:', _.toStr( files.sort() ) );
-          logger.log( 'Expected:', _.toStr( expected.sort() ) );
+          logger.log( 'Files:', _.entity.exportString( files.sort() ) );
+          logger.log( 'Expected:', _.entity.exportString( expected.sort() ) );
           checks.push( test.identical( files.sort(), expected.sort() ) );
         }
       }
@@ -1693,7 +1693,7 @@ function filesFind( test )
     var info = _.cloneJust( o );
     info.level = levels;
     info.number = ++n;
-    test.case = _.toStr( info, { levels : 3 } )
+    test.case = _.entity.exportString( info, { levels : 3 } )
     var files = provider.filesFind( _.cloneJust( o ) );
 
     // var tester = path.globRegexpsForTerminal( glob, routinePath, info.filter.basePath );
@@ -1704,8 +1704,8 @@ function filesFind( test )
     {
       return tester.test( './' + path.relative( routinePath, p ) )
     });
-    logger.log( 'Got: ', _.toStr( files ) );
-    logger.log( 'Expected: ', _.toStr( expected ) );
+    logger.log( 'Got: ', _.entity.exportString( files ) );
+    logger.log( 'Expected: ', _.entity.exportString( expected ) );
     var checks = [];
     checks.push( test.identical( files.sort(), expected.sort() ) );
 
@@ -5422,7 +5422,7 @@ function filesFindResolving( test )
     }
   ]
 
-  logger.log( _.toStr( files, { levels : 99 } )   )
+  logger.log( _.entity.exportString( files, { levels : 99 } )   )
 
   test.identical( filtered, expected )
   var srcDirStat = provider.statResolvedRead( srcDirPath );
@@ -5762,7 +5762,7 @@ function filesFindResolving( test )
   ]
 
   test.identical( filtered, expected )
-  console.log( _.toStr( filtered, { levels : 99 }))
+  console.log( _.entity.exportString( filtered, { levels : 99 }))
   var srcDirStat = provider.statResolvedRead( srcDirPath );
   var srcFileStat = findRecord( files, 'absolute', terminalPath ).stat;
   var textLinkStat = findRecord( files, 'absolute', textLinkPath ).stat;
@@ -17659,7 +17659,7 @@ function _filesReflectWithFilter( test, o )
     includingNonAllowed : 0,
   }
 
-  test.case = 'trivial \n' + _.toStr( o2 );
+  test.case = 'trivial \n' + _.entity.exportString( o2 );
 
   var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
 
@@ -17780,7 +17780,7 @@ function _filesReflectWithFilter( test, o )
     includingNonAllowed : 1,
   }
 
-  test.case = 'trivial \n' + _.toStr( o2 );
+  test.case = 'trivial \n' + _.entity.exportString( o2 );
 
   var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
 
@@ -17914,7 +17914,7 @@ function _filesReflectWithFilter( test, o )
     dstRewritingByDistinct : 1,
   }
 
-  test.case = 'dir by term and vice-versa \n' + _.toStr( o2 );
+  test.case = 'dir by term and vice-versa \n' + _.entity.exportString( o2 );
 
   var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
 
@@ -18099,7 +18099,7 @@ function filesReflect( test )
       preservingTime : 0,
     }
 
-    test.case = 'complex move\n' + _.toStr( o2 );
+    test.case = 'complex move\n' + _.entity.exportString( o2 );
 
     var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
 
@@ -18168,7 +18168,7 @@ function filesReflect( test )
       preservingTime : 0,
     }
 
-    test.case = 'complex move with linking : softLink\n' + _.toStr( o2 );
+    test.case = 'complex move with linking : softLink\n' + _.entity.exportString( o2 );
 
     var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
 
@@ -18231,7 +18231,7 @@ function filesReflect( test )
       preservingTime : 0,
     }
 
-    test.case = 'complex move with dstRewriting:0, includingNonAllowed:0\n' + _.toStr( o2 );
+    test.case = 'complex move with dstRewriting:0, includingNonAllowed:0\n' + _.entity.exportString( o2 );
 
     var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
 
@@ -18281,7 +18281,7 @@ function filesReflect( test )
       preservingTime : 0,
     }
 
-    test.case = 'complex move with dstRewriting:0, includingNonAllowed:1\n' + _.toStr( o2 );
+    test.case = 'complex move with dstRewriting:0, includingNonAllowed:1\n' + _.entity.exportString( o2 );
 
     var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
 
@@ -18337,7 +18337,7 @@ function filesReflect( test )
       preservingTime : 0,
     }
 
-    test.case = 'complex move with writing : 0\n' + _.toStr( o2 );
+    test.case = 'complex move with writing : 0\n' + _.entity.exportString( o2 );
 
     var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
 
@@ -18393,7 +18393,7 @@ function filesReflect( test )
       preservingTime : 0,
     }
 
-    test.case = 'complex move with writing : 1, linking : nop\n' + _.toStr( o2 );
+    test.case = 'complex move with writing : 1, linking : nop\n' + _.entity.exportString( o2 );
 
     var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
 
@@ -18465,7 +18465,7 @@ function filesReflect( test )
       includingNonAllowed : 0,
     }
 
-    test.case = 'complex move with writing : 1, dstRewriting : 0, includingNonAllowed : 0, linking : nop\n' + _.toStr( o2 );
+    test.case = 'complex move with writing : 1, dstRewriting : 0, includingNonAllowed : 0, linking : nop\n' + _.entity.exportString( o2 );
 
     var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
 
@@ -18518,7 +18518,7 @@ function filesReflect( test )
       includingNonAllowed : 1,
     }
 
-    test.case = 'complex move with writing : 1, dstRewriting : 0, includingNonAllowed : 1, linking : nop\n' + _.toStr( o2 );
+    test.case = 'complex move with writing : 1, dstRewriting : 0, includingNonAllowed : 1, linking : nop\n' + _.entity.exportString( o2 );
 
     var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
 
@@ -18577,7 +18577,7 @@ function filesReflect( test )
       preservingSame : 1,
     }
 
-    test.case = 'complex move with preservingSame : 1, linking : fileCopy\n' + _.toStr( o2 );
+    test.case = 'complex move with preservingSame : 1, linking : fileCopy\n' + _.entity.exportString( o2 );
 
     var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
 
@@ -18641,7 +18641,7 @@ function filesReflect( test )
       preservingTime : 0,
     }
 
-    test.case = 'complex move with srcDeleting : 1\n' + _.toStr( o2 );
+    test.case = 'complex move with srcDeleting : 1\n' + _.entity.exportString( o2 );
 
     var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
 
@@ -18707,7 +18707,7 @@ function filesReflect( test )
       preservingTime : 0,
     }
 
-    test.case = 'complex move with srcDeleting : 1, dstRewriting : 0\n' + _.toStr( o2 );
+    test.case = 'complex move with srcDeleting : 1, dstRewriting : 0\n' + _.entity.exportString( o2 );
 
     var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
 
@@ -18775,7 +18775,7 @@ function filesReflect( test )
       includingNonAllowed : 0,
     }
 
-    test.case = 'complex move with srcDeleting : 1, dstRewriting : 0, includingNonAllowed : 0\n' + _.toStr( o2 );
+    test.case = 'complex move with srcDeleting : 1, dstRewriting : 0, includingNonAllowed : 0\n' + _.entity.exportString( o2 );
 
     var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
 
@@ -18830,7 +18830,7 @@ function filesReflect( test )
       preservingTime : 0,
     }
 
-    test.case = 'complex move with dstDeleting : 1\n' + _.toStr( o2 );
+    test.case = 'complex move with dstDeleting : 1\n' + _.entity.exportString( o2 );
 
     var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
 
@@ -18899,7 +18899,7 @@ function filesReflect( test )
       includingNonAllowed : 0,
     }
 
-    test.case = 'complex move with dstDeleting : 1, dstRewriting : 0, srcDeleting : 1, includingNonAllowed : 0\n' + _.toStr( o2 );
+    test.case = 'complex move with dstDeleting : 1, dstRewriting : 0, srcDeleting : 1, includingNonAllowed : 0\n' + _.entity.exportString( o2 );
 
     var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
 
@@ -18981,7 +18981,7 @@ function filesReflect( test )
       preservingTime : 0,
     }
 
-    test.case = 'several srcs, dsts\n' + _.toStr( o2 );
+    test.case = 'several srcs, dsts\n' + _.entity.exportString( o2 );
 
     var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
 
@@ -19080,7 +19080,7 @@ function filesReflect( test )
       preservingTime : 0,
     }
 
-    test.case = 'several srcs, dsts\n' + _.toStr( o2 );
+    test.case = 'several srcs, dsts\n' + _.entity.exportString( o2 );
 
     var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
 
@@ -19159,7 +19159,7 @@ function filesReflect( test )
       preservingTime : 0,
     }
 
-    test.case = 'several srcs, dsts\n' + _.toStr( o2 );
+    test.case = 'several srcs, dsts\n' + _.entity.exportString( o2 );
 
     var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
 
@@ -19256,7 +19256,7 @@ function filesReflect( test )
       preservingTime : 0,
     }
 
-    test.case = 'base marker *()\n' + _.toStr( o2 );
+    test.case = 'base marker *()\n' + _.entity.exportString( o2 );
 
     var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
 
@@ -19365,7 +19365,7 @@ function filesReflect( test )
       preservingTime : 0,
     }
 
-    test.case = 'several srcs, dsts\n' + _.toStr( o2 );
+    test.case = 'several srcs, dsts\n' + _.entity.exportString( o2 );
 
     var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
 
@@ -19450,7 +19450,7 @@ function filesReflect( test )
       preservingTime : 0,
     }
 
-    test.case = 'several srcs, dsts\n' + _.toStr( o2 );
+    test.case = 'several srcs, dsts\n' + _.entity.exportString( o2 );
 
     var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
 
@@ -19543,7 +19543,7 @@ function filesReflect( test )
       preservingTime : 0,
     }
 
-    test.case = 'several srcs, dsts\n' + _.toStr( o2 );
+    test.case = 'several srcs, dsts\n' + _.entity.exportString( o2 );
 
     var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
 
@@ -19630,7 +19630,7 @@ function filesReflect( test )
       preservingTime : 0,
     }
 
-    test.case = 'base marker *()\n' + _.toStr( o2 );
+    test.case = 'base marker *()\n' + _.entity.exportString( o2 );
 
     var records = p.system.filesReflect( _.mapExtend( null, o1, o2 ) );
 
@@ -36451,17 +36451,17 @@ function filesFindDifference( test )
     if( !passed )
     {
 
-      // logger.log( 'got :\n' + _.toStr( got, { levels : 3 } ) );
-      // logger.log( 'expected :\n' + _.toStr( sample.expected, { levels : 3 } ) );
+      // logger.log( 'got :\n' + _.entity.exportString( got, { levels : 3 } ) );
+      // logger.log( 'expected :\n' + _.entity.exportString( sample.expected, { levels : 3 } ) );
 
-      // logger.log( 'got :\n' + _.toStr( got, { levels : 2 } ) );
+      // logger.log( 'got :\n' + _.entity.exportString( got, { levels : 2 } ) );
 
-      logger.log( 'relative :\n' + _.toStr( _.select( got, '*.src.relative' ), { levels : 2 } ) );
-      logger.log( 'same :\n' + _.toStr( _.select( got, '*.same' ), { levels : 2 } ) );
-      logger.log( 'del :\n' + _.toStr( _.select( got, '*.del' ), { levels : 2 } ) );
+      logger.log( 'relative :\n' + _.entity.exportString( _.select( got, '*.src.relative' ), { levels : 2 } ) );
+      logger.log( 'same :\n' + _.entity.exportString( _.select( got, '*.same' ), { levels : 2 } ) );
+      logger.log( 'del :\n' + _.entity.exportString( _.select( got, '*.del' ), { levels : 2 } ) );
 
-      logger.log( 'newer :\n' + _.toStr( _.select( got, '*.newer.side' ), { levels : 1 } ) );
-      logger.log( 'older :\n' + _.toStr( _.select( got, '*.older' ), { levels : 1 } ) );
+      logger.log( 'newer :\n' + _.entity.exportString( _.select( got, '*.newer.side' ), { levels : 1 } ) );
+      logger.log( 'older :\n' + _.entity.exportString( _.select( got, '*.older' ), { levels : 1 } ) );
 
     }
 
@@ -38091,16 +38091,16 @@ function filesCopyWithAdapter( test )
 
     if( !passed )
     {
-      logger.log( 'return :\n' + _.toStr( got, { levels : 2 } ) );
-      // logger.log( 'got :\n' + _.toStr( treeGot.initial, { levels : 99 } ) );
-      // logger.log( 'expected :\n' + _.toStr( sample.filesTree.got, { levels : 99 } ) );
+      logger.log( 'return :\n' + _.entity.exportString( got, { levels : 2 } ) );
+      // logger.log( 'got :\n' + _.entity.exportString( treeGot.initial, { levels : 99 } ) );
+      // logger.log( 'expected :\n' + _.entity.exportString( sample.filesTree.got, { levels : 99 } ) );
 
-      logger.log( 'relative :\n' + _.toStr( _.select( got, '*.relative' ), { levels : 2 } ) );
-      logger.log( 'action :\n' + _.toStr( _.select( got, '*.action' ), { levels : 2 } ) );
+      logger.log( 'relative :\n' + _.entity.exportString( _.select( got, '*.relative' ), { levels : 2 } ) );
+      logger.log( 'action :\n' + _.entity.exportString( _.select( got, '*.action' ), { levels : 2 } ) );
       // logger.log( 'length :\n' + got.length + ' / ' + sample.expected.length );
 
-      //logger.log( 'same :\n' + _.toStr( _.select( got, '*.same' ), { levels : 2 } ) );
-      //logger.log( 'del :\n' + _.toStr( _.select( got, '*.del' ), { levels : 2 } ) );
+      //logger.log( 'same :\n' + _.entity.exportString( _.select( got, '*.same' ), { levels : 2 } ) );
+      //logger.log( 'del :\n' + _.entity.exportString( _.select( got, '*.del' ), { levels : 2 } ) );
 
     }
 
@@ -38130,7 +38130,7 @@ function experiment( test )
   _.fileProvider.resolvingSoftLink = 1;
 
   var files = _.fileProvider.filesFind( dst );
-  console.log( _.toStr( files, { levels : 99 } ) );
+  console.log( _.entity.exportString( files, { levels : 99 } ) );
 
   // var got2 = _.fileProvider.filesFind( { filePath : __dirname, filter : { recursive : 2 } } );
   // console.log( got2[ 0 ] );

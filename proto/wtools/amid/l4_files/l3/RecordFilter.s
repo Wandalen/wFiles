@@ -187,7 +187,7 @@ function _formAssociations()
   // _.assert
   // (
   //   !filter.system || filter.system instanceof _.FileProvider.System,
-  //   () => '{- filter.system -} should be instance of {- _.FileProvider.System -}, but it is ' + _.toStrShort( filter.system )
+  //   () => '{- filter.system -} should be instance of {- _.FileProvider.System -}, but it is ' + _.entity.exportStringShort( filter.system )
   // );
   // _.assert
   // (
@@ -197,7 +197,7 @@ function _formAssociations()
   // _.assert
   // (
   //   filter.defaultProvider instanceof _.FileProvider.Abstract,
-  //   () => '{- filter.system -} should be instance of {- _.FileProvider.Abstract -}, but it is ' + _.toStrShort( filter.defaultProvider )
+  //   () => '{- filter.system -} should be instance of {- _.FileProvider.Abstract -}, but it is ' + _.entity.exportStringShort( filter.defaultProvider )
   // );
 
   /* */
@@ -342,7 +342,7 @@ function _formFinal()
     _.assert
     (
       path.s.allAreAbsolute( filePath ) || path.s.allAreGlobal( filePath ),
-      () => 'Expects absolute or global file path, but got\n' + _.toJson( filePath )
+      () => 'Expects absolute or global file path, but got\n' + _.entity.exportJson( filePath )
     );
 
     if( _.mapIs( filter.formedBasePath ) )
@@ -353,12 +353,12 @@ function _formFinal()
       _.assert
       (
         path.isAbsolute( filePath ) && path.isNormalized( filePath ) && !path.isGlob( filePath ) && !path.isTrailed( filePath ),
-        () => 'Stem path should be absolute and normalized, but not glob, neither trailed' + '\nstemPath : ' + _.toStr( filePath )
+        () => 'Stem path should be absolute and normalized, but not glob, neither trailed' + '\nstemPath : ' + _.entity.exportString( filePath )
       );
       _.assert
       (
         path.isAbsolute( basePath ) && path.isNormalized( basePath ) && !path.isGlob( basePath ) && !path.isTrailed( basePath ),
-        () => 'Base path should be absolute and normalized, but not glob, neither trailed' + '\nbasePath : ' + _.toStr( basePath )
+        () => 'Base path should be absolute and normalized, but not glob, neither trailed' + '\nbasePath : ' + _.entity.exportString( basePath )
       );
     }
 
@@ -1510,7 +1510,7 @@ function basePathSet( src )
   _.assert
   (
     src === null || _.strIs( src ) || _.mapIs( src ),
-    () => 'Base path can be null, string or map, but not ' + _.strType( src )
+    () => 'Base path can be null, string or map, but not ' + _.entity.strType( src )
   )
 
   if( 0 )
@@ -2033,7 +2033,7 @@ function filePathMove( o )
       let path = fileProvider.path;
       if( _.strIs( o.value ) || _.arrayIs( o.value ) || _.boolLike( o.value ) )
       o.value = path.mapsPair( o.value, null );
-      _.assert( o.value === null || _.mapIs( o.value ), () => 'Paired filter could have only path map as file path, not ' + _.strType( o.value ) );
+      _.assert( o.value === null || _.mapIs( o.value ), () => 'Paired filter could have only path map as file path, not ' + _.entity.strType( o.value ) );
       if( o.dstInstance.src[ filePathSymbol ] !== o.value )
       {
         _.assert( o.dstInstance.src.formed < 5, 'Paired source filter is formed and cant be modified' );
@@ -2046,7 +2046,7 @@ function filePathMove( o )
       let path = fileProvider.path;
       if( _.strIs( o.value ) || _.arrayIs( o.value ) || _.boolLike( o.value ) )
       o.value = path.mapsPair( null, o.value );
-      _.assert( o.value === null || _.mapIs( o.value ), () => 'Paired filter could have only path map as file path, not ' + _.strType( o.value ) );
+      _.assert( o.value === null || _.mapIs( o.value ), () => 'Paired filter could have only path map as file path, not ' + _.entity.strType( o.value ) );
       if( o.dstInstance.dst[ filePathSymbol ] !== o.value )
       {
         _.assert( o.dstInstance.dst.formed < 5, 'Paired destination filter is formed and cant be modified' );
@@ -2101,7 +2101,7 @@ filePathMove.defaults =
 //     let path = fileProvider.path;
 //     if( _.strIs( src ) || _.arrayIs( src ) || _.boolLike( src ) )
 //     src = path.mapsPair( src, null );
-//     _.assert( src === null || _.mapIs( src ), () => 'Paired filter could have only path map as file path, not ' + _.strType( src ) );
+//     _.assert( src === null || _.mapIs( src ), () => 'Paired filter could have only path map as file path, not ' + _.entity.strType( src ) );
 //     if( src !== filter.src.filePath )
 //     filter.src[ filePathSymbol ] = src;
 //   }
@@ -2111,7 +2111,7 @@ filePathMove.defaults =
 //     let path = fileProvider.path;
 //     if( _.strIs( src ) || _.arrayIs( src ) || _.boolLike( src ) )
 //     src = path.mapsPair( null, src );
-//     _.assert( src === null || _.mapIs( src ), () => 'Paired filter could have only path map as file path, not ' + _.strType( src ) );
+//     _.assert( src === null || _.mapIs( src ), () => 'Paired filter could have only path map as file path, not ' + _.entity.strType( src ) );
 //     if( src !== filter.dst.filePath )
 //     filter.dst[ filePathSymbol ] = src;
 //   }
@@ -3524,7 +3524,7 @@ function sureRelativeOrGlobal( o )
     _.sure
     (
       it.value === null || _.boolLike( it.value ) || path.s.allAreRelative( it.value ) || path.s.allAreGlobal( it.value ),
-      () => 'Filter should have relative ' + it.propName + ', but has ' + _.toStr( it.value )
+      () => 'Filter should have relative ' + it.propName + ', but has ' + _.entity.exportString( it.value )
     );
   }
 
@@ -3737,7 +3737,7 @@ function toStr()
   {
     let propName = FieldNames[ f ];
     if( filter[ propName ] !== null )
-    result += '\n' + '  ' + propName + ' :\n' + _.toJs( filter[ propName ], { levels : 2 } );
+    result += '\n' + '  ' + propName + ' :\n' + _.entity.exportJs( filter[ propName ], { levels : 2 } );
   }
 
   return result;

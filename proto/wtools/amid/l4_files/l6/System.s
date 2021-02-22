@@ -153,7 +153,7 @@ function providerRegister( fileProvider )
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assert( fileProvider instanceof _.FileProvider.Abstract, () => 'Expects file providers, but got ' + _.strType( fileProvider ) );
+  _.assert( fileProvider instanceof _.FileProvider.Abstract, () => 'Expects file providers, but got ' + _.entity.strType( fileProvider ) );
   _.assert( _.arrayIs( fileProvider.protocols ) );
   _.assert( _.strDefined( fileProvider.protocol ), 'Cant register file provider without {-protocol-} defined', _.strQuote( fileProvider.qualifiedName ) );
   _.assert( _.strDefined( fileProvider.originPath ) );
@@ -1334,7 +1334,7 @@ function Init()
     missingMap[ r ] = 'Routines.' + r;
   }
 
-  _.assert( !_.mapKeys( missingMap ).length, 'routine(s) were not written into Extension explicitly', '\n', _.toStr( missingMap, { stringWrapper : '' } ) );
+  _.assert( !_.mapKeys( missingMap ).length, 'routine(s) were not written into Extension explicitly', '\n', _.entity.exportString( missingMap, { stringWrapper : '' } ) );
   _.assert( !FilteredRoutines.pathResolveLinkFull );
   _.assert( !( 'pathResolveLinkFull' in FilteredRoutines ) );
   _.assertMapHasNoUndefine( FilteredRoutines );

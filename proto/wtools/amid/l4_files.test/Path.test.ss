@@ -592,8 +592,8 @@ function regexpMakeSafe( test )
     excludeAll : []
   };
   var got = _.files.regexpMakeSafe();
-  // logger.log( 'got', _.toStr( got,{ levels : 3 } ) );
-  // logger.log( 'expected1', _.toStr( expected1,{ levels : 3 } ) );
+  // logger.log( 'got', _.entity.exportString( got,{ levels : 3 } ) );
+  // logger.log( 'expected1', _.entity.exportString( expected1,{ levels : 3 } ) );
   test.identical( got.includeAny, expected1.includeAny );
   test.identical( got.includeAll, expected1.includeAll );
   test.identical( got.excludeAny, expected1.excludeAny );

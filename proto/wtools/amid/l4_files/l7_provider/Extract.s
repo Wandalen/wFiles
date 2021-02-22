@@ -684,7 +684,7 @@ function fileWriteAct( o )
 
   let encoder = fileWriteAct.encoders[ o.encoding ];
 
-  _.assert( self._DescriptorIsTerminal( o.data ), 'Expects string or BufferNode, but got', _.strType( o.data ) );
+  _.assert( self._DescriptorIsTerminal( o.data ), 'Expects string or BufferNode, but got', _.entity.strType( o.data ) );
 
   /* */
 
@@ -808,7 +808,7 @@ function fileWriteAct( o )
           else if( _.bufferRawIs( data ) )
           read = _.bufferRawFrom( read )
           else
-          _.assert( 0, 'not implemented for:', _.strType( data ) );
+          _.assert( 0, 'not implemented for:', _.entity.strType( data ) );
         }
       }
 
@@ -2722,7 +2722,7 @@ writeEncoders[ 'original.type' ] =
       e.data = _.bufferRawFrom( e.data )
       else
       {
-        _.assert( 0, 'not implemented for:', _.strType( e.read ) );
+        _.assert( 0, 'not implemented for:', _.entity.strType( e.read ) );
         // _.bufferFrom({ src : data, bufferConstructor : read.constructor });
       }
     }

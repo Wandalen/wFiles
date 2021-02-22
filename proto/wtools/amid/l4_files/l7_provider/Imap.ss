@@ -321,18 +321,18 @@ function fileReadAct( o )
       if( o.advanced.withHeader )
       {
         if( _.mapKeys( result.header ).length > 0 )
-        message += '"header" : ' + _.toJson( result.header ) + ',\n';
+        message += '"header" : ' + _.entity.exportJson( result.header ) + ',\n';
       }
       if( o.advanced.withBody )
       {
         let bodyArray = result.parts.filter( ( e ) => e.which === 'TEXT' );
         if( bodyArray[ 0 ].body )
-        message += '"body" : ' + _.toJson( bodyArray[ 0 ].body ) + ',\n';
+        message += '"body" : ' + _.entity.exportJson( bodyArray[ 0 ].body ) + ',\n';
       }
       if( o.advanced.withTail )
       {
         if( result.attachments.length > 0 )
-        message += '"attachments" : ' + _.toJson( result.attachments ) + '\n';
+        message += '"attachments" : ' + _.entity.exportJson( result.attachments ) + '\n';
       }
 
       if( _.strEnds( message, ',\n' ) )
@@ -905,7 +905,7 @@ function fileWriteAct( o )
   if( _.bufferTypedIs( o.data ) && !_.bufferBytesIs( o.data ) || _.bufferRawIs( o.data ) )
   o.data = _.bufferNodeFrom( o.data );
 
-  _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ) || _.bufferBytesIs( o.data ), 'Expects string or node buffer, but got', _.strType( o.data ) );
+  _.assert( _.strIs( o.data ) || _.bufferNodeIs( o.data ) || _.bufferBytesIs( o.data ), 'Expects string or node buffer, but got', _.entity.strType( o.data ) );
 
   /* write */
 

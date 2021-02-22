@@ -621,11 +621,11 @@ function fileReport( file ) /* xxx : rename */
     fileTypes.isSocket = file.stat.isSocket();
   }
 
-  report += _.toStr( file, { levels : 2, wrap : 0 } );
+  report += _.entity.exportString( file, { levels : 2, wrap : 0 } );
   report += '\n';
-  report += _.toStr( file.stat, { levels : 2, wrap : 0 } );
+  report += _.entity.exportString( file.stat, { levels : 2, wrap : 0 } );
   report += '\n';
-  report += _.toStr( fileTypes, { levels : 2, wrap : 0 } );
+  report += _.entity.exportString( fileTypes, { levels : 2, wrap : 0 } );
 
   return report;
 }

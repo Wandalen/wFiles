@@ -187,7 +187,7 @@ Self.shortName = 'SecondaryMixin';
 //           name = path.name;
 //         }
 //         else
-//         _.assert( 0, 'unknown type of path', _.strType( path ) );
+//         _.assert( 0, 'unknown type of path', _.entity.strType( path ) );
 //
 //         read2[ name ] = read[ p ];
 //         got2[ name ] = got[ p ];
@@ -327,7 +327,7 @@ function _filesReadOldAsync( o )
       if( _err || arg === undefined || arg === null )
       {
         err = _.errAttend( err );
-        err = _.err( 'Cant read : ' + _.toStr( readOptions.filePath ) + '\n', ( _err || 'unknown reason' ) );
+        err = _.err( 'Cant read : ' + _.entity.exportString( readOptions.filePath ) + '\n', ( _err || 'unknown reason' ) );
         errs[ p ] = err;
       }
       else

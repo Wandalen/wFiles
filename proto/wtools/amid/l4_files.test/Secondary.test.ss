@@ -3193,117 +3193,6 @@ function filesAreUpToDate2( test )
   var map = { src : file1, dst : file2, newer : 1 };
   test.shouldThrowErrorSync( () => provider.filesAreUpToDate2( map ) );
 
-
-//   var textData1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-//     textData2 = ' Aenean non feugiat mauris',
-//     bufferData1 = new BufferNode( [ 0x01, 0x02, 0x03, 0x04 ] ),
-//     bufferData2 = new BufferNode( [ 0x07, 0x06, 0x05 ] );
-//
-//   // regular tests
-//   var testChecks =
-//     [
-//       {
-//         name : 'files is up to date',
-//         createFirst :
-//         {
-//           path : [ 'tmp.tmp/filesIsUpToDate1/file1', 'tmp.tmp/filesIsUpToDate1/file2.txt' ],
-//           type : 'f',
-//           createResource : [ bufferData1, textData1 ]
-//         },
-//         createSecond :
-//         {
-//           path : [ 'tmp.tmp/filesIsUpToDate1/file3', 'tmp.tmp/filesIsUpToDate1/file4.txt' ],
-//           type : 'f',
-//           createResource : [ bufferData2, textData2 ]
-//         },
-//         src : [ 'tmp.tmp/filesIsUpToDate1/file1', 'tmp.tmp/filesIsUpToDate1/file2.txt' ],
-//         dst : [ 'tmp.tmp/filesIsUpToDate1/file3', 'tmp.tmp/filesIsUpToDate1/file4.txt' ],
-//         expected : true
-//       },
-//       {
-//         name : 'files is not up to date',
-//         createFirst :
-//         {
-//           path : [ 'tmp.tmp/filesIsUpToDate2/file1', 'tmp.tmp/filesIsUpToDate2/file2.txt' ],
-//           type : 'f',
-//           createResource : [ bufferData1, textData1 ]
-//         },
-//         createSecond :
-//         {
-//           path : [ 'tmp.tmp/filesIsUpToDate2/file3', 'tmp.tmp/filesIsUpToDate2/file4.txt' ],
-//           type : 'f',
-//           createResource : [ bufferData2, textData2 ]
-//         },
-//         src : [ 'tmp.tmp/filesIsUpToDate2/file1', 'tmp.tmp/filesIsUpToDate2/file4.txt' ],
-//         dst : [ 'tmp.tmp/filesIsUpToDate2/file3', 'tmp.tmp/filesIsUpToDate2/file2.txt' ],
-//         expected : false
-//       },
-//     ];
-//
-// /*
-//   function createWithDelay( fileLists, delay )
-//   {
-//     delay = delay || 0;
-//     var con = wConsequence( );
-//     setTimeout( function( )
-//     {
-//       context.createTestResources( fileLists );
-//       console.log( '--> files created second' );
-//       con.take( );
-//     }, delay );
-//     return con;
-//   }
-// */
-//
-//   var con = new _.Consequence( ).take( null );
-//   for( let tc of testChecks )
-//   {
-//     ( function( tc )
-//     {
-//       con.finally( () =>
-//       {
-//         console.log( 'tc : ' + tc.name );
-//         context.createTestResources( tc.createFirst );
-//         console.log( '--> files create first' );
-//         return null;
-//       })
-//
-//       con.finally( _.routineSeal( _,_.time.out,[ 1000 ] ) );
-//       con.finally( _.routineSeal( null,createTestResources,[ tc.createSecond ] ) );
-//       con.finally( _.routineSeal( console,console.log,[ '--> files created second' ] ) );
-//
-// /*
-//       try
-//       {
-//         con = createWithDelay( tc.createSecond, 500 )
-//       }
-//       catch( err )
-//       {
-//         console.log( err );
-//       }
-// */
-//
-//       con.finally( ( ) =>
-//       {
-//         test.description = tc.name;
-//         try
-//         {
-//           var got = provider.filesAreUpToDate2
-//           ({
-//             src : tc.src.map( ( v ) => _.path.resolve( context.mergePath( v ) ) ),
-//             dst : tc.dst.map( ( v ) => _.path.resolve( context.mergePath( v ) ) )
-//           });
-//         }
-//         catch( err )
-//         {
-//           console.log( err );
-//         }
-//         test.identical( got, tc.expected );
-//         return null;
-//       } );
-//     } )( _.mapExtend( null, tc ) );
-//   }
-//   return con;
 };
 
 //
@@ -3477,30 +3366,30 @@ function filesAreUpToDate2( test )
 function filesAreOnSameDevice( test )
 {
   let context = this;
-  let filesTree = 
+  let filesTree =
   {
-    a : 
+    a :
     {
       b : 'b',
       c : 'c'
     },
-    b : 
+    b :
     {
       d : 'd'
     },
-    
+
     'softLink1' : [{ softLink : '../a/b'}],
     'softLink2' : [{ softLink : '../a/c'}],
     'softLink3' : [{ softLink : '../b/d'}],
   }
-  
-  let extraStats = 
+
+  let extraStats =
   {
     '/a/b' : { dev : 1 },
     '/a/c' : { dev : 1 },
     '/b/d' : { dev : 2 },
   }
-  
+
   let provider = new _.FileProvider.Extract({ filesTree });
   _.mapSupplement( provider.extraStats, extraStats );
 
@@ -3508,53 +3397,53 @@ function filesAreOnSameDevice( test )
   var testPath = '/a/b';
   var got = provider.filesAreOnSameDevice( testPath, testPath );
   test.identical( got, true );
-  
+
   test.case = 'same path, exists'
   var testPath = '/a/b';
   var got = provider.filesAreOnSameDevice( testPath, testPath );
   test.identical( got, true );
-  
+
   test.case = 'different paths, same device, paths do not exist'
   var testPath1 = '/a/b'
   var testPath2 = '/a/c';
   var got = provider.filesAreOnSameDevice( testPath1, testPath2 );
   test.identical( got, true );
-  
+
   test.case = 'different paths, same device, paths exist'
   var testPath1 = '/a/b'
   var testPath2 = '/a/c';
   var got = provider.filesAreOnSameDevice( testPath1, testPath2 );
-  
+
   test.case = 'different devices, paths do not exist'
   var testPath1 = '/a/x';
   var testPath2 = '/b/x';
   var got = provider.filesAreOnSameDevice( testPath1, testPath2 );
   test.identical( got, false );
-  
+
   test.case = 'different devices, paths exist'
   var testPath1 = '/a/b';
   var testPath2 = '/b/d';
   var got = provider.filesAreOnSameDevice( testPath1, testPath2 );
   test.identical( got, false );
-  
+
   test.case = 'different devices, first path does not exist'
   var testPath1 = '/a/x';
   var testPath2 = '/b/d';
   var got = provider.filesAreOnSameDevice( testPath1, testPath2 );
   test.identical( got, false );
-  
+
   test.case = 'different devices, second path does not exist'
   var testPath1 = '/a/b';
   var testPath2 = '/b/x';
   var got = provider.filesAreOnSameDevice( testPath1, testPath2 );
   test.identical( got, false );
-  
+
   test.case = 'soft links on same device'
   var testPath1 = '/softLink1';
   var testPath2 = '/softLink2';
   var got = provider.filesAreOnSameDevice( testPath1, testPath2 );
   test.identical( got, true );
-  
+
   test.case = 'soft links to different devices'
   var testPath1 = '/softLink1';
   var testPath2 = '/softLink3';
@@ -3624,7 +3513,7 @@ let Self =
     // filesList,
 
     // testDelaySample,
-    
+
     filesAreOnSameDevice
 
   }

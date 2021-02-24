@@ -23,6 +23,6 @@ hub.filesCopy
   preserveTime : 0
 });
 
-var tree = _.toStr( simpleStructure.filesTree, { levels : 4 } );
+var tree = _.entity.exportString( simpleStructure.filesTree, { levels : 4 } );
 console.log( tree );
 

@@ -7,7 +7,7 @@ var _ = wTools;
 //
 
 var record = _.fileProvider.record(  _.path.join( __dirname, 'xxx' ) );
-console.log( _.toStr( record, { levels : 5 } ) )
+console.log( _.entity.exportString( record, { levels : 5 } ) )
 
 // var files = _.fileProvider.filesFind
 // ({

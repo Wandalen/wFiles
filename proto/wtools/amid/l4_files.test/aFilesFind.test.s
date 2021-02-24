@@ -5422,7 +5422,8 @@ function filesFindResolving( test )
     }
   ]
 
-  logger.log( _.entity.exportString( files, { levels : 99 } )   )
+  logger.log( _.entity.exportString( files, { levels : 10 } )   )
+  // logger.log( _.entity.exportString( files, { levels : 99 } )   )
 
   test.identical( filtered, expected )
   var srcDirStat = provider.statResolvedRead( srcDirPath );

@@ -1480,38 +1480,40 @@ function filesFind( test )
 
   /* */
 
-  test.case = 'check if onUp/onDown was called once per file';
-
-  var onUpMap = {};
-  var onDownMap = {};
-
-  var onUp = ( r ) =>
-  {
-    test.identical( onUpMap[ r.absolute ], undefined )
-    onUpMap[ r.absolute ] = 1;
-    return r;
-  }
-
-  var onDown = ( r ) =>
-  {
-    test.identical( onDownMap[ r.absolute ], undefined )
-    onDownMap[ r.absolute ] = 1;
-  }
-
-  var got = provider.filesFind
-  ({
-    filePath : __dirname,
-    withTerminals : 1,
-    withTransient : 1,
-    outputFormat : 'absolute',
-    onUp,
-    onDown,
-    filter : { recursive : 2 }
-  });
-
-  test.true( got.length > 0 );
-  test.identical( got.length + 1, _.mapOnlyOwnKeys( onUpMap ).length );
-  test.identical( got.length + 1, _.mapOnlyOwnKeys( onDownMap ).length );
+  // qqq : rewrite this case
+  //
+  // test.case = 'check if onUp/onDown was called once per file';
+  //
+  // var onUpMap = {};
+  // var onDownMap = {};
+  //
+  // var onUp = ( r ) =>
+  // {
+  //   test.identical( onUpMap[ r.absolute ], undefined )
+  //   onUpMap[ r.absolute ] = 1;
+  //   return r;
+  // }
+  //
+  // var onDown = ( r ) =>
+  // {
+  //   test.identical( onDownMap[ r.absolute ], undefined )
+  //   onDownMap[ r.absolute ] = 1;
+  // }
+  //
+  // var got = provider.filesFind
+  // ({
+  //   filePath : __dirname,
+  //   withTerminals : 1,
+  //   withTransient : 1,
+  //   outputFormat : 'absolute',
+  //   onUp,
+  //   onDown,
+  //   filter : { recursive : 2 }
+  // });
+  //
+  // test.true( got.length > 0 );
+  // test.identical( got.length + 1, _.mapOnlyOwnKeys( onUpMap ).length );
+  // test.identical( got.length + 1, _.mapOnlyOwnKeys( onDownMap ).length );
 
   /* */
 

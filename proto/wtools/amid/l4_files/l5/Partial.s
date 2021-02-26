@@ -4682,7 +4682,9 @@ function filesAreSameForSure_body( o )
 
   let file1 = o.ins1.factory.effectiveProvider.fileRead({ filePath : o.ins1.absolute, encoding : 'buffer.bytes' });
   let file2 = o.ins2.factory.effectiveProvider.fileRead({ filePath : o.ins2.absolute, encoding : 'buffer.bytes' });
-  return _.entityIdentical( file1, file2 );
+  debugger; /* xxx */
+  return _.entity.identicalShallow( file1, file2 );
+  // return _.entityIdentical( file1, file2 );
 }
 
 _.routineExtend( filesAreSameForSure_body, filesAreSameCommon_body );

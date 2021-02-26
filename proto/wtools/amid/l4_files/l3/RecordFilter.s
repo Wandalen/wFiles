@@ -3970,8 +3970,12 @@ function masksGenerate()
   _.assert( !filter.src );
   let filePath2 = _.mapExtend( null, filePath );
   let basePath2 = _.mapExtend( null, basePath );
+  // debugger;
+  /* xxx */
   // filter.filePathGlobSimplify( filePath2, basePath2 );
-  if( !_.entityIdentical( filePath2, filePath ) )
+  // if( !_.entityIdentical( filePath2, filePath ) )
+  // if( !_.entity.identicalShallow( filePath2, filePath ) )
+  if( !_.path.map.identical( filePath2, filePath ) )
   {
     globFound = filter.filePathIsComplex( filePath2 );
   }

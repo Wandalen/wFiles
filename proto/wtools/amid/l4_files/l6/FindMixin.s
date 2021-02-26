@@ -3747,11 +3747,13 @@ function filesReflect_head( routine, args )
     _.assert( o.reflectMap === null || srcFilePath === null || srcFilePath === '' );
     _.assert( o.reflectMap === null || dstFilePath === null || dstFilePath === '' );
     _.assert( o.src.isPaired( o.dst ) );
+    // debugger; /* xxx */
     _.assert
     (
-      // o.src.filePath === '.' || o.filter === null || o.filter.filePath === null || o.filter.filePath === undefined
       o.filter === null || o.filter.filePath === null || o.filter.filePath === undefined
-      || _.entityIdentical( o.filter.filePath, o.src.filePath ),
+      // || _.entityIdentical( o.filter.filePath, o.src.filePath ),
+      // || _.entity.identicalShallow( o.filter.filePath, o.src.filePath ),
+      || _.path.map.identical( o.filter.filePath, o.src.filePath ),
     );
 
     let knownFormats = [ 'src.absolute', 'src.relative', 'dst.absolute', 'dst.relative', 'record', 'nothing' ];
@@ -3771,7 +3773,10 @@ function filesReflect_head( routine, args )
     {
       let filePath1 = path.mapExtend( null, o.src.filePath );
       let filePath2 = path.mapExtend( null, o.reflectMap );
-      _.assert( _.entityIdentical( filePath1, filePath2 ) );
+      debugger; /* xxx */
+      // _.assert( _.entity.identicalShallow( filePath1, filePath2 ) );
+      _.assert( _.path.map.identical( filePath1, filePath2 ) );
+      // _.assert( _.entityIdentical( filePath1, filePath2 ) );
     }
     o.src.filePath = o.reflectMap;
     o.reflectMap = null;

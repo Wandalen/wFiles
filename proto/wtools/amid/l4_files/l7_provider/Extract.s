@@ -2043,7 +2043,7 @@ function _descriptorRead( o )
   o2.selector = o.filePath;
   o2.src = o.filesTree;
   o2.upToken = o.upToken;
-  o2.usingIndexedAccessToMap = 0;
+  // o2.usingIndexedAccessToMap = 0;
   o2.globing = 0;
 
   // if( _.strEnds( o2.selector, '"?a8"' ) )
@@ -2429,7 +2429,7 @@ function _descriptorWrite( o )
     o2.selector = o.filePath;
     o2.src = o.filesTree;
     o2.upToken = o.upToken;
-    o2.usingIndexedAccessToMap = 0;
+    // o2.usingIndexedAccessToMap = 0;
     o2.globing = 0;
 
     result = _.select( o2 );

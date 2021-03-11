@@ -645,7 +645,9 @@ function filesFindSingle_body( o )
 
 }
 
-_.routineExtend( filesFindSingle_body, filesFindNominal );
+_.assert( _.routineIs( filesFindNominal.body ) );
+_.routineExtend( filesFindSingle_body, filesFindNominal.body );
+_.assert( filesFindSingle_body.body === undefined );
 
 var defaults = filesFindSingle_body.defaults = _.mapExtend( null, filesFindSingle_body.defaults );
 
@@ -1199,7 +1201,11 @@ function filesFind_body( o )
 
 }
 
+_.assert( filesFindSingle.body.body === undefined );
+_.assert( filesFind_body.body === undefined );
 _.routineExtend( filesFind_body, filesFindSingle.body );
+_.assert( filesFindSingle.body.body === undefined );
+_.assert( filesFind_body.body === undefined );
 
 var defaults = filesFind_body.defaults = _.mapExtend( null, filesFind_body.defaults );
 
@@ -1228,7 +1234,9 @@ defaults.allowingCycled = 0;
 _.assert( defaults.maskAll === undefined );
 _.assert( defaults.glob === undefined );
 
+_.assert( filesFind_body.body === undefined );
 let filesFind = _.routineUnite( filesFind_head, filesFind_body );
+_.assert( filesFind_body.body === undefined );
 
 filesFind.having.aspect = 'entry';
 

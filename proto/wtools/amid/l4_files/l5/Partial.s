@@ -875,7 +875,7 @@ having.aspect = 'body';
 
 //
 
-let pathResolveSoftLink = _.routineUnite( _preFilePathScalarWithProviderDefaults, pathResolveSoftLink_body );
+let pathResolveSoftLink = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, pathResolveSoftLink_body );
 
 var having = pathResolveSoftLink.having;
 having.aspect = 'entry';
@@ -1070,7 +1070,7 @@ var having = pathResolveTextLink_body.having;
 having.driving = 0;
 having.aspect = 'body';
 
-let pathResolveTextLink = _.routineUnite( pathResolveTextLink_head, pathResolveTextLink_body );
+let pathResolveTextLink = _.routine.uniteCloning_( pathResolveTextLink_head, pathResolveTextLink_body );
 
 //
 
@@ -1177,7 +1177,7 @@ var defaults = pathResolveLinkStep_body.defaults;
 defaults.relativeOriginalFile = 0;
 defaults.preservingRelative = 0;
 
-let pathResolveLinkStep = _.routineUnite( pathResolveLinkStep_head, pathResolveLinkStep_body );
+let pathResolveLinkStep = _.routine.uniteCloning_( pathResolveLinkStep_head, pathResolveLinkStep_body );
 pathResolveLinkStep.having.aspect = 'entry';
 
 //
@@ -1444,7 +1444,7 @@ qqq : even if preservingRelative:1 result.relativePath should be relative ( if l
 
 //
 
-let pathResolveLinkFull = _.routineUnite( pathResolveLinkFull_head, pathResolveLinkFull_body );
+let pathResolveLinkFull = _.routine.uniteCloning_( pathResolveLinkFull_head, pathResolveLinkFull_body );
 pathResolveLinkFull.having.aspect = 'entry';
 
 //
@@ -1518,7 +1518,7 @@ defaults.recursive = 3;
 
 //
 
-let pathResolveLinkTail = _.routineUnite( pathResolveLinkTail_head, pathResolveLinkTail_body );
+let pathResolveLinkTail = _.routine.uniteCloning_( pathResolveLinkTail_head, pathResolveLinkTail_body );
 pathResolveLinkTail.having.aspect = 'entry';
 
 //
@@ -1707,7 +1707,7 @@ defaults.found = null;
 
 //
 
-let pathResolveLinkTailChain = _.routineUnite( pathResolveLinkTailChain_head, pathResolveLinkTailChain_body );
+let pathResolveLinkTailChain = _.routine.uniteCloning_( pathResolveLinkTailChain_head, pathResolveLinkTailChain_body );
 pathResolveLinkTailChain.having.aspect = 'entry';
 
 //
@@ -1805,7 +1805,7 @@ defaults.recursive = 3;
 
 //
 
-let pathResolveLinkHeadDirect = _.routineUnite( pathResolveLinkHeadDirect_head, pathResolveLinkHeadDirect_body );
+let pathResolveLinkHeadDirect = _.routine.uniteCloning_( pathResolveLinkHeadDirect_head, pathResolveLinkHeadDirect_body );
 pathResolveLinkHeadDirect.having.aspect = 'entry';
 
 //
@@ -1879,7 +1879,7 @@ defaults.recursive = 3;
 
 //
 
-let pathResolveLinkHeadReverse = _.routineUnite( pathResolveLinkHeadReverse_head, pathResolveLinkHeadReverse_body );
+let pathResolveLinkHeadReverse = _.routine.uniteCloning_( pathResolveLinkHeadReverse_head, pathResolveLinkHeadReverse_body );
 pathResolveLinkHeadReverse.having.aspect = 'entry';
 
 // --
@@ -2291,7 +2291,7 @@ statRead_body.having.aspect = 'body';
  * @module Tools/mid/Files
  */
 
-let statRead = _.routineUnite( _preFilePathScalarWithProviderDefaults, statRead_body );
+let statRead = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, statRead_body );
 
 statRead.having.aspect = 'entry';
 statRead.having.hubRedirecting = 0;
@@ -2299,15 +2299,28 @@ statRead.having.hubRedirecting = 0;
 statRead.defaults.resolvingSoftLink = 0;
 statRead.defaults.resolvingTextLink = 0;
 
+_.assert( statRead.defaults !== statRead_body.defaults );
+_.assert( statRead.defaults.resolvingSoftLink === 0 );
+_.assert( statRead.body !== statRead_body );
+_.assert( statRead.body.defaults === statRead.defaults );
+_.assert( statRead.body.having === statRead.having );
+
 //
 
-let statResolvedRead = _.routineUnite( _preFilePathScalarWithProviderDefaults, statRead_body );
+let statResolvedRead = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, statRead_body );
 
 statResolvedRead.having.aspect = 'entry';
 statResolvedRead.having.hubRedirecting = 0;
 
 statResolvedRead.defaults.resolvingSoftLink = null;
 statResolvedRead.defaults.resolvingTextLink = null;
+
+_.assert( statRead.defaults !== statResolvedRead.defaults );
+_.assert( statRead.defaults.resolvingSoftLink === 0 );
+_.assert( statRead.body.defaults === statRead.defaults );
+_.assert( statResolvedRead.defaults.resolvingSoftLink === null );
+_.assert( statResolvedRead.body.defaults === statResolvedRead.defaults );
+_.assert( statResolvedRead.body.having === statResolvedRead.having );
 
 //
 
@@ -2381,7 +2394,7 @@ function filesSize_body( o )
   return result;
 }
 
-_.routineExtend( filesSize_body, statResolvedRead );
+_.routineExtend( filesSize_body, statResolvedRead.body );
 // filesSize_body.defaults =
 // {
 //   filePath : null,
@@ -2395,7 +2408,7 @@ having.driving = 0;
 
 var operates = filesSize_body.operates = Object.create( null );
 
-let filesSize = _.routineUnite( filesSize_head, filesSize_body );
+let filesSize = _.routine.uniteCloning_( filesSize_head, filesSize_body );
 
 //
 
@@ -2445,7 +2458,7 @@ let filesSize = _.routineUnite( filesSize_head, filesSize_body );
 qqq : extend test, check cases when does not exist, check throwing option
 Dmytro : extended test routine. Throwing option is checked. Async mode is used.
          Description of routine has callback onEnd, but now it is not used because
-         _.routineUnite check srcMap and screenMap in assert.
+         _.routine.uniteCloning_ check srcMap and screenMap in assert.
 */
 
 function fileSize_body( o )
@@ -2467,14 +2480,14 @@ function fileSize_body( o )
   return stat.size;
 }
 
-_.routineExtend( fileSize_body, statResolvedRead );
+_.routineExtend( fileSize_body, statResolvedRead.body );
 
 var having = fileSize_body.having;
 having.driving = 0;
 having.aspect = 'body';
 having.hubRedirecting = 0;
 
-let fileSize = _.routineUnite( _preFilePathScalarWithProviderDefaults, fileSize_body );
+let fileSize = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, fileSize_body );
 
 fileSize.having.aspect = 'entry';
 
@@ -2634,7 +2647,7 @@ having.aspect = 'body';
 
 //
 
-let fileExists = _.routineUnite( _preFilePathScalarWithProviderDefaults, fileExists_body );
+let fileExists = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, fileExists_body );
 
 var having = fileExists.having;
 fileExists.having.aspect = 'entry';
@@ -2696,7 +2709,7 @@ operates.filePath = { pathToRead : 1 }
  * @module Tools/mid/Files
  */
 
-let isTerminal = _.routineUnite( _preFilePathScalarWithProviderDefaults, isTerminal_body );
+let isTerminal = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, isTerminal_body );
 
 isTerminal.having.aspect = 'entry';
 
@@ -2714,7 +2727,7 @@ isTerminal.having.aspect = 'entry';
  * @module Tools/mid/Files
  */
 
-let resolvedIsTerminal = _.routineUnite( _preFilePathScalarWithProviderDefaults, isTerminal_body );
+let resolvedIsTerminal = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, isTerminal_body );
 
 resolvedIsTerminal.defaults.resolvingSoftLink = null;
 resolvedIsTerminal.defaults.resolvingTextLink = null;
@@ -2778,7 +2791,7 @@ operates.filePath = { pathToRead : 1 }
  * @module Tools/mid/Files
  */
 
-let isDir = _.routineUnite( _preFilePathScalarWithProviderDefaults, isDir_body );
+let isDir = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, isDir_body );
 
 isDir.having.aspect = 'entry';
 
@@ -2797,7 +2810,7 @@ isDir.having.aspect = 'entry';
  * @module Tools/mid/Files
  */
 
-let resolvedIsDir = _.routineUnite( _preFilePathScalarWithProviderDefaults, isDir_body );
+let resolvedIsDir = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, isDir_body );
 
 resolvedIsDir.defaults.resolvingSoftLink = null;
 resolvedIsDir.defaults.resolvingTextLink = null;
@@ -2859,7 +2872,7 @@ operates.filePath = { pathToRead : 1 }
 
 //
 
-let isHardLink = _.routineUnite( _preFilePathScalarWithProviderDefaults, isHardLink_body );
+let isHardLink = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, isHardLink_body );
 
 isHardLink.defaults.resolvingSoftLink = 0;
 isHardLink.defaults.resolvingTextLink = 0;
@@ -2868,7 +2881,7 @@ isHardLink.having.aspect = 'entry';
 
 //
 
-let resolvedIsHardLink = _.routineUnite( _preFilePathScalarWithProviderDefaults, isHardLink_body );
+let resolvedIsHardLink = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, isHardLink_body );
 
 resolvedIsHardLink.defaults.resolvingSoftLink = null;
 resolvedIsHardLink.defaults.resolvingTextLink = null;
@@ -2929,13 +2942,13 @@ operates.filePath = { pathToRead : 1 }
 
 //
 
-let isSoftLink = _.routineUnite( _preFilePathScalarWithProviderDefaults, isSoftLink_body );
+let isSoftLink = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, isSoftLink_body );
 isSoftLink.defaults.resolvingTextLink = 0;
 isSoftLink.having.aspect = 'entry';
 
 //
 
-let resolvedIsSoftLink = _.routineUnite( _preFilePathScalarWithProviderDefaults, isSoftLink_body );
+let resolvedIsSoftLink = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, isSoftLink_body );
 resolvedIsSoftLink.defaults.resolvingTextLink = null;
 resolvedIsSoftLink.having.aspect = 'entry';
 
@@ -2982,13 +2995,13 @@ operates.filePath = { pathToRead : 1 }
 
 //
 
-let isTextLink = _.routineUnite( _preFilePathScalarWithProviderDefaults, isTextLink_body );
+let isTextLink = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, isTextLink_body );
 isTextLink.defaults.resolvingSoftLink = 0;
 isTextLink.having.aspect = 'entry';
 
 //
 
-let resolvedIsTextLink = _.routineUnite( _preFilePathScalarWithProviderDefaults, isTextLink_body );
+let resolvedIsTextLink = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, isTextLink_body );
 resolvedIsTextLink.defaults.resolvingSoftLink = null;
 resolvedIsTextLink.having.aspect = 'entry';
 
@@ -3042,13 +3055,13 @@ operates.filePath = { pathToRead : 1 };
 
 //
 
-let isLink = _.routineUnite( _preFilePathScalarWithProviderDefaults, isLink_body );
+let isLink = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, isLink_body );
 
 isLink.having.aspect = 'entry';
 
 //
 
-let resolvedIsLink = _.routineUnite( _preFilePathScalarWithProviderDefaults, isLink_body );
+let resolvedIsLink = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, isLink_body );
 
 resolvedIsLink.defaults.resolvingSoftLink = null;
 resolvedIsLink.defaults.resolvingTextLink = null;
@@ -3240,7 +3253,7 @@ var having = streamRead_body.having;
 having.driving = 0;
 having.aspect = 'body';
 
-let streamRead = _.routineUnite( _preFilePathScalarWithProviderDefaults, streamRead_body );
+let streamRead = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, streamRead_body );
 streamRead.having.aspect = 'entry';
 
 //
@@ -3535,7 +3548,7 @@ having.aspect = 'body';
  * @param {Error} error
  */
 
-let fileRead = _.routineUnite( fileRead_head, fileRead_body );
+let fileRead = _.routine.uniteCloning_( fileRead_head, fileRead_body );
 
 fileRead.having.aspect = 'entry';
 fileRead.having.hubResolving = 1;
@@ -3590,7 +3603,7 @@ _.assert( fileRead.encoders === undefined );
  * @module Tools/mid/Files
  */
 
-let fileReadSync = _.routineUnite( fileRead.head, fileRead.body );
+let fileReadSync = _.routine.uniteCloning_( fileRead.head, fileRead.body );
 
 fileReadSync.defaults.sync = 1;
 fileReadSync.having.aspect = 'entry';
@@ -3606,7 +3619,7 @@ function fileReadJson_body( o )
   return self.fileRead( o );
 }
 
-_.routineExtend( fileReadJson_body, fileRead );
+_.routineExtend( fileReadJson_body, fileRead.body );
 
 var defaults = fileReadJson_body.defaults;
 defaults.sync = 1;
@@ -3635,7 +3648,7 @@ having.aspect = 'body';
  * @module Tools/mid/Files
  */
 
-let fileReadJson = _.routineUnite( fileRead.head, fileReadJson_body );
+let fileReadJson = _.routine.uniteCloning_( fileRead.head, fileReadJson_body );
 
 fileReadJson.having.aspect = 'entry';
 
@@ -3650,7 +3663,7 @@ function fileReadJs_body( o )
   return self.fileRead( o );
 }
 
-_.routineExtend( fileReadJs_body, fileRead );
+_.routineExtend( fileReadJs_body, fileRead.body );
 
 var defaults = fileReadJs_body.defaults;
 defaults.sync = 1;
@@ -3662,7 +3675,7 @@ having.aspect = 'body';
 
 //
 
-let fileReadJs = _.routineUnite( fileRead.head, fileReadJs_body );
+let fileReadJs = _.routine.uniteCloning_( fileRead.head, fileReadJs_body );
 var having = fileReadJs.having;
 fileReadJs.having.aspect = 'entry';
 
@@ -3732,11 +3745,11 @@ function _fileInterpret_body( o )
   return self.fileRead( o );
 }
 
-_.routineExtend( _fileInterpret_body, fileRead );
+_.routineExtend( _fileInterpret_body, fileRead.body );
 
 _fileInterpret_body.defaults.encoding = null;
 
-let fileInterpret = _.routineUnite( _fileInterpret_head, _fileInterpret_body );
+let fileInterpret = _.routine.uniteCloning_( _fileInterpret_head, _fileInterpret_body );
 
 fileInterpret.having.aspect = 'entry';
 
@@ -3961,7 +3974,7 @@ var having = hashRead_body.having;
 having.driving = 0;
 having.aspect = 'body';
 
-let hashRead = _.routineUnite( _preFilePathScalarWithProviderDefaults, hashRead_body );
+let hashRead = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, hashRead_body );
 hashRead.having.aspect = 'entry';
 
 //
@@ -4024,7 +4037,7 @@ function hashSzRead_body( o )
 _.routineExtend( hashSzRead_body, hashRead.body );
 
 var defaults = hashSzRead_body.defaults;
-let hashSzRead = _.routineUnite( _preFilePathScalarWithProviderDefaults, hashSzRead_body );
+let hashSzRead = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, hashSzRead_body );
 hashSzRead.having.aspect = 'entry';
 
 //
@@ -4100,7 +4113,7 @@ _.routineExtend( hashSzIsUpToDate_body, hashRead.body );
 var defaults = hashSzIsUpToDate_body.defaults;
 defaults.hash = null;
 defaults.data = null;
-let hashSzIsUpToDate = _.routineUnite( hashSzIsUpToDate_head, hashSzIsUpToDate_body );
+let hashSzIsUpToDate = _.routine.uniteCloning_( hashSzIsUpToDate_head, hashSzIsUpToDate_body );
 hashSzIsUpToDate.having.aspect = 'entry';
 
 //
@@ -4298,7 +4311,7 @@ having.aspect = 'body';
  * @module Tools/mid/Files
  */
 
-let dirRead = _.routineUnite( dirRead_head, dirRead_body );
+let dirRead = _.routine.uniteCloning_( dirRead_head, dirRead_body );
 
 dirRead.having.aspect = 'entry';
 
@@ -4322,7 +4335,7 @@ function dirReadDirs_body( o )
   return result;
 }
 
-_.routineExtend( dirReadDirs_body, dirRead );
+_.routineExtend( dirReadDirs_body, dirRead.body );
 
 var having = dirReadDirs_body.having;
 having.driving = 0;
@@ -4330,7 +4343,7 @@ having.aspect = 'body';
 
 //
 
-let dirReadDirs = _.routineUnite( dirRead.head, dirReadDirs_body );
+let dirReadDirs = _.routine.uniteCloning_( dirRead.head, dirReadDirs_body );
 dirReadDirs.having.aspect = 'entry';
 
 //
@@ -4354,7 +4367,7 @@ function dirReadTerminals_body( o )
 
 }
 
-_.routineExtend( dirReadTerminals_body, dirRead );
+_.routineExtend( dirReadTerminals_body, dirRead.body );
 
 var having = dirReadTerminals_body.having;
 having.driving = 0;
@@ -4362,7 +4375,7 @@ having.aspect = 'body';
 
 //
 
-let dirReadTerminals = _.routineUnite( dirRead.head, dirReadTerminals_body );
+let dirReadTerminals = _.routine.uniteCloning_( dirRead.head, dirReadTerminals_body );
 dirReadTerminals.having.aspect = 'entry';
 
 //
@@ -4426,7 +4439,7 @@ having.aspect = 'body';
 
 //
 
-let rightsRead = _.routineUnite( rightsRead_head, rightsRead_body );
+let rightsRead = _.routine.uniteCloning_( rightsRead_head, rightsRead_body );
 var having = rightsRead.having;
 having.aspect = 'entry';
 
@@ -4664,7 +4677,7 @@ function filesCanBeSame_body( o )
 
 _.routineExtend( filesCanBeSame_body, filesAreSameCommon_body );
 
-let filesCanBeSame = _.routineUnite( filesAreSame_head, filesCanBeSame_body );
+let filesCanBeSame = _.routine.uniteCloning_( filesAreSame_head, filesCanBeSame_body );
 filesCanBeSame.having.aspect = 'entry';
 
 //
@@ -4691,7 +4704,7 @@ _.routineExtend( filesAreSameForSure_body, filesAreSameCommon_body );
 
 //
 
-let filesAreSameForSure = _.routineUnite( filesAreSame_head, filesAreSameForSure_body );
+let filesAreSameForSure = _.routine.uniteCloning_( filesAreSame_head, filesAreSameForSure_body );
 filesAreSameForSure.having.aspect = 'entry';
 
 // --
@@ -4733,7 +4746,7 @@ having.aspect = 'body';
 
 //
 
-let streamWrite = _.routineUnite( _preFilePathScalarWithProviderDefaults, streamWrite_body );
+let streamWrite = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, streamWrite_body );
 streamWrite.having.aspect = 'entry';
 
 //
@@ -4944,7 +4957,7 @@ having.aspect = 'body';
  * @module Tools/mid/Files
  */
 
-let fileWrite = _.routineUnite( fileWrite_head, fileWrite_body );
+let fileWrite = _.routine.uniteCloning_( fileWrite_head, fileWrite_body );
 
 fileWrite.having.aspect = 'entry';
 
@@ -4972,7 +4985,7 @@ having.aspect = 'body';
 
 //
 
-let fileAppend = _.routineUnite( fileWrite_head, fileAppend_body );
+let fileAppend = _.routine.uniteCloning_( fileWrite_head, fileAppend_body );
 fileAppend.having.aspect = 'entry';
 
 //
@@ -5038,7 +5051,7 @@ function fileWriteJson_body( o )
   return self.fileWrite( o2 );
 }
 
-_.routineExtend( fileWriteJson_body, fileWrite );
+_.routineExtend( fileWriteJson_body, fileWrite.body );
 
 var defaults = fileWriteJson_body.defaults;
 defaults.prefix = '';
@@ -5094,12 +5107,12 @@ _.assert( _.boolLike( _.entity.exportJson.defaults.cloning ) );
  * @module Tools/mid/Files
 */
 
-let fileWriteJson = _.routineUnite( fileWrite_head, fileWriteJson_body );
+let fileWriteJson = _.routine.uniteCloning_( fileWrite_head, fileWriteJson_body );
 fileWriteJson.having.aspect = 'entry';
 
 //
 
-let fileWriteJs = _.routineUnite( fileWrite_head, fileWriteJson_body );
+let fileWriteJs = _.routine.uniteCloning_( fileWrite_head, fileWriteJson_body );
 
 var defaults = fileWriteJs.defaults;
 defaults.jsLike = 1;
@@ -5169,7 +5182,7 @@ function fileTouch_body( o )
   return self;
 }
 
-_.routineExtend( fileTouch_body, fileWrite );
+_.routineExtend( fileTouch_body, fileWrite.body );
 
 var defaults = fileTouch_body.defaults;
 defaults.data = null;
@@ -5180,7 +5193,7 @@ having.aspect = 'body';
 
 //
 
-let fileTouch = _.routineUnite( fileTouch_head, fileTouch_body );
+let fileTouch = _.routine.uniteCloning_( fileTouch_head, fileTouch_body );
 fileTouch.having.aspect = 'entry';
 
 //
@@ -5257,7 +5270,7 @@ having.aspect = 'body';
 
 //
 
-let timeWrite = _.routineUnite( timeWrite_head, timeWrite_body );
+let timeWrite = _.routine.uniteCloning_( timeWrite_head, timeWrite_body );
 timeWrite.having.aspect = 'entry';
 
 //
@@ -5335,15 +5348,15 @@ having.aspect = 'body';
 
 //
 
-let rightsWrite = _.routineUnite( rightsWrite_pre_functor( 'setRights' ), rightsWrite_body );
+let rightsWrite = _.routine.uniteCloning_( rightsWrite_pre_functor( 'setRights' ), rightsWrite_body );
 var having = rightsWrite.having;
 having.aspect = 'entry';
 
-let rightsAdd = _.routineUnite( rightsWrite_pre_functor( 'addRights' ), rightsWrite_body );
+let rightsAdd = _.routine.uniteCloning_( rightsWrite_pre_functor( 'addRights' ), rightsWrite_body );
 var having = rightsAdd.having;
 having.aspect = 'entry';
 
-let rightsDel = _.routineUnite( rightsWrite_pre_functor( 'delRights' ), rightsWrite_body );
+let rightsDel = _.routine.uniteCloning_( rightsWrite_pre_functor( 'delRights' ), rightsWrite_body );
 var having = rightsDel.having;
 having.aspect = 'entry';
 
@@ -5544,12 +5557,12 @@ having.aspect = 'body';
  * @module Tools/mid/Files
  */
 
-let fileDelete = _.routineUnite( _preFilePathScalarWithProviderDefaults, fileDelete_body );
+let fileDelete = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, fileDelete_body );
 fileDelete.having.aspect = 'entry';
 
 //
 
-let fileResolvedDelete = _.routineUnite({ head : _preFilePathScalarWithProviderDefaults, body : fileDelete_body, name : 'fileResolvedDelete' });
+let fileResolvedDelete = _.routine.uniteCloning_({ head : _preFilePathScalarWithProviderDefaults, body : fileDelete_body, name : 'fileResolvedDelete' });
 fileResolvedDelete.defaults.resolvingSoftLink = null;
 fileResolvedDelete.defaults.resolvingTextLink = null;
 fileResolvedDelete.having.aspect = 'entry';
@@ -5685,7 +5698,7 @@ having.aspect = 'body';
 
 //
 
-let dirMake = _.routineUnite( _preFilePathScalarWithProviderDefaults, dirMake_body );
+let dirMake = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, dirMake_body );
 dirMake.having.aspect = 'entry';
 
 //
@@ -5712,7 +5725,7 @@ having.aspect = 'body';
 
 //
 
-let dirMakeForFile = _.routineUnite( _preFilePathScalarWithProviderDefaults, dirMakeForFile_body );
+let dirMakeForFile = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, dirMakeForFile_body );
 dirMakeForFile.having.aspect = 'entry';
 
 // --
@@ -5780,7 +5793,7 @@ having.aspect = 'body';
 
 //
 
-let fileLock = _.routineUnite( _preFilePathScalarWithProviderDefaults, fileLock_body );
+let fileLock = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, fileLock_body );
 dirMakeForFile.having.aspect = 'entry';
 
 //
@@ -5834,7 +5847,7 @@ having.aspect = 'body';
 
 //
 
-let fileUnlock = _.routineUnite( _preFilePathScalarWithProviderDefaults, fileUnlock_body );
+let fileUnlock = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, fileUnlock_body );
 dirMakeForFile.having.aspect = 'entry';
 
 //
@@ -5887,7 +5900,7 @@ having.aspect = 'body';
 
 //
 
-let fileIsLocked = _.routineUnite( _preFilePathScalarWithProviderDefaults, fileIsLocked_body );
+let fileIsLocked = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, fileIsLocked_body );
 dirMakeForFile.having.aspect = 'entry';
 
 // --
@@ -7319,7 +7332,7 @@ having.aspect = 'body';
  * @module Tools/mid/Files
  */
 
-let fileExchange = _.routineUnite( fileExchange_head, fileExchange_body );
+let fileExchange = _.routine.uniteCloning_( fileExchange_head, fileExchange_body );
 fileExchange.having.aspect = 'entry';
 
 // --
@@ -7374,7 +7387,7 @@ having.aspect = 'body';
 
 //
 
-let hardLinkBreak = _.routineUnite( _preFilePathScalarWithProviderDefaults, hardLinkBreak_body );
+let hardLinkBreak = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, hardLinkBreak_body );
 hardLinkBreak.having.aspect = 'entry';
 
 //
@@ -7427,7 +7440,7 @@ having.aspect = 'body';
 
 //
 
-let softLinkBreak = _.routineUnite( _preFilePathScalarWithProviderDefaults, softLinkBreak_body );
+let softLinkBreak = _.routine.uniteCloning_( _preFilePathScalarWithProviderDefaults, softLinkBreak_body );
 softLinkBreak.having.aspect = 'entry';
 
 //
@@ -7537,7 +7550,7 @@ having.aspect = 'body';
 
 //
 
-let areHardLinked = _.routineUnite( filesAreLinked_head, areHardLinked_body );
+let areHardLinked = _.routine.uniteCloning_( filesAreLinked_head, areHardLinked_body );
 
 var having = areHardLinked.having;
 having.driving = 0;
@@ -7602,7 +7615,7 @@ having.aspect = 'body';
 
 //
 
-let areSoftLinked = _.routineUnite( filesAreLinked_head, areSoftLinked_body );
+let areSoftLinked = _.routine.uniteCloning_( filesAreLinked_head, areSoftLinked_body );
 
 areSoftLinked.having.driving = 0;
 areSoftLinked.having.aspect = 'entry';
@@ -7662,7 +7675,7 @@ having.aspect = 'body';
 
 //
 
-let areTextLinked = _.routineUnite( filesAreLinked_head, areTextLinked_body );
+let areTextLinked = _.routine.uniteCloning_( filesAreLinked_head, areTextLinked_body );
 
 areTextLinked.having.driving = 0;
 areTextLinked.having.aspect = 'entry';

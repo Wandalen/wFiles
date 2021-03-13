@@ -238,7 +238,7 @@ defaults.filePath = null;
 defaults.outputFormat = 'array';
 // defaults.recursive = 1;
 
-let configFind = _.routineUnite( Partial.prototype._preFilePathVectorWithProviderDefaults, configFind_body );
+let configFind = _.routine.uniteCloning_( Partial.prototype._preFilePathVectorWithProviderDefaults, configFind_body );
 
 //
 
@@ -384,7 +384,7 @@ function configRead_body( o )
   return result;
 }
 
-_.routineExtend( configRead_body, fileRead );
+_.routineExtend( configRead_body, fileRead.body );
 
 var defaults = configRead_body.defaults;
 
@@ -394,7 +394,7 @@ defaults.found = null;
 
 //
 
-var configRead = _.routineUnite( Partial.prototype._preFilePathVectorWithProviderDefaults, configRead_body );
+var configRead = _.routine.uniteCloning_( Partial.prototype._preFilePathVectorWithProviderDefaults, configRead_body );
 
 configRead.having.aspect = 'entry';
 

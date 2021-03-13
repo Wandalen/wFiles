@@ -583,9 +583,10 @@ function pathResolveLinkFull_body( o )
   }
 }
 
-_.routineExtend( pathResolveLinkFull_body, Parent.prototype.pathResolveLinkFull );
+// _.assert( _.entity.identicalShallow( Parent.prototype.pathResolveLinkFull.body.defaults, Parent.prototype.pathResolveLinkFull.defaults ) );
+_.routineExtend( pathResolveLinkFull_body, Parent.prototype.pathResolveLinkFull.body );
 
-let pathResolveLinkFull = _.routineUnite( Parent.prototype.pathResolveLinkFull.head, pathResolveLinkFull_body );
+let pathResolveLinkFull = _.routine.uniteCloning_( Parent.prototype.pathResolveLinkFull.head, pathResolveLinkFull_body );
 
 //
 
@@ -612,9 +613,9 @@ function pathResolveLinkTail_body( o )
   return result;
 }
 
-_.routineExtend( pathResolveLinkTail_body, Parent.prototype.pathResolveLinkTail );
+_.routineExtend( pathResolveLinkTail_body, Parent.prototype.pathResolveLinkTail.body );
 
-let pathResolveLinkTail = _.routineUnite( Parent.prototype.pathResolveLinkTail.head, pathResolveLinkTail_body );
+let pathResolveLinkTail = _.routine.uniteCloning_( Parent.prototype.pathResolveLinkTail.head, pathResolveLinkTail_body );
 
 //
 
@@ -647,9 +648,9 @@ function pathResolveSoftLink_body( o )
   return result;
 }
 
-_.routineExtend( pathResolveSoftLink_body, Parent.prototype.pathResolveSoftLink );
+_.routineExtend( pathResolveSoftLink_body, Parent.prototype.pathResolveSoftLink.body );
 
-let pathResolveSoftLink = _.routineUnite( Parent.prototype.pathResolveSoftLink.head, pathResolveSoftLink_body );
+let pathResolveSoftLink = _.routine.uniteCloning_( Parent.prototype.pathResolveSoftLink.head, pathResolveSoftLink_body );
 
 //
 
@@ -682,9 +683,9 @@ function pathResolveTextLink_body( o )
   return result;
 }
 
-_.routineExtend( pathResolveTextLink_body, Parent.prototype.pathResolveTextLink );
+_.routineExtend( pathResolveTextLink_body, Parent.prototype.pathResolveTextLink.body );
 
-let pathResolveTextLink = _.routineUnite( Parent.prototype.pathResolveTextLink.head, pathResolveTextLink_body );
+let pathResolveTextLink = _.routine.uniteCloning_( Parent.prototype.pathResolveTextLink.head, pathResolveTextLink_body );
 
 //
 
@@ -713,9 +714,9 @@ function fileRead_body( o )
   return result;
 }
 
-_.routineExtend( fileRead_body, Parent.prototype.fileRead );
+_.routineExtend( fileRead_body, Parent.prototype.fileRead.body );
 
-let fileRead = _.routineUnite( Parent.prototype.fileRead.head, fileRead_body );
+let fileRead = _.routine.uniteCloning_( Parent.prototype.fileRead.head, fileRead_body );
 
 // --
 // linker
@@ -999,9 +1000,9 @@ function hardLinkBreak_body( o )
   return r.provider.hardLinkBreak.body.call( r.provider, o2 );
 }
 
-_.routineExtend( hardLinkBreak_body, Parent.prototype.hardLinkBreak );
+_.routineExtend( hardLinkBreak_body, Parent.prototype.hardLinkBreak.body );
 
-let hardLinkBreak = _.routineUnite( Parent.prototype._preFilePathScalarWithProviderDefaults, hardLinkBreak_body );
+let hardLinkBreak = _.routine.uniteCloning_( Parent.prototype._preFilePathScalarWithProviderDefaults, hardLinkBreak_body );
 
 //
 
@@ -1026,7 +1027,6 @@ function areHardLinkedAct( o )
 
 _.routineExtend( areHardLinkedAct, Parent.prototype.areHardLinkedAct );
 
-
 //
 
 function dirMake_body( o )
@@ -1041,9 +1041,9 @@ function dirMake_body( o )
   return r.provider.dirMake.body.call( r.provider, o2 );
 }
 
-_.routineExtend( dirMake_body, Parent.prototype.dirMake );
+_.routineExtend( dirMake_body, Parent.prototype.dirMake.body );
 
-let dirMake = _.routineUnite( Parent.prototype.dirMake.head, dirMake_body );
+let dirMake = _.routine.uniteCloning_( Parent.prototype.dirMake.head, dirMake_body );
 
 // --
 // accessor

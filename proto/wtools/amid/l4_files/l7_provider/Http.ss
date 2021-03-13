@@ -386,14 +386,14 @@ function filesReflectSingle_body( o )
 
 }
 
-_.routineExtend( filesReflectSingle_body, _.FileProvider.FindMixin.prototype.filesReflectSingle );
+_.routineExtend( filesReflectSingle_body, _.FileProvider.FindMixin.prototype.filesReflectSingle.body );
 
 var extra = filesReflectSingle_body.extra = Object.create( null );
 extra.fetching = 1;
 
 var defaults = filesReflectSingle_body.defaults;
 let filesReflectSingle =
-_.routineUnite( _.FileProvider.FindMixin.prototype.filesReflectSingle.head, filesReflectSingle_body );
+_.routine.uniteCloning_( _.FileProvider.FindMixin.prototype.filesReflectSingle.head, filesReflectSingle_body );
 
 //
 

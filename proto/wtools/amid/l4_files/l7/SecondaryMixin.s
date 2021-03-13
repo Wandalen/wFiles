@@ -574,7 +574,7 @@ having.writing = 0;
 having.reading = 1;
 having.driving = 0;
 
-var filesAreUpToDate2 = _.routineUnite( filesAreUpToDate2_head, filesAreUpToDate2_body );
+var filesAreUpToDate2 = _.routine.uniteCloning_( filesAreUpToDate2_head, filesAreUpToDate2_body );
 
 //
 
@@ -650,7 +650,7 @@ having.writing = 0;
 having.reading = 1;
 having.driving = 0;
 
-var filesAreOnSameDevice = _.routineUnite( filesAreOnSameDevice_head, filesAreOnSameDevice_body );
+var filesAreOnSameDevice = _.routine.uniteCloning_( filesAreOnSameDevice_head, filesAreOnSameDevice_body );
 
 //
 
@@ -836,9 +836,9 @@ defaults.name = null;
 defaults.prefix = '// ======================================\n( function {{name}}() {\n';
 defaults.postfix = '\n})();\n';
 
-_.routineExtend( fileCodeRead_body, fileRead );
+_.routineExtend( fileCodeRead_body, fileRead.body );
 
-var fileCodeRead = _.routineUnite( fileRead.head, fileCodeRead_body );
+var fileCodeRead = _.routine.uniteCloning_( fileRead.head, fileCodeRead_body );
 
 fileCodeRead.having.aspect = 'entry';
 

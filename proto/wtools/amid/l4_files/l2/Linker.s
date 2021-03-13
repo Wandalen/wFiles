@@ -1192,8 +1192,8 @@ function functor( fop )
   _.assert( onStat2 === null || _.routineIs( onStat2 ) );
   _.assert( onSizeCheck === null || _.routineIs( onSizeCheck ) );
 
-  _.routineExtend( link_body, onDo )
-  link_body.defaults = _.mapExtend( null, link_body.defaults );
+  _.routineExtend( link_body, onDo );
+  link_body.defaults = _.mapExtend( null, link_body.defaults ); /* xxx qqq : redundant? */
   delete link_body.defaults.originalSrcPath;
   delete link_body.defaults.originalDstPath;
   delete link_body.defaults.relativeSrcPath;
@@ -1204,15 +1204,14 @@ function functor( fop )
   having.driving = 0;
   having.aspect = 'body';
 
-  let linkEntry = _.routineUnite({ head : functor_head, body : link_body, name : entryMethodName });
+  let linkEntry = _.routine.uniteReplacing({ head : functor_head, body : link_body, name : entryMethodName });
 
-  var having = linkEntry.having;
+  var having = linkEntry.having = _.mapExtend( null, linkEntry.having );
   having.aspect = 'entry';
 
   return linkEntry;
 
   /* */
-
 
   function link_body( o )
   {

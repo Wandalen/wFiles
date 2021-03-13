@@ -521,7 +521,7 @@ having.writing = 0;
 having.reading = 1;
 having.driving = 0;
 
-let filesFindNominal = _.routineUnite( filesFindNominal_head, filesFindNominal_body );
+let filesFindNominal = _.routine.uniteCloning_( filesFindNominal_head, filesFindNominal_body );
 
 //
 
@@ -542,7 +542,8 @@ function filesFindSingle_head( routine, args )
 
   if( Config.debug )
   {
-    _.assertRoutineOptions( filesFindSingle_body, o );
+    // _.assertRoutineOptions( filesFindSingle_body, o );
+    _.assertRoutineOptions( routine, o );
     _.assert( !self.system || o.filter.system === self.system );
     _.assert( !!o.filter.effectiveProvider );
     _.assert( _.routineIs( o.onUp ) );
@@ -608,13 +609,6 @@ function filesFindSingle_body( o )
       return _.dont;
     }
 
-    // if( _.strEnds( record.absolute, '/Cycled.txt' ) )
-    // debugger;
-    // if( _.strEnds( record.absolute, '/Missed.txt' ) )
-    // debugger;
-    // if( _global_.debugger )
-    // debugger;
-
     let includingFile = record.isDir ? o.withDirs : o.withTerminals;
     let withTransient = ( o.withTransient && record.isTransient );
     let withActual = ( o.withActual && record.isActual );
@@ -659,7 +653,7 @@ defaults.withStem = true;
 defaults.withDefunct = null;
 defaults.visitingCertain = true;
 
-let filesFindSingle = _.routineUnite( filesFindSingle_head, filesFindSingle_body );
+let filesFindSingle = _.routine.uniteCloning_( filesFindSingle_head, filesFindSingle_body );
 
 //
 
@@ -1235,7 +1229,7 @@ _.assert( defaults.maskAll === undefined );
 _.assert( defaults.glob === undefined );
 
 _.assert( filesFind_body.body === undefined );
-let filesFind = _.routineUnite( filesFind_head, filesFind_body );
+let filesFind = _.routine.uniteCloning_( filesFind_head, filesFind_body );
 _.assert( filesFind_body.body === undefined );
 
 filesFind.having.aspect = 'entry';
@@ -1287,7 +1281,7 @@ function filesFindRecursive_head( routine, args )
   return self.filesFind.head.call( self, routine, [ o ] );
 }
 
-let filesFindRecursive = _.routineUnite( filesFindRecursive_head, filesFind.body );
+let filesFindRecursive = _.routine.uniteCloning_( filesFindRecursive_head, filesFind.body );
 
 var defaults = filesFindRecursive.defaults;
 defaults.filePath = null;
@@ -1567,7 +1561,7 @@ defaults.mode = 'distinct';
 
 //
 
-let filesFindGroups = _.routineUnite( filesFindGroups_head, filesFindGroups_body );
+let filesFindGroups = _.routine.uniteCloning_( filesFindGroups_head, filesFindGroups_body );
 
 //
 
@@ -1661,7 +1655,7 @@ function filesReadGroups_body( o )
 
 filesReadGroups_body.defaults = Object.create( filesFindGroups.defaults );
 
-let filesReadGroups = _.routineUnite( filesReadGroups_head, filesReadGroups_body );
+let filesReadGroups = _.routine.uniteCloning_( filesReadGroups_head, filesReadGroups_body );
 
 // --
 //
@@ -3084,7 +3078,7 @@ having.writing = 0;
 having.reading = 1;
 having.driving = 0;
 
-let filesReflectEvaluate = _.routineUnite( filesReflectEvaluate_head, filesReflectEvaluate_body );
+let filesReflectEvaluate = _.routine.uniteCloning_( filesReflectEvaluate_head, filesReflectEvaluate_body );
 filesReflectEvaluate.having.aspect = 'entry';
 
 //
@@ -3725,7 +3719,7 @@ having.writing = 0;
 having.reading = 1;
 having.driving = 0;
 
-let filesReflectSingle = _.routineUnite( filesReflectSingle_head, filesReflectSingle_body );
+let filesReflectSingle = _.routine.uniteCloning_( filesReflectSingle_head, filesReflectSingle_body );
 filesReflectSingle.having.aspect = 'entry';
 
 _.assert( filesReflectSingle.defaults.sync !== undefined );
@@ -4014,7 +4008,7 @@ defaults.filter = null;
 defaults.reflectMap = null;
 defaults.outputFormat = 'record';
 
-let filesReflect = _.routineUnite( filesReflect_head, filesReflect_body );
+let filesReflect = _.routine.uniteCloning_( filesReflect_head, filesReflect_body );
 
 _.assert( _.boolLike( filesReflect_body.defaults.mandatory ) );
 
@@ -4206,7 +4200,7 @@ defaults.dstProvider = null;
 defaults.dst = '/';
 defaults.src = '/';
 
-let filesReflectTo = _.routineUnite( filesReflectTo_head, filesReflectTo_body );
+let filesReflectTo = _.routine.uniteCloning_( filesReflectTo_head, filesReflectTo_body );
 
 //
 
@@ -4247,7 +4241,7 @@ function filesExtract_body( o )
 
 var defaults = filesExtract_body.defaults = Object.create( filesReflectTo.defaults );
 
-let filesExtract = _.routineUnite( filesExtract_head, filesExtract_body );
+let filesExtract = _.routine.uniteCloning_( filesExtract_head, filesExtract_body );
 
 //
 
@@ -4527,7 +4521,7 @@ function filesFindSame_body( o )
 
 }
 
-_.routineExtend( filesFindSame_body, filesFindRecursive );
+_.routineExtend( filesFindSame_body, filesFindRecursive.body );
 
 var defaults = filesFindSame_body.defaults;
 defaults.maxSize = 1 << 22;
@@ -4547,7 +4541,7 @@ defaults.relativePaths = 0;
 
 defaults.result = null;
 
-let filesFindSame = _.routineUnite( filesFind.head, filesFindSame_body );
+let filesFindSame = _.routine.uniteCloning_( filesFind.head, filesFindSame_body );
 
 filesFindSame.having.aspect = 'entry';
 
@@ -4872,7 +4866,8 @@ function filesDelete_body( o )
 
 }
 
-_.routineExtend( filesDelete_body, filesFind );
+_.assert( _.routineIs( filesFind.body ) );
+_.routineExtend( filesDelete_body, filesFind.body );
 
 var defaults = filesDelete_body.defaults;
 defaults.outputFormat = 'record';
@@ -4893,13 +4888,18 @@ defaults.late = 0;
 defaults.tempPath = null;
 defaults.deletingEmptyDirs = 0;
 
+_.assert( filesFind.defaults.deletingEmptyDirs === undefined );
+_.assert( filesFind.body.defaults.deletingEmptyDirs === undefined );
+_.assert( filesDelete_body.defaults.deletingEmptyDirs === 0 );
+_.assert( filesDelete_body.body === undefined );
+
 /*
 qqq : implement and cover option late for method filesDelete.
 */
 
 //
 
-let filesDelete = _.routineUnite( filesFindRecursive.head, filesDelete_body );
+let filesDelete = _.routine.uniteCloning_( filesFindRecursive.head, filesDelete_body );
 filesDelete.having.aspect = 'entry';
 
 var defaults = filesDelete.defaults;
@@ -4963,7 +4963,7 @@ defaults.withTerminals = 1;
 defaults.withDirs = 0;
 defaults.withTransient = 0;
 
-let filesDeleteTerminals = _.routineUnite( filesFindRecursive.head, filesDeleteTerminals_body );
+let filesDeleteTerminals = _.routine.uniteCloning_( filesFindRecursive.head, filesDeleteTerminals_body );
 
 //
 
@@ -5029,7 +5029,7 @@ defaults.withTerminals = 0;
 defaults.withDirs = 1;
 defaults.withTransient = 0;
 
-let filesDeleteEmptyDirs = _.routineUnite( filesFindRecursive.head, filesDeleteEmptyDirs_body );
+let filesDeleteEmptyDirs = _.routine.uniteCloning_( filesFindRecursive.head, filesDeleteEmptyDirs_body );
 
 // --
 // other find
@@ -5150,7 +5150,7 @@ defaults.withDirs = 0;
 
 delete defaults.outputFormat;
 
-let filesRead = _.routineUnite( filesRead_head, filesRead_body );
+let filesRead = _.routine.uniteCloning_( filesRead_head, filesRead_body );
 
 //
 
@@ -5220,7 +5220,7 @@ defaults.onRename = null;
 
 delete defaults.outputFormat;
 
-let filesRename = _.routineUnite( filesRename_head, filesRename_body );
+let filesRename = _.routine.uniteCloning_( filesRename_head, filesRename_body );
 
 //
 
@@ -5267,7 +5267,7 @@ defaults.breakingSoftLink = 1;
 defaults.breakingTextLink = 0;
 // defaults.recursive = 2;
 
-let softLinksBreak = _.routineUnite( filesFindRecursive.head, softLinksBreak_body );
+let softLinksBreak = _.routine.uniteCloning_( filesFindRecursive.head, softLinksBreak_body );
 
 //
 
@@ -5323,7 +5323,7 @@ defaults.newPath = null;
 // defaults.recursive = 2;
 defaults.resolvingSoftLink = 0;
 
-let softLinksRebase = _.routineUnite( filesFindRecursive.head, softLinksRebase_body );
+let softLinksRebase = _.routine.uniteCloning_( filesFindRecursive.head, softLinksRebase_body );
 
 //
 

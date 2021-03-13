@@ -1345,7 +1345,7 @@ having.aspect = 'body';
  * @module Tools/mid/Files
  */
 
-let forCopy = _.routineUnite( forCopy_head, forCopy_body );
+let forCopy = _.routine.uniteCloning_( forCopy_head, forCopy_body );
 
 forCopy.having.aspect = 'entry';
 
@@ -1395,7 +1395,7 @@ var having = _firstAvailable_body.having = Object.create( null );
 having.driving = 0;
 having.aspect = 'body';
 
-let firstAvailable = _.routineUnite( _firstAvailable_head, _firstAvailable_body );
+let firstAvailable = _.routine.uniteCloning_( _firstAvailable_head, _firstAvailable_body );
 firstAvailable.having.aspect = 'entry';
 
 // --

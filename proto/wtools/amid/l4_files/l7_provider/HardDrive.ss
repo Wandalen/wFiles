@@ -1848,10 +1848,33 @@ function softLinkAct( o )
   if( o.sync )
   {
 
+    // if( process.platform === 'win32' )
+    // File.symlinkSync( srcNativePath, dstNativePath, o.type );
+    // else
+    // File.symlinkSync( srcNativePath, dstNativePath );
+
     if( process.platform === 'win32' )
-    File.symlinkSync( srcNativePath, dstNativePath, o.type );
+    {
+      /*
+        Dmytro : try-catch imitate njs file system API of njs versions earlier than 15.
+        The behavior of routine is similar to posix-like OS
+      */
+      try
+      {
+        File.symlinkSync( srcNativePath, dstNativePath, o.type );
+      }
+      catch( err )
+      {
+        if( o.type === null ) /* Dmytro : can be changed only not defined type */
+        File.symlinkSync( srcNativePath, dstNativePath, 'dir' );
+        else
+        throw _.err( err );
+      }
+    }
     else
-    File.symlinkSync( srcNativePath, dstNativePath );
+    {
+      File.symlinkSync( srcNativePath, dstNativePath );
+    }
 
     return;
   }

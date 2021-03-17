@@ -1866,7 +1866,7 @@ function softLinkAct( o )
       }
       catch( err )
       {
-        if( _.numberFromStrMaybe( process.versions.node.split( '.' )[ 0 ] ) >= 15 )
+        if( _.numberFromStr( process.versions.node.split( '.' )[ 0 ] ) >= 15 )
         if( err.code === 'ELOOP' )
         if( o.type === null ) /* Dmytro : can be changed only not defined type */
         {

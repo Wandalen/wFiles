@@ -1860,21 +1860,27 @@ function softLinkAct( o )
         The behavior of routine is similar to posix-like OS
       */
 
-      try
+      if( Number( process.version[ 2 ] ) >= 5 )
+      {
+        try
+        {
+          File.symlinkSync( srcNativePath, dstNativePath, o.type );
+        }
+        catch( err )
+        {
+          if( err.code === 'ELOOP' )
+          if( o.type === null ) /* Dmytro : can be changed only not defined type */
+          {
+            File.symlinkSync( srcNativePath, dstNativePath, 'dir' );
+            return;
+          }
+
+          throw _.err( err );
+        }
+      }
+      else
       {
         File.symlinkSync( srcNativePath, dstNativePath, o.type );
-      }
-      catch( err )
-      {
-        if( _.numberFromStr( process.versions.node.split( '.' )[ 0 ] ) >= 15 )
-        if( err.code === 'ELOOP' )
-        if( o.type === null ) /* Dmytro : can be changed only not defined type */
-        {
-          File.symlinkSync( srcNativePath, dstNativePath, 'dir' );
-          return;
-        }
-
-        throw _.err( err );
       }
     }
     else

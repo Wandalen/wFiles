@@ -1859,15 +1859,21 @@ function softLinkAct( o )
         Dmytro : try-catch imitate njs file system API of njs versions earlier than 15.
         The behavior of routine is similar to posix-like OS
       */
+
       try
       {
         File.symlinkSync( srcNativePath, dstNativePath, o.type );
       }
       catch( err )
       {
+        if( _.numberFromStrMaybe( process.versions.node.split( '.' )[ 0 ] ) >= 15 )
+        if( err.code === 'ELOOP' )
         if( o.type === null ) /* Dmytro : can be changed only not defined type */
-        File.symlinkSync( srcNativePath, dstNativePath, 'dir' );
-        else
+        {
+          File.symlinkSync( srcNativePath, dstNativePath, 'dir' );
+          return;
+        }
+
         throw _.err( err );
       }
     }

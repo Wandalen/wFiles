@@ -288,7 +288,6 @@ function trivial( test )
   var gotActions = _.select( records, '*/action' );
   var gotPreserve = _.select( records, '*/preserve' );
 
-  debugger;
   test.identical( extract.filesTree, expectedExtract.filesTree );
   test.identical( gotAbsolutes, expAbsolutes );
   test.identical( gotActions, expActions );

@@ -740,7 +740,6 @@ function statReadAct( o )
 
     if( parsed.isTerminal )
     {
-      debugger;
       let files = self.dirRead({ filePath : parsed.dirPath, throwing, sync });
       if( files === null || !_.longHas( files, parsed.fullName ) )
       {

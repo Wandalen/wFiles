@@ -1824,7 +1824,8 @@ function softLinkAct( o )
 
       if( srcStat )
       o.type = srcStat.isDirectory() ? 'dir' : 'file';
-
+      else if( process.version[ 1 ] >= '1' && process.version[ 2 ] >= '5' ) /* Dmytro '.' < '5' and '4' < '5', '6' > '5' */
+      o.type = 'dir';
     }
 
   }
@@ -1848,45 +1849,45 @@ function softLinkAct( o )
   if( o.sync )
   {
 
-    // if( process.platform === 'win32' )
-    // File.symlinkSync( srcNativePath, dstNativePath, o.type );
-    // else
-    // File.symlinkSync( srcNativePath, dstNativePath );
-
     if( process.platform === 'win32' )
-    {
-      /*
-        Dmytro : try-catch imitate njs file system API of njs versions earlier than 15.
-        The behavior of routine is similar to posix-like OS
-      */
-
-      if( process.version[ 2 ] >= '5' ) /* Dmytro '.' < '5' and '4' < '5', '6' > 5 */
-      {
-        try
-        {
-          File.symlinkSync( srcNativePath, dstNativePath, o.type );
-        }
-        catch( err )
-        {
-          if( err.code === 'ELOOP' )
-          if( o.type === null ) /* Dmytro : can be changed only not defined type */
-          {
-            File.symlinkSync( srcNativePath, dstNativePath, 'dir' );
-            return;
-          }
-
-          throw _.err( err );
-        }
-      }
-      else
-      {
-        File.symlinkSync( srcNativePath, dstNativePath, o.type );
-      }
-    }
+    File.symlinkSync( srcNativePath, dstNativePath, o.type );
     else
-    {
-      File.symlinkSync( srcNativePath, dstNativePath );
-    }
+    File.symlinkSync( srcNativePath, dstNativePath );
+
+    // if( process.platform === 'win32' )
+    // {
+    //   /*
+    //     Dmytro : try-catch imitate njs file system API of njs versions earlier than 15.
+    //     The behavior of routine is similar to posix-like OS
+    //   */
+    //
+    //   if( process.version[ 2 ] >= '5' ) /* Dmytro '.' < '5' and '4' < '5', '6' > 5 */
+    //   {
+    //     try
+    //     {
+    //       File.symlinkSync( srcNativePath, dstNativePath, o.type );
+    //     }
+    //     catch( err )
+    //     {
+    //       if( err.code === 'ELOOP' )
+    //       if( o.type === null ) /* Dmytro : can be changed only not defined type */
+    //       {
+    //         File.symlinkSync( srcNativePath, dstNativePath, 'dir' );
+    //         return;
+    //       }
+    //
+    //       throw _.err( err );
+    //     }
+    //   }
+    //   else
+    //   {
+    //     File.symlinkSync( srcNativePath, dstNativePath, o.type );
+    //   }
+    // }
+    // else
+    // {
+    //   File.symlinkSync( srcNativePath, dstNativePath );
+    // }
 
     return;
   }

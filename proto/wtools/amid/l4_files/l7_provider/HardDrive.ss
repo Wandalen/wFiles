@@ -1860,7 +1860,7 @@ function softLinkAct( o )
         The behavior of routine is similar to posix-like OS
       */
 
-      if( Number( process.version[ 2 ] ) >= 5 )
+      if( process.version[ 2 ] >= '5' ) /* Dmytro '.' < '5' and '4' < '5', '6' > 5 */
       {
         try
         {

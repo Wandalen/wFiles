@@ -1477,6 +1477,7 @@ function filesReflectFetchingTags( test )
   let localPath = a.abs( 'clone' );
   let clonePathGlobal = providerDst.path.globalFromPreferred( localPath );
   let remotePath = `git+hd://${repoPath}`;
+  let escapeCaret = process.platform === 'win32' ? '^' : '';
 
   a.shellSync = _.process.starter
   ({
@@ -1757,7 +1758,7 @@ function filesReflectFetchingTags( test )
 
   a.init({ download : 1 })
   a.shell( 'git -C repo commit --allow-empty -m test' )
-  a.shell( 'git -C repo tag tag2 tag1^{}' )
+  a.shell( `git -C repo tag tag2 tag1${ escapeCaret }^{}` )
   a.shell( 'git -C repo tag -d tag1' )
   .then( () =>
   {
@@ -1781,7 +1782,7 @@ function filesReflectFetchingTags( test )
 
   a.init({ download : 1 })
   a.shell( 'git -C repo commit --allow-empty -m test' )
-  a.shell( 'git -C repo tag tag2 tag1^{}' )
+  a.shell( `git -C repo tag tag2 tag1${ escapeCaret }^{}` )
   a.shell( 'git -C repo tag -d tag1' )
   .then( () =>
   {
@@ -1808,7 +1809,7 @@ function filesReflectFetchingTags( test )
 
   a.init({ download : 1 })
   a.shell( 'git -C repo commit --allow-empty -m test' )
-  a.shell( 'git -C repo tag tag2 tag1^{}' )
+  a.shell( `git -C repo tag tag2 tag1${ escapeCaret }^{}` )
   a.shell( 'git -C repo tag -d tag1' )
   .then( () =>
   {
@@ -1835,7 +1836,7 @@ function filesReflectFetchingTags( test )
 
   a.init({ download : 1 })
   a.shell( 'git -C repo commit --allow-empty -m test' )
-  a.shell( 'git -C repo tag tag2 tag1^{}' )
+  a.shell( `git -C repo tag tag2 tag1${ escapeCaret }^{}` )
   a.shell( 'git -C repo tag -d tag1' )
   .then( () =>
   {

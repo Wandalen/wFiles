@@ -1782,89 +1782,175 @@ _.routineExtend( fileCopyAct, Parent.prototype.fileCopyAct );
 
 //
 
-function softLinkAct( o )
+// function softLinkAct( o )
+// {
+//   let self = this;
+//   let srcIsAbsolute = self.path.isAbsolute( o.relativeSrcPath );
+//   let srcPath = o.srcPath;
+//
+//   _.assertRoutineOptions( softLinkAct, arguments );
+//   _.assert( self.path.isAbsolute( o.dstPath ) );
+//   _.assert( self.path.isNormalized( o.srcPath ) );
+//   _.assert( self.path.isNormalized( o.dstPath ) );
+//   _.assert( o.type === null || o.type === 'dir' ||  o.type === 'file' );
+//
+//   if( !srcIsAbsolute )
+//   {
+//     srcPath = o.relativeSrcPath;
+//     if( _.strBegins( srcPath, './' ) )
+//     srcPath = _.strIsolateLeftOrNone( srcPath, './' )[ 2 ];
+//     if( _.strBegins( srcPath, '..' ) )
+//     srcPath = '.' + _.strIsolateLeftOrNone( srcPath, '..' )[ 2 ];
+//   }
+//
+//   if( process.platform === 'win32' )
+//   {
+//
+//     if( o.type === null )
+//     {
+//       let srcPathResolved = srcPath;
+//
+//       /* not dir */
+//       if( !srcIsAbsolute )
+//       srcPathResolved = self.path.resolve( self.path.dir( o.dstPath ), srcPath );
+//
+//       let srcStat = self.statReadAct
+//       ({
+//         filePath : srcPathResolved,
+//         resolvingSoftLink : 1,
+//         sync : 1,
+//         throwing : 0,
+//       });
+//
+//       if( srcStat )
+//       o.type = srcStat.isDirectory() ? 'dir' : 'file';
+//
+//     }
+//
+//   }
+//
+//   let dstNativePath = self.path.nativize( o.dstPath );
+//   let srcNativePath = self.path.nativize( srcPath );
+//
+//   _.assert
+//   (
+//     !srcIsAbsolute || self._pathHasDriveLetter( srcNativePath ),
+//     `Expects src path that begins with drive letter, but got:"${srcPath}"`
+//   );
+//   _.assert
+//   (
+//     self._pathHasDriveLetter( dstNativePath ),
+//     `Expects dst path that begins with drive letter, but got:"${o.dstPath}"`
+//   );
+//
+//   /* */
+//
+//   if( o.sync )
+//   {
+//
+//     if( process.platform === 'win32' )
+//     File.symlinkSync( srcNativePath, dstNativePath, o.type );
+//     else
+//     File.symlinkSync( srcNativePath, dstNativePath );
+//
+//     return;
+//   }
+//
+//   let con = new _.Consequence();
+//
+//   if( process.platform === 'win32' )
+//   File.symlink( srcNativePath, dstNativePath, o.type, onSymlink );
+//   else
+//   File.symlink( srcNativePath, dstNativePath, onSymlink );
+//
+//   return con;
+//
+//   /* */
+//
+//   function onSymlink( err )
+//   {
+//     if( err )
+//     con.error( err );
+//     else
+//     con.take( true );
+//   }
+//
+// }
+
+function softLinkAct_functor()
 {
-  let self = this;
-  let srcIsAbsolute = self.path.isAbsolute( o.relativeSrcPath );
-  let srcPath = o.srcPath;
+  let con;
+  const isWindows = process.platform === 'win32' ? 1 : 0;
+  const nodejsSoftLinkingChanged = _.files.nodeJsIsSameOrNewer([ 15, 0, 0 ]) ? 1 : 0;
 
-  _.assertRoutineOptions( softLinkAct, arguments );
-  _.assert( self.path.isAbsolute( o.dstPath ) );
-  _.assert( self.path.isNormalized( o.srcPath ) );
-  _.assert( self.path.isNormalized( o.dstPath ) );
-  _.assert( o.type === null || o.type === 'dir' ||  o.type === 'file' );
+  const softLinkSyncRoutines =
+  [
+    softLinkSync,
+    softLinkSyncWindows,
+    softLinkSyncWindowsWithTry,
+  ];
 
-  if( !srcIsAbsolute )
-  {
-    srcPath = o.relativeSrcPath;
-    if( _.strBegins( srcPath, './' ) )
-    srcPath = _.strIsolateLeftOrNone( srcPath, './' )[ 2 ];
-    if( _.strBegins( srcPath, '..' ) )
-    srcPath = '.' + _.strIsolateLeftOrNone( srcPath, '..' )[ 2 ];
-  }
+  const softLinkSyncRoutine = softLinkSyncRoutines[ isWindows + nodejsSoftLinkingChanged ];
+  const softLinkAsyncRoutine = isWindows ? softLinkAsyncWindows : softLinkAsync;
 
-  if( process.platform === 'win32' )
-  {
-
-    if( o.type === null )
-    {
-      let srcPathResolved = srcPath;
-
-      /* not dir */
-      if( !srcIsAbsolute )
-      srcPathResolved = self.path.resolve( self.path.dir( o.dstPath ), srcPath );
-
-      let srcStat = self.statReadAct
-      ({
-        filePath : srcPathResolved,
-        resolvingSoftLink : 1,
-        sync : 1,
-        throwing : 0,
-      });
-
-      if( srcStat )
-      o.type = srcStat.isDirectory() ? 'dir' : 'file';
-      else if( _.files.nodeJsIsSameOrNewer([ 15, 0, 0 ]) )
-      o.type = 'dir';
-    }
-
-  }
-
-  let dstNativePath = self.path.nativize( o.dstPath );
-  let srcNativePath = self.path.nativize( srcPath );
-
-  _.assert
-  (
-    !srcIsAbsolute || self._pathHasDriveLetter( srcNativePath ),
-    `Expects src path that begins with drive letter, but got:"${srcPath}"`
-  );
-  _.assert
-  (
-    self._pathHasDriveLetter( dstNativePath ),
-    `Expects dst path that begins with drive letter, but got:"${o.dstPath}"`
-  );
+  return softLinkAct;
 
   /* */
 
-  if( o.sync )
+  function softLinkSync( srcNativePath, dstNativePath, type )
   {
-
-    if( process.platform === 'win32' )
-    File.symlinkSync( srcNativePath, dstNativePath, o.type );
-    else
     File.symlinkSync( srcNativePath, dstNativePath );
-
-    return;
   }
 
-  let con = new _.Consequence();
+  /* */
 
-  if( process.platform === 'win32' )
-  File.symlink( srcNativePath, dstNativePath, o.type, onSymlink );
-  else
-  File.symlink( srcNativePath, dstNativePath, onSymlink );
+  function softLinkSyncWindows( srcNativePath, dstNativePath, type )
+  {
+    File.symlinkSync( srcNativePath, dstNativePath, type );
+  }
 
-  return con;
+  /* */
+
+  function softLinkSyncWindowsWithTry( srcNativePath, dstNativePath, type )
+  {
+    /*
+      Dmytro : try-catch imitate njs file system API of njs versions earlier than 15.
+      The behavior of routine is similar to posix-like OS
+    */
+    try
+    {
+      File.symlinkSync( srcNativePath, dstNativePath, type );
+    }
+    catch( err )
+    {
+      if( err.code === 'ELOOP' )
+      if( type === null ) /* Dmytro : can be changed only not defined type */
+      {
+        File.symlinkSync( srcNativePath, dstNativePath, 'dir' );
+        return;
+      }
+
+      throw _.err( err );
+    }
+  }
+
+  /* */
+
+  function softLinkAsync( srcNativePath, dstNativePath, type )
+  {
+    con = new _.Consequence();
+    File.symlink( srcNativePath, dstNativePath, onSymlink );
+    return con;
+  }
+
+  /* */
+
+  function softLinkAsyncWindows( srcNativePath, dstNativePath, type )
+  {
+    con = new _.Consequence();
+    File.symlink( srcNativePath, dstNativePath, type, onSymlink );
+    return con;
+  }
 
   /* */
 
@@ -1876,8 +1962,76 @@ function softLinkAct( o )
     con.take( true );
   }
 
+  /* */
+
+  function softLinkAct( o )
+  {
+    let self = this;
+    let srcIsAbsolute = self.path.isAbsolute( o.relativeSrcPath );
+    let srcPath = o.srcPath;
+
+    _.assertRoutineOptions( softLinkAct, arguments );
+    _.assert( self.path.isAbsolute( o.dstPath ) );
+    _.assert( self.path.isNormalized( o.srcPath ) );
+    _.assert( self.path.isNormalized( o.dstPath ) );
+    _.assert( o.type === null || o.type === 'dir' ||  o.type === 'file' );
+
+    if( !srcIsAbsolute )
+    {
+      srcPath = o.relativeSrcPath;
+      if( _.strBegins( srcPath, './' ) )
+      srcPath = _.strIsolateLeftOrNone( srcPath, './' )[ 2 ];
+      if( _.strBegins( srcPath, '..' ) )
+      srcPath = '.' + _.strIsolateLeftOrNone( srcPath, '..' )[ 2 ];
+    }
+
+    if( isWindows )
+    {
+      if( o.type === null )
+      {
+        let srcPathResolved = srcPath;
+
+        /* not dir */
+        if( !srcIsAbsolute )
+        srcPathResolved = self.path.resolve( self.path.dir( o.dstPath ), srcPath );
+
+        let srcStat = self.statReadAct
+        ({
+          filePath : srcPathResolved,
+          resolvingSoftLink : 1,
+          sync : 1,
+          throwing : 0,
+        });
+
+        if( srcStat )
+        o.type = srcStat.isDirectory() ? 'dir' : 'file';
+      }
+    }
+
+    let dstNativePath = self.path.nativize( o.dstPath );
+    let srcNativePath = self.path.nativize( srcPath );
+
+    _.assert
+    (
+      !srcIsAbsolute || self._pathHasDriveLetter( srcNativePath ),
+      `Expects src path that begins with drive letter, but got:"${srcPath}"`
+    );
+    _.assert
+    (
+      self._pathHasDriveLetter( dstNativePath ),
+      `Expects dst path that begins with drive letter, but got:"${o.dstPath}"`
+    );
+
+    /* */
+
+    if( o.sync )
+    return softLinkSyncRoutine( srcNativePath, dstNativePath, o.type );
+    else
+    return softLinkAsyncRoutine( srcNativePath, dstNativePath, o.type );
+  }
 }
 
+const softLinkAct = softLinkAct_functor();
 _.routineExtend( softLinkAct, Parent.prototype.softLinkAct );
 
 //

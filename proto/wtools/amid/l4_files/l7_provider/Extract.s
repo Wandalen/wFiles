@@ -2039,7 +2039,8 @@ function _descriptorRead( o )
 
   let o2 = Object.create( null );
 
-  o2.setting = 0;
+  // o2.setting = 0;
+  o2.action = _.Selector.Action.no;
   o2.selector = o.filePath;
   o2.src = o.filesTree;
   o2.upToken = o.upToken;
@@ -2424,7 +2425,8 @@ function _descriptorWrite( o )
   {
     let o2 = Object.create( null );
 
-    o2.setting = 1;
+    // o2.setting = 1;
+    o2.action = _.Selector.Action.set;
     o2.set = o.data;
     o2.selector = o.filePath;
     o2.src = o.filesTree;

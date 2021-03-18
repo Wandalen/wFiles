@@ -1465,6 +1465,406 @@ filesReflectEol.timeOut = 120000;
 
 //
 
+function filesReflectFetchingTags( test )
+{
+  let context = this;
+  let providerSrc = context.providerSrc;
+  let providerDst = context.providerDst;
+  let system = context.system;
+  let path = context.providerDst.path;
+  let a = test.assetFor( false );
+  let repoPath = a.abs( 'repo' );
+  let localPath = a.abs( 'clone' );
+  let clonePathGlobal = providerDst.path.globalFromPreferred( localPath );
+  let remotePath = `git+hd://${repoPath}`;
+
+  a.shellSync = _.process.starter
+  ({
+    currentPath : a.abs( '.' ),
+    outputCollecting : 1,
+    outputGraying : 1,
+    throwingExitCode : 0,
+    sync : 1,
+    deasync : 0,
+    ready : null
+  })
+
+  a.init = ( o ) =>
+  {
+    o = o || {}
+
+    a.ready.then( () =>
+    {
+      a.fileProvider.filesDelete( a.abs( '.' ) );
+      a.reflect();
+      a.fileProvider.dirMake( repoPath );
+      a.shellSync( 'git -C repo init' );
+      a.shellSync( 'git -C repo commit --allow-empty -m initial' );
+      a.shellSync( 'git -C repo tag tag1' );
+      return null;
+    })
+
+    if( o.download )
+    a.ready.then( () =>
+    {
+      return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5 })
+    })
+
+    return a.ready;
+  }
+
+  /* */
+
+  a.init()
+  .then( () =>
+  {
+    let extra = { fetching : 0, fetchingTags : 0 }
+    test.case = `first download, remote has a tag ${_.entity.exportJs( extra ) }`
+    return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5, extra })
+    .then( () =>
+    {
+      let got = a.shellSync( 'git -C clone tag' );
+      test.true( _.strHas( got.output, 'tag1' ) )
+      let tagVersionLocal = _.git.repositoryTagToVersion({ localPath, tag : 'tag1', local : 1, remote : 0 });
+      let tagVersionRemote = _.git.repositoryTagToVersion({ localPath, tag : 'tag1', local : 0, remote : 1 });
+      test.identical( tagVersionLocal, tagVersionRemote )
+      return null;
+    })
+  })
+
+  /* */
+
+  a.init()
+  .then( () =>
+  {
+    let extra = { fetching : 1, fetchingTags : 0 }
+    test.case = `first download, remote has a tag ${_.entity.exportJs( extra ) }`
+    return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5, extra })
+    .then( () =>
+    {
+      let got = a.shellSync( 'git -C clone tag' );
+      test.true( _.strHas( got.output, 'tag1' ) )
+      let tagVersionLocal = _.git.repositoryTagToVersion({ localPath, tag : 'tag1', local : 1, remote : 0 });
+      let tagVersionRemote = _.git.repositoryTagToVersion({ localPath, tag : 'tag1', local : 0, remote : 1 });
+      test.identical( tagVersionLocal, tagVersionRemote )
+      return null;
+    })
+  })
+
+  /* */
+
+  a.init()
+  .then( () =>
+  {
+    let extra = { fetching : 0, fetchingTags : 1 }
+    test.case = `first download, remote has a tag ${_.entity.exportJs( extra ) }`
+    return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5, extra })
+    .then( () =>
+    {
+      let got = a.shellSync( 'git -C clone tag' );
+      test.true( _.strHas( got.output, 'tag1' ) )
+      let tagVersionLocal = _.git.repositoryTagToVersion({ localPath, tag : 'tag1', local : 1, remote : 0 });
+      let tagVersionRemote = _.git.repositoryTagToVersion({ localPath, tag : 'tag1', local : 0, remote : 1 });
+      test.identical( tagVersionLocal, tagVersionRemote )
+      return null;
+    })
+  })
+
+  /* */
+
+  a.init()
+  .then( () =>
+  {
+    let extra = { fetching : 1, fetchingTags : 1 }
+    test.case = `first download, remote has a tag ${_.entity.exportJs( extra ) }`
+    return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5, extra })
+    .then( () =>
+    {
+      let got = a.shellSync( 'git -C clone tag' );
+      test.true( _.strHas( got.output, 'tag1' ) )
+      let tagVersionLocal = _.git.repositoryTagToVersion({ localPath, tag : 'tag1', local : 1, remote : 0 });
+      let tagVersionRemote = _.git.repositoryTagToVersion({ localPath, tag : 'tag1', local : 0, remote : 1 });
+      test.identical( tagVersionLocal, tagVersionRemote )
+      return null;
+    })
+  })
+
+  /* */
+
+  a.init({ download : 1 })
+  a.shell( 'git -C repo tag tag2' )
+  .then( () =>
+  {
+    let extra = { fetching : 0, fetchingTags : 0 }
+    test.case = `update, remote has a new tag ${_.entity.exportJs( extra ) }`
+    return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5, extra })
+    .then( () =>
+    {
+      let got = a.shellSync( 'git -C clone tag' );
+      test.true( _.strHas( got.output, 'tag1' ) )
+      test.false( _.strHas( got.output, 'tag2' ) )
+      let tagVersionLocal = _.git.repositoryTagToVersion({ localPath, tag : 'tag2', local : 1, remote : 0 });
+      test.identical( tagVersionLocal, false )
+      return null;
+    })
+  })
+
+  /* */
+
+  a.init({ download : 1 })
+  a.shell( 'git -C repo tag tag2' )
+  .then( () =>
+  {
+    let extra = { fetching : 1, fetchingTags : 0 }
+    test.case = `update, remote has a new tag ${_.entity.exportJs( extra ) }`
+    return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5, extra })
+    .then( () =>
+    {
+      let got = a.shellSync( 'git -C clone tag' );
+      test.true( _.strHas( got.output, 'tag2' ) )
+      let tagVersionLocal = _.git.repositoryTagToVersion({ localPath, tag : 'tag2', local : 1, remote : 0 });
+      let tagVersionRemote = _.git.repositoryTagToVersion({ localPath, tag : 'tag2', local : 0, remote : 1 });
+      test.identical( tagVersionLocal, tagVersionRemote )
+      return null;
+    })
+  })
+
+  /* */
+
+  a.init({ download : 1 })
+  a.shell( 'git -C repo tag tag2' )
+  .then( () =>
+  {
+    let extra = { fetching : 0, fetchingTags : 1 }
+    test.case = `update, remote has a new tag ${_.entity.exportJs( extra ) }`
+    return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5, extra })
+    .then( () =>
+    {
+      let got = a.shellSync( 'git -C clone tag' );
+      test.true( _.strHas( got.output, 'tag2' ) )
+      let tagVersionLocal = _.git.repositoryTagToVersion({ localPath, tag : 'tag2', local : 1, remote : 0 });
+      let tagVersionRemote = _.git.repositoryTagToVersion({ localPath, tag : 'tag2', local : 0, remote : 1 });
+      test.identical( tagVersionLocal, tagVersionRemote )
+      return null;
+    })
+  })
+
+  /* */
+
+  a.init({ download : 1 })
+  a.shell( 'git -C repo tag tag2' )
+  .then( () =>
+  {
+    let extra = { fetching : 1, fetchingTags : 1 }
+    test.case = `update, remote has a new tag ${_.entity.exportJs( extra ) }`
+    return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5, extra })
+    .then( () =>
+    {
+      let got = a.shellSync( 'git -C clone tag' );
+      test.true( _.strHas( got.output, 'tag2' ) )
+      let tagVersionLocal = _.git.repositoryTagToVersion({ localPath, tag : 'tag2', local : 1, remote : 0 });
+      let tagVersionRemote = _.git.repositoryTagToVersion({ localPath, tag : 'tag2', local : 0, remote : 1 });
+      test.identical( tagVersionLocal, tagVersionRemote )
+      return null;
+    })
+  })
+
+  /* */
+
+  a.init({ download : 1 })
+  a.shell( 'git -C repo commit --allow-empty -m test' )
+  a.shell( 'git -C repo tag -f tag1' )
+  .then( () =>
+  {
+    let extra = { fetching : 0, fetchingTags : 0 }
+    test.case = `update, remote has a updated tag ${_.entity.exportJs( extra ) }`
+    return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5, extra })
+    .then( () =>
+    {
+      let got = a.shellSync( 'git -C clone tag' );
+      test.true( _.strHas( got.output, 'tag1' ) )
+      let tagVersionLocal = _.git.repositoryTagToVersion({ localPath, tag : 'tag1', local : 1, remote : 0 });
+      let tagVersionRemote = _.git.repositoryTagToVersion({ localPath, tag : 'tag1', local : 0, remote : 1 });
+      test.notIdentical( tagVersionLocal, tagVersionRemote )
+      return null;
+    })
+  })
+
+  /* */
+
+  a.init({ download : 1 })
+  a.shell( 'git -C repo commit --allow-empty -m test' )
+  a.shell( 'git -C repo tag -f tag1' )
+  .then( () =>
+  {
+    let extra = { fetching : 1, fetchingTags : 0 }
+    test.case = `update, remote has a updated tag ${_.entity.exportJs( extra ) }`
+    return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5, extra })
+    .then( () =>
+    {
+      let got = a.shellSync( 'git -C clone tag' );
+      test.true( _.strHas( got.output, 'tag1' ) )
+      let tagVersionLocal = _.git.repositoryTagToVersion({ localPath, tag : 'tag1', local : 1, remote : 0 });
+      let tagVersionRemote = _.git.repositoryTagToVersion({ localPath, tag : 'tag1', local : 0, remote : 1 });
+      test.notIdentical( tagVersionLocal, tagVersionRemote )
+      return null;
+    })
+  })
+
+  /* */
+
+  a.init({ download : 1 })
+  a.shell( 'git -C repo commit --allow-empty -m test' )
+  a.shell( 'git -C repo tag -f tag1' )
+  .then( () =>
+  {
+    let extra = { fetching : 0, fetchingTags : 1 }
+    test.case = `update, remote has a updated tag ${_.entity.exportJs( extra ) }`
+    return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5, extra })
+    .then( () =>
+    {
+      let got = a.shellSync( 'git -C clone tag' );
+      test.true( _.strHas( got.output, 'tag1' ) )
+      let tagVersionLocal = _.git.repositoryTagToVersion({ localPath, tag : 'tag1', local : 1, remote : 0 });
+      let tagVersionRemote = _.git.repositoryTagToVersion({ localPath, tag : 'tag1', local : 0, remote : 1 });
+      test.identical( tagVersionLocal, tagVersionRemote )
+      return null;
+    })
+  })
+
+  /* */
+
+  a.init({ download : 1 })
+  a.shell( 'git -C repo commit --allow-empty -m test' )
+  a.shell( 'git -C repo tag -f tag1' )
+  .then( () =>
+  {
+    let extra = { fetching : 1, fetchingTags : 1 }
+    test.case = `update, remote has a updated tag ${_.entity.exportJs( extra ) }`
+    return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5, extra })
+    .then( () =>
+    {
+      let got = a.shellSync( 'git -C clone tag' );
+      test.true( _.strHas( got.output, 'tag1' ) )
+      let tagVersionLocal = _.git.repositoryTagToVersion({ localPath, tag : 'tag1', local : 1, remote : 0 });
+      let tagVersionRemote = _.git.repositoryTagToVersion({ localPath, tag : 'tag1', local : 0, remote : 1 });
+      test.identical( tagVersionLocal, tagVersionRemote )
+      return null;
+    })
+  })
+
+  /* */
+
+  a.init({ download : 1 })
+  a.shell( 'git -C repo commit --allow-empty -m test' )
+  a.shell( 'git -C repo tag tag2 tag1^{}' )
+  a.shell( 'git -C repo tag -d tag1' )
+  .then( () =>
+  {
+    let extra = { fetching : 0, fetchingTags : 0 }
+    test.case = `update, remote remamed existing tag ${_.entity.exportJs( extra ) }`
+    return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5, extra })
+    .then( () =>
+    {
+      let got = a.shellSync( 'git -C clone show-ref --tags' );
+      test.true( _.strHas( got.output, 'tag1' ) )
+      test.true( !_.strHas( got.output, 'tag2' ) )
+      var tagVersionRemote = _.git.repositoryTagToVersion({ localPath, tag : 'tag1', local : 0, remote : 1 });
+      test.identical( tagVersionRemote, false )
+      var tagVersionLocal = _.git.repositoryTagToVersion({ localPath, tag : 'tag2', local : 1, remote : 0 });
+      test.identical( tagVersionLocal, false )
+      return null;
+    })
+  })
+
+  /* */
+
+  a.init({ download : 1 })
+  a.shell( 'git -C repo commit --allow-empty -m test' )
+  a.shell( 'git -C repo tag tag2 tag1^{}' )
+  a.shell( 'git -C repo tag -d tag1' )
+  .then( () =>
+  {
+    let extra = { fetching : 1, fetchingTags : 0 }
+    test.case = `update, remote remamed existing tag ${_.entity.exportJs( extra ) }`
+    return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5, extra })
+    .then( () =>
+    {
+      let got = a.shellSync( 'git -C clone show-ref --tags' );
+      test.true( _.strHas( got.output, 'tag1' ) )
+      test.true( _.strHas( got.output, 'tag2' ) )
+      var tagVersionLocal = _.git.repositoryTagToVersion({ localPath, tag : 'tag1', local : 1, remote : 0 });
+      var tagVersionRemote = _.git.repositoryTagToVersion({ localPath, tag : 'tag1', local : 0, remote : 1 });
+      test.true( _.strHas( got.output, tagVersionLocal ) )
+      test.identical( tagVersionRemote, false )
+      var tagVersionLocal = _.git.repositoryTagToVersion({ localPath, tag : 'tag2', local : 1, remote : 0 });
+      var tagVersionRemote = _.git.repositoryTagToVersion({ localPath, tag : 'tag2', local : 0, remote : 1 });
+      test.identical( tagVersionLocal, tagVersionRemote )
+      return null;
+    })
+  })
+
+  /* */
+
+  a.init({ download : 1 })
+  a.shell( 'git -C repo commit --allow-empty -m test' )
+  a.shell( 'git -C repo tag tag2 tag1^{}' )
+  a.shell( 'git -C repo tag -d tag1' )
+  .then( () =>
+  {
+    let extra = { fetching : 0, fetchingTags : 1 }
+    test.case = `update, remote remamed existing tag ${_.entity.exportJs( extra ) }`
+    return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5, extra })
+    .then( () =>
+    {
+      let got = a.shellSync( 'git -C clone show-ref --tags' );
+      test.true( _.strHas( got.output, 'tag1' ) )
+      test.true( _.strHas( got.output, 'tag2' ) )
+      var tagVersionLocal = _.git.repositoryTagToVersion({ localPath, tag : 'tag1', local : 1, remote : 0 });
+      var tagVersionRemote = _.git.repositoryTagToVersion({ localPath, tag : 'tag1', local : 0, remote : 1 });
+      test.true( _.strHas( got.output, tagVersionLocal ) )
+      test.identical( tagVersionRemote, false )
+      var tagVersionLocal = _.git.repositoryTagToVersion({ localPath, tag : 'tag2', local : 1, remote : 0 });
+      var tagVersionRemote = _.git.repositoryTagToVersion({ localPath, tag : 'tag2', local : 0, remote : 1 });
+      test.identical( tagVersionLocal, tagVersionRemote )
+      return null;
+    })
+  })
+
+  /* */
+
+  a.init({ download : 1 })
+  a.shell( 'git -C repo commit --allow-empty -m test' )
+  a.shell( 'git -C repo tag tag2 tag1^{}' )
+  a.shell( 'git -C repo tag -d tag1' )
+  .then( () =>
+  {
+    let extra = { fetching : 1, fetchingTags : 1 }
+    test.case = `update, remote remamed existing tag ${_.entity.exportJs( extra ) }`
+    return system.filesReflect({ reflectMap : { [ remotePath ] : clonePathGlobal }, verbosity : 5, extra })
+    .then( () =>
+    {
+      let got = a.shellSync( 'git -C clone show-ref --tags' );
+      test.true( _.strHas( got.output, 'tag1' ) )
+      test.true( _.strHas( got.output, 'tag2' ) )
+      var tagVersionLocal = _.git.repositoryTagToVersion({ localPath, tag : 'tag1', local : 1, remote : 0 });
+      var tagVersionRemote = _.git.repositoryTagToVersion({ localPath, tag : 'tag1', local : 0, remote : 1 });
+      test.true( _.strHas( got.output, tagVersionLocal ) )
+      test.identical( tagVersionRemote, false )
+      var tagVersionLocal = _.git.repositoryTagToVersion({ localPath, tag : 'tag2', local : 1, remote : 0 });
+      var tagVersionRemote = _.git.repositoryTagToVersion({ localPath, tag : 'tag2', local : 0, remote : 1 });
+      test.identical( tagVersionLocal, tagVersionRemote )
+      return null;
+    })
+  })
+
+  return a.ready;
+}
+
+filesReflectFetchingTags.timeOut = 60000;
+
+//
+
 // --
 // declare
 // --
@@ -1496,7 +1896,8 @@ var Proto =
     filesReflectTrivial,
     filesReflectNoStashing,
     filesReflectDownloadThrowing,
-    filesReflectEol
+    filesReflectEol,
+    filesReflectFetchingTags
   },
 
 }

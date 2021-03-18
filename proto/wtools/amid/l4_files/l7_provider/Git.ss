@@ -405,6 +405,8 @@ function filesReflectSingle_body( o )
   {
     if( o.extra.fetching ) /* qqq : what is it for? */
     shell( 'git fetch origin' );
+    if( o.extra.fetchingTags )
+    shell( 'git fetch --tags -f origin' ); /* fetch new tags from remote updating existing local tags */
   }
 
   let localChanges = false;
@@ -584,6 +586,7 @@ _.routineExtend( filesReflectSingle_body, _.FileProvider.FindMixin.prototype.fil
 
 var extra = filesReflectSingle_body.extra = Object.create( null );
 extra.fetching = 1;
+extra.fetchingTags = 0;
 extra.stashing = 0;
 
 var defaults = filesReflectSingle_body.defaults;

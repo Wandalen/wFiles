@@ -25392,13 +25392,11 @@ function softLinkActSyncOnWindows( test )
   provider.softLinkAct( o );
   o.dstPath = linkPath;
   o.relativeDstPath = linkPath;
-  var onErrorCallback = ( err, arg ) =>
-  {
-    test.true( _.errIs( err ) );
-    test.identical( arg, undefined );
-    test.identical( _.strCount( err.message, 'ELOOP' ), 1 );
-  };
-  test.shouldThrowErrorSync( () => provider.softLinkAct( o ), onErrorCallback );
+  provider.softLinkAct( o );
+  test.true( provider.isSoftLink( linkPath ) );
+  var got = provider.pathResolveSoftLink({ filePath : linkPath });
+  test.identical( got, filePath );
+  provider.filesDelete( context.suiteTempPath );
 }
 
 //

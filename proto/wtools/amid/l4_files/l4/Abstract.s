@@ -20,7 +20,7 @@ _.assert( _.routineIs( FileRecordFactory ) );
  * @module Tools/mid/Files
 */
 
-let Parent = null;
+const Parent = null;
 const Self = wFileProviderAbstract;
 function wFileProviderAbstract( o )
 {

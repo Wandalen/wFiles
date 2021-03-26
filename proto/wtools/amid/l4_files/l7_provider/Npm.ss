@@ -35,7 +35,7 @@ const _ = _global_.wTools;
  @module Tools/mid/Files
 */
 
-let Parent = _.FileProvider.Partial;
+const Parent = _.FileProvider.Partial;
 const Self = wFileProviderNpm;
 function wFileProviderNpm( o )
 {

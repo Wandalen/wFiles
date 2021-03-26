@@ -81,7 +81,7 @@ fileIsLockedAct.defaults =
  @module Tools/mid/Files
 */
 
-let Parent = _.FileProvider.Abstract;
+const Parent = _.FileProvider.Abstract;
 const Self = wFileProviderPartial;
 function wFileProviderPartial( o )
 {
@@ -4895,7 +4895,7 @@ function fileWrite_body( o )
   function log()
   {
     if( o.verbosity >= 3 )
-    self.logger.log( ' + writing', _.entity.exportStringShort( o.data ), 'to', o.filePath );
+    self.logger.log( ' + writing', _.entity.exportStringShallow( o.data ), 'to', o.filePath );
   }
 
 }

@@ -27,7 +27,7 @@ _.assert( !_.FileProvider.Extract );
  @module Tools/mid/Files
 */
 
-let Parent = Partial;
+const Parent = Partial;
 const Self = wFileProviderExtract;
 function wFileProviderExtract( o )
 {

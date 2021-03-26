@@ -8,7 +8,7 @@ const _ = _global_.wTools;
 var Abstract = _.FileProvider.Abstract;
 var Partial = _.FileProvider.Partial;
 var Default = _.FileProvider.Default;
-let Parent = null;
+const Parent = null;
 const Self = wFileFilterReroot;
 function wFileFilterReroot( o )
 {

@@ -6,7 +6,7 @@
 const _global = _global_;
 const _ = _global_.wTools;
 let Abstract = _.FileProvider.Abstract;
-let Parent = Abstract;
+const Parent = Abstract;
 const Self = wFileFilterImage;
 function wFileFilterImage( o )
 {

@@ -28,7 +28,7 @@ if( typeof module !== 'undefined' )
 const _global = _global_;
 const _ = _global_.wTools;
 let FileRecord = _.FileRecord;
-let Parent = _.FileProvider.Partial;
+const Parent = _.FileProvider.Partial;
 const Self = wFileProviderHardDrive;
 function wFileProviderHardDrive( o )
 {

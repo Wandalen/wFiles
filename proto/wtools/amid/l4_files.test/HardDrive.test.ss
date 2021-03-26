@@ -13,7 +13,7 @@ if( typeof module !== 'undefined' )
 //
 
 const _ = _global_.wTools;
-let Parent = wTests[ 'Tools.mid.files.fileProvider.Abstract' ];
+const Parent = wTests[ 'Tools.mid.files.fileProvider.Abstract' ];
 
 _.assert( !!Parent );
 
@@ -49,7 +49,7 @@ function providerMake()
 // declare
 // --
 
-var Proto =
+const Proto =
 {
 
   name : 'Tools.mid.files.fileProvider.HardDrive',

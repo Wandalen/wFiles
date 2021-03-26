@@ -38,7 +38,7 @@ if( typeof module !== 'undefined' )
 //
 
 const _ = _global_.wTools;
-let Parent = wTester;
+const Parent = wTester;
 var suiteTempPath;
 
 // --

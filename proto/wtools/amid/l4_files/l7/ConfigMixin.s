@@ -27,7 +27,7 @@ _.assert( _.routineIs( fileRead ) );
  @module Tools/mid/Files
 */
 
-let Parent = null;
+const Parent = null;
 const Self = wFileProviderConfigMixin;
 function wFileProviderConfigMixin( o )
 {
@@ -358,7 +358,7 @@ function configRead_body( o )
       if( read === undefined )
       read = Object.create( null );
 
-      _.sure( _.mapIs( read ), () => 'Expects map, but read ' + _.entity.exportStringShort( result ) + ' from ' + o2.filePath );
+      _.sure( _.mapIs( read ), () => 'Expects map, but read ' + _.entity.exportStringShallow( result ) + ' from ' + o2.filePath );
 
       if( result === null )
       result = read;

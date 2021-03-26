@@ -31,7 +31,7 @@ _.assert( !_.FileProvider.Imap );
  * @module Tools/mid/Files
  */
 
-let Parent = Partial;
+const Parent = Partial;
 const Self = wFileProviderImap;
 function wFileProviderImap( o )
 {

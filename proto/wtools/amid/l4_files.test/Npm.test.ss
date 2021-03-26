@@ -485,7 +485,7 @@ filesReflectTrivial.timeOut = 240000;
 // declare
 // --
 
-var Proto =
+const Proto =
 {
 
   name : 'Tools.mid.files.fileProvider.Npm',

@@ -236,7 +236,7 @@ function streamReadProviderWithSystem( test )
 // declare
 // --
 
-var Proto =
+const Proto =
 {
 
   name : 'Tools.mid.files.fileProvider.Http',

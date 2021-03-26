@@ -20,7 +20,7 @@
 
 const _global = _global_;
 const _ = _global_.wTools;
-let Parent = _.FileRecordContext;
+const Parent = _.FileRecordContext;
 const Self = wFileRecordFactory;
 function wFileRecordFactory( o )
 {

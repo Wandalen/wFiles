@@ -27,7 +27,7 @@ _.assert( _.routineIs( fileRead ) );
  @module Tools/mid/Files
 */
 
-let Parent = null;
+const Parent = null;
 const Self = wFileProviderSecondaryMixin;
 function wFileProviderSecondaryMixin( o )
 {

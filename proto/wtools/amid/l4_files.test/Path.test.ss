@@ -23,7 +23,7 @@ if( typeof module !== 'undefined' )
 
 const _ = _global_.wTools;
 const __ = _globals_.testing.wTools;
-let Parent = wTester;
+const Parent = wTester;
 
 //
 

@@ -21,7 +21,7 @@
 
 const _global = _global_;
 const _ = _global_.wTools;
-let Parent = _.FileProvider.Partial;
+const Parent = _.FileProvider.Partial;
 const Self = wFileProviderHttp;
 function wFileProviderHttp( o )
 {

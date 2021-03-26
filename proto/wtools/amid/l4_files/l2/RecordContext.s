@@ -20,7 +20,7 @@
 
 const _global = _global_;
 const _ = _global_.wTools;
-let Parent = null;
+const Parent = null;
 const Self = wFileRecordContext;
 function wFileRecordContext( o )
 {
@@ -202,7 +202,7 @@ function _formAssociations()
   _.assert
   (
     !factory.system || factory.system instanceof _.FileProvider.System,
-    () => '{- factory.system -} should be instance of {- _.FileProvider.System -}, but it is ' + _.entity.exportStringShort( factory.system )
+    () => '{- factory.system -} should be instance of {- _.FileProvider.System -}, but it is ' + _.entity.exportStringShallow( factory.system )
   );
   _.assert
   (
@@ -212,7 +212,7 @@ function _formAssociations()
   _.assert
   (
     factory.defaultProvider instanceof _.FileProvider.Abstract,
-    () => '{- factory.system -} should be instance of {- _.FileProvider.Abstract -}, but it is ' + _.entity.exportStringShort( factory.defaultProvider )
+    () => '{- factory.system -} should be instance of {- _.FileProvider.Abstract -}, but it is ' + _.entity.exportStringShallow( factory.defaultProvider )
   );
 
 }

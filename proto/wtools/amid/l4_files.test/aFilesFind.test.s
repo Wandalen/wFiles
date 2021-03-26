@@ -33107,6 +33107,40 @@ filesReflectToWithSoftLinksResolving.timeOut = 500000;
 
 //
 
+function filesReflectHardlinking( test )
+{
+  let context = this;
+  let provider = context.provider;
+  let system = context.system;
+  let path = context.provider.path;
+  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
+
+  var filesTree =
+  {
+    'src' : 'abc',
+    'dst' : 'abc',
+  }
+
+  _.FileProvider.Extract({ filesTree }).filesReflectTo
+  ({
+    dst : routinePath,
+    dstProvider : provider,
+  })
+
+  provider.filesReflect
+  ({
+    filter : { filePath : { [ srcPath ] : dstPath } },
+    dstRewritingOnlyPreserving : 1,
+    breakingSrcHardLink : 1,
+    breakingDstHardLink : 0,
+    linking : 'hardLink',
+    verbosity : 1,
+  });
+
+}
+
+//
+
 /*
 two srcs with same dst path, src2/proto/amid does not exist, dst/proto/amid exists before copy
 */
@@ -38356,6 +38390,7 @@ const Proto =
     filesReflectToWithSoftLinks, /* qqq : implement filesReflectToWithTextLinks */
     filesReflectToWithSoftLinksRebasing, /* qqq : implement filesReflectToWithTextLinksRebasing */
     filesReflectToWithSoftLinksResolving, /* qqq : implement filesReflectToWithTextLinksResolving */
+    filesReflectHardlinking,
     filesReflectDstIgnoring,
     filesReflectRenaming,
     filesExtractBasic,

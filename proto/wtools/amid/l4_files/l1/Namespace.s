@@ -28,9 +28,9 @@
  * @module Tools/mid/Files
  */
 
-let _global = _global_;
-let _ = _global_.wTools;
-let Self = _.files = _.files || Object.create( null );
+const _global = _global_;
+const _ = _global_.wTools;
+const Self = _.files = _.files || Object.create( null );
 let Crypto;
 
 _.FileProvider = _.files.FileProvider = _.FileProvider || _.files.FileProvider || Object.create( null );
@@ -345,7 +345,7 @@ function _fileOptionsGet( filePath, o ) /* xxx : check */
   if( !o.filePath )
   throw _.err( 'Expects "o.filePath"' );
 
-  _.assertMapHasOnly( o, this.defaults );
+  _.map.assertHasOnly( o, this.defaults );
   _.assert( arguments.length === 1 || arguments.length === 2 );
 
   if( o.sync === undefined )

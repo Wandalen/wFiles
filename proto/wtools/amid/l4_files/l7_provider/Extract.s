@@ -3,8 +3,8 @@
 
 'use strict';
 
-let _global = _global_;
-let _ = _global_.wTools;
+const _global = _global_;
+const _ = _global_.wTools;
 let Abstract = _.FileProvider.Abstract;
 let Partial = _.FileProvider.Partial;
 let FileRecord = _.FileRecord;
@@ -28,7 +28,7 @@ _.assert( !_.FileProvider.Extract );
 */
 
 let Parent = Partial;
-let Self = wFileProviderExtract;
+const Self = wFileProviderExtract;
 function wFileProviderExtract( o )
 {
   return _.workpiece.construct( Self, this, arguments );
@@ -852,7 +852,7 @@ function timeWriteAct( o )
   let self = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
-  _.assertMapHasOnly( o, timeWriteAct.defaults );
+  _.map.assertHasOnly( o, timeWriteAct.defaults );
 
   let file = self._descriptorRead( o.filePath );
   if( !file )

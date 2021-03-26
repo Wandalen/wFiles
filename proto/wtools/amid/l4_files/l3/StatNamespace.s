@@ -24,9 +24,9 @@ if( typeof module !== 'undefined' )
  * @module Tools/mid/Files
  */
 
-let _global = _global_;
-let _ = _global_.wTools;
-let Self = _.files.stat = _.files.stat || Object.create( null );
+const _global = _global_;
+const _ = _global_.wTools;
+const Self = _.files.stat = _.files.stat || Object.create( null );
 
 // --
 //

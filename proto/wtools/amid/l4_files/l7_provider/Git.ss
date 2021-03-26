@@ -13,8 +13,8 @@
 //   _.include( 'wGitTools' );
 // }
 
-let _global = _global_;
-let _ = _global_.wTools;
+const _global = _global_;
+const _ = _global_.wTools;
 
 //
 
@@ -26,7 +26,7 @@ let _ = _global_.wTools;
 */
 
 let Parent = _.FileProvider.Partial;
-let Self = wFileProviderGit;
+const Self = wFileProviderGit;
 function wFileProviderGit( o )
 {
   return _.workpiece.construct( Self, this, arguments );

@@ -3,8 +3,8 @@
 
 'use strict';
 
-let _global = _global_;
-let _ = _global_.wTools;
+const _global = _global_;
+const _ = _global_.wTools;
 let FileRecord = _.FileRecord;
 let Abstract = _.FileProvider.Abstract;
 let Partial = _.FileProvider.Partial;
@@ -28,7 +28,7 @@ _.assert( _.routineIs( fileRead ) );
 */
 
 let Parent = null;
-let Self = wFileProviderSecondaryMixin;
+const Self = wFileProviderSecondaryMixin;
 function wFileProviderSecondaryMixin( o )
 {
   return _.workpiece.construct( Self, this, arguments );
@@ -120,7 +120,7 @@ Self.shortName = 'SecondaryMixin';
 //
 //   function _optionsForFileRead( src )
 //   {
-//     let readOptions = _.mapOnly( o, self.fileRead.defaults );
+//     let readOptions = _.mapOnly_( null, o, self.fileRead.defaults );
 //     readOptions.onEnd = o.onEach;
 //
 //     if( _.objectIs( src ) )
@@ -128,7 +128,7 @@ Self.shortName = 'SecondaryMixin';
 //       if( _.FileRecord && src instanceof _.FileRecord )
 //       readOptions.filePath = src.absolute;
 //       else
-//       _.mapExtend( readOptions, _.mapOnly( src, self.fileRead.defaults ) );
+//       _.mapExtend( readOptions, _.mapOnly_( null, src, self.fileRead.defaults ) );
 //     }
 //     else
 //     readOptions.filePath = src;
@@ -732,7 +732,7 @@ function filesSearchText( o )
     toleratingSpaces : o.toleratingSpaces,
   });
 
-  let o2 = _.mapOnly( o, self.filesFind.defaults );
+  let o2 = _.mapOnly_( null, o, self.filesFind.defaults );
 
   o2.onUp = _.arrayAppendElement( o2.onUp, handleUp );
 
@@ -746,7 +746,7 @@ function filesSearchText( o )
   {
     let read = record.factory.effectiveProvider.fileRead( record.absolute );
 
-    let o2 = _.mapOnly( o, _.strSearch.defaults );
+    let o2 = _.mapOnly_( null, o, _.strSearch.defaults );
     o2.src = read;
     o2.stringWithRegexp = 0;
     o2.toleratingSpaces = 0;
@@ -769,7 +769,7 @@ _.routineExtend( filesSearchText, Find.prototype.filesFind );
 
 var defaults = filesSearchText.defaults;
 
-_.mapSupplement( defaults, _.mapBut( _.strSearch.defaults, { src : null } ) );
+_.mapSupplement( defaults, _.mapBut_( null, _.strSearch.defaults, { src : null } ) );
 
 defaults.determiningLineNumber = 1;
 
@@ -799,7 +799,7 @@ function fileCodeRead_body( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( o.sync, 'not implemented' );
 
-  let o2 = _.mapOnly( o, self.fileRead.defaults );
+  let o2 = _.mapOnly_( null, o, self.fileRead.defaults );
   let result = self.fileRead( o2 );
 
   if( o.name === null )

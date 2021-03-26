@@ -3,8 +3,8 @@
 
 'use strict';
 
-let _global = _global_;
-let _ = _global_.wTools;
+const _global = _global_;
+const _ = _global_.wTools;
 var FileRecord = _.FileRecord;
 var FileRecordFilter = _.FileRecordFilter;
 var FileRecordFactory = _.FileRecordFactory;
@@ -21,7 +21,7 @@ _.assert( _.routineIs( FileRecordFactory ) );
 */
 
 let Parent = null;
-let Self = wFileProviderAbstract;
+const Self = wFileProviderAbstract;
 function wFileProviderAbstract( o )
 {
   return _.workpiece.construct( Self, this, arguments );

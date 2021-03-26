@@ -3,8 +3,8 @@
 
 'use strict';
 
-let _global = _global_;
-let _ = _global_.wTools;
+const _global = _global_;
+const _ = _global_.wTools;
 let FileRecord = _.FileRecord;
 let Abstract = _.FileProvider.Abstract;
 let Partial = _.FileProvider.Partial;
@@ -26,7 +26,7 @@ _.assert( _.routineIs( fileRead ) );
 */
 
 let Parent = null;
-let Self = wFileProviderFindMixin;
+const Self = wFileProviderFindMixin;
 function wFileProviderFindMixin( o )
 {
   return _.workpiece.construct( Self, this, arguments );
@@ -1394,7 +1394,7 @@ function filesFinder_functor( routine )
     let self = this;
     let path = self.path;
     let op0 = self._filesFindPrepare0( routine, arguments );
-    _.assertMapHasOnly( op0, finder.defaults );
+    _.map.assertHasOnly( op0, finder.defaults );
     return er;
 
     function er()
@@ -1491,7 +1491,7 @@ function filesFindGroups_body( o )
   for( let dstPath in r.pathsGrouped ) ( function( dstPath )
   {
     let srcPath = r.pathsGrouped[ dstPath ];
-    let o2 = _.mapOnly( o, self.filesFind.body.defaults );
+    let o2 = _.mapOnly_( null, o, self.filesFind.body.defaults );
 
     ready.finallyGive( 1 );
 
@@ -1821,7 +1821,7 @@ function filesReflectEvaluate_body( o )
     _.assert( o.srcPath === undefined );
     _.assert( o.dstPath === undefined );
 
-    let srcOptions = _.mapOnly( o, self.filesFind.defaults );
+    let srcOptions = _.mapOnly_( null, o, self.filesFind.defaults );
     srcOptions.withStem = 1;
     srcOptions.withTransient = 1;
     srcOptions.withDefunct = 1;
@@ -3123,7 +3123,7 @@ function filesReflectSingle_body( o )
     o.visitedMap = Object.create( null );
   }
 
-  let o2 = _.mapOnly( o, self.filesReflectEvaluate.body.defaults );
+  let o2 = _.mapOnly_( null, o, self.filesReflectEvaluate.body.defaults );
   o2.result = [];
   _.assert( _.arrayIs( o2.result ) );
   self.filesReflectEvaluate.body.call( self, o2 );
@@ -3878,7 +3878,7 @@ function filesReflect_body( o )
   {
 
     let srcPath = groupedByDstMap[ dstPath ];
-    let o2 = _.mapOnly( o, self.filesReflectSingle.body.defaults );
+    let o2 = _.mapOnly_( null, o, self.filesReflectSingle.body.defaults );
 
     o2.result = [];
 
@@ -4026,7 +4026,7 @@ function filesReflector_functor( routine )
   {
     let self = this;
     let op0 = self._filesFindPrepare0( routine, arguments );
-    _.assertMapHasOnly( op0, reflector.defaults );
+    _.map.assertHasOnly( op0, reflector.defaults );
     return er;
 
     function er()
@@ -4162,7 +4162,7 @@ function filesReflectTo_body( o )
     o.src = src.recordFilter( o.src );
     o.dst = dst.recordFilter( o.dst );
 
-    let o2 = _.mapOnly( o, filesReflect.defaults );
+    let o2 = _.mapOnly_( null, o, filesReflect.defaults );
 
     // o2.reflectMap = filePath;
     // delete o2.src;
@@ -4266,7 +4266,7 @@ function filesFindSame_body( o )
 
   /* find */
 
-  let findOptions = _.mapOnly( o, filesFind.defaults );
+  let findOptions = _.mapOnly_( null, o, filesFind.defaults );
   findOptions.outputFormat = 'record';
   findOptions.result = [];
   r.unique = self.filesFind.body.call( self, findOptions );
@@ -4605,7 +4605,7 @@ function filesDelete_body( o )
 
   /* */
 
-  let o2 = _.mapOnly( o, provider.filesFind.defaults );
+  let o2 = _.mapOnly_( null, o, provider.filesFind.defaults );
   o2.verbosity = 0;
   o2.outputFormat = 'record';
   o2.withTransient = 1;
@@ -4926,7 +4926,7 @@ function filesDeleteTerminals_body( o )
 
   /* */
 
-  let o2 = _.mapOnly( o, self.filesFind.defaults );
+  let o2 = _.mapOnly_( null, o, self.filesFind.defaults );
 
   o2.onDown = _.arrayAppendElement( _.arrayAs( o.onDown ), handleDown );
   if( _.arrayIs( o2.onDown ) )
@@ -4980,7 +4980,7 @@ function filesDeleteEmptyDirs_body( o )
 
   /* */
 
-  let o2 = _.mapOnly( o, self.filesFind.defaults );
+  let o2 = _.mapOnly_( null, o, self.filesFind.defaults );
 
   o2.onDown = _.arrayAppendElement( _.arrayAs( o.onDown ), handleDown );
   if( _.arrayIs( o2.onDown ) )
@@ -5062,7 +5062,7 @@ function filesRead_body( o )
 
   _.assert( o.outputFormat === undefined );
 
-  let o2 = _.mapOnly( o, self.filesFind.defaults );
+  let o2 = _.mapOnly_( null, o, self.filesFind.defaults );
   o2.outputFormat = 'record';
   let ready = _.Consequence.From( self.filesFind.body.call( self, o2 ) );
 
@@ -5106,7 +5106,7 @@ function filesRead_body( o )
 
     try
     {
-      let o2 = _.mapOnly( o, self.fileRead.defaults );
+      let o2 = _.mapOnly_( null, o, self.fileRead.defaults );
       o2.filePath = record.absolute;
       o2.outputFormat = 'data';
       r = _.Consequence.From( self.fileRead( o2 ) );
@@ -5183,8 +5183,8 @@ function filesRename_body( o )
 
   _.assert( o.outputFormat === undefined );
 
-  let o3 = _.mapOnly( o, self[ o.linking ].defaults );
-  let o2 = _.mapOnly( o, self.filesFind.defaults );
+  let o3 = _.mapOnly_( null, o, self[ o.linking ].defaults );
+  let o2 = _.mapOnly_( null, o, self.filesFind.defaults );
   o2.outputFormat = 'record';
   o2.onDown = onDown;
   return self.filesFind.body.call( self, o2 );
@@ -5235,7 +5235,7 @@ function softLinksBreak_body( o )
 
   /* */
 
-  let optionsFind = _.mapOnly( o, filesFind.defaults );
+  let optionsFind = _.mapOnly_( null, o, filesFind.defaults );
   optionsFind.onDown = _.arrayAppendElement( _.arrayAs( optionsFind.onDown ), function( record )
   {
 
@@ -5282,7 +5282,7 @@ function softLinksRebase_body( o )
 
   /* */
 
-  let optionsFind = _.mapOnly( o, filesFind.defaults );
+  let optionsFind = _.mapOnly_( null, o, filesFind.defaults );
   optionsFind.onDown = _.arrayAppendElement( _.arrayAs( optionsFind.onDown ), function( record )
   {
 
@@ -5380,7 +5380,7 @@ function filesResolve( o )
   _.assert( _.objectIs( o.translator ) );
 
   let globPath = o.translator.realFor( o.globPath );
-  let globOptions = _.mapOnly( o, self.filesGlob.defaults );
+  let globOptions = _.mapOnly_( null, o, self.filesGlob.defaults );
 
   globOptions.filter = globOptions.filter || Object.create( null );
   globOptions.filePath = globPath;

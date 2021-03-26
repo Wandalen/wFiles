@@ -8,10 +8,10 @@
  * @module Tools/mid/Files
  */
 
-let _global = _global_;
-let _ = _global_.wTools;
+const _global = _global_;
+const _ = _global_.wTools;
 _.files = _.files || Object.create( null );
-let Self = _.files.encoder = _.files.encoder || Object.create( null );
+const Self = _.files.encoder = _.files.encoder || Object.create( null );
 
 // --
 // encoder
@@ -324,7 +324,7 @@ function deduce( o )
     for( let i2 = 0 ; i2 < typeMap[ type ].length ; i2++ )
     {
       let gdf = typeMap[ type ][ i2 ];
-      let o2 = _.mapBut( o, [ 'single', 'returning', 'feature' ] );
+      let o2 = _.mapBut_( null, o, [ 'single', 'returning', 'feature' ] );
       let methodName = o.feature.reader ? 'supportsInput' : 'supportsOutput';
       let supports = gdf[ methodName ]( o2 );
       if( supports )

@@ -18,10 +18,10 @@
  * @module Tools/mid/Files
 */
 
-let _global = _global_;
-let _ = _global_.wTools;
+const _global = _global_;
+const _ = _global_.wTools;
 let Parent = _.FileRecordContext;
-let Self = wFileRecordFactory;
+const Self = wFileRecordFactory;
 function wFileRecordFactory( o )
 {
   return _.workpiece.construct( Self, this, arguments );
@@ -59,7 +59,7 @@ function init( o )
     if( _.mapIs( src ) )
     Object.assign( factory, src );
     else
-    Object.assign( factory, _.mapOnly( src, Self.prototype.fieldsOfCopyableGroups ) );
+    Object.assign( factory, _.mapOnly_( null, src, Self.prototype.fieldsOfCopyableGroups ) );
   }
 
   return factory;

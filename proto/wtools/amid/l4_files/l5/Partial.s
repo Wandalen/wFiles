@@ -3,8 +3,8 @@
 
 'use strict';
 
-let _global = _global_;
-let _ = _global_.wTools;
+const _global = _global_;
+const _ = _global_.wTools;
 
 _.assert( !!_.FileProvider.Abstract );
 _.assert( !_.FileProvider.Partial );
@@ -82,7 +82,7 @@ fileIsLockedAct.defaults =
 */
 
 let Parent = _.FileProvider.Abstract;
-let Self = wFileProviderPartial;
+const Self = wFileProviderPartial;
 function wFileProviderPartial( o )
 {
   return _.workpiece.construct( Self, this, arguments );
@@ -225,7 +225,7 @@ function _fileOptionsGet( filePath, o )
   if( !o.filePath )
   throw _.err( '_fileOptionsGet :', 'Expects (-o.filePath-)' );
 
-  _.assertMapHasOnly( o, this.defaults );
+  _.map.assertHasOnly( o, this.defaults );
   _.assert( arguments.length === 1 || arguments.length === 2 );
 
   if( o.sync === undefined )
@@ -758,7 +758,7 @@ function pathResolveSoftLink_body( o )
   if( !o.found )
   o.found = [ o.filePath ];
 
-  let actOptions = _.mapOnly( o, pathResolveSoftLinkAct.defaults );
+  let actOptions = _.mapOnly_( null, o, pathResolveSoftLinkAct.defaults );
 
   let result = self.pathResolveSoftLinkAct( actOptions );
   result = self.path.normalize( result );
@@ -845,7 +845,7 @@ function pathResolveSoftLink_body( o )
     for( let i = 1 ; i < splits.length ; i++ )
     {
       o2.filePath = self.path.join( o2.filePath, splits[ i ] );
-      let result = pathResolveSoftLink_body.call( self, _.mapOnly( o2, pathResolveSoftLink_body.defaults ) );
+      let result = pathResolveSoftLink_body.call( self, _.mapOnly_( null, o2, pathResolveSoftLink_body.defaults ) );
       o2.filePath = self.path.join( o2.filePath, result );
     }
     return o2.filePath;
@@ -948,7 +948,7 @@ function pathResolveTextLink_body( o )
   if( !o.found )
   o.found = [ o.filePath ];
 
-  let actOptions = _.mapOnly( o, pathResolveTextLinkAct.defaults );
+  let actOptions = _.mapOnly_( null, o, pathResolveTextLinkAct.defaults );
 
   let result = self.pathResolveTextLinkAct( actOptions );
 
@@ -1041,7 +1041,7 @@ function pathResolveTextLink_body( o )
       o2.filePath = self.path.join( o2.filePath, splits[ i ] );
       if( self.isTextLink( o2.filePath ) )
       {
-        let result = pathResolveTextLink_body.call( self, _.mapOnly( o2, pathResolveTextLink_body.defaults ) );
+        let result = pathResolveTextLink_body.call( self, _.mapOnly_( null, o2, pathResolveTextLink_body.defaults ) );
         o2.filePath = self.path.join( o2.filePath, result );
       }
     }
@@ -2634,7 +2634,7 @@ function fileExists_body( o )
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assert( _.routineIs( self.fileExistsAct ) );
 
-  // let o2 = _.mapOnly( o, self.fileExistsAct.defaults );
+  // let o2 = _.mapOnly_( null, o, self.fileExistsAct.defaults );
 
   return self.fileExistsAct( o );
 }
@@ -3319,7 +3319,7 @@ function fileRead_body( o )
 
   handleBegin();
 
-  let optionsRead = _.mapOnly( o, self.fileReadAct.defaults );
+  let optionsRead = _.mapOnly_( null, o, self.fileReadAct.defaults );
 
   try
   {
@@ -4083,7 +4083,7 @@ function hashSzIsUpToDate_body( o )
     return null;
     if( stat.size !== parsed[ 0 ] )
     return false;
-    return self.hashRead( _.mapOnly( o, self.hashRead.defaults ) );
+    return self.hashRead( _.mapOnly_( null, o, self.hashRead.defaults ) );
   })
   else
   ready.then( ( stat ) =>
@@ -4812,7 +4812,7 @@ function fileWrite_body( o )
   o.encoding = _.files.encoder.deduce({ filePath : o.filePath, returning : 'name', feature : { writer : true } });
   let encoder = _.files.WriteEncoders[ o.encoding ];
 
-  let o2 = _.mapOnly( o, self.fileWriteAct.defaults );
+  let o2 = _.mapOnly_( null, o, self.fileWriteAct.defaults );
 
   if( encoder && encoder.onBegin )
   {
@@ -5046,7 +5046,7 @@ function fileWriteJson_body( o )
   // delete o.jsLike;
   // delete o.cloning;
 
-  let o2 = _.mapOnly( o, self.fileWrite.defaults );
+  let o2 = _.mapOnly_( null, o, self.fileWrite.defaults );
 
   return self.fileWrite( o2 );
 }
@@ -5668,7 +5668,7 @@ function dirMake_body( o )
   function onPart( filePath )
   {
     let self = this;
-    let o2 = _.mapOnly( o, self.dirMakeAct.defaults );
+    let o2 = _.mapOnly_( null, o, self.dirMakeAct.defaults );
     o2.filePath = filePath;
     return self.dirMakeAct( o2 );
   }

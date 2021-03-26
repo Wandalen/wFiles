@@ -11,10 +11,10 @@
  * @module Tools/mid/Files
 */
 
-let _global = _global_;
-let _ = _global_.wTools;
+const _global = _global_;
+const _ = _global_.wTools;
 let Parent = null;
-let Self = wFileStat;
+const Self = wFileStat;
 function wFileStat( o )
 {
   return _.workpiece.construct( Self, this, arguments );

@@ -24,8 +24,8 @@ if( typeof module !== 'undefined' )
 
 }
 
-let _global = _global_;
-let _ = _global_.wTools;
+const _global = _global_;
+const _ = _global_.wTools;
 
 //
 
@@ -36,7 +36,7 @@ let _ = _global_.wTools;
 */
 
 let Parent = _.FileProvider.Partial;
-let Self = wFileProviderNpm;
+const Self = wFileProviderNpm;
 function wFileProviderNpm( o )
 {
   return _.workpiece.construct( Self, this, arguments );

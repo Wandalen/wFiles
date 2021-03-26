@@ -14,7 +14,7 @@ if( typeof module !== 'undefined' )
 
 //
 
-let _ = _global_.wTools;
+const _ = _global_.wTools;
 
 //
 
@@ -264,7 +264,7 @@ var Proto =
 
 //
 
-let Self = new wTestSuite( Proto )/* .inherit( Parent ); */
+const Self = wTestSuite( Proto )/* .inherit( Parent ); */
 if( typeof module !== 'undefined' && !module.parent )
 wTester.test( Self.name );
 

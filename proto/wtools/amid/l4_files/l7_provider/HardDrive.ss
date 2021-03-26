@@ -25,11 +25,11 @@ if( typeof module !== 'undefined' )
  @module Tools/mid/Files
 */
 
-let _global = _global_;
-let _ = _global_.wTools;
+const _global = _global_;
+const _ = _global_.wTools;
 let FileRecord = _.FileRecord;
 let Parent = _.FileProvider.Partial;
-let Self = wFileProviderHardDrive;
+const Self = wFileProviderHardDrive;
 function wFileProviderHardDrive( o )
 {
   return _.workpiece.construct( Self, this, arguments );

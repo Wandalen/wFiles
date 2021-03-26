@@ -12,7 +12,7 @@ if( typeof module !== 'undefined' )
   crypto = require( 'crypto' );
 }
 
-let _ = _global_.wTools;
+const _ = _global_.wTools;
 
 // --
 // context
@@ -50619,7 +50619,7 @@ function hardLinkReturnThrowing0Sync( test )
 // declare
 // --
 
-let Self =
+const Proto =
 {
 
   name : 'Tools.mid.files.fileProvider.Abstract',

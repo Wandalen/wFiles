@@ -10,12 +10,12 @@
  @module Tools/mid/Files
 */
 
-let _global = _global_;
-let _ = _global_.wTools;
+const _global = _global_;
+const _ = _global_.wTools;
 let Routines = Object.create( null );
 let FileRecord = _.FileRecord;
 let Parent = _.FileProvider.Partial;
-let Self = wFileSystem;
+const Self = wFileSystem;
 function wFileSystem( o )
 {
   return _.workpiece.construct( Self, this, arguments );
@@ -1194,7 +1194,7 @@ function _Setup1()
     return;
 
     _.assert( !!original );
-    _.assertMapHasOnly( original, KnownRoutineFields );
+    _.map.assertHasOnly( original, KnownRoutineFields );
 
     if( having.hubRedirecting === 0 || having.hubRedirecting === false )
     return;
@@ -1337,9 +1337,9 @@ function Init()
   _.assert( !_.mapKeys( missingMap ).length, 'routine(s) were not written into Extension explicitly', '\n', _.entity.exportString( missingMap, { stringWrapper : '' } ) );
   _.assert( !FilteredRoutines.pathResolveLinkFull );
   _.assert( !( 'pathResolveLinkFull' in FilteredRoutines ) );
-  _.assertMapHasNoUndefine( FilteredRoutines );
-  _.assertMapHasNoUndefine( Extension );
-  _.assertMapHasNoUndefine( Self );
+  _.map.assertHasNoUndefine( FilteredRoutines );
+  _.map.assertHasNoUndefine( Extension );
+  _.map.assertHasNoUndefine( Self );
   _.assert( _.prototype.has( Self.prototype.Path, _.uri ) );
   _.assert( Self.Path === Self.prototype.Path );
 }

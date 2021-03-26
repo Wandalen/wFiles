@@ -10,8 +10,8 @@ if( typeof module !== 'undefined' )
   Imap = require( 'imap-simple' );
 }
 
-let _global = _global_;
-let _ = _global_.wTools;
+const _global = _global_;
+const _ = _global_.wTools;
 let Abstract = _.FileProvider.Abstract;
 let Partial = _.FileProvider.Partial;
 let Find = _.FileProvider.FindMixin;
@@ -32,7 +32,7 @@ _.assert( !_.FileProvider.Imap );
  */
 
 let Parent = Partial;
-let Self = wFileProviderImap;
+const Self = wFileProviderImap;
 function wFileProviderImap( o )
 {
   return _.workpiece.construct( Self, this, arguments );

@@ -21,7 +21,8 @@ if( typeof module !== 'undefined' )
 
 //
 
-let _ = _global_.wTools;
+const _ = _global_.wTools;
+const __ = _globals_.testing.wTools;
 let Parent = wTester;
 
 //
@@ -1231,7 +1232,7 @@ function pathDirTemp( test )
 function tempCloseAfter( test )
 {
   let a = test.assetFor( false );
-  let toolsPath = _globals_.testing.wTools.strEscape( a.path.nativize( a.path.join( __dirname, '../../../wtools/Tools.s' ) ) );
+  let toolsPath = __.strEscape( a.path.nativize( a.path.join( __dirname, '../../../wtools/Tools.s' ) ) );
   let programSourceCode =
 `
 var toolsPath = '${toolsPath}';
@@ -1735,7 +1736,7 @@ nextPathDirTempMultiplePathSameNamespace.description =
 function nextPathDirTempIndexLock( test )
 {
   let a = test.assetFor( false );
-  let toolsPath = _globals_.testing.wTools.strEscape( a.path.nativize( a.path.join( __dirname, '../../amid/l3/files/UseTop.s' ) ) );
+  let toolsPath = __.strEscape( a.path.nativize( a.path.join( __dirname, '../../amid/l3/files/UseTop.s' ) ) );
   let programSourceCode =
   [
     `var toolsPath = '${toolsPath}';`,
@@ -1798,7 +1799,7 @@ Second process locks file when main releases it after two seconds.
 function nextPathDirTempIndexLockThrowing( test )
 {
   let a = test.assetFor( false );
-  let toolsPath = _globals_.testing.wTools.strEscape( a.path.nativize( a.path.join( __dirname, '../../amid/l3/files/UseTop.s' ) ) );
+  let toolsPath = __.strEscape( a.path.nativize( a.path.join( __dirname, '../../amid/l3/files/UseTop.s' ) ) );
   let programSourceCode =
   [
     `var toolsPath = '${toolsPath}';`,
@@ -1856,7 +1857,7 @@ Second process exits with lock error after timeout.
 // declare
 // --
 
-let Self =
+const Proto =
 {
 
   name : 'Tools.mid.files.Paths',
@@ -1919,7 +1920,7 @@ let Self =
 
 //
 
-Self = wTestSuite( Self )
+const Self = wTestSuite( Proto )
 if( typeof module !== 'undefined' && !module.parent )
 wTester.test( Self.name );
 

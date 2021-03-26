@@ -19,10 +19,10 @@
  @module Tools/mid/Files
 */
 
-let _global = _global_;
-let _ = _global_.wTools;
+const _global = _global_;
+const _ = _global_.wTools;
 let Parent = _.FileProvider.Partial;
-let Self = wFileProviderHttp;
+const Self = wFileProviderHttp;
 function wFileProviderHttp( o )
 {
   return _.workpiece.construct( Self, this, arguments );

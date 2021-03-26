@@ -12,7 +12,7 @@ if( typeof module !== 'undefined' )
   require( '../l4_files/entry/Files.s' );
 }
 
-let _ = _global_.wTools;
+const _ = _global_.wTools;
 
 // --
 // context
@@ -515,7 +515,7 @@ var Proto =
 
 //
 
-let Self = new wTestSuite( Proto )
+const Self = wTestSuite( Proto )
 if( typeof module !== 'undefined' && !module.parent )
 wTester.test( Self.name );
 

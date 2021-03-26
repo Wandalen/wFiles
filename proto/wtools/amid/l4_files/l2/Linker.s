@@ -3,12 +3,12 @@
 
 'use strict';
 
-let _global = _global_;
-let _ = _global_.wTools;
+const _global = _global_;
+const _ = _global_.wTools;
 
 _.assert( _.objectIs( _.files ) );
 
-let Self = _.files.linker = _.files.linker || Object.create( null );
+const Self = _.files.linker = _.files.linker || Object.create( null );
 
 // --
 // linking
@@ -1091,7 +1091,7 @@ function contextMake( o )
 
     c.linkDo = fop.onDo;
 
-    c.options2 = _.mapOnly( options, c.linkDo.defaults );
+    c.options2 = _.mapOnly_( null, options, c.linkDo.defaults );
   }
   else debugger;
 
@@ -1259,7 +1259,7 @@ function functor( fop )
       if( c.ended )
       return c.end();
 
-      o2 = c.options2 = _.mapExtend( c.options2, _.mapOnly( o, c.linkDo.defaults ) );
+      o2 = c.options2 = _.mapExtend( c.options2, _.mapOnly_( null, o, c.linkDo.defaults ) );
       o2.context = c.options2.context = c;
 
       try
@@ -1324,7 +1324,7 @@ function functor( fop )
         if( c.result !== undefined )
         return c.result;
         /* prepare options map and launch main part */
-        o2 = c.options2 = _.mapExtend( c.options2, _.mapOnly( o, c.linkDo.defaults ) );
+        o2 = c.options2 = _.mapExtend( c.options2, _.mapOnly_( null, o, c.linkDo.defaults ) );
         o2.context = c.options2.context = c;
         /* main part */
         return mainPartAsync();

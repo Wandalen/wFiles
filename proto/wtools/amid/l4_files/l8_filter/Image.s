@@ -3,11 +3,11 @@
 
 'use strict';
 
-let _global = _global_;
-let _ = _global_.wTools;
+const _global = _global_;
+const _ = _global_.wTools;
 let Abstract = _.FileProvider.Abstract;
 let Parent = Abstract;
-let Self = wFileFilterImage;
+const Self = wFileFilterImage;
 function wFileFilterImage( o )
 {
   return _.workpiece.construct( Self, this, arguments );

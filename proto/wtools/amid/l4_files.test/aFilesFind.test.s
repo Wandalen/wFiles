@@ -18,7 +18,7 @@ if( typeof module !== 'undefined' )
 
 //
 
-let _ = _global_.wTools;
+const _ = _global_.wTools;
 let Parent = wTester;
 
 // --
@@ -38257,7 +38257,7 @@ filesReflectExperiment.experimental = 1;
 // declare
 // --
 
-let Self =
+const Proto =
 {
 
   name : 'Tools.mid.files.FilesFind.Abstract',

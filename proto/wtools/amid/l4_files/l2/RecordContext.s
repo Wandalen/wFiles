@@ -18,10 +18,10 @@
  * @module Tools/mid/Files
 */
 
-let _global = _global_;
-let _ = _global_.wTools;
+const _global = _global_;
+const _ = _global_.wTools;
 let Parent = null;
-let Self = wFileRecordContext;
+const Self = wFileRecordContext;
 function wFileRecordContext( o )
 {
   return _.workpiece.construct( Self, this, arguments );
@@ -61,7 +61,7 @@ function TolerantFrom( o )
   _.assert( arguments.length >= 1, 'Expects at least one argument' );
   _.assert( _.objectIs( Cls.prototype.Composes ) );
   o = _.mapsExtend( null, arguments );
-  return new Cls( _.mapOnly( o, Cls.prototype.fieldsOfCopyableGroups ) );
+  return new Cls( _.mapOnly_( null, o, Cls.prototype.fieldsOfCopyableGroups ) );
 }
 
 //

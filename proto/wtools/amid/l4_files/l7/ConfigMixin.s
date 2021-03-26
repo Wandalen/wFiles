@@ -3,8 +3,8 @@
 
 'use strict';
 
-let _global = _global_;
-let _ = _global_.wTools;
+const _global = _global_;
+const _ = _global_.wTools;
 let FileRecord = _.FileRecord;
 let Abstract = _.FileProvider.Abstract;
 let Partial = _.FileProvider.Partial;
@@ -28,7 +28,7 @@ _.assert( _.routineIs( fileRead ) );
 */
 
 let Parent = null;
-let Self = wFileProviderConfigMixin;
+const Self = wFileProviderConfigMixin;
 function wFileProviderConfigMixin( o )
 {
   return _.workpiece.construct( Self, this, arguments );
@@ -439,7 +439,7 @@ function configUserRead( o )
 
   o = _.routineOptions( configUserRead, o );
 
-  let o2 = _.mapOnly( o, self.configUserPath.defaults );
+  let o2 = _.mapOnly_( null, o, self.configUserPath.defaults );
   let filePath = self.configUserPath( o2 );
 
   if( !self.fileExists( filePath ) )
@@ -474,7 +474,7 @@ function configUserWrite( o )
   o = _.routineOptions( configUserWrite, o );
   _.assert( o.structure !== null );
 
-  let o2 = _.mapOnly( o, self.configUserPath.defaults );
+  let o2 = _.mapOnly_( null, o, self.configUserPath.defaults );
   let filePath = self.configUserPath( o2 );
 
   /* qqq : cover option encoding of method fileWrite */
@@ -665,7 +665,7 @@ function storageDel( o )
 
     _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
 
-    let o2 = _.mapOnly( o, self.storageNameMapFrom.defaults );
+    let o2 = _.mapOnly_( null, o, self.storageNameMapFrom.defaults );
     self.storageNameMapFrom( o2 );
     _.mapExtend( o, o2 );
 
@@ -820,7 +820,7 @@ function storageProfileDel( o )
     _.assert( _.strIs( o.storageDir ), 'Expects defined {- o.storageDir -}' );
     _.assert( _.strIs( o.profileDir ), 'Expects defined {- o.profileDir -}' );
 
-    let o2 = _.mapOnly( o, self.storageProfileNameMapFrom.defaults );
+    let o2 = _.mapOnly_( null, o, self.storageProfileNameMapFrom.defaults );
     self.storageProfileNameMapFrom( o2 );
     _.mapExtend( o, o2 );
 
@@ -978,7 +978,7 @@ function storageTerminalOpen( o )
     o = { storageName : arguments[ 0 ] };
     o = _.routineOptions( storageTerminalOpen, o );
 
-    let o2 = _.mapOnly( o, self.storageTerminalNameFrom.defaults );
+    let o2 = _.mapOnly_( null, o, self.storageTerminalNameFrom.defaults );
     self.storageTerminalNameMapFrom( o2 );
     _.mapExtend( o, o2 );
 
@@ -1031,7 +1031,7 @@ function storageTerminalClose( o )
 
     _.assert( _.mapIs( o.storage ), 'Expects defined {- o.storage -}' );
 
-    let o2 = _.mapOnly( o, self.storageTerminalNameFrom.defaults );
+    let o2 = _.mapOnly_( null, o, self.storageTerminalNameFrom.defaults );
     self.storageTerminalNameMapFrom( o2 );
     _.mapExtend( o, o2 );
 
@@ -1072,7 +1072,7 @@ function storageTerminalDel( o )
     o = { storageDir : arguments[ 0 ] };
     o = _.routineOptions( storageTerminalDel, o );
 
-    let o2 = _.mapOnly( o, self.storageTerminalNameMapFrom.defaults );
+    let o2 = _.mapOnly_( null, o, self.storageTerminalNameMapFrom.defaults );
     self.storageTerminalNameMapFrom( o2 );
     _.mapExtend( o, o2 );
 

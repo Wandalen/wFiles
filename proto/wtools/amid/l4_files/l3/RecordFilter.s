@@ -11,10 +11,10 @@
  * @module Tools/mid/Files
 */
 
-let _global = _global_;
-let _ = _global_.wTools;
+const _global = _global_;
+const _ = _global_.wTools;
 let Parent = _.FileRecordContext;
-let Self = wFileRecordFilter;
+const Self = wFileRecordFilter;
 function wFileRecordFilter( o )
 {
   return _.workpiece.construct( Self, this, arguments );
@@ -453,7 +453,7 @@ function and( src )
 
   // if( Config.debug )
   // if( src && !( src instanceof filter.Self ) )
-  // _.assertMapHasOnly( src, filter.fieldsOfCopyableGroups );
+  // _.map.assertHasOnly( src, filter.fieldsOfCopyableGroups );
 
   if( src === null )
   return filter;

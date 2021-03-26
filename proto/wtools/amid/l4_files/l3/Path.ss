@@ -3,9 +3,9 @@
 
 'use strict';
 
-let _global = _global_;
-let _ = _global_.wTools;
-let Self = _global_.wTools.path;
+const _global = _global_;
+const _ = _global_.wTools;
+const Self = _global_.wTools.path;
 
 _.assert( _.objectIs( Self ) );
 

@@ -25310,6 +25310,97 @@ function softLinkActSync( test )
 
 //
 
+function softLinkActSyncOnWindows( test )
+{
+  let context = this;
+  let provider = context.provider;
+  let path = provider.path;
+
+  if( !_.routineIs( provider.softLinkAct ) || process.platform !== 'win32' )
+  return test.true( true );
+
+  var softLinkIsSupported = test.context.softLinkIsSupported();
+  if( !context.providerIsInstanceOf( _.FileProvider.HardDrive ) || !softLinkIsSupported )
+  return test.true( true );
+
+  /* - */
+
+  test.case = 'type - dir, behavior for relinking on Windows';
+  var filePath = test.context.pathFor( 'file' );
+  var linkPath = test.context.pathFor( 'link' );
+  provider.dirMake( provider.path.dir( filePath ) );
+  var o =
+  {
+    srcPath : filePath,
+    dstPath : filePath,
+    relativeSrcPath : filePath,
+    relativeDstPath : filePath,
+    type : 'dir',
+    sync : 1,
+    context : provider,
+  };
+  provider.softLinkAct( o );
+  o.dstPath = linkPath;
+  o.relativeDstPath = linkPath;
+  provider.softLinkAct( o );
+  test.true( provider.isSoftLink( linkPath ) );
+  var got = provider.pathResolveSoftLink({ filePath : linkPath });
+  test.identical( got, filePath );
+  provider.filesDelete( context.suiteTempPath );
+
+  /* */
+
+  test.case = 'type - null, routine should not throw error on Windows';
+  var filePath = test.context.pathFor( 'file' );
+  var linkPath = test.context.pathFor( 'link' );
+  provider.dirMake( provider.path.dir( filePath ) );
+  var o =
+  {
+    srcPath : filePath,
+    dstPath : filePath,
+    relativeSrcPath : filePath,
+    relativeDstPath : filePath,
+    type : null,
+    sync : 1,
+    context : provider,
+  };
+  provider.softLinkAct( o );
+  o.dstPath = linkPath;
+  o.relativeDstPath = linkPath;
+  provider.softLinkAct( o );
+  test.true( provider.isSoftLink( linkPath ) );
+  var got = provider.pathResolveSoftLink({ filePath : linkPath });
+  test.identical( got, filePath );
+  provider.filesDelete( context.suiteTempPath );
+
+  /* */
+
+  test.case = 'type - file, routine should throw error on Windows';
+  var filePath = test.context.pathFor( 'file' );
+  var linkPath = test.context.pathFor( 'link' );
+  provider.dirMake( provider.path.dir( filePath ) );
+  var o =
+  {
+    srcPath : filePath,
+    dstPath : filePath,
+    relativeSrcPath : filePath,
+    relativeDstPath : filePath,
+    type : 'file',
+    sync : 1,
+    context : provider,
+  };
+  provider.softLinkAct( o );
+  o.dstPath = linkPath;
+  o.relativeDstPath = linkPath;
+  provider.softLinkAct( o );
+  test.true( provider.isSoftLink( linkPath ) );
+  var got = provider.pathResolveSoftLink({ filePath : linkPath });
+  test.identical( got, filePath );
+  provider.filesDelete( context.suiteTempPath );
+}
+
+//
+
 function softLinkSoftLinkResolving( test )
 {
   let context = this;
@@ -50750,6 +50841,7 @@ const Proto =
     softLinkRelativePath,
     softLinkChain,
     softLinkActSync,
+    softLinkActSyncOnWindows,
     softLinkSoftLinkResolving,
     softLinkRelativeLinkResolving,
     softLinkMakeAndResolve,

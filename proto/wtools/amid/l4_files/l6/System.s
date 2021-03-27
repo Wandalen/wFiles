@@ -13,7 +13,7 @@
 const _global = _global_;
 const _ = _global_.wTools;
 let Routines = Object.create( null );
-let FileRecord = _.FileRecord;
+const FileRecord = _.FileRecord;
 const Parent = _.FileProvider.Partial;
 const Self = wFileSystem;
 function wFileSystem( o )
@@ -716,7 +716,7 @@ function fileRead_body( o )
 
 _.routineExtend( fileRead_body, Parent.prototype.fileRead.body );
 
-let fileRead = _.routine.uniteCloning_( Parent.prototype.fileRead.head, fileRead_body );
+const fileRead = _.routine.uniteCloning_( Parent.prototype.fileRead.head, fileRead_body );
 
 // --
 // linker

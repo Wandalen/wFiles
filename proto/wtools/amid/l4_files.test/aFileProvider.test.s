@@ -35885,6 +35885,882 @@ function hardLinkEscapedPath( test )
 
 //
 
+function hardLinkBreaking( test )
+{
+  let context = this;
+  let a = context.assetFor( test, false );
+
+  /* */
+
+  test.case = 'basic';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'file1' ), '1' );
+  a.fileProvider.fileWrite( a.abs( 'file2' ), '2' );
+  a.fileProvider.fileWrite( a.abs( 'file3' ), '3' );
+  a.fileProvider.hardLink( a.abs( 'file2' ), a.abs( 'file1' ) );
+
+  /* xxx qqq : enable : breakingSrcHardLink : 1, breakingDstHardLink : 1. discuss */
+  /* xxx qqq : filesExtract does not reflect hard links. fix please */
+  var exp =
+  {
+    'file1' : ( new U8x([ 49 ]) ),
+    'file2' : ( new U8x([ 49 ]) ),
+    'file3' : ( new U8x([ 51 ]) ),
+  }
+  var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
+  test.identical( got, exp );
+  test.true( a.fileProvider.areHardLinked( a.abs( 'file1' ), a.abs( 'file2' ) ) )
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'file1' ), a.abs( 'file3' ) ) )
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'file2' ), a.abs( 'file3' ) ) )
+
+  /* */
+
+  test.case = 'preset';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'dst1' ), '1' );
+  a.fileProvider.fileWrite( a.abs( 'dst2' ), '2' );
+  a.fileProvider.fileWrite( a.abs( 'src1' ), '3' );
+  a.fileProvider.fileWrite( a.abs( 'src2' ), '4' );
+
+  var exp =
+  {
+    'dst1' : ( new U8x([ 49 ]) ),
+    'dst2' : ( new U8x([ 50 ]) ),
+    'src1' : ( new U8x([ 51 ]) ),
+    'src2' : ( new U8x([ 52 ]) ),
+  }
+  var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
+  test.identical( got, exp );
+
+  a.fileProvider.hardLink( a.abs( 'dst1' ), a.abs( 'dst2' ) );
+  a.fileProvider.hardLink( a.abs( 'src1' ), a.abs( 'src2' ) );
+  var exp =
+  {
+    'dst1' : ( new U8x([ 50 ]) ),
+    'dst2' : ( new U8x([ 50 ]) ),
+    'src1' : ( new U8x([ 52 ]) ),
+    'src2' : ( new U8x([ 52 ]) ),
+  }
+  var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
+  test.identical( got, exp );
+  test.true( a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'dst2' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'src1' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'src2' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst2' ), a.abs( 'src1' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst2' ), a.abs( 'src2' ) ) );
+  test.true( a.fileProvider.areHardLinked( a.abs( 'src1' ), a.abs( 'src2' ) ) );
+
+  /* */
+
+  test.case = 'breakingSrcHardLink : 1, breakingDstHardLink : 1';
+
+  preset1();
+
+  a.fileProvider.hardLink
+  ({
+    dstPath : a.abs( 'dst1' ),
+    srcPath : a.abs( 'src1' ),
+    breakingSrcHardLink : 1,
+    breakingDstHardLink : 1,
+  });
+
+  var exp =
+  {
+    'dst1' : ( new U8x([ 52 ]) ),
+    'dst2' : ( new U8x([ 50 ]) ),
+    'src1' : ( new U8x([ 52 ]) ),
+    'src2' : ( new U8x([ 52 ]) ),
+  }
+  var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
+  test.identical( got, exp );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'dst2' ) ) );
+  test.true( a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'src1' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'src2' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst2' ), a.abs( 'src1' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst2' ), a.abs( 'src2' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'src1' ), a.abs( 'src2' ) ) );
+
+  /* */
+
+  test.case = 'breakingSrcHardLink : 0, breakingDstHardLink : 1';
+
+  preset1();
+
+  a.fileProvider.hardLink
+  ({
+    dstPath : a.abs( 'dst1' ),
+    srcPath : a.abs( 'src1' ),
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1,
+  });
+
+  var exp =
+  {
+    'dst1' : ( new U8x([ 52 ]) ),
+    'dst2' : ( new U8x([ 50 ]) ),
+    'src1' : ( new U8x([ 52 ]) ),
+    'src2' : ( new U8x([ 52 ]) ),
+  }
+  var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
+  test.identical( got, exp );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'dst2' ) ) );
+  test.true( a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'src1' ) ) );
+  test.true( a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'src2' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst2' ), a.abs( 'src1' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst2' ), a.abs( 'src2' ) ) );
+  test.true( a.fileProvider.areHardLinked( a.abs( 'src1' ), a.abs( 'src2' ) ) );
+
+  /* */
+
+  test.case = 'breakingSrcHardLink : default, breakingDstHardLink : default';
+
+  preset1();
+
+  a.fileProvider.hardLink
+  ({
+    dstPath : a.abs( 'dst1' ),
+    srcPath : a.abs( 'src1' ),
+  });
+
+  var exp =
+  {
+    'dst1' : ( new U8x([ 52 ]) ),
+    'dst2' : ( new U8x([ 50 ]) ),
+    'src1' : ( new U8x([ 52 ]) ),
+    'src2' : ( new U8x([ 52 ]) ),
+  }
+  var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
+  test.identical( got, exp );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'dst2' ) ) );
+  test.true( a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'src1' ) ) );
+  test.true( a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'src2' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst2' ), a.abs( 'src1' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst2' ), a.abs( 'src2' ) ) );
+  test.true( a.fileProvider.areHardLinked( a.abs( 'src1' ), a.abs( 'src2' ) ) );
+
+  /* */
+
+  test.case = 'breakingSrcHardLink : 1, breakingDstHardLink : 0';
+
+  preset1();
+
+  a.fileProvider.hardLink
+  ({
+    dstPath : a.abs( 'dst1' ),
+    srcPath : a.abs( 'src1' ),
+    breakingSrcHardLink : 1,
+    breakingDstHardLink : 0,
+  });
+
+  var exp =
+  {
+    'dst1' : ( new U8x([ 52 ]) ),
+    'dst2' : ( new U8x([ 52 ]) ),
+    'src1' : ( new U8x([ 52 ]) ),
+    'src2' : ( new U8x([ 52 ]) ),
+  }
+  var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
+  test.identical( got, exp );
+  test.true( a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'dst2' ) ) );
+  test.true( a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'src1' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'src2' ) ) );
+  test.true( a.fileProvider.areHardLinked( a.abs( 'dst2' ), a.abs( 'src1' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst2' ), a.abs( 'src2' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'src1' ), a.abs( 'src2' ) ) );
+
+  /* */
+
+  test.case = 'breakingSrcHardLink : 1, breakingDstHardLink : 0, same content';
+
+  preset2();
+
+  a.fileProvider.hardLink
+  ({
+    dstPath : a.abs( 'dst1' ),
+    srcPath : a.abs( 'src1' ),
+    breakingSrcHardLink : 1,
+    breakingDstHardLink : 0,
+  });
+
+  var exp =
+  {
+    'dst1' : ( new U8x([ 49 ]) ),
+    'dst2' : ( new U8x([ 49 ]) ),
+    'src1' : ( new U8x([ 49 ]) ),
+    'src2' : ( new U8x([ 49 ]) ),
+  }
+  var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
+  test.identical( got, exp );
+  test.true( a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'dst2' ) ) );
+  test.true( a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'src1' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'src2' ) ) );
+  test.true( a.fileProvider.areHardLinked( a.abs( 'dst2' ), a.abs( 'src1' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst2' ), a.abs( 'src2' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'src1' ), a.abs( 'src2' ) ) );
+
+  /* */
+
+  function preset1()
+  {
+    a.reflect();
+    a.fileProvider.fileWrite( a.abs( 'dst1' ), '1' );
+    a.fileProvider.fileWrite( a.abs( 'dst2' ), '2' );
+    a.fileProvider.fileWrite( a.abs( 'src1' ), '3' );
+    a.fileProvider.fileWrite( a.abs( 'src2' ), '4' );
+    a.fileProvider.hardLink( a.abs( 'dst1' ), a.abs( 'dst2' ) );
+    a.fileProvider.hardLink( a.abs( 'src1' ), a.abs( 'src2' ) );
+  }
+
+  /* */
+
+  function preset2()
+  {
+    a.reflect();
+    a.fileProvider.fileWrite( a.abs( 'dst1' ), '1' );
+    a.fileProvider.fileWrite( a.abs( 'dst2' ), '1' );
+    a.fileProvider.fileWrite( a.abs( 'src1' ), '1' );
+    a.fileProvider.fileWrite( a.abs( 'src2' ), '1' );
+    a.fileProvider.hardLink( a.abs( 'dst1' ), a.abs( 'dst2' ) );
+    a.fileProvider.hardLink( a.abs( 'src1' ), a.abs( 'src2' ) );
+  }
+
+  /* */
+
+}
+
+hardLinkBreaking.description =
+`
+- check breaking happens on the right side
+`
+
+//
+
+function hardLinkReturnSync( test )
+{
+/*
+  // dst does not exist && directory does not exist -> 8
+ - rewriting : 1
+ - rewriting : 0
+
+ - rewritingDirs : 1
+ - rewritingDirs : 0
+
+ - makingDirectory : 1
+
+ - breakingSrcHardLink : 0, breakingDstHardLink : 1
+ - breakingSrcHardLink : 1, breakingDstHardLink : 0
+ - breakingSrcHardLink : 1, breakingDstHardLink : 1
+
+// dst does not exist && directory exists -> 8
+ - rewriting : 1
+ - rewriting : 0
+
+ - rewritingDirs : 1
+ - rewritingDirs : 0
+
+ - makingDirectory : 1
+
+ - breakingSrcHardLink : 0, breakingDstHardLink : 1
+ - breakingSrcHardLink : 1, breakingDstHardLink : 0
+ - breakingSrcHardLink : 1, breakingDstHardLink : 1
+
+// dst exists, is not hard linked -> 6
+ - rewriting : 1
+
+ - rewritingDirs : 1
+
+ - makingDirectory : 1
+
+ - breakingSrcHardLink : 0, breakingDstHardLink : 1
+ - breakingSrcHardLink : 1, breakingDstHardLink : 0
+ - breakingSrcHardLink : 1, breakingDstHardLink : 1
+
+// dst exists, is hard linked -> 6
+ - rewriting : 1
+
+ - rewritingDirs : 1
+
+ - makingDirectory : 1
+
+ - breakingSrcHardLink : 0, breakingDstHardLink : 1
+ - breakingSrcHardLink : 1, breakingDstHardLink : 0
+ - breakingSrcHardLink : 1, breakingDstHardLink : 1
+
+// src === dst -> 8
+ - rewriting : 1
+ - rewriting : 0
+
+ - rewritingDirs : 1
+ - rewritingDirs : 0
+
+ - makingDirectory : 1
+
+ - breakingSrcHardLink : 0, breakingDstHardLink : 1
+ - breakingSrcHardLink : 1, breakingDstHardLink : 0
+ - breakingSrcHardLink : 1, breakingDstHardLink : 1
+
+total : 36
+*/
+  let context = this;
+  let a = context.assetFor( test, false ); /* qqq3 */
+
+  /* */
+
+  test.open( 'dst does not exist && directory does not exist' );
+
+  test.case = 'rewriting : 1';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dst' ), srcPath : a.abs( 'src' ), rewriting : 1 });
+  test.identical( got, true );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), true );
+
+  /* */
+
+  test.case = 'rewriting : 0';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dst' ), srcPath : a.abs( 'src' ), rewriting : 0 });
+  test.identical( got, true );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), true );
+
+  /* */
+
+  test.case = 'rewritingDirs : 1';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  a.fileProvider.dirMake( a.abs( 'dir1/dir2/dst' ) );
+  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dir2/dst' ), srcPath : a.abs( 'src' ), rewritingDirs : 1 });
+  test.identical( got, true );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'src' ) ), true );
+
+  /* */
+
+  test.case = 'rewritingDirs : 0';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  a.fileProvider.dirMake( a.abs( 'dir1/dir2' ) );
+  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dir2/dst' ), srcPath : a.abs( 'src' ), rewritingDirs : 0 });
+  test.identical( got, true );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'src' ) ), true );
+
+  /* */
+
+  test.case = 'makingDirectory : 1';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dir2/dst' ), srcPath : a.abs( 'src' ), makingDirectory : 1 });
+  test.identical( got, true );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'src' ) ), true );
+
+  /* */
+
+  test.case = 'breakingSrcHardLink : 0, breakingDstHardLink : 1';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  var got = a.fileProvider.hardLink
+  ({
+    dstPath : a.abs( 'dst' ),
+    srcPath : a.abs( 'src' ),
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1
+  });
+  test.identical( got, true );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), true );
+
+  /* */
+
+  test.case = 'breakingSrcHardLink : 1, breakingDstHardLink : 0';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  var got = a.fileProvider.hardLink
+  ({
+    dstPath : a.abs( 'dst' ),
+    srcPath : a.abs( 'src' ),
+    breakingSrcHardLink : 1,
+    breakingDstHardLink : 0
+  });
+  test.identical( got, true );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), true );
+
+  /* */
+
+  test.case = 'breakingSrcHardLink : 1, breakingDstHardLink : 1';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  var got = a.fileProvider.hardLink
+  ({
+    dstPath : a.abs( 'dst' ),
+    srcPath : a.abs( 'src' ),
+    breakingSrcHardLink : 1,
+    breakingDstHardLink : 1
+  });
+  test.identical( got, true );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), true );
+
+  test.close( 'dst does not exist && directory does not exist' );
+
+  /* */
+
+  test.open( 'dst does not exist && directory exists' );
+
+  test.case = 'rewriting : 1';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  a.fileProvider.fileWrite( a.abs( 'dir1/test' ), 'some text' );
+  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), rewriting : 1 });
+  test.identical( got, true );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
+
+  /* */
+
+  test.case = 'rewriting : 0';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  a.fileProvider.fileWrite( a.abs( 'dir1/test' ), 'some text' );
+  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), rewriting : 0 });
+  test.identical( got, true );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
+
+  /* */
+
+  test.case = 'rewritingDirs : 1';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  a.fileProvider.fileWrite( a.abs( 'dir1/test' ), 'some text' );
+  a.fileProvider.dirMake( a.abs( 'dir1/dst' ) );
+  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), rewritingDirs : 1 });
+  test.identical( got, true );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
+
+  /* */
+
+  test.case = 'rewritingDirs : 0';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  a.fileProvider.fileWrite( a.abs( 'dir1/test' ), 'some text' );
+  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), rewritingDirs : 0 });
+  test.identical( got, true );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
+
+  /* */
+
+  test.case = 'makingDirectory : 1';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  a.fileProvider.fileWrite( a.abs( 'dir1/test' ), 'some text' );
+  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dir2/dst' ), srcPath : a.abs( 'src' ), makingDirectory : 1 });
+  test.identical( got, true );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'src' ) ), true );
+
+  /* */
+
+  test.case = 'breakingSrcHardLink : 0, breakingDstHardLink : 1';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  a.fileProvider.fileWrite( a.abs( 'dir1/test' ), 'some text' );
+  var got = a.fileProvider.hardLink
+  ({
+    dstPath : a.abs( 'dir1/dst' ),
+    srcPath : a.abs( 'src' ),
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1
+  });
+  test.identical( got, true );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
+
+  /* */
+
+  test.case = 'breakingSrcHardLink : 1, breakingDstHardLink : 0';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  a.fileProvider.fileWrite( a.abs( 'dir1/test' ), 'some text' );
+  var got = a.fileProvider.hardLink
+  ({
+    dstPath : a.abs( 'dir1/dst' ),
+    srcPath : a.abs( 'src' ),
+    breakingSrcHardLink : 1,
+    breakingDstHardLink : 0
+  });
+  test.identical( got, true );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
+
+  /* */
+
+  test.case = 'breakingSrcHardLink : 1, breakingDstHardLink : 1';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  a.fileProvider.fileWrite( a.abs( 'dir1/test' ), 'some text' );
+  var got = a.fileProvider.hardLink
+  ({
+    dstPath : a.abs( 'dir1/dst' ),
+    srcPath : a.abs( 'src' ),
+    breakingSrcHardLink : 1,
+    breakingDstHardLink : 1
+  });
+  test.identical( got, true );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
+
+  test.close( 'dst does not exist && directory exists' );
+
+  /* */
+
+  test.open( 'dst exists, is not hard linked' );
+
+  test.case = 'rewriting : 1';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  a.fileProvider.fileWrite( a.abs( 'dir1/dst' ), 'some text' );
+  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), rewriting : 1 });
+  test.identical( got, true );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
+
+  /* */
+
+  test.case = 'rewritingDirs : 1';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  a.fileProvider.fileWrite( a.abs( 'dir1/dst' ), 'some text' );
+  a.fileProvider.dirMake( a.abs( 'dir1/dst' ) );
+  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), rewritingDirs : 1 });
+  test.identical( got, true );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
+
+  /* */
+
+  test.case = 'makingDirectory : 1';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  a.fileProvider.fileWrite( a.abs( 'dir1/dst' ), 'some text' );
+  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), makingDirectory : 1 });
+  test.identical( got, true );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
+
+  /* */
+
+  test.case = 'breakingSrcHardLink : 0, breakingDstHardLink : 1';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  a.fileProvider.fileWrite( a.abs( 'dir1/dst' ), 'some text' );
+  var got = a.fileProvider.hardLink
+  ({
+    dstPath : a.abs( 'dir1/dst' ),
+    srcPath : a.abs( 'src' ),
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1
+  });
+  test.identical( got, true );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
+
+  /* */
+
+  test.case = 'breakingSrcHardLink : 1, breakingDstHardLink : 0';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  a.fileProvider.fileWrite( a.abs( 'dir1/dst' ), 'some text' );
+  var got = a.fileProvider.hardLink
+  ({
+    dstPath : a.abs( 'dir1/dst' ),
+    srcPath : a.abs( 'src' ),
+    breakingSrcHardLink : 1,
+    breakingDstHardLink : 0
+  });
+  test.identical( got, true );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
+
+  /* */
+
+  test.case = 'breakingSrcHardLink : 1, breakingDstHardLink : 1';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  a.fileProvider.fileWrite( a.abs( 'dir1/dst' ), 'some text' );
+  var got = a.fileProvider.hardLink
+  ({
+    dstPath : a.abs( 'dir1/dst' ),
+    srcPath : a.abs( 'src' ),
+    breakingSrcHardLink : 1,
+    breakingDstHardLink : 1
+  });
+  test.identical( got, true );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
+
+  test.close( 'dst exists, is not hard linked' );
+
+  /* */
+
+  test.open( 'dst exists, is hard linked' );
+
+  test.case = 'rewriting : 1';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  a.fileProvider.fileWrite( a.abs( 'dir1/dst' ), 'some text' );
+  a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), rewriting : 1 });
+  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), rewriting : 1 });
+  test.identical( got, false );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
+
+  /* */
+
+  test.case = 'rewritingDirs : 1';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  a.fileProvider.fileWrite( a.abs( 'dir1/dst' ), 'some text' );
+  a.fileProvider.dirMake( a.abs( 'dir1/dst' ) );
+  a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), rewritingDirs : 1 });
+  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), rewritingDirs : 1 });
+  test.identical( got, false );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
+
+  /* */
+
+  test.case = 'makingDirectory : 1';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  a.fileProvider.fileWrite( a.abs( 'dir1/dst' ), 'some text' );
+  a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), makingDirectory : 1 });
+  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), makingDirectory : 1 });
+  test.identical( got, false );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
+
+  /* */
+
+  test.case = 'breakingSrcHardLink : 0, breakingDstHardLink : 1';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  a.fileProvider.fileWrite( a.abs( 'dir1/dst' ), 'some text' );
+  a.fileProvider.hardLink
+  ({
+    dstPath : a.abs( 'dir1/dst' ),
+    srcPath : a.abs( 'src' ),
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1
+  });
+  var got = a.fileProvider.hardLink
+  ({
+    dstPath : a.abs( 'dir1/dst' ),
+    srcPath : a.abs( 'src' ),
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1
+  });
+  test.identical( got, false );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
+
+  /* */
+
+  test.case = 'breakingSrcHardLink : 1, breakingDstHardLink : 0';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  a.fileProvider.fileWrite( a.abs( 'dir1/dst' ), 'some text' );
+  a.fileProvider.hardLink
+  ({
+    dstPath : a.abs( 'dir1/dst' ),
+    srcPath : a.abs( 'src' ),
+    breakingSrcHardLink : 1,
+    breakingDstHardLink : 0
+  });
+  var got = a.fileProvider.hardLink
+  ({
+    dstPath : a.abs( 'dir1/dst' ),
+    srcPath : a.abs( 'src' ),
+    breakingSrcHardLink : 1,
+    breakingDstHardLink : 0
+  });
+  test.identical( got, false );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
+
+  /* */
+
+  test.case = 'breakingSrcHardLink : 1, breakingDstHardLink : 1';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  a.fileProvider.fileWrite( a.abs( 'dir1/dst' ), 'some text' );
+  a.fileProvider.hardLink
+  ({
+    dstPath : a.abs( 'dir1/dst' ),
+    srcPath : a.abs( 'src' ),
+    breakingSrcHardLink : 1,
+    breakingDstHardLink : 1
+  });
+  var got = a.fileProvider.hardLink
+  ({
+    dstPath : a.abs( 'dir1/dst' ),
+    srcPath : a.abs( 'src' ),
+    breakingSrcHardLink : 1,
+    breakingDstHardLink : 1
+  });
+  test.identical( got, false );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
+
+  test.close( 'dst exists, is hard linked' );
+
+  /* */
+
+  test.open( 'src === dst' );
+
+  test.case = 'rewriting : 1';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
+  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/src' ), srcPath : a.abs( 'dir1/src' ), rewriting : 1 });
+  test.identical( got, true );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), true );
+
+  /* */
+
+  test.case = 'rewriting : 0';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
+  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/src' ), srcPath : a.abs( 'dir1/src' ), rewriting : 0 });
+  test.identical( got, true );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), true );
+
+  /* */
+
+  test.case = 'rewritingDirs : 1';
+  a.reflect();
+  a.fileProvider.dirMake( a.abs( 'dir1/src' ) );
+  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/src' ), srcPath : a.abs( 'dir1/src' ), rewritingDirs : 1 });
+  test.identical( got, true );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), true );
+
+  /* */
+
+  test.case = 'rewritingDirs : 0';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
+  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/src' ), srcPath : a.abs( 'dir1/src' ), rewritingDirs : 0 });
+  test.identical( got, true );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), true );
+
+  /* */
+
+  test.case = 'makingDirectory : 1';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
+  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/src' ), srcPath : a.abs( 'dir1/src' ), makingDirectory : 1 });
+  test.identical( got, true );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), true );
+
+  /* */
+
+  test.case = 'breakingSrcHardLink : 0, breakingDstHardLink : 1';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
+  var got = a.fileProvider.hardLink
+  ({
+    dstPath : a.abs( 'dir1/src' ),
+    srcPath : a.abs( 'dir1/src' ),
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1
+  });
+  test.identical( got, true );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), true );
+
+  /* */
+
+  test.case = 'breakingSrcHardLink : 1, breakingDstHardLink : 0';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
+  a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
+  var got = a.fileProvider.hardLink
+  ({
+    dstPath : a.abs( 'dir1/src' ),
+    srcPath : a.abs( 'dir1/src' ),
+    breakingSrcHardLink : 1,
+    breakingDstHardLink : 0
+  });
+  test.identical( got, true );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), true );
+
+  /* */
+
+  test.case = 'breakingSrcHardLink : 1, breakingDstHardLink : 1';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
+  a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
+  var got = a.fileProvider.hardLink
+  ({
+    dstPath : a.abs( 'dir1/src' ),
+    srcPath : a.abs( 'dir1/src' ),
+    breakingSrcHardLink : 1,
+    breakingDstHardLink : 1
+  });
+  test.identical( got, true );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), true );
+
+  test.close( 'src === dst' );
+
+}
+
+hardLinkReturnSync.timeOut = 60000;
+
+//
+
+function hardLinkReturnThrowing0Sync( test )
+{
+  let context = this;
+  let a = context.assetFor( test, false );
+
+  test.case = 'src does not exists';
+  a.reflect();
+  var got = a.fileProvider.hardLink
+  ({
+    dstPath : a.abs( 'dst' ),
+    srcPath : a.abs( 'src' ),
+    throwing : 0,
+  });
+  test.identical( got, null );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), false );
+
+  /* */
+
+  test.case = 'rewriting : 0';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  a.fileProvider.fileWrite( a.abs( 'dst' ), 'some text' );
+  var got = a.fileProvider.hardLink
+  ({
+    dstPath : a.abs( 'dst' ),
+    srcPath : a.abs( 'src' ),
+    throwing : 0,
+    rewriting : 0,
+  });
+  test.identical( got, null );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), false );
+
+  /* */
+
+  test.case = 'makingDirectory : 0';
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
+  var got = a.fileProvider.hardLink
+  ({
+    dstPath : a.abs( 'dir1/dir2/dst' ),
+    srcPath : a.abs( 'src' ),
+    throwing : 0,
+    makingDirectory : 0,
+  });
+  test.identical( got, null );
+  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'src' ) ), false );
+}
+
+//
+
+// function hardLinkReturnSoftLinkedSync( test )
+// {
+//   let context = this;
+//   let a = context.assetFor( test, false );
+
+//   /*
+//   - resolvingSrcSoftLink: 1
+//   - resolvingSrcSoftLink: 0
+
+//   - resolvingDstSoftLink: 1
+//   - resolvingDstSoftLink: 0
+//   */
+// }
+
+//
+
 function hardLinkSyncRunner( test )
 {
   let context = this;
@@ -50080,632 +50956,6 @@ function hardLinkExperiment( test )
 
 hardLinkExperiment.experimental = 1;
 
-//
-
-function hardLinkReturnSync( test )
-{
-/*
-  // dst does not exist && directory does not exist -> 8
- - rewriting : 1
- - rewriting : 0
-
- - rewritingDirs : 1
- - rewritingDirs : 0
-
- - makingDirectory : 1
-
- - breakingSrcHardLink : 0, breakingDstHardLink : 1
- - breakingSrcHardLink : 1, breakingDstHardLink : 0
- - breakingSrcHardLink : 1, breakingDstHardLink : 1
-
-// dst does not exist && directory exists -> 8
- - rewriting : 1
- - rewriting : 0
-
- - rewritingDirs : 1
- - rewritingDirs : 0
-
- - makingDirectory : 1
-
- - breakingSrcHardLink : 0, breakingDstHardLink : 1
- - breakingSrcHardLink : 1, breakingDstHardLink : 0
- - breakingSrcHardLink : 1, breakingDstHardLink : 1
-
-// dst exists, is not hard linked -> 6
- - rewriting : 1
-
- - rewritingDirs : 1
-
- - makingDirectory : 1
-
- - breakingSrcHardLink : 0, breakingDstHardLink : 1
- - breakingSrcHardLink : 1, breakingDstHardLink : 0
- - breakingSrcHardLink : 1, breakingDstHardLink : 1
-
-// dst exists, is hard linked -> 6
- - rewriting : 1
-
- - rewritingDirs : 1
-
- - makingDirectory : 1
-
- - breakingSrcHardLink : 0, breakingDstHardLink : 1
- - breakingSrcHardLink : 1, breakingDstHardLink : 0
- - breakingSrcHardLink : 1, breakingDstHardLink : 1
-
-// src === dst -> 8
- - rewriting : 1
- - rewriting : 0
-
- - rewritingDirs : 1
- - rewritingDirs : 0
-
- - makingDirectory : 1
-
- - breakingSrcHardLink : 0, breakingDstHardLink : 1
- - breakingSrcHardLink : 1, breakingDstHardLink : 0
- - breakingSrcHardLink : 1, breakingDstHardLink : 1
-
-total : 36
-*/
-  let context = this;
-  let a = context.assetFor( test, false ); /* qqq3 */
-
-  /* */
-
-  test.open( 'dst does not exist && directory does not exist' );
-
-  test.case = 'rewriting : 1';
-  a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dst' ), srcPath : a.abs( 'src' ), rewriting : 1 });
-  test.identical( got, true );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), true );
-
-  /* */
-
-  test.case = 'rewriting : 0';
-  a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dst' ), srcPath : a.abs( 'src' ), rewriting : 0 });
-  test.identical( got, true );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), true );
-
-  /* */
-
-  test.case = 'rewritingDirs : 1';
-  a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-  a.fileProvider.dirMake( a.abs( 'dir1/dir2/dst' ) );
-  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dir2/dst' ), srcPath : a.abs( 'src' ), rewritingDirs : 1 });
-  test.identical( got, true );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'src' ) ), true );
-
-  /* */
-
-  test.case = 'rewritingDirs : 0';
-  a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-  a.fileProvider.dirMake( a.abs( 'dir1/dir2' ) );
-  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dir2/dst' ), srcPath : a.abs( 'src' ), rewritingDirs : 0 });
-  test.identical( got, true );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'src' ) ), true );
-
-  /* */
-
-  test.case = 'makingDirectory : 1';
-  a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dir2/dst' ), srcPath : a.abs( 'src' ), makingDirectory : 1 });
-  test.identical( got, true );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'src' ) ), true );
-
-  /* */
-
-  test.case = 'breakingSrcHardLink : 0, breakingDstHardLink : 1';
-  a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-  var got = a.fileProvider.hardLink
-  ({
-    dstPath : a.abs( 'dst' ),
-    srcPath : a.abs( 'src' ),
-    breakingSrcHardLink : 0,
-    breakingDstHardLink : 1
-  });
-  test.identical( got, true );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), true );
-
-  /* */
-
-  test.case = 'breakingSrcHardLink : 1, breakingDstHardLink : 0';
-  a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-  var got = a.fileProvider.hardLink
-  ({
-    dstPath : a.abs( 'dst' ),
-    srcPath : a.abs( 'src' ),
-    breakingSrcHardLink : 1,
-    breakingDstHardLink : 0
-  });
-  test.identical( got, true );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), true );
-
-  /* */
-
-  test.case = 'breakingSrcHardLink : 1, breakingDstHardLink : 1';
-  a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-  var got = a.fileProvider.hardLink
-  ({
-    dstPath : a.abs( 'dst' ),
-    srcPath : a.abs( 'src' ),
-    breakingSrcHardLink : 1,
-    breakingDstHardLink : 1
-  });
-  test.identical( got, true );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), true );
-
-  test.close( 'dst does not exist && directory does not exist' );
-
-  /* */
-
-  test.open( 'dst does not exist && directory exists' );
-
-  test.case = 'rewriting : 1';
-  a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-  a.fileProvider.fileWrite( a.abs( 'dir1/test' ), 'some text' );
-  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), rewriting : 1 });
-  test.identical( got, true );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
-
-  /* */
-
-  test.case = 'rewriting : 0';
-  a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-  a.fileProvider.fileWrite( a.abs( 'dir1/test' ), 'some text' );
-  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), rewriting : 0 });
-  test.identical( got, true );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
-
-  /* */
-
-  test.case = 'rewritingDirs : 1';
-  a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-  a.fileProvider.fileWrite( a.abs( 'dir1/test' ), 'some text' );
-  a.fileProvider.dirMake( a.abs( 'dir1/dst' ) );
-  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), rewritingDirs : 1 });
-  test.identical( got, true );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
-
-  /* */
-
-  test.case = 'rewritingDirs : 0';
-  a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-  a.fileProvider.fileWrite( a.abs( 'dir1/test' ), 'some text' );
-  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), rewritingDirs : 0 });
-  test.identical( got, true );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
-
-  /* */
-
-  test.case = 'makingDirectory : 1';
-  a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-  a.fileProvider.fileWrite( a.abs( 'dir1/test' ), 'some text' );
-  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dir2/dst' ), srcPath : a.abs( 'src' ), makingDirectory : 1 });
-  test.identical( got, true );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'src' ) ), true );
-
-  /* */
-
-  test.case = 'breakingSrcHardLink : 0, breakingDstHardLink : 1';
-  a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-  a.fileProvider.fileWrite( a.abs( 'dir1/test' ), 'some text' );
-  var got = a.fileProvider.hardLink
-  ({
-    dstPath : a.abs( 'dir1/dst' ),
-    srcPath : a.abs( 'src' ),
-    breakingSrcHardLink : 0,
-    breakingDstHardLink : 1
-  });
-  test.identical( got, true );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
-
-  /* */
-
-  test.case = 'breakingSrcHardLink : 1, breakingDstHardLink : 0';
-  a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-  a.fileProvider.fileWrite( a.abs( 'dir1/test' ), 'some text' );
-  var got = a.fileProvider.hardLink
-  ({
-    dstPath : a.abs( 'dir1/dst' ),
-    srcPath : a.abs( 'src' ),
-    breakingSrcHardLink : 1,
-    breakingDstHardLink : 0
-  });
-  test.identical( got, true );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
-
-  /* */
-
-  test.case = 'breakingSrcHardLink : 1, breakingDstHardLink : 1';
-  a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-  a.fileProvider.fileWrite( a.abs( 'dir1/test' ), 'some text' );
-  var got = a.fileProvider.hardLink
-  ({
-    dstPath : a.abs( 'dir1/dst' ),
-    srcPath : a.abs( 'src' ),
-    breakingSrcHardLink : 1,
-    breakingDstHardLink : 1
-  });
-  test.identical( got, true );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
-
-  test.close( 'dst does not exist && directory exists' );
-
-  /* */
-
-  test.open( 'dst exists, is not hard linked' );
-
-  test.case = 'rewriting : 1';
-  a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-  a.fileProvider.fileWrite( a.abs( 'dir1/dst' ), 'some text' );
-  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), rewriting : 1 });
-  test.identical( got, true );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
-
-  /* */
-
-  test.case = 'rewritingDirs : 1';
-  a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-  a.fileProvider.fileWrite( a.abs( 'dir1/dst' ), 'some text' );
-  a.fileProvider.dirMake( a.abs( 'dir1/dst' ) );
-  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), rewritingDirs : 1 });
-  test.identical( got, true );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
-
-  /* */
-
-  test.case = 'makingDirectory : 1';
-  a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-  a.fileProvider.fileWrite( a.abs( 'dir1/dst' ), 'some text' );
-  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), makingDirectory : 1 });
-  test.identical( got, true );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
-
-  /* */
-
-  test.case = 'breakingSrcHardLink : 0, breakingDstHardLink : 1';
-  a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-  a.fileProvider.fileWrite( a.abs( 'dir1/dst' ), 'some text' );
-  var got = a.fileProvider.hardLink
-  ({
-    dstPath : a.abs( 'dir1/dst' ),
-    srcPath : a.abs( 'src' ),
-    breakingSrcHardLink : 0,
-    breakingDstHardLink : 1
-  });
-  test.identical( got, true );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
-
-  /* */
-
-  test.case = 'breakingSrcHardLink : 1, breakingDstHardLink : 0';
-  a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-  a.fileProvider.fileWrite( a.abs( 'dir1/dst' ), 'some text' );
-  var got = a.fileProvider.hardLink
-  ({
-    dstPath : a.abs( 'dir1/dst' ),
-    srcPath : a.abs( 'src' ),
-    breakingSrcHardLink : 1,
-    breakingDstHardLink : 0
-  });
-  test.identical( got, true );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
-
-  /* */
-
-  test.case = 'breakingSrcHardLink : 1, breakingDstHardLink : 1';
-  a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-  a.fileProvider.fileWrite( a.abs( 'dir1/dst' ), 'some text' );
-  var got = a.fileProvider.hardLink
-  ({
-    dstPath : a.abs( 'dir1/dst' ),
-    srcPath : a.abs( 'src' ),
-    breakingSrcHardLink : 1,
-    breakingDstHardLink : 1
-  });
-  test.identical( got, true );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
-
-  test.close( 'dst exists, is not hard linked' );
-
-  /* */
-
-  test.open( 'dst exists, is hard linked' );
-
-  test.case = 'rewriting : 1';
-  a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-  a.fileProvider.fileWrite( a.abs( 'dir1/dst' ), 'some text' );
-  a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), rewriting : 1 });
-  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), rewriting : 1 });
-  test.identical( got, false );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
-
-  /* */
-
-  test.case = 'rewritingDirs : 1';
-  a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-  a.fileProvider.fileWrite( a.abs( 'dir1/dst' ), 'some text' );
-  a.fileProvider.dirMake( a.abs( 'dir1/dst' ) );
-  a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), rewritingDirs : 1 });
-  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), rewritingDirs : 1 });
-  test.identical( got, false );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
-
-  /* */
-
-  test.case = 'makingDirectory : 1';
-  a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-  a.fileProvider.fileWrite( a.abs( 'dir1/dst' ), 'some text' );
-  a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), makingDirectory : 1 });
-  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/dst' ), srcPath : a.abs( 'src' ), makingDirectory : 1 });
-  test.identical( got, false );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
-
-  /* */
-
-  test.case = 'breakingSrcHardLink : 0, breakingDstHardLink : 1';
-  a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-  a.fileProvider.fileWrite( a.abs( 'dir1/dst' ), 'some text' );
-  a.fileProvider.hardLink
-  ({
-    dstPath : a.abs( 'dir1/dst' ),
-    srcPath : a.abs( 'src' ),
-    breakingSrcHardLink : 0,
-    breakingDstHardLink : 1
-  });
-  var got = a.fileProvider.hardLink
-  ({
-    dstPath : a.abs( 'dir1/dst' ),
-    srcPath : a.abs( 'src' ),
-    breakingSrcHardLink : 0,
-    breakingDstHardLink : 1
-  });
-  test.identical( got, false );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
-
-  /* */
-
-  test.case = 'breakingSrcHardLink : 1, breakingDstHardLink : 0';
-  a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-  a.fileProvider.fileWrite( a.abs( 'dir1/dst' ), 'some text' );
-  a.fileProvider.hardLink
-  ({
-    dstPath : a.abs( 'dir1/dst' ),
-    srcPath : a.abs( 'src' ),
-    breakingSrcHardLink : 1,
-    breakingDstHardLink : 0
-  });
-  var got = a.fileProvider.hardLink
-  ({
-    dstPath : a.abs( 'dir1/dst' ),
-    srcPath : a.abs( 'src' ),
-    breakingSrcHardLink : 1,
-    breakingDstHardLink : 0
-  });
-  test.identical( got, false );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
-
-  /* */
-
-  test.case = 'breakingSrcHardLink : 1, breakingDstHardLink : 1';
-  a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-  a.fileProvider.fileWrite( a.abs( 'dir1/dst' ), 'some text' );
-  a.fileProvider.hardLink
-  ({
-    dstPath : a.abs( 'dir1/dst' ),
-    srcPath : a.abs( 'src' ),
-    breakingSrcHardLink : 1,
-    breakingDstHardLink : 1
-  });
-  var got = a.fileProvider.hardLink
-  ({
-    dstPath : a.abs( 'dir1/dst' ),
-    srcPath : a.abs( 'src' ),
-    breakingSrcHardLink : 1,
-    breakingDstHardLink : 1
-  });
-  test.identical( got, false );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dst' ), a.abs( 'src' ) ), true );
-
-  test.close( 'dst exists, is hard linked' );
-
-  /* */
-
-  test.open( 'src === dst' );
-
-  test.case = 'rewriting : 1';
-  a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
-  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/src' ), srcPath : a.abs( 'dir1/src' ), rewriting : 1 });
-  test.identical( got, true );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), true );
-
-  /* */
-
-  test.case = 'rewriting : 0';
-  a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
-  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/src' ), srcPath : a.abs( 'dir1/src' ), rewriting : 0 });
-  test.identical( got, true );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), true );
-
-  /* */
-
-  test.case = 'rewritingDirs : 1';
-  a.reflect();
-  a.fileProvider.dirMake( a.abs( 'dir1/src' ) );
-  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/src' ), srcPath : a.abs( 'dir1/src' ), rewritingDirs : 1 });
-  test.identical( got, true );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), true );
-
-  /* */
-
-  test.case = 'rewritingDirs : 0';
-  a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
-  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/src' ), srcPath : a.abs( 'dir1/src' ), rewritingDirs : 0 });
-  test.identical( got, true );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), true );
-
-  /* */
-
-  test.case = 'makingDirectory : 1';
-  a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
-  var got = a.fileProvider.hardLink({ dstPath : a.abs( 'dir1/src' ), srcPath : a.abs( 'dir1/src' ), makingDirectory : 1 });
-  test.identical( got, true );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), true );
-
-  /* */
-
-  test.case = 'breakingSrcHardLink : 0, breakingDstHardLink : 1';
-  a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
-  var got = a.fileProvider.hardLink
-  ({
-    dstPath : a.abs( 'dir1/src' ),
-    srcPath : a.abs( 'dir1/src' ),
-    breakingSrcHardLink : 0,
-    breakingDstHardLink : 1
-  });
-  test.identical( got, true );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), true );
-
-  /* */
-
-  test.case = 'breakingSrcHardLink : 1, breakingDstHardLink : 0';
-  a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
-  a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
-  var got = a.fileProvider.hardLink
-  ({
-    dstPath : a.abs( 'dir1/src' ),
-    srcPath : a.abs( 'dir1/src' ),
-    breakingSrcHardLink : 1,
-    breakingDstHardLink : 0
-  });
-  test.identical( got, true );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), true );
-
-  /* */
-
-  test.case = 'breakingSrcHardLink : 1, breakingDstHardLink : 1';
-  a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
-  a.fileProvider.fileWrite( a.abs( 'dir1/src' ), 'some text' );
-  var got = a.fileProvider.hardLink
-  ({
-    dstPath : a.abs( 'dir1/src' ),
-    srcPath : a.abs( 'dir1/src' ),
-    breakingSrcHardLink : 1,
-    breakingDstHardLink : 1
-  });
-  test.identical( got, true );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/src' ), a.abs( 'dir1/src' ) ), true );
-
-  test.close( 'src === dst' );
-
-}
-
-hardLinkReturnSync.timeOut = 60000;
-
-//
-
-function hardLinkReturnThrowing0Sync( test )
-{
-  let context = this;
-  let a = context.assetFor( test, false );
-
-  test.case = 'src does not exists';
-  a.reflect();
-  var got = a.fileProvider.hardLink
-  ({
-    dstPath : a.abs( 'dst' ),
-    srcPath : a.abs( 'src' ),
-    throwing : 0,
-  });
-  test.identical( got, null );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), false );
-
-  /* */
-
-  test.case = 'rewriting : 0';
-  a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-  a.fileProvider.fileWrite( a.abs( 'dst' ), 'some text' );
-  var got = a.fileProvider.hardLink
-  ({
-    dstPath : a.abs( 'dst' ),
-    srcPath : a.abs( 'src' ),
-    throwing : 0,
-    rewriting : 0,
-  });
-  test.identical( got, null );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dst' ), a.abs( 'src' ) ), false );
-
-  /* */
-
-  test.case = 'makingDirectory : 0';
-  a.reflect();
-  a.fileProvider.fileWrite( a.abs( 'src' ), 'some text' );
-  var got = a.fileProvider.hardLink
-  ({
-    dstPath : a.abs( 'dir1/dir2/dst' ),
-    srcPath : a.abs( 'src' ),
-    throwing : 0,
-    makingDirectory : 0,
-  });
-  test.identical( got, null );
-  test.identical( a.fileProvider.areHardLinked( a.abs( 'dir1/dir2/dst' ), a.abs( 'src' ) ), false );
-}
-
-//
-
-// function hardLinkReturnSoftLinkedSync( test )
-// {
-//   let context = this;
-//   let a = context.assetFor( test, false );
-
-//   /*
-//   - resolvingSrcSoftLink: 1
-//   - resolvingSrcSoftLink: 0
-
-//   - resolvingDstSoftLink: 1
-//   - resolvingDstSoftLink: 0
-//   */
-// }
-
 // --
 // declare
 // --
@@ -50880,6 +51130,7 @@ const Proto =
 
     hardLinkEscapedPath, /* xxx */
 
+    hardLinkBreaking,
     hardLinkReturnSync,
 
     // qqq3 : implement
@@ -50969,6 +51220,6 @@ const Proto =
 
 };
 
-wTestSuite( Self );
+wTestSuite( Proto );
 
 })();

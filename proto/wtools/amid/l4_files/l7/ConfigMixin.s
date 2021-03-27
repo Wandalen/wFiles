@@ -5,11 +5,11 @@
 
 const _global = _global_;
 const _ = _global_.wTools;
-let FileRecord = _.FileRecord;
-let Abstract = _.FileProvider.Abstract;
-let Partial = _.FileProvider.Partial;
+const FileRecord = _.FileRecord;
+const Abstract = _.FileProvider.Abstract;
+const Partial = _.FileProvider.Partial;
 let Find = _.FileProvider.FindMixin;
-let fileRead = Partial.prototype.fileRead;
+const fileRead = Partial.prototype.fileRead;
 
 _.assert( _.lengthOf( _.files.ReadEncoders ) > 0 );
 _.assert( _.routineIs( _.FileRecord ) );

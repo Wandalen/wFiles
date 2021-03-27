@@ -33107,37 +33107,317 @@ filesReflectToWithSoftLinksResolving.timeOut = 500000;
 
 //
 
-function filesReflectHardlinking( test )
+function filesReflectHardlinkingBreaking( test )
 {
   let context = this;
-  let provider = context.provider;
-  let system = context.system;
-  let path = context.provider.path;
-  let routinePath = path.join( context.suiteTempPath, 'routine-' + test.name );
+  let a = context.assetFor( test, false );
 
-  var filesTree =
+  /* */
+
+  test.case = 'breakingSrcHardLink : 1, breakingDstHardLink : 1';
+
+  preset1();
+
+  a.fileProvider.filesReflect
+  ({
+    filter : { filePath : { [ a.abs( 'src1' ) ] : a.abs( 'dst1' ) } },
+    breakingSrcHardLink : 1,
+    breakingDstHardLink : 1,
+    linking : 'hardLink',
+    verbosity : 1,
+  });
+
+  var exp =
   {
-    'src' : 'abc',
-    'dst' : 'abc',
+    'dst1' : ( new U8x([ 52 ]) ),
+    'dst2' : ( new U8x([ 50 ]) ),
+    'src1' : ( new U8x([ 52 ]) ),
+    'src2' : ( new U8x([ 52 ]) ),
   }
+  var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
+  test.identical( got, exp );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'dst2' ) ) );
+  test.true( a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'src1' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'src2' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst2' ), a.abs( 'src1' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst2' ), a.abs( 'src2' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'src1' ), a.abs( 'src2' ) ) );
 
-  _.FileProvider.Extract({ filesTree }).filesReflectTo
-  ({
-    dst : routinePath,
-    dstProvider : provider,
-  })
+  /* */
 
-  provider.filesReflect
+  test.case = 'breakingSrcHardLink : 0, breakingDstHardLink : 1';
+
+  preset1();
+
+  a.fileProvider.filesReflect
   ({
-    filter : { filePath : { [ srcPath ] : dstPath } },
-    dstRewritingOnlyPreserving : 1,
+    filter : { filePath : { [ a.abs( 'src1' ) ] : a.abs( 'dst1' ) } },
+    breakingSrcHardLink : 0,
+    breakingDstHardLink : 1,
+    linking : 'hardLink',
+    verbosity : 1,
+  });
+
+  var exp =
+  {
+    'dst1' : ( new U8x([ 52 ]) ),
+    'dst2' : ( new U8x([ 50 ]) ),
+    'src1' : ( new U8x([ 52 ]) ),
+    'src2' : ( new U8x([ 52 ]) ),
+  }
+  var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
+  test.identical( got, exp );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'dst2' ) ) );
+  test.true( a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'src1' ) ) );
+  test.true( a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'src2' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst2' ), a.abs( 'src1' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst2' ), a.abs( 'src2' ) ) );
+  test.true( a.fileProvider.areHardLinked( a.abs( 'src1' ), a.abs( 'src2' ) ) );
+
+  /* */
+
+  test.case = 'breakingSrcHardLink : default, breakingDstHardLink : default';
+
+  preset1();
+
+  a.fileProvider.filesReflect
+  ({
+    filter : { filePath : { [ a.abs( 'src1' ) ] : a.abs( 'dst1' ) } },
+    linking : 'hardLink',
+    verbosity : 1,
+  });
+
+  var exp =
+  {
+    'dst1' : ( new U8x([ 52 ]) ),
+    'dst2' : ( new U8x([ 50 ]) ),
+    'src1' : ( new U8x([ 52 ]) ),
+    'src2' : ( new U8x([ 52 ]) ),
+  }
+  var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
+  test.identical( got, exp );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'dst2' ) ) );
+  test.true( a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'src1' ) ) );
+  test.true( a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'src2' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst2' ), a.abs( 'src1' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst2' ), a.abs( 'src2' ) ) );
+  test.true( a.fileProvider.areHardLinked( a.abs( 'src1' ), a.abs( 'src2' ) ) );
+
+  /* */
+
+  test.case = 'breakingSrcHardLink : 1, breakingDstHardLink : 0';
+
+  preset1();
+
+  a.fileProvider.filesReflect
+  ({
+    filter : { filePath : { [ a.abs( 'src1' ) ] : a.abs( 'dst1' ) } },
     breakingSrcHardLink : 1,
     breakingDstHardLink : 0,
     linking : 'hardLink',
     verbosity : 1,
   });
 
+  var exp =
+  {
+    'dst1' : ( new U8x([ 52 ]) ),
+    'dst2' : ( new U8x([ 52 ]) ),
+    'src1' : ( new U8x([ 52 ]) ),
+    'src2' : ( new U8x([ 52 ]) ),
+  }
+  var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
+  test.identical( got, exp );
+  test.true( a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'dst2' ) ) );
+  test.true( a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'src1' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'src2' ) ) );
+  test.true( a.fileProvider.areHardLinked( a.abs( 'dst2' ), a.abs( 'src1' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst2' ), a.abs( 'src2' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'src1' ), a.abs( 'src2' ) ) );
+
+  /* */
+
+  test.case = 'breakingSrcHardLink : 1, breakingDstHardLink : 0, same content';
+
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'src/f1' ), '1' );
+  a.fileProvider.fileWrite( a.abs( 'f1' ), '1' );
+  a.fileProvider.dirMake( a.abs( 'dst' ) );
+  a.fileProvider.hardLink( a.abs( 'dst/f1' ), a.abs( 'f1' ) );
+  /* xxx : qqq : hardLink should make dirs by defaults */
+
+  a.fileProvider.filesReflect
+  ({
+    filter : { filePath : { [ a.abs( 'src' ) ] : a.abs( 'dst' ) } },
+    breakingSrcHardLink : 1,
+    breakingDstHardLink : 0,
+    dstRewritingOnlyPreserving : 1,
+    linking : 'hardLink',
+    verbosity : 1,
+  });
+
+  var exp =
+  {
+    'f1' : ( new U8x([ 49 ]) ),
+    'dst' :
+    {
+      'f1' : ( new U8x([ 49 ]) )
+    },
+    'src' :
+    {
+      'f1' : ( new U8x([ 49 ]) )
+    }
+  }
+  var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
+  test.identical( got, exp );
+  test.true( a.fileProvider.areHardLinked( a.abs( 'dst/f1' ), a.abs( 'src/f1' ) ) );
+  test.true( a.fileProvider.areHardLinked( a.abs( 'dst/f1' ), a.abs( 'f1' ) ) );
+  test.true( a.fileProvider.areHardLinked( a.abs( 'src/f1' ), a.abs( 'f1' ) ) );
+
+  /* */
+
+  function preset1()
+  {
+    a.reflect();
+    a.fileProvider.fileWrite( a.abs( 'dst1' ), '1' );
+    a.fileProvider.fileWrite( a.abs( 'dst2' ), '2' );
+    a.fileProvider.fileWrite( a.abs( 'src1' ), '3' );
+    a.fileProvider.fileWrite( a.abs( 'src2' ), '4' );
+    a.fileProvider.hardLink( a.abs( 'dst1' ), a.abs( 'dst2' ) );
+    a.fileProvider.hardLink( a.abs( 'src1' ), a.abs( 'src2' ) );
+  }
+
+  /* */
+
 }
+
+filesReflectHardlinkingBreaking.description =
+`
+- check breaking happens on the right side
+`
+
+//
+
+function filesReflectHardlinkingBreakingOptionDstRewritingOnlyPreserving( test )
+{
+  let context = this;
+  let a = context.assetFor( test, false );
+
+  /* */
+
+  test.case = 'breakingSrcHardLink : 1, breakingDstHardLink : 0, same content';
+
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'dst1' ), '4' );
+  a.fileProvider.fileWrite( a.abs( 'dst2' ), '4' );
+  a.fileProvider.fileWrite( a.abs( 'src1' ), '4' );
+  a.fileProvider.fileWrite( a.abs( 'src2' ), '4' );
+  a.fileProvider.hardLink( a.abs( 'dst1' ), a.abs( 'dst2' ) );
+  a.fileProvider.hardLink( a.abs( 'src1' ), a.abs( 'src2' ) );
+
+  a.fileProvider.filesReflect
+  ({
+    filter : { filePath : { [ a.abs( 'src1' ) ] : a.abs( 'dst1' ) } },
+    breakingSrcHardLink : 1,
+    breakingDstHardLink : 0,
+    dstRewritingOnlyPreserving : 1,
+    linking : 'hardLink',
+    verbosity : 1,
+  });
+
+  var exp =
+  {
+    'dst1' : ( new U8x([ 52 ]) ),
+    'dst2' : ( new U8x([ 52 ]) ),
+    'src1' : ( new U8x([ 52 ]) ),
+    'src2' : ( new U8x([ 52 ]) ),
+  }
+  var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
+  test.identical( got, exp );
+  test.true( a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'dst2' ) ) );
+  test.true( a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'src1' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'src2' ) ) );
+  test.true( a.fileProvider.areHardLinked( a.abs( 'dst2' ), a.abs( 'src1' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst2' ), a.abs( 'src2' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'src1' ), a.abs( 'src2' ) ) );
+
+  /* */
+
+  test.case = 'breakingSrcHardLink : 1, breakingDstHardLink : 0, diff content';
+
+  a.reflect();
+  a.fileProvider.fileWrite( a.abs( 'dst1' ), '1' );
+  a.fileProvider.fileWrite( a.abs( 'dst2' ), '2' );
+  a.fileProvider.fileWrite( a.abs( 'src1' ), '3' );
+  a.fileProvider.fileWrite( a.abs( 'src2' ), '4' );
+  a.fileProvider.hardLink( a.abs( 'dst1' ), a.abs( 'dst2' ) );
+  a.fileProvider.hardLink( a.abs( 'src1' ), a.abs( 'src2' ) );
+
+  var exp =
+  {
+    'dst1' : ( new U8x([ 50 ]) ),
+    'dst2' : ( new U8x([ 50 ]) ),
+    'src1' : ( new U8x([ 52 ]) ),
+    'src2' : ( new U8x([ 52 ]) ),
+  }
+  var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
+  test.identical( got, exp );
+  test.true( a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'dst2' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'src1' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'src2' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst2' ), a.abs( 'src1' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst2' ), a.abs( 'src2' ) ) );
+  test.true( a.fileProvider.areHardLinked( a.abs( 'src1' ), a.abs( 'src2' ) ) );
+
+  test.shouldThrowErrorSync
+  (
+    () =>
+    {
+      a.fileProvider.filesReflect
+      ({
+        filter : { filePath : { [ a.abs( 'src1' ) ] : a.abs( 'dst1' ) } },
+        breakingSrcHardLink : 1,
+        breakingDstHardLink : 0,
+        dstRewritingOnlyPreserving : 1,
+        linking : 'hardLink',
+        verbosity : 1,
+      });
+    },
+    ( err ) =>
+    {
+      var exp =
+`
+Can't rewrite terminal file "${a.abs( 'dst1' )}"
+by terminal file "${a.abs( 'src1' )}"
+files have different content
+`
+      test.equivalent( err.originalMessage, exp );
+    }
+  )
+
+  var exp =
+  {
+    'dst1' : ( new U8x([ 50 ]) ),
+    'dst2' : ( new U8x([ 50 ]) ),
+    'src1' : ( new U8x([ 52 ]) ),
+    'src2' : ( new U8x([ 52 ]) ),
+  }
+  var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
+  test.identical( got, exp );
+  test.true( a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'dst2' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'src1' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'src2' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst2' ), a.abs( 'src1' ) ) );
+  test.true( !a.fileProvider.areHardLinked( a.abs( 'dst2' ), a.abs( 'src2' ) ) );
+  test.true( a.fileProvider.areHardLinked( a.abs( 'src1' ), a.abs( 'src2' ) ) );
+
+  /* */
+
+}
+
+filesReflectHardlinkingBreakingOptionDstRewritingOnlyPreserving.description =
+`
+- check option::dstRewritingOnlyPreserving is not obstace for correct braking
+`
 
 //
 
@@ -38390,7 +38670,8 @@ const Proto =
     filesReflectToWithSoftLinks, /* qqq : implement filesReflectToWithTextLinks */
     filesReflectToWithSoftLinksRebasing, /* qqq : implement filesReflectToWithTextLinksRebasing */
     filesReflectToWithSoftLinksResolving, /* qqq : implement filesReflectToWithTextLinksResolving */
-    filesReflectHardlinking,
+    filesReflectHardlinkingBreaking,
+    filesReflectHardlinkingBreakingOptionDstRewritingOnlyPreserving,
     filesReflectDstIgnoring,
     filesReflectRenaming,
     filesExtractBasic,
@@ -38418,6 +38699,6 @@ const Proto =
 
 };
 
-wTestSuite( Self );
+wTestSuite( Proto );
 
 })();

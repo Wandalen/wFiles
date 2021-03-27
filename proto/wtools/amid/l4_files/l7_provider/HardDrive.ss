@@ -27,7 +27,7 @@ if( typeof module !== 'undefined' )
 
 const _global = _global_;
 const _ = _global_.wTools;
-let FileRecord = _.FileRecord;
+const FileRecord = _.FileRecord;
 const Parent = _.FileProvider.Partial;
 const Self = wFileProviderHardDrive;
 function wFileProviderHardDrive( o )
@@ -2080,7 +2080,7 @@ function hardLinkAct( o )
 {
   let self = this;
 
-  _.assertRoutineOptions( hardLinkAct, arguments );
+  _.assertRoutineOptions( hardLinkAct, arguments ); debugger;
 
   let dstPath = self.path.nativize( o.dstPath );
   let srcPath = self.path.nativize( o.srcPath );

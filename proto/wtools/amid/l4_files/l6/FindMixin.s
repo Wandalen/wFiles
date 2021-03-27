@@ -5,10 +5,10 @@
 
 const _global = _global_;
 const _ = _global_.wTools;
-let FileRecord = _.FileRecord;
-let Abstract = _.FileProvider.Abstract;
-let Partial = _.FileProvider.Partial;
-let fileRead = Partial.prototype.fileRead;
+const FileRecord = _.FileRecord;
+const Abstract = _.FileProvider.Abstract;
+const Partial = _.FileProvider.Partial;
+const fileRead = Partial.prototype.fileRead;
 
 _.assert( _.lengthOf( _.files.ReadEncoders ) > 0 );
 _.assert( _.routineIs( _.FileRecord ) );
@@ -3570,6 +3570,8 @@ function filesReflectSingle_body( o )
         resolvingSrcTextLink : o.resolvingSrcTextLink,
         resolvingDstSoftLink : o.resolvingDstSoftLink,
         resolvingDstTextLink : o.resolvingDstTextLink,
+        breakingSrcHardLink : o.breakingSrcHardLink,
+        breakingDstHardLink : o.breakingDstHardLink,
       });
 
     }

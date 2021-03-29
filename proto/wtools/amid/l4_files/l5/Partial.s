@@ -657,7 +657,7 @@ function pathForCopy_head( routine, args )
 
 function pathForCopy_body( o )
 {
-  let fileProvider = this;
+  const fileProvider = this;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
@@ -679,7 +679,7 @@ function pathForCopy_body( o )
 
   /*file.absolute =  file.dir + '/' + file.name + file.extWithDot;*/
 
-  let path = fileProvider.path.join( file.dir, name + postfix + file.extWithDot );
+  const path = fileProvider.path.join( file.dir, name + postfix + file.extWithDot );
   if( !fileProvider.statResolvedRead({ filePath : path, sync : 1 }) )
   return path;
 
@@ -689,7 +689,7 @@ function pathForCopy_body( o )
   while( attempts > 0 )
   {
 
-    let path = fileProvider.path.join( file.dir, name + postfix + '-' + index + file.extWithDot );
+    const path = fileProvider.path.join( file.dir, name + postfix + '-' + index + file.extWithDot );
 
     if( !fileProvider.statResolvedRead({ filePath : path, sync : 1 }) )
     return path;
@@ -5077,7 +5077,7 @@ _.assert( _.boolLike( _.entity.exportJson.defaults.cloning ) );
  exist, it's created. Method can accept two parameters : string `filePath` and string\buffer `data`, or single
  argument : options map, with required 'filePath' and 'data' parameters.
  * @example
- * let fileProvider = _.FileProvider.Default();
+ * const fileProvider = _.FileProvider.Default();
  * let fs = require('fs');
    let data = { a : 'hello', b : 'world' },
    let con = fileProvider.fileWriteJson( 'tmp/sample.json', data );
@@ -6297,13 +6297,13 @@ operates.relativeSrcPath = { pathToRead : 1 }
  * Otherwise throws error with corresponding message or returns false, it depends on ( o.throwing ) property.
  * In asynchronously mode returns wConsequence instance.
  * @example
-   let fileProvider = _.FileProvider.Default();
+   const fileProvider = _.FileProvider.Default();
    let result = fileProvider.fileCopy( 'src.txt', 'dst.txt' );
    console.log( result );// true
    let stats = fileProvider.statResolvedRead( 'dst.txt' );
    console.log( stats ); // returns Stats object
  * @example
-   let fileProvider = _.FileProvider.Default();
+   const fileProvider = _.FileProvider.Default();
    let consequence = fileProvider.fileCopy
    ({
      srcPath : 'src.txt',

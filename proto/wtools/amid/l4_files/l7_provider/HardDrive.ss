@@ -1247,7 +1247,7 @@ _.routineExtend( rightsWriteAct, Parent.prototype.rightsWriteAct );
  * @example
  * let StandardFile = require( 'fs' );
 
-  let fileProvider = _.FileProvider.Default();
+  const fileProvider = _.FileProvider.Default();
 
    let path = 'tmp/fileSize/data',
    textData = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
@@ -2043,7 +2043,7 @@ _.routineExtend( softLinkAct, Parent.prototype.softLinkAct );
     In success method returns true, otherwise - false.
  * @example
 
- * let fileProvider = _.FileProvider.Default();
+ * const fileProvider = _.FileProvider.Default();
  * let path = 'tmp/hardLinkAct/data.txt',
    link = 'tmp/hardLinkAct/h_link_for_data.txt',
    textData = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',

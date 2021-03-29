@@ -106,7 +106,7 @@ function resolveTextLink( path )
 
 function dirUserHome()
 {
-  let fileProvider = this.fileProvider.preferredProvider;
+  const fileProvider = this.fileProvider.preferredProvider;
   _.assert( arguments.length === 0, 'Expects no arguments' );
   _.assert( _.routineIs( fileProvider.pathDirUserHomeAct ) );
   // if( this.userHomePath )
@@ -118,7 +118,7 @@ function dirUserHome()
 
 function dirTemp()
 {
-  let fileProvider = this.fileProvider.preferredProvider;
+  const fileProvider = this.fileProvider.preferredProvider;
   _.assert( arguments.length === 0, 'Expects no arguments' );
   _.assert( _.routineIs( fileProvider.pathDirTempAct ), () => 'Provider ' + fileProvider.qualifiedName + ' does not support temp files' );
   // if( this.tempPath )
@@ -1269,7 +1269,7 @@ function forCopy_head( routine, args )
 function forCopy_body( o )
 {
   let path = this;
-  let fileProvider = this.fileProvider;
+  const fileProvider = this.fileProvider;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 
@@ -1371,7 +1371,7 @@ function _firstAvailable_head( routine, args )
 function _firstAvailable_body( o )
 {
   let path = this;
-  let fileProvider = path.fileProvider;
+  const fileProvider = path.fileProvider;
 
   _.assert( arguments.length === 1, 'Expects single argument' );
 

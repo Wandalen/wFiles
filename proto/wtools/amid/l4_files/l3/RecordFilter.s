@@ -225,8 +225,8 @@ function _formPre()
   if( filter.formed < 1 )
   filter._formAssociations();
 
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   _.assert( arguments.length === 0, 'Expects no arguments' );
   _.assert( filter.formed === 1 );
@@ -266,8 +266,8 @@ function _formMasks()
   if( filter.formed < 3 )
   filter._formPaths();
 
-  let fileProvider = filter.effectiveProvider || filter.defaultProvider || filter.system;
-  let path = fileProvider.path;
+  const fileProvider = filter.effectiveProvider || filter.defaultProvider || filter.system;
+  const path = fileProvider.path;
 
   if( filter.recursive === null )
   filter.recursive = 2;
@@ -318,8 +318,8 @@ function _formFinal()
     should use effectiveProvider because of option globbing of file provider
   */
 
-  let fileProvider = filter.effectiveProvider || filter.system || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.effectiveProvider || filter.system || filter.defaultProvider;
+  const path = fileProvider.path;
 
   /* - */
 
@@ -458,7 +458,7 @@ function and( src )
   if( src === null )
   return filter;
 
-  let fileProvider = filter.effectiveProvider || filter.system || filter.defaultProvider;
+  const fileProvider = filter.effectiveProvider || filter.system || filter.defaultProvider;
   if( !( src instanceof _.FileRecordFilter ) )
   src = fileProvider.recordFilter( src );
 
@@ -569,14 +569,14 @@ function _pathsAmmend( o )
   _.assert( !filter.system || !o.src.system || filter.system === o.src.system );
   _.assert( o.src !== filter );
 
-  let fileProvider = filter.effectiveProvider
+  const fileProvider = filter.effectiveProvider
   || filter.system
   || filter.defaultProvider
   || o.src.effectiveProvider
   || o.src.system
   || o.src.defaultProvider;
 
-  let path = fileProvider.path;
+  const path = fileProvider.path;
 
   /* */
 
@@ -987,8 +987,8 @@ function pathsSupplementJoining( src )
 function prefixesApply( o )
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   if( filter.prefixPath === null && filter.postfixPath === null )
   return filter;
@@ -1285,8 +1285,8 @@ prefixesApply.defaults =
 function prefixesRelative( prefixPath )
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   prefixPath = prefixPath || filter.prefixPath;
 
@@ -1351,8 +1351,8 @@ function prefixesRelative( prefixPath )
 function prefixPathFromFilePath( o )
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   _.routineOptions( prefixPathFromFilePath, arguments );
 
@@ -1402,8 +1402,8 @@ prefixPathFromFilePath.defaults =
 function prefixPathAbsoluteFrom( o )
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   o = _.routineOptions( prefixPathAbsoluteFrom, arguments );
 
@@ -1492,8 +1492,8 @@ function relativeFor( filePath )
 {
   let filter = this;
   let basePath = filter.basePathForStemPath( filePath );
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   relativePath = path.relative( basePath, filePath );
 
@@ -1505,7 +1505,7 @@ function relativeFor( filePath )
 function basePathSet( src )
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
 
   _.assert
   (
@@ -1517,7 +1517,7 @@ function basePathSet( src )
   if( Config.debug )
   if( src && fileProvider )
   {
-    let path = fileProvider.path;
+    const path = fileProvider.path;
     path.filter( src, ( basePath, it ) =>
     {
       if( it.side === 'src' )
@@ -1589,8 +1589,8 @@ function basePathForFilePath( filePath )
 {
   let filter = this;
   let result = null;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   _.assert( _.strIs( filePath ), 'Expects string' );
   _.assert( arguments.length === 1 );
@@ -1668,8 +1668,8 @@ function basePathsGet()
 function basePathMapFromString( o )
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   o = _.routineOptions( basePathMapFromString, arguments );
   _.assert( o.basePath === null || _.strIs( o.basePath ) );
@@ -1760,8 +1760,8 @@ basePathMapFromString.defaults =
 function basePathMapLocalize( basePathMap )
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   let basePathMap2 = Object.create( null );
   basePathMap = basePathMap || filter.basePath;
@@ -1787,8 +1787,8 @@ function basePathMapLocalize( basePathMap )
 function basePathFromDecoratedFilePath( filePath )
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
   let basePath = Object.create( null );
 
   if( filePath === undefined )
@@ -1826,8 +1826,8 @@ function basePathFromDecoratedFilePath( filePath )
 function basePathNormalize( filePath, basePath )
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   if( filePath === undefined )
   filePath = filter.filePath;
@@ -1871,8 +1871,8 @@ function basePathNormalize( filePath, basePath )
 function basePathSimplest( basePath )
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   _.assert( arguments.length === 0 || arguments.length === 1 );
 
@@ -1901,8 +1901,8 @@ function basePathSimplest( basePath )
 function basePathDotUnwrap()
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   _.assert( arguments.length === 0, 'Expects no arguments' );
 
@@ -1931,8 +1931,8 @@ function basePathDotUnwrap()
 function basePathEach( onEach )
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   _.assert( filter.basePath === null || _.strIs( filter.basePath ) || _.mapIs( filter.basePath ) );
   _.assert( arguments.length === 1 );
@@ -1967,8 +1967,8 @@ function basePathEach( onEach )
 function basePathUse( basePath )
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   _.assert( arguments.length === 1 );
 
@@ -2029,8 +2029,8 @@ function filePathMove( o )
 
     if( _.objectIs( o.dstInstance.src ) )
     {
-      let fileProvider = o.dstInstance.system || o.dstInstance.effectiveProvider || o.dstInstance.defaultProvider;
-      let path = fileProvider.path;
+      const fileProvider = o.dstInstance.system || o.dstInstance.effectiveProvider || o.dstInstance.defaultProvider;
+      const path = fileProvider.path;
       if( _.strIs( o.value ) || _.arrayIs( o.value ) || _.boolLike( o.value ) )
       o.value = path.mapsPair( o.value, null );
       _.assert( o.value === null || _.mapIs( o.value ), () => 'Paired filter could have only path map as file path, not ' + _.entity.strType( o.value ) );
@@ -2042,8 +2042,8 @@ function filePathMove( o )
     }
     else if( _.objectIs( o.dstInstance.dst ) )
     {
-      let fileProvider = o.dstInstance.system || o.dstInstance.effectiveProvider || o.dstInstance.defaultProvider;
-      let path = fileProvider.path;
+      const fileProvider = o.dstInstance.system || o.dstInstance.effectiveProvider || o.dstInstance.defaultProvider;
+      const path = fileProvider.path;
       if( _.strIs( o.value ) || _.arrayIs( o.value ) || _.boolLike( o.value ) )
       o.value = path.mapsPair( null, o.value );
       _.assert( o.value === null || _.mapIs( o.value ), () => 'Paired filter could have only path map as file path, not ' + _.entity.strType( o.value ) );
@@ -2097,8 +2097,8 @@ filePathMove.defaults =
 //
 //   if( filter.src )
 //   {
-//     let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-//     let path = fileProvider.path;
+//     const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+//     const path = fileProvider.path;
 //     if( _.strIs( src ) || _.arrayIs( src ) || _.boolLike( src ) )
 //     src = path.mapsPair( src, null );
 //     _.assert( src === null || _.mapIs( src ), () => 'Paired filter could have only path map as file path, not ' + _.entity.strType( src ) );
@@ -2107,8 +2107,8 @@ filePathMove.defaults =
 //   }
 //   else if( filter.dst )
 //   {
-//     let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-//     let path = fileProvider.path;
+//     const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+//     const path = fileProvider.path;
 //     if( _.strIs( src ) || _.arrayIs( src ) || _.boolLike( src ) )
 //     src = path.mapsPair( null, src );
 //     _.assert( src === null || _.mapIs( src ), () => 'Paired filter could have only path map as file path, not ' + _.entity.strType( src ) );
@@ -2137,8 +2137,8 @@ function filePathSelect( srcPath, dstPath )
 {
   let src = this;
   let dst = src.dst;
-  let fileProvider = src.system || src.effectiveProvider || src.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = src.system || src.effectiveProvider || src.defaultProvider;
+  const path = fileProvider.path;
 
   _.assert( arguments.length === 2 );
   _.assert( _.mapIs( srcPath ) );
@@ -2203,8 +2203,8 @@ function filePathSelect( srcPath, dstPath )
 function filePathNormalize( filePath )
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   _.assert( arguments.length === 1 );
 
@@ -2240,8 +2240,8 @@ function filePathNormalize( filePath )
 function filePathPrependByBasePath( filePath, basePath )
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   _.assert( arguments.length === 2 );
   _.assert( _.mapIs( filePath ) );
@@ -2320,8 +2320,8 @@ function filePathPrependByBasePath( filePath, basePath )
 function filePathMultiplyRelatives( filePath, basePath )
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   _.assert( arguments.length === 2 );
   _.assert( _.mapIs( filePath ) );
@@ -2365,8 +2365,8 @@ function filePathMultiplyRelatives( filePath, basePath )
 function filePathFromBasePath( basePath )
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
   let result = Object.create( null );
 
   _.assert( basePath === '' || basePath === null || _.mapIs( basePath ) || _.strIs( basePath ) );
@@ -2403,8 +2403,8 @@ function filePathFromBasePath( basePath )
 function filePathAbsolutize( prefixPath )
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   _.assert( _.mapIs( filter.filePath ) );
   _.assert( arguments.length === 0 || arguments.length === 1 );
@@ -2444,8 +2444,8 @@ Result of such glob is equivalent to result of recursive searching.
 function filePathGlobSimplify( filePath, basePath )
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   if( filePath === undefined )
   filePath = filter.filePath;
@@ -2522,8 +2522,8 @@ function filePathGlobSimplify( filePath, basePath )
 function filePathFromFixes()
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   _.assert( arguments.length === 0, 'Expects no arguments' );
 
@@ -2562,8 +2562,8 @@ function filePathSimplest( filePath )
 function filePathNullizeMaybe( filePath )
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   if( filePath === undefined )
   filePath = filter.filePath;
@@ -2580,8 +2580,8 @@ function filePathNullizeMaybe( filePath )
 function filePathIsComplex( filePath )
 {
   let filter = this;
-  let fileProvider = filter.effectiveProvider || filter.system || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.effectiveProvider || filter.system || filter.defaultProvider;
+  const path = fileProvider.path;
 
   /*
     should use effectiveProvider because of option globbing of file provider
@@ -2606,8 +2606,8 @@ function filePathIsComplex( filePath )
 function filePathHasGlob( filePath )
 {
   let filter = this;
-  let fileProvider = filter.effectiveProvider || filter.system || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.effectiveProvider || filter.system || filter.defaultProvider;
+  const path = fileProvider.path;
 
   /*
     should use effectiveProvider because of option globbing of file provider
@@ -2635,8 +2635,8 @@ function filePathHasGlob( filePath )
 function filePathDstHasAllBools( filePath )
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   if( filePath === undefined )
   filePath = filter.filePath;
@@ -2654,8 +2654,8 @@ function filePathDstHasAllBools( filePath )
 function filePathDstHasAnyBools( filePath )
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   filePath = filter.filePathDstArrayGet( filePath );
 
@@ -2667,8 +2667,8 @@ function filePathDstHasAnyBools( filePath )
 function filePathMapOnlyBools( filePath )
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   if( filePath === undefined )
   filePath = filter.filePath;
@@ -2694,8 +2694,8 @@ function filePathMapOnlyBools( filePath )
 function filePathMap( filePath, booleanFallingBack )
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   if( filePath === undefined )
   filePath = filter.filePath;
@@ -2725,8 +2725,8 @@ function filePathMap( filePath, booleanFallingBack )
 function filePathDstArrayGet( filePath )
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   if( filePath === undefined )
   filePath = filter.filePath;
@@ -2755,8 +2755,8 @@ function filePathDstArrayGet( filePath )
 function filePathSrcArrayGet( filePath )
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   if( filePath === undefined )
   filePath = filter.filePath;
@@ -2785,8 +2785,8 @@ function filePathSrcArrayGet( filePath )
 function filePathArrayGet( filePath )
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   if( filePath === undefined )
   filePath = filter.filePath;
@@ -2815,8 +2815,8 @@ function filePathArrayGet( filePath )
 function filePathDstArrayNonBoolGet( filePath, booleanFallingBack )
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   if( filePath === undefined )
   filePath = filter.filePath;
@@ -2862,8 +2862,8 @@ function filePathDstArrayNonBoolGet( filePath, booleanFallingBack )
 function filePathSrcArrayNonBoolGet( filePath, booleanFallingBack )
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   if( filePath === undefined )
   filePath = filter.filePath;
@@ -2919,8 +2919,8 @@ function filePathSrcArrayNonBoolGet( filePath, booleanFallingBack )
 function filePathArrayNonBoolGet( filePath, booleanFallingBack )
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   if( filePath === undefined )
   filePath = filter.filePath;
@@ -2942,8 +2942,8 @@ function filePathArrayNonBoolGet( filePath, booleanFallingBack )
 function filePathDstArrayBoolGet( filePath )
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   if( filePath === undefined )
   filePath = filter.filePath;
@@ -2972,8 +2972,8 @@ function filePathDstArrayBoolGet( filePath )
 function filePathSrcArrayBoolGet( filePath )
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   if( filePath === undefined )
   filePath = filter.filePath;
@@ -3020,8 +3020,8 @@ function filePathSrcArrayBoolGet( filePath )
 function filePathArrayBoolGet( filePath )
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   if( filePath === undefined )
   filePath = filter.filePath;
@@ -3048,8 +3048,8 @@ function filePathDstNormalizedGet( filePath )
 {
   let filter = this;
   let dstFilter = filter.dst || filter;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   if( filePath === undefined )
   filePath = filter.filePath;
@@ -3084,8 +3084,8 @@ function filePathSrcNormalizedGet( filePath )
 {
   let filter = this;
   let srcFilter = filter.src || filter;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   if( filePath === undefined )
   filePath = filter.filePath;
@@ -3139,8 +3139,8 @@ function filePathCommon( filePath )
 function filePathDstCommon()
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   let filePath = filter.filePathDstNormalizedGet();
 
@@ -3152,8 +3152,8 @@ function filePathDstCommon()
 function filePathSrcCommon()
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   let filePath = filter.filePathSrcNormalizedGet();
 
@@ -3199,8 +3199,8 @@ function pairRefineLight()
 {
   let src = this;
   let dst = src.dst;
-  let fileProvider = src.system || src.effectiveProvider || src.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = src.system || src.effectiveProvider || src.defaultProvider;
+  const path = fileProvider.path;
 
   _.assert( dst instanceof Self );
   _.assert( src instanceof Self );
@@ -3289,7 +3289,7 @@ function providerForPath( filePath )
 
   _.assert( _.strIs( filePath ), 'Expects string' );
 
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
 
   filter.effectiveProvider = fileProvider.providerForPath( filePath );
 
@@ -3308,8 +3308,8 @@ function providerForPath( filePath )
 function pathLocalize( filePath )
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
   let isGlobal = path.isGlobal( filePath );
 
   _.assert( _.strIs( filePath ) );
@@ -3371,8 +3371,8 @@ function pathLocalize( filePath )
 function pathsRefine()
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
   let originalFilePath = filter.filePath;
 
   _.assert( arguments.length === 0, 'Expects no arguments' );
@@ -3451,8 +3451,8 @@ function globalsFromLocals()
 function allPaths( o )
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
   let thePath;
 
   if( _.routineIs( o ) )
@@ -3504,8 +3504,8 @@ allPaths.defaults =
 function sureRelativeOrGlobal( o )
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   o = _.routineOptions( sureRelativeOrGlobal, arguments );
 
@@ -3542,8 +3542,8 @@ sureRelativeOrGlobal.defaults =
 function sureBasePath( filePath, basePath )
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   if( filePath === undefined )
   filePath = filter.filePath;
@@ -3667,8 +3667,8 @@ function filteringClear()
 function moveTextualReport()
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   _.assert( filter.isPaired() );
 
@@ -3943,8 +3943,8 @@ function maskEndsApply()
 function masksGenerate()
 {
   let filter = this;
-  let fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
-  let path = fileProvider.path;
+  const fileProvider = filter.system || filter.effectiveProvider || filter.defaultProvider;
+  const path = fileProvider.path;
 
   _.assert( arguments.length === 0, 'Expects no arguments' );
   _.assert( filter.formed === 3 );

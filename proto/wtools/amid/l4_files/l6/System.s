@@ -1150,7 +1150,7 @@ function _defaultOriginSet( src )
 //
 //   for( var f in self.providersWithProtocolMap )
 //   {
-//     let fileProvider = self.providersWithProtocolMap[ f ];
+//     const fileProvider = self.providersWithProtocolMap[ f ];
 //     if( fileProvider.verbosity !== self.verbosity )
 //     debugger;
 //     // debugger;

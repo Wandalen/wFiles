@@ -220,7 +220,7 @@ function _pathsForm()
 {
   let record = this;
   let f = record.factory;
-  let fileProvider = f.effectiveProvider;
+  const fileProvider = f.effectiveProvider;
   let path = record.path
   let inputPath = record.input;
 
@@ -388,7 +388,7 @@ function _statAnalyze()
 {
   let record = this;
   let f = record.factory;
-  let fileProvider = f.effectiveProvider;
+  const fileProvider = f.effectiveProvider;
   let path = record.path;
   let logger = fileProvider.logger || _global.logger;
 
@@ -691,7 +691,7 @@ function _pathGet()
   // _.assert( !!f );
   if( !f )
   return null;
-  let fileProvider = f.system;
+  const fileProvider = f.system;
   return fileProvider.path;
 }
 
@@ -750,7 +750,7 @@ function _absoluteGlobalGet()
 {
   let record = this;
   let f = record.factory;
-  let fileProvider = f.effectiveProvider;
+  const fileProvider = f.effectiveProvider;
   return fileProvider.path.globalFromPreferred( record.absolute );
 }
 
@@ -760,7 +760,7 @@ function _realGlobalGet()
 {
   let record = this;
   let f = record.factory;
-  let fileProvider = f.effectiveProvider;
+  const fileProvider = f.effectiveProvider;
   return fileProvider.path.globalFromPreferred( record.real );
 }
 
@@ -770,7 +770,7 @@ function _absolutePreferredGet()
 {
   let record = this;
   let f = record.factory;
-  let fileProvider = f.system;
+  const fileProvider = f.system;
   return fileProvider._recordAbsoluteGlobalMaybeGet( record );
 }
 
@@ -780,7 +780,7 @@ function _realPreferredGet()
 {
   let record = this;
   let f = record.factory;
-  let fileProvider = f.system;
+  const fileProvider = f.system;
   return fileProvider._recordRealGlobalMaybeGet( record );
 }
 

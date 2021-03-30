@@ -4541,9 +4541,7 @@ function filesAreSameCommon_body( o )
 {
   let self = this;
 
-  // debugger;
   let f = self.recordFactory({ resolvingSoftLink : 0, resolvingTextLink : 0 });
-  // debugger;
 
   o.ins1 = f.record( o.ins1 );
   o.ins2 = f.record( o.ins2 );
@@ -4555,7 +4553,10 @@ function filesAreSameCommon_body( o )
   if( !o.ins2.stat )
   return false;
 
-  if( o.ins1.factory.effectiveProvider === o.ins2.factory.effectiveProvider && o.ins1.stat.ino > 0 )
+  let sameEffectiveProvider =  o.ins1.factory.effectiveProvider === o.ins2.factory.effectiveProvider;
+  let inoIsNumberBiggerZero = _.numberIs( o.ins1.stat.ino ) && o.ins1.stat.ino > 0;
+  // if( o.ins1.factory.effectiveProvider === o.ins2.factory.effectiveProvider && _.numberIs( o.ins1.stat.ino ) && o.ins1.stat.ino > 0 )
+  if( sameEffectiveProvider && inoIsNumberBiggerZero )
   {
     let could = _.files.stat.areHardLinked( o.ins1.stat, o.ins2.stat );
     if( could === true )
@@ -4569,9 +4570,9 @@ function filesAreSameCommon_body( o )
   {
     if( !o.ins2.stat.isDir() )
     return false;
-    debugger;
 
-    if( o.ins1.factory.effectiveProvider === o.ins2.factory.effectiveProvider && o.ins1.stat.ino > 0 )
+    // if( o.ins1.factory.effectiveProvider === o.ins2.factory.effectiveProvider && _.numberIs( o.ins1.stat.ino ) && o.ins1.stat.ino > 0 )
+    if( sameEffectiveProvider && inoIsNumberBiggerZero )
     if( self.UsingBigIntForStat )
     return o.ins1.ino === o.ins2.ino;
     else
@@ -4591,7 +4592,6 @@ function filesAreSameCommon_body( o )
 
   if( o.ins1.isSoftLink || o.ins2.isSoftLink )
   {
-    debugger;
     if( !o.ins1.isSoftLink || !o.ins2.isSoftLink )
     return false;
     return self.pathResolveSoftLink( o.ins1 ) === self.pathResolveSoftLink( o.ins2 );
@@ -4602,7 +4602,6 @@ function filesAreSameCommon_body( o )
   if( self.usingTextLink )
   if( o.ins1.isTextLink || o.ins2.isTextLink )
   {
-    debugger;
     if( !o.ins1.isTextLink || !o.ins2.isTextLink )
     return false;
     return self.pathResolveTextLink( o.ins1 ) === self.pathResolveTextLink( o.ins2 );
@@ -4610,7 +4609,8 @@ function filesAreSameCommon_body( o )
 
   /* hard linked */
 
-  if( o.ins1.factory.effectiveProvider === o.ins2.factory.effectiveProvider && o.ins1.stat.ino > 0 )
+  // if( o.ins1.factory.effectiveProvider === o.ins2.factory.effectiveProvider && _.numberIs( o.ins1.stat.ino ) && o.ins1.stat.ino > 0 )
+  if( sameEffectiveProvider && inoIsNumberBiggerZero )
   if( self.UsingBigIntForStat )
   if( o.ins1.stat.ino === o.ins2.stat.ino )
   return true;

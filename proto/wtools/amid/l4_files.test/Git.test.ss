@@ -1143,7 +1143,7 @@ function filesReflectEol( test )
       let autocrlfLocal = gitConfigLocalRead( localPath, 'core.autocrlf' )
       test.identical( autocrlfLocal, 'false' );
 
-      let branch = _.git.versionLocalRetrive({ localPath });
+      let branch = _.git.localVersion({ localPath });
       test.identical( branch, 'secondbranch' )
 
       let hash1 = providerDst.hashRead( path.join( localPath, 'file1' ) );
@@ -1186,7 +1186,7 @@ function filesReflectEol( test )
       let autocrlfLocal = gitConfigLocalRead( localPath, 'core.autocrlf' )
       test.identical( autocrlfLocal, 'true' );
 
-      let branch = _.git.versionLocalRetrive({ localPath });
+      let branch = _.git.localVersion({ localPath });
       test.identical( branch, 'secondbranch' )
 
       let hash1 = providerDst.hashRead( path.join( localPath, 'file1' ) );

@@ -149,7 +149,7 @@ function versionLocalChange( o )
 function versionLocalRetrive( o )
 {
   let self = this;
-  return _.git.versionLocalRetrive( o );
+  return _.git.localVersion( o );
 }
 
 //
@@ -168,7 +168,7 @@ function versionLocalRetrive( o )
 function versionRemoteLatestRetrive( o )
 {
   let self = this;
-  return _.git.versionRemoteLatestRetrive( o );
+  return _.git.remoteVersionLatest( o );
 }
 
 //
@@ -188,7 +188,7 @@ function versionRemoteLatestRetrive( o )
 function versionRemoteCurrentRetrive( o )
 {
   let self = this;
-  return _.git.versionRemoteCurrentRetrive( o );
+  return _.git.remoteVersionCurrent( o );
 }
 
 //

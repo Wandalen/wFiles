@@ -150,7 +150,7 @@ function pathFixate( o )
 function versionLocalRetrive( o )
 {
   let self = this;
-  return _.npm.versionLocalRetrive( o );
+  return _.npm.localVersion( o );
 }
 
 //
@@ -169,7 +169,7 @@ function versionLocalRetrive( o )
 function versionRemoteLatestRetrive( o )
 {
   let self = this;
-  return _.npm.versionRemoteLatestRetrive( o );
+  return _.npm.remoteVersionLatest( o );
 }
 
 //
@@ -189,7 +189,7 @@ function versionRemoteLatestRetrive( o )
 function versionRemoteCurrentRetrive( o )
 {
   let self = this;
-  return _.npm.versionRemoteCurrentRetrive( o );
+  return _.npm.remoteVersionCurrent( o );
 }
 
 //

@@ -63,7 +63,6 @@
   },
   "devDependencies": {
     "eslint": "7.1.0",
-    "wFiles": "file:.",
     "wTesting": "delta",
     "wait-sync": "=1.0.1"
   },

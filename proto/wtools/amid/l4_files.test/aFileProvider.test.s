@@ -35901,14 +35901,18 @@ function hardLinkBreaking( test )
 
   /* xxx qqq : enable : breakingSrcHardLink : 1, breakingDstHardLink : 1. discuss */
   /* xxx qqq : filesExtract does not reflect hard links. fix please */
-  var exp =
-  {
-    'file1' : ( new U8x([ 49 ]) ),
-    'file2' : ( new U8x([ 49 ]) ),
-    'file3' : ( new U8x([ 51 ]) ),
-  }
+  // var exp =
+  // {
+  //   'file1' : ( new U8x([ 49 ]) ),
+  //   'file2' : ( new U8x([ 49 ]) ),
+  //   'file3' : ( new U8x([ 51 ]) ),
+  // }
   var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
-  test.identical( got, exp );
+  // test.identical( got, exp );
+  test.identical( _.mapKeys( got ), [ 'file1', 'file2', 'file3' ] );
+  test.identical( got.file1, _.bufferTypedIs( got.file1 ) ? new U8x([ 49 ]) : '1' );
+  test.identical( got.file2, _.bufferTypedIs( got.file2 ) ? new U8x([ 49 ]) : '1' );
+  test.identical( got.file3, _.bufferTypedIs( got.file2 ) ? new U8x([ 51 ]) : '3' );
   test.true( a.fileProvider.areHardLinked( a.abs( 'file1' ), a.abs( 'file2' ) ) )
   test.true( !a.fileProvider.areHardLinked( a.abs( 'file1' ), a.abs( 'file3' ) ) )
   test.true( !a.fileProvider.areHardLinked( a.abs( 'file2' ), a.abs( 'file3' ) ) )
@@ -35922,27 +35926,37 @@ function hardLinkBreaking( test )
   a.fileProvider.fileWrite( a.abs( 'src1' ), '3' );
   a.fileProvider.fileWrite( a.abs( 'src2' ), '4' );
 
-  var exp =
-  {
-    'dst1' : ( new U8x([ 49 ]) ),
-    'dst2' : ( new U8x([ 50 ]) ),
-    'src1' : ( new U8x([ 51 ]) ),
-    'src2' : ( new U8x([ 52 ]) ),
-  }
+  // var exp =
+  // {
+  //   'dst1' : ( new U8x([ 49 ]) ),
+  //   'dst2' : ( new U8x([ 50 ]) ),
+  //   'src1' : ( new U8x([ 51 ]) ),
+  //   'src2' : ( new U8x([ 52 ]) ),
+  // }
   var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
-  test.identical( got, exp );
+  // test.identical( got, exp );
+  test.identical( _.mapKeys( got ), [ 'dst1', 'dst2', 'src1', 'src2' ] );
+  test.identical( got.dst1, _.bufferTypedIs( got.dst1 ) ? new U8x([ 49 ]) : '1' );
+  test.identical( got.dst2, _.bufferTypedIs( got.dst2 ) ? new U8x([ 50 ]) : '2' );
+  test.identical( got.src1, _.bufferTypedIs( got.src1 ) ? new U8x([ 51 ]) : '3' );
+  test.identical( got.src2, _.bufferTypedIs( got.src2 ) ? new U8x([ 52 ]) : '4' );
 
   a.fileProvider.hardLink( a.abs( 'dst1' ), a.abs( 'dst2' ) );
   a.fileProvider.hardLink( a.abs( 'src1' ), a.abs( 'src2' ) );
-  var exp =
-  {
-    'dst1' : ( new U8x([ 50 ]) ),
-    'dst2' : ( new U8x([ 50 ]) ),
-    'src1' : ( new U8x([ 52 ]) ),
-    'src2' : ( new U8x([ 52 ]) ),
-  }
+  // var exp =
+  // {
+  //   'dst1' : ( new U8x([ 50 ]) ),
+  //   'dst2' : ( new U8x([ 50 ]) ),
+  //   'src1' : ( new U8x([ 52 ]) ),
+  //   'src2' : ( new U8x([ 52 ]) ),
+  // }
   var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
-  test.identical( got, exp );
+  // test.identical( got, exp );
+  test.identical( _.mapKeys( got ), [ 'dst1', 'dst2', 'src1', 'src2' ] );
+  test.identical( got.dst1, _.bufferTypedIs( got.dst1 ) ? new U8x([ 50 ]) : '2' );
+  test.identical( got.dst2, _.bufferTypedIs( got.dst2 ) ? new U8x([ 50 ]) : '2' );
+  test.identical( got.src1, _.bufferTypedIs( got.src1 ) ? new U8x([ 52 ]) : '4' );
+  test.identical( got.src2, _.bufferTypedIs( got.src2 ) ? new U8x([ 52 ]) : '4' );
   test.true( a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'dst2' ) ) );
   test.true( !a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'src1' ) ) );
   test.true( !a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'src2' ) ) );
@@ -35964,15 +35978,20 @@ function hardLinkBreaking( test )
     breakingDstHardLink : 1,
   });
 
-  var exp =
-  {
-    'dst1' : ( new U8x([ 52 ]) ),
-    'dst2' : ( new U8x([ 50 ]) ),
-    'src1' : ( new U8x([ 52 ]) ),
-    'src2' : ( new U8x([ 52 ]) ),
-  }
+  // var exp =
+  // {
+  //   'dst1' : ( new U8x([ 52 ]) ),
+  //   'dst2' : ( new U8x([ 50 ]) ),
+  //   'src1' : ( new U8x([ 52 ]) ),
+  //   'src2' : ( new U8x([ 52 ]) ),
+  // }
   var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
-  test.identical( got, exp );
+  // test.identical( got, exp );
+  test.identical( _.mapKeys( got ), [ 'dst1', 'dst2', 'src1', 'src2' ] );
+  test.identical( got.dst1, _.bufferTypedIs( got.dst1 ) ? new U8x([ 52 ]) : '4' );
+  test.identical( got.dst2, _.bufferTypedIs( got.dst2 ) ? new U8x([ 50 ]) : '2' );
+  test.identical( got.src1, _.bufferTypedIs( got.src1 ) ? new U8x([ 52 ]) : '4' );
+  test.identical( got.src2, _.bufferTypedIs( got.src2 ) ? new U8x([ 52 ]) : '4' );
   test.true( !a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'dst2' ) ) );
   test.true( a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'src1' ) ) );
   test.true( !a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'src2' ) ) );
@@ -35994,15 +36013,20 @@ function hardLinkBreaking( test )
     breakingDstHardLink : 1,
   });
 
-  var exp =
-  {
-    'dst1' : ( new U8x([ 52 ]) ),
-    'dst2' : ( new U8x([ 50 ]) ),
-    'src1' : ( new U8x([ 52 ]) ),
-    'src2' : ( new U8x([ 52 ]) ),
-  }
+  // var exp =
+  // {
+  //   'dst1' : ( new U8x([ 52 ]) ),
+  //   'dst2' : ( new U8x([ 50 ]) ),
+  //   'src1' : ( new U8x([ 52 ]) ),
+  //   'src2' : ( new U8x([ 52 ]) ),
+  // }
   var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
-  test.identical( got, exp );
+  // test.identical( got, exp );
+  test.identical( _.mapKeys( got ), [ 'dst1', 'dst2', 'src1', 'src2' ] );
+  test.identical( got.dst1, _.bufferTypedIs( got.dst1 ) ? new U8x([ 52 ]) : '4' );
+  test.identical( got.dst2, _.bufferTypedIs( got.dst2 ) ? new U8x([ 50 ]) : '2' );
+  test.identical( got.src1, _.bufferTypedIs( got.src1 ) ? new U8x([ 52 ]) : '4' );
+  test.identical( got.src2, _.bufferTypedIs( got.src2 ) ? new U8x([ 52 ]) : '4' );
   test.true( !a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'dst2' ) ) );
   test.true( a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'src1' ) ) );
   test.true( a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'src2' ) ) );
@@ -36022,15 +36046,20 @@ function hardLinkBreaking( test )
     srcPath : a.abs( 'src1' ),
   });
 
-  var exp =
-  {
-    'dst1' : ( new U8x([ 52 ]) ),
-    'dst2' : ( new U8x([ 50 ]) ),
-    'src1' : ( new U8x([ 52 ]) ),
-    'src2' : ( new U8x([ 52 ]) ),
-  }
+  // var exp =
+  // {
+  //   'dst1' : ( new U8x([ 52 ]) ),
+  //   'dst2' : ( new U8x([ 50 ]) ),
+  //   'src1' : ( new U8x([ 52 ]) ),
+  //   'src2' : ( new U8x([ 52 ]) ),
+  // }
   var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
-  test.identical( got, exp );
+  // test.identical( got, exp );
+  test.identical( _.mapKeys( got ), [ 'dst1', 'dst2', 'src1', 'src2' ] );
+  test.identical( got.dst1, _.bufferTypedIs( got.dst1 ) ? new U8x([ 52 ]) : '4' );
+  test.identical( got.dst2, _.bufferTypedIs( got.dst2 ) ? new U8x([ 50 ]) : '2' );
+  test.identical( got.src1, _.bufferTypedIs( got.src1 ) ? new U8x([ 52 ]) : '4' );
+  test.identical( got.src2, _.bufferTypedIs( got.src2 ) ? new U8x([ 52 ]) : '4' );
   test.true( !a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'dst2' ) ) );
   test.true( a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'src1' ) ) );
   test.true( a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'src2' ) ) );
@@ -36052,15 +36081,20 @@ function hardLinkBreaking( test )
     breakingDstHardLink : 0,
   });
 
-  var exp =
-  {
-    'dst1' : ( new U8x([ 52 ]) ),
-    'dst2' : ( new U8x([ 52 ]) ),
-    'src1' : ( new U8x([ 52 ]) ),
-    'src2' : ( new U8x([ 52 ]) ),
-  }
+  // var exp =
+  // {
+  //   'dst1' : ( new U8x([ 52 ]) ),
+  //   'dst2' : ( new U8x([ 52 ]) ),
+  //   'src1' : ( new U8x([ 52 ]) ),
+  //   'src2' : ( new U8x([ 52 ]) ),
+  // }
   var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
-  test.identical( got, exp );
+  // test.identical( got, exp );
+  test.identical( _.mapKeys( got ), [ 'dst1', 'dst2', 'src1', 'src2' ] );
+  test.identical( got.dst1, _.bufferTypedIs( got.dst1 ) ? new U8x([ 52 ]) : '4' );
+  test.identical( got.dst2, _.bufferTypedIs( got.dst2 ) ? new U8x([ 52 ]) : '4' );
+  test.identical( got.src1, _.bufferTypedIs( got.src1 ) ? new U8x([ 52 ]) : '4' );
+  test.identical( got.src2, _.bufferTypedIs( got.src2 ) ? new U8x([ 52 ]) : '4' );
   test.true( a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'dst2' ) ) );
   test.true( a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'src1' ) ) );
   test.true( !a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'src2' ) ) );
@@ -36082,15 +36116,20 @@ function hardLinkBreaking( test )
     breakingDstHardLink : 0,
   });
 
-  var exp =
-  {
-    'dst1' : ( new U8x([ 49 ]) ),
-    'dst2' : ( new U8x([ 49 ]) ),
-    'src1' : ( new U8x([ 49 ]) ),
-    'src2' : ( new U8x([ 49 ]) ),
-  }
+  // var exp =
+  // {
+  //   'dst1' : ( new U8x([ 49 ]) ),
+  //   'dst2' : ( new U8x([ 49 ]) ),
+  //   'src1' : ( new U8x([ 49 ]) ),
+  //   'src2' : ( new U8x([ 49 ]) ),
+  // }
   var got = a.fileProvider.filesExtract( a.abs( '.' ) ).filesTree;
-  test.identical( got, exp );
+  // test.identical( got, exp );
+  test.identical( _.mapKeys( got ), [ 'dst1', 'dst2', 'src1', 'src2' ] );
+  test.identical( got.dst1, _.bufferTypedIs( got.dst1 ) ? new U8x([ 49 ]) : '1' );
+  test.identical( got.dst2, _.bufferTypedIs( got.dst2 ) ? new U8x([ 49 ]) : '1' );
+  test.identical( got.src1, _.bufferTypedIs( got.src1 ) ? new U8x([ 49 ]) : '1' );
+  test.identical( got.src2, _.bufferTypedIs( got.src2 ) ? new U8x([ 49 ]) : '1' );
   test.true( a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'dst2' ) ) );
   test.true( a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'src1' ) ) );
   test.true( !a.fileProvider.areHardLinked( a.abs( 'dst1' ), a.abs( 'src2' ) ) );

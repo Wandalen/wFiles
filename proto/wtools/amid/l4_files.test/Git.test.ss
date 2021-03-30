@@ -767,7 +767,7 @@ function filesReflectTrivial( test )
   return con;
 }
 
-filesReflectTrivial.timeOut = 120000;
+filesReflectTrivial.timeOut = 240000;
 
 //
 

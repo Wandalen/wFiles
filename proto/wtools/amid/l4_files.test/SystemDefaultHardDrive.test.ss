@@ -57,7 +57,7 @@ function onRoutineEnd( test )
   let context = this;
   let system = context.system || context.provider;
   _.sure( system instanceof _.FileProvider.System );
-  _.sure( _.entityIdentical( _.mapKeys( system.providersWithProtocolMap ), [ 'file', 'hd' ] ), test.name, 'has not restored system!' );
+  _.sure( _.entityIdentical( _.mapKeys( system.providersWithProtocolMap ), [ 'hd', 'file' ] ), test.name, 'has not restored system!' );
 }
 
 //
@@ -81,7 +81,7 @@ function providerMake()
 
   let provider = _.FileProvider.HardDrive
   ({
-    protocols : [ 'file', 'hd' ],
+    protocols : [ 'hd', 'file' ],
     // protocols : [ 'current', 'second' ],
   });
 

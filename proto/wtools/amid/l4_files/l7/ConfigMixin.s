@@ -8,7 +8,7 @@ const _ = _global_.wTools;
 const FileRecord = _.FileRecord;
 const Abstract = _.FileProvider.Abstract;
 const Partial = _.FileProvider.Partial;
-let Find = _.FileProvider.FindMixin;
+const Find = _.FileProvider.FindMixin;
 const fileRead = Partial.prototype.fileRead;
 
 _.assert( _.lengthOf( _.files.ReadEncoders ) > 0 );

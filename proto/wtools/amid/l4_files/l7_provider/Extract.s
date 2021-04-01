@@ -8,7 +8,7 @@ const _ = _global_.wTools;
 const Abstract = _.FileProvider.Abstract;
 const Partial = _.FileProvider.Partial;
 const FileRecord = _.FileRecord;
-let Find = _.FileProvider.FindMixin;
+const Find = _.FileProvider.FindMixin;
 
 _.assert( _.routineIs( _.FileRecord ) );
 _.assert( _.routineIs( Abstract ) );

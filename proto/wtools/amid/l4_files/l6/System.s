@@ -1079,6 +1079,7 @@ function _defaultProviderSet( src )
     self[ defaultProviderSymbol ] = src;
     self[ defaultProtocolSymbol ] = src.protocol;
     self[ defaultOriginSymbol ] = src.originPath;
+    self.UsingBigIntForStat = src.UsingBigIntForStat;
   }
   else
   {

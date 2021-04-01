@@ -185,6 +185,16 @@ function MakeDefault()
   _.assert( _.path.fileProvider === _.fileProvider );
   _.assert( _.uri.fileProvider === _.fileProvider );
 
+  _.assert( !_.fileSystem );
+  _.fileSystem = _.FileProvider.System({ empty : 1 });
+  _.fileSystem.providerRegister( _.fileProvider );
+  _.fileSystem.defaultProvider = _.fileProvider;
+
+  /* xxx : qqq : problem if HardDrive have protocol in order [ 'file', 'hd' ] instead of [ 'hd', 'file' ]
+  then system calls with path hd://... does fails
+  introduce and use field defaultProtocols for system
+  */
+
   return _.fileProvider;
 }
 

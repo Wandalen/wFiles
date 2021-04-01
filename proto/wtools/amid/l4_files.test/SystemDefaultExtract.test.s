@@ -80,7 +80,8 @@ function providerMake()
   system.providerRegister( provider );
 
   system.defaultProvider = provider;
-  system.UsingBigIntForStat = provider.UsingBigIntForStat;
+  // system.UsingBigIntForStat = provider.UsingBigIntForStat;
+  _.assert( system.UsingBigIntForStat === provider.UsingBigIntForStat );
 
   return system;
 }

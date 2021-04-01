@@ -18,9 +18,8 @@ const Self = _.files = _.files || Object.create( null );
 function _Setup()
 {
 
-  // debugger;
-  // if( !_.fileProvider )
-  // _.FileProvider.Default.MakeDefault();
+  if( !_.fileProvider )
+  _.FileProvider.Default.MakeDefault();
 
   _.path.currentAtBegin = _.path.current();
 

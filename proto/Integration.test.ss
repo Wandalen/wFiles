@@ -8,7 +8,6 @@
 if( typeof module !== 'undefined' )
 {
   let _ = require( 'wTools' );
-  debugger;
   _.include( 'wTesting' );
 }
 

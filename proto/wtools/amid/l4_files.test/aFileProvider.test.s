@@ -2896,6 +2896,28 @@ function readWriteAsync( test )
 
 //
 
+function fileWriteAutoEncodingUnknown( test )
+{
+  let context = this;
+  let a = context.assetFor( test, false );
+  let provider = a.provider;
+
+  test.case = 'json';
+  var data = { a : '1', b : 2 };
+  provider.fileWrite({ filePath : a.abs( 'file1.json' ), data, encoding : _.unknown });
+  var read = provider.fileRead({ filePath : a.abs( 'file1.json' ), encoding : _.unknown });
+  test.identical( data, read );
+
+  test.case = 'yml';
+  var data = { a : '1', b : 2 };
+  provider.fileWrite({ filePath : a.abs( 'file1.yml' ), data, encoding : _.unknown });
+  var read = provider.fileRead({ filePath : a.abs( 'file1.yml' ), encoding : _.unknown });
+  test.identical( data, read );
+
+}
+
+//
+
 function fileReadJson( test )
 {
   let context = this;
@@ -51039,6 +51061,7 @@ const Proto =
     fileWriteActSync,
     fileWriteActAsync,
 
+    fileWriteAutoEncodingUnknown,
     fileReadJson,
     fileWriteJson,
 

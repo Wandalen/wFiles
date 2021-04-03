@@ -3568,6 +3568,12 @@ _.assert( fileRead.encoders === undefined );
 
 //
 
+let fileReadUnknown = _.routine.uniteCloning( fileRead_head, fileRead_body );
+fileReadUnknown.having.aspect = 'entry';
+fileReadUnknown.defaults.encoding = _.unknown;
+
+//
+
 /**
  * Reads the entire content of a file synchronously.
  * Method returns encoded content of a file.
@@ -3613,7 +3619,7 @@ _.assert( fileRead.encoders === undefined );
  * @module Tools/mid/Files
  */
 
-let fileReadSync = _.routine.uniteCloning_( fileRead.head, fileRead.body );
+let fileReadSync = _.routine.uniteCloning( fileRead.head, fileRead.body );
 
 fileReadSync.defaults.sync = 1;
 fileReadSync.having.aspect = 'entry';
@@ -4977,6 +4983,7 @@ fileWrite.having.aspect = 'entry';
 
 //
 
+/* xxx : qqq : remove body */
 function fileAppend_body( o )
 {
   let self = this;
@@ -4995,8 +5002,14 @@ having.aspect = 'body';
 
 //
 
-let fileAppend = _.routine.uniteCloning_( fileWrite_head, fileAppend_body );
+let fileAppend = _.routine.uniteCloning( fileWrite_head, fileAppend_body );
 fileAppend.having.aspect = 'entry';
+
+//
+
+let fileWriteUnknown = _.routine.uniteCloning( fileWrite_head, fileWrite_body );
+fileWriteUnknown.having.aspect = 'entry';
+fileWriteUnknown.defaults.encoding = _.unknown;
 
 //
 
@@ -8111,10 +8124,11 @@ let Extension =
 
   fileReadAct,
   fileRead,
+  fileReadUnknown,
   fileReadSync,
-  fileReadJson,
-  fileReadJs,
-  fileInterpret,
+  fileReadJson, /* xxx : qqq : redo with head and body of fileRead */
+  fileReadJs, /* xxx : qqq : redo with head and body of fileRead */
+  fileInterpret, /* xxx : remove */
 
   hashReadAct,
   hashRead,
@@ -8143,8 +8157,9 @@ let Extension =
   fileWriteAct,
   fileWrite,
   fileAppend,
-  fileWriteJson,
-  fileWriteJs,
+  fileWriteUnknown,
+  fileWriteJson, /* xxx : qqq : redo with head and body of fileWrite */
+  fileWriteJs, /* xxx : qqq : redo with head and body of fileWrite */
   fileTouch,
 
   timeWriteAct,

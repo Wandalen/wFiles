@@ -12,7 +12,7 @@
     { "name" : "Volodymyr M.", "email" : "volodymyr.migdal@gmail.com" },
     { "name" : "Ihor Ostash", "email" : "iostashvxi@gmail.com" }
   ],
-  "main" : "/pro/module/wFiles/proto/node_modules/wFiles",
+  "main" : "proto/node_modules/wFiles",
   "files" : [ "proto/wtools/amid/l4_files", "proto/wtools/Tools.s", "out", "proto/node_modules" ],
   "scripts" : { "test" : "wtest .run 'proto/**' rapidity:-1", "docgen" : "wdocgen proto" },
   "repository" : { "type" : "git", "url" : "https://github.com/Wandalen/wFiles.git" },

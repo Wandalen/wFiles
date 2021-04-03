@@ -1233,15 +1233,17 @@ function tempCloseAfter( test )
 {
   let a = test.assetFor( false );
   let toolsPath = __.strEscape( a.path.nativize( a.path.join( __dirname, '../../../wtools/Tools.s' ) ) );
-  let programSourceCode =
-`
-var toolsPath = '${toolsPath}';
-${program.toString()}
-program();
-`
+//   let programSourceCode =
+// `
+// var toolsPath = '${toolsPath}';
+// ${program.toString()}
+// program();
+// `
 
-  a.fileProvider.fileWrite( a.abs( 'Program.js' ), programSourceCode );
-  a.appStartNonThrowing({ execPath : a.abs( 'Program.js' ) })
+  // a.fileProvider.fileWrite( a.abs( 'Program.js' ), programSourceCode );
+  let programPath = a.program( program );
+  // a.appStartNonThrowing({ execPath : a.abs( 'Program.js' ) })
+  a.appStartNonThrowing({ execPath : programPath })
   .then( ( op ) =>
   {
     test.identical( _.strCount( op.output, 'tempDirCreated' ), 1 );
@@ -1256,7 +1258,6 @@ program();
   {
     let _ = require( toolsPath );
     _.include( 'wFiles' );
-
     var tempPath = _.path.tempOpen( _.path.normalize( __dirname ), 'tempCloseAfter' );
     if( _.fileProvider.isDir( tempPath ) )
     console.log( 'tempDirCreated' );

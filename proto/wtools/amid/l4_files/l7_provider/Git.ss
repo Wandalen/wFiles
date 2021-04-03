@@ -112,7 +112,6 @@ function pathIsFixated( filePath )
  * @summary Changes hash in provided path `o.remotePath` to hash of latest commit available.
  * @param {Object} o Options map.
  * @param {String} o.remotePath Remote path.
- * @param {Number} o.verbosity=0 Level of verbosity.
  * @function pathFixate
  * @class wFileProviderGit
  * @namespace wTools.FileProvider
@@ -139,7 +138,6 @@ function versionLocalChange( o )
  * @summary Returns hash of latest commit from git repository located at `o.localPath`.
  * @param {Object} o Options map.
  * @param {String} o.localPath Path to git repository on hard drive.
- * @param {Number} o.verbosity=0 Level of verbosity.
  * @function versionLocalRetrive
  * @class wFileProviderGit
  * @namespace wTools.FileProvider
@@ -158,7 +156,6 @@ function versionLocalRetrive( o )
  * @summary Returns hash of latest commit from git repository using its remote path `o.remotePath`.
  * @param {Object} o Options map.
  * @param {String} o.remotePath Remote path to git repository.
- * @param {Number} o.verbosity=0 Level of verbosity.
  * @function versionRemoteLatestRetrive
  * @class wFileProviderGit
  * @namespace wTools.FileProvider
@@ -178,7 +175,6 @@ function versionRemoteLatestRetrive( o )
  * @description Returns hash of latest commit if no hash specified in remote path.
  * @param {Object} o Options map.
  * @param {String} o.remotePath Remote path.
- * @param {Number} o.verbosity=0 Level of verbosity.
  * @function versionRemoteCurrentRetrive
  * @class wFileProviderGit
  * @namespace wTools.FileProvider
@@ -198,7 +194,6 @@ function versionRemoteCurrentRetrive( o )
  * @param {Object} o Options map.
  * @param {String} o.localPath Local path to repository.
  * @param {String} o.remotePath Remote path to repository.
- * @param {Number} o.verbosity=0 Level of verbosity.
  * @function isUpToDate
  * @class wFileProviderGit
  * @namespace wTools.FileProvider
@@ -217,7 +212,6 @@ function isUpToDate( o )
  * @summary Returns true if path `o.localPath` contains a git repository.
  * @param {Object} o Options map.
  * @param {String} o.localPath Local path to package.
- * @param {Number} o.verbosity=0 Level of verbosity.
  * @function hasFiles
  * @class wFileProviderGit
  * @namespace wTools.FileProvider
@@ -341,6 +335,7 @@ function filesReflectSingle_body( o )
   let shell = _.process.starter
   ({
     verbosity : o.verbosity - 1,
+    // logger : _.logger.relative( o.verbosity, -1 ), /* xxx : qqq : use filesReflect and in starter */
     ready,
     currentPath : dstPath,
   });
@@ -397,7 +392,7 @@ function filesReflectSingle_body( o )
     ({
       remotePath : parsed,
       localPath : dstPath,
-      verbosity : o.verbosity - 1
+      logger : o.verbosity - 1
     }))
 
   }
@@ -451,7 +446,7 @@ function filesReflectSingle_body( o )
       ({
         localPath : dstPath,
         pop : 0,
-        verbosity : o.verbosity - 1
+        logger : o.verbosity - 1
       })
     })
 
@@ -515,7 +510,7 @@ function filesReflectSingle_body( o )
     ({
       remotePath : parsed,
       localPath : dstPath,
-      verbosity : o.verbosity - 1,
+      logger : o.verbosity - 1,
     })
     .catch( ( err ) =>
     {
@@ -533,7 +528,7 @@ function filesReflectSingle_body( o )
     return _.git.repositoryMerge
     ({
       localPath : dstPath,
-      verbosity : o.verbosity - 1
+      logger : o.verbosity - 1
     })
     .catch( ( err ) =>
     {
@@ -559,7 +554,7 @@ function filesReflectSingle_body( o )
     ({
       localPath : dstPath,
       pop : 1,
-      verbosity : o.verbosity - 1
+      logger : o.verbosity - 1
     })
     .catch( ( err ) =>
     {
@@ -576,7 +571,7 @@ function filesReflectSingle_body( o )
   {
     if( self.throwingGitErrors )
     throw _.errBrief( err );
-    else if( o.verbosity )
+    else if( o.logger && o.logger.verbosity >= 1 )
     self.logger.log( err );
   }
 

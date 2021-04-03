@@ -2,15 +2,12 @@ format: outwillfile-2.0
 root:
   - wFiles.out
 consistency:
-  wFiles.out.will.yml: &ref_0
-    hash: 8500917d2d86975287c477e87163da41
-    size: 50110
-  ../.ex.will.yml: &ref_1
+  ../.ex.will.yml: &ref_0
     hash: 44aae3aa1e40366fe4fa1fe181dc6bc6
     size: 3243
-  ../.im.will.yml: &ref_2
-    hash: ec7bba06a72d1221ab139fffc6c0e5ce
-    size: 6688
+  ../.im.will.yml: &ref_1
+    hash: c797261f9d8d11265715ce0ff084e5f2
+    size: 6372
 module:
   wFiles.out:
     about:
@@ -37,24 +34,24 @@ module:
         module to keep DRY.
       enabled: 1
       version: 0.7.0
-      interpreters:
+      interpreters: &ref_2
         - njs >= 10.0.0
         - chrome >= 60.0.0
         - firefox >= 60.0.0
-      keywords:
+      keywords: &ref_3
         - wTools
         - wFiles
         - file
         - standardized abstract interface
       license: MIT
       author: Kostiantyn Wandalen <wanalen@01.school>
-      contributors:
+      contributors: &ref_4
         - Kostiantyn Wandalen <wanalen@01.school>
         - Volodymyr M. <volodymyr.migdal@gmail.com>
         - Ihor O. <iostashvxi@gmail.com>
         - Dmytro Kryvoruchko <dm.vict.kr@gmail.com>
       npm.name: wFiles
-      npm.scripts:
+      npm.scripts: &ref_5
         test: wtest .run proto/**
         test2: >-
           wtest .run proto/**/wtools/amid/file.test/Provider.HardDrive.test.ss
@@ -91,7 +88,7 @@ module:
       download:
         criterion:
           predefined: 1
-        path: ../
+        path: ..
       repository:
         path: 'git+https:///github.com/Wandalen/wFiles.git'
       origins:
@@ -172,6 +169,10 @@ module:
           raw: compiled
           content: prime
         path: '{path::out.*=}/source/Index.s'
+      npm.proto.entry:
+        path:
+          - ../proto/wtools/amid/l4_files/entry/Files.s
+          - ../proto/node_modules/wFiles
       exported.dir.proto.export:
         criterion:
           generated: 1
@@ -898,24 +899,6 @@ module:
           content: prime
         inherit:
           - files.transpile
-      exported.proto.export:
-        opts:
-          filePath: 'reflector::exported.proto.export'
-        criterion:
-          generated: 1
-          content: proto
-          export: 1
-        inherit:
-          - files.reflect
-      exported.files.proto.export:
-        opts:
-          filePath: 'reflector::exported.files.proto.export'
-        criterion:
-          generated: 1
-          content: proto
-          export: 1
-        inherit:
-          - files.reflect
     build:
       proto.export:
         steps:
@@ -1004,9 +987,8 @@ module:
           content: proto
           export: 1
     consistency:
-      wFiles.out.will.yml: *ref_0
-      ../.ex.will.yml: *ref_1
-      ../.im.will.yml: *ref_2
+      ../.ex.will.yml: *ref_0
+      ../.im.will.yml: *ref_1
   ../:
     about:
       name: wFiles
@@ -1032,32 +1014,13 @@ module:
         module to keep DRY.
       enabled: 1
       version: 0.7.0
-      interpreters:
-        - njs >= 10.0.0
-        - chrome >= 60.0.0
-        - firefox >= 60.0.0
-      keywords:
-        - wTools
-        - wFiles
-        - file
-        - standardized abstract interface
+      interpreters: *ref_2
+      keywords: *ref_3
       license: MIT
       author: Kostiantyn Wandalen <wanalen@01.school>
-      contributors:
-        - Kostiantyn Wandalen <wanalen@01.school>
-        - Volodymyr M. <volodymyr.migdal@gmail.com>
-        - Ihor O. <iostashvxi@gmail.com>
-        - Dmytro Kryvoruchko <dm.vict.kr@gmail.com>
+      contributors: *ref_4
       npm.name: wFiles
-      npm.scripts:
-        test: wtest .run proto/**
-        test2: >-
-          wtest .run proto/**/wtools/amid/file.test/Provider.HardDrive.test.ss
-          routine : linkHardSyncRunner
-        test3: >-
-          wtest .run proto/**/wtools/amid/file.test/Provider.HardDrive.test.ss
-          routine : linkHardAsyncRunner
-        docgen: wdocgen .build proto
+      npm.scripts: *ref_5
     path:
       module.willfiles:
         criterion:
@@ -1086,7 +1049,7 @@ module:
       download:
         criterion:
           predefined: 1
-        path: ./
+        path: .
       repository:
         path: 'git+https:///github.com/Wandalen/wFiles.git'
       origins:
@@ -1167,6 +1130,10 @@ module:
           raw: compiled
           content: prime
         path: '{path::out.*=}/source/Index.s'
+      npm.proto.entry:
+        path:
+          - proto/wtools/amid/l4_files/entry/Files.s
+          - proto/node_modules/wFiles
     submodule:
       wTools:
         path: 'npm:///wTools'
@@ -1815,6 +1782,5 @@ module:
         hash: 44aae3aa1e40366fe4fa1fe181dc6bc6
         size: 3243
       ../.im.will.yml:
-        hash: ec7bba06a72d1221ab139fffc6c0e5ce
-        size: 6688
-      wFiles.out.will.yml: *ref_0
+        hash: c797261f9d8d11265715ce0ff084e5f2
+        size: 6372

@@ -27,7 +27,7 @@ var filesTree = /* xxx : remove? */
 
 function onSuiteBegin()
 {
-  var context = this;
+  let context = this;
 
   context.provider = _.FileProvider.System({ empty : 1 });
 

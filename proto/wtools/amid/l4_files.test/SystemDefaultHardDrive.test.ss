@@ -23,7 +23,7 @@ _.assert( !!Parent );
 
 function onSuiteBegin()
 {
-  var context = this;
+  let context = this;
 
   context.suiteTempPath = _.path.tempOpen( _.path.join( __dirname, '../..'  ), 'System/HardDrive' );
 
@@ -64,7 +64,7 @@ function onRoutineEnd( test )
 
 function pathFor( filePath )
 {
-  var context = this;
+  let context = this;
 
   filePath =  _.path.join( context.suiteTempPath,  filePath );
 

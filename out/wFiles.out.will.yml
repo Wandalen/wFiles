@@ -1825,6 +1825,4 @@ module:
       ../.im.will.yml:
         hash: 7564735aa2387b85a20cdcd457e282d8
         size: 6334
-      wFiles.out.will.yml:
-        hash: d32b2929e2277f7fe562894a5eefae1a
-        size: 50540
+      wFiles.out.will.yml: *ref_0

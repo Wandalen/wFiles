@@ -8,7 +8,7 @@ var Path, Process;
 if( typeof module !== 'undefined' )
 {
 
-  let _ = require( '../../../wtools/Tools.s' );
+  let _ = require( '../../../node_modules/Tools' );
 
   if( !_global_.wTools.FileProvider )
   require( '../l4_files/entry/Files.s' );
@@ -1232,7 +1232,7 @@ function pathDirTemp( test )
 function tempCloseAfter( test )
 {
   let a = test.assetFor( false );
-  let toolsPath = __.strEscape( a.path.nativize( a.path.join( __dirname, '../../../wtools/Tools.s' ) ) );
+  let toolsPath = __.strEscape( a.path.nativize( a.path.join( __dirname, '../../../node_modules/Tools' ) ) );
 //   let programSourceCode =
 // `
 // var toolsPath = '${toolsPath}';

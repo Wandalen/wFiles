@@ -5,7 +5,7 @@
 
 // if( typeof module !== 'undefined' )
 // {
-//   let _ = require( '../../../../wtools/Tools.s' );
+//   let _ = require( '../../../../node_modules/Tools' );
 //   if( !_.FileProvider )
 //   require( '../UseMid.s' );
 // }

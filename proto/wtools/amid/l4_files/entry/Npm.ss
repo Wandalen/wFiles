@@ -10,7 +10,7 @@
 
 if( typeof module !== 'undefined' )
 {
-  let _ = require( '../../../../wtools/Tools.s' );
+  let _ = require( '../../../../node_modules/Tools' );
   require( '../include/Npm.ss' )
   module[ 'exports' ] = _;
 }

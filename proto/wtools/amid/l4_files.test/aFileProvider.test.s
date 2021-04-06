@@ -6,7 +6,7 @@
 let crypto;
 if( typeof module !== 'undefined' )
 {
-  let _ = require( '../../../wtools/Tools.s' );
+  let _ = require( '../../../node_modules/Tools' );
   require( '../l4_files/entry/Files.s' );
   _.include( 'wTesting' );
   crypto = require( 'crypto' );

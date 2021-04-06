@@ -4,7 +4,7 @@ require( 'wFiles' )
 
 var _ = wTools;
 
-var dir = _.path.join( __dirname, '../proto/wtools/Tools.s' );
+var dir = _.path.join( __dirname, '../proto/node_modules/Tools' );
 var o =
 {
   defaultProvider : _.fileProvider,

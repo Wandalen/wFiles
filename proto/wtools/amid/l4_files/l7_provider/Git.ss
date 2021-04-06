@@ -6,7 +6,7 @@
 // if( typeof module !== 'undefined' )
 // {
 //
-//   let _ = require( '../../../../node_modules/Tools' );
+//   const _ = require( '../../../../node_modules/Tools' );
 //   if( !_.FileProvider )
 //   require( '../UseMid.s' );
 //

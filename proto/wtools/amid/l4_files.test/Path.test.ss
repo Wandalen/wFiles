@@ -8,7 +8,7 @@ var Path, Process;
 if( typeof module !== 'undefined' )
 {
 
-  let _ = require( '../../../node_modules/Tools' );
+  const _ = require( '../../../node_modules/Tools' );
 
   if( !_global_.wTools.FileProvider )
   require( '../l4_files/entry/Files.s' );
@@ -1256,7 +1256,7 @@ function tempCloseAfter( test )
 
   function program()
   {
-    let _ = require( toolsPath );
+    const _ = require( toolsPath );
     _.include( 'wFiles' );
     var tempPath = _.path.tempOpen( _.path.normalize( __dirname ), 'tempCloseAfter' );
     if( _.fileProvider.isDir( tempPath ) )
@@ -1779,7 +1779,7 @@ function nextPathDirTempIndexLock( test )
 
   function program()
   {
-    let _ = require( toolsPath );
+    const _ = require( toolsPath );
     _.path.IndexLockTimeOut = 5000;
     _.path.tempOpen
     ({
@@ -1839,7 +1839,7 @@ function nextPathDirTempIndexLockThrowing( test )
 
   function program()
   {
-    let _ = require( toolsPath );
+    const _ = require( toolsPath );
     _.path.IndexLockTimeOut = 5000;
     _.path.tempOpen
     ({

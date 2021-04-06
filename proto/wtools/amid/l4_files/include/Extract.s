@@ -5,7 +5,7 @@
 
 if( typeof module !== 'undefined' )
 {
-  let _ = require( '../../../../node_modules/Tools' );
+  const _ = require( '../../../../node_modules/Tools' );
 
   // _.include( 'wFilesBasic' );
   require( '../l7_provider/Extract.s' );

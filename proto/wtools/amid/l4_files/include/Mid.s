@@ -5,7 +5,7 @@
 
 if( typeof module !== 'undefined' )
 {
-  let _ = require( './Basic.s' );
+  const _ = require( './Basic.s' );
 
   _.assert( !!_.FieldsStack );
   _.assert( !_.FileRecord );

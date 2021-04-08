@@ -1327,8 +1327,6 @@ function fileCopyAct( o )
   let self = this;
   let srcFile;
 
-  debugger;
-
   _.assert( arguments.length === 1, 'Expects single argument' );
   _.assertRoutineOptions( fileCopyAct, arguments );
   _.assert( self.path.isNormalized( o.srcPath ) );

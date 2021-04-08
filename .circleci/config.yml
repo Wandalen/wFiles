@@ -13,7 +13,11 @@ jobs :
       - run : node -v
       - node/install-packages :
           with-cache : false
-          override-ci-command : npm install
+          override-ci-command : npm install -g willbe
+      # - node/install-packages :
+      #     with-cache : false
+      #     override-ci-command : npm install
+      - run : will .npm.install
       - run : npm test
 workflows :
   test :

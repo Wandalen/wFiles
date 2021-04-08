@@ -50847,7 +50847,7 @@ function encoderDeduce( test )
 
   var encoding = _.files.encoder.deduce
   ({
-    filePath : a.abs( 'path.js' ),
+    filePath : test.context.globalFromPreferred( a.abs( 'path.js' ) ),
     feature : { reader : true },
     returning : 'name',
     single : 1
@@ -50858,7 +50858,7 @@ function encoderDeduce( test )
 
   var encoding = _.files.encoder.deduce
   ({
-    filePath : a.abs( 'path' ),
+    filePath : test.context.globalFromPreferred( a.abs( 'path' ) ),
     ext : 'js',
     feature : { reader : true },
     returning : 'name',
@@ -50870,7 +50870,7 @@ function encoderDeduce( test )
 
   var encoding = _.files.encoder.deduce
   ({
-    filePath : a.abs( 'path.s' ),
+    filePath : test.context.globalFromPreferred( a.abs( 'path.s' ) ),
     feature : { reader : true },
     returning : 'name',
     single : 1
@@ -50881,7 +50881,7 @@ function encoderDeduce( test )
 
   var encoding = _.files.encoder.deduce
   ({
-    filePath : a.abs( 'path' ),
+    filePath : test.context.globalFromPreferred( a.abs( 'path' ) ),
     ext : 's',
     feature : { reader : true },
     returning : 'name',
@@ -50893,7 +50893,7 @@ function encoderDeduce( test )
 
   var encoding = _.files.encoder.deduce
   ({
-    filePath : a.abs( 'path.ss' ),
+    filePath : test.context.globalFromPreferred( a.abs( 'path.ss' ) ),
     feature : { reader : true },
     returning : 'name',
     single : 1
@@ -50904,7 +50904,7 @@ function encoderDeduce( test )
 
   var encoding = _.files.encoder.deduce
   ({
-    filePath : a.abs( 'path' ),
+    filePath : test.context.globalFromPreferred( a.abs( 'path' ) ),
     ext : 'ss',
     feature : { reader : true },
     returning : 'name',
@@ -50916,7 +50916,7 @@ function encoderDeduce( test )
 
   var encoding = _.files.encoder.deduce
   ({
-    filePath : a.abs( 'path.out.will.yml' ),
+    filePath : test.context.globalFromPreferred( a.abs( 'path.out.will.yml' ) ),
     feature : { reader : true },
     returning : 'name',
     single : 1
@@ -50927,7 +50927,7 @@ function encoderDeduce( test )
 
   var encoding = _.files.encoder.deduce
   ({
-    filePath : a.abs( 'path.out.will' ),
+    filePath : test.context.globalFromPreferred( a.abs( 'path.out.will' ) ),
     ext : 'yml',
     feature: { reader : true },
     returning : 'name',
@@ -51052,7 +51052,7 @@ function encoderDeduce( test )
     {
       _.files.encoder.deduce
       ({
-        filePath : a.abs( 'path.out.will' ),
+        filePath : test.context.globalFromPreferred( a.abs( 'path.out.will' ) ),
         feature : { reader : true },
         returning : 'name'
       })

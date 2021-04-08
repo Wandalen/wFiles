@@ -3,6 +3,7 @@
 
 'use strict';
 
+/* xxx : qqq : use sleep instead of waitSync. remove waitSync */
 var waitSync;
 
 if( typeof module !== 'undefined' )
@@ -3458,7 +3459,7 @@ function filesAreOnSameDevice( test )
 const Proto =
 {
 
-  name : 'Tools.mid.files.Secondary.ss',
+  name : 'Tools.files.Secondary.ss',
   silencing : 1,
   enabled : 1,
 

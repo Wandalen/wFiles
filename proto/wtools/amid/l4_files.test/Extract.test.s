@@ -11,7 +11,7 @@ if( typeof module !== 'undefined' )
 //
 
 const _ = _global_.wTools;
-const Parent = wTests[ 'Tools.mid.files.fileProvider.Abstract' ];
+const Parent = wTests[ 'Tools.files.fileProvider.Abstract' ];
 _.assert( !!Parent );
 
 // --
@@ -128,7 +128,7 @@ function copy( test )
 const Proto =
 {
 
-  name : 'Tools.mid.files.fileProvider.Extract',
+  name : 'Tools.files.fileProvider.Extract',
   silencing : 1,
   abstract : 0,
   enabled : 1,

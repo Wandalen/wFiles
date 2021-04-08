@@ -5,15 +5,10 @@
 
 if( typeof module !== 'undefined' )
 {
-
   const _ = require( '../../../node_modules/Tools' );
-
   _.include( 'wTesting' );
   _.include( 'wFiles' );
   _.include( 'wFilesArchive' );
-
-  let waitSync = require( 'wait-sync' );
-
 }
 
 //
@@ -304,7 +299,7 @@ function trivial( test )
 const Proto =
 {
 
-  name : 'Tools.mid.files.Graph',
+  name : 'Tools.files.Graph',
   silencing : 1,
   enabled : 1,
   routineTimeOut : 15000,

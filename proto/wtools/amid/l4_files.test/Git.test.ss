@@ -1873,7 +1873,7 @@ filesReflectFetchingTags.timeOut = 60000;
 const Proto =
 {
 
-  name : 'Tools.mid.files.fileProvider.Git',
+  name : 'Tools.files.fileProvider.Git',
   abstract : 0,
   silencing : 1,
   enabled : 1,

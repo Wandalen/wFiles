@@ -488,7 +488,7 @@ filesReflectTrivial.timeOut = 240000;
 const Proto =
 {
 
-  name : 'Tools.mid.files.fileProvider.Npm',
+  name : 'Tools.files.fileProvider.Npm',
   abstract : 0,
   silencing : 1,
   enabled : 1,

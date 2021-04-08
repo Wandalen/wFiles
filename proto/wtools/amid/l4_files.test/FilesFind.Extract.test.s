@@ -11,7 +11,7 @@ if( typeof module !== 'undefined' )
 //
 
 const _ = _global_.wTools;
-const Parent = wTests[ 'Tools.mid.files.FilesFind.Abstract' ];
+const Parent = wTests[ 'Tools.files.FilesFind.Abstract' ];
 
 _.assert( !!Parent );
 
@@ -61,7 +61,7 @@ function onSuiteEnd()
 const Proto =
 {
 
-  name : 'Tools.mid.files.FilesFind.Extract',
+  name : 'Tools.files.FilesFind.Extract',
   silencing : 1,
   abstract : 0,
   enabled : 1,

@@ -13,7 +13,7 @@ if( typeof module !== 'undefined' )
 //
 
 const _ = _global_.wTools;
-const Parent = wTests[ 'Tools.mid.files.fileProvider.system.default.Abstract' ];
+const Parent = wTests[ 'Tools.files.fileProvider.system.default.Abstract' ];
 
 _.assert( !!Parent );
 
@@ -25,8 +25,6 @@ function onSuiteBegin()
 {
   let context = this;
 
-  context.suiteTempPath = _.path.tempOpen( _.path.join( __dirname, '../..'  ), 'System/HardDrive' );
-
   context.providerEffective = _.FileProvider.HardDrive();
 
   context.provider = _.FileProvider.System({ empty : 1 });
@@ -35,6 +33,9 @@ function onSuiteBegin()
   context.globalFromPreferred =
   _.routineJoin( context.providerEffective.path, context.providerEffective.path.globalFromPreferred );
   context.provider.UsingBigIntForStat = context.providerEffective.UsingBigIntForStat;
+
+  let path = context.providerEffective.path;
+  context.suiteTempPath = path.tempOpen( path.join( __dirname, '../..'  ), 'System/HardDrive' );
 
 }
 
@@ -45,9 +46,10 @@ function onSuiteEnd()
   let context = this;
   context.providerEffective.finit();
   context.provider.finit();
-  _.assert( _.strHas( this.suiteTempPath, '.tmp' ), this.suiteTempPath );
-  // this.providerEffective.filesDelete({ filePath : this.suiteTempPath });
-  _.path.tempClose( this.suiteTempPath );
+
+  let path = context.providerEffective.path;
+  _.assert( _.strHas( context.suiteTempPath, '.tmp' ), context.suiteTempPath );
+  path.tempClose( context.suiteTempPath );
 }
 
 //
@@ -99,7 +101,7 @@ function providerMake()
 const Proto =
 {
 
-  name : 'Tools.mid.files.fileProvider.system.default.HardDrive',
+  name : 'Tools.files.fileProvider.system.default.HardDrive',
   abstract : 0,
   silencing : 1,
   enabled : 1,

@@ -51024,7 +51024,7 @@ hardLinkExperiment.experimental = 1;
 const Proto =
 {
 
-  name : 'Tools.mid.files.fileProvider.Abstract',
+  name : 'Tools.files.fileProvider.Abstract',
   abstract : 1,
   silencing : 1,
   routineTimeOut : 60000,

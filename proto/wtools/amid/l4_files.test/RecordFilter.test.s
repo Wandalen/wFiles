@@ -9923,7 +9923,7 @@ function pathsSupplementJoiningLogical( test )
 const Proto =
 {
 
-  name : 'Tools.mid.files.RecordFilter',
+  name : 'Tools.files.RecordFilter',
   silencing : 1,
 
   onSuiteBegin,

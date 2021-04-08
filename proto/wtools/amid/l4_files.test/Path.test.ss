@@ -1861,7 +1861,7 @@ Second process exits with lock error after timeout.
 const Proto =
 {
 
-  name : 'Tools.mid.files.Paths',
+  name : 'Tools.files.Paths',
   silencing : 1,
 
   onSuiteBegin,

@@ -1488,7 +1488,7 @@ recordSystemExperiment.experimental = 1;
 const Proto =
 {
 
-  name : 'Tools.mid.files.Record',
+  name : 'Tools.files.Record',
   silencing : 1,
 
   onSuiteBegin,

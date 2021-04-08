@@ -3,17 +3,14 @@
 
 'use strict';
 
+let crypto;
+
 if( typeof module !== 'undefined' )
 {
   const _ = require( '../../../node_modules/Tools' );
-
   _.include( 'wTesting' );
-
   require( '../l4_files/entry/Files.s' );
-
-  var crypto = require( 'crypto' );
-  var waitSync = require( 'wait-sync' );
-
+  crypto = require( 'crypto' );
 }
 
 //
@@ -38613,7 +38610,7 @@ filesReflectExperiment.experimental = 1;
 const Proto =
 {
 
-  name : 'Tools.mid.files.FilesFind.Abstract',
+  name : 'Tools.files.FilesFind.Abstract',
   abstract : 1,
   silencing : 1,
   routineTimeOut : 200000,

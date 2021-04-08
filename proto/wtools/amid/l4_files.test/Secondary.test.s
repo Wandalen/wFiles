@@ -722,7 +722,7 @@ function configRead( test )
 const Proto =
 {
 
-  name : 'Tools.mid.files.Secondary.s',
+  name : 'Tools.files.Secondary.s',
   silencing : 1,
   // verbosity : 7,
 

@@ -13,7 +13,7 @@ if( typeof module !== 'undefined' )
 //
 
 const _ = _global_.wTools;
-const Parent = wTests[ 'Tools.mid.files.fileProvider.Abstract' ];
+const Parent = wTests[ 'Tools.files.fileProvider.Abstract' ];
 
 _.assert( !!Parent );
 
@@ -40,7 +40,7 @@ function onRoutineEnd( test )
 const Proto =
 {
 
-  name : 'Tools.mid.files.fileProvider.system.default.Abstract',
+  name : 'Tools.files.fileProvider.system.default.Abstract',
   abstract : 1,
   silencing : 1,
 

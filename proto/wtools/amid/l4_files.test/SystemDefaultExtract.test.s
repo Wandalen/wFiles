@@ -5,23 +5,21 @@
 
 if( typeof module !== 'undefined' )
 {
-
   require( './aFileProviderSystemDefault.test.s' );
-
 }
 
 //
 
 const _ = _global_.wTools;
-const Parent = wTests[ 'Tools.mid.files.fileProvider.system.default.Abstract' ];
+const Parent = wTests[ 'Tools.files.fileProvider.system.default.Abstract' ];
 
 _.assert( !!Parent );
 
+// //
 //
-
-var filesTree = /* xxx : remove? */
-{
-}
+// var filesTree = /* xxx : remove? */
+// {
+// }
 
 //
 
@@ -30,7 +28,6 @@ function onSuiteBegin()
   let context = this;
 
   context.provider = _.FileProvider.System({ empty : 1 });
-
   context.providerEffective = _.FileProvider.Extract
   ({
     protocols : [ 'current', 'second' ],
@@ -43,15 +40,9 @@ function onSuiteBegin()
   _.routineJoin( context.providerEffective.path, context.providerEffective.path.globalFromPreferred );
   context.provider.UsingBigIntForStat = context.providerEffective.UsingBigIntForStat;
 
-}
+  let path = context.providerEffective .path;
+  context.suiteTempPath = path.tempOpen( path.join( __dirname, '../..'  ), 'System/Extract' );
 
-//
-
-function onRoutineEnd( test )
-{
-  let context = this;
-  let provider = context.provider;
-  _.sure( _.arraySetIdentical( _.mapKeys( provider.providersWithProtocolMap ), [ 'second', 'current' ] ), test.name, 'has not restored system!' );
 }
 
 //
@@ -61,6 +52,20 @@ function onSuiteEnd()
   let context = this;
   context.providerEffective.finit();
   context.provider.finit();
+
+  let path = context.providerEffective.path;
+  _.assert( _.strHas( context.suiteTempPath, '.tmp' ), context.suiteTempPath );
+  path.tempClose( context.suiteTempPath );
+
+}
+
+//
+
+function onRoutineEnd( test )
+{
+  let context = this;
+  let provider = context.provider;
+  _.sure( _.arraySetIdentical( _.mapKeys( provider.providersWithProtocolMap ), [ 'second', 'current' ] ), test.name, 'has not restored system!' );
 }
 
 //
@@ -93,7 +98,7 @@ function providerMake()
 const Proto =
 {
 
-  name : 'Tools.mid.files.fileProvider.system.default.Extract',
+  name : 'Tools.files.fileProvider.system.default.Extract',
   abstract : 0,
   silencing : 1,
   enabled : 1,
@@ -105,8 +110,7 @@ const Proto =
   context :
   {
     providerMake,
-
-    filesTree,
+    // filesTree,
     provider : null,
     providerEffective : null,
     globalFromPreferred : null

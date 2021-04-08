@@ -239,7 +239,7 @@ function streamReadProviderWithSystem( test )
 const Proto =
 {
 
-  name : 'Tools.mid.files.fileProvider.Http',
+  name : 'Tools.files.fileProvider.Http',
   silencing : 1,
   enabled : 1,
 

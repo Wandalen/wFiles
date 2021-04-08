@@ -50834,6 +50834,268 @@ function encodersFromGdfs( test )
   }
 }
 
+//
+
+function encoderDeduce( test )
+{
+  let context = this;
+  let a = context.assetFor( test, false );
+
+  /* */
+
+  test.open( 'single' );
+
+  var encoding = _.files.encoder.deduce
+  ({
+    filePath : a.abs( 'path.js' ),
+    feature : { reader : true },
+    returning : 'name',
+    single : 1
+  })
+  test.identical( encoding, 'js.structure' );
+
+  /* */
+
+  var encoding = _.files.encoder.deduce
+  ({
+    filePath : a.abs( 'path' ),
+    ext : 'js',
+    feature : { reader : true },
+    returning : 'name',
+    single : 1
+  })
+  test.identical( encoding, 'js.structure' );
+
+  /* */
+
+  var encoding = _.files.encoder.deduce
+  ({
+    filePath : a.abs( 'path.s' ),
+    feature : { reader : true },
+    returning : 'name',
+    single : 1
+  })
+  test.identical( encoding, 'js.structure' );
+
+  /* */
+
+  var encoding = _.files.encoder.deduce
+  ({
+    filePath : a.abs( 'path' ),
+    ext : 's',
+    feature : { reader : true },
+    returning : 'name',
+    single : 1
+  })
+  test.identical( encoding, 'js.structure' );
+
+  /* */
+
+  var encoding = _.files.encoder.deduce
+  ({
+    filePath : a.abs( 'path.ss' ),
+    feature : { reader : true },
+    returning : 'name',
+    single : 1
+  })
+  test.identical( encoding, 'js.structure' );
+
+  /* */
+
+  var encoding = _.files.encoder.deduce
+  ({
+    filePath : a.abs( 'path' ),
+    ext : 'ss',
+    feature : { reader : true },
+    returning : 'name',
+    single : 1
+  })
+  test.identical( encoding, 'js.structure' );
+
+  /* */
+
+  var encoding = _.files.encoder.deduce
+  ({
+    filePath : a.abs( 'path.out.will.yml' ),
+    feature : { reader : true },
+    returning : 'name',
+    single : 1
+  })
+  test.identical( encoding, 'yaml' );
+
+  /* */
+
+  var encoding = _.files.encoder.deduce
+  ({
+    filePath : a.abs( 'path.out.will' ),
+    ext : 'yml',
+    feature: { reader : true },
+    returning : 'name',
+    single : 1
+  })
+  test.identical( encoding, 'yaml' );
+
+  /* */
+
+  var encoding = _.files.encoder.deduce
+  ({
+    filePath : null,
+    ext : 'yml',
+    feature : { reader : true },
+    returning : 'name',
+    single : 1
+  })
+  test.identical( encoding, 'yaml' );
+
+  test.close( 'single' );
+
+  /* */
+
+  test.open( 'multiple' );
+
+  var encoding = _.files.encoder.deduce
+  ({
+    filePath : null,
+    ext : 'js',
+    format : null,
+    feature : { reader : true },
+    returning : 'name',
+    single : 0
+  })
+  test.identical( encoding, [ 'js.structure' ] );
+
+  /* */
+
+  var encoding = _.files.encoder.deduce
+  ({
+    filePath : null,
+    ext : 'js',
+    format : null,
+    feature : { writer : true },
+    returning : 'name',
+    single : 0
+  })
+  test.identical( encoding, [ 'js.structure' ] );
+
+  test.close( 'multiple' );
+
+  /* */
+
+  test.open( 'feature' );
+
+  var encoder = _.files.encoder.deduce
+  ({
+    filePath : null,
+    ext : 'js',
+    format : null,
+    feature : { reader : true },
+    returning : 'encoder',
+    single : 1
+  })
+  test.true( encoder.feature.reader );
+
+  var encoder = _.files.encoder.deduce
+  ({
+    filePath : null,
+    ext : 'js',
+    format : null,
+    feature : { writer : true },
+    returning : 'encoder',
+    single : 1
+  })
+  test.true( encoder.feature.writer );
+
+  test.close( 'feature' );
+
+  /* */
+
+  test.open( 'returning' );
+
+  var encoding = _.files.encoder.deduce
+  ({
+    filePath : null,
+    ext : 'js',
+    format : null,
+    feature : { reader : true },
+    returning : 'name',
+    single : 1
+  })
+  test.identical( encoding, 'js.structure' );
+
+  /* */
+
+  var encoder = _.files.encoder.deduce
+  ({
+    filePath : null,
+    ext : 'js',
+    format : null,
+    feature : { reader : true },
+    returning : 'encoder',
+    single : 1
+  })
+  test.true( _.objectIs( encoder ) )
+  test.true( encoder.feature.reader );
+
+  test.close( 'returning' );
+
+  /* */
+
+  if( !Config.debug )
+  return;
+
+  /* */
+
+  test.case = 'unknown ext in file path';
+  test.shouldThrowErrorSync
+  (
+    () =>
+    {
+      _.files.encoder.deduce
+      ({
+        filePath : a.abs( 'path.out.will' ),
+        feature : { reader : true },
+        returning : 'name'
+      })
+    },
+    ( err ) =>
+    {
+      test.true( _.strHas( String( err ), 'Found no reader for' ) )
+    },
+  )
+
+  /* */
+
+  test.case = 'unknown ext, no file path';
+  test.shouldThrowErrorSync
+  (
+    () =>
+    {
+      _.files.encoder.deduce
+      ({
+        filePath : null,
+        ext : 'will',
+        feature : { reader : true },
+        returning : 'name'
+      })
+    },
+    ( err ) =>
+    {
+      test.true( _.strHas( String( err ), 'Found no reader for' ) )
+    },
+  )
+
+  /* */
+
+  test.case = 'no feature defined'
+  test.shouldThrowErrorSync( () => _.files.encoder.deduce({ feature : {} }) );
+
+  /* */
+
+  test.case = 'wrong returning option value'
+  test.shouldThrowErrorSync( () => _.files.encoder.deduce({ returning : 'abc' }) );
+
+}
+
 // --
 // experiment
 // --
@@ -51270,6 +51532,7 @@ const Proto =
     // static
 
     encodersFromGdfs,
+    encoderDeduce,
 
     // experiment
 

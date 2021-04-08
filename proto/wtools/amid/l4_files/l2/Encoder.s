@@ -299,6 +299,7 @@ function deduce( o )
   _.assert( o.feature.writer || o.feature.reader );
   _.assert( _.mapIs( _.gdf.inMap ) );
   _.assert( _.mapIs( _.gdf.outMap ) );
+  _.assert( o.returning === 'name' || o.returning === 'encoder' );
 
   let fromMethodName = o.feature.writer ? 'writerFromGdf' : 'readerFromGdf';
   let typeMap = o.feature.writer ? _.gdf.outMap : _.gdf.inMap;
@@ -324,9 +325,15 @@ function deduce( o )
     for( let i2 = 0 ; i2 < typeMap[ type ].length ; i2++ )
     {
       let gdf = typeMap[ type ][ i2 ];
-      let o2 = _.mapBut_( null, o, [ 'single', 'returning', 'feature' ] );
-      let methodName = o.feature.reader ? 'supportsInput' : 'supportsOutput';
-      let supports = gdf[ methodName ]( o2 );
+      // let o2 = _.mapBut_( null, o, [ 'single', 'returning', 'feature' ] );
+      let o2 = _.mapBut_( null, o, [ 'single', 'returning', 'feature', 'format' ] );
+      if( o.feature.reader )
+      o2.inFormat = o.format;
+      else
+      o2.outFormat = o.format;
+      // let methodName = o.feature.reader ? 'supportsInput' : 'supportsOutput';
+      // let supports = gdf[ methodName ]( o2 );
+      let supports = gdf.supports( o2 );
       if( supports )
       _.arrayAppendOnce( result, _.files.encoder[ fromMethodName ]( gdf ) );
     }

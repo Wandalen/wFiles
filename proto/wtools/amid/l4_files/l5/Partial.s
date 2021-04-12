@@ -329,6 +329,18 @@ function _preFilePathScalarWithProviderDefaults( routine, args )
 {
   let self = this;
 
+  if( _.objectIs( args[ 0 ] ) )
+  if( args[ 0 ].verbosity !== undefined )
+  if( routine.defaults.logger !== undefined )
+  {
+    debugger
+    _global_.logger.styleSet( 'negative' );
+    _global_.logger.warn( 'Option verbosity will be deprecated Please use option logger.' )
+    _global_.logger.styleSet( 'default' );
+    args[ 0 ].logger = args[ 0 ].verbosity;
+    delete args[ 0 ].verbosity;
+  }
+
   let o = self._preFilePathScalarWithoutProviderDefaults.apply( self, arguments );
   self._providerDefaultsApply( o );
 
@@ -3278,6 +3290,16 @@ function fileRead_head( routine, args )
 
   if( args.length === 2 )
   args = [ { filePath : args[ 0 ], encoding : args[ 1 ] } ]; /* aaa : add test to cover this */ /* Dmytro : covered in routine `fileReadWithEncoding` */
+
+  if( args[ 0 ].verbosity !== undefined )
+  {
+    debugger
+    _global_.logger.styleSet( 'negative' );
+    _global_.logger.warn( 'Option verbosity will be deprecated Please use option logger.' )
+    _global_.logger.styleSet( 'default' );
+    args[ 0 ].logger = args[ 0 ].verbosity;
+    delete args[ 0 ].verbosity;
+  }
 
   let o = self._preFilePathScalarWithoutProviderDefaults( routine, args );
 

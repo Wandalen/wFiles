@@ -128,19 +128,19 @@ function init( o )
     if( o.logger )
     self.logger = o.logger;
     else
-    self.logger = new _.Logger({ output : console });
+    self.logger = new _.Logger({ output : console, verbosity : self.verbosity });
     self.copy( o );
   }
   else
   {
-    self.logger = new _.Logger({ output : console });
+    self.logger = new _.Logger({ output : console, verbosity : self.verbosity });
   }
 
   Self.Counter += 1;
   self.id = Self.Counter;
 
   if( self.logger === null )
-  self.logger = new _.Logger({ output : _global.logger });
+  self.logger = _.logger.fromStrictly( self.verbosity );
 
   if( o )
   if( o.protocol !== undefined || o.originPath !== undefined )
@@ -270,6 +270,8 @@ function _providerDefaultsApply( o )
     o.verbosity = 0;
   }
 
+  if( o.logger !== undefined )
+  o.logger = _.logger.maybe( o.logger );
 }
 
 //
@@ -3394,8 +3396,11 @@ function fileRead_body( o )
       return null;
     }
 
-    if( o.verbosity >= 1 )
-    self.logger.log( ' . Read .', _.color.strFormat( o.filePath, 'path' ) );
+
+    // if( o.verbosity >= 1 )
+    // self.logger.log( ' . Read .', _.color.strFormat( o.filePath, 'path' ) );
+    if( o.logger && o.logger.verbosity >= 1 )
+    o.logger.log( ' . Read .', _.color.strFormat( o.filePath, 'path' ) );
 
     o.result = data;
 
@@ -3463,7 +3468,8 @@ defaults.onEnd = null;
 defaults.onError = null;
 defaults.resolvingSoftLink = 1; /* yyy */
 defaults.resolvingTextLink = null;
-defaults.verbosity = null;
+// defaults.verbosity = null;
+defaults.logger = 0;
 
 var having = fileRead_body.having;
 having.driving = 0;
@@ -3846,7 +3852,7 @@ function hashReadAct( o )
 
   if( o.sync && _.boolLike( o.sync ) )
   {
-    let read = self.fileReadSync( o.filePath, 'buffer.raw' );
+    let read = self.fileReadSync({ filePath : o.filePath, encoding : 'buffer.raw', logger : o.logger });
     return _.files.hashFrom( read );
   }
   else if( !o.sync )
@@ -3983,7 +3989,8 @@ _.routineExtend( hashRead_body, hashReadAct );
 
 var defaults = hashRead_body.defaults;
 defaults.throwing = null;
-defaults.verbosity = null;
+// defaults.verbosity = null;
+defaults.logger = false;
 defaults.hashFileSizeLimit = null;
 
 var having = hashRead_body.having;

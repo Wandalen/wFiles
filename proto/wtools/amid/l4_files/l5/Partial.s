@@ -3990,7 +3990,7 @@ _.routineExtend( hashRead_body, hashReadAct );
 var defaults = hashRead_body.defaults;
 defaults.throwing = null;
 // defaults.verbosity = null;
-defaults.logger = null;
+defaults.logger = false;
 defaults.hashFileSizeLimit = null;
 
 var having = hashRead_body.having;

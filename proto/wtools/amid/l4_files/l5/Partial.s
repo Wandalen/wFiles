@@ -140,7 +140,7 @@ function init( o )
   self.id = Self.Counter;
 
   if( self.logger === null )
-  self.logger = new _.Logger({ output : _global.logger, verbosity : self.verbosity });
+  self.logger = _.logger.fromStrictly( self.verbosity );
 
   if( o )
   if( o.protocol !== undefined || o.originPath !== undefined )
@@ -271,12 +271,7 @@ function _providerDefaultsApply( o )
   }
 
   if( o.logger !== undefined )
-  {
-    if( o.logger === null )
-    o.logger = self.logger || _global.logger;
-    else
-    o.logger = _.logger.relativeMaybe( self.logger || _global.logger, o.logger )
-  }
+  o.logger = _.logger.maybe( o.logger );
 }
 
 //
@@ -3404,7 +3399,7 @@ function fileRead_body( o )
 
     // if( o.verbosity >= 1 )
     // self.logger.log( ' . Read .', _.color.strFormat( o.filePath, 'path' ) );
-    if( o.logger.verbosity >= 1 )
+    if( o.logger && o.logger.verbosity >= 1 )
     o.logger.log( ' . Read .', _.color.strFormat( o.filePath, 'path' ) );
 
     o.result = data;
@@ -3474,7 +3469,7 @@ defaults.onError = null;
 defaults.resolvingSoftLink = 1; /* yyy */
 defaults.resolvingTextLink = null;
 // defaults.verbosity = null;
-defaults.logger = null;
+defaults.logger = false;
 
 var having = fileRead_body.having;
 having.driving = 0;

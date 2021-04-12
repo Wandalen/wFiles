@@ -335,7 +335,7 @@ function filesReflectSingle_body( o )
   let shell = _.process.starter
   ({
     verbosity : o.verbosity - 1,
-    // logger : _.logger.relative( o.verbosity, -1 ), /* xxx : qqq : use filesReflect and in starter */
+    // logger : _.logger.relativeMaybe( o.verbosity, -1 ), /* xxx : qqq : use filesReflect and in starter */
     ready,
     currentPath : dstPath,
   });

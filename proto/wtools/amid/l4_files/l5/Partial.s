@@ -3469,7 +3469,7 @@ defaults.onError = null;
 defaults.resolvingSoftLink = 1; /* yyy */
 defaults.resolvingTextLink = null;
 // defaults.verbosity = null;
-defaults.logger = false;
+defaults.logger = 0;
 
 var having = fileRead_body.having;
 having.driving = 0;

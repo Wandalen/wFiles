@@ -469,7 +469,7 @@ function hashRead()
   record.hash = f.effectiveProvider.hashRead
   ({
     filePath : record.absolute,
-    logger : false,
+    logger : 0,
   });
 
   return record.hash;

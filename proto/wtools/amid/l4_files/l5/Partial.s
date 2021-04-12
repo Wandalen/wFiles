@@ -335,7 +335,7 @@ function _preFilePathScalarWithProviderDefaults( routine, args )
   {
     debugger
     _global_.logger.styleSet( 'negative' );
-    _global_.logger.warn( 'Option verbosity will be depracted. Please use option logger.' )
+    _global_.logger.warn( 'Option verbosity will be deprecated Please use option logger.' )
     _global_.logger.styleSet( 'default' );
     args[ 0 ].logger = args[ 0 ].verbosity;
     delete args[ 0 ].verbosity;
@@ -3295,7 +3295,7 @@ function fileRead_head( routine, args )
   {
     debugger
     _global_.logger.styleSet( 'negative' );
-    _global_.logger.warn( 'Option verbosity will be depracted. Please use option logger.' )
+    _global_.logger.warn( 'Option verbosity will be deprecated Please use option logger.' )
     _global_.logger.styleSet( 'default' );
     args[ 0 ].logger = args[ 0 ].verbosity;
     delete args[ 0 ].verbosity;

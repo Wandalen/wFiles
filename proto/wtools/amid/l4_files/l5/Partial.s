@@ -335,7 +335,7 @@ function _preFilePathScalarWithProviderDefaults( routine, args )
   {
     debugger
     _global_.logger.styleSet( 'negative' );
-    _global_.logger.warn( 'Option verbosity will be deprecated Please use option logger.' )
+    _global_.logger.warn( 'Option verbosity will be deprecated. Please use option logger.' )
     _global_.logger.styleSet( 'default' );
     args[ 0 ].logger = args[ 0 ].verbosity;
     delete args[ 0 ].verbosity;
@@ -3295,7 +3295,7 @@ function fileRead_head( routine, args )
   {
     debugger
     _global_.logger.styleSet( 'negative' );
-    _global_.logger.warn( 'Option verbosity will be deprecated Please use option logger.' )
+    _global_.logger.warn( 'Option verbosity will be deprecated. Please use option logger.' )
     _global_.logger.styleSet( 'default' );
     args[ 0 ].logger = args[ 0 ].verbosity;
     delete args[ 0 ].verbosity;
@@ -4834,6 +4834,16 @@ function fileWrite_head( routine, args )
     _.assert( _.objectIs( o ), 'Expects 2 arguments {-o.filePath-} and {-o.data-} to write, or single options map' );
   }
 
+  if( o.verbosity !== undefined )
+  {
+    debugger
+    _global_.logger.styleSet( 'negative' );
+    _global_.logger.warn( 'Option verbosity will be deprecated. Please use option logger.' )
+    _global_.logger.styleSet( 'default' );
+    o.logger = o.verbosity;
+    delete o.verbosity;
+  }
+
   _.assert( o.data !== undefined, 'Expects defined {-o.data-}' );
   _.routineOptions( routine, o );
   self._providerDefaultsApply( o );
@@ -4939,8 +4949,9 @@ function fileWrite_body( o )
 
   function log()
   {
-    if( o.verbosity >= 3 )
-    self.logger.log( ' + writing', _.entity.exportStringShallow( o.data ), 'to', o.filePath );
+    // if( o.verbosity >= 3 )
+    if( o.logger && o.logger.verbosity >= 3 )
+    o.logger.log( ' + writing', _.entity.exportStringShallow( o.data ), 'to', o.filePath );
   }
 
 }
@@ -4948,7 +4959,8 @@ function fileWrite_body( o )
 _.routineExtend( fileWrite_body, fileWriteAct );
 
 var defaults = fileWrite_body.defaults;
-defaults.verbosity = null;
+// defaults.verbosity = null;
+defaults.logger = false;
 defaults.makingDirectory = 1;
 defaults.purging = 0;
 

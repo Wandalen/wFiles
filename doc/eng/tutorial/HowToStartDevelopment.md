@@ -163,4 +163,4 @@ After opening a PR visit github to see how it looks and double-check its diff. Y
 
 ### Ask questions
 
-During the process, you will come up with a question which you can ask. If you noticed a typo or a problem in the file, please let us know.
+During the process, you will come up with questions which you can ask. If you noticed a typo or a problem in the file, please let us know.

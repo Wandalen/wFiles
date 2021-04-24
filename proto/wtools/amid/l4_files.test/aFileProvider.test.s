@@ -329,7 +329,7 @@ function readWriteOptionWriteMode( test )
 
   /* */
 
-  test.case = 'writeMode:prepend';
+  test.case = 'more test cases?';
   a.reflect();
   var data = 'data1';
   var filePath = a.abs( 'file1.txt' );

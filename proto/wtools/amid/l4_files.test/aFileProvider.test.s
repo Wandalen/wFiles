@@ -335,7 +335,7 @@ function readWriteOptionWriteMode( test )
   a.reflect();
   var data = 'data1';
   var filePath = a.abs( 'file1.txt' );
-  var writeMode = 'append';
+  var writeMode = 'prepend';
   a.fileProvider.fileWrite({filePath, data, writeMode})
   var got = a.fileProvider.fileRead( filePath );
   test.identical( got, data );

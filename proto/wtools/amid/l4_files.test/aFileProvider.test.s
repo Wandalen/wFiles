@@ -322,7 +322,11 @@ function readWriteOptionWriteMode( test )
   a.reflect();
   var data = 'data1';
   var filePath = a.abs( 'file1.txt' );
+  var got1 = a.fileProvider.fileRead( filePath ) + data;
   var writeMode = 'append';
+  a.fileProvider.fileWrite({ filePath, got1, writeMode });
+  var got=a.fileProvider.fileRead( filePath );
+  test.identical(got1, got);
 
   /* qqq : for Shivam : implmement please */
   // test.true( false );
@@ -333,7 +337,11 @@ function readWriteOptionWriteMode( test )
   a.reflect();
   var data = 'data1';
   var filePath = a.abs( 'file1.txt' );
+  var got1 = data + a.fileProvider.fileRead( filePath );
   var writeMode = 'append';
+  a.fileProvider.fileWrite({ filePath, got1, writeMode });
+  var got=a.fileProvider.fileRead( filePath );
+  test.identical(got1, got);
 
   /* qqq : for Shivam : implmement please */
   // test.true( false );

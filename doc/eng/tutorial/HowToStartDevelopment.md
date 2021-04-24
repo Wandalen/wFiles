@@ -149,7 +149,7 @@ This code read the file `file1.txt` into variable `got`.
 
 ### The first task
 
-As the first step you may extend test routine `readWriteOptionWriteMode`. Each routine cover a specific aspect of a unit. Test routines `readWrite*` covers reading/writing cycle. Test routine `readWriteOptionWriteMode` covers option `writeMode` of the `write`. Option `writeMode` may have several value. Default value of `writeMode` is `rewriting`. Please extend test routine `readWriteOptionWriteMode`.
+As the first step you may extend test routine `readWriteOptionWriteMode`. Each routine cover a specific aspect of a unit. Test routines `readWrite*` covers reading/writing cycle. Test routine `readWriteOptionWriteMode` covers option `writeMode` of the `fileWrite`. Option `writeMode` may have several value. Default value of `writeMode` is `rewriting`. Please extend test routine `readWriteOptionWriteMode`.
 
 ### Commit and push
 

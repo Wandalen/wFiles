@@ -340,6 +340,15 @@ function readWriteOptionWriteMode( test )
 
   /* */
 
+  test.case = 'writeMode:rewriting';
+  a.reflect();
+  var data = 'data1';
+  var filePath = a.abs( 'file1.txt' );
+  // var writeMode = 'rewriting'; // should be default, no need to pass
+  a.fileProvider.fileWrite({ filePath, data });
+  var got = a.fileProvider.fileRead( filePath );
+  test.identical( got, data );
+
 }
 
 //

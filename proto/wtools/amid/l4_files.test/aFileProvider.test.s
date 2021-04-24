@@ -324,7 +324,7 @@ function readWriteOptionWriteMode( test )
   var filePath = a.abs( 'file1.txt' );
   var writeMode = 'append';
 
-  /* qqq : for Shivam : implmement please */
+  /* qqq : for junior : implmement please */
   // test.true( false );
 
   /* */
@@ -335,7 +335,7 @@ function readWriteOptionWriteMode( test )
   var filePath = a.abs( 'file1.txt' );
   var writeMode = 'append';
 
-  /* qqq : for Shivam : implmement please */
+  /* qqq : for junior : implmement please */
   // test.true( false );
 
   /* */

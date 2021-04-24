@@ -320,12 +320,15 @@ function readWriteOptionWriteMode( test )
 
   test.case = 'writeMode:append';
   a.reflect();
+  var initialData = "Initial Data"
   var data = 'data1';
   var filePath = a.abs( 'file1.txt' );
+  a.fileProvider.fileWrite( filePath, initialData );
   var writeMode = 'append';
   a.fileProvider.fileWrite({ filePath, data, writeMode });
   var got = a.fileProvider.fileRead( filePath );
-  test.identical( got, data );
+  var modified =  initialData + data;
+  test.identical( got, modified );
 
   /* qqq : for junior : implmement please */
   // test.true( false );
@@ -334,12 +337,15 @@ function readWriteOptionWriteMode( test )
 
   test.case = 'writeMode:prepend';
   a.reflect();
+  var initialData = "Initial Data"
   var data = 'data1';
   var filePath = a.abs( 'file1.txt' );
+  a.fileProvider.fileWrite( filePath, initialData );
   var writeMode = 'prepend';
   a.fileProvider.fileWrite({ filePath, data, writeMode });
   var got = a.fileProvider.fileRead( filePath );
-  test.identical( got, data );
+  var modified = data + initialData
+  test.identical( got, modified );
 
   /* qqq : for junior : implmement please */
   // test.true( false );

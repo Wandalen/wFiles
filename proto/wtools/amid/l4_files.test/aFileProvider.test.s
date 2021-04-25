@@ -324,6 +324,20 @@ function readWriteOptionWriteMode( test )
   var filePath = a.abs( 'file1.txt' );
   var writeMode = 'append';
 
+  /* "data1" appended */ 
+  a.fileProvider.fileWrite({ filePath, data, writeMode });
+  var got = a.fileProvider.fileRead( filePath );
+  test.identical( got, data );
+
+  /* "data1" appended again */ 
+  a.fileProvider.fileWrite({ filePath, data, writeMode });
+  var got = a.fileProvider.fileRead( filePath );
+
+  var newData = "data1data1";
+  test.identical( got, newData );
+  test.notIdentical( got, data );
+
+
   /* qqq : for junior : implement please */
   // test.true( false );
 

@@ -323,9 +323,9 @@ function readWriteOptionWriteMode( test )
   var data = 'data1';
   var filePath = a.abs( 'file1.txt' );
   var writeMode = 'append';
-
-  /* qqq : for Shivam : implmement please */
-  // test.true( false );
+  a.fileProvider.fileWrite({ filePath, data, writeMode });
+  var got = a.fileProvider.fileRead( filePath );
+  test.identical( got, data );
 
   /* */
 
@@ -333,10 +333,20 @@ function readWriteOptionWriteMode( test )
   a.reflect();
   var data = 'data1';
   var filePath = a.abs( 'file1.txt' );
-  var writeMode = 'append';
+  var writeMode = 'prepend';
+  a.fileProvider.fileWrite({ filePath, data, writeMode });
+  var got = a.fileProvider.fileRead( filePath );
+  test.identical( got, data );
 
-  /* qqq : for Shivam : implmement please */
-  // test.true( false );
+  /* */
+
+  test.case = 'writeMode:rewriting';
+  a.reflect();
+  var data = 'data1';
+  var filePath = a.abs( 'file1.txt' );
+  a.fileProvider.fileWrite({ filePath, data });
+  var got = a.fileProvider.fileRead( filePath );
+  test.identical( got, data );
 
   /* */
 

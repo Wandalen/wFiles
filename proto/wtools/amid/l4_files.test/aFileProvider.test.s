@@ -347,7 +347,23 @@ function readWriteOptionWriteMode( test )
   a.reflect();
   var data = 'data1';
   var filePath = a.abs( 'file1.txt' );
-  var writeMode = 'append';
+  var writeMode = 'prepend';
+
+  /* "data1" prepended */ 
+  a.fileProvider.fileWrite({ filePath, data, writeMode });
+  var got = a.fileProvider.fileRead( filePath );
+  test.identical( got, data );
+
+  /* "data1" prepended again */ 
+  var data = 'data2';
+  a.fileProvider.fileWrite({ filePath, data, writeMode });
+  var got = a.fileProvider.fileRead( filePath );
+  
+  // console.log(got);
+  
+  var newData = "data2data1";
+  test.identical( got, newData );
+  test.notIdentical( got, data );
 
   /* qqq : for junior : implement please */
   // test.true( false );
